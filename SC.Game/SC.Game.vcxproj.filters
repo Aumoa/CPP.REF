@@ -1,0 +1,755 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="..\Include\SC.Game.h" />
+    <ClInclude Include="Details.ShaderBuilder.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Application.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\GameObject.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\SceneManager.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Input.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\CameraClearModeSkybox.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\CameraClearMode.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\CameraClearModeColor.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AppConfiguration.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AppDuplicateException.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Debug.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\IAsyncLoad.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Quaternion.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Time.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UnhandledErrorDetectedEventArgs.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Vector.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AnimationClip.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AnimationState.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AnimatorController.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AnimVar.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AnimationTransitionCondition.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Keyframes.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Keyframe.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Ray.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Trigger.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Scene.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Texture2D.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Material.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\RenderQueueLayer.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\KeyCode.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectEnumerator.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\AssetBundle.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Assets.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Component.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\RenderTexture2D.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Transform.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Mesh.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Animator.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Bone.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\DirectionalLight.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Light.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\MeshFilter.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\MeshRenderer.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\SkinnedMeshRenderer.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.AssimpParser.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.AsyncLoad.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CBuffer.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CCommandQueue.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CDevice.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CDeviceContext.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CDynamicBuffer.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CGraphicsPipelineStateDesc.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CRootSignatureDesc.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CShaderResourceView.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CSwapChain.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.GameLogic.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.GeometryBuffer.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.GlobalVar.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.HDRBuffer.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.HeapAllocator.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.IntegratedFactory.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.M3DParser.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.MDLParser.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.TextParser.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.ViewStorage.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.VisibleViewStorage.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Camera.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.h" />
+    <ClInclude Include="Details.CUnorderedAccessView.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.CView.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.HDRComputedBuffer.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Anchor.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Element.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Canvas.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Panel.h">
+      <Filter>UI.Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.RelativePanel.h">
+      <Filter>UI.Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.Panel.Enumerator.h">
+      <Filter>UI.Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.FixedPanel.h">
+      <Filter>UI.Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Page.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\Vertex.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.DispatcherEventArgs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.MouseClickEventArgs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.MouseMoveEventArgs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.NavigationEventArgs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.KeyboardEventArgs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.DependencyObject.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.DispatcherEventType.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.DependencyProperty.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.MouseButtonType.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.TextAlignment.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.TextVerticalAlignment.h">
+      <Filter>Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Thickness.h">
+      <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.TextFormat.h">
+      <Filter>UI.Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.TextBlock.h">
+      <Filter>UI.Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.GlyphRenderer.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Brush.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.SolidColorBrush.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.RichTextColorUnknown.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.ShaderInfo.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Shapes.Shape.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Shapes.Rectangle.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Border.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.RevealBrush.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Image.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.GridView.h">
+      <Filter>UI.View</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.ViewBase.h">
+      <Filter>UI.View</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.Button.h">
+      <Filter>UI.Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SC.Game\UI.ProgressBar.h">
+      <Filter>UI.Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Details.GarbageCollector.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Details.ShaderBuilder.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.SkyboxShader.cpp">
+      <Filter>Shaders\SkyboxShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.ColorShader.cpp">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.ToneMappingShader.cpp">
+      <Filter>Shaders\ToneMappingShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.HDRShader.cpp">
+      <Filter>Shaders\HDRShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.HDRColorShader.cpp">
+      <Filter>Shaders\HDRColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.ShadowCastShader.cpp">
+      <Filter>Shaders\ShadowCastShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.HDRComputeShader.cpp">
+      <Filter>Shaders\HDRComputeShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="AppConfiguration.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="AppDuplicateException.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="UnhandledErrorDetectedEventArgs.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationClip.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationState.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimatorController.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetBundle.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTexture2D.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Animator.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Bone.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshFilter.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinnedMeshRenderer.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.AssimpParser.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CBuffer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CCommandQueue.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CDevice.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CDeviceContext.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CDynamicBuffer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CShaderResourceView.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CSwapChain.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.GameLogic.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.GeometryBuffer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.GlobalVar.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.HDRBuffer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.HeapAllocator.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.IntegratedFactory.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.M3DParser.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.MDLParser.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.TextParser.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ViewStorage.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.VisibleViewStorage.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CView.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.CUnorderedAccessView.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.HDRComputedBuffer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.GlyphBuffer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Element.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Canvas.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Panel.cpp">
+      <Filter>UI.Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.RelativePanel.cpp">
+      <Filter>UI.Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.FixedPanel.cpp">
+      <Filter>UI.Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Panel.Enumerator.cpp">
+      <Filter>UI.Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Page.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.DispatcherEventArgs.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.KeyboardEventArgs.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.MouseClickEventArgs.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.MouseMoveEventArgs.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.NavigationEventArgs.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.DependencyObject.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.TextFormat.cpp">
+      <Filter>UI.Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.TextBlock.cpp">
+      <Filter>UI.Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.GlyphRenderer.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.IntegratedUIShader.cpp">
+      <Filter>Shaders\IntegratedUIShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.ShaderBuilder.TextAndRectShader.cpp">
+      <Filter>Shaders\TextAndRectShader</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Brush.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.SolidColorBrush.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Shapes.Shape.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Shapes.Rectangle.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Border.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.RevealBrush.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Image.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.GridView.cpp">
+      <Filter>UI.View</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.ViewBase.cpp">
+      <Filter>UI.View</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.Button.cpp">
+      <Filter>UI.Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.GarbageCollector.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{fccb02da-7d5e-4226-9175-af72357c3379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\ColorShader">
+      <UniqueIdentifier>{2a8b0285-0746-4f51-82fe-0d12bb28d734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\SkyboxShader">
+      <UniqueIdentifier>{50747596-9a11-4554-9c92-7913b5e97eff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Common">
+      <UniqueIdentifier>{5a6109c0-f40d-4689-ac49-0f9722a25229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\ToneMappingShader">
+      <UniqueIdentifier>{f6fd0c6c-8f34-427c-b28a-ee31f345d05d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\HDRShader">
+      <UniqueIdentifier>{02eb4170-6db8-4659-8aaf-33927ebddfde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\HDRColorShader">
+      <UniqueIdentifier>{977b7b7e-90c0-46e4-ae44-26c5c6e8a295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\ShadowCastShader">
+      <UniqueIdentifier>{88a0d64e-b225-4ae2-9729-cd530f5cff65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\HDRComputeShader">
+      <UniqueIdentifier>{a1be27dc-f6dc-4de9-bf81-f0f32c5fae36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Details">
+      <UniqueIdentifier>{35cd9085-d37c-4283-a00d-24d121dc9b44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{91cc45ee-252d-4899-ba44-eb87670602e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{95a59313-83d8-4a6a-9877-f03fb5b2be6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Struct">
+      <UniqueIdentifier>{72789bbc-fef2-4340-959b-c74acbc9d649}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{73383e3b-399f-4108-bff6-aecec585cb02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enum">
+      <UniqueIdentifier>{21ffb79f-42ab-47b1-9dfb-732c9e07eb98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{03a1dade-afae-449b-865c-16a105463eae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI.Panel">
+      <UniqueIdentifier>{a21c776f-6777-4e70-a2ad-1fdcbaaf094b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI.Controls">
+      <UniqueIdentifier>{af7af8b8-5ae5-4f77-a58c-f101654a2ad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\IntegratedUIShader">
+      <UniqueIdentifier>{a498497b-6a5a-4107-a0da-123971f1ae1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\TextAndRectShader">
+      <UniqueIdentifier>{b804fba2-f1ab-4c38-b4be-1715d662691f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI.View">
+      <UniqueIdentifier>{691b2983-f508-4d90-9425-0f333da732ca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="ColorVertexShader.hlsl">
+      <Filter>Shaders\ColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorPixelShader.hlsl">
+      <Filter>Shaders\ColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxVertexShader.hlsl">
+      <Filter>Shaders\SkyboxShader</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxPixelShader.hlsl">
+      <Filter>Shaders\SkyboxShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ToneMappingVertexShader.hlsl">
+      <Filter>Shaders\ToneMappingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ToneMappingPixelShader.hlsl">
+      <Filter>Shaders\ToneMappingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRVertexShader.hlsl">
+      <Filter>Shaders\HDRShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRPixelShader.hlsl">
+      <Filter>Shaders\HDRShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRColorVertexShader.hlsl">
+      <Filter>Shaders\HDRColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRColorPixelShader.hlsl">
+      <Filter>Shaders\HDRColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowCastVertexShader.hlsl">
+      <Filter>Shaders\ShadowCastShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowCastPixelShader.hlsl">
+      <Filter>Shaders\ShadowCastShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRComputeSamplingShader.hlsl">
+      <Filter>Shaders\HDRComputeShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRComputeLumCompressShader.hlsl">
+      <Filter>Shaders\HDRComputeShader</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRComputeAverageLumShader.hlsl">
+      <Filter>Shaders\HDRComputeShader</Filter>
+    </FxCompile>
+    <FxCompile Include="TextAndRectVertexShader.hlsl">
+      <Filter>Shaders\TextAndRectShader</Filter>
+    </FxCompile>
+    <FxCompile Include="TextAndRectPixelShader.hlsl">
+      <Filter>Shaders\TextAndRectShader</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vertex.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="Camera.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="Transform.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="GammaHelper.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="Light.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="Material.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="HDR.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+    <None Include="Details.GlyphBuffer.h">
+      <Filter>Details</Filter>
+    </None>
+    <None Include="Common.hlsli">
+      <Filter>Shaders\IntegratedUIShader</Filter>
+    </None>
+    <None Include="Brush.hlsli">
+      <Filter>Shaders\Common</Filter>
+    </None>
+  </ItemGroup>
+</Project>
