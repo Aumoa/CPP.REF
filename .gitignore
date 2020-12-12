@@ -338,3 +338,7 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# ThirdParty generated projects
+ThirdParty/PhysX/physx/compiler/vc16win64/
+ThirdParty/PhysX/physx/include/PxConfig.h
