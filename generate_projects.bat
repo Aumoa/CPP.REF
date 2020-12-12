@@ -1,5 +1,7 @@
 :: Copyright 2020 Aumoa.lib. All right reserved.
 
+cd ThirdParty
+
 cd assimp
 rmdir /s /q BINARIES
 start generate_projects.bat
