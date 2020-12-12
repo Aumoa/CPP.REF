@@ -39,6 +39,42 @@ void RemoveGUID(Dictionary<string, string> path_guid, string file)
     string right = text.Substring(guidEnd);
 
     string final = left + path_guid[file] + right;
+
+    int seekpos = 0;
+    while (true)
+    {
+        int reference_start = final.IndexOf("<ProjectReference ", seekpos);
+        if (reference_start == -1)
+        {
+            break;
+        }
+
+        int reference_end = final.IndexOf("</ProjectReference>", reference_start);
+        if (reference_end == -1)
+        {
+            break;
+        }
+
+        int include_start = final.IndexOf("Include=\"", reference_start) + "Include=\"".Length;
+        int include_end = final.IndexOf('\"', include_start);
+        string fullpath = final.Substring(include_start, include_end - include_start);
+
+        foreach (var keys in path_guid)
+        {
+            if (fullpath.EndsWith(keys.Key))
+            {
+                int projref_start = final.IndexOf("<Project>", include_end) + "<Project>".Length;
+                int projref_end = final.IndexOf("</Project>", projref_start);
+
+                string oldGuid = final.Substring(projref_start, projref_end - projref_start);
+                final.Replace(oldGuid, keys.Value);
+                break;
+            }
+        }
+
+        seekpos = reference_end;
+    }
+
     var stream = File.CreateText(file);
     stream.Write(final);
     stream.Flush();
@@ -91,7 +127,7 @@ Dictionary<string, string> ParseSolution()
     return path_guid;
 }
 
-Console.WriteLine($"Clear project guid in {args[0]} directory.");
+Console.WriteLine($"Clear projects guid.");
 
 Dictionary<string, string> path_guid = ParseSolution();
 

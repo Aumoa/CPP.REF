@@ -35,7 +35,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{4e5964f6-c4e6-4a98-96b3-4344b2f02698}</ProjectGuid>
+    <ProjectGuid>{4E5964F6-C4E6-4A98-96B3-4344B2F02698}</ProjectGuid>
     <RootNamespace>THourai</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
