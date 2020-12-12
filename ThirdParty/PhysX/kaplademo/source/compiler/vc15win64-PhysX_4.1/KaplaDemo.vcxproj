@@ -19,7 +19,7 @@
 		</ProjectConfiguration>
 	</ItemGroup>
 	<PropertyGroup Label="Globals">
-		<ProjectGuid>{6E287960-8900-CF0B-BACC-4AC0C281B53A}</ProjectGuid>
+		
 		<RootNamespace>KaplaDemo</RootNamespace>
 	</PropertyGroup>
 	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

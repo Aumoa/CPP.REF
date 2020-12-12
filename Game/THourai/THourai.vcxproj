@@ -25,9 +25,6 @@
     <ProjectReference Include="..\..\ThirdParty\assimp\BINARIES\x64\code\assimp.vcxproj">
       <Project>{3bb5d697-f1e4-377a-ac8e-fcee3b6780cd}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\ThirdParty\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysX.vcxproj">
-      <Project>{39170b47-5d58-3c57-89ec-f030b7c983c7}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\ThirdParty\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
       <Project>{e2c58007-6b8d-3ed8-8466-4abc26fe81f0}</Project>
     </ProjectReference>

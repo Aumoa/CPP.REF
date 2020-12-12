@@ -356,3 +356,11 @@ ThirdParty/PhysX/physx/bin/*/*/*
 !ThirdParty/PhysX/physx/bin/*/*/glut32.dll
 !ThirdParty/PhysX/physx/bin/*/*/PhysXDevice64.dll
 !ThirdParty/PhysX/physx/bin/*/*/PhysXGpu_64.dll
+
+# Program builds
+Build/*
+!Build/Program
+Build/Program/*
+!Build/Program/net5.0
+Build/Program/net5.0/*
+!Build/Program/net5.0/GUIDRemover.*
