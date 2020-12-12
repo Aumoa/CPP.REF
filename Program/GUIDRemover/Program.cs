@@ -127,7 +127,7 @@ Dictionary<string, string> ParseSolution()
     return path_guid;
 }
 
-Console.WriteLine($"Clear projects guid.");
+Console.WriteLine($"Clear {args[0]} projects guid.");
 
 Dictionary<string, string> path_guid = ParseSolution();
 

@@ -23,13 +23,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ThirdParty\assimp\BINARIES\x64\code\assimp.vcxproj">
-      <Project>{3bb5d697-f1e4-377a-ac8e-fcee3b6780cd}</Project>
+      <Project>{3BB5D697-F1E4-377A-AC8E-FCEE3B6780CD}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ThirdParty\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
-      <Project>{e2c58007-6b8d-3ed8-8466-4abc26fe81f0}</Project>
+      <Project>{E2C58007-6B8D-3ED8-8466-4ABC26FE81F0}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ThirdParty\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXFoundation.vcxproj">
-      <Project>{d74e0618-78e4-34a4-8ece-206e7a30c5c5}</Project>
+      <Project>{D74E0618-78E4-34A4-8ECE-206E7A30C5C5}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
