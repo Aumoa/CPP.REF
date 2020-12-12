@@ -67,7 +67,7 @@ void RemoveGUID(Dictionary<string, string> path_guid, string file)
                 int projref_end = final.IndexOf("</Project>", projref_start);
 
                 string oldGuid = final.Substring(projref_start, projref_end - projref_start);
-                final.Replace(oldGuid, keys.Value);
+                final = final.Replace(oldGuid, keys.Value);
                 break;
             }
         }
