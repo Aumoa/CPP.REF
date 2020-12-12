@@ -351,5 +351,5 @@ ThirdParty/PhysX/physx/bin/*/*
 !ThirdParty/PhysX/physx/bin/*/*/
 ThirdParty/PhysX/physx/bin/*/*/*
 !ThirdParty/PhysX/physx/bin/*/*/glut32.dll
-!ThirdParty/PhysX/physx/bin/*/*/PhysXDevice.dll
-!ThirdParty/PhysX/physx/bin/*/*/PhysXGpu_32.dll
+!ThirdParty/PhysX/physx/bin/*/*/PhysXDevice64.dll
+!ThirdParty/PhysX/physx/bin/*/*/PhysXGpu_64.dll
