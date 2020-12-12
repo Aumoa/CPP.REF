@@ -59,7 +59,9 @@ def noPresetProvided():
     	input = raw_input
     except NameError: 
     	pass    
-    mode = int(input('Enter preset number: '))
+    # mode = int(input('Enter preset number: '))
+    # Auto select for visual studio 2019 and 64bit.
+    mode = 13
     print('Running generate_projects.bat ' + presetList[mode])
     return presetList[mode]
 
