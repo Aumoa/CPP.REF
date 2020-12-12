@@ -6,6 +6,7 @@
 #include "PxPhysicsVersion.h"
 #include "extensions/PxDefaultAllocator.h"
 #include "extensions/PxDefaultErrorCallback.h"
+#include "assimp/Importer.hpp"
 
 using namespace physx;
 
@@ -15,6 +16,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE _, char* cmdLine, int nShow
 	PxDefaultErrorCallback defaultCallback;
 
 	auto pxf = PxCreateFoundation(PX_PHYSICS_VERSION, defaultAllocator, defaultCallback);
+
+	Assimp::Importer importer;
 
 	return 0;
 }
