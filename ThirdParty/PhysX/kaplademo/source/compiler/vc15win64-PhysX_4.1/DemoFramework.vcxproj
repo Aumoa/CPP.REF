@@ -19,7 +19,7 @@
 		</ProjectConfiguration>
 	</ItemGroup>
 	<PropertyGroup Label="Globals">
-		
+		<ProjectGuid>{334F4422-2744-A7F0-A2CA-E6E2CE04CA5C}</ProjectGuid>
 		<RootNamespace>DemoFramework</RootNamespace>
 	</PropertyGroup>
 	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

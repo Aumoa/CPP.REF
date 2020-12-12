@@ -1,2 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Public">
+      <UniqueIdentifier>{f6ff337a-3a80-4c13-9abd-731afa1e516f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{3575e8d8-8de8-4086-baff-0c46e1816c16}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\Object.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\CoreAPI.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\Object.ixx">
+      <Filter>Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

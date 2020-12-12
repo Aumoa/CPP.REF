@@ -19,7 +19,7 @@
 		</ProjectConfiguration>
 	</ItemGroup>
 	<PropertyGroup Label="Globals">
-		
+		<ProjectGuid>{7D20139C-09F4-B0C5-B9C9-8E603785931F}</ProjectGuid>
 		<RootNamespace>glew-MT</RootNamespace>
 	</PropertyGroup>
 	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

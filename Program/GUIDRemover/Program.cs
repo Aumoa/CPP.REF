@@ -4,14 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-List<string> FilterFiles(string[] files)
+List<string> FilterFiles(Dictionary<string, string> path_guid, string[] files)
 {
     var filtered = new List<string>();
     filtered.Capacity = files.Length;
 
     foreach (var file in files)
     {
-        if (file.EndsWith(".vcxproj"))
+        if (path_guid.ContainsKey(file))
         {
             filtered.Add(file);
         }
@@ -20,7 +20,7 @@ List<string> FilterFiles(string[] files)
     return filtered;
 }
 
-void RemoveGUID(string file)
+void RemoveGUID(Dictionary<string, string> path_guid, string file)
 {
     string text = File.ReadAllText(file);
     int guidStart = text.IndexOf("<ProjectGuid>");
@@ -35,10 +35,10 @@ void RemoveGUID(string file)
         return;
     }
 
-    string left = text.Substring(0, guidStart);
-    string right = text.Substring(guidEnd + "</ProjectGuid>".Length);
+    string left = text.Substring(0, guidStart + "<ProjectGuid>".Length);
+    string right = text.Substring(guidEnd);
 
-    string final = left + right;
+    string final = left + path_guid[file] + right;
     var stream = File.CreateText(file);
     stream.Write(final);
     stream.Flush();
@@ -47,11 +47,57 @@ void RemoveGUID(string file)
     Console.WriteLine($"{file} Cleared.");
 }
 
+void ParseSingleProject(string projectLine, out string path, out string guid)
+{
+    string[] left_right = projectLine.Split('=', StringSplitOptions.RemoveEmptyEntries);
+    string left = left_right[0];
+    string right = left_right[1];
+
+    string[] pars = right.Split(',', StringSplitOptions.RemoveEmptyEntries);
+    string name = pars[0];
+    path = pars[1].Trim().Trim('\"');
+    guid = pars[2].Trim().Trim('\"');
+
+    Console.WriteLine("Dictionary[{0}] = {1}", path, guid);
+}
+
+Dictionary<string, string> ParseSolution()
+{
+    string sln = File.ReadAllText("SC.sln");
+
+    var path_guid = new Dictionary<string, string>();
+
+    int seekpos = 0;
+    while (true)
+    {
+        int beg = sln.IndexOf("Project(\"{", seekpos);
+        if (beg == -1)
+        {
+            break;
+        }
+
+        int end = sln.IndexOf("EndProject", beg);
+        if (end == -1)
+        {
+            break;
+        }
+
+        ParseSingleProject(sln.Substring(beg, end - beg), out string path, out string guid);
+        seekpos = end;
+
+        path_guid.Add(path, guid);
+    }
+
+    return path_guid;
+}
+
 Console.WriteLine($"Clear project guid in {args[0]} directory.");
 
+Dictionary<string, string> path_guid = ParseSolution();
+
 var files = Directory.GetFiles(args[0], "*.*", SearchOption.AllDirectories);
-var vcprojs = FilterFiles(files);
+var vcprojs = FilterFiles(path_guid, files);
 foreach (var file in vcprojs)
 {
-    RemoveGUID(file);
+    RemoveGUID(path_guid, file);
 }
