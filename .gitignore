@@ -342,3 +342,6 @@ healthchecksdb
 # ThirdParty generated projects
 ThirdParty/PhysX/physx/compiler/vc16win64/
 ThirdParty/PhysX/physx/include/PxConfig.h
+!glut32.dll
+!PhysXDevice64.dll
+!PhysXGpu_64.dll
