@@ -2,22 +2,60 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Public">
-      <UniqueIdentifier>{f6ff337a-3a80-4c13-9abd-731afa1e516f}</UniqueIdentifier>
+      <UniqueIdentifier>{e4a6eec7-8d0a-4653-b819-cd529523a99e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private">
-      <UniqueIdentifier>{3575e8d8-8de8-4086-baff-0c46e1816c16}</UniqueIdentifier>
+      <UniqueIdentifier>{83ed1748-60ea-4f73-a097-1333ee16ac06}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public\Object.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\CoreAPI.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\CoreConcepts.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Exception.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\InvalidCastException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Object.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\String.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\TRefPtr.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\CoreMinimal.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Object.ixx">
+    <None Include="Public\String.inl">
+      <Filter>Public</Filter>
+    </None>
+    <None Include="Public\TRefPtr.inl">
+      <Filter>Public</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\Object.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\String.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TRefPtr.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Exception.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\InvalidCastException.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
