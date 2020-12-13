@@ -18,55 +18,35 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Engine\Runtime\Core\Core.vcxproj">
-      <Project>{2d9c1fc7-8c2e-4f0e-938b-8f9967b975b1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Engine\Runtime\Game\Game.vcxproj">
-      <Project>{2c0cdb0c-5e08-4f8e-9978-326beec3fcc6}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ThirdParty\assimp\BINARIES\x64\code\assimp.vcxproj">
-      <Project>{3BB5D697-F1E4-377A-AC8E-FCEE3B6780CD}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ThirdParty\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
-      <Project>{E2C58007-6B8D-3ED8-8466-4ABC26FE81F0}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ThirdParty\PhysX\physx\compiler\vc16win64\sdk_source_bin\PhysXFoundation.vcxproj">
-      <Project>{D74E0618-78E4-34A4-8ECE-206E7A30C5C5}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Private\WinMain.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{4E5964F6-C4E6-4A98-96B3-4344B2F02698}</ProjectGuid>
-    <RootNamespace>THourai</RootNamespace>
+    <ProjectGuid>{2c0cdb0c-5e08-4f8e-9978-326beec3fcc6}</ProjectGuid>
+    <RootNamespace>Game</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -98,22 +78,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ThirdParty\PhysX\pxshared\include;$(SolutionDir)ThirdParty\PhysX\physx\include;$(SolutionDir)ThirdParty\assimp\include;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include;$(SolutionDir)Engine\Runtime\Core\Public;$(SolutionDir)Engine\Runtime\Game\Public;$(ProjectDir)Public;$(ProjectDir)Private;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public;$(ProjectDir)Private;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ThirdParty\PhysX\pxshared\include;$(SolutionDir)ThirdParty\PhysX\physx\include;$(SolutionDir)ThirdParty\assimp\include;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include;$(SolutionDir)Engine\Runtime\Core\Public;$(SolutionDir)Engine\Runtime\Game\Public;$(ProjectDir)Public;$(ProjectDir)Private;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public;$(ProjectDir)Private;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,7 +103,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -130,25 +111,22 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_GAME_API__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -156,9 +134,8 @@ xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(Ou
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_GAME_API__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -166,12 +143,26 @@ xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(Ou
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\AppDuplicationException.h" />
+    <ClInclude Include="Public\Application.h" />
+    <ClInclude Include="Public\GameAPI.h" />
+    <ClInclude Include="Public\WindowsMinimal.h" />
+    <ClInclude Include="Public\WinException.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.vcxproj">
+      <Project>{2d9c1fc7-8c2e-4f0e-938b-8f9967b975b1}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\AppDuplicationException.cpp" />
+    <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\WinException.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

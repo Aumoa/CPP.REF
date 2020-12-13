@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Public">
+      <UniqueIdentifier>{9ede1bac-9c9c-48e6-a563-df3265bb0bbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{fb0a086a-e3b9-4418-bdc6-e086d607074e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\GameAPI.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Application.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\AppDuplicationException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\WindowsMinimal.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\WinException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\AppDuplicationException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Application.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WinException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
