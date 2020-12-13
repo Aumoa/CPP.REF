@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>G:\CPP.REF\Build\Program\</OutputPath>
+    <OutputPath>$(SolutionDir)Build\Program\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>G:\CPP.REF\Build\Program\</OutputPath>
+    <OutputPath>$(SolutionDir)Build\Program\</OutputPath>
   </PropertyGroup>
 
 </Project>
