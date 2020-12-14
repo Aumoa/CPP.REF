@@ -50,15 +50,27 @@ namespace SC::Runtime::Core
 			return hash_code;
 		}
 
-		TRet Invoke(TArgs... args)
+		TRet Invoke(TArgs... args) const
 		{
 			return callable(args...);
 		}
 
-		TRet operator()(TArgs... args)
+		TRet operator()(TArgs... args) const
 		{
 			return Invoke(args...);
 		}
+	};
+
+	template<class T, class TFunc> requires TIsBaseOf<T, Object>
+	struct TObjectDelegateArgs
+	{
+
+	};
+
+	template<class T, class TRet, class... TArgs>
+	struct TObjectDelegateArgs<T, TRet(TArgs...)>
+	{
+
 	};
 
 	template<class T>
@@ -104,12 +116,17 @@ namespace SC::Runtime::Core
 			RemoveInternal(wrap_hash);
 		}
 
-		void operator()(TArgs... args) const
+		void Invoke(TArgs... args) const
 		{
 			for (auto& item : functions)
 			{
 				item(args...);
 			}
+		}
+
+		void operator()(TArgs... args)
+		{
+			Invoke(args...);
 		}
 
 		template<TIsCallable T>

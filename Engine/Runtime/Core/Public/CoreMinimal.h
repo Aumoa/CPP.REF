@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "CoreAPI.h"
 #include "Object.h"
 #include "CoreString.h"
 #include "TRefPtr.h"

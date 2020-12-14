@@ -18,6 +18,8 @@ namespace SC::Runtime::Core
 	class TRefPtr
 	{
 		friend class Object;
+		template<TIsRefCore O>
+		friend class TRefPtr;
 
 	public:
 		using Type = T;
