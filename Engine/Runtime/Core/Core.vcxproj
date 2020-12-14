@@ -152,6 +152,7 @@
     <ClInclude Include="Public\CoreMinimal.h" />
     <ClInclude Include="Public\Exception.h" />
     <ClInclude Include="Public\InvalidCastException.h" />
+    <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\CoreString.h" />
     <ClInclude Include="Public\TRefPtr.h" />

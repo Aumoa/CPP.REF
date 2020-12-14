@@ -46,4 +46,10 @@ namespace SC::Runtime::Core
 	concept TIsChar =
 		TIsSame<TChar, char> ||
 		TIsSame<TChar, wchar_t>;
+
+	template<class TCallable>
+	concept TIsCallable = requires(TCallable Callable)
+	{
+		{ Callable() };
+	};
 }

@@ -6,3 +6,4 @@
 #include "CoreString.h"
 #include "TRefPtr.h"
 #include "Exception.h"
+#include "TMulticastDelegate.h"

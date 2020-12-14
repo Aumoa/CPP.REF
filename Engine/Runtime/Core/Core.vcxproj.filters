@@ -30,6 +30,9 @@
     <ClInclude Include="Public\CoreMinimal.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\TMulticastDelegate.h">
+      <Filter>Public</Filter>
+    </ClInclude>
     <ClInclude Include="Public\CoreString.h">
       <Filter>Public</Filter>
     </ClInclude>
