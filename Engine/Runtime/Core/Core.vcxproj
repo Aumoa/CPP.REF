@@ -151,6 +151,7 @@
     <ClInclude Include="Public\CoreConcepts.h" />
     <ClInclude Include="Public\CoreMinimal.h" />
     <ClInclude Include="Public\Exception.h" />
+    <ClInclude Include="Public\InvalidArgumentException.h" />
     <ClInclude Include="Public\InvalidCastException.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Exception.cpp" />
+    <ClCompile Include="Private\InvalidArgumentException.cpp" />
     <ClCompile Include="Private\InvalidCastException.cpp" />
     <ClCompile Include="Private\Object.cpp" />
     <ClCompile Include="Private\String.cpp" />

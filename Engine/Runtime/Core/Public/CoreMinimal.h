@@ -6,5 +6,8 @@
 #include "Object.h"
 #include "CoreString.h"
 #include "TRefPtr.h"
-#include "Exception.h"
 #include "TMulticastDelegate.h"
+
+#include "Exception.h"
+#include "InvalidCastException.h"
+#include "InvalidArgumentException.h"

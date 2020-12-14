@@ -36,6 +36,9 @@
     <ClInclude Include="Public\CoreString.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\InvalidArgumentException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -59,6 +62,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\InvalidCastException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\InvalidArgumentException.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
