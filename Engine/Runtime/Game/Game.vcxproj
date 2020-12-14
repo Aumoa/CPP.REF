@@ -121,11 +121,13 @@
       <PreprocessorDefinitions>_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_GAME_API__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,6 +139,7 @@
       <PreprocessorDefinitions>NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_GAME_API__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,12 +147,23 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
+    <ClInclude Include="Private\D3D12RHI\HResultException.h" />
+    <ClInclude Include="Private\D3D12RHI\RHIDeviceBundle.h" />
+    <ClInclude Include="Private\Engine.h" />
+    <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
     <ClInclude Include="Public\GameAPI.h" />
+    <ClInclude Include="Public\IEngineTick.h" />
+    <ClInclude Include="Public\Logging\LogCategoryBase.h" />
+    <ClInclude Include="Public\Logging\Logger.h" />
+    <ClInclude Include="Public\Logging\LogVerbosity.h" />
+    <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
   </ItemGroup>
@@ -161,7 +175,16 @@
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
+    <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
+    <ClCompile Include="Private\D3D12RHI\RHIDeviceBundle.cpp" />
+    <ClCompile Include="Private\Engine.cpp" />
+    <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
+    <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

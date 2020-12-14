@@ -5,9 +5,8 @@
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
 
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE _, char*, INT)
+INT WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE _, _In_ LPSTR, _In_ INT)
 {
-	auto app = Object::NewObject<Application>("MyApp");
-
-	return 0;
+	auto app = Object::NewObject<Application>(L"GameApp");
+	return app->Run();
 }

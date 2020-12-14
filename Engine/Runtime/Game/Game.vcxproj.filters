@@ -7,6 +7,18 @@
     <Filter Include="Private">
       <UniqueIdentifier>{fb0a086a-e3b9-4418-bdc6-e086d607074e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\D3D12RHI">
+      <UniqueIdentifier>{873fa724-e889-4a1c-af37-050c94679bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Logging">
+      <UniqueIdentifier>{9ffd963f-4916-4da1-a8fa-98cf1396a688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Logging">
+      <UniqueIdentifier>{fbb53c57-5927-4db8-8773-cda771d51aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\RHI">
+      <UniqueIdentifier>{4791ff92-e145-47eb-b03a-2c21e88c654b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -24,6 +36,36 @@
     <ClInclude Include="Public\WinException.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Engine.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IEngineTick.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\RHIDeviceBundle.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Logging\LogVerbosity.h">
+      <Filter>Public\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Logging\Logger.h">
+      <Filter>Public\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Logging\LogCategoryBase.h">
+      <Filter>Public\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Logging\LogMacros.h">
+      <Filter>Private\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\HResultException.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIBundle.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -35,5 +77,28 @@
     <ClCompile Include="Private\WinException.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Engine.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\RHIDeviceBundle.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Logging\LogCategoryBase.cpp">
+      <Filter>Private\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Logging\Logger.cpp">
+      <Filter>Private\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\HResultException.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Public\Logging\Logger.inl">
+      <Filter>Public\Logging</Filter>
+    </None>
   </ItemGroup>
 </Project>
