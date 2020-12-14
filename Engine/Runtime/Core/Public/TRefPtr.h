@@ -14,7 +14,7 @@ namespace SC::Runtime::Core
 
 	void CORE_API ThrowInvalidCastException();
 
-	template<class T> requires TIsRefCore<T>
+	template<TIsRefCore T>
 	class TRefPtr
 	{
 		friend class Object;

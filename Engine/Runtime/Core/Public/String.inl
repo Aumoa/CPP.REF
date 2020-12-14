@@ -15,7 +15,7 @@ namespace SC::Runtime::Core
 		return length;
 	}
 
-	template<class T> requires TIsRefCore<T>
+	template<TIsRefCore T>
 	template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
 	inline TRefPtr<T>::TRefPtr(const TChar* text) : This(new String(text))
 	{

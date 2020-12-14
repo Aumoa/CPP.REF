@@ -10,12 +10,12 @@ namespace SC::Runtime::Core
 	class Object;
 	class String;
 
-	template<class T> requires TIsRefCore<T>
+	template<TIsRefCore T>
 	class TRefPtr;
 
 	class CORE_API Object
 	{
-		template<class T> requires TIsRefCore<T>
+		template<TIsRefCore T>
 		friend class TRefPtr;
 
 	private:
