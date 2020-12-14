@@ -10,6 +10,17 @@
 namespace SC::Runtime::Core
 {
 	template<class T> requires TIsRefCore<T>
+	inline TRefPtr<T>::TRefPtr(T* ptr)
+		: This()
+	{
+		if (ptr != nullptr)
+		{
+			this->ptr = ptr;
+			ptr->AddRef();
+		}
+	}
+
+	template<class T> requires TIsRefCore<T>
 	inline TRefPtr<T>::TRefPtr()
 		: ptr(nullptr)
 	{
@@ -21,17 +32,6 @@ namespace SC::Runtime::Core
 		: This()
 	{
 
-	}
-
-	template<class T> requires TIsRefCore<T>
-	inline TRefPtr<T>::TRefPtr(T* ptr)
-		: This()
-	{
-		if (ptr != nullptr)
-		{
-			this->ptr = ptr;
-			ptr->AddRef();
-		}
 	}
 
 	template<class T> requires TIsRefCore<T>

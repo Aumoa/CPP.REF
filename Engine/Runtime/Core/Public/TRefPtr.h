@@ -17,6 +17,8 @@ namespace SC::Runtime::Core
 	template<class T> requires TIsRefCore<T>
 	class TRefPtr
 	{
+		friend class Object;
+
 	public:
 		using Type = T;
 		using This = TRefPtr;
@@ -24,10 +26,11 @@ namespace SC::Runtime::Core
 	private:
 		T* ptr;
 
+		inline TRefPtr(T* ptr);
+
 	public:
 		inline TRefPtr();
 		inline TRefPtr(std::nullptr_t);
-		inline TRefPtr(T* ptr);
 		inline TRefPtr(const TRefPtr& ptr);
 		inline TRefPtr(TRefPtr&& ptr);
 		inline ~TRefPtr();
