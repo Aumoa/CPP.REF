@@ -1,6 +1,6 @@
 ﻿// Copyright 2020 Aumoa.lib. All right reserved.
 
-#include "String.h"
+#include "CoreString.h"
 
 using namespace SC::Runtime::Core;
 

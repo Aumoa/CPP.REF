@@ -4,7 +4,7 @@
 
 #include "TRefPtr.h"
 #include <typeinfo>
-#include "String.h"
+#include "CoreString.h"
 
 using namespace SC::Runtime::Core;
 

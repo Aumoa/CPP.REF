@@ -24,13 +24,13 @@
     <ClInclude Include="Public\Object.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\String.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\TRefPtr.h">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\CoreMinimal.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\CoreString.h">
       <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>

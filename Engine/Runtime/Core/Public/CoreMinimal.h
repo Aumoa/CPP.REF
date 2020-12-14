@@ -3,6 +3,6 @@
 #pragma once
 
 #include "Object.h"
-#include "String.h"
+#include "CoreString.h"
 #include "TRefPtr.h"
 #include "Exception.h"

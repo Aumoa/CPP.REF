@@ -5,7 +5,7 @@
 #include "CoreAPI.h"
 
 #include "TRefPtr.h"
-#include "String.h"
+#include "CoreString.h"
 
 namespace SC::Runtime::Core
 {
