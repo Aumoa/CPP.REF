@@ -39,6 +39,21 @@
     <ClInclude Include="Public\InvalidArgumentException.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\ArgumentNullException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\NullReferenceException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IndexOutOfRangeException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\FormatException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IStringFormattable.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -65,6 +80,18 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\InvalidArgumentException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\ArgumentNullException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\NullReferenceException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IndexOutOfRangeException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\FormatException.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

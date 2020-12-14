@@ -35,6 +35,16 @@ size_t Object::GetHashCode() const
 	return (size_t)this;
 }
 
+bool Object::operator ==(const TRefPtr<Object>& right) const
+{
+	return this == right.Get();
+}
+
+bool Object::operator !=(const TRefPtr<Object>& right) const
+{
+	return this != right.Get();
+}
+
 void Object::AddRef()
 {
 	ref_count += 1;

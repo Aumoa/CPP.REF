@@ -13,6 +13,7 @@ namespace SC::Runtime::Core
 	class String;
 
 	void CORE_API ThrowInvalidCastException();
+	void CORE_API ThrowNullReferenceException();
 
 	template<TIsRefCore T>
 	class TRefPtr
@@ -28,11 +29,11 @@ namespace SC::Runtime::Core
 	private:
 		T* ptr;
 
-		inline TRefPtr(T* ptr);
-
 	public:
 		inline TRefPtr();
 		inline TRefPtr(std::nullptr_t);
+		inline TRefPtr(T* ptr);
+		inline TRefPtr(const T* ptr);
 		inline TRefPtr(const TRefPtr& ptr);
 		inline TRefPtr(TRefPtr&& ptr);
 		inline ~TRefPtr();
@@ -41,9 +42,9 @@ namespace SC::Runtime::Core
 		template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
 		inline TRefPtr(const TChar* text);
 
-		template<class O> requires TIsBaseOf<O, T>
+		template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
 		inline TRefPtr(const TRefPtr<O>& ptr);
-		template<class O> requires TIsBaseOf<O, T>
+		template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
 		inline TRefPtr(TRefPtr<O>&& ptr);
 
 		inline T* Detach();
@@ -54,11 +55,11 @@ namespace SC::Runtime::Core
 		[[nodiscard]] inline T** GetAddressOf();
 		[[nodiscard]] inline T** ReleaseAndGetAddressOf();
 
-		template<class O> requires TIsBaseOf<O, Object>
+		template<TIsRefCore O>
 		[[nodiscard]] inline bool Is(O** ptr = nullptr) const;
-		template<class O> requires TIsBaseOf<O, Object>
+		template<TIsRefCore O>
 		[[nodiscard]] inline auto As() const;
-		template<class O> requires TIsBaseOf<O, Object>
+		template<TIsRefCore O>
 		[[nodiscard]] inline TRefPtr<O> TryAs() const;
 
 		vs_property_get(bool, IsValid);
@@ -70,6 +71,19 @@ namespace SC::Runtime::Core
 
 		inline TRefPtr& operator=(const TRefPtr& ptr);
 		inline TRefPtr& operator=(TRefPtr&& ptr);
+
+		template<TIsRefCore O>
+		[[nodiscard]] inline bool operator ==(const TRefPtr<O>& ptr) const;
+		template<TIsRefCore O>
+		[[nodiscard]] inline bool operator !=(const TRefPtr<O>& ptr) const;
+		template<class TIndex> requires TIsIndexer<T, TIndex>
+		[[nodiscard]] inline auto operator [](const TIndex& index) const -> decltype(ptr->operator [](index));
+
+		// String specialize
+		template<TIsChar TChar> requires TIsSame<T, String>
+		[[nodiscard]] inline bool operator ==(const TChar* text) const;
+		template<TIsChar TChar> requires TIsSame<T, String>
+		[[nodiscard]] inline bool operator !=(const TChar* text) const;
 
 	private:
 		inline void SafeRelease();

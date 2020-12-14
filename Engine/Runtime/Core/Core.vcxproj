@@ -121,6 +121,7 @@
       <PreprocessorDefinitions>_DEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_CORE_API__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,6 +138,7 @@
       <PreprocessorDefinitions>NDEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_CORE_API__</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,12 +149,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Public\ArgumentNullException.h" />
     <ClInclude Include="Public\CoreAPI.h" />
     <ClInclude Include="Public\CoreConcepts.h" />
     <ClInclude Include="Public\CoreMinimal.h" />
     <ClInclude Include="Public\Exception.h" />
+    <ClInclude Include="Public\FormatException.h" />
+    <ClInclude Include="Public\IndexOutOfRangeException.h" />
     <ClInclude Include="Public\InvalidArgumentException.h" />
     <ClInclude Include="Public\InvalidCastException.h" />
+    <ClInclude Include="Public\IStringFormattable.h" />
+    <ClInclude Include="Public\NullReferenceException.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\CoreString.h" />
@@ -163,9 +170,13 @@
     <None Include="Public\TRefPtr.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\ArgumentNullException.cpp" />
     <ClCompile Include="Private\Exception.cpp" />
+    <ClCompile Include="Private\FormatException.cpp" />
+    <ClCompile Include="Private\IndexOutOfRangeException.cpp" />
     <ClCompile Include="Private\InvalidArgumentException.cpp" />
     <ClCompile Include="Private\InvalidCastException.cpp" />
+    <ClCompile Include="Private\NullReferenceException.cpp" />
     <ClCompile Include="Private\Object.cpp" />
     <ClCompile Include="Private\String.cpp" />
     <ClCompile Include="Private\TRefPtr.cpp" />

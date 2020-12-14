@@ -39,6 +39,9 @@ namespace SC::Runtime::Core
 			return binder;
 		}
 
+		bool operator ==(const TRefPtr<Object>& right) const;
+		bool operator !=(const TRefPtr<Object>& right) const;
+
 	private:
 		void AddRef();
 		void Release();

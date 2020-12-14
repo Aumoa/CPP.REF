@@ -25,7 +25,7 @@ namespace SC::Runtime::Core
 	}
 
 	template<class TDerived, class TBase>
-	concept TIsBaseOf = requires(const TBase* Base, const TDerived* Derived)
+	concept TIsBaseOf = requires(TBase* Base, TDerived* Derived)
 	{
 		{ Base = Derived };
 	};
@@ -47,9 +47,31 @@ namespace SC::Runtime::Core
 		TIsSame<TChar, char> ||
 		TIsSame<TChar, wchar_t>;
 
+	template<class TPrim>
+	concept TIsPrimitive =
+		TIsSame<TPrim, uint8> ||
+		TIsSame<TPrim, uint16> ||
+		TIsSame<TPrim, uint32> ||
+		TIsSame<TPrim, uint64> ||
+		TIsSame<TPrim, int8> ||
+		TIsSame<TPrim, int16> ||
+		TIsSame<TPrim, int32> ||
+		TIsSame<TPrim, int64> ||
+		TIsSame<TPrim, float> ||
+		TIsSame<TPrim, double> ||
+		TIsSame<TPrim, bool> ||
+		TIsSame<TPrim, char> ||
+		TIsSame<TPrim, wchar_t>;
+
 	template<class TCallable>
 	concept TIsCallable = requires(TCallable Callable)
 	{
 		{ Callable() };
+	};
+
+	template<class TIndexable, class TArg>
+	concept TIsIndexer = requires(TIndexable Indexable, TArg Index)
+	{
+		{ Indexable[Index] };
 	};
 }
