@@ -75,9 +75,9 @@ namespace SC::Runtime::Core
 		wchar_t* MultiByteToWideChar(const char* multibyte, size_t* len);
 		wchar_t* CopyAllocate(const wchar_t* text, size_t len);
 
-		template<class TChar> requires TIsChar<TChar>
+		template<TIsChar TChar>
 		inline static size_t Strlen(const TChar* text);
-		template<class TChar> requires TIsChar<TChar>
+		template<TIsChar TChar>
 		inline static bool Strcmp(const TChar* left, const TChar* right);
 		static size_t SizeAsBoundary(size_t len);
 
@@ -91,6 +91,8 @@ namespace SC::Runtime::Core
 		static TRefPtr<Object> GetString(const T& packedArg);
 		template<TIsFormattableStringConvertible T>
 		static TRefPtr<Object> GetString(const T& packedArg);
+		template<TIsBaseOf<Object> T>
+		static TRefPtr<Object> GetString(const T* packedArg);
 
 		template<class T, class... TArgs>
 		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args);

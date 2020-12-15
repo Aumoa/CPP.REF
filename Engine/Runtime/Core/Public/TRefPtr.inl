@@ -62,14 +62,14 @@ namespace SC::Runtime::Core
 		SafeRelease();
 	}
 
-	template<TIsNotPointer T> template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
+	template<TIsNotPointer T> template<TIsBaseOf<T> O>
 	inline TRefPtr<T>::TRefPtr(const TRefPtr<O>& ptr)
 		: This(ptr.ptr)
 	{
 
 	}
 
-	template<TIsNotPointer T> template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
+	template<TIsNotPointer T> template<TIsBaseOf<T> O>
 	inline TRefPtr<T>::TRefPtr(TRefPtr<O>&& ptr)
 		: This()
 	{

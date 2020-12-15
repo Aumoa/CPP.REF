@@ -18,7 +18,7 @@ namespace SC::Runtime::Core
 		return FormatHelper(format, unpacked);
 	}
 
-	template<class TChar> requires TIsChar<TChar>
+	template<TIsChar TChar>
 	inline size_t String::Strlen(const TChar* text)
 	{
 		size_t length = 0;
@@ -29,7 +29,7 @@ namespace SC::Runtime::Core
 		return length;
 	}
 
-	template<class TChar> requires TIsChar<TChar>
+	template<TIsChar TChar>
 	inline bool String::Strcmp(const TChar* left, const TChar* right)
 	{
 		while (true)
@@ -157,6 +157,12 @@ namespace SC::Runtime::Core
 		};
 
 		return NewObject<FormattableString>(packedArg);
+	}
+
+	template<TIsBaseOf<Object> T>
+	TRefPtr<Object> String::GetString(const T* packedArg)
+	{
+		return packedArg;
 	}
 
 	template<class T, class... TArgs>

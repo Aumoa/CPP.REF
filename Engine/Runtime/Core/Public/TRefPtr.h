@@ -42,9 +42,9 @@ namespace SC::Runtime::Core
 		template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
 		inline TRefPtr(const TChar* text);
 
-		template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
+		template<TIsBaseOf<T> O>
 		inline TRefPtr(const TRefPtr<O>& ptr);
-		template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
+		template<TIsBaseOf<T> O>
 		inline TRefPtr(TRefPtr<O>&& ptr);
 
 		inline T* Detach();
