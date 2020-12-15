@@ -65,6 +65,11 @@ int32 Application::Run()
 	return 0;
 }
 
+HWND Application::GetCoreHwnd() const
+{
+	return hWnd;
+}
+
 Application* Application::GetInstance()
 {
 	return instance;

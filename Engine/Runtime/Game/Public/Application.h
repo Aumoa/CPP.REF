@@ -30,6 +30,7 @@ namespace SC::Runtime::Game
 		virtual void PostInitialize();
 
 		int32 Run();
+		HWND GetCoreHwnd() const;
 
 		[[nodiscard]] static Application* GetInstance();
 

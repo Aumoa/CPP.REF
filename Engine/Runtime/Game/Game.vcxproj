@@ -127,7 +127,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,13 +147,17 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Private\D3D12RHI\D3D12CommandFence.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12CommandList.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12ImmediateCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
-    <ClInclude Include="Private\D3D12RHI\RHIDeviceBundle.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\Engine.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Public\AppDuplicationException.h" />
@@ -164,6 +168,11 @@
     <ClInclude Include="Public\Logging\Logger.h" />
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
+    <ClInclude Include="Public\RHI\IRHICommandFence.h" />
+    <ClInclude Include="Public\RHI\IRHICommandList.h" />
+    <ClInclude Include="Public\RHI\IRHIDeviceBundle.h" />
+    <ClInclude Include="Public\RHI\IRHIImmediateCommandList.h" />
+    <ClInclude Include="Public\RHI\IRHISwapChain.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
   </ItemGroup>
@@ -175,9 +184,13 @@
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12CommandFence.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12CommandList.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12ImmediateCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
-    <ClCompile Include="Private\D3D12RHI\RHIDeviceBundle.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />

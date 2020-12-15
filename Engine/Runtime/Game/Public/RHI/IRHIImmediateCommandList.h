@@ -4,12 +4,12 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
+#include "IRHICommandList.h"
 
 namespace SC::Runtime::Game::RHI
 {
-	interface IRHIBundle : virtual public Core::Object
+	interface IRHIImmediateCommandList : virtual public Core::Object, virtual public IRHICommandList
 	{
-		virtual void InitializeBundle() = 0;
-		virtual void ReleaseBundle() = 0;
+		
 	};
 }

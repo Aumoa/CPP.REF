@@ -6,10 +6,16 @@
 #include "CoreMinimal.h"
 #include "IEngineTick.h"
 
-#include "RHI/IRHIBundle.h"
-
 namespace SC::Runtime::Game
 {
+	namespace RHI
+	{
+		interface IRHIBundle;
+		interface IRHICommandFence;
+		interface IRHIDeviceBundle;
+		interface IRHIImmediateCommandList;
+	}
+
 	class Engine : virtual public Core::Object, virtual public IEngineTick
 	{
 	public:
@@ -18,6 +24,12 @@ namespace SC::Runtime::Game
 
 	private:
 		std::vector<Core::TRefPtr<RHI::IRHIBundle>> rhiBundles;
+		Core::TRefPtr<RHI::IRHICommandFence> autoFence;
+
+		RHI::IRHIDeviceBundle* deviceBundle;
+		RHI::IRHIImmediateCommandList* immediateCommandList;
+
+		bool bPresent : 1;
 
 	public:
 		Engine();
@@ -25,5 +37,8 @@ namespace SC::Runtime::Game
 
 		virtual void Initialize();
 		virtual void Tick();
+
+	private:
+		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
 	};
 }
