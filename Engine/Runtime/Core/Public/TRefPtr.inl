@@ -9,21 +9,21 @@
 
 namespace SC::Runtime::Core
 {
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::TRefPtr()
 		: ptr(nullptr)
 	{
 
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::TRefPtr(std::nullptr_t)
 		: This()
 	{
 
 	}
 	
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::TRefPtr(T* ptr)
 		: This()
 	{
@@ -34,21 +34,21 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::TRefPtr(const T* ptr)
 		: This(const_cast<T*>(ptr))
 	{
 
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::TRefPtr(const TRefPtr& ptr)
 		: This(ptr.ptr)
 	{
 
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::TRefPtr(TRefPtr&& ptr)
 		: This()
 	{
@@ -56,20 +56,20 @@ namespace SC::Runtime::Core
 		ptr.ptr = nullptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::~TRefPtr()
 	{
 		SafeRelease();
 	}
 
-	template<TIsRefCore T> template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
+	template<TIsNotPointer T> template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
 	inline TRefPtr<T>::TRefPtr(const TRefPtr<O>& ptr)
 		: This(ptr.ptr)
 	{
 
 	}
 
-	template<TIsRefCore T> template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
+	template<TIsNotPointer T> template<class O> requires TIsBaseOf<O, T> || TIsRefCore<T>
 	inline TRefPtr<T>::TRefPtr(TRefPtr<O>&& ptr)
 		: This()
 	{
@@ -77,7 +77,7 @@ namespace SC::Runtime::Core
 		ptr.ptr = nullptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline T* TRefPtr<T>::Detach()
 	{
 		T* detach = ptr;
@@ -85,14 +85,14 @@ namespace SC::Runtime::Core
 		return detach;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline void TRefPtr<T>::Attach(T* ptr)
 	{
 		SafeRelease();
 		this->ptr = ptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline void TRefPtr<T>::Reset(T* ptr)
 	{
 		SafeRelease();
@@ -103,26 +103,26 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline T* TRefPtr<T>::Get() const
 	{
 		return ptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline T** TRefPtr<T>::GetAddressOf()
 	{
 		return &ptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline T** TRefPtr<T>::ReleaseAndGetAddressOf()
 	{
 		SafeRelease();
 		return &ptr;
 	}
 
-	template<TIsRefCore T> template<TIsRefCore O>
+	template<TIsNotPointer T> template<TIsRefCore O>
 	inline bool TRefPtr<T>::Is(O** ptr) const
 	{
 		O* cast = dynamic_cast<O*>(this->ptr);
@@ -137,7 +137,7 @@ namespace SC::Runtime::Core
 		return true;
 	}
 
-	template<TIsRefCore T> template<TIsRefCore O>
+	template<TIsNotPointer T> template<TIsRefCore O>
 	inline auto TRefPtr<T>::As() const
 	{
 		auto ret = TryAs<O>();
@@ -148,7 +148,7 @@ namespace SC::Runtime::Core
 		return move(ret);
 	}
 
-	template<TIsRefCore T> template<TIsRefCore O>
+	template<TIsNotPointer T> template<TIsRefCore O>
 	inline TRefPtr<O> TRefPtr<T>::TryAs() const
 	{
 		O* cast = dynamic_cast<O*>(this->ptr);
@@ -160,45 +160,45 @@ namespace SC::Runtime::Core
 		return ptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline bool TRefPtr<T>::IsValid_get() const
 	{
 		return ptr != nullptr;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline T* TRefPtr<T>::operator->() const
 	{
 		return Get();
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline TRefPtr<T>::operator bool() const
 	{
 		return IsValid;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline T** TRefPtr<T>::operator&()
 	{
 		return ReleaseAndGetAddressOf();
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline auto TRefPtr<T>::operator=(const TRefPtr& ptr) -> This&
 	{
 		Reset(ptr.ptr);
 		return *this;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline auto TRefPtr<T>::operator=(TRefPtr&& ptr) -> This&
 	{
 		Attach(ptr.Detach());
 		return *this;
 	}
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	inline void TRefPtr<T>::SafeRelease()
 	{
 		if (ptr != nullptr)
@@ -208,8 +208,7 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsRefCore T>
-	template<TIsRefCore O>
+	template<TIsNotPointer T> template<TIsRefCore O>
 	inline bool TRefPtr<T>::operator ==(const TRefPtr<O>& ptr) const
 	{
 		if (this->ptr == nullptr)
@@ -228,8 +227,7 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsRefCore T>
-	template<TIsRefCore O>
+	template<TIsNotPointer T> template<TIsRefCore O>
 	inline bool TRefPtr<T>::operator !=(const TRefPtr<O>& ptr) const
 	{
 		if (this->ptr == nullptr)
@@ -248,8 +246,7 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsRefCore T>
-	template<class TIndex> requires TIsIndexer<T, TIndex>
+	template<TIsNotPointer T> template<class TIndex> requires TIsIndexer<T, TIndex>
 	inline auto TRefPtr<T>::operator [](const TIndex& index) const -> decltype(ptr->operator [](index))
 	{
 		if (ptr == nullptr)

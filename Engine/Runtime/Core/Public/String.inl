@@ -142,22 +142,19 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsRefCore T>
-	template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
+	template<TIsNotPointer T> template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
 	inline TRefPtr<T>::TRefPtr(const TChar* text) : This(new String(text))
 	{
 		ptr->bLockCollecting = false;
 	}
 
-	template<TIsRefCore T>
-	template<TIsChar TChar> requires TIsSame<T, String>
+	template<TIsNotPointer T> template<TIsChar TChar> requires TIsSame<T, String>
 	inline bool TRefPtr<T>::operator ==(const TChar* text) const
 	{
 		return ptr->operator ==(TRefPtr<String>(text));
 	}
 
-	template<TIsRefCore T>
-	template<TIsChar TChar> requires TIsSame<T, String>
+	template<TIsNotPointer T> template<TIsChar TChar> requires TIsSame<T, String>
 	inline bool TRefPtr<T>::operator !=(const TChar* text) const
 	{
 		return ptr->operator !=(TRefPtr<String>(text));

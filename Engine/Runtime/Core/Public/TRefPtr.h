@@ -15,11 +15,11 @@ namespace SC::Runtime::Core
 	void CORE_API ThrowInvalidCastException();
 	void CORE_API ThrowNullReferenceException();
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	class TRefPtr
 	{
 		friend class Object;
-		template<TIsRefCore O>
+		template<TIsNotPointer O>
 		friend class TRefPtr;
 
 	public:

@@ -10,12 +10,12 @@ namespace SC::Runtime::Core
 	class Object;
 	class String;
 
-	template<TIsRefCore T>
+	template<TIsNotPointer T>
 	class TRefPtr;
 
 	class CORE_API Object
 	{
-		template<TIsRefCore T>
+		template<TIsNotPointer T>
 		friend class TRefPtr;
 
 	private:

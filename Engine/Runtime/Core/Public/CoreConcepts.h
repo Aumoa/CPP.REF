@@ -3,26 +3,12 @@
 #pragma once
 
 #include "CoreAPI.h"
+#include <type_traits>
 
 namespace SC::Runtime::Core
 {
 	class Object;
 	class String;
-
-	namespace Impl
-	{
-		template<class TLeft, class TRight>
-		struct TIsSame
-		{
-			constexpr static const bool Value = false;
-		};
-
-		template<class T>
-		struct TIsSame<T, T>
-		{
-			constexpr static const bool Value = true;
-		};
-	}
 
 	template<class TDerived, class TBase>
 	concept TIsBaseOf = requires(TBase* Base, TDerived* Derived)
@@ -40,7 +26,7 @@ namespace SC::Runtime::Core
 	concept TIsRefCore = TIsBaseOf<T, Object> || TIsBaseOf<T, String>;
 
 	template<class TLeft, class TRight>
-	concept TIsSame = Impl::TIsSame<TLeft, TRight>::Value;
+	concept TIsSame = std::is_same_v<TLeft, TRight>;
 
 	template<class TChar>
 	concept TIsChar =
@@ -74,4 +60,10 @@ namespace SC::Runtime::Core
 	{
 		{ Indexable[Index] };
 	};
+
+	template<class T>
+	concept TIsPointer = std::is_pointer_v<T>;
+
+	template<class T>
+	concept TIsNotPointer = !std::is_pointer_v<T>;
 }
