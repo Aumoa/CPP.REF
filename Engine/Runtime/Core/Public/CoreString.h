@@ -8,9 +8,23 @@
 #include "CoreConcepts.h"
 #include "TRefPtr.h"
 #include <vector>
+#include "IStringFormattable.h"
 
 namespace SC::Runtime::Core
 {
+	template<class T>
+	concept TIsStringConvertible = requires(const T& arg)
+	{
+		{ arg.ToString() };
+	};
+
+	template<class T>
+	concept TIsOnlyStringConvertible = requires
+	{
+		TIsStringConvertible<T>;
+		!TIsFormattableStringConvertible<T>;
+	};
+
 	class CORE_API String : virtual public Object
 	{
 	public:
@@ -67,7 +81,9 @@ namespace SC::Runtime::Core
 		static TRefPtr<Object> GetString(T packedArg);
 		template<TIsChar T>
 		static TRefPtr<Object> GetString(const T* packedArg);
-		template<class T> requires requires(const T& packedArg) { { packedArg.ToString() }; }
+		template<TIsOnlyStringConvertible T>
+		static TRefPtr<Object> GetString(const T& packedArg);
+		template<TIsFormattableStringConvertible T>
 		static TRefPtr<Object> GetString(const T& packedArg);
 
 		template<class T, class... TArgs> requires requires(const T& arg) { { String::GetString(arg) }; }

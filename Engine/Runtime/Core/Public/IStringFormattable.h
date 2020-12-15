@@ -7,6 +7,12 @@
 
 namespace SC::Runtime::Core
 {
+	template<class T>
+	concept TIsFormattableStringConvertible = requires(const T& arg)
+	{
+		{ arg.ToString(TRefPtr<String>()) };
+	};
+
 	interface IStringFormattable : virtual public Object
 	{
 		using Object::ToString;

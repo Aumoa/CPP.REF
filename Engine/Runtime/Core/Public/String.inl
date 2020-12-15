@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "IStringFormattable.h"
 #include <sstream>
 #include <iomanip>
 
@@ -122,10 +121,42 @@ namespace SC::Runtime::Core
 		return packedArg;
 	}
 
-	template<class T> requires requires(const T& packedArg) { { packedArg.ToString() }; }
+	template<TIsOnlyStringConvertible T>
 	TRefPtr<Object> String::GetString(const T& packedArg)
 	{
 		return packedArg.ToString();
+	}
+
+	template<TIsFormattableStringConvertible T>
+	TRefPtr<Object> String::GetString(const T& packedArg)
+	{
+		class FormattableString : virtual public Object, virtual public IStringFormattable
+		{
+			const T& value;
+
+		public:
+			FormattableString(const T& value) : value(value)
+			{
+
+			}
+
+			~FormattableString() override
+			{
+
+			}
+
+			TRefPtr<String> ToString() const override
+			{
+				return value.ToString();
+			}
+
+			virtual TRefPtr<String> ToString(TRefPtr<String> formatText) const
+			{
+				return value.ToString(formatText);
+			}
+		};
+
+		return NewObject<FormattableString>(packedArg);
 	}
 
 	template<class T, class... TArgs> requires requires(const T& arg)
