@@ -30,14 +30,8 @@ namespace SC::Runtime::Core
 		virtual bool Equals(TRefPtr<Object> right) const;
 		virtual size_t GetHashCode() const;
 
-		template<class T, class... TArgs> requires TIsBaseOf<T, Object>
-		static TRefPtr<T> NewObject(TArgs... args)
-		{
-			auto ptr = new T(args...);
-			ptr->bLockCollecting = false;
-			TRefPtr<T> binder = ptr;
-			return binder;
-		}
+		template<class T, class... TArgs> requires TIsNotPointer<T> && TIsBaseOf<T, Object> && THasConstructor<T, TArgs...>
+		inline static TRefPtr<T> NewObject(TArgs... args);
 
 		bool operator ==(const TRefPtr<Object>& right) const;
 		bool operator !=(const TRefPtr<Object>& right) const;
@@ -47,3 +41,5 @@ namespace SC::Runtime::Core
 		void Release();
 	};
 }
+
+#include "Object.inl"

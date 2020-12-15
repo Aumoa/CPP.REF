@@ -19,11 +19,17 @@ namespace SC::Runtime::Core
 	};
 
 	template<class T>
-	concept TIsOnlyStringConvertible = requires
-	{
-		TIsStringConvertible<T>;
-		!TIsFormattableStringConvertible<T>;
-	};
+	constexpr bool VIsStringConvertible = false;
+	template<TIsStringConvertible T>
+	constexpr bool VIsStringConvertible<T> = true;
+
+	template<class T>
+	constexpr bool VIsFormattableStringConvertible = false;
+	template<TIsFormattableStringConvertible T>
+	constexpr bool VIsFormattableStringConvertible<T> = true;
+
+	template<class T>
+	concept TIsOnlyStringConvertible = VIsStringConvertible<T> && !VIsFormattableStringConvertible<T>;
 
 	class CORE_API String : virtual public Object
 	{
@@ -86,7 +92,7 @@ namespace SC::Runtime::Core
 		template<TIsFormattableStringConvertible T>
 		static TRefPtr<Object> GetString(const T& packedArg);
 
-		template<class T, class... TArgs> requires requires(const T& arg) { { String::GetString(arg) }; }
+		template<class T, class... TArgs>
 		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args);
 	};
 }

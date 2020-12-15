@@ -43,3 +43,4 @@ inline const char* __nameof(const char* name)
 }
 
 #define nameof(x) __nameof<decltype(x)>(#x)
+#define nameof_c(x) __nameof<x>(#x)

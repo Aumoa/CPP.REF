@@ -66,4 +66,10 @@ namespace SC::Runtime::Core
 
 	template<class T>
 	concept TIsNotPointer = !std::is_pointer_v<T>;
+
+	template<class T, class... TArgs>
+	concept THasConstructor = requires(TArgs... args)
+	{
+		{ T(args...) };
+	};
 }

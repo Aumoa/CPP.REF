@@ -159,10 +159,7 @@ namespace SC::Runtime::Core
 		return NewObject<FormattableString>(packedArg);
 	}
 
-	template<class T, class... TArgs> requires requires(const T& arg)
-	{
-		{ String::GetString(arg) };
-	}
+	template<class T, class... TArgs>
 	static void String::FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args)
 	{
 		container[index++] = GetString(arg);

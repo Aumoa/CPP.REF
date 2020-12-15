@@ -62,6 +62,9 @@
     <None Include="Public\TRefPtr.inl">
       <Filter>Public</Filter>
     </None>
+    <None Include="Public\Object.inl">
+      <Filter>Public</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Object.cpp">

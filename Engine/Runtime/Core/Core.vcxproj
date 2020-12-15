@@ -166,6 +166,7 @@
     <ClInclude Include="Public\TRefPtr.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
     <None Include="Public\TRefPtr.inl" />
   </ItemGroup>
