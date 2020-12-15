@@ -49,7 +49,7 @@ namespace SC::Runtime::Core
 
 		inline T* Detach();
 		inline void Attach(T* ptr);
-		inline void Reset(T* ptr);
+		inline void Reset(T* ptr = nullptr);
 
 		[[nodiscard]] inline T* Get() const;
 		[[nodiscard]] inline T** GetAddressOf();
