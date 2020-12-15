@@ -67,11 +67,10 @@ namespace SC::Runtime::Core
 		static TRefPtr<Object> GetString(T packedArg);
 		template<TIsChar T>
 		static TRefPtr<Object> GetString(const T* packedArg);
+		template<class T> requires requires(const T& packedArg) { { packedArg.ToString() }; }
+		static TRefPtr<Object> GetString(const T& packedArg);
 
-		template<class T, class... TArgs> requires requires(const T& arg)
-		{
-			{ String::GetString(arg) };
-		}
+		template<class T, class... TArgs> requires requires(const T& arg) { { String::GetString(arg) }; }
 		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args);
 	};
 }

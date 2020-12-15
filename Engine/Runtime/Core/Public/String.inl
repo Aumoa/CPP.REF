@@ -122,6 +122,12 @@ namespace SC::Runtime::Core
 		return packedArg;
 	}
 
+	template<class T> requires requires(const T& packedArg) { { packedArg.ToString() }; }
+	TRefPtr<Object> String::GetString(const T& packedArg)
+	{
+		return packedArg.ToString();
+	}
+
 	template<class T, class... TArgs> requires requires(const T& arg)
 	{
 		{ String::GetString(arg) };
