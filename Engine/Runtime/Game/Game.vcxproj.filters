@@ -93,6 +93,21 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIResource.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12Resource.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIRenderTargetView.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12DescriptorAllocator.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12DescriptorIndex.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -132,6 +147,15 @@
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DescriptorIndex.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DescriptorAllocator.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
   </ItemGroup>
