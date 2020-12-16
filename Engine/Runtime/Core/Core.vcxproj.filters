@@ -54,6 +54,12 @@
     <ClInclude Include="Public\IStringFormattable.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\TWeakPtr.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\WeakReferences.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -63,6 +69,9 @@
       <Filter>Public</Filter>
     </None>
     <None Include="Public\Object.inl">
+      <Filter>Public</Filter>
+    </None>
+    <None Include="Public\TWeakPtr.inl">
       <Filter>Public</Filter>
     </None>
   </ItemGroup>
@@ -95,6 +104,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\FormatException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WeakReferences.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

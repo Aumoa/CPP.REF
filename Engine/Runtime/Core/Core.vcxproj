@@ -164,11 +164,14 @@
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\CoreString.h" />
     <ClInclude Include="Public\TRefPtr.h" />
+    <ClInclude Include="Public\TWeakPtr.h" />
+    <ClInclude Include="Public\WeakReferences.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
     <None Include="Public\TRefPtr.inl" />
+    <None Include="Public\TWeakPtr.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\ArgumentNullException.cpp" />
@@ -181,6 +184,7 @@
     <ClCompile Include="Private\Object.cpp" />
     <ClCompile Include="Private\String.cpp" />
     <ClCompile Include="Private\TRefPtr.cpp" />
+    <ClCompile Include="Private\WeakReferences.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

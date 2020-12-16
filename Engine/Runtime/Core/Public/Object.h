@@ -5,6 +5,8 @@
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
 
+#include "WeakReferences.h"
+
 namespace SC::Runtime::Core
 {
 	class Object;
@@ -12,15 +14,20 @@ namespace SC::Runtime::Core
 
 	template<TIsNotPointer T>
 	class TRefPtr;
+	template<TIsNotPointer T>
+	class TWeakPtr;
 
 	class CORE_API Object
 	{
 		template<TIsNotPointer T>
 		friend class TRefPtr;
+		template<TIsNotPointer T>
+		friend class TWeakPtr;
 
 	private:
 		bool bLockCollecting : 1;
 		size_t ref_count;
+		mutable WeakReferences* weak_references;
 
 	public:
 		Object();
@@ -39,6 +46,7 @@ namespace SC::Runtime::Core
 	private:
 		void AddRef();
 		void Release();
+		WeakReferences* GetWeakReferences() const;
 	};
 }
 

@@ -128,17 +128,24 @@ namespace SC::Runtime::Core
 		O* cast = dynamic_cast<O*>(this->ptr);
 		if (cast == nullptr)
 		{
-			*ptr = nullptr;
+			if (ptr != nullptr)
+			{
+				*ptr = nullptr;
+			}
 			return false;
 		}
 
-		*ptr = cast;
-		this->ptr->AddRef();
+		if (ptr != nullptr)
+		{
+			*ptr = cast;
+			cast->AddRef();
+		}
+
 		return true;
 	}
 
 	template<TIsNotPointer T> template<TIsRefCore O>
-	inline auto TRefPtr<T>::As() const
+	inline TRefPtr<O> TRefPtr<T>::As() const
 	{
 		auto ret = TryAs<O>();
 		if (!ret.IsValid)

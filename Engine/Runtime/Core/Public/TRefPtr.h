@@ -16,6 +16,9 @@ namespace SC::Runtime::Core
 	void CORE_API ThrowNullReferenceException();
 
 	template<TIsNotPointer T>
+	class TWeakPtr;
+
+	template<TIsNotPointer T>
 	class TRefPtr
 	{
 		friend class Object;
@@ -58,9 +61,12 @@ namespace SC::Runtime::Core
 		template<TIsRefCore O>
 		[[nodiscard]] inline bool Is(O** ptr = nullptr) const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline auto As() const;
+		[[nodiscard]] inline TRefPtr<O> As() const;
 		template<TIsRefCore O>
 		[[nodiscard]] inline TRefPtr<O> TryAs() const;
+
+		template<TIsBaseOf<T> O = T>
+		inline TWeakPtr<O> AsWeak() const;  // TWeakPtr.inl
 
 		vs_property_get(bool, IsValid);
 		[[nodiscard]] inline bool IsValid_get() const;
@@ -90,4 +96,5 @@ namespace SC::Runtime::Core
 	};
 }
 
+#include "TWeakPtr.h"
 #include "TRefPtr.inl"

@@ -11,13 +11,25 @@ using namespace SC::Runtime::Core;
 Object::Object()
 	: bLockCollecting(true)
 	, ref_count(0)
+	, weak_references(nullptr)
 {
 
 }
 
 Object::~Object()
 {
-
+	if (weak_references != nullptr)
+	{
+		if (weak_references->weakReferences == 0)
+		{
+			delete weak_references;
+			weak_references = nullptr;
+		}
+		else
+		{
+			weak_references->Invalidate();
+		}
+	}
 }
 
 TRefPtr<String> Object::ToString() const
@@ -59,4 +71,13 @@ void Object::Release()
 			delete this;
 		}
 	}
+}
+
+WeakReferences* Object::GetWeakReferences() const
+{
+	if (weak_references == nullptr)
+	{
+		weak_references = new WeakReferences();
+	}
+	return weak_references;
 }
