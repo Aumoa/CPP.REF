@@ -364,3 +364,4 @@ Build/Program/*
 !Build/Program/net5.0
 Build/Program/net5.0/*
 !Build/Program/net5.0/GUIDRemover.*
+Build/Program/net5.0/GUIDRemover.runtimeconfig.dev.json
