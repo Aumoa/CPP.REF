@@ -38,7 +38,7 @@ void RemoveGUID(Dictionary<string, string> path_guid, string file)
     string left = text.Substring(0, guidStart + "<ProjectGuid>".Length);
     string right = text.Substring(guidEnd);
 
-    string final = left + path_guid[file] + right;
+    string final = left + path_guid[file].ToLower() + right;
 
     int seekpos = 0;
     while (true)

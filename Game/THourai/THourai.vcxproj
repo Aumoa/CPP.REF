@@ -20,10 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Engine\Runtime\Core\Core.vcxproj">
-      <Project>{2d9c1fc7-8c2e-4f0e-938b-8f9967b975b1}</Project>
+      <Project>{2D9C1FC7-8C2E-4F0E-938B-8F9967B975B1}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Engine\Runtime\Game\Game.vcxproj">
-      <Project>{2c0cdb0c-5e08-4f8e-9978-326beec3fcc6}</Project>
+      <Project>{2C0CDB0C-5E08-4F8E-9978-326BEEC3FCC6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ThirdParty\assimp\BINARIES\x64\code\assimp.vcxproj">
       <Project>{3BB5D697-F1E4-377A-AC8E-FCEE3B6780CD}</Project>
@@ -41,7 +41,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{4E5964F6-C4E6-4A98-96B3-4344B2F02698}</ProjectGuid>
+    <ProjectGuid>{4e5964f6-c4e6-4a98-96b3-4344b2f02698}</ProjectGuid>
     <RootNamespace>THourai</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

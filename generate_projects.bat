@@ -1,5 +1,7 @@
 :: Copyright 2020 Aumoa.lib. All right reserved.
 
+@echo off
+
 cd ThirdParty
 
 cd assimp
