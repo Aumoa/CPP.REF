@@ -5,14 +5,12 @@
 cd ThirdParty
 
 cd assimp
-if exist BINARIES rmdir /s /q BINARIES
+rmdir /s /q BINARIES
 call generate_projects.bat
 cd ..
 
 cd PhysX\physx\
-cd compiler
-if exist vc16win64 rmdir /s /q vc16win64
-cd ..
+rmdir /s /q compiler\vc16win64
 call generate_projects.bat
 cd ../..
 
