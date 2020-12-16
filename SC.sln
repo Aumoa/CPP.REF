@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THourai", "Game\THourai\THourai.vcxproj", "{4E5964F6-C4E6-4A98-96B3-4344B2F02698}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{587A04FD-B275-448F-9584-E193A2BF12E7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", "{15920566-15BC-45DD-875A-819DAE166B41}"
@@ -42,8 +44,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{71F5AD3D-4DC0-42FE-9A4B-EAB618D9A067}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{1E07DB15-CF2D-45A3-982E-D5C5E50D50CE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THourai", "Game\THourai\THourai.vcxproj", "{4E5964F6-C4E6-4A98-96B3-4344B2F02698}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assimp SDK", "assimp SDK", "{512E38E8-C863-47AD-9BA0-0E966A5A6D14}"
 EndProject
