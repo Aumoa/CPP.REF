@@ -12,6 +12,7 @@ pool:
   name: win64-notebook
 
 steps:
-- script: |
-    generate_projects.bat
+- script: generate_projects.bat
   displayName: 'Generate Thirdparty Projects'
+- script: msbuild.exe -p:Configuration=Release -p:Platform=x64 -t:rebuild SC.sln
+  displayName: 'Build solution'
