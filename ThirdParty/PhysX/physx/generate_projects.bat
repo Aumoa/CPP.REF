@@ -26,6 +26,21 @@ IF ERRORLEVEL 1 (
 
 :CMAKE_EXTERNAL
 
+where /q python
+IF ERRORLEVEL 1 (
+    if "%PM_python_PATH%" == "" (        
+        ECHO Python is missing, please install python version 2.7.6 and up. Or set env variable PM_python_PATH pointing to python root directory.
+        set /p DUMMY=Hit ENTER to continue...
+        exit /b 1
+    )
+)
+
+if "%PM_python_PATH%" == "" (    
+    set PM_PYTHON=python.exe
+) else (
+    set PM_PYTHON="%PM_python_PATH%\python.exe"
+)
+
 IF %1.==. GOTO ADDITIONAL_PARAMS_MISSING
 
 for /f "usebackq tokens=*" %%i in (`"%PM_vswhere_PATH%\VsWhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
@@ -35,7 +50,7 @@ for /f "usebackq tokens=*" %%i in (`"%PM_vswhere_PATH%\VsWhere.exe" -latest -pro
 
 :ADDITIONAL_PARAMS_MISSING
 pushd %~dp0
-python "%PHYSX_ROOT_DIR%/buildtools/cmake_generate_projects.py" %1
+%PM_PYTHON% "%PHYSX_ROOT_DIR%/buildtools/cmake_generate_projects.py" %1
 popd
 if %ERRORLEVEL% neq 0 (
     set /p DUMMY=Hit ENTER to continue...
