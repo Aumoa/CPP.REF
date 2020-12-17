@@ -20,12 +20,9 @@ jobs:
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1
-
-    - name: Restore NuGet packages
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
     
-    - name: Generate Thirdparty Projects
+    - name: Generate ThirdParty Projects
+      working-directory: ${{env.GITHUB_WORKSPACE}}
       run: generate_projects.bat
 
     - name: Build Solution
