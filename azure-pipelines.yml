@@ -4,16 +4,16 @@
 # https://aka.ms/yaml
 
 trigger:
+- master
+- dev
 - azure-pipelines
 
 pool:
   name: win64-notebook
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
 - script: |
+    generate_projects.bat
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  displayName: 'Generate Thirdparty Projects'
