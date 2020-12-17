@@ -4,7 +4,10 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+- azure-pipelines
+
+pool:
+  name: win64-notebook
 
 steps:
 - script: echo Hello, world!
