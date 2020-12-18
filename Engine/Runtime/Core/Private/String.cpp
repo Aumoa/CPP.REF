@@ -12,6 +12,7 @@ using namespace SC::Runtime::Core;
 using namespace std;
 
 wchar_t String::EmptyBuffer[1] = { 0 };
+const TRefPtr<String> String::Empty = Object::NewObject<String>(EmptyBuffer);
 
 String::String() : Super()
 	, text_buffer(nullptr)
@@ -52,8 +53,8 @@ size_t String::GetHashCode() const
 	size_t hash1 = 5381;
 	size_t hash2 = hash1;
 
-	size_t	c;
-	wchar_t*s = text_buffer;
+	size_t	        c;
+	const wchar_t*  s = text_buffer;
 
 	while ((c = s[0]) != 0) {
 		hash1 = ((hash1 << 5) + hash1) ^ c;
@@ -84,7 +85,14 @@ String::String(const char* text, size_t len) : This()
 
 String::String(const wchar_t* text, size_t len) : This()
 {
-    Assign(text, len);
+    if (text == EmptyBuffer)
+    {
+        text_buffer = text;
+    }
+    else
+    {
+        Assign(text, len);
+    }
 }
 
 String::String(const string& text) : This(text.c_str(), text.length())
@@ -105,16 +113,6 @@ String::String(string_view text) : This(text.data(), text.length())
 String::String(wstring_view text) : This(text.data(), text.length())
 {
 
-}
-
-auto String::begin() -> Iterator
-{
-    return text_buffer;
-}
-
-auto String::end() -> Iterator
-{
-    return text_buffer + len;
 }
 
 auto String::cbegin() const -> ConstIterator
@@ -379,7 +377,7 @@ TRefPtr<String> String::FormatHelper(TRefPtr<String> format, vector<TRefPtr<Obje
         {
             if (IStringFormattable* formattable = nullptr; fmtstr.length() != 0 && (formattable = dynamic_cast<IStringFormattable*>(arg)) != nullptr)
             {
-                s = formattable->ToString(fmtstr.c_str())->C_Str;
+                s = formattable->ToString(fmtstr)->C_Str;
             }
             else
             {
@@ -409,7 +407,7 @@ TRefPtr<String> String::FormatHelper(TRefPtr<String> format, vector<TRefPtr<Obje
         }
     }
 
-    return wss.str().c_str();
+    return wss.str();
 }
 
 wchar_t* String::MultiByteToWideChar(const char* multibyte, size_t* len)

@@ -36,7 +36,7 @@ namespace SC::Runtime::Core
 	template<class TItem>
 	using StringIterator = TItem*;
 
-	class CORE_API String : virtual public Object, virtual public IEnumerable<StringIterator, wchar_t>
+	class CORE_API String : virtual public Object, virtual public IConstEnumerable<StringIterator, wchar_t>
 	{
 		template<TIsChar T>
 		struct HeapStorage
@@ -63,17 +63,15 @@ namespace SC::Runtime::Core
 		};
 
 	public:
+		using Super = Object;
+		using This = String;
 		using Iterator = StringIterator<wchar_t>;
 		using ConstIterator = StringIterator<const wchar_t>;
 
-	public:
+	private:
 		static wchar_t EmptyBuffer[1];
 
-		using Super = Object;
-		using This = String;
-
-	private:
-		wchar_t* text_buffer;
+		const wchar_t* text_buffer;
 		size_t len;
 		bool bDynamicBuffer : 1;
 
@@ -98,8 +96,6 @@ namespace SC::Runtime::Core
 		template<TIsIterator<wchar_t> TIterator>
 		String(TIterator begin, TIterator end);
 
-		Iterator begin() override;
-		Iterator end() override;
 		ConstIterator cbegin() const override;
 		ConstIterator cend() const override;
 
@@ -115,6 +111,8 @@ namespace SC::Runtime::Core
 		template<class... TArgs>
 		static TRefPtr<String> Format(TRefPtr<String> format, TArgs... args);
 		static TRefPtr<String> Format(TRefPtr<String> format);
+
+		static const TRefPtr<String> Empty;
 
 	private:
 		static TRefPtr<String> FormatHelper(TRefPtr<String> format, std::vector<TRefPtr<Object>>& unpackedArgs);

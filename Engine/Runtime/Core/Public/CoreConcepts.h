@@ -102,9 +102,14 @@ namespace SC::Runtime::Core
 	};
 
 	template<class T>
-	concept THasIterator = requires()
+	concept THasConstIterator = requires()
+	{
+		{ typename T::ConstIterator() };
+	};
+
+	template<class T>
+	concept THasIterator = THasConstIterator<T> && requires()
 	{
 		{ typename T::Iterator() };
-		{ typename T::ConstIterator() };
 	};
 }

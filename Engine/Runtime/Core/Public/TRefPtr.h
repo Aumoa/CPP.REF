@@ -75,9 +75,13 @@ namespace SC::Runtime::Core
 		inline auto begin() -> typename O::Iterator;
 		template<THasIterator O = T>
 		inline auto end() -> typename O::Iterator;
-		template<THasIterator O = T>
+		template<THasConstIterator O = T>
+		inline auto begin() const -> typename O::ConstIterator;
+		template<THasConstIterator O = T>
+		inline auto end() const -> typename O::ConstIterator;
+		template<THasConstIterator O = T>
 		inline auto cbegin() const -> typename O::ConstIterator;
-		template<THasIterator O = T>
+		template<THasConstIterator O = T>
 		inline auto cend() const -> typename O::ConstIterator;
 
 		[[nodiscard]] inline T* operator->() const;
