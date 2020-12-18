@@ -79,16 +79,32 @@ String::String(const wchar_t* text) : This(text, Strlen(text))
 
 String::String(const char* text, size_t len) : This()
 {
-	text_buffer = MultiByteToWideChar(text, &len);
-	this->len = len;
-	bDynamicBuffer = true;
+    Assign(text, len);
 }
 
 String::String(const wchar_t* text, size_t len) : This()
 {
-	text_buffer = CopyAllocate(text, len);
-	this->len = len;
-	bDynamicBuffer = true;
+    Assign(text, len);
+}
+
+String::String(const string& text) : This(text.c_str(), text.length())
+{
+
+}
+
+String::String(const wstring& text) : This(text.c_str(), text.length())
+{
+
+}
+
+String::String(string_view text) : This(text.data(), text.length())
+{
+
+}
+
+String::String(wstring_view text) : This(text.data(), text.length())
+{
+
 }
 
 const wchar_t* String::C_Str_get() const
@@ -379,7 +395,7 @@ TRefPtr<String> String::FormatHelper(TRefPtr<String> format, vector<TRefPtr<Obje
 wchar_t* String::MultiByteToWideChar(const char* multibyte, size_t* len)
 {
 	int length = ::MultiByteToWideChar(CP_ACP, 0, multibyte, (int)*len, nullptr, 0);
-	auto* buffer = new wchar_t[SizeAsBoundary((size_t)length + 1)]{ };
+    auto* buffer = AllocCharBuffer<wchar_t>(*len + 1);
 	::MultiByteToWideChar(CP_ACP, 0, multibyte, (int)*len, buffer, length);
 	*len = length;
 	return buffer;
@@ -387,9 +403,33 @@ wchar_t* String::MultiByteToWideChar(const char* multibyte, size_t* len)
 
 wchar_t* String::CopyAllocate(const wchar_t* text, size_t len)
 {
-	auto* buffer = new wchar_t[SizeAsBoundary(len + 1)]{ };
+    auto* buffer = AllocCharBuffer<wchar_t>(len + 1);
 	memcpy(buffer, text, sizeof(wchar_t) * len);
 	return buffer;
+}
+
+void* String::AllocInternal(size_t sizeInBytes)
+{
+    return new int8[sizeInBytes]{ };
+}
+
+void String::FreeInternal(void* internalPointer)
+{
+    delete[] reinterpret_cast<int8*&>(internalPointer);
+}
+
+void String::Assign(const char* text, size_t len)
+{
+    text_buffer = MultiByteToWideChar(text, &len);
+    this->len = len;
+    bDynamicBuffer = true;
+}
+
+void String::Assign(const wchar_t* text, size_t len)
+{
+    text_buffer = CopyAllocate(text, len);
+    this->len = len;
+    bDynamicBuffer = true;
 }
 
 size_t String::SizeAsBoundary(size_t len)

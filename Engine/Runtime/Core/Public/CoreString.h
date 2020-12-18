@@ -8,6 +8,7 @@
 #include "CoreConcepts.h"
 #include "TRefPtr.h"
 #include <vector>
+#include <string>
 #include "IStringFormattable.h"
 
 namespace SC::Runtime::Core
@@ -33,6 +34,30 @@ namespace SC::Runtime::Core
 
 	class CORE_API String : virtual public Object
 	{
+		template<TIsChar T>
+		struct HeapStorage
+		{
+			T* ptr;
+
+			HeapStorage(T* ptr = nullptr) : ptr(ptr)
+			{
+
+			}
+
+			HeapStorage(HeapStorage&& storage) : ptr(storage.ptr)
+			{
+				storage.ptr = nullptr;
+			}
+
+			~HeapStorage()
+			{
+				if (ptr != nullptr)
+				{
+					Free(ptr);
+				}
+			}
+		};
+
 	public:
 		static wchar_t EmptyBuffer[1];
 
@@ -56,6 +81,14 @@ namespace SC::Runtime::Core
 		String(const wchar_t* text);
 		String(const char* text, size_t len);
 		String(const wchar_t* text, size_t len);
+		String(const std::string& text);
+		String(const std::wstring& text);
+		String(std::string_view text);
+		String(std::wstring_view text);
+		template<TIsIterator<char> TIterator>
+		String(TIterator begin, TIterator end);
+		template<TIsIterator<wchar_t> TIterator>
+		String(TIterator begin, TIterator end);
 
 		vs_property_get(const wchar_t*, C_Str);
 		const wchar_t* C_Str_get() const;
@@ -74,6 +107,16 @@ namespace SC::Runtime::Core
 		static TRefPtr<String> FormatHelper(TRefPtr<String> format, std::vector<TRefPtr<Object>>& unpackedArgs);
 		wchar_t* MultiByteToWideChar(const char* multibyte, size_t* len);
 		wchar_t* CopyAllocate(const wchar_t* text, size_t len);
+
+		template<TIsChar TChar>
+		static TChar* AllocCharBuffer(size_t len);
+		template<TIsChar TChar>
+		static void Free(TChar* charBuffer);
+		static void* AllocInternal(size_t sizeInBytes);
+		static void FreeInternal(void* internalPointer);
+
+		void Assign(const char* text, size_t len);
+		void Assign(const wchar_t* text, size_t len);
 
 		template<TIsChar TChar>
 		inline static size_t Strlen(const TChar* text);
@@ -96,6 +139,7 @@ namespace SC::Runtime::Core
 
 		template<class T, class... TArgs>
 		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args);
+		
 	};
 }
 

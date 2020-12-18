@@ -72,4 +72,26 @@ namespace SC::Runtime::Core
 	{
 		{ T(args...) };
 	};
+
+	template<class TLeft, class TRight>
+	concept TIsSameWithoutDeco = TIsSame<
+		std::remove_const_t<std::remove_reference_t<TLeft>>,
+		std::remove_const_t<std::remove_reference_t<TRight>>
+	>;
+
+	template<class TIterator, class T>
+	concept TIsIterator =
+		TIsSameWithoutDeco<decltype(*TIterator()), T> &&
+		requires(TIterator& It)
+		{
+			{ (T)*(++It) };
+		} &&
+		requires(TIterator& It)
+		{
+			{ (T)*(It++) };
+		} &&
+		requires(TIterator& It)
+		{
+			{ (size_t)(It - It) };
+		};
 }

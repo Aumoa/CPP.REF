@@ -7,6 +7,37 @@
 
 namespace SC::Runtime::Core
 {	
+	template<TIsIterator<char> TIterator>
+	inline String::String(TIterator begin, TIterator end)
+	{
+		size_t length = end - begin;
+		auto buffer = HeapStorage(AllocCharBuffer<char>(length + 1));
+		auto seek = buffer.ptr;
+		for (auto it = begin; it != end; ++it)
+		{
+			*seek++ = *it;
+		}
+
+		Assign(buffer.ptr, length);
+	}
+
+	template<TIsIterator<wchar_t> TIterator>
+	inline String::String(TIterator begin, TIterator end)
+	{
+		size_t length = end - begin;
+		auto buffer = HeapStorage(AllocCharBuffer<wchar_t>(length + 1));
+		auto seek = buffer.ptr;
+		for (auto it = begin; it != end; ++it)
+		{
+			*seek++ = *it;
+		}
+
+		text_buffer = buffer.ptr;
+		buffer.ptr = nullptr;
+		len = length;
+		bDynamicBuffer = true;
+	}
+
 	template<class... TArgs>
 	inline TRefPtr<String> String::Format(TRefPtr<String> format, TArgs... args)
 	{
@@ -16,6 +47,21 @@ namespace SC::Runtime::Core
 			FormatUnpack(unpacked, 0, args...);
 		}
 		return FormatHelper(format, unpacked);
+	}
+
+	template<TIsChar TChar>
+	inline TChar* String::AllocCharBuffer(size_t len)
+	{
+		len = SizeAsBoundary(len + 1);
+		TChar* buffer = (TChar*)AllocInternal(sizeof(TChar) * len);
+		memset(buffer, 0, (len) * sizeof(TChar));
+		return buffer;
+	}
+
+	template<TIsChar TChar>
+	inline void String::Free(TChar* charBuffer)
+	{
+		FreeInternal(charBuffer);
 	}
 
 	template<TIsChar TChar>
