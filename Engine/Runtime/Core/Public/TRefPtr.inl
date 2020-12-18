@@ -174,6 +174,34 @@ namespace SC::Runtime::Core
 	}
 
 	template<TIsNotPointer T>
+	template<THasIterator O>
+	inline auto TRefPtr<T>::begin() -> typename O::Iterator
+	{
+		return ptr->begin();
+	}
+
+	template<TIsNotPointer T>
+	template<THasIterator O>
+	inline auto TRefPtr<T>::end() -> typename O::Iterator
+	{
+		return ptr->end();
+	}
+
+	template<TIsNotPointer T>
+	template<THasIterator O>
+	inline auto TRefPtr<T>::cbegin() const -> typename O::ConstIterator
+	{
+		return ptr->cbegin();
+	}
+
+	template<TIsNotPointer T>
+	template<THasIterator O>
+	inline auto TRefPtr<T>::cend() const -> typename O::ConstIterator
+	{
+		return ptr->cend();
+	}
+
+	template<TIsNotPointer T>
 	inline T* TRefPtr<T>::operator->() const
 	{
 		return Get();

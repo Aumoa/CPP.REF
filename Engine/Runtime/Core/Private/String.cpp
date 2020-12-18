@@ -107,6 +107,26 @@ String::String(wstring_view text) : This(text.data(), text.length())
 
 }
 
+auto String::begin() -> Iterator
+{
+    return text_buffer;
+}
+
+auto String::end() -> Iterator
+{
+    return text_buffer + len;
+}
+
+auto String::cbegin() const -> ConstIterator
+{
+    return text_buffer;
+}
+
+auto String::cend() const -> ConstIterator
+{
+    return text_buffer + len;
+}
+
 const wchar_t* String::C_Str_get() const
 {
 	return text_buffer;

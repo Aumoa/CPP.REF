@@ -158,6 +158,7 @@
     <ClInclude Include="Public\IndexOutOfRangeException.h" />
     <ClInclude Include="Public\InvalidArgumentException.h" />
     <ClInclude Include="Public\InvalidCastException.h" />
+    <ClInclude Include="Public\IEnumerable.h" />
     <ClInclude Include="Public\IStringFormattable.h" />
     <ClInclude Include="Public\NullReferenceException.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />

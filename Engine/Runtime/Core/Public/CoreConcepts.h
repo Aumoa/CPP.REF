@@ -30,24 +30,24 @@ namespace SC::Runtime::Core
 
 	template<class TChar>
 	concept TIsChar =
-		TIsSame<TChar, char> ||
-		TIsSame<TChar, wchar_t>;
+		TIsSame<std::remove_const_t<TChar>, char> ||
+		TIsSame<std::remove_const_t<TChar>, wchar_t>;
 
 	template<class TPrim>
 	concept TIsPrimitive =
-		TIsSame<TPrim, uint8> ||
-		TIsSame<TPrim, uint16> ||
-		TIsSame<TPrim, uint32> ||
-		TIsSame<TPrim, uint64> ||
-		TIsSame<TPrim, int8> ||
-		TIsSame<TPrim, int16> ||
-		TIsSame<TPrim, int32> ||
-		TIsSame<TPrim, int64> ||
-		TIsSame<TPrim, float> ||
-		TIsSame<TPrim, double> ||
-		TIsSame<TPrim, bool> ||
-		TIsSame<TPrim, char> ||
-		TIsSame<TPrim, wchar_t>;
+		TIsSame<std::remove_const_t<TPrim>, uint8> ||
+		TIsSame<std::remove_const_t<TPrim>, uint16> ||
+		TIsSame<std::remove_const_t<TPrim>, uint32> ||
+		TIsSame<std::remove_const_t<TPrim>, uint64> ||
+		TIsSame<std::remove_const_t<TPrim>, int8> ||
+		TIsSame<std::remove_const_t<TPrim>, int16> ||
+		TIsSame<std::remove_const_t<TPrim>, int32> ||
+		TIsSame<std::remove_const_t<TPrim>, int64> ||
+		TIsSame<std::remove_const_t<TPrim>, float> ||
+		TIsSame<std::remove_const_t<TPrim>, double> ||
+		TIsSame<std::remove_const_t<TPrim>, bool> ||
+		TIsSame<std::remove_const_t<TPrim>, char> ||
+		TIsSame<std::remove_const_t<TPrim>, wchar_t>;
 
 	template<class TCallable>
 	concept TIsCallable = requires(TCallable Callable)
@@ -94,4 +94,17 @@ namespace SC::Runtime::Core
 		{
 			{ (size_t)(It - It) };
 		};
+
+	template<class TStringArg>
+	concept TIsStringConstructible = requires(const TStringArg& UnaryArg)
+	{
+		{ String(UnaryArg) };
+	};
+
+	template<class T>
+	concept THasIterator = requires()
+	{
+		{ typename T::Iterator() };
+		{ typename T::ConstIterator() };
+	};
 }

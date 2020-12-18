@@ -222,8 +222,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T> template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
-	inline TRefPtr<T>::TRefPtr(const TChar* text) : This(new String(text))
+	template<TIsNotPointer T> template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String, T>
+	inline TRefPtr<T>::TRefPtr(TStringConstructibleArg arg) : This(new String(arg))
 	{
 		ptr->bLockCollecting = false;
 	}

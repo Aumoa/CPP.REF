@@ -60,6 +60,9 @@
     <ClInclude Include="Public\WeakReferences.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\IEnumerable.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">

@@ -42,8 +42,8 @@ namespace SC::Runtime::Core
 		inline ~TRefPtr();
 
 		// String.inl
-		template<class TChar> requires TIsChar<TChar> && TIsAssignable<String, T>
-		inline TRefPtr(const TChar* text);
+		template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String, T>
+		inline TRefPtr(TStringConstructibleArg text);
 
 		template<TIsBaseOf<T> O>
 		inline TRefPtr(const TRefPtr<O>& ptr);
@@ -70,6 +70,15 @@ namespace SC::Runtime::Core
 
 		vs_property_get(bool, IsValid);
 		[[nodiscard]] inline bool IsValid_get() const;
+
+		template<THasIterator O = T>
+		inline auto begin() -> typename O::Iterator;
+		template<THasIterator O = T>
+		inline auto end() -> typename O::Iterator;
+		template<THasIterator O = T>
+		inline auto cbegin() const -> typename O::ConstIterator;
+		template<THasIterator O = T>
+		inline auto cend() const -> typename O::ConstIterator;
 
 		[[nodiscard]] inline T* operator->() const;
 		[[nodiscard]] inline operator bool() const;

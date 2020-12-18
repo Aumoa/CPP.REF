@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include "IStringFormattable.h"
+#include "IEnumerable.h"
 
 namespace SC::Runtime::Core
 {
@@ -32,7 +33,10 @@ namespace SC::Runtime::Core
 	template<class T>
 	concept TIsOnlyStringConvertible = VIsStringConvertible<T> && !VIsFormattableStringConvertible<T>;
 
-	class CORE_API String : virtual public Object
+	template<class TItem>
+	using StringIterator = TItem*;
+
+	class CORE_API String : virtual public Object, virtual public IEnumerable<StringIterator, wchar_t>
 	{
 		template<TIsChar T>
 		struct HeapStorage
@@ -57,6 +61,10 @@ namespace SC::Runtime::Core
 				}
 			}
 		};
+
+	public:
+		using Iterator = StringIterator<wchar_t>;
+		using ConstIterator = StringIterator<const wchar_t>;
 
 	public:
 		static wchar_t EmptyBuffer[1];
@@ -89,6 +97,11 @@ namespace SC::Runtime::Core
 		String(TIterator begin, TIterator end);
 		template<TIsIterator<wchar_t> TIterator>
 		String(TIterator begin, TIterator end);
+
+		Iterator begin() override;
+		Iterator end() override;
+		ConstIterator cbegin() const override;
+		ConstIterator cend() const override;
 
 		vs_property_get(const wchar_t*, C_Str);
 		const wchar_t* C_Str_get() const;
@@ -139,7 +152,6 @@ namespace SC::Runtime::Core
 
 		template<class T, class... TArgs>
 		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args);
-		
 	};
 }
 
