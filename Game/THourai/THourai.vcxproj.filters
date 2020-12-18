@@ -9,7 +9,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\WinMain.cpp">
+    <ClCompile Include="Private\WinMain.ixx">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

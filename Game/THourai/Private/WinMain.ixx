@@ -10,7 +10,7 @@ class Program : virtual public Object
 public:
 	static int32 Main()
 	{
-		auto app = NewObject<Application>(L"GameApp");
+		auto app = NewObject<Application>("GameApp");
 		return app->Run();
 	}
 };
