@@ -4,6 +4,8 @@
 
 #ifdef __SC_RUNTIME_GAME_API__
 
+#pragma warning(disable: 4250)
+
 #include <mutex>
 
 #define GAME_API __declspec(dllexport)

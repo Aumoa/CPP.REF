@@ -6,6 +6,8 @@
 #include "CoreMinimal.h"
 #include "IEngineTick.h"
 
+#include "Logging/LogCategoryBase.h"
+
 namespace SC::Runtime::Game
 {
 	namespace RHI
@@ -14,6 +16,7 @@ namespace SC::Runtime::Game
 		interface IRHICommandFence;
 		interface IRHIDeviceBundle;
 		interface IRHIImmediateCommandList;
+		interface IRHISwapChain;
 	}
 
 	class Engine : virtual public Core::Object, virtual public IEngineTick
@@ -23,11 +26,14 @@ namespace SC::Runtime::Game
 		using This = Engine;
 
 	private:
+		Logging::LogCategoryBase LogEngine;
+
 		std::vector<Core::TRefPtr<RHI::IRHIBundle>> rhiBundles;
 		Core::TRefPtr<RHI::IRHICommandFence> autoFence;
 
 		RHI::IRHIDeviceBundle* deviceBundle;
 		RHI::IRHIImmediateCommandList* immediateCommandList;
+		RHI::IRHISwapChain* swapChain;
 
 		bool bPresent : 1;
 
@@ -38,7 +44,14 @@ namespace SC::Runtime::Game
 		virtual void Initialize();
 		virtual void Tick();
 
+		vs_property_get(RHI::IRHIDeviceBundle*, DeviceBundle);
+		RHI::IRHIDeviceBundle* DeviceBundle_get() const;
+
+		static Engine* gEngine;
+
 	private:
 		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
 	};
 }
+
+#define GEngine (*SC::Runtime::Game::Engine::gEngine)

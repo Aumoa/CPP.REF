@@ -19,6 +19,8 @@ namespace SC::Runtime::Game::D3D12RHI
 		D3D12CommandList();
 		~D3D12CommandList() override;
 
+		void OMSetRenderTargets(size_t count, RHI::IRHIRenderTargetView* rtv[]);
+
 		vs_property_get(ID3D12GraphicsCommandList*, CommandList);
 		virtual ID3D12GraphicsCommandList* CommandList_get() = 0;
 	};

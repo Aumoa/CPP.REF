@@ -7,8 +7,10 @@
 
 namespace SC::Runtime::Game::RHI
 {
+	interface IRHIRenderTargetView;
+
 	interface IRHICommandList : virtual public Core::Object
 	{
-
+		virtual void OMSetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]) = 0;
 	};
 }
