@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include <utility>
+
 namespace SC::Runtime::Core
 {
-	template<class T, class... TArgs> requires TIsNotPointer<T> && TIsBaseOf<T, Object> && THasConstructor<T, TArgs...>
-	inline TRefPtr<T> Object::NewObject(TArgs... args)
+	template<TIsNotPointer T, class... TArgs> requires TIsBaseOf<T, Object> && THasConstructor<T, TArgs...>
+	inline TRefPtr<T> Object::NewObject(TArgs&&... args)
 	{
-		auto ptr = new T(args...);
+		auto ptr = new T(std::forward<TArgs>(args)...);
 		ptr->bLockCollecting = false;
 		TRefPtr<T> binder = ptr;
 		return binder;

@@ -37,8 +37,8 @@ namespace SC::Runtime::Core
 		virtual bool Equals(TRefPtr<Object> right) const;
 		virtual size_t GetHashCode() const;
 
-		template<class T, class... TArgs> requires TIsNotPointer<T> && TIsBaseOf<T, Object> && THasConstructor<T, TArgs...>
-		inline static TRefPtr<T> NewObject(TArgs... args);
+		template<TIsNotPointer T, class... TArgs> requires TIsBaseOf<T, Object> && THasConstructor<T, TArgs...>
+		inline static TRefPtr<T> NewObject(TArgs&&... args);
 
 		bool operator ==(const TRefPtr<Object>& right) const;
 		bool operator !=(const TRefPtr<Object>& right) const;

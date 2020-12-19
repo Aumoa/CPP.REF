@@ -39,12 +39,12 @@ namespace SC::Runtime::Core
 	}
 
 	template<class... TArgs>
-	inline TRefPtr<String> String::Format(TRefPtr<String> format, TArgs... args)
+	inline TRefPtr<String> String::Format(TRefPtr<String> format, TArgs&&... args)
 	{
 		std::vector<TRefPtr<Object>> unpacked(sizeof...(TArgs));
 		if constexpr (sizeof...(TArgs) != 0)
 		{
-			FormatUnpack(unpacked, 0, args...);
+			FormatUnpack(unpacked, 0, std::forward<TArgs>(args)...);
 		}
 		return FormatHelper(format, unpacked);
 	}
@@ -212,13 +212,13 @@ namespace SC::Runtime::Core
 	}
 
 	template<class T, class... TArgs>
-	static void String::FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args)
+	static void String::FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T&& arg, TArgs&&... args)
 	{
-		container[index++] = GetString(arg);
+		container[index++] = GetString(std::forward<T>(arg));
 
 		if constexpr (sizeof...(TArgs) != 0)
 		{
-			FormatUnpack(container, index, args...);
+			FormatUnpack(container, index, std::forward<TArgs>(args)...);
 		}
 	}
 

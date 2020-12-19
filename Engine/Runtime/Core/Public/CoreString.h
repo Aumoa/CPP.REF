@@ -109,7 +109,7 @@ namespace SC::Runtime::Core
 		wchar_t operator [](size_t index) const;
 
 		template<class... TArgs>
-		static TRefPtr<String> Format(TRefPtr<String> format, TArgs... args);
+		static TRefPtr<String> Format(TRefPtr<String> format, TArgs&&... args);
 		static TRefPtr<String> Format(TRefPtr<String> format);
 
 		static const TRefPtr<String> Empty;
@@ -149,7 +149,7 @@ namespace SC::Runtime::Core
 		static TRefPtr<Object> GetString(const T* packedArg);
 
 		template<class T, class... TArgs>
-		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T arg, TArgs... args);
+		static void FormatUnpack(std::vector<TRefPtr<Object>>& container, size_t index, T&& arg, TArgs&&... args);
 	};
 }
 
