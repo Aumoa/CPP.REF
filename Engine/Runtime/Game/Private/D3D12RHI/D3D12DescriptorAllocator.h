@@ -29,12 +29,22 @@ namespace SC::Runtime::Game::D3D12RHI
 		std::queue<size_t> descriptor_pool;
 		std::vector<size_t> rev_pool;
 
+		bool bOffline : 1;
+		bool bThreadSafe : 1;
+
 	public:
-		D3D12DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t numDescriptors, bool bIsOffline);
+		D3D12DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t numDescriptors, bool bIsOffline, bool bThreadSafe = true);
 		~D3D12DescriptorAllocator() override;
 
 		D3D12DescriptorIndex Alloc();
 		void Free(const D3D12DescriptorIndex& index);
+
+		vs_property_get(size_t, Slack);
+		size_t Slack_get() const;
+		vs_property_get(bool, IsOffline);
+		bool IsOffline_get() const;
+		vs_property_get(bool, IsThreadSafe);
+		bool IsThreadSafe_get() const;
 
 		const D3D12_DESCRIPTOR_HEAP_TYPE Type;
 		const size_t Count;

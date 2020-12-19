@@ -157,6 +157,8 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorIndex.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ImmediateCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
@@ -195,6 +197,8 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorIndex.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ImmediateCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />

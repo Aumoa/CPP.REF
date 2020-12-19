@@ -7,14 +7,17 @@
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game::D3D12RHI;
+using namespace std;
 
-D3D12DescriptorAllocator::D3D12DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t numDescriptors, bool bIsOffline) : Super()
+D3D12DescriptorAllocator::D3D12DescriptorAllocator(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t numDescriptors, bool bIsOffline, bool bThreadSafe) : Super()
 	, Type(type)
 	, Count(numDescriptors)
 	, DeviceRef(device)
 	, IncrementSize(device->GetDescriptorHandleIncrementSize(type))
 
 	, descriptorHeap(nullptr)
+	, bOffline(bIsOffline)
+	, bThreadSafe(bThreadSafe)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC desc;
 	desc.Type = type;
@@ -35,7 +38,12 @@ D3D12DescriptorAllocator::~D3D12DescriptorAllocator()
 
 D3D12DescriptorIndex D3D12DescriptorAllocator::Alloc()
 {
-	ScopedLock(locker);
+	unique_lock<mutex> lock_locker;
+
+	if (bThreadSafe)
+	{
+		lock_locker = move(unique_lock(locker));
+	}
 
 	if (descriptor_pool.size() == 0)
 	{
@@ -55,13 +63,33 @@ D3D12DescriptorIndex D3D12DescriptorAllocator::Alloc()
 
 void D3D12DescriptorAllocator::Free(const D3D12DescriptorIndex& index)
 {
-	ScopedLock(locker);
+	unique_lock<mutex> lock_locker;
+
+	if (bThreadSafe)
+	{
+		lock_locker = move(unique_lock(locker));
+	}
 
 	if (index.IsValid)
 	{
 		descriptor_pool.push(index.Index);
 		++rev_pool.at(index.Index);
 	}
+}
+
+size_t D3D12DescriptorAllocator::Slack_get() const
+{
+	return descriptor_pool.size();
+}
+
+bool D3D12DescriptorAllocator::IsOffline_get() const
+{
+	return bOffline;
+}
+
+bool D3D12DescriptorAllocator::IsThreadSafe_get() const
+{
+	return bThreadSafe;
 }
 
 void D3D12DescriptorAllocator::InitializePool()
