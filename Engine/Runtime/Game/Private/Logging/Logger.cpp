@@ -14,7 +14,7 @@ void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, TRefPtr<S
 	TRefPtr<String> categoryName = category.CategoryName;
 	const wchar_t* verbosityName = ToString(category.GetAmendedVerbosity(inVerbosity));
 
-	OutputDebugStringW(String::Format(L"{0}: {1}: {2}", categoryName, verbosityName, logMessage)->C_Str);
+	OutputDebugStringW(String::Format(L"{0}: {1}: {2}\n", categoryName, verbosityName, logMessage)->C_Str);
 }
 
 const wchar_t* Logger::ToString(ELogVerbosity inVerbosity)
