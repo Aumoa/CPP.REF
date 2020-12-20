@@ -8,6 +8,10 @@
 #include "D3D12SwapChain.h"
 #include "D3D12ImmediateCommandList.h"
 #include "D3D12CommandFence.h"
+#include "D3D12RenderTargetView.h"
+#include "D3D12OfflineDescriptorManager.h"
+#include "D3D12OfflineDescriptorIndex.h"
+#include "D3D12Resource.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
@@ -52,7 +56,7 @@ void D3D12DeviceBundle::InitializeBundle()
 
 	instance = this;
 
-	GApplication.PostSized += bind_delegate(Application_OnPostSized);
+	GApplication.Sizing += bind_delegate(Application_OnSizing);
 }
 
 void D3D12DeviceBundle::ReleaseBundle()
@@ -73,6 +77,14 @@ TRefPtr<IRHIImmediateCommandList> D3D12DeviceBundle::GetImmediateCommandList() c
 TRefPtr<IRHICommandFence> D3D12DeviceBundle::CreateCommandFence()
 {
 	return NewObject<D3D12CommandFence>(d3d12Device.Get());
+}
+
+TRefPtr<IRHIRenderTargetView> D3D12DeviceBundle::CreateRenderTargetView(IRHIResource* resource)
+{
+	ID3D12Resource* resource1 = Cast<D3D12Resource>(resource)->Resource;
+	D3D12OfflineDescriptorIndex index = rtvManager->Alloc();
+	d3d12Device->CreateRenderTargetView(resource1, nullptr, index.Handle);
+	return NewObject<D3D12RenderTargetView>(resource1, index);
 }
 
 ID3D12Device* D3D12DeviceBundle::Device_get() const
@@ -97,6 +109,8 @@ void D3D12DeviceBundle::InitializeDXGI()
 
 void D3D12DeviceBundle::InitializeD3D12()
 {
+	constexpr size_t OfflineDescriptorAllocUnit = 128;
+
 	ComPtr<IDXGIAdapter1> adapter;
 	for (int32 i = 0; SUCCEEDED(dxgiFactory->EnumAdapters1((UINT)i, &adapter)); ++i)
 	{
@@ -139,9 +153,12 @@ void D3D12DeviceBundle::InitializeD3D12()
 	HR(swapChain.As(&swapChain4));
 
 	this->swapChain = NewObject<D3D12SwapChain>(swapChain4.Get());
+
+	rtvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
+	dsvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
 }
 
-void D3D12DeviceBundle::Application_OnPostSized(int32 width, int32 height)
+void D3D12DeviceBundle::Application_OnSizing(int32 width, int32 height)
 {
 	SE_LOG(LogD3D12RHI, Verbose, L"Swap chain resized to {0} x {1}", width, height);
 	swapChain->ResizeBuffers(width, height);

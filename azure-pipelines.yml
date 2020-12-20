@@ -5,8 +5,6 @@
 
 trigger:
 - master
-- dev
-- azure-pipelines
 
 pool:
   name: win64-notebook

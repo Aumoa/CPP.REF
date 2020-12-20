@@ -117,6 +117,9 @@
     <ClInclude Include="Public\Engine.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\RHI\RHIResourceStates.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">

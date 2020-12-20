@@ -22,6 +22,7 @@ namespace SC::Runtime::Game
 		using This = Application;
 
 		using PreSizingDelegate = Core::TMulticastDelegate<void(int32, int32)>;
+		using SizingDelegate = Core::TMulticastDelegate<void(int32, int32)>;
 		using PostSizedDelegate = Core::TMulticastDelegate<void(int32, int32)>;
 
 	private:
@@ -42,6 +43,7 @@ namespace SC::Runtime::Game
 		HWND GetCoreHwnd() const;
 
 		PreSizingDelegate PreSizing;
+		SizingDelegate Sizing;
 		PostSizedDelegate PostSized;
 
 		[[nodiscard]] static Application* GetInstance();

@@ -25,7 +25,7 @@ namespace SC::Runtime::Game::D3D12RHI
 		const uint32 IncrementSize;
 
 		std::mutex locker;
-		ID3D12DescriptorHeap* descriptorHeap;
+		ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 		std::queue<size_t> descriptor_pool;
 		std::vector<size_t> rev_pool;
 

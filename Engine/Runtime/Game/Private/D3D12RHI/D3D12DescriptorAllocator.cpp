@@ -24,8 +24,6 @@ D3D12DescriptorAllocator::D3D12DescriptorAllocator(ID3D12Device* device, D3D12_D
 	desc.NumDescriptors = (UINT)numDescriptors;
 	desc.Flags = bIsOffline ? D3D12_DESCRIPTOR_HEAP_FLAG_NONE : D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	desc.NodeMask = 0;
-
-	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 	HR(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap)));
 
 	InitializePool();

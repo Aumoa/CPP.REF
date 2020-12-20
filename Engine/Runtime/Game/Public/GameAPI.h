@@ -18,6 +18,18 @@ std::lock_guard<std::mutex> lock_##x(x)
 #define GEngine (*SC::Runtime::Game::Engine::GetInstance())
 #define GApplication (*SC::Runtime::Game::Application::GetInstance())
 
+template<class O, class T>
+inline O* Cast(T* from)
+{
+	return dynamic_cast<O*>(from);
+}
+
+template<class O, class T>
+inline const O* Cast(const T* from)
+{
+	return dynamic_cast<const O*>(from);
+}
+
 #else
 #define GAME_API __declspec(dllimport)
 #endif

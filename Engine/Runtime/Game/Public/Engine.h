@@ -39,7 +39,7 @@ namespace SC::Runtime::Game
 		RHI::IRHISwapChain* swapChain;
 
 		// TEST IMPLEMENT
-		Core::TRefPtr<RHI::IRHIRenderTargetView> basicRTV;
+		Core::TRefPtr<RHI::IRHIRenderTargetView> basicRTV[3];
 
 		bool bPresent : 1;
 
@@ -57,5 +57,8 @@ namespace SC::Runtime::Game
 
 	private:
 		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
+
+		// CALLBACK HANDLERS
+		void Application_OnPostSized(int32 width, int32 height);
 	};
 }

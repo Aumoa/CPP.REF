@@ -11,6 +11,8 @@ namespace SC::Runtime::Game::RHI
 	interface IRHISwapChain;
 	interface IRHIImmediateCommandList;
 	interface IRHICommandFence;
+	interface IRHIRenderTargetView;
+	interface IRHIResource;
 
 	interface IRHIDeviceBundle : virtual public Core::Object, virtual public IRHIBundle
 	{
@@ -18,5 +20,6 @@ namespace SC::Runtime::Game::RHI
 		virtual Core::TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const = 0;
 
 		virtual Core::TRefPtr<IRHICommandFence> CreateCommandFence() = 0;
+		virtual Core::TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
 	};
 }

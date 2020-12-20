@@ -12,6 +12,7 @@ namespace SC::Runtime::Game::D3D12RHI
 {
 	class D3D12SwapChain;
 	class D3D12ImmediateCommandList;
+	class D3D12OfflineDescriptorManager;
 
 	class D3D12DeviceBundle : virtual public Core::Object, virtual public RHI::IRHIDeviceBundle
 	{
@@ -29,6 +30,8 @@ namespace SC::Runtime::Game::D3D12RHI
 
 		Core::TRefPtr<D3D12SwapChain> swapChain;
 		Core::TRefPtr<D3D12ImmediateCommandList> immediateCommandList;
+		Core::TRefPtr<D3D12OfflineDescriptorManager> rtvManager;
+		Core::TRefPtr<D3D12OfflineDescriptorManager> dsvManager;
 
 	public:
 		D3D12DeviceBundle();
@@ -41,6 +44,7 @@ namespace SC::Runtime::Game::D3D12RHI
 		virtual Core::TRefPtr<RHI::IRHIImmediateCommandList> GetImmediateCommandList() const;
 
 		virtual Core::TRefPtr<RHI::IRHICommandFence> CreateCommandFence();
+		virtual Core::TRefPtr<RHI::IRHIRenderTargetView> CreateRenderTargetView(RHI::IRHIResource* resource);
 
 		vs_property_get(ID3D12Device*, Device);
 		ID3D12Device* Device_get() const;
@@ -51,7 +55,6 @@ namespace SC::Runtime::Game::D3D12RHI
 		void InitializeD3D12();
 
 		// CALLBACK HANDLERS
-		void Application_OnPreSizing(int32 width, int32 height);
-		void Application_OnPostSized(int32 width, int32 height);
+		void Application_OnSizing(int32 width, int32 height);
 	};
 }

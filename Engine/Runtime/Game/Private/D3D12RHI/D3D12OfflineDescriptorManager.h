@@ -21,14 +21,14 @@ namespace SC::Runtime::Game::D3D12RHI
 
 	private:
 		const D3D12_DESCRIPTOR_HEAP_TYPE Type;
-		const uint32 NumDescriptorsPerAllocator;
+		const size_t NumDescriptorsPerAllocator;
 
 		ID3D12Device* device;
 		std::vector<Core::TRefPtr<D3D12DescriptorAllocator>> heapAllocators;
 		std::mutex locker;
 
 	public:
-		D3D12OfflineDescriptorManager(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32 numDescriptorsPerAllocator);
+		D3D12OfflineDescriptorManager(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t numDescriptorsPerAllocator);
 		~D3D12OfflineDescriptorManager() override;
 
 		D3D12OfflineDescriptorIndex Alloc();

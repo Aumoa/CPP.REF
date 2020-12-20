@@ -2,12 +2,14 @@
 
 #include "Engine.h"
 
+#include "Application.h"
 #include "D3D12RHI/D3D12Minimal.h"
 #include "D3D12RHI/D3D12DeviceBundle.h"
 #include "D3D12RHI/D3D12CommandFence.h"
 #include "D3D12RHI/D3D12ImmediateCommandList.h"
 #include "D3D12RHI/D3D12RenderTargetView.h"
 #include "RHI/IRHISwapChain.h"
+#include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
 
@@ -34,6 +36,7 @@ Engine::Engine() : Super()
 
 Engine::~Engine()
 {
+	// Waiting for all GPU tasks.
 	autoFence->BeginFence();
 }
 
@@ -56,6 +59,8 @@ void Engine::Initialize()
 	swapChain = deviceBundle->GetSwapChain().Get();
 
 	gEngine = this;
+	
+	GApplication.PostSized += bind_delegate(Application_OnPostSized);
 }
 
 void Engine::Tick()
@@ -71,7 +76,19 @@ void Engine::Tick()
 	{
 		autoFence->BeginFence();
 
-		
+		IRHIRenderTargetView* rtv = basicRTV[swapChain->CurrentBackBufferIndex].Get();
+		IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
+
+		immediateCommandList->BeginCommand();
+		immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::RENDER_TARGET);
+
+		immediateCommandList->OMSetRenderTargets(1, &rtv);
+		immediateCommandList->ClearRenderTargetView(rtv);
+
+		immediateCommandList->ResourceTransition(target, RHIResourceStates::RENDER_TARGET, RHIResourceStates::PRESENT);
+		immediateCommandList->EndCommand();
+		immediateCommandList->Flush();
+
 		bPresent = swapChain->Present();
 
 		autoFence->EndFence(immediateCommandList);
@@ -93,5 +110,14 @@ void Engine::ForEachBundles(function<void(IRHIBundle*)> action)
 	for (auto& bundle : rhiBundles)
 	{
 		action(bundle.Get());
+	}
+}
+
+void Engine::Application_OnPostSized(int32 width, int32 height)
+{
+	for (size_t i = 0; i < 3; ++i)
+	{
+		TRefPtr<IRHIResource> buffer = swapChain->GetBuffer(i);
+		basicRTV[i] = deviceBundle->CreateRenderTargetView(buffer.Get());
 	}
 }

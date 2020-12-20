@@ -29,6 +29,10 @@ namespace SC::Runtime::Game::D3D12RHI
 		D3D12ImmediateCommandList(ID3D12Device* device);
 		~D3D12ImmediateCommandList() override;
 
+		virtual void BeginCommand();
+		virtual void EndCommand() override;
+		virtual void Flush();
+
 		virtual ID3D12GraphicsCommandList* CommandList_get();
 
 		vs_property_get(ID3D12CommandQueue*, CommandQueue);
@@ -37,5 +41,6 @@ namespace SC::Runtime::Game::D3D12RHI
 	private:
 		ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
 		ComPtr<ID3D12GraphicsCommandList> CreateCommandList(ID3D12Device* device, ID3D12CommandAllocator* allocator, D3D12_COMMAND_LIST_TYPE type);
+		void MoveAllocatorNext();
 	};
 }

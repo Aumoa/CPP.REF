@@ -23,13 +23,34 @@ D3D12ImmediateCommandList::~D3D12ImmediateCommandList()
 
 }
 
-ID3D12GraphicsCommandList* D3D12ImmediateCommandList::CommandList_get()
+void D3D12ImmediateCommandList::BeginCommand()
 {
+	HR(commandAllocator[currentAllocatorIndex]->Reset());
+
 	if (!commandList)
 	{
 		commandList = CreateCommandList(device.Get(), commandAllocator[currentAllocatorIndex].Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 	}
+	else
+	{
+		HR(commandList->Reset(commandAllocator[currentAllocatorIndex].Get(), nullptr));
+	}
+}
 
+void D3D12ImmediateCommandList::EndCommand()
+{
+	Super::EndCommand();
+	MoveAllocatorNext();
+}
+
+void D3D12ImmediateCommandList::Flush()
+{
+	ID3D12CommandList* commandListRef = commandList.Get();
+	commandQueue->ExecuteCommandLists(1, &commandListRef);
+}
+
+ID3D12GraphicsCommandList* D3D12ImmediateCommandList::CommandList_get()
+{
 	return commandList.Get();
 }
 
@@ -50,4 +71,9 @@ ComPtr<ID3D12GraphicsCommandList> D3D12ImmediateCommandList::CreateCommandList(I
 	ComPtr<ID3D12GraphicsCommandList> commandList;
 	HR(device->CreateCommandList(0, type, allocator, nullptr, IID_PPV_ARGS(&commandList)));
 	return move(commandList);
+}
+
+void D3D12ImmediateCommandList::MoveAllocatorNext()
+{
+	currentAllocatorIndex = ++currentAllocatorIndex % 2;
 }

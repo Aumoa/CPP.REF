@@ -10,6 +10,8 @@ namespace SC::Runtime::Game::RHI
 {
 	interface IRHIImmediateCommandList : virtual public Core::Object, virtual public IRHICommandList
 	{
-		
+		virtual void BeginCommand() = 0;
+		virtual void EndCommand() = 0;
+		virtual void Flush() = 0;
 	};
 }
