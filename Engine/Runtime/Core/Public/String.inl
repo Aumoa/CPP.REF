@@ -85,6 +85,42 @@ namespace SC::Runtime::Core
 		return Join(separator, values_vec);
 	}
 
+	template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
+	inline TRefPtr<String> String::Concat(const T(&values)[N])
+	{
+		std::vector<T> values_vec(values, values + N);
+		return Concat(values_vec);
+	}
+
+	template<class... TArgs>
+	inline TRefPtr<String> String::Concat(TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values)
+	{
+		std::vector<TRefPtr<String>> values_vec({ arg1, arg2, values... });
+		return Concat(values_vec);
+	}
+
+	template<TIsStringConvertible T>
+	inline TRefPtr<String> String::Concat(const std::vector<T>& values)
+	{
+		std::vector<TRefPtr<String>> values_vec(values.size());
+		for (size_t i = 0; i < values.size(); ++i)
+		{
+			values_vec[i] = values[i].ToString();
+		}
+		return Concat(values_vec);
+	}
+
+	template<TIsStringConstructible T>
+	inline TRefPtr<String> String::Concat(const std::vector<T>& values)
+	{
+		std::vector<TRefPtr<String>> values_vec(values.size());
+		for (size_t i = 0; i < values.size(); ++i)
+		{
+			values_vec[i] = values[i];
+		}
+		return Concat(values_vec);
+	}
+
 	template<TIsChar TChar>
 	inline TChar* String::AllocCharBuffer(size_t len)
 	{

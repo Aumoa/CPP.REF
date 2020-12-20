@@ -120,6 +120,15 @@ namespace SC::Runtime::Core
 		template<TIsStringConstructible T>
 		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<T>& values);
 		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<TRefPtr<String>>& values);
+		template<class... TArgs>
+		static TRefPtr<String> Concat(TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values);
+		template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
+		static TRefPtr<String> Concat(const T(&values)[N]);
+		template<TIsStringConvertible T>
+		static TRefPtr<String> Concat(const std::vector<T>& values);
+		template<TIsStringConstructible T>
+		static TRefPtr<String> Concat(const std::vector<T>& values);
+		static TRefPtr<String> Concat(const std::vector<TRefPtr<String>>& values);
 
 		static const TRefPtr<String> Empty;
 
