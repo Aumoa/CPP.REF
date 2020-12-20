@@ -15,14 +15,14 @@ namespace SC::Runtime::Core
 	void CORE_API ThrowInvalidCastException();
 	void CORE_API ThrowNullReferenceException();
 
-	template<TIsNotPointer T>
+	template<TIsNotPointer T, bool bThreadSafe>
 	class TWeakPtr;
 
-	template<TIsNotPointer T>
+	template<TIsNotPointer T, bool bThreadSafe = true>
 	class TRefPtr
 	{
 		friend class Object;
-		template<TIsNotPointer O>
+		template<TIsNotPointer O, bool bThreadSafe1>
 		friend class TRefPtr;
 
 	public:
@@ -46,9 +46,9 @@ namespace SC::Runtime::Core
 		inline TRefPtr(TStringConstructibleArg text);
 
 		template<TIsBaseOf<T> O>
-		inline TRefPtr(const TRefPtr<O>& ptr);
+		inline TRefPtr(const TRefPtr<O, bThreadSafe>& ptr);
 		template<TIsBaseOf<T> O>
-		inline TRefPtr(TRefPtr<O>&& ptr);
+		inline TRefPtr(TRefPtr<O, bThreadSafe>&& ptr);
 
 		inline T* Detach();
 		inline void Attach(T* ptr);
@@ -61,12 +61,12 @@ namespace SC::Runtime::Core
 		template<TIsRefCore O>
 		[[nodiscard]] inline bool Is(O** ptr = nullptr) const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline TRefPtr<O> As() const;
+		[[nodiscard]] inline TRefPtr<O, bThreadSafe> As() const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline TRefPtr<O> TryAs() const;
+		[[nodiscard]] inline TRefPtr<O, bThreadSafe> TryAs() const;
 
 		template<TIsBaseOf<T> O = T>
-		inline TWeakPtr<O> AsWeak() const;  // TWeakPtr.inl
+		inline TWeakPtr<O, bThreadSafe> AsWeak() const;  // TWeakPtr.inl
 
 		vs_property_get(bool, IsValid);
 		[[nodiscard]] inline bool IsValid_get() const;
@@ -92,9 +92,9 @@ namespace SC::Runtime::Core
 		inline TRefPtr& operator=(TRefPtr&& ptr);
 
 		template<TIsRefCore O>
-		[[nodiscard]] inline bool operator ==(const TRefPtr<O>& ptr) const;
+		[[nodiscard]] inline bool operator ==(const TRefPtr<O, bThreadSafe>& ptr) const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline bool operator !=(const TRefPtr<O>& ptr) const;
+		[[nodiscard]] inline bool operator !=(const TRefPtr<O, bThreadSafe>& ptr) const;
 		template<class TIndex> requires TIsIndexer<T, TIndex>
 		[[nodiscard]] inline auto operator [](const TIndex& index) const -> decltype(ptr->operator [](index));
 

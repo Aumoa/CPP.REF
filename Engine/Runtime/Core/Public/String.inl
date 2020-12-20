@@ -222,20 +222,20 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T> template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String, T>
-	inline TRefPtr<T>::TRefPtr(TStringConstructibleArg arg) : This(new String(arg))
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String, T>
+	inline TRefPtr<T, bThreadSafe>::TRefPtr(TStringConstructibleArg arg) : This(new String(arg))
 	{
 		ptr->bLockCollecting = false;
 	}
 
-	template<TIsNotPointer T> template<TIsChar TChar> requires TIsSame<T, String>
-	inline bool TRefPtr<T>::operator ==(const TChar* text) const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsChar TChar> requires TIsSame<T, String>
+	inline bool TRefPtr<T, bThreadSafe>::operator ==(const TChar* text) const
 	{
 		return ptr->operator ==(TRefPtr<String>(text));
 	}
 
-	template<TIsNotPointer T> template<TIsChar TChar> requires TIsSame<T, String>
-	inline bool TRefPtr<T>::operator !=(const TChar* text) const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsChar TChar> requires TIsSame<T, String>
+	inline bool TRefPtr<T, bThreadSafe>::operator !=(const TChar* text) const
 	{
 		return ptr->operator !=(TRefPtr<String>(text));
 	}

@@ -23,6 +23,8 @@ namespace SC::Runtime::Core
 
 		void AddWeakRef();
 		void ReleaseWeak();
+		void AddWeakRefInterlocked();
+		void ReleaseWeakInterlocked();
 
 		vs_property_get(bool, IsValid);
 		bool IsValid_get() const;

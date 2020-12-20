@@ -6,6 +6,20 @@
 #include <typeinfo>
 #include "CoreString.h"
 
+#undef interface
+#include <Windows.h>
+
+#undef InterlockedIncrement
+#undef InterlockedDecrement
+
+#ifdef _W64
+#define InterlockedIncrement(x) _InterlockedIncrement64(x)
+#define InterlockedDecrement(x) _InterlockedDecrement64(x)
+#else
+#define InterlockedIncrement(x) _InterlockedIncrement(x)
+#define InterlockedDecrement(x) _InterlockedDecrement(x)
+#endif
+
 using namespace SC::Runtime::Core;
 
 Object::Object()
@@ -65,6 +79,23 @@ void Object::AddRef()
 void Object::Release()
 {
 	if ((ref_count -= 1) == 0)
+	{
+		if (!bLockCollecting)
+		{
+			delete this;
+		}
+	}
+}
+
+void Object::AddRefInterlocked()
+{
+	InterlockedIncrement((volatile ssize_t*)&ref_count);
+}
+
+void Object::ReleaseInterlocked()
+{
+	size_t decremented = InterlockedDecrement((volatile ssize_t*)&ref_count);
+	if (decremented == 0)
 	{
 		if (!bLockCollecting)
 		{

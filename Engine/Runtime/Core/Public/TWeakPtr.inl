@@ -6,22 +6,22 @@
 
 namespace SC::Runtime::Core
 {
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::TWeakPtr()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr()
 		: ptr(nullptr)
 		, references(nullptr)
 	{
 
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::TWeakPtr(std::nullptr_t) : This()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(std::nullptr_t) : This()
 	{
 
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::TWeakPtr(T* ptr) : This()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(T* ptr) : This()
 	{
 		this->ptr = ptr;
 		if (ptr != nullptr)
@@ -31,14 +31,14 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::TWeakPtr(const T* ptr) : This(const_cast<T*>(ptr))
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(const T* ptr) : This(const_cast<T*>(ptr))
 	{
 
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::TWeakPtr(const TWeakPtr& ptr) : This()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(const TWeakPtr& ptr) : This()
 	{
 		if (ptr.IsValid)
 		{
@@ -48,8 +48,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::TWeakPtr(TWeakPtr&& ptr) : This()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(TWeakPtr&& ptr) : This()
 	{
 		this->ptr = ptr.ptr;
 		this->references = ptr.references;
@@ -58,20 +58,20 @@ namespace SC::Runtime::Core
 		ptr.references = nullptr;
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::~TWeakPtr()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::~TWeakPtr()
 	{
 		SafeRelease();
 	}
 
-	template<TIsNotPointer T> template<TIsBaseOf<T> O>
-	inline TWeakPtr<T>::TWeakPtr(const TWeakPtr<O>& ptr) : This(ptr.ptr)
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsBaseOf<T> O>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(const TWeakPtr<O, bThreadSafe>& ptr) : This(ptr.ptr)
 	{
 
 	}
 
-	template<TIsNotPointer T> template<TIsBaseOf<T> O>
-	inline TWeakPtr<T>::TWeakPtr(TWeakPtr<O>&& ptr) : This()
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsBaseOf<T> O>
+	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(TWeakPtr<O, bThreadSafe>&& ptr) : This()
 	{
 		this->ptr = ptr.ptr;
 		this->references = ptr.references;
@@ -80,15 +80,15 @@ namespace SC::Runtime::Core
 		ptr.references = nullptr;
 	}
 
-	template<TIsNotPointer T>
-	inline void TWeakPtr<T>::Reset(T* ptr)
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline void TWeakPtr<T, bThreadSafe>::Reset(T* ptr)
 	{
 		SafeRelease();
 		Assign(ptr);
 	}
 
-	template<TIsNotPointer T>
-	inline T* TWeakPtr<T>::Get() const
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline T* TWeakPtr<T, bThreadSafe>::Get() const
 	{
 		if (IsValid)
 		{
@@ -100,8 +100,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T> template<TIsRefCore O>
-	inline bool TWeakPtr<T>::Is(O** ptr) const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
+	inline bool TWeakPtr<T, bThreadSafe>::Is(O** ptr) const
 	{
 		if (!IsValid)
 		{
@@ -122,8 +122,8 @@ namespace SC::Runtime::Core
 		return cast != nullptr;
 	}
 
-	template<TIsNotPointer T> template<TIsRefCore O>
-	inline TWeakPtr<O> TWeakPtr<T>::As() const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
+	inline TWeakPtr<O, bThreadSafe> TWeakPtr<T, bThreadSafe>::As() const
 	{
 		auto ret = TryAs<O>();
 		if (!ret.IsValid)
@@ -133,8 +133,8 @@ namespace SC::Runtime::Core
 		return move(ret);
 	}
 
-	template<TIsNotPointer T> template<TIsRefCore O>
-	inline TWeakPtr<O> TWeakPtr<T>::TryAs() const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
+	inline TWeakPtr<O, bThreadSafe> TWeakPtr<T, bThreadSafe>::TryAs() const
 	{
 		if (!IsValid)
 		{
@@ -150,9 +150,9 @@ namespace SC::Runtime::Core
 		return ptr;
 	}
 
-	template<TIsNotPointer T>
+	template<TIsNotPointer T, bool bThreadSafe>
 	template<TIsBaseOf<T> O>
-	inline TRefPtr<O> TWeakPtr<T>::AsShared() const
+	inline TRefPtr<O, bThreadSafe> TWeakPtr<T, bThreadSafe>::AsShared() const
 	{
 		if (IsValid)
 		{
@@ -164,8 +164,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T>
-	inline bool TWeakPtr<T>::IsValid_get() const
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline bool TWeakPtr<T, bThreadSafe>::IsValid_get() const
 	{
 		if (ptr == nullptr)
 		{
@@ -175,28 +175,28 @@ namespace SC::Runtime::Core
 		return references->IsValid;
 	}
 
-	template<TIsNotPointer T>
-	inline T* TWeakPtr<T>::operator ->() const
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline T* TWeakPtr<T, bThreadSafe>::operator ->() const
 	{
 		return Get();
 	}
 
-	template<TIsNotPointer T>
-	inline TWeakPtr<T>::operator bool() const
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TWeakPtr<T, bThreadSafe>::operator bool() const
 	{
 		return IsValid;
 	}
 
-	template<TIsNotPointer T>
-	inline auto TWeakPtr<T>::operator =(const TWeakPtr& ptr) -> TWeakPtr&
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline auto TWeakPtr<T, bThreadSafe>::operator =(const TWeakPtr& ptr) -> TWeakPtr&
 	{
 		SafeRelease();
 		Assign(ptr);
 		return *this;
 	}
 
-	template<TIsNotPointer T>
-	inline auto TWeakPtr<T>::operator =(TWeakPtr&& ptr) -> TWeakPtr&
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline auto TWeakPtr<T, bThreadSafe>::operator =(TWeakPtr&& ptr) -> TWeakPtr&
 	{
 		SafeRelease();
 		this->ptr = ptr.ptr;
@@ -206,8 +206,8 @@ namespace SC::Runtime::Core
 		return *this;
 	}
 
-	template<TIsNotPointer T> template<TIsRefCore O>
-	inline bool TWeakPtr<T>::operator ==(const TWeakPtr<O>& ptr) const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
+	inline bool TWeakPtr<T, bThreadSafe>::operator ==(const TWeakPtr<O, bThreadSafe>& ptr) const
 	{
 		if (!IsValid)
 		{
@@ -225,8 +225,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T> template<TIsRefCore O>
-	inline bool TWeakPtr<T>::operator !=(const TWeakPtr<O>& ptr) const
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
+	inline bool TWeakPtr<T, bThreadSafe>::operator !=(const TWeakPtr<O, bThreadSafe>& ptr) const
 	{
 		if (!IsValid)
 		{
@@ -244,8 +244,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T> template<class TIndex> requires TIsIndexer<T, TIndex>
-	inline auto TWeakPtr<T>::operator [](const TIndex& index) const -> decltype(ptr->operator [](index))
+	template<TIsNotPointer T, bool bThreadSafe> template<class TIndex> requires TIsIndexer<T, TIndex>
+	inline auto TWeakPtr<T, bThreadSafe>::operator [](const TIndex& index) const -> decltype(ptr->operator [](index))
 	{
 		if (!IsValid)
 		{
@@ -255,8 +255,8 @@ namespace SC::Runtime::Core
 		return ptr->operator [](index);
 	}
 
-	template<TIsNotPointer T>
-	inline void TWeakPtr<T>::SafeRelease()
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline void TWeakPtr<T, bThreadSafe>::SafeRelease()
 	{
 		if (IsValid)
 		{
@@ -266,8 +266,8 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T>
-	inline void TWeakPtr<T>::Assign(T* ptr)
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline void TWeakPtr<T, bThreadSafe>::Assign(T* ptr)
 	{
 		if (ptr != nullptr)
 		{
@@ -277,9 +277,9 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T>
+	template<TIsNotPointer T, bool bThreadSafe>
 	template<TIsBaseOf<T> O>
-	inline TWeakPtr<O> TRefPtr<T>::AsWeak() const
+	inline TWeakPtr<O, bThreadSafe> TRefPtr<T, bThreadSafe>::AsWeak() const
 	{
 		return ptr;
 	}

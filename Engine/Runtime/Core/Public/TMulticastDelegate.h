@@ -10,13 +10,13 @@
 
 namespace SC::Runtime::Core
 {
-	template<TIsNotPointer T>
+	template<TIsNotPointer T, bool bThreadSafe>
 	class TRefPtr;
 
 	template<class T>
 	struct TFunction
 	{
-		static_assert("TFunction must include parameter type that is function like void(TArgs...).");
+
 	};
 
 	template<class TRet, class... TArgs>
@@ -47,17 +47,17 @@ namespace SC::Runtime::Core
 	template<class T>
 	struct TMulticastDelegate
 	{
-		static_assert("TMulticastDelegate must include parameter type that is function like void(TArgs...).");
+
 	};
 
 	template<TIsNotPointer T, class... TArgs>
 	struct TObjectFunctionBind
 	{
-		TRefPtr<T> ptr;
+		TRefPtr<T, true> ptr;
 		void (T::* callable)(TArgs...);
 
 	public:
-		TObjectFunctionBind(TRefPtr<T> ptr, void (T::* callable)(TArgs...))
+		TObjectFunctionBind(TRefPtr<T, true> ptr, void (T::* callable)(TArgs...))
 			: ptr(std::move(ptr))
 			, callable(callable)
 		{
@@ -94,13 +94,13 @@ namespace SC::Runtime::Core
 
 	private:
 		std::vector<TFunction<void(TArgs...)>> functions;
-		std::vector<TRefPtr<Object>> objects;
+		std::vector<TRefPtr<Object, true>> objects;
 
 	public:
 		template<TIsCallable T>
 		inline void AddLambda(T lambda);
 		template<TIsNotPointer T>
-		inline void AddObject(TRefPtr<T> ptr, void (T::* callable)(TArgs...));
+		inline void AddObject(TRefPtr<T, true> ptr, void (T::* callable)(TArgs...));
 		template<TIsNotPointer T>
 		inline void AddObject(const T* ptr, void (T::* callable)(TArgs...));
 		template<TIsNotPointer T>
@@ -109,7 +109,7 @@ namespace SC::Runtime::Core
 		template<TIsCallable T>
 		inline void RemoveLambda(T lambda);
 		template<TIsNotPointer T>
-		inline void RemoveObject(TRefPtr<T> ptr, void (T::* callable)(TArgs...));
+		inline void RemoveObject(TRefPtr<T, true> ptr, void (T::* callable)(TArgs...));
 		template<TIsNotPointer T>
 		inline void RemoveObject(const T* ptr, void (T::* callable)(TArgs...));
 		template<TIsNotPointer T>

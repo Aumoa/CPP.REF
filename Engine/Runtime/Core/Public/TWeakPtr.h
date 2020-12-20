@@ -16,7 +16,7 @@ namespace SC::Runtime::Core
 	void CORE_API ThrowInvalidCastException();
 	void CORE_API ThrowNullReferenceException();
 
-	template<TIsNotPointer T>
+	template<TIsNotPointer T, bool bThreadSafe = true>
 	class TWeakPtr
 	{
 	public:
@@ -36,9 +36,9 @@ namespace SC::Runtime::Core
 		inline ~TWeakPtr();
 
 		template<TIsBaseOf<T> O>
-		inline TWeakPtr(const TWeakPtr<O>& ptr);
+		inline TWeakPtr(const TWeakPtr<O, bThreadSafe>& ptr);
 		template<TIsBaseOf<T> O>
-		inline TWeakPtr(TWeakPtr<O>&& ptr);
+		inline TWeakPtr(TWeakPtr<O, bThreadSafe>&& ptr);
 
 		inline void Reset(T* ptr = nullptr);
 
@@ -47,12 +47,12 @@ namespace SC::Runtime::Core
 		template<TIsRefCore O>
 		[[nodiscard]] inline bool Is(O** ptr = nullptr) const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline TWeakPtr<O> As() const;
+		[[nodiscard]] inline TWeakPtr<O, bThreadSafe> As() const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline TWeakPtr<O> TryAs() const;
+		[[nodiscard]] inline TWeakPtr<O, bThreadSafe> TryAs() const;
 
 		template<TIsBaseOf<T> O = T>
-		inline TRefPtr<O> AsShared() const;
+		inline TRefPtr<O, bThreadSafe> AsShared() const;
 
 		vs_property_get(bool, IsValid);
 		[[nodiscard]] inline bool IsValid_get() const;
@@ -64,9 +64,9 @@ namespace SC::Runtime::Core
 		inline TWeakPtr& operator=(TWeakPtr&& ptr);
 
 		template<TIsRefCore O>
-		[[nodiscard]] inline bool operator ==(const TWeakPtr<O>& ptr) const;
+		[[nodiscard]] inline bool operator ==(const TWeakPtr<O, bThreadSafe>& ptr) const;
 		template<TIsRefCore O>
-		[[nodiscard]] inline bool operator !=(const TWeakPtr<O>& ptr) const;
+		[[nodiscard]] inline bool operator !=(const TWeakPtr<O, bThreadSafe>& ptr) const;
 		template<class TIndex> requires TIsIndexer<T, TIndex>
 		[[nodiscard]] inline auto operator [](const TIndex& index) const -> decltype(ptr->operator [](index));
 
