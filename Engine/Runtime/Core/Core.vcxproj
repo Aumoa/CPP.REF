@@ -171,6 +171,7 @@
   <ItemGroup>
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
+    <None Include="Public\TMulticastDelegate.inl" />
     <None Include="Public\TRefPtr.inl" />
     <None Include="Public\TWeakPtr.inl" />
   </ItemGroup>

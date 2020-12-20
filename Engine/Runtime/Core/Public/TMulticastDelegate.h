@@ -10,6 +10,9 @@
 
 namespace SC::Runtime::Core
 {
+	template<TIsNotPointer T>
+	class TRefPtr;
+
 	template<class T>
 	struct TFunction
 	{
@@ -27,56 +30,61 @@ namespace SC::Runtime::Core
 		size_t hash_code;
 
 	public:
+		inline TFunction();
+
 		template<TIsCallable T>
-		TFunction(T lambda) : callable(lambda), hash_code()
-		{
-			hash_code = callable.target_type().hash_code();
-		}
+		inline TFunction(T lambda);
 
-		template<class T> requires TIsBaseOf<T, Object>
-		TFunction(T* ptr, TRet (T::* callable)(TArgs...)) : This([ptr, callable](TArgs... args)
-			{
-				(ptr->*callable)(args...);
-			})
-		{
-			std::function<TRet(T*, TArgs...)> wrap = callable;
+		template<class T>
+		inline TFunction(const T* ptr, TRet(T::* callable)(TArgs...));
 
-			hash_code = (size_t)ptr;
-			hash_code = hash_code ^ wrap.target_type().hash_code();
-		}
+		inline size_t GetHashCode() const;
+		inline TRet Invoke(TArgs... args) const;
 
-		size_t GetHashCode() const
-		{
-			return hash_code;
-		}
-
-		TRet Invoke(TArgs... args) const
-		{
-			return callable(args...);
-		}
-
-		TRet operator()(TArgs... args) const
-		{
-			return Invoke(args...);
-		}
-	};
-
-	template<class T, class TFunc> requires TIsBaseOf<T, Object>
-	struct TObjectDelegateArgs
-	{
-
-	};
-
-	template<class T, class TRet, class... TArgs>
-	struct TObjectDelegateArgs<T, TRet(TArgs...)>
-	{
-
+		inline TRet operator()(TArgs... args) const;
 	};
 
 	template<class T>
 	struct TMulticastDelegate
 	{
 		static_assert("TMulticastDelegate must include parameter type that is function like void(TArgs...).");
+	};
+
+	template<TIsNotPointer T, class... TArgs>
+	struct TObjectFunctionBind
+	{
+		TRefPtr<T> ptr;
+		void (T::* callable)(TArgs...);
+
+	public:
+		TObjectFunctionBind(TRefPtr<T> ptr, void (T::* callable)(TArgs...))
+			: ptr(std::move(ptr))
+			, callable(callable)
+		{
+
+		}
+
+		TObjectFunctionBind(const T* ptr, void (T::* callable)(TArgs...))
+			: ptr(ptr)
+			, callable(callable)
+		{
+
+		}
+	};
+
+	template<TIsNotPointer T, class... TArgs>
+	struct TRawFunctionBind
+	{
+		const T* ptr;
+		void (T::* callable)(TArgs...);
+
+	public:
+		TRawFunctionBind(const T* ptr, void (T::* callable)(TArgs...))
+			: ptr(ptr)
+			, callable(callable)
+		{
+
+		}
 	};
 
 	template<class... TArgs>
@@ -86,72 +94,47 @@ namespace SC::Runtime::Core
 
 	private:
 		std::vector<TFunction<void(TArgs...)>> functions;
+		std::vector<TRefPtr<Object>> objects;
 
 	public:
 		template<TIsCallable T>
-		void AddLambda(T lambda)
-		{
-			functions.emplace_back(lambda);
-		}
-
-		template<class T> requires TIsBaseOf<T, Object>
-		void AddObject(T* ptr, void (T::* callable)(TArgs...))
-		{
-			functions.emplace_back(ptr, callable);
-		}
+		inline void AddLambda(T lambda);
+		template<TIsNotPointer T>
+		inline void AddObject(TRefPtr<T> ptr, void (T::* callable)(TArgs...));
+		template<TIsNotPointer T>
+		inline void AddObject(const T* ptr, void (T::* callable)(TArgs...));
+		template<TIsNotPointer T>
+		inline void AddRaw(const T* ptr, void (T::* callable)(TArgs...));
 
 		template<TIsCallable T>
-		void RemoveLambda(T lambda)
-		{
-			TFunction<void(TArgs...)> wrap = lambda;
-			size_t wrap_hash = wrap.GetHashCode();
-			RemoveInternal(wrap_hash);
-		}
+		inline void RemoveLambda(T lambda);
+		template<TIsNotPointer T>
+		inline void RemoveObject(TRefPtr<T> ptr, void (T::* callable)(TArgs...));
+		template<TIsNotPointer T>
+		inline void RemoveObject(const T* ptr, void (T::* callable)(TArgs...));
+		template<TIsNotPointer T>
+		inline void RemoveRaw(const T* ptr, void (T::* callable)(TArgs...));
 
-		template<class T> requires TIsBaseOf<T, Object>
-		void RemoveObject(T* ptr, void (T::* callable)(TArgs...))
-		{
-			TFunction<void(TArgs...)> wrap(ptr, callable);
-			size_t wrap_hash = wrap.GetHashCode();
-			RemoveInternal(wrap_hash);
-		}
+		inline void Invoke(TArgs... args) const;
 
-		void Invoke(TArgs... args) const
-		{
-			for (auto& item : functions)
-			{
-				item(args...);
-			}
-		}
-
-		void operator()(TArgs... args)
-		{
-			Invoke(args...);
-		}
+		inline void operator()(TArgs... args) const;
 
 		template<TIsCallable T>
-		This& operator +=(T lambda)
-		{
-			AddLambda(lambda);
-			return *this;
-		}
-
+		inline This& operator +=(T lambda);
+		template<TIsNotPointer T>
+		inline This& operator +=(const TObjectFunctionBind<T, TArgs...>& object_bind);
+		template<TIsNotPointer T>
+		inline This& operator +=(const TRawFunctionBind<T, TArgs...>& raw_bind);
 		template<TIsCallable T>
-		This& operator -=(T lambda)
-		{
-		}
+		inline This& operator -=(T lambda);
+		template<TIsNotPointer T>
+		inline This& operator -=(const TObjectFunctionBind<T, TArgs...>& object_bind);
+		template<TIsNotPointer T>
+		inline This& operator -=(const TRawFunctionBind<T, TArgs...>& raw_bind);
 
 	private:
-		void RemoveInternal(size_t hash_code)
-		{
-			for (size_t i = 0; i < functions.size(); ++i)
-			{
-				if (functions[i].GetHashCode() == hash_code)
-				{
-					functions.erase(functions.begin() + i);
-					break;
-				}
-			}
-		}
+		inline void RemoveInternal(size_t hash_code);
 	};
 }
+
+#include "TMulticastDelegate.inl"
