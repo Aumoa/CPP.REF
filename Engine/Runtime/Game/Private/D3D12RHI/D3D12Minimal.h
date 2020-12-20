@@ -11,6 +11,8 @@
 #include "Logging/LogCategoryBase.h"
 #include "HResultException.h"
 #include "RHI/RHIResourceStates.h"
+#include "RHI/RHITextureFormat.h"
+#include "RHI/RHIResourceFlags.h"
 
 #ifndef interface
 #define interface struct
@@ -25,32 +27,12 @@ namespace SC::Runtime::Game::D3D12RHI
 
 #define HR(x) if (FAILED(x)) throw SC::Runtime::Game::D3D12RHI::HResultException(x)
 
-inline D3D12_RESOURCE_STATES ToD3D12(SC::Runtime::Game::RHI::RHIResourceStates value)
-{
-	using namespace SC::Runtime::Game::RHI;
+D3D12_RESOURCE_STATES ToD3D12(SC::Runtime::Game::RHI::RHIResourceStates value);
+DXGI_FORMAT ToD3D12(SC::Runtime::Game::RHI::RHITextureFormat value);
+D3D12_RESOURCE_FLAGS ToD3D12(SC::Runtime::Game::RHI::RHIResourceFlags value);
 
-	switch (value)
-	{
-	case RHIResourceStates::PRESENT:
-		return D3D12_RESOURCE_STATE_PRESENT;
-	case RHIResourceStates::RENDER_TARGET:
-		return D3D12_RESOURCE_STATE_RENDER_TARGET;
-	default:
-		return D3D12_RESOURCE_STATE_COMMON;
-	}
-}
+SC::Runtime::Game::RHI::RHIResourceStates ToRHI(D3D12_RESOURCE_STATES value);
+SC::Runtime::Game::RHI::RHITextureFormat ToRHI(DXGI_FORMAT value);
+SC::Runtime::Game::RHI::RHIResourceFlags ToRHI(D3D12_RESOURCE_FLAGS value);
 
-inline SC::Runtime::Game::RHI::RHIResourceStates ToRHI(D3D12_RESOURCE_STATES value)
-{
-	using namespace SC::Runtime::Game::RHI;
-
-	switch (value)
-	{
-	case D3D12_RESOURCE_STATE_PRESENT:
-		return RHIResourceStates::PRESENT;
-	case D3D12_RESOURCE_STATE_RENDER_TARGET:
-		return RHIResourceStates::RENDER_TARGET;
-	default:
-		return RHIResourceStates::PRESENT;
-	}
-}
+bool IsDepthStencilFormat(SC::Runtime::Game::RHI::RHITextureFormat value);

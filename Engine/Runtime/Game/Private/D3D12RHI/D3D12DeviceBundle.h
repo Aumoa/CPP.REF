@@ -45,6 +45,8 @@ namespace SC::Runtime::Game::D3D12RHI
 
 		virtual Core::TRefPtr<RHI::IRHICommandFence> CreateCommandFence();
 		virtual Core::TRefPtr<RHI::IRHIRenderTargetView> CreateRenderTargetView(RHI::IRHIResource* resource);
+		virtual Core::TRefPtr<RHI::IRHIResource> CreateTexture2D(RHI::RHITextureFormat format, int32 width, int32 height, RHI::RHIResourceStates initialStates, RHI::RHIResourceFlags flags);
+		virtual Core::TRefPtr<RHI::IRHIDeferredCommandList> CreateDeferredCommandList();
 
 		vs_property_get(ID3D12Device*, Device);
 		ID3D12Device* Device_get() const;

@@ -12,6 +12,7 @@
 #include "D3D12OfflineDescriptorManager.h"
 #include "D3D12OfflineDescriptorIndex.h"
 #include "D3D12Resource.h"
+#include "D3D12DeferredCommandList.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
@@ -85,6 +86,39 @@ TRefPtr<IRHIRenderTargetView> D3D12DeviceBundle::CreateRenderTargetView(IRHIReso
 	D3D12OfflineDescriptorIndex index = rtvManager->Alloc();
 	d3d12Device->CreateRenderTargetView(resource1, nullptr, index.Handle);
 	return NewObject<D3D12RenderTargetView>(resource1, index);
+}
+
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags)
+{
+	D3D12_HEAP_PROPERTIES heapProp{ };
+	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_RESOURCE_DESC desc{ };
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	desc.Width = (UINT64)width;
+	desc.Height = (UINT)height;
+	desc.DepthOrArraySize = 1;
+	desc.MipLevels = 1;
+	desc.Format = ToD3D12(format);
+	desc.SampleDesc = { 1, 0 };
+	desc.Flags = ToD3D12(flags);
+
+	D3D12_CLEAR_VALUE clearValue{ desc.Format };
+	if (IsDepthStencilFormat(format))
+	{
+		clearValue.DepthStencil.Depth = 1.0f;
+		clearValue.DepthStencil.Stencil = 0;
+	}
+
+	ComPtr<ID3D12Resource> resource;
+	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, ToD3D12(initialStates), &clearValue, IID_PPV_ARGS(&resource)));
+
+	return NewObject<D3D12Resource>(resource.Get());
+}
+
+TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
+{
+	return NewObject<D3D12DeferredCommandList>(d3d12Device.Get());
 }
 
 ID3D12Device* D3D12DeviceBundle::Device_get() const

@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="Private\D3D12RHI\D3D12CommandFence.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12CommandList.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorAllocator.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorIndex.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ImmediateCommandList.h" />
@@ -176,12 +177,17 @@
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\RHI\IRHICommandFence.h" />
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
+    <ClInclude Include="Public\RHI\IRHIDeferredCommandList.h" />
     <ClInclude Include="Public\RHI\IRHIDeviceBundle.h" />
     <ClInclude Include="Public\RHI\IRHIImmediateCommandList.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
+    <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
+    <ClInclude Include="Public\RHI\RHITextureFormat.h" />
+    <ClInclude Include="Public\SceneRendering\Scene.h" />
+    <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
   </ItemGroup>
@@ -195,6 +201,7 @@
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandFence.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandList.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12DeferredCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorAllocator.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorIndex.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ImmediateCommandList.cpp" />
@@ -209,6 +216,8 @@
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\SceneRendering\Scene.cpp" />
+    <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
   </ItemGroup>
   <ItemGroup>

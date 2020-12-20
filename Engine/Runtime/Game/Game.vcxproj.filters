@@ -19,6 +19,12 @@
     <Filter Include="Public\RHI">
       <UniqueIdentifier>{4791ff92-e145-47eb-b03a-2c21e88c654b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\SceneRendering">
+      <UniqueIdentifier>{5c801c21-88c1-4c8c-a527-1982a90a37ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\SceneRendering">
+      <UniqueIdentifier>{403871ba-6df4-4a50-91bb-39d67b7eb2a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -120,6 +126,24 @@
     <ClInclude Include="Public\RHI\RHIResourceStates.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Scene.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHITextureFormat.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIResourceFlags.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIDeferredCommandList.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -178,6 +202,15 @@
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTargetView.cpp">
       <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\Scene.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DeferredCommandList.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

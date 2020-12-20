@@ -20,6 +20,11 @@ namespace SC::Runtime::Game
 		interface IRHIRenderTargetView;
 	}
 
+	namespace SceneRendering
+	{
+		class SceneRenderer;
+	}
+
 	class Engine : virtual public Core::Object, virtual public IEngineTick
 	{
 	public:
@@ -38,9 +43,7 @@ namespace SC::Runtime::Game
 		RHI::IRHIImmediateCommandList* immediateCommandList;
 		RHI::IRHISwapChain* swapChain;
 
-		// TEST IMPLEMENT
-		Core::TRefPtr<RHI::IRHIRenderTargetView> basicRTV[3];
-
+		Core::TRefPtr<SceneRendering::SceneRenderer> sceneRenderer;
 		bool bPresent : 1;
 
 	public:
@@ -57,8 +60,5 @@ namespace SC::Runtime::Game
 
 	private:
 		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
-
-		// CALLBACK HANDLERS
-		void Application_OnPostSized(int32 width, int32 height);
 	};
 }

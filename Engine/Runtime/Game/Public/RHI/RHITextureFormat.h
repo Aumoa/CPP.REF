@@ -7,11 +7,9 @@
 
 namespace SC::Runtime::Game::RHI
 {
-	enum class RHIResourceStates
+	enum class RHITextureFormat
 	{
-		PRESENT,
-		RENDER_TARGET,
-		COPY_SOURCE,
-		COPY_DEST
+		Unknown,
+		R8G8B8A8_UNORM
 	};
 }

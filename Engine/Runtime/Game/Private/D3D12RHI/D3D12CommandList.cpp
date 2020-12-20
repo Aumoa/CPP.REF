@@ -44,7 +44,7 @@ void D3D12CommandList::ClearRenderTargetView(RHI::IRHIRenderTargetView* rtv)
 {
 	ConsumePendingDeferredCommands();
 
-	constexpr FLOAT ClearColor[4] = { 1, 0, 0, 0 };
+	constexpr FLOAT ClearColor[4] = { 0, 0, 0, 0 };
 	auto rtv_cast = Cast<D3D12RenderTargetView>(rtv);
 	CommandList->ClearRenderTargetView(rtv_cast->Handle, ClearColor, 0, nullptr);
 }

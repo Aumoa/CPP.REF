@@ -12,12 +12,14 @@
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
+#include "SceneRendering/SceneRenderer.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
 using namespace SC::Runtime::Game::RHI;
 using namespace SC::Runtime::Game::D3D12RHI;
 using namespace SC::Runtime::Game::Logging;
+using namespace SC::Runtime::Game::SceneRendering;
 using namespace std;
 
 Engine* Engine::gEngine = nullptr;
@@ -58,9 +60,9 @@ void Engine::Initialize()
 	immediateCommandList = deviceBundle->GetImmediateCommandList().Get();
 	swapChain = deviceBundle->GetSwapChain().Get();
 
+	sceneRenderer = NewObject<SceneRenderer>(this->deviceBundle);
+
 	gEngine = this;
-	
-	GApplication.PostSized += bind_delegate(Application_OnPostSized);
 }
 
 void Engine::Tick()
@@ -76,16 +78,16 @@ void Engine::Tick()
 	{
 		autoFence->BeginFence();
 
-		IRHIRenderTargetView* rtv = basicRTV[swapChain->CurrentBackBufferIndex].Get();
 		IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
 
 		immediateCommandList->BeginCommand();
-		immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::RENDER_TARGET);
+		//immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::COPY_DEST);
 
-		immediateCommandList->OMSetRenderTargets(1, &rtv);
-		immediateCommandList->ClearRenderTargetView(rtv);
+		// TODO: SceneRenderer
+		sceneRenderer->BeginRender();
+		sceneRenderer->EndRender();
 
-		immediateCommandList->ResourceTransition(target, RHIResourceStates::RENDER_TARGET, RHIResourceStates::PRESENT);
+		//immediateCommandList->ResourceTransition(target, RHIResourceStates::COPY_DEST, RHIResourceStates::PRESENT);
 		immediateCommandList->EndCommand();
 		immediateCommandList->Flush();
 
@@ -110,14 +112,5 @@ void Engine::ForEachBundles(function<void(IRHIBundle*)> action)
 	for (auto& bundle : rhiBundles)
 	{
 		action(bundle.Get());
-	}
-}
-
-void Engine::Application_OnPostSized(int32 width, int32 height)
-{
-	for (size_t i = 0; i < 3; ++i)
-	{
-		TRefPtr<IRHIResource> buffer = swapChain->GetBuffer(i);
-		basicRTV[i] = deviceBundle->CreateRenderTargetView(buffer.Get());
 	}
 }
