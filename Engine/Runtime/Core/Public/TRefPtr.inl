@@ -122,6 +122,12 @@ namespace SC::Runtime::Core
 		return &ptr;
 	}
 
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline TRefPtr<String, true> TRefPtr<T, bThreadSafe>::ToString() const
+	{
+		return ptr->ToString();
+	}
+
 	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
 	inline bool TRefPtr<T, bThreadSafe>::Is(O** ptr) const
 	{

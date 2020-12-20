@@ -49,6 +49,42 @@ namespace SC::Runtime::Core
 		return FormatHelper(format, unpacked);
 	}
 
+	template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
+	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const T(&values)[N])
+	{
+		std::vector<T> values_vec(values, values + N);
+		return Join(separator, values_vec);
+	}
+
+	template<class... TArgs>
+	inline TRefPtr<String> String::Join(TRefPtr<String> separator, TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values)
+	{
+		std::vector<TRefPtr<String>> values_vec({ arg1, arg2, values... });
+		return Join(separator, values_vec);
+	}
+
+	template<TIsStringConvertible T>
+	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<T>& values)
+	{
+		std::vector<TRefPtr<String>> values_vec(values.size());
+		for (size_t i = 0; i < values.size(); ++i)
+		{
+			values_vec[i] = values[i].ToString();
+		}
+		return Join(separator, values_vec);
+	}
+
+	template<TIsStringConstructible T>
+	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<T>& values)
+	{
+		std::vector<TRefPtr<String>> values_vec(values.size());
+		for (size_t i = 0; i < values.size(); ++i)
+		{
+			values_vec[i] = values[i];
+		}
+		return Join(separator, values_vec);
+	}
+
 	template<TIsChar TChar>
 	inline TChar* String::AllocCharBuffer(size_t len)
 	{

@@ -57,6 +57,7 @@ namespace SC::Runtime::Core
 		[[nodiscard]] inline T* Get() const;
 		[[nodiscard]] inline T** GetAddressOf();
 		[[nodiscard]] inline T** ReleaseAndGetAddressOf();
+		[[nodiscard]] inline TRefPtr<String, true> ToString() const;
 
 		template<TIsRefCore O>
 		[[nodiscard]] inline bool Is(O** ptr = nullptr) const;

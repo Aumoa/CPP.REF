@@ -96,8 +96,8 @@ namespace SC::Runtime::Core
 		template<TIsIterator<wchar_t> TIterator>
 		String(TIterator begin, TIterator end);
 
-		ConstIterator cbegin() const override;
-		ConstIterator cend() const override;
+		virtual ConstIterator cbegin() const override;
+		virtual ConstIterator cend() const override;
 
 		vs_property_get(const wchar_t*, C_Str);
 		const wchar_t* C_Str_get() const;
@@ -111,6 +111,15 @@ namespace SC::Runtime::Core
 		template<class... TArgs>
 		static TRefPtr<String> Format(TRefPtr<String> format, TArgs&&... args);
 		static TRefPtr<String> Format(TRefPtr<String> format);
+		template<class... TArgs>
+		static TRefPtr<String> Join(TRefPtr<String> separator, TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values);
+		template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
+		static TRefPtr<String> Join(TRefPtr<String> separator, const T(&values)[N]);
+		template<TIsStringConvertible T>
+		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<T>& values);
+		template<TIsStringConstructible T>
+		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<T>& values);
+		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<TRefPtr<String>>& values);
 
 		static const TRefPtr<String> Empty;
 

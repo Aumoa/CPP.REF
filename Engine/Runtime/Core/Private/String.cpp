@@ -186,6 +186,79 @@ TRefPtr<String> String::Format(TRefPtr<String> format)
     return format;
 }
 
+TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<TRefPtr<String>>& values)
+{
+    if (values.empty())
+    {
+        return Empty;
+    }
+
+    if (values.size() <= 1)
+    {
+        return values[0];
+    }
+
+    size_t total_length = 0;
+    for (size_t i = 0; i < values.size(); ++i)
+    {
+        total_length += values[i]->Length;
+    }
+
+    size_t sep_length = separator->Length;
+    total_length += sep_length * (values.size() - 1);
+
+    wchar_t* buffer = new wchar_t[SizeAsBoundary(total_length + 1)];
+    size_t   seekpos = 0;
+
+    struct __Finally
+    {
+        wchar_t* buf;
+
+        __Finally(wchar_t* buf) : buf(buf)
+        {
+
+        }
+
+        ~__Finally()
+        {
+            if (buf != nullptr)
+            {
+                delete[] buf;
+                buf = nullptr;
+            }
+        }
+
+        void Detach()
+        {
+            buf = nullptr;
+        }
+    }
+    finally(buffer);
+
+    for (size_t i = 0; i < values.size(); ++i)
+    {
+        size_t length = values[i]->Length;
+        memcpy(buffer + seekpos, values[i]->C_Str, sizeof(wchar_t) * length);
+        seekpos += length;
+
+        if (seekpos < total_length)
+        {
+            memcpy(buffer + seekpos, separator->C_Str, sizeof(wchar_t*) * sep_length);
+            seekpos += sep_length;
+        }
+    }
+
+    buffer[total_length] = 0;
+
+    auto result = NewObject<String>();
+    result->text_buffer = buffer;
+    result->len = total_length;
+    result->bDynamicBuffer = true;
+    finally.Detach();
+
+    return move(result);
+}
+
 TRefPtr<String> String::FormatHelper(TRefPtr<String> format, vector<TRefPtr<Object>>& unpackedArgs)
 {
     if (!format.IsValid)
