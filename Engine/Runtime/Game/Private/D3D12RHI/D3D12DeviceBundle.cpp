@@ -51,6 +51,8 @@ void D3D12DeviceBundle::InitializeBundle()
 	InitializeD3D12();
 
 	instance = this;
+
+	GApplication.PostSized += bind_delegate(Application_OnPostSized);
 }
 
 void D3D12DeviceBundle::ReleaseBundle()
@@ -137,4 +139,10 @@ void D3D12DeviceBundle::InitializeD3D12()
 	HR(swapChain.As(&swapChain4));
 
 	this->swapChain = NewObject<D3D12SwapChain>(swapChain4.Get());
+}
+
+void D3D12DeviceBundle::Application_OnPostSized(int32 width, int32 height)
+{
+	SE_LOG(LogD3D12RHI, Verbose, L"Swap chain resized to {0} x {1}", width, height);
+	swapChain->ResizeBuffers(width, height);
 }

@@ -36,9 +36,6 @@
     <ClInclude Include="Public\WinException.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Engine.h">
-      <Filter>Private</Filter>
-    </ClInclude>
     <ClInclude Include="Public\IEngineTick.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -116,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTargetView.h">
       <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Engine.h">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

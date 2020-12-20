@@ -49,5 +49,9 @@ namespace SC::Runtime::Game::D3D12RHI
 		void InitializeCOM();
 		void InitializeDXGI();
 		void InitializeD3D12();
+
+		// CALLBACK HANDLERS
+		void Application_OnPreSizing(int32 width, int32 height);
+		void Application_OnPostSized(int32 width, int32 height);
 	};
 }

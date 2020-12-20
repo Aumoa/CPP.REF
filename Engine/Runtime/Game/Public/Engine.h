@@ -17,6 +17,7 @@ namespace SC::Runtime::Game
 		interface IRHIDeviceBundle;
 		interface IRHIImmediateCommandList;
 		interface IRHISwapChain;
+		interface IRHIRenderTargetView;
 	}
 
 	class Engine : virtual public Core::Object, virtual public IEngineTick
@@ -26,6 +27,8 @@ namespace SC::Runtime::Game
 		using This = Engine;
 
 	private:
+		static Engine* gEngine;
+
 		Logging::LogCategoryBase LogEngine;
 
 		std::vector<Core::TRefPtr<RHI::IRHIBundle>> rhiBundles;
@@ -34,6 +37,9 @@ namespace SC::Runtime::Game
 		RHI::IRHIDeviceBundle* deviceBundle;
 		RHI::IRHIImmediateCommandList* immediateCommandList;
 		RHI::IRHISwapChain* swapChain;
+
+		// TEST IMPLEMENT
+		Core::TRefPtr<RHI::IRHIRenderTargetView> basicRTV;
 
 		bool bPresent : 1;
 
@@ -47,11 +53,9 @@ namespace SC::Runtime::Game
 		vs_property_get(RHI::IRHIDeviceBundle*, DeviceBundle);
 		RHI::IRHIDeviceBundle* DeviceBundle_get() const;
 
-		static Engine* gEngine;
+		static Engine* GetInstance();
 
 	private:
 		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
 	};
 }
-
-#define GEngine (*SC::Runtime::Game::Engine::gEngine)

@@ -6,13 +6,16 @@
 #include "WinException.h"
 #include <string.h>
 #include "Engine.h"
+#include "Logging/LogVerbosity.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
+using namespace SC::Runtime::Game::Logging;
 
 #define ALLOC_BREAK_NUMBER 0
 
 Application* Application::instance;
+LogCategoryBase Application::LogApplication(ELogVerbosity::Verbose, nameof(LogApplication));
 
 Application::Application(TRefPtr<String> appName) : Super()
 	, hWnd(nullptr)
@@ -79,6 +82,14 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 {
 	switch (uMsg)
 	{
+	case WM_SIZE:
+	{
+		int32 width = (int16)LOWORD(lParam);
+		int32 height = (int16)HIWORD(lParam);
+		GApplication.PreSizing.Invoke(width, height);
+		GApplication.PostSized.Invoke(width, height);
+		break;
+	}
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;

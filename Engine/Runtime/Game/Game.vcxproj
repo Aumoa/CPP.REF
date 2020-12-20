@@ -164,10 +164,10 @@
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
-    <ClInclude Include="Private\Engine.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
+    <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\IEngineTick.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />

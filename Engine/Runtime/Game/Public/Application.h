@@ -10,14 +10,23 @@
 
 namespace SC::Runtime::Game
 {
+	namespace Logging
+	{
+		struct LogCategoryBase;
+	}
+
 	class GAME_API Application : virtual public Core::Object
 	{
 	public:
 		using Super = Core::Object;
 		using This = Application;
 
+		using PreSizingDelegate = Core::TMulticastDelegate<void(int32, int32)>;
+		using PostSizedDelegate = Core::TMulticastDelegate<void(int32, int32)>;
+
 	private:
 		static Application* instance;
+		static Logging::LogCategoryBase LogApplication;
 
 		HWND hWnd;
 		bool bMainLoop : 1;
@@ -31,6 +40,9 @@ namespace SC::Runtime::Game
 
 		int32 Run();
 		HWND GetCoreHwnd() const;
+
+		PreSizingDelegate PreSizing;
+		PostSizedDelegate PostSized;
 
 		[[nodiscard]] static Application* GetInstance();
 

@@ -6,6 +6,7 @@
 #include "D3D12RHI/D3D12DeviceBundle.h"
 #include "D3D12RHI/D3D12CommandFence.h"
 #include "D3D12RHI/D3D12ImmediateCommandList.h"
+#include "D3D12RHI/D3D12RenderTargetView.h"
 #include "RHI/IRHISwapChain.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
@@ -80,6 +81,11 @@ void Engine::Tick()
 IRHIDeviceBundle* Engine::DeviceBundle_get() const
 {
 	return deviceBundle;
+}
+
+Engine* Engine::GetInstance()
+{
+	return gEngine;
 }
 
 void Engine::ForEachBundles(function<void(IRHIBundle*)> action)
