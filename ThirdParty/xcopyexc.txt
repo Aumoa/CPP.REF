@@ -1,3 +1,5 @@
 .pdb\
 .ilk\
 .exp\
+.lib\
+.map\
