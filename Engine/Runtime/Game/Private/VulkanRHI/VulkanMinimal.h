@@ -1,0 +1,23 @@
+﻿// Copyright 2020 Aumoa.lib. All right reserved.
+
+#pragma once
+
+#undef interface
+
+#include <vulkan/vulkan.h>
+
+#include "Logging/LogCategoryBase.h"
+#include "VulkanException.h"
+
+#ifndef interface
+#define interface struct
+#endif
+
+namespace SC::Runtime::Game::VulkanRHI
+{
+	extern Logging::LogCategoryBase LogVulkanRHI;
+}
+
+#define VK_FAILED(Result) (Result != VK_SUCCESS)
+#define VK_SUCCEEDED(Result) (Result == VK_SUCCESS)
+#define VKR(Expression) if (VkResult vkResult = Expression; VK_FAILED(vkResult)) throw SC::Runtime::Game::VulkanRHI::VulkanException(vkResult)

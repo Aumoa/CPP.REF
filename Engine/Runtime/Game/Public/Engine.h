@@ -17,7 +17,6 @@ namespace SC::Runtime::Game
 		interface IRHIDeviceBundle;
 		interface IRHIImmediateCommandList;
 		interface IRHISwapChain;
-		interface IRHIRenderTargetView;
 	}
 
 	namespace SceneRendering

@@ -3,21 +3,24 @@
 #include "Engine.h"
 
 #include "Application.h"
-#include "D3D12RHI/D3D12Minimal.h"
-#include "D3D12RHI/D3D12DeviceBundle.h"
-#include "D3D12RHI/D3D12CommandFence.h"
-#include "D3D12RHI/D3D12ImmediateCommandList.h"
-#include "D3D12RHI/D3D12RenderTargetView.h"
 #include "RHI/IRHISwapChain.h"
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
 #include "SceneRendering/SceneRenderer.h"
+#include "RHI/IRHICommandFence.h"
+#include "RHI/IRHIImmediateCommandList.h"
+#include "RHI/RHIResourceStates.h"
+#include "RHI/IRHIRenderTargetView.h"
+#include "RHI/IRHIDeferredCommandList.h"
+
+//#include "D3D12RHI/D3D12DeviceBundle.h"
+#include "VulkanRHI/VulkanDeviceBundle.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
 using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::D3D12RHI;
+using namespace SC::Runtime::Game::VulkanRHI;
 using namespace SC::Runtime::Game::Logging;
 using namespace SC::Runtime::Game::SceneRendering;
 using namespace std;
@@ -47,10 +50,10 @@ void Engine::Initialize()
 	if (gEngine != nullptr)
 	{
 		SE_LOG(LogEngine, Fatal, L"Engine duplication detected.");
-		throw HResultException(E_FAIL);
+		throw Exception("Unexpected exception.");
 	}
 
-	auto deviceBundle = NewObject<D3D12DeviceBundle>();
+	auto deviceBundle = NewObject<VulkanDeviceBundle>();
 	this->deviceBundle = deviceBundle.Get();
 	rhiBundles.push_back(deviceBundle);
 

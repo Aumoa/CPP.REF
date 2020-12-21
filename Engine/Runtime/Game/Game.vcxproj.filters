@@ -25,6 +25,9 @@
     <Filter Include="Private\SceneRendering">
       <UniqueIdentifier>{403871ba-6df4-4a50-91bb-39d67b7eb2a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\VulkanRHI">
+      <UniqueIdentifier>{8e6cbf7a-6f2c-44ba-848a-3467c342982a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -144,6 +147,21 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanException.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanMinimal.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanImmediateCommandList.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -211,6 +229,21 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VulkanRHI\VulkanException.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VulkanRHI\VulkanDeviceBundle.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VulkanRHI\VulkanMinimal.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VulkanRHI\VulkanCommandList.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp">
+      <Filter>Private\VulkanRHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
