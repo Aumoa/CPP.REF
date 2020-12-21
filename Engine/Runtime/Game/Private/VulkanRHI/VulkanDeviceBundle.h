@@ -19,13 +19,13 @@ namespace SC::Runtime::Game::VulkanRHI
 		using This = VulkanDeviceBundle;
 
 	private:
-		VkInstance vkInstance = VK_NULL_HANDLE;
-		VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE;
-		VkDebugReportCallbackEXT vkDebugReportCallback = VK_NULL_HANDLE;
-		size_t vkQueueIndex = 0;
+		VkInstance vkInstance;
+		VkPhysicalDevice vkPhysicalDevice;
+		VkDebugReportCallbackEXT vkDebugReportCallback;
+		size_t vkQueueIndex;
 
 		VkPhysicalDeviceFeatures vkDeviceFeatures;
-		VkDevice vkDevice = VK_NULL_HANDLE;
+		VkDevice vkDevice;
 
 	public:
 		VulkanDeviceBundle();

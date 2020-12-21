@@ -16,6 +16,13 @@ using namespace SC::Runtime::Game::VulkanRHI;
 using namespace std;
 
 VulkanDeviceBundle::VulkanDeviceBundle() : Super()
+	, vkInstance(VK_NULL_HANDLE)
+	, vkPhysicalDevice(VK_NULL_HANDLE)
+	, vkDebugReportCallback(VK_NULL_HANDLE)
+	, vkQueueIndex(0)
+	
+	, vkDeviceFeatures{ }
+	, vkDevice(VK_NULL_HANDLE)
 {
 
 }
