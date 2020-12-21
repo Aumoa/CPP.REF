@@ -5,6 +5,9 @@
 #include <utility>
 #include <typeinfo>
 
+#undef interface
+#include <Windows.h>
+
 using namespace SC::Runtime::Core;
 
 using namespace std;
@@ -13,18 +16,30 @@ Exception::Exception()
 	: innerException(nullptr)
 {
 	message = L"Unexpected error.";
+
+#ifdef _DEBUG
+	OutputDebugStringW(String::Format(L"{0}: {1}\n", Name->C_Str, message->C_Str)->C_Str);
+#endif
 }
 
 Exception::Exception(TRefPtr<String> message)
 	: innerException(nullptr)
 {
 	this->message = message;
+
+#ifdef _DEBUG
+	OutputDebugStringW(String::Format(L"{0}: {1}\n", Name->C_Str, message->C_Str)->C_Str);
+#endif
 }
 
 Exception::Exception(TRefPtr<String> message, Exception* innerException)
 {
 	this->message = message;
 	this->innerException = innerException;
+
+#ifdef _DEBUG
+	OutputDebugStringW(String::Format(L"{0}: {1}\n", Name->C_Str, message->C_Str)->C_Str);
+#endif
 }
 
 Exception::Exception(Exception&& other) noexcept
@@ -34,6 +49,10 @@ Exception::Exception(Exception&& other) noexcept
 	copy_name = other.Name;
 
 	other.innerException = nullptr;
+
+#ifdef _DEBUG
+	OutputDebugStringW(String::Format(L"{0}: {1}\n", Name->C_Str, message->C_Str)->C_Str);
+#endif
 }
 
 Exception::~Exception()
