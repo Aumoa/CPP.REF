@@ -115,19 +115,19 @@ namespace SC::Runtime::Core
 		static TRefPtr<String> Join(TRefPtr<String> separator, TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values);
 		template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
 		static TRefPtr<String> Join(TRefPtr<String> separator, const T(&values)[N]);
-		template<TIsStringConvertible T>
-		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<T>& values);
-		template<TIsStringConstructible T>
-		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<T>& values);
+		template<THasStdEnumerable TContainer> requires TIsStringConvertible<decltype(*std::begin(TContainer()))>
+		static TRefPtr<String> Join(TRefPtr<String> separator, const TContainer& values);
+		template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
+		static TRefPtr<String> Join(TRefPtr<String> separator, const TContainer& values);
 		static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<TRefPtr<String>>& values);
 		template<class... TArgs>
 		static TRefPtr<String> Concat(TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values);
 		template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
 		static TRefPtr<String> Concat(const T(&values)[N]);
-		template<TIsStringConvertible T>
-		static TRefPtr<String> Concat(const std::vector<T>& values);
-		template<TIsStringConstructible T>
-		static TRefPtr<String> Concat(const std::vector<T>& values);
+		template<THasStdEnumerable TContainer> requires TIsStringConvertible<decltype(*std::begin(TContainer()))>
+		static TRefPtr<String> Concat(const TContainer& values);
+		template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
+		static TRefPtr<String> Concat(const TContainer& values);
 		static TRefPtr<String> Concat(const std::vector<TRefPtr<String>>& values);
 
 		static const TRefPtr<String> Empty;

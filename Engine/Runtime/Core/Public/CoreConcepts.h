@@ -96,7 +96,7 @@ namespace SC::Runtime::Core
 		};
 
 	template<class TStringArg>
-	concept TIsStringConstructible = requires(const TStringArg& UnaryArg)
+	concept TIsStringConstructible = requires(const std::remove_reference_t<TStringArg>& UnaryArg)
 	{
 		{ String(UnaryArg) };
 	};
@@ -111,5 +111,12 @@ namespace SC::Runtime::Core
 	concept THasIterator = THasConstIterator<T> && requires()
 	{
 		{ typename T::Iterator() };
+	};
+
+	template<class T>
+	concept THasStdEnumerable = requires(const T Container)
+	{
+		{ std::begin(Container) };
+		{ std::begin(Container) };
 	};
 }

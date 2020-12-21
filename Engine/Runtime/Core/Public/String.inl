@@ -63,24 +63,26 @@ namespace SC::Runtime::Core
 		return Join(separator, values_vec);
 	}
 
-	template<TIsStringConvertible T>
-	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<T>& values)
+	template<THasStdEnumerable TContainer> requires TIsStringConvertible<decltype(*std::begin(TContainer()))>
+	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const TContainer& values)
 	{
 		std::vector<TRefPtr<String>> values_vec(values.size());
-		for (size_t i = 0; i < values.size(); ++i)
+		size_t i = 0;
+		for (auto it = std::begin(values); it != std::end(values); ++it)
 		{
-			values_vec[i] = values[i].ToString();
+			values_vec[i++] = (*it).ToString();
 		}
 		return Join(separator, values_vec);
 	}
 
-	template<TIsStringConstructible T>
-	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<T>& values)
+	template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
+	inline TRefPtr<String> String::Join(TRefPtr<String> separator, const TContainer& values)
 	{
 		std::vector<TRefPtr<String>> values_vec(values.size());
-		for (size_t i = 0; i < values.size(); ++i)
+		size_t i = 0;
+		for (auto it = std::begin(values); it != std::end(values); ++it)
 		{
-			values_vec[i] = values[i];
+			values_vec[i++] = (*it);
 		}
 		return Join(separator, values_vec);
 	}
@@ -98,25 +100,27 @@ namespace SC::Runtime::Core
 		std::vector<TRefPtr<String>> values_vec({ arg1, arg2, values... });
 		return Concat(values_vec);
 	}
-
-	template<TIsStringConvertible T>
-	inline TRefPtr<String> String::Concat(const std::vector<T>& values)
+	
+	template<THasStdEnumerable TContainer> requires TIsStringConvertible<decltype(*std::begin(TContainer()))>
+	inline TRefPtr<String> String::Concat(const TContainer& values)
 	{
 		std::vector<TRefPtr<String>> values_vec(values.size());
-		for (size_t i = 0; i < values.size(); ++i)
+		size_t i = 0;
+		for (auto it = std::begin(values); it != std::end(values); ++it)
 		{
-			values_vec[i] = values[i].ToString();
+			values_vec[i++] = (*it).ToString();
 		}
 		return Concat(values_vec);
 	}
 
-	template<TIsStringConstructible T>
-	inline TRefPtr<String> String::Concat(const std::vector<T>& values)
+	template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
+	inline TRefPtr<String> String::Concat(const TContainer& values)
 	{
 		std::vector<TRefPtr<String>> values_vec(values.size());
-		for (size_t i = 0; i < values.size(); ++i)
+		size_t i = 0;
+		for (auto it = std::begin(values); it != std::end(values); ++it)
 		{
-			values_vec[i] = values[i];
+			values_vec[i++] = (*it);
 		}
 		return Concat(values_vec);
 	}
