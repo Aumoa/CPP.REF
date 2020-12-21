@@ -28,8 +28,8 @@ namespace SC::Runtime::Game::D3D12RHI
 		D3D12DeferredCommandList(ID3D12Device* device);
 		~D3D12DeferredCommandList() override;
 
-		virtual void BeginCommand();
-		virtual void EndCommand() override;
+		void BeginCommand() override;
+		void EndCommand() override;
 
 		ID3D12GraphicsCommandList* CommandList_get() override;
 

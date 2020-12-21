@@ -31,12 +31,15 @@ void D3D12DeferredCommandList::BeginCommand()
 	{
 		HR(commandList->Reset(commandAllocator[currentAllocatorIndex].Get(), nullptr));
 	}
+
+	Super::BeginCommand();
 }
 
 void D3D12DeferredCommandList::EndCommand()
 {
-	Super::EndCommand();
 	MoveAllocatorNext();
+
+	Super::EndCommand();
 }
 
 ID3D12GraphicsCommandList* D3D12DeferredCommandList::CommandList_get()

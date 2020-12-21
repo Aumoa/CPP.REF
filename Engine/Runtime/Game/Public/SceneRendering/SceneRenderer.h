@@ -10,6 +10,7 @@ namespace SC::Runtime::Game::RHI
 	interface IRHIResource;
 	interface IRHIDeferredCommandList;
 	interface IRHIDeviceBundle;
+	interface IRHIRenderTargetView;
 }
 
 namespace SC::Runtime::Game::SceneRendering
@@ -24,6 +25,7 @@ namespace SC::Runtime::Game::SceneRendering
 		RHI::IRHIDeviceBundle* deviceBundle;
 		Core::TRefPtr<RHI::IRHIResource> finalColor;
 		Core::TRefPtr<RHI::IRHIDeferredCommandList> commandList;
+		Core::TRefPtr<RHI::IRHIRenderTargetView> rtv;
 
 	public:
 		SceneRenderer(RHI::IRHIDeviceBundle* deviceBundle);
@@ -31,6 +33,11 @@ namespace SC::Runtime::Game::SceneRendering
 
 		void BeginRender();
 		void EndRender();
+
+		vs_property_get(RHI::IRHIDeferredCommandList*, CommandList);
+		RHI::IRHIDeferredCommandList* CommandList_get() const;
+		vs_property_get(RHI::IRHIResource*, FinalColor);
+		RHI::IRHIResource* FinalColor_get() const;
 
 	private:
 		// CALLBACK HANDLERS

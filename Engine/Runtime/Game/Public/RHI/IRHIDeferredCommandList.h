@@ -10,7 +10,6 @@ namespace SC::Runtime::Game::RHI
 {
 	interface IRHIDeferredCommandList : virtual public Core::Object, virtual public IRHICommandList
 	{
-		virtual void BeginCommand() = 0;
-		virtual void EndCommand() = 0;
+
 	};
 }

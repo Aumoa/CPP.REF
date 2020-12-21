@@ -80,14 +80,15 @@ void Engine::Tick()
 
 		IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
 
-		immediateCommandList->BeginCommand();
-		//immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::COPY_DEST);
-
 		// TODO: SceneRenderer
 		sceneRenderer->BeginRender();
 		sceneRenderer->EndRender();
+		immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
 
-		//immediateCommandList->ResourceTransition(target, RHIResourceStates::COPY_DEST, RHIResourceStates::PRESENT);
+		immediateCommandList->BeginCommand();
+		immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::COPY_DEST);
+		immediateCommandList->CopyResource(target, sceneRenderer->FinalColor);
+		immediateCommandList->ResourceTransition(target, RHIResourceStates::COPY_DEST, RHIResourceStates::PRESENT);
 		immediateCommandList->EndCommand();
 		immediateCommandList->Flush();
 

@@ -8,8 +8,9 @@
 
 namespace SC::Runtime::Game::RHI
 {
-	interface IRHIImmediateCommandList : virtual public Core::Object, virtual public IRHIDeferredCommandList
+	interface IRHIImmediateCommandList : virtual public Core::Object, virtual public IRHICommandList
 	{
+		virtual void ExecuteCommandList(IRHIDeferredCommandList* deferredCommandList) = 0;
 		virtual void Flush() = 0;
 	};
 }

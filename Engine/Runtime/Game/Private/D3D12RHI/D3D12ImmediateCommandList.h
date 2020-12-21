@@ -25,6 +25,7 @@ namespace SC::Runtime::Game::D3D12RHI
 		D3D12ImmediateCommandList(ID3D12Device* device);
 		~D3D12ImmediateCommandList() override;
 
+		virtual void ExecuteCommandList(RHI::IRHIDeferredCommandList* deferredCommandList);
 		virtual void Flush();
 
 		vs_property_get(ID3D12CommandQueue*, CommandQueue);

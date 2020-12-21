@@ -9,7 +9,8 @@ using namespace SC::Runtime::Game::D3D12RHI;
 using namespace SC::Runtime::Game::RHI;
 using namespace std;
 
-D3D12CommandList::D3D12CommandList()
+D3D12CommandList::D3D12CommandList() : Super()
+	, bHasBegunCommand(false)
 {
 
 }
@@ -19,11 +20,16 @@ D3D12CommandList::~D3D12CommandList()
 
 }
 
+void D3D12CommandList::BeginCommand()
+{
+	bHasBegunCommand = true;
+}
+
 void D3D12CommandList::EndCommand()
 {
 	ConsumePendingDeferredCommands();
-
 	HR(CommandList->Close());
+	bHasBegunCommand = false;
 }
 
 void D3D12CommandList::OMSetRenderTargets(size_t count, IRHIRenderTargetView* rtv[])
@@ -59,6 +65,18 @@ void D3D12CommandList::ResourceTransition(IRHIResource* resource, RHIResourceSta
 	barrier.Transition.Subresource = (uint32)subresourceIndex;
 
 	pendingBarriers.emplace_back(barrier);
+}
+
+void D3D12CommandList::CopyResource(IRHIResource* target, IRHIResource* source)
+{
+	ConsumePendingDeferredCommands();
+
+	CommandList->CopyResource(Cast<D3D12Resource>(target)->Resource, Cast<D3D12Resource>(source)->Resource);
+}
+
+bool D3D12CommandList::HasBegunCommand_get() const
+{
+	return bHasBegunCommand;
 }
 
 void D3D12CommandList::ConsumePendingDeferredCommands()
