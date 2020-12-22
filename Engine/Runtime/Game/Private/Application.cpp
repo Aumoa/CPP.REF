@@ -2,27 +2,29 @@
 
 #include "Application.h"
 
+#include <string.h>
 #include "AppDuplicationException.h"
 #include "WinException.h"
-#include <string.h>
+#include "GameInstance.h"
 #include "Engine.h"
 #include "Logging/LogVerbosity.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
 using namespace SC::Runtime::Game::Logging;
+using namespace std;
 
 #define ALLOC_BREAK_NUMBER 0
 
 Application* Application::instance;
 LogCategoryBase Application::LogApplication(ELogVerbosity::Verbose, nameof(LogApplication));
 
-Application::Application(TRefPtr<String> appName) : Super()
+Application::Application() : Super()
 	, hWnd(nullptr)
 {
 	SetCrtMemLeakDebug();
 	CheckDuplicationAndAlloc();
-	CreateWindow(appName);
+	CreateWindow();
 }
 
 Application::~Application()
@@ -35,11 +37,48 @@ void Application::PostInitialize()
 
 }
 
-int32 Application::Run()
+HWND Application::GetCoreHwnd() const
+{
+	return hWnd;
+}
+
+GameInstance* Application::GetGameInstance() const
+{
+	return gameInstance.Get();
+}
+
+Application* Application::GetInstance()
+{
+	return instance;
+}
+
+LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_SIZE:
+	{
+		int32 width = (int16)LOWORD(lParam);
+		int32 height = (int16)HIWORD(lParam);
+		GApplication.PreSizing.Invoke(width, height);
+		GApplication.PostSized.Invoke(width, height);
+		break;
+	}
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	}
+
+	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
+}
+
+int32 Application::RunInternal(function<TRefPtr<GameInstance>()> objectConstructor)
 {
 	InitializeEngine();
+	gameInstance = objectConstructor();
 	PostInitialize();
 
+	SetWindowTextW(hWnd, gameInstance->ToString()->C_Str);
 	ShowWindow(hWnd, SW_SHOW);
 
 	MSG msg{ };
@@ -68,36 +107,6 @@ int32 Application::Run()
 	return 0;
 }
 
-HWND Application::GetCoreHwnd() const
-{
-	return hWnd;
-}
-
-Application* Application::GetInstance()
-{
-	return instance;
-}
-
-LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_SIZE:
-	{
-		int32 width = (int16)LOWORD(lParam);
-		int32 height = (int16)HIWORD(lParam);
-		GApplication.PreSizing.Invoke(width, height);
-		GApplication.PostSized.Invoke(width, height);
-		break;
-	}
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	}
-
-	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
-}
-
 void Application::SetCrtMemLeakDebug()
 {
 #ifdef _DEBUG
@@ -120,7 +129,7 @@ void Application::CheckDuplicationAndAlloc()
 	instance = this;
 }
 
-void Application::CreateWindow(TRefPtr<String> appName)
+void Application::CreateWindow()
 {
 	WNDCLASSEXW wcex{ };
 	wcex.cbSize = sizeof(wcex);
@@ -136,7 +145,7 @@ void Application::CreateWindow(TRefPtr<String> appName)
 	hWnd = CreateWindowExW(
 		NULL,
 		wcex.lpszClassName,
-		appName->C_Str,
+		L"GameApp",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,

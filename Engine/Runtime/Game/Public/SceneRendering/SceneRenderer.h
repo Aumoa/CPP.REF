@@ -31,8 +31,8 @@ namespace SC::Runtime::Game::SceneRendering
 		SceneRenderer(RHI::IRHIDeviceBundle* deviceBundle);
 		~SceneRenderer() override;
 
-		void BeginRender();
-		void EndRender();
+		virtual void BeginRender();
+		virtual void EndRender();
 
 		vs_property_get(RHI::IRHIDeferredCommandList*, CommandList);
 		RHI::IRHIDeferredCommandList* CommandList_get() const;

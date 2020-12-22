@@ -30,7 +30,6 @@ SceneRenderer::~SceneRenderer()
 void SceneRenderer::BeginRender()
 {
 	commandList->BeginCommand();
-
 	commandList->ResourceTransition(finalColor.Get(), RHIResourceStates::COPY_SOURCE, RHIResourceStates::RENDER_TARGET);
 	commandList->ClearRenderTargetView(rtv.Get());
 }
@@ -38,7 +37,6 @@ void SceneRenderer::BeginRender()
 void SceneRenderer::EndRender()
 {
 	commandList->ResourceTransition(finalColor.Get(), RHIResourceStates::RENDER_TARGET, RHIResourceStates::COPY_SOURCE);
-
 	commandList->EndCommand();
 }
 

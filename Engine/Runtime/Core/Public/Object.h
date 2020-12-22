@@ -23,6 +23,9 @@ namespace SC::Runtime::Core
 		friend class TRefPtr;
 		template<TIsNotPointer T, bool bThreadSafe>
 		friend class TWeakPtr;
+		
+		Object(const Object&) = delete;
+		Object(Object&&) = delete;
 
 	private:
 		bool bLockCollecting : 1;

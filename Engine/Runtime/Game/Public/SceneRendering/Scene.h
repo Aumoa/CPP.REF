@@ -7,10 +7,14 @@
 
 namespace SC::Runtime::Game::SceneRendering
 {
+	class SceneRenderer;
+
 	class GAME_API Scene : virtual public Core::Object
 	{
 	public:
 		Scene();
 		~Scene() override;
+
+		void Render(SceneRenderer* renderer);
 	};
 }

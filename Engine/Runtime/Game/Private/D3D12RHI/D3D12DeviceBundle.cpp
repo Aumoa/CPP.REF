@@ -148,24 +148,32 @@ void D3D12DeviceBundle::InitializeD3D12()
 	ComPtr<IDXGIAdapter1> adapter;
 	for (int32 i = 0; SUCCEEDED(dxgiFactory->EnumAdapters1((UINT)i, &adapter)); ++i)
 	{
-		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&d3d12Device))))
+		if (!IsAdapterSuitable(adapter.Get()))
 		{
-			TRefPtr<String> deviceName = L"Unknown";
-			DXGI_ADAPTER_DESC1 desc1;
-			if (SUCCEEDED(adapter->GetDesc1(&desc1)))
-			{
-				deviceName = desc1.Description;
-			}
-
-			SE_LOG(LogD3D12RHI, Verbose, "Succeeded to detect adapter that support {2} with index: {0}, name: {1}.", i, deviceName, nameof(D3D_FEATURE_LEVEL_12_1));
-			break;
+			continue;
 		}
+
+		if (FAILED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&d3d12Device))))
+		{
+			continue;
+		}
+
+		if (!IsDeviceSuitable(d3d12Device.Get()))
+		{
+			continue;
+		}
+
+		DXGI_ADAPTER_DESC1 desc = { };
+		HR(adapter->GetDesc1(&desc));
+		
+		SE_LOG(LogD3D12RHI, Verbose, L"That supported feature level 12_1 device named to {0} is selected.", desc.Description);
+		break;
 	}
 
 	if (!d3d12Device)
 	{
-		SE_LOG(LogD3D12RHI, Error, "Failed to detect adapter that support feature level 12_0. Create device with software platform.");
-		throw HResultException(E_NOTIMPL);
+		SE_LOG(LogD3D12RHI, Error, "Failed to detect adapter that support feature level 12_1. Create device with software platform.");
+		throw HResultException(CO_E_NOT_SUPPORTED);
 	}
 
 	// Create core command queue.
@@ -190,6 +198,27 @@ void D3D12DeviceBundle::InitializeD3D12()
 
 	rtvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
 	dsvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
+}
+
+bool D3D12DeviceBundle::IsAdapterSuitable(IDXGIAdapter1* adapter) const
+{
+	DXGI_ADAPTER_DESC1 desc{ };
+	HR(adapter->GetDesc1(&desc));
+
+	if (desc.Flags != DXGI_ADAPTER_FLAG_NONE)
+	{
+		// Is remote or software implement.
+		return false;
+	}
+
+	return true;
+}
+
+bool D3D12DeviceBundle::IsDeviceSuitable(ID3D12Device* device) const
+{
+	UNREFERENCED_PARAMETER(device);
+
+	return true;
 }
 
 void D3D12DeviceBundle::Application_OnSizing(int32 width, int32 height)

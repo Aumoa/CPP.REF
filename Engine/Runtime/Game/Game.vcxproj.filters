@@ -28,6 +28,18 @@
     <Filter Include="Private\VulkanRHI">
       <UniqueIdentifier>{8e6cbf7a-6f2c-44ba-848a-3467c342982a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Framework">
+      <UniqueIdentifier>{f2130872-851c-4ce0-aef4-b316b49a1fe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Framework">
+      <UniqueIdentifier>{0d1fa1d5-49ca-43bc-8976-9018d99cb1ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Components">
+      <UniqueIdentifier>{f773f46f-27d4-4b0f-9d61-1fb48287cf22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Components">
+      <UniqueIdentifier>{23ef1ada-3407-4fbf-83f9-d22b504ec91b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -171,6 +183,27 @@
     <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h">
       <Filter>Private\VulkanRHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\Actor.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\ActorComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameInstance.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\World.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\SceneComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\PrimitiveComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -263,10 +296,34 @@
     <ClCompile Include="Private\VulkanRHI\VulkanRenderTargetView.cpp">
       <Filter>Private\VulkanRHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Framework\Actor.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\ActorComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameInstance.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\World.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\SceneComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\PrimitiveComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
       <Filter>Public\Logging</Filter>
+    </None>
+    <None Include="Public\Application.inl">
+      <Filter>Public</Filter>
     </None>
   </ItemGroup>
 </Project>

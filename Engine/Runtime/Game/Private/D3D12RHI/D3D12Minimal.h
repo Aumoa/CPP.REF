@@ -25,7 +25,11 @@ namespace SC::Runtime::Game::D3D12RHI
 	extern Logging::LogCategoryBase LogD3D12RHI;
 }
 
+#ifdef _DEBUG
 #define HR(x) if (HRESULT hr = x; FAILED(hr)) throw SC::Runtime::Game::D3D12RHI::HResultException(hr)
+#else
+#define HR(x) x
+#endif
 
 D3D12_RESOURCE_STATES ToD3D12(SC::Runtime::Game::RHI::RHIResourceStates value);
 DXGI_FORMAT ToD3D12(SC::Runtime::Game::RHI::RHITextureFormat value);

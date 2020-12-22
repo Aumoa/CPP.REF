@@ -13,3 +13,8 @@ Scene::~Scene()
 {
 
 }
+
+void Scene::Render(SceneRenderer* renderer)
+{
+
+}

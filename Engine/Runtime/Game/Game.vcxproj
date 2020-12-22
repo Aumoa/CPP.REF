@@ -176,8 +176,13 @@
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
+    <ClInclude Include="Public\Components\ActorComponent.h" />
+    <ClInclude Include="Public\Components\PrimitiveComponent.h" />
+    <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Engine.h" />
+    <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\GameAPI.h" />
+    <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\IEngineTick.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
@@ -194,10 +199,12 @@
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
+    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
+    <ClInclude Include="Public\World.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\ThirdParty\glfw\BINARIES\x64\src\glfw.vcxproj">
@@ -210,6 +217,9 @@
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\Components\ActorComponent.cpp" />
+    <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
+    <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandFence.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeferredCommandList.cpp" />
@@ -225,10 +235,14 @@
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
+    <ClCompile Include="Private\Framework\Actor.cpp" />
+    <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
+    <ClCompile Include="Private\World.cpp" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
     <None Include="Private\VulkanRHI\VulkanException.cpp" />
@@ -240,6 +254,7 @@
     <ClCompile Include="Private\WinException.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Public\Application.inl" />
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

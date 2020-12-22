@@ -7,13 +7,20 @@
 
 #include "WindowsMinimal.h"
 #include "IEngineTick.h"
+#include "GameInstance.h"
+
+namespace SC::Runtime::Game::Logging
+{
+	struct LogCategoryBase;
+}
 
 namespace SC::Runtime::Game
 {
-	namespace Logging
+	template<class T>
+	concept TIsGameInstance = requires(T* Ref)
 	{
-		struct LogCategoryBase;
-	}
+		{ static_cast<GameInstance*>(Ref) };
+	};
 
 	class GAME_API Application : virtual public Core::Object
 	{
@@ -32,15 +39,19 @@ namespace SC::Runtime::Game
 		HWND hWnd;
 		bool bMainLoop : 1;
 		Core::TRefPtr<IEngineTick> engineLoop;
+		Core::TRefPtr<GameInstance> gameInstance;
 
 	public:
-		Application(Core::TRefPtr<Core::String> appName = "GameApp");
+		Application();
 		~Application() override;
 
 		virtual void PostInitialize();
 
-		int32 Run();
+		template<TIsGameInstance T, class... TArgs> requires THasConstructor<T, TArgs...>
+		inline int32 Run(TArgs&&... args);
+
 		HWND GetCoreHwnd() const;
+		GameInstance* GetGameInstance() const;
 
 		PreSizingDelegate PreSizing;
 		SizingDelegate Sizing;
@@ -51,11 +62,14 @@ namespace SC::Runtime::Game
 	private:
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+		int32 RunInternal(std::function<Core::TRefPtr<GameInstance>()> objectConstructor);
 		void SetCrtMemLeakDebug();
 		void CheckDuplicationAndAlloc();
-		void CreateWindow(Core::TRefPtr<Core::String> appName);
+		void CreateWindow();
 		void InitializeEngine();
 
 		void OnIdle();
 	};
 }
+
+#include "Application.inl"

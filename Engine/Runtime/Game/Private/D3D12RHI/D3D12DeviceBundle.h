@@ -56,6 +56,9 @@ namespace SC::Runtime::Game::D3D12RHI
 		void InitializeDXGI();
 		void InitializeD3D12();
 
+		bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;
+		bool IsDeviceSuitable(ID3D12Device* device) const;
+
 		// CALLBACK HANDLERS
 		void Application_OnSizing(int32 width, int32 height);
 	};
