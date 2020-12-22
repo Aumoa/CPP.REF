@@ -173,6 +173,8 @@
     <ClInclude Include="Private\VulkanRHI\VulkanException.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanImmediateCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanMinimal.h" />
+    <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h" />
+    <ClInclude Include="Private\VulkanRHI\VulkanResource.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
@@ -234,6 +236,8 @@
     <ClCompile Include="Private\VulkanRHI\VulkanException.cpp" />
     <ClCompile Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp" />
     <ClCompile Include="Private\VulkanRHI\VulkanMinimal.cpp" />
+    <ClCompile Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
+    <ClCompile Include="Private\VulkanRHI\VulkanResource.cpp" />
     <ClCompile Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
   </ItemGroup>

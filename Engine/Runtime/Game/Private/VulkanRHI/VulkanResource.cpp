@@ -17,6 +17,7 @@ VulkanResource::VulkanResource(VkImage vkImage, bool bDynamic) : Super()
 
 VulkanResource::~VulkanResource()
 {
+
 }
 
 VkImage VulkanResource::Image_get() const
