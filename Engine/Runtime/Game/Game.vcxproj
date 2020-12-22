@@ -78,12 +78,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\VulkanSDK\1.2.162.0\Include;$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public;$(ProjectDir)Private;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.2.162.0\Include;$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.2.162.0\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\VulkanSDK\1.2.162.0\Include;$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public;$(ProjectDir)Private;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.2.162.0\Include;$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.2.162.0\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -199,6 +199,9 @@
     <ClInclude Include="Public\WinException.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\ThirdParty\glfw\BINARIES\x64\src\glfw.vcxproj">
+      <Project>{C96BC92D-B615-3105-965D-C87ECAA001A3}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{2d9c1fc7-8c2e-4f0e-938b-8f9967b975b1}</Project>
     </ProjectReference>
