@@ -12,5 +12,13 @@
     <ClCompile Include="Private\WinMain.ixx">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Public\THGameInstance.ixx">
+      <Filter>Public</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\THAPI.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

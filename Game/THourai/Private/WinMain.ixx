@@ -2,6 +2,8 @@
 
 #include "Application.h"
 
+import THGameInstance;
+
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
 
@@ -10,8 +12,8 @@ class Program : virtual public Object
 public:
 	static int32 Main()
 	{
-		auto app = NewObject<Application>("GameApp");
-		return app->Run();
+		auto app = NewObject<Application>();
+		return app->Run<THGameInstance>();
 	}
 };
 
