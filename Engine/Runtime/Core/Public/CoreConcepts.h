@@ -119,4 +119,13 @@ namespace SC::Runtime::Core
 		{ std::begin(Container) };
 		{ std::begin(Container) };
 	};
+
+	template<class T, class O>
+	concept TIsConvertible = requires(T Arg)
+	{
+		{ (O)Arg };
+	};
+
+	template<class T>
+	concept TIsRealType = TIsConvertible<T, float> || TIsConvertible<T, double> || TIsConvertible<T, long double>;
 }

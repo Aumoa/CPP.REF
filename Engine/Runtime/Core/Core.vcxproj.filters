@@ -7,6 +7,12 @@
     <Filter Include="Private">
       <UniqueIdentifier>{83ed1748-60ea-4f73-a097-1333ee16ac06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Mathematics">
+      <UniqueIdentifier>{3fe7b9e5-fbd9-49da-bcc8-d57416230fad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Mathematics">
+      <UniqueIdentifier>{0603bf93-60c1-48b5-b61d-e84f4a7447c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -63,6 +69,15 @@
     <ClInclude Include="Public\IEnumerable.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Mathematics\Math.h">
+      <Filter>Public\Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Mathematics\TDegrees.h">
+      <Filter>Public\Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Mathematics\TRadians.h">
+      <Filter>Public\Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -79,6 +94,9 @@
     </None>
     <None Include="Public\TMulticastDelegate.inl">
       <Filter>Public</Filter>
+    </None>
+    <None Include="Public\Mathematics\Math.inl">
+      <Filter>Public\Mathematics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +132,9 @@
     </ClCompile>
     <ClCompile Include="Private\WeakReferences.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Mathematics\Math.cpp">
+      <Filter>Private\Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

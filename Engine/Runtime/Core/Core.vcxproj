@@ -160,6 +160,9 @@
     <ClInclude Include="Public\InvalidCastException.h" />
     <ClInclude Include="Public\IEnumerable.h" />
     <ClInclude Include="Public\IStringFormattable.h" />
+    <ClInclude Include="Public\Mathematics\TDegrees.h" />
+    <ClInclude Include="Public\Mathematics\Math.h" />
+    <ClInclude Include="Public\Mathematics\TRadians.h" />
     <ClInclude Include="Public\NullReferenceException.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
@@ -169,6 +172,7 @@
     <ClInclude Include="Public\WeakReferences.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Public\Mathematics\Math.inl" />
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
     <None Include="Public\TMulticastDelegate.inl" />
@@ -182,6 +186,7 @@
     <ClCompile Include="Private\IndexOutOfRangeException.cpp" />
     <ClCompile Include="Private\InvalidArgumentException.cpp" />
     <ClCompile Include="Private\InvalidCastException.cpp" />
+    <ClCompile Include="Private\Mathematics\Math.cpp" />
     <ClCompile Include="Private\NullReferenceException.cpp" />
     <ClCompile Include="Private\Object.cpp" />
     <ClCompile Include="Private\String.cpp" />
