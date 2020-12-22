@@ -13,6 +13,12 @@
     <Filter Include="Private\Mathematics">
       <UniqueIdentifier>{0603bf93-60c1-48b5-b61d-e84f4a7447c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Numerics">
+      <UniqueIdentifier>{65f6d300-cfa6-4a0a-beaa-807f4cd04fb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Numerics">
+      <UniqueIdentifier>{a7461282-9c6a-4212-80ec-8e9a67ccd5d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -78,6 +84,9 @@
     <ClInclude Include="Public\Mathematics\TRadians.h">
       <Filter>Public\Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Numerics\Vector2.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -97,6 +106,9 @@
     </None>
     <None Include="Public\Mathematics\Math.inl">
       <Filter>Public\Mathematics</Filter>
+    </None>
+    <None Include="Public\Numerics\Vector2.inl">
+      <Filter>Public\Numerics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +147,9 @@
     </ClCompile>
     <ClCompile Include="Private\Mathematics\Math.cpp">
       <Filter>Private\Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Vector2.cpp">
+      <Filter>Private\Numerics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

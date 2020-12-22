@@ -128,4 +128,15 @@ namespace SC::Runtime::Core
 
 	template<class T>
 	concept TIsRealType = TIsConvertible<T, float> || TIsConvertible<T, double> || TIsConvertible<T, long double>;
+
+	template<class T>
+	concept TIsVectorType = requires(T Arg, const T ConstArg)
+	{
+		{ ConstArg.GetComponentOrDefault(0) };
+		{ Arg.Construct(ConstArg) };
+		{ (T)ConstArg.Cast() };
+		{ (bool)ConstArg.Contains(0) };
+		{ (double)ConstArg[0] };
+		{ (size_t)ConstArg.Count };
+	};
 }

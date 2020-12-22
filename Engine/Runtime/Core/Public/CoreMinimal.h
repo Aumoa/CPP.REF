@@ -19,3 +19,5 @@
 #include "Mathematics/TDegrees.h"
 #include "Mathematics/TRadians.h"
 #include "Mathematics/Math.inl"
+
+#include "Numerics/Vector2.h"
