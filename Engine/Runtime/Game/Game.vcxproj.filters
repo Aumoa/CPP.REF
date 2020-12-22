@@ -162,6 +162,9 @@
     <ClInclude Include="Private\VulkanRHI\VulkanImmediateCommandList.h">
       <Filter>Private\VulkanRHI</Filter>
     </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -243,6 +246,9 @@
       <Filter>Private\VulkanRHI</Filter>
     </ClCompile>
     <ClCompile Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\VulkanRHI\VulkanSwapChain.cpp">
       <Filter>Private\VulkanRHI</Filter>
     </ClCompile>
   </ItemGroup>

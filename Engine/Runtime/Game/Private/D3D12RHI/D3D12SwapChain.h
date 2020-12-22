@@ -25,8 +25,7 @@ namespace SC::Runtime::Game::D3D12RHI
 		D3D12SwapChain(IDXGISwapChain4* swapChain);
 		~D3D12SwapChain() override;
 
-		virtual bool Present();
-		virtual bool PresentTest();
+		virtual void Present();
 		virtual void ResizeBuffers(int32 width, int32 height);
 		virtual Core::TRefPtr<RHI::IRHIResource> GetBuffer(size_t index) const;
 

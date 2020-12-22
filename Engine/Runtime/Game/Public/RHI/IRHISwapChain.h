@@ -11,8 +11,7 @@ namespace SC::Runtime::Game::RHI
 
 	interface IRHISwapChain : virtual public Core::Object
 	{
-		virtual bool Present() = 0;
-		virtual bool PresentTest() = 0;
+		virtual void Present() = 0;
 		virtual void ResizeBuffers(int32 width, int32 height) = 0;
 		virtual Core::TRefPtr<IRHIResource> GetBuffer(size_t index) const = 0;
 

@@ -4,7 +4,9 @@
 
 #undef interface
 
+#include "WindowsMinimal.h"
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_win32.h>
 
 #include "Logging/LogCategoryBase.h"
 #include "VulkanException.h"

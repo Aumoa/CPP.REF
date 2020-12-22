@@ -25,20 +25,9 @@ D3D12SwapChain::~D3D12SwapChain()
 	ReleaseBuffers();
 }
 
-bool D3D12SwapChain::Present()
+void D3D12SwapChain::Present()
 {
-	HRESULT hr = swapChain->Present(0, 0);
-	if (hr == DXGI_STATUS_OCCLUDED)
-	{
-		return false;
-	}
-
-	if (FAILED(hr))
-	{
-		throw HResultException(hr);
-	}
-
-	return true;
+	HR(swapChain->Present(0, 0));
 }
 
 void D3D12SwapChain::ResizeBuffers(int32 width, int32 height)
@@ -57,22 +46,6 @@ TRefPtr<IRHIResource> D3D12SwapChain::GetBuffer(size_t index) const
 	}
 
 	return backBuffers[index];
-}
-
-bool D3D12SwapChain::PresentTest()
-{
-	HRESULT hr = swapChain->Present(0, DXGI_PRESENT_TEST);
-	if (hr == DXGI_STATUS_OCCLUDED)
-	{
-		return false;
-	}
-
-	if (FAILED(hr))
-	{
-		throw HResultException(hr);
-	}
-
-	return true;
 }
 
 size_t D3D12SwapChain::CurrentBackBufferIndex_get() const

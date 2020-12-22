@@ -72,33 +72,25 @@ void Engine::Tick()
 {
 	TRefPtr<IRHISwapChain> swapChain = deviceBundle->GetSwapChain();
 
-	if (!bPresent)
-	{
-		bPresent = swapChain->PresentTest();
-	}
+	autoFence->BeginFence();
 
-	if (bPresent)
-	{
-		autoFence->BeginFence();
+	IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
 
-		IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
+	// TODO: SceneRenderer
+	sceneRenderer->BeginRender();
+	sceneRenderer->EndRender();
+	immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
 
-		// TODO: SceneRenderer
-		sceneRenderer->BeginRender();
-		sceneRenderer->EndRender();
-		immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
+	immediateCommandList->BeginCommand();
+	immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::COPY_DEST);
+	immediateCommandList->CopyResource(target, sceneRenderer->FinalColor);
+	immediateCommandList->ResourceTransition(target, RHIResourceStates::COPY_DEST, RHIResourceStates::PRESENT);
+	immediateCommandList->EndCommand();
+	immediateCommandList->Flush();
 
-		immediateCommandList->BeginCommand();
-		immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::COPY_DEST);
-		immediateCommandList->CopyResource(target, sceneRenderer->FinalColor);
-		immediateCommandList->ResourceTransition(target, RHIResourceStates::COPY_DEST, RHIResourceStates::PRESENT);
-		immediateCommandList->EndCommand();
-		immediateCommandList->Flush();
+	swapChain->Present();
 
-		bPresent = swapChain->Present();
-
-		autoFence->EndFence(immediateCommandList);
-	}
+	autoFence->EndFence(immediateCommandList);
 }
 
 IRHIDeviceBundle* Engine::DeviceBundle_get() const

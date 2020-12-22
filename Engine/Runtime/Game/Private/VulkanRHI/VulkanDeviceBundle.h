@@ -12,6 +12,8 @@
 
 namespace SC::Runtime::Game::VulkanRHI
 {
+	class VulkanSwapChain;
+
 	class VulkanDeviceBundle : virtual public Core::Object, virtual public RHI::IRHIDeviceBundle
 	{
 	public:
@@ -26,6 +28,10 @@ namespace SC::Runtime::Game::VulkanRHI
 
 		VkPhysicalDeviceFeatures vkDeviceFeatures;
 		VkDevice vkDevice;
+		VkQueue vkDirectQueue;
+		VkSurfaceKHR vkSurface;
+
+		Core::TRefPtr<VulkanSwapChain> swapChain;
 
 	public:
 		VulkanDeviceBundle();
@@ -50,7 +56,12 @@ namespace SC::Runtime::Game::VulkanRHI
 		void DestroyDebugReportCallbackEXT();
 		void CreatePhysicalDevice(const VkInstanceCreateInfo& vkInstanceCreateInfo);
 		std::optional<size_t> CheckPhysicalDeviceFeature(VkPhysicalDevice physicalDevice);
+		void DestroySurfaceKHR();
+		bool CheckSupportSwapChainDetails(VkPhysicalDevice vkDevice);
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData);
+
+		// CALLBACK HANDLERS
+		void Application_OnSizing(int32 width, int32 height);
 	};
 }

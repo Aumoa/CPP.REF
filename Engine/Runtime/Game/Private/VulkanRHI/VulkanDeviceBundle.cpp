@@ -9,6 +9,8 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIResource.h"
 #include "RHI/IRHIDeferredCommandList.h"
+#include "Application.h"
+#include "VulkanSwapChain.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game::RHI;
@@ -23,6 +25,7 @@ VulkanDeviceBundle::VulkanDeviceBundle() : Super()
 	
 	, vkDeviceFeatures{ }
 	, vkDevice(VK_NULL_HANDLE)
+	, vkSurface(VK_NULL_HANDLE)
 {
 
 }
@@ -82,10 +85,15 @@ void VulkanDeviceBundle::InitializeBundle()
 
 	CreateDebugReportCallbackEXT();
 	CreatePhysicalDevice(vkCreateInfo);
+
+	GApplication.Sizing += bind_delegate(Application_OnSizing);
 }
 
 void VulkanDeviceBundle::ReleaseBundle()
 {
+	swapChain.Reset();
+
+	DestroySurfaceKHR();
 	DestroyDebugReportCallbackEXT();
 	
 	if (vkDevice != VK_NULL_HANDLE)
@@ -263,6 +271,18 @@ void VulkanDeviceBundle::DestroyDebugReportCallbackEXT()
 
 void VulkanDeviceBundle::CreatePhysicalDevice(const VkInstanceCreateInfo& vkInstanceCreateInfo)
 {
+	auto vkCreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(vkInstance, "vkCreateWin32SurfaceKHR");
+	if (vkCreateWin32SurfaceKHR == nullptr)
+	{
+		throw VulkanException(VK_ERROR_FEATURE_NOT_PRESENT);
+	}
+
+	VkWin32SurfaceCreateInfoKHR vkCreateInfo = { };
+	vkCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	vkCreateInfo.hwnd = GApplication.GetCoreHwnd();
+	vkCreateInfo.hinstance = GetModuleHandleW(nullptr);
+	VKR(vkCreateWin32SurfaceKHR(vkInstance, &vkCreateInfo, nullptr, &vkSurface));
+
 	uint32 deviceCount = 0;
 	VKR(vkEnumeratePhysicalDevices(vkInstance, &deviceCount, nullptr));
 
@@ -303,6 +323,7 @@ void VulkanDeviceBundle::CreatePhysicalDevice(const VkInstanceCreateInfo& vkInst
 	vkDeviceCreateInfo.enabledExtensionCount = (uint32)vkExtensions.size();
 	vkDeviceCreateInfo.ppEnabledExtensionNames = vkExtensions.data();
 	VKR(vkCreateDevice(vkPhysicalDevice, &vkDeviceCreateInfo, nullptr, &vkDevice));
+	vkGetDeviceQueue(vkDevice, (uint32)vkQueueIndex, 0, &vkDirectQueue);
 }
 
 optional<size_t> VulkanDeviceBundle::CheckPhysicalDeviceFeature(VkPhysicalDevice physicalDevice)
@@ -326,6 +347,34 @@ optional<size_t> VulkanDeviceBundle::CheckPhysicalDeviceFeature(VkPhysicalDevice
 	}
 
 	//
+	// Check device is support swap chain.
+	uint32 availableExts;
+	VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &availableExts, nullptr));
+
+	vector<VkExtensionProperties> vkAvailableExts((size_t)availableExts);
+	VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &availableExts, vkAvailableExts.data()));
+
+	bool bPass = false;
+	for (size_t i = 0; i < vkAvailableExts.size(); ++i)
+	{
+		if (vkAvailableExts[i].extensionName == "VK_KHR_swapchain"s)
+		{
+			bPass = true;
+			break;
+		}
+	}
+
+	if (!bPass)
+	{
+		return nullopt;
+	}
+
+	if (!CheckSupportSwapChainDetails(physicalDevice))
+	{
+		return nullopt;
+	}
+
+	//
 	// Is support direct queue.
 	uint32 queueFamilyCount = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
@@ -337,20 +386,118 @@ optional<size_t> VulkanDeviceBundle::CheckPhysicalDeviceFeature(VkPhysicalDevice
 	for (size_t i = 0; i < queueFamilies.size(); ++i)
 	{
 		auto& family = queueFamilies[i];
-		if (family.queueCount > 0 && (family.queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)) != 0)
+		VkBool32 bPresentSupport = false;
+
+		if (FAILED(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, (uint32)i, vkSurface, &bPresentSupport)))
+		{
+			continue;
+		}
+
+		if (bPresentSupport && family.queueCount > 0 && (family.queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)) != 0)
 		{
 			queueIndex = i;
 			break;
 		}
 	}
 
-	this->vkDeviceFeatures = vkDeviceFeatures;
+	if (queueIndex.has_value())
+	{
+		this->vkDeviceFeatures = vkDeviceFeatures;
+	}
 	return move(queueIndex);
+}
+
+void VulkanDeviceBundle::DestroySurfaceKHR()
+{
+	if (vkInstance == VK_NULL_HANDLE)
+	{
+		return;
+	}
+
+	if (vkSurface == VK_NULL_HANDLE)
+	{
+		return;
+	}
+
+	auto vkDestroySurfaceKHR = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(vkInstance, "vkDestroySurfaceKHR");
+	if (vkDestroySurfaceKHR == nullptr)
+	{
+		SE_LOG(LogVulkanRHI, Warning, L"There is not address for destroy surface.");
+		return;
+	}
+
+	vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
+}
+
+bool VulkanDeviceBundle::CheckSupportSwapChainDetails(VkPhysicalDevice vkDevice)
+{
+	uint32 formatCount = 0;
+	VKR(vkGetPhysicalDeviceSurfaceFormatsKHR(vkDevice, vkSurface, &formatCount, nullptr));
+
+	if (formatCount == 0)
+	{
+		return false;
+	}
+
+	uint32 presentModeCount = 0;
+	VKR(vkGetPhysicalDeviceSurfacePresentModesKHR(vkDevice, vkSurface, &presentModeCount, nullptr));
+	if (presentModeCount == 0)
+	{
+		return false;
+	}
+
+	VkSurfaceCapabilitiesKHR vkCapabilities;
+	VKR(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkDevice, vkSurface, &vkCapabilities));
+	if (vkCapabilities.minImageCount > 2 || vkCapabilities.maxImageCount < 3)
+	{
+		return false;
+	}
+
+	vector<VkSurfaceFormatKHR> vkSurfaceFormats((size_t)formatCount);
+	VKR(vkGetPhysicalDeviceSurfaceFormatsKHR(vkDevice, vkSurface, &formatCount, vkSurfaceFormats.data()));
+
+	vector<VkPresentModeKHR> vkPresentModes((size_t)presentModeCount);
+	VKR(vkGetPhysicalDeviceSurfacePresentModesKHR(vkDevice, vkSurface, &presentModeCount, vkPresentModes.data()));
+
+	bool bFormatSuitable = false;
+	bool bPresentModeSuitable = false;
+
+	for (size_t i = 0; i < vkSurfaceFormats.size(); ++i)
+	{
+		if (vkSurfaceFormats[i].format == VK_FORMAT_B8G8R8A8_UNORM)
+		{
+			bFormatSuitable = true;
+			break;
+		}
+	}
+
+	for (size_t i = 0; i < vkPresentModes.size(); ++i)
+	{
+		if (vkPresentModes[i] == VK_PRESENT_MODE_FIFO_KHR)
+		{
+			bPresentModeSuitable = true;
+			break;
+		}
+	}
+
+	return bFormatSuitable && bPresentModeSuitable;
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDeviceBundle::DebugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData)
 {
-	SE_LOG(LogVulkanRHI, Error, L"Validation layer catched: {0}", msg);
+	SE_LOG(LogVulkanRHI, Error, msg);
 
 	return VK_FALSE;
+}
+
+void VulkanDeviceBundle::Application_OnSizing(int32 width, int32 height)
+{
+	if (swapChain.IsValid)
+	{
+		swapChain->ResizeBuffers(width, height);
+	}
+	else
+	{
+		swapChain = NewObject<VulkanSwapChain>(vkDevice, vkSurface, width, height);
+	}
 }
