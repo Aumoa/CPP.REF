@@ -14,13 +14,13 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDeferredCommandList.h"
 
-//#include "D3D12RHI/D3D12DeviceBundle.h"
-#include "VulkanRHI/VulkanDeviceBundle.h"
+#include "D3D12RHI/D3D12DeviceBundle.h"
+//#include "VulkanRHI/VulkanDeviceBundle.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game;
 using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::VulkanRHI;
+using namespace SC::Runtime::Game::D3D12RHI;
 using namespace SC::Runtime::Game::Logging;
 using namespace SC::Runtime::Game::SceneRendering;
 using namespace std;
@@ -53,7 +53,7 @@ void Engine::Initialize()
 		throw Exception("Unexpected exception.");
 	}
 
-	auto deviceBundle = NewObject<VulkanDeviceBundle>();
+	auto deviceBundle = NewObject<D3D12DeviceBundle>();
 	this->deviceBundle = deviceBundle.Get();
 	rhiBundles.push_back(deviceBundle);
 

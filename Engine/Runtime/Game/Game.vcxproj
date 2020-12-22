@@ -78,13 +78,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\VulkanSDK\1.2.162.0\Include;$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.2.162.0\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\VulkanSDK\1.2.162.0\Include;$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.2.162.0\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -129,7 +127,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;DXGI.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,7 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;DXGI.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -231,14 +229,14 @@
     <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanCommandList.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanException.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanMinimal.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanResource.cpp" />
-    <ClCompile Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
+    <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
+    <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
+    <None Include="Private\VulkanRHI\VulkanException.cpp" />
+    <None Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp" />
+    <None Include="Private\VulkanRHI\VulkanMinimal.cpp" />
+    <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
+    <None Include="Private\VulkanRHI\VulkanResource.cpp" />
+    <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
   </ItemGroup>
   <ItemGroup>
