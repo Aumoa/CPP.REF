@@ -133,10 +133,14 @@ namespace SC::Runtime::Core
 	concept TIsVectorType = requires(T Arg, const T ConstArg)
 	{
 		{ ConstArg.GetComponentOrDefault(0) };
-		{ Arg.Construct(ConstArg) };
-		{ (T)ConstArg.Cast() };
 		{ (bool)ConstArg.Contains(0) };
 		{ (double)ConstArg[0] };
 		{ (size_t)ConstArg.Count };
 	};
+
+	template<class T, class O>
+	concept TIsSmallEqualsThen = sizeof(T) <= sizeof(O);
+
+	template<class T, class O>
+	concept TIsGreaterThen = sizeof(T) > sizeof(O);
 }

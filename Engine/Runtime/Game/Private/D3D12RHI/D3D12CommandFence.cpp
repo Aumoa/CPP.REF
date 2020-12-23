@@ -33,12 +33,6 @@ void D3D12CommandFence::BeginFence()
 void D3D12CommandFence::EndFence(IRHIImmediateCommandList* immediateCommandList)
 {
 	auto d3d12ImmediateCommandList = dynamic_cast<D3D12ImmediateCommandList*>(immediateCommandList);
-	if (d3d12ImmediateCommandList == nullptr)
-	{
-		SE_LOG(LogD3D12RHI, Error, L"{0} is not valid {1} type pointer.", nameof(immediateCommandList), nameof_c(D3D12ImmediateCommandList));
-		return;
-	}
-
 	HR(d3d12ImmediateCommandList->CommandQueue->Signal(fence.Get(), ++fenceValue));
 }
 

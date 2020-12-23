@@ -5,14 +5,16 @@
 namespace SC::Runtime::Core::Mathematics
 {
 	template<TIsRealType T>
-	inline constexpr TRadians<T> TDegrees<T>::ToRadians() const
+	template<TIsRealType O>
+	inline constexpr TRadians<O> TDegrees<T>::ToRadians() const
 	{
 		return Value * InvPI;
 	}
 
 	template<TIsRealType T>
-	inline constexpr TDegrees<T> TRadians<T>::ToDegrees() const
+	template<TIsRealType O>
+	inline constexpr TDegrees<O> TRadians<T>::ToDegrees() const
 	{
-		return Value * Inv180;
+		return static_cast<O>(Value) * static_cast<O>(Inv180);
 	}
 }

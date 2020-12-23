@@ -21,3 +21,4 @@
 #include "Mathematics/Math.inl"
 
 #include "Numerics/Vector2.h"
+#include "Numerics/Rectangle.h"

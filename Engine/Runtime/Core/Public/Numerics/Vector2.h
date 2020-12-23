@@ -5,6 +5,7 @@
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
 
+#include <compare>
 #include "TRefPtr.h"
 
 namespace SC::Runtime::Core
@@ -65,6 +66,11 @@ namespace SC::Runtime::Core::Numerics
 
 		bool operator ==(const Vector2& right) const;
 		bool operator !=(const Vector2& right) const;
+		bool operator < (const Vector2& right) const;
+		bool operator <=(const Vector2& right) const;
+		bool operator > (const Vector2& right) const;
+		bool operator >=(const Vector2& right) const;
+		std::weak_ordering operator <=>(const Vector2& right) const;
 
 		Vector2& operator +=(const Vector2& right);
 		Vector2& operator -=(const Vector2& right);

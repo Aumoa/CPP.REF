@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Numerics\HashHelper.h" />
     <ClInclude Include="Public\ArgumentNullException.h" />
     <ClInclude Include="Public\CoreAPI.h" />
     <ClInclude Include="Public\CoreConcepts.h" />
@@ -164,6 +165,8 @@
     <ClInclude Include="Public\Mathematics\Math.h" />
     <ClInclude Include="Public\Mathematics\TRadians.h" />
     <ClInclude Include="Public\NullReferenceException.h" />
+    <ClInclude Include="Public\Numerics\Ray2.h" />
+    <ClInclude Include="Public\Numerics\Rectangle.h" />
     <ClInclude Include="Public\Numerics\Vector2.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
@@ -174,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Mathematics\Math.inl" />
+    <None Include="Public\Numerics\Rectangle.inl" />
     <None Include="Public\Numerics\Vector2.inl" />
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
@@ -190,6 +194,9 @@
     <ClCompile Include="Private\InvalidCastException.cpp" />
     <ClCompile Include="Private\Mathematics\Math.cpp" />
     <ClCompile Include="Private\NullReferenceException.cpp" />
+    <ClCompile Include="Private\Numerics\HashHelper.cpp" />
+    <ClCompile Include="Private\Numerics\Ray2.cpp" />
+    <ClCompile Include="Private\Numerics\Rectangle.cpp" />
     <ClCompile Include="Private\Numerics\Vector2.cpp" />
     <ClCompile Include="Private\Object.cpp" />
     <ClCompile Include="Private\String.cpp" />

@@ -3,9 +3,12 @@
 #include "Numerics/Vector2.h"
 
 #include "IndexOutOfRangeException.h"
+#include "Numerics/Rectangle.h"
+#include "HashHelper.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Core::Numerics;
+using namespace std;
 
 Vector2::Vector2()
 {
@@ -37,15 +40,8 @@ bool Vector2::NearlyEquals(const Vector2& rh, double epsilon) const
 
 size_t Vector2::GetHashCode() const
 {
-	constexpr size_t N = sizeof(Vector2) / sizeof(size_t);
-	using TReint = const size_t(&)[N];
-	TReint values = reinterpret_cast<TReint>(*this);
-	size_t hash = values[0];
-	for (size_t i = 1; i < N; ++i)
-	{
-		hash ^= values[i];
-	}
-	return hash;
+	return HashHelper::GetHashCode(X)
+		 ^ HashHelper::GetHashCode(Y);
 }
 
 TRefPtr<String> Vector2::ToString() const
@@ -66,7 +62,7 @@ double Vector2::GetComponentOrDefault(size_t index) const
 
 bool Vector2::Contains(size_t index) const
 {
-	return Count >= index;
+	return index < Count;
 }
 
 size_t Vector2::Count_get() const
@@ -169,6 +165,110 @@ bool Vector2::operator ==(const Vector2& value) const
 bool Vector2::operator !=(const Vector2& value) const
 {
 	return X != value.X || Y != value.Y;
+}
+
+bool Vector2::operator < (const Vector2& right) const
+{
+	if (X < right.X)
+	{
+		return true;
+	}
+	else if (X > right.X)
+	{
+		return false;
+	}
+	else if (Y < right.Y)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Vector2::operator <=(const Vector2& right) const
+{
+	if (X < right.X)
+	{
+		return true;
+	}
+	else if (X > right.X)
+	{
+		return false;
+	}
+	else if (Y <= right.Y)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Vector2::operator > (const Vector2& right) const
+{
+	if (X > right.X)
+	{
+		return true;
+	}
+	else if (X < right.X)
+	{
+		return false;
+	}
+	else if (Y > right.Y)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Vector2::operator >=(const Vector2& right) const
+{
+	if (X > right.X)
+	{
+		return true;
+	}
+	else if (X < right.X)
+	{
+		return false;
+	}
+	else if (Y >= right.Y)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+weak_ordering Vector2::operator <=>(const Vector2& right) const
+{
+	if (X < right.X)
+	{
+		return weak_ordering::less;
+	}
+	else if (X > right.X)
+	{
+		return weak_ordering::greater;
+	}
+	else if (Y < right.Y)
+	{
+		return weak_ordering::less;
+	}
+	else if (Y > right.Y)
+	{
+		return weak_ordering::greater;
+	}
+	else
+	{
+		return weak_ordering::equivalent;
+	}
 }
 
 Vector2& Vector2::operator +=(const Vector2& right)
