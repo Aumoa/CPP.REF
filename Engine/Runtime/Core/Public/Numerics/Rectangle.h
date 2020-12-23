@@ -31,16 +31,6 @@ namespace SC::Runtime::Core::Numerics
 		size_t GetHashCode() const;
 		TRefPtr<String> ToString() const;
 
-		double GetComponentOrDefault(size_t index) const;
-		template<TIsVectorType T>
-		inline void Construct(const T& vector);
-		template<TIsVectorType T>
-		inline T Cast() const;
-		bool Contains(size_t index) const;
-
-		vs_property_get(size_t, Count);
-		size_t Count_get() const;
-
 		bool IsOverlap(const Vector2& point) const;
 		bool IsOverlap(const Rectangle& rect) const;
 		bool IsOverlap(const Ray2& ray) const;
@@ -62,9 +52,6 @@ namespace SC::Runtime::Core::Numerics
 		vs_property_get(double, Size);
 		double Size_get() const;
 
-		const double& operator [](size_t index) const;
-		double& operator [](size_t index);
-
 		bool operator ==(const Rectangle& right) const;
 		bool operator !=(const Rectangle& right) const;
 		bool operator < (const Rectangle& right) const;
@@ -75,5 +62,3 @@ namespace SC::Runtime::Core::Numerics
 	};
 #pragma pack(pop)
 }
-
-#include "Rectangle.inl"

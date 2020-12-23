@@ -119,9 +119,6 @@
     <None Include="Public\Numerics\Vector2.inl">
       <Filter>Public\Numerics</Filter>
     </None>
-    <None Include="Public\Numerics\Rectangle.inl">
-      <Filter>Public\Numerics</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Object.cpp">

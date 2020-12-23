@@ -177,7 +177,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Mathematics\Math.inl" />
-    <None Include="Public\Numerics\Rectangle.inl" />
     <None Include="Public\Numerics\Vector2.inl" />
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
