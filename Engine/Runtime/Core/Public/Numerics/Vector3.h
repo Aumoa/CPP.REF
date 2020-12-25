@@ -80,6 +80,13 @@ namespace SC::Runtime::Core::Numerics
 		static double Distance(const Vector3& left, const Vector3& right);
 		static double DotProduct(const Vector3& left, const Vector3& right);
 		static Vector3 CrossProduct(const Vector3& left, const Vector3& right);
+
+		static Vector3 Up;
+		static Vector3 Forward;
+		static Vector3 Right;
+		static Vector3 AxisX;
+		static Vector3 AxisY;
+		static Vector3 AxisZ;
 	};
 #pragma pack(pop)
 
@@ -88,3 +95,5 @@ namespace SC::Runtime::Core::Numerics
 	CORE_API Vector3 operator *(double left, const Vector3& right);
 	CORE_API Vector3 operator /(double left, const Vector3& right);
 }
+
+#include "Vector3.inl"

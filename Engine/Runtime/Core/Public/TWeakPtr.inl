@@ -40,7 +40,7 @@ namespace SC::Runtime::Core
 	template<TIsNotPointer T, bool bThreadSafe>
 	inline TWeakPtr<T, bThreadSafe>::TWeakPtr(const TWeakPtr& ptr) : This()
 	{
-		if (ptr.IsValid)
+		if (ptr.IsValid_get())
 		{
 			this->ptr = ptr.ptr;
 			this->references = ptr.references;
@@ -126,7 +126,7 @@ namespace SC::Runtime::Core
 	inline TWeakPtr<O, bThreadSafe> TWeakPtr<T, bThreadSafe>::As() const
 	{
 		auto ret = TryAs<O>();
-		if (!ret.IsValid)
+		if (!ret.IsValid_get())
 		{
 			ThrowInvalidCastException();
 		}
@@ -211,10 +211,10 @@ namespace SC::Runtime::Core
 	{
 		if (!IsValid)
 		{
-			return !ptr.IsValid;
+			return !ptr.IsValid_get();
 		}
 
-		else if (!ptr.IsValid)
+		else if (!ptr.IsValid_get())
 		{
 			return false;
 		}
@@ -230,10 +230,10 @@ namespace SC::Runtime::Core
 	{
 		if (!IsValid)
 		{
-			return ptr.IsValid;
+			return ptr.IsValid_get();
 		}
 
-		else if (!ptr.IsValid)
+		else if (!ptr.IsValid_get())
 		{
 			return true;
 		}

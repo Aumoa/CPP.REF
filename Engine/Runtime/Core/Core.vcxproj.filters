@@ -108,6 +108,18 @@
     <ClInclude Include="Public\Numerics\Color.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Numerics\ObjectOrientedCube.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Vector4.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Quaternion.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Matrix4x4.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -132,6 +144,18 @@
       <Filter>Public\Numerics</Filter>
     </None>
     <None Include="Public\Numerics\Color.inl">
+      <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Numerics\Quaternion.inl">
+      <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Numerics\Vector3.inl">
+      <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Numerics\Vector4.inl">
+      <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Numerics\Matrix4x4.inl">
       <Filter>Public\Numerics</Filter>
     </None>
   </ItemGroup>
@@ -194,6 +218,18 @@
       <Filter>Private\Numerics</Filter>
     </ClCompile>
     <ClCompile Include="Private\Numerics\Color.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Vector4.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Quaternion.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Matrix4x4.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\ObjectOrientedCube.cpp">
       <Filter>Private\Numerics</Filter>
     </ClCompile>
   </ItemGroup>

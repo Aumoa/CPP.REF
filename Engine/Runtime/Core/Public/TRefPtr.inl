@@ -160,7 +160,7 @@ namespace SC::Runtime::Core
 	inline TRefPtr<O, bThreadSafe> TRefPtr<T, bThreadSafe>::As() const
 	{
 		auto ret = TryAs<O>();
-		if (!ret.IsValid)
+		if (!ret.IsValid_get())
 		{
 			ThrowInvalidCastException();
 		}
@@ -274,10 +274,10 @@ namespace SC::Runtime::Core
 	{
 		if (this->ptr == nullptr)
 		{
-			return !ptr.IsValid;
+			return !ptr.IsValid_get();
 		}
 
-		else if (!ptr.IsValid)
+		else if (!ptr.IsValid_get())
 		{
 			return false;
 		}
@@ -293,10 +293,10 @@ namespace SC::Runtime::Core
 	{
 		if (this->ptr == nullptr)
 		{
-			return ptr.IsValid;
+			return ptr.IsValid_get();
 		}
 
-		else if (!ptr.IsValid)
+		else if (!ptr.IsValid_get())
 		{
 			return true;
 		}

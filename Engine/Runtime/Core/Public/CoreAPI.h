@@ -12,6 +12,7 @@
 #define interface struct
 #endif
 
+#ifdef _MSC_VER
 #define vs_property_get( Type, Name )\
 __declspec( property( get = Name##_get ) ) Type Name
 
@@ -20,6 +21,11 @@ __declspec( property( put = Name##_set ) ) Type Name
 
 #define vs_property( Type, Name )\
 __declspec( property( get = Name##_get, put = Name##_set ) ) Type Name
+#else
+#define vs_property_get( Type, Name )
+#define vs_property_set( Type, Name )
+#define vs_property( Type, Name )
+#endif
 
 using uint8 = unsigned char;
 using int8 = signed char;

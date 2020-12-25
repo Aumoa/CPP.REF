@@ -145,4 +145,9 @@ namespace SC::Runtime::Core::Mathematics
 	{
 		return TRadians<T>(lh * rh.Value);
 	}
+
+	inline constexpr TRadians<long double> operator "" _rad(long double value)
+	{
+		return value;
+	}
 }

@@ -164,4 +164,23 @@ namespace SC::Runtime::Core
 	{
 		{ lh >= rh };
 	};
+
+	template<class T>
+	constexpr bool IsRealType = ((T)(1.0 + 0.1)) != ((T)1.0);
+
+	template<class T>
+	concept TIsRealType = IsRealType<T>;
+
+	template<class T>
+	concept TIsMatrixType = requires(T Arg, const T ConstArg)
+	{
+		{ ConstArg.GetComponentOrDefault(0) };
+		{ (bool)ConstArg.Contains(0) };
+		{ (bool)ConstArg.Contains(0, 0) };
+		{ (double)ConstArg[0] };
+		{ (double)ConstArg[0][0] };
+		{ (size_t)ConstArg.Rows };
+		{ (size_t)ConstArg.Columns };
+		{ (size_t)ConstArg.Count };
+	};
 }

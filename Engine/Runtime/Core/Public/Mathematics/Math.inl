@@ -17,4 +17,17 @@ namespace SC::Runtime::Core::Mathematics
 	{
 		return static_cast<O>(Value) * static_cast<O>(Inv180);
 	}
+
+	template<class T>
+	inline T Math::Lerp(const T& left, const T& right, double t)
+	{
+		if constexpr (VHasLerp<T>)
+		{
+			return T::Lerp(left, right, t);
+		}
+		else
+		{
+			return left + (right - left) * t;
+		}
+	}
 }
