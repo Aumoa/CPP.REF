@@ -25,6 +25,7 @@ namespace SC::Runtime::Core::Numerics
 		Rectangle();
 		Rectangle(double left, double top, double right, double bottom);
 		Rectangle(const Vector2& lt, const Vector2& rb);
+		Rectangle(const Rectangle& copy);
 
 		bool Equals(const Rectangle& rh) const;
 		bool NearlyEquals(const Rectangle& rh, double epsilon) const;

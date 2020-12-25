@@ -12,7 +12,7 @@
 namespace SC::Runtime::Core::Numerics
 {
 #pragma pack(push, 8)
-	struct Ray2
+	struct CORE_API Ray2
 	{
 		Vector2 Origin;
 		Vector2 Direction;
@@ -20,6 +20,7 @@ namespace SC::Runtime::Core::Numerics
 
 		Ray2();
 		Ray2(const Vector2& origin, const Vector2& direction, std::optional<double> distance = std::nullopt);
+		Ray2(const Ray2& copy);
 
 		bool Equals(const Ray2& rh) const;
 		bool NearlyEquals(const Ray2& rh, double epsilon) const;

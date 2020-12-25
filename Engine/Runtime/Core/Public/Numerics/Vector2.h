@@ -26,6 +26,7 @@ namespace SC::Runtime::Core::Numerics
 		Vector2();
 		Vector2(double x, double y);
 		Vector2(double splat);
+		Vector2(const Vector2& copy);
 		
 		bool Equals(const Vector2& rh) const;
 		bool NearlyEquals(const Vector2& rh, double epsilon) const;

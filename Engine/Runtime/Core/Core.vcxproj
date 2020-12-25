@@ -165,9 +165,12 @@
     <ClInclude Include="Public\Mathematics\Math.h" />
     <ClInclude Include="Public\Mathematics\TRadians.h" />
     <ClInclude Include="Public\NullReferenceException.h" />
+    <ClInclude Include="Public\Numerics\AxisAlignedCube.h" />
     <ClInclude Include="Public\Numerics\Ray2.h" />
+    <ClInclude Include="Public\Numerics\Ray3.h" />
     <ClInclude Include="Public\Numerics\Rectangle.h" />
     <ClInclude Include="Public\Numerics\Vector2.h" />
+    <ClInclude Include="Public\Numerics\Vector3.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\CoreString.h" />
@@ -193,10 +196,13 @@
     <ClCompile Include="Private\InvalidCastException.cpp" />
     <ClCompile Include="Private\Mathematics\Math.cpp" />
     <ClCompile Include="Private\NullReferenceException.cpp" />
+    <ClCompile Include="Private\Numerics\AxisAlignedCube.cpp" />
     <ClCompile Include="Private\Numerics\HashHelper.cpp" />
     <ClCompile Include="Private\Numerics\Ray2.cpp" />
+    <ClCompile Include="Private\Numerics\Ray3.cpp" />
     <ClCompile Include="Private\Numerics\Rectangle.cpp" />
     <ClCompile Include="Private\Numerics\Vector2.cpp" />
+    <ClCompile Include="Private\Numerics\Vector3.cpp" />
     <ClCompile Include="Private\Object.cpp" />
     <ClCompile Include="Private\String.cpp" />
     <ClCompile Include="Private\TRefPtr.cpp" />

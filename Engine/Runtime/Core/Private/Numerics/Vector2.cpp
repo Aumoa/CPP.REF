@@ -27,6 +27,12 @@ Vector2::Vector2(double splat)
 	Y = splat;
 }
 
+Vector2::Vector2(const Vector2& copy)
+{
+	X = copy.X;
+	Y = copy.Y;
+}
+
 bool Vector2::Equals(const Vector2& rh) const
 {
 	return (*this) == rh;
@@ -281,21 +287,21 @@ Vector2& Vector2::operator +=(const Vector2& right)
 Vector2& Vector2::operator -=(const Vector2& right)
 {
 	X -= right.X;
-	Y -= right.X;
+	Y -= right.Y;
 	return *this;
 }
 
 Vector2& Vector2::operator *=(const Vector2& right)
 {
 	X *= right.X;
-	Y *= right.X;
+	Y *= right.Y;
 	return *this;
 }
 
 Vector2& Vector2::operator /=(const Vector2& right)
 {
 	X /= right.X;
-	Y /= right.X;
+	Y /= right.Y;
 	return *this;
 }
 

@@ -90,11 +90,20 @@
     <ClInclude Include="Public\Numerics\Rectangle.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Numerics\Ray2.h">
-      <Filter>Public\Numerics</Filter>
-    </ClInclude>
     <ClInclude Include="Private\Numerics\HashHelper.h">
       <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Vector3.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\AxisAlignedCube.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Ray3.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Ray2.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -163,11 +172,20 @@
     <ClCompile Include="Private\Numerics\Rectangle.cpp">
       <Filter>Private\Numerics</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Numerics\HashHelper.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Vector3.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\AxisAlignedCube.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
     <ClCompile Include="Private\Numerics\Ray2.cpp">
       <Filter>Private\Numerics</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Numerics\HashHelper.cpp">
-      <Filter>Private</Filter>
+    <ClCompile Include="Private\Numerics\Ray3.cpp">
+      <Filter>Private\Numerics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

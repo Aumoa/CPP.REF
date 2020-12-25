@@ -33,6 +33,14 @@ Rectangle::Rectangle(const Vector2& lt, const Vector2& rb)
 	Bottom = rb.Y;
 }
 
+Rectangle::Rectangle(const Rectangle& copy)
+{
+	Left = copy.Left;
+	Top = copy.Top;
+	Right = copy.Right;
+	Bottom = copy.Bottom;
+}
+
 bool Rectangle::Equals(const Rectangle& rh) const
 {
 	return Left == rh.Left
@@ -66,27 +74,6 @@ TRefPtr<String> Rectangle::ToString() const
 		Width,
 		Height
 	);
-}
-
-double Rectangle::GetComponentOrDefault(size_t index) const
-{
-	if (!Contains(index))
-	{
-		return 0;
-	}
-
-	const double* ptr = &Left;
-	return ptr[index];
-}
-
-bool Rectangle::Contains(size_t index) const
-{
-	return index < Count;
-}
-
-size_t Rectangle::Count_get() const
-{
-	return 4;
 }
 
 bool Rectangle::IsOverlap(const Vector2& point) const
@@ -200,28 +187,6 @@ void Rectangle::Height_set(double value)
 double Rectangle::Size_get() const
 {
 	return Width * Height;
-}
-
-const double& Rectangle::operator [](size_t index) const
-{
-	if (!Contains(index))
-	{
-		throw IndexOutOfRangeException();
-	}
-
-	const double* ptr = &Left;
-	return ptr[index];
-}
-
-double& Rectangle::operator [](size_t index)
-{
-	if (!Contains(index))
-	{
-		throw IndexOutOfRangeException();
-	}
-
-	double* ptr = &Left;
-	return ptr[index];
 }
 
 bool Rectangle::operator ==(const Rectangle& right) const
