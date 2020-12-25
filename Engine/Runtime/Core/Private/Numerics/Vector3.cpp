@@ -216,11 +216,11 @@ bool Vector3::operator <=(const Vector3& right) const
 	{
 		return false;
 	}
-	else if (X < right.X)
+	else if (Y < right.Y)
 	{
 		return true;
 	}
-	else if (X > right.X)
+	else if (Y > right.Y)
 	{
 		return false;
 	}

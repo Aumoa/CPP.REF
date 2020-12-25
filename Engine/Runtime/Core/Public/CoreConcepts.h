@@ -140,4 +140,28 @@ namespace SC::Runtime::Core
 
 	template<class T, class O>
 	concept TIsGreaterThen = sizeof(T) > sizeof(O);
+
+	template<class T, class O>
+	concept TComparable_Less = requires(T lh, O rh)
+	{
+		{ lh < rh };
+	};
+
+	template<class T, class O>
+	concept TComparable_LessEquals = requires(T lh, O rh)
+	{
+		{ lh <= rh };
+	};
+
+	template<class T, class O>
+	concept TComparable_Greater = requires(T lh, O rh)
+	{
+		{ lh > rh };
+	};
+
+	template<class T, class O>
+	concept TComparable_GreaterEquals = requires(T lh, O rh)
+	{
+		{ lh >= rh };
+	};
 }

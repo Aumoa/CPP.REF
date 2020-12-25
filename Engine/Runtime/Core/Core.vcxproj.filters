@@ -105,6 +105,9 @@
     <ClInclude Include="Public\Numerics\Ray2.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Numerics\Color.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -126,6 +129,9 @@
       <Filter>Public\Mathematics</Filter>
     </None>
     <None Include="Public\Numerics\Vector2.inl">
+      <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Numerics\Color.inl">
       <Filter>Public\Numerics</Filter>
     </None>
   </ItemGroup>
@@ -185,6 +191,9 @@
       <Filter>Private\Numerics</Filter>
     </ClCompile>
     <ClCompile Include="Private\Numerics\Ray3.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Color.cpp">
       <Filter>Private\Numerics</Filter>
     </ClCompile>
   </ItemGroup>

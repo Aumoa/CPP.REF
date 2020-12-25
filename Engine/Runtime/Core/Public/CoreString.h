@@ -11,6 +11,7 @@
 #include <string>
 #include "IStringFormattable.h"
 #include "IEnumerable.h"
+#include <optional>
 
 namespace SC::Runtime::Core
 {
@@ -98,6 +99,8 @@ namespace SC::Runtime::Core
 
 		virtual ConstIterator cbegin() const override;
 		virtual ConstIterator cend() const override;
+
+		TRefPtr<String> Substring(size_t startIndex, std::optional<size_t> length = std::nullopt) const;
 
 		vs_property_get(const wchar_t*, C_Str);
 		const wchar_t* C_Str_get() const;

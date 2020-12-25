@@ -125,6 +125,16 @@ auto String::cend() const -> ConstIterator
     return text_buffer + len;
 }
 
+TRefPtr<String> String::Substring(size_t startIndex, optional<size_t> length) const
+{
+    if (!length.has_value())
+    {
+        length = len - startIndex;
+    }
+
+    return NewObject<String>(text_buffer + startIndex, length.value());
+}
+
 const wchar_t* String::C_Str_get() const
 {
 	return text_buffer;

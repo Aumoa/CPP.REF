@@ -128,6 +128,12 @@ namespace SC::Runtime::Core
 		return ptr->ToString();
 	}
 
+	template<TIsNotPointer T, bool bThreadSafe>
+	inline size_t TRefPtr<T, bThreadSafe>::GetHashCode() const
+	{
+		return ptr->GetHashCode();
+	}
+
 	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
 	inline bool TRefPtr<T, bThreadSafe>::Is(O** ptr) const
 	{
@@ -299,6 +305,30 @@ namespace SC::Runtime::Core
 		{
 			return this->ptr->operator !=(ptr);
 		}
+	}
+
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O> requires TComparable_Less<T, TRefPtr<O, bThreadSafe>>
+	inline auto TRefPtr<T, bThreadSafe>::operator < (const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator < (ptr))
+	{
+		return this->ptr->operator < (ptr);
+	}
+
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O> requires TComparable_LessEquals<T, TRefPtr<O, bThreadSafe>>
+	inline auto TRefPtr<T, bThreadSafe>::operator <=(const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator <=(ptr))
+	{
+		return this->ptr->operator <=(ptr);
+	}
+
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O> requires TComparable_Greater<T, TRefPtr<O, bThreadSafe>>
+	inline auto TRefPtr<T, bThreadSafe>::operator > (const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator > (ptr))
+	{
+		return this->ptr->operator > (ptr);
+	}
+
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O> requires TComparable_GreaterEquals<T, TRefPtr<O, bThreadSafe>>
+	inline auto TRefPtr<T, bThreadSafe>::operator >=(const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator >=(ptr))
+	{
+		return this->ptr->operator >=(ptr);
 	}
 
 	template<TIsNotPointer T, bool bThreadSafe> template<class TIndex> requires TIsIndexer<T, TIndex>

@@ -58,6 +58,7 @@ namespace SC::Runtime::Core
 		[[nodiscard]] inline T** GetAddressOf();
 		[[nodiscard]] inline T** ReleaseAndGetAddressOf();
 		[[nodiscard]] inline TRefPtr<String, true> ToString() const;
+		[[nodiscard]] inline size_t GetHashCode() const;
 
 		template<TIsRefCore O>
 		[[nodiscard]] inline bool Is(O** ptr = nullptr) const;
@@ -96,6 +97,14 @@ namespace SC::Runtime::Core
 		[[nodiscard]] inline bool operator ==(const TRefPtr<O, bThreadSafe>& ptr) const;
 		template<TIsRefCore O>
 		[[nodiscard]] inline bool operator !=(const TRefPtr<O, bThreadSafe>& ptr) const;
+		template<TIsRefCore O> requires TComparable_Less<T, TRefPtr<O, bThreadSafe>>
+		[[nodiscard]] inline auto operator < (const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator <(ptr));
+		template<TIsRefCore O> requires TComparable_LessEquals<T, TRefPtr<O, bThreadSafe>>
+		[[nodiscard]] inline auto operator <=(const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator <=(ptr));
+		template<TIsRefCore O> requires TComparable_Greater<T, TRefPtr<O, bThreadSafe>>
+		[[nodiscard]] inline auto operator > (const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator >(ptr));
+		template<TIsRefCore O> requires TComparable_GreaterEquals<T, TRefPtr<O, bThreadSafe>>
+		[[nodiscard]] inline auto operator >=(const TRefPtr<O, bThreadSafe>& ptr) const -> decltype(((T*)(0))->operator >=(ptr));
 		template<class TIndex> requires TIsIndexer<T, TIndex>
 		[[nodiscard]] inline auto operator [](const TIndex& index) const -> decltype(ptr->operator [](index));
 

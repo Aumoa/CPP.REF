@@ -166,6 +166,7 @@
     <ClInclude Include="Public\Mathematics\TRadians.h" />
     <ClInclude Include="Public\NullReferenceException.h" />
     <ClInclude Include="Public\Numerics\AxisAlignedCube.h" />
+    <ClInclude Include="Public\Numerics\Color.h" />
     <ClInclude Include="Public\Numerics\Ray2.h" />
     <ClInclude Include="Public\Numerics\Ray3.h" />
     <ClInclude Include="Public\Numerics\Rectangle.h" />
@@ -180,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Mathematics\Math.inl" />
+    <None Include="Public\Numerics\Color.inl" />
     <None Include="Public\Numerics\Vector2.inl" />
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
@@ -197,6 +199,7 @@
     <ClCompile Include="Private\Mathematics\Math.cpp" />
     <ClCompile Include="Private\NullReferenceException.cpp" />
     <ClCompile Include="Private\Numerics\AxisAlignedCube.cpp" />
+    <ClCompile Include="Private\Numerics\Color.cpp" />
     <ClCompile Include="Private\Numerics\HashHelper.cpp" />
     <ClCompile Include="Private\Numerics\Ray2.cpp" />
     <ClCompile Include="Private\Numerics\Ray3.cpp" />
