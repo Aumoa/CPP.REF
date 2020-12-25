@@ -5,13 +5,13 @@
 #include "CoreAPI.h"
 #include "Object.h"
 
-#include "CoreConcepts.h"
-#include "TRefPtr.h"
 #include <vector>
 #include <string>
+#include <optional>
+#include "CoreConcepts.h"
+#include "TRefPtr.h"
 #include "IStringFormattable.h"
 #include "IEnumerable.h"
-#include <optional>
 
 namespace SC::Runtime::Core
 {
@@ -75,6 +75,7 @@ namespace SC::Runtime::Core
 		const wchar_t* text_buffer;
 		size_t len;
 		bool bDynamicBuffer : 1;
+		mutable std::optional<size_t> hash_cache;
 
 	public:
 		String();

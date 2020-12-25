@@ -50,22 +50,27 @@ bool String::Equals(TRefPtr<Object> right) const
 
 size_t String::GetHashCode() const
 {
-	size_t hash1 = 5381;
-	size_t hash2 = hash1;
+    if (!hash_cache.has_value())
+    {
+        size_t hash1 = 5381;
+        size_t hash2 = hash1;
 
-	size_t	        c;
-	const wchar_t*  s = text_buffer;
+        size_t	        c;
+        const wchar_t* s = text_buffer;
 
-	while ((c = s[0]) != 0) {
-		hash1 = ((hash1 << 5) + hash1) ^ c;
-		c = s[1];
-		if (c == 0)
-			break;
-		hash2 = ((hash2 << 5) + hash2) ^ c;
-		s += 2;
-	}
+        while ((c = s[0]) != 0) {
+            hash1 = ((hash1 << 5) + hash1) ^ c;
+            c = s[1];
+            if (c == 0)
+                break;
+            hash2 = ((hash2 << 5) + hash2) ^ c;
+            s += 2;
+        }
 
-	return hash1 + (hash2 * 1566083941);
+        hash_cache = hash1 + (hash2 * 1566083941);
+    }
+
+    return hash_cache.value();
 }
 
 String::String(const char* text) : This(text, Strlen(text))
