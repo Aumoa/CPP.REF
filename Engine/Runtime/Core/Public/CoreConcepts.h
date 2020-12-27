@@ -4,6 +4,8 @@
 
 #include "CoreAPI.h"
 #include <type_traits>
+#include <string>
+#include <string_view>
 
 namespace SC::Runtime::Core
 {
@@ -17,7 +19,7 @@ namespace SC::Runtime::Core
 	};
 
 	template<class TAssign, class TBase>
-	concept TIsAssignable = requires(const TBase* Base, const TAssign* Assign)
+	concept TIsAssignable = requires(TBase Base, TAssign Assign)
 	{
 		{ Base = Assign };
 	};
@@ -96,10 +98,13 @@ namespace SC::Runtime::Core
 		};
 
 	template<class TStringArg>
-	concept TIsStringConstructible = requires(const std::remove_reference_t<TStringArg>& UnaryArg)
-	{
-		{ String(UnaryArg) };
-	};
+	concept TIsStringConstructible =
+		TIsAssignable<TStringArg, const char*> ||
+		TIsAssignable<TStringArg, const wchar_t*> ||
+		TIsAssignable<TStringArg, const std::string&> ||
+		TIsAssignable<TStringArg, const std::wstring&> ||
+		TIsAssignable<TStringArg, std::string_view> ||
+		TIsAssignable<TStringArg, std::wstring_view>;
 
 	template<class T>
 	concept THasConstIterator = requires()

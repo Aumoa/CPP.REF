@@ -10,15 +10,20 @@
 
 namespace SC::Runtime::Core::Numerics
 {
+	struct Vector3;
+
 #pragma pack(push, 8)
 	struct CORE_API Vector4
 	{
+		using This = Vector4;
+
 		double X;
 		double Y;
 		double Z;
 		double W;
 
 		Vector4();
+		Vector4(const Vector3& v3, double w);
 		Vector4(double x, double y, double z, double w);
 		Vector4(double splat);
 		Vector4(const Vector4& copy);

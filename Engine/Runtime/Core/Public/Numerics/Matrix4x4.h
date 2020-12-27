@@ -36,7 +36,6 @@ namespace SC::Runtime::Core::Numerics
         double _44;
 
         Matrix4x4();
-        Matrix4x4(double splat);
         Matrix4x4(double _11, double _12, double _13, double _14, double _21, double _22, double _23, double _24, double _31, double _32, double _33, double _34, double _41, double _42, double _43, double _44);
         Matrix4x4(const Vector4& v1, const Vector4& v2, const Vector4& v3, const Vector4& v4);
         Matrix4x4(const Matrix4x4& copy);
@@ -91,6 +90,8 @@ namespace SC::Runtime::Core::Numerics
         Matrix4x4& operator -=(const Matrix4x4& right);
         Matrix4x4& operator *=(const Matrix4x4& right);
         Matrix4x4& operator /=(const Matrix4x4& right);
+
+        static Matrix4x4 Multiply(const Matrix4x4& A, const Matrix4x4& B);
 
         static Matrix4x4 Identity;
 	};

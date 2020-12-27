@@ -184,6 +184,7 @@
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
+    <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\IEngineTick.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
+    <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
@@ -260,6 +262,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Application.inl" />
+    <None Include="Public\Framework\Actor.inl" />
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

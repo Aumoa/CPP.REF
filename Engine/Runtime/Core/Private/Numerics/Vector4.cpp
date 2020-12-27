@@ -5,12 +5,18 @@
 #include "IndexOutOfRangeException.h"
 #include "HashHelper.h"
 #include "Numerics/AxisAlignedCube.h"
+#include "Numerics/Vector3.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Vector4::Vector4()
+{
+
+}
+
+Vector4::Vector4(const Vector3& v3, double w) : This(v3.X, v3.Y, v3.Z, w)
 {
 
 }

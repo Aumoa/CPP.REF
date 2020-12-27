@@ -298,7 +298,7 @@ namespace SC::Runtime::Core
 		}
 	}
 
-	template<TIsNotPointer T, bool bThreadSafe> template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String, T>
+	template<TIsNotPointer T, bool bThreadSafe> template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String*, T*>
 	inline TRefPtr<T, bThreadSafe>::TRefPtr(TStringConstructibleArg arg) : This(new String(arg))
 	{
 		ptr->bLockCollecting = false;

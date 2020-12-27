@@ -5,6 +5,7 @@
 #include "IndexOutOfRangeException.h"
 #include "HashHelper.h"
 #include "Numerics/AxisAlignedCube.h"
+#include "Numerics/Vector2.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Core::Numerics;
@@ -20,6 +21,11 @@ Vector3 Vector3::Zero = Vector3(0, 0, 0);
 Vector3 Vector3::One = Vector3(1, 1, 1);
 
 Vector3::Vector3()
+{
+
+}
+
+Vector3::Vector3(const Vector2& v2, double z) : This(v2.X, v2.Y, z)
 {
 
 }

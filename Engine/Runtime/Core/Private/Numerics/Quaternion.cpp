@@ -7,6 +7,7 @@
 #include "HashHelper.h"
 #include "Numerics/AxisAlignedCube.h"
 #include "Numerics/Matrix4x4.h"
+#include "Numerics/Vector4.h"
 #include "Mathematics/TDegrees.h"
 #include "Mathematics/TRadians.h"
 #include "Mathematics/Math.h"
@@ -16,6 +17,8 @@ using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Core::Numerics;
 using namespace SC::Runtime::Core::Mathematics;
 using namespace std;
+
+Quaternion Quaternion::Identity = Quaternion(0, 0, 0, 1);
 
 Quaternion::Quaternion()
 {
@@ -113,6 +116,11 @@ Vector3 Quaternion::RotateVector(const Vector3& v) const
 	Vector3 result = v + (W * T) + Vector3::CrossProduct(Q, T);
 
 	return result;
+}
+
+Vector4 Quaternion::RotateVector(const Vector4& v) const
+{
+	return Vector4(RotateVector(v.Cast<Vector3>()), v.W);
 }
 
 double Quaternion::LengthSq_get() const

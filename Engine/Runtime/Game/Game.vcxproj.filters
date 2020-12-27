@@ -213,6 +213,9 @@
     <ClInclude Include="Public\Rotator.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\GameMinimal.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -308,6 +311,9 @@
     <ClCompile Include="Private\Rotator.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Transform.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -324,5 +330,8 @@
     <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
     <None Include="Private\VulkanRHI\VulkanResource.cpp" />
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
+    <None Include="Public\Framework\Actor.inl">
+      <Filter>Public\Framework</Filter>
+    </None>
   </ItemGroup>
 </Project>

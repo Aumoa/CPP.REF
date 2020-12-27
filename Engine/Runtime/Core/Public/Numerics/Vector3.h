@@ -11,15 +11,19 @@
 namespace SC::Runtime::Core::Numerics
 {
 	struct AxisAlignedCube;
+	struct Vector2;
 
 #pragma pack(push, 8)
 	struct CORE_API Vector3
 	{
+		using This = Vector3;
+
 		double X;
 		double Y;
 		double Z;
 
 		Vector3();
+		Vector3(const Vector2& v2, double z);
 		Vector3(double x, double y, double z);
 		Vector3(double splat);
 		Vector3(const Vector3& copy);

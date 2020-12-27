@@ -42,7 +42,7 @@ namespace SC::Runtime::Core
 		inline ~TRefPtr();
 
 		// String.inl
-		template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String, T>
+		template<TIsStringConstructible TStringConstructibleArg> requires TIsAssignable<String*, T*>
 		inline TRefPtr(TStringConstructibleArg text);
 
 		template<TIsBaseOf<T> O>

@@ -7,6 +7,7 @@
 #include "CoreString.h"
 #include "TRefPtr.h"
 #include "TMulticastDelegate.h"
+#include "UniqueType.h"
 
 #include "Exception.h"
 #include "InvalidCastException.h"

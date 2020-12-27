@@ -14,6 +14,7 @@
 namespace SC::Runtime::Core::Numerics
 {
 	struct Vector3;
+	struct Vector4;
 	struct Matrix4x4;
 
 #pragma pack(push, 8)
@@ -47,6 +48,7 @@ namespace SC::Runtime::Core::Numerics
 
 		std::pair<Vector3, double> ToAxisAngle() const;
 		Vector3 RotateVector(const Vector3& v) const;
+		Vector4 RotateVector(const Vector4& v) const;
 
 		vs_property_get(double, LengthSq);
 		double LengthSq_get() const;

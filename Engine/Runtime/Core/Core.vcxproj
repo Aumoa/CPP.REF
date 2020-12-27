@@ -181,6 +181,7 @@
     <ClInclude Include="Public\CoreString.h" />
     <ClInclude Include="Public\TRefPtr.h" />
     <ClInclude Include="Public\TWeakPtr.h" />
+    <ClInclude Include="Public\UniqueType.h" />
     <ClInclude Include="Public\WeakReferences.h" />
   </ItemGroup>
   <ItemGroup>

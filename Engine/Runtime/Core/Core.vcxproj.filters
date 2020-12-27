@@ -120,6 +120,9 @@
     <ClInclude Include="Public\Numerics\Matrix4x4.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\UniqueType.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
