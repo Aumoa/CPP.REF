@@ -22,3 +22,12 @@
 
 #include "Numerics/Vector2.h"
 #include "Numerics/Rectangle.h"
+#include "Numerics/Ray2.h"
+#include "Numerics/Vector3.h"
+#include "Numerics/ObjectOrientedCube.h"
+#include "Numerics/Ray3.h"
+#include "Numerics/AxisAlignedCube.h"
+#include "Numerics/Quaternion.h"
+#include "Numerics/Vector4.h"
+#include "Numerics/Matrix4x4.h"
+#include "Numerics/Color.h"

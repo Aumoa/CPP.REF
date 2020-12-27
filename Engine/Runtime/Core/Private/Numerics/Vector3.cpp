@@ -16,6 +16,8 @@ Vector3 Vector3::Forward = Vector3(0, 1, 0);
 Vector3 Vector3::AxisX = Vector3(1, 0, 0);
 Vector3 Vector3::AxisY = Vector3(0, 1, 0);
 Vector3 Vector3::AxisZ = Vector3(0, 0, 1);
+Vector3 Vector3::Zero = Vector3(0, 0, 0);
+Vector3 Vector3::One = Vector3(1, 1, 1);
 
 Vector3::Vector3()
 {

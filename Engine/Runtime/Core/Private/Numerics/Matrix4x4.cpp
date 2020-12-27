@@ -4,6 +4,7 @@
 
 #include "CoreString.h"
 #include "Numerics/Vector4.h"
+#include "Numerics/Vector3.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Core::Numerics;
@@ -174,6 +175,21 @@ Matrix4x4& Matrix4x4::Transpose()
 Matrix4x4& Matrix4x4::Invert()
 {
     return *this = Inverse;
+}
+
+Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
+{
+    return TransformVector(Vector4(vec.X, vec.Y, vec.Z, 0.0)).Cast<Vector3>();
+}
+
+Vector4 Matrix4x4::TransformVector(const Vector4& vec) const
+{
+    return Vector4(
+        vec.X * _11 + vec.Y * _21 + vec.Z * _31 + vec.W * _41,
+        vec.X * _12 + vec.Y * _22 + vec.Z * _32 + vec.W * _42,
+        vec.X * _13 + vec.Y * _23 + vec.Z * _33 + vec.W * _43,
+        vec.X * _14 + vec.Y * _24 + vec.Z * _34 + vec.W * _44
+     );
 }
 
 bool Matrix4x4::IsIdentity_get() const

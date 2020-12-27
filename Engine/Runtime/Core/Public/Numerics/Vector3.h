@@ -87,6 +87,8 @@ namespace SC::Runtime::Core::Numerics
 		static Vector3 AxisX;
 		static Vector3 AxisY;
 		static Vector3 AxisZ;
+		static Vector3 Zero;
+		static Vector3 One;
 	};
 #pragma pack(pop)
 

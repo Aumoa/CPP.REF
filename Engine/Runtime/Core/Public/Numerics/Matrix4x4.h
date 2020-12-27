@@ -10,6 +10,7 @@
 
 namespace SC::Runtime::Core::Numerics
 {
+    struct Vector3;
     struct Vector4;
 
 #pragma pack(push, 8)
@@ -62,6 +63,8 @@ namespace SC::Runtime::Core::Numerics
 
         Matrix4x4& Transpose();
         Matrix4x4& Invert();
+        Vector3 TransformVector(const Vector3& vec) const;
+        Vector4 TransformVector(const Vector4& vec) const;
 
         vs_property_get(bool, IsIdentity);
         bool IsIdentity_get() const;

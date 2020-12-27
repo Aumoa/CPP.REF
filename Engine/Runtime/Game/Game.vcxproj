@@ -177,6 +177,7 @@
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
+    <ClInclude Include="Public\Components\MeshComponent.h" />
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Engine.h" />
@@ -199,9 +200,11 @@
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
+    <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
+    <ClInclude Include="Public\Transform.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
     <ClInclude Include="Public\World.h" />
@@ -218,6 +221,7 @@
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
+    <ClCompile Include="Private\Components\MeshComponent.cpp" />
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandFence.cpp" />
@@ -239,6 +243,7 @@
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />

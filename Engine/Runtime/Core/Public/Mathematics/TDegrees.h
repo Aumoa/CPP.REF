@@ -10,12 +10,14 @@ namespace SC::Runtime::Core::Mathematics
 	template<TIsRealType T>
 	struct TRadians;
 
-	template<TIsRealType T>
+	template<TIsRealType T = double>
 	struct TDegrees
 	{
 	private:
 		static constexpr T PI = (T)3.141592;
 		static constexpr T InvPI = PI / (T)180.0;
+		static constexpr T AngleMax = (T)360.0;
+		static constexpr T AngleHalf = (T)180.0;
 
 	public:
 		T Value;
@@ -34,6 +36,17 @@ namespace SC::Runtime::Core::Mathematics
 		{
 
 		}
+
+		inline TRefPtr<String> ToString() const
+		{
+			return String::Format(L"{0}°", Value);
+		}
+
+		vs_property_get(TDegrees, Clamped);
+		inline constexpr TDegrees Clamped_get() const;
+
+		vs_property_get(TDegrees, Normalized);
+		inline constexpr TDegrees Normalized_get() const;
 
 		template<TIsRealType O = T>
 		inline constexpr TRadians<O> ToRadians() const;
@@ -68,6 +81,11 @@ namespace SC::Runtime::Core::Mathematics
 			return *this;
 		}
 
+		inline constexpr TDegrees operator -() const
+		{
+			return TDegrees(-Value);
+		}
+
 		inline constexpr TDegrees operator +(const TDegrees& value) const
 		{
 			return TDegrees(Value + value.Value);
@@ -88,25 +106,25 @@ namespace SC::Runtime::Core::Mathematics
 			return TDegrees(Value / value);
 		}
 
-		template<TIsRealType O> requires TIsSmallEqualsThen<O, T>
+		template<TIsRealType O> requires TIsSmallThen<O, T>
 		inline constexpr explicit operator TDegrees<O>() const
 		{
 			return TDegrees<O>(static_cast<O>(Value));
 		}
 
-		template<TIsRealType O> requires TIsGreaterThen<O, T>
+		template<TIsRealType O> requires TIsGreaterEqualsThen<O, T>
 		inline constexpr operator TDegrees<O>() const
 		{
 			return TDegrees<O>(static_cast<O>(Value));
 		}
 
-		template<TIsRealType O> requires TIsSmallEqualsThen<O, T>
+		template<TIsRealType O> requires TIsSmallThen<O, T>
 		inline constexpr explicit operator TRadians<O>() const
 		{
 			return ToRadians<O>();
 		}
 
-		template<TIsRealType O> requires TIsGreaterThen<O, T>
+		template<TIsRealType O> requires TIsGreaterEqualsThen<O, T>
 		inline constexpr operator TRadians<O>() const
 		{
 			return ToRadians<O>();
@@ -119,7 +137,7 @@ namespace SC::Runtime::Core::Mathematics
 
 		inline constexpr bool operator !=(const TDegrees& rh) const
 		{
-			return Value == rh.Value;
+			return Value != rh.Value;
 		}
 
 		inline constexpr bool operator <(const TDegrees& rh) const
@@ -147,6 +165,12 @@ namespace SC::Runtime::Core::Mathematics
 	inline constexpr TDegrees<T> operator *(const T& lh, const TDegrees<T>& rh)
 	{
 		return TDegrees<T>(lh * rh.Value);
+	}
+
+	template<TIsRealType T>
+	inline constexpr TDegrees<T> operator /(const T& lh, const TDegrees<T>& rh)
+	{
+		return TDegrees<T>(lh / rh.Value);
 	}
 
 	inline constexpr TDegrees<long double> operator"" _deg(long double value)

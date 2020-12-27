@@ -204,6 +204,15 @@
     <ClInclude Include="Public\Components\PrimitiveComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Components\MeshComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Transform.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Rotator.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -272,30 +281,6 @@
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
     </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanException.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanDeviceBundle.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanMinimal.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanCommandList.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanSwapChain.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanResource.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\VulkanRHI\VulkanRenderTargetView.cpp">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Framework\Actor.cpp">
       <Filter>Private\Framework</Filter>
     </ClCompile>
@@ -317,6 +302,12 @@
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Components\MeshComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Rotator.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -325,5 +316,13 @@
     <None Include="Public\Application.inl">
       <Filter>Public</Filter>
     </None>
+    <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
+    <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
+    <None Include="Private\VulkanRHI\VulkanException.cpp" />
+    <None Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp" />
+    <None Include="Private\VulkanRHI\VulkanMinimal.cpp" />
+    <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
+    <None Include="Private\VulkanRHI\VulkanResource.cpp" />
+    <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
   </ItemGroup>
 </Project>
