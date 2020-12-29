@@ -256,7 +256,7 @@ inline auto TWeakPtr<T, bThreadSafe>::operator [](const TIndex& index) const -> 
 template<TIsNotPointer T, bool bThreadSafe>
 inline void TWeakPtr<T, bThreadSafe>::SafeRelease()
 {
-	if (IsValid)
+	if (references != nullptr)
 	{
 		references->ReleaseWeak();
 		ptr = nullptr;
