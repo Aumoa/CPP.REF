@@ -9,7 +9,7 @@
 #include "TRefPtr.h"
 
 class String;
-struct Rectangle;
+struct Rect;
 
 #pragma pack(push, 8)
 struct CORE_API Vector2
@@ -37,7 +37,7 @@ struct CORE_API Vector2
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
 
-	bool IsOverlap(const Rectangle& rect) const;
+	bool IsOverlap(const Rect& rect) const;
 
 	vs_property_get(double, LengthSq);
 	double LengthSq_get() const;

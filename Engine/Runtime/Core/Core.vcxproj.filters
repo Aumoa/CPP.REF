@@ -87,9 +87,6 @@
     <ClInclude Include="Public\Numerics\Vector2.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Numerics\Rectangle.h">
-      <Filter>Public\Numerics</Filter>
-    </ClInclude>
     <ClInclude Include="Private\Numerics\HashHelper.h">
       <Filter>Private</Filter>
     </ClInclude>
@@ -122,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="Public\UniqueType.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Rect.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -202,9 +202,6 @@
     <ClCompile Include="Private\Numerics\Vector2.cpp">
       <Filter>Private\Numerics</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Numerics\Rectangle.cpp">
-      <Filter>Private\Numerics</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Numerics\HashHelper.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -233,6 +230,9 @@
       <Filter>Private\Numerics</Filter>
     </ClCompile>
     <ClCompile Include="Private\Numerics\ObjectOrientedCube.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Rect.cpp">
       <Filter>Private\Numerics</Filter>
     </ClCompile>
   </ItemGroup>

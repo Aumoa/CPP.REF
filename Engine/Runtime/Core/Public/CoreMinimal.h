@@ -22,7 +22,7 @@
 #include "Mathematics/Math.inl"
 
 #include "Numerics/Vector2.h"
-#include "Numerics/Rectangle.h"
+#include "Numerics/Rect.h"
 #include "Numerics/Ray2.h"
 #include "Numerics/Vector3.h"
 #include "Numerics/ObjectOrientedCube.h"

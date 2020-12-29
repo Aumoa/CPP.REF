@@ -4,7 +4,7 @@
 
 #include "HashHelper.h"
 #include "CoreString.h"
-#include "Numerics/Rectangle.h"
+#include "Numerics/Rect.h"
 
 using namespace std;
 
@@ -67,12 +67,12 @@ Vector2 Ray2::GetPoint(double distance) const
 	return Origin + Direction * distance;
 }
 
-bool Ray2::IsOverlap(const Rectangle& rect) const
+bool Ray2::IsOverlap(const Rect& rect) const
 {
 	return rect.IsOverlap(*this);
 }
 
-optional<double> Ray2::IsIntersect(const Rectangle& rect) const
+optional<double> Ray2::IsIntersect(const Rect& rect) const
 {
 	return rect.IsIntersect(*this);
 }

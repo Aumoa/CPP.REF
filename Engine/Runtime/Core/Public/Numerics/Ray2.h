@@ -26,8 +26,8 @@ struct CORE_API Ray2
 	TRefPtr<String> ToString() const;
 
 	Vector2 GetPoint(double distance) const;
-	bool IsOverlap(const Rectangle& rect) const;
-	std::optional<double> IsIntersect(const Rectangle& rect) const;
+	bool IsOverlap(const Rect& rect) const;
+	std::optional<double> IsIntersect(const Rect& rect) const;
 
 	bool operator ==(const Ray2& rh) const;
 	bool operator !=(const Ray2& rh) const;

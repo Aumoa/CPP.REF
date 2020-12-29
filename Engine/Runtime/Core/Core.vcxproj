@@ -172,7 +172,7 @@
     <ClInclude Include="Public\Numerics\Quaternion.h" />
     <ClInclude Include="Public\Numerics\Ray2.h" />
     <ClInclude Include="Public\Numerics\Ray3.h" />
-    <ClInclude Include="Public\Numerics\Rectangle.h" />
+    <ClInclude Include="Public\Numerics\Rect.h" />
     <ClInclude Include="Public\Numerics\Vector2.h" />
     <ClInclude Include="Public\Numerics\Vector3.h" />
     <ClInclude Include="Public\Numerics\Vector4.h" />
@@ -215,7 +215,7 @@
     <ClCompile Include="Private\Numerics\Quaternion.cpp" />
     <ClCompile Include="Private\Numerics\Ray2.cpp" />
     <ClCompile Include="Private\Numerics\Ray3.cpp" />
-    <ClCompile Include="Private\Numerics\Rectangle.cpp" />
+    <ClCompile Include="Private\Numerics\Rect.cpp" />
     <ClCompile Include="Private\Numerics\Vector2.cpp" />
     <ClCompile Include="Private\Numerics\Vector3.cpp" />
     <ClCompile Include="Private\Numerics\Vector4.cpp" />

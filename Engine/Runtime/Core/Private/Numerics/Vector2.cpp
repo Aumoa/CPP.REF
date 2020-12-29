@@ -3,7 +3,7 @@
 #include "Numerics/Vector2.h"
 
 #include "IndexOutOfRangeException.h"
-#include "Numerics/Rectangle.h"
+#include "Numerics/Rect.h"
 #include "HashHelper.h"
 
 using namespace std;
@@ -74,7 +74,7 @@ size_t Vector2::Count_get() const
 	return 2;
 }
 
-bool Vector2::IsOverlap(const Rectangle& rect) const
+bool Vector2::IsOverlap(const Rect& rect) const
 {
 	if (X >= rect.Left && X <= rect.Right &&
 		Y >= rect.Top && Y <= rect.Bottom)

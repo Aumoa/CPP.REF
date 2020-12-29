@@ -1,6 +1,6 @@
 ﻿// Copyright 2020 Aumoa.lib. All right reserved.
 
-#include "Numerics/Rectangle.h"
+#include "Numerics/Rect.h"
 
 #include "Numerics/Vector2.h"
 #include "Numerics/Ray2.h"
@@ -10,12 +10,12 @@
 
 using namespace std;
 
-Rectangle::Rectangle()
+Rect::Rect()
 {
 
 }
 
-Rectangle::Rectangle(double left, double top, double right, double bottom)
+Rect::Rect(double left, double top, double right, double bottom)
 {
 	Left = left;
 	Top = top;
@@ -23,7 +23,7 @@ Rectangle::Rectangle(double left, double top, double right, double bottom)
 	Bottom = bottom;
 }
 
-Rectangle::Rectangle(const Vector2& lt, const Vector2& rb)
+Rect::Rect(const Vector2& lt, const Vector2& rb)
 {
 	Left = lt.X;
 	Top = lt.Y;
@@ -31,7 +31,7 @@ Rectangle::Rectangle(const Vector2& lt, const Vector2& rb)
 	Bottom = rb.Y;
 }
 
-Rectangle::Rectangle(const Rectangle& copy)
+Rect::Rect(const Rect& copy)
 {
 	Left = copy.Left;
 	Top = copy.Top;
@@ -39,7 +39,7 @@ Rectangle::Rectangle(const Rectangle& copy)
 	Bottom = copy.Bottom;
 }
 
-bool Rectangle::Equals(const Rectangle& rh) const
+bool Rect::Equals(const Rect& rh) const
 {
 	return Left == rh.Left
 		&& Top == rh.Top
@@ -47,7 +47,7 @@ bool Rectangle::Equals(const Rectangle& rh) const
 		&& Bottom == rh.Bottom;
 }
 
-bool Rectangle::NearlyEquals(const Rectangle& rh, double epsilon) const
+bool Rect::NearlyEquals(const Rect& rh, double epsilon) const
 {
 	return abs(rh.Left - Left) <= epsilon
 		&& abs(rh.Top - Top) <= epsilon
@@ -55,7 +55,7 @@ bool Rectangle::NearlyEquals(const Rectangle& rh, double epsilon) const
 		&& abs(rh.Bottom - Bottom) <= epsilon;
 }
 
-size_t Rectangle::GetHashCode() const
+size_t Rect::GetHashCode() const
 {
 	return HashHelper::GetHashCode(Left)
 		 ^ HashHelper::GetHashCode(Top)
@@ -63,7 +63,7 @@ size_t Rectangle::GetHashCode() const
 		 ^ HashHelper::GetHashCode(Bottom);
 }
 
-TRefPtr<String> Rectangle::ToString() const
+TRefPtr<String> Rect::ToString() const
 {
 	return String::Format(
 		L"{{LB: {0}, RB: {1}, [{2} * {3}]}}",
@@ -74,7 +74,7 @@ TRefPtr<String> Rectangle::ToString() const
 	);
 }
 
-bool Rectangle::IsOverlap(const Vector2& point) const
+bool Rect::IsOverlap(const Vector2& point) const
 {
 	if (point.X >= Left && point.X <= Right &&
 		point.Y >= Top && point.Y <= Bottom)
@@ -85,7 +85,7 @@ bool Rectangle::IsOverlap(const Vector2& point) const
 	return false;
 }
 
-bool Rectangle::IsOverlap(const Rectangle& rect) const
+bool Rect::IsOverlap(const Rect& rect) const
 {
 	return !(Left > rect.Right ||
 			 Right < rect.Left ||
@@ -93,12 +93,12 @@ bool Rectangle::IsOverlap(const Rectangle& rect) const
 			 Bottom < rect.Top);
 }
 
-bool Rectangle::IsOverlap(const Ray2& ray) const
+bool Rect::IsOverlap(const Ray2& ray) const
 {
 	return IsIntersect(ray).has_value();
 }
 
-optional<Rectangle> Rectangle::IsIntersect(const Rectangle& rect) const
+optional<Rect> Rect::IsIntersect(const Rect& rect) const
 {
 	double left = max(Left, rect.Left);
 	double top = max(Top, rect.Top);
@@ -107,7 +107,7 @@ optional<Rectangle> Rectangle::IsIntersect(const Rectangle& rect) const
 
 	if (right >= left && bottom >= top)
 	{
-		return Rectangle(left, top, right, bottom);
+		return Rect(left, top, right, bottom);
 	}
 	else
 	{
@@ -115,7 +115,7 @@ optional<Rectangle> Rectangle::IsIntersect(const Rectangle& rect) const
 	}
 }
 
-optional<double> Rectangle::IsIntersect(const Ray2& ray) const
+optional<double> Rect::IsIntersect(const Ray2& ray) const
 {
 	Vector2 dirinv = 1.0 / ray.Direction;
 
@@ -140,64 +140,64 @@ optional<double> Rectangle::IsIntersect(const Ray2& ray) const
 	return tmin;
 }
 
-Vector2 Rectangle::LeftTop_get() const
+Vector2 Rect::LeftTop_get() const
 {
 	return { Left, Top };
 }
 
-void Rectangle::LeftTop_set(const Vector2& value)
+void Rect::LeftTop_set(const Vector2& value)
 {
 	Left = value.X;
 	Top = value.Y;
 }
 
-Vector2 Rectangle::RightBottom_get() const
+Vector2 Rect::RightBottom_get() const
 {
 	return { Right, Bottom };
 }
 
-void Rectangle::RightBottom_set(const Vector2& value)
+void Rect::RightBottom_set(const Vector2& value)
 {
 	Right = value.X;
 	Bottom = value.Y;
 }
 
-double Rectangle::Width_get() const
+double Rect::Width_get() const
 {
 	return Right - Left;
 }
 
-void Rectangle::Width_set(double value)
+void Rect::Width_set(double value)
 {
 	Right = Left + value;
 }
 
-double Rectangle::Height_get() const
+double Rect::Height_get() const
 {
 	return Bottom - Top;
 }
 
-void Rectangle::Height_set(double value)
+void Rect::Height_set(double value)
 {
 	Bottom = Top + value;
 }
 
-double Rectangle::Size_get() const
+double Rect::Size_get() const
 {
 	return Width * Height;
 }
 
-bool Rectangle::operator ==(const Rectangle& right) const
+bool Rect::operator ==(const Rect& right) const
 {
 	return Left == right.Left && Top == right.Top && Right == right.Right && Bottom == right.Bottom;
 }
 
-bool Rectangle::operator !=(const Rectangle& right) const
+bool Rect::operator !=(const Rect& right) const
 {
 	return Left != right.Left || Top != right.Top || Right != right.Right || Bottom != right.Bottom;
 }
 
-bool Rectangle::operator < (const Rectangle& right) const
+bool Rect::operator < (const Rect& right) const
 {
 	if (Left < right.Left)
 	{
@@ -233,7 +233,7 @@ bool Rectangle::operator < (const Rectangle& right) const
 	}
 }
 
-bool Rectangle::operator <=(const Rectangle& right) const
+bool Rect::operator <=(const Rect& right) const
 {
 	if (Left < right.Left)
 	{
@@ -269,7 +269,7 @@ bool Rectangle::operator <=(const Rectangle& right) const
 	}
 }
 
-bool Rectangle::operator > (const Rectangle& right) const
+bool Rect::operator > (const Rect& right) const
 {
 	if (Left > right.Left)
 	{
@@ -305,7 +305,7 @@ bool Rectangle::operator > (const Rectangle& right) const
 	}
 }
 
-bool Rectangle::operator >=(const Rectangle& right) const
+bool Rect::operator >=(const Rect& right) const
 {
 	if (Left > right.Left)
 	{
@@ -341,7 +341,7 @@ bool Rectangle::operator >=(const Rectangle& right) const
 	}
 }
 
-weak_ordering Rectangle::operator <=>(const Rectangle& right) const
+weak_ordering Rect::operator <=>(const Rect& right) const
 {
 	if (Left < right.Left)
 	{
