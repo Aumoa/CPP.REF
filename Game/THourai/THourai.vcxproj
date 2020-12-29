@@ -36,13 +36,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Levels\StartupLevel.cpp" />
     <ClCompile Include="Private\Program.cpp" />
     <ClCompile Include="Private\THGameInstance.cpp" />
     <ClCompile Include="Private\WinMain.cpp" />
-    <ClCompile Include="Public\THGameInstance.ixx" />
-    <ClCompile Include="StartupLevel.ixx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Public\Levels\StartupLevel.h" />
     <ClInclude Include="Public\Program.h" />
     <ClInclude Include="Public\THAPI.h" />
     <ClInclude Include="Public\THGameInstance.h" />

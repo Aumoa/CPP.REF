@@ -7,14 +7,14 @@
     <Filter Include="Public">
       <UniqueIdentifier>{389f5d83-949b-4ad7-afdf-91e8438305d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Levels">
+      <UniqueIdentifier>{552474cf-b643-463b-b0b0-637472e9a833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Levels">
+      <UniqueIdentifier>{c8e48153-593a-4074-bd0d-15b21749af06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Public\THGameInstance.ixx">
-      <Filter>Public</Filter>
-    </ClCompile>
-    <ClCompile Include="StartupLevel.ixx">
-      <Filter>Public</Filter>
-    </ClCompile>
     <ClCompile Include="Private\WinMain.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -23,6 +23,9 @@
     </ClCompile>
     <ClCompile Include="Private\THGameInstance.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Levels\StartupLevel.cpp">
+      <Filter>Private\Levels</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="Public\THGameInstance.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Levels\StartupLevel.h">
+      <Filter>Public\Levels</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
