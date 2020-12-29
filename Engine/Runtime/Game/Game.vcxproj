@@ -180,12 +180,15 @@
     <ClInclude Include="Public\Components\MeshComponent.h" />
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
     <ClInclude Include="Public\Components\SceneComponent.h" />
+    <ClInclude Include="Public\Components\StaticMeshComponent.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
+    <ClInclude Include="Public\Framework\StaticMeshActor.h" />
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\IEngineTick.h" />
+    <ClInclude Include="Public\Level.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
@@ -205,6 +208,7 @@
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
+    <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
@@ -225,6 +229,7 @@
     <ClCompile Include="Private\Components\MeshComponent.cpp" />
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
+    <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandFence.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12CommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeferredCommandList.cpp" />
@@ -241,13 +246,16 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\Framework\Actor.cpp" />
+    <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
+    <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
+    <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
@@ -259,6 +267,8 @@
     <None Include="Private\VulkanRHI\VulkanResource.cpp" />
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
+    <None Include="Public\Level.inl" />
+    <None Include="Public\World.inl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Application.inl" />

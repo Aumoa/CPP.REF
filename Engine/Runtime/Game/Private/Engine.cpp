@@ -3,6 +3,7 @@
 #include "Engine.h"
 
 #include "Application.h"
+#include "GameInstance.h"
 #include "RHI/IRHISwapChain.h"
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
@@ -24,11 +25,13 @@ using namespace SC::Runtime::Game::D3D12RHI;
 using namespace SC::Runtime::Game::Logging;
 using namespace SC::Runtime::Game::SceneRendering;
 using namespace std;
+using namespace std::chrono;
 
 Engine* Engine::gEngine = nullptr;
 
 Engine::Engine() : Super()
 	, LogEngine(ELogVerbosity::Verbose, nameof(LogEngine))
+	, gameInstance(nullptr)
 
 	, deviceBundle(nullptr)
 	, immediateCommandList(nullptr)
@@ -66,10 +69,22 @@ void Engine::Initialize()
 	sceneRenderer = NewObject<SceneRenderer>(this->deviceBundle);
 
 	gEngine = this;
+	prev_tick = steady_clock::now();
+}
+
+void Engine::PostInitialize()
+{
+	gameInstance = GApplication.GetGameInstance();
 }
 
 void Engine::Tick()
 {
+	auto curr_tick = steady_clock::now();
+	auto delta = curr_tick - prev_tick;
+	prev_tick = curr_tick;
+
+	gameInstance->Tick(delta);
+
 	TRefPtr<IRHISwapChain> swapChain = deviceBundle->GetSwapChain();
 
 	autoFence->BeginFence();

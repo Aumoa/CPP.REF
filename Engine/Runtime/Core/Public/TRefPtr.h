@@ -5,10 +5,10 @@
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
 
+#include "Object.h"
+
 #pragma warning(disable: 4251)
 
-namespace SC::Runtime::Core
-{
 	class Object;
 	class String;
 
@@ -117,7 +117,6 @@ namespace SC::Runtime::Core
 	private:
 		inline void SafeRelease();
 	};
-}
 
 #include "TWeakPtr.h"
 #include "TRefPtr.inl"

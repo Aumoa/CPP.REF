@@ -40,3 +40,12 @@ namespace SC::Runtime::Game::RHI
 		return (RHIResourceFlags)(~(int32)unary);
 	}
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::RHIResourceFlags;
+using SC::Runtime::Game::RHI::operator |;
+using SC::Runtime::Game::RHI::operator &;
+using SC::Runtime::Game::RHI::operator |=;
+using SC::Runtime::Game::RHI::operator &=;
+using SC::Runtime::Game::RHI::operator ~;
+#endif

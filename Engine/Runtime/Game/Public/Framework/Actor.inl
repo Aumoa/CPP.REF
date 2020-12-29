@@ -33,6 +33,34 @@ namespace SC::Runtime::Game::Framework
 		return RemoveComponentInternal(Core::TUniqueType<T>::HashCode);
 	}
 
+	template<class T> requires Core::TIsAssignable<T*, Components::ActorComponent*>
+	inline T* AActor::GetComponent() const
+	{
+		constexpr size_t HashCode = Core::TUniqueType<T>::HashCode;
+
+		auto it = hierarchy.find(HashCode);
+		if (it == hierarchy.end())
+		{
+			return nullptr;
+		}
+
+		return it->second.front();
+	}
+
+	template<class T> requires Core::TIsAssignable<T*, Components::ActorComponent*>
+	inline std::list<T*> AActor::GetComponents() const
+	{
+		constexpr size_t HashCode = Core::TUniqueType<T>::HashCode;
+
+		auto it = hierarchy.find(HashCode);
+		if (it == hierarchy.end())
+		{
+			return { };
+		}
+
+		return it->second;
+	}
+
 	template<class... TArgs, size_t... Indices>
 	inline std::array<size_t, sizeof...(TArgs)> AActor::CalcHierarchy2(const std::tuple<TArgs...>& tuple, std::index_sequence<Indices...>)
 	{

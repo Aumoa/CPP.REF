@@ -18,3 +18,7 @@ namespace SC::Runtime::Game::Logging
 		VeryVerbose,
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Logging::ELogVerbosity;
+#endif

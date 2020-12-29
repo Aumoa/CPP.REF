@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "IEngineTick.h"
 
+#include <chrono>
 #include "Logging/LogCategoryBase.h"
 
 namespace SC::Runtime::Game
@@ -24,6 +25,8 @@ namespace SC::Runtime::Game
 		class SceneRenderer;
 	}
 
+	class GameInstance;
+
 	class Engine : virtual public Core::Object, virtual public IEngineTick
 	{
 	public:
@@ -34,6 +37,8 @@ namespace SC::Runtime::Game
 		static Engine* gEngine;
 
 		Logging::LogCategoryBase LogEngine;
+		GameInstance* gameInstance;
+		std::chrono::steady_clock::time_point prev_tick;
 
 		std::vector<Core::TRefPtr<RHI::IRHIBundle>> rhiBundles;
 		Core::TRefPtr<RHI::IRHICommandFence> autoFence;
@@ -50,6 +55,7 @@ namespace SC::Runtime::Game
 		~Engine() override;
 
 		virtual void Initialize();
+		virtual void PostInitialize();
 		virtual void Tick();
 
 		vs_property_get(RHI::IRHIDeviceBundle*, DeviceBundle);
@@ -59,5 +65,10 @@ namespace SC::Runtime::Game
 
 	private:
 		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
+		void TickPrePhysics(std::chrono::duration<double> deltaTime);
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Engine;
+#endif

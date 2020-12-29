@@ -16,8 +16,6 @@
 #define InterlockedDecrement(x) _InterlockedDecrement(x)
 #endif
 
-using namespace SC::Runtime::Core;
-
 WeakReferences::WeakReferences()
 	: weakReferences(0)
 	, bValid(true)

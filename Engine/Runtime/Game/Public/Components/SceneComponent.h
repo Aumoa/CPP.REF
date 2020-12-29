@@ -28,3 +28,7 @@ namespace SC::Runtime::Game::Components
 		void RelativeTransform_set(const Transform& value);
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Components::SceneComponent;
+#endif

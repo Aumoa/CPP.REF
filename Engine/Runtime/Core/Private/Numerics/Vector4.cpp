@@ -7,8 +7,6 @@
 #include "Numerics/AxisAlignedCube.h"
 #include "Numerics/Vector3.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Vector4::Vector4()
@@ -414,22 +412,22 @@ double Vector4::DotProduct(const Vector4& left, const Vector4& right)
 	return left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
 }
 
-Vector4 Numerics::operator +(double left, const Vector4& right)
+Vector4 operator +(double left, const Vector4& right)
 {
 	return Vector4(left) + right;
 }
 
-Vector4 Numerics::operator -(double left, const Vector4& right)
+Vector4 operator -(double left, const Vector4& right)
 {
 	return Vector4(left) - right;
 }
 
-Vector4 Numerics::operator *(double left, const Vector4& right)
+Vector4 operator *(double left, const Vector4& right)
 {
 	return Vector4(left) * right;
 }
 
-Vector4 Numerics::operator /(double left, const Vector4& right)
+Vector4 operator /(double left, const Vector4& right)
 {
 	return Vector4(left) / right;
 }

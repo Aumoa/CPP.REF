@@ -5,18 +5,15 @@
 #include "CoreAPI.h"
 #include "Exception.h"
 
-namespace SC::Runtime::Core
+class CORE_API IndexOutOfRangeException : public Exception
 {
-	class CORE_API IndexOutOfRangeException : public Exception
-	{
-	public:
-		using Super = Exception;
-		using This = IndexOutOfRangeException;
+public:
+	using Super = Exception;
+	using This = IndexOutOfRangeException;
 
-	public:
-		IndexOutOfRangeException();
-		IndexOutOfRangeException(TRefPtr<String> message);
-		IndexOutOfRangeException(TRefPtr<String> message, Exception* innerException);
-		~IndexOutOfRangeException() override;
-	};
-}
+public:
+	IndexOutOfRangeException();
+	IndexOutOfRangeException(TRefPtr<String> message);
+	IndexOutOfRangeException(TRefPtr<String> message, Exception* innerException);
+	~IndexOutOfRangeException() override;
+};

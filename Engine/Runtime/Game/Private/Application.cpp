@@ -34,7 +34,8 @@ Application::~Application()
 
 void Application::PostInitialize()
 {
-
+	gameInstance->Initialize();
+	engineLoop->PostInitialize();
 }
 
 HWND Application::GetCoreHwnd() const
@@ -78,6 +79,8 @@ int32 Application::RunInternal(function<TRefPtr<GameInstance>()> objectConstruct
 	gameInstance = objectConstructor();
 	PostInitialize();
 
+	gameInstance->BeginPlay();
+
 	SetWindowTextW(hWnd, gameInstance->ToString()->C_Str);
 	ShowWindow(hWnd, SW_SHOW);
 
@@ -103,6 +106,8 @@ int32 Application::RunInternal(function<TRefPtr<GameInstance>()> objectConstruct
 			OnIdle();
 		}
 	}
+
+	gameInstance->EndPlay();
 
 	return 0;
 }

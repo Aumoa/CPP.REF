@@ -8,8 +8,6 @@
 #undef interface
 #include <Windows.h>
 
-using namespace SC::Runtime::Core;
-
 using namespace std;
 
 Exception::Exception()

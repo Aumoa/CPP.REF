@@ -3,18 +3,57 @@
 #include "Framework/Actor.h"
 
 #include "Components/SceneComponent.h"
+#include "Logging/LogMacros.h"
 
 using namespace SC::Runtime::Core;
 using namespace SC::Runtime::Game::Framework;
 using namespace SC::Runtime::Game::Components;
 using namespace std;
+using namespace std::chrono;
 
-AActor::AActor() : Super()
+AActor::ActorTickFunction::ActorTickFunction()
+	: Target(nullptr)
 {
 
 }
 
+AActor::ActorTickFunction::~ActorTickFunction()
+{
+
+}
+
+void AActor::ActorTickFunction::ExecuteTick(duration<double> deltaTime)
+{
+	if (Target == nullptr)
+	{
+		SE_LOG(LogTicking, Error, L"Target is nullptr.");
+		return;
+	}
+
+	Target->Tick(deltaTime);
+}
+
+AActor::AActor() : Super()
+{
+	PrimaryActorTick.Target = this;
+}
+
 AActor::~AActor()
+{
+
+}
+
+void AActor::BeginPlay()
+{
+
+}
+
+void AActor::EndPlay()
+{
+
+}
+
+void AActor::Tick(duration<double> deltaTime)
 {
 
 }
@@ -27,6 +66,11 @@ SceneComponent* AActor::RootComponent_get() const
 void AActor::RootComponent_set(SceneComponent* value)
 {
 	rootComponent = value;
+}
+
+auto AActor::PrimaryActorTick_get() -> ActorTickFunction&
+{
+	return primaryActorTick;
 }
 
 bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)

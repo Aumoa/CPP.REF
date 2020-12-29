@@ -36,11 +36,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\WinMain.ixx" />
+    <ClCompile Include="Private\Program.cpp" />
+    <ClCompile Include="Private\THGameInstance.cpp" />
+    <ClCompile Include="Private\WinMain.cpp" />
     <ClCompile Include="Public\THGameInstance.ixx" />
+    <ClCompile Include="StartupLevel.ixx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Public\Program.h" />
     <ClInclude Include="Public\THAPI.h" />
+    <ClInclude Include="Public\THGameInstance.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

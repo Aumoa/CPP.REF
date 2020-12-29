@@ -2,8 +2,6 @@
 
 #include "NullReferenceException.h"
 
-using namespace SC::Runtime::Core;
-
 NullReferenceException::NullReferenceException() : Super(L"Null reference detected.")
 {
 

@@ -6,8 +6,6 @@
 #include "Numerics/Vector4.h"
 #include "Numerics/Vector3.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Matrix4x4::Matrix4x4()

@@ -8,8 +8,6 @@
 #include "CoreString.h"
 #include "IndexOutOfRangeException.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Rectangle::Rectangle()

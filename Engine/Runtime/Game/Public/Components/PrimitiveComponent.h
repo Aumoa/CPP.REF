@@ -19,3 +19,7 @@ namespace SC::Runtime::Game::Components
 		~PrimitiveComponent() override;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Components::PrimitiveComponent;
+#endif

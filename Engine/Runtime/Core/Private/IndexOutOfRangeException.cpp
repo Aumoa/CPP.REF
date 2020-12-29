@@ -2,8 +2,6 @@
 
 #include "IndexOutOfRangeException.h"
 
-using namespace SC::Runtime::Core;
-
 IndexOutOfRangeException::IndexOutOfRangeException() : Super(L"Index out of range.")
 {
 

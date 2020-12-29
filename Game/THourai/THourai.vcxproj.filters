@@ -9,15 +9,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\WinMain.ixx">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Public\THGameInstance.ixx">
       <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="StartupLevel.ixx">
+      <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WinMain.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Program.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\THGameInstance.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\THAPI.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Program.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\THGameInstance.h">
       <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>

@@ -24,3 +24,7 @@ namespace SC::Runtime::Game::SceneRendering
 		void EndRender() override;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::SceneRendering::DeferredSceneRenderer;
+#endif

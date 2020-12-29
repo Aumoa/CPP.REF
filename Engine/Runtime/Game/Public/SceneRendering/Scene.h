@@ -18,3 +18,7 @@ namespace SC::Runtime::Game::SceneRendering
 		void Render(SceneRenderer* renderer);
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::SceneRendering::Scene;
+#endif

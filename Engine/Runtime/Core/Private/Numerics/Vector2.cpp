@@ -6,8 +6,6 @@
 #include "Numerics/Rectangle.h"
 #include "HashHelper.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Vector2::Vector2()
@@ -320,22 +318,22 @@ double Vector2::DotProduct(const Vector2& left, const Vector2& right)
 	return left.X * right.X + left.Y * right.Y;
 }
 
-Vector2 Numerics::operator +(double left, const Vector2& right)
+Vector2 operator +(double left, const Vector2& right)
 {
 	return Vector2(left) + right;
 }
 
-Vector2 Numerics::operator -(double left, const Vector2& right)
+Vector2 operator -(double left, const Vector2& right)
 {
 	return Vector2(left) - right;
 }
 
-Vector2 Numerics::operator *(double left, const Vector2& right)
+Vector2 operator *(double left, const Vector2& right)
 {
 	return Vector2(left) * right;
 }
 
-Vector2 Numerics::operator /(double left, const Vector2& right)
+Vector2 operator /(double left, const Vector2& right)
 {
 	return Vector2(left) / right;
 }

@@ -15,3 +15,7 @@ namespace SC::Runtime::Game::RHI
 		COPY_DEST
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::RHIResourceStates;
+#endif

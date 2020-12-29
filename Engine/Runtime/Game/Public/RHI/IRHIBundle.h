@@ -13,3 +13,7 @@ namespace SC::Runtime::Game::RHI
 		virtual void ReleaseBundle() = 0;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::IRHIBundle;
+#endif

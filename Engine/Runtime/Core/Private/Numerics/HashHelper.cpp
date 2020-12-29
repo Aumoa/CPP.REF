@@ -2,7 +2,6 @@
 
 #include "HashHelper.h"
 
-using namespace SC::Runtime::Core;
 using namespace std;
 
 template<class T, size_t... Seq>

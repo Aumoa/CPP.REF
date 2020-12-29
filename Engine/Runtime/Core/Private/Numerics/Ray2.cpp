@@ -6,8 +6,6 @@
 #include "CoreString.h"
 #include "Numerics/Rectangle.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Ray2::Ray2()

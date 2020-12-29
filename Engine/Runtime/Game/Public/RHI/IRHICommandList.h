@@ -25,3 +25,7 @@ namespace SC::Runtime::Game::RHI
 		virtual bool HasBegunCommand_get() const = 0;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::IRHICommandList;
+#endif

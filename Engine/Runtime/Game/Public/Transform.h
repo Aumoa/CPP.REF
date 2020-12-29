@@ -34,3 +34,7 @@ namespace SC::Runtime::Game
 		static Transform Identity;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Transform;
+#endif

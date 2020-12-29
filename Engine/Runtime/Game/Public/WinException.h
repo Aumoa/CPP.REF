@@ -22,3 +22,7 @@ namespace SC::Runtime::Game
 		static Core::TRefPtr<Core::String> GetErrorMessage(int32 lastError);
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::WinException;
+#endif

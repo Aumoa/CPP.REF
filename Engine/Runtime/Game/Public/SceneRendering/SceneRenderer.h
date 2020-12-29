@@ -44,3 +44,7 @@ namespace SC::Runtime::Game::SceneRendering
 		void Application_OnPostSized(int32 width, int32 height);
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::SceneRendering::SceneRenderer;
+#endif

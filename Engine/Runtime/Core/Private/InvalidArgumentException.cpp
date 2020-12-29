@@ -2,8 +2,6 @@
 
 #include "InvalidArgumentException.h"
 
-using namespace SC::Runtime::Core;
-
 InvalidArgumentException::InvalidArgumentException() : Super(L"Invalid argument detected.")
 {
 

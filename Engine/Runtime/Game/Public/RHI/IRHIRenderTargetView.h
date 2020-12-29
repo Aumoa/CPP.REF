@@ -12,3 +12,7 @@ namespace SC::Runtime::Game::RHI
 
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::IRHIRenderTargetView;
+#endif

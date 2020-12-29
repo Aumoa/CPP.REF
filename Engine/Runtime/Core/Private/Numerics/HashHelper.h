@@ -5,11 +5,8 @@
 #include "CoreAPI.h"
 #include "Object.h"
 
-namespace SC::Runtime::Core
+class HashHelper abstract final : virtual public Object
 {
-	class HashHelper abstract final : virtual public Core::Object
-	{
-	public:
-		static size_t GetHashCode(double value);
-	};
-}
+public:
+	static size_t GetHashCode(double value);
+};

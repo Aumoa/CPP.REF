@@ -18,3 +18,7 @@ namespace SC::Runtime::Game::Components
 		~ActorComponent() override;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Components::ActorComponent;
+#endif

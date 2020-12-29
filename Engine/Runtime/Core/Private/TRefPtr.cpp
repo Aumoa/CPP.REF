@@ -5,15 +5,12 @@
 #include "InvalidCastException.h"
 #include "NullReferenceException.h"
 
-namespace SC::Runtime::Core
+void ThrowInvalidCastException()
 {
-	void ThrowInvalidCastException()
-	{
-		throw InvalidCastException();
-	}
+	throw InvalidCastException();
+}
 
-	void ThrowNullReferenceException()
-	{
-		throw NullReferenceException();
-	}
+void ThrowNullReferenceException()
+{
+	throw NullReferenceException();
 }

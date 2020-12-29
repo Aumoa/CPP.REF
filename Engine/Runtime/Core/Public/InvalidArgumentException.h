@@ -5,18 +5,15 @@
 #include "CoreAPI.h"
 #include "Exception.h"
 
-namespace SC::Runtime::Core
+class CORE_API InvalidArgumentException : public Exception
 {
-	class CORE_API InvalidArgumentException : public Exception
-	{
-	public:
-		using Super = Exception;
-		using This = InvalidArgumentException;
+public:
+	using Super = Exception;
+	using This = InvalidArgumentException;
 
-	public:
-		InvalidArgumentException();
-		InvalidArgumentException(TRefPtr<String> message);
-		InvalidArgumentException(TRefPtr<String> message, Exception* innerException);
-		~InvalidArgumentException() override;
-	};
-}
+public:
+	InvalidArgumentException();
+	InvalidArgumentException(TRefPtr<String> message);
+	InvalidArgumentException(TRefPtr<String> message, Exception* innerException);
+	~InvalidArgumentException() override;
+};

@@ -5,31 +5,28 @@
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
 
-namespace SC::Runtime::Core
+class Object;
+
+struct CORE_API WeakReferences
 {
-	class Object;
+	friend class Object;
 
-	struct CORE_API WeakReferences
-	{
-		friend class Object;
+private:
+	size_t weakReferences;
+	bool bValid : 1;
 
-	private:
-		size_t weakReferences;
-		bool bValid : 1;
+public:
+	WeakReferences();
+	~WeakReferences();
 
-	public:
-		WeakReferences();
-		~WeakReferences();
+	void AddWeakRef();
+	void ReleaseWeak();
+	void AddWeakRefInterlocked();
+	void ReleaseWeakInterlocked();
 
-		void AddWeakRef();
-		void ReleaseWeak();
-		void AddWeakRefInterlocked();
-		void ReleaseWeakInterlocked();
+	vs_property_get(bool, IsValid);
+	bool IsValid_get() const;
 
-		vs_property_get(bool, IsValid);
-		bool IsValid_get() const;
-
-	private:
-		void Invalidate();
-	};
-}
+private:
+	void Invalidate();
+};

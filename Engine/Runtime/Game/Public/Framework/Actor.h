@@ -9,6 +9,7 @@
 #include <list>
 #include <tuple>
 #include <array>
+#include "TickFunction.h"
 
 namespace SC::Runtime::Game::Components
 {
@@ -20,6 +21,16 @@ namespace SC::Runtime::Game::Framework
 {
 	class GAME_API AActor : virtual public Core::Object
 	{
+		struct ActorTickFunction : public TickFunction
+		{
+			AActor* Target;
+
+			ActorTickFunction();
+			~ActorTickFunction();
+
+			void ExecuteTick(std::chrono::duration<double> deltaTime) override;
+		};
+
 	public:
 		using Super = Core::Object;
 		using This = AActor;
@@ -28,19 +39,31 @@ namespace SC::Runtime::Game::Framework
 		std::map<Components::ActorComponent*, Core::TRefPtr<Components::ActorComponent>> ownedComponents;
 		std::map<size_t, std::list<Components::ActorComponent*>> hierarchy;
 		Core::TRefPtr<Components::SceneComponent> rootComponent;
+		ActorTickFunction primaryActorTick;
 
 	public:
 		AActor();
 		~AActor() override;
+
+		virtual void BeginPlay();
+		virtual void EndPlay();
+		virtual void Tick(std::chrono::duration<double> deltaTime);
 
 		template<class T, class... TArgs> requires Core::TIsAssignable<T*, Components::ActorComponent*> && Core::THasConstructor<T, TArgs...>
 		inline T* AddComponent(TArgs&&... args);
 		template<class T> requires Core::TIsAssignable<T*, Components::ActorComponent*>
 		inline bool RemoveComponent();
 
+		template<class T> requires Core::TIsAssignable<T*, Components::ActorComponent*>
+		inline T* GetComponent() const;
+		template<class T> requires Core::TIsAssignable<T*, Components::ActorComponent*>
+		inline std::list<T*> GetComponents() const;
+
 		vs_property(Components::SceneComponent*, RootComponent);
 		Components::SceneComponent* RootComponent_get() const;
 		void RootComponent_set(Components::SceneComponent* value);
+		vs_property(ActorTickFunction&, PrimaryActorTick);
+		ActorTickFunction& PrimaryActorTick_get();
 
 	private:
 		bool AddComponentInternal(Core::TRefPtr<Components::ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num);
@@ -78,3 +101,7 @@ namespace SC::Runtime::Game::Framework
 }
 
 #include "Actor.inl"
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Framework::AActor;
+#endif

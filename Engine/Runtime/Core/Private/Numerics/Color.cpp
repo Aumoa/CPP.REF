@@ -6,8 +6,6 @@
 #include "HashHelper.h"
 #include "IndexOutOfRangeException.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 map<size_t, Color> Color::convertTable =
@@ -580,22 +578,22 @@ Color Color::FromBytes(uint8 r, uint8 g, uint8 b, uint8 a)
 	return Color((double)r * Inv255, (double)g * Inv255, (double)b * Inv255, (double)a * Inv255);
 }
 
-Color Numerics::operator +(double left, const Color& right)
+Color operator +(double left, const Color& right)
 {
 	return Color(left, left, left, left) + right;
 }
 
-Color Numerics::operator -(double left, const Color& right)
+Color operator -(double left, const Color& right)
 {
 	return Color(left, left, left, left) - right;
 }
 
-Color Numerics::operator *(double left, const Color& right)
+Color operator *(double left, const Color& right)
 {
 	return Color(left, left, left, left) * right;
 }
 
-Color Numerics::operator /(double left, const Color& right)
+Color operator /(double left, const Color& right)
 {
 	return Color(left, left, left, left) / right;
 }

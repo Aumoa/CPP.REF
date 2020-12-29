@@ -5,8 +5,6 @@
 #include "CoreString.h"
 #include "Numerics/Ray3.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 AxisAlignedCube::AxisAlignedCube()

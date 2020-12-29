@@ -46,3 +46,7 @@ namespace SC::Runtime::Game
 		bool operator !=(const Rotator& right) const;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Rotator;
+#endif

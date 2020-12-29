@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define __SC_GLOBAL_NAMESPACE__
+
 #ifdef __TH_API__
 #define TH_API __declspec(dllexport)
 

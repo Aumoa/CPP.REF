@@ -13,9 +13,6 @@
 #include "Mathematics/Math.h"
 #include "Mathematics/Math.inl"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
-using namespace SC::Runtime::Core::Mathematics;
 using namespace std;
 
 Quaternion Quaternion::Identity = Quaternion(0, 0, 0, 1);
@@ -599,22 +596,22 @@ Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, do
 	return v0 * s0 + v1 * s1;
 }
 
-Quaternion Numerics::operator +(double left, const Quaternion& right)
+Quaternion operator +(double left, const Quaternion& right)
 {
 	return Quaternion(left) + right;
 }
 
-Quaternion Numerics::operator -(double left, const Quaternion& right)
+Quaternion operator -(double left, const Quaternion& right)
 {
 	return Quaternion(left) - right;
 }
 
-Quaternion Numerics::operator *(double left, const Quaternion& right)
+Quaternion operator *(double left, const Quaternion& right)
 {
 	return Quaternion(left) * right;
 }
 
-Quaternion Numerics::operator /(double left, const Quaternion& right)
+Quaternion operator /(double left, const Quaternion& right)
 {
 	return Quaternion(left) / right;
 }

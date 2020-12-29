@@ -2,8 +2,6 @@
 
 #include "InvalidCastException.h"
 
-using namespace SC::Runtime::Core;
-
 InvalidCastException::InvalidCastException() : Super(L"Invalid cast detected.")
 {
 

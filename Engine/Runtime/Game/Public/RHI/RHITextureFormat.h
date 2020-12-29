@@ -13,3 +13,7 @@ namespace SC::Runtime::Game::RHI
 		R8G8B8A8_UNORM
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::RHITextureFormat;
+#endif

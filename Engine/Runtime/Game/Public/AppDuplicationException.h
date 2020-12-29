@@ -18,3 +18,7 @@ namespace SC::Runtime::Game
 		~AppDuplicationException() override;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::AppDuplicationException;
+#endif

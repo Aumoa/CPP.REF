@@ -8,7 +8,6 @@
 #include "IndexOutOfRangeException.h"
 #include "FormatException.h"
 
-using namespace SC::Runtime::Core;
 using namespace std;
 
 wchar_t String::EmptyBuffer[1] = { 0 };

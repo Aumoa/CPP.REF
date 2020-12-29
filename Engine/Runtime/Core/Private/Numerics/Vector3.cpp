@@ -7,8 +7,6 @@
 #include "Numerics/AxisAlignedCube.h"
 #include "Numerics/Vector2.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Vector3 Vector3::Up = Vector3(0, 0, 1);
@@ -398,22 +396,22 @@ Vector3 Vector3::CrossProduct(const Vector3& left, const Vector3& right)
 	);
 }
 
-Vector3 Numerics::operator +(double left, const Vector3& right)
+Vector3 operator +(double left, const Vector3& right)
 {
 	return Vector3(left) + right;
 }
 
-Vector3 Numerics::operator -(double left, const Vector3& right)
+Vector3 operator -(double left, const Vector3& right)
 {
 	return Vector3(left) - right;
 }
 
-Vector3 Numerics::operator *(double left, const Vector3& right)
+Vector3 operator *(double left, const Vector3& right)
 {
 	return Vector3(left) * right;
 }
 
-Vector3 Numerics::operator /(double left, const Vector3& right)
+Vector3 operator /(double left, const Vector3& right)
 {
 	return Vector3(left) / right;
 }

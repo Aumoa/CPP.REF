@@ -2,8 +2,6 @@
 
 #include "FormatException.h"
 
-using namespace SC::Runtime::Core;
-
 FormatException::FormatException() : Super(L"Invalid format or argument detected.")
 {
 

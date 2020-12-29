@@ -2,8 +2,6 @@
 
 #include "ArgumentNullException.h"
 
-using namespace SC::Runtime::Core;
-
 ArgumentNullException::ArgumentNullException() : Super(L"Null argument detected.")
 {
 

@@ -5,18 +5,15 @@
 #include "CoreAPI.h"
 #include "Exception.h"
 
-namespace SC::Runtime::Core
+class CORE_API NullReferenceException : public Exception
 {
-	class CORE_API NullReferenceException : public Exception
-	{
-	public:
-		using Super = Exception;
-		using This = NullReferenceException;
+public:
+	using Super = Exception;
+	using This = NullReferenceException;
 
-	public:
-		NullReferenceException();
-		NullReferenceException(TRefPtr<String> message);
-		NullReferenceException(TRefPtr<String> message, Exception* innerException);
-		~NullReferenceException() override;
-	};
-}
+public:
+	NullReferenceException();
+	NullReferenceException(TRefPtr<String> message);
+	NullReferenceException(TRefPtr<String> message, Exception* innerException);
+	~NullReferenceException() override;
+};

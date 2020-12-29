@@ -25,3 +25,7 @@ namespace SC::Runtime::Game::Logging
 		ELogVerbosity GetAmendedVerbosity(ELogVerbosity verbosity) const;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Logging::LogCategoryBase;
+#endif

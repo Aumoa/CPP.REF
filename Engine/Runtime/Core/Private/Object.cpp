@@ -20,8 +20,6 @@
 #define InterlockedDecrement(x) _InterlockedDecrement(x)
 #endif
 
-using namespace SC::Runtime::Core;
-
 Object::Object()
 	: bLockCollecting(true)
 	, ref_count(0)

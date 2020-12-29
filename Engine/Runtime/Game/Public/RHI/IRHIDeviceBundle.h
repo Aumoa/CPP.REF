@@ -30,3 +30,7 @@ namespace SC::Runtime::Game::RHI
 		virtual Core::TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	};
 }
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::RHI::IRHIDeviceBundle;
+#endif

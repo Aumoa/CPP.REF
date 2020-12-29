@@ -25,9 +25,6 @@
     <Filter Include="Private\SceneRendering">
       <UniqueIdentifier>{403871ba-6df4-4a50-91bb-39d67b7eb2a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\VulkanRHI">
-      <UniqueIdentifier>{8e6cbf7a-6f2c-44ba-848a-3467c342982a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Public\Framework">
       <UniqueIdentifier>{f2130872-851c-4ce0-aef4-b316b49a1fe2}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,9 @@
     </Filter>
     <Filter Include="Private\Components">
       <UniqueIdentifier>{23ef1ada-3407-4fbf-83f9-d22b504ec91b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\VulkanRHI">
+      <UniqueIdentifier>{7df3d8a5-eced-4645-9eb2-59b064c03fa5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -159,30 +159,6 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanException.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanMinimal.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanImmediateCommandList.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanResource.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h">
-      <Filter>Private\VulkanRHI</Filter>
-    </ClInclude>
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
@@ -215,6 +191,42 @@
     </ClInclude>
     <ClInclude Include="Public\GameMinimal.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\StaticMeshActor.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\StaticMeshComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Level.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\TickFunction.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanException.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanImmediateCommandList.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanMinimal.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanResource.h">
+      <Filter>Private\VulkanRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h">
+      <Filter>Private\VulkanRHI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -314,6 +326,18 @@
     <ClCompile Include="Private\Transform.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Framework\StaticMeshActor.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Level.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TickFunction.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\StaticMeshComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -322,16 +346,38 @@
     <None Include="Public\Application.inl">
       <Filter>Public</Filter>
     </None>
-    <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
-    <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
-    <None Include="Private\VulkanRHI\VulkanException.cpp" />
-    <None Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp" />
-    <None Include="Private\VulkanRHI\VulkanMinimal.cpp" />
-    <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
-    <None Include="Private\VulkanRHI\VulkanResource.cpp" />
-    <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
     <None Include="Public\Framework\Actor.inl">
       <Filter>Public\Framework</Filter>
+    </None>
+    <None Include="Public\World.inl">
+      <Filter>Public</Filter>
+    </None>
+    <None Include="Public\Level.inl">
+      <Filter>Public</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanCommandList.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanException.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanImmediateCommandList.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanMinimal.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanResource.cpp">
+      <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Private\VulkanRHI\VulkanSwapChain.cpp">
+      <Filter>Private\VulkanRHI</Filter>
     </None>
   </ItemGroup>
 </Project>

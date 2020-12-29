@@ -8,6 +8,7 @@
 #include "WindowsMinimal.h"
 #include "IEngineTick.h"
 #include "GameInstance.h"
+#include "World.h"
 
 namespace SC::Runtime::Game::Logging
 {
@@ -73,3 +74,7 @@ namespace SC::Runtime::Game
 }
 
 #include "Application.inl"
+
+#ifdef __SC_GLOBAL_NAMESPACE__
+using SC::Runtime::Game::Application;
+#endif
