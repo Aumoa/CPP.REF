@@ -26,6 +26,8 @@ namespace SC::Runtime::Core
 		
 		Object(const Object&) = delete;
 		Object(Object&&) = delete;
+		Object& operator =(const Object&) = delete;
+		Object& operator =(Object&&) = delete;
 
 	private:
 		bool bLockCollecting : 1;
