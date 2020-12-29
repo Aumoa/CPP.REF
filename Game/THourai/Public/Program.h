@@ -7,8 +7,6 @@
 
 class TH_API Program : virtual public Object
 {
-	static LogCategoryBase LogTH;
-
 public:
 	using Super = Object;
 	using This = Program;

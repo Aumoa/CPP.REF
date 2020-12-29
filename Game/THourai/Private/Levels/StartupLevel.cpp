@@ -2,7 +2,7 @@
 
 #include "Levels/StartupLevel.h"
 
-#include "Framework/StaticMeshActor.h"
+#include "Actor/MyTestActor.h"
 
 StartupLevel::StartupLevel()
 {
@@ -16,5 +16,5 @@ StartupLevel::~StartupLevel()
 
 void StartupLevel::LoadLevel()
 {
-	SpawnActorPersistent<AStaticMeshActor>();
+	SpawnActorPersistent<AMyTestActor>();
 }

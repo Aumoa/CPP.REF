@@ -9,6 +9,7 @@
 #include <list>
 #include <tuple>
 #include <array>
+#include <chrono>
 #include "TickFunction.h"
 
 class ActorComponent;
