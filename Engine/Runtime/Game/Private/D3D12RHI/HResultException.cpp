@@ -6,9 +6,6 @@
 #include "D3D12Minimal.h"
 #include "Logging/LogMacros.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::D3D12RHI;
-
 HResultException::HResultException(HRESULT hr) : Super(GetHResultString(hr))
 {
 

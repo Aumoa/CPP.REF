@@ -5,8 +5,6 @@
 #include "Logging/LogCategoryBase.h"
 #include "Logging/LogVerbosity.h"
 
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::Logging;
 using namespace std::chrono;
 
 LogCategoryBase TickFunction::LogTicking(ELogVerbosity::Verbose, L"LogTicking");

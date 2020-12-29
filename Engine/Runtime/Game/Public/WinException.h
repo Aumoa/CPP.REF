@@ -5,24 +5,17 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game
+class GAME_API WinException : public Exception
 {
-	class GAME_API WinException : public Core::Exception
-	{
-	public:
-		using Super = Core::Exception;
-		using This = WinException;
+public:
+	using Super = Exception;
+	using This = WinException;
 
-	public:
-		WinException();
-		WinException(int32 lastError);
-		~WinException() override;
+public:
+	WinException();
+	WinException(int32 lastError);
+	~WinException() override;
 
-	private:
-		static Core::TRefPtr<Core::String> GetErrorMessage(int32 lastError);
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::WinException;
-#endif
+private:
+	static TRefPtr<String> GetErrorMessage(int32 lastError);
+};

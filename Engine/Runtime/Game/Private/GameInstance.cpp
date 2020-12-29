@@ -4,8 +4,6 @@
 
 #include "World.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
 using namespace std;
 using namespace std::chrono;
 

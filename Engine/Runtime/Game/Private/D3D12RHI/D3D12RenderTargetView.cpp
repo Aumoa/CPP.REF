@@ -5,8 +5,6 @@
 #include "Engine.h"
 #include "D3D12DeviceBundle.h"
 
-using namespace SC::Runtime::Game::D3D12RHI;
-
 D3D12RenderTargetView::D3D12RenderTargetView(ID3D12Resource* resource, const D3D12DescriptorIndex& handle) : Super()
 	, handle(handle)
 {

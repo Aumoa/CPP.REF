@@ -2,15 +2,12 @@
 
 #pragma once
 
-namespace SC::Runtime::Game
+template<TIsGameInstance T, class... TArgs> requires THasConstructor<T, TArgs...>
+inline int32 Application::Run(TArgs&&... args)
 {
-	template<TIsGameInstance T, class... TArgs> requires THasConstructor<T, TArgs...>
-	inline int32 Application::Run(TArgs&&... args)
-	{
-		return RunInternal([]() -> Core::TRefPtr<GameInstance>
-			{
-				return NewObject<T>(std::forward<TArgs>(args)...);
-			}
-		);
-	}
+	return RunInternal([]() -> TRefPtr<GameInstance>
+		{
+			return NewObject<T>(std::forward<TArgs>(args)...);
+		}
+	);
 }

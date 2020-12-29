@@ -9,66 +9,52 @@
 #include <chrono>
 #include "Logging/LogCategoryBase.h"
 
-namespace SC::Runtime::Game
+interface IRHIBundle;
+interface IRHICommandFence;
+interface IRHIDeviceBundle;
+interface IRHIImmediateCommandList;
+interface IRHISwapChain;
+
+class SceneRenderer;
+class GameInstance;
+
+class Engine : virtual public Object, virtual public IEngineTick
 {
-	namespace RHI
-	{
-		interface IRHIBundle;
-		interface IRHICommandFence;
-		interface IRHIDeviceBundle;
-		interface IRHIImmediateCommandList;
-		interface IRHISwapChain;
-	}
+public:
+	using Super = Object;
+	using This = Engine;
 
-	namespace SceneRendering
-	{
-		class SceneRenderer;
-	}
+private:
+	static Engine* gEngine;
 
-	class GameInstance;
+	LogCategoryBase LogEngine;
+	GameInstance* gameInstance;
+	std::chrono::steady_clock::time_point prev_tick;
 
-	class Engine : virtual public Core::Object, virtual public IEngineTick
-	{
-	public:
-		using Super = Core::Object;
-		using This = Engine;
+	std::vector<TRefPtr<IRHIBundle>> rhiBundles;
+	TRefPtr<IRHICommandFence> autoFence;
 
-	private:
-		static Engine* gEngine;
+	IRHIDeviceBundle* deviceBundle;
+	IRHIImmediateCommandList* immediateCommandList;
+	IRHISwapChain* swapChain;
 
-		Logging::LogCategoryBase LogEngine;
-		GameInstance* gameInstance;
-		std::chrono::steady_clock::time_point prev_tick;
+	TRefPtr<SceneRenderer> sceneRenderer;
+	bool bPresent : 1;
 
-		std::vector<Core::TRefPtr<RHI::IRHIBundle>> rhiBundles;
-		Core::TRefPtr<RHI::IRHICommandFence> autoFence;
+public:
+	Engine();
+	~Engine() override;
 
-		RHI::IRHIDeviceBundle* deviceBundle;
-		RHI::IRHIImmediateCommandList* immediateCommandList;
-		RHI::IRHISwapChain* swapChain;
+	virtual void Initialize();
+	virtual void PostInitialize();
+	virtual void Tick();
 
-		Core::TRefPtr<SceneRendering::SceneRenderer> sceneRenderer;
-		bool bPresent : 1;
+	vs_property_get(IRHIDeviceBundle*, DeviceBundle);
+	IRHIDeviceBundle* DeviceBundle_get() const;
 
-	public:
-		Engine();
-		~Engine() override;
+	static Engine* GetInstance();
 
-		virtual void Initialize();
-		virtual void PostInitialize();
-		virtual void Tick();
-
-		vs_property_get(RHI::IRHIDeviceBundle*, DeviceBundle);
-		RHI::IRHIDeviceBundle* DeviceBundle_get() const;
-
-		static Engine* GetInstance();
-
-	private:
-		void ForEachBundles(std::function<void(RHI::IRHIBundle*)> action);
-		void TickPrePhysics(std::chrono::duration<double> deltaTime);
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Engine;
-#endif
+private:
+	void ForEachBundles(std::function<void(IRHIBundle*)> action);
+	void TickPrePhysics(std::chrono::duration<double> deltaTime);
+};

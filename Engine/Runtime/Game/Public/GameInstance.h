@@ -7,37 +7,30 @@
 
 #include <chrono>
 
-namespace SC::Runtime::Game
+class World;
+class Level;
+
+class GAME_API GameInstance : virtual public Object
 {
-	class World;
-	class Level;
+public:
+	using Super = Object;
+	using This = GameInstance;
 
-	class GAME_API GameInstance : virtual public Core::Object
-	{
-	public:
-		using Super = Core::Object;
-		using This = GameInstance;
+private:
+	static TRefPtr<String> defaultAppName;
 
-	private:
-		static Core::TRefPtr<Core::String> defaultAppName;
+	TRefPtr<World> world;
 
-		Core::TRefPtr<World> world;
+public:
+	GameInstance();
+	~GameInstance() override;
 
-	public:
-		GameInstance();
-		~GameInstance() override;
+	TRefPtr<String> ToString() const override;
 
-		Core::TRefPtr<Core::String> ToString() const override;
+	virtual void Initialize();
+	virtual void Tick(std::chrono::duration<double> deltaTime);
+	virtual void BeginPlay();
+	virtual void EndPlay();
 
-		virtual void Initialize();
-		virtual void Tick(std::chrono::duration<double> deltaTime);
-		virtual void BeginPlay();
-		virtual void EndPlay();
-
-		virtual Level* GetStartupLevel() = 0;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::GameInstance;
-#endif
+	virtual Level* GetStartupLevel() = 0;
+};

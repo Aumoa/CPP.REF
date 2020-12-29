@@ -7,47 +7,37 @@
 
 #include <chrono>
 
-namespace SC::Runtime::Game::Framework
+class AActor;
+
+enum class TickingGroup;
+struct TickFunction;
+class Level;
+
+class GAME_API World : virtual public Object
 {
-	class AActor;
-}
+public:
+	using Super = Object;
+	using This = World;
 
-namespace SC::Runtime::Game
-{
-	enum class TickingGroup;
-	struct TickFunction;
-	class Level;
+private:
+	std::vector<TRefPtr<AActor>> actors;
+	std::map<TickingGroup, std::vector<TickFunction*>> tickGroups;
+	TWeakPtr<Level> currentLevel = nullptr;
 
-	class GAME_API World : virtual public Core::Object
-	{
-	public:
-		using Super = Core::Object;
-		using This = World;
+public:
+	World();
+	~World() override;
 
-	private:
-		std::vector<Core::TRefPtr<Framework::AActor>> actors;
-		std::map<TickingGroup, std::vector<TickFunction*>> tickGroups;
-		Core::TWeakPtr<Level> currentLevel = nullptr;
+	virtual void Tick(std::chrono::duration<double> deltaTime);
 
-	public:
-		World();
-		~World() override;
+	template<class T, class... TArgs> requires TIsAssignable<T*, AActor*> && THasConstructor<T, TArgs...>
+	inline T* SpawnActor(TArgs&&... constructor_args);
 
-		virtual void Tick(std::chrono::duration<double> deltaTime);
+	void LoadLevel(Level* loadLevel);
 
-		template<class T, class... TArgs> requires Core::TIsAssignable<T*, Framework::AActor*> && Core::THasConstructor<T, TArgs...>
-		inline T* SpawnActor(TArgs&&... constructor_args);
-
-		void LoadLevel(Level* loadLevel);
-
-	private:
-		void Tick_PrePhysics(std::chrono::duration<double> deltaTime);
-		Framework::AActor* SpawnActorInternal(Core::TRefPtr<Framework::AActor> actor);
-	};
-}
+private:
+	void Tick_PrePhysics(std::chrono::duration<double> deltaTime);
+	AActor* SpawnActorInternal(TRefPtr<AActor> actor);
+};
 
 #include "World.inl"
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::World;
-#endif

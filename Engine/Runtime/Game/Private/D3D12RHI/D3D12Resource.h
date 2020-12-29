@@ -8,22 +8,19 @@
 
 #include "D3D12Minimal.h"
 
-namespace SC::Runtime::Game::D3D12RHI
+class D3D12Resource : virtual public Object, virtual public IRHIResource
 {
-	class D3D12Resource : virtual public Core::Object, virtual public RHI::IRHIResource
-	{
-	public:
-		using Super = Core::Object;
-		using This = D3D12Resource;
+public:
+	using Super = Object;
+	using This = D3D12Resource;
 
-	private:
-		ComPtr<ID3D12Resource> resource;
+private:
+	ComPtr<ID3D12Resource> resource;
 
-	public:
-		D3D12Resource(ID3D12Resource* resource);
-		~D3D12Resource() override;
+public:
+	D3D12Resource(ID3D12Resource* resource);
+	~D3D12Resource() override;
 
-		vs_property_get(ID3D12Resource*, Resource);
-		ID3D12Resource* Resource_get() const;
-	};
-}
+	vs_property_get(ID3D12Resource*, Resource);
+	ID3D12Resource* Resource_get() const;
+};

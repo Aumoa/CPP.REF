@@ -5,20 +5,13 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::Components
+class GAME_API ActorComponent : public Object
 {
-	class GAME_API ActorComponent : public Core::Object
-	{
-	public:
-		using Super = Core::Object;
-		using This = ActorComponent;
+public:
+	using Super = Object;
+	using This = ActorComponent;
 
-	public:
-		ActorComponent();
-		~ActorComponent() override;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Components::ActorComponent;
-#endif
+public:
+	ActorComponent();
+	~ActorComponent() override;
+};

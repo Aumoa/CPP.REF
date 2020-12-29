@@ -2,10 +2,6 @@
 
 #include "Rotator.h"
 
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Mathematics;
-using namespace SC::Runtime::Core::Numerics;
 using namespace std;
 
 Rotator::Rotator()

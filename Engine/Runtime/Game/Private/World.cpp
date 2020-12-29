@@ -5,9 +5,6 @@
 #include "Level.h"
 #include "Framework/Actor.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::Framework;
 using namespace std;
 using namespace std::chrono;
 

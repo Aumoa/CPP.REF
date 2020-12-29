@@ -2,9 +2,6 @@
 
 #include "VulkanException.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::VulkanRHI;
-
 VulkanException::VulkanException(VkResult vkResult) : Super(TranslateMessage(vkResult))
 {
 

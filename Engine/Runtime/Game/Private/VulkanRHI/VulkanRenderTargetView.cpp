@@ -2,9 +2,6 @@
 
 #include "VulkanRenderTargetView.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::VulkanRHI;
-
 VulkanRenderTargetView::VulkanRenderTargetView(VkDevice vkDevice, VkImageView vkImageView) : Super()
 	, vkDevice(vkDevice)
 	, vkImageView(vkImageView)

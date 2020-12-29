@@ -4,9 +4,6 @@
 
 #include "Logging/LogVerbosity.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::Logging;
-
 LogCategoryBase::LogCategoryBase(ELogVerbosity inBaseVerbosity, TRefPtr<String> inCategoryName)
 {
 	CategoryName = inCategoryName;

@@ -7,19 +7,16 @@
 
 #include "VulkanMinimal.h"
 
-namespace SC::Runtime::Game::VulkanRHI
+class VulkanException : public Exception
 {
-	class VulkanException : public Core::Exception
-	{
-	public:
-		using Super = Exception;
-		using This = VulkanException;
+public:
+	using Super = Exception;
+	using This = VulkanException;
 
-	public:
-		VulkanException(VkResult vkResult);
-		~VulkanException() override;
+public:
+	VulkanException(VkResult vkResult);
+	~VulkanException() override;
 
-	private:
-		static Core::TRefPtr<Core::String> TranslateMessage(VkResult vkResult);
-	};
-}
+private:
+	static TRefPtr<String> TranslateMessage(VkResult vkResult);
+};

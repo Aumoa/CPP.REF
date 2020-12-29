@@ -5,46 +5,36 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::RHI
+interface IRHIResource;
+interface IRHIDeferredCommandList;
+interface IRHIDeviceBundle;
+interface IRHIRenderTargetView;
+
+class GAME_API SceneRenderer : virtual public Object
 {
-	interface IRHIResource;
-	interface IRHIDeferredCommandList;
-	interface IRHIDeviceBundle;
-	interface IRHIRenderTargetView;
-}
+public:
+	using Super = Object;
+	using This = SceneRenderer;
 
-namespace SC::Runtime::Game::SceneRendering
-{
-	class GAME_API SceneRenderer : virtual public Core::Object
-	{
-	public:
-		using Super = Core::Object;
-		using This = SceneRenderer;
+private:
+	IRHIDeviceBundle* deviceBundle;
+	TRefPtr<IRHIResource> finalColor;
+	TRefPtr<IRHIDeferredCommandList> commandList;
+	TRefPtr<IRHIRenderTargetView> rtv;
 
-	private:
-		RHI::IRHIDeviceBundle* deviceBundle;
-		Core::TRefPtr<RHI::IRHIResource> finalColor;
-		Core::TRefPtr<RHI::IRHIDeferredCommandList> commandList;
-		Core::TRefPtr<RHI::IRHIRenderTargetView> rtv;
+public:
+	SceneRenderer(IRHIDeviceBundle* deviceBundle);
+	~SceneRenderer() override;
 
-	public:
-		SceneRenderer(RHI::IRHIDeviceBundle* deviceBundle);
-		~SceneRenderer() override;
+	virtual void BeginRender();
+	virtual void EndRender();
 
-		virtual void BeginRender();
-		virtual void EndRender();
+	vs_property_get(IRHIDeferredCommandList*, CommandList);
+	IRHIDeferredCommandList* CommandList_get() const;
+	vs_property_get(IRHIResource*, FinalColor);
+	IRHIResource* FinalColor_get() const;
 
-		vs_property_get(RHI::IRHIDeferredCommandList*, CommandList);
-		RHI::IRHIDeferredCommandList* CommandList_get() const;
-		vs_property_get(RHI::IRHIResource*, FinalColor);
-		RHI::IRHIResource* FinalColor_get() const;
-
-	private:
-		// CALLBACK HANDLERS
-		void Application_OnPostSized(int32 width, int32 height);
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::SceneRendering::SceneRenderer;
-#endif
+private:
+	// CALLBACK HANDLERS
+	void Application_OnPostSized(int32 width, int32 height);
+};

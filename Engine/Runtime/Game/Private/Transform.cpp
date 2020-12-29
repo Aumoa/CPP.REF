@@ -2,10 +2,6 @@
 
 #include "Transform.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Core::Numerics;
-using namespace SC::Runtime::Game;
-
 Transform::Transform()
 {
 

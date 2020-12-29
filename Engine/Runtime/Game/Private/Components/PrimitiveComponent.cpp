@@ -2,9 +2,6 @@
 
 #include "Components/PrimitiveComponent.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::Components;
-
 PrimitiveComponent::PrimitiveComponent() : Super()
 {
 

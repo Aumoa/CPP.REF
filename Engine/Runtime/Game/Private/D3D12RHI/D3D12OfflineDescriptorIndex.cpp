@@ -2,7 +2,6 @@
 
 #include "D3D12OfflineDescriptorIndex.h"
 
-using namespace SC::Runtime::Game::D3D12RHI;
 using namespace std;
 
 D3D12OfflineDescriptorIndex::D3D12OfflineDescriptorIndex() : Super()

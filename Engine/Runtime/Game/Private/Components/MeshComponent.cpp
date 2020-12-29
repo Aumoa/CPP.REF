@@ -2,10 +2,6 @@
 
 #include "Components/MeshComponent.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::Components;
-
 MeshComponent::MeshComponent()
 {
 

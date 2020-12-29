@@ -2,8 +2,6 @@
 
 #include "Components/StaticMeshComponent.h"
 
-using namespace SC::Runtime::Game::Components;
-
 StaticMeshComponent::StaticMeshComponent()
 {
 

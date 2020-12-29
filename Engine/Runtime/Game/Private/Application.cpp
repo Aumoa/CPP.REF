@@ -9,9 +9,6 @@
 #include "Engine.h"
 #include "Logging/LogVerbosity.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::Logging;
 using namespace std;
 
 #define ALLOC_BREAK_NUMBER 0

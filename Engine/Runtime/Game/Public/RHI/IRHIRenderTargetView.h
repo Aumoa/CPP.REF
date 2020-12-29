@@ -5,14 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::RHI
+interface IRHIRenderTargetView : virtual public Object
 {
-	interface IRHIRenderTargetView : virtual public Core::Object
-	{
 
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::RHI::IRHIRenderTargetView;
-#endif
+};

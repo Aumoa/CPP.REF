@@ -12,9 +12,6 @@
 #include "Application.h"
 #include "VulkanSwapChain.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::VulkanRHI;
 using namespace std;
 
 VulkanDeviceBundle::VulkanDeviceBundle() : Super()

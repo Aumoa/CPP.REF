@@ -2,8 +2,6 @@
 
 #include "Components/ActorComponent.h"
 
-using namespace SC::Runtime::Game::Components;
-
 ActorComponent::ActorComponent()
 {
 

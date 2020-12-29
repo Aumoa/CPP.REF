@@ -2,9 +2,6 @@
 
 #include "Level.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::Framework;
 using namespace std;
 
 Level::Level() : Super()

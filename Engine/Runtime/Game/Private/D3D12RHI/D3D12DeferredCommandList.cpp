@@ -2,7 +2,6 @@
 
 #include "D3D12DeferredCommandList.h"
 
-using namespace SC::Runtime::Game::D3D12RHI;
 using namespace std;
 
 D3D12DeferredCommandList::D3D12DeferredCommandList(ID3D12Device* device) : Super()

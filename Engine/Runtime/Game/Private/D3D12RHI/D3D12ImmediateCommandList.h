@@ -9,26 +9,23 @@
 
 #include "D3D12Minimal.h"
 
-namespace SC::Runtime::Game::D3D12RHI
+class D3D12ImmediateCommandList : public D3D12DeferredCommandList, virtual public IRHIImmediateCommandList
 {
-	class D3D12ImmediateCommandList : public D3D12DeferredCommandList, virtual public RHI::IRHIImmediateCommandList
-	{
-	public:
-		using Super = D3D12DeferredCommandList;
-		using This = D3D12ImmediateCommandList;
+public:
+	using Super = D3D12DeferredCommandList;
+	using This = D3D12ImmediateCommandList;
 
-	private:
-		ComPtr<ID3D12Device> device;
-		ComPtr<ID3D12CommandQueue> commandQueue;
+private:
+	ComPtr<ID3D12Device> device;
+	ComPtr<ID3D12CommandQueue> commandQueue;
 
-	public:
-		D3D12ImmediateCommandList(ID3D12Device* device);
-		~D3D12ImmediateCommandList() override;
+public:
+	D3D12ImmediateCommandList(ID3D12Device* device);
+	~D3D12ImmediateCommandList() override;
 
-		virtual void ExecuteCommandList(RHI::IRHIDeferredCommandList* deferredCommandList);
-		virtual void Flush();
+	virtual void ExecuteCommandList(IRHIDeferredCommandList* deferredCommandList);
+	virtual void Flush();
 
-		vs_property_get(ID3D12CommandQueue*, CommandQueue);
-		ID3D12CommandQueue* CommandQueue_get() const;
-	};
-}
+	vs_property_get(ID3D12CommandQueue*, CommandQueue);
+	ID3D12CommandQueue* CommandQueue_get() const;
+};

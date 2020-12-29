@@ -2,8 +2,6 @@
 
 #include "AppDuplicationException.h"
 
-using namespace SC::Runtime::Game;
-
 AppDuplicationException::AppDuplicationException() : Super("App duplication detected.")
 {
 

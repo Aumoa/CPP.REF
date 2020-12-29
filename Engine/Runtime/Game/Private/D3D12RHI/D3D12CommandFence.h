@@ -8,26 +8,23 @@
 
 #include "D3D12Minimal.h"
 
-namespace SC::Runtime::Game::D3D12RHI
+class D3D12CommandFence : virtual public Object, virtual public IRHICommandFence
 {
-	class D3D12CommandFence : virtual public Core::Object, virtual public RHI::IRHICommandFence
-	{
-	public:
-		using Super = Core::Object;
+public:
+	using Super = Object;
 
-	private:
-		ComPtr<ID3D12Fence> fence;
-		uint64 fenceValue;
-		HANDLE hEvent;
+private:
+	ComPtr<ID3D12Fence> fence;
+	uint64 fenceValue;
+	HANDLE hEvent;
 
-	public:
-		D3D12CommandFence(ID3D12Device* device);
-		~D3D12CommandFence() override;
+public:
+	D3D12CommandFence(ID3D12Device* device);
+	~D3D12CommandFence() override;
 
-		virtual void BeginFence();
-		virtual void EndFence(RHI::IRHIImmediateCommandList* immediateCommandList);
+	virtual void BeginFence();
+	virtual void EndFence(IRHIImmediateCommandList* immediateCommandList);
 
-		virtual bool IsFenceCompleted() const;
-		virtual bool Wait() const;
-	};
-}
+	virtual bool IsFenceCompleted() const;
+	virtual bool Wait() const;
+};

@@ -7,8 +7,6 @@
 #include <optional>
 #include "Logging/LogMacros.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::D3D12RHI;
 using namespace std;
 
 D3D12OfflineDescriptorManager::D3D12OfflineDescriptorManager(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, size_t numDescriptorsPerAllocator) : Super()

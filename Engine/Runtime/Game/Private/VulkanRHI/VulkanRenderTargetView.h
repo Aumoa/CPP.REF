@@ -8,23 +8,20 @@
 
 #include "VulkanMinimal.h"
 
-namespace SC::Runtime::Game::VulkanRHI
+class VulkanRenderTargetView : virtual public Object, virtual public IRHIRenderTargetView
 {
-	class VulkanRenderTargetView : virtual public Core::Object, virtual public RHI::IRHIRenderTargetView
-	{
-	public:
-		using Super = Core::Object;
-		using This = VulkanRenderTargetView;
+public:
+	using Super = Object;
+	using This = VulkanRenderTargetView;
 
-	private:
-		VkDevice vkDevice;
-		VkImageView vkImageView;
+private:
+	VkDevice vkDevice;
+	VkImageView vkImageView;
 
-	public:
-		VulkanRenderTargetView(VkDevice vkDevice, VkImageView vkImageView);
-		~VulkanRenderTargetView() override;
+public:
+	VulkanRenderTargetView(VkDevice vkDevice, VkImageView vkImageView);
+	~VulkanRenderTargetView() override;
 
-		vs_property_get(VkImageView, View);
-		VkImageView View_get() const;
-	};
-}
+	vs_property_get(VkImageView, View);
+	VkImageView View_get() const;
+};

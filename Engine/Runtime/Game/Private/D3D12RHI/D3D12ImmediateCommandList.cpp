@@ -4,7 +4,6 @@
 
 #include "Logging/LogMacros.h"
 
-using namespace SC::Runtime::Game::D3D12RHI;
 using namespace std;
 
 D3D12ImmediateCommandList::D3D12ImmediateCommandList(ID3D12Device* device) : Super(device)

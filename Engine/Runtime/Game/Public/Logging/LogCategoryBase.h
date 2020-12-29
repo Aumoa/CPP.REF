@@ -5,27 +5,20 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::Logging
+enum class ELogVerbosity;
+
+struct GAME_API LogCategoryBase
 {
-	enum class ELogVerbosity;
+	friend class Logger;
 
-	struct GAME_API LogCategoryBase
-	{
-		friend class Logger;
+private:
+	TRefPtr<String> CategoryName;
+	ELogVerbosity BaseVerbosity;
 
-	private:
-		Core::TRefPtr<Core::String> CategoryName;
-		ELogVerbosity BaseVerbosity;
+public:
+	LogCategoryBase(ELogVerbosity inBaseVerbosity, TRefPtr<String> inCategoryName);
+	~LogCategoryBase();
 
-	public:
-		LogCategoryBase(ELogVerbosity inBaseVerbosity, Core::TRefPtr<Core::String> inCategoryName);
-		~LogCategoryBase();
-
-	private:
-		ELogVerbosity GetAmendedVerbosity(ELogVerbosity verbosity) const;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Logging::LogCategoryBase;
-#endif
+private:
+	ELogVerbosity GetAmendedVerbosity(ELogVerbosity verbosity) const;
+};

@@ -6,28 +6,18 @@
 #include "CoreMinimal.h"
 #include "Actor.h"
 
-namespace SC::Runtime::Game::Components
+class StaticMeshComponent;
+
+class GAME_API AStaticMeshActor : public AActor
 {
-	class StaticMeshComponent;
-}
+public:
+	using Super = AActor;
+	using This = AStaticMeshActor;
 
-namespace SC::Runtime::Game::Framework
-{
-	class GAME_API AStaticMeshActor : public AActor
-	{
-	public:
-		using Super = AActor;
-		using This = AStaticMeshActor;
+private:
+	StaticMeshComponent* staticMeshComponent;
 
-	private:
-		Components::StaticMeshComponent* staticMeshComponent;
-
-	public:
-		AStaticMeshActor();
-		~AStaticMeshActor();
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Framework::AStaticMeshActor;
-#endif
+public:
+	AStaticMeshActor();
+	~AStaticMeshActor();
+};

@@ -8,58 +8,55 @@
 
 #include "D3D12Minimal.h"
 
-namespace SC::Runtime::Game::D3D12RHI
+class D3D12SwapChain;
+class D3D12ImmediateCommandList;
+class D3D12OfflineDescriptorManager;
+
+class D3D12DeviceBundle : virtual public Object, virtual public IRHIDeviceBundle
 {
-	class D3D12SwapChain;
-	class D3D12ImmediateCommandList;
-	class D3D12OfflineDescriptorManager;
+public:
+	using Super = Object;
+	using This = D3D12DeviceBundle;
 
-	class D3D12DeviceBundle : virtual public Core::Object, virtual public RHI::IRHIDeviceBundle
-	{
-	public:
-		using Super = Core::Object;
-		using This = D3D12DeviceBundle;
+private:
+	static D3D12DeviceBundle* instance;
 
-	private:
-		static D3D12DeviceBundle* instance;
+	ComPtr<IDXGIFactory2> dxgiFactory;
 
-		ComPtr<IDXGIFactory2> dxgiFactory;
+	ComPtr<IDXGIAdapter1> primaryAdapter;
+	ComPtr<ID3D12Device> d3d12Device;
 
-		ComPtr<IDXGIAdapter1> primaryAdapter;
-		ComPtr<ID3D12Device> d3d12Device;
+	TRefPtr<D3D12SwapChain> swapChain;
+	TRefPtr<D3D12ImmediateCommandList> immediateCommandList;
+	TRefPtr<D3D12OfflineDescriptorManager> rtvManager;
+	TRefPtr<D3D12OfflineDescriptorManager> dsvManager;
 
-		Core::TRefPtr<D3D12SwapChain> swapChain;
-		Core::TRefPtr<D3D12ImmediateCommandList> immediateCommandList;
-		Core::TRefPtr<D3D12OfflineDescriptorManager> rtvManager;
-		Core::TRefPtr<D3D12OfflineDescriptorManager> dsvManager;
+public:
+	D3D12DeviceBundle();
+	~D3D12DeviceBundle() override;
 
-	public:
-		D3D12DeviceBundle();
-		~D3D12DeviceBundle() override;
+	virtual void InitializeBundle();
+	virtual void ReleaseBundle();
 
-		virtual void InitializeBundle();
-		virtual void ReleaseBundle();
+	virtual TRefPtr<IRHISwapChain> GetSwapChain() const;
+	virtual TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const;
 
-		virtual Core::TRefPtr<RHI::IRHISwapChain> GetSwapChain() const;
-		virtual Core::TRefPtr<RHI::IRHIImmediateCommandList> GetImmediateCommandList() const;
+	virtual TRefPtr<IRHICommandFence> CreateCommandFence();
+	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource);
+	virtual TRefPtr<IRHIResource> CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags);
+	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 
-		virtual Core::TRefPtr<RHI::IRHICommandFence> CreateCommandFence();
-		virtual Core::TRefPtr<RHI::IRHIRenderTargetView> CreateRenderTargetView(RHI::IRHIResource* resource);
-		virtual Core::TRefPtr<RHI::IRHIResource> CreateTexture2D(RHI::RHITextureFormat format, int32 width, int32 height, RHI::RHIResourceStates initialStates, RHI::RHIResourceFlags flags);
-		virtual Core::TRefPtr<RHI::IRHIDeferredCommandList> CreateDeferredCommandList();
+	vs_property_get(ID3D12Device*, Device);
+	ID3D12Device* Device_get() const;
 
-		vs_property_get(ID3D12Device*, Device);
-		ID3D12Device* Device_get() const;
+private:
+	void InitializeCOM();
+	void InitializeDXGI();
+	void InitializeD3D12();
 
-	private:
-		void InitializeCOM();
-		void InitializeDXGI();
-		void InitializeD3D12();
+	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;
+	bool IsDeviceSuitable(ID3D12Device* device) const;
 
-		bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;
-		bool IsDeviceSuitable(ID3D12Device* device) const;
-
-		// CALLBACK HANDLERS
-		void Application_OnSizing(int32 width, int32 height);
-	};
-}
+	// CALLBACK HANDLERS
+	void Application_OnSizing(int32 width, int32 height);
+};

@@ -6,9 +6,6 @@
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogCategoryBase.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::Logging;
-
 void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, TRefPtr<String> logMessage)
 {
 	TRefPtr<String> categoryName = category.CategoryName;

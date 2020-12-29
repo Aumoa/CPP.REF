@@ -7,43 +7,32 @@
 
 #include "World.h"
 
-namespace SC::Runtime::Game::Framework
+class AActor;
+class World;
+
+class GAME_API Level : virtual public Object
 {
-	class AActor;
-}
+	friend class World;
 
-namespace SC::Runtime::Game
-{
-	class World;
+public:
+	using Super = Object;
+	using This = Level;
 
-	class GAME_API Level : virtual public Core::Object
-	{
-		friend class World;
+private:
+	World* world;
 
-	public:
-		using Super = Core::Object;
-		using This = Level;
+public:
+	Level();
+	~Level() override;
 
-	private:
-		World* world;
+	virtual void LoadLevel();
 
-	public:
-		Level();
-		~Level() override;
+protected:
+	template<class T, class... TArgs> requires TIsAssignable<T*, AActor*> && THasConstructor<T, TArgs...>
+	inline T* SpawnActorPersistent(TArgs&&... constructor_args);
 
-		virtual void LoadLevel();
-
-	protected:
-		template<class T, class... TArgs> requires Core::TIsAssignable<T*, Framework::AActor*> && Core::THasConstructor<T, TArgs...>
-		inline T* SpawnActorPersistent(TArgs&&... constructor_args);
-
-	private:
-		void UnloadLevel();
-	};
-}
+private:
+	void UnloadLevel();
+};
 
 #include "Level.inl"
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Level;
-#endif

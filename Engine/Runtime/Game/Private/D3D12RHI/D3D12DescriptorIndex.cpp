@@ -2,7 +2,6 @@
 
 #include "D3D12DescriptorIndex.h"
 
-using namespace SC::Runtime::Game::D3D12RHI;
 using namespace std;
 
 vector<size_t> D3D12DescriptorIndex::empty_pool;

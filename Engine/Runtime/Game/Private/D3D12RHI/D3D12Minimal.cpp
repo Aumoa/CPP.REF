@@ -4,13 +4,7 @@
 
 #include "Logging/LogVerbosity.h"
 
-using namespace SC::Runtime::Game::Logging;
-using namespace SC::Runtime::Game::RHI;
-
-namespace SC::Runtime::Game::D3D12RHI
-{
-	LogCategoryBase LogD3D12RHI(ELogVerbosity::Verbose, nameof(LogD3D12RHI));
-}
+LogCategoryBase LogD3D12RHI(ELogVerbosity::Verbose, nameof(LogD3D12RHI));
 
 D3D12_RESOURCE_STATES ToD3D12(RHIResourceStates value)
 {

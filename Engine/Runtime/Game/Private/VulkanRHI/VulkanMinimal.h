@@ -15,10 +15,7 @@
 #define interface struct
 #endif
 
-namespace SC::Runtime::Game::VulkanRHI
-{
-	extern Logging::LogCategoryBase LogVulkanRHI;
-}
+extern LogCategoryBase LogVulkanRHI;
 
 #define VK_FAILED(Result) (Result != VK_SUCCESS)
 #define VK_SUCCEEDED(Result) (Result == VK_SUCCESS)

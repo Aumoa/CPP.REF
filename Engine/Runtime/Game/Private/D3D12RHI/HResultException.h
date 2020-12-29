@@ -7,19 +7,16 @@
 
 #include "D3D12Minimal.h"
 
-namespace SC::Runtime::Game::D3D12RHI
+class HResultException : public Exception
 {
-	class HResultException : public Core::Exception
-	{
-	public:
-		using Super = Exception;
-		using This = HResultException;
+public:
+	using Super = Exception;
+	using This = HResultException;
 
-	public:
-		HResultException(HRESULT hr);
-		~HResultException() override;
+public:
+	HResultException(HRESULT hr);
+	~HResultException() override;
 
-	private:
-		static Core::TRefPtr<Core::String> GetHResultString(HRESULT hr);
-	};
-}
+private:
+	static TRefPtr<String> GetHResultString(HRESULT hr);
+};

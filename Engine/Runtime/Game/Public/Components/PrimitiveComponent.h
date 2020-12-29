@@ -6,20 +6,13 @@
 #include "CoreMinimal.h"
 #include "SceneComponent.h"
 
-namespace SC::Runtime::Game::Components
+class GAME_API PrimitiveComponent : public SceneComponent
 {
-	class GAME_API PrimitiveComponent : public SceneComponent
-	{
-	public:
-		using Super = SceneComponent;
-		using This = PrimitiveComponent;
+public:
+	using Super = SceneComponent;
+	using This = PrimitiveComponent;
 
-	public:
-		PrimitiveComponent();
-		~PrimitiveComponent() override;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Components::PrimitiveComponent;
-#endif
+public:
+	PrimitiveComponent();
+	~PrimitiveComponent() override;
+};

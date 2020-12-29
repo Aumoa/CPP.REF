@@ -2,8 +2,6 @@
 
 #include "SceneRendering/Scene.h"
 
-using namespace SC::Runtime::Game::SceneRendering;
-
 Scene::Scene()
 {
 

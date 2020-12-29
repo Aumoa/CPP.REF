@@ -2,16 +2,13 @@
 
 #pragma once
 
-namespace SC::Runtime::Game
+template<class T, class... TArgs> requires TIsAssignable<T*, AActor*> && THasConstructor<T, TArgs...>
+inline T* Level::SpawnActorPersistent(TArgs&&... constructor_args)
 {
-	template<class T, class... TArgs> requires Core::TIsAssignable<T*, Framework::AActor*> && Core::THasConstructor<T, TArgs...>
-	inline T* Level::SpawnActorPersistent(TArgs&&... constructor_args)
+	if (world == nullptr)
 	{
-		if (world == nullptr)
-		{
-			return nullptr;
-		}
-
-		return world->SpawnActor<T>(constructor_args...);
+		return nullptr;
 	}
+
+	return world->SpawnActor<T>(constructor_args...);
 }

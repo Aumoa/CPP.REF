@@ -5,48 +5,41 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game
+struct GAME_API Rotator
 {
-	struct GAME_API Rotator
-	{
-		Core::Mathematics::TDegrees<double> Pitch;
-		Core::Mathematics::TDegrees<double> Yaw;
-		Core::Mathematics::TDegrees<double> Roll;
+	TDegrees<double> Pitch;
+	TDegrees<double> Yaw;
+	TDegrees<double> Roll;
 
-		Rotator();
-		Rotator(const Core::Mathematics::TDegrees<double>& yaw, const Core::Mathematics::TDegrees<double>& pitch, const Core::Mathematics::TDegrees<double>& roll);
-		Rotator(const Core::Numerics::Quaternion& rotation);
-		Rotator(const Rotator& copy);
-		~Rotator();
+	Rotator();
+	Rotator(const TDegrees<double>& yaw, const TDegrees<double>& pitch, const TDegrees<double>& roll);
+	Rotator(const Quaternion& rotation);
+	Rotator(const Rotator& copy);
+	~Rotator();
 		
-		bool Equals(const Rotator& rh) const;
-		bool NearlyEquals(const Rotator& rh, Core::Mathematics::TDegrees<double> epsilon) const;
-		size_t GetHashCode() const;
-		Core::TRefPtr<Core::String> ToString() const;
+	bool Equals(const Rotator& rh) const;
+	bool NearlyEquals(const Rotator& rh, TDegrees<double> epsilon) const;
+	size_t GetHashCode() const;
+	TRefPtr<String> ToString() const;
 
-		Core::Numerics::Vector3 RotateVector(const Core::Numerics::Vector3& v) const;
-		Core::Numerics::Vector3 UnrotateVector(const Core::Numerics::Vector3& v) const;
+	Vector3 RotateVector(const Vector3& v) const;
+	Vector3 UnrotateVector(const Vector3& v) const;
 
-		Rotator& Add(const Core::Mathematics::TDegrees<double>& yawDelta, const Core::Mathematics::TDegrees<double>& pitchDelta, const Core::Mathematics::TDegrees<double>& rollDelta);
-		Rotator Clamp() const;
+	Rotator& Add(const TDegrees<double>& yawDelta, const TDegrees<double>& pitchDelta, const TDegrees<double>& rollDelta);
+	Rotator Clamp() const;
 
-		vs_property_get(Rotator, Inverse);
-		Rotator Inverse_get() const;
-		vs_property_get(Core::Numerics::Quaternion, Rotation);
-		Core::Numerics::Quaternion Rotation_get() const;
-		vs_property_get(Core::Numerics::Matrix4x4, Matrix);
-		Core::Numerics::Matrix4x4 Matrix_get() const;
+	vs_property_get(Rotator, Inverse);
+	Rotator Inverse_get() const;
+	vs_property_get(Quaternion, Rotation);
+	Quaternion Rotation_get() const;
+	vs_property_get(Matrix4x4, Matrix);
+	Matrix4x4 Matrix_get() const;
 
-		Rotator operator -() const;
-		Rotator operator +(const Rotator& right) const;
-		Rotator operator -(const Rotator& right) const;
-		Rotator& operator +=(const Rotator& right);
-		Rotator& operator -=(const Rotator& right);
-		bool operator ==(const Rotator& right) const;
-		bool operator !=(const Rotator& right) const;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Rotator;
-#endif
+	Rotator operator -() const;
+	Rotator operator +(const Rotator& right) const;
+	Rotator operator -(const Rotator& right) const;
+	Rotator& operator +=(const Rotator& right);
+	Rotator& operator -=(const Rotator& right);
+	bool operator ==(const Rotator& right) const;
+	bool operator !=(const Rotator& right) const;
+};

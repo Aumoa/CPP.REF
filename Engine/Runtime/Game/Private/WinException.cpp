@@ -4,9 +4,6 @@
 
 #include "WindowsMinimal.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-
 WinException::WinException() : This(GetLastError())
 {
 

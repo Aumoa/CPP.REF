@@ -5,36 +5,26 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::Logging
+struct LogCategoryBase;
+
+enum class TickingGroup
 {
-	struct LogCategoryBase;
-}
+	PrePhysics,
+	DuringPhysics,
+	PostPhysics,
+	PostUpdateWork
+};
 
-namespace SC::Runtime::Game
+struct GAME_API TickFunction
 {
-	enum class TickingGroup
-	{
-		PrePhysics,
-		DuringPhysics,
-		PostPhysics,
-		PostUpdateWork
-	};
+	static LogCategoryBase LogTicking;
 
-	struct GAME_API TickFunction
-	{
-		static Logging::LogCategoryBase LogTicking;
+	bool bCanEverTick : 1;
+	TickingGroup TickGroup;
+	std::chrono::duration<double> TickInterval;
 
-		bool bCanEverTick : 1;
-		TickingGroup TickGroup;
-		std::chrono::duration<double> TickInterval;
+	TickFunction();
+	~TickFunction();
 
-		TickFunction();
-		~TickFunction();
-
-		virtual void ExecuteTick(std::chrono::duration<double> deltaTime) = 0;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::TickFunction;
-#endif
+	virtual void ExecuteTick(std::chrono::duration<double> deltaTime) = 0;
+};

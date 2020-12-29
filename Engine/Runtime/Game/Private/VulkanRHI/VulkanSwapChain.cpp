@@ -4,9 +4,6 @@
 
 #include "VulkanResource.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::VulkanRHI;
-using namespace SC::Runtime::Game::RHI;
 using namespace std;
 
 VulkanSwapChain::VulkanSwapChain(VkDevice vkDevice, VkSurfaceKHR vkSurface, int32 width, int32 height) : Super()

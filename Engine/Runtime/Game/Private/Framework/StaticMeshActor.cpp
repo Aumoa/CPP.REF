@@ -4,10 +4,6 @@
 
 #include "Components/StaticMeshComponent.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::Framework;
-using namespace SC::Runtime::Game::Components;
-
 AStaticMeshActor::AStaticMeshActor() : Super()
 	, staticMeshComponent(nullptr)
 {

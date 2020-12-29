@@ -5,8 +5,6 @@
 #include "D3D12RenderTargetView.h"
 #include "D3D12Resource.h"
 
-using namespace SC::Runtime::Game::D3D12RHI;
-using namespace SC::Runtime::Game::RHI;
 using namespace std;
 
 D3D12CommandList::D3D12CommandList() : Super()
@@ -46,7 +44,7 @@ void D3D12CommandList::OMSetRenderTargets(size_t count, IRHIRenderTargetView* rt
 	CommandList->OMSetRenderTargets((UINT)count, handles.data(), FALSE, nullptr);
 }
 
-void D3D12CommandList::ClearRenderTargetView(RHI::IRHIRenderTargetView* rtv)
+void D3D12CommandList::ClearRenderTargetView(IRHIRenderTargetView* rtv)
 {
 	ConsumePendingDeferredCommands();
 

@@ -8,27 +8,20 @@
 
 #include "Transform.h"
 
-namespace SC::Runtime::Game::Components
+class GAME_API SceneComponent : public ActorComponent
 {
-	class GAME_API SceneComponent : public ActorComponent
-	{
-	public:
-		using Super = ActorComponent;
-		using This = SceneComponent;
+public:
+	using Super = ActorComponent;
+	using This = SceneComponent;
 
-	private:
-		Transform transform;
+private:
+	Transform transform;
 
-	public:
-		SceneComponent();
-		~SceneComponent();
+public:
+	SceneComponent();
+	~SceneComponent();
 
-		vs_property(Transform, RelativeTransform);
-		Transform RelativeTransform_get() const;
-		void RelativeTransform_set(const Transform& value);
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::Components::SceneComponent;
-#endif
+	vs_property(Transform, RelativeTransform);
+	Transform RelativeTransform_get() const;
+	void RelativeTransform_set(const Transform& value);
+};

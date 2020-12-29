@@ -4,9 +4,4 @@
 
 #include "Logging/LogVerbosity.h"
 
-using namespace SC::Runtime::Game::Logging;
-
-namespace SC::Runtime::Game::VulkanRHI
-{
-	LogCategoryBase LogVulkanRHI(ELogVerbosity::Verbose, nameof(LogVulkanRHI));
-}
+LogCategoryBase LogVulkanRHI(ELogVerbosity::Verbose, nameof(LogVulkanRHI));

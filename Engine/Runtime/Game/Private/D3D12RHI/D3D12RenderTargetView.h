@@ -9,24 +9,21 @@
 #include "D3D12Minimal.h"
 #include "D3D12DescriptorIndex.h"
 
-namespace SC::Runtime::Game::D3D12RHI
+struct D3D12DescriptorIndex;
+
+class D3D12RenderTargetView : virtual public Object, virtual public IRHIRenderTargetView
 {
-	struct D3D12DescriptorIndex;
+public:
+	using Super = Object;
+	using This = D3D12RenderTargetView;
 
-	class D3D12RenderTargetView : virtual public Core::Object, virtual public RHI::IRHIRenderTargetView
-	{
-	public:
-		using Super = Core::Object;
-		using This = D3D12RenderTargetView;
+private:
+	D3D12DescriptorIndex handle;
 
-	private:
-		D3D12DescriptorIndex handle;
+public:
+	D3D12RenderTargetView(ID3D12Resource* resource, const D3D12DescriptorIndex& handle);
+	~D3D12RenderTargetView() override;
 
-	public:
-		D3D12RenderTargetView(ID3D12Resource* resource, const D3D12DescriptorIndex& handle);
-		~D3D12RenderTargetView() override;
-
-		vs_property_get(D3D12_CPU_DESCRIPTOR_HANDLE, Handle);
-		D3D12_CPU_DESCRIPTOR_HANDLE Handle_get() const;
-	};
-}
+	vs_property_get(D3D12_CPU_DESCRIPTOR_HANDLE, Handle);
+	D3D12_CPU_DESCRIPTOR_HANDLE Handle_get() const;
+};

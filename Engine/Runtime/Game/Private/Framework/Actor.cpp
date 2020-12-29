@@ -5,9 +5,6 @@
 #include "Components/SceneComponent.h"
 #include "Logging/LogMacros.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::Framework;
-using namespace SC::Runtime::Game::Components;
 using namespace std;
 using namespace std::chrono;
 

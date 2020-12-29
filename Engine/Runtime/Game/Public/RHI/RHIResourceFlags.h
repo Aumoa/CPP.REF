@@ -5,47 +5,35 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::RHI
+enum class RHIResourceFlags
 {
-	enum class RHIResourceFlags
-	{
-		None = 0,
-		AllowRenderTarget = 0b1
-	};
+	None = 0,
+	AllowRenderTarget = 0b1
+};
 
-	inline RHIResourceFlags operator |(RHIResourceFlags lh, RHIResourceFlags rh)
-	{
-		return (RHIResourceFlags)((int32)lh | (int32)rh);
-	}
-
-	inline RHIResourceFlags operator &(RHIResourceFlags lh, RHIResourceFlags rh)
-	{
-		return (RHIResourceFlags)((int32)lh & (int32)rh);
-	}
-
-	inline RHIResourceFlags& operator |=(RHIResourceFlags& lh, RHIResourceFlags rh)
-	{
-		lh = lh | rh;
-		return lh;
-	}
-
-	inline RHIResourceFlags& operator &=(RHIResourceFlags& lh, RHIResourceFlags rh)
-	{
-		lh = lh & rh;
-		return lh;
-	}
-
-	inline RHIResourceFlags operator ~(RHIResourceFlags unary)
-	{
-		return (RHIResourceFlags)(~(int32)unary);
-	}
+inline RHIResourceFlags operator |(RHIResourceFlags lh, RHIResourceFlags rh)
+{
+	return (RHIResourceFlags)((int32)lh | (int32)rh);
 }
 
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::RHI::RHIResourceFlags;
-using SC::Runtime::Game::RHI::operator |;
-using SC::Runtime::Game::RHI::operator &;
-using SC::Runtime::Game::RHI::operator |=;
-using SC::Runtime::Game::RHI::operator &=;
-using SC::Runtime::Game::RHI::operator ~;
-#endif
+inline RHIResourceFlags operator &(RHIResourceFlags lh, RHIResourceFlags rh)
+{
+	return (RHIResourceFlags)((int32)lh & (int32)rh);
+}
+
+inline RHIResourceFlags& operator |=(RHIResourceFlags& lh, RHIResourceFlags rh)
+{
+	lh = lh | rh;
+	return lh;
+}
+
+inline RHIResourceFlags& operator &=(RHIResourceFlags& lh, RHIResourceFlags rh)
+{
+	lh = lh & rh;
+	return lh;
+}
+
+inline RHIResourceFlags operator ~(RHIResourceFlags unary)
+{
+	return (RHIResourceFlags)(~(int32)unary);
+}

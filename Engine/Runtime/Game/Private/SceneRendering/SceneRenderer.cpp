@@ -11,9 +11,6 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "Application.h"
 
-using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::SceneRendering;
-
 SceneRenderer::SceneRenderer(IRHIDeviceBundle* deviceBundle) : Super()
 	, deviceBundle(deviceBundle)
 {

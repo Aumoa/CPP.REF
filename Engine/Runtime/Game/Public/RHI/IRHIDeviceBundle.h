@@ -6,31 +6,24 @@
 #include "CoreMinimal.h"
 #include "IRHIBundle.h"
 
-namespace SC::Runtime::Game::RHI
+interface IRHISwapChain;
+interface IRHIImmediateCommandList;
+interface IRHICommandFence;
+interface IRHIRenderTargetView;
+interface IRHIResource;
+interface IRHIDeferredCommandList;
+
+enum class RHITextureFormat;
+enum class RHIResourceFlags;
+enum class RHIResourceStates;
+
+interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 {
-	interface IRHISwapChain;
-	interface IRHIImmediateCommandList;
-	interface IRHICommandFence;
-	interface IRHIRenderTargetView;
-	interface IRHIResource;
-	interface IRHIDeferredCommandList;
+	virtual TRefPtr<IRHISwapChain> GetSwapChain() const = 0;
+	virtual TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const = 0;
 
-	enum class RHITextureFormat;
-	enum class RHIResourceFlags;
-	enum class RHIResourceStates;
-
-	interface IRHIDeviceBundle : virtual public Core::Object, virtual public IRHIBundle
-	{
-		virtual Core::TRefPtr<IRHISwapChain> GetSwapChain() const = 0;
-		virtual Core::TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const = 0;
-
-		virtual Core::TRefPtr<IRHICommandFence> CreateCommandFence() = 0;
-		virtual Core::TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
-		virtual Core::TRefPtr<IRHIResource> CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags) = 0;
-		virtual Core::TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::RHI::IRHIDeviceBundle;
-#endif
+	virtual TRefPtr<IRHICommandFence> CreateCommandFence() = 0;
+	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
+	virtual TRefPtr<IRHIResource> CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags) = 0;
+	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
+};

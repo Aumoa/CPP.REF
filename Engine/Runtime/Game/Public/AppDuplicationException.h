@@ -5,20 +5,13 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game
+class GAME_API AppDuplicationException : public Exception
 {
-	class GAME_API AppDuplicationException : public Core::Exception
-	{
-	public:
-		using Super = Core::Exception;
-		using This = AppDuplicationException;
+public:
+	using Super = Exception;
+	using This = AppDuplicationException;
 
-	public:
-		AppDuplicationException();
-		~AppDuplicationException() override;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::AppDuplicationException;
-#endif
+public:
+	AppDuplicationException();
+	~AppDuplicationException() override;
+};

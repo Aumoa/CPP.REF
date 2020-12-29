@@ -5,20 +5,13 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-namespace SC::Runtime::Game::RHI
+interface IRHIImmediateCommandList;
+
+interface IRHICommandFence : virtual public Object
 {
-	interface IRHIImmediateCommandList;
+	virtual void BeginFence() = 0;
+	virtual void EndFence(IRHIImmediateCommandList* immediateCommandList) = 0;
 
-	interface IRHICommandFence : virtual public Core::Object
-	{
-		virtual void BeginFence() = 0;
-		virtual void EndFence(IRHIImmediateCommandList* immediateCommandList) = 0;
-
-		virtual bool IsFenceCompleted() const = 0;
-		virtual bool Wait() const = 0;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::RHI::IRHICommandFence;
-#endif
+	virtual bool IsFenceCompleted() const = 0;
+	virtual bool Wait() const = 0;
+};

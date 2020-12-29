@@ -14,11 +14,6 @@
 #include "D3D12Resource.h"
 #include "D3D12DeferredCommandList.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::D3D12RHI;
-
 D3D12DeviceBundle* D3D12DeviceBundle::instance = nullptr;
 
 D3D12DeviceBundle::D3D12DeviceBundle() : Super()

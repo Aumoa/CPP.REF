@@ -5,9 +5,6 @@
 #include "Logging/LogMacros.h"
 #include "D3D12ImmediateCommandList.h"
 
-using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::D3D12RHI;
-
 D3D12CommandFence::D3D12CommandFence(ID3D12Device* device) : Super()
 	, fenceValue(0)
 	, hEvent(nullptr)

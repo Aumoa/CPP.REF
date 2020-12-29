@@ -6,25 +6,18 @@
 #include "CoreMinimal.h"
 #include "SceneRenderer.h"
 
-namespace SC::Runtime::Game::SceneRendering
+class GAME_API DeferredSceneRenderer : public SceneRenderer
 {
-	class GAME_API DeferredSceneRenderer : public SceneRenderer
-	{
-	public:
-		using Super = SceneRenderer;
-		using This = SceneRenderer;
+public:
+	using Super = SceneRenderer;
+	using This = SceneRenderer;
 
-	private:
+private:
 
-	public:
-		DeferredSceneRenderer(RHI::IRHIDeviceBundle* deviceBundle);
-		~DeferredSceneRenderer() override;
+public:
+	DeferredSceneRenderer(IRHIDeviceBundle* deviceBundle);
+	~DeferredSceneRenderer() override;
 
-		void BeginRender() override;
-		void EndRender() override;
-	};
-}
-
-#ifdef __SC_GLOBAL_NAMESPACE__
-using SC::Runtime::Game::SceneRendering::DeferredSceneRenderer;
-#endif
+	void BeginRender() override;
+	void EndRender() override;
+};

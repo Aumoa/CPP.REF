@@ -2,11 +2,8 @@
 
 #pragma once
 
-namespace SC::Runtime::Game::Logging
+template<class... TArgs>
+inline void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, TRefPtr<String> logFormat, TArgs... args)
 {
-	template<class... TArgs>
-	inline void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, Core::TRefPtr<Core::String> logFormat, TArgs... args)
-	{
-		Log(category, inVerbosity, Core::String::Format(logFormat, args...));
-	}
+	Log(category, inVerbosity, String::Format(logFormat, args...));
 }

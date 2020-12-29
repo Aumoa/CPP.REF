@@ -2,8 +2,6 @@
 
 #include "VulkanCommandList.h"
 
-using namespace SC::Runtime::Game::VulkanRHI;
-
 VulkanCommandList::VulkanCommandList() : Super()
 {
 	// TODO: NOTIMPL

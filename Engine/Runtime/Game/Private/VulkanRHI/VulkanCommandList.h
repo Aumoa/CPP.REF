@@ -8,28 +8,25 @@
 
 #include "VulkanMinimal.h"
 
-namespace SC::Runtime::Game::VulkanRHI
+class VulkanCommandList : virtual public Object, virtual public IRHICommandList
 {
-	class VulkanCommandList : virtual public Core::Object, virtual public RHI::IRHICommandList
-	{
-	public:
-		using Super = Core::Object;
-		using This = VulkanCommandList;
+public:
+	using Super = Object;
+	using This = VulkanCommandList;
 
-	private:
+private:
 
-	public:
-		VulkanCommandList();
-		~VulkanCommandList() override;
+public:
+	VulkanCommandList();
+	~VulkanCommandList() override;
 
-		virtual void BeginCommand();
-		virtual void EndCommand();
+	virtual void BeginCommand();
+	virtual void EndCommand();
 
-		virtual void OMSetRenderTargets(size_t count, RHI::IRHIRenderTargetView* rtv[]);
-		virtual void ClearRenderTargetView(RHI::IRHIRenderTargetView* rtv);
-		virtual void ResourceTransition(RHI::IRHIResource* resource, RHI::RHIResourceStates beforeState, RHI::RHIResourceStates afterState, size_t subresourceIndex = 0);
-		virtual void CopyResource(RHI::IRHIResource* target, RHI::IRHIResource* source);
+	virtual void OMSetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]);
+	virtual void ClearRenderTargetView(IRHIRenderTargetView* rtv);
+	virtual void ResourceTransition(IRHIResource* resource, RHIResourceStates beforeState, RHIResourceStates afterState, size_t subresourceIndex = 0);
+	virtual void CopyResource(IRHIResource* target, IRHIResource* source);
 
-		virtual bool HasBegunCommand_get() const;
-	};
-}
+	virtual bool HasBegunCommand_get() const;
+};

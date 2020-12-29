@@ -18,12 +18,6 @@
 #include "D3D12RHI/D3D12DeviceBundle.h"
 //#include "VulkanRHI/VulkanDeviceBundle.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::RHI;
-using namespace SC::Runtime::Game::D3D12RHI;
-using namespace SC::Runtime::Game::Logging;
-using namespace SC::Runtime::Game::SceneRendering;
 using namespace std;
 using namespace std::chrono;
 

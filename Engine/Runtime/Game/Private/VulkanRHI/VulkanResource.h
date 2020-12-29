@@ -8,23 +8,20 @@
 
 #include "VulkanMinimal.h"
 
-namespace SC::Runtime::Game::VulkanRHI
+class VulkanResource : virtual public Object, virtual public IRHIResource
 {
-	class VulkanResource : virtual public Core::Object, virtual public RHI::IRHIResource
-	{
-	public:
-		using Super = Core::Object;
-		using This = VulkanResource;
+public:
+	using Super = Object;
+	using This = VulkanResource;
 
-	private:
-		const bool bDynamic : 1;
-		VkImage vkImage;
+private:
+	const bool bDynamic : 1;
+	VkImage vkImage;
 
-	public:
-		VulkanResource(VkImage vkImage, bool bDynamic);
-		~VulkanResource() override;
+public:
+	VulkanResource(VkImage vkImage, bool bDynamic);
+	~VulkanResource() override;
 
-		vs_property_get(VkImage, Image);
-		VkImage Image_get() const;
-	};
-}
+	vs_property_get(VkImage, Image);
+	VkImage Image_get() const;
+};

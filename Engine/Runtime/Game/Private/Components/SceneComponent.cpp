@@ -2,10 +2,6 @@
 
 #include "Components/SceneComponent.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game;
-using namespace SC::Runtime::Game::Components;
-
 SceneComponent::SceneComponent() : Super()
 	, transform(Transform::Identity)
 {

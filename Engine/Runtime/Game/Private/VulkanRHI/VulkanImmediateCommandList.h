@@ -9,26 +9,20 @@
 
 #include "VulkanMinimal.h"
 
-namespace SC::Runtime::Game::RHI
+interface IRHIDeferredCommandList;
+
+class VulkanImmediateCommandList : public VulkanCommandList, virtual public IRHIImmediateCommandList
 {
-	interface IRHIDeferredCommandList;
-}
+public:
+	using Super = VulkanCommandList;
+	using This = VulkanImmediateCommandList;
 
-namespace SC::Runtime::Game::VulkanRHI
-{
-	class VulkanImmediateCommandList : public VulkanCommandList, virtual public RHI::IRHIImmediateCommandList
-	{
-	public:
-		using Super = VulkanCommandList;
-		using This = VulkanImmediateCommandList;
+private:
 
-	private:
+public:
+	VulkanImmediateCommandList();
+	~VulkanImmediateCommandList() override;
 
-	public:
-		VulkanImmediateCommandList();
-		~VulkanImmediateCommandList() override;
-
-		virtual void ExecuteCommandList(RHI::IRHIDeferredCommandList* deferredCommandList);
-		virtual void Flush();
-	};
-}
+	virtual void ExecuteCommandList(IRHIDeferredCommandList* deferredCommandList);
+	virtual void Flush();
+};

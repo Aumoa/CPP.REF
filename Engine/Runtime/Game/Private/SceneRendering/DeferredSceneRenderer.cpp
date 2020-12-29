@@ -2,10 +2,7 @@
 
 #include "SceneRendering/DeferredSceneRenderer.h"
 
-using namespace SC::Runtime::Core;
-using namespace SC::Runtime::Game::SceneRendering;
-
-DeferredSceneRenderer::DeferredSceneRenderer(RHI::IRHIDeviceBundle* deviceBundle) : Super(deviceBundle)
+DeferredSceneRenderer::DeferredSceneRenderer(IRHIDeviceBundle* deviceBundle) : Super(deviceBundle)
 {
 
 }
