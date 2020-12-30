@@ -9,14 +9,16 @@ struct LogCategoryBase;
 
 enum class TickingGroup
 {
-	PrePhysics,
-	DuringPhysics,
-	PostPhysics,
-	PostUpdateWork
+	PrePhysics = 0,
+	DuringPhysics = 1,
+	PostPhysics = 2,
+	PostUpdateWork = 3
 };
 
 struct GAME_API TickFunction
 {
+	using This = TickFunction;
+
 	static LogCategoryBase LogTicking;
 
 	bool bCanEverTick : 1;

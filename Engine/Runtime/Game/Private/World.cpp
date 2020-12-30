@@ -4,13 +4,15 @@
 
 #include "Level.h"
 #include "Framework/Actor.h"
+#include "SceneRendering/Scene.h"
+#include "Components/PrimitiveComponent.h"
 
 using namespace std;
 using namespace std::chrono;
 
 World::World()
 {
-
+	scene = NewObject<Scene>();
 }
 
 World::~World()
@@ -24,7 +26,10 @@ World::~World()
 
 void World::Tick(duration<double> deltaTime)
 {
-	Tick_PrePhysics(deltaTime);
+	Tick_Group(deltaTime, TickingGroup::PrePhysics);
+	Tick_Group(deltaTime, TickingGroup::DuringPhysics);
+	Tick_Group(deltaTime, TickingGroup::PostPhysics);
+	Tick_Group(deltaTime, TickingGroup::PostUpdateWork);
 }
 
 void World::LoadLevel(Level* loadLevel)
@@ -43,15 +48,16 @@ void World::LoadLevel(Level* loadLevel)
 	}
 }
 
-void World::Tick_PrePhysics(duration<double> deltaTime)
+Scene* World::GetScene() const
 {
-	auto it = tickGroups.find(TickingGroup::PrePhysics);
-	if (it == tickGroups.end())
-	{
-		return;
-	}
+	return scene.Get();
+}
 
-	for (auto& item : it->second)
+void World::Tick_Group(duration<double> deltaTime, TickingGroup group)
+{
+	set<TickFunction*>& tickGroup = tickGroups[(size_t)group];
+
+	for (auto& item : tickGroup)
 	{
 		item->ExecuteTick(deltaTime);
 	}
@@ -62,17 +68,48 @@ AActor* World::SpawnActorInternal(TRefPtr<AActor> actor)
 	AActor* actor_ptr = actor.Get();
 	actors.push_back(move(actor));
 
-	// Add to tick group.
-	if (actor_ptr->PrimaryActorTick.bCanEverTick)
-	{
-		auto tickGroup = actor_ptr->PrimaryActorTick.TickGroup;
-		auto it = tickGroups.find(tickGroup);
-		if (it == tickGroups.end())
-		{
-			it = tickGroups.insert({ tickGroup, { } }).first;
-		}
-		it->second.emplace_back(&actor_ptr->PrimaryActorTick);
-	}
+	AddTickGroup(actor_ptr);
+	AddSceneProxy(actor_ptr);
 
 	return actor_ptr;
+}
+
+void World::AddTickGroup(AActor* actor_ptr)
+{
+	// Add to tick group.
+	if (auto& tickFunction = actor_ptr->PrimaryActorTick; tickFunction.bCanEverTick)
+	{
+		auto tickGroup = tickFunction.TickGroup;
+		tickGroups[(size_t)tickGroup].emplace(&tickFunction);
+	}
+
+	// Add all components to tick group.
+	list<ActorComponent*> actorComponents = actor_ptr->GetComponents<ActorComponent>();
+	for (auto& component : actorComponents)
+	{
+		if (auto& tickFunction = component->PrimaryComponentTick; tickFunction.bCanEverTick)
+		{
+			auto tickGroup = tickFunction.TickGroup;
+			tickGroups[(size_t)tickGroup].emplace(&tickFunction);
+		}
+	}
+}
+
+void World::AddSceneProxy(AActor* actor_ptr)
+{
+	list<PrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<PrimitiveComponent>();
+	
+	for (auto& item : primitiveComponents)
+	{
+		if (item->HasDirtyMark())
+		{
+			item->ResolveDirtyState();
+		}
+
+		PrimitiveSceneProxy* sceneProxy = item->GetSceneProxy();
+		if (sceneProxy != nullptr)
+		{
+			scene->AddScene(sceneProxy);
+		}
+	}
 }

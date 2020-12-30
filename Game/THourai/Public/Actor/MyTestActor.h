@@ -6,11 +6,16 @@
 #include "GameMinimal.h"
 #include "Framework/Actor.h"
 
+class StaticMeshComponent;
+
 class TH_API AMyTestActor : public AActor
 {
 public:
 	using Super = AActor;
 	using This = AMyTestActor;
+
+private:
+	TRefPtr<StaticMeshComponent> staticMeshComponent;
 
 public:
 	AMyTestActor();

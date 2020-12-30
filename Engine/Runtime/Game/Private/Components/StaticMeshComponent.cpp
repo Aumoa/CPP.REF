@@ -2,6 +2,8 @@
 
 #include "Components/StaticMeshComponent.h"
 
+#include "SceneRendering/StaticMeshSceneProxy.h"
+
 StaticMeshComponent::StaticMeshComponent()
 {
 
@@ -10,4 +12,9 @@ StaticMeshComponent::StaticMeshComponent()
 StaticMeshComponent::~StaticMeshComponent()
 {
 
+}
+
+TRefPtr<PrimitiveSceneProxy> StaticMeshComponent::CreateSceneProxy()
+{
+	return NewObject<StaticMeshSceneProxy>(this);
 }

@@ -10,15 +10,19 @@
 #include <tuple>
 #include <array>
 #include <chrono>
+#include <stack>
 #include "TickFunction.h"
+#include "Components/SceneComponent.h"
 
-class ActorComponent;
-class SceneComponent;
+class World;
 
 class GAME_API AActor : virtual public Object
 {
 	struct ActorTickFunction : public TickFunction
 	{
+		using Super = TickFunction;
+		using This = ActorTickFunction;
+
 		AActor* Target;
 
 		ActorTickFunction();
@@ -36,6 +40,9 @@ private:
 	std::map<size_t, std::list<ActorComponent*>> hierarchy;
 	TRefPtr<SceneComponent> rootComponent;
 	ActorTickFunction primaryActorTick;
+	bool bActorTickEnabled : 1;
+	bool bActorHasBegunPlay : 1;
+	World* world;
 
 public:
 	AActor();
@@ -55,11 +62,19 @@ public:
 	template<class T> requires TIsAssignable<T*, ActorComponent*>
 	inline std::list<T*> GetComponents() const;
 
+	World* GetWorld() const;
+	void SetWorld(World* inWorld);
+
 	vs_property(SceneComponent*, RootComponent);
 	SceneComponent* RootComponent_get() const;
 	void RootComponent_set(SceneComponent* value);
-	vs_property(ActorTickFunction&, PrimaryActorTick);
+	vs_property_get(ActorTickFunction&, PrimaryActorTick);
 	ActorTickFunction& PrimaryActorTick_get();
+	vs_property(bool, ActorTickEnabled);
+	bool ActorTickEnabled_get() const;
+	void ActorTickEnabled_set(bool value);
+	vs_property_get(bool, HasBegunPlay);
+	bool HasBegunPlay_get() const;
 
 private:
 	bool AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num);

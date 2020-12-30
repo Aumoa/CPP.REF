@@ -44,3 +44,8 @@ void GameInstance::EndPlay()
 {
 
 }
+
+World* GameInstance::GetWorld() const
+{
+	return world.Get();
+}

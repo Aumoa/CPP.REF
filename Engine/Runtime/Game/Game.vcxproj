@@ -129,6 +129,12 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>D3D12.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+      <VariableName>p%(Filename)</VariableName>
+      <HeaderFileOutput>Private\Shaders\Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <ObjectFileOutput />
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,6 +155,12 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>D3D12.lib;DXGI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+      <VariableName>p%(Filename)</VariableName>
+      <HeaderFileOutput>Private\Shaders\Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <ObjectFileOutput />
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Private\D3D12RHI\D3D12CommandFence.h" />
@@ -201,13 +213,17 @@
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
+    <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h" />
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
+    <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h" />
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
@@ -251,10 +267,14 @@
     <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
+    <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
@@ -274,6 +294,20 @@
     <None Include="Public\Application.inl" />
     <None Include="Public\Framework\Actor.inl" />
     <None Include="Public\Logging\Logger.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Private\Shaders\PixelShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\VertexShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

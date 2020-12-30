@@ -33,4 +33,6 @@ public:
 	virtual void EndPlay();
 
 	virtual Level* GetStartupLevel() = 0;
+
+	World* GetWorld() const;
 };

@@ -14,5 +14,10 @@ Scene::~Scene()
 
 void Scene::Render(SceneRenderer* renderer)
 {
+	
+}
 
+void Scene::AddScene(PrimitiveSceneProxy* inSceneProxy)
+{
+	sceneProxies.emplace_back(inSceneProxy);
 }

@@ -40,6 +40,12 @@
     <Filter Include="Private\VulkanRHI">
       <UniqueIdentifier>{7df3d8a5-eced-4645-9eb2-59b064c03fa5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\Shaders">
+      <UniqueIdentifier>{5ef71315-a72a-49bb-a56d-a8d89c76164b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\RHI">
+      <UniqueIdentifier>{e96d80f9-da6a-4dad-ac0f-25a9e8a4d181}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -228,6 +234,18 @@
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h">
       <Filter>Private\VulkanRHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\MeshBatch.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -338,6 +356,18 @@
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\MeshBatch.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -379,5 +409,13 @@
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp">
       <Filter>Private\VulkanRHI</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Private\Shaders\VertexShader.hlsl">
+      <Filter>Private\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\PixelShader.hlsl">
+      <Filter>Private\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

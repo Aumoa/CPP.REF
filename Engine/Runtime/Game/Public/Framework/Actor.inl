@@ -38,7 +38,42 @@ inline T* AActor::GetComponent() const
 	auto it = hierarchy.find(HashCode);
 	if (it == hierarchy.end())
 	{
-		return nullptr;
+		if constexpr (!std::is_base_of_v<SceneComponent, T>)
+		{
+			return nullptr;
+		}
+
+		if (!rootComponent.IsValid)
+		{
+			return nullptr;
+		}
+
+		std::stack<SceneComponent*> roots;
+		roots.push(rootComponent.Get());
+
+		while (!roots.empty())
+		{
+			std::stack<SceneComponent*> stack_pop;
+			std::stack<SceneComponent*> stack_push;
+
+			roots.swap(stack_pop);
+			while (!stack_pop.empty())
+			{
+				auto parent = stack_pop.top();
+				stack_pop.pop();
+
+				if (auto ptr = Cast<T>(parent))
+				{
+					return ptr;
+				}
+
+				for (auto child : parent->GetChildComponents())
+				{
+					stack_push.push(child.Get());
+				}
+			}
+			roots.swap(stack_push);
+		}
 	}
 
 	return it->second.front();
@@ -48,14 +83,49 @@ template<class T> requires TIsAssignable<T*, ActorComponent*>
 inline std::list<T*> AActor::GetComponents() const
 {
 	constexpr size_t HashCode = TUniqueType<T>::HashCode;
+	
+	std::list<T*> items;
 
 	auto it = hierarchy.find(HashCode);
-	if (it == hierarchy.end())
+	if (it != hierarchy.end())
 	{
-		return { };
+		for (auto& item : it->second)
+		{
+			items.emplace_back(Cast<T>(item));
+		}
 	}
 
-	return it->second;
+	if constexpr (std::is_base_of_v<SceneComponent, T>)
+	{
+		std::stack<SceneComponent*> roots;
+		roots.push(rootComponent.Get());
+
+		while (!roots.empty())
+		{
+			std::stack<SceneComponent*> stack_pop;
+			std::stack<SceneComponent*> stack_push;
+
+			roots.swap(stack_pop);
+			while (!stack_pop.empty())
+			{
+				auto parent = stack_pop.top();
+				stack_pop.pop();
+
+				if (auto ptr = Cast<T>(parent))
+				{
+					items.emplace_back(ptr);
+				}
+
+				for (auto child : parent->GetChildComponents())
+				{
+					stack_push.push(child.Get());
+				}
+			}
+			roots.swap(stack_push);
+		}
+	}
+
+	return items;
 }
 
 template<class... TArgs, size_t... Indices>

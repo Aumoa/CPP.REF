@@ -15,4 +15,6 @@ public:
 public:
 	StaticMeshComponent();
 	~StaticMeshComponent() override;
+
+	TRefPtr<PrimitiveSceneProxy> CreateSceneProxy() override;
 };

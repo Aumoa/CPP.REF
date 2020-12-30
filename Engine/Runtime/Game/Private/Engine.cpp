@@ -9,6 +9,7 @@
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
 #include "SceneRendering/SceneRenderer.h"
+#include "SceneRendering/Scene.h"
 #include "RHI/IRHICommandFence.h"
 #include "RHI/IRHIImmediateCommandList.h"
 #include "RHI/RHIResourceStates.h"
@@ -87,6 +88,7 @@ void Engine::Tick()
 
 	// TODO: SceneRenderer
 	sceneRenderer->BeginRender();
+	gameInstance->GetWorld()->GetScene()->Render(sceneRenderer.Get());
 	sceneRenderer->EndRender();
 	immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
 

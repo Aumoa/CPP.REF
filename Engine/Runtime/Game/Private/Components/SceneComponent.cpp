@@ -2,6 +2,8 @@
 
 #include "Components/SceneComponent.h"
 
+using namespace std;
+
 SceneComponent::SceneComponent() : Super()
 	, transform(Transform::Identity)
 {
@@ -21,4 +23,9 @@ Transform SceneComponent::RelativeTransform_get() const
 void SceneComponent::RelativeTransform_set(const Transform& value)
 {
 	transform = value;
+}
+
+const vector<TRefPtr<SceneComponent>>& SceneComponent::GetChildComponents() const
+{
+	return childComponents;
 }

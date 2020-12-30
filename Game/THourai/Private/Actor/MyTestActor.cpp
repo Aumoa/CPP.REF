@@ -2,12 +2,17 @@
 
 #include "Actor/MyTestActor.h"
 
+#include "Components/StaticMeshComponent.h"
+
 using namespace std;
 using namespace std::chrono;
 
 AMyTestActor::AMyTestActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	staticMeshComponent = NewObject<StaticMeshComponent>();
+	RootComponent = staticMeshComponent.Get();
 }
 
 AMyTestActor::~AMyTestActor()
@@ -18,6 +23,4 @@ AMyTestActor::~AMyTestActor()
 void AMyTestActor::Tick(duration<double> deltaTime)
 {
 	Super::Tick(deltaTime);
-
-	TH_LOG(LogTH, Verbose, L"AMyTestActor::Tick");
 }

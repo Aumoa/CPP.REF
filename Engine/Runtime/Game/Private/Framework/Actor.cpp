@@ -8,8 +8,8 @@
 using namespace std;
 using namespace std::chrono;
 
-AActor::ActorTickFunction::ActorTickFunction()
-	: Target(nullptr)
+AActor::ActorTickFunction::ActorTickFunction() : Super()
+	, Target(nullptr)
 {
 
 }
@@ -27,10 +27,16 @@ void AActor::ActorTickFunction::ExecuteTick(duration<double> deltaTime)
 		return;
 	}
 
-	Target->Tick(deltaTime);
+	if (Target->HasBegunPlay && Target->ActorTickEnabled)
+	{
+		Target->Tick(deltaTime);
+	}
 }
 
 AActor::AActor() : Super()
+	, bActorTickEnabled(true)
+	, world(nullptr)
+	, bActorHasBegunPlay(false)
 {
 	PrimaryActorTick.Target = this;
 }
@@ -42,17 +48,27 @@ AActor::~AActor()
 
 void AActor::BeginPlay()
 {
-
+	bActorHasBegunPlay = true;
 }
 
 void AActor::EndPlay()
 {
-
+	bActorHasBegunPlay = false;
 }
 
 void AActor::Tick(duration<double> deltaTime)
 {
 
+}
+
+World* AActor::GetWorld() const
+{
+	return world;
+}
+
+void AActor::SetWorld(World* world)
+{
+	this->world = world;
 }
 
 SceneComponent* AActor::RootComponent_get() const
@@ -68,6 +84,21 @@ void AActor::RootComponent_set(SceneComponent* value)
 auto AActor::PrimaryActorTick_get() -> ActorTickFunction&
 {
 	return primaryActorTick;
+}
+
+bool AActor::ActorTickEnabled_get() const
+{
+	return bActorTickEnabled;
+}
+
+void AActor::ActorTickEnabled_set(bool value)
+{
+	bActorTickEnabled = value;
+}
+
+bool AActor::HasBegunPlay_get() const
+{
+	return bActorHasBegunPlay;
 }
 
 bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)

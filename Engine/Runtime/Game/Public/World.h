@@ -6,12 +6,15 @@
 #include "CoreMinimal.h"
 
 #include <chrono>
+#include <array>
+#include <set>
 
 class AActor;
 
 enum class TickingGroup;
 struct TickFunction;
 class Level;
+class Scene;
 
 class GAME_API World : virtual public Object
 {
@@ -21,8 +24,9 @@ public:
 
 private:
 	std::vector<TRefPtr<AActor>> actors;
-	std::map<TickingGroup, std::vector<TickFunction*>> tickGroups;
+	std::array<std::set<TickFunction*>, 4> tickGroups;
 	TWeakPtr<Level> currentLevel = nullptr;
+	TRefPtr<Scene> scene;
 
 public:
 	World();
@@ -35,9 +39,14 @@ public:
 
 	void LoadLevel(Level* loadLevel);
 
+	Scene* GetScene() const;
+
 private:
-	void Tick_PrePhysics(std::chrono::duration<double> deltaTime);
+	void Tick_Group(std::chrono::duration<double> deltaTime, TickingGroup group);
 	AActor* SpawnActorInternal(TRefPtr<AActor> actor);
+
+	void AddTickGroup(AActor* actor_ptr);
+	void AddSceneProxy(AActor* actor_ptr);
 };
 
 #include "World.inl"

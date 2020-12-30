@@ -17,6 +17,8 @@ public:
 private:
 	Transform transform;
 
+	std::vector<TRefPtr<SceneComponent>> childComponents;
+
 public:
 	SceneComponent();
 	~SceneComponent();
@@ -24,4 +26,6 @@ public:
 	vs_property(Transform, RelativeTransform);
 	Transform RelativeTransform_get() const;
 	void RelativeTransform_set(const Transform& value);
+
+	const std::vector<TRefPtr<SceneComponent>>& GetChildComponents() const;
 };
