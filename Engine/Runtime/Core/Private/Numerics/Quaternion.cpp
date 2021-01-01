@@ -15,14 +15,14 @@
 
 using namespace std;
 
-Quaternion Quaternion::Identity = Quaternion(0, 0, 0, 1);
+Quaternion Quaternion::Identity = Quaternion(0, 0, 0, 1.0f);
 
 Quaternion::Quaternion()
 {
 
 }
 
-Quaternion::Quaternion(double x, double y, double z, double w)
+Quaternion::Quaternion(float x, float y, float z, float w)
 {
 	X = x;
 	Y = y;
@@ -30,7 +30,7 @@ Quaternion::Quaternion(double x, double y, double z, double w)
 	W = w;
 }
 
-Quaternion::Quaternion(const Vector3& xyz, double w)
+Quaternion::Quaternion(const Vector3& xyz, float w)
 {
 	X = xyz.X;
 	Y = xyz.Y;
@@ -38,7 +38,7 @@ Quaternion::Quaternion(const Vector3& xyz, double w)
 	W = w;
 }
 
-Quaternion::Quaternion(double splat)
+Quaternion::Quaternion(float splat)
 {
 	X = splat;
 	Y = splat;
@@ -59,7 +59,7 @@ bool Quaternion::Equals(const Quaternion& rh) const
 	return (*this) == rh;
 }
 
-bool Quaternion::NearlyEquals(const Quaternion& rh, double epsilon) const
+bool Quaternion::NearlyEquals(const Quaternion& rh, float epsilon) const
 {
 	return abs(X - rh.X) <= epsilon
 		&& abs(Y - rh.Y) <= epsilon
@@ -80,14 +80,14 @@ TRefPtr<String> Quaternion::ToString() const
 	return String::Format(L"{{Axis: {0}, Angle: {1}}}", Axis, Angle);
 }
 
-double Quaternion::GetComponentOrDefault(size_t index) const
+float Quaternion::GetComponentOrDefault(size_t index) const
 {
 	if (!Contains(index))
 	{
 		return 0;
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
@@ -101,7 +101,7 @@ size_t Quaternion::Count_get() const
 	return 4;
 }
 
-pair<Vector3, double> Quaternion::ToAxisAngle() const
+pair<Vector3, float> Quaternion::ToAxisAngle() const
 {
 	return { Axis, Angle };
 }
@@ -120,12 +120,12 @@ Vector4 Quaternion::RotateVector(const Vector4& v) const
 	return Vector4(RotateVector(v.Cast<Vector3>()), v.W);
 }
 
-double Quaternion::LengthSq_get() const
+float Quaternion::LengthSq_get() const
 {
 	return X * X + Y * Y + Z * Z + W * W;
 }
 
-double Quaternion::Length_get() const
+float Quaternion::Length_get() const
 {
 	return sqrt(LengthSq);
 }
@@ -157,21 +157,21 @@ void Quaternion::VectorPart_set(const Vector3& value)
 	Z = value.Z;
 }
 
-double Quaternion::Angle_get() const
+float Quaternion::Angle_get() const
 {
-	return 2.0 * acos(W);
+	return 2.0f * acos(W);
 }
 
 Vector3 Quaternion::Axis_get() const
 {
-	double S = sqrt(max(1.0 - (W * W), 0.0));
+	float S = sqrt(max(1.0f - (W * W), 0.0f));
 
-	if (S >= 0.0001)
+	if (S >= 0.0001f)
 	{
 		return Vector3(X / S, Y / S, Z / S);
 	}
 
-	return Vector3(1, 0, 0);
+	return Vector3(1.0f, 0, 0);
 }
 
 Quaternion Quaternion::Inverse_get() const
@@ -179,25 +179,25 @@ Quaternion Quaternion::Inverse_get() const
 	return Quaternion(-X, -Y, -Z, W);
 }
 
-const double& Quaternion::operator [](size_t index) const
+const float& Quaternion::operator [](size_t index) const
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
-double& Quaternion::operator [](size_t index)
+float& Quaternion::operator [](size_t index)
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	double* ptr = &X;
+	float* ptr = &X;
 	return ptr[index];
 }
 
@@ -226,7 +226,7 @@ Quaternion Quaternion::operator /(const Quaternion& value) const
 	return Quaternion(X / value.X, Y / value.Y, Z / value.Z, W / value.W);
 }
 
-double Quaternion::operator |(const Quaternion& value) const
+float Quaternion::operator |(const Quaternion& value) const
 {
 	return DotProduct(*this, value);
 }
@@ -461,16 +461,16 @@ Quaternion& Quaternion::operator /=(const Quaternion& right)
 	return *this;
 }
 
-double Quaternion::DotProduct(const Quaternion& left, const Quaternion& right)
+float Quaternion::DotProduct(const Quaternion& left, const Quaternion& right)
 {
 	return left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
 }
 
-Quaternion Quaternion::FromAxisAngle(const Vector3& axis, TDegrees<double> angle)
+Quaternion Quaternion::FromAxisAngle(const Vector3& axis, TDegrees<float> angle)
 {
-	double half = angle.ToRadians().Value * 0.5;
-	double vsin = sin(half);
-	double vcos = cos(half);
+	float half = angle.ToRadians().Value * 0.5f;
+	float vsin = sin(half);
+	float vcos = cos(half);
 
 	Quaternion quat;
 	quat.X = axis.X * vsin;
@@ -484,10 +484,10 @@ Quaternion Quaternion::FromAxisAngle(const Vector3& axis, TDegrees<double> angle
 Quaternion Quaternion::Concatenate(const Quaternion& left, const Quaternion& right)
 {
 	Quaternion quaternion;
-	double x = (right.Y * left.Z) - (right.Z * left.Y);
-	double y = (right.Z * left.X) - (right.X * left.Z);
-	double z = (right.X * left.Y) - (right.Y * left.X);
-	double w = ((right.X * left.X) + (right.Y * left.Y)) + (right.Z * left.Z);
+	float x = (right.Y * left.Z) - (right.Z * left.Y);
+	float y = (right.Z * left.X) - (right.X * left.Z);
+	float z = (right.X * left.Y) - (right.Y * left.X);
+	float w = ((right.X * left.X) + (right.Y * left.Y)) + (right.Z * left.Z);
 	quaternion.X = ((right.X * left.W) + (left.X * right.W)) + x;
 	quaternion.Y = ((right.Y * left.W) + (left.Y * right.W)) + y;
 	quaternion.Z = ((right.Z * left.W) + (left.Z * right.W)) + z;
@@ -497,14 +497,14 @@ Quaternion Quaternion::Concatenate(const Quaternion& left, const Quaternion& rig
 
 Quaternion Quaternion::FromMatrix(const Matrix4x4& rotationMatrix)
 {
-	double side = (rotationMatrix._11 + rotationMatrix._22) + rotationMatrix._33;
+	float side = (rotationMatrix._11 + rotationMatrix._22) + rotationMatrix._33;
 
 	Quaternion quaternion;
 	if (side > 0)
 	{
-		double sq = sqrt(side + 1);
-		double sqiv = 0.5 / sq;
-		quaternion.W = sq * 0.5;
+		float sq = sqrt(side + 1);
+		float sqiv = 0.5f / sq;
+		quaternion.W = sq * 0.5f;
 		quaternion.X = (rotationMatrix._23 - rotationMatrix._32) * sqiv;
 		quaternion.Y = (rotationMatrix._31 - rotationMatrix._13) * sqiv;
 		quaternion.Z = (rotationMatrix._12 - rotationMatrix._21) * sqiv;
@@ -512,9 +512,9 @@ Quaternion Quaternion::FromMatrix(const Matrix4x4& rotationMatrix)
 
 	else if ((rotationMatrix._11 >= rotationMatrix._22) && (rotationMatrix._11 >= rotationMatrix._33))
 	{
-		double sq = sqrt(((1 + rotationMatrix._11) - rotationMatrix._22) - rotationMatrix._33);
-		double sqiv = 0.5 / sq;
-		quaternion.X = 0.5 * sq;
+		float sq = sqrt(((1 + rotationMatrix._11) - rotationMatrix._22) - rotationMatrix._33);
+		float sqiv = 0.5f / sq;
+		quaternion.X = 0.5f * sq;
 		quaternion.Y = (rotationMatrix._12 + rotationMatrix._21) * sqiv;
 		quaternion.Z = (rotationMatrix._13 + rotationMatrix._31) * sqiv;
 		quaternion.W = (rotationMatrix._23 - rotationMatrix._32) * sqiv;
@@ -522,28 +522,28 @@ Quaternion Quaternion::FromMatrix(const Matrix4x4& rotationMatrix)
 
 	else if (rotationMatrix._22 > rotationMatrix._33)
 	{
-		double sq = sqrt(((1 + rotationMatrix._22) - rotationMatrix._11) - rotationMatrix._33);
-		double sqiv = 0.5 / sq;
+		float sq = sqrt(((1 + rotationMatrix._22) - rotationMatrix._11) - rotationMatrix._33);
+		float sqiv = 0.5f / sq;
 		quaternion.X = (rotationMatrix._21 + rotationMatrix._12) * sqiv;
-		quaternion.Y = 0.5 * sq;
+		quaternion.Y = 0.5f * sq;
 		quaternion.Z = (rotationMatrix._32 + rotationMatrix._23) * sqiv;
 		quaternion.W = (rotationMatrix._31 - rotationMatrix._13) * sqiv;
 	}
 
 	else
 	{
-		double sq = sqrt(((1 + rotationMatrix._33) - rotationMatrix._11) - rotationMatrix._22);
-		double sqiv = 0.5 / sq;
+		float sq = sqrt(((1 + rotationMatrix._33) - rotationMatrix._11) - rotationMatrix._22);
+		float sqiv = 0.5f / sq;
 		quaternion.X = (rotationMatrix._31 + rotationMatrix._13) * sqiv;
 		quaternion.Y = (rotationMatrix._32 + rotationMatrix._23) * sqiv;
-		quaternion.Z = 0.5 * sq;
+		quaternion.Z = 0.5f * sq;
 		quaternion.W = (rotationMatrix._12 - rotationMatrix._21) * sqiv;
 	}
 
 	return quaternion;
 }
 
-Quaternion Quaternion::FromEuler(TDegrees<double> yaw, TDegrees<double> pitch, TDegrees<double> roll)
+Quaternion Quaternion::FromEuler(TDegrees<float> yaw, TDegrees<float> pitch, TDegrees<float> roll)
 {
 	auto yawq = FromAxisAngle(Vector3::Up, yaw.ToRadians().Value);
 	auto pitchq = FromAxisAngle(Vector3::Right, pitch.ToRadians().Value);
@@ -552,21 +552,21 @@ Quaternion Quaternion::FromEuler(TDegrees<double> yaw, TDegrees<double> pitch, T
 	return Concatenate(Concatenate(yawq, pitchq), rollq);
 }
 
-Quaternion Quaternion::Lerp(const Quaternion& left, const Quaternion& right, double t)
+Quaternion Quaternion::Lerp(const Quaternion& left, const Quaternion& right, float t)
 {
-	double Dot = DotProduct(left, right);
-	double Bias = Dot >= 0 ? 1.0 : -1.0;
+	float Dot = DotProduct(left, right);
+	float Bias = Dot >= 0 ? 1.0f : -1.0f;
 	return (right * t) + (left * (Bias * (1 - t)));
 }
 
-Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, double t)
+Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, float t)
 {
-	double Threshold = 0.9995;
+	float Threshold = 0.9995f;
 
 	Quaternion v0 = left.Normalized;
 	Quaternion v1 = right.Normalized;
 
-	double dot = DotProduct(v0, v1);
+	float dot = DotProduct(v0, v1);
 
 	if (dot < 0)
 	{
@@ -574,9 +574,9 @@ Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, do
 		dot = -dot;
 	}
 
-	double theta_0 = acos(dot);
-	double theta = theta_0 * t;
-	theta = clamp(theta, 0.0, 3.1415926535);
+	float theta_0 = acos(dot);
+	float theta = theta_0 * t;
+	theta = clamp(theta, 0.0f, 3.1415926535f);
 	if (theta > theta_0)
 	{
 		return left;
@@ -587,31 +587,31 @@ Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, do
 		return Lerp(v0, v1, t).Normalized;
 	}
 
-	double sin_theta = sin(theta);
-	double sin_theta_0 = sin(theta_0);
+	float sin_theta = sin(theta);
+	float sin_theta_0 = sin(theta_0);
 
-	double s0 = cos(theta) - dot * sin_theta / sin_theta_0;
-	double s1 = sin_theta / sin_theta_0;
+	float s0 = cos(theta) - dot * sin_theta / sin_theta_0;
+	float s1 = sin_theta / sin_theta_0;
 
 	return v0 * s0 + v1 * s1;
 }
 
-Quaternion operator +(double left, const Quaternion& right)
+Quaternion operator +(float left, const Quaternion& right)
 {
 	return Quaternion(left) + right;
 }
 
-Quaternion operator -(double left, const Quaternion& right)
+Quaternion operator -(float left, const Quaternion& right)
 {
 	return Quaternion(left) - right;
 }
 
-Quaternion operator *(double left, const Quaternion& right)
+Quaternion operator *(float left, const Quaternion& right)
 {
 	return Quaternion(left) * right;
 }
 
-Quaternion operator /(double left, const Quaternion& right)
+Quaternion operator /(float left, const Quaternion& right)
 {
 	return Quaternion(left) / right;
 }

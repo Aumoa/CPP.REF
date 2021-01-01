@@ -25,7 +25,7 @@ struct CORE_API ObjectOrientedCube
 	ObjectOrientedCube(const ObjectOrientedCube& copy);
 
 	bool Equals(const ObjectOrientedCube& rh) const;
-	bool NearlyEquals(const ObjectOrientedCube& rh, double epsilon) const;
+	bool NearlyEquals(const ObjectOrientedCube& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 

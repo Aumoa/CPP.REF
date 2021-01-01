@@ -12,7 +12,7 @@ AxisAlignedCube::AxisAlignedCube()
 
 }
 
-AxisAlignedCube::AxisAlignedCube(double x, double y, double z, double width, double height, double depth) : This(Vector3(x, y, z), Vector3(width * 0.5, height * 0.5, depth * 0.5))
+AxisAlignedCube::AxisAlignedCube(float x, float y, float z, float width, float height, float depth) : This(Vector3(x, y, z), Vector3(width * 0.5f, height * 0.5f, depth * 0.5f))
 {
 
 }
@@ -37,7 +37,7 @@ bool AxisAlignedCube::Equals(const AxisAlignedCube& rh) const
 		&& Extent == rh.Extent;
 }
 
-bool AxisAlignedCube::NearlyEquals(const AxisAlignedCube& rh, double epsilon) const
+bool AxisAlignedCube::NearlyEquals(const AxisAlignedCube& rh, float epsilon) const
 {
 	return Center.NearlyEquals(rh.Center, epsilon)
 		&& Extent.NearlyEquals(rh.Extent, epsilon);
@@ -83,12 +83,12 @@ bool AxisAlignedCube::IsOverlap(const Ray3& ray) const
 
 optional<AxisAlignedCube> AxisAlignedCube::IsIntersect(const AxisAlignedCube& cube) const
 {
-	double left = max(Left, cube.Left);
-	double bottom = max(Bottom, cube.Bottom);
-	double near = max(Near, cube.Near);
-	double right = min(Right, cube.Right);
-	double top = min(Top, cube.Top);
-	double far = min(Far, cube.Far);
+	float left = max(Left, cube.Left);
+	float bottom = max(Bottom, cube.Bottom);
+	float near = max(Near, cube.Near);
+	float right = min(Right, cube.Right);
+	float top = min(Top, cube.Top);
+	float far = min(Far, cube.Far);
 
 	if (right >= left && top >= bottom && far >= near)
 	{
@@ -100,19 +100,19 @@ optional<AxisAlignedCube> AxisAlignedCube::IsIntersect(const AxisAlignedCube& cu
 	}
 }
 
-optional<double> AxisAlignedCube::IsIntersect(const Ray3& ray) const
+optional<float> AxisAlignedCube::IsIntersect(const Ray3& ray) const
 {
 	Vector3 dirinv = 1.0 / ray.Direction;
 
-	double t1 = (Left - ray.Origin.X) * dirinv.X;
-	double t2 = (Right - ray.Origin.X) * dirinv.X;
-	double t3 = (Bottom - ray.Origin.Y) * dirinv.Y;
-	double t4 = (Top - ray.Origin.Y) * dirinv.Y;
-	double t5 = (Near - ray.Origin.Z) * dirinv.Z;
-	double t6 = (Far - ray.Origin.Z) * dirinv.Z;
+	float t1 = (Left - ray.Origin.X) * dirinv.X;
+	float t2 = (Right - ray.Origin.X) * dirinv.X;
+	float t3 = (Bottom - ray.Origin.Y) * dirinv.Y;
+	float t4 = (Top - ray.Origin.Y) * dirinv.Y;
+	float t5 = (Near - ray.Origin.Z) * dirinv.Z;
+	float t6 = (Far - ray.Origin.Z) * dirinv.Z;
 
-	double tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
-	double tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+	float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+	float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
 
 	if (tmax < 0)
 	{
@@ -127,32 +127,32 @@ optional<double> AxisAlignedCube::IsIntersect(const Ray3& ray) const
 	return tmin;
 }
 
-double AxisAlignedCube::Left_get() const
+float AxisAlignedCube::Left_get() const
 {
 	return Center.X - Extent.X;
 }
 
-double AxisAlignedCube::Right_get() const
+float AxisAlignedCube::Right_get() const
 {
 	return Center.X + Extent.X;
 }
 
-double AxisAlignedCube::Top_get() const
+float AxisAlignedCube::Top_get() const
 {
 	return Center.Y + Extent.Y;
 }
 
-double AxisAlignedCube::Bottom_get() const
+float AxisAlignedCube::Bottom_get() const
 {
 	return Center.Y - Extent.Y;
 }
 
-double AxisAlignedCube::Near_get() const
+float AxisAlignedCube::Near_get() const
 {
 	return Center.Z - Extent.Z;
 }
 
-double AxisAlignedCube::Far_get() const
+float AxisAlignedCube::Far_get() const
 {
 	return Center.Z + Extent.Z;
 }

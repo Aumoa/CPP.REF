@@ -14,10 +14,10 @@ Matrix4x4::Matrix4x4()
 }
 
 Matrix4x4::Matrix4x4(
-    double _11, double _12, double _13, double _14,
-    double _21, double _22, double _23, double _24,
-    double _31, double _32, double _33, double _34,
-    double _41, double _42, double _43, double _44
+    float _11, float _12, float _13, float _14,
+    float _21, float _22, float _23, float _24,
+    float _31, float _32, float _33, float _34,
+    float _41, float _42, float _43, float _44
 )
 {
     this->_11 = _11;
@@ -86,7 +86,7 @@ bool Matrix4x4::Equals(const Matrix4x4& rh) const
     return *this == rh;
 }
 
-bool Matrix4x4::NearlyEquals(const Matrix4x4& rh, double epsilon) const
+bool Matrix4x4::NearlyEquals(const Matrix4x4& rh, float epsilon) const
 {
     return abs(_11 - rh._11) <= epsilon
         && abs(_12 - rh._12) <= epsilon
@@ -129,7 +129,7 @@ Vector4 Matrix4x4::GetComponentOrDefault(size_t index) const
         return Vector4{ };
     }
 
-    const double* ptr = &_11;
+    const float* ptr = &_11;
     return *reinterpret_cast<const Vector4*>(ptr + 4 * index);
 }
 
@@ -192,10 +192,10 @@ Vector4 Matrix4x4::TransformVector(const Vector4& vec) const
 
 bool Matrix4x4::IsIdentity_get() const
 {
-    return NearlyEquals(Identity, 0.0001);
+    return NearlyEquals(Identity, 0.0001f);
 }
 
-double Matrix4x4::Determinant_get() const
+float Matrix4x4::Determinant_get() const
 {
     return
         _14 * _23 * _32 * _41 - _13 * _24 * _32 * _41 -
@@ -214,26 +214,26 @@ double Matrix4x4::Determinant_get() const
 
 Matrix4x4 Matrix4x4::Inverse_get() const
 {
-    double A2323 = _33 * _44 - _34 * _43;
-    double A1323 = _32 * _44 - _34 * _42;
-    double A1223 = _32 * _43 - _33 * _42;
-    double A0323 = _31 * _44 - _34 * _41;
-    double A0223 = _31 * _43 - _33 * _41;
-    double A0123 = _31 * _42 - _32 * _41;
-    double A2313 = _23 * _44 - _24 * _43;
-    double A1313 = _22 * _44 - _24 * _42;
-    double A1213 = _22 * _43 - _23 * _42;
-    double A2312 = _23 * _34 - _24 * _33;
-    double A1312 = _22 * _34 - _24 * _32;
-    double A1212 = _22 * _33 - _23 * _32;
-    double A0313 = _21 * _44 - _24 * _41;
-    double A0213 = _21 * _43 - _23 * _41;
-    double A0312 = _21 * _34 - _24 * _31;
-    double A0212 = _21 * _33 - _23 * _31;
-    double A0113 = _21 * _42 - _22 * _41;
-    double A0112 = _21 * _32 - _22 * _31;
+    float A2323 = _33 * _44 - _34 * _43;
+    float A1323 = _32 * _44 - _34 * _42;
+    float A1223 = _32 * _43 - _33 * _42;
+    float A0323 = _31 * _44 - _34 * _41;
+    float A0223 = _31 * _43 - _33 * _41;
+    float A0123 = _31 * _42 - _32 * _41;
+    float A2313 = _23 * _44 - _24 * _43;
+    float A1313 = _22 * _44 - _24 * _42;
+    float A1213 = _22 * _43 - _23 * _42;
+    float A2312 = _23 * _34 - _24 * _33;
+    float A1312 = _22 * _34 - _24 * _32;
+    float A1212 = _22 * _33 - _23 * _32;
+    float A0313 = _21 * _44 - _24 * _41;
+    float A0213 = _21 * _43 - _23 * _41;
+    float A0312 = _21 * _34 - _24 * _31;
+    float A0212 = _21 * _33 - _23 * _31;
+    float A0113 = _21 * _42 - _22 * _41;
+    float A0112 = _21 * _32 - _22 * _31;
 
-    double det
+    float det
         = _11 * (_22 * A2323 - _23 * A1323 + _24 * A1223)
         - _12 * (_21 * A2323 - _23 * A0323 + _24 * A0223)
         + _13 * (_21 * A1323 - _22 * A0323 + _24 * A0123)
@@ -272,13 +272,13 @@ Matrix4x4 Matrix4x4::Transposed_get() const
 
 const Vector4& Matrix4x4::operator [](size_t index) const
 {
-    const double* ptr = &_11;
+    const float* ptr = &_11;
     return *reinterpret_cast<const Vector4*>(ptr + 4 * index);
 }
 
 Vector4& Matrix4x4::operator [](size_t index)
 {
-    double* ptr = &_11;
+    float* ptr = &_11;
     return *reinterpret_cast<Vector4*>(ptr + 4 * index);
 }
 

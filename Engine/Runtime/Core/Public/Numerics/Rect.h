@@ -15,18 +15,18 @@ struct Ray2;
 #pragma pack(push, 8)
 struct CORE_API Rect
 {
-	double Left;
-	double Top;
-	double Right;
-	double Bottom;
+	float Left;
+	float Top;
+	float Right;
+	float Bottom;
 
 	Rect();
-	Rect(double left, double top, double right, double bottom);
+	Rect(float left, float top, float right, float bottom);
 	Rect(const Vector2& lt, const Vector2& rb);
 	Rect(const Rect& copy);
 
 	bool Equals(const Rect& rh) const;
-	bool NearlyEquals(const Rect& rh, double epsilon) const;
+	bool NearlyEquals(const Rect& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
@@ -34,7 +34,7 @@ struct CORE_API Rect
 	bool IsOverlap(const Rect& rect) const;
 	bool IsOverlap(const Ray2& ray) const;
 	std::optional<Rect> IsIntersect(const Rect& rect) const;
-	std::optional<double> IsIntersect(const Ray2& ray) const;
+	std::optional<float> IsIntersect(const Ray2& ray) const;
 
 	vs_property(Vector2, LeftTop);
 	Vector2 LeftTop_get() const;
@@ -42,14 +42,14 @@ struct CORE_API Rect
 	vs_property(Vector2, RightBottom);
 	Vector2 RightBottom_get() const;
 	void RightBottom_set(const Vector2& value);
-	vs_property(double, Width);
-	double Width_get() const;
-	void Width_set(double value);
-	vs_property(double, Height);
-	double Height_get() const;
-	void Height_set(double value);
-	vs_property_get(double, Size);
-	double Size_get() const;
+	vs_property(float, Width);
+	float Width_get() const;
+	void Width_set(float value);
+	vs_property(float, Height);
+	float Height_get() const;
+	void Height_set(float value);
+	vs_property_get(float, Size);
+	float Size_get() const;
 
 	bool operator ==(const Rect& right) const;
 	bool operator !=(const Rect& right) const;

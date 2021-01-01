@@ -16,30 +16,30 @@ struct CORE_API Matrix4x4
 {
     using This = Matrix4x4;
 
-    double _11;
-    double _12;
-    double _13;
-    double _14;
-    double _21;
-    double _22;
-    double _23;
-    double _24;
-    double _31;
-    double _32;
-    double _33;
-    double _34;
-    double _41;
-    double _42;
-    double _43;
-    double _44;
+    float _11;
+    float _12;
+    float _13;
+    float _14;
+    float _21;
+    float _22;
+    float _23;
+    float _24;
+    float _31;
+    float _32;
+    float _33;
+    float _34;
+    float _41;
+    float _42;
+    float _43;
+    float _44;
 
     Matrix4x4();
-    Matrix4x4(double _11, double _12, double _13, double _14, double _21, double _22, double _23, double _24, double _31, double _32, double _33, double _34, double _41, double _42, double _43, double _44);
+    Matrix4x4(float _11, float _12, float _13, float _14, float _21, float _22, float _23, float _24, float _31, float _32, float _33, float _34, float _41, float _42, float _43, float _44);
     Matrix4x4(const Vector4& v1, const Vector4& v2, const Vector4& v3, const Vector4& v4);
     Matrix4x4(const Matrix4x4& copy);
 
     bool Equals(const Matrix4x4& rh) const;
-    bool NearlyEquals(const Matrix4x4& rh, double epsilon) const;
+    bool NearlyEquals(const Matrix4x4& rh, float epsilon) const;
     size_t GetHashCode() const;
     TRefPtr<String> ToString() const;
 
@@ -65,8 +65,8 @@ struct CORE_API Matrix4x4
 
     vs_property_get(bool, IsIdentity);
     bool IsIdentity_get() const;
-    vs_property_get(double, Determinant);
-    double Determinant_get() const;
+    vs_property_get(float, Determinant);
+    float Determinant_get() const;
     vs_property_get(Matrix4x4, Inverse);
     Matrix4x4 Inverse_get() const;
     vs_property_get(Matrix4x4, Transposed);

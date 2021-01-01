@@ -10,7 +10,7 @@
 template<class T>
 concept THasLerp = requires()
 {
-	{ T::Lerp(T(), T(), (double)0) };
+	{ T::Lerp(T(), T(), (float)0) };
 };
 
 template<class T>
@@ -30,7 +30,7 @@ public:
 	using This = Math;
 
 	template<class T>
-	inline static T Lerp(const T& left, const T& right, double t);
+	inline static T Lerp(const T& left, const T& right, float t);
 	template<class T>
 	inline static T Square(const T& value);
 	template<class TItem>
@@ -45,10 +45,10 @@ public:
 	template<class T>
 	inline static constexpr T Abs(const T& value);
 
-	template<class T = double>
+	template<class T = float>
 	inline static constexpr const T PI = (T)3.141592;
-	template<class T = double>
+	template<class T = float>
 	inline static constexpr const T HalfPI = PI<T> / (T)2;
-	template<class T = double>
+	template<class T = float>
 	inline static constexpr const T InvPI = (T)1 / PI<T>;
 };

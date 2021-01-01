@@ -57,7 +57,7 @@ inline constexpr TDegrees<O> TRadians<T>::ToDegrees() const
 }
 
 template<class T>
-inline T Math::Lerp(const T& left, const T& right, double t)
+inline T Math::Lerp(const T& left, const T& right, float t)
 {
 	if constexpr (VHasLerp<T>)
 	{

@@ -15,26 +15,26 @@ struct CORE_API Color
 	using This = Color;
 
 private:
-	Color(double splat);
+	Color(float splat);
 
 	static std::map<size_t, Color> convertTable;
 
 public:
-	double R;
-	double G;
-	double B;
-	double A;
+	float R;
+	float G;
+	float B;
+	float A;
 
 	Color();
-	Color(double r, double g, double b, double a = 1);
+	Color(float r, float g, float b, float a = 1);
 	Color(const Color& copy);
 
 	bool Equals(const Color& rh) const;
-	bool NearlyEquals(const Color& rh, double epsilon) const;
+	bool NearlyEquals(const Color& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
-	double GetComponentOrDefault(size_t index) const;
+	float GetComponentOrDefault(size_t index) const;
 	template<TIsVectorType T>
 	inline void Construct(const T& vector);
 	template<TIsVectorType T>
@@ -44,8 +44,8 @@ public:
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
 
-	const double& operator [](size_t index) const;
-	double& operator [](size_t index);
+	const float& operator [](size_t index) const;
+	float& operator [](size_t index);
 
 	Color operator -() const;
 	Color operator +(const Color& right) const;
@@ -69,7 +69,7 @@ public:
 	Color& operator ^=(const Color& right);
 
 	static Color AlphaBlend(const Color& left, const Color& right);
-	static Color AlphaBlend(const Color& left, const Color& right, double alpha);
+	static Color AlphaBlend(const Color& left, const Color& right, float alpha);
 	static Color FromUInt(uint32 argb);
 	static Color FromHtml(TRefPtr<String> html);
 	static Color FromBytes(uint8 r, uint8 g, uint8 b, uint8 a);
@@ -218,9 +218,9 @@ public:
 };
 #pragma pack(pop)
 
-CORE_API Color operator +(double left, const Color& right);
-CORE_API Color operator -(double left, const Color& right);
-CORE_API Color operator *(double left, const Color& right);
-CORE_API Color operator /(double left, const Color& right);
+CORE_API Color operator +(float left, const Color& right);
+CORE_API Color operator -(float left, const Color& right);
+CORE_API Color operator *(float left, const Color& right);
+CORE_API Color operator /(float left, const Color& right);
 
 #include "Color.inl"

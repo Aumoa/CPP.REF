@@ -14,20 +14,20 @@ struct CORE_API Ray2
 {
 	Vector2 Origin;
 	Vector2 Direction;
-	std::optional<double> Distance;
+	std::optional<float> Distance;
 
 	Ray2();
-	Ray2(const Vector2& origin, const Vector2& direction, std::optional<double> distance = std::nullopt);
+	Ray2(const Vector2& origin, const Vector2& direction, std::optional<float> distance = std::nullopt);
 	Ray2(const Ray2& copy);
 
 	bool Equals(const Ray2& rh) const;
-	bool NearlyEquals(const Ray2& rh, double epsilon) const;
+	bool NearlyEquals(const Ray2& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
-	Vector2 GetPoint(double distance) const;
+	Vector2 GetPoint(float distance) const;
 	bool IsOverlap(const Rect& rect) const;
-	std::optional<double> IsIntersect(const Rect& rect) const;
+	std::optional<float> IsIntersect(const Rect& rect) const;
 
 	bool operator ==(const Ray2& rh) const;
 	bool operator !=(const Ray2& rh) const;

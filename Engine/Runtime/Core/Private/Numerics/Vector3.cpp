@@ -9,33 +9,33 @@
 
 using namespace std;
 
-Vector3 Vector3::Up = Vector3(0, 0, 1);
-Vector3 Vector3::Right = Vector3(1, 0, 0);
-Vector3 Vector3::Forward = Vector3(0, 1, 0);
-Vector3 Vector3::AxisX = Vector3(1, 0, 0);
-Vector3 Vector3::AxisY = Vector3(0, 1, 0);
-Vector3 Vector3::AxisZ = Vector3(0, 0, 1);
+Vector3 Vector3::Up = Vector3(0, 0, 1.0f);
+Vector3 Vector3::Right = Vector3(1.0f, 0, 0);
+Vector3 Vector3::Forward = Vector3(0, 1.0f, 0);
+Vector3 Vector3::AxisX = Vector3(1.0f, 0, 0);
+Vector3 Vector3::AxisY = Vector3(0, 1.0f, 0);
+Vector3 Vector3::AxisZ = Vector3(0, 0, 1.0f);
 Vector3 Vector3::Zero = Vector3(0, 0, 0);
-Vector3 Vector3::One = Vector3(1, 1, 1);
+Vector3 Vector3::One = Vector3(1.0f, 1.0f, 1.0f);
 
 Vector3::Vector3()
 {
 
 }
 
-Vector3::Vector3(const Vector2& v2, double z) : This(v2.X, v2.Y, z)
+Vector3::Vector3(const Vector2& v2, float z) : This(v2.X, v2.Y, z)
 {
 
 }
 
-Vector3::Vector3(double x, double y, double z)
+Vector3::Vector3(float x, float y, float z)
 {
 	X = x;
 	Y = y;
 	Z = z;
 }
 
-Vector3::Vector3(double splat)
+Vector3::Vector3(float splat)
 {
 	X = splat;
 	Y = splat;
@@ -54,7 +54,7 @@ bool Vector3::Equals(const Vector3& rh) const
 	return (*this) == rh;
 }
 
-bool Vector3::NearlyEquals(const Vector3& rh, double epsilon) const
+bool Vector3::NearlyEquals(const Vector3& rh, float epsilon) const
 {
 	return abs(X - rh.X) <= epsilon
 		&& abs(Y - rh.Y) <= epsilon
@@ -73,14 +73,14 @@ TRefPtr<String> Vector3::ToString() const
 	return String::Format(L"{{{0}, {1}, {2}}}", X, Y, Z);
 }
 
-double Vector3::GetComponentOrDefault(size_t index) const
+float Vector3::GetComponentOrDefault(size_t index) const
 {
 	if (!Contains(index))
 	{
 		return 0;
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
@@ -99,12 +99,12 @@ bool Vector3::IsOverlap(const AxisAlignedCube& cube) const
 	return cube.IsOverlap(*this);
 }
 
-double Vector3::LengthSq_get() const
+float Vector3::LengthSq_get() const
 {
 	return X * X + Y * Y + Z * Z;
 }
 
-double Vector3::Length_get() const
+float Vector3::Length_get() const
 {
 	return sqrt(LengthSq);
 }
@@ -124,25 +124,25 @@ void Vector3::Direction_set(const Vector3& value)
 	(*this) = value * Length;
 }
 
-const double& Vector3::operator [](size_t index) const
+const float& Vector3::operator [](size_t index) const
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
-double& Vector3::operator [](size_t index)
+float& Vector3::operator [](size_t index)
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	double* ptr = &X;
+	float* ptr = &X;
 	return ptr[index];
 }
 
@@ -176,7 +176,7 @@ Vector3 Vector3::operator ^(const Vector3& value) const
 	return CrossProduct(*this, value);
 }
 
-double Vector3::operator |(const Vector3& value) const
+float Vector3::operator |(const Vector3& value) const
 {
 	return DotProduct(*this, value);
 }
@@ -372,17 +372,17 @@ Vector3& Vector3::operator ^=(const Vector3& right)
 	return (*this) = (*this) ^ right;
 }
 
-double Vector3::DistanceSq(const Vector3& left, const Vector3& right)
+float Vector3::DistanceSq(const Vector3& left, const Vector3& right)
 {
 	return (right - left).LengthSq;
 }
 
-double Vector3::Distance(const Vector3& left, const Vector3& right)
+float Vector3::Distance(const Vector3& left, const Vector3& right)
 {
 	return (right - left).Length;
 }
 
-double Vector3::DotProduct(const Vector3& left, const Vector3& right)
+float Vector3::DotProduct(const Vector3& left, const Vector3& right)
 {
 	return left.X * right.X + left.Y * right.Y + left.Z * right.Z;
 }
@@ -396,22 +396,22 @@ Vector3 Vector3::CrossProduct(const Vector3& left, const Vector3& right)
 	);
 }
 
-Vector3 operator +(double left, const Vector3& right)
+Vector3 operator +(float left, const Vector3& right)
 {
 	return Vector3(left) + right;
 }
 
-Vector3 operator -(double left, const Vector3& right)
+Vector3 operator -(float left, const Vector3& right)
 {
 	return Vector3(left) - right;
 }
 
-Vector3 operator *(double left, const Vector3& right)
+Vector3 operator *(float left, const Vector3& right)
 {
 	return Vector3(left) * right;
 }
 
-Vector3 operator /(double left, const Vector3& right)
+Vector3 operator /(float left, const Vector3& right)
 {
 	return Vector3(left) / right;
 }

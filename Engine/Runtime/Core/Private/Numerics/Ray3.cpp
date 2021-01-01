@@ -13,7 +13,7 @@ Ray3::Ray3()
 
 }
 
-Ray3::Ray3(const Vector3& origin, const Vector3& direction, optional<double> distance)
+Ray3::Ray3(const Vector3& origin, const Vector3& direction, optional<float> distance)
 {
 	Origin = origin;
 	Direction = direction;
@@ -34,7 +34,7 @@ bool Ray3::Equals(const Ray3& rh) const
 		&& Distance == rh.Distance;
 }
 
-bool Ray3::NearlyEquals(const Ray3& rh, double epsilon) const
+bool Ray3::NearlyEquals(const Ray3& rh, float epsilon) const
 {
 	return Origin.NearlyEquals(rh.Origin, epsilon)
 		&& Direction.NearlyEquals(rh.Direction, epsilon)
@@ -62,7 +62,7 @@ TRefPtr<String> Ray3::ToString() const
 	);
 }
 
-Vector3 Ray3::GetPoint(double distance) const
+Vector3 Ray3::GetPoint(float distance) const
 {
 	return Origin + Direction * distance;
 }
@@ -72,7 +72,7 @@ bool Ray3::IsOverlap(const AxisAlignedCube& cube) const
 	return cube.IsOverlap(*this);
 }
 
-optional<double> Ray3::IsIntersect(const AxisAlignedCube& cube) const
+optional<float> Ray3::IsIntersect(const AxisAlignedCube& cube) const
 {
 	return cube.IsIntersect(*this);
 }
@@ -89,8 +89,8 @@ bool Ray3::operator !=(const Ray3& rh) const
 
 bool Ray3::operator < (const Ray3& right) const
 {
-	const double dist = Distance.has_value() ? Distance.value() : -1;
-	const double rdist = right.Distance.has_value() ? Distance.value() : -1;
+	const float dist = Distance.has_value() ? Distance.value() : -1;
+	const float rdist = right.Distance.has_value() ? Distance.value() : -1;
 	if (Origin < right.Origin)
 	{
 		return true;
@@ -119,8 +119,8 @@ bool Ray3::operator < (const Ray3& right) const
 
 bool Ray3::operator <=(const Ray3& right) const
 {
-	const double dist = Distance.has_value() ? Distance.value() : -1;
-	const double rdist = right.Distance.has_value() ? Distance.value() : -1;
+	const float dist = Distance.has_value() ? Distance.value() : -1;
+	const float rdist = right.Distance.has_value() ? Distance.value() : -1;
 	if (Origin < right.Origin)
 	{
 		return true;
@@ -149,8 +149,8 @@ bool Ray3::operator <=(const Ray3& right) const
 
 bool Ray3::operator > (const Ray3& right) const
 {
-	const double dist = Distance.has_value() ? Distance.value() : -1;
-	const double rdist = right.Distance.has_value() ? Distance.value() : -1;
+	const float dist = Distance.has_value() ? Distance.value() : -1;
+	const float rdist = right.Distance.has_value() ? Distance.value() : -1;
 	if (Origin > right.Origin)
 	{
 		return true;
@@ -179,8 +179,8 @@ bool Ray3::operator > (const Ray3& right) const
 
 bool Ray3::operator >=(const Ray3& right) const
 {
-	const double dist = Distance.has_value() ? Distance.value() : -1;
-	const double rdist = right.Distance.has_value() ? Distance.value() : -1;
+	const float dist = Distance.has_value() ? Distance.value() : -1;
+	const float rdist = right.Distance.has_value() ? Distance.value() : -1;
 	if (Origin > right.Origin)
 	{
 		return true;
@@ -209,8 +209,8 @@ bool Ray3::operator >=(const Ray3& right) const
 
 weak_ordering Ray3::operator <=>(const Ray3& right) const
 {
-	const double dist = Distance.has_value() ? Distance.value() : -1;
-	const double rdist = right.Distance.has_value() ? Distance.value() : -1;
+	const float dist = Distance.has_value() ? Distance.value() : -1;
+	const float rdist = right.Distance.has_value() ? Distance.value() : -1;
 	if (Origin < right.Origin)
 	{
 		return weak_ordering::less;

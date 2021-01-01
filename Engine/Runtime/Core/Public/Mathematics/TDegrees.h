@@ -8,7 +8,7 @@
 template<TIsRealType T>
 struct TRadians;
 
-template<TIsRealType T = double>
+template<TIsRealType T = float>
 struct TDegrees
 {
 private:

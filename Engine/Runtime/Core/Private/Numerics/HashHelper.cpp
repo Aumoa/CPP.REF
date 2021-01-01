@@ -7,13 +7,12 @@ using namespace std;
 template<class T, size_t... Seq>
 static size_t GetHashCodeInlineHelper(T value, std::index_sequence<Seq...>&&)
 {
-	constexpr size_t NumArray = sizeof(T) / sizeof(size_t);
 	size_t* Array = reinterpret_cast<size_t*>(&value);
 	return (... + Array[Seq]);
 }
 
-size_t HashHelper::GetHashCode(double value)
+size_t HashHelper::GetHashCode(float value)
 {
-	constexpr size_t NumArray = sizeof(double) / sizeof(size_t);
+	constexpr size_t NumArray = (sizeof(float) + sizeof(size_t) - 1) / sizeof(size_t);
 	return GetHashCodeInlineHelper(value, make_index_sequence<NumArray>{ });
 }

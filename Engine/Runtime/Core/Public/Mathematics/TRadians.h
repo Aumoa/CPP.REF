@@ -5,7 +5,7 @@
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
 
-template<TIsRealType T = double>
+template<TIsRealType T = float>
 struct TRadians
 {
 private:

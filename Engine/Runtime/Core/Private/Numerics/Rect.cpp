@@ -15,7 +15,7 @@ Rect::Rect()
 
 }
 
-Rect::Rect(double left, double top, double right, double bottom)
+Rect::Rect(float left, float top, float right, float bottom)
 {
 	Left = left;
 	Top = top;
@@ -47,7 +47,7 @@ bool Rect::Equals(const Rect& rh) const
 		&& Bottom == rh.Bottom;
 }
 
-bool Rect::NearlyEquals(const Rect& rh, double epsilon) const
+bool Rect::NearlyEquals(const Rect& rh, float epsilon) const
 {
 	return abs(rh.Left - Left) <= epsilon
 		&& abs(rh.Top - Top) <= epsilon
@@ -100,10 +100,10 @@ bool Rect::IsOverlap(const Ray2& ray) const
 
 optional<Rect> Rect::IsIntersect(const Rect& rect) const
 {
-	double left = max(Left, rect.Left);
-	double top = max(Top, rect.Top);
-	double right = min(Right, rect.Right);
-	double bottom = min(Bottom, rect.Bottom);
+	float left = max(Left, rect.Left);
+	float top = max(Top, rect.Top);
+	float right = min(Right, rect.Right);
+	float bottom = min(Bottom, rect.Bottom);
 
 	if (right >= left && bottom >= top)
 	{
@@ -115,17 +115,17 @@ optional<Rect> Rect::IsIntersect(const Rect& rect) const
 	}
 }
 
-optional<double> Rect::IsIntersect(const Ray2& ray) const
+optional<float> Rect::IsIntersect(const Ray2& ray) const
 {
 	Vector2 dirinv = 1.0 / ray.Direction;
 
-	double t1 = (Left - ray.Origin.X) * dirinv.X;
-	double t2 = (Right - ray.Origin.X) * dirinv.X;
-	double t3 = (Bottom - ray.Origin.Y) * dirinv.Y;
-	double t4 = (Top - ray.Origin.Y) * dirinv.Y;
+	float t1 = (Left - ray.Origin.X) * dirinv.X;
+	float t2 = (Right - ray.Origin.X) * dirinv.X;
+	float t3 = (Bottom - ray.Origin.Y) * dirinv.Y;
+	float t4 = (Top - ray.Origin.Y) * dirinv.Y;
 
-	double tmin = max(min(t1, t2), min(t3, t4));
-	double tmax = min(max(t1, t2), max(t3, t4));
+	float tmin = max(min(t1, t2), min(t3, t4));
+	float tmax = min(max(t1, t2), max(t3, t4));
 
 	if (tmax < 0)
 	{
@@ -162,27 +162,27 @@ void Rect::RightBottom_set(const Vector2& value)
 	Bottom = value.Y;
 }
 
-double Rect::Width_get() const
+float Rect::Width_get() const
 {
 	return Right - Left;
 }
 
-void Rect::Width_set(double value)
+void Rect::Width_set(float value)
 {
 	Right = Left + value;
 }
 
-double Rect::Height_get() const
+float Rect::Height_get() const
 {
 	return Bottom - Top;
 }
 
-void Rect::Height_set(double value)
+void Rect::Height_set(float value)
 {
 	Bottom = Top + value;
 }
 
-double Rect::Size_get() const
+float Rect::Size_get() const
 {
 	return Width * Height;
 }

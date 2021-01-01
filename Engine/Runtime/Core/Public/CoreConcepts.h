@@ -44,7 +44,7 @@ concept TIsPrimitive =
 	TIsSame<std::remove_const_t<TPrim>, int32> ||
 	TIsSame<std::remove_const_t<TPrim>, int64> ||
 	TIsSame<std::remove_const_t<TPrim>, float> ||
-	TIsSame<std::remove_const_t<TPrim>, double> ||
+	TIsSame<std::remove_const_t<TPrim>, float> ||
 	TIsSame<std::remove_const_t<TPrim>, bool> ||
 	TIsSame<std::remove_const_t<TPrim>, char> ||
 	TIsSame<std::remove_const_t<TPrim>, wchar_t>;
@@ -134,7 +134,7 @@ concept TIsVectorType = requires(T Arg, const T ConstArg)
 {
 	{ ConstArg.GetComponentOrDefault(0) };
 	{ (bool)ConstArg.Contains(0) };
-	{ (double)ConstArg[0] };
+	{ (float)ConstArg[0] };
 	{ (size_t)ConstArg.Count };
 };
 
@@ -180,8 +180,8 @@ concept TIsMatrixType = requires(T Arg, const T ConstArg)
 	{ ConstArg.GetComponentOrDefault(0) };
 	{ (bool)ConstArg.Contains(0) };
 	{ (bool)ConstArg.Contains(0, 0) };
-	{ (double)ConstArg[0] };
-	{ (double)ConstArg[0][0] };
+	{ (float)ConstArg[0] };
+	{ (float)ConstArg[0][0] };
 	{ (size_t)ConstArg.Rows };
 	{ (size_t)ConstArg.Columns };
 	{ (size_t)ConstArg.Count };

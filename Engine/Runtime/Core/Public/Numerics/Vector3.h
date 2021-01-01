@@ -16,22 +16,22 @@ struct CORE_API Vector3
 {
 	using This = Vector3;
 
-	double X;
-	double Y;
-	double Z;
+	float X;
+	float Y;
+	float Z;
 
 	Vector3();
-	Vector3(const Vector2& v2, double z);
-	Vector3(double x, double y, double z);
-	Vector3(double splat);
+	Vector3(const Vector2& v2, float z);
+	Vector3(float x, float y, float z);
+	Vector3(float splat);
 	Vector3(const Vector3& copy);
 
 	bool Equals(const Vector3& rh) const;
-	bool NearlyEquals(const Vector3& rh, double epsilon) const;
+	bool NearlyEquals(const Vector3& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
-	double GetComponentOrDefault(size_t index) const;
+	float GetComponentOrDefault(size_t index) const;
 	template<TIsVectorType T>
 	inline void Construct(const T& vector);
 	template<TIsVectorType T>
@@ -43,18 +43,18 @@ struct CORE_API Vector3
 
 	bool IsOverlap(const AxisAlignedCube& cube) const;
 
-	vs_property_get(double, LengthSq);
-	double LengthSq_get() const;
-	vs_property_get(double, Length);
-	double Length_get() const;
+	vs_property_get(float, LengthSq);
+	float LengthSq_get() const;
+	vs_property_get(float, Length);
+	float Length_get() const;
 	vs_property_get(Vector3, Normalized);
 	Vector3 Normalized_get() const;
 	vs_property(Vector3, Direction);
 	Vector3 Direction_get() const;
 	void Direction_set(const Vector3& value);
 
-	const double& operator [](size_t index) const;
-	double& operator [](size_t index);
+	const float& operator [](size_t index) const;
+	float& operator [](size_t index);
 
 	Vector3 operator -() const;
 	Vector3 operator +(const Vector3& right) const;
@@ -62,7 +62,7 @@ struct CORE_API Vector3
 	Vector3 operator *(const Vector3& right) const;
 	Vector3 operator /(const Vector3& right) const;
 	Vector3 operator ^(const Vector3& right) const;
-	double operator |(const Vector3& right) const;
+	float operator |(const Vector3& right) const;
 
 	bool operator ==(const Vector3& right) const;
 	bool operator !=(const Vector3& right) const;
@@ -78,9 +78,9 @@ struct CORE_API Vector3
 	Vector3& operator /=(const Vector3& right);
 	Vector3& operator ^=(const Vector3& right);
 
-	static double DistanceSq(const Vector3& left, const Vector3& right);
-	static double Distance(const Vector3& left, const Vector3& right);
-	static double DotProduct(const Vector3& left, const Vector3& right);
+	static float DistanceSq(const Vector3& left, const Vector3& right);
+	static float Distance(const Vector3& left, const Vector3& right);
+	static float DotProduct(const Vector3& left, const Vector3& right);
 	static Vector3 CrossProduct(const Vector3& left, const Vector3& right);
 
 	static Vector3 Up;
@@ -94,9 +94,9 @@ struct CORE_API Vector3
 };
 #pragma pack(pop)
 
-CORE_API Vector3 operator +(double left, const Vector3& right);
-CORE_API Vector3 operator -(double left, const Vector3& right);
-CORE_API Vector3 operator *(double left, const Vector3& right);
-CORE_API Vector3 operator /(double left, const Vector3& right);
+CORE_API Vector3 operator +(float left, const Vector3& right);
+CORE_API Vector3 operator -(float left, const Vector3& right);
+CORE_API Vector3 operator *(float left, const Vector3& right);
+CORE_API Vector3 operator /(float left, const Vector3& right);
 
 #include "Vector3.inl"

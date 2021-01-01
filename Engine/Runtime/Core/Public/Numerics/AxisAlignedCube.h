@@ -21,12 +21,12 @@ struct CORE_API AxisAlignedCube
 	Vector3 Extent;
 
 	AxisAlignedCube();
-	AxisAlignedCube(double x, double y, double z, double width, double height, double depth);
+	AxisAlignedCube(float x, float y, float z, float width, float height, float depth);
 	AxisAlignedCube(const Vector3& center, const Vector3& extent);
 	AxisAlignedCube(const AxisAlignedCube& copy);
 
 	bool Equals(const AxisAlignedCube& rh) const;
-	bool NearlyEquals(const AxisAlignedCube& rh, double epsilon) const;
+	bool NearlyEquals(const AxisAlignedCube& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
@@ -34,20 +34,20 @@ struct CORE_API AxisAlignedCube
 	bool IsOverlap(const AxisAlignedCube& cube) const;
 	bool IsOverlap(const Ray3& ray) const;
 	std::optional<AxisAlignedCube> IsIntersect(const AxisAlignedCube& cube) const;
-	std::optional<double> IsIntersect(const Ray3& ray) const;
+	std::optional<float> IsIntersect(const Ray3& ray) const;
 
-	vs_property_get(double, Left);
-	double Left_get() const;
-	vs_property_get(double, Right);
-	double Right_get() const;
-	vs_property_get(double, Top);
-	double Top_get() const;
-	vs_property_get(double, Bottom);
-	double Bottom_get() const;
-	vs_property_get(double, Near);
-	double Near_get() const;
-	vs_property_get(double, Far);
-	double Far_get() const;
+	vs_property_get(float, Left);
+	float Left_get() const;
+	vs_property_get(float, Right);
+	float Right_get() const;
+	vs_property_get(float, Top);
+	float Top_get() const;
+	vs_property_get(float, Bottom);
+	float Bottom_get() const;
+	vs_property_get(float, Near);
+	float Near_get() const;
+	vs_property_get(float, Far);
+	float Far_get() const;
 
 	bool operator ==(const AxisAlignedCube& right) const;
 	bool operator !=(const AxisAlignedCube& right) const;

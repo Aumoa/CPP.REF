@@ -14,12 +14,12 @@ Vector4::Vector4()
 
 }
 
-Vector4::Vector4(const Vector3& v3, double w) : This(v3.X, v3.Y, v3.Z, w)
+Vector4::Vector4(const Vector3& v3, float w) : This(v3.X, v3.Y, v3.Z, w)
 {
 
 }
 
-Vector4::Vector4(double x, double y, double z, double w)
+Vector4::Vector4(float x, float y, float z, float w)
 {
 	X = x;
 	Y = y;
@@ -27,7 +27,7 @@ Vector4::Vector4(double x, double y, double z, double w)
 	W = w;
 }
 
-Vector4::Vector4(double splat)
+Vector4::Vector4(float splat)
 {
 	X = splat;
 	Y = splat;
@@ -48,7 +48,7 @@ bool Vector4::Equals(const Vector4& rh) const
 	return (*this) == rh;
 }
 
-bool Vector4::NearlyEquals(const Vector4& rh, double epsilon) const
+bool Vector4::NearlyEquals(const Vector4& rh, float epsilon) const
 {
 	return abs(X - rh.X) <= epsilon
 		&& abs(Y - rh.Y) <= epsilon
@@ -69,14 +69,14 @@ TRefPtr<String> Vector4::ToString() const
 	return String::Format(L"{{{0}, {1}, {2}, {3}}}", X, Y, Z, W);
 }
 
-double Vector4::GetComponentOrDefault(size_t index) const
+float Vector4::GetComponentOrDefault(size_t index) const
 {
 	if (!Contains(index))
 	{
 		return 0;
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
@@ -90,12 +90,12 @@ size_t Vector4::Count_get() const
 	return 4;
 }
 
-double Vector4::LengthSq_get() const
+float Vector4::LengthSq_get() const
 {
 	return X * X + Y * Y + Z * Z + W * W;
 }
 
-double Vector4::Length_get() const
+float Vector4::Length_get() const
 {
 	return sqrt(LengthSq);
 }
@@ -115,25 +115,25 @@ void Vector4::Direction_set(const Vector4& value)
 	(*this) = value * Length;
 }
 
-const double& Vector4::operator [](size_t index) const
+const float& Vector4::operator [](size_t index) const
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
-double& Vector4::operator [](size_t index)
+float& Vector4::operator [](size_t index)
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	double* ptr = &X;
+	float* ptr = &X;
 	return ptr[index];
 }
 
@@ -162,7 +162,7 @@ Vector4 Vector4::operator /(const Vector4& value) const
 	return Vector4(X / value.X, Y / value.Y, Z / value.Z, W / value.W);
 }
 
-double Vector4::operator |(const Vector4& value) const
+float Vector4::operator |(const Vector4& value) const
 {
 	return DotProduct(*this, value);
 }
@@ -397,37 +397,37 @@ Vector4& Vector4::operator /=(const Vector4& right)
 	return *this;
 }
 
-double Vector4::DistanceSq(const Vector4& left, const Vector4& right)
+float Vector4::DistanceSq(const Vector4& left, const Vector4& right)
 {
 	return (right - left).LengthSq;
 }
 
-double Vector4::Distance(const Vector4& left, const Vector4& right)
+float Vector4::Distance(const Vector4& left, const Vector4& right)
 {
 	return (right - left).Length;
 }
 
-double Vector4::DotProduct(const Vector4& left, const Vector4& right)
+float Vector4::DotProduct(const Vector4& left, const Vector4& right)
 {
 	return left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
 }
 
-Vector4 operator +(double left, const Vector4& right)
+Vector4 operator +(float left, const Vector4& right)
 {
 	return Vector4(left) + right;
 }
 
-Vector4 operator -(double left, const Vector4& right)
+Vector4 operator -(float left, const Vector4& right)
 {
 	return Vector4(left) - right;
 }
 
-Vector4 operator *(double left, const Vector4& right)
+Vector4 operator *(float left, const Vector4& right)
 {
 	return Vector4(left) * right;
 }
 
-Vector4 operator /(double left, const Vector4& right)
+Vector4 operator /(float left, const Vector4& right)
 {
 	return Vector4(left) / right;
 }

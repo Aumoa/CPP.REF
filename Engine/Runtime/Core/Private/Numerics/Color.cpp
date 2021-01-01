@@ -153,7 +153,7 @@ map<size_t, Color> Color::convertTable =
 	{ String("YellowGreen").GetHashCode(), Color::FromHtml("#9ACD32") },
 };
 
-Color::Color(double splat) : This(splat, splat, splat, splat)
+Color::Color(float splat) : This(splat, splat, splat, splat)
 {
 
 }
@@ -163,7 +163,7 @@ Color::Color()
 
 }
 
-Color::Color(double r, double g, double b, double a)
+Color::Color(float r, float g, float b, float a)
 {
 	R = r;
 	G = g;
@@ -184,7 +184,7 @@ bool Color::Equals(const Color& rh) const
 	return (*this) == rh;
 }
 
-bool Color::NearlyEquals(const Color& rh, double epsilon) const
+bool Color::NearlyEquals(const Color& rh, float epsilon) const
 {
 	return abs(R - rh.R) <= epsilon
 		&& abs(G - rh.G) <= epsilon
@@ -205,14 +205,14 @@ TRefPtr<String> Color::ToString() const
 	return String::Format("{{R: {0}, G: {1}, B: {2}, A: {3}}}", R, G, B, A);
 }
 
-double Color::GetComponentOrDefault(size_t index) const
+float Color::GetComponentOrDefault(size_t index) const
 {
 	if (!Contains(index))
 	{
 		return 0;
 	}
 
-	const double* ptr = &R;
+	const float* ptr = &R;
 	return ptr[index];
 }
 
@@ -226,25 +226,25 @@ size_t Color::Count_get() const
 	return 3;
 }
 
-const double& Color::operator [](size_t index) const
+const float& Color::operator [](size_t index) const
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	const double* ptr = &R;
+	const float* ptr = &R;
 	return ptr[index];
 }
 
-double& Color::operator [](size_t index)
+float& Color::operator [](size_t index)
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	double* ptr = &R;
+	float* ptr = &R;
 	return ptr[index];
 }
 
@@ -518,10 +518,10 @@ Color Color::AlphaBlend(const Color& left, const Color& right)
 	return AlphaBlend(left, right, right.A);
 }
 
-Color Color::AlphaBlend(const Color& left, const Color& right, double alpha)
+Color Color::AlphaBlend(const Color& left, const Color& right, float alpha)
 {
-	Color r = left * (1.0 - alpha) + right * alpha;
-	r.A = 1.0;
+	Color r = left * (1.0f - alpha) + right * alpha;
+	r.A = 1.0f;
 	return r;
 }
 
@@ -574,26 +574,26 @@ Color Color::FromHtml(TRefPtr<String> html)
 
 Color Color::FromBytes(uint8 r, uint8 g, uint8 b, uint8 a)
 {
-	constexpr double Inv255 = 1.0 / 255.0;
-	return Color((double)r * Inv255, (double)g * Inv255, (double)b * Inv255, (double)a * Inv255);
+	constexpr float Inv255 = 1.0f / 255.0f;
+	return Color((float)r * Inv255, (float)g * Inv255, (float)b * Inv255, (float)a * Inv255);
 }
 
-Color operator +(double left, const Color& right)
+Color operator +(float left, const Color& right)
 {
 	return Color(left, left, left, left) + right;
 }
 
-Color operator -(double left, const Color& right)
+Color operator -(float left, const Color& right)
 {
 	return Color(left, left, left, left) - right;
 }
 
-Color operator *(double left, const Color& right)
+Color operator *(float left, const Color& right)
 {
 	return Color(left, left, left, left) * right;
 }
 
-Color operator /(double left, const Color& right)
+Color operator /(float left, const Color& right)
 {
 	return Color(left, left, left, left) / right;
 }

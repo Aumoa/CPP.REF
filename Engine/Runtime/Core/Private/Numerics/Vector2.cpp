@@ -13,13 +13,13 @@ Vector2::Vector2()
 
 }
 
-Vector2::Vector2(double x, double y)
+Vector2::Vector2(float x, float y)
 {
 	X = x;
 	Y = y;
 }
 
-Vector2::Vector2(double splat)
+Vector2::Vector2(float splat)
 {
 	X = splat;
 	Y = splat;
@@ -36,7 +36,7 @@ bool Vector2::Equals(const Vector2& rh) const
 	return (*this) == rh;
 }
 
-bool Vector2::NearlyEquals(const Vector2& rh, double epsilon) const
+bool Vector2::NearlyEquals(const Vector2& rh, float epsilon) const
 {
 	return abs(X - rh.X) <= epsilon
 		&& abs(Y - rh.Y) <= epsilon;
@@ -53,14 +53,14 @@ TRefPtr<String> Vector2::ToString() const
 	return String::Format(L"{{{0}, {1}}}", X, Y);
 }
 
-double Vector2::GetComponentOrDefault(size_t index) const
+float Vector2::GetComponentOrDefault(size_t index) const
 {
 	if (!Contains(index))
 	{
 		return 0;
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
@@ -84,12 +84,12 @@ bool Vector2::IsOverlap(const Rect& rect) const
 	return false;
 }
 
-double Vector2::LengthSq_get() const
+float Vector2::LengthSq_get() const
 {
 	return X * X + Y * Y;
 }
 
-double Vector2::Length_get() const
+float Vector2::Length_get() const
 {
 	return sqrt(LengthSq);
 }
@@ -109,25 +109,25 @@ void Vector2::Direction_set(const Vector2& value)
 	(*this) = value * Length;
 }
 
-const double& Vector2::operator [](size_t index) const
+const float& Vector2::operator [](size_t index) const
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	const double* ptr = &X;
+	const float* ptr = &X;
 	return ptr[index];
 }
 
-double& Vector2::operator [](size_t index)
+float& Vector2::operator [](size_t index)
 {
 	if (!Contains(index))
 	{
 		throw IndexOutOfRangeException();
 	}
 
-	double* ptr = &X;
+	float* ptr = &X;
 	return ptr[index];
 }
 
@@ -156,7 +156,7 @@ Vector2 Vector2::operator /(const Vector2& value) const
 	return Vector2(X / value.X, Y / value.Y);
 }
 
-double Vector2::operator |(const Vector2& value) const
+float Vector2::operator |(const Vector2& value) const
 {
 	return DotProduct(*this, value);
 }
@@ -303,37 +303,37 @@ Vector2& Vector2::operator /=(const Vector2& right)
 	return *this;
 }
 
-double Vector2::DistanceSq(const Vector2& left, const Vector2& right)
+float Vector2::DistanceSq(const Vector2& left, const Vector2& right)
 {
 	return (right - left).LengthSq;
 }
 
-double Vector2::Distance(const Vector2& left, const Vector2& right)
+float Vector2::Distance(const Vector2& left, const Vector2& right)
 {
 	return (right - left).Length;
 }
 
-double Vector2::DotProduct(const Vector2& left, const Vector2& right)
+float Vector2::DotProduct(const Vector2& left, const Vector2& right)
 {
 	return left.X * right.X + left.Y * right.Y;
 }
 
-Vector2 operator +(double left, const Vector2& right)
+Vector2 operator +(float left, const Vector2& right)
 {
 	return Vector2(left) + right;
 }
 
-Vector2 operator -(double left, const Vector2& right)
+Vector2 operator -(float left, const Vector2& right)
 {
 	return Vector2(left) - right;
 }
 
-Vector2 operator *(double left, const Vector2& right)
+Vector2 operator *(float left, const Vector2& right)
 {
 	return Vector2(left) * right;
 }
 
-Vector2 operator /(double left, const Vector2& right)
+Vector2 operator /(float left, const Vector2& right)
 {
 	return Vector2(left) / right;
 }

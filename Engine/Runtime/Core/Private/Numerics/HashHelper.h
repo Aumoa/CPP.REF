@@ -8,5 +8,5 @@
 class HashHelper abstract final : virtual public Object
 {
 public:
-	static size_t GetHashCode(double value);
+	static size_t GetHashCode(float value);
 };

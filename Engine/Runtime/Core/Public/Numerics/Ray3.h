@@ -15,20 +15,20 @@ struct CORE_API Ray3
 {
 	Vector3 Origin;
 	Vector3 Direction;
-	std::optional<double> Distance;
+	std::optional<float> Distance;
 
 	Ray3();
-	Ray3(const Vector3& origin, const Vector3& direction, std::optional<double> distance = std::nullopt);
+	Ray3(const Vector3& origin, const Vector3& direction, std::optional<float> distance = std::nullopt);
 	Ray3(const Ray3& copy);
 
 	bool Equals(const Ray3& rh) const;
-	bool NearlyEquals(const Ray3& rh, double epsilon) const;
+	bool NearlyEquals(const Ray3& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
-	Vector3 GetPoint(double distance) const;
+	Vector3 GetPoint(float distance) const;
 	bool IsOverlap(const AxisAlignedCube& cube) const;
-	std::optional<double> IsIntersect(const AxisAlignedCube& cube) const;
+	std::optional<float> IsIntersect(const AxisAlignedCube& cube) const;
 
 	bool operator ==(const Ray3& rh) const;
 	bool operator !=(const Ray3& rh) const;

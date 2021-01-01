@@ -30,7 +30,7 @@ bool ObjectOrientedCube::Equals(const ObjectOrientedCube& rh) const
 	return *this == rh;
 }
 
-bool ObjectOrientedCube::NearlyEquals(const ObjectOrientedCube& rh, double epsilon) const
+bool ObjectOrientedCube::NearlyEquals(const ObjectOrientedCube& rh, float epsilon) const
 {
 	return Center.NearlyEquals(rh.Center, epsilon)
 		&& Extent.NearlyEquals(rh.Extent, epsilon)
@@ -55,15 +55,15 @@ TRefPtr<String> ObjectOrientedCube::ToString() const
 bool ObjectOrientedCube::IsOverlap(const ObjectOrientedCube& cube) const
 {
 	Vector3 Axis[3] = { AxisX, AxisY, AxisZ };
-	double pExtent[3] = { Extent.X, Extent.Y, Extent.Z };
+	float pExtent[3] = { Extent.X, Extent.Y, Extent.Z };
 	Vector3 OtherAxis[3] = { cube.AxisX, cube.AxisY, cube.AxisZ };
-	double pOtherExtent[3] = { cube.Extent.X, cube.Extent.Y, cube.Extent.Z };
+	float pOtherExtent[3] = { cube.Extent.X, cube.Extent.Y, cube.Extent.Z };
 
 	Vector3 abvec = cube.Center - Center;
 
 	Vector3 cofactor[3];
 	Vector3 absCof[3];
-	double a_dot[3];
+	float a_dot[3];
 
 	// Check A-oriented axes.
 	{
@@ -81,9 +81,9 @@ bool ObjectOrientedCube::IsOverlap(const ObjectOrientedCube& cube) const
 			absCof[i][1] = abs(cofactor[i][1]);
 			absCof[i][2] = abs(cofactor[i][2]);
 
-			double R = abs(a_dot[i]);
-			double R1 = cube.Extent | Vector3(absCof[i][0], absCof[i][1], absCof[i][2]);
-			double R01 = pExtent[i] + R1;
+			float R = abs(a_dot[i]);
+			float R1 = cube.Extent | Vector3(absCof[i][0], absCof[i][1], absCof[i][2]);
+			float R01 = pExtent[i] + R1;
 
 			if (R > R01)
 			{
@@ -96,9 +96,9 @@ bool ObjectOrientedCube::IsOverlap(const ObjectOrientedCube& cube) const
 	{
 		for (int i = 0; i < 3; ++i)
 		{
-			double R = abs(OtherAxis[i] | abvec);
-			double R0 = Extent | Vector3(absCof[0][i], absCof[1][i], absCof[2][i]);
-			double R01 = R0 + pOtherExtent[i];
+			float R = abs(OtherAxis[i] | abvec);
+			float R0 = Extent | Vector3(absCof[0][i], absCof[1][i], absCof[2][i]);
+			float R01 = R0 + pOtherExtent[i];
 
 			if (R > R01)
 			{
@@ -116,7 +116,7 @@ bool ObjectOrientedCube::IsOverlap(const ObjectOrientedCube& cube) const
 		{
 			for (int j = 0; j < 3; ++j)
 			{
-				double R = abs(
+				float R = abs(
 					a_dot[OrderA[i]] * cofactor[OrderB[i]][j]
 					-
 					a_dot[OrderB[i]] * cofactor[OrderA[i]][j]
@@ -124,13 +124,13 @@ bool ObjectOrientedCube::IsOverlap(const ObjectOrientedCube& cube) const
 
 				int nInc = (i == 0) ? 1 : 0;  // 1, 0, 0
 				int nExc = 2 - ((i == 2) ? 1 : 0);  // 2, 2, 1
-				double R0 = pExtent[nInc] * absCof[nExc][j] + pExtent[nExc] * absCof[nInc][j];
+				float R0 = pExtent[nInc] * absCof[nExc][j] + pExtent[nExc] * absCof[nInc][j];
 
 				nInc = (j == 0) ? 1 : 0;
 				nExc = 2 - ((j == 2) ? 1 : 0);
-				double R1 = pOtherExtent[nInc] * absCof[i][nExc] + pOtherExtent[nExc] * absCof[i][nInc];
+				float R1 = pOtherExtent[nInc] * absCof[i][nExc] + pOtherExtent[nExc] * absCof[i][nInc];
 
-				double R01 = R0 + R1;
+				float R01 = R0 + R1;
 				if (R > R01)
 				{
 					return false;
@@ -144,7 +144,7 @@ bool ObjectOrientedCube::IsOverlap(const ObjectOrientedCube& cube) const
 
 vector<Vector3> ObjectOrientedCube::CalcVertices() const
 {
-	double Signs[2] = { +1, -1 };
+	float Signs[2] = { +1, -1 };
 
 	vector<Vector3> verts(8);
 	int index = 0;
