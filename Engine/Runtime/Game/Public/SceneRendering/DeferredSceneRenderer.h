@@ -20,4 +20,5 @@ public:
 
 	void BeginRender() override;
 	void EndRender() override;
+	void PopulateRenderCommands() override;
 };

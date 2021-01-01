@@ -12,10 +12,17 @@ struct Fragment
 	float4 Color : COLOR;
 };
 
-Fragment VS_Main(in Vertex inVertex)
+static Vertex gVertex[3] =
+{
+	{ float3(0, 1, 0), float4(1, 0, 0, 1) },
+	{ float3(1, -1, 0), float4(0, 1, 0, 1) },
+	{ float3(-1, -1, 0), float4(0, 0, 1, 1) },
+};
+
+Fragment VS_Main(uint iVertexID : SV_VERTEXID)
 {
 	Fragment oFrag;
-	oFrag.PosH = float4(inVertex.Pos, 1.0f);
-	oFrag.Color = inVertex.Color;
+	oFrag.PosH = float4(gVertex[iVertexID].Pos, 1.0f);
+	oFrag.Color = gVertex[iVertexID].Color;
 	return oFrag;
 }

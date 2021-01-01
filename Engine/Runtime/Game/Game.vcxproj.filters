@@ -246,6 +246,24 @@
     <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIShader.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12Shader.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIShaderLibrary.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RHI\RHICommon.h">
+      <Filter>Private\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIPrimitiveTopology.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIViewport.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -367,6 +385,18 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp">
       <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIShaderLibrary.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHICommon.cpp">
+      <Filter>Private\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIViewport.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

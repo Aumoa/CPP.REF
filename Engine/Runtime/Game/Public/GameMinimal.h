@@ -6,3 +6,4 @@
 #include "Rotator.h"
 #include "Transform.h"
 #include "WindowsMinimal.h"
+#include "RHI/RHIViewport.h"

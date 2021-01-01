@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "IRHICommandList.h"
 
-interface IRHIDeferredCommandList : virtual public Object, virtual public IRHICommandList
+interface GAME_API IRHIDeferredCommandList : virtual public Object, virtual public IRHICommandList
 {
 
 };

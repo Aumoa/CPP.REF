@@ -24,10 +24,16 @@ public:
 	virtual void BeginCommand();
 	virtual void EndCommand();
 
-	virtual void OMSetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]);
+	virtual void SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]);
 	virtual void ClearRenderTargetView(IRHIRenderTargetView* rtv);
 	virtual void ResourceTransition(IRHIResource* resource, RHIResourceStates beforeState, RHIResourceStates afterState, size_t subresourceIndex = 0);
 	virtual void CopyResource(IRHIResource* target, IRHIResource* source);
+	virtual void SetShader(IRHIShader* shader);
+	virtual void DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount, int32 baseVertexLocation, uint32 startInstanceLocation);
+	virtual void DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation);
+	virtual void SetPrimitiveTopology(RHIPrimitiveTopology primitiveTopology);
+	virtual void SetScissorRects(const Rect& scissorRect);
+	virtual void SetViewports(const RHIViewport& viewport);
 
 	virtual bool HasBegunCommand_get() const;
 

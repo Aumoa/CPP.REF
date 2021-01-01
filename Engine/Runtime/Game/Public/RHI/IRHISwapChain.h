@@ -7,7 +7,7 @@
 
 interface IRHIResource;
 
-interface IRHISwapChain : virtual public Object
+interface GAME_API IRHISwapChain : virtual public Object
 {
 	virtual void Present() = 0;
 	virtual void ResizeBuffers(int32 width, int32 height) = 0;

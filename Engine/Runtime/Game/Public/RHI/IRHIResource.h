@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface IRHIResource : virtual public Object
+interface GAME_API IRHIResource : virtual public Object
 {
 
 };

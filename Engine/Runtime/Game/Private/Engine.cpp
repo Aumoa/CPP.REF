@@ -8,7 +8,7 @@
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
-#include "SceneRendering/SceneRenderer.h"
+#include "SceneRendering/DeferredSceneRenderer.h"
 #include "SceneRendering/Scene.h"
 #include "RHI/IRHICommandFence.h"
 #include "RHI/IRHIImmediateCommandList.h"
@@ -61,7 +61,7 @@ void Engine::Initialize()
 	immediateCommandList = deviceBundle->GetImmediateCommandList().Get();
 	swapChain = deviceBundle->GetSwapChain().Get();
 
-	sceneRenderer = NewObject<SceneRenderer>(this->deviceBundle);
+	sceneRenderer = NewObject<DeferredSceneRenderer>(this->deviceBundle);
 
 	gEngine = this;
 	prev_tick = steady_clock::now();
@@ -86,9 +86,13 @@ void Engine::Tick()
 
 	IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
 
-	// TODO: SceneRenderer
 	sceneRenderer->BeginRender();
-	gameInstance->GetWorld()->GetScene()->Render(sceneRenderer.Get());
+
+	World* renderWorld = gameInstance->GetWorld();
+	Scene* renderScene = renderWorld->GetScene();
+	renderScene->Render(sceneRenderer.Get());
+	sceneRenderer->PopulateRenderCommands();
+
 	sceneRenderer->EndRender();
 	immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
 

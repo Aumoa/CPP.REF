@@ -5,7 +5,8 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface GAME_API IRHIRenderTargetView : virtual public Object
+enum class RHIPrimitiveTopology
 {
-
+	UNDEFINED = 0,
+	TRIANGLELIST = 4,
 };

@@ -6,83 +6,33 @@
 
 LogCategoryBase LogD3D12RHI(ELogVerbosity::Verbose, nameof(LogD3D12RHI));
 
-D3D12_RESOURCE_STATES ToD3D12(RHIResourceStates value)
-{
+#define ToD3D12_Begin(D3D12Class, RHIClass)\
+D3D12Class ToD3D12(RHIClass value)\
+{\
+	using T = D3D12Class;\
 	switch (value)
-	{
-	case RHIResourceStates::PRESENT:
-		return D3D12_RESOURCE_STATE_PRESENT;
-	case RHIResourceStates::RENDER_TARGET:
-		return D3D12_RESOURCE_STATE_RENDER_TARGET;
-	case RHIResourceStates::COPY_SOURCE:
-		return D3D12_RESOURCE_STATE_COPY_SOURCE;
-	case RHIResourceStates::COPY_DEST:
-		return D3D12_RESOURCE_STATE_COPY_DEST;
-	default:
-		return D3D12_RESOURCE_STATE_COMMON;
-	}
+
+#define ToD3D12_End\
+	return (T)0;\
 }
 
-DXGI_FORMAT ToD3D12(RHITextureFormat value)
-{
+#define ToD3D12_Item(Prefix, Name)\
+	case decltype(value)::Name:\
+		return Prefix ## _ ## Name;
+
+#define ToRHI_Begin(D3D12Class, RHIClass)\
+RHIClass ToD3D12(D3D12Class value)\
+{\
+	using T = RHIClass;\
 	switch (value)
-	{
-	case RHITextureFormat::R8G8B8A8_UNORM:
-		return DXGI_FORMAT_R8G8B8A8_UNORM;
-	default:
-		return DXGI_FORMAT_UNKNOWN;
-	}
+
+#define ToRHI_End\
+	return (T)0;\
 }
 
-D3D12_RESOURCE_FLAGS ToD3D12(RHIResourceFlags value)
-{
-	bool bAllowRenderTarget = (value & RHIResourceFlags::AllowRenderTarget) != RHIResourceFlags::None;
-	D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE;
-	if (bAllowRenderTarget)
-	{
-		flags = flags | D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-	}
-	return flags;
-}
-
-RHIResourceStates ToRHI(D3D12_RESOURCE_STATES value)
-{
-	switch (value)
-	{
-	case D3D12_RESOURCE_STATE_PRESENT:
-		return RHIResourceStates::PRESENT;
-	case D3D12_RESOURCE_STATE_RENDER_TARGET:
-		return RHIResourceStates::RENDER_TARGET;
-	case D3D12_RESOURCE_STATE_COPY_SOURCE:
-		return RHIResourceStates::COPY_SOURCE;
-	case D3D12_RESOURCE_STATE_COPY_DEST:
-		return RHIResourceStates::COPY_DEST;
-	default:
-		return RHIResourceStates::PRESENT;
-	}
-}
-
-RHITextureFormat ToRHI(DXGI_FORMAT value)
-{
-	switch (value)
-	{
-	case DXGI_FORMAT_R8G8B8A8_UNORM:
-		return RHITextureFormat::R8G8B8A8_UNORM;
-	default:
-		return RHITextureFormat::Unknown;
-	}
-}
-
-RHIResourceFlags ToRHI(D3D12_RESOURCE_FLAGS value)
-{
-	bool bAllowRenderTarget = (value & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) != D3D12_RESOURCE_FLAG_NONE;
-	RHIResourceFlags flags = RHIResourceFlags::None;
-	if (bAllowRenderTarget)
-	{
-		flags = flags | RHIResourceFlags::AllowRenderTarget;
-	}
-	return flags;
-}
+#define ToRHI_Item(Prefix, Name)\
+	case Prefix ## _ ## Name:\
+		return T::Name;
 
 bool IsDepthStencilFormat(RHITextureFormat value)
 {

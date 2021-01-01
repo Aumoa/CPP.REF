@@ -174,10 +174,12 @@
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTargetView.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12Shader.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
+    <ClInclude Include="Private\RHI\RHICommon.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanException.h" />
@@ -212,11 +214,15 @@
     <ClInclude Include="Public\RHI\IRHIImmediateCommandList.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
+    <ClInclude Include="Public\RHI\IRHIShader.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h" />
+    <ClInclude Include="Public\RHI\RHIPrimitiveTopology.h" />
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
+    <ClInclude Include="Public\RHI\RHIShaderLibrary.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
+    <ClInclude Include="Public\RHI\RHIViewport.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
@@ -257,6 +263,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTargetView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
@@ -267,7 +274,10 @@
     <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
+    <ClCompile Include="Private\RHI\RHIShaderLibrary.cpp" />
+    <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />

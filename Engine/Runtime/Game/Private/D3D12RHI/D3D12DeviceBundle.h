@@ -31,6 +31,8 @@ private:
 	TRefPtr<D3D12OfflineDescriptorManager> rtvManager;
 	TRefPtr<D3D12OfflineDescriptorManager> dsvManager;
 
+	TRefPtr<RHIShaderLibrary> shaderLibrary;
+
 public:
 	D3D12DeviceBundle();
 	~D3D12DeviceBundle() override;
@@ -40,6 +42,7 @@ public:
 
 	virtual TRefPtr<IRHISwapChain> GetSwapChain() const;
 	virtual TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const;
+	virtual TRefPtr<RHIShaderLibrary> GetShaderLibrary() const;
 
 	virtual TRefPtr<IRHICommandFence> CreateCommandFence();
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource);

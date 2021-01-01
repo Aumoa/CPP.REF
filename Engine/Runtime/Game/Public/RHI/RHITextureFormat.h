@@ -8,5 +8,6 @@
 enum class RHITextureFormat
 {
 	Unknown,
-	R8G8B8A8_UNORM
+	R8G8B8A8_UNORM = 28,
+	B8G8R8A8_UNORM = 87,
 };

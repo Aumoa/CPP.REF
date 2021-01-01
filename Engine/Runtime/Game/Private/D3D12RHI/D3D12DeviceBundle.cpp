@@ -13,6 +13,8 @@
 #include "D3D12OfflineDescriptorIndex.h"
 #include "D3D12Resource.h"
 #include "D3D12DeferredCommandList.h"
+#include "D3D12Shader.h"
+#include "RHI/RHIShaderLibrary.h"
 
 D3D12DeviceBundle* D3D12DeviceBundle::instance = nullptr;
 
@@ -50,6 +52,11 @@ void D3D12DeviceBundle::InitializeBundle()
 	InitializeDXGI();
 	InitializeD3D12();
 
+	auto d3d12Shader = NewObject<D3D12Shader>();
+	d3d12Shader->CreateShaderPipeline(d3d12Device.Get());
+	shaderLibrary = NewObject<RHIShaderLibrary>();
+	shaderLibrary->AddShader(d3d12Shader);
+
 	instance = this;
 
 	GApplication.Sizing += bind_delegate(Application_OnSizing);
@@ -68,6 +75,11 @@ TRefPtr<IRHISwapChain> D3D12DeviceBundle::GetSwapChain() const
 TRefPtr<IRHIImmediateCommandList> D3D12DeviceBundle::GetImmediateCommandList() const
 {
 	return immediateCommandList;
+}
+
+TRefPtr<RHIShaderLibrary> D3D12DeviceBundle::GetShaderLibrary() const
+{
+	return shaderLibrary;
 }
 
 TRefPtr<IRHICommandFence> D3D12DeviceBundle::CreateCommandFence()
@@ -94,9 +106,9 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(RHITextureFormat format
 	desc.Height = (UINT)height;
 	desc.DepthOrArraySize = 1;
 	desc.MipLevels = 1;
-	desc.Format = ToD3D12(format);
+	desc.Format = (DXGI_FORMAT)format;
 	desc.SampleDesc = { 1, 0 };
-	desc.Flags = ToD3D12(flags);
+	desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
 
 	D3D12_CLEAR_VALUE clearValue{ desc.Format };
 	if (IsDepthStencilFormat(format))
@@ -106,7 +118,7 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(RHITextureFormat format
 	}
 
 	ComPtr<ID3D12Resource> resource;
-	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, ToD3D12(initialStates), &clearValue, IID_PPV_ARGS(&resource)));
+	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, (D3D12_RESOURCE_STATES)initialStates, &clearValue, IID_PPV_ARGS(&resource)));
 
 	return NewObject<D3D12Resource>(resource.Get());
 }
@@ -175,7 +187,7 @@ void D3D12DeviceBundle::InitializeD3D12()
 	immediateCommandList = NewObject<D3D12ImmediateCommandList>(d3d12Device.Get());
 
 	DXGI_SWAP_CHAIN_DESC1 chainDesc{ };
-	chainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	chainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	chainDesc.SampleDesc = { 1, 0 };
 	chainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
 	chainDesc.BufferCount = 3;

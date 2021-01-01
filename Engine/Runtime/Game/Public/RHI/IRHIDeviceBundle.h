@@ -17,10 +17,13 @@ enum class RHITextureFormat;
 enum class RHIResourceFlags;
 enum class RHIResourceStates;
 
-interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
+class RHIShaderLibrary;
+
+interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 {
 	virtual TRefPtr<IRHISwapChain> GetSwapChain() const = 0;
 	virtual TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const = 0;
+	virtual TRefPtr<RHIShaderLibrary> GetShaderLibrary() const = 0;
 
 	virtual TRefPtr<IRHICommandFence> CreateCommandFence() = 0;
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
