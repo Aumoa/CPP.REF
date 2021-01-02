@@ -168,6 +168,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorAllocator.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorIndex.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12Fence.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ImmediateCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
+    <ClInclude Include="Public\Assets\AssetManager.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\MeshComponent.h" />
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
@@ -211,6 +213,7 @@
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
     <ClInclude Include="Public\RHI\IRHIDeferredCommandList.h" />
     <ClInclude Include="Public\RHI\IRHIDeviceBundle.h" />
+    <ClInclude Include="Public\RHI\IRHIFence.h" />
     <ClInclude Include="Public\RHI\IRHIImmediateCommandList.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
@@ -219,16 +222,20 @@
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h" />
     <ClInclude Include="Public\RHI\RHIPrimitiveTopology.h" />
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
+    <ClInclude Include="Public\RHI\RHIResourceGC.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
     <ClInclude Include="Public\RHI\RHIShaderLibrary.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
+    <ClInclude Include="Public\RHI\RHIVertex.h" />
     <ClInclude Include="Public\RHI\RHIViewport.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\Mesh.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\StaticMesh.h" />
     <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h" />
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
@@ -247,6 +254,7 @@
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\MeshComponent.cpp" />
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
@@ -257,6 +265,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DeferredCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorAllocator.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorIndex.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12Fence.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ImmediateCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.cpp" />
@@ -276,14 +285,18 @@
     <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
+    <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />
     <ClCompile Include="Private\RHI\RHIShaderLibrary.cpp" />
+    <ClCompile Include="Private\RHI\RHIVertex.cpp" />
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
     <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\StaticMesh.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />

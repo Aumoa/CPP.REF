@@ -7,25 +7,25 @@
 
 struct GAME_API Rotator
 {
-	TDegrees<double> Pitch;
-	TDegrees<double> Yaw;
-	TDegrees<double> Roll;
+	TDegrees<float> Pitch;
+	TDegrees<float> Yaw;
+	TDegrees<float> Roll;
 
 	Rotator();
-	Rotator(const TDegrees<double>& yaw, const TDegrees<double>& pitch, const TDegrees<double>& roll);
+	Rotator(const TDegrees<float>& yaw, const TDegrees<float>& pitch, const TDegrees<float>& roll);
 	Rotator(const Quaternion& rotation);
 	Rotator(const Rotator& copy);
 	~Rotator();
 		
 	bool Equals(const Rotator& rh) const;
-	bool NearlyEquals(const Rotator& rh, TDegrees<double> epsilon) const;
+	bool NearlyEquals(const Rotator& rh, TDegrees<float> epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
 	Vector3 RotateVector(const Vector3& v) const;
 	Vector3 UnrotateVector(const Vector3& v) const;
 
-	Rotator& Add(const TDegrees<double>& yawDelta, const TDegrees<double>& pitchDelta, const TDegrees<double>& rollDelta);
+	Rotator& Add(const TDegrees<float>& yawDelta, const TDegrees<float>& pitchDelta, const TDegrees<float>& rollDelta);
 	Rotator Clamp() const;
 
 	vs_property_get(Rotator, Inverse);

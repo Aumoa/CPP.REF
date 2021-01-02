@@ -30,6 +30,7 @@ void World::Tick(duration<double> deltaTime)
 	Tick_Group(deltaTime, TickingGroup::DuringPhysics);
 	Tick_Group(deltaTime, TickingGroup::PostPhysics);
 	Tick_Group(deltaTime, TickingGroup::PostUpdateWork);
+	scene->Update();
 }
 
 void World::LoadLevel(Level* loadLevel)
@@ -106,10 +107,6 @@ void World::AddSceneProxy(AActor* actor_ptr)
 			item->ResolveDirtyState();
 		}
 
-		PrimitiveSceneProxy* sceneProxy = item->GetSceneProxy();
-		if (sceneProxy != nullptr)
-		{
-			scene->AddScene(sceneProxy);
-		}
+		scene->AddScene(item);
 	}
 }

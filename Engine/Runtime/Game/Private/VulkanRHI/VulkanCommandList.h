@@ -25,7 +25,7 @@ public:
 
 	virtual void OMSetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]);
 	virtual void ClearRenderTargetView(IRHIRenderTargetView* rtv);
-	virtual void ResourceTransition(IRHIResource* resource, RHIResourceStates beforeState, RHIResourceStates afterState, size_t subresourceIndex = 0);
+	virtual void ResourceTransition(IRHIResource* resource, ERHIResourceStates beforeState, ERHIResourceStates afterState, size_t subresourceIndex = 0);
 	virtual void CopyResource(IRHIResource* target, IRHIResource* source);
 
 	virtual bool HasBegunCommand_get() const;

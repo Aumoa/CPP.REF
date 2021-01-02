@@ -8,7 +8,7 @@
 
 interface IRHIDeferredCommandList;
 
-interface GAME_API IRHIImmediateCommandList : virtual public Object, virtual public IRHICommandList
+interface IRHIImmediateCommandList : virtual public Object, virtual public IRHICommandList
 {
 	virtual void ExecuteCommandList(IRHIDeferredCommandList* deferredCommandList) = 0;
 	virtual void Flush() = 0;

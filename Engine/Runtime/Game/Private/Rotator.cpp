@@ -9,7 +9,7 @@ Rotator::Rotator()
 
 }
 
-Rotator::Rotator(const TDegrees<double>& pitch, const TDegrees<double>& yaw, const TDegrees<double>& roll)
+Rotator::Rotator(const TDegrees<float>& pitch, const TDegrees<float>& yaw, const TDegrees<float>& roll)
 {
 	Pitch = pitch;
 	Yaw = yaw;
@@ -18,33 +18,33 @@ Rotator::Rotator(const TDegrees<double>& pitch, const TDegrees<double>& yaw, con
 
 Rotator::Rotator(const Quaternion& rotation)
 {
-	const double X = rotation.X;
-	const double Y = rotation.Y;
-	const double Z = rotation.Z;
-	const double W = rotation.W;
+	const float X = rotation.X;
+	const float Y = rotation.Y;
+	const float Z = rotation.Z;
+	const float W = rotation.W;
 
-	const double singularityTest = Z * X - W * Y;
-	const double yawY = 2.0 * (W * Z + X * Y);
-	const double yawX = (1.0 - 2.0 * (Math::Square(Y) + Math::Square(Z)));
+	const float singularityTest = Z * X - W * Y;
+	const float yawY = 2.0f * (W * Z + X * Y);
+	const float yawX = (1.0f - 2.0f * (Math::Square(Y) + Math::Square(Z)));
 
-	constexpr double SINGULARITY_THRESHOLD = 0.4999995;
+	constexpr float SINGULARITY_THRESHOLD = 0.4999995f;
 	if (singularityTest < -SINGULARITY_THRESHOLD)
 	{
-		Pitch = -90.0;
+		Pitch = -90.0f;
 		Yaw = Math::Atan2(yawY, yawX);
-		Roll = (-Yaw - (2.0 * Math::Atan2(X, W))).Normalized;
+		Roll = (-Yaw - (2.0f * Math::Atan2(X, W))).Normalized;
 	}
 	else if (singularityTest > SINGULARITY_THRESHOLD)
 	{
 		Pitch = 90.f;
 		Yaw = Math::Atan2(yawY, yawX);
-		Roll = (Yaw - (2.0 * Math::Atan2(X, W))).Normalized;
+		Roll = (Yaw - (2.0f * Math::Atan2(X, W))).Normalized;
 	}
 	else
 	{
-		Pitch = Math::Asin(2.0 * singularityTest);
+		Pitch = Math::Asin(2.0f * singularityTest);
 		Yaw = Math::Atan2(yawY, yawX);
-		Roll = Math::Atan2(-2.0 * (W * X + Y * Z), 1.0 - 2.0 * (Math::Square(X) + Math::Square(Y)));
+		Roll = Math::Atan2(-2.0f * (W * X + Y * Z), 1.0f - 2.0f * (Math::Square(X) + Math::Square(Y)));
 	}
 }
 
@@ -67,7 +67,7 @@ bool Rotator::Equals(const Rotator& rh) const
 		&& Roll == rh.Roll;
 }
 
-bool Rotator::NearlyEquals(const Rotator& rh, TDegrees<double> epsilon) const
+bool Rotator::NearlyEquals(const Rotator& rh, TDegrees<float> epsilon) const
 {
 	return Math::Abs(Pitch - rh.Pitch) <= epsilon
 		&& Math::Abs(Yaw - rh.Yaw) <= epsilon
@@ -94,7 +94,7 @@ Vector3 Rotator::UnrotateVector(const Vector3& v) const
 	return Matrix.Transposed.TransformVector(v);
 }
 
-Rotator& Rotator::Add(const TDegrees<double>& yawDelta, const TDegrees<double>& pitchDelta, const TDegrees<double>& rollDelta)
+Rotator& Rotator::Add(const TDegrees<float>& yawDelta, const TDegrees<float>& pitchDelta, const TDegrees<float>& rollDelta)
 {
 	Pitch += pitchDelta;
 	Yaw += yawDelta;
@@ -104,7 +104,7 @@ Rotator& Rotator::Add(const TDegrees<double>& yawDelta, const TDegrees<double>& 
 
 Rotator Rotator::Clamp() const
 {
-	return { fmod(Pitch.Value, 360.0), fmod(Yaw.Value, 360.0), fmod(Roll.Value, 360.0) };
+	return { fmod(Pitch.Value, 360.0f), fmod(Yaw.Value, 360.0f), fmod(Roll.Value, 360.0f) };
 }
 
 Rotator Rotator::Inverse_get() const
@@ -114,13 +114,13 @@ Rotator Rotator::Inverse_get() const
 
 Quaternion Rotator::Rotation_get() const
 {
-	const TDegrees<double> PitchNoWinding = Pitch.Clamped;
-	const TDegrees<double> YawNoWinding = Yaw.Clamped;
-	const TDegrees<double> RollNoWinding = Roll.Clamped;
+	const TDegrees<float> PitchNoWinding = Pitch.Clamped;
+	const TDegrees<float> YawNoWinding = Yaw.Clamped;
+	const TDegrees<float> RollNoWinding = Roll.Clamped;
 
-	auto[SP, CP] = Math::SinCos<double>(PitchNoWinding * 0.5);
-	auto[SY, CY] = Math::SinCos<double>(YawNoWinding * 0.5);
-	auto[SR, CR] = Math::SinCos<double>(RollNoWinding * 0.5);
+	auto[SP, CP] = Math::SinCos<float>(PitchNoWinding * 0.5);
+	auto[SY, CY] = Math::SinCos<float>(YawNoWinding * 0.5);
+	auto[SR, CR] = Math::SinCos<float>(RollNoWinding * 0.5);
 
 	Quaternion rotationQuat;
 	rotationQuat.X = CR * SP * SY - SR * CP * CY;
@@ -135,9 +135,9 @@ Matrix4x4 Rotator::Matrix_get() const
 {
 	const Vector3 Origin = Vector3::Zero;
 
-	auto[SP, CP] = Math::SinCos<double>(Pitch);
-	auto[SY, CY] = Math::SinCos<double>(Yaw);
-	auto[SR, CR] = Math::SinCos<double>(Roll);
+	auto[SP, CP] = Math::SinCos<float>(Pitch);
+	auto[SY, CY] = Math::SinCos<float>(Yaw);
+	auto[SR, CR] = Math::SinCos<float>(Roll);
 
 	Matrix4x4 M;
 	M[0][0] = CP * CY;

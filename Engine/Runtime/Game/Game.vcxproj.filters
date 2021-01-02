@@ -46,6 +46,12 @@
     <Filter Include="Private\RHI">
       <UniqueIdentifier>{e96d80f9-da6a-4dad-ac0f-25a9e8a4d181}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Assets">
+      <UniqueIdentifier>{274472a8-b9ae-4ede-8a77-0ab900847e3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Assets">
+      <UniqueIdentifier>{815f49cc-3fde-41f5-b552-f38cb78f101a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -264,6 +270,27 @@
     <ClInclude Include="Public\RHI\RHIViewport.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Mesh.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\StaticMesh.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\AssetManager.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIVertex.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIResourceGC.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIFence.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12Fence.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -397,6 +424,24 @@
     </ClCompile>
     <ClCompile Include="Private\RHI\RHIViewport.cpp">
       <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\Mesh.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\StaticMesh.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\AssetManager.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIVertex.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIResourceGC.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12Fence.cpp">
+      <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

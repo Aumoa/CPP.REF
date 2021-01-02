@@ -34,7 +34,7 @@ RHIClass ToD3D12(D3D12Class value)\
 	case Prefix ## _ ## Name:\
 		return T::Name;
 
-bool IsDepthStencilFormat(RHITextureFormat value)
+bool IsDepthStencilFormat(ERHITextureFormat value)
 {
 	return false;
 }

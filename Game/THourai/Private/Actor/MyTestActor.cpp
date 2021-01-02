@@ -13,6 +13,9 @@ AMyTestActor::AMyTestActor()
 
 	staticMeshComponent = NewObject<StaticMeshComponent>();
 	RootComponent = staticMeshComponent.Get();
+
+	StaticMesh* staticMesh = GAssetMgr.Load(L"Engine/StaticMesh/Triangle");
+	staticMeshComponent->SetStaticMesh(staticMesh);
 }
 
 AMyTestActor::~AMyTestActor()

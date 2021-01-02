@@ -157,7 +157,7 @@ inline TRefPtr<O, bThreadSafe> TRefPtr<T, bThreadSafe>::As() const
 	{
 		ThrowInvalidCastException();
 	}
-	return move(ret);
+	return std::move(ret);
 }
 
 template<TIsNotPointer T, bool bThreadSafe> template<TIsRefCore O>
@@ -169,7 +169,7 @@ inline TRefPtr<O, bThreadSafe> TRefPtr<T, bThreadSafe>::TryAs() const
 		return nullptr;
 	}
 
-	return ptr;
+	return cast;
 }
 
 template<TIsNotPointer T, bool bThreadSafe>

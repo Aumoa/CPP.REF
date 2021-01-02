@@ -10,11 +10,14 @@
 #include "Logging/LogMacros.h"
 #include "SceneRendering/DeferredSceneRenderer.h"
 #include "SceneRendering/Scene.h"
+#include "SceneRendering/StaticMesh.h"
 #include "RHI/IRHICommandFence.h"
 #include "RHI/IRHIImmediateCommandList.h"
 #include "RHI/RHIResourceStates.h"
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDeferredCommandList.h"
+#include "RHI/RHIResourceGC.h"
+#include "Assets/AssetManager.h"
 
 #include "D3D12RHI/D3D12DeviceBundle.h"
 //#include "VulkanRHI/VulkanDeviceBundle.h"
@@ -50,6 +53,7 @@ void Engine::Initialize()
 		SE_LOG(LogEngine, Fatal, L"Engine duplication detected.");
 		throw Exception("Unexpected exception.");
 	}
+	gEngine = this;
 
 	auto deviceBundle = NewObject<D3D12DeviceBundle>();
 	this->deviceBundle = deviceBundle.Get();
@@ -58,12 +62,14 @@ void Engine::Initialize()
 	ForEachBundles([](auto* bundle) { bundle->InitializeBundle(); });
 
 	autoFence = deviceBundle->CreateCommandFence();
-	immediateCommandList = deviceBundle->GetImmediateCommandList().Get();
+	immediateCommandList = deviceBundle->GetImmediateCommandList();
 	swapChain = deviceBundle->GetSwapChain().Get();
 
 	sceneRenderer = NewObject<DeferredSceneRenderer>(this->deviceBundle);
+	assetManager = NewObject<AssetManager>();
 
-	gEngine = this;
+	LoadEngineDefaultAssets();
+
 	prev_tick = steady_clock::now();
 }
 
@@ -78,6 +84,7 @@ void Engine::Tick()
 	auto delta = curr_tick - prev_tick;
 	prev_tick = curr_tick;
 
+	deviceBundle->GetResourceGC()->Collect();
 	gameInstance->Tick(delta);
 
 	TRefPtr<IRHISwapChain> swapChain = deviceBundle->GetSwapChain();
@@ -97,9 +104,9 @@ void Engine::Tick()
 	immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
 
 	immediateCommandList->BeginCommand();
-	immediateCommandList->ResourceTransition(target, RHIResourceStates::PRESENT, RHIResourceStates::COPY_DEST);
+	immediateCommandList->ResourceTransition(target, ERHIResourceStates::PRESENT, ERHIResourceStates::COPY_DEST);
 	immediateCommandList->CopyResource(target, sceneRenderer->FinalColor);
-	immediateCommandList->ResourceTransition(target, RHIResourceStates::COPY_DEST, RHIResourceStates::PRESENT);
+	immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
 	immediateCommandList->EndCommand();
 	immediateCommandList->Flush();
 
@@ -113,6 +120,11 @@ IRHIDeviceBundle* Engine::DeviceBundle_get() const
 	return deviceBundle;
 }
 
+AssetManager* Engine::GetAssetManager() const
+{
+	return assetManager.Get();
+}
+
 Engine* Engine::GetInstance()
 {
 	return gEngine;
@@ -124,4 +136,10 @@ void Engine::ForEachBundles(function<void(IRHIBundle*)> action)
 	{
 		action(bundle.Get());
 	}
+}
+
+void Engine::LoadEngineDefaultAssets()
+{
+	TRefPtr<StaticMesh> mesh = NewObject<StaticMesh>();
+	GetAssetManager()->Import(L"Engine/StaticMesh/Triangle", mesh);
 }

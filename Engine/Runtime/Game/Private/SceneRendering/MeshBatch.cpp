@@ -3,7 +3,6 @@
 #include "SceneRendering/MeshBatch.h"
 
 MeshBatch::MeshBatch() : Super()
-	, drawCommand(nullptr)
 {
 	
 }
@@ -11,9 +10,4 @@ MeshBatch::MeshBatch() : Super()
 MeshBatch::~MeshBatch()
 {
 
-}
-
-RHIMeshDrawCommand* MeshBatch::GetDrawCommand() const
-{
-	return drawCommand;
 }

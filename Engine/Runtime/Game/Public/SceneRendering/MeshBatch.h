@@ -13,12 +13,9 @@ public:
 	using Super = Object;
 	using This = MeshBatch;
 
-private:
-	RHIMeshDrawCommand* drawCommand;
-
 public:
 	MeshBatch();
 	~MeshBatch();
 
-	RHIMeshDrawCommand* GetDrawCommand() const;
+	virtual const RHIMeshDrawCommand* GetDrawCommand() const = 0;
 };

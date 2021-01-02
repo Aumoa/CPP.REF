@@ -130,7 +130,7 @@ TRefPtr<IRHIRenderTargetView> VulkanDeviceBundle::CreateRenderTargetView(IRHIRes
 	throw;
 }
 
-TRefPtr<IRHIResource> VulkanDeviceBundle::CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags)
+TRefPtr<IRHIResource> VulkanDeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags)
 {
 	// TODO: NOTIMPL
 	throw;

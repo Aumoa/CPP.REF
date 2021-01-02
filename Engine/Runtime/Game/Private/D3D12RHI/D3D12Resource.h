@@ -21,6 +21,8 @@ public:
 	D3D12Resource(ID3D12Resource* resource);
 	~D3D12Resource() override;
 
+	virtual uint64 GetVirtualAddress() const;
+
 	vs_property_get(ID3D12Resource*, Resource);
 	ID3D12Resource* Resource_get() const;
 };

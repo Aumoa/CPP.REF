@@ -19,7 +19,7 @@ struct GAME_API Transform
 	~Transform();
 
 	bool Equals(const Transform& rh) const;
-	bool NearlyEquals(const Transform& rh, double epsilon) const;
+	bool NearlyEquals(const Transform& rh, float epsilon) const;
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 

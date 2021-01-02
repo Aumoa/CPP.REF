@@ -10,6 +10,7 @@
 #include "RHI/RHIPrimitiveTopology.h"
 #include "RHI/RHIViewport.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
+#include "SceneRendering/MeshBatch.h"
 
 using namespace std;
 
@@ -41,20 +42,24 @@ void DeferredSceneRenderer::PopulateRenderCommands()
 	int32 sceneX, sceneY;
 	GetSceneSize(sceneX, sceneY);
 
-	CommandList->SetScissorRects(Rect(0, 0, sceneX, sceneY));
+	CommandList->SetScissorRects(Rect(0, 0, (float)sceneX, (float)sceneY));
 	CommandList->SetViewports(RHIViewport(sceneX, sceneY));
 
-	TRefPtr<RHIShaderLibrary> shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
+	RHIShaderLibrary* shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
 	IRHIShader* test_shader = shaderLibrary->GetShader(0);
+
+	CommandList->SetShader(test_shader);
+	CommandList->SetPrimitiveTopology(ERHIPrimitiveTopology::TRIANGLELIST);
 
 	PrimitiveSceneProxy* const* sceneProxyArray = GetPrimitives();
 	auto primitives = span(sceneProxyArray, GetPrimitiveCount());
 	for (auto& primitive : primitives)
 	{
-		// TODO: Render primitives.
+		MeshBatch* batch = primitive->GetMeshBatch();
+		if (batch != nullptr)
+		{
+			const RHIMeshDrawCommand* meshDrawCommand = batch->GetDrawCommand();
+			CommandList->DrawMesh(*meshDrawCommand);
+		}
 	}
-
-	CommandList->SetShader(test_shader);
-	CommandList->SetPrimitiveTopology(RHIPrimitiveTopology::TRIANGLELIST);
-	CommandList->DrawInstanced(3, 1, 0, 0);
 }

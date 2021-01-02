@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface GAME_API IRHIRenderTargetView : virtual public Object
+interface IRHIRenderTargetView : virtual public Object
 {
 
 };

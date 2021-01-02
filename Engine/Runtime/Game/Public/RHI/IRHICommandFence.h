@@ -7,7 +7,7 @@
 
 interface IRHIImmediateCommandList;
 
-interface GAME_API IRHICommandFence : virtual public Object
+interface IRHICommandFence : virtual public Object
 {
 	virtual void BeginFence() = 0;
 	virtual void EndFence(IRHIImmediateCommandList* immediateCommandList) = 0;

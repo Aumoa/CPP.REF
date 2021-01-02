@@ -12,6 +12,11 @@ D3D12Resource::~D3D12Resource()
 
 }
 
+uint64 D3D12Resource::GetVirtualAddress() const
+{
+	return resource->GetGPUVirtualAddress();
+}
+
 ID3D12Resource* D3D12Resource::Resource_get() const
 {
 	return resource.Get();

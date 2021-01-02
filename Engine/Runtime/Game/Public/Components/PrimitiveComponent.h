@@ -25,7 +25,7 @@ public:
 	virtual TRefPtr<PrimitiveSceneProxy> CreateSceneProxy();
 	PrimitiveSceneProxy* GetSceneProxy() const;
 
-	void SetDirtyMark();
+	void SetMarkDirty();
 	bool HasDirtyMark() const;
 	virtual void ResolveDirtyState();
 };

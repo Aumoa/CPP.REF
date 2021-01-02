@@ -6,7 +6,9 @@
 #include "CoreMinimal.h"
 #include "RHI/IRHIDeviceBundle.h"
 
+#include <span>
 #include "D3D12Minimal.h"
+#include "RHI/RHIResourceFlags.h"
 
 class D3D12SwapChain;
 class D3D12ImmediateCommandList;
@@ -32,6 +34,7 @@ private:
 	TRefPtr<D3D12OfflineDescriptorManager> dsvManager;
 
 	TRefPtr<RHIShaderLibrary> shaderLibrary;
+	TRefPtr<RHIResourceGC> resourceGC;
 
 public:
 	D3D12DeviceBundle();
@@ -41,13 +44,18 @@ public:
 	virtual void ReleaseBundle();
 
 	virtual TRefPtr<IRHISwapChain> GetSwapChain() const;
-	virtual TRefPtr<IRHIImmediateCommandList> GetImmediateCommandList() const;
-	virtual TRefPtr<RHIShaderLibrary> GetShaderLibrary() const;
+	virtual IRHIImmediateCommandList* GetImmediateCommandList() const;
+	virtual RHIShaderLibrary* GetShaderLibrary() const;
+	virtual RHIResourceGC* GetResourceGC() const;
 
 	virtual TRefPtr<IRHICommandFence> CreateCommandFence();
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource);
-	virtual TRefPtr<IRHIResource> CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags);
+	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
+	virtual TRefPtr<IRHIFence> CreateFence();
+
+	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
+	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
 
 	vs_property_get(ID3D12Device*, Device);
 	ID3D12Device* Device_get() const;
@@ -59,6 +67,8 @@ private:
 
 	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;
 	bool IsDeviceSuitable(ID3D12Device* device) const;
+	
+	ComPtr<ID3D12Resource> CreateImmutableBuffer(D3D12_RESOURCE_STATES initialState, std::span<uint8> initialBuffer, ERHIResourceFlags flags = ERHIResourceFlags::None);
 
 	// CALLBACK HANDLERS
 	void Application_OnSizing(int32 width, int32 height);

@@ -14,7 +14,12 @@
 #include "D3D12Resource.h"
 #include "D3D12DeferredCommandList.h"
 #include "D3D12Shader.h"
+#include "D3D12Fence.h"
 #include "RHI/RHIShaderLibrary.h"
+#include "RHI/RHIVertex.h"
+#include "RHI/RHIResourceGC.h"
+
+using namespace std;
 
 D3D12DeviceBundle* D3D12DeviceBundle::instance = nullptr;
 
@@ -57,6 +62,8 @@ void D3D12DeviceBundle::InitializeBundle()
 	shaderLibrary = NewObject<RHIShaderLibrary>();
 	shaderLibrary->AddShader(d3d12Shader);
 
+	resourceGC = NewObject<RHIResourceGC>();
+
 	instance = this;
 
 	GApplication.Sizing += bind_delegate(Application_OnSizing);
@@ -72,14 +79,19 @@ TRefPtr<IRHISwapChain> D3D12DeviceBundle::GetSwapChain() const
 	return swapChain;
 }
 
-TRefPtr<IRHIImmediateCommandList> D3D12DeviceBundle::GetImmediateCommandList() const
+IRHIImmediateCommandList* D3D12DeviceBundle::GetImmediateCommandList() const
 {
-	return immediateCommandList;
+	return immediateCommandList.Get();
 }
 
-TRefPtr<RHIShaderLibrary> D3D12DeviceBundle::GetShaderLibrary() const
+RHIShaderLibrary* D3D12DeviceBundle::GetShaderLibrary() const
 {
-	return shaderLibrary;
+	return shaderLibrary.Get();
+}
+
+RHIResourceGC* D3D12DeviceBundle::GetResourceGC() const
+{
+	return resourceGC.Get();
 }
 
 TRefPtr<IRHICommandFence> D3D12DeviceBundle::CreateCommandFence()
@@ -95,7 +107,7 @@ TRefPtr<IRHIRenderTargetView> D3D12DeviceBundle::CreateRenderTargetView(IRHIReso
 	return NewObject<D3D12RenderTargetView>(resource1, index);
 }
 
-TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(RHITextureFormat format, int32 width, int32 height, RHIResourceStates initialStates, RHIResourceFlags flags)
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags)
 {
 	D3D12_HEAP_PROPERTIES heapProp{ };
 	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -126,6 +138,25 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(RHITextureFormat format
 TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
 {
 	return NewObject<D3D12DeferredCommandList>(d3d12Device.Get());
+}
+
+TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
+{
+	return NewObject<D3D12Fence>();
+}
+
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)
+{
+	span<uint8> buffer = span((uint8*)vertices.data(), vertices.size() * sizeof(RHIVertex));
+	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, buffer);
+	return NewObject<D3D12Resource>(resource.Get());
+}
+
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(span<uint32> indices)
+{
+	span<uint8> buffer = span((uint8*)indices.data(), indices.size() * sizeof(RHIVertex));
+	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, buffer);
+	return NewObject<D3D12Resource>(resource.Get());
 }
 
 ID3D12Device* D3D12DeviceBundle::Device_get() const
@@ -226,6 +257,56 @@ bool D3D12DeviceBundle::IsDeviceSuitable(ID3D12Device* device) const
 	UNREFERENCED_PARAMETER(device);
 
 	return true;
+}
+
+ComPtr<ID3D12Resource> D3D12DeviceBundle::CreateImmutableBuffer(D3D12_RESOURCE_STATES initialState, span<uint8> initialBuffer, ERHIResourceFlags flags)
+{
+	D3D12_RESOURCE_DESC bufferDesc = { };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = (UINT64)initialBuffer.size_bytes();
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	bufferDesc.Flags = (D3D12_RESOURCE_FLAGS)flags;
+
+	D3D12_HEAP_PROPERTIES heap = { };
+	heap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	ComPtr<ID3D12Resource> resource;
+	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+	ComPtr<ID3D12Resource> uploadHeap;
+	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	void* pData;
+	HR(uploadHeap->Map(0, nullptr, &pData));
+	memcpy(pData, initialBuffer.data(), initialBuffer.size_bytes());
+	uploadHeap->Unmap(0, nullptr);
+
+	D3D12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = initialState;
+
+	TRefPtr<D3D12DeferredCommandList> deferredCmd = Cast<D3D12DeferredCommandList>(CreateDeferredCommandList());
+	deferredCmd->BeginCommand();
+	deferredCmd->CommandList->CopyResource(resource.Get(), uploadHeap.Get());
+	deferredCmd->CommandList->ResourceBarrier(1, &barrier);
+	deferredCmd->EndCommand();
+
+	uint64 issued = resourceGC->IssueNumber();
+	resourceGC->AddPendingResource(deferredCmd, issued);
+	resourceGC->AddPendingResource(NewObject<D3D12Resource>(uploadHeap.Get()), issued);
+
+	immediateCommandList->ExecuteCommandList(deferredCmd.Get());
+	resourceGC->SignalNumber(issued);
+
+	return move(resource);
 }
 
 void D3D12DeviceBundle::Application_OnSizing(int32 width, int32 height)

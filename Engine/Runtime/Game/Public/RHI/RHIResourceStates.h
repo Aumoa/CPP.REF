@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-enum class RHIResourceStates
+enum class ERHIResourceStates
 {
 	PRESENT = 0,
 	RENDER_TARGET =				                                    0b100,
@@ -13,29 +13,29 @@ enum class RHIResourceStates
 	COPY_SOURCE =									     0b1000'0000'0000,
 };
 
-inline RHIResourceStates operator |(RHIResourceStates lh, RHIResourceStates rh)
+inline ERHIResourceStates operator |(ERHIResourceStates lh, ERHIResourceStates rh)
 {
-	return (RHIResourceStates)((int32)lh | (int32)rh);
+	return (ERHIResourceStates)((int32)lh | (int32)rh);
 }
 
-inline RHIResourceStates operator &(RHIResourceStates lh, RHIResourceStates rh)
+inline ERHIResourceStates operator &(ERHIResourceStates lh, ERHIResourceStates rh)
 {
-	return (RHIResourceStates)((int32)lh & (int32)rh);
+	return (ERHIResourceStates)((int32)lh & (int32)rh);
 }
 
-inline RHIResourceStates& operator |=(RHIResourceStates& lh, RHIResourceStates rh)
+inline ERHIResourceStates& operator |=(ERHIResourceStates& lh, ERHIResourceStates rh)
 {
 	lh = lh | rh;
 	return lh;
 }
 
-inline RHIResourceStates& operator &=(RHIResourceStates& lh, RHIResourceStates rh)
+inline ERHIResourceStates& operator &=(ERHIResourceStates& lh, ERHIResourceStates rh)
 {
 	lh = lh & rh;
 	return lh;
 }
 
-inline RHIResourceStates operator ~(RHIResourceStates unary)
+inline ERHIResourceStates operator ~(ERHIResourceStates unary)
 {
-	return (RHIResourceStates)(~(int32)unary);
+	return (ERHIResourceStates)(~(int32)unary);
 }

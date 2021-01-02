@@ -28,4 +28,4 @@ extern LogCategoryBase LogD3D12RHI;
 #define HR(x) x
 #endif
 
-bool IsDepthStencilFormat(RHITextureFormat value);
+bool IsDepthStencilFormat(ERHITextureFormat value);

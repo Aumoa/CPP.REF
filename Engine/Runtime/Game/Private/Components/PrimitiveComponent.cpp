@@ -24,7 +24,7 @@ PrimitiveSceneProxy* PrimitiveComponent::GetSceneProxy() const
 	return sceneProxy.Get();
 }
 
-void PrimitiveComponent::SetDirtyMark()
+void PrimitiveComponent::SetMarkDirty()
 {
 	bHasDirtyMark = true;
 }

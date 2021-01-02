@@ -6,6 +6,7 @@
 #include "D3D12Resource.h"
 #include "D3D12Shader.h"
 #include "RHI/RHIViewport.h"
+#include "RHI/RHIMeshDrawCommand.h"
 
 using namespace std;
 
@@ -55,7 +56,7 @@ void D3D12CommandList::ClearRenderTargetView(IRHIRenderTargetView* rtv)
 	CommandList->ClearRenderTargetView(rtv_cast->Handle, ClearColor, 0, nullptr);
 }
 
-void D3D12CommandList::ResourceTransition(IRHIResource* resource, RHIResourceStates beforeState, RHIResourceStates afterState, size_t subresourceIndex)
+void D3D12CommandList::ResourceTransition(IRHIResource* resource, ERHIResourceStates beforeState, ERHIResourceStates afterState, size_t subresourceIndex)
 {
 	D3D12_RESOURCE_BARRIER barrier{ };
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -83,21 +84,7 @@ void D3D12CommandList::SetShader(IRHIShader* shader)
 	CommandList->SetPipelineState(d3d12Shader->PipelineState);
 }
 
-void D3D12CommandList::DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount, int32 baseVertexLocation, uint32 startInstanceLocation)
-{
-	ConsumePendingDeferredCommands();
-
-	CommandList->DrawInstanced(vertexCountPerInstance, instanceCount, baseVertexLocation, startInstanceLocation);
-}
-
-void D3D12CommandList::DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation)
-{
-	ConsumePendingDeferredCommands();
-
-	CommandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
-}
-
-void D3D12CommandList::SetPrimitiveTopology(RHIPrimitiveTopology primitiveTopology)
+void D3D12CommandList::SetPrimitiveTopology(ERHIPrimitiveTopology primitiveTopology)
 {
 	ConsumePendingDeferredCommands();
 
@@ -130,6 +117,31 @@ void D3D12CommandList::SetViewports(const RHIViewport& scissorRect)
 	vp.MaxDepth = (FLOAT)scissorRect.Far;
 
 	CommandList->RSSetViewports(1, &vp);
+}
+
+void D3D12CommandList::DrawMesh(const RHIMeshDrawCommand& command)
+{
+	ConsumePendingDeferredCommands();
+
+	D3D12_VERTEX_BUFFER_VIEW vbv = { };
+	vbv.BufferLocation = command.VertexBufferVirtualAddress;
+	vbv.StrideInBytes = command.VertexStride;
+	vbv.SizeInBytes = vbv.StrideInBytes * command.VertexCount;
+	CommandList->IASetVertexBuffers(0, 1, &vbv);
+
+	if (command.IndexBufferVirtualAddress != 0)
+	{
+		D3D12_INDEX_BUFFER_VIEW ibv = { };
+		ibv.BufferLocation = command.IndexBufferVirtualAddress;
+		ibv.SizeInBytes = (uint32)sizeof(uint32) * command.IndexCount;
+		ibv.Format = DXGI_FORMAT_R32_UINT;
+		CommandList->IASetIndexBuffer(&ibv);
+		CommandList->DrawIndexedInstanced(command.IndexCount, 1, 0, 0, 0);
+	}
+	else
+	{
+		CommandList->DrawInstanced(command.VertexCount, 1, 0, 0);
+	}
 }
 
 bool D3D12CommandList::HasBegunCommand_get() const

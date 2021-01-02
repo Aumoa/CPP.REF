@@ -7,3 +7,4 @@
 #include "Transform.h"
 #include "WindowsMinimal.h"
 #include "RHI/RHIViewport.h"
+#include "RHI/RHIMeshDrawCommand.h"

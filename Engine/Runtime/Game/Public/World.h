@@ -24,6 +24,7 @@ public:
 
 private:
 	std::vector<TRefPtr<AActor>> actors;
+
 	std::array<std::set<TickFunction*>, 4> tickGroups;
 	TWeakPtr<Level> currentLevel = nullptr;
 	TRefPtr<Scene> scene;

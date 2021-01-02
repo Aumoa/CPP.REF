@@ -7,6 +7,7 @@
 #include "PrimitiveSceneProxy.h"
 
 class StaticMeshComponent;
+class StaticMesh;
 
 class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
 {
@@ -14,7 +15,12 @@ public:
 	using Super = PrimitiveSceneProxy;
 	using This = StaticMeshSceneProxy;
 
+private:
+	StaticMesh* staticMesh;
+
 public:
 	StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent);
 	~StaticMeshSceneProxy();
+
+	MeshBatch* GetMeshBatch() const override;
 };

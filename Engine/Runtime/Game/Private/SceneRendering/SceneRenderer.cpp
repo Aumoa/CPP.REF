@@ -34,13 +34,13 @@ void SceneRenderer::BeginRender()
 	primitives_size = 0;
 
 	commandList->BeginCommand();
-	commandList->ResourceTransition(finalColor.Get(), RHIResourceStates::COPY_SOURCE, RHIResourceStates::RENDER_TARGET);
+	commandList->ResourceTransition(finalColor.Get(), ERHIResourceStates::COPY_SOURCE, ERHIResourceStates::RENDER_TARGET);
 	commandList->ClearRenderTargetView(rtv.Get());
 }
 
 void SceneRenderer::EndRender()
 {
-	commandList->ResourceTransition(finalColor.Get(), RHIResourceStates::RENDER_TARGET, RHIResourceStates::COPY_SOURCE);
+	commandList->ResourceTransition(finalColor.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::COPY_SOURCE);
 	commandList->EndCommand();
 }
 
@@ -101,7 +101,7 @@ void SceneRenderer::GetSceneSize(int32& x, int32& y)
 
 void SceneRenderer::Application_OnPostSized(int32 width, int32 height)
 {
-	finalColor = deviceBundle->CreateTexture2D(RHITextureFormat::B8G8R8A8_UNORM, width, height, RHIResourceStates::COPY_SOURCE, RHIResourceFlags::AllowRenderTarget);
+	finalColor = deviceBundle->CreateTexture2D(ERHITextureFormat::B8G8R8A8_UNORM, width, height, ERHIResourceStates::COPY_SOURCE, ERHIResourceFlags::AllowRenderTarget);
 	rtv = deviceBundle->CreateRenderTargetView(finalColor.Get());
 
 	sceneSizeX = width;

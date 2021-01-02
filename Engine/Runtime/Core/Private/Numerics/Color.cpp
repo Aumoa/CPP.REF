@@ -536,26 +536,26 @@ Color Color::FromUInt(uint32 argb)
 
 Color Color::FromHtml(TRefPtr<String> html)
 {
-	if ((html.IsValid) || (html->Length == 0))
+	if ((!html.IsValid) || (html->Length == 0))
 	{
 		return Color::Transparent;
 	}
 
 	// #AARRGGBB
-	if (html->Length == 7)
+	if (html->Length == 9)
 	{
 		wistringstream wiss;
-		wiss.str(html->Substring(1, 6)->C_Str);
+		wiss.str(html->Substring(1, 8)->C_Str);
 		uint32 hexCode;
 		wiss >> hex >> hexCode;
 		return Color::FromUInt(hexCode);
 	}
 
 	// #RRGGBB
-	if (html->Length == 5)
+	if (html->Length == 7)
 	{
 		wistringstream wiss;
-		wiss.str(html->Substring(1, 4)->C_Str);
+		wiss.str(html->Substring(1, 6)->C_Str);
 		uint32 hexCode;
 		wiss >> hex >> hexCode;
 		hexCode |= 0xFF000000;

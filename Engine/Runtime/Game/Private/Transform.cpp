@@ -31,7 +31,7 @@ bool Transform::Equals(const Transform& rh) const
 	return *this == rh;
 }
 
-bool Transform::NearlyEquals(const Transform& rh, double epsilon) const
+bool Transform::NearlyEquals(const Transform& rh, float epsilon) const
 {
 	return Translation.NearlyEquals(rh.Translation, epsilon)
 		&& Scale.NearlyEquals(rh.Scale, epsilon)

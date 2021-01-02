@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface GAME_API IRHIResource : virtual public Object
+interface IRHIResource : virtual public Object
 {
-
+	virtual uint64 GetVirtualAddress() const = 0;
 };

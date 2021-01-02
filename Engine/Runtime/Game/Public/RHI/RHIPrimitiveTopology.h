@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-enum class RHIPrimitiveTopology
+enum class ERHIPrimitiveTopology
 {
 	UNDEFINED = 0,
 	TRIANGLELIST = 4,

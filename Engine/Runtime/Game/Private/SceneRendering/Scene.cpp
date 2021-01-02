@@ -2,6 +2,9 @@
 
 #include "SceneRendering/Scene.h"
 
+#include "Components/PrimitiveComponent.h"
+#include "SceneRendering/SceneRenderer.h"
+
 Scene::Scene()
 {
 
@@ -12,12 +15,28 @@ Scene::~Scene()
 
 }
 
-void Scene::Render(SceneRenderer* renderer)
+void Scene::Update()
 {
-	
+	for (size_t i = 0; i < primitiveComponents.size(); ++i)
+	{
+		PrimitiveComponent*& primitive = primitiveComponents[i];
+		PrimitiveSceneProxy*& sceneProxy = sceneProxies[i];
+
+		if (primitive->HasDirtyMark())
+		{
+			primitive->ResolveDirtyState();
+			sceneProxy = primitive->GetSceneProxy();
+		}
+	}
 }
 
-void Scene::AddScene(PrimitiveSceneProxy* inSceneProxy)
+void Scene::Render(SceneRenderer* renderer)
 {
-	sceneProxies.emplace_back(inSceneProxy);
+	renderer->AddPrimitives(sceneProxies);
+}
+
+void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
+{
+	primitiveComponents.emplace_back(inPrimitiveComponent);
+	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
 }

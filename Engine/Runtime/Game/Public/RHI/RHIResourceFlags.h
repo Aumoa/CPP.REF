@@ -5,35 +5,35 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-enum class RHIResourceFlags
+enum class ERHIResourceFlags
 {
 	None = 0,
 	AllowRenderTarget = 0b1
 };
 
-inline RHIResourceFlags operator |(RHIResourceFlags lh, RHIResourceFlags rh)
+inline ERHIResourceFlags operator |(ERHIResourceFlags lh, ERHIResourceFlags rh)
 {
-	return (RHIResourceFlags)((int32)lh | (int32)rh);
+	return (ERHIResourceFlags)((int32)lh | (int32)rh);
 }
 
-inline RHIResourceFlags operator &(RHIResourceFlags lh, RHIResourceFlags rh)
+inline ERHIResourceFlags operator &(ERHIResourceFlags lh, ERHIResourceFlags rh)
 {
-	return (RHIResourceFlags)((int32)lh & (int32)rh);
+	return (ERHIResourceFlags)((int32)lh & (int32)rh);
 }
 
-inline RHIResourceFlags& operator |=(RHIResourceFlags& lh, RHIResourceFlags rh)
+inline ERHIResourceFlags& operator |=(ERHIResourceFlags& lh, ERHIResourceFlags rh)
 {
 	lh = lh | rh;
 	return lh;
 }
 
-inline RHIResourceFlags& operator &=(RHIResourceFlags& lh, RHIResourceFlags rh)
+inline ERHIResourceFlags& operator &=(ERHIResourceFlags& lh, ERHIResourceFlags rh)
 {
 	lh = lh & rh;
 	return lh;
 }
 
-inline RHIResourceFlags operator ~(RHIResourceFlags unary)
+inline ERHIResourceFlags operator ~(ERHIResourceFlags unary)
 {
-	return (RHIResourceFlags)(~(int32)unary);
+	return (ERHIResourceFlags)(~(int32)unary);
 }

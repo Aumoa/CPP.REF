@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-enum class RHITextureFormat
+enum class ERHITextureFormat
 {
 	Unknown,
 	R8G8B8A8_UNORM = 28,

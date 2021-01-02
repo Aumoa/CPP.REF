@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 
 #include "SceneRendering/StaticMeshSceneProxy.h"
+#include "SceneRendering/StaticMesh.h"
 
 StaticMeshComponent::StaticMeshComponent()
 {
@@ -14,7 +15,25 @@ StaticMeshComponent::~StaticMeshComponent()
 
 }
 
+void StaticMeshComponent::SetStaticMesh(StaticMesh* inMesh)
+{
+	staticMesh = inMesh;
+	SetMarkDirty();
+}
+
+StaticMesh* StaticMeshComponent::GetStaticMesh() const
+{
+	return staticMesh.Get();
+}
+
 TRefPtr<PrimitiveSceneProxy> StaticMeshComponent::CreateSceneProxy()
 {
-	return NewObject<StaticMeshSceneProxy>(this);
+	if (staticMesh.IsValid)
+	{
+		return NewObject<StaticMeshSceneProxy>(this);
+	}
+	else
+	{
+		return nullptr;
+	}
 }

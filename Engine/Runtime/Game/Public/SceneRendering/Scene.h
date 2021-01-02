@@ -7,16 +7,23 @@
 
 class SceneRenderer;
 class PrimitiveSceneProxy;
+class PrimitiveComponent;
 
 class GAME_API Scene : virtual public Object
 {
+public:
+	using Super = Object;
+	using This = Scene;
+
+	std::vector<PrimitiveComponent*> primitiveComponents;
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
 public:
 	Scene();
 	~Scene() override;
 
+	void Update();
 	void Render(SceneRenderer* renderer);
 	
-	void AddScene(PrimitiveSceneProxy* inSceneProxy);
+	void AddScene(PrimitiveComponent* inPrimitiveComponent);
 };

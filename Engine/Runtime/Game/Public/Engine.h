@@ -17,8 +17,9 @@ interface IRHISwapChain;
 
 class SceneRenderer;
 class GameInstance;
+class AssetManager;
 
-class Engine : virtual public Object, virtual public IEngineTick
+class GAME_API Engine : virtual public Object, virtual public IEngineTick
 {
 public:
 	using Super = Object;
@@ -39,6 +40,7 @@ private:
 	IRHISwapChain* swapChain;
 
 	TRefPtr<SceneRenderer> sceneRenderer;
+	TRefPtr<AssetManager> assetManager;
 	bool bPresent : 1;
 
 public:
@@ -51,10 +53,11 @@ public:
 
 	vs_property_get(IRHIDeviceBundle*, DeviceBundle);
 	IRHIDeviceBundle* DeviceBundle_get() const;
+	AssetManager* GetAssetManager() const;
 
 	static Engine* GetInstance();
 
 private:
 	void ForEachBundles(std::function<void(IRHIBundle*)> action);
-	void TickPrePhysics(std::chrono::duration<double> deltaTime);
+	void LoadEngineDefaultAssets();
 };

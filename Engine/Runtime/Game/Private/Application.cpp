@@ -59,6 +59,7 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		int32 width = (int16)LOWORD(lParam);
 		int32 height = (int16)HIWORD(lParam);
 		GApplication.PreSizing.Invoke(width, height);
+		GApplication.Sizing.Invoke(width, height);
 		GApplication.PostSized.Invoke(width, height);
 		break;
 	}
