@@ -16,5 +16,6 @@ public:
 	~RHIShaderLibrary() override;
 
 	bool AddShader(TRefPtr<IRHIShader> shader);
-	IRHIShader* GetShader(size_t shaderTypeHashCode) const;
+	IRHIShader* GetShader(TRefPtr<String> shaderName) const;
+	IRHIShader* GetShader(size_t shaderNameHash) const;
 };

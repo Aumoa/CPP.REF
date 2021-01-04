@@ -53,6 +53,7 @@ public:
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
+	virtual TRefPtr<IRHIShader> CreateShader(const RHIShaderDescription& shaderDesc);
 
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);

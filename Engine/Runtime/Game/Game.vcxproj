@@ -224,6 +224,7 @@
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceGC.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
+    <ClInclude Include="Public\RHI\RHIShaderDescription.h" />
     <ClInclude Include="Public\RHI\RHIShaderLibrary.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
     <ClInclude Include="Public\RHI\RHIVertex.h" />
@@ -286,6 +287,7 @@
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />
+    <ClCompile Include="Private\RHI\RHIShaderDescription.cpp" />
     <ClCompile Include="Private\RHI\RHIShaderLibrary.cpp" />
     <ClCompile Include="Private\RHI\RHIVertex.cpp" />
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />

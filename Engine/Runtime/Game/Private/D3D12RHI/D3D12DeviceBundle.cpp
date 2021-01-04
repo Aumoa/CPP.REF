@@ -18,6 +18,7 @@
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
+#include "RHI/RHIShaderDescription.h"
 
 using namespace std;
 
@@ -57,11 +58,7 @@ void D3D12DeviceBundle::InitializeBundle()
 	InitializeDXGI();
 	InitializeD3D12();
 
-	auto d3d12Shader = NewObject<D3D12Shader>();
-	d3d12Shader->CreateShaderPipeline(d3d12Device.Get());
 	shaderLibrary = NewObject<RHIShaderLibrary>();
-	shaderLibrary->AddShader(d3d12Shader);
-
 	resourceGC = NewObject<RHIResourceGC>();
 
 	instance = this;
@@ -143,6 +140,16 @@ TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
 TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
 {
 	return NewObject<D3D12Fence>();
+}
+
+TRefPtr<IRHIShader> D3D12DeviceBundle::CreateShader(const RHIShaderDescription& shaderDesc)
+{
+	TRefPtr<D3D12Shader> shader = NewObject<D3D12Shader>();
+	shader->SetVertexShader({ (const uint8*)shaderDesc.VS.pShaderBytecode, shaderDesc.VS.BytecodeLength });
+	shader->SetPixelShader({ (const uint8*)shaderDesc.PS.pShaderBytecode, shaderDesc.PS.BytecodeLength });
+	shader->CreateShaderPipeline(shaderDesc.ShaderName, d3d12Device.Get());
+
+	return shader;
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)

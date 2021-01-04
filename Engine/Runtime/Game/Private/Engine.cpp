@@ -13,10 +13,13 @@
 #include "SceneRendering/StaticMesh.h"
 #include "RHI/IRHICommandFence.h"
 #include "RHI/IRHIImmediateCommandList.h"
-#include "RHI/RHIResourceStates.h"
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDeferredCommandList.h"
+#include "RHI/RHIShaderLibrary.h"
+#include "RHI/RHIResourceStates.h"
 #include "RHI/RHIResourceGC.h"
+#include "RHI/RHIShaderDescription.h"
+#include "RHI/IRHIShader.h"
 #include "Assets/AssetManager.h"
 
 #include "D3D12RHI/D3D12DeviceBundle.h"
@@ -76,6 +79,7 @@ void Engine::Initialize()
 void Engine::PostInitialize()
 {
 	gameInstance = GApplication.GetGameInstance();
+	InitializeDefaultShaders();
 }
 
 void Engine::Tick()
@@ -142,4 +146,20 @@ void Engine::LoadEngineDefaultAssets()
 {
 	TRefPtr<StaticMesh> mesh = NewObject<StaticMesh>();
 	GetAssetManager()->Import(L"Engine/StaticMesh/Triangle", mesh);
+}
+
+#include "Shaders/Compiled/VertexShader.hlsl.h"
+#include "Shaders/Compiled/PixelShader.hlsl.h"
+
+void Engine::InitializeDefaultShaders()
+{
+	RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
+
+	RHIShaderDescription shaderDesc;
+	shaderDesc.ShaderName = "Engine/Default";
+	shaderDesc.VS = RHIShaderBytecode(pVertexShader);
+	shaderDesc.PS = RHIShaderBytecode(pPixelShader);
+	TRefPtr<IRHIShader> shader = DeviceBundle->CreateShader(shaderDesc);
+
+	shaderLibrary->AddShader(shader);
 }

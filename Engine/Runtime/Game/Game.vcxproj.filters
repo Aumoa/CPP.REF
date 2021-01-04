@@ -291,6 +291,9 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Fence.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\RHI\RHIShaderDescription.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -442,6 +445,9 @@
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12Fence.cpp">
       <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIShaderDescription.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

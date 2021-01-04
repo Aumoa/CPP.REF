@@ -40,7 +40,7 @@ void D3D12Shader::SetPixelShader(span<const uint8> shaderBytecode)
 	pixelShaderBytecode.assign(shaderBytecode.begin(), shaderBytecode.end());
 }
 
-void D3D12Shader::CreateShaderPipeline(ID3D12Device* device)
+void D3D12Shader::CreateShaderPipeline(TRefPtr<String> name, ID3D12Device* device)
 {
 	D3D12_ROOT_SIGNATURE_DESC sigDesc = { };
 	sigDesc.NumParameters = 0;
@@ -73,6 +73,8 @@ void D3D12Shader::CreateShaderPipeline(ID3D12Device* device)
 	pipelineDesc.DSVFormat = DXGI_FORMAT_UNKNOWN;
 	pipelineDesc.SampleDesc = { 1, 0 };
 	HR(device->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(&pipelineState)));
+
+	shaderTypeHash = name->GetHashCode();
 }
 
 ID3D12RootSignature* D3D12Shader::RootSignature_get() const

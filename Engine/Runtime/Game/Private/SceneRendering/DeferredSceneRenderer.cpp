@@ -46,7 +46,7 @@ void DeferredSceneRenderer::PopulateRenderCommands()
 	CommandList->SetViewports(RHIViewport(sceneX, sceneY));
 
 	RHIShaderLibrary* shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
-	IRHIShader* test_shader = shaderLibrary->GetShader(0);
+	IRHIShader* test_shader = shaderLibrary->GetShader("Engine/Default");
 
 	CommandList->SetShader(test_shader);
 	CommandList->SetPrimitiveTopology(ERHIPrimitiveTopology::TRIANGLELIST);

@@ -35,7 +35,7 @@ public:
 	void SetVertexShader(std::span<const uint8> shaderBytecode);
 	void SetPixelShader(std::span<const uint8> shaderBytecode);
 
-	void CreateShaderPipeline(ID3D12Device* device);
+	void CreateShaderPipeline(TRefPtr<String> name, ID3D12Device* device);
 
 	vs_property_get(bool, ShaderInitialized);
 	bool ShaderInitialize_get() const;

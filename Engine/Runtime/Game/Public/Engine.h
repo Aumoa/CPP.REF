@@ -60,4 +60,5 @@ public:
 private:
 	void ForEachBundles(std::function<void(IRHIBundle*)> action);
 	void LoadEngineDefaultAssets();
+	void InitializeDefaultShaders();
 };

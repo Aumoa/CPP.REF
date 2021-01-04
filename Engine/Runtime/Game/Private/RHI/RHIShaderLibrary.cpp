@@ -37,9 +37,14 @@ bool RHIShaderLibrary::AddShader(TRefPtr<IRHIShader> shader)
 	return true;
 }
 
-IRHIShader* RHIShaderLibrary::GetShader(size_t shaderTypeHashCode) const
+IRHIShader* RHIShaderLibrary::GetShader(TRefPtr<String> shaderName) const
 {
-	auto it = shaderMap.find(shaderTypeHashCode);
+	return GetShader(shaderName->GetHashCode());
+}
+
+IRHIShader* RHIShaderLibrary::GetShader(size_t shaderNameHash) const
+{
+	auto it = shaderMap.find(shaderNameHash);
 	if (it == shaderMap.end())
 	{
 		SE_LOG(LogRHI, Error, "Shader is not contains to library.");
