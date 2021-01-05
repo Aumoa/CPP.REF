@@ -49,10 +49,20 @@ AActor::~AActor()
 void AActor::BeginPlay()
 {
 	bActorHasBegunPlay = true;
+
+	for (auto& component : ownedComponents)
+	{
+		component.first->BeginPlay();
+	}
 }
 
 void AActor::EndPlay()
 {
+	for (auto& component : ownedComponents)
+	{
+		component.first->EndPlay();
+	}
+
 	bActorHasBegunPlay = false;
 }
 
@@ -120,6 +130,11 @@ bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const si
 		it->second.push_back(ptr);
 	}
 
+	if (HasBegunPlay)
+	{
+		assign_ptr->BeginPlay();
+	}
+
 	// Add to owned list.
 	return ownedComponents.emplace(ptr, move(assign_ptr)).second;
 }
@@ -141,6 +156,7 @@ bool AActor::RemoveComponentInternal(size_t hash_code)
 		auto erase_it = find(item.second.begin(), item.second.end(), front);
 		if (erase_it != item.second.end())
 		{
+			(*erase_it)->EndPlay();
 			item.second.erase(erase_it);
 			if (item.second.empty())
 			{

@@ -23,7 +23,9 @@ struct GAME_API Rotator
 	TRefPtr<String> ToString() const;
 
 	Vector3 RotateVector(const Vector3& v) const;
+	Vector4 RotateVector(const Vector4& v) const;
 	Vector3 UnrotateVector(const Vector3& v) const;
+	Vector4 UnrotateVector(const Vector4& v) const;
 
 	Rotator& Add(const TDegrees<float>& yawDelta, const TDegrees<float>& pitchDelta, const TDegrees<float>& rollDelta);
 	Rotator Clamp() const;
@@ -42,4 +44,6 @@ struct GAME_API Rotator
 	Rotator& operator -=(const Rotator& right);
 	bool operator ==(const Rotator& right) const;
 	bool operator !=(const Rotator& right) const;
+
+	static Rotator Identity;
 };

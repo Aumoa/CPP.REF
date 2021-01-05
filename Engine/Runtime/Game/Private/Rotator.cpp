@@ -89,7 +89,17 @@ Vector3 Rotator::RotateVector(const Vector3& v) const
 	return Matrix.TransformVector(v);
 }
 
+Vector4 Rotator::RotateVector(const Vector4& v) const
+{
+	return Matrix.TransformVector(v);
+}
+
 Vector3 Rotator::UnrotateVector(const Vector3& v) const
+{
+	return Matrix.Transposed.TransformVector(v);
+}
+
+Vector4 Rotator::UnrotateVector(const Vector4& v) const
 {
 	return Matrix.Transposed.TransformVector(v);
 }
@@ -203,3 +213,5 @@ bool Rotator::operator !=(const Rotator& right) const
 {
 	return Yaw != right.Yaw || Pitch != right.Pitch || Roll != right.Roll;
 }
+
+Rotator Rotator::Identity = Rotator(0, 0, 0);

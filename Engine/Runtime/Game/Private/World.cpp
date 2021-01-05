@@ -72,6 +72,8 @@ AActor* World::SpawnActorInternal(TRefPtr<AActor> actor)
 	AddTickGroup(actor_ptr);
 	AddSceneProxy(actor_ptr);
 
+	actor_ptr->BeginPlay();
+
 	return actor_ptr;
 }
 

@@ -5,8 +5,6 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "Rotator.h"
-
 struct GAME_API Transform
 {
 	Vector3 Translation;
@@ -26,8 +24,13 @@ struct GAME_API Transform
 	Vector3 TransformVector(const Vector3& v) const;
 	Vector4 TransformVector(const Vector4& v) const;
 
+	vs_property_get(Transform, Inverse);
+	Transform Inverse_get() const;
+
 	bool operator ==(const Transform& rh) const;
 	bool operator !=(const Transform& rh) const;
+
+	static Transform Multiply(const Transform& lh, const Transform& rh);
 
 	static Transform Identity;
 };

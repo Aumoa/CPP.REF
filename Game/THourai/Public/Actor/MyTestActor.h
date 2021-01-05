@@ -15,7 +15,7 @@ public:
 	using This = AMyTestActor;
 
 private:
-	TRefPtr<StaticMeshComponent> staticMeshComponent;
+	StaticMeshComponent* staticMeshComponent;
 
 public:
 	AMyTestActor();

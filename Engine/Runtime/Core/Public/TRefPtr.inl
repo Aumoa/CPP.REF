@@ -17,21 +17,14 @@ inline TRefPtr<T, bThreadSafe>::TRefPtr(std::nullptr_t)
 }
 	
 template<TIsNotPointer T, bool bThreadSafe>
-inline TRefPtr<T, bThreadSafe>::TRefPtr(T* ptr)
+inline TRefPtr<T, bThreadSafe>::TRefPtr(const T* ptr)
 	: This()
 {
 	if (ptr != nullptr)
 	{
-		this->ptr = ptr;
-		ptr->AddRef();
+		this->ptr = const_cast<std::remove_const_t<T>*>(ptr);
+		this->ptr->AddRef();
 	}
-}
-
-template<TIsNotPointer T, bool bThreadSafe>
-inline TRefPtr<T, bThreadSafe>::TRefPtr(const T* ptr)
-	: This(const_cast<T*>(ptr))
-{
-
 }
 
 template<TIsNotPointer T, bool bThreadSafe>
@@ -63,10 +56,25 @@ inline TRefPtr<T, bThreadSafe>::TRefPtr(const TRefPtr<O, bThreadSafe>& ptr)
 }
 
 template<TIsNotPointer T, bool bThreadSafe> template<TIsBaseOf<T> O>
+inline TRefPtr<T, bThreadSafe>::TRefPtr(const TRefPtr<const O, bThreadSafe>& ptr)
+	: This(const_cast<O*>(ptr.ptr))
+{
+
+}
+
+template<TIsNotPointer T, bool bThreadSafe> template<TIsBaseOf<T> O>
 inline TRefPtr<T, bThreadSafe>::TRefPtr(TRefPtr<O, bThreadSafe>&& ptr)
 	: This()
 {
 	this->ptr = ptr.ptr;
+	ptr.ptr = nullptr;
+}
+
+template<TIsNotPointer T, bool bThreadSafe> template<TIsBaseOf<T> O>
+inline TRefPtr<T, bThreadSafe>::TRefPtr(TRefPtr<const O, bThreadSafe>&& ptr)
+	: This()
+{
+	this->ptr = const_cast<O*>(ptr.ptr);
 	ptr.ptr = nullptr;
 }
 

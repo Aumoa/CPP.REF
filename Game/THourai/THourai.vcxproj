@@ -39,6 +39,7 @@
     <ClCompile Include="Private\Actor\MyTestActor.cpp" />
     <ClCompile Include="Private\Common\THLogs.cpp" />
     <ClCompile Include="Private\Levels\StartupLevel.cpp" />
+    <ClCompile Include="Private\Pawn\MyCharacter.cpp" />
     <ClCompile Include="Private\Program.cpp" />
     <ClCompile Include="Private\THGameInstance.cpp" />
     <ClCompile Include="Private\WinMain.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="Private\Common\THLogs.h" />
     <ClInclude Include="Public\Actor\MyTestActor.h" />
     <ClInclude Include="Public\Levels\StartupLevel.h" />
+    <ClInclude Include="Public\Pawn\MyCharacter.h" />
     <ClInclude Include="Public\Program.h" />
     <ClInclude Include="Public\THAPI.h" />
     <ClInclude Include="Public\THGameInstance.h" />

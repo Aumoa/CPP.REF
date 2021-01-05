@@ -5,6 +5,7 @@
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
 
+#include <type_traits>
 #include "Object.h"
 
 #pragma warning(disable: 4251)
@@ -30,12 +31,11 @@
 		using This = TRefPtr;
 
 	private:
-		T* ptr;
+		mutable std::remove_const_t<T>* ptr;
 
 	public:
 		inline TRefPtr();
 		inline TRefPtr(std::nullptr_t);
-		inline TRefPtr(T* ptr);
 		inline TRefPtr(const T* ptr);
 		inline TRefPtr(const TRefPtr& ptr);
 		inline TRefPtr(TRefPtr&& ptr);
@@ -48,7 +48,11 @@
 		template<TIsBaseOf<T> O>
 		inline TRefPtr(const TRefPtr<O, bThreadSafe>& ptr);
 		template<TIsBaseOf<T> O>
+		inline TRefPtr(const TRefPtr<const O, bThreadSafe>& ptr);
+		template<TIsBaseOf<T> O>
 		inline TRefPtr(TRefPtr<O, bThreadSafe>&& ptr);
+		template<TIsBaseOf<T> O>
+		inline TRefPtr(TRefPtr<const O, bThreadSafe>&& ptr);
 
 		inline T* Detach();
 		inline void Attach(T* ptr);

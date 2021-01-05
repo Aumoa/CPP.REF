@@ -7,12 +7,13 @@
 using namespace std;
 using namespace std::chrono;
 
-AMyTestActor::AMyTestActor()
+AMyTestActor::AMyTestActor() : Super()
+	, staticMeshComponent(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	staticMeshComponent = NewObject<StaticMeshComponent>();
-	RootComponent = staticMeshComponent.Get();
+	staticMeshComponent = AddComponent<StaticMeshComponent>();
+	RootComponent = staticMeshComponent;
 
 	StaticMesh* staticMesh = GAssetMgr.Load(L"Engine/StaticMesh/Triangle");
 	staticMeshComponent->SetStaticMesh(staticMesh);

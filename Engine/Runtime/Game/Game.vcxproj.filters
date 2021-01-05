@@ -294,6 +294,30 @@
     <ClInclude Include="Public\RHI\RHIShaderDescription.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Framework\Pawn.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\Controller.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\PlayerController.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\CameraComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\Character.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\SpringArmComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\ComponentTransformSpace.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -449,6 +473,24 @@
     <ClCompile Include="Private\RHI\RHIShaderDescription.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Framework\Pawn.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\Controller.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\PlayerController.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\CameraComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\Character.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\SpringArmComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -489,6 +531,9 @@
     </None>
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp">
       <Filter>Private\VulkanRHI</Filter>
+    </None>
+    <None Include="Public\Framework\Controller.inl">
+      <Filter>Public\Framework</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

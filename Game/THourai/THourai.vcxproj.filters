@@ -25,6 +25,12 @@
     <Filter Include="Private\Common">
       <UniqueIdentifier>{a320a586-5606-4a24-824d-d385a6fc0ee3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Pawn">
+      <UniqueIdentifier>{9258df6e-9c39-4528-93c1-d5f939244675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Pawn">
+      <UniqueIdentifier>{e0340e88-f720-4c37-a7ce-b9ce5f3ef172}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\WinMain.cpp">
@@ -45,6 +51,9 @@
     <ClCompile Include="Private\Common\THLogs.cpp">
       <Filter>Private\Common</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Pawn\MyCharacter.cpp">
+      <Filter>Private\Pawn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\THAPI.h">
@@ -64,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="Private\Common\THLogs.h">
       <Filter>Private\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Pawn\MyCharacter.h">
+      <Filter>Public\Pawn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

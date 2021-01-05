@@ -60,6 +60,15 @@ Vector4 Transform::TransformVector(const Vector4& v) const
 	return rotated + Vector4(Translation * v.W, v.W);
 }
 
+Transform Transform::Inverse_get() const
+{
+	Transform inverse;
+	inverse.Translation = -Translation;
+	inverse.Scale = 1.0f / Scale;
+	inverse.Rotation = Rotation.Inverse;
+	return inverse;
+}
+
 bool Transform::operator ==(const Transform& rh) const
 {
 	return Translation == rh.Translation && Scale == rh.Scale && Rotation == rh.Rotation;
@@ -68,6 +77,15 @@ bool Transform::operator ==(const Transform& rh) const
 bool Transform::operator !=(const Transform& rh) const
 {
 	return Translation != rh.Translation || Scale != rh.Scale || Rotation != rh.Rotation;
+}
+
+Transform Transform::Multiply(const Transform& lh, const Transform& rh)
+{
+	Quaternion R = Quaternion::Concatenate(rh.Rotation, lh.Rotation);
+	Vector3 S = lh.Scale * rh.Scale;
+	Vector3 T = rh.Rotation.RotateVector(rh.Scale * lh.Translation) + rh.Translation;
+
+	return Transform(T, S, R);
 }
 
 Transform Transform::Identity = Transform(Vector3::Zero, Vector3::One, Quaternion::Identity);

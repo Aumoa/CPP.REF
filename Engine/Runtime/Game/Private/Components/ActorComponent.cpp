@@ -36,7 +36,7 @@ ActorComponent::ActorComponent() : Super()
 	, bComponentTickEnabled(true)
 	, bComponentHasBegunPlay(false)
 {
-
+	PrimaryComponentTick.Target = this;
 }
 
 ActorComponent::~ActorComponent()
