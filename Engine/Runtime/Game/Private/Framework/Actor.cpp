@@ -132,6 +132,8 @@ bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const si
 
 	if (HasBegunPlay)
 	{
+		assign_ptr->owner = this;
+		ComponentAdded.Invoke(assign_ptr.Get());
 		assign_ptr->BeginPlay();
 	}
 
@@ -156,7 +158,11 @@ bool AActor::RemoveComponentInternal(size_t hash_code)
 		auto erase_it = find(item.second.begin(), item.second.end(), front);
 		if (erase_it != item.second.end())
 		{
-			(*erase_it)->EndPlay();
+			ActorComponent* component = (*erase_it);
+			component->EndPlay();
+			ComponentRemoved.Invoke(component);
+			component->owner = nullptr;
+
 			item.second.erase(erase_it);
 			if (item.second.empty())
 			{

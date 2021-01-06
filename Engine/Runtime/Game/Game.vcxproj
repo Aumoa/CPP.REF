@@ -179,6 +179,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
+    <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Private\RHI\RHICommon.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="Public\Components\CameraComponent.h" />
     <ClInclude Include="Public\Components\ComponentTransformSpace.h" />
     <ClInclude Include="Public\Components\MeshComponent.h" />
+    <ClInclude Include="Public\Components\PlayerCameraManager.h" />
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
@@ -267,6 +269,7 @@
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\MeshComponent.cpp" />
+    <ClCompile Include="Private\Components\PlayerCameraManager.cpp" />
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\Components\SpringArmComponent.cpp" />
@@ -296,6 +299,7 @@
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\Level.cpp" />
+    <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
@@ -326,6 +330,7 @@
     <None Include="Private\VulkanRHI\VulkanResource.cpp" />
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
+    <None Include="Public\Components\ActorComponent.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Level.inl" />
     <None Include="Public\World.inl" />

@@ -35,6 +35,9 @@ public:
 	using Super = Object;
 	using This = AActor;
 
+	using ComponentAddedDelegate = TMulticastDelegate<void(ActorComponent*)>;
+	using ComponentRemovedDelegate = TMulticastDelegate<void(ActorComponent*)>;
+
 private:
 	std::map<ActorComponent*, TRefPtr<ActorComponent>> ownedComponents;
 	std::map<size_t, std::list<ActorComponent*>> hierarchy;
@@ -75,6 +78,9 @@ public:
 	void ActorTickEnabled_set(bool value);
 	vs_property_get(bool, HasBegunPlay);
 	bool HasBegunPlay_get() const;
+
+	ComponentAddedDelegate ComponentAdded;
+	ComponentRemovedDelegate ComponentRemoved;
 
 private:
 	bool AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num);

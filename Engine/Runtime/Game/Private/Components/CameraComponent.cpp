@@ -16,7 +16,7 @@ CameraComponent::~CameraComponent()
 
 }
 
-void CameraComponent::CalcMinimalViewInfo(MinimalViewInfo& outViewInfo) const
+void CameraComponent::CalcCameraView(MinimalViewInfo& outViewInfo) const
 {
 	outViewInfo.FOV = fov;
 	outViewInfo.AspectRatio = aspectRatio;

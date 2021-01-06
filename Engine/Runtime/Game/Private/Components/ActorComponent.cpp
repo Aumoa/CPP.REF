@@ -35,6 +35,7 @@ void ActorComponent::ComponentTickFunction::ExecuteTick(duration<double> deltaTi
 ActorComponent::ActorComponent() : Super()
 	, bComponentTickEnabled(true)
 	, bComponentHasBegunPlay(false)
+	, owner(nullptr)
 {
 	PrimaryComponentTick.Target = this;
 }
@@ -57,6 +58,11 @@ void ActorComponent::EndPlay()
 void ActorComponent::TickComponent(duration<double> deltaTime)
 {
 
+}
+
+AActor* ActorComponent::GetOwner() const
+{
+	return owner;
 }
 
 auto ActorComponent::PrimaryComponentTick_get() -> ComponentTickFunction&

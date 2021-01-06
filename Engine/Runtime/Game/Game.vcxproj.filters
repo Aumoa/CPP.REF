@@ -318,6 +318,12 @@
     <ClInclude Include="Public\Components\ComponentTransformSpace.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Components\PlayerCameraManager.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Logging\EngineLogCategory.h">
+      <Filter>Private\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -491,6 +497,12 @@
     <ClCompile Include="Private\Components\SpringArmComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Components\PlayerCameraManager.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Logging\EngineLogCategory.cpp">
+      <Filter>Private\Logging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -534,6 +546,9 @@
     </None>
     <None Include="Public\Framework\Controller.inl">
       <Filter>Public\Framework</Filter>
+    </None>
+    <None Include="Public\Components\ActorComponent.inl">
+      <Filter>Public\Components</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

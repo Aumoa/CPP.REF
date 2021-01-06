@@ -41,7 +41,7 @@ inline T* AActor::GetComponent() const
 		return nullptr;
 	}
 
-	return it->second.front();
+	return Cast<T>(it->second.front());
 }
 
 template<class T> requires TIsAssignable<T*, ActorComponent*>

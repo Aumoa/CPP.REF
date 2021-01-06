@@ -7,8 +7,12 @@
 
 #include "TickFunction.h"
 
+class AActor;
+
 class GAME_API ActorComponent : public Object
 {
+	friend class AActor;
+
 	struct ComponentTickFunction : public TickFunction
 	{
 		using Super = TickFunction;
@@ -30,6 +34,7 @@ private:
 	ComponentTickFunction primaryComponentTick;
 	bool bComponentTickEnabled : 1;
 	bool bComponentHasBegunPlay : 1;
+	AActor* owner;
 
 public:
 	ActorComponent();
@@ -39,6 +44,10 @@ public:
 	virtual void EndPlay();
 	virtual void TickComponent(std::chrono::duration<double> deltaTime);
 
+	AActor* GetOwner() const;
+	template<TIsBaseOf<AActor> T>
+	T* GetOwner() const;
+
 	vs_property_get(ComponentTickFunction&, PrimaryComponentTick);
 	ComponentTickFunction& PrimaryComponentTick_get();
 	vs_property(bool, ComponentTickEnabled);
@@ -47,3 +56,5 @@ public:
 	vs_property_get(bool, HasBegunPlay);
 	bool HasBegunPlay_get() const;
 };
+
+#include "ActorComponent.inl"

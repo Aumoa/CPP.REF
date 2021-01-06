@@ -22,5 +22,5 @@ public:
 	CameraComponent();
 	~CameraComponent() override;
 
-	void CalcMinimalViewInfo(MinimalViewInfo& outViewInfo) const;
+	void CalcCameraView(MinimalViewInfo& outViewInfo) const;
 };

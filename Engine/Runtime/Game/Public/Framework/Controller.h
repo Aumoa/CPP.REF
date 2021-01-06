@@ -7,6 +7,7 @@
 
 #include "Actor.h"
 
+struct LogCategoryBase;
 class APawn;
 
 class GAME_API AController : public AActor
@@ -16,14 +17,19 @@ public:
 	using This = AController;
 
 private:
+	static LogCategoryBase LogController;
+
 	TWeakPtr<APawn> possessedPawn;
 
 public:
 	AController();
 	~AController() override;
 
-	virtual void Possess(APawn* inPawn);
-	virtual void UnPossess();
+	void Possess(APawn* inPawn);
+	void UnPossess();
+
+	virtual void OnPossess(APawn* inPawn);
+	virtual void OnUnPossess();
 
 	APawn* GetPawn() const;
 	template<class T> requires TIsBaseOf<T, APawn>
