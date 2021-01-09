@@ -31,3 +31,5 @@
 #include "Numerics/Vector4.h"
 #include "Numerics/Matrix4x4.h"
 #include "Numerics/Color.h"
+#include "Numerics/Sphere.h"
+#include "Numerics/Circle.h"

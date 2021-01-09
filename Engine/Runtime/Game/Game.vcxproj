@@ -217,6 +217,7 @@
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
+    <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\RHI\IRHICommandFence.h" />
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
@@ -302,6 +303,7 @@
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\Physics\Collision.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />

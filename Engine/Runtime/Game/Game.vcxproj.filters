@@ -52,6 +52,12 @@
     <Filter Include="Private\Assets">
       <UniqueIdentifier>{815f49cc-3fde-41f5-b552-f38cb78f101a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Physics">
+      <UniqueIdentifier>{2d663c95-549c-4c4a-b096-0d75a54b2c1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Physics">
+      <UniqueIdentifier>{9bb56105-49e2-4c7f-b198-d9c935413991}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -324,6 +330,9 @@
     <ClInclude Include="Private\Logging\EngineLogCategory.h">
       <Filter>Private\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Physics\Collision.h">
+      <Filter>Public\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -502,6 +511,9 @@
     </ClCompile>
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp">
       <Filter>Private\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Physics\Collision.cpp">
+      <Filter>Private\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

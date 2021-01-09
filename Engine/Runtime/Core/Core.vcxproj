@@ -180,7 +180,6 @@
     <ClInclude Include="Public\Numerics\Vector2.h" />
     <ClInclude Include="Public\Numerics\Vector3.h" />
     <ClInclude Include="Public\Numerics\Vector4.h" />
-    <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\CoreString.h" />
@@ -231,7 +230,6 @@
     <ClCompile Include="Private\Numerics\Vector3.cpp" />
     <ClCompile Include="Private\Numerics\Vector4.cpp" />
     <ClCompile Include="Private\Object.cpp" />
-    <ClCompile Include="Private\Physics\Collision.cpp" />
     <ClCompile Include="Private\String.cpp" />
     <ClCompile Include="Private\TRefPtr.cpp" />
     <ClCompile Include="Private\WeakReferences.cpp" />

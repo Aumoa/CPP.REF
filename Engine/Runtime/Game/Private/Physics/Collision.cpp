@@ -3,12 +3,6 @@
 #include "Physics/Collision.h"
 
 #include <limits>
-#include "Numerics/Rect.h"
-#include "Numerics/Vector2.h"
-#include "Numerics/Ray2.h"
-#include "Numerics/AxisAlignedCube.h"
-#include "Numerics/Ray3.h"
-#include "Mathematics/Math.h"
 
 using namespace std;
 
@@ -26,9 +20,9 @@ bool Collision::IsOverlap(const Rect& rc, const Ray2& ray)
 bool Collision::IsOverlap(const Rect& rc, const Rect& rc2)
 {
 	return !(rc.Min.X > rc2.Max.X ||
-			 rc.Max.X < rc2.Min.X ||
-			 rc.Min.Y > rc2.Max.Y ||
-			 rc.Max.Y < rc2.Min.Y);
+		rc.Max.X < rc2.Min.X ||
+		rc.Min.Y > rc2.Max.Y ||
+		rc.Max.Y < rc2.Min.Y);
 }
 
 bool Collision::IsOverlap(const AxisAlignedCube& cube, const AxisAlignedCube& cube2)

@@ -19,12 +19,6 @@
     <Filter Include="Private\Numerics">
       <UniqueIdentifier>{a7461282-9c6a-4212-80ec-8e9a67ccd5d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\Physics">
-      <UniqueIdentifier>{bfd826d8-d7e5-4cf0-a10e-9bd855729d69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\Physics">
-      <UniqueIdentifier>{5a85cda7-d0ba-4a78-8913-190da6b061b7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -125,9 +119,6 @@
     </ClInclude>
     <ClInclude Include="Public\Numerics\Circle.h">
       <Filter>Public\Numerics</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Physics\Collision.h">
-      <Filter>Public\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Public\Numerics\Line3.h">
       <Filter>Public\Numerics</Filter>
@@ -273,9 +264,6 @@
     </ClCompile>
     <ClCompile Include="Private\Numerics\Line3.cpp">
       <Filter>Private\Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Physics\Collision.cpp">
-      <Filter>Private\Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
