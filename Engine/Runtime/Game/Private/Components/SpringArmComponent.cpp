@@ -21,7 +21,7 @@ SpringArmComponent::~SpringArmComponent()
 
 }
 
-void SpringArmComponent::TickComponent(duration<double> deltaTime)
+void SpringArmComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
 	UpdateSpringArmTransform(deltaTime);
@@ -46,7 +46,7 @@ Transform SpringArmComponent::GetSocketTransform(TRefPtr<String> socketName, ECo
 	return relativeTransform;
 }
 
-void SpringArmComponent::UpdateSpringArmTransform(duration<double> deltaTime)
+void SpringArmComponent::UpdateSpringArmTransform(Seconds deltaTime)
 {
 	socketRelativeLocation = Vector3(-springArmLength, 0, 0);
 	socketRelativeLocation += targetOffset;

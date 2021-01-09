@@ -24,7 +24,7 @@ World::~World()
 	}
 }
 
-void World::Tick(duration<double> deltaTime)
+void World::Tick(Seconds deltaTime)
 {
 	Tick_Group(deltaTime, TickingGroup::PrePhysics);
 	Tick_Group(deltaTime, TickingGroup::DuringPhysics);
@@ -54,7 +54,7 @@ Scene* World::GetScene() const
 	return scene.Get();
 }
 
-void World::Tick_Group(duration<double> deltaTime, TickingGroup group)
+void World::Tick_Group(Seconds deltaTime, TickingGroup group)
 {
 	set<TickFunction*>& tickGroup = tickGroups[(size_t)group];
 

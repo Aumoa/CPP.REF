@@ -28,7 +28,7 @@ class GAME_API AActor : virtual public Object
 		ActorTickFunction();
 		~ActorTickFunction();
 
-		void ExecuteTick(std::chrono::duration<double> deltaTime) override;
+		void ExecuteTick(Seconds deltaTime) override;
 	};
 
 public:
@@ -53,7 +53,7 @@ public:
 
 	virtual void BeginPlay();
 	virtual void EndPlay();
-	virtual void Tick(std::chrono::duration<double> deltaTime);
+	virtual void Tick(Seconds deltaTime);
 
 	template<class T, class... TArgs> requires TIsAssignable<T*, ActorComponent*> && THasConstructor<T, TArgs...>
 	inline T* AddComponent(TArgs&&... args);

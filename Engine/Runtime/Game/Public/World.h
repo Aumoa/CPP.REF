@@ -33,7 +33,7 @@ public:
 	World();
 	~World() override;
 
-	virtual void Tick(std::chrono::duration<double> deltaTime);
+	virtual void Tick(Seconds deltaTime);
 
 	template<class T, class... TArgs> requires TIsAssignable<T*, AActor*> && THasConstructor<T, TArgs...>
 	inline T* SpawnActor(TArgs&&... constructor_args);
@@ -43,7 +43,7 @@ public:
 	Scene* GetScene() const;
 
 private:
-	void Tick_Group(std::chrono::duration<double> deltaTime, TickingGroup group);
+	void Tick_Group(Seconds deltaTime, TickingGroup group);
 	AActor* SpawnActorInternal(TRefPtr<AActor> actor);
 
 	void AddTickGroup(AActor* actor_ptr);

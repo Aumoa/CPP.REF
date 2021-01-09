@@ -19,7 +19,7 @@ AActor::ActorTickFunction::~ActorTickFunction()
 
 }
 
-void AActor::ActorTickFunction::ExecuteTick(duration<double> deltaTime)
+void AActor::ActorTickFunction::ExecuteTick(Seconds deltaTime)
 {
 	if (Target == nullptr)
 	{
@@ -66,7 +66,7 @@ void AActor::EndPlay()
 	bActorHasBegunPlay = false;
 }
 
-void AActor::Tick(duration<double> deltaTime)
+void AActor::Tick(Seconds deltaTime)
 {
 
 }

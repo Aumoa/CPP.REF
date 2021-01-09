@@ -23,7 +23,7 @@ class GAME_API ActorComponent : public Object
 		ComponentTickFunction();
 		~ComponentTickFunction();
 
-		void ExecuteTick(std::chrono::duration<double> deltaTime) override;
+		void ExecuteTick(Seconds deltaTime) override;
 	};
 
 public:
@@ -42,7 +42,7 @@ public:
 
 	virtual void BeginPlay();
 	virtual void EndPlay();
-	virtual void TickComponent(std::chrono::duration<double> deltaTime);
+	virtual void TickComponent(Seconds deltaTime);
 
 	AActor* GetOwner() const;
 	template<TIsBaseOf<AActor> T>

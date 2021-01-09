@@ -12,7 +12,7 @@ LogCategoryBase TickFunction::LogTicking(ELogVerbosity::Verbose, L"LogTicking");
 TickFunction::TickFunction()
 	: bCanEverTick(false)
 	, TickGroup(TickingGroup::PrePhysics)
-	, TickInterval(0)
+	, TickInterval(0s)
 {
 
 }

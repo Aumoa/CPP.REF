@@ -5,6 +5,8 @@
 #include "Application.h"
 #include "THGameInstance.h"
 
+using namespace std;
+
 int32 Program::Main()
 {
 	auto app = NewObject<Application>();

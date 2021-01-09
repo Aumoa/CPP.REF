@@ -25,10 +25,10 @@ public:
 	SpringArmComponent();
 	~SpringArmComponent() override;
 
-	void TickComponent(std::chrono::duration<double> deltaTime) override;
+	void TickComponent(Seconds deltaTime) override;
 
 	Transform GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const override;
 
 private:
-	void UpdateSpringArmTransform(std::chrono::duration<double> deltaTime);
+	void UpdateSpringArmTransform(Seconds deltaTime);
 };

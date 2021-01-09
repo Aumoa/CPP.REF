@@ -24,7 +24,7 @@ AMyTestActor::~AMyTestActor()
 
 }
 
-void AMyTestActor::Tick(duration<double> deltaTime)
+void AMyTestActor::Tick(Seconds deltaTime)
 {
 	Super::Tick(deltaTime);
 }

@@ -30,7 +30,7 @@ void GameInstance::Initialize()
 	world->LoadLevel(GetStartupLevel());
 }
 
-void GameInstance::Tick(duration<double> deltaTime)
+void GameInstance::Tick(Seconds deltaTime)
 {
 	world->Tick(deltaTime);
 }

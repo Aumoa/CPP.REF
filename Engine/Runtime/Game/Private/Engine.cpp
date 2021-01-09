@@ -85,7 +85,7 @@ void Engine::PostInitialize()
 void Engine::Tick()
 {
 	auto curr_tick = steady_clock::now();
-	auto delta = curr_tick - prev_tick;
+	Seconds delta = Seconds(curr_tick - prev_tick);
 	prev_tick = curr_tick;
 
 	deviceBundle->GetResourceGC()->Collect();

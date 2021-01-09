@@ -5,7 +5,6 @@
 #include "Logging/LogMacros.h"
 
 using namespace std;
-using namespace std::chrono;
 
 ActorComponent::ComponentTickFunction::ComponentTickFunction() : Super()
 	, Target(nullptr)
@@ -18,7 +17,7 @@ ActorComponent::ComponentTickFunction::~ComponentTickFunction()
 
 }
 
-void ActorComponent::ComponentTickFunction::ExecuteTick(duration<double> deltaTime)
+void ActorComponent::ComponentTickFunction::ExecuteTick(Seconds deltaTime)
 {
 	if (Target == nullptr)
 	{
@@ -55,7 +54,7 @@ void ActorComponent::EndPlay()
 	bComponentHasBegunPlay = false;
 }
 
-void ActorComponent::TickComponent(duration<double> deltaTime)
+void ActorComponent::TickComponent(Seconds deltaTime)
 {
 
 }

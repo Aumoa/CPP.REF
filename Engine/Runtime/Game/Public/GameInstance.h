@@ -28,7 +28,7 @@ public:
 	TRefPtr<String> ToString() const override;
 
 	virtual void Initialize();
-	virtual void Tick(std::chrono::duration<double> deltaTime);
+	virtual void Tick(Seconds deltaTime);
 	virtual void BeginPlay();
 	virtual void EndPlay();
 

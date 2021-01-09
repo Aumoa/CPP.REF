@@ -23,10 +23,10 @@ struct GAME_API TickFunction
 
 	bool bCanEverTick : 1;
 	TickingGroup TickGroup;
-	std::chrono::duration<double> TickInterval;
+	Seconds TickInterval;
 
 	TickFunction();
 	~TickFunction();
 
-	virtual void ExecuteTick(std::chrono::duration<double> deltaTime) = 0;
+	virtual void ExecuteTick(Seconds deltaTime) = 0;
 };

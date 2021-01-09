@@ -21,5 +21,5 @@ public:
 	AMyTestActor();
 	~AMyTestActor();
 
-	void Tick(std::chrono::duration<double> deltaTime) override;
+	void Tick(Seconds deltaTime) override;
 };

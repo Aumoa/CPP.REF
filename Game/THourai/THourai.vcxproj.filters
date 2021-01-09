@@ -31,6 +31,12 @@
     <Filter Include="Private\Pawn">
       <UniqueIdentifier>{e0340e88-f720-4c37-a7ce-b9ce5f3ef172}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Controller">
+      <UniqueIdentifier>{0318e0ab-4d7c-4576-bd52-119063cf51a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Controller">
+      <UniqueIdentifier>{ba5d5c51-eafc-4637-81d1-47ca3ee0be32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\WinMain.cpp">
@@ -54,6 +60,9 @@
     <ClCompile Include="Private\Pawn\MyCharacter.cpp">
       <Filter>Private\Pawn</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Controller\THPlayerController.cpp">
+      <Filter>Private\Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\THAPI.h">
@@ -76,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="Public\Pawn\MyCharacter.h">
       <Filter>Public\Pawn</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Controller\THPlayerController.h">
+      <Filter>Public\Controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
