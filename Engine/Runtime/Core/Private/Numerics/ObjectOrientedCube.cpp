@@ -177,13 +177,3 @@ Vector3 ObjectOrientedCube::AxisZ_get() const
 {
 	return Rotation.RotateVector(Vector3::AxisZ);
 }
-
-bool ObjectOrientedCube::operator ==(const ObjectOrientedCube& right) const
-{
-	return Center == right.Center && Extent == right.Extent && Rotation == right.Rotation;
-}
-
-bool ObjectOrientedCube::operator !=(const ObjectOrientedCube& right) const
-{
-	return Center != right.Center || Extent != right.Extent || Rotation != right.Rotation;
-}

@@ -4,14 +4,14 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include <optional>
 #include "TRefPtr.h"
 #include "Vector3.h"
 
-#pragma pack(push, 8)
-struct CORE_API Ray3
+#pragma pack(push, 4)
+struct CORE_API Ray3 : public TNumericsBasicOperator<Ray3, Vector3, Vector3, std::optional<float>>
 {
 	Vector3 Origin;
 	Vector3 Direction;
@@ -27,15 +27,6 @@ struct CORE_API Ray3
 	TRefPtr<String> ToString() const;
 
 	Vector3 GetPoint(float distance) const;
-	bool IsOverlap(const AxisAlignedCube& cube) const;
-	std::optional<float> IsIntersect(const AxisAlignedCube& cube) const;
-
-	bool operator ==(const Ray3& rh) const;
-	bool operator !=(const Ray3& rh) const;
-	bool operator < (const Ray3& right) const;
-	bool operator <=(const Ray3& right) const;
-	bool operator > (const Ray3& right) const;
-	bool operator >=(const Ray3& right) const;
-	std::weak_ordering operator <=>(const Ray3& right) const;
+	Vector3 GetEndPoint() const;
 };
 #pragma pack(pop)

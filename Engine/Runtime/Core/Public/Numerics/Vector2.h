@@ -4,15 +4,15 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include "TRefPtr.h"
 
 class String;
 struct Rect;
 
-#pragma pack(push, 8)
-struct CORE_API Vector2
+#pragma pack(push, 4)
+struct CORE_API Vector2 : public TNumericsBasicOperator<Vector2, float, float>
 {
 	float X;
 	float Y;
@@ -37,8 +37,6 @@ struct CORE_API Vector2
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
 
-	bool IsOverlap(const Rect& rect) const;
-
 	vs_property_get(float, LengthSq);
 	float LengthSq_get() const;
 	vs_property_get(float, Length);
@@ -59,14 +57,6 @@ struct CORE_API Vector2
 	Vector2 operator /(const Vector2& right) const;
 	float operator |(const Vector2& right) const;
 
-	bool operator ==(const Vector2& right) const;
-	bool operator !=(const Vector2& right) const;
-	bool operator < (const Vector2& right) const;
-	bool operator <=(const Vector2& right) const;
-	bool operator > (const Vector2& right) const;
-	bool operator >=(const Vector2& right) const;
-	std::weak_ordering operator <=>(const Vector2& right) const;
-
 	Vector2& operator +=(const Vector2& right);
 	Vector2& operator -=(const Vector2& right);
 	Vector2& operator *=(const Vector2& right);
@@ -75,6 +65,11 @@ struct CORE_API Vector2
 	static float DistanceSq(const Vector2& left, const Vector2& right);
 	static float Distance(const Vector2& left, const Vector2& right);
 	static float DotProduct(const Vector2& left, const Vector2& right);
+	static Vector2 Min(const Vector2& lh, const Vector2& rh);
+	static Vector2 Max(const Vector2& lh, const Vector2& rh);
+
+	static Vector2 Zero;
+	static Vector2 One;
 };
 #pragma pack(pop)
 

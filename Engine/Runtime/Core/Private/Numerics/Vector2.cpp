@@ -5,8 +5,12 @@
 #include "IndexOutOfRangeException.h"
 #include "Numerics/Rect.h"
 #include "HashHelper.h"
+#include "Mathematics/Math.h"
 
 using namespace std;
+
+Vector2 Vector2::Zero = Vector2(0, 0);
+Vector2 Vector2::One = Vector2(1.0f, 1.0f);
 
 Vector2::Vector2()
 {
@@ -72,16 +76,6 @@ bool Vector2::Contains(size_t index) const
 size_t Vector2::Count_get() const
 {
 	return 2;
-}
-
-bool Vector2::IsOverlap(const Rect& rect) const
-{
-	if (X >= rect.Left && X <= rect.Right &&
-		Y >= rect.Top && Y <= rect.Bottom)
-	{
-		return true;
-	}
-	return false;
 }
 
 float Vector2::LengthSq_get() const
@@ -161,120 +155,6 @@ float Vector2::operator |(const Vector2& value) const
 	return DotProduct(*this, value);
 }
 
-bool Vector2::operator ==(const Vector2& value) const
-{
-	return X == value.X && Y == value.Y;
-}
-
-bool Vector2::operator !=(const Vector2& value) const
-{
-	return X != value.X || Y != value.Y;
-}
-
-bool Vector2::operator < (const Vector2& right) const
-{
-	if (X < right.X)
-	{
-		return true;
-	}
-	else if (X > right.X)
-	{
-		return false;
-	}
-	else if (Y < right.Y)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector2::operator <=(const Vector2& right) const
-{
-	if (X < right.X)
-	{
-		return true;
-	}
-	else if (X > right.X)
-	{
-		return false;
-	}
-	else if (Y <= right.Y)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector2::operator > (const Vector2& right) const
-{
-	if (X > right.X)
-	{
-		return true;
-	}
-	else if (X < right.X)
-	{
-		return false;
-	}
-	else if (Y > right.Y)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector2::operator >=(const Vector2& right) const
-{
-	if (X > right.X)
-	{
-		return true;
-	}
-	else if (X < right.X)
-	{
-		return false;
-	}
-	else if (Y >= right.Y)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-weak_ordering Vector2::operator <=>(const Vector2& right) const
-{
-	if (X < right.X)
-	{
-		return weak_ordering::less;
-	}
-	else if (X > right.X)
-	{
-		return weak_ordering::greater;
-	}
-	else if (Y < right.Y)
-	{
-		return weak_ordering::less;
-	}
-	else if (Y > right.Y)
-	{
-		return weak_ordering::greater;
-	}
-	else
-	{
-		return weak_ordering::equivalent;
-	}
-}
-
 Vector2& Vector2::operator +=(const Vector2& right)
 {
 	X += right.X;
@@ -316,6 +196,16 @@ float Vector2::Distance(const Vector2& left, const Vector2& right)
 float Vector2::DotProduct(const Vector2& left, const Vector2& right)
 {
 	return left.X * right.X + left.Y * right.Y;
+}
+
+Vector2 Vector2::Min(const Vector2& lh, const Vector2& rh)
+{
+	return { Math::Min(lh.X, rh.X), Math::Min(lh.Y, rh.Y) };
+}
+
+Vector2 Vector2::Max(const Vector2& lh, const Vector2& rh)
+{
+	return { Math::Max(lh.X, rh.X), Math::Max(lh.Y, rh.Y) };
 }
 
 Vector2 operator +(float left, const Vector2& right)

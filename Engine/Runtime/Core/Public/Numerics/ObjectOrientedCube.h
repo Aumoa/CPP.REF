@@ -4,15 +4,15 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include <vector>
 #include "TRefPtr.h"
 #include "Vector3.h"
 #include "Quaternion.h"
 
-#pragma pack(push, 8)
-struct CORE_API ObjectOrientedCube
+#pragma pack(push, 4)
+struct CORE_API ObjectOrientedCube : public TNumericsBasicOperator<ObjectOrientedCube, Vector3, Vector3, Quaternion>
 {
 	using This = ObjectOrientedCube;
 
@@ -38,8 +38,5 @@ struct CORE_API ObjectOrientedCube
 	Vector3 AxisY_get() const;
 	vs_property_get(Vector3, AxisZ);
 	Vector3 AxisZ_get() const;
-
-	bool operator ==(const ObjectOrientedCube& right) const;
-	bool operator !=(const ObjectOrientedCube& right) const;
 };
 #pragma pack(pop)

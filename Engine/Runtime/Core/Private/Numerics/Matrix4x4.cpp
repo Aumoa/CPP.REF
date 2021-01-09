@@ -332,22 +332,6 @@ Matrix4x4 Matrix4x4::operator /(const Matrix4x4& right) const
     );
 }
 
-bool Matrix4x4::operator ==(const Matrix4x4& right) const
-{
-    return _11 == right._11 && _12 == right._12 && _13 == right._13 && _14 == right._14
-        && _21 == right._21 && _22 == right._22 && _23 == right._23 && _24 == right._24
-        && _31 == right._31 && _32 == right._32 && _33 == right._33 && _34 == right._34
-        && _41 == right._41 && _42 == right._42 && _43 == right._43 && _44 == right._44;
-}
-
-bool Matrix4x4::operator !=(const Matrix4x4& right) const
-{
-    return _11 != right._11 || _12 != right._12 || _13 != right._13 || _14 != right._14
-        || _21 != right._21 || _22 != right._22 || _23 != right._23 || _24 != right._24
-        || _31 != right._31 || _32 != right._32 || _33 != right._33 || _34 != right._34
-        || _41 != right._41 || _42 != right._42 || _43 != right._43 || _44 != right._44;
-}
-
 Matrix4x4& Matrix4x4::operator +=(const Matrix4x4& right)
 {
     return *this = *this + right;

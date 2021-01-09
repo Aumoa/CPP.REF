@@ -4,15 +4,15 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
 #include "TRefPtr.h"
-#include <compare>
 
 struct Vector3;
 struct Vector4;
 
-#pragma pack(push, 8)
-struct CORE_API Matrix4x4
+#pragma pack(push, 4)
+struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float>
 {
     using This = Matrix4x4;
 
@@ -80,9 +80,6 @@ struct CORE_API Matrix4x4
     Matrix4x4 operator -(const Matrix4x4& right) const;
     Matrix4x4 operator *(const Matrix4x4& right) const;
     Matrix4x4 operator /(const Matrix4x4& right) const;
-
-    bool operator ==(const Matrix4x4& right) const;
-    bool operator !=(const Matrix4x4& right) const;
 
     Matrix4x4& operator +=(const Matrix4x4& right);
     Matrix4x4& operator -=(const Matrix4x4& right);

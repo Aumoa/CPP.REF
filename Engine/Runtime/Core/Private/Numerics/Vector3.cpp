@@ -6,6 +6,7 @@
 #include "HashHelper.h"
 #include "Numerics/AxisAlignedCube.h"
 #include "Numerics/Vector2.h"
+#include "Mathematics/Math.h"
 
 using namespace std;
 
@@ -94,11 +95,6 @@ size_t Vector3::Count_get() const
 	return 3;
 }
 
-bool Vector3::IsOverlap(const AxisAlignedCube& cube) const
-{
-	return cube.IsOverlap(*this);
-}
-
 float Vector3::LengthSq_get() const
 {
 	return X * X + Y * Y + Z * Z;
@@ -181,160 +177,6 @@ float Vector3::operator |(const Vector3& value) const
 	return DotProduct(*this, value);
 }
 
-bool Vector3::operator ==(const Vector3& value) const
-{
-	return X == value.X && Y == value.Y && Z == value.Z;
-}
-
-bool Vector3::operator !=(const Vector3& value) const
-{
-	return X != value.X || Y != value.Y || Z != value.Z;
-}
-
-bool Vector3::operator < (const Vector3& right) const
-{
-	if (X < right.X)
-	{
-		return true;
-	}
-	else if (X > right.X)
-	{
-		return false;
-	}
-	else if (Y < right.Y)
-	{
-		return true;
-	}
-	else if (Y > right.Y)
-	{
-		return false;
-	}
-	else if (Z < right.Z)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector3::operator <=(const Vector3& right) const
-{
-	if (X < right.X)
-	{
-		return true;
-	}
-	else if (X > right.X)
-	{
-		return false;
-	}
-	else if (Y < right.Y)
-	{
-		return true;
-	}
-	else if (Y > right.Y)
-	{
-		return false;
-	}
-	else if (Z <= right.Z)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector3::operator > (const Vector3& right) const
-{
-	if (X > right.X)
-	{
-		return true;
-	}
-	else if (X < right.X)
-	{
-		return false;
-	}
-	else if (Y > right.Y)
-	{
-		return true;
-	}
-	else if (Y < right.Y)
-	{
-		return false;
-	}
-	else if (Z > right.Z)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector3::operator >=(const Vector3& right) const
-{
-	if (X > right.X)
-	{
-		return true;
-	}
-	else if (X < right.X)
-	{
-		return false;
-	}
-	else if (Y > right.Y)
-	{
-		return true;
-	}
-	else if (Y < right.Y)
-	{
-		return false;
-	}
-	else if (Z >= right.Z)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-weak_ordering Vector3::operator <=>(const Vector3& right) const
-{
-	if (X < right.X)
-	{
-		return weak_ordering::less;
-	}
-	else if (X > right.X)
-	{
-		return weak_ordering::greater;
-	}
-	else if (Y < right.Y)
-	{
-		return weak_ordering::less;
-	}
-	else if (Y > right.Y)
-	{
-		return weak_ordering::greater;
-	}
-	else if (Z < right.Z)
-	{
-		return weak_ordering::less;
-	}
-	else if (Z > right.Z)
-	{
-		return weak_ordering::greater;
-	}
-	else
-	{
-		return weak_ordering::equivalent;
-	}
-}
-
 Vector3& Vector3::operator +=(const Vector3& right)
 {
 	X += right.X;
@@ -394,6 +236,16 @@ Vector3 Vector3::CrossProduct(const Vector3& left, const Vector3& right)
 		left.Z * right.X - left.X * right.Z,
 		left.X * right.Y - left.Y * right.X
 	);
+}
+
+Vector3 Vector3::Min(const Vector3& lh, const Vector3& rh)
+{
+	return { Math::Min(lh.X, rh.X), Math::Min(lh.Y, rh.Y), Math::Min(lh.Z, rh.Z) };
+}
+
+Vector3 Vector3::Max(const Vector3& lh, const Vector3& rh)
+{
+	return { Math::Max(lh.X, rh.X), Math::Max(lh.Y, rh.Y), Math::Max(lh.Z, rh.Z) };
 }
 
 Vector3 operator +(float left, const Vector3& right)

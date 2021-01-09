@@ -4,19 +4,18 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include <utility>
 #include "TRefPtr.h"
-#include "Mathematics/TDegrees.h"
-#include "Mathematics/TRadians.h"
+#include "Mathematics/TAngleDef.h"
 
 struct Vector3;
 struct Vector4;
 struct Matrix4x4;
 
-#pragma pack(push, 8)
-struct CORE_API Quaternion
+#pragma pack(push, 4)
+struct CORE_API Quaternion : public TNumericsBasicOperator<Quaternion, float, float, float, float>
 {
 	float X;
 	float Y;
@@ -76,14 +75,6 @@ struct CORE_API Quaternion
 	Quaternion operator *(const Quaternion& right) const;
 	Quaternion operator /(const Quaternion& right) const;
 	float operator |(const Quaternion& right) const;
-
-	bool operator ==(const Quaternion& right) const;
-	bool operator !=(const Quaternion& right) const;
-	bool operator < (const Quaternion& right) const;
-	bool operator <=(const Quaternion& right) const;
-	bool operator > (const Quaternion& right) const;
-	bool operator >=(const Quaternion& right) const;
-	std::weak_ordering operator <=>(const Quaternion& right) const;
 
 	Quaternion& operator +=(const Quaternion& right);
 	Quaternion& operator -=(const Quaternion& right);

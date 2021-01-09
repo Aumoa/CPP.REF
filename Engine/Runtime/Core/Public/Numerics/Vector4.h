@@ -4,14 +4,14 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include "TRefPtr.h"
 
 struct Vector3;
 
-#pragma pack(push, 8)
-struct CORE_API Vector4
+#pragma pack(push, 4)
+struct CORE_API Vector4 : public TNumericsBasicOperator<Vector4, float, float, float, float>
 {
 	using This = Vector4;
 
@@ -61,14 +61,6 @@ struct CORE_API Vector4
 	Vector4 operator /(const Vector4& right) const;
 	float operator |(const Vector4& right) const;
 
-	bool operator ==(const Vector4& right) const;
-	bool operator !=(const Vector4& right) const;
-	bool operator < (const Vector4& right) const;
-	bool operator <=(const Vector4& right) const;
-	bool operator > (const Vector4& right) const;
-	bool operator >=(const Vector4& right) const;
-	std::weak_ordering operator <=>(const Vector4& right) const;
-
 	Vector4& operator +=(const Vector4& right);
 	Vector4& operator -=(const Vector4& right);
 	Vector4& operator *=(const Vector4& right);
@@ -77,6 +69,8 @@ struct CORE_API Vector4
 	static float DistanceSq(const Vector4& left, const Vector4& right);
 	static float Distance(const Vector4& left, const Vector4& right);
 	static float DotProduct(const Vector4& left, const Vector4& right);
+	static Vector4 Min(const Vector4& lh, const Vector4& rh);
+	static Vector4 Max(const Vector4& lh, const Vector4& rh);
 };
 #pragma pack(pop)
 

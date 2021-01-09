@@ -4,13 +4,13 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include <map>
 #include "TRefPtr.h"
 
-#pragma pack(push, 8)
-struct CORE_API Color
+#pragma pack(push, 4)
+struct CORE_API Color : public TNumericsBasicOperator<Color, float, float, float, float>
 {
 	using This = Color;
 
@@ -53,14 +53,6 @@ public:
 	Color operator *(const Color& right) const;
 	Color operator /(const Color& right) const;
 	Color operator ^(const Color& right) const;
-
-	bool operator ==(const Color& right) const;
-	bool operator !=(const Color& right) const;
-	bool operator < (const Color& right) const;
-	bool operator <=(const Color& right) const;
-	bool operator > (const Color& right) const;
-	bool operator >=(const Color& right) const;
-	std::weak_ordering operator <=>(const Color& right) const;
 
 	Color& operator +=(const Color& right);
 	Color& operator -=(const Color& right);

@@ -42,7 +42,7 @@ void DeferredSceneRenderer::PopulateRenderCommands()
 	int32 sceneX, sceneY;
 	GetSceneSize(sceneX, sceneY);
 
-	CommandList->SetScissorRects(Rect(0, 0, (float)sceneX, (float)sceneY));
+	CommandList->SetScissorRects(Rect(Vector2::Zero, Vector2((float)sceneX, (float)sceneY)));
 	CommandList->SetViewports(RHIViewport(sceneX, sceneY));
 
 	RHIShaderLibrary* shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();

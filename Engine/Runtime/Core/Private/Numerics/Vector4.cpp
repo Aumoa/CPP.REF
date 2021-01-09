@@ -6,6 +6,7 @@
 #include "HashHelper.h"
 #include "Numerics/AxisAlignedCube.h"
 #include "Numerics/Vector3.h"
+#include "Mathematics/Math.h"
 
 using namespace std;
 
@@ -167,200 +168,6 @@ float Vector4::operator |(const Vector4& value) const
 	return DotProduct(*this, value);
 }
 
-bool Vector4::operator ==(const Vector4& value) const
-{
-	return X == value.X && Y == value.Y && Z == value.Z && W == value.W;
-}
-
-bool Vector4::operator !=(const Vector4& value) const
-{
-	return X != value.X || Y != value.Y || Z != value.Z || W != value.W;
-}
-
-bool Vector4::operator < (const Vector4& right) const
-{
-	if (X < right.X)
-	{
-		return true;
-	}
-	else if (X > right.X)
-	{
-		return false;
-	}
-	else if (Y < right.Y)
-	{
-		return true;
-	}
-	else if (Y > right.Y)
-	{
-		return false;
-	}
-	else if (Z < right.Z)
-	{
-		return true;
-	}
-	else if (Z > right.Z)
-	{
-		return false;
-	}
-	else if (W < right.W)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector4::operator <=(const Vector4& right) const
-{
-	if (X < right.X)
-	{
-		return true;
-	}
-	else if (X > right.X)
-	{
-		return false;
-	}
-	else if (Y < right.Y)
-	{
-		return true;
-	}
-	else if (Y > right.Y)
-	{
-		return false;
-	}
-	else if (Z < right.Z)
-	{
-		return true;
-	}
-	else if (Z > right.Z)
-	{
-		return false;
-	}
-	else if (W <= right.W)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector4::operator > (const Vector4& right) const
-{
-	if (X > right.X)
-	{
-		return true;
-	}
-	else if (X < right.X)
-	{
-		return false;
-	}
-	else if (Y > right.Y)
-	{
-		return true;
-	}
-	else if (Y < right.Y)
-	{
-		return false;
-	}
-	else if (Z > right.Z)
-	{
-		return true;
-	}
-	else if (Z < right.Z)
-	{
-		return false;
-	}
-	else if (W > right.W)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Vector4::operator >=(const Vector4& right) const
-{
-	if (X > right.X)
-	{
-		return true;
-	}
-	else if (X < right.X)
-	{
-		return false;
-	}
-	else if (Y > right.Y)
-	{
-		return true;
-	}
-	else if (Y < right.Y)
-	{
-		return false;
-	}
-	else if (Z > right.Z)
-	{
-		return true;
-	}
-	else if (Z < right.Z)
-	{
-		return false;
-	}
-	else if (W >= right.W)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-weak_ordering Vector4::operator <=>(const Vector4& right) const
-{
-	if (X < right.X)
-	{
-		return weak_ordering::less;
-	}
-	else if (X > right.X)
-	{
-		return weak_ordering::greater;
-	}
-	else if (Y < right.Y)
-	{
-		return weak_ordering::less;
-	}
-	else if (Y > right.Y)
-	{
-		return weak_ordering::greater;
-	}
-	else if (Z < right.Z)
-	{
-		return weak_ordering::less;
-	}
-	else if (Z > right.Z)
-	{
-		return weak_ordering::greater;
-	}
-	else if (W < right.W)
-	{
-		return weak_ordering::less;
-	}
-	else if (W > right.W)
-	{
-		return weak_ordering::greater;
-	}
-	else
-	{
-		return weak_ordering::equivalent;
-	}
-}
-
 Vector4& Vector4::operator +=(const Vector4& right)
 {
 	X += right.X;
@@ -410,6 +217,16 @@ float Vector4::Distance(const Vector4& left, const Vector4& right)
 float Vector4::DotProduct(const Vector4& left, const Vector4& right)
 {
 	return left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
+}
+
+Vector4 Vector4::Min(const Vector4& lh, const Vector4& rh)
+{
+	return { Math::Min(lh.X, rh.X), Math::Min(lh.Y, rh.Y), Math::Min(lh.Z, rh.Z), Math::Min(lh.W, rh.W) };
+}
+
+Vector4 Vector4::Max(const Vector4& lh, const Vector4& rh)
+{
+	return { Math::Max(lh.X, rh.X), Math::Max(lh.Y, rh.Y), Math::Max(lh.Z, rh.Z), Math::Max(lh.W, rh.W) };
 }
 
 Vector4 operator +(float left, const Vector4& right)

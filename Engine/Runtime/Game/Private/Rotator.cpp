@@ -124,13 +124,13 @@ Rotator Rotator::Inverse_get() const
 
 Quaternion Rotator::Rotation_get() const
 {
-	const TDegrees<float> PitchNoWinding = Pitch.Clamped;
-	const TDegrees<float> YawNoWinding = Yaw.Clamped;
-	const TDegrees<float> RollNoWinding = Roll.Clamped;
+	const TDegrees PitchNoWinding = Pitch.Clamped;
+	const TDegrees YawNoWinding = Yaw.Clamped;
+	const TDegrees RollNoWinding = Roll.Clamped;
 
-	auto[SP, CP] = Math::SinCos<float>(PitchNoWinding * 0.5);
-	auto[SY, CY] = Math::SinCos<float>(YawNoWinding * 0.5);
-	auto[SR, CR] = Math::SinCos<float>(RollNoWinding * 0.5);
+	auto[SP, CP] = Math::SinCos(PitchNoWinding * 0.5);
+	auto[SY, CY] = Math::SinCos(YawNoWinding * 0.5);
+	auto[SR, CR] = Math::SinCos(RollNoWinding * 0.5);
 
 	Quaternion rotationQuat;
 	rotationQuat.X = CR * SP * SY - SR * CP * CY;
@@ -145,9 +145,9 @@ Matrix4x4 Rotator::Matrix_get() const
 {
 	const Vector3 Origin = Vector3::Zero;
 
-	auto[SP, CP] = Math::SinCos<float>(Pitch);
-	auto[SY, CY] = Math::SinCos<float>(Yaw);
-	auto[SR, CR] = Math::SinCos<float>(Roll);
+	auto[SP, CP] = Math::SinCos(Pitch);
+	auto[SY, CY] = Math::SinCos(Yaw);
+	auto[SR, CR] = Math::SinCos(Roll);
 
 	Matrix4x4 M;
 	M[0][0] = CP * CY;

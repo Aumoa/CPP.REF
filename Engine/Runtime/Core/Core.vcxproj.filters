@@ -19,6 +19,12 @@
     <Filter Include="Private\Numerics">
       <UniqueIdentifier>{a7461282-9c6a-4212-80ec-8e9a67ccd5d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Physics">
+      <UniqueIdentifier>{bfd826d8-d7e5-4cf0-a10e-9bd855729d69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Physics">
+      <UniqueIdentifier>{5a85cda7-d0ba-4a78-8913-190da6b061b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -78,12 +84,6 @@
     <ClInclude Include="Public\Mathematics\Math.h">
       <Filter>Public\Mathematics</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Mathematics\TDegrees.h">
-      <Filter>Public\Mathematics</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Mathematics\TRadians.h">
-      <Filter>Public\Mathematics</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Numerics\Vector2.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
@@ -123,6 +123,27 @@
     <ClInclude Include="Public\Numerics\Rect.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Numerics\Circle.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Physics\Collision.h">
+      <Filter>Public\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Line3.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Sphere.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Line2.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\TNumericsBasicOperator.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Mathematics\TAngleDef.h">
+      <Filter>Public\Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -160,6 +181,12 @@
     </None>
     <None Include="Public\Numerics\Matrix4x4.inl">
       <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Numerics\TNumericsBasicOperator.inl">
+      <Filter>Public\Numerics</Filter>
+    </None>
+    <None Include="Public\Mathematics\TAngleDef.inl">
+      <Filter>Public\Mathematics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +261,21 @@
     </ClCompile>
     <ClCompile Include="Private\Numerics\Rect.cpp">
       <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Circle.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Sphere.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Line2.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Line3.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Physics\Collision.cpp">
+      <Filter>Private\Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

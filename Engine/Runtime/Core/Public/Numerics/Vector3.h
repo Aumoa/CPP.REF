@@ -4,15 +4,15 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include "TRefPtr.h"
 
 struct AxisAlignedCube;
 struct Vector2;
 
-#pragma pack(push, 8)
-struct CORE_API Vector3
+#pragma pack(push, 4)
+struct CORE_API Vector3 : public TNumericsBasicOperator<Vector3, float, float, float>
 {
 	using This = Vector3;
 
@@ -41,8 +41,6 @@ struct CORE_API Vector3
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
 
-	bool IsOverlap(const AxisAlignedCube& cube) const;
-
 	vs_property_get(float, LengthSq);
 	float LengthSq_get() const;
 	vs_property_get(float, Length);
@@ -64,14 +62,6 @@ struct CORE_API Vector3
 	Vector3 operator ^(const Vector3& right) const;
 	float operator |(const Vector3& right) const;
 
-	bool operator ==(const Vector3& right) const;
-	bool operator !=(const Vector3& right) const;
-	bool operator < (const Vector3& right) const;
-	bool operator <=(const Vector3& right) const;
-	bool operator > (const Vector3& right) const;
-	bool operator >=(const Vector3& right) const;
-	std::weak_ordering operator <=>(const Vector3& right) const;
-
 	Vector3& operator +=(const Vector3& right);
 	Vector3& operator -=(const Vector3& right);
 	Vector3& operator *=(const Vector3& right);
@@ -82,6 +72,8 @@ struct CORE_API Vector3
 	static float Distance(const Vector3& left, const Vector3& right);
 	static float DotProduct(const Vector3& left, const Vector3& right);
 	static Vector3 CrossProduct(const Vector3& left, const Vector3& right);
+	static Vector3 Min(const Vector3& lh, const Vector3& rh);
+	static Vector3 Max(const Vector3& lh, const Vector3& rh);
 
 	static Vector3 Up;
 	static Vector3 Forward;

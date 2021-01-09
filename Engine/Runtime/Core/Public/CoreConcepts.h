@@ -168,8 +168,11 @@ concept TComparable_GreaterEquals = requires(T lh, O rh)
 	{ lh >= rh };
 };
 
+#pragma warning(push)
+#pragma warning(disable: 4305)
 template<class T>
 constexpr bool IsRealType = ((T)(1.0 + 0.1)) != ((T)1.0);
+#pragma warning(pop)
 
 template<class T>
 concept TIsRealType = IsRealType<T>;

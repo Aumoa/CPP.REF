@@ -4,25 +4,24 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
+#include "TNumericsBasicOperator.h"
 
-#include <compare>
 #include <optional>
 #include "TRefPtr.h"
 #include "Vector3.h"
 
 struct Ray3;
 
-#pragma pack(push, 8)
-struct CORE_API AxisAlignedCube
+#pragma pack(push, 4)
+struct CORE_API AxisAlignedCube : public TNumericsBasicOperator<AxisAlignedCube, Vector3, Vector3>
 {
 	using This = AxisAlignedCube;
 
-	Vector3 Center;
-	Vector3 Extent;
+	Vector3 Min;
+	Vector3 Max;
 
 	AxisAlignedCube();
-	AxisAlignedCube(float x, float y, float z, float width, float height, float depth);
-	AxisAlignedCube(const Vector3& center, const Vector3& extent);
+	AxisAlignedCube(const Vector3& min, const Vector3& max);
 	AxisAlignedCube(const AxisAlignedCube& copy);
 
 	bool Equals(const AxisAlignedCube& rh) const;
@@ -30,31 +29,7 @@ struct CORE_API AxisAlignedCube
 	size_t GetHashCode() const;
 	TRefPtr<String> ToString() const;
 
-	bool IsOverlap(const Vector3& point) const;
-	bool IsOverlap(const AxisAlignedCube& cube) const;
-	bool IsOverlap(const Ray3& ray) const;
-	std::optional<AxisAlignedCube> IsIntersect(const AxisAlignedCube& cube) const;
-	std::optional<float> IsIntersect(const Ray3& ray) const;
-
-	vs_property_get(float, Left);
-	float Left_get() const;
-	vs_property_get(float, Right);
-	float Right_get() const;
-	vs_property_get(float, Top);
-	float Top_get() const;
-	vs_property_get(float, Bottom);
-	float Bottom_get() const;
-	vs_property_get(float, Near);
-	float Near_get() const;
-	vs_property_get(float, Far);
-	float Far_get() const;
-
-	bool operator ==(const AxisAlignedCube& right) const;
-	bool operator !=(const AxisAlignedCube& right) const;
-	bool operator < (const AxisAlignedCube& right) const;
-	bool operator <=(const AxisAlignedCube& right) const;
-	bool operator > (const AxisAlignedCube& right) const;
-	bool operator >=(const AxisAlignedCube& right) const;
-	std::weak_ordering operator <=>(const AxisAlignedCube& right) const;
+	vs_property_get(Vector3, Center);
+	Vector3 Center_get() const;
 };
 #pragma pack(pop)

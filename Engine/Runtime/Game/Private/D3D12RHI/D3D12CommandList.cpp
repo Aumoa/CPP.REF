@@ -96,10 +96,10 @@ void D3D12CommandList::SetScissorRects(const Rect& scissorRect)
 	ConsumePendingDeferredCommands();
 
 	D3D12_RECT rc;
-	rc.left = (INT)scissorRect.Left;
-	rc.top = (INT)scissorRect.Top;
-	rc.right = (INT)scissorRect.Right;
-	rc.bottom = (INT)scissorRect.Bottom;
+	rc.left = (INT)scissorRect.Min.X;
+	rc.top = (INT)scissorRect.Min.Y;
+	rc.right = (INT)scissorRect.Max.X;
+	rc.bottom = (INT)scissorRect.Max.Y;
 
 	CommandList->RSSetScissorRects(1, &rc);
 }
