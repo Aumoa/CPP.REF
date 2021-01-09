@@ -33,3 +33,5 @@
 #include "Numerics/Color.h"
 #include "Numerics/Sphere.h"
 #include "Numerics/Circle.h"
+
+#include "Time/Duration.h"

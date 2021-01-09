@@ -19,6 +19,9 @@
     <Filter Include="Private\Numerics">
       <UniqueIdentifier>{a7461282-9c6a-4212-80ec-8e9a67ccd5d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Time">
+      <UniqueIdentifier>{aba7b5d8-1c27-4b0e-91e6-777f195c8d61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -135,6 +138,9 @@
     <ClInclude Include="Public\Mathematics\TAngleDef.h">
       <Filter>Public\Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Time\Duration.h">
+      <Filter>Public\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -178,6 +184,9 @@
     </None>
     <None Include="Public\Mathematics\TAngleDef.inl">
       <Filter>Public\Mathematics</Filter>
+    </None>
+    <None Include="Public\Time\Duration.inl">
+      <Filter>Public\Time</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

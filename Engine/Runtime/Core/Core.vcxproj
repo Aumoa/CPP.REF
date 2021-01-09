@@ -180,6 +180,7 @@
     <ClInclude Include="Public\Numerics\Vector2.h" />
     <ClInclude Include="Public\Numerics\Vector3.h" />
     <ClInclude Include="Public\Numerics\Vector4.h" />
+    <ClInclude Include="Public\Time\Duration.h" />
     <ClInclude Include="Public\TMulticastDelegate.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\CoreString.h" />
@@ -200,6 +201,7 @@
     <None Include="Public\Numerics\Vector4.inl" />
     <None Include="Public\Object.inl" />
     <None Include="Public\String.inl" />
+    <None Include="Public\Time\Duration.inl" />
     <None Include="Public\TMulticastDelegate.inl" />
     <None Include="Public\TRefPtr.inl" />
     <None Include="Public\TWeakPtr.inl" />
