@@ -39,6 +39,9 @@ public:
 	inline size_t GetHashCode() const;
 	inline TRet Invoke(TArgs... args) const;
 
+	vs_property_get(bool, IsValid);
+	inline bool IsValid_get() const;
+
 	inline TRet operator()(TArgs... args) const;
 };
 
@@ -55,19 +58,8 @@ struct TObjectFunctionBind
 	void (T::* callable)(TArgs...);
 
 public:
-	TObjectFunctionBind(TRefPtr<T, true> ptr, void (T::* callable)(TArgs...))
-		: ptr(std::move(ptr))
-		, callable(callable)
-	{
-
-	}
-
-	TObjectFunctionBind(const T* ptr, void (T::* callable)(TArgs...))
-		: ptr(ptr)
-		, callable(callable)
-	{
-
-	}
+	inline TObjectFunctionBind(TRefPtr<T, true> ptr, void (T::* callable)(TArgs...));
+	inline TObjectFunctionBind(const T* ptr, void (T::* callable)(TArgs...));
 };
 
 template<TIsNotPointer T, class... TArgs>
@@ -77,12 +69,7 @@ struct TRawFunctionBind
 	void (T::* callable)(TArgs...);
 
 public:
-	TRawFunctionBind(const T* ptr, void (T::* callable)(TArgs...))
-		: ptr(ptr)
-		, callable(callable)
-	{
-
-	}
+	inline TRawFunctionBind(const T* ptr, void (T::* callable)(TArgs...));
 };
 
 template<class... TArgs>

@@ -40,9 +40,39 @@ inline TRet TFunction<TRet(TArgs...)>::Invoke(TArgs... args) const
 }
 
 template<class TRet, class... TArgs>
+inline bool TFunction<TRet(TArgs...)>::IsValid_get() const
+{
+	return (bool)callable;
+}
+
+template<class TRet, class... TArgs>
 inline TRet TFunction<TRet(TArgs...)>::operator ()(TArgs... args) const
 {
 	return callable(args...);
+}
+
+template<TIsNotPointer T, class... TArgs>
+inline TObjectFunctionBind<T, TArgs...>::TObjectFunctionBind(TRefPtr<T, true> ptr, void (T::* callable)(TArgs...))
+	: ptr(std::move(ptr))
+	, callable(callable)
+{
+
+}
+
+template<TIsNotPointer T, class... TArgs>
+inline TObjectFunctionBind<T, TArgs...>::TObjectFunctionBind(const T* ptr, void (T::* callable)(TArgs...))
+	: ptr(ptr)
+	, callable(callable)
+{
+
+}
+
+template<TIsNotPointer T, class... TArgs>
+inline TRawFunctionBind<T, TArgs...>::TRawFunctionBind(const T* ptr, void (T::* callable)(TArgs...))
+	: ptr(ptr)
+	, callable(callable)
+{
+
 }
 
 template<class... TArgs>
