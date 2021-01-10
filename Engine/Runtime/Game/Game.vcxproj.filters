@@ -333,6 +333,9 @@
     <ClInclude Include="Public\Physics\Collision.h">
       <Filter>Public\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\TSubclassOf.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -561,6 +564,9 @@
     </None>
     <None Include="Public\Components\ActorComponent.inl">
       <Filter>Public\Components</Filter>
+    </None>
+    <None Include="Public\TSubclassOf.inl">
+      <Filter>Public</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

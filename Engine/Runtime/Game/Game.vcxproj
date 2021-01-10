@@ -251,6 +251,7 @@
     <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h" />
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
+    <ClInclude Include="Public\TSubclassOf.h" />
     <ClInclude Include="Public\WindowsMinimal.h" />
     <ClInclude Include="Public\WinException.h" />
     <ClInclude Include="Public\World.h" />
@@ -335,6 +336,7 @@
     <None Include="Public\Components\ActorComponent.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Level.inl" />
+    <None Include="Public\TSubclassOf.inl" />
     <None Include="Public\World.inl" />
   </ItemGroup>
   <ItemGroup>
