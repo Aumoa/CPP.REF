@@ -338,6 +338,15 @@ Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, fl
 	return q;
 }
 
+Quaternion Quaternion::LookTo(const Vector3& forward, const Vector3& up)
+{
+	XMMATRIX M = XMMatrixLookToLH(XMVectorZero(), XMLoadVector3(&forward), XMLoadVector3(&up));
+	XMVECTOR Q = XMQuaternionRotationMatrix(M);
+	Quaternion q;
+	XMStoreQuaternion(&q, Q);
+	return q;
+}
+
 Quaternion operator +(float left, const Quaternion& right)
 {
 	return Quaternion(left) + right;

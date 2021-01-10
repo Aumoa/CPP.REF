@@ -42,4 +42,5 @@ interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices) = 0;
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices) = 0;
+	virtual TRefPtr<IRHIResource> CreateDynamicConstantBuffer(size_t sizeInBytes) = 0;
 };

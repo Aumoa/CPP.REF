@@ -45,7 +45,7 @@ size_t Transform::GetHashCode() const
 
 TRefPtr<String> Transform::ToString() const
 {
-	return String::Format("{{Translation: {0}, Scale: {1}, Rotation: {2}}}", Translation, Scale, Rotation);
+	return String::Format("{{T: {0}, S: {1}, R: {2}}}", Translation, Scale, Rotation);
 }
 
 Vector3 Transform::TransformVector(const Vector3& v) const
@@ -69,6 +69,11 @@ Transform Transform::Inverse_get() const
 	return inverse;
 }
 
+Matrix4x4 Transform::Matrix_get() const
+{
+	return Matrix4x4::AffineTransformation(Translation, Scale, Rotation);
+}
+
 bool Transform::operator ==(const Transform& rh) const
 {
 	return Translation == rh.Translation && Scale == rh.Scale && Rotation == rh.Rotation;
@@ -79,13 +84,19 @@ bool Transform::operator !=(const Transform& rh) const
 	return Translation != rh.Translation || Scale != rh.Scale || Rotation != rh.Rotation;
 }
 
+Transform Transform::FromMatrix(const Matrix4x4& value)
+{
+	Transform t;
+	value.BreakTransform(t.Translation, t.Scale, t.Rotation);
+	return t;
+}
+
 Transform Transform::Multiply(const Transform& lh, const Transform& rh)
 {
-	Quaternion R = Quaternion::Concatenate(rh.Rotation, lh.Rotation);
-	Vector3 S = lh.Scale * rh.Scale;
-	Vector3 T = rh.Rotation.RotateVector(rh.Scale * lh.Translation) + rh.Translation;
-
-	return Transform(T, S, R);
+	Matrix4x4 m = Matrix4x4::Multiply(lh.Matrix, rh.Matrix);
+	Transform trp;
+	m.BreakTransform(trp.Translation, trp.Scale, trp.Rotation);
+	return trp;
 }
 
 Transform Transform::Identity = Transform(Vector3::Zero, Vector3::One, Quaternion::Identity);

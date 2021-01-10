@@ -166,6 +166,31 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(span<uint32> indices)
 	return NewObject<D3D12Resource>(resource.Get());
 }
 
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicConstantBuffer(size_t sizeInBytes)
+{
+	D3D12_RESOURCE_DESC bufferDesc = { };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = (UINT64)sizeInBytes;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heap = { };
+	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+	ComPtr<ID3D12Resource> resource;
+	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+	auto d3d12Res = NewObject<D3D12Resource>(resource.Get());
+	d3d12Res->BindMappingAddress();
+
+	return move(d3d12Res);
+}
+
 ID3D12Device* D3D12DeviceBundle::Device_get() const
 {
 	return d3d12Device.Get();

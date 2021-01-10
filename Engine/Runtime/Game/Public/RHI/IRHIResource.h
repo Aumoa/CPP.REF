@@ -8,4 +8,5 @@
 interface IRHIResource : virtual public Object
 {
 	virtual uint64 GetVirtualAddress() const = 0;
+	virtual void* GetMappingAddress() const = 0;
 };

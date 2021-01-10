@@ -5,6 +5,8 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+#include "Transform.h"
+
 class MeshBatch;
 class PrimitiveComponent;
 
@@ -16,10 +18,14 @@ public:
 
 private:
 	PrimitiveComponent* myPrimitiveComponent;
+	Transform transform;
 
 public:
 	PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent);
 	~PrimitiveSceneProxy();
 
+	void UpdateTransform(const Transform& value);
+
 	virtual MeshBatch* GetMeshBatch() const;
+	virtual Transform GetPrimitiveTransform() const;
 };

@@ -13,7 +13,17 @@ PrimitiveSceneProxy::~PrimitiveSceneProxy()
 
 }
 
+void PrimitiveSceneProxy::UpdateTransform(const Transform& value)
+{
+	transform = value;
+}
+
 MeshBatch* PrimitiveSceneProxy::GetMeshBatch() const
 {
 	return nullptr;
+}
+
+Transform PrimitiveSceneProxy::GetPrimitiveTransform() const
+{
+	return transform;
 }

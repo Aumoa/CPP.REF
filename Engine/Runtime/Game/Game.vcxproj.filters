@@ -348,6 +348,12 @@
     <ClInclude Include="Public\GameViewport.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneVisibility.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Shaders\ShaderCameraConstant.h">
+      <Filter>Private\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -541,6 +547,12 @@
     </ClCompile>
     <ClCompile Include="Private\GameViewport.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneVisibility.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Shaders\ShaderCameraConstant.cpp">
+      <Filter>Private\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

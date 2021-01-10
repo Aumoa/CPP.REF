@@ -10,6 +10,7 @@
 
 struct Vector3;
 struct Vector4;
+struct Quaternion;
 
 #pragma pack(push, 4)
 struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float>
@@ -72,6 +73,14 @@ struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, floa
     vs_property_get(Matrix4x4, Transposed);
     Matrix4x4 Transposed_get() const;
 
+    void BreakTransform(Vector3& outTranslation, Vector3& outScale, Quaternion& outRotation) const;
+    vs_property_get(Vector3, Translation);
+    Vector3 Translation_get() const;
+    vs_property_get(Vector3, Scale);
+    Vector3 Scale_get() const;
+    vs_property_get(Quaternion, Rotation);
+    Quaternion Rotation_get() const;
+
     const Vector4& operator [](size_t index) const;
     Vector4& operator [](size_t index);
 
@@ -87,6 +96,8 @@ struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, floa
     Matrix4x4& operator /=(const Matrix4x4& right);
 
     static Matrix4x4 Multiply(const Matrix4x4& a, const Matrix4x4& b);
+    static Matrix4x4 LookTo(const Vector3& location, const Vector3& dir, const Vector3& up);
+    static Matrix4x4 AffineTransformation(const Vector3& t, const Vector3& s, const Quaternion& q);
 
     static Matrix4x4 Identity;
 };

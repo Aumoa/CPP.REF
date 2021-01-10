@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <optional>
+#include <span>
 #include "CoreConcepts.h"
 #include "TRefPtr.h"
 #include "IStringFormattable.h"
@@ -121,7 +122,7 @@ public:
 	static TRefPtr<String> Join(TRefPtr<String> separator, const TContainer& values);
 	template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
 	static TRefPtr<String> Join(TRefPtr<String> separator, const TContainer& values);
-	static TRefPtr<String> Join(TRefPtr<String> separator, const std::vector<TRefPtr<String>>& values);
+	static TRefPtr<String> Join(TRefPtr<String> separator, const std::span<TRefPtr<String>>& values);
 	template<class... TArgs>
 	static TRefPtr<String> Concat(TRefPtr<String> arg1, TRefPtr<String> arg2, TArgs&&... values);
 	template<class T, size_t N> requires TIsStringConvertible<T> || TIsStringConstructible<T>
@@ -130,12 +131,12 @@ public:
 	static TRefPtr<String> Concat(const TContainer& values);
 	template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
 	static TRefPtr<String> Concat(const TContainer& values);
-	static TRefPtr<String> Concat(const std::vector<TRefPtr<String>>& values);
+	static TRefPtr<String> Concat(const std::span<TRefPtr<String>>& values);
 
 	static const TRefPtr<String> Empty;
 
 private:
-	static TRefPtr<String> FormatHelper(TRefPtr<String> format, std::vector<TRefPtr<Object>>& unpackedArgs);
+	static TRefPtr<String> FormatHelper(TRefPtr<String> format, const std::span<TRefPtr<Object>>& unpackedArgs);
 	wchar_t* MultiByteToWideChar(const char* multibyte, size_t* len);
 	wchar_t* CopyAllocate(const wchar_t* text, size_t len);
 

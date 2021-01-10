@@ -226,6 +226,40 @@ Matrix4x4 Matrix4x4::Transposed_get() const
     return t;
 }
 
+void Matrix4x4::BreakTransform(Vector3& outTranslation, Vector3& outScale, Quaternion& outRotation) const
+{
+    XMMATRIX M = XMLoadMatrix4x4(this);
+    XMVECTOR T;
+    XMVECTOR S;
+    XMVECTOR Q;
+    XMMatrixDecompose(&S, &Q, &T, M);
+
+    XMStoreVector3(&outTranslation, T);
+    XMStoreVector3(&outScale, S);
+    XMStoreVector3(&outRotation, Q);
+}
+
+Vector3 Matrix4x4::Translation_get() const
+{
+    return Vector3(_41, _42, _43);
+}
+
+Vector3 Matrix4x4::Scale_get() const
+{
+    Vector3 t, s;
+    Quaternion q;
+    BreakTransform(t, s, q);
+    return s;
+}
+
+Quaternion Matrix4x4::Rotation_get() const
+{
+    Vector3 t, s;
+    Quaternion q;
+    BreakTransform(t, s, q);
+    return q;
+}
+
 const Vector4& Matrix4x4::operator [](size_t index) const
 {
     const float* ptr = &_11;
@@ -313,6 +347,22 @@ Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& a, const Matrix4x4& b)
     XMMATRIX A = XMLoadMatrix4x4(&a);
     XMMATRIX B = XMLoadMatrix4x4(&b);
     XMMATRIX M = XMMatrixMultiply(A, B);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
+Matrix4x4 Matrix4x4::LookTo(const Vector3& location, const Vector3& dir, const Vector3& up)
+{
+    XMMATRIX M = XMMatrixLookToLH(XMLoadVector3(&location), XMLoadVector3(&dir), XMLoadVector3(&up));
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
+Matrix4x4 Matrix4x4::AffineTransformation(const Vector3& t, const Vector3& s, const Quaternion& q)
+{
+    XMMATRIX M = XMMatrixAffineTransformation(XMLoadVector3(&s), XMVectorZero(), XMLoadQuaternion(&q), XMLoadVector3(&t));
     Matrix4x4 m;
     XMStoreMatrix4x4(&m, M);
     return m;

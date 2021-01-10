@@ -197,10 +197,12 @@ wchar_t String::operator [](size_t index) const
 
 TRefPtr<String> String::Format(TRefPtr<String> format)
 {
+    std::vector<int> r;
+    std::span<int> g = r;
     return format;
 }
 
-TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<TRefPtr<String>>& values)
+TRefPtr<String> String::Join(TRefPtr<String> separator, const span<TRefPtr<String>>& values)
 {
     if (values.empty())
     {
@@ -273,7 +275,7 @@ TRefPtr<String> String::Join(TRefPtr<String> separator, const std::vector<TRefPt
     return move(result);
 }
 
-TRefPtr<String> String::Concat(const std::vector<TRefPtr<String>>& values)
+TRefPtr<String> String::Concat(const span<TRefPtr<String>>& values)
 {
     if (values.empty())
     {
@@ -337,7 +339,7 @@ TRefPtr<String> String::Concat(const std::vector<TRefPtr<String>>& values)
     return move(result);
 }
 
-TRefPtr<String> String::FormatHelper(TRefPtr<String> format, vector<TRefPtr<Object>>& unpackedArgs)
+TRefPtr<String> String::FormatHelper(TRefPtr<String> format, const span<TRefPtr<Object>>& unpackedArgs)
 {
     if (!format.IsValid)
     {

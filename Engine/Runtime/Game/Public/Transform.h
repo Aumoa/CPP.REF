@@ -26,10 +26,13 @@ struct GAME_API Transform
 
 	vs_property_get(Transform, Inverse);
 	Transform Inverse_get() const;
+	vs_property_get(Matrix4x4, Matrix);
+	Matrix4x4 Matrix_get() const;
 
 	bool operator ==(const Transform& rh) const;
 	bool operator !=(const Transform& rh) const;
 
+	static Transform FromMatrix(const Matrix4x4& value);
 	static Transform Multiply(const Transform& lh, const Transform& rh);
 
 	static Transform Identity;

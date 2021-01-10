@@ -57,6 +57,7 @@ public:
 
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
+	virtual TRefPtr<IRHIResource> CreateDynamicConstantBuffer(size_t sizeInBytes);
 
 	vs_property_get(ID3D12Device*, Device);
 	ID3D12Device* Device_get() const;

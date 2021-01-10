@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-class GAME_API EngineCriticalException : public Exception
+class EngineCriticalException : public Exception
 {
 public:
 	using Super = Exception;

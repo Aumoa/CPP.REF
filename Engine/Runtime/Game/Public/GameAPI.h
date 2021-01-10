@@ -21,3 +21,5 @@ std::lock_guard<std::mutex> lock_##x(x)
 #else
 #define GAME_API __declspec(dllimport)
 #endif
+
+#undef GetMessage
