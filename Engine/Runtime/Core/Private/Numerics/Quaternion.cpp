@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "IndexOutOfRangeException.h"
 #include "HashHelper.h"
+#include "DXMathMinimal.h"
 #include "Numerics/AxisAlignedCube.h"
 #include "Numerics/Matrix4x4.h"
 #include "Numerics/Vector4.h"
@@ -106,16 +107,20 @@ pair<Vector3, float> Quaternion::ToAxisAngle() const
 
 Vector3 Quaternion::RotateVector(const Vector3& v) const
 {
-	auto Q = Vector3(X, Y, Z);
-	Vector3 T = 2.0 * Vector3::CrossProduct(Q, v);
-	Vector3 result = v + (W * T) + Vector3::CrossProduct(Q, T);
+	XMVECTOR xmv = XMLoadVector3(&v);
 
-	return result;
+	XMVECTOR Q = XMVectorSet(X, Y, Z, 0);
+	XMVECTOR T = 2.0f * XMVector3Cross(Q, xmv);
+	XMVECTOR R = xmv + (W * T) + XMVector3Cross(Q, T);
+
+	Vector3 r;
+	XMStoreVector3(&r, R);
+	return r;
 }
 
 Vector4 Quaternion::RotateVector(const Vector4& v) const
 {
-	return Vector4(RotateVector(v.Cast<Vector3>()), v.W);
+	return Vector4(RotateVector((const Vector3&)v), v.W);
 }
 
 float Quaternion::LengthSq_get() const
@@ -175,6 +180,14 @@ Vector3 Quaternion::Axis_get() const
 Quaternion Quaternion::Inverse_get() const
 {
 	return Quaternion(-X, -Y, -Z, W);
+}
+
+Matrix4x4 Quaternion::Matrix_get() const
+{
+	XMMATRIX M = XMMatrixRotationQuaternion(XMLoadQuaternion(this));
+	Matrix4x4 m;
+	XMStoreMatrix4x4(&m, M);
+	return m;
 }
 
 const float& Quaternion::operator [](size_t index) const
@@ -272,79 +285,31 @@ float Quaternion::DotProduct(const Quaternion& left, const Quaternion& right)
 
 Quaternion Quaternion::FromAxisAngle(const Vector3& axis, TDegrees<float> angle)
 {
-	float half = angle.ToRadians().Value * 0.5f;
-	float vsin = sin(half);
-	float vcos = cos(half);
-
-	Quaternion quat;
-	quat.X = axis.X * vsin;
-	quat.Y = axis.Y * vsin;
-	quat.Z = axis.Z * vsin;
-	quat.W = vcos;
-
-	return quat;
+	TRadians<float> rad = angle;
+	XMVECTOR Axis = XMLoadVector3(&axis);
+	XMVECTOR Q = XMQuaternionRotationNormal(Axis, rad.Value);
+	Quaternion q;
+	XMStoreQuaternion(&q, Q);
+	return q;
 }
 
 Quaternion Quaternion::Concatenate(const Quaternion& left, const Quaternion& right)
 {
-	Quaternion quaternion;
-	float x = (right.Y * left.Z) - (right.Z * left.Y);
-	float y = (right.Z * left.X) - (right.X * left.Z);
-	float z = (right.X * left.Y) - (right.Y * left.X);
-	float w = ((right.X * left.X) + (right.Y * left.Y)) + (right.Z * left.Z);
-	quaternion.X = ((right.X * left.W) + (left.X * right.W)) + x;
-	quaternion.Y = ((right.Y * left.W) + (left.Y * right.W)) + y;
-	quaternion.Z = ((right.Z * left.W) + (left.Z * right.W)) + z;
-	quaternion.W = (right.W * left.W) - w;
-	return quaternion;
+	XMVECTOR Left = XMLoadQuaternion(&left);
+	XMVECTOR Right = XMLoadQuaternion(&right);
+	XMVECTOR Q = XMQuaternionMultiply(Left, Right);
+	Quaternion q;
+	XMStoreQuaternion(&q, Q);
+	return q;
 }
 
 Quaternion Quaternion::FromMatrix(const Matrix4x4& rotationMatrix)
 {
-	float side = (rotationMatrix._11 + rotationMatrix._22) + rotationMatrix._33;
-
-	Quaternion quaternion;
-	if (side > 0)
-	{
-		float sq = sqrt(side + 1);
-		float sqiv = 0.5f / sq;
-		quaternion.W = sq * 0.5f;
-		quaternion.X = (rotationMatrix._23 - rotationMatrix._32) * sqiv;
-		quaternion.Y = (rotationMatrix._31 - rotationMatrix._13) * sqiv;
-		quaternion.Z = (rotationMatrix._12 - rotationMatrix._21) * sqiv;
-	}
-
-	else if ((rotationMatrix._11 >= rotationMatrix._22) && (rotationMatrix._11 >= rotationMatrix._33))
-	{
-		float sq = sqrt(((1 + rotationMatrix._11) - rotationMatrix._22) - rotationMatrix._33);
-		float sqiv = 0.5f / sq;
-		quaternion.X = 0.5f * sq;
-		quaternion.Y = (rotationMatrix._12 + rotationMatrix._21) * sqiv;
-		quaternion.Z = (rotationMatrix._13 + rotationMatrix._31) * sqiv;
-		quaternion.W = (rotationMatrix._23 - rotationMatrix._32) * sqiv;
-	}
-
-	else if (rotationMatrix._22 > rotationMatrix._33)
-	{
-		float sq = sqrt(((1 + rotationMatrix._22) - rotationMatrix._11) - rotationMatrix._33);
-		float sqiv = 0.5f / sq;
-		quaternion.X = (rotationMatrix._21 + rotationMatrix._12) * sqiv;
-		quaternion.Y = 0.5f * sq;
-		quaternion.Z = (rotationMatrix._32 + rotationMatrix._23) * sqiv;
-		quaternion.W = (rotationMatrix._31 - rotationMatrix._13) * sqiv;
-	}
-
-	else
-	{
-		float sq = sqrt(((1 + rotationMatrix._33) - rotationMatrix._11) - rotationMatrix._22);
-		float sqiv = 0.5f / sq;
-		quaternion.X = (rotationMatrix._31 + rotationMatrix._13) * sqiv;
-		quaternion.Y = (rotationMatrix._32 + rotationMatrix._23) * sqiv;
-		quaternion.Z = 0.5f * sq;
-		quaternion.W = (rotationMatrix._12 - rotationMatrix._21) * sqiv;
-	}
-
-	return quaternion;
+	XMMATRIX R = XMLoadMatrix4x4(&rotationMatrix);
+	XMVECTOR Q = XMQuaternionRotationMatrix(R);
+	Quaternion q;
+	XMStoreQuaternion(&q, Q);
+	return q;
 }
 
 Quaternion Quaternion::FromEuler(TDegrees<float> yaw, TDegrees<float> pitch, TDegrees<float> roll)
@@ -365,39 +330,12 @@ Quaternion Quaternion::Lerp(const Quaternion& left, const Quaternion& right, flo
 
 Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, float t)
 {
-	float Threshold = 0.9995f;
-
-	Quaternion v0 = left.Normalized;
-	Quaternion v1 = right.Normalized;
-
-	float dot = DotProduct(v0, v1);
-
-	if (dot < 0)
-	{
-		v1 = -v1;
-		dot = -dot;
-	}
-
-	float theta_0 = acos(dot);
-	float theta = theta_0 * t;
-	theta = clamp(theta, 0.0f, 3.1415926535f);
-	if (theta > theta_0)
-	{
-		return left;
-	}
-
-	if (dot > Threshold)
-	{
-		return Lerp(v0, v1, t).Normalized;
-	}
-
-	float sin_theta = sin(theta);
-	float sin_theta_0 = sin(theta_0);
-
-	float s0 = cos(theta) - dot * sin_theta / sin_theta_0;
-	float s1 = sin_theta / sin_theta_0;
-
-	return v0 * s0 + v1 * s1;
+	XMVECTOR Left = XMLoadQuaternion(&left);
+	XMVECTOR Right = XMLoadQuaternion(&right);
+	XMVECTOR Q = XMQuaternionSlerp(Left, Right, t);
+	Quaternion q;
+	XMStoreQuaternion(&q, Q);
+	return q;
 }
 
 Quaternion operator +(float left, const Quaternion& right)

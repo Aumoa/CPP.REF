@@ -141,6 +141,9 @@
     <ClInclude Include="Public\Time\Duration.h">
       <Filter>Public\Time</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Numerics\DXMathMinimal.h">
+      <Filter>Private\Numerics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">

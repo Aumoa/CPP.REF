@@ -86,7 +86,7 @@ struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, floa
     Matrix4x4& operator *=(const Matrix4x4& right);
     Matrix4x4& operator /=(const Matrix4x4& right);
 
-    static Matrix4x4 Multiply(const Matrix4x4& A, const Matrix4x4& B);
+    static Matrix4x4 Multiply(const Matrix4x4& a, const Matrix4x4& b);
 
     static Matrix4x4 Identity;
 };

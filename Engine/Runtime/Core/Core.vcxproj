@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Numerics\DXMathMinimal.h" />
     <ClInclude Include="Private\Numerics\HashHelper.h" />
     <ClInclude Include="Public\ArgumentNullException.h" />
     <ClInclude Include="Public\CoreAPI.h" />

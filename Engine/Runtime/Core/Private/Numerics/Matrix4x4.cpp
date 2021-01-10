@@ -2,6 +2,7 @@
 
 #include "Numerics/Matrix4x4.h"
 
+#include "DXMathMinimal.h"
 #include "CoreString.h"
 #include "Numerics/Vector4.h"
 #include "Numerics/Vector3.h"
@@ -177,17 +178,20 @@ Matrix4x4& Matrix4x4::Invert()
 
 Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
 {
-    return TransformVector(Vector4(vec.X, vec.Y, vec.Z, 0.0)).Cast<Vector3>();
+    XMMATRIX M = XMLoadMatrix4x4(this);
+    XMVECTOR V = XMVector3TransformCoord(XMLoadVector3(&vec), M);
+    Vector3 v;
+    XMStoreVector4(&v, V);
+    return v;
 }
 
 Vector4 Matrix4x4::TransformVector(const Vector4& vec) const
 {
-    return Vector4(
-        vec.X * _11 + vec.Y * _21 + vec.Z * _31 + vec.W * _41,
-        vec.X * _12 + vec.Y * _22 + vec.Z * _32 + vec.W * _42,
-        vec.X * _13 + vec.Y * _23 + vec.Z * _33 + vec.W * _43,
-        vec.X * _14 + vec.Y * _24 + vec.Z * _34 + vec.W * _44
-     );
+    XMMATRIX M = XMLoadMatrix4x4(this);
+    XMVECTOR V = XMVector4Transform(XMLoadVector4(&vec), M);
+    Vector4 v;
+    XMStoreVector4(&v, V);
+    return v;
 }
 
 bool Matrix4x4::IsIdentity_get() const
@@ -197,77 +201,29 @@ bool Matrix4x4::IsIdentity_get() const
 
 float Matrix4x4::Determinant_get() const
 {
-    return
-        _14 * _23 * _32 * _41 - _13 * _24 * _32 * _41 -
-        _14 * _22 * _33 * _41 + _12 * _24 * _33 * _41 +
-        _13 * _22 * _34 * _41 - _12 * _23 * _34 * _41 -
-        _14 * _23 * _31 * _42 + _13 * _24 * _31 * _42 +
-        _14 * _21 * _33 * _42 - _11 * _24 * _33 * _42 -
-        _13 * _21 * _34 * _42 + _11 * _23 * _34 * _42 +
-        _14 * _22 * _31 * _43 - _12 * _24 * _31 * _43 -
-        _14 * _21 * _32 * _43 + _11 * _24 * _32 * _43 +
-        _12 * _21 * _34 * _43 - _11 * _22 * _34 * _43 -
-        _13 * _22 * _31 * _44 + _12 * _23 * _31 * _44 +
-        _13 * _21 * _32 * _44 - _11 * _23 * _32 * _44 -
-        _12 * _21 * _33 * _44 + _11 * _22 * _33 * _44;
+    XMMATRIX M = XMLoadMatrix4x4(this);
+    XMVECTOR V = XMMatrixDeterminant(M);
+    return XMVectorGetX(V);
 }
 
 Matrix4x4 Matrix4x4::Inverse_get() const
 {
-    float A2323 = _33 * _44 - _34 * _43;
-    float A1323 = _32 * _44 - _34 * _42;
-    float A1223 = _32 * _43 - _33 * _42;
-    float A0323 = _31 * _44 - _34 * _41;
-    float A0223 = _31 * _43 - _33 * _41;
-    float A0123 = _31 * _42 - _32 * _41;
-    float A2313 = _23 * _44 - _24 * _43;
-    float A1313 = _22 * _44 - _24 * _42;
-    float A1213 = _22 * _43 - _23 * _42;
-    float A2312 = _23 * _34 - _24 * _33;
-    float A1312 = _22 * _34 - _24 * _32;
-    float A1212 = _22 * _33 - _23 * _32;
-    float A0313 = _21 * _44 - _24 * _41;
-    float A0213 = _21 * _43 - _23 * _41;
-    float A0312 = _21 * _34 - _24 * _31;
-    float A0212 = _21 * _33 - _23 * _31;
-    float A0113 = _21 * _42 - _22 * _41;
-    float A0112 = _21 * _32 - _22 * _31;
+    XMMATRIX M = XMLoadMatrix4x4(this);
+    XMVECTOR Det = XMMatrixDeterminant(M);
+    XMMATRIX Inv = XMMatrixInverse(&Det, M);
 
-    float det
-        = _11 * (_22 * A2323 - _23 * A1323 + _24 * A1223)
-        - _12 * (_21 * A2323 - _23 * A0323 + _24 * A0223)
-        + _13 * (_21 * A1323 - _22 * A0323 + _24 * A0123)
-        - _14 * (_21 * A1223 - _22 * A0223 + _23 * A0123);
-    det = 1 / det;
-
-    return Matrix4x4(
-        det * (_22 * A2323 - _23 * A1323 + _24 * A1223),
-        det * -(_12 * A2323 - _13 * A1323 + _14 * A1223),
-        det * (_12 * A2313 - _13 * A1313 + _14 * A1213),
-        det * -(_12 * A2312 - _13 * A1312 + _14 * A1212),
-        det * -(_21 * A2323 - _23 * A0323 + _24 * A0223),
-        det * (_11 * A2323 - _13 * A0323 + _14 * A0223),
-        det * -(_11 * A2313 - _13 * A0313 + _14 * A0213),
-        det * (_11 * A2312 - _13 * A0312 + _14 * A0212),
-        det * (_21 * A1323 - _22 * A0323 + _24 * A0123),
-        det * -(_11 * A1323 - _12 * A0323 + _14 * A0123),
-        det * (_11 * A1313 - _12 * A0313 + _14 * A0113),
-        det * -(_11 * A1312 - _12 * A0312 + _14 * A0112),
-        det * -(_21 * A1223 - _22 * A0223 + _23 * A0123),
-        det * (_11 * A1223 - _12 * A0223 + _13 * A0123),
-        det * -(_11 * A1213 - _12 * A0213 + _13 * A0113),
-        det * (_11 * A1212 - _12 * A0212 + _13 * A0112)
-    );
+    Matrix4x4 inv;
+    XMStoreMatrix4x4(&inv, Inv);
+    return inv;
 }
 
 Matrix4x4 Matrix4x4::Transposed_get() const
 {
-    return Matrix4x4(
-        _11, _21, _31, _41,
-        _12, _22, _32, _42,
-        _13, _23, _33, _43,
-        _14, _24, _34, _44
-    );
+    XMMATRIX M = XMLoadMatrix4x4(this);
+    XMMATRIX T = XMMatrixTranspose(M);
+    Matrix4x4 t;
+    XMStoreMatrix4x4(&t, T);
+    return t;
 }
 
 const Vector4& Matrix4x4::operator [](size_t index) const
@@ -352,29 +308,14 @@ Matrix4x4& Matrix4x4::operator /=(const Matrix4x4& right)
     return *this = *this / right;
 }
 
-Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& A, const Matrix4x4& B)
+Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& a, const Matrix4x4& b)
 {
-    return Matrix4x4(
-        A._11 * B._11 + A._12 * B._21 + A._13 * B._31 + A._14 * B._41,
-        A._11 * B._12 + A._12 * B._22 + A._13 * B._32 + A._14 * B._42,
-        A._11 * B._13 + A._12 * B._23 + A._13 * B._33 + A._14 * B._43,
-        A._11 * B._14 + A._12 * B._24 + A._13 * B._34 + A._14 * B._44,
-
-        A._21 * B._11 + A._22 * B._21 + A._23 * B._31 + A._24 * B._41,
-        A._21 * B._12 + A._22 * B._22 + A._23 * B._32 + A._24 * B._42,
-        A._21 * B._13 + A._22 * B._23 + A._23 * B._33 + A._24 * B._43,
-        A._21 * B._14 + A._22 * B._24 + A._23 * B._34 + A._24 * B._44,
-
-        A._31 * B._11 + A._32 * B._21 + A._33 * B._31 + A._34 * B._41,
-        A._31 * B._12 + A._32 * B._22 + A._33 * B._32 + A._34 * B._42,
-        A._31 * B._13 + A._32 * B._23 + A._33 * B._33 + A._34 * B._43,
-        A._31 * B._14 + A._32 * B._24 + A._33 * B._34 + A._34 * B._44,
-
-        A._41 * B._11 + A._42 * B._21 + A._43 * B._31 + A._44 * B._41,
-        A._41 * B._12 + A._42 * B._22 + A._43 * B._32 + A._44 * B._42,
-        A._41 * B._13 + A._42 * B._23 + A._43 * B._33 + A._44 * B._43,
-        A._41 * B._14 + A._42 * B._24 + A._43 * B._34 + A._44 * B._44
-    );
+    XMMATRIX A = XMLoadMatrix4x4(&a);
+    XMMATRIX B = XMLoadMatrix4x4(&b);
+    XMMATRIX M = XMMatrixMultiply(A, B);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
 }
 
 Matrix4x4 Matrix4x4::Identity = Matrix4x4(

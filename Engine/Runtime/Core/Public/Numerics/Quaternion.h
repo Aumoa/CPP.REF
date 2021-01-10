@@ -65,6 +65,8 @@ struct CORE_API Quaternion : public TNumericsBasicOperator<Quaternion, float, fl
 	Vector3 Axis_get() const;
 	vs_property_get(Quaternion, Inverse);
 	Quaternion Inverse_get() const;
+	vs_property_get(Matrix4x4, Matrix);
+	Matrix4x4 Matrix_get() const;
 
 	const float& operator [](size_t index) const;
 	float& operator [](size_t index);
