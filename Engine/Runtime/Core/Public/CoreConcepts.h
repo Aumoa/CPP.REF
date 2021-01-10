@@ -189,3 +189,9 @@ concept TIsMatrixType = requires(T Arg, const T ConstArg)
 	{ (size_t)ConstArg.Columns };
 	{ (size_t)ConstArg.Count };
 };
+
+template<class T>
+concept TIsObject = requires(Object* Base, T* Derived)
+{
+	{ Base = Derived };
+};
