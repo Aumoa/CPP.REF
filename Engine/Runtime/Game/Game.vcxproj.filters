@@ -333,7 +333,19 @@
     <ClInclude Include="Public\Physics\Collision.h">
       <Filter>Public\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Framework\GameModeBase.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\Info.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
     <ClInclude Include="Public\TSubclassOf.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\EngineCriticalException.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameViewport.h">
       <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
@@ -517,6 +529,18 @@
     </ClCompile>
     <ClCompile Include="Private\Physics\Collision.cpp">
       <Filter>Private\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\Info.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\GameModeBase.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineCriticalException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameViewport.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

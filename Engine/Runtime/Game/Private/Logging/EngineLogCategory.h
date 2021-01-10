@@ -8,3 +8,5 @@
 #include "Logging/LogCategoryBase.h"
 
 extern LogCategoryBase LogCamera;
+extern LogCategoryBase LogEngine;
+extern LogCategoryBase LogActor;

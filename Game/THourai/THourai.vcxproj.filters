@@ -63,6 +63,9 @@
     <ClCompile Include="Private\Controller\THPlayerController.cpp">
       <Filter>Private\Controller</Filter>
     </ClCompile>
+    <ClCompile Include="Private\THGameMode.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\THAPI.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="Public\Controller\THPlayerController.h">
       <Filter>Public\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\THGameMode.h">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

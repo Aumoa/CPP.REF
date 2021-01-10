@@ -4,6 +4,7 @@
 
 #include "Components/SceneComponent.h"
 #include "Logging/LogMacros.h"
+#include "Logging/EngineLogCategory.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -37,6 +38,7 @@ AActor::AActor() : Super()
 	, bActorTickEnabled(true)
 	, world(nullptr)
 	, bActorHasBegunPlay(false)
+	, rootComponent(nullptr)
 {
 	PrimaryActorTick.Target = this;
 }
@@ -81,9 +83,22 @@ void AActor::SetWorld(World* world)
 	this->world = world;
 }
 
+Transform AActor::GetActorTransform() const
+{
+	if (rootComponent == nullptr)
+	{
+		SE_LOG(LogActor, Warning, L"GetActorTransform() called with actor that have not a root scene component. Function will be return identity transform.");
+		return Transform::Identity;
+	}
+	else
+	{
+		return rootComponent->ComponentTransform;
+	}
+}
+
 SceneComponent* AActor::RootComponent_get() const
 {
-	return rootComponent.Get();
+	return rootComponent;
 }
 
 void AActor::RootComponent_set(SceneComponent* value)

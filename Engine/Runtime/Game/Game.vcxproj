@@ -179,6 +179,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
+    <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Private\RHI\RHICommon.h" />
@@ -205,6 +206,8 @@
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\Framework\Character.h" />
+    <ClInclude Include="Public\Framework\GameModeBase.h" />
+    <ClInclude Include="Public\Framework\Info.h" />
     <ClInclude Include="Public\Framework\Pawn.h" />
     <ClInclude Include="Public\Framework\Controller.h" />
     <ClInclude Include="Public\Framework\PlayerController.h" />
@@ -212,6 +215,7 @@
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameMinimal.h" />
+    <ClInclude Include="Public\GameViewport.h" />
     <ClInclude Include="Public\IEngineTick.h" />
     <ClInclude Include="Public\Level.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
@@ -293,13 +297,17 @@
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
+    <ClCompile Include="Private\EngineCriticalException.cpp" />
     <ClCompile Include="Private\Framework\Actor.cpp" />
     <ClCompile Include="Private\Framework\Character.cpp" />
     <ClCompile Include="Private\Framework\Controller.cpp" />
+    <ClCompile Include="Private\Framework\GameModeBase.cpp" />
+    <ClCompile Include="Private\Framework\Info.cpp" />
     <ClCompile Include="Private\Framework\Pawn.cpp" />
     <ClCompile Include="Private\Framework\PlayerController.cpp" />
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
+    <ClCompile Include="Private\GameViewport.cpp" />
     <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />

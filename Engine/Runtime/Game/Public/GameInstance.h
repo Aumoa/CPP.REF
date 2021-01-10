@@ -5,10 +5,11 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include <chrono>
+#include "TSubclassOf.h"
 
 class World;
-class Level;
+class AGameModeBase;
+class APlayerController;
 
 class GAME_API GameInstance : virtual public Object
 {
@@ -20,6 +21,8 @@ private:
 	static TRefPtr<String> defaultAppName;
 
 	TRefPtr<World> world;
+	AGameModeBase* gameMode;
+	APlayerController* localPlayerController;
 
 public:
 	GameInstance();
@@ -32,7 +35,9 @@ public:
 	virtual void BeginPlay();
 	virtual void EndPlay();
 
-	virtual Level* GetStartupLevel() = 0;
-
 	World* GetWorld() const;
+	AGameModeBase* GetGameMode() const;
+	APlayerController* GetLocalPlayer() const;
+
+	TSubclassOf<AGameModeBase> GameModeClass;
 };

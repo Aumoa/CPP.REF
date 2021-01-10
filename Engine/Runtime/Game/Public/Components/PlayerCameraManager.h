@@ -6,6 +6,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
+#include "Transform.h"
+
 struct MinimalViewInfo;
 class CameraComponent;
 
@@ -16,7 +18,9 @@ public:
 	using This = PlayerCameraManager;
 
 private:
+	mutable bool bPrintNoCameraWarning : 1;
 	CameraComponent* pawnCamera;
+	Transform lastUpdatedTransform;
 
 public:
 	PlayerCameraManager();
@@ -24,4 +28,7 @@ public:
 
 	void CalcCameraView(MinimalViewInfo& outViewInfo) const;
 	void UpdateCameraComponent();
+
+private:
+	void PrintNoCameraWarning(TRefPtr<String> message) const;
 };

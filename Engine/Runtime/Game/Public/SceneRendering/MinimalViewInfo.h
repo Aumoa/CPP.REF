@@ -12,5 +12,5 @@ struct GAME_API MinimalViewInfo
 	float FOV;
 	float AspectRatio;
 	Vector3 Location;
-	Rotator Rotation;
+	Quaternion Rotation;
 };

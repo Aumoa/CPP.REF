@@ -41,7 +41,7 @@ public:
 private:
 	std::map<ActorComponent*, TRefPtr<ActorComponent>> ownedComponents;
 	std::map<size_t, std::list<ActorComponent*>> hierarchy;
-	TRefPtr<SceneComponent> rootComponent;
+	SceneComponent* rootComponent;
 	ActorTickFunction primaryActorTick;
 	bool bActorTickEnabled : 1;
 	bool bActorHasBegunPlay : 1;
@@ -67,6 +67,8 @@ public:
 
 	World* GetWorld() const;
 	void SetWorld(World* inWorld);
+	Transform GetActorTransform() const;
+	void SetActorTransform(const Transform& value);
 
 	vs_property(SceneComponent*, RootComponent);
 	SceneComponent* RootComponent_get() const;

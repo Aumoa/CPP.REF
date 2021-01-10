@@ -19,6 +19,7 @@ APlayerController::~APlayerController()
 void APlayerController::OnPossess(APawn* inPawn)
 {
 	inPawn->ComponentAdded += bind_delegate(Possessed_ComponentAdded);
+	cameraManager->UpdateCameraComponent();
 }
 
 void APlayerController::OnUnPossess()

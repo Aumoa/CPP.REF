@@ -6,6 +6,8 @@
 #include "Framework/Actor.h"
 #include "SceneRendering/Scene.h"
 #include "Components/PrimitiveComponent.h"
+#include "Logging/LogMacros.h"
+#include "Logging/EngineLogCategory.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -33,20 +35,27 @@ void World::Tick(Seconds deltaTime)
 	scene->Update();
 }
 
-void World::LoadLevel(Level* loadLevel)
+Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 {
 	if (currentLevel.IsValid)
 	{
 		currentLevel->UnloadLevel();
 	}
 
-	currentLevel = loadLevel;
+	currentLevel = loadLevel.Instantiate();
+	if (!currentLevel.IsValid)
+	{
+		SE_LOG(LogEngine, Fatal, L"Cannot load level.");
+		return nullptr;
+	}
 
 	if (currentLevel.IsValid)
 	{
 		currentLevel->world = this;
-		loadLevel->LoadLevel();
+		currentLevel->LoadLevel();
 	}
+
+	return currentLevel.Get();
 }
 
 Scene* World::GetScene() const

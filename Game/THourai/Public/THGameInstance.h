@@ -14,13 +14,9 @@ public:
 	using Super = GameInstance;
 	using This = THGameInstance;
 
-private:
-	TRefPtr<StartupLevel> startupLevel;
-
 public:
 	THGameInstance();
 	~THGameInstance();
 
 	TRefPtr<String> ToString() const;
-	Level* GetStartupLevel() override;
 };

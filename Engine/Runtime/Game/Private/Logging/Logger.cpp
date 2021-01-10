@@ -3,15 +3,22 @@
 #include "Logging/Logger.h"
 
 #include "WindowsMinimal.h"
+#include "EngineCriticalException.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogCategoryBase.h"
 
 void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, TRefPtr<String> logMessage)
 {
 	TRefPtr<String> categoryName = category.CategoryName;
-	const wchar_t* verbosityName = ToString(category.GetAmendedVerbosity(inVerbosity));
+	inVerbosity = category.GetAmendedVerbosity(inVerbosity);
+	const wchar_t* verbosityName = ToString(inVerbosity);
 
 	OutputDebugStringW(String::Format(L"{0}: {1}: {2}\n", categoryName, verbosityName, logMessage)->C_Str);
+
+	if (inVerbosity == ELogVerbosity::Fatal)
+	{
+		throw EngineCriticalException(categoryName, logMessage);
+	}
 }
 
 const wchar_t* Logger::ToString(ELogVerbosity inVerbosity)

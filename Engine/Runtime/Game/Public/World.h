@@ -5,9 +5,9 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include <chrono>
 #include <array>
 #include <set>
+#include "TSubclassOf.h"
 
 class AActor;
 
@@ -26,7 +26,7 @@ private:
 	std::vector<TRefPtr<AActor>> actors;
 
 	std::array<std::set<TickFunction*>, 4> tickGroups;
-	TWeakPtr<Level> currentLevel = nullptr;
+	TRefPtr<Level> currentLevel = nullptr;
 	TRefPtr<Scene> scene;
 
 public:
@@ -35,10 +35,12 @@ public:
 
 	virtual void Tick(Seconds deltaTime);
 
-	template<class T, class... TArgs> requires TIsAssignable<T*, AActor*> && THasConstructor<T, TArgs...>
+	template<TIsBaseOf<AActor> T, class... TArgs> requires THasConstructor<T, TArgs...>
 	inline T* SpawnActor(TArgs&&... constructor_args);
+	template<TIsBaseOf<AActor> T = AActor>
+	inline T* SpawnActor(TSubclassOf<T> static_class);
 
-	void LoadLevel(Level* loadLevel);
+	Level* LoadLevel(TSubclassOf<Level> loadLevel);
 
 	Scene* GetScene() const;
 

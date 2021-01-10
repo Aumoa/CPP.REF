@@ -4,6 +4,7 @@
 
 #include "Application.h"
 #include "GameInstance.h"
+#include "GameViewport.h"
 #include "RHI/IRHISwapChain.h"
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
@@ -37,8 +38,6 @@ Engine::Engine() : Super()
 	, deviceBundle(nullptr)
 	, immediateCommandList(nullptr)
 	, swapChain(nullptr)
-
-	, bPresent(false)
 {
 
 }
@@ -70,6 +69,8 @@ void Engine::Initialize()
 
 	sceneRenderer = NewObject<DeferredSceneRenderer>(this->deviceBundle);
 	assetManager = NewObject<AssetManager>();
+	gameViewport = NewObject<GameViewport>();
+	GApplication.PostSized += bind_delegate(Application_OnPostSized);
 
 	LoadEngineDefaultAssets();
 
@@ -129,6 +130,11 @@ AssetManager* Engine::GetAssetManager() const
 	return assetManager.Get();
 }
 
+GameViewport* Engine::GetGameViewport() const
+{
+	return gameViewport.Get();
+}
+
 Engine* Engine::GetInstance()
 {
 	return gEngine;
@@ -162,4 +168,9 @@ void Engine::InitializeDefaultShaders()
 	TRefPtr<IRHIShader> shader = DeviceBundle->CreateShader(shaderDesc);
 
 	shaderLibrary->AddShader(shader);
+}
+
+void Engine::Application_OnPostSized(int32 x, int32 y)
+{
+	gameViewport->SetViewportResolution_Internal(x, y);
 }

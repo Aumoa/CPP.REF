@@ -2,11 +2,11 @@
 
 #include "THGameInstance.h"
 
-#include "Levels/StartupLevel.h"
+#include "THGameMode.h"
 
 THGameInstance::THGameInstance()
 {
-
+	GameModeClass = TSubclassOf<ATHGameMode>::StaticClass();
 }
 
 THGameInstance::~THGameInstance()
@@ -17,13 +17,4 @@ THGameInstance::~THGameInstance()
 TRefPtr<String> THGameInstance::ToString() const
 {
 	return L"Touhou Hourai";
-}
-
-Level* THGameInstance::GetStartupLevel()
-{
-	if (!startupLevel.IsValid)
-	{
-		startupLevel = NewObject<StartupLevel>();
-	}
-	return startupLevel.Get();
 }

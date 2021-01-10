@@ -5,3 +5,5 @@
 #include "Logging/LogVerbosity.h"
 
 LogCategoryBase LogCamera(ELogVerbosity::Verbose, nameof(LogCamera));
+LogCategoryBase LogEngine(ELogVerbosity::Verbose, nameof(LogEngine));
+LogCategoryBase LogActor(ELogVerbosity::Verbose, nameof(LogActor));

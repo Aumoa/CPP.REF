@@ -50,14 +50,14 @@ inline TRefPtr<TBase> TSubclassOf<TBase>::Instantiate() const
 		throw NullReferenceException("TSubclassOf<TBase> is not setted.");
 	}
 
-	return Constructor();
+	return Object::Cast<TBase>(Constructor());
 }
 
 template<class TBase>
 template<TIsBaseOf<TBase> O>
 inline TRefPtr<O> TSubclassOf<TBase>::Instantiate() const
 {
-	return Cast<O>(Instantiate());
+	return Object::Cast<O>(Instantiate());
 }
 
 template<class TBase>

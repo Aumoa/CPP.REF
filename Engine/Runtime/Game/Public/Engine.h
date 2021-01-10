@@ -18,6 +18,7 @@ interface IRHISwapChain;
 class SceneRenderer;
 class GameInstance;
 class AssetManager;
+class GameViewport;
 
 class GAME_API Engine : virtual public Object, virtual public IEngineTick
 {
@@ -41,7 +42,7 @@ private:
 
 	TRefPtr<SceneRenderer> sceneRenderer;
 	TRefPtr<AssetManager> assetManager;
-	bool bPresent : 1;
+	TRefPtr<GameViewport> gameViewport;
 
 public:
 	Engine();
@@ -54,6 +55,7 @@ public:
 	vs_property_get(IRHIDeviceBundle*, DeviceBundle);
 	IRHIDeviceBundle* DeviceBundle_get() const;
 	AssetManager* GetAssetManager() const;
+	GameViewport* GetGameViewport() const;
 
 	static Engine* GetInstance();
 
@@ -61,4 +63,6 @@ private:
 	void ForEachBundles(std::function<void(IRHIBundle*)> action);
 	void LoadEngineDefaultAssets();
 	void InitializeDefaultShaders();
+
+	void Application_OnPostSized(int32 x, int32 y);
 };

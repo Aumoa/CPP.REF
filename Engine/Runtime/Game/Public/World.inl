@@ -2,8 +2,14 @@
 
 #pragma once
 
-template<class T, class... TArgs> requires TIsAssignable<T*, AActor*> && THasConstructor<T, TArgs...>
+template<TIsBaseOf<AActor> T, class... TArgs> requires THasConstructor<T, TArgs...>
 inline T* World::SpawnActor(TArgs&&... constructor_args)
 {
 	return Cast<T>(SpawnActorInternal(NewObject<T>(forward<TArgs>(constructor_args)...)));
+}
+
+template<TIsBaseOf<AActor> T>
+inline T* World::SpawnActor(TSubclassOf<T> static_class)
+{
+	return Cast<T>(SpawnActorInternal(static_class.Instantiate()));
 }
