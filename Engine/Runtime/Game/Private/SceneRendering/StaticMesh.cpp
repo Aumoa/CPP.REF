@@ -7,6 +7,8 @@
 #include "RHI/RHIVertex.h"
 #include "RHI/IRHIDeviceBundle.h"
 
+using namespace std;
+
 StaticMeshBatch::StaticMeshBatch(const RHIMeshDrawCommand& drawCommand)
 {
 	this->drawCommand = drawCommand;
@@ -40,14 +42,11 @@ StaticMesh::StaticMesh() : Super()
 	indexBuffer = GEngine.DeviceBundle->CreateIndexBuffer(indices);
 
 	RHIMeshDrawCommand command;
-
 	command.VertexBufferVirtualAddress = vertexBuffer->GetVirtualAddress();
 	command.VertexCount = 3;
-
 	command.VertexStride = sizeof(RHIVertex);
 	command.IndexBufferVirtualAddress = indexBuffer->GetVirtualAddress();
 	command.IndexCount = 3;
-
 	meshBatch = NewObject<StaticMeshBatch>(command);
 }
 
@@ -59,4 +58,22 @@ StaticMesh::~StaticMesh()
 MeshBatch* StaticMesh::GetMeshBatch() const
 {
 	return meshBatch.Get();
+}
+
+TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<uint32> indices)
+{
+	auto staticMesh = NewObject<StaticMesh>();
+
+	staticMesh->vertexBuffer = GEngine.DeviceBundle->CreateVertexBuffer(vertices);
+	staticMesh->indexBuffer = GEngine.DeviceBundle->CreateIndexBuffer(indices);
+
+	RHIMeshDrawCommand command;
+	command.VertexBufferVirtualAddress = staticMesh->vertexBuffer->GetVirtualAddress();
+	command.VertexCount = 3;
+	command.VertexStride = sizeof(RHIVertex);
+	command.IndexBufferVirtualAddress = staticMesh->indexBuffer->GetVirtualAddress();
+	command.IndexCount = 3;
+	staticMesh->meshBatch = NewObject<StaticMeshBatch>(command);
+
+	return staticMesh;
 }

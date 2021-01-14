@@ -10,6 +10,7 @@
 #include "TSubclassOf.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
+#include "RHI/RHIVertex.h"
 #include "Logging/LogCategoryBase.h"
 #include "Logging/Logger.h"
 

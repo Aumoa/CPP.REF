@@ -8,6 +8,7 @@
 
 #include "MeshBatch.h"
 #include "RHi/RHIMeshDrawCommand.h"
+#include "RHI/RHIVertex.h"
 
 interface IRHIResource;
 
@@ -43,4 +44,6 @@ public:
 	~StaticMesh();
 
 	MeshBatch* GetMeshBatch() const;
+
+	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices);
 };
