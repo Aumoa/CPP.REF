@@ -2,12 +2,36 @@
 
 #include "Controller/THPlayerController.h"
 
+#include "World.h"
+#include "Levels/StartupLevel.h"
+#include "Pawn/MyCharacter.h"
+
 ATHPlayerController::ATHPlayerController()
 {
-	PrimaryActorTick.bCanEverTick = true;
+
 }
 
 ATHPlayerController::~ATHPlayerController()
 {
 	
+}
+
+void ATHPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	StartupLevel* level = Cast<StartupLevel>(GetWorld()->GetCurrentLevel());
+	if (level == nullptr)
+	{
+		TH_LOG(LogTH, Error, L"Current level must StartupLevel class. (TEST IMPLEMENT)");
+		return;
+	}
+
+	AMyCharacter* actor = level->GetPersistentActor();
+	Possess(actor);
+}
+
+void ATHPlayerController::Tick(Seconds deltaTime)
+{
+	Super::Tick(deltaTime);
 }

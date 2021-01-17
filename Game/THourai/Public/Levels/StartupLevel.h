@@ -6,15 +6,24 @@
 #include "GameMinimal.h"
 #include "Level.h"
 
+class AMyTestActor;
+class AMyCharacter;
+
 class TH_API StartupLevel : public Level
 {
 public:
 	using Super = Level;
 	using This = StartupLevel;
 
+private:
+	AMyTestActor* persistent_actor;
+	AMyCharacter* persistent_character;
+
 public:
 	StartupLevel();
 	~StartupLevel() override;
 
 	void LoadLevel() override;
+
+	AMyCharacter* GetPersistentActor() const;
 };

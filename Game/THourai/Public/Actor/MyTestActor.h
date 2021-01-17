@@ -8,6 +8,8 @@
 
 class StaticMesh;
 class StaticMeshComponent;
+class SpringArmComponent;
+class CameraComponent;
 
 class TH_API AMyTestActor : public AActor
 {
@@ -18,6 +20,9 @@ public:
 private:
 	TRefPtr<StaticMesh> myStaticMesh;
 	StaticMeshComponent* staticMeshComponent;
+
+	SpringArmComponent* springArm;
+	CameraComponent* camera;
 
 public:
 	AMyTestActor();

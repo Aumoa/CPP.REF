@@ -14,4 +14,7 @@ class TH_API ATHPlayerController : public APlayerController
 public:
 	ATHPlayerController();
 	~ATHPlayerController() override;
+
+	void BeginPlay() override;
+	void Tick(Seconds deltaTime) override;
 };

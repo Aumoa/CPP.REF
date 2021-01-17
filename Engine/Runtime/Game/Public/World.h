@@ -26,7 +26,7 @@ private:
 	std::vector<TRefPtr<AActor>> actors;
 
 	std::array<std::set<TickFunction*>, 4> tickGroups;
-	TRefPtr<Level> currentLevel = nullptr;
+	TRefPtr<Level> currentLevel;
 	TRefPtr<Scene> scene;
 
 public:
@@ -43,6 +43,7 @@ public:
 	Level* LoadLevel(TSubclassOf<Level> loadLevel);
 
 	Scene* GetScene() const;
+	Level* GetCurrentLevel() const;
 
 private:
 	void Tick_Group(Seconds deltaTime, TickingGroup group);

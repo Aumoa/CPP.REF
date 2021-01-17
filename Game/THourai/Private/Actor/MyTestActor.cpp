@@ -3,6 +3,8 @@
 #include "Actor/MyTestActor.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/SpringArmComponent.h"
+#include "Components/CameraComponent.h"
 #include "SceneRendering/StaticMesh.h"
 
 using namespace std;
@@ -10,6 +12,9 @@ using namespace std::chrono;
 
 AMyTestActor::AMyTestActor() : Super()
 	, staticMeshComponent(nullptr)
+
+	, springArm(nullptr)
+	, camera(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 

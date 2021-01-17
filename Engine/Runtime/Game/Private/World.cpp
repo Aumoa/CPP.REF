@@ -63,6 +63,11 @@ Scene* World::GetScene() const
 	return scene.Get();
 }
 
+Level* World::GetCurrentLevel() const
+{
+	return currentLevel.Get();
+}
+
 void World::Tick_Group(Seconds deltaTime, TickingGroup group)
 {
 	set<TickFunction*>& tickGroup = tickGroups[(size_t)group];
@@ -77,6 +82,7 @@ AActor* World::SpawnActorInternal(TRefPtr<AActor> actor)
 {
 	AActor* actor_ptr = actor.Get();
 	actors.push_back(move(actor));
+	actor_ptr->SetWorld(this);
 
 	AddTickGroup(actor_ptr);
 	AddSceneProxy(actor_ptr);
