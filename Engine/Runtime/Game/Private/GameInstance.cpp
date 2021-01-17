@@ -7,6 +7,7 @@
 #include "Framework/PlayerController.h"
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
+#include "Diagnostics/ScopedCycleCounterStorage.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -45,6 +46,7 @@ void GameInstance::Initialize()
 
 void GameInstance::Tick(Seconds deltaTime)
 {
+	ScopedCycleCounterStorage::MoveFrame();
 	world->Tick(deltaTime);
 }
 

@@ -21,6 +21,7 @@ public:
 	APlayerController();
 	~APlayerController() override;
 
+	void Tick(Seconds deltaTime) override;
 	void OnPossess(APawn* inPawn) override;
 	void OnUnPossess() override;
 

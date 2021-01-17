@@ -3,6 +3,7 @@
 #include "THGameInstance.h"
 
 #include "THGameMode.h"
+#include "Diagnostics/ScopedCycleCounterStorage.h"
 
 THGameInstance::THGameInstance()
 {
@@ -17,4 +18,11 @@ THGameInstance::~THGameInstance()
 TRefPtr<String> THGameInstance::ToString() const
 {
 	return L"Touhou Hourai";
+}
+
+void THGameInstance::Tick(Seconds deltaTime)
+{
+	Super::Tick(deltaTime);
+
+	TH_LOG(LogTH, Verbose, String::Format("\n{0}", ScopedCycleCounterStorage::GetDiagStatics()));
 }

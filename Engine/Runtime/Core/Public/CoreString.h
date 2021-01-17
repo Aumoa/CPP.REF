@@ -107,6 +107,7 @@ public:
 	vs_property_get(size_t, Length);
 	size_t Length_get() const;
 
+	bool operator < (const TRefPtr<String>& right) const;
 	bool operator ==(const TRefPtr<String>& right) const;
 	bool operator !=(const TRefPtr<String>& right) const;
 	wchar_t operator [](size_t index) const;

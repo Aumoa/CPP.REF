@@ -8,6 +8,7 @@
 #include "Shaders/ShaderCameraConstant.h"
 #include "SceneRendering/SceneRenderer.h"
 #include "SceneRendering/MinimalViewInfo.h"
+#include "Diagnostics/ScopedCycleCounter.h"
 
 SceneVisibility::SceneVisibility(APlayerController* inPlayerController) : Super()
 	, playerController(inPlayerController)
@@ -35,6 +36,8 @@ SceneVisibility::~SceneVisibility()
 
 void SceneVisibility::CalcVisibility(SceneRenderer* renderer)
 {
+	QUICK_SCOPED_CYCLE_COUNTER(SceneVisibility, CalcVisibility);
+
 	size_t prim_count = renderer->GetPrimitiveCount();
 	PrimitiveSceneProxy* const* prims = renderer->GetPrimitives();
 

@@ -19,4 +19,6 @@ public:
 	~THGameInstance();
 
 	TRefPtr<String> ToString() const;
+
+	void Tick(Seconds deltaTime) override;
 };

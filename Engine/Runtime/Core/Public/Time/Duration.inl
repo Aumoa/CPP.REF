@@ -28,7 +28,8 @@ inline constexpr Nanoseconds::Nanoseconds(int64 value) : Unit(Mychrono(value))
 
 }
 
-inline constexpr Nanoseconds::Nanoseconds(Mychrono value) : Unit(value)
+template<class T>
+inline constexpr Nanoseconds::Nanoseconds(std::chrono::duration<int64, T> value) : Unit(value)
 {
 
 }

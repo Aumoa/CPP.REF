@@ -149,6 +149,17 @@ size_t String::Length_get() const
 	return len;
 }
 
+bool String::operator < (const TRefPtr<String>& right) const
+{
+    if (!right.IsValid)
+    {
+        return false;
+    }
+
+    int compare = lstrcmpW(C_Str, right->C_Str);
+    return compare < 0;
+}
+
 bool String::operator ==(const TRefPtr<String>& right) const
 {
 	if (text_buffer == right->text_buffer)

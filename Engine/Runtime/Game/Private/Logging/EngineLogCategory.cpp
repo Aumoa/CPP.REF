@@ -7,3 +7,4 @@
 LogCategoryBase LogCamera(ELogVerbosity::Verbose, nameof(LogCamera));
 LogCategoryBase LogEngine(ELogVerbosity::Verbose, nameof(LogEngine));
 LogCategoryBase LogActor(ELogVerbosity::Verbose, nameof(LogActor));
+LogCategoryBase LogDiagnostics(ELogVerbosity::Verbose, nameof(LogDiagnostics));

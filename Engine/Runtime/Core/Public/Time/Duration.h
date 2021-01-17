@@ -43,7 +43,8 @@ struct Nanoseconds
 
 	inline Nanoseconds();
 	inline constexpr Nanoseconds(int64 value);
-	inline constexpr Nanoseconds(Mychrono value);
+	template<class T>
+	inline constexpr Nanoseconds(std::chrono::duration<int64, T> value);
 
 	inline constexpr bool Equals(const Nanoseconds& rh) const;
 	inline TRefPtr<String> ToString() const;

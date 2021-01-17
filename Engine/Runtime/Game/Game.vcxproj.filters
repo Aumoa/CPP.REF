@@ -58,6 +58,12 @@
     <Filter Include="Private\Physics">
       <UniqueIdentifier>{9bb56105-49e2-4c7f-b198-d9c935413991}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Diagnostics">
+      <UniqueIdentifier>{723c307f-4c46-41a9-85f8-f65ba76cb975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Diagnostics">
+      <UniqueIdentifier>{8c8d8630-6d1d-4e04-9462-0e76f2f471ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -354,6 +360,12 @@
     <ClInclude Include="Private\Shaders\ShaderCameraConstant.h">
       <Filter>Private\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h">
+      <Filter>Public\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Diagnostics\ScopedCycleCounterStorage.h">
+      <Filter>Public\Diagnostics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -553,6 +565,12 @@
     </ClCompile>
     <ClCompile Include="Private\Shaders\ShaderCameraConstant.cpp">
       <Filter>Private\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Diagnostics\ScopedCycleCounterStorage.cpp">
+      <Filter>Private\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp">
+      <Filter>Private\Diagnostics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -16,3 +16,5 @@
 
 #include "Logging/LogVerbosity.h"
 #include "Components/ComponentTransformSpace.h"
+
+#include "Diagnostics/ScopedCycleCounter.h"

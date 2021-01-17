@@ -10,3 +10,4 @@
 extern LogCategoryBase LogCamera;
 extern LogCategoryBase LogEngine;
 extern LogCategoryBase LogActor;
+extern LogCategoryBase LogDiagnostics;
