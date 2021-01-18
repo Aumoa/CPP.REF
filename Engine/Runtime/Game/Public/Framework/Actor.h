@@ -16,7 +16,7 @@
 
 class World;
 
-class GAME_API AActor : virtual public Object
+class GAME_API AActor : virtual public Object, virtual public ITickFunctionObject
 {
 	struct ActorTickFunction : public TickFunction
 	{
@@ -51,9 +51,13 @@ public:
 	AActor();
 	~AActor() override;
 
+	virtual TickFunction* GetTickFunction() override;
+	virtual void AddPrerequisiteObject(ITickFunctionObject* inObject) override;
+	virtual void RemovePrerequisiteObject(ITickFunctionObject* inObject) override;
+
 	virtual void BeginPlay();
 	virtual void EndPlay();
-	virtual void Tick(Seconds deltaTime);
+	virtual void TickActor(Seconds deltaTime);
 
 	template<class T, class... TArgs> requires TIsAssignable<T*, ActorComponent*> && THasConstructor<T, TArgs...>
 	inline T* AddComponent(TArgs&&... args);
@@ -83,6 +87,9 @@ public:
 
 	ComponentAddedDelegate ComponentAdded;
 	ComponentRemovedDelegate ComponentRemoved;
+
+protected:
+	virtual void Tick(Seconds deltaTime);
 
 private:
 	bool AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num);

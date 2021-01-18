@@ -30,8 +30,10 @@ void AActor::ActorTickFunction::ExecuteTick(Seconds deltaTime)
 
 	if (Target->HasBegunPlay && Target->ActorTickEnabled)
 	{
-		Target->Tick(deltaTime);
+		Target->TickActor(deltaTime);
 	}
+
+	Super::ExecuteTick(deltaTime);
 }
 
 AActor::AActor() : Super()
@@ -46,6 +48,21 @@ AActor::AActor() : Super()
 AActor::~AActor()
 {
 
+}
+
+TickFunction* AActor::GetTickFunction()
+{
+	return &PrimaryActorTick;
+}
+
+void AActor::AddPrerequisiteObject(ITickFunctionObject* inObject)
+{
+	PrimaryActorTick.AddPrerequisite(inObject);
+}
+
+void AActor::RemovePrerequisiteObject(ITickFunctionObject* inObject)
+{
+	PrimaryActorTick.RemovePrerequisite(inObject);
 }
 
 void AActor::BeginPlay()
@@ -68,9 +85,9 @@ void AActor::EndPlay()
 	bActorHasBegunPlay = false;
 }
 
-void AActor::Tick(Seconds deltaTime)
+void AActor::TickActor(Seconds deltaTime)
 {
-
+	Tick(deltaTime);
 }
 
 World* AActor::GetWorld() const
@@ -124,6 +141,11 @@ void AActor::ActorTickEnabled_set(bool value)
 bool AActor::HasBegunPlay_get() const
 {
 	return bActorHasBegunPlay;
+}
+
+void AActor::Tick(Seconds deltaTime)
+{
+
 }
 
 bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)

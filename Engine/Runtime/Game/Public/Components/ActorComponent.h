@@ -9,7 +9,7 @@
 
 class AActor;
 
-class GAME_API ActorComponent : public Object
+class GAME_API ActorComponent : virtual public Object, virtual public ITickFunctionObject
 {
 	friend class AActor;
 
@@ -39,6 +39,10 @@ private:
 public:
 	ActorComponent();
 	~ActorComponent() override;
+
+	virtual TickFunction* GetTickFunction() override;
+	virtual void AddPrerequisiteObject(ITickFunctionObject* inObject) override;
+	virtual void RemovePrerequisiteObject(ITickFunctionObject* inObject) override;
 
 	virtual void BeginPlay();
 	virtual void EndPlay();

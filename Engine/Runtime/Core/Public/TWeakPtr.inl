@@ -189,7 +189,7 @@ template<TIsNotPointer T, bool bThreadSafe>
 inline auto TWeakPtr<T, bThreadSafe>::operator =(const TWeakPtr& ptr) -> TWeakPtr&
 {
 	SafeRelease();
-	Assign(ptr);
+	Assign(ptr.Get());
 	return *this;
 }
 

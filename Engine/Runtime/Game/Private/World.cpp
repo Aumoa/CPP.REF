@@ -28,6 +28,7 @@ World::~World()
 
 void World::Tick(Seconds deltaTime)
 {
+	Tick_Ready();
 	Tick_Group(deltaTime, TickingGroup::PrePhysics);
 	Tick_Group(deltaTime, TickingGroup::DuringPhysics);
 	Tick_Group(deltaTime, TickingGroup::PostPhysics);
@@ -68,13 +69,47 @@ Level* World::GetCurrentLevel() const
 	return currentLevel.Get();
 }
 
+void World::Tick_Ready()
+{
+	for (auto& tickGroup : actualTickGroups)
+	{
+		tickGroup.clear();
+	}
+
+	for (auto& tickGroup : tickGroups)
+	{
+		for (auto& item : tickGroup)
+		{
+			item->ReadyTick();
+
+			if (item->bNeedActualGroup)
+			{
+				actualTickGroups[(size_t)item->ActualTickGroup].emplace(item);
+			}
+		}
+	}
+}
+
 void World::Tick_Group(Seconds deltaTime, TickingGroup group)
 {
 	set<TickFunction*>& tickGroup = tickGroups[(size_t)group];
 
 	for (auto& item : tickGroup)
 	{
-		item->ExecuteTick(deltaTime);
+		if (!item->bCompleteTickThisFrame && !item->bNeedActualGroup)
+		{
+			item->ExecuteTick(deltaTime);
+		}
+	}
+
+	set<TickFunction*>& actualTickGroup = actualTickGroups[(size_t)group];
+
+	for (auto& item : actualTickGroup)
+	{
+		if (!item->bCompleteTickThisFrame)
+		{
+			item->ExecuteTick(deltaTime);
+		}
 	}
 }
 

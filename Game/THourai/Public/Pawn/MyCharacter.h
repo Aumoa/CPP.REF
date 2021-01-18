@@ -15,4 +15,6 @@ public:
 public:
 	AMyCharacter();
 	~AMyCharacter();
+
+	void Tick(Seconds deltaTime) override;
 };

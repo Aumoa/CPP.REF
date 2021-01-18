@@ -44,6 +44,21 @@ ActorComponent::~ActorComponent()
 
 }
 
+TickFunction* ActorComponent::GetTickFunction()
+{
+	return &PrimaryComponentTick;
+}
+
+void ActorComponent::AddPrerequisiteObject(ITickFunctionObject* inObject)
+{
+	PrimaryComponentTick.AddPrerequisite(inObject);
+}
+
+void ActorComponent::RemovePrerequisiteObject(ITickFunctionObject* inObject)
+{
+	PrimaryComponentTick.RemovePrerequisite(inObject);
+}
+
 void ActorComponent::BeginPlay()
 {
 	bComponentHasBegunPlay = true;
