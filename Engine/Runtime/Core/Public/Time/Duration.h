@@ -81,8 +81,6 @@ struct Subseconds : public Nanoseconds
 	inline constexpr Subseconds();
 	inline constexpr Subseconds(int64 nano);
 	inline constexpr Subseconds(float value);
-	inline constexpr Subseconds(std::chrono::duration<int64, TRatio> value);
-	inline constexpr Subseconds(Super::Mychrono value);
 	inline constexpr Subseconds(const Nanoseconds& nano);
 
 	inline TRefPtr<String> ToString() const;
@@ -91,6 +89,7 @@ struct Subseconds : public Nanoseconds
 	inline constexpr float Value_get() const;
 	inline void Value_set(float value);
 
+	inline Subseconds& operator =(const Nanoseconds& rh);
 	inline Subseconds& operator +=(const Nanoseconds& rh);
 	inline Subseconds& operator -=(const Nanoseconds& rh);
 };

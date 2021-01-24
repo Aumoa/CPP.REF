@@ -8,6 +8,7 @@
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "SceneRendering/Scene.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -42,6 +43,9 @@ void GameInstance::Initialize()
 		return;
 	}
 	world->LoadLevel(gameMode->StartLevelClass);
+
+	Scene* scene = world->GetScene();
+	scene->LocalPlayer = localPlayerController;
 }
 
 void GameInstance::Tick(Seconds deltaTime)

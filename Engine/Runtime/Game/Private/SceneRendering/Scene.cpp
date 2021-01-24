@@ -4,8 +4,12 @@
 
 #include "Components/PrimitiveComponent.h"
 #include "SceneRendering/SceneRenderer.h"
+#include "SceneRendering/SceneVisibility.h"
+#include "Framework/PlayerController.h"
+#include "Components/PlayerCameraManager.h"
 
-Scene::Scene()
+Scene::Scene() : Super()
+	, localPlayer(nullptr)
 {
 
 }
@@ -32,11 +36,27 @@ void Scene::Update()
 
 void Scene::Render(SceneRenderer* renderer)
 {
-	renderer->AddPrimitives(sceneProxies);
+	if (localPlayerVisibility.IsValid)
+	{
+		localPlayerVisibility->CalcVisibility(sceneProxies);
+	}
+
+	renderer->SetPrimitivesArray(sceneProxies);
 }
 
 void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
 {
 	primitiveComponents.emplace_back(inPrimitiveComponent);
 	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
+}
+
+APlayerController* Scene::LocalPlayer_get() const
+{
+	return localPlayer;
+}
+
+void Scene::LocalPlayer_set(APlayerController* value)
+{
+	localPlayer = value;
+	localPlayerVisibility = NewObject<SceneVisibility>(value);
 }

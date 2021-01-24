@@ -24,8 +24,8 @@ private:
 	TRefPtr<IRHIDeferredCommandList> commandList;
 	TRefPtr<IRHIRenderTargetView> rtv;
 
-	std::vector<PrimitiveSceneProxy*> primitives;
-	size_t primitives_size;
+	std::span<PrimitiveSceneProxy* const> primitives;
+	std::vector<bool> visibility;
 
 	int32 sceneSizeX;
 	int32 sceneSizeY;
@@ -38,9 +38,9 @@ public:
 	virtual void EndRender();
 	virtual void PopulateRenderCommands();
 
-	void AddPrimitives(const std::vector<PrimitiveSceneProxy*>& sceneProxies);
-	PrimitiveSceneProxy* const* GetPrimitives() const;
-	size_t GetPrimitiveCount() const;
+	void SetPrimitivesArray(std::span<PrimitiveSceneProxy* const> sceneProxies);
+	void AddPrimitive(size_t index);
+	void RemovePrimitive(size_t index);
 
 	vs_property_get(IRHIDeferredCommandList*, CommandList);
 	IRHIDeferredCommandList* CommandList_get() const;
@@ -50,6 +50,8 @@ public:
 protected:
 	IRHIRenderTargetView* GetFinalColorRTV() const;
 	void GetSceneSize(int32& x, int32& y);
+
+	std::span<PrimitiveSceneProxy* const> GetPrimitivesView() const;
 
 private:
 	// CALLBACK HANDLERS

@@ -15,7 +15,7 @@ using namespace std;
 
 SceneRenderer::SceneRenderer(IRHIDeviceBundle* deviceBundle) : Super()
 	, deviceBundle(deviceBundle)
-	, primitives_size(0)
+
 	, sceneSizeX(0)
 	, sceneSizeY(0)
 {
@@ -31,8 +31,6 @@ SceneRenderer::~SceneRenderer()
 
 void SceneRenderer::BeginRender()
 {
-	primitives_size = 0;
-
 	commandList->BeginCommand();
 	commandList->ResourceTransition(finalColor.Get(), ERHIResourceStates::COPY_SOURCE, ERHIResourceStates::RENDER_TARGET);
 	commandList->ClearRenderTargetView(rtv.Get());
@@ -49,33 +47,20 @@ void SceneRenderer::PopulateRenderCommands()
 
 }
 
-void SceneRenderer::AddPrimitives(const vector<PrimitiveSceneProxy*>& sceneProxies)
+void SceneRenderer::SetPrimitivesArray(span<PrimitiveSceneProxy* const> sceneProxies)
 {
-	size_t numPrims = primitives_size;
-	size_t newSize = numPrims + sceneProxies.size();
-
-	if (primitives.size() < newSize)
-	{
-		primitives.resize(newSize);
-	}
-
-	for (size_t i = 0; i < sceneProxies.size(); ++i)
-	{
-		size_t dest = i + numPrims;
-		primitives[dest] = sceneProxies[i];
-	}
-
-	primitives_size = newSize;
+	primitives = sceneProxies;
+	visibility.resize(primitives.size());
 }
 
-PrimitiveSceneProxy* const* SceneRenderer::GetPrimitives() const
+void SceneRenderer::AddPrimitive(size_t index)
 {
-	return primitives.data();
+	visibility[index] = true;
 }
 
-size_t SceneRenderer::GetPrimitiveCount() const
+void SceneRenderer::RemovePrimitive(size_t index)
 {
-	return primitives_size;
+	visibility[index] = false;
 }
 
 IRHIDeferredCommandList* SceneRenderer::CommandList_get() const
@@ -97,6 +82,11 @@ void SceneRenderer::GetSceneSize(int32& x, int32& y)
 {
 	x = sceneSizeX;
 	y = sceneSizeY;
+}
+
+span<PrimitiveSceneProxy* const> SceneRenderer::GetPrimitivesView() const
+{
+	return primitives;
 }
 
 void SceneRenderer::Application_OnPostSized(int32 width, int32 height)

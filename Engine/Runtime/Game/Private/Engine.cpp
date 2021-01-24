@@ -22,12 +22,15 @@
 #include "RHI/RHIShaderDescription.h"
 #include "RHI/IRHIShader.h"
 #include "Assets/AssetManager.h"
+#include "Diagnostics/ScopedCycleCounter.h"
 
 #include "D3D12RHI/D3D12DeviceBundle.h"
 //#include "VulkanRHI/VulkanDeviceBundle.h"
 
 using namespace std;
 using namespace std::chrono;
+
+DEFINE_STATS_GROUP(Engine);
 
 Engine* Engine::gEngine = nullptr;
 
@@ -85,6 +88,8 @@ void Engine::PostInitialize()
 
 void Engine::Tick()
 {
+	QUICK_SCOPED_CYCLE_COUNTER(Engine, Tick);
+
 	auto curr_tick = steady_clock::now();
 	Seconds delta = Seconds(curr_tick - prev_tick);
 	prev_tick = curr_tick;

@@ -5,9 +5,13 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+#include "SceneRendering/MinimalViewInfo.h"
+
 class SceneRenderer;
 class PrimitiveSceneProxy;
 class PrimitiveComponent;
+class SceneVisibility;
+class APlayerController;
 
 class GAME_API Scene : virtual public Object
 {
@@ -18,6 +22,9 @@ public:
 	std::vector<PrimitiveComponent*> primitiveComponents;
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
+	APlayerController* localPlayer;
+	TRefPtr<SceneVisibility> localPlayerVisibility;
+
 public:
 	Scene();
 	~Scene() override;
@@ -26,4 +33,8 @@ public:
 	void Render(SceneRenderer* renderer);
 	
 	void AddScene(PrimitiveComponent* inPrimitiveComponent);
+	
+	vs_property(APlayerController*, LocalPlayer);
+	APlayerController* LocalPlayer_get() const;
+	void LocalPlayer_set(APlayerController* value);
 };

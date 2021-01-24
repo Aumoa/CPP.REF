@@ -6,8 +6,10 @@
 #include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
 #include "Shaders/ShaderCameraConstant.h"
-#include "SceneRendering/SceneRenderer.h"
+#include "SceneRendering/Scene.h"
 #include "SceneRendering/MinimalViewInfo.h"
+
+using namespace std;
 
 DEFINE_STATS_GROUP(SceneVisibility);
 
@@ -35,21 +37,32 @@ SceneVisibility::~SceneVisibility()
 
 }
 
-void SceneVisibility::CalcVisibility(SceneRenderer* renderer)
+void SceneVisibility::CalcVisibility(const vector<PrimitiveSceneProxy*>& sceneProxies)
 {
 	QUICK_SCOPED_CYCLE_COUNTER(SceneVisibility, CalcVisibility);
 
-	size_t prim_count = renderer->GetPrimitiveCount();
-	PrimitiveSceneProxy* const* prims = renderer->GetPrimitives();
+	size_t prim_count = sceneProxies.size();
 
 	MinimalViewInfo viewInfo;
 	cameraManager->CalcCameraView(viewInfo);
 	cameraConstants->BeginUpdateConstant(viewInfo, prim_count);
 
+	visibilities.resize(prim_count);
 	for (size_t i = 0; i < prim_count; ++i)
 	{
-		cameraConstants->AddPrimitive(prims[i]);
+		cameraConstants->AddPrimitive(sceneProxies[i]);
+		visibilities[i] = true;
 	}
+}
+
+const vector<bool>& SceneVisibility::GetVisibilities() const
+{
+	return visibilities;
+}
+
+ShaderCameraConstantVector* SceneVisibility::GetConstantVector() const
+{
+	return cameraConstants.Get();
 }
 
 bool SceneVisibility::IsValid_get() const

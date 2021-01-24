@@ -16,7 +16,6 @@ public:
 private:
 	static std::vector<CycleStatsGroup*> stats_groups;
 
-	bool bDeferredInit : 1;
 	TRefPtr<String> name;
 	std::vector<CycleStatStorage*> links;
 
@@ -30,9 +29,7 @@ public:
 	void ResolveLinks();
 
 	static void ResolveFrameDiagnostics();
-
-private:
-	void DeferredInit();
+	static const std::vector<CycleStatsGroup*>& GetAllStatsGroup();
 };
 
 class GAME_API CycleStatStorage : virtual public Object

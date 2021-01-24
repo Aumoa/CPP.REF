@@ -23,8 +23,13 @@ ShaderCameraConstantVector::~ShaderCameraConstantVector()
 
 void ShaderCameraConstantVector::BeginUpdateConstant(const MinimalViewInfo& viewInfo, size_t primitiveCount)
 {
+	if (primitiveCount == 0)
+	{
+		return;
+	}
+
 	size_t newsz = AlignOf(primitiveCount);
-	if (newsz != this->capacity)
+	if (newsz > this->capacity)
 	{
 		constantBuffer = GEngine.DeviceBundle->CreateDynamicConstantBuffer(newsz);
 		this->capacity = newsz;

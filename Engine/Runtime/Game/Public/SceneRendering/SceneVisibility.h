@@ -10,7 +10,7 @@
 class APlayerController;
 class PlayerCameraManager;
 class ShaderCameraConstantVector;
-class SceneRenderer;
+class PrimitiveSceneProxy;
 
 GAME_API DECLARE_STATS_GROUP(SceneVisibility);
 
@@ -25,11 +25,15 @@ private:
 	PlayerCameraManager* cameraManager;
 	TRefPtr<ShaderCameraConstantVector> cameraConstants;
 
+	std::vector<bool> visibilities;
+
 public:
 	SceneVisibility(APlayerController* inPlayerController);
 	~SceneVisibility() override;
 
-	void CalcVisibility(SceneRenderer* renderer);
+	void CalcVisibility(const std::vector<PrimitiveSceneProxy*>& sceneProxies);
+	const std::vector<bool>& GetVisibilities() const;
+	ShaderCameraConstantVector* GetConstantVector() const;
 
 	vs_property_get(bool, IsValid);
 	bool IsValid_get() const;

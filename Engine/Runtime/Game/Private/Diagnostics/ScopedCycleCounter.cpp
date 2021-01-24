@@ -11,7 +11,6 @@ using namespace std;
 vector<CycleStatsGroup*> CycleStatsGroup::stats_groups;
 
 CycleStatsGroup::CycleStatsGroup(TRefPtr<String> inNamespace) : Super()
-	, bDeferredInit(false)
 {
 	name = inNamespace;
 	stats_groups.emplace_back(this);
@@ -48,7 +47,7 @@ TRefPtr<String> CycleStatsGroup::ToString() const
 		return lh->Tick > rh->Tick;
 	});
 
-	woss << name->C_Str;
+	woss << L"STATGROUP_" << name->C_Str;
 	for (auto& item : active_links)
 	{
 		woss << endl << item->ToString()->C_Str;
@@ -59,7 +58,6 @@ TRefPtr<String> CycleStatsGroup::ToString() const
 
 void CycleStatsGroup::AddLink(CycleStatStorage* inStorage)
 {
-	DeferredInit();
 	links.emplace_back(inStorage);
 }
 
@@ -79,13 +77,9 @@ void CycleStatsGroup::ResolveFrameDiagnostics()
 	}
 }
 
-void CycleStatsGroup::DeferredInit()
+const vector<CycleStatsGroup*>& CycleStatsGroup::GetAllStatsGroup()
 {
-	if (!bDeferredInit)
-	{
-		stats_groups.emplace_back(this);
-		bDeferredInit = true;
-	}
+	return stats_groups;
 }
 
 CycleStatStorage::CycleStatStorage(CycleStatsGroup* inStatGroup, TRefPtr<String> inName) : Super()
@@ -113,7 +107,7 @@ TRefPtr<String> CycleStatStorage::ToString() const
 {
 	wostringstream woss;
 
-	woss << L"\t" << setw(40) << left << name->C_Str << setw(10) << right << fixed << setprecision(4) << Milliseconds(dur).Value << L"ms";
+	woss << L"\t" << setw(40) << left << name->C_Str << setw(10) << right << fixed << setprecision(4) << Milliseconds(resolved).Value << L"ms";
 	return woss.str();
 }
 
@@ -202,7 +196,7 @@ ScopedCycleCounter::~ScopedCycleCounter()
 
 Seconds ScopedCycleCounter::Secs_get() const
 {
-	return mydur;
+	return Seconds(mydur);
 }
 
 void ScopedCycleCounter::RegisterFrameDiagnostics()

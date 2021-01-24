@@ -8,9 +8,12 @@
 #include "Components/PrimitiveComponent.h"
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
+#include "Diagnostics/ScopedCycleCounter.h"
 
 using namespace std;
 using namespace std::chrono;
+
+DEFINE_STATS_GROUP(World);
 
 World::World()
 {
@@ -28,6 +31,8 @@ World::~World()
 
 void World::Tick(Seconds deltaTime)
 {
+	QUICK_SCOPED_CYCLE_COUNTER(World, Tick);
+
 	Tick_Ready();
 	Tick_Group(deltaTime, TickingGroup::PrePhysics);
 	Tick_Group(deltaTime, TickingGroup::DuringPhysics);

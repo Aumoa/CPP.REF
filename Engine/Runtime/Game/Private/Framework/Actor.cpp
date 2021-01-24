@@ -69,17 +69,27 @@ void AActor::BeginPlay()
 {
 	bActorHasBegunPlay = true;
 
-	for (auto& component : ownedComponents)
+	for (auto& component_pair : ownedComponents)
 	{
-		component.first->BeginPlay();
+		auto& component = component_pair.first;
+		if (!component->HasBegunPlay)
+		{
+			component->owner = this;
+			component->BeginPlay();
+		}
 	}
 }
 
 void AActor::EndPlay()
 {
-	for (auto& component : ownedComponents)
+	for (auto& component_pair : ownedComponents)
 	{
-		component.first->EndPlay();
+		auto& component = component_pair.first;
+		if (component->HasBegunPlay)
+		{
+			component->EndPlay();
+			component->owner = nullptr;
+		}
 	}
 
 	bActorHasBegunPlay = false;
@@ -170,9 +180,9 @@ bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const si
 	if (HasBegunPlay)
 	{
 		assign_ptr->owner = this;
-		ComponentAdded.Invoke(assign_ptr.Get());
 		assign_ptr->BeginPlay();
 	}
+	ComponentAdded.Invoke(assign_ptr.Get());
 
 	// Add to owned list.
 	return ownedComponents.emplace(ptr, move(assign_ptr)).second;
@@ -196,9 +206,12 @@ bool AActor::RemoveComponentInternal(size_t hash_code)
 		if (erase_it != item.second.end())
 		{
 			ActorComponent* component = (*erase_it);
-			component->EndPlay();
+			if (component->HasBegunPlay)
+			{
+				component->EndPlay();
+				component->owner = nullptr;
+			}
 			ComponentRemoved.Invoke(component);
-			component->owner = nullptr;
 
 			item.second.erase(erase_it);
 			if (item.second.empty())

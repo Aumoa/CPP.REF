@@ -12,8 +12,6 @@ public:
 	using Super = SceneRenderer;
 	using This = SceneRenderer;
 
-private:
-
 public:
 	DeferredSceneRenderer(IRHIDeviceBundle* deviceBundle);
 	~DeferredSceneRenderer() override;

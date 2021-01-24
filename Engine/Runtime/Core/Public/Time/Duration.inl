@@ -136,18 +136,6 @@ inline constexpr Subseconds<TRatio, TimeStr>::Subseconds(float value) : Super(st
 }
 
 template<TIsRatio TRatio, TimeStringLit TimeStr>
-inline constexpr Subseconds<TRatio, TimeStr>::Subseconds(std::chrono::duration<int64, TRatio> value) : Super(std::chrono::duration_cast<Super::Mychrono>(value).count())
-{
-
-}
-
-template<TIsRatio TRatio, TimeStringLit TimeStr>
-inline constexpr Subseconds<TRatio, TimeStr>::Subseconds(Super::Mychrono value) : Super(value)
-{
-
-}
-
-template<TIsRatio TRatio, TimeStringLit TimeStr>
 inline constexpr Subseconds<TRatio, TimeStr>::Subseconds(const Nanoseconds& nano) : Super(nano.Unit)
 {
 
@@ -169,6 +157,13 @@ template<TIsRatio TRatio, TimeStringLit TimeStr>
 inline void Subseconds<TRatio, TimeStr>::Value_set(float value)
 {
 	Unit = std::chrono::duration_cast<Super::Mychrono>(Mychrono(value));
+}
+
+template<TIsRatio TRatio, TimeStringLit TimeStr>
+inline auto Subseconds<TRatio, TimeStr>::operator =(const Nanoseconds& rh) -> Subseconds&
+{
+	Unit = rh.Unit;
+	return *this;
 }
 
 template<TIsRatio TRatio, TimeStringLit TimeStr>

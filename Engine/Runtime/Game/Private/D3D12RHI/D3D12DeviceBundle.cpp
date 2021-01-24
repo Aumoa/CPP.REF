@@ -183,7 +183,7 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicConstantBuffer(size_t size
 	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
 
 	ComPtr<ID3D12Resource> resource;
-	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
 
 	auto d3d12Res = NewObject<D3D12Resource>(resource.Get());
 	d3d12Res->BindMappingAddress();

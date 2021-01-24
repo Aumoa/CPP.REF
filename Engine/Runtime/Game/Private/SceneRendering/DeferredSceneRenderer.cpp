@@ -51,8 +51,9 @@ void DeferredSceneRenderer::PopulateRenderCommands()
 	CommandList->SetShader(test_shader);
 	CommandList->SetPrimitiveTopology(ERHIPrimitiveTopology::TRIANGLELIST);
 
-	PrimitiveSceneProxy* const* sceneProxyArray = GetPrimitives();
-	auto primitives = span(sceneProxyArray, GetPrimitiveCount());
+	// Rendering primitives for each views.
+
+	span<PrimitiveSceneProxy* const> primitives = GetPrimitivesView();
 	for (auto& primitive : primitives)
 	{
 		MeshBatch* batch = primitive->GetMeshBatch();
