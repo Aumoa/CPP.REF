@@ -38,30 +38,6 @@ using StringIterator = TItem*;
 
 class CORE_API String : virtual public Object, virtual public IConstEnumerable<StringIterator, wchar_t>
 {
-	template<TIsChar T>
-	struct HeapStorage
-	{
-		T* ptr;
-
-		HeapStorage(T* ptr = nullptr) : ptr(ptr)
-		{
-
-		}
-
-		HeapStorage(HeapStorage&& storage) : ptr(storage.ptr)
-		{
-			storage.ptr = nullptr;
-		}
-
-		~HeapStorage()
-		{
-			if (ptr != nullptr)
-			{
-				Free(ptr);
-			}
-		}
-	};
-
 public:
 	using Super = Object;
 	using This = String;

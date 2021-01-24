@@ -63,6 +63,12 @@ struct Nanoseconds
 
 	template<TIsDuration T>
 	inline constexpr operator T () const;
+
+	inline constexpr Nanoseconds operator +(const Nanoseconds& rh) const;
+	inline constexpr Nanoseconds operator -(const Nanoseconds& rh) const;
+	
+	inline Nanoseconds& operator +=(const Nanoseconds& rh);
+	inline Nanoseconds& operator -=(const Nanoseconds& rh);
 };
 
 template<TIsRatio TRatio, TimeStringLit TimeStr>
@@ -77,12 +83,16 @@ struct Subseconds : public Nanoseconds
 	inline constexpr Subseconds(float value);
 	inline constexpr Subseconds(std::chrono::duration<int64, TRatio> value);
 	inline constexpr Subseconds(Super::Mychrono value);
+	inline constexpr Subseconds(const Nanoseconds& nano);
 
 	inline TRefPtr<String> ToString() const;
 
 	vs_property(float, Value);
 	inline constexpr float Value_get() const;
 	inline void Value_set(float value);
+
+	inline Subseconds& operator +=(const Nanoseconds& rh);
+	inline Subseconds& operator -=(const Nanoseconds& rh);
 };
 
 #include "Duration.inl"
