@@ -6,7 +6,11 @@
 #include "CoreMinimal.h"
 #include "Controller.h"
 
+#include "Diagnostics/ScopedCycleCounter.h"
+
 class PlayerCameraManager;
+
+GAME_API DECLARE_STATS_GROUP(APlayerController);
 
 class GAME_API APlayerController : public AController
 {

@@ -8,7 +8,8 @@
 #include "Shaders/ShaderCameraConstant.h"
 #include "SceneRendering/SceneRenderer.h"
 #include "SceneRendering/MinimalViewInfo.h"
-#include "Diagnostics/ScopedCycleCounter.h"
+
+DEFINE_STATS_GROUP(SceneVisibility);
 
 SceneVisibility::SceneVisibility(APlayerController* inPlayerController) : Super()
 	, playerController(inPlayerController)

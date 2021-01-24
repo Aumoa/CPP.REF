@@ -4,11 +4,17 @@
 
 #include "Application.h"
 #include "THGameInstance.h"
+#include "PlatformMisc/PlatformConsole.h"
 
 using namespace std;
 
 int32 Program::Main()
 {
+	PlatformConsole::Alloc();
+
 	auto app = NewObject<Application>();
-	return app->Run<THGameInstance>();
+	int32 ret = app->Run<THGameInstance>();
+
+	PlatformConsole::Free();
+	return ret;
 }

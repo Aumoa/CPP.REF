@@ -6,6 +6,8 @@
 #include "Components/PlayerCameraManager.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 
+DEFINE_STATS_GROUP(APlayerController);
+
 APlayerController::APlayerController() : Super()
 	, cameraManager(nullptr)
 {

@@ -5,10 +5,14 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+#include "Diagnostics/ScopedCycleCounter.h"
+
 class APlayerController;
 class PlayerCameraManager;
 class ShaderCameraConstantVector;
 class SceneRenderer;
+
+GAME_API DECLARE_STATS_GROUP(SceneVisibility);
 
 class GAME_API SceneVisibility : virtual public Object
 {

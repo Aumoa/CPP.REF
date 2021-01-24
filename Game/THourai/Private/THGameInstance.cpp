@@ -3,7 +3,9 @@
 #include "THGameInstance.h"
 
 #include "THGameMode.h"
-#include "Diagnostics/ScopedCycleCounterStorage.h"
+#include "Diagnostics/ScopedCycleCounter.h"
+#include "PlatformMisc/PlatformConsole.h"
+#include "Framework/PlayerController.h"
 
 THGameInstance::THGameInstance()
 {
@@ -24,5 +26,5 @@ void THGameInstance::Tick(Seconds deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	TH_LOG(LogTH, Verbose, String::Format("\n{0}", ScopedCycleCounterStorage::GetDiagStatics()));
+	PlatformConsole::WriteLine(STATGROUP_APlayerController.ToString());
 }
