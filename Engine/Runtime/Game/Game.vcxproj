@@ -289,7 +289,6 @@
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
-    <ClInclude Include="Public\Diagnostics\ScopedCycleCounterStorage.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\Framework\Character.h" />
@@ -308,7 +307,9 @@
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
+    <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
+    <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\RHI\IRHICommandFence.h" />
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
@@ -385,7 +386,6 @@
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
-    <ClCompile Include="Private\Diagnostics\ScopedCycleCounterStorage.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\EngineCriticalException.cpp" />
     <ClCompile Include="Private\Framework\Actor.cpp" />
@@ -402,7 +402,9 @@
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\Misc\TickScheduler.cpp" />
     <ClCompile Include="Private\Physics\Collision.cpp" />
+    <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />

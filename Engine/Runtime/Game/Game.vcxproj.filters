@@ -64,6 +64,18 @@
     <Filter Include="Private\Diagnostics">
       <UniqueIdentifier>{8c8d8630-6d1d-4e04-9462-0e76f2f471ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\PlatformMisc">
+      <UniqueIdentifier>{8388413d-3bdc-4178-8a6f-97d9332dec2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\PlatformMisc">
+      <UniqueIdentifier>{482323bf-8ae6-4395-8a42-88a0facda7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Misc">
+      <UniqueIdentifier>{39f866c4-a196-4fe3-8c4e-395915442f9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Misc">
+      <UniqueIdentifier>{24e4bb5b-7f53-4e00-bdaa-9946ea62fe97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -363,8 +375,11 @@
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h">
       <Filter>Public\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Diagnostics\ScopedCycleCounterStorage.h">
-      <Filter>Public\Diagnostics</Filter>
+    <ClInclude Include="Public\PlatformMisc\PlatformConsole.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\TickScheduler.h">
+      <Filter>Public\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -566,11 +581,14 @@
     <ClCompile Include="Private\Shaders\ShaderCameraConstant.cpp">
       <Filter>Private\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Diagnostics\ScopedCycleCounterStorage.cpp">
-      <Filter>Private\Diagnostics</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp">
       <Filter>Private\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Misc\TickScheduler.cpp">
+      <Filter>Private\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
