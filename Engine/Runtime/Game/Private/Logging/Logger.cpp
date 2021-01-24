@@ -2,10 +2,10 @@
 
 #include "Logging/Logger.h"
 
-#include "WindowsMinimal.h"
 #include "EngineCriticalException.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogCategoryBase.h"
+#include "PlatformMisc/PlatformConsole.h"
 
 void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, TRefPtr<String> logMessage)
 {
@@ -13,7 +13,7 @@ void Logger::Log(LogCategoryBase& category, ELogVerbosity inVerbosity, TRefPtr<S
 	inVerbosity = category.GetAmendedVerbosity(inVerbosity);
 	const wchar_t* verbosityName = ToString(inVerbosity);
 
-	OutputDebugStringW(String::Format(L"{0}: {1}: {2}\n", categoryName, verbosityName, logMessage)->C_Str);
+	PlatformConsole::Write(String::Format(L"{0}: {1}: {2}\n", categoryName, verbosityName, logMessage)->C_Str);
 
 	if (inVerbosity == ELogVerbosity::Fatal)
 	{
