@@ -43,7 +43,7 @@ public:
 	virtual void InitializeBundle();
 	virtual void ReleaseBundle();
 
-	virtual TRefPtr<IRHISwapChain> GetSwapChain() const;
+	virtual IRHISwapChain* GetSwapChain() const;
 	virtual IRHIImmediateCommandList* GetImmediateCommandList() const;
 	virtual RHIShaderLibrary* GetShaderLibrary() const;
 	virtual RHIResourceGC* GetResourceGC() const;

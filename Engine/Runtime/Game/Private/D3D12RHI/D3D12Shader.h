@@ -44,4 +44,7 @@ public:
 	ID3D12RootSignature* RootSignature_get() const;
 	vs_property_get(ID3D12PipelineState*, PipelineState);
 	ID3D12PipelineState* PipelineState_get() const;
+
+private:
+	static D3D12_ROOT_PARAMETER GetRootCBVParameter(uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility);
 };

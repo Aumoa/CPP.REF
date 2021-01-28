@@ -23,18 +23,21 @@ public:
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
 	APlayerController* localPlayer;
-	TRefPtr<SceneVisibility> localPlayerVisibility;
 
 public:
 	Scene();
 	~Scene() override;
 
 	void Update();
-	void Render(SceneRenderer* renderer);
 	
 	void AddScene(PrimitiveComponent* inPrimitiveComponent);
 	
 	vs_property(APlayerController*, LocalPlayer);
 	APlayerController* LocalPlayer_get() const;
 	void LocalPlayer_set(APlayerController* value);
+
+	vs_property_get(std::span<PrimitiveComponent* const>, Primitives);
+	std::span<PrimitiveComponent* const> Primitives_get() const;
+	vs_property_get(std::span<PrimitiveSceneProxy* const>, PrimitiveSceneProxies);
+	std::span<PrimitiveSceneProxy* const> PrimitiveSceneProxies_get() const;
 };

@@ -71,9 +71,9 @@ void D3D12DeviceBundle::ReleaseBundle()
 	instance = nullptr;
 }
 
-TRefPtr<IRHISwapChain> D3D12DeviceBundle::GetSwapChain() const
+IRHISwapChain* D3D12DeviceBundle::GetSwapChain() const
 {
-	return swapChain;
+	return swapChain.Get();
 }
 
 IRHIImmediateCommandList* D3D12DeviceBundle::GetImmediateCommandList() const

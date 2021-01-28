@@ -195,9 +195,6 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h">
-      <Filter>Public\SceneRendering</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Framework\Actor.h">
       <Filter>Public\Framework</Filter>
     </ClInclude>
@@ -460,9 +457,6 @@
     </ClCompile>
     <ClCompile Include="Private\World.cpp">
       <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp">
-      <Filter>Private\SceneRendering</Filter>
     </ClCompile>
     <ClCompile Include="Private\Components\SceneComponent.cpp">
       <Filter>Private\Components</Filter>

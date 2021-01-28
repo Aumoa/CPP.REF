@@ -28,7 +28,7 @@ struct RHIShaderDescription;
 
 interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 {
-	virtual TRefPtr<IRHISwapChain> GetSwapChain() const = 0;
+	virtual IRHISwapChain* GetSwapChain() const = 0;
 	virtual IRHIImmediateCommandList* GetImmediateCommandList() const = 0;
 	virtual RHIShaderLibrary* GetShaderLibrary() const = 0;
 	virtual RHIResourceGC* GetResourceGC() const = 0;

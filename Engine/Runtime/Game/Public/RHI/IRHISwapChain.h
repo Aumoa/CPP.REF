@@ -11,7 +11,7 @@ interface IRHISwapChain : virtual public Object
 {
 	virtual void Present() = 0;
 	virtual void ResizeBuffers(int32 width, int32 height) = 0;
-	virtual TRefPtr<IRHIResource> GetBuffer(size_t index) const = 0;
+	virtual IRHIResource* GetBuffer(size_t index) const = 0;
 
 	vs_property_get(size_t, CurrentBackBufferIndex);
 	vs_property_get(size_t, NumBuffers);

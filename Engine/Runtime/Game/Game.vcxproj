@@ -332,7 +332,6 @@
     <ClInclude Include="Public\RHI\RHIVertex.h" />
     <ClInclude Include="Public\RHI\RHIViewport.h" />
     <ClInclude Include="Public\Rotator.h" />
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
@@ -413,7 +412,6 @@
     <ClCompile Include="Private\RHI\RHIVertex.cpp" />
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
-    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
     <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />

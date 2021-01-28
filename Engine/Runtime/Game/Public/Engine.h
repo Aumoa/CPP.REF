@@ -40,7 +40,6 @@ private:
 	IRHIImmediateCommandList* immediateCommandList;
 	IRHISwapChain* swapChain;
 
-	TRefPtr<SceneRenderer> sceneRenderer;
 	TRefPtr<AssetManager> assetManager;
 	TRefPtr<GameViewport> gameViewport;
 
@@ -60,9 +59,11 @@ public:
 	static Engine* GetInstance();
 
 private:
+	void TickWorld();
+	void RenderScene();
+
 	void ForEachBundles(std::function<void(IRHIBundle*)> action);
 	void LoadEngineDefaultAssets();
-	void InitializeDefaultShaders();
 
 	void Application_OnPostSized(int32 x, int32 y);
 };

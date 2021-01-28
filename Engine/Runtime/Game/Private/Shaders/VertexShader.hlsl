@@ -12,6 +12,15 @@ struct Fragment
 	float4 Color : COLOR;
 };
 
+struct ShaderCameraConstant
+{
+	matrix World;
+	matrix ViewProj;
+	matrix WVP;
+};
+
+ConstantBuffer<ShaderCameraConstant> gCameraConstant : register(b0);
+
 Fragment VS_Main(in Vertex inVertex)
 {
 	Fragment oFrag;

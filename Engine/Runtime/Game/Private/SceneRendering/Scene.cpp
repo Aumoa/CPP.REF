@@ -8,6 +8,8 @@
 #include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
 
+using namespace std;
+
 Scene::Scene() : Super()
 	, localPlayer(nullptr)
 {
@@ -34,16 +36,6 @@ void Scene::Update()
 	}
 }
 
-void Scene::Render(SceneRenderer* renderer)
-{
-	if (localPlayerVisibility.IsValid)
-	{
-		localPlayerVisibility->CalcVisibility(sceneProxies);
-	}
-
-	renderer->SetPrimitivesArray(sceneProxies);
-}
-
 void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
 {
 	primitiveComponents.emplace_back(inPrimitiveComponent);
@@ -58,5 +50,14 @@ APlayerController* Scene::LocalPlayer_get() const
 void Scene::LocalPlayer_set(APlayerController* value)
 {
 	localPlayer = value;
-	localPlayerVisibility = NewObject<SceneVisibility>(value);
+}
+
+span<PrimitiveComponent* const> Scene::Primitives_get() const
+{
+	return primitiveComponents;
+}
+
+span<PrimitiveSceneProxy* const> Scene::PrimitiveSceneProxies_get() const
+{
+	return sceneProxies;
 }

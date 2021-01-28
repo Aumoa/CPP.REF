@@ -9,7 +9,7 @@
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
-#include "SceneRendering/DeferredSceneRenderer.h"
+#include "SceneRendering/SceneRenderer.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/StaticMesh.h"
 #include "RHI/IRHICommandFence.h"
@@ -68,9 +68,8 @@ void Engine::Initialize()
 
 	autoFence = deviceBundle->CreateCommandFence();
 	immediateCommandList = deviceBundle->GetImmediateCommandList();
-	swapChain = deviceBundle->GetSwapChain().Get();
+	swapChain = deviceBundle->GetSwapChain();
 
-	sceneRenderer = NewObject<DeferredSceneRenderer>(this->deviceBundle);
 	assetManager = NewObject<AssetManager>();
 	gameViewport = NewObject<GameViewport>();
 	GApplication.PostSized += bind_delegate(Application_OnPostSized);
@@ -83,46 +82,12 @@ void Engine::Initialize()
 void Engine::PostInitialize()
 {
 	gameInstance = GApplication.GetGameInstance();
-	InitializeDefaultShaders();
 }
 
 void Engine::Tick()
 {
-	QUICK_SCOPED_CYCLE_COUNTER(Engine, Tick);
-
-	auto curr_tick = steady_clock::now();
-	Seconds delta = Seconds(curr_tick - prev_tick);
-	prev_tick = curr_tick;
-
-	deviceBundle->GetResourceGC()->Collect();
-	gameInstance->Tick(delta);
-
-	TRefPtr<IRHISwapChain> swapChain = deviceBundle->GetSwapChain();
-
-	autoFence->BeginFence();
-
-	IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex).Get();
-
-	sceneRenderer->BeginRender();
-
-	World* renderWorld = gameInstance->GetWorld();
-	Scene* renderScene = renderWorld->GetScene();
-	renderScene->Render(sceneRenderer.Get());
-	sceneRenderer->PopulateRenderCommands();
-
-	sceneRenderer->EndRender();
-	immediateCommandList->ExecuteCommandList(sceneRenderer->CommandList);
-
-	immediateCommandList->BeginCommand();
-	immediateCommandList->ResourceTransition(target, ERHIResourceStates::PRESENT, ERHIResourceStates::COPY_DEST);
-	immediateCommandList->CopyResource(target, sceneRenderer->FinalColor);
-	immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
-	immediateCommandList->EndCommand();
-	immediateCommandList->Flush();
-
-	swapChain->Present();
-
-	autoFence->EndFence(immediateCommandList);
+	TickWorld();
+	RenderScene();
 }
 
 IRHIDeviceBundle* Engine::DeviceBundle_get() const
@@ -145,6 +110,63 @@ Engine* Engine::GetInstance()
 	return gEngine;
 }
 
+void Engine::TickWorld()
+{
+	QUICK_SCOPED_CYCLE_COUNTER(Engine, TickWorld);
+
+	auto curr_tick = steady_clock::now();
+	Seconds delta = Seconds(curr_tick - prev_tick);
+	prev_tick = curr_tick;
+
+	deviceBundle->GetResourceGC()->Collect();
+	gameInstance->Tick(delta);
+}
+
+void Engine::RenderScene()
+{
+	World* const world = gameInstance->GetWorld();
+	Scene* const scene = world->GetScene();
+
+	autoFence->BeginFence();
+
+	SceneRenderer sceneRenderer(scene);
+
+	immediateCommandList->BeginCommand();
+	
+	{
+		QUICK_SCOPED_CYCLE_COUNTER(Engine, CalcVisibility);
+		
+		sceneRenderer.CalcLocalPlayerVisibility();
+	}
+
+	{
+		QUICK_SCOPED_CYCLE_COUNTER(Engine, RenderScene);
+
+		gameViewport->BeginRender(immediateCommandList);
+		{
+			sceneRenderer.RenderScene(immediateCommandList);
+		}
+		gameViewport->EndRender(immediateCommandList);
+	}
+
+	{
+		QUICK_SCOPED_CYCLE_COUNTER(Engine, RenderFlushing);
+
+		IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex);
+
+		immediateCommandList->ResourceTransition(target, ERHIResourceStates::PRESENT, ERHIResourceStates::COPY_DEST);
+		immediateCommandList->CopyResource(target, gameViewport->GetRenderTarget());
+		immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
+
+		immediateCommandList->EndCommand();
+		immediateCommandList->Flush();
+
+		swapChain->Present();
+	}
+
+	autoFence->EndFence(immediateCommandList);
+}
+
 void Engine::ForEachBundles(function<void(IRHIBundle*)> action)
 {
 	for (auto& bundle : rhiBundles)
@@ -157,22 +179,6 @@ void Engine::LoadEngineDefaultAssets()
 {
 	TRefPtr<StaticMesh> mesh = NewObject<StaticMesh>();
 	GetAssetManager()->Import(L"Engine/StaticMesh/Triangle", mesh);
-}
-
-#include "Shaders/Compiled/VertexShader.hlsl.h"
-#include "Shaders/Compiled/PixelShader.hlsl.h"
-
-void Engine::InitializeDefaultShaders()
-{
-	RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
-
-	RHIShaderDescription shaderDesc;
-	shaderDesc.ShaderName = "Engine/Default";
-	shaderDesc.VS = RHIShaderBytecode(pVertexShader);
-	shaderDesc.PS = RHIShaderBytecode(pPixelShader);
-	TRefPtr<IRHIShader> shader = DeviceBundle->CreateShader(shaderDesc);
-
-	shaderLibrary->AddShader(shader);
 }
 
 void Engine::Application_OnPostSized(int32 x, int32 y)

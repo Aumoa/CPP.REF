@@ -6,13 +6,10 @@
 #include "CoreMinimal.h"
 
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "SceneRendering/MinimalViewInfo.h"
 
-class APlayerController;
-class PlayerCameraManager;
-class ShaderCameraConstantVector;
 class PrimitiveSceneProxy;
-
-GAME_API DECLARE_STATS_GROUP(SceneVisibility);
+class Scene;
 
 class GAME_API SceneVisibility : virtual public Object
 {
@@ -21,20 +18,17 @@ public:
 	using This = SceneVisibility;
 
 private:
-	APlayerController* playerController;
-	PlayerCameraManager* cameraManager;
-	TRefPtr<ShaderCameraConstantVector> cameraConstants;
-
+	Scene* myScene;
+	MinimalViewInfo myView;
 	std::vector<bool> visibilities;
 
 public:
-	SceneVisibility(APlayerController* inPlayerController);
+	SceneVisibility(Scene* inScene, MinimalViewInfo& inView);
+	SceneVisibility(SceneVisibility&& rh) noexcept;
 	~SceneVisibility() override;
 
-	void CalcVisibility(const std::vector<PrimitiveSceneProxy*>& sceneProxies);
-	const std::vector<bool>& GetVisibilities() const;
-	ShaderCameraConstantVector* GetConstantVector() const;
+	void CalcVisibility();
 
-	vs_property_get(bool, IsValid);
-	bool IsValid_get() const;
+	vs_property_get(const std::vector<bool>&, PrimitiveVisibility);
+	const std::vector<bool>& PrimitiveVisibility_get() const;
 };

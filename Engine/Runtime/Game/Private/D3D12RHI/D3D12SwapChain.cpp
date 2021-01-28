@@ -33,7 +33,7 @@ void D3D12SwapChain::ResizeBuffers(int32 width, int32 height)
 	AllocBuffers();
 }
 
-TRefPtr<IRHIResource> D3D12SwapChain::GetBuffer(size_t index) const
+IRHIResource* D3D12SwapChain::GetBuffer(size_t index) const
 {
 	if (index >= backBuffers.size())
 	{
@@ -41,7 +41,7 @@ TRefPtr<IRHIResource> D3D12SwapChain::GetBuffer(size_t index) const
 		return nullptr;
 	}
 
-	return backBuffers[index];
+	return backBuffers[index].Get();
 }
 
 size_t D3D12SwapChain::CurrentBackBufferIndex_get() const

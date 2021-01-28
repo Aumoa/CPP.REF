@@ -42,9 +42,14 @@ void D3D12Shader::SetPixelShader(span<const uint8> shaderBytecode)
 
 void D3D12Shader::CreateShaderPipeline(TRefPtr<String> name, ID3D12Device* device)
 {
+	D3D12_ROOT_PARAMETER rootParameters[]
+	{
+		GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX)
+	};
+
 	D3D12_ROOT_SIGNATURE_DESC sigDesc = { };
-	sigDesc.NumParameters = 0;
-	sigDesc.pParameters = nullptr;
+	sigDesc.NumParameters = ARRAYSIZE(rootParameters);
+	sigDesc.pParameters = rootParameters;
 	sigDesc.NumStaticSamplers = 0;
 	sigDesc.pStaticSamplers = nullptr;
 	sigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -85,4 +90,13 @@ ID3D12RootSignature* D3D12Shader::RootSignature_get() const
 ID3D12PipelineState* D3D12Shader::PipelineState_get() const
 {
 	return pipelineState.Get();
+}
+
+D3D12_ROOT_PARAMETER D3D12Shader::GetRootCBVParameter(uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility)
+{
+	D3D12_ROOT_PARAMETER param = { };
+	param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	param.ShaderVisibility = shaderVisibility;
+	param.Constants.ShaderRegister = shaderRegister;
+	return param;
 }

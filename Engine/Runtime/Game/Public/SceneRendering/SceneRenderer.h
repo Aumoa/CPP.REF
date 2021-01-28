@@ -9,8 +9,14 @@ interface IRHIResource;
 interface IRHIDeferredCommandList;
 interface IRHIDeviceBundle;
 interface IRHIRenderTargetView;
+interface IRHICommandList;
+interface IRHIShader;
 
 class PrimitiveSceneProxy;
+class Scene;
+class SceneVisibility;
+
+struct MinimalViewInfo;
 
 class GAME_API SceneRenderer : virtual public Object
 {
@@ -19,41 +25,24 @@ public:
 	using This = SceneRenderer;
 
 private:
-	IRHIDeviceBundle* deviceBundle;
-	TRefPtr<IRHIResource> finalColor;
-	TRefPtr<IRHIDeferredCommandList> commandList;
-	TRefPtr<IRHIRenderTargetView> rtv;
+	static bool bShaderCompiled;
+	static IRHIShader* pickShader;
 
-	std::span<PrimitiveSceneProxy* const> primitives;
-	std::vector<bool> visibility;
-
-	int32 sceneSizeX;
-	int32 sceneSizeY;
+	Scene* renderScene;
+	std::vector<SceneVisibility> visibilities;
 
 public:
-	SceneRenderer(IRHIDeviceBundle* deviceBundle);
+	SceneRenderer(Scene* scene);
 	~SceneRenderer() override;
 
-	virtual void BeginRender();
-	virtual void EndRender();
-	virtual void PopulateRenderCommands();
+	virtual void CalcVisibility(MinimalViewInfo& inView);
+	virtual void RenderScene(IRHICommandList* immediateCommandList);
 
-	void SetPrimitivesArray(std::span<PrimitiveSceneProxy* const> sceneProxies);
-	void AddPrimitive(size_t index);
-	void RemovePrimitive(size_t index);
-
-	vs_property_get(IRHIDeferredCommandList*, CommandList);
-	IRHIDeferredCommandList* CommandList_get() const;
-	vs_property_get(IRHIResource*, FinalColor);
-	IRHIResource* FinalColor_get() const;
-
-protected:
-	IRHIRenderTargetView* GetFinalColorRTV() const;
-	void GetSceneSize(int32& x, int32& y);
-
-	std::span<PrimitiveSceneProxy* const> GetPrimitivesView() const;
+	void CalcLocalPlayerVisibility();
 
 private:
-	// CALLBACK HANDLERS
-	void Application_OnPostSized(int32 width, int32 height);
+	static void ShaderInitialize();
+
+	void SetShader(IRHICommandList* commandList);
+	void RenderSceneInternal(IRHICommandList* commandList, const std::vector<bool>& primitiveVisibility);
 };

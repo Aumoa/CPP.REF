@@ -5,6 +5,10 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+interface IRHIResource;
+interface IRHIRenderTargetView;
+interface IRHICommandList;
+
 class GAME_API GameViewport : virtual public Object
 {
 	friend class Engine;
@@ -16,10 +20,17 @@ public:
 private:
 	int32 resX;
 	int32 resY;
+	TRefPtr<IRHIResource> renderTarget;
+	TRefPtr<IRHIRenderTargetView> renderTargetView;
 
 public:
 	GameViewport();
 	~GameViewport() override;
+
+	virtual void BeginRender(IRHICommandList* immediateCommandList);
+	virtual void EndRender(IRHICommandList* immediateCommandList);
+
+	IRHIResource* GetRenderTarget() const;
 
 	vs_property_get(int32, ResolutionX);
 	int32 ResolutionX_get() const;

@@ -25,7 +25,7 @@ public:
 
 	virtual void Present();
 	virtual void ResizeBuffers(int32 width, int32 height);
-	virtual TRefPtr<IRHIResource> GetBuffer(size_t index) const;
+	virtual IRHIResource* GetBuffer(size_t index) const;
 
 	virtual size_t CurrentBackBufferIndex_get() const;
 	virtual size_t NumBuffers_get() const;

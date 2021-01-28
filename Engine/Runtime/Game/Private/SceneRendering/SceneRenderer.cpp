@@ -2,26 +2,30 @@
 
 #include "SceneRendering/SceneRenderer.h"
 
-#include "RHI/IRHIResource.h"
+#include "SceneRendering/SceneVisibility.h"
+#include "SceneRendering/Scene.h"
+#include "SceneRendering/PrimitiveSceneProxy.h"
+#include "SceneRendering/MeshBatch.h"
+#include "Framework/PlayerController.h"
+#include "Components/PlayerCameraManager.h"
+#include "Logging/LogMacros.h"
+#include "RHI/RHIMeshDrawCommand.h"
+#include "RHI/IRHICommandList.h"
 #include "RHI/IRHIDeviceBundle.h"
-#include "RHI/RHITextureFormat.h"
-#include "RHI/RHIResourceStates.h"
-#include "RHI/RHIResourceFlags.h"
-#include "RHI/IRHIDeferredCommandList.h"
-#include "RHI/IRHIRenderTargetView.h"
-#include "Application.h"
+#include "RHI/RHIShaderLibrary.h"
+#include "RHI/RHIShaderDescription.h"
+#include "RHI/IRHIShader.h"
+#include "Engine.h"
 
 using namespace std;
 
-SceneRenderer::SceneRenderer(IRHIDeviceBundle* deviceBundle) : Super()
-	, deviceBundle(deviceBundle)
+bool SceneRenderer::bShaderCompiled = false;
+IRHIShader* SceneRenderer::pickShader = nullptr;
 
-	, sceneSizeX(0)
-	, sceneSizeY(0)
+SceneRenderer::SceneRenderer(Scene* scene) : Super()
+	, renderScene(scene)
 {
-	commandList = deviceBundle->CreateDeferredCommandList();
-
-	GApplication.PostSized += bind_delegate(Application_OnPostSized);
+	ShaderInitialize();
 }
 
 SceneRenderer::~SceneRenderer()
@@ -29,71 +33,98 @@ SceneRenderer::~SceneRenderer()
 
 }
 
-void SceneRenderer::BeginRender()
+void SceneRenderer::CalcVisibility(MinimalViewInfo& inView)
 {
-	commandList->BeginCommand();
-	commandList->ResourceTransition(finalColor.Get(), ERHIResourceStates::COPY_SOURCE, ERHIResourceStates::RENDER_TARGET);
-	commandList->ClearRenderTargetView(rtv.Get());
+	visibilities.emplace_back(renderScene, inView);
+	visibilities.back().CalcVisibility();
 }
 
-void SceneRenderer::EndRender()
+void SceneRenderer::RenderScene(IRHICommandList* immediateCommandList)
 {
-	commandList->ResourceTransition(finalColor.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::COPY_SOURCE);
-	commandList->EndCommand();
+	SetShader(immediateCommandList);
+
+	for (size_t i = 0; i < visibilities.size(); ++i)
+	{
+		SceneVisibility& visibility = visibilities[i];
+		const vector<bool> primitiveVisibility = visibility.PrimitiveVisibility;
+		RenderSceneInternal(immediateCommandList, primitiveVisibility);
+	}
 }
 
-void SceneRenderer::PopulateRenderCommands()
+void SceneRenderer::CalcLocalPlayerVisibility()
 {
+	APlayerController* localPlayer = renderScene->LocalPlayer;
+	PlayerCameraManager* cameraManager = localPlayer->CameraManager;
 
+	if (cameraManager == nullptr)
+	{
+		SE_LOG(LogRendering, Error, L"PlayerController have not a camera manager component. Abort.");
+		return;
+	}
+
+	MinimalViewInfo viewInfo;
+	cameraManager->CalcCameraView(viewInfo);
+
+	CalcVisibility(viewInfo);
 }
 
-void SceneRenderer::SetPrimitivesArray(span<PrimitiveSceneProxy* const> sceneProxies)
+using BYTE = unsigned char;
+
+#include "Shaders/Compiled/VertexShader.hlsl.h"
+#include "Shaders/Compiled/PixelShader.hlsl.h"
+
+void SceneRenderer::ShaderInitialize()
 {
-	primitives = sceneProxies;
-	visibility.resize(primitives.size());
+	if (!bShaderCompiled)
+	{
+		RHIShaderLibrary* shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
+
+		RHIShaderDescription shaderDesc;
+		shaderDesc.ShaderName = "Engine/SceneRendererShader";
+		shaderDesc.VS = RHIShaderBytecode(pVertexShader);
+		shaderDesc.PS = RHIShaderBytecode(pPixelShader);
+		TRefPtr<IRHIShader> shader = GEngine.DeviceBundle->CreateShader(shaderDesc);
+		pickShader = shader.Get();
+
+		shaderLibrary->AddShader(shader);
+		bShaderCompiled = true;
+	}
 }
 
-void SceneRenderer::AddPrimitive(size_t index)
+void SceneRenderer::SetShader(IRHICommandList* commandList)
 {
-	visibility[index] = true;
+	IRHIShader* shader = pickShader;
+
+	if (!bShaderCompiled)
+	{
+		RHIShaderLibrary* shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
+		shader = shaderLibrary->GetShader(L"Engine/Default");
+	}
+
+#if defined(_DEBUG)
+	if (shader == nullptr)
+	{
+		SE_LOG(LogRendering, Error, L"Cannot found desired shader and default shader. Abort.");
+		return;
+	}
+#endif
+
+	commandList->SetShader(shader);
 }
 
-void SceneRenderer::RemovePrimitive(size_t index)
+void SceneRenderer::RenderSceneInternal(IRHICommandList* commandList, const vector<bool>& primitiveVisibility)
 {
-	visibility[index] = false;
-}
+	span<PrimitiveSceneProxy* const> primitiveSceneProxies = renderScene->PrimitiveSceneProxies;
+	size_t numSceneProxies = primitiveSceneProxies.size();
 
-IRHIDeferredCommandList* SceneRenderer::CommandList_get() const
-{
-	return commandList.Get();
-}
-
-IRHIResource* SceneRenderer::FinalColor_get() const
-{
-	return finalColor.Get();
-}
-
-IRHIRenderTargetView* SceneRenderer::GetFinalColorRTV() const
-{
-	return rtv.Get();
-}
-
-void SceneRenderer::GetSceneSize(int32& x, int32& y)
-{
-	x = sceneSizeX;
-	y = sceneSizeY;
-}
-
-span<PrimitiveSceneProxy* const> SceneRenderer::GetPrimitivesView() const
-{
-	return primitives;
-}
-
-void SceneRenderer::Application_OnPostSized(int32 width, int32 height)
-{
-	finalColor = deviceBundle->CreateTexture2D(ERHITextureFormat::B8G8R8A8_UNORM, width, height, ERHIResourceStates::COPY_SOURCE, ERHIResourceFlags::AllowRenderTarget);
-	rtv = deviceBundle->CreateRenderTargetView(finalColor.Get());
-
-	sceneSizeX = width;
-	sceneSizeY = height;
+	for (size_t i = 0; i < numSceneProxies; ++i)
+	{
+		if (primitiveVisibility[i])
+		{
+			PrimitiveSceneProxy* scene = primitiveSceneProxies[i];
+			MeshBatch* batch = scene->GetMeshBatch();
+			const RHIMeshDrawCommand* drawCommand = batch->GetDrawCommand();
+			commandList->DrawMesh(*drawCommand);
+		}
+	}
 }
