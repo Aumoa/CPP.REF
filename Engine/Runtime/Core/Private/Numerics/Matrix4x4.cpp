@@ -236,7 +236,7 @@ void Matrix4x4::BreakTransform(Vector3& outTranslation, Vector3& outScale, Quate
 
     XMStoreVector3(&outTranslation, T);
     XMStoreVector3(&outScale, S);
-    XMStoreVector3(&outRotation, Q);
+    XMStoreQuaternion(&outRotation, Q);
 }
 
 Vector3 Matrix4x4::Translation_get() const
