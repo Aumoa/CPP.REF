@@ -7,6 +7,8 @@
 
 #include "Actor.h"
 
+class InputComponent;
+
 class GAME_API APawn : public AActor
 {
 public:
@@ -16,4 +18,6 @@ public:
 public:
 	APawn();
 	~APawn() override;
+
+	virtual void SetupPlayerInputComponent(InputComponent* inPlayerInput);
 };

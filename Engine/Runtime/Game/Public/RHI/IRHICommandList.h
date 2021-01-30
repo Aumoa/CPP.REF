@@ -27,6 +27,7 @@ interface IRHICommandList : virtual public Object
 	virtual void SetScissorRects(const Rect& scissorRect) = 0;
 	virtual void SetViewports(const RHIViewport& viewport) = 0;
 	virtual void DrawMesh(const RHIMeshDrawCommand& command) = 0;
+	virtual void SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

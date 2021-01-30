@@ -12,3 +12,5 @@ extern LogCategoryBase LogEngine;
 extern LogCategoryBase LogActor;
 extern LogCategoryBase LogDiagnostics;
 extern LogCategoryBase LogRendering;
+extern LogCategoryBase LogPlatform;
+extern LogCategoryBase LogInput;

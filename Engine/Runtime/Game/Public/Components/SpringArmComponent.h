@@ -18,8 +18,6 @@ public:
 	Vector3 socketRelativeLocation;
 
 	float springArmLength;
-	Vector3 targetOffset;
-	Vector3 socketOffset;
 
 public:
 	SpringArmComponent();
@@ -28,6 +26,12 @@ public:
 	void TickComponent(Seconds deltaTime) override;
 
 	Transform GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const override;
+
+	vs_property(float, SpringArmLength);
+	float SpringArmLength_get() const;
+	void SpringArmLength_set(float value);
+	Vector3 TargetOffset;
+	Vector3 SocketOffset;
 
 private:
 	void UpdateSpringArmTransform(Seconds deltaTime);

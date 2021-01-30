@@ -378,6 +378,18 @@
     <ClInclude Include="Public\Misc\TickScheduler.h">
       <Filter>Public\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Public\ComponentMobility.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\InputComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Key.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\PlatformInput.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -583,6 +595,15 @@
     </ClCompile>
     <ClCompile Include="Private\Misc\TickScheduler.cpp">
       <Filter>Private\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\InputComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp">
+      <Filter>Private\PlatformMisc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

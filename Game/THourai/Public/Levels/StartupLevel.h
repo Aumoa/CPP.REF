@@ -18,6 +18,7 @@ public:
 private:
 	AMyTestActor* persistent_actor;
 	AMyCharacter* persistent_character;
+	AActor* plane;
 
 public:
 	StartupLevel();

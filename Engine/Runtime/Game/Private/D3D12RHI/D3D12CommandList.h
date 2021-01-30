@@ -33,6 +33,7 @@ public:
 	virtual void SetScissorRects(const Rect& scissorRect);
 	virtual void SetViewports(const RHIViewport& viewport);
 	virtual void DrawMesh(const RHIMeshDrawCommand& command);
+	virtual void SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress);
 
 	virtual bool HasBegunCommand_get() const;
 

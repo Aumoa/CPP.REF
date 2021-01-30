@@ -101,6 +101,7 @@ public:
 	inline void RemoveRaw(const T* ptr, void (T::* callable)(TArgs...));
 
 	inline void Invoke(TArgs... args) const;
+	inline size_t NumBindings() const;
 
 	inline void operator()(TArgs... args) const;
 

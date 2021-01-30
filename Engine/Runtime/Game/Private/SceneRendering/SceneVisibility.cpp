@@ -3,6 +3,8 @@
 #include "SceneRendering/SceneVisibility.h"
 
 #include "SceneRendering/Scene.h"
+#include "Shaders/ShaderCameraConstant.h"
+#include "Components/PrimitiveComponent.h"
 
 using namespace std;
 
@@ -27,8 +29,16 @@ SceneVisibility::~SceneVisibility()
 
 void SceneVisibility::CalcVisibility()
 {
+	const auto& primitives = myScene->Primitives;
+
 	// PREVIEW IMPLEMENT. All primitives are visible.
-	visibilities.resize(myScene->Primitives.size(), true);
+	visibilities.resize(primitives.size(), true);
+
+	ShaderCameraConstantVector* cbv = myScene->ShaderCameraConstants;
+	for (size_t i = 0; i < primitives.size(); ++i)
+	{
+		cbv->AddPrimitive(myView, primitives[i]->GetSceneProxy());
+	}
 }
 
 const vector<bool>& SceneVisibility::PrimitiveVisibility_get() const

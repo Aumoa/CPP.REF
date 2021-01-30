@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 
 #include "Transform.h"
+#include "ComponentMobility.h"
 
 class MeshBatch;
 class PrimitiveComponent;
@@ -24,8 +25,10 @@ public:
 	PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent);
 	~PrimitiveSceneProxy();
 
-	void UpdateTransform(const Transform& value);
+	void UpdateMovable();
 
 	virtual MeshBatch* GetMeshBatch() const;
 	virtual Transform GetPrimitiveTransform() const;
+
+	const EComponentMobility Mobility;
 };

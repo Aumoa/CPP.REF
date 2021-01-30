@@ -32,6 +32,8 @@ void GameViewport::BeginRender(IRHICommandList* immediateCommandList)
 	immediateCommandList->SetRenderTargets(1, rtvs);
 	immediateCommandList->SetViewports(RHIViewport(resX, resY));
 	immediateCommandList->SetScissorRects(Rect(0.0f, Vector2((float)resX, (float)resY)));
+
+	immediateCommandList->ClearRenderTargetView(renderTargetView.Get());
 }
 
 void GameViewport::EndRender(IRHICommandList* immediateCommandList)
@@ -60,7 +62,7 @@ void GameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 	resY = y;
 
 	renderTarget = GEngine.DeviceBundle->CreateTexture2D(
-		ERHITextureFormat::R8G8B8A8_UNORM,
+		ERHITextureFormat::B8G8R8A8_UNORM,
 		resX,
 		resY,
 		ERHIResourceStates::COPY_SOURCE,

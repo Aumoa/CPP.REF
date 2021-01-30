@@ -11,11 +11,11 @@ class StaticMeshComponent;
 class SpringArmComponent;
 class CameraComponent;
 
-class TH_API AMyTestActor : public AActor
+class TH_API APlane : public AActor
 {
 public:
 	using Super = AActor;
-	using This = AMyTestActor;
+	using This = APlane;
 
 private:
 	TRefPtr<StaticMesh> myStaticMesh;
@@ -25,6 +25,6 @@ private:
 	CameraComponent* camera;
 
 public:
-	AMyTestActor();
-	~AMyTestActor();
+	APlane();
+	~APlane();
 };

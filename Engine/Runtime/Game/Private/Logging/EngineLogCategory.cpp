@@ -9,3 +9,5 @@ LogCategoryBase LogEngine(ELogVerbosity::Verbose, nameof(LogEngine));
 LogCategoryBase LogActor(ELogVerbosity::Verbose, nameof(LogActor));
 LogCategoryBase LogDiagnostics(ELogVerbosity::Verbose, nameof(LogDiagnostics));
 LogCategoryBase LogRendering(ELogVerbosity::Verbose, nameof(LogRendering));
+LogCategoryBase LogPlatform(ELogVerbosity::Verbose, nameof(LogPlatform));
+LogCategoryBase LogInput(ELogVerbosity::Verbose, nameof(LogInput));

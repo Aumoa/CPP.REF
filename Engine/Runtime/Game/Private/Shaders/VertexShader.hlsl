@@ -14,9 +14,9 @@ struct Fragment
 
 struct ShaderCameraConstant
 {
-	matrix World;
-	matrix ViewProj;
-	matrix WVP;
+	row_major matrix World;
+	row_major matrix ViewProj;
+	row_major matrix WVP;
 };
 
 ConstantBuffer<ShaderCameraConstant> gCameraConstant : register(b0);
@@ -24,7 +24,7 @@ ConstantBuffer<ShaderCameraConstant> gCameraConstant : register(b0);
 Fragment VS_Main(in Vertex inVertex)
 {
 	Fragment oFrag;
-	oFrag.PosH = float4(inVertex.Pos, 1.0f);
+	oFrag.PosH = mul(float4(inVertex.Pos, 1.0f), gCameraConstant.WVP);
 	oFrag.Color = inVertex.Color;
 	return oFrag;
 }

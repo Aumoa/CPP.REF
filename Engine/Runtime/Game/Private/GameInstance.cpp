@@ -46,6 +46,8 @@ void GameInstance::Initialize()
 
 	Scene* scene = world->GetScene();
 	scene->LocalPlayer = localPlayerController;
+
+	localPlayerController->BeginPlay();
 }
 
 void GameInstance::Tick(Seconds deltaTime)

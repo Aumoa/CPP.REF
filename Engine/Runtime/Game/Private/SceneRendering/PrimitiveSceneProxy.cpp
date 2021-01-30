@@ -2,10 +2,16 @@
 
 #include "SceneRendering/PrimitiveSceneProxy.h"
 
+#include "Components/PrimitiveComponent.h"
+
 PrimitiveSceneProxy::PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent) : Super()
 	, myPrimitiveComponent(inPrimitiveComponent)
+	, Mobility(inPrimitiveComponent->Mobility)
 {
-
+	if (Mobility == EComponentMobility::Static)
+	{
+		transform = inPrimitiveComponent->ComponentTransform;
+	}
 }
 
 PrimitiveSceneProxy::~PrimitiveSceneProxy()
@@ -13,9 +19,9 @@ PrimitiveSceneProxy::~PrimitiveSceneProxy()
 
 }
 
-void PrimitiveSceneProxy::UpdateTransform(const Transform& value)
+void PrimitiveSceneProxy::UpdateMovable()
 {
-	transform = value;
+	transform = myPrimitiveComponent->ComponentTransform;
 }
 
 MeshBatch* PrimitiveSceneProxy::GetMeshBatch() const

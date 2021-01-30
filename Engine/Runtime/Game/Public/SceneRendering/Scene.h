@@ -7,11 +7,10 @@
 
 #include "SceneRendering/MinimalViewInfo.h"
 
-class SceneRenderer;
 class PrimitiveSceneProxy;
 class PrimitiveComponent;
-class SceneVisibility;
 class APlayerController;
+class ShaderCameraConstantVector;
 
 class GAME_API Scene : virtual public Object
 {
@@ -23,6 +22,7 @@ public:
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
 	APlayerController* localPlayer;
+	TRefPtr<ShaderCameraConstantVector> shaderCamConstants;
 
 public:
 	Scene();
@@ -40,4 +40,6 @@ public:
 	std::span<PrimitiveComponent* const> Primitives_get() const;
 	vs_property_get(std::span<PrimitiveSceneProxy* const>, PrimitiveSceneProxies);
 	std::span<PrimitiveSceneProxy* const> PrimitiveSceneProxies_get() const;
+	vs_property_get(ShaderCameraConstantVector*, ShaderCameraConstants);
+	ShaderCameraConstantVector* ShaderCameraConstants_get() const;
 };

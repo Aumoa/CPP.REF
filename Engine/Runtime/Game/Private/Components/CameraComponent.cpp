@@ -22,4 +22,5 @@ void CameraComponent::CalcCameraView(MinimalViewInfo& outViewInfo) const
 	outViewInfo.AspectRatio = aspectRatio;
 	outViewInfo.Location = ComponentLocation;
 	outViewInfo.Rotation = ComponentRotation;
+	outViewInfo.Apply();
 }

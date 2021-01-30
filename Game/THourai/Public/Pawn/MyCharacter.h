@@ -12,9 +12,17 @@ public:
 	using Super = ACharacter;
 	using This = AMyCharacter;
 
+private:
+	Vector3 velocity;
+
 public:
 	AMyCharacter();
 	~AMyCharacter();
 
 	void Tick(Seconds deltaTime) override;
+
+	void SetupPlayerInputComponent(InputComponent* inPlayerInput) override;
+
+private:
+	void MovementKeyPressed(EKey inKey, EKeyEvent inKeyEvent);
 };

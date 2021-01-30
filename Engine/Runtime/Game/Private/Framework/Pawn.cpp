@@ -11,3 +11,8 @@ APawn::~APawn()
 {
 
 }
+
+void APawn::SetupPlayerInputComponent(InputComponent* inPlayerInput)
+{
+
+}

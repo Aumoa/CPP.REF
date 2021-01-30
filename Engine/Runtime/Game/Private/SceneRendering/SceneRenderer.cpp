@@ -15,6 +15,7 @@
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIShaderDescription.h"
 #include "RHI/IRHIShader.h"
+#include "Shaders/ShaderCameraConstant.h"
 #include "Engine.h"
 
 using namespace std;
@@ -26,6 +27,7 @@ SceneRenderer::SceneRenderer(Scene* scene) : Super()
 	, renderScene(scene)
 {
 	ShaderInitialize();
+	scene->ShaderCameraConstants->BeginUpdateConstant();
 }
 
 SceneRenderer::~SceneRenderer()
@@ -41,6 +43,8 @@ void SceneRenderer::CalcVisibility(MinimalViewInfo& inView)
 
 void SceneRenderer::RenderScene(IRHICommandList* immediateCommandList)
 {
+	renderScene->ShaderCameraConstants->EndUpdateConstant();
+
 	SetShader(immediateCommandList);
 
 	for (size_t i = 0; i < visibilities.size(); ++i)
@@ -117,14 +121,21 @@ void SceneRenderer::RenderSceneInternal(IRHICommandList* commandList, const vect
 	span<PrimitiveSceneProxy* const> primitiveSceneProxies = renderScene->PrimitiveSceneProxies;
 	size_t numSceneProxies = primitiveSceneProxies.size();
 
+	CameraConstantIterator cbvIterator = renderScene->ShaderCameraConstants->GetBufferIterator();
+
 	for (size_t i = 0; i < numSceneProxies; ++i)
 	{
 		if (primitiveVisibility[i])
 		{
+			uint64 cbv = cbvIterator.Current();
+
 			PrimitiveSceneProxy* scene = primitiveSceneProxies[i];
 			MeshBatch* batch = scene->GetMeshBatch();
 			const RHIMeshDrawCommand* drawCommand = batch->GetDrawCommand();
+			commandList->SetGraphicsRootConstantBufferView(0, cbv);
 			commandList->DrawMesh(*drawCommand);
+
+			cbvIterator.MoveNext();
 		}
 	}
 }

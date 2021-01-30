@@ -98,6 +98,7 @@ struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, floa
     static Matrix4x4 Multiply(const Matrix4x4& a, const Matrix4x4& b);
     static Matrix4x4 LookTo(const Vector3& location, const Vector3& dir, const Vector3& up);
     static Matrix4x4 AffineTransformation(const Vector3& t, const Vector3& s, const Quaternion& q);
+    static Matrix4x4 PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ);
 
     static Matrix4x4 Identity;
 };

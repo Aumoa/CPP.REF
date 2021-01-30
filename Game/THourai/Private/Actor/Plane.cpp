@@ -1,6 +1,6 @@
 ﻿// Copyright 2020 Aumoa.lib. All right reserved.
 
-#include "Actor/MyTestActor.h"
+#include "Actor/Plane.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SpringArmComponent.h"
@@ -10,7 +10,7 @@
 using namespace std;
 using namespace std::chrono;
 
-AMyTestActor::AMyTestActor() : Super()
+APlane::APlane() : Super()
 	, staticMeshComponent(nullptr)
 
 	, springArm(nullptr)
@@ -19,23 +19,25 @@ AMyTestActor::AMyTestActor() : Super()
 	staticMeshComponent = AddComponent<StaticMeshComponent>();
 	RootComponent = staticMeshComponent;
 
-	RHIVertex vertices[3] =
+	RHIVertex vertices[] =
 	{
-		{ Vector3(0, 0, 1), Color::Red },
-		{ Vector3(0, 1, -1), Color::Green },
-		{ Vector3(0, -1, -1), Color::Blue }
+		{ Vector3(1, -1, -0.5f), Color::Red },
+		{ Vector3(1, 1, -0.5f), Color::Green },
+		{ Vector3(-1, 1, -0.5f), Color::Blue },
+		{ Vector3(-1, -1, -0.5f), Color::White }
 	};
 
-	uint32 indices[3] =
+	uint32 indices[] =
 	{
-		0, 1, 2
+		0, 1, 3,
+		1, 2, 3
 	};
 
 	myStaticMesh = StaticMesh::CreateStaticMesh(vertices, indices);
 	staticMeshComponent->SetStaticMesh(myStaticMesh.Get());
 }
 
-AMyTestActor::~AMyTestActor()
+APlane::~APlane()
 {
 
 }

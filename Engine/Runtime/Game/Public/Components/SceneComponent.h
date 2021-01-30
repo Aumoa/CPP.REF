@@ -8,6 +8,7 @@
 
 #include "Transform.h"
 #include "ComponentTransformSpace.h"
+#include "ComponentMobility.h"
 
 struct LogCategoryBase;
 
@@ -34,6 +35,7 @@ private:
 
 	Transform transform;
 	Transform localToWorld;
+	EComponentMobility mobility;
 
 	SceneAttachment componentAttachment;
 	std::vector<SceneComponent*> childComponents;
@@ -78,4 +80,7 @@ public:
 	Vector3 ComponentScale_get() const;
 	vs_property_get(Quaternion, ComponentRotation);
 	Quaternion ComponentRotation_get() const;
+	vs_property(EComponentMobility, Mobility);
+	EComponentMobility Mobility_get() const;
+	void Mobility_set(EComponentMobility value);
 };

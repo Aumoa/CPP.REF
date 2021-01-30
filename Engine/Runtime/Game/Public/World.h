@@ -53,6 +53,9 @@ private:
 
 	void AddTickGroup(AActor* actor_ptr);
 	void AddSceneProxy(AActor* actor_ptr);
+
+	void OnLoadLevel();
+	void OnUnloadLevel();
 };
 
 #include "World.inl"

@@ -122,6 +122,7 @@ void D3D12CommandList::SetViewports(const RHIViewport& scissorRect)
 void D3D12CommandList::DrawMesh(const RHIMeshDrawCommand& command)
 {
 	ConsumePendingDeferredCommands();
+	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	D3D12_VERTEX_BUFFER_VIEW vbv = { };
 	vbv.BufferLocation = command.VertexBufferVirtualAddress;
@@ -142,6 +143,12 @@ void D3D12CommandList::DrawMesh(const RHIMeshDrawCommand& command)
 	{
 		CommandList->DrawInstanced(command.VertexCount, 1, 0, 0);
 	}
+}
+
+void D3D12CommandList::SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress)
+{
+	ConsumePendingDeferredCommands();
+	CommandList->SetGraphicsRootConstantBufferView(inParamIndex, (D3D12_GPU_VIRTUAL_ADDRESS)inVirtualAddress);
 }
 
 bool D3D12CommandList::HasBegunCommand_get() const

@@ -4,7 +4,6 @@
 
 #include "Engine.h"
 #include "GameViewport.h"
-#include "Logging/EngineLogCategory.h"
 #include "Logging/LogMacros.h"
 #include "Framework/PlayerController.h"
 #include "Framework/Pawn.h"
@@ -62,11 +61,14 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 		outViewInfo.AspectRatio = (float)viewport->ResolutionX / (float)viewport->ResolutionY;
 		outViewInfo.Location = updateTransform.Translation;
 		outViewInfo.Rotation = updateTransform.Rotation;
+		outViewInfo.Apply();
 	}
 }
 
 void PlayerCameraManager::UpdateCameraComponent()
 {
+	pawnCamera = nullptr;
+
 	APlayerController* playerController = GetOwner<APlayerController>();
 	if (playerController == nullptr)
 	{
@@ -87,6 +89,8 @@ void PlayerCameraManager::UpdateCameraComponent()
 		SE_LOG(LogCamera, Verbose, L"Possessed pawn have not a camera component. Using default camera view property.");
 		return;
 	}
+
+	pawnCamera = camera;
 }
 
 void PlayerCameraManager::PrintNoCameraWarning(TRefPtr<String> message) const

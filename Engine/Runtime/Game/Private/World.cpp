@@ -46,6 +46,7 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 	if (currentLevel.IsValid)
 	{
 		currentLevel->UnloadLevel();
+		OnUnloadLevel();
 	}
 
 	currentLevel = loadLevel.Instantiate();
@@ -59,6 +60,7 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 	{
 		currentLevel->world = this;
 		currentLevel->LoadLevel();
+		OnLoadLevel();
 	}
 
 	return currentLevel.Get();
@@ -165,5 +167,27 @@ void World::AddSceneProxy(AActor* actor_ptr)
 		}
 
 		scene->AddScene(item);
+	}
+}
+
+void World::OnLoadLevel()
+{
+	for (size_t i = 0; i < actors.size(); ++i)
+	{
+		if (!actors[i]->HasBegunPlay)
+		{
+			actors[i]->BeginPlay();
+		}
+	}
+}
+
+void World::OnUnloadLevel()
+{
+	for (size_t i = 0; i < actors.size(); ++i)
+	{
+		if (!actors[i]->HasBegunPlay)
+		{
+			actors[i]->EndPlay();
+		}
 	}
 }

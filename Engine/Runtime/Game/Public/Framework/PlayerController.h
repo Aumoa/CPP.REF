@@ -9,6 +9,7 @@
 #include "Diagnostics/ScopedCycleCounter.h"
 
 class PlayerCameraManager;
+class InputComponent;
 
 GAME_API DECLARE_STATS_GROUP(APlayerController);
 
@@ -20,6 +21,8 @@ public:
 
 private:
 	PlayerCameraManager* cameraManager;
+	InputComponent* inputComponent;
+	InputComponent* possessedInputComponent;
 
 public:
 	APlayerController();
@@ -30,6 +33,8 @@ public:
 
 	vs_property_get(PlayerCameraManager*, CameraManager);
 	PlayerCameraManager* CameraManager_get() const;
+	vs_property_get(InputComponent*, PlayerInputComponent);
+	InputComponent* PlayerInputComponent_get() const;
 
 private:
 	void Possessed_ComponentAdded(ActorComponent*);

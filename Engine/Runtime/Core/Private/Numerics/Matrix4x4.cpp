@@ -368,6 +368,14 @@ Matrix4x4 Matrix4x4::AffineTransformation(const Vector3& t, const Vector3& s, co
     return m;
 }
 
+Matrix4x4 Matrix4x4::PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
+{
+    XMMATRIX M = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
 Matrix4x4 Matrix4x4::Identity = Matrix4x4(
     1, 0, 0, 0,
     0, 1, 0, 0,

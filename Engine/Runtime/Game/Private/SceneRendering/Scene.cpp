@@ -3,17 +3,17 @@
 #include "SceneRendering/Scene.h"
 
 #include "Components/PrimitiveComponent.h"
-#include "SceneRendering/SceneRenderer.h"
-#include "SceneRendering/SceneVisibility.h"
 #include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
+#include "Shaders/ShaderCameraConstant.h"
+#include "SceneRendering/PrimitiveSceneProxy.h"
 
 using namespace std;
 
 Scene::Scene() : Super()
 	, localPlayer(nullptr)
 {
-
+	shaderCamConstants = NewObject<ShaderCameraConstantVector>();
 }
 
 Scene::~Scene()
@@ -32,6 +32,7 @@ void Scene::Update()
 		{
 			primitive->ResolveDirtyState();
 			sceneProxy = primitive->GetSceneProxy();
+			sceneProxy->UpdateMovable();
 		}
 	}
 }
@@ -60,4 +61,9 @@ span<PrimitiveComponent* const> Scene::Primitives_get() const
 span<PrimitiveSceneProxy* const> Scene::PrimitiveSceneProxies_get() const
 {
 	return sceneProxies;
+}
+
+ShaderCameraConstantVector* Scene::ShaderCameraConstants_get() const
+{
+	return shaderCamConstants.Get();
 }

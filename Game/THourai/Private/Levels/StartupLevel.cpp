@@ -3,11 +3,13 @@
 #include "Levels/StartupLevel.h"
 
 #include "Actor/MyTestActor.h"
+#include "Actor/Plane.h"
 #include "Pawn/MyCharacter.h"
 
 StartupLevel::StartupLevel() : Super()
 	, persistent_actor(nullptr)
 	, persistent_character(nullptr)
+	, plane(nullptr)
 {
 
 }
@@ -21,6 +23,7 @@ void StartupLevel::LoadLevel()
 {
 	persistent_actor = SpawnActorPersistent<AMyTestActor>();
 	persistent_character = SpawnActorPersistent<AMyCharacter>();
+	plane = SpawnActorPersistent<APlane>();
 }
 
 AMyCharacter* StartupLevel::GetPersistentActor() const

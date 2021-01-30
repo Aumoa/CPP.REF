@@ -8,10 +8,28 @@
 #include "SceneRendering/MinimalViewInfo.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 
+CameraConstantIterator::CameraConstantIterator(size_t size, uint64 virtualAddress, size_t count)
+	: size(size)
+	, virtualAddress(virtualAddress)
+	, seekpos(0)
+	, count(count)
+{
+
+}
+
+bool CameraConstantIterator::MoveNext()
+{
+	seekpos += 1;
+	return seekpos < count;
+}
+
+uint64 CameraConstantIterator::Current() const
+{
+	return virtualAddress + (uint64)(size * seekpos);
+}
+
 ShaderCameraConstantVector::ShaderCameraConstantVector(size_t capacity) : Super()
 	, capacity(0)
-	, mapped_addr(nullptr)
-	, seekpos(0)
 {
 
 }
@@ -21,39 +39,40 @@ ShaderCameraConstantVector::~ShaderCameraConstantVector()
 
 }
 
-void ShaderCameraConstantVector::BeginUpdateConstant(const MinimalViewInfo& viewInfo, size_t primitiveCount)
+void ShaderCameraConstantVector::BeginUpdateConstant()
 {
-	if (primitiveCount == 0)
-	{
-		return;
-	}
+	constants.resize(0);
+}
 
-	size_t newsz = AlignOf(primitiveCount);
+void ShaderCameraConstantVector::AddPrimitive(const MinimalViewInfo& inView, const PrimitiveSceneProxy* inPrimitive)
+{
+	Matrix4x4 w = inPrimitive->GetPrimitiveTransform().Matrix;
+	Matrix4x4 vp = inView.ViewProj;
+
+	ShaderCameraConstant& constant = constants.emplace_back();
+	constant.World = w;
+	constant.ViewProj = vp;
+	constant.WVP = Matrix4x4::Multiply(w, vp);
+}
+
+void ShaderCameraConstantVector::EndUpdateConstant()
+{
+	size_t actSize = sizeof(ShaderCameraConstant) * constants.size();
+
+	size_t newsz = AlignOf(actSize);
 	if (newsz > this->capacity)
 	{
 		constantBuffer = GEngine.DeviceBundle->CreateDynamicConstantBuffer(newsz);
 		this->capacity = newsz;
 	}
 
-	mapped_addr = constantBuffer->GetMappingAddress();
-	seekpos = 0;
-
-	Vector3 dir = viewInfo.Rotation.RotateVector(Vector3::Forward);
-	Vector3 up = viewInfo.Rotation.RotateVector(Vector3::Up);
-	vp = Matrix4x4::LookTo(viewInfo.Location, dir, up);
+	void* ptr = constantBuffer->GetMappingAddress();
+	std::memcpy(ptr, constants.data(), actSize);
 }
 
-void ShaderCameraConstantVector::AddPrimitive(PrimitiveSceneProxy* primitive)
+CameraConstantIterator ShaderCameraConstantVector::GetBufferIterator() const
 {
-	ShaderCameraConstant* mapped_ptr = reinterpret_cast<ShaderCameraConstant*>(mapped_addr) + seekpos++;
-	mapped_ptr->World = primitive->GetPrimitiveTransform().Matrix;
-	mapped_ptr->ViewProj = vp;
-	mapped_ptr->WVP = Matrix4x4::Multiply(mapped_ptr->World, mapped_ptr->ViewProj);
-}
-
-void ShaderCameraConstantVector::EndUpdateConstant()
-{
-	
+	return CameraConstantIterator(sizeof(ShaderCameraConstant), constantBuffer->GetVirtualAddress(), constants.size());
 }
 
 size_t ShaderCameraConstantVector::AlignOf(size_t value)

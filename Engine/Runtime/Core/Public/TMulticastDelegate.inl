@@ -153,6 +153,12 @@ inline void TMulticastDelegate<void(TArgs...)>::Invoke(TArgs... args) const
 }
 
 template<class... TArgs>
+inline size_t TMulticastDelegate<void(TArgs...)>::NumBindings() const
+{
+	return functions.size();
+}
+
+template<class... TArgs>
 inline void TMulticastDelegate<void(TArgs...)>::operator ()(TArgs... args) const
 {
 	for (auto& item : functions)

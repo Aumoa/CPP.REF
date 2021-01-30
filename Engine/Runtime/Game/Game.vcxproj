@@ -279,9 +279,11 @@
     <ClInclude Include="Public\AppDuplicationException.h" />
     <ClInclude Include="Public\Application.h" />
     <ClInclude Include="Public\Assets\AssetManager.h" />
+    <ClInclude Include="Public\ComponentMobility.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\CameraComponent.h" />
     <ClInclude Include="Public\Components\ComponentTransformSpace.h" />
+    <ClInclude Include="Public\Components\InputComponent.h" />
     <ClInclude Include="Public\Components\MeshComponent.h" />
     <ClInclude Include="Public\Components\PlayerCameraManager.h" />
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
@@ -303,6 +305,7 @@
     <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\GameViewport.h" />
     <ClInclude Include="Public\IEngineTick.h" />
+    <ClInclude Include="Public\Key.h" />
     <ClInclude Include="Public\Level.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
@@ -310,6 +313,7 @@
     <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
+    <ClInclude Include="Public\PlatformMisc\PlatformInput.h" />
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\RHI\IRHICommandFence.h" />
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
@@ -362,6 +366,7 @@
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
+    <ClCompile Include="Private\Components\InputComponent.cpp" />
     <ClCompile Include="Private\Components\MeshComponent.cpp" />
     <ClCompile Include="Private\Components\PlayerCameraManager.cpp" />
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
@@ -404,6 +409,7 @@
     <ClCompile Include="Private\Misc\TickScheduler.cpp" />
     <ClCompile Include="Private\Physics\Collision.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />
+    <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />
@@ -414,6 +420,7 @@
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
     <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
+    <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
