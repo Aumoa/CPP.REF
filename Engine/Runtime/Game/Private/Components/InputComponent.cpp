@@ -22,6 +22,7 @@ void InputComponent::TickComponent(Seconds deltaTime)
 	Super::TickComponent(deltaTime);
 
 	UpdateKeyboardState();
+	UpdateCursorState();
 }
 
 void InputComponent::SetOverrideComponent(InputComponent* inDerived)
@@ -68,22 +69,24 @@ auto InputComponent::GetKeyActionBinder(EKey inKey, EKeyEvent inEventType) -> Ke
 	}
 }
 
+auto InputComponent::GetCursorMoveBinder() -> CursorMoveBindDelegate&
+{
+	return cursorBind;
+}
+
 void InputComponent::UpdateKeyboardState()
 {
 	KeyboardState currentKeys = PlatformInput::GetKeyboardState();
 	keyCompare.Compare(keys, currentKeys);
 	keys = move(currentKeys);
 
-	set<EKey> keyProcessed;
-
 	if (overrideComponent != nullptr)
 	{
 		for (auto& keyBind : overrideComponent->keyBinds[0])
 		{
-			if (keyCompare.IsKeyDown(keyBind.first) && keyBind.second.NumBindings() != 0)
+			if (keyCompare.IsKeyDown(keyBind.first))
 			{
 				keyBind.second.Invoke(keyBind.first, EKeyEvent::Pressed);
-				keyProcessed.emplace(keyBind.first);
 			}
 		}
 
@@ -92,14 +95,13 @@ void InputComponent::UpdateKeyboardState()
 			if (keyCompare.IsKeyUp(keyBind.first))
 			{
 				keyBind.second.Invoke(keyBind.first, EKeyEvent::Released);
-				keyProcessed.emplace(keyBind.first);
 			}
 		}
 	}
 
 	for (auto& keyBind : keyBinds[0])
 	{
-		if (keyCompare.IsKeyDown(keyBind.first) && !keyProcessed.contains(keyBind.first))
+		if (keyCompare.IsKeyDown(keyBind.first))
 		{
 			keyBind.second.Invoke(keyBind.first, EKeyEvent::Pressed);
 		}
@@ -107,9 +109,23 @@ void InputComponent::UpdateKeyboardState()
 
 	for (auto& keyBind : keyBinds[1])
 	{
-		if (keyCompare.IsKeyUp(keyBind.first) && !keyProcessed.contains(keyBind.first))
+		if (keyCompare.IsKeyUp(keyBind.first))
 		{
 			keyBind.second.Invoke(keyBind.first, EKeyEvent::Released);
 		}
 	}
+}
+
+void InputComponent::UpdateCursorState()
+{
+	CursorState currentCursor = PlatformInput::GetCursorState();
+	cursorCompare.Compare(cursor, currentCursor);
+	cursor = move(currentCursor);
+
+	if (overrideComponent != nullptr)
+	{
+		overrideComponent->cursorBind.Invoke(cursor, cursorCompare);
+	}
+
+	cursorBind.Invoke(cursor, cursorCompare);
 }

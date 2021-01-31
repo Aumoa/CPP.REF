@@ -5,6 +5,7 @@
 #include "Components/InputComponent.h"
 #include "Components/FloatingPawnMovementComponent.h"
 #include "Components/CameraComponent.h"
+#include "Framework/PlayerController.h"
 
 ASpectatorPawn::ASpectatorPawn() : Super()
 	, bMoveForward(false)
@@ -12,7 +13,12 @@ ASpectatorPawn::ASpectatorPawn() : Super()
 	, bMoveRight(false)
 	, bMoveLeft(false)
 
+	, yaw(0)
+	, pitch(0)
+
 	, movementComponent(nullptr)
+
+	, RotationSpeed(10.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -37,14 +43,15 @@ void ASpectatorPawn::SetupPlayerInputComponent(InputComponent* inPlayerInput)
 {
 	Super::SetupPlayerInputComponent(inPlayerInput);
 
-	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::A, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::A, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::S, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::S, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
-	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerInput);
+	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::A, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::A, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::S, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::S, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
+	inPlayerInput->GetCursorMoveBinder().AddRaw(this, &ASpectatorPawn::HandlePlayerCursorInput);
 }
 
 void ASpectatorPawn::MoveForward(float value)
@@ -61,7 +68,17 @@ void ASpectatorPawn::MoveRight(float value)
 	movementComponent->AddInputVector(myRight * value);
 }
 
-void ASpectatorPawn::HandlePlayerInput(EKey inKey, EKeyEvent inEvent)
+void ASpectatorPawn::AddYawInput(TDegrees<float> input)
+{
+	yaw += input * RotationSpeed;
+}
+
+void ASpectatorPawn::AddPitchInput(TDegrees<float> input)
+{
+	pitch += input * RotationSpeed;
+}
+
+void ASpectatorPawn::HandlePlayerKeyboardInput(EKey inKey, EKeyEvent inEvent)
 {
 	switch (inKey)
 	{
@@ -77,6 +94,17 @@ void ASpectatorPawn::HandlePlayerInput(EKey inKey, EKeyEvent inEvent)
 	case EKey::D:
 		bMoveRight = inEvent == EKeyEvent::Pressed;
 		break;
+	}
+}
+
+void ASpectatorPawn::HandlePlayerCursorInput(const CursorState& inCursorState, const CursorCompare& inCursorDelta)
+{
+	APlayerController* const playerController = GetController<APlayerController>();
+
+	if (playerController != nullptr && playerController->IsCursorLocked)
+	{
+		AddYawInput(inCursorDelta.GetDeltaXByDpi());
+		AddPitchInput(inCursorDelta.GetDeltaYByDpi());
 	}
 }
 
@@ -100,4 +128,28 @@ void ASpectatorPawn::ProcessPlayerInput()
 	{
 		MoveRight(-1.0f);
 	}
+
+	RootComponent->Rotation = ConsumeRotationInput();
+}
+
+Quaternion ASpectatorPawn::ConsumeRotationInput()
+{
+	Quaternion r = Quaternion::Identity;
+	Vector3 right = Vector3::Right;
+
+	yaw = yaw.Normalized;
+	pitch = Math::Clamp(pitch.Value, -89.9f, 89.9f);
+	
+	if (Math::Abs(yaw.Value) > Math::SmallNumber<>)
+	{
+		r = Quaternion::FromAxisAngle(Vector3::Up, yaw);
+		right = r.RotateVector(right);
+	}
+
+	if (Math::Abs(pitch.Value) > Math::SmallNumber<>)
+	{
+		r = Quaternion::Concatenate(r, Quaternion::FromAxisAngle(right, pitch.Value));
+	}
+
+	return r;
 }

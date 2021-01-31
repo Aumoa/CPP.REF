@@ -39,12 +39,14 @@ void AController::Possess(APawn* inPawn)
 
 	possessedPawn = inPawn;
 	OnPossess(inPawn);
+	possessedPawn->PossessedBy(this);
 }
 
 void AController::UnPossess()
 {
 	if (possessedPawn.IsValid)
 	{
+		possessedPawn->UnPossessed();
 		OnUnPossess();
 		possessedPawn = nullptr;
 	}

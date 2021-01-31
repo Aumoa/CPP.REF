@@ -8,7 +8,7 @@
 
 ATHPlayerController::ATHPlayerController()
 {
-
+	bShowMouseCursor = false;
 }
 
 ATHPlayerController::~ATHPlayerController()

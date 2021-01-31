@@ -16,12 +16,16 @@ public:
 	using This = InputComponent;
 
 	using KeyActionBindDelegate = TMulticastDelegate<void(EKey, EKeyEvent)>;
+	using CursorMoveBindDelegate = TMulticastDelegate<void(const CursorState&, const CursorCompare&)>;
 
 private:
 	KeyboardState keys;
 	KeyboardCompare keyCompare;
+	CursorState cursor;
+	CursorCompare cursorCompare;
 
 	std::map<EKey, KeyActionBindDelegate> keyBinds[2];
+	CursorMoveBindDelegate cursorBind;
 	InputComponent* overrideComponent;
 
 public:
@@ -33,7 +37,9 @@ public:
 	void SetOverrideComponent(InputComponent* inDerived);
 
 	KeyActionBindDelegate& GetKeyActionBinder(EKey inKey, EKeyEvent inEventType);
+	CursorMoveBindDelegate& GetCursorMoveBinder();
 
 private:
 	void UpdateKeyboardState();
+	void UpdateCursorState();
 };

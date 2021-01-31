@@ -23,7 +23,7 @@ void APawn::SetupPlayerInputComponent(InputComponent* inPlayerInput)
 
 void APawn::PossessedBy(AController* inNewController)
 {
-	if (myController == nullptr)
+	if (myController != nullptr)
 	{
 		SE_LOG(LogPawn, Error, L"Pawn is already possessed by {0}. Abort.", myController->ToString());
 		return;
@@ -34,7 +34,7 @@ void APawn::PossessedBy(AController* inNewController)
 
 void APawn::UnPossessed()
 {
-
+	myController = nullptr;
 }
 
 AController* APawn::GetController() const

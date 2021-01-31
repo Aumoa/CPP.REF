@@ -7,6 +7,7 @@
 #include "Controller.h"
 
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "Key.h"
 
 class PlayerCameraManager;
 class InputComponent;
@@ -20,6 +21,8 @@ public:
 	using This = APlayerController;
 
 private:
+	bool bAutoUnlocked : 1;
+
 	PlayerCameraManager* cameraManager;
 	InputComponent* inputComponent;
 	InputComponent* possessedInputComponent;
@@ -28,6 +31,8 @@ public:
 	APlayerController();
 	~APlayerController() override;
 
+	void Tick(Seconds deltaTime) override;
+
 	void OnPossess(APawn* inPawn) override;
 	void OnUnPossess() override;
 
@@ -35,7 +40,15 @@ public:
 	PlayerCameraManager* CameraManager_get() const;
 	vs_property_get(InputComponent*, PlayerInputComponent);
 	InputComponent* PlayerInputComponent_get() const;
+	vs_property_get(bool, IsCursorLocked);
+	bool IsCursorLocked_get() const;
+
+	bool bShowMouseCursor : 1;
+	bool bAutoUnlockMouseCursor : 1;
 
 private:
+	void UpdateCursorVisibleState();
+
 	void Possessed_ComponentAdded(ActorComponent*);
+	void AutoUnlockMouseCursor(EKey inKey, EKeyEvent inKeyEvent);
 };

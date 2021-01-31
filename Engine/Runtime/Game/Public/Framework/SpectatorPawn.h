@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "Pawn.h"
 
-#include "Key.h"
+#include "PlatformMisc/PlatformInput.h"
 
 class FloatingPawnMovementComponent;
 
@@ -22,6 +22,9 @@ private:
 	bool bMoveRight : 1;
 	bool bMoveLeft : 1;
 
+	TDegrees<float> yaw;
+	TDegrees<float> pitch;
+
 	FloatingPawnMovementComponent* movementComponent;
 
 public:
@@ -34,8 +37,15 @@ public:
 
 	void MoveForward(float value);
 	void MoveRight(float value);
+	void AddYawInput(TDegrees<float> input);
+	void AddPitchInput(TDegrees<float> input);
+
+	float RotationSpeed;
 
 private:
-	void HandlePlayerInput(EKey inKey, EKeyEvent inEvent);
+	void HandlePlayerKeyboardInput(EKey inKey, EKeyEvent inEvent);
+	void HandlePlayerCursorInput(const CursorState& inCursorState, const CursorCompare& inCursorDelta);
 	void ProcessPlayerInput();
+
+	Quaternion ConsumeRotationInput();
 };
