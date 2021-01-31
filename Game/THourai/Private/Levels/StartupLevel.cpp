@@ -10,6 +10,7 @@ StartupLevel::StartupLevel() : Super()
 	, persistent_actor(nullptr)
 	, persistent_character(nullptr)
 	, plane(nullptr)
+	, spectator(nullptr)
 {
 
 }
@@ -24,9 +25,10 @@ void StartupLevel::LoadLevel()
 	persistent_actor = SpawnActorPersistent<AMyTestActor>();
 	persistent_character = SpawnActorPersistent<AMyCharacter>();
 	plane = SpawnActorPersistent<APlane>();
+	spectator = SpawnActorPersistent<ASpectatorPawn>();
 }
 
-AMyCharacter* StartupLevel::GetPersistentActor() const
+APawn* StartupLevel::GetPersistentActor() const
 {
-	return persistent_character;
+	return spectator;
 }

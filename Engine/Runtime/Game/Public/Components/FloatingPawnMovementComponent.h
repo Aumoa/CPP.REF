@@ -25,7 +25,7 @@ public:
 
 private:
 	void CalcVelocity(Seconds deltaTime);
-	void MoveActor(const Vector3& delta);
+	void MoveActor(Seconds deltaTime);
 
 	Vector3 ConsumePendingInputVectorWithMaxLength(float inMaxLength);
 };

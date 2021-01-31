@@ -151,7 +151,7 @@ bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion&
 	Vector3 relativeLocation;
 	Quaternion relativeRotation;
 
-	if (inSpace == EComponentTransformSpace::World)
+	if (inSpace == EComponentTransformSpace::World && AttachParent != nullptr)
 	{
 		// Transform unit is only calculate from local space.
 		// Therefore, will convert world space unit to local space unit and apply it.

@@ -14,6 +14,8 @@ ASpectatorPawn::ASpectatorPawn() : Super()
 
 	, movementComponent(nullptr)
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	RootComponent = AddComponent<CameraComponent>();
 	movementComponent = AddComponent<FloatingPawnMovementComponent>();
 	movementComponent->UpdatedComponent = RootComponent;

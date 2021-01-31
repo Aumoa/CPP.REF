@@ -4,6 +4,7 @@
 
 #include "Framework/Pawn.h"
 #include "Framework/Controller.h"
+#include "Logging/LogMacros.h"
 
 FloatingPawnMovementComponent::FloatingPawnMovementComponent() : Super()
 	, MaxSpeed(12.0f)
@@ -34,12 +35,7 @@ void FloatingPawnMovementComponent::TickComponent(Seconds deltaTime)
 	CalcVelocity(deltaTime);
 
 	// Get delta of this frame for moving my actor.
-	const Vector3 delta = Velocity * deltaTime.Value;
-
-	if (!delta.NearlyEquals(0.0f, Math::SmallNumber<>))
-	{
-		MoveActor(delta);
-	}
+	MoveActor(deltaTime);
 }
 
 void FloatingPawnMovementComponent::CalcVelocity(Seconds deltaTime)
@@ -83,15 +79,21 @@ void FloatingPawnMovementComponent::CalcVelocity(Seconds deltaTime)
 	Velocity = Velocity.GetClampedToMaxLength(NewMaxSpeed);
 }
 
-void FloatingPawnMovementComponent::MoveActor(const Vector3& delta)
+void FloatingPawnMovementComponent::MoveActor(Seconds deltaTime)
 {
+	Vector3 delta = Velocity * deltaTime.Value;
+	if (delta.NearlyEquals(Vector3::Zero, Math::SmallNumber<>))
+	{
+		return;
+	}
+
 	const Vector3 oldLocation = UpdatedComponent->ComponentLocation;
 	const Quaternion oldRotation = UpdatedComponent->ComponentRotation;
 
 	UpdatedComponent->MoveComponent(delta, oldRotation);
 
 	const Vector3 newLocation = UpdatedComponent->ComponentLocation;
-	Velocity = ((newLocation - oldLocation) / delta);
+	Velocity = ((newLocation - oldLocation) / deltaTime.Value);
 }
 
 Vector3 FloatingPawnMovementComponent::ConsumePendingInputVectorWithMaxLength(float inMaxLength)

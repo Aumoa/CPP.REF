@@ -37,6 +37,11 @@ KeyboardState::~KeyboardState()
 
 bool KeyboardState::HasKeyDown(EKey inKey) const
 {
+	if (states.size() == 0)
+	{
+		return false;
+	}
+
 	size_t keyIdx = (size_t)inKey;
 	if (keyIdx >= states.size())
 	{
@@ -49,6 +54,11 @@ bool KeyboardState::HasKeyDown(EKey inKey) const
 
 bool KeyboardState::HasKeyUp(EKey inKey) const
 {
+	if (states.size() == 0)
+	{
+		return false;
+	}
+
 	size_t keyIdx = (size_t)inKey;
 	if (keyIdx >= states.size())
 	{

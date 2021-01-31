@@ -27,7 +27,7 @@ void ATHPlayerController::BeginPlay()
 		return;
 	}
 
-	AMyCharacter* actor = level->GetPersistentActor();
+	APawn* actor = level->GetPersistentActor();
 	Possess(actor);
 }
 
