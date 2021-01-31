@@ -1,11 +1,11 @@
 ﻿// Copyright 2020 Aumoa.lib. All right reserved.
 
-#include "Components/FloatingPawnMovement.h"
+#include "Components/FloatingPawnMovementComponent.h"
 
 #include "Framework/Pawn.h"
 #include "Framework/Controller.h"
 
-FloatingPawnMovement::FloatingPawnMovement() : Super()
+FloatingPawnMovementComponent::FloatingPawnMovementComponent() : Super()
 	, MaxSpeed(12.0f)
 	, Acceleration(40.0f)
 	, Deceleration(80.0f)
@@ -14,12 +14,12 @@ FloatingPawnMovement::FloatingPawnMovement() : Super()
 
 }
 
-FloatingPawnMovement::~FloatingPawnMovement()
+FloatingPawnMovementComponent::~FloatingPawnMovementComponent()
 {
 
 }
 
-void FloatingPawnMovement::TickComponent(Seconds deltaTime)
+void FloatingPawnMovementComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
 
@@ -42,7 +42,7 @@ void FloatingPawnMovement::TickComponent(Seconds deltaTime)
 	}
 }
 
-void FloatingPawnMovement::CalcVelocity(Seconds deltaTime)
+void FloatingPawnMovementComponent::CalcVelocity(Seconds deltaTime)
 {
 	Vector3 ControlAcceleration = ConsumePendingInputVectorWithMaxLength(1.0f);
 
@@ -83,7 +83,7 @@ void FloatingPawnMovement::CalcVelocity(Seconds deltaTime)
 	Velocity = Velocity.GetClampedToMaxLength(NewMaxSpeed);
 }
 
-void FloatingPawnMovement::MoveActor(const Vector3& delta)
+void FloatingPawnMovementComponent::MoveActor(const Vector3& delta)
 {
 	const Vector3 oldLocation = UpdatedComponent->ComponentLocation;
 	const Quaternion oldRotation = UpdatedComponent->ComponentRotation;
@@ -94,7 +94,7 @@ void FloatingPawnMovement::MoveActor(const Vector3& delta)
 	Velocity = ((newLocation - oldLocation) / delta);
 }
 
-Vector3 FloatingPawnMovement::ConsumePendingInputVectorWithMaxLength(float inMaxLength)
+Vector3 FloatingPawnMovementComponent::ConsumePendingInputVectorWithMaxLength(float inMaxLength)
 {
 	Vector3 pendingInput = ConsumePendingInputVector();
 	if (float length = pendingInput.Length; length > 1.0f)

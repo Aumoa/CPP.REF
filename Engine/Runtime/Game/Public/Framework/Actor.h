@@ -72,7 +72,6 @@ public:
 	World* GetWorld() const;
 	void SetWorld(World* inWorld);
 	Transform GetActorTransform() const;
-	void SetActorTransform(const Transform& value);
 
 	vs_property(SceneComponent*, RootComponent);
 	SceneComponent* RootComponent_get() const;

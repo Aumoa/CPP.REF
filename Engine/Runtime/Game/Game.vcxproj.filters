@@ -405,7 +405,10 @@
     <ClInclude Include="Public\Components\PawnMovementComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Components\FloatingPawnMovement.h">
+    <ClInclude Include="Public\Framework\SpectatorPawn.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
   </ItemGroup>
@@ -635,7 +638,10 @@
     <ClCompile Include="Private\Components\PawnMovementComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Components\FloatingPawnMovement.cpp">
+    <ClCompile Include="Private\Framework\SpectatorPawn.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
   </ItemGroup>

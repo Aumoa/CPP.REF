@@ -284,7 +284,7 @@
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\CameraComponent.h" />
     <ClInclude Include="Public\Components\ComponentTransformSpace.h" />
-    <ClInclude Include="Public\Components\FloatingPawnMovement.h" />
+    <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h" />
     <ClInclude Include="Public\Components\InputComponent.h" />
     <ClInclude Include="Public\Components\MeshComponent.h" />
     <ClInclude Include="Public\Components\MovementComponent.h" />
@@ -303,6 +303,7 @@
     <ClInclude Include="Public\Framework\Pawn.h" />
     <ClInclude Include="Public\Framework\Controller.h" />
     <ClInclude Include="Public\Framework\PlayerController.h" />
+    <ClInclude Include="Public\Framework\SpectatorPawn.h" />
     <ClInclude Include="Public\Framework\StaticMeshActor.h" />
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
@@ -372,7 +373,7 @@
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
-    <ClCompile Include="Private\Components\FloatingPawnMovement.cpp" />
+    <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp" />
     <ClCompile Include="Private\Components\InputComponent.cpp" />
     <ClCompile Include="Private\Components\MeshComponent.cpp" />
     <ClCompile Include="Private\Components\MovementComponent.cpp" />
@@ -409,6 +410,7 @@
     <ClCompile Include="Private\Framework\Info.cpp" />
     <ClCompile Include="Private\Framework\Pawn.cpp" />
     <ClCompile Include="Private\Framework\PlayerController.cpp" />
+    <ClCompile Include="Private\Framework\SpectatorPawn.cpp" />
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\GameViewport.cpp" />
