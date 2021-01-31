@@ -41,6 +41,8 @@ struct CORE_API Vector3 : public TNumericsBasicOperator<Vector3, float, float, f
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
 
+	Vector3 GetClampedToMaxLength(float inMaxLength) const;
+
 	vs_property_get(float, LengthSq);
 	float LengthSq_get() const;
 	vs_property_get(float, Length);

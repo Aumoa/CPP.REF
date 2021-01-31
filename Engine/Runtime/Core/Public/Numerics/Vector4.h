@@ -41,6 +41,8 @@ struct CORE_API Vector4 : public TNumericsBasicOperator<Vector4, float, float, f
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
 
+	Vector4 GetClampedToMaxLength(float inMaxLength) const;
+
 	vs_property_get(float, LengthSq);
 	float LengthSq_get() const;
 	vs_property_get(float, Length);
@@ -71,6 +73,8 @@ struct CORE_API Vector4 : public TNumericsBasicOperator<Vector4, float, float, f
 	static float DotProduct(const Vector4& left, const Vector4& right);
 	static Vector4 Min(const Vector4& lh, const Vector4& rh);
 	static Vector4 Max(const Vector4& lh, const Vector4& rh);
+
+	static Vector4 Zero;
 };
 #pragma pack(pop)
 

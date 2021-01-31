@@ -91,6 +91,27 @@ size_t Vector4::Count_get() const
 	return 4;
 }
 
+Vector4 Vector4::GetClampedToMaxLength(float inMaxLength) const
+{
+	if (inMaxLength < Math::SmallNumber<>)
+	{
+		return Vector4::Zero;
+	}
+
+	const float VSq = LengthSq;
+	// If vector length is over than max length,
+	// clamp it to max length.
+	if (VSq > Math::Square(inMaxLength))
+	{
+		float scale = inMaxLength * Math::InvSqrt(VSq);
+		return *this * scale;
+	}
+	else
+	{
+		return *this;
+	}
+}
+
 float Vector4::LengthSq_get() const
 {
 	return X * X + Y * Y + Z * Z + W * W;
@@ -248,3 +269,5 @@ Vector4 operator /(float left, const Vector4& right)
 {
 	return Vector4(left) / right;
 }
+
+Vector4 Vector4::Zero = Vector4(0, 0, 0, 0);

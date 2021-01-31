@@ -1,4 +1,5 @@
-﻿// Copyright 2020 Aumoa.lib. All right reserved.
+﻿
+// Copyright 2020 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -46,6 +47,7 @@ public:
 	CORE_API static TRadians<float> Atan(float value);
 	CORE_API static TRadians<float> Atan2(float y, float x);
 	CORE_API static std::pair<float, float> SinCos(TRadians<float> value);
+	CORE_API static float InvSqrt(float x);
 
 	template<class T>
 	inline static constexpr T Lerp(const T& left, const T& right, float t);
@@ -83,6 +85,8 @@ public:
 	inline static constexpr const T HalfPI = PI<T> / (T)2;
 	template<class T = float>
 	inline static constexpr const T InvPI = (T)1 / PI<T>;
+	template<class T = float>
+	inline static constexpr const T SmallNumber = (T)1.e-4;
 };
 
 #include "Math.inl"

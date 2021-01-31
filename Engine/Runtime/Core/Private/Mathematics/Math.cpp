@@ -86,3 +86,14 @@ pair<float, float> Math::SinCos(TRadians<float> value)
 
 	return { sin, cos };
 }
+
+float Math::InvSqrt(float x)
+{
+	constexpr int32 LogExp = 0x5F3759DF;
+
+	int32 i = LogExp - ((int32&)x >> 1);
+	float ret = (float&)i;
+
+	ret = ret * (1.5f - (x * 0.5f * ret * ret));
+	return ret;
+}

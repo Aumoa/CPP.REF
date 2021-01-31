@@ -1,4 +1,5 @@
-﻿// Copyright 2020 Aumoa.lib. All right reserved.
+﻿
+// Copyright 2020 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -36,6 +37,8 @@ struct CORE_API Vector2 : public TNumericsBasicOperator<Vector2, float, float>
 
 	vs_property_get(size_t, Count);
 	size_t Count_get() const;
+
+	Vector2 GetClampedToMaxLength(float inMaxLength) const;
 
 	vs_property_get(float, LengthSq);
 	float LengthSq_get() const;

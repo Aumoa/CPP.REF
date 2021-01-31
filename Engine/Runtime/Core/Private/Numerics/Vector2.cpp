@@ -78,6 +78,27 @@ size_t Vector2::Count_get() const
 	return 2;
 }
 
+Vector2 Vector2::GetClampedToMaxLength(float inMaxLength) const
+{
+	if (inMaxLength < Math::SmallNumber<>)
+	{
+		return Vector2::Zero;
+	}
+
+	const float VSq = LengthSq;
+	// If vector length is over than max length,
+	// clamp it to max length.
+	if (VSq > Math::Square(inMaxLength))
+	{
+		float scale = inMaxLength * Math::InvSqrt(VSq);
+		return *this * scale;
+	}
+	else
+	{
+		return *this;
+	}
+}
+
 float Vector2::LengthSq_get() const
 {
 	return X * X + Y * Y;
