@@ -8,6 +8,7 @@
 interface IRHIRenderTargetView;
 interface IRHIResource;
 interface IRHIShader;
+interface IRHIDepthStencilView;
 enum class ERHIResourceStates;
 enum class ERHIPrimitiveTopology;
 struct RHIViewport;
@@ -18,7 +19,7 @@ interface IRHICommandList : virtual public Object
 	virtual void BeginCommand() = 0;
 	virtual void EndCommand() = 0;
 
-	virtual void SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]) = 0;
+	virtual void SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[], IRHIDepthStencilView* dsv) = 0;
 	virtual void ClearRenderTargetView(IRHIRenderTargetView* rtv) = 0;
 	virtual void ResourceTransition(IRHIResource* resource, ERHIResourceStates beforeState, ERHIResourceStates afterState, size_t subresourceIndex = 0) = 0;
 	virtual void CopyResource(IRHIResource* target, IRHIResource* source) = 0;
@@ -28,6 +29,7 @@ interface IRHICommandList : virtual public Object
 	virtual void SetViewports(const RHIViewport& viewport) = 0;
 	virtual void DrawMesh(const RHIMeshDrawCommand& command) = 0;
 	virtual void SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
+	virtual void ClearDepthStencilView(IRHIDepthStencilView* dsv, std::optional<float> depth, std::optional<uint8> stencil) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

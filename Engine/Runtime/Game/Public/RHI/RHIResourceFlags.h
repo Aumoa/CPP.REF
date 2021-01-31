@@ -8,7 +8,8 @@
 enum class ERHIResourceFlags
 {
 	None = 0,
-	AllowRenderTarget = 0b1
+	AllowRenderTarget = 0b1,
+	AllowDepthStencil = 0b10
 };
 
 inline ERHIResourceFlags operator |(ERHIResourceFlags lh, ERHIResourceFlags rh)

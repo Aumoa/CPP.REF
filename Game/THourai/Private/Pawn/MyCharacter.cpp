@@ -8,6 +8,11 @@
 
 AMyCharacter::AMyCharacter()
 	: velocity(Vector3::Zero)
+
+	, bWKeyDown(false)
+	, bSKeyDown(false)
+	, bAKeyDown(false)
+	, bDKeyDown(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -29,6 +34,8 @@ void AMyCharacter::Tick(Seconds deltaTime)
 {
 	Super::Tick(deltaTime);
 
+	UpdateMovement();
+
 	Vector3 delta = velocity * deltaTime.Value;
 	RootComponent->Location += delta;
 }
@@ -45,28 +52,51 @@ void AMyCharacter::SetupPlayerInputComponent(InputComponent* inPlayerInput)
 	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Released).AddRaw(this, &AMyCharacter::MovementKeyPressed);
 }
 
+void AMyCharacter::UpdateMovement()
+{
+	velocity = 0;
+
+	if (bWKeyDown)
+	{
+		velocity.X += 1.0f;
+	}
+	if (bSKeyDown)
+	{
+		velocity.X -= 1.0f;
+	}
+	if (bAKeyDown)
+	{
+		velocity.Y -= 1.0f;
+	}
+	if (bDKeyDown)
+	{
+		velocity.Y += 1.0f;
+	}
+
+	float speed = 1.0f;
+	velocity *= speed;
+}
+
 void AMyCharacter::MovementKeyPressed(EKey inKey, EKeyEvent inKeyEvent)
 {
-	auto GetSpeed = [inKeyEvent]()
+	auto UpdateKey = [inKeyEvent]()
 	{
-		return inKeyEvent == EKeyEvent::Pressed ? 1.0f : 0.0f;
+		return inKeyEvent == EKeyEvent::Pressed;
 	};
-
-	TH_LOG(LogTH, Verbose, L"speed: {0}", GetSpeed());
 
 	switch (inKey)
 	{
 	case EKey::W:
-		velocity.X = GetSpeed();
+		bWKeyDown = UpdateKey();
 		break;
 	case EKey::A:
-		velocity.Y = -GetSpeed();
+		bAKeyDown = UpdateKey();
 		break;
 	case EKey::S:
-		velocity.X = -GetSpeed();
+		bSKeyDown = UpdateKey();
 		break;
 	case EKey::D:
-		velocity.Y = GetSpeed();
+		bDKeyDown = UpdateKey();
 		break;
 	}
 }

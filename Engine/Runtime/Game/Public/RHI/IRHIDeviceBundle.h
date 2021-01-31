@@ -7,6 +7,7 @@
 #include "IRHIBundle.h"
 
 #include <span>
+#include "RHITextureFormat.h"
 
 interface IRHISwapChain;
 interface IRHIImmediateCommandList;
@@ -16,8 +17,8 @@ interface IRHIResource;
 interface IRHIDeferredCommandList;
 interface IRHIFence;
 interface IRHIShader;
+interface IRHIDepthStencilView;
 
-enum class ERHITextureFormat;
 enum class ERHIResourceFlags;
 enum class ERHIResourceStates;
 
@@ -35,6 +36,7 @@ interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 
 	virtual TRefPtr<IRHICommandFence> CreateCommandFence() = 0;
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
+	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat = ERHITextureFormat::Unknown) = 0;
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags) = 0;
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	virtual TRefPtr<IRHIFence> CreateFence() = 0;

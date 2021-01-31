@@ -7,8 +7,6 @@
 
 #include "D3D12Minimal.h"
 #include <mutex>
-#include <queue>
-#include <vector>
 
 struct D3D12DescriptorIndex;
 

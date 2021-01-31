@@ -2,7 +2,6 @@
 
 #include "D3D12Shader.h"
 
-#include <map>
 #include "Shaders/Compiled/VertexShader.hlsl.h"
 #include "Shaders/Compiled/PixelShader.hlsl.h"
 
@@ -70,7 +69,7 @@ void D3D12Shader::CreateShaderPipeline(TRefPtr<String> name, ID3D12Device* devic
 	pipelineDesc.PS = { pixelShaderBytecode.data(), (uint32)pixelShaderBytecode.size() };
 	pipelineDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 	pipelineDesc.SampleMask = 0xFFFFFFFF;
-	pipelineDesc.RasterizerState = { D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_NONE };
+	pipelineDesc.RasterizerState = { D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_BACK };
 	pipelineDesc.InputLayout = { inputElements, ARRAYSIZE(inputElements) };
 	pipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineDesc.NumRenderTargets = 1;

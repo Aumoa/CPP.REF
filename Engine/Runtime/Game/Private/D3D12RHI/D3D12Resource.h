@@ -7,6 +7,7 @@
 #include "RHI/IRHIResource.h"
 
 #include "D3D12Minimal.h"
+#include "RHI/RHIResourceDesc.h"
 
 class D3D12Resource : virtual public Object, virtual public IRHIResource
 {
@@ -17,6 +18,7 @@ public:
 private:
 	ComPtr<ID3D12Resource> resource;
 	void* mappingAddr;
+	RHIResourceDesc desc;
 
 public:
 	D3D12Resource(ID3D12Resource* resource);
@@ -24,6 +26,7 @@ public:
 
 	virtual uint64 GetVirtualAddress() const;
 	virtual void* GetMappingAddress() const;
+	virtual RHIResourceDesc GetDesc() const;
 
 	void BindMappingAddress();
 

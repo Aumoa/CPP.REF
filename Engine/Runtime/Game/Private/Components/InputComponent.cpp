@@ -2,7 +2,6 @@
 
 #include "Components/InputComponent.h"
 
-#include <set>
 #include "Logging/LogMacros.h"
 
 using namespace std;

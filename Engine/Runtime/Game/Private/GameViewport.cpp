@@ -11,6 +11,7 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHICommandList.h"
 #include "RHI/RHIViewport.h"
+#include "RHI/IRHIDepthStencilView.h"
 
 GameViewport::GameViewport() : Super()
 	, resX(0)
@@ -29,7 +30,7 @@ void GameViewport::BeginRender(IRHICommandList* immediateCommandList)
 	IRHIRenderTargetView* rtvs[] = { renderTargetView.Get() };
 
 	immediateCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::COPY_SOURCE, ERHIResourceStates::RENDER_TARGET);
-	immediateCommandList->SetRenderTargets(1, rtvs);
+	immediateCommandList->SetRenderTargets(1, rtvs, depthStencilView.Get());
 	immediateCommandList->SetViewports(RHIViewport(resX, resY));
 	immediateCommandList->SetScissorRects(Rect(0.0f, Vector2((float)resX, (float)resY)));
 
@@ -69,7 +70,19 @@ void GameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 		ERHIResourceFlags::AllowRenderTarget
 	);
 
+	depthStencilBuffer = GEngine.DeviceBundle->CreateTexture2D(
+		ERHITextureFormat::D24_UNORM_S8_UINT,
+		resX,
+		resY,
+		ERHIResourceStates::DEPTH_WRITE,
+		ERHIResourceFlags::AllowDepthStencil
+	);
+
 	renderTargetView = GEngine.DeviceBundle->CreateRenderTargetView(
 		renderTarget.Get()
+	);
+
+	depthStencilView = GEngine.DeviceBundle->CreateDepthStencilView(
+		depthStencilBuffer.Get()
 	);
 }

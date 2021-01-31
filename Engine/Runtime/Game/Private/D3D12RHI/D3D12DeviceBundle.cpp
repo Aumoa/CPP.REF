@@ -15,6 +15,7 @@
 #include "D3D12DeferredCommandList.h"
 #include "D3D12Shader.h"
 #include "D3D12Fence.h"
+#include "D3D12DepthStencilView.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
@@ -102,6 +103,23 @@ TRefPtr<IRHIRenderTargetView> D3D12DeviceBundle::CreateRenderTargetView(IRHIReso
 	D3D12OfflineDescriptorIndex index = rtvManager->Alloc();
 	d3d12Device->CreateRenderTargetView(resource1, nullptr, index.Handle);
 	return NewObject<D3D12RenderTargetView>(resource1, index);
+}
+
+TRefPtr<IRHIDepthStencilView> D3D12DeviceBundle::CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat)
+{
+	if (inViewFormat == ERHITextureFormat::Unknown)
+	{
+		inViewFormat = resource->GetDesc().Format;
+	}
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{ };
+	dsvDesc.Format = (DXGI_FORMAT)inViewFormat;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+	ID3D12Resource* resource1 = Cast<D3D12Resource>(resource)->Resource;
+	D3D12OfflineDescriptorIndex index = dsvManager->Alloc();
+	d3d12Device->CreateDepthStencilView(resource1, &dsvDesc, index.Handle);
+	return NewObject<D3D12DepthStencilView>(resource1, index);
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags)
@@ -267,7 +285,7 @@ void D3D12DeviceBundle::InitializeD3D12()
 	this->swapChain = NewObject<D3D12SwapChain>(swapChain4.Get());
 
 	rtvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
-	dsvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
+	dsvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, OfflineDescriptorAllocUnit);
 }
 
 bool D3D12DeviceBundle::IsAdapterSuitable(IDXGIAdapter1* adapter) const

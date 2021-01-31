@@ -10,4 +10,5 @@ enum class ERHITextureFormat
 	Unknown,
 	R8G8B8A8_UNORM = 28,
 	B8G8R8A8_UNORM = 87,
+	D24_UNORM_S8_UINT = 45,
 };

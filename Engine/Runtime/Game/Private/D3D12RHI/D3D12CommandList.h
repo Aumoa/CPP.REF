@@ -24,7 +24,7 @@ public:
 	virtual void BeginCommand();
 	virtual void EndCommand();
 
-	virtual void SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[]);
+	virtual void SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[], IRHIDepthStencilView* dsv);
 	virtual void ClearRenderTargetView(IRHIRenderTargetView* rtv);
 	virtual void ResourceTransition(IRHIResource* resource, ERHIResourceStates beforeState, ERHIResourceStates afterState, size_t subresourceIndex = 0);
 	virtual void CopyResource(IRHIResource* target, IRHIResource* source);
@@ -34,6 +34,7 @@ public:
 	virtual void SetViewports(const RHIViewport& viewport);
 	virtual void DrawMesh(const RHIMeshDrawCommand& command);
 	virtual void SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress);
+	virtual void ClearDepthStencilView(IRHIDepthStencilView* dsv, std::optional<float> depth, std::optional<uint8> stencil);
 
 	virtual bool HasBegunCommand_get() const;
 

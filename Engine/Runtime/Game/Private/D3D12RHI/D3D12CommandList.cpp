@@ -5,6 +5,7 @@
 #include "D3D12RenderTargetView.h"
 #include "D3D12Resource.h"
 #include "D3D12Shader.h"
+#include "D3D12DepthStencilView.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
 
@@ -33,18 +34,24 @@ void D3D12CommandList::EndCommand()
 	bHasBegunCommand = false;
 }
 
-void D3D12CommandList::SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[])
+void D3D12CommandList::SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[], IRHIDepthStencilView* dsv)
 {
 	ConsumePendingDeferredCommands();
 
 	vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(count);
 	for (size_t i = 0; i < count; ++i)
 	{
-		auto rtv_cast = dynamic_cast<D3D12RenderTargetView*>(rtv[i]);
+		auto rtv_cast = Cast<D3D12RenderTargetView>(rtv[i]);
 		handles[i] = rtv_cast->Handle;
 	}
 
-	CommandList->OMSetRenderTargets((UINT)count, handles.data(), FALSE, nullptr);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+	if (dsv != nullptr)
+	{
+		dsvHandle = Cast<D3D12DepthStencilView>(dsv)->Handle;
+	}
+
+	CommandList->OMSetRenderTargets((UINT)count, handles.data(), FALSE, dsv == nullptr ? nullptr : &dsvHandle);
 }
 
 void D3D12CommandList::ClearRenderTargetView(IRHIRenderTargetView* rtv)
@@ -151,6 +158,18 @@ void D3D12CommandList::SetGraphicsRootConstantBufferView(uint32 inParamIndex, ui
 	CommandList->SetGraphicsRootConstantBufferView(inParamIndex, (D3D12_GPU_VIRTUAL_ADDRESS)inVirtualAddress);
 }
 
+void D3D12CommandList::ClearDepthStencilView(IRHIDepthStencilView* dsv, optional<float> depth, optional<uint8> stencil)
+{
+	ConsumePendingDeferredCommands();
+	
+	uint32 flags = depth.has_value() ? D3D12_CLEAR_FLAG_DEPTH : 0;
+	flags |= stencil.has_value() ? D3D12_CLEAR_FLAG_STENCIL : 0;
+
+	constexpr FLOAT ClearColor[4] = { 0, 0, 0, 0 };
+	auto rtv_cast = Cast<D3D12DepthStencilView>(dsv);
+	CommandList->ClearDepthStencilView(rtv_cast->Handle, (D3D12_CLEAR_FLAGS)flags, depth.value_or(1.0f), stencil.value_or(0), 0, nullptr);
+}
+
 bool D3D12CommandList::HasBegunCommand_get() const
 {
 	return bHasBegunCommand;
@@ -158,6 +177,11 @@ bool D3D12CommandList::HasBegunCommand_get() const
 
 void D3D12CommandList::ConsumePendingDeferredCommands()
 {
+	if (pendingBarriers.empty())
+	{
+		return;
+	}
+
 	{
 		vector<D3D12_RESOURCE_BARRIER> barrier_swap;
 		swap(barrier_swap, pendingBarriers);

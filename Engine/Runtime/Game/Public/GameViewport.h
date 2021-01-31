@@ -8,6 +8,7 @@
 interface IRHIResource;
 interface IRHIRenderTargetView;
 interface IRHICommandList;
+interface IRHIDepthStencilView;
 
 class GAME_API GameViewport : virtual public Object
 {
@@ -21,7 +22,9 @@ private:
 	int32 resX;
 	int32 resY;
 	TRefPtr<IRHIResource> renderTarget;
+	TRefPtr<IRHIResource> depthStencilBuffer;
 	TRefPtr<IRHIRenderTargetView> renderTargetView;
+	TRefPtr<IRHIDepthStencilView> depthStencilView;
 
 public:
 	GameViewport();

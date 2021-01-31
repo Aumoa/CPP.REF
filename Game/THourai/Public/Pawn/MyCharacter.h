@@ -15,6 +15,11 @@ public:
 private:
 	Vector3 velocity;
 
+	bool bWKeyDown : 1;
+	bool bSKeyDown : 1;
+	bool bAKeyDown : 1;
+	bool bDKeyDown : 1;
+
 public:
 	AMyCharacter();
 	~AMyCharacter();
@@ -24,5 +29,6 @@ public:
 	void SetupPlayerInputComponent(InputComponent* inPlayerInput) override;
 
 private:
+	void UpdateMovement();
 	void MovementKeyPressed(EKey inKey, EKeyEvent inKeyEvent);
 };

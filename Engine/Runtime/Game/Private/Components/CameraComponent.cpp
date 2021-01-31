@@ -5,7 +5,7 @@
 #include "SceneRendering/MinimalViewInfo.h"
 
 CameraComponent::CameraComponent() : Super()
-	, aspectRatio(1.0f)
+	, aspectRatio(0.0f)
 	, fov(0.25f * 3.14f)
 {
 
@@ -22,5 +22,4 @@ void CameraComponent::CalcCameraView(MinimalViewInfo& outViewInfo) const
 	outViewInfo.AspectRatio = aspectRatio;
 	outViewInfo.Location = ComponentLocation;
 	outViewInfo.Rotation = ComponentRotation;
-	outViewInfo.Apply();
 }

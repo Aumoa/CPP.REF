@@ -8,6 +8,7 @@
 #include "TRefPtr.h"
 #include "TMulticastDelegate.h"
 #include "UniqueType.h"
+#include "StdContainers.h"
 
 #include "Exception.h"
 #include "InvalidCastException.h"

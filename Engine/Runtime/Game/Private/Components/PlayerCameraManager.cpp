@@ -31,6 +31,14 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 	{
 		bPrintNoCameraWarning = true;
 		pawnCamera->CalcCameraView(outViewInfo);
+
+		if (outViewInfo.AspectRatio == 0.0f)
+		{
+			GameViewport* vp = GEngine.GetGameViewport();
+			outViewInfo.AspectRatio = vp->ResolutionX / (float)vp->ResolutionY;
+		}
+
+		outViewInfo.Apply();
 	}
 	else
 	{

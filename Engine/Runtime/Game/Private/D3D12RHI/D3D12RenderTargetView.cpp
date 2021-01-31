@@ -8,8 +8,7 @@
 D3D12RenderTargetView::D3D12RenderTargetView(ID3D12Resource* resource, const D3D12DescriptorIndex& handle) : Super()
 	, handle(handle)
 {
-	auto device = dynamic_cast<D3D12DeviceBundle*>(GEngine.DeviceBundle)->Device;
-	device->CreateRenderTargetView(resource, nullptr, handle.Handle);
+
 }
 
 D3D12RenderTargetView::~D3D12RenderTargetView()

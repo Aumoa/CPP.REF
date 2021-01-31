@@ -6,8 +6,6 @@
 #include "CoreMinimal.h"
 #include "D3D12DescriptorIndex.h"
 
-#include <list>
-
 class D3D12DescriptorAllocator;
 
 struct D3D12OfflineDescriptorIndex : public D3D12DescriptorIndex
