@@ -21,14 +21,16 @@ APlane::APlane() : Super()
 
 	RHIVertex vertices[] =
 	{
-		{ Vector3(1, 0, 0), Color::Red },
-		{ Vector3(0, 1, -2), Color::Green },
-		{ Vector3(0, -1, -2), Color::Blue }
+		{ Vector3(1, -1, -1), Color::Red },
+		{ Vector3(1, 1, -1), Color::Green },
+		{ Vector3(-1, 1, -1), Color::Blue },
+		{ Vector3(-1, -1, -1), Color::White }
 	};
 
 	uint32 indices[] =
 	{
-		0, 1, 2
+		0, 1, 2,
+		0, 2, 3
 	};
 
 	myStaticMesh = StaticMesh::CreateStaticMesh(vertices, indices);

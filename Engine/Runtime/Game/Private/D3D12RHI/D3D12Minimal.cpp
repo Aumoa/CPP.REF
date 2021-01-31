@@ -36,5 +36,11 @@ RHIClass ToD3D12(D3D12Class value)\
 
 bool IsDepthStencilFormat(ERHITextureFormat value)
 {
+	switch (value)
+	{
+	case ERHITextureFormat::D24_UNORM_S8_UINT:
+		return true;
+	}
+
 	return false;
 }

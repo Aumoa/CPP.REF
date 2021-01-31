@@ -13,6 +13,8 @@
 #include "RHI/RHIViewport.h"
 #include "RHI/IRHIDepthStencilView.h"
 
+using namespace std;
+
 GameViewport::GameViewport() : Super()
 	, resX(0)
 	, resY(0)
@@ -35,6 +37,7 @@ void GameViewport::BeginRender(IRHICommandList* immediateCommandList)
 	immediateCommandList->SetScissorRects(Rect(0.0f, Vector2((float)resX, (float)resY)));
 
 	immediateCommandList->ClearRenderTargetView(renderTargetView.Get());
+	immediateCommandList->ClearDepthStencilView(depthStencilView.Get(), 1.0f, 0);
 }
 
 void GameViewport::EndRender(IRHICommandList* immediateCommandList)

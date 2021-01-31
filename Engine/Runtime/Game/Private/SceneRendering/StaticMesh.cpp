@@ -26,28 +26,7 @@ const RHIMeshDrawCommand* StaticMeshBatch::GetDrawCommand() const
 
 StaticMesh::StaticMesh() : Super()
 {
-	RHIVertex vertices[3] =
-	{
-		{ Vector3(0, 1, 0), Color::Red },
-		{ Vector3(1, -1, 0), Color::Green },
-		{ Vector3(-1, -1, 0), Color::Blue }
-	};
 
-	uint32 indices[3] =
-	{
-		0, 1, 2
-	};
-
-	vertexBuffer = GEngine.DeviceBundle->CreateVertexBuffer(vertices);
-	indexBuffer = GEngine.DeviceBundle->CreateIndexBuffer(indices);
-
-	RHIMeshDrawCommand command;
-	command.VertexBufferVirtualAddress = vertexBuffer->GetVirtualAddress();
-	command.VertexCount = 3;
-	command.VertexStride = sizeof(RHIVertex);
-	command.IndexBufferVirtualAddress = indexBuffer->GetVirtualAddress();
-	command.IndexCount = 3;
-	meshBatch = NewObject<StaticMeshBatch>(command);
 }
 
 StaticMesh::~StaticMesh()
@@ -69,10 +48,10 @@ TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<
 
 	RHIMeshDrawCommand command;
 	command.VertexBufferVirtualAddress = staticMesh->vertexBuffer->GetVirtualAddress();
-	command.VertexCount = 3;
+	command.VertexCount = (uint32)vertices.size();
 	command.VertexStride = sizeof(RHIVertex);
 	command.IndexBufferVirtualAddress = staticMesh->indexBuffer->GetVirtualAddress();
-	command.IndexCount = 3;
+	command.IndexCount = (uint32)indices.size();
 	staticMesh->meshBatch = NewObject<StaticMeshBatch>(command);
 
 	return staticMesh;

@@ -70,11 +70,12 @@ void D3D12Shader::CreateShaderPipeline(TRefPtr<String> name, ID3D12Device* devic
 	pipelineDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 	pipelineDesc.SampleMask = 0xFFFFFFFF;
 	pipelineDesc.RasterizerState = { D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_BACK };
+	pipelineDesc.DepthStencilState = { TRUE, D3D12_DEPTH_WRITE_MASK_ALL, D3D12_COMPARISON_FUNC_LESS, FALSE, 0, 0 };
 	pipelineDesc.InputLayout = { inputElements, ARRAYSIZE(inputElements) };
 	pipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineDesc.NumRenderTargets = 1;
 	pipelineDesc.RTVFormats[0] = DXGI_FORMAT_B8G8R8A8_UNORM;
-	pipelineDesc.DSVFormat = DXGI_FORMAT_UNKNOWN;
+	pipelineDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	pipelineDesc.SampleDesc = { 1, 0 };
 	HR(device->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(&pipelineState)));
 
