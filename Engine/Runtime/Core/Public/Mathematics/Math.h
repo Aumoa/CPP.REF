@@ -86,7 +86,7 @@ public:
 	template<class T = float>
 	inline static constexpr const T InvPI = (T)1 / PI<T>;
 	template<class T = float>
-	inline static constexpr const T SmallNumber = (T)1.e-4;
+	inline static constexpr const T SmallNumber = (T)1.e-6;
 };
 
 #include "Math.inl"

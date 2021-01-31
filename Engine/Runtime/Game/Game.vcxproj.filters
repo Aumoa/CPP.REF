@@ -399,6 +399,15 @@
     <ClInclude Include="Public\RHI\RHIResourceDesc.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Components\MovementComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\PawnMovementComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\FloatingPawnMovement.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -620,6 +629,15 @@
     <ClCompile Include="Private\RHI\RHIResourceDesc.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Components\MovementComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\PawnMovementComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\FloatingPawnMovement.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -669,6 +687,9 @@
     </None>
     <None Include="Public\TSubclassOf.inl">
       <Filter>Public</Filter>
+    </None>
+    <None Include="Public\Framework\Pawn.inl">
+      <Filter>Public\Framework</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

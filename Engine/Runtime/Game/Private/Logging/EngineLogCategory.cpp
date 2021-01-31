@@ -11,3 +11,4 @@ LogCategoryBase LogDiagnostics(ELogVerbosity::Verbose, nameof(LogDiagnostics));
 LogCategoryBase LogRendering(ELogVerbosity::Verbose, nameof(LogRendering));
 LogCategoryBase LogPlatform(ELogVerbosity::Verbose, nameof(LogPlatform));
 LogCategoryBase LogInput(ELogVerbosity::Verbose, nameof(LogInput));
+LogCategoryBase LogPawn(ELogVerbosity::Verbose, nameof(LogPawn));

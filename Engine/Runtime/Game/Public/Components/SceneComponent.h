@@ -51,6 +51,7 @@ public:
 	virtual void UpdateChildTransforms();
 	virtual void UpdateComponentToWorld();
 	virtual Transform GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const;
+	virtual bool MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace = EComponentTransformSpace::World);
 
 	vs_property_get(SceneComponent*, AttachParent);
 	SceneComponent* AttachParent_get() const;

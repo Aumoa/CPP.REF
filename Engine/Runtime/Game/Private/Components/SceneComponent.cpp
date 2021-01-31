@@ -4,6 +4,9 @@
 
 #include "Logging/LogCategoryBase.h"
 #include "Logging/LogMacros.h"
+#include "Diagnostics/ScopedCycleCounter.h"
+
+DEFINE_STATS_GROUP(SceneComponent);
 
 using namespace std;
 
@@ -104,6 +107,8 @@ void SceneComponent::UpdateChildTransforms()
 
 void SceneComponent::UpdateComponentToWorld()
 {
+	QUICK_SCOPED_CYCLE_COUNTER(SceneComponent, UpdateComponentToWorld);
+
 	if (AttachParent == nullptr)
 	{
 		localToWorld = Transform::Identity;
@@ -133,6 +138,45 @@ Transform SceneComponent::GetSocketTransform(TRefPtr<String> socketName, ECompon
 	}
 
 	return RelativeTransform;
+}
+
+bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
+{
+	Quaternion oldRotation = inSpace == EComponentTransformSpace::World ? ComponentRotation : Rotation;
+	if (inMoveDelta.NearlyEquals(Vector3::Zero, Math::SmallNumber<>) && oldRotation.NearlyEquals(inNewRotation, Math::SmallNumber<>))
+	{
+		// MoveDelta and NewRotation is nearly equals to previous component transform.
+		// Skip moving and return state indicating that be not moved.
+		return false;
+	}
+
+	Vector3 relativeLocation;
+	Quaternion relativeRotation;
+
+	if (inSpace == EComponentTransformSpace::World)
+	{
+		// Transform unit is only calculate from local space.
+		// Therefore, will convert world space unit to local space unit and apply it.
+		Vector3 newLocation = ComponentLocation + inMoveDelta;
+		Quaternion newRotation = inNewRotation;
+
+		auto worldTransform = Transform(newLocation, ComponentScale, newRotation);
+		auto relativeTransform = worldTransform.GetRelativeTransform(AttachParent->GetSocketTransform(AttachSocketName));
+
+		relativeLocation = relativeTransform.Translation;
+		relativeRotation = relativeTransform.Rotation;
+	}
+	else
+	{
+		relativeLocation = Location + inMoveDelta;
+		relativeRotation = inNewRotation;
+	}
+
+	transform.Translation = relativeLocation;
+	transform.Rotation = relativeRotation;
+	UpdateChildTransforms();
+
+	return true;
 }
 
 SceneComponent* SceneComponent::AttachParent_get() const

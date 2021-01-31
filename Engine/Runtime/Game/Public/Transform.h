@@ -23,6 +23,7 @@ struct GAME_API Transform
 
 	Vector3 TransformVector(const Vector3& v) const;
 	Vector4 TransformVector(const Vector4& v) const;
+	Transform GetRelativeTransform(const Transform& rh) const;
 
 	vs_property_get(Transform, Inverse);
 	Transform Inverse_get() const;

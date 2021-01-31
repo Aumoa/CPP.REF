@@ -60,6 +60,19 @@ Vector4 Transform::TransformVector(const Vector4& v) const
 	return rotated + Vector4(Translation * v.W, v.W);
 }
 
+Transform Transform::GetRelativeTransform(const Transform& rh) const
+{
+	Vector3 recipScale = 1.0f / rh.Scale;
+	Quaternion invRotation = rh.Rotation.Inverse;
+
+	Transform r;
+	r.Scale = Scale * recipScale;
+	r.Rotation = invRotation * Rotation;
+	r.Translation = invRotation.RotateVector(Translation - rh.Translation) * recipScale;
+
+	return r;
+}
+
 Transform Transform::Inverse_get() const
 {
 	Transform inverse;
