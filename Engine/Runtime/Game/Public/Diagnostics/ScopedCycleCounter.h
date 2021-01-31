@@ -5,43 +5,37 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+#include <string_view>
+
 class CycleStatStorage;
 
-class GAME_API CycleStatsGroup : virtual public Object
+class GAME_API CycleStatsGroup
 {
-public:
-	using Super = Object;
-	using This = CycleStatsGroup;
+	static CycleStatsGroup* stats_groups[1000];
+	static size_t stats_groups_size;
 
-private:
-	static std::vector<CycleStatsGroup*> stats_groups;
-
-	TRefPtr<String> name;
+	std::wstring_view name;
 	std::vector<CycleStatStorage*> links;
 
 public:
-	CycleStatsGroup(TRefPtr<String> inNamespace);
+	CycleStatsGroup(std::wstring_view inNamespace);
 	~CycleStatsGroup();
 
-	virtual TRefPtr<String> ToString() const override;
+	virtual std::wstring ToString() const;
 	
 	void AddLink(CycleStatStorage* inStorage);
 	void ResolveLinks();
 
 	static void ResolveFrameDiagnostics();
-	static const std::vector<CycleStatsGroup*>& GetAllStatsGroup();
+	static std::span<CycleStatsGroup*> GetAllStatsGroup();
+	static void ReadyToShutdown();
 };
 
-class GAME_API CycleStatStorage : virtual public Object
+class GAME_API CycleStatStorage
 {
-public:
-	using Super = Object;
-	using This = CycleStatStorage;
-
-private:
 	bool bDeferredInit : 1;
 	CycleStatsGroup* myGroup;
-	TRefPtr<String> name;
+	std::wstring_view name;
 
 	int64 dur;
 	size_t cnt;
@@ -52,10 +46,10 @@ private:
 	float resolved;
 
 public:
-	CycleStatStorage(CycleStatsGroup* inStatGroup, TRefPtr<String> inName);
+	CycleStatStorage(CycleStatsGroup* inStatGroup, std::wstring_view inName);
 	~CycleStatStorage();
 
-	TRefPtr<String> ToString() const override;
+	std::wstring ToString() const;
 
 	void AddTick(Nanoseconds tick);
 	void ResolveTick();
@@ -69,11 +63,9 @@ private:
 	void DeferredInit();
 };
 
-class GAME_API ScopedCycleCounter : virtual public Object
+class GAME_API ScopedCycleCounter
 {
 public:
-	using Super = Object;
-	using This = ScopedCycleCounter;
 	using MyTimer = std::chrono::steady_clock;
 
 private:
@@ -84,7 +76,7 @@ private:
 
 public:
 	ScopedCycleCounter(CycleStatStorage* inStorage);
-	~ScopedCycleCounter() override;
+	~ScopedCycleCounter();
 
 	vs_property_get(Seconds, Secs);
 	Seconds Secs_get() const;
@@ -94,10 +86,10 @@ private:
 };
 
 #define DECLARE_STATS_GROUP(InNamespace) extern CycleStatsGroup STATGROUP_ ## InNamespace
-#define DEFINE_STATS_GROUP(InNamespace) CycleStatsGroup STATGROUP_ ## InNamespace(#InNamespace)
+#define DEFINE_STATS_GROUP(InNamespace) CycleStatsGroup STATGROUP_ ## InNamespace(L ## #InNamespace)
 
 #define DECLARE_CYCLE_STAT(InNamespace, InScopeName) extern CycleStatStorage STAT_InNamespace ## _ ## InScopeName
-#define DEFINE_CYCLE_STAT(InNamespace, InScopeName) CycleStatStorage STAT_ ## InScopeName(&STATGROUP_ ## InNamespace, #InScopeName)
+#define DEFINE_CYCLE_STAT(InNamespace, InScopeName) CycleStatStorage STAT_ ## InScopeName(&STATGROUP_ ## InNamespace, L ## #InScopeName)
 
 #define SCOPED_CYCLE_COUNTER(InScopeName) ScopedCycleCounter CYCLECOUNTER_ ## InScopeName(&STAT_ ## InScopeName)
 #define QUICK_SCOPED_CYCLE_COUNTER(InNamespace, InScopeName) static DEFINE_CYCLE_STAT(InNamespace, InScopeName); SCOPED_CYCLE_COUNTER(InScopeName)

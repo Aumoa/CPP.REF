@@ -15,3 +15,4 @@ extern LogCategoryBase LogRendering;
 extern LogCategoryBase LogPlatform;
 extern LogCategoryBase LogInput;
 extern LogCategoryBase LogPawn;
+extern LogCategoryBase LogSceneComponent;

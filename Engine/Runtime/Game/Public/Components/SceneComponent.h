@@ -31,8 +31,6 @@ private:
 	};
 
 private:
-	static LogCategoryBase LogSceneComponent;
-
 	Transform transform;
 	Transform localToWorld;
 	EComponentMobility mobility;

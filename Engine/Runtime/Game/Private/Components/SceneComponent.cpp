@@ -2,15 +2,12 @@
 
 #include "Components/SceneComponent.h"
 
-#include "Logging/LogCategoryBase.h"
 #include "Logging/LogMacros.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 
 DEFINE_STATS_GROUP(SceneComponent);
 
 using namespace std;
-
-LogCategoryBase SceneComponent::LogSceneComponent(ELogVerbosity::Verbose, L"LogSceneComponent");
 
 SceneComponent::SceneAttachment::SceneAttachment()
 	: AttachmentRoot(nullptr)

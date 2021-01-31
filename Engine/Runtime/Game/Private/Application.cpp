@@ -106,6 +106,7 @@ int32 Application::RunInternal(function<TRefPtr<GameInstance>()> objectConstruct
 	}
 
 	gameInstance->EndPlay();
+	engineLoop->Shutdown();
 
 	return 0;
 }

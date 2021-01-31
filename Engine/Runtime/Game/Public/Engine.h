@@ -50,6 +50,7 @@ public:
 	virtual void Initialize();
 	virtual void PostInitialize();
 	virtual void Tick();
+	virtual void Shutdown();
 
 	vs_property_get(IRHIDeviceBundle*, DeviceBundle);
 	IRHIDeviceBundle* DeviceBundle_get() const;

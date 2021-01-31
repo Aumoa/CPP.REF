@@ -8,12 +8,13 @@
 
 using namespace std;
 
-vector<CycleStatsGroup*> CycleStatsGroup::stats_groups;
+CycleStatsGroup* CycleStatsGroup::stats_groups[1000];
+size_t CycleStatsGroup::stats_groups_size;
 
-CycleStatsGroup::CycleStatsGroup(TRefPtr<String> inNamespace) : Super()
+CycleStatsGroup::CycleStatsGroup(wstring_view inNamespace)
 {
 	name = inNamespace;
-	stats_groups.emplace_back(this);
+	stats_groups[stats_groups_size++] = this;
 }
 
 CycleStatsGroup::~CycleStatsGroup()
@@ -21,7 +22,7 @@ CycleStatsGroup::~CycleStatsGroup()
 
 }
 
-TRefPtr<String> CycleStatsGroup::ToString() const
+wstring CycleStatsGroup::ToString() const
 {
 	wostringstream woss;
 
@@ -38,7 +39,7 @@ TRefPtr<String> CycleStatsGroup::ToString() const
 
 	if (active_links.empty())
 	{
-		return nullptr;
+		return L""s;
 	}
 
 	// Sort with descending.
@@ -47,10 +48,10 @@ TRefPtr<String> CycleStatsGroup::ToString() const
 		return lh->Tick > rh->Tick;
 	});
 
-	woss << L"STATGROUP_" << name->C_Str;
+	woss << L"STATGROUP_" << name;
 	for (auto& item : active_links)
 	{
-		woss << endl << item->ToString()->C_Str;
+		woss << endl << item->ToString();
 	}
 
 	return woss.str();
@@ -71,19 +72,28 @@ void CycleStatsGroup::ResolveLinks()
 
 void CycleStatsGroup::ResolveFrameDiagnostics()
 {
-	for (auto& item : stats_groups)
+	for (auto& item : GetAllStatsGroup())
 	{
 		item->ResolveLinks();
 	}
 }
 
-const vector<CycleStatsGroup*>& CycleStatsGroup::GetAllStatsGroup()
+span<CycleStatsGroup*> CycleStatsGroup::GetAllStatsGroup()
 {
-	return stats_groups;
+	return span<CycleStatsGroup*>(stats_groups, stats_groups_size);
 }
 
-CycleStatStorage::CycleStatStorage(CycleStatsGroup* inStatGroup, TRefPtr<String> inName) : Super()
-	, bDeferredInit(false)
+void CycleStatsGroup::ReadyToShutdown()
+{
+	for (auto& item : GetAllStatsGroup())
+	{
+		decltype(item->links) empty1;
+		item->links.swap(empty1);
+	}
+}
+
+CycleStatStorage::CycleStatStorage(CycleStatsGroup* inStatGroup, wstring_view inName)
+	: bDeferredInit(false)
 	, myGroup(nullptr)
 
 	, dur(0)
@@ -103,11 +113,11 @@ CycleStatStorage::~CycleStatStorage()
 
 }
 
-TRefPtr<String> CycleStatStorage::ToString() const
+wstring CycleStatStorage::ToString() const
 {
 	wostringstream woss;
 
-	woss << L"\t" << setw(40) << left << name->C_Str << setw(10) << right << fixed << setprecision(4) << Milliseconds(resolved).Value << L"ms";
+	woss << L"\t" << setw(40) << left << name << setw(10) << right << fixed << setprecision(4) << Milliseconds(resolved).Value << L"ms";
 	return woss.str();
 }
 
@@ -179,8 +189,8 @@ void CycleStatStorage::DeferredInit()
 	}
 }
 
-ScopedCycleCounter::ScopedCycleCounter(CycleStatStorage* inStorage) : Super()
-	, myStorage(nullptr)
+ScopedCycleCounter::ScopedCycleCounter(CycleStatStorage* inStorage)
+	: myStorage(nullptr)
 {
 	start = MyTimer::now();
 	myStorage = inStorage;

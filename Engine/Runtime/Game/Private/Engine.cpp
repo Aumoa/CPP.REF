@@ -90,6 +90,11 @@ void Engine::Tick()
 	RenderScene();
 }
 
+void Engine::Shutdown()
+{
+	CycleStatsGroup::ReadyToShutdown();
+}
+
 IRHIDeviceBundle* Engine::DeviceBundle_get() const
 {
 	return deviceBundle;
