@@ -28,6 +28,7 @@ void SceneComponent::SceneAttachment::Clear()
 
 SceneComponent::SceneComponent() : Super()
 	, transform(Transform::Identity)
+	, worldTransform(Transform::Identity)
 	, localToWorld(Transform::Identity)
 	, mobility(EComponentMobility::Static)
 {
@@ -118,10 +119,10 @@ void SceneComponent::UpdateComponentToWorld()
 	}
 	else
 	{
-		localToWorld = AttachParent->ComponentLocation;
+		localToWorld = AttachParent->ComponentTransform;
 	}
 
-	UpdateChildTransforms();
+	UpdateWorldTransform();
 }
 
 Transform SceneComponent::GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space) const
@@ -171,7 +172,7 @@ bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion&
 
 	transform.Translation = relativeLocation;
 	transform.Rotation = relativeRotation;
-	UpdateChildTransforms();
+	UpdateWorldTransform();
 
 	return true;
 }
@@ -204,7 +205,7 @@ void SceneComponent::RelativeTransform_set(const Transform& value)
 
 Transform SceneComponent::ComponentTransform_get() const
 {
-	return Transform::Multiply(transform, localToWorld);
+	return worldTransform;
 }
 
 Vector3 SceneComponent::Location_get() const
@@ -215,7 +216,7 @@ Vector3 SceneComponent::Location_get() const
 void SceneComponent::Location_set(const Vector3& value)
 {
 	transform.Translation = value;
-	UpdateChildTransforms();
+	UpdateWorldTransform();
 }
 
 Vector3 SceneComponent::Scale_get() const
@@ -226,7 +227,7 @@ Vector3 SceneComponent::Scale_get() const
 void SceneComponent::Scale_set(const Vector3& value)
 {
 	transform.Scale = value;
-	UpdateChildTransforms();
+	UpdateWorldTransform();
 }
 
 Quaternion SceneComponent::Rotation_get() const
@@ -237,22 +238,22 @@ Quaternion SceneComponent::Rotation_get() const
 void SceneComponent::Rotation_set(const Quaternion& value)
 {
 	transform.Rotation = value;
-	UpdateChildTransforms();
+	UpdateWorldTransform();
 }
 
 Vector3 SceneComponent::ComponentLocation_get() const
 {
-	return ComponentTransform.Translation;
+	return worldTransform.Translation;
 }
 
 Vector3 SceneComponent::ComponentScale_get() const
 {
-	return ComponentTransform.Scale;
+	return worldTransform.Scale;
 }
 
 Quaternion SceneComponent::ComponentRotation_get() const
 {
-	return ComponentTransform.Rotation;
+	return worldTransform.Rotation;
 }
 
 EComponentMobility SceneComponent::Mobility_get() const
@@ -263,4 +264,10 @@ EComponentMobility SceneComponent::Mobility_get() const
 void SceneComponent::Mobility_set(EComponentMobility value)
 {
 	mobility = value;
+}
+
+void SceneComponent::UpdateWorldTransform()
+{
+	worldTransform = Transform::Multiply(transform, localToWorld);
+	UpdateChildTransforms();
 }

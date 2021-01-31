@@ -32,6 +32,7 @@ private:
 
 private:
 	Transform transform;
+	Transform worldTransform;
 	Transform localToWorld;
 	EComponentMobility mobility;
 
@@ -82,4 +83,7 @@ public:
 	vs_property(EComponentMobility, Mobility);
 	EComponentMobility Mobility_get() const;
 	void Mobility_set(EComponentMobility value);
+
+private:
+	void UpdateWorldTransform();
 };
