@@ -5,6 +5,9 @@
 #include "WindowsMinimal.h"
 #include "Application.h"
 #include "Logging/LogMacros.h"
+#include "Diagnostics/ScopedCycleCounter.h"
+
+DEFINE_STATS_GROUP(PlatformInput);
 
 using namespace std;
 
@@ -19,14 +22,14 @@ KeyboardState::KeyboardState(const KeyboardState& rh)
 
 }
 
-KeyboardState::KeyboardState(KeyboardState&& rh)
+KeyboardState::KeyboardState(KeyboardState&& rh) noexcept
 	: states(std::move(rh.states))
 {
 
 }
 
-KeyboardState::KeyboardState(vector<bool>&& inKeyStates)
-	: states(move(inKeyStates))
+KeyboardState::KeyboardState(const vector<char>& inKeyStates)
+	: states(inKeyStates)
 {
 
 }
@@ -44,30 +47,21 @@ bool KeyboardState::HasKeyDown(EKey inKey) const
 	}
 
 	size_t keyIdx = (size_t)inKey;
-	if (keyIdx >= states.size())
+	if (keyIdx >= states.size() * 8)
 	{
 		SE_LOG(LogPlatform, Error, L"Key index {0} is not supported on this platform.", keyIdx);
 		return false;
 	}
 
-	return states[keyIdx];
+	size_t fastA = keyIdx / 8;
+	size_t fastB = keyIdx % 8;
+
+	return ((states[keyIdx / 8] >> fastB) & 1) == 1;
 }
 
 bool KeyboardState::HasKeyUp(EKey inKey) const
 {
-	if (states.size() == 0)
-	{
-		return false;
-	}
-
-	size_t keyIdx = (size_t)inKey;
-	if (keyIdx >= states.size())
-	{
-		SE_LOG(LogPlatform, Error, L"Key index {0} is not supported on this platform.", keyIdx);
-		return false;
-	}
-
-	return !states[keyIdx];
+	return !HasKeyDown(inKey);
 }
 
 KeyboardState& KeyboardState::operator =(const KeyboardState& rh)
@@ -95,55 +89,52 @@ KeyboardCompare::~KeyboardCompare()
 
 void KeyboardCompare::Compare(const KeyboardState& lh, const KeyboardState& rh)
 {
-	for (size_t i = 0; i < 256; ++i)
+	if (lh.states.empty() || rh.states.empty())
 	{
-		auto keyIdx = (EKey)i;
+		return;
+	}
 
-		bool lhd = lh.HasKeyDown(keyIdx);
-		bool rhd = rh.HasKeyDown(keyIdx);
+	keyDown.resize(32);
+	keyUp.resize(32);
 
-		if (!lhd && rhd)
-		{
-			keyDown[i] = true;
-		}
-		else
-		{
-			keyDown[i] = false;
-		}
+	for (size_t i = 0; i < 32; ++i)
+	{
+		const char& lhc = lh.states[i];
+		const char& rhc = rh.states[i];
 
-		if (lhd && !rhd)
-		{
-			keyUp[i] = true;
-		}
-		else
-		{
-			keyUp[i] = false;
-		}
+		keyDown[i] = rhc & (lhc ^ rhc);
+		keyUp[i] = lhc & (lhc ^ rhc);
 	}
 }
 
 bool KeyboardCompare::IsKeyDown(EKey inKey) const
 {
 	size_t keyIdx = (size_t)inKey;
-	if (keyIdx >= keyDown.size())
+	if (keyIdx >= keyDown.size() * 8)
 	{
 		SE_LOG(LogPlatform, Error, L"Key index {0} is not supported on this platform.", keyIdx);
 		return false;
 	}
 
-	return keyDown[keyIdx];
+	size_t fastA = keyIdx / 8;
+	size_t fastB = keyIdx % 8;
+
+	return ((keyDown[keyIdx / 8] >> fastB) & 1) == 1;
 }
 
 bool KeyboardCompare::IsKeyUp(EKey inKey) const
 {
 	size_t keyIdx = (size_t)inKey;
-	if (keyIdx >= keyUp.size())
+	if (keyIdx >= keyUp.size() * 8)
 	{
 		SE_LOG(LogPlatform, Error, L"Key index {0} is not supported on this platform.", keyIdx);
 		return false;
 	}
 
-	return keyUp[keyIdx];
+	size_t fastA = keyIdx / 8;
+	size_t fastB = keyIdx % 8;
+
+	return ((keyUp[keyIdx / 8] >> fastB) & 1) == 1;
 }
 
 CursorState::CursorState()
@@ -238,43 +229,62 @@ float CursorCompare::GetDeltaYByDpi() const
 }
 
 bool PlatformInput::bCaptureCursor = false;
+vector<char> PlatformInput::bKeyboardStates(32);
 
-KeyboardState PlatformInput::GetKeyboardState()
+int32 PlatformInput::cursorX = 0;
+int32 PlatformInput::cursorY = 0;
+bool PlatformInput::bCursorVisible = false;
+
+void PlatformInput::Tick()
 {
-	vector<bool> states;
-	states.resize(256, false);
-
-	if (!IsInputActive())
-	{
-		return states;
-	}
-
-	uint8 keyBytes[256];
-	if (!::GetKeyboardState(keyBytes))
+	uint8 keyboardStates[256];
+	if (!::GetKeyboardState(keyboardStates))
 	{
 		SE_LOG(LogPlatform, Error, L"Cannot query keyboard states.");
-		return KeyboardState();
+		return;
 	}
 
-	for (size_t i = 0; i < 256; ++i)
+	for (size_t i = 0; i < 32; ++i)
 	{
-		states[i] = (keyBytes[i] & 0x80) != 0;
+		char& c = bKeyboardStates[i];
+		c = 0;
+		for (size_t j = 0; j < 8; ++j)
+		{
+			size_t k = i * 8 + j;
+			bool b = keyboardStates[k] & 0x80;
+			char n = (char)b << j;
+			c = c | n;
+		}
 	}
 
-	return states;
-}
-
-CursorState PlatformInput::GetCursorState()
-{
 	CURSORINFO cinfo = { };
 	cinfo.cbSize = sizeof(cinfo);
 	if (!::GetCursorInfo(&cinfo))
 	{
 		SE_LOG(LogPlatform, Error, L"Cannot query cursor states.");
-		return CursorState();
+		return;
 	}
 
-	auto cursorState = CursorState((int32)cinfo.ptScreenPos.x, (int32)cinfo.ptScreenPos.y, cinfo.flags != 0);
+	cursorX = cinfo.ptScreenPos.x;
+	cursorY = cinfo.ptScreenPos.y;
+	bCursorVisible = cinfo.flags != 0;
+}
+
+KeyboardState PlatformInput::GetKeyboardState()
+{
+	static vector<char> empty(32);
+
+	if (!IsInputActive())
+	{
+		return empty;
+	}
+
+	return bKeyboardStates;
+}
+
+CursorState PlatformInput::GetCursorState()
+{
+	CursorState cursorState(cursorX, cursorY, bCursorVisible);
 	if (bCaptureCursor)
 	{
 		SetCursorToHwndCenter();

@@ -9,14 +9,16 @@
 
 struct KeyboardState
 {
+	friend struct KeyboardCompare;
+
 private:
-	std::vector<bool> states;
+	std::vector<char> states;
 
 public:
 	KeyboardState();
 	KeyboardState(const KeyboardState& rh);
-	KeyboardState(KeyboardState&& rh);
-	KeyboardState(std::vector<bool>&& inKeyStates);
+	KeyboardState(KeyboardState&& rh) noexcept;
+	KeyboardState(const std::vector<char>& inKeyStates);
 	~KeyboardState();
 
 	bool HasKeyDown(EKey inKey) const;
@@ -29,8 +31,8 @@ public:
 struct KeyboardCompare
 {
 private:
-	std::vector<bool> keyDown;
-	std::vector<bool> keyUp;
+	std::vector<char> keyDown;
+	std::vector<char> keyUp;
 
 public:
 	KeyboardCompare();
@@ -85,8 +87,15 @@ class PlatformInput : virtual public Object
 	friend struct CursorCompare;
 
 	static bool bCaptureCursor;
+	static std::vector<char> bKeyboardStates;
+
+	static int32 cursorX;
+	static int32 cursorY;
+	static bool bCursorVisible;
 
 public:
+	static void Tick();
+
 	static KeyboardState GetKeyboardState();
 	static CursorState GetCursorState();
 	static void SetCursorVisible(bool value);

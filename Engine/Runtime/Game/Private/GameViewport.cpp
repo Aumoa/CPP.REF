@@ -12,6 +12,7 @@
 #include "RHI/IRHICommandList.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/IRHIDepthStencilView.h"
+#include "Logging/LogMacros.h"
 
 using namespace std;
 
@@ -62,6 +63,11 @@ int32 GameViewport::ResolutionY_get() const
 
 void GameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 {
+	if (x == 0 || y == 0)
+	{
+		return;
+	}
+
 	resX = x;
 	resY = y;
 

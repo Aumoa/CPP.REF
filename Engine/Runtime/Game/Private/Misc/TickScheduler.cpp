@@ -28,8 +28,6 @@ TickScheduler::~TickScheduler()
 
 void TickScheduler::Tick(Seconds deltaTime)
 {
-	QUICK_SCOPED_CYCLE_COUNTER(TickScheduler, Tick);
-
 	for (auto& task : tasks)
 	{
 		auto& info = task.second;

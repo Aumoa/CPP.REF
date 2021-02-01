@@ -3,8 +3,11 @@
 #include "Components/InputComponent.h"
 
 #include "Logging/LogMacros.h"
+#include "Diagnostics/ScopedCycleCounter.h"
 
 using namespace std;
+
+DEFINE_STATS_GROUP(InputComponent);
 
 InputComponent::InputComponent()
 	: overrideComponent(nullptr)
@@ -20,7 +23,7 @@ InputComponent::~InputComponent()
 void InputComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
-
+	
 	UpdateKeyboardState();
 	UpdateCursorState();
 }

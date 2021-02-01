@@ -23,6 +23,7 @@
 #include "RHI/IRHIShader.h"
 #include "Assets/AssetManager.h"
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "PlatformMisc/PlatformInput.h"
 
 #include "D3D12RHI/D3D12DeviceBundle.h"
 //#include "VulkanRHI/VulkanDeviceBundle.h"
@@ -86,6 +87,8 @@ void Engine::PostInitialize()
 
 void Engine::Tick()
 {
+	PlatformInput::Tick();
+
 	TickWorld();
 	RenderScene();
 }
