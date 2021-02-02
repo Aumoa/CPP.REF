@@ -44,8 +44,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Actor\MyTestActor.cpp" />
-    <ClCompile Include="Private\Actor\Plane.cpp" />
     <ClCompile Include="Private\Common\THLogs.cpp" />
     <ClCompile Include="Private\Controller\THPlayerController.cpp" />
     <ClCompile Include="Private\Levels\StartupLevel.cpp" />
@@ -57,8 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Common\THLogs.h" />
-    <ClInclude Include="Public\Actor\MyTestActor.h" />
-    <ClInclude Include="Public\Actor\Plane.h" />
     <ClInclude Include="Public\Controller\THPlayerController.h" />
     <ClInclude Include="Public\Levels\StartupLevel.h" />
     <ClInclude Include="Public\Pawn\MyCharacter.h" />

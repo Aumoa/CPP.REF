@@ -10,6 +10,7 @@
 
 class AMyTestActor;
 class AMyCharacter;
+class AStaticMeshActor;
 
 class TH_API StartupLevel : public Level
 {
@@ -18,9 +19,13 @@ public:
 	using This = StartupLevel;
 
 private:
-	AMyTestActor* persistent_actor;
-	AMyCharacter* persistent_character;
-	AActor* plane;
+	AStaticMeshActor* plane;
+	AStaticMeshActor* geosphere;
+	AStaticMeshActor* teapot;
+	AStaticMeshActor* cylinder;
+	AStaticMeshActor* cone;
+	AStaticMeshActor* icosahedron;
+
 	ASpectatorPawn* spectator;
 
 public:

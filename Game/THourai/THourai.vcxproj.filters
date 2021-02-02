@@ -51,9 +51,6 @@
     <ClCompile Include="Private\Levels\StartupLevel.cpp">
       <Filter>Private\Levels</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Actor\MyTestActor.cpp">
-      <Filter>Private\Actor</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Common\THLogs.cpp">
       <Filter>Private\Common</Filter>
     </ClCompile>
@@ -65,9 +62,6 @@
     </ClCompile>
     <ClCompile Include="Private\THGameMode.cpp">
       <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Actor\Plane.cpp">
-      <Filter>Private\Actor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +77,6 @@
     <ClInclude Include="Public\Levels\StartupLevel.h">
       <Filter>Public\Levels</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Actor\MyTestActor.h">
-      <Filter>Public\Actor</Filter>
-    </ClInclude>
     <ClInclude Include="Private\Common\THLogs.h">
       <Filter>Private\Common</Filter>
     </ClInclude>
@@ -97,9 +88,6 @@
     </ClInclude>
     <ClInclude Include="Public\THGameMode.h">
       <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Actor\Plane.h">
-      <Filter>Public\Actor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
