@@ -41,6 +41,20 @@ namespace
     }
 
 
+    inline void ToZUp(DirectXGeometry::IndexCollection& indices, DirectXGeometry::VertexCollection& vertices)
+    {
+        for (auto it = indices.begin(); it != indices.end(); it += 3)
+        {
+            std::swap(*it, *(it + 2));
+        }
+
+        for (auto it = vertices.begin(); it != vertices.end(); ++it)
+        {
+            std::swap(it->Pos.Y, it->Pos.Z);
+        }
+    }
+
+
     // Helper for inverting normals of geometric primitives for 'inside' vs. 'outside' viewing
     inline void InvertNormals(DirectXGeometry::VertexCollection& vertices)
     {
@@ -762,6 +776,8 @@ void DirectXGeometry::ComputeCylinder(VertexCollection& vertices, IndexCollectio
     // Build RH above
     if (!rhcoords)
         ReverseWinding(indices, vertices);
+
+    ToZUp(indices, vertices);
 }
 
 
@@ -814,6 +830,8 @@ void DirectXGeometry::ComputeCone(VertexCollection& vertices, IndexCollection& i
     // Build RH above
     if (!rhcoords)
         ReverseWinding(indices, vertices);
+
+    ToZUp(indices, vertices);
 }
 
 
@@ -878,6 +896,8 @@ void DirectXGeometry::ComputeTorus(VertexCollection& vertices, IndexCollection& 
     // Build RH above
     if (!rhcoords)
         ReverseWinding(indices, vertices);
+
+    ToZUp(indices, vertices);
 }
 
 
@@ -1301,4 +1321,6 @@ void DirectXGeometry::ComputeTeapot(VertexCollection& vertices, IndexCollection&
     // Built RH above
     if (!rhcoords)
         ReverseWinding(indices, vertices);
+
+    ToZUp(indices, vertices);
 }

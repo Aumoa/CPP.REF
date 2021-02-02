@@ -179,7 +179,7 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vert
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(span<uint32> indices)
 {
-	span<uint8> buffer = span((uint8*)indices.data(), indices.size() * sizeof(RHIVertex));
+	span<uint8> buffer = span((uint8*)indices.data(), indices.size() * sizeof(uint32));
 	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, buffer);
 	return NewObject<D3D12Resource>(resource.Get());
 }

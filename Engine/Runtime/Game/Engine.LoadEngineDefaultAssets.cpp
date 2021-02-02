@@ -31,7 +31,7 @@ void Engine::LoadEngineDefaultAssets()
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
-		DirectXGeometry::ComputeGeoSphere(vertexCollection, indexCollection, 1.0f, 5, false);
+		DirectXGeometry::ComputeGeoSphere(vertexCollection, indexCollection, 1.0f, 4, false);
 
 		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection);
 		GetAssetManager()->Import(L"Engine/StaticMesh/GeoSphere", mesh);
@@ -53,15 +53,6 @@ void Engine::LoadEngineDefaultAssets()
 
 		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection);
 		GetAssetManager()->Import(L"Engine/StaticMesh/Cone", mesh);
-	}
-
-	{
-		vector<RHIVertex> vertexCollection;
-		vector<uint32> indexCollection;
-		DirectXGeometry::ComputeTorus(vertexCollection, indexCollection, 1.0f, 0.1f, 16, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection);
-		GetAssetManager()->Import(L"Engine/StaticMesh/Torus", mesh);
 	}
 
 	{

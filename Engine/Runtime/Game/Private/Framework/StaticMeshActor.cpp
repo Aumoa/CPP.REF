@@ -7,9 +7,9 @@
 AStaticMeshActor::AStaticMeshActor() : Super()
 	, staticMeshComponent(nullptr)
 {
-	auto component = NewObject<StaticMeshComponent>();
-	RootComponent = component.Get();
-	staticMeshComponent = component.Get();
+	auto component = AddComponent<StaticMeshComponent>();
+	RootComponent = component;
+	staticMeshComponent = component;
 }
 
 AStaticMeshActor::~AStaticMeshActor()

@@ -4,12 +4,15 @@ struct Vertex
 {
 	float3 Pos : POSITION;
 	float4 Color : COLOR;
+	float2 TexCoord : TEXCOORD;
+	float3 Normal : NORMAL;
 };
 
 struct Fragment
 {
 	float4 PosH : SV_POSITION;
 	float4 Color : COLOR;
+
 };
 
 struct ShaderCameraConstant
@@ -25,6 +28,6 @@ Fragment VS_Main(in Vertex inVertex)
 {
 	Fragment oFrag;
 	oFrag.PosH = mul(float4(inVertex.Pos, 1.0f), gCameraConstant.WVP);
-	oFrag.Color = inVertex.Color;
+	oFrag.Color = float4(inVertex.Normal, 1.0f);
 	return oFrag;
 }

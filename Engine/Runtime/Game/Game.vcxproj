@@ -448,7 +448,6 @@
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
-    <None Include="Private\TeapotData.inl" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
     <None Include="Private\VulkanRHI\VulkanException.cpp" />

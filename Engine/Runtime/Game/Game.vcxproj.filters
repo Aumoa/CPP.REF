@@ -709,7 +709,6 @@
     <None Include="Public\Framework\Pawn.inl">
       <Filter>Public\Framework</Filter>
     </None>
-    <None Include="Private\TeapotData.inl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Private\Shaders\VertexShader.hlsl">
