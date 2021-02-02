@@ -25,7 +25,7 @@ void AssetManager::Import(TRefPtr<String> key, TRefPtr<StaticMesh> imported)
 	assets.insert(make_pair(key, imported));
 }
 
-StaticMesh* AssetManager::Load(TRefPtr<String> key) const
+StaticMesh* AssetManager::LoadStaticMesh(TRefPtr<String> key) const
 {
 	auto it = assets.find(key);
 	if (it == assets.end())

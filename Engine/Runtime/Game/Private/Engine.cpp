@@ -11,7 +11,6 @@
 #include "Logging/LogMacros.h"
 #include "SceneRendering/SceneRenderer.h"
 #include "SceneRendering/Scene.h"
-#include "SceneRendering/StaticMesh.h"
 #include "RHI/IRHICommandFence.h"
 #include "RHI/IRHIImmediateCommandList.h"
 #include "RHI/IRHIRenderTargetView.h"
@@ -181,12 +180,6 @@ void Engine::ForEachBundles(function<void(IRHIBundle*)> action)
 	{
 		action(bundle.Get());
 	}
-}
-
-void Engine::LoadEngineDefaultAssets()
-{
-	TRefPtr<StaticMesh> mesh = NewObject<StaticMesh>();
-	GetAssetManager()->Import(L"Engine/StaticMesh/Triangle", mesh);
 }
 
 void Engine::Application_OnPostSized(int32 x, int32 y)

@@ -24,5 +24,5 @@ public:
 	~AssetManager() override;
 
 	void Import(TRefPtr<String> key, TRefPtr<StaticMesh> imported);
-	StaticMesh* Load(TRefPtr<String> key) const;
+	StaticMesh* LoadStaticMesh(TRefPtr<String> key) const;
 };

@@ -7,10 +7,12 @@ RHIVertex::RHIVertex()
 
 }
 
-RHIVertex::RHIVertex(const Vector3& pos, const ::Color& color)
+RHIVertex::RHIVertex(const Vector3& pos, const Vector3& normal, const Vector2& texCoord, const ::Color& color)
 {
 	Pos = pos;
 	Color = color;
+	TexCoord = texCoord;
+	Normal = normal;
 }
 
 RHIVertex::~RHIVertex()

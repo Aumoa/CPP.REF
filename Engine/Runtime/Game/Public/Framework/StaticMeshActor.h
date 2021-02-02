@@ -20,4 +20,7 @@ private:
 public:
 	AStaticMeshActor();
 	~AStaticMeshActor();
+
+	vs_property_get(StaticMeshComponent*, StaticMesh);
+	StaticMeshComponent* StaticMesh_get() const;
 };

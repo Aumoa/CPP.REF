@@ -247,6 +247,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Bezier.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12CommandFence.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12CommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeferredCommandList.h" />
@@ -264,6 +265,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
+    <ClInclude Include="Private\DirectXGeometry.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
@@ -368,6 +370,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine.LoadEngineDefaultAssets.cpp" />
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
@@ -401,6 +404,7 @@
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
+    <ClCompile Include="Private\DirectXGeometry.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\EngineCriticalException.cpp" />
     <ClCompile Include="Private\Framework\Actor.cpp" />
@@ -444,6 +448,7 @@
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
+    <None Include="Private\TeapotData.inl" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
     <None Include="Private\VulkanRHI\VulkanException.cpp" />

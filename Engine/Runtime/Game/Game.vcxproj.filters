@@ -411,6 +411,12 @@
     <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Private\DirectXGeometry.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Bezier.h">
+      <Filter>Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -644,6 +650,12 @@
     <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Private\DirectXGeometry.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.LoadEngineDefaultAssets.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -697,6 +709,7 @@
     <None Include="Public\Framework\Pawn.inl">
       <Filter>Public\Framework</Filter>
     </None>
+    <None Include="Private\TeapotData.inl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Private\Shaders\VertexShader.hlsl">

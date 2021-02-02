@@ -9,8 +9,10 @@ struct GAME_API RHIVertex
 {
 	Vector3 Pos;
 	Color Color;
+	Vector2 TexCoord;
+	Vector3 Normal;
 
 	RHIVertex();
-	RHIVertex(const Vector3& pos, const ::Color& color);
+	RHIVertex(const Vector3& pos, const Vector3& normal = Vector3::Zero, const Vector2& texCoord = Vector2::Zero, const ::Color& color = Color::Transparent);
 	~RHIVertex();
 };

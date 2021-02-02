@@ -16,3 +16,8 @@ AStaticMeshActor::~AStaticMeshActor()
 {
 
 }
+
+StaticMeshComponent* AStaticMeshActor::StaticMesh_get() const
+{
+	return staticMeshComponent;
+}
