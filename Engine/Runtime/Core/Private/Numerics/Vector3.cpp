@@ -269,6 +269,15 @@ Vector3 Vector3::Max(const Vector3& lh, const Vector3& rh)
 	return { Math::Max(lh.X, rh.X), Math::Max(lh.Y, rh.Y), Math::Max(lh.Z, rh.Z) };
 }
 
+Vector3 Vector3::Select(const Vector3& lh, const Vector3& rh, const SelectControl& selectControl)
+{
+	return Vector3(
+		(selectControl.Value & 0b100) == 0b100,
+		(selectControl.Value & 0b10) == 0b10,
+		(selectControl.Value & 0b1) == 0b1
+	);
+}
+
 Vector3 operator +(float left, const Vector3& right)
 {
 	return Vector3(left) + right;

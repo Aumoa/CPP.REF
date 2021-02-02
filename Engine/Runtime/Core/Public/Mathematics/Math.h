@@ -86,6 +86,8 @@ public:
 	template<class T = float>
 	inline static constexpr const T InvPI = (T)1 / PI<T>;
 	template<class T = float>
+	inline static constexpr const T PIx2 = PI<T> * (T)2.0;
+	template<class T = float>
 	inline static constexpr const T SmallNumber = (T)1.e-6;
 };
 

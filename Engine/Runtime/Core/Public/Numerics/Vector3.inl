@@ -2,6 +2,22 @@
 
 #pragma once
 
+inline constexpr Vector3::SelectControl::SelectControl(bool v1, bool v2, bool v3)
+	: Value(((char)v1 << 2) | ((char)v1 << 1) | ((char)v1 << 0))
+{
+
+}
+
+inline constexpr auto Vector3::SelectControl::Less(const Vector3& lh, const Vector3& rh) -> SelectControl
+{
+	return SelectControl(lh.X < rh.X, lh.Y < rh.Y, lh.Z < rh.Z);
+}
+
+inline constexpr auto Vector3::SelectControl::Greater(const Vector3& lh, const Vector3& rh) -> SelectControl
+{
+	return SelectControl(lh.X > rh.X, lh.Y > rh.Y, lh.Z > rh.Z);
+}
+
 template<TIsVectorType T>
 inline void Vector3::Construct(const T& vector)
 {

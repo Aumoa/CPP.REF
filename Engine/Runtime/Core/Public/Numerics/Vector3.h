@@ -16,6 +16,19 @@ struct CORE_API Vector3 : public TNumericsBasicOperator<Vector3, float, float, f
 {
 	using This = Vector3;
 
+	class SelectControl
+	{
+		friend struct Vector3;
+
+		char Value;
+
+	public:
+		inline constexpr SelectControl(bool v1, bool v2, bool v3);
+
+		static constexpr SelectControl Less(const Vector3& lh, const Vector3& rh);
+		static constexpr SelectControl Greater(const Vector3& lh, const Vector3& rh);
+	};
+
 	float X;
 	float Y;
 	float Z;
@@ -76,6 +89,7 @@ struct CORE_API Vector3 : public TNumericsBasicOperator<Vector3, float, float, f
 	static Vector3 CrossProduct(const Vector3& left, const Vector3& right);
 	static Vector3 Min(const Vector3& lh, const Vector3& rh);
 	static Vector3 Max(const Vector3& lh, const Vector3& rh);
+	static Vector3 Select(const Vector3& lh, const Vector3& rh, const SelectControl& selectControl);
 
 	static Vector3 Up;
 	static Vector3 Forward;

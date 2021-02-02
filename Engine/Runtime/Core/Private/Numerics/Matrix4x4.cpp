@@ -179,7 +179,7 @@ Matrix4x4& Matrix4x4::Invert()
 Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
 {
     XMMATRIX M = XMLoadMatrix4x4(this);
-    XMVECTOR V = XMVector3TransformCoord(XMLoadVector3(&vec), M);
+    XMVECTOR V = XMVector3Transform(XMVectorSet(vec.X, vec.Y, vec.Z, 1.0f), M);
     Vector3 v;
     XMStoreVector4(&v, V);
     return v;
@@ -188,7 +188,7 @@ Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
 Vector4 Matrix4x4::TransformVector(const Vector4& vec) const
 {
     XMMATRIX M = XMLoadMatrix4x4(this);
-    XMVECTOR V = XMVector4Transform(XMLoadVector4(&vec), M);
+    XMVECTOR V = XMVector3Transform(XMLoadVector4(&vec), M);
     Vector4 v;
     XMStoreVector4(&v, V);
     return v;
@@ -371,6 +371,38 @@ Matrix4x4 Matrix4x4::AffineTransformation(const Vector3& t, const Vector3& s, co
 Matrix4x4 Matrix4x4::PerspectiveFovLH(float fov, float aspectRatio, float nearZ, float farZ)
 {
     XMMATRIX M = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
+Matrix4x4 Matrix4x4::RotationX(TRadians<float> angle)
+{
+    XMMATRIX M = XMMatrixRotationX(angle.Value);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
+Matrix4x4 Matrix4x4::RotationY(TRadians<float> angle)
+{
+    XMMATRIX M = XMMatrixRotationY(angle.Value);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
+Matrix4x4 Matrix4x4::RotationZ(TRadians<float> angle)
+{
+    XMMATRIX M = XMMatrixRotationZ(angle.Value);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
+Matrix4x4 Matrix4x4::RotationNormal(const Vector3& inAxis, TRadians<float> angle)
+{
+    XMMATRIX M = XMMatrixRotationNormal(XMVectorSet(inAxis.X, inAxis.Y, inAxis.Z, 0), angle.Value);
     Matrix4x4 m;
     XMStoreMatrix4x4(&m, M);
     return m;
