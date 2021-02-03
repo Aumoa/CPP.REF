@@ -219,8 +219,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
+xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -242,8 +242,8 @@ xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(Ou
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
+xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
@@ -270,8 +270,8 @@ xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(Ou
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\$(Configuration)\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
+xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
