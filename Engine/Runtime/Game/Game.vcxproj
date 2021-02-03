@@ -296,6 +296,7 @@
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
@@ -341,6 +342,7 @@
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
     <ClInclude Include="Public\RHI\RHIShaderDescription.h" />
     <ClInclude Include="Public\RHI\RHIShaderLibrary.h" />
+    <ClInclude Include="Public\RHI\RHITextureClearValue.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
     <ClInclude Include="Public\RHI\RHIVertex.h" />
     <ClInclude Include="Public\RHI\RHIViewport.h" />
@@ -403,6 +405,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
+    <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
     <ClCompile Include="Private\DirectXGeometry.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
@@ -432,6 +435,7 @@
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />
     <ClCompile Include="Private\RHI\RHIShaderDescription.cpp" />
     <ClCompile Include="Private\RHI\RHIShaderLibrary.cpp" />
+    <ClCompile Include="Private\RHI\RHITextureClearValue.cpp" />
     <ClCompile Include="Private\RHI\RHIVertex.cpp" />
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />

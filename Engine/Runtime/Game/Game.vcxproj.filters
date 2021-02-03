@@ -417,6 +417,10 @@
     <ClInclude Include="Private\Bezier.h">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DeferredGameViewport.h" />
+    <ClInclude Include="Public\RHI\RHITextureClearValue.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -655,6 +659,10 @@
     </ClCompile>
     <ClCompile Include="Engine.LoadEngineDefaultAssets.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DeferredGameViewport.cpp" />
+    <ClCompile Include="Private\RHI\RHITextureClearValue.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

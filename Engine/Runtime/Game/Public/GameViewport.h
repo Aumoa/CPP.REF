@@ -10,6 +10,8 @@ interface IRHIRenderTargetView;
 interface IRHICommandList;
 interface IRHIDepthStencilView;
 
+class Scene;
+
 class GAME_API GameViewport : virtual public Object
 {
 	friend class Engine;
@@ -30,16 +32,20 @@ public:
 	GameViewport();
 	~GameViewport() override;
 
-	virtual void BeginRender(IRHICommandList* immediateCommandList);
-	virtual void EndRender(IRHICommandList* immediateCommandList);
+	virtual void RenderScene(IRHICommandList* inCommandList, Scene* inScene);
 
 	IRHIResource* GetRenderTarget() const;
+	IRHIResource* GetDepthStencilBuffer() const;
 
 	vs_property_get(int32, ResolutionX);
 	int32 ResolutionX_get() const;
 	vs_property_get(int32, ResolutionY);
 	int32 ResolutionY_get() const;
 
+protected:
+	virtual void SetViewportResolution_Internal(int32 x, int32 y);
+
 private:
-	void SetViewportResolution_Internal(int32 x, int32 y);
+	void BeginRender(IRHICommandList* inCommandList);
+	void EndRender(IRHICommandList* inCommandList);
 };

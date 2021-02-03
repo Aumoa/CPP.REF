@@ -4,7 +4,7 @@
 
 #include "Application.h"
 #include "GameInstance.h"
-#include "GameViewport.h"
+#include "DeferredGameViewport.h"
 #include "RHI/IRHISwapChain.h"
 #include "RHI/IRHIResource.h"
 #include "Logging/LogVerbosity.h"
@@ -71,7 +71,7 @@ void Engine::Initialize()
 	swapChain = deviceBundle->GetSwapChain();
 
 	assetManager = NewObject<AssetManager>();
-	gameViewport = NewObject<GameViewport>();
+	gameViewport = NewObject<DeferredGameViewport>();
 	GApplication.PostSized += bind_delegate(Application_OnPostSized);
 
 	LoadEngineDefaultAssets();
@@ -136,25 +136,8 @@ void Engine::RenderScene()
 
 	autoFence->BeginFence();
 
-	SceneRenderer sceneRenderer(scene);
-
 	immediateCommandList->BeginCommand();
-	
-	{
-		QUICK_SCOPED_CYCLE_COUNTER(Engine, CalcVisibility);
-		
-		sceneRenderer.CalcLocalPlayerVisibility();
-	}
-
-	{
-		QUICK_SCOPED_CYCLE_COUNTER(Engine, RenderScene);
-
-		gameViewport->BeginRender(immediateCommandList);
-		{
-			sceneRenderer.RenderScene(immediateCommandList);
-		}
-		gameViewport->EndRender(immediateCommandList);
-	}
+	gameViewport->RenderScene(immediateCommandList, scene);
 
 	{
 		QUICK_SCOPED_CYCLE_COUNTER(Engine, RenderFlushing);

@@ -51,7 +51,7 @@ public:
 	virtual TRefPtr<IRHICommandFence> CreateCommandFence();
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource);
 	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat);
-	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags);
+	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
 	virtual TRefPtr<IRHIShader> CreateShader(const RHIShaderDescription& shaderDesc);

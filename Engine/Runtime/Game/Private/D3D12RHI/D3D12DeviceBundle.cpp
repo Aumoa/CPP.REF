@@ -20,6 +20,7 @@
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
 #include "RHI/RHIShaderDescription.h"
+#include "RHI/RHITextureClearValue.h"
 
 using namespace std;
 
@@ -122,7 +123,7 @@ TRefPtr<IRHIDepthStencilView> D3D12DeviceBundle::CreateDepthStencilView(IRHIReso
 	return NewObject<D3D12DepthStencilView>(resource1, index);
 }
 
-TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags)
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue)
 {
 	D3D12_HEAP_PROPERTIES heapProp{ };
 	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -137,15 +138,20 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat forma
 	desc.SampleDesc = { 1, 0 };
 	desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
 
-	D3D12_CLEAR_VALUE clearValue{ desc.Format };
-	if (IsDepthStencilFormat(format))
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = (DXGI_FORMAT)inClearValue.Format;
+	if (inClearValue.IsColor)
 	{
-		clearValue.DepthStencil.Depth = 1.0f;
-		clearValue.DepthStencil.Stencil = 0;
+		memcpy(clearValue.Color, &inClearValue.Color.R, sizeof(Color));
+	}
+	else if (inClearValue.IsDepthStencil)
+	{
+		clearValue.DepthStencil.Depth = inClearValue.Depth;
+		clearValue.DepthStencil.Stencil = inClearValue.Stencil;
 	}
 
 	ComPtr<ID3D12Resource> resource;
-	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, (D3D12_RESOURCE_STATES)initialStates, &clearValue, IID_PPV_ARGS(&resource)));
+	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, (D3D12_RESOURCE_STATES)initialStates, inClearValue.IsValid ? &clearValue : nullptr, IID_PPV_ARGS(&resource)));
 
 	return NewObject<D3D12Resource>(resource.Get());
 }

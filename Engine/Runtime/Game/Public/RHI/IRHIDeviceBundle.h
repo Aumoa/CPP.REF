@@ -24,8 +24,10 @@ enum class ERHIResourceStates;
 
 class RHIShaderLibrary;
 class RHIResourceGC;
+
 struct RHIVertex;
 struct RHIShaderDescription;
+struct RHITextureClearValue;
 
 interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 {
@@ -37,7 +39,7 @@ interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 	virtual TRefPtr<IRHICommandFence> CreateCommandFence() = 0;
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
 	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat = ERHITextureFormat::Unknown) = 0;
-	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags) = 0;
+	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue) = 0;
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	virtual TRefPtr<IRHIFence> CreateFence() = 0;
 	virtual TRefPtr<IRHIShader> CreateShader(const RHIShaderDescription& shaderDesc) = 0;
