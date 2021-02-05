@@ -87,6 +87,8 @@ void SceneRenderer::ShaderInitialize()
 		shaderDesc.ShaderName = "Engine/SceneRendererShader";
 		shaderDesc.VS = RHIShaderBytecode(pVertexShader);
 		shaderDesc.PS = RHIShaderBytecode(pPixelShader);
+		shaderDesc.RTVFormats = { ERHITextureFormat::B8G8R8A8_UNORM, ERHITextureFormat::R16G16B16A16_FLOAT };
+		shaderDesc.DSVFormat = ERHITextureFormat::D24_UNORM_S8_UINT;
 		TRefPtr<IRHIShader> shader = GEngine.DeviceBundle->CreateShader(shaderDesc);
 		pickShader = shader.Get();
 

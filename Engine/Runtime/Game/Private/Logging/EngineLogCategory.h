@@ -17,3 +17,5 @@ extern LogCategoryBase LogInput;
 extern LogCategoryBase LogPawn;
 extern LogCategoryBase LogSceneComponent;
 extern LogCategoryBase LogMovement;
+extern LogCategoryBase LogShader;
+extern LogCategoryBase LogRHI;

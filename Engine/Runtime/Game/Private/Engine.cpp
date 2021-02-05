@@ -7,7 +7,6 @@
 #include "DeferredGameViewport.h"
 #include "RHI/IRHISwapChain.h"
 #include "RHI/IRHIResource.h"
-#include "Logging/LogVerbosity.h"
 #include "Logging/LogMacros.h"
 #include "SceneRendering/SceneRenderer.h"
 #include "SceneRendering/Scene.h"
@@ -15,11 +14,8 @@
 #include "RHI/IRHIImmediateCommandList.h"
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDeferredCommandList.h"
-#include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIResourceStates.h"
 #include "RHI/RHIResourceGC.h"
-#include "RHI/RHIShaderDescription.h"
-#include "RHI/IRHIShader.h"
 #include "Assets/AssetManager.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "PlatformMisc/PlatformInput.h"
@@ -134,8 +130,6 @@ void Engine::RenderScene()
 	World* const world = gameInstance->GetWorld();
 	Scene* const scene = world->GetScene();
 
-	autoFence->BeginFence();
-
 	immediateCommandList->BeginCommand();
 	gameViewport->RenderScene(immediateCommandList, scene);
 
@@ -148,13 +142,14 @@ void Engine::RenderScene()
 		immediateCommandList->CopyResource(target, gameViewport->GetRenderTarget());
 		immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
 
+		autoFence->BeginFence();
+
 		immediateCommandList->EndCommand();
 		immediateCommandList->Flush();
-
 		swapChain->Present();
-	}
 
-	autoFence->EndFence(immediateCommandList);
+		autoFence->EndFence(immediateCommandList);
+	}
 }
 
 void Engine::ForEachBundles(function<void(IRHIBundle*)> action)

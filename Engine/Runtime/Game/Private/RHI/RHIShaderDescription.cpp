@@ -2,6 +2,8 @@
 
 #include "RHI/RHIShaderDescription.h"
 
+#include "RHI/RHITextureFormat.h"
+
 using namespace std;
 
 RHIShaderBytecode::RHIShaderBytecode()
@@ -34,6 +36,7 @@ bool RHIShaderBytecode::IsValid_get() const
 }
 
 RHIShaderDescription::RHIShaderDescription()
+	: DSVFormat(ERHITextureFormat::Unknown)
 {
 
 }
@@ -41,4 +44,37 @@ RHIShaderDescription::RHIShaderDescription()
 RHIShaderDescription::~RHIShaderDescription()
 {
 
+}
+
+#define FAST_RETURN(VarName, Exp)\
+bool VarName = Exp;\
+if (!VarName)\
+{\
+	return VarName;\
+}
+
+bool RHIShaderDescription::IsValid_get() const
+{
+	// Shader name cannot be empty.
+	if (!ShaderName.IsValid)
+	{
+		return false;
+	}
+
+	// Count of RTV formats is now supports up to 8.
+	if (RTVFormats.size() > 8)
+	{
+		return false;
+	}
+
+	// RTV formats cannot contain Unknown or typeless format.
+	for (size_t i = 0; i < RTVFormats.size(); ++i)
+	{
+		if (!IsColorFormat(RTVFormats[i]))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

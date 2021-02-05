@@ -12,7 +12,7 @@ struct Fragment
 {
 	float4 PosH : SV_POSITION;
 	float4 Color : COLOR;
-
+	float3 Normal : NORMAL;
 };
 
 struct ShaderCameraConstant
@@ -29,5 +29,6 @@ Fragment VS_Main(in Vertex inVertex)
 	Fragment oFrag;
 	oFrag.PosH = mul(float4(inVertex.Pos, 1.0f), gCameraConstant.WVP);
 	oFrag.Color = float4(inVertex.Normal, 1.0f);
+	oFrag.Normal = mul(inVertex.Normal, (float3x3)gCameraConstant.World);
 	return oFrag;
 }

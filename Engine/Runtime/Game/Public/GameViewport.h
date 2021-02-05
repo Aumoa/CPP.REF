@@ -6,9 +6,7 @@
 #include "CoreMinimal.h"
 
 interface IRHIResource;
-interface IRHIRenderTargetView;
 interface IRHICommandList;
-interface IRHIDepthStencilView;
 
 class Scene;
 
@@ -23,19 +21,13 @@ public:
 private:
 	int32 resX;
 	int32 resY;
-	TRefPtr<IRHIResource> renderTarget;
-	TRefPtr<IRHIResource> depthStencilBuffer;
-	TRefPtr<IRHIRenderTargetView> renderTargetView;
-	TRefPtr<IRHIDepthStencilView> depthStencilView;
 
 public:
 	GameViewport();
 	~GameViewport() override;
 
-	virtual void RenderScene(IRHICommandList* inCommandList, Scene* inScene);
-
-	IRHIResource* GetRenderTarget() const;
-	IRHIResource* GetDepthStencilBuffer() const;
+	virtual void RenderScene(IRHICommandList* inCommandList, Scene* inScene) = 0;
+	virtual IRHIResource* GetRenderTarget() const = 0;
 
 	vs_property_get(int32, ResolutionX);
 	int32 ResolutionX_get() const;
@@ -44,8 +36,4 @@ public:
 
 protected:
 	virtual void SetViewportResolution_Internal(int32 x, int32 y);
-
-private:
-	void BeginRender(IRHICommandList* inCommandList);
-	void EndRender(IRHICommandList* inCommandList);
 };

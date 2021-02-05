@@ -33,14 +33,3 @@ RHIClass ToD3D12(D3D12Class value)\
 #define ToRHI_Item(Prefix, Name)\
 	case Prefix ## _ ## Name:\
 		return T::Name;
-
-bool IsDepthStencilFormat(ERHITextureFormat value)
-{
-	switch (value)
-	{
-	case ERHITextureFormat::D24_UNORM_S8_UINT:
-		return true;
-	}
-
-	return false;
-}

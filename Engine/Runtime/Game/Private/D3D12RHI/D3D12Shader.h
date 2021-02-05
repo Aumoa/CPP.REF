@@ -6,8 +6,9 @@
 #include "CoreMinimal.h"
 #include "RHI/IRHIShader.h"
 
-#include <span>
 #include "D3D12Minimal.h"
+
+struct RHIShaderDescription;
 
 class D3D12Shader : virtual public Object, virtual public IRHIShader
 {
@@ -19,9 +20,6 @@ private:
 	ComPtr<ID3D12RootSignature> rootSignature;
 	ComPtr<ID3D12PipelineState> pipelineState;
 
-	std::vector<uint8> vertexShaderBytecode;
-	std::vector<uint8> pixelShaderBytecode;
-
 	bool bShaderInitialized : 1;
 	size_t shaderTypeHash;
 
@@ -32,13 +30,10 @@ public:
 	size_t GetHashCode() const override;
 	size_t GetShaderTypeHashCode() const override;
 
-	void SetVertexShader(std::span<const uint8> shaderBytecode);
-	void SetPixelShader(std::span<const uint8> shaderBytecode);
+	void CreateShaderPipeline(const RHIShaderDescription& inShaderDesc, ID3D12Device* device);
 
-	void CreateShaderPipeline(TRefPtr<String> name, ID3D12Device* device);
-
-	vs_property_get(bool, ShaderInitialized);
-	bool ShaderInitialize_get() const;
+	vs_property_get(bool, IsInitialized);
+	bool IsInitialized_get() const;
 
 	vs_property_get(ID3D12RootSignature*, RootSignature);
 	ID3D12RootSignature* RootSignature_get() const;
@@ -47,4 +42,7 @@ public:
 
 private:
 	static D3D12_ROOT_PARAMETER GetRootCBVParameter(uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility);
+
+	template<bool bFastCopy, class T>
+	static inline void ApplyArray(T* outArray, std::span<T const> inArray);
 };

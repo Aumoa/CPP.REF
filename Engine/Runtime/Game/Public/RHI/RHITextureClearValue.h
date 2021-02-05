@@ -30,9 +30,4 @@ struct GAME_API RHITextureClearValue
 	bool IsColor_get() const;
 	vs_property_get(bool, IsDepthStencil);
 	bool IsDepthStencil_get() const;
-
-private:
-	static bool IsUnknownFormat(ERHITextureFormat inFormat);
-	static bool IsColorFormat(ERHITextureFormat inFormat);
-	static bool IsDepthStencilFormat(ERHITextureFormat inFormat);
 };

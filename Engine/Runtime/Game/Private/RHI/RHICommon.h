@@ -5,4 +5,10 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-extern struct LogCategoryBase LogRHI;
+#include "RHI/RHITextureFormat.h"
+#include "RHI/RHIResourceStates.h"
+#include "RHI/RHIResourceFlags.h"
+
+#include "RHI/RHIVertex.h"
+#include "RHI/RHITextureClearValue.h"
+#include "RHI/RHIViewport.h"

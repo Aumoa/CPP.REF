@@ -8,8 +8,13 @@
 enum class ERHITextureFormat
 {
 	Unknown,
+	R16G16B16A16_FLOAT						= 10,
 	R8G8B8A8_UNORM							= 28,
 	R24G8_TYPELESS							= 44,
 	D24_UNORM_S8_UINT						= 45,
 	B8G8R8A8_UNORM							= 87,
 };
+
+GAME_API bool IsUnknownFormat(ERHITextureFormat inFormat);
+GAME_API bool IsColorFormat(ERHITextureFormat inFormat);
+GAME_API bool IsDepthStencilFormat(ERHITextureFormat inFormat);

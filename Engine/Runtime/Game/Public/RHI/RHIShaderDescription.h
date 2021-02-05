@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include <span>
+enum class ERHITextureFormat;
 
 struct GAME_API RHIShaderBytecode
 {
@@ -28,7 +28,12 @@ struct GAME_API RHIShaderDescription
 	TRefPtr<String> ShaderName;
 	RHIShaderBytecode VS;
 	RHIShaderBytecode PS;
+	std::vector<ERHITextureFormat> RTVFormats;
+	ERHITextureFormat DSVFormat;
 
 	RHIShaderDescription();
 	~RHIShaderDescription();
+
+	vs_property_get(bool, IsValid);
+	bool IsValid_get() const;
 };

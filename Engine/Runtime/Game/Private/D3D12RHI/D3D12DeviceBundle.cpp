@@ -169,10 +169,7 @@ TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
 TRefPtr<IRHIShader> D3D12DeviceBundle::CreateShader(const RHIShaderDescription& shaderDesc)
 {
 	TRefPtr<D3D12Shader> shader = NewObject<D3D12Shader>();
-	shader->SetVertexShader({ (const uint8*)shaderDesc.VS.pShaderBytecode, shaderDesc.VS.BytecodeLength });
-	shader->SetPixelShader({ (const uint8*)shaderDesc.PS.pShaderBytecode, shaderDesc.PS.BytecodeLength });
-	shader->CreateShaderPipeline(shaderDesc.ShaderName, d3d12Device.Get());
-
+	shader->CreateShaderPipeline(shaderDesc, d3d12Device.Get());
 	return shader;
 }
 

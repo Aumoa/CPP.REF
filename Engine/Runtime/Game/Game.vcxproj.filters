@@ -664,6 +664,9 @@
     <ClCompile Include="Private\RHI\RHITextureClearValue.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\RHI\RHITextureFormat.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
