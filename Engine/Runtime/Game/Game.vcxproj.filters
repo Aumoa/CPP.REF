@@ -421,6 +421,7 @@
     <ClInclude Include="Public\RHI\RHITextureClearValue.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -666,6 +667,9 @@
     </ClCompile>
     <ClCompile Include="Private\RHI\RHITextureFormat.cpp">
       <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

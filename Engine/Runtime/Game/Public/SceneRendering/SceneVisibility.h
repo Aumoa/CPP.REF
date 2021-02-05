@@ -24,6 +24,7 @@ private:
 
 public:
 	SceneVisibility(Scene* inScene, MinimalViewInfo& inView);
+	SceneVisibility(const SceneVisibility& rh);
 	SceneVisibility(SceneVisibility&& rh) noexcept;
 	~SceneVisibility() override;
 

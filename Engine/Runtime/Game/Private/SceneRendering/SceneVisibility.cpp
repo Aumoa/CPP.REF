@@ -15,9 +15,18 @@ SceneVisibility::SceneVisibility(Scene* inScene, MinimalViewInfo& inView) : Supe
 
 }
 
+SceneVisibility::SceneVisibility(const SceneVisibility& rh) : Super()
+	, myScene(rh.myScene)
+	, myView(rh.myView)
+	, visibilities(rh.visibilities)
+{
+
+}
+
 SceneVisibility::SceneVisibility(SceneVisibility&& rh) noexcept : Super()
 	, myScene(rh.myScene)
 	, myView(rh.myView)
+	, visibilities(move(rh.visibilities))
 {
 
 }

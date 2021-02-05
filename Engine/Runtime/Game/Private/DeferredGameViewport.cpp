@@ -9,8 +9,13 @@
 #include "RHI/IRHIResource.h"
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDepthStencilView.h"
-#include "SceneRendering/SceneRenderer.h"
+#include "SceneRendering/DeferredSceneRenderer.h"
+#include "SceneRendering/Scene.h"
+#include "SceneRendering/MinimalViewInfo.h"
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "Framework/PlayerController.h"
+#include "Components/PlayerCameraManager.h"
+#include "Logging/LogMacros.h"
 
 DEFINE_STATS_GROUP(DeferredGameViewport);
 
@@ -26,11 +31,25 @@ DeferredGameViewport::~DeferredGameViewport()
 
 void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, Scene* inScene)
 {
-	SceneRenderer renderer(inScene);
+	DeferredSceneRenderer renderer(inScene);
 
 	{
 		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, CalcVisibility);
-		renderer.CalcLocalPlayerVisibility();
+
+		APlayerController* localPlayer = inScene->LocalPlayer;
+		PlayerCameraManager* cameraManager = localPlayer->CameraManager;
+
+		if (cameraManager == nullptr)
+		{
+			SE_LOG(LogRendering, Error, L"PlayerController have not a camera manager component. Abort.");
+			return;
+		}
+
+		MinimalViewInfo viewInfo;
+		cameraManager->CalcCameraView(viewInfo);
+
+		renderer.AddViewInfo(viewInfo);
+		renderer.CalcVisibility();
 	}
 
 	{

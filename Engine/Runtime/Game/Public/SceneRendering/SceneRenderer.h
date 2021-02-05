@@ -5,12 +5,9 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface IRHIResource;
-interface IRHIDeferredCommandList;
-interface IRHIDeviceBundle;
-interface IRHIRenderTargetView;
+#include "SceneVisibility.h"
+
 interface IRHICommandList;
-interface IRHIShader;
 
 class PrimitiveSceneProxy;
 class Scene;
@@ -25,9 +22,6 @@ public:
 	using This = SceneRenderer;
 
 private:
-	static bool bShaderCompiled;
-	static IRHIShader* pickShader;
-
 	Scene* renderScene;
 	std::vector<SceneVisibility> visibilities;
 
@@ -35,14 +29,14 @@ public:
 	SceneRenderer(Scene* scene);
 	~SceneRenderer() override;
 
-	virtual void CalcVisibility(MinimalViewInfo& inView);
-	virtual void RenderScene(IRHICommandList* immediateCommandList);
+	virtual void CalcVisibility();
+	virtual void RenderScene(IRHICommandList* immediateCommandList) = 0;
 
-	void CalcLocalPlayerVisibility();
+	void AddViewInfo(MinimalViewInfo& inView);
 
-private:
-	static void ShaderInitialize();
+	vs_property_get(Scene*, TargetScene);
+	Scene* TargetScene_get() const;
 
-	void SetShader(IRHICommandList* commandList);
-	void RenderSceneInternal(IRHICommandList* commandList, const std::vector<bool>& primitiveVisibility);
+protected:
+	const std::vector<SceneVisibility>& GetSceneVisibilities() const;
 };
