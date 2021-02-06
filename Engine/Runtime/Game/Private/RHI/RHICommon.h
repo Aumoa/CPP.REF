@@ -13,3 +13,4 @@
 #include "RHI/RHITextureClearValue.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
+#include "RHI/RHIResourceDesc.h"

@@ -21,10 +21,21 @@ __declspec( property( put = Name##_set ) ) Type Name
 
 #define vs_property( Type, Name )\
 __declspec( property( get = Name##_get, put = Name##_set ) ) Type Name
+
+#define vs_property_get_auto(Type, Name, Internal)\
+vs_property_get(Type, Name);\
+inline Type Name ## _get() const { return Internal; }
+
+#define vs_property_set_auto(Type, Name, Internal)\
+vs_property_set(Type, Name);\
+inline void Name ## _set(const Type& value) { Internal = value; }
+
+#define vs_property_auto(Type, Name, Internal)\
+vs_property(Type, Name);\
+inline Type Name ## _get() const { return Internal; }\
+inline void Name ## _set(const Type& value) { Internal = value; }
 #else
-#define vs_property_get( Type, Name )
-#define vs_property_set( Type, Name )
-#define vs_property( Type, Name )
+#error "Cannot compile without MSVC."
 #endif
 
 using uint8 = unsigned char;

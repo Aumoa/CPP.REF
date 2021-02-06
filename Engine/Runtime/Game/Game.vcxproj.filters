@@ -447,6 +447,18 @@
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Components\DirectionalLight.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12DynamicBuffer.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferManager.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -705,6 +717,18 @@
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\DirectionalLight.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DynamicBuffer.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferManager.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
   </ItemGroup>

@@ -14,6 +14,7 @@ class D3D12SwapChain;
 class D3D12ImmediateCommandList;
 class D3D12OfflineDescriptorManager;
 class D3D12OnlineDescriptorManager;
+class D3D12DynamicBufferManager;
 
 class D3D12DeviceBundle : virtual public Object, virtual public IRHIDeviceBundle
 {
@@ -37,6 +38,8 @@ private:
 
 	TRefPtr<RHIShaderLibrary> shaderLibrary;
 	TRefPtr<RHIResourceGC> resourceGC;
+
+	std::map<size_t, TRefPtr<D3D12DynamicBufferManager>> bufferManager;
 
 public:
 	D3D12DeviceBundle();

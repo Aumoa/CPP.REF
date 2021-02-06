@@ -19,6 +19,8 @@
 #include "D3D12Fence.h"
 #include "D3D12DepthStencilView.h"
 #include "D3D12ShaderResourceView.h"
+#include "D3D12DynamicBufferManager.h"
+#include "D3D12DynamicBuffer.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
@@ -201,29 +203,19 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(span<uint32> indices)
 	return NewObject<D3D12Resource>(resource.Get());
 }
 
+#define ALIGN_256(x) ((x + 255) & ~255)
+
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicConstantBuffer(size_t sizeInBytes)
 {
-	D3D12_RESOURCE_DESC bufferDesc = { };
-	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	bufferDesc.Width = (UINT64)sizeInBytes;
-	bufferDesc.Height = 1;
-	bufferDesc.DepthOrArraySize = 1;
-	bufferDesc.MipLevels = 1;
-	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-	bufferDesc.SampleDesc = { 1, 0 };
-	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	size_t align_size = ALIGN_256(sizeInBytes);
 
-	D3D12_HEAP_PROPERTIES heap = { };
-	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+	auto it = bufferManager.find(align_size);
+	if (it == bufferManager.end())
+	{
+		it = bufferManager.emplace(align_size, NewObject<D3D12DynamicBufferManager>(align_size)).first;
+	}
 
-	ComPtr<ID3D12Resource> resource;
-	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
-
-	auto d3d12Res = NewObject<D3D12Resource>(resource.Get());
-	d3d12Res->BindMappingAddress();
-
-	return move(d3d12Res);
+	return it->second->AllocBuffer();
 }
 
 ID3D12Device* D3D12DeviceBundle::Device_get() const
