@@ -3,7 +3,7 @@
 #include "SceneRendering/SceneVisibility.h"
 
 #include "SceneRendering/Scene.h"
-#include "Shaders/ShaderCameraConstant.h"
+#include "SceneRendering/ShaderCameraConstant.h"
 #include "Components/PrimitiveComponent.h"
 
 using namespace std;

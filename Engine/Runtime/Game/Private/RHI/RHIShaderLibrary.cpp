@@ -18,38 +18,23 @@ RHIShaderLibrary::~RHIShaderLibrary()
 
 }
 
-bool RHIShaderLibrary::AddShader(TRefPtr<IRHIShader> shader)
+void RHIShaderLibrary::SetShader(size_t inShaderIndex, TRefPtr<IRHIShader> inShader)
 {
-	if (!shader.IsValid)
+	if (shaders.size() <= inShaderIndex)
 	{
-		SE_LOG(LogRHI, Error, L"Unexpected error. Shader is invalid.");
-		return false;
+		shaders.resize(inShaderIndex + 1);
 	}
 
-	auto& mapped_ptr = shaderMap[shader->GetShaderTypeHashCode()];
-	if (mapped_ptr.IsValid)
-	{
-		SE_LOG(LogRHI, Error, "Shader duplication detected on library.");
-		return false;
-	}
-
-	mapped_ptr = move(shader);
-	return true;
+	shaders[inShaderIndex] = move(inShader);
 }
 
-IRHIShader* RHIShaderLibrary::GetShader(TRefPtr<String> shaderName) const
+IRHIShader* RHIShaderLibrary::GetShader(size_t inShaderIndex) const
 {
-	return GetShader(shaderName->GetHashCode());
-}
-
-IRHIShader* RHIShaderLibrary::GetShader(size_t shaderNameHash) const
-{
-	auto it = shaderMap.find(shaderNameHash);
-	if (it == shaderMap.end())
+	if (inShaderIndex >= shaders.size())
 	{
-		SE_LOG(LogRHI, Error, "Shader is not contains to library.");
+		SE_LOG(LogRHI, Error, L"Shader index {0} is not contains to shader library.", inShaderIndex);
 		return nullptr;
 	}
 
-	return it->second.Get();
+	return shaders[inShaderIndex].Get();
 }

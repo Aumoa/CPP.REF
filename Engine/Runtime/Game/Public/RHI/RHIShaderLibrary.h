@@ -9,13 +9,24 @@ interface IRHIShader;
 
 class GAME_API RHIShaderLibrary : virtual public Object
 {
-	std::map<size_t, TRefPtr<IRHIShader>> shaderMap;
+public:
+	using Super = Object;
+	using This = RHIShaderLibrary;
+
+public:
+	enum : size_t
+	{
+		GeometryShader,
+		LightingShader,
+		TonemapShader
+	};
+
+	std::vector<TRefPtr<IRHIShader>> shaders;
 
 public:
 	RHIShaderLibrary();
 	~RHIShaderLibrary() override;
 
-	bool AddShader(TRefPtr<IRHIShader> shader);
-	IRHIShader* GetShader(TRefPtr<String> shaderName) const;
-	IRHIShader* GetShader(size_t shaderNameHash) const;
+	void SetShader(size_t inShaderIndex, TRefPtr<IRHIShader> inShader);
+	IRHIShader* GetShader(size_t inShaderIndex) const;
 };

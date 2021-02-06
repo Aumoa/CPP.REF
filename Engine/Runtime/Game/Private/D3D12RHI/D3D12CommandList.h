@@ -17,6 +17,8 @@ private:
 	std::vector<D3D12_RESOURCE_BARRIER> pendingBarriers;
 	bool bHasBegunCommand : 1;
 
+	ID3D12DescriptorHeap* currentTable;
+
 public:
 	D3D12CommandList();
 	~D3D12CommandList() override;
@@ -35,6 +37,7 @@ public:
 	virtual void DrawMesh(const RHIMeshDrawCommand& command);
 	virtual void SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress);
 	virtual void ClearDepthStencilView(IRHIDepthStencilView* dsv, std::optional<float> depth, std::optional<uint8> stencil);
+	virtual void SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV);
 
 	virtual bool HasBegunCommand_get() const;
 
@@ -43,4 +46,5 @@ public:
 
 private:
 	void ConsumePendingDeferredCommands();
+	void EnqueueDescriptorTable();
 };

@@ -1,4 +1,5 @@
-﻿// Copyright 2020 Aumoa.lib. All right reserved.
+﻿
+// Copyright 2020 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -9,6 +10,7 @@ interface IRHIRenderTargetView;
 interface IRHIResource;
 interface IRHIShader;
 interface IRHIDepthStencilView;
+interface IRHIShaderResourceView;
 enum class ERHIResourceStates;
 enum class ERHIPrimitiveTopology;
 struct RHIViewport;
@@ -30,6 +32,7 @@ interface IRHICommandList : virtual public Object
 	virtual void DrawMesh(const RHIMeshDrawCommand& command) = 0;
 	virtual void SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 	virtual void ClearDepthStencilView(IRHIDepthStencilView* dsv, std::optional<float> depth, std::optional<uint8> stencil) = 0;
+	virtual void SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

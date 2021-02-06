@@ -2,10 +2,14 @@
 
 #include "D3D12CommandList.h"
 
+#include "Engine.h"
+#include "D3D12DeviceBundle.h"
+#include "D3D12OnlineDescriptorManager.h"
 #include "D3D12RenderTargetView.h"
 #include "D3D12Resource.h"
 #include "D3D12Shader.h"
 #include "D3D12DepthStencilView.h"
+#include "D3D12ShaderResourceView.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
 
@@ -13,6 +17,8 @@ using namespace std;
 
 D3D12CommandList::D3D12CommandList() : Super()
 	, bHasBegunCommand(false)
+
+	, currentTable(nullptr)
 {
 
 }
@@ -25,6 +31,7 @@ D3D12CommandList::~D3D12CommandList()
 void D3D12CommandList::BeginCommand()
 {
 	bHasBegunCommand = true;
+	currentTable = nullptr;
 }
 
 void D3D12CommandList::EndCommand()
@@ -36,8 +43,6 @@ void D3D12CommandList::EndCommand()
 
 void D3D12CommandList::SetRenderTargets(size_t count, IRHIRenderTargetView* rtv[], IRHIDepthStencilView* dsv)
 {
-	ConsumePendingDeferredCommands();
-
 	vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(count);
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -84,8 +89,6 @@ void D3D12CommandList::CopyResource(IRHIResource* target, IRHIResource* source)
 
 void D3D12CommandList::SetShader(IRHIShader* shader)
 {
-	ConsumePendingDeferredCommands();
-
 	auto d3d12Shader = Cast<D3D12Shader>(shader);
 	CommandList->SetGraphicsRootSignature(d3d12Shader->RootSignature);
 	CommandList->SetPipelineState(d3d12Shader->PipelineState);
@@ -93,15 +96,11 @@ void D3D12CommandList::SetShader(IRHIShader* shader)
 
 void D3D12CommandList::SetPrimitiveTopology(ERHIPrimitiveTopology primitiveTopology)
 {
-	ConsumePendingDeferredCommands();
-
 	CommandList->IASetPrimitiveTopology((D3D_PRIMITIVE_TOPOLOGY)primitiveTopology);
 }
 
 void D3D12CommandList::SetScissorRects(const Rect& scissorRect)
 {
-	ConsumePendingDeferredCommands();
-
 	D3D12_RECT rc;
 	rc.left = (INT)scissorRect.Min.X;
 	rc.top = (INT)scissorRect.Min.Y;
@@ -113,8 +112,6 @@ void D3D12CommandList::SetScissorRects(const Rect& scissorRect)
 
 void D3D12CommandList::SetViewports(const RHIViewport& scissorRect)
 {
-	ConsumePendingDeferredCommands();
-
 	D3D12_VIEWPORT vp;
 	vp.TopLeftX = (FLOAT)scissorRect.X;
 	vp.TopLeftY = (FLOAT)scissorRect.Y;
@@ -129,13 +126,16 @@ void D3D12CommandList::SetViewports(const RHIViewport& scissorRect)
 void D3D12CommandList::DrawMesh(const RHIMeshDrawCommand& command)
 {
 	ConsumePendingDeferredCommands();
-	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	CommandList->IASetPrimitiveTopology((D3D_PRIMITIVE_TOPOLOGY)command.Topology);
 
-	D3D12_VERTEX_BUFFER_VIEW vbv = { };
-	vbv.BufferLocation = command.VertexBufferVirtualAddress;
-	vbv.StrideInBytes = command.VertexStride;
-	vbv.SizeInBytes = vbv.StrideInBytes * command.VertexCount;
-	CommandList->IASetVertexBuffers(0, 1, &vbv);
+	if (command.VertexBufferVirtualAddress != 0)
+	{
+		D3D12_VERTEX_BUFFER_VIEW vbv = { };
+		vbv.BufferLocation = command.VertexBufferVirtualAddress;
+		vbv.StrideInBytes = command.VertexStride;
+		vbv.SizeInBytes = vbv.StrideInBytes * command.VertexCount;
+		CommandList->IASetVertexBuffers(0, 1, &vbv);
+	}
 
 	if (command.IndexBufferVirtualAddress != 0)
 	{
@@ -154,7 +154,6 @@ void D3D12CommandList::DrawMesh(const RHIMeshDrawCommand& command)
 
 void D3D12CommandList::SetGraphicsRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress)
 {
-	ConsumePendingDeferredCommands();
 	CommandList->SetGraphicsRootConstantBufferView(inParamIndex, (D3D12_GPU_VIRTUAL_ADDRESS)inVirtualAddress);
 }
 
@@ -168,6 +167,14 @@ void D3D12CommandList::ClearDepthStencilView(IRHIDepthStencilView* dsv, optional
 	constexpr FLOAT ClearColor[4] = { 0, 0, 0, 0 };
 	auto rtv_cast = Cast<D3D12DepthStencilView>(dsv);
 	CommandList->ClearDepthStencilView(rtv_cast->Handle, (D3D12_CLEAR_FLAGS)flags, depth.value_or(1.0f), stencil.value_or(0), 0, nullptr);
+}
+
+void D3D12CommandList::SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV)
+{
+	EnqueueDescriptorTable();
+
+	auto srv = Cast<D3D12ShaderResourceView>(inSRV);
+	CommandList->SetGraphicsRootDescriptorTable(inRootParameterIndex, srv->Handle);
 }
 
 bool D3D12CommandList::HasBegunCommand_get() const
@@ -190,5 +197,18 @@ void D3D12CommandList::ConsumePendingDeferredCommands()
 		{
 			CommandList->ResourceBarrier((UINT)barrier_swap.size(), barrier_swap.data());
 		}
+	}
+}
+
+void D3D12CommandList::EnqueueDescriptorTable()
+{
+	// Experimental implementation!!
+	if (currentTable == nullptr)
+	{
+		D3D12OnlineDescriptorManager* srvMgr = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->SrvManager;
+		currentTable = srvMgr->pHeap;
+
+		ID3D12DescriptorHeap* ppHeaps[] = { currentTable };
+		CommandList->SetDescriptorHeaps(1, ppHeaps);
 	}
 }

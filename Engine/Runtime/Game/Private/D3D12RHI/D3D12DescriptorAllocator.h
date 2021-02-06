@@ -1,4 +1,5 @@
-﻿// Copyright 2020 Aumoa.lib. All right reserved.
+﻿
+// Copyright 2020 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -41,6 +42,8 @@ public:
 	bool IsOffline_get() const;
 	vs_property_get(bool, IsThreadSafe);
 	bool IsThreadSafe_get() const;
+	vs_property_get(ID3D12DescriptorHeap*, pHeap);
+	ID3D12DescriptorHeap* pHeap_get() const;
 
 	const D3D12_DESCRIPTOR_HEAP_TYPE Type;
 	const size_t Count;

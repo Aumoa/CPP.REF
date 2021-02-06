@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface IRHIShader : virtual public Object
+interface GAME_API IRHIShaderResourceView : virtual public Object
 {
 
 };

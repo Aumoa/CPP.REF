@@ -46,7 +46,7 @@ D3D12OfflineDescriptorIndex D3D12OfflineDescriptorManager::Alloc()
 
 	D3D12DescriptorAllocator* allocator = heapAllocators[*select].Get();
 	D3D12DescriptorIndex index = allocator->Alloc();
-	auto offline_index = D3D12OfflineDescriptorIndex(*select, index);
+	auto offline_index = D3D12OfflineDescriptorIndex(*select, this, index);
 
 	return offline_index;
 }

@@ -52,9 +52,18 @@ D3D12DescriptorIndex D3D12DescriptorAllocator::Alloc()
 
 	D3D12_CPU_DESCRIPTOR_HANDLE startAddr = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	startAddr.ptr += IncrementSize * idx;
-
 	descriptor_pool.pop();
-	return D3D12DescriptorIndex(rev_pool, ++rev, idx, startAddr);
+
+	if (bOffline)
+	{
+		return D3D12DescriptorIndex(rev_pool, ++rev, idx, startAddr);
+	}
+	else
+	{
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuAddr = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		gpuAddr.ptr += IncrementSize * idx;
+		return D3D12DescriptorIndex(rev_pool, ++rev, idx, startAddr, gpuAddr);
+	}
 }
 
 void D3D12DescriptorAllocator::Free(const D3D12DescriptorIndex& index)
@@ -86,6 +95,11 @@ bool D3D12DescriptorAllocator::IsOffline_get() const
 bool D3D12DescriptorAllocator::IsThreadSafe_get() const
 {
 	return bThreadSafe;
+}
+
+ID3D12DescriptorHeap* D3D12DescriptorAllocator::pHeap_get() const
+{
+	return descriptorHeap.Get();
 }
 
 void D3D12DescriptorAllocator::InitializePool()

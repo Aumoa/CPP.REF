@@ -11,15 +11,17 @@
 #include "D3D12RenderTargetView.h"
 #include "D3D12OfflineDescriptorManager.h"
 #include "D3D12OfflineDescriptorIndex.h"
+#include "D3D12OnlineDescriptorManager.h"
+#include "D3D12OnlineDescriptorIndex.h"
 #include "D3D12Resource.h"
 #include "D3D12DeferredCommandList.h"
 #include "D3D12Shader.h"
 #include "D3D12Fence.h"
 #include "D3D12DepthStencilView.h"
+#include "D3D12ShaderResourceView.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
-#include "RHI/RHIShaderDescription.h"
 #include "RHI/RHITextureClearValue.h"
 
 using namespace std;
@@ -59,8 +61,8 @@ void D3D12DeviceBundle::InitializeBundle()
 	InitializeCOM();
 	InitializeDXGI();
 	InitializeD3D12();
+	InitializeShaders();
 
-	shaderLibrary = NewObject<RHIShaderLibrary>();
 	resourceGC = NewObject<RHIResourceGC>();
 
 	instance = this;
@@ -123,6 +125,25 @@ TRefPtr<IRHIDepthStencilView> D3D12DeviceBundle::CreateDepthStencilView(IRHIReso
 	return NewObject<D3D12DepthStencilView>(resource1, index);
 }
 
+TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureView(IRHIResource* resource, ERHITextureFormat inViewFormat)
+{
+	if (inViewFormat == ERHITextureFormat::Unknown)
+	{
+		inViewFormat = resource->GetDesc().Format;
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{ };
+	srvDesc.Format = (DXGI_FORMAT)inViewFormat;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Texture2D.MipLevels = 1;
+
+	ID3D12Resource* resource1 = Cast<D3D12Resource>(resource)->Resource;
+	D3D12OnlineDescriptorIndex index = srvManager->Alloc();
+	d3d12Device->CreateShaderResourceView(resource1, &srvDesc, index.Handle);
+	return NewObject<D3D12ShaderResourceView>(resource1, index);
+}
+
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue)
 {
 	D3D12_HEAP_PROPERTIES heapProp{ };
@@ -164,13 +185,6 @@ TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
 TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
 {
 	return NewObject<D3D12Fence>();
-}
-
-TRefPtr<IRHIShader> D3D12DeviceBundle::CreateShader(const RHIShaderDescription& shaderDesc)
-{
-	TRefPtr<D3D12Shader> shader = NewObject<D3D12Shader>();
-	shader->CreateShaderPipeline(shaderDesc, d3d12Device.Get());
-	return shader;
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)
@@ -215,6 +229,11 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicConstantBuffer(size_t size
 ID3D12Device* D3D12DeviceBundle::Device_get() const
 {
 	return d3d12Device.Get();
+}
+
+D3D12OnlineDescriptorManager* D3D12DeviceBundle::SrvManager_get() const
+{
+	return srvManager.Get();
 }
 
 void D3D12DeviceBundle::InitializeCOM()
@@ -289,6 +308,218 @@ void D3D12DeviceBundle::InitializeD3D12()
 
 	rtvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
 	dsvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, OfflineDescriptorAllocUnit);
+	srvManager = NewObject<D3D12OnlineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096);
+}
+
+#include "Shaders/GeometryShader/Compiled/VertexShader.hlsl.h"
+#include "Shaders/GeometryShader/Compiled/PixelShader.hlsl.h"
+#include "Shaders/LightingShader/Compiled/VertexShader.hlsl.h"
+#include "Shaders/LightingShader/Compiled/PixelShader.hlsl.h"
+#include "Shaders/TonemapShader/Compiled/VertexShader.hlsl.h"
+#include "Shaders/TonemapShader/Compiled/PixelShader.hlsl.h"
+
+template<class... TArgs, size_t... Indices>
+inline void SetRTVFormatsHelper(D3D12_GRAPHICS_PIPELINE_STATE_DESC& outDesc, TArgs&&... inArgs, index_sequence<Indices...>&&)
+{
+	outDesc.NumRenderTargets = (uint32)sizeof...(TArgs);
+	tie(outDesc.RTVFormats[Indices]...) = tie(inArgs...);
+}
+
+void D3D12DeviceBundle::InitializeShaders()
+{
+	static auto GetRootCBVParameter = [](uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility)
+	{
+		D3D12_ROOT_PARAMETER param = { };
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		param.ShaderVisibility = shaderVisibility;
+		param.Constants.ShaderRegister = shaderRegister;
+		return param;
+	};
+
+	static auto GetRootDescriptorTableParameter = [] <size_t NumRanges> (D3D12_SHADER_VISIBILITY shaderVisibility, const D3D12_DESCRIPTOR_RANGE(&inRanges)[NumRanges])
+	{
+		D3D12_ROOT_PARAMETER param = { };
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		param.ShaderVisibility = shaderVisibility;
+		param.DescriptorTable.NumDescriptorRanges = (uint32)NumRanges;
+		param.DescriptorTable.pDescriptorRanges = inRanges;
+		return param;
+	};
+
+	static auto GetRootSignatureDesc = [](span<D3D12_ROOT_PARAMETER> inParameters, span<D3D12_STATIC_SAMPLER_DESC> inSamplers)
+	{
+		D3D12_ROOT_SIGNATURE_DESC RSDesc = { };
+		RSDesc.NumParameters = (uint32)inParameters.size();
+		RSDesc.pParameters = inParameters.data();
+		RSDesc.NumStaticSamplers = (uint32)inSamplers.size();
+		RSDesc.pStaticSamplers = inSamplers.data();
+		return RSDesc;
+	};
+
+	static auto GetShaderBytecode = [] <size_t NumBytes> (const BYTE(&inArray)[NumBytes]) -> D3D12_SHADER_BYTECODE
+	{
+		return { inArray, NumBytes };
+	};
+
+	static auto GetInputLayout = [] <size_t NumItems> (const D3D12_INPUT_ELEMENT_DESC(&inArray)[NumItems]) -> D3D12_INPUT_LAYOUT_DESC
+	{
+		return { inArray, NumItems };
+	};
+
+	static auto GetInitialPipelineDesc = [](ID3D12RootSignature* pRS)
+	{
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = { };
+		PSDesc.pRootSignature = pRS;
+		for (size_t i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+		{
+			PSDesc.BlendState.RenderTarget[i].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		}
+		PSDesc.SampleMask = 0xFFFFFFFF;
+		PSDesc.RasterizerState = { D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_BACK };
+		PSDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		PSDesc.SampleDesc = { 1, 0 };
+		return PSDesc;
+	};
+
+	static auto SetRTVFormats = [] <class... TArgs> (D3D12_GRAPHICS_PIPELINE_STATE_DESC& outDesc, TArgs&&... inArgs)
+	{
+		SetRTVFormatsHelper<TArgs...>(outDesc, forward<TArgs>(inArgs)..., make_index_sequence<sizeof...(TArgs)>{ });
+	};
+
+	static auto GetStaticSampler = [](D3D12_FILTER inFilter, D3D12_TEXTURE_ADDRESS_MODE inAddressMode, uint32 inRegister = 0, D3D12_SHADER_VISIBILITY inVisibility = D3D12_SHADER_VISIBILITY_PIXEL)
+	{
+		D3D12_STATIC_SAMPLER_DESC SSDesc = { };
+		SSDesc.Filter = inFilter;
+		SSDesc.AddressU = inAddressMode;
+		SSDesc.AddressV = inAddressMode;
+		SSDesc.AddressW = inAddressMode;
+		SSDesc.ShaderRegister = inRegister;
+		SSDesc.ShaderVisibility = inVisibility;
+		return SSDesc;
+	};
+
+	auto CreateRootSignature = [&](const D3D12_ROOT_SIGNATURE_DESC& inRS)
+	{
+		ComPtr<ID3DBlob> pBlob, pError;
+		ComPtr<ID3D12RootSignature> pRootSignature;
+		HR(D3D12SerializeRootSignature(&inRS, D3D_ROOT_SIGNATURE_VERSION_1_0, &pBlob, &pError));
+		HR(d3d12Device->CreateRootSignature(0, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), IID_PPV_ARGS(&pRootSignature)));
+		return pRootSignature;
+	};
+
+	shaderLibrary = NewObject<RHIShaderLibrary>();
+	RHIShaderLibrary* lib = shaderLibrary.Get();
+
+#define GetRSFlags1(Deny1) D3D12_ROOT_SIGNATURE_FLAG_DENY_ ## Deny1 ## _SHADER_ROOT_ACCESS
+#define GetRSFlags2(Deny1, Deny2) GetRSFlags1(Deny1) | GetRSFlags1(Deny2)
+#define GetRSFlags3(Deny1, Deny2, Deny3) GetRSFlags2(Deny1, Deny2) | GetRSFlags1(Deny3)
+#define GetRSFlags4(Deny1, Deny2, Deny3, Deny4) GetRSFlags3(Deny1, Deny2, Deny3) | GetRSFlags1(Deny4)
+#define GetRSFlags5(Deny1, Deny2, Deny3, Deny4, Deny5) GetRSFlags4(Deny1, Deny2, Deny3, Deny4) | GetRSFlags1(Deny5)
+#define GetRSFlagsIA1(Deny1) D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | GetRSFlags1(Deny1)
+#define GetRSFlagsIA2(Deny1, Deny2) GetRSFlagsIA1(Deny1) | GetRSFlags1(Deny2)
+#define GetRSFlagsIA3(Deny1, Deny2, Deny3) GetRSFlagsIA2(Deny1, Deny2) | GetRSFlags1(Deny3)
+#define GetRSFlagsIA4(Deny1, Deny2, Deny3, Deny4) GetRSFlagsIA3(Deny1, Deny2, Deny3) | GetRSFlags1(Deny4)
+#define GetRSFlagsIA5(Deny1, Deny2, Deny3, Deny4, Deny5) GetRSFlagsIA4(Deny1, Deny2, Deny3, Deny4) | GetRSFlags1(Deny5)
+#undef DOMAIN
+
+	{  // Geometry Shader
+		D3D12_ROOT_PARAMETER RootParameters[]
+		{
+			GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX)
+		};
+
+		D3D12_INPUT_ELEMENT_DESC InputElements[]
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		};
+
+		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, { });
+		RSDesc.Flags = GetRSFlagsIA3(HULL, DOMAIN, GEOMETRY);
+		ComPtr<ID3D12RootSignature> pRS = CreateRootSignature(RSDesc);
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = GetInitialPipelineDesc(pRS.Get());
+		PSDesc.VS = GetShaderBytecode(pGeometryVertexShader);
+		PSDesc.PS = GetShaderBytecode(pGeometryPixelShader);
+		PSDesc.DepthStencilState = { TRUE, D3D12_DEPTH_WRITE_MASK_ALL, D3D12_COMPARISON_FUNC_LESS, FALSE, 0, 0 };
+		PSDesc.InputLayout = GetInputLayout(InputElements);
+		SetRTVFormats(PSDesc, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		PSDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		ComPtr<ID3D12PipelineState> pPS;
+		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
+
+		lib->SetShader(RHIShaderLibrary::GeometryShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
+	}
+
+	{  // Lighting Shader
+		D3D12_DESCRIPTOR_RANGE ranges1[]
+		{
+			{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+		};
+
+		D3D12_DESCRIPTOR_RANGE ranges2[]
+		{
+			{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+		};
+
+		D3D12_ROOT_PARAMETER RootParameters[]
+		{
+			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges1),
+			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges2)
+		};
+
+		D3D12_STATIC_SAMPLER_DESC StaticSamplers[]
+		{
+			GetStaticSampler(D3D12_FILTER_MIN_MAG_MIP_POINT, D3D12_TEXTURE_ADDRESS_MODE_BORDER)
+		};
+
+		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, StaticSamplers);
+		RSDesc.Flags = GetRSFlags4(VERTEX, DOMAIN, HULL, GEOMETRY);
+		ComPtr<ID3D12RootSignature> pRS = CreateRootSignature(RSDesc);
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = GetInitialPipelineDesc(pRS.Get());
+		PSDesc.VS = GetShaderBytecode(pLightingVertexShader);
+		PSDesc.PS = GetShaderBytecode(pLightingPixelShader);
+		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
+
+		ComPtr<ID3D12PipelineState> pPS;
+		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
+
+		lib->SetShader(RHIShaderLibrary::LightingShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
+	}
+
+	{  // Tonemap Shader
+		D3D12_DESCRIPTOR_RANGE ranges1[]
+		{
+			{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+		};
+
+		D3D12_ROOT_PARAMETER RootParameters[]
+		{
+			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges1)
+		};
+
+		D3D12_STATIC_SAMPLER_DESC StaticSamplers[]
+		{
+			GetStaticSampler(D3D12_FILTER_MIN_MAG_MIP_POINT, D3D12_TEXTURE_ADDRESS_MODE_BORDER)
+		};
+
+		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, StaticSamplers);
+		RSDesc.Flags = GetRSFlags4(VERTEX, DOMAIN, HULL, GEOMETRY);
+		ComPtr<ID3D12RootSignature> pRS = CreateRootSignature(RSDesc);
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = GetInitialPipelineDesc(pRS.Get());
+		PSDesc.VS = GetShaderBytecode(pTonemapVertexShader);
+		PSDesc.PS = GetShaderBytecode(pTonemapPixelShader);
+		SetRTVFormats(PSDesc, DXGI_FORMAT_B8G8R8A8_UNORM);
+
+		ComPtr<ID3D12PipelineState> pPS;
+		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
+
+		lib->SetShader(RHIShaderLibrary::TonemapShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
+	}
 }
 
 bool D3D12DeviceBundle::IsAdapterSuitable(IDXGIAdapter1* adapter) const

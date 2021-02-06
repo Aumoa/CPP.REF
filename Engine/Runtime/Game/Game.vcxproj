@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugGame|Win32">
@@ -188,7 +188,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>Private\Shaders\Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <HeaderFileOutput>..\..\..\..\%(Directory)Compiled\%(Filename).hlsl.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
   </ItemDefinitionGroup>
@@ -214,7 +214,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>Private\Shaders\Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <HeaderFileOutput>..\..\..\..\%(Directory)Compiled\%(Filename).hlsl.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
   </ItemDefinitionGroup>
@@ -241,7 +241,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>Private\Shaders\Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <HeaderFileOutput>..\..\..\..\%(Directory)Compiled\%(Filename).hlsl.h</HeaderFileOutput>
       <ObjectFileOutput>
       </ObjectFileOutput>
     </FxCompile>
@@ -259,9 +259,12 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTargetView.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Shader.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
@@ -270,7 +273,7 @@
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Private\RHI\RHICommon.h" />
-    <ClInclude Include="Private\Shaders\ShaderCameraConstant.h" />
+    <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanException.h" />
@@ -288,6 +291,7 @@
     <ClInclude Include="Public\Components\ComponentTransformSpace.h" />
     <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h" />
     <ClInclude Include="Public\Components\InputComponent.h" />
+    <ClInclude Include="Public\Components\LightComponent.h" />
     <ClInclude Include="Public\Components\MeshComponent.h" />
     <ClInclude Include="Public\Components\MovementComponent.h" />
     <ClInclude Include="Public\Components\PawnMovementComponent.h" />
@@ -333,6 +337,7 @@
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
     <ClInclude Include="Public\RHI\IRHIShader.h" />
+    <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h" />
     <ClInclude Include="Public\RHI\RHIPrimitiveTopology.h" />
@@ -340,7 +345,6 @@
     <ClInclude Include="Public\RHI\RHIResourceFlags.h" />
     <ClInclude Include="Public\RHI\RHIResourceGC.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
-    <ClInclude Include="Public\RHI\RHIShaderDescription.h" />
     <ClInclude Include="Public\RHI\RHIShaderLibrary.h" />
     <ClInclude Include="Public\RHI\RHITextureClearValue.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
@@ -381,6 +385,7 @@
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp" />
     <ClCompile Include="Private\Components\InputComponent.cpp" />
+    <ClCompile Include="Private\Components\LightComponent.cpp" />
     <ClCompile Include="Private\Components\MeshComponent.cpp" />
     <ClCompile Include="Private\Components\MovementComponent.cpp" />
     <ClCompile Include="Private\Components\PawnMovementComponent.cpp" />
@@ -400,9 +405,12 @@
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTargetView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
@@ -434,7 +442,6 @@
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceDesc.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />
-    <ClCompile Include="Private\RHI\RHIShaderDescription.cpp" />
     <ClCompile Include="Private\RHI\RHIShaderLibrary.cpp" />
     <ClCompile Include="Private\RHI\RHITextureClearValue.cpp" />
     <ClCompile Include="Private\RHI\RHITextureFormat.cpp" />
@@ -449,12 +456,13 @@
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneVisibility.cpp" />
+    <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMesh.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
-    <ClCompile Include="Private\Shaders\ShaderCameraConstant.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
+    <None Include="Private\Shaders\ShaderCommon.hlsli" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
     <None Include="Private\VulkanRHI\VulkanException.cpp" />
@@ -477,21 +485,71 @@
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\PixelShader.hlsl">
+    <FxCompile Include="Private\Shaders\GeometryShader\PixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pGeometry%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pGeometry%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pGeometry%(Filename)</VariableName>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\VertexShader.hlsl">
+    <FxCompile Include="Private\Shaders\GeometryShader\VertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pGeometry%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pGeometry%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pGeometry%(Filename)</VariableName>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\VertexShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pLighting%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\PixelShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pLighting%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TonemapShader\PixelShader.hlsl">
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pTonemap%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pTonemap%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pTonemap%(Filename)</VariableName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TonemapShader\VertexShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pTonemap%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pTonemap%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pTonemap%(Filename)</VariableName>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

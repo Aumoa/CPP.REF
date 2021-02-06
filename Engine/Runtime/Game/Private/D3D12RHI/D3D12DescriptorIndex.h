@@ -23,6 +23,7 @@ private:
 public:
 	D3D12DescriptorIndex();
 	D3D12DescriptorIndex(const std::vector<size_t>& rev_pool_ref, size_t revision, size_t index, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	D3D12DescriptorIndex(const std::vector<size_t>& rev_pool_ref, size_t revision, size_t index, D3D12_CPU_DESCRIPTOR_HANDLE handle, D3D12_GPU_DESCRIPTOR_HANDLE handleGpu);
 	~D3D12DescriptorIndex();
 
 	vs_property_get(bool, IsValid);
@@ -30,4 +31,6 @@ public:
 		
 	const size_t Index;
 	const D3D12_CPU_DESCRIPTOR_HANDLE Handle;
+	const D3D12_GPU_DESCRIPTOR_HANDLE HandleGPU;
+	const bool IsOnline;
 };

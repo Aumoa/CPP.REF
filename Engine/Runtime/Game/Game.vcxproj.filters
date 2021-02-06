@@ -76,6 +76,15 @@
     <Filter Include="Private\Misc">
       <UniqueIdentifier>{24e4bb5b-7f53-4e00-bdaa-9946ea62fe97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\Shaders\GeometryShader">
+      <UniqueIdentifier>{fb91fe45-859e-4f02-965b-022d91840834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders\LightingShader">
+      <UniqueIdentifier>{99ee7a18-5f91-42a3-ab31-32c6e4e69cda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders\TonemapShader">
+      <UniqueIdentifier>{95b714ea-5949-40fa-8dee-43e3f7b7dee0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -312,9 +321,6 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Fence.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Public\RHI\RHIShaderDescription.h">
-      <Filter>Public\RHI</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Framework\Pawn.h">
       <Filter>Public\Framework</Filter>
     </ClInclude>
@@ -366,9 +372,6 @@
     <ClInclude Include="Public\SceneRendering\SceneVisibility.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Shaders\ShaderCameraConstant.h">
-      <Filter>Private\Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h">
       <Filter>Public\Diagnostics</Filter>
     </ClInclude>
@@ -417,11 +420,33 @@
     <ClInclude Include="Private\Bezier.h">
       <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\RHI\RHITextureClearValue.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
+    <ClInclude Include="Public\Components\LightComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h">
+      <Filter>Private\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIShaderResourceView.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DeferredGameViewport.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -571,9 +596,6 @@
     <ClCompile Include="Private\D3D12RHI\D3D12Fence.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Private\RHI\RHIShaderDescription.cpp">
-      <Filter>Private\RHI</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Framework\Pawn.cpp">
       <Filter>Private\Framework</Filter>
     </ClCompile>
@@ -615,9 +637,6 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\SceneVisibility.cpp">
       <Filter>Private\SceneRendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Shaders\ShaderCameraConstant.cpp">
-      <Filter>Private\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp">
       <Filter>Private\Diagnostics</Filter>
@@ -661,7 +680,6 @@
     <ClCompile Include="Engine.LoadEngineDefaultAssets.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\RHI\RHITextureClearValue.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
@@ -670,6 +688,24 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\LightComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DeferredGameViewport.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp">
+      <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -724,13 +760,28 @@
     <None Include="Public\Framework\Pawn.inl">
       <Filter>Public\Framework</Filter>
     </None>
+    <None Include="Private\Shaders\ShaderCommon.hlsli">
+      <Filter>Private\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\VertexShader.hlsl">
-      <Filter>Private\Shaders</Filter>
+    <FxCompile Include="Private\Shaders\GeometryShader\PixelShader.hlsl">
+      <Filter>Private\Shaders\GeometryShader</Filter>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\PixelShader.hlsl">
-      <Filter>Private\Shaders</Filter>
+    <FxCompile Include="Private\Shaders\GeometryShader\VertexShader.hlsl">
+      <Filter>Private\Shaders\GeometryShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\PixelShader.hlsl">
+      <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\VertexShader.hlsl">
+      <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TonemapShader\VertexShader.hlsl">
+      <Filter>Private\Shaders\TonemapShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TonemapShader\PixelShader.hlsl">
+      <Filter>Private\Shaders\TonemapShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
