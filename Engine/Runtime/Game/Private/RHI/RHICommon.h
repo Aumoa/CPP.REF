@@ -14,3 +14,4 @@
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
 #include "RHI/RHIResourceDesc.h"
+#include "RHI/RHILight.h"

@@ -47,6 +47,6 @@ HDRPixel PS_Main(in QuadFrag inFrag)
 	float3 ads = ComputeDirectionalLight(myMat, myLight, gNormalBuffer.Sample(gSampler, inFrag.Tex).xyz, rayDir);
 
 	HDRPixel oPixel;
-	oPixel.Color = float4(float3((ads.x + ads.y) * myLight.Color + ads.z), 1.0f);
+	oPixel.Color = float4(float3((ads.x + ads.y) * myLight.Color.xyz + ads.z), 1.0f);
 	return oPixel;
 }

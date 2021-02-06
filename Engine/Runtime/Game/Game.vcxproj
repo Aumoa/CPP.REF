@@ -292,7 +292,7 @@
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\CameraComponent.h" />
     <ClInclude Include="Public\Components\ComponentTransformSpace.h" />
-    <ClInclude Include="Public\Components\DirectionalLight.h" />
+    <ClInclude Include="Public\Components\DirectionalLightComponent.h" />
     <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h" />
     <ClInclude Include="Public\Components\InputComponent.h" />
     <ClInclude Include="Public\Components\LightComponent.h" />
@@ -343,6 +343,7 @@
     <ClInclude Include="Public\RHI\IRHIShader.h" />
     <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
+    <ClInclude Include="Public\RHI\RHILight.h" />
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h" />
     <ClInclude Include="Public\RHI\RHIPrimitiveTopology.h" />
     <ClInclude Include="Public\RHI\RHIResourceDesc.h" />
@@ -356,6 +357,7 @@
     <ClInclude Include="Public\RHI\RHIViewport.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\LightSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
@@ -387,7 +389,7 @@
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
-    <ClCompile Include="Private\Components\DirectionalLight.cpp" />
+    <ClCompile Include="Private\Components\DirectionalLightComponent.cpp" />
     <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp" />
     <ClCompile Include="Private\Components\InputComponent.cpp" />
     <ClCompile Include="Private\Components\LightComponent.cpp" />
@@ -457,6 +459,7 @@
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\LightSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
     <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
     <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />

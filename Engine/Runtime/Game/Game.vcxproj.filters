@@ -447,9 +447,6 @@
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Components\DirectionalLight.h">
-      <Filter>Public\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
@@ -458,6 +455,15 @@
     </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferManager.h">
       <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\LightSceneProxy.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\DirectionalLightComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHILight.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -719,9 +725,6 @@
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Components\DirectionalLight.cpp">
-      <Filter>Private\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
@@ -730,6 +733,12 @@
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferManager.cpp">
       <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\LightSceneProxy.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\DirectionalLightComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
