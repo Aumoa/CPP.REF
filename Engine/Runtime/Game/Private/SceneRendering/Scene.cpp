@@ -3,10 +3,12 @@
 #include "SceneRendering/Scene.h"
 
 #include "Components/PrimitiveComponent.h"
-#include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
+#include "Components/LightComponent.h"
+#include "Framework/PlayerController.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 #include "SceneRendering/SceneVisibility.h"
+#include "SceneRendering/LightSceneProxy.h"
 #include "Logging/LogMacros.h"
 
 using namespace std;
@@ -28,6 +30,19 @@ void Scene::Update()
 	{
 		PrimitiveComponent*& primitive = primitiveComponents[i];
 		PrimitiveSceneProxy*& sceneProxy = sceneProxies[i];
+
+		if (primitive->HasDirtyMark())
+		{
+			primitive->ResolveDirtyState();
+			sceneProxy = primitive->GetSceneProxy();
+			sceneProxy->UpdateMovable();
+		}
+	}
+
+	for (size_t i = 0; i < lightComponents.size(); ++i)
+	{
+		LightComponent*& primitive = lightComponents[i];
+		LightSceneProxy*& sceneProxy = lightProxies[i];
 
 		if (primitive->HasDirtyMark())
 		{
@@ -62,6 +77,12 @@ void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
 	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
 }
 
+void Scene::AddLight(LightComponent* inLightComponent)
+{
+	lightComponents.emplace_back(inLightComponent);
+	lightProxies.emplace_back(inLightComponent->GetSceneProxy());
+}
+
 SceneVisibility* Scene::GetLocalPlayerVisibility() const
 {
 	return localPlayerVisibility.Get();
@@ -75,14 +96,4 @@ APlayerController* Scene::LocalPlayer_get() const
 void Scene::LocalPlayer_set(APlayerController* value)
 {
 	localPlayer = value;
-}
-
-span<PrimitiveComponent* const> Scene::Primitives_get() const
-{
-	return primitiveComponents;
-}
-
-span<PrimitiveSceneProxy* const> Scene::PrimitiveSceneProxies_get() const
-{
-	return sceneProxies;
 }

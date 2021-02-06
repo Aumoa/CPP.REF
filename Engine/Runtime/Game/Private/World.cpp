@@ -6,6 +6,7 @@
 #include "Framework/Actor.h"
 #include "SceneRendering/Scene.h"
 #include "Components/PrimitiveComponent.h"
+#include "Components/LightComponent.h"
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
 #include "Diagnostics/ScopedCycleCounter.h"
@@ -167,6 +168,18 @@ void World::AddSceneProxy(AActor* actor_ptr)
 		}
 
 		scene->AddScene(item);
+	}
+
+	list<LightComponent*> lightComponents = actor_ptr->GetComponents<LightComponent>();
+
+	for (auto& item : lightComponents)
+	{
+		if (item->HasDirtyMark())
+		{
+			item->ResolveDirtyState();
+		}
+
+		scene->AddLight(item);
 	}
 }
 

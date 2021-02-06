@@ -11,6 +11,8 @@ class PrimitiveSceneProxy;
 class PrimitiveComponent;
 class APlayerController;
 class SceneVisibility;
+class LightComponent;
+class LightSceneProxy;
 
 class GAME_API Scene : virtual public Object
 {
@@ -25,6 +27,9 @@ public:
 	TRefPtr<SceneVisibility> localPlayerVisibility;
 	std::vector<TRefPtr<SceneVisibility>> visibilities;
 
+	std::vector<LightComponent*> lightComponents;
+	std::vector<LightSceneProxy*> lightProxies;
+
 public:
 	Scene();
 	~Scene() override;
@@ -33,6 +38,7 @@ public:
 	void CalcVisibility();
 	
 	void AddScene(PrimitiveComponent* inPrimitiveComponent);
+	void AddLight(LightComponent* inLightComponent);
 
 	SceneVisibility* GetLocalPlayerVisibility() const;
 	
@@ -40,8 +46,8 @@ public:
 	APlayerController* LocalPlayer_get() const;
 	void LocalPlayer_set(APlayerController* value);
 
-	vs_property_get(std::span<PrimitiveComponent* const>, Primitives);
-	std::span<PrimitiveComponent* const> Primitives_get() const;
-	vs_property_get(std::span<PrimitiveSceneProxy* const>, PrimitiveSceneProxies);
-	std::span<PrimitiveSceneProxy* const> PrimitiveSceneProxies_get() const;
+	vs_property_get_auto(std::span<PrimitiveComponent* const>, Primitives, primitiveComponents);
+	vs_property_get_auto(std::span<PrimitiveSceneProxy* const>, PrimitiveSceneProxies, sceneProxies);
+	vs_property_get_auto(std::span<LightComponent* const>, Lights, lightComponents);
+	vs_property_get_auto(std::span<LightSceneProxy* const>, LightSceneProxies, lightProxies);
 };
