@@ -1,5 +1,8 @@
 // Copyright 2020 Aumoa.lib. All right reserved.
 
+#ifndef __SHADERCOMMON_HLSLI__
+#define __SHADERCOMMON_HLSLI__
+
 struct Vertex
 {
 	float3 Pos : POSITION;
@@ -48,6 +51,26 @@ struct LDRPixel
 	float4 Color : SV_TARGET0;
 };
 
+struct Material
+{
+	float Ambient;
+	float Diffuse;
+	float Specular;
+	float SpecExp;
+};
+
+struct Light
+{
+	uint Type;
+	float3 Color;
+	float Ambient;
+	float Diffuse;
+	float Specular;
+	uint ShadowCast;
+	row_major matrix ViewProj;
+	float4 Ambiguous_01;
+};
+
 static float4 QuadPos[4] =
 {
 	float4(-1.0f, +1.0f, +0.0f, 1.0f),
@@ -63,3 +86,5 @@ static float2 QuadTex[4] =
 	float2(0.0f, 1.0f),
 	float2(1.0f, 1.0f),
 };
+
+#endif

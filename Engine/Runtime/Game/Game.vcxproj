@@ -462,6 +462,7 @@
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
+    <None Include="Private\Shaders\GenericLighting.hlsli" />
     <None Include="Private\Shaders\ShaderCommon.hlsli" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />

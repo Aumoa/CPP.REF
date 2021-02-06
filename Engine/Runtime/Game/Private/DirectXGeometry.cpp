@@ -51,6 +51,7 @@ namespace
         for (auto it = vertices.begin(); it != vertices.end(); ++it)
         {
             std::swap(it->Pos.Y, it->Pos.Z);
+            std::swap(it->Normal.Y, it->Normal.Z);
         }
     }
 

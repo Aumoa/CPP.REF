@@ -763,6 +763,9 @@
     <None Include="Private\Shaders\ShaderCommon.hlsli">
       <Filter>Private\Shaders</Filter>
     </None>
+    <None Include="Private\Shaders\GenericLighting.hlsli">
+      <Filter>Private\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Private\Shaders\GeometryShader\PixelShader.hlsl">
