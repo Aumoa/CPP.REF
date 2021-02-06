@@ -7,6 +7,7 @@
 #include "SceneRenderer.h"
 
 class RHIShaderLibrary;
+class SceneVisibility;
 
 class GAME_API DeferredSceneRenderer : public SceneRenderer
 {
@@ -25,5 +26,5 @@ public:
 
 private:
 	void SetShader(IRHICommandList* commandList);
-	void RenderSceneInternal(IRHICommandList* commandList, const std::vector<bool>& primitiveVisibility);
+	void RenderSceneInternal(IRHICommandList* commandList, SceneVisibility* inSceneVisibility);
 };

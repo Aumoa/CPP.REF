@@ -5,15 +5,16 @@
 #include "Components/PrimitiveComponent.h"
 #include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
-#include "Shaders/ShaderCameraConstant.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
+#include "SceneRendering/SceneVisibility.h"
+#include "Logging/LogMacros.h"
 
 using namespace std;
 
 Scene::Scene() : Super()
 	, localPlayer(nullptr)
 {
-	shaderCamConstants = NewObject<ShaderCameraConstantVector>();
+	localPlayerVisibility = NewObject<SceneVisibility>(this);
 }
 
 Scene::~Scene()
@@ -37,10 +38,33 @@ void Scene::Update()
 	}
 }
 
+void Scene::CalcVisibility()
+{
+	APlayerController* localPlayer = LocalPlayer;
+	PlayerCameraManager* cameraManager = localPlayer->CameraManager;
+
+	if (cameraManager == nullptr)
+	{
+		SE_LOG(LogRendering, Error, L"PlayerController have not a camera manager component. Abort.");
+		return;
+	}
+
+	MinimalViewInfo viewInfo;
+	cameraManager->CalcCameraView(viewInfo);
+
+	localPlayerVisibility->UpdateView(viewInfo);
+	localPlayerVisibility->CalcVisibility();
+}
+
 void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
 {
 	primitiveComponents.emplace_back(inPrimitiveComponent);
 	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
+}
+
+SceneVisibility* Scene::GetLocalPlayerVisibility() const
+{
+	return localPlayerVisibility.Get();
 }
 
 APlayerController* Scene::LocalPlayer_get() const
@@ -61,9 +85,4 @@ span<PrimitiveComponent* const> Scene::Primitives_get() const
 span<PrimitiveSceneProxy* const> Scene::PrimitiveSceneProxies_get() const
 {
 	return sceneProxies;
-}
-
-ShaderCameraConstantVector* Scene::ShaderCameraConstants_get() const
-{
-	return shaderCamConstants.Get();
 }

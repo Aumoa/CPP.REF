@@ -14,6 +14,8 @@
 #include "SceneRendering/DeferredSceneRenderer.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/MinimalViewInfo.h"
+#include "SceneRendering/ShaderCameraConstant.h"
+#include "SceneRendering/SceneVisibility.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
@@ -37,21 +39,7 @@ void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, Scene* in
 
 	{
 		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, CalcVisibility);
-
-		APlayerController* localPlayer = inScene->LocalPlayer;
-		PlayerCameraManager* cameraManager = localPlayer->CameraManager;
-
-		if (cameraManager == nullptr)
-		{
-			SE_LOG(LogRendering, Error, L"PlayerController have not a camera manager component. Abort.");
-			return;
-		}
-
-		MinimalViewInfo viewInfo;
-		cameraManager->CalcCameraView(viewInfo);
-
-		renderer.AddViewInfo(viewInfo);
-		renderer.CalcVisibility();
+		inScene->CalcVisibility();
 	}
 
 	{
@@ -60,7 +48,7 @@ void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, Scene* in
 		renderer.RenderScene(inCommandList);
 		EndGeometryRender(inCommandList);
 
-		LightRender(inCommandList);
+		LightRender(inCommandList, inScene);
 		TonemapRender(inCommandList);
 	}
 }
@@ -132,6 +120,7 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 	hdrTargetView = device->CreateRenderTargetView(hdrBuffer.Get());
 	colorBufferSRV = device->CreateTextureView(renderTarget.Get(), ERHITextureFormat::B8G8R8A8_UNORM);
 	normalBufferSRV = device->CreateTextureView(normalBuffer.Get(), ERHITextureFormat::R16G16B16A16_FLOAT);
+	depthBufferSRV = device->CreateTextureView(depthStencilBuffer.Get(), ERHITextureFormat::R24_UNORM_X8_TYPELESS);
 	hdrBufferSRV = device->CreateTextureView(hdrBuffer.Get(), ERHITextureFormat::R16G16B16A16_FLOAT);
 
 	viewport = RHIViewport(x, y);
@@ -160,10 +149,13 @@ void DeferredGameViewport::EndGeometryRender(IRHICommandList* inCommandList)
 	inCommandList->ResourceTransition(normalBuffer.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::PIXEL_SHADER_RESOURCE);
 }
 
-void DeferredGameViewport::LightRender(IRHICommandList* inCommandList)
+void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* inScene)
 {
 	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::LightingShader);
 	inCommandList->SetShader(shader);
+
+	SceneVisibility* localPlayerVisibility = inScene->GetLocalPlayerVisibility();
+	const uint64 playerCameraConstantAddr = localPlayerVisibility->ShaderCameraConstants->GetCameraConstantVirtualAddress();
 
 	IRHIRenderTargetView* rtvs[] = { hdrTargetView.Get() };
 
@@ -175,8 +167,10 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList)
 
 	inCommandList->ClearRenderTargetView(hdrTargetView.Get());
 
-	inCommandList->SetGraphicsRootShaderResourceView(0, colorBufferSRV.Get());
-	inCommandList->SetGraphicsRootShaderResourceView(1, normalBufferSRV.Get());
+	inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
+	inCommandList->SetGraphicsRootShaderResourceView(1, colorBufferSRV.Get());
+	inCommandList->SetGraphicsRootShaderResourceView(2, normalBufferSRV.Get());
+	inCommandList->SetGraphicsRootShaderResourceView(3, depthBufferSRV.Get());
 
 	RHIMeshDrawCommand Quad;
 	Quad.Topology = ERHIPrimitiveTopology::TriangleStrip;

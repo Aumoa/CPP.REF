@@ -24,4 +24,5 @@ void MinimalViewInfo::Apply()
 	Matrix4x4 vp = Matrix4x4::Multiply(lookTo, proj);
 
 	ViewProj = vp;
+	ViewProjInv = vp.Inverse;
 }

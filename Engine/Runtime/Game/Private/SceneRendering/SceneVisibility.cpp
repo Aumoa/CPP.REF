@@ -8,27 +8,11 @@
 
 using namespace std;
 
-SceneVisibility::SceneVisibility(Scene* inScene, MinimalViewInfo& inView) : Super()
+SceneVisibility::SceneVisibility(Scene* inScene) : Super()
 	, myScene(inScene)
-	, myView(inView)
+	, bDirty(true)
 {
-
-}
-
-SceneVisibility::SceneVisibility(const SceneVisibility& rh) : Super()
-	, myScene(rh.myScene)
-	, myView(rh.myView)
-	, visibilities(rh.visibilities)
-{
-
-}
-
-SceneVisibility::SceneVisibility(SceneVisibility&& rh) noexcept : Super()
-	, myScene(rh.myScene)
-	, myView(rh.myView)
-	, visibilities(move(rh.visibilities))
-{
-
+	shaderCameraConstants = NewObject<ShaderCameraConstantVector>();
 }
 
 SceneVisibility::~SceneVisibility()
@@ -38,19 +22,38 @@ SceneVisibility::~SceneVisibility()
 
 void SceneVisibility::CalcVisibility()
 {
-	const auto& primitives = myScene->Primitives;
-
-	// PREVIEW IMPLEMENT. All primitives are visible.
-	visibilities.resize(primitives.size(), true);
-
-	ShaderCameraConstantVector* cbv = myScene->ShaderCameraConstants;
-	for (size_t i = 0; i < primitives.size(); ++i)
+	if (bDirty)
 	{
-		cbv->AddPrimitive(myView, primitives[i]->GetSceneProxy());
+		const auto& primitives = myScene->Primitives;
+
+		visibilities.resize(primitives.size(), true);
+
+		shaderCameraConstants->BeginUpdateConstant(myView);
+
+		// PREVIEW IMPLEMENT. All primitives are visible.
+		for (size_t i = 0; i < primitives.size(); ++i)
+		{
+			shaderCameraConstants->AddPrimitive(primitives[i]->GetSceneProxy());
+		}
+
+		shaderCameraConstants->EndUpdateConstant();
+
+		bDirty = false;
 	}
+}
+
+void SceneVisibility::UpdateView(const MinimalViewInfo& inView)
+{
+	myView = inView;
+	bDirty = true;
 }
 
 const vector<bool>& SceneVisibility::PrimitiveVisibility_get() const
 {
 	return visibilities;
+}
+
+ShaderCameraConstantVector* SceneVisibility::ShaderCameraConstants_get() const
+{
+	return shaderCameraConstants.Get();
 }

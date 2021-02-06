@@ -31,13 +31,12 @@ void DeferredSceneRenderer::RenderScene(IRHICommandList* immediateCommandList)
 {
 	SetShader(immediateCommandList);
 
-	const auto& visibilities = GetSceneVisibilities();
-
+	Scene* myScene = GetScene();
+	std::vector<SceneVisibility*> visibilities = { myScene->GetLocalPlayerVisibility() };
 	for (size_t i = 0; i < visibilities.size(); ++i)
 	{
-		const SceneVisibility& visibility = visibilities[i];
-		const vector<bool> primitiveVisibility = visibility.PrimitiveVisibility;
-		RenderSceneInternal(immediateCommandList, primitiveVisibility);
+		SceneVisibility* visibility = visibilities[i];
+		RenderSceneInternal(immediateCommandList, visibility);
 	}
 }
 
@@ -47,14 +46,13 @@ void DeferredSceneRenderer::SetShader(IRHICommandList* commandList)
 	commandList->SetShader(shader);
 }
 
-void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, const vector<bool>& primitiveVisibility)
+void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, SceneVisibility* inSceneVisibility)
 {
-	span<PrimitiveSceneProxy* const> primitiveSceneProxies = TargetScene->PrimitiveSceneProxies;
-	size_t numSceneProxies = primitiveSceneProxies.size();
+	span<PrimitiveSceneProxy* const> primitiveSceneProxies = GetScene()->PrimitiveSceneProxies;
+	const auto& primitiveVisibility = inSceneVisibility->PrimitiveVisibility;
+	CameraConstantIterator cbvIterator = inSceneVisibility->ShaderCameraConstants->GetBufferIterator();
 
-	CameraConstantIterator cbvIterator = TargetScene->ShaderCameraConstants->GetBufferIterator();
-
-	for (size_t i = 0; i < numSceneProxies; ++i)
+	for (size_t i = 0; i < primitiveSceneProxies.size(); ++i)
 	{
 		if (primitiveVisibility[i])
 		{

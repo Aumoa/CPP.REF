@@ -34,6 +34,7 @@ private:
 	TRefPtr<IRHIRenderTargetView> hdrTargetView;
 	TRefPtr<IRHIShaderResourceView> colorBufferSRV;
 	TRefPtr<IRHIShaderResourceView> normalBufferSRV;
+	TRefPtr<IRHIShaderResourceView> depthBufferSRV;
 	TRefPtr<IRHIShaderResourceView> hdrBufferSRV;
 
 public:
@@ -50,6 +51,6 @@ private:
 	void BeginGeometryRender(IRHICommandList* inCommandList);
 	void EndGeometryRender(IRHICommandList* inCommandList);
 
-	void LightRender(IRHICommandList* inCommandList);
+	void LightRender(IRHICommandList* inCommandList, Scene* inScene);
 	void TonemapRender(IRHICommandList* inCommandList);
 };

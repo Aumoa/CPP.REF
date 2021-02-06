@@ -15,7 +15,9 @@ struct GAME_API MinimalViewInfo
 	float FarPlane;
 	Vector3 Location;
 	Quaternion Rotation;
+
 	Matrix4x4 ViewProj;
+	Matrix4x4 ViewProjInv;
 
 	MinimalViewInfo();
 	void Apply();

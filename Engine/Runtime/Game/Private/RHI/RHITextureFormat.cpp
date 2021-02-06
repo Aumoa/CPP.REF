@@ -2,14 +2,16 @@
 
 #include "RHI/RHITextureFormat.h"
 
+#define CASE(x) case ERHITextureFormat::x
+
 bool IsUnknownFormat(ERHITextureFormat inFormat)
 {
-	if (inFormat == ERHITextureFormat::Unknown)
+	switch (inFormat)
 	{
-		return true;
-	}
-	else if (inFormat == ERHITextureFormat::R24G8_TYPELESS)
-	{
+	CASE(Unknown):
+	CASE(R24G8_TYPELESS):
+	CASE(R24_UNORM_X8_TYPELESS):
+	CASE(X24_UNORM_G8_UINT):
 		return true;
 	}
 
@@ -18,16 +20,11 @@ bool IsUnknownFormat(ERHITextureFormat inFormat)
 
 bool IsColorFormat(ERHITextureFormat inFormat)
 {
-	if (inFormat == ERHITextureFormat::R16G16B16A16_FLOAT)
+	switch (inFormat)
 	{
-		return true;
-	}
-	else if (inFormat == ERHITextureFormat::R8G8B8A8_UNORM)
-	{
-		return true;
-	}
-	else if (inFormat == ERHITextureFormat::B8G8R8A8_UNORM)
-	{
+	CASE(R16G16B16A16_FLOAT) :
+	CASE(R8G8B8A8_UNORM) :
+	CASE(B8G8R8A8_UNORM) :
 		return true;
 	}
 
@@ -36,8 +33,9 @@ bool IsColorFormat(ERHITextureFormat inFormat)
 
 bool IsDepthStencilFormat(ERHITextureFormat inFormat)
 {
-	if (inFormat == ERHITextureFormat::D24_UNORM_S8_UINT)
+	switch (inFormat)
 	{
+	CASE(D24_UNORM_S8_UINT):
 		return true;
 	}
 

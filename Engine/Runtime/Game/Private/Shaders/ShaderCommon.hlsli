@@ -19,11 +19,17 @@ struct GeometryPixel
 	float4 Normal : SV_TARGET1;
 };
 
-struct ShaderCameraConstant
+struct ShaderObjectConstant
 {
 	row_major matrix World;
-	row_major matrix ViewProj;
 	row_major matrix WVP;
+};
+
+struct ShaderCameraConstant
+{
+	row_major matrix ViewProj;
+	row_major matrix ViewProjInv;
+	float3 Pos;
 };
 
 struct QuadFrag

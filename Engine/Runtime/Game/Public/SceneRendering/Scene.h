@@ -10,7 +10,7 @@
 class PrimitiveSceneProxy;
 class PrimitiveComponent;
 class APlayerController;
-class ShaderCameraConstantVector;
+class SceneVisibility;
 
 class GAME_API Scene : virtual public Object
 {
@@ -22,15 +22,19 @@ public:
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
 	APlayerController* localPlayer;
-	TRefPtr<ShaderCameraConstantVector> shaderCamConstants;
+	TRefPtr<SceneVisibility> localPlayerVisibility;
+	std::vector<TRefPtr<SceneVisibility>> visibilities;
 
 public:
 	Scene();
 	~Scene() override;
 
 	void Update();
+	void CalcVisibility();
 	
 	void AddScene(PrimitiveComponent* inPrimitiveComponent);
+
+	SceneVisibility* GetLocalPlayerVisibility() const;
 	
 	vs_property(APlayerController*, LocalPlayer);
 	APlayerController* LocalPlayer_get() const;
@@ -40,6 +44,4 @@ public:
 	std::span<PrimitiveComponent* const> Primitives_get() const;
 	vs_property_get(std::span<PrimitiveSceneProxy* const>, PrimitiveSceneProxies);
 	std::span<PrimitiveSceneProxy* const> PrimitiveSceneProxies_get() const;
-	vs_property_get(ShaderCameraConstantVector*, ShaderCameraConstants);
-	ShaderCameraConstantVector* ShaderCameraConstants_get() const;
 };

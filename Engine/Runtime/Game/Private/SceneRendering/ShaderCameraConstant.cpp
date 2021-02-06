@@ -39,40 +39,53 @@ ShaderCameraConstantVector::~ShaderCameraConstantVector()
 
 }
 
-void ShaderCameraConstantVector::BeginUpdateConstant()
+void ShaderCameraConstantVector::BeginUpdateConstant(const MinimalViewInfo& inView)
 {
 	constants.resize(0);
+	
+	cameraConst.ViewProj = inView.ViewProj;
+	cameraConst.ViewProjInv = inView.ViewProjInv;
+	cameraConst.Pos = inView.Location;
+
+	currView = inView;
 }
 
-void ShaderCameraConstantVector::AddPrimitive(const MinimalViewInfo& inView, const PrimitiveSceneProxy* inPrimitive)
+void ShaderCameraConstantVector::AddPrimitive(const PrimitiveSceneProxy* inPrimitive)
 {
 	Matrix4x4 w = inPrimitive->GetPrimitiveTransform().Matrix;
-	Matrix4x4 vp = inView.ViewProj;
+	Matrix4x4 vp = currView.ViewProj;
 
-	ShaderCameraConstant& constant = constants.emplace_back();
+	ShaderObjectConstant& constant = constants.emplace_back();
 	constant.World = w;
-	constant.ViewProj = vp;
 	constant.WVP = Matrix4x4::Multiply(w, vp);
 }
 
 void ShaderCameraConstantVector::EndUpdateConstant()
 {
-	size_t actSize = sizeof(ShaderCameraConstant) * constants.size();
+	constexpr size_t CameraConst = sizeof(ShaderCameraConstant);
+	size_t actSize = sizeof(ShaderObjectConstant) * constants.size();
 
-	size_t newsz = AlignOf(actSize);
+	size_t newsz = AlignOf(CameraConst + actSize);
 	if (newsz > this->capacity)
 	{
 		constantBuffer = GEngine.DeviceBundle->CreateDynamicConstantBuffer(newsz);
 		this->capacity = newsz;
 	}
 
-	void* ptr = constantBuffer->GetMappingAddress();
-	std::memcpy(ptr, constants.data(), actSize);
+	char* ptr = (char*)constantBuffer->GetMappingAddress();
+	memcpy(ptr, &cameraConst, CameraConst);
+	memcpy(ptr + CameraConst, constants.data(), actSize);
+}
+
+uint64 ShaderCameraConstantVector::GetCameraConstantVirtualAddress() const
+{
+	return constantBuffer->GetVirtualAddress();
 }
 
 CameraConstantIterator ShaderCameraConstantVector::GetBufferIterator() const
 {
-	return CameraConstantIterator(sizeof(ShaderCameraConstant), constantBuffer->GetVirtualAddress(), constants.size());
+	constexpr size_t CameraConst = sizeof(ShaderCameraConstant);
+	return CameraConstantIterator(sizeof(ShaderCameraConstant), constantBuffer->GetVirtualAddress() + CameraConst, constants.size() - CameraConst);
 }
 
 size_t ShaderCameraConstantVector::AlignOf(size_t value)

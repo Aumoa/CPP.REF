@@ -2,7 +2,7 @@
 
 #include "../ShaderCommon.hlsli"
 
-ConstantBuffer<ShaderCameraConstant> gCameraConstant : register(b0);
+ConstantBuffer<ShaderObjectConstant> gCameraConstant : register(b0);
 
 Fragment VS_Main(in Vertex inVertex)
 {

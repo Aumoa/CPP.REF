@@ -4,12 +4,7 @@
 
 Texture2D<float4> gHDRBuffer : register(t0);
 
-SamplerState gSampler
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
+SamplerState gSampler : register(s0);
 
 LDRPixel PS_Main(in QuadFrag inFrag)
 {
