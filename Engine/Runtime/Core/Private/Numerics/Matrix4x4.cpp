@@ -181,7 +181,7 @@ Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
     XMMATRIX M = XMLoadMatrix4x4(this);
     XMVECTOR V = XMVector3Transform(XMVectorSet(vec.X, vec.Y, vec.Z, 1.0f), M);
     Vector3 v;
-    XMStoreVector4(&v, V);
+    XMStoreVector3(&v, V);
     return v;
 }
 

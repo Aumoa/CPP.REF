@@ -48,6 +48,7 @@ public:
 	CORE_API static TRadians<float> Atan2(float y, float x);
 	CORE_API static std::pair<float, float> SinCos(TRadians<float> value);
 	CORE_API static float InvSqrt(float x);
+	CORE_API static float Sqrt(float x);
 
 	template<class T>
 	inline static constexpr T Lerp(const T& left, const T& right, float t);

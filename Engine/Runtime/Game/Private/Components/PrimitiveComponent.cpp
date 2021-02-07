@@ -14,6 +14,21 @@ PrimitiveComponent::~PrimitiveComponent()
 
 }
 
+void PrimitiveComponent::ResolveDirtyState()
+{
+	if (HasDirtyMark(EComponentDirtyMask::RecreateProxy))
+	{
+		sceneProxy = CreateSceneProxy();
+	}
+
+	if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && sceneProxy.IsValid)
+	{
+		sceneProxy->UpdateMovable();
+	}
+
+	Super::ResolveDirtyState();
+}
+
 TRefPtr<PrimitiveSceneProxy> PrimitiveComponent::CreateSceneProxy()
 {
 	return nullptr;
@@ -22,20 +37,4 @@ TRefPtr<PrimitiveSceneProxy> PrimitiveComponent::CreateSceneProxy()
 PrimitiveSceneProxy* PrimitiveComponent::GetSceneProxy() const
 {
 	return sceneProxy.Get();
-}
-
-void PrimitiveComponent::SetMarkDirty()
-{
-	bHasDirtyMark = true;
-}
-
-bool PrimitiveComponent::HasDirtyMark() const
-{
-	return bHasDirtyMark;
-}
-
-void PrimitiveComponent::ResolveDirtyState()
-{
-	sceneProxy = CreateSceneProxy();
-	bHasDirtyMark = false;
 }

@@ -130,8 +130,6 @@ AActor* World::SpawnActorInternal(TRefPtr<AActor> actor)
 	AddTickGroup(actor_ptr);
 	AddSceneProxy(actor_ptr);
 
-	actor_ptr->BeginPlay();
-
 	return actor_ptr;
 }
 
@@ -162,7 +160,7 @@ void World::AddSceneProxy(AActor* actor_ptr)
 	
 	for (auto& item : primitiveComponents)
 	{
-		if (item->HasDirtyMark())
+		if (item->HasAnyDirtyMark())
 		{
 			item->ResolveDirtyState();
 		}
@@ -174,7 +172,7 @@ void World::AddSceneProxy(AActor* actor_ptr)
 
 	for (auto& item : lightComponents)
 	{
-		if (item->HasDirtyMark())
+		if (item->HasAnyDirtyMark())
 		{
 			item->ResolveDirtyState();
 		}

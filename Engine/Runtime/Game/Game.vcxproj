@@ -309,6 +309,7 @@
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\Framework\Character.h" />
+    <ClInclude Include="Public\Framework\DirectionalLight.h" />
     <ClInclude Include="Public\Framework\GameModeBase.h" />
     <ClInclude Include="Public\Framework\Info.h" />
     <ClInclude Include="Public\Framework\Pawn.h" />
@@ -432,6 +433,7 @@
     <ClCompile Include="Private\Framework\Actor.cpp" />
     <ClCompile Include="Private\Framework\Character.cpp" />
     <ClCompile Include="Private\Framework\Controller.cpp" />
+    <ClCompile Include="Private\Framework\DirectionalLight.cpp" />
     <ClCompile Include="Private\Framework\GameModeBase.cpp" />
     <ClCompile Include="Private\Framework\Info.cpp" />
     <ClCompile Include="Private\Framework\Pawn.cpp" />
@@ -485,6 +487,7 @@
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
     <ClCompile Include="Private\WinException.cpp" />
     <None Include="Public\Components\ActorComponent.inl" />
+    <None Include="Public\Components\SceneComponent.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
     <None Include="Public\Level.inl" />
@@ -519,6 +522,17 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pGeometry%(Filename)</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pGeometry%(Filename)</VariableName>
     </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\LightAccumulatePixelShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pLighting%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
+    </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\VertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -530,7 +544,7 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\PixelShader.hlsl">
+    <FxCompile Include="Private\Shaders\LightingShader\ColorEmplacePixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>

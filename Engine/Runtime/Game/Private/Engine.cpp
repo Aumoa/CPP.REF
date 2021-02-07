@@ -82,6 +82,8 @@ void Engine::PostInitialize()
 
 void Engine::Tick()
 {
+	QUICK_SCOPED_CYCLE_COUNTER(Engine, Tick);
+
 	PlatformInput::Tick();
 
 	TickWorld();

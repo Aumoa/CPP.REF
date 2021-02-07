@@ -20,6 +20,28 @@ LightComponent::~LightComponent()
 
 }
 
+void LightComponent::ResolveDirtyState()
+{
+	if (HasDirtyMark(EComponentDirtyMask::RecreateProxy))
+	{
+		sceneProxy = CreateSceneProxy();
+	}
+
+	bool bHasSceneProxy = sceneProxy.IsValid;
+
+	if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && bHasSceneProxy)
+	{
+		sceneProxy->UpdateMovable();
+	}
+
+	if (HasDirtyMark((EComponentDirtyMask)ELightComponentDirtyMask::LightUpdated) && bHasSceneProxy)
+	{
+		sceneProxy->UpdateBatchBuffer();
+	}
+
+	Super::ResolveDirtyState();
+}
+
 TRefPtr<LightSceneProxy> LightComponent::CreateSceneProxy()
 {
 	return nullptr;
@@ -30,18 +52,62 @@ LightSceneProxy* LightComponent::GetSceneProxy() const
 	return sceneProxy.Get();
 }
 
-void LightComponent::SetMarkDirty()
+Color LightComponent::LightColor_get() const
 {
-	bHasDirtyMark = true;
+	return lightColor;
 }
 
-bool LightComponent::HasDirtyMark() const
+void LightComponent::LightColor_set(const Color& value)
 {
-	return bHasDirtyMark;
+	lightColor = value;
+	SetMarkDirtyLightUpdated();
 }
 
-void LightComponent::ResolveDirtyState()
+float LightComponent::Ambient_get() const
 {
-	sceneProxy = CreateSceneProxy();
-	bHasDirtyMark = false;
+	return lightAmbient;
+}
+
+void LightComponent::Ambient_set(float value)
+{
+	lightAmbient = value;
+	SetMarkDirtyLightUpdated();
+}
+
+float LightComponent::Diffuse_get() const
+{
+	return lightDiffuse;
+}
+
+void LightComponent::Diffuse_set(float value)
+{
+	lightDiffuse = value;
+	SetMarkDirtyLightUpdated();
+}
+
+float LightComponent::Specular_get() const
+{
+	return lightSpecular;
+}
+
+void LightComponent::Specular_set(float value)
+{
+	lightSpecular = value;
+	SetMarkDirtyLightUpdated();
+}
+
+bool LightComponent::IsShadowCast_get() const
+{
+	return bShadowCast;
+}
+
+void LightComponent::IsShadowCast_set(bool value)
+{
+	bShadowCast = true;
+	SetMarkDirtyLightUpdated();
+}
+
+void LightComponent::SetMarkDirtyLightUpdated()
+{
+	Super::SetMarkDirty((EComponentDirtyMask)ELightComponentDirtyMask::LightUpdated);
 }

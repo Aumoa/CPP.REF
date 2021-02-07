@@ -11,6 +11,7 @@
 class AMyTestActor;
 class AMyCharacter;
 class AStaticMeshActor;
+class ADirectionalLight;
 
 class TH_API StartupLevel : public Level
 {
@@ -19,6 +20,9 @@ public:
 	using This = StartupLevel;
 
 private:
+	ADirectionalLight* light;
+	ADirectionalLight* light2;
+
 	AStaticMeshActor* plane;
 	AStaticMeshActor* geosphere;
 	AStaticMeshActor* teapot;

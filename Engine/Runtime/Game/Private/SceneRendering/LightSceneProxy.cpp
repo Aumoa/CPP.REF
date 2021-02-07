@@ -11,7 +11,7 @@
 
 LightBatch::LightBatch()
 {
-	GEngine.DeviceBundle->CreateDynamicConstantBuffer(sizeof(RHILight));
+	basicLightBuffer = GEngine.DeviceBundle->CreateDynamicConstantBuffer(sizeof(RHILight));
 }
 
 LightBatch::~LightBatch()
@@ -28,6 +28,7 @@ LightSceneProxy::LightSceneProxy(LightComponent* inLightComponent) : Super()
 	, myLightComponent(inLightComponent)
 	, transform(Transform::Identity)
 {
+	batch = NewObject<LightBatch>();
 	UpdateMovable();
 }
 
@@ -49,7 +50,7 @@ Transform LightSceneProxy::GetLightTransform() const
 
 LightBatch* LightSceneProxy::GetLightBatch() const
 {
-	return nullptr;
+	return batch.Get();
 }
 
 void LightSceneProxy::UpdateBatchBuffer()
@@ -60,6 +61,7 @@ void LightSceneProxy::UpdateBatchBuffer()
 	MinimalViewInfo viewInfo;
 	myLightComponent->CalcLightView(viewInfo);
 
+	light.LightColor = myLightComponent->LightColor.Cast<Vector3>();
 	light.Ambient = myLightComponent->Ambient;
 	light.Diffuse = myLightComponent->Diffuse;
 	light.Specular = myLightComponent->Specular;

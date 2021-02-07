@@ -97,3 +97,8 @@ float Math::InvSqrt(float x)
 	ret = ret * (1.5f - (x * 0.5f * ret * ret));
 	return ret;
 }
+
+float Math::Sqrt(float x)
+{
+	return sqrt(x);
+}

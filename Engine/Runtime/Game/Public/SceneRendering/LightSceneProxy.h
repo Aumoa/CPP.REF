@@ -36,6 +36,7 @@ public:
 	using This = LightSceneProxy;
 
 private:
+	TRefPtr<LightBatch> batch;
 	LightComponent* myLightComponent;
 	Transform transform;
 
@@ -47,7 +48,5 @@ public:
 
 	virtual Transform GetLightTransform() const;
 	virtual LightBatch* GetLightBatch() const;
-
-protected:
 	virtual void UpdateBatchBuffer();
 };

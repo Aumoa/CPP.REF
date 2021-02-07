@@ -14,7 +14,7 @@ struct alignas(256) RHILight
 	};
 
 	uint32 Type;
-	Color LightColor;
+	Vector3 LightColor;
 	float Ambient;
 	float Diffuse;
 	float Specular;

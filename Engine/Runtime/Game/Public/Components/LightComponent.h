@@ -9,6 +9,11 @@
 struct MinimalViewInfo;
 class LightSceneProxy;
 
+enum class ELightComponentDirtyMask : uint32
+{
+	LightUpdated = (uint32)EComponentDirtyMask::Last
+};
+
 class GAME_API LightComponent : public SceneComponent
 {
 public:
@@ -29,18 +34,32 @@ public:
 	LightComponent();
 	~LightComponent() override;
 
-	virtual TRefPtr<LightSceneProxy> CreateSceneProxy();
-	virtual void CalcLightView(MinimalViewInfo& outViewInfo) const = 0;
-
-	LightSceneProxy* GetSceneProxy() const;
-
-	void SetMarkDirty();
-	bool HasDirtyMark() const;
 	virtual void ResolveDirtyState();
 
-	vs_property_auto(Color, LightColor, lightColor);
-	vs_property_auto(float, Ambient, lightAmbient);
-	vs_property_auto(float, Diffuse, lightDiffuse);
-	vs_property_auto(float, Specular, lightSpecular);
-	vs_property_auto(bool, IsShadowCast, bShadowCast);
+	virtual TRefPtr<LightSceneProxy> CreateSceneProxy();
+	virtual void CalcLightView(MinimalViewInfo& outViewInfo) const = 0;
+	LightSceneProxy* GetSceneProxy() const;
+
+	vs_property(Color, LightColor);
+	Color LightColor_get() const;
+	void LightColor_set(const Color& value);
+
+	vs_property(float, Ambient);
+	float Ambient_get() const;
+	void Ambient_set(float value);
+
+	vs_property(float, Diffuse);
+	float Diffuse_get() const;
+	void Diffuse_set(float value);
+
+	vs_property(float, Specular);
+	float Specular_get() const;
+	void Specular_set(float value);
+
+	vs_property(bool, IsShadowCast);
+	bool IsShadowCast_get() const;
+	void IsShadowCast_set(bool value);
+
+private:
+	void SetMarkDirtyLightUpdated();
 };

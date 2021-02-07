@@ -18,7 +18,7 @@ StaticMeshComponent::~StaticMeshComponent()
 void StaticMeshComponent::SetStaticMesh(StaticMesh* inMesh)
 {
 	staticMesh = inMesh;
-	SetMarkDirty();
+	SetMarkDirty(EComponentDirtyMask::RecreateProxy);
 }
 
 StaticMesh* StaticMeshComponent::GetStaticMesh() const

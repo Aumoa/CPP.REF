@@ -16,6 +16,7 @@
 #include "SceneRendering/MinimalViewInfo.h"
 #include "SceneRendering/ShaderCameraConstant.h"
 #include "SceneRendering/SceneVisibility.h"
+#include "SceneRendering/LightSceneProxy.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "Framework/PlayerController.h"
 #include "Components/PlayerCameraManager.h"
@@ -151,9 +152,6 @@ void DeferredGameViewport::EndGeometryRender(IRHICommandList* inCommandList)
 
 void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* inScene)
 {
-	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::LightingShader);
-	inCommandList->SetShader(shader);
-
 	SceneVisibility* localPlayerVisibility = inScene->GetLocalPlayerVisibility();
 	const uint64 playerCameraConstantAddr = localPlayerVisibility->ShaderCameraConstants->GetCameraConstantVirtualAddress();
 
@@ -167,14 +165,28 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 
 	inCommandList->ClearRenderTargetView(hdrTargetView.Get());
 
-	inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
-	inCommandList->SetGraphicsRootShaderResourceView(1, colorBufferSRV.Get());
-	inCommandList->SetGraphicsRootShaderResourceView(2, normalBufferSRV.Get());
-	inCommandList->SetGraphicsRootShaderResourceView(3, depthBufferSRV.Get());
+	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::LightingShader);
+	inCommandList->SetShader(shader);
 
 	RHIMeshDrawCommand Quad;
 	Quad.Topology = ERHIPrimitiveTopology::TriangleStrip;
 	Quad.VertexCount = 4;
+
+	const auto& lights = inScene->LightSceneProxies;
+	for (auto& light : lights)
+	{
+		LightBatch* batch = light->GetLightBatch();
+		inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
+		inCommandList->SetGraphicsRootShaderResourceView(1, colorBufferSRV.Get());
+		inCommandList->SetGraphicsRootShaderResourceView(2, normalBufferSRV.Get());
+		inCommandList->SetGraphicsRootShaderResourceView(3, depthBufferSRV.Get());
+		inCommandList->SetGraphicsRootConstantBufferView(4, batch->GetLightBuffer()->GetVirtualAddress());
+
+		inCommandList->DrawMesh(Quad);
+	}
+
+	shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::ColorEmplaceShader);
+	inCommandList->SetShader(shader);
 	inCommandList->DrawMesh(Quad);
 
 	inCommandList->ResourceTransition(hdrBuffer.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::PIXEL_SHADER_RESOURCE);

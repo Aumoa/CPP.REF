@@ -22,7 +22,7 @@ void MinimalViewInfo::Apply()
 	Matrix4x4 lookTo = Matrix4x4::LookTo(Location, forward, up);
 	Matrix4x4 proj;
 
-	if (FOV == 0)
+	if (FOV != 0)
 	{
 		proj = Matrix4x4::PerspectiveFovLH(FOV, AspectRatio, NearPlane, FarPlane);
 	}

@@ -31,6 +31,7 @@ SceneComponent::SceneComponent() : Super()
 	, worldTransform(Transform::Identity)
 	, localToWorld(Transform::Identity)
 	, mobility(EComponentMobility::Static)
+	, dirtyMark(EComponentDirtyMask::All)
 {
 
 }
@@ -38,61 +39,6 @@ SceneComponent::SceneComponent() : Super()
 SceneComponent::~SceneComponent()
 {
 
-}
-
-void SceneComponent::AttachToComponent(SceneComponent* attachTo)
-{
-	AttachToSocket(attachTo, nullptr);
-}
-
-void SceneComponent::AttachToSocket(SceneComponent* attachTo, TRefPtr<String> socketName)
-{
-	if (attachTo == nullptr)
-	{
-		SE_LOG(LogSceneComponent, Warning, L"{0} is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.", nameof(attachTo));
-		return;
-	}
-
-	if (componentAttachment.AttachmentRoot == attachTo && componentAttachment.SocketName == socketName)
-	{
-		SE_LOG(LogSceneComponent, Verbose, L"Component is already attach to desired target. Abort.");
-		return;
-	}
-
-	if (componentAttachment.AttachmentRoot != nullptr)
-	{
-		DetachFromComponent();
-	}
-
-	attachTo->childComponents.emplace_back(this);
-	componentAttachment.AttachmentRoot = attachTo;
-	componentAttachment.SocketName = socketName;
-
-	UpdateComponentToWorld();
-}
-
-void SceneComponent::DetachFromComponent()
-{
-	if (componentAttachment.AttachmentRoot == nullptr)
-	{
-		SE_LOG(LogSceneComponent, Verbose, L"Component is already detached from any components. Abort.");
-		return;
-	}
-
-	auto it = find(childComponents.begin(), childComponents.end(), this);
-	if (it == childComponents.end())
-	{
-		SE_LOG(LogSceneComponent, Error, L"Cannot found this component from child component list of parent component.");
-	}
-	else
-	{
-		childComponents.erase(it);
-	}
-
-	componentAttachment.AttachmentRoot = nullptr;
-	componentAttachment.SocketName = nullptr;
-
-	UpdateComponentToWorld();
 }
 
 void SceneComponent::UpdateChildTransforms()
@@ -177,6 +123,81 @@ bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion&
 	return true;
 }
 
+void SceneComponent::AttachToComponent(SceneComponent* attachTo)
+{
+	AttachToSocket(attachTo, nullptr);
+}
+
+void SceneComponent::AttachToSocket(SceneComponent* attachTo, TRefPtr<String> socketName)
+{
+	if (attachTo == nullptr)
+	{
+		SE_LOG(LogSceneComponent, Warning, L"{0} is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.", nameof(attachTo));
+		return;
+	}
+
+	if (componentAttachment.AttachmentRoot == attachTo && componentAttachment.SocketName == socketName)
+	{
+		SE_LOG(LogSceneComponent, Verbose, L"Component is already attach to desired target. Abort.");
+		return;
+	}
+
+	if (componentAttachment.AttachmentRoot != nullptr)
+	{
+		DetachFromComponent();
+	}
+
+	attachTo->childComponents.emplace_back(this);
+	componentAttachment.AttachmentRoot = attachTo;
+	componentAttachment.SocketName = socketName;
+
+	UpdateComponentToWorld();
+}
+
+void SceneComponent::DetachFromComponent()
+{
+	if (componentAttachment.AttachmentRoot == nullptr)
+	{
+		SE_LOG(LogSceneComponent, Verbose, L"Component is already detached from any components. Abort.");
+		return;
+	}
+
+	auto it = find(childComponents.begin(), childComponents.end(), this);
+	if (it == childComponents.end())
+	{
+		SE_LOG(LogSceneComponent, Error, L"Cannot found this component from child component list of parent component.");
+	}
+	else
+	{
+		childComponents.erase(it);
+	}
+
+	componentAttachment.AttachmentRoot = nullptr;
+	componentAttachment.SocketName = nullptr;
+
+	UpdateComponentToWorld();
+}
+
+void SceneComponent::SetMarkDirty(EComponentDirtyMask inSetMasks)
+{
+	dirtyMark |= inSetMasks;
+}
+
+bool SceneComponent::HasAnyDirtyMark() const
+{
+	return dirtyMark != EComponentDirtyMask::None;
+}
+
+bool SceneComponent::HasDirtyMark(EComponentDirtyMask inMask) const
+{
+	return (dirtyMark & inMask) != EComponentDirtyMask::None;
+}
+
+void SceneComponent::ResolveDirtyState()
+{
+	dirtyMark = EComponentDirtyMask::None;
+}
+
 SceneComponent* SceneComponent::AttachParent_get() const
 {
 	return componentAttachment.AttachmentRoot;
@@ -200,7 +221,7 @@ Transform SceneComponent::RelativeTransform_get() const
 void SceneComponent::RelativeTransform_set(const Transform& value)
 {
 	transform = value;
-	UpdateChildTransforms();
+	UpdateWorldTransform();
 }
 
 Transform SceneComponent::ComponentTransform_get() const
@@ -241,33 +262,22 @@ void SceneComponent::Rotation_set(const Quaternion& value)
 	UpdateWorldTransform();
 }
 
-Vector3 SceneComponent::ComponentLocation_get() const
-{
-	return worldTransform.Translation;
-}
-
-Vector3 SceneComponent::ComponentScale_get() const
-{
-	return worldTransform.Scale;
-}
-
-Quaternion SceneComponent::ComponentRotation_get() const
-{
-	return worldTransform.Rotation;
-}
-
-EComponentMobility SceneComponent::Mobility_get() const
-{
-	return mobility;
-}
-
-void SceneComponent::Mobility_set(EComponentMobility value)
-{
-	mobility = value;
-}
-
 void SceneComponent::UpdateWorldTransform()
 {
-	worldTransform = Transform::Multiply(transform, localToWorld);
+	if (HasBegunPlay && Mobility != EComponentMobility::Movable)
+	{
+		SE_LOG(LogSceneComponent, Error, L"SceneComponent has been try move but it is not movable mobility.");
+	}
+
+	if (AttachParent != nullptr)
+	{
+		worldTransform = Transform::Multiply(transform, localToWorld);
+	}
+	else
+	{
+		worldTransform = transform;
+	}
+	SetMarkDirty(EComponentDirtyMask::TransformUpdated);
+
 	UpdateChildTransforms();
 }

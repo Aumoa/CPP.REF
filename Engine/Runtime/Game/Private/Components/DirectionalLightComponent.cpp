@@ -25,6 +25,8 @@ public:
 
 	void UpdateBatchBuffer() override
 	{
+		Super::UpdateBatchBuffer();
+
 		auto lightBatch = GetLightBatch();
 		RHILight& light = *(RHILight*)lightBatch->GetLightBuffer()->GetMappingAddress();
 

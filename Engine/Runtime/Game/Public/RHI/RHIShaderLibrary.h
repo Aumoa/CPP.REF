@@ -18,6 +18,7 @@ public:
 	{
 		GeometryShader,
 		LightingShader,
+		ColorEmplaceShader,
 		TonemapShader
 	};
 

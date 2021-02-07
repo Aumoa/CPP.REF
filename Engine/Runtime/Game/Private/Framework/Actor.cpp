@@ -110,18 +110,84 @@ void AActor::SetWorld(World* world)
 	this->world = world;
 }
 
+#define NO_ROOT_WARNINGS(...) \
+if (rootComponent == nullptr)\
+{\
+	SE_LOG(LogActor, Warning, L"{0} called with actor that have not a root scene component. Function will be return identity transform.", __FUNCTIONW__);\
+	return __VA_ARGS__;\
+}
+
 Transform AActor::GetActorTransform() const
 {
-	if (rootComponent == nullptr)
+	NO_ROOT_WARNINGS(Transform::Identity);
+	return rootComponent->ComponentTransform;
+}
+
+void AActor::SetActorTransform(const Transform& value)
+{
+	NO_ROOT_WARNINGS();
+
+	Transform relativeTransform;
+	if (rootComponent->AttachParent != nullptr)
 	{
-		SE_LOG(LogActor, Warning, L"GetActorTransform() called with actor that have not a root scene component. Function will be return identity transform.");
-		return Transform::Identity;
+		relativeTransform = value.GetRelativeTransform(rootComponent->AttachParent->GetSocketTransform(rootComponent->AttachSocketName));
 	}
 	else
 	{
-		return rootComponent->ComponentTransform;
+		relativeTransform = value;
 	}
+	rootComponent->RelativeTransform = relativeTransform;
 }
+
+Vector3 AActor::GetActorLocation() const
+{
+	NO_ROOT_WARNINGS(Vector3::Zero);
+	return rootComponent->ComponentLocation;
+}
+
+void AActor::SetActorLocation(const Vector3& value)
+{
+	NO_ROOT_WARNINGS();
+	auto delta = value - GetActorLocation();
+	rootComponent->MoveComponent(delta, GetActorRotation());
+}
+
+Vector3 AActor::GetActorScale() const
+{
+	NO_ROOT_WARNINGS(Vector3::One);
+	return rootComponent->Scale;
+}
+
+void AActor::SetActorScale(const Vector3& value)
+{
+	NO_ROOT_WARNINGS();
+
+	Transform relativeTransform;
+	if (rootComponent->AttachParent != nullptr)
+	{
+		auto worldTransform = Transform(GetActorLocation(), value, GetActorRotation());
+		relativeTransform = worldTransform.GetRelativeTransform(rootComponent->AttachParent->GetSocketTransform(rootComponent->AttachSocketName));
+	}
+	else
+	{
+		relativeTransform = Transform(GetActorLocation(), value, GetActorRotation());
+	}
+	rootComponent->RelativeTransform = relativeTransform;
+}
+
+Quaternion AActor::GetActorRotation() const
+{
+	NO_ROOT_WARNINGS(Quaternion::Identity);
+	return rootComponent->ComponentRotation;
+}
+
+void AActor::SetActorRotation(const Quaternion& value)
+{
+	NO_ROOT_WARNINGS();
+	rootComponent->MoveComponent(Vector3::Zero, value);
+}
+
+#undef NO_ROOT_WARNINGS
 
 SceneComponent* AActor::RootComponent_get() const
 {

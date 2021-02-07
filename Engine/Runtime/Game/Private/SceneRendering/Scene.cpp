@@ -29,26 +29,22 @@ void Scene::Update()
 	for (size_t i = 0; i < primitiveComponents.size(); ++i)
 	{
 		PrimitiveComponent*& primitive = primitiveComponents[i];
-		PrimitiveSceneProxy*& sceneProxy = sceneProxies[i];
 
-		if (primitive->HasDirtyMark())
+		if (primitive->HasAnyDirtyMark())
 		{
 			primitive->ResolveDirtyState();
-			sceneProxy = primitive->GetSceneProxy();
-			sceneProxy->UpdateMovable();
+			sceneProxies[i] = primitive->GetSceneProxy();
 		}
 	}
 
 	for (size_t i = 0; i < lightComponents.size(); ++i)
 	{
 		LightComponent*& primitive = lightComponents[i];
-		LightSceneProxy*& sceneProxy = lightProxies[i];
 
-		if (primitive->HasDirtyMark())
+		if (primitive->HasAnyDirtyMark())
 		{
 			primitive->ResolveDirtyState();
-			sceneProxy = primitive->GetSceneProxy();
-			sceneProxy->UpdateMovable();
+			lightProxies[i] = primitive->GetSceneProxy();
 		}
 	}
 }

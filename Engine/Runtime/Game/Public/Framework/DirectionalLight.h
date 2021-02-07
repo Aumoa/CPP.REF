@@ -20,4 +20,6 @@ private:
 public:
 	ADirectionalLight();
 	~ADirectionalLight() override;
+
+	vs_property_get_auto(DirectionalLightComponent*, LightComponent, lightComponent);
 };

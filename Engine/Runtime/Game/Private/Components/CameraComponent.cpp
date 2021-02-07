@@ -8,7 +8,7 @@ CameraComponent::CameraComponent() : Super()
 	, aspectRatio(0.0f)
 	, fov(0.25f * 3.14f)
 {
-
+	Mobility = EComponentMobility::Movable;
 }
 
 CameraComponent::~CameraComponent()

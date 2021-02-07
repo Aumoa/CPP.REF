@@ -17,6 +17,7 @@ private:
 	std::vector<D3D12_RESOURCE_BARRIER> pendingBarriers;
 	bool bHasBegunCommand : 1;
 
+	ID3D12RootSignature* currentRS;
 	ID3D12DescriptorHeap* currentTable;
 
 public:

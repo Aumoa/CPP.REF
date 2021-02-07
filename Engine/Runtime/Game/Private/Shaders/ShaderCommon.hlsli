@@ -62,7 +62,7 @@ struct Material
 struct Light
 {
 	uint Type;
-	float4 Color;
+	float3 Color;
 	float Ambient;
 	float Diffuse;
 	float Specular;

@@ -2,6 +2,8 @@
 
 #include "Level.h"
 
+#include "Framework/Actor.h"
+
 using namespace std;
 
 Level::Level() : Super()

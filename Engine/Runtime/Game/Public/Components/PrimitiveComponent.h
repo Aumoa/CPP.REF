@@ -16,16 +16,13 @@ public:
 
 private:
 	TRefPtr<PrimitiveSceneProxy> sceneProxy;
-	bool bHasDirtyMark : 1;
 
 public:
 	PrimitiveComponent();
 	~PrimitiveComponent() override;
 
+	void ResolveDirtyState() override;
+
 	virtual TRefPtr<PrimitiveSceneProxy> CreateSceneProxy();
 	PrimitiveSceneProxy* GetSceneProxy() const;
-
-	void SetMarkDirty();
-	bool HasDirtyMark() const;
-	virtual void ResolveDirtyState();
 };

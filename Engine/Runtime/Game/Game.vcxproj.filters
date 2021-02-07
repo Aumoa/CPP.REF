@@ -465,6 +465,9 @@
     <ClInclude Include="Public\RHI\RHILight.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Framework\DirectionalLight.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -740,6 +743,9 @@
     <ClCompile Include="Private\Components\DirectionalLightComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Framework\DirectionalLight.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -799,6 +805,9 @@
     <None Include="Private\Shaders\GenericLighting.hlsli">
       <Filter>Private\Shaders</Filter>
     </None>
+    <None Include="Public\Components\SceneComponent.inl">
+      <Filter>Public\Components</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Private\Shaders\GeometryShader\PixelShader.hlsl">
@@ -806,9 +815,6 @@
     </FxCompile>
     <FxCompile Include="Private\Shaders\GeometryShader\VertexShader.hlsl">
       <Filter>Private\Shaders\GeometryShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\PixelShader.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\VertexShader.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
@@ -818,6 +824,12 @@
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\PixelShader.hlsl">
       <Filter>Private\Shaders\TonemapShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\LightAccumulatePixelShader.hlsl">
+      <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\ColorEmplacePixelShader.hlsl">
+      <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

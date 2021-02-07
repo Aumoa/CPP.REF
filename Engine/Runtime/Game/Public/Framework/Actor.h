@@ -72,6 +72,14 @@ public:
 	World* GetWorld() const;
 	void SetWorld(World* inWorld);
 	Transform GetActorTransform() const;
+	void SetActorTransform(const Transform& value);
+
+	Vector3 GetActorLocation() const;
+	void SetActorLocation(const Vector3& value);
+	Vector3 GetActorScale() const;
+	void SetActorScale(const Vector3& value);
+	Quaternion GetActorRotation() const;
+	void SetActorRotation(const Quaternion& value);
 
 	vs_property(SceneComponent*, RootComponent);
 	SceneComponent* RootComponent_get() const;

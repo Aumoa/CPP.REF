@@ -338,13 +338,37 @@ Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, fl
 	return q;
 }
 
+inline void ZUP(Vector3& lh)
+{
+	static const Matrix4x4 M = Matrix4x4(
+		0, -1, 0, 0,
+		0, 0, 1, 0,
+		1, 0, 0, 0,
+		0, 0, 0, 1
+	);
+
+	lh = M.TransformVector(lh);
+}
+
 Quaternion Quaternion::LookTo(const Vector3& forward, const Vector3& up)
 {
-	XMMATRIX M = XMMatrixLookToLH(XMVectorZero(), XMLoadVector3(&forward), XMLoadVector3(&up));
+	Quaternion t;
+
+	Vector3 F = forward.Normalized;
+	Vector3 U = up.Normalized;
+	Vector3 R = Vector3::CrossProduct(up, forward).Normalized;
+	U = Vector3::CrossProduct(F, R);
+
+	XMMATRIX M = XMMatrixSet(
+		R.X, R.Y, R.Z, 0,
+		U.X, U.Y, U.Z, 0,
+		F.X, F.Y, F.Z, 0,
+		0, 0, 0, 1.0f
+	);
+
 	XMVECTOR Q = XMQuaternionRotationMatrix(M);
-	Quaternion q;
-	XMStoreQuaternion(&q, Q);
-	return q;
+	XMStoreQuaternion(&t, Q);
+	return t;
 }
 
 Quaternion operator +(float left, const Quaternion& right)

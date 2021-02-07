@@ -306,7 +306,8 @@ void D3D12DeviceBundle::InitializeD3D12()
 #include "Shaders/GeometryShader/Compiled/VertexShader.hlsl.h"
 #include "Shaders/GeometryShader/Compiled/PixelShader.hlsl.h"
 #include "Shaders/LightingShader/Compiled/VertexShader.hlsl.h"
-#include "Shaders/LightingShader/Compiled/PixelShader.hlsl.h"
+#include "Shaders/LightingShader/Compiled/LightAccumulatePixelShader.hlsl.h"
+#include "Shaders/LightingShader/Compiled/ColorEmplacePixelShader.hlsl.h"
 #include "Shaders/TonemapShader/Compiled/VertexShader.hlsl.h"
 #include "Shaders/TonemapShader/Compiled/PixelShader.hlsl.h"
 
@@ -456,11 +457,40 @@ void D3D12DeviceBundle::InitializeShaders()
 			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges1),
 			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges2),
 			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges3),
+			GetRootCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL),
 		};
 
 		D3D12_STATIC_SAMPLER_DESC StaticSamplers[]
 		{
 			GetStaticSampler(D3D12_FILTER_MIN_MAG_MIP_POINT, D3D12_TEXTURE_ADDRESS_MODE_BORDER)
+		};
+
+		D3D12_RENDER_TARGET_BLEND_DESC RTBlendAcc =
+		{
+			TRUE,
+			FALSE,
+			D3D12_BLEND_ONE,
+			D3D12_BLEND_ONE,
+			D3D12_BLEND_OP_ADD,
+			D3D12_BLEND_ONE,
+			D3D12_BLEND_ONE,
+			D3D12_BLEND_OP_ADD,
+			D3D12_LOGIC_OP_CLEAR,
+			D3D12_COLOR_WRITE_ENABLE_ALL
+		};
+
+		D3D12_RENDER_TARGET_BLEND_DESC RTBlendMul =
+		{
+			TRUE,
+			FALSE,
+			D3D12_BLEND_DEST_COLOR,
+			D3D12_BLEND_ZERO,
+			D3D12_BLEND_OP_ADD,
+			D3D12_BLEND_SRC_ALPHA,
+			D3D12_BLEND_ZERO,
+			D3D12_BLEND_OP_ADD,
+			D3D12_LOGIC_OP_CLEAR,
+			D3D12_COLOR_WRITE_ENABLE_ALL
 		};
 
 		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, StaticSamplers);
@@ -469,13 +499,19 @@ void D3D12DeviceBundle::InitializeShaders()
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = GetInitialPipelineDesc(pRS.Get());
 		PSDesc.VS = GetShaderBytecode(pLightingVertexShader);
-		PSDesc.PS = GetShaderBytecode(pLightingPixelShader);
+		PSDesc.PS = GetShaderBytecode(pLightingLightAccumulatePixelShader);
 		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
+		PSDesc.BlendState.RenderTarget[0] = RTBlendAcc;
 		ComPtr<ID3D12PipelineState> pPS;
 		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
-
 		lib->SetShader(RHIShaderLibrary::LightingShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
+
+		PSDesc.PS = GetShaderBytecode(pLightingColorEmplacePixelShader);
+		PSDesc.BlendState.RenderTarget[0] = RTBlendMul;
+		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
+		lib->SetShader(RHIShaderLibrary::ColorEmplaceShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
 	}
 
 	{  // Tonemap Shader
