@@ -376,6 +376,14 @@ Matrix4x4 Matrix4x4::PerspectiveFovLH(float fov, float aspectRatio, float nearZ,
     return m;
 }
 
+Matrix4x4 Matrix4x4::OrthographicLH(float inWidth, float inHeight, float nearZ, float farZ)
+{
+    XMMATRIX M = XMMatrixOrthographicLH(inWidth, inHeight, nearZ, farZ);
+    Matrix4x4 m;
+    XMStoreMatrix4x4(&m, M);
+    return m;
+}
+
 Matrix4x4 Matrix4x4::RotationX(TRadians<float> angle)
 {
     XMMATRIX M = XMMatrixRotationX(angle.Value);

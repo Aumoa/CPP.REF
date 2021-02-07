@@ -20,7 +20,17 @@ void MinimalViewInfo::Apply()
 	Vector3 up = Rotation.RotateVector(Vector3::Up);
 	
 	Matrix4x4 lookTo = Matrix4x4::LookTo(Location, forward, up);
-	Matrix4x4 proj = Matrix4x4::PerspectiveFovLH(FOV, AspectRatio, NearPlane, FarPlane);
+	Matrix4x4 proj;
+
+	if (FOV == 0)
+	{
+		proj = Matrix4x4::PerspectiveFovLH(FOV, AspectRatio, NearPlane, FarPlane);
+	}
+	else
+	{
+		proj = Matrix4x4::OrthographicLH(AspectRatio, 1.0f, NearPlane, FarPlane);
+	}
+
 	Matrix4x4 vp = Matrix4x4::Multiply(lookTo, proj);
 
 	ViewProj = vp;

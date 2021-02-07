@@ -3,6 +3,7 @@
 #include "Components/DirectionalLightComponent.h"
 
 #include "SceneRendering/LightSceneProxy.h"
+#include "SceneRendering/MinimalViewInfo.h"
 #include "RHI/RHICommon.h"
 #include "RHI/IRHIResource.h"
 
@@ -45,4 +46,12 @@ DirectionalLightComponent::~DirectionalLightComponent()
 TRefPtr<LightSceneProxy> DirectionalLightComponent::CreateSceneProxy()
 {
 	return NewObject<DirectionalLightSceneProxy>(this);
+}
+
+void DirectionalLightComponent::CalcLightView(MinimalViewInfo& outViewInfo) const
+{
+	outViewInfo.FOV = 0;
+	outViewInfo.AspectRatio = 1.0f;
+	outViewInfo.Location = ComponentLocation;
+	outViewInfo.Rotation = ComponentRotation;
 }
