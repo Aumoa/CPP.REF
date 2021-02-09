@@ -19,7 +19,7 @@ struct Fragment
 struct GeometryPixel
 {
 	float4 Color : SV_TARGET0;
-	float4 Normal : SV_TARGET1;
+	uint4 Normal : SV_TARGET1;
 };
 
 struct ShaderObjectConstant

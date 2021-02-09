@@ -247,6 +247,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Assets\MeshLoader.h" />
     <ClInclude Include="Private\Bezier.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBuffer.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.h" />
@@ -275,7 +276,10 @@
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
+    <ClInclude Include="Private\Materials\MaterialInstance.h" />
     <ClInclude Include="Private\RHI\RHICommon.h" />
+    <ClInclude Include="Private\RHI\RHIMaterial.h" />
+    <ClInclude Include="Private\RHI\RHIMaterialBundle.h" />
     <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
@@ -327,6 +331,8 @@
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
+    <ClInclude Include="Public\Materials\Material.h" />
+    <ClInclude Include="Public\Materials\MaterialInterface.h" />
     <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
@@ -339,6 +345,7 @@
     <ClInclude Include="Public\RHI\IRHIDeviceBundle.h" />
     <ClInclude Include="Public\RHI\IRHIFence.h" />
     <ClInclude Include="Public\RHI\IRHIImmediateCommandList.h" />
+    <ClInclude Include="Public\RHI\IRHIMaterialBundle.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
     <ClInclude Include="Public\RHI\IRHIShader.h" />
@@ -388,6 +395,7 @@
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
+    <ClCompile Include="Private\Assets\MeshLoader.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\DirectionalLightComponent.cpp" />
@@ -446,11 +454,14 @@
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
     <ClCompile Include="Private\Logging\Logger.cpp" />
+    <ClCompile Include="Private\Materials\Material.cpp" />
+    <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
     <ClCompile Include="Private\Misc\TickScheduler.cpp" />
     <ClCompile Include="Private\Physics\Collision.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
+    <ClCompile Include="Private\RHI\RHIMaterialBundle.cpp" />
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceDesc.cpp" />
     <ClCompile Include="Private\RHI\RHIResourceGC.cpp" />
@@ -476,6 +487,7 @@
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\Shaders\GenericLighting.hlsli" />
+    <None Include="Private\Shaders\PrimitivePacking.hlsli" />
     <None Include="Private\Shaders\ShaderCommon.hlsli" />
     <None Include="Private\VulkanRHI\VulkanCommandList.cpp" />
     <None Include="Private\VulkanRHI\VulkanDeviceBundle.cpp" />
@@ -491,6 +503,7 @@
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
     <None Include="Public\Level.inl" />
+    <None Include="Public\Materials\MaterialInterface.inl" />
     <None Include="Public\TSubclassOf.inl" />
     <None Include="Public\World.inl" />
   </ItemGroup>

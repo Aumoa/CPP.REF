@@ -15,6 +15,8 @@
 
 using namespace std;
 
+#define GET_RESOURCE(x) Cast<D3D12Resource>(x)->Resource
+
 D3D12CommandList::D3D12CommandList() : Super()
 	, bHasBegunCommand(false)
 
@@ -86,7 +88,28 @@ void D3D12CommandList::CopyResource(IRHIResource* target, IRHIResource* source)
 {
 	ConsumePendingDeferredCommands();
 
-	CommandList->CopyResource(Cast<D3D12Resource>(target)->Resource, Cast<D3D12Resource>(source)->Resource);
+	CommandList->CopyResource(GET_RESOURCE(target), GET_RESOURCE(source));
+}
+
+void D3D12CommandList::CopyBufferRegion(IRHIResource* inDstBuffer, uint64 inDstLocation, IRHIResource* inSrcBuffer, uint64 inSrcLocation, uint64 inNumBytes)
+{
+	ConsumePendingDeferredCommands();
+
+	CommandList->CopyBufferRegion(GET_RESOURCE(inDstBuffer), inDstLocation, GET_RESOURCE(inSrcBuffer), inSrcLocation, inNumBytes);
+}
+
+void D3D12CommandList::SetGraphicsRoot32BitConstants(uint32 inParamIndex, const uint32* inBytes, size_t inNum32Bits, size_t location)
+{
+	ConsumePendingDeferredCommands();
+
+	if (inNum32Bits == 1)
+	{
+		CommandList->SetGraphicsRoot32BitConstant(inParamIndex, *inBytes, (UINT)location);
+	}
+	else
+	{
+		CommandList->SetGraphicsRoot32BitConstants(inParamIndex, (UINT)inNum32Bits, inBytes, (UINT)location);
+	}
 }
 
 void D3D12CommandList::SetShader(IRHIShader* shader)

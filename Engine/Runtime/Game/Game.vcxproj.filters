@@ -85,6 +85,12 @@
     <Filter Include="Private\Shaders\TonemapShader">
       <UniqueIdentifier>{95b714ea-5949-40fa-8dee-43e3f7b7dee0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Materials">
+      <UniqueIdentifier>{d0ac7db1-63e5-49d3-b29a-f19e20e04324}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Materials">
+      <UniqueIdentifier>{c3331f6d-5edc-4e1c-81dd-c28c37fbdcc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -468,6 +474,27 @@
     <ClInclude Include="Public\Framework\DirectionalLight.h">
       <Filter>Public\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="Private\Assets\MeshLoader.h">
+      <Filter>Private\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Materials\MaterialInterface.h">
+      <Filter>Public\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIMaterialBundle.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Materials\MaterialInstance.h">
+      <Filter>Private\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RHI\RHIMaterial.h">
+      <Filter>Private\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RHI\RHIMaterialBundle.h">
+      <Filter>Private\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Materials\Material.h">
+      <Filter>Public\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -746,6 +773,18 @@
     <ClCompile Include="Private\Framework\DirectionalLight.cpp">
       <Filter>Private\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Assets\MeshLoader.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Materials\MaterialInterface.cpp">
+      <Filter>Private\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIMaterialBundle.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Materials\Material.cpp">
+      <Filter>Private\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -807,6 +846,12 @@
     </None>
     <None Include="Public\Components\SceneComponent.inl">
       <Filter>Public\Components</Filter>
+    </None>
+    <None Include="Private\Shaders\PrimitivePacking.hlsli">
+      <Filter>Private\Shaders</Filter>
+    </None>
+    <None Include="Public\Materials\MaterialInterface.inl">
+      <Filter>Public\Materials</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

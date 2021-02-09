@@ -68,7 +68,7 @@ void ShaderCameraConstantVector::EndUpdateConstant()
 	size_t newsz = AlignOf(CameraConst + actSize);
 	if (newsz > this->capacity)
 	{
-		constantBuffer = GEngine.DeviceBundle->CreateDynamicConstantBuffer(newsz);
+		constantBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(newsz);
 		this->capacity = newsz;
 	}
 

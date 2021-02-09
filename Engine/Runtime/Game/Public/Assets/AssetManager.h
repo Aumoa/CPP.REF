@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 
 class StaticMesh;
+class Material;
 struct LogCategoryBase;
 
 class GAME_API AssetManager : virtual public Object
@@ -17,7 +18,8 @@ public:
 private:
 	static LogCategoryBase LogAssets;
 
-	std::map<TRefPtr<String>, TRefPtr<StaticMesh>> assets;
+	std::map<TRefPtr<String>, TRefPtr<StaticMesh>> staticMeshes;
+	std::map<TRefPtr<String>, TRefPtr<Material>> materials;
 
 public:
 	AssetManager();
@@ -25,4 +27,7 @@ public:
 
 	void Import(TRefPtr<String> key, TRefPtr<StaticMesh> imported);
 	StaticMesh* LoadStaticMesh(TRefPtr<String> key) const;
+
+	void Import(TRefPtr<String> key, TRefPtr<Material> imported);
+	Material* LoadMaterial(TRefPtr<String> key) const;
 };

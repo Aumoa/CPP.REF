@@ -22,5 +22,7 @@ struct GAME_API RHIMeshDrawCommand
 	uint32 IndexCount;
 	uint32 VertexStride;
 
+	uint16 MaterialIndex;
+
 	RHIMeshDrawCommand();
 };

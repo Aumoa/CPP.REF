@@ -10,6 +10,7 @@
 #include "RHi/RHIMeshDrawCommand.h"
 #include "RHI/RHIVertex.h"
 
+class Material;
 interface IRHIResource;
 
 class GAME_API StaticMeshBatch : public MeshBatch
@@ -39,11 +40,15 @@ private:
 	TRefPtr<IRHIResource> indexBuffer;
 	TRefPtr<StaticMeshBatch> meshBatch;
 
+	TRefPtr<Material> material;
+
 public:
 	StaticMesh();
 	~StaticMesh();
 
 	MeshBatch* GetMeshBatch() const;
+	
+	vs_property_get_auto(Material*, DefaultMaterial, material.Get());
 
-	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices);
+	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial);
 };

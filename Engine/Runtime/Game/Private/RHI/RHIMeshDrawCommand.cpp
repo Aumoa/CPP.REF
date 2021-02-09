@@ -11,6 +11,8 @@ RHIMeshDrawCommand::RHIMeshDrawCommand()
 	, VertexCount(0)
 	, IndexCount(0)
 	, VertexStride(0)
+
+	, MaterialIndex(0)
 {
 
 }

@@ -61,7 +61,9 @@ void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, Sc
 			PrimitiveSceneProxy* scene = primitiveSceneProxies[i];
 			MeshBatch* batch = scene->GetMeshBatch();
 			const RHIMeshDrawCommand* drawCommand = batch->GetDrawCommand();
+			uint32 const32Bit = drawCommand->MaterialIndex;
 			commandList->SetGraphicsRootConstantBufferView(0, cbv);
+			commandList->SetGraphicsRoot32BitConstants(1, &const32Bit, 1);
 			commandList->DrawMesh(*drawCommand);
 
 			cbvIterator.MoveNext();

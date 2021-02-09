@@ -29,7 +29,7 @@ class RHIResourceGC;
 struct RHIVertex;
 struct RHITextureClearValue;
 
-interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
+interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 {
 	virtual IRHISwapChain* GetSwapChain() const = 0;
 	virtual IRHIImmediateCommandList* GetImmediateCommandList() const = 0;
@@ -46,5 +46,6 @@ interface IRHIDeviceBundle : virtual public Object, virtual public IRHIBundle
 
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices) = 0;
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices) = 0;
-	virtual TRefPtr<IRHIResource> CreateDynamicConstantBuffer(size_t sizeInBytes) = 0;
+	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes) = 0;
+	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState) = 0;
 };

@@ -2,8 +2,9 @@
 
 #include "../ShaderCommon.hlsli"
 #include "../GenericLighting.hlsli"
+#include "../PrimitivePacking.hlsli"
 
-Texture2D<float4> gNormalBuffer : register(t1);
+Texture2D<uint4> gNormalBuffer : register(t1);
 Texture2D<float> gDepthBuffer : register(t2);
 
 SamplerState gSampler : register(s0);
@@ -27,6 +28,7 @@ float3 WorldPosFromDepth(float2 tex, float depth, ShaderCameraConstant cameraCon
 HDRPixel PS_Main(in QuadFrag inFrag)
 {
 	float3 worldPos = WorldPosFromDepth(inFrag.Tex, gDepthBuffer.Sample(gSampler, inFrag.Tex), gCamera);
+	uint4 normal = gNormalBuffer[(uint2)inFrag.PosH.xy];
 
 	Material myMat;
 	myMat.Ambient = 0.2f;
@@ -36,7 +38,7 @@ HDRPixel PS_Main(in QuadFrag inFrag)
 
 	float3 ray = gCamera.Pos - worldPos;
 	float3 rayDir = normalize(ray);
-	float3 ads = ComputeDirectionalLight(myMat, gLight, gNormalBuffer.Sample(gSampler, inFrag.Tex).xyz, rayDir);
+	float3 ads = ComputeDirectionalLight(myMat, gLight, ConvUInt16ToSnorm16(normal.xyz), rayDir);
 
 	HDRPixel oPixel;
 	oPixel.Color = float4(float3((ads.x + ads.y) * gLight.Color + ads.z), 1.0f);

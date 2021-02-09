@@ -20,11 +20,15 @@ bool IsUnknownFormat(ERHITextureFormat inFormat)
 
 bool IsColorFormat(ERHITextureFormat inFormat)
 {
+	if (inFormat >= ERHITextureFormat::R16G16B16A16_FLOAT && inFormat <= ERHITextureFormat::R16G16B16A16_SINT)
+	{
+		return true;
+	}
+
 	switch (inFormat)
 	{
-	CASE(R16G16B16A16_FLOAT) :
-	CASE(R8G8B8A8_UNORM) :
-	CASE(B8G8R8A8_UNORM) :
+	CASE(R8G8B8A8_UNORM):
+	CASE(B8G8R8A8_UNORM):
 		return true;
 	}
 

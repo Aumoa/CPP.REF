@@ -9,6 +9,10 @@ enum class ERHITextureFormat
 {
 	Unknown,
 	R16G16B16A16_FLOAT						= 10,
+	R16G16B16A16_UNORM						= 11,
+	R16G16B16A16_UINT 						= 12,
+	R16G16B16A16_SNORM						= 13,
+	R16G16B16A16_SINT 						= 14,
 	R8G8B8A8_UNORM							= 28,
 	R24G8_TYPELESS							= 44,
 	D24_UNORM_S8_UINT						= 45,

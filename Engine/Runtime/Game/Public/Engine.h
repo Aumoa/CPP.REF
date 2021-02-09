@@ -14,6 +14,8 @@ interface IRHICommandFence;
 interface IRHIDeviceBundle;
 interface IRHIImmediateCommandList;
 interface IRHISwapChain;
+interface IRHIMaterialBundle;
+interface IRHICommandList;
 
 class SceneRenderer;
 class GameInstance;
@@ -37,6 +39,7 @@ private:
 	TRefPtr<IRHICommandFence> autoFence;
 
 	IRHIDeviceBundle* deviceBundle;
+	IRHIMaterialBundle* materialBundle;
 	IRHIImmediateCommandList* immediateCommandList;
 	IRHISwapChain* swapChain;
 
@@ -52,19 +55,22 @@ public:
 	virtual void Tick();
 	virtual void Shutdown();
 
-	vs_property_get(IRHIDeviceBundle*, DeviceBundle);
-	IRHIDeviceBundle* DeviceBundle_get() const;
+	vs_property_get_auto(IRHIDeviceBundle*, DeviceBundle, deviceBundle);
+	vs_property_get_auto(IRHIMaterialBundle*, MaterialBundle, materialBundle);
 	AssetManager* GetAssetManager() const;
 	GameViewport* GetGameViewport() const;
 
 	static Engine* GetInstance();
 
 private:
+	void CommitBundles(IRHICommandList* inCommandList);
 	void TickWorld();
 	void RenderScene();
 
-	void ForEachBundles(std::function<void(IRHIBundle*)> action);
+	void InitializeBundles();
 	void LoadEngineDefaultAssets();
+
+	void ForEachBundles(std::function<void(IRHIBundle*)> action);
 
 	void Application_OnPostSized(int32 x, int32 y);
 };

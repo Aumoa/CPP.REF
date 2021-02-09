@@ -15,3 +15,4 @@
 #include "RHI/RHIMeshDrawCommand.h"
 #include "RHI/RHIResourceDesc.h"
 #include "RHI/RHILight.h"
+#include "RHI/RHIMaterial.h"

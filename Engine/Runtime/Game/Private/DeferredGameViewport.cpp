@@ -85,9 +85,9 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 		clearColor
 	);
 
-	clearColor.Format = ERHITextureFormat::R16G16B16A16_FLOAT;
+	clearColor.Format = ERHITextureFormat::R16G16B16A16_UINT;
 	normalBuffer = device->CreateTexture2D(
-		ERHITextureFormat::R16G16B16A16_FLOAT,
+		ERHITextureFormat::R16G16B16A16_UINT,
 		x,
 		y,
 		ERHIResourceStates::PIXEL_SHADER_RESOURCE,
@@ -120,7 +120,7 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 
 	hdrTargetView = device->CreateRenderTargetView(hdrBuffer.Get());
 	colorBufferSRV = device->CreateTextureView(renderTarget.Get(), ERHITextureFormat::B8G8R8A8_UNORM);
-	normalBufferSRV = device->CreateTextureView(normalBuffer.Get(), ERHITextureFormat::R16G16B16A16_FLOAT);
+	normalBufferSRV = device->CreateTextureView(normalBuffer.Get(), ERHITextureFormat::R16G16B16A16_UINT);
 	depthBufferSRV = device->CreateTextureView(depthStencilBuffer.Get(), ERHITextureFormat::R24_UNORM_X8_TYPELESS);
 	hdrBufferSRV = device->CreateTextureView(hdrBuffer.Get(), ERHITextureFormat::R16G16B16A16_FLOAT);
 

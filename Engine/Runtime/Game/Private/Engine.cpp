@@ -16,6 +16,7 @@
 #include "RHI/IRHIDeferredCommandList.h"
 #include "RHI/RHIResourceStates.h"
 #include "RHI/RHIResourceGC.h"
+#include "RHI/RHIMaterialBundle.h"
 #include "Assets/AssetManager.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "PlatformMisc/PlatformInput.h"
@@ -56,11 +57,7 @@ void Engine::Initialize()
 	}
 	gEngine = this;
 
-	auto deviceBundle = NewObject<D3D12DeviceBundle>();
-	this->deviceBundle = deviceBundle.Get();
-	rhiBundles.push_back(deviceBundle);
-
-	ForEachBundles([](auto* bundle) { bundle->InitializeBundle(); });
+	InitializeBundles();
 
 	autoFence = deviceBundle->CreateCommandFence();
 	immediateCommandList = deviceBundle->GetImmediateCommandList();
@@ -95,11 +92,6 @@ void Engine::Shutdown()
 	CycleStatsGroup::ReadyToShutdown();
 }
 
-IRHIDeviceBundle* Engine::DeviceBundle_get() const
-{
-	return deviceBundle;
-}
-
 AssetManager* Engine::GetAssetManager() const
 {
 	return assetManager.Get();
@@ -113,6 +105,14 @@ GameViewport* Engine::GetGameViewport() const
 Engine* Engine::GetInstance()
 {
 	return gEngine;
+}
+
+void Engine::CommitBundles(IRHICommandList* inCommandList)
+{
+	ForEachBundles([inCommandList](auto bundle)
+	{
+		bundle->Commit(inCommandList);
+	});
 }
 
 void Engine::TickWorld()
@@ -133,6 +133,8 @@ void Engine::RenderScene()
 	Scene* const scene = world->GetScene();
 
 	immediateCommandList->BeginCommand();
+	CommitBundles(immediateCommandList);
+
 	gameViewport->RenderScene(immediateCommandList, scene);
 
 	{
@@ -152,6 +154,19 @@ void Engine::RenderScene()
 
 		autoFence->EndFence(immediateCommandList);
 	}
+}
+
+void Engine::InitializeBundles()
+{
+	auto deviceBundle = NewObject<D3D12DeviceBundle>();
+	this->deviceBundle = deviceBundle.Get();
+	rhiBundles.emplace_back(move(deviceBundle));
+
+	auto materialBundle = NewObject<RHIMaterialBundle>();
+	this->materialBundle = materialBundle.Get();
+	rhiBundles.emplace_back(move(materialBundle));
+
+	ForEachBundles([](auto* bundle) { bundle->InitializeBundle(); });
 }
 
 void Engine::ForEachBundles(function<void(IRHIBundle*)> action)

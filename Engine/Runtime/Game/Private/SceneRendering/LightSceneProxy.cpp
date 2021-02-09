@@ -11,7 +11,7 @@
 
 LightBatch::LightBatch()
 {
-	basicLightBuffer = GEngine.DeviceBundle->CreateDynamicConstantBuffer(sizeof(RHILight));
+	basicLightBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(sizeof(RHILight));
 }
 
 LightBatch::~LightBatch()

@@ -47,6 +47,7 @@ public:
 
 	virtual void InitializeBundle();
 	virtual void ReleaseBundle();
+	virtual void Commit(IRHICommandList* inCommandList);
 
 	virtual IRHISwapChain* GetSwapChain() const;
 	virtual IRHIImmediateCommandList* GetImmediateCommandList() const;
@@ -63,7 +64,8 @@ public:
 
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
-	virtual TRefPtr<IRHIResource> CreateDynamicConstantBuffer(size_t sizeInBytes);
+	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);
+	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState);
 
 	vs_property_get(ID3D12Device*, Device);
 	ID3D12Device* Device_get() const;

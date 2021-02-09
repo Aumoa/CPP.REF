@@ -77,6 +77,11 @@ void D3D12DeviceBundle::ReleaseBundle()
 	instance = nullptr;
 }
 
+void D3D12DeviceBundle::Commit(IRHICommandList* inCommandList)
+{
+
+}
+
 IRHISwapChain* D3D12DeviceBundle::GetSwapChain() const
 {
 	return swapChain.Get();
@@ -205,7 +210,7 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(span<uint32> indices)
 
 #define ALIGN_256(x) ((x + 255) & ~255)
 
-TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicConstantBuffer(size_t sizeInBytes)
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicBuffer(size_t sizeInBytes)
 {
 	size_t align_size = ALIGN_256(sizeInBytes);
 
@@ -216,6 +221,26 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicConstantBuffer(size_t size
 	}
 
 	return it->second->AllocBuffer();
+}
+
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState)
+{
+	D3D12_RESOURCE_DESC bufferDesc = { };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = (uint64)sizeInBytes;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	D3D12_HEAP_PROPERTIES heapProp = { };
+	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	ComPtr<ID3D12Resource> pResource;
+	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, (D3D12_RESOURCE_STATES)initialState, nullptr, IID_PPV_ARGS(&pResource)));
+
+	return NewObject<D3D12Resource>(pResource.Get());
 }
 
 ID3D12Device* D3D12DeviceBundle::Device_get() const
@@ -325,6 +350,16 @@ void D3D12DeviceBundle::InitializeShaders()
 		D3D12_ROOT_PARAMETER param = { };
 		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		param.ShaderVisibility = shaderVisibility;
+		param.Descriptor.ShaderRegister = shaderRegister;
+		return param;
+	};
+
+	static auto GetRoot32BitCBVParameter = [](uint32 shaderRegister, uint32 num32Bits, D3D12_SHADER_VISIBILITY shaderVisibility)
+	{
+		D3D12_ROOT_PARAMETER param = { };
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+		param.ShaderVisibility = shaderVisibility;
+		param.Constants.Num32BitValues = num32Bits;
 		param.Constants.ShaderRegister = shaderRegister;
 		return param;
 	};
@@ -418,7 +453,8 @@ void D3D12DeviceBundle::InitializeShaders()
 	{  // Geometry Shader
 		D3D12_ROOT_PARAMETER RootParameters[]
 		{
-			GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX)
+			GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX),
+			GetRoot32BitCBVParameter(0, 1, D3D12_SHADER_VISIBILITY_PIXEL),
 		};
 
 		D3D12_INPUT_ELEMENT_DESC InputElements[]
@@ -437,7 +473,7 @@ void D3D12DeviceBundle::InitializeShaders()
 		PSDesc.PS = GetShaderBytecode(pGeometryPixelShader);
 		PSDesc.DepthStencilState = { TRUE, D3D12_DEPTH_WRITE_MASK_ALL, D3D12_COMPARISON_FUNC_LESS, FALSE, 0, 0 };
 		PSDesc.InputLayout = GetInputLayout(InputElements);
-		SetRTVFormats(PSDesc, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		SetRTVFormats(PSDesc, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_R16G16B16A16_UINT);
 		PSDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 		ComPtr<ID3D12PipelineState> pPS;

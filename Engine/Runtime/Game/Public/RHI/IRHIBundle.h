@@ -5,8 +5,11 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface IRHIBundle : virtual public Object
+interface IRHICommandList;
+
+interface GAME_API IRHIBundle : virtual public Object
 {
 	virtual void InitializeBundle() = 0;
 	virtual void ReleaseBundle() = 0;
+	virtual void Commit(IRHICommandList* inCommandList) = 0;
 };
