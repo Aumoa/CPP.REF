@@ -41,6 +41,7 @@ public:
 	virtual void SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV);
 	virtual void CopyBufferRegion(IRHIResource* inDstBuffer, uint64 inDstLocation, IRHIResource* inSrcBuffer, uint64 inSrcLocation, uint64 inNumBytes);
 	virtual void SetGraphicsRoot32BitConstants(uint32 inParamIndex, const uint32* inBytes, size_t inNum32Bits, size_t location);
+	virtual void SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress);
 
 	virtual bool HasBegunCommand_get() const;
 

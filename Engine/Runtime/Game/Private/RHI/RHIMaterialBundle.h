@@ -40,6 +40,7 @@ public:
 	virtual void Commit(IRHICommandList* inCommandList);
 
 	virtual TRefPtr<MaterialInterface> CreateMaterial();
+	virtual uint64 GetMaterialsBufferVirtualAddress() const;
 
 	void EnqueueDirty(MaterialInterface* inQuery);
 	void* GetUploadBufferPointer(uint16 inMaterialIndex);

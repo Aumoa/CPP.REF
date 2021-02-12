@@ -6,11 +6,11 @@
 #include "RHI/RHIMaterialBundle.h"
 
 Material::Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle) : Super(inMaterialIndex)
-	, bMarkDirty(true)
+	, bMarkDirty(false)
 	, owner(inBundle)
 	, uploadBufferPtr(nullptr)
 {
-
+	SetMarkDirty(EMaterialDirtyMask::All);
 }
 
 Material::~Material()

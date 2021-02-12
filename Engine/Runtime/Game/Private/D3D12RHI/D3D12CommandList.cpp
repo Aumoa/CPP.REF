@@ -15,7 +15,7 @@
 
 using namespace std;
 
-#define GET_RESOURCE(x) Cast<D3D12Resource>(x)->Resource
+#define GET_RESOURCE(x) Cast<ID3D12ResourceBase>(x)->Resource
 
 D3D12CommandList::D3D12CommandList() : Super()
 	, bHasBegunCommand(false)
@@ -110,6 +110,12 @@ void D3D12CommandList::SetGraphicsRoot32BitConstants(uint32 inParamIndex, const 
 	{
 		CommandList->SetGraphicsRoot32BitConstants(inParamIndex, (UINT)inNum32Bits, inBytes, (UINT)location);
 	}
+}
+
+void D3D12CommandList::SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress)
+{
+	ConsumePendingDeferredCommands();
+	CommandList->SetGraphicsRootShaderResourceView(inParamIndex, inVirtualAddress);
 }
 
 void D3D12CommandList::SetShader(IRHIShader* shader)

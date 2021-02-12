@@ -11,6 +11,7 @@ SamplerState gSampler : register(s0);
 
 ConstantBuffer<ShaderCameraConstant> gCamera : register(b0);
 ConstantBuffer<Light> gLight : register(b1);
+StructuredBuffer<Material> gMaterialBuffer : register(t3);
 
 float3 WorldPosFromDepth(float2 tex, float depth, ShaderCameraConstant cameraConstant)
 {
@@ -28,17 +29,14 @@ float3 WorldPosFromDepth(float2 tex, float depth, ShaderCameraConstant cameraCon
 HDRPixel PS_Main(in QuadFrag inFrag)
 {
 	float3 worldPos = WorldPosFromDepth(inFrag.Tex, gDepthBuffer.Sample(gSampler, inFrag.Tex), gCamera);
-	uint4 normal = gNormalBuffer[(uint2)inFrag.PosH.xy];
+	uint4 normalRaw = gNormalBuffer[(uint2)inFrag.PosH.xy];
 
-	Material myMat;
-	myMat.Ambient = 0.2f;
-	myMat.Diffuse = 0.5f;
-	myMat.Specular = 0.2f;
-	myMat.SpecExp = 16.0f;
+	float3 normal = ConvUInt16ToSnorm16(normalRaw.xyz);	
+	uint matIndex = normalRaw.w;
 
 	float3 ray = gCamera.Pos - worldPos;
 	float3 rayDir = normalize(ray);
-	float3 ads = ComputeDirectionalLight(myMat, gLight, ConvUInt16ToSnorm16(normal.xyz), rayDir);
+	float3 ads = ComputeDirectionalLight(gMaterialBuffer[matIndex], gLight, normal, rayDir);
 
 	HDRPixel oPixel;
 	oPixel.Color = float4(float3((ads.x + ads.y) * gLight.Color + ads.z), 1.0f);

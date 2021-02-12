@@ -32,3 +32,8 @@ RHIResourceDesc D3D12DynamicBuffer::GetDesc() const
 	desc.Width = allocator->NodeSize;
 	return desc;
 }
+
+ID3D12Resource* D3D12DynamicBuffer::Resource_get() const
+{
+	return allocator->Resource;
+}

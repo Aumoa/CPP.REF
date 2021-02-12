@@ -2,16 +2,13 @@
 
 #include "D3D12Resource.h"
 
-D3D12Resource::D3D12Resource(ID3D12Resource* resource) : Super()
+D3D12Resource::D3D12Resource(ID3D12Resource* inResource) : Super()
 	, mappingAddr(nullptr)
+	, virtualAddress(0)
 {
-	this->resource = resource;
-
-	D3D12_RESOURCE_DESC desc = resource->GetDesc();
-	this->desc.Format = (ERHITextureFormat)desc.Format;
-	this->desc.Width = desc.Width;
-	this->desc.Height = desc.Height;
-	this->desc.DepthOrArraySize = desc.DepthOrArraySize;
+	resource = inResource;
+	UpdateResourceDesc();
+	BindMappingAddress();
 }
 
 D3D12Resource::~D3D12Resource()
@@ -36,10 +33,25 @@ RHIResourceDesc D3D12Resource::GetDesc() const
 
 void D3D12Resource::BindMappingAddress()
 {
-	HR(resource->Map(0, nullptr, &mappingAddr));
+	D3D12_HEAP_PROPERTIES heapProp;
+	D3D12_HEAP_FLAGS flags;
+	HR(resource->GetHeapProperties(&heapProp, &flags));
+
+	if (heapProp.Type == D3D12_HEAP_TYPE_UPLOAD) {
+		HR(resource->Map(0, nullptr, &mappingAddr));
+	}
 }
 
 ID3D12Resource* D3D12Resource::Resource_get() const
 {
 	return resource.Get();
+}
+
+void D3D12Resource::UpdateResourceDesc()
+{
+	D3D12_RESOURCE_DESC desc = resource->GetDesc();
+	this->desc.Format = (ERHITextureFormat)desc.Format;
+	this->desc.Width = desc.Width;
+	this->desc.Height = desc.Height;
+	this->desc.DepthOrArraySize = desc.DepthOrArraySize;
 }

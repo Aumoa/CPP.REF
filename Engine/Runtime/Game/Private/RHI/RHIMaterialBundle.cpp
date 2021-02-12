@@ -49,7 +49,7 @@ void RHIMaterialBundle::Commit(IRHICommandList* inCommandList)
 
 		// Fast-single merge for all components are dirty.
 		range myRange = GetVirtualAddressRange(dirty->Index);
-		if (myRange.first <= updateRanges.back().second)
+		if (!updateRanges.empty() && myRange.first <= updateRanges.back().second)
 		{
 			updateRanges.back().second = myRange.second;
 		}
@@ -76,6 +76,11 @@ void RHIMaterialBundle::Commit(IRHICommandList* inCommandList)
 TRefPtr<MaterialInterface> RHIMaterialBundle::CreateMaterial()
 {
 	return NewObject<Material>(Issue(), this);
+}
+
+uint64 RHIMaterialBundle::GetMaterialsBufferVirtualAddress() const
+{
+	return immutableBuffer->GetVirtualAddress();
 }
 
 void RHIMaterialBundle::EnqueueDirty(MaterialInterface* inQuery)

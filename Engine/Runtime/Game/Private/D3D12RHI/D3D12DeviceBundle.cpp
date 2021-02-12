@@ -374,6 +374,15 @@ void D3D12DeviceBundle::InitializeShaders()
 		return param;
 	};
 
+	static auto GetRootShaderResourceView = [](uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility)
+	{
+		D3D12_ROOT_PARAMETER param = { };
+		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+		param.ShaderVisibility = shaderVisibility;
+		param.Descriptor.ShaderRegister = shaderRegister;
+		return param;
+	};
+
 	static auto GetRootSignatureDesc = [](span<D3D12_ROOT_PARAMETER> inParameters, span<D3D12_STATIC_SAMPLER_DESC> inSamplers)
 	{
 		D3D12_ROOT_SIGNATURE_DESC RSDesc = { };
@@ -494,6 +503,7 @@ void D3D12DeviceBundle::InitializeShaders()
 			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges2),
 			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges3),
 			GetRootCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL),
+			GetRootShaderResourceView(3, D3D12_SHADER_VISIBILITY_PIXEL),
 		};
 
 		D3D12_STATIC_SAMPLER_DESC StaticSamplers[]

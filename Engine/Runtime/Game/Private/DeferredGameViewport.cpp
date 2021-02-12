@@ -11,6 +11,7 @@
 #include "RHI/IRHIDepthStencilView.h"
 #include "RHI/IRHIShaderResourceView.h"
 #include "RHI/RHIShaderLibrary.h"
+#include "RHI/IRHIMaterialBundle.h"
 #include "SceneRendering/DeferredSceneRenderer.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/MinimalViewInfo.h"
@@ -155,6 +156,8 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	SceneVisibility* localPlayerVisibility = inScene->GetLocalPlayerVisibility();
 	const uint64 playerCameraConstantAddr = localPlayerVisibility->ShaderCameraConstants->GetCameraConstantVirtualAddress();
 
+	IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
+
 	IRHIRenderTargetView* rtvs[] = { hdrTargetView.Get() };
 
 	inCommandList->ResourceTransition(hdrBuffer.Get(), ERHIResourceStates::PIXEL_SHADER_RESOURCE, ERHIResourceStates::RENDER_TARGET);
@@ -168,6 +171,12 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::LightingShader);
 	inCommandList->SetShader(shader);
 
+	inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
+	inCommandList->SetGraphicsRootShaderResourceView(1, colorBufferSRV.Get());
+	inCommandList->SetGraphicsRootShaderResourceView(2, normalBufferSRV.Get());
+	inCommandList->SetGraphicsRootShaderResourceView(3, depthBufferSRV.Get());
+	inCommandList->SetGraphicsRootShaderResource(5, materialBundle->GetMaterialsBufferVirtualAddress());
+
 	RHIMeshDrawCommand Quad;
 	Quad.Topology = ERHIPrimitiveTopology::TriangleStrip;
 	Quad.VertexCount = 4;
@@ -176,10 +185,6 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	for (auto& light : lights)
 	{
 		LightBatch* batch = light->GetLightBatch();
-		inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
-		inCommandList->SetGraphicsRootShaderResourceView(1, colorBufferSRV.Get());
-		inCommandList->SetGraphicsRootShaderResourceView(2, normalBufferSRV.Get());
-		inCommandList->SetGraphicsRootShaderResourceView(3, depthBufferSRV.Get());
 		inCommandList->SetGraphicsRootConstantBufferView(4, batch->GetLightBuffer()->GetVirtualAddress());
 
 		inCommandList->DrawMesh(Quad);

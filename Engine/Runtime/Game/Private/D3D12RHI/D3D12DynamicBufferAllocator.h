@@ -40,4 +40,5 @@ public:
 	vs_property_get(size_t, Slack);
 	size_t Slack_get() const;
 	vs_property_get_auto(size_t, NodeSize, nodeSize);
+	vs_property_get_auto(ID3D12Resource*, Resource, buffer.Get());
 };

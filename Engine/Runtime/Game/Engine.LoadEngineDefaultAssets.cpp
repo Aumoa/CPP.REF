@@ -23,94 +23,12 @@ inline void LoadEngineDefaultMaterials(Engine* engine)
 		material->SpecExp = 32.0f;
 		mgr->Import(L"Engine/Materials/Default", move(material).As<Material>());
 	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default1", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default2", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default3", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default4", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default5", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default6", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default7", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default8", move(material).As<Material>());
-	}
-
-	{
-		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
-		material->Ambient = 0.2f;
-		material->Diffuse = 0.5f;
-		material->Specular = 0.8f;
-		material->SpecExp = 32.0f;
-		mgr->Import(L"Engine/Materials/Default9", move(material).As<Material>());
-	}
 }
 
 inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 {
 	auto mgr = engine->GetAssetManager();
 	auto mat = mgr->LoadMaterial(L"Engine/Materials/Default");
-	auto mat2 = mgr->LoadMaterial(L"Engine/Materials/Default9");
 
 	{
 		vector<RHIVertex> vertexCollection;
@@ -162,7 +80,7 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeTetrahedron(vertexCollection, indexCollection, 1.0f, false);
 
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat2);
+		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
 		mgr->Import(L"Engine/StaticMesh/Tetrahedron", mesh);
 	}
 
@@ -171,7 +89,7 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeOctahedron(vertexCollection, indexCollection, 1.0f, false);
 
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat2);
+		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
 		mgr->Import(L"Engine/StaticMesh/Octahedron", mesh);
 	}
 
@@ -180,7 +98,7 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeDodecahedron(vertexCollection, indexCollection, 1.0f, false);
 
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat2);
+		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
 		mgr->Import(L"Engine/StaticMesh/Dodecahedron", mesh);
 	}
 
@@ -189,7 +107,7 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeIcosahedron(vertexCollection, indexCollection, 1.0f, false);
 
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat2);
+		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
 		mgr->Import(L"Engine/StaticMesh/Icosahedron", mesh);
 	}
 
@@ -198,7 +116,7 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeTeapot(vertexCollection, indexCollection, 1.0f, 16, false);
 
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat2);
+		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
 		mgr->Import(L"Engine/StaticMesh/Teapot", mesh);
 	}
 }

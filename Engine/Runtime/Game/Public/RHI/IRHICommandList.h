@@ -35,6 +35,7 @@ interface IRHICommandList : virtual public Object
 	virtual void SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV) = 0;
 	virtual void CopyBufferRegion(IRHIResource* inDstBuffer, uint64 inDstLocation, IRHIResource* inSrcBuffer, uint64 inSrcLocation, uint64 inNumBytes) = 0;
 	virtual void SetGraphicsRoot32BitConstants(uint32 inParamIndex, const uint32* inBytes, size_t inNum32Bits, size_t location = 0) = 0;
+	virtual void SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;
