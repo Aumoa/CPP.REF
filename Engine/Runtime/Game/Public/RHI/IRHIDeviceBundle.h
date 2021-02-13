@@ -19,6 +19,7 @@ interface IRHIFence;
 interface IRHIShader;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
+interface IRHIRenderTarget;
 
 enum class ERHIResourceFlags;
 enum class ERHIResourceStates;
@@ -44,6 +45,7 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	virtual TRefPtr<IRHIFence> CreateFence() = 0;
 
+	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget() = 0;
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices) = 0;
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices) = 0;
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes) = 0;

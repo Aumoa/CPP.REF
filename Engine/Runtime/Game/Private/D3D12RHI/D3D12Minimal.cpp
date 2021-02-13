@@ -4,32 +4,50 @@
 
 #include "Logging/LogVerbosity.h"
 
+using namespace std;
+
 LogCategoryBase LogD3D12RHI(ELogVerbosity::Verbose, nameof(LogD3D12RHI));
 
-#define ToD3D12_Begin(D3D12Class, RHIClass)\
-D3D12Class ToD3D12(RHIClass value)\
-{\
-	using T = D3D12Class;\
-	switch (value)
+CD3DX12_CPU_DESCRIPTOR_HANDLE::CD3DX12_CPU_DESCRIPTOR_HANDLE()
+{
 
-#define ToD3D12_End\
-	return (T)0;\
 }
 
-#define ToD3D12_Item(Prefix, Name)\
-	case decltype(value)::Name:\
-		return Prefix ## _ ## Name;
+CD3DX12_CPU_DESCRIPTOR_HANDLE::CD3DX12_CPU_DESCRIPTOR_HANDLE(const D3D12_CPU_DESCRIPTOR_HANDLE& handle) : D3D12_CPU_DESCRIPTOR_HANDLE(handle)
+{
 
-#define ToRHI_Begin(D3D12Class, RHIClass)\
-RHIClass ToD3D12(D3D12Class value)\
-{\
-	using T = RHIClass;\
-	switch (value)
-
-#define ToRHI_End\
-	return (T)0;\
 }
 
-#define ToRHI_Item(Prefix, Name)\
-	case Prefix ## _ ## Name:\
-		return T::Name;
+CD3DX12_CPU_DESCRIPTOR_HANDLE::CD3DX12_CPU_DESCRIPTOR_HANDLE(const CD3DX12_CPU_DESCRIPTOR_HANDLE& handle) : D3D12_CPU_DESCRIPTOR_HANDLE(handle)
+{
+
+}
+
+CD3DX12_CPU_DESCRIPTOR_HANDLE CD3DX12_CPU_DESCRIPTOR_HANDLE::IncrementPost(uint32 increment)
+{
+	auto left = *this;
+	ptr += (ssize_t)increment;
+	return left;
+}
+
+CD3DX12_RESOURCE_BARRIER::CD3DX12_RESOURCE_BARRIER() : D3D12_RESOURCE_BARRIER{ }
+{
+
+}
+
+CD3DX12_RESOURCE_BARRIER& CD3DX12_RESOURCE_BARRIER::SwapTransition()
+{
+	swap(Transition.StateBefore, Transition.StateAfter);
+	return *this;
+}
+
+CD3DX12_RESOURCE_BARRIER CD3DX12_RESOURCE_BARRIER::TransitionBarrier(ID3D12Resource* inResource, D3D12_RESOURCE_STATES inBefore, D3D12_RESOURCE_STATES inAfter, uint32 inSubresourceIdx)
+{
+	CD3DX12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = inResource;
+	barrier.Transition.StateBefore = inBefore;
+	barrier.Transition.StateAfter = inAfter;
+	barrier.Transition.Subresource = inSubresourceIdx;
+	return barrier;
+}

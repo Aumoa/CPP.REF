@@ -10,6 +10,7 @@
 #include "D3D12Shader.h"
 #include "D3D12DepthStencilView.h"
 #include "D3D12ShaderResourceView.h"
+#include "D3D12RenderTarget.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
 
@@ -211,6 +212,18 @@ void D3D12CommandList::SetGraphicsRootShaderResourceView(uint32 inRootParameterI
 
 	auto srv = Cast<D3D12ShaderResourceView>(inSRV);
 	CommandList->SetGraphicsRootDescriptorTable(inRootParameterIndex, srv->Handle);
+}
+
+void D3D12CommandList::BeginRenderTarget(IRHIRenderTarget* renderTarget)
+{
+	ConsumePendingDeferredCommands();
+	Cast<D3D12RenderTarget>(renderTarget)->BeginRender(CommandList);
+}
+
+void D3D12CommandList::EndRenderTarget(IRHIRenderTarget* renderTarget)
+{
+	ConsumePendingDeferredCommands();
+	Cast<D3D12RenderTarget>(renderTarget)->EndRender(CommandList);
 }
 
 bool D3D12CommandList::HasBegunCommand_get() const

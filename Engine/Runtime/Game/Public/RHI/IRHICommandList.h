@@ -11,6 +11,7 @@ interface IRHIResource;
 interface IRHIShader;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
+interface IRHIRenderTarget;
 enum class ERHIResourceStates;
 enum class ERHIPrimitiveTopology;
 struct RHIViewport;
@@ -36,6 +37,8 @@ interface IRHICommandList : virtual public Object
 	virtual void CopyBufferRegion(IRHIResource* inDstBuffer, uint64 inDstLocation, IRHIResource* inSrcBuffer, uint64 inSrcLocation, uint64 inNumBytes) = 0;
 	virtual void SetGraphicsRoot32BitConstants(uint32 inParamIndex, const uint32* inBytes, size_t inNum32Bits, size_t location = 0) = 0;
 	virtual void SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
+	virtual void BeginRenderTarget(IRHIRenderTarget* renderTarget) = 0;
+	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

@@ -21,6 +21,7 @@
 #include "D3D12ShaderResourceView.h"
 #include "D3D12DynamicBufferManager.h"
 #include "D3D12DynamicBuffer.h"
+#include "D3D12GBufferRenderTarget.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
@@ -192,6 +193,11 @@ TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
 TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
 {
 	return NewObject<D3D12Fence>();
+}
+
+TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
+{
+	return NewObject<D3D12GBufferRenderTarget>();
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)

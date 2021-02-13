@@ -17,6 +17,10 @@ class TWeakPtr;
 
 class CORE_API Object
 {
+public:
+	using This = Object;
+
+private:
 	template<TIsNotPointer T, bool bThreadSafe>
 	friend class TRefPtr;
 	template<TIsNotPointer T, bool bThreadSafe>
