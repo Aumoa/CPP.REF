@@ -48,6 +48,7 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch() = 0;
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget() = 0;
+	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget() = 0;
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices) = 0;
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices) = 0;
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes) = 0;

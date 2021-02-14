@@ -20,17 +20,11 @@ public:
 	using This = DeferredGameViewport;
 
 private:
-	RHIViewport viewport;
-	Rect scissor;
-
-	TRefPtr<IRHIRenderTarget> gbuffer;
+	TRefPtr<IRHIRenderTarget> gBuffer;
+	TRefPtr<IRHIRenderTarget> hdrBuffer;
 
 	TRefPtr<IRHIResource> renderTarget;
 	TRefPtr<IRHIRenderTargetView> rtv;
-
-	TRefPtr<IRHIResource> hdrBuffer;
-	TRefPtr<IRHIRenderTargetView> hdrTargetView;
-	TRefPtr<IRHIShaderResourceView> hdrBufferSRV;
 
 public:
 	DeferredGameViewport();

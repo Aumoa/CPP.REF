@@ -19,7 +19,7 @@
 #include "D3D12ShaderResourceView.h"
 #include "D3D12DynamicBufferManager.h"
 #include "D3D12DynamicBuffer.h"
-#include "D3D12GBufferRenderTarget.h"
+#include "D3D12RenderTarget.h"
 #include "D3D12OnlineDescriptorPatch.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
@@ -201,7 +201,265 @@ TRefPtr<IRHIOnlineDescriptorPatch> D3D12DeviceBundle::CreateOnlineDescriptorPatc
 
 TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 {
-	return NewObject<D3D12GBufferRenderTarget>();
+	class D3D12GBufferRenderTarget : public D3D12RenderTarget
+	{
+	public:
+		using Super = D3D12RenderTarget;
+		using This = D3D12GBufferRenderTarget;
+
+	private:
+		D3D12DeviceBundle* bundle;
+		ID3D12Device* device;
+
+		int32 width;
+		int32 height;
+
+		ComPtr<ID3D12DescriptorHeap> rtvHeap;
+		ComPtr<ID3D12DescriptorHeap> dsvHeap;
+		TRefPtr<D3D12IndependentShaderResourceView> srvHeap;
+		uint32 rtvIncrement;
+
+		TRefPtr<D3D12Resource> colorBuffer;
+		TRefPtr<D3D12Resource> normalBuffer;
+		TRefPtr<D3D12Resource> depthStencilBuffer;
+
+	public:
+		D3D12GBufferRenderTarget(D3D12DeviceBundle* owner) : Super()
+			, bundle(nullptr)
+			, device(nullptr)
+
+			, width(0)
+			, height(0)
+
+			, rtvIncrement(0)
+		{
+			bundle = owner;
+			device = bundle->Device;
+
+			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = { };
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+			heapDesc.NumDescriptors = 2;
+			HR(device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeap)));
+			rtvIncrement = device->GetDescriptorHandleIncrementSize(heapDesc.Type);
+
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+			heapDesc.NumDescriptors = 1;
+			HR(device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&dsvHeap)));
+
+			srvHeap = NewObject<D3D12IndependentShaderResourceView>(device, 3);
+		}
+
+		~D3D12GBufferRenderTarget() override
+		{
+
+		}
+
+		virtual void ResizeBuffers(int32 width, int32 height)
+		{
+			colorBuffer = CreateTexture2D(device, DXGI_FORMAT_B8G8R8A8_UNORM, D3D12_RESOURCE_STATE_COPY_SOURCE, width, height);
+			normalBuffer = CreateTexture2D(device, DXGI_FORMAT_R16G16B16A16_UINT, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, width, height);
+			depthStencilBuffer = CreateTexture2D(device, DXGI_FORMAT_R24G8_TYPELESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, width, height);
+
+			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
+			uint32 increment = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+			device->CreateRenderTargetView(colorBuffer->Resource, nullptr, rtvHandle.IncrementPost(increment));
+			device->CreateRenderTargetView(normalBuffer->Resource, nullptr, rtvHandle.IncrementPost(increment));
+
+			D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = { };
+			dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+			dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+			device->CreateDepthStencilView(depthStencilBuffer->Resource, &dsvDesc, dsvHandle);
+
+			D3D12_SHADER_RESOURCE_VIEW_DESC ds_srv = { };
+			ds_srv.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			ds_srv.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			ds_srv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			ds_srv.Texture2D.MipLevels = 1;
+
+			srvHeap->CreateView(0, colorBuffer->Resource, nullptr);
+			srvHeap->CreateView(1, normalBuffer->Resource, nullptr);
+			srvHeap->CreateView(2, depthStencilBuffer->Resource, &ds_srv);
+
+			this->width = width;
+			this->height = height;
+		}
+
+		virtual size_t GetRenderTargetCount() const
+		{
+			return 2;
+		}
+
+		virtual IRHIResource* GetRenderTarget(size_t index) const
+		{
+			IRHIResource* resources[] = { colorBuffer.Get(), normalBuffer.Get() };
+			return resources[index];
+		}
+
+		virtual IRHIShaderResourceView* GetShaderResourceView() const
+		{
+			return srvHeap.Get();
+		}
+
+		void BeginRender(ID3D12GraphicsCommandList* inCommandList) override
+		{
+			D3D12_RESOURCE_BARRIER barriers[3] =
+			{
+				TRANSITION(colorBuffer, COPY_SOURCE, RENDER_TARGET),
+				TRANSITION(normalBuffer, PIXEL_SHADER_RESOURCE, RENDER_TARGET),
+				TRANSITION(depthStencilBuffer, PIXEL_SHADER_RESOURCE, DEPTH_WRITE)
+			};
+
+			inCommandList->ResourceBarrier(3, barriers);
+
+			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
+			auto dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+
+			inCommandList->OMSetRenderTargets(2, &rtvHandle, TRUE, &dsvHandle);
+
+			FLOAT transparent[4] = { };
+			inCommandList->ClearRenderTargetView(rtvHandle.Get(rtvIncrement, 0), transparent, 0, nullptr);
+			inCommandList->ClearRenderTargetView(rtvHandle.Get(rtvIncrement, 1), transparent, 0, nullptr);
+			inCommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+			D3D12_VIEWPORT vp = { };
+			vp.Width = (float)width;
+			vp.Height = (float)height;
+			vp.MaxDepth = 1.0f;
+
+			D3D12_RECT sc = { };
+			sc.right = width;
+			sc.bottom = height;
+
+			inCommandList->RSSetViewports(1, &vp);
+			inCommandList->RSSetScissorRects(1, &sc);
+		}
+
+		void EndRender(ID3D12GraphicsCommandList* inCommandList) override
+		{
+			D3D12_RESOURCE_BARRIER barriers[3] =
+			{
+				TRANSITION(colorBuffer, RENDER_TARGET, PIXEL_SHADER_RESOURCE),
+				TRANSITION(normalBuffer, RENDER_TARGET, PIXEL_SHADER_RESOURCE),
+				TRANSITION(depthStencilBuffer, DEPTH_WRITE, PIXEL_SHADER_RESOURCE)
+			};
+
+			inCommandList->ResourceBarrier(3, barriers);
+		}
+	};
+
+	return NewObject<D3D12GBufferRenderTarget>(this);
+}
+
+TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
+{
+	class D3D12HDRRenderTarget : public D3D12RenderTarget
+	{
+	public:
+		using Super = D3D12RenderTarget;
+
+	private:
+		D3D12DeviceBundle* bundle;
+		ID3D12Device* device;
+
+		int32 width;
+		int32 height;
+
+		ComPtr<ID3D12DescriptorHeap> rtvHeap;
+		TRefPtr<D3D12IndependentShaderResourceView> srvHeap;
+
+		TRefPtr<D3D12Resource> colorBuffer;
+
+	public:
+		D3D12HDRRenderTarget(D3D12DeviceBundle* owner) : Super()
+			, bundle(nullptr)
+			, device(nullptr)
+
+			, width(0)
+			, height(0)
+		{
+			bundle = owner;
+			device = bundle->Device;
+
+			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = { };
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+			heapDesc.NumDescriptors = 1;
+			HR(device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeap)));
+
+			srvHeap = NewObject<D3D12IndependentShaderResourceView>(device, 1);
+		}
+
+		~D3D12HDRRenderTarget() override
+		{
+
+		}
+
+		virtual void ResizeBuffers(int32 width, int32 height)
+		{
+			colorBuffer = CreateTexture2D(device, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, width, height);
+
+			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
+			device->CreateRenderTargetView(colorBuffer->Resource, nullptr, rtvHandle);
+			srvHeap->CreateView(0, colorBuffer->Resource, nullptr);
+
+			this->width = width;
+			this->height = height;
+		}
+
+		virtual size_t GetRenderTargetCount() const
+		{
+			return 1;
+		}
+
+		virtual IRHIResource* GetRenderTarget(size_t index) const
+		{
+			return colorBuffer.Get();
+		}
+
+		virtual IRHIShaderResourceView* GetShaderResourceView() const
+		{
+			return srvHeap.Get();
+		}
+
+		void BeginRender(ID3D12GraphicsCommandList* inCommandList) override
+		{
+			D3D12_RESOURCE_BARRIER barriers[1] =
+			{
+				TRANSITION(colorBuffer, PIXEL_SHADER_RESOURCE, RENDER_TARGET),
+			};
+
+			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
+			inCommandList->ResourceBarrier(1, barriers);
+			inCommandList->OMSetRenderTargets(1, &rtvHandle, TRUE, nullptr);
+
+			FLOAT transparent[4] = { };
+			inCommandList->ClearRenderTargetView(rtvHandle, transparent, 0, nullptr);
+
+			D3D12_VIEWPORT vp = { };
+			vp.Width = (float)width;
+			vp.Height = (float)height;
+			vp.MaxDepth = 1.0f;
+
+			D3D12_RECT sc = { };
+			sc.right = width;
+			sc.bottom = height;
+
+			inCommandList->RSSetViewports(1, &vp);
+			inCommandList->RSSetScissorRects(1, &sc);
+		}
+
+		void EndRender(ID3D12GraphicsCommandList* inCommandList) override
+		{
+			D3D12_RESOURCE_BARRIER barriers[1] =
+			{
+				TRANSITION(colorBuffer, RENDER_TARGET, PIXEL_SHADER_RESOURCE),
+			};
+
+			inCommandList->ResourceBarrier(1, barriers);
+		}
+	};
+
+	return NewObject<D3D12HDRRenderTarget>(this);
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)

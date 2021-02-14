@@ -49,9 +49,9 @@ void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, Scene* in
 		inScene->BeginRender(inCommandList);
 
 		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, PopulateSceneRender);
-		inCommandList->BeginRenderTarget(gbuffer.Get());
+		inCommandList->BeginRenderTarget(gBuffer.Get());
 		renderer.RenderScene(inCommandList);
-		inCommandList->EndRenderTarget(gbuffer.Get());
+		inCommandList->EndRenderTarget(gBuffer.Get());
 
 		LightRender(inCommandList, inScene);
 		TonemapRender(inCommandList);
@@ -73,34 +73,18 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 		return;
 	}
 
-	if (!gbuffer.IsValid)
+	if (!gBuffer.IsValid)
 	{
 		RecreateRenderTarget();
 	}
 
 	auto device = GEngine.DeviceBundle;
 
-	gbuffer->ResizeBuffers(x, y);
-	renderTarget = gbuffer->GetRenderTarget(0);
+	gBuffer->ResizeBuffers(x, y);
+	hdrBuffer->ResizeBuffers(x, y);
+
+	renderTarget = gBuffer->GetRenderTarget(0);
 	rtv = device->CreateRenderTargetView(renderTarget.Get());
-
-	RHITextureClearValue clearColor(ERHITextureFormat::R16G16B16A16_FLOAT);
-	clearColor.Color = Color::Transparent;
-
-	hdrBuffer = device->CreateTexture2D(
-		ERHITextureFormat::R16G16B16A16_FLOAT,
-		x,
-		y,
-		ERHIResourceStates::PIXEL_SHADER_RESOURCE,
-		ERHIResourceFlags::AllowRenderTarget,
-		clearColor
-	);
-
-	hdrTargetView = device->CreateRenderTargetView(hdrBuffer.Get());
-	hdrBufferSRV = device->CreateTextureView(hdrBuffer.Get(), ERHITextureFormat::R16G16B16A16_FLOAT);
-
-	viewport = RHIViewport(x, y);
-	scissor = Rect(0.0f, Vector2((float)x, (float)y));
 }
 
 void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* inScene)
@@ -110,21 +94,13 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 
 	IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
 
-	IRHIRenderTargetView* rtvs[] = { hdrTargetView.Get() };
-
-	inCommandList->ResourceTransition(hdrBuffer.Get(), ERHIResourceStates::PIXEL_SHADER_RESOURCE, ERHIResourceStates::RENDER_TARGET);
-
-	inCommandList->SetRenderTargets(1, rtvs, nullptr);
-	inCommandList->SetViewports(viewport);
-	inCommandList->SetScissorRects(scissor);
-
-	inCommandList->ClearRenderTargetView(hdrTargetView.Get());
+	inCommandList->BeginRenderTarget(hdrBuffer.Get());
 
 	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::LightingShader);
 	inCommandList->SetShader(shader);
 
 	inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
-	inCommandList->SetGraphicsRootShaderResourceView(1, gbuffer->GetShaderResourceView());
+	inCommandList->SetGraphicsRootShaderResourceView(1, gBuffer->GetShaderResourceView());
 	inCommandList->SetGraphicsRootShaderResource(3, materialBundle->GetMaterialsBufferVirtualAddress());
 
 	RHIMeshDrawCommand Quad;
@@ -144,7 +120,7 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	inCommandList->SetShader(shader);
 	inCommandList->DrawMesh(Quad);
 
-	inCommandList->ResourceTransition(hdrBuffer.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::PIXEL_SHADER_RESOURCE);
+	inCommandList->EndRenderTarget(hdrBuffer.Get());
 }
 
 void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
@@ -155,14 +131,9 @@ void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
 	IRHIRenderTargetView* rtvs[] = { rtv.Get() };
 
 	inCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::PIXEL_SHADER_RESOURCE, ERHIResourceStates::RENDER_TARGET);
-
 	inCommandList->SetRenderTargets(1, rtvs, nullptr);
-	inCommandList->SetViewports(viewport);
-	inCommandList->SetScissorRects(scissor);
 
-	inCommandList->ClearRenderTargetView(rtv.Get());
-
-	inCommandList->SetGraphicsRootShaderResourceView(0, hdrBufferSRV.Get());
+	inCommandList->SetGraphicsRootShaderResourceView(0, hdrBuffer->GetShaderResourceView());
 
 	RHIMeshDrawCommand Quad;
 	Quad.Topology = ERHIPrimitiveTopology::TriangleStrip;
@@ -174,5 +145,6 @@ void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
 
 void DeferredGameViewport::RecreateRenderTarget()
 {
-	gbuffer = GEngine.DeviceBundle->CreateGBufferRenderTarget();
+	gBuffer = GEngine.DeviceBundle->CreateGBufferRenderTarget();
+	hdrBuffer = GEngine.DeviceBundle->CreateHDRRenderTarget();
 }

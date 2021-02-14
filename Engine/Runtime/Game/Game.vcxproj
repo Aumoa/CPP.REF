@@ -259,7 +259,6 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorIndex.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferManager.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Fence.h" />
-    <ClInclude Include="Private\D3D12RHI\D3D12GBufferRenderTarget.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ImmediateCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.h" />
@@ -423,7 +422,6 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorIndex.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferManager.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Fence.cpp" />
-    <ClCompile Include="Private\D3D12RHI\D3D12GBufferRenderTarget.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ImmediateCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.cpp" />

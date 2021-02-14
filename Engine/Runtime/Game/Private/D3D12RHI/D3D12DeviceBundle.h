@@ -64,6 +64,7 @@ public:
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch();
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget();
+	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget();
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);

@@ -8,6 +8,8 @@
 
 #include "D3D12Minimal.h"
 
+class D3D12Resource;
+
 class D3D12RenderTarget : virtual public Object, virtual public IRHIRenderTarget
 {
 public:
@@ -20,4 +22,7 @@ public:
 
 	virtual void BeginRender(ID3D12GraphicsCommandList* inCommandList) = 0;
 	virtual void EndRender(ID3D12GraphicsCommandList* inCommandList) = 0;
+
+protected:
+	TRefPtr<D3D12Resource> CreateTexture2D(ID3D12Device* device, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height);
 };
