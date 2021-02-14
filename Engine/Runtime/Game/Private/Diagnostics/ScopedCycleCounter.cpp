@@ -151,7 +151,11 @@ void CycleStatStorage::ResolveTick()
 	}
 	else
 	{
-		res[res_idx] = myt;
+		res[res_idx++] = myt;
+		if (res_idx == 10)
+		{
+			res_idx = 0;
+		}
 	}
 
 	float avg = 0;
