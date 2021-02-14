@@ -11,8 +11,6 @@
 #include "D3D12RenderTargetView.h"
 #include "D3D12OfflineDescriptorManager.h"
 #include "D3D12OfflineDescriptorIndex.h"
-#include "D3D12OnlineDescriptorManager.h"
-#include "D3D12OnlineDescriptorIndex.h"
 #include "D3D12Resource.h"
 #include "D3D12DeferredCommandList.h"
 #include "D3D12Shader.h"
@@ -22,6 +20,7 @@
 #include "D3D12DynamicBufferManager.h"
 #include "D3D12DynamicBuffer.h"
 #include "D3D12GBufferRenderTarget.h"
+#include "D3D12OnlineDescriptorPatch.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
@@ -147,9 +146,9 @@ TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureView(IRHIResourc
 	srvDesc.Texture2D.MipLevels = 1;
 
 	ID3D12Resource* resource1 = Cast<D3D12Resource>(resource)->Resource;
-	D3D12OnlineDescriptorIndex index = srvManager->Alloc();
+	D3D12OfflineDescriptorIndex index = srvManager->Alloc();
 	d3d12Device->CreateShaderResourceView(resource1, &srvDesc, index.Handle);
-	return NewObject<D3D12ShaderResourceView>(resource1, index);
+	return NewObject<D3D12SingleShaderResourceViewNode>(resource1, index);
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue)
@@ -193,6 +192,11 @@ TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
 TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
 {
 	return NewObject<D3D12Fence>();
+}
+
+TRefPtr<IRHIOnlineDescriptorPatch> D3D12DeviceBundle::CreateOnlineDescriptorPatch()
+{
+	return NewObject<D3D12OnlineDescriptorPatch>();
 }
 
 TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
@@ -252,11 +256,6 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateImmutableBuffer(size_t sizeInByte
 ID3D12Device* D3D12DeviceBundle::Device_get() const
 {
 	return d3d12Device.Get();
-}
-
-D3D12OnlineDescriptorManager* D3D12DeviceBundle::SrvManager_get() const
-{
-	return srvManager.Get();
 }
 
 void D3D12DeviceBundle::InitializeCOM()
@@ -331,7 +330,7 @@ void D3D12DeviceBundle::InitializeD3D12()
 
 	rtvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, OfflineDescriptorAllocUnit);
 	dsvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, OfflineDescriptorAllocUnit);
-	srvManager = NewObject<D3D12OnlineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4096);
+	srvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, OfflineDescriptorAllocUnit);
 }
 
 #include "Shaders/GeometryShader/Compiled/VertexShader.hlsl.h"
@@ -498,16 +497,12 @@ void D3D12DeviceBundle::InitializeShaders()
 	}
 
 	{  // Lighting Shader
-		D3D12_DESCRIPTOR_RANGE ranges1[]{ { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
-		D3D12_DESCRIPTOR_RANGE ranges2[]{ { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
-		D3D12_DESCRIPTOR_RANGE ranges3[]{ { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
+		D3D12_DESCRIPTOR_RANGE ranges1[]{ { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
 
 		D3D12_ROOT_PARAMETER RootParameters[]
 		{
 			GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL),
 			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges1),
-			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges2),
-			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges3),
 			GetRootCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL),
 			GetRootShaderResourceView(3, D3D12_SHADER_VISIBILITY_PIXEL),
 		};

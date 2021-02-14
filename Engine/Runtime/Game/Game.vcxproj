@@ -264,8 +264,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.h" />
-    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.h" />
-    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorPatch.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTarget.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTargetView.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
@@ -349,6 +348,7 @@
     <ClInclude Include="Public\RHI\IRHIFence.h" />
     <ClInclude Include="Public\RHI\IRHIImmediateCommandList.h" />
     <ClInclude Include="Public\RHI\IRHIMaterialBundle.h" />
+    <ClInclude Include="Public\RHI\IRHIOnlineDescriptorPatch.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTarget.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
@@ -429,8 +429,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorManager.cpp" />
-    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.cpp" />
-    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorPatch.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTarget.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTargetView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />

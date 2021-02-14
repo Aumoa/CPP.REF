@@ -12,6 +12,7 @@
 #include "RHI/IRHIShaderResourceView.h"
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/IRHIMaterialBundle.h"
+#include "RHI/IRHIRenderTarget.h"
 #include "SceneRendering/DeferredSceneRenderer.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/MinimalViewInfo.h"
@@ -27,7 +28,7 @@ DEFINE_STATS_GROUP(DeferredGameViewport);
 
 DeferredGameViewport::DeferredGameViewport() : Super()
 {
-
+	
 }
 
 DeferredGameViewport::~DeferredGameViewport()
@@ -45,13 +46,17 @@ void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, Scene* in
 	}
 
 	{
+		inScene->BeginRender(inCommandList);
+
 		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, PopulateSceneRender);
-		BeginGeometryRender(inCommandList);
+		inCommandList->BeginRenderTarget(gbuffer.Get());
 		renderer.RenderScene(inCommandList);
-		EndGeometryRender(inCommandList);
+		inCommandList->EndRenderTarget(gbuffer.Get());
 
 		LightRender(inCommandList, inScene);
 		TonemapRender(inCommandList);
+
+		inScene->EndRender(inCommandList);
 	}
 }
 
@@ -68,44 +73,20 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 		return;
 	}
 
-	IRHIDeviceBundle* device = GEngine.DeviceBundle;
+	if (!gbuffer.IsValid)
+	{
+		RecreateRenderTarget();
+	}
 
-	RHITextureClearValue clearColor(ERHITextureFormat::B8G8R8A8_UNORM);
+	auto device = GEngine.DeviceBundle;
+
+	gbuffer->ResizeBuffers(x, y);
+	renderTarget = gbuffer->GetRenderTarget(0);
+	rtv = device->CreateRenderTargetView(renderTarget.Get());
+
+	RHITextureClearValue clearColor(ERHITextureFormat::R16G16B16A16_FLOAT);
 	clearColor.Color = Color::Transparent;
 
-	RHITextureClearValue depthStencilClear(ERHITextureFormat::D24_UNORM_S8_UINT);
-	depthStencilClear.Depth = 1.0f;
-	depthStencilClear.Stencil = 0;
-
-	renderTarget = device->CreateTexture2D(
-		ERHITextureFormat::B8G8R8A8_UNORM,
-		x,
-		y,
-		ERHIResourceStates::COPY_SOURCE,
-		ERHIResourceFlags::AllowRenderTarget,
-		clearColor
-	);
-
-	clearColor.Format = ERHITextureFormat::R16G16B16A16_UINT;
-	normalBuffer = device->CreateTexture2D(
-		ERHITextureFormat::R16G16B16A16_UINT,
-		x,
-		y,
-		ERHIResourceStates::PIXEL_SHADER_RESOURCE,
-		ERHIResourceFlags::AllowRenderTarget,
-		clearColor
-	);
-
-	depthStencilBuffer = device->CreateTexture2D(
-		ERHITextureFormat::R24G8_TYPELESS,
-		x,
-		y,
-		ERHIResourceStates::DEPTH_WRITE,
-		ERHIResourceFlags::AllowDepthStencil,
-		depthStencilClear
-	);
-
-	clearColor.Format = ERHITextureFormat::R16G16B16A16_FLOAT;
 	hdrBuffer = device->CreateTexture2D(
 		ERHITextureFormat::R16G16B16A16_FLOAT,
 		x,
@@ -115,40 +96,11 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 		clearColor
 	);
 
-	renderTargetView = device->CreateRenderTargetView(renderTarget.Get());
-	normalBufferView = device->CreateRenderTargetView(normalBuffer.Get());
-	depthStencilView = device->CreateDepthStencilView(depthStencilBuffer.Get(), ERHITextureFormat::D24_UNORM_S8_UINT);
-
 	hdrTargetView = device->CreateRenderTargetView(hdrBuffer.Get());
-	colorBufferSRV = device->CreateTextureView(renderTarget.Get(), ERHITextureFormat::B8G8R8A8_UNORM);
-	normalBufferSRV = device->CreateTextureView(normalBuffer.Get(), ERHITextureFormat::R16G16B16A16_UINT);
-	depthBufferSRV = device->CreateTextureView(depthStencilBuffer.Get(), ERHITextureFormat::R24_UNORM_X8_TYPELESS);
 	hdrBufferSRV = device->CreateTextureView(hdrBuffer.Get(), ERHITextureFormat::R16G16B16A16_FLOAT);
 
 	viewport = RHIViewport(x, y);
 	scissor = Rect(0.0f, Vector2((float)x, (float)y));
-}
-
-#define ARRAYSIZE(x) (sizeof(x) / sizeof(x[0]))
-void DeferredGameViewport::BeginGeometryRender(IRHICommandList* inCommandList)
-{
-	IRHIRenderTargetView* rtvs[] = { renderTargetView.Get(), normalBufferView.Get() };
-
-	inCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::COPY_SOURCE, ERHIResourceStates::RENDER_TARGET);
-	inCommandList->ResourceTransition(normalBuffer.Get(), ERHIResourceStates::PIXEL_SHADER_RESOURCE, ERHIResourceStates::RENDER_TARGET);
-
-	inCommandList->SetRenderTargets(ARRAYSIZE(rtvs), rtvs, depthStencilView.Get());
-	inCommandList->SetViewports(viewport);
-	inCommandList->SetScissorRects(scissor);
-
-	inCommandList->ClearRenderTargetView(renderTargetView.Get());
-	inCommandList->ClearDepthStencilView(depthStencilView.Get(), 1.0f, 0);
-}
-
-void DeferredGameViewport::EndGeometryRender(IRHICommandList* inCommandList)
-{
-	inCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::PIXEL_SHADER_RESOURCE);
-	inCommandList->ResourceTransition(normalBuffer.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::PIXEL_SHADER_RESOURCE);
 }
 
 void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* inScene)
@@ -162,7 +114,7 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 
 	inCommandList->ResourceTransition(hdrBuffer.Get(), ERHIResourceStates::PIXEL_SHADER_RESOURCE, ERHIResourceStates::RENDER_TARGET);
 
-	inCommandList->SetRenderTargets(ARRAYSIZE(rtvs), rtvs, nullptr);
+	inCommandList->SetRenderTargets(1, rtvs, nullptr);
 	inCommandList->SetViewports(viewport);
 	inCommandList->SetScissorRects(scissor);
 
@@ -172,10 +124,8 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	inCommandList->SetShader(shader);
 
 	inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
-	inCommandList->SetGraphicsRootShaderResourceView(1, colorBufferSRV.Get());
-	inCommandList->SetGraphicsRootShaderResourceView(2, normalBufferSRV.Get());
-	inCommandList->SetGraphicsRootShaderResourceView(3, depthBufferSRV.Get());
-	inCommandList->SetGraphicsRootShaderResource(5, materialBundle->GetMaterialsBufferVirtualAddress());
+	inCommandList->SetGraphicsRootShaderResourceView(1, gbuffer->GetShaderResourceView());
+	inCommandList->SetGraphicsRootShaderResource(3, materialBundle->GetMaterialsBufferVirtualAddress());
 
 	RHIMeshDrawCommand Quad;
 	Quad.Topology = ERHIPrimitiveTopology::TriangleStrip;
@@ -185,7 +135,7 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	for (auto& light : lights)
 	{
 		LightBatch* batch = light->GetLightBatch();
-		inCommandList->SetGraphicsRootConstantBufferView(4, batch->GetLightBuffer()->GetVirtualAddress());
+		inCommandList->SetGraphicsRootConstantBufferView(2, batch->GetLightBuffer()->GetVirtualAddress());
 
 		inCommandList->DrawMesh(Quad);
 	}
@@ -202,15 +152,15 @@ void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
 	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::TonemapShader);
 	inCommandList->SetShader(shader);
 
-	IRHIRenderTargetView* rtvs[] = { renderTargetView.Get() };
+	IRHIRenderTargetView* rtvs[] = { rtv.Get() };
 
 	inCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::PIXEL_SHADER_RESOURCE, ERHIResourceStates::RENDER_TARGET);
 
-	inCommandList->SetRenderTargets(ARRAYSIZE(rtvs), rtvs, nullptr);
+	inCommandList->SetRenderTargets(1, rtvs, nullptr);
 	inCommandList->SetViewports(viewport);
 	inCommandList->SetScissorRects(scissor);
 
-	inCommandList->ClearRenderTargetView(renderTargetView.Get());
+	inCommandList->ClearRenderTargetView(rtv.Get());
 
 	inCommandList->SetGraphicsRootShaderResourceView(0, hdrBufferSRV.Get());
 
@@ -219,5 +169,10 @@ void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
 	Quad.VertexCount = 4;
 	inCommandList->DrawMesh(Quad);
 
-	inCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::COMMON);
+	inCommandList->ResourceTransition(renderTarget.Get(), ERHIResourceStates::RENDER_TARGET, ERHIResourceStates::COPY_SOURCE);
+}
+
+void DeferredGameViewport::RecreateRenderTarget()
+{
+	gbuffer = GEngine.DeviceBundle->CreateGBufferRenderTarget();
 }

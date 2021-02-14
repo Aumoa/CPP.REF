@@ -7,6 +7,9 @@
 
 #include "SceneRendering/MinimalViewInfo.h"
 
+interface IRHIOnlineDescriptorPatch;
+interface IRHICommandList;
+
 class PrimitiveSceneProxy;
 class PrimitiveComponent;
 class APlayerController;
@@ -27,8 +30,10 @@ public:
 	TRefPtr<SceneVisibility> localPlayerVisibility;
 	std::vector<TRefPtr<SceneVisibility>> visibilities;
 
+	size_t numSRVs;
 	std::vector<LightComponent*> lightComponents;
 	std::vector<LightSceneProxy*> lightProxies;
+	TRefPtr<IRHIOnlineDescriptorPatch> srvPatch;
 
 public:
 	Scene();
@@ -36,6 +41,9 @@ public:
 
 	void Update();
 	void CalcVisibility();
+
+	void BeginRender(IRHICommandList* inCommandList);
+	void EndRender(IRHICommandList* inCommandList);
 	
 	void AddScene(PrimitiveComponent* inPrimitiveComponent);
 	void AddLight(LightComponent* inLightComponent);

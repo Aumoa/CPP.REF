@@ -4,13 +4,14 @@
 
 #include "Engine.h"
 #include "D3D12DeviceBundle.h"
-#include "D3D12OnlineDescriptorManager.h"
 #include "D3D12RenderTargetView.h"
 #include "D3D12Resource.h"
 #include "D3D12Shader.h"
 #include "D3D12DepthStencilView.h"
 #include "D3D12ShaderResourceView.h"
 #include "D3D12RenderTarget.h"
+#include "D3D12OnlineDescriptorPatch.h"
+#include "Logging/LogMacros.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
 
@@ -22,7 +23,7 @@ D3D12CommandList::D3D12CommandList() : Super()
 	, bHasBegunCommand(false)
 
 	, currentRS(nullptr)
-	, currentTable(nullptr)
+	, currentPatch(nullptr)
 {
 
 }
@@ -36,7 +37,7 @@ void D3D12CommandList::BeginCommand()
 {
 	bHasBegunCommand = true;
 	currentRS = nullptr;
-	currentTable = nullptr;
+	currentPatch = nullptr;
 }
 
 void D3D12CommandList::EndCommand()
@@ -208,10 +209,15 @@ void D3D12CommandList::ClearDepthStencilView(IRHIDepthStencilView* dsv, optional
 
 void D3D12CommandList::SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV)
 {
-	EnqueueDescriptorTable();
+	if (currentPatch == nullptr)
+	{
+		SE_LOG(LogD3D12RHI, Error, L"DescriptorPatch is not selected on current command list.");
+		return;
+	}
 
-	auto srv = Cast<D3D12ShaderResourceView>(inSRV);
-	CommandList->SetGraphicsRootDescriptorTable(inRootParameterIndex, srv->Handle);
+	size_t patchIndex = currentPatch->Patch(inSRV);
+	D3D12_GPU_DESCRIPTOR_HANDLE handle = currentPatch->GetOnlineHandle(patchIndex);
+	CommandList->SetGraphicsRootDescriptorTable(inRootParameterIndex, handle);
 }
 
 void D3D12CommandList::BeginRenderTarget(IRHIRenderTarget* renderTarget)
@@ -224,6 +230,14 @@ void D3D12CommandList::EndRenderTarget(IRHIRenderTarget* renderTarget)
 {
 	ConsumePendingDeferredCommands();
 	Cast<D3D12RenderTarget>(renderTarget)->EndRender(CommandList);
+}
+
+void D3D12CommandList::SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch)
+{
+	auto* patch = Cast<D3D12OnlineDescriptorPatch>(inPatch);
+	ID3D12DescriptorHeap* heaps[] = { patch->Heap };
+	CommandList->SetDescriptorHeaps(1, heaps);
+	currentPatch = patch;
 }
 
 bool D3D12CommandList::HasBegunCommand_get() const
@@ -246,18 +260,5 @@ void D3D12CommandList::ConsumePendingDeferredCommands()
 		{
 			CommandList->ResourceBarrier((UINT)barrier_swap.size(), barrier_swap.data());
 		}
-	}
-}
-
-void D3D12CommandList::EnqueueDescriptorTable()
-{
-	// Experimental implementation!!
-	if (currentTable == nullptr)
-	{
-		D3D12OnlineDescriptorManager* srvMgr = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->SrvManager;
-		currentTable = srvMgr->pHeap;
-
-		ID3D12DescriptorHeap* ppHeaps[] = { currentTable };
-		CommandList->SetDescriptorHeaps(1, ppHeaps);
 	}
 }

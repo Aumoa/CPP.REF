@@ -20,6 +20,7 @@ interface IRHIShader;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 interface IRHIRenderTarget;
+interface IRHIOnlineDescriptorPatch;
 
 enum class ERHIResourceFlags;
 enum class ERHIResourceStates;
@@ -44,6 +45,7 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue) = 0;
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	virtual TRefPtr<IRHIFence> CreateFence() = 0;
+	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch() = 0;
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget() = 0;
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices) = 0;

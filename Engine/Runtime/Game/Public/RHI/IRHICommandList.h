@@ -12,6 +12,7 @@ interface IRHIShader;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 interface IRHIRenderTarget;
+interface IRHIOnlineDescriptorPatch;
 enum class ERHIResourceStates;
 enum class ERHIPrimitiveTopology;
 struct RHIViewport;
@@ -39,6 +40,7 @@ interface IRHICommandList : virtual public Object
 	virtual void SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 	virtual void BeginRenderTarget(IRHIRenderTarget* renderTarget) = 0;
 	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget) = 0;
+	virtual void SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

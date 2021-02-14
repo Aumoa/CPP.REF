@@ -11,6 +11,7 @@
 interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
+interface IRHIRenderTarget;
 
 class GAME_API DeferredGameViewport : public GameViewport
 {
@@ -22,19 +23,13 @@ private:
 	RHIViewport viewport;
 	Rect scissor;
 
-	TRefPtr<IRHIResource> renderTarget;
-	TRefPtr<IRHIResource> normalBuffer;
-	TRefPtr<IRHIResource> depthStencilBuffer;
+	TRefPtr<IRHIRenderTarget> gbuffer;
 
-	TRefPtr<IRHIRenderTargetView> renderTargetView;
-	TRefPtr<IRHIRenderTargetView> normalBufferView;
-	TRefPtr<IRHIDepthStencilView> depthStencilView;
+	TRefPtr<IRHIResource> renderTarget;
+	TRefPtr<IRHIRenderTargetView> rtv;
 
 	TRefPtr<IRHIResource> hdrBuffer;
 	TRefPtr<IRHIRenderTargetView> hdrTargetView;
-	TRefPtr<IRHIShaderResourceView> colorBufferSRV;
-	TRefPtr<IRHIShaderResourceView> normalBufferSRV;
-	TRefPtr<IRHIShaderResourceView> depthBufferSRV;
 	TRefPtr<IRHIShaderResourceView> hdrBufferSRV;
 
 public:
@@ -48,9 +43,8 @@ protected:
 	void SetViewportResolution_Internal(int32 x, int32 y) override;
 
 private:
-	void BeginGeometryRender(IRHICommandList* inCommandList);
-	void EndGeometryRender(IRHICommandList* inCommandList);
-
 	void LightRender(IRHICommandList* inCommandList, Scene* inScene);
 	void TonemapRender(IRHICommandList* inCommandList);
+
+	void RecreateRenderTarget();
 };

@@ -34,7 +34,7 @@ private:
 	TRefPtr<D3D12ImmediateCommandList> immediateCommandList;
 	TRefPtr<D3D12OfflineDescriptorManager> rtvManager;
 	TRefPtr<D3D12OfflineDescriptorManager> dsvManager;
-	TRefPtr<D3D12OnlineDescriptorManager> srvManager;
+	TRefPtr<D3D12OfflineDescriptorManager> srvManager;
 
 	TRefPtr<RHIShaderLibrary> shaderLibrary;
 	TRefPtr<RHIResourceGC> resourceGC;
@@ -61,6 +61,7 @@ public:
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
+	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch();
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget();
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
@@ -70,8 +71,6 @@ public:
 
 	vs_property_get(ID3D12Device*, Device);
 	ID3D12Device* Device_get() const;
-	vs_property_get(D3D12OnlineDescriptorManager*, SrvManager);
-	D3D12OnlineDescriptorManager* SrvManager_get() const;
 
 private:
 	void InitializeCOM();

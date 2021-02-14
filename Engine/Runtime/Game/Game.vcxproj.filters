@@ -438,12 +438,6 @@
     <ClInclude Include="Public\RHI\IRHIShaderResourceView.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.h">
-      <Filter>Private\D3D12RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.h">
-      <Filter>Private\D3D12RHI</Filter>
-    </ClInclude>
     <ClInclude Include="Public\DeferredGameViewport.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -506,6 +500,12 @@
     </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12GBufferRenderTarget.h">
       <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D12RHI\D3D12OnlineDescriptorPatch.h">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIOnlineDescriptorPatch.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -758,12 +758,6 @@
     <ClCompile Include="Private\DeferredGameViewport.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorIndex.cpp">
-      <Filter>Private\D3D12RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorManager.cpp">
-      <Filter>Private\D3D12RHI</Filter>
-    </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
@@ -801,6 +795,9 @@
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12GBufferRenderTarget.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12OnlineDescriptorPatch.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
   </ItemGroup>

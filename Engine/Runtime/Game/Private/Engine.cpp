@@ -135,6 +135,8 @@ void Engine::RenderScene()
 	immediateCommandList->BeginCommand();
 	CommitBundles(immediateCommandList);
 
+	autoFence->BeginFence();
+
 	gameViewport->RenderScene(immediateCommandList, scene);
 
 	{
@@ -146,14 +148,12 @@ void Engine::RenderScene()
 		immediateCommandList->CopyResource(target, gameViewport->GetRenderTarget());
 		immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
 
-		autoFence->BeginFence();
-
 		immediateCommandList->EndCommand();
 		immediateCommandList->Flush();
 		swapChain->Present();
-
-		autoFence->EndFence(immediateCommandList);
 	}
+
+	autoFence->EndFence(immediateCommandList);
 }
 
 void Engine::InitializeBundles()

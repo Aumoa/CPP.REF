@@ -8,6 +8,8 @@
 
 #include "D3D12Minimal.h"
 
+class D3D12OnlineDescriptorPatch;
+
 class D3D12CommandList : virtual public Object, virtual public IRHICommandList
 {
 public:
@@ -18,7 +20,7 @@ private:
 	bool bHasBegunCommand : 1;
 
 	ID3D12RootSignature* currentRS;
-	ID3D12DescriptorHeap* currentTable;
+	D3D12OnlineDescriptorPatch* currentPatch;
 
 public:
 	D3D12CommandList();
@@ -44,6 +46,7 @@ public:
 	virtual void SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress);
 	virtual void BeginRenderTarget(IRHIRenderTarget* renderTarget);
 	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget);
+	virtual void SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch);
 
 	virtual bool HasBegunCommand_get() const;
 
@@ -52,5 +55,4 @@ public:
 
 private:
 	void ConsumePendingDeferredCommands();
-	void EnqueueDescriptorTable();
 };

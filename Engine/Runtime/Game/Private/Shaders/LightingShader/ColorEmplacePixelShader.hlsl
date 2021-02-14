@@ -16,6 +16,7 @@ HDRPixel PS_Main(in QuadFrag inFrag)
 
 	HDRPixel oPixel;
 	oPixel.Color = color;
+	oPixel.Color = 1.0f;
 
 	return oPixel;
 }

@@ -28,13 +28,47 @@ extern LogCategoryBase LogD3D12RHI;
 #define HR(x) x
 #endif
 
-struct CD3DX12_CPU_DESCRIPTOR_HANDLE : public D3D12_CPU_DESCRIPTOR_HANDLE
+template<class T>
+struct CD3DX12_ANY_DESCRIPTOR_HANDLE : public T
 {
-	CD3DX12_CPU_DESCRIPTOR_HANDLE();
-	CD3DX12_CPU_DESCRIPTOR_HANDLE(const D3D12_CPU_DESCRIPTOR_HANDLE& handle);
-	CD3DX12_CPU_DESCRIPTOR_HANDLE(const CD3DX12_CPU_DESCRIPTOR_HANDLE& handle);
-	CD3DX12_CPU_DESCRIPTOR_HANDLE IncrementPost(uint32 increment);
+	CD3DX12_ANY_DESCRIPTOR_HANDLE()
+	{
+
+	}
+
+	CD3DX12_ANY_DESCRIPTOR_HANDLE(const T& handle) : T(handle)
+	{
+
+	}
+
+	CD3DX12_ANY_DESCRIPTOR_HANDLE(const CD3DX12_ANY_DESCRIPTOR_HANDLE& handle) : T(handle)
+	{
+
+	}
+
+	CD3DX12_ANY_DESCRIPTOR_HANDLE& IncrementPre(uint32 increment, size_t count = 1)
+	{
+		this->T::ptr += (ssize_t)increment * count;
+		return *this;
+	}
+
+	CD3DX12_ANY_DESCRIPTOR_HANDLE IncrementPost(uint32 increment, size_t count = 1)
+	{
+		auto left = *this;
+		this->T::ptr += (ssize_t)increment * count;
+		return left;
+	}
+
+	CD3DX12_ANY_DESCRIPTOR_HANDLE Get(uint32 increment, size_t count) const
+	{
+		auto left = *this;
+		left.T::ptr += (size_t)increment * count;
+		return left;
+	}
 };
+
+using CD3DX12_CPU_DESCRIPTOR_HANDLE = CD3DX12_ANY_DESCRIPTOR_HANDLE<D3D12_CPU_DESCRIPTOR_HANDLE>;
+using CD3DX12_GPU_DESCRIPTOR_HANDLE = CD3DX12_ANY_DESCRIPTOR_HANDLE<D3D12_GPU_DESCRIPTOR_HANDLE>;
 
 struct CD3DX12_RESOURCE_BARRIER : public D3D12_RESOURCE_BARRIER
 {
@@ -45,4 +79,4 @@ struct CD3DX12_RESOURCE_BARRIER : public D3D12_RESOURCE_BARRIER
 	static CD3DX12_RESOURCE_BARRIER TransitionBarrier(ID3D12Resource* inResource, D3D12_RESOURCE_STATES inBefore, D3D12_RESOURCE_STATES inAfter, uint32 inSubresourceIdx = 0);
 };
 
-#define TRANSITION(x, before, after) CD3DX12_RESOURCE_BARRIER::TransitionBarrier((x).Get(), D3D12_RESOURCE_STATE_ ## before, D3D12_RESOURCE_STATE_ ## after)
+#define TRANSITION(x, before, after) CD3DX12_RESOURCE_BARRIER::TransitionBarrier((x)->Resource, D3D12_RESOURCE_STATE_ ## before, D3D12_RESOURCE_STATE_ ## after)

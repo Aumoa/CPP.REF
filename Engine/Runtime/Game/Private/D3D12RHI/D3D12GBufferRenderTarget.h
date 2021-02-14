@@ -7,6 +7,8 @@
 #include "D3D12RenderTarget.h"
 
 class D3D12DeviceBundle;
+class D3D12IndependentShaderResourceView;
+class D3D12Resource;
 
 class D3D12GBufferRenderTarget : public D3D12RenderTarget
 {
@@ -23,10 +25,12 @@ private:
 
 	ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	ComPtr<ID3D12DescriptorHeap> dsvHeap;
+	TRefPtr<D3D12IndependentShaderResourceView> srvHeap;
+	uint32 rtvIncrement;
 
-	ComPtr<ID3D12Resource> colorBuffer;
-	ComPtr<ID3D12Resource> normalBuffer;
-	ComPtr<ID3D12Resource> depthStencilBuffer;
+	TRefPtr<D3D12Resource> colorBuffer;
+	TRefPtr<D3D12Resource> normalBuffer;
+	TRefPtr<D3D12Resource> depthStencilBuffer;
 
 public:
 	D3D12GBufferRenderTarget();
@@ -34,10 +38,12 @@ public:
 
 	virtual void ResizeBuffers(int32 width, int32 height);
 	virtual size_t GetRenderTargetCount() const;
+	virtual IRHIResource* GetRenderTarget(size_t index) const;
+	virtual IRHIShaderResourceView* GetShaderResourceView() const;
 
 	void BeginRender(ID3D12GraphicsCommandList* inCommandList) override;
 	void EndRender(ID3D12GraphicsCommandList* inCommandList) override;
 
 private:
-	ComPtr<ID3D12Resource> CreateTexture2D(DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height);
+	TRefPtr<D3D12Resource> CreateTexture2D(DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height);
 };

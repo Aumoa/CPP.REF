@@ -2,6 +2,7 @@
 
 #include "SceneRendering/Scene.h"
 
+#include "Engine.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/PlayerCameraManager.h"
 #include "Components/LightComponent.h"
@@ -10,13 +11,18 @@
 #include "SceneRendering/SceneVisibility.h"
 #include "SceneRendering/LightSceneProxy.h"
 #include "Logging/LogMacros.h"
+#include "RHI/IRHIOnlineDescriptorPatch.h"
+#include "RHI/IRHIDeviceBundle.h"
+#include "RHi/IRHICommandList.h"
 
 using namespace std;
 
 Scene::Scene() : Super()
 	, localPlayer(nullptr)
+	, numSRVs(2048)
 {
 	localPlayerVisibility = NewObject<SceneVisibility>(this);
+	srvPatch = GEngine.DeviceBundle->CreateOnlineDescriptorPatch();
 }
 
 Scene::~Scene()
@@ -65,6 +71,18 @@ void Scene::CalcVisibility()
 
 	localPlayerVisibility->UpdateView(viewInfo);
 	localPlayerVisibility->CalcVisibility();
+}
+
+void Scene::BeginRender(IRHICommandList* inCommandList)
+{
+	// numSRVs is 2048 that is experimental implementation.
+	srvPatch->ReallocAndStart(numSRVs);
+	inCommandList->SetShaderDescriptorPatch(srvPatch.Get());
+}
+
+void Scene::EndRender(IRHICommandList* inCommandList)
+{
+
 }
 
 void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
