@@ -870,26 +870,26 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\GeometryShader\PixelShader.hlsl">
-      <Filter>Private\Shaders\GeometryShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\GeometryShader\VertexShader.hlsl">
-      <Filter>Private\Shaders\GeometryShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\VertexShader.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\TonemapShader\VertexShader.hlsl">
-      <Filter>Private\Shaders\TonemapShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\TonemapShader\PixelShader.hlsl">
-      <Filter>Private\Shaders\TonemapShader</Filter>
-    </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\LightAccumulatePixelShader.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\ColorEmplacePixelShader.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\GeometryShader\GeometryPixelShader.hlsl">
+      <Filter>Private\Shaders\GeometryShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\GeometryShader\GeometryVertexShader.hlsl">
+      <Filter>Private\Shaders\GeometryShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\LightingVertexShader.hlsl">
+      <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
+      <Filter>Private\Shaders\TonemapShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TonemapShader\TonemapVertexShader.hlsl">
+      <Filter>Private\Shaders\TonemapShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

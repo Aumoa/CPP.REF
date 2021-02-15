@@ -188,7 +188,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>..\..\..\..\%(Directory)Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
   </ItemDefinitionGroup>
@@ -214,7 +214,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>..\..\..\..\%(Directory)Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
   </ItemDefinitionGroup>
@@ -241,7 +241,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>..\..\..\..\%(Directory)Compiled\%(Filename).hlsl.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders</HeaderFileOutput>
       <ObjectFileOutput>
       </ObjectFileOutput>
     </FxCompile>
@@ -518,27 +518,27 @@
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\GeometryShader\PixelShader.hlsl">
+    <FxCompile Include="Private\Shaders\GeometryShader\GeometryPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pGeometry%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pGeometry%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pGeometry%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\GeometryShader\VertexShader.hlsl">
+    <FxCompile Include="Private\Shaders\GeometryShader\GeometryVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pGeometry%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pGeometry%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pGeometry%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\LightAccumulatePixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
@@ -547,20 +547,20 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pLighting%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\VertexShader.hlsl">
+    <FxCompile Include="Private\Shaders\LightingShader\LightingVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pLighting%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\ColorEmplacePixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
@@ -569,31 +569,31 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pLighting%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pLighting%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pLighting%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\TonemapShader\PixelShader.hlsl">
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pTonemap%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pTonemap%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pTonemap%(Filename)</VariableName>
+    <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\TonemapShader\VertexShader.hlsl">
+    <FxCompile Include="Private\Shaders\TonemapShader\TonemapVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pTonemap%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">pTonemap%(Filename)</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pTonemap%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

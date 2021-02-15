@@ -333,13 +333,13 @@ void D3D12DeviceBundle::InitializeD3D12()
 	srvManager = NewObject<D3D12OfflineDescriptorManager>(d3d12Device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, OfflineDescriptorAllocUnit);
 }
 
-#include "Shaders/GeometryShader/Compiled/VertexShader.hlsl.h"
-#include "Shaders/GeometryShader/Compiled/PixelShader.hlsl.h"
-#include "Shaders/LightingShader/Compiled/VertexShader.hlsl.h"
-#include "Shaders/LightingShader/Compiled/LightAccumulatePixelShader.hlsl.h"
-#include "Shaders/LightingShader/Compiled/ColorEmplacePixelShader.hlsl.h"
-#include "Shaders/TonemapShader/Compiled/VertexShader.hlsl.h"
-#include "Shaders/TonemapShader/Compiled/PixelShader.hlsl.h"
+#include "CompiledShaders/GeometryVertexShader.generated.h"
+#include "CompiledShaders/GeometryPixelShader.generated.h"
+#include "CompiledShaders/LightingVertexShader.generated.h"
+#include "CompiledShaders/LightAccumulatePixelShader.generated.h"
+#include "CompiledShaders/ColorEmplacePixelShader.generated.h"
+#include "CompiledShaders/TonemapVertexShader.generated.h"
+#include "CompiledShaders/TonemapPixelShader.generated.h"
 
 template<class... TArgs, size_t... Indices>
 inline void SetRTVFormatsHelper(D3D12_GRAPHICS_PIPELINE_STATE_DESC& outDesc, TArgs&&... inArgs, index_sequence<Indices...>&&)
@@ -546,7 +546,7 @@ void D3D12DeviceBundle::InitializeShaders()
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = GetInitialPipelineDesc(pRS.Get());
 		PSDesc.VS = GetShaderBytecode(pLightingVertexShader);
-		PSDesc.PS = GetShaderBytecode(pLightingLightAccumulatePixelShader);
+		PSDesc.PS = GetShaderBytecode(pLightAccumulatePixelShader);
 		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		PSDesc.BlendState.RenderTarget[0] = RTBlendAcc;
@@ -554,7 +554,7 @@ void D3D12DeviceBundle::InitializeShaders()
 		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
 		lib->SetShader(RHIShaderLibrary::LightingShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
 
-		PSDesc.PS = GetShaderBytecode(pLightingColorEmplacePixelShader);
+		PSDesc.PS = GetShaderBytecode(pColorEmplacePixelShader);
 		PSDesc.BlendState.RenderTarget[0] = RTBlendMul;
 		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
 		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
