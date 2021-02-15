@@ -395,7 +395,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine.LoadEngineDefaultAssets.cpp" />
     <ClCompile Include="Private\AppDuplicationException.cpp" />
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
@@ -442,6 +441,7 @@
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
     <ClCompile Include="Private\DirectXGeometry.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
+    <ClCompile Include="Private\Engine.LoadEngineDefaultAssets.cpp" />
     <ClCompile Include="Private\EngineCriticalException.cpp" />
     <ClCompile Include="Private\Framework\Actor.cpp" />
     <ClCompile Include="Private\Framework\Character.cpp" />
