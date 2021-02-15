@@ -64,13 +64,13 @@ void StartupLevel::LoadLevel()
 	icosahedron->StaticMesh->Location = Vector3(0, 0.55f, 1.0f);
 	icosahedron->StaticMesh->Scale = 0.5f;
 
-	for (size_t i = 0; i < 2500; ++i)
+	for (size_t i = 0; i < 10000; ++i)
 	{
-		int32 x = (int32)i % 50;
-		int32 y = (int32)i / 50;
-		sphere_2500[i] = SpawnActorPersistent<AStaticMeshActor>();
-		sphere_2500[i]->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
-		sphere_2500[i]->RootComponent->Location = Vector3((float)(-25 + x), 0.55f, (float)(-25 + y));
+		int32 x = (int32)i % 100;
+		int32 y = (int32)i / 100;
+		sphere_10000[i] = SpawnActorPersistent<AStaticMeshActor>();
+		sphere_10000[i]->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
+		sphere_10000[i]->RootComponent->Location = Vector3((float)(-50 + x), 0.55f, (float)(-50 + y));
 	}
 
 	spectator = SpawnActorPersistent<ASpectatorPawn>();

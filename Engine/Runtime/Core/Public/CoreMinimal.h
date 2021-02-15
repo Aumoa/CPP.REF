@@ -34,5 +34,9 @@
 #include "Numerics/Color.h"
 #include "Numerics/Sphere.h"
 #include "Numerics/Circle.h"
+#include "Numerics/Plane.h"
+#include "Numerics/Frustum.h"
+
+#include "Collision/OverlapTest.h"
 
 #include "Time/Duration.h"

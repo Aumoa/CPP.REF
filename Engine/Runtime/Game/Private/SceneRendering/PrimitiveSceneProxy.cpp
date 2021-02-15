@@ -33,3 +33,8 @@ Transform PrimitiveSceneProxy::GetPrimitiveTransform() const
 {
 	return transform;
 }
+
+const AxisAlignedCube* PrimitiveSceneProxy::GetPrimitiveBoundingBox() const
+{
+	return nullptr;
+}

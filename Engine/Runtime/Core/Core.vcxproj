@@ -208,7 +208,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_CORE_API__</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);__SC_RUNTIME_CORE_API__;_DEBUGGAME</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -228,6 +228,7 @@
     <ClInclude Include="Private\Numerics\DXMathMinimal.h" />
     <ClInclude Include="Private\Numerics\HashHelper.h" />
     <ClInclude Include="Public\ArgumentNullException.h" />
+    <ClInclude Include="Public\Collision\OverlapTest.h" />
     <ClInclude Include="Public\CoreAPI.h" />
     <ClInclude Include="Public\CoreConcepts.h" />
     <ClInclude Include="Public\CoreMinimal.h" />
@@ -244,10 +245,12 @@
     <ClInclude Include="Public\Numerics\AxisAlignedCube.h" />
     <ClInclude Include="Public\Numerics\Circle.h" />
     <ClInclude Include="Public\Numerics\Color.h" />
+    <ClInclude Include="Public\Numerics\Frustum.h" />
     <ClInclude Include="Public\Numerics\Line2.h" />
     <ClInclude Include="Public\Numerics\Line3.h" />
     <ClInclude Include="Public\Numerics\Matrix4x4.h" />
     <ClInclude Include="Public\Numerics\ObjectOrientedCube.h" />
+    <ClInclude Include="Public\Numerics\Plane.h" />
     <ClInclude Include="Public\Numerics\Quaternion.h" />
     <ClInclude Include="Public\Numerics\Ray2.h" />
     <ClInclude Include="Public\Numerics\Ray3.h" />
@@ -272,6 +275,7 @@
     <None Include="Public\Mathematics\TAngleDef.inl" />
     <None Include="Public\Numerics\Color.inl" />
     <None Include="Public\Numerics\Matrix4x4.inl" />
+    <None Include="Public\Numerics\Plane.inl" />
     <None Include="Public\Numerics\Quaternion.inl" />
     <None Include="Public\Numerics\TNumericsBasicOperator.inl" />
     <None Include="Public\Numerics\Vector2.inl" />
@@ -286,6 +290,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\ArgumentNullException.cpp" />
+    <ClCompile Include="Private\Collision\OverlapTest.cpp" />
     <ClCompile Include="Private\Exception.cpp" />
     <ClCompile Include="Private\FormatException.cpp" />
     <ClCompile Include="Private\IndexOutOfRangeException.cpp" />
@@ -296,11 +301,13 @@
     <ClCompile Include="Private\Numerics\AxisAlignedCube.cpp" />
     <ClCompile Include="Private\Numerics\Circle.cpp" />
     <ClCompile Include="Private\Numerics\Color.cpp" />
+    <ClCompile Include="Private\Numerics\Frustum.cpp" />
     <ClCompile Include="Private\Numerics\HashHelper.cpp" />
     <ClCompile Include="Private\Numerics\Line2.cpp" />
     <ClCompile Include="Private\Numerics\Line3.cpp" />
     <ClCompile Include="Private\Numerics\Matrix4x4.cpp" />
     <ClCompile Include="Private\Numerics\ObjectOrientedCube.cpp" />
+    <ClCompile Include="Private\Numerics\Plane.cpp" />
     <ClCompile Include="Private\Numerics\Quaternion.cpp" />
     <ClCompile Include="Private\Numerics\Ray2.cpp" />
     <ClCompile Include="Private\Numerics\Ray3.cpp" />

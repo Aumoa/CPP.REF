@@ -10,20 +10,36 @@
 
 using namespace std;
 
-StaticMeshBatch::StaticMeshBatch(const RHIMeshDrawCommand& drawCommand)
+class StaticMeshBatch : public MeshBatch
 {
-	this->drawCommand = drawCommand;
-}
+public:
+	using Super = MeshBatch;
+	using This = StaticMeshBatch;
 
-StaticMeshBatch::~StaticMeshBatch()
-{
+private:
+	RHIMeshDrawCommand drawCommand;
 
-}
+public:
+	StaticMeshBatch()
+	{
 
-const RHIMeshDrawCommand* StaticMeshBatch::GetDrawCommand() const
-{
-	return &drawCommand;
-}
+	}
+
+	~StaticMeshBatch() override
+	{
+
+	}
+
+	void SetMeshDrawCommand(const RHIMeshDrawCommand& inDrawCommand)
+	{
+		drawCommand = inDrawCommand;
+	}
+
+	const RHIMeshDrawCommand* GetDrawCommand() const override
+	{
+		return &drawCommand;
+	}
+};
 
 StaticMesh::StaticMesh() : Super()
 {
@@ -42,6 +58,11 @@ MeshBatch* StaticMesh::GetMeshBatch() const
 
 TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<uint32> indices, TRefPtr<Material> defaultMaterial)
 {
+	return CreateStaticMesh(vertices, indices, defaultMaterial, ComputeBoundingBox(vertices));
+}
+
+TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<uint32> indices, TRefPtr<Material> defaultMaterial, const AxisAlignedCube& inBoundingBox)
+{
 	auto staticMesh = NewObject<StaticMesh>();
 
 	staticMesh->vertexBuffer = GEngine.DeviceBundle->CreateVertexBuffer(vertices);
@@ -55,7 +76,25 @@ TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<
 	command.IndexBufferVirtualAddress = staticMesh->indexBuffer->GetVirtualAddress();
 	command.IndexCount = (uint32)indices.size();
 	command.MaterialIndex = staticMesh->material.IsValid ? staticMesh->material->Index : 0;
-	staticMesh->meshBatch = NewObject<StaticMeshBatch>(command);
+
+	auto batch = NewObject<StaticMeshBatch>();
+	batch->SetMeshDrawCommand(command);
+
+	staticMesh->meshBatch = batch;
+	staticMesh->boundingBox = inBoundingBox;
 
 	return staticMesh;
+}
+
+AxisAlignedCube StaticMesh::ComputeBoundingBox(span<RHIVertex> vertices)
+{
+	AxisAlignedCube cube(Vector3::Zero, Vector3::Zero);
+
+	for (size_t i = 0; i < vertices.size(); ++i)
+	{
+		cube.Min = Vector3::Min(cube.Min, vertices[i].Pos);
+		cube.Max = Vector3::Max(cube.Max, vertices[i].Pos);
+	}
+
+	return cube;
 }

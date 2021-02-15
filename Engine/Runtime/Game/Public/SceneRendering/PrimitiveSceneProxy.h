@@ -25,10 +25,11 @@ public:
 	PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent);
 	~PrimitiveSceneProxy();
 
-	void UpdateMovable();
+	virtual void UpdateMovable();
 
 	virtual MeshBatch* GetMeshBatch() const;
 	virtual Transform GetPrimitiveTransform() const;
+	virtual const AxisAlignedCube* GetPrimitiveBoundingBox() const;
 
 	const EComponentMobility Mobility;
 };

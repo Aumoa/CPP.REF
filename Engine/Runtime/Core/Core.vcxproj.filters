@@ -22,6 +22,12 @@
     <Filter Include="Public\Time">
       <UniqueIdentifier>{aba7b5d8-1c27-4b0e-91e6-777f195c8d61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Collision">
+      <UniqueIdentifier>{2e11c5c6-deaa-4788-b3fb-7586303597db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Collision">
+      <UniqueIdentifier>{ed4590cf-de66-411b-a714-d79d0a42952d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -147,6 +153,15 @@
     <ClInclude Include="Public\StdContainers.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Numerics\Frustum.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Plane.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Collision\OverlapTest.h">
+      <Filter>Public\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -193,6 +208,9 @@
     </None>
     <None Include="Public\Time\Duration.inl">
       <Filter>Public\Time</Filter>
+    </None>
+    <None Include="Public\Numerics\Plane.inl">
+      <Filter>Public\Numerics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -279,6 +297,15 @@
     </ClCompile>
     <ClCompile Include="Private\Numerics\Line3.cpp">
       <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Plane.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Numerics\Frustum.cpp">
+      <Filter>Private\Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Collision\OverlapTest.cpp">
+      <Filter>Private\Collision</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

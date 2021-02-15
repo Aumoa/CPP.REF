@@ -24,6 +24,7 @@ private:
 	std::vector<bool> visibilities;
 	TRefPtr<ShaderCameraConstantVector> shaderCameraConstants;
 	bool bDirty : 1;
+	Frustum viewFrustum;
 
 public:
 	SceneVisibility(Scene* inScene);

@@ -32,7 +32,7 @@ private:
 
 	ASpectatorPawn* spectator;
 
-	AStaticMeshActor* sphere_2500[2500];
+	AStaticMeshActor* sphere_10000[10000];
 
 public:
 	StartupLevel();

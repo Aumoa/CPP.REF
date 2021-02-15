@@ -17,10 +17,15 @@ public:
 
 private:
 	StaticMesh* staticMesh;
+	AxisAlignedCube baseBoundingBox;
+	AxisAlignedCube transformedBoundingBox;
 
 public:
 	StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent);
 	~StaticMeshSceneProxy();
 
+	void UpdateMovable() override;
+
 	MeshBatch* GetMeshBatch() const override;
+	const AxisAlignedCube* GetPrimitiveBoundingBox() const override;
 };

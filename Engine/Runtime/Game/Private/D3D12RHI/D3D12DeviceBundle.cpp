@@ -32,7 +32,7 @@ D3D12DeviceBundle* D3D12DeviceBundle::instance = nullptr;
 
 D3D12DeviceBundle::D3D12DeviceBundle() : Super()
 {
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(_DEBUGGAME)
 	if (ComPtr<ID3D12Debug> debug; SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug))))
 	{
 		debug->EnableDebugLayer();
@@ -482,13 +482,35 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateDynamicBuffer(size_t sizeInBytes)
 {
 	size_t align_size = ALIGN_256(sizeInBytes);
 
-	auto it = bufferManager.find(align_size);
-	if (it == bufferManager.end())
+	if (align_size > 2048)
 	{
-		it = bufferManager.emplace(align_size, NewObject<D3D12DynamicBufferManager>(align_size)).first;
-	}
+		D3D12_RESOURCE_DESC bufferDesc = { };
+		bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		bufferDesc.Width = (uint64)sizeInBytes;
+		bufferDesc.Height = 1;
+		bufferDesc.DepthOrArraySize = 1;
+		bufferDesc.MipLevels = 1;
+		bufferDesc.SampleDesc = { 1, 0 };
+		bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	return it->second->AllocBuffer();
+		D3D12_HEAP_PROPERTIES heapProp = { };
+		heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+		ComPtr<ID3D12Resource> pResource;
+		HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&pResource)));
+
+		return NewObject<D3D12Resource>(pResource.Get());
+	}
+	else
+	{
+		auto it = bufferManager.find(align_size);
+		if (it == bufferManager.end())
+		{
+			it = bufferManager.emplace(align_size, NewObject<D3D12DynamicBufferManager>(align_size)).first;
+		}
+
+		return it->second->AllocBuffer();
+	}
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState)
