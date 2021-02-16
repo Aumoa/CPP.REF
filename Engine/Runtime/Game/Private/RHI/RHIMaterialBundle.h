@@ -41,10 +41,12 @@ public:
 
 	virtual TRefPtr<MaterialInterface> CreateMaterial();
 	virtual uint64 GetMaterialsBufferVirtualAddress() const;
+	virtual MaterialInterface* FindMaterialFromIndex(uint16 index) const;
 
 	void EnqueueDirty(MaterialInterface* inQuery);
 	void* GetUploadBufferPointer(uint16 inMaterialIndex);
 	uint64 GetBufferVirtualAddress() const;
+	void ReleaseMaterial(uint16 index);
 
 private:
 	uint16 Issue();

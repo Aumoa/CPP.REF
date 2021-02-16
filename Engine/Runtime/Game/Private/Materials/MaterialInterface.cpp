@@ -2,6 +2,8 @@
 
 #include "Materials/MaterialInterface.h"
 
+#include "RHI/IRHIResource.h"
+
 MaterialInterface::MaterialInterface(uint16 inIndex) : Super()
 	, index(inIndex)
 	, dirtyMask(EMaterialDirtyMask::All)
@@ -45,8 +47,11 @@ float MaterialInterface::Ambient_get() const
 
 void MaterialInterface::Ambient_set(float value)
 {
-	ambient = value;
-	SetMarkDirty(EMaterialDirtyMask::RenderState);
+	if (ambient != value)
+	{
+		ambient = value;
+		SetMarkDirty(EMaterialDirtyMask::RenderState);
+	}
 }
 
 float MaterialInterface::Diffuse_get() const
@@ -56,8 +61,11 @@ float MaterialInterface::Diffuse_get() const
 
 void MaterialInterface::Diffuse_set(float value)
 {
-	diffuse = value;
-	SetMarkDirty(EMaterialDirtyMask::RenderState);
+	if (diffuse != value)
+	{
+		diffuse = value;
+		SetMarkDirty(EMaterialDirtyMask::RenderState);
+	}
 }
 
 float MaterialInterface::Specular_get() const
@@ -67,8 +75,11 @@ float MaterialInterface::Specular_get() const
 
 void MaterialInterface::Specular_set(float value)
 {
-	specular = value;
-	SetMarkDirty(EMaterialDirtyMask::RenderState);
+	if (specular != value)
+	{
+		specular = value;
+		SetMarkDirty(EMaterialDirtyMask::RenderState);
+	}
 }
 
 float MaterialInterface::SpecExp_get() const
@@ -78,6 +89,42 @@ float MaterialInterface::SpecExp_get() const
 
 void MaterialInterface::SpecExp_set(float value)
 {
-	specExp = value;
-	SetMarkDirty(EMaterialDirtyMask::RenderState);
+	if (specExp != value)
+	{
+		specExp = value;
+		SetMarkDirty(EMaterialDirtyMask::RenderState);
+	}
+}
+
+IRHIResource* MaterialInterface::DiffuseMap_get() const
+{
+	return diffuseMap.Get();
+}
+
+void MaterialInterface::DiffuseMap_set(IRHIResource* value)
+{
+	if (diffuseMap.Get() != value)
+	{
+		diffuseMap = value;
+		SetMarkDirty(EMaterialDirtyMask::SurfaceTexture);
+	}
+}
+
+IRHIResource* MaterialInterface::NormalMap_get() const
+{
+	return normalMap.Get();
+}
+
+void MaterialInterface::NormalMap_set(IRHIResource* value)
+{
+	if (normalMap.Get() != value)
+	{
+		normalMap = value;
+		SetMarkDirty(EMaterialDirtyMask::SurfaceTexture);
+	}
+}
+
+IRHIShaderResourceView* MaterialInterface::SurfaceTextureSRV_get() const
+{
+	return nullptr;
 }

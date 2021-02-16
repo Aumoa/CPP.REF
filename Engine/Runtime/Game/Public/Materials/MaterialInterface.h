@@ -5,15 +5,19 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+interface IRHIResource;
+interface IRHIShaderResourceView;
+
 enum class EMaterialDirtyMask : uint8
 {
 	None = 0,
 	RenderState = 1,
 	UpdateBuffer = RenderState << 1,
+	SurfaceTexture = UpdateBuffer << 1,
 	All = 0xFF
 };
 
-class GAME_API MaterialInterface abstract : virtual public Object
+class GAME_API MaterialInterface : virtual public Object
 {
 public:
 	using Super = Object;
@@ -26,6 +30,9 @@ private:
 	float diffuse;
 	float specular;
 	float specExp;
+	
+	TRefPtr<IRHIResource> diffuseMap;
+	TRefPtr<IRHIResource> normalMap;
 
 public:
 	MaterialInterface(uint16 inIndex);
@@ -52,7 +59,17 @@ public:
 	float SpecExp_get() const;
 	void SpecExp_set(float value);
 
+	vs_property(IRHIResource*, DiffuseMap);
+	IRHIResource* DiffuseMap_get() const;
+	void DiffuseMap_set(IRHIResource* value);
+
+	vs_property(IRHIResource*, NormalMap);
+	IRHIResource* NormalMap_get() const;
+	void NormalMap_set(IRHIResource* value);
+
 	vs_property_get_auto(uint16, Index, index);
+	vs_property_get(IRHIShaderResourceView*, SurfaceTextureSRV);
+	virtual IRHIShaderResourceView* SurfaceTextureSRV_get() const;
 };
 
 #include "MaterialInterface.inl"

@@ -16,15 +16,20 @@ public:
 	using This = StaticMeshSceneProxy;
 
 private:
+	TWeakPtr<StaticMeshComponent> meshComponent;
 	StaticMesh* staticMesh;
 	AxisAlignedCube baseBoundingBox;
 	AxisAlignedCube transformedBoundingBox;
+	uint16 materialIndex;
+
+	TRefPtr<MeshBatch> customBatch;
 
 public:
 	StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent);
 	~StaticMeshSceneProxy();
 
-	void UpdateMovable() override;
+	void Update() override;
+	void UpdateTransform() override;
 
 	MeshBatch* GetMeshBatch() const override;
 	const AxisAlignedCube* GetPrimitiveBoundingBox() const override;

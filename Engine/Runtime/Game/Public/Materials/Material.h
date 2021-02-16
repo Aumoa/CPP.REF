@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "Materials/MaterialInterface.h"
 
+interface IRHIShaderResourceView;
 class RHIMaterialBundle;
 
 class Material : public MaterialInterface
@@ -19,6 +20,7 @@ private:
 
 	RHIMaterialBundle* owner;
 	void* uploadBufferPtr;
+	TRefPtr<IRHIShaderResourceView> textureGroupView;
 
 public:
 	Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle);
@@ -26,4 +28,6 @@ public:
 
 	void SetMarkDirty(EMaterialDirtyMask inAddMask) override;
 	void ResolveDirtyState() override;
+
+	IRHIShaderResourceView* SurfaceTextureSRV_get() const override;
 };

@@ -28,12 +28,18 @@ void SceneVisibility::CalcVisibility()
 		const auto& primitives = myScene->Primitives;
 
 		visibilities.resize(primitives.size());
-
 		shaderCameraConstants->BeginUpdateConstant(myView);
+		numPrimitivesRender = 0;
 
 		for (size_t i = 0; i < primitives.size(); ++i)
 		{
 			PrimitiveSceneProxy* proxy = primitives[i]->GetSceneProxy();
+			if (proxy == nullptr)
+			{
+				visibilities[i] = false;
+				continue;
+			}
+
 			if (const AxisAlignedCube* boundingBoxEnabled = proxy->GetPrimitiveBoundingBox(); boundingBoxEnabled != nullptr)
 			{
 				AxisAlignedCube boundingBox = *boundingBoxEnabled;
@@ -45,8 +51,9 @@ void SceneVisibility::CalcVisibility()
 				}
 			}
 
-			shaderCameraConstants->AddPrimitive(primitives[i]->GetSceneProxy());
+			shaderCameraConstants->AddPrimitive(proxy);
 			visibilities[i] = true;
+			numPrimitivesRender += 1;
 		}
 
 		shaderCameraConstants->EndUpdateConstant();

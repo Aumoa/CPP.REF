@@ -4,12 +4,44 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "SceneRendering/StaticMesh.h"
+#include "Materials/MaterialInterface.h"
+
+class StaticMeshSceneProxyBatch : public MeshBatch
+{
+public:
+	using Super = MeshBatch;
+
+private:
+	RHIMeshDrawCommand drawCommand;
+
+public:
+	StaticMeshSceneProxyBatch(const RHIMeshDrawCommand& inDrawCommand, uint16 materialIndexOverride)
+	{
+		drawCommand = inDrawCommand;
+		drawCommand.MaterialIndex = materialIndexOverride;
+	}
+
+	~StaticMeshSceneProxyBatch()
+	{
+
+	}
+
+	const RHIMeshDrawCommand* GetDrawCommand() const override
+	{
+		return &drawCommand;
+	}
+};
 
 StaticMeshSceneProxy::StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
-	, staticMesh(nullptr)
+	, meshComponent(inMeshComponent)
+	, staticMesh(inMeshComponent->GetStaticMesh())
+	, materialIndex(0)
 {
-	staticMesh = inMeshComponent->GetStaticMesh();
-	baseBoundingBox = staticMesh->BoundingBox;
+	if (staticMesh != nullptr)
+	{
+		baseBoundingBox = staticMesh->BoundingBox;
+		materialIndex = meshComponent->GetMaterial()->Index;
+	}
 }
 
 StaticMeshSceneProxy::~StaticMeshSceneProxy()
@@ -17,7 +49,30 @@ StaticMeshSceneProxy::~StaticMeshSceneProxy()
 
 }
 
-void StaticMeshSceneProxy::UpdateMovable()
+void StaticMeshSceneProxy::Update()
+{
+	if (!meshComponent.IsValid)
+	{
+		staticMesh = nullptr;
+		materialIndex = 0;
+		return;
+	}
+
+	staticMesh = meshComponent->GetStaticMesh();
+	materialIndex = meshComponent->GetMaterial()->Index;
+
+	customBatch.Reset();
+	if (staticMesh != nullptr)
+	{
+		const RHIMeshDrawCommand* drawCommand = staticMesh->GetMeshBatch()->GetDrawCommand();
+		if (drawCommand != nullptr)
+		{
+			customBatch = NewObject<StaticMeshSceneProxyBatch>(*drawCommand, materialIndex);
+		}
+	}
+}
+
+void StaticMeshSceneProxy::UpdateTransform()
 {
 	auto trp = GetPrimitiveTransform();
 
@@ -37,7 +92,7 @@ void StaticMeshSceneProxy::UpdateMovable()
 
 MeshBatch* StaticMeshSceneProxy::GetMeshBatch() const
 {
-	return staticMesh->GetMeshBatch();
+	return customBatch.Get();
 }
 
 const AxisAlignedCube* StaticMeshSceneProxy::GetPrimitiveBoundingBox() const

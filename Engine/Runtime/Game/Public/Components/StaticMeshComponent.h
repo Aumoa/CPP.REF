@@ -7,6 +7,7 @@
 #include "MeshComponent.h"
 
 class StaticMesh;
+class MaterialInterface;
 
 class GAME_API StaticMeshComponent : public MeshComponent
 {
@@ -16,13 +17,16 @@ public:
 
 private:
 	TWeakPtr<StaticMesh> staticMesh;
+	TRefPtr<MaterialInterface> overrideMaterial;
 
 public:
 	StaticMeshComponent();
 	~StaticMeshComponent() override;
 
+	TRefPtr<PrimitiveSceneProxy> CreateSceneProxy() override;
+
 	void SetStaticMesh(StaticMesh* inMesh);
 	StaticMesh* GetStaticMesh() const;
-
-	TRefPtr<PrimitiveSceneProxy> CreateSceneProxy() override;
+	void SetMaterial(MaterialInterface* inMaterial);
+	MaterialInterface* GetMaterial() const;
 };

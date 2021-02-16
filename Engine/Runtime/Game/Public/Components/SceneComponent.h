@@ -16,7 +16,8 @@ enum class EComponentDirtyMask : uint32
 {
 	None = 0,
 	RecreateProxy = 1,
-	TransformUpdated = RecreateProxy << 1,
+	UpdateProxy = RecreateProxy << 1,
+	TransformUpdated = UpdateProxy << 1,
 	Last = TransformUpdated,
 	All = 0xFFFFFFFF,
 };

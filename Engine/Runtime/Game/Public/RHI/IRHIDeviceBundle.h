@@ -42,6 +42,7 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource) = 0;
 	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat = ERHITextureFormat::Unknown) = 0;
 	virtual TRefPtr<IRHIShaderResourceView> CreateTextureView(IRHIResource* resource, ERHITextureFormat inViewFormat = ERHITextureFormat::Unknown) = 0;
+	virtual TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(std::span<IRHIResource*> inResources) = 0;
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue) = 0;
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	virtual TRefPtr<IRHIFence> CreateFence() = 0;
@@ -53,4 +54,6 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices) = 0;
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes) = 0;
 	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState) = 0;
+
+	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource*> inResources) = 0;
 };

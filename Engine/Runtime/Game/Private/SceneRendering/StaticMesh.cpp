@@ -6,40 +6,30 @@
 #include "RHI/IRHIResource.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/IRHIDeviceBundle.h"
-#include "Materials/Material.h"
 
 using namespace std;
 
-class StaticMeshBatch : public MeshBatch
+StaticMeshBatch::StaticMeshBatch()
 {
-public:
-	using Super = MeshBatch;
-	using This = StaticMeshBatch;
 
-private:
-	RHIMeshDrawCommand drawCommand;
+}
 
-public:
-	StaticMeshBatch()
-	{
+StaticMeshBatch::~StaticMeshBatch()
+{
 
-	}
+}
 
-	~StaticMeshBatch() override
-	{
+void StaticMeshBatch::SetMeshDrawCommand(const RHIMeshDrawCommand& inDrawCommand)
+{
+	drawCommand = inDrawCommand;
+}
 
-	}
+const RHIMeshDrawCommand* StaticMeshBatch::GetDrawCommand() const
+{
+	return &drawCommand;
+}
 
-	void SetMeshDrawCommand(const RHIMeshDrawCommand& inDrawCommand)
-	{
-		drawCommand = inDrawCommand;
-	}
-
-	const RHIMeshDrawCommand* GetDrawCommand() const override
-	{
-		return &drawCommand;
-	}
-};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 StaticMesh::StaticMesh() : Super()
 {

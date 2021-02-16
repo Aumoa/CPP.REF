@@ -58,6 +58,7 @@ public:
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource);
 	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat);
 	virtual TRefPtr<IRHIShaderResourceView> CreateTextureView(IRHIResource* resource, ERHITextureFormat inViewFormat);
+	virtual TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(std::span<IRHIResource*> inResources);
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
@@ -69,6 +70,8 @@ public:
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);
 	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState);
+
+	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource*> inResources);
 
 	vs_property_get(ID3D12Device*, Device);
 	ID3D12Device* Device_get() const;

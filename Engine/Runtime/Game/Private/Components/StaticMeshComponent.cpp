@@ -4,6 +4,7 @@
 
 #include "SceneRendering/StaticMeshSceneProxy.h"
 #include "SceneRendering/StaticMesh.h"
+#include "Materials/MaterialInterface.h"
 
 StaticMeshComponent::StaticMeshComponent()
 {
@@ -13,17 +14,6 @@ StaticMeshComponent::StaticMeshComponent()
 StaticMeshComponent::~StaticMeshComponent()
 {
 
-}
-
-void StaticMeshComponent::SetStaticMesh(StaticMesh* inMesh)
-{
-	staticMesh = inMesh;
-	SetMarkDirty(EComponentDirtyMask::RecreateProxy);
-}
-
-StaticMesh* StaticMeshComponent::GetStaticMesh() const
-{
-	return staticMesh.Get();
 }
 
 TRefPtr<PrimitiveSceneProxy> StaticMeshComponent::CreateSceneProxy()
@@ -36,4 +26,27 @@ TRefPtr<PrimitiveSceneProxy> StaticMeshComponent::CreateSceneProxy()
 	{
 		return nullptr;
 	}
+}
+
+void StaticMeshComponent::SetStaticMesh(StaticMesh* inMesh)
+{
+	staticMesh = inMesh;
+	overrideMaterial = staticMesh->DefaultMaterial;
+	SetMarkDirty(EComponentDirtyMask::RecreateProxy);
+}
+
+StaticMesh* StaticMeshComponent::GetStaticMesh() const
+{
+	return staticMesh.Get();
+}
+
+void StaticMeshComponent::SetMaterial(MaterialInterface* inMaterial)
+{
+	overrideMaterial = inMaterial;
+	SetMarkDirty(EComponentDirtyMask::UpdateProxy);
+}
+
+MaterialInterface* StaticMeshComponent::GetMaterial() const
+{
+	return overrideMaterial.Get();
 }

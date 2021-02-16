@@ -12,7 +12,9 @@
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/IRHICommandList.h"
 #include "RHI/IRHIDeviceBundle.h"
+#include "RHI/IRHIMaterialBundle.h"
 #include "Logging/LogMacros.h"
+#include "Materials/MaterialInterface.h"
 
 using namespace std;
 
@@ -52,6 +54,8 @@ void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, Sc
 	const auto& primitiveVisibility = inSceneVisibility->PrimitiveVisibility;
 	CameraConstantIterator cbvIterator = inSceneVisibility->ShaderCameraConstants->GetBufferIterator();
 
+	IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
+
 	for (size_t i = 0; i < primitiveSceneProxies.size(); ++i)
 	{
 		if (primitiveVisibility[i])
@@ -62,8 +66,11 @@ void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, Sc
 			MeshBatch* batch = scene->GetMeshBatch();
 			const RHIMeshDrawCommand* drawCommand = batch->GetDrawCommand();
 			uint32 const32Bit = drawCommand->MaterialIndex;
+			MaterialInterface* material = materialBundle->FindMaterialFromIndex(drawCommand->MaterialIndex);
+
 			commandList->SetGraphicsRootConstantBufferView(0, cbv);
 			commandList->SetGraphicsRoot32BitConstants(1, &const32Bit, 1);
+			commandList->SetGraphicsRootShaderResourceView(2, material->SurfaceTextureSRV);
 			commandList->DrawMesh(*drawCommand);
 
 			cbvIterator.MoveNext();

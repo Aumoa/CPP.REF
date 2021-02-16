@@ -16,14 +16,24 @@ PrimitiveComponent::~PrimitiveComponent()
 
 void PrimitiveComponent::ResolveDirtyState()
 {
+	bool bRecreated = false;
 	if (HasDirtyMark(EComponentDirtyMask::RecreateProxy))
 	{
 		sceneProxy = CreateSceneProxy();
+		bRecreated = true;
 	}
 
-	if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && sceneProxy.IsValid)
+	if (sceneProxy.IsValid)
 	{
-		sceneProxy->UpdateMovable();
+		if (bRecreated || HasDirtyMark(EComponentDirtyMask::UpdateProxy))
+		{
+			sceneProxy->Update();
+		}
+
+		if (bRecreated || HasDirtyMark(EComponentDirtyMask::TransformUpdated))
+		{
+			sceneProxy->UpdateTransform();
+		}
 	}
 
 	Super::ResolveDirtyState();

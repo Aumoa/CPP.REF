@@ -12,4 +12,5 @@ interface GAME_API IRHIMaterialBundle : virtual public Object, virtual public IR
 {
 	virtual TRefPtr<MaterialInterface> CreateMaterial() = 0;
 	virtual uint64 GetMaterialsBufferVirtualAddress() const = 0;
+	virtual MaterialInterface* FindMaterialFromIndex(uint16 index) const = 0;
 };

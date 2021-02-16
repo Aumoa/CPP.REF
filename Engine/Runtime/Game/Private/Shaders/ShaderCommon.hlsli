@@ -13,6 +13,7 @@ struct Vertex
 struct Fragment
 {
 	float4 PosH : SV_POSITION;
+	float2 Tex : TEXCOORD;
 	float3 Normal : NORMAL;
 };
 

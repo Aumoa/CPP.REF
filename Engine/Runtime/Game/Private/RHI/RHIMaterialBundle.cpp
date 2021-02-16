@@ -75,12 +75,20 @@ void RHIMaterialBundle::Commit(IRHICommandList* inCommandList)
 
 TRefPtr<MaterialInterface> RHIMaterialBundle::CreateMaterial()
 {
-	return NewObject<Material>(Issue(), this);
+	auto issue = Issue();
+	auto material = NewObject<Material>(issue, this);
+	materials[issue] = material.Get();
+	return material;
 }
 
 uint64 RHIMaterialBundle::GetMaterialsBufferVirtualAddress() const
 {
 	return immutableBuffer->GetVirtualAddress();
+}
+
+MaterialInterface* RHIMaterialBundle::FindMaterialFromIndex(uint16 index) const
+{
+	return materials[index];
 }
 
 void RHIMaterialBundle::EnqueueDirty(MaterialInterface* inQuery)
@@ -97,6 +105,15 @@ void* RHIMaterialBundle::GetUploadBufferPointer(uint16 inMaterialIndex)
 uint64 RHIMaterialBundle::GetBufferVirtualAddress() const
 {
 	return immutableBuffer->GetVirtualAddress();
+}
+
+void RHIMaterialBundle::ReleaseMaterial(uint16 index)
+{
+	if (materials[index] != nullptr)
+	{
+		materials[index] = nullptr;
+		reserved.emplace(index);
+	}
 }
 
 uint16 RHIMaterialBundle::Issue()
@@ -149,6 +166,7 @@ void RHIMaterialBundle::Resize(size_t inNewSize)
 	}
 
 	currSize = inNewSize;
+	materials.resize(currSize);
 }
 
 pair<uint64, uint64> RHIMaterialBundle::GetVirtualAddressRange(uint16 index) const

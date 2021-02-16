@@ -2,8 +2,11 @@
 
 #include "Materials/Material.h"
 
+#include "Engine.h"
 #include "RHI/RHICommon.h"
 #include "RHI/RHIMaterialBundle.h"
+#include "RHI/IRHIDeviceBundle.h"
+#include "RHI/IRHIShaderResourceView.h"
 
 Material::Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle) : Super(inMaterialIndex)
 	, bMarkDirty(false)
@@ -15,7 +18,7 @@ Material::Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle) : Super(
 
 Material::~Material()
 {
-
+	owner->ReleaseMaterial(Index);
 }
 
 void Material::SetMarkDirty(EMaterialDirtyMask inAddMask)
@@ -42,6 +45,24 @@ void Material::ResolveDirtyState()
 		memcpy(uploadBufferPtr, &mat, sizeof(mat));
 	}
 
+	if (HasDirtyMark(EMaterialDirtyMask::SurfaceTexture))
+	{
+		IRHIResource* ppResources[] = { DiffuseMap, NormalMap };
+		if (textureGroupView.IsValid)
+		{
+			GEngine.DeviceBundle->UpdateTextureGroupView(textureGroupView.Get(), ppResources);
+		}
+		else
+		{
+			textureGroupView = GEngine.DeviceBundle->CreateTextureGroupView(ppResources);
+		}
+	}
+
 	Super::ResolveDirtyState();
 	bMarkDirty = false;
+}
+
+IRHIShaderResourceView* Material::SurfaceTextureSRV_get() const
+{
+	return textureGroupView.Get();
 }

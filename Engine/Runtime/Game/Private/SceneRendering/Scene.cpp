@@ -71,11 +71,13 @@ void Scene::CalcVisibility()
 
 	localPlayerVisibility->UpdateView(viewInfo);
 	localPlayerVisibility->CalcVisibility();
+
+	numSRVs = 256;  // Reserved
+	numSRVs += localPlayerVisibility->NumPrimitivesRender * 2;  // Material
 }
 
 void Scene::BeginRender(IRHICommandList* inCommandList)
 {
-	// numSRVs is 2048 that is experimental implementation.
 	srvPatch->ReallocAndStart(numSRVs);
 	inCommandList->SetShaderDescriptorPatch(srvPatch.Get());
 }

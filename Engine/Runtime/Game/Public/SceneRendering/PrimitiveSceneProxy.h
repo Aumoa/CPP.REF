@@ -18,14 +18,15 @@ public:
 	using This = PrimitiveSceneProxy;
 
 private:
-	PrimitiveComponent* myPrimitiveComponent;
+	TWeakPtr<PrimitiveComponent> myPrimitiveComponent;
 	Transform transform;
 
 public:
 	PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent);
 	~PrimitiveSceneProxy();
 
-	virtual void UpdateMovable();
+	virtual void Update();
+	virtual void UpdateTransform();
 
 	virtual MeshBatch* GetMeshBatch() const;
 	virtual Transform GetPrimitiveTransform() const;

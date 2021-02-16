@@ -19,7 +19,12 @@ PrimitiveSceneProxy::~PrimitiveSceneProxy()
 
 }
 
-void PrimitiveSceneProxy::UpdateMovable()
+void PrimitiveSceneProxy::Update()
+{
+
+}
+
+void PrimitiveSceneProxy::UpdateTransform()
 {
 	transform = myPrimitiveComponent->ComponentTransform;
 }

@@ -151,6 +151,29 @@ TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureView(IRHIResourc
 	return NewObject<D3D12SingleShaderResourceViewNode>(resource1, index);
 }
 
+TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureGroupView(span<IRHIResource*> inResources)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC nullSRV = { };
+	nullSRV.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	nullSRV.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	nullSRV.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	auto multiSRV = NewObject<D3D12IndependentShaderResourceView>(d3d12Device.Get(), inResources.size());
+
+	for (size_t i = 0; i < inResources.size(); ++i)
+	{
+		auto d3d12Resource = Cast<D3D12Resource>(inResources[i]);
+		ID3D12Resource* resource = nullptr;
+		if (d3d12Resource != nullptr)
+		{
+			resource = d3d12Resource->Resource;
+		}
+
+		multiSRV->CreateView(i, resource, resource == nullptr ? &nullSRV : nullptr);
+	}
+
+	return multiSRV;
+}
+
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue)
 {
 	D3D12_HEAP_PROPERTIES heapProp{ };
@@ -533,6 +556,33 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateImmutableBuffer(size_t sizeInByte
 	return NewObject<D3D12Resource>(pResource.Get());
 }
 
+void D3D12DeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, span<IRHIResource*> inResources)
+{
+	if (inView->Count != inResources.size())
+	{
+		SE_LOG(LogRHI, Error, L"UpdateTextureGroupView: SRVs count of ShaderResourceView({0}) is not equals to count of new resources({1}).", inView->Count, inResources.size());
+		return;
+	}
+
+	D3D12IndependentShaderResourceView* d3d12Srv = Cast<D3D12IndependentShaderResourceView>(inView);
+	D3D12_SHADER_RESOURCE_VIEW_DESC nullSRV = { };
+	nullSRV.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	nullSRV.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	nullSRV.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	for (size_t i = 0; i < inResources.size(); ++i)
+	{
+		auto d3d12Resource = Cast<D3D12Resource>(inResources[i]);
+		ID3D12Resource* resource = nullptr;
+		if (d3d12Resource != nullptr)
+		{
+			resource = d3d12Resource->Resource;
+		}
+		
+		d3d12Srv->CreateView(i, resource, resource == nullptr ? &nullSRV : nullptr);
+	}
+}
+
 ID3D12Device* D3D12DeviceBundle::Device_get() const
 {
 	return d3d12Device.Get();
@@ -745,10 +795,21 @@ void D3D12DeviceBundle::InitializeShaders()
 #undef DOMAIN
 
 	{  // Geometry Shader
+		D3D12_DESCRIPTOR_RANGE ranges[] =
+		{
+			{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+		};
+
 		D3D12_ROOT_PARAMETER RootParameters[]
 		{
 			GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX),
 			GetRoot32BitCBVParameter(0, 1, D3D12_SHADER_VISIBILITY_PIXEL),
+			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_PIXEL, ranges)
+		};
+
+		D3D12_STATIC_SAMPLER_DESC staticSamplers[] =
+		{
+			GetStaticSampler(D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP)
 		};
 
 		D3D12_INPUT_ELEMENT_DESC InputElements[]
@@ -758,7 +819,7 @@ void D3D12DeviceBundle::InitializeShaders()
 			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 		};
 
-		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, { });
+		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, staticSamplers);
 		RSDesc.Flags = GetRSFlagsIA3(HULL, DOMAIN, GEOMETRY);
 		ComPtr<ID3D12RootSignature> pRS = CreateRootSignature(RSDesc);
 
