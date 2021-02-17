@@ -20,6 +20,7 @@
 #include "Assets/AssetManager.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "PlatformMisc/PlatformInput.h"
+#include "PlatformMisc/PlatformImageLoader.h"
 
 #include "D3D12RHI/D3D12DeviceBundle.h"
 //#include "VulkanRHI/VulkanDeviceBundle.h"
@@ -44,8 +45,7 @@ Engine::Engine() : Super()
 
 Engine::~Engine()
 {
-	// Waiting for all GPU tasks.
-	autoFence->BeginFence();
+
 }
 
 void Engine::Initialize()
@@ -57,6 +57,7 @@ void Engine::Initialize()
 	}
 	gEngine = this;
 
+	PlatformImageLoader::Initialize();
 	InitializeBundles();
 
 	autoFence = deviceBundle->CreateCommandFence();
@@ -89,7 +90,11 @@ void Engine::Tick()
 
 void Engine::Shutdown()
 {
+	// Waiting for all GPU tasks.
+	autoFence->BeginFence();
+
 	CycleStatsGroup::ReadyToShutdown();
+	PlatformImageLoader::Shutdown();
 }
 
 AssetManager* Engine::GetAssetManager() const

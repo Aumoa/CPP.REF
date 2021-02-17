@@ -25,6 +25,7 @@
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
 #include "RHI/RHITextureClearValue.h"
+#include "PlatformMisc/PlatformImage.h"
 
 using namespace std;
 
@@ -172,39 +173,6 @@ TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureGroupView(span<I
 	}
 
 	return multiSRV;
-}
-
-TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue)
-{
-	D3D12_HEAP_PROPERTIES heapProp{ };
-	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-	D3D12_RESOURCE_DESC desc{ };
-	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	desc.Width = (UINT64)width;
-	desc.Height = (UINT)height;
-	desc.DepthOrArraySize = 1;
-	desc.MipLevels = 1;
-	desc.Format = (DXGI_FORMAT)format;
-	desc.SampleDesc = { 1, 0 };
-	desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
-
-	D3D12_CLEAR_VALUE clearValue;
-	clearValue.Format = (DXGI_FORMAT)inClearValue.Format;
-	if (inClearValue.IsColor)
-	{
-		memcpy(clearValue.Color, &inClearValue.Color.R, sizeof(Color));
-	}
-	else if (inClearValue.IsDepthStencil)
-	{
-		clearValue.DepthStencil.Depth = inClearValue.Depth;
-		clearValue.DepthStencil.Stencil = inClearValue.Stencil;
-	}
-
-	ComPtr<ID3D12Resource> resource;
-	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, (D3D12_RESOURCE_STATES)initialStates, inClearValue.IsValid ? &clearValue : nullptr, IID_PPV_ARGS(&resource)));
-
-	return NewObject<D3D12Resource>(resource.Get());
 }
 
 TRefPtr<IRHIDeferredCommandList> D3D12DeviceBundle::CreateDeferredCommandList()
@@ -556,6 +524,115 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateImmutableBuffer(size_t sizeInByte
 	return NewObject<D3D12Resource>(pResource.Get());
 }
 
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue)
+{
+	D3D12_HEAP_PROPERTIES heapProp{ };
+	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_RESOURCE_DESC desc{ };
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	desc.Width = (UINT64)width;
+	desc.Height = (UINT)height;
+	desc.DepthOrArraySize = 1;
+	desc.MipLevels = 1;
+	desc.Format = (DXGI_FORMAT)format;
+	desc.SampleDesc = { 1, 0 };
+	desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
+
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = (DXGI_FORMAT)inClearValue.Format;
+	if (inClearValue.IsColor)
+	{
+		memcpy(clearValue.Color, &inClearValue.Color.R, sizeof(Color));
+	}
+	else if (inClearValue.IsDepthStencil)
+	{
+		clearValue.DepthStencil.Depth = inClearValue.Depth;
+		clearValue.DepthStencil.Stencil = inClearValue.Stencil;
+	}
+
+	ComPtr<ID3D12Resource> resource;
+	HR(d3d12Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &desc, (D3D12_RESOURCE_STATES)initialStates, inClearValue.IsValid ? &clearValue : nullptr, IID_PPV_ARGS(&resource)));
+
+	return NewObject<D3D12Resource>(resource.Get());
+}
+
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage)
+{
+	D3D12_RESOURCE_DESC textureDesc = { };
+	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	textureDesc.Width = platformImage->Width;
+	textureDesc.Height = platformImage->Height;
+	textureDesc.DepthOrArraySize = 1;
+	textureDesc.MipLevels = 1;
+	textureDesc.Format = (DXGI_FORMAT)format;
+	textureDesc.SampleDesc = { 1, 0 };
+	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+	D3D12_HEAP_PROPERTIES heap = { };
+	heap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	// Create texture immutable buffer for copy destination.
+	ComPtr<ID3D12Resource> resource;
+	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+	// Get copyable footprint.
+	uint64 totalBytes;
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
+	d3d12Device->GetCopyableFootprints(&textureDesc, 0, 1, 0, &layout, nullptr, nullptr, &totalBytes);
+
+	D3D12_RESOURCE_DESC bufferDesc{ };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = totalBytes;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	// Create upload heap for copy source that texture pixels.
+	ComPtr<ID3D12Resource> uploadHeap;
+	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+	HR(d3d12Device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	// Copy pixels.
+	void* pData;
+	HR(uploadHeap->Map(0, nullptr, &pData));
+	platformImage->CopyPixels(layout.Footprint.RowPitch, totalBytes, (int8*)pData);
+	uploadHeap->Unmap(0, nullptr);
+
+	// Ready to upload to destination texture heap.
+	D3D12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	D3D12_TEXTURE_COPY_LOCATION dst = { }, src = { };
+	dst.pResource = resource.Get();
+	dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	dst.SubresourceIndex = 0;
+	src.pResource = uploadHeap.Get();
+	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	src.PlacedFootprint = layout;
+
+	// Commit copy commands.
+	TRefPtr<D3D12DeferredCommandList> deferredCmd = Cast<D3D12DeferredCommandList>(CreateDeferredCommandList());
+	deferredCmd->BeginCommand();
+	deferredCmd->CommandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+	deferredCmd->CommandList->ResourceBarrier(1, &barrier);
+	deferredCmd->EndCommand();
+
+	uint64 issued = resourceGC->IssueNumber();
+	resourceGC->AddPendingResource(deferredCmd, issued);
+	resourceGC->AddPendingResource(NewObject<D3D12Resource>(uploadHeap.Get()), issued);
+
+	immediateCommandList->ExecuteCommandList(deferredCmd.Get());
+	resourceGC->SignalNumber(issued);
+
+	return NewObject<D3D12Resource>(resource.Get());
+}
+
 void D3D12DeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, span<IRHIResource*> inResources)
 {
 	if (inView->Count != inResources.size())
@@ -666,8 +743,7 @@ void D3D12DeviceBundle::InitializeD3D12()
 #include "CompiledShaders/GeometryVertexShader.generated.h"
 #include "CompiledShaders/GeometryPixelShader.generated.h"
 #include "CompiledShaders/LightingVertexShader.generated.h"
-#include "CompiledShaders/LightAccumulatePixelShader.generated.h"
-#include "CompiledShaders/ColorEmplacePixelShader.generated.h"
+#include "CompiledShaders/LightingPixelShader.generated.h"
 #include "CompiledShaders/TonemapVertexShader.generated.h"
 #include "CompiledShaders/TonemapPixelShader.generated.h"
 
@@ -887,19 +963,13 @@ void D3D12DeviceBundle::InitializeShaders()
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = GetInitialPipelineDesc(pRS.Get());
 		PSDesc.VS = GetShaderBytecode(pLightingVertexShader);
-		PSDesc.PS = GetShaderBytecode(pLightAccumulatePixelShader);
+		PSDesc.PS = GetShaderBytecode(pLightingPixelShader);
 		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		PSDesc.BlendState.RenderTarget[0] = RTBlendAcc;
 		ComPtr<ID3D12PipelineState> pPS;
 		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
 		lib->SetShader(RHIShaderLibrary::LightingShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
-
-		PSDesc.PS = GetShaderBytecode(pColorEmplacePixelShader);
-		PSDesc.BlendState.RenderTarget[0] = RTBlendMul;
-		SetRTVFormats(PSDesc, DXGI_FORMAT_R16G16B16A16_FLOAT);
-		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
-		lib->SetShader(RHIShaderLibrary::ColorEmplaceShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
 	}
 
 	{  // Tonemap Shader

@@ -2,21 +2,18 @@
 
 #pragma once
 
-#undef interface
-
+#pragma warning(push)
+#pragma warning(disable: 4005)
 #include <dxgi1_6.h>
 #include <d3d12.h>
 #include <wrl/client.h>
+#pragma warning(pop)
 
 #include "Logging/LogCategoryBase.h"
 #include "HResultException.h"
 #include "RHI/RHIResourceStates.h"
 #include "RHI/RHITextureFormat.h"
 #include "RHI/RHIResourceFlags.h"
-
-#ifndef interface
-#define interface struct
-#endif
 
 using Microsoft::WRL::ComPtr;
 

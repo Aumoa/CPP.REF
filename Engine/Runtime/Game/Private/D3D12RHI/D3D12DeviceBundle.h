@@ -59,7 +59,6 @@ public:
 	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat);
 	virtual TRefPtr<IRHIShaderResourceView> CreateTextureView(IRHIResource* resource, ERHITextureFormat inViewFormat);
 	virtual TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(std::span<IRHIResource*> inResources);
-	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch();
@@ -70,6 +69,8 @@ public:
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);
 	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState);
+	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
+	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage);
 
 	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource*> inResources);
 

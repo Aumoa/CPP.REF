@@ -504,6 +504,21 @@
     <ClInclude Include="Public\RHI\IRHIOnlineDescriptorPatch.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\RHI\RHIImage.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PlatformMisc\PlatformImageLoader.h">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PlatformMisc\PlatformImageCommon.inl">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PlatformMisc\PlatformImage.h">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\PlatformMisc\PlatformBitmapFrame.h">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppDuplicationException.cpp">
@@ -794,6 +809,15 @@
     <ClCompile Include="Private\Engine.LoadEngineDefaultAssets.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformImageLoader.cpp">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformImage.cpp">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformBitmapFrame.cpp">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -864,12 +888,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\LightingShader\LightAccumulatePixelShader.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\ColorEmplacePixelShader.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
-    </FxCompile>
     <FxCompile Include="Private\Shaders\GeometryShader\GeometryPixelShader.hlsl">
       <Filter>Private\Shaders\GeometryShader</Filter>
     </FxCompile>
@@ -884,6 +902,9 @@
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapVertexShader.hlsl">
       <Filter>Private\Shaders\TonemapShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\LightingShader\LightingPixelShader.hlsl">
+      <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

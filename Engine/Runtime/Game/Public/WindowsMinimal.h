@@ -4,8 +4,6 @@
 
 #ifdef __SC_RUNTIME_GAME_API__
 
-#undef interface
-
 #define WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
 #define NOMENUS
@@ -17,12 +15,15 @@
 #define NOMCX
 #define NOHELP
 
+#pragma warning(push)
+#pragma warning(disable: 4005)
 #include <Windows.h>
+#include <wrl/client.h>
 #include <crtdbg.h>
+#include <wincodec.h>
+#pragma warning(pop)
 
-#ifndef interface
-#define interface struct
-#endif
+using Microsoft::WRL::ComPtr;
 
 #undef CreateWindow
 

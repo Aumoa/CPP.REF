@@ -116,10 +116,6 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 		inCommandList->DrawMesh(Quad);
 	}
 
-	shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::ColorEmplaceShader);
-	inCommandList->SetShader(shader);
-	inCommandList->DrawMesh(Quad);
-
 	inCommandList->EndRenderTarget(hdrBuffer.Get());
 }
 

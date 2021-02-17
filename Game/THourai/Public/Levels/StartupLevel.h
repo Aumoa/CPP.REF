@@ -21,7 +21,6 @@ public:
 
 private:
 	ADirectionalLight* light;
-	ADirectionalLight* light2;
 
 	AStaticMeshActor* plane;
 	AStaticMeshActor* geosphere;
