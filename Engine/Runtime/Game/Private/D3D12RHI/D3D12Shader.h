@@ -16,17 +16,18 @@ public:
 
 private:
 	ComPtr<ID3D12RootSignature> rootSignature;
-	ComPtr<ID3D12PipelineState> pipelineState;
+	ComPtr<ID3D12Pageable> pipelineState;
+	ComPtr<ID3D12StateObjectProperties> raytracingProperties;
 
-	bool bShaderInitialized : 1;
+	bool bRaytracing : 1;
 	size_t shaderTypeHash;
 
 public:
 	D3D12Shader(ID3D12RootSignature* inRootSignature, ID3D12PipelineState* inPipelineState);
+	D3D12Shader(ID3D12RootSignature* inRootSignature, ID3D12StateObject* inPipelineState, ID3D12StateObjectProperties* raytracingProperties);
 	~D3D12Shader();
 
-	vs_property_get(ID3D12RootSignature*, RootSignature);
-	ID3D12RootSignature* RootSignature_get() const;
-	vs_property_get(ID3D12PipelineState*, PipelineState);
-	ID3D12PipelineState* PipelineState_get() const;
+	void InputShader(ID3D12GraphicsCommandList4* inCommandList);
+
+	vs_property_get_auto(bool, IsRaytracingShader, bRaytracing);
 };

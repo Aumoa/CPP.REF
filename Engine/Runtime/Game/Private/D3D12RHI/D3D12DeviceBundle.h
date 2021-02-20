@@ -28,7 +28,7 @@ private:
 	ComPtr<IDXGIFactory2> dxgiFactory;
 
 	ComPtr<IDXGIAdapter1> primaryAdapter;
-	ComPtr<ID3D12Device> d3d12Device;
+	ComPtr<ID3D12Device5> d3d12Device;
 
 	TRefPtr<D3D12SwapChain> swapChain;
 	TRefPtr<D3D12ImmediateCommandList> immediateCommandList;

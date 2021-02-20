@@ -22,7 +22,6 @@ using namespace std;
 D3D12CommandList::D3D12CommandList() : Super()
 	, bHasBegunCommand(false)
 
-	, currentRS(nullptr)
 	, currentPatch(nullptr)
 {
 
@@ -36,7 +35,6 @@ D3D12CommandList::~D3D12CommandList()
 void D3D12CommandList::BeginCommand()
 {
 	bHasBegunCommand = true;
-	currentRS = nullptr;
 	currentPatch = nullptr;
 }
 
@@ -123,13 +121,7 @@ void D3D12CommandList::SetGraphicsRootShaderResource(uint32 inParamIndex, uint64
 void D3D12CommandList::SetShader(IRHIShader* shader)
 {
 	auto d3d12Shader = Cast<D3D12Shader>(shader);
-	
-	if (currentRS != d3d12Shader->RootSignature)
-	{
-		CommandList->SetGraphicsRootSignature(d3d12Shader->RootSignature);
-		currentRS = d3d12Shader->RootSignature;
-	}
-	CommandList->SetPipelineState(d3d12Shader->PipelineState);
+	d3d12Shader->InputShader(CommandList);
 }
 
 void D3D12CommandList::SetPrimitiveTopology(ERHIPrimitiveTopology primitiveTopology)

@@ -906,7 +906,7 @@
     <FxCompile Include="Private\Shaders\LightingShader\LightingPixelShader.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LIghtingRayGeneration.hlsl">
+    <FxCompile Include="Private\Shaders\LightingShader\LightingRayGeneration.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
   </ItemGroup>

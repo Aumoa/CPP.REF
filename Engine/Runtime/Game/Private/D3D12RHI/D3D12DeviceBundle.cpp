@@ -775,6 +775,7 @@ void D3D12DeviceBundle::InitializeD3D12()
 #include "CompiledShaders/GeometryPixelShader.generated.h"
 #include "CompiledShaders/LightingVertexShader.generated.h"
 #include "CompiledShaders/LightingPixelShader.generated.h"
+#include "CompiledShaders/LightingRayGeneration.generated.h"
 #include "CompiledShaders/TonemapVertexShader.generated.h"
 #include "CompiledShaders/TonemapPixelShader.generated.h"
 
@@ -1035,7 +1036,92 @@ void D3D12DeviceBundle::InitializeShaders()
 	}
 
 	{  // Lighting Shader
+		D3D12_DESCRIPTOR_RANGE rtv[] =
+		{
+			{ D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+		};
 
+		D3D12_DESCRIPTOR_RANGE srv[] =
+		{
+			{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+		};
+
+		D3D12_ROOT_PARAMETER RootParameters[] =
+		{
+			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_ALL, rtv),
+			GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL),
+			GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_ALL, srv),
+			GetRootCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL),
+			GetRootShaderResourceView(3, D3D12_SHADER_VISIBILITY_ALL),
+		};
+
+		D3D12_ROOT_SIGNATURE_DESC RSDesc = GetRootSignatureDesc(RootParameters, { });
+		ComPtr<ID3D12RootSignature> pRS = CreateRootSignature(RSDesc);
+
+		D3D12_EXPORT_DESC exportDesc[] =
+		{
+			{ L"LightingRayGeneration", nullptr, D3D12_EXPORT_FLAG_NONE }
+		};
+
+		D3D12_DXIL_LIBRARY_DESC lightingRayGeneration =
+		{
+			GetShaderBytecode(pLightingRayGeneration),
+			1,
+			exportDesc
+		};
+
+		D3D12_STATE_SUBOBJECT shaders =
+		{
+			D3D12_STATE_SUBOBJECT_TYPE_DXIL_LIBRARY,
+			&lightingRayGeneration
+		};
+
+		D3D12_RAYTRACING_SHADER_CONFIG shaderConfigDesc =
+		{
+			0,
+			sizeof(Vector2)
+		};
+
+		D3D12_STATE_SUBOBJECT shaderConfig =
+		{
+			D3D12_STATE_SUBOBJECT_TYPE_RAYTRACING_SHADER_CONFIG,
+			& shaderConfigDesc
+		};
+
+		D3D12_STATE_SUBOBJECT globalRS =
+		{
+			D3D12_STATE_SUBOBJECT_TYPE_GLOBAL_ROOT_SIGNATURE,
+			pRS.GetAddressOf()
+		};
+
+		D3D12_RAYTRACING_PIPELINE_CONFIG pipelineDesc =
+		{
+			1
+		};
+
+		D3D12_STATE_SUBOBJECT pipeline =
+		{
+			D3D12_STATE_SUBOBJECT_TYPE_RAYTRACING_PIPELINE_CONFIG,
+			&pipelineDesc,
+		};
+
+		D3D12_STATE_SUBOBJECT subobjects[] =
+		{
+			shaders,
+			shaderConfig,
+			globalRS,
+			pipeline
+		};
+
+		D3D12_STATE_OBJECT_DESC pipelineObject =
+		{
+			D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE,
+			4,
+			subobjects
+		};
+
+		ComPtr<ID3D12StateObject> pStateObject;
+		HR(d3d12Device->CreateStateObject(&pipelineObject, IID_PPV_ARGS(&pStateObject)));
 	}
 }
 

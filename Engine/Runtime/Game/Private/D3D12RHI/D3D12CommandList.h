@@ -19,7 +19,6 @@ private:
 	std::vector<D3D12_RESOURCE_BARRIER> pendingBarriers;
 	bool bHasBegunCommand : 1;
 
-	ID3D12RootSignature* currentRS;
 	D3D12OnlineDescriptorPatch* currentPatch;
 
 public:

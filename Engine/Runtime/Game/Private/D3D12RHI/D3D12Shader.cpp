@@ -7,6 +7,15 @@
 using namespace std;
 
 D3D12Shader::D3D12Shader(ID3D12RootSignature* inRootSignature, ID3D12PipelineState* inPipelineState) : Super()
+	, bRaytracing(false)
+	, shaderTypeHash(0)
+{
+	rootSignature = inRootSignature;
+	pipelineState = inPipelineState;
+}
+
+D3D12Shader::D3D12Shader(ID3D12RootSignature* inRootSignature, ID3D12StateObject* inPipelineState, ID3D12StateObjectProperties* raytracingProperties) : Super()
+	, bRaytracing(true)
 	, shaderTypeHash(0)
 {
 	rootSignature = inRootSignature;
@@ -18,12 +27,8 @@ D3D12Shader::~D3D12Shader()
 
 }
 
-ID3D12RootSignature* D3D12Shader::RootSignature_get() const
+void D3D12Shader::InputShader(ID3D12GraphicsCommandList4* inCommandList)
 {
-	return rootSignature.Get();
-}
-
-ID3D12PipelineState* D3D12Shader::PipelineState_get() const
-{
-	return pipelineState.Get();
+	inCommandList->SetGraphicsRootSignature(rootSignature.Get());
+	inCommandList->SetPipelineState((ID3D12PipelineState*)pipelineState.Get());
 }

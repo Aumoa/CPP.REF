@@ -188,7 +188,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
   </ItemDefinitionGroup>
@@ -214,7 +214,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
   </ItemDefinitionGroup>
@@ -241,7 +241,7 @@
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
       <VariableName>p%(Filename)</VariableName>
-      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput>
       </ObjectFileOutput>
     </FxCompile>
@@ -531,9 +531,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="Private\Shaders\GeometryShader\GeometryVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
@@ -542,9 +539,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\LightingPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
@@ -553,17 +547,20 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LIghtingRayGeneration.hlsl">
+    <FxCompile Include="Private\Shaders\LightingShader\LightingRayGeneration.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Library</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">6.3</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
+      </EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </EntryPointName>
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\LightingVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
@@ -572,9 +569,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
@@ -583,9 +577,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapVertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
@@ -594,9 +585,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
