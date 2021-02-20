@@ -1,4 +1,4 @@
-// Copyright 2020 Aumoa.lib. All right reserved.
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #ifndef __PRIMITIVEPACKING_HLSLI__
 #define __PRIMITIVEPACKING_HLSLI__

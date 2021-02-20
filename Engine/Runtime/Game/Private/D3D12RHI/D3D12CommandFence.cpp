@@ -1,5 +1,5 @@
 ﻿
-// Copyright 2020 Aumoa.lib. All right reserved.
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "D3D12CommandFence.h"
 

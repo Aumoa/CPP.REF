@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "D3D12DeviceBundle.h"
 
@@ -1032,6 +1032,10 @@ void D3D12DeviceBundle::InitializeShaders()
 		HR(d3d12Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
 
 		lib->SetShader(RHIShaderLibrary::TonemapShader, NewObject<D3D12Shader>(pRS.Get(), pPS.Get()));
+	}
+
+	{  // Lighting Shader
+
 	}
 }
 
