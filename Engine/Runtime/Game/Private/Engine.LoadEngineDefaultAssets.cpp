@@ -10,6 +10,11 @@
 #include "RHI/IRHIMaterialBundle.h"
 #include "RHI/IRHIResourceBundle.h"
 
+#include "RHI/IRHIDeviceBundle.h"
+#include "RHI/IRHIResource.h"
+#include "PlatformMisc/PlatformImageLoader.h"
+#include "PlatformMisc/PlatformBitmapFrame.h"
+
 using namespace std;
 
 inline void LoadEngineDefaultMaterials(Engine* engine)
@@ -18,11 +23,17 @@ inline void LoadEngineDefaultMaterials(Engine* engine)
 	auto mgr = engine->GetAssetManager();
 
 	{
+		auto imageLoader = engine->NewObject<PlatformImageLoader>(L"img.jpg");
+		auto imageFrame = imageLoader->GetFrame(0);
+		auto imageConv = imageFrame->FormatConvert(ERHITextureFormat::B8G8R8A8_UNORM);
+		auto diffuseMap = engine->DeviceBundle->CreateTexture2D(ERHITextureFormat::B8G8R8A8_UNORM, imageConv.Get());
+
 		TRefPtr<MaterialInterface> material = bundle->CreateMaterial();
 		material->Ambient = 0.2f;
 		material->Diffuse = 0.5f;
 		material->Specular = 0.8f;
 		material->SpecExp = 32.0f;
+		material->DiffuseMap = diffuseMap.Get();
 		mgr->Import(L"Engine/Materials/Default", move(material).As<Material>());
 	}
 }
