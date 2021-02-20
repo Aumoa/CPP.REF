@@ -41,7 +41,7 @@ void D3D12DeferredCommandList::EndCommand()
 	Super::EndCommand();
 }
 
-ID3D12GraphicsCommandList* D3D12DeferredCommandList::CommandList_get()
+ID3D12GraphicsCommandList4* D3D12DeferredCommandList::CommandList_get()
 {
 	return commandList.Get();
 }
@@ -53,9 +53,9 @@ ComPtr<ID3D12CommandAllocator> D3D12DeferredCommandList::CreateCommandAllocator(
 	return move(allocator);
 }
 
-ComPtr<ID3D12GraphicsCommandList> D3D12DeferredCommandList::CreateCommandList(ID3D12Device* device, ID3D12CommandAllocator* allocator, D3D12_COMMAND_LIST_TYPE type)
+ComPtr<ID3D12GraphicsCommandList4> D3D12DeferredCommandList::CreateCommandList(ID3D12Device* device, ID3D12CommandAllocator* allocator, D3D12_COMMAND_LIST_TYPE type)
 {
-	ComPtr<ID3D12GraphicsCommandList> commandList;
+	ComPtr<ID3D12GraphicsCommandList4> commandList;
 	HR(device->CreateCommandList(0, type, allocator, nullptr, IID_PPV_ARGS(&commandList)));
 	return move(commandList);
 }

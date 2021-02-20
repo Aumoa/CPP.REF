@@ -214,6 +214,9 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 		TRefPtr<D3D12Resource> normalBuffer;
 		TRefPtr<D3D12Resource> depthStencilBuffer;
 
+		D3D12_RENDER_PASS_RENDER_TARGET_DESC renderPassRT[2];
+		D3D12_RENDER_PASS_DEPTH_STENCIL_DESC renderPassDS;
+
 	public:
 		D3D12GBufferRenderTarget(D3D12DeviceBundle* owner) : Super()
 			, bundle(nullptr)
@@ -223,6 +226,9 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 			, height(0)
 
 			, rtvIncrement(0)
+
+			, renderPassRT{ }
+			, renderPassDS{ }
 		{
 			bundle = owner;
 			device = bundle->Device;
@@ -253,8 +259,8 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
 			uint32 increment = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-			device->CreateRenderTargetView(colorBuffer->Resource, nullptr, rtvHandle.IncrementPost(increment));
-			device->CreateRenderTargetView(normalBuffer->Resource, nullptr, rtvHandle.IncrementPost(increment));
+			device->CreateRenderTargetView(colorBuffer->Resource, nullptr, rtvHandle);
+			device->CreateRenderTargetView(normalBuffer->Resource, nullptr, rtvHandle.Get(increment, 1));
 
 			D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = { };
 			dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
@@ -274,6 +280,29 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 
 			this->width = width;
 			this->height = height;
+
+			D3D12_CLEAR_VALUE clearValue = { };
+			clearValue.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+			renderPassRT[0].cpuDescriptor = rtvHandle;
+			renderPassRT[0].BeginningAccess.Type = D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
+			renderPassRT[0].BeginningAccess.Clear.ClearValue = clearValue;
+			renderPassRT[0].EndingAccess.Type = D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
+
+			clearValue.Format = DXGI_FORMAT_R16G16B16A16_UINT;
+			renderPassRT[1].cpuDescriptor = rtvHandle.Get(increment, 1);
+			renderPassRT[1].BeginningAccess.Type = D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
+			renderPassRT[1].BeginningAccess.Clear.ClearValue = clearValue;
+			renderPassRT[1].EndingAccess.Type = D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
+
+			clearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			clearValue.DepthStencil.Depth = 1.0f;
+			renderPassDS.cpuDescriptor = dsvHandle;
+			renderPassDS.DepthBeginningAccess.Type = D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
+			renderPassDS.DepthBeginningAccess.Clear.ClearValue = clearValue;
+			renderPassDS.DepthEndingAccess.Type = D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
+			renderPassDS.StencilBeginningAccess.Type = D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
+			renderPassDS.StencilBeginningAccess.Clear.ClearValue = clearValue;
+			renderPassDS.StencilEndingAccess.Type = D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
 		}
 
 		virtual size_t GetRenderTargetCount() const
@@ -292,7 +321,7 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 			return srvHeap.Get();
 		}
 
-		void BeginRender(ID3D12GraphicsCommandList* inCommandList) override
+		void BeginRender(ID3D12GraphicsCommandList4* inCommandList) override
 		{
 			D3D12_RESOURCE_BARRIER barriers[3] =
 			{
@@ -302,16 +331,7 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 			};
 
 			inCommandList->ResourceBarrier(3, barriers);
-
-			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
-			auto dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
-
-			inCommandList->OMSetRenderTargets(2, &rtvHandle, TRUE, &dsvHandle);
-
-			FLOAT transparent[4] = { };
-			inCommandList->ClearRenderTargetView(rtvHandle.Get(rtvIncrement, 0), transparent, 0, nullptr);
-			inCommandList->ClearRenderTargetView(rtvHandle.Get(rtvIncrement, 1), transparent, 0, nullptr);
-			inCommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+			inCommandList->BeginRenderPass(2, renderPassRT, &renderPassDS, D3D12_RENDER_PASS_FLAG_NONE);
 
 			D3D12_VIEWPORT vp = { };
 			vp.Width = (float)width;
@@ -326,7 +346,7 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 			inCommandList->RSSetScissorRects(1, &sc);
 		}
 
-		void EndRender(ID3D12GraphicsCommandList* inCommandList) override
+		void EndRender(ID3D12GraphicsCommandList4* inCommandList) override
 		{
 			D3D12_RESOURCE_BARRIER barriers[3] =
 			{
@@ -335,6 +355,7 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateGBufferRenderTarget()
 				TRANSITION(depthStencilBuffer, DEPTH_WRITE, PIXEL_SHADER_RESOURCE)
 			};
 
+			inCommandList->EndRenderPass();
 			inCommandList->ResourceBarrier(3, barriers);
 		}
 	};
@@ -360,6 +381,7 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
 		TRefPtr<D3D12IndependentShaderResourceView> srvHeap;
 
 		TRefPtr<D3D12Resource> colorBuffer;
+		D3D12_RENDER_PASS_RENDER_TARGET_DESC renderPass;
 
 	public:
 		D3D12HDRRenderTarget(D3D12DeviceBundle* owner) : Super()
@@ -368,6 +390,8 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
 
 			, width(0)
 			, height(0)
+
+			, renderPass{ }
 		{
 			bundle = owner;
 			device = bundle->Device;
@@ -395,6 +419,14 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
 
 			this->width = width;
 			this->height = height;
+
+			D3D12_CLEAR_VALUE clearValue = { };
+			clearValue.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+
+			renderPass.cpuDescriptor = rtvHandle;
+			renderPass.BeginningAccess.Type = D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR;
+			renderPass.BeginningAccess.Clear.ClearValue = clearValue;
+			renderPass.EndingAccess.Type = D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE;
 		}
 
 		virtual size_t GetRenderTargetCount() const
@@ -412,7 +444,7 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
 			return srvHeap.Get();
 		}
 
-		void BeginRender(ID3D12GraphicsCommandList* inCommandList) override
+		void BeginRender(ID3D12GraphicsCommandList4* inCommandList) override
 		{
 			D3D12_RESOURCE_BARRIER barriers[1] =
 			{
@@ -420,11 +452,9 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
 			};
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
-			inCommandList->ResourceBarrier(1, barriers);
-			inCommandList->OMSetRenderTargets(1, &rtvHandle, TRUE, nullptr);
 
-			FLOAT transparent[4] = { };
-			inCommandList->ClearRenderTargetView(rtvHandle, transparent, 0, nullptr);
+			inCommandList->ResourceBarrier(1, barriers);
+			inCommandList->BeginRenderPass(1, &renderPass, nullptr, D3D12_RENDER_PASS_FLAG_NONE);
 
 			D3D12_VIEWPORT vp = { };
 			vp.Width = (float)width;
@@ -439,13 +469,14 @@ TRefPtr<IRHIRenderTarget> D3D12DeviceBundle::CreateHDRRenderTarget()
 			inCommandList->RSSetScissorRects(1, &sc);
 		}
 
-		void EndRender(ID3D12GraphicsCommandList* inCommandList) override
+		void EndRender(ID3D12GraphicsCommandList4* inCommandList) override
 		{
 			D3D12_RESOURCE_BARRIER barriers[1] =
 			{
 				TRANSITION(colorBuffer, RENDER_TARGET, PIXEL_SHADER_RESOURCE),
 			};
 
+			inCommandList->EndRenderPass();
 			inCommandList->ResourceBarrier(1, barriers);
 		}
 	};

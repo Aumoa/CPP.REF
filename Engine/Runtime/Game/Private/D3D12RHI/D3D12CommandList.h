@@ -50,8 +50,8 @@ public:
 
 	virtual bool HasBegunCommand_get() const;
 
-	vs_property_get(ID3D12GraphicsCommandList*, CommandList);
-	virtual ID3D12GraphicsCommandList* CommandList_get() = 0;
+	vs_property_get(ID3D12GraphicsCommandList4*, CommandList);
+	virtual ID3D12GraphicsCommandList4* CommandList_get() = 0;
 
 private:
 	void ConsumePendingDeferredCommands();
