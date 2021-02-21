@@ -92,29 +92,27 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	SceneVisibility* localPlayerVisibility = inScene->GetLocalPlayerVisibility();
 	const uint64 playerCameraConstantAddr = localPlayerVisibility->ShaderCameraConstants->GetCameraConstantVirtualAddress();
 
+	IRHIDeviceBundle* deviceBundle = GEngine.DeviceBundle;
 	IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
+	RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
 
 	inCommandList->BeginRenderTarget(hdrBuffer.Get());
 
-	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::LightingShader);
+	IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
 	inCommandList->SetShader(shader);
 
-	inCommandList->SetGraphicsRootConstantBufferView(0, playerCameraConstantAddr);
-	inCommandList->SetGraphicsRootShaderResourceView(1, gBuffer->GetShaderResourceView());
-	inCommandList->SetGraphicsRootShaderResource(3, materialBundle->GetMaterialsBufferVirtualAddress());
-
-	RHIMeshDrawCommand Quad;
-	Quad.Topology = ERHIPrimitiveTopology::TriangleStrip;
-	Quad.VertexCount = 4;
-
 	const auto& lights = inScene->LightSceneProxies;
-	for (auto& light : lights)
-	{
-		LightBatch* batch = light->GetLightBatch();
-		inCommandList->SetGraphicsRootConstantBufferView(2, batch->GetLightBuffer()->GetVirtualAddress());
+	LightBatch* batch = lights[0]->GetLightBatch();
+	inCommandList->SetComputeRootUnorderedAccessView(0, hdrBuffer->GetUnorderedAccessView());
+	inCommandList->SetComputeRootConstantBufferView(1, playerCameraConstantAddr);
+	inCommandList->SetComputeRootShaderResourceView(2, gBuffer->GetShaderResourceView());
+	inCommandList->SetComputeRootConstantBufferView(3, batch->GetLightBuffer()->GetVirtualAddress());
+	inCommandList->SetComputeRootShaderResource(4, materialBundle->GetMaterialsBufferVirtualAddress());
 
-		inCommandList->DrawMesh(Quad);
-	}
+	RHIDispatchRaysDesc dispatchRays;
+	dispatchRays.Width = hdrBuffer->Width;
+	dispatchRays.Height = hdrBuffer->Height;
+	inCommandList->DispatchRays(dispatchRays);
 
 	inCommandList->EndRenderTarget(hdrBuffer.Get());
 }

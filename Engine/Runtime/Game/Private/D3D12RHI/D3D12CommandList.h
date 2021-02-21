@@ -47,6 +47,10 @@ public:
 	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget);
 	virtual void SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch);
 	virtual void SetComputeRootUnorderedAccessView(uint32 inParamIndex, IRHIUnorderedAccessView* inUAV);
+	virtual void DispatchRays(const RHIDispatchRaysDesc& dispatch);
+	virtual void SetComputeRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV);
+	virtual void SetComputeRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress);
+	virtual void SetComputeRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress);
 
 	virtual bool HasBegunCommand_get() const;
 

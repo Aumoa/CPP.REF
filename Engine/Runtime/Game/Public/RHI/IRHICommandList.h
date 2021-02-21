@@ -18,6 +18,7 @@ enum class ERHIResourceStates;
 enum class ERHIPrimitiveTopology;
 struct RHIViewport;
 struct RHIMeshDrawCommand;
+struct RHIDispatchRaysDesc;
 
 interface IRHICommandList : virtual public Object
 {
@@ -43,6 +44,10 @@ interface IRHICommandList : virtual public Object
 	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget) = 0;
 	virtual void SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch) = 0;
 	virtual void SetComputeRootUnorderedAccessView(uint32 inParamIndex, IRHIUnorderedAccessView* inUAV) = 0;
+	virtual void DispatchRays(const RHIDispatchRaysDesc& dispatch) = 0;
+	virtual void SetComputeRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV) = 0;
+	virtual void SetComputeRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
+	virtual void SetComputeRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

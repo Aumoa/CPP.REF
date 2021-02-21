@@ -15,6 +15,7 @@
 #include "Logging/LogMacros.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
+#include "RHI/RHIDispatchRaysDesc.h"
 
 using namespace std;
 
@@ -107,8 +108,6 @@ void D3D12CommandList::CopyBufferRegion(IRHIResource* inDstBuffer, uint64 inDstL
 
 void D3D12CommandList::SetGraphicsRoot32BitConstants(uint32 inParamIndex, const uint32* inBytes, size_t inNum32Bits, size_t location)
 {
-	ConsumePendingDeferredCommands();
-
 	if (inNum32Bits == 1)
 	{
 		CommandList->SetGraphicsRoot32BitConstant(inParamIndex, *inBytes, (UINT)location);
@@ -121,7 +120,6 @@ void D3D12CommandList::SetGraphicsRoot32BitConstants(uint32 inParamIndex, const 
 
 void D3D12CommandList::SetGraphicsRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress)
 {
-	ConsumePendingDeferredCommands();
 	CommandList->SetGraphicsRootShaderResourceView(inParamIndex, inVirtualAddress);
 }
 
@@ -241,6 +239,36 @@ void D3D12CommandList::SetComputeRootUnorderedAccessView(uint32 inParamIndex, IR
 	D3D12_GPU_DESCRIPTOR_HANDLE handle = currentPatch->GetOnlineHandle(patchIndex);
 	CommandList->SetComputeRootDescriptorTable(inParamIndex, handle);
 }
+
+void D3D12CommandList::DispatchRays(const RHIDispatchRaysDesc& dispatch)
+{
+	ConsumePendingDeferredCommands();
+
+	D3D12_DISPATCH_RAYS_DESC dispatchDesc = { };
+	dispatchDesc.Width = dispatch.Width;
+	dispatchDesc.Height = dispatch.Height;
+	dispatchDesc.Depth = 1;
+	CommandList->DispatchRays(&dispatchDesc);
+}
+
+void D3D12CommandList::SetComputeRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV)
+{
+	CHECK_PATCH;
+	size_t patchIndex = currentPatch->Patch(inSRV);
+	D3D12_GPU_DESCRIPTOR_HANDLE handle = currentPatch->GetOnlineHandle(patchIndex);
+	CommandList->SetComputeRootDescriptorTable(inRootParameterIndex, handle);
+}
+
+void D3D12CommandList::SetComputeRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress)
+{
+	CommandList->SetComputeRootConstantBufferView(inParamIndex, (D3D12_GPU_VIRTUAL_ADDRESS)inVirtualAddress);
+}
+
+void D3D12CommandList::SetComputeRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress)
+{
+	CommandList->SetComputeRootShaderResourceView(inParamIndex, inVirtualAddress);
+}
+
 bool D3D12CommandList::HasBegunCommand_get() const
 {
 	return bHasBegunCommand;

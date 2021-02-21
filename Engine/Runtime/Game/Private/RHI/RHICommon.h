@@ -16,3 +16,4 @@
 #include "RHI/RHIResourceDesc.h"
 #include "RHI/RHILight.h"
 #include "RHI/RHIMaterial.h"
+#include "RHI/RHIDispatchRaysDesc.h"
