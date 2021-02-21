@@ -41,7 +41,7 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE HandleBase_get() const;
 };
 
-class D3D12IndependentShaderResourceView : public D3D12ShaderResourceView, virtual public IRHIShaderResourceView
+class D3D12IndependentShaderResourceView : public D3D12ShaderResourceView
 {
 public:
 	using Super = D3D12ShaderResourceView;

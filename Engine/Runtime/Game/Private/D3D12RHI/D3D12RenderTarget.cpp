@@ -14,7 +14,7 @@ D3D12RenderTarget::~D3D12RenderTarget()
 
 }
 
-TRefPtr<D3D12Resource> D3D12RenderTarget::CreateTexture2D(ID3D12Device* device, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height)
+TRefPtr<D3D12Resource> D3D12RenderTarget::CreateTexture2D(ID3D12Device* device, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height, bool bAllowUnorderedAccess)
 {
 	D3D12_RESOURCE_DESC textureDesc = { };
 	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -25,6 +25,11 @@ TRefPtr<D3D12Resource> D3D12RenderTarget::CreateTexture2D(ID3D12Device* device, 
 	textureDesc.Format = format;
 	textureDesc.SampleDesc = { 1, 0 };
 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	if (bAllowUnorderedAccess)
+	{
+		textureDesc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
 
 	D3D12_HEAP_PROPERTIES heapProp = { };
 	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;

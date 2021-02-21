@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "D3D12DeviceBundle.h"
 #include "D3D12ShaderResourceView.h"
+#include "D3D12UnorderedAccessView.h"
 
 D3D12OnlineDescriptorPatch::D3D12OnlineDescriptorPatch() : Super()
 	, device(nullptr)
@@ -50,6 +51,16 @@ size_t D3D12OnlineDescriptorPatch::Patch(IRHIShaderResourceView* srv)
 	
 	size_t left = seekpos;
 	seekpos += srv->Count;
+	return left;
+}
+
+size_t D3D12OnlineDescriptorPatch::Patch(IRHIUnorderedAccessView* uav)
+{
+	auto seek = handle_seek.IncrementPost(increment, uav->Count);
+	device->CopyDescriptorsSimple((uint32)uav->Count, seek, Cast<D3D12UnorderedAccessView>(uav)->HandleBase, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	size_t left = seekpos;
+	seekpos += uav->Count;
 	return left;
 }
 

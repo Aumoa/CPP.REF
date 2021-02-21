@@ -63,8 +63,8 @@ public:
 	virtual TRefPtr<IRHIFence> CreateFence();
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch();
 
-	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget();
-	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget();
+	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget();  // D3D12GBufferRenderTarget.cpp
+	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget();  // D3D12HDRRenderTarget.cpp
 	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
 	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);

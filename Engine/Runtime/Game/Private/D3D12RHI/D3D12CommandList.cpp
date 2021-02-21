@@ -11,6 +11,7 @@
 #include "D3D12ShaderResourceView.h"
 #include "D3D12RenderTarget.h"
 #include "D3D12OnlineDescriptorPatch.h"
+#include "D3D12UnorderedAccessView.h"
 #include "Logging/LogMacros.h"
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
@@ -18,6 +19,12 @@
 using namespace std;
 
 #define GET_RESOURCE(x) Cast<ID3D12ResourceBase>(x)->Resource
+#define CHECK_PATCH \
+if (currentPatch == nullptr)\
+{\
+	SE_LOG(LogD3D12RHI, Error, L"DescriptorPatch is not selected on current command list.");\
+	return;\
+}
 
 D3D12CommandList::D3D12CommandList() : Super()
 	, bHasBegunCommand(false)
@@ -201,12 +208,7 @@ void D3D12CommandList::ClearDepthStencilView(IRHIDepthStencilView* dsv, optional
 
 void D3D12CommandList::SetGraphicsRootShaderResourceView(uint32 inRootParameterIndex, IRHIShaderResourceView* inSRV)
 {
-	if (currentPatch == nullptr)
-	{
-		SE_LOG(LogD3D12RHI, Error, L"DescriptorPatch is not selected on current command list.");
-		return;
-	}
-
+	CHECK_PATCH;
 	size_t patchIndex = currentPatch->Patch(inSRV);
 	D3D12_GPU_DESCRIPTOR_HANDLE handle = currentPatch->GetOnlineHandle(patchIndex);
 	CommandList->SetGraphicsRootDescriptorTable(inRootParameterIndex, handle);
@@ -232,6 +234,13 @@ void D3D12CommandList::SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPat
 	currentPatch = patch;
 }
 
+void D3D12CommandList::SetComputeRootUnorderedAccessView(uint32 inParamIndex, IRHIUnorderedAccessView* inUAV)
+{
+	CHECK_PATCH;
+	size_t patchIndex = currentPatch->Patch(inUAV);
+	D3D12_GPU_DESCRIPTOR_HANDLE handle = currentPatch->GetOnlineHandle(patchIndex);
+	CommandList->SetComputeRootDescriptorTable(inParamIndex, handle);
+}
 bool D3D12CommandList::HasBegunCommand_get() const
 {
 	return bHasBegunCommand;

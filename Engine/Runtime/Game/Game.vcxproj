@@ -259,6 +259,8 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DescriptorIndex.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferManager.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Fence.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12GBufferRenderTarget.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12HDRRenderTarget.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ImmediateCommandList.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.h" />
@@ -270,6 +272,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Shader.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SwapChain.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12UnorderedAccessView.h" />
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\ID3D12ResourceBase.h" />
@@ -358,6 +361,7 @@
     <ClInclude Include="Public\RHI\IRHIShader.h" />
     <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
+    <ClInclude Include="Public\RHI\IRHIUnorderedAccessView.h" />
     <ClInclude Include="Public\RHI\RHIImage.h" />
     <ClInclude Include="Public\RHI\RHILight.h" />
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h" />
@@ -427,6 +431,8 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DescriptorIndex.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferManager.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Fence.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12GBufferRenderTarget.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12HDRRenderTarget.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ImmediateCommandList.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Minimal.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12OfflineDescriptorIndex.cpp" />
@@ -438,6 +444,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12UnorderedAccessView.cpp" />
     <ClCompile Include="Private\D3D12RHI\HResultException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\DeferredGameViewport.cpp" />

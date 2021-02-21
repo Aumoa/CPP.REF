@@ -13,6 +13,7 @@ interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 interface IRHIRenderTarget;
 interface IRHIOnlineDescriptorPatch;
+interface IRHIUnorderedAccessView;
 enum class ERHIResourceStates;
 enum class ERHIPrimitiveTopology;
 struct RHIViewport;
@@ -41,6 +42,7 @@ interface IRHICommandList : virtual public Object
 	virtual void BeginRenderTarget(IRHIRenderTarget* renderTarget) = 0;
 	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget) = 0;
 	virtual void SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch) = 0;
+	virtual void SetComputeRootUnorderedAccessView(uint32 inParamIndex, IRHIUnorderedAccessView* inUAV) = 0;
 
 	vs_property_get(bool, HasBegunCommand);
 	virtual bool HasBegunCommand_get() const = 0;

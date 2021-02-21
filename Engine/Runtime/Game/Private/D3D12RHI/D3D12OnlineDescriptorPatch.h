@@ -29,8 +29,9 @@ public:
 	D3D12OnlineDescriptorPatch();
 	~D3D12OnlineDescriptorPatch() override;
 
-	void ReallocAndStart(size_t num);
-	size_t Patch(IRHIShaderResourceView* srv);
+	virtual void ReallocAndStart(size_t num);
+	virtual size_t Patch(IRHIShaderResourceView* srv);
+	virtual size_t Patch(IRHIUnorderedAccessView* uav);
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetOnlineHandle(size_t seekpos) const;
 

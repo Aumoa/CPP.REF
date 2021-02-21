@@ -24,5 +24,5 @@ public:
 	virtual void EndRender(ID3D12GraphicsCommandList4* inCommandList) = 0;
 
 protected:
-	TRefPtr<D3D12Resource> CreateTexture2D(ID3D12Device* device, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height);
+	TRefPtr<D3D12Resource> CreateTexture2D(ID3D12Device* device, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState, int32 width, int32 height, bool bAllowUnorderedAccess = false);
 };

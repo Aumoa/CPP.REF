@@ -46,6 +46,7 @@ public:
 	virtual void BeginRenderTarget(IRHIRenderTarget* renderTarget);
 	virtual void EndRenderTarget(IRHIRenderTarget* renderTarget);
 	virtual void SetShaderDescriptorPatch(IRHIOnlineDescriptorPatch* inPatch);
+	virtual void SetComputeRootUnorderedAccessView(uint32 inParamIndex, IRHIUnorderedAccessView* inUAV);
 
 	virtual bool HasBegunCommand_get() const;
 
