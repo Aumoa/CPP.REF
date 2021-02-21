@@ -29,6 +29,14 @@ D3D12Shader::~D3D12Shader()
 
 void D3D12Shader::InputShader(ID3D12GraphicsCommandList4* inCommandList)
 {
-	inCommandList->SetGraphicsRootSignature(rootSignature.Get());
-	inCommandList->SetPipelineState((ID3D12PipelineState*)pipelineState.Get());
+	if (bRaytracing)
+	{
+		inCommandList->SetComputeRootSignature(rootSignature.Get());
+		inCommandList->SetPipelineState1((ID3D12StateObject*)pipelineState.Get());
+	}
+	else
+	{
+		inCommandList->SetGraphicsRootSignature(rootSignature.Get());
+		inCommandList->SetPipelineState((ID3D12PipelineState*)pipelineState.Get());
+	}
 }

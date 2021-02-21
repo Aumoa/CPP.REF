@@ -19,7 +19,8 @@ public:
 		GeometryShader,
 		LightingShader,
 		ColorEmplaceShader,
-		TonemapShader
+		TonemapShader,
+		LightingExperimental
 	};
 
 	std::vector<TRefPtr<IRHIShader>> shaders;

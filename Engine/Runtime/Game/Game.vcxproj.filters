@@ -836,6 +836,9 @@
     <ClCompile Include="Private\D3D12RHI\D3D12HDRRenderTarget.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.InitializeShaders.cpp">
+      <Filter>Private\D3D12RHI</Filter>
+    </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12GBufferRenderTarget.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>

@@ -17,7 +17,6 @@ public:
 private:
 	ComPtr<ID3D12RootSignature> rootSignature;
 	ComPtr<ID3D12Pageable> pipelineState;
-	ComPtr<ID3D12StateObjectProperties> raytracingProperties;
 
 	bool bRaytracing : 1;
 	size_t shaderTypeHash;
