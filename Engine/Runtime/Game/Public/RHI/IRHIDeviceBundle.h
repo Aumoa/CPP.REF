@@ -21,6 +21,7 @@ interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 interface IRHIRenderTarget;
 interface IRHIOnlineDescriptorPatch;
+interface IRHIShaderBindingTable;
 enum class ERHIResourceFlags;
 enum class ERHIResourceStates;
 class RHIShaderLibrary;
@@ -44,6 +45,7 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList() = 0;
 	virtual TRefPtr<IRHIFence> CreateFence() = 0;
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch() = 0;
+	virtual TRefPtr<IRHIShaderBindingTable> CreateShaderBindingTable(IRHIShader* inShader) = 0;
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget() = 0;
 	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget() = 0;

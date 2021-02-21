@@ -33,23 +33,23 @@ void LightingRayGeneration()
 	uint2 launchIndex = (uint2)DispatchRaysIndex();
 	uint2 dimensions = (uint2)DispatchRaysDimensions();
 
-	//float4 color = gColorBuffer[launchIndex];
-	//float3 worldPos = WorldPosFromDepth(launchIndex / (float2)dimensions, gDepthBuffer[launchIndex], gCamera);
-	//uint4 normalRaw = gNormalBuffer[launchIndex];
+	float4 color = gColorBuffer[launchIndex];
+	float3 worldPos = WorldPosFromDepth(launchIndex / (float2)dimensions, gDepthBuffer[launchIndex], gCamera);
+	uint4 normalRaw = gNormalBuffer[launchIndex];
 
-	//float3 normal = ConvUInt16ToSnorm16(normalRaw.xyz);
-	//uint matIndex = normalRaw.w;
+	float3 normal = ConvUInt16ToSnorm16(normalRaw.xyz);
+	uint matIndex = normalRaw.w;
 
-	//float3 ray = gCamera.Pos - worldPos;
-	//float3 rayDir = normalize(ray);
-	//float3 ads = ComputeDirectionalLight(gMaterialBuffer[matIndex], gLight, normal, rayDir);
+	float3 ray = gCamera.Pos - worldPos;
+	float3 rayDir = normalize(ray);
+	float3 ads = ComputeDirectionalLight(gMaterialBuffer[matIndex], gLight, normal, rayDir);
 
-	//float ambient = ads.x;
-	//float diffuse = ads.y;
-	//float specular = ads.z;
+	float ambient = ads.x;
+	float diffuse = ads.y;
+	float specular = ads.z;
 
-	//float3 finalColor = ((ambient + diffuse) * color.xyz + specular) * gLight.Color;
+	float3 finalColor = ((ambient + diffuse) * color.xyz + specular) * gLight.Color;
 
-	//gColorOutput[launchIndex] = float4(finalColor, 1.0f);
-	gColorOutput[launchIndex] = 1.0f;
+	gColorOutput[launchIndex] = float4(finalColor, 1.0f);
+	//gColorOutput[launchIndex] = 1.0f;
 }

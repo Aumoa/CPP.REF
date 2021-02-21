@@ -5,8 +5,11 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+interface IRHIShaderBindingTable;
+
 struct GAME_API RHIDispatchRaysDesc
 {
+	IRHIShaderBindingTable* SBT;
 	uint32 Width;
 	uint32 Height;
 

@@ -20,6 +20,8 @@
 #include "D3D12DynamicBuffer.h"
 #include "D3D12RenderTarget.h"
 #include "D3D12OnlineDescriptorPatch.h"
+#include "D3D12Shader.h"
+#include "D3D12SBTAllocator.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
 #include "RHI/RHITextureClearValue.h"
@@ -187,6 +189,11 @@ TRefPtr<IRHIFence> D3D12DeviceBundle::CreateFence()
 TRefPtr<IRHIOnlineDescriptorPatch> D3D12DeviceBundle::CreateOnlineDescriptorPatch()
 {
 	return NewObject<D3D12OnlineDescriptorPatch>();
+}
+
+TRefPtr<IRHIShaderBindingTable> D3D12DeviceBundle::CreateShaderBindingTable(IRHIShader* inShader)
+{
+	return NewObject<D3D12SBTAllocator>(d3d12Device.Get(), Cast<D3D12Shader>(inShader));
 }
 
 TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)

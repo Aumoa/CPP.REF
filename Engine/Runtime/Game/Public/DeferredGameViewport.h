@@ -12,6 +12,7 @@ interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 interface IRHIRenderTarget;
+interface IRHIShaderBindingTable;
 
 class GAME_API DeferredGameViewport : public GameViewport
 {
@@ -25,6 +26,7 @@ private:
 
 	TRefPtr<IRHIResource> renderTarget;
 	TRefPtr<IRHIRenderTargetView> rtv;
+	TRefPtr<IRHIShaderBindingTable> sbt;
 
 public:
 	DeferredGameViewport();

@@ -16,6 +16,7 @@
 #include "RHI/RHIViewport.h"
 #include "RHI/RHIMeshDrawCommand.h"
 #include "RHI/RHIDispatchRaysDesc.h"
+#include "RHI/IRHIShaderBindingTable.h"
 
 using namespace std;
 
@@ -245,6 +246,8 @@ void D3D12CommandList::DispatchRays(const RHIDispatchRaysDesc& dispatch)
 	ConsumePendingDeferredCommands();
 
 	D3D12_DISPATCH_RAYS_DESC dispatchDesc = { };
+	dispatchDesc.RayGenerationShaderRecord.StartAddress = dispatch.SBT->RayGenerationStartAddress;
+	dispatchDesc.RayGenerationShaderRecord.SizeInBytes = dispatch.SBT->RayGenerationBufferStride;
 	dispatchDesc.Width = dispatch.Width;
 	dispatchDesc.Height = dispatch.Height;
 	dispatchDesc.Depth = 1;

@@ -3,6 +3,7 @@
 #include "RHI/RHIDispatchRaysDesc.h"
 
 RHIDispatchRaysDesc::RHIDispatchRaysDesc()
+	: SBT(nullptr)
 {
 
 }

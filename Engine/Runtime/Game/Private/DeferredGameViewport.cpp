@@ -13,6 +13,7 @@
 #include "RHI/RHIShaderLibrary.h"
 #include "RHI/IRHIMaterialBundle.h"
 #include "RHI/IRHIRenderTarget.h"
+#include "RHI/IRHIShaderBindingTable.h"
 #include "SceneRendering/DeferredSceneRenderer.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/MinimalViewInfo.h"
@@ -28,7 +29,11 @@ DEFINE_STATS_GROUP(DeferredGameViewport);
 
 DeferredGameViewport::DeferredGameViewport() : Super()
 {
-	
+	IRHIDeviceBundle* deviceBundle = GEngine.DeviceBundle;
+	RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
+	IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
+
+	sbt = deviceBundle->CreateShaderBindingTable(shader);
 }
 
 DeferredGameViewport::~DeferredGameViewport()
@@ -110,6 +115,7 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	inCommandList->SetComputeRootShaderResource(4, materialBundle->GetMaterialsBufferVirtualAddress());
 
 	RHIDispatchRaysDesc dispatchRays;
+	dispatchRays.SBT = sbt.Get();
 	dispatchRays.Width = hdrBuffer->Width;
 	dispatchRays.Height = hdrBuffer->Height;
 	inCommandList->DispatchRays(dispatchRays);

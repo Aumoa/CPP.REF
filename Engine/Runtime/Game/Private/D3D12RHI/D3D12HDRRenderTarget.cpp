@@ -78,7 +78,7 @@ void D3D12HDRRenderTarget::BeginRender(ID3D12GraphicsCommandList4* inCommandList
 {
 	D3D12_RESOURCE_BARRIER barriers[1] =
 	{
-		TRANSITION(colorBuffer, PIXEL_SHADER_RESOURCE, RENDER_TARGET),
+		TRANSITION(colorBuffer, PIXEL_SHADER_RESOURCE, UNORDERED_ACCESS),
 	};
 
 	inCommandList->ResourceBarrier(1, barriers);
@@ -89,7 +89,7 @@ void D3D12HDRRenderTarget::EndRender(ID3D12GraphicsCommandList4* inCommandList)
 {
 	D3D12_RESOURCE_BARRIER barriers[1] =
 	{
-		TRANSITION(colorBuffer, RENDER_TARGET, PIXEL_SHADER_RESOURCE),
+		TRANSITION(colorBuffer, UNORDERED_ACCESS, PIXEL_SHADER_RESOURCE),
 	};
 
 	//inCommandList->EndRenderPass();

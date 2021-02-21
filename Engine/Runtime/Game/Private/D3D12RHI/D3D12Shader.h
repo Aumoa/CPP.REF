@@ -17,6 +17,7 @@ public:
 private:
 	ComPtr<ID3D12RootSignature> rootSignature;
 	ComPtr<ID3D12Pageable> pipelineState;
+	ComPtr<ID3D12StateObjectProperties> properties;
 
 	bool bRaytracing : 1;
 	size_t shaderTypeHash;
@@ -29,4 +30,5 @@ public:
 	void InputShader(ID3D12GraphicsCommandList4* inCommandList);
 
 	vs_property_get_auto(bool, IsRaytracingShader, bRaytracing);
+	vs_property_get_auto(void*, pShaderIdentifier, properties->GetShaderIdentifier(L"LightingRayGeneration"));
 };

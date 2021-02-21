@@ -20,6 +20,7 @@ D3D12Shader::D3D12Shader(ID3D12RootSignature* inRootSignature, ID3D12StateObject
 {
 	rootSignature = inRootSignature;
 	pipelineState = inPipelineState;
+	properties = raytracingProperties;
 }
 
 D3D12Shader::~D3D12Shader()

@@ -62,6 +62,7 @@ public:
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch();
+	virtual TRefPtr<IRHIShaderBindingTable> CreateShaderBindingTable(IRHIShader* inShader);
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget();  // D3D12GBufferRenderTarget.cpp
 	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget();  // D3D12HDRRenderTarget.cpp
