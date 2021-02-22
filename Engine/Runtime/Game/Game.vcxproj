@@ -484,6 +484,7 @@
     <ClCompile Include="Private\PlatformMisc\PlatformImage.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformImageLoader.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp" />
+    <ClCompile Include="Private\RHI\IRHIDeviceBundle.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIDispatchRaysDesc.cpp" />
     <ClCompile Include="Private\RHI\RHIMaterialBundle.cpp" />

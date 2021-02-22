@@ -58,7 +58,7 @@ public:
 	virtual TRefPtr<IRHIRenderTargetView> CreateRenderTargetView(IRHIResource* resource);
 	virtual TRefPtr<IRHIDepthStencilView> CreateDepthStencilView(IRHIResource* resource, ERHITextureFormat inViewFormat);
 	virtual TRefPtr<IRHIShaderResourceView> CreateTextureView(IRHIResource* resource, ERHITextureFormat inViewFormat);
-	virtual TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(std::span<IRHIResource*> inResources);
+	virtual TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(IRHIResource* const* inResources, size_t count);
 	virtual TRefPtr<IRHIDeferredCommandList> CreateDeferredCommandList();
 	virtual TRefPtr<IRHIFence> CreateFence();
 	virtual TRefPtr<IRHIOnlineDescriptorPatch> CreateOnlineDescriptorPatch();
@@ -66,14 +66,14 @@ public:
 
 	virtual TRefPtr<IRHIRenderTarget> CreateGBufferRenderTarget();  // D3D12GBufferRenderTarget.cpp
 	virtual TRefPtr<IRHIRenderTarget> CreateHDRRenderTarget();  // D3D12HDRRenderTarget.cpp
-	virtual TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
-	virtual TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
+	virtual TRefPtr<IRHIResource> CreateVertexBuffer(const RHIVertex* vertices, size_t count);
+	virtual TRefPtr<IRHIResource> CreateIndexBuffer(const uint32* indices, size_t count);
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);
 	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState);
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage);
 
-	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource*> inResources);
+	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, IRHIResource* const* inResources, size_t count);
 
 	vs_property_get(ID3D12Device*, Device);
 	ID3D12Device* Device_get() const;
@@ -87,7 +87,7 @@ private:
 	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;
 	bool IsDeviceSuitable(ID3D12Device* device) const;
 	
-	ComPtr<ID3D12Resource> CreateImmutableBuffer(D3D12_RESOURCE_STATES initialState, std::span<uint8> initialBuffer, ERHIResourceFlags flags = ERHIResourceFlags::None);
+	ComPtr<ID3D12Resource> CreateImmutableBuffer(D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, ERHIResourceFlags flags = ERHIResourceFlags::None);
 
 	// CALLBACK HANDLERS
 	void Application_OnSizing(int32 width, int32 height);

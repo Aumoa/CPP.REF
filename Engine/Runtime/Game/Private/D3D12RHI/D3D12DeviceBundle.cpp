@@ -153,15 +153,15 @@ TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureView(IRHIResourc
 	return NewObject<D3D12SingleShaderResourceViewNode>(resource1, index);
 }
 
-TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureGroupView(span<IRHIResource*> inResources)
+TRefPtr<IRHIShaderResourceView> D3D12DeviceBundle::CreateTextureGroupView(IRHIResource* const* inResources, size_t count)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC nullSRV = { };
 	nullSRV.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	nullSRV.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	nullSRV.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	auto multiSRV = NewObject<D3D12IndependentShaderResourceView>(d3d12Device.Get(), inResources.size());
+	auto multiSRV = NewObject<D3D12IndependentShaderResourceView>(d3d12Device.Get(), count);
 
-	for (size_t i = 0; i < inResources.size(); ++i)
+	for (size_t i = 0; i < count; ++i)
 	{
 		auto d3d12Resource = Cast<D3D12Resource>(inResources[i]);
 		ID3D12Resource* resource = nullptr;
@@ -196,17 +196,15 @@ TRefPtr<IRHIShaderBindingTable> D3D12DeviceBundle::CreateShaderBindingTable(IRHI
 	return NewObject<D3D12SBTAllocator>(d3d12Device.Get(), Cast<D3D12Shader>(inShader));
 }
 
-TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(span<RHIVertex> vertices)
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateVertexBuffer(const RHIVertex* vertices, size_t count)
 {
-	span<uint8> buffer = span((uint8*)vertices.data(), vertices.size() * sizeof(RHIVertex));
-	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, buffer);
+	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, (const uint8*)vertices, count * sizeof(RHIVertex));
 	return NewObject<D3D12Resource>(resource.Get());
 }
 
-TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(span<uint32> indices)
+TRefPtr<IRHIResource> D3D12DeviceBundle::CreateIndexBuffer(const uint32* indices, size_t count)
 {
-	span<uint8> buffer = span((uint8*)indices.data(), indices.size() * sizeof(uint32));
-	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, buffer);
+	ComPtr<ID3D12Resource> resource = CreateImmutableBuffer(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, (const uint8*)indices, count * sizeof(uint32));
 	return NewObject<D3D12Resource>(resource.Get());
 }
 
@@ -376,11 +374,11 @@ TRefPtr<IRHIResource> D3D12DeviceBundle::CreateTexture2D(ERHITextureFormat forma
 	return NewObject<D3D12Resource>(resource.Get());
 }
 
-void D3D12DeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, span<IRHIResource*> inResources)
+void D3D12DeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, IRHIResource* const* inResources, size_t count)
 {
-	if (inView->Count != inResources.size())
+	if (inView->Count != count)
 	{
-		SE_LOG(LogRHI, Error, L"UpdateTextureGroupView: SRVs count of ShaderResourceView({0}) is not equals to count of new resources({1}).", inView->Count, inResources.size());
+		SE_LOG(LogRHI, Error, L"UpdateTextureGroupView: SRVs count of ShaderResourceView({0}) is not equals to count of new resources({1}).", inView->Count, count);
 		return;
 	}
 
@@ -390,7 +388,7 @@ void D3D12DeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, s
 	nullSRV.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	nullSRV.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	for (size_t i = 0; i < inResources.size(); ++i)
+	for (size_t i = 0; i < count; ++i)
 	{
 		auto d3d12Resource = Cast<D3D12Resource>(inResources[i]);
 		ID3D12Resource* resource = nullptr;
@@ -504,11 +502,11 @@ bool D3D12DeviceBundle::IsDeviceSuitable(ID3D12Device* device) const
 	return true;
 }
 
-ComPtr<ID3D12Resource> D3D12DeviceBundle::CreateImmutableBuffer(D3D12_RESOURCE_STATES initialState, span<uint8> initialBuffer, ERHIResourceFlags flags)
+ComPtr<ID3D12Resource> D3D12DeviceBundle::CreateImmutableBuffer(D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, ERHIResourceFlags flags)
 {
 	D3D12_RESOURCE_DESC bufferDesc = { };
 	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	bufferDesc.Width = (UINT64)initialBuffer.size_bytes();
+	bufferDesc.Width = (UINT64)sizeInBytes;
 	bufferDesc.Height = 1;
 	bufferDesc.DepthOrArraySize = 1;
 	bufferDesc.MipLevels = 1;
@@ -529,7 +527,7 @@ ComPtr<ID3D12Resource> D3D12DeviceBundle::CreateImmutableBuffer(D3D12_RESOURCE_S
 
 	void* pData;
 	HR(uploadHeap->Map(0, nullptr, &pData));
-	memcpy(pData, initialBuffer.data(), initialBuffer.size_bytes());
+	memcpy(pData, initialBuffer, sizeInBytes);
 	uploadHeap->Unmap(0, nullptr);
 
 	D3D12_RESOURCE_BARRIER barrier = { };
