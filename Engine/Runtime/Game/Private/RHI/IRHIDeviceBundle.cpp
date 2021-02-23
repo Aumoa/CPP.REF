@@ -5,22 +5,22 @@
 #include "RHI/IRHIShaderResourceView.h"
 #include "RHI/IRHIResource.h"
 
-TRefPtr<IRHIShaderResourceView> IRHIDeviceBundle::CreateTextureGroupView(std::span<IRHIResource*> inResources)
+TRefPtr<IRHIShaderResourceView> IRHIDeviceBundle::CreateTextureGroupView(std::span<IRHIResource* const> inResources)
 {
 	return CreateTextureGroupView(inResources.data(), inResources.size());
 }
 
-TRefPtr<IRHIResource> IRHIDeviceBundle::CreateVertexBuffer(std::span<RHIVertex> vertices)
+TRefPtr<IRHIResource> IRHIDeviceBundle::CreateVertexBuffer(std::span<const RHIVertex> vertices)
 {
 	return CreateVertexBuffer(vertices.data(), vertices.size());
 }
 
-TRefPtr<IRHIResource> IRHIDeviceBundle::CreateIndexBuffer(std::span<uint32> indices)
+TRefPtr<IRHIResource> IRHIDeviceBundle::CreateIndexBuffer(std::span<const uint32> indices)
 {
 	return CreateIndexBuffer(indices.data(), indices.size());
 }
 
-void IRHIDeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource*> inResources)
+void IRHIDeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource* const> inResources)
 {
 	UpdateTextureGroupView(inView, inResources.data(), inResources.size());
 }

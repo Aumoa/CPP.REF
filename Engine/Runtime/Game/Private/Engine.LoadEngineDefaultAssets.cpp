@@ -6,7 +6,9 @@
 #include "Assets/AssetManager.h"
 #include "SceneRendering/StaticMesh.h"
 #include "Materials/Material.h"
+#include "RHI/RHICommon.h"
 #include "RHI/IRHIMaterialBundle.h"
+#include "RHI/IRHIResourceBundle.h"
 
 using namespace std;
 
@@ -29,95 +31,96 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 {
 	auto mgr = engine->GetAssetManager();
 	auto mat = mgr->LoadMaterial(L"Engine/Materials/Default");
+	auto resourceBundle = engine->ResourceBundle;
+
+	auto RegisterSingleSubsetGeometry = [&](wstring_view importPath, const vector<RHIVertex>& vc, const vector<uint32>& ic)
+	{
+		RHIStaticMeshSubsetInfo subset[1] = { };
+		subset[0].VertexStart = 0;
+		subset[0].VertexCount = (uint32)vc.size();
+		subset[0].IndexStart = 0;
+		subset[0].IndexCount = (uint32)ic.size();
+
+		Material* mats[1] = { mat };
+
+		RHIStaticMeshGeometryData data;
+		data.VertexBuffer = vc;
+		data.IndexBuffer = ic;
+		data.Subsets = subset;
+		data.Materials = mats;
+
+		TRefPtr<StaticMesh> mesh = resourceBundle->CreateStaticMesh(data);
+		mgr->Import(importPath.data(), mesh);
+	};
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeBox(vertexCollection, indexCollection, 1.0f, false, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Box", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Box", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeSphere(vertexCollection, indexCollection, 1.0f, 16, false, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Sphere", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Sphere", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeGeoSphere(vertexCollection, indexCollection, 1.0f, 4, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/GeoSphere", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/GeoSphere", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeCylinder(vertexCollection, indexCollection, 1.0f, 1.0f, 16, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Cylinder", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Cylinder", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeCone(vertexCollection, indexCollection, 1.0f, 1.0f, 16, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Cone", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Cone", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeTetrahedron(vertexCollection, indexCollection, 1.0f, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Tetrahedron", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Tetrahedron", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeOctahedron(vertexCollection, indexCollection, 1.0f, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Octahedron", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Octahedron", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeDodecahedron(vertexCollection, indexCollection, 1.0f, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Dodecahedron", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Dodecahedron", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeIcosahedron(vertexCollection, indexCollection, 1.0f, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Icosahedron", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Icosahedron", vertexCollection, indexCollection);
 	}
 
 	{
 		vector<RHIVertex> vertexCollection;
 		vector<uint32> indexCollection;
 		DirectXGeometry::ComputeTeapot(vertexCollection, indexCollection, 1.0f, 16, false);
-
-		TRefPtr<StaticMesh> mesh = StaticMesh::CreateStaticMesh(vertexCollection, indexCollection, mat);
-		mgr->Import(L"Engine/StaticMesh/Teapot", mesh);
+		RegisterSingleSubsetGeometry(L"Engine/StaticMesh/Teapot", vertexCollection, indexCollection);
 	}
 }
 

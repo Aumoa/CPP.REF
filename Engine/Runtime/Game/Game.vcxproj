@@ -269,6 +269,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTarget.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12RenderTargetView.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12ResourceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SBTAllocator.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Shader.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderBindingParameter.h" />
@@ -360,6 +361,7 @@
     <ClInclude Include="Public\RHI\IRHIRenderTarget.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
+    <ClInclude Include="Public\RHI\IRHIResourceBundle.h" />
     <ClInclude Include="Public\RHI\IRHIShader.h" />
     <ClInclude Include="Public\RHI\IRHIShaderBindingTable.h" />
     <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
@@ -375,6 +377,8 @@
     <ClInclude Include="Public\RHI\RHIResourceGC.h" />
     <ClInclude Include="Public\RHI\RHIResourceStates.h" />
     <ClInclude Include="Public\RHI\RHIShaderLibrary.h" />
+    <ClInclude Include="Public\RHI\RHIStaticMeshGeometryData.h" />
+    <ClInclude Include="Public\RHI\RHIStaticMeshRenderData.h" />
     <ClInclude Include="Public\RHI\RHITextureClearValue.h" />
     <ClInclude Include="Public\RHI\RHITextureFormat.h" />
     <ClInclude Include="Public\RHI\RHIVertex.h" />
@@ -446,6 +450,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTarget.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12RenderTargetView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12ResourceBundle.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SBTAllocator.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp" />

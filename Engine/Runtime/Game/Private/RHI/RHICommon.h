@@ -17,3 +17,4 @@
 #include "RHI/RHILight.h"
 #include "RHI/RHIMaterial.h"
 #include "RHI/RHIDispatchRaysDesc.h"
+#include "RHI/RHIStaticMeshGeometryData.h"

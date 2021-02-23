@@ -19,6 +19,9 @@ using Microsoft::WRL::ComPtr;
 
 extern LogCategoryBase LogD3D12RHI;
 
+#undef min
+#undef max
+
 #ifdef _DEBUG
 #define HR(x) if (HRESULT hr = x; FAILED(hr)) throw HResultException(hr)
 #else

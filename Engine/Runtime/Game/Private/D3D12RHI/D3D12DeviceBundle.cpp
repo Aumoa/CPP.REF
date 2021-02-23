@@ -401,11 +401,6 @@ void D3D12DeviceBundle::UpdateTextureGroupView(IRHIShaderResourceView* inView, I
 	}
 }
 
-ID3D12Device* D3D12DeviceBundle::Device_get() const
-{
-	return d3d12Device.Get();
-}
-
 void D3D12DeviceBundle::InitializeCOM()
 {
 	HR(CoInitializeEx(nullptr, COINIT_MULTITHREADED));

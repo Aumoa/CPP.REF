@@ -75,8 +75,7 @@ public:
 
 	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, IRHIResource* const* inResources, size_t count);
 
-	vs_property_get(ID3D12Device*, Device);
-	ID3D12Device* Device_get() const;
+	vs_property_get_auto(ID3D12Device5*, Device, d3d12Device.Get());
 
 private:
 	void InitializeCOM();

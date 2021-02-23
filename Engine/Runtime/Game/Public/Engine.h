@@ -16,6 +16,7 @@ interface IRHIImmediateCommandList;
 interface IRHISwapChain;
 interface IRHIMaterialBundle;
 interface IRHICommandList;
+interface IRHIResourceBundle;
 
 class SceneRenderer;
 class GameInstance;
@@ -40,6 +41,8 @@ private:
 
 	IRHIDeviceBundle* deviceBundle;
 	IRHIMaterialBundle* materialBundle;
+	IRHIResourceBundle* resourceBundle;
+
 	IRHIImmediateCommandList* immediateCommandList;
 	IRHISwapChain* swapChain;
 
@@ -57,6 +60,7 @@ public:
 
 	vs_property_get_auto(IRHIDeviceBundle*, DeviceBundle, deviceBundle);
 	vs_property_get_auto(IRHIMaterialBundle*, MaterialBundle, materialBundle);
+	vs_property_get_auto(IRHIResourceBundle*, ResourceBundle, resourceBundle);
 	AssetManager* GetAssetManager() const;
 	GameViewport* GetGameViewport() const;
 

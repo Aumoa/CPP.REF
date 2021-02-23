@@ -58,8 +58,8 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 
 	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, IRHIResource* const* inResources, size_t count) = 0;
 
-	TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(std::span<IRHIResource*> inResource);
-	TRefPtr<IRHIResource> CreateVertexBuffer(std::span<RHIVertex> vertices);
-	TRefPtr<IRHIResource> CreateIndexBuffer(std::span<uint32> indices);
-	void UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource*> inResources);
+	TRefPtr<IRHIShaderResourceView> CreateTextureGroupView(std::span<IRHIResource* const> inResource);
+	TRefPtr<IRHIResource> CreateVertexBuffer(std::span<const RHIVertex> vertices);
+	TRefPtr<IRHIResource> CreateIndexBuffer(std::span<const uint32> indices);
+	void UpdateTextureGroupView(IRHIShaderResourceView* inView, std::span<IRHIResource* const> inResources);
 };

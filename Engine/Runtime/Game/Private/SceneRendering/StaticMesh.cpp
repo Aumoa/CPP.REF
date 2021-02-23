@@ -3,8 +3,8 @@
 #include "SceneRendering/StaticMesh.h"
 
 #include "Engine.h"
+#include "RHi/RHICommon.h"
 #include "RHI/IRHIResource.h"
-#include "RHI/RHIVertex.h"
 #include "RHI/IRHIDeviceBundle.h"
 
 using namespace std;
@@ -76,9 +76,35 @@ TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<
 	return staticMesh;
 }
 
-AxisAlignedCube StaticMesh::ComputeBoundingBox(span<RHIVertex> vertices)
+TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(const RHIStaticMeshGeometryData& inGeometryData, IRHIResource* inVertexBuffer, IRHIResource* inIndexBuffer, IRHIResource* inAccelerationStructure)
 {
-	AxisAlignedCube cube(Vector3::Zero, Vector3::Zero);
+	auto staticMesh = NewObject<StaticMesh>();
+
+	staticMesh->vertexBuffer = inVertexBuffer;
+	staticMesh->indexBuffer = inIndexBuffer;
+	staticMesh->accelerationStructure = inAccelerationStructure;
+	staticMesh->material = inGeometryData.Materials[0];
+
+	RHIMeshDrawCommand command;
+	command.VertexBufferVirtualAddress = staticMesh->vertexBuffer->GetVirtualAddress();
+	command.VertexCount = (uint32)inGeometryData.VertexBuffer.size();
+	command.VertexStride = sizeof(RHIVertex);
+	command.IndexBufferVirtualAddress = staticMesh->indexBuffer->GetVirtualAddress();
+	command.IndexCount = (uint32)inGeometryData.IndexBuffer.size();
+	command.MaterialIndex = staticMesh->material.IsValid ? staticMesh->material->Index : 0;
+
+	auto batch = NewObject<StaticMeshBatch>();
+	batch->SetMeshDrawCommand(command);
+
+	staticMesh->meshBatch = batch;
+	staticMesh->boundingBox = ComputeBoundingBox(inGeometryData.VertexBuffer);
+
+	return staticMesh;
+}
+
+AxisAlignedCube StaticMesh::ComputeBoundingBox(span<const RHIVertex> vertices)
+{
+	AxisAlignedCube cube(numeric_limits<float>::max(), numeric_limits<float>::lowest());
 
 	for (size_t i = 0; i < vertices.size(); ++i)
 	{

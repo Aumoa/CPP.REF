@@ -11,8 +11,9 @@
 #include "RHI/RHIVertex.h"
 #include "Materials/Material.h"
 
-class StaticMeshBatch;
 interface IRHIResource;
+class StaticMeshBatch;
+struct RHIStaticMeshGeometryData;
 
 class GAME_API StaticMeshBatch : public MeshBatch
 {
@@ -41,6 +42,7 @@ public:
 private:
 	TRefPtr<IRHIResource> vertexBuffer;
 	TRefPtr<IRHIResource> indexBuffer;
+	TRefPtr<IRHIResource> accelerationStructure;
 	TRefPtr<StaticMeshBatch> meshBatch;
 	AxisAlignedCube boundingBox;
 
@@ -57,7 +59,8 @@ public:
 
 	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial);
 	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial, const AxisAlignedCube& inBoundingBox);
+	static TRefPtr<StaticMesh> CreateStaticMesh(const RHIStaticMeshGeometryData& inGeometryData, IRHIResource* inVertexBuffer, IRHIResource* inIndexBuffer, IRHIResource* inAccelerationStructure);
 
 private:
-	static AxisAlignedCube ComputeBoundingBox(std::span<RHIVertex> vertices);
+	static AxisAlignedCube ComputeBoundingBox(std::span<const RHIVertex> vertices);
 };

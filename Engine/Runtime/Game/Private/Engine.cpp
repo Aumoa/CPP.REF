@@ -23,6 +23,7 @@
 #include "PlatformMisc/PlatformImageLoader.h"
 
 #include "D3D12RHI/D3D12DeviceBundle.h"
+#include "D3D12RHI/D3D12ResourceBundle.h"
 //#include "VulkanRHI/VulkanDeviceBundle.h"
 
 using namespace std;
@@ -170,6 +171,10 @@ void Engine::InitializeBundles()
 	auto materialBundle = NewObject<RHIMaterialBundle>();
 	this->materialBundle = materialBundle.Get();
 	rhiBundles.emplace_back(move(materialBundle));
+
+	auto resourceBundle = NewObject<D3D12ResourceBundle>();
+	this->resourceBundle = resourceBundle.Get();
+	rhiBundles.emplace_back(move(resourceBundle));
 
 	ForEachBundles([](auto* bundle) { bundle->InitializeBundle(); });
 }
