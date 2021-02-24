@@ -9,6 +9,7 @@
 #include "RHI/RHICommon.h"
 #include "RHI/IRHIMaterialBundle.h"
 #include "RHI/IRHIResourceBundle.h"
+#include "Logging/LogMacros.h"
 
 #include "RHI/IRHIDeviceBundle.h"
 #include "RHI/IRHIResource.h"
@@ -137,6 +138,7 @@ inline void LoadEngineDefaultStaticMeshes(Engine* engine)
 
 void Engine::LoadEngineDefaultAssets()
 {
+	SE_LOG(LogEngine, Display, L"Load engine default assets.");
 	LoadEngineDefaultMaterials(this);
 	LoadEngineDefaultStaticMeshes(this);
 }

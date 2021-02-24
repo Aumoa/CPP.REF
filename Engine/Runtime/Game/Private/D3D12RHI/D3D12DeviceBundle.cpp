@@ -2,9 +2,8 @@
 
 #include "D3D12DeviceBundle.h"
 
-#include "Logging/Logger.h"
-#include "Logging/LogMacros.h"
 #include "Application.h"
+#include "Logging/LogMacros.h"
 #include "D3D12SwapChain.h"
 #include "D3D12ImmediateCommandList.h"
 #include "D3D12CommandFence.h"

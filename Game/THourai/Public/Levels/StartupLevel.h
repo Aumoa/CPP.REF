@@ -31,8 +31,6 @@ private:
 
 	ASpectatorPawn* spectator;
 
-	AStaticMeshActor* sphere_10000[10000];
-
 public:
 	StartupLevel();
 	~StartupLevel() override;

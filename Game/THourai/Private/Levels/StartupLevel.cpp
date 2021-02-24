@@ -21,8 +21,6 @@ StartupLevel::StartupLevel() : Super()
 	, icosahedron(nullptr)
 
 	, spectator(nullptr)
-
-	, sphere_10000{ }
 {
 
 }
@@ -60,20 +58,6 @@ void StartupLevel::LoadLevel()
 	icosahedron->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Icosahedron"));
 	icosahedron->StaticMesh->Location = Vector3(0, 0.55f, 1.0f);
 	icosahedron->StaticMesh->Scale = 0.5f;
-
-	for (size_t i = 0; i < 10000; ++i)
-	{
-		int32 x = (int32)i % 100;
-		int32 y = (int32)i / 100;
-
-		if ((x >= 49 && x <= 51) && (y >= 49 && y <= 51))
-		{
-			continue;
-		}
-		sphere_10000[i] = SpawnActorPersistent<AStaticMeshActor>();
-		sphere_10000[i]->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
-		sphere_10000[i]->RootComponent->Location = Vector3((float)(-50 + x), 0.55f, (float)(-50 + y));
-	}
 
 	spectator = SpawnActorPersistent<ASpectatorPawn>();
 }

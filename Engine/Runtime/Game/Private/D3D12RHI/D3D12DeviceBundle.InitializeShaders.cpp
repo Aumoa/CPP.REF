@@ -2,8 +2,9 @@
 
 #include "D3D12DeviceBundle.h"
 
-#include "RHI/RHIShaderLibrary.h"
 #include "D3D12Shader.h"
+#include "RHI/RHIShaderLibrary.h"
+#include "Logging/LogMacros.h"
 #include "CompiledShaders/GeometryVertexShader.generated.h"
 #include "CompiledShaders/GeometryPixelShader.generated.h"
 #include "CompiledShaders/LightingVertexShader.generated.h"
@@ -23,6 +24,8 @@ inline void SetRTVFormatsHelper(D3D12_GRAPHICS_PIPELINE_STATE_DESC& outDesc, TAr
 
 void D3D12DeviceBundle::InitializeShaders()
 {
+	SE_LOG(LogD3D12RHI, Display, L"Initialize engine default shaders.");
+
 	static auto GetRootCBVParameter = [](uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility)
 	{
 		D3D12_ROOT_PARAMETER param = { };
