@@ -1,6 +1,6 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "SceneRendering/Scene.h"
+#include "D3D12Scene.h"
 
 #include "Engine.h"
 #include "Components/PrimitiveComponent.h"
@@ -17,20 +17,20 @@
 
 using namespace std;
 
-Scene::Scene() : Super()
-	, localPlayer(nullptr)
-	, numSRVs(2048)
+D3D12Scene::D3D12Scene(APlayerController* inPlayerController) : Super()
+	, localPlayer(inPlayerController)
+	, numSRVs(0)
 {
 	localPlayerVisibility = NewObject<SceneVisibility>(this);
 	srvPatch = GEngine.DeviceBundle->CreateOnlineDescriptorPatch();
 }
 
-Scene::~Scene()
+D3D12Scene::~D3D12Scene()
 {
 
 }
 
-void Scene::Update()
+void D3D12Scene::Update()
 {
 	for (size_t i = 0; i < primitiveComponents.size(); ++i)
 	{
@@ -55,9 +55,8 @@ void Scene::Update()
 	}
 }
 
-void Scene::CalcVisibility()
+void D3D12Scene::CalcVisibility()
 {
-	APlayerController* localPlayer = LocalPlayer;
 	PlayerCameraManager* cameraManager = localPlayer->CameraManager;
 
 	if (cameraManager == nullptr)
@@ -76,40 +75,40 @@ void Scene::CalcVisibility()
 	numSRVs += localPlayerVisibility->NumPrimitivesRender * 2;  // Material
 }
 
-void Scene::BeginRender(IRHICommandList* inCommandList)
+void D3D12Scene::BeginRender(IRHICommandList* inCommandList)
 {
 	srvPatch->ReallocAndStart(numSRVs);
 	inCommandList->SetShaderDescriptorPatch(srvPatch.Get());
 }
 
-void Scene::EndRender(IRHICommandList* inCommandList)
+void D3D12Scene::EndRender(IRHICommandList* inCommandList)
 {
 
 }
 
-void Scene::AddScene(PrimitiveComponent* inPrimitiveComponent)
+void D3D12Scene::AddPrimitive(PrimitiveComponent* inPrimitiveComponent)
 {
 	primitiveComponents.emplace_back(inPrimitiveComponent);
 	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
 }
 
-void Scene::AddLight(LightComponent* inLightComponent)
+void D3D12Scene::AddLight(LightComponent* inLightComponent)
 {
 	lightComponents.emplace_back(inLightComponent);
 	lightProxies.emplace_back(inLightComponent->GetSceneProxy());
 }
 
-SceneVisibility* Scene::GetLocalPlayerVisibility() const
+SceneVisibility* D3D12Scene::GetLocalPlayerVisibility() const
 {
 	return localPlayerVisibility.Get();
 }
 
-APlayerController* Scene::LocalPlayer_get() const
+span<PrimitiveSceneProxy* const> D3D12Scene::GetPrimitives() const
 {
-	return localPlayer;
+	return sceneProxies;
 }
 
-void Scene::LocalPlayer_set(APlayerController* value)
+span<LightSceneProxy* const> D3D12Scene::GetLights() const
 {
-	localPlayer = value;
+	return lightProxies;
 }

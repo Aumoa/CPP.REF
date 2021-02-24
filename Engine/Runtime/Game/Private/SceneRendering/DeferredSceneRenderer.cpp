@@ -3,7 +3,6 @@
 #include "SceneRendering/DeferredSceneRenderer.h"
 
 #include "Engine.h"
-#include "SceneRendering/Scene.h"
 #include "SceneRendering/SceneVisibility.h"
 #include "SceneRendering/MeshBatch.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
@@ -13,12 +12,13 @@
 #include "RHI/IRHICommandList.h"
 #include "RHI/IRHIDeviceBundle.h"
 #include "RHI/IRHIMaterialBundle.h"
+#include "RHI/IRHIScene.h"
 #include "Logging/LogMacros.h"
 #include "Materials/MaterialInterface.h"
 
 using namespace std;
 
-DeferredSceneRenderer::DeferredSceneRenderer(Scene* inScene) : Super(inScene)
+DeferredSceneRenderer::DeferredSceneRenderer(IRHIScene* inScene) : Super(inScene)
 	, shaderLibrary(nullptr)
 {
 	shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
@@ -33,7 +33,7 @@ void DeferredSceneRenderer::RenderScene(IRHICommandList* immediateCommandList)
 {
 	SetShader(immediateCommandList);
 
-	Scene* myScene = GetScene();
+	IRHIScene* myScene = GetScene();
 	std::vector<SceneVisibility*> visibilities = { myScene->GetLocalPlayerVisibility() };
 	for (size_t i = 0; i < visibilities.size(); ++i)
 	{
@@ -50,7 +50,7 @@ void DeferredSceneRenderer::SetShader(IRHICommandList* commandList)
 
 void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, SceneVisibility* inSceneVisibility)
 {
-	span<PrimitiveSceneProxy* const> primitiveSceneProxies = GetScene()->PrimitiveSceneProxies;
+	span<PrimitiveSceneProxy* const> primitiveSceneProxies = GetScene()->GetPrimitives();
 	const auto& primitiveVisibility = inSceneVisibility->PrimitiveVisibility;
 	CameraConstantIterator cbvIterator = inSceneVisibility->ShaderCameraConstants->GetBufferIterator();
 

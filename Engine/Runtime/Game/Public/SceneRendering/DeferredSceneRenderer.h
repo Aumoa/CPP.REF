@@ -19,7 +19,7 @@ private:
 	RHIShaderLibrary* shaderLibrary;
 
 public:
-	DeferredSceneRenderer(Scene* inScene);
+	DeferredSceneRenderer(IRHIScene* inScene);
 	~DeferredSceneRenderer();
 
 	virtual void RenderScene(IRHICommandList* immediateCommandList);

@@ -9,12 +9,12 @@
 #include <set>
 #include "TSubclassOf.h"
 
-class AActor;
-
 enum class TickingGroup;
-struct TickFunction;
+interface IRHIScene;
 class Level;
-class Scene;
+class AActor;
+class APlayerController;
+struct TickFunction;
 
 class GAME_API World : virtual public Object
 {
@@ -28,7 +28,8 @@ private:
 	std::array<std::set<TickFunction*>, 4> tickGroups;
 	std::array<std::set<TickFunction*>, 4> actualTickGroups;
 	TRefPtr<Level> currentLevel;
-	TRefPtr<Scene> scene;
+	TRefPtr<IRHIScene> scene;
+	APlayerController* localPlayerController;
 
 public:
 	World();
@@ -43,7 +44,7 @@ public:
 
 	Level* LoadLevel(TSubclassOf<Level> loadLevel);
 
-	Scene* GetScene() const;
+	IRHIScene* GetScene() const;
 	Level* GetCurrentLevel() const;
 
 private:
@@ -56,6 +57,11 @@ private:
 
 	void OnLoadLevel();
 	void OnUnloadLevel();
+
+private:
+	friend class GameInstance;
+
+	void RegisterPlayerController(APlayerController* inPlayerController);
 };
 
 #include "World.inl"

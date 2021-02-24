@@ -14,8 +14,8 @@
 #include "RHI/IRHIMaterialBundle.h"
 #include "RHI/IRHIRenderTarget.h"
 #include "RHI/IRHIShaderBindingTable.h"
+#include "RHI/IRHIScene.h"
 #include "SceneRendering/DeferredSceneRenderer.h"
-#include "SceneRendering/Scene.h"
 #include "SceneRendering/MinimalViewInfo.h"
 #include "SceneRendering/ShaderCameraConstant.h"
 #include "SceneRendering/SceneVisibility.h"
@@ -41,7 +41,7 @@ DeferredGameViewport::~DeferredGameViewport()
 
 }
 
-void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, Scene* inScene)
+void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, IRHIScene* inScene)
 {
 	DeferredSceneRenderer renderer(inScene);
 
@@ -92,7 +92,7 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 	rtv = device->CreateRenderTargetView(renderTarget.Get());
 }
 
-void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* inScene)
+void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, IRHIScene* inScene)
 {
 	SceneVisibility* localPlayerVisibility = inScene->GetLocalPlayerVisibility();
 	const uint64 playerCameraConstantAddr = localPlayerVisibility->ShaderCameraConstants->GetCameraConstantVirtualAddress();
@@ -106,7 +106,7 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, Scene* in
 	IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
 	inCommandList->SetShader(shader);
 
-	const auto& lights = inScene->LightSceneProxies;
+	const auto& lights = inScene->GetLights();
 	LightBatch* batch = lights[0]->GetLightBatch();
 	inCommandList->SetComputeRootUnorderedAccessView(0, hdrBuffer->GetUnorderedAccessView());
 	inCommandList->SetComputeRootConstantBufferView(1, playerCameraConstantAddr);

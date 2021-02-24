@@ -8,7 +8,6 @@
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
 #include "Diagnostics/ScopedCycleCounter.h"
-#include "SceneRendering/Scene.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -42,10 +41,8 @@ void GameInstance::Initialize()
 		SE_LOG(LogEngine, Fatal, L"Cannot create player controller.");
 		return;
 	}
+	world->RegisterPlayerController(localPlayerController);
 	world->LoadLevel(gameMode->StartLevelClass);
-
-	Scene* scene = world->GetScene();
-	scene->LocalPlayer = localPlayerController;
 
 	localPlayerController->BeginPlay();
 }

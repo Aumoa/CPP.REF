@@ -8,8 +8,8 @@
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "SceneRendering/MinimalViewInfo.h"
 
+interface IRHIScene;
 class PrimitiveSceneProxy;
-class Scene;
 class ShaderCameraConstantVector;
 
 class GAME_API SceneVisibility : virtual public Object
@@ -19,7 +19,7 @@ public:
 	using This = SceneVisibility;
 
 private:
-	Scene* myScene;
+	IRHIScene* myScene;
 	MinimalViewInfo myView;
 	std::vector<bool> visibilities;
 	TRefPtr<ShaderCameraConstantVector> shaderCameraConstants;
@@ -28,7 +28,7 @@ private:
 	size_t numPrimitivesRender;
 
 public:
-	SceneVisibility(Scene* inScene);
+	SceneVisibility(IRHIScene* inScene);
 	~SceneVisibility() override;
 
 	void CalcVisibility();

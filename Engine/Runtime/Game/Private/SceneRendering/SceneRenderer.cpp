@@ -4,7 +4,7 @@
 
 using namespace std;
 
-SceneRenderer::SceneRenderer(Scene* scene) : Super()
+SceneRenderer::SceneRenderer(IRHIScene* scene) : Super()
 	, renderScene(scene)
 {
 
@@ -15,7 +15,7 @@ SceneRenderer::~SceneRenderer()
 
 }
 
-Scene* SceneRenderer::GetScene() const
+IRHIScene* SceneRenderer::GetScene() const
 {
 	return renderScene;
 }

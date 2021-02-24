@@ -7,8 +7,7 @@
 
 interface IRHIResource;
 interface IRHICommandList;
-
-class Scene;
+interface IRHIScene;
 
 class GAME_API GameViewport : virtual public Object
 {
@@ -26,7 +25,7 @@ public:
 	GameViewport();
 	~GameViewport() override;
 
-	virtual void RenderScene(IRHICommandList* inCommandList, Scene* inScene) = 0;
+	virtual void RenderScene(IRHICommandList* inCommandList, IRHIScene* inScene) = 0;
 	virtual IRHIResource* GetRenderTarget() const = 0;
 
 	vs_property_get(int32, ResolutionX);

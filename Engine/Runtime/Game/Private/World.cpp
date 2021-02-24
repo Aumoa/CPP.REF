@@ -3,22 +3,25 @@
 #include "World.h"
 
 #include "Level.h"
+#include "Engine.h"
 #include "Framework/Actor.h"
-#include "SceneRendering/Scene.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/LightComponent.h"
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "RHI/IRHIScene.h"
+#include "RHI/IRHIResourceBundle.h"
 
 using namespace std;
 using namespace std::chrono;
 
 DEFINE_STATS_GROUP(World);
 
-World::World()
+World::World() : Super()
+	, localPlayerController(nullptr)
 {
-	scene = NewObject<Scene>();
+
 }
 
 World::~World()
@@ -67,7 +70,7 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 	return currentLevel.Get();
 }
 
-Scene* World::GetScene() const
+IRHIScene* World::GetScene() const
 {
 	return scene.Get();
 }
@@ -165,7 +168,7 @@ void World::AddSceneProxy(AActor* actor_ptr)
 			item->ResolveDirtyState();
 		}
 
-		scene->AddScene(item);
+		scene->AddPrimitive(item);
 	}
 
 	list<LightComponent*> lightComponents = actor_ptr->GetComponents<LightComponent>();
@@ -201,4 +204,10 @@ void World::OnUnloadLevel()
 			actors[i]->EndPlay();
 		}
 	}
+}
+
+void World::RegisterPlayerController(APlayerController* inPlayerController)
+{
+	localPlayerController = inPlayerController;
+	scene = GEngine.ResourceBundle->CreateScene(inPlayerController);
 }

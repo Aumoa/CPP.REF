@@ -2,14 +2,14 @@
 
 #include "SceneRendering/SceneVisibility.h"
 
-#include "SceneRendering/Scene.h"
 #include "SceneRendering/ShaderCameraConstant.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 #include "Components/PrimitiveComponent.h"
+#include "RHI/IRHIScene.h"
 
 using namespace std;
 
-SceneVisibility::SceneVisibility(Scene* inScene) : Super()
+SceneVisibility::SceneVisibility(IRHIScene* inScene) : Super()
 	, myScene(inScene)
 	, bDirty(true)
 {
@@ -25,7 +25,7 @@ void SceneVisibility::CalcVisibility()
 {
 	if (bDirty)
 	{
-		const auto& primitives = myScene->Primitives;
+		const auto& primitives = myScene->GetPrimitives();
 
 		visibilities.resize(primitives.size());
 		shaderCameraConstants->BeginUpdateConstant(myView);
@@ -33,7 +33,7 @@ void SceneVisibility::CalcVisibility()
 
 		for (size_t i = 0; i < primitives.size(); ++i)
 		{
-			PrimitiveSceneProxy* proxy = primitives[i]->GetSceneProxy();
+			PrimitiveSceneProxy* proxy = primitives[i];
 			if (proxy == nullptr)
 			{
 				visibilities[i] = false;

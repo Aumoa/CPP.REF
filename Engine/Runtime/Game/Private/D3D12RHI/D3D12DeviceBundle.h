@@ -71,7 +71,6 @@ public:
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes);
 	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState);
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue);
-	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage);
 
 	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, IRHIResource* const* inResources, size_t count);
 

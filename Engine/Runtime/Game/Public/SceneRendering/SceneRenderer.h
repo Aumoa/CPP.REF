@@ -6,8 +6,7 @@
 #include "CoreMinimal.h"
 
 interface IRHICommandList;
-
-class Scene;
+interface IRHIScene;
 
 class GAME_API SceneRenderer : virtual public Object
 {
@@ -16,13 +15,13 @@ public:
 	using This = SceneRenderer;
 
 private:
-	Scene* renderScene;
+	IRHIScene* renderScene;
 
 public:
-	SceneRenderer(Scene* scene);
+	SceneRenderer(IRHIScene* scene);
 	~SceneRenderer() override;
 
 	virtual void RenderScene(IRHICommandList* immediateCommandList) = 0;
 
-	Scene* GetScene() const;
+	IRHIScene* GetScene() const;
 };

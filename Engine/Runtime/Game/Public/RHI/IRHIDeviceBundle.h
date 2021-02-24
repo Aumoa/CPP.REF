@@ -54,7 +54,6 @@ interface GAME_API IRHIDeviceBundle : virtual public Object, virtual public IRHI
 	virtual TRefPtr<IRHIResource> CreateDynamicBuffer(size_t sizeInBytes) = 0;
 	virtual TRefPtr<IRHIResource> CreateImmutableBuffer(size_t sizeInBytes, ERHIResourceStates initialState) = 0;
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, int32 width, int32 height, ERHIResourceStates initialStates, ERHIResourceFlags flags, const RHITextureClearValue& inClearValue) = 0;
-	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage) = 0;
 
 	virtual void UpdateTextureGroupView(IRHIShaderResourceView* inView, IRHIResource* const* inResources, size_t count) = 0;
 

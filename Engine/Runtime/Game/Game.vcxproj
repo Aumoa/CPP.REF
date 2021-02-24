@@ -271,6 +271,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ResourceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SBTAllocator.h" />
+    <ClInclude Include="Private\D3D12RHI\D3D12Scene.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Shader.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderBindingParameter.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h" />
@@ -362,6 +363,7 @@
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\IRHIResource.h" />
     <ClInclude Include="Public\RHI\IRHIResourceBundle.h" />
+    <ClInclude Include="Public\RHI\IRHIScene.h" />
     <ClInclude Include="Public\RHI\IRHIShader.h" />
     <ClInclude Include="Public\RHI\IRHIShaderBindingTable.h" />
     <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
@@ -390,7 +392,6 @@
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h" />
-    <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\SceneVisibility.h" />
     <ClInclude Include="Public\SceneRendering\StaticMesh.h" />
@@ -452,6 +453,7 @@
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ResourceBundle.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SBTAllocator.cpp" />
+    <ClCompile Include="Private\D3D12RHI\D3D12Scene.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
@@ -508,7 +510,6 @@
     <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
     <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
-    <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneVisibility.cpp" />
     <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp" />

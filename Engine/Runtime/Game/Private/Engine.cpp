@@ -9,7 +9,6 @@
 #include "RHI/IRHIResource.h"
 #include "Logging/LogMacros.h"
 #include "SceneRendering/SceneRenderer.h"
-#include "SceneRendering/Scene.h"
 #include "RHI/IRHICommandFence.h"
 #include "RHI/IRHIImmediateCommandList.h"
 #include "RHI/IRHIRenderTargetView.h"
@@ -136,7 +135,7 @@ void Engine::TickWorld()
 void Engine::RenderScene()
 {
 	World* const world = gameInstance->GetWorld();
-	Scene* const scene = world->GetScene();
+	IRHIScene* const scene = world->GetScene();
 
 	immediateCommandList->BeginCommand();
 	CommitBundles(immediateCommandList);

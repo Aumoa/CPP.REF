@@ -32,14 +32,14 @@ public:
 	DeferredGameViewport();
 	~DeferredGameViewport() override;
 
-	void RenderScene(IRHICommandList* inCommandList, Scene* inScene) override;
+	void RenderScene(IRHICommandList* inCommandList, IRHIScene* inScene) override;
 	IRHIResource* GetRenderTarget() const override;
 
 protected:
 	void SetViewportResolution_Internal(int32 x, int32 y) override;
 
 private:
-	void LightRender(IRHICommandList* inCommandList, Scene* inScene);
+	void LightRender(IRHICommandList* inCommandList, IRHIScene* inScene);
 	void TonemapRender(IRHICommandList* inCommandList);
 
 	void RecreateRenderTarget();
