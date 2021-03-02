@@ -15,4 +15,5 @@ LogCategoryBase LogPawn(ELogVerbosity::Verbose, nameof(LogPawn));
 LogCategoryBase LogSceneComponent(ELogVerbosity::Verbose, nameof(LogSceneComponent));
 LogCategoryBase LogMovement(ELogVerbosity::Verbose, nameof(LogMovement));
 LogCategoryBase LogShader(ELogVerbosity::Verbose, nameof(LogShader));
-LogCategoryBase LogRHI(ELogVerbosity::Verbose, nameof(LogShader));
+LogCategoryBase LogRHI(ELogVerbosity::Verbose, nameof(LogRHI));
+LogCategoryBase LogCOM(ELogVerbosity::Verbose, nameof(LogCOM));

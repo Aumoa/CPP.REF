@@ -31,6 +31,7 @@ public:
 	virtual MeshBatch* GetMeshBatch() const;
 	virtual Transform GetPrimitiveTransform() const;
 	virtual const AxisAlignedCube* GetPrimitiveBoundingBox() const;
+	virtual uint64 GetRaytracingAccelerationStructurePtr() const;
 
 	const EComponentMobility Mobility;
 };

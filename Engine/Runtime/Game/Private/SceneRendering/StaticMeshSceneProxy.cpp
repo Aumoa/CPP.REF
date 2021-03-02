@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "SceneRendering/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
+#include "RHI/IRHIResource.h"
 
 class StaticMeshSceneProxyBatch : public MeshBatch
 {
@@ -98,4 +99,9 @@ MeshBatch* StaticMeshSceneProxy::GetMeshBatch() const
 const AxisAlignedCube* StaticMeshSceneProxy::GetPrimitiveBoundingBox() const
 {
 	return &transformedBoundingBox;
+}
+
+uint64 StaticMeshSceneProxy::GetRaytracingAccelerationStructurePtr() const
+{
+	return staticMesh->RaytracingAccelerationStructureBuffer->GetVirtualAddress();
 }

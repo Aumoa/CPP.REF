@@ -320,8 +320,12 @@
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\COM\COMDeviceBundle.h" />
+    <ClInclude Include="Public\COM\COMException.h" />
+    <ClInclude Include="Public\COM\TComPtr.h" />
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeviceBundle.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\Framework\Character.h" />
@@ -430,6 +434,8 @@
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\Components\SpringArmComponent.cpp" />
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Private\COM\COMDeviceBundle.cpp" />
+    <ClCompile Include="Private\COM\COMException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.InitializeShaders.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBuffer.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.cpp" />
@@ -532,6 +538,7 @@
     <ClCompile Include="Private\WinException.cpp" />
     <None Include="Public\Components\ActorComponent.inl" />
     <None Include="Public\Components\SceneComponent.inl" />
+    <None Include="Public\COM\TComPtr.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
     <None Include="Public\Level.inl" />

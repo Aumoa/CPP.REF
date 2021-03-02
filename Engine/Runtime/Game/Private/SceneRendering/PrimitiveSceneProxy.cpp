@@ -43,3 +43,8 @@ const AxisAlignedCube* PrimitiveSceneProxy::GetPrimitiveBoundingBox() const
 {
 	return nullptr;
 }
+
+uint64 PrimitiveSceneProxy::GetRaytracingAccelerationStructurePtr() const
+{
+	return 0;
+}

@@ -10,6 +10,7 @@
 
 interface IRHIOnlineDescriptorPatch;
 interface IRHICommandList;
+interface IRHIResource;
 
 class PrimitiveSceneProxy;
 class PrimitiveComponent;
@@ -17,6 +18,8 @@ class APlayerController;
 class SceneVisibility;
 class LightComponent;
 class LightSceneProxy;
+class D3D12DeviceBundle;
+class D3D12ResourceBundle;
 
 class D3D12Scene : virtual public Object, virtual public IRHIScene
 {
@@ -24,6 +27,9 @@ public:
 	using Super = Object;
 
 public:
+	D3D12DeviceBundle* deviceBundle;
+	D3D12ResourceBundle* resourceBundle;
+
 	std::vector<PrimitiveComponent*> primitiveComponents;
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
@@ -35,6 +41,9 @@ public:
 	std::vector<LightComponent*> lightComponents;
 	std::vector<LightSceneProxy*> lightProxies;
 	TRefPtr<IRHIOnlineDescriptorPatch> srvPatch;
+
+	TRefPtr<IRHIResource> topLevelAS;
+	TRefPtr<IRHIResource> topLevelScratch;
 
 public:
 	D3D12Scene(APlayerController* inPlayerController);
@@ -52,4 +61,7 @@ public:
 	virtual SceneVisibility* GetLocalPlayerVisibility() const;
 	virtual std::span<PrimitiveSceneProxy* const> GetPrimitives() const;
 	virtual std::span<LightSceneProxy* const> GetLights() const;
+
+private:
+	void ReadyRaytracingAccelerationBuffers();
 };

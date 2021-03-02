@@ -56,6 +56,7 @@ public:
 	
 	vs_property_get_auto(MaterialInterface*, DefaultMaterial, material.Get());
 	vs_property_get_auto(AxisAlignedCube, BoundingBox, boundingBox);
+	vs_property_get_auto(IRHIResource*, RaytracingAccelerationStructureBuffer, accelerationStructure.Get());
 
 	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial);
 	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial, const AxisAlignedCube& inBoundingBox);

@@ -33,4 +33,5 @@ public:
 
 	MeshBatch* GetMeshBatch() const override;
 	const AxisAlignedCube* GetPrimitiveBoundingBox() const override;
+	uint64 GetRaytracingAccelerationStructurePtr() const override;
 };
