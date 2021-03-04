@@ -7,7 +7,7 @@
 
 using namespace std;
 
-ComPtr<IWICImagingFactory2> imagingFactory;
+TComPtr<IWICImagingFactory2> imagingFactory;
 
 PlatformImageLoader::PlatformImageLoader(TRefPtr<String> inFilepath) : Super()
 	, bValid(false)
@@ -43,7 +43,7 @@ TRefPtr<PlatformBitmapFrame> PlatformImageLoader::GetFrame(size_t frameIndex) co
 		return nullptr;
 	}
 
-	ComPtr<IWICBitmapFrameDecode> frame;
+	TComPtr<IWICBitmapFrameDecode> frame;
 	if (FAILED(decoder->GetFrame((UINT)frameIndex, &frame)))
 	{
 		SE_LOG(LogPlatform, Error, L"Cannot query bitmap frame. Bitmap or frame is corrupted.");

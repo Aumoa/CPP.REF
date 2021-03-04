@@ -18,12 +18,9 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 #include <Windows.h>
-#include <wrl/client.h>
 #include <crtdbg.h>
 #include <wincodec.h>
 #pragma warning(pop)
-
-using Microsoft::WRL::ComPtr;
 
 #undef CreateWindow
 
@@ -45,6 +42,7 @@ using Microsoft::WRL::ComPtr;
 #define _In_opt_
 #endif
 
+using HANDLE = void*;
 using HWND = void*;
 using UINT = uint32;
 using WPARAM = uint64;

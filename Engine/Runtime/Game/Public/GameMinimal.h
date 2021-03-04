@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WindowsMinimal.h"
 
 #include "Rotator.h"
 #include "Transform.h"

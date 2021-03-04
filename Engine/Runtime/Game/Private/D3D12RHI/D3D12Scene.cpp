@@ -138,6 +138,6 @@ void D3D12Scene::ReadyRaytracingAccelerationBuffers()
 	D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO prebuild = { };
 	deviceBundle->Device->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
 
-	topLevelAS = resourceBundle->CreateRaytracingAccelerationStructureBuffer(prebuild.ResultDataMaxSizeInBytes);
-	topLevelScratch = resourceBundle->CreateRaytracingScratchBuffer(prebuild.ScratchDataSizeInBytes);
+	//topLevelAS = resourceBundle->CreateRaytracingAccelerationStructureBuffer(prebuild.ResultDataMaxSizeInBytes);
+	//topLevelScratch = resourceBundle->CreateRaytracingScratchBuffer(prebuild.ScratchDataSizeInBytes);
 }

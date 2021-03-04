@@ -2,9 +2,9 @@
 
 #include "Engine.h"
 
-#include "Application.h"
 #include "GameInstance.h"
 #include "DeferredGameViewport.h"
+#include "Windows/CoreWindow.h"
 #include "RHI/IRHISwapChain.h"
 #include "RHI/IRHIResource.h"
 #include "Logging/LogMacros.h"
@@ -34,7 +34,6 @@ Engine* Engine::gEngine = nullptr;
 
 Engine::Engine() : Super()
 	, LogEngine(ELogVerbosity::Verbose, nameof(LogEngine))
-	, gameInstance(nullptr)
 
 	, deviceBundle(nullptr)
 	, immediateCommandList(nullptr)
@@ -66,16 +65,11 @@ void Engine::Initialize()
 
 	assetManager = NewObject<AssetManager>();
 	gameViewport = NewObject<DeferredGameViewport>();
-	GApplication.PostSized += bind_delegate(Application_OnPostSized);
+	GApplication.MainWindow->PostSized += bind_delegate(Application_OnPostSized);
 
 	LoadEngineDefaultAssets();
 
 	prev_tick = steady_clock::now();
-}
-
-void Engine::PostInitialize()
-{
-	gameInstance = GApplication.GetGameInstance();
 }
 
 void Engine::Tick()
@@ -129,36 +123,35 @@ void Engine::TickWorld()
 	prev_tick = curr_tick;
 
 	deviceBundle->GetResourceGC()->Collect();
-	gameInstance->Tick(delta);
 }
 
 void Engine::RenderScene()
 {
-	World* const world = gameInstance->GetWorld();
-	IRHIScene* const scene = world->GetScene();
+	//World* const world = gameInstance->GetWorld();
+	//IRHIScene* const scene = world->GetScene();
 
-	immediateCommandList->BeginCommand();
-	CommitBundles(immediateCommandList);
+	//immediateCommandList->BeginCommand();
+	//CommitBundles(immediateCommandList);
 
-	autoFence->BeginFence();
+	//autoFence->BeginFence();
 
-	gameViewport->RenderScene(immediateCommandList, scene);
+	//gameViewport->RenderScene(immediateCommandList, scene);
 
-	{
-		QUICK_SCOPED_CYCLE_COUNTER(Engine, RenderFlushing);
+	//{
+	//	QUICK_SCOPED_CYCLE_COUNTER(Engine, RenderFlushing);
 
-		IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex);
+	//	IRHIResource* target = swapChain->GetBuffer(swapChain->CurrentBackBufferIndex);
 
-		immediateCommandList->ResourceTransition(target, ERHIResourceStates::PRESENT, ERHIResourceStates::COPY_DEST);
-		immediateCommandList->CopyResource(target, gameViewport->GetRenderTarget());
-		immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
+	//	immediateCommandList->ResourceTransition(target, ERHIResourceStates::PRESENT, ERHIResourceStates::COPY_DEST);
+	//	immediateCommandList->CopyResource(target, gameViewport->GetRenderTarget());
+	//	immediateCommandList->ResourceTransition(target, ERHIResourceStates::COPY_DEST, ERHIResourceStates::PRESENT);
 
-		immediateCommandList->EndCommand();
-		immediateCommandList->Flush();
-		swapChain->Present();
-	}
+	//	immediateCommandList->EndCommand();
+	//	immediateCommandList->Flush();
+	//	swapChain->Present();
+	//}
 
-	autoFence->EndFence(immediateCommandList);
+	//autoFence->EndFence(immediateCommandList);
 }
 
 void Engine::InitializeBundles()

@@ -23,7 +23,7 @@ class GameInstance;
 class AssetManager;
 class GameViewport;
 
-class GAME_API Engine : virtual public Object, virtual public IEngineTick
+class GAME_API Engine : virtual public Object
 {
 public:
 	using Super = Object;
@@ -33,7 +33,6 @@ private:
 	static Engine* gEngine;
 
 	LogCategoryBase LogEngine;
-	GameInstance* gameInstance;
 	std::chrono::steady_clock::time_point prev_tick;
 
 	std::vector<TRefPtr<IRHIBundle>> rhiBundles;
@@ -54,7 +53,6 @@ public:
 	~Engine() override;
 
 	virtual void Initialize();
-	virtual void PostInitialize();
 	virtual void Tick();
 	virtual void Shutdown();
 

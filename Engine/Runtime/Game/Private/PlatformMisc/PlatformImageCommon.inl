@@ -2,13 +2,14 @@
 
 #include "Logging/LogMacros.h"
 #include "RHI/RHICommon.h"
+#include "COM/TComPtr.h"
 
 inline bool operator <(const WICPixelFormatGUID& lh, const WICPixelFormatGUID& rh)
 {
 	return memcmp(&lh, &rh, sizeof(lh)) < 0;
 }
 
-extern ComPtr<IWICImagingFactory2> imagingFactory;
+extern TComPtr<IWICImagingFactory2> imagingFactory;
 static std::tuple<ERHITextureFormat, WICPixelFormatGUID, size_t> convertTable[]
 {
 	{ ERHITextureFormat::R16G16B16A16_UNORM, GUID_WICPixelFormat64bppRGBA, 64 },

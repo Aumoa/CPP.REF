@@ -4,23 +4,25 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
+#include "Windows/Application.h"
 
 #include "TSubclassOf.h"
 
+class Engine;
 class World;
 class AGameModeBase;
 class APlayerController;
 
-class GAME_API GameInstance : virtual public Object
+class GAME_API GameInstance : public Application
 {
 public:
-	using Super = Object;
-	using This = GameInstance;
+	using Super = Application;
 
 private:
-	static TRefPtr<String> defaultAppName;
-
+	TRefPtr<String> appName;
+	TRefPtr<Engine> engine;
 	TRefPtr<World> world;
+
 	AGameModeBase* gameMode;
 	APlayerController* localPlayerController;
 
@@ -29,15 +31,19 @@ public:
 	~GameInstance() override;
 
 	TRefPtr<String> ToString() const override;
-
-	virtual void Initialize();
-	virtual void Tick(Seconds deltaTime);
-	virtual void BeginPlay();
-	virtual void EndPlay();
+	void Tick() override;
 
 	World* GetWorld() const;
 	AGameModeBase* GetGameMode() const;
 	APlayerController* GetLocalPlayer() const;
 
 	TSubclassOf<AGameModeBase> GameModeClass;
+
+	vs_property(TRefPtr<String>, AppName);
+	TRefPtr<String> AppName_get() const;
+	void AppName_set(TRefPtr<String> value);
+
+protected:
+	void Initialize() override;
+	void Shutdown() override;
 };

@@ -301,8 +301,6 @@
     <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanResource.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
-    <ClInclude Include="Public\AppDuplicationException.h" />
-    <ClInclude Include="Public\Application.h" />
     <ClInclude Include="Public\Assets\AssetManager.h" />
     <ClInclude Include="Public\ComponentMobility.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
@@ -403,8 +401,11 @@
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
     <ClInclude Include="Public\TSubclassOf.h" />
-    <ClInclude Include="Public\WindowsMinimal.h" />
-    <ClInclude Include="Public\WinException.h" />
+    <ClInclude Include="Public\Windows\Application.h" />
+    <ClInclude Include="Public\Windows\CoreWindow.h" />
+    <ClInclude Include="Public\Windows\HandleBase.h" />
+    <ClInclude Include="Public\Windows\WindowsMinimal.h" />
+    <ClInclude Include="Public\Windows\WinException.h" />
     <ClInclude Include="Public\World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -416,8 +417,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\AppDuplicationException.cpp" />
-    <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Assets\MeshLoader.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
@@ -523,6 +522,10 @@
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
+    <ClCompile Include="Private\Windows\Application.cpp" />
+    <ClCompile Include="Private\Windows\CoreWindow.cpp" />
+    <ClCompile Include="Private\Windows\HandleBase.cpp" />
+    <ClCompile Include="Private\Windows\WinException.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\Shaders\GenericLighting.hlsli" />
     <None Include="Private\Shaders\PrimitivePacking.hlsli" />
@@ -535,7 +538,6 @@
     <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
     <None Include="Private\VulkanRHI\VulkanResource.cpp" />
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
-    <ClCompile Include="Private\WinException.cpp" />
     <None Include="Public\Components\ActorComponent.inl" />
     <None Include="Public\Components\SceneComponent.inl" />
     <None Include="Public\COM\TComPtr.inl" />
@@ -547,7 +549,6 @@
     <None Include="Public\World.inl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Public\Application.inl" />
     <None Include="Public\Framework\Actor.inl" />
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>

@@ -2,8 +2,6 @@
 
 #include "D3D12DeviceBundle.h"
 
-#include "Application.h"
-#include "Logging/LogMacros.h"
 #include "D3D12SwapChain.h"
 #include "D3D12ImmediateCommandList.h"
 #include "D3D12CommandFence.h"
@@ -21,6 +19,9 @@
 #include "D3D12OnlineDescriptorPatch.h"
 #include "D3D12Shader.h"
 #include "D3D12SBTAllocator.h"
+#include "Windows/Application.h"
+#include "Windows/CoreWindow.h"
+#include "Logging/LogMacros.h"
 #include "RHI/RHIVertex.h"
 #include "RHI/RHIResourceGC.h"
 #include "RHI/RHITextureClearValue.h"
@@ -69,7 +70,7 @@ void D3D12DeviceBundle::InitializeBundle()
 
 	instance = this;
 
-	GApplication.Sizing += bind_delegate(Application_OnSizing);
+	GApplication.MainWindow->Sizing += bind_delegate(Application_OnSizing);
 }
 
 void D3D12DeviceBundle::ReleaseBundle()
@@ -385,7 +386,7 @@ void D3D12DeviceBundle::InitializeD3D12()
 	chainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	chainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
-	HWND hWnd = Application::GetInstance()->GetCoreHwnd();
+	HWND hWnd = Application::GetInstance()->MainWindow->HWnd;
 	ComPtr<IDXGISwapChain1> swapChain;
 	HR(dxgiFactory->CreateSwapChainForHwnd(immediateCommandList->CommandQueue, hWnd, &chainDesc, nullptr, nullptr, &swapChain));
 	ComPtr<IDXGISwapChain4> swapChain4;

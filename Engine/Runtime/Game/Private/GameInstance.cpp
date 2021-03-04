@@ -2,17 +2,15 @@
 
 #include "GameInstance.h"
 
+#include "Engine.h"
 #include "World.h"
 #include "Framework/GameModeBase.h"
 #include "Framework/PlayerController.h"
 #include "Logging/LogMacros.h"
-#include "Logging/EngineLogCategory.h"
-#include "Diagnostics/ScopedCycleCounter.h"
+#include "Windows/CoreWindow.h"
 
 using namespace std;
 using namespace std::chrono;
-
-TRefPtr<String> GameInstance::defaultAppName = L"GameInstance";
 
 GameInstance::GameInstance() : Super()
 	, gameMode(nullptr)
@@ -28,11 +26,51 @@ GameInstance::~GameInstance()
 
 TRefPtr<String> GameInstance::ToString() const
 {
-	return defaultAppName;
+	return AppName;
+}
+
+void GameInstance::Tick()
+{
+	CycleStatsGroup::ResolveFrameDiagnostics();
+	world->Tick(Seconds(0s));
+}
+
+World* GameInstance::GetWorld() const
+{
+	return world.Get();
+}
+
+AGameModeBase* GameInstance::GetGameMode() const
+{
+	return gameMode;
+}
+
+APlayerController* GameInstance::GetLocalPlayer() const
+{
+	return localPlayerController;
+}
+
+TRefPtr<String> GameInstance::AppName_get() const
+{
+	return appName;
+}
+
+void GameInstance::AppName_set(TRefPtr<String> value)
+{
+	appName = value;
+	if (MainWindow != nullptr)
+	{
+		MainWindow->Title = value;
+	}
 }
 
 void GameInstance::Initialize()
 {
+	MainWindow->Title = appName;
+
+	engine = NewObject<Engine>();
+	engine->Initialize();
+
 	world = NewObject<World>();
 	gameMode = world->SpawnActor(GameModeClass);
 	localPlayerController = world->SpawnActor(gameMode->PlayerControllerClass);
@@ -47,23 +85,7 @@ void GameInstance::Initialize()
 	localPlayerController->BeginPlay();
 }
 
-void GameInstance::Tick(Seconds deltaTime)
-{
-	CycleStatsGroup::ResolveFrameDiagnostics();
-	world->Tick(deltaTime);
-}
-
-void GameInstance::BeginPlay()
+void GameInstance::Shutdown()
 {
 
-}
-
-void GameInstance::EndPlay()
-{
-
-}
-
-World* GameInstance::GetWorld() const
-{
-	return world.Get();
 }

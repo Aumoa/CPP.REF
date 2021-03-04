@@ -22,7 +22,5 @@ public:
 	THGameInstance();
 	~THGameInstance();
 
-	TRefPtr<String> ToString() const;
-
-	void Tick(Seconds deltaTime) override;
+	void Tick() override;
 };

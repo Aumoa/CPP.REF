@@ -36,6 +36,8 @@ THGameInstance::THGameInstance() : Super()
 	};
 
 	diag_tick->AddSchedule(taskInfo);
+
+	AppName = L"GameApp";
 }
 
 THGameInstance::~THGameInstance()
@@ -43,14 +45,9 @@ THGameInstance::~THGameInstance()
 
 }
 
-TRefPtr<String> THGameInstance::ToString() const
+void THGameInstance::Tick()
 {
-	return L"Touhou Hourai";
-}
+	Super::Tick();
 
-void THGameInstance::Tick(Seconds deltaTime)
-{
-	Super::Tick(deltaTime);
-
-	diag_tick->Tick(deltaTime);
+	diag_tick->Tick(Seconds(0ms));
 }

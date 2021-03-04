@@ -100,21 +100,15 @@
     <Filter Include="Private\COM">
       <UniqueIdentifier>{035bfb9c-81cd-43e6-8028-772ad8a60fc3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Windows">
+      <UniqueIdentifier>{48451bd6-2d21-4155-8e2f-459cdfcfcd6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Windows">
+      <UniqueIdentifier>{27f32681-b7e3-4fbc-a68a-28043d929a74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Application.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\AppDuplicationException.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\WindowsMinimal.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\WinException.h">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\IEngineTick.h">
@@ -579,17 +573,23 @@
     <ClInclude Include="Public\COM\COMException.h">
       <Filter>Public\COM</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Windows\CoreWindow.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\HandleBase.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WindowsMinimal.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\Application.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinException.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\AppDuplicationException.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Application.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\WinException.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Engine.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -908,13 +908,22 @@
     <ClCompile Include="Private\COM\COMException.cpp">
       <Filter>Private\COM</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Windows\HandleBase.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\CoreWindow.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\Application.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinException.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
       <Filter>Public\Logging</Filter>
-    </None>
-    <None Include="Public\Application.inl">
-      <Filter>Public</Filter>
     </None>
     <None Include="Public\Framework\Actor.inl">
       <Filter>Public\Framework</Filter>

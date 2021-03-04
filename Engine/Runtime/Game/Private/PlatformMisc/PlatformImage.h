@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "WindowsMinimal.h"
+#include "Windows/WindowsMinimal.h"
 
 class PlatformImage : virtual public Object
 {

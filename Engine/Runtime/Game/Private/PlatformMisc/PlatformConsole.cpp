@@ -2,7 +2,7 @@
 
 #include "PlatformMisc/PlatformConsole.h"
 
-#include "WindowsMinimal.h"
+#include "Windows/WindowsMinimal.h"
 #include "Logging/LogMacros.h"
 
 bool PlatformConsole::Alloc()

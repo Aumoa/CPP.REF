@@ -2,8 +2,9 @@
 
 #include "PlatformMisc/PlatformInput.h"
 
-#include "WindowsMinimal.h"
-#include "Application.h"
+#include "Windows/WindowsMinimal.h"
+#include "Windows/Application.h"
+#include "Windows/CoreWindow.h"
 #include "Logging/LogMacros.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 
@@ -198,7 +199,7 @@ void CursorCompare::Compare(const CursorState& lh, const CursorState& rh)
 		lhy = lh.GetCursorY();
 	}
 
-	HWND hWnd = GApplication.GetCoreHwnd();
+	HWND hWnd = GApplication.MainWindow->HWnd;
 	uint32 dpi = GetDpiForWindow(hWnd);
 
 	cursorDeltaX = rh.GetCursorX() - lhx;
@@ -302,7 +303,7 @@ void PlatformInput::SetCursorVisible(bool value)
 bool PlatformInput::IsInputActive()
 {
 	// If application is not active, all input states are undefined.
-	return GetActiveWindow() == GApplication.GetCoreHwnd();
+	return GetActiveWindow() == GApplication.MainWindow->HWnd;
 }
 
 void PlatformInput::SetCursorToHwndCenter()
@@ -314,7 +315,7 @@ void PlatformInput::SetCursorToHwndCenter()
 
 void PlatformInput::GetCenterCursor(int32& x, int32& y)
 {
-	HWND hWnd = GApplication.GetCoreHwnd();
+	HWND hWnd = GApplication.MainWindow->HWnd;
 	RECT rc;
 	GetClientRect(hWnd, &rc);
 

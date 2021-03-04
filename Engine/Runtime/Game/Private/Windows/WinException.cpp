@@ -1,8 +1,8 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "WinException.h"
+#include "Windows/WinException.h"
 
-#include "WindowsMinimal.h"
+#include "Windows/WindowsMinimal.h"
 
 WinException::WinException() : This(GetLastError())
 {
@@ -10,6 +10,7 @@ WinException::WinException() : This(GetLastError())
 }
 
 WinException::WinException(int32 lastError) : Super(GetErrorMessage(lastError))
+	, lastError(lastError)
 {
 
 }
