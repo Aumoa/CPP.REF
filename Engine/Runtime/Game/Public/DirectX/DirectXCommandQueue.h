@@ -4,12 +4,23 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
-
-#include "COM/TComPtr.h"
+#include "DirectXDeviceResource.h"
 
 interface ID3D12CommandQueue;
+enum D3D12_COMMAND_LIST_TYPE;
 
-class GAME_API DirectXCommandQueue : virtual public Object
+class GAME_API DirectXCommandQueue : public DirectXDeviceResource
 {
+public:
+	using Super = DirectXDeviceResource;
 
+private:
+	TComPtr<ID3D12CommandQueue> commandQueue;
+
+public:
+	DirectXCommandQueue(DirectXDeviceBundle* deviceBundle);
+	DirectXCommandQueue(DirectXDeviceBundle* deviceBundle, D3D12_COMMAND_LIST_TYPE type);
+	~DirectXCommandQueue() override;
+
+	vs_property_get_auto(ID3D12CommandQueue*, Item, commandQueue.Get());
 };

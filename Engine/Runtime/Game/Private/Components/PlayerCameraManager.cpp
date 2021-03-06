@@ -34,8 +34,8 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 
 		if (outViewInfo.AspectRatio == 0.0f)
 		{
-			GameViewport* vp = GEngine.GetGameViewport();
-			outViewInfo.AspectRatio = vp->ResolutionX / (float)vp->ResolutionY;
+			//GameViewport* vp = GEngine.GetGameViewport();
+			//outViewInfo.AspectRatio = vp->ResolutionX / (float)vp->ResolutionY;
 		}
 
 		outViewInfo.Apply();
@@ -63,10 +63,10 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 			updateTransform = pawn->GetActorTransform();
 		}
 
-		GameViewport* viewport = GEngine.GetGameViewport();
+		//GameViewport* viewport = GEngine.GetGameViewport();
 
 		outViewInfo.FOV = DefaultFOV;
-		outViewInfo.AspectRatio = (float)viewport->ResolutionX / (float)viewport->ResolutionY;
+		//outViewInfo.AspectRatio = (float)viewport->ResolutionX / (float)viewport->ResolutionY;
 		outViewInfo.Location = updateTransform.Translation;
 		outViewInfo.Rotation = updateTransform.Rotation;
 		outViewInfo.Apply();

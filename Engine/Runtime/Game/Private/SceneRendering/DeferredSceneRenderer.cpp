@@ -21,7 +21,7 @@ using namespace std;
 DeferredSceneRenderer::DeferredSceneRenderer(IRHIScene* inScene) : Super(inScene)
 	, shaderLibrary(nullptr)
 {
-	shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
+	//shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
 }
 
 DeferredSceneRenderer::~DeferredSceneRenderer()
@@ -54,7 +54,7 @@ void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, Sc
 	const auto& primitiveVisibility = inSceneVisibility->PrimitiveVisibility;
 	CameraConstantIterator cbvIterator = inSceneVisibility->ShaderCameraConstants->GetBufferIterator();
 
-	IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
+	//IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
 
 	for (size_t i = 0; i < primitiveSceneProxies.size(); ++i)
 	{
@@ -66,11 +66,11 @@ void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, Sc
 			MeshBatch* batch = scene->GetMeshBatch();
 			const RHIMeshDrawCommand* drawCommand = batch->GetDrawCommand();
 			uint32 const32Bit = drawCommand->MaterialIndex;
-			MaterialInterface* material = materialBundle->FindMaterialFromIndex(drawCommand->MaterialIndex);
+			//MaterialInterface* material = materialBundle->FindMaterialFromIndex(drawCommand->MaterialIndex);
 
 			commandList->SetGraphicsRootConstantBufferView(0, cbv);
 			commandList->SetGraphicsRoot32BitConstants(1, &const32Bit, 1);
-			commandList->SetGraphicsRootShaderResourceView(2, material->SurfaceTextureSRV);
+			//commandList->SetGraphicsRootShaderResourceView(2, material->SurfaceTextureSRV);
 			commandList->DrawMesh(*drawCommand);
 
 			cbvIterator.MoveNext();

@@ -55,8 +55,8 @@ TRefPtr<StaticMesh> StaticMesh::CreateStaticMesh(span<RHIVertex> vertices, span<
 {
 	auto staticMesh = NewObject<StaticMesh>();
 
-	staticMesh->vertexBuffer = GEngine.DeviceBundle->CreateVertexBuffer(vertices);
-	staticMesh->indexBuffer = GEngine.DeviceBundle->CreateIndexBuffer(indices);
+	//staticMesh->vertexBuffer = GEngine.DeviceBundle->CreateVertexBuffer(vertices);
+	//staticMesh->indexBuffer = GEngine.DeviceBundle->CreateIndexBuffer(indices);
 	staticMesh->material = move(defaultMaterial);
 
 	RHIMeshDrawCommand command;

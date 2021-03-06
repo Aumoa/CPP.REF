@@ -17,7 +17,7 @@ D3D12OnlineDescriptorPatch::D3D12OnlineDescriptorPatch() : Super()
 	, increment(0)
 	, handle_start{ }
 {
-	device = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->Device;
+	//device = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->Device;
 }
 
 D3D12OnlineDescriptorPatch::~D3D12OnlineDescriptorPatch()

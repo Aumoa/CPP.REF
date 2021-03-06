@@ -2,22 +2,11 @@
 
 #include "DirectX/DirectXDeviceBundle.h"
 
-#include <dxgi1_6.h>
-#include <d3d12.h>
+#include "DirectXMinimal.h"
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
 
 DirectXDeviceBundle::DirectXDeviceBundle() : Super()
-{
-
-}
-
-DirectXDeviceBundle::~DirectXDeviceBundle()
-{
-
-}
-
-void DirectXDeviceBundle::Initialize()
 {
 	UINT flag = 0;
 #ifdef _DEBUG
@@ -57,6 +46,16 @@ void DirectXDeviceBundle::Initialize()
 		SE_LOG(LogDirectX, Error, "Failed to detect adapter that support feature level 12_1. Create device with software platform.");
 		throw COMException(E_NOINTERFACE);
 	}
+}
+
+DirectXDeviceBundle::~DirectXDeviceBundle()
+{
+
+}
+
+ID3D12Device5* DirectXDeviceBundle::GetDevice() const
+{
+	return device.Get();
 }
 
 bool DirectXDeviceBundle::IsAdapterSuitable(IDXGIAdapter1* adapter) const

@@ -282,6 +282,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\ID3D12ResourceBase.h" />
     <ClInclude Include="Private\DirectXGeometry.h" />
+    <ClInclude Include="Private\DirectX\DirectXMinimal.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
@@ -342,6 +343,7 @@
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameMinimal.h" />
+    <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameViewport.h" />
     <ClInclude Include="Public\IEngineTick.h" />
     <ClInclude Include="Public\Key.h" />
@@ -472,6 +474,7 @@
     <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
     <ClCompile Include="Private\DirectXGeometry.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
@@ -488,6 +491,7 @@
     <ClCompile Include="Private\Framework\SpectatorPawn.cpp" />
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
+    <ClCompile Include="Private\GameObject.cpp" />
     <ClCompile Include="Private\GameViewport.cpp" />
     <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />

@@ -32,7 +32,8 @@ TRefPtr<String> GameInstance::ToString() const
 void GameInstance::Tick()
 {
 	CycleStatsGroup::ResolveFrameDiagnostics();
-	world->Tick(Seconds(0s));
+
+	engine->Tick();
 }
 
 World* GameInstance::GetWorld() const
@@ -69,20 +70,20 @@ void GameInstance::Initialize()
 	MainWindow->Title = appName;
 
 	engine = NewObject<Engine>();
-	engine->Initialize();
+	engine->Initialize(this);
 
-	world = NewObject<World>();
-	gameMode = world->SpawnActor(GameModeClass);
-	localPlayerController = world->SpawnActor(gameMode->PlayerControllerClass);
-	if (localPlayerController == nullptr)
-	{
-		SE_LOG(LogEngine, Fatal, L"Cannot create player controller.");
-		return;
-	}
-	world->RegisterPlayerController(localPlayerController);
-	world->LoadLevel(gameMode->StartLevelClass);
+	//world = NewObject<World>();
+	//gameMode = world->SpawnActor(GameModeClass);
+	//localPlayerController = world->SpawnActor(gameMode->PlayerControllerClass);
+	//if (localPlayerController == nullptr)
+	//{
+	//	SE_LOG(LogEngine, Fatal, L"Cannot create player controller.");
+	//	return;
+	//}
+	//world->RegisterPlayerController(localPlayerController);
+	//world->LoadLevel(gameMode->StartLevelClass);
 
-	localPlayerController->BeginPlay();
+	//localPlayerController->BeginPlay();
 }
 
 void GameInstance::Shutdown()

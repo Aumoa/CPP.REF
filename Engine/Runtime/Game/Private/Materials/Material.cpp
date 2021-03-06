@@ -50,11 +50,11 @@ void Material::ResolveDirtyState()
 		IRHIResource* ppResources[] = { DiffuseMap, NormalMap };
 		if (textureGroupView.IsValid)
 		{
-			GEngine.DeviceBundle->UpdateTextureGroupView(textureGroupView.Get(), ppResources);
+			//GEngine.DeviceBundle->UpdateTextureGroupView(textureGroupView.Get(), ppResources);
 		}
 		else
 		{
-			textureGroupView = GEngine.DeviceBundle->CreateTextureGroupView(ppResources);
+			//textureGroupView = GEngine.DeviceBundle->CreateTextureGroupView(ppResources);
 		}
 	}
 

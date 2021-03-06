@@ -603,6 +603,12 @@
     <ClInclude Include="Public\DirectX\DirectXDeviceResource.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Private\DirectX\DirectXMinimal.h">
+      <Filter>Private\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameObject.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -940,6 +946,12 @@
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp">
       <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameObject.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

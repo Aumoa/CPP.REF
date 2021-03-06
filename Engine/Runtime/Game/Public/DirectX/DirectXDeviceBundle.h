@@ -24,7 +24,7 @@ public:
 	DirectXDeviceBundle();
 	~DirectXDeviceBundle() override;
 
-	void Initialize();
+	ID3D12Device5* GetDevice() const;
 
 private:
 	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;

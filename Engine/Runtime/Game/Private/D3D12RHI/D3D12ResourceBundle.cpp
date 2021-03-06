@@ -30,8 +30,8 @@ D3D12ResourceBundle::~D3D12ResourceBundle()
 
 void D3D12ResourceBundle::InitializeBundle()
 {
-	deviceBundle = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle);
-	device = deviceBundle->Device;
+	//deviceBundle = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle);
+	//device = deviceBundle->Device;
 }
 
 void D3D12ResourceBundle::ReleaseBundle()

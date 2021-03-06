@@ -138,13 +138,13 @@ void RHIMaterialBundle::Resize(size_t inNewSize)
 		return;
 	}
 
-	auto device = GEngine.DeviceBundle;
+	//auto device = GEngine.DeviceBundle;
 
 	size_t slack = inNewSize - currSize;
 	TRefPtr<IRHIResource> oldDynamic = dynamicBuffer;
 
-	immutableBuffer = device->CreateImmutableBuffer(SizeofMaterial * inNewSize, ERHIResourceStates::NON_PIXEL_SHADER_RESOURCE);
-	dynamicBuffer = device->CreateDynamicBuffer(SizeofMaterial * inNewSize);
+	//immutableBuffer = device->CreateImmutableBuffer(SizeofMaterial * inNewSize, ERHIResourceStates::NON_PIXEL_SHADER_RESOURCE);
+	//dynamicBuffer = device->CreateDynamicBuffer(SizeofMaterial * inNewSize);
 
 	// Copy previous data to new buffer.
 	if (oldDynamic.IsValid)

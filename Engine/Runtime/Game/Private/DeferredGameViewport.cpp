@@ -29,11 +29,11 @@ DEFINE_STATS_GROUP(DeferredGameViewport);
 
 DeferredGameViewport::DeferredGameViewport() : Super()
 {
-	IRHIDeviceBundle* deviceBundle = GEngine.DeviceBundle;
-	RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
-	IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
+	//IRHIDeviceBundle* deviceBundle = GEngine.DeviceBundle;
+	//RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
+	//IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
 
-	sbt = deviceBundle->CreateShaderBindingTable(shader);
+	//sbt = deviceBundle->CreateShaderBindingTable(shader);
 }
 
 DeferredGameViewport::~DeferredGameViewport()
@@ -83,13 +83,13 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 		RecreateRenderTarget();
 	}
 
-	auto device = GEngine.DeviceBundle;
+	//auto device = GEngine.DeviceBundle;
 
-	gBuffer->ResizeBuffers(x, y);
-	hdrBuffer->ResizeBuffers(x, y);
+	//gBuffer->ResizeBuffers(x, y);
+	//hdrBuffer->ResizeBuffers(x, y);
 
-	renderTarget = gBuffer->GetRenderTarget(0);
-	rtv = device->CreateRenderTargetView(renderTarget.Get());
+	//renderTarget = gBuffer->GetRenderTarget(0);
+	//rtv = device->CreateRenderTargetView(renderTarget.Get());
 }
 
 void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, IRHIScene* inScene)
@@ -97,22 +97,22 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, IRHIScene
 	SceneVisibility* localPlayerVisibility = inScene->GetLocalPlayerVisibility();
 	const uint64 playerCameraConstantAddr = localPlayerVisibility->ShaderCameraConstants->GetCameraConstantVirtualAddress();
 
-	IRHIDeviceBundle* deviceBundle = GEngine.DeviceBundle;
-	IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
-	RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
+	//IRHIDeviceBundle* deviceBundle = GEngine.DeviceBundle;
+	//IRHIMaterialBundle* materialBundle = GEngine.MaterialBundle;
+	//RHIShaderLibrary* shaderLibrary = deviceBundle->GetShaderLibrary();
 
-	inCommandList->BeginRenderTarget(hdrBuffer.Get());
+	//inCommandList->BeginRenderTarget(hdrBuffer.Get());
 
-	IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
-	inCommandList->SetShader(shader);
+	//IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::LightingExperimental);
+	//inCommandList->SetShader(shader);
 
-	const auto& lights = inScene->GetLights();
-	LightBatch* batch = lights[0]->GetLightBatch();
-	inCommandList->SetComputeRootUnorderedAccessView(0, hdrBuffer->GetUnorderedAccessView());
-	inCommandList->SetComputeRootConstantBufferView(1, playerCameraConstantAddr);
-	inCommandList->SetComputeRootShaderResourceView(2, gBuffer->GetShaderResourceView());
-	inCommandList->SetComputeRootConstantBufferView(3, batch->GetLightBuffer()->GetVirtualAddress());
-	inCommandList->SetComputeRootShaderResource(4, materialBundle->GetMaterialsBufferVirtualAddress());
+	//const auto& lights = inScene->GetLights();
+	//LightBatch* batch = lights[0]->GetLightBatch();
+	//inCommandList->SetComputeRootUnorderedAccessView(0, hdrBuffer->GetUnorderedAccessView());
+	//inCommandList->SetComputeRootConstantBufferView(1, playerCameraConstantAddr);
+	//inCommandList->SetComputeRootShaderResourceView(2, gBuffer->GetShaderResourceView());
+	//inCommandList->SetComputeRootConstantBufferView(3, batch->GetLightBuffer()->GetVirtualAddress());
+	//inCommandList->SetComputeRootShaderResource(4, materialBundle->GetMaterialsBufferVirtualAddress());
 
 	RHIDispatchRaysDesc dispatchRays;
 	dispatchRays.SBT = sbt.Get();
@@ -125,8 +125,8 @@ void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, IRHIScene
 
 void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
 {
-	IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::TonemapShader);
-	inCommandList->SetShader(shader);
+	//IRHIShader* shader = GEngine.DeviceBundle->GetShaderLibrary()->GetShader(RHIShaderLibrary::TonemapShader);
+	//inCommandList->SetShader(shader);
 
 	IRHIRenderTargetView* rtvs[] = { rtv.Get() };
 
@@ -145,6 +145,6 @@ void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
 
 void DeferredGameViewport::RecreateRenderTarget()
 {
-	gBuffer = GEngine.DeviceBundle->CreateGBufferRenderTarget();
-	hdrBuffer = GEngine.DeviceBundle->CreateHDRRenderTarget();
+	//gBuffer = GEngine.DeviceBundle->CreateGBufferRenderTarget();
+	//hdrBuffer = GEngine.DeviceBundle->CreateHDRRenderTarget();
 }

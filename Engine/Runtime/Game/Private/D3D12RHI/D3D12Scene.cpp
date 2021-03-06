@@ -26,9 +26,9 @@ D3D12Scene::D3D12Scene(APlayerController* inPlayerController) : Super()
 	, localPlayer(inPlayerController)
 	, numSRVs(0)
 {
-	deviceBundle = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle);
-	localPlayerVisibility = NewObject<SceneVisibility>(this);
-	srvPatch = deviceBundle->CreateOnlineDescriptorPatch();
+	//deviceBundle = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle);
+	//localPlayerVisibility = NewObject<SceneVisibility>(this);
+	//srvPatch = deviceBundle->CreateOnlineDescriptorPatch();
 }
 
 D3D12Scene::~D3D12Scene()

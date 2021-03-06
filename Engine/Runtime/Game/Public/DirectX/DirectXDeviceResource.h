@@ -8,6 +8,7 @@
 #include "COM/TComPtr.h"
 
 interface ID3D12DeviceChild;
+class DirectXDeviceBundle;
 
 class GAME_API DirectXDeviceResource : virtual public Object
 {
@@ -16,13 +17,16 @@ public:
 
 private:
 	ID3D12DeviceChild* object;
+	DirectXDeviceBundle* parent;
+	TRefPtr<String> debugName;
 
 public:
 	DirectXDeviceResource();
 	~DirectXDeviceResource() override;
 
-	vs_property_set(TRefPtr<String>, DebugName);
+	vs_property(TRefPtr<String>, DebugName);
+	DirectXDeviceBundle* GetDevice() const;
 
 protected:
-	void SetDeviceChildPtr(ID3D12DeviceChild* ptr);
+	void SetDeviceChildPtr(ID3D12DeviceChild* ptr, DirectXDeviceBundle* parent);
 };

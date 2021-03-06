@@ -209,5 +209,5 @@ void World::OnUnloadLevel()
 void World::RegisterPlayerController(APlayerController* inPlayerController)
 {
 	localPlayerController = inPlayerController;
-	scene = GEngine.ResourceBundle->CreateScene(inPlayerController);
+	//scene = GEngine.ResourceBundle->CreateScene(inPlayerController);
 }

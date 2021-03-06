@@ -15,7 +15,7 @@ RHIResourceGC::RHIResourceGC() : Super()
 	, issued(0)
 	, lastCollected(0)
 {
-	fence = GEngine.DeviceBundle->CreateFence();
+	//fence = GEngine.DeviceBundle->CreateFence();
 }
 
 RHIResourceGC::~RHIResourceGC()
@@ -52,8 +52,8 @@ void RHIResourceGC::AddPendingResource(TRefPtr<Object> resource, uint64 number)
 
 void RHIResourceGC::SignalNumber(uint64 number)
 {
-	IRHIImmediateCommandList* immediateCommandList = GEngine.DeviceBundle->GetImmediateCommandList();
-	fence->Signal(immediateCommandList, issued);
+	//IRHIImmediateCommandList* immediateCommandList = GEngine.DeviceBundle->GetImmediateCommandList();
+	//fence->Signal(immediateCommandList, issued);
 }
 
 void RHIResourceGC::Collect()
