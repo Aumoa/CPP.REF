@@ -41,24 +41,10 @@ public:
 	LightSceneProxy* GetSceneProxy() const;
 
 	vs_property(Color, LightColor);
-	Color LightColor_get() const;
-	void LightColor_set(const Color& value);
-
 	vs_property(float, Ambient);
-	float Ambient_get() const;
-	void Ambient_set(float value);
-
 	vs_property(float, Diffuse);
-	float Diffuse_get() const;
-	void Diffuse_set(float value);
-
 	vs_property(float, Specular);
-	float Specular_get() const;
-	void Specular_set(float value);
-
 	vs_property(bool, IsShadowCast);
-	bool IsShadowCast_get() const;
-	void IsShadowCast_set(bool value);
 
 private:
 	void SetMarkDirtyLightUpdated();

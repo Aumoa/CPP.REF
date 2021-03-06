@@ -106,6 +106,9 @@
     <Filter Include="Private\Windows">
       <UniqueIdentifier>{27f32681-b7e3-4fbc-a68a-28043d929a74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\DirectX">
+      <UniqueIdentifier>{c4d60643-a0fe-4f21-a66f-233da83e3469}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -588,6 +591,18 @@
     <ClInclude Include="Public\Windows\WinException.h">
       <Filter>Public\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXSwapChain.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\COM\COMMinimal.h">
+      <Filter>Private\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXCommandQueue.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeviceResource.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -919,6 +934,12 @@
     </ClCompile>
     <ClCompile Include="Private\Windows\WinException.cpp">
       <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp">
+      <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -79,9 +79,9 @@ AActor* ActorComponent::GetOwner() const
 	return owner;
 }
 
-auto ActorComponent::PrimaryComponentTick_get() -> ComponentTickFunction&
+auto ActorComponent::PrimaryComponentTick_get() const -> ComponentTickFunction&
 {
-	return primaryComponentTick;
+	return const_cast<ComponentTickFunction&>(primaryComponentTick);
 }
 
 bool ActorComponent::ComponentTickEnabled_get() const

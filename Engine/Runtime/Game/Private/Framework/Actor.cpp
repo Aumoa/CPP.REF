@@ -199,9 +199,9 @@ void AActor::RootComponent_set(SceneComponent* value)
 	rootComponent = value;
 }
 
-auto AActor::PrimaryActorTick_get() -> ActorTickFunction&
+auto AActor::PrimaryActorTick_get() const -> ActorTickFunction&
 {
-	return primaryActorTick;
+	return const_cast<ActorTickFunction&>(primaryActorTick);
 }
 
 bool AActor::ActorTickEnabled_get() const

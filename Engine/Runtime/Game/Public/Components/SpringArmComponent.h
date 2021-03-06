@@ -13,7 +13,7 @@ public:
 	using This = SpringArmComponent;
 
 public:
-	static TRefPtr<const String> SocketName;
+	static const TRefPtr<String> SocketName;
 
 	Vector3 socketRelativeLocation;
 
@@ -28,8 +28,6 @@ public:
 	Transform GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const override;
 
 	vs_property(float, SpringArmLength);
-	float SpringArmLength_get() const;
-	void SpringArmLength_set(float value);
 	Vector3 TargetOffset;
 	Vector3 SocketOffset;
 

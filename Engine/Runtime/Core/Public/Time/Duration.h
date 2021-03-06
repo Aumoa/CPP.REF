@@ -49,7 +49,7 @@ struct Nanoseconds
 	inline constexpr bool Equals(const Nanoseconds& rh) const;
 	inline TRefPtr<String> ToString() const;
 
-	vs_property(int64, Value);
+	__declspec(property(get=Value_get)) int64 Value;
 	inline constexpr int64 Value_get() const;
 	inline void Value_set(int64 value);
 
@@ -85,7 +85,7 @@ struct Subseconds : public Nanoseconds
 
 	inline TRefPtr<String> ToString() const;
 
-	vs_property(float, Value);
+	__declspec(property(get=Value_get)) float Value;
 	inline constexpr float Value_get() const;
 	inline void Value_set(float value);
 

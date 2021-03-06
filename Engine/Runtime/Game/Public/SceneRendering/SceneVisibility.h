@@ -35,8 +35,6 @@ public:
 	void UpdateView(const MinimalViewInfo& inView);
 
 	vs_property_get(const std::vector<bool>&, PrimitiveVisibility);
-	const std::vector<bool>& PrimitiveVisibility_get() const;
 	vs_property_get(ShaderCameraConstantVector*, ShaderCameraConstants);
-	ShaderCameraConstantVector* ShaderCameraConstants_get() const;
 	vs_property_get_auto(size_t, NumPrimitivesRender, numPrimitivesRender);
 };

@@ -23,8 +23,4 @@ public:
 	virtual void Close();
 
 	vs_property(HANDLE, Handle);
-	HANDLE Handle_get() const;
-
-protected:
-	void Handle_set(HANDLE value);
 };

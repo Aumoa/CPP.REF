@@ -249,6 +249,7 @@
   <ItemGroup>
     <ClInclude Include="Private\Assets\MeshLoader.h" />
     <ClInclude Include="Private\Bezier.h" />
+    <ClInclude Include="Private\COM\COMMinimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBuffer.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12CommandFence.h" />
@@ -323,7 +324,10 @@
     <ClInclude Include="Public\COM\TComPtr.h" />
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
+    <ClInclude Include="Public\DirectX\DirectXCommandQueue.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceBundle.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeviceResource.h" />
+    <ClInclude Include="Public\DirectX\DirectXSwapChain.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\Framework\Character.h" />
@@ -468,6 +472,8 @@
     <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
     <ClCompile Include="Private\DirectXGeometry.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\Engine.LoadEngineDefaultAssets.cpp" />
     <ClCompile Include="Private\EngineCriticalException.cpp" />

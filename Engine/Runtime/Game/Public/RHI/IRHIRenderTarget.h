@@ -17,8 +17,6 @@ interface GAME_API IRHIRenderTarget : virtual public Object
 	virtual IRHIResource* GetRenderTarget(size_t index) const = 0;
 	virtual IRHIShaderResourceView* GetShaderResourceView() const = 0;
 	virtual IRHIUnorderedAccessView* GetUnorderedAccessView() const = 0;
-	vs_property_get(uint32, Width);
-	virtual uint32 Width_get() const = 0;
-	vs_property_get(uint32, Height);
-	virtual uint32 Height_get() const = 0;
+	vs_property_get_pure(uint32, Width);
+	vs_property_get_pure(uint32, Height);
 };

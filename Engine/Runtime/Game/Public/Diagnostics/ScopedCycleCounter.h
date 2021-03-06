@@ -55,9 +55,7 @@ public:
 	void ResolveTick();
 
 	vs_property_get(bool, HasTick);
-	bool HasTick_get() const;
 	vs_property_get(Milliseconds, Tick);
-	Milliseconds Tick_get() const;
 
 private:
 	void DeferredInit();
@@ -79,7 +77,6 @@ public:
 	~ScopedCycleCounter();
 
 	vs_property_get(Seconds, Secs);
-	Seconds Secs_get() const;
 
 private:
 	void RegisterFrameDiagnostics();

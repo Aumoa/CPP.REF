@@ -37,13 +37,9 @@ public:
 	void Free(const D3D12DescriptorIndex& index);
 
 	vs_property_get(size_t, Slack);
-	size_t Slack_get() const;
 	vs_property_get(bool, IsOffline);
-	bool IsOffline_get() const;
 	vs_property_get(bool, IsThreadSafe);
-	bool IsThreadSafe_get() const;
 	vs_property_get(ID3D12DescriptorHeap*, pHeap);
-	ID3D12DescriptorHeap* pHeap_get() const;
 
 	const D3D12_DESCRIPTOR_HEAP_TYPE Type;
 	const size_t Count;

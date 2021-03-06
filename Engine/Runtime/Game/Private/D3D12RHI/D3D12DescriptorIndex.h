@@ -27,7 +27,6 @@ public:
 	~D3D12DescriptorIndex();
 
 	vs_property_get(bool, IsValid);
-	bool IsValid_get() const;
 		
 	const size_t Index;
 	const D3D12_CPU_DESCRIPTOR_HANDLE Handle;

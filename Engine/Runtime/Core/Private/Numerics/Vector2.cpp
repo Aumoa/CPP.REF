@@ -119,7 +119,7 @@ Vector2 Vector2::Direction_get() const
 	return Normalized;
 }
 
-void Vector2::Direction_set(const Vector2& value)
+void Vector2::Direction_set(Vector2 value)
 {
 	(*this) = value * Length;
 }

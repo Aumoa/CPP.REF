@@ -143,7 +143,7 @@ Quaternion Quaternion::Direction_get() const
 	return Normalized;
 }
 
-void Quaternion::Direction_set(const Quaternion& value)
+void Quaternion::Direction_set(Quaternion value)
 {
 	(*this) = value * Length;
 }
@@ -153,7 +153,7 @@ Vector3 Quaternion::VectorPart_get() const
 	return Vector3(X, Y, Z);
 }
 
-void Quaternion::VectorPart_set(const Vector3& value)
+void Quaternion::VectorPart_set(Vector3 value)
 {
 	X = value.X;
 	Y = value.Y;

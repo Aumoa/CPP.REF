@@ -75,7 +75,6 @@ public:
 	inline TWeakPtr<O, bThreadSafe> AsWeak() const;  // TWeakPtr.inl
 
 	vs_property_get(bool, IsValid);
-	[[nodiscard]] inline bool IsValid_get() const;
 
 	template<THasIterator O = T>
 	inline auto begin() -> typename O::Iterator;

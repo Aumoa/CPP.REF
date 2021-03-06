@@ -21,3 +21,4 @@ extern LogCategoryBase LogShader;
 extern LogCategoryBase LogRHI;
 extern LogCategoryBase LogCOM;
 extern LogCategoryBase LogWindows;
+extern LogCategoryBase LogDirectX;

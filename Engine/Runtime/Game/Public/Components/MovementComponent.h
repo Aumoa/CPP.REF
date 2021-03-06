@@ -27,13 +27,7 @@ public:
 	bool IsExceedingMaxSpeed(float inMaxSpeed) const;
 
 	vs_property(SceneComponent*, UpdatedComponent);
-	SceneComponent* UpdatedComponent_get() const;
-	void UpdatedComponent_set(SceneComponent* value);
 	vs_property(bool, AutoRegisterUpdatedComponent);
-	bool AutoRegisterUpdatedComponent_get() const;
 
 	Vector3 Velocity;
-
-protected:
-	void AutoRegisterUpdatedComponent_set(bool value);
 };

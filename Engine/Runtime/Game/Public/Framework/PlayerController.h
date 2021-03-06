@@ -37,11 +37,8 @@ public:
 	void OnUnPossess() override;
 
 	vs_property_get(PlayerCameraManager*, CameraManager);
-	PlayerCameraManager* CameraManager_get() const;
 	vs_property_get(InputComponent*, PlayerInputComponent);
-	InputComponent* PlayerInputComponent_get() const;
 	vs_property_get(bool, IsCursorLocked);
-	bool IsCursorLocked_get() const;
 
 	bool bShowMouseCursor : 1;
 	bool bAutoUnlockMouseCursor : 1;

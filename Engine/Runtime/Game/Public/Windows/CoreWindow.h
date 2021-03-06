@@ -36,11 +36,7 @@ public:
 	void Close() override;
 
 	vs_property(bool, IsVisible);
-	bool IsVisible_get() const;
-	void IsVisible_set(bool value);
 	vs_property(TRefPtr<String>, Title);
-	TRefPtr<String> Title_get() const;
-	void Title_set(TRefPtr<String> value);
 	vs_property_get_auto(HWND, HWnd, hWnd);
 	vs_property_get_auto(bool, IsInitialized, bInit);
 

@@ -57,7 +57,7 @@ Color LightComponent::LightColor_get() const
 	return lightColor;
 }
 
-void LightComponent::LightColor_set(const Color& value)
+void LightComponent::LightColor_set(Color value)
 {
 	lightColor = value;
 	SetMarkDirtyLightUpdated();

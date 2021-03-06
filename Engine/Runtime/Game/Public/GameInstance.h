@@ -40,8 +40,6 @@ public:
 	TSubclassOf<AGameModeBase> GameModeClass;
 
 	vs_property(TRefPtr<String>, AppName);
-	TRefPtr<String> AppName_get() const;
-	void AppName_set(TRefPtr<String> value);
 
 protected:
 	void Initialize() override;

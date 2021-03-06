@@ -4,7 +4,7 @@
 
 #include "Logging/LogMacros.h"
 
-TRefPtr<const String> SpringArmComponent::SocketName = L"SpringArmSocket";
+const TRefPtr<String> SpringArmComponent::SocketName = L"SpringArmSocket";
 
 SpringArmComponent::SpringArmComponent() : Super()
 	, socketRelativeLocation(Vector3::Zero)

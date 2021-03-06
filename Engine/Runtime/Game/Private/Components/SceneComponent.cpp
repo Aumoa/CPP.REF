@@ -218,7 +218,7 @@ Transform SceneComponent::RelativeTransform_get() const
 	return transform;
 }
 
-void SceneComponent::RelativeTransform_set(const Transform& value)
+void SceneComponent::RelativeTransform_set(Transform value)
 {
 	transform = value;
 	UpdateWorldTransform();
@@ -234,7 +234,7 @@ Vector3 SceneComponent::Location_get() const
 	return transform.Translation;
 }
 
-void SceneComponent::Location_set(const Vector3& value)
+void SceneComponent::Location_set(Vector3 value)
 {
 	transform.Translation = value;
 	UpdateWorldTransform();
@@ -245,7 +245,7 @@ Vector3 SceneComponent::Scale_get() const
 	return transform.Scale;
 }
 
-void SceneComponent::Scale_set(const Vector3& value)
+void SceneComponent::Scale_set(Vector3 value)
 {
 	transform.Scale = value;
 	UpdateWorldTransform();
@@ -256,7 +256,7 @@ Quaternion SceneComponent::Rotation_get() const
 	return transform.Rotation;
 }
 
-void SceneComponent::Rotation_set(const Quaternion& value)
+void SceneComponent::Rotation_set(Quaternion value)
 {
 	transform.Rotation = value;
 	UpdateWorldTransform();

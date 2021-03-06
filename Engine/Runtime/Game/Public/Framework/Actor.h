@@ -82,15 +82,9 @@ public:
 	void SetActorRotation(const Quaternion& value);
 
 	vs_property(SceneComponent*, RootComponent);
-	SceneComponent* RootComponent_get() const;
-	void RootComponent_set(SceneComponent* value);
 	vs_property_get(ActorTickFunction&, PrimaryActorTick);
-	ActorTickFunction& PrimaryActorTick_get();
 	vs_property(bool, ActorTickEnabled);
-	bool ActorTickEnabled_get() const;
-	void ActorTickEnabled_set(bool value);
 	vs_property_get(bool, HasBegunPlay);
-	bool HasBegunPlay_get() const;
 
 	ComponentAddedDelegate ComponentAdded;
 	ComponentRemovedDelegate ComponentRemoved;

@@ -53,12 +53,8 @@ public:
 	T* GetOwner() const;
 
 	vs_property_get(ComponentTickFunction&, PrimaryComponentTick);
-	ComponentTickFunction& PrimaryComponentTick_get();
 	vs_property(bool, ComponentTickEnabled);
-	bool ComponentTickEnabled_get() const;
-	void ComponentTickEnabled_set(bool value);
 	vs_property_get(bool, HasBegunPlay);
-	bool HasBegunPlay_get() const;
 };
 
 #include "ActorComponent.inl"

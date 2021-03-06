@@ -49,6 +49,5 @@ interface IRHICommandList : virtual public Object
 	virtual void SetComputeRootConstantBufferView(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 	virtual void SetComputeRootShaderResource(uint32 inParamIndex, uint64 inVirtualAddress) = 0;
 
-	vs_property_get(bool, HasBegunCommand);
-	virtual bool HasBegunCommand_get() const = 0;
+	vs_property_get_pure(bool, HasBegunCommand);
 };

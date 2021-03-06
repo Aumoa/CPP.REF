@@ -5,7 +5,11 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface GAME_API IRHIUnorderedAccessView : virtual public Object
+#include "COM/TComPtr.h"
+
+interface ID3D12CommandQueue;
+
+class GAME_API DirectXCommandQueue : virtual public Object
 {
-	vs_property_get_pure(size_t, Count);
+
 };
