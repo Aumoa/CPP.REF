@@ -5,9 +5,8 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "COM/TComPtr.h"
+#include "DirectXMinimal.h"
 
-interface ID3D12DeviceChild;
 class DirectXDeviceBundle;
 
 class GAME_API DirectXDeviceResource : virtual public Object

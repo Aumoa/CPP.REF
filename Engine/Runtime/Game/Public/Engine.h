@@ -8,6 +8,7 @@
 class GameInstance;
 class DirectXDeviceBundle;
 class DirectXCommandQueue;
+class DirectXSwapChain;
 
 class GAME_API Engine : virtual public Object
 {
@@ -20,6 +21,8 @@ private:
 	TRefPtr<DirectXDeviceBundle> deviceBundle;
 	TRefPtr<DirectXCommandQueue> primaryQueue;
 
+	TRefPtr<DirectXSwapChain> swapChain;
+
 public:
 	Engine();
 	~Engine() override;
@@ -27,4 +30,7 @@ public:
 	virtual void Initialize(GameInstance* gameInstance);
 	virtual void Shutdown();
 	virtual void Tick();
+
+private:
+	void Render();
 };

@@ -5,11 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "COM/TComPtr.h"
-
-interface IDXGIAdapter1;
-interface IDXGIFactory2;
-interface ID3D12Device5;
+#include "DirectXMinimal.h"
 
 class GAME_API DirectXDeviceBundle : virtual public Object
 {
@@ -24,6 +20,7 @@ public:
 	DirectXDeviceBundle();
 	~DirectXDeviceBundle() override;
 
+	IDXGIFactory2* GetFactory() const;
 	ID3D12Device5* GetDevice() const;
 
 private:

@@ -603,11 +603,20 @@
     <ClInclude Include="Public\DirectX\DirectXDeviceResource.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Private\DirectX\DirectXMinimal.h">
-      <Filter>Private\DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="Public\GameObject.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeviceContext.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXImmediateContext.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXMinimal.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DirectX\DirectXCommon.h">
+      <Filter>Private\DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -952,6 +961,15 @@
     </ClCompile>
     <ClCompile Include="Private\GameObject.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXSwapChain.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp">
+      <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

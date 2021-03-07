@@ -2,7 +2,7 @@
 
 #include "DirectX/DirectXDeviceBundle.h"
 
-#include "DirectXMinimal.h"
+#include "DirectXCommon.h"
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
 
@@ -51,6 +51,11 @@ DirectXDeviceBundle::DirectXDeviceBundle() : Super()
 DirectXDeviceBundle::~DirectXDeviceBundle()
 {
 
+}
+
+IDXGIFactory2* DirectXDeviceBundle::GetFactory() const
+{
+	return dxgiFactory.Get();
 }
 
 ID3D12Device5* DirectXDeviceBundle::GetDevice() const

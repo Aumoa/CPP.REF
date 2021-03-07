@@ -5,10 +5,14 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#undef interface
+#pragma warning(push)
+#pragma warning(disable: 4005)
+
 #include <dxgi1_6.h>
 #include <d3d12.h>
-#include "COM/COMMinimal.h"
+#include "DirectX/DirectXMinimal.h"
+
+#pragma warning(pop)
 
 #define DirectXNew(Ret, Class, ...) \
 Ret = Object::NewObject<Class>(__VA_ARGS__);\

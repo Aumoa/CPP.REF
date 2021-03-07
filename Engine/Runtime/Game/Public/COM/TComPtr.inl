@@ -103,11 +103,6 @@ template<class T>
 template<class O>
 TComPtr<O> TComPtr<T>::As() const
 {
-	if (O* ptr = dynamic_cast<O*>(instance); ptr != nullptr)
-	{
-		return ptr;
-	}
-
 	TComPtr<O> ptr;
 	int32 hr = instance->QueryInterface(__uuidof(O), (void**)&ptr);
 	if (COMException::Failed(hr))
@@ -122,11 +117,6 @@ template<class T>
 template<class O>
 TComPtr<O> TComPtr<T>::TryAs() const
 {
-	if (O* ptr = dynamic_cast<O*>(instance); ptr != nullptr)
-	{
-		return ptr;
-	}
-
 	if (TComPtr<O> ptr; COMException::Succeeded(instance->QueryInterface(__uuidof(O), (void**)&ptr)))
 	{
 		return ptr;
@@ -151,6 +141,24 @@ template<class T>
 T** TComPtr<T>::operator &()
 {
 	return ReleaseAndGetAddressOf();
+}
+
+template<class T>
+auto TComPtr<T>::operator =(const TComPtr& rh) -> TComPtr&
+{
+	SafeRelease();
+	instance = rh.Get();
+	SafeAddRef();
+	return *this;
+}
+
+template<class T>
+auto TComPtr<T>::operator =(TComPtr&& rh) -> TComPtr&
+{
+	SafeRelease();
+	instance = rh.Get();
+	rh.instance = nullptr;
+	return *this;
 }
 
 template<class T>

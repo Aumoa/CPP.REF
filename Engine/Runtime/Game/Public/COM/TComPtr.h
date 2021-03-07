@@ -41,6 +41,9 @@ public:
 	[[nodiscard]] inline operator bool() const;
 	[[nodiscard]] inline T** operator &();
 
+	inline TComPtr& operator =(const TComPtr& rh);
+	inline TComPtr& operator =(TComPtr&& rh);
+
 private:
 	inline void SafeAddRef();
 	inline void SafeRelease();

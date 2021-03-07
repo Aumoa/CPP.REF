@@ -282,7 +282,7 @@
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\ID3D12ResourceBase.h" />
     <ClInclude Include="Private\DirectXGeometry.h" />
-    <ClInclude Include="Private\DirectX\DirectXMinimal.h" />
+    <ClInclude Include="Private\DirectX\DirectXCommon.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
@@ -327,7 +327,10 @@
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
     <ClInclude Include="Public\DirectX\DirectXCommandQueue.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceBundle.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeviceContext.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceResource.h" />
+    <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
+    <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
     <ClInclude Include="Public\DirectX\DirectXSwapChain.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
@@ -476,7 +479,10 @@
     <ClCompile Include="Private\DirectXGeometry.cpp" />
     <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXSwapChain.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\Engine.LoadEngineDefaultAssets.cpp" />
     <ClCompile Include="Private\EngineCriticalException.cpp" />

@@ -2,7 +2,7 @@
 
 #include "DirectX/DirectXCommandQueue.h"
 
-#include "DirectXMinimal.h"
+#include "DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
 
 DirectXCommandQueue::DirectXCommandQueue(DirectXDeviceBundle* deviceBundle) : DirectXCommandQueue(deviceBundle, D3D12_COMMAND_LIST_TYPE_DIRECT)

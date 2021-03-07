@@ -6,8 +6,7 @@
 #include "CoreMinimal.h"
 #include "DirectXDeviceResource.h"
 
-interface ID3D12CommandQueue;
-enum D3D12_COMMAND_LIST_TYPE;
+#include "DirectXMinimal.h"
 
 class GAME_API DirectXCommandQueue : public DirectXDeviceResource
 {
