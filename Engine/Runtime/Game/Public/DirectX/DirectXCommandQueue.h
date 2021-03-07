@@ -8,6 +8,8 @@
 
 #include "DirectXMinimal.h"
 
+class DirectXDeviceContext;
+
 class GAME_API DirectXCommandQueue : public DirectXDeviceResource
 {
 public:
@@ -21,5 +23,13 @@ public:
 	DirectXCommandQueue(DirectXDeviceBundle* deviceBundle, D3D12_COMMAND_LIST_TYPE type);
 	~DirectXCommandQueue() override;
 
+	void ExecuteCommandLists(DirectXDeviceContext* const* deviceContexts, size_t count);
+
 	vs_property_get_auto(ID3D12CommandQueue*, Item, commandQueue.Get());
+
+public:
+	inline void ExecuteCommandLists(DirectXDeviceContext* deviceContext);
+	inline void ExecuteCommandLists(std::span<DirectXDeviceContext* const> deviceContexts);
 };
+
+#include "DirectXCommandQueue.inl"

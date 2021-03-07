@@ -12,9 +12,11 @@ class GAME_API HandleBase : virtual public Object
 public:
 	using Super = Object;
 
+private:
+	HANDLE handle;
+
 protected:
 	bool bAutoCloseHandle : 1;
-	HANDLE handle;
 
 public:
 	HandleBase();

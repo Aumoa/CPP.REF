@@ -23,6 +23,7 @@ public:
 	inline T* Detach();
 	inline void Attach(T* ptr);
 	inline void Reset(T* ptr = nullptr);
+	inline void Swap(TComPtr<T>& target);
 
 	[[nodiscard]] inline T* Get() const;
 	[[nodiscard]] inline T** GetAddressOf();

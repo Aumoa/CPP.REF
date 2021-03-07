@@ -23,7 +23,7 @@ public:
 	DirectXDeviceResource();
 	~DirectXDeviceResource() override;
 
-	vs_property(TRefPtr<String>, DebugName);
+	vs_property_virtual(TRefPtr<String>, DebugName);
 	DirectXDeviceBundle* GetDevice() const;
 
 protected:

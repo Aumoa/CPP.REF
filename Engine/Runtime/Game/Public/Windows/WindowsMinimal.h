@@ -23,6 +23,7 @@
 #pragma warning(pop)
 
 #undef CreateWindow
+#undef OpenEvent
 
 #else
 

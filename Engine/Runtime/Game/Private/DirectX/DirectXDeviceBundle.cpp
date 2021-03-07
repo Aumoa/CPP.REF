@@ -9,7 +9,17 @@
 DirectXDeviceBundle::DirectXDeviceBundle() : Super()
 {
 	UINT flag = 0;
-#ifdef _DEBUG
+
+#if defined(_DEBUG) && !defined(_DEBUGGAME)
+	if (TComPtr<ID3D12Debug> debug; SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug))))
+	{
+		debug->EnableDebugLayer();
+		SE_LOG(LogDirectX, Verbose, "D3D12 debug layer enabled.");
+	}
+	else
+	{
+		SE_LOG(LogDirectX, Warning, "Cannot enable D3D12 debug layer.");
+	}
 	flag |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 

@@ -24,4 +24,5 @@ public:
 	~DirectXSwapChain() override;
 
 	void Present();
+	void ResizeBuffers(int32 x, int32 y);
 };

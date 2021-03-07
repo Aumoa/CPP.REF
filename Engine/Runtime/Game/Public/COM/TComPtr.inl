@@ -64,6 +64,14 @@ void TComPtr<T>::Reset(T* ptr)
 }
 
 template<class T>
+void TComPtr<T>::Swap(TComPtr<T>& target)
+{
+	T* ptr = target.instance;
+	target.instance = instance;
+	instance = ptr;
+}
+
+template<class T>
 T* TComPtr<T>::Get() const
 {
 	return instance;

@@ -26,6 +26,8 @@ public:
 	virtual void BeginDraw();
 	virtual void EndDraw();
 
+	ID3D12GraphicsCommandList4* GetCommandList() const;
+
 protected:
 	void SwapCommandAllocator(TComPtr<ID3D12CommandAllocator>& swapTarget);
 };

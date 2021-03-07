@@ -13,3 +13,9 @@ DirectXImmediateContext::~DirectXImmediateContext()
 {
 
 }
+
+void DirectXImmediateContext::EndDraw()
+{
+	Super::EndDraw();
+	commandQueue->ExecuteCommandLists(this);
+}

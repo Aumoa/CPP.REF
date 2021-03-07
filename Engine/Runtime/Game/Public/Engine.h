@@ -9,6 +9,8 @@ class GameInstance;
 class DirectXDeviceBundle;
 class DirectXCommandQueue;
 class DirectXSwapChain;
+class DirectXImmediateContext;
+class DirectXAutoFence;
 
 class GAME_API Engine : virtual public Object
 {
@@ -22,6 +24,8 @@ private:
 	TRefPtr<DirectXCommandQueue> primaryQueue;
 
 	TRefPtr<DirectXSwapChain> swapChain;
+	TRefPtr<DirectXImmediateContext> immediateContext;
+	TRefPtr<DirectXAutoFence> immediateFence;
 
 public:
 	Engine();
@@ -33,4 +37,7 @@ public:
 
 private:
 	void Render();
+
+private:
+	void MainWindow_OnSizing(int32 x, int32 y);
 };

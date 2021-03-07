@@ -4,14 +4,14 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
-#include "DirectXDeviceContext.h"
+#include "DirectXDeferredContext.h"
 
 class DirectXCommandQueue;
 
-class GAME_API DirectXImmediateContext : public DirectXDeviceContext
+class GAME_API DirectXImmediateContext : public DirectXDeferredContext
 {
 public:
-	using Super = DirectXDeviceContext;
+	using Super = DirectXDeferredContext;
 
 private:
 	TRefPtr<DirectXCommandQueue> commandQueue;
@@ -19,4 +19,6 @@ private:
 public:
 	DirectXImmediateContext(DirectXDeviceBundle* deviceBundle, DirectXCommandQueue* commandQueue, D3D12_COMMAND_LIST_TYPE type);
 	~DirectXImmediateContext() override;
+
+	void EndDraw() override;
 };

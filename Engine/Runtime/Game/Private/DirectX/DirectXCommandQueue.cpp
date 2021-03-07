@@ -3,7 +3,11 @@
 #include "DirectX/DirectXCommandQueue.h"
 
 #include "DirectXCommon.h"
+#include "Logging/LogMacros.h"
 #include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXDeviceContext.h"
+
+using namespace std;
 
 DirectXCommandQueue::DirectXCommandQueue(DirectXDeviceBundle* deviceBundle) : DirectXCommandQueue(deviceBundle, D3D12_COMMAND_LIST_TYPE_DIRECT)
 {
@@ -24,4 +28,27 @@ DirectXCommandQueue::DirectXCommandQueue(DirectXDeviceBundle* deviceBundle, D3D1
 DirectXCommandQueue::~DirectXCommandQueue()
 {
 
+}
+
+void DirectXCommandQueue::ExecuteCommandLists(DirectXDeviceContext* const* deviceContexts, size_t count)
+{
+	vector<ID3D12CommandList*> commandLists;
+	commandLists.reserve(count);
+
+	for (size_t i = 0; i < count; ++i)
+	{
+		if (deviceContexts[i] != nullptr)
+		{
+			if (auto ptr = deviceContexts[i]->GetCommandList(); ptr != nullptr)
+			{
+				commandLists.emplace_back(ptr);
+				continue;
+			}
+		}
+	}
+
+	if (!commandLists.empty())
+	{
+		commandQueue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
+	}
 }

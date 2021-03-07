@@ -34,3 +34,8 @@ void DirectXSwapChain::Present()
 {
 	HR(swapChain->Present(0, 0));
 }
+
+void DirectXSwapChain::ResizeBuffers(int32 x, int32 y)
+{
+	HR(swapChain->ResizeBuffers(0, (UINT)x, (UINT)y, DXGI_FORMAT_UNKNOWN, 0));
+}

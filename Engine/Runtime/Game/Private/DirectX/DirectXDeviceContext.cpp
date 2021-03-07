@@ -25,3 +25,13 @@ void DirectXDeviceContext::EndDraw()
 {
 
 }
+
+ID3D12GraphicsCommandList4* DirectXDeviceContext::GetCommandList() const
+{
+	return commandList.Get();
+}
+
+void DirectXDeviceContext::SwapCommandAllocator(TComPtr<ID3D12CommandAllocator>& swapTarget)
+{
+	commandAllocator.Swap(swapTarget);
+}

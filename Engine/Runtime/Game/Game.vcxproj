@@ -326,9 +326,11 @@
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
     <ClInclude Include="Public\DirectX\DirectXCommandQueue.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeferredContext.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceBundle.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceContext.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceResource.h" />
+    <ClInclude Include="Public\DirectX\DirectXAutoFence.h" />
     <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
     <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
     <ClInclude Include="Public\DirectX\DirectXSwapChain.h" />
@@ -348,7 +350,6 @@
     <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameViewport.h" />
-    <ClInclude Include="Public\IEngineTick.h" />
     <ClInclude Include="Public\Key.h" />
     <ClInclude Include="Public\Level.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
@@ -414,6 +415,7 @@
     <ClInclude Include="Public\Windows\CoreWindow.h" />
     <ClInclude Include="Public\Windows\HandleBase.h" />
     <ClInclude Include="Public\Windows\WindowsMinimal.h" />
+    <ClInclude Include="Public\Windows\WinEvent.h" />
     <ClInclude Include="Public\Windows\WinException.h" />
     <ClInclude Include="Public\World.h" />
   </ItemGroup>
@@ -477,7 +479,9 @@
     <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
     <ClCompile Include="Private\DirectXGeometry.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXAutoFence.cpp" />
     <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeferredContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
@@ -541,6 +545,7 @@
     <ClCompile Include="Private\Windows\Application.cpp" />
     <ClCompile Include="Private\Windows\CoreWindow.cpp" />
     <ClCompile Include="Private\Windows\HandleBase.cpp" />
+    <ClCompile Include="Private\Windows\WinEvent.cpp" />
     <ClCompile Include="Private\Windows\WinException.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\Shaders\GenericLighting.hlsli" />
@@ -557,6 +562,7 @@
     <None Include="Public\Components\ActorComponent.inl" />
     <None Include="Public\Components\SceneComponent.inl" />
     <None Include="Public\COM\TComPtr.inl" />
+    <None Include="Public\DirectX\DirectXCommandQueue.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
     <None Include="Public\Level.inl" />

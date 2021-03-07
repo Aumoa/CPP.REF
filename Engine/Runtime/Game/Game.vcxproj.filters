@@ -114,9 +114,6 @@
     <ClInclude Include="Public\GameAPI.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\IEngineTick.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
@@ -618,6 +615,15 @@
     <ClInclude Include="Private\DirectX\DirectXCommon.h">
       <Filter>Private\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeferredContext.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXAutoFence.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinEvent.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -971,6 +977,15 @@
     <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeferredContext.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXAutoFence.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinEvent.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -1038,6 +1053,9 @@
     </None>
     <None Include="Public\COM\TComPtr.inl">
       <Filter>Public\COM</Filter>
+    </None>
+    <None Include="Public\DirectX\DirectXCommandQueue.inl">
+      <Filter>Public\DirectX</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

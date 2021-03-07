@@ -12,6 +12,7 @@ interface IDXGIAdapter1;
 interface IDXGIFactory2;
 interface IDXGISwapChain4;
 interface ID3D12Device5;
+interface ID3D12Fence;
 interface ID3D12DeviceChild;
 interface ID3D12CommandQueue;
 interface ID3D12CommandAllocator;
