@@ -633,6 +633,21 @@
     <ClInclude Include="Public\DirectX\DirectXDepthStencilView.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Scene.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\RenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\DeferredRenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDescriptorAllocator.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXShaderResourceView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -1002,6 +1017,21 @@
       <Filter>Private\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXDepthStencilView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\Scene.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\RenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\DeferredRenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDescriptorAllocator.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXShaderResourceView.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,20 +17,15 @@ private:
 	TComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
 	uint32 numDescriptors;
-	bool bShaderVisible : 1;
-
 	uint32 incrementSize;
 	size_t handleCPU;
-	uint64 handleGPU;
 
 public:
-	DirectXView(DirectXDeviceBundle* deviceBundle, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32 numDescriptors, bool bShaderVisible = false);
+	DirectXView(DirectXDeviceBundle* deviceBundle, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32 numDescriptors);
 	~DirectXView() override;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(size_t index) const;
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(size_t index) const;
 
-	vs_property_get_auto(bool, IsShaderVisible, bShaderVisible);
 	vs_property_get_auto(uint32, NumDescriptors, numDescriptors);
 	vs_property_get_auto(ID3D12DescriptorHeap*, Item, descriptorHeap.Get());
 };

@@ -37,7 +37,7 @@ void DirectXDeviceResource::SetDeviceChildPtr(ID3D12DeviceChild* ptr, DirectXDev
 	object = ptr;
 	this->parent = parent;
 
-	if (debugName.IsValid)
+	if (object != nullptr && debugName.IsValid)
 	{
 		object->SetName(debugName->C_Str);
 	}
