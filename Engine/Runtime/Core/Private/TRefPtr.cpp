@@ -5,12 +5,12 @@
 #include "InvalidCastException.h"
 #include "NullReferenceException.h"
 
-void ThrowInvalidCastException()
+[[noreturn]] void ThrowInvalidCastException()
 {
 	throw InvalidCastException();
 }
 
-void ThrowNullReferenceException()
+[[noreturn]] void ThrowNullReferenceException()
 {
 	throw NullReferenceException();
 }

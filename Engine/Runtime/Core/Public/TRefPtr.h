@@ -13,8 +13,8 @@
 class Object;
 class String;
 
-void CORE_API ThrowInvalidCastException();
-void CORE_API ThrowNullReferenceException();
+[[noreturn]] void CORE_API ThrowInvalidCastException();
+[[noreturn]] void CORE_API ThrowNullReferenceException();
 
 template<TIsNotPointer T, bool bThreadSafe>
 class TWeakPtr;
