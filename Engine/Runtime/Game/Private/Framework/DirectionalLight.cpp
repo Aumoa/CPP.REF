@@ -7,7 +7,7 @@
 ADirectionalLight::ADirectionalLight() : Super()
 	, lightComponent(nullptr)
 {
-	lightComponent = AddComponent<DirectionalLightComponent>();
+	lightComponent = AddComponent<GDirectionalLightComponent>();
 	RootComponent = lightComponent;
 }
 

@@ -4,19 +4,14 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
+#include "GameObject.h"
 
-#include <set>
-#include <list>
-#include <tuple>
-#include <array>
-#include <chrono>
-#include <stack>
 #include "TickFunction.h"
 #include "Components/SceneComponent.h"
 
 class World;
 
-class GAME_API AActor : virtual public Object, virtual public ITickFunctionObject
+class GAME_API AActor : public GGameObject, virtual public ITickFunctionObject
 {
 	struct ActorTickFunction : public TickFunction
 	{
@@ -35,13 +30,13 @@ public:
 	using Super = Object;
 	using This = AActor;
 
-	using ComponentAddedDelegate = TMulticastDelegate<void(ActorComponent*)>;
-	using ComponentRemovedDelegate = TMulticastDelegate<void(ActorComponent*)>;
+	using ComponentAddedDelegate = TMulticastDelegate<void(GActorComponent*)>;
+	using ComponentRemovedDelegate = TMulticastDelegate<void(GActorComponent*)>;
 
 private:
-	std::map<ActorComponent*, TRefPtr<ActorComponent>> ownedComponents;
-	std::map<size_t, std::list<ActorComponent*>> hierarchy;
-	SceneComponent* rootComponent;
+	std::map<GActorComponent*, TRefPtr<GActorComponent>> ownedComponents;
+	std::map<size_t, std::list<GActorComponent*>> hierarchy;
+	GSceneComponent* rootComponent;
 	ActorTickFunction primaryActorTick;
 	bool bActorTickEnabled : 1;
 	bool bActorHasBegunPlay : 1;
@@ -59,14 +54,14 @@ public:
 	virtual void EndPlay();
 	virtual void TickActor(Seconds deltaTime);
 
-	template<class T, class... TArgs> requires TIsAssignable<T*, ActorComponent*> && THasConstructor<T, TArgs...>
+	template<class T, class... TArgs> requires TIsAssignable<T*, GActorComponent*> && THasConstructor<T, TArgs...>
 	inline T* AddComponent(TArgs&&... args);
-	template<class T> requires TIsAssignable<T*, ActorComponent*>
+	template<class T> requires TIsAssignable<T*, GActorComponent*>
 	inline bool RemoveComponent();
 
-	template<class T> requires TIsAssignable<T*, ActorComponent*>
+	template<class T> requires TIsAssignable<T*, GActorComponent*>
 	inline T* GetComponent() const;
-	template<class T> requires TIsAssignable<T*, ActorComponent*>
+	template<class T> requires TIsAssignable<T*, GActorComponent*>
 	inline std::list<T*> GetComponents() const;
 
 	World* GetWorld() const;
@@ -81,7 +76,7 @@ public:
 	Quaternion GetActorRotation() const;
 	void SetActorRotation(const Quaternion& value);
 
-	vs_property(SceneComponent*, RootComponent);
+	vs_property(GSceneComponent*, RootComponent);
 	vs_property_get(ActorTickFunction&, PrimaryActorTick);
 	vs_property(bool, ActorTickEnabled);
 	vs_property_get(bool, HasBegunPlay);
@@ -93,7 +88,7 @@ protected:
 	virtual void Tick(Seconds deltaTime);
 
 private:
-	bool AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num);
+	bool AddComponentInternal(TRefPtr<GActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num);
 	bool RemoveComponentInternal(size_t hash_code);
 
 	template<class... TArgs, size_t... Indices>
@@ -102,7 +97,7 @@ private:
 	template<class T>
 	inline static consteval auto CalcHierarchy()
 	{
-		if constexpr (std::is_same_v<T, ActorComponent>)
+		if constexpr (std::is_same_v<T, GActorComponent>)
 		{
 			return std::tuple<size_t>(TUniqueType<T>::HashCode);
 		}
@@ -115,7 +110,7 @@ private:
 	template<class T, class... TRest, size_t... Indices>
 	inline static consteval auto CalcHierarchy(const std::tuple<TRest...>& rest, std::index_sequence<Indices...>)
 	{
-		if constexpr (std::is_same_v<T, ActorComponent>)
+		if constexpr (std::is_same_v<T, GActorComponent>)
 		{
 			return std::tuple(TUniqueType<T>::HashCode, std::get<Indices>(rest)...);
 		}

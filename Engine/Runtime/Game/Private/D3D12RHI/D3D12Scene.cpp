@@ -40,7 +40,7 @@ void D3D12Scene::Update()
 {
 	for (size_t i = 0; i < primitiveComponents.size(); ++i)
 	{
-		PrimitiveComponent*& primitive = primitiveComponents[i];
+		GPrimitiveComponent*& primitive = primitiveComponents[i];
 
 		if (primitive->HasAnyDirtyMark())
 		{
@@ -51,7 +51,7 @@ void D3D12Scene::Update()
 
 	for (size_t i = 0; i < lightComponents.size(); ++i)
 	{
-		LightComponent*& primitive = lightComponents[i];
+		GLightComponent*& primitive = lightComponents[i];
 
 		if (primitive->HasAnyDirtyMark())
 		{
@@ -63,7 +63,7 @@ void D3D12Scene::Update()
 
 void D3D12Scene::CalcVisibility()
 {
-	PlayerCameraManager* cameraManager = localPlayer->CameraManager;
+	GPlayerCameraManager* cameraManager = localPlayer->CameraManager;
 
 	if (cameraManager == nullptr)
 	{
@@ -98,7 +98,7 @@ void D3D12Scene::EndRender(IRHICommandList* inCommandList)
 
 }
 
-void D3D12Scene::AddPrimitive(PrimitiveComponent* inPrimitiveComponent)
+void D3D12Scene::AddPrimitive(GPrimitiveComponent* inPrimitiveComponent)
 {
 	primitiveComponents.emplace_back(inPrimitiveComponent);
 	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
@@ -106,7 +106,7 @@ void D3D12Scene::AddPrimitive(PrimitiveComponent* inPrimitiveComponent)
 	ReadyRaytracingAccelerationBuffers();
 }
 
-void D3D12Scene::AddLight(LightComponent* inLightComponent)
+void D3D12Scene::AddLight(GLightComponent* inLightComponent)
 {
 	lightComponents.emplace_back(inLightComponent);
 	lightProxies.emplace_back(inLightComponent->GetSceneProxy());

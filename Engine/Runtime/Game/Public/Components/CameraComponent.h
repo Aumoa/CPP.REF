@@ -8,19 +8,19 @@
 
 struct MinimalViewInfo;
 
-class GAME_API CameraComponent : public SceneComponent
+class GAME_API GCameraComponent : public GSceneComponent
 {
 public:
-	using Super = SceneComponent;
-	using This = CameraComponent;
+	using Super = GSceneComponent;
+	using This = GCameraComponent;
 
 private:
 	float aspectRatio;
 	float fov;
 
 public:
-	CameraComponent();
-	~CameraComponent() override;
+	GCameraComponent();
+	~GCameraComponent() override;
 
 	void CalcCameraView(MinimalViewInfo& outViewInfo) const;
 };

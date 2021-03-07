@@ -6,13 +6,13 @@
 #include "CoreMinimal.h"
 #include "PrimitiveComponent.h"
 
-class GAME_API MeshComponent : public PrimitiveComponent
+class GAME_API GMeshComponent : public GPrimitiveComponent
 {
 public:
-	using Super = PrimitiveComponent;
-	using This = PrimitiveComponent;
+	using Super = GPrimitiveComponent;
+	using This = GPrimitiveComponent;
 
 public:
-	MeshComponent();
-	~MeshComponent() override;
+	GMeshComponent();
+	~GMeshComponent() override;
 };

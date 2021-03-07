@@ -9,11 +9,11 @@
 #include "PlatformMisc/PlatformInput.h"
 #include "Key.h"
 
-class GAME_API InputComponent : public ActorComponent
+class GAME_API GInputComponent : public GActorComponent
 {
 public:
-	using Super = ActorComponent;
-	using This = InputComponent;
+	using Super = GActorComponent;
+	using This = GInputComponent;
 
 	using KeyActionBindDelegate = TMulticastDelegate<void(EKey, EKeyEvent)>;
 	using CursorMoveBindDelegate = TMulticastDelegate<void(const CursorState&, const CursorCompare&)>;
@@ -26,15 +26,15 @@ private:
 
 	std::map<EKey, KeyActionBindDelegate> keyBinds[2];
 	CursorMoveBindDelegate cursorBind;
-	InputComponent* overrideComponent;
+	GInputComponent* overrideComponent;
 
 public:
-	InputComponent();
-	~InputComponent() override;
+	GInputComponent();
+	~GInputComponent() override;
 
 	void TickComponent(Seconds deltaTime) override;
 
-	void SetOverrideComponent(InputComponent* inDerived);
+	void SetOverrideComponent(GInputComponent* inDerived);
 
 	KeyActionBindDelegate& GetKeyActionBinder(EKey inKey, EKeyEvent inEventType);
 	CursorMoveBindDelegate& GetCursorMoveBinder();

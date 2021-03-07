@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "Actor.h"
 
-class DirectionalLightComponent;
+class GDirectionalLightComponent;
 
 class GAME_API ADirectionalLight : public AActor
 {
@@ -15,11 +15,11 @@ public:
 	using This = ADirectionalLight;
 
 private:
-	DirectionalLightComponent* lightComponent;
+	GDirectionalLightComponent* lightComponent;
 
 public:
 	ADirectionalLight();
 	~ADirectionalLight() override;
 
-	vs_property_get_auto(DirectionalLightComponent*, LightComponent, lightComponent);
+	vs_property_get_auto(GDirectionalLightComponent*, LightComponent, lightComponent);
 };

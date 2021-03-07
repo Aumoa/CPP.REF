@@ -13,10 +13,10 @@ interface IRHICommandList;
 interface IRHIResource;
 
 class PrimitiveSceneProxy;
-class PrimitiveComponent;
+class GPrimitiveComponent;
 class APlayerController;
 class SceneVisibility;
-class LightComponent;
+class GLightComponent;
 class LightSceneProxy;
 class D3D12DeviceBundle;
 class D3D12ResourceBundle;
@@ -30,7 +30,7 @@ public:
 	D3D12DeviceBundle* deviceBundle;
 	D3D12ResourceBundle* resourceBundle;
 
-	std::vector<PrimitiveComponent*> primitiveComponents;
+	std::vector<GPrimitiveComponent*> primitiveComponents;
 	std::vector<PrimitiveSceneProxy*> sceneProxies;
 
 	APlayerController* localPlayer;
@@ -38,7 +38,7 @@ public:
 	std::vector<TRefPtr<SceneVisibility>> visibilities;
 
 	size_t numSRVs;
-	std::vector<LightComponent*> lightComponents;
+	std::vector<GLightComponent*> lightComponents;
 	std::vector<LightSceneProxy*> lightProxies;
 	TRefPtr<IRHIOnlineDescriptorPatch> srvPatch;
 
@@ -55,8 +55,8 @@ public:
 	virtual void BeginRender(IRHICommandList* inCommandList);
 	virtual void EndRender(IRHICommandList* inCommandList);
 
-	virtual void AddPrimitive(PrimitiveComponent* inPrimitiveComponent);
-	virtual void AddLight(LightComponent* inLightComponent);
+	virtual void AddPrimitive(GPrimitiveComponent* inPrimitiveComponent);
+	virtual void AddLight(GLightComponent* inLightComponent);
 
 	virtual SceneVisibility* GetLocalPlayerVisibility() const;
 	virtual std::span<PrimitiveSceneProxy* const> GetPrimitives() const;

@@ -423,9 +423,6 @@
     <ClInclude Include="Private\DirectXGeometry.h">
       <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Bezier.h">
-      <Filter>Private</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\RHITextureClearValue.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -623,6 +620,9 @@
     </ClInclude>
     <ClInclude Include="Public\Windows\WinEvent.h">
       <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DirectX\Bezier.h">
+      <Filter>Public\DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

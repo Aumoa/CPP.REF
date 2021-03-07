@@ -4,7 +4,7 @@
 
 #include "SceneRendering/LightSceneProxy.h"
 
-LightComponent::LightComponent() : Super()
+GLightComponent::GLightComponent() : Super()
 	, lightColor(Color::White)
 	, lightAmbient(1.0f)
 	, lightDiffuse(1.0f)
@@ -15,12 +15,12 @@ LightComponent::LightComponent() : Super()
 
 }
 
-LightComponent::~LightComponent()
+GLightComponent::~GLightComponent()
 {
 
 }
 
-void LightComponent::ResolveDirtyState()
+void GLightComponent::ResolveDirtyState()
 {
 	if (HasDirtyMark(EComponentDirtyMask::RecreateProxy))
 	{
@@ -42,72 +42,72 @@ void LightComponent::ResolveDirtyState()
 	Super::ResolveDirtyState();
 }
 
-TRefPtr<LightSceneProxy> LightComponent::CreateSceneProxy()
+TRefPtr<LightSceneProxy> GLightComponent::CreateSceneProxy()
 {
 	return nullptr;
 }
 
-LightSceneProxy* LightComponent::GetSceneProxy() const
+LightSceneProxy* GLightComponent::GetSceneProxy() const
 {
 	return sceneProxy.Get();
 }
 
-Color LightComponent::LightColor_get() const
+Color GLightComponent::LightColor_get() const
 {
 	return lightColor;
 }
 
-void LightComponent::LightColor_set(Color value)
+void GLightComponent::LightColor_set(Color value)
 {
 	lightColor = value;
 	SetMarkDirtyLightUpdated();
 }
 
-float LightComponent::Ambient_get() const
+float GLightComponent::Ambient_get() const
 {
 	return lightAmbient;
 }
 
-void LightComponent::Ambient_set(float value)
+void GLightComponent::Ambient_set(float value)
 {
 	lightAmbient = value;
 	SetMarkDirtyLightUpdated();
 }
 
-float LightComponent::Diffuse_get() const
+float GLightComponent::Diffuse_get() const
 {
 	return lightDiffuse;
 }
 
-void LightComponent::Diffuse_set(float value)
+void GLightComponent::Diffuse_set(float value)
 {
 	lightDiffuse = value;
 	SetMarkDirtyLightUpdated();
 }
 
-float LightComponent::Specular_get() const
+float GLightComponent::Specular_get() const
 {
 	return lightSpecular;
 }
 
-void LightComponent::Specular_set(float value)
+void GLightComponent::Specular_set(float value)
 {
 	lightSpecular = value;
 	SetMarkDirtyLightUpdated();
 }
 
-bool LightComponent::IsShadowCast_get() const
+bool GLightComponent::IsShadowCast_get() const
 {
 	return bShadowCast;
 }
 
-void LightComponent::IsShadowCast_set(bool value)
+void GLightComponent::IsShadowCast_set(bool value)
 {
 	bShadowCast = true;
 	SetMarkDirtyLightUpdated();
 }
 
-void LightComponent::SetMarkDirtyLightUpdated()
+void GLightComponent::SetMarkDirtyLightUpdated()
 {
 	Super::SetMarkDirty((EComponentDirtyMask)ELightComponentDirtyMask::LightUpdated);
 }

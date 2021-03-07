@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "Actor.h"
 
-class StaticMeshComponent;
+class GStaticMeshComponent;
 
 class GAME_API AStaticMeshActor : public AActor
 {
@@ -15,11 +15,11 @@ public:
 	using This = AStaticMeshActor;
 
 private:
-	StaticMeshComponent* staticMeshComponent;
+	GStaticMeshComponent* staticMeshComponent;
 
 public:
 	AStaticMeshActor();
 	~AStaticMeshActor();
 
-	vs_property_get(StaticMeshComponent*, StaticMesh);
+	vs_property_get(GStaticMeshComponent*, StaticMesh);
 };

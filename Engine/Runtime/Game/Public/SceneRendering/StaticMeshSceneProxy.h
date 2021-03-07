@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "PrimitiveSceneProxy.h"
 
-class StaticMeshComponent;
+class GStaticMeshComponent;
 class StaticMesh;
 
 class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
@@ -16,7 +16,7 @@ public:
 	using This = StaticMeshSceneProxy;
 
 private:
-	TWeakPtr<StaticMeshComponent> meshComponent;
+	TWeakPtr<GStaticMeshComponent> meshComponent;
 	StaticMesh* staticMesh;
 	AxisAlignedCube baseBoundingBox;
 	AxisAlignedCube transformedBoundingBox;
@@ -25,7 +25,7 @@ private:
 	TRefPtr<MeshBatch> customBatch;
 
 public:
-	StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent);
+	StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent);
 	~StaticMeshSceneProxy();
 
 	void Update() override;

@@ -33,7 +33,7 @@ public:
 	}
 };
 
-StaticMeshSceneProxy::StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
+StaticMeshSceneProxy::StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
 	, meshComponent(inMeshComponent)
 	, staticMesh(inMeshComponent->GetStaticMesh())
 	, materialIndex(0)

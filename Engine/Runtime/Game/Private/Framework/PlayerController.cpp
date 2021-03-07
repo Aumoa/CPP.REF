@@ -21,8 +21,8 @@ APlayerController::APlayerController() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	cameraManager = AddComponent<PlayerCameraManager>();
-	inputComponent = AddComponent<InputComponent>();
+	cameraManager = AddComponent<GPlayerCameraManager>();
+	inputComponent = AddComponent<GInputComponent>();
 
 	inputComponent->GetKeyActionBinder(EKey::ESC, EKeyEvent::Pressed).AddRaw(this, &APlayerController::AutoUnlockMouseCursor);
 	inputComponent->GetKeyActionBinder(EKey::LeftButton, EKeyEvent::Pressed).AddRaw(this, &APlayerController::AutoUnlockMouseCursor);
@@ -47,7 +47,7 @@ void APlayerController::OnPossess(APawn* inPawn)
 	cameraManager->UpdateCameraComponent();
 
 	// Binding input override component.
-	possessedInputComponent = inPawn->AddComponent<InputComponent>();
+	possessedInputComponent = inPawn->AddComponent<GInputComponent>();
 	inputComponent->SetOverrideComponent(possessedInputComponent);
 
 	inPawn->SetupPlayerInputComponent(possessedInputComponent);
@@ -56,7 +56,7 @@ void APlayerController::OnPossess(APawn* inPawn)
 void APlayerController::OnUnPossess()
 {
 	// Unbinding input override component.
-	if (GetPawn()->RemoveComponent<InputComponent>())
+	if (GetPawn()->RemoveComponent<GInputComponent>())
 	{
 		inputComponent->SetOverrideComponent(nullptr);
 	}
@@ -65,12 +65,12 @@ void APlayerController::OnUnPossess()
 	cameraManager->UpdateCameraComponent();
 }
 
-PlayerCameraManager* APlayerController::CameraManager_get() const
+GPlayerCameraManager* APlayerController::CameraManager_get() const
 {
 	return cameraManager;
 }
 
-InputComponent* APlayerController::PlayerInputComponent_get() const
+GInputComponent* APlayerController::PlayerInputComponent_get() const
 {
 	return inputComponent;
 }
@@ -91,7 +91,7 @@ void APlayerController::UpdateCursorVisibleState()
 	}
 }
 
-void APlayerController::Possessed_ComponentAdded(ActorComponent*)
+void APlayerController::Possessed_ComponentAdded(GActorComponent*)
 {
 	cameraManager->UpdateCameraComponent();
 }

@@ -9,7 +9,7 @@
 #include "ComponentMobility.h"
 
 class MeshBatch;
-class PrimitiveComponent;
+class GPrimitiveComponent;
 
 class GAME_API PrimitiveSceneProxy : public Object
 {
@@ -18,11 +18,11 @@ public:
 	using This = PrimitiveSceneProxy;
 
 private:
-	TWeakPtr<PrimitiveComponent> myPrimitiveComponent;
+	TWeakPtr<GPrimitiveComponent> myPrimitiveComponent;
 	Transform transform;
 
 public:
-	PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent);
+	PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent);
 	~PrimitiveSceneProxy();
 
 	virtual void Update();

@@ -13,9 +13,6 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include <array>
-#include <algorithm>
-
 class Bezier
 {
 public:
@@ -30,23 +27,6 @@ public:
             p4 * t * t * t;
     }
 
-    template<>
-    inline static Vector3 CubicInterpolate(Vector3 const& p1, Vector3 const& p2, Vector3 const& p3, Vector3 const& p4, float t)
-    {
-        Vector3 T0 = ((1 - t) * (1 - t) * (1 - t));
-        Vector3 T1 = (3 * t * (1 - t) * (1 - t));
-        Vector3 T2 = (3 * t * t * (1 - t));
-        Vector3 T3 = (t * t * t);
-
-        Vector3 Result = p1 * T0;
-        Result = p2 * T1 + Result;
-        Result = p3 * T2 + Result;
-        Result = p4 * T3 + Result;
-
-        return Result;
-    }
-
-
     // Computes the tangent of a cubic bezier curve at the specified time.
     template<typename T>
     inline static T CubicTangent(T const& p1, T const& p2, T const& p3, T const& p4, float t)
@@ -57,28 +37,11 @@ public:
             p4 * (t * t);
     }
 
-    template<>
-    inline static Vector3 CubicTangent(Vector3 const& p1, Vector3 const& p2, Vector3 const& p3, Vector3 const& p4, float t)
-    {
-        Vector3 T0 = (-1 + 2 * t - t * t);
-        Vector3 T1 = (1 - 4 * t + 3 * t * t);
-        Vector3 T2 = (2 * t - 3 * t * t);
-        Vector3 T3 = (t * t);
-
-        Vector3 Result = p1 * T0;
-        Result = p2 * T1 + Result;
-        Result = p3 * T2 + Result;
-        Result = p4 * T3 + Result;
-
-        return Result;
-    }
-
-
     // Creates vertices for a patch that is tessellated at the specified level.
     // Calls the specified outputVertex function for each generated vertex,
     // passing the position, normal, and texture coordinate as parameters.
     template<typename TOutputFunc>
-    static void CreatePatchVertices(_In_reads_(16) Vector3 patch[16], size_t tessellation, bool isMirrored, TOutputFunc outputVertex)
+    static void CreatePatchVertices(_In_reads_(16) Vector3 patch[16], size_t tessellation, bool bMirrored, TOutputFunc outputVertex)
     {
         for (size_t i = 0; i <= tessellation; i++)
         {
@@ -118,7 +81,7 @@ public:
                     normal = normal.Normalized;
 
                     // If this patch is mirrored, we must invert the normal.
-                    if (isMirrored)
+                    if (bMirrored)
                     {
                         normal = -normal;
                     }
@@ -143,7 +106,7 @@ public:
                 }
 
                 // Compute the texture coordinate.
-                float mirroredU = isMirrored ? 1 - u : u;
+                float mirroredU = bMirrored ? 1 - u : u;
 
                 Vector2 textureCoordinate = Vector2(mirroredU, v);
 
@@ -157,7 +120,7 @@ public:
     // Creates indices for a patch that is tessellated at the specified level.
     // Calls the specified outputIndex function for each generated index value.
     template<typename TOutputFunc>
-    static void CreatePatchIndices(size_t tessellation, bool isMirrored, TOutputFunc outputIndex)
+    static void CreatePatchIndices(size_t tessellation, bool bMirrored, TOutputFunc outputIndex)
     {
         size_t stride = tessellation + 1;
 
@@ -178,7 +141,7 @@ public:
                 };
 
                 // If this patch is mirrored, reverse indices to fix the winding order.
-                if (isMirrored)
+                if (bMirrored)
                 {
                     std::reverse(indices.begin(), indices.end());
                 }

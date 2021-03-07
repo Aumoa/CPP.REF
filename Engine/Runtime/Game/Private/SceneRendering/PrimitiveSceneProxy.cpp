@@ -4,7 +4,7 @@
 
 #include "Components/PrimitiveComponent.h"
 
-PrimitiveSceneProxy::PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent) : Super()
+PrimitiveSceneProxy::PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent) : Super()
 	, myPrimitiveComponent(inPrimitiveComponent)
 	, Mobility(inPrimitiveComponent->Mobility)
 {

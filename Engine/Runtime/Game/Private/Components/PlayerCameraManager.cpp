@@ -10,7 +10,7 @@
 #include "Components/CameraComponent.h"
 #include "SceneRendering/MinimalViewInfo.h"
 
-PlayerCameraManager::PlayerCameraManager() : Super()
+GPlayerCameraManager::GPlayerCameraManager() : Super()
 	, bPrintNoCameraWarning(true)
 	, pawnCamera(nullptr)
 	, lastUpdatedTransform(Transform::Identity)
@@ -18,12 +18,12 @@ PlayerCameraManager::PlayerCameraManager() : Super()
 
 }
 
-PlayerCameraManager::~PlayerCameraManager()
+GPlayerCameraManager::~GPlayerCameraManager()
 {
 
 }
 
-void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
+void GPlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 {
 	static constexpr const float DefaultFOV = 0.25f * 3.14f;
 
@@ -73,7 +73,7 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 	}
 }
 
-void PlayerCameraManager::UpdateCameraComponent()
+void GPlayerCameraManager::UpdateCameraComponent()
 {
 	pawnCamera = nullptr;
 
@@ -91,7 +91,7 @@ void PlayerCameraManager::UpdateCameraComponent()
 		return;
 	}
 
-	CameraComponent* camera = pawn->GetComponent<CameraComponent>();
+	GCameraComponent* camera = pawn->GetComponent<GCameraComponent>();
 	if (camera == nullptr)
 	{
 		SE_LOG(LogCamera, Verbose, L"Possessed pawn have not a camera component. Using default camera view property.");
@@ -101,7 +101,7 @@ void PlayerCameraManager::UpdateCameraComponent()
 	pawnCamera = camera;
 }
 
-void PlayerCameraManager::PrintNoCameraWarning(TRefPtr<String> message) const
+void GPlayerCameraManager::PrintNoCameraWarning(TRefPtr<String> message) const
 {
 	if (bPrintNoCameraWarning)
 	{

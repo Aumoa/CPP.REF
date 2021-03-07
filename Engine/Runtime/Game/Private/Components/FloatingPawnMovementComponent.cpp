@@ -6,7 +6,7 @@
 #include "Framework/Controller.h"
 #include "Logging/LogMacros.h"
 
-FloatingPawnMovementComponent::FloatingPawnMovementComponent() : Super()
+GFloatingPawnMovementComponent::GFloatingPawnMovementComponent() : Super()
 	, MaxSpeed(12.0f)
 	, Acceleration(40.0f)
 	, Deceleration(80.0f)
@@ -15,12 +15,12 @@ FloatingPawnMovementComponent::FloatingPawnMovementComponent() : Super()
 
 }
 
-FloatingPawnMovementComponent::~FloatingPawnMovementComponent()
+GFloatingPawnMovementComponent::~GFloatingPawnMovementComponent()
 {
 
 }
 
-void FloatingPawnMovementComponent::TickComponent(Seconds deltaTime)
+void GFloatingPawnMovementComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
 
@@ -38,7 +38,7 @@ void FloatingPawnMovementComponent::TickComponent(Seconds deltaTime)
 	MoveActor(deltaTime);
 }
 
-void FloatingPawnMovementComponent::CalcVelocity(Seconds deltaTime)
+void GFloatingPawnMovementComponent::CalcVelocity(Seconds deltaTime)
 {
 	Vector3 ControlAcceleration = ConsumePendingInputVectorWithMaxLength(1.0f);
 
@@ -79,7 +79,7 @@ void FloatingPawnMovementComponent::CalcVelocity(Seconds deltaTime)
 	Velocity = Velocity.GetClampedToMaxLength(NewMaxSpeed);
 }
 
-void FloatingPawnMovementComponent::MoveActor(Seconds deltaTime)
+void GFloatingPawnMovementComponent::MoveActor(Seconds deltaTime)
 {
 	Vector3 delta = Velocity * deltaTime.Value;
 	if (delta.NearlyEquals(Vector3::Zero, Math::SmallNumber<>))
@@ -96,7 +96,7 @@ void FloatingPawnMovementComponent::MoveActor(Seconds deltaTime)
 	Velocity = ((newLocation - oldLocation) / deltaTime.Value);
 }
 
-Vector3 FloatingPawnMovementComponent::ConsumePendingInputVectorWithMaxLength(float inMaxLength)
+Vector3 GFloatingPawnMovementComponent::ConsumePendingInputVectorWithMaxLength(float inMaxLength)
 {
 	Vector3 pendingInput = ConsumePendingInputVector();
 	if (float length = pendingInput.Length; length > 1.0f)

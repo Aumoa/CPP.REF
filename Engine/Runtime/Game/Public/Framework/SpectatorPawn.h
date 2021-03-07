@@ -8,7 +8,7 @@
 
 #include "PlatformMisc/PlatformInput.h"
 
-class FloatingPawnMovementComponent;
+class GFloatingPawnMovementComponent;
 
 class GAME_API ASpectatorPawn : public APawn
 {
@@ -25,7 +25,7 @@ private:
 	TDegrees<float> yaw;
 	TDegrees<float> pitch;
 
-	FloatingPawnMovementComponent* movementComponent;
+	GFloatingPawnMovementComponent* movementComponent;
 
 public:
 	ASpectatorPawn();
@@ -33,7 +33,7 @@ public:
 
 	void Tick(Seconds deltaTime) override;
 
-	void SetupPlayerInputComponent(InputComponent* inPlayerInput) override;
+	void SetupPlayerInputComponent(GInputComponent* inPlayerInput) override;
 
 	void MoveForward(float value);
 	void MoveRight(float value);

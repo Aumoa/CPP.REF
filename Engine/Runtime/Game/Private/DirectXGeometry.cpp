@@ -11,7 +11,7 @@
 #pragma unmanaged
 
 #include "DirectXGeometry.h"
-#include "Bezier.h"
+#include "DirectX/Bezier.h"
 
 namespace
 {

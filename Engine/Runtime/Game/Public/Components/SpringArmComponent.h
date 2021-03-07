@@ -6,11 +6,11 @@
 #include "CoreMinimal.h"
 #include "SceneComponent.h"
 
-class GAME_API SpringArmComponent : public SceneComponent
+class GAME_API GSpringArmComponent : public GSceneComponent
 {
 public:
-	using Super = SceneComponent;
-	using This = SpringArmComponent;
+	using Super = GSceneComponent;
+	using This = GSpringArmComponent;
 
 public:
 	static const TRefPtr<String> SocketName;
@@ -20,8 +20,8 @@ public:
 	float springArmLength;
 
 public:
-	SpringArmComponent();
-	~SpringArmComponent() override;
+	GSpringArmComponent();
+	~GSpringArmComponent() override;
 
 	void TickComponent(Seconds deltaTime) override;
 

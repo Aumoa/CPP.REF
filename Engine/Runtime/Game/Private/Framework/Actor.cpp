@@ -189,12 +189,12 @@ void AActor::SetActorRotation(const Quaternion& value)
 
 #undef NO_ROOT_WARNINGS
 
-SceneComponent* AActor::RootComponent_get() const
+GSceneComponent* AActor::RootComponent_get() const
 {
 	return rootComponent;
 }
 
-void AActor::RootComponent_set(SceneComponent* value)
+void AActor::RootComponent_set(GSceneComponent* value)
 {
 	rootComponent = value;
 }
@@ -224,9 +224,9 @@ void AActor::Tick(Seconds deltaTime)
 
 }
 
-bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)
+bool AActor::AddComponentInternal(TRefPtr<GActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)
 {
-	ActorComponent* ptr = assign_ptr.Get();
+	GActorComponent* ptr = assign_ptr.Get();
 	if (ptr == nullptr)
 	{
 		return false;
@@ -238,7 +238,7 @@ bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const si
 		auto it = this->hierarchy.find(hierarchy[i]);
 		if (it == this->hierarchy.end())
 		{
-			it = this->hierarchy.emplace(hierarchy[i], list<ActorComponent*>()).first;
+			it = this->hierarchy.emplace(hierarchy[i], list<GActorComponent*>()).first;
 		}
 		it->second.push_back(ptr);
 	}
@@ -271,7 +271,7 @@ bool AActor::RemoveComponentInternal(size_t hash_code)
 		auto erase_it = find(item.second.begin(), item.second.end(), front);
 		if (erase_it != item.second.end())
 		{
-			ActorComponent* component = (*erase_it);
+			GActorComponent* component = (*erase_it);
 			if (component->HasBegunPlay)
 			{
 				component->EndPlay();

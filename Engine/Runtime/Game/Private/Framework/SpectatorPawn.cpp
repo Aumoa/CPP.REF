@@ -22,8 +22,8 @@ ASpectatorPawn::ASpectatorPawn() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = AddComponent<CameraComponent>();
-	movementComponent = AddComponent<FloatingPawnMovementComponent>();
+	RootComponent = AddComponent<GCameraComponent>();
+	movementComponent = AddComponent<GFloatingPawnMovementComponent>();
 	movementComponent->UpdatedComponent = RootComponent;
 }
 
@@ -39,7 +39,7 @@ void ASpectatorPawn::Tick(Seconds deltaTime)
 	ProcessPlayerInput();
 }
 
-void ASpectatorPawn::SetupPlayerInputComponent(InputComponent* inPlayerInput)
+void ASpectatorPawn::SetupPlayerInputComponent(GInputComponent* inPlayerInput)
 {
 	Super::SetupPlayerInputComponent(inPlayerInput);
 

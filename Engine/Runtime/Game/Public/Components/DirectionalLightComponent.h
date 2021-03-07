@@ -7,15 +7,15 @@
 #include "LightComponent.h"
 #include "SceneRendering/LightSceneProxy.h"
 
-class GAME_API DirectionalLightComponent : public LightComponent
+class GAME_API GDirectionalLightComponent : public GLightComponent
 {
 public:
-	using Super = LightComponent;
-	using This = DirectionalLightComponent;
+	using Super = GLightComponent;
+	using This = GDirectionalLightComponent;
 
 public:
-	DirectionalLightComponent();
-	~DirectionalLightComponent() override;
+	GDirectionalLightComponent();
+	~GDirectionalLightComponent() override;
 
 	TRefPtr<LightSceneProxy> CreateSceneProxy() override;
 	void CalcLightView(MinimalViewInfo& outViewInfo) const override;

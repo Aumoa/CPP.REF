@@ -7,20 +7,20 @@
 
 using namespace std;
 
-DEFINE_STATS_GROUP(InputComponent);
+DEFINE_STATS_GROUP(GInputComponent);
 
-InputComponent::InputComponent()
+GInputComponent::GInputComponent()
 	: overrideComponent(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-InputComponent::~InputComponent()
+GInputComponent::~GInputComponent()
 {
 
 }
 
-void InputComponent::TickComponent(Seconds deltaTime)
+void GInputComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
 	
@@ -28,7 +28,7 @@ void InputComponent::TickComponent(Seconds deltaTime)
 	UpdateCursorState();
 }
 
-void InputComponent::SetOverrideComponent(InputComponent* inDerived)
+void GInputComponent::SetOverrideComponent(GInputComponent* inDerived)
 {
 	if (overrideComponent == inDerived)
 	{
@@ -50,7 +50,7 @@ void InputComponent::SetOverrideComponent(InputComponent* inDerived)
 	}
 }
 
-auto InputComponent::GetKeyActionBinder(EKey inKey, EKeyEvent inEventType) -> KeyActionBindDelegate&
+auto GInputComponent::GetKeyActionBinder(EKey inKey, EKeyEvent inEventType) -> KeyActionBindDelegate&
 {
 	if ((size_t)inEventType >= 2)
 	{
@@ -72,12 +72,12 @@ auto InputComponent::GetKeyActionBinder(EKey inKey, EKeyEvent inEventType) -> Ke
 	}
 }
 
-auto InputComponent::GetCursorMoveBinder() -> CursorMoveBindDelegate&
+auto GInputComponent::GetCursorMoveBinder() -> CursorMoveBindDelegate&
 {
 	return cursorBind;
 }
 
-void InputComponent::UpdateKeyboardState()
+void GInputComponent::UpdateKeyboardState()
 {
 	KeyboardState currentKeys = PlatformInput::GetKeyboardState();
 	keyCompare.Compare(keys, currentKeys);
@@ -119,7 +119,7 @@ void InputComponent::UpdateKeyboardState()
 	}
 }
 
-void InputComponent::UpdateCursorState()
+void GInputComponent::UpdateCursorState()
 {
 	CursorState currentCursor = PlatformInput::GetCursorState();
 	cursorCompare.Compare(cursor, currentCursor);

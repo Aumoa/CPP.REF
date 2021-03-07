@@ -9,19 +9,19 @@
 class StaticMesh;
 class MaterialInterface;
 
-class GAME_API StaticMeshComponent : public MeshComponent
+class GAME_API GStaticMeshComponent : public GMeshComponent
 {
 public:
-	using Super = MeshComponent;
-	using This = StaticMeshComponent;
+	using Super = GMeshComponent;
+	using This = GStaticMeshComponent;
 
 private:
 	TWeakPtr<StaticMesh> staticMesh;
 	TRefPtr<MaterialInterface> overrideMaterial;
 
 public:
-	StaticMeshComponent();
-	~StaticMeshComponent() override;
+	GStaticMeshComponent();
+	~GStaticMeshComponent() override;
 
 	TRefPtr<PrimitiveSceneProxy> CreateSceneProxy() override;
 

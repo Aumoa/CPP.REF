@@ -2,7 +2,7 @@
 
 #include "Components/MovementComponent.h"
 
-MovementComponent::MovementComponent() : Super()
+GMovementComponent::GMovementComponent() : Super()
 	, bAutoRegisterUpdatedComponent(false)
 	, updatedComponent(nullptr)
 
@@ -11,17 +11,17 @@ MovementComponent::MovementComponent() : Super()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-MovementComponent::~MovementComponent()
+GMovementComponent::~GMovementComponent()
 {
 
 }
 
-void MovementComponent::TickComponent(Seconds deltaTime)
+void GMovementComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
 }
 
-bool MovementComponent::IsExceedingMaxSpeed(float inMaxSpeed) const
+bool GMovementComponent::IsExceedingMaxSpeed(float inMaxSpeed) const
 {
 	inMaxSpeed = Math::Max(0.f, inMaxSpeed);
 	const float MaxSpeedSquared = Math::Square(inMaxSpeed);
@@ -31,22 +31,22 @@ bool MovementComponent::IsExceedingMaxSpeed(float inMaxSpeed) const
 	return (Velocity.LengthSq > MaxSpeedSquared * OverVelocityPercent);
 }
 
-SceneComponent* MovementComponent::UpdatedComponent_get() const
+GSceneComponent* GMovementComponent::UpdatedComponent_get() const
 {
 	return updatedComponent;
 }
 
-void MovementComponent::UpdatedComponent_set(SceneComponent* value)
+void GMovementComponent::UpdatedComponent_set(GSceneComponent* value)
 {
 	updatedComponent = value;
 }
 
-bool MovementComponent::AutoRegisterUpdatedComponent_get() const
+bool GMovementComponent::AutoRegisterUpdatedComponent_get() const
 {
 	return bAutoRegisterUpdatedComponent;
 }
 
-void MovementComponent::AutoRegisterUpdatedComponent_set(bool value)
+void GMovementComponent::AutoRegisterUpdatedComponent_set(bool value)
 {
 	bAutoRegisterUpdatedComponent = value;
 }

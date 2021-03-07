@@ -14,10 +14,10 @@ public:
 	using This = DirectionalLightSceneProxy;
 
 private:
-	DirectionalLightComponent* myComponent;
+	GDirectionalLightComponent* myComponent;
 
 public:
-	DirectionalLightSceneProxy(DirectionalLightComponent* inComponent) : Super(inComponent)
+	DirectionalLightSceneProxy(GDirectionalLightComponent* inComponent) : Super(inComponent)
 		, myComponent(inComponent)
 	{
 
@@ -35,22 +35,22 @@ public:
 	}
 };
 
-DirectionalLightComponent::DirectionalLightComponent() : Super()
+GDirectionalLightComponent::GDirectionalLightComponent() : Super()
 {
 
 }
 
-DirectionalLightComponent::~DirectionalLightComponent()
+GDirectionalLightComponent::~GDirectionalLightComponent()
 {
 
 }
 
-TRefPtr<LightSceneProxy> DirectionalLightComponent::CreateSceneProxy()
+TRefPtr<LightSceneProxy> GDirectionalLightComponent::CreateSceneProxy()
 {
 	return NewObject<DirectionalLightSceneProxy>(this);
 }
 
-void DirectionalLightComponent::CalcLightView(MinimalViewInfo& outViewInfo) const
+void GDirectionalLightComponent::CalcLightView(MinimalViewInfo& outViewInfo) const
 {
 	outViewInfo.FOV = 0;
 	outViewInfo.AspectRatio = 1.0f;

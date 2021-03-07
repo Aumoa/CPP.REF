@@ -14,11 +14,11 @@ enum class ELightComponentDirtyMask : uint32
 	LightUpdated = (uint32)EComponentDirtyMask::Last
 };
 
-class GAME_API LightComponent : public SceneComponent
+class GAME_API GLightComponent : public GSceneComponent
 {
 public:
-	using Super = SceneComponent;
-	using This = LightComponent;
+	using Super = GSceneComponent;
+	using This = GLightComponent;
 
 private:
 	Color lightColor;
@@ -31,8 +31,8 @@ private:
 	TRefPtr<LightSceneProxy> sceneProxy;
 
 public:
-	LightComponent();
-	~LightComponent() override;
+	GLightComponent();
+	~GLightComponent() override;
 
 	virtual void ResolveDirtyState();
 

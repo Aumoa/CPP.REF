@@ -6,18 +6,18 @@
 #include "CoreMinimal.h"
 #include "MovementComponent.h"
 
-class GAME_API PawnMovementComponent : public MovementComponent
+class GAME_API GPawnMovementComponent : public GMovementComponent
 {
 public:
-	using Super = MovementComponent;
-	using This = PawnMovementComponent;
+	using Super = GMovementComponent;
+	using This = GPawnMovementComponent;
 
 private:
 	Vector3 pendingInputVector;
 
 public:
-	PawnMovementComponent();
-	~PawnMovementComponent() override;
+	GPawnMovementComponent();
+	~GPawnMovementComponent() override;
 
 	virtual void AddInputVector(const Vector3& inWorldAccel);
 

@@ -146,7 +146,7 @@ void World::AddTickGroup(AActor* actor_ptr)
 	}
 
 	// Add all components to tick group.
-	list<ActorComponent*> actorComponents = actor_ptr->GetComponents<ActorComponent>();
+	list<GActorComponent*> actorComponents = actor_ptr->GetComponents<GActorComponent>();
 	for (auto& component : actorComponents)
 	{
 		if (auto& tickFunction = component->PrimaryComponentTick; tickFunction.bCanEverTick)
@@ -159,7 +159,7 @@ void World::AddTickGroup(AActor* actor_ptr)
 
 void World::AddSceneProxy(AActor* actor_ptr)
 {
-	list<PrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<PrimitiveComponent>();
+	list<GPrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<GPrimitiveComponent>();
 	
 	for (auto& item : primitiveComponents)
 	{
@@ -171,7 +171,7 @@ void World::AddSceneProxy(AActor* actor_ptr)
 		scene->AddPrimitive(item);
 	}
 
-	list<LightComponent*> lightComponents = actor_ptr->GetComponents<LightComponent>();
+	list<GLightComponent*> lightComponents = actor_ptr->GetComponents<GLightComponent>();
 
 	for (auto& item : lightComponents)
 	{

@@ -24,7 +24,7 @@ TRefPtr<IRHIResource> LightBatch::GetLightBuffer() const
 	return basicLightBuffer;
 }
 
-LightSceneProxy::LightSceneProxy(LightComponent* inLightComponent) : Super()
+LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent) : Super()
 	, myLightComponent(inLightComponent)
 	, transform(Transform::Identity)
 {

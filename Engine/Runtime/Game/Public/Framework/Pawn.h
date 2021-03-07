@@ -7,7 +7,7 @@
 
 #include "Actor.h"
 
-class InputComponent;
+class GInputComponent;
 class AController;
 
 template<class T>
@@ -29,7 +29,7 @@ public:
 	APawn();
 	~APawn() override;
 
-	virtual void SetupPlayerInputComponent(InputComponent* inPlayerInput);
+	virtual void SetupPlayerInputComponent(GInputComponent* inPlayerInput);
 	virtual void PossessedBy(AController* inNewController);
 	virtual void UnPossessed();
 

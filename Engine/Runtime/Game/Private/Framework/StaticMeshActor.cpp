@@ -7,7 +7,7 @@
 AStaticMeshActor::AStaticMeshActor() : Super()
 	, staticMeshComponent(nullptr)
 {
-	auto component = AddComponent<StaticMeshComponent>();
+	auto component = AddComponent<GStaticMeshComponent>();
 	RootComponent = component;
 	staticMeshComponent = component;
 }
@@ -17,7 +17,7 @@ AStaticMeshActor::~AStaticMeshActor()
 
 }
 
-StaticMeshComponent* AStaticMeshActor::StaticMesh_get() const
+GStaticMeshComponent* AStaticMeshActor::StaticMesh_get() const
 {
 	return staticMeshComponent;
 }

@@ -9,8 +9,8 @@
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "Key.h"
 
-class PlayerCameraManager;
-class InputComponent;
+class GPlayerCameraManager;
+class GInputComponent;
 
 GAME_API DECLARE_STATS_GROUP(APlayerController);
 
@@ -23,9 +23,9 @@ public:
 private:
 	bool bAutoUnlocked : 1;
 
-	PlayerCameraManager* cameraManager;
-	InputComponent* inputComponent;
-	InputComponent* possessedInputComponent;
+	GPlayerCameraManager* cameraManager;
+	GInputComponent* inputComponent;
+	GInputComponent* possessedInputComponent;
 
 public:
 	APlayerController();
@@ -36,8 +36,8 @@ public:
 	void OnPossess(APawn* inPawn) override;
 	void OnUnPossess() override;
 
-	vs_property_get(PlayerCameraManager*, CameraManager);
-	vs_property_get(InputComponent*, PlayerInputComponent);
+	vs_property_get(GPlayerCameraManager*, CameraManager);
+	vs_property_get(GInputComponent*, PlayerInputComponent);
 	vs_property_get(bool, IsCursorLocked);
 
 	bool bShowMouseCursor : 1;
@@ -46,6 +46,6 @@ public:
 private:
 	void UpdateCursorVisibleState();
 
-	void Possessed_ComponentAdded(ActorComponent*);
+	void Possessed_ComponentAdded(GActorComponent*);
 	void AutoUnlockMouseCursor(EKey inKey, EKeyEvent inKeyEvent);
 };
