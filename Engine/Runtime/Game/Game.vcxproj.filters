@@ -624,6 +624,15 @@
     <ClInclude Include="Private\DirectX\Bezier.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXRenderTargetView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDepthStencilView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -985,6 +994,15 @@
     </ClCompile>
     <ClCompile Include="Private\Windows\WinEvent.cpp">
       <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXRenderTargetView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDepthStencilView.cpp">
+      <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -16,17 +16,23 @@ public:
 	using Super = DirectXDeviceResource;
 
 private:
+	ID3D12Device5* device;
+	D3D12_COMMAND_LIST_TYPE commandType;
+
 	TComPtr<ID3D12CommandAllocator> commandAllocator;
 	TComPtr<ID3D12GraphicsCommandList4> commandList;
+	bool bHasBegunDraw : 1;
 
 public:
 	DirectXDeviceContext(DirectXDeviceBundle* deviceBundle, D3D12_COMMAND_LIST_TYPE type);
 	~DirectXDeviceContext() override;
 
-	virtual void BeginDraw();
+	virtual void BeginDraw(ID3D12PipelineState* initialPipeline = nullptr);
 	virtual void EndDraw();
 
 	ID3D12GraphicsCommandList4* GetCommandList() const;
+	D3D12_COMMAND_LIST_TYPE GetCommandListType() const;
+	vs_property_get_auto(bool, HasBegunDraw, bHasBegunDraw);
 
 protected:
 	void SwapCommandAllocator(TComPtr<ID3D12CommandAllocator>& swapTarget);

@@ -17,10 +17,20 @@ interface ID3D12DeviceChild;
 interface ID3D12CommandQueue;
 interface ID3D12CommandAllocator;
 interface ID3D12GraphicsCommandList4;
+interface ID3D12DescriptorHeap;
+interface ID3D12Resource;
+interface ID3D12PipelineState;
+interface ID3D12RootSignature;
 
 #pragma warning(push)
 #pragma warning(disable: 4369)
 
 enum D3D12_COMMAND_LIST_TYPE : int;
+enum D3D12_DESCRIPTOR_HEAP_TYPE : int;
 
 #pragma warning(pop)
+
+struct D3D12_CPU_DESCRIPTOR_HANDLE;
+struct D3D12_GPU_DESCRIPTOR_HANDLE;
+struct D3D12_RENDER_TARGET_VIEW_DESC;
+struct D3D12_DEPTH_STENCIL_VIEW_DESC;
