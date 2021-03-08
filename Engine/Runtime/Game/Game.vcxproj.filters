@@ -660,6 +660,12 @@
     <ClInclude Include="Public\DirectX\DirectXCompatibleRenderTarget.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\ToneMappingSceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -1057,6 +1063,12 @@
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXCompatibleRenderTarget.cpp">
       <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\ToneMappingSceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
