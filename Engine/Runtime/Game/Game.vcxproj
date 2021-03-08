@@ -336,6 +336,7 @@
     <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
     <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
     <ClInclude Include="Public\DirectX\DirectXRenderTargetView.h" />
+    <ClInclude Include="Public\DirectX\DirectXShaderBindingTable.h" />
     <ClInclude Include="Public\DirectX\DirectXShaderResourceView.h" />
     <ClInclude Include="Public\DirectX\DirectXSwapChain.h" />
     <ClInclude Include="Public\DirectX\DirectXView.h" />
@@ -497,6 +498,7 @@
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
     <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRenderTargetView.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXShaderBindingTable.cpp" />
     <ClCompile Include="Private\DirectX\DirectXShaderResourceView.cpp" />
     <ClCompile Include="Private\DirectX\DirectXSwapChain.cpp" />
     <ClCompile Include="Private\DirectX\DirectXView.cpp" />

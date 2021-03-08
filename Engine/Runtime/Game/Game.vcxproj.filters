@@ -648,6 +648,9 @@
     <ClInclude Include="Public\DirectX\DirectXShaderResourceView.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXShaderBindingTable.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -1032,6 +1035,9 @@
       <Filter>Private\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXShaderResourceView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXShaderBindingTable.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
