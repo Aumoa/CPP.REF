@@ -651,6 +651,15 @@
     <ClInclude Include="Public\DirectX\DirectXShaderBindingTable.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXRenderTarget.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXHDRTarget.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXCompatibleRenderTarget.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -1038,6 +1047,15 @@
       <Filter>Private\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXShaderBindingTable.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXRenderTarget.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXCompatibleRenderTarget.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>

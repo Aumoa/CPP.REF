@@ -27,6 +27,7 @@ interface ID3D12RootSignature;
 
 enum D3D12_COMMAND_LIST_TYPE : int;
 enum D3D12_DESCRIPTOR_HEAP_TYPE : int;
+enum D3D12_RESOURCE_STATES : int;
 
 #pragma warning(pop)
 
