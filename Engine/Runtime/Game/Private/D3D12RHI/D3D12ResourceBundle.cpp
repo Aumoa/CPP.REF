@@ -7,7 +7,6 @@
 #include "D3D12Resource.h"
 #include "D3D12ImmediateCommandList.h"
 #include "D3D12DeferredCommandList.h"
-#include "D3D12Scene.h"
 #include "SceneRendering/StaticMesh.h"
 #include "RHI/RHICommon.h"
 #include "RHI/RHIResourceGC.h"
@@ -199,11 +198,6 @@ TRefPtr<IRHIResource> D3D12ResourceBundle::CreateTexture2D(ERHITextureFormat for
 	resourceGC->SignalNumber(issued);
 
 	return NewObject<D3D12Resource>(resource.Get());
-}
-
-TRefPtr<IRHIScene> D3D12ResourceBundle::CreateScene(APlayerController* inPlayerController)
-{
-	return NewObject<D3D12Scene>(inPlayerController);
 }
 
 TRefPtr<IRHIResource> D3D12ResourceBundle::CreateRaytracingScratchBuffer(uint64 sizeInBytes)
