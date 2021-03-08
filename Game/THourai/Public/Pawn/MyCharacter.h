@@ -26,7 +26,7 @@ public:
 
 	void Tick(Seconds deltaTime) override;
 
-	void SetupPlayerInputComponent(InputComponent* inPlayerInput) override;
+	void SetupPlayerInputComponent(GInputComponent* inPlayerInput) override;
 
 private:
 	void UpdateMovement();

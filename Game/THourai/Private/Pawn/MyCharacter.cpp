@@ -16,11 +16,11 @@ AMyCharacter::AMyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	auto* springArm = AddComponent<SpringArmComponent>();
-	auto* camera = AddComponent<CameraComponent>();
+	auto* springArm = AddComponent<GSpringArmComponent>();
+	auto* camera = AddComponent<GCameraComponent>();
 
 	springArm->AttachToComponent(RootComponent);
-	camera->AttachToSocket(springArm, SpringArmComponent::SocketName);
+	camera->AttachToSocket(springArm, GSpringArmComponent::SocketName);
 
 	springArm->SpringArmLength = 5.0f;
 }
@@ -40,7 +40,7 @@ void AMyCharacter::Tick(Seconds deltaTime)
 	RootComponent->Location += delta;
 }
 
-void AMyCharacter::SetupPlayerInputComponent(InputComponent* inPlayerInput)
+void AMyCharacter::SetupPlayerInputComponent(GInputComponent* inPlayerInput)
 {
 	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Pressed).AddRaw(this, &AMyCharacter::MovementKeyPressed);
 	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Released).AddRaw(this, &AMyCharacter::MovementKeyPressed);
