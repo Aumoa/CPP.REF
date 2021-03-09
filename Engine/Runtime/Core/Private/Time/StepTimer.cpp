@@ -105,7 +105,10 @@ void StepTimer::Tick()
 			leftOverTicks -= targetElapsedTicks;
 			frameCount += 1;
 
-			StepTimerCallback.Invoke(this);
+			if (StepTimerCallback.IsValid)
+			{
+				StepTimerCallback.Invoke(this);
+			}
 		}
 	}
 	else
@@ -115,7 +118,10 @@ void StepTimer::Tick()
 		leftOverTicks = 0;
 		frameCount += 1;
 
-		StepTimerCallback.Invoke(this);
+		if (StepTimerCallback.IsValid)
+		{
+			StepTimerCallback.Invoke(this);
+		}
 	}
 
 	if (frameCount != lastFrameCount)
