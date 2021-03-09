@@ -8,14 +8,22 @@
 
 #include "DirectX/DirectXMinimal.h"
 
+class Engine;
 class PrimitiveSceneProxy;
 class GPrimitiveComponent;
 class APlayerController;
 class SceneVisibility;
 class GLightComponent;
 class LightSceneProxy;
-class D3D12DeviceBundle;
-class D3D12ResourceBundle;
+
+class GAME_API AccelerationStructureInstancingManager : virtual public Object
+{
+public:
+	using Super = Object;
+
+public:
+
+};
 
 class Scene : virtual public Object, virtual public IRHIScene
 {
@@ -23,8 +31,7 @@ public:
 	using Super = Object;
 
 public:
-	D3D12DeviceBundle* deviceBundle;
-	D3D12ResourceBundle* resourceBundle;
+	Engine* engine;
 
 	std::vector<GPrimitiveComponent*> primitiveComponents;
 	std::vector<PrimitiveSceneProxy*> sceneProxies;

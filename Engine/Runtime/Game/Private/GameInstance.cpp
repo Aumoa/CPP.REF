@@ -31,9 +31,17 @@ TRefPtr<String> GameInstance::ToString() const
 
 void GameInstance::Tick()
 {
-	CycleStatsGroup::ResolveFrameDiagnostics();
-
 	engine->Tick();
+}
+
+void GameInstance::TickWorld(Seconds deltaTime)
+{
+	world->Tick(deltaTime);
+}
+
+Engine* GameInstance::GetEngine() const
+{
+	return engine.Get();
 }
 
 World* GameInstance::GetWorld() const
@@ -72,18 +80,18 @@ void GameInstance::Initialize()
 	engine = NewObject<Engine>();
 	engine->Initialize(this);
 
-	//world = NewObject<World>();
-	//gameMode = world->SpawnActor(GameModeClass);
-	//localPlayerController = world->SpawnActor(gameMode->PlayerControllerClass);
-	//if (localPlayerController == nullptr)
-	//{
-	//	SE_LOG(LogEngine, Fatal, L"Cannot create player controller.");
-	//	return;
-	//}
-	//world->RegisterPlayerController(localPlayerController);
-	//world->LoadLevel(gameMode->StartLevelClass);
+	world = NewObject<World>(this);
+	gameMode = world->SpawnActor(GameModeClass);
+	localPlayerController = world->SpawnActor(gameMode->PlayerControllerClass);
+	if (localPlayerController == nullptr)
+	{
+		SE_LOG(LogEngine, Fatal, L"Cannot create player controller.");
+		return;
+	}
+	world->RegisterPlayerController(localPlayerController);
+	world->LoadLevel(gameMode->StartLevelClass);
 
-	//localPlayerController->BeginPlay();
+	localPlayerController->BeginPlay();
 }
 
 void GameInstance::Shutdown()

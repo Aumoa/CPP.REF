@@ -13,6 +13,7 @@
 #include "DirectX/DirectXImmediateContext.h"
 #include "DirectX/DirectXAutoFence.h"
 #include "Assets/AssetManager.h"
+#include "Time/StepTimer.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -22,7 +23,7 @@ DEFINE_STATS_GROUP(Engine);
 Engine::Engine() : Super()
 	, gameInstance(nullptr)
 {
-
+	tickTimer = NewObject<StepTimer>();
 }
 
 Engine::~Engine()
@@ -46,8 +47,12 @@ void Engine::Initialize(GameInstance* gameInstance)
 
 void Engine::Tick()
 {
+	CycleStatsGroup::ResolveFrameDiagnostics();
+
 	QUICK_SCOPED_CYCLE_COUNTER(Engine, Tick);
 
+	tickTimer->Tick();
+	gameInstance->TickWorld(tickTimer->ElapsedSeconds);
 	Render();
 }
 

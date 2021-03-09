@@ -38,7 +38,6 @@ void AActor::ActorTickFunction::ExecuteTick(Seconds deltaTime)
 
 AActor::AActor() : Super()
 	, bActorTickEnabled(true)
-	, world(nullptr)
 	, bActorHasBegunPlay(false)
 	, rootComponent(nullptr)
 {
@@ -98,16 +97,6 @@ void AActor::EndPlay()
 void AActor::TickActor(Seconds deltaTime)
 {
 	Tick(deltaTime);
-}
-
-World* AActor::GetWorld() const
-{
-	return world;
-}
-
-void AActor::SetWorld(World* world)
-{
-	this->world = world;
 }
 
 #define NO_ROOT_WARNINGS(...) \
@@ -246,6 +235,7 @@ bool AActor::AddComponentInternal(TRefPtr<GActorComponent>&& assign_ptr, const s
 	if (HasBegunPlay)
 	{
 		assign_ptr->owner = this;
+		assign_ptr->SetWorld(GetWorld());
 		assign_ptr->BeginPlay();
 	}
 	ComponentAdded.Invoke(assign_ptr.Get());
@@ -276,6 +266,7 @@ bool AActor::RemoveComponentInternal(size_t hash_code)
 			{
 				component->EndPlay();
 				component->owner = nullptr;
+				component->SetWorld(nullptr);
 			}
 			ComponentRemoved.Invoke(component);
 

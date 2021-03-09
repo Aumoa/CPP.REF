@@ -3,6 +3,8 @@
 #include "SceneRendering/Scene.h"
 
 #include "Engine.h"
+#include "World.h"
+#include "GameInstance.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/PlayerCameraManager.h"
 #include "Components/LightComponent.h"
@@ -11,14 +13,11 @@
 #include "SceneRendering/SceneVisibility.h"
 #include "SceneRendering/LightSceneProxy.h"
 #include "Logging/LogMacros.h"
-#include "RHI/IRHIOnlineDescriptorPatch.h"
-#include "RHI/IRHIResource.h"
 
 using namespace std;
 
 Scene::Scene(APlayerController* inPlayerController) : Super()
-	, deviceBundle(nullptr)
-	, resourceBundle(nullptr)
+	, engine(inPlayerController->GetWorld()->GetGameInstance()->GetEngine())
 
 	, localPlayer(inPlayerController)
 	, numSRVs(0)

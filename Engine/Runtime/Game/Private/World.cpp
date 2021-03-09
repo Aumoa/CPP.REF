@@ -10,15 +10,15 @@
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
 #include "Diagnostics/ScopedCycleCounter.h"
-#include "RHI/IRHIScene.h"
-#include "RHI/IRHIResourceBundle.h"
+#include "SceneRendering/Scene.h"
 
 using namespace std;
 using namespace std::chrono;
 
 DEFINE_STATS_GROUP(World);
 
-World::World() : Super()
+World::World(GameInstance* gameInstance) : Super()
+	, gameInstance(gameInstance)
 	, localPlayerController(nullptr)
 {
 
@@ -70,7 +70,12 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 	return currentLevel.Get();
 }
 
-IRHIScene* World::GetScene() const
+GameInstance* World::GetGameInstance() const
+{
+	return gameInstance;
+}
+
+Scene* World::GetScene() const
 {
 	return scene.Get();
 }
@@ -209,5 +214,5 @@ void World::OnUnloadLevel()
 void World::RegisterPlayerController(APlayerController* inPlayerController)
 {
 	localPlayerController = inPlayerController;
-	//scene = GEngine.ResourceBundle->CreateScene(inPlayerController);
+	scene = NewObject<Scene>(inPlayerController);
 }

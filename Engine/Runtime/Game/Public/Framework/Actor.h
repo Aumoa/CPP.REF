@@ -40,7 +40,6 @@ private:
 	ActorTickFunction primaryActorTick;
 	bool bActorTickEnabled : 1;
 	bool bActorHasBegunPlay : 1;
-	World* world;
 
 public:
 	AActor();
@@ -64,8 +63,6 @@ public:
 	template<class T> requires TIsAssignable<T*, GActorComponent*>
 	inline std::list<T*> GetComponents() const;
 
-	World* GetWorld() const;
-	void SetWorld(World* inWorld);
 	Transform GetActorTransform() const;
 	void SetActorTransform(const Transform& value);
 

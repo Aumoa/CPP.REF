@@ -33,6 +33,8 @@ public:
 	TRefPtr<String> ToString() const override;
 	void Tick() override;
 
+	void TickWorld(Seconds deltaTime);
+	Engine* GetEngine() const;
 	World* GetWorld() const;
 	AGameModeBase* GetGameMode() const;
 	APlayerController* GetLocalPlayer() const;
