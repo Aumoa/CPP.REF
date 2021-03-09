@@ -11,6 +11,7 @@ class DirectXCommandQueue;
 class DirectXSwapChain;
 class DirectXImmediateContext;
 class DirectXAutoFence;
+class AssetManager;
 
 class GAME_API Engine : virtual public Object
 {
@@ -22,6 +23,7 @@ private:
 	GameInstance* gameInstance;
 	TRefPtr<DirectXDeviceBundle> deviceBundle;
 	TRefPtr<DirectXCommandQueue> primaryQueue;
+	TRefPtr<AssetManager> assetManager;
 
 	TRefPtr<DirectXSwapChain> swapChain;
 	TRefPtr<DirectXImmediateContext> immediateContext;
@@ -34,6 +36,10 @@ public:
 	virtual void Initialize(GameInstance* gameInstance);
 	virtual void Shutdown();
 	virtual void Tick();
+
+	DirectXDeviceBundle* GetDeviceBundle() const;
+	DirectXCommandQueue* GetPrimaryCommandQueue() const;
+	AssetManager* GetAssetManager() const;
 
 private:
 	void Render();

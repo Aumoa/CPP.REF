@@ -247,7 +247,6 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Private\Assets\MeshLoader.h" />
     <ClInclude Include="Private\COM\COMMinimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBuffer.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.h" />
@@ -279,7 +278,6 @@
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\ID3D12ResourceBase.h" />
-    <ClInclude Include="Private\DirectXGeometry.h" />
     <ClInclude Include="Private\DirectX\Bezier.h" />
     <ClInclude Include="Private\DirectX\DirectXCommon.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
@@ -333,6 +331,7 @@
     <ClInclude Include="Public\DirectX\DirectXDeviceContext.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceResource.h" />
     <ClInclude Include="Public\DirectX\DirectXAutoFence.h" />
+    <ClInclude Include="Public\DirectX\DirectXGeometry.h" />
     <ClInclude Include="Public\DirectX\DirectXHDRTarget.h" />
     <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
     <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
@@ -410,7 +409,6 @@
     <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
-    <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h" />
@@ -421,6 +419,7 @@
     <ClInclude Include="Public\SceneRendering\StaticMesh.h" />
     <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\ToneMappingSceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\Vertex.h" />
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
     <ClInclude Include="Public\TSubclassOf.h" />
@@ -442,7 +441,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
-    <ClCompile Include="Private\Assets\MeshLoader.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\DirectionalLightComponent.cpp" />
@@ -490,7 +488,6 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
-    <ClCompile Include="Private\DirectXGeometry.cpp" />
     <ClCompile Include="Private\DirectX\DirectXAutoFence.cpp" />
     <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp" />
     <ClCompile Include="Private\DirectX\DirectXCompatibleRenderTarget.cpp" />
@@ -500,6 +497,7 @@
     <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXGeometry.cpp" />
     <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp" />
     <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRenderTarget.cpp" />
@@ -554,7 +552,6 @@
     <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\LightSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
-    <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
     <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp" />

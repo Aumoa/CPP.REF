@@ -12,6 +12,7 @@
 #include "DirectX/DirectXSwapChain.h"
 #include "DirectX/DirectXImmediateContext.h"
 #include "DirectX/DirectXAutoFence.h"
+#include "Assets/AssetManager.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -34,6 +35,7 @@ void Engine::Initialize(GameInstance* gameInstance)
 	this->gameInstance = gameInstance;
 	deviceBundle = NewObject<DirectXDeviceBundle>();
 	DirectXNew(primaryQueue, DirectXCommandQueue, deviceBundle.Get());
+	assetManager = NewObject<AssetManager>(this);
 
 	swapChain = NewObject<DirectXSwapChain>(deviceBundle.Get(), primaryQueue.Get(), gameInstance->MainWindow, DXGI_FORMAT_B8G8R8A8_UNORM);
 	DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle.Get(), primaryQueue.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -61,6 +63,21 @@ void Engine::Render()
 	swapChain->Present();
 
 	immediateFence->AcceptSignal(primaryQueue.Get());
+}
+
+DirectXDeviceBundle* Engine::GetDeviceBundle() const
+{
+	return deviceBundle.Get();
+}
+
+DirectXCommandQueue* Engine::GetPrimaryCommandQueue() const
+{
+	return primaryQueue.Get();
+}
+
+AssetManager* Engine::GetAssetManager() const
+{
+	return assetManager.Get();
 }
 
 void Engine::MainWindow_OnSizing(int32 x, int32 y)

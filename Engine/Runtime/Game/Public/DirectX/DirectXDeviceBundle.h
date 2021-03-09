@@ -7,6 +7,8 @@
 
 #include "DirectXMinimal.h"
 
+class DirectXCommandQueue;
+
 class GAME_API DirectXDeviceBundle : virtual public Object
 {
 public:
@@ -22,6 +24,8 @@ public:
 
 	IDXGIFactory2* GetFactory() const;
 	ID3D12Device5* GetDevice() const;
+
+	TComPtr<ID3D12Resource> CreateImmutableBuffer(DirectXCommandQueue* commandQueue, D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags);
 
 private:
 	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;

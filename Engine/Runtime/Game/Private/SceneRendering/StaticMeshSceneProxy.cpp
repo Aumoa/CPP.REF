@@ -7,31 +7,31 @@
 #include "Materials/MaterialInterface.h"
 #include "RHI/IRHIResource.h"
 
-class StaticMeshSceneProxyBatch : public MeshBatch
-{
-public:
-	using Super = MeshBatch;
-
-private:
-	RHIMeshDrawCommand drawCommand;
-
-public:
-	StaticMeshSceneProxyBatch(const RHIMeshDrawCommand& inDrawCommand, uint16 materialIndexOverride)
-	{
-		drawCommand = inDrawCommand;
-		drawCommand.MaterialIndex = materialIndexOverride;
-	}
-
-	~StaticMeshSceneProxyBatch()
-	{
-
-	}
-
-	const RHIMeshDrawCommand* GetDrawCommand() const override
-	{
-		return &drawCommand;
-	}
-};
+//class StaticMeshSceneProxyBatch : public MeshBatch
+//{
+//public:
+//	using Super = MeshBatch;
+//
+//private:
+//	RHIMeshDrawCommand drawCommand;
+//
+//public:
+//	StaticMeshSceneProxyBatch(const RHIMeshDrawCommand& inDrawCommand, uint16 materialIndexOverride)
+//	{
+//		drawCommand = inDrawCommand;
+//		drawCommand.MaterialIndex = materialIndexOverride;
+//	}
+//
+//	~StaticMeshSceneProxyBatch()
+//	{
+//
+//	}
+//
+//	const RHIMeshDrawCommand* GetDrawCommand() const override
+//	{
+//		return &drawCommand;
+//	}
+//};
 
 StaticMeshSceneProxy::StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
 	, meshComponent(inMeshComponent)
@@ -62,15 +62,15 @@ void StaticMeshSceneProxy::Update()
 	staticMesh = meshComponent->GetStaticMesh();
 	materialIndex = meshComponent->GetMaterial()->Index;
 
-	customBatch.Reset();
-	if (staticMesh != nullptr)
-	{
-		const RHIMeshDrawCommand* drawCommand = staticMesh->GetMeshBatch()->GetDrawCommand();
-		if (drawCommand != nullptr)
-		{
-			customBatch = NewObject<StaticMeshSceneProxyBatch>(*drawCommand, materialIndex);
-		}
-	}
+	//customBatch.Reset();
+	//if (staticMesh != nullptr)
+	//{
+	//	const RHIMeshDrawCommand* drawCommand = staticMesh->GetMeshBatch()->GetDrawCommand();
+	//	if (drawCommand != nullptr)
+	//	{
+	//		customBatch = NewObject<StaticMeshSceneProxyBatch>(*drawCommand, materialIndex);
+	//	}
+	//}
 }
 
 void StaticMeshSceneProxy::UpdateTransform()
@@ -93,7 +93,8 @@ void StaticMeshSceneProxy::UpdateTransform()
 
 MeshBatch* StaticMeshSceneProxy::GetMeshBatch() const
 {
-	return customBatch.Get();
+	//return customBatch.Get();
+	return nullptr;
 }
 
 const AxisAlignedCube* StaticMeshSceneProxy::GetPrimitiveBoundingBox() const
@@ -103,5 +104,6 @@ const AxisAlignedCube* StaticMeshSceneProxy::GetPrimitiveBoundingBox() const
 
 uint64 StaticMeshSceneProxy::GetRaytracingAccelerationStructurePtr() const
 {
-	return staticMesh->RaytracingAccelerationStructureBuffer->GetVirtualAddress();
+	//return staticMesh->RaytracingAccelerationStructureBuffer->GetVirtualAddress();
+	return 0;
 }

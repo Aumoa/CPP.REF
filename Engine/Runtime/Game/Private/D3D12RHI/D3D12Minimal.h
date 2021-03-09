@@ -23,7 +23,9 @@ extern LogCategoryBase LogD3D12RHI;
 #undef max
 
 #ifdef _DEBUG
+#ifndef HR
 #define HR(x) if (HRESULT hr = x; FAILED(hr)) throw HResultException(hr)
+#endif
 #else
 #define HR(x) x
 #endif

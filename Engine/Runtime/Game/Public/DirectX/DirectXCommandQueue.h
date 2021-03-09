@@ -16,7 +16,17 @@ public:
 	using Super = DirectXDeviceResource;
 
 private:
+	struct PendingReference
+	{
+		uint64 FenceValue;
+		TRefPtr<Object> ObjectReference;
+	};
+
+private:
 	TComPtr<ID3D12CommandQueue> commandQueue;
+	TComPtr<ID3D12Fence> fence;
+	uint64 fenceValue;
+	std::queue<PendingReference> pendingReferences;
 
 public:
 	DirectXCommandQueue(DirectXDeviceBundle* deviceBundle);
@@ -24,6 +34,8 @@ public:
 	~DirectXCommandQueue() override;
 
 	void ExecuteCommandLists(DirectXDeviceContext* const* deviceContexts, size_t count);
+	void AddPendingReference(Object* inPendingReference);
+	void CollectPendingReferences();
 
 	vs_property_get_auto(ID3D12CommandQueue*, Item, commandQueue.Get());
 

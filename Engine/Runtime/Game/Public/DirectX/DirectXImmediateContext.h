@@ -16,9 +16,14 @@ public:
 private:
 	TRefPtr<DirectXCommandQueue> commandQueue;
 
+	std::vector<TRefPtr<Object>> pendingReferences;
+
 public:
 	DirectXImmediateContext(DirectXDeviceBundle* deviceBundle, DirectXCommandQueue* commandQueue, D3D12_COMMAND_LIST_TYPE type);
 	~DirectXImmediateContext() override;
 
 	void EndDraw() override;
+
+	void AddPendingReference(Object* pendingReference);
+	void AddPendingReference(IUnknown* pendingReference);
 };

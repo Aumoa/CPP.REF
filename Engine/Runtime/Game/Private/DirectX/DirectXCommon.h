@@ -17,3 +17,6 @@
 #define DirectXNew(Ret, Class, ...) \
 Ret = Object::NewObject<Class>(__VA_ARGS__);\
 Ret->DebugName = L ## #Ret;
+
+#undef min
+#undef max

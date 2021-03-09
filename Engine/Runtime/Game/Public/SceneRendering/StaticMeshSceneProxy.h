@@ -22,7 +22,7 @@ private:
 	AxisAlignedCube transformedBoundingBox;
 	uint16 materialIndex;
 
-	TRefPtr<MeshBatch> customBatch;
+	//TRefPtr<MeshBatch> customBatch;
 
 public:
 	StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent);

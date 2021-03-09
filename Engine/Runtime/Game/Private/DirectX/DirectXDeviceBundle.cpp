@@ -3,6 +3,8 @@
 #include "DirectX/DirectXDeviceBundle.h"
 
 #include "DirectXCommon.h"
+#include "DirectX/DirectXCommandQueue.h"
+#include "DirectX/DirectXImmediateContext.h"
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
 
@@ -73,12 +75,67 @@ ID3D12Device5* DirectXDeviceBundle::GetDevice() const
 	return device.Get();
 }
 
+TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateImmutableBuffer(DirectXCommandQueue* commandQueue, D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags)
+{
+	//
+	// Create committed default buffer.
+	D3D12_RESOURCE_DESC bufferDesc = { };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = (UINT64)sizeInBytes;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	bufferDesc.Flags = flags;
+
+	D3D12_HEAP_PROPERTIES heap = { };
+	heap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	TComPtr<ID3D12Resource> resource;
+	HR(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+	// Create committed upload buffer.
+	TComPtr<ID3D12Resource> uploadHeap;
+	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+	HR(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	// Copy upload data to upload buffer.
+	void* pData;
+	HR(uploadHeap->Map(0, nullptr, &pData));
+	memcpy(pData, initialBuffer, sizeInBytes);
+	uploadHeap->Unmap(0, nullptr);
+
+	D3D12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = initialState;
+
+	auto DirectXNew(immediateContext, DirectXImmediateContext, this, commandQueue, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
+
+	// Copy resource from CPU storage(UploadHeap) to GPU storage(DefaultHeap).
+	immediateContext->BeginDraw();
+	{
+		commandList->CopyResource(resource.Get(), uploadHeap.Get());
+		commandList->ResourceBarrier(1, &barrier);
+	}
+	immediateContext->EndDraw();
+
+	// Add pending reference for keep upload heap until copy operation will completed.
+	immediateContext->AddPendingReference(uploadHeap.Get());
+
+	return resource;
+}
+
 bool DirectXDeviceBundle::IsAdapterSuitable(IDXGIAdapter1* adapter) const
 {
 	DXGI_ADAPTER_DESC1 desc = { };
 	HR(adapter->GetDesc1(&desc));
 
-	if (desc.Flags != DXGI_ADAPTER_FLAG_NONE) {
+	if (desc.Flags == DXGI_ADAPTER_FLAG_REMOTE || desc.Flags == DXGI_ADAPTER_FLAG_SOFTWARE) {
 		// Is remote or software implement.
 		return false;
 	}

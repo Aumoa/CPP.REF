@@ -279,9 +279,6 @@
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
-    <ClInclude Include="Public\SceneRendering\MeshBatch.h">
-      <Filter>Public\SceneRendering</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -305,9 +302,6 @@
     </ClInclude>
     <ClInclude Include="Public\RHI\RHIViewport.h">
       <Filter>Public\RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\SceneRendering\Mesh.h">
-      <Filter>Public\SceneRendering</Filter>
     </ClInclude>
     <ClInclude Include="Public\SceneRendering\StaticMesh.h">
       <Filter>Public\SceneRendering</Filter>
@@ -420,9 +414,6 @@
     <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Private\DirectXGeometry.h">
-      <Filter>Private</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\RHITextureClearValue.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -464,9 +455,6 @@
     </ClInclude>
     <ClInclude Include="Public\Framework\DirectionalLight.h">
       <Filter>Public\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\Assets\MeshLoader.h">
-      <Filter>Private\Assets</Filter>
     </ClInclude>
     <ClInclude Include="Public\Materials\MaterialInterface.h">
       <Filter>Public\Materials</Filter>
@@ -663,6 +651,15 @@
     <ClInclude Include="Public\SceneRendering\ToneMappingSceneRenderer.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Mesh.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Vertex.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXGeometry.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -763,9 +760,6 @@
     </ClCompile>
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp">
       <Filter>Private\RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\SceneRendering\MeshBatch.cpp">
-      <Filter>Private\SceneRendering</Filter>
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp">
       <Filter>Private\SceneRendering</Filter>
@@ -878,9 +872,6 @@
     <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Private\DirectXGeometry.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\RHI\RHITextureClearValue.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
@@ -919,9 +910,6 @@
     </ClCompile>
     <ClCompile Include="Private\Framework\DirectionalLight.cpp">
       <Filter>Private\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Assets\MeshLoader.cpp">
-      <Filter>Private\Assets</Filter>
     </ClCompile>
     <ClCompile Include="Private\Materials\MaterialInterface.cpp">
       <Filter>Private\Materials</Filter>
@@ -1063,6 +1051,9 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\ToneMappingSceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXGeometry.cpp">
+      <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
