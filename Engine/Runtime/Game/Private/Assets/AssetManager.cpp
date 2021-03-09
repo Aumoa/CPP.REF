@@ -10,8 +10,6 @@
 
 using namespace std;
 
-LogCategoryBase AssetManager::LogAssets(ELogVerbosity::Verbose, L"LogAssets");
-
 AssetManager::AssetManager(Engine* engine) : Super()
 	, engine(engine)
 {

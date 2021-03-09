@@ -96,5 +96,6 @@ void GameInstance::Initialize()
 
 void GameInstance::Shutdown()
 {
-
+	engine.Reset();
+	world.Reset();
 }

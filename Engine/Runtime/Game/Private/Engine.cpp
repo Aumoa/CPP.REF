@@ -53,6 +53,7 @@ void Engine::Tick()
 
 	tickTimer->Tick();
 	gameInstance->TickWorld(tickTimer->ElapsedSeconds);
+	primaryQueue->CollectPendingReferences();
 	Render();
 }
 

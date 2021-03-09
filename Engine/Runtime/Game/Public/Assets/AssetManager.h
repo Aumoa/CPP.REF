@@ -17,8 +17,6 @@ public:
 	using This = AssetManager;
 
 private:
-	static LogCategoryBase LogAssets;
-
 	Engine* engine;
 	std::map<TRefPtr<String>, TRefPtr<StaticMesh>> staticMeshes;
 	std::map<TRefPtr<String>, TRefPtr<Material>> materials;
