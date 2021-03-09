@@ -119,10 +119,12 @@ StaticMesh::StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryD
 	D3D12_HEAP_PROPERTIES heapProp = { };
 	heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
 	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE, nullptr, IID_PPV_ARGS(&accelerationStructure)));
+	SetNameAuto(accelerationStructure);
 
 	TComPtr<ID3D12Resource> scratchBuffer;
 	bufferDesc.Width = prebuildInfo.ScratchDataSizeInBytes;
 	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&scratchBuffer)));
+	SetNameAuto(scratchBuffer);
 
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc = { };
 	buildDesc.Inputs = inputs;
@@ -131,9 +133,9 @@ StaticMesh::StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryD
 
 	// Build acceleration structure and discard scratch buffer.
 	auto DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle, commandQueue, D3D12_COMMAND_LIST_TYPE_DIRECT);
-	ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
 	immediateContext->BeginDraw();
 	{
+		ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
 		commandList->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
 	}
 	immediateContext->EndDraw();

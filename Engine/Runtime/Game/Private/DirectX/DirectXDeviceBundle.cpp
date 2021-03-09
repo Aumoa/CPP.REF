@@ -114,11 +114,11 @@ TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateImmutableBuffer(DirectXComman
 	barrier.Transition.StateAfter = initialState;
 
 	auto DirectXNew(immediateContext, DirectXImmediateContext, this, commandQueue, D3D12_COMMAND_LIST_TYPE_DIRECT);
-	ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
 
 	// Copy resource from CPU storage(UploadHeap) to GPU storage(DefaultHeap).
 	immediateContext->BeginDraw();
 	{
+		ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
 		commandList->CopyResource(resource.Get(), uploadHeap.Get());
 		commandList->ResourceBarrier(1, &barrier);
 	}

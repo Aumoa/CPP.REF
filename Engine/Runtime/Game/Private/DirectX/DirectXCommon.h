@@ -18,5 +18,7 @@
 Ret = Object::NewObject<Class>(__VA_ARGS__);\
 Ret->DebugName = L ## #Ret;
 
+#define SetNameAuto(Var) Var->SetName(L ## #Var)
+
 #undef min
 #undef max

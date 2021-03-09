@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 //--------------------------------------------------------------------------------------
-// File: Geometry.h
+// File: DirectXGeometry.h
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
@@ -14,12 +14,18 @@
 #include "CoreMinimal.h"
 
 #include <vector>
-#include "RHI/RHIVertex.h"
+#include "SceneRendering/Vertex.h"
 
-class DirectXGeometry
+class GAME_API DirectXGeometry : virtual public Object
 {
 public:
-    typedef std::vector<RHIVertex> VertexCollection;
+    using Super = Object;
+
+private:
+    DirectXGeometry() = delete;
+
+public:
+    typedef std::vector<Vertex> VertexCollection;
     typedef std::vector<uint32> IndexCollection;
 
     static void ComputeBox(VertexCollection& vertices, IndexCollection& indices, const Vector3& size, bool rhcoords, bool invertn);

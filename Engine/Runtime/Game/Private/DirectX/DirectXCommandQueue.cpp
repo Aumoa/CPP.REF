@@ -58,7 +58,7 @@ void DirectXCommandQueue::ExecuteCommandLists(DirectXDeviceContext* const* devic
 
 void DirectXCommandQueue::AddPendingReference(Object* inPendingReference)
 {
-	if (inPendingReference)
+	if (inPendingReference == nullptr)
 	{
 #if defined(_DEBUG)
 		SE_LOG(LogDirectX, Warning, "inPendingReference is nullptr.");

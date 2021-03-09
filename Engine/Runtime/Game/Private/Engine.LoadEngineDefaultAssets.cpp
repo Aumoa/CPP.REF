@@ -2,7 +2,6 @@
 
 #include "Engine.h"
 
-#include "DirectXGeometry.h"
 #include "Assets/AssetManager.h"
 #include "SceneRendering/StaticMesh.h"
 #include "Materials/Material.h"

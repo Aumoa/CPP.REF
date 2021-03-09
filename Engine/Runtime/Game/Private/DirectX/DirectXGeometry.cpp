@@ -10,7 +10,7 @@
 
 #pragma unmanaged
 
-#include "DirectXGeometry.h"
+#include "DirectX/DirectXGeometry.h"
 #include "DirectX/Bezier.h"
 
 namespace
@@ -234,16 +234,16 @@ void DirectXGeometry::ComputeBox(VertexCollection& vertices, IndexCollection& in
 
         // Four vertices per face.
         // (Normal - side1 - side2) * tsize // Normal // t0
-        vertices.push_back(RHIVertex(XMVectorMultiply(XMVectorSubtract(XMVectorSubtract(Normal, side1), side2), tsize), Normal, textureCoordinates[0]));
+        vertices.push_back(Vertex(XMVectorMultiply(XMVectorSubtract(XMVectorSubtract(Normal, side1), side2), tsize), Normal, textureCoordinates[0]));
 
         // (Normal - side1 + side2) * tsize // Normal // t1
-        vertices.push_back(RHIVertex(XMVectorMultiply(XMVectorAdd(XMVectorSubtract(Normal, side1), side2), tsize), Normal, textureCoordinates[1]));
+        vertices.push_back(Vertex(XMVectorMultiply(XMVectorAdd(XMVectorSubtract(Normal, side1), side2), tsize), Normal, textureCoordinates[1]));
 
         // (Normal + side1 + side2) * tsize // Normal // t2
-        vertices.push_back(RHIVertex(XMVectorMultiply(XMVectorAdd(Normal, XMVectorAdd(side1, side2)), tsize), Normal, textureCoordinates[2]));
+        vertices.push_back(Vertex(XMVectorMultiply(XMVectorAdd(Normal, XMVectorAdd(side1, side2)), tsize), Normal, textureCoordinates[2]));
 
         // (Normal + side1 - side2) * tsize // Normal // t3
-        vertices.push_back(RHIVertex(XMVectorMultiply(XMVectorSubtract(XMVectorAdd(Normal, side1), side2), tsize), Normal, textureCoordinates[3]));
+        vertices.push_back(Vertex(XMVectorMultiply(XMVectorSubtract(XMVectorAdd(Normal, side1), side2), tsize), Normal, textureCoordinates[3]));
     }
 
     // Build RH above
@@ -297,7 +297,7 @@ void DirectXGeometry::ComputeSphere(VertexCollection& vertices, IndexCollection&
             Vector3 Normal = XMVectorSet(dx, dy, dz, 0);
             Vector2 Tex = Vector2(u, v);
 
-            vertices.push_back(RHIVertex(XMVectorScale(Normal, radius), Normal, Tex));
+            vertices.push_back(Vertex(XMVectorScale(Normal, radius), Normal, Tex));
         }
     }
 
@@ -497,7 +497,7 @@ void DirectXGeometry::ComputeGeoSphere(VertexCollection& vertices, IndexCollecti
         float v = latitude / Math::PI<float>;
 
         auto texcoord = Vector2(1.0f - u, v);
-        vertices.push_back(RHIVertex(pos, Normal, texcoord));
+        vertices.push_back(Vertex(pos, Normal, texcoord));
     }
 
     // There are a couple of fixes to do. One is a texture coordinate wraparound fixup. At some point, there will be
@@ -524,7 +524,7 @@ void DirectXGeometry::ComputeGeoSphere(VertexCollection& vertices, IndexCollecti
             size_t newIndex = vertices.size(); // the index of this vertex that we're about to add
 
             // copy this vertex, correct the texture coordinate, and add the vertex
-            RHIVertex v = vertices[i];
+            Vertex v = vertices[i];
             v.TexCoord.X = 1.0f;
             vertices.push_back(v);
 
@@ -557,9 +557,9 @@ void DirectXGeometry::ComputeGeoSphere(VertexCollection& vertices, IndexCollecti
                 assert(*triIndex0 == i);
                 assert(*triIndex1 != i && *triIndex2 != i); // assume no degenerate triangles
 
-                const RHIVertex& v0 = vertices[*triIndex0];
-                const RHIVertex& v1 = vertices[*triIndex1];
-                const RHIVertex& v2 = vertices[*triIndex2];
+                const Vertex& v0 = vertices[*triIndex0];
+                const Vertex& v1 = vertices[*triIndex1];
+                const Vertex& v2 = vertices[*triIndex2];
 
                 // check the other two vertices to see if we might need to fix this triangle
 
@@ -618,7 +618,7 @@ void DirectXGeometry::ComputeGeoSphere(VertexCollection& vertices, IndexCollecti
             const auto& otherVertex1 = vertices[*pOtherIndex1];
 
             // Calculate the texcoords for the new pole vertex, add it to the vertices and update the index
-            RHIVertex newPoleVertex = poleVertex;
+            Vertex newPoleVertex = poleVertex;
             newPoleVertex.TexCoord.X = (otherVertex0.TexCoord.X + otherVertex1.TexCoord.X) / 2;
             newPoleVertex.TexCoord.Y = poleVertex.TexCoord.Y;
 
@@ -712,7 +712,7 @@ namespace
 
             Vector2 Tex = XMVectorMultiplyAdd(XMVectorSwizzle<0, 2>(circleVector), textureScale, 0.5f);
 
-            vertices.push_back(RHIVertex(Pos, Normal, Tex));
+            vertices.push_back(Vertex(Pos, Normal, Tex));
         }
     }
 }
@@ -743,8 +743,8 @@ void DirectXGeometry::ComputeCylinder(VertexCollection& vertices, IndexCollectio
 
         Vector2 Tex = u;
 
-        vertices.push_back(RHIVertex(XMVectorAdd(sideOffset, topOffset), Normal, Tex));
-        vertices.push_back(RHIVertex(XMVectorSubtract(sideOffset, topOffset), Normal, XMVectorAdd(Tex, Vector2(0, 1.0f))));
+        vertices.push_back(Vertex(XMVectorAdd(sideOffset, topOffset), Normal, Tex));
+        vertices.push_back(Vertex(XMVectorSubtract(sideOffset, topOffset), Normal, XMVectorAdd(Tex, Vector2(0, 1.0f))));
 
         index_push_back(indices, i * 2);
         index_push_back(indices, (i * 2 + 2) % (stride * 2));
@@ -800,8 +800,8 @@ void DirectXGeometry::ComputeCone(VertexCollection& vertices, IndexCollection& i
         Normal = XMVector3Normalize(Normal);
 
         // Duplicate the top vertex for distinct normals
-        vertices.push_back(RHIVertex(topOffset, Normal, Vector2::Zero));
-        vertices.push_back(RHIVertex(pt, Normal, XMVectorAdd(Tex, Vector2(0, 1.0f))));
+        vertices.push_back(Vertex(topOffset, Normal, Vector2::Zero));
+        vertices.push_back(Vertex(pt, Normal, XMVectorAdd(Tex, Vector2(0, 1.0f))));
 
         index_push_back(indices, i * 2);
         index_push_back(indices, (i * 2 + 3) % (stride * 2));
@@ -859,7 +859,7 @@ void DirectXGeometry::ComputeTorus(VertexCollection& vertices, IndexCollection& 
             Pos = XMVector3Transform(Pos, transform);
             Normal = XMVector3TransformNormal(Normal, transform);
 
-            vertices.push_back(RHIVertex(Pos, Normal, Tex));
+            vertices.push_back(Vertex(Pos, Normal, Tex));
 
             // And create indices for two triangles.
             size_t nextI = (i + 1) % stride;
@@ -923,13 +923,13 @@ void DirectXGeometry::ComputeTetrahedron(VertexCollection& vertices, IndexCollec
 
         // Duplicate vertices to use face normals
         Vector3 Pos = XMVectorScale(verts[v0], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2::Zero /* 0, 0 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2::Zero /* 0, 0 */));
 
         Pos = XMVectorScale(verts[v1], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2(1.0f, 0) /* 1, 0 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2(1.0f, 0) /* 1, 0 */));
 
         Pos = XMVectorScale(verts[v2], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2(0, 1.0f) /* 0, 1 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2(0, 1.0f) /* 0, 1 */));
     }
 
     // Built LH above
@@ -989,13 +989,13 @@ void DirectXGeometry::ComputeOctahedron(VertexCollection& vertices, IndexCollect
 
         // Duplicate vertices to use face normals
         Vector3 Pos = XMVectorScale(verts[v0], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2::Zero /* 0, 0 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2::Zero /* 0, 0 */));
 
         Pos = XMVectorScale(verts[v1], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2(1.0f, 0) /* 1, 0 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2(1.0f, 0) /* 1, 0 */));
 
         Pos = XMVectorScale(verts[v2], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2(0, 1.0f) /* 0, 1*/));
+        vertices.push_back(Vertex(Pos, Normal, Vector2(0, 1.0f) /* 0, 1*/));
     }
 
     // Built LH above
@@ -1114,19 +1114,19 @@ void DirectXGeometry::ComputeDodecahedron(VertexCollection& vertices, IndexColle
 
         // Duplicate vertices to use face normals
         Vector3 Pos = XMVectorScale(verts[v0], size);
-        vertices.push_back(RHIVertex(Pos, Normal, textureCoordinates[textureIndex[t][0]]));
+        vertices.push_back(Vertex(Pos, Normal, textureCoordinates[textureIndex[t][0]]));
 
         Pos = XMVectorScale(verts[v1], size);
-        vertices.push_back(RHIVertex(Pos, Normal, textureCoordinates[textureIndex[t][1]]));
+        vertices.push_back(Vertex(Pos, Normal, textureCoordinates[textureIndex[t][1]]));
 
         Pos = XMVectorScale(verts[v2], size);
-        vertices.push_back(RHIVertex(Pos, Normal, textureCoordinates[textureIndex[t][2]]));
+        vertices.push_back(Vertex(Pos, Normal, textureCoordinates[textureIndex[t][2]]));
 
         Pos = XMVectorScale(verts[v3], size);
-        vertices.push_back(RHIVertex(Pos, Normal, textureCoordinates[textureIndex[t][3]]));
+        vertices.push_back(Vertex(Pos, Normal, textureCoordinates[textureIndex[t][3]]));
 
         Pos = XMVectorScale(verts[v4], size);
-        vertices.push_back(RHIVertex(Pos, Normal, textureCoordinates[textureIndex[t][4]]));
+        vertices.push_back(Vertex(Pos, Normal, textureCoordinates[textureIndex[t][4]]));
     }
 
     // Built LH above
@@ -1207,13 +1207,13 @@ void DirectXGeometry::ComputeIcosahedron(VertexCollection& vertices, IndexCollec
 
         // Duplicate vertices to use face normals
         Vector3 Pos = XMVectorScale(verts[v0], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2::Zero /* 0, 0 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2::Zero /* 0, 0 */));
 
         Pos = XMVectorScale(verts[v1], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2(1.0f, 0) /* 1, 0 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2(1.0f, 0) /* 1, 0 */));
 
         Pos = XMVectorScale(verts[v2], size);
-        vertices.push_back(RHIVertex(Pos, Normal, Vector2(0, 1.0f) /* 0, 1 */));
+        vertices.push_back(Vertex(Pos, Normal, Vector2(0, 1.0f) /* 0, 1 */));
     }
 
     // Built LH above
@@ -1255,7 +1255,7 @@ namespace
         // Create the vertex data.
         Bezier::CreatePatchVertices(controlPoints, tessellation, isMirrored, [&](Vector3 Pos, Vector3 Normal, Vector2 Tex)
         {
-            vertices.push_back(RHIVertex(Pos, Normal, Tex));
+            vertices.push_back(Vertex(Pos, Normal, Tex));
         });
     }
 }
