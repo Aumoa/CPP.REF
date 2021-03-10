@@ -7,19 +7,17 @@
 
 #include "Transform.h"
 #include "ComponentMobility.h"
+#include "DirectX/DirectXMinimal.h"
 
-class MeshBatch;
 class GPrimitiveComponent;
 
 class GAME_API PrimitiveSceneProxy : public Object
 {
 public:
 	using Super = Object;
-	using This = PrimitiveSceneProxy;
 
 private:
 	TWeakPtr<GPrimitiveComponent> myPrimitiveComponent;
-	Transform transform;
 
 public:
 	PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent);
@@ -28,10 +26,9 @@ public:
 	virtual void Update();
 	virtual void UpdateTransform();
 
-	virtual MeshBatch* GetMeshBatch() const;
-	virtual Transform GetPrimitiveTransform() const;
-	virtual const AxisAlignedCube* GetPrimitiveBoundingBox() const;
-	virtual uint64 GetRaytracingAccelerationStructurePtr() const;
-
 	const EComponentMobility Mobility;
+	Transform PrimitiveTransform;
+	uint64 PrimitiveId;
+	AxisAlignedCube PrimitiveBoundingBox;
+	uint64 PrimitiveAccelerationPtr;
 };

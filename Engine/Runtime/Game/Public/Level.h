@@ -4,26 +4,24 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
+#include "GameObject.h"
 
 #include "World.h"
 
 class AActor;
 class World;
 
-class GAME_API Level : virtual public Object
+class GAME_API GLevel : public GGameObject
 {
 	friend class World;
 
 public:
 	using Super = Object;
-	using This = Level;
-
-private:
-	World* world;
+	using This = GLevel;
 
 public:
-	Level();
-	~Level() override;
+	GLevel();
+	~GLevel() override;
 
 	virtual void LoadLevel();
 

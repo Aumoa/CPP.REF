@@ -660,6 +660,9 @@
     <ClInclude Include="Public\DirectX\DirectXGeometry.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXAccelerationInstancingScene.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -1053,6 +1056,9 @@
       <Filter>Private\SceneRendering</Filter>
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXGeometry.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXAccelerationInstancingScene.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>

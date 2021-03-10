@@ -6,8 +6,7 @@
 #include "CoreMinimal.h"
 #include "RHI/IRHIScene.h"
 
-#include "DirectX/DirectXMinimal.h"
-
+interface ID3D12GraphicsCommandList4;
 class Engine;
 class PrimitiveSceneProxy;
 class GPrimitiveComponent;
@@ -15,17 +14,9 @@ class APlayerController;
 class SceneVisibility;
 class GLightComponent;
 class LightSceneProxy;
+class DirectXAccelerationInstancingScene;
 
-class GAME_API AccelerationStructureInstancingManager : virtual public Object
-{
-public:
-	using Super = Object;
-
-public:
-
-};
-
-class Scene : virtual public Object, virtual public IRHIScene
+class Scene : virtual public Object
 {
 public:
 	using Super = Object;
@@ -44,6 +35,8 @@ public:
 	std::vector<GLightComponent*> lightComponents;
 	std::vector<LightSceneProxy*> lightProxies;
 
+	TRefPtr<DirectXAccelerationInstancingScene> instancingScene;
+
 public:
 	Scene(APlayerController* inPlayerController);
 	~Scene() override;
@@ -51,8 +44,8 @@ public:
 	virtual void Update();
 	virtual void CalcVisibility();
 
-	virtual void BeginRender(IRHICommandList* inCommandList);
-	virtual void EndRender(IRHICommandList* inCommandList);
+	virtual void BeginRender(ID3D12GraphicsCommandList4* inCommandList);
+	virtual void EndRender(ID3D12GraphicsCommandList4* inCommandList);
 
 	virtual void AddPrimitive(GPrimitiveComponent* inPrimitiveComponent);
 	virtual void AddLight(GLightComponent* inLightComponent);

@@ -8,7 +8,7 @@
 ATHGameMode::ATHGameMode()
 {
 	PlayerControllerClass = TSubclassOf<ATHPlayerController>::StaticClass();
-	StartLevelClass = TSubclassOf<StartupLevel>::StaticClass();
+	StartLevelClass = TSubclassOf<GStartupLevel>::StaticClass();
 }
 
 ATHGameMode::~ATHGameMode()

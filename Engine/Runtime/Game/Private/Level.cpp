@@ -6,23 +6,22 @@
 
 using namespace std;
 
-Level::Level() : Super()
-	, world(nullptr)
+GLevel::GLevel() : Super()
 {
 
 }
 
-Level::~Level()
+GLevel::~GLevel()
 {
 
 }
 
-void Level::LoadLevel()
+void GLevel::LoadLevel()
 {
 
 }
 
-void Level::UnloadLevel()
+void GLevel::UnloadLevel()
 {
-	world = nullptr;
+
 }

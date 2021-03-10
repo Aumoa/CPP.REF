@@ -5,6 +5,9 @@
 #include "Engine.h"
 #include "World.h"
 #include "GameInstance.h"
+#include "DirectX/DirectXCommon.h"
+#include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXAccelerationInstancingScene.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/PlayerCameraManager.h"
 #include "Components/LightComponent.h"
@@ -22,7 +25,7 @@ Scene::Scene(APlayerController* inPlayerController) : Super()
 	, localPlayer(inPlayerController)
 	, numSRVs(0)
 {
-
+	DirectXNew(instancingScene, DirectXAccelerationInstancingScene, engine->GetDeviceBundle());
 }
 
 Scene::~Scene()
@@ -40,8 +43,14 @@ void Scene::Update()
 		{
 			primitive->ResolveDirtyState();
 			sceneProxies[i] = primitive->GetSceneProxy();
+			if (sceneProxies[i] != nullptr)
+			{
+				sceneProxies[i]->PrimitiveId = i;
+				instancingScene->AddInstanceDeferred(i, sceneProxies[i]);
+			}
 		}
 	}
+	instancingScene->FinishEditInstance();
 
 	for (size_t i = 0; i < lightComponents.size(); ++i)
 	{
@@ -53,6 +62,8 @@ void Scene::Update()
 			lightProxies[i] = primitive->GetSceneProxy();
 		}
 	}
+
+	instancingScene->UpdateScene();
 }
 
 void Scene::CalcVisibility()
@@ -76,20 +87,29 @@ void Scene::CalcVisibility()
 	
 }
 
-void Scene::BeginRender(IRHICommandList* inCommandList)
+void Scene::BeginRender(ID3D12GraphicsCommandList4* inCommandList)
 {
-
+	instancingScene->BuildScene(inCommandList);
 }
 
-void Scene::EndRender(IRHICommandList* inCommandList)
+void Scene::EndRender(ID3D12GraphicsCommandList4* inCommandList)
 {
 
 }
 
 void Scene::AddPrimitive(GPrimitiveComponent* inPrimitiveComponent)
 {
+	size_t index = primitiveComponents.size();
+	PrimitiveSceneProxy* sceneProxy = inPrimitiveComponent->GetSceneProxy();
+
 	primitiveComponents.emplace_back(inPrimitiveComponent);
-	sceneProxies.emplace_back(inPrimitiveComponent->GetSceneProxy());
+	sceneProxies.emplace_back(sceneProxy);
+
+	if (sceneProxy != nullptr)
+	{
+		sceneProxy->PrimitiveId = index;
+		instancingScene->AddInstance(index, sceneProxy);
+	}
 }
 
 void Scene::AddLight(GLightComponent* inLightComponent)

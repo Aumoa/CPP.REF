@@ -6,7 +6,7 @@
 #include "GameMinimal.h"
 #include "GameInstance.h"
 
-class StartupLevel;
+class GStartupLevel;
 class TickScheduler;
 
 class TH_API THGameInstance : public GameInstance

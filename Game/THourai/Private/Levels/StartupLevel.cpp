@@ -3,6 +3,7 @@
 #include "Levels/StartupLevel.h"
 
 #include "Engine.h"
+#include "GameInstance.h"
 #include "Pawn/MyCharacter.h"
 #include "Framework/StaticMeshActor.h"
 #include "Framework/DirectionalLight.h"
@@ -10,7 +11,7 @@
 #include "Components/DirectionalLightComponent.h"
 #include "Assets/AssetManager.h"
 
-StartupLevel::StartupLevel() : Super()
+GStartupLevel::GStartupLevel() : Super()
 	, light(nullptr)
 	
 	, plane(nullptr)
@@ -25,23 +26,25 @@ StartupLevel::StartupLevel() : Super()
 
 }
 
-StartupLevel::~StartupLevel()
+GStartupLevel::~GStartupLevel()
 {
 
 }
 
-void StartupLevel::LoadLevel()
+void GStartupLevel::LoadLevel()
 {
-	//Engine* engine = Engine::GetInstance();
-	//AssetManager* assetMgr = engine->GetAssetManager();
+	World* world = GetWorld();
+	GameInstance* gameInstance = world->GetGameInstance();
+	Engine* engine = gameInstance->GetEngine();
+	AssetManager* assetMgr = engine->GetAssetManager();
 
 	//light = SpawnActorPersistent<ADirectionalLight>();
 	//light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
 	//light->LightComponent->LightColor = Color::White;
 
-	//plane = SpawnActorPersistent<AStaticMeshActor>();
-	//plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
-	//plane->StaticMesh->Scale = Vector3(10.0f, 0.1f, 10.0f);
+	plane = SpawnActorPersistent<AStaticMeshActor>();
+	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
+	plane->StaticMesh->Scale = Vector3(10.0f, 0.1f, 10.0f);
 	//geosphere = SpawnActorPersistent<AStaticMeshActor>();
 	//geosphere->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
 	//geosphere->RootComponent->Location = Vector3(0, 0.55f, 0);
@@ -59,10 +62,10 @@ void StartupLevel::LoadLevel()
 	//icosahedron->StaticMesh->Location = Vector3(0, 0.55f, 1.0f);
 	//icosahedron->StaticMesh->Scale = 0.5f;
 
-	//spectator = SpawnActorPersistent<ASpectatorPawn>();
+	spectator = SpawnActorPersistent<ASpectatorPawn>();
 }
 
-APawn* StartupLevel::GetPersistentActor() const
+APawn* GStartupLevel::GetPersistentActor() const
 {
 	return spectator;
 }

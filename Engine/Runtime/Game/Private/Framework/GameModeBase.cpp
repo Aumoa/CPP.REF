@@ -8,7 +8,7 @@
 AGameModeBase::AGameModeBase() : Super()
 {
 	PlayerControllerClass = TSubclassOf<APlayerController>::StaticClass();
-	StartLevelClass = TSubclassOf<Level>::StaticClass();
+	StartLevelClass = TSubclassOf<GLevel>::StaticClass();
 }
 
 AGameModeBase::~AGameModeBase()

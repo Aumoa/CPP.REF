@@ -40,15 +40,12 @@ void SceneVisibility::CalcVisibility()
 				continue;
 			}
 
-			if (const AxisAlignedCube* boundingBoxEnabled = proxy->GetPrimitiveBoundingBox(); boundingBoxEnabled != nullptr)
+			AxisAlignedCube boundingBox = proxy->PrimitiveBoundingBox;
+			if (!OverlapTest::IsOverlap(viewFrustum, boundingBox))
 			{
-				AxisAlignedCube boundingBox = *boundingBoxEnabled;
-				if (!OverlapTest::IsOverlap(viewFrustum, boundingBox))
-				{
-					// Skip this primitive.
-					visibilities[i] = false;
-					continue;
-				}
+				// Skip this primitive.
+				visibilities[i] = false;
+				continue;
 			}
 
 			shaderCameraConstants->AddPrimitive(proxy);

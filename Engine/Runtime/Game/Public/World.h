@@ -11,7 +11,7 @@
 
 enum class TickingGroup;
 class GameInstance;
-class Level;
+class GLevel;
 class AActor;
 class APlayerController;
 class Scene;
@@ -30,7 +30,7 @@ private:
 
 	std::array<std::set<TickFunction*>, 4> tickGroups;
 	std::array<std::set<TickFunction*>, 4> actualTickGroups;
-	TRefPtr<Level> currentLevel;
+	TRefPtr<GLevel> currentLevel;
 	TRefPtr<Scene> scene;
 	APlayerController* localPlayerController;
 
@@ -45,11 +45,11 @@ public:
 	template<TIsBaseOf<AActor> T = AActor>
 	inline T* SpawnActor(TSubclassOf<T> static_class);
 
-	Level* LoadLevel(TSubclassOf<Level> loadLevel);
+	GLevel* LoadLevel(TSubclassOf<GLevel> loadLevel);
 
 	GameInstance* GetGameInstance() const;
 	Scene* GetScene() const;
-	Level* GetCurrentLevel() const;
+	GLevel* GetCurrentLevel() const;
 
 private:
 	void Tick_Ready();

@@ -48,6 +48,7 @@ void StaticMeshGeometryData::AddSubset(span<Vertex const> inVertices, span<uint3
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 StaticMesh::StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryData) : Super(engine)
+	, boundingBox{ }
 {
 	vertexBuffer = CreateVertexBuffer(inGeometryData.VertexBuffer);
 	indexBuffer = CreateIndexBuffer(inGeometryData.IndexBuffer);

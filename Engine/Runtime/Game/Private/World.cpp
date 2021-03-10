@@ -45,11 +45,12 @@ void World::Tick(Seconds deltaTime)
 	scene->Update();
 }
 
-Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
+GLevel* World::LoadLevel(TSubclassOf<GLevel> loadLevel)
 {
 	if (currentLevel.IsValid)
 	{
 		currentLevel->UnloadLevel();
+		currentLevel->SetWorld(nullptr);
 		OnUnloadLevel();
 	}
 
@@ -62,7 +63,7 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 
 	if (currentLevel.IsValid)
 	{
-		currentLevel->world = this;
+		currentLevel->SetWorld(this);
 		currentLevel->LoadLevel();
 		OnLoadLevel();
 	}
@@ -80,7 +81,7 @@ Scene* World::GetScene() const
 	return scene.Get();
 }
 
-Level* World::GetCurrentLevel() const
+GLevel* World::GetCurrentLevel() const
 {
 	return currentLevel.Get();
 }

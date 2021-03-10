@@ -8,6 +8,7 @@
 
 class GStaticMeshComponent;
 class StaticMesh;
+class MaterialInterface;
 
 class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
 {
@@ -18,11 +19,7 @@ public:
 private:
 	TWeakPtr<GStaticMeshComponent> meshComponent;
 	StaticMesh* staticMesh;
-	AxisAlignedCube baseBoundingBox;
-	AxisAlignedCube transformedBoundingBox;
-	uint16 materialIndex;
-
-	//TRefPtr<MeshBatch> customBatch;
+	MaterialInterface* material;
 
 public:
 	StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent);
@@ -30,8 +27,4 @@ public:
 
 	void Update() override;
 	void UpdateTransform() override;
-
-	MeshBatch* GetMeshBatch() const override;
-	const AxisAlignedCube* GetPrimitiveBoundingBox() const override;
-	uint64 GetRaytracingAccelerationStructurePtr() const override;
 };
