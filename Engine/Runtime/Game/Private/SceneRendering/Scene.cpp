@@ -25,6 +25,7 @@ Scene::Scene(APlayerController* inPlayerController) : Super()
 	, localPlayer(inPlayerController)
 	, numSRVs(0)
 {
+	localPlayerVisibility = NewObject<SceneVisibility>(this);
 	DirectXNew(instancingScene, DirectXAccelerationInstancingScene, engine->GetDeviceBundle());
 }
 

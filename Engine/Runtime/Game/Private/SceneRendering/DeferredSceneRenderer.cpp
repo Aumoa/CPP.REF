@@ -3,21 +3,17 @@
 #include "SceneRendering/DeferredSceneRenderer.h"
 
 #include "Engine.h"
+#include "DirectX/DirectXCommon.h"
 #include "SceneRendering/SceneVisibility.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 #include "SceneRendering/ShaderCameraConstant.h"
-#include "RHI/RHICommon.h"
-#include "RHI/RHIShaderLibrary.h"
-#include "RHI/IRHICommandList.h"
-#include "RHI/IRHIDeviceBundle.h"
-#include "RHI/IRHIMaterialBundle.h"
-#include "RHI/IRHIScene.h"
+#include "SceneRendering/Scene.h"
 #include "Logging/LogMacros.h"
 #include "Materials/MaterialInterface.h"
 
 using namespace std;
 
-DeferredSceneRenderer::DeferredSceneRenderer(IRHIScene* inScene) : Super(inScene)
+DeferredSceneRenderer::DeferredSceneRenderer(Scene* inScene) : Super(inScene)
 	, shaderLibrary(nullptr)
 {
 	//shaderLibrary = GEngine.DeviceBundle->GetShaderLibrary();
@@ -28,11 +24,11 @@ DeferredSceneRenderer::~DeferredSceneRenderer()
 
 }
 
-void DeferredSceneRenderer::RenderScene(IRHICommandList* immediateCommandList)
+void DeferredSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* immediateCommandList)
 {
 	SetShader(immediateCommandList);
 
-	IRHIScene* myScene = GetScene();
+	Scene* myScene = GetScene();
 	std::vector<SceneVisibility*> visibilities = { myScene->GetLocalPlayerVisibility() };
 	for (size_t i = 0; i < visibilities.size(); ++i)
 	{
@@ -41,13 +37,12 @@ void DeferredSceneRenderer::RenderScene(IRHICommandList* immediateCommandList)
 	}
 }
 
-void DeferredSceneRenderer::SetShader(IRHICommandList* commandList)
+void DeferredSceneRenderer::SetShader(ID3D12GraphicsCommandList4* commandList)
 {
-	IRHIShader* shader = shaderLibrary->GetShader(RHIShaderLibrary::GeometryShader);
-	commandList->SetShader(shader);
+
 }
 
-void DeferredSceneRenderer::RenderSceneInternal(IRHICommandList* commandList, SceneVisibility* inSceneVisibility)
+void DeferredSceneRenderer::RenderSceneInternal(ID3D12GraphicsCommandList4* commandList, SceneVisibility* inSceneVisibility)
 {
 	//span<PrimitiveSceneProxy* const> primitiveSceneProxies = GetScene()->GetPrimitives();
 	//const auto& primitiveVisibility = inSceneVisibility->PrimitiveVisibility;

@@ -19,12 +19,12 @@ private:
 	RHIShaderLibrary* shaderLibrary;
 
 public:
-	DeferredSceneRenderer(IRHIScene* inScene);
+	DeferredSceneRenderer(Scene* inScene);
 	~DeferredSceneRenderer();
 
-	virtual void RenderScene(IRHICommandList* immediateCommandList);
+	virtual void RenderScene(ID3D12GraphicsCommandList4* immediateCommandList);
 
 private:
-	void SetShader(IRHICommandList* commandList);
-	void RenderSceneInternal(IRHICommandList* commandList, SceneVisibility* inSceneVisibility);
+	void SetShader(ID3D12GraphicsCommandList4* commandList);
+	void RenderSceneInternal(ID3D12GraphicsCommandList4* commandList, SceneVisibility* inSceneVisibility);
 };

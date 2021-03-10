@@ -31,7 +31,7 @@ GSceneComponent::GSceneComponent() : Super()
 	, worldTransform(Transform::Identity)
 	, localToWorld(Transform::Identity)
 	, mobility(EComponentMobility::Static)
-	, dirtyMark(EComponentDirtyMask::All)
+	, dirtyMark(EComponentDirtyMask::None)
 {
 
 }

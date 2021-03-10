@@ -3,6 +3,8 @@
 #include "Engine.h"
 
 #include "GameInstance.h"
+#include "DeferredGameViewport.h"
+#include "World.h"
 #include "Logging/LogMacros.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "Windows/CoreWindow.h"
@@ -41,6 +43,7 @@ void Engine::Initialize(GameInstance* gameInstance)
 	swapChain = NewObject<DirectXSwapChain>(deviceBundle.Get(), primaryQueue.Get(), gameInstance->MainWindow, DXGI_FORMAT_B8G8R8A8_UNORM);
 	DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle.Get(), primaryQueue.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 	DirectXNew(immediateFence, DirectXAutoFence, deviceBundle.Get());
+	gameViewport = NewObject<DeferredGameViewport>(deviceBundle.Get());
 
 	gameInstance->MainWindow->Sizing += bind_delegate(MainWindow_OnSizing);
 }
@@ -53,8 +56,8 @@ void Engine::Tick()
 
 	tickTimer->Tick();
 	gameInstance->TickWorld(tickTimer->ElapsedSeconds);
-	primaryQueue->CollectPendingReferences();
 	Render();
+	primaryQueue->CollectPendingReferences();
 }
 
 void Engine::Shutdown()
@@ -65,7 +68,12 @@ void Engine::Shutdown()
 void Engine::Render()
 {
 	immediateFence->Wait();
-
+	immediateContext->BeginDraw();
+	{
+		Scene* scene = gameInstance->GetWorld()->GetScene();
+		gameViewport->RenderScene(immediateContext->GetCommandList(), scene);
+	}
+	immediateContext->EndDraw();
 	swapChain->Present();
 
 	immediateFence->AcceptSignal(primaryQueue.Get());

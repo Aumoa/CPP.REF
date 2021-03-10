@@ -6,6 +6,8 @@
 #include "CoreMinimal.h"
 #include "DirectXRenderTarget.h"
 
+#include "DirectX/DirectXMinimal.h"
+
 class DirectXRenderTargetView;
 
 class GAME_API DirectXCompatibleRenderTarget : public DirectXRenderTarget

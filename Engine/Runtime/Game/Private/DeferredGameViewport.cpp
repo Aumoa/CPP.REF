@@ -7,12 +7,12 @@
 #include "DirectX/DirectXCompatibleRenderTarget.h"
 #include "Logging/LogMacros.h"
 #include "Diagnostics/ScopedCycleCounter.h"
+#include "SceneRendering/Scene.h"
 #include "SceneRendering/DeferredSceneRenderer.h"
-#include "RHI/IRHIScene.h"
 
 DEFINE_STATS_GROUP(DeferredGameViewport);
 
-DeferredGameViewport::DeferredGameViewport(DirectXDeviceBundle* deviceBundle) : Super()
+DeferredGameViewport::DeferredGameViewport(DirectXDeviceBundle* deviceBundle) : Super(deviceBundle)
 {
 	DirectXNew(hdrTarget, DirectXHDRTarget, deviceBundle);
 }
@@ -22,19 +22,17 @@ DeferredGameViewport::~DeferredGameViewport()
 
 }
 
-void DeferredGameViewport::RenderScene(IRHICommandList* inCommandList, IRHIScene* inScene)
+void DeferredGameViewport::RenderScene(ID3D12GraphicsCommandList4* inCommandList, Scene* inScene)
 {
-	DeferredSceneRenderer renderer(inScene);
-
 	{
 		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, CalcVisibility);
 		inScene->CalcVisibility();
 	}
-}
 
-IRHIResource* DeferredGameViewport::GetRenderTarget() const
-{
-	return nullptr;
+	{
+		DeferredSceneRenderer renderer(inScene);
+		renderer.RenderScene(inCommandList);
+	}
 }
 
 void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
@@ -46,14 +44,4 @@ void DeferredGameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 	}
 
 	hdrTarget->ResizeBuffers(x, y);
-}
-
-void DeferredGameViewport::LightRender(IRHICommandList* inCommandList, IRHIScene* inScene)
-{
-
-}
-
-void DeferredGameViewport::TonemapRender(IRHICommandList* inCommandList)
-{
-
 }

@@ -2,18 +2,17 @@
 
 #include "SceneRendering/SceneVisibility.h"
 
-#include "SceneRendering/ShaderCameraConstant.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
+#include "SceneRendering/Scene.h"
 #include "Components/PrimitiveComponent.h"
-#include "RHI/IRHIScene.h"
 
 using namespace std;
 
-SceneVisibility::SceneVisibility(IRHIScene* inScene) : Super()
+SceneVisibility::SceneVisibility(Scene* inScene) : Super()
 	, myScene(inScene)
 	, bDirty(true)
 {
-	shaderCameraConstants = NewObject<ShaderCameraConstantVector>();
+
 }
 
 SceneVisibility::~SceneVisibility()
@@ -28,7 +27,6 @@ void SceneVisibility::CalcVisibility()
 		const auto& primitives = myScene->GetPrimitives();
 
 		visibilities.resize(primitives.size());
-		shaderCameraConstants->BeginUpdateConstant(myView);
 		numPrimitivesRender = 0;
 
 		for (size_t i = 0; i < primitives.size(); ++i)
@@ -48,12 +46,9 @@ void SceneVisibility::CalcVisibility()
 				continue;
 			}
 
-			shaderCameraConstants->AddPrimitive(proxy);
 			visibilities[i] = true;
 			numPrimitivesRender += 1;
 		}
-
-		shaderCameraConstants->EndUpdateConstant();
 
 		bDirty = false;
 	}
@@ -70,9 +65,4 @@ void SceneVisibility::UpdateView(const MinimalViewInfo& inView)
 const vector<bool>& SceneVisibility::PrimitiveVisibility_get() const
 {
 	return visibilities;
-}
-
-ShaderCameraConstantVector* SceneVisibility::ShaderCameraConstants_get() const
-{
-	return shaderCameraConstants.Get();
 }

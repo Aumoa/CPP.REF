@@ -5,8 +5,9 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-interface IRHICommandList;
-interface IRHIScene;
+#include "DirectX/DirectXMinimal.h"
+
+class Scene;
 
 class GAME_API SceneRenderer : virtual public Object
 {
@@ -15,13 +16,13 @@ public:
 	using This = SceneRenderer;
 
 private:
-	IRHIScene* renderScene;
+	Scene* renderScene;
 
 public:
-	SceneRenderer(IRHIScene* scene);
+	SceneRenderer(Scene* scene);
 	~SceneRenderer() override;
 
-	virtual void RenderScene(IRHICommandList* immediateCommandList) = 0;
+	virtual void RenderScene(ID3D12GraphicsCommandList4* immediateCommandList) = 0;
 
-	IRHIScene* GetScene() const;
+	Scene* GetScene() const;
 };

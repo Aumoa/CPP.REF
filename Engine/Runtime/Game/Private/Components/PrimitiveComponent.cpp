@@ -25,12 +25,12 @@ void GPrimitiveComponent::ResolveDirtyState()
 
 	if (sceneProxy.IsValid)
 	{
-		if (bRecreated || HasDirtyMark(EComponentDirtyMask::UpdateProxy))
+		if (!bRecreated && HasDirtyMark(EComponentDirtyMask::UpdateProxy))
 		{
 			sceneProxy->Update();
 		}
 
-		if (bRecreated || HasDirtyMark(EComponentDirtyMask::TransformUpdated))
+		if (!bRecreated && HasDirtyMark(EComponentDirtyMask::TransformUpdated))
 		{
 			sceneProxy->UpdateTransform();
 		}

@@ -412,14 +412,12 @@
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h" />
-    <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\RenderTarget.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\SceneVisibility.h" />
     <ClInclude Include="Public\SceneRendering\StaticMesh.h" />
     <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h" />
-    <ClInclude Include="Public\SceneRendering\ToneMappingSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\Vertex.h" />
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
@@ -556,7 +554,6 @@
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
     <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
-    <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\RenderTarget.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
@@ -564,7 +561,6 @@
     <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMesh.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
-    <ClCompile Include="Private\SceneRendering\ToneMappingSceneRenderer.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
     <ClCompile Include="Private\Windows\Application.cpp" />

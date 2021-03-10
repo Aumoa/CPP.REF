@@ -13,6 +13,7 @@ class DirectXImmediateContext;
 class DirectXAutoFence;
 class AssetManager;
 class StepTimer;
+class GameViewport;
 
 class GAME_API Engine : virtual public Object
 {
@@ -29,6 +30,7 @@ private:
 	TRefPtr<DirectXSwapChain> swapChain;
 	TRefPtr<DirectXImmediateContext> immediateContext;
 	TRefPtr<DirectXAutoFence> immediateFence;
+	TRefPtr<GameViewport> gameViewport;
 
 	TRefPtr<StepTimer> tickTimer;
 
