@@ -14,7 +14,9 @@
 #include "DirectX/DirectXSwapChain.h"
 #include "DirectX/DirectXImmediateContext.h"
 #include "DirectX/DirectXAutoFence.h"
+#include "DirectX/DirectXCompatibleRenderTarget.h"
 #include "Assets/AssetManager.h"
+#include "Assets/CachedShaderLibrary.h"
 #include "Time/StepTimer.h"
 
 using namespace std;
@@ -44,6 +46,7 @@ void Engine::Initialize(GameInstance* gameInstance)
 	DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle.Get(), primaryQueue.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
 	DirectXNew(immediateFence, DirectXAutoFence, deviceBundle.Get());
 	gameViewport = NewObject<DeferredGameViewport>(deviceBundle.Get());
+	shaderLibrary = NewObject<CachedShaderLibrary>(deviceBundle.Get());
 
 	gameInstance->MainWindow->Sizing += bind_delegate(MainWindow_OnSizing);
 }
@@ -70,8 +73,26 @@ void Engine::Render()
 	immediateFence->Wait();
 	immediateContext->BeginDraw();
 	{
+		ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
+
 		Scene* scene = gameInstance->GetWorld()->GetScene();
-		gameViewport->RenderScene(immediateContext->GetCommandList(), scene);
+		gameViewport->RenderScene(commandList, scene);
+
+		ID3D12Resource* src = gameViewport->GetCompatibleRenderTarget()->GetResource();
+		ID3D12Resource* dst = swapChain->GetCurrentBuffer();
+
+		D3D12_RESOURCE_BARRIER barrier = { };
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Transition.pResource = dst;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+
+		commandList->ResourceBarrier(1, &barrier);
+		commandList->CopyResource(dst, src);
+
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+		commandList->ResourceBarrier(1, &barrier);
 	}
 	immediateContext->EndDraw();
 	swapChain->Present();
@@ -94,11 +115,19 @@ AssetManager* Engine::GetAssetManager() const
 	return assetManager.Get();
 }
 
+CachedShaderLibrary* Engine::GetCachedShaderLibrary() const
+{
+	return shaderLibrary.Get();
+}
+
 void Engine::MainWindow_OnSizing(int32 x, int32 y)
 {
 	if (x * y != 0)
 	{
+		immediateFence->Wait();
+
 		swapChain->ResizeBuffers(x, y);
+		gameViewport->SetResolution(x, y);
 		SE_LOG(LogEngine, Verbose, L"SwapChain was resize to [{0}x{1}].", x, y);
 	}
 	else

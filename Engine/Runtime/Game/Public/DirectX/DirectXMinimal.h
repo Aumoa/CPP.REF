@@ -22,6 +22,8 @@ interface ID3D12DescriptorHeap;
 interface ID3D12Resource;
 interface ID3D12PipelineState;
 interface ID3D12RootSignature;
+interface ID3D12StateObject;
+interface ID3D12StateObjectProperties;
 
 #pragma warning(push)
 #pragma warning(disable: 4369)
@@ -41,3 +43,5 @@ struct D3D12_CLEAR_VALUE;
 struct D3D12_SHADER_RESOURCE_VIEW_DESC;
 struct D3D12_UNORDERED_ACCESS_VIEW_DESC;
 struct D3D12_RAYTRACING_INSTANCE_DESC;
+struct D3D12_HIT_GROUP_DESC;
+struct D3D12_DISPATCH_RAYS_DESC;

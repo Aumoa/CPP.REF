@@ -31,6 +31,8 @@ public:
 	virtual void RenderScene(ID3D12GraphicsCommandList4* inCommandList, Scene* inScene) = 0;
 	DirectXCompatibleRenderTarget* GetCompatibleRenderTarget() const;
 
+	void SetResolution(int32 x, int32 y);
+
 	vs_property_get_auto(int32, ResolutionX, resX);
 	vs_property_get_auto(int32, ResolutionY, resY);
 

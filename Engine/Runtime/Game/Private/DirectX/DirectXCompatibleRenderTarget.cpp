@@ -25,3 +25,8 @@ DirectXRenderTargetView* DirectXCompatibleRenderTarget::GetRTV() const
 {
 	return compatibleRTV.Get();
 }
+
+ID3D12Resource* DirectXCompatibleRenderTarget::GetResource() const
+{
+	return compatibleBuffer.Get();
+}

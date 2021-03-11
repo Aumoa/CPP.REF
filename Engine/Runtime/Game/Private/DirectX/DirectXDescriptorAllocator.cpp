@@ -23,6 +23,11 @@ DirectXDescriptorAllocator::~DirectXDescriptorAllocator()
 
 }
 
+void DirectXDescriptorAllocator::SetDescriptorHeaps(ID3D12GraphicsCommandList4* inCommandList)
+{
+	inCommandList->SetDescriptorHeaps(1, descriptorHeap.GetAddressOf());
+}
+
 void DirectXDescriptorAllocator::BeginAllocate(uint32 capacity)
 {
 	if (numDescriptors < capacity)

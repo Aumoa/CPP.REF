@@ -14,6 +14,7 @@ class DirectXAutoFence;
 class AssetManager;
 class StepTimer;
 class GameViewport;
+class CachedShaderLibrary;
 
 class GAME_API Engine : virtual public Object
 {
@@ -31,6 +32,7 @@ private:
 	TRefPtr<DirectXImmediateContext> immediateContext;
 	TRefPtr<DirectXAutoFence> immediateFence;
 	TRefPtr<GameViewport> gameViewport;
+	TRefPtr<CachedShaderLibrary> shaderLibrary;
 
 	TRefPtr<StepTimer> tickTimer;
 
@@ -45,6 +47,7 @@ public:
 	DirectXDeviceBundle* GetDeviceBundle() const;
 	DirectXCommandQueue* GetPrimaryCommandQueue() const;
 	AssetManager* GetAssetManager() const;
+	CachedShaderLibrary* GetCachedShaderLibrary() const;
 
 private:
 	void Render();

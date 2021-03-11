@@ -26,6 +26,7 @@ public:
 	ID3D12Device5* GetDevice() const;
 
 	TComPtr<ID3D12Resource> CreateImmutableBuffer(DirectXCommandQueue* commandQueue, D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags);
+	TComPtr<ID3D12Resource> CreateDynamicBuffer(size_t sizeInBytes);
 
 private:
 	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;

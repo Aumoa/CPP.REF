@@ -7,6 +7,8 @@
 #include "Logging/LogMacros.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 
+using namespace std;
+
 DirectXAccelerationInstancingScene::DirectXAccelerationInstancingScene(DirectXDeviceBundle* deviceBundle) : Super()
 	, device(deviceBundle->GetDevice())
 	, lastCount(0)
@@ -54,6 +56,9 @@ void DirectXAccelerationInstancingScene::BuildScene(ID3D12GraphicsCommandList4* 
 	{
 		return;
 	}
+
+	// Clanup old acceleration structure when new build is started.
+	oldAccelerationStructure.Reset();
 
 	if (bNeedRebuild)
 	{
@@ -132,6 +137,12 @@ void DirectXAccelerationInstancingScene::CheckAndReallocate(size_t desiredCount)
 		return;
 	}
 
+	// Save old acceleration structure if it is now using.
+	if (!oldAccelerationStructure.IsValid)
+	{
+		oldAccelerationStructure = move(accelerationStructure);
+	}
+
 	// Update inputs information.
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{ };
 	inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
@@ -169,6 +180,8 @@ void DirectXAccelerationInstancingScene::CheckAndReallocate(size_t desiredCount)
 	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 	heapProp.Type=  D3D12_HEAP_TYPE_UPLOAD;
 	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&instanceBuffer)));
+
+	lastCount = desiredCount;
 }
 
 D3D12_RAYTRACING_INSTANCE_DESC DirectXAccelerationInstancingScene::GetRaytracingInstanceDesc(const PrimitiveSceneProxy* sceneProxy) const

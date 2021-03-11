@@ -18,6 +18,7 @@ private:
 	std::vector<const PrimitiveSceneProxy*> proxies;
 
 	TComPtr<ID3D12Resource> accelerationStructure;
+	TComPtr<ID3D12Resource> oldAccelerationStructure;
 	TComPtr<ID3D12Resource> scratchBuffer;
 	size_t lastCount;
 

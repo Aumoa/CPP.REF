@@ -109,6 +109,9 @@
     <Filter Include="Private\DirectX">
       <UniqueIdentifier>{c4d60643-a0fe-4f21-a66f-233da83e3469}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\Shaders\RaytracingShader">
+      <UniqueIdentifier>{da307a7c-1fc2-48d0-b456-2d260e9c498e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -429,7 +432,7 @@
     <ClInclude Include="Public\DeferredGameViewport.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h">
+    <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h">
@@ -657,6 +660,15 @@
     <ClInclude Include="Public\DirectX\DirectXAccelerationInstancingScene.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXRaytracingShader.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Shaders\ShaderTypes.h">
+      <Filter>Private\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\CachedShaderLibrary.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -875,7 +887,7 @@
     <ClCompile Include="Private\RHI\RHITextureFormat.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp">
+    <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
     </ClCompile>
     <ClCompile Include="Private\Components\LightComponent.cpp">
@@ -1049,6 +1061,12 @@
     <ClCompile Include="Private\DirectX\DirectXAccelerationInstancingScene.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXRaytracingShader.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\CachedShaderLibrary.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -1142,6 +1160,9 @@
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\LightingRayGeneration.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\RaytracingShader\RaytracingShader.hlsl">
+      <Filter>Private\Shaders\RaytracingShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

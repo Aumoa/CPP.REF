@@ -4,16 +4,41 @@
 
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXRaytracingShader.h"
+
+namespace
+{
+	extern "C" struct DXRayGenerationBinding
+	{
+		char Identifier[D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES];
+		D3D12_GPU_DESCRIPTOR_HANDLE rootParameters[1];
+	};
+}
 
 DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle) : Super()
 	, device(deviceBundle->GetDevice())
 {
 	rayGeneration = CreateBuffer(D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+	SetDeviceChildPtr(nullptr, deviceBundle);
 }
 
 DirectXShaderBindingTable::~DirectXShaderBindingTable()
 {
 
+}
+
+void DirectXShaderBindingTable::Init(DirectXRaytracingShader* initShader)
+{
+	DXRayGenerationBinding* rgBind;
+	HR(rayGeneration->Map(0, nullptr, (void**)&rgBind));
+	memcpy(rgBind->Identifier, initShader->GetRayGenerationIdentifier(), D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+	rayGeneration->Unmap(0, nullptr);
+}
+
+void DirectXShaderBindingTable::FillDispatchRaysDesc(D3D12_DISPATCH_RAYS_DESC& outDispatchRays) const
+{
+	outDispatchRays.RayGenerationShaderRecord.StartAddress = rayGeneration->GetGPUVirtualAddress();
+	outDispatchRays.RayGenerationShaderRecord.SizeInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 }
 
 TComPtr<ID3D12Resource> DirectXShaderBindingTable::CreateBuffer(uint64 sizeInBytes)

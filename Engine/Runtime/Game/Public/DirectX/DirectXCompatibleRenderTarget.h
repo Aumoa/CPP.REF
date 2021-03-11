@@ -26,4 +26,5 @@ public:
 	void ResizeBuffers(int32 x, int32 y) override;
 
 	DirectXRenderTargetView* GetRTV() const;
+	ID3D12Resource* GetResource() const;
 };

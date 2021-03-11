@@ -15,7 +15,7 @@ DirectXSwapChain::DirectXSwapChain(DirectXDeviceBundle* deviceBundle, DirectXCom
 	desc.Format = format;
 	desc.SampleDesc = { 1, 0 };
 	desc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
-	desc.BufferCount = 3;
+	desc.BufferCount = _countof(buffers);
 	desc.Scaling = DXGI_SCALING_STRETCH;
 	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
@@ -37,5 +37,21 @@ void DirectXSwapChain::Present()
 
 void DirectXSwapChain::ResizeBuffers(int32 x, int32 y)
 {
+	buffers[0].Reset();
+	buffers[1].Reset();
+	buffers[2].Reset();
+
 	HR(swapChain->ResizeBuffers(0, (UINT)x, (UINT)y, DXGI_FORMAT_UNKNOWN, 0));
+
+	HR(swapChain->GetBuffer(0, IID_PPV_ARGS(&buffers[0])));
+	SetNameAuto(buffers[0]);
+	HR(swapChain->GetBuffer(1, IID_PPV_ARGS(&buffers[1])));
+	SetNameAuto(buffers[1]);
+	HR(swapChain->GetBuffer(2, IID_PPV_ARGS(&buffers[2])));
+	SetNameAuto(buffers[2]);
+}
+
+ID3D12Resource* DirectXSwapChain::GetCurrentBuffer() const
+{
+	return buffers[swapChain->GetCurrentBackBufferIndex()].Get();
 }

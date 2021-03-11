@@ -8,6 +8,8 @@
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
 #include "DirectX/DirectXAccelerationInstancingScene.h"
+#include "DirectX/DirectXShaderBindingTable.h"
+#include "DirectX/DirectXDescriptorAllocator.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/PlayerCameraManager.h"
 #include "Components/LightComponent.h"
@@ -26,7 +28,10 @@ Scene::Scene(APlayerController* inPlayerController) : Super()
 	, numSRVs(0)
 {
 	localPlayerVisibility = NewObject<SceneVisibility>(this);
-	DirectXNew(instancingScene, DirectXAccelerationInstancingScene, engine->GetDeviceBundle());
+	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();
+	DirectXNew(instancingScene, DirectXAccelerationInstancingScene, deviceBundle);
+	DirectXNew(sbt, DirectXShaderBindingTable, deviceBundle);
+	DirectXNew(allocator, DirectXDescriptorAllocator, deviceBundle);
 }
 
 Scene::~Scene()
@@ -85,17 +90,17 @@ void Scene::CalcVisibility()
 
 	numSRVs = 256;  // Reserved
 	numSRVs += localPlayerVisibility->NumPrimitivesRender * 2;  // Material
-	
 }
 
 void Scene::BeginRender(ID3D12GraphicsCommandList4* inCommandList)
 {
 	instancingScene->BuildScene(inCommandList);
+	allocator->BeginAllocate((uint32)numSRVs);
 }
 
 void Scene::EndRender(ID3D12GraphicsCommandList4* inCommandList)
 {
-
+	allocator->EndAllocate();
 }
 
 void Scene::AddPrimitive(GPrimitiveComponent* inPrimitiveComponent)
@@ -132,4 +137,24 @@ span<PrimitiveSceneProxy* const> Scene::GetPrimitives() const
 span<LightSceneProxy* const> Scene::GetLights() const
 {
 	return lightProxies;
+}
+
+Engine* Scene::GetEngine() const
+{
+	return engine;
+}
+
+DirectXAccelerationInstancingScene* Scene::GetAccelScene() const
+{
+	return instancingScene.Get();
+}
+
+DirectXShaderBindingTable* Scene::GetShaderBindingTable() const
+{
+	return sbt.Get();
+}
+
+DirectXDescriptorAllocator* Scene::GetDescriptorAllocator() const
+{
+	return allocator.Get();
 }

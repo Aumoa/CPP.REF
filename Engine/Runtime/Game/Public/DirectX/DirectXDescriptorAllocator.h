@@ -27,6 +27,7 @@ public:
 	DirectXDescriptorAllocator(DirectXDeviceBundle* deviceBundle);
 	~DirectXDescriptorAllocator() override;
 
+	void SetDescriptorHeaps(ID3D12GraphicsCommandList4* inCommandList);
 	void BeginAllocate(uint32 capacity);
 	void EndAllocate();
 

@@ -2,17 +2,24 @@
 
 #include "SceneRendering/SceneVisibility.h"
 
+#include "Engine.h"
+#include "DirectX/DirectXCommon.h"
+#include "DirectX/DirectXDeviceBundle.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 #include "SceneRendering/Scene.h"
 #include "Components/PrimitiveComponent.h"
+#include "Shaders/ShaderTypes.h"
 
 using namespace std;
 
 SceneVisibility::SceneVisibility(Scene* inScene) : Super()
 	, myScene(inScene)
 	, bDirty(true)
+	, cameraConstantPtr(nullptr)
 {
-
+	DirectXDeviceBundle* device = inScene->GetEngine()->GetDeviceBundle();
+	DirectXAssign(cameraConstant, device->CreateDynamicBuffer(sizeof(ShaderCameraConstant)));
+	HR(cameraConstant->Map(0, nullptr, &cameraConstantPtr));
 }
 
 SceneVisibility::~SceneVisibility()
@@ -50,6 +57,11 @@ void SceneVisibility::CalcVisibility()
 			numPrimitivesRender += 1;
 		}
 
+		auto ptr = (ShaderCameraConstant*)cameraConstantPtr;
+		ptr->ViewProj = myView.ViewProj;
+		ptr->ViewProjInv = myView.ViewProjInv;
+		ptr->Pos = myView.Location;
+
 		bDirty = false;
 	}
 }
@@ -65,4 +77,9 @@ void SceneVisibility::UpdateView(const MinimalViewInfo& inView)
 const vector<bool>& SceneVisibility::PrimitiveVisibility_get() const
 {
 	return visibilities;
+}
+
+uint64 SceneVisibility::GetCameraConstantBuffer() const
+{
+	return cameraConstant->GetGPUVirtualAddress();
 }

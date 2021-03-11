@@ -26,4 +26,5 @@ public:
 
 	DirectXShaderResourceView* GetUAV() const;
 	DirectXShaderResourceView* GetSRV() const;
+	ID3D12Resource* GetResource() const;
 };

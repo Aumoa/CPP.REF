@@ -5,7 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "Diagnostics/ScopedCycleCounter.h"
+#include "DirectX/DirectXMinimal.h"
 #include "SceneRendering/MinimalViewInfo.h"
 
 class Scene;
@@ -25,6 +25,9 @@ private:
 	Frustum viewFrustum;
 	size_t numPrimitivesRender;
 
+	TComPtr<ID3D12Resource> cameraConstant;
+	void* cameraConstantPtr;
+
 public:
 	SceneVisibility(Scene* inScene);
 	~SceneVisibility() override;
@@ -34,4 +37,6 @@ public:
 
 	vs_property_get(const std::vector<bool>&, PrimitiveVisibility);
 	vs_property_get_auto(size_t, NumPrimitivesRender, numPrimitivesRender);
+
+	uint64 GetCameraConstantBuffer() const;
 };

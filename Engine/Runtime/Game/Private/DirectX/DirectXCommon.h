@@ -16,7 +16,11 @@
 
 #define DirectXNew(Ret, Class, ...) \
 Ret = Object::NewObject<Class>(__VA_ARGS__);\
-Ret->DebugName = L ## #Ret;
+Ret->DebugName = L ## #Ret
+
+#define DirectXAssign(Ret, Assign) \
+Ret = Assign;\
+Ret->SetName(L ## #Ret)
 
 #define SetNameAuto(Var) Var->SetName(L ## #Var)
 

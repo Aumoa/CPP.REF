@@ -23,17 +23,21 @@ GameViewport::~GameViewport()
 DirectXCompatibleRenderTarget* GameViewport::GetCompatibleRenderTarget() const
 {
 	return compatibleTarget.Get();
-	return nullptr;
+}
+
+void GameViewport::SetResolution(int32 x, int32 y)
+{
+	resX = x;
+	resY = y;
+
+	if (x != 0 && y != 0)
+	{
+		compatibleTarget->ResizeBuffers(x, y);
+		SetViewportResolution_Internal(x, y);
+	}
 }
 
 void GameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 {
-	if (x == 0 || y == 0)
-	{
-		return;
-	}
 
-	resX = x;
-	resY = y;
-	compatibleTarget->ResizeBuffers(x, y);
 }

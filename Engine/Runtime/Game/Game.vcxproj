@@ -292,6 +292,7 @@
     <ClInclude Include="Private\RHI\RHIMaterial.h" />
     <ClInclude Include="Private\RHI\RHIMaterialBundle.h" />
     <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h" />
+    <ClInclude Include="Private\Shaders\ShaderTypes.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanException.h" />
@@ -301,6 +302,7 @@
     <ClInclude Include="Private\VulkanRHI\VulkanResource.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
     <ClInclude Include="Public\Assets\AssetManager.h" />
+    <ClInclude Include="Public\Assets\CachedShaderLibrary.h" />
     <ClInclude Include="Public\ComponentMobility.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\CameraComponent.h" />
@@ -336,6 +338,7 @@
     <ClInclude Include="Public\DirectX\DirectXHDRTarget.h" />
     <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
     <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
+    <ClInclude Include="Public\DirectX\DirectXRaytracingShader.h" />
     <ClInclude Include="Public\DirectX\DirectXRenderTarget.h" />
     <ClInclude Include="Public\DirectX\DirectXRenderTargetView.h" />
     <ClInclude Include="Public\DirectX\DirectXShaderBindingTable.h" />
@@ -407,7 +410,7 @@
     <ClInclude Include="Public\RHI\RHIViewport.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredRenderTarget.h" />
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
@@ -440,6 +443,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
+    <ClCompile Include="Private\Assets\CachedShaderLibrary.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\DirectionalLightComponent.cpp" />
@@ -500,6 +504,7 @@
     <ClCompile Include="Private\DirectX\DirectXGeometry.cpp" />
     <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp" />
     <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXRaytracingShader.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRenderTarget.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRenderTargetView.cpp" />
     <ClCompile Include="Private\DirectX\DirectXShaderBindingTable.cpp" />
@@ -549,7 +554,7 @@
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
     <ClCompile Include="Private\SceneRendering\DeferredRenderTarget.cpp" />
-    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\LightSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
     <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />
@@ -641,6 +646,20 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\RaytracingShader\RaytracingShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.4</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
+      </EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Library</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">6.4</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.4</ShaderModel>
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>

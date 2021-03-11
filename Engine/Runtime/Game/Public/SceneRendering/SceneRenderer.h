@@ -8,6 +8,7 @@
 #include "DirectX/DirectXMinimal.h"
 
 class Scene;
+class GameViewport;
 
 class GAME_API SceneRenderer : virtual public Object
 {
@@ -22,7 +23,7 @@ public:
 	SceneRenderer(Scene* scene);
 	~SceneRenderer() override;
 
-	virtual void RenderScene(ID3D12GraphicsCommandList4* immediateCommandList) = 0;
+	virtual void RenderScene(ID3D12GraphicsCommandList4* immediateCommandList, GameViewport* gameViewport) = 0;
 
 	Scene* GetScene() const;
 };

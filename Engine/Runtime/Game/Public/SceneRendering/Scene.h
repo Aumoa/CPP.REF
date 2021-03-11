@@ -15,13 +15,15 @@ class SceneVisibility;
 class GLightComponent;
 class LightSceneProxy;
 class DirectXAccelerationInstancingScene;
+class DirectXShaderBindingTable;
+class DirectXDescriptorAllocator;
 
 class Scene : virtual public Object
 {
 public:
 	using Super = Object;
 
-public:
+private:
 	Engine* engine;
 
 	std::vector<GPrimitiveComponent*> primitiveComponents;
@@ -29,13 +31,14 @@ public:
 
 	APlayerController* localPlayer;
 	TRefPtr<SceneVisibility> localPlayerVisibility;
-	std::vector<TRefPtr<SceneVisibility>> visibilities;
 
 	size_t numSRVs;
 	std::vector<GLightComponent*> lightComponents;
 	std::vector<LightSceneProxy*> lightProxies;
 
 	TRefPtr<DirectXAccelerationInstancingScene> instancingScene;
+	TRefPtr<DirectXShaderBindingTable> sbt;
+	TRefPtr<DirectXDescriptorAllocator> allocator;
 
 public:
 	Scene(APlayerController* inPlayerController);
@@ -53,4 +56,9 @@ public:
 	virtual SceneVisibility* GetLocalPlayerVisibility() const;
 	virtual std::span<PrimitiveSceneProxy* const> GetPrimitives() const;
 	virtual std::span<LightSceneProxy* const> GetLights() const;
+
+	Engine* GetEngine() const;
+	DirectXAccelerationInstancingScene* GetAccelScene() const;
+	DirectXShaderBindingTable* GetShaderBindingTable() const;
+	DirectXDescriptorAllocator* GetDescriptorAllocator() const;
 };
