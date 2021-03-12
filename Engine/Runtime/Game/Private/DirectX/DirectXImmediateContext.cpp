@@ -6,8 +6,9 @@
 #include "DirectX/DirectXCommandQueue.h"
 
 DirectXImmediateContext::DirectXImmediateContext(DirectXDeviceBundle* deviceBundle, DirectXCommandQueue* commandQueue, D3D12_COMMAND_LIST_TYPE type) : Super(deviceBundle, type)
+	, commandQueue(commandQueue)
 {
-	this->commandQueue = commandQueue;
+
 }
 
 DirectXImmediateContext::~DirectXImmediateContext()

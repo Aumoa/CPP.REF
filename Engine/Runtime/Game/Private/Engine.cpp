@@ -65,7 +65,10 @@ void Engine::Tick()
 
 void Engine::Shutdown()
 {
+	immediateFence->Wait();
+
 	CycleStatsGroup::ReadyToShutdown();
+	swapChain.Reset();
 }
 
 void Engine::Render()

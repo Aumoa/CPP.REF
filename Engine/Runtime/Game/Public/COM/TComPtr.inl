@@ -29,7 +29,7 @@ TComPtr<T>::TComPtr(const TComPtr& ptr) : TComPtr(ptr.instance)
 }
 
 template<class T>
-TComPtr<T>::TComPtr(TComPtr&& ptr) : instance(ptr.instance)
+TComPtr<T>::TComPtr(TComPtr&& ptr) noexcept : instance(ptr.instance)
 {
 	ptr.instance = nullptr;
 }

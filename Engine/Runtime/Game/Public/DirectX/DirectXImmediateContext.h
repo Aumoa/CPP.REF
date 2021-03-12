@@ -14,7 +14,7 @@ public:
 	using Super = DirectXDeferredContext;
 
 private:
-	TRefPtr<DirectXCommandQueue> commandQueue;
+	DirectXCommandQueue* commandQueue;
 
 	std::vector<TRefPtr<Object>> pendingReferences;
 

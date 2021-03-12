@@ -29,7 +29,7 @@ void RayGeneration()
 	uint2 launchIndex = (uint2)DispatchRaysIndex();
 	uint2 dimensions = (uint2)DispatchRaysDimensions();
 	Ray cameraRay = GenerateRay(launchIndex, dimensions, gCamera.Pos, gCamera.ViewProj);
-	gColorOutput[launchIndex] = 1.0f;
+	gColorOutput[launchIndex] = 0.0f;
 }
 
 [shader("miss")]

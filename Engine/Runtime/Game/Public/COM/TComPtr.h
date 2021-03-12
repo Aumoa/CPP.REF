@@ -17,7 +17,7 @@ public:
 	inline TComPtr(std::nullptr_t);
 	inline TComPtr(T* ptr);
 	inline TComPtr(const TComPtr& ptr);
-	inline TComPtr(TComPtr&& ptr);
+	inline TComPtr(TComPtr&& ptr) noexcept;
 	inline ~TComPtr();
 
 	inline T* Detach();

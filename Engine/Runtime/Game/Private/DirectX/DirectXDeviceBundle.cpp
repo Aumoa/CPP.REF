@@ -8,6 +8,8 @@
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
 
+#define WITH_REPORT 0
+
 DirectXDeviceBundle::DirectXDeviceBundle() : Super()
 {
 	UINT flag = 0;
@@ -62,7 +64,18 @@ DirectXDeviceBundle::DirectXDeviceBundle() : Super()
 
 DirectXDeviceBundle::~DirectXDeviceBundle()
 {
-
+#if WITH_REPORT && defined(_DEBUG)
+	if (TComPtr<ID3D12DebugDevice> debugDevice; device.IsValid && SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&debugDevice))))
+	{
+		// Report live debug objects.
+		HRESULT hr = debugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+		if (FAILED(hr))
+		{
+			SE_LOG(LogDirectX, Warning, L"Failed to report live device objects.");
+			return;
+		}
+	}
+#endif
 }
 
 IDXGIFactory2* DirectXDeviceBundle::GetFactory() const
