@@ -27,11 +27,6 @@ public:
 	virtual ~Exception();
 
 	vs_property_get(TRefPtr<String>, Name);
-	TRefPtr<String> Name_get() const;
-
 	vs_property_get(TRefPtr<String>, Message);
-	TRefPtr<String> Message_get() const;
-
 	vs_property_get(Exception*, InnerException);
-	Exception* InnerException_get() const;
 };

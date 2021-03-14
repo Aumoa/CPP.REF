@@ -6,13 +6,11 @@
 #include "CoreMinimal.h"
 #include "Controller.h"
 
-#include "Diagnostics/ScopedCycleCounter.h"
-#include "Key.h"
-
-class PlayerCameraManager;
-class InputComponent;
-
-GAME_API DECLARE_STATS_GROUP(APlayerController);
+class GPlayerCameraManager;
+class GInputComponent;
+class Keyboard;
+class KeyStateTracker;
+class MouseStateTracker;
 
 class GAME_API APlayerController : public AController
 {
@@ -23,9 +21,11 @@ public:
 private:
 	bool bAutoUnlocked : 1;
 
-	PlayerCameraManager* cameraManager;
-	InputComponent* inputComponent;
-	InputComponent* possessedInputComponent;
+	GPlayerCameraManager* cameraManager;
+	GInputComponent* inputComponent;
+
+	KeyStateTracker* keyTracker;
+	MouseStateTracker* mouseTracker;
 
 public:
 	APlayerController();
@@ -36,19 +36,16 @@ public:
 	void OnPossess(APawn* inPawn) override;
 	void OnUnPossess() override;
 
-	vs_property_get(PlayerCameraManager*, CameraManager);
-	PlayerCameraManager* CameraManager_get() const;
-	vs_property_get(InputComponent*, PlayerInputComponent);
-	InputComponent* PlayerInputComponent_get() const;
+	vs_property_get(GPlayerCameraManager*, CameraManager);
+	vs_property_get(GInputComponent*, PlayerInputComponent);
 	vs_property_get(bool, IsCursorLocked);
-	bool IsCursorLocked_get() const;
 
 	bool bShowMouseCursor : 1;
 	bool bAutoUnlockMouseCursor : 1;
 
 private:
+	void UpdateInput();
 	void UpdateCursorVisibleState();
 
-	void Possessed_ComponentAdded(ActorComponent*);
-	void AutoUnlockMouseCursor(EKey inKey, EKeyEvent inKeyEvent);
+	void Possessed_ComponentAdded(GActorComponent*);
 };

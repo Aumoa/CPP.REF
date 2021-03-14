@@ -10,15 +10,15 @@
 #include "Logging/LogMacros.h"
 #include "Logging/EngineLogCategory.h"
 #include "Diagnostics/ScopedCycleCounter.h"
-#include "RHI/IRHIScene.h"
-#include "RHI/IRHIResourceBundle.h"
+#include "SceneRendering/Scene.h"
 
 using namespace std;
 using namespace std::chrono;
 
 DEFINE_STATS_GROUP(World);
 
-World::World() : Super()
+World::World(GameInstance* gameInstance) : Super()
+	, gameInstance(gameInstance)
 	, localPlayerController(nullptr)
 {
 
@@ -45,11 +45,12 @@ void World::Tick(Seconds deltaTime)
 	scene->Update();
 }
 
-Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
+GLevel* World::LoadLevel(TSubclassOf<GLevel> loadLevel)
 {
 	if (currentLevel.IsValid)
 	{
 		currentLevel->UnloadLevel();
+		currentLevel->SetWorld(nullptr);
 		OnUnloadLevel();
 	}
 
@@ -62,7 +63,7 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 
 	if (currentLevel.IsValid)
 	{
-		currentLevel->world = this;
+		currentLevel->SetWorld(this);
 		currentLevel->LoadLevel();
 		OnLoadLevel();
 	}
@@ -70,12 +71,17 @@ Level* World::LoadLevel(TSubclassOf<Level> loadLevel)
 	return currentLevel.Get();
 }
 
-IRHIScene* World::GetScene() const
+GameInstance* World::GetGameInstance() const
+{
+	return gameInstance;
+}
+
+Scene* World::GetScene() const
 {
 	return scene.Get();
 }
 
-Level* World::GetCurrentLevel() const
+GLevel* World::GetCurrentLevel() const
 {
 	return currentLevel.Get();
 }
@@ -146,7 +152,7 @@ void World::AddTickGroup(AActor* actor_ptr)
 	}
 
 	// Add all components to tick group.
-	list<ActorComponent*> actorComponents = actor_ptr->GetComponents<ActorComponent>();
+	list<GActorComponent*> actorComponents = actor_ptr->GetComponents<GActorComponent>();
 	for (auto& component : actorComponents)
 	{
 		if (auto& tickFunction = component->PrimaryComponentTick; tickFunction.bCanEverTick)
@@ -159,7 +165,7 @@ void World::AddTickGroup(AActor* actor_ptr)
 
 void World::AddSceneProxy(AActor* actor_ptr)
 {
-	list<PrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<PrimitiveComponent>();
+	list<GPrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<GPrimitiveComponent>();
 	
 	for (auto& item : primitiveComponents)
 	{
@@ -171,7 +177,7 @@ void World::AddSceneProxy(AActor* actor_ptr)
 		scene->AddPrimitive(item);
 	}
 
-	list<LightComponent*> lightComponents = actor_ptr->GetComponents<LightComponent>();
+	list<GLightComponent*> lightComponents = actor_ptr->GetComponents<GLightComponent>();
 
 	for (auto& item : lightComponents)
 	{
@@ -209,5 +215,5 @@ void World::OnUnloadLevel()
 void World::RegisterPlayerController(APlayerController* inPlayerController)
 {
 	localPlayerController = inPlayerController;
-	scene = GEngine.ResourceBundle->CreateScene(inPlayerController);
+	scene = NewObject<Scene>(inPlayerController);
 }

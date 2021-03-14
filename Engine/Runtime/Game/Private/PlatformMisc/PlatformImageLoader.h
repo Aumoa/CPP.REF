@@ -5,9 +5,11 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "WindowsMinimal.h"
+#include "Windows/WindowsMinimal.h"
+#include "COM/TComPtr.h"
 
 class PlatformBitmapFrame;
+interface IWICBitmapDecoder;
 
 class PlatformImageLoader : virtual public Object
 {
@@ -16,7 +18,7 @@ public:
 
 private:
 	uint8 bValid : 1;
-	ComPtr<IWICBitmapDecoder> decoder;
+	TComPtr<IWICBitmapDecoder> decoder;
 	size_t frameCount;
 
 public:

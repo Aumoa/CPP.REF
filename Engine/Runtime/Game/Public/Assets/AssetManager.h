@@ -7,6 +7,7 @@
 
 class StaticMesh;
 class Material;
+class Engine;
 struct LogCategoryBase;
 
 class GAME_API AssetManager : virtual public Object
@@ -16,13 +17,12 @@ public:
 	using This = AssetManager;
 
 private:
-	static LogCategoryBase LogAssets;
-
+	Engine* engine;
 	std::map<TRefPtr<String>, TRefPtr<StaticMesh>> staticMeshes;
 	std::map<TRefPtr<String>, TRefPtr<Material>> materials;
 
 public:
-	AssetManager();
+	AssetManager(Engine* engine);
 	~AssetManager() override;
 
 	void Import(TRefPtr<String> key, TRefPtr<StaticMesh> imported);
@@ -30,4 +30,7 @@ public:
 
 	void Import(TRefPtr<String> key, TRefPtr<Material> imported);
 	Material* LoadMaterial(TRefPtr<String> key) const;
+
+private:
+	void InitEngineAssets();
 };

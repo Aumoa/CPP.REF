@@ -8,8 +8,8 @@
 
 D3D12Fence::D3D12Fence()
 {
-	ID3D12Device* dev = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->Device;
-	HR(dev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
+	//ID3D12Device* dev = Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->Device;
+	//HR(dev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 }
 
 D3D12Fence::~D3D12Fence()

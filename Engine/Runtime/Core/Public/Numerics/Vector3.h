@@ -52,19 +52,13 @@ struct CORE_API Vector3 : public TNumericsBasicOperator<Vector3, float, float, f
 	bool Contains(size_t index) const;
 
 	vs_property_get(size_t, Count);
-	size_t Count_get() const;
 
 	Vector3 GetClampedToMaxLength(float inMaxLength) const;
 
 	vs_property_get(float, LengthSq);
-	float LengthSq_get() const;
 	vs_property_get(float, Length);
-	float Length_get() const;
 	vs_property_get(Vector3, Normalized);
-	Vector3 Normalized_get() const;
 	vs_property(Vector3, Direction);
-	Vector3 Direction_get() const;
-	void Direction_set(const Vector3& value);
 
 	const float& operator [](size_t index) const;
 	float& operator [](size_t index);

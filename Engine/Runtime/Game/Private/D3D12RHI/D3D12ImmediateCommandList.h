@@ -27,5 +27,4 @@ public:
 	virtual void Flush();
 
 	vs_property_get(ID3D12CommandQueue*, CommandQueue);
-	ID3D12CommandQueue* CommandQueue_get() const;
 };

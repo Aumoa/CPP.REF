@@ -41,32 +41,20 @@ struct CORE_API Quaternion : public TNumericsBasicOperator<Quaternion, float, fl
 	bool Contains(size_t index) const;
 
 	vs_property_get(size_t, Count);
-	size_t Count_get() const;
 
 	std::pair<Vector3, float> ToAxisAngle() const;
 	Vector3 RotateVector(const Vector3& v) const;
 	Vector4 RotateVector(const Vector4& v) const;
 
 	vs_property_get(float, LengthSq);
-	float LengthSq_get() const;
 	vs_property_get(float, Length);
-	float Length_get() const;
 	vs_property_get(Quaternion, Normalized);
-	Quaternion Normalized_get() const;
 	vs_property(Quaternion, Direction);
-	Quaternion Direction_get() const;
-	void Direction_set(const Quaternion& value);
 	vs_property(Vector3, VectorPart);
-	Vector3 VectorPart_get() const;
-	void VectorPart_set(const Vector3& value);
 	vs_property_get(float, Angle);
-	float Angle_get() const;
 	vs_property_get(Vector3, Axis);
-	Vector3 Axis_get() const;
 	vs_property_get(Quaternion, Inverse);
-	Quaternion Inverse_get() const;
 	vs_property_get(Matrix4x4, Matrix);
-	Matrix4x4 Matrix_get() const;
 
 	const float& operator [](size_t index) const;
 	float& operator [](size_t index);

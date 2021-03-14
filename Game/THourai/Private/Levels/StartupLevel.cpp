@@ -3,14 +3,14 @@
 #include "Levels/StartupLevel.h"
 
 #include "Engine.h"
-#include "Pawn/MyCharacter.h"
+#include "GameInstance.h"
 #include "Framework/StaticMeshActor.h"
 #include "Framework/DirectionalLight.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Assets/AssetManager.h"
 
-StartupLevel::StartupLevel() : Super()
+GStartupLevel::GStartupLevel() : Super()
 	, light(nullptr)
 	
 	, plane(nullptr)
@@ -25,19 +25,21 @@ StartupLevel::StartupLevel() : Super()
 
 }
 
-StartupLevel::~StartupLevel()
+GStartupLevel::~GStartupLevel()
 {
 
 }
 
-void StartupLevel::LoadLevel()
+void GStartupLevel::LoadLevel()
 {
-	Engine* engine = Engine::GetInstance();
+	World* world = GetWorld();
+	GameInstance* gameInstance = world->GetGameInstance();
+	Engine* engine = gameInstance->GetEngine();
 	AssetManager* assetMgr = engine->GetAssetManager();
 
-	light = SpawnActorPersistent<ADirectionalLight>();
-	light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
-	light->LightComponent->LightColor = Color::White;
+	//light = SpawnActorPersistent<ADirectionalLight>();
+	//light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
+	//light->LightComponent->LightColor = Color::White;
 
 	plane = SpawnActorPersistent<AStaticMeshActor>();
 	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
@@ -62,7 +64,7 @@ void StartupLevel::LoadLevel()
 	spectator = SpawnActorPersistent<ASpectatorPawn>();
 }
 
-APawn* StartupLevel::GetPersistentActor() const
+APawn* GStartupLevel::GetPersistentActor() const
 {
 	return spectator;
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 template<TIsBaseOf<AActor> T>
-T* ActorComponent::GetOwner() const
+T* GActorComponent::GetOwner() const
 {
 	return Cast<T>(GetOwner());
 }

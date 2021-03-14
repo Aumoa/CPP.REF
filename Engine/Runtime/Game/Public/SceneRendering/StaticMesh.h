@@ -6,61 +6,52 @@
 #include "CoreMinimal.h"
 #include "Mesh.h"
 
-#include "MeshBatch.h"
-#include "RHI/RHIMeshDrawCommand.h"
-#include "RHI/RHIVertex.h"
+#include "Vertex.h"
+#include "DirectX/DirectXMinimal.h"
 #include "Materials/Material.h"
 
-interface IRHIResource;
-class StaticMeshBatch;
-struct RHIStaticMeshGeometryData;
+class DirectXDeviceBundle;
 
-class GAME_API StaticMeshBatch : public MeshBatch
+struct StaticMeshSubsetInfo
 {
-public:
-	using Super = MeshBatch;
-	using This = StaticMeshBatch;
+	uint32 VertexStart;
+	uint32 VertexCount;
+	uint32 IndexStart;
+	uint32 IndexCount;
+};
 
-private:
-	RHIMeshDrawCommand drawCommand;
+struct StaticMeshGeometryData
+{
+	std::vector<Vertex> VertexBuffer;
+	std::vector<uint32> IndexBuffer;
+	std::vector<StaticMeshSubsetInfo> Subsets;
+	std::vector<Material*> Materials;
 
-public:
-	StaticMeshBatch();
-	~StaticMeshBatch() override;
-
-	const RHIMeshDrawCommand* GetDrawCommand() const override;
-
-	void SetMeshDrawCommand(const RHIMeshDrawCommand& inDrawCommand);
+	void Clear(bool bShrinkToFit = false);
+	void AddSubset(std::span<Vertex const> inVertices, std::span<uint32 const> inIndices, Material* inMaterial);
 };
 
 class GAME_API StaticMesh : public Mesh
 {
 public:
 	using Super = Mesh;
-	using This = StaticMesh;
 
 private:
-	TRefPtr<IRHIResource> vertexBuffer;
-	TRefPtr<IRHIResource> indexBuffer;
-	TRefPtr<IRHIResource> accelerationStructure;
-	TRefPtr<StaticMeshBatch> meshBatch;
+	TComPtr<ID3D12Resource> vertexBuffer;
+	TComPtr<ID3D12Resource> indexBuffer;
+	TComPtr<ID3D12Resource> accelerationStructure;
 	AxisAlignedCube boundingBox;
 
 	TRefPtr<Material> material;
 
 public:
-	StaticMesh();
+	StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryData);
 	~StaticMesh();
-
-	MeshBatch* GetMeshBatch() const;
 	
 	vs_property_get_auto(MaterialInterface*, DefaultMaterial, material.Get());
 	vs_property_get_auto(AxisAlignedCube, BoundingBox, boundingBox);
-
-	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial);
-	static TRefPtr<StaticMesh> CreateStaticMesh(std::span<RHIVertex> vertices, std::span<uint32> indices, TRefPtr<Material> defaultMaterial, const AxisAlignedCube& inBoundingBox);
-	static TRefPtr<StaticMesh> CreateStaticMesh(const RHIStaticMeshGeometryData& inGeometryData, IRHIResource* inVertexBuffer, IRHIResource* inIndexBuffer, IRHIResource* inAccelerationStructure);
+	vs_property_get_auto(ID3D12Resource*, RaytracingAccelerationStructureBuffer, accelerationStructure.Get());
 
 private:
-	static AxisAlignedCube ComputeBoundingBox(std::span<const RHIVertex> vertices);
+	static AxisAlignedCube ComputeBoundingBox(std::span<Vertex const> vertices);
 };

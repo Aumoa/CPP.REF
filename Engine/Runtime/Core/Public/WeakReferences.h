@@ -25,7 +25,6 @@ public:
 	void ReleaseWeakInterlocked();
 
 	vs_property_get(bool, IsValid);
-	bool IsValid_get() const;
 
 private:
 	void Invalidate();

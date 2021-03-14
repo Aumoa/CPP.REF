@@ -6,15 +6,15 @@
 #include "CoreMinimal.h"
 #include "PawnMovementComponent.h"
 
-class GAME_API FloatingPawnMovementComponent : public PawnMovementComponent
+class GAME_API GFloatingPawnMovementComponent : public GPawnMovementComponent
 {
 public:
-	using Super = PawnMovementComponent;
-	using This = FloatingPawnMovementComponent;
+	using Super = GPawnMovementComponent;
+	using This = GFloatingPawnMovementComponent;
 
 public:
-	FloatingPawnMovementComponent();
-	~FloatingPawnMovementComponent() override;
+	GFloatingPawnMovementComponent();
+	~GFloatingPawnMovementComponent() override;
 
 	void TickComponent(Seconds deltaTime) override;
 

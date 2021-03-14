@@ -16,7 +16,5 @@ struct RHIStaticMeshGeometryData;
 
 interface GAME_API IRHIResourceBundle : virtual public Object, virtual public IRHIBundle
 {
-	virtual TRefPtr<StaticMesh> CreateStaticMesh(const RHIStaticMeshGeometryData& inGeometryData) = 0;
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage) = 0;
-	virtual TRefPtr<IRHIScene> CreateScene(APlayerController* inPlayerController) = 0;
 };

@@ -52,7 +52,7 @@ void ShaderCameraConstantVector::BeginUpdateConstant(const MinimalViewInfo& inVi
 
 void ShaderCameraConstantVector::AddPrimitive(const PrimitiveSceneProxy* inPrimitive)
 {
-	Matrix4x4 w = inPrimitive->GetPrimitiveTransform().Matrix;
+	Matrix4x4 w = inPrimitive->PrimitiveTransform.Matrix;
 	Matrix4x4 vp = currView.ViewProj;
 
 	ShaderObjectConstant& constant = constants.emplace_back();
@@ -68,7 +68,7 @@ void ShaderCameraConstantVector::EndUpdateConstant()
 	size_t newsz = AlignOf(CameraConst + actSize);
 	if (newsz > this->capacity)
 	{
-		constantBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(newsz);
+		//constantBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(newsz);
 		this->capacity = newsz;
 	}
 

@@ -26,7 +26,7 @@ D3D12DynamicBufferAllocator::D3D12DynamicBufferAllocator(size_t inCapacity, size
 	D3D12_HEAP_PROPERTIES heapProp{ };
 	heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
 
-	HR(Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&buffer)));
+	//HR(Cast<D3D12DeviceBundle>(GEngine.DeviceBundle)->Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&buffer)));
 
 	for (size_t i = 0; i < inCapacity; ++i)
 	{

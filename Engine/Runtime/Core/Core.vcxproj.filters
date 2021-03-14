@@ -28,6 +28,9 @@
     <Filter Include="Private\Collision">
       <UniqueIdentifier>{ed4590cf-de66-411b-a714-d79d0a42952d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\Time">
+      <UniqueIdentifier>{22573f52-a623-49b9-8c6a-d8dedd10b269}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -161,6 +164,12 @@
     </ClInclude>
     <ClInclude Include="Public\Collision\OverlapTest.h">
       <Filter>Public\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Time\StepTimer.h">
+      <Filter>Public\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\NotSupportedException.h">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +315,12 @@
     </ClCompile>
     <ClCompile Include="Private\Collision\OverlapTest.cpp">
       <Filter>Private\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Time\StepTimer.cpp">
+      <Filter>Private\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\NotSupportedException.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

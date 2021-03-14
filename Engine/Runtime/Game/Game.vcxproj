@@ -247,8 +247,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Private\Assets\MeshLoader.h" />
-    <ClInclude Include="Private\Bezier.h" />
+    <ClInclude Include="Private\COM\COMMinimal.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBuffer.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12CommandFence.h" />
@@ -271,7 +270,6 @@
     <ClInclude Include="Private\D3D12RHI\D3D12Resource.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ResourceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12SBTAllocator.h" />
-    <ClInclude Include="Private\D3D12RHI\D3D12Scene.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12Shader.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderBindingParameter.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h" />
@@ -280,7 +278,8 @@
     <ClInclude Include="Private\D3D12RHI\HResultException.h" />
     <ClInclude Include="Private\D3D12RHI\D3D12DeviceBundle.h" />
     <ClInclude Include="Private\D3D12RHI\ID3D12ResourceBase.h" />
-    <ClInclude Include="Private\DirectXGeometry.h" />
+    <ClInclude Include="Private\DirectX\Bezier.h" />
+    <ClInclude Include="Private\DirectX\DirectXCommon.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
@@ -293,6 +292,7 @@
     <ClInclude Include="Private\RHI\RHIMaterial.h" />
     <ClInclude Include="Private\RHI\RHIMaterialBundle.h" />
     <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h" />
+    <ClInclude Include="Private\Shaders\ShaderTypes.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanException.h" />
@@ -301,9 +301,8 @@
     <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanResource.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
-    <ClInclude Include="Public\AppDuplicationException.h" />
-    <ClInclude Include="Public\Application.h" />
     <ClInclude Include="Public\Assets\AssetManager.h" />
+    <ClInclude Include="Public\Assets\CachedShaderLibrary.h" />
     <ClInclude Include="Public\ComponentMobility.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\CameraComponent.h" />
@@ -320,8 +319,32 @@
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\COM\COMDeviceBundle.h" />
+    <ClInclude Include="Public\COM\COMException.h" />
+    <ClInclude Include="Public\COM\TComPtr.h" />
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
+    <ClInclude Include="Public\DirectX\DirectXAccelerationInstancingScene.h" />
+    <ClInclude Include="Public\DirectX\DirectXCommandQueue.h" />
+    <ClInclude Include="Public\DirectX\DirectXCompatibleRenderTarget.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeferredContext.h" />
+    <ClInclude Include="Public\DirectX\DirectXDepthStencilView.h" />
+    <ClInclude Include="Public\DirectX\DirectXDescriptorAllocator.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeviceBundle.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeviceContext.h" />
+    <ClInclude Include="Public\DirectX\DirectXDeviceResource.h" />
+    <ClInclude Include="Public\DirectX\DirectXAutoFence.h" />
+    <ClInclude Include="Public\DirectX\DirectXGeometry.h" />
+    <ClInclude Include="Public\DirectX\DirectXHDRTarget.h" />
+    <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
+    <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
+    <ClInclude Include="Public\DirectX\DirectXRaytracingShader.h" />
+    <ClInclude Include="Public\DirectX\DirectXRenderTarget.h" />
+    <ClInclude Include="Public\DirectX\DirectXRenderTargetView.h" />
+    <ClInclude Include="Public\DirectX\DirectXShaderBindingTable.h" />
+    <ClInclude Include="Public\DirectX\DirectXShaderResourceView.h" />
+    <ClInclude Include="Public\DirectX\DirectXSwapChain.h" />
+    <ClInclude Include="Public\DirectX\DirectXView.h" />
     <ClInclude Include="Public\Engine.h" />
     <ClInclude Include="Public\Framework\Actor.h" />
     <ClInclude Include="Public\Framework\Character.h" />
@@ -336,9 +359,11 @@
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameMinimal.h" />
+    <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameViewport.h" />
-    <ClInclude Include="Public\IEngineTick.h" />
-    <ClInclude Include="Public\Key.h" />
+    <ClInclude Include="Public\Input\TBitfieldInputChangeTracker.h" />
+    <ClInclude Include="Public\Input\Keyboard.h" />
+    <ClInclude Include="Public\Input\Mouse.h" />
     <ClInclude Include="Public\Level.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
@@ -348,7 +373,6 @@
     <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
-    <ClInclude Include="Public\PlatformMisc\PlatformInput.h" />
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\RHI\IRHICommandFence.h" />
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
@@ -386,36 +410,40 @@
     <ClInclude Include="Public\RHI\RHIVertex.h" />
     <ClInclude Include="Public\RHI\RHIViewport.h" />
     <ClInclude Include="Public\Rotator.h" />
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\DeferredRenderTarget.h" />
+    <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
-    <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MinimalViewInfo.h" />
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h" />
+    <ClInclude Include="Public\SceneRendering\RenderTarget.h" />
+    <ClInclude Include="Public\SceneRendering\Scene.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\SceneVisibility.h" />
     <ClInclude Include="Public\SceneRendering\StaticMesh.h" />
     <ClInclude Include="Public\SceneRendering\StaticMeshSceneProxy.h" />
+    <ClInclude Include="Public\SceneRendering\Vertex.h" />
     <ClInclude Include="Public\TickFunction.h" />
     <ClInclude Include="Public\Transform.h" />
     <ClInclude Include="Public\TSubclassOf.h" />
-    <ClInclude Include="Public\WindowsMinimal.h" />
-    <ClInclude Include="Public\WinException.h" />
+    <ClInclude Include="Public\Windows\Application.h" />
+    <ClInclude Include="Public\Windows\CoreWindow.h" />
+    <ClInclude Include="Public\Windows\HandleBase.h" />
+    <ClInclude Include="Public\Windows\WindowsMinimal.h" />
+    <ClInclude Include="Public\Windows\WinEvent.h" />
+    <ClInclude Include="Public\Windows\WinException.h" />
+    <ClInclude Include="Public\Windows\WinKeyboard.h" />
+    <ClInclude Include="Public\Windows\WinMouse.h" />
     <ClInclude Include="Public\World.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ThirdParty\glfw\BINARIES\x64\src\glfw.vcxproj">
-      <Project>{C96BC92D-B615-3105-965D-C87ECAA001A3}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{2d9c1fc7-8c2e-4f0e-938b-8f9967b975b1}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\AppDuplicationException.cpp" />
-    <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
-    <ClCompile Include="Private\Assets\MeshLoader.cpp" />
+    <ClCompile Include="Private\Assets\CachedShaderLibrary.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\DirectionalLightComponent.cpp" />
@@ -430,6 +458,8 @@
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\Components\SpringArmComponent.cpp" />
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Private\COM\COMDeviceBundle.cpp" />
+    <ClCompile Include="Private\COM\COMException.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.InitializeShaders.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBuffer.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.cpp" />
@@ -453,7 +483,6 @@
     <ClCompile Include="Private\D3D12RHI\D3D12Resource.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ResourceBundle.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SBTAllocator.cpp" />
-    <ClCompile Include="Private\D3D12RHI\D3D12Scene.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12Shader.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12ShaderResourceView.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12SwapChain.cpp" />
@@ -462,7 +491,26 @@
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.cpp" />
     <ClCompile Include="Private\DeferredGameViewport.cpp" />
     <ClCompile Include="Private\Diagnostics\ScopedCycleCounter.cpp" />
-    <ClCompile Include="Private\DirectXGeometry.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXAccelerationInstancingScene.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXAutoFence.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXCompatibleRenderTarget.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeferredContext.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDepthStencilView.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDescriptorAllocator.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXGeometry.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXRaytracingShader.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXRenderTarget.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXRenderTargetView.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXShaderBindingTable.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXShaderResourceView.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXSwapChain.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXView.cpp" />
     <ClCompile Include="Private\Engine.cpp" />
     <ClCompile Include="Private\Engine.LoadEngineDefaultAssets.cpp" />
     <ClCompile Include="Private\EngineCriticalException.cpp" />
@@ -477,7 +525,10 @@
     <ClCompile Include="Private\Framework\SpectatorPawn.cpp" />
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
+    <ClCompile Include="Private\GameObject.cpp" />
     <ClCompile Include="Private\GameViewport.cpp" />
+    <ClCompile Include="Private\Input\Keyboard.cpp" />
+    <ClCompile Include="Private\Input\Mouse.cpp" />
     <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
@@ -490,7 +541,6 @@
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformImage.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformImageLoader.cpp" />
-    <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp" />
     <ClCompile Include="Private\RHI\IRHIDeviceBundle.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIDispatchRaysDesc.cpp" />
@@ -504,12 +554,14 @@
     <ClCompile Include="Private\RHI\RHIVertex.cpp" />
     <ClCompile Include="Private\RHI\RHIViewport.cpp" />
     <ClCompile Include="Private\Rotator.cpp" />
-    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\DeferredRenderTarget.cpp" />
+    <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\LightSceneProxy.cpp" />
     <ClCompile Include="Private\SceneRendering\Mesh.cpp" />
-    <ClCompile Include="Private\SceneRendering\MeshBatch.cpp" />
     <ClCompile Include="Private\SceneRendering\MinimalViewInfo.cpp" />
     <ClCompile Include="Private\SceneRendering\PrimitiveSceneProxy.cpp" />
+    <ClCompile Include="Private\SceneRendering\RenderTarget.cpp" />
+    <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneVisibility.cpp" />
     <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp" />
@@ -517,6 +569,13 @@
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
     <ClCompile Include="Private\Transform.cpp" />
+    <ClCompile Include="Private\Windows\Application.cpp" />
+    <ClCompile Include="Private\Windows\CoreWindow.cpp" />
+    <ClCompile Include="Private\Windows\HandleBase.cpp" />
+    <ClCompile Include="Private\Windows\WinEvent.cpp" />
+    <ClCompile Include="Private\Windows\WinException.cpp" />
+    <ClCompile Include="Private\Windows\WinKeyboard.cpp" />
+    <ClCompile Include="Private\Windows\WinMouse.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\Shaders\GenericLighting.hlsli" />
     <None Include="Private\Shaders\PrimitivePacking.hlsli" />
@@ -529,18 +588,19 @@
     <None Include="Private\VulkanRHI\VulkanRenderTargetView.cpp" />
     <None Include="Private\VulkanRHI\VulkanResource.cpp" />
     <None Include="Private\VulkanRHI\VulkanSwapChain.cpp" />
-    <ClCompile Include="Private\WinException.cpp" />
     <None Include="Public\Components\ActorComponent.inl" />
     <None Include="Public\Components\SceneComponent.inl" />
+    <None Include="Public\COM\TComPtr.inl" />
+    <None Include="Public\DirectX\DirectXCommandQueue.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
+    <None Include="Public\Input\TBitfieldInputChangeTracker.inl" />
     <None Include="Public\Level.inl" />
     <None Include="Public\Materials\MaterialInterface.inl" />
     <None Include="Public\TSubclassOf.inl" />
     <None Include="Public\World.inl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Public\Application.inl" />
     <None Include="Public\Framework\Actor.inl" />
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
@@ -590,6 +650,20 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\RaytracingShader\RaytracingShader.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.4</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
+      </EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Library</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">6.4</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.4</ShaderModel>
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>

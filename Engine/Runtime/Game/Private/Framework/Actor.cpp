@@ -38,7 +38,6 @@ void AActor::ActorTickFunction::ExecuteTick(Seconds deltaTime)
 
 AActor::AActor() : Super()
 	, bActorTickEnabled(true)
-	, world(nullptr)
 	, bActorHasBegunPlay(false)
 	, rootComponent(nullptr)
 {
@@ -98,16 +97,6 @@ void AActor::EndPlay()
 void AActor::TickActor(Seconds deltaTime)
 {
 	Tick(deltaTime);
-}
-
-World* AActor::GetWorld() const
-{
-	return world;
-}
-
-void AActor::SetWorld(World* world)
-{
-	this->world = world;
 }
 
 #define NO_ROOT_WARNINGS(...) \
@@ -189,19 +178,19 @@ void AActor::SetActorRotation(const Quaternion& value)
 
 #undef NO_ROOT_WARNINGS
 
-SceneComponent* AActor::RootComponent_get() const
+GSceneComponent* AActor::RootComponent_get() const
 {
 	return rootComponent;
 }
 
-void AActor::RootComponent_set(SceneComponent* value)
+void AActor::RootComponent_set(GSceneComponent* value)
 {
 	rootComponent = value;
 }
 
-auto AActor::PrimaryActorTick_get() -> ActorTickFunction&
+auto AActor::PrimaryActorTick_get() const -> ActorTickFunction&
 {
-	return primaryActorTick;
+	return const_cast<ActorTickFunction&>(primaryActorTick);
 }
 
 bool AActor::ActorTickEnabled_get() const
@@ -224,9 +213,9 @@ void AActor::Tick(Seconds deltaTime)
 
 }
 
-bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)
+bool AActor::AddComponentInternal(TRefPtr<GActorComponent>&& assign_ptr, const size_t* hierarchy, size_t num)
 {
-	ActorComponent* ptr = assign_ptr.Get();
+	GActorComponent* ptr = assign_ptr.Get();
 	if (ptr == nullptr)
 	{
 		return false;
@@ -238,7 +227,7 @@ bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const si
 		auto it = this->hierarchy.find(hierarchy[i]);
 		if (it == this->hierarchy.end())
 		{
-			it = this->hierarchy.emplace(hierarchy[i], list<ActorComponent*>()).first;
+			it = this->hierarchy.emplace(hierarchy[i], list<GActorComponent*>()).first;
 		}
 		it->second.push_back(ptr);
 	}
@@ -246,6 +235,7 @@ bool AActor::AddComponentInternal(TRefPtr<ActorComponent>&& assign_ptr, const si
 	if (HasBegunPlay)
 	{
 		assign_ptr->owner = this;
+		assign_ptr->SetWorld(GetWorld());
 		assign_ptr->BeginPlay();
 	}
 	ComponentAdded.Invoke(assign_ptr.Get());
@@ -271,11 +261,12 @@ bool AActor::RemoveComponentInternal(size_t hash_code)
 		auto erase_it = find(item.second.begin(), item.second.end(), front);
 		if (erase_it != item.second.end())
 		{
-			ActorComponent* component = (*erase_it);
+			GActorComponent* component = (*erase_it);
 			if (component->HasBegunPlay)
 			{
 				component->EndPlay();
 				component->owner = nullptr;
+				component->SetWorld(nullptr);
 			}
 			ComponentRemoved.Invoke(component);
 

@@ -32,7 +32,6 @@ public:
 
 	vs_property_get_auto(size_t, Count, 4);
 	vs_property_get(Plane, Normalized);
-	Plane Normalized_get() const;
 
 	const float& operator [](size_t index) const;
 	float& operator [](size_t index);

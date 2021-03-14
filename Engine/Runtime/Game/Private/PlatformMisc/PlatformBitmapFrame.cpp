@@ -5,7 +5,7 @@
 
 using namespace std;
 
-PlatformBitmapFrame::PlatformBitmapFrame(ComPtr<IWICBitmapFrameDecode> frame) : Super(frame.Get())
+PlatformBitmapFrame::PlatformBitmapFrame(TComPtr<IWICBitmapFrameDecode> frame) : Super(frame.Get())
 	, frame(move(frame))
 {
 
@@ -31,10 +31,10 @@ TRefPtr<PlatformImage> PlatformBitmapFrame::FormatConvert(ERHITextureFormat inDe
 		using Super = PlatformImage;
 
 	private:
-		ComPtr<IWICFormatConverter> converter;
+		TComPtr<IWICFormatConverter> converter;
 
 	public:
-		PlatformBitmapConverter(ComPtr<IWICFormatConverter> converter) : Super(converter.Get())
+		PlatformBitmapConverter(TComPtr<IWICFormatConverter> converter) : Super(converter.Get())
 			, converter(move(converter))
 		{
 
@@ -46,7 +46,7 @@ TRefPtr<PlatformImage> PlatformBitmapFrame::FormatConvert(ERHITextureFormat inDe
 		}
 	};
 
-	ComPtr<IWICFormatConverter> converter;
+	TComPtr<IWICFormatConverter> converter;
 	if (FAILED(imagingFactory->CreateFormatConverter(&converter)))
 	{
 		SE_LOG(LogPlatform, Fatal, L"Cannot create format converter. Factory was corrupted.");

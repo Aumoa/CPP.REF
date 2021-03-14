@@ -2,7 +2,7 @@
 
 #pragma once
 
-template<class T, class... TArgs> requires TIsAssignable<T*, ActorComponent*> && THasConstructor<T, TArgs...>
+template<class T, class... TArgs> requires TIsAssignable<T*, GActorComponent*> && THasConstructor<T, TArgs...>
 inline T* AActor::AddComponent(TArgs&&... args)
 {
 	using namespace std;
@@ -24,13 +24,13 @@ inline T* AActor::AddComponent(TArgs&&... args)
 	}
 }
 
-template<class T> requires TIsAssignable<T*, ActorComponent*>
+template<class T> requires TIsAssignable<T*, GActorComponent*>
 inline bool AActor::RemoveComponent()
 {
 	return RemoveComponentInternal(TUniqueType<T>::HashCode);
 }
 
-template<class T> requires TIsAssignable<T*, ActorComponent*>
+template<class T> requires TIsAssignable<T*, GActorComponent*>
 inline T* AActor::GetComponent() const
 {
 	constexpr size_t HashCode = TUniqueType<T>::HashCode;
@@ -44,7 +44,7 @@ inline T* AActor::GetComponent() const
 	return Cast<T>(it->second.front());
 }
 
-template<class T> requires TIsAssignable<T*, ActorComponent*>
+template<class T> requires TIsAssignable<T*, GActorComponent*>
 inline std::list<T*> AActor::GetComponents() const
 {
 	constexpr size_t HashCode = TUniqueType<T>::HashCode;

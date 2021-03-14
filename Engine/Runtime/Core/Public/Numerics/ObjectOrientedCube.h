@@ -33,10 +33,7 @@ struct CORE_API ObjectOrientedCube : public TNumericsBasicOperator<ObjectOriente
 	std::vector<Vector3> CalcVertices() const;
 
 	vs_property_get(Vector3, AxisX);
-	Vector3 AxisX_get() const;
 	vs_property_get(Vector3, AxisY);
-	Vector3 AxisY_get() const;
 	vs_property_get(Vector3, AxisZ);
-	Vector3 AxisZ_get() const;
 };
 #pragma pack(pop)

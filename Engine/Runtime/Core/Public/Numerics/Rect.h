@@ -26,11 +26,7 @@ struct CORE_API Rect : public TNumericsBasicOperator<Rect, Vector2, Vector2>
 	TRefPtr<String> ToString() const;
 
 	vs_property_get(Vector2, Center);
-	Vector2 Center_get() const;
 	vs_property_get(float, Width);
-	float Width_get() const;
 	vs_property_get(float, Height);
-	float Height_get() const;
 	vs_property_get(float, Size);
-	float Size_get() const;
 };

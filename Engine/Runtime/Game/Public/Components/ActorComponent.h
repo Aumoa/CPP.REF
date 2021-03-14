@@ -4,12 +4,13 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
+#include "GameObject.h"
 
 #include "TickFunction.h"
 
 class AActor;
 
-class GAME_API ActorComponent : virtual public Object, virtual public ITickFunctionObject
+class GAME_API GActorComponent : public GGameObject, virtual public ITickFunctionObject
 {
 	friend class AActor;
 
@@ -18,7 +19,7 @@ class GAME_API ActorComponent : virtual public Object, virtual public ITickFunct
 		using Super = TickFunction;
 		using This = ComponentTickFunction;
 
-		ActorComponent* Target;
+		GActorComponent* Target;
 
 		ComponentTickFunction();
 		~ComponentTickFunction();
@@ -28,7 +29,7 @@ class GAME_API ActorComponent : virtual public Object, virtual public ITickFunct
 
 public:
 	using Super = Object;
-	using This = ActorComponent;
+	using This = GActorComponent;
 
 private:
 	ComponentTickFunction primaryComponentTick;
@@ -37,8 +38,8 @@ private:
 	AActor* owner;
 
 public:
-	ActorComponent();
-	~ActorComponent() override;
+	GActorComponent();
+	~GActorComponent() override;
 
 	virtual TickFunction* GetTickFunction() override;
 	virtual void AddPrerequisiteObject(ITickFunctionObject* inObject) override;
@@ -53,12 +54,8 @@ public:
 	T* GetOwner() const;
 
 	vs_property_get(ComponentTickFunction&, PrimaryComponentTick);
-	ComponentTickFunction& PrimaryComponentTick_get();
 	vs_property(bool, ComponentTickEnabled);
-	bool ComponentTickEnabled_get() const;
-	void ComponentTickEnabled_set(bool value);
 	vs_property_get(bool, HasBegunPlay);
-	bool HasBegunPlay_get() const;
 };
 
 #include "ActorComponent.inl"

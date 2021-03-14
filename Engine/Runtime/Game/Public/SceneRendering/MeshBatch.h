@@ -4,18 +4,3 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
-
-struct RHIMeshDrawCommand;
-
-class GAME_API MeshBatch : virtual public Object
-{
-public:
-	using Super = Object;
-	using This = MeshBatch;
-
-public:
-	MeshBatch();
-	~MeshBatch();
-
-	virtual const RHIMeshDrawCommand* GetDrawCommand() const = 0;
-};

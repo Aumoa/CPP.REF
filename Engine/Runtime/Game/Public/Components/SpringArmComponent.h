@@ -6,30 +6,28 @@
 #include "CoreMinimal.h"
 #include "SceneComponent.h"
 
-class GAME_API SpringArmComponent : public SceneComponent
+class GAME_API GSpringArmComponent : public GSceneComponent
 {
 public:
-	using Super = SceneComponent;
-	using This = SpringArmComponent;
+	using Super = GSceneComponent;
+	using This = GSpringArmComponent;
 
 public:
-	static TRefPtr<const String> SocketName;
+	static const TRefPtr<String> SocketName;
 
 	Vector3 socketRelativeLocation;
 
 	float springArmLength;
 
 public:
-	SpringArmComponent();
-	~SpringArmComponent() override;
+	GSpringArmComponent();
+	~GSpringArmComponent() override;
 
 	void TickComponent(Seconds deltaTime) override;
 
 	Transform GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const override;
 
 	vs_property(float, SpringArmLength);
-	float SpringArmLength_get() const;
-	void SpringArmLength_set(float value);
 	Vector3 TargetOffset;
 	Vector3 SocketOffset;
 

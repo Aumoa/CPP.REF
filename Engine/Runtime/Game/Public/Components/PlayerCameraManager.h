@@ -9,22 +9,22 @@
 #include "Transform.h"
 
 struct MinimalViewInfo;
-class CameraComponent;
+class GCameraComponent;
 
-class GAME_API PlayerCameraManager : public ActorComponent
+class GAME_API GPlayerCameraManager : public GActorComponent
 {
 public:
-	using Super = ActorComponent;
-	using This = PlayerCameraManager;
+	using Super = GActorComponent;
+	using This = GPlayerCameraManager;
 
 private:
 	mutable bool bPrintNoCameraWarning : 1;
-	CameraComponent* pawnCamera;
+	GCameraComponent* pawnCamera;
 	Transform lastUpdatedTransform;
 
 public:
-	PlayerCameraManager();
-	~PlayerCameraManager() override;
+	GPlayerCameraManager();
+	~GPlayerCameraManager() override;
 
 	void CalcCameraView(MinimalViewInfo& outViewInfo) const;
 	void UpdateCameraComponent();

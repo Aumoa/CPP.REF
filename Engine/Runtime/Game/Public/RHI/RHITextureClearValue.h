@@ -25,9 +25,6 @@ struct GAME_API RHITextureClearValue
 	RHITextureClearValue(ERHITextureFormat inFormat);
 
 	vs_property_get(bool, IsValid);
-	bool IsValid_get() const;
 	vs_property_get(bool, IsColor);
-	bool IsColor_get() const;
 	vs_property_get(bool, IsDepthStencil);
-	bool IsDepthStencil_get() const;
 };

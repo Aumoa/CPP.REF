@@ -3,14 +3,20 @@
 #include "SceneRendering/PrimitiveSceneProxy.h"
 
 #include "Components/PrimitiveComponent.h"
+#include "DirectX/DirectXCommon.h"
+#include "Logging/LogMacros.h"
 
-PrimitiveSceneProxy::PrimitiveSceneProxy(PrimitiveComponent* inPrimitiveComponent) : Super()
+PrimitiveSceneProxy::PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent) : Super()
 	, myPrimitiveComponent(inPrimitiveComponent)
+
 	, Mobility(inPrimitiveComponent->Mobility)
+	, PrimitiveId(0)
+	, PrimitiveBoundingBox{ }
+	, PrimitiveAccelerationPtr(0)
 {
 	if (Mobility == EComponentMobility::Static)
 	{
-		transform = inPrimitiveComponent->ComponentTransform;
+		PrimitiveTransform = inPrimitiveComponent->ComponentTransform;
 	}
 }
 
@@ -26,20 +32,10 @@ void PrimitiveSceneProxy::Update()
 
 void PrimitiveSceneProxy::UpdateTransform()
 {
-	transform = myPrimitiveComponent->ComponentTransform;
-}
+	if (Mobility == EComponentMobility::Static)
+	{
+		SE_LOG(LogRendering, Error, L"Primitive mobility is static only. Update transform is not defined.");
+	}
 
-MeshBatch* PrimitiveSceneProxy::GetMeshBatch() const
-{
-	return nullptr;
-}
-
-Transform PrimitiveSceneProxy::GetPrimitiveTransform() const
-{
-	return transform;
-}
-
-const AxisAlignedCube* PrimitiveSceneProxy::GetPrimitiveBoundingBox() const
-{
-	return nullptr;
+	PrimitiveTransform = myPrimitiveComponent->ComponentTransform;
 }

@@ -14,26 +14,56 @@
 
 #ifdef _MSC_VER
 #define vs_property_get( Type, Name )\
-__declspec( property( get = Name##_get ) ) Type Name
+__declspec( property( get = Name##_get ) ) Type Name;\
+[[nodiscard]] Type Name##_get() const;
 
 #define vs_property_set( Type, Name )\
-__declspec( property( put = Name##_set ) ) Type Name
+__declspec( property( put = Name##_set ) ) Type Name;\
+void Name##_set(Type value);
 
 #define vs_property( Type, Name )\
-__declspec( property( get = Name##_get, put = Name##_set ) ) Type Name
+__declspec( property( get = Name##_get, put = Name##_set ) ) Type Name;\
+[[nodiscard]] Type Name##_get() const;\
+void Name##_set(Type value);
+
+#define vs_property_get_virtual( Type, Name )\
+__declspec( property( get = Name##_get ) ) Type Name;\
+[[nodiscard]] virtual Type Name##_get() const;
+
+#define vs_property_set_virtual( Type, Name )\
+__declspec( property( put = Name##_set ) ) Type Name;\
+virtual void Name##_set(Type value);
+
+#define vs_property_virtual( Type, Name )\
+__declspec( property( get = Name##_get, put = Name##_set ) ) Type Name;\
+[[nodiscard]] virtual Type Name##_get() const;\
+virtual void Name##_set(Type value);
+
+#define vs_property_get_pure( Type, Name )\
+__declspec( property( get = Name##_get ) ) Type Name;\
+[[nodiscard]] virtual Type Name##_get() const = 0;
+
+#define vs_property_set_pure( Type, Name )\
+__declspec( property( put = Name##_set ) ) Type Name;\
+virtual void Name##_set(Type value) = 0;
+
+#define vs_property_pure( Type, Name )\
+__declspec( property( get = Name##_get, put = Name##_set ) ) Type Name;\
+[[nodiscard]] virtual Type Name##_get() const = 0;\
+virtual void Name##_set(Type value) = 0;
 
 #define vs_property_get_auto(Type, Name, Internal)\
-vs_property_get(Type, Name);\
-inline Type Name ## _get() const { return Internal; }
+__declspec( property( get = Name##_get ) ) Type Name;\
+[[nodiscard]] inline Type Name ## _get() const { return Internal; }
 
 #define vs_property_set_auto(Type, Name, Internal)\
-vs_property_set(Type, Name);\
-inline void Name ## _set(const Type& value) { Internal = value; }
+__declspec( property( put = Name##_set ) ) Type Name;\
+inline void Name ## _set(Type value) { Internal = value; }
 
 #define vs_property_auto(Type, Name, Internal)\
-vs_property(Type, Name);\
-inline Type Name ## _get() const { return Internal; }\
-inline void Name ## _set(const Type& value) { Internal = value; }
+__declspec( property( get = Name##_get, put = Name##_set ) ) Type Name;\
+[[nodiscard]] inline Type Name ## _get() const { return Internal; }\
+inline void Name ## _set(Type value) { Internal = value; }
 #else
 #error "Cannot compile without MSVC."
 #endif

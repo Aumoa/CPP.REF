@@ -6,40 +6,25 @@
 #include "CoreMinimal.h"
 #include "ActorComponent.h"
 
-#include "PlatformMisc/PlatformInput.h"
-#include "Key.h"
+class KeyStateTracker;
+class MouseStateTracker;
 
-class GAME_API InputComponent : public ActorComponent
+class GAME_API GInputComponent : public GActorComponent
 {
 public:
-	using Super = ActorComponent;
-	using This = InputComponent;
-
-	using KeyActionBindDelegate = TMulticastDelegate<void(EKey, EKeyEvent)>;
-	using CursorMoveBindDelegate = TMulticastDelegate<void(const CursorState&, const CursorCompare&)>;
+	using Super = GActorComponent;
+	using This = GInputComponent;
 
 private:
-	KeyboardState keys;
-	KeyboardCompare keyCompare;
-	CursorState cursor;
-	CursorCompare cursorCompare;
-
-	std::map<EKey, KeyActionBindDelegate> keyBinds[2];
-	CursorMoveBindDelegate cursorBind;
-	InputComponent* overrideComponent;
+	TRefPtr<KeyStateTracker> keyTracker;
+	TRefPtr<MouseStateTracker> mouseTracker;
 
 public:
-	InputComponent();
-	~InputComponent() override;
+	GInputComponent();
+	~GInputComponent() override;
 
 	void TickComponent(Seconds deltaTime) override;
 
-	void SetOverrideComponent(InputComponent* inDerived);
-
-	KeyActionBindDelegate& GetKeyActionBinder(EKey inKey, EKeyEvent inEventType);
-	CursorMoveBindDelegate& GetCursorMoveBinder();
-
-private:
-	void UpdateKeyboardState();
-	void UpdateCursorState();
+	vs_property_get_auto(KeyStateTracker*, KeyTracker, keyTracker.Get());
+	vs_property_get_auto(MouseStateTracker*, MouseTracker, mouseTracker.Get());
 };

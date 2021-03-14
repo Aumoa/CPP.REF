@@ -25,5 +25,4 @@ public:
 	~D3D12RenderTargetView() override;
 
 	vs_property_get(D3D12_CPU_DESCRIPTOR_HANDLE, Handle);
-	D3D12_CPU_DESCRIPTOR_HANDLE Handle_get() const;
 };

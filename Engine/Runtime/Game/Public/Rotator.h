@@ -31,11 +31,8 @@ struct GAME_API Rotator
 	Rotator Clamp() const;
 
 	vs_property_get(Rotator, Inverse);
-	Rotator Inverse_get() const;
 	vs_property_get(Quaternion, Rotation);
-	Quaternion Rotation_get() const;
 	vs_property_get(Matrix4x4, Matrix);
-	Matrix4x4 Matrix_get() const;
 
 	Rotator operator -() const;
 	Rotator operator +(const Rotator& right) const;

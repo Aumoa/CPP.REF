@@ -2,13 +2,17 @@
 
 #include "GameViewport.h"
 
+#include "DirectX/DirectXCommon.h"
+#include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXCompatibleRenderTarget.h"
+
 using namespace std;
 
-GameViewport::GameViewport() : Super()
+GameViewport::GameViewport(DirectXDeviceBundle* deviceBundle) : Super()
 	, resX(0)
 	, resY(0)
 {
-
+	DirectXNew(compatibleTarget, DirectXCompatibleRenderTarget, deviceBundle);
 }
 
 GameViewport::~GameViewport()
@@ -16,23 +20,24 @@ GameViewport::~GameViewport()
 
 }
 
-int32 GameViewport::ResolutionX_get() const
+DirectXCompatibleRenderTarget* GameViewport::GetCompatibleRenderTarget() const
 {
-	return resX;
+	return compatibleTarget.Get();
 }
 
-int32 GameViewport::ResolutionY_get() const
+void GameViewport::SetResolution(int32 x, int32 y)
 {
-	return resY;
+	resX = x;
+	resY = y;
+
+	if (x != 0 && y != 0)
+	{
+		compatibleTarget->ResizeBuffers(x, y);
+		SetViewportResolution_Internal(x, y);
+	}
 }
 
 void GameViewport::SetViewportResolution_Internal(int32 x, int32 y)
 {
-	if (x == 0 || y == 0)
-	{
-		return;
-	}
 
-	resX = x;
-	resY = y;
 }

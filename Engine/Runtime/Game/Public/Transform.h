@@ -26,9 +26,7 @@ struct GAME_API Transform
 	Transform GetRelativeTransform(const Transform& rh) const;
 
 	vs_property_get(Transform, Inverse);
-	Transform Inverse_get() const;
 	vs_property_get(Matrix4x4, Matrix);
-	Matrix4x4 Matrix_get() const;
 
 	bool operator ==(const Transform& rh) const;
 	bool operator !=(const Transform& rh) const;

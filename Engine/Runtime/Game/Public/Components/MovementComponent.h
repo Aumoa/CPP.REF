@@ -6,34 +6,28 @@
 #include "CoreMinimal.h"
 #include "ActorComponent.h"
 
-class SceneComponent;
+class GSceneComponent;
 
-class GAME_API MovementComponent : public ActorComponent
+class GAME_API GMovementComponent : public GActorComponent
 {
 public:
-	using Super = ActorComponent;
-	using This = MovementComponent;
+	using Super = GActorComponent;
+	using This = GMovementComponent;
 
 private:
 	bool bAutoRegisterUpdatedComponent : 1;
-	SceneComponent* updatedComponent;
+	GSceneComponent* updatedComponent;
 
 public:
-	MovementComponent();
-	~MovementComponent() override;
+	GMovementComponent();
+	~GMovementComponent() override;
 
 	void TickComponent(Seconds deltaTime) override;
 	
 	bool IsExceedingMaxSpeed(float inMaxSpeed) const;
 
-	vs_property(SceneComponent*, UpdatedComponent);
-	SceneComponent* UpdatedComponent_get() const;
-	void UpdatedComponent_set(SceneComponent* value);
+	vs_property(GSceneComponent*, UpdatedComponent);
 	vs_property(bool, AutoRegisterUpdatedComponent);
-	bool AutoRegisterUpdatedComponent_get() const;
 
 	Vector3 Velocity;
-
-protected:
-	void AutoRegisterUpdatedComponent_set(bool value);
 };

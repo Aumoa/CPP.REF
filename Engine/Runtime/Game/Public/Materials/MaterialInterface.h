@@ -44,32 +44,15 @@ public:
 	bool HasDirtyMark(EMaterialDirtyMask inCompareMask) const;
 
 	vs_property(float, Ambient);
-	float Ambient_get() const;
-	void Ambient_set(float value);
-
 	vs_property(float, Diffuse);
-	float Diffuse_get() const;
-	void Diffuse_set(float value);
-
 	vs_property(float, Specular);
-	float Specular_get() const;
-	void Specular_set(float value);
-
 	vs_property(float, SpecExp);
-	float SpecExp_get() const;
-	void SpecExp_set(float value);
 
 	vs_property(IRHIResource*, DiffuseMap);
-	IRHIResource* DiffuseMap_get() const;
-	void DiffuseMap_set(IRHIResource* value);
-
 	vs_property(IRHIResource*, NormalMap);
-	IRHIResource* NormalMap_get() const;
-	void NormalMap_set(IRHIResource* value);
 
 	vs_property_get_auto(uint16, Index, index);
-	vs_property_get(IRHIShaderResourceView*, SurfaceTextureSRV);
-	virtual IRHIShaderResourceView* SurfaceTextureSRV_get() const;
+	vs_property_get_virtual(IRHIShaderResourceView*, SurfaceTextureSRV);
 };
 
 #include "MaterialInterface.inl"

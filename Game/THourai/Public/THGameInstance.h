@@ -6,7 +6,7 @@
 #include "GameMinimal.h"
 #include "GameInstance.h"
 
-class StartupLevel;
+class GStartupLevel;
 class TickScheduler;
 
 class TH_API THGameInstance : public GameInstance
@@ -22,7 +22,5 @@ public:
 	THGameInstance();
 	~THGameInstance();
 
-	TRefPtr<String> ToString() const;
-
-	void Tick(Seconds deltaTime) override;
+	void Tick() override;
 };

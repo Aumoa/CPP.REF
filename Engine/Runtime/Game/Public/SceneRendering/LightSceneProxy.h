@@ -10,7 +10,7 @@
 
 interface IRHIResource;
 
-class LightComponent;
+class GLightComponent;
 struct RHILight;
 
 class GAME_API LightBatch : virtual public Object
@@ -37,11 +37,11 @@ public:
 
 private:
 	TRefPtr<LightBatch> batch;
-	LightComponent* myLightComponent;
+	GLightComponent* myLightComponent;
 	Transform transform;
 
 public:
-	LightSceneProxy(LightComponent* inLightComponent);
+	LightSceneProxy(GLightComponent* inLightComponent);
 	~LightSceneProxy() override;
 
 	void UpdateMovable();

@@ -9,6 +9,5 @@
 
 interface ID3D12ResourceBase : virtual public Object
 {
-	vs_property_get(ID3D12Resource*, Resource);
-	virtual ID3D12Resource* Resource_get() const = 0;
+	vs_property_get_pure(ID3D12Resource*, Resource);
 };

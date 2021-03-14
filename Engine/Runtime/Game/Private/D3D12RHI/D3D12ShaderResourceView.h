@@ -21,8 +21,7 @@ public:
 	D3D12ShaderResourceView();
 	~D3D12ShaderResourceView() override;
 
-	vs_property_get(D3D12_CPU_DESCRIPTOR_HANDLE, HandleBase);
-	virtual D3D12_CPU_DESCRIPTOR_HANDLE HandleBase_get() const = 0;
+	vs_property_get_pure(D3D12_CPU_DESCRIPTOR_HANDLE, HandleBase);
 };
 
 class D3D12SingleShaderResourceViewNode : public D3D12ShaderResourceView

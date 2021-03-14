@@ -4,9 +4,9 @@
 
 #include "Logging/LogMacros.h"
 
-TRefPtr<const String> SpringArmComponent::SocketName = L"SpringArmSocket";
+const TRefPtr<String> GSpringArmComponent::SocketName = L"SpringArmSocket";
 
-SpringArmComponent::SpringArmComponent() : Super()
+GSpringArmComponent::GSpringArmComponent() : Super()
 	, socketRelativeLocation(Vector3::Zero)
 	, springArmLength(1.0f)
 	, TargetOffset(Vector3::Zero)
@@ -15,18 +15,18 @@ SpringArmComponent::SpringArmComponent() : Super()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-SpringArmComponent::~SpringArmComponent()
+GSpringArmComponent::~GSpringArmComponent()
 {
 
 }
 
-void SpringArmComponent::TickComponent(Seconds deltaTime)
+void GSpringArmComponent::TickComponent(Seconds deltaTime)
 {
 	Super::TickComponent(deltaTime);
 	UpdateSpringArmTransform(deltaTime);
 }
 
-Transform SpringArmComponent::GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space) const
+Transform GSpringArmComponent::GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space) const
 {
 	if (socketName != SocketName)
 	{
@@ -45,12 +45,12 @@ Transform SpringArmComponent::GetSocketTransform(TRefPtr<String> socketName, ECo
 	return relativeTransform;
 }
 
-float SpringArmComponent::SpringArmLength_get() const
+float GSpringArmComponent::SpringArmLength_get() const
 {
 	return springArmLength;
 }
 
-void SpringArmComponent::SpringArmLength_set(float value)
+void GSpringArmComponent::SpringArmLength_set(float value)
 {
 	if (value < 0)
 	{
@@ -61,7 +61,7 @@ void SpringArmComponent::SpringArmLength_set(float value)
 	springArmLength = value;
 }
 
-void SpringArmComponent::UpdateSpringArmTransform(Seconds deltaTime)
+void GSpringArmComponent::UpdateSpringArmTransform(Seconds deltaTime)
 {
 	socketRelativeLocation = Vector3(-springArmLength, 0, 0);
 	socketRelativeLocation += TargetOffset;

@@ -2,12 +2,12 @@
 
 #include "Components/MeshComponent.h"
 
-MeshComponent::MeshComponent()
+GMeshComponent::GMeshComponent()
 {
 
 }
 
-MeshComponent::~MeshComponent()
+GMeshComponent::~GMeshComponent()
 {
 
 }

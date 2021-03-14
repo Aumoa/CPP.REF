@@ -4,17 +4,17 @@
 
 #include "SceneRendering/PrimitiveSceneProxy.h"
 
-PrimitiveComponent::PrimitiveComponent() : Super()
+GPrimitiveComponent::GPrimitiveComponent() : Super()
 {
 
 }
 
-PrimitiveComponent::~PrimitiveComponent()
+GPrimitiveComponent::~GPrimitiveComponent()
 {
 
 }
 
-void PrimitiveComponent::ResolveDirtyState()
+void GPrimitiveComponent::ResolveDirtyState()
 {
 	bool bRecreated = false;
 	if (HasDirtyMark(EComponentDirtyMask::RecreateProxy))
@@ -25,12 +25,12 @@ void PrimitiveComponent::ResolveDirtyState()
 
 	if (sceneProxy.IsValid)
 	{
-		if (bRecreated || HasDirtyMark(EComponentDirtyMask::UpdateProxy))
+		if (!bRecreated && HasDirtyMark(EComponentDirtyMask::UpdateProxy))
 		{
 			sceneProxy->Update();
 		}
 
-		if (bRecreated || HasDirtyMark(EComponentDirtyMask::TransformUpdated))
+		if (!bRecreated && HasDirtyMark(EComponentDirtyMask::TransformUpdated))
 		{
 			sceneProxy->UpdateTransform();
 		}
@@ -39,12 +39,12 @@ void PrimitiveComponent::ResolveDirtyState()
 	Super::ResolveDirtyState();
 }
 
-TRefPtr<PrimitiveSceneProxy> PrimitiveComponent::CreateSceneProxy()
+TRefPtr<PrimitiveSceneProxy> GPrimitiveComponent::CreateSceneProxy()
 {
 	return nullptr;
 }
 
-PrimitiveSceneProxy* PrimitiveComponent::GetSceneProxy() const
+PrimitiveSceneProxy* GPrimitiveComponent::GetSceneProxy() const
 {
 	return sceneProxy.Get();
 }

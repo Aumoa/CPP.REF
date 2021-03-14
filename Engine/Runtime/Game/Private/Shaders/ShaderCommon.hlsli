@@ -3,6 +3,8 @@
 #ifndef __SHADERCOMMON_HLSLI__
 #define __SHADERCOMMON_HLSLI__
 
+#include "ShaderTypes.h"
+
 struct Vertex
 {
 	float3 Pos : POSITION;
@@ -27,13 +29,6 @@ struct ShaderObjectConstant
 {
 	row_major matrix World;
 	row_major matrix WVP;
-};
-
-struct ShaderCameraConstant
-{
-	row_major matrix ViewProj;
-	row_major matrix ViewProjInv;
-	float3 Pos;
 };
 
 struct QuadFrag

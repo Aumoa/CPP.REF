@@ -132,7 +132,7 @@ Vector4 Vector4::Direction_get() const
 	return Normalized;
 }
 
-void Vector4::Direction_set(const Vector4& value)
+void Vector4::Direction_set(Vector4 value)
 {
 	(*this) = value * Length;
 }

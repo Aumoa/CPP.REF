@@ -4,77 +4,55 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
-#include "IEngineTick.h"
 
-#include <chrono>
-#include "Logging/LogCategoryBase.h"
-
-interface IRHIBundle;
-interface IRHICommandFence;
-interface IRHIDeviceBundle;
-interface IRHIImmediateCommandList;
-interface IRHISwapChain;
-interface IRHIMaterialBundle;
-interface IRHICommandList;
-interface IRHIResourceBundle;
-
-class SceneRenderer;
 class GameInstance;
+class DirectXDeviceBundle;
+class DirectXCommandQueue;
+class DirectXSwapChain;
+class DirectXImmediateContext;
+class DirectXAutoFence;
 class AssetManager;
+class StepTimer;
 class GameViewport;
+class CachedShaderLibrary;
 
-class GAME_API Engine : virtual public Object, virtual public IEngineTick
+class GAME_API Engine : virtual public Object
 {
 public:
 	using Super = Object;
 	using This = Engine;
 
 private:
-	static Engine* gEngine;
-
-	LogCategoryBase LogEngine;
 	GameInstance* gameInstance;
-	std::chrono::steady_clock::time_point prev_tick;
-
-	std::vector<TRefPtr<IRHIBundle>> rhiBundles;
-	TRefPtr<IRHICommandFence> autoFence;
-
-	IRHIDeviceBundle* deviceBundle;
-	IRHIMaterialBundle* materialBundle;
-	IRHIResourceBundle* resourceBundle;
-
-	IRHIImmediateCommandList* immediateCommandList;
-	IRHISwapChain* swapChain;
-
+	TRefPtr<DirectXDeviceBundle> deviceBundle;
+	TRefPtr<DirectXCommandQueue> primaryQueue;
 	TRefPtr<AssetManager> assetManager;
+
+	TRefPtr<DirectXSwapChain> swapChain;
+	TRefPtr<DirectXImmediateContext> immediateContext;
+	TRefPtr<DirectXAutoFence> immediateFence;
 	TRefPtr<GameViewport> gameViewport;
+	TRefPtr<CachedShaderLibrary> shaderLibrary;
+
+	TRefPtr<StepTimer> tickTimer;
 
 public:
 	Engine();
 	~Engine() override;
 
-	virtual void Initialize();
-	virtual void PostInitialize();
-	virtual void Tick();
+	virtual void Initialize(GameInstance* gameInstance);
 	virtual void Shutdown();
+	virtual void Tick();
 
-	vs_property_get_auto(IRHIDeviceBundle*, DeviceBundle, deviceBundle);
-	vs_property_get_auto(IRHIMaterialBundle*, MaterialBundle, materialBundle);
-	vs_property_get_auto(IRHIResourceBundle*, ResourceBundle, resourceBundle);
+	DirectXDeviceBundle* GetDeviceBundle() const;
+	DirectXCommandQueue* GetPrimaryCommandQueue() const;
 	AssetManager* GetAssetManager() const;
-	GameViewport* GetGameViewport() const;
-
-	static Engine* GetInstance();
+	CachedShaderLibrary* GetCachedShaderLibrary() const;
+	GameViewport* GetLocalViewport() const;
 
 private:
-	void CommitBundles(IRHICommandList* inCommandList);
-	void TickWorld();
-	void RenderScene();
+	void Render();
 
-	void InitializeBundles();
-	void LoadEngineDefaultAssets();
-
-	void ForEachBundles(std::function<void(IRHIBundle*)> action);
-
-	void Application_OnPostSized(int32 x, int32 y);
+private:
+	void MainWindow_OnSizing(int32 x, int32 y);
 };

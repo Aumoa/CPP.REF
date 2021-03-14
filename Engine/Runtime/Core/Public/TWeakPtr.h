@@ -53,7 +53,6 @@ public:
 	inline TRefPtr<O, bThreadSafe> AsShared() const;
 
 	vs_property_get(bool, IsValid);
-	[[nodiscard]] inline bool IsValid_get() const;
 
 	[[nodiscard]] inline T* operator->() const;
 	[[nodiscard]] inline operator bool() const;

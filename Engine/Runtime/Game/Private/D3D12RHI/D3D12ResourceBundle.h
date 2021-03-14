@@ -28,11 +28,5 @@ public:
 	virtual void ReleaseBundle();
 	virtual void Commit(IRHICommandList* inCommandList);
 
-	virtual TRefPtr<StaticMesh> CreateStaticMesh(const RHIStaticMeshGeometryData& inGeometryData);
 	virtual TRefPtr<IRHIResource> CreateTexture2D(ERHITextureFormat format, PlatformImage* platformImage);
-	virtual TRefPtr<IRHIScene> CreateScene(APlayerController* inPlayerController);
-
-private:
-	TRefPtr<IRHIResource> CreateRaytracingScratchBuffer(uint64 sizeInBytes);
-	TRefPtr<IRHIResource> CreateRaytracingAccelerationStructureBuffer(uint64 sizeInBytes);
 };

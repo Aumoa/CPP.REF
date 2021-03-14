@@ -3,21 +3,22 @@
 #include "Components/ActorComponent.h"
 
 #include "Logging/LogMacros.h"
+#include "Framework/Actor.h"
 
 using namespace std;
 
-ActorComponent::ComponentTickFunction::ComponentTickFunction() : Super()
+GActorComponent::ComponentTickFunction::ComponentTickFunction() : Super()
 	, Target(nullptr)
 {
 
 }
 
-ActorComponent::ComponentTickFunction::~ComponentTickFunction()
+GActorComponent::ComponentTickFunction::~ComponentTickFunction()
 {
 
 }
 
-void ActorComponent::ComponentTickFunction::ExecuteTick(Seconds deltaTime)
+void GActorComponent::ComponentTickFunction::ExecuteTick(Seconds deltaTime)
 {
 	if (Target == nullptr)
 	{
@@ -31,7 +32,7 @@ void ActorComponent::ComponentTickFunction::ExecuteTick(Seconds deltaTime)
 	}
 }
 
-ActorComponent::ActorComponent() : Super()
+GActorComponent::GActorComponent() : Super()
 	, bComponentTickEnabled(true)
 	, bComponentHasBegunPlay(false)
 	, owner(nullptr)
@@ -39,62 +40,70 @@ ActorComponent::ActorComponent() : Super()
 	PrimaryComponentTick.Target = this;
 }
 
-ActorComponent::~ActorComponent()
+GActorComponent::~GActorComponent()
 {
 
 }
 
-TickFunction* ActorComponent::GetTickFunction()
+TickFunction* GActorComponent::GetTickFunction()
 {
 	return &PrimaryComponentTick;
 }
 
-void ActorComponent::AddPrerequisiteObject(ITickFunctionObject* inObject)
+void GActorComponent::AddPrerequisiteObject(ITickFunctionObject* inObject)
 {
 	PrimaryComponentTick.AddPrerequisite(inObject);
 }
 
-void ActorComponent::RemovePrerequisiteObject(ITickFunctionObject* inObject)
+void GActorComponent::RemovePrerequisiteObject(ITickFunctionObject* inObject)
 {
 	PrimaryComponentTick.RemovePrerequisite(inObject);
 }
 
-void ActorComponent::BeginPlay()
+void GActorComponent::BeginPlay()
 {
-	bComponentHasBegunPlay = true;
+	if (owner != nullptr)
+	{
+		SetWorld(owner->GetWorld());
+		bComponentHasBegunPlay = true;
+	}
 }
 
-void ActorComponent::EndPlay()
+void GActorComponent::EndPlay()
 {
-	bComponentHasBegunPlay = false;
+	if (bComponentHasBegunPlay)
+	{
+		SetWorld(nullptr);
+		bComponentHasBegunPlay = false;
+	}
 }
 
-void ActorComponent::TickComponent(Seconds deltaTime)
+void GActorComponent::TickComponent(Seconds deltaTime)
 {
 
 }
 
-AActor* ActorComponent::GetOwner() const
+AActor* GActorComponent::GetOwner() const
 {
 	return owner;
 }
 
-auto ActorComponent::PrimaryComponentTick_get() -> ComponentTickFunction&
+auto GActorComponent::PrimaryComponentTick_get() const -> ComponentTickFunction&
 {
-	return primaryComponentTick;
+	return const_cast<ComponentTickFunction&>(primaryComponentTick);
 }
 
-bool ActorComponent::ComponentTickEnabled_get() const
+bool GActorComponent::ComponentTickEnabled_get() const
 {
 	return bComponentTickEnabled;
 }
 
-void ActorComponent::ComponentTickEnabled_set(bool value)
+void GActorComponent::ComponentTickEnabled_set(bool value)
 {
 	bComponentTickEnabled = true;
 }
 
-bool ActorComponent::HasBegunPlay_get() const
+bool GActorComponent::HasBegunPlay_get() const
 {
 	return bComponentHasBegunPlay;
 }

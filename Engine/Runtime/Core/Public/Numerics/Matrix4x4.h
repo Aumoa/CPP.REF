@@ -54,11 +54,8 @@ struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, floa
     bool Contains(size_t row, size_t column) const;
 
     vs_property_get(size_t, Count);
-    size_t Count_get() const;
     vs_property_get(size_t, Rows);
-    size_t Rows_get() const;
     vs_property_get(size_t, Columns);
-    size_t Columns_get() const;
 
     Matrix4x4& Transpose();
     Matrix4x4& Invert();
@@ -66,21 +63,14 @@ struct CORE_API Matrix4x4 : public TNumericsBasicOperator<Matrix4x4, float, floa
     Vector4 TransformVector(const Vector4& vec) const;
 
     vs_property_get(bool, IsIdentity);
-    bool IsIdentity_get() const;
     vs_property_get(float, Determinant);
-    float Determinant_get() const;
     vs_property_get(Matrix4x4, Inverse);
-    Matrix4x4 Inverse_get() const;
     vs_property_get(Matrix4x4, Transposed);
-    Matrix4x4 Transposed_get() const;
 
     void BreakTransform(Vector3& outTranslation, Vector3& outScale, Quaternion& outRotation) const;
     vs_property_get(Vector3, Translation);
-    Vector3 Translation_get() const;
     vs_property_get(Vector3, Scale);
-    Vector3 Scale_get() const;
     vs_property_get(Quaternion, Rotation);
-    Quaternion Rotation_get() const;
 
     const Vector4& operator [](size_t index) const;
     Vector4& operator [](size_t index);

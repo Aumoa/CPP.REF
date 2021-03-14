@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WindowsMinimal.h"
 
 #include "Rotator.h"
 #include "Transform.h"
@@ -16,6 +15,5 @@
 
 #include "Logging/LogVerbosity.h"
 #include "Components/ComponentTransformSpace.h"
-#include "Key.h"
 
 #include "Diagnostics/ScopedCycleCounter.h"

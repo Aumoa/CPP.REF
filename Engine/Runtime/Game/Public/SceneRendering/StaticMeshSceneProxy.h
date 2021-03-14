@@ -6,8 +6,9 @@
 #include "CoreMinimal.h"
 #include "PrimitiveSceneProxy.h"
 
-class StaticMeshComponent;
+class GStaticMeshComponent;
 class StaticMesh;
+class MaterialInterface;
 
 class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
 {
@@ -16,21 +17,14 @@ public:
 	using This = StaticMeshSceneProxy;
 
 private:
-	TWeakPtr<StaticMeshComponent> meshComponent;
+	TWeakPtr<GStaticMeshComponent> meshComponent;
 	StaticMesh* staticMesh;
-	AxisAlignedCube baseBoundingBox;
-	AxisAlignedCube transformedBoundingBox;
-	uint16 materialIndex;
-
-	TRefPtr<MeshBatch> customBatch;
+	MaterialInterface* material;
 
 public:
-	StaticMeshSceneProxy(StaticMeshComponent* inMeshComponent);
+	StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent);
 	~StaticMeshSceneProxy();
 
 	void Update() override;
 	void UpdateTransform() override;
-
-	MeshBatch* GetMeshBatch() const override;
-	const AxisAlignedCube* GetPrimitiveBoundingBox() const override;
 };

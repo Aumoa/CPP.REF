@@ -79,9 +79,7 @@ public:
 	TRefPtr<String> Substring(size_t startIndex, std::optional<size_t> length = std::nullopt) const;
 
 	vs_property_get(const wchar_t*, C_Str);
-	const wchar_t* C_Str_get() const;
 	vs_property_get(size_t, Length);
-	size_t Length_get() const;
 
 	bool operator < (const TRefPtr<String>& right) const;
 	bool operator ==(const TRefPtr<String>& right) const;

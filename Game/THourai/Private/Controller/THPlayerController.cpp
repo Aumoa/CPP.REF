@@ -4,7 +4,6 @@
 
 #include "World.h"
 #include "Levels/StartupLevel.h"
-#include "Pawn/MyCharacter.h"
 
 ATHPlayerController::ATHPlayerController()
 {
@@ -20,7 +19,7 @@ void ATHPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartupLevel* level = Cast<StartupLevel>(GetWorld()->GetCurrentLevel());
+	GStartupLevel* level = Cast<GStartupLevel>(GetWorld()->GetCurrentLevel());
 	if (level == nullptr)
 	{
 		TH_LOG(LogTH, Error, L"Current level must StartupLevel class. (TEST IMPLEMENT)");

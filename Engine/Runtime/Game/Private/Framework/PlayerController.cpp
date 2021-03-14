@@ -6,7 +6,8 @@
 #include "Components/PlayerCameraManager.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "Components/InputComponent.h"
-#include "PlatformMisc/PlatformInput.h"
+#include "Input/Keyboard.h"
+#include "Windows/WinMouse.h"
 
 DEFINE_STATS_GROUP(APlayerController);
 
@@ -21,12 +22,11 @@ APlayerController::APlayerController() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	cameraManager = AddComponent<PlayerCameraManager>();
-	inputComponent = AddComponent<InputComponent>();
+	cameraManager = AddComponent<GPlayerCameraManager>();
+	inputComponent = AddComponent<GInputComponent>();
 
-	inputComponent->GetKeyActionBinder(EKey::ESC, EKeyEvent::Pressed).AddRaw(this, &APlayerController::AutoUnlockMouseCursor);
-	inputComponent->GetKeyActionBinder(EKey::LeftButton, EKeyEvent::Pressed).AddRaw(this, &APlayerController::AutoUnlockMouseCursor);
-	inputComponent->GetKeyActionBinder(EKey::RightButton, EKeyEvent::Pressed).AddRaw(this, &APlayerController::AutoUnlockMouseCursor);
+	keyTracker = inputComponent->KeyTracker;
+	mouseTracker = inputComponent->MouseTracker;
 }
 
 APlayerController::~APlayerController()
@@ -38,6 +38,7 @@ void APlayerController::Tick(Seconds deltaTime)
 {
 	Super::Tick(deltaTime);
 
+	UpdateInput();
 	UpdateCursorVisibleState();
 }
 
@@ -46,31 +47,21 @@ void APlayerController::OnPossess(APawn* inPawn)
 	inPawn->ComponentAdded += bind_delegate(Possessed_ComponentAdded);
 	cameraManager->UpdateCameraComponent();
 
-	// Binding input override component.
-	possessedInputComponent = inPawn->AddComponent<InputComponent>();
-	inputComponent->SetOverrideComponent(possessedInputComponent);
-
-	inPawn->SetupPlayerInputComponent(possessedInputComponent);
+	inPawn->SetupPlayerInputComponent(inputComponent);
 }
 
 void APlayerController::OnUnPossess()
 {
-	// Unbinding input override component.
-	if (GetPawn()->RemoveComponent<InputComponent>())
-	{
-		inputComponent->SetOverrideComponent(nullptr);
-	}
-
 	GetPawn()->ComponentAdded -= bind_delegate(Possessed_ComponentAdded);
 	cameraManager->UpdateCameraComponent();
 }
 
-PlayerCameraManager* APlayerController::CameraManager_get() const
+GPlayerCameraManager* APlayerController::CameraManager_get() const
 {
 	return cameraManager;
 }
 
-InputComponent* APlayerController::PlayerInputComponent_get() const
+GInputComponent* APlayerController::PlayerInputComponent_get() const
 {
 	return inputComponent;
 }
@@ -80,35 +71,35 @@ bool APlayerController::IsCursorLocked_get() const
 	return !bShowMouseCursor && !bAutoUnlocked;
 }
 
+void APlayerController::UpdateInput()
+{
+	if (bAutoUnlockMouseCursor)
+	{
+		if (keyTracker->IsKeyPressed(EKey::Escape))
+		{
+			bAutoUnlocked = true;
+		}
+
+		if (mouseTracker->IsButtonPressed(EMouseButton::Left) || mouseTracker->IsButtonPressed(EMouseButton::Right))
+		{
+			bAutoUnlocked = false;
+		}
+	}
+}
+
 void APlayerController::UpdateCursorVisibleState()
 {
-	bool bCursorVisible = PlatformInput::GetCursorState().IsCursorVisible();
+	bool bCursorVisible = mouseTracker->Last.Mode == EMousePositionMode::Absolute;
 	bool bDesiredVisible = !IsCursorLocked;
 
 	if (bCursorVisible != bDesiredVisible)
 	{
-		PlatformInput::SetCursorVisible(bDesiredVisible);
+		EMousePositionMode mode = bDesiredVisible ? EMousePositionMode::Absolute : EMousePositionMode::Relative;
+		WinMouse::Get().SetMode(mode);
 	}
 }
 
-void APlayerController::Possessed_ComponentAdded(ActorComponent*)
+void APlayerController::Possessed_ComponentAdded(GActorComponent*)
 {
 	cameraManager->UpdateCameraComponent();
-}
-
-void APlayerController::AutoUnlockMouseCursor(EKey inKey, EKeyEvent inKeyEvent)
-{
-	if (bAutoUnlockMouseCursor)
-	{
-		switch (inKey)
-		{
-		case EKey::ESC:
-			bAutoUnlocked = true;
-			break;
-		case EKey::LeftButton:
-		case EKey::RightButton:
-			bAutoUnlocked = false;
-			break;
-		}
-	}
 }

@@ -7,7 +7,7 @@
 ACharacter::ACharacter() : Super()
 	, capsuleComponent(nullptr)
 {
-	capsuleComponent = AddComponent<SceneComponent>();
+	capsuleComponent = AddComponent<GSceneComponent>();
 	RootComponent = capsuleComponent;
 }
 

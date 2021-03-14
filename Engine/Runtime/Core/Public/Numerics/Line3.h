@@ -30,7 +30,6 @@ struct CORE_API Line3 : public TNumericsBasicOperator<Line3, Vector3, Vector3>
 	Vector3 GetPoint(float factor) const;
 
 	vs_property_get(Vector3, Vector);
-	Vector3 Vector_get() const;
 
 	static Line3 FromRay(const Ray3& ray);
 };

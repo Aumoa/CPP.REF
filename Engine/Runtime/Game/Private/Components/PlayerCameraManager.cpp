@@ -4,13 +4,15 @@
 
 #include "Engine.h"
 #include "GameViewport.h"
+#include "World.h"
 #include "Logging/LogMacros.h"
 #include "Framework/PlayerController.h"
 #include "Framework/Pawn.h"
 #include "Components/CameraComponent.h"
 #include "SceneRendering/MinimalViewInfo.h"
+#include "SceneRendering/Scene.h"
 
-PlayerCameraManager::PlayerCameraManager() : Super()
+GPlayerCameraManager::GPlayerCameraManager() : Super()
 	, bPrintNoCameraWarning(true)
 	, pawnCamera(nullptr)
 	, lastUpdatedTransform(Transform::Identity)
@@ -18,12 +20,12 @@ PlayerCameraManager::PlayerCameraManager() : Super()
 
 }
 
-PlayerCameraManager::~PlayerCameraManager()
+GPlayerCameraManager::~GPlayerCameraManager()
 {
 
 }
 
-void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
+void GPlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 {
 	static constexpr const float DefaultFOV = 0.25f * 3.14f;
 
@@ -34,7 +36,10 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 
 		if (outViewInfo.AspectRatio == 0.0f)
 		{
-			GameViewport* vp = GEngine.GetGameViewport();
+			World* world = GetWorld();
+			Scene* scene = world->GetScene();
+			Engine* engine = scene->GetEngine();
+			GameViewport* vp = engine->GetLocalViewport();
 			outViewInfo.AspectRatio = vp->ResolutionX / (float)vp->ResolutionY;
 		}
 
@@ -63,17 +68,20 @@ void PlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 			updateTransform = pawn->GetActorTransform();
 		}
 
-		GameViewport* viewport = GEngine.GetGameViewport();
+		World* world = GetWorld();
+		Scene* scene = world->GetScene();
+		Engine* engine = scene->GetEngine();
+		GameViewport* vp = engine->GetLocalViewport();
 
 		outViewInfo.FOV = DefaultFOV;
-		outViewInfo.AspectRatio = (float)viewport->ResolutionX / (float)viewport->ResolutionY;
+		outViewInfo.AspectRatio = (float)vp->ResolutionX / (float)vp->ResolutionY;
 		outViewInfo.Location = updateTransform.Translation;
 		outViewInfo.Rotation = updateTransform.Rotation;
 		outViewInfo.Apply();
 	}
 }
 
-void PlayerCameraManager::UpdateCameraComponent()
+void GPlayerCameraManager::UpdateCameraComponent()
 {
 	pawnCamera = nullptr;
 
@@ -91,7 +99,7 @@ void PlayerCameraManager::UpdateCameraComponent()
 		return;
 	}
 
-	CameraComponent* camera = pawn->GetComponent<CameraComponent>();
+	GCameraComponent* camera = pawn->GetComponent<GCameraComponent>();
 	if (camera == nullptr)
 	{
 		SE_LOG(LogCamera, Verbose, L"Possessed pawn have not a camera component. Using default camera view property.");
@@ -101,7 +109,7 @@ void PlayerCameraManager::UpdateCameraComponent()
 	pawnCamera = camera;
 }
 
-void PlayerCameraManager::PrintNoCameraWarning(TRefPtr<String> message) const
+void GPlayerCameraManager::PrintNoCameraWarning(TRefPtr<String> message) const
 {
 	if (bPrintNoCameraWarning)
 	{

@@ -4,19 +4,19 @@
 
 #include "SceneRendering/MinimalViewInfo.h"
 
-CameraComponent::CameraComponent() : Super()
+GCameraComponent::GCameraComponent() : Super()
 	, aspectRatio(0.0f)
 	, fov(0.25f * 3.14f)
 {
 	Mobility = EComponentMobility::Movable;
 }
 
-CameraComponent::~CameraComponent()
+GCameraComponent::~GCameraComponent()
 {
 
 }
 
-void CameraComponent::CalcCameraView(MinimalViewInfo& outViewInfo) const
+void GCameraComponent::CalcCameraView(MinimalViewInfo& outViewInfo) const
 {
 	outViewInfo.FOV = fov;
 	outViewInfo.AspectRatio = aspectRatio;

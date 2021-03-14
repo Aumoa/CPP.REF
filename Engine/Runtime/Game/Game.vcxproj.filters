@@ -91,24 +91,36 @@
     <Filter Include="Private\Materials">
       <UniqueIdentifier>{c3331f6d-5edc-4e1c-81dd-c28c37fbdcc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\DirectX">
+      <UniqueIdentifier>{6fd9d0ae-a306-4eec-b257-be010cec840e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\COM">
+      <UniqueIdentifier>{efef971c-2ac7-4f09-8a9e-61e20a36ee25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\COM">
+      <UniqueIdentifier>{035bfb9c-81cd-43e6-8028-772ad8a60fc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Windows">
+      <UniqueIdentifier>{48451bd6-2d21-4155-8e2f-459cdfcfcd6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Windows">
+      <UniqueIdentifier>{27f32681-b7e3-4fbc-a68a-28043d929a74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\DirectX">
+      <UniqueIdentifier>{c4d60643-a0fe-4f21-a66f-233da83e3469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders\RaytracingShader">
+      <UniqueIdentifier>{da307a7c-1fc2-48d0-b456-2d260e9c498e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Input">
+      <UniqueIdentifier>{8a94c755-c002-4372-bc29-c7231a063259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Input">
+      <UniqueIdentifier>{a4c2915e-8861-4fc9-a3df-e77337998966}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Application.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\AppDuplicationException.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\WindowsMinimal.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\WinException.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\IEngineTick.h">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12Minimal.h">
@@ -276,9 +288,6 @@
     <ClInclude Include="Public\SceneRendering\PrimitiveSceneProxy.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
-    <ClInclude Include="Public\SceneRendering\MeshBatch.h">
-      <Filter>Public\SceneRendering</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\RHIMeshDrawCommand.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -302,9 +311,6 @@
     </ClInclude>
     <ClInclude Include="Public\RHI\RHIViewport.h">
       <Filter>Public\RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\SceneRendering\Mesh.h">
-      <Filter>Public\SceneRendering</Filter>
     </ClInclude>
     <ClInclude Include="Public\SceneRendering\StaticMesh.h">
       <Filter>Public\SceneRendering</Filter>
@@ -390,12 +396,6 @@
     <ClInclude Include="Public\Components\InputComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Key.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\PlatformMisc\PlatformInput.h">
-      <Filter>Public\PlatformMisc</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\IRHIDepthStencilView.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -417,12 +417,6 @@
     <ClInclude Include="Public\Components\FloatingPawnMovementComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Private\DirectXGeometry.h">
-      <Filter>Private</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\Bezier.h">
-      <Filter>Private</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\RHITextureClearValue.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -438,7 +432,7 @@
     <ClInclude Include="Public\DeferredGameViewport.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\SceneRendering\DeferredSceneRenderer.h">
+    <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12ShaderResourceView.h">
@@ -464,9 +458,6 @@
     </ClInclude>
     <ClInclude Include="Public\Framework\DirectionalLight.h">
       <Filter>Public\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\Assets\MeshLoader.h">
-      <Filter>Private\Assets</Filter>
     </ClInclude>
     <ClInclude Include="Public\Materials\MaterialInterface.h">
       <Filter>Public\Materials</Filter>
@@ -552,23 +543,149 @@
     <ClInclude Include="Private\D3D12RHI\D3D12ResourceBundle.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Private\D3D12RHI\D3D12Scene.h">
-      <Filter>Private\D3D12RHI</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\IRHIScene.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeviceBundle.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\COMDeviceBundle.h">
+      <Filter>Public\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\TComPtr.h">
+      <Filter>Public\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\COMException.h">
+      <Filter>Public\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\CoreWindow.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\HandleBase.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WindowsMinimal.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\Application.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinException.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXSwapChain.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\COM\COMMinimal.h">
+      <Filter>Private\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXCommandQueue.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeviceResource.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameObject.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeviceContext.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXImmediateContext.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXMinimal.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DirectX\DirectXCommon.h">
+      <Filter>Private\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDeferredContext.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXAutoFence.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinEvent.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\DirectX\Bezier.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXRenderTargetView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDepthStencilView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Scene.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\RenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\DeferredRenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDescriptorAllocator.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXShaderResourceView.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXShaderBindingTable.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXRenderTarget.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXHDRTarget.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXCompatibleRenderTarget.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Mesh.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Vertex.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXGeometry.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXAccelerationInstancingScene.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXRaytracingShader.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Shaders\ShaderTypes.h">
+      <Filter>Private\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\CachedShaderLibrary.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinKeyboard.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinMouse.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Input\Keyboard.h">
+      <Filter>Public\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Input\Mouse.h">
+      <Filter>Public\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Input\TBitfieldInputChangeTracker.h">
+      <Filter>Public\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\AppDuplicationException.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Application.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\WinException.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Engine.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -668,9 +785,6 @@
     <ClCompile Include="Private\RHI\RHIMeshDrawCommand.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Private\SceneRendering\MeshBatch.cpp">
-      <Filter>Private\SceneRendering</Filter>
-    </ClCompile>
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp">
       <Filter>Private\SceneRendering</Filter>
     </ClCompile>
@@ -761,9 +875,6 @@
     <ClCompile Include="Private\Components\InputComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12DepthStencilView.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
@@ -782,16 +893,13 @@
     <ClCompile Include="Private\Components\FloatingPawnMovementComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Private\DirectXGeometry.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\RHI\RHITextureClearValue.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
     <ClCompile Include="Private\RHI\RHITextureFormat.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Private\SceneRendering\DeferredSceneRenderer.cpp">
+    <ClCompile Include="Private\SceneRendering\RaytracingSceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
     </ClCompile>
     <ClCompile Include="Private\Components\LightComponent.cpp">
@@ -823,9 +931,6 @@
     </ClCompile>
     <ClCompile Include="Private\Framework\DirectionalLight.cpp">
       <Filter>Private\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Assets\MeshLoader.cpp">
-      <Filter>Private\Assets</Filter>
     </ClCompile>
     <ClCompile Include="Private\Materials\MaterialInterface.cpp">
       <Filter>Private\Materials</Filter>
@@ -878,16 +983,118 @@
     <ClCompile Include="Private\D3D12RHI\D3D12ResourceBundle.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
-    <ClCompile Include="Private\D3D12RHI\D3D12Scene.cpp">
-      <Filter>Private\D3D12RHI</Filter>
+    <ClCompile Include="Private\COM\COMDeviceBundle.cpp">
+      <Filter>Private\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\COM\COMException.cpp">
+      <Filter>Private\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\HandleBase.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\CoreWindow.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\Application.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinException.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXCommandQueue.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameObject.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXSwapChain.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDeferredContext.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXAutoFence.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinEvent.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXRenderTargetView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDepthStencilView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\Scene.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\RenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\DeferredRenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDescriptorAllocator.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXShaderResourceView.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXShaderBindingTable.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXRenderTarget.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXCompatibleRenderTarget.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXGeometry.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXAccelerationInstancingScene.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXRaytracingShader.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\CachedShaderLibrary.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinKeyboard.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinMouse.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Input\Keyboard.cpp">
+      <Filter>Private\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Input\Mouse.cpp">
+      <Filter>Private\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
       <Filter>Public\Logging</Filter>
-    </None>
-    <None Include="Public\Application.inl">
-      <Filter>Public</Filter>
     </None>
     <None Include="Public\Framework\Actor.inl">
       <Filter>Public\Framework</Filter>
@@ -949,6 +1156,15 @@
     <None Include="Public\Materials\MaterialInterface.inl">
       <Filter>Public\Materials</Filter>
     </None>
+    <None Include="Public\COM\TComPtr.inl">
+      <Filter>Public\COM</Filter>
+    </None>
+    <None Include="Public\DirectX\DirectXCommandQueue.inl">
+      <Filter>Public\DirectX</Filter>
+    </None>
+    <None Include="Public\Input\TBitfieldInputChangeTracker.inl">
+      <Filter>Public\Input</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Private\Shaders\GeometryShader\GeometryPixelShader.hlsl">
@@ -971,6 +1187,9 @@
     </FxCompile>
     <FxCompile Include="Private\Shaders\LightingShader\LightingRayGeneration.hlsl">
       <Filter>Private\Shaders\LightingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\RaytracingShader\RaytracingShader.hlsl">
+      <Filter>Private\Shaders\RaytracingShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

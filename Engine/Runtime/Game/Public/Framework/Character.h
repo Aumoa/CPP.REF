@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "Pawn.h"
 
-class SceneComponent;
+class GSceneComponent;
 
 class GAME_API ACharacter : public APawn
 {
@@ -15,7 +15,7 @@ public:
 	using This = ACharacter;
 
 private:
-	SceneComponent* capsuleComponent;
+	GSceneComponent* capsuleComponent;
 
 public:
 	ACharacter();

@@ -13,11 +13,11 @@ class AMyCharacter;
 class AStaticMeshActor;
 class ADirectionalLight;
 
-class TH_API StartupLevel : public Level
+class TH_API GStartupLevel : public GLevel
 {
 public:
-	using Super = Level;
-	using This = StartupLevel;
+	using Super = GLevel;
+	using This = GStartupLevel;
 
 private:
 	ADirectionalLight* light;
@@ -32,8 +32,8 @@ private:
 	ASpectatorPawn* spectator;
 
 public:
-	StartupLevel();
-	~StartupLevel() override;
+	GStartupLevel();
+	~GStartupLevel() override;
 
 	void LoadLevel() override;
 

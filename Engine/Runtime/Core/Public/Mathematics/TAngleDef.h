@@ -43,11 +43,11 @@ public:
 		return String::Format(L"{0}°", Value);
 	}
 
-	vs_property_get(TDegrees, Clamped);
-	inline constexpr TDegrees Clamped_get() const;
+	__declspec(property(get = Clamped_get)) TDegrees Clamped;
+	[[nodiscard]] inline constexpr TDegrees Clamped_get() const;
 
-	vs_property_get(TDegrees, Normalized);
-	inline constexpr TDegrees Normalized_get() const;
+	__declspec(property(get = Normalized_get)) TDegrees Normalized;
+	[[nodiscard]] inline constexpr TDegrees Normalized_get() const;
 
 	template<TIsRealType O = T>
 	inline constexpr TRadians<O> ToRadians() const;
@@ -211,11 +211,11 @@ public:
 		return String::Format(L"{0}rad", Value);
 	}
 
-	vs_property_get(TRadians, Clamped);
-	inline constexpr TRadians Clamped_get() const;
+	__declspec(property(get = Clamped_get)) TRadians Clamped;
+	[[nodiscard]] inline constexpr TRadians Clamped_get() const;
 
-	vs_property_get(TRadians, Normalized);
-	inline constexpr TRadians Normalized_get() const;
+	__declspec(property(get = Normalized_get)) TRadians Normalized;
+	[[nodiscard]] inline constexpr TRadians Normalized_get() const;
 
 	template<TIsRealType O = T>
 	inline constexpr TDegrees<O> ToDegrees() const;

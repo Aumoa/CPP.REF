@@ -26,7 +26,6 @@ public:
 	inline size_t GetHashCode() const;
 
 	vs_property_get(bool, IsValid);
-	inline bool IsValid_get() const;
 
 	inline TRefPtr<TBase> Instantiate() const;
 	template<TIsBaseOf<TBase> O>

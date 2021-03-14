@@ -40,7 +40,6 @@ public:
 	inline TRet Invoke(TArgs... args) const;
 
 	vs_property_get(bool, IsValid);
-	inline bool IsValid_get() const;
 
 	inline TRet operator()(TArgs... args) const;
 };

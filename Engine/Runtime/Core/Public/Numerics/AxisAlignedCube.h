@@ -32,6 +32,5 @@ struct CORE_API AxisAlignedCube : public TNumericsBasicOperator<AxisAlignedCube,
 	Vector3 GetPoint(size_t index) const;
 
 	vs_property_get(Vector3, Center);
-	Vector3 Center_get() const;
 };
 #pragma pack(pop)

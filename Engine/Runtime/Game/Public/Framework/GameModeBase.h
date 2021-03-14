@@ -9,7 +9,7 @@
 #include "TSubclassOf.h"
 
 class APlayerController;
-class Level;
+class GLevel;
 
 class GAME_API AGameModeBase : public AInfo
 {
@@ -22,5 +22,5 @@ public:
 	~AGameModeBase() override;
 
 	TSubclassOf<APlayerController> PlayerControllerClass;
-	TSubclassOf<Level> StartLevelClass;
+	TSubclassOf<GLevel> StartLevelClass;
 };

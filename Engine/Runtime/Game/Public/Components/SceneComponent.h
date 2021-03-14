@@ -22,16 +22,16 @@ enum class EComponentDirtyMask : uint32
 	All = 0xFFFFFFFF,
 };
 
-class GAME_API SceneComponent : public ActorComponent
+class GAME_API GSceneComponent : public GActorComponent
 {
 public:
-	using Super = ActorComponent;
-	using This = SceneComponent;
+	using Super = GActorComponent;
+	using This = GSceneComponent;
 
 private:
 	struct SceneAttachment
 	{
-		SceneComponent* AttachmentRoot;
+		GSceneComponent* AttachmentRoot;
 		TRefPtr<String> SocketName;
 
 		SceneAttachment();
@@ -48,19 +48,19 @@ private:
 	EComponentDirtyMask dirtyMark;
 
 	SceneAttachment componentAttachment;
-	std::vector<SceneComponent*> childComponents;
+	std::vector<GSceneComponent*> childComponents;
 
 public:
-	SceneComponent();
-	~SceneComponent();
+	GSceneComponent();
+	~GSceneComponent();
 	
 	virtual void UpdateChildTransforms();
 	virtual void UpdateComponentToWorld();
 	virtual Transform GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const;
 	virtual bool MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace = EComponentTransformSpace::World);
 
-	void AttachToComponent(SceneComponent* attachTo);
-	void AttachToSocket(SceneComponent* attachTo, TRefPtr<String> socketName);
+	void AttachToComponent(GSceneComponent* attachTo);
+	void AttachToSocket(GSceneComponent* attachTo, TRefPtr<String> socketName);
 	void DetachFromComponent();
 
 	void SetMarkDirty(EComponentDirtyMask inSetMasks);
@@ -68,27 +68,15 @@ public:
 	bool HasDirtyMark(EComponentDirtyMask inMask) const;
 	virtual void ResolveDirtyState();
 
-	vs_property_get(SceneComponent*, AttachParent);
-	SceneComponent* AttachParent_get() const;
+	vs_property_get(GSceneComponent*, AttachParent);
 	vs_property_get(TRefPtr<String>, AttachSocketName);
-	TRefPtr<String> AttachSocketName_get() const;
-	vs_property_get(const std::vector<SceneComponent*>&, ChildComponents);
-	const std::vector<SceneComponent*>& ChildComponents_get() const;
+	vs_property_get(const std::vector<GSceneComponent*>&, ChildComponents);
 	vs_property(Transform, RelativeTransform);
-	Transform RelativeTransform_get() const;
-	void RelativeTransform_set(const Transform& value);
 	vs_property_get(Transform, ComponentTransform);
-	Transform ComponentTransform_get() const;
 
 	vs_property(Vector3, Location);
-	Vector3 Location_get() const;
-	void Location_set(const Vector3& value);
 	vs_property(Vector3, Scale);
-	Vector3 Scale_get() const;
-	void Scale_set(const Vector3& value);
 	vs_property(Quaternion, Rotation);
-	Quaternion Rotation_get() const;
-	void Rotation_set(const Quaternion& value);
 
 	vs_property_get_auto(Vector3, ComponentLocation, worldTransform.Translation);
 	vs_property_get_auto(Vector3, ComponentScale, worldTransform.Scale);

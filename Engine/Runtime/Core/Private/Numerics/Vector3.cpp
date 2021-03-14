@@ -136,7 +136,7 @@ Vector3 Vector3::Direction_get() const
 	return Normalized;
 }
 
-void Vector3::Direction_set(const Vector3& value)
+void Vector3::Direction_set(Vector3 value)
 {
 	(*this) = value * Length;
 }

@@ -5,12 +5,11 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
-#include "Diagnostics/ScopedCycleCounter.h"
+#include "DirectX/DirectXMinimal.h"
 #include "SceneRendering/MinimalViewInfo.h"
 
-interface IRHIScene;
+class Scene;
 class PrimitiveSceneProxy;
-class ShaderCameraConstantVector;
 
 class GAME_API SceneVisibility : virtual public Object
 {
@@ -19,24 +18,25 @@ public:
 	using This = SceneVisibility;
 
 private:
-	IRHIScene* myScene;
+	Scene* myScene;
 	MinimalViewInfo myView;
 	std::vector<bool> visibilities;
-	TRefPtr<ShaderCameraConstantVector> shaderCameraConstants;
 	bool bDirty : 1;
 	Frustum viewFrustum;
 	size_t numPrimitivesRender;
 
+	TComPtr<ID3D12Resource> cameraConstant;
+	void* cameraConstantPtr;
+
 public:
-	SceneVisibility(IRHIScene* inScene);
+	SceneVisibility(Scene* inScene);
 	~SceneVisibility() override;
 
 	void CalcVisibility();
 	void UpdateView(const MinimalViewInfo& inView);
 
 	vs_property_get(const std::vector<bool>&, PrimitiveVisibility);
-	const std::vector<bool>& PrimitiveVisibility_get() const;
-	vs_property_get(ShaderCameraConstantVector*, ShaderCameraConstants);
-	ShaderCameraConstantVector* ShaderCameraConstants_get() const;
 	vs_property_get_auto(size_t, NumPrimitivesRender, numPrimitivesRender);
+
+	uint64 GetCameraConstantBuffer() const;
 };

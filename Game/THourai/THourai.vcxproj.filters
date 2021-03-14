@@ -54,9 +54,6 @@
     <ClCompile Include="Private\Common\THLogs.cpp">
       <Filter>Private\Common</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Pawn\MyCharacter.cpp">
-      <Filter>Private\Pawn</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Controller\THPlayerController.cpp">
       <Filter>Private\Controller</Filter>
     </ClCompile>
@@ -79,9 +76,6 @@
     </ClInclude>
     <ClInclude Include="Private\Common\THLogs.h">
       <Filter>Private\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Pawn\MyCharacter.h">
-      <Filter>Public\Pawn</Filter>
     </ClInclude>
     <ClInclude Include="Public\Controller\THPlayerController.h">
       <Filter>Public\Controller</Filter>

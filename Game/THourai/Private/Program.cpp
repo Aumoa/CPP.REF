@@ -2,7 +2,8 @@
 
 #include "Program.h"
 
-#include "Application.h"
+#include "Windows/Application.h"
+#include "Windows/CoreWindow.h"
 #include "THGameInstance.h"
 #include "PlatformMisc/PlatformConsole.h"
 
@@ -14,11 +15,11 @@ int32 Program::Main()
 	PlatformConsole::Alloc();
 #endif
 
-	auto app = NewObject<Application>();
-	int32 ret = app->Run<THGameInstance>();
+	auto gameInstance = NewObject<THGameInstance>();
+	gameInstance->Run(NewObject<CoreWindow>(gameInstance.Get()));
 
 #if defined(_DEBUG)
 	PlatformConsole::Free();
 #endif
-	return ret;
+	return 0;
 }

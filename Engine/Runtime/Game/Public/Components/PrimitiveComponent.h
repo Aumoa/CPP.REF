@@ -8,18 +8,18 @@
 
 class PrimitiveSceneProxy;
 
-class GAME_API PrimitiveComponent : public SceneComponent
+class GAME_API GPrimitiveComponent : public GSceneComponent
 {
 public:
-	using Super = SceneComponent;
-	using This = PrimitiveComponent;
+	using Super = GSceneComponent;
+	using This = GPrimitiveComponent;
 
 private:
 	TRefPtr<PrimitiveSceneProxy> sceneProxy;
 
 public:
-	PrimitiveComponent();
-	~PrimitiveComponent() override;
+	GPrimitiveComponent();
+	~GPrimitiveComponent() override;
 
 	void ResolveDirtyState() override;
 

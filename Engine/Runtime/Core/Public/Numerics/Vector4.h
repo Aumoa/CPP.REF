@@ -39,19 +39,13 @@ struct CORE_API Vector4 : public TNumericsBasicOperator<Vector4, float, float, f
 	bool Contains(size_t index) const;
 
 	vs_property_get(size_t, Count);
-	size_t Count_get() const;
 
 	Vector4 GetClampedToMaxLength(float inMaxLength) const;
 
 	vs_property_get(float, LengthSq);
-	float LengthSq_get() const;
 	vs_property_get(float, Length);
-	float Length_get() const;
 	vs_property_get(Vector4, Normalized);
-	Vector4 Normalized_get() const;
 	vs_property(Vector4, Direction);
-	Vector4 Direction_get() const;
-	void Direction_set(const Vector4& value);
 
 	const float& operator [](size_t index) const;
 	float& operator [](size_t index);

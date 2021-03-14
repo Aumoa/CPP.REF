@@ -4,28 +4,28 @@
 
 using namespace std;
 
-PawnMovementComponent::PawnMovementComponent() : Super()
+GPawnMovementComponent::GPawnMovementComponent() : Super()
 	, pendingInputVector(Vector3::Zero)
 {
 
 }
 
-PawnMovementComponent::~PawnMovementComponent()
+GPawnMovementComponent::~GPawnMovementComponent()
 {
 
 }
 
-void PawnMovementComponent::AddInputVector(const Vector3& inWorldAccel)
+void GPawnMovementComponent::AddInputVector(const Vector3& inWorldAccel)
 {
 	pendingInputVector += inWorldAccel;
 }
 
-Vector3 PawnMovementComponent::GetPendingInputVector() const
+Vector3 GPawnMovementComponent::GetPendingInputVector() const
 {
 	return pendingInputVector;
 }
 
-Vector3 PawnMovementComponent::ConsumePendingInputVector()
+Vector3 GPawnMovementComponent::ConsumePendingInputVector()
 {
 	Vector3 pending = Vector3::Zero;
 	swap(pending, pendingInputVector);

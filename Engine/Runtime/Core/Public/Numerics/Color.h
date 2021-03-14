@@ -42,7 +42,6 @@ public:
 	bool Contains(size_t index) const;
 
 	vs_property_get(size_t, Count);
-	size_t Count_get() const;
 
 	const float& operator [](size_t index) const;
 	float& operator [](size_t index);

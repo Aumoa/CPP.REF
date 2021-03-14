@@ -7,8 +7,6 @@
 
 interface GAME_API IRHIShaderBindingTable : virtual public Object
 {
-	vs_property_get(uint64, RayGenerationStartAddress);
-	virtual uint64 RayGenerationStartAddress_get() const = 0;
-	vs_property_get(uint64, RayGenerationBufferStride);
-	virtual uint64 RayGenerationBufferStride_get() const = 0;
+	vs_property_get_pure(uint64, RayGenerationStartAddress);
+	vs_property_get_pure(uint64, RayGenerationBufferStride);
 };

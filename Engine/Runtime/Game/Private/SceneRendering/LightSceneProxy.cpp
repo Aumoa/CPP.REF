@@ -11,7 +11,7 @@
 
 LightBatch::LightBatch()
 {
-	basicLightBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(sizeof(RHILight));
+	//basicLightBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(sizeof(RHILight));
 }
 
 LightBatch::~LightBatch()
@@ -24,7 +24,7 @@ TRefPtr<IRHIResource> LightBatch::GetLightBuffer() const
 	return basicLightBuffer;
 }
 
-LightSceneProxy::LightSceneProxy(LightComponent* inLightComponent) : Super()
+LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent) : Super()
 	, myLightComponent(inLightComponent)
 	, transform(Transform::Identity)
 {

@@ -5,53 +5,53 @@
 #include "Logging/LogMacros.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 
-DEFINE_STATS_GROUP(SceneComponent);
+DEFINE_STATS_GROUP(GSceneComponent);
 
 using namespace std;
 
-SceneComponent::SceneAttachment::SceneAttachment()
+GSceneComponent::SceneAttachment::SceneAttachment()
 	: AttachmentRoot(nullptr)
 {
 
 }
 
-SceneComponent::SceneAttachment::~SceneAttachment()
+GSceneComponent::SceneAttachment::~SceneAttachment()
 {
 
 }
 
-void SceneComponent::SceneAttachment::Clear()
+void GSceneComponent::SceneAttachment::Clear()
 {
 	AttachmentRoot = nullptr;
 	SocketName = nullptr;
 }
 
-SceneComponent::SceneComponent() : Super()
+GSceneComponent::GSceneComponent() : Super()
 	, transform(Transform::Identity)
 	, worldTransform(Transform::Identity)
 	, localToWorld(Transform::Identity)
 	, mobility(EComponentMobility::Static)
-	, dirtyMark(EComponentDirtyMask::All)
+	, dirtyMark(EComponentDirtyMask::None)
 {
 
 }
 
-SceneComponent::~SceneComponent()
+GSceneComponent::~GSceneComponent()
 {
 
 }
 
-void SceneComponent::UpdateChildTransforms()
+void GSceneComponent::UpdateChildTransforms()
 {
-	for (SceneComponent* child : childComponents)
+	for (GSceneComponent* child : childComponents)
 	{
 		child->UpdateComponentToWorld();
 	}
 }
 
-void SceneComponent::UpdateComponentToWorld()
+void GSceneComponent::UpdateComponentToWorld()
 {
-	QUICK_SCOPED_CYCLE_COUNTER(SceneComponent, UpdateComponentToWorld);
+	QUICK_SCOPED_CYCLE_COUNTER(GSceneComponent, UpdateComponentToWorld);
 
 	if (AttachParent == nullptr)
 	{
@@ -71,9 +71,9 @@ void SceneComponent::UpdateComponentToWorld()
 	UpdateWorldTransform();
 }
 
-Transform SceneComponent::GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space) const
+Transform GSceneComponent::GetSocketTransform(TRefPtr<String> socketName, EComponentTransformSpace space) const
 {
-	SE_LOG(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
+	SE_LOG(LogSceneComponent, Error, L"GSceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
 
 	switch (space)
 	{
@@ -84,7 +84,7 @@ Transform SceneComponent::GetSocketTransform(TRefPtr<String> socketName, ECompon
 	return RelativeTransform;
 }
 
-bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
+bool GSceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
 {
 	Quaternion oldRotation = inSpace == EComponentTransformSpace::World ? ComponentRotation : Rotation;
 	if (inMoveDelta.NearlyEquals(Vector3::Zero, Math::SmallNumber<>) && oldRotation.NearlyEquals(inNewRotation, Math::SmallNumber<>))
@@ -123,12 +123,12 @@ bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion&
 	return true;
 }
 
-void SceneComponent::AttachToComponent(SceneComponent* attachTo)
+void GSceneComponent::AttachToComponent(GSceneComponent* attachTo)
 {
 	AttachToSocket(attachTo, nullptr);
 }
 
-void SceneComponent::AttachToSocket(SceneComponent* attachTo, TRefPtr<String> socketName)
+void GSceneComponent::AttachToSocket(GSceneComponent* attachTo, TRefPtr<String> socketName)
 {
 	if (attachTo == nullptr)
 	{
@@ -154,7 +154,7 @@ void SceneComponent::AttachToSocket(SceneComponent* attachTo, TRefPtr<String> so
 	UpdateComponentToWorld();
 }
 
-void SceneComponent::DetachFromComponent()
+void GSceneComponent::DetachFromComponent()
 {
 	if (componentAttachment.AttachmentRoot == nullptr)
 	{
@@ -178,91 +178,91 @@ void SceneComponent::DetachFromComponent()
 	UpdateComponentToWorld();
 }
 
-void SceneComponent::SetMarkDirty(EComponentDirtyMask inSetMasks)
+void GSceneComponent::SetMarkDirty(EComponentDirtyMask inSetMasks)
 {
 	dirtyMark |= inSetMasks;
 }
 
-bool SceneComponent::HasAnyDirtyMark() const
+bool GSceneComponent::HasAnyDirtyMark() const
 {
 	return dirtyMark != EComponentDirtyMask::None;
 }
 
-bool SceneComponent::HasDirtyMark(EComponentDirtyMask inMask) const
+bool GSceneComponent::HasDirtyMark(EComponentDirtyMask inMask) const
 {
 	return (dirtyMark & inMask) != EComponentDirtyMask::None;
 }
 
-void SceneComponent::ResolveDirtyState()
+void GSceneComponent::ResolveDirtyState()
 {
 	dirtyMark = EComponentDirtyMask::None;
 }
 
-SceneComponent* SceneComponent::AttachParent_get() const
+GSceneComponent* GSceneComponent::AttachParent_get() const
 {
 	return componentAttachment.AttachmentRoot;
 }
 
-TRefPtr<String> SceneComponent::AttachSocketName_get() const
+TRefPtr<String> GSceneComponent::AttachSocketName_get() const
 {
 	return componentAttachment.SocketName;
 }
 
-const vector<SceneComponent*>& SceneComponent::ChildComponents_get() const
+const vector<GSceneComponent*>& GSceneComponent::ChildComponents_get() const
 {
 	return childComponents;
 }
 
-Transform SceneComponent::RelativeTransform_get() const
+Transform GSceneComponent::RelativeTransform_get() const
 {
 	return transform;
 }
 
-void SceneComponent::RelativeTransform_set(const Transform& value)
+void GSceneComponent::RelativeTransform_set(Transform value)
 {
 	transform = value;
 	UpdateWorldTransform();
 }
 
-Transform SceneComponent::ComponentTransform_get() const
+Transform GSceneComponent::ComponentTransform_get() const
 {
 	return worldTransform;
 }
 
-Vector3 SceneComponent::Location_get() const
+Vector3 GSceneComponent::Location_get() const
 {
 	return transform.Translation;
 }
 
-void SceneComponent::Location_set(const Vector3& value)
+void GSceneComponent::Location_set(Vector3 value)
 {
 	transform.Translation = value;
 	UpdateWorldTransform();
 }
 
-Vector3 SceneComponent::Scale_get() const
+Vector3 GSceneComponent::Scale_get() const
 {
 	return transform.Scale;
 }
 
-void SceneComponent::Scale_set(const Vector3& value)
+void GSceneComponent::Scale_set(Vector3 value)
 {
 	transform.Scale = value;
 	UpdateWorldTransform();
 }
 
-Quaternion SceneComponent::Rotation_get() const
+Quaternion GSceneComponent::Rotation_get() const
 {
 	return transform.Rotation;
 }
 
-void SceneComponent::Rotation_set(const Quaternion& value)
+void GSceneComponent::Rotation_set(Quaternion value)
 {
 	transform.Rotation = value;
 	UpdateWorldTransform();
 }
 
-void SceneComponent::UpdateWorldTransform()
+void GSceneComponent::UpdateWorldTransform()
 {
 	if (HasBegunPlay && Mobility != EComponentMobility::Movable)
 	{

@@ -10,10 +10,11 @@
 #include "TSubclassOf.h"
 
 enum class TickingGroup;
-interface IRHIScene;
-class Level;
+class GameInstance;
+class GLevel;
 class AActor;
 class APlayerController;
+class Scene;
 struct TickFunction;
 
 class GAME_API World : virtual public Object
@@ -23,16 +24,18 @@ public:
 	using This = World;
 
 private:
+	GameInstance* gameInstance;
+
 	std::vector<TRefPtr<AActor>> actors;
 
 	std::array<std::set<TickFunction*>, 4> tickGroups;
 	std::array<std::set<TickFunction*>, 4> actualTickGroups;
-	TRefPtr<Level> currentLevel;
-	TRefPtr<IRHIScene> scene;
+	TRefPtr<GLevel> currentLevel;
+	TRefPtr<Scene> scene;
 	APlayerController* localPlayerController;
 
 public:
-	World();
+	World(GameInstance* gameInstance);
 	~World() override;
 
 	virtual void Tick(Seconds deltaTime);
@@ -42,10 +45,11 @@ public:
 	template<TIsBaseOf<AActor> T = AActor>
 	inline T* SpawnActor(TSubclassOf<T> static_class);
 
-	Level* LoadLevel(TSubclassOf<Level> loadLevel);
+	GLevel* LoadLevel(TSubclassOf<GLevel> loadLevel);
 
-	IRHIScene* GetScene() const;
-	Level* GetCurrentLevel() const;
+	GameInstance* GetGameInstance() const;
+	Scene* GetScene() const;
+	GLevel* GetCurrentLevel() const;
 
 private:
 	void Tick_Ready();
