@@ -15,8 +15,11 @@
 #include "DirectX/DirectXShaderBindingTable.h"
 #include "DirectX/DirectXAccelerationInstancingScene.h"
 #include "Logging/LogMacros.h"
+#include "Diagnostics/ScopedCycleCounter.h"
 
 using namespace std;
+
+DEFINE_STATS_GROUP(RaytracingSceneRenderer);
 
 RaytracingSceneRenderer::RaytracingSceneRenderer(Scene* inScene) : Super(inScene)
 	, shaderLibrary(nullptr)
@@ -32,6 +35,8 @@ RaytracingSceneRenderer::~RaytracingSceneRenderer()
 
 void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandList, GameViewport* inViewport)
 {
+	QUICK_SCOPED_CYCLE_COUNTER(RaytracingSceneRenderer, RenderScene);
+
 	Scene* scene = GetScene();
 
 	DirectXRaytracingShader* cached = shaderLibrary->GetOrReadyShader();
@@ -40,8 +45,24 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 	DirectXDescriptorAllocator* allocator = scene->GetDescriptorAllocator();
 	DirectXShaderBindingTable* sbt = scene->GetShaderBindingTable();
 
+	std::vector<DirectXInstanceShaderRecord> hitGroupRecords;
+	std::vector<DirectXInstanceShaderRecord> missRecords;
+	
+	// Fill instanced hit group records.
+	const auto& primitives = scene->GetPrimitives();
+	hitGroupRecords.reserve(primitives.size());
+	for (auto& primitive : primitives)
+	{
+		hitGroupRecords.emplace_back(primitive->InstanceShaderRecord);
+	}
+
+	// Fill instanced miss records.
+	// In most cases, this is may be sky sphere.
+	missRecords.emplace_back(0);
+
+	sbt->Init(cached, hitGroupRecords, missRecords);
+
 	D3D12_DISPATCH_RAYS_DESC dispatchRays = { };
-	sbt->Init(cached);
 	sbt->FillDispatchRaysDesc(dispatchRays);
 	dispatchRays.Width = inViewport->ResolutionX;
 	dispatchRays.Height = inViewport->ResolutionY;

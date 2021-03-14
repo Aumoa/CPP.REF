@@ -360,6 +360,7 @@
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\GameObject.h" />
+    <ClInclude Include="Public\GameplayStatics\ClassDependencyHelper.h" />
     <ClInclude Include="Public\GameViewport.h" />
     <ClInclude Include="Public\Input\TBitfieldInputChangeTracker.h" />
     <ClInclude Include="Public\Input\Keyboard.h" />
@@ -526,6 +527,7 @@
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\GameObject.cpp" />
+    <ClCompile Include="Private\GameplayStatics\ClassDependencyHelper.cpp" />
     <ClCompile Include="Private\GameViewport.cpp" />
     <ClCompile Include="Private\Input\Keyboard.cpp" />
     <ClCompile Include="Private\Input\Mouse.cpp" />

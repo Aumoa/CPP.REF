@@ -1,34 +1,25 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "../ShaderCommon.hlsli"
+#include "../GenericLighting.hlsli"
 
 ConstantBuffer<ShaderCameraConstant> gCamera : register(b0);
 RaytracingAccelerationStructure gSceneAS : register(t0);
 
 RWTexture2D<float4> gColorOutput : register(u0);
 
-struct TraceArgs
+inline float3 HitAttribute(float3 v1, float3 v2, float3 v3, BuiltInAttr bary)
 {
-	uint RayFlags;
-	uint InstanceInclusionMask;
-	uint RayContributionToHitGroupIndex;
-	uint MultiplierForGeometryContributionToHitGroupIndex;
-	uint MissShaderIndex;
-	RayDesc Ray;
-};
+	return v1 +
+		bary.Value.x * (v2 - v1) +
+		bary.Value.y * (v3 - v1);
+}
 
-inline void TraceRayWithArgs(RaytracingAccelerationStructure inScene, TraceArgs inArgs, inout Payload payload)
+inline float2 HitAttribute(float2 v1, float2 v2, float2 v3, BuiltInAttr bary)
 {
-	TraceRay(
-		inScene,
-		inArgs.RayFlags,
-		inArgs.InstanceInclusionMask,
-		inArgs.RayContributionToHitGroupIndex,
-		inArgs.MultiplierForGeometryContributionToHitGroupIndex,
-		inArgs.MissShaderIndex,
-		inArgs.Ray,
-		payload
-	);
+	return v1 +
+		bary.Value.x * (v2 - v1) +
+		bary.Value.y * (v3 - v1);
 }
 
 RayDesc GenerateRay(uint2 launchIndex, float3 cameraPos, matrix projectionToWorld, float near = 0.01f, float far = 1000.0f)
@@ -49,9 +40,6 @@ RayDesc GenerateRay(uint2 launchIndex, float3 cameraPos, matrix projectionToWorl
 	ray.TMin = near;
 	ray.TMax = far;
 
-	//ray.Origin = float3(screenPos, -1.0f);
-	//ray.Direction = gCamera.Pos;
-
 	return ray;
 }
 
@@ -60,16 +48,19 @@ void RayGeneration()
 {
 	uint2 launchIndex = (uint2)DispatchRaysIndex();
 
-	TraceArgs args = (TraceArgs)0;
-	args.RayFlags = RAY_FLAG_CULL_BACK_FACING_TRIANGLES;
-	args.InstanceInclusionMask = ~0;
-	args.MultiplierForGeometryContributionToHitGroupIndex = 1;
-	args.Ray = GenerateRay(launchIndex, gCamera.Pos, gCamera.ViewProjInv);
+	Payload payload = (Payload)0;
+	TraceRay(
+		gSceneAS,
+		RAY_FLAG_NONE,
+		0xFF,
+		0,
+		1,
+		0,
+		GenerateRay(launchIndex, gCamera.Pos, gCamera.ViewProjInv),
+		payload
+	);
 
-	Payload payload;
-	TraceRayWithArgs(gSceneAS, args, payload);
-
-	gColorOutput[launchIndex] = payload.Color;
+	gColorOutput[launchIndex] = float4(payload.Color);
 }
 
 [shader("miss")]
@@ -80,14 +71,12 @@ void Miss(inout Payload payload : SV_Payload)
 
 StructuredBuffer<Vertex> cVertexBuffer : register(t0, space2);
 StructuredBuffer<uint> cIndexBuffer : register(t1, space2);
+StructuredBuffer<RaytracingInstanceTransform> cTransform : register(t2, space2);
 
 [shader("closesthit")]
 void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
 {
-	// 삼각형 보간 좌표를 조회합니다.
-	float3 bary = float3(1.f - attr.Value.x - attr.Value.y, attr.Value.x, attr.Value.y);
-
-	// 세 개의 정점을 찾습니다.
+	// Get primitive triangle.
 	Vertex triangles[3];
 
 	uint primitiveID = PrimitiveIndex() * 3;
@@ -100,13 +89,30 @@ void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
 		triangles[i] = cVertexBuffer[triangleIndex[i]];
 	}
 
-	// 보간된 조각 값을 찾습니다.
+	// Interpolate fragment attributes.
 	RayFragment frag;
 	frag.PosW = WorldRayOrigin() + RayTCurrent() * WorldRayDirection();
-	frag.Tex = triangles[0].Tex * bary.x + triangles[1].Tex * bary.y + triangles[2].Tex * bary.z;
-	//frag.NormalW = normalize(mul(triangles[0].NormalL * bary.x + triangles[1].NormalL * bary.y + triangles[2].NormalL * bary.z, (float3x3)lTransform.WorldInvTranspose));
-	//frag.TangentW = normalize(mul(triangles[0].TangentL * bary.x + triangles[1].TangentL * bary.y + triangles[2].TangentL * bary.z, (float3x3)lTransform.World));
+	frag.Tex = HitAttribute(triangles[0].Tex, triangles[1].Tex, triangles[2].Tex, attr);
+	frag.NormalW = normalize(HitAttribute(triangles[0].Normal, triangles[1].Normal, triangles[2].Normal, attr));
+	//frag.TangentW = normalize(mul(triangles[0].TangentL * bary.x + triangles[1].TangentL * bary.y + triangles[2].TangentL * bary.z, (float3x3)cTransform.World));
 
-	payload.Color = 1.0f;
+	Material mat;
+	mat.Ambient = 1.0f;
+	mat.Diffuse = 1.0f;
+	mat.Specular = 1.0f;
+	mat.SpecExp = 32.0f;
+
+	Light light;
+	light.Type = 0;
+	light.Color = 1.0f;
+	light.Ambient = 0.2f;
+	light.Diffuse = 0.5f;
+	light.Specular = 0.4f;
+	light.Ambiguous_01.xyz = float3(0, -1.0f, 0);
+
+	float3 ads = ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection());
+
+	payload.Color = ads.x + ads.y + ads.z;
 	payload.Pos = frag.PosW;
+	payload.Normal = frag.NormalW;
 }

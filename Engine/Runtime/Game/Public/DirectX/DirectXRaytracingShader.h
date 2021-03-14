@@ -8,6 +8,12 @@
 
 #include "DirectXMinimal.h"
 
+struct DirectXShaderRecordInfo
+{
+	const void* ShaderIdentifier;
+	size_t NumParameters;
+};
+
 class GAME_API DirectXRaytracingShader : public DirectXDeviceResource
 {
 public:
@@ -30,9 +36,9 @@ public:
 	void Init();
 	void Render(ID3D12GraphicsCommandList4* inCommandList);
 
-	const void* GetRayGenerationIdentifier() const;
-	const void* GetClosestHitIdentifier(size_t shaderIndex) const;
-	const void* GetMissIdentifier(size_t shaderIndex) const;
+	DirectXShaderRecordInfo GetRayGenerationRecord() const;
+	std::vector<DirectXShaderRecordInfo> GetClosestHitRecords() const;
+	std::vector<DirectXShaderRecordInfo> GetMissRecords() const;
 
 	vs_property_get_auto(bool, IsInitialized, bInit);
 	vs_property_get_auto(ID3D12RootSignature*, RootSignature, rootSignature.Get());

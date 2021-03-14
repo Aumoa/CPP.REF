@@ -21,6 +21,4 @@ private:
 public:
 	THGameInstance();
 	~THGameInstance();
-
-	void Tick() override;
 };

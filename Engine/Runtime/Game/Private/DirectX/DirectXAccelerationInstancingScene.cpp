@@ -48,6 +48,8 @@ void DirectXAccelerationInstancingScene::UpdateScene()
 			actualInstanceCount += 1;
 		}
 	}
+
+	instanceBuffer->Unmap(0, nullptr);
 }
 
 void DirectXAccelerationInstancingScene::BuildScene(ID3D12GraphicsCommandList4* inCommandList)
@@ -185,7 +187,7 @@ void DirectXAccelerationInstancingScene::CheckAndReallocate(size_t desiredCount)
 	// Create instance desc gpu-based buffer.
 	bufferDesc.Width = sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * desiredCount;
 	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	heapProp.Type=  D3D12_HEAP_TYPE_UPLOAD;
+	heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
 	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&instanceBuffer)));
 
 	lastCount = desiredCount;
@@ -196,8 +198,8 @@ D3D12_RAYTRACING_INSTANCE_DESC DirectXAccelerationInstancingScene::GetRaytracing
 	D3D12_RAYTRACING_INSTANCE_DESC instance = { };
 	instance.InstanceID = sceneProxy->PrimitiveId;
 	instance.InstanceMask = 0xFF;
-	instance.InstanceContributionToHitGroupIndex = 0;
-	instance.Flags = 0;
+	instance.InstanceContributionToHitGroupIndex = instance.InstanceID;
+	instance.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 	instance.AccelerationStructure = sceneProxy->PrimitiveAccelerationPtr;
 
 	Matrix4x4 matrix = sceneProxy->PrimitiveTransform.Matrix;

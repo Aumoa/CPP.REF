@@ -118,6 +118,12 @@
     <Filter Include="Private\Input">
       <UniqueIdentifier>{a4c2915e-8861-4fc9-a3df-e77337998966}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\GameplayStatics">
+      <UniqueIdentifier>{f68d1238-5495-4eef-ba0d-d68f7caa0c1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\GameplayStatics">
+      <UniqueIdentifier>{45b3c9f1-50f3-4a68-80ff-c5dd14b17fe8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -684,6 +690,9 @@
     <ClInclude Include="Public\Input\TBitfieldInputChangeTracker.h">
       <Filter>Public\Input</Filter>
     </ClInclude>
+    <ClInclude Include="Public\GameplayStatics\ClassDependencyHelper.h">
+      <Filter>Public\GameplayStatics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -1090,6 +1099,9 @@
     </ClCompile>
     <ClCompile Include="Private\Input\Mouse.cpp">
       <Filter>Private\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameplayStatics\ClassDependencyHelper.cpp">
+      <Filter>Private\GameplayStatics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

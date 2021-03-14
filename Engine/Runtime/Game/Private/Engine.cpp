@@ -73,6 +73,8 @@ void Engine::Shutdown()
 
 void Engine::Render()
 {
+	QUICK_SCOPED_CYCLE_COUNTER(Engine, Render);
+
 	immediateFence->Wait();
 	immediateContext->BeginDraw();
 	{

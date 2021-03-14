@@ -38,6 +38,11 @@ void StaticMeshSceneProxy::Update()
 	if (staticMesh != nullptr)
 	{
 		PrimitiveAccelerationPtr = staticMesh->RaytracingAccelerationStructureBuffer->GetGPUVirtualAddress();
+		InstanceShaderRecord.ShaderIndex = 0;
+		InstanceShaderRecord.RootParameters.resize(0);
+		InstanceShaderRecord.RootParameters.emplace_back(staticMesh->VertexBuffer->GetGPUVirtualAddress());
+		InstanceShaderRecord.RootParameters.emplace_back(staticMesh->IndexBuffer->GetGPUVirtualAddress());
+		InstanceShaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
 	}
 }
 

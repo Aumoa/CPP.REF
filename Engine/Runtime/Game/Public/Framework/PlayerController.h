@@ -8,7 +8,6 @@
 
 class GPlayerCameraManager;
 class GInputComponent;
-class Keyboard;
 class KeyStateTracker;
 class MouseStateTracker;
 
