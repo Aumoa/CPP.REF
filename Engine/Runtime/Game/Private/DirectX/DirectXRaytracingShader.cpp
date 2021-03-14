@@ -12,12 +12,13 @@ using namespace std;
 
 namespace
 {
-	inline auto GetRootCBVParameter(uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility)
+	inline auto GetRootCBVParameter(uint32 shaderRegister, D3D12_SHADER_VISIBILITY shaderVisibility, uint32 space = 0)
 	{
 		D3D12_ROOT_PARAMETER param = { };
 		param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 		param.ShaderVisibility = shaderVisibility;
 		param.Descriptor.ShaderRegister = shaderRegister;
+		param.Descriptor.RegisterSpace = space;
 		return param;
 	};
 
@@ -160,7 +161,7 @@ vector<DirectXShaderRecordInfo> DirectXRaytracingShader::GetClosestHitRecords() 
 {
 	DirectXShaderRecordInfo sInfo;
 	sInfo.ShaderIdentifier = properties->GetShaderIdentifier(L"OpaqueHit");
-	sInfo.NumParameters = 0;
+	sInfo.NumParameters = 3;
 	return { sInfo };
 }
 
@@ -195,6 +196,7 @@ void DirectXRaytracingShader::InitLocalRS()
 	{
 		GetRootShaderResourceView(0, D3D12_SHADER_VISIBILITY_ALL, 2),
 		GetRootShaderResourceView(1, D3D12_SHADER_VISIBILITY_ALL, 2),
+		GetRootShaderResourceView(2, D3D12_SHADER_VISIBILITY_ALL, 2),
 	};
 
 	D3D12_ROOT_SIGNATURE_DESC localRSDesc = GetRootSignatureDesc(rootParams, { });

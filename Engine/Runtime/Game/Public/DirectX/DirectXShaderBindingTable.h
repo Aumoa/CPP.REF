@@ -35,6 +35,15 @@ private:
 	std::vector<uint64> params;
 };
 
+struct GAME_API DirectXInstanceShaderRecord
+{
+	size_t ShaderIndex;
+	std::vector<uint64> RootParameters;
+
+	DirectXInstanceShaderRecord(size_t shaderIndex = 0, const std::vector<uint64>& inParams = { });
+	DirectXInstanceShaderRecord(size_t shaderIndex, std::vector<uint64>&& inParams);
+};
+
 class GAME_API DirectXShaderBindingTable : public DirectXDeviceResource
 {
 public:
@@ -64,11 +73,13 @@ public:
 	DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle);
 	~DirectXShaderBindingTable() override;
 
-	void Init(DirectXRaytracingShader* initShader);
-	void Update();
+	void Init(DirectXRaytracingShader* initShader, std::span<DirectXInstanceShaderRecord const> hitGroupInstances, std::span<DirectXInstanceShaderRecord const> missInstances);
 	void FillDispatchRaysDesc(D3D12_DISPATCH_RAYS_DESC& outDispatchRays) const;
 
 private:
+	void Update();
+	void AddShaderRecord(std::vector<TRefPtr<DirectXShaderRecord>>& target, const std::vector<DirectXShaderRecordInfo>& identifiers, const DirectXInstanceShaderRecord& instance);
+
 	void ReadyBuffers();
 	void ReadyBufferSingle(const std::vector<TRefPtr<DirectXShaderRecord>>& records, TComPtr<ID3D12Resource>& buf, uint64& length, uint64& stride, char*& bufPtr);
 };

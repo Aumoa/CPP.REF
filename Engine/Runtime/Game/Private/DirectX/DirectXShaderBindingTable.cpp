@@ -48,7 +48,23 @@ size_t DirectXShaderRecord::RoundUp(size_t actual, size_t powerOf2Alignment)
 	return (actual + powerOf2Alignment) & ~powerOf2Alignment;
 }
 
-// ^^^^^^^^^^^^ ShaderRecord ^^^^^^^^^^^^vvvvvvvvvvvv DirectXShaderBindingTable vvvvvvvvvvvv
+// ^^^^^^^^^^^^ ShaderRecord ^^^^^^^^^^^^vvvvvvvvvvvv DirectXInstanceShaderRecord vvvvvvvvvvvv
+
+DirectXInstanceShaderRecord::DirectXInstanceShaderRecord(size_t shaderIndex, const vector<uint64>& inParams)
+	: ShaderIndex(shaderIndex)
+	, RootParameters(inParams)
+{
+
+}
+
+DirectXInstanceShaderRecord::DirectXInstanceShaderRecord(size_t shaderIndex, vector<uint64>&& inParams)
+	: ShaderIndex(shaderIndex)
+	, RootParameters(move(inParams))
+{
+
+}
+
+// ^^^^^^^^^^^^ DirectXInstanceShaderRecord ^^^^^^^^^^^^vvvvvvvvvvvv DirectXShaderBindingTable vvvvvvvvvvvv
 
 DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle) : Super()
 	, deviceBundle(deviceBundle)
@@ -70,22 +86,43 @@ DirectXShaderBindingTable::~DirectXShaderBindingTable()
 
 }
 
-void DirectXShaderBindingTable::Init(DirectXRaytracingShader* initShader)
+void DirectXShaderBindingTable::Init(DirectXRaytracingShader* initShader, span<DirectXInstanceShaderRecord const> hitGroupInstances, span<DirectXInstanceShaderRecord const> missInstances)
 {
 	shader = initShader;
 
 	rayGen = NewObject<DirectXShaderRecord>(initShader->GetRayGenerationRecord());
+
+	// Get ready shader identifiers.
 	vector<DirectXShaderRecordInfo> closestRecords = initShader->GetClosestHitRecords();
 	vector<DirectXShaderRecordInfo> missRecords = initShader->GetMissRecords();
-	for (size_t i = 0; i < closestRecords.size(); ++i)
+
+	// Add instances for each shader identifier.
+	closestHit.resize(0);
+	for (size_t i = 0; i < hitGroupInstances.size(); ++i)
 	{
-		closestHit.emplace_back(NewObject<DirectXShaderRecord>(closestRecords[i]));
+		AddShaderRecord(closestHit, closestRecords, hitGroupInstances[i]);
 	}
+	miss.resize(0);
 	for (size_t i = 0; i < missRecords.size(); ++i)
 	{
-		miss.emplace_back(NewObject<DirectXShaderRecord>(missRecords[i]));
+		AddShaderRecord(miss, missRecords, missInstances[i]);
 	}
+
+	// Update gpu upload buffer.
 	ReadyBuffers();
+	Update();
+}
+
+void DirectXShaderBindingTable::FillDispatchRaysDesc(D3D12_DISPATCH_RAYS_DESC& outDispatchRays) const
+{
+	outDispatchRays.RayGenerationShaderRecord.StartAddress = rayGenBuf->GetGPUVirtualAddress();
+	outDispatchRays.RayGenerationShaderRecord.SizeInBytes = rayGenLen;
+	outDispatchRays.HitGroupTable.StartAddress = closestHitBuf->GetGPUVirtualAddress();
+	outDispatchRays.HitGroupTable.SizeInBytes = closestHitLen;
+	outDispatchRays.HitGroupTable.StrideInBytes = closestHitStride;
+	outDispatchRays.MissShaderTable.StartAddress = missBuf->GetGPUVirtualAddress();
+	outDispatchRays.MissShaderTable.SizeInBytes = missLen;
+	outDispatchRays.MissShaderTable.StrideInBytes = missStride;
 }
 
 void DirectXShaderBindingTable::Update()
@@ -108,16 +145,15 @@ void DirectXShaderBindingTable::Update()
 	}
 }
 
-void DirectXShaderBindingTable::FillDispatchRaysDesc(D3D12_DISPATCH_RAYS_DESC& outDispatchRays) const
+void DirectXShaderBindingTable::AddShaderRecord(vector<TRefPtr<DirectXShaderRecord>>& target, const vector<DirectXShaderRecordInfo>& identifiers, const DirectXInstanceShaderRecord& instance)
 {
-	outDispatchRays.RayGenerationShaderRecord.StartAddress = rayGenBuf->GetGPUVirtualAddress();
-	outDispatchRays.RayGenerationShaderRecord.SizeInBytes = rayGenLen;
-	outDispatchRays.HitGroupTable.StartAddress = closestHitBuf->GetGPUVirtualAddress();
-	outDispatchRays.HitGroupTable.SizeInBytes = closestHitLen;
-	outDispatchRays.HitGroupTable.StrideInBytes = closestHitStride;
-	outDispatchRays.MissShaderTable.StartAddress = missBuf->GetGPUVirtualAddress();
-	outDispatchRays.MissShaderTable.SizeInBytes = missLen;
-	outDispatchRays.MissShaderTable.StrideInBytes = missStride;
+	size_t shaderIndex = instance.ShaderIndex;
+	DirectXShaderRecord* record = target.emplace_back(NewObject<DirectXShaderRecord>(identifiers[shaderIndex])).Get();
+
+	for (size_t i = 0; i < instance.RootParameters.size(); ++i)
+	{
+		record->SetParameter((uint32)i, instance.RootParameters[i]);
+	}
 }
 
 void DirectXShaderBindingTable::ReadyBuffers()
@@ -140,9 +176,12 @@ void DirectXShaderBindingTable::ReadyBufferSingle(const vector<TRefPtr<DirectXSh
 	}
 
 	// Calc full length.
-	length = stride * records.size();
-
-	// Create buffer and copy bytes.
-	buf = deviceBundle->CreateDynamicBuffer((size_t)length);
-	HR(buf->Map(0, nullptr, (void**)&bufPtr));
+	size_t new_length = stride * records.size();
+	if (new_length > length)
+	{
+		// Create buffer and copy bytes.
+		buf = deviceBundle->CreateDynamicBuffer((size_t)new_length);
+		HR(buf->Map(0, nullptr, (void**)&bufPtr));
+		length = new_length;
+	}
 }

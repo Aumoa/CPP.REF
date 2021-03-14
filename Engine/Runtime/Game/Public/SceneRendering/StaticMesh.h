@@ -51,6 +51,8 @@ public:
 	vs_property_get_auto(MaterialInterface*, DefaultMaterial, material.Get());
 	vs_property_get_auto(AxisAlignedCube, BoundingBox, boundingBox);
 	vs_property_get_auto(ID3D12Resource*, RaytracingAccelerationStructureBuffer, accelerationStructure.Get());
+	vs_property_get_auto(ID3D12Resource*, VertexBuffer, vertexBuffer.Get());
+	vs_property_get_auto(ID3D12Resource*, IndexBuffer, indexBuffer.Get());
 
 private:
 	static AxisAlignedCube ComputeBoundingBox(std::span<Vertex const> vertices);

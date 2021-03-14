@@ -21,7 +21,7 @@ THGameInstance::~THGameInstance()
 
 }
 
-void THGameInstance::Tick()
-{
-	Super::Tick();
-}
+//void THGameInstance::Tick()
+//{
+//	Super::Tick();
+//}

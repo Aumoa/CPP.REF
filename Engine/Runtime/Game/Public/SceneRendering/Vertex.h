@@ -5,6 +5,7 @@
 #include "GameAPI.h"
 #include "CoreMinimal.h"
 
+#pragma pack(push, 1)
 struct Vertex
 {
 	Vector3 Pos;
@@ -24,3 +25,4 @@ struct Vertex
 
 	}
 };
+#pragma pack(pop)

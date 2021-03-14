@@ -23,12 +23,14 @@ struct Payload
 {
 	float4 Color;
 	float3 Pos;
+	float3 Normal;
 };
 
 struct RayFragment
 {
 	float3 PosW;
 	float2 Tex;
+	float3 NormalW;
 };
 
 struct BuiltInAttr
@@ -42,6 +44,12 @@ struct ShaderCameraConstant
 	row_major matrix ViewProj;
 	row_major matrix ViewProjInv;
 	float3 Pos;
+};
+
+struct RaytracingInstanceTransform
+{
+	row_major matrix World;
+	row_major matrix WorldInvTranspose;
 };
 
 #if defined(__cplusplus)

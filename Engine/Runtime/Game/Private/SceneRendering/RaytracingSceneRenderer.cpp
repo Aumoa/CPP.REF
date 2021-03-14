@@ -44,8 +44,23 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 
 	DirectXDescriptorAllocator* allocator = scene->GetDescriptorAllocator();
 	DirectXShaderBindingTable* sbt = scene->GetShaderBindingTable();
-	sbt->Init(cached);
-	sbt->Update();
+
+	std::vector<DirectXInstanceShaderRecord> hitGroupRecords;
+	std::vector<DirectXInstanceShaderRecord> missRecords;
+	
+	// Fill instanced hit group records.
+	const auto& primitives = scene->GetPrimitives();
+	hitGroupRecords.reserve(primitives.size());
+	for (auto& primitive : primitives)
+	{
+		hitGroupRecords.emplace_back(primitive->InstanceShaderRecord);
+	}
+
+	// Fill instanced miss records.
+	// In most cases, this is may be sky sphere.
+	missRecords.emplace_back(0);
+
+	sbt->Init(cached, hitGroupRecords, missRecords);
 
 	D3D12_DISPATCH_RAYS_DESC dispatchRays = { };
 	sbt->FillDispatchRaysDesc(dispatchRays);

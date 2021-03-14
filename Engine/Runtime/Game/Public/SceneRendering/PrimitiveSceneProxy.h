@@ -8,8 +8,10 @@
 #include "Transform.h"
 #include "ComponentMobility.h"
 #include "DirectX/DirectXMinimal.h"
+#include "DirectX/DirectXShaderBindingTable.h"
 
 class GPrimitiveComponent;
+class DirectXDeviceBundle;
 
 class GAME_API PrimitiveSceneProxy : public Object
 {
@@ -18,6 +20,7 @@ public:
 
 private:
 	TWeakPtr<GPrimitiveComponent> myPrimitiveComponent;
+	TComPtr<ID3D12Resource> instanceTransformBuf;
 
 public:
 	PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent);
@@ -31,4 +34,8 @@ public:
 	uint64 PrimitiveId;
 	AxisAlignedCube PrimitiveBoundingBox;
 	uint64 PrimitiveAccelerationPtr;
+	DirectXInstanceShaderRecord InstanceShaderRecord;
+
+protected:
+	uint64 GetInstanceTransformBuf() const;
 };
