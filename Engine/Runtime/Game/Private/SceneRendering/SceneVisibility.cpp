@@ -58,6 +58,7 @@ void SceneVisibility::CalcVisibility()
 		}
 
 		auto ptr = (ShaderCameraConstant*)cameraConstantPtr;
+		ptr->Proj = myView.Proj;
 		ptr->ViewProj = myView.ViewProj;
 		ptr->ViewProjInv = myView.ViewProjInv;
 		ptr->Pos = myView.Location;

@@ -4,11 +4,13 @@
 
 #include "Engine.h"
 #include "GameViewport.h"
+#include "World.h"
 #include "Logging/LogMacros.h"
 #include "Framework/PlayerController.h"
 #include "Framework/Pawn.h"
 #include "Components/CameraComponent.h"
 #include "SceneRendering/MinimalViewInfo.h"
+#include "SceneRendering/Scene.h"
 
 GPlayerCameraManager::GPlayerCameraManager() : Super()
 	, bPrintNoCameraWarning(true)
@@ -34,8 +36,11 @@ void GPlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 
 		if (outViewInfo.AspectRatio == 0.0f)
 		{
-			//GameViewport* vp = GEngine.GetGameViewport();
-			//outViewInfo.AspectRatio = vp->ResolutionX / (float)vp->ResolutionY;
+			World* world = GetWorld();
+			Scene* scene = world->GetScene();
+			Engine* engine = scene->GetEngine();
+			GameViewport* vp = engine->GetLocalViewport();
+			outViewInfo.AspectRatio = vp->ResolutionX / (float)vp->ResolutionY;
 		}
 
 		outViewInfo.Apply();
@@ -63,10 +68,13 @@ void GPlayerCameraManager::CalcCameraView(MinimalViewInfo& outViewInfo) const
 			updateTransform = pawn->GetActorTransform();
 		}
 
-		//GameViewport* viewport = GEngine.GetGameViewport();
+		World* world = GetWorld();
+		Scene* scene = world->GetScene();
+		Engine* engine = scene->GetEngine();
+		GameViewport* vp = engine->GetLocalViewport();
 
 		outViewInfo.FOV = DefaultFOV;
-		//outViewInfo.AspectRatio = (float)viewport->ResolutionX / (float)viewport->ResolutionY;
+		outViewInfo.AspectRatio = (float)vp->ResolutionX / (float)vp->ResolutionY;
 		outViewInfo.Location = updateTransform.Translation;
 		outViewInfo.Rotation = updateTransform.Rotation;
 		outViewInfo.Apply();

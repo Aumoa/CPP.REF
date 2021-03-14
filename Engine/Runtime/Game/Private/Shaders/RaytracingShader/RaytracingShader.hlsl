@@ -31,13 +31,16 @@ inline void TraceRayWithArgs(RaytracingAccelerationStructure inScene, TraceArgs 
 	);
 }
 
-RayDesc GenerateRay(uint2 launchIndex, uint2 dimensions, float3 cameraPos, matrix vp, float near = 0.01f, float far = 1000.0f)
+RayDesc GenerateRay(uint2 launchIndex, float3 cameraPos, matrix projectionToWorld, float near = 0.01f, float far = 1000.0f)
 {
-	float2 xy = (float2)launchIndex + 0.5f;
-	float2 screenPos = xy / (float2)dimensions * 2.0f - 1.0f;
+	float2 xy = launchIndex + 0.5f; // center in the middle of the pixel.
+	float2 screenPos = xy / DispatchRaysDimensions().xy * 2.0 - 1.0;
+
+	// Invert Y for DirectX-style coordinates.
 	screenPos.y = -screenPos.y;
 
-	float4 world = mul(float4(screenPos, 0, 1.0f), vp);
+	// Unproject the pixel coordinate into a ray.
+	float4 world = mul(float4(screenPos, 0, 1), projectionToWorld);
 	world.xyz /= world.w;
 
 	RayDesc ray;
@@ -46,6 +49,9 @@ RayDesc GenerateRay(uint2 launchIndex, uint2 dimensions, float3 cameraPos, matri
 	ray.TMin = near;
 	ray.TMax = far;
 
+	//ray.Origin = float3(screenPos, -1.0f);
+	//ray.Direction = gCamera.Pos;
+
 	return ray;
 }
 
@@ -53,12 +59,12 @@ RayDesc GenerateRay(uint2 launchIndex, uint2 dimensions, float3 cameraPos, matri
 void RayGeneration()
 {
 	uint2 launchIndex = (uint2)DispatchRaysIndex();
-	uint2 dimensions = (uint2)DispatchRaysDimensions();
 
 	TraceArgs args = (TraceArgs)0;
+	args.RayFlags = RAY_FLAG_CULL_BACK_FACING_TRIANGLES;
 	args.InstanceInclusionMask = ~0;
 	args.MultiplierForGeometryContributionToHitGroupIndex = 1;
-	args.Ray = GenerateRay(launchIndex, dimensions, gCamera.Pos, gCamera.ViewProj);
+	args.Ray = GenerateRay(launchIndex, gCamera.Pos, gCamera.ViewProjInv);
 
 	Payload payload;
 	TraceRayWithArgs(gSceneAS, args, payload);

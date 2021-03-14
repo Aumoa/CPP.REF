@@ -38,6 +38,7 @@ struct BuiltInAttr
 
 struct ShaderCameraConstant
 {
+	row_major matrix Proj;
 	row_major matrix ViewProj;
 	row_major matrix ViewProjInv;
 	float3 Pos;

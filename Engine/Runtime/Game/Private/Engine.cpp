@@ -123,6 +123,11 @@ CachedShaderLibrary* Engine::GetCachedShaderLibrary() const
 	return shaderLibrary.Get();
 }
 
+GameViewport* Engine::GetLocalViewport() const
+{
+	return gameViewport.Get();
+}
+
 void Engine::MainWindow_OnSizing(int32 x, int32 y)
 {
 	if (x * y != 0)

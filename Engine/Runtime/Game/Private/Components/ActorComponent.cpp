@@ -3,6 +3,7 @@
 #include "Components/ActorComponent.h"
 
 #include "Logging/LogMacros.h"
+#include "Framework/Actor.h"
 
 using namespace std;
 
@@ -61,12 +62,20 @@ void GActorComponent::RemovePrerequisiteObject(ITickFunctionObject* inObject)
 
 void GActorComponent::BeginPlay()
 {
-	bComponentHasBegunPlay = true;
+	if (owner != nullptr)
+	{
+		SetWorld(owner->GetWorld());
+		bComponentHasBegunPlay = true;
+	}
 }
 
 void GActorComponent::EndPlay()
 {
-	bComponentHasBegunPlay = false;
+	if (bComponentHasBegunPlay)
+	{
+		SetWorld(nullptr);
+		bComponentHasBegunPlay = false;
+	}
 }
 
 void GActorComponent::TickComponent(Seconds deltaTime)

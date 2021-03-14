@@ -36,7 +36,7 @@ void ASpectatorPawn::Tick(Seconds deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	ProcessPlayerInput();
+	//ProcessPlayerInput();
 }
 
 void ASpectatorPawn::SetupPlayerInputComponent(GInputComponent* inPlayerInput)

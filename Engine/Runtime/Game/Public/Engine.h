@@ -48,6 +48,7 @@ public:
 	DirectXCommandQueue* GetPrimaryCommandQueue() const;
 	AssetManager* GetAssetManager() const;
 	CachedShaderLibrary* GetCachedShaderLibrary() const;
+	GameViewport* GetLocalViewport() const;
 
 private:
 	void Render();

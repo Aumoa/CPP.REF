@@ -16,6 +16,7 @@ struct GAME_API MinimalViewInfo
 	Vector3 Location;
 	Quaternion Rotation;
 
+	Matrix4x4 Proj;
 	Matrix4x4 ViewProj;
 	Matrix4x4 ViewProjInv;
 

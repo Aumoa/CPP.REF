@@ -42,9 +42,9 @@ void GStartupLevel::LoadLevel()
 	//light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
 	//light->LightComponent->LightColor = Color::White;
 
-	//plane = SpawnActorPersistent<AStaticMeshActor>();
-	//plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
-	//plane->StaticMesh->Scale = Vector3(10.0f, 0.1f, 10.0f);
+	plane = SpawnActorPersistent<AStaticMeshActor>();
+	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
+	plane->StaticMesh->Scale = Vector3(0.1f);
 	//geosphere = SpawnActorPersistent<AStaticMeshActor>();
 	//geosphere->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
 	//geosphere->RootComponent->Location = Vector3(0, 0.55f, 0);
@@ -63,6 +63,8 @@ void GStartupLevel::LoadLevel()
 	//icosahedron->StaticMesh->Scale = 0.5f;
 
 	spectator = SpawnActorPersistent<ASpectatorPawn>();
+	spectator->SetActorLocation(Vector3(0, 0, -1.0f));
+	spectator->SetActorRotation(Quaternion::LookTo(Vector3(0, 0, 1.0f), Vector3::Up));
 }
 
 APawn* GStartupLevel::GetPersistentActor() const
