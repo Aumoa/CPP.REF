@@ -6,10 +6,15 @@
 #include "GameMinimal.h"
 #include "Framework/PlayerController.h"
 
+class TickScheduler;
+
 class TH_API ATHPlayerController : public APlayerController
 {
+public:
 	using Super = APlayerController;
-	using This = ATHPlayerController;
+
+private:
+	TRefPtr<TickScheduler> diag_tick;
 
 public:
 	ATHPlayerController();
