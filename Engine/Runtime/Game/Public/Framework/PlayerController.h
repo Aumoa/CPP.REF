@@ -6,13 +6,11 @@
 #include "CoreMinimal.h"
 #include "Controller.h"
 
-#include "Diagnostics/ScopedCycleCounter.h"
-#include "Key.h"
-
 class GPlayerCameraManager;
 class GInputComponent;
-
-GAME_API DECLARE_STATS_GROUP(APlayerController);
+class Keyboard;
+class KeyStateTracker;
+class MouseStateTracker;
 
 class GAME_API APlayerController : public AController
 {
@@ -25,7 +23,9 @@ private:
 
 	GPlayerCameraManager* cameraManager;
 	GInputComponent* inputComponent;
-	GInputComponent* possessedInputComponent;
+
+	KeyStateTracker* keyTracker;
+	MouseStateTracker* mouseTracker;
 
 public:
 	APlayerController();
@@ -44,8 +44,8 @@ public:
 	bool bAutoUnlockMouseCursor : 1;
 
 private:
+	void UpdateInput();
 	void UpdateCursorVisibleState();
 
 	void Possessed_ComponentAdded(GActorComponent*);
-	void AutoUnlockMouseCursor(EKey inKey, EKeyEvent inKeyEvent);
 };

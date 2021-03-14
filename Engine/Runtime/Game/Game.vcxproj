@@ -361,7 +361,9 @@
     <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameViewport.h" />
-    <ClInclude Include="Public\Key.h" />
+    <ClInclude Include="Public\Input\TBitfieldInputChangeTracker.h" />
+    <ClInclude Include="Public\Input\Keyboard.h" />
+    <ClInclude Include="Public\Input\Mouse.h" />
     <ClInclude Include="Public\Level.h" />
     <ClInclude Include="Public\Logging\LogCategoryBase.h" />
     <ClInclude Include="Public\Logging\Logger.h" />
@@ -371,7 +373,6 @@
     <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
-    <ClInclude Include="Public\PlatformMisc\PlatformInput.h" />
     <ClInclude Include="Public\RHI\IRHIBundle.h" />
     <ClInclude Include="Public\RHI\IRHICommandFence.h" />
     <ClInclude Include="Public\RHI\IRHICommandList.h" />
@@ -431,6 +432,8 @@
     <ClInclude Include="Public\Windows\WindowsMinimal.h" />
     <ClInclude Include="Public\Windows\WinEvent.h" />
     <ClInclude Include="Public\Windows\WinException.h" />
+    <ClInclude Include="Public\Windows\WinKeyboard.h" />
+    <ClInclude Include="Public\Windows\WinMouse.h" />
     <ClInclude Include="Public\World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -524,6 +527,8 @@
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\GameObject.cpp" />
     <ClCompile Include="Private\GameViewport.cpp" />
+    <ClCompile Include="Private\Input\Keyboard.cpp" />
+    <ClCompile Include="Private\Input\Mouse.cpp" />
     <ClCompile Include="Private\Level.cpp" />
     <ClCompile Include="Private\Logging\EngineLogCategory.cpp" />
     <ClCompile Include="Private\Logging\LogCategoryBase.cpp" />
@@ -536,7 +541,6 @@
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformImage.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformImageLoader.cpp" />
-    <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp" />
     <ClCompile Include="Private\RHI\IRHIDeviceBundle.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIDispatchRaysDesc.cpp" />
@@ -570,6 +574,8 @@
     <ClCompile Include="Private\Windows\HandleBase.cpp" />
     <ClCompile Include="Private\Windows\WinEvent.cpp" />
     <ClCompile Include="Private\Windows\WinException.cpp" />
+    <ClCompile Include="Private\Windows\WinKeyboard.cpp" />
+    <ClCompile Include="Private\Windows\WinMouse.cpp" />
     <ClCompile Include="Private\World.cpp" />
     <None Include="Private\Shaders\GenericLighting.hlsli" />
     <None Include="Private\Shaders\PrimitivePacking.hlsli" />
@@ -588,6 +594,7 @@
     <None Include="Public\DirectX\DirectXCommandQueue.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
+    <None Include="Public\Input\TBitfieldInputChangeTracker.inl" />
     <None Include="Public\Level.inl" />
     <None Include="Public\Materials\MaterialInterface.inl" />
     <None Include="Public\TSubclassOf.inl" />

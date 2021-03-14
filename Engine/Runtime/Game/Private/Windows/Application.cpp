@@ -3,6 +3,8 @@
 #include "Windows/Application.h"
 
 #include "Windows/CoreWindow.h"
+#include "Windows/WinKeyboard.h"
+#include "Windows/WinMouse.h"
 #include "Logging/LogMacros.h"
 
 Application* Application::instance;
@@ -16,6 +18,38 @@ Application::Application()
 Application::~Application()
 {
 
+}
+
+inline void ProcessInputMessage(uint32 message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+		case WM_ACTIVATEAPP:
+		    WinKeyboard::ProcessMessage(message, wParam, lParam);
+			WinMouse::ProcessMessage(message, wParam, lParam);
+		    break;
+		
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+		    WinKeyboard::ProcessMessage(message, wParam, lParam);
+		    break;
+		case WM_INPUT:
+		case WM_MOUSEMOVE:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_MOUSEWHEEL:
+		case WM_XBUTTONDOWN:
+		case WM_XBUTTONUP:
+		case WM_MOUSEHOVER:
+			WinMouse::ProcessMessage(message, wParam, lParam);
+			break;
+	}
 }
 
 void Application::Run(TRefPtr<CoreWindow> main)
@@ -35,6 +69,10 @@ void Application::Run(TRefPtr<CoreWindow> main)
 		main->Init();
 	}
 	Initialize();
+
+	winKey = NewObject<WinKeyboard>();
+	winMouse = NewObject<WinMouse>();
+	winMouse->SetWindow(main->HWnd);
 
 	// Show main windows.
 	if (!main->IsVisible)
@@ -57,6 +95,7 @@ void Application::Run(TRefPtr<CoreWindow> main)
 			{
 				TranslateMessage(&msg);
 				DispatchMessageW(&msg);
+				ProcessInputMessage(msg.message, msg.wParam, msg.lParam);
 			}
 		}
 

@@ -6,8 +6,8 @@
 #include "CoreMinimal.h"
 #include "ActorComponent.h"
 
-#include "PlatformMisc/PlatformInput.h"
-#include "Key.h"
+class KeyStateTracker;
+class MouseStateTracker;
 
 class GAME_API GInputComponent : public GActorComponent
 {
@@ -15,18 +15,9 @@ public:
 	using Super = GActorComponent;
 	using This = GInputComponent;
 
-	using KeyActionBindDelegate = TMulticastDelegate<void(EKey, EKeyEvent)>;
-	using CursorMoveBindDelegate = TMulticastDelegate<void(const CursorState&, const CursorCompare&)>;
-
 private:
-	KeyboardState keys;
-	KeyboardCompare keyCompare;
-	CursorState cursor;
-	CursorCompare cursorCompare;
-
-	std::map<EKey, KeyActionBindDelegate> keyBinds[2];
-	CursorMoveBindDelegate cursorBind;
-	GInputComponent* overrideComponent;
+	TRefPtr<KeyStateTracker> keyTracker;
+	TRefPtr<MouseStateTracker> mouseTracker;
 
 public:
 	GInputComponent();
@@ -34,12 +25,6 @@ public:
 
 	void TickComponent(Seconds deltaTime) override;
 
-	void SetOverrideComponent(GInputComponent* inDerived);
-
-	KeyActionBindDelegate& GetKeyActionBinder(EKey inKey, EKeyEvent inEventType);
-	CursorMoveBindDelegate& GetCursorMoveBinder();
-
-private:
-	void UpdateKeyboardState();
-	void UpdateCursorState();
+	vs_property_get_auto(KeyStateTracker*, KeyTracker, keyTracker.Get());
+	vs_property_get_auto(MouseStateTracker*, MouseTracker, mouseTracker.Get());
 };

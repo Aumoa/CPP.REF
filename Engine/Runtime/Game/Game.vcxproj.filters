@@ -112,6 +112,12 @@
     <Filter Include="Private\Shaders\RaytracingShader">
       <UniqueIdentifier>{da307a7c-1fc2-48d0-b456-2d260e9c498e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Input">
+      <UniqueIdentifier>{8a94c755-c002-4372-bc29-c7231a063259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Input">
+      <UniqueIdentifier>{a4c2915e-8861-4fc9-a3df-e77337998966}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -390,12 +396,6 @@
     <ClInclude Include="Public\Components\InputComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Key.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\PlatformMisc\PlatformInput.h">
-      <Filter>Public\PlatformMisc</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\IRHIDepthStencilView.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
@@ -669,6 +669,21 @@
     <ClInclude Include="Public\Assets\CachedShaderLibrary.h">
       <Filter>Public\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Windows\WinKeyboard.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Windows\WinMouse.h">
+      <Filter>Public\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Input\Keyboard.h">
+      <Filter>Public\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Input\Mouse.h">
+      <Filter>Public\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Input\TBitfieldInputChangeTracker.h">
+      <Filter>Public\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -859,9 +874,6 @@
     </ClCompile>
     <ClCompile Include="Private\Components\InputComponent.cpp">
       <Filter>Private\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\PlatformInput.cpp">
-      <Filter>Private\PlatformMisc</Filter>
     </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12DepthStencilView.cpp">
       <Filter>Private\D3D12RHI</Filter>
@@ -1067,6 +1079,18 @@
     <ClCompile Include="Private\Assets\CachedShaderLibrary.cpp">
       <Filter>Private\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Windows\WinKeyboard.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Windows\WinMouse.cpp">
+      <Filter>Private\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Input\Keyboard.cpp">
+      <Filter>Private\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Input\Mouse.cpp">
+      <Filter>Private\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -1137,6 +1161,9 @@
     </None>
     <None Include="Public\DirectX\DirectXCommandQueue.inl">
       <Filter>Public\DirectX</Filter>
+    </None>
+    <None Include="Public\Input\TBitfieldInputChangeTracker.inl">
+      <Filter>Public\Input</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

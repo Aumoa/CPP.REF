@@ -6,6 +6,8 @@
 #include "Components/FloatingPawnMovementComponent.h"
 #include "Components/CameraComponent.h"
 #include "Framework/PlayerController.h"
+#include "Input/Keyboard.h"
+#include "Input/Mouse.h"
 
 ASpectatorPawn::ASpectatorPawn() : Super()
 	, bMoveForward(false)
@@ -17,6 +19,8 @@ ASpectatorPawn::ASpectatorPawn() : Super()
 	, pitch(0)
 
 	, movementComponent(nullptr)
+	, keyTracker(nullptr)
+	, mouseTracker(nullptr)
 
 	, RotationSpeed(10.0f)
 {
@@ -36,22 +40,20 @@ void ASpectatorPawn::Tick(Seconds deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	//ProcessPlayerInput();
+	if (keyTracker != nullptr || mouseTracker != nullptr)
+	{
+		HandlePlayerKeyboardInput();
+		HandlePlayerCursorInput();
+		ProcessPlayerInput();
+	}
 }
 
 void ASpectatorPawn::SetupPlayerInputComponent(GInputComponent* inPlayerInput)
 {
 	Super::SetupPlayerInputComponent(inPlayerInput);
 
-	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::W, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::A, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::A, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::S, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::S, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Pressed).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetKeyActionBinder(EKey::D, EKeyEvent::Released).AddRaw(this, &ASpectatorPawn::HandlePlayerKeyboardInput);
-	inPlayerInput->GetCursorMoveBinder().AddRaw(this, &ASpectatorPawn::HandlePlayerCursorInput);
+	keyTracker = inPlayerInput->KeyTracker;
+	mouseTracker = inPlayerInput->MouseTracker;
 }
 
 void ASpectatorPawn::MoveForward(float value)
@@ -78,33 +80,26 @@ void ASpectatorPawn::AddPitchInput(TDegrees<float> input)
 	pitch += input * RotationSpeed;
 }
 
-void ASpectatorPawn::HandlePlayerKeyboardInput(EKey inKey, EKeyEvent inEvent)
+void ASpectatorPawn::HandlePlayerKeyboardInput()
 {
-	switch (inKey)
-	{
-	case EKey::W:
-		bMoveForward = inEvent == EKeyEvent::Pressed;
-		break;
-	case EKey::A:
-		bMoveLeft = inEvent == EKeyEvent::Pressed;
-		break;
-	case EKey::S:
-		bMoveBackward = inEvent == EKeyEvent::Pressed;
-		break;
-	case EKey::D:
-		bMoveRight = inEvent == EKeyEvent::Pressed;
-		break;
-	}
+	auto last = keyTracker->Last;
+	bMoveForward = last.IsKeyDown(EKey::W);
+	bMoveLeft = last.IsKeyDown(EKey::A);
+	bMoveBackward = last.IsKeyDown(EKey::S);
+	bMoveRight = last.IsKeyDown(EKey::D);
 }
 
-void ASpectatorPawn::HandlePlayerCursorInput(const CursorState& inCursorState, const CursorCompare& inCursorDelta)
+void ASpectatorPawn::HandlePlayerCursorInput()
 {
-	APlayerController* const playerController = GetController<APlayerController>();
+	MouseState last = mouseTracker->Last;
 
-	if (playerController != nullptr && playerController->IsCursorLocked)
+	if (last.Mode == EMousePositionMode::Relative)
 	{
-		AddYawInput(inCursorDelta.GetDeltaXByDpi());
-		AddPitchInput(inCursorDelta.GetDeltaYByDpi());
+		float yawInput = last.X / 96.0f;
+		float pitchInput = last.Y / 96.0f;
+
+		AddYawInput(yawInput * 2.0f);
+		AddPitchInput(pitchInput * 2.0f);
 	}
 }
 

@@ -6,9 +6,12 @@
 #include "CoreMinimal.h"
 #include "Pawn.h"
 
-#include "PlatformMisc/PlatformInput.h"
-
 class GFloatingPawnMovementComponent;
+class KeyStateTracker;
+class MouseStateTracker;
+enum class EKey;
+enum class EKeyEvent;
+struct MouseState;
 
 class GAME_API ASpectatorPawn : public APawn
 {
@@ -26,6 +29,8 @@ private:
 	TDegrees<float> pitch;
 
 	GFloatingPawnMovementComponent* movementComponent;
+	KeyStateTracker* keyTracker;
+	MouseStateTracker* mouseTracker;
 
 public:
 	ASpectatorPawn();
@@ -43,8 +48,8 @@ public:
 	float RotationSpeed;
 
 private:
-	void HandlePlayerKeyboardInput(EKey inKey, EKeyEvent inEvent);
-	void HandlePlayerCursorInput(const CursorState& inCursorState, const CursorCompare& inCursorDelta);
+	void HandlePlayerKeyboardInput();
+	void HandlePlayerCursorInput();
 	void ProcessPlayerInput();
 
 	Quaternion ConsumeRotationInput();

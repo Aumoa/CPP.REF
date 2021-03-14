@@ -4,7 +4,6 @@
 
 #include "World.h"
 #include "Levels/StartupLevel.h"
-#include "Pawn/MyCharacter.h"
 
 ATHPlayerController::ATHPlayerController()
 {

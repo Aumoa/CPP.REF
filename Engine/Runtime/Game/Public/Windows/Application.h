@@ -7,6 +7,8 @@
 #include "HandleBase.h"
 
 class CoreWindow;
+class WinKeyboard;
+class WinMouse;
 
 class GAME_API Application : public HandleBase
 {
@@ -19,6 +21,9 @@ private:
 	HANDLE hModule;
 	TRefPtr<CoreWindow> mainWindow;
 	bool bMainLoop : 1;
+
+	TRefPtr<WinKeyboard> winKey;
+	TRefPtr<WinMouse> winMouse;
 
 protected:
 	bool bForcedTick : 1;
