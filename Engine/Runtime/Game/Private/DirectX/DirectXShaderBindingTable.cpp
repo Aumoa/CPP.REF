@@ -6,19 +6,67 @@
 #include "DirectX/DirectXDeviceBundle.h"
 #include "DirectX/DirectXRaytracingShader.h"
 
-namespace
+using namespace std;
+
+DirectXShaderRecord::DirectXShaderRecord(DirectXDeviceBundle* deviceBundle, const void* pShaderIdentifier) : Super()
+	, deviceBundle(deviceBundle)
+	, mappingBuffer(nullptr)
+	, sizeInBytes(0)
 {
-	extern "C" struct DXRayGenerationBinding
-	{
-		char Identifier[D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES];
-		D3D12_GPU_DESCRIPTOR_HANDLE rootParameters[1];
-	};
+	Reallocate(CalcSizeInBytes(0));
+	memcpy(mappingBuffer, pShaderIdentifier, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
 }
 
-DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle) : Super()
-	, device(deviceBundle->GetDevice())
+DirectXShaderRecord::~DirectXShaderRecord()
 {
-	rayGeneration = CreateBuffer(D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+
+}
+
+ID3D12Resource* DirectXShaderRecord::GetBuffer() const
+{
+	return recordBuffer.Get();
+}
+
+uint64 DirectXShaderRecord::GetGPUVirtualAddress() const
+{
+	return recordBuffer->GetGPUVirtualAddress();
+}
+
+uint64 DirectXShaderRecord::GetSizeInBytes() const
+{
+	return sizeInBytes;
+}
+
+size_t DirectXShaderRecord::CalcSizeInBytes(size_t paramCount) const
+{
+	return D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES + sizeof(D3D12_GPU_VIRTUAL_ADDRESS) * paramCount;
+}
+
+void DirectXShaderRecord::Reallocate(size_t newSize)
+{
+	// Need reallocate.
+	if (sizeInBytes < newSize)
+	{
+		TComPtr<ID3D12Resource> newBuffer = deviceBundle->CreateDynamicBuffer(newSize);
+		void* newBufferMap = nullptr;
+		HR(newBuffer->Map(0, nullptr, &newBufferMap));
+		
+		// Copy previous bytes to new buffer.
+		memcpy(newBufferMap, mappingBuffer, sizeInBytes);
+
+		// Replace binding table.
+		recordBuffer = move(newBuffer);
+		mappingBuffer = newBufferMap;
+
+		SetDeviceChildPtr(recordBuffer.Get(), deviceBundle);
+	}
+}
+
+// ^^^^^^^^^^^^ ShaderRecord ^^^^^^^^^^^^vvvvvvvvvvvv DirectXShaderBindingTable
+
+DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle) : Super()
+	, deviceBundle(deviceBundle)
+{
 	SetDeviceChildPtr(nullptr, deviceBundle);
 }
 
@@ -29,34 +77,19 @@ DirectXShaderBindingTable::~DirectXShaderBindingTable()
 
 void DirectXShaderBindingTable::Init(DirectXRaytracingShader* initShader)
 {
-	DXRayGenerationBinding* rgBind;
-	HR(rayGeneration->Map(0, nullptr, (void**)&rgBind));
-	memcpy(rgBind->Identifier, initShader->GetRayGenerationIdentifier(), D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
-	rayGeneration->Unmap(0, nullptr);
+	DirectXNew(rayGen, DirectXShaderRecord, deviceBundle, initShader->GetRayGenerationIdentifier());
+	DirectXNew(closestHit, DirectXShaderRecord, deviceBundle, initShader->GetClosestHitIdentifier(0));
+	DirectXNew(miss, DirectXShaderRecord, deviceBundle, initShader->GetMissIdentifier(0));
 }
 
 void DirectXShaderBindingTable::FillDispatchRaysDesc(D3D12_DISPATCH_RAYS_DESC& outDispatchRays) const
 {
-	outDispatchRays.RayGenerationShaderRecord.StartAddress = rayGeneration->GetGPUVirtualAddress();
-	outDispatchRays.RayGenerationShaderRecord.SizeInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-}
-
-TComPtr<ID3D12Resource> DirectXShaderBindingTable::CreateBuffer(uint64 sizeInBytes)
-{
-	D3D12_RESOURCE_DESC bufferDesc = { };
-	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	bufferDesc.Width = sizeInBytes;
-	bufferDesc.Height = 1;
-	bufferDesc.DepthOrArraySize = 1;
-	bufferDesc.MipLevels = 1;
-	bufferDesc.SampleDesc = { 1, 0 };
-	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-	D3D12_HEAP_PROPERTIES heapProp = { };
-	heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-	TComPtr<ID3D12Resource> resource;
-	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
-
-	return resource;
+	outDispatchRays.RayGenerationShaderRecord.StartAddress = rayGen->GetGPUVirtualAddress();
+	outDispatchRays.RayGenerationShaderRecord.SizeInBytes = rayGen->GetSizeInBytes();
+	outDispatchRays.HitGroupTable.StartAddress = closestHit->GetGPUVirtualAddress();
+	outDispatchRays.HitGroupTable.SizeInBytes = closestHit->GetSizeInBytes();
+	outDispatchRays.HitGroupTable.StrideInBytes = closestHit->GetSizeInBytes();
+	outDispatchRays.MissShaderTable.StartAddress = miss->GetGPUVirtualAddress();
+	outDispatchRays.MissShaderTable.SizeInBytes = miss->GetSizeInBytes();
+	outDispatchRays.MissShaderTable.StrideInBytes = miss->GetSizeInBytes();
 }

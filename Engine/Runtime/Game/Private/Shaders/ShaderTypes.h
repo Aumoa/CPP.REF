@@ -19,12 +19,6 @@ inline namespace
 
 #endif
 
-struct Ray
-{
-	float3 Origin;
-	float3 Direction;
-};
-
 struct Payload
 {
 	float4 Color;
@@ -48,3 +42,9 @@ struct ShaderCameraConstant
 	row_major matrix ViewProjInv;
 	float3 Pos;
 };
+
+#if defined(__cplusplus)
+
+#undef row_major
+
+#endif

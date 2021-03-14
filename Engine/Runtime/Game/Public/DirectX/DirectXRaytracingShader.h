@@ -30,7 +30,9 @@ public:
 	void Init();
 	void Render(ID3D12GraphicsCommandList4* inCommandList);
 
-	const char* GetRayGenerationIdentifier() const;
+	const void* GetRayGenerationIdentifier() const;
+	const void* GetClosestHitIdentifier(size_t shaderIndex) const;
+	const void* GetMissIdentifier(size_t shaderIndex) const;
 
 	vs_property_get_auto(bool, IsInitialized, bInit);
 	vs_property_get_auto(ID3D12RootSignature*, RootSignature, rootSignature.Get());

@@ -127,7 +127,15 @@ void DirectXAccelerationInstancingScene::FinishEditInstance()
 
 uint64 DirectXAccelerationInstancingScene::GetRaytracingAccelerationStructureBuffer() const
 {
-	return accelerationStructure->GetGPUVirtualAddress();
+	if (accelerationStructure.IsValid)
+	{
+		return accelerationStructure->GetGPUVirtualAddress();
+	}
+	else
+	{
+		// There has no any instances.
+		return 0;
+	}
 }
 
 void DirectXAccelerationInstancingScene::CheckAndReallocate(size_t desiredCount)
@@ -170,7 +178,6 @@ void DirectXAccelerationInstancingScene::CheckAndReallocate(size_t desiredCount)
 	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE, nullptr, IID_PPV_ARGS(&accelerationStructure)));
 	SetNameAuto(accelerationStructure);
 
-	TComPtr<ID3D12Resource> scratchBuffer;
 	bufferDesc.Width = prebuildInfo.ScratchDataSizeInBytes;
 	HR(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&scratchBuffer)));
 	SetNameAuto(scratchBuffer);

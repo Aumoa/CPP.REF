@@ -13,7 +13,7 @@ StaticMeshSceneProxy::StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent
 	, staticMesh(inMeshComponent->GetStaticMesh())
 	, material(nullptr)
 {
-
+	Update();
 }
 
 StaticMeshSceneProxy::~StaticMeshSceneProxy()
