@@ -7,7 +7,6 @@
 #include "GameInstance.h"
 
 class GStartupLevel;
-class TickScheduler;
 
 class TH_API THGameInstance : public GameInstance
 {
@@ -15,12 +14,7 @@ public:
 	using Super = GameInstance;
 	using This = THGameInstance;
 
-private:
-	TRefPtr<TickScheduler> diag_tick;
-
 public:
 	THGameInstance();
 	~THGameInstance();
-
-	void Tick() override;
 };

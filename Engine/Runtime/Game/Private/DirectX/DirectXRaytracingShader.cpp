@@ -148,19 +148,28 @@ void DirectXRaytracingShader::Render(ID3D12GraphicsCommandList4* inCommandList)
 	inCommandList->SetPipelineState1(pipelineState.Get());
 }
 
-const void* DirectXRaytracingShader::GetRayGenerationIdentifier() const
+DirectXShaderRecordInfo DirectXRaytracingShader::GetRayGenerationRecord() const
 {
-	return properties->GetShaderIdentifier(L"RayGeneration");
+	DirectXShaderRecordInfo sInfo;
+	sInfo.ShaderIdentifier = properties->GetShaderIdentifier(L"RayGeneration");
+	sInfo.NumParameters = 0;
+	return sInfo;
 }
 
-const void* DirectXRaytracingShader::GetClosestHitIdentifier(size_t shaderIndex) const
+vector<DirectXShaderRecordInfo> DirectXRaytracingShader::GetClosestHitRecords() const
 {
-	return properties->GetShaderIdentifier(L"OpaqueHit");
+	DirectXShaderRecordInfo sInfo;
+	sInfo.ShaderIdentifier = properties->GetShaderIdentifier(L"OpaqueHit");
+	sInfo.NumParameters = 0;
+	return { sInfo };
 }
 
-const void* DirectXRaytracingShader::GetMissIdentifier(size_t shaderIndex) const
+vector<DirectXShaderRecordInfo> DirectXRaytracingShader::GetMissRecords() const
 {
-	return properties->GetShaderIdentifier(L"Miss");
+	DirectXShaderRecordInfo sInfo;
+	sInfo.ShaderIdentifier = properties->GetShaderIdentifier(L"Miss");
+	sInfo.NumParameters = 0;
+	return { sInfo };
 }
 
 void DirectXRaytracingShader::InitRS()

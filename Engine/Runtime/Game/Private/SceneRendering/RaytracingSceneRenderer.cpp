@@ -15,8 +15,11 @@
 #include "DirectX/DirectXShaderBindingTable.h"
 #include "DirectX/DirectXAccelerationInstancingScene.h"
 #include "Logging/LogMacros.h"
+#include "Diagnostics/ScopedCycleCounter.h"
 
 using namespace std;
+
+DEFINE_STATS_GROUP(RaytracingSceneRenderer);
 
 RaytracingSceneRenderer::RaytracingSceneRenderer(Scene* inScene) : Super(inScene)
 	, shaderLibrary(nullptr)
@@ -32,6 +35,8 @@ RaytracingSceneRenderer::~RaytracingSceneRenderer()
 
 void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandList, GameViewport* inViewport)
 {
+	QUICK_SCOPED_CYCLE_COUNTER(RaytracingSceneRenderer, RenderScene);
+
 	Scene* scene = GetScene();
 
 	DirectXRaytracingShader* cached = shaderLibrary->GetOrReadyShader();
@@ -39,9 +44,10 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 
 	DirectXDescriptorAllocator* allocator = scene->GetDescriptorAllocator();
 	DirectXShaderBindingTable* sbt = scene->GetShaderBindingTable();
+	sbt->Init(cached);
+	sbt->Update();
 
 	D3D12_DISPATCH_RAYS_DESC dispatchRays = { };
-	sbt->Init(cached);
 	sbt->FillDispatchRaysDesc(dispatchRays);
 	dispatchRays.Width = inViewport->ResolutionX;
 	dispatchRays.Height = inViewport->ResolutionY;
