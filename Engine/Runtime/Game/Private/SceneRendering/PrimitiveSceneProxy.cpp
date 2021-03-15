@@ -6,6 +6,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXDynamicBufferAllocator.h"
 #include "Logging/LogMacros.h"
 #include "GameplayStatics/ClassDependencyHelper.h"
 #include "Shaders/ShaderTypes.h"
@@ -20,19 +21,18 @@ PrimitiveSceneProxy::PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveCompone
 {
 	Engine* engine = ClassDependencyHelper::GetEngine(inPrimitiveComponent);
 	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();
+	DirectXDynamicBufferAllocator* allocator = deviceBundle->GetOrCreateDynamicBufferAllocator(sizeof(ShaderTypes::RaytracingInstanceTransform));
+	instanceTransformBuf = NewObject<DirectXDynamicBuffer>(allocator);
 
 	if (Mobility == EComponentMobility::Static)
 	{
 		PrimitiveTransform = inPrimitiveComponent->ComponentTransform;
 
-		RaytracingInstanceTransform trpInstanced;
+		ShaderTypes::RaytracingInstanceTransform trpInstanced;
 		trpInstanced.World = PrimitiveTransform.Matrix;
 		trpInstanced.WorldInvTranspose = trpInstanced.World.Inverse.Transposed;
-		instanceTransformBuf = deviceBundle->CreateImmutableBuffer(engine->GetPrimaryCommandQueue(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, (const uint8*)&trpInstanced, sizeof(trpInstanced), D3D12_RESOURCE_FLAG_NONE);
-	}
-	else
-	{
-		instanceTransformBuf = deviceBundle->CreateDynamicBuffer(sizeof(RaytracingInstanceTransform));
+
+		memcpy(instanceTransformBuf->GetBufferPointer(), &trpInstanced, sizeof(trpInstanced));
 	}
 }
 
@@ -55,15 +55,13 @@ void PrimitiveSceneProxy::UpdateTransform()
 
 	PrimitiveTransform = myPrimitiveComponent->ComponentTransform;
 
-	void* ptr;
-	HR(instanceTransformBuf->Map(0, nullptr, &ptr));
+	void* ptr = instanceTransformBuf->GetBufferPointer();
 
-	RaytracingInstanceTransform trpInstanced;
+	ShaderTypes::RaytracingInstanceTransform trpInstanced;
 	trpInstanced.World = PrimitiveTransform.Matrix;
 	trpInstanced.WorldInvTranspose = trpInstanced.World.Inverse.Transposed;
 
 	memcpy(ptr, &trpInstanced, sizeof(trpInstanced));
-	instanceTransformBuf->Unmap(0, nullptr);
 }
 
 uint64 PrimitiveSceneProxy::GetInstanceTransformBuf() const

@@ -235,8 +235,8 @@ void DirectXRaytracingShader::InitPS()
 	// Raytracing shader configuration.
 	D3D12_RAYTRACING_SHADER_CONFIG shaderConfig =
 	{
-		sizeof(Payload),
-		sizeof(BuiltInAttr)
+		sizeof(ShaderTypes::Payload),
+		sizeof(ShaderTypes::BuiltInAttr)
 	};
 
 	D3D12_RAYTRACING_PIPELINE_CONFIG pipelineConfig =

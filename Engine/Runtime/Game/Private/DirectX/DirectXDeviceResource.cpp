@@ -32,6 +32,11 @@ void DirectXDeviceResource::DebugName_set(TRefPtr<String> value)
 	}
 }
 
+DirectXDeviceBundle* DirectXDeviceResource::GetDevice() const
+{
+	return parent;
+}
+
 void DirectXDeviceResource::SetDeviceChildPtr(ID3D12DeviceChild* ptr, DirectXDeviceBundle* parent)
 {
 	object = ptr;

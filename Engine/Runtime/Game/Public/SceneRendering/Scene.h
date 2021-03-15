@@ -4,7 +4,6 @@
 
 #include "GameAPI.h"
 #include "CoreMinimal.h"
-#include "RHI/IRHIScene.h"
 
 interface ID3D12GraphicsCommandList4;
 class Engine;

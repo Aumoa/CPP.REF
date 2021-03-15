@@ -5,6 +5,7 @@
 #include "DirectXCommon.h"
 #include "DirectX/DirectXCommandQueue.h"
 #include "DirectX/DirectXImmediateContext.h"
+#include "DirectX/DirectXDynamicBufferAllocator.h"
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
 
@@ -86,6 +87,43 @@ IDXGIFactory2* DirectXDeviceBundle::GetFactory() const
 ID3D12Device5* DirectXDeviceBundle::GetDevice() const
 {
 	return device.Get();
+}
+
+DirectXDynamicBufferAllocator* DirectXDeviceBundle::GetOrCreateDynamicBufferAllocator(uint64 allocateUnit)
+{
+	if (allocateUnit == 0)
+	{
+		SE_LOG(LogDirectX, Error, L"allocateUnit is zero.");
+		return nullptr;
+	}
+
+	// Size will be aligned by 256 bytes.
+	allocateUnit = (allocateUnit + 255) & ~255;
+
+	if (auto it = dynamicBufferAllocators.find(allocateUnit); it != dynamicBufferAllocators.end())
+	{
+		return it->second.Get();
+	}
+	else
+	{
+		return dynamicBufferAllocators.emplace(allocateUnit, NewObject<DirectXDynamicBufferAllocator>(this, allocateUnit, true)).first->second.Get();
+	}
+}
+
+DirectXDynamicBufferAllocator* DirectXDeviceBundle::GetDynamicBufferAllocator(uint64 allocateUnit) const
+{
+	// Size will be aligned by 256 bytes.
+	allocateUnit = (allocateUnit + 255) & ~255;
+
+	if (auto it = dynamicBufferAllocators.find(allocateUnit); it != dynamicBufferAllocators.end())
+	{
+		return it->second.Get();
+	}
+	else
+	{
+		SE_LOG(LogDirectX, Error, L"There is not contains buffer allocator for allocate unit: {0}. See GetOrCreateDynamicBufferAllocator function.", allocateUnit);
+		return nullptr;
+	}
 }
 
 TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateImmutableBuffer(DirectXCommandQueue* commandQueue, D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags)

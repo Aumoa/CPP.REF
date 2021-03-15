@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXDynamicBufferAllocator.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 #include "SceneRendering/Scene.h"
 #include "Components/PrimitiveComponent.h"
@@ -18,8 +19,8 @@ SceneVisibility::SceneVisibility(Scene* inScene) : Super()
 	, cameraConstantPtr(nullptr)
 {
 	DirectXDeviceBundle* device = inScene->GetEngine()->GetDeviceBundle();
-	DirectXAssign(cameraConstant, device->CreateDynamicBuffer(sizeof(ShaderCameraConstant)));
-	HR(cameraConstant->Map(0, nullptr, &cameraConstantPtr));
+	DirectXDynamicBufferAllocator* allocator = device->GetOrCreateDynamicBufferAllocator(sizeof(ShaderTypes::ShaderCameraConstant));
+	cameraConstant = NewObject<DirectXDynamicBuffer>(allocator);
 }
 
 SceneVisibility::~SceneVisibility()
@@ -57,7 +58,7 @@ void SceneVisibility::CalcVisibility()
 			numPrimitivesRender += 1;
 		}
 
-		auto ptr = (ShaderCameraConstant*)cameraConstantPtr;
+		auto ptr = (ShaderTypes::ShaderCameraConstant*)cameraConstant->GetBufferPointer();
 		ptr->Proj = myView.Proj;
 		ptr->ViewProj = myView.ViewProj;
 		ptr->ViewProjInv = myView.ViewProjInv;

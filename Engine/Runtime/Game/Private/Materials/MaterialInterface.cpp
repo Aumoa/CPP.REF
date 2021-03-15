@@ -2,10 +2,10 @@
 
 #include "Materials/MaterialInterface.h"
 
-#include "RHI/IRHIResource.h"
+#include "DirectX/DirectXCommon.h"
+#include "DirectX/DirectXShaderResourceView.h"
 
-MaterialInterface::MaterialInterface(uint16 inIndex) : Super()
-	, index(inIndex)
+MaterialInterface::MaterialInterface() : Super()
 	, dirtyMask(EMaterialDirtyMask::All)
 	, ambient(1.0f)
 	, diffuse(1.0f)
@@ -96,12 +96,12 @@ void MaterialInterface::SpecExp_set(float value)
 	}
 }
 
-IRHIResource* MaterialInterface::DiffuseMap_get() const
+ID3D12Resource* MaterialInterface::DiffuseMap_get() const
 {
 	return diffuseMap.Get();
 }
 
-void MaterialInterface::DiffuseMap_set(IRHIResource* value)
+void MaterialInterface::DiffuseMap_set(ID3D12Resource* value)
 {
 	if (diffuseMap.Get() != value)
 	{
@@ -110,12 +110,12 @@ void MaterialInterface::DiffuseMap_set(IRHIResource* value)
 	}
 }
 
-IRHIResource* MaterialInterface::NormalMap_get() const
+ID3D12Resource* MaterialInterface::NormalMap_get() const
 {
 	return normalMap.Get();
 }
 
-void MaterialInterface::NormalMap_set(IRHIResource* value)
+void MaterialInterface::NormalMap_set(ID3D12Resource* value)
 {
 	if (normalMap.Get() != value)
 	{
@@ -124,7 +124,7 @@ void MaterialInterface::NormalMap_set(IRHIResource* value)
 	}
 }
 
-IRHIShaderResourceView* MaterialInterface::SurfaceTextureSRV_get() const
+DirectXShaderResourceView* MaterialInterface::SurfaceTextureSRV_get() const
 {
 	return nullptr;
 }

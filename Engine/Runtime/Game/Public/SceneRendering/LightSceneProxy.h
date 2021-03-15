@@ -8,8 +8,6 @@
 #include "Transform.h"
 #include "ComponentMobility.h"
 
-interface IRHIResource;
-
 class GLightComponent;
 struct RHILight;
 
@@ -20,13 +18,13 @@ public:
 	using This = LightBatch;
 
 private:
-	TRefPtr<IRHIResource> basicLightBuffer;
+	//TRefPtr<IRHIResource> basicLightBuffer;
 
 public:
 	LightBatch();
 	~LightBatch() override;
 
-	virtual TRefPtr<IRHIResource> GetLightBuffer() const;
+	//virtual TRefPtr<IRHIResource> GetLightBuffer() const;
 };
 
 class GAME_API LightSceneProxy : virtual public Object

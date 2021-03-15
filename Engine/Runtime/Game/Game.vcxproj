@@ -254,7 +254,6 @@
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Private\Materials\MaterialInstance.h" />
-    <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h" />
     <ClInclude Include="Private\Shaders\ShaderTypes.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
@@ -300,6 +299,7 @@
     <ClInclude Include="Public\DirectX\DirectXDeviceContext.h" />
     <ClInclude Include="Public\DirectX\DirectXDeviceResource.h" />
     <ClInclude Include="Public\DirectX\DirectXAutoFence.h" />
+    <ClInclude Include="Public\DirectX\DirectXDynamicBufferAllocator.h" />
     <ClInclude Include="Public\DirectX\DirectXGeometry.h" />
     <ClInclude Include="Public\DirectX\DirectXHDRTarget.h" />
     <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
@@ -406,6 +406,7 @@
     <ClCompile Include="Private\DirectX\DirectXDeviceBundle.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceContext.cpp" />
     <ClCompile Include="Private\DirectX\DirectXDeviceResource.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXDynamicBufferAllocator.cpp" />
     <ClCompile Include="Private\DirectX\DirectXGeometry.cpp" />
     <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp" />
     <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
@@ -454,7 +455,6 @@
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneVisibility.cpp" />
-    <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMesh.cpp" />
     <ClCompile Include="Private\SceneRendering\StaticMeshSceneProxy.cpp" />
     <ClCompile Include="Private\TickFunction.cpp" />
@@ -496,52 +496,6 @@
     <None Include="Public\Logging\Logger.inl" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\GeometryShader\GeometryPixelShader.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\GeometryShader\GeometryVertexShader.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LightingPixelShader.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">PS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LightingRayGeneration.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.3</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Library</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">6.3</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.3</ShaderModel>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
-      </EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </EntryPointName>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LightingVertexShader.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">VS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_Main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
     <FxCompile Include="Private\Shaders\RaytracingShader\RaytracingShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </EntryPointName>

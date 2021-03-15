@@ -67,12 +67,6 @@
     <Filter Include="Private\Misc">
       <UniqueIdentifier>{24e4bb5b-7f53-4e00-bdaa-9946ea62fe97}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\Shaders\GeometryShader">
-      <UniqueIdentifier>{fb91fe45-859e-4f02-965b-022d91840834}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\Shaders\LightingShader">
-      <UniqueIdentifier>{99ee7a18-5f91-42a3-ab31-32c6e4e69cda}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\Shaders\TonemapShader">
       <UniqueIdentifier>{95b714ea-5949-40fa-8dee-43e3f7b7dee0}</UniqueIdentifier>
     </Filter>
@@ -297,9 +291,6 @@
     <ClInclude Include="Public\Components\LightComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Private\SceneRendering\ShaderCameraConstant.h">
-      <Filter>Private\SceneRendering</Filter>
-    </ClInclude>
     <ClInclude Include="Public\DeferredGameViewport.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -474,6 +465,9 @@
     <ClInclude Include="Public\COM\COMImage.h">
       <Filter>Public\COM</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXDynamicBufferAllocator.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -617,9 +611,6 @@
     <ClCompile Include="Private\Components\LightComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Private\SceneRendering\ShaderCameraConstant.cpp">
-      <Filter>Private\SceneRendering</Filter>
-    </ClCompile>
     <ClCompile Include="Private\DeferredGameViewport.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -758,6 +749,9 @@
     <ClCompile Include="Private\COM\COMBitmapFrame.cpp">
       <Filter>Private\COM</Filter>
     </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXDynamicBufferAllocator.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -837,26 +831,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Private\Shaders\GeometryShader\GeometryPixelShader.hlsl">
-      <Filter>Private\Shaders\GeometryShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\GeometryShader\GeometryVertexShader.hlsl">
-      <Filter>Private\Shaders\GeometryShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LightingVertexShader.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
-    </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
       <Filter>Private\Shaders\TonemapShader</Filter>
     </FxCompile>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapVertexShader.hlsl">
       <Filter>Private\Shaders\TonemapShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LightingPixelShader.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Private\Shaders\LightingShader\LightingRayGeneration.hlsl">
-      <Filter>Private\Shaders\LightingShader</Filter>
     </FxCompile>
     <FxCompile Include="Private\Shaders\RaytracingShader\RaytracingShader.hlsl">
       <Filter>Private\Shaders\RaytracingShader</Filter>

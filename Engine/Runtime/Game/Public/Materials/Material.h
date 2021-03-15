@@ -6,7 +6,8 @@
 #include "CoreMinimal.h"
 #include "Materials/MaterialInterface.h"
 
-class RHIMaterialBundle;
+class DirectXDeviceBundle;
+class DirectXDynamicBuffer;
 
 class Material : public MaterialInterface
 {
@@ -16,16 +17,16 @@ public:
 
 private:
 	bool bMarkDirty : 1;
-
-	RHIMaterialBundle* owner;
-	void* uploadBufferPtr;
+	DirectXDeviceBundle* deviceBundle;
+	TRefPtr<DirectXDynamicBuffer> materialBuffer;
+	TRefPtr<DirectXShaderResourceView> surfaceSRV;
 
 public:
-	Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle);
+	Material(DirectXDeviceBundle* deviceBundle);
 	~Material() override;
 
 	void SetMarkDirty(EMaterialDirtyMask inAddMask) override;
 	void ResolveDirtyState() override;
 
-	IRHIShaderResourceView* SurfaceTextureSRV_get() const override;
+	DirectXShaderResourceView* SurfaceTextureSRV_get() const override;
 };

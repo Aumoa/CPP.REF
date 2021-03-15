@@ -4,8 +4,6 @@
 
 #include "SceneRendering/LightSceneProxy.h"
 #include "SceneRendering/MinimalViewInfo.h"
-#include "RHI/RHICommon.h"
-#include "RHI/IRHIResource.h"
 
 class DirectionalLightSceneProxy : public LightSceneProxy
 {
@@ -25,13 +23,13 @@ public:
 
 	void UpdateBatchBuffer() override
 	{
-		Super::UpdateBatchBuffer();
+		//Super::UpdateBatchBuffer();
 
-		auto lightBatch = GetLightBatch();
-		RHILight& light = *(RHILight*)lightBatch->GetLightBuffer()->GetMappingAddress();
+		//auto lightBatch = GetLightBatch();
+		//RHILight& light = *(RHILight*)lightBatch->GetLightBuffer()->GetMappingAddress();
 
-		light.Type = RHILight::LIGHT_TYPE_DIRECTIONAL;
-		light.Ambiguous_01 = myComponent->ComponentRotation.RotateVector(Vector3::Forward).Cast<Vector4>();
+		//light.Type = RHILight::LIGHT_TYPE_DIRECTIONAL;
+		//light.Ambiguous_01 = myComponent->ComponentRotation.RotateVector(Vector3::Forward).Cast<Vector4>();
 	}
 };
 

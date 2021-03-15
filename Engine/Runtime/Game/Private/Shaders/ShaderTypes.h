@@ -15,6 +15,9 @@ inline namespace
 	using matrix = Matrix4x4;
 }
 
+namespace ShaderTypes
+{
+
 #define row_major
 
 #endif
@@ -52,7 +55,17 @@ struct RaytracingInstanceTransform
 	row_major matrix WorldInvTranspose;
 };
 
+struct Material
+{
+	float Ambient;
+	float Diffuse;
+	float Specular;
+	float SpecExp;
+};
+
 #if defined(__cplusplus)
+
+}
 
 #undef row_major
 

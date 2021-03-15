@@ -10,6 +10,7 @@
 
 class Scene;
 class PrimitiveSceneProxy;
+class DirectXDynamicBuffer;
 
 class GAME_API SceneVisibility : virtual public Object
 {
@@ -25,7 +26,7 @@ private:
 	Frustum viewFrustum;
 	size_t numPrimitivesRender;
 
-	TComPtr<ID3D12Resource> cameraConstant;
+	TRefPtr<DirectXDynamicBuffer> cameraConstant;
 	void* cameraConstantPtr;
 
 public:

@@ -11,7 +11,7 @@
 #include "DirectX/DirectXShaderBindingTable.h"
 
 class GPrimitiveComponent;
-class DirectXDeviceBundle;
+class DirectXDynamicBuffer;
 
 class GAME_API PrimitiveSceneProxy : public Object
 {
@@ -20,7 +20,7 @@ public:
 
 private:
 	TWeakPtr<GPrimitiveComponent> myPrimitiveComponent;
-	TComPtr<ID3D12Resource> instanceTransformBuf;
+	TRefPtr<DirectXDynamicBuffer> instanceTransformBuf;
 
 public:
 	PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent);

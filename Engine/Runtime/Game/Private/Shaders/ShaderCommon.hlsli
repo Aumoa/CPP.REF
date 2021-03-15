@@ -47,14 +47,6 @@ struct LDRPixel
 	float4 Color : SV_TARGET0;
 };
 
-struct Material
-{
-	float Ambient;
-	float Diffuse;
-	float Specular;
-	float SpecExp;
-};
-
 struct Light
 {
 	uint Type;
