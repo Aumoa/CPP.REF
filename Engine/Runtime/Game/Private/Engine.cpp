@@ -18,6 +18,7 @@
 #include "Assets/AssetManager.h"
 #include "Assets/CachedShaderLibrary.h"
 #include "Time/StepTimer.h"
+#include "COM/COMDeviceBundle.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -41,6 +42,7 @@ void Engine::Initialize(GameInstance* gameInstance)
 	deviceBundle = NewObject<DirectXDeviceBundle>();
 	DirectXNew(primaryQueue, DirectXCommandQueue, deviceBundle.Get());
 	assetManager = NewObject<AssetManager>(this);
+	comBundle = NewObject<COMDeviceBundle>();
 
 	swapChain = NewObject<DirectXSwapChain>(deviceBundle.Get(), primaryQueue.Get(), gameInstance->MainWindow, DXGI_FORMAT_B8G8R8A8_UNORM);
 	DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle.Get(), primaryQueue.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);

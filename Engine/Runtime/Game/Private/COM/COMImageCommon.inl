@@ -9,7 +9,6 @@ inline bool operator <(const WICPixelFormatGUID& lh, const WICPixelFormatGUID& r
 	return memcmp(&lh, &rh, sizeof(lh)) < 0;
 }
 
-extern TComPtr<IWICImagingFactory2> imagingFactory;
 static std::tuple<ERHITextureFormat, WICPixelFormatGUID, size_t> convertTable[]
 {
 	{ ERHITextureFormat::R16G16B16A16_UNORM, GUID_WICPixelFormat64bppRGBA, 64 },

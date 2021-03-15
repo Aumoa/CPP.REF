@@ -501,18 +501,6 @@
     <ClInclude Include="Public\RHI\RHIImage.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Private\PlatformMisc\PlatformImageLoader.h">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\PlatformMisc\PlatformImageCommon.inl">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\PlatformMisc\PlatformImage.h">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="Private\PlatformMisc\PlatformBitmapFrame.h">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClInclude>
     <ClInclude Include="Private\D3D12RHI\D3D12SBTAllocator.h">
       <Filter>Private\D3D12RHI</Filter>
     </ClInclude>
@@ -692,6 +680,15 @@
     </ClInclude>
     <ClInclude Include="Public\GameplayStatics\ClassDependencyHelper.h">
       <Filter>Public\GameplayStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\COMImageLoader.h">
+      <Filter>Public\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\COMBitmapFrame.h">
+      <Filter>Public\COM</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\COMImage.h">
+      <Filter>Public\COM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -959,15 +956,6 @@
     <ClCompile Include="Private\Engine.LoadEngineDefaultAssets.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\PlatformImageLoader.cpp">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\PlatformImage.cpp">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\PlatformBitmapFrame.cpp">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClCompile>
     <ClCompile Include="Private\D3D12RHI\D3D12UnorderedAccessView.cpp">
       <Filter>Private\D3D12RHI</Filter>
     </ClCompile>
@@ -1103,6 +1091,15 @@
     <ClCompile Include="Private\GameplayStatics\ClassDependencyHelper.cpp">
       <Filter>Private\GameplayStatics</Filter>
     </ClCompile>
+    <ClCompile Include="Private\COM\COMImageLoader.cpp">
+      <Filter>Private\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\COM\COMImage.cpp">
+      <Filter>Private\COM</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\COM\COMBitmapFrame.cpp">
+      <Filter>Private\COM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -1176,6 +1173,9 @@
     </None>
     <None Include="Public\Input\TBitfieldInputChangeTracker.inl">
       <Filter>Public\Input</Filter>
+    </None>
+    <None Include="Private\COM\COMImageCommon.inl">
+      <Filter>Private\COM</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

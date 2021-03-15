@@ -11,7 +11,7 @@
 #include "RHI/RHICommon.h"
 #include "RHI/RHIResourceGC.h"
 #include "RHI/RHIResourceGC.h"
-#include "PlatformMisc/PlatformImage.h"
+//#include "PlatformMisc/PlatformImage.h"
 
 using namespace std;
 
@@ -47,8 +47,8 @@ TRefPtr<IRHIResource> D3D12ResourceBundle::CreateTexture2D(ERHITextureFormat for
 {
 	D3D12_RESOURCE_DESC textureDesc = { };
 	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	textureDesc.Width = platformImage->Width;
-	textureDesc.Height = platformImage->Height;
+	//textureDesc.Width = platformImage->Width;
+	//textureDesc.Height = platformImage->Height;
 	textureDesc.DepthOrArraySize = 1;
 	textureDesc.MipLevels = 1;
 	textureDesc.Format = (DXGI_FORMAT)format;
@@ -84,7 +84,7 @@ TRefPtr<IRHIResource> D3D12ResourceBundle::CreateTexture2D(ERHITextureFormat for
 	// Copy pixels.
 	void* pData;
 	HR(uploadHeap->Map(0, nullptr, &pData));
-	platformImage->CopyPixels(layout.Footprint.RowPitch, totalBytes, (int8*)pData);
+	//platformImage->CopyPixels(layout.Footprint.RowPitch, totalBytes, (int8*)pData);
 	uploadHeap->Unmap(0, nullptr);
 
 	// Ready to upload to destination texture heap.

@@ -284,10 +284,6 @@
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
     <ClInclude Include="Private\Materials\MaterialInstance.h" />
-    <ClInclude Include="Private\PlatformMisc\PlatformBitmapFrame.h" />
-    <ClInclude Include="Private\PlatformMisc\PlatformImage.h" />
-    <ClInclude Include="Private\PlatformMisc\PlatformImageCommon.inl" />
-    <ClInclude Include="Private\PlatformMisc\PlatformImageLoader.h" />
     <ClInclude Include="Private\RHI\RHICommon.h" />
     <ClInclude Include="Private\RHI\RHIMaterial.h" />
     <ClInclude Include="Private\RHI\RHIMaterialBundle.h" />
@@ -319,8 +315,11 @@
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\COM\COMBitmapFrame.h" />
     <ClInclude Include="Public\COM\COMDeviceBundle.h" />
     <ClInclude Include="Public\COM\COMException.h" />
+    <ClInclude Include="Public\COM\COMImage.h" />
+    <ClInclude Include="Public\COM\COMImageLoader.h" />
     <ClInclude Include="Public\COM\TComPtr.h" />
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
@@ -459,8 +458,11 @@
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\Components\SpringArmComponent.cpp" />
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Private\COM\COMBitmapFrame.cpp" />
     <ClCompile Include="Private\COM\COMDeviceBundle.cpp" />
     <ClCompile Include="Private\COM\COMException.cpp" />
+    <ClCompile Include="Private\COM\COMImage.cpp" />
+    <ClCompile Include="Private\COM\COMImageLoader.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DeviceBundle.InitializeShaders.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBuffer.cpp" />
     <ClCompile Include="Private\D3D12RHI\D3D12DynamicBufferAllocator.cpp" />
@@ -539,10 +541,7 @@
     <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
     <ClCompile Include="Private\Misc\TickScheduler.cpp" />
     <ClCompile Include="Private\Physics\Collision.cpp" />
-    <ClCompile Include="Private\PlatformMisc\PlatformBitmapFrame.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />
-    <ClCompile Include="Private\PlatformMisc\PlatformImage.cpp" />
-    <ClCompile Include="Private\PlatformMisc\PlatformImageLoader.cpp" />
     <ClCompile Include="Private\RHI\IRHIDeviceBundle.cpp" />
     <ClCompile Include="Private\RHI\RHICommon.cpp" />
     <ClCompile Include="Private\RHI\RHIDispatchRaysDesc.cpp" />
@@ -579,6 +578,7 @@
     <ClCompile Include="Private\Windows\WinKeyboard.cpp" />
     <ClCompile Include="Private\Windows\WinMouse.cpp" />
     <ClCompile Include="Private\World.cpp" />
+    <None Include="Private\COM\COMImageCommon.inl" />
     <None Include="Private\Shaders\GenericLighting.hlsli" />
     <None Include="Private\Shaders\PrimitivePacking.hlsli" />
     <None Include="Private\Shaders\ShaderCommon.hlsli" />

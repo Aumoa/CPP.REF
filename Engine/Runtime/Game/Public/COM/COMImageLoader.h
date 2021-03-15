@@ -8,28 +8,27 @@
 #include "Windows/WindowsMinimal.h"
 #include "COM/TComPtr.h"
 
-class PlatformBitmapFrame;
+class COMDeviceBundle;
+class COMBitmapFrame;
 interface IWICBitmapDecoder;
 
-class PlatformImageLoader : virtual public Object
+class COMImageLoader : virtual public Object
 {
 public:
 	using Super = Object;
 
 private:
+	COMDeviceBundle* deviceBundle;
 	uint8 bValid : 1;
 	TComPtr<IWICBitmapDecoder> decoder;
 	size_t frameCount;
 
 public:
-	PlatformImageLoader(TRefPtr<String> inFilepath);
-	~PlatformImageLoader();
+	COMImageLoader(COMDeviceBundle* deviceBundle, TRefPtr<String> filepath);
+	~COMImageLoader();
 
-	TRefPtr<PlatformBitmapFrame> GetFrame(size_t frameIndex) const;
+	TRefPtr<COMBitmapFrame> GetFrame(size_t frameIndex) const;
 
 	vs_property_get_auto(bool, IsValid, bValid);
 	vs_property_get_auto(size_t, FrameCount, frameCount);
-
-	static void Initialize();
-	static void Shutdown();
 };

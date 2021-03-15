@@ -15,6 +15,7 @@ class AssetManager;
 class StepTimer;
 class GameViewport;
 class CachedShaderLibrary;
+class COMDeviceBundle;
 
 class GAME_API Engine : virtual public Object
 {
@@ -27,6 +28,7 @@ private:
 	TRefPtr<DirectXDeviceBundle> deviceBundle;
 	TRefPtr<DirectXCommandQueue> primaryQueue;
 	TRefPtr<AssetManager> assetManager;
+	TRefPtr<COMDeviceBundle> comBundle;
 
 	TRefPtr<DirectXSwapChain> swapChain;
 	TRefPtr<DirectXImmediateContext> immediateContext;

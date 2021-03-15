@@ -1,11 +1,11 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "PlatformImage.h"
-#include "PlatformImageCommon.inl"
+#include "COM/COMImage.h"
+#include "COMImageCommon.inl"
 
 using namespace std;
 
-PlatformImage::PlatformImage(IWICBitmapSource* inSourceWeak) : Super()
+COMImage::COMImage(IWICBitmapSource* inSourceWeak) : Super()
 	, sourceWeak(inSourceWeak)
 	, width(0)
 	, height(0)
@@ -18,12 +18,12 @@ PlatformImage::PlatformImage(IWICBitmapSource* inSourceWeak) : Super()
 	bitsPerPixel = CalcBitsPerPixel(format);
 }
 
-PlatformImage::~PlatformImage()
+COMImage::~COMImage()
 {
 
 }
 
-void PlatformImage::CopyPixels(optional<ImageRect> inCopyRect, size_t rowStride, size_t bufferSize, int8* buffer) const
+void COMImage::CopyPixels(optional<ImageRect> inCopyRect, size_t rowStride, size_t bufferSize, int8* buffer) const
 {
 	WICRect* wicRect = inCopyRect.has_value() ? (WICRect*)&inCopyRect.value() : nullptr;
 	if (FAILED(sourceWeak->CopyPixels(wicRect, (UINT)rowStride, (UINT)bufferSize, (BYTE*)buffer)))
@@ -33,12 +33,12 @@ void PlatformImage::CopyPixels(optional<ImageRect> inCopyRect, size_t rowStride,
 	}
 }
 
-void PlatformImage::CopyPixels(size_t rowStride, size_t bufferSize, int8* buffer) const
+void COMImage::CopyPixels(size_t rowStride, size_t bufferSize, int8* buffer) const
 {
 	CopyPixels(nullopt, rowStride, bufferSize, buffer);
 }
 
-void PlatformImage::CopyPixels(size_t rowStride, int8* buffer) const
+void COMImage::CopyPixels(size_t rowStride, int8* buffer) const
 {
 	size_t bytes = BitsPerPixel / 8;
 	size_t bufferSize = rowStride * (Height - 1) + Width * bytes;

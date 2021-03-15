@@ -7,7 +7,7 @@
 
 #include "Windows/WindowsMinimal.h"
 
-class PlatformImage : virtual public Object
+class COMImage : virtual public Object
 {
 public:
 	using Super = Object;
@@ -27,8 +27,8 @@ private:
 	size_t bitsPerPixel;
 
 public:
-	PlatformImage(IWICBitmapSource* inSourceWeak);
-	~PlatformImage() override;
+	COMImage(IWICBitmapSource* inSourceWeak);
+	~COMImage() override;
 
 	virtual void CopyPixels(std::optional<ImageRect> inCopyRect, size_t rowStride, size_t bufferSize, int8* buffer) const;
 	void CopyPixels(size_t rowStride, size_t bufferSize, int8* buffer) const;

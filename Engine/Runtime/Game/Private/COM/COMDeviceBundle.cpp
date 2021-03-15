@@ -2,9 +2,13 @@
 
 #include "COM/COMDeviceBundle.h"
 
+#include "COMMinimal.h"
+#undef interface
+#include <wincodec.h>
+
 COMDeviceBundle::COMDeviceBundle() : Super()
 {
-
+	Initialize();
 }
 
 COMDeviceBundle::~COMDeviceBundle()
@@ -12,7 +16,16 @@ COMDeviceBundle::~COMDeviceBundle()
 
 }
 
+IWICImagingFactory* COMDeviceBundle::GetImagingFactory() const
+{
+	return imagingFactory.Get();
+}
+
 void COMDeviceBundle::Initialize()
 {
+	// Initialize COM.
+	HR(::CoInitializeEx(nullptr, COINIT_MULTITHREADED));
 
+	// Create WIC imaging factory.
+	HR(::CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&imagingFactory)));
 }

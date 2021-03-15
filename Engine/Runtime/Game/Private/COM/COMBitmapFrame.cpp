@@ -1,22 +1,25 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "PlatformBitmapFrame.h"
-#include "PlatformImageCommon.inl"
+#include "COM/COMBitmapFrame.h"
+#include "COMImageCommon.inl"
+
+#include "COM/COMDeviceBundle.h"
 
 using namespace std;
 
-PlatformBitmapFrame::PlatformBitmapFrame(TComPtr<IWICBitmapFrameDecode> frame) : Super(frame.Get())
+COMBitmapFrame::COMBitmapFrame(COMDeviceBundle* deviceBundle, TComPtr<IWICBitmapFrameDecode> frame) : Super(frame.Get())
+	, deviceBundle(deviceBundle)
 	, frame(move(frame))
 {
 
 }
 
-PlatformBitmapFrame::~PlatformBitmapFrame()
+COMBitmapFrame::~COMBitmapFrame()
 {
 
 }
 
-TRefPtr<PlatformImage> PlatformBitmapFrame::FormatConvert(ERHITextureFormat inDesiredFormat) const
+TRefPtr<COMImage> COMBitmapFrame::ConvertFormat(ERHITextureFormat inDesiredFormat) const
 {
 	WICPixelFormatGUID formatGuid = GetWICFormat(inDesiredFormat);
 	if (formatGuid == GUID_WICPixelFormatUndefined)
@@ -25,10 +28,10 @@ TRefPtr<PlatformImage> PlatformBitmapFrame::FormatConvert(ERHITextureFormat inDe
 		return nullptr;
 	}
 
-	class PlatformBitmapConverter : public PlatformImage
+	class PlatformBitmapConverter : public COMImage
 	{
 	public:
-		using Super = PlatformImage;
+		using Super = COMImage;
 
 	private:
 		TComPtr<IWICFormatConverter> converter;
@@ -45,6 +48,8 @@ TRefPtr<PlatformImage> PlatformBitmapFrame::FormatConvert(ERHITextureFormat inDe
 
 		}
 	};
+
+	IWICImagingFactory* imagingFactory = deviceBundle->GetImagingFactory();
 
 	TComPtr<IWICFormatConverter> converter;
 	if (FAILED(imagingFactory->CreateFormatConverter(&converter)))
