@@ -6,7 +6,6 @@
 #include "CoreMinimal.h"
 #include "Materials/MaterialInterface.h"
 
-interface IRHIShaderResourceView;
 class RHIMaterialBundle;
 
 class Material : public MaterialInterface
@@ -20,7 +19,6 @@ private:
 
 	RHIMaterialBundle* owner;
 	void* uploadBufferPtr;
-	TRefPtr<IRHIShaderResourceView> textureGroupView;
 
 public:
 	Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle);

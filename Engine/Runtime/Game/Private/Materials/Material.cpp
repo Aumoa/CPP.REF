@@ -3,10 +3,6 @@
 #include "Materials/Material.h"
 
 #include "Engine.h"
-#include "RHI/RHICommon.h"
-#include "RHI/RHIMaterialBundle.h"
-#include "RHI/IRHIDeviceBundle.h"
-#include "RHI/IRHIShaderResourceView.h"
 
 Material::Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle) : Super(inMaterialIndex)
 	, bMarkDirty(false)
@@ -18,7 +14,7 @@ Material::Material(uint16 inMaterialIndex, RHIMaterialBundle* inBundle) : Super(
 
 Material::~Material()
 {
-	owner->ReleaseMaterial(Index);
+	//owner->ReleaseMaterial(Index);
 }
 
 void Material::SetMarkDirty(EMaterialDirtyMask inAddMask)
@@ -27,8 +23,8 @@ void Material::SetMarkDirty(EMaterialDirtyMask inAddMask)
 
 	if (!bMarkDirty)
 	{
-		owner->EnqueueDirty(this);
-		bMarkDirty = true;
+		//owner->EnqueueDirty(this);
+		//bMarkDirty = true;
 	}
 }
 
@@ -36,23 +32,23 @@ void Material::ResolveDirtyState()
 {
 	if (HasDirtyMark(EMaterialDirtyMask::UpdateBuffer))
 	{
-		uploadBufferPtr = owner->GetUploadBufferPointer(Index);
+		//uploadBufferPtr = owner->GetUploadBufferPointer(Index);
 	}
 
 	if (HasDirtyMark(EMaterialDirtyMask::RenderState))
 	{
-		RHIMaterial mat = { Ambient, Diffuse, Specular, SpecExp };
-		memcpy(uploadBufferPtr, &mat, sizeof(mat));
+		//RHIMaterial mat = { Ambient, Diffuse, Specular, SpecExp };
+		//memcpy(uploadBufferPtr, &mat, sizeof(mat));
 	}
 
 	if (HasDirtyMark(EMaterialDirtyMask::SurfaceTexture))
 	{
 		IRHIResource* ppResources[] = { DiffuseMap, NormalMap };
-		if (textureGroupView.IsValid)
+		//if (textureGroupView.IsValid)
 		{
 			//GEngine.DeviceBundle->UpdateTextureGroupView(textureGroupView.Get(), ppResources);
 		}
-		else
+		//else
 		{
 			//textureGroupView = GEngine.DeviceBundle->CreateTextureGroupView(ppResources);
 		}
@@ -64,5 +60,6 @@ void Material::ResolveDirtyState()
 
 IRHIShaderResourceView* Material::SurfaceTextureSRV_get() const
 {
-	return textureGroupView.Get();
+	//return textureGroupView.Get();
+	return nullptr;
 }

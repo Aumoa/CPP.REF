@@ -5,7 +5,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "SceneRendering/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
-#include "RHI/IRHIResource.h"
 #include "DirectX/DirectXCommon.h"
 
 StaticMeshSceneProxy::StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
