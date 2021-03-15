@@ -171,6 +171,9 @@
     <ClInclude Include="Public\NotSupportedException.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\IDisposable.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">

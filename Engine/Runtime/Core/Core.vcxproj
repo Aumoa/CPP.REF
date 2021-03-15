@@ -234,6 +234,7 @@
     <ClInclude Include="Public\CoreMinimal.h" />
     <ClInclude Include="Public\Exception.h" />
     <ClInclude Include="Public\FormatException.h" />
+    <ClInclude Include="Public\IDisposable.h" />
     <ClInclude Include="Public\IndexOutOfRangeException.h" />
     <ClInclude Include="Public\InvalidArgumentException.h" />
     <ClInclude Include="Public\InvalidCastException.h" />
