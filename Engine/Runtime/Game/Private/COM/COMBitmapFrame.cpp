@@ -19,7 +19,7 @@ COMBitmapFrame::~COMBitmapFrame()
 
 }
 
-TRefPtr<COMImage> COMBitmapFrame::ConvertFormat(ERHITextureFormat inDesiredFormat) const
+TRefPtr<COMImage> COMBitmapFrame::ConvertFormat(DXGI_FORMAT inDesiredFormat) const
 {
 	WICPixelFormatGUID formatGuid = GetWICFormat(inDesiredFormat);
 	if (formatGuid == GUID_WICPixelFormatUndefined)

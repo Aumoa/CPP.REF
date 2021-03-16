@@ -9,7 +9,6 @@
 #include "COM/TComPtr.h"
 
 class COMDeviceBundle;
-enum class ERHITextureFormat;
 
 class COMBitmapFrame : public COMImage
 {
@@ -24,5 +23,5 @@ public:
 	COMBitmapFrame(COMDeviceBundle* deviceBundle, TComPtr<IWICBitmapFrameDecode> frame);
 	~COMBitmapFrame() override;
 
-	TRefPtr<COMImage> ConvertFormat(ERHITextureFormat inDesiredFormat) const;
+	TRefPtr<COMImage> ConvertFormat(DXGI_FORMAT inDesiredFormat) const;
 };
