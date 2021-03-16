@@ -4,12 +4,13 @@
 
 #include "DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
+#include "DirectX/DirectXDeviceContext.h"
 #include "Logging/LogMacros.h"
 #include "SceneRendering/PrimitiveSceneProxy.h"
 
 using namespace std;
 
-DirectXAccelerationInstancingScene::DirectXAccelerationInstancingScene(DirectXDeviceBundle* deviceBundle) : Super()
+DirectXAccelerationInstancingScene::DirectXAccelerationInstancingScene(DirectXDeviceBundle* deviceBundle) : Super(deviceBundle)
 	, device(deviceBundle->GetDevice())
 	, lastCount(0)
 
@@ -18,7 +19,7 @@ DirectXAccelerationInstancingScene::DirectXAccelerationInstancingScene(DirectXDe
 	, bNeedRebuild(false)
 	, bAllowUpdate(false)
 {
-	SetDeviceChildPtr(nullptr, deviceBundle);
+
 }
 
 DirectXAccelerationInstancingScene::~DirectXAccelerationInstancingScene()
@@ -52,15 +53,19 @@ void DirectXAccelerationInstancingScene::UpdateScene()
 	instanceBuffer->Unmap(0, nullptr);
 }
 
-void DirectXAccelerationInstancingScene::BuildScene(ID3D12GraphicsCommandList4* inCommandList)
+void DirectXAccelerationInstancingScene::BuildScene(DirectXDeviceContext* deviceContext)
 {
 	if (actualInstanceCount == 0)
 	{
 		return;
 	}
 
-	// Clanup old acceleration structure when new build is started.
-	oldAccelerationStructure.Reset();
+	ID3D12GraphicsCommandList4* inCommandList = deviceContext->GetCommandList();
+	if (oldAccelerationStructure.IsValid)
+	{
+		// Clanup old acceleration structure when new build is started.
+		deviceContext->AddPendingReference(move(oldAccelerationStructure));
+	}
 
 	if (bNeedRebuild)
 	{

@@ -10,6 +10,9 @@
 template<class T>
 class TComPtr
 {
+	template<class T>
+	friend class TComPtr;
+
 	T* instance;
 
 public:
@@ -17,7 +20,11 @@ public:
 	inline TComPtr(std::nullptr_t);
 	inline TComPtr(T* ptr);
 	inline TComPtr(const TComPtr& ptr);
+	template<class O> requires TIsAssignable<O*, T*>
+	inline TComPtr(const TComPtr<O>& ptr);
 	inline TComPtr(TComPtr&& ptr) noexcept;
+	template<class O> requires TIsAssignable<O*, T*>
+	inline TComPtr(TComPtr<O>&& ptr) noexcept;
 	inline ~TComPtr();
 
 	inline T* Detach();

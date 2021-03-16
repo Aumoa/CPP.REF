@@ -6,7 +6,7 @@
 #include "DirectX/DirectXDeviceBundle.h"
 #include "DirectX/DirectXShaderResourceView.h"
 
-DirectXDescriptorAllocator::DirectXDescriptorAllocator(DirectXDeviceBundle* deviceBundle) : Super()
+DirectXDescriptorAllocator::DirectXDescriptorAllocator(DirectXDeviceBundle* deviceBundle) : Super(deviceBundle)
 	, device(deviceBundle->GetDevice())
 	, numDescriptors(0)
 	, issued(0)
@@ -15,7 +15,7 @@ DirectXDescriptorAllocator::DirectXDescriptorAllocator(DirectXDeviceBundle* devi
 	, handleStartGpu(0)
 	, incrementSize(0)
 {
-	SetDeviceChildPtr(nullptr, deviceBundle);
+
 }
 
 DirectXDescriptorAllocator::~DirectXDescriptorAllocator()

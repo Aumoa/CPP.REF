@@ -66,7 +66,7 @@ DirectXInstanceShaderRecord::DirectXInstanceShaderRecord(size_t shaderIndex, vec
 
 // ^^^^^^^^^^^^ DirectXInstanceShaderRecord ^^^^^^^^^^^^vvvvvvvvvvvv DirectXShaderBindingTable vvvvvvvvvvvv
 
-DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle) : Super()
+DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* deviceBundle) : Super(deviceBundle)
 	, deviceBundle(deviceBundle)
 	, shader(nullptr)
 
@@ -78,7 +78,7 @@ DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* device
 	, missStride(0)
 	, missLen(0)
 {
-	SetDeviceChildPtr(nullptr, deviceBundle);
+
 }
 
 DirectXShaderBindingTable::~DirectXShaderBindingTable()

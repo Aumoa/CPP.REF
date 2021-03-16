@@ -18,5 +18,4 @@ public:
 	~GDirectionalLightComponent() override;
 
 	TRefPtr<LightSceneProxy> CreateSceneProxy() override;
-	void CalcLightView(MinimalViewInfo& outViewInfo) const override;
 };

@@ -7,7 +7,7 @@
 
 #define LIGHT_TYPE_DIRECTIONAL 0
 
-float3 ComputeDirectionalLight(Material material, Light light, float3 normal, float3 rayDir)
+float3 ComputeDirectionalLight(Material material, GeneralLight light, float3 normal, float3 rayDir)
 {
 	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
 

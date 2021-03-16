@@ -5,9 +5,9 @@
 #include "DirectXCommon.h"
 #include "Logging/LogMacros.h"
 
-DirectXDeviceResource::DirectXDeviceResource() : Super()
+DirectXDeviceResource::DirectXDeviceResource(DirectXDeviceBundle* deviceBundle) : Super()
 	, object(nullptr)
-	, parent(nullptr)
+	, parent(deviceBundle)
 {
 
 }
@@ -37,10 +37,9 @@ DirectXDeviceBundle* DirectXDeviceResource::GetDevice() const
 	return parent;
 }
 
-void DirectXDeviceResource::SetDeviceChildPtr(ID3D12DeviceChild* ptr, DirectXDeviceBundle* parent)
+void DirectXDeviceResource::SetDeviceChildPtr(ID3D12DeviceChild* ptr)
 {
 	object = ptr;
-	this->parent = parent;
 
 	if (object != nullptr && debugName.IsValid)
 	{

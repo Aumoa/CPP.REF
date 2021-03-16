@@ -3,30 +3,38 @@
 #include "SceneRendering/LightSceneProxy.h"
 
 #include "Engine.h"
+#include "GameplayStatics/ClassDependencyHelper.h"
 #include "Components/LightComponent.h"
-#include "SceneRendering/MinimalViewInfo.h"
+#include "DirectX/DirectXDynamicBufferAllocator.h"
+#include "DirectX/DirectXDeviceBundle.h"
+#include "Logging/LogMacros.h"
+#include "Shaders/ShaderTypes.h"
 
-LightBatch::LightBatch()
+LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent, size_t inDesiredBuffSize) : Super()
+	, Component(inLightComponent)
+	, Mobility(Component->Mobility)
+	, PrimitiveTransform(inLightComponent->ComponentTransform)
+	, InstanceCBV(0)
 {
-	//basicLightBuffer = GEngine.DeviceBundle->CreateDynamicBuffer(sizeof(RHILight));
-}
+	if (inDesiredBuffSize == 0)
+	{
+		inDesiredBuffSize = sizeof(ShaderTypes::GeneralLight);
+	}
 
-LightBatch::~LightBatch()
-{
+	Engine* engine = ClassDependencyHelper::GetEngine(inLightComponent);
+	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();
+	DirectXDynamicBufferAllocator* allocator = deviceBundle->GetOrCreateDynamicBufferAllocator(sizeof(ShaderTypes::GeneralLight));
+	lightShaderBuf = NewObject<DirectXDynamicBuffer>(allocator);
+	InstanceCBV = lightShaderBuf->GetGPUVirtualAddress();
 
-}
-
-//TRefPtr<IRHIResource> LightBatch::GetLightBuffer() const
-//{
-//	return basicLightBuffer;
-//}
-
-LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent) : Super()
-	, myLightComponent(inLightComponent)
-	, transform(Transform::Identity)
-{
-	batch = NewObject<LightBatch>();
-	UpdateMovable();
+	if (Mobility == EComponentMobility::Static)
+	{
+		auto* ptr = (ShaderTypes::GeneralLight*)lightShaderBuf->GetBufferPointer();
+		ptr->Color = Component->LightColor.Cast<Vector3>();
+		ptr->Ambient = Component->Ambient;
+		ptr->Diffuse = Component->Diffuse;
+		ptr->Specular = Component->Specular;
+	}
 }
 
 LightSceneProxy::~LightSceneProxy()
@@ -34,34 +42,33 @@ LightSceneProxy::~LightSceneProxy()
 
 }
 
-void LightSceneProxy::UpdateMovable()
+void LightSceneProxy::Update()
 {
-	transform = myLightComponent->ComponentTransform;
-	UpdateBatchBuffer();
+	if (Mobility == EComponentMobility::Static)
+	{
+		SE_LOG(LogRendering, Error, L"You try to update light attribute, but owning component is static mobility. The action does not defined.");
+		return;
+	}
+
+	auto* ptr = (ShaderTypes::GeneralLight*)lightShaderBuf->GetBufferPointer();
+	ptr->Color = Component->LightColor.Cast<Vector3>();
+	ptr->Ambient = Component->Ambient;
+	ptr->Diffuse = Component->Diffuse;
+	ptr->Specular = Component->Specular;
 }
 
-Transform LightSceneProxy::GetLightTransform() const
+void LightSceneProxy::UpdateTransform()
 {
-	return transform;
+	if (Mobility == EComponentMobility::Static)
+	{
+		SE_LOG(LogRendering, Error, L"You try to update transform, but owning component is static mobility. The action does not defined.");
+		return;
+	}
+
+	PrimitiveTransform = Component->ComponentTransform;
 }
 
-LightBatch* LightSceneProxy::GetLightBatch() const
+void* LightSceneProxy::GetLightShaderBuffer() const
 {
-	return batch.Get();
-}
-
-void LightSceneProxy::UpdateBatchBuffer()
-{
-	//auto lightBatch = GetLightBatch();
-	//RHILight& light = *(RHILight*)lightBatch->GetLightBuffer()->GetMappingAddress();
-
-	//MinimalViewInfo viewInfo;
-	//myLightComponent->CalcLightView(viewInfo);
-
-	//light.LightColor = myLightComponent->LightColor.Cast<Vector3>();
-	//light.Ambient = myLightComponent->Ambient;
-	//light.Diffuse = myLightComponent->Diffuse;
-	//light.Specular = myLightComponent->Specular;
-	//light.ShadowCast = (uint32)myLightComponent->IsShadowCast;
-	//light.ViewProj = viewInfo.ViewProj;
+	return lightShaderBuf->GetBufferPointer();
 }

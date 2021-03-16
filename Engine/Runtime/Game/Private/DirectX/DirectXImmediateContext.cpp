@@ -21,31 +21,4 @@ void DirectXImmediateContext::EndDraw()
 	Super::EndDraw();
 
 	commandQueue->ExecuteCommandLists(this);
-	commandQueue->AddPendingReference(this);
-}
-
-void DirectXImmediateContext::AddPendingReference(Object* pendingReference)
-{
-	pendingReferences.emplace_back(pendingReference);
-}
-
-void DirectXImmediateContext::AddPendingReference(IUnknown* pendingReference)
-{
-	class PendingUnknownCapture : virtual public Object
-	{
-	public:
-		using Super = Object;
-
-	private:
-		TComPtr<IUnknown> unknown;
-
-	public:
-		PendingUnknownCapture(IUnknown* inUnknown) : Super()
-			, unknown(inUnknown)
-		{
-
-		}
-	};
-
-	pendingReferences.emplace_back(NewObject<PendingUnknownCapture>(pendingReference));
 }

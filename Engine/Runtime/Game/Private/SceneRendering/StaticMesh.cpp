@@ -5,7 +5,8 @@
 #include "Engine.h"
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
-#include "DirectX/DirectXImmediateContext.h"
+#include "DirectX/DirectXDeviceContext.h"
+#include "DirectX/DirectXCommandQueue.h"
 #include "SceneRendering/Vertex.h"
 
 using namespace std;
@@ -133,16 +134,20 @@ StaticMesh::StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryD
 	buildDesc.DestAccelerationStructureData = accelerationStructure->GetGPUVirtualAddress();
 
 	// Build acceleration structure and discard scratch buffer.
-	auto DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle, commandQueue, D3D12_COMMAND_LIST_TYPE_DIRECT);
-	immediateContext->BeginDraw();
+	auto DirectXNew(deviceContext, DirectXDeviceContext, deviceBundle, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	deviceContext->BeginDraw();
 	{
-		ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
+		ID3D12GraphicsCommandList4* commandList = deviceContext->GetCommandList();
 		commandList->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
 	}
-	immediateContext->EndDraw();
+	deviceContext->EndDraw();
 
 	// Add pending reference for keep scratch buffer until build completed.
-	immediateContext->AddPendingReference(scratchBuffer.Get());
+	deviceContext->AddPendingReference(scratchBuffer.Get());
+
+	// Execute commands and enqueue pending reference.
+	commandQueue->ExecuteCommandLists(deviceContext.Get());
+	commandQueue->AddPendingReference(move(deviceContext));
 
 	// Compute bounding box.
 	boundingBox = ComputeBoundingBox(inGeometryData.VertexBuffer);

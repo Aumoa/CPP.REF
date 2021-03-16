@@ -10,14 +10,14 @@
 
 using namespace std;
 
-DirectXAutoFence::DirectXAutoFence(DirectXDeviceBundle* deviceBundle, bool bBusyloop) : Super()
+DirectXAutoFence::DirectXAutoFence(DirectXDeviceBundle* deviceBundle, bool bBusyloop) : Super(deviceBundle)
 	, fenceValue(0)
 	, bBusyloop(bBusyloop)
 {
 	ID3D12Device5* device = deviceBundle->GetDevice();
 	HR(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 
-	SetDeviceChildPtr(fence.Get(), deviceBundle);
+	SetDeviceChildPtr(fence.Get());
 
 	if (!bBusyloop)
 	{

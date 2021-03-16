@@ -124,7 +124,7 @@ namespace
 	};
 }
 
-DirectXRaytracingShader::DirectXRaytracingShader(DirectXDeviceBundle* deviceBundle) : Super()
+DirectXRaytracingShader::DirectXRaytracingShader(DirectXDeviceBundle* deviceBundle) : Super(deviceBundle)
 	, device(deviceBundle->GetDevice())
 {
 

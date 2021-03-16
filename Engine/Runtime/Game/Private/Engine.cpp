@@ -83,7 +83,7 @@ void Engine::Render()
 		ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
 
 		Scene* scene = gameInstance->GetWorld()->GetScene();
-		gameViewport->RenderScene(commandList, scene);
+		gameViewport->RenderScene(immediateContext.Get(), scene);
 
 		ID3D12Resource* src = gameViewport->GetCompatibleRenderTarget()->GetResource();
 		ID3D12Resource* dst = swapChain->GetCurrentBuffer();

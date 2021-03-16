@@ -20,7 +20,7 @@ public:
 	DeferredGameViewport(DirectXDeviceBundle* deviceBundle);
 	~DeferredGameViewport() override;
 
-	void RenderScene(ID3D12GraphicsCommandList4* inCommandList, Scene* inScene) override;
+	void RenderScene(DirectXDeviceContext* deviceContext, Scene* inScene) override;
 
 protected:
 	void SetViewportResolution_Internal(int32 x, int32 y) override;

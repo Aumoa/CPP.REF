@@ -37,7 +37,6 @@ public:
 	virtual void ResolveDirtyState();
 
 	virtual TRefPtr<LightSceneProxy> CreateSceneProxy();
-	virtual void CalcLightView(MinimalViewInfo& outViewInfo) const = 0;
 	LightSceneProxy* GetSceneProxy() const;
 
 	vs_property(Color, LightColor);

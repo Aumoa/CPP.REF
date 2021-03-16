@@ -3,33 +3,34 @@
 #include "Components/DirectionalLightComponent.h"
 
 #include "SceneRendering/LightSceneProxy.h"
-#include "SceneRendering/MinimalViewInfo.h"
+#include "Shaders/ShaderTypes.h"
 
 class DirectionalLightSceneProxy : public LightSceneProxy
 {
 public:
 	using Super = LightSceneProxy;
-	using This = DirectionalLightSceneProxy;
-
-private:
-	GDirectionalLightComponent* myComponent;
 
 public:
 	DirectionalLightSceneProxy(GDirectionalLightComponent* inComponent) : Super(inComponent)
-		, myComponent(inComponent)
 	{
-
+		if (Mobility == EComponentMobility::Static)
+		{
+			Internal_UpdateTransform();
+		}
 	}
 
-	void UpdateBatchBuffer() override
+	void UpdateTransform() override
 	{
-		//Super::UpdateBatchBuffer();
+		Super::UpdateTransform();
+		Internal_UpdateTransform();
+	}
 
-		//auto lightBatch = GetLightBatch();
-		//RHILight& light = *(RHILight*)lightBatch->GetLightBuffer()->GetMappingAddress();
-
-		//light.Type = RHILight::LIGHT_TYPE_DIRECTIONAL;
-		//light.Ambiguous_01 = myComponent->ComponentRotation.RotateVector(Vector3::Forward).Cast<Vector4>();
+private:
+	void Internal_UpdateTransform()
+	{
+		auto* ptr = (ShaderTypes::GeneralLight*)GetLightShaderBuffer();
+		ptr->Type = LightType_Directional;
+		ptr->DirectionalLight_Direction = PrimitiveTransform.Rotation.RotateVector(Vector3::Forward).Cast<Vector4>();
 	}
 };
 
@@ -46,12 +47,4 @@ GDirectionalLightComponent::~GDirectionalLightComponent()
 TRefPtr<LightSceneProxy> GDirectionalLightComponent::CreateSceneProxy()
 {
 	return NewObject<DirectionalLightSceneProxy>(this);
-}
-
-void GDirectionalLightComponent::CalcLightView(MinimalViewInfo& outViewInfo) const
-{
-	outViewInfo.FOV = 0;
-	outViewInfo.AspectRatio = 1.0f;
-	outViewInfo.Location = ComponentLocation;
-	outViewInfo.Rotation = ComponentRotation;
 }

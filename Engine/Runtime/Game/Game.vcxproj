@@ -303,6 +303,7 @@
     <ClInclude Include="Public\DirectX\DirectXGeometry.h" />
     <ClInclude Include="Public\DirectX\DirectXHDRTarget.h" />
     <ClInclude Include="Public\DirectX\DirectXImmediateContext.h" />
+    <ClInclude Include="Public\DirectX\DirectXInstancedBufferAllocator.h" />
     <ClInclude Include="Public\DirectX\DirectXMinimal.h" />
     <ClInclude Include="Public\DirectX\DirectXRaytracingShader.h" />
     <ClInclude Include="Public\DirectX\DirectXRenderTarget.h" />
@@ -410,6 +411,7 @@
     <ClCompile Include="Private\DirectX\DirectXGeometry.cpp" />
     <ClCompile Include="Private\DirectX\DirectXHDRTarget.cpp" />
     <ClCompile Include="Private\DirectX\DirectXImmediateContext.cpp" />
+    <ClCompile Include="Private\DirectX\DirectXInstancedBufferAllocator.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRaytracingShader.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRenderTarget.cpp" />
     <ClCompile Include="Private\DirectX\DirectXRenderTargetView.cpp" />

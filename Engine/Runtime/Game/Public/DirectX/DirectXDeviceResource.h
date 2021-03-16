@@ -20,12 +20,12 @@ private:
 	TRefPtr<String> debugName;
 
 public:
-	DirectXDeviceResource();
+	DirectXDeviceResource(DirectXDeviceBundle* deviceBundle);
 	~DirectXDeviceResource() override;
 
 	vs_property_virtual(TRefPtr<String>, DebugName);
 	DirectXDeviceBundle* GetDevice() const;
 
 protected:
-	void SetDeviceChildPtr(ID3D12DeviceChild* ptr, DirectXDeviceBundle* parent);
+	void SetDeviceChildPtr(ID3D12DeviceChild* ptr);
 };

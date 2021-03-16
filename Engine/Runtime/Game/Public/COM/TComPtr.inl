@@ -29,7 +29,21 @@ TComPtr<T>::TComPtr(const TComPtr& ptr) : TComPtr(ptr.instance)
 }
 
 template<class T>
+template<class O> requires TIsAssignable<O*, T*>
+TComPtr<T>::TComPtr(const TComPtr<O>& ptr) : TComPtr(ptr.instance)
+{
+
+}
+
+template<class T>
 TComPtr<T>::TComPtr(TComPtr&& ptr) noexcept : instance(ptr.instance)
+{
+	ptr.instance = nullptr;
+}
+
+template<class T>
+template<class O> requires TIsAssignable<O*, T*>
+TComPtr<T>::TComPtr(TComPtr<O>&& ptr) noexcept : instance(ptr.instance)
 {
 	ptr.instance = nullptr;
 }

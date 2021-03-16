@@ -47,18 +47,6 @@ struct LDRPixel
 	float4 Color : SV_TARGET0;
 };
 
-struct Light
-{
-	uint Type;
-	float3 Color;
-	float Ambient;
-	float Diffuse;
-	float Specular;
-	uint ShadowCast;
-	row_major matrix ViewProj;
-	float4 Ambiguous_01;
-};
-
 static float4 QuadPos[4] =
 {
 	float4(-1.0f, +1.0f, +0.0f, 1.0f),

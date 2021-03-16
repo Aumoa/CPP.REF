@@ -29,14 +29,14 @@ void GLightComponent::ResolveDirtyState()
 
 	bool bHasSceneProxy = sceneProxy.IsValid;
 
-	if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && bHasSceneProxy)
-	{
-		sceneProxy->UpdateMovable();
-	}
-
 	if (HasDirtyMark((EComponentDirtyMask)ELightComponentDirtyMask::LightUpdated) && bHasSceneProxy)
 	{
-		sceneProxy->UpdateBatchBuffer();
+		sceneProxy->Update();
+	}
+
+	if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && bHasSceneProxy)
+	{
+		sceneProxy->UpdateTransform();
 	}
 
 	Super::ResolveDirtyState();

@@ -16,6 +16,7 @@ class LightSceneProxy;
 class DirectXAccelerationInstancingScene;
 class DirectXShaderBindingTable;
 class DirectXDescriptorAllocator;
+class DirectXDeviceContext;
 
 class Scene : virtual public Object
 {
@@ -44,10 +45,10 @@ public:
 	~Scene() override;
 
 	virtual void Update();
-	virtual void CalcVisibility();
+	virtual void InitViews();
 
-	virtual void BeginRender(ID3D12GraphicsCommandList4* inCommandList);
-	virtual void EndRender(ID3D12GraphicsCommandList4* inCommandList);
+	virtual void BeginRender(DirectXDeviceContext* deviceContext);
+	virtual void EndRender(DirectXDeviceContext* deviceContext);
 
 	virtual void AddPrimitive(GPrimitiveComponent* inPrimitiveComponent);
 	virtual void AddLight(GLightComponent* inLightComponent);

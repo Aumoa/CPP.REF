@@ -7,6 +7,7 @@
 #include "DirectXDeviceResource.h"
 
 class PrimitiveSceneProxy;
+class DirectXDeviceContext;
 
 class GAME_API DirectXAccelerationInstancingScene : public DirectXDeviceResource
 {
@@ -33,7 +34,7 @@ public:
 	~DirectXAccelerationInstancingScene() override;
 
 	void UpdateScene();
-	void BuildScene(ID3D12GraphicsCommandList4* inCommandList);
+	void BuildScene(DirectXDeviceContext* deviceContext);
 
 	void AddInstance(size_t index, const PrimitiveSceneProxy* instanceDesc);
 	void RemoveInstance(size_t index);

@@ -5,6 +5,7 @@
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXHDRTarget.h"
 #include "DirectX/DirectXCompatibleRenderTarget.h"
+#include "DirectX/DirectXDeviceContext.h"
 #include "Logging/LogMacros.h"
 #include "Diagnostics/ScopedCycleCounter.h"
 #include "SceneRendering/Scene.h"
@@ -22,15 +23,17 @@ DeferredGameViewport::~DeferredGameViewport()
 
 }
 
-void DeferredGameViewport::RenderScene(ID3D12GraphicsCommandList4* inCommandList, Scene* inScene)
+void DeferredGameViewport::RenderScene(DirectXDeviceContext* deviceContext, Scene* inScene)
 {
+	ID3D12GraphicsCommandList4* inCommandList = deviceContext->GetCommandList();
+
 	{
-		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, CalcVisibility);
-		inScene->CalcVisibility();
+		QUICK_SCOPED_CYCLE_COUNTER(DeferredGameViewport, InitViews);
+		inScene->InitViews();
 	}
 
 	{
-		inScene->BeginRender(inCommandList);
+		inScene->BeginRender(deviceContext);
 
 		D3D12_RESOURCE_BARRIER barrier = { };
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -47,7 +50,7 @@ void DeferredGameViewport::RenderScene(ID3D12GraphicsCommandList4* inCommandList
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
 		inCommandList->ResourceBarrier(1, &barrier);
 
-		inScene->EndRender(inCommandList);
+		inScene->EndRender(deviceContext);
 	}
 
 	auto r = GetCompatibleRenderTarget();

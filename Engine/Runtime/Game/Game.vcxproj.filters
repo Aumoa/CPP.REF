@@ -468,6 +468,9 @@
     <ClInclude Include="Public\DirectX\DirectXDynamicBufferAllocator.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\DirectX\DirectXInstancedBufferAllocator.h">
+      <Filter>Public\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -750,6 +753,9 @@
       <Filter>Private\COM</Filter>
     </ClCompile>
     <ClCompile Include="Private\DirectX\DirectXDynamicBufferAllocator.cpp">
+      <Filter>Private\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\DirectX\DirectXInstancedBufferAllocator.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
   </ItemGroup>

@@ -13,11 +13,13 @@ inline namespace
 	using float3 = Vector3;
 	using float2 = Vector2;
 	using matrix = Matrix4x4;
+	using uint = uint32;
 }
 
 namespace ShaderTypes
 {
 
+#pragma pack(push, 1)
 #define row_major
 
 #endif
@@ -63,10 +65,24 @@ struct Material
 	float SpecExp;
 };
 
+#define LightType_Directional 0
+#define DirectionalLight_Direction Ambiguous_01
+
+struct GeneralLight
+{
+	uint Type;
+	float Ambient;
+	float Diffuse;
+	float Specular;
+	float3 Color;
+	float4 Ambiguous_01;
+};
+
 #if defined(__cplusplus)
 
 }
 
 #undef row_major
+#pragma pack(pop)
 
 #endif

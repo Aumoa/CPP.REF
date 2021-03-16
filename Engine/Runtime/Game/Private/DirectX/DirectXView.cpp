@@ -6,7 +6,7 @@
 #include "DirectX/DirectXDeviceBundle.h"
 #include "Logging/LogMacros.h"
 
-DirectXView::DirectXView(DirectXDeviceBundle* deviceBundle, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32 numDescriptors) : Super()
+DirectXView::DirectXView(DirectXDeviceBundle* deviceBundle, D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32 numDescriptors) : Super(deviceBundle)
 	, numDescriptors(numDescriptors)
 	, incrementSize(0)
 	, handleCPU(0)
@@ -22,7 +22,7 @@ DirectXView::DirectXView(DirectXDeviceBundle* deviceBundle, D3D12_DESCRIPTOR_HEA
 	incrementSize = device->GetDescriptorHandleIncrementSize(heapType);
 	handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 
-	SetDeviceChildPtr(descriptorHeap.Get(), deviceBundle);
+	SetDeviceChildPtr(descriptorHeap.Get());
 }
 
 DirectXView::~DirectXView()

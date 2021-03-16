@@ -45,10 +45,10 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 	DirectXDescriptorAllocator* allocator = scene->GetDescriptorAllocator();
 	DirectXShaderBindingTable* sbt = scene->GetShaderBindingTable();
 
+	// Fill instanced hit group records.
 	std::vector<DirectXInstanceShaderRecord> hitGroupRecords;
 	std::vector<DirectXInstanceShaderRecord> missRecords;
 	
-	// Fill instanced hit group records.
 	const auto& primitives = scene->GetPrimitives();
 	hitGroupRecords.reserve(primitives.size());
 	for (auto& primitive : primitives)

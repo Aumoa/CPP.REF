@@ -10,6 +10,7 @@
 class Scene;
 class DirectXCompatibleRenderTarget;
 class DirectXDeviceBundle;
+class DirectXDeviceContext;
 
 class GAME_API GameViewport : virtual public Object
 {
@@ -28,7 +29,7 @@ public:
 	GameViewport(DirectXDeviceBundle* deviceBundle);
 	~GameViewport() override;
 
-	virtual void RenderScene(ID3D12GraphicsCommandList4* inCommandList, Scene* inScene) = 0;
+	virtual void RenderScene(DirectXDeviceContext* deviceContext, Scene* inScene) = 0;
 	DirectXCompatibleRenderTarget* GetCompatibleRenderTarget() const;
 
 	void SetResolution(int32 x, int32 y);

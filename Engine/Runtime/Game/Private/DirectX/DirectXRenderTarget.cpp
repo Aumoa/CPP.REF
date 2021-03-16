@@ -5,10 +5,10 @@
 #include "DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
 
-DirectXRenderTarget::DirectXRenderTarget(DirectXDeviceBundle* deviceBundle) : Super()
+DirectXRenderTarget::DirectXRenderTarget(DirectXDeviceBundle* deviceBundle) : Super(deviceBundle)
 	, device(deviceBundle->GetDevice())
 {
-	SetDeviceChildPtr(nullptr, deviceBundle);
+
 }
 
 DirectXRenderTarget::~DirectXRenderTarget()

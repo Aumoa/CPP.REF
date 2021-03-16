@@ -61,11 +61,11 @@ void DirectXDynamicBufferAllocator::SingleBufferAllocator::Free(SingleBufferAllo
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DirectXDynamicBufferAllocator::DirectXDynamicBufferAllocator(DirectXDeviceBundle* deviceBundle, uint64 allocateUnit, bool bThreadSafe) : Super()
+DirectXDynamicBufferAllocator::DirectXDynamicBufferAllocator(DirectXDeviceBundle* deviceBundle, uint64 allocateUnit, bool bThreadSafe) : Super(deviceBundle)
 	, allocateUnit(allocateUnit)
 	, bThreadSafe(bThreadSafe)
 {
-	SetDeviceChildPtr(nullptr, deviceBundle);
+
 }
 
 DirectXDynamicBufferAllocator::~DirectXDynamicBufferAllocator()

@@ -4,10 +4,12 @@
 
 #include "DirectXCommon.h"
 #include "DirectX/DirectXCommandQueue.h"
-#include "DirectX/DirectXImmediateContext.h"
+#include "DirectX/DirectXDeviceContext.h"
 #include "DirectX/DirectXDynamicBufferAllocator.h"
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
+
+using namespace std;
 
 #define WITH_REPORT 0
 
@@ -164,19 +166,23 @@ TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateImmutableBuffer(DirectXComman
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = initialState;
 
-	auto DirectXNew(immediateContext, DirectXImmediateContext, this, commandQueue, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	auto DirectXNew(deviceContext, DirectXDeviceContext, this, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 	// Copy resource from CPU storage(UploadHeap) to GPU storage(DefaultHeap).
-	immediateContext->BeginDraw();
+	deviceContext->BeginDraw();
 	{
-		ID3D12GraphicsCommandList4* commandList = immediateContext->GetCommandList();
+		ID3D12GraphicsCommandList4* commandList = deviceContext->GetCommandList();
 		commandList->CopyResource(resource.Get(), uploadHeap.Get());
 		commandList->ResourceBarrier(1, &barrier);
 	}
-	immediateContext->EndDraw();
+	deviceContext->EndDraw();
 
 	// Add pending reference for keep upload heap until copy operation will completed.
-	immediateContext->AddPendingReference(uploadHeap.Get());
+	deviceContext->AddPendingReference(uploadHeap.Get());
+
+	// Execute commands and enqueue pending reference.
+	commandQueue->ExecuteCommandLists(deviceContext.Get());
+	commandQueue->AddPendingReference(move(deviceContext));
 
 	return resource;
 }

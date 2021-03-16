@@ -5,7 +5,9 @@
 #include "DirectXCommon.h"
 #include "DirectX/DirectXDeviceBundle.h"
 
-DirectXDeviceContext::DirectXDeviceContext(DirectXDeviceBundle* deviceBundle, D3D12_COMMAND_LIST_TYPE type) : Super()
+using namespace std;
+
+DirectXDeviceContext::DirectXDeviceContext(DirectXDeviceBundle* deviceBundle, D3D12_COMMAND_LIST_TYPE type) : Super(deviceBundle)
 	, device(deviceBundle->GetDevice())
 	, commandType(type)
 
@@ -48,6 +50,32 @@ ID3D12GraphicsCommandList4* DirectXDeviceContext::GetCommandList() const
 D3D12_COMMAND_LIST_TYPE DirectXDeviceContext::GetCommandListType() const
 {
 	return commandType;
+}
+
+void DirectXDeviceContext::AddPendingReference(TRefPtr<Object>&& pendingReference)
+{
+	pendingReferences.emplace_back(move(pendingReference));
+}
+
+void DirectXDeviceContext::AddPendingReference(TComPtr<IUnknown>&& pendingReference)
+{
+	class PendingUnknownCapture : virtual public Object
+	{
+	public:
+		using Super = Object;
+
+	private:
+		TComPtr<IUnknown> unknown;
+
+	public:
+		PendingUnknownCapture(TComPtr<IUnknown>& inUnknown) : Super()
+			, unknown(move(inUnknown))
+		{
+
+		}
+	};
+
+	pendingReferences.emplace_back(NewObject<PendingUnknownCapture>(pendingReference));
 }
 
 void DirectXDeviceContext::SwapCommandAllocator(TComPtr<ID3D12CommandAllocator>& swapTarget)

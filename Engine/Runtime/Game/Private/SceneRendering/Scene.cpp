@@ -72,7 +72,7 @@ void Scene::Update()
 	instancingScene->UpdateScene();
 }
 
-void Scene::CalcVisibility()
+void Scene::InitViews()
 {
 	GPlayerCameraManager* cameraManager = localPlayer->CameraManager;
 
@@ -82,23 +82,25 @@ void Scene::CalcVisibility()
 		return;
 	}
 
+	// Calc scene visibilities for each views.
 	MinimalViewInfo viewInfo;
 	cameraManager->CalcCameraView(viewInfo);
 
 	localPlayerVisibility->UpdateView(viewInfo);
 	localPlayerVisibility->CalcVisibility();
 
+	// Calc count of shader resource views.
 	numSRVs = 256;  // Reserved
 	numSRVs += localPlayerVisibility->NumPrimitivesRender * 2;  // Material
 }
 
-void Scene::BeginRender(ID3D12GraphicsCommandList4* inCommandList)
+void Scene::BeginRender(DirectXDeviceContext* deviceContext)
 {
-	instancingScene->BuildScene(inCommandList);
+	instancingScene->BuildScene(deviceContext);
 	allocator->BeginAllocate((uint32)numSRVs);
 }
 
-void Scene::EndRender(ID3D12GraphicsCommandList4* inCommandList)
+void Scene::EndRender(DirectXDeviceContext* deviceContext)
 {
 	allocator->EndAllocate();
 }

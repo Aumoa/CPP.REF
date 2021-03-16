@@ -9,23 +9,7 @@
 #include "ComponentMobility.h"
 
 class GLightComponent;
-struct RHILight;
-
-class GAME_API LightBatch : virtual public Object
-{
-public:
-	using Super = Object;
-	using This = LightBatch;
-
-private:
-	//TRefPtr<IRHIResource> basicLightBuffer;
-
-public:
-	LightBatch();
-	~LightBatch() override;
-
-	//virtual TRefPtr<IRHIResource> GetLightBuffer() const;
-};
+class DirectXDynamicBuffer;
 
 class GAME_API LightSceneProxy : virtual public Object
 {
@@ -34,17 +18,21 @@ public:
 	using This = LightSceneProxy;
 
 private:
-	TRefPtr<LightBatch> batch;
-	GLightComponent* myLightComponent;
-	Transform transform;
+	GLightComponent* myComponent;
+	TRefPtr<DirectXDynamicBuffer> lightShaderBuf;
 
 public:
-	LightSceneProxy(GLightComponent* inLightComponent);
+	LightSceneProxy(GLightComponent* inLightComponent, size_t inDesiredBuffSize = 0);
 	~LightSceneProxy() override;
 
-	void UpdateMovable();
+	virtual void Update();
+	virtual void UpdateTransform();
 
-	virtual Transform GetLightTransform() const;
-	virtual LightBatch* GetLightBatch() const;
-	virtual void UpdateBatchBuffer();
+	GLightComponent* const Component;
+	const EComponentMobility Mobility;
+	Transform PrimitiveTransform;
+	uint64 InstanceCBV;
+
+protected:
+	void* GetLightShaderBuffer() const;
 };

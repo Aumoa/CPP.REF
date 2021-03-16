@@ -102,13 +102,13 @@ void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
 	mat.Specular = 1.0f;
 	mat.SpecExp = 32.0f;
 
-	Light light;
+	GeneralLight light;
 	light.Type = 0;
 	light.Color = 1.0f;
 	light.Ambient = 0.2f;
 	light.Diffuse = 0.5f;
 	light.Specular = 0.4f;
-	light.Ambiguous_01.xyz = float3(0, -1.0f, 0);
+	light.DirectionalLight_Direction.xyz = float3(0, -1.0f, 0);
 
 	float3 ads = ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection());
 

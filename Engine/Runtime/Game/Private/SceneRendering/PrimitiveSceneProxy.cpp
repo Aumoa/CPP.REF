@@ -12,8 +12,7 @@
 #include "Shaders/ShaderTypes.h"
 
 PrimitiveSceneProxy::PrimitiveSceneProxy(GPrimitiveComponent* inPrimitiveComponent) : Super()
-	, myPrimitiveComponent(inPrimitiveComponent)
-
+	, Component(inPrimitiveComponent)
 	, Mobility(inPrimitiveComponent->Mobility)
 	, PrimitiveId(0)
 	, PrimitiveBoundingBox{ }
@@ -50,18 +49,16 @@ void PrimitiveSceneProxy::UpdateTransform()
 {
 	if (Mobility == EComponentMobility::Static)
 	{
-		SE_LOG(LogRendering, Error, L"Primitive mobility is static only. Update transform is not defined.");
+		SE_LOG(LogRendering, Error, L"You try to update transform, but owning component is static mobility. The action does not defined.");
+		return;
 	}
 
-	PrimitiveTransform = myPrimitiveComponent->ComponentTransform;
-
-	void* ptr = instanceTransformBuf->GetBufferPointer();
+	PrimitiveTransform = Component->ComponentTransform;
 
 	ShaderTypes::RaytracingInstanceTransform trpInstanced;
 	trpInstanced.World = PrimitiveTransform.Matrix;
 	trpInstanced.WorldInvTranspose = trpInstanced.World.Inverse.Transposed;
-
-	memcpy(ptr, &trpInstanced, sizeof(trpInstanced));
+	memcpy(instanceTransformBuf->GetBufferPointer(), &trpInstanced, sizeof(trpInstanced));
 }
 
 uint64 PrimitiveSceneProxy::GetInstanceTransformBuf() const

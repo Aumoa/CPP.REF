@@ -19,7 +19,19 @@ private:
 	struct PendingReference
 	{
 		uint64 FenceValue;
-		TRefPtr<Object> ObjectReference;
+		std::vector<TRefPtr<Object>> ObjectReference;
+
+		PendingReference()
+			: FenceValue(0)
+		{
+		}
+
+		PendingReference(PendingReference&& rhs) noexcept
+			: FenceValue(rhs.FenceValue)
+			, ObjectReference(std::move(rhs.ObjectReference))
+		{
+			rhs.FenceValue = 0;
+		}
 	};
 
 private:
@@ -34,7 +46,8 @@ public:
 	~DirectXCommandQueue() override;
 
 	void ExecuteCommandLists(DirectXDeviceContext* const* deviceContexts, size_t count);
-	void AddPendingReference(Object* inPendingReference);
+	void AddPendingReference(TRefPtr<Object>&& inPendingReference);
+	void AddPendingReferences(std::vector<TRefPtr<Object>>&& inPendingReferences);
 	void CollectPendingReferences();
 
 	vs_property_get_auto(ID3D12CommandQueue*, Item, commandQueue.Get());

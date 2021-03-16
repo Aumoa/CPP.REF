@@ -29,6 +29,7 @@ public:
 	virtual void Update();
 	virtual void UpdateTransform();
 
+	GPrimitiveComponent* const Component;
 	const EComponentMobility Mobility;
 	Transform PrimitiveTransform;
 	uint64 PrimitiveId;
