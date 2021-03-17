@@ -51,7 +51,7 @@ void RayGeneration()
 	Payload payload = (Payload)0;
 	TraceRay(
 		gSceneAS,
-		RAY_FLAG_NONE,
+		RAY_FLAG_CULL_BACK_FACING_TRIANGLES | RAY_FLAG_FORCE_OPAQUE,
 		0xFF,
 		0,
 		1,
@@ -71,7 +71,7 @@ void Miss(inout Payload payload : SV_Payload)
 
 StructuredBuffer<Vertex> cVertexBuffer : register(t0, space2);
 StructuredBuffer<uint> cIndexBuffer : register(t1, space2);
-StructuredBuffer<RaytracingInstanceTransform> cTransform : register(t2, space2);
+ConstantBuffer<RaytracingInstanceTransform> cTransform : register(b0, space2);
 
 [shader("closesthit")]
 void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
@@ -93,7 +93,7 @@ void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
 	RayFragment frag;
 	frag.PosW = WorldRayOrigin() + RayTCurrent() * WorldRayDirection();
 	frag.Tex = HitAttribute(triangles[0].Tex, triangles[1].Tex, triangles[2].Tex, attr);
-	frag.NormalW = normalize(HitAttribute(triangles[0].Normal, triangles[1].Normal, triangles[2].Normal, attr));
+	frag.NormalW = normalize(mul(HitAttribute(triangles[0].Normal, triangles[1].Normal, triangles[2].Normal, attr), (float3x3)cTransform.WorldInvTranspose));
 	//frag.TangentW = normalize(mul(triangles[0].TangentL * bary.x + triangles[1].TangentL * bary.y + triangles[2].TangentL * bary.z, (float3x3)cTransform.World));
 
 	Material mat;

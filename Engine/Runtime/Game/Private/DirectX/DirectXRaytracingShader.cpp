@@ -196,7 +196,7 @@ void DirectXRaytracingShader::InitLocalRS()
 	{
 		GetRootShaderResourceView(0, D3D12_SHADER_VISIBILITY_ALL, 2),
 		GetRootShaderResourceView(1, D3D12_SHADER_VISIBILITY_ALL, 2),
-		GetRootShaderResourceView(2, D3D12_SHADER_VISIBILITY_ALL, 2),
+		GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL, 2),
 	};
 
 	D3D12_ROOT_SIGNATURE_DESC localRSDesc = GetRootSignatureDesc(rootParams, { });
