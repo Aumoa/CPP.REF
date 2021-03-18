@@ -343,6 +343,7 @@
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredRenderTarget.h" />
+    <ClInclude Include="Public\SceneRendering\HomogeneousLight.h" />
     <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
