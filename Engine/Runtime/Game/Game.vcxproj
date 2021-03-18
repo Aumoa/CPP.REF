@@ -485,6 +485,7 @@
     <None Include="Public\Components\SceneComponent.inl" />
     <None Include="Public\COM\TComPtr.inl" />
     <None Include="Public\DirectX\DirectXCommandQueue.inl" />
+    <None Include="Public\DirectX\DirectXInstancedBufferAllocator.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
     <None Include="Public\Input\TBitfieldInputChangeTracker.inl" />

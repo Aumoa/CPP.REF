@@ -835,6 +835,9 @@
     <None Include="Private\COM\COMImageCommon.inl">
       <Filter>Private\COM</Filter>
     </None>
+    <None Include="Public\DirectX\DirectXInstancedBufferAllocator.inl">
+      <Filter>Public\DirectX</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Private\Shaders\TonemapShader\TonemapPixelShader.hlsl">
