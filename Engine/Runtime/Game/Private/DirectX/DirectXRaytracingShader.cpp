@@ -180,11 +180,16 @@ void DirectXRaytracingShader::InitRS()
 		{ D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
 	};
 
+	D3D12_DESCRIPTOR_RANGE scene[] =
+	{
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
+	};
+
 	D3D12_ROOT_PARAMETER rootParameters[] =
 	{
 		GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL),
 		GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_ALL, colorOutput),
-		GetRootShaderResourceView(0, D3D12_SHADER_VISIBILITY_ALL),
+		GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_ALL, scene),
 	};
 
 	rootSignature = CreateRootSignature(device, GetRootSignatureDesc(rootParameters, { }));

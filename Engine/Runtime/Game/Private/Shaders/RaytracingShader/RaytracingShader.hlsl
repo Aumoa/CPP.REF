@@ -5,6 +5,7 @@
 
 ConstantBuffer<ShaderCameraConstant> gCamera : register(b0);
 RaytracingAccelerationStructure gSceneAS : register(t0);
+StructuredBuffer<GeneralLight> gLights : register(t1);
 
 RWTexture2D<float4> gColorOutput : register(u0);
 
@@ -83,7 +84,7 @@ void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
 	uint triangleIndex[3] = { primitiveID + 0, primitiveID + 1, primitiveID + 2 };
 
 	[unroll]
-	for (int i = 0; i < 3; ++i)
+	for (uint i = 0; i < 3; ++i)
 	{
 		triangleIndex[i] = cIndexBuffer[triangleIndex[i]];
 		triangles[i] = cVertexBuffer[triangleIndex[i]];
@@ -102,17 +103,18 @@ void ClosestHit(inout Payload payload : SV_Payload, BuiltInAttr attr)
 	mat.Specular = 1.0f;
 	mat.SpecExp = 32.0f;
 
-	GeneralLight light;
-	light.Type = 0;
-	light.Color = 1.0f;
-	light.Ambient = 0.2f;
-	light.Diffuse = 0.5f;
-	light.Specular = 0.4f;
-	light.DirectionalLight_Direction.xyz = float3(0, -1.0f, 0);
+	uint numLights;
+	uint lightStride;
+	gLights.GetDimensions(numLights, lightStride);
 
-	float3 ads = ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection());
+	float3 lights = 0;
+	for (i = 0; i < numLights; ++i)
+	{
+		float3 ads = ComputeDirectionalLight(mat, gLights[i], frag.NormalW, -WorldRayDirection());
+		lights += (ads.x + ads.y) * gLights[i].Color + ads.z;
+	}
 
-	payload.Color = ads.x + ads.y + ads.z;
+	payload.Color = float4(lights, 1.0f);
 	payload.Pos = frag.PosW;
 	payload.Normal = frag.NormalW;
 }

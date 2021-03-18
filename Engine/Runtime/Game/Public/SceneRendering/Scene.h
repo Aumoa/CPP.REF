@@ -1,4 +1,5 @@
-﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
+﻿
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -17,6 +18,8 @@ class DirectXAccelerationInstancingScene;
 class DirectXShaderBindingTable;
 class DirectXDescriptorAllocator;
 class DirectXDeviceContext;
+class DirectXInstancedBufferAllocator;
+class DirectXShaderResourceView;
 
 class Scene : virtual public Object
 {
@@ -36,9 +39,11 @@ private:
 	std::vector<GLightComponent*> lightComponents;
 	std::vector<LightSceneProxy*> lightProxies;
 
+	TRefPtr<DirectXShaderResourceView> sceneSRV;
 	TRefPtr<DirectXAccelerationInstancingScene> instancingScene;
 	TRefPtr<DirectXShaderBindingTable> sbt;
 	TRefPtr<DirectXDescriptorAllocator> allocator;
+	TRefPtr<DirectXInstancedBufferAllocator> lightInstanced;
 
 public:
 	Scene(APlayerController* inPlayerController);
@@ -58,7 +63,11 @@ public:
 	virtual std::span<LightSceneProxy* const> GetLights() const;
 
 	Engine* GetEngine() const;
-	DirectXAccelerationInstancingScene* GetAccelScene() const;
-	DirectXShaderBindingTable* GetShaderBindingTable() const;
-	DirectXDescriptorAllocator* GetDescriptorAllocator() const;
+	vs_property_get_auto(DirectXShaderResourceView*, SceneSRV, sceneSRV.Get());
+	vs_property_get_auto(DirectXShaderBindingTable*, ShaderBindingTable, sbt.Get());
+	vs_property_get_auto(DirectXDescriptorAllocator*, DescriptorAllocator, allocator.Get());
+
+private:
+	void UpdateInstancingBufferSRV();
+	void UpdateLightInstancedSRV();
 };

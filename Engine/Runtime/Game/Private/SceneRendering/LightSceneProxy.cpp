@@ -37,11 +37,10 @@ void LightSceneProxy::Update()
 		return;
 	}
 
-	auto* ptr = (ShaderTypes::GeneralLight*)lightShaderBuf->GetBufferPointer();
-	ptr->Color = Component->LightColor.Cast<Vector3>();
-	ptr->Ambient = Component->Ambient;
-	ptr->Diffuse = Component->Diffuse;
-	ptr->Specular = Component->Specular;
+	PrimitiveLight.Color = Component->LightColor.Cast<Vector3>();
+	PrimitiveLight.Ambient = Component->Ambient;
+	PrimitiveLight.Diffuse = Component->Diffuse;
+	PrimitiveLight.Specular = Component->Specular;
 }
 
 void LightSceneProxy::UpdateTransform()
@@ -53,9 +52,4 @@ void LightSceneProxy::UpdateTransform()
 	}
 
 	PrimitiveTransform = Component->ComponentTransform;
-}
-
-void* LightSceneProxy::GetLightShaderBuffer() const
-{
-	return lightShaderBuf->GetBufferPointer();
 }
