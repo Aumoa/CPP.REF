@@ -12,6 +12,7 @@
 
 GStartupLevel::GStartupLevel() : Super()
 	, light(nullptr)
+	, lightBlue(nullptr)
 	
 	, plane(nullptr)
 	, geosphere(nullptr)
@@ -37,9 +38,15 @@ void GStartupLevel::LoadLevel()
 	Engine* engine = gameInstance->GetEngine();
 	AssetManager* assetMgr = engine->GetAssetManager();
 
-	//light = SpawnActorPersistent<ADirectionalLight>();
-	//light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
-	//light->LightComponent->LightColor = Color::White;
+	light = SpawnActorPersistent<ADirectionalLight>();
+	light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
+	light->LightComponent->LightColor = Color::White;
+
+	lightBlue = SpawnActorPersistent<ADirectionalLight>();
+	lightBlue->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(1, -1, 1), Vector3(0, 1, 0))));
+	lightBlue->LightComponent->Ambient = 0;
+	lightBlue->LightComponent->Diffuse = 0.3f;
+	lightBlue->LightComponent->LightColor = Color::Blue;
 
 	plane = SpawnActorPersistent<AStaticMeshActor>();
 	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
