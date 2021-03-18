@@ -8,32 +8,19 @@
 #include "DirectX/DirectXDynamicBufferAllocator.h"
 #include "DirectX/DirectXDeviceBundle.h"
 #include "Logging/LogMacros.h"
-#include "Shaders/ShaderTypes.h"
 
-LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent, size_t inDesiredBuffSize) : Super()
+LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent) : Super()
 	, Component(inLightComponent)
 	, Mobility(Component->Mobility)
 	, PrimitiveTransform(inLightComponent->ComponentTransform)
-	, InstanceCBV(0)
+	, PrimitiveId(0)
 {
-	if (inDesiredBuffSize == 0)
-	{
-		inDesiredBuffSize = sizeof(ShaderTypes::GeneralLight);
-	}
-
-	Engine* engine = ClassDependencyHelper::GetEngine(inLightComponent);
-	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();
-	DirectXDynamicBufferAllocator* allocator = deviceBundle->GetOrCreateDynamicBufferAllocator(sizeof(ShaderTypes::GeneralLight));
-	lightShaderBuf = NewObject<DirectXDynamicBuffer>(allocator);
-	InstanceCBV = lightShaderBuf->GetGPUVirtualAddress();
-
 	if (Mobility == EComponentMobility::Static)
 	{
-		auto* ptr = (ShaderTypes::GeneralLight*)lightShaderBuf->GetBufferPointer();
-		ptr->Color = Component->LightColor.Cast<Vector3>();
-		ptr->Ambient = Component->Ambient;
-		ptr->Diffuse = Component->Diffuse;
-		ptr->Specular = Component->Specular;
+		PrimitiveLight.Color = Component->LightColor.Cast<Vector3>();
+		PrimitiveLight.Ambient = Component->Ambient;
+		PrimitiveLight.Diffuse = Component->Diffuse;
+		PrimitiveLight.Specular = Component->Specular;
 	}
 }
 
@@ -50,11 +37,10 @@ void LightSceneProxy::Update()
 		return;
 	}
 
-	auto* ptr = (ShaderTypes::GeneralLight*)lightShaderBuf->GetBufferPointer();
-	ptr->Color = Component->LightColor.Cast<Vector3>();
-	ptr->Ambient = Component->Ambient;
-	ptr->Diffuse = Component->Diffuse;
-	ptr->Specular = Component->Specular;
+	PrimitiveLight.Color = Component->LightColor.Cast<Vector3>();
+	PrimitiveLight.Ambient = Component->Ambient;
+	PrimitiveLight.Diffuse = Component->Diffuse;
+	PrimitiveLight.Specular = Component->Specular;
 }
 
 void LightSceneProxy::UpdateTransform()
@@ -66,9 +52,4 @@ void LightSceneProxy::UpdateTransform()
 	}
 
 	PrimitiveTransform = Component->ComponentTransform;
-}
-
-void* LightSceneProxy::GetLightShaderBuffer() const
-{
-	return lightShaderBuf->GetBufferPointer();
 }

@@ -471,6 +471,9 @@
     <ClInclude Include="Public\DirectX\DirectXInstancedBufferAllocator.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\HomogeneousLight.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -834,6 +837,9 @@
     </None>
     <None Include="Private\COM\COMImageCommon.inl">
       <Filter>Private\COM</Filter>
+    </None>
+    <None Include="Public\DirectX\DirectXInstancedBufferAllocator.inl">
+      <Filter>Public\DirectX</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

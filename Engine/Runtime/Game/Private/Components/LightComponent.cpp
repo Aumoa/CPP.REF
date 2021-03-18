@@ -6,13 +6,13 @@
 
 GLightComponent::GLightComponent() : Super()
 	, lightColor(Color::White)
-	, lightAmbient(1.0f)
-	, lightDiffuse(1.0f)
-	, lightSpecular(1.0f)
+	, lightAmbient(0.2f)
+	, lightDiffuse(0.5f)
+	, lightSpecular(0.4f)
 	, bShadowCast(false)
 	, bHasDirtyMark(true)
 {
-
+	SetMarkDirty(EComponentDirtyMask::RecreateProxy);
 }
 
 GLightComponent::~GLightComponent()

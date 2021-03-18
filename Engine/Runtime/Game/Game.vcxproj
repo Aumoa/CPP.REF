@@ -343,6 +343,7 @@
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
     <ClInclude Include="Public\Rotator.h" />
     <ClInclude Include="Public\SceneRendering\DeferredRenderTarget.h" />
+    <ClInclude Include="Public\SceneRendering\HomogeneousLight.h" />
     <ClInclude Include="Public\SceneRendering\RaytracingSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneProxy.h" />
     <ClInclude Include="Public\SceneRendering\Mesh.h" />
@@ -485,6 +486,7 @@
     <None Include="Public\Components\SceneComponent.inl" />
     <None Include="Public\COM\TComPtr.inl" />
     <None Include="Public\DirectX\DirectXCommandQueue.inl" />
+    <None Include="Public\DirectX\DirectXInstancedBufferAllocator.inl" />
     <None Include="Public\Framework\Controller.inl" />
     <None Include="Public\Framework\Pawn.inl" />
     <None Include="Public\Input\TBitfieldInputChangeTracker.inl" />

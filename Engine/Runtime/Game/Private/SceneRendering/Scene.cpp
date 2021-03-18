@@ -10,6 +10,8 @@
 #include "DirectX/DirectXAccelerationInstancingScene.h"
 #include "DirectX/DirectXShaderBindingTable.h"
 #include "DirectX/DirectXDescriptorAllocator.h"
+#include "DirectX/DirectXInstancedBufferAllocator.h"
+#include "DirectX/DirectXShaderResourceView.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/PlayerCameraManager.h"
 #include "Components/LightComponent.h"
@@ -29,9 +31,11 @@ Scene::Scene(APlayerController* inPlayerController) : Super()
 {
 	localPlayerVisibility = NewObject<SceneVisibility>(this);
 	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();
+	DirectXNew(sceneSRV, DirectXShaderResourceView, deviceBundle, 2);
 	DirectXNew(instancingScene, DirectXAccelerationInstancingScene, deviceBundle);
 	DirectXNew(sbt, DirectXShaderBindingTable, deviceBundle);
 	DirectXNew(allocator, DirectXDescriptorAllocator, deviceBundle);
+	DirectXNew(lightInstanced, DirectXInstancedBufferAllocator, deviceBundle, sizeof(HomogeneousLight));
 }
 
 Scene::~Scene()
@@ -41,6 +45,8 @@ Scene::~Scene()
 
 void Scene::Update()
 {
+	const uint64 prevBuffer = instancingScene->GetRaytracingAccelerationStructureBuffer();
+
 	for (size_t i = 0; i < primitiveComponents.size(); ++i)
 	{
 		GPrimitiveComponent*& primitive = primitiveComponents[i];
@@ -57,19 +63,48 @@ void Scene::Update()
 		}
 	}
 	instancingScene->FinishEditInstance();
+	instancingScene->UpdateScene();
 
+	const bool bInstancingBufferUpdated = prevBuffer != instancingScene->GetRaytracingAccelerationStructureBuffer();
+	const bool bLightCountUpdated = lightInstanced->Count != lightComponents.size();
+
+	lightInstanced->Count = lightComponents.size();
+	static HomogeneousLight nullLight = { };
 	for (size_t i = 0; i < lightComponents.size(); ++i)
 	{
 		GLightComponent*& primitive = lightComponents[i];
 
+		bool bUpdated = false;
 		if (primitive->HasAnyDirtyMark())
 		{
 			primitive->ResolveDirtyState();
+			bUpdated = true;
+		}
+
+		if (bUpdated || bLightCountUpdated)
+		{
 			lightProxies[i] = primitive->GetSceneProxy();
+			if (lightProxies[i] != nullptr)
+			{
+				lightProxies[i]->PrimitiveId = i;
+				lightInstanced->Emplace<HomogeneousLight>(i, lightProxies[i]->PrimitiveLight);
+			}
+			else
+			{
+				lightInstanced->Emplace<HomogeneousLight>(i, nullLight);
+			}
 		}
 	}
 
-	instancingScene->UpdateScene();
+	if (bInstancingBufferUpdated)
+	{
+		UpdateInstancingBufferSRV();
+	}
+
+	if (bLightCountUpdated)
+	{
+		UpdateLightInstancedSRV();
+	}
 }
 
 void Scene::InitViews()
@@ -107,7 +142,7 @@ void Scene::EndRender(DirectXDeviceContext* deviceContext)
 
 void Scene::AddPrimitive(GPrimitiveComponent* inPrimitiveComponent)
 {
-	size_t index = primitiveComponents.size();
+	const size_t index = primitiveComponents.size();
 	PrimitiveSceneProxy* sceneProxy = inPrimitiveComponent->GetSceneProxy();
 
 	primitiveComponents.emplace_back(inPrimitiveComponent);
@@ -117,13 +152,27 @@ void Scene::AddPrimitive(GPrimitiveComponent* inPrimitiveComponent)
 	{
 		sceneProxy->PrimitiveId = index;
 		instancingScene->AddInstance(index, sceneProxy);
+
+		UpdateInstancingBufferSRV();
 	}
 }
 
 void Scene::AddLight(GLightComponent* inLightComponent)
 {
+	const size_t index = lightComponents.size();
+	LightSceneProxy* sceneProxy = inLightComponent->GetSceneProxy();
+
 	lightComponents.emplace_back(inLightComponent);
-	lightProxies.emplace_back(inLightComponent->GetSceneProxy());
+	lightProxies.emplace_back(sceneProxy);
+
+	if (sceneProxy != nullptr)
+	{
+		sceneProxy->PrimitiveId = index;
+		lightInstanced->Count = max(lightInstanced->Count, index + 1);
+		lightInstanced->Emplace<HomogeneousLight>(index, sceneProxy->PrimitiveLight);
+
+		UpdateLightInstancedSRV();
+	}
 }
 
 SceneVisibility* Scene::GetLocalPlayerVisibility() const
@@ -146,17 +195,23 @@ Engine* Scene::GetEngine() const
 	return engine;
 }
 
-DirectXAccelerationInstancingScene* Scene::GetAccelScene() const
+void Scene::UpdateInstancingBufferSRV()
 {
-	return instancingScene.Get();
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = { };
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_RAYTRACING_ACCELERATION_STRUCTURE;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.RaytracingAccelerationStructure.Location = instancingScene->GetRaytracingAccelerationStructureBuffer();
+
+	sceneSRV->CreateShaderResourceView(0, nullptr, &srvDesc);
 }
 
-DirectXShaderBindingTable* Scene::GetShaderBindingTable() const
+void Scene::UpdateLightInstancedSRV()
 {
-	return sbt.Get();
-}
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = { };
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Buffer.NumElements = (uint32)lightInstanced->Count;
+	srvDesc.Buffer.StructureByteStride = sizeof(HomogeneousLight);
 
-DirectXDescriptorAllocator* Scene::GetDescriptorAllocator() const
-{
-	return allocator.Get();
+	sceneSRV->CreateShaderResourceView(1, lightInstanced->Resource, &srvDesc);
 }

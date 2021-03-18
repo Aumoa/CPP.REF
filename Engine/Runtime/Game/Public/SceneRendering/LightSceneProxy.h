@@ -7,6 +7,7 @@
 
 #include "Transform.h"
 #include "ComponentMobility.h"
+#include "HomogeneousLight.h"
 
 class GLightComponent;
 class DirectXDynamicBuffer;
@@ -19,10 +20,9 @@ public:
 
 private:
 	GLightComponent* myComponent;
-	TRefPtr<DirectXDynamicBuffer> lightShaderBuf;
 
 public:
-	LightSceneProxy(GLightComponent* inLightComponent, size_t inDesiredBuffSize = 0);
+	LightSceneProxy(GLightComponent* inLightComponent);
 	~LightSceneProxy() override;
 
 	virtual void Update();
@@ -31,8 +31,6 @@ public:
 	GLightComponent* const Component;
 	const EComponentMobility Mobility;
 	Transform PrimitiveTransform;
-	uint64 InstanceCBV;
-
-protected:
-	void* GetLightShaderBuffer() const;
+	uint64 PrimitiveId;
+	HomogeneousLight PrimitiveLight;
 };

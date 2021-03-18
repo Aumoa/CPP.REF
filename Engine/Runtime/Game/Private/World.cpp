@@ -166,26 +166,14 @@ void World::AddTickGroup(AActor* actor_ptr)
 void World::AddSceneProxy(AActor* actor_ptr)
 {
 	list<GPrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<GPrimitiveComponent>();
-	
 	for (auto& item : primitiveComponents)
 	{
-		if (item->HasAnyDirtyMark())
-		{
-			item->ResolveDirtyState();
-		}
-
 		scene->AddPrimitive(item);
 	}
 
 	list<GLightComponent*> lightComponents = actor_ptr->GetComponents<GLightComponent>();
-
 	for (auto& item : lightComponents)
 	{
-		if (item->HasAnyDirtyMark())
-		{
-			item->ResolveDirtyState();
-		}
-
 		scene->AddLight(item);
 	}
 }

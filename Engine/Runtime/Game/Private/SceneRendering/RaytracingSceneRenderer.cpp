@@ -42,8 +42,8 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 	DirectXRaytracingShader* cached = shaderLibrary->GetOrReadyShader();
 	cached->Render(inCommandList);
 
-	DirectXDescriptorAllocator* allocator = scene->GetDescriptorAllocator();
-	DirectXShaderBindingTable* sbt = scene->GetShaderBindingTable();
+	DirectXDescriptorAllocator* allocator = scene->DescriptorAllocator;
+	DirectXShaderBindingTable* sbt = scene->ShaderBindingTable;
 
 	// Fill instanced hit group records.
 	std::vector<DirectXInstanceShaderRecord> hitGroupRecords;
@@ -72,7 +72,7 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 	allocator->SetDescriptorHeaps(inCommandList);
 	inCommandList->SetComputeRootConstantBufferView(0, localVisibility->GetCameraConstantBuffer());
 	inCommandList->SetComputeRootDescriptorTable(1, allocator->GetGPUHandle(allocator->Issue(globalInputs.ColorOutput)));
-	inCommandList->SetComputeRootShaderResourceView(2, scene->GetAccelScene()->GetRaytracingAccelerationStructureBuffer());
+	inCommandList->SetComputeRootDescriptorTable(2, allocator->GetGPUHandle(allocator->Issue(scene->SceneSRV)));
 	inCommandList->DispatchRays(&dispatchRays);
 }
 

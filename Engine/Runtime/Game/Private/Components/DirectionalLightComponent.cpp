@@ -28,9 +28,8 @@ public:
 private:
 	void Internal_UpdateTransform()
 	{
-		auto* ptr = (ShaderTypes::GeneralLight*)GetLightShaderBuffer();
-		ptr->Type = LightType_Directional;
-		ptr->DirectionalLight_Direction = PrimitiveTransform.Rotation.RotateVector(Vector3::Forward).Cast<Vector4>();
+		PrimitiveLight.LightIndex = HomogeneousLight::INDEX_DIRECTIONAL;
+		PrimitiveLight.DirectionalLightAtt.Direction = PrimitiveTransform.Rotation.RotateVector(Vector3::Forward);
 	}
 };
 

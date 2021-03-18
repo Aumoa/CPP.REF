@@ -65,7 +65,7 @@ struct Material
 	float SpecExp;
 };
 
-#define LightType_Directional 0
+#define LightType_Directional 1
 #define DirectionalLight_Direction Ambiguous_01
 
 struct GeneralLight
@@ -75,6 +75,7 @@ struct GeneralLight
 	float Diffuse;
 	float Specular;
 	float3 Color;
+	float pad0;
 	float4 Ambiguous_01;
 };
 
