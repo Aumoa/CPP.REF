@@ -13,10 +13,7 @@ public:
 public:
 	DirectionalLightSceneProxy(GDirectionalLightComponent* inComponent) : Super(inComponent)
 	{
-		if (Mobility == EComponentMobility::Static)
-		{
-			Internal_UpdateTransform();
-		}
+		Internal_UpdateTransform();
 	}
 
 	void UpdateTransform() override

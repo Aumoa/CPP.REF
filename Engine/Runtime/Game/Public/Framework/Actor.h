@@ -10,6 +10,7 @@
 #include "Components/SceneComponent.h"
 
 class World;
+enum class EComponentMobility;
 
 class GAME_API AActor : public GGameObject, virtual public ITickFunctionObject
 {
@@ -72,6 +73,9 @@ public:
 	void SetActorScale(const Vector3& value);
 	Quaternion GetActorRotation() const;
 	void SetActorRotation(const Quaternion& value);
+
+	EComponentMobility GetMobility() const;
+	void SetMobility(EComponentMobility inRootMobility);
 
 	vs_property(GSceneComponent*, RootComponent);
 	vs_property_get(ActorTickFunction&, PrimaryActorTick);

@@ -24,13 +24,6 @@ namespace ShaderTypes
 
 #endif
 
-struct Payload
-{
-	float4 Color;
-	float3 Pos;
-	float3 Normal;
-};
-
 struct RayFragment
 {
 	float3 PosW;
@@ -66,7 +59,20 @@ struct Material
 };
 
 #define LightType_Directional 1
-#define DirectionalLight_Direction Ambiguous_01
+#define LightType_Point 2
+#define LightType_Spot 3
+#define DirectionalLight_Direction Ambiguous_01.xyz
+#define PointLight_Position Ambiguous_01.xyz
+#define PointLight_Constant Ambiguous_02.x
+#define PointLight_Linear Ambiguous_02.y
+#define PointLight_Quad Ambiguous_02.z
+#define SpotLight_Direction Ambiguous_01.xyz
+#define SpotLight_CutOff Ambiguous_01.w
+#define SpotLight_Position Ambiguous_02.xyz
+#define SpotLight_OuterCutOff Ambiguous_02.w
+#define SpotLight_Constant Ambiguous_03.x
+#define SpotLight_Linear Ambiguous_03.y
+#define SpotLight_Quad Ambiguous_03.z
 
 struct GeneralLight
 {
@@ -77,6 +83,20 @@ struct GeneralLight
 	float3 Color;
 	float pad0;
 	float4 Ambiguous_01;
+	float4 Ambiguous_02;
+	float4 Ambiguous_03;
+};
+
+#define Payload_MaxRecursive 3
+#define PayloadType_OpaqueHit 0
+#define PayloadType_ShadowCast 1
+
+struct Payload
+{
+	uint Attributes;
+	float3 Pos;
+	float4 Color;
+	float3 Normal;
 };
 
 #if defined(__cplusplus)
@@ -84,6 +104,26 @@ struct GeneralLight
 }
 
 #undef row_major
+
+#undef LightType_Directional
+#undef LightType_Point
+#undef LightType_Spot
+#undef DirectionalLight_Direction
+#undef PointLight_Position
+#undef PointLight_Constant
+#undef PointLight_Linear
+#undef PointLight_Quad
+#undef SpotLight_Direction
+#undef SpotLight_CutOff
+#undef SpotLight_Position
+#undef SpotLight_OuterCutOff
+#undef SpotLight_Constant
+#undef SpotLight_Linear
+#undef SpotLight_Quad
+
+#undef PayloadType_OpaqueHit
+#undef PayloadType_ShadowCast
+
 #pragma pack(pop)
 
 #endif

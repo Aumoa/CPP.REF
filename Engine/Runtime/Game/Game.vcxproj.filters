@@ -474,6 +474,18 @@
     <ClInclude Include="Public\SceneRendering\HomogeneousLight.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Components\PointLightComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\PointLight.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\SpotLightComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Framework\SpotLight.h">
+      <Filter>Public\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -761,6 +773,18 @@
     <ClCompile Include="Private\DirectX\DirectXInstancedBufferAllocator.cpp">
       <Filter>Private\DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Components\PointLightComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\PointLight.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Components\SpotLightComponent.cpp">
+      <Filter>Private\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Framework\SpotLight.cpp">
+      <Filter>Private\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Logging\Logger.inl">
@@ -812,9 +836,6 @@
       <Filter>Public\Framework</Filter>
     </None>
     <None Include="Private\Shaders\ShaderCommon.hlsli">
-      <Filter>Private\Shaders</Filter>
-    </None>
-    <None Include="Private\Shaders\GenericLighting.hlsli">
       <Filter>Private\Shaders</Filter>
     </None>
     <None Include="Public\Components\SceneComponent.inl">

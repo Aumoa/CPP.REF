@@ -35,6 +35,7 @@ private:
 	ComponentTickFunction primaryComponentTick;
 	bool bComponentTickEnabled : 1;
 	bool bComponentHasBegunPlay : 1;
+	bool bComponentRegistered : 1;
 	AActor* owner;
 
 public:
@@ -49,6 +50,9 @@ public:
 	virtual void EndPlay();
 	virtual void TickComponent(Seconds deltaTime);
 
+	void RegisterComponent();
+	void RegisterComponentWithWorld(World* inWorld);
+
 	AActor* GetOwner() const;
 	template<TIsBaseOf<AActor> T>
 	T* GetOwner() const;
@@ -56,6 +60,7 @@ public:
 	vs_property_get(ComponentTickFunction&, PrimaryComponentTick);
 	vs_property(bool, ComponentTickEnabled);
 	vs_property_get(bool, HasBegunPlay);
+	vs_property_get(bool, IsRegistered);
 };
 
 #include "ActorComponent.inl"

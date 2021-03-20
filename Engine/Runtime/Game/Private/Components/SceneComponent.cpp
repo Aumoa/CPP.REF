@@ -220,8 +220,11 @@ Transform GSceneComponent::RelativeTransform_get() const
 
 void GSceneComponent::RelativeTransform_set(Transform value)
 {
-	transform = value;
-	UpdateWorldTransform();
+	if (transform != value)
+	{
+		transform = value;
+		UpdateWorldTransform();
+	}
 }
 
 Transform GSceneComponent::ComponentTransform_get() const
@@ -236,8 +239,11 @@ Vector3 GSceneComponent::Location_get() const
 
 void GSceneComponent::Location_set(Vector3 value)
 {
-	transform.Translation = value;
-	UpdateWorldTransform();
+	if (transform.Translation != value)
+	{
+		transform.Translation = value;
+		UpdateWorldTransform();
+	}
 }
 
 Vector3 GSceneComponent::Scale_get() const
@@ -247,8 +253,11 @@ Vector3 GSceneComponent::Scale_get() const
 
 void GSceneComponent::Scale_set(Vector3 value)
 {
-	transform.Scale = value;
-	UpdateWorldTransform();
+	if (transform.Scale != value)
+	{
+		transform.Scale = value;
+		UpdateWorldTransform();
+	}
 }
 
 Quaternion GSceneComponent::Rotation_get() const
@@ -258,8 +267,11 @@ Quaternion GSceneComponent::Rotation_get() const
 
 void GSceneComponent::Rotation_set(Quaternion value)
 {
-	transform.Rotation = value;
-	UpdateWorldTransform();
+	if (transform.Rotation != value)
+	{
+		transform.Rotation = value;
+		UpdateWorldTransform();
+	}
 }
 
 void GSceneComponent::UpdateWorldTransform()

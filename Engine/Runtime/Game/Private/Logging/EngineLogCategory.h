@@ -10,6 +10,7 @@
 extern LogCategoryBase LogCamera;
 extern LogCategoryBase LogEngine;
 extern LogCategoryBase LogActor;
+extern LogCategoryBase LogActorComponent;
 extern LogCategoryBase LogDiagnostics;
 extern LogCategoryBase LogRendering;
 extern LogCategoryBase LogPlatform;

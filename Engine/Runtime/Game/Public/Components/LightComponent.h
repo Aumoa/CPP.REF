@@ -45,6 +45,6 @@ public:
 	vs_property(float, Specular);
 	vs_property(bool, IsShadowCast);
 
-private:
+protected:
 	void SetMarkDirtyLightUpdated();
 };

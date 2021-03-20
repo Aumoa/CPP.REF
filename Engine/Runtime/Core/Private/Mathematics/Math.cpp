@@ -7,45 +7,45 @@
 
 using namespace std;
 
-TRadians<float> Math::Sin(float value)
+float Math::Sin(TRadians<float> value)
 {
-	const TRadians<float> rad_r = sin(value);
+	float rad_r = sin(value.Value);
 	return rad_r;
 }
 
-TRadians<float> Math::Cos(float value)
+float Math::Cos(TRadians<float> value)
 {
-	const TRadians<float> rad_r = cos(value);
+	float rad_r = cos(value.Value);
 	return rad_r;
 }
 
-TRadians<float> Math::Tan(float value)
+float Math::Tan(TRadians<float> value)
 {
-	const TRadians<float> rad_r = tan(value);
+	float rad_r = tan(value.Value);
 	return rad_r;
 }
 
-TRadians<float> Math::Asin(float value)
+float Math::Asin(float value)
 {
-	const TRadians<float> rad_r = asin(value);
+	float rad_r = asin(value);
 	return rad_r;
 }
 
-TRadians<float> Math::Acos(float value)
+float Math::Acos(float value)
 {
-	const TRadians<float> rad_r = acos(value);
+	float rad_r = acos(value);
 	return rad_r;
 }
 
-TRadians<float> Math::Atan(float value)
+float Math::Atan(float value)
 {
-	const TRadians<float> rad_r = atan(value);
+	float rad_r = atan(value);
 	return rad_r;
 }
 
-TRadians<float> Math::Atan2(float y, float x)
+float Math::Atan2(float y, float x)
 {
-	const TRadians<float> rad_r = atan2(y, x);
+	float rad_r = atan2(y, x);
 	return rad_r;
 }
 

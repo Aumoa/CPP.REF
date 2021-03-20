@@ -176,6 +176,18 @@ void AActor::SetActorRotation(const Quaternion& value)
 	rootComponent->MoveComponent(Vector3::Zero, value);
 }
 
+EComponentMobility AActor::GetMobility() const
+{
+	NO_ROOT_WARNINGS(EComponentMobility::Static);
+	return rootComponent->Mobility;
+}
+
+void AActor::SetMobility(EComponentMobility inRootMobility)
+{
+	NO_ROOT_WARNINGS();
+	rootComponent->Mobility = inRootMobility;
+}
+
 #undef NO_ROOT_WARNINGS
 
 GSceneComponent* AActor::RootComponent_get() const
