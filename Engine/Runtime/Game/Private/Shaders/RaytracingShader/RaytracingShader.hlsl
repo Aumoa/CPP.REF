@@ -169,15 +169,15 @@ inline float3 ComputePointLight(Material material, GeneralLight light, float3 no
 	l = l / len;
 	float3 direction = -l;
 
-	// Calc basic ambient factor.
-	ambient = light.Ambient * material.Ambient;
-
 	// Calc diffuse and specular factor.
 	const float angleFactor = dot(l, normal);
 	const float att = 1.0f /
 		 (light.PointLight_Constant
 		+ light.PointLight_Linear * len
 		+ light.PointLight_Quad * len * len);
+
+	// Calc basic ambient factor.
+	ambient = light.Ambient * material.Ambient * att;
 
 	const float diffuseFactor = att;
 	[flatten]
@@ -198,6 +198,62 @@ inline float3 ComputePointLight(Material material, GeneralLight light, float3 no
 		{
 			float3 v = reflect(direction, normal);
 			float specFactor = pow(max(dot(v, rayDir), 0.0f), max(material.SpecExp, 1.0f)) * att;
+
+			diffuse = diffuseFactor * light.Diffuse * material.Diffuse;
+			specular = specFactor * light.Specular * material.Specular;
+		}
+	}
+
+	// Make light color.
+	return light.Color * (ambient + diffuse) + specular;
+}
+
+inline float3 ComputeSpotLight(Material material, GeneralLight light, float3 normal, float3 rayDir, float3 posW)
+{
+	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
+
+	const float3 lightPos = light.SpotLight_Position;
+	const float3 lightDir = light.SpotLight_Direction;
+
+	float3 l = lightPos - posW;
+	float len = length(l);
+	l = l / len;
+	float3 direction = -l;
+
+	// Calc diffuse and specular factor.
+	const float angleFactor = dot(l, normal);
+	const float att = 1.0f /
+		 (light.SpotLight_Constant
+		+ light.SpotLight_Linear * len
+		+ light.SpotLight_Quad * len * len);
+
+	// Calc basic ambient factor.
+	ambient = light.Ambient * material.Ambient * att;
+
+	// Calc light angle factor.
+	float theta = dot(lightDir, -l);
+	float epsilon = light.SpotLight_CutOff - light.SpotLight_OuterCutOff;
+	float intensity = saturate((theta - light.SpotLight_OuterCutOff) / epsilon);
+
+	const float diffuseFactor = angleFactor * intensity * att;
+	[flatten]
+	if (diffuseFactor > 0.0f)
+	{
+		// Check shadow caster.
+		RayDesc toLight = (RayDesc)0;
+		toLight.Origin = posW;
+		toLight.Direction = l;
+		toLight.TMin = 0.01f;
+		toLight.TMax = len;
+
+		Payload shadowPayload = (Payload)0;
+		Payload_Type(shadowPayload, PayloadType_ShadowCast);
+		TraceRaySimply(shadowPayload, toLight);
+
+		if (!Payload_bShadowHit(shadowPayload))
+		{
+			float3 v = reflect(direction, normal);
+			float specFactor = pow(max(dot(v, rayDir), 0.0f), max(material.SpecExp, 1.0f)) * att * intensity;
 
 			diffuse = diffuseFactor * light.Diffuse * material.Diffuse;
 			specular = specFactor * light.Specular * material.Specular;
@@ -253,8 +309,11 @@ inline void ClosestHit_OpaqueHit(inout Payload payload, RayFragment frag)
 		case LightType_Directional:
 			lights += ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
 			break;
-		default:
+		case LightType_Point:
 			lights += ComputePointLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+			break;
+		case LightType_Spot:
+			lights += ComputeSpotLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
 			break;
 		}
 	}

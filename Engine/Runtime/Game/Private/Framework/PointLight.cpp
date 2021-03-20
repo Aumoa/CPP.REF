@@ -5,7 +5,7 @@
 #include "Components/PointLightComponent.h"
 
 APointLight::APointLight() : Super()
-, lightComponent(nullptr)
+	, lightComponent(nullptr)
 {
 	lightComponent = AddComponent<GPointLightComponent>();
 	RootComponent = lightComponent;

@@ -13,7 +13,8 @@ struct HomogeneousLight
 	{
 		INDEX_NONE,
 		INDEX_DIRECTIONAL,
-		INDEX_POINT
+		INDEX_POINT,
+		INDEX_SPOT
 	};
 
 	Lights LightIndex;
@@ -29,6 +30,7 @@ struct HomogeneousLight
 		{
 			Vector4 Pad0;
 			Vector4 Pad1;
+			Vector4 Pad2;
 		} Pads;
 		
 		struct
@@ -47,6 +49,18 @@ struct HomogeneousLight
 			float Quad;
 		}
 		PointLightAtt;
+
+		struct
+		{
+			Vector3 Direction;
+			Radians CutOff;
+			Vector3 Position;
+			Radians OuterCutOff;
+			float Constant;
+			float Linear;
+			float Quad;
+		}
+		SpotLightAtt;
 	};
 
 	HomogeneousLight()

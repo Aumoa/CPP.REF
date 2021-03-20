@@ -14,6 +14,7 @@ class AStaticMeshActor;
 class ADirectionalLight;
 class APointLight;
 class ARotateLight;
+class ASpotLight;
 
 class TH_API GStartupLevel : public GLevel
 {
@@ -24,6 +25,7 @@ public:
 private:
 	ADirectionalLight* light;
 	APointLight* rotateLight;
+	ASpotLight* spotLight;
 
 	AStaticMeshActor* plane;
 	AStaticMeshActor* geosphere;

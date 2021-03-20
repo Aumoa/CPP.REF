@@ -39,13 +39,13 @@ public:
 	using This = Math;
 
 public:
-	CORE_API static TRadians<float> Sin(float value);
-	CORE_API static TRadians<float> Cos(float value);
-	CORE_API static TRadians<float> Tan(float value);
-	CORE_API static TRadians<float> Asin(float value);
-	CORE_API static TRadians<float> Acos(float value);
-	CORE_API static TRadians<float> Atan(float value);
-	CORE_API static TRadians<float> Atan2(float y, float x);
+	CORE_API static float Sin(TRadians<float> value);
+	CORE_API static float Cos(TRadians<float> value);
+	CORE_API static float Tan(TRadians<float> value);
+	CORE_API static float Asin(float value);
+	CORE_API static float Acos(float value);
+	CORE_API static float Atan(float value);
+	CORE_API static float Atan2(float y, float x);
 	CORE_API static std::pair<float, float> SinCos(TRadians<float> value);
 	CORE_API static float InvSqrt(float x);
 	CORE_API static float Sqrt(float x);

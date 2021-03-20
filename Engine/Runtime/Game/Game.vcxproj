@@ -280,6 +280,7 @@
     <ClInclude Include="Public\Components\PointLightComponent.h" />
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
     <ClInclude Include="Public\Components\SceneComponent.h" />
+    <ClInclude Include="Public\Components\SpotLightComponent.h" />
     <ClInclude Include="Public\Components\SpringArmComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
     <ClInclude Include="Public\COM\COMBitmapFrame.h" />
@@ -324,6 +325,7 @@
     <ClInclude Include="Public\Framework\PlayerController.h" />
     <ClInclude Include="Public\Framework\PointLight.h" />
     <ClInclude Include="Public\Framework\SpectatorPawn.h" />
+    <ClInclude Include="Public\Framework\SpotLight.h" />
     <ClInclude Include="Public\Framework\StaticMeshActor.h" />
     <ClInclude Include="Public\GameAPI.h" />
     <ClInclude Include="Public\GameInstance.h" />
@@ -392,6 +394,7 @@
     <ClCompile Include="Private\Components\PointLightComponent.cpp" />
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
+    <ClCompile Include="Private\Components\SpotLightComponent.cpp" />
     <ClCompile Include="Private\Components\SpringArmComponent.cpp" />
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
     <ClCompile Include="Private\COM\COMBitmapFrame.cpp" />
@@ -435,6 +438,7 @@
     <ClCompile Include="Private\Framework\PlayerController.cpp" />
     <ClCompile Include="Private\Framework\PointLight.cpp" />
     <ClCompile Include="Private\Framework\SpectatorPawn.cpp" />
+    <ClCompile Include="Private\Framework\SpotLight.cpp" />
     <ClCompile Include="Private\Framework\StaticMeshActor.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\GameObject.cpp" />
