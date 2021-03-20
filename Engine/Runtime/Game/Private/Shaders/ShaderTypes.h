@@ -24,13 +24,6 @@ namespace ShaderTypes
 
 #endif
 
-struct Payload
-{
-	float4 Color;
-	float3 Pos;
-	float3 Normal;
-};
-
 struct RayFragment
 {
 	float3 PosW;
@@ -66,7 +59,7 @@ struct Material
 };
 
 #define LightType_Directional 1
-#define DirectionalLight_Direction Ambiguous_01
+#define DirectionalLight_Direction Ambiguous_01.xyz
 
 struct GeneralLight
 {
@@ -79,11 +72,30 @@ struct GeneralLight
 	float4 Ambiguous_01;
 };
 
+#define Payload_MaxRecursive 3
+#define PayloadType_OpaqueHit 0
+#define PayloadType_ShadowCast 1
+
+struct Payload
+{
+	uint Attributes;
+	float3 Pos;
+	float4 Color;
+	float3 Normal;
+};
+
 #if defined(__cplusplus)
 
 }
 
 #undef row_major
+
+#undef LightType_Directional
+#undef DirectionalLight_Direction
+
+#undef PayloadType_OpaqueHit
+#undef PayloadType_ShadowCast
+
 #pragma pack(pop)
 
 #endif

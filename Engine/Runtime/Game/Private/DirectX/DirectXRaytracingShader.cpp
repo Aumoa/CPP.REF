@@ -247,7 +247,7 @@ void DirectXRaytracingShader::InitPS()
 	D3D12_RAYTRACING_PIPELINE_CONFIG pipelineConfig =
 	{
 		/* MaxTraceRecursionDepth */
-		1,
+		Payload_MaxRecursive,
 	};
 
 	std::vector<D3D12_STATE_SUBOBJECT> state_hitGroups;

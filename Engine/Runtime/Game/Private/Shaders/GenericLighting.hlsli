@@ -11,7 +11,7 @@ float3 ComputeDirectionalLight(Material material, GeneralLight light, float3 nor
 {
 	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
 
-	float3 direction = normalize(light.Ambiguous_01.xyz);
+	float3 direction = normalize(light.DirectionalLight_Direction);
 	float3 l = -direction;
 	ambient = light.Ambient * material.Ambient;
 
