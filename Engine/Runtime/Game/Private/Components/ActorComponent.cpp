@@ -2,6 +2,7 @@
 
 #include "Components/ActorComponent.h"
 
+#include "World.h"
 #include "Logging/LogMacros.h"
 #include "Framework/Actor.h"
 
@@ -35,6 +36,7 @@ void GActorComponent::ComponentTickFunction::ExecuteTick(Seconds deltaTime)
 GActorComponent::GActorComponent() : Super()
 	, bComponentTickEnabled(true)
 	, bComponentHasBegunPlay(false)
+	, bComponentRegistered(false)
 	, owner(nullptr)
 {
 	PrimaryComponentTick.Target = this;
@@ -81,6 +83,29 @@ void GActorComponent::EndPlay()
 void GActorComponent::TickComponent(Seconds deltaTime)
 {
 
+}
+
+void GActorComponent::RegisterComponent()
+{
+	RegisterComponentWithWorld(GetWorld());
+}
+
+void GActorComponent::RegisterComponentWithWorld(World* inWorld)
+{
+	if (inWorld == nullptr)
+	{
+		SE_LOG(LogActorComponent, Error, L"Cannot register component without world.");
+		return;
+	}
+
+	if (bComponentRegistered)
+	{
+		SE_LOG(LogActorComponent, Verbose, L"Component is already registered. Abort.");
+		return;
+	}
+
+	inWorld->RegisterComponent(this);
+	bComponentRegistered = true;
 }
 
 AActor* GActorComponent::GetOwner() const

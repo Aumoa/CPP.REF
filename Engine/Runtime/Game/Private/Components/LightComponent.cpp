@@ -22,21 +22,25 @@ GLightComponent::~GLightComponent()
 
 void GLightComponent::ResolveDirtyState()
 {
+	bool bRecreated = false;
 	if (HasDirtyMark(EComponentDirtyMask::RecreateProxy))
 	{
 		sceneProxy = CreateSceneProxy();
+		bRecreated = true;
 	}
 
-	bool bHasSceneProxy = sceneProxy.IsValid;
-
-	if (HasDirtyMark((EComponentDirtyMask)ELightComponentDirtyMask::LightUpdated) && bHasSceneProxy)
+	const bool bHasSceneProxy = sceneProxy.IsValid;
+	if (bHasSceneProxy && !bRecreated)
 	{
-		sceneProxy->Update();
-	}
+		if (HasDirtyMark((EComponentDirtyMask)ELightComponentDirtyMask::LightUpdated) && bHasSceneProxy)
+		{
+			sceneProxy->Update();
+		}
 
-	if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && bHasSceneProxy)
-	{
-		sceneProxy->UpdateTransform();
+		if (HasDirtyMark(EComponentDirtyMask::TransformUpdated) && bHasSceneProxy)
+		{
+			sceneProxy->UpdateTransform();
+		}
 	}
 
 	Super::ResolveDirtyState();

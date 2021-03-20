@@ -12,6 +12,8 @@ class AMyTestActor;
 class AMyCharacter;
 class AStaticMeshActor;
 class ADirectionalLight;
+class APointLight;
+class ARotateLight;
 
 class TH_API GStartupLevel : public GLevel
 {
@@ -21,7 +23,7 @@ public:
 
 private:
 	ADirectionalLight* light;
-	ADirectionalLight* lightBlue;
+	APointLight* rotateLight;
 
 	AStaticMeshActor* plane;
 	AStaticMeshActor* geosphere;

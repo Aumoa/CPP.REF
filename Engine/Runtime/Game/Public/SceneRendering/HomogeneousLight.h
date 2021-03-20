@@ -12,7 +12,8 @@ struct HomogeneousLight
 	enum Lights : uint32
 	{
 		INDEX_NONE,
-		INDEX_DIRECTIONAL
+		INDEX_DIRECTIONAL,
+		INDEX_POINT
 	};
 
 	Lights LightIndex;
@@ -26,10 +27,26 @@ struct HomogeneousLight
 	{
 		struct
 		{
+			Vector4 Pad0;
+			Vector4 Pad1;
+		} Pads;
+		
+		struct
+		{
 			Vector3 Direction;
 			float pad;
 		}
 		DirectionalLightAtt;
+
+		struct
+		{
+			Vector3 Position;
+			float pad;
+			float Constant;
+			float Linear;
+			float Quad;
+		}
+		PointLightAtt;
 	};
 
 	HomogeneousLight()

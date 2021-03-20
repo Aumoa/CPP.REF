@@ -60,6 +60,9 @@
     <ClCompile Include="Private\THGameMode.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Actor\RotateLight.cpp">
+      <Filter>Private\Actor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\THAPI.h">
@@ -82,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="Public\THGameMode.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Actor\RotateLight.h">
+      <Filter>Public\Actor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

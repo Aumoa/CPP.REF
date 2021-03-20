@@ -15,13 +15,10 @@ LightSceneProxy::LightSceneProxy(GLightComponent* inLightComponent) : Super()
 	, PrimitiveTransform(inLightComponent->ComponentTransform)
 	, PrimitiveId(0)
 {
-	if (Mobility == EComponentMobility::Static)
-	{
-		PrimitiveLight.Color = Component->LightColor.Cast<Vector3>();
-		PrimitiveLight.Ambient = Component->Ambient;
-		PrimitiveLight.Diffuse = Component->Diffuse;
-		PrimitiveLight.Specular = Component->Specular;
-	}
+	PrimitiveLight.Color = Component->LightColor.Cast<Vector3>();
+	PrimitiveLight.Ambient = Component->Ambient;
+	PrimitiveLight.Diffuse = Component->Diffuse;
+	PrimitiveLight.Specular = Component->Specular;
 }
 
 LightSceneProxy::~LightSceneProxy()

@@ -45,6 +45,19 @@ void World::Tick(Seconds deltaTime)
 	scene->Update();
 }
 
+void World::RegisterComponent(GActorComponent* inComponent)
+{
+	if (GPrimitiveComponent* isPrimitive = Cast<GPrimitiveComponent>(inComponent); isPrimitive != nullptr)
+	{
+		scene->AddPrimitive(isPrimitive);
+	}
+
+	if (GLightComponent* isLight = Cast<GLightComponent>(inComponent); isLight != nullptr)
+	{
+		scene->AddLight(isLight);
+	}
+}
+
 GLevel* World::LoadLevel(TSubclassOf<GLevel> loadLevel)
 {
 	if (currentLevel.IsValid)
@@ -137,7 +150,7 @@ AActor* World::SpawnActorInternal(TRefPtr<AActor> actor)
 	actor_ptr->SetWorld(this);
 
 	AddTickGroup(actor_ptr);
-	AddSceneProxy(actor_ptr);
+	RegisterActorComponents(actor_ptr);
 
 	return actor_ptr;
 }
@@ -163,18 +176,12 @@ void World::AddTickGroup(AActor* actor_ptr)
 	}
 }
 
-void World::AddSceneProxy(AActor* actor_ptr)
+void World::RegisterActorComponents(AActor* actor_ptr)
 {
-	list<GPrimitiveComponent*> primitiveComponents = actor_ptr->GetComponents<GPrimitiveComponent>();
-	for (auto& item : primitiveComponents)
+	list<GActorComponent*> actorComponents = actor_ptr->GetComponents<GActorComponent>();
+	for (auto& item : actorComponents)
 	{
-		scene->AddPrimitive(item);
-	}
-
-	list<GLightComponent*> lightComponents = actor_ptr->GetComponents<GLightComponent>();
-	for (auto& item : lightComponents)
-	{
-		scene->AddLight(item);
+		RegisterComponent(item);
 	}
 }
 

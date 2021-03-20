@@ -16,6 +16,7 @@ class AActor;
 class APlayerController;
 class Scene;
 struct TickFunction;
+class GActorComponent;
 
 class GAME_API World : virtual public Object
 {
@@ -44,6 +45,7 @@ public:
 	inline T* SpawnActor(TArgs&&... constructor_args);
 	template<TIsBaseOf<AActor> T = AActor>
 	inline T* SpawnActor(TSubclassOf<T> static_class);
+	void RegisterComponent(GActorComponent* inComponent);
 
 	GLevel* LoadLevel(TSubclassOf<GLevel> loadLevel);
 
@@ -57,7 +59,7 @@ private:
 	AActor* SpawnActorInternal(TRefPtr<AActor> actor);
 
 	void AddTickGroup(AActor* actor_ptr);
-	void AddSceneProxy(AActor* actor_ptr);
+	void RegisterActorComponents(AActor* actor_ptr);
 
 	void OnLoadLevel();
 	void OnUnloadLevel();

@@ -1,7 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "../ShaderCommon.hlsli"
-#include "../GenericLighting.hlsli"
 
 ConstantBuffer<ShaderCameraConstant> gCamera : register(b0);
 RaytracingAccelerationStructure gSceneAS : register(t0);
@@ -11,16 +10,12 @@ RWTexture2D<float4> gColorOutput : register(u0);
 
 inline float3 HitAttribute(float3 v1, float3 v2, float3 v3, float2 bary)
 {
-	return v1 +
-		bary.x * (v2 - v1) +
-		bary.y * (v3 - v1);
+	return (v1 + bary.x * (v2 - v1) + bary.y * (v3 - v1)) * 0.3333f;
 }
 
 inline float2 HitAttribute(float2 v1, float2 v2, float2 v3, float2 bary)
 {
-	return v1 +
-		bary.x * (v2 - v1) +
-		bary.y * (v3 - v1);
+	return (v1 + bary.x * (v2 - v1) + bary.y * (v3 - v1)) * 0.3333f;
 }
 
 inline RayDesc GenerateRay(uint2 launchIndex, float3 cameraPos, matrix projectionToWorld, float near = 0.01f, float far = 1000.0f)
@@ -163,6 +158,56 @@ inline float3 ComputeDirectionalLight(Material material, GeneralLight light, flo
 	return light.Color * (ambient + diffuse) + specular;
 }
 
+inline float3 ComputePointLight(Material material, GeneralLight light, float3 normal, float3 rayDir, float3 posW)
+{
+	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
+
+	const float3 lightPos = light.PointLight_Position;
+
+	float3 l = lightPos - posW;
+	float len = length(l);
+	l = l / len;
+	float3 direction = -l;
+
+	// Calc basic ambient factor.
+	ambient = light.Ambient * material.Ambient;
+
+	// Calc diffuse and specular factor.
+	const float angleFactor = dot(l, normal);
+	const float att = 1.0f /
+		 (light.PointLight_Constant
+		+ light.PointLight_Linear * len
+		+ light.PointLight_Quad * len * len);
+
+	const float diffuseFactor = att;
+	[flatten]
+	if (diffuseFactor > 0.0f)
+	{
+		// Check shadow caster.
+		RayDesc toLight = (RayDesc)0;
+		toLight.Origin = posW;
+		toLight.Direction = l;
+		toLight.TMin = 0.01f;
+		toLight.TMax = len;
+
+		Payload shadowPayload = (Payload)0;
+		Payload_Type(shadowPayload, PayloadType_ShadowCast);
+		TraceRaySimply(shadowPayload, toLight);
+
+		if (!Payload_bShadowHit(shadowPayload))
+		{
+			float3 v = reflect(direction, normal);
+			float specFactor = pow(max(dot(v, rayDir), 0.0f), max(material.SpecExp, 1.0f)) * att;
+
+			diffuse = diffuseFactor * light.Diffuse * material.Diffuse;
+			specular = specFactor * light.Specular * material.Specular;
+		}
+	}
+
+	// Make light color.
+	return light.Color * (ambient + diffuse) + specular;
+}
+
 inline RayFragment CalcFragment(uint primitiveId, float2 bary)
 {
 	// Get primitive triangle.
@@ -203,7 +248,15 @@ inline void ClosestHit_OpaqueHit(inout Payload payload, RayFragment frag)
 	for (uint i = 0; i < numLights; ++i)
 	{
 		GeneralLight light = gLights[i];
-		lights += ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+		switch (light.Type)
+		{
+		case LightType_Directional:
+			lights += ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+			break;
+		default:
+			lights += ComputePointLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+			break;
+		}
 	}
 
 	payload.Color = float4(lights, 1.0f);

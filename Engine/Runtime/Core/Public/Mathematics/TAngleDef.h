@@ -174,11 +174,6 @@ inline constexpr TDegrees<T> operator /(const T& lh, const TDegrees<T>& rh)
 	return TDegrees<T>(lh / rh.Value);
 }
 
-inline constexpr TDegrees<long double> operator"" _deg(long double value)
-{
-	return TDegrees<long double>(value);
-}
-
 template<TIsRealType T = float>
 struct TRadians
 {
@@ -342,9 +337,17 @@ inline constexpr TRadians<T> operator /(const T& lh, const TRadians<T>& rh)
 	return TRadians<T>(lh / rh.Value);
 }
 
-inline constexpr TRadians<long double> operator "" _rad(long double value)
+using Radians = TRadians<float>;
+using Degrees = TDegrees<float>;
+
+inline constexpr Degrees operator"" _deg(long double value)
 {
-	return value;
+	return (float)value;
+}
+
+inline constexpr Radians operator "" _rad(long double value)
+{
+	return (float)value;
 }
 
 #include "TAngleDef.inl"

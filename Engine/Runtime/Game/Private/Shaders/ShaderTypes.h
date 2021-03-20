@@ -59,7 +59,12 @@ struct Material
 };
 
 #define LightType_Directional 1
+#define LightType_Point 2
 #define DirectionalLight_Direction Ambiguous_01.xyz
+#define PointLight_Position Ambiguous_01.xyz
+#define PointLight_Constant Ambiguous_02.x
+#define PointLight_Linear Ambiguous_02.y
+#define PointLight_Quad Ambiguous_02.z
 
 struct GeneralLight
 {
@@ -70,6 +75,7 @@ struct GeneralLight
 	float3 Color;
 	float pad0;
 	float4 Ambiguous_01;
+	float4 Ambiguous_02;
 };
 
 #define Payload_MaxRecursive 3
@@ -92,6 +98,10 @@ struct Payload
 
 #undef LightType_Directional
 #undef DirectionalLight_Direction
+#undef PointLight_Position
+#undef PointLight_Constant
+#undef PointLight_Linear
+#undef PointLight_Quad
 
 #undef PayloadType_OpaqueHit
 #undef PayloadType_ShadowCast

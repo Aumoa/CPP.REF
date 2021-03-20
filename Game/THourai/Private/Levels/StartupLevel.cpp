@@ -6,13 +6,16 @@
 #include "GameInstance.h"
 #include "Framework/StaticMeshActor.h"
 #include "Framework/DirectionalLight.h"
+#include "Framework/PointLight.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/DirectionalLightComponent.h"
+#include "Components/PointLightComponent.h"
 #include "Assets/AssetManager.h"
+#include "Actor/RotateLight.h"
 
 GStartupLevel::GStartupLevel() : Super()
 	, light(nullptr)
-	, lightBlue(nullptr)
+	, rotateLight(nullptr)
 	
 	, plane(nullptr)
 	, geosphere(nullptr)
@@ -42,18 +45,9 @@ void GStartupLevel::LoadLevel()
 	light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
 	light->LightComponent->LightColor = Color::White;
 
-	lightBlue = SpawnActorPersistent<ADirectionalLight>();
-	lightBlue->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(1, -1, 1), Vector3(0, 1, 0))));
-	lightBlue->LightComponent->Ambient = 0;
-	lightBlue->LightComponent->Diffuse = 0.3f;
-	lightBlue->LightComponent->LightColor = Color::Blue;
-
 	plane = SpawnActorPersistent<AStaticMeshActor>();
 	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
 	plane->StaticMesh->Scale = Vector3(10.0f, 0.1f, 10.0f);
-	geosphere = SpawnActorPersistent<AStaticMeshActor>();
-	geosphere->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
-	geosphere->RootComponent->Location = Vector3(0, 0.55f, 0);
 	teapot = SpawnActorPersistent<AStaticMeshActor>();
 	teapot->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Teapot"));
 	teapot->RootComponent->Location = Vector3(-1.0f, 0.55f, 0);
@@ -69,6 +63,13 @@ void GStartupLevel::LoadLevel()
 	icosahedron->StaticMesh->Scale = 0.5f;
 
 	spectator = SpawnActorPersistent<ASpectatorPawn>();
+	GPointLightComponent* pointLight = spectator->AddComponent<GPointLightComponent>();
+	pointLight->Mobility = EComponentMobility::Movable;
+	pointLight->AttachToComponent(spectator->RootComponent);
+	pointLight->LightColor = Color::Red;
+	pointLight->RegisterComponentWithWorld(GetWorld());
+
+	rotateLight = SpawnActorPersistent<ARotateLight>();
 }
 
 APawn* GStartupLevel::GetPersistentActor() const

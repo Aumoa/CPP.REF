@@ -23,14 +23,15 @@ void GPrimitiveComponent::ResolveDirtyState()
 		bRecreated = true;
 	}
 
-	if (sceneProxy.IsValid)
+	const bool bHasSceneProxy = sceneProxy.IsValid;
+	if (bHasSceneProxy && !bRecreated)
 	{
-		if (!bRecreated && HasDirtyMark(EComponentDirtyMask::UpdateProxy))
+		if (HasDirtyMark(EComponentDirtyMask::UpdateProxy))
 		{
 			sceneProxy->Update();
 		}
 
-		if (!bRecreated && HasDirtyMark(EComponentDirtyMask::TransformUpdated))
+		if (HasDirtyMark(EComponentDirtyMask::TransformUpdated))
 		{
 			sceneProxy->UpdateTransform();
 		}
