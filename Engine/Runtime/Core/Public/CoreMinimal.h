@@ -12,7 +12,7 @@
 
 #include "Exception.h"
 #include "InvalidCastException.h"
-#include "InvalidArgumentException.h"
+#include "ArgumentException.h"
 #include "ArgumentNullException.h"
 #include "NullReferenceException.h"
 #include "IndexOutOfRangeException.h"

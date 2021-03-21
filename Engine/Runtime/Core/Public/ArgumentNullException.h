@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreAPI.h"
-#include "Exception.h"
+#include "ArgumentException.h"
 
-class CORE_API ArgumentNullException : public Exception
+class CORE_API ArgumentNullException : public ArgumentException
 {
 public:
-	using Super = Exception;
-	using This = ArgumentNullException;
+	using Super = ArgumentException;
 
 public:
 	ArgumentNullException();
