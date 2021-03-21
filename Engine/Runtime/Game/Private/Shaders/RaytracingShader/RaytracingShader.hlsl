@@ -5,6 +5,7 @@
 ConstantBuffer<ShaderCameraConstant> gCamera : register(b0);
 RaytracingAccelerationStructure gSceneAS : register(t0);
 StructuredBuffer<GeneralLight> gLights : register(t1);
+SamplerState gSampler : register(s0);
 
 RWTexture2D<float4> gColorOutput : register(u0);
 
@@ -118,15 +119,19 @@ StructuredBuffer<Vertex> cVertexBuffer : register(t0, space2);
 StructuredBuffer<uint> cIndexBuffer : register(t1, space2);
 ConstantBuffer<RaytracingInstanceTransform> cTransform : register(b0, space2);
 
+ConstantBuffer<Material> cMaterial : register(b1, space2);
+Texture2D<float4> cDiffuseMap : register(t2, space2);
+Texture2D<float4> cNormalMap : register(t3, space2);
+
 inline float3 ComputeDirectionalLight(Material material, GeneralLight light, float3 normal, float3 rayDir, float3 posW)
 {
-	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
+	float3 ambient = 0, diffuse = 0, specular = 0;
 
 	float3 direction = normalize(light.DirectionalLight_Direction);
 	float3 l = -direction;
 
 	// Calc basic ambient factor.
-	ambient = light.Ambient * material.Ambient;
+	ambient = light.Color * light.Ambient * material.Ambient;
 
 	// Calc diffuse and specular factor.
 	float diffuseFactor = dot(l, normal);
@@ -149,18 +154,18 @@ inline float3 ComputeDirectionalLight(Material material, GeneralLight light, flo
 			float3 v = reflect(direction, normal);
 			float specFactor = pow(max(dot(v, rayDir), 0.0f), max(material.SpecExp, 1.0f));
 
-			diffuse = diffuseFactor * light.Diffuse * material.Diffuse;
+			diffuse = light.Color * diffuseFactor * light.Diffuse * material.Diffuse;
 			specular = specFactor * light.Specular * material.Specular;
 		}
 	}
 
 	// Make light color.
-	return light.Color * (ambient + diffuse) + specular;
+	return ambient + diffuse + specular;
 }
 
 inline float3 ComputePointLight(Material material, GeneralLight light, float3 normal, float3 rayDir, float3 posW)
 {
-	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
+	float3 ambient = 0, diffuse = 0, specular = 0;
 
 	const float3 lightPos = light.PointLight_Position;
 
@@ -177,7 +182,7 @@ inline float3 ComputePointLight(Material material, GeneralLight light, float3 no
 		+ light.PointLight_Quad * len * len);
 
 	// Calc basic ambient factor.
-	ambient = light.Ambient * material.Ambient * att;
+	ambient = light.Color * light.Ambient * material.Ambient * att;
 
 	const float diffuseFactor = att;
 	[flatten]
@@ -199,18 +204,18 @@ inline float3 ComputePointLight(Material material, GeneralLight light, float3 no
 			float3 v = reflect(direction, normal);
 			float specFactor = pow(max(dot(v, rayDir), 0.0f), max(material.SpecExp, 1.0f)) * att;
 
-			diffuse = diffuseFactor * light.Diffuse * material.Diffuse;
+			diffuse = light.Color * diffuseFactor * light.Diffuse * material.Diffuse;
 			specular = specFactor * light.Specular * material.Specular;
 		}
 	}
 
 	// Make light color.
-	return light.Color * (ambient + diffuse) + specular;
+	return ambient + diffuse + specular;
 }
 
 inline float3 ComputeSpotLight(Material material, GeneralLight light, float3 normal, float3 rayDir, float3 posW)
 {
-	float ambient = 0.0f, diffuse = 0.0f, specular = 0.0f;
+	float3 ambient = 0, diffuse = 0, specular = 0;
 
 	const float3 lightPos = light.SpotLight_Position;
 	const float3 lightDir = light.SpotLight_Direction;
@@ -228,7 +233,7 @@ inline float3 ComputeSpotLight(Material material, GeneralLight light, float3 nor
 		+ light.SpotLight_Quad * len * len);
 
 	// Calc basic ambient factor.
-	ambient = light.Ambient * material.Ambient * att;
+	ambient = light.Color * light.Ambient * material.Ambient * att;
 
 	// Calc light angle factor.
 	float theta = dot(lightDir, -l);
@@ -255,13 +260,13 @@ inline float3 ComputeSpotLight(Material material, GeneralLight light, float3 nor
 			float3 v = reflect(direction, normal);
 			float specFactor = pow(max(dot(v, rayDir), 0.0f), max(material.SpecExp, 1.0f)) * att * intensity;
 
-			diffuse = diffuseFactor * light.Diffuse * material.Diffuse;
+			diffuse = light.Color * diffuseFactor * light.Diffuse * material.Diffuse;
 			specular = specFactor * light.Specular * material.Specular;
 		}
 	}
 
 	// Make light color.
-	return light.Color * (ambient + diffuse) + specular;
+	return ambient + diffuse + specular;
 }
 
 inline RayFragment CalcFragment(uint primitiveId, float2 bary)
@@ -290,12 +295,6 @@ inline RayFragment CalcFragment(uint primitiveId, float2 bary)
 
 inline void ClosestHit_OpaqueHit(inout Payload payload, RayFragment frag)
 {
-	Material mat;
-	mat.Ambient = 1.0f;
-	mat.Diffuse = 1.0f;
-	mat.Specular = 1.0f;
-	mat.SpecExp = 32.0f;
-
 	uint numLights;
 	uint lightStride;
 	gLights.GetDimensions(numLights, lightStride);
@@ -307,18 +306,21 @@ inline void ClosestHit_OpaqueHit(inout Payload payload, RayFragment frag)
 		switch (light.Type)
 		{
 		case LightType_Directional:
-			lights += ComputeDirectionalLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+			lights += ComputeDirectionalLight(cMaterial, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
 			break;
 		case LightType_Point:
-			lights += ComputePointLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+			lights += ComputePointLight(cMaterial, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
 			break;
 		case LightType_Spot:
-			lights += ComputeSpotLight(mat, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
+			lights += ComputeSpotLight(cMaterial, light, frag.NormalW, -WorldRayDirection(), frag.PosW);
 			break;
 		}
 	}
 
-	payload.Color = float4(lights, 1.0f);
+	float4 diffuse = lerp((float4)1.0f, cDiffuseMap.SampleLevel(gSampler, frag.Tex, 0), cMaterial.bDiffuseMap);
+	diffuse.xyz *= lights;
+
+	payload.Color = diffuse;
 	payload.Pos = frag.PosW;
 	payload.Normal = frag.NormalW;
 }

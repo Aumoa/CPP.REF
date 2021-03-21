@@ -8,6 +8,7 @@
 #include "Logging/LogMacros.h"
 #include "SceneRendering/StaticMesh.h"
 #include "SceneRendering/Vertex.h"
+#include "Materials/Material.h"
 
 using namespace std;
 
@@ -81,6 +82,17 @@ bool AssimpParser::IsStaticMesh() const
 TRefPtr<StaticMesh> AssimpParser::GetStaticMesh() const
 {
 	return staticMesh;
+}
+
+bool AssimpParser::ProcessMaterials()
+{
+	materials.reserve(myScene->mNumMaterials);
+	for (uint32 i = 0; i < myScene->mNumMaterials; ++i)
+	{
+		aiMaterial* aiMat = myScene->mMaterials[i];
+	}
+
+	return true;
 }
 
 bool AssimpParser::ProcessStaticMeshSubsets()

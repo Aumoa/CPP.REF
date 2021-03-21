@@ -12,6 +12,7 @@ namespace Assimp
 }
 
 class Engine;
+class Material;
 struct aiScene;
 
 class AssimpParser : public ParserBase
@@ -24,6 +25,7 @@ private:
 	std::unique_ptr<Assimp::Importer> myImporter;
 	const aiScene* myScene;
 
+	std::vector<TRefPtr<Material>> materials;
 	TRefPtr<StaticMesh> staticMesh;
 
 public:
@@ -36,5 +38,6 @@ public:
 	TRefPtr<StaticMesh> GetStaticMesh() const override;
 
 private:
+	bool ProcessMaterials();
 	bool ProcessStaticMeshSubsets();
 };

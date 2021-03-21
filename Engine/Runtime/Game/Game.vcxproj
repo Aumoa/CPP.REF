@@ -357,6 +357,7 @@
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
     <ClInclude Include="Public\Materials\Material.h" />
     <ClInclude Include="Public\Materials\MaterialInterface.h" />
+    <ClInclude Include="Public\Materials\ShaderManager.h" />
     <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
@@ -473,6 +474,7 @@
     <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\Materials\Material.cpp" />
     <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
+    <ClCompile Include="Private\Materials\ShaderManager.cpp" />
     <ClCompile Include="Private\Misc\TickScheduler.cpp" />
     <ClCompile Include="Private\Physics\Collision.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />

@@ -2,6 +2,7 @@
 
 #include "Assets/AssetManager.h"
 
+#include "Engine.h"
 #include "Logging/LogVerbosity.h"
 #include "Logging/LogCategoryBase.h"
 #include "SceneRendering/StaticMesh.h"
@@ -55,6 +56,8 @@ Material* AssetManager::LoadMaterial(TRefPtr<String> key) const
 
 void AssetManager::InitEngineAssets()
 {	
+	defaultMaterial = NewObject<Material>(engine->GetDeviceBundle());
+
 	auto RegisterSingleSubsetGeometry = [&](wstring_view importPath, const vector<Vertex>& vc, const vector<uint32>& ic)
 	{
 		StaticMeshSubsetInfo subset = { };
@@ -62,6 +65,7 @@ void AssetManager::InitEngineAssets()
 		subset.VertexCount = (uint32)vc.size();
 		subset.IndexStart = 0;
 		subset.IndexCount = (uint32)ic.size();
+		subset.Material = defaultMaterial.Get();
 	
 		StaticMeshGeometryData data;
 		data.VertexBuffer = vc;

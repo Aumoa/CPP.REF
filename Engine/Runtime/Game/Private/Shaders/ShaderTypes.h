@@ -21,6 +21,11 @@ namespace ShaderTypes
 
 #pragma pack(push, 1)
 #define row_major
+#define cbuffer_align alignas(256)
+
+#else
+
+#define cbuffer_align
 
 #endif
 
@@ -50,12 +55,13 @@ struct RaytracingInstanceTransform
 	row_major matrix WorldInvTranspose;
 };
 
-struct Material
+struct cbuffer_align Material
 {
-	float Ambient;
-	float Diffuse;
-	float Specular;
+	float3 Ambient;
+	float bDiffuseMap;
+	float3 Diffuse;
 	float SpecExp;
+	float3 Specular;
 };
 
 #define LightType_Directional 1
@@ -104,6 +110,7 @@ struct Payload
 }
 
 #undef row_major
+#undef cbuffer_align
 
 #undef LightType_Directional
 #undef LightType_Point

@@ -6,11 +6,11 @@
 #include "SceneRendering/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
 #include "DirectX/DirectXCommon.h"
+#include "DirectX/DirectXShaderResourceView.h"
 
 StaticMeshSceneProxy::StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
 	, meshComponent(inMeshComponent)
 	, staticMesh(inMeshComponent->GetStaticMesh())
-	, material(nullptr)
 {
 	Update();
 }
@@ -27,18 +27,18 @@ void StaticMeshSceneProxy::Update()
 	if (!meshComponent.IsValid)
 	{
 		staticMesh = nullptr;
-		material = nullptr;
 		return;
 	}
 
 	staticMesh = meshComponent->GetStaticMesh();
-	material = meshComponent->GetMaterial();
 
 	if (staticMesh != nullptr)
 	{
-		PrimitiveAccelerationPtr = staticMesh->RaytracingAccelerationStructureBuffer->GetGPUVirtualAddress();
-
 		InstanceShaderRecord.resize(0);
+		ShaderRecordApps.resize(0);
+		Materials.resize(0);
+
+		PrimitiveAccelerationPtr = staticMesh->RaytracingAccelerationStructureBuffer->GetGPUVirtualAddress();
 		for (auto& subset : staticMesh->Subsets)
 		{
 			uint64 vertexBufferView = staticMesh->VertexBuffer->GetGPUVirtualAddress();
@@ -52,6 +52,12 @@ void StaticMeshSceneProxy::Update()
 			shaderRecord.RootParameters.emplace_back(vertexBufferView);
 			shaderRecord.RootParameters.emplace_back(indexBufferView);
 			shaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
+
+			if (subset.Material != nullptr)
+			{
+				ShaderRecordApps.emplace_back(subset.Material->SurfaceTextureSRV);
+				Materials.emplace_back(subset.Material);
+			}
 		}
 	}
 }

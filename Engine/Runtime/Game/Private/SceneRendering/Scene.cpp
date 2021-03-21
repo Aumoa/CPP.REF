@@ -20,6 +20,7 @@
 #include "SceneRendering/SceneVisibility.h"
 #include "SceneRendering/LightSceneProxy.h"
 #include "Logging/LogMacros.h"
+#include "Materials/ShaderManager.h"
 
 using namespace std;
 
@@ -36,6 +37,8 @@ Scene::Scene(APlayerController* inPlayerController) : Super()
 	DirectXNew(sbt, DirectXShaderBindingTable, deviceBundle);
 	DirectXNew(allocator, DirectXDescriptorAllocator, deviceBundle);
 	DirectXNew(lightInstanced, DirectXInstancedBufferAllocator, deviceBundle, sizeof(HomogeneousLight));
+	
+	shaderManager = NewObject<ShaderManager>(engine);
 }
 
 Scene::~Scene()
@@ -59,6 +62,11 @@ void Scene::Update()
 			{
 				sceneProxies[i]->PrimitiveId = i;
 				instancingScene->AddInstanceDeferred(i, sceneProxies[i]);
+
+				for (auto material : sceneProxies[i]->Materials)
+				{
+					shaderManager->AddMaterialRef(material);
+				}
 			}
 		}
 	}
@@ -131,6 +139,7 @@ void Scene::InitViews()
 
 void Scene::BeginRender(DirectXDeviceContext* deviceContext)
 {
+	shaderManager->ResolveMaterials();
 	instancingScene->BuildScene(deviceContext);
 	allocator->BeginAllocate((uint32)numSRVs);
 }

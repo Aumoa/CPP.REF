@@ -8,6 +8,7 @@
 #include "DirectX/DirectXMinimal.h"
 
 class DirectXShaderResourceView;
+class DirectXDynamicBuffer;
 
 enum class EMaterialDirtyMask : uint8
 {
@@ -19,15 +20,17 @@ enum class EMaterialDirtyMask : uint8
 
 class GAME_API MaterialInterface : virtual public Object
 {
+	MaterialInterface(const MaterialInterface&) = delete;
+
 public:
 	using Super = Object;
 	using This = MaterialInterface;
 
 private:
 	EMaterialDirtyMask dirtyMask;
-	float ambient;
-	float diffuse;
-	float specular;
+	Vector3 ambient;
+	Vector3 diffuse;
+	Vector3 specular;
 	float specExp;
 
 	TComPtr<ID3D12Resource> diffuseMap;
@@ -42,15 +45,16 @@ public:
 	bool HasAnyDirtyMark() const;
 	bool HasDirtyMark(EMaterialDirtyMask inCompareMask) const;
 
-	vs_property(float, Ambient);
-	vs_property(float, Diffuse);
-	vs_property(float, Specular);
+	vs_property(Vector3, Ambient);
+	vs_property(Vector3, Diffuse);
+	vs_property(Vector3, Specular);
 	vs_property(float, SpecExp);
 
 	vs_property(ID3D12Resource*, DiffuseMap);
 	vs_property(ID3D12Resource*, NormalMap);
 
-	vs_property_get_virtual(DirectXShaderResourceView*, SurfaceTextureSRV);
+	vs_property_get_pure(DirectXShaderResourceView*, SurfaceTextureSRV);
+	vs_property_get_pure(uint64, BufferLocation);
 };
 
 #include "MaterialInterface.inl"

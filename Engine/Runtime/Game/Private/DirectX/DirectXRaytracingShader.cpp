@@ -161,7 +161,7 @@ vector<DirectXShaderRecordInfo> DirectXRaytracingShader::GetClosestHitRecords() 
 {
 	DirectXShaderRecordInfo sInfo;
 	sInfo.ShaderIdentifier = properties->GetShaderIdentifier(L"OpaqueHit");
-	sInfo.NumParameters = 3;
+	sInfo.NumParameters = 4;
 	return { sInfo };
 }
 
@@ -192,16 +192,30 @@ void DirectXRaytracingShader::InitRS()
 		GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_ALL, scene),
 	};
 
-	rootSignature = CreateRootSignature(device, GetRootSignatureDesc(rootParameters, { }));
+	D3D12_STATIC_SAMPLER_DESC staticSampler = GetStaticSampler(
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		0,
+		D3D12_SHADER_VISIBILITY_ALL
+	);
+
+	rootSignature = CreateRootSignature(device, GetRootSignatureDesc(rootParameters, { &staticSampler, 1 }));
 }
 
 void DirectXRaytracingShader::InitLocalRS()
 {
+	D3D12_DESCRIPTOR_RANGE material[] =
+	{
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1, 2, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, 2, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND }
+	};
+
 	D3D12_ROOT_PARAMETER rootParams[] =
 	{
 		GetRootShaderResourceView(0, D3D12_SHADER_VISIBILITY_ALL, 2),
 		GetRootShaderResourceView(1, D3D12_SHADER_VISIBILITY_ALL, 2),
 		GetRootCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL, 2),
+		GetRootDescriptorTableParameter(D3D12_SHADER_VISIBILITY_ALL, material),
 	};
 
 	D3D12_ROOT_SIGNATURE_DESC localRSDesc = GetRootSignatureDesc(rootParams, { });
@@ -268,11 +282,7 @@ void DirectXRaytracingShader::InitPS()
 		LPCWSTR opaqueHit = L"OpaqueHit";
 
 		state_localRS.emplace_back(D3D12_STATE_SUBOBJECT_TYPE_LOCAL_ROOT_SIGNATURE, (void*)localRS[0].GetAddressOf());
-		localRSAsso.emplace_back(
-			&state_localRS.back(),
-			1,
-			&opaqueHit
-		);
+		localRSAsso.emplace_back(&state_localRS.back(), 1, &opaqueHit);
 		state_localRSAsso.emplace_back(D3D12_STATE_SUBOBJECT_TYPE_SUBOBJECT_TO_EXPORTS_ASSOCIATION, &localRSAsso.back());
 	}
 

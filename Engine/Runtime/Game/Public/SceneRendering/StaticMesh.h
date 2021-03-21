@@ -18,6 +18,7 @@ struct StaticMeshSubsetInfo
 	uint32 VertexCount;
 	uint32 IndexStart;
 	uint32 IndexCount;
+	Material* Material;
 };
 
 struct StaticMeshGeometryData
@@ -43,13 +44,10 @@ private:
 	AxisAlignedCube boundingBox;
 	std::vector<StaticMeshSubsetInfo> subsets;
 
-	TRefPtr<Material> material;
-
 public:
 	StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryData);
 	~StaticMesh();
 	
-	vs_property_get_auto(MaterialInterface*, DefaultMaterial, material.Get());
 	vs_property_get_auto(AxisAlignedCube, BoundingBox, boundingBox);
 	vs_property_get_auto(ID3D12Resource*, RaytracingAccelerationStructureBuffer, accelerationStructure.Get());
 	vs_property_get_auto(ID3D12Resource*, VertexBuffer, vertexBuffer.Get());

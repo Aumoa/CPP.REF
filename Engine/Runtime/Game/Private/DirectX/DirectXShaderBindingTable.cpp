@@ -71,12 +71,13 @@ DirectXShaderBindingTable::DirectXShaderBindingTable(DirectXDeviceBundle* device
 	, shader(nullptr)
 
 	, rayGenLen(0)
-
+	, rayGenBufPtr(nullptr)
 	, closestHitStride(0)
 	, closestHitLen(0)
-
+	, closestHitBufPtr(nullptr)
 	, missStride(0)
 	, missLen(0)
+	, missBufPtr(nullptr)
 {
 
 }

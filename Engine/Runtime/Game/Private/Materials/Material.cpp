@@ -16,12 +16,13 @@ Material::Material(DirectXDeviceBundle* deviceBundle) : Super()
 	
 	DirectXDynamicBufferAllocator* allocator = deviceBundle->GetOrCreateDynamicBufferAllocator(sizeof(ShaderTypes::Material));
 	materialBuffer = NewObject<DirectXDynamicBuffer>(allocator);
-	surfaceSRV = NewObject<DirectXShaderResourceView>(deviceBundle, 2);
+	surfaceSRV = NewObject<DirectXShaderResourceView>(deviceBundle, 3);
+	surfaceSRV->CreateConstantBufferView(0, materialBuffer->GetGPUVirtualAddress(), sizeof(ShaderTypes::Material));
 }
 
 Material::~Material()
 {
-
+	
 }
 
 void Material::SetMarkDirty(EMaterialDirtyMask inAddMask)
@@ -44,14 +45,19 @@ void Material::ResolveDirtyState()
 
 	if (HasDirtyMark(EMaterialDirtyMask::RenderState))
 	{
-		ShaderTypes::Material mat = { Ambient, Diffuse, Specular, SpecExp };
+		ShaderTypes::Material mat;
+		mat.Ambient = Ambient;
+		mat.Diffuse = Diffuse;
+		mat.Specular = Specular;
+		mat.SpecExp = SpecExp;
+		mat.bDiffuseMap = DiffuseMap != nullptr;
 		memcpy(materialBuffer->GetBufferPointer(), &mat, sizeof(mat));
 	}
 
 	if (HasDirtyMark(EMaterialDirtyMask::SurfaceTexture))
 	{
-		surfaceSRV->CreateShaderResourceView(0, DiffuseMap, DiffuseMap ? nullptr : &nullDesc);
-		surfaceSRV->CreateShaderResourceView(1, NormalMap, NormalMap ? nullptr : &nullDesc);
+		surfaceSRV->CreateShaderResourceView(1, DiffuseMap, DiffuseMap ? nullptr : &nullDesc);
+		surfaceSRV->CreateShaderResourceView(2, NormalMap, NormalMap ? nullptr : &nullDesc);
 	}
 
 	Super::ResolveDirtyState();
@@ -61,4 +67,9 @@ void Material::ResolveDirtyState()
 DirectXShaderResourceView* Material::SurfaceTextureSRV_get() const
 {
 	return surfaceSRV.Get();
+}
+
+uint64 Material::BufferLocation_get() const
+{
+	return materialBuffer->GetGPUVirtualAddress();
 }

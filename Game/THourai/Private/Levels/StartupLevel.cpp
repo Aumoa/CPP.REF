@@ -71,9 +71,9 @@ void GStartupLevel::LoadLevel()
 		mesh->StaticMesh->Location = Vector3(1.2f, 4.0f, 0);
 	}
 
-	sakura_miku = SpawnActorPersistent<AStaticMeshActor>();
-	sakura_miku->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Sakura_Miku/Sakura_Miku.x"));
-	sakura_miku->SetActorScale(0.1f);
+	//sakura_miku = SpawnActorPersistent<AStaticMeshActor>();
+	//sakura_miku->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Sakura_Miku/Sakura_Miku.x"));
+	//sakura_miku->SetActorScale(0.1f);
 
 	plane = SpawnActorPersistent<AStaticMeshActor>();
 	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));

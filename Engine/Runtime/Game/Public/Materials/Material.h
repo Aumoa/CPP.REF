@@ -29,4 +29,5 @@ public:
 	void ResolveDirtyState() override;
 
 	DirectXShaderResourceView* SurfaceTextureSRV_get() const override;
+	uint64 BufferLocation_get() const override;
 };

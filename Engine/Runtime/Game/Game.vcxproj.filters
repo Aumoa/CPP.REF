@@ -498,6 +498,9 @@
     <ClInclude Include="Public\COM\COMMinimal.h">
       <Filter>Public\COM</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Materials\ShaderManager.h">
+      <Filter>Public\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Engine.cpp">
@@ -805,6 +808,9 @@
     </ClCompile>
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp">
       <Filter>Private\Assets\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Materials\ShaderManager.cpp">
+      <Filter>Private\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

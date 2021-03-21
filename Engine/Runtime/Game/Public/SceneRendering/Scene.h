@@ -20,6 +20,7 @@ class DirectXDescriptorAllocator;
 class DirectXDeviceContext;
 class DirectXInstancedBufferAllocator;
 class DirectXShaderResourceView;
+class ShaderManager;
 
 class Scene : virtual public Object
 {
@@ -44,6 +45,8 @@ private:
 	TRefPtr<DirectXShaderBindingTable> sbt;
 	TRefPtr<DirectXDescriptorAllocator> allocator;
 	TRefPtr<DirectXInstancedBufferAllocator> lightInstanced;
+
+	TRefPtr<ShaderManager> shaderManager;
 
 public:
 	Scene(APlayerController* inPlayerController);

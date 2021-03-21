@@ -4,6 +4,7 @@
 
 #include "DirectX/DirectXCommon.h"
 #include "DirectX/DirectXShaderResourceView.h"
+#include "DirectX/DirectXDynamicBufferAllocator.h"
 
 MaterialInterface::MaterialInterface() : Super()
 	, dirtyMask(EMaterialDirtyMask::All)
@@ -40,12 +41,12 @@ bool MaterialInterface::HasDirtyMark(EMaterialDirtyMask inCompareMask) const
 	return (dirtyMask & inCompareMask) != EMaterialDirtyMask::None;
 }
 
-float MaterialInterface::Ambient_get() const
+Vector3 MaterialInterface::Ambient_get() const
 {
 	return ambient;
 }
 
-void MaterialInterface::Ambient_set(float value)
+void MaterialInterface::Ambient_set(Vector3 value)
 {
 	if (ambient != value)
 	{
@@ -54,12 +55,12 @@ void MaterialInterface::Ambient_set(float value)
 	}
 }
 
-float MaterialInterface::Diffuse_get() const
+Vector3 MaterialInterface::Diffuse_get() const
 {
 	return diffuse;
 }
 
-void MaterialInterface::Diffuse_set(float value)
+void MaterialInterface::Diffuse_set(Vector3 value)
 {
 	if (diffuse != value)
 	{
@@ -68,12 +69,12 @@ void MaterialInterface::Diffuse_set(float value)
 	}
 }
 
-float MaterialInterface::Specular_get() const
+Vector3 MaterialInterface::Specular_get() const
 {
 	return specular;
 }
 
-void MaterialInterface::Specular_set(float value)
+void MaterialInterface::Specular_set(Vector3 value)
 {
 	if (specular != value)
 	{
@@ -122,9 +123,4 @@ void MaterialInterface::NormalMap_set(ID3D12Resource* value)
 		normalMap = value;
 		SetMarkDirty(EMaterialDirtyMask::SurfaceTexture);
 	}
-}
-
-DirectXShaderResourceView* MaterialInterface::SurfaceTextureSRV_get() const
-{
-	return nullptr;
 }

@@ -12,6 +12,8 @@
 
 class GPrimitiveComponent;
 class DirectXDynamicBuffer;
+class MaterialInterface;
+class DirectXShaderResourceView;
 
 class GAME_API PrimitiveSceneProxy : public Object
 {
@@ -36,6 +38,8 @@ public:
 	AxisAlignedCube PrimitiveBoundingBox;
 	uint64 PrimitiveAccelerationPtr;
 	std::vector<DirectXInstanceShaderRecord> InstanceShaderRecord;
+	std::vector<DirectXShaderResourceView*> ShaderRecordApps;
+	std::vector<MaterialInterface*> Materials;
 
 protected:
 	uint64 GetInstanceTransformBuf() const;
