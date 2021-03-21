@@ -9,6 +9,7 @@
 
 class DirectXCommandQueue;
 class DirectXDynamicBufferAllocator;
+class COMImage;
 
 class GAME_API DirectXDeviceBundle : virtual public Object
 {
@@ -31,6 +32,7 @@ public:
 
 	TComPtr<ID3D12Resource> CreateImmutableBuffer(DirectXCommandQueue* commandQueue, D3D12_RESOURCE_STATES initialState, const uint8* initialBuffer, size_t sizeInBytes, D3D12_RESOURCE_FLAGS flags);
 	TComPtr<ID3D12Resource> CreateDynamicBuffer(size_t sizeInBytes);
+	TComPtr<ID3D12Resource> CreateTexture2D(COMImage* image, DirectXCommandQueue* commandQueue, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState);
 
 private:
 	bool IsAdapterSuitable(IDXGIAdapter1* adapter) const;
