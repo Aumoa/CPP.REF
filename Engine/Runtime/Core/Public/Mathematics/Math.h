@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreAPI.h"
-#include "Object.h"
+#include "Core/Object.h"
 
 template<class T>
 concept THasLerp = requires()

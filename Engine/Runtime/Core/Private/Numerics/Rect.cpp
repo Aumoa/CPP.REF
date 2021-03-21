@@ -4,7 +4,7 @@
 
 #include "Numerics/Ray2.h"
 #include "HashHelper.h"
-#include "CoreString.h"
+#include "Core/String.h"
 #include "IndexOutOfRangeException.h"
 
 using namespace std;

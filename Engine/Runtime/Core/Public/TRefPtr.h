@@ -6,7 +6,7 @@
 #include "CoreConcepts.h"
 
 #include <type_traits>
-#include "Object.h"
+#include "Core/Object.h"
 
 #pragma warning(disable: 4251)
 

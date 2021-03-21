@@ -3,7 +3,7 @@
 #include "Numerics/Matrix4x4.h"
 
 #include "DXMathMinimal.h"
-#include "CoreString.h"
+#include "Core/String.h"
 #include "Numerics/Vector4.h"
 #include "Numerics/Vector3.h"
 

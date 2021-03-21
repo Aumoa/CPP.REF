@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreAPI.h"
-#include "Object.h"
+#include "Core/Object.h"
 
 #include <vector>
 #include <string>
@@ -77,6 +77,9 @@ public:
 	virtual ConstIterator cend() const override;
 
 	TRefPtr<String> Substring(size_t startIndex, std::optional<size_t> length = std::nullopt) const;
+	std::optional<size_t> IndexOf(TRefPtr<String> value, size_t startIndex = 0, bool bIgnoreCase = false) const;
+	std::optional<size_t> IndexOf(wchar_t value, size_t startIndex = 0, bool bIgnoreCase = false) const;
+	std::optional<size_t> IndexOfAny(const wchar_t* value_sequence, size_t length, size_t startIndex = 0, bool bIgnoreCase = false) const;
 
 	vs_property_get(const wchar_t*, C_Str);
 	vs_property_get(size_t, Length);

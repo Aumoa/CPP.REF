@@ -3,7 +3,7 @@
 #include "Numerics/Ray3.h"
 
 #include "HashHelper.h"
-#include "CoreString.h"
+#include "Core/String.h"
 #include "Numerics/AxisAlignedCube.h"
 
 using namespace std;

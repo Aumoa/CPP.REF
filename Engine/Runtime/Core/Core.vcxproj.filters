@@ -31,6 +31,12 @@
     <Filter Include="Private\Time">
       <UniqueIdentifier>{22573f52-a623-49b9-8c6a-d8dedd10b269}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Core">
+      <UniqueIdentifier>{69f6bb08-44ce-4ff5-be2e-341365012870}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Core">
+      <UniqueIdentifier>{eedbf26a-af15-4fca-a344-8699d8f28d1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\CoreAPI.h">
@@ -45,9 +51,6 @@
     <ClInclude Include="Public\InvalidCastException.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Object.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\TRefPtr.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -55,12 +58,6 @@
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\TMulticastDelegate.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\CoreString.h">
-      <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\InvalidArgumentException.h">
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\ArgumentNullException.h">
@@ -174,6 +171,18 @@
     <ClInclude Include="Public\IDisposable.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Path.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\ArgumentException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Core\String.h">
+      <Filter>Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Core\Object.h">
+      <Filter>Public\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -226,12 +235,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Object.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\String.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\TRefPtr.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -239,9 +242,6 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\InvalidCastException.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\InvalidArgumentException.cpp">
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\ArgumentNullException.cpp">
@@ -324,6 +324,18 @@
     </ClCompile>
     <ClCompile Include="Private\NotSupportedException.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Path.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\ArgumentException.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Core\String.cpp">
+      <Filter>Private\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Core\Object.cpp">
+      <Filter>Private\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

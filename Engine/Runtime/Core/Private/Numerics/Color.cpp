@@ -2,7 +2,7 @@
 
 #include "Numerics/Color.h"
 
-#include "CoreString.h"
+#include "Core/String.h"
 #include "HashHelper.h"
 #include "IndexOutOfRangeException.h"
 

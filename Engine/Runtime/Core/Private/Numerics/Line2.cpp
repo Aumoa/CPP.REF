@@ -4,7 +4,7 @@
 
 #include "Mathematics/Math.h"
 #include "HashHelper.h"
-#include "CoreString.h"
+#include "Core/String.h"
 #include "Numerics/Ray2.h"
 
 using namespace std;

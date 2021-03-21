@@ -1,17 +1,22 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "CoreString.h"
+#include "Core/String.h"
 
 #undef interface
 #include <Windows.h>
 #include "ArgumentNullException.h"
 #include "IndexOutOfRangeException.h"
 #include "FormatException.h"
+#include "ArgumentException.h"
 
 using namespace std;
 
 wchar_t String::EmptyBuffer[1] = { 0 };
 const TRefPtr<String> String::Empty = Object::NewObject<String>(EmptyBuffer);
+
+#define ThrowIfNull(exp) if ((exp) == nullptr) { throw ArgumentNullException(L"(" L ## #exp L") == nullptr"); }
+#define ThrowArg(exp) if (exp) { throw ArgumentException(L ## #exp); }
+#define ThrowIfInvalid(exp) if (!exp.IsValid) { throw ArgumentNullException(L"!" L ## #exp); }
 
 String::String() : Super()
 	, text_buffer(nullptr)
@@ -137,6 +142,118 @@ TRefPtr<String> String::Substring(size_t startIndex, optional<size_t> length) co
     }
 
     return NewObject<String>(text_buffer + startIndex, length.value());
+}
+
+optional<size_t> String::IndexOf(TRefPtr<String> value, size_t startIndex, bool bIgnoreCase) const
+{
+    ThrowIfInvalid(value);
+    ThrowArg(value->Length == 0);
+
+    for (size_t i = startIndex; i < len; ++i)
+    {
+        optional<size_t> find = IndexOf(value[0], i, bIgnoreCase);
+        // Could'n find any chars.
+        if (!find.has_value())
+        {
+            return nullopt;
+        }
+
+        // Find chars but lack of length.
+        size_t rem = len - i;
+        if (rem < value->Length)
+        {
+            return nullopt;
+        }
+        rem = value->Length;
+
+        const size_t seekpos = find.value();
+        if (bIgnoreCase)
+        {
+            bool bSucceeded = true;
+            for (size_t j = 0; j < rem; ++j)
+            {
+                if (tolower(text_buffer[seekpos + j]) != tolower(value[j]))
+                {
+                    bSucceeded = false;
+                    break;
+                }
+            }
+
+            if (bSucceeded)
+            {
+                return seekpos;
+            }
+        }
+        else
+        {
+            if (memcmp(text_buffer + seekpos, value->C_Str, sizeof(wchar_t) * rem) == 0)
+            {
+                return seekpos;
+            }
+        }
+
+        i = seekpos + 1;
+    }
+
+    return nullopt;
+}
+
+optional<size_t> String::IndexOf(wchar_t value, size_t startIndex, bool bIgnoreCase) const
+{
+    ThrowArg(startIndex >= len);
+
+    for (size_t i = startIndex; i < len; ++i)
+    {
+        bool bCompare = false;
+
+        if (bIgnoreCase)
+        {
+            bCompare = tolower(text_buffer[i]) == tolower(value);
+        }
+        else
+        {
+            bCompare = text_buffer[i] == value;
+        }
+
+        if (bCompare)
+        {
+            return i;
+        }
+    }
+
+    return nullopt;
+}
+
+optional<size_t> String::IndexOfAny(const wchar_t* value_sequence, size_t length, size_t startIndex, bool bIgnoreCase) const
+{
+    ThrowArg(startIndex >= len);
+    ThrowIfNull(value_sequence);
+    ThrowArg(length == 0);
+
+    auto Compare = [&](size_t index, wchar_t value)
+    {
+        if (bIgnoreCase)
+        {
+            return tolower(text_buffer[index]) == tolower(value);
+        }
+        else
+        {
+            return text_buffer[index] == value;
+        }
+    };
+
+    for (size_t i = startIndex; i < len; ++i)
+    {
+        for (size_t j = 0; j < length; ++j)
+        {
+            if (Compare(i, value_sequence[j]))
+            {
+                return i;
+            }
+        }
+    }
+
+    return nullopt;
 }
 
 const wchar_t* String::C_Str_get() const

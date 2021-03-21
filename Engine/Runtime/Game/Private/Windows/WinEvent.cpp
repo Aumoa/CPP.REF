@@ -35,7 +35,7 @@ TRefPtr<WinEvent> WinEvent::OpenEvent(TRefPtr<String> eventName)
 {
 	if (!eventName.IsValid)
 	{
-		throw InvalidArgumentException(L"eventName is nullptr.");
+		throw ArgumentNullException(L"eventName");
 	}
 
 	HANDLE hOpened = ::OpenEventW(GENERIC_ALL, FALSE, eventName->C_Str);

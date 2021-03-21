@@ -40,6 +40,6 @@ const wchar_t* Logger::ToString(ELogVerbosity inVerbosity)
 	case ELogVerbosity::VeryVerbose:
 		return L"VeryVerbose";
 	default:
-		throw InvalidArgumentException();
+		throw ArgumentException(L"inVerbosity");
 	}
 }

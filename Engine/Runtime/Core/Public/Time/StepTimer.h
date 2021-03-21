@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreAPI.h"
-#include "Object.h"
+#include "Core/Object.h"
 
-#include "CoreString.h"
+#include "Core/String.h"
 #include "TMulticastDelegate.h"
 #include "Duration.h"
 
