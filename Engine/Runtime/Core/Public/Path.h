@@ -32,6 +32,7 @@ public:
 public:
 	static TRefPtr<String> GetExtension(TRefPtr<String> path);
 	static TRefPtr<String> ChangeExtension(TRefPtr<String> path, TRefPtr<String> extension);
+	static TRefPtr<String> GetDirectoryName(TRefPtr<String> path);
 
 private:
 	static void CheckInvalidPathChars(TRefPtr<String> path, bool bCheckAdditional = false);
