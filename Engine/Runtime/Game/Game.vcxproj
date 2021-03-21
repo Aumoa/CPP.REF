@@ -191,6 +191,9 @@
       <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -217,6 +220,9 @@
       <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <ClCompile>
@@ -245,6 +251,9 @@
       <ObjectFileOutput>
       </ObjectFileOutput>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Private\COM\COMMinimal.h" />

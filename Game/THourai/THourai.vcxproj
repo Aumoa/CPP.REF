@@ -209,10 +209,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -232,10 +229,7 @@ xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <ClCompile>
@@ -260,10 +254,7 @@ xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\PhysX\physx\bin\win.x86_64.vc142.mt\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
-xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
