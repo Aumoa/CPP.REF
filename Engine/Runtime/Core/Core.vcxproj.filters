@@ -183,6 +183,12 @@
     <ClInclude Include="Public\Core\Object.h">
       <Filter>Public\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Public\PathTooLongException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IOException.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\String.inl">
@@ -336,6 +342,9 @@
     </ClCompile>
     <ClCompile Include="Private\Core\Object.cpp">
       <Filter>Private\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\IOException.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

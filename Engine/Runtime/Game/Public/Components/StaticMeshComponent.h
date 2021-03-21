@@ -17,7 +17,6 @@ public:
 
 private:
 	TWeakPtr<StaticMesh> staticMesh;
-	TRefPtr<MaterialInterface> overrideMaterial;
 
 public:
 	GStaticMeshComponent();
@@ -27,6 +26,4 @@ public:
 
 	void SetStaticMesh(StaticMesh* inMesh);
 	StaticMesh* GetStaticMesh() const;
-	void SetMaterial(MaterialInterface* inMaterial);
-	MaterialInterface* GetMaterial() const;
 };

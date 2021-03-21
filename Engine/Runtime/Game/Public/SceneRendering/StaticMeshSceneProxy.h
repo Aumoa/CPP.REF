@@ -19,7 +19,6 @@ public:
 private:
 	TWeakPtr<GStaticMeshComponent> meshComponent;
 	StaticMesh* staticMesh;
-	MaterialInterface* material;
 
 public:
 	StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent);

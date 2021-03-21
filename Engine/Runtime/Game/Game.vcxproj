@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugGame|Win32">
@@ -109,17 +109,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(SolutionDir)ThirdParty\glfw\include\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -191,6 +191,10 @@
       <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Message>Assimp Binaries copy to Output Directory.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -217,6 +221,10 @@
       <HeaderFileOutput>$(ProjectDir)Private\CompiledShaders\%(Filename).generated.h</HeaderFileOutput>
       <ObjectFileOutput />
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Message>Assimp Binaries copy to Output Directory.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <ClCompile>
@@ -245,15 +253,19 @@
       <ObjectFileOutput>
       </ObjectFileOutput>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Message>Assimp Binaries copy to Output Directory.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Private\COM\COMMinimal.h" />
+    <ClInclude Include="Private\Assets\Parser\AssimpParser.h" />
+    <ClInclude Include="Private\Assets\Parser\ParserBase.h" />
     <ClInclude Include="Private\DirectX\Bezier.h" />
     <ClInclude Include="Private\DirectX\DirectXCommon.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
-    <ClInclude Include="Private\Materials\MaterialInstance.h" />
     <ClInclude Include="Private\Shaders\ShaderTypes.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />
@@ -263,6 +275,7 @@
     <ClInclude Include="Private\VulkanRHI\VulkanRenderTargetView.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanResource.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanSwapChain.h" />
+    <ClInclude Include="Public\Assets\AssetImporter.h" />
     <ClInclude Include="Public\Assets\AssetManager.h" />
     <ClInclude Include="Public\Assets\CachedShaderLibrary.h" />
     <ClInclude Include="Public\ComponentMobility.h" />
@@ -288,6 +301,7 @@
     <ClInclude Include="Public\COM\COMException.h" />
     <ClInclude Include="Public\COM\COMImage.h" />
     <ClInclude Include="Public\COM\COMImageLoader.h" />
+    <ClInclude Include="Public\COM\COMMinimal.h" />
     <ClInclude Include="Public\COM\TComPtr.h" />
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
@@ -342,6 +356,7 @@
     <ClInclude Include="Public\Logging\LogVerbosity.h" />
     <ClInclude Include="Public\Materials\Material.h" />
     <ClInclude Include="Public\Materials\MaterialInterface.h" />
+    <ClInclude Include="Public\Materials\ShaderManager.h" />
     <ClInclude Include="Public\Misc\TickScheduler.h" />
     <ClInclude Include="Public\Physics\Collision.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformConsole.h" />
@@ -374,13 +389,19 @@
     <ClInclude Include="Public\World.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\ThirdParty\assimp\BINARIES\x64\code\assimp.vcxproj">
+      <Project>{3BB5D697-F1E4-377A-AC8E-FCEE3B6780CD}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{2d9c1fc7-8c2e-4f0e-938b-8f9967b975b1}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Assets\AssetImporter.cpp" />
     <ClCompile Include="Private\Assets\AssetManager.cpp" />
     <ClCompile Include="Private\Assets\CachedShaderLibrary.cpp" />
+    <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
+    <ClCompile Include="Private\Assets\Parser\ParserBase.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Private\Components\CameraComponent.cpp" />
     <ClCompile Include="Private\Components\DirectionalLightComponent.cpp" />
@@ -452,6 +473,7 @@
     <ClCompile Include="Private\Logging\Logger.cpp" />
     <ClCompile Include="Private\Materials\Material.cpp" />
     <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
+    <ClCompile Include="Private\Materials\ShaderManager.cpp" />
     <ClCompile Include="Private\Misc\TickScheduler.cpp" />
     <ClCompile Include="Private\Physics\Collision.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformConsole.cpp" />

@@ -3,6 +3,7 @@
 #include "Path.h"
 
 #include <sstream>
+#include <filesystem>
 #include "ArgumentNullException.h"
 
 using namespace std;
@@ -75,6 +76,12 @@ TRefPtr<String> Path::ChangeExtension(TRefPtr<String> path, TRefPtr<String> exte
 	}
 
 	return wss.str();
+}
+
+TRefPtr<String> Path::GetDirectoryName(TRefPtr<String> path)
+{
+	filesystem::path mypath = path->C_Str;
+	return mypath.parent_path().wstring();
 }
 
 void Path::CheckInvalidPathChars(TRefPtr<String> path, bool bCheckAdditional)

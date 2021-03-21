@@ -53,6 +53,13 @@ StaticMesh::StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryD
 {
 	vertexBuffer = CreateVertexBuffer(inGeometryData.VertexBuffer);
 	indexBuffer = CreateIndexBuffer(inGeometryData.IndexBuffer);
+	subsets = inGeometryData.Subsets;
+	materialCapture.reserve(subsets.size());
+
+	for (size_t i = 0; i < subsets.size(); ++i)
+	{
+		materialCapture.emplace_back(subsets[i].Material);
+	}
 
 	DirectXCommandQueue* commandQueue = engine->GetPrimaryCommandQueue();
 	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();

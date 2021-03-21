@@ -47,5 +47,5 @@ public:
 
 private:
 	void CheckAndReallocate(size_t desiredCount);
-	D3D12_RAYTRACING_INSTANCE_DESC GetRaytracingInstanceDesc(const PrimitiveSceneProxy* sceneProxy) const;
+	D3D12_RAYTRACING_INSTANCE_DESC GetRaytracingInstanceDesc(uint32& shaderRecords, const PrimitiveSceneProxy* sceneProxy) const;
 };

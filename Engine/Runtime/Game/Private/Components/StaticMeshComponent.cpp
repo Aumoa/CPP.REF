@@ -31,22 +31,10 @@ TRefPtr<PrimitiveSceneProxy> GStaticMeshComponent::CreateSceneProxy()
 void GStaticMeshComponent::SetStaticMesh(StaticMesh* inMesh)
 {
 	staticMesh = inMesh;
-	overrideMaterial = staticMesh->DefaultMaterial;
 	SetMarkDirty(EComponentDirtyMask::RecreateProxy);
 }
 
 StaticMesh* GStaticMeshComponent::GetStaticMesh() const
 {
 	return staticMesh.Get();
-}
-
-void GStaticMeshComponent::SetMaterial(MaterialInterface* inMaterial)
-{
-	overrideMaterial = inMaterial;
-	SetMarkDirty(EComponentDirtyMask::UpdateProxy);
-}
-
-MaterialInterface* GStaticMeshComponent::GetMaterial() const
-{
-	return overrideMaterial.Get();
 }

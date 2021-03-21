@@ -6,11 +6,11 @@
 #include "SceneRendering/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
 #include "DirectX/DirectXCommon.h"
+#include "DirectX/DirectXShaderResourceView.h"
 
 StaticMeshSceneProxy::StaticMeshSceneProxy(GStaticMeshComponent* inMeshComponent) : Super(inMeshComponent)
 	, meshComponent(inMeshComponent)
 	, staticMesh(inMeshComponent->GetStaticMesh())
-	, material(nullptr)
 {
 	Update();
 }
@@ -27,21 +27,40 @@ void StaticMeshSceneProxy::Update()
 	if (!meshComponent.IsValid)
 	{
 		staticMesh = nullptr;
-		material = nullptr;
 		return;
 	}
 
 	staticMesh = meshComponent->GetStaticMesh();
-	material = meshComponent->GetMaterial();
 
 	if (staticMesh != nullptr)
 	{
+		InstanceShaderRecord.resize(0);
+		DeferredShaderRecords.resize(0);
+		Materials.resize(0);
+
 		PrimitiveAccelerationPtr = staticMesh->RaytracingAccelerationStructureBuffer->GetGPUVirtualAddress();
-		InstanceShaderRecord.ShaderIndex = 0;
-		InstanceShaderRecord.RootParameters.resize(0);
-		InstanceShaderRecord.RootParameters.emplace_back(staticMesh->VertexBuffer->GetGPUVirtualAddress());
-		InstanceShaderRecord.RootParameters.emplace_back(staticMesh->IndexBuffer->GetGPUVirtualAddress());
-		InstanceShaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
+		for (auto& subset : staticMesh->Subsets)
+		{
+			uint64 vertexBufferView = staticMesh->VertexBuffer->GetGPUVirtualAddress();
+			vertexBufferView += subset.VertexStart * sizeof(Vertex);
+
+			uint64 indexBufferView = staticMesh->IndexBuffer->GetGPUVirtualAddress();
+			indexBufferView += subset.IndexStart * sizeof(uint32);
+
+			DirectXInstanceShaderRecord& shaderRecord = InstanceShaderRecord.emplace_back();
+			shaderRecord.ShaderIndex = 0;
+			shaderRecord.RootParameters.emplace_back(vertexBufferView);
+			shaderRecord.RootParameters.emplace_back(indexBufferView);
+			shaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
+
+			DeferredShaderRecordApp& deferredApp = DeferredShaderRecords.emplace_back();
+
+			if (subset.Material != nullptr)
+			{
+				deferredApp.ShaderRecordApps.emplace_back(subset.Material->SurfaceTextureSRV);
+				Materials.emplace_back(subset.Material);
+			}
+		}
 	}
 }
 

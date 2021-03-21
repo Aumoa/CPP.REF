@@ -8,6 +8,7 @@
 #include "DirectX/DirectXDynamicBufferAllocator.h"
 #include "Logging/LogMacros.h"
 #include "COM/COMMinimal.h"
+#include "COM/COMImage.h"
 
 using namespace std;
 
@@ -204,6 +205,87 @@ TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateDynamicBuffer(size_t sizeInBy
 
 	TComPtr<ID3D12Resource> resource;
 	HR(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
+
+	return resource;
+}
+
+TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateTexture2D(COMImage* image, DirectXCommandQueue* commandQueue, DXGI_FORMAT format, D3D12_RESOURCE_STATES initialState)
+{
+	D3D12_RESOURCE_DESC textureDesc = { };
+	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	textureDesc.Width = image->Width;
+	textureDesc.Height = image->Height;
+	textureDesc.DepthOrArraySize = 1;
+	textureDesc.MipLevels = 1;
+	textureDesc.Format = (DXGI_FORMAT)format;
+	textureDesc.SampleDesc = { 1, 0 };
+	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+	D3D12_HEAP_PROPERTIES heap = { };
+	heap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	// Create texture immutable buffer for copy destination.
+	TComPtr<ID3D12Resource> resource;
+	HR(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+	// Get copyable footprint.
+	uint64 totalBytes;
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
+	device->GetCopyableFootprints(&textureDesc, 0, 1, 0, &layout, nullptr, nullptr, &totalBytes);
+
+	D3D12_RESOURCE_DESC bufferDesc{ };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = totalBytes;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	// Create upload heap for copy source that texture pixels.
+	TComPtr<ID3D12Resource> uploadHeap;
+	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+	HR(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	// Copy pixels.
+	void* pData;
+	HR(uploadHeap->Map(0, nullptr, &pData));
+	image->CopyPixels(layout.Footprint.RowPitch, totalBytes, (int8*)pData);
+	uploadHeap->Unmap(0, nullptr);
+
+	// Ready to upload to destination texture heap.
+	D3D12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = initialState;
+
+	D3D12_TEXTURE_COPY_LOCATION dst = { }, src = { };
+	dst.pResource = resource.Get();
+	dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	dst.SubresourceIndex = 0;
+	src.pResource = uploadHeap.Get();
+	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	src.PlacedFootprint = layout;
+
+	// Commit copy commands.
+	auto DirectXNew(deviceContext, DirectXDeviceContext, this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+	// Copy resource from CPU storage(UploadHeap) to GPU storage(DefaultHeap).
+	deviceContext->BeginDraw();
+	{
+		ID3D12GraphicsCommandList4* commandList = deviceContext->GetCommandList();
+		commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+		commandList->ResourceBarrier(1, &barrier);
+	}
+	deviceContext->EndDraw();
+
+	// Add pending reference for keep upload heap until copy operation will completed.
+	deviceContext->AddPendingReference(uploadHeap.Get());
+
+	// Execute commands and enqueue pending reference.
+	commandQueue->ExecuteCommandLists(deviceContext.Get());
+	commandQueue->AddPendingReference(move(deviceContext));
 
 	return resource;
 }

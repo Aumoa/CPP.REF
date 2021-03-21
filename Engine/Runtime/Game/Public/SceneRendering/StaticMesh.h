@@ -18,6 +18,7 @@ struct StaticMeshSubsetInfo
 	uint32 VertexCount;
 	uint32 IndexStart;
 	uint32 IndexCount;
+	Material* Material;
 };
 
 struct StaticMeshGeometryData
@@ -41,18 +42,18 @@ private:
 	TComPtr<ID3D12Resource> indexBuffer;
 	TComPtr<ID3D12Resource> accelerationStructure;
 	AxisAlignedCube boundingBox;
-
-	TRefPtr<Material> material;
+	std::vector<StaticMeshSubsetInfo> subsets;
+	std::vector<TRefPtr<Material>> materialCapture;
 
 public:
 	StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryData);
 	~StaticMesh();
 	
-	vs_property_get_auto(MaterialInterface*, DefaultMaterial, material.Get());
 	vs_property_get_auto(AxisAlignedCube, BoundingBox, boundingBox);
 	vs_property_get_auto(ID3D12Resource*, RaytracingAccelerationStructureBuffer, accelerationStructure.Get());
 	vs_property_get_auto(ID3D12Resource*, VertexBuffer, vertexBuffer.Get());
 	vs_property_get_auto(ID3D12Resource*, IndexBuffer, indexBuffer.Get());
+	vs_property_get_auto(std::vector<StaticMeshSubsetInfo>, Subsets, subsets);
 
 private:
 	static AxisAlignedCube ComputeBoundingBox(std::span<Vertex const> vertices);

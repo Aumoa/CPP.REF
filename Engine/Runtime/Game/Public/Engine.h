@@ -16,6 +16,7 @@ class StepTimer;
 class GameViewport;
 class CachedShaderLibrary;
 class COMDeviceBundle;
+class AssetImporter;
 
 class GAME_API Engine : virtual public Object
 {
@@ -29,6 +30,7 @@ private:
 	TRefPtr<DirectXCommandQueue> primaryQueue;
 	TRefPtr<AssetManager> assetManager;
 	TRefPtr<COMDeviceBundle> comBundle;
+	TRefPtr<AssetImporter> assimp;
 
 	TRefPtr<DirectXSwapChain> swapChain;
 	TRefPtr<DirectXImmediateContext> immediateContext;
@@ -51,6 +53,8 @@ public:
 	AssetManager* GetAssetManager() const;
 	CachedShaderLibrary* GetCachedShaderLibrary() const;
 	GameViewport* GetLocalViewport() const;
+	AssetImporter* GetAssetImporter() const;
+	COMDeviceBundle* GetCOMDevice() const;
 
 private:
 	void Render();

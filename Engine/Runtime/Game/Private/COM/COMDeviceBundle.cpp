@@ -2,7 +2,7 @@
 
 #include "COM/COMDeviceBundle.h"
 
-#include "COMMinimal.h"
+#include "COM/COMMinimal.h"
 #undef interface
 #include <wincodec.h>
 

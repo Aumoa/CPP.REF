@@ -19,7 +19,7 @@ DirectXShaderResourceView::~DirectXShaderResourceView()
 
 void DirectXShaderResourceView::CreateConstantBufferView(size_t index, uint64 bufferLocation, uint32 sizeInBytes)
 {
-	if (index > NumDescriptors)
+	if (index >= NumDescriptors)
 	{
 		SE_LOG(LogDirectX, Error, L"CreateConstantBufferView: index is over than NumDescriptors.");
 		return;
@@ -35,7 +35,7 @@ void DirectXShaderResourceView::CreateConstantBufferView(size_t index, uint64 bu
 
 void DirectXShaderResourceView::CreateShaderResourceView(size_t index, ID3D12Resource* srvTarget, const D3D12_SHADER_RESOURCE_VIEW_DESC* srvDesc)
 {
-	if (index > NumDescriptors)
+	if (index >= NumDescriptors)
 	{
 		SE_LOG(LogDirectX, Error, L"CreateShaderResourceView: index is over than NumDescriptors.");
 		return;
@@ -47,7 +47,7 @@ void DirectXShaderResourceView::CreateShaderResourceView(size_t index, ID3D12Res
 
 void DirectXShaderResourceView::CreateUnorderedAccessView(size_t index, ID3D12Resource* uavTarget, ID3D12Resource* counterResource, const D3D12_UNORDERED_ACCESS_VIEW_DESC* uavDesc)
 {
-	if (index > NumDescriptors)
+	if (index >= NumDescriptors)
 	{
 		SE_LOG(LogDirectX, Error, L"CreateUnorderedAccessView: index is over than NumDescriptors.");
 		return;

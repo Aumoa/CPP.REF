@@ -17,6 +17,7 @@
 #include "NullReferenceException.h"
 #include "IndexOutOfRangeException.h"
 #include "NotSupportedException.h"
+#include "IOException.h"
 
 #include "Mathematics/Math.h"
 #include "Mathematics/TAngleDef.h"

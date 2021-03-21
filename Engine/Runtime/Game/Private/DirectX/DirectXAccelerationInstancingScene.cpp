@@ -40,12 +40,13 @@ void DirectXAccelerationInstancingScene::UpdateScene()
 
 	// Write instance description to gpu-based buffer.
 	actualInstanceCount = 0;
+	uint32 shaderRecords = 0;
 	for (size_t i = 0; i < proxies.size(); ++i)
 	{
 		// Without null referenced instance.
 		if (proxies[i] != nullptr && proxies[i]->PrimitiveAccelerationPtr != 0)
 		{
-			instances[instances_size++] = GetRaytracingInstanceDesc(proxies[i]);
+			instances[instances_size++] = GetRaytracingInstanceDesc(shaderRecords, proxies[i]);
 			actualInstanceCount += 1;
 		}
 	}
@@ -198,12 +199,12 @@ void DirectXAccelerationInstancingScene::CheckAndReallocate(size_t desiredCount)
 	lastCount = desiredCount;
 }
 
-D3D12_RAYTRACING_INSTANCE_DESC DirectXAccelerationInstancingScene::GetRaytracingInstanceDesc(const PrimitiveSceneProxy* sceneProxy) const
+D3D12_RAYTRACING_INSTANCE_DESC DirectXAccelerationInstancingScene::GetRaytracingInstanceDesc(uint32& shaderRecords, const PrimitiveSceneProxy* sceneProxy) const
 {
 	D3D12_RAYTRACING_INSTANCE_DESC instance = { };
 	instance.InstanceID = sceneProxy->PrimitiveId;
 	instance.InstanceMask = 0xFF;
-	instance.InstanceContributionToHitGroupIndex = instance.InstanceID;
+	instance.InstanceContributionToHitGroupIndex = shaderRecords;
 	instance.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 	instance.AccelerationStructure = sceneProxy->PrimitiveAccelerationPtr;
 
@@ -222,5 +223,7 @@ D3D12_RAYTRACING_INSTANCE_DESC DirectXAccelerationInstancingScene::GetRaytracing
 	instance.Transform[2][1] = matrix._23;
 	instance.Transform[2][2] = matrix._33;
 	instance.Transform[2][3] = matrix._43;
+
+	shaderRecords += (uint32)sceneProxy->InstanceShaderRecord.size();
 	return instance;
 }

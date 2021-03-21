@@ -20,6 +20,7 @@ private:
 	Engine* engine;
 	std::map<TRefPtr<String>, TRefPtr<StaticMesh>> staticMeshes;
 	std::map<TRefPtr<String>, TRefPtr<Material>> materials;
+	TRefPtr<Material> defaultMaterial;
 
 public:
 	AssetManager(Engine* engine);

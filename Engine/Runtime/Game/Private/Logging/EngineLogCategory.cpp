@@ -21,3 +21,4 @@ LogCategoryBase LogCOM(ELogVerbosity::Verbose, nameof(LogCOM));
 LogCategoryBase LogWindows(ELogVerbosity::Verbose, nameof(LogWindows));
 LogCategoryBase LogDirectX(ELogVerbosity::Verbose, nameof(LogDirectX));
 LogCategoryBase LogGameObject(ELogVerbosity::Verbose, nameof(LogGameObject));
+LogCategoryBase LogAssets(ELogVerbosity::Verbose, nameof(LogAssets));

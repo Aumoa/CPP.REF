@@ -24,3 +24,4 @@ extern LogCategoryBase LogCOM;
 extern LogCategoryBase LogWindows;
 extern LogCategoryBase LogDirectX;
 extern LogCategoryBase LogGameObject;
+extern LogCategoryBase LogAssets;

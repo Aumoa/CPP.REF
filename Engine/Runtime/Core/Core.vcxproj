@@ -241,6 +241,7 @@
     <ClInclude Include="Public\IndexOutOfRangeException.h" />
     <ClInclude Include="Public\InvalidCastException.h" />
     <ClInclude Include="Public\IEnumerable.h" />
+    <ClInclude Include="Public\IOException.h" />
     <ClInclude Include="Public\IStringFormattable.h" />
     <ClInclude Include="Public\Mathematics\TAngleDef.h" />
     <ClInclude Include="Public\Mathematics\Math.h" />
@@ -265,6 +266,7 @@
     <ClInclude Include="Public\Numerics\Vector3.h" />
     <ClInclude Include="Public\Numerics\Vector4.h" />
     <ClInclude Include="Public\Path.h" />
+    <ClInclude Include="Public\PathTooLongException.h" />
     <ClInclude Include="Public\StdContainers.h" />
     <ClInclude Include="Public\Time\Duration.h" />
     <ClInclude Include="Public\Time\StepTimer.h" />
@@ -302,6 +304,7 @@
     <ClCompile Include="Private\FormatException.cpp" />
     <ClCompile Include="Private\IndexOutOfRangeException.cpp" />
     <ClCompile Include="Private\InvalidCastException.cpp" />
+    <ClCompile Include="Private\IOException.cpp" />
     <ClCompile Include="Private\Mathematics\Math.cpp" />
     <ClCompile Include="Private\NotSupportedException.cpp" />
     <ClCompile Include="Private\NullReferenceException.cpp" />

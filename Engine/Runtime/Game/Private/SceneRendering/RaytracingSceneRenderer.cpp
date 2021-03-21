@@ -46,18 +46,37 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 	DirectXShaderBindingTable* sbt = scene->ShaderBindingTable;
 
 	// Fill instanced hit group records.
-	std::vector<DirectXInstanceShaderRecord> hitGroupRecords;
-	std::vector<DirectXInstanceShaderRecord> missRecords;
+	static thread_local std::vector<DirectXInstanceShaderRecord> hitGroupRecords;
+	static thread_local std::vector<DirectXInstanceShaderRecord> missRecords;
 	
 	const auto& primitives = scene->GetPrimitives();
-	hitGroupRecords.reserve(primitives.size());
+
+	// Calc count of shader records.
+	size_t shaderRecords = 0;
 	for (auto& primitive : primitives)
 	{
-		hitGroupRecords.emplace_back(primitive->InstanceShaderRecord);
+		shaderRecords += primitive->InstanceShaderRecord.size();
+	}
+
+	// Assign shader records.
+	hitGroupRecords.resize(0);
+	hitGroupRecords.reserve(shaderRecords);
+	for (auto& primitive : primitives)
+	{
+		for (size_t i = 0; i < primitive->InstanceShaderRecord.size(); ++i)
+		{
+			auto record = primitive->InstanceShaderRecord[i];
+			for (auto app : primitive->DeferredShaderRecords[i].ShaderRecordApps)
+			{
+				record.RootParameters.emplace_back(allocator->GetGPUHandle(allocator->Issue(app)).ptr);
+			}
+			hitGroupRecords.emplace_back(record);
+		}
 	}
 
 	// Fill instanced miss records.
 	// In most cases, this is may be sky sphere.
+	missRecords.resize(0);
 	missRecords.emplace_back(0);
 
 	sbt->Init(cached, hitGroupRecords, missRecords);
