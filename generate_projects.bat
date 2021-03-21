@@ -1,4 +1,4 @@
-:: Copyright 2020 Aumoa.lib. All right reserved.
+:: Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 @echo off
 
@@ -23,15 +23,6 @@ if exist vc16win64 rmdir /s /q vc16win64
 cd ..
 call generate_projects.bat
 cd ../..
-
-echo -
-echo ---------- cmake glfw ----------
-echo -
-
-cd glfw
-if exist BINARIES rmdir /s /q BINARIES
-call generate_projects.bat
-cd ..
 
 :: Exit from ThirdParty
 cd ..
