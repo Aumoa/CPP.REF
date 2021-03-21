@@ -1,6 +1,6 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "CoreString.h"
+#include "Core/String.h"
 
 #undef interface
 #include <Windows.h>

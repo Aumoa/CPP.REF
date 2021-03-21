@@ -3,7 +3,7 @@
 #include "Numerics/Plane.h"
 
 #include "HashHelper.h"
-#include "CoreString.h"
+#include "Core/String.h"
 #include "Mathematics/Math.h"
 
 Plane::Plane()

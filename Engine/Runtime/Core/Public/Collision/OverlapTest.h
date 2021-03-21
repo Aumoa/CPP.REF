@@ -4,7 +4,7 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
-#include "Object.h"
+#include "Core/Object.h"
 
 struct Frustum;
 struct Vector3;

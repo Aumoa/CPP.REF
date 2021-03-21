@@ -5,7 +5,7 @@
 #include "Mathematics/Math.h"
 #include "Mathematics/Math.inl"
 #include "HashHelper.h"
-#include "CoreString.h"
+#include "Core/String.h"
 
 using namespace std;
 

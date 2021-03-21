@@ -5,7 +5,7 @@
 #include "CoreAPI.h"
 
 #include "TRefPtr.h"
-#include "CoreString.h"
+#include "Core/String.h"
 
 class CORE_API Exception
 {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreAPI.h"
-#include "Object.h"
+#include "Core/Object.h"
 
 class HashHelper abstract final : virtual public Object
 {

@@ -1,10 +1,10 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Object.h"
+#include "Core/Object.h"
 
 #include "TRefPtr.h"
 #include <typeinfo>
-#include "CoreString.h"
+#include "Core/String.h"
 
 #undef interface
 #include <Windows.h>

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreAPI.h"
-#include "Object.h"
+#include "Core/Object.h"
 
 template<template<class> class T, class TItem>
 interface IConstEnumerable

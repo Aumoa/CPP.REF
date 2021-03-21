@@ -2,7 +2,7 @@
 
 #include "Numerics/ObjectOrientedCube.h"
 
-#include "CoreString.h"
+#include "Core/String.h"
 
 using namespace std;
 

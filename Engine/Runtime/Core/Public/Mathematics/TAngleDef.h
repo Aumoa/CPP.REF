@@ -4,7 +4,7 @@
 
 #include "CoreAPI.h"
 #include "CoreConcepts.h"
-#include "CoreString.h"
+#include "Core/String.h"
 
 #include "Math.h"
 
