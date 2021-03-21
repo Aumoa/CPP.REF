@@ -53,6 +53,7 @@ StaticMesh::StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryD
 {
 	vertexBuffer = CreateVertexBuffer(inGeometryData.VertexBuffer);
 	indexBuffer = CreateIndexBuffer(inGeometryData.IndexBuffer);
+	subsets = inGeometryData.Subsets;
 
 	DirectXCommandQueue* commandQueue = engine->GetPrimaryCommandQueue();
 	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();

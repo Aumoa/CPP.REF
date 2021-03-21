@@ -41,6 +41,7 @@ private:
 	TComPtr<ID3D12Resource> indexBuffer;
 	TComPtr<ID3D12Resource> accelerationStructure;
 	AxisAlignedCube boundingBox;
+	std::vector<StaticMeshSubsetInfo> subsets;
 
 	TRefPtr<Material> material;
 
@@ -53,6 +54,7 @@ public:
 	vs_property_get_auto(ID3D12Resource*, RaytracingAccelerationStructureBuffer, accelerationStructure.Get());
 	vs_property_get_auto(ID3D12Resource*, VertexBuffer, vertexBuffer.Get());
 	vs_property_get_auto(ID3D12Resource*, IndexBuffer, indexBuffer.Get());
+	vs_property_get_auto(std::vector<StaticMeshSubsetInfo>, Subsets, subsets);
 
 private:
 	static AxisAlignedCube ComputeBoundingBox(std::span<Vertex const> vertices);

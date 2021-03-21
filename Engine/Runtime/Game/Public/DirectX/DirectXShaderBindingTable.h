@@ -42,6 +42,7 @@ struct GAME_API DirectXInstanceShaderRecord
 
 	DirectXInstanceShaderRecord(size_t shaderIndex = 0, const std::vector<uint64>& inParams = { });
 	DirectXInstanceShaderRecord(size_t shaderIndex, std::vector<uint64>&& inParams);
+	DirectXInstanceShaderRecord(const DirectXInstanceShaderRecord&) = default;
 };
 
 class GAME_API DirectXShaderBindingTable : public DirectXDeviceResource

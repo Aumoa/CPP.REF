@@ -17,6 +17,7 @@
 #include "DirectX/DirectXCompatibleRenderTarget.h"
 #include "Assets/AssetManager.h"
 #include "Assets/CachedShaderLibrary.h"
+#include "Assets/AssetImporter.h"
 #include "Time/StepTimer.h"
 #include "COM/COMDeviceBundle.h"
 
@@ -43,6 +44,7 @@ void Engine::Initialize(GameInstance* gameInstance)
 	DirectXNew(primaryQueue, DirectXCommandQueue, deviceBundle.Get());
 	assetManager = NewObject<AssetManager>(this);
 	comBundle = NewObject<COMDeviceBundle>();
+	assimp = NewObject<AssetImporter>(this);
 
 	swapChain = NewObject<DirectXSwapChain>(deviceBundle.Get(), primaryQueue.Get(), gameInstance->MainWindow, DXGI_FORMAT_B8G8R8A8_UNORM);
 	DirectXNew(immediateContext, DirectXImmediateContext, deviceBundle.Get(), primaryQueue.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -71,6 +73,7 @@ void Engine::Shutdown()
 
 	CycleStatsGroup::ReadyToShutdown();
 	swapChain.Reset();
+	assimp.Reset();
 }
 
 void Engine::Render()
@@ -130,6 +133,11 @@ CachedShaderLibrary* Engine::GetCachedShaderLibrary() const
 GameViewport* Engine::GetLocalViewport() const
 {
 	return gameViewport.Get();
+}
+
+AssetImporter* Engine::GetAssetImporter() const
+{
+	return assimp.Get();
 }
 
 void Engine::MainWindow_OnSizing(int32 x, int32 y)

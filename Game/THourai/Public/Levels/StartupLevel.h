@@ -15,6 +15,7 @@ class ADirectionalLight;
 class APointLight;
 class ARotateLight;
 class ASpotLight;
+class Engine;
 
 class TH_API GStartupLevel : public GLevel
 {
@@ -36,6 +37,8 @@ private:
 
 	ASpectatorPawn* spectator;
 
+	AStaticMeshActor* sakura_miku;
+
 public:
 	GStartupLevel();
 	~GStartupLevel() override;
@@ -43,4 +46,8 @@ public:
 	void LoadLevel() override;
 
 	APawn* GetPersistentActor() const;
+
+private:
+	void LoadAssets(Engine* engine);
+	void ImportStaticMesh(Engine* engine, TRefPtr<String> keyAndPath);
 };

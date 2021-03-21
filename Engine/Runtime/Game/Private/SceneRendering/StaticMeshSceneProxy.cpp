@@ -37,11 +37,22 @@ void StaticMeshSceneProxy::Update()
 	if (staticMesh != nullptr)
 	{
 		PrimitiveAccelerationPtr = staticMesh->RaytracingAccelerationStructureBuffer->GetGPUVirtualAddress();
-		InstanceShaderRecord.ShaderIndex = 0;
-		InstanceShaderRecord.RootParameters.resize(0);
-		InstanceShaderRecord.RootParameters.emplace_back(staticMesh->VertexBuffer->GetGPUVirtualAddress());
-		InstanceShaderRecord.RootParameters.emplace_back(staticMesh->IndexBuffer->GetGPUVirtualAddress());
-		InstanceShaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
+
+		InstanceShaderRecord.resize(0);
+		for (auto& subset : staticMesh->Subsets)
+		{
+			uint64 vertexBufferView = staticMesh->VertexBuffer->GetGPUVirtualAddress();
+			vertexBufferView += subset.VertexStart * sizeof(Vertex);
+
+			uint64 indexBufferView = staticMesh->IndexBuffer->GetGPUVirtualAddress();
+			indexBufferView += subset.IndexStart * sizeof(uint32);
+
+			DirectXInstanceShaderRecord& shaderRecord = InstanceShaderRecord.emplace_back();
+			shaderRecord.ShaderIndex = 0;
+			shaderRecord.RootParameters.emplace_back(vertexBufferView);
+			shaderRecord.RootParameters.emplace_back(indexBufferView);
+			shaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
+		}
 	}
 }
 

@@ -35,7 +35,7 @@ public:
 	uint64 PrimitiveId;
 	AxisAlignedCube PrimitiveBoundingBox;
 	uint64 PrimitiveAccelerationPtr;
-	DirectXInstanceShaderRecord InstanceShaderRecord;
+	std::vector<DirectXInstanceShaderRecord> InstanceShaderRecord;
 
 protected:
 	uint64 GetInstanceTransformBuf() const;

@@ -109,6 +109,9 @@
     <Filter Include="Private\GameplayStatics">
       <UniqueIdentifier>{45b3c9f1-50f3-4a68-80ff-c5dd14b17fe8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\Assets\Parser">
+      <UniqueIdentifier>{2253488b-3bfe-4824-9f59-c2a231b85a6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\GameAPI.h">
@@ -345,9 +348,6 @@
     <ClInclude Include="Public\DirectX\DirectXSwapChain.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Private\COM\COMMinimal.h">
-      <Filter>Private\COM</Filter>
-    </ClInclude>
     <ClInclude Include="Public\DirectX\DirectXCommandQueue.h">
       <Filter>Public\DirectX</Filter>
     </ClInclude>
@@ -485,6 +485,18 @@
     </ClInclude>
     <ClInclude Include="Public\Framework\SpotLight.h">
       <Filter>Public\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\AssetImporter.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Assets\Parser\AssimpParser.h">
+      <Filter>Private\Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Assets\Parser\ParserBase.h">
+      <Filter>Private\Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\COM\COMMinimal.h">
+      <Filter>Public\COM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -784,6 +796,15 @@
     </ClCompile>
     <ClCompile Include="Private\Framework\SpotLight.cpp">
       <Filter>Private\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\AssetImporter.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\Parser\ParserBase.cpp">
+      <Filter>Private\Assets\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp">
+      <Filter>Private\Assets\Parser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
