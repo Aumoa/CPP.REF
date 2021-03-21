@@ -36,8 +36,8 @@ cd ..
 :: Exit from ThirdParty
 cd ..
 
-call Build\Program\net5.0\GUIDRemover.exe "ThirdParty"
-call Build\Program\net5.0\GUIDRemover.exe "Engine"
-call Build\Program\net5.0\GUIDRemover.exe "Game"
+call Program\Binaries\GUIDRemover\net5.0\GUIDRemover.exe "ThirdParty"
+call Program\Binaries\GUIDRemover\net5.0\GUIDRemover.exe "Engine"
+call Program\Binaries\GUIDRemover\net5.0\GUIDRemover.exe "Game"
 
 pause
