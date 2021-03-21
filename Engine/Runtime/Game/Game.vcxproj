@@ -256,7 +256,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Private\COM\COMMinimal.h" />
     <ClInclude Include="Private\DirectX\Bezier.h" />
     <ClInclude Include="Private\DirectX\DirectXCommon.h" />
     <ClInclude Include="Private\EngineCriticalException.h" />
@@ -297,6 +296,7 @@
     <ClInclude Include="Public\COM\COMException.h" />
     <ClInclude Include="Public\COM\COMImage.h" />
     <ClInclude Include="Public\COM\COMImageLoader.h" />
+    <ClInclude Include="Public\COM\COMMinimal.h" />
     <ClInclude Include="Public\COM\TComPtr.h" />
     <ClInclude Include="Public\DeferredGameViewport.h" />
     <ClInclude Include="Public\Diagnostics\ScopedCycleCounter.h" />
