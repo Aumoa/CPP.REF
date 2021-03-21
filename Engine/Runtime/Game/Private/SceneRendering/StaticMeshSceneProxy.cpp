@@ -35,7 +35,7 @@ void StaticMeshSceneProxy::Update()
 	if (staticMesh != nullptr)
 	{
 		InstanceShaderRecord.resize(0);
-		ShaderRecordApps.resize(0);
+		DeferredShaderRecords.resize(0);
 		Materials.resize(0);
 
 		PrimitiveAccelerationPtr = staticMesh->RaytracingAccelerationStructureBuffer->GetGPUVirtualAddress();
@@ -53,9 +53,11 @@ void StaticMeshSceneProxy::Update()
 			shaderRecord.RootParameters.emplace_back(indexBufferView);
 			shaderRecord.RootParameters.emplace_back(GetInstanceTransformBuf());
 
+			DeferredShaderRecordApp& deferredApp = DeferredShaderRecords.emplace_back();
+
 			if (subset.Material != nullptr)
 			{
-				ShaderRecordApps.emplace_back(subset.Material->SurfaceTextureSRV);
+				deferredApp.ShaderRecordApps.emplace_back(subset.Material->SurfaceTextureSRV);
 				Materials.emplace_back(subset.Material);
 			}
 		}

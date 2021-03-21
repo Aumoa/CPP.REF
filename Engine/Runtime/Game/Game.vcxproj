@@ -266,7 +266,6 @@
     <ClInclude Include="Private\EngineCriticalException.h" />
     <ClInclude Include="Private\Logging\EngineLogCategory.h" />
     <ClInclude Include="Private\Logging\LogMacros.h" />
-    <ClInclude Include="Private\Materials\MaterialInstance.h" />
     <ClInclude Include="Private\Shaders\ShaderTypes.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanCommandList.h" />
     <ClInclude Include="Private\VulkanRHI\VulkanDeviceBundle.h" />

@@ -250,7 +250,7 @@ TComPtr<ID3D12Resource> DirectXDeviceBundle::CreateTexture2D(COMImage* image, Di
 	// Copy pixels.
 	void* pData;
 	HR(uploadHeap->Map(0, nullptr, &pData));
-	//image->CopyPixels(layout.Footprint.RowPitch, totalBytes, (int8*)pData);
+	image->CopyPixels(layout.Footprint.RowPitch, totalBytes, (int8*)pData);
 	uploadHeap->Unmap(0, nullptr);
 
 	// Ready to upload to destination texture heap.

@@ -20,6 +20,11 @@ class GAME_API PrimitiveSceneProxy : public Object
 public:
 	using Super = Object;
 
+	struct DeferredShaderRecordApp
+	{
+		std::vector<DirectXShaderResourceView*> ShaderRecordApps;
+	};
+
 private:
 	TWeakPtr<GPrimitiveComponent> myPrimitiveComponent;
 	TRefPtr<DirectXDynamicBuffer> instanceTransformBuf;
@@ -38,7 +43,7 @@ public:
 	AxisAlignedCube PrimitiveBoundingBox;
 	uint64 PrimitiveAccelerationPtr;
 	std::vector<DirectXInstanceShaderRecord> InstanceShaderRecord;
-	std::vector<DirectXShaderResourceView*> ShaderRecordApps;
+	std::vector<DeferredShaderRecordApp> DeferredShaderRecords;
 	std::vector<MaterialInterface*> Materials;
 
 protected:

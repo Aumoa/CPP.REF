@@ -54,6 +54,7 @@ public:
 	CachedShaderLibrary* GetCachedShaderLibrary() const;
 	GameViewport* GetLocalViewport() const;
 	AssetImporter* GetAssetImporter() const;
+	COMDeviceBundle* GetCOMDevice() const;
 
 private:
 	void Render();

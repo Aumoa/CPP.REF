@@ -140,6 +140,11 @@ AssetImporter* Engine::GetAssetImporter() const
 	return assimp.Get();
 }
 
+COMDeviceBundle* Engine::GetCOMDevice() const
+{
+	return comBundle.Get();
+}
+
 void Engine::MainWindow_OnSizing(int32 x, int32 y)
 {
 	if (x * y != 0)

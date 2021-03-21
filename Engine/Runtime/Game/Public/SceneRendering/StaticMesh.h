@@ -43,6 +43,7 @@ private:
 	TComPtr<ID3D12Resource> accelerationStructure;
 	AxisAlignedCube boundingBox;
 	std::vector<StaticMeshSubsetInfo> subsets;
+	std::vector<TRefPtr<Material>> materialCapture;
 
 public:
 	StaticMesh(Engine* engine, const StaticMeshGeometryData& inGeometryData);

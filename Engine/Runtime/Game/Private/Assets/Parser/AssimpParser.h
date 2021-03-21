@@ -6,6 +6,8 @@
 #include "CoreMinimal.h"
 #include "ParserBase.h"
 
+#include "COM/COMMinimal.h"
+
 namespace Assimp
 {
 	class Importer;
@@ -14,6 +16,7 @@ namespace Assimp
 class Engine;
 class Material;
 struct aiScene;
+interface ID3D12Resource;
 
 class AssimpParser : public ParserBase
 {
@@ -25,6 +28,7 @@ private:
 	std::unique_ptr<Assimp::Importer> myImporter;
 	const aiScene* myScene;
 
+	TRefPtr<String> directoryName;
 	std::vector<TRefPtr<Material>> materials;
 	TRefPtr<StaticMesh> staticMesh;
 
@@ -40,4 +44,5 @@ public:
 private:
 	bool ProcessMaterials();
 	bool ProcessStaticMeshSubsets();
+	TComPtr<ID3D12Resource> LoadImageTexture(TRefPtr<String> filepath);
 };

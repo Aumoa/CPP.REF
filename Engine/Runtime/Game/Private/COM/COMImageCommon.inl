@@ -16,6 +16,7 @@ static std::tuple<DXGI_FORMAT, WICPixelFormatGUID, size_t> convertTable[]
 	{ DXGI_FORMAT_R8G8B8A8_UNORM, GUID_WICPixelFormat32bppPRGBA, 32 },
 	{ DXGI_FORMAT_UNKNOWN, GUID_WICPixelFormat24bppBGR, 24 },
 	{ DXGI_FORMAT_UNKNOWN, GUID_WICPixelFormat24bppRGB, 24 },
+	{ DXGI_FORMAT_B8G8R8A8_UNORM, GUID_WICPixelFormat32bppBGRA, 32 },
 };
 static constexpr size_t convertTable_ArraySize = sizeof(convertTable) / sizeof(convertTable[0]);
 

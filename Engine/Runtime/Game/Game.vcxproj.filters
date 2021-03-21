@@ -312,9 +312,6 @@
     <ClInclude Include="Public\Materials\MaterialInterface.h">
       <Filter>Public\Materials</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Materials\MaterialInstance.h">
-      <Filter>Private\Materials</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Materials\Material.h">
       <Filter>Public\Materials</Filter>
     </ClInclude>

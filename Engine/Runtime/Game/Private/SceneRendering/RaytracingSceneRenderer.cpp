@@ -63,9 +63,10 @@ void RaytracingSceneRenderer::RenderScene(ID3D12GraphicsCommandList4* inCommandL
 	hitGroupRecords.reserve(shaderRecords);
 	for (auto& primitive : primitives)
 	{
-		for (auto record : primitive->InstanceShaderRecord)
+		for (size_t i = 0; i < primitive->InstanceShaderRecord.size(); ++i)
 		{
-			for (auto app : primitive->ShaderRecordApps)
+			auto record = primitive->InstanceShaderRecord[i];
+			for (auto app : primitive->DeferredShaderRecords[i].ShaderRecordApps)
 			{
 				record.RootParameters.emplace_back(allocator->GetGPUHandle(allocator->Issue(app)).ptr);
 			}

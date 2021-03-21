@@ -52,7 +52,8 @@ void GStartupLevel::LoadLevel()
 	light = SpawnActorPersistent<ADirectionalLight>();
 	light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
 	light->LightComponent->LightColor = Color::White;
-	light->LightComponent->Diffuse = 0.2f;
+	light->LightComponent->Ambient = 0;
+	light->LightComponent->Diffuse = 0.05f;
 	light->LightComponent->Specular = 0;
 	spotLight = SpawnActorPersistent<ASpotLight>();
 	spotLight->LightComponent->LightColor = Color::Blue;
@@ -71,9 +72,9 @@ void GStartupLevel::LoadLevel()
 		mesh->StaticMesh->Location = Vector3(1.2f, 4.0f, 0);
 	}
 
-	//sakura_miku = SpawnActorPersistent<AStaticMeshActor>();
-	//sakura_miku->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Sakura_Miku/Sakura_Miku.x"));
-	//sakura_miku->SetActorScale(0.1f);
+	sakura_miku = SpawnActorPersistent<AStaticMeshActor>();
+	sakura_miku->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Sakura_Miku/Sakura_Miku.x"));
+	sakura_miku->SetActorScale(0.1f);
 
 	plane = SpawnActorPersistent<AStaticMeshActor>();
 	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
@@ -96,7 +97,6 @@ void GStartupLevel::LoadLevel()
 	GSpotLightComponent* pointLight = spectator->AddComponent<GSpotLightComponent>();
 	pointLight->Mobility = EComponentMobility::Movable;
 	pointLight->AttachToComponent(spectator->RootComponent);
-	pointLight->LightColor = Color(0, 0.3f, 0);
 	pointLight->RegisterComponentWithWorld(GetWorld());
 
 	rotateLight = SpawnActorPersistent<ARotateLight>();
