@@ -81,6 +81,8 @@ public:
 	std::optional<size_t> IndexOf(wchar_t value, size_t startIndex = 0, bool bIgnoreCase = false) const;
 	std::optional<size_t> IndexOfAny(const wchar_t* value_sequence, size_t length, size_t startIndex = 0, bool bIgnoreCase = false) const;
 
+	std::string AsMultiByte() const;
+
 	vs_property_get(const wchar_t*, C_Str);
 	vs_property_get(size_t, Length);
 
@@ -110,6 +112,8 @@ public:
 	template<THasStdEnumerable TContainer> requires TIsStringConstructible<decltype(*std::begin(TContainer()))>
 	static TRefPtr<String> Concat(const TContainer& values);
 	static TRefPtr<String> Concat(const std::span<TRefPtr<String>>& values);
+	static bool IsNullOrEmpty(const TRefPtr<String>& value);
+	static bool IsNullOrWhiteSpace(const TRefPtr<String>& value);
 
 	static const TRefPtr<String> Empty;
 

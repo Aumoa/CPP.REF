@@ -18,6 +18,28 @@ const TRefPtr<String> String::Empty = Object::NewObject<String>(EmptyBuffer);
 #define ThrowArg(exp) if (exp) { throw ArgumentException(L ## #exp); }
 #define ThrowIfInvalid(exp) if (!exp.IsValid) { throw ArgumentNullException(L"!" L ## #exp); }
 
+namespace
+{
+    inline bool IsLatin1(wchar_t ch)
+    {
+        return ch <= '\x00ff';
+    }
+
+    inline bool IsWhiteSpaceLatin1(wchar_t ch)
+    {
+        return (ch == ' ') || (ch >= '\x0009' && ch <= '\x000d') || ch == '\x00a0' || ch == '\x0085';
+    }
+
+    inline bool IsWhiteSpace(wchar_t ch)
+    {
+        if (IsLatin1(ch))
+        {
+            return IsWhiteSpaceLatin1(ch);
+        }
+        return false;
+    }
+}
+
 String::String() : Super()
 	, text_buffer(nullptr)
 	, len(0)
@@ -256,6 +278,17 @@ optional<size_t> String::IndexOfAny(const wchar_t* value_sequence, size_t length
     return nullopt;
 }
 
+string String::AsMultiByte() const
+{
+    string buf;
+
+    int length = ::WideCharToMultiByte(CP_ACP, 0, text_buffer, (int)len, nullptr, 0, nullptr, FALSE);
+    buf.resize(length, ' ');
+    ::WideCharToMultiByte(CP_ACP, 0, text_buffer, (int)len, buf.data(), length, nullptr, FALSE);
+
+    return buf;
+}
+
 const wchar_t* String::C_Str_get() const
 {
 	return text_buffer;
@@ -465,6 +498,29 @@ TRefPtr<String> String::Concat(const span<TRefPtr<String>>& values)
     finally.Detach();
 
     return move(result);
+}
+
+bool String::IsNullOrEmpty(const TRefPtr<String>& value)
+{
+    return !value.IsValid || value->Length == 0;
+}
+
+bool String::IsNullOrWhiteSpace(const TRefPtr<String>& value)
+{
+    if (!value.IsValid)
+    {
+        return true;
+    }
+
+    for (size_t i = 0; i < value->Length; i++)
+    {
+        if (!IsWhiteSpace(value[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 TRefPtr<String> String::FormatHelper(TRefPtr<String> format, const span<TRefPtr<Object>>& unpackedArgs)
