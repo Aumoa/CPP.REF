@@ -356,6 +356,8 @@ ThirdParty/PhysX/physx/bin/*/*/*
 !ThirdParty/PhysX/physx/bin/*/*/glut32.dll
 !ThirdParty/PhysX/physx/bin/*/*/PhysXDevice64.dll
 !ThirdParty/PhysX/physx/bin/*/*/PhysXGpu_64.dll
+!ThirdParty/fbxsdk/2018.1.1/lib/vs2015/x64
+!ThirdParty/fbxsdk/2018.1.1/lib/vs2015/x64/release
 
 # Program builds
 Build/*

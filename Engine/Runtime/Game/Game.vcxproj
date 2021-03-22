@@ -109,18 +109,21 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\</OutDir>
+    <LibraryPath>$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\lib\vs2015\x64\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\</OutDir>
+    <LibraryPath>$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\lib\vs2015\x64\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Runtime\Core\Public\;$(ProjectDir)Public\;$(ProjectDir)Private\;$(SolutionDir)ThirdParty\assimp\include\;$(SolutionDir)ThirdParty\assimp\BINARIES\x64\include\;$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\include\;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\</OutDir>
+    <LibraryPath>$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\lib\vs2015\x64\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -183,7 +186,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;DXGI.lib;WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;WindowsCodecs.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
@@ -192,8 +195,9 @@
       <ObjectFileOutput />
     </FxCompile>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-      <Message>Assimp Binaries copy to Output Directory.</Message>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
+xcopy "$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\lib\vs2015\x64\release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Message>Assimp, FbxSDK Binaries copy to Output Directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -213,7 +217,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;DXGI.lib;WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;WindowsCodecs.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
@@ -222,8 +226,9 @@
       <ObjectFileOutput />
     </FxCompile>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-      <Message>Assimp Binaries copy to Output Directory.</Message>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
+xcopy "$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\lib\vs2015\x64\release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Message>Assimp, FbxSDK Binaries copy to Output Directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
@@ -244,7 +249,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>D3D12.lib;DXGI.lib;WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D3D12.lib;DXGI.lib;WindowsCodecs.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
@@ -254,8 +259,9 @@
       </ObjectFileOutput>
     </FxCompile>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
-      <Message>Assimp Binaries copy to Output Directory.</Message>
+      <Command>xcopy "$(SolutionDir)ThirdParty\assimp\BINARIES\x64\bin\Release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt
+xcopy "$(SolutionDir)ThirdParty\fbxsdk\2018.1.1\lib\vs2015\x64\release\" "$(OutDir)" /y /exclude:$(SolutionDir)ThirdParty\xcopyexc.txt</Command>
+      <Message>Assimp, FbxSDK Binaries copy to Output Directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
