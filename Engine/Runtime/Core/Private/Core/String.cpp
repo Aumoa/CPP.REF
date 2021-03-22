@@ -749,9 +749,9 @@ TRefPtr<String> String::FormatHelper(TRefPtr<String> format, const span<TRefPtr<
 
 wchar_t* String::MultiByteToWideChar(const char* multibyte, size_t* len)
 {
-	int length = ::MultiByteToWideChar(CP_ACP, 0, multibyte, (int)*len, nullptr, 0);
+	int length = ::MultiByteToWideChar(CP_UTF8, 0, multibyte, (int)*len, nullptr, 0);
     auto* buffer = AllocCharBuffer<wchar_t>(*len + 1);
-	::MultiByteToWideChar(CP_ACP, 0, multibyte, (int)*len, buffer, length);
+	::MultiByteToWideChar(CP_UTF8, 0, multibyte, (int)*len, buffer, length);
 	*len = length;
 	return buffer;
 }
