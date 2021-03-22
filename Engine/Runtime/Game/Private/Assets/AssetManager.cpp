@@ -56,7 +56,7 @@ Material* AssetManager::LoadMaterial(TRefPtr<String> key) const
 
 void AssetManager::InitEngineAssets()
 {	
-	defaultMaterial = NewObject<Material>(engine->GetDeviceBundle());
+	Import(L"Engine/Materials/Default", NewObject<Material>(engine->GetDeviceBundle()));
 
 	auto RegisterSingleSubsetGeometry = [&](wstring_view importPath, const vector<Vertex>& vc, const vector<uint32>& ic)
 	{
@@ -65,7 +65,7 @@ void AssetManager::InitEngineAssets()
 		subset.VertexCount = (uint32)vc.size();
 		subset.IndexStart = 0;
 		subset.IndexCount = (uint32)ic.size();
-		subset.Material = defaultMaterial.Get();
+		subset.Material = LoadMaterial(L"Engine/Materials/Default");
 	
 		StaticMeshGeometryData data;
 		data.VertexBuffer = vc;

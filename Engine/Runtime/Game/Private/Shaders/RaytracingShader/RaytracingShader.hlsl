@@ -11,12 +11,12 @@ RWTexture2D<float4> gColorOutput : register(u0);
 
 inline float3 HitAttribute(float3 v1, float3 v2, float3 v3, float2 bary)
 {
-	return (v1 + bary.x * (v2 - v1) + bary.y * (v3 - v1)) * 0.3333f;
+	return (v1 + bary.x * (v2 - v1) + bary.y * (v3 - v1));
 }
 
 inline float2 HitAttribute(float2 v1, float2 v2, float2 v3, float2 bary)
 {
-	return (v1 + bary.x * (v2 - v1) + bary.y * (v3 - v1)) * 0.3333f;
+	return (v1 + bary.x * (v2 - v1) + bary.y * (v3 - v1));
 }
 
 inline RayDesc GenerateRay(uint2 launchIndex, float3 cameraPos, matrix projectionToWorld, float near = 0.01f, float far = 1000.0f)
@@ -278,7 +278,8 @@ inline RayFragment CalcFragment(uint primitiveId, float2 bary)
 	uint triangleIndex[3] = { primitiveID + 0, primitiveID + 1, primitiveID + 2 };
 
 	[unroll]
-	for (uint i = 0; i < 3; ++i) {
+	for (uint i = 0; i < 3; ++i)
+	{
 		triangleIndex[i] = cIndexBuffer[triangleIndex[i]];
 		triangles[i] = cVertexBuffer[triangleIndex[i]];
 	}
