@@ -23,10 +23,9 @@ public:
 	using Super = GLevel;
 	using This = GStartupLevel;
 
-private:
+public:
 	ADirectionalLight* light;
 	APointLight* rotateLight;
-	ASpotLight* spotLight;
 
 	AStaticMeshActor* plane;
 	AStaticMeshActor* geosphere;
@@ -38,6 +37,8 @@ private:
 	ASpectatorPawn* spectator;
 
 	AStaticMeshActor* sakura_miku;
+	AStaticMeshActor* hotaru;
+	AStaticMeshActor* babara;
 
 public:
 	GStartupLevel();

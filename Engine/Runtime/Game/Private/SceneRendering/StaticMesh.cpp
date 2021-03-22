@@ -18,7 +18,6 @@ void StaticMeshGeometryData::Clear(bool bShrinkToFit)
 		VertexBuffer.clear();
 		IndexBuffer.clear();
 		Subsets.clear();
-		Materials.clear();
 	}
 	else
 	{
@@ -28,8 +27,6 @@ void StaticMeshGeometryData::Clear(bool bShrinkToFit)
 		IndexBuffer.swap(indexBufferEmpty);
 		vector<StaticMeshSubsetInfo> subsetsEmpty;
 		Subsets.swap(subsetsEmpty);
-		vector<Material*> materialsEmpty;
-		Materials.swap(materialsEmpty);
 	}
 }
 
@@ -43,7 +40,6 @@ void StaticMeshGeometryData::AddSubset(span<Vertex const> inVertices, span<uint3
 
 	VertexBuffer.insert(VertexBuffer.end(), inVertices.begin(), inVertices.end());
 	IndexBuffer.insert(IndexBuffer.end(), inIndices.begin(), inIndices.end());
-	Materials.emplace_back(inMaterial);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

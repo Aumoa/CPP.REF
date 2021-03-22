@@ -26,7 +26,6 @@ struct StaticMeshGeometryData
 	std::vector<Vertex> VertexBuffer;
 	std::vector<uint32> IndexBuffer;
 	std::vector<StaticMeshSubsetInfo> Subsets;
-	std::vector<Material*> Materials;
 
 	void Clear(bool bShrinkToFit = false);
 	void AddSubset(std::span<Vertex const> inVertices, std::span<uint32 const> inIndices, Material* inMaterial);

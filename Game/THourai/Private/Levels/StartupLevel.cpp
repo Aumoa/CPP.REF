@@ -31,6 +31,8 @@ GStartupLevel::GStartupLevel() : Super()
 	, spectator(nullptr)
 
 	, sakura_miku(nullptr)
+	, hotaru(nullptr)
+	, babara(nullptr)
 {
 
 }
@@ -52,54 +54,28 @@ void GStartupLevel::LoadLevel()
 	light = SpawnActorPersistent<ADirectionalLight>();
 	light->SetActorTransform(Transform(Vector3(0, 100, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -1, 1), Vector3(0, 1, 0))));
 	light->LightComponent->LightColor = Color::White;
-	light->LightComponent->Ambient = 0;
-	light->LightComponent->Diffuse = 0.05f;
-	light->LightComponent->Specular = 0;
-	spotLight = SpawnActorPersistent<ASpotLight>();
-	spotLight->LightComponent->LightColor = Color::Blue;
-	spotLight->SetActorTransform(Transform(Vector3(1.0f, 4.0f, 0), Vector3::One, Quaternion::LookTo(Vector3(-1, -4, 0), Vector3(0, 0, 1))));
+	light->LightComponent->Ambient = 0.8f;
+	light->LightComponent->Diffuse = 1.0f;
+	light->LightComponent->Specular = 0.4f;
+	rotateLight = SpawnActorPersistent<ARotateLight>();
 
-	// StreetLight
-	{
-		auto mesh = SpawnActorPersistent<AStaticMeshActor>();
-		mesh->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Cylinder"));
-		mesh->StaticMesh->Scale = Vector3(0.1f, 4.0f, 0.1f);
-		mesh->StaticMesh->Location = Vector3(1.2f, 2.0f, 0);
+	plane = SpawnActorPersistent<AStaticMeshActor>();
+	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Plane"));
+	plane->StaticMesh->Scale = Vector3(10.0f, 0.1f, 10.0f);
 
-		mesh = SpawnActorPersistent<AStaticMeshActor>();
-		mesh->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/GeoSphere"));
-		mesh->StaticMesh->Scale = 0.2f;
-		mesh->StaticMesh->Location = Vector3(1.2f, 4.0f, 0);
-	}
+	spectator = SpawnActorPersistent<ASpectatorPawn>();
 
 	sakura_miku = SpawnActorPersistent<AStaticMeshActor>();
 	sakura_miku->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Sakura_Miku/Sakura_Miku.x"));
 	sakura_miku->SetActorScale(0.1f);
-
-	plane = SpawnActorPersistent<AStaticMeshActor>();
-	plane->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Box"));
-	plane->StaticMesh->Scale = Vector3(10.0f, 0.1f, 10.0f);
-	teapot = SpawnActorPersistent<AStaticMeshActor>();
-	teapot->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Teapot"));
-	teapot->RootComponent->Location = Vector3(-1.0f, 0.55f, 0);
-	cylinder = SpawnActorPersistent<AStaticMeshActor>();
-	cylinder->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Cylinder"));
-	cylinder->StaticMesh->Location = Vector3(1.0f, 0.55f, 0);
-	cone = SpawnActorPersistent<AStaticMeshActor>();
-	cone->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Cone"));
-	cone->StaticMesh->Location = Vector3(0, 0.55f, -1.0f);
-	icosahedron = SpawnActorPersistent<AStaticMeshActor>();
-	icosahedron->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Engine/StaticMesh/Icosahedron"));
-	icosahedron->StaticMesh->Location = Vector3(0, 0.55f, 1.0f);
-	icosahedron->StaticMesh->Scale = 0.5f;
-
-	spectator = SpawnActorPersistent<ASpectatorPawn>();
-	GSpotLightComponent* pointLight = spectator->AddComponent<GSpotLightComponent>();
-	pointLight->Mobility = EComponentMobility::Movable;
-	pointLight->AttachToComponent(spectator->RootComponent);
-	pointLight->RegisterComponentWithWorld(GetWorld());
-
-	rotateLight = SpawnActorPersistent<ARotateLight>();
+	sakura_miku->SetActorLocation(Vector3(-1.0f, 0, 0));
+	hotaru = SpawnActorPersistent<AStaticMeshActor>();
+	hotaru->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Hotaru/Hotaru.pmx"));
+	hotaru->SetActorScale(0.1f);
+	babara = SpawnActorPersistent<AStaticMeshActor>();
+	babara->StaticMesh->SetStaticMesh(assetMgr->LoadStaticMesh(L"Content/Models/Babara/Babara.pmx"));
+	babara->SetActorScale(0.1f);
+	babara->SetActorLocation(Vector3(1.0f, 0, 0));
 }
 
 APawn* GStartupLevel::GetPersistentActor() const
@@ -109,7 +85,27 @@ APawn* GStartupLevel::GetPersistentActor() const
 
 void GStartupLevel::LoadAssets(Engine* engine)
 {
+	AssetManager* assmgr = engine->GetAssetManager();
+
+	StaticMeshGeometryData planeGeo;
+	planeGeo.VertexBuffer =
+	{
+		Vertex(Vector3(-1, 0, 1), Vector3(0, 1, 0), Vector2(0, 0)),
+		Vertex(Vector3(+1, 0, 1), Vector3(0, 1, 0), Vector2(1, 0)),
+		Vertex(Vector3(+1, 0, -1), Vector3(0, 1, 0), Vector2(1, 1)),
+		Vertex(Vector3(-1, 0, -1), Vector3(0, 1, 0), Vector2(0, 1)),
+	};
+	planeGeo.IndexBuffer =
+	{
+		0, 1, 3,
+		1, 2, 3
+	};
+	planeGeo.Subsets.emplace_back(0, 4, 0, 6, assmgr->LoadMaterial(L"Engine/Materials/Default"));
+	assmgr->Import(L"Content/Plane", NewObject<StaticMesh>(engine, planeGeo));
+
 	ImportStaticMesh(engine, L"Content/Models/Sakura_Miku/Sakura_Miku.x");
+	ImportStaticMesh(engine, L"Content/Models/Hotaru/Hotaru.pmx");
+	ImportStaticMesh(engine, L"Content/Models/Babara/Babara.pmx");
 }
 
 void GStartupLevel::ImportStaticMesh(Engine* engine, TRefPtr<String> keyAndPath)
