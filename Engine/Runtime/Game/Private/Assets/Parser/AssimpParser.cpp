@@ -76,9 +76,9 @@ bool AssimpParser::TryParse(TRefPtr<String> filepath)
 	if (bSkeletalMesh)
 	{
 		SE_LOG(LogAssets, Error, L"SkeletalMesh is not supported yet with assimp library.");
-		return false;
+		//return false;
 	}
-	else
+	//else
 	{
 		if (!ProcessStaticMeshSubsets())
 		{
@@ -150,6 +150,7 @@ bool AssimpParser::ProcessMaterials()
 			TRefPtr<String> fullpath = String::Format(L"{0}/{1}", directoryName, diffuseId.C_Str());
 			if (optional<size_t> index = fullpath->IndexOf(L'*'); index.has_value())
 			{
+				SE_LOG(LogAssets, Verbose, L"Filepath include asterlisk detected. Cut path. Original: {0}", fullpath);
 				fullpath = fullpath->Substring(0, index.value());
 			}
 			
