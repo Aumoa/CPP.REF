@@ -142,7 +142,7 @@ bool AssimpParser::ProcessMaterials()
 		auto aiMat_LoadTexture = [&](auto aiTextureType, int32 index) -> TComPtr<ID3D12Resource>
 		{
 			aiString diffuseId;
-			if (aiMat->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, index), diffuseId) != AI_SUCCESS)
+			if (aiMat->Get(AI_MATKEY_TEXTURE(aiTextureType, index), diffuseId) != AI_SUCCESS)
 			{
 				return nullptr;
 			}
