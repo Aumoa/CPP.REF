@@ -1,9 +1,12 @@
 # Ignore Visual Studio Project Files
 .vs/
-obj/
 *.sln
 *.vcxproj
 *.vcxproj.filters
+*.csproj.*
+Debug/
+*.assets.json
+*.nuget.cache
 
 # Ignore Build Results
 Build/
