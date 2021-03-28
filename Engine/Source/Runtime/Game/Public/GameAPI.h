@@ -2,7 +2,7 @@
 
 #pragma once
 
-#ifdef __SC_RUNTIME_GAME_API__
+#ifdef GAME_BUILD
 
 #pragma warning(disable: 4250)
 

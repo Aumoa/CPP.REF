@@ -4,6 +4,6 @@ public class CoreBuild : BuildRules
 {
     public CoreBuild()
     {
-        
+        CppStandardVersion = CppVersion.Cpp20;
     }
 }
