@@ -24,12 +24,6 @@ class Program
     /// <param name="InArgs"> 첫 번째 인수는 GenerateGameProject가 입력됩니다. </param>
     static void Main(string[] InArgs)
     {
-        InArgs = new string[]
-        {
-            "GenerateEngineSolution",
-            "..\\..\\"
-        };
-
         Log.TraceLog($"Automation Tool Started with {string.Join(" ", InArgs)}");
 
         // AutomationTool을 실행하기 위한 충분한 인수가 전달되었는지 검사합니다.

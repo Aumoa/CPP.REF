@@ -4,11 +4,6 @@ public class GameBuild : BuildRules
 {
     public GameBuild()
     {
-        PrivateDependencyModuleNames.AddRange(new string[]
-        {
-            "CoreSObject"
-        });
-
         PublicDependencyModuleNames.AddRange(new string[]
         {
             "Core"

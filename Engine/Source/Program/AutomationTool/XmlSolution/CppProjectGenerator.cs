@@ -54,7 +54,6 @@ class CppProjectGenerator
         {
             if (File.CompareExtension("cpp") ||
                 File.CompareExtension("c") ||
-                File.CompareExtension("cc") ||
                 File.CompareExtension("cxx"))
             {
                 SourceCodeFiles.Add(File);
@@ -70,9 +69,9 @@ class CppProjectGenerator
     /// 프로젝트 파일 및 프로젝트 필터 파일을 생성합니다.
     /// </summary>
     /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
-    public FileReference Generate(List<CppProjectBuildInfo> GeneratedDependencyProjects)
+    public FileReference Generate(CppProjectBuildInfo MyBuild, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
-        GenerateVcxProj(GeneratedDependencyProjects);
+        GenerateVcxProj(MyBuild, GeneratedDependencyProjects);
         GenerateVcxProjFilter();
 
         return ProjectReference;
@@ -81,8 +80,9 @@ class CppProjectGenerator
     /// <summary>
     /// 프로젝트 파일을 생성합니다.
     /// </summary>
+    /// <param name="MyBuild"> 이 프로젝트의 빌드 정보를 전달합니다. </param>
     /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
-    private void GenerateVcxProj(List<CppProjectBuildInfo> GeneratedDependencyProjects)
+    private void GenerateVcxProj(CppProjectBuildInfo MyBuild, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
         XmlVcxProj = new();
         XmlDocument MyDoc = XmlVcxProj;
@@ -97,11 +97,11 @@ class CppProjectGenerator
         GenerateImportProject(RootNode, "$(VCTargetsPath)\\Microsoft.Cpp.props");
         XmlNode PropertySheets = GenerateImportGroup(RootNode, "PropertySheets");
         GenerateImportProject(PropertySheets, "$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props", "LocalAppDataPlatform");
-        GenerateItemDefinitionGroup(RootNode, GeneratedDependencyProjects);
-        GenerateItemDefinitionGroup(RootNode, true, GeneratedDependencyProjects);
-        GenerateItemDefinitionGroup(RootNode, false, GeneratedDependencyProjects);
+        GenerateItemDefinitionGroup(RootNode, MyBuild, GeneratedDependencyProjects);
+        GenerateItemDefinitionGroup(RootNode, true, MyBuild, GeneratedDependencyProjects);
+        GenerateItemDefinitionGroup(RootNode, false, MyBuild, GeneratedDependencyProjects);
         GenerateHeaderFiles(RootNode);
-        GenerateSourceFiles(RootNode);
+        GenerateSourceFiles(RootNode, MyBuild);
         GenerateImportProject(RootNode, "$(VCTargetsPath)\\Microsoft.Cpp.targets");
         GenerateProjectReferences(RootNode, GeneratedDependencyProjects);
 
@@ -270,9 +270,10 @@ class CppProjectGenerator
     /// <summary>
     /// 소스 파일 포함을 생성합니다.
     /// </summary>
+    /// <param name="MyBuild"> 이 프로젝트의 빌드 정보를 전달합니다. </param>
     /// <param name="InParent"> 상위 노드를 전달합니다. </param>
     /// <returns> 생성된 노드가 반환됩니다. </returns>
-    private XmlNode GenerateSourceFiles(XmlNode InParent)
+    private XmlNode GenerateSourceFiles(XmlNode InParent, CppProjectBuildInfo MyBuild)
     {
         XmlNode Group = CreateChildNode(InParent, "ItemGroup");
         for (int i = 0; i < SourceCodeFiles.Count; ++i)
@@ -280,7 +281,7 @@ class CppProjectGenerator
             XmlNode ClCompile = CreateChildNode(Group, "ClCompile");
             CreateKeyStringAttribute(ClCompile, "Include", SourceCodeFiles[i].FullPath);
 
-            if (SourceCodeFiles[i].Name.Equals(ProjectName, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(MyBuild.Rules.PrivatePCHHeaderFile) && SourceCodeFiles[i].Name.Equals(MyBuild.Rules.PrivatePCHHeaderFile, StringComparison.OrdinalIgnoreCase))
             {
                 CreateChildNode(ClCompile, "PrecompiledHeader").InnerText = "Create";
             }
@@ -293,9 +294,10 @@ class CppProjectGenerator
     /// 컴파일 아이템 그룹을 생성합니다.
     /// </summary>
     /// <param name="InParent"> 상위 노드를 전달합니다. </param>
+    /// <param name="MyBuild"> 이 프로젝트의 빌드 정보를 전달합니다. </param>
     /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
     /// <returns> 생성된 노드가 반환됩니다. </returns>
-    private XmlNode GenerateItemDefinitionGroup(XmlNode InParent, List<CppProjectBuildInfo> GeneratedDependencyProjects)
+    private XmlNode GenerateItemDefinitionGroup(XmlNode InParent, CppProjectBuildInfo MyBuild, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
         List<string> AdditionalIncludePaths = new()
         {
@@ -314,15 +316,30 @@ class CppProjectGenerator
         CreateChildNode(ClCompile, "SDKCheck").InnerText = "true";
         CreateChildNode(ClCompile, "ConformanceMode").InnerText = "true";
         CreateChildNode(ClCompile, "AdditionalIncludeDirectories").InnerText = $"{string.Join(';', AdditionalIncludePaths)};%(AdditionalIncludeDirectories)";
-        CreateChildNode(ClCompile, "PrecompiledHeader").InnerText = "Use";
-        CreateChildNode(ClCompile, "PrecompiledHeaderFile").InnerText = "$(ProjectName).h";
-        CreateChildNode(ClCompile, "ForcedIncludeFiles").InnerText = "$(ProjectName).h";
+
+        if (!string.IsNullOrEmpty(MyBuild.Rules.PrivatePCHHeaderFile))
+        {
+            CreateChildNode(ClCompile, "PrecompiledHeader").InnerText = "Use";
+            CreateChildNode(ClCompile, "PrecompiledHeaderFile").InnerText = $"{MyBuild.Rules.PrivatePCHHeaderFile}.h";
+            CreateChildNode(ClCompile, "ForcedIncludeFiles").InnerText = $"{MyBuild.Rules.PrivatePCHHeaderFile}.h";
+        }
         CreateChildNode(ClCompile, "MultiProcessorCompilation").InnerText = "true";
-        CreateChildNode(ClCompile, "LanguageStandard").InnerText = "stdcpplatest";
+        CreateChildNode(ClCompile, "LanguageStandard").InnerText = MyBuild.Rules.CppStandardVersion switch
+        {
+            CppVersion.Cpp14 => "stdcpp14",
+            CppVersion.Cpp17 => "stdcpp17",
+            CppVersion.Cpp20 => "stdcpplatest",
+            _ => "Default"
+        };
         XmlNode Link = CreateChildNode(Group, "Link");
         CreateChildNode(Link, "SubSystem").InnerText = "Windows";
         CreateChildNode(Link, "GenerateDebugInformation").InnerText = "true";
         CreateChildNode(Link, "EnableUAC").InnerText = "false";
+        if (MyBuild.Rules.AdditionalDependencies.Count != 0)
+        {
+            CreateChildNode(Link, "AdditionalDependencies").InnerText = $"{string.Join(';', MyBuild.Rules.AdditionalDependencies)};kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)";
+        }
+
         return Group;
     }
 
@@ -333,12 +350,15 @@ class CppProjectGenerator
     /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
     /// <param name="bRelease"> 릴리즈 모드로 생성합니다. </param>
     /// <returns> 생성된 노드가 반환됩니다. </returns>
-    private XmlNode GenerateItemDefinitionGroup(XmlNode InParent, bool bRelease, List<CppProjectBuildInfo> GeneratedDependencyProjects)
+    private XmlNode GenerateItemDefinitionGroup(XmlNode InParent, bool bRelease, CppProjectBuildInfo MyBuild, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
         List<string> AdditionalPreprocessorDefines = new()
         {
             $"{ProjectName.ToUpper()}_API=__declspec(dllexport)",
+            $"{ProjectName.ToUpper()}_BUILD",
         };
+
+        AdditionalPreprocessorDefines.AddRange(MyBuild.Rules.AdditionalPreprocessorDefines);
 
         foreach (var Item in GeneratedDependencyProjects)
         {
@@ -351,8 +371,8 @@ class CppProjectGenerator
         string Platform = "x64";
         string ReleaseCaseString = bRelease.ToString().ToLower();
         string PreprocessorDefinitions = bRelease
-            ? $"{AdditionalPreprocessorDefine};_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)"
-            : $"{AdditionalPreprocessorDefine};NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)";
+            ? $"{AdditionalPreprocessorDefine};NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)"
+            : $"{AdditionalPreprocessorDefine};_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)";
 
         XmlNode Group = CreateChildNode(InParent, "ItemDefinitionGroup");
         CreateKeyStringAttribute(Group, "Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");

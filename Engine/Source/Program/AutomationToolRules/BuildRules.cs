@@ -16,4 +16,24 @@ public class BuildRules
     /// 내부에서만 사용되는 비공개 의존 프로젝트 목록입니다.
     /// </summary>
     public List<string> PrivateDependencyModuleNames = new();
+
+    /// <summary>
+    /// 추가로 지정할 전처리기 지정자입니다.
+    /// </summary>
+    public List<string> AdditionalPreprocessorDefines = new();
+
+    /// <summary>
+    /// 추가로 지정할 동적 라이브러리 링크 목록입니다.
+    /// </summary>
+    public List<string> AdditionalDependencies = new();
+
+    /// <summary>
+    /// PCH 헤더 파일 여부를 설정합니다. 확장자를 제외한 파일 이름을 결정합니다.
+    /// </summary>
+    public string PrivatePCHHeaderFile = null;
+
+    /// <summary>
+    /// C++ 컴파일 버전을 선택합니다.
+    /// </summary>
+    public CppVersion CppStandardVersion = CppVersion.Cpp14;
 }

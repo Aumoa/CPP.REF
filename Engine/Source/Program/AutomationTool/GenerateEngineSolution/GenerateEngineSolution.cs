@@ -76,8 +76,9 @@ class GenerateEngineSolution : Subprogram
     /// </summary>
     public override void Run()
     {
-        GenerateRuntimeProjects();
+        GenerateThirdPartyProjects();
         GenerateProgramProjects();
+        GenerateRuntimeProjects();
 
         // 솔루션 헤더를 씁니다.
         Builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 12.00");
@@ -94,6 +95,10 @@ class GenerateEngineSolution : Subprogram
             WriteProjectFile(Item.Value);
         }
         foreach (var Item in ProgramProjects)
+        {
+            WriteProjectFile(Item.Value);
+        }
+        foreach (var Item in ThirdPartyProjects)
         {
             WriteProjectFile(Item.Value);
         }
@@ -148,6 +153,15 @@ class GenerateEngineSolution : Subprogram
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.ActiveCfg = Release|{PlatformStr}");
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.Build.0 = Release|{PlatformStr}");
         }
+        foreach (var Item in ThirdPartyProjects)
+        {
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Debug|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.Build.0 = Debug|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.ActiveCfg = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.Build.0 = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.ActiveCfg = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.Build.0 = Release|x64");
+        }
         Builder.AppendLine($"\tEndGlobalSection");
     }
 
@@ -164,6 +178,10 @@ class GenerateEngineSolution : Subprogram
         foreach (var Item in ProgramProjects)
         {
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid.ToString().ToUpper()}}} = {{{ProgramGuid.ToString().ToUpper()}}}");
+        }
+        foreach (var Item in ThirdPartyProjects)
+        {
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid.ToString().ToUpper()}}} = {{{ThirdPartyGuid.ToString().ToUpper()}}}");
         }
         Builder.AppendLine($"\tEndGlobalSection");
     }
@@ -192,8 +210,65 @@ class GenerateEngineSolution : Subprogram
         Builder.AppendLine($"EndProject");
     }
 
-    Dictionary<string, ProjectBuildInfo> ProgramProjects= new();
+    Dictionary<string, CppProjectBuildInfo> AllProjects = new();
+    Dictionary<string, CppProjectBuildInfo> ThirdPartyProjects = new();
 
+    /// <summary>
+    /// ThirdParty 프로젝트를 수집합니다.
+    /// </summary>
+    private void GenerateThirdPartyProjects()
+    {
+        Log.TraceLog($"{ThirdPartyDirectory.FullPath} 경로의 소스코드 프로젝트 탐색을 시작합니다.");
+
+        FileReference[] Files = ThirdPartyDirectory.GetAllFiles();
+        if (Files is null || Files.Length == 0)
+        {
+            throw new FileNotFoundException("필요한 파일이 존재하지 않습니다.");
+        }
+
+        FileReference BuileRuleAssembly = new(typeof(BuildRules).Assembly.Location);
+
+        // 프로젝트 레퍼런스를 수집합니다.
+        foreach (FileReference File in Files)
+        {
+            if (IsProjectBuildReference(File, out var Symbol))
+            {
+                Assembly BuildRulesAssembly = RuntimeCompilation.CompileAssembly(
+                    File.Name,
+                    new List<FileReference>() { File },
+                    new List<FileReference>() { BuileRuleAssembly }
+                    );
+
+                CppProjectBuildInfo BuildInfo = new();
+                BuildInfo.SourceRoot = File.GetParent();
+                BuildInfo.Rules = Activator.CreateInstance(BuildRulesAssembly.GetType($"{Symbol}Build")) as BuildRules;
+                BuildInfo.Symbol = Symbol;
+
+                ThirdPartyProjects.Add(Symbol, BuildInfo);
+                AllProjects.Add(Symbol, BuildInfo);
+            }
+        }
+
+        // 프로젝트의 의존 관계를 해결합니다.
+        foreach (var Item in ThirdPartyProjects)
+        {
+            CppProjectBuildInfo BuildInfo = Item.Value;
+            ResolveProjectDependency(BuildInfo);
+        }
+
+        // 프로젝트 파일을 생성합니다.
+        foreach (var Item in ThirdPartyProjects)
+        {
+            CppProjectBuildInfo BuildInfo = Item.Value;
+            GenerateCppProject(BuildInfo, ThirdPartyDirectory);
+        }
+    }
+
+    Dictionary<string, ProjectBuildInfo> ProgramProjects = new();
+
+    /// <summary>
+    /// 프로그램 프로젝트를 수집합니다.
+    /// </summary>
     private void GenerateProgramProjects()
     {
         Log.TraceLog($"{ProgramDirectory.FullPath} 경로의 소스코드 프로젝트 탐색을 시작합니다.");
@@ -236,6 +311,7 @@ class GenerateEngineSolution : Subprogram
                 BuildInfo.Symbol = Symbol;
 
                 ProgramProjects.Add(Symbol, BuildInfo);
+                AllProjects.Add(Symbol, BuildInfo);
             }
         }
 
@@ -253,7 +329,7 @@ class GenerateEngineSolution : Subprogram
         {
             if (Item.Value is CppProjectBuildInfo BuildInfo)
             {
-                GenerateCppProject(BuildInfo);
+                GenerateCppProject(BuildInfo, EngineDirectory);
             }
         }
     }
@@ -292,6 +368,7 @@ class GenerateEngineSolution : Subprogram
                 BuildInfo.Symbol = Symbol;
 
                 RuntimeProjects.Add(Symbol, BuildInfo);
+                AllProjects.Add(Symbol, BuildInfo);
             }
         }
 
@@ -306,7 +383,7 @@ class GenerateEngineSolution : Subprogram
         foreach (var Item in RuntimeProjects)
         {
             CppProjectBuildInfo BuildInfo = Item.Value;
-            GenerateCppProject(BuildInfo);
+            GenerateCppProject(BuildInfo, EngineDirectory);
         }
     }
 
@@ -314,7 +391,7 @@ class GenerateEngineSolution : Subprogram
     /// 단일 프로젝트를 생성합니다.
     /// </summary>
     /// <param name="Target"> 대상 프로젝트를 전달합니다. </param>
-    private void GenerateCppProject(CppProjectBuildInfo Target)
+    private void GenerateCppProject(CppProjectBuildInfo Target, DirectoryReference SourceRoot)
     {
         // 이 프로젝트는 이미 생성되었습니다.
         if (Target.IsGenerated)
@@ -322,27 +399,27 @@ class GenerateEngineSolution : Subprogram
             return;
         }
 
-        DirectoryReference IntermediateRoot = EngineDirectory.Move(@"Intermediate\ProjectFiles");
+        DirectoryReference IntermediateRoot = RootDirectory.Move(@"Intermediate\ProjectFiles");
 
         // 의존 관계 프로젝트를 포함합니다.
         List<CppProjectBuildInfo> AllDependency = new();
         foreach (string Module in Target.ResolvedPrivateDependency)
         {
-            AllDependency.Add(RuntimeProjects[Module]);
+            AllDependency.Add(AllProjects[Module]);
         }
         foreach (string Module in Target.ResolvedPublicDependency)
         {
-            AllDependency.Add(RuntimeProjects[Module]);
+            AllDependency.Add(AllProjects[Module]);
         }
 
         // 생성되지 않은 프로젝트가 있다면 생성합니다.
         foreach (CppProjectBuildInfo Build in AllDependency)
         {
-            GenerateCppProject(Build);
+            GenerateCppProject(Build, SourceRoot);
         }
 
-        CppProjectGenerator Generator = new(Target.Symbol, EngineDirectory, Target.SourceRoot, IntermediateRoot);
-        Target.ProjectFile = Generator.Generate(AllDependency);
+        CppProjectGenerator Generator = new(Target.Symbol, SourceRoot, Target.SourceRoot, IntermediateRoot);
+        Target.ProjectFile = Generator.Generate(Target, AllDependency);
         Target.ProjectGuid = GetCppProjectGuid(Target.ProjectFile.FullPath);
     }
 
@@ -365,7 +442,7 @@ class GenerateEngineSolution : Subprogram
         for (int i = 0; i < Target.Rules.PublicDependencyModuleNames.Count; ++i)
         {
             string PublicModuleSymbol = Target.Rules.PublicDependencyModuleNames[i];
-            CppProjectBuildInfo PublicModule = RuntimeProjects[PublicModuleSymbol];
+            CppProjectBuildInfo PublicModule = AllProjects[PublicModuleSymbol];
             
             // 의존 관계 대상 프로젝트가 처리되지 않았으면 먼저 처리합니다.
             if (PublicModule.ResolvedPublicDependency is null)
@@ -381,7 +458,7 @@ class GenerateEngineSolution : Subprogram
         for (int i = 0; i < Target.Rules.PrivateDependencyModuleNames.Count; ++i)
         {
             string PrivateModuleSymbol = Target.Rules.PrivateDependencyModuleNames[i];
-            CppProjectBuildInfo PrivateModule = RuntimeProjects[PrivateModuleSymbol];
+            CppProjectBuildInfo PrivateModule = AllProjects[PrivateModuleSymbol];
 
             // 의존 관계 대상 프로젝트가 처리되지 않았으면 먼저 처리합니다.
             if (PrivateModule.ResolvedPublicDependency is null)
