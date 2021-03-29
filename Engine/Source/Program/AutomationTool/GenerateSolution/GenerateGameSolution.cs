@@ -11,7 +11,7 @@ using System.Xml;
 /// <summary>
 /// 엔진 프로젝트 솔루션을 생성하는 하위 프로그램입니다.
 /// </summary>
-class GenerateEngineSolution : Subprogram
+class GenerateGameSolution : Subprogram
 {
     static readonly string SolutionFilterGuid = "2150E333-8FDC-42A3-9474-1A3956D46DE8";
     static readonly string CppProjectGuid = "8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
@@ -22,6 +22,8 @@ class GenerateEngineSolution : Subprogram
     DirectoryReference RuntimeDirectory;
     DirectoryReference ProgramDirectory;
     DirectoryReference ThirdPartyDirectory;
+    DirectoryReference GameDirectory;
+    string ProjectName;
 
     StringBuilder Builder = new();
 
@@ -29,11 +31,21 @@ class GenerateEngineSolution : Subprogram
     /// 개체를 생성합니다.
     /// </summary>
     /// <param name="InArgs"> 명령 인수를 전달합니다. </param>
-    public GenerateEngineSolution(string[] InArgs)
+    public GenerateGameSolution(string[] InArgs)
     {
         if (InArgs.Length < 2)
         {
-            throw new ArgumentException("GenerateEngineSolution 두 번째 인수는 프로젝트의 루트 디렉토리입니다.");
+            throw new ArgumentException("GenerateGameSolution 두 번째 인수는 엔진 프로젝트의 루트 디렉토리입니다.");
+        }
+
+        if (InArgs.Length < 3)
+        {
+            throw new ArgumentException("GenerateGameSolution 세 번째 인수는 게임 프로젝트의 루트 디렉토리입니다.");
+        }
+
+        if (InArgs.Length < 4)
+        {
+            throw new ArgumentException("GenerateGameSolution 네 번째 인수는 프로젝트 이름입니다.");
         }
 
         RootDirectory = new(InArgs[1]);
@@ -65,11 +77,20 @@ class GenerateEngineSolution : Subprogram
         {
             throw new DirectoryNotExistsException(ThirdPartyDirectory.FullPath);
         }
+
+        GameDirectory = new(InArgs[2]);
+        if (!GameDirectory.IsExist)
+        {
+            throw new DirectoryNotExistsException(GameDirectory.FullPath);
+        }
+
+        ProjectName = InArgs[3];
     }
 
     readonly Guid EngineGuid = Guid.NewGuid();
     readonly Guid ProgramGuid = Guid.NewGuid();
     readonly Guid ThirdPartyGuid = Guid.NewGuid();
+    readonly Guid GameGuid = Guid.NewGuid();
 
     /// <summary>
     /// 프로그램을 실행합니다.
@@ -79,6 +100,7 @@ class GenerateEngineSolution : Subprogram
         GenerateThirdPartyProjects();
         GenerateProgramProjects();
         GenerateRuntimeProjects();
+        GenerateGameProjects();
 
         // 솔루션 헤더를 씁니다.
         Builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 12.00");
@@ -90,6 +112,11 @@ class GenerateEngineSolution : Subprogram
         WriteSolutionFilter("Engine", EngineGuid);
         WriteSolutionFilter("Program", ProgramGuid);
         WriteSolutionFilter("ThirdParty", ThirdPartyGuid);
+        WriteSolutionFilter("Game", GameGuid);
+        foreach (var Item in GameProjects)
+        {
+            WriteProjectFile(Item.Value);
+        }
         foreach (var Item in RuntimeProjects)
         {
             WriteProjectFile(Item.Value);
@@ -110,7 +137,7 @@ class GenerateEngineSolution : Subprogram
         Builder.AppendLine($"EndGlobal");
 
         // 솔루션 파일을 씁니다.
-        string OutputPath = Path.Combine(RootDirectory.FullPath, "Engine.sln");
+        string OutputPath = Path.Combine(GameDirectory.FullPath, $"{ProjectName}.sln");
         File.WriteAllText(OutputPath, Builder.ToString());
         Console.WriteLine(OutputPath);
     }
@@ -132,7 +159,7 @@ class GenerateEngineSolution : Subprogram
     /// </summary>
     private void WriteProjectConfigurationPlatforms()
     {
-        Builder.AppendLine($"\tGlobalSection(SolutionConfigurationPlatforms) = postSolution");
+        Builder.AppendLine($"\tGlobalSection(ProjectConfigurationPlatforms) = postSolution");
         foreach (var Item in RuntimeProjects)
         {
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Debug|x64");
@@ -155,8 +182,17 @@ class GenerateEngineSolution : Subprogram
         }
         foreach (var Item in ThirdPartyProjects)
         {
-            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Debug|x64");
-            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.Build.0 = Debug|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.Build.0 = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.ActiveCfg = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.Build.0 = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.ActiveCfg = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.Build.0 = Release|x64");
+        }
+        foreach (var Item in GameProjects)
+        {
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.Build.0 = Release|x64");
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.ActiveCfg = Release|x64");
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.Build.0 = Release|x64");
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.ActiveCfg = Release|x64");
@@ -182,6 +218,10 @@ class GenerateEngineSolution : Subprogram
         foreach (var Item in ThirdPartyProjects)
         {
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid.ToString().ToUpper()}}} = {{{ThirdPartyGuid.ToString().ToUpper()}}}");
+        }
+        foreach (var Item in GameProjects)
+        {
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid.ToString().ToUpper()}}} = {{{GameGuid.ToString().ToUpper()}}}");
         }
         Builder.AppendLine($"\tEndGlobalSection");
     }
@@ -243,6 +283,7 @@ class GenerateEngineSolution : Subprogram
                 BuildInfo.SourceRoot = File.GetParent();
                 BuildInfo.Rules = Activator.CreateInstance(BuildRulesAssembly.GetType($"{Symbol}Build")) as BuildRules;
                 BuildInfo.Symbol = Symbol;
+                BuildInfo.Rules.PostProcess();
 
                 ThirdPartyProjects.Add(Symbol, BuildInfo);
                 AllProjects.Add(Symbol, BuildInfo);
@@ -265,6 +306,59 @@ class GenerateEngineSolution : Subprogram
     }
 
     Dictionary<string, ProjectBuildInfo> ProgramProjects = new();
+    Dictionary<string, CppProjectBuildInfo> RuntimeProjects = new();
+    Dictionary<string, CppProjectBuildInfo> GameProjects = new();
+
+    /// <summary>
+    /// 게임 C++ 프로젝트를 수집합니다.
+    /// </summary>
+    private void GenerateGameProjects()
+    {
+        Log.TraceLog($"{GameDirectory.FullPath} 경로의 소스코드 프로젝트 탐색을 시작합니다.");
+
+        FileReference[] Files = GameDirectory.GetAllFiles();
+        if (Files is null || Files.Length == 0)
+        {
+            throw new FileNotFoundException("필요한 파일이 존재하지 않습니다.");
+        }
+
+        FileReference BuileRuleAssembly = new(typeof(BuildRules).Assembly.Location);
+
+        // 프로젝트 레퍼런스를 수집합니다.
+        foreach (FileReference File in Files)
+        {
+            if (IsProjectBuildReference(File, out var Symbol))
+            {
+                Assembly BuildRulesAssembly = RuntimeCompilation.CompileAssembly(
+                    File.Name,
+                    new List<FileReference>() { File },
+                    new List<FileReference>() { BuileRuleAssembly }
+                    );
+
+                CppProjectBuildInfo BuildInfo = new();
+                BuildInfo.SourceRoot = File.GetParent();
+                BuildInfo.Rules = Activator.CreateInstance(BuildRulesAssembly.GetType($"{Symbol}Build")) as BuildRules;
+                BuildInfo.Symbol = Symbol;
+
+                GameProjects.Add(Symbol, BuildInfo);
+                AllProjects.Add(Symbol, BuildInfo);
+            }
+        }
+
+        // 프로젝트의 의존 관계를 해결합니다.
+        foreach (var Item in GameProjects)
+        {
+            CppProjectBuildInfo BuildInfo = Item.Value;
+            ResolveProjectDependency(BuildInfo);
+        }
+
+        // 프로젝트 파일을 생성합니다.
+        foreach (var Item in GameProjects)
+        {
+            CppProjectBuildInfo BuildInfo = Item.Value;
+            GenerateCppProject(BuildInfo, GameDirectory);
+        }
+    }
 
     /// <summary>
     /// 프로그램 프로젝트를 수집합니다.
@@ -334,8 +428,6 @@ class GenerateEngineSolution : Subprogram
         }
     }
 
-    Dictionary<string, CppProjectBuildInfo> RuntimeProjects = new();
-
     /// <summary>
     /// Engine C++ 프로젝트를 수집합니다.
     /// </summary>
@@ -399,7 +491,7 @@ class GenerateEngineSolution : Subprogram
             return;
         }
 
-        DirectoryReference IntermediateRoot = RootDirectory.Move(@"Intermediate\ProjectFiles");
+        DirectoryReference IntermediateRoot = GameDirectory.Move(@"Intermediate\ProjectFiles");
 
         // 의존 관계 프로젝트를 포함합니다.
         List<CppProjectBuildInfo> AllDependency = new();

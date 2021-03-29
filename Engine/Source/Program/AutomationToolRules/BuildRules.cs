@@ -36,4 +36,50 @@ public class BuildRules
     /// C++ 컴파일 버전을 선택합니다.
     /// </summary>
     public CppVersion CppStandardVersion = CppVersion.Cpp14;
+
+    /// <summary>
+    /// 이 모듈에서 컴파일 대상으로 포함 시킬 코드 파일의 확장자를 설정합니다.
+    /// </summary>
+    public List<string> ExtensionNamesForCompile = new()
+    {
+        ".cpp",
+        ".c"
+    };
+
+    /// <summary>
+    /// 이 모듈에서 FX 컴파일 대상으로 포함 시킬 코드 파일의 확장자를 설정합니다.
+    /// FX 파일은 파일 이름.형식.확장자로 구성되며, 형식은 VertexShader, PixelShader, ShaderLibrary 등입니다.
+    /// </summary>
+    public List<string> ExtensionNamesForFxCompile = new()
+    {
+        ".hlsl"
+    };
+
+    /// <summary>
+    /// 소스 코드 빌드를 사용하지 않고 바이너리를 즉시 링크합니다.
+    /// </summary>
+    public bool bDirectLink = false;
+
+    /// <summary>
+    /// 이 프로젝트는 프로그램을 실행하는 데 사용됩니다.
+    /// </summary>
+    public bool bLaunch = false;
+
+    /// <summary>
+    /// 빌드 규칙이 로드된 후 호출되는 함수입니다.
+    /// </summary>
+    public void PostProcess()
+    {
+        for (int i = 0; i < ExtensionNamesForCompile.Count; ++i)
+        {
+            // 모든 확장자를 소문자로 만듭니다.
+            ExtensionNamesForCompile[i] = ExtensionNamesForCompile[i].ToLower();
+
+            // .이 붙어있지 않을 경우 .을 붙입니다.
+            if (ExtensionNamesForCompile[i][0] is not '.')
+            {
+                ExtensionNamesForCompile[i] = $".{ExtensionNamesForCompile[i]}";
+            }
+        }
+    }
 }

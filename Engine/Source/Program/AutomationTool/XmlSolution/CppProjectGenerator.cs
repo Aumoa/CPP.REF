@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Xml;
 
 /// <summary>
@@ -36,6 +37,7 @@ class CppProjectGenerator
 
     List<FileReference> SourceCodeFiles = new();
     List<FileReference> HeaderFiles = new();
+    List<FileReference> FxCodeFiles = new();
     string ProjectFilter;
 
     FileReference ProjectReference;
@@ -48,21 +50,6 @@ class CppProjectGenerator
         OutputRoot = InOutputRoot;
 
         ProjectFilter = InRootDirectory.Move("Source").GetRelativePath(SourceDirectory);
-
-        FileReference[] AllFiles = InSourceDirectory.GetAllFiles();
-        foreach (FileReference File in AllFiles)
-        {
-            if (File.CompareExtension("cpp") ||
-                File.CompareExtension("c") ||
-                File.CompareExtension("cxx"))
-            {
-                SourceCodeFiles.Add(File);
-            }
-            else
-            {
-                HeaderFiles.Add(File);
-            }
-        }
     }
 
     /// <summary>
@@ -71,6 +58,23 @@ class CppProjectGenerator
     /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
     public FileReference Generate(CppProjectBuildInfo MyBuild, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
+        FileReference[] AllFiles = SourceDirectory.GetAllFiles();
+        foreach (FileReference File in AllFiles)
+        {
+            if (MyBuild.Rules.ExtensionNamesForCompile.Contains(File.Extension))
+            {
+                SourceCodeFiles.Add(File);
+            }
+            else if (MyBuild.Rules.ExtensionNamesForFxCompile.Contains(File.Extension))
+            {
+                FxCodeFiles.Add(File);
+            }
+            else
+            {
+                HeaderFiles.Add(File);
+            }
+        }
+
         GenerateVcxProj(MyBuild, GeneratedDependencyProjects);
         GenerateVcxProjFilter();
 
@@ -84,28 +88,29 @@ class CppProjectGenerator
     /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
     private void GenerateVcxProj(CppProjectBuildInfo MyBuild, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
-        XmlVcxProj = new();
+        XmlVcxProj = new XmlDocument();
         XmlDocument MyDoc = XmlVcxProj;
 
         XmlNode RootNode = GenerateProjectNode(MyDoc);
         GenerateItemGroupNode(RootNode);
         GeneratePropertyGroupsGlobal(RootNode);
         GenerateImportProject(RootNode, "$(VCTargetsPath)\\Microsoft.Cpp.Default.props");
-        GeneratePropertySheets(RootNode);
-        GeneratePropertyGroup(RootNode, false);
-        GeneratePropertyGroup(RootNode, true);
+        GeneratePropertySheets(RootNode, MyBuild.Rules.bLaunch);
         GenerateImportProject(RootNode, "$(VCTargetsPath)\\Microsoft.Cpp.props");
+        GeneratePropertyGroup(RootNode, false, GeneratedDependencyProjects);
+        GeneratePropertyGroup(RootNode, true, GeneratedDependencyProjects);
         XmlNode PropertySheets = GenerateImportGroup(RootNode, "PropertySheets");
         GenerateImportProject(PropertySheets, "$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props", "LocalAppDataPlatform");
         GenerateItemDefinitionGroup(RootNode, MyBuild, GeneratedDependencyProjects);
         GenerateItemDefinitionGroup(RootNode, true, MyBuild, GeneratedDependencyProjects);
         GenerateItemDefinitionGroup(RootNode, false, MyBuild, GeneratedDependencyProjects);
         GenerateHeaderFiles(RootNode);
+        GenerateFxCodeFiles(RootNode, MyBuild);
         GenerateSourceFiles(RootNode, MyBuild);
         GenerateImportProject(RootNode, "$(VCTargetsPath)\\Microsoft.Cpp.targets");
         GenerateProjectReferences(RootNode, GeneratedDependencyProjects);
 
-        ProjectReference = new(SaveAll(MyDoc, $"{ProjectName}.vcxproj"));
+        ProjectReference = new FileReference(SaveAll(MyDoc, $"{ProjectName}.vcxproj"));
     }
 
     /// <summary>
@@ -113,12 +118,13 @@ class CppProjectGenerator
     /// </summary>
     private void GenerateVcxProjFilter()
     {
-        XmlVcxProjFilter = new();
+        XmlVcxProjFilter = new XmlDocument();
         XmlDocument MyDoc = XmlVcxProjFilter;
 
         XmlNode RootNode = GenerateProjectNode(MyDoc, true);
         GenerateFilters(RootNode);
         GenerateIncludeFiles(RootNode);
+        GenerateFxCodeFiles(RootNode);
         GenerateCodeFiles(RootNode);
 
         SaveAll(MyDoc, $"{ProjectName}.vcxproj.filters");
@@ -166,9 +172,12 @@ class CppProjectGenerator
         XmlNode Group = CreateChildNode(InParent, "ItemGroup");
         foreach (CppProjectBuildInfo Dependency in GeneratedDependencyProjects)
         {
-            XmlNode ProjectReference = CreateChildNode(Group, "ProjectReference");
-            CreateKeyStringAttribute(ProjectReference, "Include", Dependency.ProjectFile.FullPath);
-            CreateChildNode(ProjectReference, "Project").InnerText = $"{{{Dependency.ProjectGuid}}}";
+            if (!Dependency.Rules.bDirectLink)
+            {
+                XmlNode ProjectReference = CreateChildNode(Group, "ProjectReference");
+                CreateKeyStringAttribute(ProjectReference, "Include", Dependency.ProjectFile.FullPath);
+                CreateChildNode(ProjectReference, "Project").InnerText = $"{{{Dependency.ProjectGuid}}}";
+            }
         }
     }
 
@@ -188,6 +197,25 @@ class CppProjectGenerator
             XmlNode ClInclude = CreateChildNode(Group, "ClInclude");
             CreateKeyStringAttribute(ClInclude, "Include", HeaderFiles[i].FullPath);
             CreateChildNode(ClInclude, "Filter").InnerText = RelativePath;
+        }
+    }
+
+    /// <summary>
+    /// FX 코드 목록에 포함된 코드 파일을 생성합니다.
+    /// </summary>
+    /// <param name="InParent"> 상위 노드를 전달합니다. </param>
+    private void GenerateFxCodeFiles(XmlNode InParent)
+    {
+        XmlNode Group = CreateChildNode(InParent, "ItemGroup");
+
+        for (int i = 0; i < FxCodeFiles.Count; ++i)
+        {
+            string CodeRelativePath = SourceDirectory.GetRelativePath(FxCodeFiles[i]);
+            string RelativePath = Path.GetDirectoryName(CodeRelativePath);
+
+            XmlNode FxCompile = CreateChildNode(Group, "FxCompile");
+            CreateKeyStringAttribute(FxCompile, "Include", FxCodeFiles[i].FullPath);
+            CreateChildNode(FxCompile, "Filter").InnerText = RelativePath;
         }
     }
 
@@ -268,6 +296,65 @@ class CppProjectGenerator
     }
 
     /// <summary>
+    /// FX 소스 파일 포함을 생성합니다.
+    /// </summary>
+    /// <param name="MyBuild"> 이 프로젝트의 빌드 정보를 전달합니다. </param>
+    /// <param name="InParent"> 상위 노드를 전달합니다. </param>
+    /// <returns> 생성된 노드가 반환됩니다. </returns>
+    private XmlNode GenerateFxCodeFiles(XmlNode InParent, CppProjectBuildInfo MyBuild)
+    {
+        XmlNode Group = CreateChildNode(InParent, "ItemGroup");
+        for (int i = 0; i < FxCodeFiles.Count; ++i)
+        {
+            FileReference File = FxCodeFiles[i];
+
+            XmlNode FxCompile = CreateChildNode(Group, "FxCompile");
+            CreateKeyStringAttribute(FxCompile, "Include", FxCodeFiles[i].FullPath);
+
+            string ActualName = Path.GetFileNameWithoutExtension(File.Name);
+            string MinorExtension = Path.GetExtension(File.Name);
+
+            if (MinorExtension == ".ShaderLibrary")
+            {
+                CreateChildNode(FxCompile, "ShaderType").InnerText = "Library";
+                CreateChildNode(FxCompile, "ShaderModel").InnerText = "6.3";
+                CreateChildNode(FxCompile, "EntryPointName");
+            }
+            else
+            {
+                string ShaderType = MinorExtension switch
+                {
+                    ".VertexShader" => "Vertex",
+                    ".PixelShader" => "Pixel",
+                    ".DomainShader" => "Domain",
+                    ".HullShader" => "Hull",
+                    ".GeometryShader" => "Geomtry",
+                    ".ComputeShader" => "Compute",
+                    _ => throw new ArgumentException("파일 이름이 잘못되었습니다. 확장자가 .hlsl인 Fx 파일은 중간 확장자로 셰이더 형식을 지정하여야 합니다.")
+                };
+
+                CreateChildNode(FxCompile, "ShaderType").InnerText = ShaderType;
+                CreateChildNode(FxCompile, "ShaderModel").InnerText = "5.1";
+                CreateChildNode(FxCompile, "EntryPointName").InnerText = "Main";
+            }
+
+            // 파일의 상대 경로를 구합니다.
+            string RelativePath = SourceDirectory.GetRelativePath(File.GetParent());
+
+            // Public, Private 구분자를 제거합니다.
+            int IndexOfFirstDirectory = RelativePath.IndexOf("\\");
+            if (IndexOfFirstDirectory != -1)
+            {
+                RelativePath = RelativePath.Remove(0, IndexOfFirstDirectory + 1);
+            }
+            CreateChildNode(FxCompile, "VariableName").InnerText = $"p{ActualName}{MinorExtension.Substring(1)}";
+            CreateChildNode(FxCompile, "HeaderFileOutput").InnerText = $"$(IntDir)CompiledShaders\\{RelativePath}\\{File.Name}.generated.h";
+        }
+
+        return Group;
+    }
+
+    /// <summary>
     /// 소스 파일 포함을 생성합니다.
     /// </summary>
     /// <param name="MyBuild"> 이 프로젝트의 빌드 정보를 전달합니다. </param>
@@ -303,6 +390,7 @@ class CppProjectGenerator
         {
              $"{SourceDirectory.FullPath}\\Public",
              $"{SourceDirectory.FullPath}\\Private",
+             $"$(IntDir)CompiledShaders\\",
         };
 
         foreach (var Item in GeneratedDependencyProjects)
@@ -311,6 +399,8 @@ class CppProjectGenerator
         }
 
         XmlNode Group = CreateChildNode(InParent, "ItemDefinitionGroup");
+
+        // C++ 코드 컴파일 노드입니다.
         XmlNode ClCompile = CreateChildNode(Group, "ClCompile");
         CreateChildNode(ClCompile, "WarningLevel").InnerText = "Level3";
         CreateChildNode(ClCompile, "SDKCheck").InnerText = "true";
@@ -331,6 +421,13 @@ class CppProjectGenerator
             CppVersion.Cpp20 => "stdcpplatest",
             _ => "Default"
         };
+
+        // HLSL 컴파일 노드입니다.
+        XmlNode FxCompile = CreateChildNode(Group, "FxCompile");
+        CreateChildNode(FxCompile, "FileType").InnerText = "Document";
+        CreateChildNode(FxCompile, "ObjectFileOutput");
+
+        // 링크 노드입니다.
         XmlNode Link = CreateChildNode(Group, "Link");
         CreateChildNode(Link, "SubSystem").InnerText = "Windows";
         CreateChildNode(Link, "GenerateDebugInformation").InnerText = "true";
@@ -339,6 +436,20 @@ class CppProjectGenerator
         {
             CreateChildNode(Link, "AdditionalDependencies").InnerText = $"{string.Join(';', MyBuild.Rules.AdditionalDependencies)};kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)";
         }
+
+        // 빌드 후 이벤트 노드입니다.
+        XmlNode PostBuildEvent = CreateChildNode(Group, "PostBuildEvent");
+        StringBuilder PostBuildEventBuilder = new();
+
+        foreach (CppProjectBuildInfo Item in GeneratedDependencyProjects)
+        {
+            if (Item.Rules.bDirectLink)
+            {
+                PostBuildEventBuilder.AppendLine($"xcopy \"{Item.SourceRoot}\\Binaries\\\" \"$(OutDir)\" /Y");
+            }
+        }
+
+        CreateChildNode(PostBuildEvent, "Command").InnerText = PostBuildEventBuilder.ToString();
 
         return Group;
     }
@@ -371,8 +482,8 @@ class CppProjectGenerator
         string Platform = "x64";
         string ReleaseCaseString = bRelease.ToString().ToLower();
         string PreprocessorDefinitions = bRelease
-            ? $"{AdditionalPreprocessorDefine};NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)"
-            : $"{AdditionalPreprocessorDefine};_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)";
+            ? $"{AdditionalPreprocessorDefine};WITH_DEBUG=0;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)"
+            : $"{AdditionalPreprocessorDefine};WITH_DEBUG=1;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)";
 
         XmlNode Group = CreateChildNode(InParent, "ItemDefinitionGroup");
         CreateKeyStringAttribute(Group, "Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
@@ -390,16 +501,22 @@ class CppProjectGenerator
     /// 프로퍼티 그룹을 생성합니다.
     /// </summary>
     /// <param name="InParent"> 상위 노드를 전달합니다. </param>
+    /// <param name="bLaunch"> 프로그램 실행을 위한 프로젝트입니다. </param>
     /// <returns> 생성된 노드가 반환됩니다. </returns>
-    private XmlNode GeneratePropertySheets(XmlNode InParent)
+    private XmlNode GeneratePropertySheets(XmlNode InParent, bool bLaunch)
     {
+        string ConfigurationType = bLaunch
+            ? "Application"
+            : "DynamicLibrary";
+
         XmlNode PropertyGroup = CreateChildNode(InParent, "PropertyGroup");
         CreateChildNode(PropertyGroup, "LinkIncremental").InnerText = "false";
         CreateChildNode(PropertyGroup, "OutDir").InnerText = "$(SolutionDir)Build\\$(Platform)\\";
         CreateChildNode(PropertyGroup, "IntDir").InnerText = "$(SolutionDir)Intermediate\\Build\\$(Platform)\\$(ProjectName)\\";
-        CreateChildNode(PropertyGroup, "ConfigurationType").InnerText = "DynamicLibrary";
+        CreateChildNode(PropertyGroup, "ConfigurationType").InnerText = ConfigurationType;
         CreateChildNode(PropertyGroup, "PlatformToolset").InnerText = PlatformToolset[CppProjectGeneratorVersion.VC2019];
         CreateChildNode(PropertyGroup, "CharacterSet").InnerText = "Unicode";
+
         return PropertyGroup;
     }
 
@@ -408,19 +525,35 @@ class CppProjectGenerator
     /// </summary>
     /// <param name="InParent"> 상위 노드를 전달합니다. </param>
     /// <param name="bRelease"> 릴리즈 모드로 생성합니다. </param>
+    /// <param name="GeneratedDependencyProjects"> 의존 관계 프로젝트 목록을 전달합니다. </param>
     /// <returns> 생성된 노드가 반환됩니다. </returns>
-    private XmlNode GeneratePropertyGroup(XmlNode InParent, bool bRelease)
+    private XmlNode GeneratePropertyGroup(XmlNode InParent, bool bRelease, List<CppProjectBuildInfo> GeneratedDependencyProjects)
     {
         string Configuration = bRelease ? "Release" : "Debug";
         string Platform = "x64";
 
         XmlNode MyNode = CreateChildNode(InParent, "PropertyGroup");
         CreateKeyStringAttribute(MyNode, "Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
-        CreateChildNode(MyNode, "UseDebugLibrary").InnerText = (!bRelease).ToString().ToLower();
+        CreateChildNode(MyNode, "UseDebugLibrary").InnerText = "false";
 
         if (bRelease)
         {
             CreateChildNode(MyNode, "WholeProgramOptimization").InnerText = "true";
+        }
+
+        List<string> LibraryPaths = new();
+        foreach (CppProjectBuildInfo Item in GeneratedDependencyProjects)
+        {
+            if (Item.Rules.bDirectLink)
+            {
+                LibraryPaths.Add(Item.SourceRoot.Move("Libraries").ToString());
+            }
+        }
+
+        if (LibraryPaths.Count != 0)
+        {
+            LibraryPaths.Add("$(LibraryPath)");
+            CreateChildNode(MyNode, "LibraryPath").InnerText = string.Join(';', LibraryPaths);
         }
 
         return MyNode;
