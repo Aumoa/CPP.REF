@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 
+#include <filesystem>
 #include "GameInstance.h"
 #include "DeferredGameViewport.h"
 #include "World.h"
@@ -23,6 +24,7 @@
 
 using namespace std;
 using namespace std::chrono;
+using namespace std::filesystem;
 
 DEFINE_STATS_GROUP(Engine);
 
@@ -40,6 +42,13 @@ Engine::~Engine()
 void Engine::Initialize(GameInstance* gameInstance)
 {
 	this->gameInstance = gameInstance;
+
+	static wchar_t Buffer[1024];
+	GetModuleFileNameW((HMODULE)gameInstance->Handle, Buffer, 1024);
+
+	const path RootDirectory = path(Buffer).parent_path() / L".." / L"..";
+	current_path(RootDirectory);
+
 	deviceBundle = NewObject<DirectXDeviceBundle>();
 	DirectXNew(primaryQueue, DirectXCommandQueue, deviceBundle.Get());
 	assetManager = NewObject<AssetManager>(this);

@@ -6,7 +6,7 @@
 #include "SceneRendering/Vertex.h"
 #include "DirectX/DirectXDeviceBundle.h"
 #include "Shaders/ShaderTypes.h"
-#include "CompiledShaders/RaytracingShader.generated.h"
+#include "Shaders/RaytracingShader/Raytracing.ShaderLibrary.generated.h"
 
 using namespace std;
 
@@ -246,7 +246,7 @@ void DirectXRaytracingShader::InitPS()
 
 	D3D12_DXIL_LIBRARY_DESC exportShaders =
 	{
-		GetShaderBytecode(pRaytracingShader),
+		GetShaderBytecode(pRaytracingShaderLibrary),
 		_countof(exportDesc),
 		exportDesc
 	};

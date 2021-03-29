@@ -40,10 +40,8 @@ bool AssimpParser::TryParse(TRefPtr<String> filepath)
 		aiProcess_CalcTangentSpace |
 		aiProcess_LimitBoneWeights |
 		aiProcess_GenNormals |
-		aiProcess_GenSmoothNormals |
 		aiProcess_Triangulate |
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_GenNormals;
+		aiProcess_ConvertToLeftHanded;
 
 	string filepath_mb = filepath->AsMultiByte();
 	myScene = myImporter->ReadFile(filepath_mb.c_str(), ReadOptions);

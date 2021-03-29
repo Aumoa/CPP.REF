@@ -9,13 +9,19 @@ public class GameBuild : BuildRules
         PublicDependencyModuleNames.AddRange(new string[]
         {
             "Core",
-            "Assimp"
+        });
+
+        PrivateDependencyModuleNames.AddRange(new string[]
+        {
+            "Assimp",
+            "FbxSDK",
         });
 
         AdditionalDependencies.AddRange(new string[]
         {
             "DXGI.lib",
             "D3D12.lib",
+            "libfbxsdk-md.lib"
         });
     }
 }
