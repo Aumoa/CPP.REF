@@ -191,10 +191,10 @@ class GenerateGameSolution : Subprogram
         }
         foreach (var Item in GameProjects)
         {
-            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Release|x64");
-            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.Build.0 = Release|x64");
-            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.ActiveCfg = Release|x64");
-            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.Build.0 = Release|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.ActiveCfg = Debug|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Debug|x64.Build.0 = Debug|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.ActiveCfg = Debug|x64");
+            Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.DebugGame|x64.Build.0 = Debug|x64");
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.ActiveCfg = Release|x64");
             Builder.AppendLine($"\t\t{{{Item.Value.ProjectGuid}}}.Release|x64.Build.0 = Release|x64");
         }
