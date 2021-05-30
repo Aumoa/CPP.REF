@@ -4,8 +4,6 @@ export module SC.Runtime.Core:Object;
 
 import std.core;
 import :PrimitiveTypes;
-import :SupportsObject;
-import :Range;
 import :LogCore;
 import :LogSystem;
 import :LogVerbosity;
