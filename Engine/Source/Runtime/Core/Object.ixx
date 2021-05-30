@@ -75,6 +75,25 @@ public:
 	}
 
 	/// <summary>
+	/// Change outer. Object will destroy when outer be destroyed.
+	/// </summary>
+	/// <param name="newOuter"> The new outer. </param>
+	void SetOuter(Object* newOuter)
+	{
+		if (_outer != nullptr)
+		{
+			_outer->InternalDetachSubobject(this);
+		}
+
+		if (newOuter != nullptr)
+		{
+			newOuter->InternalAttachSubobject(this);
+		}
+
+		_outer = newOuter;
+	}
+
+	/// <summary>
 	/// Destroy subobject.
 	/// </summary>
 	/// <param name="subobject"> The target object. </param>
@@ -91,6 +110,27 @@ public:
 	}
 
 private:
+	void InternalDetachSubobject(Object* subobject)
+	{
+		for (size_t i = 0; i < _subobjects.size(); ++i)
+		{
+			if (_subobjects[i] == subobject)
+			{
+				// RemoveAtSwap
+				std::swap(_subobjects[_subobjects.size() - 1], _subobjects[i]);
+				_subobjects.resize(_subobjects.size() - 1);
+				return;
+			}
+		}
+
+		LogSystem::Log(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+	}
+
+	void InternalAttachSubobject(Object* subobject)
+	{
+		_subobjects.emplace_back(subobject);
+	}
+
 	void InternalDestroySubobject(Object* subobject)
 	{
 		for (size_t i = 0; i < _subobjects.size(); ++i)
