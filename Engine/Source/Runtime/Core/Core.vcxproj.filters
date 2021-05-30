@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Object.ixx" />
+    <ClCompile Include="PrimitiveTypes.ixx" />
+    <ClCompile Include="Core.ixx" />
+    <ClCompile Include="Numerics\Vector.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="SupportsObject.ixx" />
+    <ClCompile Include="Mathematics\MathEx.ixx">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Radians.ixx">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Degrees.ixx">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\StringUtils.ixx">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Range.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\LogSystem.ixx">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\LogVerbosity.ixx">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\LogCategory.ixx">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="LogCategory\LogCore.ixx">
+      <Filter>LogCategory</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Numerics">
+      <UniqueIdentifier>{0bff16ca-400f-4271-8ae9-ebc7af65f787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mathematics">
+      <UniqueIdentifier>{42efaef3-280c-4344-ac18-53eacd9555c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{8987bf89-95bb-4ddb-a40b-06ef984b8686}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Delegates">
+      <UniqueIdentifier>{c051ea61-a877-4c07-9a50-d881f300038c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diagnostics">
+      <UniqueIdentifier>{8655c301-4f6a-40b2-8cc7-14168da95641}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LogCategory">
+      <UniqueIdentifier>{af7bcf90-9508-48e7-b5d0-1944441469fa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
