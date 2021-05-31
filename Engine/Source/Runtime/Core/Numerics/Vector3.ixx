@@ -5,6 +5,9 @@ export module SC.Runtime.Core:Vector3;
 import std.core;
 import :Vector;
 
+/// <summary>
+/// Represent a vector with 3 floating point values.
+/// </summary>
 export struct Vector3 : public Vector<3>
 {
 	/// <summary>

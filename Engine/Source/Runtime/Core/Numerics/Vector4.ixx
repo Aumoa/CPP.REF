@@ -4,6 +4,9 @@ export module SC.Runtime.Core:Vector4;
 
 import :Vector;
 
+/// <summary>
+/// Represent a vector with 4 floating point values.
+/// </summary>
 export struct Vector4 : public Vector<4>
 {
 	/// <summary>

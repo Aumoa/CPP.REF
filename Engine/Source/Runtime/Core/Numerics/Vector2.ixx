@@ -5,6 +5,9 @@ export module SC.Runtime.Core:Vector2;
 import std.core;
 import :Vector;
 
+/// <summary>
+/// Represent a vector with 2 floating point values.
+/// </summary>
 export struct Vector2 : public Vector<2>
 {
 	/// <summary>
