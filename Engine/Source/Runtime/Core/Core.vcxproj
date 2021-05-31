@@ -101,6 +101,7 @@
     <ClCompile Include="Mathematics\Radians.ixx" />
     <ClCompile Include="Numerics\Range.ixx" />
     <ClCompile Include="Numerics\Vector.ixx" />
+    <ClCompile Include="Numerics\Vector3.ixx" />
     <ClCompile Include="Object.ixx" />
     <ClCompile Include="PrimitiveTypes.ixx" />
     <ClCompile Include="SupportsObject.ixx" />

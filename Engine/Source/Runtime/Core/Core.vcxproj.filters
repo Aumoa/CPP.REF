@@ -35,6 +35,9 @@
     <ClCompile Include="LogCategory\LogCore.ixx">
       <Filter>LogCategory</Filter>
     </ClCompile>
+    <ClCompile Include="Numerics\Vector3.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
