@@ -103,6 +103,7 @@
     <ClCompile Include="Diagnostics\LogVerbosity.ixx" />
     <ClCompile Include="LogCategory\LogCore.ixx" />
     <ClCompile Include="Mathematics\Degrees.ixx" />
+    <ClCompile Include="Mathematics\MathEx.cpp" />
     <ClCompile Include="Mathematics\MathEx.ixx" />
     <ClCompile Include="Mathematics\Radians.ixx" />
     <ClCompile Include="Numerics\Quaternion.ixx" />

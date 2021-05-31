@@ -7,6 +7,7 @@ import :MathEx;
 import :StringUtils;
 
 using namespace std;
+using namespace std::numbers;
 
 struct Degrees;
 
@@ -177,7 +178,30 @@ private:
 	static constexpr float _180PI = 180.0f / numbers::pi_v<float>;
 };
 
-export float MathEx::GetValue(const Radians& v)
+export
 {
-	return v.Value;
+	float MathEx::Sin(const Radians& v)
+	{
+		return sin(v.Value);
+	}
+
+	float MathEx::Cos(const Radians& v)
+	{
+		return cos(v.Value);
+	}
+
+	float MathEx::Tan(const Radians& v)
+	{
+		return tan(v.Value);
+	}
+
+	Radians MathEx::Asin(float x)
+	{
+		return asin(x);
+	}
+
+	Radians MathEx::Acos(float x)
+	{
+		return acos(x);
+	}
 }

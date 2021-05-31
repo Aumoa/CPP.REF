@@ -66,6 +66,9 @@
     <ClCompile Include="Delegates\MulticastEvent.ixx">
       <Filter>Delegates</Filter>
     </ClCompile>
+    <ClCompile Include="Mathematics\MathEx.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

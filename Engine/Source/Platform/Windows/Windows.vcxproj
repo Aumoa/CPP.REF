@@ -79,6 +79,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableSpecificWarnings>5050;4005;</DisableSpecificWarnings>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>
