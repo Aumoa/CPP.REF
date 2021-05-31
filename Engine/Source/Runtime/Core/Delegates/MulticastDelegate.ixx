@@ -69,9 +69,9 @@ export
 		/// <param name="...args"> The function arguments. </param>
 		void Invoke(TArgs&&... args)
 		{
-			for (function<void(TArgs...)>& func : _functions)
+			for (auto it : _functions)
 			{
-				func(forward<TArgs>(args)...);
+				it(forward<TArgs>(args)...);
 			}
 		}
 

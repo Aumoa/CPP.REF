@@ -13,4 +13,14 @@ export struct IFrameworkView : virtual public Object
 	/// Start application.
 	/// </summary>
 	virtual void Start() = 0;
+
+	/// <summary>
+	/// Represents multicast delegate to be called every frame when the process is idle.
+	/// </summary>
+	using IdleDelegate = MulticastDelegate<void()>;
+
+	/// <summary>
+	/// To be called every frame when the process is idle.
+	/// </summary>
+	MulticastDelegate<void()> Idle;
 };

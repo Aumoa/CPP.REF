@@ -65,6 +65,7 @@ void CoreWindow::Start()
 		}
 		else
 		{
+			Idle.Invoke();
 		}
 	}
 }
