@@ -47,6 +47,16 @@
     <ClCompile Include="Numerics\Quaternion.ixx">
       <Filter>Numerics</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\StringUtils.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Diagnostics\LogCategory.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Diagnostics\LogSystem.cpp">
+      <Filter>Diagnostics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

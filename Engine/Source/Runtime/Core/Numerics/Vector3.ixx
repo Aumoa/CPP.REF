@@ -5,6 +5,8 @@ export module SC.Runtime.Core:Vector3;
 import std.core;
 import :Vector;
 
+using namespace std;
+
 /// <summary>
 /// Represent a vector with 3 floating point values.
 /// </summary>
@@ -21,9 +23,9 @@ export struct Vector3 : public Vector<3>
 	/// Initialize new <see cref="Vector3"/> instance.
 	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Vector3(std::initializer_list<float> initializer)
+	inline constexpr Vector3(initializer_list<float> initializer)
 	{
-		for (size_t i = 0; i < MathEx::Min(initializer.size(), (size_t)3); ++i)
+		for (size_t i = 0; i < MathEx::Min(initializer.size(), (size_t)Num()); ++i)
 		{
 			Values[i] = initializer.begin()[i];
 		}
@@ -35,7 +37,7 @@ export struct Vector3 : public Vector<3>
 	/// <param name="copy"> The copy vector to initialize vector values. </param>
 	inline constexpr Vector3(const Vector<3>& copy)
 	{
-		for (size_t i = 0; i < 3; ++i)
+		for (size_t i = 0; i < Num(); ++i)
 		{
 			Values[i] = copy[i];
 		}
@@ -49,7 +51,7 @@ export struct Vector3 : public Vector<3>
 	template<size_t ON>
 	inline constexpr Vector3(const Vector<ON>& copy, float fill = 0.0f)
 	{
-		for (size_t i = 0; i < 3; ++i)
+		for (size_t i = 0; i < Num(); ++i)
 		{
 			if (i < ON)
 			{

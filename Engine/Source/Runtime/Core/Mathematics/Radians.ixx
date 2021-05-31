@@ -6,6 +6,8 @@ import std.core;
 import :MathEx;
 import :StringUtils;
 
+using namespace std;
+
 struct Degrees;
 
 /// <summary>
@@ -35,10 +37,10 @@ export struct Radians
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
+	inline wstring ToString(wstring_view formatArgs = L"") const
 	{
-		std::wstring placeholder = StringUtils::GetPlaceholder(formatArgs) + L"rad";
-		return std::format(placeholder, Value);
+		wstring placeholder = StringUtils::GetPlaceholder(formatArgs) + L"rad";
+		return format(placeholder, Value);
 	}
 
 	/// <summary>
@@ -170,9 +172,9 @@ export struct Radians
 	}
 
 private:
-	static constexpr float AngleHalf = std::numbers::pi_v<float>;
+	static constexpr float AngleHalf = numbers::pi_v<float>;
 	static constexpr float AngleMax = AngleHalf * 2.0f;
-	static constexpr float _180PI = 180.0f / std::numbers::pi_v<float>;
+	static constexpr float _180PI = 180.0f / numbers::pi_v<float>;
 };
 
 export float MathEx::GetValue(const Radians& v)

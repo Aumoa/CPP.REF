@@ -2,7 +2,10 @@
 
 export module SC.Runtime.Core:Vector4;
 
+import std.core;
 import :Vector;
+
+using namespace std;
 
 /// <summary>
 /// Represent a vector with 4 floating point values.
@@ -20,7 +23,7 @@ export struct Vector4 : public Vector<4>
 	/// Initialize new <see cref="Vector4"/> instance.
 	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Vector4(std::initializer_list<float> initializer)
+	inline constexpr Vector4(initializer_list<float> initializer)
 	{
 		for (size_t i = 0; i < MathEx::Min(initializer.size(), Num()); ++i)
 		{

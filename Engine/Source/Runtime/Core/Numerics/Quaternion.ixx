@@ -5,6 +5,8 @@ export module SC.Runtime.Core:Quaternion;
 import std.core;
 import :Vector4;
 
+using namespace std;
+
 export struct Quaternion : public Vector4
 {
 	/// <summary>
@@ -18,7 +20,7 @@ export struct Quaternion : public Vector4
 	/// Initialize new <see cref="Quaternion"/> instance.
 	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Quaternion(std::initializer_list<float> initializer)
+	inline constexpr Quaternion(initializer_list<float> initializer)
 	{
 		for (size_t i = 0; i < MathEx::Min(initializer.size(), Num()); ++i)
 		{

@@ -5,6 +5,8 @@ export module SC.Runtime.Core:StringUtils;
 import std.core;
 import :PrimitiveTypes;
 
+using namespace std;
+
 /// <summary>
 /// Provide extended functions for compose string.
 /// </summary>
@@ -19,40 +21,50 @@ public:
 	/// <param name="arguments"> The arguments. </param>
 	/// <returns> The composed string. </returns>
 	template<class T>
-	static std::wstring Join(std::wstring_view separator, std::span<T const> arguments)
+	static wstring Join(wstring_view separator, span<T const> arguments)
 	{
 		if (arguments.size() == 0)
 		{
 			return L"";
 		}
 
-		std::wstringstream wss;
-		wss << std::format(L"{}", arguments[0]);
+		wstringstream wss;
+		wss << format(L"{}", arguments[0]);
 		for (size_t i = 1; i < arguments.size(); ++i)
 		{
-			wss << separator << std::format(L"{}", arguments[i]);
+			wss << separator << format(L"{}", arguments[i]);
 		}
-		return std::move(wss).str();
+		return move(wss).str();
 	}
 
 	/// <summary>
-	/// Get placeholder text for std::format.
+	/// Get placeholder text for format.
 	/// </summary>
 	/// <param name="number"> The argument number. </param>
 	/// <param name="formatArgs"> The formatting arguments includes colon. </param>
 	/// <returns> The placeholder string. </returns>
-	static std::wstring GetPlaceholder(int32 number, std::wstring_view formatArgs)
-	{
-		return std::format(L"{{{}{}}}", number, formatArgs);
-	}
+	static wstring GetPlaceholder(int32 number, wstring_view formatArgs);
 
 	/// <summary>
-	/// Get placeholder text for std::format.
+	/// Get placeholder text for format.
 	/// </summary>
 	/// <param name="formatArgs"> The formatting arguments includes colon. </param>
 	/// <returns> The placeholder string. </returns>
-	static std::wstring GetPlaceholder(std::wstring_view formatArgs)
-	{
-		return std::format(L"{{{}}}", formatArgs);
-	}
+	static wstring GetPlaceholder(wstring_view formatArgs);
+
+	/// <summary>
+	/// Convert multibyte string to unicode string.
+	/// </summary>
+	/// <param name="multibyte"> The multibyte string. </param>
+	/// <param name="codePage"> The code page that desired converted. </param>
+	/// <returns> Converted unicode string. </returns>
+	static wstring AsUnicode(const string& multibyte, uint32 codePage = 0);
+
+	/// <summary>
+	/// Convert unicode string to multibyte string.
+	/// </summary>
+	/// <param name="unicode"> The unicode string. </param>
+	/// <param name="codePage"> The code page that desired converted. </param>
+	/// <returns> Converted multibyte string. </returns>
+	static string AsMultibyte(const wstring& unicode, uint32 codePage = 0);
 };

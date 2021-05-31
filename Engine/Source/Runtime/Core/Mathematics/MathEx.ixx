@@ -5,6 +5,8 @@ export module SC.Runtime.Core:MathEx;
 import std.core;
 import :PrimitiveTypes;
 
+using namespace std;
+
 struct Radians;
 
 /// <summary>
@@ -20,7 +22,7 @@ public:
 	/// <returns> The computed value. </returns>
 	static float Sin(const Radians& x)
 	{
-		return std::sin(GetValue(x));
+		return sin(GetValue(x));
 	}
 
 	/// <summary>
@@ -30,7 +32,7 @@ public:
 	/// <returns> The computed value. </returns>
 	static float Cos(const Radians& x)
 	{
-		return std::cos(GetValue(x));
+		return cos(GetValue(x));
 	}
 
 	/// <summary>
@@ -51,7 +53,7 @@ public:
 	/// <returns> The computed value. </returns>
 	static float Sqrt(float x)
 	{
-		return std::sqrt(x);
+		return sqrt(x);
 	}
 
 	/// <summary>
@@ -61,7 +63,7 @@ public:
 	/// <param name="x"> The argument value. </param>
 	/// <param name="divisor"> The divisor. </param>
 	/// <returns> The computed value. </returns>
-	template<std::floating_point T>
+	template<floating_point T>
 	static inline constexpr T Mod(const T& x, const T& divisor)
 	{
 		T exp = x / divisor;
@@ -77,7 +79,7 @@ public:
 	/// <param name="x"> The argument value. </param>
 	/// <param name="divisor"> The divisor. </param>
 	/// <returns> The computed value. </returns>
-	template<std::signed_integral T>
+	template<signed_integral T>
 	static inline constexpr T Mod(const T& x, const T& divisor)
 	{
 		return x % divisor;

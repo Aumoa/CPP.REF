@@ -60,7 +60,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;5201;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>5050;5201;4005;5105;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>
@@ -79,8 +79,9 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;5201;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>5050;5201;4005;5105;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -92,7 +93,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core.ixx" />
+    <ClCompile Include="Diagnostics\LogCategory.cpp" />
     <ClCompile Include="Diagnostics\LogCategory.ixx" />
+    <ClCompile Include="Diagnostics\LogSystem.cpp" />
     <ClCompile Include="Diagnostics\LogSystem.ixx" />
     <ClCompile Include="Diagnostics\LogVerbosity.ixx" />
     <ClCompile Include="LogCategory\LogCore.ixx" />
@@ -105,9 +108,11 @@
     <ClCompile Include="Numerics\Vector2.ixx" />
     <ClCompile Include="Numerics\Vector3.ixx" />
     <ClCompile Include="Numerics\Vector4.ixx" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Object.ixx" />
     <ClCompile Include="PrimitiveTypes.ixx" />
     <ClCompile Include="SupportsObject.ixx" />
+    <ClCompile Include="Utilities\StringUtils.cpp" />
     <ClCompile Include="Utilities\StringUtils.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

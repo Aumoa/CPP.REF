@@ -12,11 +12,18 @@ export class CoreWindow : Object
 public:
 	using Super = Object;
 
+private:
+	void* _hwnd = nullptr;
+
 public:
 	/// <summary>
 	/// Initialize new <see cref="CoreWindow"/> instance.
 	/// </summary>
 	CoreWindow() : Super()
 	{
+		InternalCreateWindow();
 	}
+
+private:
+	void InternalCreateWindow();
 };

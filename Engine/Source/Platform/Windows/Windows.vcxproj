@@ -89,7 +89,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CoreWindow.cpp" />
     <ClCompile Include="CoreWindow.ixx" />
+    <ClCompile Include="LogWindows.ixx" />
     <ClCompile Include="Windows.ixx" />
     <ClCompile Include="WinMain.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5050;4005;5105;5106;</DisableSpecificWarnings>

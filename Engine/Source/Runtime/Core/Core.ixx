@@ -26,3 +26,6 @@ export import :MathEx;
 export import :LogSystem;
 export import :LogVerbosity;
 export import :LogCategory;
+
+// LogCategory
+export import :LogCore;

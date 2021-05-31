@@ -6,6 +6,8 @@ import std.core;
 import :MathEx;
 import :StringUtils;
 
+using namespace std;
+
 /// <summary>
 /// Represents a vector with specified count floating values.
 /// </summary>
@@ -28,7 +30,7 @@ struct Vector
 	/// Initialize new <see cref="Vector"/> instance.
 	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Vector(std::initializer_list<float> initializer)
+	inline constexpr Vector(initializer_list<float> initializer)
 	{
 		for (size_t i = 0; i < MathEx::Min(initializer.size(), (size_t)N); ++i)
 		{
@@ -322,16 +324,16 @@ struct Vector
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
+	inline wstring ToString(wstring_view formatArgs = L"") const
 	{
-		std::wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
+		wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
 
-		std::array<std::wstring, N> composed;
+		array<wstring, N> composed;
 		for (size_t i = 0; i < N; ++i)
 		{
-			composed[i] = std::format(placeholder, Values[i]);
+			composed[i] = format(placeholder, Values[i]);
 		}
 
-		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
+		return format(L"{{{}}}", StringUtils::Join(L", ", span<wstring const>(composed)));
 	}
 };

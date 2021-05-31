@@ -4,5 +4,7 @@
     <ClCompile Include="Windows.ixx" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="CoreWindow.ixx" />
+    <ClCompile Include="CoreWindow.cpp" />
+    <ClCompile Include="LogWindows.ixx" />
   </ItemGroup>
 </Project>
