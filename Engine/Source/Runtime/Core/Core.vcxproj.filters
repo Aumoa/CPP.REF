@@ -38,6 +38,15 @@
     <ClCompile Include="Numerics\Vector3.ixx">
       <Filter>Numerics</Filter>
     </ClCompile>
+    <ClCompile Include="Numerics\Vector2.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Vector4.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Quaternion.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

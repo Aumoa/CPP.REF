@@ -335,6 +335,3 @@ struct Vector
 		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
 	}
 };
-
-export using Vector2 = Vector<2>;
-export using Vector4 = Vector<4>;
