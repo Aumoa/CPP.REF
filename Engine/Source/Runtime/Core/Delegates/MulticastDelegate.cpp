@@ -12,7 +12,7 @@ DelegateHandle::~DelegateHandle()
 	Unlink();
 }
 
-void DelegateHandle::Unlink()
+void DelegateHandle::Unlink() noexcept
 {
 	if (IsValid())
 	{

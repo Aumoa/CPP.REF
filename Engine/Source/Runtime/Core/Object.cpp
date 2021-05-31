@@ -21,6 +21,7 @@ Object::~Object() noexcept
 	// Destroy all subobjects.
 	for (size_t i = 0; i < _subobjects.size(); ++i)
 	{
+		_subobjects[i]->_outer = nullptr;
 		delete _subobjects[i];
 		_subobjects[i] = nullptr;
 	}

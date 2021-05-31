@@ -60,7 +60,12 @@
     <ClCompile Include="Delegates\MulticastDelegate.ixx">
       <Filter>Delegates</Filter>
     </ClCompile>
-    <ClCompile Include="Delegates\MulticastDelegate.cpp" />
+    <ClCompile Include="Delegates\MulticastDelegate.cpp">
+      <Filter>Delegates</Filter>
+    </ClCompile>
+    <ClCompile Include="Delegates\MulticastEvent.ixx">
+      <Filter>Delegates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

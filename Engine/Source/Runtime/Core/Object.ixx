@@ -40,7 +40,8 @@ public:
 	template<class T, class... TArgs>
 	T* CreateSubobject(TArgs&&... args)
 	{
-		T*& ptr = _subobjects.emplace_back(new T(forward<TArgs>(args)...));
+		T* ptr = new T(forward<TArgs>(args)...);
+		_subobjects.emplace_back(ptr);
 		ptr->_outer = this;
 		return ptr;
 	}

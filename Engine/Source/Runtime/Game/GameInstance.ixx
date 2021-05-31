@@ -5,6 +5,9 @@ export module SC.Runtime.Game:GameInstance;
 import std.core;
 import SC.Runtime.Core;
 import :GameObject;
+import :IFrameworkView;
+
+using namespace std;
 
 /// <summary>
 /// Represents single game instance while application are running.
@@ -19,16 +22,12 @@ public:
 	/// Initialize new <see cref="GameInstance"/> instance.
 	/// </summary>
 	/// <param name="name"> The instance name. </param>
-	GameInstance(std::wstring_view name) : Super(name)
-	{
-	}
+	GameInstance(wstring_view name);
 
 	/// <summary>
 	/// Run the application.
 	/// </summary>
+	/// <param name="frameworkView"> The core framework view window. </param>
 	/// <returns> Return primary exit code. </returns>
-	int32 Run()
-	{
-		return 0;
-	}
+	int32 Run(IFrameworkView* frameworkView);
 };

@@ -19,7 +19,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-void CoreWindow::InternalCreateWindow()
+CoreWindow::CoreWindow() : Super()
 {
 	WNDCLASSEXW wcex = {};
 	wcex.cbSize = sizeof(wcex);
@@ -28,6 +28,43 @@ void CoreWindow::InternalCreateWindow()
 	wcex.hInstance = GetModuleHandleW(nullptr);
 	if (RegisterClassExW(&wcex) == 0)
 	{
-		LogSystem::Log(Fatal, 
+		LogSystem::Log(LogWindows, Fatal, L"Could not register window class with error code: {}. Abort.", ::GetLastError());
+		return;
+	}
+
+	HWND hWnd = CreateWindowW(wcex.lpszClassName, L"GameApp", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, wcex.hInstance, this);
+	if (hWnd == nullptr)
+	{
+		LogSystem::Log(LogWindows, Fatal, L"Could not create core window with error code: {}. Abort.", ::GetLastError());
+		return;
+	}
+
+	_hwnd = hWnd;
+}
+
+void CoreWindow::Start()
+{
+	::ShowWindow((HWND)_hwnd, SW_SHOW);
+
+	MSG msg{ };
+
+	_bMainLoop = true;
+	while (_bMainLoop)
+	{
+		if (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+			{
+				_bMainLoop = false;
+			}
+			else
+			{
+				TranslateMessage(&msg);
+				DispatchMessageW(&msg);
+			}
+		}
+		else
+		{
+		}
 	}
 }

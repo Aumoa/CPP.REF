@@ -4,9 +4,10 @@
 
 import SC.Runtime.Core;
 import SC.Game.Chess;
+import SC.Platform.Windows;
 
 INT APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR cmd, INT show)
 {
 	ChessGameInstance gameInstance;
-	return gameInstance.Run();
+	return gameInstance.Run(gameInstance.CreateSubobject<CoreWindow>());
 }

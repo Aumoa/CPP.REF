@@ -5,6 +5,8 @@ export module SC.Runtime.Game:GameObject;
 import std.core;
 import SC.Runtime.Core;
 
+using namespace std;
+
 /// <summary>
 /// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
 /// </summary>
@@ -14,24 +16,18 @@ public:
 	using Super = Object;
 
 private:
-	std::wstring _name;
+	wstring _name;
 
 public:
 	/// <summary>
 	/// Initialize new <see cref="GameObject"/> instance.
 	/// </summary>
 	/// <param name="name"> The object name. </param>
-	GameObject(std::wstring_view name) : Super()
-		, _name(name)
-	{
-	}
+	GameObject(wstring_view name);
 
 	/// <summary>
 	/// Get object name to represent this object.
 	/// </summary>
 	/// <returns> The string view instance. </returns>
-	virtual std::wstring ToString() const
-	{
-		return _name;
-	}
+	virtual wstring ToString() const;
 };

@@ -34,7 +34,7 @@ export
 		/// <summary>
 		/// Unlink target multicast delegate.
 		/// </summary>
-		void Unlink();
+		void Unlink() noexcept;
 
 		/// <summary>
 		/// Get validation state that represents link state.
@@ -54,7 +54,7 @@ export
 		set<DelegateHandle*> _handles;
 
 	public:
-		~MulticastDelegate()
+		~MulticastDelegate() noexcept
 		{
 			for (auto it = _handles.begin(); _handles.size() != 0; it = _handles.begin())
 			{

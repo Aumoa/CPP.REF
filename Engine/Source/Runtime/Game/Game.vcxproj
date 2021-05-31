@@ -97,7 +97,9 @@
   <ItemGroup>
     <ClCompile Include="Game.ixx" />
     <ClCompile Include="GameFramework\AActor.ixx" />
+    <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="GameInstance.ixx" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="IFrameworkView.ixx" />
   </ItemGroup>

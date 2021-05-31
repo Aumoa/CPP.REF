@@ -32,3 +32,4 @@ export import :LogCore;
 
 // Delegates
 export import :MulticastDelegate;
+export import :MulticastEvent;

@@ -3,3 +3,4 @@
 export module SC.Platform.Windows;
 
 export import :CoreWindow;
+export import :LogWindows;

@@ -13,5 +13,7 @@
     <ClCompile Include="Game.ixx" />
     <ClCompile Include="GameInstance.ixx" />
     <ClCompile Include="IFrameworkView.ixx" />
+    <ClCompile Include="GameInstance.cpp" />
+    <ClCompile Include="GameObject.cpp" />
   </ItemGroup>
 </Project>
