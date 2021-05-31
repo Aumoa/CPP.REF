@@ -93,6 +93,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core.ixx" />
+    <ClCompile Include="Delegates\MulticastDelegate.cpp" />
+    <ClCompile Include="Delegates\MulticastDelegate.ixx" />
     <ClCompile Include="Diagnostics\LogCategory.cpp" />
     <ClCompile Include="Diagnostics\LogCategory.ixx" />
     <ClCompile Include="Diagnostics\LogSystem.cpp" />

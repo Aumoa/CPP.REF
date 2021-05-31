@@ -29,3 +29,6 @@ export import :LogCategory;
 
 // LogCategory
 export import :LogCore;
+
+// Delegates
+export import :MulticastDelegate;

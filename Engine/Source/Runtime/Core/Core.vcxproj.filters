@@ -57,6 +57,10 @@
     <ClCompile Include="Diagnostics\LogSystem.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
+    <ClCompile Include="Delegates\MulticastDelegate.ixx">
+      <Filter>Delegates</Filter>
+    </ClCompile>
+    <ClCompile Include="Delegates\MulticastDelegate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
