@@ -22,6 +22,29 @@ export struct Vector4 : public Vector<4>
 	/// <summary>
 	/// Initialize new <see cref="Vector4"/> instance.
 	/// </summary>
+	/// <param name="v"> The initialize value. </param>
+	inline constexpr Vector4(float v)
+	{
+		for (size_t i = 0; i < Num(); ++i)
+		{
+			Values[i] = v;
+		}
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector4"/> instance.
+	/// </summary>
+	/// <param name="x"> The X value. </param>
+	/// <param name="y"> The Y value. </param>
+	/// <param name="z"> The Z value. </param>
+	/// <param name="w"> The Z value. </param>
+	inline constexpr Vector4(float x, float y, float z, float w) : Vector{ x, y, z, w }
+	{
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector4"/> instance.
+	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
 	inline constexpr Vector4(initializer_list<float> initializer)
 	{

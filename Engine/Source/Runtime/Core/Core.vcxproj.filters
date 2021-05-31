@@ -69,6 +69,9 @@
     <ClCompile Include="Mathematics\MathEx.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
+    <ClCompile Include="Numerics\Line.ixx">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

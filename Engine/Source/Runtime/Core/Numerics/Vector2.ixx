@@ -22,6 +22,27 @@ export struct Vector2 : public Vector<2>
 	/// <summary>
 	/// Initialize new <see cref="Vector2"/> instance.
 	/// </summary>
+	/// <param name="v"> The initialize value. </param>
+	inline constexpr Vector2(float v)
+	{
+		for (size_t i = 0; i < Num(); ++i)
+		{
+			Values[i] = v;
+		}
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector2"/> instance.
+	/// </summary>
+	/// <param name="x"> The X value. </param>
+	/// <param name="y"> The Y value. </param>
+	inline constexpr Vector2(float x, float y) : Vector{ x, y }
+	{
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector2"/> instance.
+	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
 	inline constexpr Vector2(initializer_list<float> initializer)
 	{

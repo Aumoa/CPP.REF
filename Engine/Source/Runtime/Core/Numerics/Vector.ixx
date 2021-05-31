@@ -29,6 +29,18 @@ struct Vector
 	/// <summary>
 	/// Initialize new <see cref="Vector"/> instance.
 	/// </summary>
+	/// <param name="v"> The initialize value. </param>
+	inline constexpr Vector(float v)
+	{
+		for (size_t i = 0; i < N; ++i)
+		{
+			Values[i] = v;
+		}
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector"/> instance.
+	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
 	inline constexpr Vector(initializer_list<float> initializer)
 	{
