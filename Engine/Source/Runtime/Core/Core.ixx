@@ -18,6 +18,12 @@ export import :Vector4;
 export import :Quaternion;
 export import :Line;
 export import :Color;
+export import :AxisAlignedCube;
+export import :Sphere;
+export import :Ray;
+export import :Plane;
+export import :ObjectOrientedCube;
+export import :Frustum;
 
 // Mathematics
 export import :Degrees;
