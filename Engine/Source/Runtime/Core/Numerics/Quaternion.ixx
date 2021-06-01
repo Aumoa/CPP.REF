@@ -4,6 +4,7 @@ export module SC.Runtime.Core:Quaternion;
 
 import std.core;
 import :Vector4;
+import :Vector3;
 
 using namespace std;
 
@@ -146,4 +147,32 @@ export struct Quaternion : public Vector4
 	{
 		return Values[3];
 	}
+
+	/// <summary>
+	/// Rotate vector.
+	/// </summary>
+	constexpr Vector3 RotateVector(const Vector3& V) const
+	{
+		Vector3 Q = Swiz<0, 1, 2>();
+		Vector3 T = (Q ^ V) * 2.0f;
+		return V + (T * W()) + (Q ^ T);
+	}
+
+	/// <summary>
+	/// Get inversed quaternion.
+	/// </summary>
+	constexpr Quaternion GetInverse() const
+	{
+		return Quaternion(-X(), -Y(), -Z(), W());
+	}
+
+	/// <summary>
+	/// Get identity quaternion.
+	/// </summary>
+	static inline constexpr Quaternion GetIdentity();
 };
+
+inline constexpr Quaternion Quaternion::GetIdentity()
+{
+	return Quaternion(0, 0, 0, 1.0f);
+}

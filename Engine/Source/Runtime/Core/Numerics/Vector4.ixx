@@ -34,6 +34,18 @@ export struct Vector4 : public Vector<4>
 	/// <summary>
 	/// Initialize new <see cref="Vector4"/> instance.
 	/// </summary>
+	inline constexpr Vector4(const Vector<Num() - 1>& lhs, float rhs)
+	{
+		for (size_t i = 0; i < Num() - 1; ++i)
+		{
+			Values[i] = lhs.Values[i];
+		}
+		Values[Num() - 1] = rhs;
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector4"/> instance.
+	/// </summary>
 	/// <param name="x"> The X value. </param>
 	/// <param name="y"> The Y value. </param>
 	/// <param name="z"> The Z value. </param>

@@ -113,6 +113,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="IFrameworkView.ixx" />
+    <ClCompile Include="Transform.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

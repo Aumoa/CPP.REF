@@ -42,5 +42,6 @@
     <ClCompile Include="GameFramework\APawn.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
+    <ClCompile Include="Transform.ixx" />
   </ItemGroup>
 </Project>

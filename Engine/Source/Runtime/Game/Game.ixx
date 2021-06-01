@@ -5,6 +5,7 @@ export module SC.Runtime.Game;
 export import :GameObject;
 export import :GameInstance;
 export import :IFrameworkView;
+export import :Transform;
 
 // GameFramework
 export import :AActor;

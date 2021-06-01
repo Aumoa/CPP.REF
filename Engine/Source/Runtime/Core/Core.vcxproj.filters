@@ -105,6 +105,9 @@
     <ClCompile Include="Numerics\Matrix4x4.cpp">
       <Filter>Numerics</Filter>
     </ClCompile>
+    <ClCompile Include="Numerics\Quaternion.cpp">
+      <Filter>Numerics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

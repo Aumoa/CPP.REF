@@ -41,6 +41,18 @@ struct Vector
 	/// <summary>
 	/// Initialize new <see cref="Vector"/> instance.
 	/// </summary>
+	inline constexpr Vector(const Vector<N - 1>& lhs, float rhs)
+	{
+		for (size_t i = 0; i < N - 1; ++i)
+		{
+			Values[i] = lhs.Values[i];
+		}
+		Values[N - 1] = rhs;
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector"/> instance.
+	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
 	inline constexpr Vector(initializer_list<float> initializer)
 	{
@@ -87,7 +99,7 @@ struct Vector
 	/// Get vector element count.
 	/// </summary>
 	/// <returns> The element count. </returns>
-	inline constexpr size_t Num() const
+	static inline constexpr size_t Num() 
 	{
 		return N;
 	}
@@ -254,6 +266,26 @@ struct Vector
 		return result;
 	}
 
+	inline constexpr Vector operator *(float rhs) const
+	{
+		Vector result;
+		for (size_t i = 0; i < N; ++i)
+		{
+			result.Values[i] = Values[i] * rhs;
+		}
+		return result;
+	}
+
+	inline constexpr Vector operator /(float rhs) const
+	{
+		Vector result;
+		for (size_t i = 0; i < N; ++i)
+		{
+			result.Values[i] = Values[i] / rhs;
+		}
+		return result;
+	}
+
 	inline Vector& operator =(const Vector& rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
@@ -295,6 +327,24 @@ struct Vector
 		for (size_t i = 0; i < N; ++i)
 		{
 			Values[i] /= rhs.Values[i];
+		}
+		return *this;
+	}
+
+	inline Vector& operator *=(float rhs)
+	{
+		for (size_t i = 0; i < N; ++i)
+		{
+			Values[i] *= rhs;
+		}
+		return *this;
+	}
+
+	inline Vector& operator /=(float rhs)
+	{
+		for (size_t i = 0; i < N; ++i)
+		{
+			Values[i] /= rhs;
 		}
 		return *this;
 	}
@@ -348,4 +398,29 @@ struct Vector
 
 		return format(L"{{{}}}", StringUtils::Join(L", ", span<wstring const>(composed)));
 	}
+
+	/// <summary>
+	/// Swizzling vector that compose components specified indexes.
+	/// </summary>
+	/// <returns> Composed vector. </returns>
+	template<size_t... Indexes>
+	inline constexpr Vector<sizeof...(Indexes)> Swiz() const
+	{
+		return Vector<sizeof...(Indexes)>{ Values[Indexes]... };
+	}
 };
+
+export
+{
+	template<size_t N>
+	inline constexpr Vector<N> operator *(float lhs, const Vector<N>& rhs)
+	{
+		return Vector<N>(lhs) * rhs;
+	}
+
+	template<size_t N>
+	inline constexpr Vector<N> operator /(float lhs, const Vector<N>& rhs)
+	{
+		return Vector<N>(lhs) / rhs;
+	}
+}

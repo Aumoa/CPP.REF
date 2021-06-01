@@ -116,6 +116,7 @@
     <ClCompile Include="Numerics\Matrix4x4.ixx" />
     <ClCompile Include="Numerics\ObjectOrientedCube.ixx" />
     <ClCompile Include="Numerics\Plane.ixx" />
+    <ClCompile Include="Numerics\Quaternion.cpp" />
     <ClCompile Include="Numerics\Quaternion.ixx" />
     <ClCompile Include="Numerics\Range.ixx" />
     <ClCompile Include="Numerics\Ray.ixx" />

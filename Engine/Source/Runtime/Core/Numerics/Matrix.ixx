@@ -101,35 +101,64 @@ export
 		/// <summary>
 		/// Represents the matrix is identity.
 		/// </summary>
-		template<enable_if_t<IsSquared(), void*> = nullptr>
 		constexpr bool IsIdentity() const
 		{
-			for (size_t i = 0; i < NRow; ++i)
+			if constexpr (IsSquared())
 			{
-				for (size_t j = 0; j < NCol; ++j)
+				for (size_t i = 0; i < NRow; ++i)
 				{
-					if (V[i][j] != (float)(i == j))
+					for (size_t j = 0; j < NCol; ++j)
 					{
-						return false;
+						if (V[i][j] != (float)(i == j))
+						{
+							return false;
+						}
 					}
 				}
+				return true;
 			}
-			return true;
+			else
+			{
+				return false;
+			}
 		}
 
 		/// <summary>
 		/// Get transposed matrix.
 		/// </summary>
 		/// <returns></returns>
-		template<enable_if_t<IsSquared(), void*> = nullptr>
-		constexpr Matrix GetTransposed() const
+		constexpr Matrix<NCol, NRow> GetTransposed() const
 		{
-			Matrix m;
+			Matrix<NCol, NRow> m;
 			for (size_t i = 0; i < NRow; ++i)
 			{
 				for (size_t j = 0; j < NCol; ++j)
 				{
 					m.V[j][i] = V[i][j];
+				}
+			}
+			return m;
+		}
+
+		/// <summary>
+		/// Multiply two matrices.
+		/// </summary>
+		/// <param name="lhs"></param>
+		/// <param name="rhs"></param>
+		/// <returns></returns>
+		template<size_t TCol>
+		static constexpr Matrix<NRow, TCol> Multiply(const Matrix& lhs, const Matrix<NCol, TCol>& rhs)
+		{
+			Matrix<NRow, TCol> m;
+			for (size_t i = 0; i < NRow; ++i)
+			{
+				for (size_t j = 0; j < TCol; ++j)
+				{
+					m.V[i].Values[j] = 0;
+					for (size_t k = 0; k < NCol; ++k)
+					{
+						m.V[i].Values[j] += lhs.V[i].Values[k] * rhs.V[k].Values[j];
+					}
 				}
 			}
 			return m;

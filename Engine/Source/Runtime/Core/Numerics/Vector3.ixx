@@ -34,6 +34,18 @@ export struct Vector3 : public Vector<3>
 	/// <summary>
 	/// Initialize new <see cref="Vector3"/> instance.
 	/// </summary>
+	inline constexpr Vector3(const Vector<Num() - 1>& lhs, float rhs)
+	{
+		for (size_t i = 0; i < Num() - 1; ++i)
+		{
+			Values[i] = lhs.Values[i];
+		}
+		Values[Num() - 1] = rhs;
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="Vector3"/> instance.
+	/// </summary>
 	/// <param name="x"> The X value. </param>
 	/// <param name="y"> The Y value. </param>
 	/// <param name="z"> The Z value. </param>
@@ -92,7 +104,7 @@ export struct Vector3 : public Vector<3>
 	/// <param name="lhs"> The first value. </param>
 	/// <param name="rhs"> The second value. </param>
 	/// <returns> The vector of result of cross product. </returns>
-	static Vector3 CrossProduct(const Vector3& lhs, const Vector3& rhs)
+	static constexpr Vector3 CrossProduct(const Vector3& lhs, const Vector3& rhs)
 	{
 		return
 		{
@@ -100,6 +112,11 @@ export struct Vector3 : public Vector<3>
 			lhs.Z() * rhs.X() - lhs.X() * rhs.Z(),
 			lhs.X() * rhs.Y() - lhs.Y() * rhs.X()
 		};
+	}
+
+	constexpr Vector3 operator ^(const Vector3& rhs) const
+	{
+		return CrossProduct(*this, rhs);
 	}
 
 	/// <summary>

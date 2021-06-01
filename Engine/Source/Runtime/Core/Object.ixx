@@ -8,7 +8,8 @@ import :PrimitiveTypes;
 using namespace std;
 
 /// <summary>
-/// Supports all classes in the smart component hierarcy and provides low-level services to derived classes.
+/// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
+/// Represents unit that subobjects are binding and managed.
 /// </summary>
 export class Object
 {
