@@ -15,5 +15,32 @@
     <ClCompile Include="IFrameworkView.ixx" />
     <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameFramework\AController.ixx">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\AActor.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\AController.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\APlayerController.ixx">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\APlayerController.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\AAIController.ixx">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\AAIController.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\APawn.ixx">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\APawn.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

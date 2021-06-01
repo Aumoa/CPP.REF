@@ -5,3 +5,10 @@ export module SC.Runtime.Game;
 export import :GameObject;
 export import :GameInstance;
 export import :IFrameworkView;
+
+// GameFramework
+export import :AActor;
+export import :AController;
+export import :APlayerController;
+export import :AAIController;
+export import :APawn;

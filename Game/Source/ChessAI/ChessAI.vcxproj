@@ -13,8 +13,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{3009a2f5-8441-4cd7-8385-9810a1c4642e}</ProjectGuid>
-    <RootNamespace>Game</RootNamespace>
+    <ProjectGuid>{dadb4b61-e8bb-4cc7-b46b-854c5dc0e608}</ProjectGuid>
+    <RootNamespace>ChessAI</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -57,17 +57,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableSpecificWarnings>5050;4005;5201;</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
+      <DisableSpecificWarnings>5050;4005;5201;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -76,43 +76,37 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableSpecificWarnings>5050;4005;5201;</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
+      <DisableSpecificWarnings>5050;4005;5201;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>
+      </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.vcxproj">
-      <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
-    </ProjectReference>
+    <ClCompile Include="Actors\AChessBoard.cpp" />
+    <ClCompile Include="Actors\AChessBoard.ixx" />
+    <ClCompile Include="Actors\APiece.ixx" />
+    <ClCompile Include="ChessAI.ixx" />
+    <ClCompile Include="Pawns\AChessBoardProxy.cpp" />
+    <ClCompile Include="Pawns\AChessBoardProxy.ixx" />
+    <ClCompile Include="Queries\ChessBoardQuery.ixx" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game.ixx" />
-    <ClCompile Include="GameFramework\AActor.cpp" />
-    <ClCompile Include="GameFramework\AActor.ixx" />
-    <ClCompile Include="GameFramework\AAIController.cpp" />
-    <ClCompile Include="GameFramework\AAIController.ixx" />
-    <ClCompile Include="GameFramework\AController.cpp" />
-    <ClCompile Include="GameFramework\AController.ixx" />
-    <ClCompile Include="GameFramework\APawn.cpp" />
-    <ClCompile Include="GameFramework\APawn.ixx" />
-    <ClCompile Include="GameFramework\APlayerController.cpp" />
-    <ClCompile Include="GameFramework\APlayerController.ixx" />
-    <ClCompile Include="GameInstance.cpp" />
-    <ClCompile Include="GameInstance.ixx" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GameObject.ixx" />
-    <ClCompile Include="IFrameworkView.ixx" />
+    <ProjectReference Include="..\..\..\Engine\Source\Runtime\Core\Core.vcxproj">
+      <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Engine\Source\Runtime\Game\Game.vcxproj">
+      <Project>{3009a2f5-8441-4cd7-8385-9810a1c4642e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
