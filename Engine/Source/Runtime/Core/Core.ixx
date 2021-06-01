@@ -17,6 +17,7 @@ export import :Vector3;
 export import :Vector4;
 export import :Quaternion;
 export import :Line;
+export import :Color;
 
 // Mathematics
 export import :Degrees;

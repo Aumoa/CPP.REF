@@ -106,6 +106,8 @@
     <ClCompile Include="Mathematics\MathEx.cpp" />
     <ClCompile Include="Mathematics\MathEx.ixx" />
     <ClCompile Include="Mathematics\Radians.ixx" />
+    <ClCompile Include="Numerics\Color.cpp" />
+    <ClCompile Include="Numerics\Color.ixx" />
     <ClCompile Include="Numerics\Line.ixx" />
     <ClCompile Include="Numerics\Quaternion.ixx" />
     <ClCompile Include="Numerics\Range.ixx" />

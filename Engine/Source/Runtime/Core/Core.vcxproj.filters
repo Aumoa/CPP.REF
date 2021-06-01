@@ -72,6 +72,12 @@
     <ClCompile Include="Numerics\Line.ixx">
       <Filter>Mathematics</Filter>
     </ClCompile>
+    <ClCompile Include="Numerics\Color.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Color.cpp">
+      <Filter>Numerics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
