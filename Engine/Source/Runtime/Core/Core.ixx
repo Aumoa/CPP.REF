@@ -24,6 +24,8 @@ export import :Ray;
 export import :Plane;
 export import :ObjectOrientedCube;
 export import :Frustum;
+export import :Matrix;
+export import :Matrix4x4;
 
 // Mathematics
 export import :Degrees;

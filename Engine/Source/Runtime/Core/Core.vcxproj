@@ -111,6 +111,9 @@
     <ClCompile Include="Numerics\Color.ixx" />
     <ClCompile Include="Numerics\Frustum.ixx" />
     <ClCompile Include="Numerics\Line.ixx" />
+    <ClCompile Include="Numerics\Matrix.ixx" />
+    <ClCompile Include="Numerics\Matrix4x4.cpp" />
+    <ClCompile Include="Numerics\Matrix4x4.ixx" />
     <ClCompile Include="Numerics\ObjectOrientedCube.ixx" />
     <ClCompile Include="Numerics\Plane.ixx" />
     <ClCompile Include="Numerics\Quaternion.ixx" />

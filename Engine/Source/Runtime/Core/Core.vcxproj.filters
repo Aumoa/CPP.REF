@@ -96,6 +96,15 @@
     <ClCompile Include="Numerics\Frustum.ixx">
       <Filter>Numerics</Filter>
     </ClCompile>
+    <ClCompile Include="Numerics\Matrix.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Matrix4x4.ixx">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Matrix4x4.cpp">
+      <Filter>Numerics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
