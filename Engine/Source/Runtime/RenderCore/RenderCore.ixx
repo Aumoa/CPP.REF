@@ -3,4 +3,5 @@
 export module SC.Runtime.RenderCore;
 
 // RHI
+export import :LogRHI;
 export import :RHIDevice;

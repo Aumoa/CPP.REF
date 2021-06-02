@@ -15,7 +15,7 @@ export class Object
 {
 	atomic<int32> _ref = 0;
 	Object* _outer = nullptr;
-	vector<Object*> _subobjects;
+	set<Object*> _subobjects;
 
 public:
 	/// <summary>
@@ -42,7 +42,7 @@ public:
 	T* CreateSubobject(TArgs&&... args)
 	{
 		T* ptr = new T(forward<TArgs>(args)...);
-		_subobjects.emplace_back(ptr);
+		_subobjects.emplace(ptr);
 		ptr->_outer = this;
 		return ptr;
 	}

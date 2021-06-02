@@ -12,7 +12,7 @@ using namespace std::filesystem;
 
 using enum ELogVerbosity;
 
-optional<FileReference> LogCategory::_file;
+//optional<FileReference> LogCategory::_file;
 
 LogCategory::LogCategory(wstring_view categoryName)
 	: _name(categoryName)
@@ -38,17 +38,17 @@ wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 
 void LogCategory::OnLog(ELogVerbosity logVerbosity, wstring_view message)
 {
-	if (!_file.has_value())
-	{
-		_file = FileReference(format(L"Saved\\Logs\\{}_{}.log", L"Logs", 0));
-	}
+	//if (!_file.has_value())
+	//{
+	//	_file = FileReference(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));
+	//}
 
-	wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
-	wstring composed = format(L"{}: Log{}: {}: {}", zoned_time(system_clock::now()), _name, VerbosityToString(logVerbosity), message);
-	if (stream.is_open())
-	{
-		stream << composed << endl;
-		stream.flush();
-	}
+	//wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
+	wstring composed = format(L"{}: Log{}: {}: {}\n", zoned_time(system_clock::now()), _name, VerbosityToString(logVerbosity), message);
+	//if (stream.is_open())
+	//{
+	//	stream << composed;
+	//	stream.flush();
+	//}
 	OutputDebugStringW(composed.c_str());
 }

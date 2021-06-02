@@ -6,9 +6,11 @@ import std.core;
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
 import :GameObject;
-import :IFrameworkView;
 
 using namespace std;
+
+export class GameEngine;
+export struct IFrameworkView;
 
 /// <summary>
 /// Represents single game instance while application are running.
@@ -20,7 +22,8 @@ public:
 	using PostInitializedEvent = MulticastEvent<GameInstance, void()>;
 
 private:
-	RHIDevice* _device;
+	IFrameworkView* _frameworkView = nullptr;
+	GameEngine* _engine = nullptr;
 
 public:
 	/// <summary>
@@ -40,6 +43,11 @@ public:
 	/// Event for game engine be initialized.
 	/// </summary>
 	PostInitializedEvent PostInitialized;
+
+	/// <summary>
+	/// Get core framework view.
+	/// </summary>
+	IFrameworkView* GetFrameworkView() const;
 
 protected:
 	/// <summary>

@@ -19,11 +19,10 @@ Object::~Object() noexcept
 	}
 
 	// Destroy all subobjects.
-	for (size_t i = 0; i < _subobjects.size(); ++i)
+	for (auto it : _subobjects)
 	{
-		_subobjects[i]->_outer = nullptr;
-		delete _subobjects[i];
-		_subobjects[i] = nullptr;
+		it->_outer = nullptr;
+		delete it;
 	}
 }
 
@@ -66,17 +65,11 @@ void Object::DestroySubobject(Object* subobject)
 
 void Object::InternalDetachSubobject(Object* subobject)
 {
-	for (size_t i = 0; i < _subobjects.size(); ++i)
+	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
 	{
-		if (_subobjects[i] == subobject)
-		{
-			_subobjects[i]->_outer = nullptr;
-
-			// RemoveAtSwap
-			std::swap(_subobjects[_subobjects.size() - 1], _subobjects[i]);
-			_subobjects.resize(_subobjects.size() - 1);
-			return;
-		}
+		(*it)->_outer = nullptr;
+		_subobjects.erase(it);
+		return;
 	}
 
 	LogSystem::Log(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
@@ -84,22 +77,20 @@ void Object::InternalDetachSubobject(Object* subobject)
 
 void Object::InternalAttachSubobject(Object* subobject)
 {
-	_subobjects.emplace_back(subobject);
+	_subobjects.emplace(subobject);
 }
 
 void Object::InternalDestroySubobject(Object* subobject)
 {
-	for (size_t i = 0; i < _subobjects.size(); ++i)
+	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
 	{
-		if (_subobjects[i] == subobject)
-		{
-			Object* ptr = _subobjects[i];
-			InternalDetachSubobject(subobject);
+		Object* ptr = *it;
+		ptr->_outer = nullptr;
+		_subobjects.erase(it);
 
-			// Will remove all subobjects on destructor of object.
-			delete _subobjects[i];
-			return;
-		}
+		// Will remove all subobjects on destructor of object.
+		delete ptr;
+		return;
 	}
 
 	LogSystem::Log(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");

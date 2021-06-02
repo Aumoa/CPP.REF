@@ -43,5 +43,8 @@
       <Filter>GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Transform.ixx" />
+    <ClCompile Include="GameEngine.ixx" />
+    <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="LogGame.ixx" />
   </ItemGroup>
 </Project>

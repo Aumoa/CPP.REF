@@ -12,11 +12,18 @@ GameInstance::GameInstance(wstring_view name) : Super(name)
 
 int32 GameInstance::Run(IFrameworkView* frameworkView)
 {
+	_frameworkView = frameworkView;
+
 	InitializeEngine();
 	PostInitialized.Invoke();
 
 	frameworkView->Start();
 	return 0;
+}
+
+IFrameworkView* GameInstance::GetFrameworkView() const
+{
+	return _frameworkView;
 }
 
 void GameInstance::InitializeEngine()
@@ -27,5 +34,6 @@ void GameInstance::InitializeEngine()
 	constexpr bool bDebug = false;
 #endif
 
-	_device = CreateSubobject<RHIDevice>(bDebug);
+	_engine = CreateSubobject<GameEngine>(bDebug);
+	_engine->InitEngine(this);
 }

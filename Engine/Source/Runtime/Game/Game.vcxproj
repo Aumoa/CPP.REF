@@ -101,6 +101,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.ixx" />
+    <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="GameEngine.ixx" />
     <ClCompile Include="GameFramework\AActor.cpp" />
     <ClCompile Include="GameFramework\AActor.ixx" />
     <ClCompile Include="GameFramework\AAIController.cpp" />
@@ -116,6 +118,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="IFrameworkView.ixx" />
+    <ClCompile Include="LogGame.ixx" />
     <ClCompile Include="Transform.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -235,6 +235,11 @@ public:
     {
         return _ptr->QueryInterface(riid, reinterpret_cast<void**>(p->ReleaseAndGetAddressOf()));
     }
+
+    bool IsSet() const
+    {
+        return operator bool();
+    }
 };
 
 #define HR(LogCategory, x)                                              \

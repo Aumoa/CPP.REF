@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="RenderCore.ixx" />
     <ClCompile Include="RHI\LogRHI.ixx" />
+    <ClCompile Include="RHI\RHIDevice.cpp" />
     <ClCompile Include="RHI\RHIDevice.ixx" />
   </ItemGroup>
   <ItemGroup>

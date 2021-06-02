@@ -8,6 +8,9 @@
     <ClCompile Include="RHI\LogRHI.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
+    <ClCompile Include="RHI\RHIDevice.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">
