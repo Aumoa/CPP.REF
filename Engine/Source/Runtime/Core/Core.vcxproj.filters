@@ -108,6 +108,24 @@
     <ClCompile Include="Numerics\Quaternion.cpp">
       <Filter>Numerics</Filter>
     </ClCompile>
+    <ClCompile Include="IO\FileSystemReference.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\FileSystemReference.ixx">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\DirectoryReference.ixx">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\DirectoryReference.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\FileReference.ixx">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\FileReference.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
@@ -127,6 +145,9 @@
     </Filter>
     <Filter Include="LogCategory">
       <UniqueIdentifier>{af7bcf90-9508-48e7-b5d0-1944441469fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{b7c6a406-36fa-4cd8-907e-464bb6718a77}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

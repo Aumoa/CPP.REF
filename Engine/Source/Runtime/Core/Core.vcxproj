@@ -101,6 +101,12 @@
     <ClCompile Include="Diagnostics\LogSystem.cpp" />
     <ClCompile Include="Diagnostics\LogSystem.ixx" />
     <ClCompile Include="Diagnostics\LogVerbosity.ixx" />
+    <ClCompile Include="IO\DirectoryReference.cpp" />
+    <ClCompile Include="IO\DirectoryReference.ixx" />
+    <ClCompile Include="IO\FileReference.cpp" />
+    <ClCompile Include="IO\FileReference.ixx" />
+    <ClCompile Include="IO\FileSystemReference.cpp" />
+    <ClCompile Include="IO\FileSystemReference.ixx" />
     <ClCompile Include="LogCategory\LogCore.ixx" />
     <ClCompile Include="Mathematics\Degrees.ixx" />
     <ClCompile Include="Mathematics\MathEx.cpp" />

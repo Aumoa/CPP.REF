@@ -43,3 +43,8 @@ export import :LogCore;
 // Delegates
 export import :MulticastDelegate;
 export import :MulticastEvent;
+
+// IO
+export import :FileSystemReference;
+export import :DirectoryReference;
+export import :FileReference;
