@@ -4,65 +4,6 @@
 #include <comdef.h>
 
 template <typename T>
-class ComPtrRefBase
-{
-public:
-    typedef typename T::InterfaceType InterfaceType;
-
-    operator IUnknown** () const throw()
-    {
-        static_assert(__is_base_of(IUnknown, InterfaceType), "Invalid cast: InterfaceType does not derive from IUnknown");
-        return reinterpret_cast<IUnknown**>(_ptr->ReleaseAndGetAddressOf());
-    }
-
-protected:
-    T* _ptr;
-};
-
-template <typename T>
-class ComPtrRef : public ComPtrRefBase<T>
-{
-    using Super = ComPtrRefBase<T>;
-    using InterfaceType = typename Super::InterfaceType;
-public:
-    ComPtrRef(T* ptr) throw()
-    {
-        this->_ptr = ptr;
-    }
-
-    operator void** () const throw()
-    {
-        return reinterpret_cast<void**>(this->_ptr->ReleaseAndGetAddressOf());
-    }
-
-    operator T* () throw()
-    {
-        *this->_ptr = nullptr;
-        return this->_ptr;
-    }
-
-    operator InterfaceType** () throw()
-    {
-        return this->_ptr->ReleaseAndGetAddressOf();
-    }
-
-    InterfaceType* operator *() throw()
-    {
-        return this->_ptr->Get();
-    }
-
-    InterfaceType* const* GetAddressOf() const throw()
-    {
-        return this->_ptr->GetAddressOf();
-    }
-
-    InterfaceType** ReleaseAndGetAddressOf() throw()
-    {
-        return this->_ptr->ReleaseAndGetAddressOf();
-    }
-};
-
-template <typename T>
 class ComPtr
 {
 public:
@@ -221,14 +162,9 @@ public:
         return _ptr;
     }
 
-    ComPtrRef<ComPtr<T>> operator&() throw()
+    InterfaceType** operator&() throw()
     {
-        return ComPtrRef<ComPtr<T>>(this);
-    }
-
-    const ComPtrRef<const ComPtr<T>> operator&() const throw()
-    {
-        return ComPtrRef<const ComPtr<T>>(this);
+        return ReleaseAndGetAddressOf();
     }
 
     T* const* GetAddressOf() const throw()
@@ -269,17 +205,6 @@ public:
         return InternalRelease();
     }
 
-    // Previously, unsafe behavior could be triggered when 'this' is ComPtr<IInspectable> or ComPtr<IUnknown> and CopyTo is used to copy to another type U. 
-    // The user will use operator& to convert the destination into a ComPtrRef, which can then implicit cast to IInspectable** and IUnknown**. 
-    // If this overload of CopyTo is not present, it will implicitly cast to IInspectable or IUnknown and match CopyTo(InterfaceType**) instead.
-    // A valid polymoprhic downcast requires run-time type checking via QueryInterface, so CopyTo(InterfaceType**) will break type safety.
-    // This overload matches ComPtrRef before the implicit cast takes place, preventing the unsafe downcast.
-    template <typename U>
-    HRESULT CopyTo(ComPtrRef<ComPtr<U>> ptr) const throw()
-    {
-        return _ptr->QueryInterface(__uuidof(U), ptr);
-    }
-
     HRESULT CopyTo(InterfaceType** ptr) const throw()
     {
         InternalAddRef();
@@ -296,13 +221,6 @@ public:
     HRESULT CopyTo(U** ptr) const throw()
     {
         return _ptr->QueryInterface(__uuidof(U), reinterpret_cast<void**>(ptr));
-    }
-
-    // query for U interface
-    template<typename U>
-    HRESULT As(ComPtrRef<ComPtr<U>> p) const throw()
-    {
-        return _ptr->QueryInterface(__uuidof(U), p);
     }
 
     // query for U interface

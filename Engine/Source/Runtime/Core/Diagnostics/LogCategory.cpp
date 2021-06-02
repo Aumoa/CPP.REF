@@ -1,5 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include <Windows.h>
+
 import std.core;
 import std.filesystem;
 import SC.Runtime.Core;
@@ -10,14 +12,15 @@ using namespace std::filesystem;
 
 using enum ELogVerbosity;
 
-LogCategory::LogCategory(wstring_view categoryName) : _name(categoryName)
+optional<FileReference> LogCategory::_file;
+
+LogCategory::LogCategory(wstring_view categoryName)
+	: _name(categoryName)
 {
 }
 
-zoned_time<system_clock::duration> LogCategory::GetZonedTime()
+LogCategory::~LogCategory()
 {
-	system_clock::time_point systemNow = system_clock::now();
-	return zoned_time(current_zone(), systemNow);
 }
 
 wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
@@ -33,32 +36,19 @@ wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 	}
 }
 
-wstring LogCategory::GetTimedStringAppend(wstring_view name)
-{
-	return format(L"{}_{:%m-%d}", name, GetZonedTime());
-}
-
 void LogCategory::OnLog(ELogVerbosity logVerbosity, wstring_view message)
 {
-	if (_logfile && !_file.is_open())
+	if (!_file.has_value())
 	{
-		wstring logFile = GetLogFilePath();
-		_file.open(logFile, ios::app);
-		if (!_file.is_open())
-		{
-			_logfile = false;
-			OnLog(Error, format(L"Log to file is disabled. Cannot open logging file: {}", logFile));
-		}
+		_file = FileReference(format(L"Saved\\Logs\\{}_{}.log", L"Logs", 0));
 	}
 
-	if (_logfile)
+	wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
+	wstring composed = format(L"{}: Log{}: {}: {}", zoned_time(system_clock::now()), _name, VerbosityToString(logVerbosity), message);
+	if (stream.is_open())
 	{
-		auto time = GetZonedTime();
-		_file << time << L": Log" << _name << L": " << VerbosityToString(logVerbosity) << L": " << message << endl;
+		stream << composed << endl;
+		stream.flush();
 	}
-}
-
-path LogCategory::GetLogFilePath() const
-{
-	return L"Saved/Logs/" + GetTimedStringAppend(_name);
+	OutputDebugStringW(composed.c_str());
 }

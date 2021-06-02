@@ -21,5 +21,11 @@ int32 GameInstance::Run(IFrameworkView* frameworkView)
 
 void GameInstance::InitializeEngine()
 {
-	_device = CreateSubobject<RHIDevice>();
+#ifdef _DEBUG
+	constexpr bool bDebug = true;
+#else
+	constexpr bool bDebug = false;
+#endif
+
+	_device = CreateSubobject<RHIDevice>(bDebug);
 }
