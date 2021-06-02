@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="RenderCore.ixx" />
+    <ClCompile Include="RHI\RHIDevice.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\LogRHI.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="RHI">
+      <UniqueIdentifier>{994723c2-299e-4fce-a060-5a9f7fbe1469}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ComPtr.h" />
+  </ItemGroup>
+</Project>

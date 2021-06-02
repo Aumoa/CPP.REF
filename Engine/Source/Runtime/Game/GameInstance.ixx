@@ -4,6 +4,7 @@ export module SC.Runtime.Game:GameInstance;
 
 import std.core;
 import SC.Runtime.Core;
+import SC.Runtime.RenderCore;
 import :GameObject;
 import :IFrameworkView;
 
@@ -16,6 +17,10 @@ export class GameInstance : public GameObject
 {
 public:
 	using Super = GameObject;
+	using PostInitializedEvent = MulticastEvent<GameInstance, void()>;
+
+private:
+	RHIDevice* _device;
 
 public:
 	/// <summary>
@@ -30,4 +35,15 @@ public:
 	/// <param name="frameworkView"> The core framework view window. </param>
 	/// <returns> Return primary exit code. </returns>
 	int32 Run(IFrameworkView* frameworkView);
+
+	/// <summary>
+	/// Event for game engine be initialized.
+	/// </summary>
+	PostInitializedEvent PostInitialized;
+
+protected:
+	/// <summary>
+	/// Initialize the game engine.
+	/// </summary>
+	virtual void InitializeEngine();
 };

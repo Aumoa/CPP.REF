@@ -12,6 +12,14 @@ GameInstance::GameInstance(wstring_view name) : Super(name)
 
 int32 GameInstance::Run(IFrameworkView* frameworkView)
 {
+	InitializeEngine();
+	PostInitialized.Invoke();
+
 	frameworkView->Start();
 	return 0;
+}
+
+void GameInstance::InitializeEngine()
+{
+	_device = CreateSubobject<RHIDevice>();
 }
