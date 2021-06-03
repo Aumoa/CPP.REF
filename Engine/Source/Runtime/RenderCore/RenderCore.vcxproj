@@ -126,6 +126,8 @@
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>5201;5050;</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>Internal.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -145,6 +147,8 @@
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>5201;5050;</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>Internal.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -156,19 +160,39 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComPtr.ixx" />
+    <ClCompile Include="Internal.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="IWindowView.ixx" />
     <ClCompile Include="RenderCore.ixx" />
     <ClCompile Include="RHI\Internal.ixx" />
     <ClCompile Include="RHI\LogRHI.ixx" />
-    <ClCompile Include="RHI\RHIDevice.cpp" />
+    <ClCompile Include="RHI\RHICommandQueue.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="RHI\RHICommandQueue.ixx" />
+    <ClCompile Include="RHI\RHICommandType.ixx" />
+    <ClCompile Include="RHI\RHIDevice.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="RHI\RHIDevice.ixx" />
-    <ClCompile Include="RHI\RHISwapChain.cpp" />
+    <ClCompile Include="RHI\RHIDeviceChild.ixx" />
+    <ClCompile Include="RHI\RHISwapChain.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="RHI\RHISwapChain.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

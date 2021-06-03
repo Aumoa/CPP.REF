@@ -18,6 +18,18 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 {
 	LogSystem::Log(LogEngine, Info, L"Initialize engine.");
 
+	IFrameworkView* frameworkView = gameInstance->GetFrameworkView();
+
+	LogSystem::Log(LogEngine, Info, L"Initialize RHI subsystems.");
 	_gameInstance = gameInstance;
 	_device = CreateSubobject<RHIDevice>(_bDebug);
+	_primaryQueue = CreateSubobject<RHICommandQueue>(_device);
+	_frameworkViewChain = CreateSubobject<RHISwapChain>(_device, frameworkView, _primaryQueue);
+
+	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
+	frameworkView->Idle += [this]() { TickEngine(); };
+}
+
+void GameEngine::TickEngine()
+{
 }

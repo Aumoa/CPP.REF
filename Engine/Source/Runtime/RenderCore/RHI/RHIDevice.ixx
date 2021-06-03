@@ -30,6 +30,10 @@ public:
 	RHIDevice(bool bDebug = false);
 	~RHIDevice() override;
 
+public /*internal*/ :
+	IDXGIFactory2* GetFactory() const { return _factory.Get(); }
+	ID3D12Device* GetDevice() const { return _device.Get(); }
+
 private:
 	void InitializeDebug();
 	void InitializeCOM();

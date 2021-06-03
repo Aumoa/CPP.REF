@@ -20,10 +20,26 @@
     </ClCompile>
     <ClCompile Include="RHI\Internal.ixx" />
     <ClCompile Include="ComPtr.ixx" />
+    <ClCompile Include="Internal.cpp" />
+    <ClCompile Include="RHI\RHICommandQueue.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHICommandType.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHICommandQueue.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIDeviceChild.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">
       <UniqueIdentifier>{994723c2-299e-4fce-a060-5a9f7fbe1469}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Internal.h" />
   </ItemGroup>
 </Project>

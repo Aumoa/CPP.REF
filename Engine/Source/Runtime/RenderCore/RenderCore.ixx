@@ -9,3 +9,6 @@ export import :ComPtr;
 export import :LogRHI;
 export import :RHIDevice;
 export import :RHISwapChain;
+export import :RHICommandType;
+export import :RHICommandQueue;
+export import :RHISwapChain;

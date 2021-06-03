@@ -1,12 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "Internal.h"
+
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
 import SC.Runtime.RenderCore.Internal;
 
 using enum ELogVerbosity;
-
-#define IID_PPV_ARGS(x) __uuidof(*x), (void**)x
 
 RHIDevice::RHIDevice(bool bDebug) : Super()
 	, _bDebug(bDebug)

@@ -20,6 +20,8 @@ private:
 	
 	GameInstance* _gameInstance = nullptr;
 	RHIDevice* _device = nullptr;
+	RHICommandQueue* _primaryQueue = nullptr;
+	RHISwapChain* _frameworkViewChain = nullptr;
 
 public:
 	/// <summary>
@@ -34,4 +36,7 @@ public:
 	/// </summary>
 	/// <param name="gameInstance"> The owner game instance. </param>
 	virtual void InitEngine(GameInstance* gameInstance);
+
+private:
+	void TickEngine();
 };
