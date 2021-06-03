@@ -17,7 +17,7 @@ export class LogCategory : virtual public Object
 {
 	friend class LogSystem;
 
-	//static std::optional<FileReference> _file;
+	static std::optional<FileReference> _file;
 	std::wstring _name;
 
 public:

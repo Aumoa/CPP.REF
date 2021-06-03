@@ -1,10 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-
 import std.core;
 import std.filesystem;
 import SC.Runtime.Core;
+import SC.Runtime.Core.Internal;
 
 using namespace std;
 using namespace std::chrono;
@@ -12,7 +11,7 @@ using namespace std::filesystem;
 
 using enum ELogVerbosity;
 
-//optional<FileReference> LogCategory::_file;
+optional<FileReference> LogCategory::_file;
 
 LogCategory::LogCategory(wstring_view categoryName)
 	: _name(categoryName)
@@ -38,17 +37,17 @@ wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 
 void LogCategory::OnLog(ELogVerbosity logVerbosity, wstring_view message)
 {
-	//if (!_file.has_value())
-	//{
-	//	_file = FileReference(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));
-	//}
+	if (!_file.has_value())
+	{
+		_file = FileReference(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));
+	}
 
-	//wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
+	wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
 	wstring composed = format(L"{}: Log{}: {}: {}\n", zoned_time(system_clock::now()), _name, VerbosityToString(logVerbosity), message);
-	//if (stream.is_open())
-	//{
-	//	stream << composed;
-	//	stream.flush();
-	//}
+	if (stream.is_open())
+	{
+		stream << composed;
+		stream.flush();
+	}
 	OutputDebugStringW(composed.c_str());
 }

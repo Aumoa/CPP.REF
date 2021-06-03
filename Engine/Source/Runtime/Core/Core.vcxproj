@@ -101,6 +101,7 @@
     <ClCompile Include="Diagnostics\LogSystem.cpp" />
     <ClCompile Include="Diagnostics\LogSystem.ixx" />
     <ClCompile Include="Diagnostics\LogVerbosity.ixx" />
+    <ClCompile Include="Internal.ixx" />
     <ClCompile Include="IO\DirectoryReference.cpp" />
     <ClCompile Include="IO\DirectoryReference.ixx" />
     <ClCompile Include="IO\FileReference.cpp" />

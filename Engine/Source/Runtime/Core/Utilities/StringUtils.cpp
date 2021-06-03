@@ -1,9 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-
 import std.core;
 import SC.Runtime.Core;
+import SC.Runtime.Core.Internal;
 
 using namespace std;
 
