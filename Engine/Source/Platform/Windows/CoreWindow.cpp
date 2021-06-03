@@ -69,3 +69,8 @@ void CoreWindow::Start()
 		}
 	}
 }
+
+void* CoreWindow::GetWindowHandle() const
+{
+	return _hwnd;
+}

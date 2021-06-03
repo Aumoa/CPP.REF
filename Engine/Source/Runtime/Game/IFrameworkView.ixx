@@ -3,11 +3,12 @@
 export module SC.Runtime.Game:IFrameworkView;
 
 import SC.Runtime.Core;
+import SC.Runtime.RenderCore;
 
 /// <summary>
 /// Provide interface for platform specified application view.
 /// </summary>
-export struct IFrameworkView : virtual public Object
+export struct IFrameworkView : virtual public Object, virtual public IWindowView
 {
 	/// <summary>
 	/// Start application.

@@ -11,13 +11,19 @@
     <ClCompile Include="RHI\RHIDevice.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
+    <ClCompile Include="RHI\RHISwapChain.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="IWindowView.ixx" />
+    <ClCompile Include="RHI\RHISwapChain.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\Internal.ixx" />
+    <ClCompile Include="ComPtr.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">
       <UniqueIdentifier>{994723c2-299e-4fce-a060-5a9f7fbe1469}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ComPtr.h" />
   </ItemGroup>
 </Project>

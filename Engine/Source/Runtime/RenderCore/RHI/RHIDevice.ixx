@@ -1,13 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "../ComPtr.h"
-
 export module SC.Runtime.RenderCore:RHIDevice;
 
 import SC.Runtime.Core;
+import SC.Runtime.RenderCore.Internal;
 import :LogRHI;
-import <d3d12.h>;
-import <dxgi1_6.h>;
+import :ComPtr;
 
 using enum ELogVerbosity;
 
@@ -16,6 +14,10 @@ using enum ELogVerbosity;
 /// </summary>
 export class RHIDevice : virtual public Object
 {
+public:
+	using Super = Object;
+
+private:
 	const uint8 _bDebug : 1;
 
 	ComPtr<IDXGIFactory2> _factory;

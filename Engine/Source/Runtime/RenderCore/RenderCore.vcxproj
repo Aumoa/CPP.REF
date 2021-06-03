@@ -125,7 +125,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;4005;5201;5105;5106;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>5201;5050;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -144,7 +144,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;4005;5201;5105;5106;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>5201;5050;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -155,18 +155,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComPtr.ixx" />
+    <ClCompile Include="IWindowView.ixx" />
     <ClCompile Include="RenderCore.ixx" />
+    <ClCompile Include="RHI\Internal.ixx" />
     <ClCompile Include="RHI\LogRHI.ixx" />
     <ClCompile Include="RHI\RHIDevice.cpp" />
     <ClCompile Include="RHI\RHIDevice.ixx" />
+    <ClCompile Include="RHI\RHISwapChain.cpp" />
+    <ClCompile Include="RHI\RHISwapChain.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ComPtr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

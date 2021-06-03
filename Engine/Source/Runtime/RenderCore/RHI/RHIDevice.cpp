@@ -1,13 +1,15 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "../ComPtr.h"
-
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
+import SC.Runtime.RenderCore.Internal;
 
 using enum ELogVerbosity;
 
-RHIDevice::RHIDevice(bool bDebug) : _bDebug(bDebug)
+#define IID_PPV_ARGS(x) __uuidof(*x), (void**)x
+
+RHIDevice::RHIDevice(bool bDebug) : Super()
+	, _bDebug(bDebug)
 {
 	if (bDebug)
 	{
@@ -43,7 +45,7 @@ void RHIDevice::InitializeCOM()
 {
 	LogSystem::Log(LogRHI, Info, L"----- Initialize COM subsystem.");
 
-	HR(LogRHI, CoInitializeEx(nullptr, COINIT_MULTITHREADED));
+	HR(LogRHI, CoInitializeEx(nullptr, COINIT::COINIT_MULTITHREADED));
 	LogSystem::Log(LogRHI, Info, L"COM initialized.");
 
 	LogSystem::Log(LogRHI, Info, L"----- Done!");
@@ -68,7 +70,7 @@ void RHIDevice::InitializeD3D12()
 
 	LogSystem::Log(LogRHI, Info, L"Finding most suitable physical device.");
 	ComPtr<IDXGIAdapter1> adapter;
-	for (int32 i = 0; SUCCEEDED(_factory->EnumAdapters1((UINT)i, &adapter)); ++i)
+	for (int32 i = 0; SUCCEEDED(_factory->EnumAdapters1((uint32)i, &adapter)); ++i)
 	{
 		DXGI_ADAPTER_DESC1 desc;
 		if (FAILED(adapter->GetDesc1(&desc)))
@@ -93,7 +95,7 @@ void RHIDevice::InitializeD3D12()
 		return;
 	}
 
-	HR(LogRHI, ::D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device)));
+	HR(LogRHI, D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device)));
 	LogSystem::Log(LogRHI, Info, L"Direct3D 12 device created with feature level 11_0.");
 
 	LogSystem::Log(LogRHI, Info, L"----- Done!");

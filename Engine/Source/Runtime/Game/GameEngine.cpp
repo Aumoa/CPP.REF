@@ -16,7 +16,7 @@ GameEngine::~GameEngine()
 
 void GameEngine::InitEngine(GameInstance* gameInstance)
 {
-	LogSystem::Log(LogEngine, Info, TEXT("Initialize engine."));
+	LogSystem::Log(LogEngine, Info, L"Initialize engine.");
 
 	_gameInstance = gameInstance;
 	_device = CreateSubobject<RHIDevice>(_bDebug);

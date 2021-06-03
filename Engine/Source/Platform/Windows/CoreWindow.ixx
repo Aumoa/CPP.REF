@@ -23,8 +23,9 @@ public:
 	/// </summary>
 	CoreWindow();
 
-	/// <summary>
-	/// Start application.
-	/// </summary>
+	/// <inheritdoc/>
 	virtual void Start() override;
+
+	/// <inheritdoc/>
+	virtual void* GetWindowHandle() const override;
 };

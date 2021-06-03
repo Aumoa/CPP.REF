@@ -2,6 +2,10 @@
 
 export module SC.Runtime.RenderCore;
 
+export import :IWindowView;
+export import :ComPtr;
+
 // RHI
 export import :LogRHI;
 export import :RHIDevice;
+export import :RHISwapChain;
