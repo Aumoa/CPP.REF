@@ -32,4 +32,5 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 
 void GameEngine::TickEngine()
 {
+	_frameworkViewChain->Present();
 }
