@@ -1,11 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-
 import SC.Platform.Windows;
+import SC.Platform.Windows.Internal;
 import SC.Runtime.Core;
 
 using enum ELogVerbosity;
+
+#define CALLBACK __stdcall
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -32,7 +33,7 @@ CoreWindow::CoreWindow() : Super()
 		return;
 	}
 
-	HWND hWnd = CreateWindowW(wcex.lpszClassName, L"GameApp", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, wcex.hInstance, this);
+	HWND hWnd = CreateWindowExW(0, wcex.lpszClassName, L"GameApp", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, wcex.hInstance, this);
 	if (hWnd == nullptr)
 	{
 		LogSystem::Log(LogWindows, Fatal, L"Could not create core window with error code: {}. Abort.", ::GetLastError());

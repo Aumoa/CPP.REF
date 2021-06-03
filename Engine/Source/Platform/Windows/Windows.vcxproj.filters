@@ -6,5 +6,6 @@
     <ClCompile Include="CoreWindow.ixx" />
     <ClCompile Include="CoreWindow.cpp" />
     <ClCompile Include="LogWindows.ixx" />
+    <ClCompile Include="Internal.ixx" />
   </ItemGroup>
 </Project>
