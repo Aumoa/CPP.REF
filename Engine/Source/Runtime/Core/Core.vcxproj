@@ -60,7 +60,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;5201;4005;5105;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>
@@ -79,7 +79,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;5201;4005;5105;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>

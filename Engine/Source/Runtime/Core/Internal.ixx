@@ -1,5 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+module;
+
 #include <Windows.h>
 #include <DirectXMath.h>
 

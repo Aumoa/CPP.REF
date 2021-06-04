@@ -20,6 +20,8 @@ public:
 
 private:
 	ComPtr<ID3D12CommandQueue> _queue;
+	ComPtr<ID3D12Fence> _fence;
+	uint64 _signalNumber = 0;
 
 public:
 	/// <summary>
@@ -29,6 +31,23 @@ public:
 	/// <param name="commandType"> Specify command type for usage. </param>
 	RHICommandQueue(RHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
 	~RHICommandQueue() override;
+
+	/// <summary>
+	/// Signal the last committed command list for reference from CPU commands and waiting.
+	/// </summary>
+	/// <returns> The signal number. </returns>
+	uint64 Signal();
+
+	/// <summary>
+	/// Wait for commands executed that represented by signal number.
+	/// </summary>
+	/// <param name="signalNumber"> The signal number. </param>
+	void WaitSignal(uint64 signalNumber);
+
+	/// <summary>
+	/// Wait for commands executed that represented by last signaled number.
+	/// </summary>
+	void WaitLastSignal();
 
 public /*internal*/:
 	ID3D12CommandQueue* GetCommandQueue() const { return _queue.Get(); }
