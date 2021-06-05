@@ -150,4 +150,13 @@ public:
 	{
 		return lhs > rhs ? lhs : rhs;
 	}
+
+	/// <summary>
+	/// Clamp value between lhs and rhs.
+	/// </summary>
+	template<class T>
+	static inline constexpr T Clamp(const T& value, const T& lhs, const T& rhs)
+	{
+		return Max(Min(value, rhs), lhs);
+	}
 };

@@ -4,6 +4,9 @@
     <Filter Include="GameFramework">
       <UniqueIdentifier>{eb55dc3f-4aee-47f6-88f5-0aae5fde5e4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Ticking">
+      <UniqueIdentifier>{a976eb34-38eb-495d-9131-6d93a80aa162}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -46,5 +49,14 @@
     <ClCompile Include="GameEngine.ixx" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="LogGame.ixx" />
+    <ClCompile Include="Ticking\TickingGroup.ixx">
+      <Filter>Ticking</Filter>
+    </ClCompile>
+    <ClCompile Include="Ticking\TickFunction.ixx">
+      <Filter>Ticking</Filter>
+    </ClCompile>
+    <ClCompile Include="Ticking\TickFunction.cpp">
+      <Filter>Ticking</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

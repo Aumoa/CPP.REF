@@ -119,6 +119,9 @@
     <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="IFrameworkView.ixx" />
     <ClCompile Include="LogGame.ixx" />
+    <ClCompile Include="Ticking\TickFunction.cpp" />
+    <ClCompile Include="Ticking\TickFunction.ixx" />
+    <ClCompile Include="Ticking\TickingGroup.ixx" />
     <ClCompile Include="Transform.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

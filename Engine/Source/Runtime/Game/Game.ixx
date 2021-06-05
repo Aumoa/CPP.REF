@@ -15,3 +15,7 @@ export import :AController;
 export import :APlayerController;
 export import :AAIController;
 export import :APawn;
+
+// Ticking
+export import :TickingGroup;
+export import :TickFunction;
