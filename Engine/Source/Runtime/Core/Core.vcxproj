@@ -135,6 +135,8 @@
     <ClCompile Include="Object.ixx" />
     <ClCompile Include="PrimitiveTypes.ixx" />
     <ClCompile Include="SupportsObject.ixx" />
+    <ClCompile Include="Threading\EventHandle.cpp" />
+    <ClCompile Include="Threading\EventHandle.ixx" />
     <ClCompile Include="Utilities\StringUtils.cpp" />
     <ClCompile Include="Utilities\StringUtils.ixx" />
   </ItemGroup>

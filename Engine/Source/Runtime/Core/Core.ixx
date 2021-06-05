@@ -48,3 +48,6 @@ export import :MulticastEvent;
 export import :FileSystemReference;
 export import :DirectoryReference;
 export import :FileReference;
+
+// Threading
+export import :EventHandle;

@@ -124,6 +124,12 @@
       <Filter>IO</Filter>
     </ClCompile>
     <ClCompile Include="Internal.ixx" />
+    <ClCompile Include="Threading\EventHandle.ixx">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\EventHandle.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
@@ -146,6 +152,9 @@
     </Filter>
     <Filter Include="IO">
       <UniqueIdentifier>{b7c6a406-36fa-4cd8-907e-464bb6718a77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{0a7dee3b-e03f-4a22-9112-6772872cef59}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
