@@ -1,39 +1,40 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.Game:AActor;
+export module SC.Runtime.Game:ActorComponent;
 
 import std.core;
-import SC.Runtime.Core;
 import :GameObject;
 import :TickFunction;
 
 using namespace std;
 using namespace std::chrono;
 
+export class AActor;
+
 /// <summary>
-/// Represents actor that, spawn to world and interaction with other actors.
+/// ActorComponent is the base class for components that define reusable behavior that can be added to different types of Actors.
 /// </summary>
-export class AActor : public GameObject
+export class ActorComponent : public GameObject
 {
 public:
 	using Super = GameObject;
 
 	/// <summary>
-	/// Represents tick function for targeted to actor.
+	/// Represents tick function for targeted to actor component.
 	/// </summary>
-	class ActorTickFunction : public TickFunction
+	class ComponentTickFunction : public TickFunction
 	{
 	public:
 		using Super = TickFunction;
 
 	private:
-		AActor* const _target = nullptr;
+		ActorComponent* const _target = nullptr;
 
 	public:
 		/// <summary>
-		/// Initialize new <see cref="ActorTickFunction"/> instance.
+		/// Initialize new <see cref="ComponentTickFunction"/> instance.
 		/// </summary>
-		inline ActorTickFunction(AActor* target) : Super()
+		inline ComponentTickFunction(ActorComponent* target) : Super()
 			, _target(target)
 		{
 		}
@@ -41,7 +42,7 @@ public:
 		/// <summary>
 		/// Get tick function target.
 		/// </summary>
-		inline AActor* GetTarget() const
+		inline ActorComponent* GetTarget() const
 		{
 			return _target;
 		}
@@ -51,32 +52,27 @@ public:
 	};
 
 protected:
-	/// <summary>
-	/// Represents primary actor tick function that call AActor::TickActor().
-	/// </summary>
-	ActorTickFunction PrimaryActorTick;
+	ComponentTickFunction PrimaryComponentTick;
 
 private:
 	uint8 _bActive : 1 = true;
 	uint8 _bHasBegunPlay : 1 = false;
+	AActor* _owner = nullptr;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="AActor"/> instance.
-	/// </summary>
-	/// <param name="name"> The actor name. </param>
-	AActor(wstring_view name);
+	ActorComponent(wstring_view name);
 
 	/// <summary>
 	/// Update frame tick.
 	/// </summary>
 	/// <param name="elapsedTime"> The elapsed time from previous frame. </param>
 	/// <param name="tickFunction"> Tick function what called this. </param>
-	virtual void TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction);
+	virtual void TickComponent(duration<float> elapsedTime, ComponentTickFunction* tickFunction);
 
+	AActor* GetOwner() const { return _owner; }
 	void SetActive(bool bActive);
 	inline bool IsActive() const { return _bActive; }
 	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
-	MulticastEvent<AActor, void()> Activated;
-	MulticastEvent<AActor, void()> Inactivated;
+	MulticastEvent<ActorComponent, void()> Activated;
+	MulticastEvent<ActorComponent, void()> Inactivated;
 };

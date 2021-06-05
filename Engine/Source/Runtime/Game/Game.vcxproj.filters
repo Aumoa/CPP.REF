@@ -16,6 +16,9 @@
     <Filter Include="Info">
       <UniqueIdentifier>{ce7d5638-8368-4678-9ff8-14925a3ccaf9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{3833ef9b-b9ca-44ca-a55a-c5a80f3571ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -94,6 +97,27 @@
     </ClCompile>
     <ClCompile Include="Info\AGameMode.cpp">
       <Filter>Info</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ActorComponent.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ActorComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\SceneComponent.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\SceneComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ComponentMobility.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ComponentDirtyMask.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ComponentTransformSpace.ixx">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

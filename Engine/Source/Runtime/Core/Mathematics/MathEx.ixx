@@ -159,4 +159,10 @@ public:
 	{
 		return Max(Min(value, rhs), lhs);
 	}
+
+	/// <summary>
+	/// Represents small number.
+	/// </summary>
+	template<class T = float>
+	static inline constexpr T SmallNumber = (T)0.0001;
 };

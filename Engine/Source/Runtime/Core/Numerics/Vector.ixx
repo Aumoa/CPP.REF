@@ -408,6 +408,11 @@ struct Vector
 	{
 		return Vector<sizeof...(Indexes)>{ Values[Indexes]... };
 	}
+
+	/// <summary>
+	/// Get zero vector.
+	/// </summary>
+	inline static constexpr Vector GetZero();
 };
 
 export
@@ -423,4 +428,10 @@ export
 	{
 		return Vector<N>(lhs) / rhs;
 	}
+}
+
+template<size_t N>
+inline constexpr auto Vector<N>::GetZero() -> Vector
+{
+	return Vector();
 }

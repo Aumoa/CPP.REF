@@ -31,3 +31,10 @@ export import :GameConcepts;
 // Info
 export import :AInfo;
 export import :AGameMode;
+
+// Components
+export import :ActorComponent;
+export import :SceneComponent;
+export import :ComponentMobility;
+export import :ComponentDirtyMask;
+export import :ComponentTransformSpace;

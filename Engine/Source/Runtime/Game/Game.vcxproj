@@ -100,6 +100,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Components\ActorComponent.cpp" />
+    <ClCompile Include="Components\ActorComponent.ixx" />
+    <ClCompile Include="Components\ComponentDirtyMask.ixx" />
+    <ClCompile Include="Components\ComponentMobility.ixx" />
+    <ClCompile Include="Components\ComponentTransformSpace.ixx" />
+    <ClCompile Include="Components\SceneComponent.cpp" />
+    <ClCompile Include="Components\SceneComponent.ixx" />
     <ClCompile Include="Concepts\GameConcepts.ixx" />
     <ClCompile Include="Game.ixx" />
     <ClCompile Include="GameEngine.cpp" />
