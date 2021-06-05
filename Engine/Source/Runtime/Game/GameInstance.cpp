@@ -18,7 +18,7 @@ int32 GameInstance::Run(IFrameworkView* frameworkView)
 	PostInitialized.Invoke();
 
 	frameworkView->Start();
-	return 0;
+	return frameworkView->GetLastError();
 }
 
 IFrameworkView* GameInstance::GetFrameworkView() const

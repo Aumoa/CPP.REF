@@ -21,7 +21,22 @@ export struct IFrameworkView : virtual public Object, virtual public IWindowView
 	using IdleDelegate = MulticastDelegate<void()>;
 
 	/// <summary>
-	/// To be called every frame when the process is idle.
+	/// Event that called every frame when the process is idle.
 	/// </summary>
 	MulticastDelegate<void()> Idle;
+
+	/// <summary>
+	/// Event that called when the application size change.
+	/// </summary>
+	MulticastDelegate<void(int32, int32)> Size;
+
+	/// <summary>
+	/// Get latest error code.
+	/// </summary>
+	virtual int32 GetLastError() const = 0;
+
+	/// <summary>
+	/// Set latest error code.
+	/// </summary>
+	virtual void SetLastError(int32 code) = 0;
 };

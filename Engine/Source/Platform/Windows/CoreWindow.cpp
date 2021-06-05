@@ -1,18 +1,47 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include <Windows.h>
+
 import SC.Platform.Windows;
-import SC.Platform.Windows.Internal;
 import SC.Runtime.Core;
 
 using enum ELogVerbosity;
 
 #define CALLBACK __stdcall
 
+inline void SetupHwndParameters(HWND hWnd, LPARAM lParam)
+{
+	auto lpCreateStruct = (LPCREATESTRUCTW)lParam;
+	auto* coreWindow = (CoreWindow*)lpCreateStruct->lpCreateParams;
+
+	SetPropW(hWnd, L"this", coreWindow);
+}
+
+inline CoreWindow* GetThis(HWND hWnd)
+{
+	return (CoreWindow*)GetPropW(hWnd, L"this");
+}
+
+inline void FinallizeHwndParameters(HWND hWnd)
+{
+	RemovePropW(hWnd, L"this");
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+	case WM_CREATE:
+		SetupHwndParameters(hWnd, lParam);
+		break;
+	case WM_SIZE:
+		if (CoreWindow* cw = GetThis(hWnd); cw != nullptr)
+		{
+			cw->Size.Invoke((int16)LOWORD(lParam), (int16)HIWORD(lParam));
+		}
+		break;
 	case WM_DESTROY:
+		FinallizeHwndParameters(hWnd);
 		PostQuitMessage(0);
 		break;
 	}
@@ -71,7 +100,12 @@ void CoreWindow::Start()
 	}
 }
 
-void* CoreWindow::GetWindowHandle() const
+int32 CoreWindow::GetLastError() const
 {
-	return _hwnd;
+	return _lastError;
+}
+
+void CoreWindow::SetLastError(int32 code)
+{
+	_lastError = code;
 }

@@ -32,5 +32,10 @@ RHISwapChain::~RHISwapChain()
 
 void RHISwapChain::Present(uint8 vSyncLevel)
 {
-	HR(LogRHI, _swapChain->Present((UINT)vSyncLevel, 0));
+	HR_E(LogRHI, _swapChain->Present((UINT)vSyncLevel, 0));
+}
+
+void RHISwapChain::ResizeBuffers(int32 width, int32 height)
+{
+	HR_E(LogRHI, _swapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, 0));
 }

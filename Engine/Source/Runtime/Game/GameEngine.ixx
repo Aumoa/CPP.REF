@@ -39,4 +39,5 @@ public:
 
 private:
 	void TickEngine();
+	void ResizedApp(int32 width, int32 height);
 };

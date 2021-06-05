@@ -37,4 +37,9 @@ public:
 	/// </summary>
 	/// <param name="vSyncLevel"> An integer that specifies how to synchronize presentation of a frame with the vertical blank. </param>
 	void Present(uint8 vSyncLevel = 0);
+
+	/// <summary>
+	/// Resize all back buffers. All back buffers should be unlocked state.
+	/// </summary>
+	void ResizeBuffers(int32 width, int32 height);
 };

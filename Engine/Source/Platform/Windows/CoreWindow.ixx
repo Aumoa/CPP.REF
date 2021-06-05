@@ -16,6 +16,7 @@ public:
 private:
 	void* _hwnd = nullptr;
 	uint8 _bMainLoop : 1 = false;
+	int32 _lastError = 0;
 
 public:
 	/// <summary>
@@ -27,5 +28,11 @@ public:
 	virtual void Start() override;
 
 	/// <inheritdoc/>
-	virtual void* GetWindowHandle() const override;
+	virtual void* GetWindowHandle() const override { return _hwnd; }
+
+	/// <inheritdoc/>
+	virtual int32 GetLastError() const override;
+
+	/// <inheritdoc/>
+	virtual void SetLastError(int32 code) override;
 };
