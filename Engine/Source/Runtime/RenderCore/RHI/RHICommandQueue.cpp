@@ -16,6 +16,8 @@ RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType)
 
 	HR(LogRHI, d3ddev->CreateCommandQueue(&desc, IID_PPV_ARGS(&_queue)));
 	HR(LogRHI, d3ddev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
+
+	_fenceEvent = CreateSubobject<EventHandle>();
 }
 
 RHICommandQueue::~RHICommandQueue()
@@ -24,11 +26,20 @@ RHICommandQueue::~RHICommandQueue()
 
 uint64 RHICommandQueue::Signal()
 {
-	HR(LogRHI, _queue->Signal(_fence.Get(), _signalNumber++));
+	HR(LogRHI, _queue->Signal(_fence.Get(), ++_signalNumber));
 	return _signalNumber;
 }
 
 void RHICommandQueue::WaitSignal(uint64 signalNumber)
 {
-	
+	if (_fence->GetCompletedValue() < _signalNumber)
+	{
+		HR_E(LogRHI, _fence->SetEventOnCompletion(_signalNumber, _fenceEvent->GetHandle()));
+		_fenceEvent->Wait();
+	}
+}
+
+void RHICommandQueue::WaitLastSignal()
+{
+	WaitSignal(_signalNumber);
 }

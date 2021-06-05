@@ -22,6 +22,7 @@ private:
 	ComPtr<ID3D12CommandQueue> _queue;
 	ComPtr<ID3D12Fence> _fence;
 	uint64 _signalNumber = 0;
+	EventHandle* _fenceEvent = nullptr;
 
 public:
 	/// <summary>

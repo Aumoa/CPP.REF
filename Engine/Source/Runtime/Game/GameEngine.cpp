@@ -33,4 +33,6 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 void GameEngine::TickEngine()
 {
 	_frameworkViewChain->Present();
+	_primaryQueue->Signal();
+	_primaryQueue->WaitLastSignal();
 }
