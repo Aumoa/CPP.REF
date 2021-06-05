@@ -67,8 +67,8 @@ public:
 	/// <summary>
 	/// Execute tick function.
 	/// </summary>
-	/// <param name="deltaTime"> The frame elapsed time. </param>
-	virtual void ExecuteTick(duration<float> deltaTime);
+	/// <param name="elapsedTime"> The frame elapsed time. </param>
+	virtual void ExecuteTick(duration<float> elapsedTime);
 
 	/// <summary>
 	/// Add prerequisite function.
