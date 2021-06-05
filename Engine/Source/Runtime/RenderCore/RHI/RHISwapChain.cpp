@@ -11,6 +11,8 @@ RHISwapChain::RHISwapChain(RHIDevice* device, IWindowView* view, RHICommandQueue
 
 	DXGI_SWAP_CHAIN_DESC1 chainDesc =
 	{
+		.Width = 800,
+		.Height = 600,
 		.Format = DXGI_FORMAT_B8G8R8A8_UNORM,
 		.SampleDesc = { 1, 0 },
 		.BufferUsage = DXGI_USAGE_BACK_BUFFER,
@@ -21,7 +23,7 @@ RHISwapChain::RHISwapChain(RHIDevice* device, IWindowView* view, RHICommandQueue
 	};
 
 	ComPtr<IDXGISwapChain1> swapChain1;
-	HWND hWnd = (HWND)view->GetWindowHandle();
+	HWND hWnd = reinterpret_cast<HWND>(view->GetWindowHandle());
 	HR(LogRHI, dxgi->CreateSwapChainForHwnd(queue->GetCommandQueue(), hWnd, &chainDesc, nullptr, nullptr, &swapChain1));
 	HR(LogRHI, swapChain1.CopyTo(&_swapChain));
 }

@@ -28,7 +28,7 @@ public:
 	virtual void Start() override;
 
 	/// <inheritdoc/>
-	virtual void* GetWindowHandle() const override { return _hwnd; }
+	virtual void* GetWindowHandle() const override;
 
 	/// <inheritdoc/>
 	virtual int32 GetLastError() const override;

@@ -130,6 +130,9 @@
     <ClCompile Include="Threading\EventHandle.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\UniqueType.ixx">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

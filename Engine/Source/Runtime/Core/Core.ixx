@@ -8,6 +8,7 @@ export import :Object;
 
 // Utilities
 export import :StringUtils;
+export import :UniqueType;
 
 // Numerics
 export import :Range;

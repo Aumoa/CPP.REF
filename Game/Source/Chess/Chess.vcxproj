@@ -96,10 +96,15 @@
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\Game\Game.vcxproj">
       <Project>{3009a2f5-8441-4cd7-8385-9810a1c4642e}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\ChessAI\ChessAI.vcxproj">
+      <Project>{dadb4b61-e8bb-4cc7-b46b-854c5dc0e608}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chess.ixx" />
     <ClCompile Include="ChessGameInstance.ixx" />
+    <ClCompile Include="Level\GameLevel.cpp" />
+    <ClCompile Include="Level\GameLevel.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

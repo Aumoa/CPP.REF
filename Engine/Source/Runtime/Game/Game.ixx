@@ -8,6 +8,7 @@ export import :GameInstance;
 export import :IFrameworkView;
 export import :Transform;
 export import :GameEngine;
+export import :SubclassOf;
 
 // GameFramework
 export import :AActor;
@@ -19,3 +20,14 @@ export import :APawn;
 // Ticking
 export import :TickingGroup;
 export import :TickFunction;
+
+// Level
+export import :Level;
+export import :World;
+
+// Concepts
+export import :GameConcepts;
+
+// Info
+export import :AInfo;
+export import :AGameMode;

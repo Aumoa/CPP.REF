@@ -100,6 +100,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Concepts\GameConcepts.ixx" />
     <ClCompile Include="Game.ixx" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEngine.ixx" />
@@ -118,7 +119,16 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObject.ixx" />
     <ClCompile Include="IFrameworkView.ixx" />
+    <ClCompile Include="Info\AGameMode.cpp" />
+    <ClCompile Include="Info\AGameMode.ixx" />
+    <ClCompile Include="Info\AInfo.cpp" />
+    <ClCompile Include="Info\AInfo.ixx" />
+    <ClCompile Include="Level\Level.cpp" />
+    <ClCompile Include="Level\Level.ixx" />
+    <ClCompile Include="Level\World.cpp" />
+    <ClCompile Include="Level\World.ixx" />
     <ClCompile Include="LogGame.ixx" />
+    <ClCompile Include="SubclassOf.ixx" />
     <ClCompile Include="Ticking\TickFunction.cpp" />
     <ClCompile Include="Ticking\TickFunction.ixx" />
     <ClCompile Include="Ticking\TickingGroup.ixx" />

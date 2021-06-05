@@ -1,8 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+import std.core;
 import SC.Game.ChessAI;
 
-AChessBoard::AChessBoard() : Super(L"ChessBoard")
+using namespace std;
+
+AChessBoard::AChessBoard(wstring_view name) : Super(name)
 {
 }
 

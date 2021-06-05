@@ -7,6 +7,15 @@
     <Filter Include="Ticking">
       <UniqueIdentifier>{a976eb34-38eb-495d-9131-6d93a80aa162}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{44098b13-d317-4e17-af8d-c7defdc0a3cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Concepts">
+      <UniqueIdentifier>{1478f489-bcfc-428f-ac8f-83a064c07380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Info">
+      <UniqueIdentifier>{ce7d5638-8368-4678-9ff8-14925a3ccaf9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -57,6 +66,34 @@
     </ClCompile>
     <ClCompile Include="Ticking\TickFunction.cpp">
       <Filter>Ticking</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.ixx">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\World.ixx">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Concepts\GameConcepts.ixx">
+      <Filter>Concepts</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\World.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="SubclassOf.ixx" />
+    <ClCompile Include="Info\AInfo.ixx">
+      <Filter>Info</Filter>
+    </ClCompile>
+    <ClCompile Include="Info\AInfo.cpp">
+      <Filter>Info</Filter>
+    </ClCompile>
+    <ClCompile Include="Info\AGameMode.ixx">
+      <Filter>Info</Filter>
+    </ClCompile>
+    <ClCompile Include="Info\AGameMode.cpp">
+      <Filter>Info</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

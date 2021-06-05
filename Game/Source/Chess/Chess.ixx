@@ -3,3 +3,6 @@
 export module SC.Game.Chess;
 
 export import :ChessGameInstance;
+
+// Level
+export import :GameLevel;
