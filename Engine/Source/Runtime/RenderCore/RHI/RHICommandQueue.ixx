@@ -3,12 +3,16 @@
 export module SC.Runtime.RenderCore:RHICommandQueue;
 
 import SC.Runtime.Core;
-import SC.Runtime.Core.Internal;
+import SC.Runtime.RenderCore.Internal;
 import :ComPtr;
 import :RHICommandType;
 import :RHIDeviceChild;
+import std.core;
 
 export class RHIDevice;
+export class RHIDeviceContext;
+
+using namespace std;
 
 /// <summary>
 /// Provides methods for submitting command lists that written by device context, synchronizing device context execution.
@@ -49,6 +53,30 @@ public:
 	/// Wait for commands executed that represented by last signaled number.
 	/// </summary>
 	void WaitLastSignal();
+
+	/// <summary>
+	/// Execute a device context.
+	/// </summary>
+	void ExecuteDeviceContext(RHIDeviceContext* deviceContext)
+	{
+		RHIDeviceContext* deviceContextsSpan[] = { deviceContext };
+		ExecuteDeviceContexts(span(deviceContextsSpan));
+	}
+
+	/// <summary>
+	/// Execute multiple device contexts.
+	/// </summary>
+	void ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts);
+
+	/// <summary>
+	/// Execute multiple device contexts.
+	/// </summary>
+	template<class... TDeviceContexts>
+	void ExecuteDeviceContext(TDeviceContexts&&... deviceContexts)
+	{
+		RHIDeviceContext* deviceContextsSpan[] = { deviceContexts... };
+		ExecuteDeviceContexts(span(deviceContextsSpan));
+	}
 
 public /*internal*/:
 	ID3D12CommandQueue* GetCommandQueue() const { return _queue.Get(); }

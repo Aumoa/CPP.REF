@@ -22,6 +22,7 @@ private:
 	RHIDevice* _device = nullptr;
 	RHICommandQueue* _primaryQueue = nullptr;
 	RHISwapChain* _frameworkViewChain = nullptr;
+	RHIDeviceContext* _deviceContext = nullptr;
 
 public:
 	/// <summary>

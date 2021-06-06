@@ -28,6 +28,10 @@ export
 	interface ID3D12Debug;
 	interface ID3D12Device;
 	interface ID3D12CommandQueue;
+	interface ID3D12Fence;
+	interface ID3D12CommandList;
+	interface ID3D12GraphicsCommandList;
+	interface ID3D12CommandAllocator;
 
 	/* ----------- Macro declaration */
 #undef FAILED

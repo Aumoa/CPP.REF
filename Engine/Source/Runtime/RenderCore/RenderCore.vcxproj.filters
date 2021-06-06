@@ -33,6 +33,10 @@
     <ClCompile Include="RHI\RHIDeviceChild.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
+    <ClCompile Include="RHI\RHIDeviceContext.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIDeviceContext.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">

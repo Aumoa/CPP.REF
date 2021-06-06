@@ -12,3 +12,4 @@ export import :RHISwapChain;
 export import :RHICommandType;
 export import :RHICommandQueue;
 export import :RHISwapChain;
+export import :RHIDeviceContext;

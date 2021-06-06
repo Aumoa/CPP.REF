@@ -25,6 +25,7 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_device = CreateSubobject<RHIDevice>(_bDebug);
 	_primaryQueue = CreateSubobject<RHICommandQueue>(_device);
 	_frameworkViewChain = CreateSubobject<RHISwapChain>(_device, frameworkView, _primaryQueue);
+	_deviceContext = CreateSubobject<RHIDeviceContext>(_device);
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
@@ -33,6 +34,11 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 
 void GameEngine::TickEngine()
 {
+	_deviceContext->Begin();
+	_deviceContext->End();
+
+	_primaryQueue->ExecuteDeviceContext(_deviceContext);
+
 	_frameworkViewChain->Present();
 	_primaryQueue->Signal();
 	_primaryQueue->WaitLastSignal();

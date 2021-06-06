@@ -4,6 +4,9 @@
 
 import SC.Runtime.RenderCore;
 import SC.Runtime.Core;
+import std.core;
+
+using namespace std;
 
 RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType) : Super(device)
 {
@@ -42,4 +45,21 @@ void RHICommandQueue::WaitSignal(uint64 signalNumber)
 void RHICommandQueue::WaitLastSignal()
 {
 	WaitSignal(_signalNumber);
+}
+
+void RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts)
+{
+	vector<ID3D12CommandList*> commandLists;
+	commandLists.reserve(deviceContexts.size());
+
+	for (size_t i = 0; i < deviceContexts.size(); ++i)
+	{
+		ID3D12CommandList* cmd = deviceContexts[i]->GetCommandList();
+		if (cmd != nullptr)
+		{
+			commandLists.emplace_back(cmd);
+		}
+	}
+
+	_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
 }
