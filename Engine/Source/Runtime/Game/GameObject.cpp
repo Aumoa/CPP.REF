@@ -15,3 +15,8 @@ wstring GameObject::ToString() const
 {
 	return _name;
 }
+
+wstring GameObject::GetName() const
+{
+	return _name;
+}

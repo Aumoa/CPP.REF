@@ -33,7 +33,7 @@ public:
 	/// <typeparam name="T"> The actor class. </typeparam>
 	/// <param name="name"> Actor name. </param>
 	/// <returns> Spawned actor. </returns>
-	template<IsActorClass T>
+	template<derived_from<AActor> T>
 	T* SpawnActor(wstring_view name)
 	{
 		T* spawnedActor = CreateSubobject<T>(name);

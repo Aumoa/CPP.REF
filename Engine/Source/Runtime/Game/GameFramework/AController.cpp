@@ -6,6 +6,34 @@ import SC.Runtime.Game;
 
 using namespace std;
 
+using enum ELogVerbosity;
+
 AController::AController(wstring_view name) : Super(name)
 {
+}
+
+void AController::Possess(APawn* pawn)
+{
+	if (_possessedPawn != nullptr)
+	{
+		LogSystem::Log(LogController, Error, L"The controller already possessed to pawn[{}]. Abort.", _possessedPawn->GetName());
+		return;
+	}
+
+	_possessedPawn = pawn;
+	pawn->PossessedBy(this);
+	OnPossess(pawn);
+}
+
+void AController::UnPossess()
+{
+	if (_possessedPawn == nullptr)
+	{
+		LogSystem::Log(LogController, Verbose, L"The controller already detached any pawn. Abort.");
+		return;
+	}
+
+	OnUnPossess();
+	_possessedPawn->UnPossessed();
+	_possessedPawn = nullptr;
 }

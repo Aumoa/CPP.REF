@@ -25,9 +25,12 @@ public:
 	/// <param name="name"> The object name. </param>
 	GameObject(wstring_view name);
 
-	/// <summary>
-	/// Get object name to represent this object.
-	/// </summary>
-	/// <returns> The string view instance. </returns>
+	/// <inheritdoc/>
 	virtual wstring ToString() const;
+
+	/// <summary>
+	/// Get object name to represents this object.
+	/// </summary>
+	/// <returns></returns>
+	wstring GetName() const;
 };

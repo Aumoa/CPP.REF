@@ -6,12 +6,4 @@ import :AActor;
 
 export
 {
-	/// <summary>
-	/// Represents the type is subclass of AActor.
-	/// </summary>
-	template<class T>
-	concept IsActorClass = requires(T* instance, AActor* actor)
-	{
-		{ actor = instance };
-	};
 }
