@@ -4,6 +4,7 @@ export module SC.Runtime.Game:GameEngine;
 
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
+import SC.Runtime.Game.Shaders;
 
 export class GameInstance;
 
@@ -23,6 +24,7 @@ private:
 	RHICommandQueue* _primaryQueue = nullptr;
 	RHISwapChain* _frameworkViewChain = nullptr;
 	RHIDeviceContext* _deviceContext = nullptr;
+	ColorShader* _colorShader = nullptr;
 
 public:
 	/// <summary>

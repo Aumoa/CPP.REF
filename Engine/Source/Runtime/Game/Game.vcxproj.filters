@@ -19,6 +19,12 @@
     <Filter Include="Components">
       <UniqueIdentifier>{3833ef9b-b9ca-44ca-a55a-c5a80f3571ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{5f049205-8ad6-4a5a-95df-7a22c4a22750}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\ColorShader">
+      <UniqueIdentifier>{196c48bb-95d0-4497-82e0-36336b821e09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -119,5 +125,22 @@
     <ClCompile Include="Components\ComponentTransformSpace.ixx">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Shaders\Shaders.ixx">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\ColorShader\ColorShader.ixx">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
+      <Filter>Shaders\ColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
+      <Filter>Shaders\ColorShader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -26,6 +26,8 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_primaryQueue = CreateSubobject<RHICommandQueue>(_device);
 	_frameworkViewChain = CreateSubobject<RHISwapChain>(_device, frameworkView, _primaryQueue);
 	_deviceContext = CreateSubobject<RHIDeviceContext>(_device);
+	_colorShader = CreateSubobject<ColorShader>(_device);
+	_colorShader->Compile();
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };

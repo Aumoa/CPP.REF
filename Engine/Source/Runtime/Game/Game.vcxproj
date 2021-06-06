@@ -69,6 +69,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
+    <FxCompile>
+      <EntryPointName>Main</EntryPointName>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+      <VariableName>p%(Filename)</VariableName>
+      <HeaderFileOutput>$(IntDir)%(Filename).hlsl.h</HeaderFileOutput>
+      <ObjectFileOutput />
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -90,6 +99,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
+    <FxCompile>
+      <EntryPointName>Main</EntryPointName>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.1</ShaderModel>
+      <VariableName>p%(Filename)</VariableName>
+      <HeaderFileOutput>$(IntDir)%(Filename).hlsl.h</HeaderFileOutput>
+      <ObjectFileOutput />
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
@@ -135,11 +153,27 @@
     <ClCompile Include="Level\World.cpp" />
     <ClCompile Include="Level\World.ixx" />
     <ClCompile Include="LogGame.ixx" />
+    <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="Shaders\ColorShader\ColorShader.ixx" />
+    <ClCompile Include="Shaders\Shaders.ixx" />
     <ClCompile Include="SubclassOf.ixx" />
     <ClCompile Include="Ticking\TickFunction.cpp" />
     <ClCompile Include="Ticking\TickFunction.ixx" />
     <ClCompile Include="Ticking\TickingGroup.ixx" />
     <ClCompile Include="Transform.ixx" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

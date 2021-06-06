@@ -32,6 +32,8 @@ export
 	interface ID3D12CommandList;
 	interface ID3D12GraphicsCommandList;
 	interface ID3D12CommandAllocator;
+	interface ID3D12RootSignature;
+	interface ID3D12PipelineState;
 
 	/* ----------- Macro declaration */
 #undef FAILED

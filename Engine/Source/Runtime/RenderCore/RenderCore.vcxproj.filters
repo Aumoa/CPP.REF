@@ -37,6 +37,12 @@
       <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="RHI\RHIDeviceContext.ixx" />
+    <ClCompile Include="RHI\RHIShader.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIShader.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">
