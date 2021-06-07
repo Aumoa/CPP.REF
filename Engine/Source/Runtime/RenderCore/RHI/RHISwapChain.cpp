@@ -39,5 +39,26 @@ void RHISwapChain::Present(uint8 vSyncLevel)
 
 void RHISwapChain::ResizeBuffers(int32 width, int32 height)
 {
+	for (int32 i = 0; i < 3; ++i)
+	{
+		if (_buffers[i] != nullptr)
+		{
+			DestroySubobject(_buffers[i]);
+			_buffers[i] = nullptr;
+		}
+	}
+
 	HR_E(LogRHI, _swapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, 0));
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		ComPtr<ID3D12Resource> buffer;
+		HR(LogRHI, _swapChain->GetBuffer((UINT)i, IID_PPV_ARGS(&buffer)));
+		_buffers[i] = CreateSubobject<RHITexture2D>(GetDevice(), buffer.Get());
+	}
+}
+
+RHITexture2D* RHISwapChain::GetBuffer(int32 index) const
+{
+	return _buffers[index];
 }

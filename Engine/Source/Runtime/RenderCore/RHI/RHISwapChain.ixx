@@ -7,9 +7,10 @@ import SC.Runtime.RenderCore.Internal;
 import :ComPtr;
 import :RHIDeviceChild;
 
-export class RHIDevice;
 export struct IWindowView;
+export class RHIDevice;
 export class RHICommandQueue;
+export class RHITexture2D;
 
 /// <summary>
 /// Represents interface implements one or more surfaces for storing rendered data before presenting it to an output.
@@ -21,6 +22,7 @@ public:
 
 private:
 	ComPtr<IDXGISwapChain4> _swapChain;
+	RHITexture2D* _buffers[3] = {};
 
 public:
 	/// <summary>
@@ -42,4 +44,9 @@ public:
 	/// Resize all back buffers. All back buffers should be unlocked state.
 	/// </summary>
 	void ResizeBuffers(int32 width, int32 height);
+
+	/// <summary>
+	/// Get allocated buffer.
+	/// </summary>
+	RHITexture2D* GetBuffer(int32 index) const;
 };

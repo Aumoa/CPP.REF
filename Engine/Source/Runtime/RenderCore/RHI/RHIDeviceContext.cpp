@@ -4,6 +4,7 @@
 
 import std.core;
 import SC.Runtime.RenderCore;
+import SC.Runtime.Core;
 
 using namespace std;
 
@@ -36,6 +37,27 @@ void RHIDeviceContext::Begin()
 void RHIDeviceContext::End()
 {
 	HR_E(LogRHI, _commandList->Close());
+}
+
+void RHIDeviceContext::DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation)
+{
+	_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+void RHIDeviceContext::DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount, int32 baseVertexLocation, uint32 startInstanceLocation)
+{
+	_commandList->DrawInstanced(vertexCountPerInstance, instanceCount, baseVertexLocation, startInstanceLocation);
+}
+
+void RHIDeviceContext::IASetPrimitiveTopology(ERHIPrimitiveTopology topology)
+{
+	_commandList->IASetPrimitiveTopology((D3D_PRIMITIVE_TOPOLOGY)topology);
+}
+
+void RHIDeviceContext::SetGraphicsShader(RHIShader* shader)
+{
+	_commandList->SetGraphicsRootSignature(shader->GetRootSignature());
+	_commandList->SetPipelineState(shader->GetPipelineState());
 }
 
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)

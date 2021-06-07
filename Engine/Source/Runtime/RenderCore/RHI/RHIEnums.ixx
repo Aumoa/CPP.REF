@@ -1,6 +1,22 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHICommandType;
+export module SC.Runtime.RenderCore:RHIEnums;
+
+/// <summary>
+/// Represents primitive topology.
+/// </summary>
+export enum class ERHIPrimitiveTopology
+{
+	/// <summary>
+	/// The triangle list topology.
+	/// </summary>
+	TriangleList = 4,
+
+	/// <summary>
+	/// The triangle strip topology.
+	/// </summary>
+	TriangleStrip = 5
+};
 
 /// <summary>
 /// Specifies the type of a command list that written by device context.

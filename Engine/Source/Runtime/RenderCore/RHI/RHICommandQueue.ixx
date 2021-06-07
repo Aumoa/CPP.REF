@@ -5,7 +5,7 @@ export module SC.Runtime.RenderCore:RHICommandQueue;
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore.Internal;
 import :ComPtr;
-import :RHICommandType;
+import :RHIEnums;
 import :RHIDeviceChild;
 import std.core;
 

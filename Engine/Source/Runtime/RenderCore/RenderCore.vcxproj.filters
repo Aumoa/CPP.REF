@@ -24,9 +24,6 @@
     <ClCompile Include="RHI\RHICommandQueue.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHICommandType.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHICommandQueue.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
@@ -36,11 +33,34 @@
     <ClCompile Include="RHI\RHIDeviceContext.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIDeviceContext.ixx" />
     <ClCompile Include="RHI\RHIShader.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="RHI\RHIShader.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIDeviceContext.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIEnums.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIResource.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIResource.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHITexture2D.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHITexture.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHITexture.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHITexture2D.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
   </ItemGroup>

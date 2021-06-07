@@ -3,10 +3,11 @@
 export module SC.Runtime.RenderCore:RHIDeviceContext;
 
 import :RHIDeviceChild;
-import :RHICommandType;
+import :RHIEnums;
 import :ComPtr;
 
 export class RHIDevice;
+export class RHIShader;
 
 /// <summary>
 /// Represents a device context which generates rendering commands.
@@ -39,6 +40,26 @@ public:
 	/// Mark the end of a series of commands.
 	/// </summary>
 	virtual void End();
+
+	/// <summary>
+	/// Draw primitive with vertex buffer and index buffer.
+	/// </summary>
+	virtual void DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount = 1, uint32 startIndexLocation = 0, int32 baseVertexLocation = 0, uint32 startInstanceLocation = 0);
+
+	/// <summary>
+	/// Draw primitive with vertex buffer.
+	/// </summary>
+	virtual void DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount = 1, int32 baseVertexLocation = 0, uint32 startInstanceLocation = 0);
+
+	/// <summary>
+	/// Set IA primitive topology.
+	/// </summary>
+	virtual void IASetPrimitiveTopology(ERHIPrimitiveTopology topology);
+
+	/// <summary>
+	/// Set graphics pipeline shader program.
+	/// </summary>
+	virtual void SetGraphicsShader(RHIShader* shader);
 
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const { return _commandList.Get(); }

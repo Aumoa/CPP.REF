@@ -37,6 +37,9 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 void GameEngine::TickEngine()
 {
 	_deviceContext->Begin();
+	_deviceContext->SetGraphicsShader(_colorShader);
+	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+	_deviceContext->DrawInstanced(4, 1);
 	_deviceContext->End();
 
 	_primaryQueue->ExecuteDeviceContext(_deviceContext);
