@@ -15,4 +15,9 @@ public:
 public:
 	RHITexture2D(RHIDevice* device, ID3D12Resource* resource);
 	~RHITexture2D() override;
+
+	/// <summary>
+	/// Get pixels resolution.
+	/// </summary>
+	virtual void GetPixelSize(int32* pWidth, int32* pHeight);
 };

@@ -32,16 +32,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_CREATE:
-		//SetupHwndParameters(hWnd, lParam);
+		SetupHwndParameters(hWnd, lParam);
 		break;
 	case WM_SIZE:
-		//if (CoreWindow* cw = GetThis(hWnd); cw != nullptr)
-		//{
-		//	cw->Size.Invoke((int16)LOWORD(lParam), (int16)HIWORD(lParam));
-		//}
+		if (CoreWindow* cw = GetThis(hWnd); cw != nullptr)
+		{
+			cw->Size.Invoke((int16)LOWORD(lParam), (int16)HIWORD(lParam));
+		}
 		break;
 	case WM_DESTROY:
-		//FinallizeHwndParameters(hWnd);
+		FinallizeHwndParameters(hWnd);
 		PostQuitMessage(0);
 		break;
 	}

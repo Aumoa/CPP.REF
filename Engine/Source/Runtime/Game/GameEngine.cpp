@@ -28,6 +28,7 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_deviceContext = CreateSubobject<RHIDeviceContext>(_device);
 	_colorShader = CreateSubobject<ColorShader>(_device);
 	_colorShader->Compile();
+	_rtv = CreateSubobject<RHIRenderTargetView>(_device, 3);
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
@@ -36,7 +37,31 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 
 void GameEngine::TickEngine()
 {
+	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
+
+	RHIViewport vp =
+	{
+		.TopLeftX = 0,
+		.TopLeftY = 0,
+		.Width = (float)_vpWidth,
+		.Height = (float)_vpHeight,
+		.MinDepth = 0,
+		.MaxDepth = 1.0f
+	};
+
+	RHIScissorRect sc =
+	{
+		.Left = 0,
+		.Top = 0,
+		.Right = _vpWidth,
+		.Bottom = _vpHeight
+	};
+
 	_deviceContext->Begin();
+	_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1);
+	_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
+	_deviceContext->RSSetScissorRects(1, &sc);
+	_deviceContext->RSSetViewports(1, &vp);
 	_deviceContext->SetGraphicsShader(_colorShader);
 	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
 	_deviceContext->DrawInstanced(4, 1);
@@ -61,4 +86,13 @@ void GameEngine::ResizedApp(int32 width, int32 height)
 	_primaryQueue->WaitLastSignal();
 
 	_frameworkViewChain->ResizeBuffers(width, height);
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		RHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
+		_rtv->CreateRenderTargetView(texture, i);
+	}
+
+	_vpWidth = width;
+	_vpHeight = height;
 }

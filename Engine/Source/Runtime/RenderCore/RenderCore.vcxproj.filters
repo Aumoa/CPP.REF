@@ -63,6 +63,21 @@
     <ClCompile Include="RHI\RHITexture2D.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
+    <ClCompile Include="RHI\RHIView.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIView.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIRenderTargetView.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIRenderTargetView.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIStructures.ixx">
+      <Filter>RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">

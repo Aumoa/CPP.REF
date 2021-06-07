@@ -16,6 +16,8 @@ export
 	/* ----------- Type declaration */
 	typedef HRESULT HRESULT;
 	typedef IID IID;
+	typedef D3D12_CPU_DESCRIPTOR_HANDLE D3D12_CPU_DESCRIPTOR_HANDLE;
+	typedef D3D12_GPU_DESCRIPTOR_HANDLE D3D12_GPU_DESCRIPTOR_HANDLE;
 
 	/* ----------- class declaration */
 	class _com_error;
@@ -35,6 +37,7 @@ export
 	interface ID3D12RootSignature;
 	interface ID3D12PipelineState;
 	interface ID3D12Resource;
+	interface ID3D12DescriptorHeap;
 
 	/* ----------- Macro declaration */
 #undef FAILED

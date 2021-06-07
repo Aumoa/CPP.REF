@@ -62,3 +62,8 @@ RHITexture2D* RHISwapChain::GetBuffer(int32 index) const
 {
 	return _buffers[index];
 }
+
+int32 RHISwapChain::GetCurrentBackBufferIndex() const
+{
+	return (int32)_swapChain->GetCurrentBackBufferIndex();
+}

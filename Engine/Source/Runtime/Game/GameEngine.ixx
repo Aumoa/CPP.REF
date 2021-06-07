@@ -25,6 +25,10 @@ private:
 	RHISwapChain* _frameworkViewChain = nullptr;
 	RHIDeviceContext* _deviceContext = nullptr;
 	ColorShader* _colorShader = nullptr;
+	RHIRenderTargetView* _rtv = nullptr;
+
+	int32 _vpWidth = 0;
+	int32 _vpHeight = 0;
 
 public:
 	/// <summary>

@@ -3,6 +3,7 @@
 #include "Internal.h"
 
 import SC.Runtime.RenderCore;
+import SC.Runtime.Core;
 
 RHITexture2D::RHITexture2D(RHIDevice* device, ID3D12Resource* resource) : Super(device, resource)
 {
@@ -10,4 +11,17 @@ RHITexture2D::RHITexture2D(RHIDevice* device, ID3D12Resource* resource) : Super(
 
 RHITexture2D::~RHITexture2D()
 {
+}
+
+void RHITexture2D::GetPixelSize(int32* pWidth, int32* pHeight)
+{
+	D3D12_RESOURCE_DESC desc = GetResource()->GetDesc();
+	if (pWidth != nullptr)
+	{
+		*pWidth = (int32)desc.Width;
+	}
+	if (pHeight != nullptr)
+	{
+		*pHeight = (int32)desc.Height;
+	}
 }

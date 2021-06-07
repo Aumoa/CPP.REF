@@ -60,6 +60,38 @@ void RHIDeviceContext::SetGraphicsShader(RHIShader* shader)
 	_commandList->SetPipelineState(shader->GetPipelineState());
 }
 
+void RHIDeviceContext::OMSetRenderTargets(RHIRenderTargetView* rtv)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetCPUDescriptorHandle();
+	_commandList->OMSetRenderTargets(rtv->GetDescriptorCount(), &handle, 0, nullptr);
+}
+
+void RHIDeviceContext::OMSetRenderTargets(RHIRenderTargetView* rtv, int32 index, int32 count)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetCPUDescriptorHandle(index);
+	_commandList->OMSetRenderTargets(count, &handle, 0, nullptr);
+}
+
+void RHIDeviceContext::ClearRenderTargetView(RHIRenderTargetView* rtv, const Color& color)
+{
+	_commandList->ClearRenderTargetView(rtv->GetCPUDescriptorHandle(), (const FLOAT*)&color, 0, nullptr);
+}
+
+void RHIDeviceContext::ClearRenderTargetView(RHIRenderTargetView* rtv, int32 index, const Color& color)
+{
+	_commandList->ClearRenderTargetView(rtv->GetCPUDescriptorHandle(index), (const FLOAT*)&color, 0, nullptr);
+}
+
+void RHIDeviceContext::RSSetScissorRects(int32 count, const RHIScissorRect* rects)
+{
+	_commandList->RSSetScissorRects((UINT)count, (const D3D12_RECT*)rects);
+}
+
+void RHIDeviceContext::RSSetViewports(int32 count, const RHIViewport* viewports)
+{
+	_commandList->RSSetViewports((UINT)count, (const D3D12_VIEWPORT*)viewports);
+}
+
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)
 {
 	ComPtr<ID3D12CommandAllocator> t = move(_allocator);

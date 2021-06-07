@@ -49,4 +49,9 @@ public:
 	/// Get allocated buffer.
 	/// </summary>
 	RHITexture2D* GetBuffer(int32 index) const;
+
+	/// <summary>
+	/// Get current back buffer index.
+	/// </summary>
+	int32 GetCurrentBackBufferIndex() const;
 };
