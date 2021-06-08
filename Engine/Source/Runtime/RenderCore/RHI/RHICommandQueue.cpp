@@ -68,16 +68,17 @@ uint64 RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceCont
 	return Signal();
 }
 
-void RHICommandQueue::Collect()
+int32 RHICommandQueue::Collect()
 {
 	uint64 fenceValue = _signalNumber;
+	int32 count = 0;
 
 	while (!_gcobjects.empty())
 	{
 		GarbageItem& item = _gcobjects.front();
 		if (item.FenceValue > fenceValue)
 		{
-			return;
+			return count;
 		}
 
 		_gcobjects.pop();
@@ -90,7 +91,11 @@ void RHICommandQueue::Collect()
 			DestroySubobject(item.IsObject);
 			break;
 		}
+
+		++count;
 	}
+
+	return count;
 }
 
 void RHICommandQueue::AddGarbageObject(uint64 fenceValue, Object* object)

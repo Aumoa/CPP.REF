@@ -94,7 +94,8 @@ public:
 	/// <summary>
 	/// Collect all registered garbages.
 	/// </summary>
-	void Collect();
+	/// <returns> Count of collected items. </returns>
+	int32 Collect();
 
 	/// <summary>
 	/// Add garbage object. Object will destroy at Collect() called and outer will change to this object.

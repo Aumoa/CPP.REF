@@ -134,6 +134,9 @@
     <ClCompile Include="Shaders\ColorShader\ColorShader.ixx">
       <Filter>Shaders\ColorShader</Filter>
     </ClCompile>
+    <ClCompile Include="Ticking\TickScheduler.ixx">
+      <Filter>Ticking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">

@@ -26,7 +26,7 @@ export
 	class MulticastDelegate<void(TArgs...)>
 	{
 		map<int64, function<void(TArgs...)>> _functions;
-		int64 _id = 0;
+		atomic<int64> _id = 0;
 
 	public:
 		~MulticastDelegate() noexcept
@@ -52,8 +52,9 @@ export
 		/// <returns> Return valid function id if succeeded to bind, otherwise return -1. </returns>
 		int64 AddRaw(function<void(TArgs...)> func)
 		{
-			auto pair = _functions.emplace(_id, move(func));
-			return pair.second ? _id++ : -1;
+			int64 id = _id++;
+			auto pair = _functions.emplace(id, move(func));
+			return pair.second ? id : -1;
 		}
 
 		/// <summary>

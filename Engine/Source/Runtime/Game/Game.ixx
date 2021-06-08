@@ -20,6 +20,7 @@ export import :APawn;
 // Ticking
 export import :TickingGroup;
 export import :TickFunction;
+export import :TickScheduler;
 
 // Level
 export import :Level;

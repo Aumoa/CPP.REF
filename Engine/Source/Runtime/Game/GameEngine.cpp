@@ -3,8 +3,12 @@
 import SC.Runtime.Game;
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
+import std.core;
 
 using enum ELogVerbosity;
+
+using namespace std;
+using namespace std::chrono;
 
 GameEngine::GameEngine(bool bDebug) : Super()
 	, _bDebug(bDebug)
@@ -45,10 +49,25 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_vbv.BufferLocation = _colorShader->CreateVertexBuffer(triangle, 3)->GetGPUVirtualAddress();
 	_vbv.StrideInBytes = _colorShader->GetVertexStride();
 	_vbv.SizeInBytes = _vbv.StrideInBytes * 3;
+
+	auto gc = [this]()
+	{
+		int32 count = _primaryQueue->Collect();
+		LogSystem::Log(LogEngine, Verbose, L"Collect {} RHI garbages.", count);
+	};
+	_scheduler.AddSchedule({ .Task = gc, .Delay = 10s, .InitDelay = 10s });
 }
 
 void GameEngine::TickEngine()
 {
+	duration<float> deltaSeconds = 0ns;
+	steady_clock::time_point now = steady_clock::now();
+	if (_prev.has_value())
+	{
+		deltaSeconds = now - _prev.value();
+	}
+	_prev = now;
+
 	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
 
 	RHIViewport vp =
@@ -100,6 +119,8 @@ void GameEngine::TickEngine()
 	_frameworkViewChain->Present();
 	_primaryQueue->Signal();
 	_primaryQueue->WaitLastSignal();
+
+	_scheduler.Tick(deltaSeconds);
 }
 
 void GameEngine::ResizedApp(int32 width, int32 height)

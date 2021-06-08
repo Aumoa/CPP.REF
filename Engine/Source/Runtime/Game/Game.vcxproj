@@ -163,6 +163,7 @@
     <ClCompile Include="Ticking\TickFunction.cpp" />
     <ClCompile Include="Ticking\TickFunction.ixx" />
     <ClCompile Include="Ticking\TickingGroup.ixx" />
+    <ClCompile Include="Ticking\TickScheduler.ixx" />
     <ClCompile Include="Transform.ixx" />
   </ItemGroup>
   <ItemGroup>

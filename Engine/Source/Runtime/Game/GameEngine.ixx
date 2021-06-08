@@ -5,8 +5,13 @@ export module SC.Runtime.Game:GameEngine;
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
 import SC.Runtime.Game.Shaders;
+import :TickScheduler;
+import std.core;
 
 export class GameInstance;
+
+using namespace std;
+using namespace std::chrono;
 
 /// <summary>
 /// Represents game engine that manage core resources.
@@ -31,6 +36,9 @@ private:
 	int32 _vpHeight = 0;
 
 	RHIVertexBufferView _vbv;
+	TickScheduler _scheduler;
+
+	optional<steady_clock::time_point> _prev;
 
 public:
 	/// <summary>
