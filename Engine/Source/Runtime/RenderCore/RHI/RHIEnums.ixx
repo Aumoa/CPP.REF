@@ -2,6 +2,20 @@
 
 export module SC.Runtime.RenderCore:RHIEnums;
 
+import SC.Runtime.Core;
+
+#define DEFINE_ENUM_FLAG_OPERATORS(Enum) \
+export\
+{\
+	inline constexpr Enum operator |(Enum a, Enum b) { return Enum(((int32)a) | ((int32)b)); }\
+	inline Enum& operator |=(Enum& a, Enum b) { return (Enum&)(((int32 &)a) |= ((int32)b)); }\
+	inline constexpr Enum operator &(Enum a, Enum b) { return Enum(((int32)a) & ((int32)b)); }\
+	inline Enum& operator &=(Enum& a, Enum b) { return (Enum&)(((int32 &)a) &= ((int32)b)); }\
+	inline constexpr Enum operator ~(Enum a) { return Enum(~((int32)a)); }\
+	inline constexpr Enum operator ^(Enum a, Enum b) { return Enum(((int32)a) ^ ((int32)b)); }\
+	inline Enum& operator ^=(Enum& a, Enum b) { return (Enum&)(((int32 &)a) ^= ((int32)b)); }\
+}
+
 /// <summary>
 /// Represents primitive topology.
 /// </summary>
@@ -43,3 +57,31 @@ export enum class ERHICommandType
 	/// </summary>
 	Copy = 3,
 };
+
+/// <summary>
+/// Specifies the resource state for guarding resource usage.
+/// </summary>
+export enum class ERHIResourceStates
+{
+	Common = 0,
+	VertexAndConstantBuffer = 0x1,
+	IndexBuffer = 0x2,
+	RenderTarget = 0x4,
+	UnorderedAccess = 0x8,
+	DepthWrite = 0x10,
+	DepthRead = 0x20,
+	NonPixelShaderResource = 0x40,
+	PixelShaderResource = 0x80,
+	StreamOut = 0x100,
+	IndirectArgument = 0x200,
+	CopyDest = 0x400,
+	CopySource = 0x800,
+	ResolveDest = 0x1000,
+	ResolveSource = 0x2000,
+	RaytracingAccelerationStructure = 0x400000,
+
+	GENERIC_READ = VertexAndConstantBuffer | IndexBuffer | NonPixelShaderResource | PixelShaderResource | IndirectArgument | CopySource,
+	Present = 0,
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(ERHIResourceStates);

@@ -105,9 +105,9 @@ void RHIShader::Compile()
 		.RTVFormats =
 		{
 			// [0]
-			DXGI_FORMAT_R8G8B8A8_UNORM
+			DXGI_FORMAT_B8G8R8A8_UNORM
 		},
-		.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
+		//.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
 		.SampleDesc = { 1, 0 },
 	};
 

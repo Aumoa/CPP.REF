@@ -3,6 +3,9 @@
 export module SC.Runtime.RenderCore:RHIStructures;
 
 import SC.Runtime.Core;
+import :RHIEnums;
+
+export class RHIResource;
 
 /// <summary>
 /// Represent viewport area.
@@ -26,4 +29,15 @@ export struct RHIScissorRect
 	int32 Top = 0;
 	int32 Right = 0;
 	int32 Bottom = 0;
+};
+
+/// <summary>
+/// Represent transition resource state information.
+/// </summary>
+export struct RHITransitionBarrier
+{
+	RHIResource* Resource = nullptr;
+	ERHIResourceStates StateBefore = ERHIResourceStates::Common;
+	ERHIResourceStates StateAfter = ERHIResourceStates::Common;
+	uint32 SubresourceIndex = 0;
 };

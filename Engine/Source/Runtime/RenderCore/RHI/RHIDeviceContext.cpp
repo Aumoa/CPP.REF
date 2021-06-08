@@ -92,6 +92,30 @@ void RHIDeviceContext::RSSetViewports(int32 count, const RHIViewport* viewports)
 	_commandList->RSSetViewports((UINT)count, (const D3D12_VIEWPORT*)viewports);
 }
 
+void RHIDeviceContext::TransitionBarrier(int32 count, const RHITransitionBarrier* barriers)
+{
+	vector<D3D12_RESOURCE_BARRIER> d3dbars(count);
+	for (int32 i = 0; i < count; ++i)
+	{
+		auto& barrier = barriers[i];
+
+		d3dbars[i] =
+		{
+			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+			.Transition =
+			{
+				.pResource = barrier.Resource->GetResource(),
+				.Subresource = barrier.SubresourceIndex,
+				.StateBefore = (D3D12_RESOURCE_STATES)barrier.StateBefore,
+				.StateAfter = (D3D12_RESOURCE_STATES)barrier.StateAfter
+			}
+		};
+	}
+
+	_commandList->ResourceBarrier(count, d3dbars.data());
+}
+
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)
 {
 	ComPtr<ID3D12CommandAllocator> t = move(_allocator);

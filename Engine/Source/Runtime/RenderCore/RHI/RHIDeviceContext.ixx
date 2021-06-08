@@ -93,6 +93,11 @@ public:
 	/// </summary>
 	virtual void RSSetViewports(int32 count, const RHIViewport* viewports);
 
+	/// <summary>
+	/// Set transition barriers.
+	/// </summary>
+	virtual void TransitionBarrier(int32 count, const RHITransitionBarrier* barriers);
+
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const { return _commandList.Get(); }
 

@@ -2,6 +2,7 @@
 
 import SC.Runtime.Game;
 import SC.Runtime.Core;
+import SC.Runtime.RenderCore;
 
 using enum ELogVerbosity;
 
@@ -57,7 +58,21 @@ void GameEngine::TickEngine()
 		.Bottom = _vpHeight
 	};
 
+	RHITransitionBarrier barrierBegin =
+	{
+		.Resource = _frameworkViewChain->GetBuffer(bufferIdx),
+		.StateBefore = ERHIResourceStates::Present,
+		.StateAfter = ERHIResourceStates::RenderTarget
+	};
+	RHITransitionBarrier barrierEnd =
+	{
+		.Resource = _frameworkViewChain->GetBuffer(bufferIdx),
+		.StateBefore = ERHIResourceStates::RenderTarget,
+		.StateAfter = ERHIResourceStates::Present
+	};
+
 	_deviceContext->Begin();
+	_deviceContext->TransitionBarrier(1, &barrierBegin);
 	_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1);
 	_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
 	_deviceContext->RSSetScissorRects(1, &sc);
@@ -65,6 +80,7 @@ void GameEngine::TickEngine()
 	_deviceContext->SetGraphicsShader(_colorShader);
 	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
 	_deviceContext->DrawInstanced(4, 1);
+	_deviceContext->TransitionBarrier(1, &barrierEnd);
 	_deviceContext->End();
 
 	_primaryQueue->ExecuteDeviceContext(_deviceContext);
