@@ -23,10 +23,23 @@ public:
 	using Super = RHIDeviceChild;
 
 private:
+	struct GarbageItem
+	{
+		int32 TypeIndex = 0;
+		uint64 FenceValue = 0;
+		union
+		{
+			IUnknown* IsUnknown;
+			Object* IsObject;
+		};
+	};
+
+private:
 	ComPtr<ID3D12CommandQueue> _queue;
 	ComPtr<ID3D12Fence> _fence;
-	uint64 _signalNumber = 0;
+	atomic<uint64> _signalNumber = 0;
 	EventHandle* _fenceEvent = nullptr;
+	queue<GarbageItem> _gcobjects;
 
 public:
 	/// <summary>
@@ -57,27 +70,38 @@ public:
 	/// <summary>
 	/// Execute a device context.
 	/// </summary>
-	void ExecuteDeviceContext(RHIDeviceContext* deviceContext)
+	uint64 ExecuteDeviceContext(RHIDeviceContext* deviceContext)
 	{
 		RHIDeviceContext* deviceContextsSpan[] = { deviceContext };
-		ExecuteDeviceContexts(span(deviceContextsSpan));
+		return ExecuteDeviceContexts(span(deviceContextsSpan));
 	}
 
 	/// <summary>
 	/// Execute multiple device contexts.
 	/// </summary>
-	void ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts);
+	uint64 ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts);
 
 	/// <summary>
 	/// Execute multiple device contexts.
 	/// </summary>
 	template<class... TDeviceContexts>
-	void ExecuteDeviceContext(TDeviceContexts&&... deviceContexts)
+	uint64 ExecuteDeviceContext(TDeviceContexts&&... deviceContexts)
 	{
 		RHIDeviceContext* deviceContextsSpan[] = { deviceContexts... };
-		ExecuteDeviceContexts(span(deviceContextsSpan));
+		return ExecuteDeviceContexts(span(deviceContextsSpan));
 	}
+
+	/// <summary>
+	/// Collect all registered garbages.
+	/// </summary>
+	void Collect();
+
+	/// <summary>
+	/// Add garbage object. Object will destroy at Collect() called and outer will change to this object.
+	/// </summary>
+	void AddGarbageObject(uint64 fenceValue, Object* object);
 
 public /*internal*/:
 	ID3D12CommandQueue* GetCommandQueue() const { return _queue.Get(); }
+	void AddGarbageObject(uint64 fenceValue, IUnknown* unknown);
 };

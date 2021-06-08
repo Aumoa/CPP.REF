@@ -2,6 +2,7 @@
 
 export module SC.Runtime.RenderCore:RHIResource;
 
+import SC.Runtime.Core;
 import :RHIDeviceChild;
 import :ComPtr;
 
@@ -19,6 +20,11 @@ private:
 public:
 	RHIResource(RHIDevice* device, ID3D12Resource* resource);
 	~RHIResource() override;
+
+	/// <summary>
+	/// Get GPU virtual address.
+	/// </summary>
+	virtual uint64 GetGPUVirtualAddress() const;
 
 public /*internal*/:
 	ID3D12Resource* GetResource() const { return _resource.Get(); }

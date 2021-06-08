@@ -2,6 +2,7 @@
 
 #include "Internal.h"
 
+import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
 
 RHIResource::RHIResource(RHIDevice* device, ID3D12Resource* resource) : Super(device)
@@ -11,4 +12,9 @@ RHIResource::RHIResource(RHIDevice* device, ID3D12Resource* resource) : Super(de
 
 RHIResource::~RHIResource()
 {
+}
+
+uint64 RHIResource::GetGPUVirtualAddress() const
+{
+	return _resource->GetGPUVirtualAddress();
 }

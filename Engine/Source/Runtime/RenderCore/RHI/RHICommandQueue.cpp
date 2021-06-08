@@ -25,12 +25,15 @@ RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType)
 
 RHICommandQueue::~RHICommandQueue()
 {
+	WaitLastSignal();
+	Collect();
 }
 
 uint64 RHICommandQueue::Signal()
 {
-	HR(LogRHI, _queue->Signal(_fence.Get(), ++_signalNumber));
-	return _signalNumber;
+	uint64 fenceValue = ++_signalNumber;
+	HR(LogRHI, _queue->Signal(_fence.Get(), fenceValue));
+	return fenceValue;
 }
 
 void RHICommandQueue::WaitSignal(uint64 signalNumber)
@@ -47,7 +50,7 @@ void RHICommandQueue::WaitLastSignal()
 	WaitSignal(_signalNumber);
 }
 
-void RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts)
+uint64 RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts)
 {
 	vector<ID3D12CommandList*> commandLists;
 	commandLists.reserve(deviceContexts.size());
@@ -62,4 +65,52 @@ void RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContex
 	}
 
 	_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
+	return Signal();
+}
+
+void RHICommandQueue::Collect()
+{
+	uint64 fenceValue = _signalNumber;
+
+	while (!_gcobjects.empty())
+	{
+		GarbageItem& item = _gcobjects.front();
+		if (item.FenceValue > fenceValue)
+		{
+			return;
+		}
+
+		_gcobjects.pop();
+		switch (item.TypeIndex)
+		{
+		case 0:
+			item.IsUnknown->Release();
+			break;
+		case 1:
+			DestroySubobject(item.IsObject);
+			break;
+		}
+	}
+}
+
+void RHICommandQueue::AddGarbageObject(uint64 fenceValue, Object* object)
+{
+	object->SetOuter(this);
+
+	_gcobjects.emplace() =
+	{
+		.TypeIndex = 1,
+		.FenceValue = fenceValue,
+		.IsObject = object
+	};
+}
+
+void RHICommandQueue::AddGarbageObject(uint64 fenceValue, IUnknown* unknown)
+{
+	_gcobjects.emplace() =
+	{
+		.TypeIndex = 0,
+		.FenceValue = fenceValue,
+		.IsUnknown = unknown
+	};
 }

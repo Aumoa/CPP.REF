@@ -1,21 +1,11 @@
-static float4 gPos[4] =
+struct VertexElement
 {
-    float4(-1.0f, 1.0f, 0, 1.0f),
-    float4(1.0f, 1.0f, 0, 1.0f),
-    float4(-1.0f, -1.0f, 0, 1.0f),
-    float4(1.0f, -1.0f, 0, 1.0f),
+    float3 Pos : POSITION;
+    float3 Color : COLOR;
 };
 
-static float3 gColor[4] =
+void Main(VertexElement element, out float4 posH : SV_Position, out float3 color : COLOR)
 {
-    float3(1.0f, 0.0f, 0.0f),
-    float3(0.0f, 1.0f, 0.0f),
-    float3(0.0f, 0.0f, 1.0f),
-    float3(1.0f, 1.0f, 0.0f),
-};
-
-void Main(uint vertexId : SV_VertexID, out float4 posH : SV_Position, out float3 color : COLOR)
-{
-    posH = gPos[vertexId];
-    color = gColor[vertexId];
+    posH = float4(element.Pos, 1.0f);
+    color = element.Color;
 }

@@ -6,8 +6,12 @@ import SC.Runtime.Core;
 import SC.Runtime.RenderCore.Internal;
 import :LogRHI;
 import :ComPtr;
+import :RHIEnums;
 
 using enum ELogVerbosity;
+
+export class RHIResource;
+export class RHICommandQueue;
 
 /// <summary>
 /// Provide interface for control all render devices.
@@ -22,6 +26,7 @@ private:
 
 	ComPtr<IDXGIFactory2> _factory;
 	ComPtr<ID3D12Device> _device;
+	RHICommandQueue* _queue = nullptr;
 
 public:
 	/// <summary>
@@ -29,6 +34,16 @@ public:
 	/// </summary>
 	RHIDevice(bool bDebug = false);
 	~RHIDevice() override;
+
+	/// <summary>
+	/// Get primary queue.
+	/// </summary>
+	RHICommandQueue* GetPrimaryQueue() const { return _queue; }
+
+	/// <summary>
+	/// Create immutable buffer.
+	/// </summary>
+	RHIResource* CreateImmutableBuffer(ERHIResourceStates initialState, const uint8* buffer, size_t length);
 
 public /*internal*/ :
 	IDXGIFactory2* GetFactory() const { return _factory.Get(); }

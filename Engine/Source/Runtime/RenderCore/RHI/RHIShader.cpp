@@ -57,6 +57,26 @@ void RHIShader::Compile()
 
 	HR(LogRHI, dev->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&_rs)));
 
+	// Make vertex declaration to input element.
+	std::vector<RHIVertexElement> vertexDeclaration = GetVertexDeclaration();
+	std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements(vertexDeclaration.size());
+
+	for (size_t i = 0; i < inputElements.size(); ++i)
+	{
+		auto& element = vertexDeclaration[i];
+
+		inputElements[i] =
+		{
+			.SemanticName = element.SemanticName.c_str(),
+			.SemanticIndex = element.SemanticIndex,
+			.Format = (DXGI_FORMAT)element.Format,
+			.InputSlot = element.InputSlot,
+			.AlignedByteOffset = element.AlignedByteOffset,
+			.InputSlotClass = (D3D12_INPUT_CLASSIFICATION)element.InputSlotClass,
+			.InstanceDataStepRate = 0
+		};
+	}
+
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psd =
 	{
 		.pRootSignature = _rs.Get(),
@@ -99,6 +119,8 @@ void RHIShader::Compile()
 		},
 		.InputLayout =
 		{
+			.pInputElementDescs = inputElements.data(),
+			.NumElements = (UINT)inputElements.size()
 		},
 		.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
 		.NumRenderTargets = 1,

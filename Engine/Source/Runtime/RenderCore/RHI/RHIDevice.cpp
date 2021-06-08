@@ -25,6 +25,55 @@ RHIDevice::~RHIDevice()
 {
 }
 
+RHIResource* RHIDevice::CreateImmutableBuffer(ERHIResourceStates initialState, const uint8* buffer, size_t length)
+{
+	D3D12_RESOURCE_DESC bufferDesc = { };
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Width = (UINT64)length;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	bufferDesc.SampleDesc = { 1, 0 };
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heap = { };
+	heap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	ComPtr<ID3D12Resource> resource;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+	ComPtr<ID3D12Resource> uploadHeap;
+	heap.Type = D3D12_HEAP_TYPE_UPLOAD;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	void* pData;
+	HR(LogRHI, uploadHeap->Map(0, nullptr, &pData));
+	memcpy(pData, buffer, length);
+	uploadHeap->Unmap(0, nullptr);
+
+	D3D12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = (D3D12_RESOURCE_STATES)initialState;
+
+	RHIDeviceContext* cmd = CreateSubobject<RHIDeviceContext>(this, ERHICommandType::Direct);
+	cmd->Begin();
+	ComPtr<ID3D12GraphicsCommandList> cmdlist;
+	HR(LogRHI, cmd->GetCommandList()->QueryInterface(IID_PPV_ARGS(&cmdlist)));
+	cmdlist->CopyResource(resource.Get(), uploadHeap.Get());
+	cmdlist->ResourceBarrier(1, &barrier);
+	cmd->End();
+
+	uint64 signalNumber = _queue->ExecuteDeviceContext(cmd);
+	_queue->AddGarbageObject(signalNumber, uploadHeap.Detach());
+	_queue->AddGarbageObject(signalNumber, cmd);
+
+	return CreateSubobject<RHIResource>(this, resource.Get());
+}
+
 void RHIDevice::InitializeDebug()
 {
 	LogSystem::Log(LogRHI, Info, L"----- Initialize Direct3D 12 debug layer.");
@@ -96,6 +145,7 @@ void RHIDevice::InitializeD3D12()
 	}
 
 	HR(LogRHI, D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device)));
+	_queue = CreateSubobject<RHICommandQueue>(this, ERHICommandType::Direct);
 	LogSystem::Log(LogRHI, Info, L"Direct3D 12 device created with feature level 11_0.");
 
 	LogSystem::Log(LogRHI, Info, L"----- Done!");

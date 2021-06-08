@@ -24,7 +24,7 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	LogSystem::Log(LogEngine, Info, L"Initialize RHI subsystems.");
 	_gameInstance = gameInstance;
 	_device = CreateSubobject<RHIDevice>(_bDebug);
-	_primaryQueue = CreateSubobject<RHICommandQueue>(_device);
+	_primaryQueue = _device->GetPrimaryQueue();
 	_frameworkViewChain = CreateSubobject<RHISwapChain>(_device, frameworkView, _primaryQueue);
 	_deviceContext = CreateSubobject<RHIDeviceContext>(_device);
 	_colorShader = CreateSubobject<ColorShader>(_device);
@@ -34,6 +34,17 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
 	frameworkView->Size += [this](int32 width, int32 height) { ResizedApp(width, height); };
+
+	RHIVertex triangle[3] =
+	{
+		{ .Position = Vector3(0.0f, +1.0f, 0.0f), .Color = NamedColors::Red },
+		{ .Position = Vector3(1.0f, -1.0f, 0.0f), .Color = NamedColors::Green },
+		{ .Position = Vector3(-1.0f, -1.0f, 0.0f), .Color = NamedColors::Blue },
+	};
+
+	_vbv.BufferLocation = _colorShader->CreateVertexBuffer(triangle, 3)->GetGPUVirtualAddress();
+	_vbv.StrideInBytes = _colorShader->GetVertexStride();
+	_vbv.SizeInBytes = _vbv.StrideInBytes * 3;
 }
 
 void GameEngine::TickEngine()
@@ -79,7 +90,8 @@ void GameEngine::TickEngine()
 	_deviceContext->RSSetViewports(1, &vp);
 	_deviceContext->SetGraphicsShader(_colorShader);
 	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-	_deviceContext->DrawInstanced(4, 1);
+	_deviceContext->IASetVertexBuffers(0, 1, &_vbv);
+	_deviceContext->DrawInstanced(3, 1);
 	_deviceContext->TransitionBarrier(1, &barrierEnd);
 	_deviceContext->End();
 
@@ -111,4 +123,6 @@ void GameEngine::ResizedApp(int32 width, int32 height)
 
 	_vpWidth = width;
 	_vpHeight = height;
+
+	LogSystem::Log(LogEngine, Info, L"Application resized to {}x{}.", width, height);
 }

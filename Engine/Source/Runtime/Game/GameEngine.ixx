@@ -30,6 +30,8 @@ private:
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;
 
+	RHIVertexBufferView _vbv;
+
 public:
 	/// <summary>
 	/// Initialize new <see cref="GameEngine"/> instance.

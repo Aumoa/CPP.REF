@@ -116,6 +116,11 @@ void RHIDeviceContext::TransitionBarrier(int32 count, const RHITransitionBarrier
 	_commandList->ResourceBarrier(count, d3dbars.data());
 }
 
+void RHIDeviceContext::IASetVertexBuffers(uint32 startSlot, uint32 numViews, const RHIVertexBufferView* views)
+{
+	_commandList->IASetVertexBuffers(startSlot, numViews, (const D3D12_VERTEX_BUFFER_VIEW*)views);
+}
+
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)
 {
 	ComPtr<ID3D12CommandAllocator> t = move(_allocator);

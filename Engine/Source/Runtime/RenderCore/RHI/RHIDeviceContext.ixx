@@ -98,6 +98,11 @@ public:
 	/// </summary>
 	virtual void TransitionBarrier(int32 count, const RHITransitionBarrier* barriers);
 
+	/// <summary>
+	/// Set vertex buffer view to IA slot.
+	/// </summary>
+	virtual void IASetVertexBuffers(uint32 startSlot, uint32 numViews, const RHIVertexBufferView* views);
+
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const { return _commandList.Get(); }
 
