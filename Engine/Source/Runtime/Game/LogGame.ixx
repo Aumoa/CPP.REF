@@ -9,3 +9,4 @@ export LogCategory LogTicking(L"Ticking");
 export LogCategory LogPawn(L"Pawn");
 export LogCategory LogSceneComponent(L"SceneComponent");
 export LogCategory LogController(L"Controller");
+export LogCategory LogWorld(L"World");

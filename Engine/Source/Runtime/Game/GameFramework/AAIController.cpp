@@ -6,6 +6,6 @@ import SC.Runtime.Game;
 
 using namespace std;
 
-AAIController::AAIController(wstring_view name) : Super(name)
+AAIController::AAIController() : Super()
 {
 }

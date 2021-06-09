@@ -17,7 +17,7 @@ private:
 	AChessBoard* _board = nullptr;
 
 public:
-	APiece(wstring_view name, AChessBoard* board) : Super(name)
+	APiece(AChessBoard* board) : Super()
 		, _board(board)
 	{
 	}

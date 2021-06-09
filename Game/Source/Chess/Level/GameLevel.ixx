@@ -17,7 +17,7 @@ private:
 public:
 	GameLevel();
 
-	virtual void LoadLevel(World* world) override;
+	virtual bool LoadLevel(World* world) override;
 
 	inline AChessBoard* GetPersistentChessBoard() const { return _psBoard; }
 };

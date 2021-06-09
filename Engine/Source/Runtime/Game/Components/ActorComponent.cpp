@@ -31,7 +31,7 @@ void ActorComponent::ComponentTickFunction::ExecuteTick(duration<float> elapsedT
 	}
 }
 
-ActorComponent::ActorComponent(wstring_view name) : Super(name)
+ActorComponent::ActorComponent() : Super()
 	, PrimaryComponentTick(this)
 {
 }

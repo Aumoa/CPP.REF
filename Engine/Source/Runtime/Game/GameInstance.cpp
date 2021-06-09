@@ -6,7 +6,7 @@ import SC.Runtime.Game;
 
 using namespace std;
 
-GameInstance::GameInstance(wstring_view name) : Super(name)
+GameInstance::GameInstance() : Super()
 {
 }
 
@@ -36,4 +36,7 @@ void GameInstance::InitializeEngine()
 
 	_engine = CreateSubobject<GameEngine>(bDebug);
 	_engine->InitEngine(this);
+
+	_world = CreateSubobject<World>();
+	_world->LoadLevel(StartupLevel);
 }

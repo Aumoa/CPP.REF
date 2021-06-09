@@ -20,6 +20,5 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="APlayerController"/> instance.
 	/// </summary>
-	/// <param name="name"> The controller name. </param>
-	APlayerController(wstring_view name);
+	APlayerController();
 };

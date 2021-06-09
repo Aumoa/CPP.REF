@@ -8,7 +8,7 @@ using namespace std;
 
 using enum ELogVerbosity;
 
-SceneComponent::SceneComponent(wstring_view name) : Super(name)
+SceneComponent::SceneComponent() : Super()
 {
 }
 

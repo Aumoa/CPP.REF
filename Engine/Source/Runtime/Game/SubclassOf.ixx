@@ -51,6 +51,26 @@ export
 		}
 
 		/// <summary>
+		/// Initialize new <see cref="SubclassOf"/> instance.
+		/// </summary>
+		template<derived_from<TBase> TOther>
+		inline SubclassOf(const SubclassOf<TOther>& rhs)
+			: _hash(rhs._hash)
+			, _ctor(rhs._ctor)
+		{
+		}
+
+		/// <summary>
+		/// Initialize new <see cref="SubclassOf"/> instance.
+		/// </summary>
+		template<derived_from<TBase> TOther>
+		inline SubclassOf(SubclassOf<TOther>&& rhs)
+			: _hash(rhs._hash)
+			, _ctor(move(rhs._ctor))
+		{
+		}
+
+		/// <summary>
 		/// Get identifier hash code.
 		/// </summary>
 		inline size_t GetHashCode() const { return _hash; }
@@ -58,7 +78,7 @@ export
 		/// <summary>
 		/// Represents this is valid state.
 		/// </summary>
-		inline bool IsValid() const { return _ctor; }
+		inline bool IsValid() const { return (bool)_ctor; }
 
 		/// <summary>
 		/// Instantiate saved class as base class.
@@ -70,7 +90,7 @@ export
 			{
 				return nullptr;
 			}
-			return static_cast<TBase*>(_ctor(outer));
+			return dynamic_cast<TBase*>(_ctor(outer));
 		}
 
 		inline SubclassOf& operator =(const SubclassOf& rhs)
@@ -81,6 +101,22 @@ export
 		}
 
 		inline SubclassOf& operator =(SubclassOf&& rhs)
+		{
+			_hash = rhs._hash;
+			_ctor = move(rhs._ctor);
+			return *this;
+		}
+
+		template<derived_from<TBase> TOther>
+		inline SubclassOf& operator =(const SubclassOf<TOther>& rhs)
+		{
+			_hash = rhs._hash;
+			_ctor = rhs._ctor;
+			return *this;
+		}
+
+		template<derived_from<TBase> TOther>
+		inline SubclassOf& operator =(SubclassOf<TOther>&& rhs)
 		{
 			_hash = rhs._hash;
 			_ctor = move(rhs._ctor);

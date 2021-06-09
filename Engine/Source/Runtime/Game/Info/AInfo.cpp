@@ -5,6 +5,6 @@ import SC.Runtime.Game;
 
 using namespace std;
 
-AInfo::AInfo(wstring_view name) : Super(name)
+AInfo::AInfo() : Super()
 {
 }

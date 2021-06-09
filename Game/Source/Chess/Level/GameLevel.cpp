@@ -8,7 +8,13 @@ GameLevel::GameLevel() : Super()
 {
 }
 
-void GameLevel::LoadLevel(World* world)
+bool GameLevel::LoadLevel(World* world)
 {
-	_psBoard = world->SpawnActor<AChessBoard>(L"ChessBoard");
+	if (!Super::LoadLevel(world))
+	{
+		return false;
+	}
+
+	_psBoard = world->SpawnActor<AChessBoard>();
+	return true;
 }

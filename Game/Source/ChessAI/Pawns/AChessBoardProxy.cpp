@@ -3,6 +3,6 @@
 import SC.Runtime.Game;
 import SC.Game.ChessAI;
 
-AChessBoardProxy::AChessBoardProxy(AChessBoard* chessBoard) : Super(chessBoard->ToString() + L" Proxy")
+AChessBoardProxy::AChessBoardProxy(AChessBoard* chessBoard) : Super()
 {
 }

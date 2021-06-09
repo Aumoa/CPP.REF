@@ -6,6 +6,6 @@ import SC.Runtime.Game;
 
 using namespace std;
 
-APlayerController::APlayerController(wstring_view name) : Super(name)
+APlayerController::APlayerController() : Super()
 {
 }

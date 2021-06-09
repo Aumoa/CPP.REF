@@ -42,7 +42,7 @@ private:
 	vector<SceneComponent*> _childComponents;
 
 public:
-	SceneComponent(wstring_view name);
+	SceneComponent();
 	~SceneComponent();
 
 	virtual void UpdateChildTransforms();

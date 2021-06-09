@@ -5,7 +5,7 @@ import SC.Game.ChessAI;
 
 using namespace std;
 
-AChessBoard::AChessBoard(wstring_view name) : Super(name)
+AChessBoard::AChessBoard() : Super()
 {
 }
 

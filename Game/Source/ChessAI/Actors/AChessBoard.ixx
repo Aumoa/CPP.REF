@@ -15,7 +15,7 @@ public:
 	using Super = AActor;
 
 public:
-	AChessBoard(wstring_view name);
+	AChessBoard();
 
 	AChessBoardProxy* CreateProxy();
 };

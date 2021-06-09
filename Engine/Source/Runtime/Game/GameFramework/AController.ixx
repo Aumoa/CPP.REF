@@ -26,7 +26,7 @@ public:
 	/// Initialize new <see cref="AController"/> instance.
 	/// </summary>
 	/// <param name="name"> The controller name. </param>
-	AController(wstring_view name);
+	AController();
 
 	/// <summary>
 	/// Possess to target pawn.

@@ -23,7 +23,7 @@ void AActor::ActorTickFunction::ExecuteTick(duration<float> elapsedTime)
 	}
 }
 
-AActor::AActor(wstring_view name) : Super(name)
+AActor::AActor() : Super()
 	, PrimaryActorTick(this)
 {
 }

@@ -8,7 +8,7 @@ using namespace std;
 
 using enum ELogVerbosity;
 
-APawn::APawn(wstring_view name) : Super(name)
+APawn::APawn() : Super()
 {
 }
 

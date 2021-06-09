@@ -16,5 +16,5 @@ public:
 	using Super = AActor;
 
 public:
-	AInfo(wstring_view name);
+	AInfo();
 };

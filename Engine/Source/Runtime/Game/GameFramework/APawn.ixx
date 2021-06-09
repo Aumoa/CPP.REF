@@ -24,8 +24,7 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="APawn"/> instance.
 	/// </summary>
-	/// <param name="name"> The pawn name. </param>
-	APawn(wstring_view name);
+	APawn();
 
 	/// <summary>
 	/// The function called when possessed by controller.

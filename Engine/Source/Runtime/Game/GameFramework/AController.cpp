@@ -8,7 +8,7 @@ using namespace std;
 
 using enum ELogVerbosity;
 
-AController::AController(wstring_view name) : Super(name)
+AController::AController() : Super()
 {
 }
 

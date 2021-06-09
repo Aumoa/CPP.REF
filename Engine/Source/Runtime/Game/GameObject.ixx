@@ -16,21 +16,25 @@ public:
 	using Super = Object;
 
 private:
-	wstring _name;
+	mutable wstring _name;
 
 public:
 	/// <summary>
 	/// Initialize new <see cref="GameObject"/> instance.
 	/// </summary>
 	/// <param name="name"> The object name. </param>
-	GameObject(wstring_view name);
+	GameObject();
 
 	/// <inheritdoc/>
 	virtual wstring ToString() const;
 
 	/// <summary>
+	/// Set object name to represents this object.
+	/// </summary>
+	void SetName(wstring_view value) { _name = value; }
+
+	/// <summary>
 	/// Get object name to represents this object.
 	/// </summary>
-	/// <returns></returns>
 	wstring GetName() const;
 };

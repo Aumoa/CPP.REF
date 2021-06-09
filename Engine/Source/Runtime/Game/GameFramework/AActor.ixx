@@ -64,8 +64,7 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="AActor"/> instance.
 	/// </summary>
-	/// <param name="name"> The actor name. </param>
-	AActor(wstring_view name);
+	AActor();
 
 	/// <summary>
 	/// Update frame tick.

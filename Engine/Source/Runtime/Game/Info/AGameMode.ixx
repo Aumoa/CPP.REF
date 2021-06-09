@@ -5,7 +5,7 @@ export module SC.Runtime.Game:AGameMode;
 import std.core;
 import :AInfo;
 import :SubclassOf;
-import :Level;
+import :APlayerController;
 
 using namespace std;
 
@@ -18,5 +18,8 @@ public:
 	using Super = AInfo;
 
 public:
-	AGameMode(wstring_view name);
+	SubclassOf<APlayerController> PlayerControllerClass;
+
+public:
+	AGameMode();
 };

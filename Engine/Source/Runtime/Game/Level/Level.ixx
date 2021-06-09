@@ -4,6 +4,8 @@ export module SC.Runtime.Game:Level;
 
 import SC.Runtime.Core;
 import :World;
+import :AGameMode;
+import :SubclassOf;
 
 /// <summary>
 /// Represents actor placement unit.
@@ -12,6 +14,12 @@ export class Level : virtual public Object
 {
 public:
 	using Super = Object;
+
+public:
+	SubclassOf<AGameMode> GameModeClass;
+
+private:
+	AGameMode* _gameMode = nullptr;
 
 public:
 	/// <summary>
@@ -24,5 +32,5 @@ public:
 	/// Load level.
 	/// </summary>
 	/// <param name="world"> The world that level be placed. </param>
-	virtual void LoadLevel(World* world);
+	virtual bool LoadLevel(World* world);
 };

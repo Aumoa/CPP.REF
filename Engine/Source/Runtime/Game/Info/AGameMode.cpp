@@ -5,6 +5,7 @@ import SC.Runtime.Game;
 
 using namespace std;
 
-AGameMode::AGameMode(wstring_view name) : Super(name)
+AGameMode::AGameMode() : Super()
+	, PlayerControllerClass(SubclassOf<APlayerController>::StaticClass())
 {
 }

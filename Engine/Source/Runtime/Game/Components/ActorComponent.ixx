@@ -60,7 +60,7 @@ private:
 	AActor* _owner = nullptr;
 
 public:
-	ActorComponent(wstring_view name);
+	ActorComponent();
 
 	/// <summary>
 	/// Update frame tick.

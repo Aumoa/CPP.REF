@@ -6,10 +6,13 @@ import std.core;
 import SC.Runtime.Core;
 import SC.Runtime.RenderCore;
 import :GameObject;
+import :SubclassOf;
 
 using namespace std;
 
 export class GameEngine;
+export class Level;
+export class World;
 export struct IFrameworkView;
 
 /// <summary>
@@ -24,13 +27,16 @@ public:
 private:
 	IFrameworkView* _frameworkView = nullptr;
 	GameEngine* _engine = nullptr;
+	World* _world = nullptr;
+
+public:
+	SubclassOf<Level> StartupLevel;
 
 public:
 	/// <summary>
 	/// Initialize new <see cref="GameInstance"/> instance.
 	/// </summary>
-	/// <param name="name"> The instance name. </param>
-	GameInstance(wstring_view name);
+	GameInstance();
 
 	/// <summary>
 	/// Run the application.

@@ -20,6 +20,5 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="AAIController"/> instance.
 	/// </summary>
-	/// <param name="name"> The controller name. </param>
-	AAIController(wstring_view name);
+	AAIController();
 };

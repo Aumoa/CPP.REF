@@ -6,17 +6,20 @@ import SC.Runtime.Game;
 
 using namespace std;
 
-GameObject::GameObject(wstring_view name) : Super()
-	, _name(name)
+GameObject::GameObject() : Super()
 {
 }
 
 wstring GameObject::ToString() const
 {
-	return _name;
+	return GetName();
 }
 
 wstring GameObject::GetName() const
 {
+	if (_name.length() == 0)
+	{
+		_name = StringUtils::AsUnicode(typeid(*this).name());
+	}
 	return _name;
 }
