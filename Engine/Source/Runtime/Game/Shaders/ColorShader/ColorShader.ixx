@@ -39,4 +39,5 @@ protected:
 	virtual span<uint8 const> CompileVS() override;
 	virtual span<uint8 const> CompilePS() override;
 	virtual vector<RHIVertexElement> GetVertexDeclaration() const override;
+	virtual vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
 };

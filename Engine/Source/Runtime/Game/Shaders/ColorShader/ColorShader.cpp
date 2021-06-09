@@ -28,7 +28,7 @@ RHIResource* ColorShader::CreateVertexBuffer(const RHIVertex* vertices, size_t c
 		};
 	}
 
-	return GetDevice()->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (uint8*)vertexBuffer.data(), span(vertexBuffer).size_bytes());
+	return GetDevice()->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertexBuffer.data(), span(vertexBuffer).size_bytes());
 }
 
 span<uint8 const> ColorShader::CompileVS()
@@ -59,6 +59,23 @@ vector<RHIVertexElement> ColorShader::GetVertexDeclaration() const
 		.SemanticName = "COLOR",
 		.AlignedByteOffset = 12,
 		.Format = ERHIVertexElementFormat::R32G32B32_FLOAT
+	};
+
+	return elements;
+}
+
+vector<RHIShaderParameterElement> ColorShader::GetShaderParameterDeclaration() const
+{
+	vector<RHIShaderParameterElement> elements;
+
+	// Camera constants.
+	elements.emplace_back() =
+	{
+		.Type = ERHIShaderParameterType::ParameterCollection_CameraConstants,
+		.ParameterCollection =
+		{
+			.ShaderRegister = 0
+		}
 	};
 
 	return elements;

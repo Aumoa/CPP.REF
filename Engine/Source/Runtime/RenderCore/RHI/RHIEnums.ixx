@@ -268,3 +268,13 @@ export enum class ERHIInputClassification
     PerVertexData = 0,
     PerInstanceData = 1,
 };
+
+/// <summary>
+/// The shader parameter type.
+/// </summary>
+export enum class ERHIShaderParameterType
+{
+    ParameterCollection_CameraConstants,
+
+    ParameterCollection
+};

@@ -109,3 +109,24 @@ export struct RHIVertexBufferView
 	uint32 SizeInBytes = 0;
 	uint32 StrideInBytes = 0;
 };
+
+/// <summary>
+/// Describe parameter collection shader parameter.
+/// </summary>
+export struct RHIParameterCollectionDeclaration
+{
+	uint32 ShaderRegister;
+	uint32 RegisterSpace;
+};
+
+/// <summary>
+/// Represents shader parameter element.
+/// </summary>
+export struct RHIShaderParameterElement
+{
+	ERHIShaderParameterType Type = ERHIShaderParameterType::ParameterCollection;
+	union
+	{
+		RHIParameterCollectionDeclaration ParameterCollection;
+	};
+};

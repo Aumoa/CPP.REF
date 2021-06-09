@@ -24,10 +24,37 @@ void RHIShader::Compile()
 	span<uint8 const> psBytecode = CompilePS();
 	ID3D12Device* dev = GetDevice()->GetDevice();
 
+	vector<RHIShaderParameterElement> shaderParameters = GetShaderParameterDeclaration();
+	vector<D3D12_ROOT_PARAMETER> rootParameters;
+
+	for (size_t i = 0; i < shaderParameters.size(); ++i)
+	{
+		RHIShaderParameterElement& myParam = shaderParameters[i];
+		switch (myParam.Type)
+		{
+		case ERHIShaderParameterType::ParameterCollection:
+		case ERHIShaderParameterType::ParameterCollection_CameraConstants:
+			rootParameters.emplace_back() =
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
+				.Descriptor =
+				{
+					.ShaderRegister = myParam.ParameterCollection.ShaderRegister,
+					.RegisterSpace = myParam.ParameterCollection.RegisterSpace
+				}
+			};
+			break;
+		default:
+			LogSystem::Log(LogRHI, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
+			rootParameters.emplace_back();
+			break;
+		}
+	}
+
 	D3D12_ROOT_SIGNATURE_DESC rsd =
 	{
-		.NumParameters = 0,
-		.pParameters = nullptr,
+		.NumParameters = (UINT)rootParameters.size(),
+		.pParameters = rootParameters.empty() ? nullptr : rootParameters.data(),
 		.NumStaticSamplers = 0,
 		.pStaticSamplers = nullptr,
 		.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
@@ -58,8 +85,8 @@ void RHIShader::Compile()
 	HR(LogRHI, dev->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&_rs)));
 
 	// Make vertex declaration to input element.
-	std::vector<RHIVertexElement> vertexDeclaration = GetVertexDeclaration();
-	std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements(vertexDeclaration.size());
+	vector<RHIVertexElement> vertexDeclaration = GetVertexDeclaration();
+	vector<D3D12_INPUT_ELEMENT_DESC> inputElements(vertexDeclaration.size());
 
 	for (size_t i = 0; i < inputElements.size(); ++i)
 	{
@@ -119,7 +146,7 @@ void RHIShader::Compile()
 		},
 		.InputLayout =
 		{
-			.pInputElementDescs = inputElements.data(),
+			.pInputElementDescs = inputElements.empty() ? nullptr : inputElements.data(),
 			.NumElements = (UINT)inputElements.size()
 		},
 		.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
@@ -134,4 +161,16 @@ void RHIShader::Compile()
 	};
 
 	HR(LogRHI, dev->CreateGraphicsPipelineState(&psd, IID_PPV_ARGS(&_ps)));
+}
+
+RHIResource* RHIShader::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
+{
+	RHIDevice* dev = GetDevice();
+	return dev->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertices, sizeof(RHIVertex) * count);
+}
+
+RHIResource* RHIShader::CreateIndexBuffer(const uint32* indices, size_t count) const
+{
+	RHIDevice* dev = GetDevice();
+	return dev->CreateImmutableBuffer(ERHIResourceStates::IndexBuffer, (const uint8*)indices, sizeof(uint32) * count);
 }

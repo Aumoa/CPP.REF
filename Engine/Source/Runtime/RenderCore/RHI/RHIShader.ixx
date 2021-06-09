@@ -37,7 +37,12 @@ public:
 	/// <summary>
 	/// Create vertex buffer using vertex declaration of this shader program.
 	/// </summary>
-	virtual RHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const = 0;
+	virtual RHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const;
+
+	/// <summary>
+	/// Create index buffer.
+	/// </summary>
+	virtual RHIResource* CreateIndexBuffer(const uint32* indices, size_t count) const;
 
 	/// <summary>
 	/// Get vertex stride.
@@ -58,7 +63,12 @@ protected:
 	/// <summary>
 	/// Provide vertex declaration of this shader program.
 	/// </summary>
-	virtual std::vector<RHIVertexElement> GetVertexDeclaration() const = 0;
+	virtual vector<RHIVertexElement> GetVertexDeclaration() const { return {}; }
+
+	/// <summary>
+	/// Provide shader parameter declaration of this shader program.
+	/// </summary>
+	virtual vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const { return {}; }
 
 public /*internal*/:
 	ID3D12RootSignature* GetRootSignature() const { return _rs.Get(); }
