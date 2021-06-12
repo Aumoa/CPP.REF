@@ -137,6 +137,8 @@
     <ClCompile Include="SupportsObject.ixx" />
     <ClCompile Include="Threading\EventHandle.cpp" />
     <ClCompile Include="Threading\EventHandle.ixx" />
+    <ClCompile Include="Utilities\DateTime.cpp" />
+    <ClCompile Include="Utilities\DateTime.ixx" />
     <ClCompile Include="Utilities\StringUtils.cpp" />
     <ClCompile Include="Utilities\StringUtils.ixx" />
     <ClCompile Include="Utilities\UniqueType.ixx" />

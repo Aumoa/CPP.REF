@@ -133,6 +133,12 @@
     <ClCompile Include="Utilities\UniqueType.ixx">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\DateTime.ixx">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\DateTime.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">

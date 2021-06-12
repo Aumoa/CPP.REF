@@ -9,6 +9,7 @@ export import :Object;
 // Utilities
 export import :StringUtils;
 export import :UniqueType;
+export import :DateTime;
 
 // Numerics
 export import :Range;
