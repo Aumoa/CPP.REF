@@ -39,3 +39,7 @@ export import :SceneComponent;
 export import :ComponentMobility;
 export import :ComponentDirtyMask;
 export import :ComponentTransformSpace;
+
+// Camera
+export import :CameraComponent;
+export import :MinimalViewInfo;

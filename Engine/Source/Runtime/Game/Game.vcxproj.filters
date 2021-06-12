@@ -25,6 +25,9 @@
     <Filter Include="Shaders\ColorShader">
       <UniqueIdentifier>{196c48bb-95d0-4497-82e0-36336b821e09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{15327ed0-3d11-4720-8937-d89cbf1eb5e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -136,6 +139,15 @@
     </ClCompile>
     <ClCompile Include="Ticking\TickScheduler.ixx">
       <Filter>Ticking</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\CameraComponent.ixx">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\CameraComponent.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\MinimalViewInfo.ixx">
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

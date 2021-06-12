@@ -22,8 +22,11 @@ public:
 	/// Initialize new <see cref="Object"/> class instance.
 	/// </summary>
 	Object();
+
+protected:
 	virtual ~Object() noexcept;
 
+public:
 	/// <summary>
 	/// Get a simple string representing this object.
 	/// </summary>

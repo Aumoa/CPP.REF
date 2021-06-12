@@ -118,6 +118,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera\CameraComponent.cpp" />
+    <ClCompile Include="Camera\CameraComponent.ixx" />
+    <ClCompile Include="Camera\MinimalViewInfo.ixx" />
     <ClCompile Include="Components\ActorComponent.cpp" />
     <ClCompile Include="Components\ActorComponent.ixx" />
     <ClCompile Include="Components\ComponentDirtyMask.ixx" />
