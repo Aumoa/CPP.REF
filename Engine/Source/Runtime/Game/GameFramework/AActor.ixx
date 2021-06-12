@@ -6,6 +6,7 @@ import std.core;
 import SC.Runtime.Core;
 import :GameObject;
 import :TickFunction;
+import :SceneComponent;
 
 using namespace std;
 using namespace std::chrono;
@@ -78,4 +79,62 @@ public:
 	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
 	MulticastEvent<AActor, void()> Activated;
 	MulticastEvent<AActor, void()> Inactivated;
+
+private:
+	map<size_t, set<ActorComponent*>> _components;
+
+public:
+	vector<ActorComponent*> GetOwnedComponents() const;
+	ActorComponent* GetComponentByClass(const type_info& type) const;
+	template<derived_from<ActorComponent> T>
+	T* GetComponentAs() const
+	{
+		return dynamic_cast<T*>(GetComponentByClass(typeid(T)));
+	}
+
+private:
+	SceneComponent* _rootComponent = nullptr;
+
+public:
+	void SetRootComponent(SceneComponent* scene);
+	SceneComponent* GetRootComponent() const;
+	template<derived_from<SceneComponent> T>
+	T* GetRootComponentAs() const
+	{
+		return dynamic_cast<T*>(GetRootComponent());
+	}
+
+	template<derived_from<SceneComponent> T>
+	void ForEachSceneComponents(function<bool(T*)> body) const
+	{
+		if (_rootComponent == nullptr)
+		{
+			return;
+		}
+
+		queue<SceneComponent*> hierarchy;
+		hierarchy.emplace(_rootComponent);
+
+		while (!hierarchy.empty())
+		{
+			SceneComponent* top = hierarchy.front();
+			if (typeid(top).hash_code() == typeid(T).hash_code())
+			{
+				if (body(top))
+				{
+					break;
+				}
+			}
+
+			vector<SceneComponent*> childs = top->GetChildComponents();
+			for (auto& child : childs)
+			{
+				hierarchy.emplace(child);
+			}
+
+			hierarchy.pop();
+		}
+	}
+
+	void ForEachSceneComponents(function<bool(SceneComponent*)> body) const;
 };

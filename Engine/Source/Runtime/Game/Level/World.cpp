@@ -2,8 +2,11 @@
 
 import SC.Runtime.Core;
 import SC.Runtime.Game;
+import std.core;
 
 using enum ELogVerbosity;
+
+using namespace std;
 
 World::World()
 {
@@ -11,11 +14,6 @@ World::World()
 
 World::~World()
 {
-}
-
-bool World::InternalSpawnActor(AActor* instance)
-{
-	return _actors.emplace(instance).second;
 }
 
 bool World::LoadLevel(SubclassOf<Level> levelToLoad)
@@ -41,4 +39,28 @@ bool World::LoadLevel(SubclassOf<Level> levelToLoad)
 	}
 
 	return true;
+}
+
+void World::RegisterTickFunction(TickFunction* function)
+{
+	_tickInstances.emplace(function);
+}
+
+bool World::InternalSpawnActor(AActor* instance)
+{
+	// Register all actor components.
+	vector<ActorComponent*> actorComponents = instance->GetOwnedComponents();
+	for (auto& ac : actorComponents)
+	{
+		ac->RegisterComponentWithWorld(this);
+	}
+
+	// Register all scene components.
+	instance->ForEachSceneComponents<SceneComponent>([this](SceneComponent* component)
+	{
+		component->RegisterComponentWithWorld(this);
+		return false;
+	});
+
+	return _actors.emplace(instance).second;
 }

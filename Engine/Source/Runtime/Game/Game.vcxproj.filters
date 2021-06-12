@@ -149,6 +149,12 @@
     <ClCompile Include="Camera\MinimalViewInfo.ixx">
       <Filter>Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Camera\APlayerCameraManager.ixx">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\APlayerCameraManager.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">

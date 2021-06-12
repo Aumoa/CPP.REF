@@ -43,7 +43,6 @@ private:
 
 public:
 	SceneComponent();
-	~SceneComponent();
 
 	virtual void UpdateChildTransforms();
 	virtual void UpdateComponentToWorld();

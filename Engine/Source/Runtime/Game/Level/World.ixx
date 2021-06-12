@@ -8,6 +8,7 @@ import :GameConcepts;
 import :AActor;
 import :SubclassOf;
 import :LogGame;
+import :TickFunction;
 
 using enum ELogVerbosity;
 using namespace std;
@@ -25,6 +26,7 @@ public:
 private:
 	set<AActor*> _actors;
 	Level* _level = nullptr;
+	set<TickFunction*> _tickInstances;
 
 public:
 	/// <summary>
@@ -87,6 +89,8 @@ public:
 	/// Load level.
 	/// </summary>
 	bool LoadLevel(SubclassOf<Level> levelToLoad);
+
+	void RegisterTickFunction(TickFunction* function);
 
 private:
 	bool InternalSpawnActor(AActor* instance);

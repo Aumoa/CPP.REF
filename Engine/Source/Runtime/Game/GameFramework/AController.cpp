@@ -37,3 +37,8 @@ void AController::UnPossess()
 	_possessedPawn->UnPossessed();
 	_possessedPawn = nullptr;
 }
+
+APawn* AController::GetPawn() const
+{
+	return _possessedPawn;
+}

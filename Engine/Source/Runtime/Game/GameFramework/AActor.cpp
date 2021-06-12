@@ -47,3 +47,98 @@ void AActor::SetActive(bool bActive)
 		}
 	}
 }
+
+vector<ActorComponent*> AActor::GetOwnedComponents() const
+{
+	size_t cnt = 0;
+	for (auto& subset : _components)
+	{
+		cnt += subset.second.size();
+	}
+
+	vector<ActorComponent*> cps(cnt);
+	for (auto& subset : _components)
+	{
+		cps.insert(cps.end(), subset.second.begin(), subset.second.end());
+	}
+	
+	return cps;
+}
+
+ActorComponent* AActor::GetComponentByClass(const type_info& type) const
+{
+	// Find component from actor components.
+	if (auto it = _components.find(type.hash_code()); it != _components.end())
+	{
+		return (*it->second.begin());
+	}
+
+	// Else, find component from scene components.
+	SceneComponent* item = nullptr;
+	ForEachSceneComponents([&item, &type](SceneComponent* component)
+	{
+		if (typeid(*component).hash_code() == type.hash_code())
+		{
+			item = component;
+			return true;
+		}
+
+		return false;
+	});
+
+	return nullptr;
+}
+
+void AActor::SetRootComponent(SceneComponent* scene)
+{
+	if (scene == nullptr)
+	{
+		LogSystem::Log(LogComponent, Error, L"The root component could not be nullptr.");
+		return;
+	}
+
+	if (_rootComponent == nullptr)
+	{
+		LogSystem::Log(LogComponent, Verbose, L"The root component is not empty. Instance will be dangling.");
+	}
+
+	_rootComponent = scene;
+	Object* outer = scene->GetOuter();
+	if (outer != this)
+	{
+		scene->SetOuter(outer);
+	}
+}
+
+SceneComponent* AActor::GetRootComponent() const
+{
+	return _rootComponent;
+}
+
+void AActor::ForEachSceneComponents(function<bool(SceneComponent*)> body) const
+{
+	if (_rootComponent == nullptr)
+	{
+		return;
+	}
+
+	queue<SceneComponent*> hierarchy;
+	hierarchy.emplace(_rootComponent);
+
+	while (!hierarchy.empty())
+	{
+		SceneComponent* top = hierarchy.front();
+		if (body(top))
+		{
+			break;
+		}
+
+		vector<SceneComponent*> childs = top->GetChildComponents();
+		for (auto& child : childs)
+		{
+			hierarchy.emplace(child);
+		}
+
+		hierarchy.pop();
+	}
+}

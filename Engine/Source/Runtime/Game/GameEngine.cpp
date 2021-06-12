@@ -68,6 +68,42 @@ void GameEngine::TickEngine()
 	}
 	_prev = now;
 
+	LevelTick(deltaSeconds);
+	RenderTick(deltaSeconds);
+}
+
+void GameEngine::ResizedApp(int32 width, int32 height)
+{
+	if (width == 0 || height == 0)
+	{
+		return;
+	}
+
+	// On the framework view is resized, wait all graphics commands for
+	// synchronize and cleanup resource lock states.
+	_primaryQueue->WaitLastSignal();
+
+	_frameworkViewChain->ResizeBuffers(width, height);
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		RHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
+		_rtv->CreateRenderTargetView(texture, i);
+	}
+
+	_vpWidth = width;
+	_vpHeight = height;
+
+	LogSystem::Log(LogEngine, Info, L"Application resized to {}x{}.", width, height);
+}
+
+void GameEngine::LevelTick(duration<float> elapsedTime)
+{
+	_scheduler.Tick(elapsedTime);
+}
+
+void GameEngine::RenderTick(duration<float> elapsedTime)
+{
 	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
 
 	RHIViewport vp =
@@ -119,31 +155,4 @@ void GameEngine::TickEngine()
 	_frameworkViewChain->Present();
 	_primaryQueue->Signal();
 	_primaryQueue->WaitLastSignal();
-
-	_scheduler.Tick(deltaSeconds);
-}
-
-void GameEngine::ResizedApp(int32 width, int32 height)
-{
-	if (width == 0 || height == 0)
-	{
-		return;
-	}
-
-	// On the framework view is resized, wait all graphics commands for
-	// synchronize and cleanup resource lock states.
-	_primaryQueue->WaitLastSignal();
-
-	_frameworkViewChain->ResizeBuffers(width, height);
-
-	for (int32 i = 0; i < 3; ++i)
-	{
-		RHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
-		_rtv->CreateRenderTargetView(texture, i);
-	}
-
-	_vpWidth = width;
-	_vpHeight = height;
-
-	LogSystem::Log(LogEngine, Info, L"Application resized to {}x{}.", width, height);
 }

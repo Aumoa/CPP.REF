@@ -10,6 +10,7 @@ using namespace std;
 using namespace std::chrono;
 
 export class AActor;
+export class World;
 
 /// <summary>
 /// ActorComponent is the base class for components that define reusable behavior that can be added to different types of Actors.
@@ -75,4 +76,6 @@ public:
 	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
 	MulticastEvent<ActorComponent, void()> Activated;
 	MulticastEvent<ActorComponent, void()> Inactivated;
+
+	void RegisterComponentWithWorld(World* world);
 };

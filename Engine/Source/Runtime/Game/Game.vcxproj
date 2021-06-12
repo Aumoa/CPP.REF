@@ -118,6 +118,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera\APlayerCameraManager.cpp" />
+    <ClCompile Include="Camera\APlayerCameraManager.ixx" />
     <ClCompile Include="Camera\CameraComponent.cpp" />
     <ClCompile Include="Camera\CameraComponent.ixx" />
     <ClCompile Include="Camera\MinimalViewInfo.ixx" />

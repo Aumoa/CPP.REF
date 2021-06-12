@@ -10,3 +10,5 @@ export LogCategory LogPawn(L"Pawn");
 export LogCategory LogSceneComponent(L"SceneComponent");
 export LogCategory LogController(L"Controller");
 export LogCategory LogWorld(L"World");
+export LogCategory LogCamera(L"Camera");
+export LogCategory LogComponent(L"Component");
