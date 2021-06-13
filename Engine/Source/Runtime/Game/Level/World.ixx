@@ -12,6 +12,7 @@ import :TickFunction;
 
 using enum ELogVerbosity;
 using namespace std;
+using namespace std::chrono;
 
 export class Level;
 
@@ -91,6 +92,7 @@ public:
 	bool LoadLevel(SubclassOf<Level> levelToLoad);
 
 	void RegisterTickFunction(TickFunction* function);
+	virtual void LevelTick(duration<float> elapsedTime);
 
 private:
 	bool InternalSpawnActor(AActor* instance);

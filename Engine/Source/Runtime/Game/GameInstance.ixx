@@ -9,6 +9,7 @@ import :GameObject;
 import :SubclassOf;
 
 using namespace std;
+using namespace std::chrono;
 
 export class GameEngine;
 export class Level;
@@ -37,6 +38,8 @@ public:
 	/// Initialize new <see cref="GameInstance"/> instance.
 	/// </summary>
 	GameInstance();
+
+	virtual void Tick(duration<float> elapsedTime);
 
 	/// <summary>
 	/// Run the application.

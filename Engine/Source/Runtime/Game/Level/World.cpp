@@ -7,6 +7,7 @@ import std.core;
 using enum ELogVerbosity;
 
 using namespace std;
+using namespace std::chrono;
 
 World::World()
 {
@@ -63,4 +64,8 @@ bool World::InternalSpawnActor(AActor* instance)
 	});
 
 	return _actors.emplace(instance).second;
+}
+
+void World::LevelTick(duration<float> elapsedTime)
+{
 }

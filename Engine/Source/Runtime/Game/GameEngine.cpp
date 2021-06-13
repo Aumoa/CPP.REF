@@ -68,7 +68,7 @@ void GameEngine::TickEngine()
 	}
 	_prev = now;
 
-	LevelTick(deltaSeconds);
+	GameTick(deltaSeconds);
 	RenderTick(deltaSeconds);
 }
 
@@ -97,9 +97,10 @@ void GameEngine::ResizedApp(int32 width, int32 height)
 	LogSystem::Log(LogEngine, Info, L"Application resized to {}x{}.", width, height);
 }
 
-void GameEngine::LevelTick(duration<float> elapsedTime)
+void GameEngine::GameTick(duration<float> elapsedTime)
 {
 	_scheduler.Tick(elapsedTime);
+	_gameInstance->Tick(elapsedTime);
 }
 
 void GameEngine::RenderTick(duration<float> elapsedTime)

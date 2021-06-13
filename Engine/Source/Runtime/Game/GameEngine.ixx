@@ -59,6 +59,6 @@ private:
 	void ResizedApp(int32 width, int32 height);
 
 private:
-	void LevelTick(duration<float> elapsedTime);
+	void GameTick(duration<float> elapsedTime);
 	void RenderTick(duration<float> elapsedTime);
 };

@@ -5,9 +5,15 @@ import SC.Runtime.Core;
 import SC.Runtime.Game;
 
 using namespace std;
+using namespace std::chrono;
 
 GameInstance::GameInstance() : Super()
 {
+}
+
+void GameInstance::Tick(duration<float> elapsedTime)
+{
+	_world->LevelTick(elapsedTime);
 }
 
 int32 GameInstance::Run(IFrameworkView* frameworkView)
