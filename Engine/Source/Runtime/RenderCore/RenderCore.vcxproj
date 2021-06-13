@@ -138,6 +138,8 @@
     </ClCompile>
     <ClCompile Include="RHI\RHIShader.ixx" />
     <ClCompile Include="RHI\RHIStructures.ixx" />
+    <ClCompile Include="RHI\RHIVertexFactory.cpp" />
+    <ClCompile Include="RHI\RHIVertexFactory.ixx" />
     <ClCompile Include="RHI\RHIView.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>

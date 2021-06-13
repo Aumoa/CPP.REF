@@ -10,6 +10,7 @@ import :RHIStructures;
 
 export class RHIDevice;
 export class RHIResource;
+export class RHIVertexFactory;
 
 using namespace std;
 
@@ -22,6 +23,7 @@ public:
 	using Super = RHIDeviceChild;
 
 private:
+	RHIVertexFactory* _vfactory = nullptr;
 	ComPtr<ID3D12RootSignature> _rs;
 	ComPtr<ID3D12PipelineState> _ps;
 
@@ -32,22 +34,12 @@ public:
 	/// <summary>
 	/// Compile and apply shader implements.
 	/// </summary>
-	virtual void Compile();
+	virtual void Compile(RHIVertexFactory* vertexDeclaration);
 
 	/// <summary>
-	/// Create vertex buffer using vertex declaration of this shader program.
+	/// Provide shader parameter declaration of this shader program.
 	/// </summary>
-	virtual RHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const;
-
-	/// <summary>
-	/// Create index buffer.
-	/// </summary>
-	virtual RHIResource* CreateIndexBuffer(const uint32* indices, size_t count) const;
-
-	/// <summary>
-	/// Get vertex stride.
-	/// </summary>
-	virtual uint32 GetVertexStride() const = 0;
+	virtual vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const { return {}; }
 
 protected:
 	/// <summary>
@@ -59,16 +51,6 @@ protected:
 	/// Compile pixel shader bytecode.
 	/// </summary>
 	virtual span<uint8 const> CompilePS() = 0;
-
-	/// <summary>
-	/// Provide vertex declaration of this shader program.
-	/// </summary>
-	virtual vector<RHIVertexElement> GetVertexDeclaration() const { return {}; }
-
-	/// <summary>
-	/// Provide shader parameter declaration of this shader program.
-	/// </summary>
-	virtual vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const { return {}; }
 
 public /*internal*/:
 	ID3D12RootSignature* GetRootSignature() const { return _rs.Get(); }

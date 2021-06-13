@@ -20,3 +20,4 @@ export import :RHITexture2D;
 export import :RHIView;
 export import :RHIRenderTargetView;
 export import :RHIStructures;
+export import :RHIVertexFactory;

@@ -31,8 +31,9 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_primaryQueue = _device->GetPrimaryQueue();
 	_frameworkViewChain = CreateSubobject<RHISwapChain>(_device, frameworkView, _primaryQueue);
 	_deviceContext = CreateSubobject<RHIDeviceContext>(_device);
+	_colorVertexFactory = CreateSubobject<ColorVertexFactory>(_device);
 	_colorShader = CreateSubobject<ColorShader>(_device);
-	_colorShader->Compile();
+	_colorShader->Compile(_colorVertexFactory);
 	_rtv = CreateSubobject<RHIRenderTargetView>(_device, 3);
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
@@ -46,8 +47,8 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 		{ .Position = Vector3(-1.0f, -1.0f, 0.0f), .Color = NamedColors::Blue },
 	};
 
-	_vbv.BufferLocation = _colorShader->CreateVertexBuffer(triangle, 3)->GetGPUVirtualAddress();
-	_vbv.StrideInBytes = _colorShader->GetVertexStride();
+	_vbv.BufferLocation = _colorVertexFactory->CreateVertexBuffer(triangle, 3)->GetGPUVirtualAddress();
+	_vbv.StrideInBytes = _colorVertexFactory->GetVertexStride();
 	_vbv.SizeInBytes = _vbv.StrideInBytes * 3;
 
 	auto gc = [this]()

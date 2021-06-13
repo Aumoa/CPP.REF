@@ -3,3 +3,4 @@
 export module SC.Runtime.Game.Shaders;
 
 export import :ColorShader;
+export import :ColorVertexFactory;

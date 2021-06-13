@@ -48,3 +48,6 @@ export import :APlayerCameraManager;
 // Scene
 export import :Scene;
 export import :SceneVisibility;
+export import :PrimitiveSceneProxy;
+export import :MeshBatch;
+export import :MeshBatchElement;

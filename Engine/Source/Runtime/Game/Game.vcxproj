@@ -158,6 +158,9 @@
     <ClCompile Include="Level\World.cpp" />
     <ClCompile Include="Level\World.ixx" />
     <ClCompile Include="LogGame.ixx" />
+    <ClCompile Include="Scene\MeshBatch.ixx" />
+    <ClCompile Include="Scene\MeshBatchElement.ixx" />
+    <ClCompile Include="Scene\PrimitiveSceneProxy.ixx" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\Scene.ixx" />
     <ClCompile Include="Scene\SceneVisibility.cpp" />
@@ -167,6 +170,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Shaders\ColorShader\ColorShader.ixx" />
+    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp" />
+    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.ixx" />
     <ClCompile Include="Shaders\Shaders.ixx" />
     <ClCompile Include="SubclassOf.ixx" />
     <ClCompile Include="Ticking\TickFunction.cpp" />

@@ -18,7 +18,7 @@ RHIShader::~RHIShader()
 {
 }
 
-void RHIShader::Compile()
+void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 {
 	span<uint8 const> vsBytecode = CompileVS();
 	span<uint8 const> psBytecode = CompilePS();
@@ -85,12 +85,12 @@ void RHIShader::Compile()
 	HR(LogRHI, dev->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&_rs)));
 
 	// Make vertex declaration to input element.
-	vector<RHIVertexElement> vertexDeclaration = GetVertexDeclaration();
-	vector<D3D12_INPUT_ELEMENT_DESC> inputElements(vertexDeclaration.size());
+	vector<RHIVertexElement> declaration = vertexDeclaration->GetVertexDeclaration();
+	vector<D3D12_INPUT_ELEMENT_DESC> inputElements(declaration.size());
 
 	for (size_t i = 0; i < inputElements.size(); ++i)
 	{
-		auto& element = vertexDeclaration[i];
+		auto& element = declaration[i];
 
 		inputElements[i] =
 		{
@@ -161,16 +161,4 @@ void RHIShader::Compile()
 	};
 
 	HR(LogRHI, dev->CreateGraphicsPipelineState(&psd, IID_PPV_ARGS(&_ps)));
-}
-
-RHIResource* RHIShader::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
-{
-	RHIDevice* dev = GetDevice();
-	return dev->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertices, sizeof(RHIVertex) * count);
-}
-
-RHIResource* RHIShader::CreateIndexBuffer(const uint32* indices, size_t count) const
-{
-	RHIDevice* dev = GetDevice();
-	return dev->CreateImmutableBuffer(ERHIResourceStates::IndexBuffer, (const uint8*)indices, sizeof(uint32) * count);
 }

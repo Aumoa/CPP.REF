@@ -170,6 +170,21 @@
     <ClCompile Include="Scene\SceneVisibility.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\PrimitiveSceneProxy.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\MeshBatch.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\MeshBatchElement.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.ixx">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">

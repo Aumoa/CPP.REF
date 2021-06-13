@@ -29,6 +29,7 @@ private:
 	RHICommandQueue* _primaryQueue = nullptr;
 	RHISwapChain* _frameworkViewChain = nullptr;
 	RHIDeviceContext* _deviceContext = nullptr;
+	ColorVertexFactory* _colorVertexFactory = nullptr;
 	ColorShader* _colorShader = nullptr;
 	RHIRenderTargetView* _rtv = nullptr;
 
