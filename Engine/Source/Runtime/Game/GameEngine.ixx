@@ -36,7 +36,6 @@ private:
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;
 
-	RHIVertexBufferView _vbv;
 	TickScheduler _scheduler;
 
 	optional<steady_clock::time_point> _prev;
@@ -56,6 +55,7 @@ public:
 	virtual void InitEngine(GameInstance* gameInstance);
 
 private:
+	void RegisterRHIGarbageCollector();
 	void TickEngine();
 	void ResizedApp(int32 width, int32 height);
 

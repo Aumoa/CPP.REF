@@ -39,6 +39,9 @@ export import :SceneComponent;
 export import :ComponentMobility;
 export import :ComponentDirtyMask;
 export import :ComponentTransformSpace;
+export import :PrimitiveComponent;
+export import :MeshComponent;
+export import :StaticMeshComponent;
 
 // Camera
 export import :CameraComponent;
@@ -51,3 +54,8 @@ export import :SceneVisibility;
 export import :PrimitiveSceneProxy;
 export import :MeshBatch;
 export import :MeshBatchElement;
+export import :StaticMeshSceneProxy;
+export import :StaticMeshRenderData;
+
+// Assets
+export import :StaticMesh;

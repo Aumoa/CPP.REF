@@ -10,6 +10,7 @@ export struct MeshBatchElement
 	RHIResource* VertexBuffer = nullptr;
 	RHIResource* IndexBuffer = nullptr;
 
+	uint64 BufferLocation = 0;
 	uint32 IndexCount = 0;
 	uint32 InstanceCount = 0;
 	int32 StartIndexLocation = 0;

@@ -118,6 +118,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Assets\StaticMesh.ixx" />
     <ClCompile Include="Camera\APlayerCameraManager.cpp" />
     <ClCompile Include="Camera\APlayerCameraManager.ixx" />
     <ClCompile Include="Camera\CameraComponent.cpp" />
@@ -128,8 +129,14 @@
     <ClCompile Include="Components\ComponentDirtyMask.ixx" />
     <ClCompile Include="Components\ComponentMobility.ixx" />
     <ClCompile Include="Components\ComponentTransformSpace.ixx" />
+    <ClCompile Include="Components\MeshComponent.cpp" />
+    <ClCompile Include="Components\MeshComponent.ixx" />
+    <ClCompile Include="Components\PrimitiveComponent.cpp" />
+    <ClCompile Include="Components\PrimitiveComponent.ixx" />
     <ClCompile Include="Components\SceneComponent.cpp" />
     <ClCompile Include="Components\SceneComponent.ixx" />
+    <ClCompile Include="Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Components\StaticMeshComponent.ixx" />
     <ClCompile Include="Concepts\GameConcepts.ixx" />
     <ClCompile Include="Game.ixx" />
     <ClCompile Include="GameEngine.cpp" />
@@ -160,11 +167,16 @@
     <ClCompile Include="LogGame.ixx" />
     <ClCompile Include="Scene\MeshBatch.ixx" />
     <ClCompile Include="Scene\MeshBatchElement.ixx" />
+    <ClCompile Include="Scene\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Scene\PrimitiveSceneProxy.ixx" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\Scene.ixx" />
     <ClCompile Include="Scene\SceneVisibility.cpp" />
     <ClCompile Include="Scene\SceneVisibility.ixx" />
+    <ClCompile Include="Scene\StaticMeshRenderData.cpp" />
+    <ClCompile Include="Scene\StaticMeshRenderData.ixx" />
+    <ClCompile Include="Scene\StaticMeshSceneProxy.cpp" />
+    <ClCompile Include="Scene\StaticMeshSceneProxy.ixx" />
     <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</AdditionalIncludeDirectories>

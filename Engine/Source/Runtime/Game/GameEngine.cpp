@@ -40,17 +40,11 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	frameworkView->Idle += [this]() { TickEngine(); };
 	frameworkView->Size += [this](int32 width, int32 height) { ResizedApp(width, height); };
 
-	RHIVertex triangle[3] =
-	{
-		{ .Position = Vector3(0.0f, +1.0f, 0.0f), .Color = NamedColors::Red },
-		{ .Position = Vector3(1.0f, -1.0f, 0.0f), .Color = NamedColors::Green },
-		{ .Position = Vector3(-1.0f, -1.0f, 0.0f), .Color = NamedColors::Blue },
-	};
+	RegisterRHIGarbageCollector();
+}
 
-	_vbv.BufferLocation = _colorVertexFactory->CreateVertexBuffer(triangle, 3)->GetGPUVirtualAddress();
-	_vbv.StrideInBytes = _colorVertexFactory->GetVertexStride();
-	_vbv.SizeInBytes = _vbv.StrideInBytes * 3;
-
+void GameEngine::RegisterRHIGarbageCollector()
+{
 	auto gc = [this]()
 	{
 		int32 count = _primaryQueue->Collect();
@@ -147,7 +141,7 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	_deviceContext->RSSetViewports(1, &vp);
 	_deviceContext->SetGraphicsShader(_colorShader);
 	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-	_deviceContext->IASetVertexBuffers(0, 1, &_vbv);
+	//_deviceContext->IASetVertexBuffers(0, 1, &_vbv);
 	_deviceContext->DrawInstanced(3, 1);
 	_deviceContext->TransitionBarrier(1, &barrierEnd);
 	_deviceContext->End();

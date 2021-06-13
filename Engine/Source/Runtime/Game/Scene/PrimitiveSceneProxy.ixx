@@ -8,13 +8,18 @@ import :MeshBatch;
 
 using namespace std;
 
+export class PrimitiveComponent;
+
 export class PrimitiveSceneProxy : virtual public Object
 {
 public:
 	using Super = Object;
+
+private:
+	PrimitiveComponent* _MyComponent = nullptr;
 	
 public:
-	PrimitiveSceneProxy();
+	PrimitiveSceneProxy(PrimitiveComponent* inComponent);
 
 protected:
 	vector<MeshBatch> MeshBatches;

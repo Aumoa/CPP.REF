@@ -31,6 +31,9 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{e54a2c04-5af0-4672-829e-96abc7391a2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{a1c14794-9076-4aee-8501-0f82cdb85808}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -184,6 +187,42 @@
     </ClCompile>
     <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp">
       <Filter>Shaders\ColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\MeshComponent.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\MeshComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PrimitiveComponent.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PrimitiveComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\StaticMeshComponent.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\StaticMeshComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\StaticMeshSceneProxy.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\StaticMeshSceneProxy.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\PrimitiveSceneProxy.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\StaticMesh.ixx">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\StaticMeshRenderData.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\StaticMeshRenderData.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
