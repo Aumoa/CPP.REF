@@ -45,6 +45,11 @@ public:
 	/// </summary>
 	RHIResource* CreateImmutableBuffer(ERHIResourceStates initialState, const uint8* buffer, size_t length);
 
+	/// <summary>
+	/// Create dynamic buffer.
+	/// </summary>
+	RHIResource* CreateDynamicBuffer(size_t length);
+
 public /*internal*/ :
 	IDXGIFactory2* GetFactory() const { return _factory.Get(); }
 	ID3D12Device* GetDevice() const { return _device.Get(); }

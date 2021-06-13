@@ -8,6 +8,8 @@ import std.core;
 
 export class RHIResource;
 
+#pragma pack(push, 4)
+
 /// <summary>
 /// Represent viewport area.
 /// </summary>
@@ -130,3 +132,11 @@ export struct RHIShaderParameterElement
 		RHIParameterCollectionDeclaration ParameterCollection;
 	};
 };
+
+export struct RHIViewConstants
+{
+	Matrix4x4 World;
+	Matrix4x4 WorldViewProj;
+};
+
+#pragma pack(pop)

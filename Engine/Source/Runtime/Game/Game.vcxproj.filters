@@ -28,6 +28,9 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{15327ed0-3d11-4720-8937-d89cbf1eb5e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{e54a2c04-5af0-4672-829e-96abc7391a2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -154,6 +157,18 @@
     </ClCompile>
     <ClCompile Include="Camera\APlayerCameraManager.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Scene.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneVisibility.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneVisibility.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

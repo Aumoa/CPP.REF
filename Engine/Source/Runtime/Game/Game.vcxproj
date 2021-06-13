@@ -158,6 +158,10 @@
     <ClCompile Include="Level\World.cpp" />
     <ClCompile Include="Level\World.ixx" />
     <ClCompile Include="LogGame.ixx" />
+    <ClCompile Include="Scene\Scene.cpp" />
+    <ClCompile Include="Scene\Scene.ixx" />
+    <ClCompile Include="Scene\SceneVisibility.cpp" />
+    <ClCompile Include="Scene\SceneVisibility.ixx" />
     <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</AdditionalIncludeDirectories>

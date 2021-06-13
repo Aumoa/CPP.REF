@@ -44,3 +44,7 @@ export import :ComponentTransformSpace;
 export import :CameraComponent;
 export import :MinimalViewInfo;
 export import :APlayerCameraManager;
+
+// Scene
+export import :Scene;
+export import :SceneVisibility;

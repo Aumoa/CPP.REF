@@ -74,6 +74,32 @@ RHIResource* RHIDevice::CreateImmutableBuffer(ERHIResourceStates initialState, c
 	return CreateSubobject<RHIResource>(this, resource.Get());
 }
 
+RHIResource* RHIDevice::CreateDynamicBuffer(size_t length)
+{
+	D3D12_RESOURCE_DESC bufferDesc =
+	{
+		.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+		.Width = (UINT64)length,
+		.Height = 1,
+		.DepthOrArraySize = 1,
+		.MipLevels = 1,
+		.Format = DXGI_FORMAT_UNKNOWN,
+		.SampleDesc = { 1, 0 },
+		.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+		.Flags = D3D12_RESOURCE_FLAG_NONE
+	};
+
+	D3D12_HEAP_PROPERTIES heap = 
+	{
+		.Type = D3D12_HEAP_TYPE_DEFAULT
+	};
+
+	ComPtr<ID3D12Resource> resource;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
+
+	return CreateSubobject<RHIResource>(this, resource.Get());
+}
+
 void RHIDevice::InitializeDebug()
 {
 	LogSystem::Log(LogRHI, Info, L"----- Initialize Direct3D 12 debug layer.");
