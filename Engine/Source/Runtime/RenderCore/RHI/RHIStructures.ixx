@@ -112,6 +112,13 @@ export struct RHIVertexBufferView
 	uint32 StrideInBytes = 0;
 };
 
+export struct RHIIndexBufferView
+{
+	uint64 BufferLocation = 0;
+	uint32 SizeInBytes = 0;
+	ERHIVertexElementFormat Format = ERHIVertexElementFormat::R32_UINT;
+};
+
 /// <summary>
 /// Describe parameter collection shader parameter.
 /// </summary>

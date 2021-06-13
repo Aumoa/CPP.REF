@@ -9,32 +9,36 @@ import :AActor;
 import :SubclassOf;
 import :LogGame;
 import :TickFunction;
+import :GameObject;
 
 using enum ELogVerbosity;
 using namespace std;
 using namespace std::chrono;
 
 export class Level;
+export class Scene;
+export class GameEngine;
 
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
 /// </summary>
-export class World : virtual public Object
+export class World : public GameObject
 {
 public:
 	using Super = Object;
 
 private:
+	GameEngine* _engine = nullptr;
 	set<AActor*> _actors;
 	Level* _level = nullptr;
 	set<TickFunction*> _tickInstances;
+	Scene* _scene = nullptr;
 
 public:
 	/// <summary>
 	/// Initialize new <see cref="World"/> instance.
 	/// </summary>
-	World();
-	~World();
+	World(GameEngine* engine);
 
 	/// <summary>
 	/// Spawn actor to world.
@@ -92,7 +96,9 @@ public:
 	bool LoadLevel(SubclassOf<Level> levelToLoad);
 
 	void RegisterTickFunction(TickFunction* function);
+	void RegisterComponent(ActorComponent* component);
 	virtual void LevelTick(duration<float> elapsedTime);
+	Scene* GetScene() const { return _scene; }
 
 private:
 	bool InternalSpawnActor(AActor* instance);

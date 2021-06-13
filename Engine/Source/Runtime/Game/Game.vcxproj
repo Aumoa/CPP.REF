@@ -118,7 +118,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Assets\StaticMesh.cpp" />
     <ClCompile Include="Assets\StaticMesh.ixx" />
+    <ClCompile Include="Assets\StaticMeshTest.cpp" />
+    <ClCompile Include="Assets\StaticMeshTest.ixx" />
     <ClCompile Include="Camera\APlayerCameraManager.cpp" />
     <ClCompile Include="Camera\APlayerCameraManager.ixx" />
     <ClCompile Include="Camera\CameraComponent.cpp" />
@@ -171,6 +174,8 @@
     <ClCompile Include="Scene\PrimitiveSceneProxy.ixx" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\Scene.ixx" />
+    <ClCompile Include="Scene\SceneRenderer.cpp" />
+    <ClCompile Include="Scene\SceneRenderer.ixx" />
     <ClCompile Include="Scene\SceneVisibility.cpp" />
     <ClCompile Include="Scene\SceneVisibility.ixx" />
     <ClCompile Include="Scene\StaticMeshRenderData.cpp" />

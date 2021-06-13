@@ -78,4 +78,6 @@ public:
 	MulticastEvent<ActorComponent, void()> Inactivated;
 
 	void RegisterComponentWithWorld(World* world);
+
+	void SetOwnerPrivate(AActor* owner) { _owner = owner; }
 };

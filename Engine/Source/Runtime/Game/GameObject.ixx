@@ -7,6 +7,8 @@ import SC.Runtime.Core;
 
 using namespace std;
 
+export class World;
+
 /// <summary>
 /// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
 /// </summary>
@@ -37,4 +39,10 @@ public:
 	/// Get object name to represents this object.
 	/// </summary>
 	wstring GetName() const;
+
+	World* GetWorld() const;
+	void SetWorld(World* value);
+
+private:
+	mutable World* _WorldPrivate = nullptr;
 };

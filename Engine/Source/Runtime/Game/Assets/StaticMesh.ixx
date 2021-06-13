@@ -7,16 +7,24 @@ import SC.Runtime.Core;
 
 using namespace std;
 
+export class StaticMeshRenderData;
+
 export class StaticMesh : virtual public Object
 {
 public:
 	using Super = Object;
 
+private:
+	wstring _name;
+
 public:
 	StaticMesh(wstring_view name);
 
-	wstring GetName() const;
+	wstring GetName() const { return _name; }
 
 protected:
+	StaticMeshRenderData* _RenderData = nullptr;
 
+public:
+	StaticMeshRenderData* GetRenderData() const { return _RenderData; }
 };

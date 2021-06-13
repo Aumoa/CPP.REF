@@ -121,6 +121,11 @@ void RHIDeviceContext::IASetVertexBuffers(uint32 startSlot, uint32 numViews, con
 	_commandList->IASetVertexBuffers(startSlot, numViews, (const D3D12_VERTEX_BUFFER_VIEW*)views);
 }
 
+void RHIDeviceContext::IASetIndexBuffer(const RHIIndexBufferView& view)
+{
+	_commandList->IASetIndexBuffer((const D3D12_INDEX_BUFFER_VIEW*)&view);
+}
+
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)
 {
 	ComPtr<ID3D12CommandAllocator> t = move(_allocator);

@@ -43,6 +43,8 @@ void GameInstance::InitializeEngine()
 	_engine = CreateSubobject<GameEngine>(bDebug);
 	_engine->InitEngine(this);
 
-	_world = CreateSubobject<World>();
+	_world = CreateSubobject<World>(_engine);
 	_world->LoadLevel(StartupLevel);
+
+	SetWorld(_world);
 }

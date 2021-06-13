@@ -15,4 +15,5 @@ public:
 	PrimitiveComponent();
 
 	virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
+	PrimitiveSceneProxy* SceneProxy = nullptr;
 };

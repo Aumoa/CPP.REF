@@ -21,6 +21,6 @@ private:
 public:
 	PrimitiveSceneProxy(PrimitiveComponent* inComponent);
 
-protected:
 	vector<MeshBatch> MeshBatches;
+	int64 PrimitiveId = -1;
 };

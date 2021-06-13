@@ -7,7 +7,7 @@ import SC.Runtime.Game;
 StaticMeshRenderData::StaticMeshRenderData(RHIVertexFactory* vfactory) : Super()
 {
 	// TEST IMPLEMENTATION
-	MeshBatch& batch1 = _MeshBatches.emplace_back();
+	MeshBatch& batch1 = MeshBatches.emplace_back();
 	batch1.VertexFactory = vfactory;
 
 	RHIVertex triangle[3] =
@@ -23,13 +23,16 @@ StaticMeshRenderData::StaticMeshRenderData(RHIVertexFactory* vfactory) : Super()
 	RHIResource* ib = vfactory->CreateIndexBuffer(ids, 3);
 	MeshBatchElement& element1 = batch1.Elements.emplace_back() =
 	{
-		.VertexBuffer = vb,
-		.IndexBuffer = ib,
-		.BufferLocation = vb->GetGPUVirtualAddress(),
+		.VertexBufferLocation = vb->GetGPUVirtualAddress(),
+		.IndexBufferLocation = ib->GetGPUVirtualAddress(),
 		.IndexCount = 3,
 		.InstanceCount = 1,
 		.StartIndexLocation = 0,
 		.BaseVertexLocation = 0,
 		.StartInstanceLocation = 0,
+		.VertexCount = 3
 	};
+
+	vb->SetOuter(this);
+	ib->SetOuter(this);
 }

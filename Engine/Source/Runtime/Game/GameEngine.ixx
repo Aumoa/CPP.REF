@@ -55,6 +55,12 @@ public:
 	virtual void InitEngine(GameInstance* gameInstance);
 
 private:
+	static GameEngine* _gEngine;
+
+public:
+	static GameEngine* GetEngine() { return _gEngine; }
+
+private:
 	void RegisterRHIGarbageCollector();
 	void TickEngine();
 	void ResizedApp(int32 width, int32 height);
@@ -62,4 +68,8 @@ private:
 private:
 	void GameTick(duration<float> elapsedTime);
 	void RenderTick(duration<float> elapsedTime);
+
+public:
+	RHIDevice* GetRHIDevice() const { return _device; }
+	ColorVertexFactory* GetColorVertexFactory() const { return _colorVertexFactory; }
 };

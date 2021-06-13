@@ -118,11 +118,21 @@ public:
 		while (!hierarchy.empty())
 		{
 			SceneComponent* top = hierarchy.front();
-			if (typeid(top).hash_code() == typeid(T).hash_code())
+			if constexpr (is_same_v<T, SceneComponent>)
 			{
 				if (body(top))
 				{
 					break;
+				}
+			}
+			else
+			{
+				if (auto* ptr = dynamic_cast<T*>(top); ptr != nullptr)
+				{
+					if (body(ptr))
+					{
+						break;
+					}
 				}
 			}
 
@@ -135,6 +145,4 @@ public:
 			hierarchy.pop();
 		}
 	}
-
-	void ForEachSceneComponents(function<bool(SceneComponent*)> body) const;
 };

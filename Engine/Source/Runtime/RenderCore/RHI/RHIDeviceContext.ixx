@@ -103,6 +103,8 @@ public:
 	/// </summary>
 	virtual void IASetVertexBuffers(uint32 startSlot, uint32 numViews, const RHIVertexBufferView* views);
 
+	virtual void IASetIndexBuffer(const RHIIndexBufferView& view);
+
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const { return _commandList.Get(); }
 

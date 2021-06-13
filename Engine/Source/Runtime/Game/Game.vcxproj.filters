@@ -224,6 +224,21 @@
     <ClCompile Include="Scene\StaticMeshRenderData.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\StaticMeshTest.ixx">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\StaticMeshTest.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\StaticMesh.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneRenderer.ixx">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneRenderer.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">

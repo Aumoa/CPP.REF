@@ -10,3 +10,8 @@ PrimitiveSceneProxy* StaticMeshComponent::CreateSceneProxy()
 {
 	return new StaticMeshSceneProxy(this);
 }
+
+void StaticMeshComponent::SetStaticMesh(StaticMesh* inNewMesh)
+{
+	_StaticMesh = inNewMesh;
+}

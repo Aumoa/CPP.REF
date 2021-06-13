@@ -56,6 +56,8 @@ export import :MeshBatch;
 export import :MeshBatchElement;
 export import :StaticMeshSceneProxy;
 export import :StaticMeshRenderData;
+export import :SceneRenderer;
 
 // Assets
 export import :StaticMesh;
+export import :StaticMeshTest;

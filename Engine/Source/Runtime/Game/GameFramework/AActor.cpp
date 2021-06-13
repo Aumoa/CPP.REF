@@ -75,7 +75,7 @@ ActorComponent* AActor::GetComponentByClass(const type_info& type) const
 
 	// Else, find component from scene components.
 	SceneComponent* item = nullptr;
-	ForEachSceneComponents([&item, &type](SceneComponent* component)
+	ForEachSceneComponents<SceneComponent>([&item, &type](SceneComponent* component)
 	{
 		if (typeid(*component).hash_code() == type.hash_code())
 		{
@@ -108,37 +108,15 @@ void AActor::SetRootComponent(SceneComponent* scene)
 	{
 		scene->SetOuter(outer);
 	}
+
+	ForEachSceneComponents<SceneComponent>([this](SceneComponent* ptr)
+	{
+		ptr->SetOwnerPrivate(this);
+		return false;
+	});
 }
 
 SceneComponent* AActor::GetRootComponent() const
 {
 	return _rootComponent;
-}
-
-void AActor::ForEachSceneComponents(function<bool(SceneComponent*)> body) const
-{
-	if (_rootComponent == nullptr)
-	{
-		return;
-	}
-
-	queue<SceneComponent*> hierarchy;
-	hierarchy.emplace(_rootComponent);
-
-	while (!hierarchy.empty())
-	{
-		SceneComponent* top = hierarchy.front();
-		if (body(top))
-		{
-			break;
-		}
-
-		vector<SceneComponent*> childs = top->GetChildComponents();
-		for (auto& child : childs)
-		{
-			hierarchy.emplace(child);
-		}
-
-		hierarchy.pop();
-	}
 }

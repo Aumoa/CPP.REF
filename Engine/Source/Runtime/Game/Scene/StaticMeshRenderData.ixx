@@ -17,6 +17,5 @@ public:
 public:
 	StaticMeshRenderData(RHIVertexFactory* vfactory);
 
-private:
-	vector<MeshBatch> _MeshBatches;
+	vector<MeshBatch> MeshBatches;
 };

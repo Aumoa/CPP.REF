@@ -9,12 +9,11 @@ using enum ELogVerbosity;
 using namespace std;
 using namespace std::chrono;
 
-World::World()
+World::World(GameEngine* engine) : Super()
+	, _engine(engine)
 {
-}
-
-World::~World()
-{
+	SetWorld(this);
+	_scene = CreateSubobject<Scene>(this, _engine->GetRHIDevice());
 }
 
 bool World::LoadLevel(SubclassOf<Level> levelToLoad)
@@ -47,6 +46,33 @@ void World::RegisterTickFunction(TickFunction* function)
 	_tickInstances.emplace(function);
 }
 
+void World::RegisterComponent(ActorComponent* component)
+{
+	if (auto* isPrimitive = dynamic_cast<PrimitiveComponent*>(component); isPrimitive != nullptr)
+	{
+		PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
+		if (proxy != nullptr)
+		{
+			int64 id = _scene->AddPrimitive(proxy);
+			proxy->PrimitiveId = id;
+		}
+		isPrimitive->SceneProxy = proxy;
+	}
+}
+
+void World::LevelTick(duration<float> elapsedTime)
+{
+	for (auto& func : _tickInstances)
+	{
+		func->Ready();
+	}
+
+	for (auto& func : _tickInstances)
+	{
+		func->ExecuteTick(elapsedTime);
+	}
+}
+
 bool World::InternalSpawnActor(AActor* instance)
 {
 	// Register all actor components.
@@ -64,8 +90,4 @@ bool World::InternalSpawnActor(AActor* instance)
 	});
 
 	return _actors.emplace(instance).second;
-}
-
-void World::LevelTick(duration<float> elapsedTime)
-{
 }

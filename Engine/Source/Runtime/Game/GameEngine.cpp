@@ -10,6 +10,8 @@ using enum ELogVerbosity;
 using namespace std;
 using namespace std::chrono;
 
+GameEngine* GameEngine::_gEngine = nullptr;
+
 GameEngine::GameEngine(bool bDebug) : Super()
 	, _bDebug(bDebug)
 {
@@ -22,6 +24,7 @@ GameEngine::~GameEngine()
 void GameEngine::InitEngine(GameInstance* gameInstance)
 {
 	LogSystem::Log(LogEngine, Info, L"Initialize engine.");
+	_gEngine = this;
 
 	IFrameworkView* frameworkView = gameInstance->GetFrameworkView();
 
@@ -139,10 +142,11 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
 	_deviceContext->RSSetScissorRects(1, &sc);
 	_deviceContext->RSSetViewports(1, &vp);
-	_deviceContext->SetGraphicsShader(_colorShader);
-	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-	//_deviceContext->IASetVertexBuffers(0, 1, &_vbv);
-	_deviceContext->DrawInstanced(3, 1);
+
+	Scene* scene = _gameInstance->GetWorld()->GetScene();
+	SceneRenderer renderer(scene, _colorShader);
+	renderer.RenderScene(_deviceContext);
+
 	_deviceContext->TransitionBarrier(1, &barrierEnd);
 	_deviceContext->End();
 

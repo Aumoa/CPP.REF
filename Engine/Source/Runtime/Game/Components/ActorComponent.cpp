@@ -59,4 +59,5 @@ void ActorComponent::SetActive(bool bActive)
 void ActorComponent::RegisterComponentWithWorld(World* world)
 {
 	world->RegisterTickFunction(&PrimaryComponentTick);
+	world->RegisterComponent(this);
 }
