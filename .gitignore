@@ -1,16 +1,9 @@
-# Ignore Visual Studio Project Files
+## gitignore for SmartComponent engine system.
+# Visual Studio Files
 .vs/
-*.sln
-*.vcxproj
-*.vcxproj.filters
-*.csproj.*
-Debug/
-*.assets.json
-*.nuget.cache
 
-# Ignore Build Results
+# Output files
 Build/
-Intermediate/
 
-# Ignore Compiled Shaders
-*.generated.h
+# Intermediate files.
+Intermediate/

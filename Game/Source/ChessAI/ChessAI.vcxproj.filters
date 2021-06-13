@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ChessAI.ixx" />
+    <ClCompile Include="Actors\AChessBoard.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\AChessBoard.ixx">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Pawns\AChessBoardProxy.ixx">
+      <Filter>Pawns</Filter>
+    </ClCompile>
+    <ClCompile Include="Pawns\AChessBoardProxy.cpp">
+      <Filter>Pawns</Filter>
+    </ClCompile>
+    <ClCompile Include="Queries\ChessBoardQuery.ixx">
+      <Filter>Queries</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\APiece.ixx">
+      <Filter>Actors</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Actors">
+      <UniqueIdentifier>{eece25d5-0384-44fd-aec7-a0bf99b5b155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pawns">
+      <UniqueIdentifier>{2a345fa8-7f17-4bff-a620-4991b9baa8df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Queries">
+      <UniqueIdentifier>{511c74db-0ecf-4e74-8ef5-10894daf816b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
