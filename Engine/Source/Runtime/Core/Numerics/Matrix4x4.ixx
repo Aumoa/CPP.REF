@@ -4,6 +4,7 @@ export module SC.Runtime.Core:Matrix4x4;
 
 import std.core;
 import :Matrix;
+import :Radians;
 
 using namespace std;
 
@@ -69,4 +70,18 @@ export struct Matrix4x4 : public Matrix<4, 4>
 	/// <param name="q"> The quaternion vector. </param>
 	/// <returns> Result matrix. </returns>
 	static Matrix4x4 AffineTransformation(const Vector3& t, const Vector3& s, const Quaternion& q);
+	
+	static Matrix4x4 LookToLH(const Vector3& location, const Vector3& dir, const Vector3& up);
+	static Matrix4x4 PerspectiveFovLH(Radians fovAngle, float aspectRatio, float zNearPlane, float zFarPlane);
+	static constexpr Matrix4x4 Identity();
 };
+
+export constexpr Matrix4x4 Matrix4x4::Identity()
+{
+	return Matrix4x4{
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+}

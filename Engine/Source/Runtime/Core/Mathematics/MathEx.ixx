@@ -7,7 +7,7 @@ import :PrimitiveTypes;
 
 using namespace std;
 
-struct Radians;
+export struct Radians;
 
 /// <summary>
 /// Provide standard math functions.

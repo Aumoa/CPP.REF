@@ -9,17 +9,17 @@ using namespace DirectX;
 
 inline XMMATRIX XMLoadMatrix4x4(const Matrix4x4* m)
 {
-	return XMLoadFloat4x4((const XMFLOAT4X4*)&m);
+	return XMLoadFloat4x4((const XMFLOAT4X4*)m);
 }
 
 inline XMVECTOR XMLoadVector3(const Vector3* v)
 {
-	return XMLoadFloat3((const XMFLOAT3*)&v);
+	return XMLoadFloat3((const XMFLOAT3*)v);
 }
 
 inline XMVECTOR XMLoadQuaternion(const Quaternion* v)
 {
-	return XMLoadFloat4((const XMFLOAT4*)&v);
+	return XMLoadFloat4((const XMFLOAT4*)v);
 }
 
 inline Matrix4x4 XMStoreMatrix4x4(FXMMATRIX M)
@@ -77,5 +77,17 @@ Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& lhs, const Matrix4x4& rhs)
 Matrix4x4 Matrix4x4::AffineTransformation(const Vector3& t, const Vector3& s, const Quaternion& q)
 {
 	XMMATRIX M = XMMatrixAffineTransformation(XMLoadVector3(&s), XMVectorZero(), XMLoadQuaternion(&q), XMLoadVector3(&t));
+	return XMStoreMatrix4x4(M);
+}
+
+Matrix4x4 Matrix4x4::LookToLH(const Vector3& location, const Vector3& dir, const Vector3& up)
+{
+	XMMATRIX M = XMMatrixLookToLH(XMLoadVector3(&location), XMLoadVector3(&dir), XMLoadVector3(&up));
+	return XMStoreMatrix4x4(M);
+}
+
+Matrix4x4 Matrix4x4::PerspectiveFovLH(Radians fovAngle, float aspectRatio, float zNearPlane, float zFarPlane)
+{
+	XMMATRIX M = XMMatrixPerspectiveFovLH(fovAngle.Value, aspectRatio, zNearPlane, zFarPlane);
 	return XMStoreMatrix4x4(M);
 }

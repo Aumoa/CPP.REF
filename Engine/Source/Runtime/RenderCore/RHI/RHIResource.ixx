@@ -16,6 +16,7 @@ public:
 
 private:
 	ComPtr<ID3D12Resource> _resource;
+	void* _ptr = nullptr;
 
 public:
 	RHIResource(RHIDevice* device, ID3D12Resource* resource);
@@ -26,6 +27,11 @@ public:
 	/// </summary>
 	virtual uint64 GetGPUVirtualAddress() const;
 
+	virtual void* GetMappingPointer() const;
+
 public /*internal*/:
 	ID3D12Resource* GetResource() const { return _resource.Get(); }
+
+private:
+	void Mapping();
 };

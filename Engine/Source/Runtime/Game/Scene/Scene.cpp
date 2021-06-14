@@ -12,9 +12,18 @@ Scene::Scene(World* worldOwner, RHIDevice* device) : Super()
 	_localPlayerView = CreateSubobject<SceneVisibility>(this);
 }
 
-void Scene::InitViews(duration<float> elapsedTime, const MinimalViewInfo& localPlayerView)
+void Scene::UpdateScene(duration<float> elapsedTime)
 {
-	_localPlayerView->CalcVisibility(elapsedTime, localPlayerView);
+	for (auto& proxy : _primitives)
+	{
+		PrimitiveComponent* component = proxy->GetComponent();
+		proxy->UpdateTransform_GameThread(component->GetComponentTransform());
+	}
+}
+
+void Scene::InitViews(const MinimalViewInfo& localPlayerView)
+{
+	_localPlayerView->CalcVisibility(localPlayerView);
 }
 
 int64 Scene::AddPrimitive(PrimitiveSceneProxy* proxy)

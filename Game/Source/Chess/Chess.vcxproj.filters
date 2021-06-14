@@ -9,10 +9,20 @@
     <ClCompile Include="Level\GameLevel.cpp">
       <Filter>Level</Filter>
     </ClCompile>
+    <ClCompile Include="Controller\AChessPlayerController.ixx">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\AChessPlayerController.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="AChessGameMode.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Level">
       <UniqueIdentifier>{3a10e25d-0a94-41d9-ab6a-889d1426f97f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller">
+      <UniqueIdentifier>{559afec6-4c7f-4897-9bbf-ee621e8db27a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

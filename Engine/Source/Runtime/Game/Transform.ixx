@@ -13,7 +13,7 @@ using namespace std;
 export struct Transform
 {
 	Vector3 Translation;
-	Vector3 Scale;
+	Vector3 Scale = Vector3(1.0f, 1.0f, 1.0f);
 	Quaternion Rotation = Quaternion::GetIdentity();
 
 	/// <summary>

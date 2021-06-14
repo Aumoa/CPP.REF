@@ -101,8 +101,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AChessGameMode.ixx" />
     <ClCompile Include="Chess.ixx" />
     <ClCompile Include="ChessGameInstance.ixx" />
+    <ClCompile Include="Controller\AChessPlayerController.cpp" />
+    <ClCompile Include="Controller\AChessPlayerController.ixx" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Level\GameLevel.ixx" />
   </ItemGroup>

@@ -58,8 +58,8 @@ protected:
 	ActorTickFunction PrimaryActorTick;
 
 private:
-	uint8 _bActive : 1 = true;
-	uint8 _bHasBegunPlay : 1 = false;
+	uint8 _bActive : 1;
+	uint8 _bHasBegunPlay : 1;
 
 public:
 	/// <summary>
@@ -74,22 +74,48 @@ public:
 	/// <param name="tickFunction"> Tick function what called this. </param>
 	virtual void TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction);
 
+	virtual void BeginPlay();
+	virtual void EndPlay();
+
 	void SetActive(bool bActive);
 	inline bool IsActive() const { return _bActive; }
 	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
 	MulticastEvent<AActor, void()> Activated;
 	MulticastEvent<AActor, void()> Inactivated;
 
+	void RegisterActorWithWorld(World* world);
+
 private:
-	map<size_t, set<ActorComponent*>> _components;
+	set<ActorComponent*> _components;
 
 public:
-	vector<ActorComponent*> GetOwnedComponents() const;
-	ActorComponent* GetComponentByClass(const type_info& type) const;
+	set<ActorComponent*> GetOwnedComponents() const;
 	template<derived_from<ActorComponent> T>
 	T* GetComponentAs() const
 	{
-		return dynamic_cast<T*>(GetComponentByClass(typeid(T)));
+		// Find component from actor components.
+		for (auto& component : _components)
+		{
+			if (auto* ptr = dynamic_cast<T*>(component); ptr != nullptr)
+			{
+				return ptr;
+			}
+		}
+
+		if constexpr (derived_from<T, SceneComponent>)
+		{
+			// Else, find component from scene components.
+			T* item = nullptr;
+			ForEachSceneComponents<T>([&item](T* component)
+			{
+				item = component;
+				return false;
+			});
+
+			return item;
+		}
+
+		return nullptr;
 	}
 
 private:
@@ -112,37 +138,12 @@ public:
 			return;
 		}
 
-		queue<SceneComponent*> hierarchy;
-		hierarchy.emplace(_rootComponent);
-
-		while (!hierarchy.empty())
-		{
-			SceneComponent* top = hierarchy.front();
-			if constexpr (is_same_v<T, SceneComponent>)
-			{
-				if (body(top))
-				{
-					break;
-				}
-			}
-			else
-			{
-				if (auto* ptr = dynamic_cast<T*>(top); ptr != nullptr)
-				{
-					if (body(ptr))
-					{
-						break;
-					}
-				}
-			}
-
-			vector<SceneComponent*> childs = top->GetChildComponents();
-			for (auto& child : childs)
-			{
-				hierarchy.emplace(child);
-			}
-
-			hierarchy.pop();
-		}
+		_rootComponent->ForEachSceneComponents<T>(body);
 	}
+
+public:
+	void SetActorLocation(const Vector3& location);
+	Vector3 GetActorLocation() const;
+	void SetActorRotation(const Quaternion& rotation);
+	Quaternion GetActorRotation() const;
 };

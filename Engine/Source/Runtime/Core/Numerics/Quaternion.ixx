@@ -5,6 +5,7 @@ export module SC.Runtime.Core:Quaternion;
 import std.core;
 import :Vector4;
 import :Vector3;
+import :Degrees;
 
 using namespace std;
 
@@ -170,6 +171,8 @@ export struct Quaternion : public Vector4
 	/// Get identity quaternion.
 	/// </summary>
 	static inline constexpr Quaternion GetIdentity();
+
+	static Quaternion FromAxisAngle(const Vector3& axis, Degrees angle);
 };
 
 inline constexpr Quaternion Quaternion::GetIdentity()

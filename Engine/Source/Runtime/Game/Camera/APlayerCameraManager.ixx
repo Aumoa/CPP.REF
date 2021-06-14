@@ -18,11 +18,13 @@ public:
 
 private:
 	CameraComponent* _cachedBindCamera = nullptr;
+	MinimalViewInfo _cachedView;
 
 public:
 	APlayerCameraManager();
 
-	virtual MinimalViewInfo UpdateCamera(duration<float> elapsedTime) const;
+	virtual void UpdateCamera(duration<float> elapsedTime);
 
 	void CachePlayerCamera(APlayerController* controller);
+	MinimalViewInfo GetCachedCameraView() const;
 };

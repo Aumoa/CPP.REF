@@ -91,7 +91,7 @@ RHIResource* RHIDevice::CreateDynamicBuffer(size_t length)
 
 	D3D12_HEAP_PROPERTIES heap = 
 	{
-		.Type = D3D12_HEAP_TYPE_DEFAULT
+		.Type = D3D12_HEAP_TYPE_UPLOAD
 	};
 
 	ComPtr<ID3D12Resource> resource;

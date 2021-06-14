@@ -3,6 +3,10 @@
 export module SC.Game.Chess;
 
 export import :ChessGameInstance;
+export import :AChessGameMode;
 
 // Level
 export import :GameLevel;
+
+// Controller
+export import :AChessPlayerController;

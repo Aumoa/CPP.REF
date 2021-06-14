@@ -79,6 +79,80 @@ public:
 	EComponentMobility GetMobility() const;
 	void SetMobility(EComponentMobility value);
 
+	template<derived_from<SceneComponent> T>
+	void ForEachSceneComponents(function<bool(const T*)> body) const
+	{
+		queue<const SceneComponent*> hierarchy;
+		hierarchy.emplace(this);
+
+		while (!hierarchy.empty())
+		{
+			SceneComponent* top = hierarchy.front();
+			if constexpr (is_same_v<T, SceneComponent>)
+			{
+				if (body(top))
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (auto* ptr = dynamic_cast<T*>(top); ptr != nullptr)
+				{
+					if (body(ptr))
+					{
+						break;
+					}
+				}
+			}
+
+			vector<SceneComponent*> childs = top->GetChildComponents();
+			for (auto& child : childs)
+			{
+				hierarchy.emplace(child);
+			}
+
+			hierarchy.pop();
+		}
+	}
+
+	template<derived_from<SceneComponent> T>
+	void ForEachSceneComponents(function<bool(T*)> body)
+	{
+		queue<SceneComponent*> hierarchy;
+		hierarchy.emplace(this);
+
+		while (!hierarchy.empty())
+		{
+			SceneComponent* top = hierarchy.front();
+			if constexpr (is_same_v<T, SceneComponent>)
+			{
+				if (body(top))
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (auto* ptr = dynamic_cast<T*>(top); ptr != nullptr)
+				{
+					if (body(ptr))
+					{
+						break;
+					}
+				}
+			}
+
+			vector<SceneComponent*> childs = top->GetChildComponents();
+			for (auto& child : childs)
+			{
+				hierarchy.emplace(child);
+			}
+
+			hierarchy.pop();
+		}
+	}
+
 private:
 	void UpdateWorldTransform();
 };

@@ -38,12 +38,22 @@ bool World::LoadLevel(SubclassOf<Level> levelToLoad)
 		return false;
 	}
 
+	// Begin play for all actors.
+	_level = levelInstance;
+	for (auto& actor : _actors)
+	{
+		actor->BeginPlay();
+	}
+
 	return true;
 }
 
 void World::RegisterTickFunction(TickFunction* function)
 {
-	_tickInstances.emplace(function);
+	if (function->bCanEverTick)
+	{
+		_tickInstances.emplace(function);
+	}
 }
 
 void World::RegisterComponent(ActorComponent* component)
@@ -71,23 +81,26 @@ void World::LevelTick(duration<float> elapsedTime)
 	{
 		func->ExecuteTick(elapsedTime);
 	}
+
+	_playerController->UpdateCameraManager(elapsedTime);
+
+	_scene->UpdateScene(elapsedTime);
 }
 
 bool World::InternalSpawnActor(AActor* instance)
 {
-	// Register all actor components.
-	vector<ActorComponent*> actorComponents = instance->GetOwnedComponents();
-	for (auto& ac : actorComponents)
+	// Register.
+	instance->RegisterActorWithWorld(this);
+
+	if (auto* playerController = dynamic_cast<APlayerController*>(instance); playerController != nullptr)
 	{
-		ac->RegisterComponentWithWorld(this);
+		_playerController = playerController;
 	}
 
-	// Register all scene components.
-	instance->ForEachSceneComponents<SceneComponent>([this](SceneComponent* component)
+	if (auto* playerCamera = dynamic_cast<APlayerCameraManager*>(instance); playerCamera != nullptr)
 	{
-		component->RegisterComponentWithWorld(this);
-		return false;
-	});
+		_playerCamera = playerCamera;
+	}
 
 	return _actors.emplace(instance).second;
 }

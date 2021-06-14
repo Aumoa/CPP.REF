@@ -8,14 +8,20 @@ import SC.Runtime.Game;
 export class AChessBoardProxy;
 
 using namespace std;
+using namespace std::chrono;
 
 export class AChessBoard : public AActor
 {
 public:
 	using Super = AActor;
 
+private:
+	Degrees _rotation;
+
 public:
 	AChessBoard();
+
+	virtual void TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction) override;
 
 	AChessBoardProxy* CreateProxy();
 };

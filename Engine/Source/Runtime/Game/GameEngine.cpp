@@ -143,7 +143,12 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	_deviceContext->RSSetScissorRects(1, &sc);
 	_deviceContext->RSSetViewports(1, &vp);
 
+	World* world = _gameInstance->GetWorld();
+	APlayerCameraManager* playerCamera = world->GetPlayerCamera();
+
 	Scene* scene = _gameInstance->GetWorld()->GetScene();
+	scene->InitViews(playerCamera->GetCachedCameraView());
+
 	SceneRenderer renderer(scene, _colorShader);
 	renderer.RenderScene(_deviceContext);
 

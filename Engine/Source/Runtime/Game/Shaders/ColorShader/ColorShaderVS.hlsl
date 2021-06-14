@@ -1,8 +1,7 @@
 struct CameraConstant
 {
     row_major matrix World;
-    row_major matrix WorldInvTranspose;
-    float3 CameraPos;
+    row_major matrix WorldViewProj;
 };
 
 struct VertexElement
@@ -15,6 +14,6 @@ ConstantBuffer<CameraConstant> gCamera : register(b0);
 
 void Main(VertexElement element, out float4 posH : SV_Position, out float3 color : COLOR)
 {
-    posH = float4(element.Pos, 1.0f);
+    posH = mul(float4(element.Pos, 1.0f), gCamera.WorldViewProj);
     color = element.Color;
 }

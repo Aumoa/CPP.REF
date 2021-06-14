@@ -6,6 +6,7 @@ import SC.Game.ChessAI;
 
 GameLevel::GameLevel() : Super()
 {
+	GameModeClass = SubclassOf<AChessGameMode>::StaticClass();
 }
 
 bool GameLevel::LoadLevel(World* world)

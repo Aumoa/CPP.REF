@@ -5,4 +5,6 @@ import SC.Game.ChessAI;
 
 AChessBoardProxy::AChessBoardProxy(AChessBoard* chessBoard) : Super()
 {
+	CameraComponent* cp = CreateSubobject<CameraComponent>();
+	SetRootComponent(cp);
 }

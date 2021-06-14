@@ -14,16 +14,22 @@ void SceneRenderer::RenderScene(RHIDeviceContext* dc)
 {
 	dc->SetGraphicsShader(_shader);
 
-	for (size_t i = 0; i < _scene->_primitives.size(); ++i)
+	RenderWithSceneVisibility(dc, _scene->_localPlayerView);
+}
+
+void SceneRenderer::RenderWithSceneVisibility(RHIDeviceContext* dc, SceneVisibility* view)
+{
+	view->ForEachVisibleItem([this, dc, view](size_t idx)
 	{
-		PrimitiveSceneProxy* proxy = _scene->_primitives[i];
+		PrimitiveSceneProxy* proxy = _scene->_primitives[idx];
 		if (proxy == nullptr)
 		{
-			continue;
+			return;
 		}
 
+		view->SetupView(dc, _shader, idx);
 		RenderPrimitive(dc, proxy);
-	}
+	});
 }
 
 void SceneRenderer::RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* proxy)

@@ -9,7 +9,7 @@ import :StringUtils;
 using namespace std;
 using namespace std::numbers;
 
-struct Degrees;
+export struct Degrees;
 
 /// <summary>
 /// Represents the radians value.

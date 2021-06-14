@@ -33,5 +33,5 @@ public:
 
 	CameraComponent* FindPlayerCameraComponent() const;
 	void SpawnCameraManager(World* level);
-	MinimalViewInfo UpdateCameraManager(duration<float> elapsedTime) const;
+	void UpdateCameraManager(duration<float> elapsedTime);
 };

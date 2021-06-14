@@ -8,6 +8,7 @@ import SC.Runtime.Game.Shaders;
 
 export class Scene;
 export class PrimitiveSceneProxy;
+export class SceneVisibility;
 
 export class SceneRenderer : virtual public Object
 {
@@ -24,5 +25,6 @@ public:
 	void RenderScene(RHIDeviceContext* dc);
 
 private:
+	void RenderWithSceneVisibility(RHIDeviceContext* dc, SceneVisibility* view);
 	void RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* proxy);
 };

@@ -16,6 +16,7 @@ export class PrimitiveSceneProxy;
 
 export class Scene : virtual public Object
 {
+	friend class SceneVisibility;
 	friend class SceneRenderer;
 
 public:
@@ -31,7 +32,8 @@ private:
 public:
 	Scene(World* worldOwner, RHIDevice* device);
 
-	void InitViews(duration<float> elapsedTime, const MinimalViewInfo& localPlayerView);
+	void UpdateScene(duration<float> elapsedTime);
+	void InitViews(const MinimalViewInfo& localPlayerView);
 
 	int64 AddPrimitive(PrimitiveSceneProxy* proxy);
 	void RemovePrimitive(int64 primitiveId);

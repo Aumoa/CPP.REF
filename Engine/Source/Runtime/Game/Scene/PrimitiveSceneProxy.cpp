@@ -6,3 +6,8 @@ PrimitiveSceneProxy::PrimitiveSceneProxy(PrimitiveComponent* inComponent) : Supe
 	, _MyComponent(inComponent)
 {
 }
+
+void PrimitiveSceneProxy::UpdateTransform_GameThread(const Transform& value)
+{
+	ComponentTransform = value;
+}

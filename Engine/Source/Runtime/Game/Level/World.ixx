@@ -18,6 +18,8 @@ using namespace std::chrono;
 export class Level;
 export class Scene;
 export class GameEngine;
+export class APlayerController;
+export class APlayerCameraManager;
 
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
@@ -33,6 +35,9 @@ private:
 	Level* _level = nullptr;
 	set<TickFunction*> _tickInstances;
 	Scene* _scene = nullptr;
+
+	APlayerController* _playerController = nullptr;
+	APlayerCameraManager* _playerCamera = nullptr;
 
 public:
 	/// <summary>
@@ -99,6 +104,8 @@ public:
 	void RegisterComponent(ActorComponent* component);
 	virtual void LevelTick(duration<float> elapsedTime);
 	Scene* GetScene() const { return _scene; }
+	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
+	Level* GetLevel() const { return _level; }
 
 private:
 	bool InternalSpawnActor(AActor* instance);

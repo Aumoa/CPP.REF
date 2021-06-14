@@ -25,11 +25,23 @@ void AActor::ActorTickFunction::ExecuteTick(duration<float> elapsedTime)
 
 AActor::AActor() : Super()
 	, PrimaryActorTick(this)
+	, _bActive(true)
+	, _bHasBegunPlay(false)
 {
 }
 
 void AActor::TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction)
 {
+}
+
+void AActor::BeginPlay()
+{
+	_bHasBegunPlay = true;
+}
+
+void AActor::EndPlay()
+{
+	_bHasBegunPlay = false;
 }
 
 void AActor::SetActive(bool bActive)
@@ -48,45 +60,26 @@ void AActor::SetActive(bool bActive)
 	}
 }
 
-vector<ActorComponent*> AActor::GetOwnedComponents() const
+void AActor::RegisterActorWithWorld(World* world)
 {
-	size_t cnt = 0;
-	for (auto& subset : _components)
+	world->RegisterTickFunction(&PrimaryActorTick);
+
+	for (auto& component : _components)
 	{
-		cnt += subset.second.size();
+		component->RegisterComponentWithWorld(world);
 	}
 
-	vector<ActorComponent*> cps(cnt);
-	for (auto& subset : _components)
+	// Register all scene components.
+	ForEachSceneComponents<SceneComponent>([world](SceneComponent* component)
 	{
-		cps.insert(cps.end(), subset.second.begin(), subset.second.end());
-	}
-	
-	return cps;
-}
-
-ActorComponent* AActor::GetComponentByClass(const type_info& type) const
-{
-	// Find component from actor components.
-	if (auto it = _components.find(type.hash_code()); it != _components.end())
-	{
-		return (*it->second.begin());
-	}
-
-	// Else, find component from scene components.
-	SceneComponent* item = nullptr;
-	ForEachSceneComponents<SceneComponent>([&item, &type](SceneComponent* component)
-	{
-		if (typeid(*component).hash_code() == type.hash_code())
-		{
-			item = component;
-			return true;
-		}
-
+		component->RegisterComponentWithWorld(world);
 		return false;
 	});
+}
 
-	return nullptr;
+set<ActorComponent*> AActor::GetOwnedComponents() const
+{
+	return _components;
 }
 
 void AActor::SetRootComponent(SceneComponent* scene)
@@ -97,9 +90,9 @@ void AActor::SetRootComponent(SceneComponent* scene)
 		return;
 	}
 
-	if (_rootComponent == nullptr)
+	if (_rootComponent != nullptr)
 	{
-		LogSystem::Log(LogComponent, Verbose, L"The root component is not empty. Instance will be dangling.");
+		LogSystem::Log(LogComponent, Warning, L"The root component is not empty. Instance will be dangling.");
 	}
 
 	_rootComponent = scene;
@@ -119,4 +112,44 @@ void AActor::SetRootComponent(SceneComponent* scene)
 SceneComponent* AActor::GetRootComponent() const
 {
 	return _rootComponent;
+}
+
+void AActor::SetActorLocation(const Vector3& location)
+{
+	if (_rootComponent == nullptr)
+	{
+		return;
+	}
+
+	_rootComponent->SetLocation(location);
+}
+
+Vector3 AActor::GetActorLocation() const
+{
+	if (_rootComponent == nullptr)
+	{
+		return Vector3();
+	}
+
+	return _rootComponent->GetLocation();
+}
+
+void AActor::SetActorRotation(const Quaternion& rotation)
+{
+	if (_rootComponent == nullptr)
+	{
+		return;
+	}
+
+	_rootComponent->SetRotation(rotation);
+}
+
+Quaternion AActor::GetActorRotation() const
+{
+	if (_rootComponent == nullptr)
+	{
+		return Quaternion();
+	}
+
+	return _rootComponent->GetRotation();
 }

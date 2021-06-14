@@ -104,6 +104,7 @@ public:
 	virtual void IASetVertexBuffers(uint32 startSlot, uint32 numViews, const RHIVertexBufferView* views);
 
 	virtual void IASetIndexBuffer(const RHIIndexBufferView& view);
+	virtual void SetGraphicsRootConstantBufferView(uint32 index, uint64 bufferLocation);
 
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const { return _commandList.Get(); }

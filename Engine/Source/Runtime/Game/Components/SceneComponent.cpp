@@ -94,7 +94,7 @@ bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion&
 
 void SceneComponent::AttachToComponent(SceneComponent* attachTo)
 {
-	AttachToSocket(attachTo, nullptr);
+	AttachToSocket(attachTo, L"");
 }
 
 void SceneComponent::AttachToSocket(SceneComponent* attachTo, const wstring& socketName)
@@ -120,6 +120,11 @@ void SceneComponent::AttachToSocket(SceneComponent* attachTo, const wstring& soc
 	_attachment.AttachmentRoot = attachTo;
 	_attachment.SocketName = socketName;
 
+	ForEachSceneComponents<SceneComponent>([attachTo](SceneComponent* sc)
+	{
+		sc->SetOwnerPrivate(attachTo->GetOwner());
+		return false;
+	});
 	UpdateComponentToWorld();
 }
 

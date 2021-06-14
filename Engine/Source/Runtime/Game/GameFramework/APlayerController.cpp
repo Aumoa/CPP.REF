@@ -27,7 +27,8 @@ void APlayerController::SpawnCameraManager(World* level)
 	_cameraManager = level->SpawnActor<APlayerCameraManager>();
 }
 
-MinimalViewInfo APlayerController::UpdateCameraManager(duration<float> elapsedTime) const
+void APlayerController::UpdateCameraManager(duration<float> elapsedTime)
 {
-	return _cameraManager->UpdateCamera(elapsedTime);
+	_cameraManager->CachePlayerCamera(this);
+	_cameraManager->UpdateCamera(elapsedTime);
 }

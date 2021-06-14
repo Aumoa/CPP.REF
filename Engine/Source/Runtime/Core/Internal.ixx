@@ -42,5 +42,8 @@ export
 		XMVECTOR    XM_CALLCONV     XMVectorZero();
 		XMVECTOR    XM_CALLCONV     XMVectorSet(float x, float y, float z, float w);
 		XMMATRIX    XM_CALLCONV     XMMatrixAffineTransformation(FXMVECTOR Scaling, FXMVECTOR RotationOrigin, FXMVECTOR RotationQuaternion, GXMVECTOR Translation);
+		XMMATRIX    XM_CALLCONV     XMMatrixLookToLH(FXMVECTOR Location, FXMVECTOR Direction, FXMVECTOR Up);
+		XMMATRIX    XM_CALLCONV     XMMatrixPerspectiveFovLH(float FieldOfViewY, float AspectRatio, float NearPlaneZ, float FarPlaneZ);
+		XMVECTOR    XM_CALLCONV     XMQuaternionRotationNormal(FXMVECTOR Axis, float Angle);
 	}
 }

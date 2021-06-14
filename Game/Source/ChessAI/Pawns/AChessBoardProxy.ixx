@@ -16,4 +16,6 @@ private:
 
 public:
 	AChessBoardProxy(AChessBoard* chessBoard);
+
+	void SetBoard(AChessBoard* board) { _board = board; }
 };
