@@ -34,6 +34,9 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{a1c14794-9076-4aee-8501-0f82cdb85808}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlatformMisc">
+      <UniqueIdentifier>{2d8c3a2f-56e9-4a58-b628-e301a83f8021}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameFramework\AActor.ixx">
@@ -238,6 +241,51 @@
     </ClCompile>
     <ClCompile Include="Scene\SceneRenderer.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\KeyboardState.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\Key.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\KeyboardEvent.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\KeyboardTracker.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\BitfieldInputChangeTracker.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\MouseButton.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\MouseButtonEvent.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\MousePositionMode.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\MouseState.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\MouseStateTracker.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\WinMouse.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\WindowsMinimal.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\WinMouse.cpp">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\WinKeyboard.ixx">
+      <Filter>PlatformMisc</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformMisc\WinKeyboard.cpp">
+      <Filter>PlatformMisc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

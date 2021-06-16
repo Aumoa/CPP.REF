@@ -61,3 +61,17 @@ export import :SceneRenderer;
 // Assets
 export import :StaticMesh;
 export import :StaticMeshTest;
+
+// PlatformMisc
+export import :BitfieldInputChangeTracker;
+export import :Key;
+export import :KeyboardEvent;
+export import :KeyboardState;
+export import :KeyboardTracker;
+export import :MouseButton;
+export import :MouseButtonEvent;
+export import :MousePositionMode;
+export import :MouseState;
+export import :WindowsMinimal;
+export import :WinMouse;
+export import :WinKeyboard;

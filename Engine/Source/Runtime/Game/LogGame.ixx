@@ -12,3 +12,4 @@ export LogCategory LogController(L"Controller");
 export LogCategory LogWorld(L"World");
 export LogCategory LogCamera(L"Camera");
 export LogCategory LogComponent(L"Component");
+export LogCategory LogWindows(L"Windows");

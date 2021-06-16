@@ -10,6 +10,7 @@ using enum ELogVerbosity;
 
 AController::AController() : Super()
 {
+	SetRootComponent(CreateSubobject<SceneComponent>());
 }
 
 void AController::Possess(APawn* pawn)
