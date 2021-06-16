@@ -29,7 +29,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 	constexpr Vector3 forward = Vector3(0, 0, 1);
 	Matrix4x4 viewMatrix = Matrix4x4::LookToLH(view.Location, view.Rotation.RotateVector(forward), view.Rotation.RotateVector(up));
 	constexpr Radians angle = Degrees(45.0f).ToRadians();
-	Matrix4x4 projMatrix = Matrix4x4::PerspectiveFovLH(angle, 1.0f, 0.1f, 1000.0f);
+	Matrix4x4 projMatrix = Matrix4x4::PerspectiveFovLH(angle, view.AspectRatio, 0.1f, 1000.0f);
 	Matrix4x4 vp = Matrix4x4::Multiply(viewMatrix, projMatrix);
 
 	// Push camera constants.

@@ -8,4 +8,5 @@ export struct MinimalViewInfo
 {
 	Vector3 Location;
 	Quaternion Rotation;
+	float AspectRatio = 1.0f;
 };

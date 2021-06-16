@@ -147,7 +147,9 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	APlayerCameraManager* playerCamera = world->GetPlayerCamera();
 
 	Scene* scene = _gameInstance->GetWorld()->GetScene();
-	scene->InitViews(playerCamera->GetCachedCameraView());
+	MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
+	localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
+	scene->InitViews(localPlayerView);
 
 	SceneRenderer renderer(scene, _colorShader);
 	renderer.RenderScene(_deviceContext);
