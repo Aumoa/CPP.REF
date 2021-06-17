@@ -80,11 +80,23 @@ export
 			return (ptr[(bitIndex >> 5)] & bf) != 0;
 		}
 
+		const uint32& GetPressedBitIndex(uint32 bitIndex) const
+		{
+			auto ptr = reinterpret_cast<const uint32*>(&pressed);
+			return ptr[bitIndex];
+		}
+
 		bool IsReleasedByBitIndex(uint32 bitIndex) const
 		{
 			auto ptr = reinterpret_cast<const uint32*>(&released);
 			unsigned int bf = 1u << bitIndex;
 			return (ptr[(bitIndex >> 5)] & bf) == 0;
+		}
+
+		const uint32& GetReleasedBitIndex(uint32 bitIndex) const
+		{
+			auto ptr = reinterpret_cast<const uint32*>(&released);
+			return ptr[bitIndex];
 		}
 	};
 }

@@ -9,6 +9,8 @@ using namespace std::chrono;
 
 APlayerController::APlayerController() : Super()
 {
+	_inputComponent = CreateSubobject<InputComponent>();
+	AddOwnedComponent(_inputComponent);
 }
 
 CameraComponent* APlayerController::FindPlayerCameraComponent() const

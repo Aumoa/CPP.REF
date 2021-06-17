@@ -180,4 +180,5 @@ export enum class EKey
 
     Pa1                 = 0xfd,
     OemClear            = 0xfe,
+    Max
 };

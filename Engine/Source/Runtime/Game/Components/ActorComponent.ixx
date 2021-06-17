@@ -70,6 +70,9 @@ public:
 	/// <param name="tickFunction"> Tick function what called this. </param>
 	virtual void TickComponent(duration<float> elapsedTime, ComponentTickFunction* tickFunction);
 
+	virtual void BeginPlay();
+	virtual void EndPlay();
+
 	AActor* GetOwner() const { return _owner; }
 	void SetActive(bool bActive);
 	inline bool IsActive() const { return _bActive; }

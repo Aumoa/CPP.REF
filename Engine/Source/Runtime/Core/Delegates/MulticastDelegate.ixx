@@ -37,11 +37,12 @@ export
 		/// Invoke all functions.
 		/// </summary>
 		/// <param name="...args"> The function arguments. </param>
-		void Invoke(TArgs&&... args)
+		template<class... TInvokeArgs>
+		void Invoke(TInvokeArgs&&... args)
 		{
 			for (auto it : _functions)
 			{
-				it.second(forward<TArgs>(args)...);
+				it.second(forward<TInvokeArgs>(args)...);
 			}
 		}
 

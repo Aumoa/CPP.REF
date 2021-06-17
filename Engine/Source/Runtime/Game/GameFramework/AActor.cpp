@@ -37,6 +37,18 @@ void AActor::TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunct
 void AActor::BeginPlay()
 {
 	_bHasBegunPlay = true;
+
+	for (auto& component : _components)
+	{
+		component->BeginPlay();
+	}
+
+	// Register all scene components.
+	ForEachSceneComponents<SceneComponent>([](SceneComponent* component)
+	{
+		component->BeginPlay();
+		return false;
+	});
 }
 
 void AActor::EndPlay()
@@ -75,6 +87,11 @@ void AActor::RegisterActorWithWorld(World* world)
 		component->RegisterComponentWithWorld(world);
 		return false;
 	});
+}
+
+void AActor::AddOwnedComponent(ActorComponent* component)
+{
+	_components.emplace(component);
 }
 
 set<ActorComponent*> AActor::GetOwnedComponents() const

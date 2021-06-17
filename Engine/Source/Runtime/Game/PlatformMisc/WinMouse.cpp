@@ -529,6 +529,8 @@ void WinMouse::SetVisible(bool visible)
 
 WinMouse& WinMouse::Get()
 {
+    static WinMouse sInstance;
+
     if (!Impl::s_mouse || !Impl::s_mouse->mOwner)
         LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WinMouse singleton not created");
 

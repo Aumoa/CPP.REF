@@ -108,6 +108,7 @@
     <ClCompile Include="Controller\AChessPlayerController.ixx" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Level\GameLevel.ixx" />
+    <ClCompile Include="LogChess.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

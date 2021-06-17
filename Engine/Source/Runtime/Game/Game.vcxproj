@@ -132,6 +132,8 @@
     <ClCompile Include="Components\ComponentDirtyMask.ixx" />
     <ClCompile Include="Components\ComponentMobility.ixx" />
     <ClCompile Include="Components\ComponentTransformSpace.ixx" />
+    <ClCompile Include="Components\InputComponent.cpp" />
+    <ClCompile Include="Components\InputComponent.ixx" />
     <ClCompile Include="Components\MeshComponent.cpp" />
     <ClCompile Include="Components\MeshComponent.ixx" />
     <ClCompile Include="Components\PrimitiveComponent.cpp" />

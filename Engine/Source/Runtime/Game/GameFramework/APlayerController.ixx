@@ -13,6 +13,7 @@ using namespace std::chrono;
 export class CameraComponent;
 export class APlayerCameraManager;
 export class World;
+export class InputComponent;
 
 /// <summary>
 /// Represents controller that possess to pawn, process player input, etc...
@@ -24,6 +25,7 @@ public:
 
 private:
 	APlayerCameraManager* _cameraManager = nullptr;
+	InputComponent* _inputComponent = nullptr;
 
 public:
 	/// <summary>
@@ -34,4 +36,6 @@ public:
 	CameraComponent* FindPlayerCameraComponent() const;
 	void SpawnCameraManager(World* level);
 	void UpdateCameraManager(duration<float> elapsedTime);
+
+	inline InputComponent* GetInputComponent() const { return _inputComponent; }
 };

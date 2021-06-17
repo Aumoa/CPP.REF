@@ -40,6 +40,16 @@ void ActorComponent::TickComponent(duration<float> elapsedTime, ComponentTickFun
 {
 }
 
+void ActorComponent::BeginPlay()
+{
+	_bHasBegunPlay = true;
+}
+
+void ActorComponent::EndPlay()
+{
+	_bHasBegunPlay = false;
+}
+
 void ActorComponent::SetActive(bool bActive)
 {
 	if (_bActive != bActive)

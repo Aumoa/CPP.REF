@@ -13,7 +13,6 @@ export class WinKeyboard : virtual public Object
 {
 public:
     WinKeyboard();
-    ~WinKeyboard() override;
 
     // Retrieve the current state of the keyboard
     KeyboardState GetState() const;

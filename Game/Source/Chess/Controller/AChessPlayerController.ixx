@@ -13,4 +13,7 @@ public:
 	AChessPlayerController();
 
 	virtual void BeginPlay() override;
+
+private:
+	void SetupPlayerInput(InputComponent* inputComponent);
 };

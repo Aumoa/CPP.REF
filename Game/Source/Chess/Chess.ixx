@@ -2,8 +2,11 @@
 
 export module SC.Game.Chess;
 
+import SC.Runtime.Game;
+
 export import :ChessGameInstance;
 export import :AChessGameMode;
+export import :LogChess;
 
 // Level
 export import :GameLevel;

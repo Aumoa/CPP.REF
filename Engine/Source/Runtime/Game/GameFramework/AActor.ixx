@@ -89,6 +89,7 @@ private:
 	set<ActorComponent*> _components;
 
 public:
+	void AddOwnedComponent(ActorComponent* component);
 	set<ActorComponent*> GetOwnedComponents() const;
 	template<derived_from<ActorComponent> T>
 	T* GetComponentAs() const

@@ -42,6 +42,7 @@ export import :ComponentTransformSpace;
 export import :PrimitiveComponent;
 export import :MeshComponent;
 export import :StaticMeshComponent;
+export import :InputComponent;
 
 // Camera
 export import :CameraComponent;
@@ -72,6 +73,7 @@ export import :MouseButton;
 export import :MouseButtonEvent;
 export import :MousePositionMode;
 export import :MouseState;
+export import :MouseStateTracker;
 export import :WindowsMinimal;
 export import :WinMouse;
 export import :WinKeyboard;

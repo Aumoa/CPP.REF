@@ -287,6 +287,12 @@
     <ClCompile Include="PlatformMisc\WinKeyboard.cpp">
       <Filter>PlatformMisc</Filter>
     </ClCompile>
+    <ClCompile Include="Components\InputComponent.ixx">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\InputComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">

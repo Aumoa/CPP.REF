@@ -44,6 +44,9 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	frameworkView->Size += [this](int32 width, int32 height) { ResizedApp(width, height); };
 
 	RegisterRHIGarbageCollector();
+
+	// Initialize platform input system.
+
 }
 
 void GameEngine::RegisterRHIGarbageCollector()
@@ -97,6 +100,9 @@ void GameEngine::ResizedApp(int32 width, int32 height)
 
 void GameEngine::GameTick(duration<float> elapsedTime)
 {
+	// Update input.
+	InputComponent::StaticTick(elapsedTime);
+
 	_scheduler.Tick(elapsedTime);
 	_gameInstance->Tick(elapsedTime);
 }

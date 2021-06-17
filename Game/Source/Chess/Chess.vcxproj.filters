@@ -16,6 +16,7 @@
       <Filter>Controller</Filter>
     </ClCompile>
     <ClCompile Include="AChessGameMode.ixx" />
+    <ClCompile Include="LogChess.ixx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Level">

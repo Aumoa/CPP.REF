@@ -2,7 +2,7 @@
 
 export module SC.Runtime.Game:KeyboardEvent;
 
-export enum class EKeyEvent
+export enum class EKeyboardEvent
 {
 	Pressed,
 	Released,

@@ -187,11 +187,6 @@ WinKeyboard::WinKeyboard() noexcept(false)
 {
 }
 
-// Public destructor.
-WinKeyboard::~WinKeyboard()
-{
-}
-
 
 KeyboardState WinKeyboard::GetState() const
 {
@@ -214,6 +209,8 @@ bool WinKeyboard::IsConnected() const
 
 WinKeyboard& WinKeyboard::Get()
 {
+    static WinKeyboard sInstance;
+
     if (!Impl::s_keyboard || !Impl::s_keyboard->mOwner)
         LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WinKeyboard singleton not created");
 
