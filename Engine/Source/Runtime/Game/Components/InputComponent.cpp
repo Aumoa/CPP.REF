@@ -7,9 +7,12 @@ import SC.Runtime.Game;
 using namespace std;
 using namespace std::chrono;
 
+set<InputComponent*> InputComponent::_inputComponents;
+
 MouseStateTracker InputComponent::_mouseTracker;
 KeyboardTracker InputComponent::_keyboardTracker;
-set<InputComponent*> InputComponent::_inputComponents;
+optional<int32> InputComponent::_lastMouseX;
+optional<int32> InputComponent::_lastMouseY;
 
 InputComponent::InputComponent() : Super()
 {
@@ -99,6 +102,21 @@ void InputComponent::StaticTick(duration<float> elapsedTime)
 			n <<= 1;
 		}
 	}
+
+	// Invoke mouse move event dispatcher.
+	MouseState mState = wMouse.GetState();
+	int32 dx = 0, dy = 0;
+	if (_lastMouseX.has_value())
+	{
+		dx = mState.X - *_lastMouseX;
+	}
+	if (_lastMouseY.has_value())
+	{
+		dy = mState.Y - *_lastMouseY;
+	}
+	_lastMouseX = mState.X;
+	_lastMouseY = mState.Y;
+	BroadcastMouseMoveEventForAllComponents(mState.X, mState.Y, dx, dy);
 }
 
 void InputComponent::BroadcastMouseEventForAllComponents(uint32 idx, EMouseButtonEvent buttonEvent)
@@ -114,5 +132,13 @@ void InputComponent::BroadcastKeyboardEventForAllComponents(uint32 idx, EKeyboar
 	for (auto& cp : _inputComponents)
 	{
 		cp->KeyboardEvent.Invoke((EKey)idx, keyboardEvent);
+	}
+}
+
+void InputComponent::BroadcastMouseMoveEventForAllComponents(int32 x, int32 y, int32 dx, int32 dy)
+{
+	for (auto& cp : _inputComponents)
+	{
+		cp->MouseMoveEvent.Invoke(x, y, dx, dy);
 	}
 }

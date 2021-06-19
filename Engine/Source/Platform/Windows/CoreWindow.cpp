@@ -8,8 +8,6 @@ import SC.Runtime.Game;
 
 using enum ELogVerbosity;
 
-#define CALLBACK __stdcall
-
 inline void SetupHwndParameters(HWND hWnd, LPARAM lParam)
 {
 	auto lpCreateStruct = (LPCREATESTRUCTW)lParam;
