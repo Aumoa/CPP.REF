@@ -1,8 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "ActorComponent.h"
+#include "LogGame.h"
+#include "GameFramework/Actor.h"
+#include "Level/World.h"
 
 using namespace std;
 using namespace std::chrono;

@@ -1,7 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Game;
-import std.core;
+#include "Scene.h"
+#include "PrimitiveSceneProxy.h"
+#include "SceneVisibility.h"
+#include "Components/PrimitiveComponent.h"
 
 using namespace std::chrono;
 

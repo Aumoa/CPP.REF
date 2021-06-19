@@ -1,6 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Game;
+#include "PrimitiveSceneProxy.h"
 
 PrimitiveSceneProxy::PrimitiveSceneProxy(PrimitiveComponent* inComponent) : Super()
 	, _MyComponent(inComponent)

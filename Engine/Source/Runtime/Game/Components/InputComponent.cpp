@@ -1,8 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "InputComponent.h"
+#include "PlatformMisc/WinMouse.h"
+#include "PlatformMisc/WinKeyboard.h"
 
 using namespace std;
 using namespace std::chrono;

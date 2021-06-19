@@ -91,5 +91,6 @@
     <ClInclude Include="RHI\RHIVertexFactory.h">
       <Filter>RHI</Filter>
     </ClInclude>
+    <ClInclude Include="RenderMinimal.h" />
   </ItemGroup>
 </Project>

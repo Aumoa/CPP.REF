@@ -8,11 +8,10 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
+#include "WinKeyboard.h"
 #include <Windows.h>
-
-import std.core;
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "GameStructures.h"
+#include "LogGame.h"
 
 static_assert(sizeof(KeyboardState) == (256 / 8), "Size mismatch for State");
 
@@ -119,7 +118,7 @@ public:
 WinKeyboard::Impl* WinKeyboard::Impl::s_keyboard = nullptr;
 
 
-void WinKeyboard::ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam)
+void WinKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 {
     auto pImpl = Impl::s_keyboard;
 

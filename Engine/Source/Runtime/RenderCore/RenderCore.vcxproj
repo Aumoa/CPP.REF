@@ -111,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="ComPtr.h" />
     <ClInclude Include="IWindowView.h" />
+    <ClInclude Include="RenderMinimal.h" />
     <ClInclude Include="RHI\LogRHI.h" />
     <ClInclude Include="RHI\RHICommandQueue.h" />
     <ClInclude Include="RHI\RHIDevice.h" />

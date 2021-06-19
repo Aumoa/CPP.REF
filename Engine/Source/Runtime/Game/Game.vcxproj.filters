@@ -10,9 +10,6 @@
     <Filter Include="Level">
       <UniqueIdentifier>{44098b13-d317-4e17-af8d-c7defdc0a3cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Concepts">
-      <UniqueIdentifier>{1478f489-bcfc-428f-ac8f-83a064c07380}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Info">
       <UniqueIdentifier>{ce7d5638-8368-4678-9ff8-14925a3ccaf9}</UniqueIdentifier>
     </Filter>
@@ -39,178 +36,71 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameFramework\AActor.ixx">
-      <Filter>GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.ixx" />
-    <ClCompile Include="Game.ixx" />
-    <ClCompile Include="GameInstance.ixx" />
-    <ClCompile Include="IFrameworkView.ixx" />
     <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GameFramework\AController.ixx">
+    <ClCompile Include="GameFramework\Actor.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\AActor.cpp">
+    <ClCompile Include="GameFramework\Controller.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\AController.cpp">
+    <ClCompile Include="GameFramework\PlayerController.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\APlayerController.ixx">
+    <ClCompile Include="GameFramework\AIController.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\APlayerController.cpp">
+    <ClCompile Include="GameFramework\Pawn.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\AAIController.ixx">
-      <Filter>GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="GameFramework\AAIController.cpp">
-      <Filter>GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="GameFramework\APawn.ixx">
-      <Filter>GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="GameFramework\APawn.cpp">
-      <Filter>GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.ixx" />
-    <ClCompile Include="GameEngine.ixx" />
     <ClCompile Include="GameEngine.cpp" />
-    <ClCompile Include="LogGame.ixx" />
-    <ClCompile Include="Ticking\TickingGroup.ixx">
-      <Filter>Ticking</Filter>
-    </ClCompile>
-    <ClCompile Include="Ticking\TickFunction.ixx">
-      <Filter>Ticking</Filter>
-    </ClCompile>
     <ClCompile Include="Ticking\TickFunction.cpp">
       <Filter>Ticking</Filter>
-    </ClCompile>
-    <ClCompile Include="Level\Level.ixx">
-      <Filter>Level</Filter>
     </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Level</Filter>
     </ClCompile>
-    <ClCompile Include="Level\World.ixx">
-      <Filter>Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Concepts\GameConcepts.ixx">
-      <Filter>Concepts</Filter>
-    </ClCompile>
     <ClCompile Include="Level\World.cpp">
       <Filter>Level</Filter>
     </ClCompile>
-    <ClCompile Include="SubclassOf.ixx" />
-    <ClCompile Include="Info\AInfo.ixx">
+    <ClCompile Include="Info\Info.cpp">
       <Filter>Info</Filter>
     </ClCompile>
-    <ClCompile Include="Info\AInfo.cpp">
+    <ClCompile Include="Info\GameMode.cpp">
       <Filter>Info</Filter>
-    </ClCompile>
-    <ClCompile Include="Info\AGameMode.ixx">
-      <Filter>Info</Filter>
-    </ClCompile>
-    <ClCompile Include="Info\AGameMode.cpp">
-      <Filter>Info</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\ActorComponent.ixx">
-      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Components\ActorComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\SceneComponent.ixx">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Components\SceneComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="Components\ComponentMobility.ixx">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\ComponentDirtyMask.ixx">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\ComponentTransformSpace.ixx">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Shaders\Shaders.ixx">
-      <Filter>Shaders</Filter>
-    </ClCompile>
     <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
       <Filter>Shaders\ColorShader</Filter>
-    </ClCompile>
-    <ClCompile Include="Shaders\ColorShader\ColorShader.ixx">
-      <Filter>Shaders\ColorShader</Filter>
-    </ClCompile>
-    <ClCompile Include="Ticking\TickScheduler.ixx">
-      <Filter>Ticking</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\CameraComponent.ixx">
-      <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="Camera\CameraComponent.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\MinimalViewInfo.ixx">
+    <ClCompile Include="Camera\PlayerCameraManager.cpp">
       <Filter>Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\APlayerCameraManager.ixx">
-      <Filter>Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera\APlayerCameraManager.cpp">
-      <Filter>Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Scene.ixx">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Scene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\SceneVisibility.ixx">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Scene\SceneVisibility.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\PrimitiveSceneProxy.ixx">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\MeshBatch.ixx">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\MeshBatchElement.ixx">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.ixx">
-      <Filter>Shaders\ColorShader</Filter>
-    </ClCompile>
     <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp">
       <Filter>Shaders\ColorShader</Filter>
     </ClCompile>
-    <ClCompile Include="Components\MeshComponent.ixx">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="Components\MeshComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\PrimitiveComponent.ixx">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Components\PrimitiveComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="Components\StaticMeshComponent.ixx">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="Components\StaticMeshComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\StaticMeshSceneProxy.ixx">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Scene\StaticMeshSceneProxy.cpp">
       <Filter>Scene</Filter>
@@ -218,17 +108,8 @@
     <ClCompile Include="Scene\PrimitiveSceneProxy.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\StaticMesh.ixx">
-      <Filter>Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\StaticMeshRenderData.ixx">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\StaticMeshRenderData.cpp">
       <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\StaticMeshTest.ixx">
-      <Filter>Assets</Filter>
     </ClCompile>
     <ClCompile Include="Assets\StaticMeshTest.cpp">
       <Filter>Assets</Filter>
@@ -236,63 +117,19 @@
     <ClCompile Include="Assets\StaticMesh.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneRenderer.ixx">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\SceneRenderer.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="PlatformMisc\KeyboardState.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\Key.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\KeyboardEvent.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\KeyboardTracker.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\BitfieldInputChangeTracker.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\MouseButton.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\MouseButtonEvent.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\MousePositionMode.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\MouseState.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\MouseStateTracker.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\WinMouse.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\WindowsMinimal.ixx">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
     <ClCompile Include="PlatformMisc\WinMouse.cpp">
-      <Filter>PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformMisc\WinKeyboard.ixx">
       <Filter>PlatformMisc</Filter>
     </ClCompile>
     <ClCompile Include="PlatformMisc\WinKeyboard.cpp">
       <Filter>PlatformMisc</Filter>
     </ClCompile>
-    <ClCompile Include="Components\InputComponent.ixx">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="Components\InputComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="LogGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
@@ -301,5 +138,121 @@
     <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
       <Filter>Shaders\ColorShader</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GameMinimal.h" />
+    <ClInclude Include="Ticking\TickScheduler.h">
+      <Filter>Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="GameInstance.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="SubclassOf.h" />
+    <ClInclude Include="IFrameworkView.h" />
+    <ClInclude Include="LogGame.h" />
+    <ClInclude Include="Assets\StaticMesh.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\StaticMeshTest.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\Actor.h">
+      <Filter>GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Ticking\TickingGroup.h">
+      <Filter>Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="Ticking\TickFunction.h">
+      <Filter>Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\Pawn.h">
+      <Filter>GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\Controller.h">
+      <Filter>GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\AIController.h">
+      <Filter>GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\PlayerController.h">
+      <Filter>GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\PlayerCameraManager.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CameraComponent.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\ActorComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEnums.h" />
+    <ClInclude Include="Components\InputComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h">
+      <Filter>PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformMisc\KeyboardTracker.h">
+      <Filter>PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformMisc\MouseStateTracker.h">
+      <Filter>PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformMisc\WinKeyboard.h">
+      <Filter>PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformMisc\WinMouse.h">
+      <Filter>PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\MeshComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\PrimitiveComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\SceneComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\StaticMeshComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Info\Info.h">
+      <Filter>Info</Filter>
+    </ClInclude>
+    <ClInclude Include="Info\GameMode.h">
+      <Filter>Info</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\World.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Level.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStructures.h" />
+    <ClInclude Include="Scene\PrimitiveSceneProxy.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneRenderer.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneVisibility.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\StaticMeshRenderData.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\StaticMeshSceneProxy.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\ColorShader\ColorShader.h">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\ColorShader\ColorVertexFactory.h">
+      <Filter>Shaders\ColorShader</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

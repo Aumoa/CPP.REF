@@ -8,12 +8,13 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
+#include "WinMouse.h"
 #include <Windows.h>
 #include <assert.h>
-
-import std.core;
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "GameEnums.h"
+#include "GameStructures.h"
+#include "LogGame.h"
+#include "IFrameworkView.h"
 
 struct handle_closer { void operator()(HANDLE h) noexcept { if (h) CloseHandle(h); } };
 using ScopedHandle = std::unique_ptr<void, handle_closer>;
@@ -233,7 +234,7 @@ private:
 
     bool            mInFocus;
 
-    friend void WinMouse::ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
+    friend void WinMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
 
     void ClipToWindow() noexcept
     {
@@ -273,7 +274,7 @@ void WinMouse::SetWindow(IFrameworkView* window)
 }
 
 
-void WinMouse::ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam)
+void WinMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 {
     auto pImpl = Impl::s_mouse;
 

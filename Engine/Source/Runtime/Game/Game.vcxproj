@@ -63,6 +63,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,6 +92,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -119,100 +121,42 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assets\StaticMesh.cpp" />
-    <ClCompile Include="Assets\StaticMesh.ixx" />
     <ClCompile Include="Assets\StaticMeshTest.cpp" />
-    <ClCompile Include="Assets\StaticMeshTest.ixx" />
-    <ClCompile Include="Camera\APlayerCameraManager.cpp" />
-    <ClCompile Include="Camera\APlayerCameraManager.ixx" />
+    <ClCompile Include="Camera\PlayerCameraManager.cpp" />
     <ClCompile Include="Camera\CameraComponent.cpp" />
-    <ClCompile Include="Camera\CameraComponent.ixx" />
-    <ClCompile Include="Camera\MinimalViewInfo.ixx" />
     <ClCompile Include="Components\ActorComponent.cpp" />
-    <ClCompile Include="Components\ActorComponent.ixx" />
-    <ClCompile Include="Components\ComponentDirtyMask.ixx" />
-    <ClCompile Include="Components\ComponentMobility.ixx" />
-    <ClCompile Include="Components\ComponentTransformSpace.ixx" />
     <ClCompile Include="Components\InputComponent.cpp" />
-    <ClCompile Include="Components\InputComponent.ixx" />
     <ClCompile Include="Components\MeshComponent.cpp" />
-    <ClCompile Include="Components\MeshComponent.ixx" />
     <ClCompile Include="Components\PrimitiveComponent.cpp" />
-    <ClCompile Include="Components\PrimitiveComponent.ixx" />
     <ClCompile Include="Components\SceneComponent.cpp" />
-    <ClCompile Include="Components\SceneComponent.ixx" />
     <ClCompile Include="Components\StaticMeshComponent.cpp" />
-    <ClCompile Include="Components\StaticMeshComponent.ixx" />
-    <ClCompile Include="Concepts\GameConcepts.ixx" />
-    <ClCompile Include="Game.ixx" />
     <ClCompile Include="GameEngine.cpp" />
-    <ClCompile Include="GameEngine.ixx" />
-    <ClCompile Include="GameFramework\AActor.cpp" />
-    <ClCompile Include="GameFramework\AActor.ixx" />
-    <ClCompile Include="GameFramework\AAIController.cpp" />
-    <ClCompile Include="GameFramework\AAIController.ixx" />
-    <ClCompile Include="GameFramework\AController.cpp" />
-    <ClCompile Include="GameFramework\AController.ixx" />
-    <ClCompile Include="GameFramework\APawn.cpp" />
-    <ClCompile Include="GameFramework\APawn.ixx" />
-    <ClCompile Include="GameFramework\APlayerController.cpp" />
-    <ClCompile Include="GameFramework\APlayerController.ixx" />
+    <ClCompile Include="GameFramework\Actor.cpp" />
+    <ClCompile Include="GameFramework\AIController.cpp" />
+    <ClCompile Include="GameFramework\Controller.cpp" />
+    <ClCompile Include="GameFramework\Pawn.cpp" />
+    <ClCompile Include="GameFramework\PlayerController.cpp" />
     <ClCompile Include="GameInstance.cpp" />
-    <ClCompile Include="GameInstance.ixx" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GameObject.ixx" />
-    <ClCompile Include="IFrameworkView.ixx" />
-    <ClCompile Include="Info\AGameMode.cpp" />
-    <ClCompile Include="Info\AGameMode.ixx" />
-    <ClCompile Include="Info\AInfo.cpp" />
-    <ClCompile Include="Info\AInfo.ixx" />
+    <ClCompile Include="Info\GameMode.cpp" />
+    <ClCompile Include="Info\Info.cpp" />
     <ClCompile Include="Level\Level.cpp" />
-    <ClCompile Include="Level\Level.ixx" />
     <ClCompile Include="Level\World.cpp" />
-    <ClCompile Include="Level\World.ixx" />
-    <ClCompile Include="LogGame.ixx" />
-    <ClCompile Include="PlatformMisc\BitfieldInputChangeTracker.ixx" />
-    <ClCompile Include="PlatformMisc\Key.ixx" />
-    <ClCompile Include="PlatformMisc\KeyboardEvent.ixx" />
-    <ClCompile Include="PlatformMisc\KeyboardState.ixx" />
-    <ClCompile Include="PlatformMisc\KeyboardTracker.ixx" />
-    <ClCompile Include="PlatformMisc\MouseButton.ixx" />
-    <ClCompile Include="PlatformMisc\MouseButtonEvent.ixx" />
-    <ClCompile Include="PlatformMisc\MousePositionMode.ixx" />
-    <ClCompile Include="PlatformMisc\MouseState.ixx" />
-    <ClCompile Include="PlatformMisc\MouseStateTracker.ixx" />
-    <ClCompile Include="PlatformMisc\WindowsMinimal.ixx" />
+    <ClCompile Include="LogGame.cpp" />
     <ClCompile Include="PlatformMisc\WinKeyboard.cpp" />
-    <ClCompile Include="PlatformMisc\WinKeyboard.ixx" />
     <ClCompile Include="PlatformMisc\WinMouse.cpp" />
-    <ClCompile Include="PlatformMisc\WinMouse.ixx" />
-    <ClCompile Include="Scene\MeshBatch.ixx" />
-    <ClCompile Include="Scene\MeshBatchElement.ixx" />
     <ClCompile Include="Scene\PrimitiveSceneProxy.cpp" />
-    <ClCompile Include="Scene\PrimitiveSceneProxy.ixx" />
     <ClCompile Include="Scene\Scene.cpp" />
-    <ClCompile Include="Scene\Scene.ixx" />
     <ClCompile Include="Scene\SceneRenderer.cpp" />
-    <ClCompile Include="Scene\SceneRenderer.ixx" />
     <ClCompile Include="Scene\SceneVisibility.cpp" />
-    <ClCompile Include="Scene\SceneVisibility.ixx" />
     <ClCompile Include="Scene\StaticMeshRenderData.cpp" />
-    <ClCompile Include="Scene\StaticMeshRenderData.ixx" />
     <ClCompile Include="Scene\StaticMeshSceneProxy.cpp" />
-    <ClCompile Include="Scene\StaticMeshSceneProxy.ixx" />
     <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Shaders\ColorShader\ColorShader.ixx" />
     <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp" />
-    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.ixx" />
-    <ClCompile Include="Shaders\Shaders.ixx" />
-    <ClCompile Include="SubclassOf.ixx" />
     <ClCompile Include="Ticking\TickFunction.cpp" />
-    <ClCompile Include="Ticking\TickFunction.ixx" />
-    <ClCompile Include="Ticking\TickingGroup.ixx" />
-    <ClCompile Include="Ticking\TickScheduler.ixx" />
-    <ClCompile Include="Transform.ixx" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
@@ -223,6 +167,52 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Assets\StaticMesh.h" />
+    <ClInclude Include="Assets\StaticMeshTest.h" />
+    <ClInclude Include="Camera\CameraComponent.h" />
+    <ClInclude Include="Camera\PlayerCameraManager.h" />
+    <ClInclude Include="Components\ActorComponent.h" />
+    <ClInclude Include="Components\InputComponent.h" />
+    <ClInclude Include="Components\MeshComponent.h" />
+    <ClInclude Include="Components\PrimitiveComponent.h" />
+    <ClInclude Include="Components\SceneComponent.h" />
+    <ClInclude Include="Components\StaticMeshComponent.h" />
+    <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GameEnums.h" />
+    <ClInclude Include="GameFramework\Actor.h" />
+    <ClInclude Include="GameFramework\AIController.h" />
+    <ClInclude Include="GameFramework\Controller.h" />
+    <ClInclude Include="GameFramework\Pawn.h" />
+    <ClInclude Include="GameFramework\PlayerController.h" />
+    <ClInclude Include="GameInstance.h" />
+    <ClInclude Include="GameMinimal.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameStructures.h" />
+    <ClInclude Include="IFrameworkView.h" />
+    <ClInclude Include="Info\GameMode.h" />
+    <ClInclude Include="Info\Info.h" />
+    <ClInclude Include="Level\Level.h" />
+    <ClInclude Include="Level\World.h" />
+    <ClInclude Include="LogGame.h" />
+    <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h" />
+    <ClInclude Include="PlatformMisc\KeyboardTracker.h" />
+    <ClInclude Include="PlatformMisc\MouseStateTracker.h" />
+    <ClInclude Include="PlatformMisc\WinKeyboard.h" />
+    <ClInclude Include="PlatformMisc\WinMouse.h" />
+    <ClInclude Include="Scene\PrimitiveSceneProxy.h" />
+    <ClInclude Include="Scene\Scene.h" />
+    <ClInclude Include="Scene\SceneRenderer.h" />
+    <ClInclude Include="Scene\SceneVisibility.h" />
+    <ClInclude Include="Scene\StaticMeshRenderData.h" />
+    <ClInclude Include="Scene\StaticMeshSceneProxy.h" />
+    <ClInclude Include="Shaders\ColorShader\ColorShader.h" />
+    <ClInclude Include="Shaders\ColorShader\ColorVertexFactory.h" />
+    <ClInclude Include="SubclassOf.h" />
+    <ClInclude Include="Ticking\TickFunction.h" />
+    <ClInclude Include="Ticking\TickingGroup.h" />
+    <ClInclude Include="Ticking\TickScheduler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

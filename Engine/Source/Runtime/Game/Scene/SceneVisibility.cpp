@@ -1,9 +1,13 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import SC.Runtime.Core;
-import SC.Runtime.Game;
-import SC.Runtime.RenderCore;
+#include "SceneVisibility.h"
+#include "GameStructures.h"
+#include "Scene.h"
+#include "PrimitiveSceneProxy.h"
+#include "RHI/RHIResource.h"
+#include "RHI/RHIShader.h"
+#include "RHI/RHIDeviceContext.h"
+#include "RHI/RHIDevice.h"
 
 using namespace std;
 using namespace std::chrono;

@@ -1,8 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore;
-import SC.Runtime.Game;
+#include "StaticMeshRenderData.h"
+#include "GameStructures.h"
+#include "RHI/RHIVertexFactory.h"
+#include "RHI/RHIResource.h"
 
 StaticMeshRenderData::StaticMeshRenderData(RHIVertexFactory* vfactory) : Super()
 {

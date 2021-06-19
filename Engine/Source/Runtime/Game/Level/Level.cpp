@@ -1,7 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "Level.h"
+#include "LogGame.h"
+#include "World.h"
+#include "GameFramework/PlayerController.h"
+#include "Info/GameMode.h"
 
 using enum ELogVerbosity;
 

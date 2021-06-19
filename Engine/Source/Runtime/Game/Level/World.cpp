@@ -1,8 +1,13 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Core;
-import SC.Runtime.Game;
-import std.core;
+#include "World.h"
+#include "GameEngine.h"
+#include "Level.h"
+#include "Components/PrimitiveComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "Scene/Scene.h"
+#include "Scene/PrimitiveSceneProxy.h"
+#include "Camera/PlayerCameraManager.h"
 
 using enum ELogVerbosity;
 
