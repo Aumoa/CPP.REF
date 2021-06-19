@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include "Vector.h"
+#include <optional>
+
 /// <summary>
 /// Represents ray.
 /// </summary>
@@ -21,7 +24,7 @@ struct Ray
 	/// <summary>
 	/// The distance. Represents infinity if it is nullopt.
 	/// </summary>
-	optional<float> Distance = 0;
+	std::optional<float> Distance = 0;
 
 	/// <summary>
 	/// Initialize new <see cref="Ray"/> instance.
@@ -36,7 +39,7 @@ struct Ray
 	/// <param name="origin"> The origin location. </param>
 	/// <param name="direction"> The vector direction. </param>
 	/// <param name="distance"> The distance. </param>
-	constexpr Ray(const Vector<N>& origin, const Vector<N>& direction, optional<float> distance = nullopt)
+	constexpr Ray(const Vector<N>& origin, const Vector<N>& direction, std::optional<float> distance = std::nullopt)
 		: Origin(origin)
 		, Direction(direction)
 		, Distance(distance)
@@ -69,8 +72,8 @@ struct Ray
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	wstring ToString(wstring_view formatArgs = L"") const
+	std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		return format(L"Origin: {}, Direction: {}", Origin.ToString(formatArgs), Direction.ToString(formatArgs));
+		return std::format(L"Origin: {}, Direction: {}", Origin.ToString(formatArgs), Direction.ToString(formatArgs));
 	}
 };

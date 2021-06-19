@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <string>
+#include <string_view>
+#include <format>
+
 /// <summary>
 /// Represents a plane that defined as normal and distance.
 /// </summary>
@@ -50,10 +54,10 @@ struct Plane
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	wstring ToString(wstring_view formatArgs = L"") const
+	std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
-		return format(L"Normal: {}, Distance: {}", Normal.ToString(formatArgs), format(placeholder, Distance));
+		std::wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
+		return std::format(L"Normal: {}, Distance: {}", Normal.ToString(formatArgs), std::format(placeholder, Distance));
 	}
 
 	/// <summary>

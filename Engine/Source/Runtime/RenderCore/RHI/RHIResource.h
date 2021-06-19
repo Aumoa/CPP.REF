@@ -1,15 +1,17 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIResource;
+#pragma once
 
-import SC.Runtime.Core;
-import :RHIDeviceChild;
-import :ComPtr;
+#include "CoreMinimal.h"
+#include "RHIDeviceChild.h"
+#include "ComPtr.h"
+
+struct ID3D12Resource;
 
 /// <summary>
 /// Represents render resources.
 /// </summary>
-export class RHIResource : public RHIDeviceChild
+class RHIResource : public RHIDeviceChild
 {
 public:
 	using Super = RHIDeviceChild;

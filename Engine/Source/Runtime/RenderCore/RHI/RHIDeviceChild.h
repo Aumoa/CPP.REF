@@ -1,15 +1,15 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIDeviceChild;
+#pragma once
 
-import SC.Runtime.Core;
+#include "CoreMinimal.h"
 
-export class RHIDevice;
+class RHIDevice;
 
 /// <summary>
 /// Represents classes created by logical device.
 /// </summary>
-export class RHIDeviceChild : virtual public Object
+class RHIDeviceChild : virtual public Object
 {
 public:
 	using Super = Object;
@@ -22,14 +22,14 @@ public:
 	/// Initialize new <see cref="RHIDeviceChild"/> instance.
 	/// </summary>
 	/// <param name="device"> The logical device. </param>
-	RHIDeviceChild(RHIDevice* device) : _device(device)
+	inline RHIDeviceChild(RHIDevice* device) : _device(device)
 	{
 	}
 
 	/// <summary>
 	/// Get logical device that create this instance.
 	/// </summary>
-	RHIDevice* GetDevice() const
+	inline RHIDevice* GetDevice() const
 	{
 		return _device;
 	}

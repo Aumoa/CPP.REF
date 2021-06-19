@@ -1,9 +1,13 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Internal.h"
-
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore;
+#include "RHISwapChain.h"
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include "LogRHI.h"
+#include "IWindowView.h"
+#include "RHIDevice.h"
+#include "RHICommandQueue.h"
+#include "RHITexture2D.h"
 
 RHISwapChain::RHISwapChain(RHIDevice* device, IWindowView* view, RHICommandQueue* queue) : Super(device)
 {

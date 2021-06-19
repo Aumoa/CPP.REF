@@ -1,23 +1,22 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIShader;
+#pragma once
 
-import :RHIDeviceChild;
-import :ComPtr;
-import SC.Runtime.RenderCore.Internal;
-import std.core;
-import :RHIStructures;
+#include "CoreMinimal.h"
+#include "RHIDeviceChild.h"
+#include <vector>
+#include <span>
+#include "ComPtr.h"
+#include "RHIStructures.h"
 
-export class RHIDevice;
-export class RHIResource;
-export class RHIVertexFactory;
-
-using namespace std;
+struct ID3D12RootSignature;
+struct ID3D12PipelineState;
+class RHIVertexFactory;
 
 /// <summary>
 /// Represents shader implements.
 /// </summary>
-export class RHIShader : public RHIDeviceChild
+class RHIShader : public RHIDeviceChild
 {
 public:
 	using Super = RHIDeviceChild;
@@ -39,18 +38,18 @@ public:
 	/// <summary>
 	/// Provide shader parameter declaration of this shader program.
 	/// </summary>
-	virtual vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const { return {}; }
+	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const { return {}; }
 
 protected:
 	/// <summary>
 	/// Compile vertex shader bytecode.
 	/// </summary>
-	virtual span<uint8 const> CompileVS() = 0;
+	virtual std::span<uint8 const> CompileVS() = 0;
 
 	/// <summary>
 	/// Compile pixel shader bytecode.
 	/// </summary>
-	virtual span<uint8 const> CompilePS() = 0;
+	virtual std::span<uint8 const> CompilePS() = 0;
 
 public /*internal*/:
 	ID3D12RootSignature* GetRootSignature() const { return _rs.Get(); }

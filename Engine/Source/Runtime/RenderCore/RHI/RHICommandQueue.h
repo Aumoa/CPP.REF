@@ -1,23 +1,25 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHICommandQueue;
+#pragma once
 
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore.Internal;
-import :ComPtr;
-import :RHIEnums;
-import :RHIDeviceChild;
-import std.core;
+#include "CoreMinimal.h"
+#include "RHIDeviceChild.h"
+#include <atomic>
+#include <queue>
+#include <span>
+#include "ComPtr.h"
+#include "RHIEnums.h"
+#include "Threading/EventHandle.h"
 
-export class RHIDevice;
-export class RHIDeviceContext;
-
-using namespace std;
+struct IUnknown;
+struct ID3D12CommandQueue;
+struct ID3D12Fence;
+class RHIDeviceContext;
 
 /// <summary>
 /// Provides methods for submitting command lists that written by device context, synchronizing device context execution.
 /// </summary>
-export class RHICommandQueue : public RHIDeviceChild
+class RHICommandQueue : public RHIDeviceChild
 {
 public:
 	using Super = RHIDeviceChild;
@@ -37,9 +39,9 @@ private:
 private:
 	ComPtr<ID3D12CommandQueue> _queue;
 	ComPtr<ID3D12Fence> _fence;
-	atomic<uint64> _signalNumber = 0;
+	std::atomic<uint64> _signalNumber = 0;
 	EventHandle* _fenceEvent = nullptr;
-	queue<GarbageItem> _gcobjects;
+	std::queue<GarbageItem> _gcobjects;
 
 public:
 	/// <summary>
@@ -73,13 +75,13 @@ public:
 	uint64 ExecuteDeviceContext(RHIDeviceContext* deviceContext)
 	{
 		RHIDeviceContext* deviceContextsSpan[] = { deviceContext };
-		return ExecuteDeviceContexts(span(deviceContextsSpan));
+		return ExecuteDeviceContexts(std::span(deviceContextsSpan));
 	}
 
 	/// <summary>
 	/// Execute multiple device contexts.
 	/// </summary>
-	uint64 ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts);
+	uint64 ExecuteDeviceContexts(std::span<RHIDeviceContext*> deviceContexts);
 
 	/// <summary>
 	/// Execute multiple device contexts.

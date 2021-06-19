@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <string>
+#include <string_view>
+#include <format>
+
 /// <summary>
 /// Represents aligned of standard basis box geometry.
 /// </summary>
@@ -59,9 +63,9 @@ struct AxisAlignedCube
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	wstring ToString(wstring_view formatArgs = L"") const
+	std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		return format(L"Min: {}, Max: {}", Min.ToString(formatArgs), Max.ToString(formatArgs));
+		return std::format(L"Min: {}, Max: {}", Min.ToString(formatArgs), Max.ToString(formatArgs));
 	}
 
 	/// <summary>

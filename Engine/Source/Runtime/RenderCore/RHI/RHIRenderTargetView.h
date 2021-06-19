@@ -1,17 +1,19 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIRenderTargetView;
+#pragma once
 
-import :RHIView;
-import SC.Runtime.RenderCore.Internal;
-import :ComPtr;
+#include "CoreMinimal.h"
+#include "RHIView.h"
+#include "ComPtr.h"
 
-export class RHITexture2D;
+struct ID3D12DescriptorHeap;
+struct D3D12_CPU_DESCRIPTOR_HANDLE;
+class RHITexture2D;
 
 /// <summary>
 /// Represents render target view for binding to gpu output.
 /// </summary>
-export class RHIRenderTargetView : public RHIView
+class RHIRenderTargetView : public RHIView
 {
 public:
 	using Super = RHIView;

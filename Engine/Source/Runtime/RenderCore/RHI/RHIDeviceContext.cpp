@@ -1,10 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Internal.h"
-
-import std.core;
-import SC.Runtime.RenderCore;
-import SC.Runtime.Core;
+#include "RHIDeviceContext.h"
+#include <d3d12.h>
+#include "LogRHI.h"
+#include "RHIDevice.h"
+#include "RHIShader.h"
+#include "RHIRenderTargetView.h"
+#include "RHIResource.h"
 
 using namespace std;
 
@@ -13,10 +15,6 @@ RHIDeviceContext::RHIDeviceContext(RHIDevice* device, ERHICommandType commandTyp
 {
 	ID3D12Device* d3ddev = device->GetDevice();
 	HR(LogRHI, d3ddev->CreateCommandAllocator((D3D12_COMMAND_LIST_TYPE)commandType, IID_PPV_ARGS(&_allocator)));
-}
-
-RHIDeviceContext::~RHIDeviceContext()
-{
 }
 
 void RHIDeviceContext::Begin()
@@ -129,6 +127,11 @@ void RHIDeviceContext::IASetIndexBuffer(const RHIIndexBufferView& view)
 void RHIDeviceContext::SetGraphicsRootConstantBufferView(uint32 index, uint64 bufferLocation)
 {
 	_commandList->SetGraphicsRootConstantBufferView(index, bufferLocation);
+}
+
+ID3D12CommandList* RHIDeviceContext::GetCommandList() const
+{
+	return _commandList.Get();
 }
 
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)

@@ -1,19 +1,18 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIStructures;
+#pragma once
 
-import SC.Runtime.Core;
-import :RHIEnums;
-import std.core;
+#include "CoreMinimal.h"
+#include "RHIEnums.h"
 
-export class RHIResource;
+class RHIResource;
 
 #pragma pack(push, 4)
 
 /// <summary>
 /// Represent viewport area.
 /// </summary>
-export struct RHIViewport
+struct RHIViewport
 {
 	float TopLeftX = 0;
 	float TopLeftY = 0;
@@ -26,7 +25,7 @@ export struct RHIViewport
 /// <summary>
 /// Represent viewport scissor rect.
 /// </summary>
-export struct RHIScissorRect
+struct RHIScissorRect
 {
 	int32 Left = 0;
 	int32 Top = 0;
@@ -37,7 +36,7 @@ export struct RHIScissorRect
 /// <summary>
 /// Represent transition resource state information.
 /// </summary>
-export struct RHITransitionBarrier
+struct RHITransitionBarrier
 {
 	RHIResource* Resource = nullptr;
 	ERHIResourceStates StateBefore = ERHIResourceStates::Common;
@@ -48,7 +47,7 @@ export struct RHITransitionBarrier
 /// <summary>
 /// Represents vertex element using input layout.
 /// </summary>
-export struct RHIVertexElement
+struct RHIVertexElement
 {
 	/// <summary>
 	/// The semantic name.
@@ -84,7 +83,7 @@ export struct RHIVertexElement
 /// <summary>
 /// The full-spec vertex declaration.
 /// </summary>
-export struct RHIVertex
+struct RHIVertex
 {
 	/// <summary>
 	/// The position.
@@ -105,14 +104,14 @@ export struct RHIVertex
 /// <summary>
 /// Represents vertex buffer view.
 /// </summary>
-export struct RHIVertexBufferView
+struct RHIVertexBufferView
 {
 	uint64 BufferLocation = 0;
 	uint32 SizeInBytes = 0;
 	uint32 StrideInBytes = 0;
 };
 
-export struct RHIIndexBufferView
+struct RHIIndexBufferView
 {
 	uint64 BufferLocation = 0;
 	uint32 SizeInBytes = 0;
@@ -122,7 +121,7 @@ export struct RHIIndexBufferView
 /// <summary>
 /// Describe parameter collection shader parameter.
 /// </summary>
-export struct RHIParameterCollectionDeclaration
+struct RHIParameterCollectionDeclaration
 {
 	uint32 ShaderRegister;
 	uint32 RegisterSpace;
@@ -131,7 +130,7 @@ export struct RHIParameterCollectionDeclaration
 /// <summary>
 /// Represents shader parameter element.
 /// </summary>
-export struct RHIShaderParameterElement
+struct RHIShaderParameterElement
 {
 	ERHIShaderParameterType Type = ERHIShaderParameterType::ParameterCollection;
 	union
@@ -140,7 +139,7 @@ export struct RHIShaderParameterElement
 	};
 };
 
-export struct RHIViewConstants
+struct RHIViewConstants
 {
 	Matrix4x4 World;
 	Matrix4x4 WorldViewProj;

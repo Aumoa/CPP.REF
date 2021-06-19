@@ -1,10 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Internal.h"
-
-import SC.Runtime.RenderCore;
-import SC.Runtime.Core;
-import std.core;
+#include "RHICommandQueue.h"
+#include <d3d12.h>
+#include "LogRHI.h"
+#include "RHIDevice.h"
+#include "RHIDeviceContext.h"
 
 using namespace std;
 

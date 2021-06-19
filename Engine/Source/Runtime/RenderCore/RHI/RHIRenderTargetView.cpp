@@ -1,9 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Internal.h"
-
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore;
+#include "RHIRenderTargetView.h"
+#include <d3d12.h>
+#include "LogRHI.h"
+#include "RHIDevice.h"
+#include "RHITexture2D.h"
 
 RHIRenderTargetView::RHIRenderTargetView(RHIDevice* device, uint32 descriptorCount) : Super(device)
 	, _descriptorCount(descriptorCount)

@@ -1,9 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Internal.h"
-
-import SC.Runtime.RenderCore;
-import SC.Runtime.Core;
+#include "RHITexture2D.h"
+#include <d3d12.h>
 
 RHITexture2D::RHITexture2D(RHIDevice* device, ID3D12Resource* resource) : Super(device, resource)
 {

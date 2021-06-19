@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Vector.h"
+
 /// <summary>
 /// Represents sphere geometry that contains center and radius.
 /// </summary>
@@ -59,9 +61,9 @@ struct Sphere
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	wstring ToString(wstring_view formatArgs = L"") const
+	std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
-		return format(L"Center: {}, Radius: {}", Center.ToString(formatArgs), format(placeholder, Radius));
+		std::wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
+		return std::format(L"Center: {}, Radius: {}", Center.ToString(formatArgs), std::format(placeholder, Radius));
 	}
 };

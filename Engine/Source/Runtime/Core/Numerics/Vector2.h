@@ -39,7 +39,7 @@ struct Vector2 : public Vector<2>
 	/// Initialize new <see cref="Vector2"/> instance.
 	/// </summary>
 	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Vector2(initializer_list<float> initializer)
+	inline constexpr Vector2(std::initializer_list<float> initializer)
 	{
 		for (size_t i = 0; i < MathEx::Min(initializer.size(), Num()); ++i)
 		{

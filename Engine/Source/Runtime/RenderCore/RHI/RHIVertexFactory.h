@@ -1,15 +1,15 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIVertexFactory;
+#pragma once
 
-import std.core;
-import SC.Runtime.Core;
-import :RHIDeviceChild;
-import :RHIStructures;
+#include "CoreMinimal.h"
+#include "RHIDeviceChild.h"
+#include <vector>
+#include "RHIStructures.h"
 
-using namespace std;
+class RHIResource;
 
-export class RHIVertexFactory : public RHIDeviceChild
+class RHIVertexFactory : public RHIDeviceChild
 {
 public:
 	using Super = RHIDeviceChild;
@@ -35,5 +35,5 @@ public:
 	/// <summary>
 	/// Provide vertex declaration of this shader program.
 	/// </summary>
-	virtual vector<RHIVertexElement> GetVertexDeclaration() const { return {}; }
+	virtual std::vector<RHIVertexElement> GetVertexDeclaration() const { return {}; }
 };

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Vector3.h"
+
 /// <summary>
 /// Represents object oriented cube.
 /// </summary>
@@ -60,8 +62,8 @@ struct ObjectOrientedCube
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	wstring ToString(wstring_view formatArgs = L"") const
+	std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		return format(L"Center: {}, Extent: {}, Rotation{}", Center.ToString(formatArgs), Extent.ToString(formatArgs), Rotation.ToString(formatArgs));
+		return std::format(L"Center: {}, Extent: {}, Rotation{}", Center.ToString(formatArgs), Extent.ToString(formatArgs), Rotation.ToString(formatArgs));
 	}
 };

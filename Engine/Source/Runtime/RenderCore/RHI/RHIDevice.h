@@ -1,22 +1,20 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIDevice;
+#pragma once
 
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore.Internal;
-import :LogRHI;
-import :ComPtr;
-import :RHIEnums;
+#include "CoreMinimal.h"
+#include "ComPtr.h"
+#include "RHIEnums.h"
 
-using enum ELogVerbosity;
-
-export class RHIResource;
-export class RHICommandQueue;
+struct IDXGIFactory2;
+struct ID3D12Device;
+class RHICommandQueue;
+class RHIResource;
 
 /// <summary>
 /// Provide interface for control all render devices.
 /// </summary>
-export class RHIDevice : virtual public Object
+class RHIDevice : virtual public Object
 {
 public:
 	using Super = Object;
@@ -50,7 +48,7 @@ public:
 	/// </summary>
 	RHIResource* CreateDynamicBuffer(size_t length);
 
-public /*internal*/ :
+public /*internal*/:
 	IDXGIFactory2* GetFactory() const { return _factory.Get(); }
 	ID3D12Device* GetDevice() const { return _device.Get(); }
 

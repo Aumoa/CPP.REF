@@ -1,13 +1,14 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHITexture2D;
+#pragma once
 
-import :RHITexture;
+#include "CoreMinimal.h"
+#include "RHITexture.h"
 
 /// <summary>
 /// Represents 2D textures.
 /// </summary>
-export class RHITexture2D : public RHITexture
+class RHITexture2D : public RHITexture
 {
 public:
 	using Super = RHITexture;

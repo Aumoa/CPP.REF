@@ -60,11 +60,8 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>Internal.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\Engine\Source\Runtime\Core\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -81,11 +78,8 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>Internal.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\Engine\Source\Runtime\Core\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -96,70 +90,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ComPtr.ixx" />
-    <ClCompile Include="Internal.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="IWindowView.ixx" />
-    <ClCompile Include="RenderCore.ixx" />
-    <ClCompile Include="RHI\Internal.ixx" />
-    <ClCompile Include="RHI\LogRHI.ixx" />
-    <ClCompile Include="RHI\RHICommandQueue.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHICommandQueue.ixx" />
-    <ClCompile Include="RHI\RHIDevice.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIDevice.ixx" />
-    <ClCompile Include="RHI\RHIDeviceChild.ixx" />
-    <ClCompile Include="RHI\RHIDeviceContext.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIDeviceContext.ixx" />
-    <ClCompile Include="RHI\RHIEnums.ixx" />
-    <ClCompile Include="RHI\RHIRenderTargetView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIRenderTargetView.ixx" />
-    <ClCompile Include="RHI\RHIResource.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIResource.ixx" />
-    <ClCompile Include="RHI\RHIShader.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIShader.ixx" />
-    <ClCompile Include="RHI\RHIStructures.ixx" />
+    <ClCompile Include="RHI\LogRHI.cpp" />
+    <ClCompile Include="RHI\RHICommandQueue.cpp" />
+    <ClCompile Include="RHI\RHIDevice.cpp" />
+    <ClCompile Include="RHI\RHIDeviceContext.cpp" />
+    <ClCompile Include="RHI\RHIRenderTargetView.cpp" />
+    <ClCompile Include="RHI\RHIResource.cpp" />
+    <ClCompile Include="RHI\RHIShader.cpp" />
     <ClCompile Include="RHI\RHIVertexFactory.cpp" />
-    <ClCompile Include="RHI\RHIVertexFactory.ixx" />
-    <ClCompile Include="RHI\RHIView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIView.ixx" />
-    <ClCompile Include="RHI\RHISwapChain.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHISwapChain.ixx" />
-    <ClCompile Include="RHI\RHITexture.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHITexture.ixx" />
-    <ClCompile Include="RHI\RHITexture2D.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="RHI\RHITexture2D.ixx" />
+    <ClCompile Include="RHI\RHIView.cpp" />
+    <ClCompile Include="RHI\RHISwapChain.cpp" />
+    <ClCompile Include="RHI\RHITexture.cpp" />
+    <ClCompile Include="RHI\RHITexture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
@@ -167,7 +109,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Internal.h" />
+    <ClInclude Include="ComPtr.h" />
+    <ClInclude Include="IWindowView.h" />
+    <ClInclude Include="RHI\LogRHI.h" />
+    <ClInclude Include="RHI\RHICommandQueue.h" />
+    <ClInclude Include="RHI\RHIDevice.h" />
+    <ClInclude Include="RHI\RHIDeviceChild.h" />
+    <ClInclude Include="RHI\RHIDeviceContext.h" />
+    <ClInclude Include="RHI\RHIEnums.h" />
+    <ClInclude Include="RHI\RHIRenderTargetView.h" />
+    <ClInclude Include="RHI\RHIResource.h" />
+    <ClInclude Include="RHI\RHIShader.h" />
+    <ClInclude Include="RHI\RHIStructures.h" />
+    <ClInclude Include="RHI\RHISwapChain.h" />
+    <ClInclude Include="RHI\RHITexture.h" />
+    <ClInclude Include="RHI\RHITexture2D.h" />
+    <ClInclude Include="RHI\RHIVertexFactory.h" />
+    <ClInclude Include="RHI\RHIView.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

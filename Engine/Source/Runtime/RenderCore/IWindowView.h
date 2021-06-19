@@ -1,10 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:IWindowView;
+#pragma once
 
-import SC.Runtime.Core;
+#include "CoreMinimal.h"
 
-export struct IWindowView : virtual public Object
+struct IWindowView : virtual public Object
 {
 	/// <summary>
 	/// Get window handle that platform specialized.

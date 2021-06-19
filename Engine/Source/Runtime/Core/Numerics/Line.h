@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Vector.h"
+
 /// <summary>
 /// Represents line that contains start point and end point.
 /// </summary>
@@ -63,9 +65,9 @@ struct Line
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The simple string value. </returns>
-	inline wstring ToString(wstring_view formatArgs = L"") const
+	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		return format(L"Start: {}, End: {}", Start.ToString(formatArgs), End.ToString(formatArgs));
+		return std::format(L"Start: {}, End: {}", Start.ToString(formatArgs), End.ToString(formatArgs));
 	}
 
 	/// <summary>

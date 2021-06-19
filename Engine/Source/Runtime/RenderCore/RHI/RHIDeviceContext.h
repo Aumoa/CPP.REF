@@ -1,20 +1,23 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHIDeviceContext;
+#pragma once
 
-import :RHIDeviceChild;
-import :RHIEnums;
-import :ComPtr;
-import :RHIStructures;
+#include "CoreMinimal.h"
+#include "RHIDeviceChild.h"
+#include "ComPtr.h"
+#include "RHIEnums.h"
+#include "RHIStructures.h"
 
-export class RHIDevice;
-export class RHIShader;
-export class RHIRenderTargetView;
+struct ID3D12CommandAllocator;
+struct ID3D12GraphicsCommandList;
+struct ID3D12CommandList;
+class RHIShader;
+class RHIRenderTargetView;
 
 /// <summary>
 /// Represents a device context which generates rendering commands.
 /// </summary>
-export class RHIDeviceContext : public RHIDeviceChild
+class RHIDeviceContext : public RHIDeviceChild
 {
 public:
 	using Super = RHIDeviceChild;
@@ -31,7 +34,6 @@ public:
 	/// <param name="device"> The logical device. </param>
 	/// <param name="commandType"> Specify command type for usage. </param>
 	RHIDeviceContext(RHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
-	~RHIDeviceContext();
 
 	/// <summary>
 	/// Mark the beginning of a series of commands.
@@ -107,7 +109,7 @@ public:
 	virtual void SetGraphicsRootConstantBufferView(uint32 index, uint64 bufferLocation);
 
 public /*internal*/:
-	ID3D12CommandList* GetCommandList() const { return _commandList.Get(); }
+	ID3D12CommandList* GetCommandList() const;
 
 protected:
 	/// <summary>

@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore;
+#include "RHIVertexFactory.h"
+#include "RHIDevice.h"
 
 RHIVertexFactory::RHIVertexFactory(RHIDevice* device) : Super(device)
 {

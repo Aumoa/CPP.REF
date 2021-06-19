@@ -1,21 +1,20 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHISwapChain;
+#pragma once
 
-import SC.Runtime.Core;
-import SC.Runtime.RenderCore.Internal;
-import :ComPtr;
-import :RHIDeviceChild;
+#include "CoreMinimal.h"
+#include "RHIDeviceChild.h"
+#include "ComPtr.h"
 
-export struct IWindowView;
-export class RHIDevice;
-export class RHICommandQueue;
-export class RHITexture2D;
+struct IDXGISwapChain4;
+struct IWindowView;
+class RHITexture2D;
+class RHICommandQueue;
 
 /// <summary>
 /// Represents interface implements one or more surfaces for storing rendered data before presenting it to an output.
 /// </summary>
-export class RHISwapChain : virtual public RHIDeviceChild
+class RHISwapChain : virtual public RHIDeviceChild
 {
 public:
 	using Super = RHIDeviceChild;

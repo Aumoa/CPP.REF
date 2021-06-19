@@ -1,87 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="RenderCore.ixx" />
-    <ClCompile Include="RHI\RHIDevice.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\LogRHI.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHIDevice.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHISwapChain.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="IWindowView.ixx" />
     <ClCompile Include="RHI\RHISwapChain.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\Internal.ixx" />
-    <ClCompile Include="ComPtr.ixx" />
-    <ClCompile Include="Internal.cpp" />
-    <ClCompile Include="RHI\RHICommandQueue.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="RHI\RHICommandQueue.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIDeviceChild.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHIDeviceContext.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIShader.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="RHI\RHIShader.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIDeviceContext.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIEnums.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIResource.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHIResource.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\RHITexture2D.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="RHI\RHITexture.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHITexture.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHITexture2D.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIView.ixx">
       <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="RHI\RHIView.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIRenderTargetView.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHIRenderTargetView.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIStructures.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\RHIVertexFactory.ixx">
-      <Filter>RHI</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\RHIVertexFactory.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\LogRHI.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -91,6 +44,52 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Internal.h" />
+    <ClInclude Include="ComPtr.h" />
+    <ClInclude Include="IWindowView.h" />
+    <ClInclude Include="RHI\LogRHI.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHICommandQueue.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIDeviceChild.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIEnums.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIDevice.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIDeviceContext.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIStructures.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIView.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIRenderTargetView.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIResource.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIShader.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHISwapChain.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHITexture.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHITexture2D.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\RHIVertexFactory.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

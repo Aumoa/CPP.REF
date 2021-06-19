@@ -1,13 +1,14 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Runtime.RenderCore:RHITexture;
+#pragma once
 
-import :RHIResource;
+#include "CoreMinimal.h"
+#include "RHIResource.h"
 
 /// <summary>
 /// Provide functions that control texture resources.
 /// </summary>
-export class RHITexture : public RHIResource
+class RHITexture : public RHIResource
 {
 public:
 	using Super = RHIResource;

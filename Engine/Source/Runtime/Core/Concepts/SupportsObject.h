@@ -8,7 +8,6 @@
 /// <summary>
 /// Supports native object that provide object's functions.
 /// </summary>
-export
 template<class T>
 concept SupportsObject = requires(T instance)
 {
