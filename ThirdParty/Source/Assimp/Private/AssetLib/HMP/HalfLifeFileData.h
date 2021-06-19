@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MDLFILEHELPER2_H_INC
 #define AI_MDLFILEHELPER2_H_INC
 
-#include <assimp/Compiler/pushpack1.h>
+#include "Compiler/pushpack1.h"
 
 namespace Assimp    {
 namespace MDL   {
@@ -141,7 +141,7 @@ struct Header_HL2 {
     int32_t         transitionindex;
 } /* PACK_STRUCT */;
 
-#include <assimp/Compiler/poppack1.h>
+#include "Compiler/poppack1.h"
 
 }
 } // end namespaces

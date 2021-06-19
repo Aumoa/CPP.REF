@@ -44,9 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "M3DWrapper.h"
 
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/IOStreamBuffer.h>
-#include <assimp/ai_assert.h>
+#include "DefaultIOSystem.h"
+#include "IOStreamBuffer.h"
+#include "ai_assert.h"
 
 #ifdef ASSIMP_USE_M3D_READFILECB
 

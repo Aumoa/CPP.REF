@@ -39,11 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-#include <assimp/StringUtils.h>
+#include "StringUtils.h"
 #include <iomanip>
 
 // Header files, Assimp
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 #ifdef ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC
 // Header files, Open3DGC.

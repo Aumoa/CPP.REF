@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PretransformVertices.h"
 #include "ConvertToLHProcess.h"
 #include "ProcessHelper.h"
-#include <assimp/Exceptional.h>
-#include <assimp/SceneCombiner.h>
+#include "Exceptional.h"
+#include "SceneCombiner.h"
 
 using namespace Assimp;
 

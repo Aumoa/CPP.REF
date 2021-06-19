@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MDL_HALFLIFE_LOGFUNCTIONS_INCLUDED
 #define AI_MDL_HALFLIFE_LOGFUNCTIONS_INCLUDED
 
-#include <assimp/Logger.hpp>
+#include "Logger.hpp"
 #include <string>
 
 namespace Assimp {

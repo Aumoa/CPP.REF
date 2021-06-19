@@ -49,9 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 #include "XFileHelper.h"
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
-#include <assimp/types.h>
+#include "types.h"
 
 struct aiNode;
 

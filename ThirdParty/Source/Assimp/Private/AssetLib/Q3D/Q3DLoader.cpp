@@ -47,12 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // internal headers
 #include "Q3DLoader.h"
-#include <assimp/StreamReader.h>
-#include <assimp/fast_atof.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
+#include "StreamReader.h"
+#include "fast_atof.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
 
 using namespace Assimp;
 

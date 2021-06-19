@@ -53,12 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXProperties.h"
 #include "FBXImporter.h"
 
-#include <assimp/anim.h>
-#include <assimp/material.h>
-#include <assimp/light.h>
-#include <assimp/texture.h>
-#include <assimp/camera.h>
-#include <assimp/StringComparison.h>
+#include "anim.h"
+#include "material.h"
+#include "light.h"
+#include "texture.h"
+#include "camera.h"
+#include "StringComparison.h"
 #include <unordered_map>
 #include <unordered_set>
 

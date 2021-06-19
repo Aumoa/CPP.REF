@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EmbedTexturesProcess.h"
-#include <assimp/ParsingUtils.h>
+#include "ParsingUtils.h"
 #include "ProcessHelper.h"
 
 #include <fstream>

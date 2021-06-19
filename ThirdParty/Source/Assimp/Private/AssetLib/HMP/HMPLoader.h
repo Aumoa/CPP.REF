@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_HMPLOADER_H_INCLUDED
 
 // internal headers
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
 #include "AssetLib/MDL/MDLLoader.h"
 #include "AssetLib/HMP/HMPFileData.h"

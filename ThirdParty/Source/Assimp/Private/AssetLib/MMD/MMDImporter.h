@@ -40,9 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MMD_FILE_IMPORTER_H_INC
 #define MMD_FILE_IMPORTER_H_INC
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include "MMDPmxParser.h"
-#include <assimp/material.h>
+#include "material.h"
 #include <vector>
 
 struct aiMesh;

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXUtil.h"
 #include "FBXTokenizer.h"
 
-#include <assimp/TinyFormatter.h>
+#include "TinyFormatter.h"
 #include <string>
 #include <cstring>
 

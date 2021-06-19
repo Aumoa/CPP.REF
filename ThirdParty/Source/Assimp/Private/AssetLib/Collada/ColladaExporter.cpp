@@ -45,19 +45,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ColladaExporter.h"
 
-#include <assimp/Bitmap.h>
-#include <assimp/ColladaMetaData.h>
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/Exceptional.h>
-#include <assimp/MathFunctions.h>
-#include <assimp/SceneCombiner.h>
-#include <assimp/StringUtils.h>
-#include <assimp/XMLTools.h>
-#include <assimp/commonMetaData.h>
-#include <assimp/fast_atof.h>
-#include <assimp/scene.h>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOSystem.hpp>
+#include "Bitmap.h"
+#include "ColladaMetaData.h"
+#include "DefaultIOSystem.h"
+#include "Exceptional.h"
+#include "MathFunctions.h"
+#include "SceneCombiner.h"
+#include "StringUtils.h"
+#include "XMLTools.h"
+#include "commonMetaData.h"
+#include "fast_atof.h"
+#include "scene.h"
+#include "Exporter.hpp"
+#include "IOSystem.hpp"
 
 #include <ctime>
 #include <memory>

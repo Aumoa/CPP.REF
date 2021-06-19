@@ -46,22 +46,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Q3BSPFileData.h"
 #include "Q3BSPFileParser.h"
 
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 #ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #include <zlib.h>
 #else
-#include "zlib.h"
+#include "zlib/zlib.h"
 #endif
 
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/StringComparison.h>
-#include <assimp/ZipArchiveIOSystem.h>
-#include <assimp/ai_assert.h>
-#include <assimp/importerdesc.h>
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
-#include <assimp/types.h>
+#include "DefaultIOSystem.h"
+#include "StringComparison.h"
+#include "ZipArchiveIOSystem.h"
+#include "ai_assert.h"
+#include "importerdesc.h"
+#include "mesh.h"
+#include "scene.h"
+#include "types.h"
 #include <sstream>
 #include <vector>
 

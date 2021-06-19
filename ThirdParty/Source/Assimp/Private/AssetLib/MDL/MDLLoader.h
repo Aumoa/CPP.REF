@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MDLLOADER_H_INCLUDED
 #define AI_MDLLOADER_H_INCLUDED
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include "MDLFileData.h"
 #include "AssetLib/HMP/HalfLifeFileData.h"
 #include "AssetLib/MDL/HalfLife/HL1ImportSettings.h"

@@ -45,15 +45,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_ASEFILEHELPER_H_INC
 
 // public ASSIMP headers
-#include <assimp/anim.h>
-#include <assimp/mesh.h>
-#include <assimp/types.h>
+#include "anim.h"
+#include "mesh.h"
+#include "types.h"
 
 #ifndef ASSIMP_BUILD_NO_3DS_IMPORTER
 
 // for some helper routines like IsSpace()
-#include <assimp/ParsingUtils.h>
-#include <assimp/qnan.h>
+#include "ParsingUtils.h"
+#include "qnan.h"
 
 // ASE is quite similar to 3ds. We can reuse some structures
 #include "AssetLib/3DS/3DSLoader.h"

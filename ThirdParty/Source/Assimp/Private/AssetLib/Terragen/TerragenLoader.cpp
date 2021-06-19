@@ -44,12 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_TERRAGEN_IMPORTER
 
 #include "TerragenLoader.h"
-#include <assimp/StreamReader.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "StreamReader.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 
 using namespace Assimp;
 

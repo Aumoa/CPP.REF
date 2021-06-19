@@ -49,8 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HalfLifeMDLBaseHeader.h"
 
-#include <assimp/Compiler/pushpack1.h>
-#include <assimp/types.h>
+#include "Compiler/pushpack1.h"
+#include "types.h"
 
 namespace Assimp {
 namespace MDL {
@@ -534,7 +534,7 @@ struct Trivert {
     short s, t;
 } PACK_STRUCT;
 
-#include <assimp/Compiler/poppack1.h>
+#include "Compiler/poppack1.h"
 
 #if (!defined AI_MDL_HL1_VERSION)
 #define AI_MDL_HL1_VERSION 10

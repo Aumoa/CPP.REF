@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_PLYFILEHELPER_H_INC
 #define AI_PLYFILEHELPER_H_INC
 
-#include <assimp/ParsingUtils.h>
-#include <assimp/IOStreamBuffer.h>
+#include "ParsingUtils.h"
+#include "IOStreamBuffer.h"
 #include <vector>
 
 namespace Assimp

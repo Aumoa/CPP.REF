@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <sstream>
 
-#include <assimp/types.h>
-#include <assimp/mesh.h>
-#include <assimp/anim.h>
+#include "types.h"
+#include "mesh.h"
+#include "anim.h"
 
 #if defined(_MSC_VER) ||  defined(__BORLANDC__) ||  defined (__BCPLUSPLUS__)
 #   pragma pack(push,1)

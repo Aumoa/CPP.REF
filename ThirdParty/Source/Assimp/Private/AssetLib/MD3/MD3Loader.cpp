@@ -55,15 +55,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/MD3/MD3Loader.h"
 #include "Common/Importer.h"
 
-#include <assimp/GenericProperty.h>
-#include <assimp/ParsingUtils.h>
-#include <assimp/RemoveComments.h>
-#include <assimp/SceneCombiner.h>
-#include <assimp/importerdesc.h>
-#include <assimp/material.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
+#include "GenericProperty.h"
+#include "ParsingUtils.h"
+#include "RemoveComments.h"
+#include "SceneCombiner.h"
+#include "importerdesc.h"
+#include "material.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
 
 #include <cctype>
 #include <memory>

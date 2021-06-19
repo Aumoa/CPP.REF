@@ -41,10 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef OBJ_FILEPARSER_H_INC
 #define OBJ_FILEPARSER_H_INC
 
-#include <assimp/IOStreamBuffer.h>
-#include <assimp/mesh.h>
-#include <assimp/vector2.h>
-#include <assimp/vector3.h>
+#include "IOStreamBuffer.h"
+#include "mesh.h"
+#include "vector2.h"
+#include "vector3.h"
 #include <map>
 #include <memory>
 #include <string>

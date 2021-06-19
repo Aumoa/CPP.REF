@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Common/BaseProcess.h"
 
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
+#include "mesh.h"
+#include "scene.h"
 
 #include <vector>
 #include <utility>

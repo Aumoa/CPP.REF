@@ -47,15 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/assbin_chunks.h"
 #include "PostProcessing/ProcessHelper.h"
 
-#include <assimp/Exceptional.h>
-#include <assimp/version.h>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOStream.hpp>
+#include "Exceptional.h"
+#include "version.h"
+#include "Exporter.hpp"
+#include "IOStream.hpp"
 
 #ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #include <zlib.h>
 #else
-#include "zlib.h"
+#include "zlib/zlib.h"
 #endif
 
 #include <time.h>

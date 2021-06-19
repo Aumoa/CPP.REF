@@ -48,12 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HL1MeshTrivert.h"
 #include "UniqueNameGenerator.h"
 
-#include <assimp/BaseImporter.h>
-#include <assimp/StringUtils.h>
-#include <assimp/ai_assert.h>
-#include <assimp/qnan.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Importer.hpp>
+#include "BaseImporter.h"
+#include "StringUtils.h"
+#include "ai_assert.h"
+#include "qnan.h"
+#include "DefaultLogger.hpp"
+#include "Importer.hpp"
 
 #include <iomanip>
 #include <sstream>

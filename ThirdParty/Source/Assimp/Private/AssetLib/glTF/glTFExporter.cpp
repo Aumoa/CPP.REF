@@ -46,16 +46,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/glTF/glTFAssetWriter.h"
 #include "PostProcessing/SplitLargeMeshes.h"
 
-#include <assimp/commonMetaData.h>
-#include <assimp/Exceptional.h>
-#include <assimp/StringComparison.h>
-#include <assimp/ByteSwapper.h>
-#include <assimp/SceneCombiner.h>
-#include <assimp/version.h>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Exporter.hpp>
-#include <assimp/material.h>
-#include <assimp/scene.h>
+#include "commonMetaData.h"
+#include "Exceptional.h"
+#include "StringComparison.h"
+#include "ByteSwapper.h"
+#include "SceneCombiner.h"
+#include "version.h"
+#include "IOSystem.hpp"
+#include "Exporter.hpp"
+#include "material.h"
+#include "scene.h"
 
 // Header files, standard library.
 #include <memory>

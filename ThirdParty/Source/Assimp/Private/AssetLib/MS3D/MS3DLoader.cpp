@@ -51,11 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // internal headers
 #include "MS3DLoader.h"
-#include <assimp/StreamReader.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/scene.h>
-#include <assimp/IOSystem.hpp>
-#include <assimp/importerdesc.h>
+#include "StreamReader.h"
+#include "DefaultLogger.hpp"
+#include "scene.h"
+#include "IOSystem.hpp"
+#include "importerdesc.h"
 #include <map>
 
 using namespace Assimp;

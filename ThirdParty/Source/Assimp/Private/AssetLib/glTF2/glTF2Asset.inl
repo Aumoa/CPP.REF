@@ -42,8 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AssetLib/glTF/glTFCommon.h"
 
-#include <assimp/StringUtils.h>
-#include <assimp/DefaultLogger.hpp>
+#include "StringUtils.h"
+#include "DefaultLogger.hpp"
 
 using namespace Assimp;
 

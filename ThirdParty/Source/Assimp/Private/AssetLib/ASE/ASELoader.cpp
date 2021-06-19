@@ -52,19 +52,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // internal headers
 #include "ASELoader.h"
 #include "Common/TargetAnimation.h"
-#include <assimp/SkeletonMeshBuilder.h>
-#include <assimp/StringComparison.h>
+#include "SkeletonMeshBuilder.h"
+#include "StringComparison.h"
 
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 
 #include <memory>
 
 // utilities
-#include <assimp/fast_atof.h>
+#include "fast_atof.h"
 
 using namespace Assimp;
 using namespace Assimp::ASE;

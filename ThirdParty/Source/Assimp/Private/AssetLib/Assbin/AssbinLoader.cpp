@@ -50,18 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // internal headers
 #include "AssetLib/Assbin/AssbinLoader.h"
 #include "Common/assbin_chunks.h"
-#include <assimp/MemoryIOWrapper.h>
-#include <assimp/anim.h>
-#include <assimp/importerdesc.h>
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
+#include "MemoryIOWrapper.h"
+#include "anim.h"
+#include "importerdesc.h"
+#include "mesh.h"
+#include "scene.h"
 #include <memory>
-
-#ifdef ASSIMP_BUILD_NO_OWN_ZLIB
-#include <zlib.h>
-#else
-#include "zlib.h"
-#endif
+#include "zlib/zlib.h"
 
 using namespace Assimp;
 

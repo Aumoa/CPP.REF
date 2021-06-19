@@ -54,15 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 
-#include <assimp/Exceptional.h> // DeadlyExportError
-#include <assimp/StreamWriter.h> // StreamWriterLE
-#include <assimp/material.h> // aiTextureType
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
-#include <assimp/version.h> // aiGetVersion
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOSystem.hpp>
+#include "Exceptional.h" // DeadlyExportError
+#include "StreamWriter.h" // StreamWriterLE
+#include "material.h" // aiTextureType
+#include "mesh.h"
+#include "scene.h"
+#include "version.h" // aiGetVersion
+#include "DefaultLogger.hpp"
+#include "Exporter.hpp"
+#include "IOSystem.hpp"
 
 #include "M3DExporter.h"
 #include "M3DMaterials.h"

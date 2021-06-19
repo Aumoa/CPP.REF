@@ -45,13 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FileSystemFilter.h"
 #include "Importer.h"
-#include <assimp/BaseImporter.h>
-#include <assimp/ByteSwapper.h>
-#include <assimp/ParsingUtils.h>
-#include <assimp/importerdesc.h>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-#include <assimp/Importer.hpp>
+#include "BaseImporter.h"
+#include "ByteSwapper.h"
+#include "ParsingUtils.h"
+#include "importerdesc.h"
+#include "postprocess.h"
+#include "scene.h"
+#include "Importer.hpp"
 
 #include <cctype>
 #include <ios>
@@ -344,7 +344,7 @@ std::string BaseImporter::GetExtension(const std::string &file) {
 #ifdef ASSIMP_USE_HUNTER
 #include <utf8.h>
 #else
-#include "source/utf8.h"
+#include "utf8/utf8.h"
 #endif
 
 // ------------------------------------------------------------------------------------------------

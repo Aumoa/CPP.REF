@@ -40,13 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /** @file Default implementation of IOSystem using the standard C file functions */
 
-#include <assimp/StringComparison.h>
+#include "StringComparison.h"
 
-#include <assimp/DefaultIOStream.h>
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/ai_assert.h>
+#include "DefaultIOStream.h"
+#include "DefaultIOSystem.h"
+#include "ai_assert.h"
 #include <stdlib.h>
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 #ifdef __unix__
 #    include <stdlib.h>

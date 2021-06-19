@@ -44,11 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ObjFileMtlImporter.h"
 #include "ObjFileData.h"
 #include "ObjTools.h"
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
-#include <assimp/material.h>
+#include "ParsingUtils.h"
+#include "fast_atof.h"
+#include "material.h"
 #include <stdlib.h>
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 namespace Assimp {
 

@@ -47,10 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/MMD/MMDVmdParser.h"
 #include "PostProcessing/ConvertToLHProcess.h"
 
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/ai_assert.h>
-#include <assimp/scene.h>
-#include <assimp/Importer.hpp>
+#include "DefaultIOSystem.h"
+#include "ai_assert.h"
+#include "scene.h"
+#include "Importer.hpp"
 
 #include <fstream>
 #include <iomanip>

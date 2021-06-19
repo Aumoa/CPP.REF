@@ -47,10 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Used for file formats which embed their textures into the model file.
  */
 
-#include <assimp/Bitmap.h>
-#include <assimp/ByteSwapper.h>
-#include <assimp/texture.h>
-#include <assimp/IOStream.hpp>
+#include "Bitmap.h"
+#include "ByteSwapper.h"
+#include "texture.h"
+#include "IOStream.hpp"
 
 namespace Assimp {
 

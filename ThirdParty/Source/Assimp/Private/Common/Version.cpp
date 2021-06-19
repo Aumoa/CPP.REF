@@ -43,10 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Actually just a dummy, used by the compiler to build the pre-compiled header.
 
 #include "ScenePrivate.h"
-#include <assimp/scene.h>
-#include <assimp/version.h>
+#include "scene.h"
+#include "version.h"
 
-#include "assimp/revision.h"
+#include "revision.h"
 
 // --------------------------------------------------------------------------------
 // Legal information string - don't remove this.

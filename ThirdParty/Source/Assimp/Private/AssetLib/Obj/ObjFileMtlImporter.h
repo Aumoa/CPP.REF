@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef OBJFILEMTLIMPORTER_H_INC
 #define OBJFILEMTLIMPORTER_H_INC
 
-#include <assimp/defs.h>
+#include "defs.h"
 #include <string>
 #include <vector>
 

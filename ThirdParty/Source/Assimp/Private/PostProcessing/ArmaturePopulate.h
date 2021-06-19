@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ARMATURE_POPULATE_H_
 
 #include "Common/BaseProcess.h"
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include <vector>
 #include <map>
 

@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_COLLADAEXPORTER_H_INC
 #define AI_COLLADAEXPORTER_H_INC
 
-#include <assimp/ai_assert.h>
-#include <assimp/material.h>
+#include "ai_assert.h"
+#include "material.h"
 
 #include <array>
 #include <map>

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_CONVERTTOLHPROCESS_H_INC
 #define AI_CONVERTTOLHPROCESS_H_INC
 
-#include <assimp/types.h>
+#include "types.h"
 
 #include "Common/BaseProcess.h"
 

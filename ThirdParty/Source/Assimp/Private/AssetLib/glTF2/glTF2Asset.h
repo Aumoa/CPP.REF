@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined(ASSIMP_BUILD_NO_GLTF_IMPORTER) && !defined(ASSIMP_BUILD_NO_GLTF2_IMPORTER)
 
-#include <assimp/Exceptional.h>
+#include "Exceptional.h"
 
 #include <algorithm>
 #include <list>
@@ -76,8 +76,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifdef ASSIMP_API
-#include <assimp/ByteSwapper.h>
-#include <assimp/DefaultIOSystem.h>
+#include "ByteSwapper.h"
+#include "DefaultIOSystem.h"
 #include <memory>
 #else
 #include <memory>
@@ -104,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #endif
 
-#include <assimp/StringUtils.h>
+#include "StringUtils.h"
 
 #include "AssetLib/glTF/glTFCommon.h"
 
@@ -130,10 +130,10 @@ using glTFCommon::vec4;
 
 //! Magic number for GLB files
 #define AI_GLB_MAGIC_NUMBER "glTF"
-#include <assimp/pbrmaterial.h>
+#include "pbrmaterial.h"
 
 #ifdef ASSIMP_API
-#include <assimp/Compiler/pushpack1.h>
+#include "Compiler/pushpack1.h"
 #endif
 
 //! For binary .glb files
@@ -150,7 +150,7 @@ struct GLB_Chunk {
 } PACK_STRUCT;
 
 #ifdef ASSIMP_API
-#include <assimp/Compiler/poppack1.h>
+#include "Compiler/poppack1.h"
 #endif
 
 //! Values for the GLB_Chunk::chunkType field

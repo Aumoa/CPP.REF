@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FBXExportProperty.h"
 
-#include <assimp/StreamWriter.h> // StreamWriterLE
+#include "StreamWriter.h" // StreamWriterLE
 
 #include <string>
 #include <vector>

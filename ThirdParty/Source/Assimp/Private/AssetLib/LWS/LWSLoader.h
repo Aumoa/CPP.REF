@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AssetLib/LWO/LWOFileData.h"
 
-#include <assimp/BaseImporter.h>
-#include <assimp/SceneCombiner.h>
+#include "BaseImporter.h"
+#include "SceneCombiner.h"
 
 struct aiImporterDesc;
 

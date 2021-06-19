@@ -49,8 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <memory>
 
-#include <assimp/StreamWriter.h>
-#include <assimp/material.h>
+#include "StreamWriter.h"
+#include "material.h"
 
 struct aiScene;
 struct aiNode;

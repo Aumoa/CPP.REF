@@ -48,15 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/COB/COBScene.h"
 #include "PostProcessing/ConvertToLHProcess.h"
 
-#include <assimp/LineSplitter.h>
-#include <assimp/ParsingUtils.h>
-#include <assimp/StreamReader.h>
-#include <assimp/TinyFormatter.h>
-#include <assimp/fast_atof.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
+#include "LineSplitter.h"
+#include "ParsingUtils.h"
+#include "StreamReader.h"
+#include "TinyFormatter.h"
+#include "fast_atof.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
 
 #include <memory>
 

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_DXFLOADER_H_INCLUDED
 #define AI_DXFLOADER_H_INCLUDED
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include <map>
 
 namespace Assimp    {

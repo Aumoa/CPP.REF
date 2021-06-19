@@ -48,14 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_SMDLOADER_H_INCLUDED
 
 // internal headers
-#include <assimp/BaseImporter.h>
-#include <assimp/ParsingUtils.h>
+#include "BaseImporter.h"
+#include "ParsingUtils.h"
 
 // public Assimp headers
-#include <assimp/types.h>
-#include <assimp/texture.h>
-#include <assimp/anim.h>
-#include <assimp/material.h>
+#include "types.h"
+#include "texture.h"
+#include "anim.h"
+#include "material.h"
 
 struct aiNode;
 

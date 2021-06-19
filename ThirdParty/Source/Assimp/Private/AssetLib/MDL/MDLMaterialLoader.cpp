@@ -46,13 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // internal headers
 #include "MDLDefaultColorMap.h"
 #include "MDLLoader.h"
-#include <assimp/Defines.h>
-#include <assimp/StringUtils.h>
-#include <assimp/qnan.h>
-#include <assimp/scene.h>
-#include <assimp/texture.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
+#include "Defines.h"
+#include "StringUtils.h"
+#include "qnan.h"
+#include "scene.h"
+#include "texture.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
 
 #include <memory>
 

@@ -47,10 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if !(defined(ASSIMP_BUILD_NO_IRR_IMPORTER) && defined(ASSIMP_BUILD_NO_IRRMESH_IMPORTER))
 
 #include "IRRShared.h"
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/material.h>
+#include "ParsingUtils.h"
+#include "fast_atof.h"
+#include "DefaultLogger.hpp"
+#include "material.h"
 
 using namespace Assimp;
 

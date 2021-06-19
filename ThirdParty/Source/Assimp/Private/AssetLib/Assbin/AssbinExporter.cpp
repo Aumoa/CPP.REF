@@ -47,9 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AssbinFileWriter.h"
 
-#include <assimp/scene.h>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOSystem.hpp>
+#include "scene.h"
+#include "Exporter.hpp"
+#include "IOSystem.hpp"
 
 namespace Assimp {
 

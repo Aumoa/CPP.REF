@@ -49,17 +49,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #   include <zlib.h>
 #else
-#   include "zlib.h"
+#   include "zlib/zlib.h"
 #endif
 
 #include "FBXTokenizer.h"
 #include "FBXParser.h"
 #include "FBXUtil.h"
 
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
-#include <assimp/ByteSwapper.h>
-#include <assimp/DefaultLogger.hpp>
+#include "ParsingUtils.h"
+#include "fast_atof.h"
+#include "ByteSwapper.h"
+#include "DefaultLogger.hpp"
 
 #include <iostream>
 

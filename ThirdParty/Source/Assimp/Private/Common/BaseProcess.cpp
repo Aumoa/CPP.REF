@@ -43,9 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BaseProcess.h"
 #include "Importer.h"
-#include <assimp/BaseImporter.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
+#include "BaseImporter.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
 
 using namespace Assimp;
 

@@ -44,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXExportNode.h"
 #include "FBXCommon.h"
 
-#include <assimp/StreamWriter.h> // StreamWriterLE
-#include <assimp/Exceptional.h> // DeadlyExportError
-#include <assimp/ai_assert.h>
-#include <assimp/StringUtils.h> // ai_snprintf
+#include "StreamWriter.h" // StreamWriterLE
+#include "Exceptional.h" // DeadlyExportError
+#include "ai_assert.h"
+#include "StringUtils.h" // ai_snprintf
 
 #include <string>
 #include <ostream>

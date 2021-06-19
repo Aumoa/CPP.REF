@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "Common/BaseProcess.h"
 
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
+#include "mesh.h"
+#include "scene.h"
 
 // Forward declarations
 class SplitLargeMeshesTest;

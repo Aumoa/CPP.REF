@@ -44,12 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_LWOLOADER_H_INCLUDED
 #define AI_LWOLOADER_H_INCLUDED
 
-#include <assimp/types.h>
-#include <assimp/material.h>
-#include <assimp/DefaultLogger.hpp>
+#include "types.h"
+#include "material.h"
+#include "DefaultLogger.hpp"
 
 #include "LWOFileData.h"
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
 #include <map>
 

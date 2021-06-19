@@ -52,11 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/DXF/DXFHelper.h"
 #include "PostProcessing/ConvertToLHProcess.h"
 
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
-#include <assimp/IOSystem.hpp>
-#include <assimp/scene.h>
-#include <assimp/importerdesc.h>
+#include "ParsingUtils.h"
+#include "fast_atof.h"
+#include "IOSystem.hpp"
+#include "scene.h"
+#include "importerdesc.h"
 
 #include <numeric>
 

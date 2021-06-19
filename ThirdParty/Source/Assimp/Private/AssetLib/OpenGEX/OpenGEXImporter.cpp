@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/OpenGEX/OpenGEXImporter.h"
 #include "PostProcessing/MakeVerboseFormat.h"
 
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/StringComparison.h>
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultIOSystem.h"
+#include "StringComparison.h"
+#include "DefaultLogger.hpp"
 
-#include <assimp/ai_assert.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
+#include "ai_assert.h"
+#include "importerdesc.h"
+#include "scene.h"
 #include <openddlparser/OpenDDLParser.h>
 
 #include <vector>

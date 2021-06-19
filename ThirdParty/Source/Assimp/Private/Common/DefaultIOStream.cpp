@@ -42,8 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  @brief Default File I/O implementation for #Importer
  */
 
-#include <assimp/DefaultIOStream.h>
-#include <assimp/ai_assert.h>
+#include "DefaultIOStream.h"
+#include "ai_assert.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 

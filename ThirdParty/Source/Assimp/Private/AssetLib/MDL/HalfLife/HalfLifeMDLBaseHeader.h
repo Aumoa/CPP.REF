@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_HALFLIFEMDLBASEHEADER_INCLUDED
 #define AI_HALFLIFEMDLBASEHEADER_INCLUDED
 
-#include <assimp/types.h>
+#include "types.h"
 
 namespace Assimp {
 namespace MDL {

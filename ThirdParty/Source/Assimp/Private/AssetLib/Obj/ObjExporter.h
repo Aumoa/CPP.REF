@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_OBJEXPORTER_H_INC
 #define AI_OBJEXPORTER_H_INC
 
-#include <assimp/types.h>
+#include "types.h"
 #include <sstream>
 #include <vector>
 #include <map>

@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_M3D_EXPORTER
 
-#include <assimp/types.h>
-//#include <assimp/material.h>
-#include <assimp/StreamWriter.h> // StreamWriterLE
-#include <assimp/Exceptional.h> // DeadlyExportError
+#include "types.h"
+//#include "material.h"
+#include "StreamWriter.h" // StreamWriterLE
+#include "Exceptional.h" // DeadlyExportError
 
 #include <memory> // shared_ptr
 

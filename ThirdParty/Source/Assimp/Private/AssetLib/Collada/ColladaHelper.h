@@ -44,9 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_COLLADAHELPER_H_INC
 #define AI_COLLADAHELPER_H_INC
 
-#include <assimp/light.h>
-#include <assimp/material.h>
-#include <assimp/mesh.h>
+#include "light.h"
+#include "material.h"
+#include "mesh.h"
 
 #include <stdint.h>
 #include <map>

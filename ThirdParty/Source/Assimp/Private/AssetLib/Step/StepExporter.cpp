@@ -48,15 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/Step/StepExporter.h"
 #include "PostProcessing/ConvertToLHProcess.h"
 
-#include <assimp/Bitmap.h>
-#include <assimp/BaseImporter.h>
-#include <assimp/fast_atof.h>
-#include <assimp/SceneCombiner.h>
-#include <assimp/Exceptional.h>
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/IOSystem.hpp>
-#include <assimp/scene.h>
-#include <assimp/light.h>
+#include "Bitmap.h"
+#include "BaseImporter.h"
+#include "fast_atof.h"
+#include "SceneCombiner.h"
+#include "Exceptional.h"
+#include "DefaultIOSystem.h"
+#include "IOSystem.hpp"
+#include "scene.h"
+#include "light.h"
 
 #include <iostream>
 #include <ctime>

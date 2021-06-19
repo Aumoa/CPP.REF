@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "TargetAnimation.h"
-#include <assimp/ai_assert.h>
+#include "ai_assert.h"
 #include <algorithm>
 
 using namespace Assimp;

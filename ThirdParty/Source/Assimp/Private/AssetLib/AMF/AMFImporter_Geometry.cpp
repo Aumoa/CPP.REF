@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AMFImporter.hpp"
 #include "AMFImporter_Macro.hpp"
 
-#include <assimp/ParsingUtils.h>
+#include "ParsingUtils.h"
 
 namespace Assimp {
 

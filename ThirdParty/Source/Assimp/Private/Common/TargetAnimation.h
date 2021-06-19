@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_TARGET_ANIMATION_H_INC
 #define AI_TARGET_ANIMATION_H_INC
 
-#include <assimp/anim.h>
+#include "anim.h"
 #include <vector>
 
 namespace Assimp {

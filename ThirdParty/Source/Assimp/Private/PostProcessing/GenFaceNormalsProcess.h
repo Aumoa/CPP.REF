@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_GENFACENORMALPROCESS_H_INC
 
 #include "Common/BaseProcess.h"
-#include <assimp/mesh.h>
+#include "mesh.h"
 
 namespace Assimp
 {

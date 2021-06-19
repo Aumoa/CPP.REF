@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_FBX_EXPORTER
 
-#include <assimp/types.h> // aiMatrix4x4
-#include <assimp/StreamWriter.h> // StreamWriterLE
+#include "types.h" // aiMatrix4x4
+#include "StreamWriter.h" // StreamWriterLE
 
 #include <string>
 #include <vector>

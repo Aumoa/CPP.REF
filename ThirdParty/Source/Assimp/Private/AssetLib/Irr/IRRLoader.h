@@ -49,9 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/Irr/IRRShared.h"
 #include "Common/Importer.h"
 
-#include <assimp/SceneCombiner.h>
-#include <assimp/StringUtils.h>
-#include <assimp/anim.h>
+#include "SceneCombiner.h"
+#include "StringUtils.h"
+#include "anim.h"
 
 namespace Assimp    {
 

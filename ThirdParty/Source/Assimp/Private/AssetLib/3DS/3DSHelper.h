@@ -45,20 +45,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_3DSFILEHELPER_H_INC
 #define AI_3DSFILEHELPER_H_INC
 
-#include <assimp/SmoothingGroups.h>
-#include <assimp/SpatialSort.h>
-#include <assimp/StringUtils.h>
-#include <assimp/anim.h>
-#include <assimp/camera.h>
-#include <assimp/light.h>
-#include <assimp/material.h>
-#include <assimp/qnan.h>
+#include "SmoothingGroups.h"
+#include "SpatialSort.h"
+#include "StringUtils.h"
+#include "anim.h"
+#include "camera.h"
+#include "light.h"
+#include "material.h"
+#include "qnan.h"
 #include <stdio.h> //sprintf
 
 namespace Assimp {
 namespace D3DS {
 
-#include <assimp/Compiler/pushpack1.h>
+#include "Compiler/pushpack1.h"
 
 // ---------------------------------------------------------------------------
 /** Discreet3DS class: Helper class for loading 3ds files. Defines chunks
@@ -411,7 +411,7 @@ struct Texture {
     int iUVSrc;
 };
 
-#include <assimp/Compiler/poppack1.h>
+#include "Compiler/poppack1.h"
 
 #ifdef _MSC_VER
 #pragma warning(pop)

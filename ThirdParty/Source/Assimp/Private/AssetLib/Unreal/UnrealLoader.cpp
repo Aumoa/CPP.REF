@@ -51,14 +51,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/Unreal/UnrealLoader.h"
 #include "PostProcessing/ConvertToLHProcess.h"
 
-#include <assimp/ParsingUtils.h>
-#include <assimp/StreamReader.h>
-#include <assimp/fast_atof.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "ParsingUtils.h"
+#include "StreamReader.h"
+#include "fast_atof.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 
 #include <stdint.h>
 #include <memory>

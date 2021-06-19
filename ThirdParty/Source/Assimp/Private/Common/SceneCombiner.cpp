@@ -54,15 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ----------------------------------------------------------------------------
 #include "ScenePrivate.h"
 #include "time.h"
-#include <assimp/Hash.h>
-#include <assimp/SceneCombiner.h>
-#include <assimp/StringUtils.h>
-#include <assimp/fast_atof.h>
-#include <assimp/mesh.h>
-#include <assimp/metadata.h>
-#include <assimp/scene.h>
+#include "Hash.h"
+#include "SceneCombiner.h"
+#include "StringUtils.h"
+#include "fast_atof.h"
+#include "mesh.h"
+#include "metadata.h"
+#include "scene.h"
 #include <stdio.h>
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 namespace Assimp {
 

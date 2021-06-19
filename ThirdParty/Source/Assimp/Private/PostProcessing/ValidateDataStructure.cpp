@@ -49,8 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // internal headers
 #include "ValidateDataStructure.h"
 #include "ProcessHelper.h"
-#include <assimp/BaseImporter.h>
-#include <assimp/fast_atof.h>
+#include "BaseImporter.h"
+#include "fast_atof.h"
 #include <memory>
 
 // CRT headers

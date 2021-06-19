@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXDocumentUtil.h"
 #include "FBXProperties.h"
 
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 #include <memory>
 #include <functional>

@@ -53,14 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXProperties.h"
 #include "FBXUtil.h"
 
-#include <assimp/MathFunctions.h>
-#include <assimp/StringComparison.h>
+#include "MathFunctions.h"
+#include "StringComparison.h"
 
-#include <assimp/scene.h>
+#include "scene.h"
 
-#include <assimp/CreateAnimMesh.h>
-#include <assimp/StringUtils.h>
-#include <assimp/commonMetaData.h>
+#include "CreateAnimMesh.h"
+#include "StringUtils.h"
+#include "commonMetaData.h"
 
 #include <stdlib.h>
 #include <cstdint>

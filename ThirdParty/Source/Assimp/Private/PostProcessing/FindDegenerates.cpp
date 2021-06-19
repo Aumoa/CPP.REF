@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProcessHelper.h"
 #include "FindDegenerates.h"
 
-#include <assimp/Exceptional.h>
+#include "Exceptional.h"
 
 #include <unordered_map>
 

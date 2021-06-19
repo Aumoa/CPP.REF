@@ -47,9 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Common/BaseProcess.h"
 
-#include <assimp/mesh.h>
-#include <assimp/material.h>
-#include <assimp/types.h>
+#include "mesh.h"
+#include "material.h"
+#include "types.h"
 
 class ComputeUVMappingTest;
 

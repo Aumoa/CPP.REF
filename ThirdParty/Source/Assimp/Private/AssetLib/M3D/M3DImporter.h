@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_M3D_IMPORTER
 
-#include <assimp/BaseImporter.h>
-#include <assimp/material.h>
+#include "BaseImporter.h"
+#include "material.h"
 #include <vector>
 
 struct aiMesh;

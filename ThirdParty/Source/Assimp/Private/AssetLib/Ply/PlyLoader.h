@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_PLYLOADER_H_INCLUDED
 
 #include "PlyParser.h"
-#include <assimp/BaseImporter.h>
-#include <assimp/types.h>
+#include "BaseImporter.h"
+#include "types.h"
 #include <vector>
 
 struct aiNode;

@@ -8,7 +8,7 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 
 #include "mesh_splitter.h"
 
-#include <assimp/scene.h>
+#include "scene.h"
 
 // ----------------------------------------------------------------------------
 // Note: this is largely based on assimp's SplitLargeMeshes_Vertex process.

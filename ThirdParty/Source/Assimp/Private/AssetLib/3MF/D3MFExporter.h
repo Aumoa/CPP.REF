@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <sstream>
 #include <vector>
-#include <assimp/vector3.h>
+#include "vector3.h"
 
 struct aiScene;
 struct aiNode;

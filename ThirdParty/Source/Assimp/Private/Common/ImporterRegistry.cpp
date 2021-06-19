@@ -46,7 +46,7 @@ directly (unless you are adding new loaders), instead use the
 corresponding preprocessor flag to selectively disable formats.
 */
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include <vector>
 
 // ------------------------------------------------------------------------------------------------

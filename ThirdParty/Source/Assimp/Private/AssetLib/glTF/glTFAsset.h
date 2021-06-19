@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined(ASSIMP_BUILD_NO_GLTF_IMPORTER) && !defined(ASSIMP_BUILD_NO_GLTF1_IMPORTER)
 
-#include <assimp/Exceptional.h>
+#include "Exceptional.h"
 
 #include <map>
 #include <string>
@@ -75,8 +75,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef ASSIMP_API
 #   include <memory>
-#   include <assimp/DefaultIOSystem.h>
-#   include <assimp/ByteSwapper.h>
+#   include "DefaultIOSystem.h"
+#   include "ByteSwapper.h"
 #else
 #   include <memory>
 #   define AI_SWAP4(p)
@@ -126,7 +126,7 @@ namespace glTF
     #define AI_GLB_MAGIC_NUMBER "glTF"
 
     #ifdef ASSIMP_API
-        #include <assimp/Compiler/pushpack1.h>
+        #include "Compiler/pushpack1.h"
     #endif
 
     //! For the KHR_binary_glTF extension (binary .glb file)
@@ -141,7 +141,7 @@ namespace glTF
     } PACK_STRUCT;
 
     #ifdef ASSIMP_API
-        #include <assimp/Compiler/poppack1.h>
+        #include "Compiler/poppack1.h"
     #endif
 
 

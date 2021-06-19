@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INCLUDED_AI_BLEND_LOADER_H
 #define INCLUDED_AI_BLEND_LOADER_H
 
-#include <assimp/BaseImporter.h>
-#include <assimp/LogAux.h>
+#include "BaseImporter.h"
+#include "LogAux.h"
 #include <memory>
 
 struct aiNode;

@@ -46,14 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_COLLADA_IMPORTER
 
 #include "ColladaParser.h"
-#include <assimp/ParsingUtils.h>
-#include <assimp/StringUtils.h>
-#include <assimp/ZipArchiveIOSystem.h>
-#include <assimp/commonMetaData.h>
-#include <assimp/fast_atof.h>
-#include <assimp/light.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
+#include "ParsingUtils.h"
+#include "StringUtils.h"
+#include "ZipArchiveIOSystem.h"
+#include "commonMetaData.h"
+#include "fast_atof.h"
+#include "light.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
 
 using namespace Assimp;
 using namespace Assimp::Collada;

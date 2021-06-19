@@ -53,10 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXTokenizer.h"
 #include "FBXUtil.h"
 
-#include <assimp/MemoryIOWrapper.h>
-#include <assimp/StreamReader.h>
-#include <assimp/importerdesc.h>
-#include <assimp/Importer.hpp>
+#include "MemoryIOWrapper.h"
+#include "StreamReader.h"
+#include "importerdesc.h"
+#include "Importer.hpp"
 
 namespace Assimp {
 

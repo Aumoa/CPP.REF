@@ -43,14 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "D3MFImporter.h"
 
-#include <assimp/StringComparison.h>
-#include <assimp/StringUtils.h>
-#include <assimp/XmlParser.h>
-#include <assimp/ZipArchiveIOSystem.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
+#include "StringComparison.h"
+#include "StringUtils.h"
+#include "XmlParser.h"
+#include "ZipArchiveIOSystem.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
 #include <cassert>
 #include <map>
 #include <memory>
@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "3MFXmlTags.h"
 #include "D3MFOpcPackage.h"
-#include <assimp/fast_atof.h>
+#include "fast_atof.h"
 
 #include <iomanip>
 

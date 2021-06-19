@@ -49,11 +49,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/MD5/MD5Loader.h"
 #include "Material/MaterialSystem.h"
 
-#include <assimp/ParsingUtils.h>
-#include <assimp/StringComparison.h>
-#include <assimp/fast_atof.h>
-#include <assimp/mesh.h>
-#include <assimp/DefaultLogger.hpp>
+#include "ParsingUtils.h"
+#include "StringComparison.h"
+#include "fast_atof.h"
+#include "mesh.h"
+#include "DefaultLogger.hpp"
 
 using namespace Assimp;
 using namespace Assimp::MD5;

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INCLUDED_AI_BASEPROCESS_H
 #define INCLUDED_AI_BASEPROCESS_H
 
-#include <assimp/GenericProperty.h>
+#include "GenericProperty.h"
 
 #include <map>
 

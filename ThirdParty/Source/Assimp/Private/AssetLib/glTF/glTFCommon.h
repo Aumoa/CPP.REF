@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_GLTF_IMPORTER
 
-#include <assimp/Exceptional.h>
+#include "Exceptional.h"
 
 #include <algorithm>
 #include <list>
@@ -57,8 +57,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <rapidjson/rapidjson.h>
 
 #ifdef ASSIMP_BUILD
-#include <assimp/ByteSwapper.h>
-#include <assimp/DefaultIOSystem.h>
+#include "ByteSwapper.h"
+#include "DefaultIOSystem.h"
 #include <memory>
 #else
 #include <memory>

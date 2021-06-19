@@ -51,8 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OptimizeMeshes.h"
 #include "ProcessHelper.h"
-#include <assimp/SceneCombiner.h>
-#include <assimp/Exceptional.h>
+#include "SceneCombiner.h"
+#include "Exceptional.h"
 
 using namespace Assimp;
 

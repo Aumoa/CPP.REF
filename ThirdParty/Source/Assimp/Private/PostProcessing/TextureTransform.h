@@ -44,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_TEXTURE_TRANSFORM_H_INCLUDED
 #define AI_TEXTURE_TRANSFORM_H_INCLUDED
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include "Common/BaseProcess.h"
 
-#include <assimp/material.h>
+#include "material.h"
 #include <list>
 
 struct aiNode;

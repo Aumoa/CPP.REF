@@ -50,10 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FBXExportNode.h" // FBX::Node
 #include "FBXCommon.h" // FBX::TransformInheritance
 
-#include <assimp/types.h>
-//#include <assimp/material.h>
-#include <assimp/StreamWriter.h> // StreamWriterLE
-#include <assimp/Exceptional.h> // DeadlyExportError
+#include "types.h"
+//#include "material.h"
+#include "StreamWriter.h" // StreamWriterLE
+#include "Exceptional.h" // DeadlyExportError
 
 #include <vector>
 #include <map>

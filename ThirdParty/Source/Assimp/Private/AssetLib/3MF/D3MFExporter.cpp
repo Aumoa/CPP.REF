@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "D3MFExporter.h"
 
-#include <assimp/Exceptional.h>
-#include <assimp/StringUtils.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOStream.hpp>
-#include <assimp/IOSystem.hpp>
+#include "Exceptional.h"
+#include "StringUtils.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "Exporter.hpp"
+#include "IOStream.hpp"
+#include "IOSystem.hpp"
 
 #include "3MFXmlTags.h"
 #include "D3MFOpcPackage.h"

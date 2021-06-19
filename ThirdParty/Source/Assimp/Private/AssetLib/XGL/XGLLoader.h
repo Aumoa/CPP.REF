@@ -45,15 +45,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_XGLLOADER_H_INCLUDED
 #define AI_XGLLOADER_H_INCLUDED
 
-#include <assimp/BaseImporter.h>
-#include <assimp/XmlParser.h>
-#include <assimp/LogAux.h>
-#include <assimp/light.h>
-#include <assimp/material.h>
-#include <assimp/mesh.h>
-#include <assimp/light.h>
-#include <assimp/Importer.hpp>
-#include <assimp/XmlParser.h>
+#include "BaseImporter.h"
+#include "XmlParser.h"
+#include "LogAux.h"
+#include "light.h"
+#include "material.h"
+#include "mesh.h"
+#include "light.h"
+#include "Importer.hpp"
+#include "XmlParser.h"
 
 #include <map>
 #include <memory>

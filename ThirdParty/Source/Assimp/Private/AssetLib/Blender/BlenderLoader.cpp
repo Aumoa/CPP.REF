@@ -54,13 +54,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BlenderCustomData.h"
 #include "BlenderIntermediate.h"
 #include "BlenderModifier.h"
-#include <assimp/StringUtils.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
+#include "StringUtils.h"
+#include "importerdesc.h"
+#include "scene.h"
 
-#include <assimp/MemoryIOWrapper.h>
-#include <assimp/StreamReader.h>
-#include <assimp/StringComparison.h>
+#include "MemoryIOWrapper.h"
+#include "StreamReader.h"
+#include "StringComparison.h"
 
 #include <cctype>
 
@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #include <zlib.h>
 #else
-#include "zlib.h"
+#include "zlib/zlib.h"
 #endif
 #endif
 

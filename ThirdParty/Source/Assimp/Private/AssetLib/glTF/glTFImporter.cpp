@@ -46,14 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/glTF/glTFAssetWriter.h"
 #include "PostProcessing/MakeVerboseFormat.h"
 
-#include <assimp/StringComparison.h>
-#include <assimp/StringUtils.h>
-#include <assimp/ai_assert.h>
-#include <assimp/commonMetaData.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Importer.hpp>
+#include "StringComparison.h"
+#include "StringUtils.h"
+#include "ai_assert.h"
+#include "commonMetaData.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "Importer.hpp"
 
 #include <memory>
 

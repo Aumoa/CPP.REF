@@ -43,10 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_OGRE_IMPORTER
 
 #include "OgreStructs.h"
-#include <assimp/Exceptional.h>
-#include <assimp/TinyFormatter.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
+#include "Exceptional.h"
+#include "TinyFormatter.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
 
 namespace Assimp {
 namespace Ogre {

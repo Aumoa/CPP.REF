@@ -44,11 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "LimitBoneWeightsProcess.h"
-#include <assimp/SmallVector.h>
-#include <assimp/StringUtils.h>
-#include <assimp/postprocess.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/scene.h>
+#include "SmallVector.h"
+#include "StringUtils.h"
+#include "postprocess.h"
+#include "DefaultLogger.hpp"
+#include "scene.h"
 #include <stdio.h>
 
 using namespace Assimp;

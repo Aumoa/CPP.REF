@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ComputeUVMappingProcess.h"
 #include "ProcessHelper.h"
-#include <assimp/Exceptional.h>
+#include "Exceptional.h"
 
 using namespace Assimp;
 

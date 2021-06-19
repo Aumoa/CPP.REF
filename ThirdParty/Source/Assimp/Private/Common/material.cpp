@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// @file material.cpp
 /** Implement common material related functions. */
 
-#include <assimp/ai_assert.h>
-#include <assimp/material.h>
+#include "ai_assert.h"
+#include "material.h"
 
 // -------------------------------------------------------------------------------
 const char* TextureTypeToString(aiTextureType in)

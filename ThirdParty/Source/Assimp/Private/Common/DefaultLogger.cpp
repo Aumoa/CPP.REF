@@ -49,13 +49,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileLogStream.h"
 #include "StdOStreamLogStream.h"
 #include "Win32DebugLogStream.h"
-#include <assimp/StringUtils.h>
+#include "StringUtils.h"
 
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/ai_assert.h>
+#include "DefaultIOSystem.h"
+#include "ai_assert.h"
 #include <stdio.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/NullLogger.hpp>
+#include "DefaultLogger.hpp"
+#include "NullLogger.hpp"
 #include <iostream>
 
 #ifndef ASSIMP_BUILD_SINGLETHREADED

@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
-#include <assimp/IOSystem.hpp>
+#include "IOSystem.hpp"
 
 namespace Assimp {
     class ZipArchiveIOSystem;

@@ -52,11 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AMFImporter_Node.hpp"
 
 // Header files, Assimp.
-#include "assimp/types.h"
-#include <assimp/BaseImporter.h>
-#include <assimp/XmlParser.h>
-#include <assimp/importerdesc.h>
-#include <assimp/DefaultLogger.hpp>
+#include "types.h"
+#include "BaseImporter.h"
+#include "XmlParser.h"
+#include "importerdesc.h"
+#include "DefaultLogger.hpp"
 
 // Header files, stdlib.
 #include <set>

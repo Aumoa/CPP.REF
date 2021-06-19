@@ -48,17 +48,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PostProcessing/ProcessHelper.h"
 
-#include <assimp/version.h>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOStream.hpp>
-#include <assimp/IOSystem.hpp>
+#include "version.h"
+#include "Exporter.hpp"
+#include "IOStream.hpp"
+#include "IOSystem.hpp"
 
 #include <stdarg.h>
 
 #ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #include <zlib.h>
 #else
-#include "zlib.h"
+#include "zlib/zlib.h"
 #endif
 
 #include <stdio.h>

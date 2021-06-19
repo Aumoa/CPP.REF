@@ -48,9 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AMFImporter.hpp"
 
-#include <assimp/SceneCombiner.h>
-#include <assimp/StandardShapes.h>
-#include <assimp/StringUtils.h>
+#include "SceneCombiner.h"
+#include "StandardShapes.h"
+#include "StringUtils.h"
 
 #include <iterator>
 

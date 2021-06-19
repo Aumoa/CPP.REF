@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_OPENGEX_IMPORTER
 
-#include <assimp/BaseImporter.h>
-#include <assimp/mesh.h>
+#include "BaseImporter.h"
+#include "mesh.h"
 
 #include <vector>
 #include <list>

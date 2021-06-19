@@ -49,11 +49,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <stdint.h>
 
-#include <assimp/types.h>
-#include <assimp/quaternion.h>
-#include <assimp/mesh.h>
-#include <assimp/anim.h>
-#include <assimp/Defines.h>
+#include "types.h"
+#include "quaternion.h"
+#include "mesh.h"
+#include "anim.h"
+#include "Defines.h"
 
 namespace Assimp {
 namespace XFile {

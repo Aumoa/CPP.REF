@@ -47,9 +47,9 @@
 #define AI_COLLADAPARSER_H_INC
 
 #include "ColladaHelper.h"
-#include <assimp/TinyFormatter.h>
-#include <assimp/ai_assert.h>
-#include <assimp/XmlParser.h>
+#include "TinyFormatter.h"
+#include "ai_assert.h"
+#include "XmlParser.h"
 
 #include <map>
 

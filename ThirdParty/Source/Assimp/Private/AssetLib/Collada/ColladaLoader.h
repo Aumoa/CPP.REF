@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_COLLADALOADER_H_INC
 #define AI_COLLADALOADER_H_INC
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include "ColladaParser.h"
 
 struct aiNode;

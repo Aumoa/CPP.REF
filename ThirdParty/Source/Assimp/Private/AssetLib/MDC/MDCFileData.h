@@ -51,11 +51,11 @@ http://themdcfile.planetwolfenstein.gamespy.com/MDC_File_Format.pdf
 #ifndef AI_MDCFILEHELPER_H_INC
 #define AI_MDCFILEHELPER_H_INC
 
-#include <assimp/types.h>
-#include <assimp/mesh.h>
-#include <assimp/anim.h>
+#include "types.h"
+#include "mesh.h"
+#include "anim.h"
 
-#include <assimp/Compiler/pushpack1.h>
+#include "Compiler/pushpack1.h"
 #include <stdint.h>
 
 namespace Assimp {
@@ -192,7 +192,7 @@ struct Shader {
     uint32_t ulPath;
 } PACK_STRUCT;
 
-#include <assimp/Compiler/poppack1.h>
+#include "Compiler/poppack1.h"
 
 // ---------------------------------------------------------------------------
 /** Build a floating point vertex from the compressed data in MDC files

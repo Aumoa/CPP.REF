@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Common/BaseProcess.h"
 
-#include <assimp/mesh.h>
+#include "mesh.h"
 
 #include <list>
 #include <vector>

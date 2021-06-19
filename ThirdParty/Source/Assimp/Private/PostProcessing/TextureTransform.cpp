@@ -44,13 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/scene.h>
+#include "Importer.hpp"
+#include "postprocess.h"
+#include "DefaultLogger.hpp"
+#include "scene.h"
 
 #include "TextureTransform.h"
-#include <assimp/StringUtils.h>
+#include "StringUtils.h"
 
 using namespace Assimp;
 

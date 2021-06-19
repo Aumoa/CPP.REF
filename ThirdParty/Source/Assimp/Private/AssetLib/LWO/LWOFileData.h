@@ -53,7 +53,7 @@ The chunks are taken from the official LightWave SDK headers.
 #include <vector>
 
 // public ASSIMP headers
-#include <assimp/mesh.h>
+#include "mesh.h"
 
 // internal headers
 #include "AssetLib/LWO/LWOAnimation.h"

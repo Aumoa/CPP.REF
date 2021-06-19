@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MD2LOADER_H_INCLUDED
 #define AI_MD2LOADER_H_INCLUDED
 
-#include <assimp/BaseImporter.h>
-#include <assimp/types.h>
-#include <assimp/ByteSwapper.h>
+#include "BaseImporter.h"
+#include "types.h"
+#include "ByteSwapper.h"
 #include "MD2FileData.h"
 
 struct aiNode;

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INCLUDED_AI_CSM_LOADER_H
 #define INCLUDED_AI_CSM_LOADER_H
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
 namespace Assimp    {
 

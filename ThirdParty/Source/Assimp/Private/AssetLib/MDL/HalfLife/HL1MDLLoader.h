@@ -53,12 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 
-#include <assimp/types.h>
-#include <assimp/scene.h>
-#include <assimp/texture.h>
-#include <assimp/IOSystem.hpp>
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/Exceptional.h>
+#include "types.h"
+#include "scene.h"
+#include "texture.h"
+#include "IOSystem.hpp"
+#include "DefaultIOSystem.h"
+#include "Exceptional.h"
 
 namespace Assimp {
 namespace MDL {

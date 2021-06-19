@@ -46,15 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/glTF2/glTF2Asset.h"
 #include "AssetLib/glTF2/glTF2AssetWriter.h"
 
-#include <assimp/CreateAnimMesh.h>
-#include <assimp/StringComparison.h>
-#include <assimp/StringUtils.h>
-#include <assimp/ai_assert.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/commonMetaData.h>
+#include "CreateAnimMesh.h"
+#include "StringComparison.h"
+#include "StringUtils.h"
+#include "ai_assert.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "Importer.hpp"
+#include "commonMetaData.h"
 
 #include <memory>
 #include <unordered_map>

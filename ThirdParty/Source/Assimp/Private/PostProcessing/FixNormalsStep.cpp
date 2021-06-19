@@ -47,10 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // internal headers
 #include "FixNormalsStep.h"
-#include <assimp/StringUtils.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
+#include "StringUtils.h"
+#include "DefaultLogger.hpp"
+#include "postprocess.h"
+#include "scene.h"
 #include <stdio.h>
 
 

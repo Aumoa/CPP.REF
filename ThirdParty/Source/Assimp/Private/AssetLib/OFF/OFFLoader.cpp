@@ -50,13 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // internal headers
 #include "OFFLoader.h"
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
+#include "ParsingUtils.h"
+#include "fast_atof.h"
 #include <memory>
-#include <assimp/IOSystem.hpp>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/importerdesc.h>
+#include "IOSystem.hpp"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "importerdesc.h"
 
 using namespace Assimp;
 

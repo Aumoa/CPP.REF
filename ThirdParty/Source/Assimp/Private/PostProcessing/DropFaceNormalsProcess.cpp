@@ -47,10 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "DropFaceNormalsProcess.h"
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Exceptional.h>
+#include "postprocess.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "Exceptional.h"
 
 using namespace Assimp;
 

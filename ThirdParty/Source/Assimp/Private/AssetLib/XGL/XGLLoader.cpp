@@ -44,14 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_XGL_IMPORTER
 
 #include "XGLLoader.h"
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
+#include "ParsingUtils.h"
+#include "fast_atof.h"
 
-#include <assimp/MemoryIOWrapper.h>
-#include <assimp/StreamReader.h>
-#include <assimp/importerdesc.h>
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
+#include "MemoryIOWrapper.h"
+#include "StreamReader.h"
+#include "importerdesc.h"
+#include "mesh.h"
+#include "scene.h"
 #include <cctype>
 #include <memory>
 
@@ -62,7 +62,7 @@ using namespace Assimp;
 #  ifdef ASSIMP_BUILD_NO_OWN_ZLIB
 #    include <zlib.h>
 #  else
-#    include <zlib.h>
+#    include "zlib/zlib.h"
 #  endif
 #endif
 

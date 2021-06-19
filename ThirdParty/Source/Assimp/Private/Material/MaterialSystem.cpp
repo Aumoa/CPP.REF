@@ -45,12 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "MaterialSystem.h"
-#include <assimp/Hash.h>
-#include <assimp/ParsingUtils.h>
-#include <assimp/fast_atof.h>
-#include <assimp/material.h>
-#include <assimp/types.h>
-#include <assimp/DefaultLogger.hpp>
+#include "Hash.h"
+#include "ParsingUtils.h"
+#include "fast_atof.h"
+#include "material.h"
+#include "types.h"
+#include "DefaultLogger.hpp"
 
 using namespace Assimp;
 

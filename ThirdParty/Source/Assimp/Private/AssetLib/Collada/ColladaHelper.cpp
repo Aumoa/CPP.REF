@@ -42,8 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ColladaHelper.h"
 
-#include <assimp/ParsingUtils.h>
-#include <assimp/commonMetaData.h>
+#include "ParsingUtils.h"
+#include "commonMetaData.h"
 
 namespace Assimp {
 namespace Collada {

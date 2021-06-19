@@ -48,13 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INCLUDED_AI_X3D_IMPORTER_H
 
 // Header files, Assimp.
-#include <assimp/BaseImporter.h>
-#include <assimp/XmlParser.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/types.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/ProgressHandler.hpp>
+#include "BaseImporter.h"
+#include "XmlParser.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "types.h"
+#include "DefaultLogger.hpp"
+#include "ProgressHandler.hpp"
 
 #include <list>
 

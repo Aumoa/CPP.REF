@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AssetLib/FBX/FBXDocument.h" //ObjectMap::value_type
 
-#include <assimp/DefaultLogger.hpp>
+#include "DefaultLogger.hpp"
 
 #ifdef _MSC_VER
 #    pragma warning(push)
@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #    endif
 #endif
 
-#include <assimp/LineSplitter.h>
+#include "LineSplitter.h"
 
 // uncomment this to have the loader evaluate all entities upon loading.
 // this is intended as stress test - by default, entities are evaluated

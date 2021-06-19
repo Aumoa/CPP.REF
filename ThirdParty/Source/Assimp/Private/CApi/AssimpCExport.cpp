@@ -49,8 +49,8 @@ Assimp C export interface. See Exporter.cpp for some notes.
 
 #include "CInterfaceIOWrapper.h"
 #include "Common/ScenePrivate.h"
-#include <assimp/SceneCombiner.h>
-#include <assimp/Exporter.hpp>
+#include "SceneCombiner.h"
+#include "Exporter.hpp"
 
 using namespace Assimp;
 

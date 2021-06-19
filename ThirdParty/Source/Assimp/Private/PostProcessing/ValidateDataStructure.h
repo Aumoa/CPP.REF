@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_VALIDATEPROCESS_H_INC
 #define AI_VALIDATEPROCESS_H_INC
 
-#include <assimp/types.h>
-#include <assimp/material.h>
+#include "types.h"
+#include "material.h"
 
 #include "Common/BaseProcess.h"
 

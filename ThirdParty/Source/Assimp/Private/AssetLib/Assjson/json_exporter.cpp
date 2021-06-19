@@ -9,12 +9,12 @@ Licensed under a 3-clause BSD license. See the LICENSE file for more information
 #ifndef ASSIMP_BUILD_NO_EXPORT
 #ifndef ASSIMP_BUILD_NO_ASSJSON_EXPORTER
 
-#include <assimp/scene.h>
-#include <assimp/Exporter.hpp>
-#include <assimp/IOStream.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/Exceptional.h>
+#include "scene.h"
+#include "Exporter.hpp"
+#include "IOStream.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
+#include "Exceptional.h"
 
 #include <cassert>
 #include <limits>

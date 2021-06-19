@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/BaseProcess.h"
 #include "PostProcessing/ProcessHelper.h"
 
-#include <assimp/types.h>
+#include "types.h"
 
 #include <set>
 

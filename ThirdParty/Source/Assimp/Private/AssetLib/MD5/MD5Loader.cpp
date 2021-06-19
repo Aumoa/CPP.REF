@@ -47,16 +47,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // internal headers
 #include "MD5Loader.h"
-#include <assimp/MathFunctions.h>
-#include <assimp/RemoveComments.h>
-#include <assimp/SkeletonMeshBuilder.h>
-#include <assimp/StringComparison.h>
-#include <assimp/fast_atof.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "MathFunctions.h"
+#include "RemoveComments.h"
+#include "SkeletonMeshBuilder.h"
+#include "StringComparison.h"
+#include "fast_atof.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 #include <memory>
 
 using namespace Assimp;

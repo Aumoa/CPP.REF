@@ -47,9 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_MD5LOADER_H_INCLUDED
 
 #include "MD5Parser.h"
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
-#include <assimp/types.h>
+#include "types.h"
 
 struct aiNode;
 struct aiNodeAnim;

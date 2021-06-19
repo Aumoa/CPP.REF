@@ -47,13 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define M3D_NOWEIGHTS
 #define M3D_NOANIMATION
 
-#include <assimp/DefaultIOSystem.h>
-#include <assimp/IOStreamBuffer.h>
-#include <assimp/ai_assert.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/Importer.hpp>
+#include "DefaultIOSystem.h"
+#include "IOStreamBuffer.h"
+#include "ai_assert.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "Importer.hpp"
 #include <memory>
 
 #include "M3DImporter.h"

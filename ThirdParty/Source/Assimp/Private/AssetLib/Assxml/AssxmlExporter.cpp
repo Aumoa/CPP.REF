@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_ASSXML_EXPORTER
 
 #include "AssxmlFileWriter.h"
-#include <assimp/IOSystem.hpp>
-#include <assimp/Exporter.hpp>
+#include "IOSystem.hpp"
+#include "Exporter.hpp"
 
 namespace Assimp   { 
 

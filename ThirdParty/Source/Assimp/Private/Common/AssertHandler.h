@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INCLUDED_AI_ASSERTHANDLER_H
 #define INCLUDED_AI_ASSERTHANDLER_H
 
-#include <assimp/ai_assert.h>
-#include <assimp/defs.h>
+#include "ai_assert.h"
+#include "defs.h"
 
 namespace Assimp
 {

@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined(ASSIMP_BUILD_NO_GLTF_EXPORTER) && !defined(ASSIMP_BUILD_NO_GLTF1_EXPORTER)
 
-#include <assimp/types.h>
-#include <assimp/material.h>
+#include "types.h"
+#include "material.h"
 
 #include <sstream>
 #include <vector>

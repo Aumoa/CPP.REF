@@ -47,9 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_ASSXMLFILEWRITER_H_INC
 #define AI_ASSXMLFILEWRITER_H_INC
 
-#include <assimp/defs.h>
-#include <assimp/scene.h>
-#include <assimp/IOSystem.hpp>
+#include "defs.h"
+#include "scene.h"
+#include "IOSystem.hpp"
 
 namespace Assimp {
 

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_ASSBINEXPORTER_H_INC
 #define AI_ASSBINEXPORTER_H_INC
 
-#include <assimp/defs.h>
+#include "defs.h"
 
 // nothing really needed here - reserved for future use like properties
 namespace Assimp {

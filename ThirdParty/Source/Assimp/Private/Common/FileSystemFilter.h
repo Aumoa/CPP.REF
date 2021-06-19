@@ -46,10 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_FILESYSTEMFILTER_H_INC
 #define AI_FILESYSTEMFILTER_H_INC
 
-#include <assimp/IOSystem.hpp>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/fast_atof.h>
-#include <assimp/ParsingUtils.h>
+#include "IOSystem.hpp"
+#include "DefaultLogger.hpp"
+#include "fast_atof.h"
+#include "ParsingUtils.h"
 
 namespace Assimp    {
 

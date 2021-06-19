@@ -46,18 +46,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // internal headers
 #include "ACLoader.h"
 #include "Common/Importer.h"
-#include <assimp/BaseImporter.h>
-#include <assimp/ParsingUtils.h>
-#include <assimp/Subdivision.h>
-#include <assimp/config.h>
-#include <assimp/fast_atof.h>
-#include <assimp/importerdesc.h>
-#include <assimp/light.h>
-#include <assimp/material.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "BaseImporter.h"
+#include "ParsingUtils.h"
+#include "Subdivision.h"
+#include "config.h"
+#include "fast_atof.h"
+#include "importerdesc.h"
+#include "light.h"
+#include "material.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 #include <memory>
 
 using namespace Assimp;

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_IRRMESHLOADER_H_INCLUDED
 
 #include "IRRShared.h"
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
 #ifndef ASSIMP_BUILD_NO_IRRMESH_IMPORTER
 

@@ -53,13 +53,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AssetLib/MDL/HalfLife/HL1MDLLoader.h"
 #include "AssetLib/MDL/MDLDefaultColorMap.h"
 
-#include <assimp/StringUtils.h>
-#include <assimp/importerdesc.h>
-#include <assimp/qnan.h>
-#include <assimp/scene.h>
-#include <assimp/DefaultLogger.hpp>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "StringUtils.h"
+#include "importerdesc.h"
+#include "qnan.h"
+#include "scene.h"
+#include "DefaultLogger.hpp"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 
 #include <memory>
 

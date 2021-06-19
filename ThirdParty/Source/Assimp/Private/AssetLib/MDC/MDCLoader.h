@@ -46,11 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_MDCLOADER_H_INCLUDED
 #define AI_MDCLOADER_H_INCLUDED
 
-#include <assimp/types.h>
+#include "types.h"
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 #include "MDCFileData.h"
-#include <assimp/ByteSwapper.h>
+#include "ByteSwapper.h"
 
 namespace Assimp {
 

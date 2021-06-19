@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_Q3BSPFILEIMPORTER_H_INC
 #define ASSIMP_Q3BSPFILEIMPORTER_H_INC
 
-#include <assimp/BaseImporter.h>
+#include "BaseImporter.h"
 
 #include <map>
 #include <string>

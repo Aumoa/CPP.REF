@@ -45,13 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_BVH_IMPORTER
 
 #include "BVHLoader.h"
-#include <assimp/SkeletonMeshBuilder.h>
-#include <assimp/TinyFormatter.h>
-#include <assimp/fast_atof.h>
-#include <assimp/importerdesc.h>
-#include <assimp/scene.h>
-#include <assimp/IOSystem.hpp>
-#include <assimp/Importer.hpp>
+#include "SkeletonMeshBuilder.h"
+#include "TinyFormatter.h"
+#include "fast_atof.h"
+#include "importerdesc.h"
+#include "scene.h"
+#include "IOSystem.hpp"
+#include "Importer.hpp"
 #include <map>
 #include <memory>
 

@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  @brief Defines the CommentRemover utility class
  */
 
-#include <assimp/RemoveComments.h>
-#include <assimp/ParsingUtils.h>
+#include "RemoveComments.h"
+#include "ParsingUtils.h"
 
 namespace Assimp    {
 
