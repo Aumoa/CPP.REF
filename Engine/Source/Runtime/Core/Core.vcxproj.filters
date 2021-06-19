@@ -1,52 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Object.ixx" />
-    <ClCompile Include="PrimitiveTypes.ixx" />
-    <ClCompile Include="Core.ixx" />
-    <ClCompile Include="Numerics\Vector.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="SupportsObject.ixx" />
-    <ClCompile Include="Mathematics\MathEx.ixx">
-      <Filter>Mathematics</Filter>
-    </ClCompile>
-    <ClCompile Include="Mathematics\Radians.ixx">
-      <Filter>Mathematics</Filter>
-    </ClCompile>
-    <ClCompile Include="Mathematics\Degrees.ixx">
-      <Filter>Mathematics</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities\StringUtils.ixx">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Range.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\LogSystem.ixx">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\LogVerbosity.ixx">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="Diagnostics\LogCategory.ixx">
-      <Filter>Diagnostics</Filter>
-    </ClCompile>
-    <ClCompile Include="LogCategory\LogCore.ixx">
-      <Filter>LogCategory</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Vector3.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Vector2.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Vector4.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Quaternion.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\StringUtils.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -57,46 +11,10 @@
     <ClCompile Include="Diagnostics\LogSystem.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
-    <ClCompile Include="Delegates\MulticastDelegate.ixx">
-      <Filter>Delegates</Filter>
-    </ClCompile>
-    <ClCompile Include="Delegates\MulticastEvent.ixx">
-      <Filter>Delegates</Filter>
-    </ClCompile>
     <ClCompile Include="Mathematics\MathEx.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
-    <ClCompile Include="Numerics\Color.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
     <ClCompile Include="Numerics\Color.cpp">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\AxisAlignedCube.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Line.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Sphere.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Plane.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Ray.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\ObjectOrientedCube.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Frustum.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Matrix.ixx">
-      <Filter>Numerics</Filter>
-    </ClCompile>
-    <ClCompile Include="Numerics\Matrix4x4.ixx">
       <Filter>Numerics</Filter>
     </ClCompile>
     <ClCompile Include="Numerics\Matrix4x4.cpp">
@@ -108,36 +26,20 @@
     <ClCompile Include="IO\FileSystemReference.cpp">
       <Filter>IO</Filter>
     </ClCompile>
-    <ClCompile Include="IO\FileSystemReference.ixx">
-      <Filter>IO</Filter>
-    </ClCompile>
-    <ClCompile Include="IO\DirectoryReference.ixx">
-      <Filter>IO</Filter>
-    </ClCompile>
     <ClCompile Include="IO\DirectoryReference.cpp">
-      <Filter>IO</Filter>
-    </ClCompile>
-    <ClCompile Include="IO\FileReference.ixx">
       <Filter>IO</Filter>
     </ClCompile>
     <ClCompile Include="IO\FileReference.cpp">
       <Filter>IO</Filter>
     </ClCompile>
-    <ClCompile Include="Internal.ixx" />
-    <ClCompile Include="Threading\EventHandle.ixx">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\EventHandle.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\UniqueType.ixx">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities\DateTime.ixx">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\DateTime.cpp">
       <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="LogCategory\LogCore.cpp">
+      <Filter>LogCategory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,5 +67,112 @@
     <Filter Include="Threading">
       <UniqueIdentifier>{0a7dee3b-e03f-4a22-9112-6772872cef59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Concepts">
+      <UniqueIdentifier>{7899fd6f-7a65-41e7-8ba3-ab1f37f1eac3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="CoreMinimal.h" />
+    <ClInclude Include="PrimitiveTypes.h" />
+    <ClInclude Include="Concepts\SupportsObject.h">
+      <Filter>Concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="Delegates\MulticastDelegate.h">
+      <Filter>Delegates</Filter>
+    </ClInclude>
+    <ClInclude Include="Delegates\MulticastEvent.h">
+      <Filter>Delegates</Filter>
+    </ClInclude>
+    <ClInclude Include="Diagnostics\LogCategory.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="Diagnostics\LogSystem.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="Diagnostics\LogVerbosity.h">
+      <Filter>Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\DirectoryReference.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\FileReference.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\FileSystemReference.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="LogCategory\LogCore.h">
+      <Filter>LogCategory</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\Degrees.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\MathEx.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\Radians.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\AxisAlignedCube.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Color.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Frustum.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Line.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Matrix.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Matrix4x4.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\ObjectOrientedCube.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Plane.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Quaternion.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Range.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Ray.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Sphere.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Vector.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Vector2.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Vector3.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Vector4.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\EventHandle.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\DateTime.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\StringUtils.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\UniqueType.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

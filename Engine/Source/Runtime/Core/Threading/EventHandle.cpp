@@ -1,9 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "EventHandle.h"
 #include <Windows.h>
-
-import std.core;
-import SC.Runtime.Core;
+#include "Diagnostics/LogVerbosity.h"
+#include "Diagnostics/LogSystem.h"
+#include "LogCategory/LogCore.h"
 
 using namespace std;
 using namespace std::chrono;

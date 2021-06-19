@@ -1,10 +1,36 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import SC.Runtime.Core;
+#include "MathEx.h"
+#include <numbers>
+#include "Radians.h"
 
 using namespace std;
 using namespace std::numbers;
+
+float MathEx::Sin(const Radians& v)
+{
+	return sin(v.Value);
+}
+
+float MathEx::Cos(const Radians& v)
+{
+	return cos(v.Value);
+}
+
+float MathEx::Tan(const Radians& v)
+{
+	return tan(v.Value);
+}
+
+Radians MathEx::Asin(float x)
+{
+	return asin(x);
+}
+
+Radians MathEx::Acos(float x)
+{
+	return acos(x);
+}
 
 float MathEx::Atan(float x)
 {

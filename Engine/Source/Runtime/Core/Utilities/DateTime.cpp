@@ -1,7 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Core;
-import std.core;
+#include "DateTime.h"
 
 using namespace std::chrono;
 

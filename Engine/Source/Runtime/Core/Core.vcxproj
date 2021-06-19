@@ -60,9 +60,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
-      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -79,9 +77,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
-      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -92,56 +88,58 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core.ixx" />
-    <ClCompile Include="Delegates\MulticastDelegate.ixx" />
-    <ClCompile Include="Delegates\MulticastEvent.ixx" />
     <ClCompile Include="Diagnostics\LogCategory.cpp" />
-    <ClCompile Include="Diagnostics\LogCategory.ixx" />
     <ClCompile Include="Diagnostics\LogSystem.cpp" />
-    <ClCompile Include="Diagnostics\LogSystem.ixx" />
-    <ClCompile Include="Diagnostics\LogVerbosity.ixx" />
-    <ClCompile Include="Internal.ixx" />
     <ClCompile Include="IO\DirectoryReference.cpp" />
-    <ClCompile Include="IO\DirectoryReference.ixx" />
     <ClCompile Include="IO\FileReference.cpp" />
-    <ClCompile Include="IO\FileReference.ixx" />
     <ClCompile Include="IO\FileSystemReference.cpp" />
-    <ClCompile Include="IO\FileSystemReference.ixx" />
-    <ClCompile Include="LogCategory\LogCore.ixx" />
-    <ClCompile Include="Mathematics\Degrees.ixx" />
+    <ClCompile Include="LogCategory\LogCore.cpp" />
     <ClCompile Include="Mathematics\MathEx.cpp" />
-    <ClCompile Include="Mathematics\MathEx.ixx" />
-    <ClCompile Include="Mathematics\Radians.ixx" />
-    <ClCompile Include="Numerics\AxisAlignedCube.ixx" />
     <ClCompile Include="Numerics\Color.cpp" />
-    <ClCompile Include="Numerics\Color.ixx" />
-    <ClCompile Include="Numerics\Frustum.ixx" />
-    <ClCompile Include="Numerics\Line.ixx" />
-    <ClCompile Include="Numerics\Matrix.ixx" />
     <ClCompile Include="Numerics\Matrix4x4.cpp" />
-    <ClCompile Include="Numerics\Matrix4x4.ixx" />
-    <ClCompile Include="Numerics\ObjectOrientedCube.ixx" />
-    <ClCompile Include="Numerics\Plane.ixx" />
     <ClCompile Include="Numerics\Quaternion.cpp" />
-    <ClCompile Include="Numerics\Quaternion.ixx" />
-    <ClCompile Include="Numerics\Range.ixx" />
-    <ClCompile Include="Numerics\Ray.ixx" />
-    <ClCompile Include="Numerics\Sphere.ixx" />
-    <ClCompile Include="Numerics\Vector.ixx" />
-    <ClCompile Include="Numerics\Vector2.ixx" />
-    <ClCompile Include="Numerics\Vector3.ixx" />
-    <ClCompile Include="Numerics\Vector4.ixx" />
     <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Object.ixx" />
-    <ClCompile Include="PrimitiveTypes.ixx" />
-    <ClCompile Include="SupportsObject.ixx" />
     <ClCompile Include="Threading\EventHandle.cpp" />
-    <ClCompile Include="Threading\EventHandle.ixx" />
     <ClCompile Include="Utilities\DateTime.cpp" />
-    <ClCompile Include="Utilities\DateTime.ixx" />
     <ClCompile Include="Utilities\StringUtils.cpp" />
-    <ClCompile Include="Utilities\StringUtils.ixx" />
-    <ClCompile Include="Utilities\UniqueType.ixx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Concepts\SupportsObject.h" />
+    <ClInclude Include="CoreMinimal.h" />
+    <ClInclude Include="Delegates\MulticastDelegate.h" />
+    <ClInclude Include="Delegates\MulticastEvent.h" />
+    <ClInclude Include="Diagnostics\LogCategory.h" />
+    <ClInclude Include="Diagnostics\LogSystem.h" />
+    <ClInclude Include="Diagnostics\LogVerbosity.h" />
+    <ClInclude Include="IO\DirectoryReference.h" />
+    <ClInclude Include="IO\FileReference.h" />
+    <ClInclude Include="IO\FileSystemReference.h" />
+    <ClInclude Include="LogCategory\LogCore.h" />
+    <ClInclude Include="Mathematics\Degrees.h" />
+    <ClInclude Include="Mathematics\MathEx.h" />
+    <ClInclude Include="Mathematics\Radians.h" />
+    <ClInclude Include="Numerics\AxisAlignedCube.h" />
+    <ClInclude Include="Numerics\Color.h" />
+    <ClInclude Include="Numerics\Frustum.h" />
+    <ClInclude Include="Numerics\Line.h" />
+    <ClInclude Include="Numerics\Matrix.h" />
+    <ClInclude Include="Numerics\Matrix4x4.h" />
+    <ClInclude Include="Numerics\ObjectOrientedCube.h" />
+    <ClInclude Include="Numerics\Plane.h" />
+    <ClInclude Include="Numerics\Quaternion.h" />
+    <ClInclude Include="Numerics\Range.h" />
+    <ClInclude Include="Numerics\Ray.h" />
+    <ClInclude Include="Numerics\Sphere.h" />
+    <ClInclude Include="Numerics\Vector.h" />
+    <ClInclude Include="Numerics\Vector2.h" />
+    <ClInclude Include="Numerics\Vector3.h" />
+    <ClInclude Include="Numerics\Vector4.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="PrimitiveTypes.h" />
+    <ClInclude Include="Threading\EventHandle.h" />
+    <ClInclude Include="Utilities\DateTime.h" />
+    <ClInclude Include="Utilities\StringUtils.h" />
+    <ClInclude Include="Utilities\UniqueType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

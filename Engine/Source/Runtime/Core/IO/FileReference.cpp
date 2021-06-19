@@ -1,8 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import std.filesystem;
-import SC.Runtime.Core;
+#include "FileReference.h"
+#include "Object.h"
+#include "DirectoryReference.h"
+#include "Diagnostics/LogVerbosity.h"
+#include "Diagnostics/LogSystem.h"
+#include "LogCategory/LogCore.h"
 
 using enum ELogVerbosity;
 

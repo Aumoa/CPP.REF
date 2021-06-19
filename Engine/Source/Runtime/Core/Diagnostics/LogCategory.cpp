@@ -1,9 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import std.filesystem;
-import SC.Runtime.Core;
-import SC.Runtime.Core.Internal;
+#include "LogCategory.h"
+#include <chrono>
+#include <string>
+#include <format>
+#include <Windows.h>
+#include "LogVerbosity.h"
 
 using namespace std;
 using namespace std::chrono;

@@ -1,8 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import SC.Runtime.Core;
-import SC.Runtime.Core.Internal;
+#include "StringUtils.h"
+#include <Windows.h>
+#include "Diagnostics/LogVerbosity.h"
+#include "Diagnostics/LogSystem.h"
+#include "LogCategory/LogCore.h"
 
 using namespace std;
 
