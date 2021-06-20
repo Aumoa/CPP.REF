@@ -172,6 +172,7 @@ struct Quaternion : public Vector4
 	static inline constexpr Quaternion GetIdentity();
 
 	static Quaternion FromAxisAngle(const Vector3& axis, Degrees angle);
+	static Quaternion LookTo(const Vector3& forward, const Vector3& up);
 };
 
 inline constexpr Quaternion Quaternion::GetIdentity()

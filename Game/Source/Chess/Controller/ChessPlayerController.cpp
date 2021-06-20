@@ -25,7 +25,8 @@ void AChessPlayerController::BeginPlay()
 		AChessBoardProxy* proxy = board->CreateProxy();
 		Possess(proxy);
 
-		proxy->SetActorLocation(Vector3(0, 0, -10));
+		proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));
+		proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
 	}
 
 	SetupPlayerInput(GetInputComponent());

@@ -202,7 +202,7 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 	{
 		const aiMesh* myMesh = _impl->_scene->mMeshes[i];
 		vertexCount += myMesh->mNumVertices;
-		indexCount += myMesh->mNumFaces * 3;
+		indexCount += (size_t)myMesh->mNumFaces * 3;
 		subsetCount += 1;
 	}
 
@@ -212,6 +212,7 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 	subsets.reserve(subsetCount);
 
 	// Store all elements for this game engine.
+	Color r = NamedColors::Gray;
 	auto StoreSingleMesh = [&](const aiMesh* inMesh)
 	{
 		// Store subset.
@@ -228,19 +229,27 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 			RHIVertex& myVertex = vertexBuffer.emplace_back();
 			memcpy(&myVertex.Position, &inMesh->mVertices[i], sizeof(Vector3));
 			memcpy(&myVertex.Normal, &inMesh->mNormals[i], sizeof(Vector3));
+			if (inMesh->HasVertexColors(i))
+			{
+				memcpy(&myVertex.Color, &inMesh->mColors[i], sizeof(Color));
+			}
+			else
+			{
+				myVertex.Color = r;
+			}
 			//memcpy(&myVertex.TexCoord, &inMesh->mTextureCoords[0][i], sizeof(Vector2));
-			myVertex.Color = NamedColors::White;
 		}
 
 		// Store indices.
 		for (uint32 i = 0; i < inMesh->mNumFaces; ++i)
 		{
-			uint32& _1 = indexBuffer.emplace_back();
-			indexBuffer.emplace_back();
-			indexBuffer.emplace_back();
-
-			memcpy(&_1, inMesh->mFaces[i].mIndices, sizeof(uint32) * 3);
+			indexBuffer.emplace_back() = inMesh->mFaces[i].mIndices[0] + subset.VertexStart;
+			indexBuffer.emplace_back() = inMesh->mFaces[i].mIndices[1] + subset.VertexStart;
+			indexBuffer.emplace_back() = inMesh->mFaces[i].mIndices[2] + subset.VertexStart;
 		}
+
+		// TEST IMPLEMENTS
+		r = NamedColors::White;
 	};
 
 	for (uint32 i = 0; i < _impl->_scene->mNumMeshes; ++i)

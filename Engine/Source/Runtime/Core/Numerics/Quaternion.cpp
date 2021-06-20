@@ -38,3 +38,23 @@ Quaternion Quaternion::FromAxisAngle(const Vector3& axis, Degrees angle)
 	XMVECTOR Q = XMQuaternionRotationNormal(Axis, rad.Value);
 	return XMStoreQuaternion(Q);
 }
+
+Quaternion Quaternion::LookTo(const Vector3& forward, const Vector3& up)
+{
+	Quaternion t;
+
+	Vector3 F = forward.GetNormal();
+	Vector3 U = up.GetNormal();
+	Vector3 R = Vector3::CrossProduct(up, forward).GetNormal();
+	U = Vector3::CrossProduct(F, R);
+
+	XMMATRIX M = XMMatrixSet(
+		R.X(), R.Y(), R.Z(), 0,
+		U.X(), U.Y(), U.Z(), 0,
+		F.X(), F.Y(), F.Z(), 0,
+		0, 0, 0, 1.0f
+	);
+
+	XMVECTOR Q = XMQuaternionRotationMatrix(M);
+	return XMStoreQuaternion(Q);
+}

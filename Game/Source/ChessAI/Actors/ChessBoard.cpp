@@ -12,14 +12,18 @@ using namespace std::chrono;
 
 AChessBoard::AChessBoard() : Super()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	StaticMeshComponent* smc = CreateSubobject<StaticMeshComponent>();
 	SetRootComponent(smc);
 
 	AssetImporter* assimp = GameEngine::GetEngine()->GetAssetImporter();
-	StaticMesh* sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/King/Mesh/king.fbx");
+	StaticMesh* sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/Board/Mesh/board.fbx");
 	smc->SetStaticMesh(sm);
+
+	StaticMeshComponent* king = CreateSubobject<StaticMeshComponent>();
+	king->AttachToComponent(smc);
+
+	sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/King/Mesh/king.fbx");
+	king->SetStaticMesh(sm);
 }
 
 void AChessBoard::TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction)
