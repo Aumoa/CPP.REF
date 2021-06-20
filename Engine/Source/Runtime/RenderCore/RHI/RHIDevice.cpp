@@ -6,7 +6,9 @@
 #include "LogRHI.h"
 #include "RHIDeviceContext.h"
 #include "RHICommandQueue.h"
-#include "RHIResource.h"
+#include "RHITexture2D.h"
+
+using namespace std;
 
 using enum ELogVerbosity;
 
@@ -100,6 +102,32 @@ RHIResource* RHIDevice::CreateDynamicBuffer(size_t length)
 	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
 
 	return CreateSubobject<RHIResource>(this, resource.Get());
+}
+
+RHITexture2D* RHIDevice::CreateTexture2D(ERHIResourceStates initialState, ERHIPixelFormat format, uint32 width, uint32 height, optional<RHITexture2DClearValue> clearValue, ERHIResourceFlags flags)
+{
+	D3D12_RESOURCE_DESC bufferDesc =
+	{
+		.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		.Width = (UINT64)width,
+		.Height = height,
+		.DepthOrArraySize = 1,
+		.MipLevels = 1,
+		.Format = (DXGI_FORMAT)format,
+		.SampleDesc = { 1, 0 },
+		.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
+		.Flags = (D3D12_RESOURCE_FLAGS)flags
+	};
+
+	D3D12_HEAP_PROPERTIES heap =
+	{
+		.Type = D3D12_HEAP_TYPE_DEFAULT
+	};
+
+	ComPtr<ID3D12Resource> resource;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, (D3D12_RESOURCE_STATES)initialState, clearValue.has_value() ? (const D3D12_CLEAR_VALUE*)&clearValue.value() : nullptr, IID_PPV_ARGS(&resource)));
+
+	return CreateSubobject<RHITexture2D>(this, resource.Get());
 }
 
 void RHIDevice::InitializeDebug()

@@ -34,6 +34,9 @@
     <Filter Include="PlatformMisc">
       <UniqueIdentifier>{2d8c3a2f-56e9-4a58-b628-e301a83f8021}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Parser">
+      <UniqueIdentifier>{fa6b7893-f83c-4194-bc75-dc387449523f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameInstance.cpp" />
@@ -130,6 +133,12 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="LogGame.cpp" />
+    <ClCompile Include="Assets\AssetImporter.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Parser\AssimpParser.cpp">
+      <Filter>Assets\Parser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
@@ -253,6 +262,15 @@
     </ClInclude>
     <ClInclude Include="Shaders\ColorShader\ColorVertexFactory.h">
       <Filter>Shaders\ColorShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\AssetImporter.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Parser\ParserBase.h">
+      <Filter>Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Parser\AssimpParser.h">
+      <Filter>Assets\Parser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

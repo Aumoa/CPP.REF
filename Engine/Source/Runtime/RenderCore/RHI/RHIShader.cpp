@@ -137,7 +137,7 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 		},
 		.DepthStencilState =
 		{
-			.DepthEnable = FALSE,
+			.DepthEnable = TRUE,
 			.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
 			.DepthFunc = D3D12_COMPARISON_FUNC_LESS,
 			.StencilEnable = FALSE
@@ -154,7 +154,7 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 			// [0]
 			DXGI_FORMAT_B8G8R8A8_UNORM
 		},
-		//.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
+		.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
 		.SampleDesc = { 1, 0 },
 	};
 

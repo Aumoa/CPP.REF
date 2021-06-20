@@ -280,5 +280,18 @@ enum class ERHIShaderParameterType
     ParameterCollection
 };
 
+enum class ERHIResourceFlags
+{
+    None = 0,
+    AllowRenderTarget= 0x1,
+    AllowDepthStencil = 0x2,
+    AllowUnorderedAccess = 0x4,
+    DenyShaderResource = 0x8,
+    AllowCrossAdapter = 0x10,
+    AllowSimultaneous = 0x20,
+    VideoDecodeReferenceOnly = 0x40
+};
+DEFINE_ENUM_FLAG_OPERATORS(ERHIResourceFlags);
+
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

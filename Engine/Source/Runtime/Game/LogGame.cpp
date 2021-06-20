@@ -11,3 +11,4 @@ LogCategory LogWorld(L"World");
 LogCategory LogCamera(L"Camera");
 LogCategory LogComponent(L"Component");
 LogCategory LogWindows(L"Windows");
+LogCategory LogAssets(L"Assets");

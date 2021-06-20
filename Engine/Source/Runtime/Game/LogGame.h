@@ -13,3 +13,4 @@ extern LogCategory LogWorld;
 extern LogCategory LogCamera;
 extern LogCategory LogComponent;
 extern LogCategory LogWindows;
+extern LogCategory LogAssets;

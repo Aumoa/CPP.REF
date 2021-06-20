@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "RenderMinimal.h"
 #include "StaticMesh.h"
 
 class RHIVertexFactory;
@@ -13,4 +14,5 @@ public:
 
 public:
 	StaticMeshTest(std::wstring_view name, RHIVertexFactory* vfactory);
+	StaticMeshTest(std::wstring_view name, RHIVertexFactory* vfactory, std::span<const RHIVertex> vertices, std::span<const uint32> indices);
 };

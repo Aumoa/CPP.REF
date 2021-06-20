@@ -7,33 +7,36 @@
 
 StaticMeshRenderData::StaticMeshRenderData(RHIVertexFactory* vfactory) : Super()
 {
-	// TEST IMPLEMENTATION
-	MeshBatch& batch1 = MeshBatches.emplace_back();
-	batch1.VertexFactory = vfactory;
-
-	RHIVertex triangle[3] =
+	if (vfactory != nullptr)
 	{
-		{.Position = Vector3(0.0f, +1.0f, 0.0f), .Color = NamedColors::Red },
-		{.Position = Vector3(1.0f, -1.0f, 0.0f), .Color = NamedColors::Green },
-		{.Position = Vector3(-1.0f, -1.0f, 0.0f), .Color = NamedColors::Blue },
-	};
+		// TEST IMPLEMENTATION
+		MeshBatch& batch1 = MeshBatches.emplace_back();
+		batch1.VertexFactory = vfactory;
 
-	uint32 ids[3] = { 0, 1, 2 };
+		RHIVertex triangle[3] =
+		{
+			{.Position = Vector3(0.0f, +1.0f, 0.0f), .Color = NamedColors::Red },
+			{.Position = Vector3(1.0f, -1.0f, 0.0f), .Color = NamedColors::Green },
+			{.Position = Vector3(-1.0f, -1.0f, 0.0f), .Color = NamedColors::Blue },
+		};
 
-	RHIResource* vb = vfactory->CreateVertexBuffer(triangle, 3);
-	RHIResource* ib = vfactory->CreateIndexBuffer(ids, 3);
-	MeshBatchElement& element1 = batch1.Elements.emplace_back() =
-	{
-		.VertexBufferLocation = vb->GetGPUVirtualAddress(),
-		.IndexBufferLocation = ib->GetGPUVirtualAddress(),
-		.IndexCount = 3,
-		.InstanceCount = 1,
-		.StartIndexLocation = 0,
-		.BaseVertexLocation = 0,
-		.StartInstanceLocation = 0,
-		.VertexCount = 3
-	};
+		uint32 ids[3] = { 0, 1, 2 };
 
-	vb->SetOuter(this);
-	ib->SetOuter(this);
+		RHIResource* vb = vfactory->CreateVertexBuffer(triangle, 3);
+		RHIResource* ib = vfactory->CreateIndexBuffer(ids, 3);
+		MeshBatchElement& element1 = batch1.Elements.emplace_back() =
+		{
+			.VertexBufferLocation = vb->GetGPUVirtualAddress(),
+			.IndexBufferLocation = ib->GetGPUVirtualAddress(),
+			.IndexCount = 3,
+			.InstanceCount = 1,
+			.StartIndexLocation = 0,
+			.BaseVertexLocation = 0,
+			.StartInstanceLocation = 0,
+			.VertexCount = 3
+		};
+
+		vb->SetOuter(this);
+		ib->SetOuter(this);
+	}
 }

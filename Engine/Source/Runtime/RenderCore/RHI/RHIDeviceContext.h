@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RHIDeviceChild.h"
+#include <optional>
 #include "ComPtr.h"
 #include "RHIEnums.h"
 #include "RHIStructures.h"
@@ -13,6 +14,7 @@ struct ID3D12GraphicsCommandList;
 struct ID3D12CommandList;
 class RHIShader;
 class RHIRenderTargetView;
+class RHIDepthStencilView;
 
 /// <summary>
 /// Represents a device context which generates rendering commands.
@@ -73,17 +75,17 @@ public:
 	/// <summary>
 	/// Set render target view.
 	/// </summary>
-	virtual void OMSetRenderTargets(RHIRenderTargetView* rtv, int32 index, int32 count);
-
-	/// <summary>
-	/// Clear render target view as color.
-	/// </summary>
-	virtual void ClearRenderTargetView(RHIRenderTargetView* rtv, const Color& color);
+	virtual void OMSetRenderTargets(RHIRenderTargetView* rtv, int32 rtvStart, int32 count, RHIDepthStencilView* dsv, int32 dsvStart);
 
 	/// <summary>
 	/// Clear render target view as color.
 	/// </summary>
 	virtual void ClearRenderTargetView(RHIRenderTargetView* rtv, int32 index, const Color& color);
+
+	/// <summary>
+	/// Clear render target view as color.
+	/// </summary>
+	virtual void ClearDepthStencilView(RHIDepthStencilView* dsv, int32 index, std::optional<float> depth, std::optional<uint8> stencil);
 
 	/// <summary>
 	/// Set scissor rects.

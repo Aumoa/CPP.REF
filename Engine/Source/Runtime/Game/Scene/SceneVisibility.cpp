@@ -43,6 +43,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 		Transform transform = _scene->_primitives[idx]->ComponentTransform;
 		ptr->World = transform.GetMatrix();
 		ptr->WorldViewProj = Matrix4x4::Multiply(ptr->World, vp);
+		ptr->WorldInvTranspose = (Matrix4x4&)ptr->World.GetInverse().GetTransposed();
 		++ptr;
 	});
 }

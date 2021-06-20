@@ -143,6 +143,21 @@ struct RHIViewConstants
 {
 	Matrix4x4 World;
 	Matrix4x4 WorldViewProj;
+	Matrix4x4 WorldInvTranspose;
+};
+
+struct RHITexture2DClearValue
+{
+	ERHIPixelFormat Format;
+	union
+	{
+		float ClearColor[4];
+		struct DepthStencilValue
+		{
+			float Depth;
+			uint8 Stencil;
+		} DepthStencil;
+	};
 };
 
 #pragma pack(pop)

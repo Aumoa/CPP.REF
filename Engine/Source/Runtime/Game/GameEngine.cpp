@@ -10,6 +10,7 @@
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHIRenderTargetView.h"
 #include "RHI/RHITexture2D.h"
+#include "RHI/RHIDepthStencilView.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
 #include "Shaders/ColorShader/ColorShader.h"
 #include "Components/InputComponent.h"
@@ -17,6 +18,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneRenderer.h"
+#include "Assets/AssetImporter.h"
 
 using enum ELogVerbosity;
 
@@ -51,15 +53,14 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_colorShader = CreateSubobject<ColorShader>(_device);
 	_colorShader->Compile(_colorVertexFactory);
 	_rtv = CreateSubobject<RHIRenderTargetView>(_device, 3);
+	_assimp = CreateSubobject<AssetImporter>(this, _colorVertexFactory);
+	_dsv = CreateSubobject<RHIDepthStencilView>(_device, 1);
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
 	frameworkView->Size += [this](int32 width, int32 height) { ResizedApp(width, height); };
 
 	RegisterRHIGarbageCollector();
-
-	// Initialize platform input system.
-
 }
 
 void GameEngine::RegisterRHIGarbageCollector()
@@ -104,6 +105,21 @@ void GameEngine::ResizedApp(int32 width, int32 height)
 		RHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
 		_rtv->CreateRenderTargetView(texture, i);
 	}
+
+	// Resize depth stencil buffer.
+	if (_depthBuffer != nullptr)
+	{
+		DestroySubobject(_depthBuffer);
+	}
+
+	RHITexture2DClearValue clearValue =
+	{
+		.Format = ERHIPixelFormat::D24_UNORM_S8_UINT,
+		.DepthStencil = { 1.0f, 0 }
+	};
+
+	_depthBuffer = _device->CreateTexture2D(ERHIResourceStates::DepthWrite, ERHIPixelFormat::D24_UNORM_S8_UINT, width, height, clearValue, ERHIResourceFlags::AllowDepthStencil);
+	_dsv->CreateDepthStencilView(_depthBuffer, 0);
 
 	_vpWidth = width;
 	_vpHeight = height;
@@ -157,8 +173,9 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 
 	_deviceContext->Begin();
 	_deviceContext->TransitionBarrier(1, &barrierBegin);
-	_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1);
+	_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
 	_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
+	_deviceContext->ClearDepthStencilView(_dsv, 0, 1.0f, nullopt);
 	_deviceContext->RSSetScissorRects(1, &sc);
 	_deviceContext->RSSetViewports(1, &vp);
 

@@ -59,7 +59,7 @@ void SceneRenderer::RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* p
 
 			dc->IASetVertexBuffers(0, 1, &vbv);
 			dc->IASetIndexBuffer(ibv);
-			dc->DrawIndexedInstanced(3, 1);
+			dc->DrawIndexedInstanced(element.IndexCount, 1);
 		}
 	}
 }

@@ -6,6 +6,7 @@
 #include "RHIDevice.h"
 #include "RHIShader.h"
 #include "RHIRenderTargetView.h"
+#include "RHIDepthStencilView.h"
 #include "RHIResource.h"
 
 using namespace std;
@@ -64,20 +65,28 @@ void RHIDeviceContext::OMSetRenderTargets(RHIRenderTargetView* rtv)
 	_commandList->OMSetRenderTargets(rtv->GetDescriptorCount(), &handle, 0, nullptr);
 }
 
-void RHIDeviceContext::OMSetRenderTargets(RHIRenderTargetView* rtv, int32 index, int32 count)
+void RHIDeviceContext::OMSetRenderTargets(RHIRenderTargetView* rtv, int32 rtvStart, int32 count, RHIDepthStencilView* dsv, int32 dsvStart)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetCPUDescriptorHandle(index);
-	_commandList->OMSetRenderTargets(count, &handle, 0, nullptr);
-}
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetCPUDescriptorHandle(rtvStart);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+	if (dsv != nullptr)
+	{
+		dsvHandle = dsv->GetCPUDescriptorHandle(dsvStart);
+	}
 
-void RHIDeviceContext::ClearRenderTargetView(RHIRenderTargetView* rtv, const Color& color)
-{
-	_commandList->ClearRenderTargetView(rtv->GetCPUDescriptorHandle(), (const FLOAT*)&color, 0, nullptr);
+	_commandList->OMSetRenderTargets(count, &handle, FALSE, dsv != nullptr ? &dsvHandle : nullptr);
 }
 
 void RHIDeviceContext::ClearRenderTargetView(RHIRenderTargetView* rtv, int32 index, const Color& color)
 {
 	_commandList->ClearRenderTargetView(rtv->GetCPUDescriptorHandle(index), (const FLOAT*)&color, 0, nullptr);
+}
+
+void RHIDeviceContext::ClearDepthStencilView(RHIDepthStencilView* rtv, int32 index, optional<float> depth, optional<uint8> stencil)
+{
+	D3D12_CLEAR_FLAGS flags = depth.has_value() ? D3D12_CLEAR_FLAG_DEPTH : (D3D12_CLEAR_FLAGS)0;
+	flags |= stencil.has_value() ? D3D12_CLEAR_FLAG_STENCIL : (D3D12_CLEAR_FLAGS)0;
+	_commandList->ClearDepthStencilView(rtv->GetCPUDescriptorHandle(index), flags, depth.value_or(0), stencil.value_or(0), 0, nullptr);
 }
 
 void RHIDeviceContext::RSSetScissorRects(int32 count, const RHIScissorRect* rects)

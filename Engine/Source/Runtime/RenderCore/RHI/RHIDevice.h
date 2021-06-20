@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "ComPtr.h"
-#include "RHIEnums.h"
+#include "RHIStructures.h"
 
 struct IDXGIFactory2;
 struct ID3D12Device;
 class RHICommandQueue;
 class RHIResource;
+class RHITexture2D;
 
 /// <summary>
 /// Provide interface for control all render devices.
@@ -47,6 +48,8 @@ public:
 	/// Create dynamic buffer.
 	/// </summary>
 	RHIResource* CreateDynamicBuffer(size_t length);
+
+	RHITexture2D* CreateTexture2D(ERHIResourceStates initialState, ERHIPixelFormat format, uint32 width, uint32 height, std::optional<RHITexture2DClearValue> clearValue, ERHIResourceFlags flags = ERHIResourceFlags::None);
 
 public /*internal*/:
 	IDXGIFactory2* GetFactory() const { return _factory.Get(); }

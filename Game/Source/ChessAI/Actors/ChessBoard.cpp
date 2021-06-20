@@ -2,7 +2,7 @@
 
 #include "ChessBoard.h"
 #include "Components/StaticMeshComponent.h"
-#include "Assets/StaticMeshTest.h"
+#include "Assets/AssetImporter.h"
 #include "GameEngine.h"
 #include "Pawns/ChessBoardProxy.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
@@ -14,9 +14,12 @@ AChessBoard::AChessBoard() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	StaticMeshComponent* sm = CreateSubobject<StaticMeshComponent>();
-	SetRootComponent(sm);
-	sm->SetStaticMesh(CreateSubobject<StaticMeshTest>(L"TEST_Triangle", GameEngine::GetEngine()->GetColorVertexFactory()));
+	StaticMeshComponent* smc = CreateSubobject<StaticMeshComponent>();
+	SetRootComponent(smc);
+
+	AssetImporter* assimp = GameEngine::GetEngine()->GetAssetImporter();
+	StaticMesh* sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/King/Mesh/king.fbx");
+	smc->SetStaticMesh(sm);
 }
 
 void AChessBoard::TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction)

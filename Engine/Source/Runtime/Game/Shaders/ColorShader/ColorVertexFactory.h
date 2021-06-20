@@ -16,6 +16,7 @@ public:
 	{
 		Vector3 Pos;
 		Vector3 Color;
+		Vector3 Normal;
 	};
 #pragma pack(pop)
 

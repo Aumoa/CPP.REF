@@ -17,7 +17,8 @@ RHIResource* ColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, s
 		vertexBuffer[i] =
 		{
 			.Pos = vertices[i].Position,
-			.Color = ((const Vector4&)vertices[i].Color).Swiz<0, 1, 2>()
+			.Color = ((const Vector4&)vertices[i].Color).Swiz<0, 1, 2>(),
+			.Normal = vertices[i].Normal
 		};
 	}
 
@@ -41,6 +42,14 @@ vector<RHIVertexElement> ColorVertexFactory::GetVertexDeclaration() const
 	{
 		.SemanticName = "COLOR",
 		.AlignedByteOffset = 12,
+		.Format = ERHIVertexElementFormat::R32G32B32_FLOAT
+	};
+
+	// NORMAL
+	elements.emplace_back() =
+	{
+		.SemanticName = "NORMAL",
+		.AlignedByteOffset = 24,
 		.Format = ERHIVertexElementFormat::R32G32B32_FLOAT
 	};
 

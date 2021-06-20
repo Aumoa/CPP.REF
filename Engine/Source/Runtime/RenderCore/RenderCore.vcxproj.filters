@@ -37,6 +37,9 @@
     <ClCompile Include="RHI\LogRHI.cpp">
       <Filter>RHI</Filter>
     </ClCompile>
+    <ClCompile Include="RHI\D3D12DepthStencilView.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RHI">
@@ -92,5 +95,8 @@
       <Filter>RHI</Filter>
     </ClInclude>
     <ClInclude Include="RenderMinimal.h" />
+    <ClInclude Include="RHI\RHIDepthStencilView.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

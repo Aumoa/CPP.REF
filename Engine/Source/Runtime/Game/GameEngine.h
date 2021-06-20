@@ -13,8 +13,11 @@ class RHICommandQueue;
 class RHISwapChain;
 class RHIDeviceContext;
 class RHIRenderTargetView;
+class RHIDepthStencilView;
 class ColorVertexFactory;
 class ColorShader;
+class AssetImporter;
+class RHITexture2D;
 
 /// <summary>
 /// Represents game engine that manage core resources.
@@ -35,6 +38,9 @@ private:
 	ColorVertexFactory* _colorVertexFactory = nullptr;
 	ColorShader* _colorShader = nullptr;
 	RHIRenderTargetView* _rtv = nullptr;
+	AssetImporter* _assimp = nullptr;
+	RHITexture2D* _depthBuffer = nullptr;
+	RHIDepthStencilView* _dsv = nullptr;
 
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;
@@ -75,4 +81,5 @@ private:
 public:
 	RHIDevice* GetRHIDevice() const { return _device; }
 	ColorVertexFactory* GetColorVertexFactory() const { return _colorVertexFactory; }
+	AssetImporter* GetAssetImporter() const { return _assimp; }
 };

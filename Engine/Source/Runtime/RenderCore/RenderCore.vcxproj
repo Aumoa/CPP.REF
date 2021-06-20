@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RHI\D3D12DepthStencilView.cpp" />
     <ClCompile Include="RHI\LogRHI.cpp" />
     <ClCompile Include="RHI\RHICommandQueue.cpp" />
     <ClCompile Include="RHI\RHIDevice.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="RenderMinimal.h" />
     <ClInclude Include="RHI\LogRHI.h" />
     <ClInclude Include="RHI\RHICommandQueue.h" />
+    <ClInclude Include="RHI\RHIDepthStencilView.h" />
     <ClInclude Include="RHI\RHIDevice.h" />
     <ClInclude Include="RHI\RHIDeviceChild.h" />
     <ClInclude Include="RHI\RHIDeviceContext.h" />
