@@ -1,14 +1,14 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Platform.Windows:CoreWindow;
+#pragma once
 
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "GameMinimal.h"
+#include "IFrameworkView.h"
 
 /// <summary>
 /// Represents the single window with input events and basic user interface behaviors.
 /// </summary>
-export class CoreWindow : virtual public Object, virtual public IFrameworkView
+class CoreWindow : virtual public Object, virtual public IFrameworkView
 {
 public:
 	using Super = Object;

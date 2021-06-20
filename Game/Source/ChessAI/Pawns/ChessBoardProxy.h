@@ -1,12 +1,13 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Game.ChessAI:AChessBoardProxy;
+#pragma once
 
-import SC.Runtime.Game;
+#include "GameMinimal.h"
+#include "GameFramework/Pawn.h"
 
-export class AChessBoard;
+class AChessBoard;
 
-export class AChessBoardProxy : public APawn
+class AChessBoardProxy : public APawn
 {
 public:
 	using Super = APawn;

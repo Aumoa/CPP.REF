@@ -1,14 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Game.ChessAI:APiece;
+#pragma once
 
-import std.core;
-import SC.Runtime.Game;
-import :AChessBoard;
+#include "GameMinimal.h"
 
-using namespace std;
+class AChessBoard;
 
-export class APiece : public AActor
+class APiece : public AActor
 {
 public:
 	using Super = AActor;

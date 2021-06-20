@@ -63,6 +63,7 @@
       <EnableModules>true</EnableModules>
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -82,6 +83,7 @@
       <EnableModules>true</EnableModules>
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -92,13 +94,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actors\AChessBoard.cpp" />
-    <ClCompile Include="Actors\AChessBoard.ixx" />
-    <ClCompile Include="Actors\APiece.ixx" />
-    <ClCompile Include="ChessAI.ixx" />
-    <ClCompile Include="Pawns\AChessBoardProxy.cpp" />
-    <ClCompile Include="Pawns\AChessBoardProxy.ixx" />
-    <ClCompile Include="Queries\ChessBoardQuery.ixx" />
+    <ClCompile Include="Actors\ChessBoard.cpp" />
+    <ClCompile Include="Pawns\ChessBoardProxy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\Core\Core.vcxproj">
@@ -107,6 +104,12 @@
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\Game\Game.vcxproj">
       <Project>{3009a2f5-8441-4cd7-8385-9810a1c4642e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Actors\ChessBoard.h" />
+    <ClInclude Include="Actors\Piece.h" />
+    <ClInclude Include="Pawns\ChessBoardProxy.h" />
+    <ClInclude Include="Queries\ChessBoardQuery.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

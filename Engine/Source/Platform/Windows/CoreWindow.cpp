@@ -1,10 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "CoreWindow.h"
 #include <Windows.h>
-
-import SC.Platform.Windows;
-import SC.Runtime.Core;
-import SC.Runtime.Game;
+#include "LogGame.h"
+#include "PlatformMisc/WinMouse.h"
+#include "PlatformMisc/WinKeyboard.h"
 
 using enum ELogVerbosity;
 

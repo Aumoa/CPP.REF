@@ -1,9 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import std.core;
-import SC.Runtime.Game;
-import SC.Runtime.Game.Shaders;
-import SC.Game.ChessAI;
+#include "ChessBoard.h"
+#include "Components/StaticMeshComponent.h"
+#include "Assets/StaticMeshTest.h"
+#include "GameEngine.h"
+#include "Pawns/ChessBoardProxy.h"
+#include "Shaders/ColorShader/ColorVertexFactory.h"
 
 using namespace std;
 using namespace std::chrono;

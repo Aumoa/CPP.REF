@@ -1,9 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Game;
-import SC.Game.ChessAI;
+#include "ChessBoardProxy.h"
+#include "Camera/CameraComponent.h"
 
 AChessBoardProxy::AChessBoardProxy(AChessBoard* chessBoard) : Super()
+	, _board(chessBoard)
 {
 	CameraComponent* cp = CreateSubobject<CameraComponent>();
 	SetRootComponent(cp);

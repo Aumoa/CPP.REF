@@ -1,9 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Core;
-import SC.Runtime.Game;
-import SC.Game.Chess;
-import SC.Game.ChessAI;
+#include "ChessPlayerController.h"
+#include "LogChess.h"
+#include "Level/World.h"
+#include "Level/GameLevel.h"
+#include "Actors/ChessBoard.h"
+#include "Pawns/ChessBoardProxy.h"
+#include "Components/InputComponent.h"
 
 AChessPlayerController::AChessPlayerController() : Super()
 {

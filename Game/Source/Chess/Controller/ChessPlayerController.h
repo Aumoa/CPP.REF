@@ -1,10 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Game.Chess:AChessPlayerController;
+#pragma once
 
-import SC.Runtime.Game;
+#include "GameMinimal.h"
+#include "GameFramework/PlayerController.h"
 
-export class AChessPlayerController : public APlayerController
+class AChessPlayerController : public APlayerController
 {
 public:
 	using Super = APlayerController;

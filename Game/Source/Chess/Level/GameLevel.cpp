@@ -1,8 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-import SC.Runtime.Game;
-import SC.Game.Chess;
-import SC.Game.ChessAI;
+#include "GameLevel.h"
+#include "ChessGameMode.h"
+#include "Level/World.h"
+#include "Actors/ChessBoard.h"
 
 GameLevel::GameLevel() : Super()
 {

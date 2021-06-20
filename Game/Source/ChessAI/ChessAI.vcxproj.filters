@@ -1,24 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ChessAI.ixx" />
-    <ClCompile Include="Actors\AChessBoard.cpp">
+    <ClCompile Include="Actors\ChessBoard.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="Actors\AChessBoard.ixx">
-      <Filter>Actors</Filter>
-    </ClCompile>
-    <ClCompile Include="Pawns\AChessBoardProxy.ixx">
+    <ClCompile Include="Pawns\ChessBoardProxy.cpp">
       <Filter>Pawns</Filter>
-    </ClCompile>
-    <ClCompile Include="Pawns\AChessBoardProxy.cpp">
-      <Filter>Pawns</Filter>
-    </ClCompile>
-    <ClCompile Include="Queries\ChessBoardQuery.ixx">
-      <Filter>Queries</Filter>
-    </ClCompile>
-    <ClCompile Include="Actors\APiece.ixx">
-      <Filter>Actors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -31,5 +18,19 @@
     <Filter Include="Queries">
       <UniqueIdentifier>{511c74db-0ecf-4e74-8ef5-10894daf816b}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Actors\Piece.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\ChessBoard.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Pawns\ChessBoardProxy.h">
+      <Filter>Pawns</Filter>
+    </ClInclude>
+    <ClInclude Include="Queries\ChessBoardQuery.h">
+      <Filter>Queries</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

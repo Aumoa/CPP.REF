@@ -63,6 +63,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(SolutionDir)Game\Source\ChessAI\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,6 +82,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(SolutionDir)Game\Source\ChessAI\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -101,14 +103,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AChessGameMode.ixx" />
-    <ClCompile Include="Chess.ixx" />
-    <ClCompile Include="ChessGameInstance.ixx" />
-    <ClCompile Include="Controller\AChessPlayerController.cpp" />
-    <ClCompile Include="Controller\AChessPlayerController.ixx" />
+    <ClCompile Include="ChessGameInstance.cpp" />
+    <ClCompile Include="ChessGameMode.cpp" />
+    <ClCompile Include="Controller\ChessPlayerController.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
-    <ClCompile Include="Level\GameLevel.ixx" />
-    <ClCompile Include="LogChess.ixx" />
+    <ClCompile Include="LogChess.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChessGameInstance.h" />
+    <ClInclude Include="ChessGameMode.h" />
+    <ClInclude Include="Controller\ChessPlayerController.h" />
+    <ClInclude Include="Level\GameLevel.h" />
+    <ClInclude Include="LogChess.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

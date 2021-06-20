@@ -1,12 +1,13 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-export module SC.Game.Chess:GameLevel;
+#pragma once
 
-import SC.Runtime.Game;
+#include "GameMinimal.h"
+#include "Level/Level.h"
 
-export class AChessBoard;
+class AChessBoard;
 
-export class GameLevel : public Level
+class GameLevel : public Level
 {
 public:
 	using Super = Level;

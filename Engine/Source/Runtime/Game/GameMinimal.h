@@ -6,4 +6,4 @@
 #include "GameEnums.h"
 #include "GameStructures.h"
 #include "SubclassOf.h"
-#include "GameObject.h"
+#include "GameFramework/Actor.h"

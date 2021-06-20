@@ -2,10 +2,8 @@
 
 #include <crtdbg.h>
 #include <Windows.h>
-
-import std.core;
-import SC.Game.Chess;
-import SC.Platform.Windows;
+#include "ChessGameInstance.h"
+#include "CoreWindow.h"
 
 using namespace std::chrono;
 

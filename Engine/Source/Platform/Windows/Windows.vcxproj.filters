@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Windows.ixx" />
     <ClCompile Include="WinMain.cpp" />
-    <ClCompile Include="CoreWindow.ixx" />
     <ClCompile Include="CoreWindow.cpp" />
-    <ClCompile Include="LogWindows.ixx" />
-    <ClCompile Include="Internal.ixx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CoreWindow.h" />
   </ItemGroup>
 </Project>
