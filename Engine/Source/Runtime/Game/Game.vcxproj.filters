@@ -114,9 +114,6 @@
     <ClCompile Include="Scene\StaticMeshRenderData.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\StaticMeshTest.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\StaticMesh.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
@@ -160,9 +157,6 @@
     <ClInclude Include="IFrameworkView.h" />
     <ClInclude Include="LogGame.h" />
     <ClInclude Include="Assets\StaticMesh.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="Assets\StaticMeshTest.h">
       <Filter>Assets</Filter>
     </ClInclude>
     <ClInclude Include="GameFramework\Actor.h">

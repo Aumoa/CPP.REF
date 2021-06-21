@@ -2,26 +2,27 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "RenderMinimal.h"
 #include "GameEnums.h"
 
 class RHIVertexFactory;
 
 struct MeshBatchElement
 {
-	uint64 VertexBufferLocation = 0;
-	uint64 IndexBufferLocation = 0;
-
 	uint32 IndexCount = 0;
 	uint32 InstanceCount = 0;
 	int32 StartIndexLocation = 0;
 	int32 BaseVertexLocation = 0;
-	uint32 StartInstanceLocation = 0;
 	uint32 VertexCount = 0;
 };
 
 struct MeshBatch
 {
+    std::vector<RHIVertex> VertexBuffer;
+    std::vector<uint32> IndexBuffer;
+    uint64 VertexBufferLocation = 0;
+    uint64 IndexBufferLocation = 0;
+
 	std::vector<MeshBatchElement> Elements;
 	RHIVertexFactory* VertexFactory = nullptr;
 };

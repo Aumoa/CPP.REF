@@ -129,7 +129,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ASSIMP_API=</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="Assets\StaticMesh.cpp" />
-    <ClCompile Include="Assets\StaticMeshTest.cpp" />
     <ClCompile Include="Camera\PlayerCameraManager.cpp" />
     <ClCompile Include="Camera\CameraComponent.cpp" />
     <ClCompile Include="Components\ActorComponent.cpp" />
@@ -181,7 +180,6 @@
     <ClInclude Include="Assets\Parser\AssimpParser.h" />
     <ClInclude Include="Assets\Parser\ParserBase.h" />
     <ClInclude Include="Assets\StaticMesh.h" />
-    <ClInclude Include="Assets\StaticMeshTest.h" />
     <ClInclude Include="Camera\CameraComponent.h" />
     <ClInclude Include="Camera\PlayerCameraManager.h" />
     <ClInclude Include="Components\ActorComponent.h" />

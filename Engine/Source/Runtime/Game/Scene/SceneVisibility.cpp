@@ -112,4 +112,5 @@ void SceneVisibility::ReadyBuffer(size_t capa, bool bAllowShrink)
 	}
 
 	_viewBuffer = dev->CreateDynamicBuffer(next);
+	_viewBufCapa = capa;
 }

@@ -44,22 +44,24 @@ void SceneRenderer::RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* p
 	for (auto& batch : proxy->MeshBatches)
 	{
 		uint32 vStride = batch.VertexFactory->GetVertexStride();
+		uint32 iStride = batch.VertexFactory->GetIndexStride();
+
+		RHIVertexBufferView vbv;
+		vbv.BufferLocation = batch.VertexBufferLocation;
+		vbv.SizeInBytes = vStride * (uint32)batch.VertexBuffer.size();
+		vbv.StrideInBytes = vStride;
+
+		RHIIndexBufferView ibv;
+		ibv.BufferLocation = batch.IndexBufferLocation;
+		ibv.SizeInBytes = sizeof(uint32) * (uint32)batch.IndexBuffer.size();
+		ibv.Format = ERHIVertexElementFormat::R32_UINT;
+
+		dc->IASetVertexBuffers(0, 1, &vbv);
+		dc->IASetIndexBuffer(ibv);
 
 		for (auto& element : batch.Elements)
 		{
-			RHIVertexBufferView vbv;
-			vbv.BufferLocation = element.VertexBufferLocation;
-			vbv.SizeInBytes = vStride * element.VertexCount;
-			vbv.StrideInBytes = vStride;
-
-			RHIIndexBufferView ibv;
-			ibv.BufferLocation = element.IndexBufferLocation;
-			ibv.SizeInBytes = sizeof(uint32) * element.IndexCount;
-			ibv.Format = ERHIVertexElementFormat::R32_UINT;
-
-			dc->IASetVertexBuffers(0, 1, &vbv);
-			dc->IASetIndexBuffer(ibv);
-			dc->DrawIndexedInstanced(element.IndexCount, 1);
+			dc->DrawIndexedInstanced(element.IndexCount, 1, element.StartIndexLocation, element.BaseVertexLocation);
 		}
 	}
 }

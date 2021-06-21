@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include <comdef.h>
+#include <string>
 
 template <typename T>
 class ComPtr
@@ -244,22 +245,5 @@ public:
     }
 };
 
-inline void HR(LogCategory& category, HRESULT hr)
-{
-    if (FAILED(hr))
-    {
-        _com_error com_error(hr);
-        std::wstring msg = com_error.ErrorMessage();
-        LogSystem::Log(category, ELogVerbosity::Fatal, msg);
-    }
-}
-
-inline void HR_E(LogCategory& category, HRESULT hr)
-{
-    if (FAILED(hr))
-    {
-        _com_error com_error(hr);
-        std::wstring msg = com_error.ErrorMessage();
-        LogSystem::Log(category, ELogVerbosity::Error, msg);
-    }
-}
+void HR(LogCategory& category, HRESULT hr);
+void HR_E(LogCategory& category, HRESULT hr);

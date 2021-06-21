@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComPtr.cpp" />
     <ClCompile Include="RHI\D3D12DepthStencilView.cpp" />
     <ClCompile Include="RHI\LogRHI.cpp" />
     <ClCompile Include="RHI\RHICommandQueue.cpp" />

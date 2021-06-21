@@ -13,7 +13,7 @@ public:
 	using Super = Object;
 
 public:
-	StaticMeshRenderData(RHIVertexFactory* vfactory);
+	StaticMeshRenderData();
 
 	std::vector<MeshBatch> MeshBatches;
 };

@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 
+class RHIVertexFactory;
 class StaticMeshRenderData;
+struct RHIVertex;
 
 class StaticMesh : virtual public Object
 {
@@ -13,15 +15,13 @@ public:
 
 private:
 	std::wstring _name;
+	StaticMeshRenderData* _renderData = nullptr;
 
 public:
-	StaticMesh(std::wstring_view name);
+	StaticMesh(std::wstring_view name, StaticMeshRenderData* renderData);
 
 	std::wstring GetName() const { return _name; }
 
-protected:
-	StaticMeshRenderData* _RenderData = nullptr;
-
 public:
-	StaticMeshRenderData* GetRenderData() const { return _RenderData; }
+	StaticMeshRenderData* GetRenderData() const { return _renderData; }
 };

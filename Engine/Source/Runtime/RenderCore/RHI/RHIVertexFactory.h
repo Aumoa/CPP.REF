@@ -36,4 +36,9 @@ public:
 	/// Provide vertex declaration of this shader program.
 	/// </summary>
 	virtual std::vector<RHIVertexElement> GetVertexDeclaration() const { return {}; }
+
+	/// <summary>
+	/// Get index stride.
+	/// </summary>
+	virtual uint32 GetIndexStride() const { return sizeof(uint32); }
 };

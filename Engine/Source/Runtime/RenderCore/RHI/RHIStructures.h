@@ -99,6 +99,11 @@ struct RHIVertex
 	/// Color.
 	/// </summary>
 	Color Color;
+
+	/// <summary>
+	/// Texture coordinates.
+	/// </summary>
+	Vector2 TexCoord;
 };
 
 /// <summary>
@@ -139,7 +144,7 @@ struct RHIShaderParameterElement
 	};
 };
 
-struct RHIViewConstants
+struct alignas(256) RHIViewConstants
 {
 	Matrix4x4 World;
 	Matrix4x4 WorldViewProj;

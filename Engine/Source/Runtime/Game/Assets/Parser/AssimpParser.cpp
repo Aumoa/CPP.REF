@@ -1,13 +1,16 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "AssimpParser.h"
-
-#include "GameEngine.h"
-#include <scene.h>
-#include <Importer.hpp>
-#include <postprocess.h>
+#include "scene.h"
+#include "Importer.hpp"
+#include "postprocess.h"
 #include "LogGame.h"
-#include "Assets/StaticMeshTest.h"
+#include "GameStructures.h"
+#include "GameEngine.h"
+#include "Assets/StaticMesh.h"
+#include "Scene/StaticMeshRenderData.h"
+#include "RHI/RHIVertexFactory.h"
+#include "RHI/RHIResource.h"
 
 using namespace std;
 using namespace std::filesystem;
@@ -182,17 +185,13 @@ StaticMesh* AssimpParser::GetStaticMesh() const
 
 bool AssimpParser::ProcessStaticMeshSubsets()
 {
-	struct StaticMeshSubsetInfo
-	{
-		uint32 VertexStart;
-		uint32 IndexStart;
-		uint32 VertexCount;
-		uint32 IndexCount;
-	};
+	// Ready render data.
+	StaticMeshRenderData* renderData = CreateSubobject<StaticMeshRenderData>();
+	MeshBatch& batch = renderData->MeshBatches.emplace_back();
+	batch.VertexFactory = GetVertexFactory();
 
-	vector<RHIVertex> vertexBuffer;
-	vector<uint32> indexBuffer;
-	vector<StaticMeshSubsetInfo> subsets;
+	vector<RHIVertex>& vertexBuffer = batch.VertexBuffer;
+	vector<uint32>& indexBuffer = batch.IndexBuffer;
 
 	// Query size for all containers preallocate.
 	size_t vertexCount = 0;
@@ -206,63 +205,66 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 		subsetCount += 1;
 	}
 
-	// Preallocate containers.
+	// Pre-allocate containers.
 	vertexBuffer.reserve(vertexCount);
 	indexBuffer.reserve(indexCount);
-	subsets.reserve(subsetCount);
+	batch.Elements.reserve((size_t)_impl->_scene->mNumMeshes);
+
+	int32 lastVertexLocation = 0;
+	int32 lastIndexLocation = 0;
 
 	// Store all elements for this game engine.
-	Color r = NamedColors::Gray;
-	auto StoreSingleMesh = [&](const aiMesh* inMesh)
+	for (uint32 i = 0; i < _impl->_scene->mNumMeshes; ++i)
 	{
-		// Store subset.
-		StaticMeshSubsetInfo& subset = subsets.emplace_back();
-		subset.VertexStart = (uint32)vertexBuffer.size();
-		subset.IndexStart = (uint32)indexBuffer.size();
-		subset.VertexCount = (uint32)inMesh->mNumVertices;
-		subset.IndexCount = (uint32)inMesh->mNumFaces * 3;
-		//subset.Material = materials[inMesh->mMaterialIndex].Get();
+		aiMesh* mesh = _impl->_scene->mMeshes[i];
+
+		MeshBatchElement& element = batch.Elements.emplace_back() =
+		{
+			.IndexCount = (uint32)mesh->mNumFaces * 3,
+			.InstanceCount = 1,
+			.StartIndexLocation = lastIndexLocation,
+			.BaseVertexLocation = lastVertexLocation,
+			.VertexCount = (uint32)mesh->mNumVertices
+		};
 
 		// Store vertices.
-		for (uint32 i = 0; i < inMesh->mNumVertices; ++i)
+		for (uint32 i = 0; i < mesh->mNumVertices; ++i)
 		{
 			RHIVertex& myVertex = vertexBuffer.emplace_back();
-			memcpy(&myVertex.Position, &inMesh->mVertices[i], sizeof(Vector3));
-			memcpy(&myVertex.Normal, &inMesh->mNormals[i], sizeof(Vector3));
-			if (inMesh->HasVertexColors(i))
+			memcpy(&myVertex.Position, &mesh->mVertices[i], sizeof(Vector3));
+			memcpy(&myVertex.Normal, &mesh->mNormals[i], sizeof(Vector3));
+			memcpy(&myVertex.TexCoord, &mesh->mTextureCoords[0][i], sizeof(Vector2));
+			if (mesh->HasVertexColors(i))
 			{
-				memcpy(&myVertex.Color, &inMesh->mColors[i], sizeof(Color));
+				memcpy(&myVertex.Color, &mesh->mColors[i], sizeof(Color));
 			}
 			else
 			{
-				myVertex.Color = r;
+				myVertex.Color = NamedColors::White;
 			}
-			//memcpy(&myVertex.TexCoord, &inMesh->mTextureCoords[0][i], sizeof(Vector2));
 		}
 
 		// Store indices.
-		for (uint32 i = 0; i < inMesh->mNumFaces; ++i)
+		for (uint32 i = 0; i < mesh->mNumFaces; ++i)
 		{
-			indexBuffer.emplace_back() = inMesh->mFaces[i].mIndices[0] + subset.VertexStart;
-			indexBuffer.emplace_back() = inMesh->mFaces[i].mIndices[1] + subset.VertexStart;
-			indexBuffer.emplace_back() = inMesh->mFaces[i].mIndices[2] + subset.VertexStart;
+			uint32& _1 = indexBuffer.emplace_back();
+			indexBuffer.emplace_back();
+			indexBuffer.emplace_back();
+			memcpy(&_1, mesh->mFaces[i].mIndices, sizeof(uint32) * 3);
 		}
 
-		// TEST IMPLEMENTS
-		r = NamedColors::White;
-	};
-
-	for (uint32 i = 0; i < _impl->_scene->mNumMeshes; ++i)
-	{
-		StoreSingleMesh(_impl->_scene->mMeshes[i]);
+		lastVertexLocation = (int32)vertexBuffer.size();
+		lastIndexLocation = (int32)indexBuffer.size();
 	}
 
-	// Create static mesh.
-	//StaticMeshGeometryData geometryData;
-	//geometryData.VertexBuffer = move(vertexBuffer);
-	//geometryData.IndexBuffer = move(indexBuffer);
-	//geometryData.Subsets = move(subsets);
+	RHIResource* vb = batch.VertexFactory->CreateVertexBuffer(vertexBuffer.data(), vertexBuffer.size());
+	vb->SetOuter(renderData);
+	batch.VertexBufferLocation = vb->GetGPUVirtualAddress();
 
-	_mesh = CreateSubobject<StaticMeshTest>(_name.wstring(), GetVertexFactory(), vertexBuffer, indexBuffer);
+	RHIResource* ib = batch.VertexFactory->CreateIndexBuffer(indexBuffer.data(), indexBuffer.size());
+	ib->SetOuter(renderData);
+	batch.IndexBufferLocation = ib->GetGPUVirtualAddress();
+
+	_mesh = CreateSubobject<StaticMesh>(_name.wstring(), renderData);
 	return true;
 }
