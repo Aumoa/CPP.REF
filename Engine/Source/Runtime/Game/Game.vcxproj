@@ -150,6 +150,8 @@
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\World.cpp" />
     <ClCompile Include="LogGame.cpp" />
+    <ClCompile Include="Materials\Material.cpp" />
+    <ClCompile Include="Materials\MaterialInstance.cpp" />
     <ClCompile Include="PlatformMisc\WinKeyboard.cpp" />
     <ClCompile Include="PlatformMisc\WinMouse.cpp" />
     <ClCompile Include="Scene\PrimitiveSceneProxy.cpp" />
@@ -205,6 +207,8 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Level\World.h" />
     <ClInclude Include="LogGame.h" />
+    <ClInclude Include="Materials\Material.h" />
+    <ClInclude Include="Materials\MaterialInstance.h" />
     <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="PlatformMisc\KeyboardTracker.h" />
     <ClInclude Include="PlatformMisc\MouseStateTracker.h" />

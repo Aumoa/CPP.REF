@@ -13,5 +13,5 @@ public:
 	using Super = PrimitiveSceneProxy;
 
 public:
-	StaticMeshSceneProxy(StaticMeshComponent* inComponent);
+	StaticMeshSceneProxy(StaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches);
 };

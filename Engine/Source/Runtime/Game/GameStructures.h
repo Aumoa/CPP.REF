@@ -6,6 +6,7 @@
 #include "GameEnums.h"
 
 class RHIVertexFactory;
+class Material;
 
 struct MeshBatchElement
 {
@@ -14,6 +15,7 @@ struct MeshBatchElement
 	int32 StartIndexLocation = 0;
 	int32 BaseVertexLocation = 0;
 	uint32 VertexCount = 0;
+    uint32 MaterialSlotIndex = 0;
 };
 
 struct MeshBatch
@@ -24,6 +26,7 @@ struct MeshBatch
     uint64 IndexBufferLocation = 0;
 
 	std::vector<MeshBatchElement> Elements;
+    std::vector<Material*> MaterialSlots;
 	RHIVertexFactory* VertexFactory = nullptr;
 };
 

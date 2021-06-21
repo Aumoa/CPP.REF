@@ -6,6 +6,8 @@
 #include "GameEngine.h"
 #include "Pawns/ChessBoardProxy.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
+#include "Shaders/ColorShader/ColorShader.h"
+#include "Materials/MaterialInstance.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -19,11 +21,21 @@ AChessBoard::AChessBoard() : Super()
 	StaticMesh* sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/Board/Mesh/board.fbx");
 	smc->SetStaticMesh(sm);
 
+	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
+	MaterialInstance* black = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
+	black->SetScalarParameterValueByName(L"Color", 0.2f);
+	smc->SetMaterial(0, black);
+
+	MaterialInstance* white = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
+	white->SetScalarParameterValueByName(L"Color", 0.8f);
+	smc->SetMaterial(1, white);
+
 	StaticMeshComponent* king = CreateSubobject<StaticMeshComponent>();
 	king->AttachToComponent(smc);
 
 	sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/King/Mesh/king.fbx");
 	king->SetStaticMesh(sm);
+	king->SetMaterial(0, black);
 }
 
 void AChessBoard::TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction)

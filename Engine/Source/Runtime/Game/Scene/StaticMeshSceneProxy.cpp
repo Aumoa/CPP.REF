@@ -5,10 +5,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Assets/StaticMesh.h"
 
-StaticMeshSceneProxy::StaticMeshSceneProxy(StaticMeshComponent* inComponent) : Super(inComponent)
-{
-	StaticMesh* mesh = inComponent->GetStaticMesh();
-	StaticMeshRenderData* rd = mesh->GetRenderData();
+using namespace std;
 
-	MeshBatches = rd->MeshBatches;
+StaticMeshSceneProxy::StaticMeshSceneProxy(StaticMeshComponent* inComponent, const vector<MeshBatch>& batches) : Super(inComponent)
+{
+	MeshBatches = batches;
 }

@@ -138,6 +138,11 @@ void RHIDeviceContext::SetGraphicsRootConstantBufferView(uint32 index, uint64 bu
 	_commandList->SetGraphicsRootConstantBufferView(index, bufferLocation);
 }
 
+void RHIDeviceContext::SetGraphicsRoot32BitConstants(uint32 index, uint32 num32BitsToSet, const void* srcData, uint32 destOffsetIn32BitValues)
+{
+	_commandList->SetGraphicsRoot32BitConstants(index, num32BitsToSet, srcData, destOffsetIn32BitValues);
+}
+
 ID3D12CommandList* RHIDeviceContext::GetCommandList() const
 {
 	return _commandList.Get();

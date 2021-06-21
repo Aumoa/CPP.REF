@@ -37,6 +37,9 @@
     <Filter Include="Assets\Parser">
       <UniqueIdentifier>{fa6b7893-f83c-4194-bc75-dc387449523f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{d708cf45-3403-4133-b7ad-cd5028d451b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameInstance.cpp" />
@@ -135,6 +138,12 @@
     </ClCompile>
     <ClCompile Include="Assets\Parser\AssimpParser.cpp">
       <Filter>Assets\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Materials\Material.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="Materials\MaterialInstance.cpp">
+      <Filter>Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +274,12 @@
     </ClInclude>
     <ClInclude Include="Assets\Parser\AssimpParser.h">
       <Filter>Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials\Material.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials\MaterialInstance.h">
+      <Filter>Materials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

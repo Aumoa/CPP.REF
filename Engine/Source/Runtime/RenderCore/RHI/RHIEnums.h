@@ -277,7 +277,8 @@ enum class ERHIShaderParameterType
 {
     ParameterCollection_CameraConstants,
 
-    ParameterCollection
+    ParameterCollection,
+    ScalarParameterConstants
 };
 
 enum class ERHIResourceFlags

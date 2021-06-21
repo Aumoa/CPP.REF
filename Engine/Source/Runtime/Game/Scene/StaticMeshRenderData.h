@@ -4,6 +4,7 @@
 
 #include "RenderMinimal.h"
 
+class Material;
 class RHIVertexFactory;
 struct MeshBatch;
 

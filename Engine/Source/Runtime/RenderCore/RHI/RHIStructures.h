@@ -132,6 +132,13 @@ struct RHIParameterCollectionDeclaration
 	uint32 RegisterSpace;
 };
 
+struct RHIScalarConstantsParameter
+{
+	uint32 ShaderRegister;
+	uint32 RegisterSpace;
+	uint32 Num32Bits;
+};
+
 /// <summary>
 /// Represents shader parameter element.
 /// </summary>
@@ -141,6 +148,7 @@ struct RHIShaderParameterElement
 	union
 	{
 		RHIParameterCollectionDeclaration ParameterCollection;
+		RHIScalarConstantsParameter ScalarConstantsParameter;
 	};
 };
 

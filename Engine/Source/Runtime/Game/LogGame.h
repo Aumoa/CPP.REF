@@ -14,3 +14,5 @@ extern LogCategory LogCamera;
 extern LogCategory LogComponent;
 extern LogCategory LogWindows;
 extern LogCategory LogAssets;
+extern LogCategory LogMaterial;
+extern LogCategory LogStaticMesh;

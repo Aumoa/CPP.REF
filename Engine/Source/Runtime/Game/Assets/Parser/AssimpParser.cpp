@@ -209,6 +209,7 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 	vertexBuffer.reserve(vertexCount);
 	indexBuffer.reserve(indexCount);
 	batch.Elements.reserve((size_t)_impl->_scene->mNumMeshes);
+	batch.MaterialSlots.resize((size_t)_impl->_scene->mNumMaterials);
 
 	int32 lastVertexLocation = 0;
 	int32 lastIndexLocation = 0;
@@ -252,6 +253,8 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 			indexBuffer.emplace_back();
 			memcpy(&_1, mesh->mFaces[i].mIndices, sizeof(uint32) * 3);
 		}
+		
+		element.MaterialSlotIndex = mesh->mMaterialIndex;
 
 		lastVertexLocation = (int32)vertexBuffer.size();
 		lastIndexLocation = (int32)indexBuffer.size();

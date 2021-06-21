@@ -12,3 +12,5 @@ LogCategory LogCamera(L"Camera");
 LogCategory LogComponent(L"Component");
 LogCategory LogWindows(L"Windows");
 LogCategory LogAssets(L"Assets");
+LogCategory LogMaterial(L"Material");
+LogCategory LogStaticMesh(L"StaticMesh");

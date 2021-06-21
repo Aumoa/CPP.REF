@@ -7,6 +7,8 @@
 #include <vector>
 #include <span>
 
+class Material;
+
 /// <summary>
 /// Represents default shader bytecode.
 /// </summary>
@@ -18,11 +20,14 @@ public:
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
+	Material* _material = nullptr;
 
 public:
 	ColorShader(RHIDevice* device);
 
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
+
+	Material* GetDefaultMaterial() const;
 
 protected:
 	virtual std::span<uint8 const> CompileVS() override;

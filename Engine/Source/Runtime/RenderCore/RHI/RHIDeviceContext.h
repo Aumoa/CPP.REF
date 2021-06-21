@@ -109,6 +109,7 @@ public:
 
 	virtual void IASetIndexBuffer(const RHIIndexBufferView& view);
 	virtual void SetGraphicsRootConstantBufferView(uint32 index, uint64 bufferLocation);
+	virtual void SetGraphicsRoot32BitConstants(uint32 index, uint32 num32BitsToSet, const void* srcData, uint32 destOffsetIn32BitValues);
 
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const;

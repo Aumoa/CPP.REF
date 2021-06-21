@@ -18,5 +18,6 @@ bool GameLevel::LoadLevel(World* world)
 	}
 
 	_psBoard = world->SpawnActor<AChessBoard>();
+	_psBoard->SetActorLocation(Vector3(3.5f, 0, 3.5f));
 	return true;
 }

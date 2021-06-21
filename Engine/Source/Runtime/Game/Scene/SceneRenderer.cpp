@@ -8,6 +8,7 @@
 #include "RHI/RHIDeviceContext.h"
 #include "RHI/RHIShader.h"
 #include "RHI/RHIVertexFactory.h"
+#include "Materials/Material.h"
 
 SceneRenderer::SceneRenderer(Scene* scene, RHIShader* shader) : Super()
 	, _scene(scene)
@@ -41,6 +42,7 @@ void SceneRenderer::RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* p
 {
 	dc->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
 
+	static int32 j = 0;
 	for (auto& batch : proxy->MeshBatches)
 	{
 		uint32 vStride = batch.VertexFactory->GetVertexStride();
@@ -59,8 +61,15 @@ void SceneRenderer::RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* p
 		dc->IASetVertexBuffers(0, 1, &vbv);
 		dc->IASetIndexBuffer(ibv);
 
+		int32 i = 0;
+		j++;
 		for (auto& element : batch.Elements)
 		{
+			Material* material = batch.MaterialSlots[element.MaterialSlotIndex];
+			if (material != nullptr)
+			{
+				material->SetupMaterial(dc);
+			}
 			dc->DrawIndexedInstanced(element.IndexCount, 1, element.StartIndexLocation, element.BaseVertexLocation);
 		}
 	}

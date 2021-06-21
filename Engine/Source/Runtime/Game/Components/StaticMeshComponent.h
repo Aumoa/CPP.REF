@@ -14,6 +14,8 @@ public:
 
 private:
 	StaticMesh* _StaticMesh = nullptr;
+	MeshBatch _batch;
+	std::vector<Material*> _materials;
 
 public:
 	StaticMeshComponent();
@@ -22,4 +24,8 @@ public:
 
 	virtual void SetStaticMesh(StaticMesh* inNewMesh);
 	StaticMesh* GetStaticMesh() const { return _StaticMesh; }
+
+	void SetMaterial(int32 index, Material* material);
+	Material* GetMaterial(int32 index) const;
+	int32 GetMaterialCount() const;
 };

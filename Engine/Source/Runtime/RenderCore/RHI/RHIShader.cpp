@@ -44,6 +44,18 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 				}
 			};
 			break;
+		case ERHIShaderParameterType::ScalarParameterConstants:
+			rootParameters.emplace_back() =
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
+				.Constants =
+				{
+					.ShaderRegister = myParam.ScalarConstantsParameter.ShaderRegister,
+					.RegisterSpace = myParam.ScalarConstantsParameter.RegisterSpace,
+					.Num32BitValues = myParam.ScalarConstantsParameter.Num32Bits
+				}
+			};
+			break;
 		default:
 			LogSystem::Log(LogRHI, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
 			rootParameters.emplace_back();
@@ -139,7 +151,7 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 		{
 			.DepthEnable = TRUE,
 			.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-			.DepthFunc = D3D12_COMPARISON_FUNC_LESS,
+			.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
 			.StencilEnable = FALSE
 		},
 		.InputLayout =
