@@ -34,7 +34,6 @@ private:
 	Transform _worldTransform;
 	Transform _localToWorld;
 	EComponentMobility _mobility = EComponentMobility::Movable;
-	EComponentDirtyMask _dirtyMark = EComponentDirtyMask::All;
 
 	SceneAttachment _attachment;
 	std::vector<SceneComponent*> _childComponents;
@@ -50,11 +49,6 @@ public:
 	void AttachToComponent(SceneComponent* attachTo);
 	void AttachToSocket(SceneComponent* attachTo, const std::wstring& socketName);
 	void DetachFromComponent();
-
-	void SetMarkDirty(EComponentDirtyMask inSetMasks);
-	bool HasAnyDirtyMark() const;
-	bool HasDirtyMark(EComponentDirtyMask inMask) const;
-	virtual void ResolveDirtyState();
 
 	inline SceneComponent* GetAttachParent() const { return _attachment.AttachmentRoot; }
 	inline std::wstring GetAttachSocketName() const { return _attachment.SocketName; }
@@ -150,6 +144,8 @@ public:
 			hierarchy.pop();
 		}
 	}
+
+	virtual void MarkRenderStateDirty() {}
 
 private:
 	void UpdateWorldTransform();

@@ -16,38 +16,6 @@ inline constexpr Enum operator ^(Enum a, Enum b) { return Enum(((int32)a) ^ ((in
 inline Enum& operator ^=(Enum& a, Enum b) { return (Enum&)(((int32 &)a) ^= ((int32)b)); }
 
 /// <summary>
-/// The component dirty mask.
-/// </summary>
-enum class EComponentDirtyMask : uint32
-{
-	/// <summary>
-	/// None value.
-	/// </summary>
-	None = 0,
-
-	/// <summary>
-	/// Need to recreate scene proxy.
-	/// </summary>
-	RecreateProxy = 1,
-
-	/// <summary>
-	/// Need to update scene proxy.
-	/// </summary>
-	UpdateProxy = RecreateProxy << 1,
-
-	/// <summary>
-	/// Transform updated.
-	/// </summary>
-	TransformUpdated = UpdateProxy << 1,
-
-	/// <summary>
-	/// All bits.
-	/// </summary>
-	All = 0xFFFFFFFF
-};
-DEFINE_ENUM_FLAG_OPERATORS(EComponentDirtyMask);
-
-/// <summary>
 /// Describes how often this component is allowed to move.
 /// </summary>
 enum class EComponentMobility

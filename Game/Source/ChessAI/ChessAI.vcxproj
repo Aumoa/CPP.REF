@@ -92,7 +92,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actors\Bishop.cpp" />
     <ClCompile Include="Actors\ChessBoard.cpp" />
+    <ClCompile Include="Actors\ChessPawn.cpp" />
+    <ClCompile Include="Actors\King.cpp" />
+    <ClCompile Include="Actors\Knight.cpp" />
+    <ClCompile Include="Actors\Piece.cpp" />
+    <ClCompile Include="Actors\Queen.cpp" />
+    <ClCompile Include="Actors\Rook.cpp" />
+    <ClCompile Include="LogChessAI.cpp" />
     <ClCompile Include="Pawns\ChessBoardProxy.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -104,8 +112,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actors\Bishop.h" />
     <ClInclude Include="Actors\ChessBoard.h" />
+    <ClInclude Include="Actors\ChessPawn.h" />
+    <ClInclude Include="Actors\King.h" />
+    <ClInclude Include="Actors\Knight.h" />
     <ClInclude Include="Actors\Piece.h" />
+    <ClInclude Include="Actors\Queen.h" />
+    <ClInclude Include="Actors\Rook.h" />
+    <ClInclude Include="ChessAIEnums.h" />
+    <ClInclude Include="ChessAIStructures.h" />
+    <ClInclude Include="LogChessAI.h" />
     <ClInclude Include="Pawns\ChessBoardProxy.h" />
     <ClInclude Include="Queries\ChessBoardQuery.h" />
   </ItemGroup>

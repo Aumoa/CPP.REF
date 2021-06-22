@@ -13,6 +13,9 @@ class CoreWindow : virtual public Object, virtual public IFrameworkView
 public:
 	using Super = Object;
 
+public:
+	static constexpr wchar_t ApplicationTitle[] = L"ChessApp";
+
 private:
 	void* _hwnd = nullptr;
 	uint8 _bMainLoop : 1 = false;

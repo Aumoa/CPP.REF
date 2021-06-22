@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameMinimal.h"
+#include "ChessAIStructures.h"
 
 class AChessBoardProxy;
 
@@ -17,7 +18,8 @@ private:
 public:
 	AChessBoard();
 
-	virtual void TickActor(std::chrono::duration<float> elapsedTime, ActorTickFunction* tickFunction) override;
-
+	void InitBoard(World* world);
 	AChessBoardProxy* CreateProxy();
+
+	Vector3 GetBoardCellPosition(const GridIndex& index) const;
 };

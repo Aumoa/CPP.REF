@@ -58,7 +58,7 @@ void Object::DestroySubobject(Object* subobject)
 	Object* outer = subobject->_outer;
 	if (outer == nullptr)
 	{
-		LogSystem::Log(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer is nullptr.");
+		delete outer;
 		return;
 	}
 

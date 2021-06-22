@@ -121,7 +121,10 @@ void SceneComponent::AttachToSocket(SceneComponent* attachTo, const wstring& soc
 
 	ForEachSceneComponents<SceneComponent>([attachTo](SceneComponent* sc)
 	{
-		sc->SetOwnerPrivate(attachTo->GetOwner());
+		if (sc->GetOwner() == nullptr)
+		{
+			sc->SetOwnerPrivate(attachTo->GetOwner());
+		}
 		return false;
 	});
 	UpdateComponentToWorld();
@@ -149,26 +152,6 @@ void SceneComponent::DetachFromComponent()
 	_attachment.SocketName = nullptr;
 
 	UpdateComponentToWorld();
-}
-
-void SceneComponent::SetMarkDirty(EComponentDirtyMask inSetMasks)
-{
-	_dirtyMark |= inSetMasks;
-}
-
-bool SceneComponent::HasAnyDirtyMark() const
-{
-	return _dirtyMark != EComponentDirtyMask::None;
-}
-
-bool SceneComponent::HasDirtyMark(EComponentDirtyMask inMask) const
-{
-	return (_dirtyMark & inMask) != EComponentDirtyMask::None;
-}
-
-void SceneComponent::ResolveDirtyState()
-{
-	_dirtyMark = EComponentDirtyMask::None;
 }
 
 Transform SceneComponent::GetRelativeTransform() const
@@ -246,7 +229,6 @@ void SceneComponent::UpdateWorldTransform()
 	{
 		_worldTransform = _transform;
 	}
-	SetMarkDirty(EComponentDirtyMask::TransformUpdated);
 
 	UpdateChildTransforms();
 }

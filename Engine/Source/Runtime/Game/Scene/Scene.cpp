@@ -19,6 +19,16 @@ void Scene::UpdateScene(duration<float> elapsedTime)
 	for (auto& proxy : _primitives)
 	{
 		PrimitiveComponent* component = proxy->GetComponent();
+
+		if (proxy->bRenderStateDirty)
+		{
+			// Replace primitive scene proxy to re-created instance with same primitive id.
+			int64 primitiveId = proxy->PrimitiveId;
+			DestroySubobject(proxy);
+			proxy = component->CreateSceneProxy();
+			proxy->PrimitiveId = primitiveId;
+		}
+
 		proxy->UpdateTransform_GameThread(component->GetComponentTransform());
 	}
 }

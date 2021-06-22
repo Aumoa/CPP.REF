@@ -25,4 +25,7 @@ public:
 	std::vector<MeshBatch> MeshBatches;
 	int64 PrimitiveId = -1;
 	Transform ComponentTransform;
+	uint8 bRenderStateDirty : 1 = false;
+
+	virtual void MarkRenderStateDirty_GameThread();
 };

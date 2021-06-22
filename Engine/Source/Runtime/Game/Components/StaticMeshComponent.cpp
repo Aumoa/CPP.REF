@@ -48,7 +48,7 @@ void StaticMeshComponent::SetStaticMesh(StaticMesh* inNewMesh)
 			}
 		}
 
-		SetMarkDirty(EComponentDirtyMask::RecreateProxy);
+		MarkRenderStateDirty();
 	}
 }
 
@@ -69,7 +69,7 @@ void StaticMeshComponent::SetMaterial(int32 index, Material* material)
 		if (_batch.MaterialSlots[index] != material)
 		{
 			_batch.MaterialSlots[index] = material;
-			SetMarkDirty(EComponentDirtyMask::RecreateProxy);
+			MarkRenderStateDirty();
 		}
 	}
 }

@@ -17,4 +17,6 @@ public:
 
 	virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
 	PrimitiveSceneProxy* SceneProxy = nullptr;
+
+	virtual void MarkRenderStateDirty() override;
 };

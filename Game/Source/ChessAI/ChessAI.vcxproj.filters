@@ -7,6 +7,28 @@
     <ClCompile Include="Pawns\ChessBoardProxy.cpp">
       <Filter>Pawns</Filter>
     </ClCompile>
+    <ClCompile Include="Actors\Piece.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="LogChessAI.cpp" />
+    <ClCompile Include="Actors\King.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\Queen.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\Bishop.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\Knight.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\Rook.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\ChessPawn.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Actors">
@@ -17,6 +39,9 @@
     </Filter>
     <Filter Include="Queries">
       <UniqueIdentifier>{511c74db-0ecf-4e74-8ef5-10894daf816b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{47172992-06b8-41c2-a3aa-baf574979ec8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +56,27 @@
     </ClInclude>
     <ClInclude Include="Queries\ChessBoardQuery.h">
       <Filter>Queries</Filter>
+    </ClInclude>
+    <ClInclude Include="ChessAIEnums.h" />
+    <ClInclude Include="LogChessAI.h" />
+    <ClInclude Include="Actors\King.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="ChessAIStructures.h" />
+    <ClInclude Include="Actors\Queen.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Bishop.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Knight.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Rook.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\ChessPawn.h">
+      <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

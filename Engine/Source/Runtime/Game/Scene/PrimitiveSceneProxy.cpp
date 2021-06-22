@@ -11,3 +11,8 @@ void PrimitiveSceneProxy::UpdateTransform_GameThread(const Transform& value)
 {
 	ComponentTransform = value;
 }
+
+void PrimitiveSceneProxy::MarkRenderStateDirty_GameThread()
+{
+	bRenderStateDirty = true;
+}
