@@ -39,4 +39,7 @@ struct IFrameworkView : virtual public Object, virtual public IWindowView
 	/// Set latest error code.
 	/// </summary>
 	virtual void SetLastError(int32 code) = 0;
+
+	virtual int32 GetFrameworkWidth() const = 0;
+	virtual int32 GetFrameworkHeight() const = 0;
 };

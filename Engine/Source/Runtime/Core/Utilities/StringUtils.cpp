@@ -2,9 +2,9 @@
 
 #include "StringUtils.h"
 #include <Windows.h>
+#include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
-#include "LogCategory/LogCore.h"
 
 using namespace std;
 

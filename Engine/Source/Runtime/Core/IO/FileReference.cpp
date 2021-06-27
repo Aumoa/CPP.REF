@@ -2,10 +2,10 @@
 
 #include "FileReference.h"
 #include "Object.h"
+#include "LogCore.h"
 #include "DirectoryReference.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
-#include "LogCategory/LogCore.h"
 
 using enum ELogVerbosity;
 

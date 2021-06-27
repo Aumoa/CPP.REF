@@ -101,6 +101,7 @@ public:
 	Scene* GetScene() const { return _scene; }
 	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
 	Level* GetLevel() const { return _level; }
+	GameEngine* GetEngine() const { return _engine; }
 
 private:
 	bool InternalSpawnActor(AActor* instance);

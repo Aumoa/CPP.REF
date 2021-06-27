@@ -30,6 +30,7 @@ public:
 	CameraComponent* FindPlayerCameraComponent() const;
 	void SpawnCameraManager(World* level);
 	void UpdateCameraManager(std::chrono::duration<float> elapsedTime);
+	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY) const;
 
 	inline InputComponent* GetInputComponent() const { return _inputComponent; }
 };

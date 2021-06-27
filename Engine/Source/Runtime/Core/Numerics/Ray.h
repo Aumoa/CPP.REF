@@ -24,12 +24,12 @@ struct Ray
 	/// <summary>
 	/// The distance. Represents infinity if it is nullopt.
 	/// </summary>
-	std::optional<float> Distance = 0;
+	std::optional<float> Distance;
 
 	/// <summary>
 	/// Initialize new <see cref="Ray"/> instance.
 	/// </summary>
-	constexpr Ray()
+	Ray()
 	{
 	}
 
@@ -39,7 +39,7 @@ struct Ray
 	/// <param name="origin"> The origin location. </param>
 	/// <param name="direction"> The vector direction. </param>
 	/// <param name="distance"> The distance. </param>
-	constexpr Ray(const Vector<N>& origin, const Vector<N>& direction, std::optional<float> distance = std::nullopt)
+	Ray(const Vector<N>& origin, const Vector<N>& direction, std::optional<float> distance = std::nullopt)
 		: Origin(origin)
 		, Direction(direction)
 		, Distance(distance)
@@ -50,7 +50,7 @@ struct Ray
 	/// Initialize new <see cref="Ray"/> instance.
 	/// </summary>
 	/// <param name="ray"> The initial value. </param>
-	constexpr Ray(const Ray& ray) : Origin(ray.Origin), Direction(ray.Direction), Distance(ray.Distance)
+	Ray(const Ray& ray) : Origin(ray.Origin), Direction(ray.Direction), Distance(ray.Distance)
 	{
 	}
 
@@ -60,7 +60,7 @@ struct Ray
 	/// <param name="rhs"> The target ray. </param>
 	/// <param name="epsilon"> The epsilon value. If different of two components is lower than this values, is nearly equals. </param>
 	/// <returns> Indicate two rays is nearly equals. </returns>
-	constexpr bool NearlyEquals(const Ray& rhs, float epsilon) const
+	bool NearlyEquals(const Ray& rhs, float epsilon) const
 	{
 		return Origin.NearlyEquals(rhs.Origin, epsilon)
 			&& Direction.NearlyEquals(rhs.Direction, epsilon)

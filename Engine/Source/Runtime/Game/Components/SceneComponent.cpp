@@ -55,7 +55,7 @@ Transform SceneComponent::GetSocketTransform(const wstring& socketName, ECompone
 bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
 {
 	Quaternion oldRotation = inSpace == EComponentTransformSpace::World ? GetComponentRotation() : GetRotation();
-	if (inMoveDelta.NearlyEquals(Vector3::GetZero(), MathEx::SmallNumber<>) && oldRotation.NearlyEquals(inNewRotation, MathEx::SmallNumber<>))
+	if (inMoveDelta.NearlyEquals(Vector3::GetZero()) && oldRotation.NearlyEquals(inNewRotation))
 	{
 		// MoveDelta and NewRotation is nearly equals to previous component transform.
 		// Skip moving and return state indicating that be not moved.

@@ -1,9 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Object.h"
+#include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
-#include "LogCategory/LogCore.h"
 
 using namespace std;
 

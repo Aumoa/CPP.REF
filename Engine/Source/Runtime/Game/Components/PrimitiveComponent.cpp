@@ -8,6 +8,16 @@ PrimitiveComponent::PrimitiveComponent() : Super()
 {
 }
 
+void PrimitiveComponent::SetHiddenInGame(bool bHidden)
+{
+	_bHiddenInGame = bHidden;
+
+	if (SceneProxy != nullptr)
+	{
+		SceneProxy->SetHiddenInGame_GameThread(bHidden);
+	}
+}
+
 void PrimitiveComponent::MarkRenderStateDirty()
 {
 	if (SceneProxy == nullptr)

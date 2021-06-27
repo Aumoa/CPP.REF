@@ -14,3 +14,4 @@ LogCategory LogWindows(L"Windows");
 LogCategory LogAssets(L"Assets");
 LogCategory LogMaterial(L"Material");
 LogCategory LogStaticMesh(L"StaticMesh");
+LogCategory LogPlayerController(L"PlayerController");

@@ -137,3 +137,17 @@ void CoreWindow::SetLastError(int32 code)
 {
 	_lastError = code;
 }
+
+int32 CoreWindow::GetFrameworkWidth() const
+{
+	RECT rc;
+	GetClientRect((HWND)_hwnd, &rc);
+	return rc.right - rc.left;
+}
+
+int32 CoreWindow::GetFrameworkHeight() const
+{
+	RECT rc;
+	GetClientRect((HWND)_hwnd, &rc);
+	return rc.bottom - rc.top;
+}

@@ -40,6 +40,9 @@
     <Filter Include="Materials">
       <UniqueIdentifier>{d708cf45-3403-4133-b7ad-cd5028d451b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{21ad887c-a43b-40d0-a88c-418f84ed372a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameInstance.cpp" />
@@ -144,6 +147,9 @@
     </ClCompile>
     <ClCompile Include="Materials\MaterialInstance.cpp">
       <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\GeometryGenerator.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -281,5 +287,16 @@
     <ClInclude Include="Materials\MaterialInstance.h">
       <Filter>Materials</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\GeometryGenerator.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\Bezier.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Misc\TeapotData.inl">
+      <Filter>Misc</Filter>
+    </None>
   </ItemGroup>
 </Project>

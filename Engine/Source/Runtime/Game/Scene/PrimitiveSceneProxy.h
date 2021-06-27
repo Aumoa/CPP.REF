@@ -27,5 +27,11 @@ public:
 	Transform ComponentTransform;
 	uint8 bRenderStateDirty : 1 = false;
 
+private:
+	uint8 _bHiddenInGame : 1 = false;
+
+public:
 	virtual void MarkRenderStateDirty_GameThread();
+	virtual void SetHiddenInGame_GameThread(bool bHiddenInGame);
+	bool IsHiddenInGame() const { return _bHiddenInGame; }
 };

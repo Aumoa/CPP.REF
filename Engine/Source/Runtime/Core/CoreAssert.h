@@ -39,7 +39,7 @@ public:
 	}\
 	\
 	return b;\
-}();
+}()
 #define ensureMsgf(x, fmt, ...) \
 [b = (bool)(x)]()\
 {\
@@ -55,7 +55,7 @@ public:
 	}\
 	\
 	return b;\
-}();
+}()
 
 #else
 

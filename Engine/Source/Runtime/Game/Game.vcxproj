@@ -152,6 +152,7 @@
     <ClCompile Include="LogGame.cpp" />
     <ClCompile Include="Materials\Material.cpp" />
     <ClCompile Include="Materials\MaterialInstance.cpp" />
+    <ClCompile Include="Misc\GeometryGenerator.cpp" />
     <ClCompile Include="PlatformMisc\WinKeyboard.cpp" />
     <ClCompile Include="PlatformMisc\WinMouse.cpp" />
     <ClCompile Include="Scene\PrimitiveSceneProxy.cpp" />
@@ -209,6 +210,8 @@
     <ClInclude Include="LogGame.h" />
     <ClInclude Include="Materials\Material.h" />
     <ClInclude Include="Materials\MaterialInstance.h" />
+    <ClInclude Include="Misc\Bezier.h" />
+    <ClInclude Include="Misc\GeometryGenerator.h" />
     <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="PlatformMisc\KeyboardTracker.h" />
     <ClInclude Include="PlatformMisc\MouseStateTracker.h" />
@@ -226,6 +229,9 @@
     <ClInclude Include="Ticking\TickFunction.h" />
     <ClInclude Include="Ticking\TickingGroup.h" />
     <ClInclude Include="Ticking\TickScheduler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Misc\TeapotData.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

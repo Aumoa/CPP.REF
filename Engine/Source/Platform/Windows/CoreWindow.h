@@ -38,4 +38,10 @@ public:
 
 	/// <inheritdoc/>
 	virtual void SetLastError(int32 code) override;
+
+	/// <inheritdoc/>
+	virtual int32 GetFrameworkWidth() const override;
+
+	/// <inheritdoc/>
+	virtual int32 GetFrameworkHeight() const override;
 };

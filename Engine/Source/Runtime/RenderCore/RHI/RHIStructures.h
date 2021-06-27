@@ -98,7 +98,7 @@ struct RHIVertex
 	/// <summary>
 	/// Color.
 	/// </summary>
-	Color Color;
+	Color Color = NamedColors::White;
 
 	/// <summary>
 	/// Texture coordinates.

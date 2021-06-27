@@ -16,3 +16,4 @@ extern LogCategory LogWindows;
 extern LogCategory LogAssets;
 extern LogCategory LogMaterial;
 extern LogCategory LogStaticMesh;
+extern LogCategory LogPlayerController;
