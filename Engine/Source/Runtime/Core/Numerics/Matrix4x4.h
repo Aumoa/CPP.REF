@@ -53,6 +53,7 @@ struct Matrix4x4 : public Matrix<4, 4>
 	void Decompose(Vector3& outTranslation, Vector3& outScale, Quaternion& outRotation) const;
 
 	Vector3 TransformVector(const Vector3& vector) const;
+	Vector3 TransformNormal(const Vector3& vector) const;
 
 	/// <summary>
 	/// Multiply two matrices with SIMD functions.
@@ -73,7 +74,11 @@ struct Matrix4x4 : public Matrix<4, 4>
 
 	static Matrix4x4 LookToLH(const Vector3& location, const Vector3& dir, const Vector3& up);
 	static Matrix4x4 PerspectiveFovLH(Radians fovAngle, float aspectRatio, float zNearPlane, float zFarPlane);
+	static Matrix4x4 RotationX(Radians angle);
+	static Matrix4x4 RotationY(Radians angle);
+	static Matrix4x4 RotationZ(Radians angle);
 	inline static constexpr Matrix4x4 Identity();
+	inline static constexpr Matrix4x4 Translation(const Vector3& translation);
 };
 
 inline constexpr Matrix4x4 Matrix4x4::Identity()
@@ -83,5 +88,15 @@ inline constexpr Matrix4x4 Matrix4x4::Identity()
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
+	};
+}
+
+inline constexpr Matrix4x4 Matrix4x4::Translation(const Vector3& translation)
+{
+	return Matrix4x4{
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		translation.X(), translation.Y(), translation.Z(), 1.0f
 	};
 }

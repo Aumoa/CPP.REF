@@ -75,6 +75,15 @@ Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
 	return v;
 }
 
+Vector3 Matrix4x4::TransformNormal(const Vector3& vec) const
+{
+	XMMATRIX M = XMLoadMatrix4x4(this);
+	XMVECTOR V = XMVector3TransformNormal(XMVectorSet(vec.X(), vec.Y(), vec.Z(), 0.0f), M);
+	Vector3 v;
+	XMStoreVector3(v, V);
+	return v;
+}
+
 Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& lhs, const Matrix4x4& rhs)
 {
 	XMMATRIX LHS = XMLoadMatrix4x4(&lhs);
@@ -97,5 +106,23 @@ Matrix4x4 Matrix4x4::LookToLH(const Vector3& location, const Vector3& dir, const
 Matrix4x4 Matrix4x4::PerspectiveFovLH(Radians fovAngle, float aspectRatio, float zNearPlane, float zFarPlane)
 {
 	XMMATRIX M = XMMatrixPerspectiveFovLH(fovAngle.Value, aspectRatio, zNearPlane, zFarPlane);
+	return XMStoreMatrix4x4(M);
+}
+
+Matrix4x4 Matrix4x4::RotationX(Radians angle)
+{
+	XMMATRIX M = XMMatrixRotationX(angle.Value);
+	return XMStoreMatrix4x4(M);
+}
+
+Matrix4x4 Matrix4x4::RotationY(Radians angle)
+{
+	XMMATRIX M = XMMatrixRotationY(angle.Value);
+	return XMStoreMatrix4x4(M);
+}
+
+Matrix4x4 Matrix4x4::RotationZ(Radians angle)
+{
+	XMMATRIX M = XMMatrixRotationZ(angle.Value);
 	return XMStoreMatrix4x4(M);
 }

@@ -161,6 +161,5 @@ public:
 	/// <summary>
 	/// Represents small number.
 	/// </summary>
-	template<class T = float>
-	static inline constexpr T SmallNumber = (T)0.0001;
+	static inline constexpr float SmallNumber = 0.0001f;
 };

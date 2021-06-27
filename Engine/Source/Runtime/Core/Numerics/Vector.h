@@ -15,6 +15,51 @@
 template<size_t N>
 struct Vector
 {
+	struct SelectControl
+	{
+		friend struct Vector<N>;
+
+		int32 Bits = 0;
+
+		inline constexpr SelectControl(std::initializer_list<bool> init_bits)
+		{
+			int32 mybit = 1;
+			for (const bool* it = init_bits.begin(); it != init_bits.end(); ++it)
+			{
+				if (*it)
+				{
+					Bits = Bits | mybit;
+				}
+				mybit <<= 1;
+			}
+		}
+
+		static inline constexpr SelectControl Less(const Vector<N>& lhs, const Vector<N>& rhs)
+		{
+			return Less_impl(lhs, rhs, std::make_index_sequence<N>{});
+		}
+
+		static inline constexpr SelectControl Greater(const Vector<N>& lhs, const Vector<N>& rhs)
+		{
+			return Greater_impl(lhs, rhs, std::make_index_sequence<N>{});
+		}
+
+	private:
+		template<size_t... idx>
+		static inline constexpr SelectControl Less_impl(const Vector<N>& lhs, const Vector<N>& rhs, std::index_sequence<idx...>&&)
+		{
+			std::initializer_list<bool> inits = { (lhs[idx] < rhs[idx])... };
+			return SelectControl(inits);
+		}
+
+		template<size_t... idx>
+		static inline constexpr SelectControl Greater_impl(const Vector<N>& lhs, const Vector<N>& rhs, std::index_sequence<idx...>&&)
+		{
+			std::initializer_list<bool> inits = { (lhs[idx] > rhs[idx])... };
+			return SelectControl(inits);
+		}
+	};
+
 	/// <summary>
 	/// The values.
 	/// </summary>
@@ -134,7 +179,7 @@ struct Vector
 	/// <param name="rhs"> The target vector. </param>
 	/// <param name="epsilon"> The epsilon value. If different of two components is lower than this values, is nearly equals. </param>
 	/// <returns> Indicate two vectors is nearly equals. </returns>
-	inline constexpr bool NearlyEquals(const Vector& rhs, float epsilon) const
+	inline constexpr bool NearlyEquals(const Vector& rhs, float epsilon = MathEx::SmallNumber) const
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
@@ -414,6 +459,25 @@ struct Vector
 	/// Get zero vector.
 	/// </summary>
 	inline static constexpr Vector GetZero();
+
+	inline static constexpr Vector Select(const Vector& lhs, const Vector& rhs, const SelectControl& select)
+	{
+		Vector V;
+		int32 mybit = 1;
+		for (size_t i = 0; i < N; ++i)
+		{
+			if (mybit & select.Bits)
+			{
+				V[i] = rhs[i];
+			}
+			else
+			{
+				V[i] = lhs[i];
+			}
+			mybit <<= 1;
+		}
+		return V;
+	}
 };
 
 template<size_t N>
