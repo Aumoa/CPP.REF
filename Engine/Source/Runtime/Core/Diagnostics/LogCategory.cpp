@@ -48,8 +48,11 @@ void LogCategory::OnLog(ELogVerbosity logVerbosity, wstring_view message)
 	wstring composed = format(L"{}: Log{}: {}: {}\n", zoned_time(system_clock::now()).get_local_time(), _name, VerbosityToString(logVerbosity), message);
 	if (stream.is_open())
 	{
+		// Log to file.
 		stream << composed;
 		stream.flush();
 	}
+
+	// Log to Visual Studio Output Console.
 	OutputDebugStringW(composed.c_str());
 }

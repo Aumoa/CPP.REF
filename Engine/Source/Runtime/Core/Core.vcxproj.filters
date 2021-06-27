@@ -38,9 +38,8 @@
     <ClCompile Include="Utilities\DateTime.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="LogCategory\LogCore.cpp">
-      <Filter>LogCategory</Filter>
-    </ClCompile>
+    <ClCompile Include="LogCore.cpp" />
+    <ClCompile Include="CoreAssert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
@@ -57,9 +56,6 @@
     </Filter>
     <Filter Include="Diagnostics">
       <UniqueIdentifier>{8655c301-4f6a-40b2-8cc7-14168da95641}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LogCategory">
-      <UniqueIdentifier>{af7bcf90-9508-48e7-b5d0-1944441469fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="IO">
       <UniqueIdentifier>{b7c6a406-36fa-4cd8-907e-464bb6718a77}</UniqueIdentifier>
@@ -101,9 +97,6 @@
     </ClInclude>
     <ClInclude Include="IO\FileSystemReference.h">
       <Filter>IO</Filter>
-    </ClInclude>
-    <ClInclude Include="LogCategory\LogCore.h">
-      <Filter>LogCategory</Filter>
     </ClInclude>
     <ClInclude Include="Mathematics\Degrees.h">
       <Filter>Mathematics</Filter>
@@ -174,5 +167,7 @@
     <ClInclude Include="Utilities\UniqueType.h">
       <Filter>Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="CoreAssert.h" />
+    <ClInclude Include="LogCore.h" />
   </ItemGroup>
 </Project>

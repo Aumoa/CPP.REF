@@ -4,6 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "Object.h"
+#include "CoreAssert.h"
 #include "Concepts/SupportsObject.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"

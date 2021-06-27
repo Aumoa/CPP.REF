@@ -5,3 +5,4 @@
 #include "Diagnostics/LogCategory.h"
 
 extern LogCategory LogCore;
+extern LogCategory LogAssert;

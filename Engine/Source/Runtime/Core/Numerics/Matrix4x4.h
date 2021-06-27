@@ -52,6 +52,8 @@ struct Matrix4x4 : public Matrix<4, 4>
 	/// <param name="outRotation"> The rotation transform. </param>
 	void Decompose(Vector3& outTranslation, Vector3& outScale, Quaternion& outRotation) const;
 
+	Vector3 TransformVector(const Vector3& vector) const;
+
 	/// <summary>
 	/// Multiply two matrices with SIMD functions.
 	/// </summary>

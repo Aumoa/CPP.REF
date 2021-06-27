@@ -88,12 +88,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CoreAssert.cpp" />
     <ClCompile Include="Diagnostics\LogCategory.cpp" />
     <ClCompile Include="Diagnostics\LogSystem.cpp" />
     <ClCompile Include="IO\DirectoryReference.cpp" />
     <ClCompile Include="IO\FileReference.cpp" />
     <ClCompile Include="IO\FileSystemReference.cpp" />
-    <ClCompile Include="LogCategory\LogCore.cpp" />
+    <ClCompile Include="LogCore.cpp" />
     <ClCompile Include="Mathematics\MathEx.cpp" />
     <ClCompile Include="Numerics\Color.cpp" />
     <ClCompile Include="Numerics\Matrix4x4.cpp" />
@@ -105,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Concepts\SupportsObject.h" />
+    <ClInclude Include="CoreAssert.h" />
     <ClInclude Include="CoreMinimal.h" />
     <ClInclude Include="Delegates\MulticastDelegate.h" />
     <ClInclude Include="Delegates\MulticastEvent.h" />
@@ -114,7 +116,7 @@
     <ClInclude Include="IO\DirectoryReference.h" />
     <ClInclude Include="IO\FileReference.h" />
     <ClInclude Include="IO\FileSystemReference.h" />
-    <ClInclude Include="LogCategory\LogCore.h" />
+    <ClInclude Include="LogCore.h" />
     <ClInclude Include="Mathematics\Degrees.h" />
     <ClInclude Include="Mathematics\MathEx.h" />
     <ClInclude Include="Mathematics\Radians.h" />

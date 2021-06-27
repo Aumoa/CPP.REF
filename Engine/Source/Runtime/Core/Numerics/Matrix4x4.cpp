@@ -66,6 +66,15 @@ void Matrix4x4::Decompose(Vector3& outTranslation, Vector3& outScale, Quaternion
 	XMStoreQuaternion(outRotation, Q);
 }
 
+Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
+{
+	XMMATRIX M = XMLoadMatrix4x4(this);
+	XMVECTOR V = XMVector3Transform(XMVectorSet(vec.X(), vec.Y(), vec.Z(), 1.0f), M);
+	Vector3 v;
+	XMStoreVector3(v, V);
+	return v;
+}
+
 Matrix4x4 Matrix4x4::Multiply(const Matrix4x4& lhs, const Matrix4x4& rhs)
 {
 	XMMATRIX LHS = XMLoadMatrix4x4(&lhs);

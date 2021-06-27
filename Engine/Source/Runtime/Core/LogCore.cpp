@@ -3,3 +3,4 @@
 #include "LogCore.h"
 
 LogCategory LogCore(L"Core");
+LogCategory LogAssert(L"Assert");
