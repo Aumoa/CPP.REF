@@ -43,6 +43,9 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{21ad887c-a43b-40d0-a88c-418f84ed372a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\TransparentShader">
+      <UniqueIdentifier>{6c250c3c-5594-448a-b17c-683276d3021d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameInstance.cpp" />
@@ -151,6 +154,9 @@
     <ClCompile Include="Misc\GeometryGenerator.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Shaders\TransparentShader\TransparentShader.cpp">
+      <Filter>Shaders\TransparentShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
@@ -158,6 +164,12 @@
     </FxCompile>
     <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
       <Filter>Shaders\ColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TransparentShader\TransparentShaderPS.hlsl">
+      <Filter>Shaders\TransparentShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TransparentShader\TransparentShaderVS.hlsl">
+      <Filter>Shaders\TransparentShader</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="Misc\Bezier.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\TransparentShader\TransparentShader.h">
+      <Filter>Shaders\TransparentShader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

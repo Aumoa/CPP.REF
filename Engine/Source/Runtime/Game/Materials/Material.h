@@ -4,6 +4,7 @@
 
 #include "RenderMinimal.h"
 #include <variant>
+#include "GameEnums.h"
 
 class RHIShader;
 class RHIDeviceContext;
@@ -19,6 +20,9 @@ private:
 	std::vector<RHIShaderParameterElement> _parametersDecl;
 	std::vector<ShaderVars> _storage;
 
+protected:
+	EMaterialBlendMode _BlendMode = EMaterialBlendMode::Opaque;
+
 public:
 	Material(RHIShader* shader);
 
@@ -27,6 +31,7 @@ public:
 	virtual void SetScalarParameterValueByIndex(int32 index, float value);
 	virtual void SetScalarParameterValueByName(std::wstring_view parameterName, float value);
 	inline RHIShader* GetShader() const { return _shader; }
+	inline EMaterialBlendMode GetBlendMode() const { return _BlendMode; }
 
 	virtual int32 GetRootParameterMappingIndex(std::wstring_view parameterName) const { return -1; }
 	virtual bool IgnoreParameterType(ERHIShaderParameterType type) const { return type == ERHIShaderParameterType::ParameterCollection_CameraConstants; }

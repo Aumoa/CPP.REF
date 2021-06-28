@@ -18,6 +18,7 @@ class ColorVertexFactory;
 class ColorShader;
 class AssetImporter;
 class RHITexture2D;
+class TransparentShader;
 
 /// <summary>
 /// Represents game engine that manage core resources.
@@ -41,6 +42,7 @@ private:
 	AssetImporter* _assimp = nullptr;
 	RHITexture2D* _depthBuffer = nullptr;
 	RHIDepthStencilView* _dsv = nullptr;
+	TransparentShader* _transparentShader = nullptr;
 
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;
@@ -84,4 +86,5 @@ public:
 	ColorVertexFactory* GetColorVertexFactory() const { return _colorVertexFactory; }
 	AssetImporter* GetAssetImporter() const { return _assimp; }
 	GameInstance* GetGameInstance() const { return _gameInstance; }
+	TransparentShader* GetTransparentShader() const { return _transparentShader; }
 };

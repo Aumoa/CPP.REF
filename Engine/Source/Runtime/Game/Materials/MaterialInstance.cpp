@@ -8,6 +8,7 @@ using enum ELogVerbosity;
 MaterialInstance::MaterialInstance(Material* source) : Super(source->GetShader())
 	, _source(source)
 {
+	_BlendMode = source->GetBlendMode();
 }
 
 void MaterialInstance::SetScalarParameterValueByIndex(int32 index, float value)

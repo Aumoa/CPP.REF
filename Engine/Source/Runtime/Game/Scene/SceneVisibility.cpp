@@ -67,7 +67,7 @@ void SceneVisibility::SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t 
 void SceneVisibility::FrustumCull(vector<int32>& bits)
 {
 	size_t cnt = _scene->_primitives.size();
-	bits.resize((cnt / 8) + 1);
+	bits.resize((cnt / 32) + 1);
 
 	for (size_t i = 0; i < bits.size(); ++i)
 	{

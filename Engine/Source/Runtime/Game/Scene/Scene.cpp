@@ -3,8 +3,11 @@
 #include "Scene.h"
 #include "PrimitiveSceneProxy.h"
 #include "SceneVisibility.h"
+#include "SceneRenderer.h"
 #include "Components/PrimitiveComponent.h"
+#include "Materials/Material.h"
 
+using namespace std;
 using namespace std::chrono;
 
 Scene::Scene(World* worldOwner, RHIDevice* device) : Super()
@@ -12,6 +15,10 @@ Scene::Scene(World* worldOwner, RHIDevice* device) : Super()
 	, _device(device)
 {
 	_localPlayerView = CreateSubobject<SceneVisibility>(this);
+}
+
+Scene::~Scene()
+{
 }
 
 void Scene::UpdateScene(duration<float> elapsedTime)
@@ -36,6 +43,82 @@ void Scene::UpdateScene(duration<float> elapsedTime)
 void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 {
 	_localPlayerView->CalcVisibility(localPlayerView);
+
+	// Reset material slots.
+	for (auto& it : _renderQueue)
+	{
+		it.second.clear();
+	}
+
+	// Collect primitive materials.
+	size_t renderers = 0;
+	set<RHIShader*> checks;
+	for (PrimitiveSceneProxy*& proxy : _primitives)
+	{
+		for (auto& batch : proxy->MeshBatches)
+		{
+			for (auto& materialSlot : batch.MaterialSlots)
+			{
+				if (materialSlot != nullptr)
+				{
+					map<size_t, vector<RHIShader*>>::iterator it;
+
+					size_t queueNumber = 0;
+					switch (materialSlot->GetBlendMode())
+					{
+					case EMaterialBlendMode::Opaque:
+						queueNumber = RenderQueue_Opaque;
+						break;
+					case EMaterialBlendMode::Masked:
+						queueNumber = RenderQueue_Masked;
+						break;
+					case EMaterialBlendMode::Transparent:
+						queueNumber = RenderQueue_Transparent;
+						break;
+					}
+
+					if (!ensureMsgf(queueNumber != 0, L"Render Queue Number is not setted."))
+					{
+						continue;
+					}
+
+					it = _renderQueue.find(queueNumber);
+					if (it == _renderQueue.end())
+					{
+						it = _renderQueue.emplace_hint(it, queueNumber, vector<RHIShader*>());
+					}
+
+					if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())
+					{
+						checks.emplace_hint(ck, materialSlot->GetShader());
+						it->second.emplace_back(materialSlot->GetShader());
+						renderers += 1;
+					}
+				}
+			}
+		}
+	}
+
+	_renderers.clear();
+	_renderers.reserve(renderers);
+
+	// Enqueue renderer.
+	for (auto& it : _renderQueue)
+	{
+		for (auto& slots : it.second)
+		{
+			SceneRenderer& renderer = _renderers.emplace_back(this, (RHIShader*)slots);
+			renderer.CollectPrimitives(_localPlayerView);
+		}
+	}
+}
+
+void Scene::RenderScene(RHIDeviceContext* dc)
+{
+	for (auto& renderer : _renderers)
+	{
+		renderer.RenderScene(dc);
+	}
 }
 
 int64 Scene::AddPrimitive(PrimitiveSceneProxy* proxy)

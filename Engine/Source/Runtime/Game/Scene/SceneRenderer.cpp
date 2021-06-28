@@ -10,66 +10,116 @@
 #include "RHI/RHIVertexFactory.h"
 #include "Materials/Material.h"
 
+using namespace std;
+
 SceneRenderer::SceneRenderer(Scene* scene, RHIShader* shader) : Super()
 	, _scene(scene)
 	, _shader(shader)
 {
 }
 
+SceneRenderer::SceneRenderer(SceneRenderer&& rhs) noexcept : Super()
+	, _scene(rhs._scene)
+	, _shader(rhs._shader)
+	, _visibility(rhs._visibility)
+	, _drawRelevances(move(rhs._drawRelevances))
+	, _relevances(rhs._relevances)
+{
+}
+
+SceneRenderer::~SceneRenderer()
+{
+}
+
+void SceneRenderer::CollectPrimitives(SceneVisibility* view)
+{
+	size_t primitives = _scene->_primitives.size();
+	_drawRelevances.resize(max(primitives, _drawRelevances.size()));
+	_relevances = 0;
+
+	view->ForEachVisibleItem([&](size_t idx)
+	{
+		PrimitiveSceneProxy* sceneProxy = _scene->_primitives[idx];
+		
+		for (auto& batch : sceneProxy->MeshBatches)
+		{
+			bool bCollectBatch = false;
+			MeshBatchDrawRelevance* relevance = nullptr;
+
+			for (auto& element : batch.Elements)
+			{
+				Material* material = batch.MaterialSlots[element.MaterialSlotIndex];
+				if (material == nullptr)
+				{
+					continue;
+				}
+
+				RHIShader* mtShader = material->GetShader();
+				if (mtShader != _shader)
+				{
+					continue;
+				}
+
+				if (!bCollectBatch)
+				{
+					relevance = &_drawRelevances[_relevances++];
+					relevance->ViewIndex = idx;
+					relevance->SceneProxy = sceneProxy;
+					relevance->Batch = batch;
+					relevance->Elements.clear();
+					relevance->Elements.reserve(batch.Elements.size());
+					relevance->Materials.clear();
+					relevance->Materials.reserve(batch.Elements.size());
+
+					bCollectBatch = true;
+				}
+
+				relevance->Elements.emplace_back(element);
+				relevance->Materials.emplace_back(material);
+			}
+		}
+	});
+
+	_visibility = view;
+}
+
 void SceneRenderer::RenderScene(RHIDeviceContext* dc)
 {
 	dc->SetGraphicsShader(_shader);
-
-	RenderWithSceneVisibility(dc, _scene->_localPlayerView);
-}
-
-void SceneRenderer::RenderWithSceneVisibility(RHIDeviceContext* dc, SceneVisibility* view)
-{
-	view->ForEachVisibleItem([this, dc, view](size_t idx)
-	{
-		PrimitiveSceneProxy* proxy = _scene->_primitives[idx];
-		if (proxy == nullptr)
-		{
-			return;
-		}
-
-		view->SetupView(dc, _shader, idx);
-		RenderPrimitive(dc, proxy);
-	});
-}
-
-void SceneRenderer::RenderPrimitive(RHIDeviceContext* dc, PrimitiveSceneProxy* proxy)
-{
 	dc->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
 
-	static int32 j = 0;
-	for (auto& batch : proxy->MeshBatches)
+	RenderWithSceneVisibility(dc);
+}
+
+void SceneRenderer::RenderWithSceneVisibility(RHIDeviceContext* dc)
+{
+	for (size_t i = 0; i < _relevances; ++i)
 	{
-		uint32 vStride = batch.VertexFactory->GetVertexStride();
-		uint32 iStride = batch.VertexFactory->GetIndexStride();
+		MeshBatchDrawRelevance& relevance = _drawRelevances[i];
+		_visibility->SetupView(dc, _shader, relevance.ViewIndex);
+
+		uint32 vStride = relevance.Batch.VertexFactory->GetVertexStride();
+		uint32 iStride = relevance.Batch.VertexFactory->GetIndexStride();
 
 		RHIVertexBufferView vbv;
-		vbv.BufferLocation = batch.VertexBufferLocation;
-		vbv.SizeInBytes = vStride * (uint32)batch.VertexBuffer.size();
+		vbv.BufferLocation = relevance.Batch.VertexBufferLocation;
+		vbv.SizeInBytes = vStride * (uint32)relevance.Batch.VertexBuffer.size();
 		vbv.StrideInBytes = vStride;
 
 		RHIIndexBufferView ibv;
-		ibv.BufferLocation = batch.IndexBufferLocation;
-		ibv.SizeInBytes = sizeof(uint32) * (uint32)batch.IndexBuffer.size();
+		ibv.BufferLocation = relevance.Batch.IndexBufferLocation;
+		ibv.SizeInBytes = sizeof(uint32) * (uint32)relevance.Batch.IndexBuffer.size();
 		ibv.Format = ERHIVertexElementFormat::R32_UINT;
 
 		dc->IASetVertexBuffers(0, 1, &vbv);
 		dc->IASetIndexBuffer(ibv);
 
-		int32 i = 0;
-		j++;
-		for (auto& element : batch.Elements)
+		for (size_t j = 0; j < relevance.Elements.size(); ++j)
 		{
-			Material* material = batch.MaterialSlots[element.MaterialSlotIndex];
-			if (material != nullptr)
-			{
-				material->SetupMaterial(dc);
-			}
+			MeshBatchElement& element = relevance.Elements[j];
+			Material*& material = relevance.Materials[j];
+
+			material->SetupMaterial(dc);
 			dc->DrawIndexedInstanced(element.IndexCount, 1, element.StartIndexLocation, element.BaseVertexLocation);
 		}
 	}

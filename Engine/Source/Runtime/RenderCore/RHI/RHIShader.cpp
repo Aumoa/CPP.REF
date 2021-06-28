@@ -135,8 +135,14 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 			{
 				// [0]
 				{
-					.BlendEnable = FALSE,
+					.BlendEnable = TRUE,
 					.LogicOpEnable = FALSE,
+					.SrcBlend = D3D12_BLEND_SRC_ALPHA,
+					.DestBlend = D3D12_BLEND_INV_SRC_ALPHA,
+					.BlendOp = D3D12_BLEND_OP_ADD,
+					.SrcBlendAlpha = D3D12_BLEND_ONE,
+					.DestBlendAlpha = D3D12_BLEND_ZERO,
+					.BlendOpAlpha = D3D12_BLEND_OP_ADD,
 					.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
 				}
 			}

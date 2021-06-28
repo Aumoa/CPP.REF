@@ -27,6 +27,10 @@ public:
 protected:
 	virtual ~Object() noexcept;
 
+private:
+	Object(const Object&) = delete;
+	Object(Object&&) = delete;
+
 public:
 	/// <summary>
 	/// Get a simple string representing this object.

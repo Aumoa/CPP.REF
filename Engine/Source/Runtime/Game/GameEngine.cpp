@@ -13,6 +13,7 @@
 #include "RHI/RHIDepthStencilView.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
 #include "Shaders/ColorShader/ColorShader.h"
+#include "Shaders/TransparentShader/TransparentShader.h"
 #include "Components/InputComponent.h"
 #include "Level/World.h"
 #include "Camera/PlayerCameraManager.h"
@@ -55,6 +56,8 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_rtv = CreateSubobject<RHIRenderTargetView>(_device, 3);
 	_assimp = CreateSubobject<AssetImporter>(this, _colorVertexFactory);
 	_dsv = CreateSubobject<RHIDepthStencilView>(_device, 1);
+	_transparentShader = CreateSubobject<TransparentShader>(_device);
+	_transparentShader->Compile(_colorVertexFactory);
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
@@ -186,9 +189,7 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
 	localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
 	scene->InitViews(localPlayerView);
-
-	SceneRenderer renderer(scene, _colorShader);
-	renderer.RenderScene(_deviceContext);
+	scene->RenderScene(_deviceContext);
 
 	_deviceContext->TransitionBarrier(1, &barrierEnd);
 	_deviceContext->End();
