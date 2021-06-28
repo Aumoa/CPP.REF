@@ -5,10 +5,15 @@
 #include "GameMinimal.h"
 #include "GameFramework/PlayerController.h"
 
+class SceneComponent;
+
 class AChessPlayerController : public APlayerController
 {
 public:
 	using Super = APlayerController;
+
+private:
+	SceneComponent* _indicator = nullptr;
 
 public:
 	AChessPlayerController();

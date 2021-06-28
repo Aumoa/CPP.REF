@@ -6,6 +6,7 @@
 #include "Level/Level.h"
 
 class AChessBoard;
+class AGridIndicator;
 
 class GameLevel : public Level
 {

@@ -10,6 +10,12 @@
     <ClCompile Include="LogChess.cpp" />
     <ClCompile Include="ChessGameInstance.cpp" />
     <ClCompile Include="ChessGameMode.cpp" />
+    <ClCompile Include="Assets\Cube.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Actors\GridIndicator.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Level">
@@ -17,6 +23,12 @@
     </Filter>
     <Filter Include="Controller">
       <UniqueIdentifier>{559afec6-4c7f-4897-9bbf-ee621e8db27a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{648cbadd-6955-4a45-a3fd-468f1c31484b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actors">
+      <UniqueIdentifier>{4c89eb06-3433-42ce-a44b-11f3f3bcfc4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +40,12 @@
     </ClInclude>
     <ClInclude Include="Controller\ChessPlayerController.h">
       <Filter>Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Cube.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\GridIndicator.h">
+      <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

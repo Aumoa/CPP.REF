@@ -101,6 +101,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actors\GridIndicator.cpp" />
+    <ClCompile Include="Assets\Cube.cpp" />
     <ClCompile Include="ChessGameInstance.cpp" />
     <ClCompile Include="ChessGameMode.cpp" />
     <ClCompile Include="Controller\ChessPlayerController.cpp" />
@@ -108,6 +110,8 @@
     <ClCompile Include="LogChess.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actors\GridIndicator.h" />
+    <ClInclude Include="Assets\Cube.h" />
     <ClInclude Include="ChessGameInstance.h" />
     <ClInclude Include="ChessGameMode.h" />
     <ClInclude Include="Controller\ChessPlayerController.h" />
