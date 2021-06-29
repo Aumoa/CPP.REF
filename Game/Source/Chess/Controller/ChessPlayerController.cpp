@@ -8,6 +8,7 @@
 #include "Actors/GridIndicator.h"
 #include "Pawns/ChessBoardProxy.h"
 #include "Components/InputComponent.h"
+#include "Components/PrimitiveComponent.h"
 
 AChessPlayerController::AChessPlayerController() : Super()
 {
@@ -30,9 +31,9 @@ void AChessPlayerController::BeginPlay()
 		proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
 
 		AActor* indicator = world->SpawnActor<AGridIndicator>();
-		_indicator = indicator->GetRootComponent();
+		_indicator = dynamic_cast<PrimitiveComponent*>(indicator->GetRootComponent());
 		_indicator->AttachToComponent(board->GetRootComponent());
-		_indicator->SetScale(Vector3(1, 0.1f, 1));
+		_indicator->SetScale(Vector3(1, 0.05f, 1));
 	}
 
 	SetupPlayerInput(GetInputComponent());
@@ -59,6 +60,21 @@ void AChessPlayerController::SetupPlayerInput(InputComponent* inputComponent)
 		Transform inversedTransform = relativeTransform.GetInverse();
 		dst = inversedTransform.TransformPoint(dst);
 
-		_indicator->SetLocation(dst);
+		int32 dstx = (int32)(dst.X() - 0.5f);
+		int32 dstz = (int32)(dst.Z() - 0.5f);
+
+		if (dstx <= 0 && dstx > -8 &&
+			dstz <= 0 && dstz > -8)
+		{
+			dst.X() = (float)dstx;
+			dst.Z() = (float)dstz;
+
+			_indicator->SetLocation(dst);
+			_indicator->SetHiddenInGame(false);
+		}
+		else
+		{
+			_indicator->SetHiddenInGame(true);
+		}
 	});
 }

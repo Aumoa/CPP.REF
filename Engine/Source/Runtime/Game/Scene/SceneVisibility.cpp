@@ -68,6 +68,7 @@ void SceneVisibility::FrustumCull(vector<int32>& bits)
 {
 	size_t cnt = _scene->_primitives.size();
 	bits.resize((cnt / 32) + 1);
+	memset(bits.data(), 0, sizeof(int32) * bits.size());
 
 	for (size_t i = 0; i < bits.size(); ++i)
 	{
