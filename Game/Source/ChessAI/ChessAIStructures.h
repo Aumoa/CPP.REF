@@ -23,4 +23,14 @@ struct GridIndex
 		return X >= 0 && X < 8
 			&& Y >= 0 && Y < 8;
 	}
+
+	constexpr bool operator ==(const GridIndex& rhs) const
+	{
+		return X == rhs.X && Y == rhs.Y;
+	}
+
+	constexpr bool operator !=(const GridIndex& rhs) const
+	{
+		return X != rhs.X || Y != rhs.Y;
+	}
 };

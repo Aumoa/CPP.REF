@@ -19,6 +19,9 @@
     <ClCompile Include="Components\IndicatingComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Components\CommandComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Level">
@@ -54,6 +57,9 @@
       <Filter>Actors</Filter>
     </ClInclude>
     <ClInclude Include="Components\IndicatingComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\CommandComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

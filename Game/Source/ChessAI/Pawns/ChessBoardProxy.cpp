@@ -2,10 +2,35 @@
 
 #include "ChessBoardProxy.h"
 #include "Camera/CameraComponent.h"
+#include "Actors/ChessBoard.h"
+#include "Actors/Piece.h"
 
 AChessBoardProxy::AChessBoardProxy(AChessBoard* chessBoard) : Super()
 	, _board(chessBoard)
 {
 	CameraComponent* cp = CreateSubobject<CameraComponent>();
 	SetRootComponent(cp);
+}
+
+void AChessBoardProxy::InitBoard(AChessBoard* board, EChessTeam team)
+{
+	_board = board;
+	_myteam = team;
+}
+
+bool AChessBoardProxy::CanSelect(const GridIndex& location) const
+{
+	APiece* piece = _board->GetPiece(location);
+	if (piece == nullptr)
+	{
+		return false;
+	}
+
+	EChessTeam team = piece->GetTeam();
+	if (team != _myteam)
+	{
+		return false;
+	}
+
+	return true;
 }

@@ -22,10 +22,12 @@ public:
 	AChessBoard();
 
 	void InitBoard(World* world);
-	AChessBoardProxy* CreateProxy();
+	AChessBoardProxy* CreateProxy(EChessTeam team);
 
 	Vector3 GetBoardCellPosition(const GridIndex& index) const;
 	GridIndex GetGridIndexFromPosition(const Vector3& location) const;
+	bool HasPiece(const GridIndex& index) const;
+	APiece* GetPiece(const GridIndex& index) const;
 
 	template<std::derived_from<APiece> T>
 	T* SpawnPiece(EChessTeam team, const GridIndex& index)

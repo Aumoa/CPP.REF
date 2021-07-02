@@ -105,6 +105,7 @@
     <ClCompile Include="Assets\Cube.cpp" />
     <ClCompile Include="ChessGameInstance.cpp" />
     <ClCompile Include="ChessGameMode.cpp" />
+    <ClCompile Include="Components\CommandComponent.cpp" />
     <ClCompile Include="Components\IndicatingComponent.cpp" />
     <ClCompile Include="Controller\ChessPlayerController.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Assets\Cube.h" />
     <ClInclude Include="ChessGameInstance.h" />
     <ClInclude Include="ChessGameMode.h" />
+    <ClInclude Include="Components\CommandComponent.h" />
     <ClInclude Include="Components\IndicatingComponent.h" />
     <ClInclude Include="Controller\ChessPlayerController.h" />
     <ClInclude Include="Level\GameLevel.h" />

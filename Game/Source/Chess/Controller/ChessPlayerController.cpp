@@ -5,7 +5,6 @@
 #include "Level/World.h"
 #include "Level/GameLevel.h"
 #include "Actors/ChessBoard.h"
-#include "Actors/GridIndicator.h"
 #include "Pawns/ChessBoardProxy.h"
 #include "Components/InputComponent.h"
 #include "Components/IndicatingComponent.h"
@@ -25,12 +24,12 @@ void AChessPlayerController::BeginPlay()
 	if (gameLevel != nullptr)
 	{
 		_board = gameLevel->GetPersistentChessBoard();
-		AChessBoardProxy* proxy = _board->CreateProxy();
+		AChessBoardProxy* proxy = _board->CreateProxy(EChessTeam::Black);
 		Possess(proxy);
 
 		proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));
 		proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
-		_indicatingComponent->SetupBoard(_board);
+		_indicatingComponent->SetupBoard(proxy);
 	}
 
 	SetupPlayerInput(GetInputComponent());

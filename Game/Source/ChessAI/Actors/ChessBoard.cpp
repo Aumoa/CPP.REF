@@ -88,10 +88,10 @@ void AChessBoard::InitBoard(World* world)
 	});
 }
 
-AChessBoardProxy* AChessBoard::CreateProxy()
+AChessBoardProxy* AChessBoard::CreateProxy(EChessTeam team)
 {
 	AChessBoardProxy* proxy = CreateSubobject<AChessBoardProxy>(this);
-	proxy->SetBoard(this);
+	proxy->InitBoard(this, team);
 	return proxy;
 }
 
@@ -140,6 +140,16 @@ GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
 	int32 intY = (int32)-localPosition.Z();
 
 	return { 7 - intX, 7 - intY };
+}
+
+bool AChessBoard::HasPiece(const GridIndex& index) const
+{
+	return _pieces[index.X][index.Y] != nullptr;
+}
+
+APiece* AChessBoard::GetPiece(const GridIndex& index) const
+{
+	return _pieces[index.X][index.Y];
 }
 
 void AChessBoard::Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index)

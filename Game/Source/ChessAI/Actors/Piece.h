@@ -24,6 +24,7 @@ public:
 	APiece();
 
 	virtual void Init(AChessBoard* board, EChessTeam team, const GridIndex& index);
+	inline EChessTeam GetTeam() const { return _team; }
 
 protected:
 	virtual StaticMesh* GetStaticMesh() const = 0;
