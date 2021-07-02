@@ -5,6 +5,7 @@
 #include "GameMinimal.h"
 #include "GameFramework/PlayerController.h"
 
+class AChessBoard;
 class PrimitiveComponent;
 
 class AChessPlayerController : public APlayerController
@@ -13,6 +14,7 @@ public:
 	using Super = APlayerController;
 
 private:
+	AChessBoard* _board = nullptr;
 	PrimitiveComponent* _indicator = nullptr;
 
 public:

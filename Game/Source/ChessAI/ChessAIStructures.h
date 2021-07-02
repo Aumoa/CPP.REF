@@ -17,4 +17,10 @@ struct GridIndex
 	constexpr GridIndex(int32 x, int32 y) : X(x), Y(y)
 	{
 	}
+
+	constexpr bool IsValid() const
+	{
+		return X >= 0 && X < 8
+			&& Y >= 0 && Y < 8;
+	}
 };

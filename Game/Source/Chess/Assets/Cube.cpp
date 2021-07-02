@@ -21,11 +21,6 @@ StaticMeshRenderData* Cube::GetRenderData(GameEngine* engine)
 	batch.MaterialSlots.emplace_back() = nullptr;
 	GeometryGenerator::ComputeBox(batch.VertexBuffer, batch.IndexBuffer, 1.0f, false, false);
 
-	for (auto& vertex : batch.VertexBuffer)
-	{
-		vertex.Color = NamedColors::Aquamarine;
-	}
-
 	batch.Elements.emplace_back() =
 	{
 		.IndexCount = (uint32)batch.IndexBuffer.size(),

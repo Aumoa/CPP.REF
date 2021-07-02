@@ -28,14 +28,16 @@ void Material::SetupMaterial(RHIDeviceContext* dc)
 	}
 }
 
+#define checkIdxf(idx, cnt, ...) \
+if (idx < 0 || idx >= (int32)(cnt)) \
+{\
+	LogSystem::Log(LogMaterial, Error, L"The parameter index[{}] is not valid on this shader program.", (idx));\
+	return __VA_ARGS__;\
+}
+
 void Material::SetScalarParameterValueByIndex(int32 index, float value)
 {
-	if (index < 0 || index >= (int32)_parametersDecl.size())
-	{
-		LogSystem::Log(LogMaterial, Error, L"The parameter index[{}] is not valid on this shader program.", index);
-		return;
-	}
-
+	checkIdxf(index, _parametersDecl.size());
 	if (_parametersDecl[index].Type != ERHIShaderParameterType::ScalarParameterConstants)
 	{
 		LogSystem::Log(LogMaterial, Error, L"The type of parameter at index[{}] is not ScalarParameterConstants type.", index);
@@ -57,6 +59,64 @@ void Material::SetScalarParameterValueByName(wstring_view parameterName, float v
 	SetScalarParameterValueByIndex(index, value);
 }
 
+float Material::GetScalarParameterValueByIndex(int32 index) const
+{
+	checkIdxf(index, _parametersDecl.size(), 0);
+	return get<float>(_storage[index]);
+}
+
+float Material::GetScalarParameterValueByName(wstring_view parameterName) const
+{
+	const int32 index = GetRootParameterMappingIndex(parameterName);
+	if (index == -1)
+	{
+		LogSystem::Log(LogMaterial, Error, L"The parameter name \"{}\" does not found from this shader program.", parameterName);
+		return 0;
+	}
+	return GetScalarParameterValueByIndex(index);
+}
+
+void Material::SetVector3ParameterValueByIndex(int32 index, const Vector3& value)
+{
+	checkIdxf(index, _parametersDecl.size());
+	if (_parametersDecl[index].Type != ERHIShaderParameterType::ScalarParameterConstants)
+	{
+		LogSystem::Log(LogMaterial, Error, L"The type of parameter at index[{}] is not Vector3ParameterConstants type.", index);
+		return;
+	}
+
+	StoreValue(_storage, index, value);
+}
+
+void Material::SetVector3ParameterValueByName(wstring_view parameterName, const Vector3& value)
+{
+	const int32 index = GetRootParameterMappingIndex(parameterName);
+	if (index == -1)
+	{
+		LogSystem::Log(LogMaterial, Error, L"The parameter name \"{}\" does not found from this shader program.", parameterName);
+		return;
+	}
+
+	SetVector3ParameterValueByIndex(index, value);
+}
+
+Vector3 Material::GetVector3ParameterValueByIndex(int32 index) const
+{
+	checkIdxf(index, _parametersDecl.size(), 0);
+	return get<Vector3>(_storage[index]);
+}
+
+Vector3 Material::GetVector3ParameterValueByName(wstring_view parameterName) const
+{
+	const int32 index = GetRootParameterMappingIndex(parameterName);
+	if (index == -1)
+	{
+		LogSystem::Log(LogMaterial, Error, L"The parameter name \"{}\" does not found from this shader program.", parameterName);
+		return 0;
+	}
+	return GetVector3ParameterValueByIndex(index);
+}
+
 void Material::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 index) const
 {
 	if (index >= _storage.size())
@@ -72,11 +132,17 @@ void Material::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 index) cons
 void Material::SetGraphicsParameterValueWithVariant(RHIDeviceContext* dc, int32 index, const ShaderVars& vars) const
 {
 	[[maybe_unused]] float fvalue;
+	[[maybe_unused]] Vector3 v3;
+
 	switch (vars.index())
 	{
 	case 0:
 		fvalue = get<float>(vars);
 		dc->SetGraphicsRoot32BitConstants((uint32)index, 1, &fvalue, 0);
+		break;
+	case 1:
+		v3 = get<Vector3>(vars);
+		dc->SetGraphicsRoot32BitConstants((uint32)index, 3, &v3, 0);
 		break;
 	default:
 		LogSystem::Log(LogMaterial, Warning, L"The default parameter does not setted at index [{}]. Can keep running, but material values are undefined.", index);

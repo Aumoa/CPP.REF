@@ -31,11 +31,11 @@ AChessBoard::AChessBoard() : Super()
 
 	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
 	MaterialInstance* black = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
-	black->SetScalarParameterValueByName(L"Color", 0.2f);
+	black->SetVector3ParameterValueByName(L"Color", 0.2f);
 	smc->SetMaterial(0, black);
 
 	MaterialInstance* white = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
-	white->SetScalarParameterValueByName(L"Color", 0.8f);
+	white->SetVector3ParameterValueByName(L"Color", 0.8f);
 	smc->SetMaterial(1, white);
 }
 
@@ -114,4 +114,42 @@ Vector3 AChessBoard::GetBoardCellPosition(const GridIndex& index) const
 	int32 actualX = index.X - 7;
 	int32 actualY = index.Y - 7;
 	return Vector3((float)actualX, 0, (float)actualY);
+}
+
+GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
+{
+	SceneComponent* parent = GetRootComponent();
+
+	// Calc world to local transform.
+	Transform worldToLocal;
+	if (parent == nullptr)
+	{
+		worldToLocal = Transform::GetIdentity();
+	}
+	else
+	{
+		worldToLocal = parent->GetComponentTransform().GetInverse();
+	}
+
+	Vector3 localPosition = worldToLocal.TransformPoint(location);
+	// The beginning location is start with center of each cells.
+	localPosition.X() -= 0.5f;
+	localPosition.Z() -= 0.5f;
+
+	// The positive number is based on 1.
+	if (localPosition.X() > 0)
+	{
+		localPosition.X() += 1;
+	}
+	if (localPosition.Z() > 0)
+	{
+		localPosition.Z() += 1;
+	}
+
+	// Offset is value that is in range between -0 and -8.
+	// Make it to positive number that is in range between 0 ~ 8.
+	int32 intX = (int32)-localPosition.X();
+	int32 intY = (int32)-localPosition.Z();
+
+	return { 7 - intX, 7 - intY };
 }

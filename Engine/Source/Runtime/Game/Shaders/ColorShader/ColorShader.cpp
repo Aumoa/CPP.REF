@@ -74,7 +74,7 @@ vector<RHIShaderParameterElement> ColorShader::GetShaderParameterDeclaration() c
 		.ScalarConstantsParameter =
 		{
 			.ShaderRegister = 1,
-			.Num32Bits = 1
+			.Num32Bits = 3
 		}
 	};
 

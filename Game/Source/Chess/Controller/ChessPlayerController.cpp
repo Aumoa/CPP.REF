@@ -23,17 +23,18 @@ void AChessPlayerController::BeginPlay()
 	GameLevel* gameLevel = dynamic_cast<GameLevel*>(level);
 	if (gameLevel != nullptr)
 	{
-		AChessBoard* board = gameLevel->GetPersistentChessBoard();
-		AChessBoardProxy* proxy = board->CreateProxy();
+		_board = gameLevel->GetPersistentChessBoard();
+		AChessBoardProxy* proxy = _board->CreateProxy();
 		Possess(proxy);
 
 		proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));
 		proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
 
-		AActor* indicator = world->SpawnActor<AGridIndicator>();
+		AGridIndicator* indicator = world->SpawnActor<AGridIndicator>();
 		_indicator = dynamic_cast<PrimitiveComponent*>(indicator->GetRootComponent());
-		_indicator->AttachToComponent(board->GetRootComponent());
+		_indicator->AttachToComponent(_board->GetRootComponent());
 		_indicator->SetScale(Vector3(1, 0.05f, 1));
+		indicator->SetIndicatorColor(NamedColors::Gray);
 	}
 
 	SetupPlayerInput(GetInputComponent());
@@ -55,21 +56,11 @@ void AChessPlayerController::SetupPlayerInput(InputComponent* inputComponent)
 		float distance = toWorldRay.Origin[1] / -toWorldRay.Direction[1];
 		Vector3 dst = toWorldRay.Origin + toWorldRay.Direction * distance;
 
-		SceneComponent* parentComponent = _indicator->GetAttachParent();
-		Transform relativeTransform = parentComponent->GetRelativeTransform();
-		Transform inversedTransform = relativeTransform.GetInverse();
-		dst = inversedTransform.TransformPoint(dst);
-
-		int32 dstx = (int32)(dst.X() - 0.5f);
-		int32 dstz = (int32)(dst.Z() - 0.5f);
-
-		if (dstx <= 0 && dstx > -8 &&
-			dstz <= 0 && dstz > -8)
+		GridIndex gridIndex = _board->GetGridIndexFromPosition(dst);
+		if (gridIndex.IsValid())
 		{
-			dst.X() = (float)dstx;
-			dst.Z() = (float)dstz;
-
-			_indicator->SetLocation(dst);
+			Vector3 amendedLocation = _board->GetBoardCellPosition(gridIndex);
+			_indicator->SetLocation(amendedLocation);
 			_indicator->SetHiddenInGame(false);
 		}
 		else

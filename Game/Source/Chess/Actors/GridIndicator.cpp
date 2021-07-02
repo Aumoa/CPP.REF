@@ -17,8 +17,12 @@ AGridIndicator::AGridIndicator() : Super()
 	_MeshObject = CreateSubobject<Cube>(L"CubeAsset", engine);
 	_StaticMeshComponent->SetStaticMesh(_MeshObject);
 
-	auto* mi = CreateSubobject<MaterialInstance>(engine->GetTransparentShader()->GetDefaultMaterial());
-	mi->SetScalarParameterValueByName(L"Color", 1.0f);
-	mi->SetScalarParameterValueByName(L"Alpha", 0.5f);
-	_StaticMeshComponent->SetMaterial(0, mi);
+	_materialInterface = CreateSubobject<MaterialInstance>(engine->GetTransparentShader()->GetDefaultMaterial());
+	_materialInterface->SetScalarParameterValueByName(L"Alpha", 0.5f);
+	_StaticMeshComponent->SetMaterial(0, _materialInterface);
+}
+
+void AGridIndicator::SetIndicatorColor(const Color& value)
+{
+	_materialInterface->SetVector3ParameterValueByName(L"Color", value);
 }

@@ -22,4 +22,5 @@ public:
 	AChessBoardProxy* CreateProxy();
 
 	Vector3 GetBoardCellPosition(const GridIndex& index) const;
+	GridIndex GetGridIndexFromPosition(const Vector3& location) const;
 };

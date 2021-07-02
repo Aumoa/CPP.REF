@@ -1,6 +1,6 @@
 cbuffer C1 : register(b1)
 {
-    float gColor;
+    float3 gColor;
 };
 
 float4 Main(float4 posH : SV_Position, float3 normal : NORMAL, float3 color : COLOR) : SV_TARGET

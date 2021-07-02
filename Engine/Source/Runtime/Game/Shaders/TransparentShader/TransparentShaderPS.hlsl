@@ -1,6 +1,6 @@
 cbuffer C1 : register(b1)
 {
-    float gColor;
+    float3 gColor;
 };
 
 cbuffer C2 : register(b2)

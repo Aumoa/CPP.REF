@@ -30,7 +30,7 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 
 	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
 	MaterialInstance* color = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
-	color->SetScalarParameterValueByName(L"Color", team == EChessTeam::Black ? 0.2f : 0.8f);
+	color->SetVector3ParameterValueByName(L"Color", team == EChessTeam::Black ? 0.2f : 0.8f);
 	_meshComponent->SetMaterial(0, color);
 
 	_meshComponent->SetLocation(board->GetBoardCellPosition(index));

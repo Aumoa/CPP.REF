@@ -79,7 +79,7 @@ vector<RHIShaderParameterElement> TransparentShader::GetShaderParameterDeclarati
 		.ScalarConstantsParameter =
 		{
 			.ShaderRegister = 1,
-			.Num32Bits = 1
+			.Num32Bits = 3
 		}
 	};
 

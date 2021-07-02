@@ -7,6 +7,7 @@
 
 class StaticMesh;
 class StaticMeshComponent;
+class MaterialInstance;
 
 class AGridIndicator : public AActor
 {
@@ -16,7 +17,10 @@ public:
 private:
 	StaticMesh* _MeshObject = nullptr;
 	StaticMeshComponent* _StaticMeshComponent = nullptr;
+	MaterialInstance* _materialInterface = nullptr;
 
 public:
 	AGridIndicator();
+
+	void SetIndicatorColor(const Color& value);
 };
