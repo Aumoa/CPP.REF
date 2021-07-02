@@ -8,10 +8,11 @@
 #include "Actors/GridIndicator.h"
 #include "Pawns/ChessBoardProxy.h"
 #include "Components/InputComponent.h"
-#include "Components/PrimitiveComponent.h"
+#include "Components/IndicatingComponent.h"
 
 AChessPlayerController::AChessPlayerController() : Super()
 {
+	_indicatingComponent = CreateSubobject<IndicatingComponent>();
 }
 
 void AChessPlayerController::BeginPlay()
@@ -29,12 +30,7 @@ void AChessPlayerController::BeginPlay()
 
 		proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));
 		proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
-
-		AGridIndicator* indicator = world->SpawnActor<AGridIndicator>();
-		_indicator = dynamic_cast<PrimitiveComponent*>(indicator->GetRootComponent());
-		_indicator->AttachToComponent(_board->GetRootComponent());
-		_indicator->SetScale(Vector3(1, 0.05f, 1));
-		indicator->SetIndicatorColor(NamedColors::Gray);
+		_indicatingComponent->SetupBoard(_board);
 	}
 
 	SetupPlayerInput(GetInputComponent());
@@ -55,17 +51,14 @@ void AChessPlayerController::SetupPlayerInput(InputComponent* inputComponent)
 		Ray toWorldRay = ScreenPointToRay(x, y);
 		float distance = toWorldRay.Origin[1] / -toWorldRay.Direction[1];
 		Vector3 dst = toWorldRay.Origin + toWorldRay.Direction * distance;
+		_indicatingComponent->UpdateHoverIndicator(dst);
+	});
 
-		GridIndex gridIndex = _board->GetGridIndexFromPosition(dst);
-		if (gridIndex.IsValid())
+	inputComponent->MouseEvent.AddRaw([this](EMouseButton button, EMouseButtonEvent event)
+	{
+		if (button == EMouseButton::Left && event == EMouseButtonEvent::Pressed)
 		{
-			Vector3 amendedLocation = _board->GetBoardCellPosition(gridIndex);
-			_indicator->SetLocation(amendedLocation);
-			_indicator->SetHiddenInGame(false);
-		}
-		else
-		{
-			_indicator->SetHiddenInGame(true);
+			_indicatingComponent->UpdateSelected();
 		}
 	});
 }

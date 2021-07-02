@@ -16,6 +16,9 @@
     <ClCompile Include="Actors\GridIndicator.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="Components\IndicatingComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Level">
@@ -29,6 +32,9 @@
     </Filter>
     <Filter Include="Actors">
       <UniqueIdentifier>{4c89eb06-3433-42ce-a44b-11f3f3bcfc4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{a86d6666-bcf1-47ac-b551-20e61cebcefc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="Actors\GridIndicator.h">
       <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\IndicatingComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

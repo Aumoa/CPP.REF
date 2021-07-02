@@ -13,6 +13,7 @@ AGridIndicator::AGridIndicator() : Super()
 
 	_StaticMeshComponent = CreateSubobject<StaticMeshComponent>();
 	SetRootComponent(_StaticMeshComponent);
+	_StaticMeshComponent->SetHiddenInGame(true);
 
 	_MeshObject = CreateSubobject<Cube>(L"CubeAsset", engine);
 	_StaticMeshComponent->SetStaticMesh(_MeshObject);

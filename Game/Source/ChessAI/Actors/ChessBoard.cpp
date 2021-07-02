@@ -52,14 +52,10 @@ void AChessBoard::InitBoard(World* world)
 		APiece* piece = nullptr;
 		
 		// KING
-		piece = world->SpawnActor<AKing>();
-		piece->Init(this, team, GridIndex(4, head));
-		piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+		SpawnPiece<AKing>(team, GridIndex(4, head));
 		
 		// QUEEN
-		piece = world->SpawnActor<AQueen>();
-		piece->Init(this, team, GridIndex(3, head));
-		piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+		SpawnPiece<AQueen>(team, GridIndex(3, head));
 
 		auto get_index = [](int32 i, int32 j)
 		{
@@ -76,26 +72,18 @@ void AChessBoard::InitBoard(World* world)
 		for (int32 i = 0; i < 2; ++i)
 		{
 			// BISHOPS
-			piece = world->SpawnActor<ABishop>();
-			piece->Init(this, team, GridIndex(get_index(i, 2), head));
-			piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+			SpawnPiece<ABishop>(team, GridIndex(get_index(i, 2), head));
 
 			// KNIGHTS
-			piece = world->SpawnActor<AKnight>();
-			piece->Init(this, team, GridIndex(get_index(i, 1), head));
-			piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+			SpawnPiece<AKnight>(team, GridIndex(get_index(i, 1), head));
 
 			// ROOKS
-			piece = world->SpawnActor<ARook>();
-			piece->Init(this, team, GridIndex(get_index(i, 0), head));
-			piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+			SpawnPiece<ARook>(team, GridIndex(get_index(i, 0), head));
 		}
 
 		for (int32 i = 0; i < 8; ++i)
 		{
-			piece = world->SpawnActor<AChessPawn>();
-			piece->Init(this, team, GridIndex(i, forward));
-			piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+			SpawnPiece<AChessPawn>(team, GridIndex(i, forward));
 		}
 	});
 }
@@ -152,4 +140,12 @@ GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
 	int32 intY = (int32)-localPosition.Z();
 
 	return { 7 - intX, 7 - intY };
+}
+
+void AChessBoard::Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index)
+{
+	piece->Init(this, team, index);
+	piece->GetRootComponent()->AttachToComponent(GetRootComponent());
+	checkf(_pieces[index.X][index.Y] == nullptr, L"Spawn location is not empty.");
+	_pieces[index.X][index.Y] = piece;
 }
