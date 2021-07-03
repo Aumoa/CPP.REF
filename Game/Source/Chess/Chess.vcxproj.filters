@@ -22,6 +22,9 @@
     <ClCompile Include="Components\CommandComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Components\ChessSystemComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Level">
@@ -60,6 +63,9 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Components\CommandComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\ChessSystemComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

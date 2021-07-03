@@ -15,9 +15,10 @@ IndicatingComponent::IndicatingComponent() : Super()
 
 void IndicatingComponent::SetupBoard(AChessBoardProxy* board)
 {
-	_board = board;
+	Super::SetupBoard(board);
+
 	World* const world = GetWorld();
-	AChessBoard* const chessBoard = board->GetBoard();
+	AChessBoard* const chessBoard = GetBoard();
 
 	// READY HOVER INDICATOR
 	_hoverIndicator = world->SpawnActor<AGridIndicator>();
@@ -38,7 +39,7 @@ void IndicatingComponent::UpdateHoverIndicator(const Vector3& worldLocation)
 	auto* primitiveComponent = dynamic_cast<PrimitiveComponent*>(_hoverIndicator->GetRootComponent());
 	checkf(primitiveComponent != nullptr, L"The root component of hover indicator is not primitive component.");
 
-	AChessBoard* board = _board->GetBoard();
+	AChessBoard* board = GetBoard();
 
 	_hoverIndex = board->GetGridIndexFromPosition(worldLocation);
 	if (_hoverIndex.IsValid())
@@ -62,6 +63,8 @@ return;
 
 	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<PrimitiveComponent>();
 	GridIndex gridIndex = location.value_or(_hoverIndex);
+	AChessBoard* board = GetBoard();
+	AChessBoardProxy* proxy = GetProxy();
 
 	if (!gridIndex.IsValid())
 	{
@@ -73,7 +76,7 @@ return;
 		finally();
 	}
 
-	if (!_board->CanSelect(gridIndex))
+	if (!proxy->CanSelect(gridIndex))
 	{
 		if (_selectIndex.has_value())
 		{
@@ -82,7 +85,7 @@ return;
 		finally();
 	}
 
-	Vector3 position = _board->GetBoard()->GetBoardCellPosition(gridIndex);
+	Vector3 position = board->GetBoardCellPosition(gridIndex);
 	primitiveComponent->SetLocation(position);
 	primitiveComponent->SetHiddenInGame(false);
 	_selectIndex = gridIndex;

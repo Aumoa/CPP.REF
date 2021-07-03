@@ -6,7 +6,9 @@
 #include "GameFramework/PlayerController.h"
 
 class AChessBoard;
+class ChessSystemComponent;
 class IndicatingComponent;
+class CommandComponent;
 
 class AChessPlayerController : public APlayerController
 {
@@ -15,7 +17,9 @@ public:
 
 private:
 	AChessBoard* _board = nullptr;	
+	std::vector<ChessSystemComponent*> _systems;
 	IndicatingComponent* _indicatingComponent = nullptr;
+	CommandComponent* _commandComponent = nullptr;
 
 public:
 	AChessPlayerController();

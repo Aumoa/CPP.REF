@@ -54,10 +54,19 @@ public:
 		return pair.second ? id : -1;
 	}
 
+	template<class O>
+	int64 AddObject(O* object, void (O::* func)(TArgs...))
+	{
+		return AddRaw([object, func](TArgs&&... args)
+		{
+			(object->*func)(std::forward<TArgs>(args)...);
+		});
+	}
+
 	/// <summary>
 	/// Remove binded function using delegate id.
 	/// </summary>
-	void RemoveRaw(int64 id)
+	void Remove(int64 id)
 	{
 		_functions.erase(id);
 	}

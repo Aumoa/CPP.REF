@@ -8,10 +8,12 @@
 #include "Pawns/ChessBoardProxy.h"
 #include "Components/InputComponent.h"
 #include "Components/IndicatingComponent.h"
+#include "Components/CommandComponent.h"
 
 AChessPlayerController::AChessPlayerController() : Super()
 {
-	_indicatingComponent = CreateSubobject<IndicatingComponent>();
+	_systems.emplace_back(_indicatingComponent = CreateSubobject<IndicatingComponent>());
+	_systems.emplace_back(_commandComponent = CreateSubobject<CommandComponent>());
 }
 
 void AChessPlayerController::BeginPlay()
@@ -21,16 +23,23 @@ void AChessPlayerController::BeginPlay()
 	World* world = GetWorld();
 	Level* level = world->GetLevel();
 	GameLevel* gameLevel = dynamic_cast<GameLevel*>(level);
-	if (gameLevel != nullptr)
-	{
-		_board = gameLevel->GetPersistentChessBoard();
-		AChessBoardProxy* proxy = _board->CreateProxy(EChessTeam::Black);
-		Possess(proxy);
+	checkf(gameLevel != nullptr, L"Level is not a GameLevel class.");
 
-		proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));
-		proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
-		_indicatingComponent->SetupBoard(proxy);
+	_board = gameLevel->GetPersistentChessBoard();
+	AChessBoardProxy* proxy = _board->CreateProxy(EChessTeam::Black);
+	Possess(proxy);
+
+	proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));
+	proxy->SetActorRotation(Quaternion::LookTo(Vector3(0, -10.0f, 10.0f), Vector3(0, 1.0f, 0)));
+
+	// Setting up chess board on system component.
+	for (auto& system : _systems)
+	{
+		system->SetupBoard(proxy);
 	}
+
+	// Post initialize system component.
+	_indicatingComponent->ActionRequest.AddObject(_commandComponent, &CommandComponent::DoCommand);
 
 	SetupPlayerInput(GetInputComponent());
 }

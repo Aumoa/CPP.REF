@@ -4,18 +4,17 @@
 
 #include "GameMinimal.h"
 #include "ChessAIStructures.h"
-#include "Components/ActorComponent.h"
+#include "ChessSystemComponent.h"
 
 class AChessBoardProxy;
 class AGridIndicator;
 
-class IndicatingComponent : public ActorComponent
+class IndicatingComponent : public ChessSystemComponent
 {
 public:
-	using Super = ActorComponent;
+	using Super = ChessSystemComponent;
 
 private:
-	AChessBoardProxy* _board = nullptr;
 	AGridIndicator* _hoverIndicator = nullptr;
 	GridIndex _hoverIndex;
 	AGridIndicator* _selectedIndicator = nullptr;
@@ -24,7 +23,7 @@ private:
 public:
 	IndicatingComponent();
 
-	void SetupBoard(AChessBoardProxy* board);
+	virtual void SetupBoard(AChessBoardProxy* board) override;
 
 	void UpdateHoverIndicator(const Vector3& worldLocation);
 	void UpdateSelected(std::optional<GridIndex> location = std::nullopt);

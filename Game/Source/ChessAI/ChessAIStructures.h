@@ -18,6 +18,21 @@ struct GridIndex
 	{
 	}
 
+	std::wstring ToString() const
+	{
+		if (!IsValid())
+		{
+			return L"<Invalid>";
+		}
+		else
+		{
+			static wchar_t Horzs[] = L"ABCDEFGH";
+			static wchar_t Verts[] = L"12345678";
+			wchar_t buff[] = { Horzs[X], Verts[Y], 0 };
+			return buff;
+		}
+	}
+
 	constexpr bool IsValid() const
 	{
 		return X >= 0 && X < 8
