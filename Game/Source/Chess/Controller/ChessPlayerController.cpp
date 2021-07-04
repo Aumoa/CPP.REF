@@ -26,7 +26,7 @@ void AChessPlayerController::BeginPlay()
 	checkf(gameLevel != nullptr, L"Level is not a GameLevel class.");
 
 	_board = gameLevel->GetPersistentChessBoard();
-	AChessBoardProxy* proxy = _board->CreateProxy(EChessTeam::Black);
+	AChessBoardProxy* proxy = _board->CreateProxy(EChessTeam::White);
 	Possess(proxy);
 
 	proxy->SetActorLocation(Vector3(0, 10.0f, -10.0f));

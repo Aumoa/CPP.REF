@@ -22,7 +22,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 	_visibilityCnt = 0;
 	FrustumCull(_visibilityBits);
 
-	ForEachVisibleItem([this](size_t idx)
+	ForEachVisibleItem([this](size_t idx, size_t viewIndex)
 	{
 		_visibilityCnt += 1;
 	});
@@ -38,7 +38,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 
 	// Push camera constants.
 	auto* ptr = (RHIViewConstants*)_viewBuffer->GetMappingPointer();
-	ForEachVisibleItem([this, &ptr, &vp](size_t idx)
+	ForEachVisibleItem([this, &ptr, &vp](size_t idx, size_t viewIndex)
 	{
 		Transform transform = _scene->_primitives[idx]->ComponentTransform;
 		ptr->World = transform.GetMatrix();

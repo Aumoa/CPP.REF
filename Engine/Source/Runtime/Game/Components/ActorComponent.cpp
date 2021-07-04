@@ -69,6 +69,24 @@ void ActorComponent::SetActive(bool bActive)
 
 void ActorComponent::RegisterComponentWithWorld(World* world)
 {
-	world->RegisterTickFunction(&PrimaryComponentTick);
-	world->RegisterComponent(this);
+	if (!_bIsRegistered)
+	{
+		world->RegisterTickFunction(&PrimaryComponentTick);
+		world->RegisterComponent(this);
+		_bIsRegistered = true;
+	}
+}
+
+void ActorComponent::UnregisterComponent()
+{
+	if (_bIsRegistered)
+	{
+		World* const world = GetWorld();
+		if (world != nullptr)
+		{
+			world->UnregisterTickFunction(&PrimaryComponentTick);
+			world->UnregisterComponent(this);
+		}
+		_bIsRegistered = false;
+	}
 }

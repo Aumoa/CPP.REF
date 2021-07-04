@@ -34,3 +34,13 @@ bool AChessBoardProxy::CanSelect(const GridIndex& location) const
 
 	return true;
 }
+
+bool AChessBoardProxy::SimulateMove(const GridIndex& from, const GridIndex& to)
+{
+	if (_board->GetTurn() != _myteam)
+	{
+		return false;
+	}
+
+	return _board->MovePiece(from, to);
+}

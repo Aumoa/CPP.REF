@@ -3,7 +3,7 @@
 #include "Actor.h"
 #include "LogGame.h"
 #include "Level/World.h"
-#include "Components/SceneComponent.h"
+#include "Components/PrimitiveComponent.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -86,6 +86,24 @@ void AActor::RegisterActorWithWorld(World* world)
 	ForEachSceneComponents<SceneComponent>([world](SceneComponent* component)
 	{
 		component->RegisterComponentWithWorld(world);
+		return false;
+	});
+}
+
+void AActor::DestroyActor()
+{
+	World* const world = GetWorld();
+	ensureMsgf(world != nullptr, L"Actor does not spawned at world.");
+	
+	for (auto& component : _components)
+	{
+		component->UnregisterComponent();
+	}
+
+	// Register all scene components.
+	ForEachSceneComponents<SceneComponent>([world](SceneComponent* component)
+	{
+		component->UnregisterComponent();
 		return false;
 	});
 }

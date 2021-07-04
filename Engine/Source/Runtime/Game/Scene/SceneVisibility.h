@@ -30,8 +30,9 @@ public:
 	void CalcVisibility(const MinimalViewInfo& view);
 	void SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t idx);
 
-	inline void ForEachVisibleItem(std::function<void(size_t)> body)
+	inline void ForEachVisibleItem(std::function<void(size_t, size_t)> body)
 	{
+		size_t viewIdx = 0;
 		for (size_t i = 0; i < _visibilityBits.size(); ++i)
 		{
 			int32 n = _visibilityBits[i];
@@ -45,7 +46,7 @@ public:
 
 				if (b)
 				{
-					body(idx);
+					body(idx, viewIdx++);
 				}
 			}
 		}

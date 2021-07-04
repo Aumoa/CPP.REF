@@ -39,3 +39,9 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 		_meshComponent->SetRotation(Quaternion::FromAxisAngle(Vector3(0, 1, 0), 180.0f));
 	}
 }
+
+bool APiece::SimulateMove(const GridIndex& index)
+{
+	_meshComponent->SetLocation(_board->GetBoardCellPosition(index));
+	return true;
+}

@@ -2,6 +2,7 @@
 
 #include "ChessBoard.h"
 #include "GameEngine.h"
+#include "LogChessAI.h"
 #include "Level/World.h"
 #include "Components/StaticMeshComponent.h"
 #include "Assets/AssetImporter.h"
@@ -19,6 +20,8 @@
 
 using namespace std;
 using namespace std::chrono;
+
+using enum ELogVerbosity;
 
 AChessBoard::AChessBoard() : Super()
 {
@@ -152,10 +155,53 @@ APiece* AChessBoard::GetPiece(const GridIndex& index) const
 	return _pieces[index.X][index.Y];
 }
 
+bool AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
+{
+	APiece*& fromPiece = _pieces[from.X][from.Y];
+	if (fromPiece == nullptr)
+	{
+		return false;
+	}
+
+	if (!fromPiece->SimulateMove(to))
+	{
+		return false;
+	}
+
+	const bool bMoveTurn = Internal_MoveTurn();
+	checkf(bMoveTurn, L"Could not move turn.");
+
+	swap(fromPiece, _pieces[to.X][to.Y]);
+
+	if (fromPiece != nullptr)
+	{
+		fromPiece->DestroyActor();
+		fromPiece = nullptr;
+	}
+
+	return true;
+}
+
 void AChessBoard::Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index)
 {
 	piece->Init(this, team, index);
 	piece->GetRootComponent()->AttachToComponent(GetRootComponent());
 	checkf(_pieces[index.X][index.Y] == nullptr, L"Spawn location is not empty.");
 	_pieces[index.X][index.Y] = piece;
+}
+
+bool AChessBoard::Internal_MoveTurn()
+{
+	if (_turn == EChessTeam::Black)
+	{
+		_turn = EChessTeam::White;
+		return true;
+	}
+	else if (_turn == EChessTeam::White)
+	{
+		_turn = EChessTeam::Black;
+		return true;
+	}
+	LogSystem::Log(LogChessAI, Fatal, L"Current team is not valid value({}).", (int32)_turn);
+	return false;
 }

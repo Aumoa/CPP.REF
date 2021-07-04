@@ -97,6 +97,9 @@ public:
 
 	void RegisterTickFunction(TickFunction* function);
 	void RegisterComponent(ActorComponent* component);
+	void UnregisterTickFunction(TickFunction* function);
+	void UnregisterComponent(ActorComponent* component);
+
 	virtual void LevelTick(std::chrono::duration<float> elapsedTime);
 	Scene* GetScene() const { return _scene; }
 	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }

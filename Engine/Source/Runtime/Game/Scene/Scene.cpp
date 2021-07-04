@@ -25,18 +25,22 @@ void Scene::UpdateScene(duration<float> elapsedTime)
 {
 	for (auto& proxy : _primitives)
 	{
-		PrimitiveComponent* component = proxy->GetComponent();
-
-		if (proxy->bRenderStateDirty)
+		if (proxy != nullptr)
 		{
-			// Replace primitive scene proxy to re-created instance with same primitive id.
-			int64 primitiveId = proxy->PrimitiveId;
-			DestroySubobject(proxy);
-			proxy = component->CreateSceneProxy();
-			proxy->PrimitiveId = primitiveId;
-		}
+			if (proxy->bRenderStateDirty)
+			{
+				// Replace primitive scene proxy to re-created instance with same primitive id.
+				proxy = RecreateRenderSceneProxy(proxy);
+			}
 
-		proxy->UpdateTransform_GameThread(component->GetComponentTransform());
+			if (proxy == nullptr)
+			{
+				continue;
+			}
+
+			PrimitiveComponent* component = proxy->GetComponent();
+			proxy->UpdateTransform_GameThread(component->GetComponentTransform());
+		}
 	}
 }
 
@@ -55,44 +59,47 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 	set<RHIShader*> checks;
 	for (PrimitiveSceneProxy*& proxy : _primitives)
 	{
-		for (auto& batch : proxy->MeshBatches)
+		if (proxy != nullptr)
 		{
-			for (auto& materialSlot : batch.MaterialSlots)
+			for (auto& batch : proxy->MeshBatches)
 			{
-				if (materialSlot != nullptr)
+				for (auto& materialSlot : batch.MaterialSlots)
 				{
-					map<size_t, vector<RHIShader*>>::iterator it;
-
-					size_t queueNumber = 0;
-					switch (materialSlot->GetBlendMode())
+					if (materialSlot != nullptr)
 					{
-					case EMaterialBlendMode::Opaque:
-						queueNumber = RenderQueue_Opaque;
-						break;
-					case EMaterialBlendMode::Masked:
-						queueNumber = RenderQueue_Masked;
-						break;
-					case EMaterialBlendMode::Transparent:
-						queueNumber = RenderQueue_Transparent;
-						break;
-					}
+						map<size_t, vector<RHIShader*>>::iterator it;
 
-					if (!ensureMsgf(queueNumber != 0, L"Render Queue Number is not setted."))
-					{
-						continue;
-					}
+						size_t queueNumber = 0;
+						switch (materialSlot->GetBlendMode())
+						{
+						case EMaterialBlendMode::Opaque:
+							queueNumber = RenderQueue_Opaque;
+							break;
+						case EMaterialBlendMode::Masked:
+							queueNumber = RenderQueue_Masked;
+							break;
+						case EMaterialBlendMode::Transparent:
+							queueNumber = RenderQueue_Transparent;
+							break;
+						}
 
-					it = _renderQueue.find(queueNumber);
-					if (it == _renderQueue.end())
-					{
-						it = _renderQueue.emplace_hint(it, queueNumber, vector<RHIShader*>());
-					}
+						if (!ensureMsgf(queueNumber != 0, L"Render Queue Number is not setted."))
+						{
+							continue;
+						}
 
-					if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())
-					{
-						checks.emplace_hint(ck, materialSlot->GetShader());
-						it->second.emplace_back(materialSlot->GetShader());
-						renderers += 1;
+						it = _renderQueue.find(queueNumber);
+						if (it == _renderQueue.end())
+						{
+							it = _renderQueue.emplace_hint(it, queueNumber, vector<RHIShader*>());
+						}
+
+						if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())
+						{
+							checks.emplace_hint(ck, materialSlot->GetShader());
+							it->second.emplace_back(materialSlot->GetShader());
+							renderers += 1;
+						}
 					}
 				}
 			}
@@ -164,6 +171,28 @@ void Scene::RemovePrimitive(int64 primitiveId)
 		return;
 	}
 
+	DestroySubobject(_primitives[primitiveId]);
 	_primitives[primitiveId] = nullptr;
 	_spaces.emplace(primitiveId);
+}
+
+PrimitiveSceneProxy* Scene::RecreateRenderSceneProxy(PrimitiveSceneProxy* proxy)
+{
+	PrimitiveComponent* component = proxy->GetComponent();
+	int64 primitiveId = proxy->PrimitiveId;
+	DestroySubobject(proxy);
+	proxy = component->CreateSceneProxy();
+	if (proxy == nullptr)
+	{
+		_primitives[primitiveId] = nullptr;
+		_spaces.emplace(primitiveId);
+	}
+	else
+	{
+		// Remove previous and attach with same primitive id.
+		proxy->PrimitiveId = primitiveId;
+		component->SceneProxy = proxy;
+		_primitives[primitiveId] = proxy;
+	}
+	return proxy;
 }

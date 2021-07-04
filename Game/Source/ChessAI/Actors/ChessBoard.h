@@ -17,6 +17,7 @@ public:
 private:
 	Degrees _rotation;
 	APiece* _pieces[8][8] = {};
+	EChessTeam _turn = EChessTeam::White;
 
 public:
 	AChessBoard();
@@ -38,6 +39,10 @@ public:
 		return piece;
 	}
 
+	bool MovePiece(const GridIndex& from, const GridIndex& to);
+	inline EChessTeam GetTurn() const { return _turn; }
+
 private:
 	void Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index);
+	bool Internal_MoveTurn();
 };

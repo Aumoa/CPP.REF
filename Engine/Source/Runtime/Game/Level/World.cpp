@@ -65,30 +65,37 @@ void World::RegisterComponent(ActorComponent* component)
 {
 	if (auto* isPrimitive = dynamic_cast<PrimitiveComponent*>(component); isPrimitive != nullptr)
 	{
-		if (isPrimitive->SceneProxy == nullptr)
+		PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
+		if (isPrimitive->SceneProxy != nullptr)
 		{
-			PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
-			if (proxy != nullptr)
-			{
-				int64 id = _scene->AddPrimitive(proxy);
-				proxy->PrimitiveId = id;
-			}
-			isPrimitive->SceneProxy = proxy;
-		}
-		else
-		{
-			PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
-
 			// Actually need to remove previous scene proxy from scene.
 			_scene->RemovePrimitive(isPrimitive->SceneProxy->PrimitiveId);
+			DestroySubobject(isPrimitive->SceneProxy);
+		}
 
-			if (proxy != nullptr)
-			{
-				int64 newPrimitiveId = _scene->AddPrimitive(proxy);
-				proxy->PrimitiveId = newPrimitiveId;
-			}
+		if (proxy != nullptr)
+		{
+			int64 id = _scene->AddPrimitive(proxy);
+			proxy->PrimitiveId = id;
+		}
 
-			isPrimitive->SceneProxy = proxy;
+		isPrimitive->SceneProxy = proxy;
+	}
+}
+
+void World::UnregisterTickFunction(TickFunction* function)
+{
+	_tickInstances.erase(function);
+}
+
+void World::UnregisterComponent(ActorComponent* component)
+{
+	if (auto* isPrimitive = dynamic_cast<PrimitiveComponent*>(component); isPrimitive != nullptr)
+	{
+		if (isPrimitive->SceneProxy != nullptr)
+		{
+			int64 id = isPrimitive->SceneProxy->PrimitiveId;
+			_scene->RemovePrimitive(id);
 		}
 	}
 }

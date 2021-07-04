@@ -54,6 +54,7 @@ protected:
 private:
 	uint8 _bActive : 1 = true;
 	uint8 _bHasBegunPlay : 1 = false;
+	uint8 _bIsRegistered : 1 = false;
 	AActor* _owner = nullptr;
 
 public:
@@ -77,6 +78,7 @@ public:
 	MulticastEvent<ActorComponent, void()> Inactivated;
 
 	void RegisterComponentWithWorld(World* world);
+	void UnregisterComponent();
 
 	void SetOwnerPrivate(AActor* owner) { _owner = owner; }
 };

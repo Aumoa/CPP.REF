@@ -84,6 +84,7 @@ public:
 	MulticastEvent<AActor, void()> Inactivated;
 
 	void RegisterActorWithWorld(World* world);
+	void DestroyActor();
 
 private:
 	std::set<ActorComponent*> _components;

@@ -51,4 +51,7 @@ public:
 	void RemovePrimitive(int64 primitiveId);
 
 	RHIDevice* GetDevice() const { return _device; }
+
+private:
+	PrimitiveSceneProxy* RecreateRenderSceneProxy(PrimitiveSceneProxy* proxy);
 };

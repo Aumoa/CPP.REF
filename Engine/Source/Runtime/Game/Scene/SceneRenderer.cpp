@@ -37,7 +37,7 @@ void SceneRenderer::CollectPrimitives(SceneVisibility* view)
 	_drawRelevances.resize(max(primitives, _drawRelevances.size()));
 	_relevances = 0;
 
-	view->ForEachVisibleItem([&](size_t idx)
+	view->ForEachVisibleItem([&](size_t idx, size_t viewIndex)
 	{
 		PrimitiveSceneProxy* sceneProxy = _scene->_primitives[idx];
 		
@@ -63,7 +63,7 @@ void SceneRenderer::CollectPrimitives(SceneVisibility* view)
 				if (!bCollectBatch)
 				{
 					relevance = &_drawRelevances[_relevances++];
-					relevance->ViewIndex = idx;
+					relevance->ViewIndex = viewIndex;
 					relevance->SceneProxy = sceneProxy;
 					relevance->Batch = batch;
 					relevance->Elements.clear();

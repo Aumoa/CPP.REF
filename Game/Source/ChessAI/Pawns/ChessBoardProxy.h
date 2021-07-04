@@ -15,7 +15,7 @@ public:
 
 private:
 	AChessBoard* _board = nullptr;
-	EChessTeam _myteam;
+	EChessTeam _myteam = EChessTeam::Black;
 
 public:
 	AChessBoardProxy(AChessBoard* chessBoard);
@@ -24,4 +24,5 @@ public:
 	inline AChessBoard* GetBoard() const { return _board; }
 
 	bool CanSelect(const GridIndex& location) const;
+	bool SimulateMove(const GridIndex& from, const GridIndex& to);
 };
