@@ -5,6 +5,7 @@
 #include "GameMinimal.h"
 #include "ChessAIStructures.h"
 #include "ChessSystemComponent.h"
+#include "Queries/ChessQueries.h"
 
 class AChessBoardProxy;
 class AGridIndicator;
@@ -20,6 +21,7 @@ private:
 	AGridIndicator* _selectedIndicator = nullptr;
 	std::optional<GridIndex> _selectIndex;
 	std::vector<AGridIndicator*> _movableIndicators;
+	std::vector<AGridIndicator*> _attackIndicators;
 
 public:
 	IndicatingComponent();
@@ -35,4 +37,7 @@ public:
 private:
 	void UpdateSelectIndicator(bool bActive);
 	void SetIndicatorLocation(AGridIndicator* indicator, const GridIndex& location);
+	void UpdateMovableIndicators(const MovablePointsQuery& results);
+	void UpdateAttackIndicators(const MovablePointsQuery& results);
+	void UpdateIndicatorsImpl(std::vector<AGridIndicator*>& container, MovablePointsArray::FigureType type, const MovablePointsQuery& results, std::function<AGridIndicator*()> ctor);
 };

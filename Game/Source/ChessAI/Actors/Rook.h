@@ -16,6 +16,8 @@ private:
 public:
 	ARook();
 
+	virtual bool QueryMovable(MovablePointsQuery& query) const override;
+
 protected:
 	virtual StaticMesh* GetStaticMesh() const override;
 };

@@ -106,50 +106,18 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 		primitiveComponent->SetHiddenInGame(false);
 
 		APiece* piece = board->GetPiece(*_selectIndex);
-		MovablePointsQuery query = { .Type = MovablePointsQuery::QueryType::Move };
+		MovablePointsQuery query;
 		if (piece->QueryMovable(query))
 		{
-			// Make pending indicators.
-			size_t count = query.GetPointsCount();
-			if (_movableIndicators.size() < count)
-			{
-				_movableIndicators.reserve(count);
-				for (size_t i = _movableIndicators.size(); i < count; ++i)
-				{
-					AGridIndicator*& indicator = _movableIndicators.emplace_back(world->SpawnActor<AGridIndicator>());
-					indicator->GetRootComponent()->AttachToComponent(board->GetRootComponent());
-					indicator->GetRootComponent()->SetScale(Vector3(1, 0.05f, 1));
-					indicator->SetIndicatorColor(NamedColors::Aquamarine);
-				}
-			}
-
-			// Setup locations.
-			size_t idx = 0;
-			for (auto& arr : query.Results)
-			{
-				for (auto& point : arr.Points)
-				{
-					AGridIndicator*& indicator = _movableIndicators[idx++];
-					SetIndicatorLocation(indicator, point);
-					if (auto* primitive = indicator->GetRootComponentAs<PrimitiveComponent>(); primitive != nullptr)
-					{
-						primitive->SetHiddenInGame(false);
-					}
-				}
-			}
+			UpdateMovableIndicators(query);
+			UpdateAttackIndicators(query);
 		}
 	}
 	else
 	{
 		primitiveComponent->SetHiddenInGame(true);
-
-		for (auto& indicator : _movableIndicators)
-		{
-			if (auto* primitive = indicator->GetRootComponentAs<PrimitiveComponent>(); primitive != nullptr)
-			{
-				primitive->SetHiddenInGame(true);
-			}
-		}
+		UpdateMovableIndicators({});
+		UpdateAttackIndicators({});
 	}
 }
 
@@ -158,4 +126,78 @@ void IndicatingComponent::SetIndicatorLocation(AGridIndicator* indicator, const 
 	AChessBoard* board = GetBoard();
 	Vector3 amendedLocation = board->GetBoardCellPosition(location);
 	indicator->SetActorLocation(amendedLocation);
+}
+
+void IndicatingComponent::UpdateMovableIndicators(const MovablePointsQuery& results)
+{
+	World* const world = GetWorld();
+	AChessBoard* const board = GetBoard();
+	UpdateIndicatorsImpl(_movableIndicators, MovablePointsArray::FigureType::Move, results, [&]()
+	{
+		AGridIndicator* indicator = world->SpawnActor<AGridIndicator>();
+		indicator->GetRootComponent()->AttachToComponent(board->GetRootComponent());
+		indicator->GetRootComponent()->SetScale(Vector3(1, 0.05f, 1));
+		indicator->SetIndicatorColor(NamedColors::Aquamarine);
+		return indicator;
+	});
+}
+
+void IndicatingComponent::UpdateAttackIndicators(const MovablePointsQuery& results)
+{
+	World* const world = GetWorld();
+	AChessBoard* const board = GetBoard();
+	UpdateIndicatorsImpl(_attackIndicators, MovablePointsArray::FigureType::Attack, results, [&]()
+	{
+		AGridIndicator* indicator = world->SpawnActor<AGridIndicator>();
+		indicator->GetRootComponent()->AttachToComponent(board->GetRootComponent());
+		indicator->GetRootComponent()->SetScale(Vector3(1, 0.05f, 1));
+		indicator->SetIndicatorColor(NamedColors::Red);
+		return indicator;
+	});
+}
+
+void IndicatingComponent::UpdateIndicatorsImpl(vector<AGridIndicator*>& container, MovablePointsArray::FigureType type, const MovablePointsQuery& results, function<AGridIndicator*()> ctor)
+{
+	World* const world = GetWorld();
+	AChessBoard* const board = GetBoard();
+
+	// Make pending indicators.
+	size_t count = results.GetPointsCount(type);
+	if (container.size() < count)
+	{
+		container.reserve(count);
+		for (size_t i = container.size(); i < count; ++i)
+		{
+			AGridIndicator*& indicator = container.emplace_back(ctor());
+		}
+	}
+	else
+	{
+		for (size_t i = count; i < container.size(); ++i)
+		{
+			PrimitiveComponent* primitive = container[i]->GetRootComponentAs<PrimitiveComponent>();
+			if (primitive != nullptr)
+			{
+				primitive->SetHiddenInGame(true);
+			}
+		}
+	}
+
+	// Setup locations.
+	size_t idx = 0;
+	for (auto& arr : results.Results)
+	{
+		if (arr.Type == type)
+		{
+			for (auto& point : arr.Points)
+			{
+				AGridIndicator*& indicator = container[idx++];
+				SetIndicatorLocation(indicator, point);
+				if (auto* primitive = indicator->GetRootComponentAs<PrimitiveComponent>(); primitive != nullptr)
+				{
+					primitive->SetHiddenInGame(false);
+				}
+			}
+		}
+	}
 }

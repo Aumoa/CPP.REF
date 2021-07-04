@@ -3,9 +3,37 @@
 #include "Knight.h"
 #include "GameEngine.h"
 #include "Assets/AssetImporter.h"
+#include "Actors/ChessBoard.h"
 
 AKnight::AKnight() : Super()
 {
+}
+
+bool AKnight::QueryMovable(MovablePointsQuery& query) const
+{
+	GridIndex direction[] =
+	{
+		// Left top
+		GridIndex(-2, +1), GridIndex(-1, +2),
+
+		// Right top
+		GridIndex(+1, +2), GridIndex(+2, +1),
+
+		// Right bottom
+		GridIndex(+2, -1), GridIndex(+1, -2),
+
+		// Left bottom
+		GridIndex(-1, -2), GridIndex(-2, -1),
+	};
+
+	for (int32 i = 0; i < _countof(direction); ++i)
+	{
+		GridIndex loc = GetIndex() + direction[i];
+		CheckAndEmplace(query.BeginFigure(MovablePointsArray::FigureType::Move), loc);
+		CheckAndEmplaceHit(query, loc);
+	}
+
+	return true;
 }
 
 StaticMesh* AKnight::GetStaticMesh() const

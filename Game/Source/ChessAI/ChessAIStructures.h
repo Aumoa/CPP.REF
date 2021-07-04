@@ -48,4 +48,19 @@ struct GridIndex
 	{
 		return X != rhs.X || Y != rhs.Y;
 	}
+
+	constexpr GridIndex operator +(const GridIndex& rhs) const
+	{
+		return GridIndex(X + rhs.X, Y + rhs.Y);
+	}
+
+	constexpr GridIndex operator -(const GridIndex& rhs) const
+	{
+		return GridIndex(X - rhs.X, Y - rhs.Y);
+	}
+
+	constexpr GridIndex operator *(int32 multiplier) const
+	{
+		return GridIndex(X * multiplier, Y * multiplier);
+	}
 };

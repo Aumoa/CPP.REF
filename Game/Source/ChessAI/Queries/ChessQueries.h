@@ -9,23 +9,25 @@ class AChessBoard;
 
 struct MovablePointsArray
 {
-	std::vector<GridIndex> Points;
-};
-
-struct MovablePointsQuery
-{
-	enum class QueryType
+	enum class FigureType
 	{
 		Move,
 		Attack,
 	};
 
-	QueryType Type;
+	FigureType Type;
+	std::vector<GridIndex> Points;
+};
+
+struct MovablePointsQuery
+{
 	std::vector<MovablePointsArray> Results;
 
-	inline MovablePointsArray* BeginFigure()
+	inline MovablePointsArray* BeginFigure(MovablePointsArray::FigureType figureType)
 	{
-		return &Results.emplace_back();
+		MovablePointsArray* figure = &Results.emplace_back();
+		figure->Type = figureType;
+		return figure;
 	}
 
 	inline size_t GetPointsCount() const
@@ -34,6 +36,19 @@ struct MovablePointsQuery
 		for (size_t i = 0; i < Results.size(); ++i)
 		{
 			n += Results[i].Points.size();
+		}
+		return n;
+	}
+
+	inline size_t GetPointsCount(MovablePointsArray::FigureType figureType) const
+	{
+		size_t n = 0;
+		for (size_t i = 0; i < Results.size(); ++i)
+		{
+			if (Results[i].Type == figureType)
+			{
+				n += Results[i].Points.size();
+			}
 		}
 		return n;
 	}

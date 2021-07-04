@@ -3,7 +3,6 @@
 #include "ChessPawn.h"
 #include "GameEngine.h"
 #include "Assets/AssetImporter.h"
-#include "Actors/ChessBoard.h"
 
 AChessPawn::AChessPawn() : Super()
 {
@@ -21,13 +20,22 @@ bool AChessPawn::SimulateMove(const GridIndex& index)
 
 bool AChessPawn::QueryMovable(MovablePointsQuery& query) const
 {
-	switch (query.Type)
+	int32 incrementer = GetIncrementer();
+	MovablePointsArray* figure = query.BeginFigure(MovablePointsArray::FigureType::Move);
+
+	GridIndex location = GetIndex();
+	location.Y += GetIncrementer();
+	const bool bBlocked = !CheckAndEmplace(figure, location);
+
+	GridIndex left = location + GridIndex(-1, 0);
+	GridIndex right = location + GridIndex(+1, 0);
+	CheckAndEmplaceHit(query, left);
+	CheckAndEmplaceHit(query, right);
+
+	if (_bFirst && !bBlocked)
 	{
-	case MovablePointsQuery::QueryType::Move:
-		QueryMove(query);
-		break;
-	default:
-		return false;
+		location.Y += GetIncrementer();
+		CheckAndEmplace(figure, location);
 	}
 
 	return true;
@@ -55,33 +63,6 @@ inline int32 AChessPawn::GetIncrementer() const
 
 void AChessPawn::QueryMove(MovablePointsQuery& query) const
 {
-	auto checkAndEmplace = [&](auto& container, const GridIndex& loc)
-	{
-		AChessBoard* board = GetBoard();
-		if (board->HasPiece(loc))
-		{
-			return false;
-		}
-
-		container.emplace_back(loc);
-		return true;
-	};
-
-	int32 incrementer = GetIncrementer();
-	MovablePointsArray* figure = query.BeginFigure();
-
-	GridIndex location = GetIndex();
-	location.Y += GetIncrementer();
-	if (!checkAndEmplace(figure->Points, location))
-	{
-		return;
-	}
-
-	if (_bFirst)
-	{
-		location.Y += GetIncrementer();
-		checkAndEmplace(figure->Points, location);
-	}
 }
 
 void AChessPawn::QueryAttack(MovablePointsQuery& query) const

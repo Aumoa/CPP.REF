@@ -48,8 +48,43 @@ bool APiece::SimulateMove(const GridIndex& index)
 	return true;
 }
 
-bool APiece::QueryMovable(MovablePointsQuery& query) const
+bool APiece::CheckAndEmplace(MovablePointsArray* figure, const GridIndex& loc) const
 {
-	checkf(false, L"NOT IMPLEMENTED. MAKE IT TO PURE VIRTUAL FUNCTION.");
-	return false;
+	if (figure == nullptr)
+	{
+		return false;
+	}
+
+	if (!loc.IsValid())
+	{
+		return false;
+	}
+
+	AChessBoard* board = GetBoard();
+	if (board->HasPiece(loc))
+	{
+		return false;
+	}
+
+	figure->Points.emplace_back(loc);
+	return true;
+}
+
+bool APiece::CheckAndEmplaceHit(MovablePointsQuery& query, const GridIndex& loc) const
+{
+	if (!loc.IsValid())
+	{
+		return false;
+	}
+
+	AChessBoard* board = GetBoard();
+	APiece* piece = board->GetPiece(loc);
+	if (piece == nullptr || piece->GetTeam() == _team)
+	{
+		return false;
+	}
+
+	MovablePointsArray* figure = query.BeginFigure(MovablePointsArray::FigureType::Attack);
+	figure->Points.emplace_back(loc);
+	return true;
 }

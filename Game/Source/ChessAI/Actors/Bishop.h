@@ -16,6 +16,8 @@ private:
 public:
 	ABishop();
 
+	virtual bool QueryMovable(MovablePointsQuery& query) const override;
+
 protected:
 	virtual StaticMesh* GetStaticMesh() const override;
 };
