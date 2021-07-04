@@ -52,4 +52,20 @@ struct MovablePointsQuery
 		}
 		return n;
 	}
+
+	inline const MovablePointsArray* GetHit(const GridIndex& loc) const
+	{
+		for (auto& figure : Results)
+		{
+			for (auto& point : figure.Points)
+			{
+				if (point == loc)
+				{
+					return &figure;
+				}
+			}
+		}
+
+		return nullptr;
+	}
 };

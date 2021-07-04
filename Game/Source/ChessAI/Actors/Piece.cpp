@@ -43,6 +43,18 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 
 bool APiece::SimulateMove(const GridIndex& index)
 {
+	MovablePointsQuery query;
+	if (!QueryMovable(query))
+	{
+		return false;
+	}
+
+	const MovablePointsArray* figure = query.GetHit(index);
+	if (figure == nullptr)
+	{
+		return false;
+	}
+
 	_meshComponent->SetLocation(_board->GetBoardCellPosition(index));
 	_myIndex = index;
 	return true;
