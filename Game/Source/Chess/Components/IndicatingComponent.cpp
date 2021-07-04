@@ -4,8 +4,10 @@
 #include "Level/World.h"
 #include "Actors/ChessBoard.h"
 #include "Actors/GridIndicator.h"
+#include "Actors/Piece.h"
 #include "Pawns/ChessBoardProxy.h"
 #include "Components/PrimitiveComponent.h"
+#include "Queries/ChessQueries.h"
 
 using namespace std;
 
@@ -44,8 +46,7 @@ void IndicatingComponent::UpdateHoverIndicator(const Vector3& worldLocation)
 	_hoverIndex = board->GetGridIndexFromPosition(worldLocation);
 	if (_hoverIndex.IsValid())
 	{
-		Vector3 amendedLocation = board->GetBoardCellPosition(_hoverIndex);
-		primitiveComponent->SetLocation(amendedLocation);
+		SetIndicatorLocation(_hoverIndicator, _hoverIndex);
 		primitiveComponent->SetHiddenInGame(false);
 	}
 	else
@@ -56,24 +57,27 @@ void IndicatingComponent::UpdateHoverIndicator(const Vector3& worldLocation)
 
 void IndicatingComponent::UpdateSelected(optional<GridIndex> location)
 {
-#define finally() \
-primitiveComponent->SetHiddenInGame(true);\
-_selectIndex = nullopt;\
-return;
-
 	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<PrimitiveComponent>();
 	GridIndex gridIndex = location.value_or(_hoverIndex);
 	AChessBoard* board = GetBoard();
 	AChessBoardProxy* proxy = GetProxy();
 
+	auto finally = [&]()
+	{
+		_selectIndex = nullopt;
+		UpdateSelectIndicator(false);
+	};
+
 	if (!gridIndex.IsValid())
 	{
 		finally();
+		return;
 	}
 
 	if (_selectIndex.has_value() && *_selectIndex == gridIndex)
 	{
 		finally();
+		return;
 	}
 
 	if (!proxy->CanSelect(gridIndex))
@@ -83,10 +87,75 @@ return;
 			ActionRequest.Invoke(*_selectIndex, gridIndex);
 		}
 		finally();
+		return;
 	}
 
-	Vector3 position = board->GetBoardCellPosition(gridIndex);
-	primitiveComponent->SetLocation(position);
-	primitiveComponent->SetHiddenInGame(false);
 	_selectIndex = gridIndex;
+	UpdateSelectIndicator(true);
+}
+
+void IndicatingComponent::UpdateSelectIndicator(bool bActive)
+{
+	AChessBoard* board = GetBoard();
+	World* world = board->GetWorld();
+	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<PrimitiveComponent>();
+
+	if (bActive)
+	{
+		SetIndicatorLocation(_selectedIndicator, *_selectIndex);
+		primitiveComponent->SetHiddenInGame(false);
+
+		APiece* piece = board->GetPiece(*_selectIndex);
+		MovablePointsQuery query = { .Type = MovablePointsQuery::QueryType::Move };
+		if (piece->QueryMovable(query))
+		{
+			// Make pending indicators.
+			size_t count = query.GetPointsCount();
+			if (_movableIndicators.size() < count)
+			{
+				_movableIndicators.reserve(count);
+				for (size_t i = _movableIndicators.size(); i < count; ++i)
+				{
+					AGridIndicator*& indicator = _movableIndicators.emplace_back(world->SpawnActor<AGridIndicator>());
+					indicator->GetRootComponent()->AttachToComponent(board->GetRootComponent());
+					indicator->GetRootComponent()->SetScale(Vector3(1, 0.05f, 1));
+					indicator->SetIndicatorColor(NamedColors::Aquamarine);
+				}
+			}
+
+			// Setup locations.
+			size_t idx = 0;
+			for (auto& arr : query.Results)
+			{
+				for (auto& point : arr.Points)
+				{
+					AGridIndicator*& indicator = _movableIndicators[idx++];
+					SetIndicatorLocation(indicator, point);
+					if (auto* primitive = indicator->GetRootComponentAs<PrimitiveComponent>(); primitive != nullptr)
+					{
+						primitive->SetHiddenInGame(false);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		primitiveComponent->SetHiddenInGame(true);
+
+		for (auto& indicator : _movableIndicators)
+		{
+			if (auto* primitive = indicator->GetRootComponentAs<PrimitiveComponent>(); primitive != nullptr)
+			{
+				primitive->SetHiddenInGame(true);
+			}
+		}
+	}
+}
+
+void IndicatingComponent::SetIndicatorLocation(AGridIndicator* indicator, const GridIndex& location)
+{
+	AChessBoard* board = GetBoard();
+	Vector3 amendedLocation = board->GetBoardCellPosition(location);
+	indicator->SetActorLocation(amendedLocation);
 }

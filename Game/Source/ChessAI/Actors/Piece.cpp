@@ -27,6 +27,7 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 	_board = board;
 	_meshComponent->SetStaticMesh(GetStaticMesh());
 	_team = team;
+	_myIndex = index;
 
 	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
 	MaterialInstance* color = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
@@ -43,5 +44,12 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 bool APiece::SimulateMove(const GridIndex& index)
 {
 	_meshComponent->SetLocation(_board->GetBoardCellPosition(index));
+	_myIndex = index;
 	return true;
+}
+
+bool APiece::QueryMovable(MovablePointsQuery& query) const
+{
+	checkf(false, L"NOT IMPLEMENTED. MAKE IT TO PURE VIRTUAL FUNCTION.");
+	return false;
 }

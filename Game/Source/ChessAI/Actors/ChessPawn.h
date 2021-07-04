@@ -12,10 +12,21 @@ public:
 
 private:
 	static constexpr wchar_t AssetPath[] = L"Contents/Chess/Arts/Pawn/Mesh/pawn.fbx";
+	
+	uint8 _bFirst : 1 = true;
 
 public:
 	AChessPawn();
 
+	virtual bool SimulateMove(const GridIndex& index) override;
+	virtual bool QueryMovable(MovablePointsQuery& query) const override;
+
 protected:
 	virtual StaticMesh* GetStaticMesh() const override;
+
+private:
+	inline int32 GetIncrementer() const;
+
+	void QueryMove(MovablePointsQuery& query) const;
+	void QueryAttack(MovablePointsQuery& query) const;
 };

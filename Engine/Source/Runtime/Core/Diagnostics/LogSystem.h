@@ -17,10 +17,8 @@ class LogSystem abstract final
 {
 	class fatal_exception : public std::exception
 	{
-		std::string _storage;
-
 	public:
-		fatal_exception(std::string_view message);
+		fatal_exception(const std::string& message);
 	};
 
 public:

@@ -54,7 +54,7 @@
     <ClInclude Include="Pawns\ChessBoardProxy.h">
       <Filter>Pawns</Filter>
     </ClInclude>
-    <ClInclude Include="Queries\ChessBoardQuery.h">
+    <ClInclude Include="Queries\ChessQueries.h">
       <Filter>Queries</Filter>
     </ClInclude>
     <ClInclude Include="ChessAIEnums.h" />

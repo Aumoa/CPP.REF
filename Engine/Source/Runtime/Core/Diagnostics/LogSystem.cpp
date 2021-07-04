@@ -7,7 +7,7 @@
 
 using namespace std;
 
-LogSystem::fatal_exception::fatal_exception(string_view message) : exception((_storage = message).c_str())
+LogSystem::fatal_exception::fatal_exception(const std::string& message) : exception(message.c_str())
 {
 }
 

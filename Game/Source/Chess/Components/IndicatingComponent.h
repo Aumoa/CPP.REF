@@ -19,6 +19,7 @@ private:
 	GridIndex _hoverIndex;
 	AGridIndicator* _selectedIndicator = nullptr;
 	std::optional<GridIndex> _selectIndex;
+	std::vector<AGridIndicator*> _movableIndicators;
 
 public:
 	IndicatingComponent();
@@ -30,4 +31,8 @@ public:
 
 	using ActionRequestDelegate = MulticastEvent<IndicatingComponent, void(const GridIndex& from, const GridIndex& to)>;
 	ActionRequestDelegate ActionRequest;
+
+private:
+	void UpdateSelectIndicator(bool bActive);
+	void SetIndicatorLocation(AGridIndicator* indicator, const GridIndex& location);
 };

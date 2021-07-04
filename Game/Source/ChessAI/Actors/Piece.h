@@ -4,6 +4,7 @@
 
 #include "GameMinimal.h"
 #include "ChessAIStructures.h"
+#include "Queries/ChessQueries.h"
 
 class AChessBoard;
 class StaticMesh;
@@ -25,7 +26,12 @@ public:
 
 	virtual void Init(AChessBoard* board, EChessTeam team, const GridIndex& index);
 	virtual bool SimulateMove(const GridIndex& index);
+
+	virtual bool QueryMovable(MovablePointsQuery& query) const;
+
 	inline EChessTeam GetTeam() const { return _team; }
+	inline GridIndex GetIndex() const { return _myIndex; }
+	inline AChessBoard* GetBoard() const { return _board; }
 
 protected:
 	virtual StaticMesh* GetStaticMesh() const = 0;
