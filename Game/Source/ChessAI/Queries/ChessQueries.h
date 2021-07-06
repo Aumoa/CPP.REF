@@ -6,6 +6,7 @@
 #include "ChessAIStructures.h"
 
 class AChessBoard;
+class APiece;
 
 struct MovablePointsArray
 {
@@ -68,4 +69,25 @@ struct MovablePointsQuery
 
 		return nullptr;
 	}
+};
+
+class ActionRecord
+{
+private:
+	APiece* _actor = nullptr;
+	std::function<void()> _undoRecord;
+	uint8 _bValid : 1;
+	APiece* _actorTaked = nullptr;
+
+public:
+	ActionRecord(bool bValid = false);
+	ActionRecord(APiece* actor, std::function<void()> undoRecord);
+
+	inline APiece* GetActor() const { return _actor; }
+	inline APiece* GetTakeActor() const { return _actorTaked; }
+	void Undo() const;
+	void TakeActor(APiece* actor);
+
+	bool IsValid() const;
+	inline operator bool() const { return IsValid(); }
 };

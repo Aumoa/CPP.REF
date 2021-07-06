@@ -29,6 +29,9 @@
     <ClCompile Include="Actors\ChessPawn.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="Queries\ChessQueries.cpp">
+      <Filter>Queries</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Actors">

@@ -18,13 +18,26 @@ void CommandComponent::SetupBoard(AChessBoardProxy* proxy)
 
 void CommandComponent::DoCommand(const GridIndex& from, const GridIndex& to)
 {
-	bool bSimulated = GetProxy()->SimulateMove(from, to);
-	if (bSimulated)
+	ActionRecord simulateRecord = GetProxy()->SimulateMove(from, to);
+	if (simulateRecord)
 	{
 		LogSystem::Log(LogChess, Verbose, L"DoCommand: {} -> {}", from.ToString(), to.ToString());
+		_history.emplace(simulateRecord);
 	}
 	else
 	{
 		LogSystem::Log(LogChess, Verbose, L"CommandFailed: {} -> {}", from.ToString(), to.ToString());
 	}
+}
+
+void CommandComponent::Undo()
+{
+	if (_history.empty())
+	{
+		return;
+	}
+
+	const ActionRecord& record = _history.top();
+	record.Undo();
+	_history.pop();
 }

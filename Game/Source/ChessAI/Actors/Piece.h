@@ -25,7 +25,7 @@ public:
 	APiece();
 
 	virtual void Init(AChessBoard* board, EChessTeam team, const GridIndex& index);
-	virtual bool SimulateMove(const GridIndex& index);
+	virtual ActionRecord SimulateMove(const GridIndex& index);
 
 	virtual bool QueryMovable(MovablePointsQuery& query) const = 0;
 

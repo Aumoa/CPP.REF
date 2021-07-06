@@ -102,6 +102,7 @@
     <ClCompile Include="Actors\Rook.cpp" />
     <ClCompile Include="LogChessAI.cpp" />
     <ClCompile Include="Pawns\ChessBoardProxy.cpp" />
+    <ClCompile Include="Queries\ChessQueries.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\Core\Core.vcxproj">

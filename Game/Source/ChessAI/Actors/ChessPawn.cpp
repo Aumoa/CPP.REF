@@ -4,18 +4,30 @@
 #include "GameEngine.h"
 #include "Assets/AssetImporter.h"
 
+using namespace std;
+
 AChessPawn::AChessPawn() : Super()
 {
 }
 
-bool AChessPawn::SimulateMove(const GridIndex& index)
+ActionRecord AChessPawn::SimulateMove(const GridIndex& index)
 {
-	bool bMoved = Super::SimulateMove(index);
-	if (bMoved)
+	ActionRecord record = Super::SimulateMove(index);
+	if (!record)
 	{
-		_bFirst = false;
+		return record;
 	}
-	return bMoved;
+
+	const bool bFirstRecord = _bFirst;
+	_bFirst = false;
+
+	return ActionRecord(
+		this,
+		[&, bFirstRecord, record = move(record)]()
+		{
+			_bFirst = bFirstRecord;
+			record.Undo();
+		});
 }
 
 bool AChessPawn::QueryMovable(MovablePointsQuery& query) const

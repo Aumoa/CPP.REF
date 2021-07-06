@@ -18,7 +18,7 @@ private:
 public:
 	AChessPawn();
 
-	virtual bool SimulateMove(const GridIndex& index) override;
+	virtual ActionRecord SimulateMove(const GridIndex& index) override;
 	virtual bool QueryMovable(MovablePointsQuery& query) const override;
 
 protected:

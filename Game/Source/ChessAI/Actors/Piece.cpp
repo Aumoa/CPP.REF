@@ -41,7 +41,7 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 	}
 }
 
-bool APiece::SimulateMove(const GridIndex& index)
+ActionRecord APiece::SimulateMove(const GridIndex& index)
 {
 	MovablePointsQuery query;
 	if (!QueryMovable(query))
@@ -56,8 +56,16 @@ bool APiece::SimulateMove(const GridIndex& index)
 	}
 
 	_meshComponent->SetLocation(_board->GetBoardCellPosition(index));
+	GridIndex loc = _myIndex;
 	_myIndex = index;
-	return true;
+
+	return ActionRecord(
+		this,
+		[&, loc]()
+		{
+			_meshComponent->SetLocation(_board->GetBoardCellPosition(loc));
+			_myIndex = loc;
+		});
 }
 
 bool APiece::CheckAndEmplace(MovablePointsArray* figure, const GridIndex& loc) const

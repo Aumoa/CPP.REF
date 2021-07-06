@@ -4,6 +4,7 @@
 
 #include "GameMinimal.h"
 #include "ChessAIStructures.h"
+#include "Queries/ChessQueries.h"
 #include "GameFramework/Pawn.h"
 
 class AChessBoard;
@@ -24,5 +25,5 @@ public:
 	inline AChessBoard* GetBoard() const { return _board; }
 
 	bool CanSelect(const GridIndex& location) const;
-	bool SimulateMove(const GridIndex& from, const GridIndex& to);
+	ActionRecord SimulateMove(const GridIndex& from, const GridIndex& to);
 };

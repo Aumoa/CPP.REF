@@ -5,6 +5,7 @@
 #include "GameMinimal.h"
 #include "Level/World.h"
 #include "ChessAIStructures.h"
+#include "Queries/ChessQueries.h"
 
 class AChessBoardProxy;
 class APiece;
@@ -39,7 +40,7 @@ public:
 		return piece;
 	}
 
-	bool MovePiece(const GridIndex& from, const GridIndex& to);
+	ActionRecord MovePiece(const GridIndex& from, const GridIndex& to);
 	inline EChessTeam GetTurn() const { return _turn; }
 
 private:

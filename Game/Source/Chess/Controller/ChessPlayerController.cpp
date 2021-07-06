@@ -46,11 +46,26 @@ void AChessPlayerController::BeginPlay()
 
 void AChessPlayerController::SetupPlayerInput(InputComponent* inputComponent)
 {
-	inputComponent->KeyboardEvent.AddRaw([](EKey key, EKeyboardEvent keyEvent)
+	inputComponent->KeyboardEvent.AddRaw([&](EKey key, EKeyboardEvent keyEvent)
 	{
-		if (key == EKey::Escape && keyEvent == EKeyboardEvent::Pressed)
+		if (key == EKey::LeftControl)
 		{
-			LogSystem::Log(LogChess, ELogVerbosity::Verbose, L"Escape key pressed.");
+			if (keyEvent == EKeyboardEvent::Pressed)
+			{
+				_bLeftCtrl = true;
+			}
+			else
+			{
+				_bLeftCtrl = false;
+			}
+		}
+
+		if (keyEvent == EKeyboardEvent::Pressed)
+		{
+			if (key == EKey::Z)
+			{
+				_commandComponent->Undo();
+			}
 		}
 	});
 

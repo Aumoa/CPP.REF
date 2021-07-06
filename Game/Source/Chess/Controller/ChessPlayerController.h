@@ -21,6 +21,8 @@ private:
 	IndicatingComponent* _indicatingComponent = nullptr;
 	CommandComponent* _commandComponent = nullptr;
 
+	uint8 _bLeftCtrl : 1 = false;
+
 public:
 	AChessPlayerController();
 

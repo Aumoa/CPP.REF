@@ -155,7 +155,7 @@ APiece* AChessBoard::GetPiece(const GridIndex& index) const
 	return _pieces[index.X][index.Y];
 }
 
-bool AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
+ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 {
 	APiece*& fromPiece = _pieces[from.X][from.Y];
 	if (fromPiece == nullptr)
@@ -163,7 +163,8 @@ bool AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 		return false;
 	}
 
-	if (!fromPiece->SimulateMove(to))
+	ActionRecord record = fromPiece->SimulateMove(to);
+	if (!record)
 	{
 		return false;
 	}
@@ -175,11 +176,17 @@ bool AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 
 	if (fromPiece != nullptr)
 	{
-		fromPiece->DestroyActor();
-		fromPiece = nullptr;
+		record.TakeActor(fromPiece);
 	}
 
-	return true;
+	return ActionRecord(
+		record.GetActor(),
+		[&, record = move(record), fromPiece = fromPiece, from = from, to = to]()
+		{
+			record.Undo();
+			_pieces[from.X][from.Y] = record.GetTakeActor();
+			swap(_pieces[from.X][from.Y], _pieces[to.X][to.Y]);
+		});
 }
 
 void AChessBoard::Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index)
