@@ -3,22 +3,19 @@
 #pragma once
 
 #include "GameMinimal.h"
-#include "Piece.h"
+#include "FirstCheckPiece.h"
 
-class AChessPawn : public APiece
+class AChessPawn : public AFirstCheckPiece
 {
 public:
-	using Super = APiece;
+	using Super = AFirstCheckPiece;
 
 private:
 	static constexpr wchar_t AssetPath[] = L"Contents/Chess/Arts/Pawn/Mesh/pawn.fbx";
-	
-	uint8 _bFirst : 1 = true;
 
 public:
 	AChessPawn();
 
-	virtual ActionRecord SimulateMove(const GridIndex& index) override;
 	virtual bool QueryMovable(MovablePointsQuery& query) const override;
 
 protected:

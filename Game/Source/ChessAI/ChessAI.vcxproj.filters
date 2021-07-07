@@ -32,6 +32,12 @@
     <ClCompile Include="Queries\ChessQueries.cpp">
       <Filter>Queries</Filter>
     </ClCompile>
+    <ClCompile Include="Actors\FirstCheckPiece.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="Queries\DirectionalMovablePiece.cpp">
+      <Filter>Queries</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Actors">
@@ -80,6 +86,12 @@
     </ClInclude>
     <ClInclude Include="Actors\ChessPawn.h">
       <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\FirstCheckPiece.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Queries\DirectionalMovablePiece.h">
+      <Filter>Queries</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

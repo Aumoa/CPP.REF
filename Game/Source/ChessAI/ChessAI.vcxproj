@@ -95,6 +95,7 @@
     <ClCompile Include="Actors\Bishop.cpp" />
     <ClCompile Include="Actors\ChessBoard.cpp" />
     <ClCompile Include="Actors\ChessPawn.cpp" />
+    <ClCompile Include="Actors\FirstCheckPiece.cpp" />
     <ClCompile Include="Actors\King.cpp" />
     <ClCompile Include="Actors\Knight.cpp" />
     <ClCompile Include="Actors\Piece.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="LogChessAI.cpp" />
     <ClCompile Include="Pawns\ChessBoardProxy.cpp" />
     <ClCompile Include="Queries\ChessQueries.cpp" />
+    <ClCompile Include="Queries\DirectionalMovablePiece.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\Core\Core.vcxproj">
@@ -116,6 +118,7 @@
     <ClInclude Include="Actors\Bishop.h" />
     <ClInclude Include="Actors\ChessBoard.h" />
     <ClInclude Include="Actors\ChessPawn.h" />
+    <ClInclude Include="Actors\FirstCheckPiece.h" />
     <ClInclude Include="Actors\King.h" />
     <ClInclude Include="Actors\Knight.h" />
     <ClInclude Include="Actors\Piece.h" />
@@ -126,6 +129,7 @@
     <ClInclude Include="LogChessAI.h" />
     <ClInclude Include="Pawns\ChessBoardProxy.h" />
     <ClInclude Include="Queries\ChessQueries.h" />
+    <ClInclude Include="Queries\DirectionalMovablePiece.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

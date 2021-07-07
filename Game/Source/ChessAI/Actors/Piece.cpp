@@ -41,7 +41,7 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 	}
 }
 
-ActionRecord APiece::SimulateMove(const GridIndex& index)
+ActionRecord APiece::Move(const GridIndex& index)
 {
 	MovablePointsQuery query;
 	if (!QueryMovable(query))
@@ -49,6 +49,7 @@ ActionRecord APiece::SimulateMove(const GridIndex& index)
 		return false;
 	}
 
+	_board->SimulateMoveQuery(query);
 	const MovablePointsArray* figure = query.GetHit(index);
 	if (figure == nullptr)
 	{
@@ -66,45 +67,4 @@ ActionRecord APiece::SimulateMove(const GridIndex& index)
 			_meshComponent->SetLocation(_board->GetBoardCellPosition(loc));
 			_myIndex = loc;
 		});
-}
-
-bool APiece::CheckAndEmplace(MovablePointsArray* figure, const GridIndex& loc) const
-{
-	if (figure == nullptr)
-	{
-		return false;
-	}
-
-	if (!loc.IsValid())
-	{
-		return false;
-	}
-
-	AChessBoard* board = GetBoard();
-	if (board->HasPiece(loc))
-	{
-		return false;
-	}
-
-	figure->Points.emplace_back(loc);
-	return true;
-}
-
-bool APiece::CheckAndEmplaceHit(MovablePointsQuery& query, const GridIndex& loc) const
-{
-	if (!loc.IsValid())
-	{
-		return false;
-	}
-
-	AChessBoard* board = GetBoard();
-	APiece* piece = board->GetPiece(loc);
-	if (piece == nullptr || piece->GetTeam() == _team)
-	{
-		return false;
-	}
-
-	MovablePointsArray* figure = query.BeginFigure(MovablePointsArray::FigureType::Attack);
-	figure->Points.emplace_back(loc);
-	return true;
 }

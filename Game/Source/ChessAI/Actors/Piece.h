@@ -25,9 +25,10 @@ public:
 	APiece();
 
 	virtual void Init(AChessBoard* board, EChessTeam team, const GridIndex& index);
-	virtual ActionRecord SimulateMove(const GridIndex& index);
+	virtual ActionRecord Move(const GridIndex& index);
 
 	virtual bool QueryMovable(MovablePointsQuery& query) const = 0;
+	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece) const { return true; }
 
 	inline EChessTeam GetTeam() const { return _team; }
 	inline GridIndex GetIndex() const { return _myIndex; }
@@ -35,6 +36,4 @@ public:
 
 protected:
 	virtual StaticMesh* GetStaticMesh() const = 0;
-	bool CheckAndEmplace(MovablePointsArray* figure, const GridIndex& loc) const;
-	bool CheckAndEmplaceHit(MovablePointsQuery& query, const GridIndex& loc) const;
 };

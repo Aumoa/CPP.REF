@@ -10,46 +10,26 @@ AChessPawn::AChessPawn() : Super()
 {
 }
 
-ActionRecord AChessPawn::SimulateMove(const GridIndex& index)
-{
-	ActionRecord record = Super::SimulateMove(index);
-	if (!record)
-	{
-		return record;
-	}
-
-	const bool bFirstRecord = _bFirst;
-	_bFirst = false;
-
-	return ActionRecord(
-		this,
-		[&, bFirstRecord, record = move(record)]()
-		{
-			_bFirst = bFirstRecord;
-			record.Undo();
-		});
-}
-
 bool AChessPawn::QueryMovable(MovablePointsQuery& query) const
 {
 	int32 incrementer = GetIncrementer();
-	MovablePointsArray* figure = query.BeginFigure(MovablePointsArray::FigureType::Move);
+	MovablePointsArrayPointer figure = query.BeginFigure(MovablePointsArray::FigureType::Move);
 
 	GridIndex location = GetIndex();
 	location.Y += GetIncrementer();
-	const bool bBlocked = !CheckAndEmplace(figure, location);
+	const bool bBlocked = !figure->CheckAndEmplace(this, location);
+
+	if (IsFirst() && !bBlocked)
+	{
+		figure->CheckAndEmplace(this, location + GridIndex(0, GetIncrementer()));
+	}
 
 	GridIndex left = location + GridIndex(-1, 0);
 	GridIndex right = location + GridIndex(+1, 0);
-	CheckAndEmplaceHit(query, left);
-	CheckAndEmplaceHit(query, right);
+	query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, left);
+	query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, right);
 
-	if (_bFirst && !bBlocked)
-	{
-		location.Y += GetIncrementer();
-		CheckAndEmplace(figure, location);
-	}
-
+	query.OwnerActor = this;
 	return true;
 }
 

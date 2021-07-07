@@ -29,10 +29,11 @@ bool AKnight::QueryMovable(MovablePointsQuery& query) const
 	for (int32 i = 0; i < _countof(direction); ++i)
 	{
 		GridIndex loc = GetIndex() + direction[i];
-		CheckAndEmplace(query.BeginFigure(MovablePointsArray::FigureType::Move), loc);
-		CheckAndEmplaceHit(query, loc);
+		query.BeginFigure(MovablePointsArray::FigureType::Move)->CheckAndEmplace(this, loc);
+		query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, loc);
 	}
 
+	query.OwnerActor = this;
 	return true;
 }
 

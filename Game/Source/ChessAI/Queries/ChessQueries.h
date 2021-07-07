@@ -7,6 +7,7 @@
 
 class AChessBoard;
 class APiece;
+struct MovablePointsQuery;
 
 struct MovablePointsArray
 {
@@ -18,57 +19,28 @@ struct MovablePointsArray
 
 	FigureType Type;
 	std::vector<GridIndex> Points;
+
+	bool CheckAndEmplace(const APiece* piece, const GridIndex& location);
+};
+
+struct MovablePointsArrayPointer
+{
+	MovablePointsQuery* Root = nullptr;
+	size_t MyIndex = -1;
+
+	MovablePointsArray* operator ->();
 };
 
 struct MovablePointsQuery
 {
+	const APiece* OwnerActor = nullptr;
 	std::vector<MovablePointsArray> Results;
 
-	inline MovablePointsArray* BeginFigure(MovablePointsArray::FigureType figureType)
-	{
-		MovablePointsArray* figure = &Results.emplace_back();
-		figure->Type = figureType;
-		return figure;
-	}
+	MovablePointsArrayPointer BeginFigure(MovablePointsArray::FigureType figureType);
+	size_t GetPointsCount() const;
+	size_t GetPointsCount(MovablePointsArray::FigureType figureType) const;
 
-	inline size_t GetPointsCount() const
-	{
-		size_t n = 0;
-		for (size_t i = 0; i < Results.size(); ++i)
-		{
-			n += Results[i].Points.size();
-		}
-		return n;
-	}
-
-	inline size_t GetPointsCount(MovablePointsArray::FigureType figureType) const
-	{
-		size_t n = 0;
-		for (size_t i = 0; i < Results.size(); ++i)
-		{
-			if (Results[i].Type == figureType)
-			{
-				n += Results[i].Points.size();
-			}
-		}
-		return n;
-	}
-
-	inline const MovablePointsArray* GetHit(const GridIndex& loc) const
-	{
-		for (auto& figure : Results)
-		{
-			for (auto& point : figure.Points)
-			{
-				if (point == loc)
-				{
-					return &figure;
-				}
-			}
-		}
-
-		return nullptr;
-	}
+	const MovablePointsArray* GetHit(const GridIndex& loc) const;
 };
 
 class ActionRecord

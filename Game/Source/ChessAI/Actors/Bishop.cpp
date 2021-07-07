@@ -3,6 +3,7 @@
 #include "Bishop.h"
 #include "GameEngine.h"
 #include "Assets/AssetImporter.h"
+#include "Queries/DirectionalMovablePiece.h"
 
 ABishop::ABishop() : Super()
 {
@@ -10,29 +11,7 @@ ABishop::ABishop() : Super()
 
 bool ABishop::QueryMovable(MovablePointsQuery& query) const
 {
-	GridIndex direction[] =
-	{
-		// Diagonal
-		GridIndex(-1, +1), GridIndex(+1, +1),
-		GridIndex(-1, -1), GridIndex(+1, -1),
-	};
-
-	const int32 Length = 8;
-	for (int32 i = 0; i < _countof(direction); ++i)
-	{
-		MovablePointsArray* figure = query.BeginFigure(MovablePointsArray::FigureType::Move);
-		for (int32 j = 1; j < Length; ++j)
-		{
-			GridIndex loc = GetIndex() + direction[i] * j;
-			if (!CheckAndEmplace(figure, loc))
-			{
-				CheckAndEmplaceHit(query, loc);
-				break;
-			}
-		}
-	}
-
-	return true;
+	return DirectionalMovablePiece::QueryMovable(this, query, false, true, 8);
 }
 
 StaticMesh* ABishop::GetStaticMesh() const

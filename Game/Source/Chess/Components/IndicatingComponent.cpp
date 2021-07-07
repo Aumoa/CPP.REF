@@ -109,6 +109,7 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 		MovablePointsQuery query;
 		if (piece->QueryMovable(query))
 		{
+			board->SimulateMoveQuery(query);
 			UpdateMovableIndicators(query);
 			UpdateAttackIndicators(query);
 		}

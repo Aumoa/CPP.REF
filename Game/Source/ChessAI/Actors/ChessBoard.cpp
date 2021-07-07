@@ -163,7 +163,7 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 		return false;
 	}
 
-	ActionRecord record = fromPiece->SimulateMove(to);
+	ActionRecord record = fromPiece->Move(to);
 	if (!record)
 	{
 		return false;
@@ -187,6 +187,35 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 			_pieces[from.X][from.Y] = record.GetTakeActor();
 			swap(_pieces[from.X][from.Y], _pieces[to.X][to.Y]);
 		});
+}
+
+void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
+{
+	for (auto& result : query.Results)
+	{
+		if (result.Type == MovablePointsArray::FigureType::Attack)
+		{
+			for (size_t i = 0; i < result.Points.size(); ++i)
+			{
+				if (!HasPiece(result.Points[i]))
+				{
+					result.Points.erase(result.Points.begin() + i);
+					i -= 1;
+				}
+			}
+		}
+	}
+
+	for (int32 i = 0; i < 8; ++i)
+	{
+		for (int32 j = 0; j < 8; ++j)
+		{
+			if (APiece* piece = GetPiece(GridIndex(i, j)); piece)
+			{
+				piece->QueryInteractionWith(query, piece);
+			}
+		}
+	}
 }
 
 void AChessBoard::Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index)
