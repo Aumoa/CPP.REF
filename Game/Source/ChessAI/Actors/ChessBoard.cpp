@@ -23,6 +23,36 @@ using namespace std::chrono;
 
 using enum ELogVerbosity;
 
+void AChessBoard::ChessBoardBuilt::Init(const AChessBoard* board)
+{
+	Owner = board;
+	for (size_t i = 0; i < 8; ++i)
+	{
+		for (size_t j = 0; j < 8; ++j)
+		{
+			Marks[i][j].PlacedActor = board->_pieces[i][j];
+		}
+	}
+}
+
+void AChessBoard::ChessBoardBuilt::Build()
+{
+}
+
+void AChessBoard::ChessBoardBuilt::SimulateMoveAndBuild(const GridIndex& from, const GridIndex& to)
+{
+}
+
+bool AChessBoard::ChessBoardBuilt::HasPiece(const GridIndex& index) const
+{
+	return GetPiece(index);
+}
+
+APiece* AChessBoard::ChessBoardBuilt::GetPiece(const GridIndex& index) const
+{
+	return Marks[index.X][index.Y].PlacedActor;
+}
+
 AChessBoard::AChessBoard() : Super()
 {
 	StaticMeshComponent* smc = CreateSubobject<StaticMeshComponent>();
@@ -89,6 +119,8 @@ void AChessBoard::InitBoard(World* world)
 			SpawnPiece<AChessPawn>(team, GridIndex(i, forward));
 		}
 	});
+
+	_built.Init(this);
 }
 
 AChessBoardProxy* AChessBoard::CreateProxy(EChessTeam team)
@@ -145,16 +177,6 @@ GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
 	return { 7 - intX, 7 - intY };
 }
 
-bool AChessBoard::HasPiece(const GridIndex& index) const
-{
-	return _pieces[index.X][index.Y] != nullptr;
-}
-
-APiece* AChessBoard::GetPiece(const GridIndex& index) const
-{
-	return _pieces[index.X][index.Y];
-}
-
 ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 {
 	APiece*& fromPiece = _pieces[from.X][from.Y];
@@ -173,6 +195,7 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 	checkf(bMoveTurn, L"Could not move turn.");
 
 	swap(fromPiece, _pieces[to.X][to.Y]);
+	_built.Init(this);
 
 	if (fromPiece != nullptr)
 	{
@@ -193,16 +216,20 @@ void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
 {
 	for (auto& result : query.Results)
 	{
-		if (result.Type == MovablePointsArray::FigureType::Attack)
+		const bool bAttack = result.Type == MovablePointsArray::FigureType::Attack;
+		for (size_t i = 0; i < result.Points.size(); ++i)
 		{
-			for (size_t i = 0; i < result.Points.size(); ++i)
+			auto it = result.Points.begin() + i;
+
+			if (bAttack && !_built.HasPiece(*it))
 			{
-				if (!HasPiece(result.Points[i]))
-				{
-					result.Points.erase(result.Points.begin() + i);
-					i -= 1;
-				}
+				result.Points.erase(it);
+				i -= 1;
+				continue;
 			}
+
+			ChessBoardBuilt builder(this);
+			builder.SimulateMoveAndBuild(query.OwnerActor->GetIndex(), *it);
 		}
 	}
 
@@ -210,7 +237,7 @@ void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
 	{
 		for (int32 j = 0; j < 8; ++j)
 		{
-			if (APiece* piece = GetPiece(GridIndex(i, j)); piece)
+			if (APiece* piece = _built.GetPiece(GridIndex(i, j)); piece)
 			{
 				piece->QueryInteractionWith(query, piece);
 			}

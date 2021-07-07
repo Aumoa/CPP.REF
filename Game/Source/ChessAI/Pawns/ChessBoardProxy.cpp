@@ -20,7 +20,7 @@ void AChessBoardProxy::InitBoard(AChessBoard* board, EChessTeam team)
 
 bool AChessBoardProxy::CanSelect(const GridIndex& location) const
 {
-	APiece* piece = _board->GetPiece(location);
+	APiece* piece = _board->GetBoardBuilt().GetPiece(location);
 	if (piece == nullptr)
 	{
 		return false;

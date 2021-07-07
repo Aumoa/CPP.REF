@@ -15,7 +15,7 @@ bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& l
 	}
 
 	AChessBoard* board = piece->GetBoard();
-	APiece* getPiece = board->GetPiece(location);
+	APiece* getPiece = board->GetBoardBuilt().GetPiece(location);
 	if (getPiece)
 	{
 		if (Type == FigureType::Move)

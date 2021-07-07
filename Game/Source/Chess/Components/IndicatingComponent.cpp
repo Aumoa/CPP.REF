@@ -105,7 +105,7 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 		SetIndicatorLocation(_selectedIndicator, *_selectIndex);
 		primitiveComponent->SetHiddenInGame(false);
 
-		APiece* piece = board->GetPiece(*_selectIndex);
+		APiece* piece = board->GetBoardBuilt().GetPiece(*_selectIndex);
 		MovablePointsQuery query;
 		if (piece->QueryMovable(query))
 		{
