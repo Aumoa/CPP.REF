@@ -9,6 +9,7 @@
 class AChessBoard;
 class StaticMesh;
 class StaticMeshComponent;
+class ChessBoardBuilt;
 
 class APiece : public AActor
 {
@@ -25,9 +26,9 @@ public:
 	APiece();
 
 	virtual void Init(AChessBoard* board, EChessTeam team, const GridIndex& index);
-	virtual ActionRecord Move(const GridIndex& index);
+	virtual ActionRecord Move(const GridIndex& index, const ChessBoardBuilt& built);
 
-	virtual bool QueryMovable(MovablePointsQuery& query) const = 0;
+	virtual bool QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const = 0;
 	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece) const { return true; }
 
 	inline EChessTeam GetTeam() const { return _team; }

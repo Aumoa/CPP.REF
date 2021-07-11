@@ -7,6 +7,7 @@
 
 class AChessBoard;
 class APiece;
+class ChessBoardBuilt;
 struct MovablePointsQuery;
 
 struct MovablePointsArray
@@ -20,7 +21,7 @@ struct MovablePointsArray
 	FigureType Type;
 	std::vector<GridIndex> Points;
 
-	bool CheckAndEmplace(const APiece* piece, const GridIndex& location);
+	bool CheckAndEmplace(const APiece* piece, const GridIndex& location, const ChessBoardBuilt& built);
 };
 
 struct MovablePointsArrayPointer

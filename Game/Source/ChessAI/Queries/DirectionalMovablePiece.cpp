@@ -3,39 +3,49 @@
 #include "DirectionalMovablePiece.h"
 #include "Actors/Piece.h"
 
+using namespace std;
+
 DirectionalMovablePiece::DirectionalMovablePiece()
 {
 }
 
-bool DirectionalMovablePiece::QueryMovable(const APiece* piece, MovablePointsQuery& query, bool bOrthogonal, bool bDiagonal, int32 length)
+bool DirectionalMovablePiece::QueryMovable(const APiece* piece, MovablePointsQuery& query, const ChessBoardBuilt& built, bool bOrthogonal, bool bDiagonal, int32 length)
 {
-	GridIndex direction[] =
+	vector<GridIndex> direction;
+	direction.reserve(8);
+
+	if (bOrthogonal)
 	{
-		// Orthogonal
-		GridIndex(-1, +0), GridIndex(+1, +0),
-		GridIndex(+0, -1), GridIndex(+0, +1),
+		direction.emplace_back(-1, +0);
+		direction.emplace_back(+1, +0);
+		direction.emplace_back(+0, -1);
+		direction.emplace_back(+0, +1);
+	}
 
-		// Diagonal
-		GridIndex(-1, +1), GridIndex(+1, +1),
-		GridIndex(-1, -1), GridIndex(+1, -1),
-	};
+	if (bDiagonal)
+	{
+		direction.emplace_back(-1, +1);
+		direction.emplace_back(+1, +1);
+		direction.emplace_back(-1, -1);
+		direction.emplace_back(+1, -1);
+	}
 
-	const int32 Length = 8;
-	for (int32 i = 0; i < _countof(direction); ++i)
+	const int32 Length = length;
+	for (int32 i = 0; i < (int32)direction.size(); ++i)
 	{
 		MovablePointsArrayPointer figure = query.BeginFigure(MovablePointsArray::FigureType::Move);
 		MovablePointsArrayPointer figureAttack = query.BeginFigure(MovablePointsArray::FigureType::Attack);
 		for (int32 j = 1; j < Length; ++j)
 		{
 			GridIndex loc = piece->GetIndex() + direction[i] * j;
-			if (!figure->CheckAndEmplace(piece, loc))
+			if (!figure->CheckAndEmplace(piece, loc, built))
 			{
-				figureAttack->CheckAndEmplace(piece, loc);
+				figureAttack->CheckAndEmplace(piece, loc, built);
 				break;
 			}
 			else
 			{
-				figureAttack->CheckAndEmplace(piece, loc);
+				figureAttack->CheckAndEmplace(piece, loc, built);
 			}
 		}
 	}

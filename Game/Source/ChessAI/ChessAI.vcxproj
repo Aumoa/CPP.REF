@@ -103,6 +103,7 @@
     <ClCompile Include="Actors\Rook.cpp" />
     <ClCompile Include="LogChessAI.cpp" />
     <ClCompile Include="Pawns\ChessBoardProxy.cpp" />
+    <ClCompile Include="Queries\ChessBoardBuilt.cpp" />
     <ClCompile Include="Queries\ChessQueries.cpp" />
     <ClCompile Include="Queries\DirectionalMovablePiece.cpp" />
   </ItemGroup>
@@ -128,6 +129,7 @@
     <ClInclude Include="ChessAIStructures.h" />
     <ClInclude Include="LogChessAI.h" />
     <ClInclude Include="Pawns\ChessBoardProxy.h" />
+    <ClInclude Include="Queries\ChessBoardBuilt.h" />
     <ClInclude Include="Queries\ChessQueries.h" />
     <ClInclude Include="Queries\DirectionalMovablePiece.h" />
   </ItemGroup>

@@ -105,9 +105,10 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 		SetIndicatorLocation(_selectedIndicator, *_selectIndex);
 		primitiveComponent->SetHiddenInGame(false);
 
-		APiece* piece = board->GetBoardBuilt().GetPiece(*_selectIndex);
+		const ChessBoardBuilt& built = board->GetBoardBuilt();
+		APiece* piece = built.GetPiece(*_selectIndex);
 		MovablePointsQuery query;
-		if (piece->QueryMovable(query))
+		if (piece->QueryMovable(query, built))
 		{
 			board->SimulateMoveQuery(query);
 			UpdateMovableIndicators(query);

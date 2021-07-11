@@ -8,9 +8,9 @@ AFirstCheckPiece::AFirstCheckPiece() : Super()
 {
 }
 
-ActionRecord AFirstCheckPiece::Move(const GridIndex& index)
+ActionRecord AFirstCheckPiece::Move(const GridIndex& index, const ChessBoardBuilt& built)
 {
-	ActionRecord record = Super::Move(index);
+	ActionRecord record = Super::Move(index, built);
 	if (!record)
 	{
 		return record;

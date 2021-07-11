@@ -9,9 +9,9 @@ ABishop::ABishop() : Super()
 {
 }
 
-bool ABishop::QueryMovable(MovablePointsQuery& query) const
+bool ABishop::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
-	return DirectionalMovablePiece::QueryMovable(this, query, false, true, 8);
+	return DirectionalMovablePiece::QueryMovable(this, query, built, false, true, 8);
 }
 
 StaticMesh* ABishop::GetStaticMesh() const

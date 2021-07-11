@@ -9,9 +9,9 @@ AQueen::AQueen() : Super()
 {
 }
 
-bool AQueen::QueryMovable(MovablePointsQuery& query) const
+bool AQueen::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
-	return DirectionalMovablePiece::QueryMovable(this, query, true, true, 8);
+	return DirectionalMovablePiece::QueryMovable(this, query, built, true, true, 8);
 }
 
 StaticMesh* AQueen::GetStaticMesh() const

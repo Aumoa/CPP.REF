@@ -9,9 +9,9 @@ ARook::ARook() : Super()
 {
 }
 
-bool ARook::QueryMovable(MovablePointsQuery& query) const
+bool ARook::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
-	return DirectionalMovablePiece::QueryMovable(this, query, true, false, 8);
+	return DirectionalMovablePiece::QueryMovable(this, query, built, true, false, 8);
 }
 
 StaticMesh* ARook::GetStaticMesh() const

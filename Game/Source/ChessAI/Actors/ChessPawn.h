@@ -16,7 +16,7 @@ private:
 public:
 	AChessPawn();
 
-	virtual bool QueryMovable(MovablePointsQuery& query) const override;
+	virtual bool QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const override;
 
 protected:
 	virtual StaticMesh* GetStaticMesh() const override;

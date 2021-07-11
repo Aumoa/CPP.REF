@@ -41,10 +41,10 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 	}
 }
 
-ActionRecord APiece::Move(const GridIndex& index)
+ActionRecord APiece::Move(const GridIndex& index, const ChessBoardBuilt& built)
 {
 	MovablePointsQuery query;
-	if (!QueryMovable(query))
+	if (!QueryMovable(query, built))
 	{
 		return false;
 	}

@@ -9,7 +9,7 @@ AKnight::AKnight() : Super()
 {
 }
 
-bool AKnight::QueryMovable(MovablePointsQuery& query) const
+bool AKnight::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
 	GridIndex direction[] =
 	{
@@ -29,8 +29,8 @@ bool AKnight::QueryMovable(MovablePointsQuery& query) const
 	for (int32 i = 0; i < _countof(direction); ++i)
 	{
 		GridIndex loc = GetIndex() + direction[i];
-		query.BeginFigure(MovablePointsArray::FigureType::Move)->CheckAndEmplace(this, loc);
-		query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, loc);
+		query.BeginFigure(MovablePointsArray::FigureType::Move)->CheckAndEmplace(this, loc, built);
+		query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, loc, built);
 	}
 
 	query.OwnerActor = this;

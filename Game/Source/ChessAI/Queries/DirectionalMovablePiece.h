@@ -12,5 +12,5 @@ class DirectionalMovablePiece
 public:
 	DirectionalMovablePiece();
 
-	static bool QueryMovable(const APiece* piece, MovablePointsQuery& query, bool bOrthogonal, bool bDiagonal, int32 length);
+	static bool QueryMovable(const APiece* piece, MovablePointsQuery& query, const ChessBoardBuilt& built, bool bOrthogonal, bool bDiagonal, int32 length);
 };

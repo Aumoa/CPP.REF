@@ -38,6 +38,9 @@
     <ClCompile Include="Queries\DirectionalMovablePiece.cpp">
       <Filter>Queries</Filter>
     </ClCompile>
+    <ClCompile Include="Queries\ChessBoardBuilt.cpp">
+      <Filter>Queries</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Actors">
@@ -91,6 +94,9 @@
       <Filter>Actors</Filter>
     </ClInclude>
     <ClInclude Include="Queries\DirectionalMovablePiece.h">
+      <Filter>Queries</Filter>
+    </ClInclude>
+    <ClInclude Include="Queries\ChessBoardBuilt.h">
       <Filter>Queries</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,7 +16,7 @@ private:
 public:
 	AFirstCheckPiece();
 
-	virtual ActionRecord Move(const GridIndex& index) override;
+	virtual ActionRecord Move(const GridIndex& index, const ChessBoardBuilt& built) override;
 
 	inline bool IsFirst() const { return _bFirstMove; }
 };

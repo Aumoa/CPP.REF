@@ -23,37 +23,8 @@ using namespace std::chrono;
 
 using enum ELogVerbosity;
 
-void AChessBoard::ChessBoardBuilt::Init(const AChessBoard* board)
-{
-	Owner = board;
-	for (size_t i = 0; i < 8; ++i)
-	{
-		for (size_t j = 0; j < 8; ++j)
-		{
-			Marks[i][j].PlacedActor = board->_pieces[i][j];
-		}
-	}
-}
-
-void AChessBoard::ChessBoardBuilt::Build()
-{
-}
-
-void AChessBoard::ChessBoardBuilt::SimulateMoveAndBuild(const GridIndex& from, const GridIndex& to)
-{
-}
-
-bool AChessBoard::ChessBoardBuilt::HasPiece(const GridIndex& index) const
-{
-	return GetPiece(index);
-}
-
-APiece* AChessBoard::ChessBoardBuilt::GetPiece(const GridIndex& index) const
-{
-	return Marks[index.X][index.Y].PlacedActor;
-}
-
 AChessBoard::AChessBoard() : Super()
+	, _built(this)
 {
 	StaticMeshComponent* smc = CreateSubobject<StaticMeshComponent>();
 	SetRootComponent(smc);
@@ -120,7 +91,7 @@ void AChessBoard::InitBoard(World* world)
 		}
 	});
 
-	_built.Init(this);
+	_built.Init();
 }
 
 AChessBoardProxy* AChessBoard::CreateProxy(EChessTeam team)
@@ -185,7 +156,7 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 		return false;
 	}
 
-	ActionRecord record = fromPiece->Move(to);
+	ActionRecord record = fromPiece->Move(to, _built);
 	if (!record)
 	{
 		return false;
@@ -195,7 +166,7 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 	checkf(bMoveTurn, L"Could not move turn.");
 
 	swap(fromPiece, _pieces[to.X][to.Y]);
-	_built.Init(this);
+	_built.Init();
 
 	if (fromPiece != nullptr)
 	{

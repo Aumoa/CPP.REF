@@ -10,24 +10,24 @@ AChessPawn::AChessPawn() : Super()
 {
 }
 
-bool AChessPawn::QueryMovable(MovablePointsQuery& query) const
+bool AChessPawn::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
 	int32 incrementer = GetIncrementer();
 	MovablePointsArrayPointer figure = query.BeginFigure(MovablePointsArray::FigureType::Move);
 
 	GridIndex location = GetIndex();
 	location.Y += GetIncrementer();
-	const bool bBlocked = !figure->CheckAndEmplace(this, location);
+	const bool bBlocked = !figure->CheckAndEmplace(this, location, built);
 
 	if (IsFirst() && !bBlocked)
 	{
-		figure->CheckAndEmplace(this, location + GridIndex(0, GetIncrementer()));
+		figure->CheckAndEmplace(this, location + GridIndex(0, GetIncrementer()), built);
 	}
 
 	GridIndex left = location + GridIndex(-1, 0);
 	GridIndex right = location + GridIndex(+1, 0);
-	query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, left);
-	query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, right);
+	query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, left, built);
+	query.BeginFigure(MovablePointsArray::FigureType::Attack)->CheckAndEmplace(this, right, built);
 
 	query.OwnerActor = this;
 	return true;

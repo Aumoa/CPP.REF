@@ -9,9 +9,9 @@ AKing::AKing() : Super()
 {
 }
 
-bool AKing::QueryMovable(MovablePointsQuery& query) const
+bool AKing::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
-	return DirectionalMovablePiece::QueryMovable(this, query, true, true, 2);
+	return DirectionalMovablePiece::QueryMovable(this, query, built, true, true, 2);
 }
 
 StaticMesh* AKing::GetStaticMesh() const

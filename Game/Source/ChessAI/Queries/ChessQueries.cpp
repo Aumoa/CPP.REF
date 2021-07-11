@@ -7,7 +7,7 @@
 
 using namespace std;
 
-bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& location)
+bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& location, const ChessBoardBuilt& built)
 {
 	if (!location.IsValid())
 	{
@@ -15,7 +15,7 @@ bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& l
 	}
 
 	AChessBoard* board = piece->GetBoard();
-	APiece* getPiece = board->GetBoardBuilt().GetPiece(location);
+	APiece* getPiece = built.GetPiece(location);
 	if (getPiece)
 	{
 		if (Type == FigureType::Move)

@@ -6,35 +6,17 @@
 #include "Level/World.h"
 #include "ChessAIStructures.h"
 #include "Queries/ChessQueries.h"
+#include "Queries/ChessBoardBuilt.h"
 
 class AChessBoardProxy;
 class APiece;
 
 class AChessBoard : public AActor
 {
+	friend class ChessBoardBuilt;
+
 public:
 	using Super = AActor;
-
-private:
-	struct ChessBoardBuilt
-	{
-		struct Mark
-		{
-			APiece* PlacedActor;
-			uint8 bMarkAttackWhite : 1;
-			uint8 bMarkAttackBlack : 1;
-		};
-
-		const AChessBoard* Owner = nullptr;
-		Mark Marks[8][8] = {};
-
-		void Init(const AChessBoard* board);
-		void Build();
-		void SimulateMoveAndBuild(const GridIndex& from, const GridIndex& to);
-
-		bool HasPiece(const GridIndex& index) const;
-		APiece* GetPiece(const GridIndex& index) const;
-	};
 
 private:
 	Degrees _rotation;
