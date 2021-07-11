@@ -31,6 +31,7 @@ public:
 	virtual bool QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const = 0;
 	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece) const { return true; }
 
+	void SetIndex(const GridIndex& location);
 	inline EChessTeam GetTeam() const { return _team; }
 	inline GridIndex GetIndex() const { return _myIndex; }
 	inline AChessBoard* GetBoard() const { return _board; }

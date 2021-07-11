@@ -68,3 +68,8 @@ ActionRecord APiece::Move(const GridIndex& index, const ChessBoardBuilt& built)
 			_myIndex = loc;
 		});
 }
+
+void APiece::SetIndex(const GridIndex& location)
+{
+	_myIndex = location;
+}

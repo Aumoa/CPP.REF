@@ -46,6 +46,7 @@ public:
 	ActionRecord MovePiece(const GridIndex& from, const GridIndex& to);
 	inline EChessTeam GetTurn() const { return _turn; }
 	void SimulateMoveQuery(MovablePointsQuery& query) const;
+	void RestorePiece(APiece* piece, const GridIndex& index);
 
 private:
 	void Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index);

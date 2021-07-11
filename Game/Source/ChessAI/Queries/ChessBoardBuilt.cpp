@@ -4,6 +4,8 @@
 #include "Actors/ChessBoard.h"
 #include "Actors/King.h"
 
+using namespace std;
+
 ChessBoardBuilt::ChessBoardBuilt(const AChessBoard* board) : _board(board)
 {
 }
@@ -14,7 +16,10 @@ void ChessBoardBuilt::Init()
 	{
 		for (size_t j = 0; j < 8; ++j)
 		{
-			_marks[i][j].PlacedActor = _board->_pieces[i][j];
+			Mark& mark = _marks[i][j];
+			mark.PlacedActor = _board->_pieces[i][j];
+			mark.bMarkAttackBlack = false;
+			mark.bMarkAttackWhite = false;
 		}
 	}
 }
@@ -34,11 +39,20 @@ void ChessBoardBuilt::Build()
 					continue;
 				}
 
+				const bool bBlack = mark.PlacedActor->GetTeam() == EChessTeam::Black;
 				for (auto& result : query.Results)
 				{
 					for (auto& point : result.Points)
 					{
-
+						Mark& pointMark = _marks[point.X][point.Y];
+						if (bBlack)
+						{
+							pointMark.bMarkAttackBlack = true;
+						}
+						else
+						{
+							pointMark.bMarkAttackWhite = true;
+						}
 					}
 				}
 			}
@@ -48,6 +62,22 @@ void ChessBoardBuilt::Build()
 
 void ChessBoardBuilt::SimulateMoveAndBuild(const GridIndex& from, const GridIndex& to)
 {
+	Mark& mark = _marks[from.X][from.Y];
+	Mark& markTo = _marks[to.X][to.Y];
+	check(mark.PlacedActor);
+
+	// Change index to destination.
+	mark.PlacedActor->SetIndex(to);
+	markTo.PlacedActor = mark.PlacedActor;
+	mark.PlacedActor = nullptr;
+
+	// Build.
+	Build();
+
+	// Restore indes to source.
+	markTo.PlacedActor->SetIndex(from);
+
+	// KEEP board status for checking piece's validation.
 }
 
 bool ChessBoardBuilt::HasPiece(const GridIndex& index) const

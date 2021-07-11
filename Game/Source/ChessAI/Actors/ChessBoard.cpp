@@ -166,12 +166,14 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 	checkf(bMoveTurn, L"Could not move turn.");
 
 	swap(fromPiece, _pieces[to.X][to.Y]);
-	_built.Init();
 
 	if (fromPiece != nullptr)
 	{
 		record.TakeActor(fromPiece);
+		fromPiece = nullptr;
 	}
+
+	_built.Init();
 
 	return ActionRecord(
 		record.GetActor(),
@@ -200,7 +202,19 @@ void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
 			}
 
 			ChessBoardBuilt builder(this);
+			builder.Init();
 			builder.SimulateMoveAndBuild(query.OwnerActor->GetIndex(), *it);
+
+			if (GridIndex checked; builder.IsChecked(checked))
+			{
+				APiece* checkedPiece = builder.GetPiece(checked);
+				if (checkedPiece->GetTeam() == query.OwnerActor->GetTeam())
+				{
+					result.Points.erase(it);
+					i -= 1;
+					continue;
+				}
+			}
 		}
 	}
 
@@ -214,6 +228,12 @@ void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
 			}
 		}
 	}
+}
+
+void AChessBoard::RestorePiece(APiece* piece, const GridIndex& index)
+{
+	check(_pieces[index.X][index.Y] == nullptr);
+	_pieces[index.X][index.Y] = piece;
 }
 
 void AChessBoard::Internal_SpawnPiece(APiece* piece, EChessTeam team, const GridIndex& index)
