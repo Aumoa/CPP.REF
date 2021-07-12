@@ -81,7 +81,7 @@ bool AChessPawn::QueryInteractionWith(MovablePointsQuery& query, APiece* piece, 
 				specialMove.Y = targetIdx.Y + GetIncrementer();
 
 				MovablePointsArrayPointer figure = query.BeginFigure(MovablePointsArray::FigureType::Special);
-				figure->CheckAndEmplace(this, specialMove, built);
+				figure->CheckAndEmplace(this, specialMove, built, isPawn);
 			}
 		}
 	}

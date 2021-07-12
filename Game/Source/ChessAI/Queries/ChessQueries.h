@@ -21,8 +21,9 @@ struct MovablePointsArray
 
 	FigureType Type;
 	std::vector<GridIndex> Points;
+	std::vector<APiece*> Targets;
 
-	bool CheckAndEmplace(const APiece* piece, const GridIndex& location, const ChessBoardBuilt& built);
+	bool CheckAndEmplace(const APiece* piece, const GridIndex& location, const ChessBoardBuilt& built, APiece* target = nullptr);
 };
 
 struct MovablePointsArrayPointer
@@ -42,7 +43,7 @@ struct MovablePointsQuery
 	size_t GetPointsCount() const;
 	size_t GetPointsCount(MovablePointsArray::FigureType figureType) const;
 
-	const MovablePointsArray* GetHit(const GridIndex& loc) const;
+	std::pair<const MovablePointsArray*, size_t> GetHit(const GridIndex& loc) const;
 };
 
 class ActionRecord

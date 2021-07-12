@@ -50,7 +50,7 @@ ActionRecord APiece::Move(const GridIndex& index, const ChessBoardBuilt& built)
 	}
 
 	_board->SimulateMoveQuery(query);
-	const MovablePointsArray* figure = query.GetHit(index);
+	auto [figure, figureIdx] = query.GetHit(index);
 	if (figure == nullptr)
 	{
 		return false;
@@ -60,13 +60,20 @@ ActionRecord APiece::Move(const GridIndex& index, const ChessBoardBuilt& built)
 	GridIndex loc = _myIndex;
 	_myIndex = index;
 
-	return ActionRecord(
+	ActionRecord record(
 		this,
 		[&, loc]()
 		{
 			_meshComponent->SetLocation(_board->GetBoardCellPosition(loc));
 			_myIndex = loc;
 		});
+
+	if (figure->Targets[figureIdx])
+	{
+		record.TakeActor(figure->Targets[figureIdx]);
+	}
+	
+	return record;
 }
 
 void APiece::SetIndex(const GridIndex& location)

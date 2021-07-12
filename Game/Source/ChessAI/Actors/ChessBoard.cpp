@@ -150,7 +150,7 @@ GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
 
 ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 {
-	APiece*& fromPiece = _pieces[from.X][from.Y];
+	APiece* fromPiece = _pieces[from.X][from.Y];
 	if (fromPiece == nullptr)
 	{
 		return false;
@@ -165,14 +165,15 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 	const bool bMoveTurn = Internal_MoveTurn();
 	checkf(bMoveTurn, L"Could not move turn.");
 
-	swap(fromPiece, _pieces[to.X][to.Y]);
-
-	if (fromPiece != nullptr)
+	APiece* takeActor = record.GetTakeActor();
+	if (takeActor)
 	{
-		record.TakeActor(fromPiece);
-		fromPiece = nullptr;
+		GridIndex takeIndex = takeActor->GetIndex();
+		_pieces[takeIndex.X][takeIndex.Y] = nullptr;
 	}
 
+	_pieces[to.X][to.Y] = fromPiece;
+	_pieces[from.X][from.Y] = nullptr;
 	_built.Init();
 
 	return ActionRecord(
@@ -180,8 +181,9 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 		[&, record = move(record), fromPiece = fromPiece, from = from, to = to]()
 		{
 			record.Undo();
-			_pieces[from.X][from.Y] = record.GetTakeActor();
-			swap(_pieces[from.X][from.Y], _pieces[to.X][to.Y]);
+			_pieces[from.X][from.Y] = _pieces[to.X][to.Y];
+			_pieces[to.X][to.Y] = record.GetTakeActor();
+			_built.Init();
 		});
 }
 

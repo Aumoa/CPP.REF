@@ -7,7 +7,7 @@
 
 using namespace std;
 
-bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& location, const ChessBoardBuilt& built)
+bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& location, const ChessBoardBuilt& built, APiece* target)
 {
 	if (!location.IsValid())
 	{
@@ -28,7 +28,13 @@ bool MovablePointsArray::CheckAndEmplace(const APiece* piece, const GridIndex& l
 		}
 	}
 
-	this->Points.emplace_back(location);
+	if (target == nullptr)
+	{
+		target = getPiece;
+	}
+
+	Points.emplace_back(location);
+	Targets.emplace_back(target);
 	return true;
 }
 
@@ -69,20 +75,20 @@ size_t MovablePointsQuery::GetPointsCount(MovablePointsArray::FigureType figureT
 	return n;
 }
 
-const MovablePointsArray* MovablePointsQuery::GetHit(const GridIndex& loc) const
+pair<const MovablePointsArray*, size_t> MovablePointsQuery::GetHit(const GridIndex& loc) const
 {
 	for (auto& figure : Results)
 	{
-		for (auto& point : figure.Points)
+		for (size_t i = 0; i < figure.Points.size(); ++i)
 		{
-			if (point == loc)
+			if (figure.Points[i] == loc)
 			{
-				return &figure;
+				return { &figure, i };
 			}
 		}
 	}
 
-	return nullptr;
+	return {};
 }
 
 #define checkValid() checkf(_bValid, L"Record is not valid.")
