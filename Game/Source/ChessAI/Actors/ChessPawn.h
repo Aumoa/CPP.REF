@@ -12,18 +12,21 @@ public:
 
 private:
 	static constexpr wchar_t AssetPath[] = L"Contents/Chess/Arts/Pawn/Mesh/pawn.fbx";
+	uint8 _bCanEnpassant : 1 = false;
+	uint8 _bMoved : 1 = false;
 
 public:
 	AChessPawn();
 
+	virtual ActionRecord Move(const GridIndex& index, const ChessBoardBuilt& built) override;
+	virtual void TurnChanged(EChessTeam changedTurn) override;
+
 	virtual bool QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const override;
+	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece, const ChessBoardBuilt& built) const override;
 
 protected:
 	virtual StaticMesh* GetStaticMesh() const override;
 
 private:
 	inline int32 GetIncrementer() const;
-
-	void QueryMove(MovablePointsQuery& query) const;
-	void QueryAttack(MovablePointsQuery& query) const;
 };

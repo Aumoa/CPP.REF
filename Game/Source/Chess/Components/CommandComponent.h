@@ -22,4 +22,8 @@ public:
 	virtual void SetupBoard(AChessBoardProxy* proxy) override;
 	virtual void DoCommand(const GridIndex& from, const GridIndex& to);
 	virtual void Undo();
+
+public:
+	using CommandExecutedEvent = MulticastEvent<CommandComponent, void()>;
+	CommandExecutedEvent CommandExecuted;
 };

@@ -224,7 +224,7 @@ void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
 		{
 			if (APiece* piece = _built.GetPiece(GridIndex(i, j)); piece)
 			{
-				piece->QueryInteractionWith(query, piece);
+				query.OwnerActor->QueryInteractionWith(query, piece, _built);
 			}
 		}
 	}
@@ -249,13 +249,27 @@ bool AChessBoard::Internal_MoveTurn()
 	if (_turn == EChessTeam::Black)
 	{
 		_turn = EChessTeam::White;
-		return true;
 	}
 	else if (_turn == EChessTeam::White)
 	{
 		_turn = EChessTeam::Black;
-		return true;
 	}
-	LogSystem::Log(LogChessAI, Fatal, L"Current team is not valid value({}).", (int32)_turn);
-	return false;
+	else
+	{
+		LogSystem::Log(LogChessAI, Fatal, L"Current team is not valid value({}).", (int32)_turn);
+	}
+
+	// Broadcast turn changed message.
+	for (int32 i = 0; i < 8; ++i)
+	{
+		for (int32 j = 0; j < 8; ++j)
+		{
+			if (_pieces[i][j])
+			{
+				_pieces[i][j]->TurnChanged(_turn);
+			}
+		}
+	}
+
+	return true;
 }

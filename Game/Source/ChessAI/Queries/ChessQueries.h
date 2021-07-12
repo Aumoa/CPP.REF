@@ -16,6 +16,7 @@ struct MovablePointsArray
 	{
 		Move,
 		Attack,
+		Special,
 	};
 
 	FigureType Type;

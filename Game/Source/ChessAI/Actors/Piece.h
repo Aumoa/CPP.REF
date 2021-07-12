@@ -27,9 +27,10 @@ public:
 
 	virtual void Init(AChessBoard* board, EChessTeam team, const GridIndex& index);
 	virtual ActionRecord Move(const GridIndex& index, const ChessBoardBuilt& built);
+	virtual void TurnChanged(EChessTeam changedTurn) {};
 
 	virtual bool QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const = 0;
-	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece) const { return true; }
+	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece, const ChessBoardBuilt& built) const { return true; }
 
 	void SetIndex(const GridIndex& location);
 	inline EChessTeam GetTeam() const { return _team; }

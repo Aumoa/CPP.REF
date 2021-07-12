@@ -10,6 +10,39 @@ AChessPawn::AChessPawn() : Super()
 {
 }
 
+ActionRecord AChessPawn::Move(const GridIndex& index, const ChessBoardBuilt& built)
+{
+	const bool bFirst = IsFirst();
+	auto indexBack = GetIndex();
+
+	ActionRecord record = Super::Move(index, built);
+	if (!record)
+	{
+		return record;
+	}
+
+	int32 movedY = index.Y - indexBack.Y;
+	_bCanEnpassant = abs(movedY) == 2;
+	_bMoved = true;
+
+	return ActionRecord(
+		this,
+		[&, bCanEnpassant = _bCanEnpassant, record = move(record)]()
+		{
+			_bCanEnpassant = bCanEnpassant;
+			record.Undo();
+		});
+}
+
+void AChessPawn::TurnChanged(EChessTeam changedTurn)
+{
+	if (!_bMoved)
+	{
+		_bCanEnpassant = false;
+	}
+	_bMoved = false;
+}
+
 bool AChessPawn::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const
 {
 	int32 incrementer = GetIncrementer();
@@ -33,6 +66,29 @@ bool AChessPawn::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& 
 	return true;
 }
 
+bool AChessPawn::QueryInteractionWith(MovablePointsQuery& query, APiece* piece, const ChessBoardBuilt& built) const
+{
+	if (auto* isPawn = dynamic_cast<AChessPawn*>(piece); isPawn)
+	{
+		if (isPawn->GetTeam() != GetTeam() && isPawn->_bCanEnpassant)
+		{
+			GridIndex targetIdx = isPawn->GetIndex();
+			GridIndex myIdx = GetIndex();
+			if (targetIdx.Y == myIdx.Y)
+			{
+				GridIndex specialMove;
+				specialMove.X = targetIdx.X;
+				specialMove.Y = targetIdx.Y + GetIncrementer();
+
+				MovablePointsArrayPointer figure = query.BeginFigure(MovablePointsArray::FigureType::Special);
+				figure->CheckAndEmplace(this, specialMove, built);
+			}
+		}
+	}
+
+	return true;
+}
+
 StaticMesh* AChessPawn::GetStaticMesh() const
 {
 	static StaticMesh* globalMesh = GameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
@@ -51,12 +107,4 @@ inline int32 AChessPawn::GetIncrementer() const
 
 	checkf(false, L"Invalid team.");
 	return 0;
-}
-
-void AChessPawn::QueryMove(MovablePointsQuery& query) const
-{
-}
-
-void AChessPawn::QueryAttack(MovablePointsQuery& query) const
-{
 }

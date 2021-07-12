@@ -113,6 +113,7 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 			board->SimulateMoveQuery(query);
 			UpdateMovableIndicators(query);
 			UpdateAttackIndicators(query);
+			UpdateSpecialIndicators(query);
 		}
 	}
 	else
@@ -120,6 +121,7 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 		primitiveComponent->SetHiddenInGame(true);
 		UpdateMovableIndicators({});
 		UpdateAttackIndicators({});
+		UpdateSpecialIndicators({});
 	}
 }
 
@@ -154,6 +156,20 @@ void IndicatingComponent::UpdateAttackIndicators(const MovablePointsQuery& resul
 		indicator->GetRootComponent()->AttachToComponent(board->GetRootComponent());
 		indicator->GetRootComponent()->SetScale(Vector3(1, 0.05f, 1));
 		indicator->SetIndicatorColor(NamedColors::Red);
+		return indicator;
+	});
+}
+
+void IndicatingComponent::UpdateSpecialIndicators(const MovablePointsQuery& results)
+{
+	World* const world = GetWorld();
+	AChessBoard* const board = GetBoard();
+	UpdateIndicatorsImpl(_attackIndicators, MovablePointsArray::FigureType::Special, results, [&]()
+	{
+		AGridIndicator* indicator = world->SpawnActor<AGridIndicator>();
+		indicator->GetRootComponent()->AttachToComponent(board->GetRootComponent());
+		indicator->GetRootComponent()->SetScale(Vector3(1, 0.05f, 1));
+		indicator->SetIndicatorColor(NamedColors::Purple);
 		return indicator;
 	});
 }

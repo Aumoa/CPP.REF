@@ -29,7 +29,7 @@ bool AChessBoardProxy::CanSelect(const GridIndex& location) const
 	EChessTeam team = piece->GetTeam();
 	if (team != _myteam)
 	{
-		return false;
+		//return false;
 	}
 
 	return true;

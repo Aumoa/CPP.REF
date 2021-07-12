@@ -23,6 +23,7 @@ void CommandComponent::DoCommand(const GridIndex& from, const GridIndex& to)
 	{
 		LogSystem::Log(LogChess, Verbose, L"DoCommand: {} -> {}", from.ToString(), to.ToString());
 		_history.emplace(simulateRecord);
+		CommandExecuted.Invoke();
 	}
 	else
 	{
