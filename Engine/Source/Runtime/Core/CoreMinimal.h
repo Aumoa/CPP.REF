@@ -33,3 +33,4 @@
 #include "Utilities/DateTime.h"
 #include "Utilities/StringUtils.h"
 #include "Utilities/UniqueType.h"
+#include "Container/BitArray.h"

@@ -19,33 +19,64 @@ SceneVisibility::SceneVisibility(Scene* owner) : Super()
 
 void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 {
+	size_t cnt = _scene->_primitives.size();
+	_visibilityBits.Init(true, cnt);
+
+	// Do frustum culling.
+	FrustumCull();
+
+	// Primitive culling.
 	_visibilityCnt = 0;
-	FrustumCull(_visibilityBits);
-
-	ForEachVisibleItem([this](size_t idx, size_t viewIndex)
+	for (ConstBitIterator bitIt(_visibilityBits); bitIt; ++bitIt)
 	{
-		_visibilityCnt += 1;
-	});
+		RelativeBitReference relativeBit = bitIt.GetIndex();
+		BitArray::BitReference bit = _visibilityBits.AccessCorrespondingBit(relativeBit);
+		if (bit)
+		{
+			PrimitiveSceneProxy* primitive = _scene->_primitives[relativeBit.BitIndex];
+			if (primitive == nullptr)
+			{
+				bit = false;
+				continue;
+			}
 
-	ReadyBuffer(_visibilityCnt, false);
+			if (primitive->IsHiddenInGame())
+			{
+				bit = false;
+				continue;
+			}
 
-	constexpr Vector3 up = Vector3(0, 1, 0);
-	constexpr Vector3 forward = Vector3(0, 0, 1);
-	Matrix4x4 viewMatrix = Matrix4x4::LookToLH(view.Location, view.Rotation.RotateVector(forward), view.Rotation.RotateVector(up));
-	constexpr Radians angle = Degrees(45.0f).ToRadians();
-	Matrix4x4 projMatrix = Matrix4x4::PerspectiveFovLH(view.FOVAngle.ToRadians(), view.AspectRatio, view.NearPlane, view.FarPlane);
-	Matrix4x4 vp = Matrix4x4::Multiply(viewMatrix, projMatrix);
+			++_visibilityCnt;
+		}
+	}
 
-	// Push camera constants.
-	auto* ptr = (RHIViewConstants*)_viewBuffer->GetMappingPointer();
-	ForEachVisibleItem([this, &ptr, &vp](size_t idx, size_t viewIndex)
+	if (_visibilityCnt != 0)
 	{
-		Transform transform = _scene->_primitives[idx]->ComponentTransform;
-		ptr->World = transform.GetMatrix();
-		ptr->WorldViewProj = Matrix4x4::Multiply(ptr->World, vp);
-		ptr->WorldInvTranspose = (Matrix4x4&)ptr->World.GetInverse().GetTransposed();
-		++ptr;
-	});
+		ReadyBuffer(_visibilityCnt, false);
+
+		constexpr Vector3 up = Vector3(0, 1, 0);
+		constexpr Vector3 forward = Vector3(0, 0, 1);
+		Matrix4x4 viewMatrix = Matrix4x4::LookToLH(view.Location, view.Rotation.RotateVector(forward), view.Rotation.RotateVector(up));
+		constexpr Radians angle = Degrees(45.0f).ToRadians();
+		Matrix4x4 projMatrix = Matrix4x4::PerspectiveFovLH(view.FOVAngle.ToRadians(), view.AspectRatio, view.NearPlane, view.FarPlane);
+		Matrix4x4 vp = Matrix4x4::Multiply(viewMatrix, projMatrix);
+
+		// Push camera constants.
+		auto* ptr = (RHIViewConstants*)_viewBuffer->GetMappingPointer();
+		for (ConstBitIterator bitIt(_visibilityBits); bitIt; ++bitIt)
+		{
+			RelativeBitReference relativeBit = bitIt.GetIndex();
+			if (_visibilityBits.AccessCorrespondingBit(relativeBit))
+			{
+				PrimitiveSceneProxy* primitive = _scene->_primitives[relativeBit.BitIndex];
+				Transform transform = primitive->ComponentTransform;
+				ptr->World = transform.GetMatrix();
+				ptr->WorldViewProj = Matrix4x4::Multiply(ptr->World, vp);
+				ptr->WorldInvTranspose = (Matrix4x4&)ptr->World.GetInverse().GetTransposed();
+				++ptr;
+			}
+		}
+	}
 }
 
 void SceneVisibility::SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t idx)
@@ -64,36 +95,15 @@ void SceneVisibility::SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t 
 	}
 }
 
-void SceneVisibility::FrustumCull(vector<int32>& bits)
+void SceneVisibility::FrustumCull()
 {
-	size_t cnt = _scene->_primitives.size();
-	bits.resize((cnt / 32) + 1);
-	memset(bits.data(), 0, sizeof(int32) * bits.size());
-
-	for (size_t i = 0; i < bits.size(); ++i)
+	for (ConstBitIterator bitIt(_visibilityBits); bitIt; ++bitIt)
 	{
-		int32& n = bits[i];
-		int32 f = 1;
-		for (size_t j = 0; j < 32; ++j)
+		// NOT IMPLEMENTED.
+		const bool bFrustumCulled = false;
+		if (bFrustumCulled)
 		{
-			size_t primitiveIndex = i * 32 + j;
-			if (primitiveIndex >= _scene->_primitives.size())
-			{
-				break;
-			}
-
-			PrimitiveSceneProxy* proxy = _scene->_primitives[primitiveIndex];
-			if (proxy != nullptr)
-			{
-				bool bVisible = !proxy->IsHiddenInGame();
-
-				if (bVisible)
-				{
-					n |= f;
-				}
-			}
-
-			f <<= 1;
+			_visibilityBits.AccessCorrespondingBit(bitIt.GetIndex()) = false;
 		}
 	}
 }

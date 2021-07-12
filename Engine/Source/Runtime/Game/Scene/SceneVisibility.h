@@ -21,7 +21,7 @@ private:
 	RHIResource* _viewBuffer = nullptr;
 	size_t _viewBufCapa = 0;
 
-	std::vector<int32> _visibilityBits;
+	BitArray _visibilityBits;
 	size_t _visibilityCnt = 0;
 
 public:
@@ -33,26 +33,17 @@ public:
 	inline void ForEachVisibleItem(std::function<void(size_t, size_t)> body)
 	{
 		size_t viewIdx = 0;
-		for (size_t i = 0; i < _visibilityBits.size(); ++i)
+		for (ConstBitIterator bitIt(_visibilityBits); bitIt; ++bitIt)
 		{
-			int32 n = _visibilityBits[i];
-			int32 f = 1;
-			for (size_t j = 0; j < 32; ++j)
+			RelativeBitReference relativeRef = bitIt.GetIndex();
+			if (_visibilityBits.AccessCorrespondingBit(relativeRef))
 			{
-				size_t idx = i * 32 + j;
-
-				const bool b = (n & f) != 0;
-				f <<= 1;
-
-				if (b)
-				{
-					body(idx, viewIdx++);
-				}
+				body(relativeRef.BitIndex, viewIdx++);
 			}
 		}
 	}
 
 private:
-	void FrustumCull(std::vector<int32>& bits);
+	void FrustumCull();
 	void ReadyBuffer(size_t capa, bool bAllowShrink);
 };

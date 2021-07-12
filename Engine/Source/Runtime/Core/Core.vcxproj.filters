@@ -40,6 +40,9 @@
     </ClCompile>
     <ClCompile Include="LogCore.cpp" />
     <ClCompile Include="CoreAssert.cpp" />
+    <ClCompile Include="Container\BitArray.cpp">
+      <Filter>Container</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
@@ -65,6 +68,9 @@
     </Filter>
     <Filter Include="Concepts">
       <UniqueIdentifier>{7899fd6f-7a65-41e7-8ba3-ab1f37f1eac3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container">
+      <UniqueIdentifier>{4f2db49c-ffe3-466d-b36c-ff59cd51f61e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -169,5 +175,8 @@
     </ClInclude>
     <ClInclude Include="CoreAssert.h" />
     <ClInclude Include="LogCore.h" />
+    <ClInclude Include="Container\BitArray.h">
+      <Filter>Container</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

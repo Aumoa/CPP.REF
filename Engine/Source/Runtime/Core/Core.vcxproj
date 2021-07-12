@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Container\BitArray.cpp" />
     <ClCompile Include="CoreAssert.cpp" />
     <ClCompile Include="Diagnostics\LogCategory.cpp" />
     <ClCompile Include="Diagnostics\LogSystem.cpp" />
@@ -106,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Concepts\SupportsObject.h" />
+    <ClInclude Include="Container\BitArray.h" />
     <ClInclude Include="CoreAssert.h" />
     <ClInclude Include="CoreMinimal.h" />
     <ClInclude Include="Delegates\MulticastDelegate.h" />
