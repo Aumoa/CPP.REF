@@ -1,0 +1,3 @@
+[submodule "ThirdParty/Source/assimp"]
+	path = ThirdParty/Source/assimp
+	url = https://github.com/Aumoa/assimp

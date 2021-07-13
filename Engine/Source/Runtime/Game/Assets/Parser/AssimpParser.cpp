@@ -1,9 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "AssimpParser.h"
-#include "scene.h"
-#include "Importer.hpp"
-#include "postprocess.h"
+#include "assimp/scene.h"
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
 #include "LogGame.h"
 #include "GameStructures.h"
 #include "GameEngine.h"
