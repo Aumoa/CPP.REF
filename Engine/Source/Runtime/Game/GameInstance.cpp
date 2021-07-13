@@ -1,8 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "GameInstance.h"
-#include "IFrameworkView.h"
 #include "GameEngine.h"
+#include "IFrameworkView.h"
 #include "Level/World.h"
 
 using namespace std;

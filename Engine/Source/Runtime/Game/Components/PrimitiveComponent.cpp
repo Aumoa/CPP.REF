@@ -1,5 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "PrimitiveComponent.h"
 #include "Level/World.h"
 #include "Scene/PrimitiveSceneProxy.h"

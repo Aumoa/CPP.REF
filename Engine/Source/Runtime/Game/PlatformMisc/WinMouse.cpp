@@ -8,9 +8,8 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
+#include "pch.h"
 #include "WinMouse.h"
-#include <Windows.h>
-#include <assert.h>
 #include "GameEnums.h"
 #include "GameStructures.h"
 #include "LogGame.h"
@@ -144,7 +143,7 @@ public:
 
         SetEvent((mode == EMousePositionMode::Absolute) ? mAbsoluteMode.get() : mRelativeMode.get());
 
-        assert(mWindow != nullptr);
+        check(mWindow != nullptr);
 
         TRACKMOUSEEVENT tme;
         tme.cbSize = sizeof(tme);
@@ -197,7 +196,7 @@ public:
         if (mWindow == window)
             return;
 
-        assert(window != nullptr);
+        check(window != nullptr);
 
         RAWINPUTDEVICE Rid;
         Rid.usUsagePage = 0x1 /* HID_USAGE_PAGE_GENERIC */;
@@ -238,7 +237,7 @@ private:
 
     void ClipToWindow() noexcept
     {
-        assert(mWindow != nullptr);
+        check(mWindow != nullptr);
 
         RECT rect;
         GetClientRect(mWindow, &rect);

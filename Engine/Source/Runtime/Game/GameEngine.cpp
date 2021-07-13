@@ -1,16 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "GameEngine.h"
 #include "LogGame.h"
-#include "IFrameworkView.h"
 #include "GameInstance.h"
-#include "RHI/RHIDevice.h"
-#include "RHI/RHISwapChain.h"
-#include "RHI/RHIDeviceContext.h"
-#include "RHI/RHICommandQueue.h"
-#include "RHI/RHIRenderTargetView.h"
-#include "RHI/RHITexture2D.h"
-#include "RHI/RHIDepthStencilView.h"
+#include "IFrameworkView.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
 #include "Shaders/ColorShader/ColorShader.h"
 #include "Shaders/TransparentShader/TransparentShader.h"

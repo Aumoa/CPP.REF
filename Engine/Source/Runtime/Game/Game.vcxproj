@@ -63,6 +63,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(ProjectDir)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>5105</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,6 +93,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(ProjectDir)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>5105</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +131,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)ThirdParty\Source\assimp\include\;$(SolutionDir)ThirdParty\Source\assimp\generated\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ASSIMP_API=</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ASSIMP_API=</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Assets\StaticMesh.cpp" />
     <ClCompile Include="Camera\PlayerCameraManager.cpp" />
@@ -155,6 +161,10 @@
     <ClCompile Include="Materials\Material.cpp" />
     <ClCompile Include="Materials\MaterialInstance.cpp" />
     <ClCompile Include="Misc\GeometryGenerator.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="PlatformMisc\WinKeyboard.cpp" />
     <ClCompile Include="PlatformMisc\WinMouse.cpp" />
     <ClCompile Include="Scene\PrimitiveSceneProxy.cpp" />
@@ -228,6 +238,7 @@
     <ClInclude Include="Materials\MaterialInstance.h" />
     <ClInclude Include="Misc\Bezier.h" />
     <ClInclude Include="Misc\GeometryGenerator.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="PlatformMisc\KeyboardTracker.h" />
     <ClInclude Include="PlatformMisc\MouseStateTracker.h" />

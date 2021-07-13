@@ -163,6 +163,7 @@
     <ClCompile Include="GameFramework\LocalPlayer.cpp">
       <Filter>GameFramework</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
@@ -320,6 +321,7 @@
     <ClInclude Include="GameFramework\LocalPlayer.h">
       <Filter>GameFramework</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\TeapotData.inl">

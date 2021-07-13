@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "RenderMinimal.h"
 #include "Actor.h"
 
 class AController;

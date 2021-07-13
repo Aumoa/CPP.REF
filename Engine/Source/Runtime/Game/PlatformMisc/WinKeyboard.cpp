@@ -8,8 +8,8 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
+#include "pch.h"
 #include "WinKeyboard.h"
-#include <Windows.h>
 #include "GameStructures.h"
 #include "LogGame.h"
 

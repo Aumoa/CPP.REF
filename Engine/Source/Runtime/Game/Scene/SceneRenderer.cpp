@@ -1,13 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "SceneRenderer.h"
 #include "GameStructures.h"
 #include "Scene.h"
 #include "SceneVisibility.h"
 #include "PrimitiveSceneProxy.h"
-#include "RHI/RHIDeviceContext.h"
-#include "RHI/RHIShader.h"
-#include "RHI/RHIVertexFactory.h"
 #include "Materials/Material.h"
 
 using namespace std;

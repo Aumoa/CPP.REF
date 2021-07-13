@@ -1,5 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "InputComponent.h"
 #include "PlatformMisc/WinMouse.h"
 #include "PlatformMisc/WinKeyboard.h"

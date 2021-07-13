@@ -1,5 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
+
+#undef min
+#undef max
+
 #include "AssimpParser.h"
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
