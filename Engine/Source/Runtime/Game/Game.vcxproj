@@ -141,7 +141,9 @@
     <ClCompile Include="GameFramework\Actor.cpp" />
     <ClCompile Include="GameFramework\AIController.cpp" />
     <ClCompile Include="GameFramework\Controller.cpp" />
+    <ClCompile Include="GameFramework\LocalPlayer.cpp" />
     <ClCompile Include="GameFramework\Pawn.cpp" />
+    <ClCompile Include="GameFramework\Player.cpp" />
     <ClCompile Include="GameFramework\PlayerController.cpp" />
     <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -208,7 +210,9 @@
     <ClInclude Include="GameFramework\Actor.h" />
     <ClInclude Include="GameFramework\AIController.h" />
     <ClInclude Include="GameFramework\Controller.h" />
+    <ClInclude Include="GameFramework\LocalPlayer.h" />
     <ClInclude Include="GameFramework\Pawn.h" />
+    <ClInclude Include="GameFramework\Player.h" />
     <ClInclude Include="GameFramework\PlayerController.h" />
     <ClInclude Include="GameInstance.h" />
     <ClInclude Include="GameMinimal.h" />

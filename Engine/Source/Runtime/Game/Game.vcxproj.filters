@@ -157,6 +157,12 @@
     <ClCompile Include="Shaders\TransparentShader\TransparentShader.cpp">
       <Filter>Shaders\TransparentShader</Filter>
     </ClCompile>
+    <ClCompile Include="GameFramework\Player.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework\LocalPlayer.cpp">
+      <Filter>GameFramework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
@@ -307,6 +313,12 @@
     </ClInclude>
     <ClInclude Include="Shaders\TransparentShader\TransparentShader.h">
       <Filter>Shaders\TransparentShader</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\Player.h">
+      <Filter>GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework\LocalPlayer.h">
+      <Filter>GameFramework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

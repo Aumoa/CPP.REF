@@ -10,6 +10,7 @@
 struct IFrameworkView;
 class GameEngine;
 class Level;
+class LocalPlayer;
 
 /// <summary>
 /// Represents single game instance while application are running.
@@ -24,6 +25,7 @@ private:
 	IFrameworkView* _frameworkView = nullptr;
 	GameEngine* _engine = nullptr;
 	World* _world = nullptr;
+	LocalPlayer* _localPlayer = nullptr;
 
 public:
 	SubclassOf<Level> StartupLevel;
@@ -58,4 +60,7 @@ protected:
 	/// Initialize the game engine.
 	/// </summary>
 	virtual void InitializeEngine();
+
+public:
+	inline LocalPlayer* GetLocalPlayer() const { return _localPlayer; }
 };
