@@ -27,8 +27,8 @@ bool Level::LoadLevel(World* world)
 	}
 
 	_gameMode = world->SpawnActor(GameModeClass);
-	APlayerController* localPlayer = world->SpawnActor(_gameMode->PlayerControllerClass);
-	localPlayer->SpawnCameraManager(world);
+	_playerController = world->SpawnActor(_gameMode->PlayerControllerClass);
+	_playerController->SpawnCameraManager(world);
 
 	return true;
 }

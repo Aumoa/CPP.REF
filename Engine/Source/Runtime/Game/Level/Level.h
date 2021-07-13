@@ -7,6 +7,7 @@
 
 class World;
 class AGameMode;
+class APlayerController;
 
 /// <summary>
 /// Represents actor placement unit.
@@ -20,6 +21,7 @@ public:
 	SubclassOf<AGameMode> GameModeClass;
 
 private:
+	APlayerController* _playerController = nullptr;
 	AGameMode* _gameMode = nullptr;
 
 public:
@@ -34,4 +36,6 @@ public:
 	/// </summary>
 	/// <param name="world"> The world that level be placed. </param>
 	virtual bool LoadLevel(World* world);
+
+	inline APlayerController* GetPlayerController() const { return _playerController; }
 };

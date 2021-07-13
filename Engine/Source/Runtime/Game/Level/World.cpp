@@ -22,12 +22,12 @@ World::World(GameEngine* engine) : Super()
 	_scene = CreateSubobject<Scene>(this, _engine->GetRHIDevice());
 }
 
-bool World::LoadLevel(SubclassOf<Level> levelToLoad)
+Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
 {
 	if (!levelToLoad.IsValid())
 	{
 		LogSystem::Log(LogWorld, Error, L"The parameter that specified class of desired to load level is nullptr. Abort.");
-		return false;
+		return nullptr;
 	}
 
 	// Clear spawned actors.
@@ -41,7 +41,8 @@ bool World::LoadLevel(SubclassOf<Level> levelToLoad)
 	if (!levelInstance->LoadLevel(this))
 	{
 		LogSystem::Log(LogWorld, Fatal, L"Could not load level.");
-		return false;
+		DestroySubobject(levelInstance);
+		return nullptr;
 	}
 
 	// Begin play for all actors.
@@ -51,7 +52,7 @@ bool World::LoadLevel(SubclassOf<Level> levelToLoad)
 		actor->BeginPlay();
 	}
 
-	return true;
+	return levelInstance;
 }
 
 void World::RegisterTickFunction(TickFunction* function)

@@ -93,7 +93,7 @@ public:
 	/// <summary>
 	/// Load level.
 	/// </summary>
-	bool LoadLevel(SubclassOf<Level> levelToLoad);
+	Level* LoadLevel(SubclassOf<Level> levelToLoad);
 
 	void RegisterTickFunction(TickFunction* function);
 	void RegisterComponent(ActorComponent* component);

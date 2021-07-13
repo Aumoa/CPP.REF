@@ -5,6 +5,9 @@
 #include "GameEngine.h"
 #include "IFrameworkView.h"
 #include "Level/World.h"
+#include "Level/Level.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/LocalPlayer.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -45,8 +48,11 @@ void GameInstance::InitializeEngine()
 	_engine = CreateSubobject<GameEngine>(bDebug);
 	_engine->InitEngine(this);
 
+	_localPlayer = CreateSubobject<LocalPlayer>();
+
 	_world = CreateSubobject<World>(_engine);
-	_world->LoadLevel(StartupLevel);
+	Level* loadedLevel = _world->LoadLevel(StartupLevel);
+	loadedLevel->GetPlayerController()->_localPlayer = _localPlayer;
 
 	SetWorld(_world);
 }

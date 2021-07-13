@@ -8,18 +8,22 @@
 class APlayerCameraManager;
 class InputComponent;
 class CameraComponent;
+class LocalPlayer;
 
 /// <summary>
 /// Represents controller that possess to pawn, process player input, etc...
 /// </summary>
 class APlayerController : public AController
 {
+	friend class GameInstance;
+
 public:
 	using Super = AController;
 
 private:
 	APlayerCameraManager* _cameraManager = nullptr;
 	InputComponent* _inputComponent = nullptr;
+	LocalPlayer* _localPlayer = nullptr;
 
 public:
 	/// <summary>
@@ -33,4 +37,5 @@ public:
 	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY) const;
 
 	inline InputComponent* GetInputComponent() const { return _inputComponent; }
+	inline LocalPlayer* GetLocalPlayer() const { return _localPlayer; }
 };
