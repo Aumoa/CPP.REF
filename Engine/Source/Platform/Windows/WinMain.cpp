@@ -2,7 +2,7 @@
 
 #include <crtdbg.h>
 #include <Windows.h>
-#include "ChessGameInstance.h"
+#include "THGameInstance.h"
 #include "CoreWindow.h"
 
 using namespace std::chrono;
@@ -15,6 +15,6 @@ INT __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR cmd, INT show)
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 	
-	ChessGameInstance gameInstance;
+	THGameInstance gameInstance;
 	return gameInstance.Run(gameInstance.CreateSubobject<CoreWindow>());
 }

@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assimp", "ThirdParty\Source\Assimp\Assimp.vcxproj", "{61715BD6-4CC9-4776-BA37-67B551200276}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THStory", "Game\Source\THStory\THStory.vcxproj", "{5F2C0713-688B-4C31-A3EF-CCF563ADD372}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,10 @@ Global
 		{61715BD6-4CC9-4776-BA37-67B551200276}.Debug|x64.Build.0 = Debug|x64
 		{61715BD6-4CC9-4776-BA37-67B551200276}.Release|x64.ActiveCfg = Release|x64
 		{61715BD6-4CC9-4776-BA37-67B551200276}.Release|x64.Build.0 = Release|x64
+		{5F2C0713-688B-4C31-A3EF-CCF563ADD372}.Debug|x64.ActiveCfg = Debug|x64
+		{5F2C0713-688B-4C31-A3EF-CCF563ADD372}.Debug|x64.Build.0 = Debug|x64
+		{5F2C0713-688B-4C31-A3EF-CCF563ADD372}.Release|x64.ActiveCfg = Release|x64
+		{5F2C0713-688B-4C31-A3EF-CCF563ADD372}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{DADB4B61-E8BB-4CC7-B46B-854C5DC0E608} = {D5615039-CEE3-4B6E-B35C-18FF0355212F}
 		{F00C8C6A-83D9-4827-A043-FC6707A647D2} = {D7A17DCC-D52F-454A-A115-D9B2BA5597E6}
 		{61715BD6-4CC9-4776-BA37-67B551200276} = {2DFD566B-833A-4873-899F-0CF8CFBC4DB2}
+		{5F2C0713-688B-4C31-A3EF-CCF563ADD372} = {D5615039-CEE3-4B6E-B35C-18FF0355212F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3B8A6A43-DD28-4861-8C4D-FB452750B113}

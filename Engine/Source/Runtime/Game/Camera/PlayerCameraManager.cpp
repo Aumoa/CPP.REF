@@ -18,11 +18,17 @@ void APlayerCameraManager::UpdateCamera(duration<float> elapsedTime)
 {
 	if (_cachedBindCamera == nullptr)
 	{
-		LogSystem::Log(LogCamera, Error, L"There is no cached camera component. Please call CachePlayerCamera with PlayerController instance to binding current camera component that owned by possessed pawn.");
-		_cachedView = MinimalViewInfo();
+		_cachedView.bInit = true;
+		_cachedView.Location = GetActorLocation();
+		_cachedView.Rotation = GetActorRotation();
+		_cachedView.NearPlane = 0.1f;
+		_cachedView.FarPlane = 1000.0f;
+		_cachedView.FOVAngle = 45.0f;
 	}
-
-	_cachedView = _cachedBindCamera->GetViewInfo(elapsedTime);
+	else
+	{
+		_cachedView = _cachedBindCamera->GetViewInfo(elapsedTime);
+	}
 }
 
 void APlayerCameraManager::CachePlayerCamera(APlayerController* controller)

@@ -38,6 +38,11 @@ public:
 /// </summary>
 class BitArray
 {
+public:
+	static constexpr size_t NumBitsPerDWORD = 32;
+	static constexpr int32 FullDWORDMask = 0xFFFFFFFF;
+
+private:
 	std::vector<int32> _bits;
 	int32* _bitsRaw = nullptr;
 	size_t _numBits = 0;
@@ -93,6 +98,7 @@ public:
 public:
 	BitArray();
 	BitArray(std::initializer_list<bool> initializer);
+	BitArray(bool bValue, size_t bitsToSet);
 	BitArray(const BitArray& rhs);
 	BitArray(BitArray&& rhs) noexcept;
 
@@ -103,11 +109,28 @@ public:
 	BitReference AccessCorrespondingBit(const RelativeBitReference& relativeReference);
 	ConstBitReference AccessCorrespondingBit(const RelativeBitReference& relativeReference) const;
 
+	bool Contains(bool bValue) const;
+	size_t Add(bool bValue);
+	size_t Add(bool bValue, size_t numToAdd);
+	size_t AddUninitialized(size_t numToAdd);
+	void SetRange(size_t index, size_t numBitsToSet, bool bValue);
 	inline size_t GetNumBits() const { return _numBits; }
+	
+	const int32* GetData() const { return _bits.data(); }
+	int32* GetData() { return _bits.data(); }
 
 private:
 	inline size_t GetValueCount(size_t n)
 	{
-		return (n - 1) / 32 + 1;
+		if (n == 0)
+		{
+			return 0;
+		}
+		else
+		{
+			return (n - 1) / 32 + 1;
+		}
 	}
+
+	void ClearPartialSlackBits();
 };
