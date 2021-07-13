@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "EventHandle.h"
-#include <Windows.h>
 #include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"

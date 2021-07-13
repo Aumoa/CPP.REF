@@ -61,6 +61,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,6 +80,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -101,6 +105,10 @@
     <ClCompile Include="Numerics\Matrix4x4.cpp" />
     <ClCompile Include="Numerics\Quaternion.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Threading\EventHandle.cpp" />
     <ClCompile Include="Utilities\DateTime.cpp" />
     <ClCompile Include="Utilities\StringUtils.cpp" />
@@ -139,6 +147,7 @@
     <ClInclude Include="Numerics\Vector3.h" />
     <ClInclude Include="Numerics\Vector4.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="PrimitiveTypes.h" />
     <ClInclude Include="Threading\EventHandle.h" />
     <ClInclude Include="Utilities\DateTime.h" />

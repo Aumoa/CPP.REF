@@ -1,10 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "LogCategory.h"
-#include <chrono>
-#include <string>
-#include <format>
-#include <Windows.h>
 #include "LogVerbosity.h"
 
 using namespace std;

@@ -43,6 +43,7 @@
     <ClCompile Include="Container\BitArray.cpp">
       <Filter>Container</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
@@ -178,5 +179,6 @@
     <ClInclude Include="Container\BitArray.h">
       <Filter>Container</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
 </Project>

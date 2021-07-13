@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "MathEx.h"
-#include <numbers>
 #include "Radians.h"
 
 using namespace std;

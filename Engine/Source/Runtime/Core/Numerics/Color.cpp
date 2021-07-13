@@ -1,8 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "Color.h"
-#include <map>
-#include <sstream>
 
 using namespace std;
 
