@@ -1,8 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "RHISwapChain.h"
-#include <d3d12.h>
-#include <dxgi1_6.h>
 #include "LogRHI.h"
 #include "IWindowView.h"
 #include "RHIDevice.h"

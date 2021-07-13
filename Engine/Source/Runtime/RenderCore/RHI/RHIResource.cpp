@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "pch.h"
 #include "RHIResource.h"
-#include <d3d12.h>
 #include "LogRHI.h"
 
 RHIResource::RHIResource(RHIDevice* device, ID3D12Resource* resource) : Super(device)

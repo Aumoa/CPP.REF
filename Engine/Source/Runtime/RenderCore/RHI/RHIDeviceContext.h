@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "RHIDeviceChild.h"
-#include <optional>
 #include "ComPtr.h"
 #include "RHIEnums.h"
 #include "RHIStructures.h"

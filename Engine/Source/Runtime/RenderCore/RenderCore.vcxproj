@@ -62,6 +62,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\Engine\Source\Runtime\Core\</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -80,6 +82,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\Engine\Source\Runtime\Core\</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -91,7 +95,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ComPtr.cpp" />
-    <ClCompile Include="RHI\D3D12DepthStencilView.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="RHI\RHIDepthStencilView.cpp" />
     <ClCompile Include="RHI\LogRHI.cpp" />
     <ClCompile Include="RHI\RHICommandQueue.cpp" />
     <ClCompile Include="RHI\RHIDevice.cpp" />
@@ -113,6 +121,7 @@
   <ItemGroup>
     <ClInclude Include="ComPtr.h" />
     <ClInclude Include="IWindowView.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="RenderMinimal.h" />
     <ClInclude Include="RHI\LogRHI.h" />
     <ClInclude Include="RHI\RHICommandQueue.h" />
