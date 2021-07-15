@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Vector.h"
+
 /// <summary>
 /// Represent a vector with 2 floating point values.
 /// </summary>

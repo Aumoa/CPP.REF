@@ -44,6 +44,12 @@
       <Filter>Container</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Numerics\Matrix2x2.cpp">
+      <Filter>Numerics</Filter>
+    </ClCompile>
+    <ClCompile Include="Numerics\Matrix3x2.cpp">
+      <Filter>Numerics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Numerics">
@@ -180,5 +186,17 @@
       <Filter>Container</Filter>
     </ClInclude>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Numerics\Matrix2x2.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Matrix3x2.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Complex.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Rect.h">
+      <Filter>Numerics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

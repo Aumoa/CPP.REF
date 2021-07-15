@@ -140,6 +140,15 @@ struct Quaternion : public Vector4
 	}
 
 	/// <summary>
+	/// Get Z component.
+	/// </summary>
+	/// <returns> Reference of Z component. </returns>
+	inline float& Z()
+	{
+		return Values[2];
+	}
+
+	/// <summary>
 	/// Get W component.
 	/// </summary>
 	/// <returns> Reference of W component. </returns>

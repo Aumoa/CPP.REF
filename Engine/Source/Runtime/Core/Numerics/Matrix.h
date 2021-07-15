@@ -46,6 +46,19 @@ struct Matrix
 		}
 	}
 
+	constexpr bool NearlyEquals(const Matrix& rhs, float epsilon = MathEx::SmallNumber) const
+	{
+		for (size_t i = 0; i < NRow; ++i)
+		{
+			if (!V[i].NearlyEquals(rhs.V[i], epsilon))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	/// <summary>
 	/// Get row count.
 	/// </summary>
@@ -156,5 +169,48 @@ struct Matrix
 			}
 		}
 		return m;
+	}
+
+	constexpr bool operator ==(const Matrix& rhs) const
+	{
+		for (size_t i = 0; i < NRow; ++i)
+		{
+			for (size_t j = 0; j < NCol; ++j)
+			{
+				if (V[i][j] != rhs.V[i][j])
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	constexpr bool operator !=(const Matrix& rhs) const
+	{
+		for (size_t i = 0; i < NRow; ++i)
+		{
+			for (size_t j = 0; j < NCol; ++j)
+			{
+				if (V[i][j] != rhs.V[i][j])
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	std::wstring ToString(std::wstring_view formatArgs) const
+	{
+		std::wstring placeholder = StringUtils::GetPlaceholder(formatArgs);
+
+		std::array<std::wstring, NRow> composed;
+		for (size_t i = 0; i < NRow; ++i)
+		{
+			composed[i] = std::format(placeholder, V[i]);
+		}
+
+		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
 	}
 };

@@ -34,6 +34,10 @@ struct Matrix4x4 : public Matrix<4, 4>
 	{
 	}
 
+	constexpr Matrix4x4(const Matrix<4, 4>& rhs) : Matrix(rhs)
+	{
+	}
+
 	/// <summary>
 	/// Get determinant value with SIMD functions.
 	/// </summary>
@@ -83,7 +87,8 @@ struct Matrix4x4 : public Matrix<4, 4>
 
 inline constexpr Matrix4x4 Matrix4x4::Identity()
 {
-	return Matrix4x4{
+	return Matrix4x4
+	{
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,

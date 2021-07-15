@@ -69,7 +69,7 @@ public:
 	/// <param name="y"> The argument value. </param>
 	/// <param name="osin"> The return parameter of sine value. </param>
 	/// <param name="ocos"> The return parameter of cosine value.  </param>
-	static void SinCos(float x, float& osin, float& ocos);
+	static void SinCos(const Radians& x, float& osin, float& ocos);
 
 	/// <summary>
 	/// Get absolute value.

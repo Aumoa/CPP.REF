@@ -439,10 +439,10 @@ struct Vector
 		std::array<std::wstring, N> composed;
 		for (size_t i = 0; i < N; ++i)
 		{
-			composed[i] = format(placeholder, Values[i]);
+			composed[i] = std::format(placeholder, Values[i]);
 		}
 
-		return format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
+		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
 	}
 
 	/// <summary>

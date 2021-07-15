@@ -42,9 +42,9 @@ float MathEx::Atan2(float y, float x)
 	return atan2(y, x);
 }
 
-void MathEx::SinCos(float x, float& sin, float& cos)
+void MathEx::SinCos(const Radians& x, float& sin, float& cos)
 {
-	float quotient = (pi_v<float> *0.5f) * x;
+	float quotient = (pi_v<float> *0.5f) * x.Value;
 	if (x >= 0)
 	{
 		quotient = (float)((int32)(quotient + 0.5f));
@@ -53,7 +53,7 @@ void MathEx::SinCos(float x, float& sin, float& cos)
 	{
 		quotient = (float)((int32)(quotient - 0.5f));
 	}
-	float y = x - (2.0f * pi_v<float>) * quotient;
+	float y = x.Value - (2.0f * pi_v<float>) * quotient;
 
 	float sign;
 	if (y > (pi_v<float> *0.5f))
