@@ -19,6 +19,7 @@ GameInstance::GameInstance() : Super()
 void GameInstance::Tick(duration<float> elapsedTime)
 {
 	_world->LevelTick(elapsedTime);
+	_localPlayer->Tick(elapsedTime);
 }
 
 int32 GameInstance::Run(IFrameworkView* frameworkView)
@@ -37,6 +38,11 @@ IFrameworkView* GameInstance::GetFrameworkView() const
 	return _frameworkView;
 }
 
+LocalPlayer* GameInstance::GetLocalPlayer() const
+{
+	return _localPlayer;
+}
+
 void GameInstance::InitializeEngine()
 {
 #ifdef _DEBUG
@@ -49,6 +55,7 @@ void GameInstance::InitializeEngine()
 	_engine->InitEngine(this);
 
 	_localPlayer = CreateSubobject<LocalPlayer>();
+	_localPlayer->Init(_engine);
 
 	_world = CreateSubobject<World>(_engine);
 	Level* loadedLevel = _world->LoadLevel(StartupLevel);

@@ -88,12 +88,9 @@ struct Vector2 : public Vector<2>
 	/// <param name="lhs"> The first value. </param>
 	/// <param name="rhs"> The second value. </param>
 	/// <returns> The vector of result of cross product. </returns>
-	static Vector2 CrossProduct(const Vector2& lhs, const Vector2& rhs)
+	static constexpr float CrossProduct(const Vector2& lhs, const Vector2& rhs)
 	{
-		return
-		{
-			lhs.X() * rhs.Y() - lhs.Y() * rhs.X()
-		};
+		return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
 	}
 
 	/// <summary>

@@ -55,12 +55,14 @@ public:
 	/// </summary>
 	IFrameworkView* GetFrameworkView() const;
 
+	/// <summary>
+	/// Get local player.
+	/// </summary>
+	LocalPlayer* GetLocalPlayer() const;
+
 protected:
 	/// <summary>
 	/// Initialize the game engine.
 	/// </summary>
 	virtual void InitializeEngine();
-
-public:
-	inline LocalPlayer* GetLocalPlayer() const { return _localPlayer; }
 };

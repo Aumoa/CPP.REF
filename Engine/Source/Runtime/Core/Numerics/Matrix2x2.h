@@ -78,14 +78,17 @@ struct Matrix2x2 : public Matrix<2, 2>
 	{
 		return
 		{
-			point[0] * V[0][0] + point[1] * V[1][0],
-			point[0] * V[0][1] + point[1] * V[1][1]
+			point.X() * V[0][0] + point.Y() * V[1][0],
+			point.X() * V[0][1] + point.Y() * V[1][1]
 		};
 	}
 
-	constexpr Vector2 TransformVector(const Vector2& point) const { return TransformPoint(point); }
+	constexpr Vector2 TransformVector(const Vector2& point) const
+	{
+		return TransformPoint(point);
+	}
 
-	constexpr Matrix2x2 GetInverse() const
+	constexpr Matrix2x2 Inverse() const
 	{
 		float a = V[0][0], b = V[0][1], c = V[1][0], d = V[1][1];
 		float det = a * d - b * c;

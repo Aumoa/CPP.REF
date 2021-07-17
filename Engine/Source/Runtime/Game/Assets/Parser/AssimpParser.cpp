@@ -8,6 +8,7 @@
 #include "AssimpParser.h"
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
+#include "assimp/Exporter.hpp"
 #include "assimp/postprocess.h"
 #include "LogGame.h"
 #include "GameStructures.h"

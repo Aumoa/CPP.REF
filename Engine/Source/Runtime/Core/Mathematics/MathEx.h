@@ -158,6 +158,23 @@ public:
 		return Max(Min(value, rhs), lhs);
 	}
 
+	static inline constexpr bool IsWithinInclusive(float v, float minv, float maxv)
+	{
+		return v >= minv && v <= maxv;
+	}
+
+	static constexpr float Round(float v)
+	{
+		if (v >= 0.0f)
+		{
+			return (float)(int32)(v + 0.5f);
+		}
+		else
+		{
+			return (float)(int32)(v - 0.5f);
+		}
+	}
+
 	/// <summary>
 	/// Represents small number.
 	/// </summary>

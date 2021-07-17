@@ -455,6 +455,16 @@ struct Vector
 		return Vector<sizeof...(Indexes)>{ Values[Indexes]... };
 	}
 
+	inline constexpr Vector Round() const
+	{
+		Vector V;
+		for (size_t i = 0; i < N; ++i)
+		{
+			V.Values[i] = MathEx::Round(Values[i]);
+		}
+		return V;
+	}
+
 	/// <summary>
 	/// Get zero vector.
 	/// </summary>

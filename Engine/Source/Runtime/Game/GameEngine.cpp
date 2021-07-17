@@ -14,6 +14,7 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneRenderer.h"
 #include "Assets/AssetImporter.h"
+#include "GameFramework/LocalPlayer.h"
 
 using enum ELogVerbosity;
 
@@ -184,6 +185,12 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
 	scene->InitViews(localPlayerView);
 	scene->RenderScene(_deviceContext);
+
+	LocalPlayer* localPlayer = _gameInstance->GetLocalPlayer();
+	if (localPlayer)
+	{
+		localPlayer->Render();
+	}
 
 	_deviceContext->TransitionBarrier(1, &barrierEnd);
 	_deviceContext->End();

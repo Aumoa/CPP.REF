@@ -208,7 +208,7 @@ struct Matrix
 		std::array<std::wstring, NRow> composed;
 		for (size_t i = 0; i < NRow; ++i)
 		{
-			composed[i] = std::format(placeholder, V[i]);
+			composed[i] = V[i].ToString(formatArgs);
 		}
 
 		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));

@@ -82,6 +82,7 @@ private:
 
 public:
 	RHIDevice* GetRHIDevice() const { return _device; }
+
 	ColorShader* GetColorShader() const { return _colorShader; }
 	ColorVertexFactory* GetColorVertexFactory() const { return _colorVertexFactory; }
 	AssetImporter* GetAssetImporter() const { return _assimp; }

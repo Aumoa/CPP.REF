@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Widgets\Widget.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="SlateMinimal.h" />
+    <ClInclude Include="Layout\Scale2D.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\Shear2D.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\SlateRenderTransform.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\TransformCalculus2D.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\SlateLayoutTransform.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\Geometry.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Concepts\LayoutTransform.h">
+      <Filter>Concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\ArrangedWidget.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\LayoutGeometry.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\FlowDirection.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\Anchors.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\PaintArgs.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\SlateWindowElementList.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\SlateDrawElement.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\SlateBrush.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\PaintGeometry.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\SlateVisibility.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\ArrangedChildrens.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\WidgetClipping.h">
+      <Filter>Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\SlateRotatedRect.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\LayoutImpl.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\Margin.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout\Orientation.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Widgets\CompoundWidget.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Widgets\Window.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Widgets\Widget.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout\ArrangedWidget.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout\Geometry.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw\PaintArgs.cpp">
+      <Filter>Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw\SlateWindowElementList.cpp">
+      <Filter>Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout\ArrangedChildrens.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Widgets\CompoundWidget.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Widgets\Window.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Widgets">
+      <UniqueIdentifier>{ce0113af-4158-463c-a8ce-de5c87baaea4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Layout">
+      <UniqueIdentifier>{ec068298-d96f-4a16-98af-66facb810a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Concepts">
+      <UniqueIdentifier>{73e2cc12-354f-4edc-b8d7-c7edc46b0a53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Draw">
+      <UniqueIdentifier>{792d1b92-cc97-428b-b50d-3944513cd5a7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

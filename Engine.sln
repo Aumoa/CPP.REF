@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IrrXML", "ThirdParty\Source
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstatic", "ThirdParty\Source\assimp\zlibstatic.vcxproj", "{EFA46E97-7AB6-36CD-B956-B4F91A82958E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SlateCore", "Engine\Source\Runtime\SlateCore\SlateCore.vcxproj", "{1F1A153E-420A-40E8-8185-2166B77FEA98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -81,6 +83,10 @@ Global
 		{EFA46E97-7AB6-36CD-B956-B4F91A82958E}.Debug|x64.Build.0 = Debug|x64
 		{EFA46E97-7AB6-36CD-B956-B4F91A82958E}.Release|x64.ActiveCfg = Release|x64
 		{EFA46E97-7AB6-36CD-B956-B4F91A82958E}.Release|x64.Build.0 = Release|x64
+		{1F1A153E-420A-40E8-8185-2166B77FEA98}.Debug|x64.ActiveCfg = Debug|x64
+		{1F1A153E-420A-40E8-8185-2166B77FEA98}.Debug|x64.Build.0 = Debug|x64
+		{1F1A153E-420A-40E8-8185-2166B77FEA98}.Release|x64.ActiveCfg = Release|x64
+		{1F1A153E-420A-40E8-8185-2166B77FEA98}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +105,7 @@ Global
 		{073B7D61-A847-355B-87F3-503834416AD0} = {149C19A1-3E99-4BC5-B19D-03BA2A9DAA2A}
 		{0F7B7B18-5253-33BD-AE08-8382FC23DA63} = {149C19A1-3E99-4BC5-B19D-03BA2A9DAA2A}
 		{EFA46E97-7AB6-36CD-B956-B4F91A82958E} = {149C19A1-3E99-4BC5-B19D-03BA2A9DAA2A}
+		{1F1A153E-420A-40E8-8185-2166B77FEA98} = {D7A17DCC-D52F-454A-A115-D9B2BA5597E6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3B8A6A43-DD28-4861-8C4D-FB452750B113}
