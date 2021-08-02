@@ -11,7 +11,7 @@ public:
 	using Super = APiece;
 
 private:
-	static constexpr wchar_t AssetPath[] = L"Contents/Chess/Arts/King/Mesh/king.fbx";
+	static constexpr wchar_t AssetPath[] = L"Content/Chess/Arts/King/Mesh/king.fbx";
 
 public:
 	AKing();

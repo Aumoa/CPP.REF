@@ -11,7 +11,7 @@ public:
 	using Super = AFirstCheckPiece;
 
 private:
-	static constexpr wchar_t AssetPath[] = L"Contents/Chess/Arts/Pawn/Mesh/pawn.fbx";
+	static constexpr wchar_t AssetPath[] = L"Content/Chess/Arts/Pawn/Mesh/pawn.fbx";
 	uint8 _bCanEnpassant : 1 = false;
 	uint8 _bMoved : 1 = false;
 

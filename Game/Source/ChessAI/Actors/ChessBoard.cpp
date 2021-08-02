@@ -30,7 +30,7 @@ AChessBoard::AChessBoard() : Super()
 	SetRootComponent(smc);
 
 	AssetImporter* assimp = GameEngine::GetEngine()->GetAssetImporter();
-	StaticMesh* sm = assimp->ImportStaticMesh(L"Contents/Chess/Arts/Board/Mesh/board.fbx");
+	StaticMesh* sm = assimp->ImportStaticMesh(L"Content/Chess/Arts/Board/Mesh/board.fbx");
 	smc->SetStaticMesh(sm);
 
 	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
