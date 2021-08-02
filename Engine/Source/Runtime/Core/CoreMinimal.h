@@ -38,3 +38,4 @@
 #include "Utilities/StringUtils.h"
 #include "Utilities/UniqueType.h"
 #include "Container/BitArray.h"
+#include "Memory/ScopedPtr.h"

@@ -132,6 +132,7 @@
     <ClInclude Include="Mathematics\Degrees.h" />
     <ClInclude Include="Mathematics\MathEx.h" />
     <ClInclude Include="Mathematics\Radians.h" />
+    <ClInclude Include="Memory\ScopedPtr.h" />
     <ClInclude Include="Numerics\AxisAlignedCube.h" />
     <ClInclude Include="Numerics\Color.h" />
     <ClInclude Include="Numerics\Complex.h" />

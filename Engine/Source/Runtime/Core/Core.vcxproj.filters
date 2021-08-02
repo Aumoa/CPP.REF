@@ -79,6 +79,9 @@
     <Filter Include="Container">
       <UniqueIdentifier>{4f2db49c-ffe3-466d-b36c-ff59cd51f61e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{dac68a6e-75f4-4c79-ad95-c65dc8e25b6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h" />
@@ -197,6 +200,9 @@
     </ClInclude>
     <ClInclude Include="Numerics\Rect.h">
       <Filter>Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\ScopedPtr.h">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
