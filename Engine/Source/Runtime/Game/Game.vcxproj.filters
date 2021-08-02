@@ -46,6 +46,9 @@
     <Filter Include="Shaders\TransparentShader">
       <UniqueIdentifier>{6c250c3c-5594-448a-b17c-683276d3021d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\SlateShader">
+      <UniqueIdentifier>{31360618-8371-4824-97a3-cf6a8abb687e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameInstance.cpp" />
@@ -164,6 +167,9 @@
       <Filter>GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Shaders\SlateShader\SlateShader.cpp">
+      <Filter>Shaders\SlateShader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
@@ -177,6 +183,12 @@
     </FxCompile>
     <FxCompile Include="Shaders\TransparentShader\TransparentShaderVS.hlsl">
       <Filter>Shaders\TransparentShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\SlateShader\SlateShaderVS.hlsl">
+      <Filter>Shaders\SlateShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\SlateShader\SlateShaderPS.hlsl">
+      <Filter>Shaders\SlateShader</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -322,10 +334,16 @@
       <Filter>GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Shaders\SlateShader\SlateShader.h">
+      <Filter>Shaders\SlateShader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\TeapotData.inl">
       <Filter>Misc</Filter>
+    </None>
+    <None Include="Shaders\SlateShader\SlateCommon.hlsli">
+      <Filter>Shaders\SlateShader</Filter>
     </None>
   </ItemGroup>
 </Project>
