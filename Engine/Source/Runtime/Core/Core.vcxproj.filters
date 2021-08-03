@@ -1,208 +1,249 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Utilities\StringUtils.cpp">
-      <Filter>Utilities</Filter>
+    <ClCompile Include="Private\CoreAssert.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Diagnostics\LogCategory.cpp">
-      <Filter>Diagnostics</Filter>
+    <ClCompile Include="Private\pch.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Diagnostics\LogSystem.cpp">
-      <Filter>Diagnostics</Filter>
+    <ClCompile Include="Private\LogCore.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Mathematics\MathEx.cpp">
-      <Filter>Mathematics</Filter>
+    <ClCompile Include="Private\Object.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Numerics\Color.cpp">
-      <Filter>Numerics</Filter>
+    <ClCompile Include="Private\Container\BitArray.cpp">
+      <Filter>Private\Container</Filter>
     </ClCompile>
-    <ClCompile Include="Numerics\Matrix4x4.cpp">
-      <Filter>Numerics</Filter>
+    <ClCompile Include="Private\Diagnostics\LogSystem.cpp">
+      <Filter>Private\Diagnostics</Filter>
     </ClCompile>
-    <ClCompile Include="Numerics\Quaternion.cpp">
-      <Filter>Numerics</Filter>
+    <ClCompile Include="Private\Diagnostics\LogCategory.cpp">
+      <Filter>Private\Diagnostics</Filter>
     </ClCompile>
-    <ClCompile Include="IO\FileSystemReference.cpp">
-      <Filter>IO</Filter>
+    <ClCompile Include="Private\IO\FileReference.cpp">
+      <Filter>Private\IO</Filter>
     </ClCompile>
-    <ClCompile Include="IO\DirectoryReference.cpp">
-      <Filter>IO</Filter>
+    <ClCompile Include="Private\IO\FileSystemReference.cpp">
+      <Filter>Private\IO</Filter>
     </ClCompile>
-    <ClCompile Include="IO\FileReference.cpp">
-      <Filter>IO</Filter>
+    <ClCompile Include="Private\IO\DirectoryReference.cpp">
+      <Filter>Private\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\EventHandle.cpp">
-      <Filter>Threading</Filter>
+    <ClCompile Include="Private\Mathematics\MathEx.cpp">
+      <Filter>Private\Mathematics</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\DateTime.cpp">
-      <Filter>Utilities</Filter>
+    <ClCompile Include="Private\Numerics\Matrix4x4.cpp">
+      <Filter>Private\Numerics</Filter>
     </ClCompile>
-    <ClCompile Include="LogCore.cpp" />
-    <ClCompile Include="CoreAssert.cpp" />
-    <ClCompile Include="Container\BitArray.cpp">
-      <Filter>Container</Filter>
+    <ClCompile Include="Private\Numerics\Quaternion.cpp">
+      <Filter>Private\Numerics</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Numerics\Matrix2x2.cpp">
-      <Filter>Numerics</Filter>
+    <ClCompile Include="Private\Numerics\Color.cpp">
+      <Filter>Private\Numerics</Filter>
     </ClCompile>
-    <ClCompile Include="Numerics\Matrix3x2.cpp">
-      <Filter>Numerics</Filter>
+    <ClCompile Include="Private\Threading\EventHandle.cpp">
+      <Filter>Private\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Misc\StringUtils.cpp">
+      <Filter>Private\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Misc\DateTime.cpp">
+      <Filter>Private\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Numerics">
-      <UniqueIdentifier>{0bff16ca-400f-4271-8ae9-ebc7af65f787}</UniqueIdentifier>
+    <Filter Include="Public">
+      <UniqueIdentifier>{6583af40-0ffe-4205-9cb1-e40a126841d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Mathematics">
-      <UniqueIdentifier>{42efaef3-280c-4344-ac18-53eacd9555c1}</UniqueIdentifier>
+    <Filter Include="Private">
+      <UniqueIdentifier>{437a26c5-7451-4070-b502-100d8cffdc1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utilities">
-      <UniqueIdentifier>{8987bf89-95bb-4ddb-a40b-06ef984b8686}</UniqueIdentifier>
+    <Filter Include="Public\Concepts">
+      <UniqueIdentifier>{f404128f-6157-4f71-b6a3-a6ce2c500336}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Delegates">
-      <UniqueIdentifier>{c051ea61-a877-4c07-9a50-d881f300038c}</UniqueIdentifier>
+    <Filter Include="Public\Container">
+      <UniqueIdentifier>{6c85e9f6-4916-4b57-aa10-12b12c1e1d0e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Diagnostics">
-      <UniqueIdentifier>{8655c301-4f6a-40b2-8cc7-14168da95641}</UniqueIdentifier>
+    <Filter Include="Private\Container">
+      <UniqueIdentifier>{5a629616-4046-45df-beb2-765193e56d55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="IO">
-      <UniqueIdentifier>{b7c6a406-36fa-4cd8-907e-464bb6718a77}</UniqueIdentifier>
+    <Filter Include="Public\Delegates">
+      <UniqueIdentifier>{3561089f-4078-47c4-ac34-a46249e6ac89}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Threading">
-      <UniqueIdentifier>{0a7dee3b-e03f-4a22-9112-6772872cef59}</UniqueIdentifier>
+    <Filter Include="Public\Diagnostics">
+      <UniqueIdentifier>{7d533520-de09-44b5-a236-bd10650760a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Concepts">
-      <UniqueIdentifier>{7899fd6f-7a65-41e7-8ba3-ab1f37f1eac3}</UniqueIdentifier>
+    <Filter Include="Private\Diagnostics">
+      <UniqueIdentifier>{081ffa2b-2510-43b3-bd33-c8e7318f2168}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Container">
-      <UniqueIdentifier>{4f2db49c-ffe3-466d-b36c-ff59cd51f61e}</UniqueIdentifier>
+    <Filter Include="Public\IO">
+      <UniqueIdentifier>{b138cf5e-34da-4d73-8b6d-a5054a077f7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory">
-      <UniqueIdentifier>{dac68a6e-75f4-4c79-ad95-c65dc8e25b6e}</UniqueIdentifier>
+    <Filter Include="Private\IO">
+      <UniqueIdentifier>{1b158a35-6b3b-46b8-b2da-deaf13ce9059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Mathematics">
+      <UniqueIdentifier>{d9abd0ca-c3c2-4806-9164-1697af158e8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Mathematics">
+      <UniqueIdentifier>{9ce0ecfe-b396-4947-a0b6-ec6dce18481a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Memory">
+      <UniqueIdentifier>{7fc66191-ce31-4666-8ee5-552760f677e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Numerics">
+      <UniqueIdentifier>{1a5a6ebe-a1ca-4248-a664-5192ce8ef972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Numerics">
+      <UniqueIdentifier>{4e840aef-ff15-4c79-979c-5253440559c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Threading">
+      <UniqueIdentifier>{4a4b1998-0ede-434f-9d79-c28160195e9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Threading">
+      <UniqueIdentifier>{366a0cde-9a02-4779-b42e-db63f501dd35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Misc">
+      <UniqueIdentifier>{388b244c-376a-4b48-b823-9ef5c908433d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Misc">
+      <UniqueIdentifier>{3a331db3-d4f4-4aa0-a54a-e80db945d4fe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="CoreMinimal.h" />
-    <ClInclude Include="PrimitiveTypes.h" />
-    <ClInclude Include="Concepts\SupportsObject.h">
-      <Filter>Concepts</Filter>
+    <ClInclude Include="Public\PrimitiveTypes.h">
+      <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Delegates\MulticastDelegate.h">
-      <Filter>Delegates</Filter>
+    <ClInclude Include="Public\Object.h">
+      <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Delegates\MulticastEvent.h">
-      <Filter>Delegates</Filter>
+    <ClInclude Include="Public\LogCore.h">
+      <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Diagnostics\LogCategory.h">
-      <Filter>Diagnostics</Filter>
+    <ClInclude Include="Public\CoreAssert.h">
+      <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Diagnostics\LogSystem.h">
-      <Filter>Diagnostics</Filter>
+    <ClInclude Include="Public\CoreMinimal.h">
+      <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Diagnostics\LogVerbosity.h">
-      <Filter>Diagnostics</Filter>
+    <ClInclude Include="Private\pch.h">
+      <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="IO\DirectoryReference.h">
-      <Filter>IO</Filter>
+    <ClInclude Include="Public\Concepts\SupportsObject.h">
+      <Filter>Public\Concepts</Filter>
     </ClInclude>
-    <ClInclude Include="IO\FileReference.h">
-      <Filter>IO</Filter>
+    <ClInclude Include="Public\Container\BitArray.h">
+      <Filter>Public\Container</Filter>
     </ClInclude>
-    <ClInclude Include="IO\FileSystemReference.h">
-      <Filter>IO</Filter>
+    <ClInclude Include="Public\Delegates\MulticastDelegate.h">
+      <Filter>Public\Delegates</Filter>
     </ClInclude>
-    <ClInclude Include="Mathematics\Degrees.h">
-      <Filter>Mathematics</Filter>
+    <ClInclude Include="Public\Delegates\MulticastEvent.h">
+      <Filter>Public\Delegates</Filter>
     </ClInclude>
-    <ClInclude Include="Mathematics\MathEx.h">
-      <Filter>Mathematics</Filter>
+    <ClInclude Include="Public\Diagnostics\LogVerbosity.h">
+      <Filter>Public\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="Mathematics\Radians.h">
-      <Filter>Mathematics</Filter>
+    <ClInclude Include="Public\Diagnostics\LogSystem.h">
+      <Filter>Public\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\AxisAlignedCube.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Diagnostics\LogCategory.h">
+      <Filter>Public\Diagnostics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Color.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\IO\FileReference.h">
+      <Filter>Public\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Frustum.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\IO\FileSystemReference.h">
+      <Filter>Public\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Line.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\IO\DirectoryReference.h">
+      <Filter>Public\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Matrix.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Mathematics\MathEx.h">
+      <Filter>Public\Mathematics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Matrix4x4.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Mathematics\Radians.h">
+      <Filter>Public\Mathematics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\ObjectOrientedCube.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Mathematics\Degrees.h">
+      <Filter>Public\Mathematics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Plane.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Memory\ScopedPtr.h">
+      <Filter>Public\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Quaternion.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Frustum.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Range.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Line.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Ray.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Matrix.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Sphere.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Matrix2x2.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Vector.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Matrix3x2.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Vector2.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Matrix4x4.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Vector3.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\ObjectOrientedCube.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Vector4.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Plane.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\EventHandle.h">
-      <Filter>Threading</Filter>
+    <ClInclude Include="Public\Numerics\Quaternion.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\DateTime.h">
-      <Filter>Utilities</Filter>
+    <ClInclude Include="Public\Numerics\Range.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\StringUtils.h">
-      <Filter>Utilities</Filter>
+    <ClInclude Include="Public\Numerics\Ray.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Utilities\UniqueType.h">
-      <Filter>Utilities</Filter>
+    <ClInclude Include="Public\Numerics\Rect.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="CoreAssert.h" />
-    <ClInclude Include="LogCore.h" />
-    <ClInclude Include="Container\BitArray.h">
-      <Filter>Container</Filter>
+    <ClInclude Include="Public\Numerics\Sphere.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Numerics\Matrix2x2.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Vector.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Matrix3x2.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Vector2.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Complex.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Vector3.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Rect.h">
-      <Filter>Numerics</Filter>
+    <ClInclude Include="Public\Numerics\Vector4.h">
+      <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\ScopedPtr.h">
-      <Filter>Memory</Filter>
+    <ClInclude Include="Public\Numerics\AxisAlignedCube.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Color.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Numerics\Complex.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Threading\EventHandle.h">
+      <Filter>Public\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\StringUtils.h">
+      <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\UniqueType.h">
+      <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\DateTime.h">
+      <Filter>Public\Misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
