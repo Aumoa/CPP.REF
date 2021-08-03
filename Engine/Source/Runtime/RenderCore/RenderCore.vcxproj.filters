@@ -1,105 +1,129 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="RHI\RHIDevice.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\pch.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHISwapChain.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\ComPtr.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHICommandQueue.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIDepthStencilView.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIDeviceContext.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIDevice.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIShader.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIDeviceContext.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIResource.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIRenderTargetView.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHITexture.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIResource.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHITexture2D.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIShader.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIView.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHISwapChain.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIRenderTargetView.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHITexture.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\RHIVertexFactory.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHITexture2D.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\LogRHI.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIVertexFactory.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="ComPtr.cpp" />
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="RHI\RHIDepthStencilView.cpp">
-      <Filter>RHI</Filter>
+    <ClCompile Include="Private\RHI\RHIView.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\LogRHI.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHICommandQueue.cpp">
+      <Filter>Private\RHI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="RHI">
-      <UniqueIdentifier>{994723c2-299e-4fce-a060-5a9f7fbe1469}</UniqueIdentifier>
+    <Filter Include="Public">
+      <UniqueIdentifier>{cacb5d27-a283-496c-97fe-5e13c9210e48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{af1b4535-b181-4931-a985-438f4679fae1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\RHI">
+      <UniqueIdentifier>{e379fe32-db3e-4b09-a23e-2836d24c05cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\RHI">
+      <UniqueIdentifier>{c370a806-9677-400e-8b45-74368a553256}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComPtr.h" />
-    <ClInclude Include="IWindowView.h" />
-    <ClInclude Include="RHI\LogRHI.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Private\pch.h">
+      <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHICommandQueue.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\ComPtr.h">
+      <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIDeviceChild.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Private\InternalComPtr.h">
+      <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIEnums.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIShader.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIDevice.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIStructures.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIDeviceContext.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHISwapChain.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIStructures.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHITexture.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIView.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHITexture2D.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIRenderTargetView.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIVertexFactory.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIResource.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIView.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIShader.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\LogRHI.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHISwapChain.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHICommandQueue.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHITexture.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIDepthStencilView.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHITexture2D.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIDevice.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\RHIVertexFactory.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIDeviceChild.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="RenderMinimal.h" />
-    <ClInclude Include="RHI\RHIDepthStencilView.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="Public\RHI\RHIDeviceContext.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="Public\RHI\RHIEnums.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIRenderTargetView.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIResource.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RenderMinimal.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IWindowView.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
