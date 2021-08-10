@@ -1,22 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="LogTHStory.h" />
-    <ClInclude Include="THGameInstance.h" />
-    <ClInclude Include="Levels\StartupLevel.h">
-      <Filter>Levels</Filter>
+    <Filter Include="Public">
+      <UniqueIdentifier>{169d86fc-b7a6-40f2-86a4-de1ae17b3355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Levels">
+      <UniqueIdentifier>{3a097d23-95ca-4659-b589-5178218d1721}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{c804fb1e-35e3-4a62-8f42-dd1c6640b459}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Levels">
+      <UniqueIdentifier>{63694bab-c0ab-4af7-a53d-10b4f67f8705}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\THGameInstance.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\LogTHStory.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Levels\StartupLevel.h">
+      <Filter>Public\Levels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LogTHStory.cpp" />
-    <ClCompile Include="THGameInstance.cpp" />
-    <ClCompile Include="Levels\StartupLevel.cpp">
-      <Filter>Levels</Filter>
+    <ClCompile Include="Private\LogTHStory.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Levels">
-      <UniqueIdentifier>{31761278-77db-4b1f-bd11-1c1555ae182f}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="Private\THGameInstance.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Levels\StartupLevel.cpp">
+      <Filter>Private\Levels</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -25,6 +25,7 @@ private:
 
 public:
 	RHIRenderTargetView(RHIDevice* device, uint32 descriptorCount);
+	~RHIRenderTargetView() override;
 
 	/// <summary>
 	/// Create render target view.

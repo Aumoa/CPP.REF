@@ -1,349 +1,439 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="GameFramework">
-      <UniqueIdentifier>{eb55dc3f-4aee-47f6-88f5-0aae5fde5e4f}</UniqueIdentifier>
+    <Filter Include="Public">
+      <UniqueIdentifier>{07add5e3-090a-4314-87ce-9e885fb3264d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Ticking">
-      <UniqueIdentifier>{a976eb34-38eb-495d-9131-6d93a80aa162}</UniqueIdentifier>
+    <Filter Include="Private">
+      <UniqueIdentifier>{0e323baf-b565-4f6f-95f6-4f76073e0089}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Level">
-      <UniqueIdentifier>{44098b13-d317-4e17-af8d-c7defdc0a3cb}</UniqueIdentifier>
+    <Filter Include="Public\Assets">
+      <UniqueIdentifier>{c9b1977b-568a-4248-947f-33665d28eb0d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Info">
-      <UniqueIdentifier>{ce7d5638-8368-4678-9ff8-14925a3ccaf9}</UniqueIdentifier>
+    <Filter Include="Public\Assets\Parser">
+      <UniqueIdentifier>{a5405911-2357-4495-849b-96fc33e0eb4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Components">
-      <UniqueIdentifier>{3833ef9b-b9ca-44ca-a55a-c5a80f3571ae}</UniqueIdentifier>
+    <Filter Include="Private\Assets">
+      <UniqueIdentifier>{4f46f4b9-39f9-41ed-a892-3ab22414e366}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{5f049205-8ad6-4a5a-95df-7a22c4a22750}</UniqueIdentifier>
+    <Filter Include="Private\Assets\Parser">
+      <UniqueIdentifier>{374cfe67-dedd-40fc-b2b3-19f3d4cb5613}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\ColorShader">
-      <UniqueIdentifier>{196c48bb-95d0-4497-82e0-36336b821e09}</UniqueIdentifier>
+    <Filter Include="Public\Camera">
+      <UniqueIdentifier>{7af0a2fc-37e3-4c2c-a890-136ee977f25f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Camera">
-      <UniqueIdentifier>{15327ed0-3d11-4720-8937-d89cbf1eb5e5}</UniqueIdentifier>
+    <Filter Include="Private\Camera">
+      <UniqueIdentifier>{3453d1e3-6774-4155-995d-2c02f2446c14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{e54a2c04-5af0-4672-829e-96abc7391a2d}</UniqueIdentifier>
+    <Filter Include="Public\Components">
+      <UniqueIdentifier>{9cdf48f0-e74f-478d-9445-6b0b4bf4fbac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets">
-      <UniqueIdentifier>{a1c14794-9076-4aee-8501-0f82cdb85808}</UniqueIdentifier>
+    <Filter Include="Private\Components">
+      <UniqueIdentifier>{98434413-2949-4773-a46c-714ede42c157}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PlatformMisc">
-      <UniqueIdentifier>{2d8c3a2f-56e9-4a58-b628-e301a83f8021}</UniqueIdentifier>
+    <Filter Include="Public\GameFramework">
+      <UniqueIdentifier>{4c7f9df1-2f03-45b1-9dad-efa039c09608}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Parser">
-      <UniqueIdentifier>{fa6b7893-f83c-4194-bc75-dc387449523f}</UniqueIdentifier>
+    <Filter Include="Private\GameFramework">
+      <UniqueIdentifier>{e5989a81-d67e-4995-8381-11695c2c30c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Materials">
-      <UniqueIdentifier>{d708cf45-3403-4133-b7ad-cd5028d451b1}</UniqueIdentifier>
+    <Filter Include="Public\Info">
+      <UniqueIdentifier>{b1795795-8fa6-41b0-8539-9b43970fcfca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Misc">
-      <UniqueIdentifier>{21ad887c-a43b-40d0-a88c-418f84ed372a}</UniqueIdentifier>
+    <Filter Include="Private\Info">
+      <UniqueIdentifier>{b791991e-1ab0-4be6-97e1-ad4b550931e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\TransparentShader">
-      <UniqueIdentifier>{6c250c3c-5594-448a-b17c-683276d3021d}</UniqueIdentifier>
+    <Filter Include="Public\Level">
+      <UniqueIdentifier>{862c3977-ee25-4331-9eec-9fd0f70d631c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\SlateShader">
-      <UniqueIdentifier>{31360618-8371-4824-97a3-cf6a8abb687e}</UniqueIdentifier>
+    <Filter Include="Private\Level">
+      <UniqueIdentifier>{8cd3dc67-6396-4406-b9d5-06bd5555e75a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Materials">
+      <UniqueIdentifier>{63909791-18c1-4935-8bff-748d747cef36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Materials">
+      <UniqueIdentifier>{3cc07679-098a-48bd-8152-0147fded5ebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Misc">
+      <UniqueIdentifier>{4d54c39c-43a1-4e01-9f1b-f9596334bf6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Misc">
+      <UniqueIdentifier>{b25eb165-44f7-4fe8-9038-d890ab1f8446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\PlatformMisc">
+      <UniqueIdentifier>{fce18116-8143-4912-b013-a69446ae2e65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\PlatformMisc">
+      <UniqueIdentifier>{064d2e71-8cfc-4915-9cd7-4faaf555d6fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Scene">
+      <UniqueIdentifier>{89dbcfc5-ef67-44b1-b738-567e3c7bbb4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Scene">
+      <UniqueIdentifier>{852471a2-f151-4c7f-bfba-73f710d9dc5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Shaders">
+      <UniqueIdentifier>{968a8002-89d4-49d7-be33-d247b1c0ba8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Shaders\ColorShader">
+      <UniqueIdentifier>{c1fc4f0e-002b-4088-a285-9f51d3bd5a09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders">
+      <UniqueIdentifier>{4f1e3f8f-e9f4-41cc-b679-0ab0840f850c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders\ColorShader">
+      <UniqueIdentifier>{9070de1c-3ae4-4443-a077-904b4f87d457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Shaders\SlateShader">
+      <UniqueIdentifier>{280636e4-ca86-425a-a513-09116dd6a88d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Shaders\TransparentShader">
+      <UniqueIdentifier>{6f6945b6-b6cf-49b6-9a94-3b1e84fa40de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders\SlateShader">
+      <UniqueIdentifier>{94a38d4b-32c4-4059-a711-d3f00536cbf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Shaders\TransparentShader">
+      <UniqueIdentifier>{2ed5124e-8b8e-4f4a-b965-523c2e47da25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Ticking">
+      <UniqueIdentifier>{6c608359-36be-4446-bae4-2c7dad90585a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Ticking">
+      <UniqueIdentifier>{46ee6663-295b-49a7-84b1-d69c76704e01}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameInstance.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GameFramework\Actor.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\pch.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\Controller.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\LogGame.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\PlayerController.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\GameEngine.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\AIController.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\GameInstance.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\Pawn.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\GameObject.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="GameEngine.cpp" />
-    <ClCompile Include="Ticking\TickFunction.cpp">
-      <Filter>Ticking</Filter>
+    <ClCompile Include="Private\Assets\StaticMesh.cpp">
+      <Filter>Private\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="Level\Level.cpp">
-      <Filter>Level</Filter>
+    <ClCompile Include="Private\Assets\AssetImporter.cpp">
+      <Filter>Private\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="Level\World.cpp">
-      <Filter>Level</Filter>
+    <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp">
+      <Filter>Private\Assets\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="Info\Info.cpp">
-      <Filter>Info</Filter>
+    <ClCompile Include="Private\Assets\Parser\MDLParser.cpp">
+      <Filter>Private\Assets\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="Info\GameMode.cpp">
-      <Filter>Info</Filter>
+    <ClCompile Include="Private\Camera\PlayerCameraManager.cpp">
+      <Filter>Private\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Components\ActorComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Private\Camera\CameraComponent.cpp">
+      <Filter>Private\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Components\SceneComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Private\Components\StaticMeshComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
-      <Filter>Shaders\ColorShader</Filter>
+    <ClCompile Include="Private\Components\ActorComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\CameraComponent.cpp">
-      <Filter>Camera</Filter>
+    <ClCompile Include="Private\Components\InputComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Camera\PlayerCameraManager.cpp">
-      <Filter>Camera</Filter>
+    <ClCompile Include="Private\Components\MeshComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Scene.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="Private\Components\PrimitiveComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneVisibility.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="Private\Components\SceneComponent.cpp">
+      <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp">
-      <Filter>Shaders\ColorShader</Filter>
+    <ClCompile Include="Private\GameFramework\PlayerController.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Components\MeshComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Private\GameFramework\Actor.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Components\PrimitiveComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Private\GameFramework\AIController.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Components\StaticMeshComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Private\GameFramework\Controller.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\StaticMeshSceneProxy.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="Private\GameFramework\LocalPlayer.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\PrimitiveSceneProxy.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="Private\GameFramework\Pawn.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\StaticMeshRenderData.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="Private\GameFramework\Player.cpp">
+      <Filter>Private\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\StaticMesh.cpp">
-      <Filter>Assets</Filter>
+    <ClCompile Include="Private\Info\GameMode.cpp">
+      <Filter>Private\Info</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneRenderer.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="Private\Info\Info.cpp">
+      <Filter>Private\Info</Filter>
     </ClCompile>
-    <ClCompile Include="PlatformMisc\WinMouse.cpp">
-      <Filter>PlatformMisc</Filter>
+    <ClCompile Include="Private\Level\World.cpp">
+      <Filter>Private\Level</Filter>
     </ClCompile>
-    <ClCompile Include="PlatformMisc\WinKeyboard.cpp">
-      <Filter>PlatformMisc</Filter>
+    <ClCompile Include="Private\Level\Level.cpp">
+      <Filter>Private\Level</Filter>
     </ClCompile>
-    <ClCompile Include="Components\InputComponent.cpp">
-      <Filter>Components</Filter>
+    <ClCompile Include="Private\Materials\MaterialInstance.cpp">
+      <Filter>Private\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="LogGame.cpp" />
-    <ClCompile Include="Assets\AssetImporter.cpp">
-      <Filter>Assets</Filter>
+    <ClCompile Include="Private\Materials\Material.cpp">
+      <Filter>Private\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Parser\AssimpParser.cpp">
-      <Filter>Assets\Parser</Filter>
+    <ClCompile Include="Private\PlatformMisc\WinKeyboard.cpp">
+      <Filter>Private\PlatformMisc</Filter>
     </ClCompile>
-    <ClCompile Include="Materials\Material.cpp">
-      <Filter>Materials</Filter>
+    <ClCompile Include="Private\PlatformMisc\WinMouse.cpp">
+      <Filter>Private\PlatformMisc</Filter>
     </ClCompile>
-    <ClCompile Include="Materials\MaterialInstance.cpp">
-      <Filter>Materials</Filter>
+    <ClCompile Include="Private\Scene\StaticMeshSceneProxy.cpp">
+      <Filter>Private\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\GeometryGenerator.cpp">
-      <Filter>Misc</Filter>
+    <ClCompile Include="Private\Scene\PrimitiveSceneProxy.cpp">
+      <Filter>Private\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Shaders\TransparentShader\TransparentShader.cpp">
-      <Filter>Shaders\TransparentShader</Filter>
+    <ClCompile Include="Private\Scene\Scene.cpp">
+      <Filter>Private\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\Player.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\Scene\SceneRenderer.cpp">
+      <Filter>Private\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="GameFramework\LocalPlayer.cpp">
-      <Filter>GameFramework</Filter>
+    <ClCompile Include="Private\Scene\SceneVisibility.cpp">
+      <Filter>Private\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Shaders\SlateShader\SlateShader.cpp">
-      <Filter>Shaders\SlateShader</Filter>
+    <ClCompile Include="Private\Scene\StaticMeshRenderData.cpp">
+      <Filter>Private\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Misc\GeometryGenerator.cpp">
+      <Filter>Private\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Shaders\ColorShader\ColorVertexFactory.cpp">
+      <Filter>Private\Shaders\ColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Shaders\ColorShader\ColorShader.cpp">
+      <Filter>Private\Shaders\ColorShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Shaders\TransparentShader\TransparentShader.cpp">
+      <Filter>Private\Shaders\TransparentShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\TIcking\TickFunction.cpp">
+      <Filter>Private\Ticking</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Shaders\SlateShader\SlateShader.cpp">
+      <Filter>Private\Shaders\SlateShader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
-      <Filter>Shaders\ColorShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
-      <Filter>Shaders\ColorShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\TransparentShader\TransparentShaderPS.hlsl">
-      <Filter>Shaders\TransparentShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\TransparentShader\TransparentShaderVS.hlsl">
-      <Filter>Shaders\TransparentShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SlateShader\SlateShaderVS.hlsl">
-      <Filter>Shaders\SlateShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SlateShader\SlateShaderPS.hlsl">
-      <Filter>Shaders\SlateShader</Filter>
-    </FxCompile>
+    <ClInclude Include="Private\pch.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameStructures.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\IFrameworkView.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\LogGame.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SubclassOf.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameEngine.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameEnums.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameInstance.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameMinimal.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameObject.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\StaticMesh.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\AssetImporter.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\Parser\MDLParser.h">
+      <Filter>Public\Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\Parser\ParserBase.h">
+      <Filter>Public\Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\Parser\AssimpParser.h">
+      <Filter>Public\Assets\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Camera\CameraComponent.h">
+      <Filter>Public\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Camera\PlayerCameraManager.h">
+      <Filter>Public\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\MeshComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\PrimitiveComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\SceneComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\StaticMeshComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\ActorComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Components\InputComponent.h">
+      <Filter>Public\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\PlayerController.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\Actor.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\AIController.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\Controller.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\LocalPlayer.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\Pawn.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameFramework\Player.h">
+      <Filter>Public\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Info\GameMode.h">
+      <Filter>Public\Info</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Info\Info.h">
+      <Filter>Public\Info</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Level\World.h">
+      <Filter>Public\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Level\Level.h">
+      <Filter>Public\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Materials\MaterialInstance.h">
+      <Filter>Public\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Materials\Material.h">
+      <Filter>Public\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\Bezier.h">
+      <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\GeometryGenerator.h">
+      <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\MouseStateTracker.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\WinKeyboard.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\WinMouse.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\BitfieldInputChangeTracker.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\KeyboardTracker.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\Scene.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\SceneRenderer.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\SceneVisibility.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\StaticMeshRenderData.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\StaticMeshSceneProxy.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\PrimitiveSceneProxy.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Shaders\ColorShader\ColorVertexFactory.h">
+      <Filter>Public\Shaders\ColorShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Shaders\ColorShader\ColorShader.h">
+      <Filter>Public\Shaders\ColorShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Shaders\SlateShader\SlateShader.h">
+      <Filter>Public\Shaders\SlateShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Shaders\TransparentShader\TransparentShader.h">
+      <Filter>Public\Shaders\TransparentShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Ticking\TickScheduler.h">
+      <Filter>Public\Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Ticking\TickFunction.h">
+      <Filter>Public\Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Ticking\TickingGroup.h">
+      <Filter>Public\Ticking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameEngine.h" />
-    <ClInclude Include="GameMinimal.h" />
-    <ClInclude Include="Ticking\TickScheduler.h">
-      <Filter>Ticking</Filter>
-    </ClInclude>
-    <ClInclude Include="GameInstance.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="SubclassOf.h" />
-    <ClInclude Include="IFrameworkView.h" />
-    <ClInclude Include="LogGame.h" />
-    <ClInclude Include="Assets\StaticMesh.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\Actor.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Ticking\TickingGroup.h">
-      <Filter>Ticking</Filter>
-    </ClInclude>
-    <ClInclude Include="Ticking\TickFunction.h">
-      <Filter>Ticking</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\Pawn.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\Controller.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\AIController.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\PlayerController.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\PlayerCameraManager.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera\CameraComponent.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\ActorComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="GameEnums.h" />
-    <ClInclude Include="Components\InputComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h">
-      <Filter>PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformMisc\KeyboardTracker.h">
-      <Filter>PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformMisc\MouseStateTracker.h">
-      <Filter>PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformMisc\WinKeyboard.h">
-      <Filter>PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformMisc\WinMouse.h">
-      <Filter>PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\MeshComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\PrimitiveComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\SceneComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\StaticMeshComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Info\Info.h">
-      <Filter>Info</Filter>
-    </ClInclude>
-    <ClInclude Include="Info\GameMode.h">
-      <Filter>Info</Filter>
-    </ClInclude>
-    <ClInclude Include="Level\World.h">
-      <Filter>Level</Filter>
-    </ClInclude>
-    <ClInclude Include="Level\Level.h">
-      <Filter>Level</Filter>
-    </ClInclude>
-    <ClInclude Include="GameStructures.h" />
-    <ClInclude Include="Scene\PrimitiveSceneProxy.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Scene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SceneRenderer.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SceneVisibility.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\StaticMeshRenderData.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\StaticMeshSceneProxy.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Shaders\ColorShader\ColorShader.h">
-      <Filter>Shaders\ColorShader</Filter>
-    </ClInclude>
-    <ClInclude Include="Shaders\ColorShader\ColorVertexFactory.h">
-      <Filter>Shaders\ColorShader</Filter>
-    </ClInclude>
-    <ClInclude Include="Assets\AssetImporter.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="Assets\Parser\ParserBase.h">
-      <Filter>Assets\Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="Assets\Parser\AssimpParser.h">
-      <Filter>Assets\Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="Materials\Material.h">
-      <Filter>Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="Materials\MaterialInstance.h">
-      <Filter>Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="Misc\GeometryGenerator.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Misc\Bezier.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Shaders\TransparentShader\TransparentShader.h">
-      <Filter>Shaders\TransparentShader</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\Player.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework\LocalPlayer.h">
-      <Filter>GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Shaders\SlateShader\SlateShader.h">
-      <Filter>Shaders\SlateShader</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Misc\TeapotData.inl">
-      <Filter>Misc</Filter>
+    <None Include="Public\Misc\TeapotData.inl">
+      <Filter>Public\Misc</Filter>
     </None>
-    <None Include="Shaders\SlateShader\SlateCommon.hlsli">
-      <Filter>Shaders\SlateShader</Filter>
+    <None Include="Private\Shaders\SlateShader\SlateCommon.hlsli">
+      <Filter>Private\Shaders\SlateShader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Private\Shaders\ColorShader\ColorShaderPS.hlsl">
+      <Filter>Private\Shaders\ColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\ColorShader\ColorShaderVS.hlsl">
+      <Filter>Private\Shaders\ColorShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TransparentShader\TransparentShaderVS.hlsl">
+      <Filter>Private\Shaders\TransparentShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\TransparentShader\TransparentShaderPS.hlsl">
+      <Filter>Private\Shaders\TransparentShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\SlateShader\SlateShaderPS.hlsl">
+      <Filter>Private\Shaders\SlateShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Private\Shaders\SlateShader\SlateShaderVS.hlsl">
+      <Filter>Private\Shaders\SlateShader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

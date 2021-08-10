@@ -21,6 +21,10 @@ RHIRenderTargetView::RHIRenderTargetView(RHIDevice* device, uint32 descriptorCou
 	_increment = dev->GetDescriptorHandleIncrementSize(heapd.Type);
 }
 
+RHIRenderTargetView::~RHIRenderTargetView()
+{
+}
+
 void RHIRenderTargetView::CreateRenderTargetView(RHITexture2D* texture, int32 index)
 {
 	ID3D12Resource* resource = texture->GetResource();

@@ -19,6 +19,10 @@ RHIDeviceContext::RHIDeviceContext(RHIDevice* device, ERHICommandType commandTyp
 	HR(LogRHI, d3ddev->CreateCommandAllocator((D3D12_COMMAND_LIST_TYPE)commandType, IID_PPV_ARGS(&_allocator)));
 }
 
+RHIDeviceContext::~RHIDeviceContext()
+{
+}
+
 void RHIDeviceContext::Begin()
 {
 	HR_E(LogRHI, _allocator->Reset());

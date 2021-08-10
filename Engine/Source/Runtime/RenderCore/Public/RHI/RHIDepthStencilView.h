@@ -25,6 +25,7 @@ private:
 
 public:
 	RHIDepthStencilView(RHIDevice* device, uint32 descriptorCount);
+	~RHIDepthStencilView() override;
 
 	/// <summary>
 	/// Create render target view.

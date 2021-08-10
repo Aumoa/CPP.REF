@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -26,27 +18,14 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -57,12 +36,6 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -70,12 +43,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
@@ -86,46 +53,17 @@
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>
-      </SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>
-      </SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SLATECORE_API=__declspec(dllexport);_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -139,12 +77,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SLATECORE_API=__declspec(dllexport);NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -155,48 +94,48 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Concepts\LayoutTransform.h" />
-    <ClInclude Include="Draw\PaintArgs.h" />
-    <ClInclude Include="Draw\SlateBrush.h" />
-    <ClInclude Include="Draw\SlateDrawElement.h" />
-    <ClInclude Include="Draw\SlateVisibility.h" />
-    <ClInclude Include="Draw\SlateWindowElementList.h" />
-    <ClInclude Include="Draw\WidgetClipping.h" />
-    <ClInclude Include="Layout\Anchors.h" />
-    <ClInclude Include="Layout\ArrangedChildrens.h" />
-    <ClInclude Include="Layout\ArrangedWidget.h" />
-    <ClInclude Include="Layout\FlowDirection.h" />
-    <ClInclude Include="Layout\Geometry.h" />
-    <ClInclude Include="Layout\LayoutGeometry.h" />
-    <ClInclude Include="Layout\LayoutImpl.h" />
-    <ClInclude Include="Layout\Margin.h" />
-    <ClInclude Include="Layout\Orientation.h" />
-    <ClInclude Include="Layout\PaintGeometry.h" />
-    <ClInclude Include="Layout\SlateRotatedRect.h" />
-    <ClInclude Include="Layout\Scale2D.h" />
-    <ClInclude Include="Layout\Shear2D.h" />
-    <ClInclude Include="Layout\SlateLayoutTransform.h" />
-    <ClInclude Include="Layout\SlateRenderTransform.h" />
-    <ClInclude Include="Layout\TransformCalculus2D.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="SlateMinimal.h" />
-    <ClInclude Include="Widgets\CompoundWidget.h" />
-    <ClInclude Include="Widgets\Widget.h" />
-    <ClInclude Include="Widgets\Window.h" />
+    <ClInclude Include="Private\pch.h" />
+    <ClInclude Include="Public\Concepts\LayoutTransform.h" />
+    <ClInclude Include="Public\Draw\PaintArgs.h" />
+    <ClInclude Include="Public\Draw\SlateBrush.h" />
+    <ClInclude Include="Public\Draw\SlateDrawElement.h" />
+    <ClInclude Include="Public\Draw\SlateVisibility.h" />
+    <ClInclude Include="Public\Draw\SlateWindowElementList.h" />
+    <ClInclude Include="Public\Draw\WidgetClipping.h" />
+    <ClInclude Include="Public\Layout\Anchors.h" />
+    <ClInclude Include="Public\Layout\ArrangedChildrens.h" />
+    <ClInclude Include="Public\Layout\ArrangedWidget.h" />
+    <ClInclude Include="Public\Layout\FlowDirection.h" />
+    <ClInclude Include="Public\Layout\Geometry.h" />
+    <ClInclude Include="Public\Layout\LayoutGeometry.h" />
+    <ClInclude Include="Public\Layout\LayoutImpl.h" />
+    <ClInclude Include="Public\Layout\Margin.h" />
+    <ClInclude Include="Public\Layout\Orientation.h" />
+    <ClInclude Include="Public\Layout\PaintGeometry.h" />
+    <ClInclude Include="Public\Layout\Scale2D.h" />
+    <ClInclude Include="Public\Layout\Shear2D.h" />
+    <ClInclude Include="Public\Layout\SlateLayoutTransform.h" />
+    <ClInclude Include="Public\Layout\SlateRenderTransform.h" />
+    <ClInclude Include="Public\Layout\SlateRotatedRect.h" />
+    <ClInclude Include="Public\Layout\TransformCalculus2D.h" />
+    <ClInclude Include="Public\SlateMinimal.h" />
+    <ClInclude Include="Public\Widgets\CompoundWidget.h" />
+    <ClInclude Include="Public\Widgets\Widget.h" />
+    <ClInclude Include="Public\Widgets\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Draw\PaintArgs.cpp" />
-    <ClCompile Include="Draw\SlateWindowElementList.cpp" />
-    <ClCompile Include="Layout\ArrangedChildrens.cpp" />
-    <ClCompile Include="Layout\ArrangedWidget.cpp" />
-    <ClCompile Include="Layout\Geometry.cpp" />
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="Private\Draw\PaintArgs.cpp" />
+    <ClCompile Include="Private\Draw\SlateWindowElementList.cpp" />
+    <ClCompile Include="Private\Layout\ArrangedChildrens.cpp" />
+    <ClCompile Include="Private\Layout\ArrangedWidget.cpp" />
+    <ClCompile Include="Private\Layout\Geometry.cpp" />
+    <ClCompile Include="Private\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Widgets\CompoundWidget.cpp" />
-    <ClCompile Include="Widgets\Widget.cpp" />
-    <ClCompile Include="Widgets\Window.cpp" />
+    <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Widget.cpp" />
+    <ClCompile Include="Private\Widgets\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

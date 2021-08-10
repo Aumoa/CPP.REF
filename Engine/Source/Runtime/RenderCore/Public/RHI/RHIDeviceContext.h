@@ -35,6 +35,7 @@ public:
 	/// <param name="device"> The logical device. </param>
 	/// <param name="commandType"> Specify command type for usage. </param>
 	RHIDeviceContext(RHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
+	~RHIDeviceContext() override;
 
 	/// <summary>
 	/// Mark the beginning of a series of commands.

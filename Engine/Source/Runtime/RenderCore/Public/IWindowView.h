@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-struct RENDERCORE_API IWindowView : virtual public Object
+struct IWindowView : virtual public Object
 {
 	/// <summary>
 	/// Get window handle that platform specialized.

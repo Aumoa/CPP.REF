@@ -19,13 +19,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -57,12 +57,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SLATECORE_API=__declspec(dllimport);_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\SlateCore\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>5105</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -87,12 +87,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SLATECORE_API=__declspec(dllimport);NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\SlateCore\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>5105</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -128,155 +128,150 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Assets\AssetImporter.cpp" />
-    <ClCompile Include="Assets\Parser\AssimpParser.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)ThirdParty\Source\assimp\include\;$(SolutionDir)ThirdParty\Source\assimp\generated\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)ThirdParty\Source\assimp\include\;$(SolutionDir)ThirdParty\Source\assimp\generated\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ASSIMP_API=</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ASSIMP_API=</PreprocessorDefinitions>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Assets\StaticMesh.cpp" />
-    <ClCompile Include="Camera\PlayerCameraManager.cpp" />
-    <ClCompile Include="Camera\CameraComponent.cpp" />
-    <ClCompile Include="Components\ActorComponent.cpp" />
-    <ClCompile Include="Components\InputComponent.cpp" />
-    <ClCompile Include="Components\MeshComponent.cpp" />
-    <ClCompile Include="Components\PrimitiveComponent.cpp" />
-    <ClCompile Include="Components\SceneComponent.cpp" />
-    <ClCompile Include="Components\StaticMeshComponent.cpp" />
-    <ClCompile Include="GameEngine.cpp" />
-    <ClCompile Include="GameFramework\Actor.cpp" />
-    <ClCompile Include="GameFramework\AIController.cpp" />
-    <ClCompile Include="GameFramework\Controller.cpp" />
-    <ClCompile Include="GameFramework\LocalPlayer.cpp" />
-    <ClCompile Include="GameFramework\Pawn.cpp" />
-    <ClCompile Include="GameFramework\Player.cpp" />
-    <ClCompile Include="GameFramework\PlayerController.cpp" />
-    <ClCompile Include="GameInstance.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Info\GameMode.cpp" />
-    <ClCompile Include="Info\Info.cpp" />
-    <ClCompile Include="Level\Level.cpp" />
-    <ClCompile Include="Level\World.cpp" />
-    <ClCompile Include="LogGame.cpp" />
-    <ClCompile Include="Materials\Material.cpp" />
-    <ClCompile Include="Materials\MaterialInstance.cpp" />
-    <ClCompile Include="Misc\GeometryGenerator.cpp" />
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="Private\Assets\AssetImporter.cpp" />
+    <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
+    <ClCompile Include="Private\Assets\Parser\MDLParser.cpp" />
+    <ClCompile Include="Private\Assets\StaticMesh.cpp" />
+    <ClCompile Include="Private\Camera\CameraComponent.cpp" />
+    <ClCompile Include="Private\Camera\PlayerCameraManager.cpp" />
+    <ClCompile Include="Private\Components\ActorComponent.cpp" />
+    <ClCompile Include="Private\Components\InputComponent.cpp" />
+    <ClCompile Include="Private\Components\MeshComponent.cpp" />
+    <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
+    <ClCompile Include="Private\Components\SceneComponent.cpp" />
+    <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Private\GameEngine.cpp" />
+    <ClCompile Include="Private\GameFramework\Actor.cpp" />
+    <ClCompile Include="Private\GameFramework\AIController.cpp" />
+    <ClCompile Include="Private\GameFramework\Controller.cpp" />
+    <ClCompile Include="Private\GameFramework\LocalPlayer.cpp" />
+    <ClCompile Include="Private\GameFramework\Pawn.cpp" />
+    <ClCompile Include="Private\GameFramework\Player.cpp" />
+    <ClCompile Include="Private\GameFramework\PlayerController.cpp" />
+    <ClCompile Include="Private\GameInstance.cpp" />
+    <ClCompile Include="Private\GameObject.cpp" />
+    <ClCompile Include="Private\Info\GameMode.cpp" />
+    <ClCompile Include="Private\Info\Info.cpp" />
+    <ClCompile Include="Private\Level\Level.cpp" />
+    <ClCompile Include="Private\Level\World.cpp" />
+    <ClCompile Include="Private\LogGame.cpp" />
+    <ClCompile Include="Private\Materials\Material.cpp" />
+    <ClCompile Include="Private\Materials\MaterialInstance.cpp" />
+    <ClCompile Include="Private\Misc\GeometryGenerator.cpp" />
+    <ClCompile Include="Private\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="PlatformMisc\WinKeyboard.cpp" />
-    <ClCompile Include="PlatformMisc\WinMouse.cpp" />
-    <ClCompile Include="Scene\PrimitiveSceneProxy.cpp" />
-    <ClCompile Include="Scene\Scene.cpp" />
-    <ClCompile Include="Scene\SceneRenderer.cpp" />
-    <ClCompile Include="Scene\SceneVisibility.cpp" />
-    <ClCompile Include="Scene\StaticMeshRenderData.cpp" />
-    <ClCompile Include="Scene\StaticMeshSceneProxy.cpp" />
-    <ClCompile Include="Shaders\ColorShader\ColorShader.cpp">
+    <ClCompile Include="Private\PlatformMisc\WinKeyboard.cpp" />
+    <ClCompile Include="Private\PlatformMisc\WinMouse.cpp" />
+    <ClCompile Include="Private\Scene\PrimitiveSceneProxy.cpp" />
+    <ClCompile Include="Private\Scene\Scene.cpp" />
+    <ClCompile Include="Private\Scene\SceneRenderer.cpp" />
+    <ClCompile Include="Private\Scene\SceneVisibility.cpp" />
+    <ClCompile Include="Private\Scene\StaticMeshRenderData.cpp" />
+    <ClCompile Include="Private\Scene\StaticMeshSceneProxy.cpp" />
+    <ClCompile Include="Private\Shaders\ColorShader\ColorShader.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Shaders\ColorShader\ColorVertexFactory.cpp" />
-    <ClCompile Include="Shaders\SlateShader\SlateShader.cpp">
+    <ClCompile Include="Private\Shaders\ColorShader\ColorVertexFactory.cpp" />
+    <ClCompile Include="Private\Shaders\SlateShader\SlateShader.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Shaders\TransparentShader\TransparentShader.cpp">
+    <ClCompile Include="Private\Shaders\TransparentShader\TransparentShader.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Ticking\TickFunction.cpp" />
+    <ClCompile Include="Private\TIcking\TickFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\ColorShader\ColorShaderPS.hlsl">
+    <ClInclude Include="Private\pch.h" />
+    <ClInclude Include="Public\Assets\AssetImporter.h" />
+    <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
+    <ClInclude Include="Public\Assets\Parser\MDLParser.h" />
+    <ClInclude Include="Public\Assets\Parser\ParserBase.h" />
+    <ClInclude Include="Public\Assets\StaticMesh.h" />
+    <ClInclude Include="Public\Camera\CameraComponent.h" />
+    <ClInclude Include="Public\Camera\PlayerCameraManager.h" />
+    <ClInclude Include="Public\Components\ActorComponent.h" />
+    <ClInclude Include="Public\Components\InputComponent.h" />
+    <ClInclude Include="Public\Components\MeshComponent.h" />
+    <ClInclude Include="Public\Components\PrimitiveComponent.h" />
+    <ClInclude Include="Public\Components\SceneComponent.h" />
+    <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\GameEngine.h" />
+    <ClInclude Include="Public\GameEnums.h" />
+    <ClInclude Include="Public\GameFramework\Actor.h" />
+    <ClInclude Include="Public\GameFramework\AIController.h" />
+    <ClInclude Include="Public\GameFramework\Controller.h" />
+    <ClInclude Include="Public\GameFramework\LocalPlayer.h" />
+    <ClInclude Include="Public\GameFramework\Pawn.h" />
+    <ClInclude Include="Public\GameFramework\Player.h" />
+    <ClInclude Include="Public\GameFramework\PlayerController.h" />
+    <ClInclude Include="Public\GameInstance.h" />
+    <ClInclude Include="Public\GameMinimal.h" />
+    <ClInclude Include="Public\GameObject.h" />
+    <ClInclude Include="Public\GameStructures.h" />
+    <ClInclude Include="Public\IFrameworkView.h" />
+    <ClInclude Include="Public\Info\GameMode.h" />
+    <ClInclude Include="Public\Info\Info.h" />
+    <ClInclude Include="Public\Level\Level.h" />
+    <ClInclude Include="Public\Level\World.h" />
+    <ClInclude Include="Public\LogGame.h" />
+    <ClInclude Include="Public\Materials\Material.h" />
+    <ClInclude Include="Public\Materials\MaterialInstance.h" />
+    <ClInclude Include="Public\Misc\Bezier.h" />
+    <ClInclude Include="Public\Misc\GeometryGenerator.h" />
+    <ClInclude Include="Public\PlatformMisc\BitfieldInputChangeTracker.h" />
+    <ClInclude Include="Public\PlatformMisc\KeyboardTracker.h" />
+    <ClInclude Include="Public\PlatformMisc\MouseStateTracker.h" />
+    <ClInclude Include="Public\PlatformMisc\WinKeyboard.h" />
+    <ClInclude Include="Public\PlatformMisc\WinMouse.h" />
+    <ClInclude Include="Public\Scene\PrimitiveSceneProxy.h" />
+    <ClInclude Include="Public\Scene\Scene.h" />
+    <ClInclude Include="Public\Scene\SceneRenderer.h" />
+    <ClInclude Include="Public\Scene\SceneVisibility.h" />
+    <ClInclude Include="Public\Scene\StaticMeshRenderData.h" />
+    <ClInclude Include="Public\Scene\StaticMeshSceneProxy.h" />
+    <ClInclude Include="Public\Shaders\ColorShader\ColorShader.h" />
+    <ClInclude Include="Public\Shaders\ColorShader\ColorVertexFactory.h" />
+    <ClInclude Include="Public\Shaders\SlateShader\SlateShader.h" />
+    <ClInclude Include="Public\Shaders\TransparentShader\TransparentShader.h" />
+    <ClInclude Include="Public\SubclassOf.h" />
+    <ClInclude Include="Public\Ticking\TickFunction.h" />
+    <ClInclude Include="Public\Ticking\TickingGroup.h" />
+    <ClInclude Include="Public\Ticking\TickScheduler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Private\Shaders\SlateShader\SlateCommon.hlsli" />
+    <None Include="Public\Misc\TeapotData.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Private\Shaders\ColorShader\ColorShaderPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shaders\ColorShader\ColorShaderVS.hlsl">
+    <FxCompile Include="Private\Shaders\ColorShader\ColorShaderVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shaders\SlateShader\SlateShaderPS.hlsl">
+    <FxCompile Include="Private\Shaders\SlateShader\SlateShaderPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shaders\SlateShader\SlateShaderVS.hlsl">
+    <FxCompile Include="Private\Shaders\SlateShader\SlateShaderVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shaders\TransparentShader\TransparentShaderPS.hlsl">
+    <FxCompile Include="Private\Shaders\TransparentShader\TransparentShaderPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shaders\TransparentShader\TransparentShaderVS.hlsl">
+    <FxCompile Include="Private\Shaders\TransparentShader\TransparentShaderVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Assets\AssetImporter.h" />
-    <ClInclude Include="Assets\Parser\AssimpParser.h" />
-    <ClInclude Include="Assets\Parser\ParserBase.h" />
-    <ClInclude Include="Assets\StaticMesh.h" />
-    <ClInclude Include="Camera\CameraComponent.h" />
-    <ClInclude Include="Camera\PlayerCameraManager.h" />
-    <ClInclude Include="Components\ActorComponent.h" />
-    <ClInclude Include="Components\InputComponent.h" />
-    <ClInclude Include="Components\MeshComponent.h" />
-    <ClInclude Include="Components\PrimitiveComponent.h" />
-    <ClInclude Include="Components\SceneComponent.h" />
-    <ClInclude Include="Components\StaticMeshComponent.h" />
-    <ClInclude Include="GameEngine.h" />
-    <ClInclude Include="GameEnums.h" />
-    <ClInclude Include="GameFramework\Actor.h" />
-    <ClInclude Include="GameFramework\AIController.h" />
-    <ClInclude Include="GameFramework\Controller.h" />
-    <ClInclude Include="GameFramework\LocalPlayer.h" />
-    <ClInclude Include="GameFramework\Pawn.h" />
-    <ClInclude Include="GameFramework\Player.h" />
-    <ClInclude Include="GameFramework\PlayerController.h" />
-    <ClInclude Include="GameInstance.h" />
-    <ClInclude Include="GameMinimal.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="GameStructures.h" />
-    <ClInclude Include="IFrameworkView.h" />
-    <ClInclude Include="Info\GameMode.h" />
-    <ClInclude Include="Info\Info.h" />
-    <ClInclude Include="Level\Level.h" />
-    <ClInclude Include="Level\World.h" />
-    <ClInclude Include="LogGame.h" />
-    <ClInclude Include="Materials\Material.h" />
-    <ClInclude Include="Materials\MaterialInstance.h" />
-    <ClInclude Include="Misc\Bezier.h" />
-    <ClInclude Include="Misc\GeometryGenerator.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="PlatformMisc\BitfieldInputChangeTracker.h" />
-    <ClInclude Include="PlatformMisc\KeyboardTracker.h" />
-    <ClInclude Include="PlatformMisc\MouseStateTracker.h" />
-    <ClInclude Include="PlatformMisc\WinKeyboard.h" />
-    <ClInclude Include="PlatformMisc\WinMouse.h" />
-    <ClInclude Include="Scene\PrimitiveSceneProxy.h" />
-    <ClInclude Include="Scene\Scene.h" />
-    <ClInclude Include="Scene\SceneRenderer.h" />
-    <ClInclude Include="Scene\SceneVisibility.h" />
-    <ClInclude Include="Scene\StaticMeshRenderData.h" />
-    <ClInclude Include="Scene\StaticMeshSceneProxy.h" />
-    <ClInclude Include="Shaders\ColorShader\ColorShader.h" />
-    <ClInclude Include="Shaders\ColorShader\ColorVertexFactory.h" />
-    <ClInclude Include="Shaders\SlateShader\SlateShader.h" />
-    <ClInclude Include="Shaders\TransparentShader\TransparentShader.h" />
-    <ClInclude Include="SubclassOf.h" />
-    <ClInclude Include="Ticking\TickFunction.h" />
-    <ClInclude Include="Ticking\TickingGroup.h" />
-    <ClInclude Include="Ticking\TickScheduler.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Misc\TeapotData.inl" />
-    <None Include="Shaders\SlateShader\SlateCommon.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
