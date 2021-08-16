@@ -9,6 +9,8 @@
 #include "RHI/RHIRenderTargetView.h"
 #include "RHI/RHIDepthStencilView.h"
 #include "RHI/RHIResource.h"
+#include "RHI/RHIShaderDescriptorView.h"
+#include "RHI/RHICommandQueue.h"
 
 using namespace std;
 
@@ -36,6 +38,8 @@ void RHIDeviceContext::Begin()
 		ID3D12Device* d3ddev = GetDevice()->GetDevice();
 		HR(LogRHI, d3ddev->CreateCommandList(0, (D3D12_COMMAND_LIST_TYPE)_type, _allocator.Get(), nullptr, IID_PPV_ARGS(&_commandList)));
 	}
+
+	_resourceView = nullptr;
 }
 
 void RHIDeviceContext::End()
@@ -146,6 +150,71 @@ void RHIDeviceContext::SetGraphicsRootConstantBufferView(uint32 index, uint64 bu
 void RHIDeviceContext::SetGraphicsRoot32BitConstants(uint32 index, uint32 num32BitsToSet, const void* srcData, uint32 destOffsetIn32BitValues)
 {
 	_commandList->SetGraphicsRoot32BitConstants(index, num32BitsToSet, srcData, destOffsetIn32BitValues);
+}
+
+void RHIDeviceContext::SetGraphicsRootShaderResourceView(uint32 index, uint64 bufferLocation)
+{
+	_commandList->SetGraphicsRootShaderResourceView(index, (D3D12_GPU_VIRTUAL_ADDRESS)bufferLocation);
+}
+
+void RHIDeviceContext::SetGraphicsRootShaderResourceView(uint32 index, RHIShaderResourceView* resourceView)
+{
+	size_t descriptorIndex = _resourceView->ApplyPayload(resourceView);
+	_commandList->SetGraphicsRootDescriptorTable(index, _resourceView->GetGPUDescriptorHandle(descriptorIndex));
+}
+
+void RHIDeviceContext::SetShaderDescriptorViews(RHIShaderDescriptorView* resourceView, RHIShaderDescriptorView* samplerView)
+{
+	ID3D12DescriptorHeap* heaps[] = { nullptr, nullptr };
+	size_t idx = 0;
+
+	checkf(!samplerView, L"NOT IMPLEMENTED");
+
+	auto commitHeap = [&](auto& view)
+	{
+		if (view)
+		{
+			heaps[idx++] = view->_descriptorHeap.Get();
+
+			if (view->_pendingDestroyHeap)
+			{
+				AddPendingDestroyObject(view->_pendingDestroyHeap.Detach());
+				view->_pendingDestroyHeap.Reset();
+			}
+		}
+	};
+
+	commitHeap(resourceView);
+	commitHeap(samplerView);
+
+	_commandList->SetDescriptorHeaps((UINT)idx, heaps);
+	_resourceView = resourceView;
+}
+
+void RHIDeviceContext::AddPendingDestroyObject(Object* object)
+{
+	_pendingDestroyObjects.emplace_back(object);
+}
+
+void RHIDeviceContext::AddPendingDestroyObject(IUnknown* unknown)
+{
+	_pendingDestroyUnknowns.emplace_back(unknown);
+}
+
+void RHIDeviceContext::FlushPendingDestroyObjects(uint64 fenceValue, RHICommandQueue* queue)
+{
+	for (size_t i = 0; i < _pendingDestroyObjects.size(); ++i)
+	{
+		queue->AddGarbageObject(fenceValue, _pendingDestroyObjects[i]);
+	}
+
+	for (size_t i = 0; i < _pendingDestroyUnknowns.size(); ++i)
+	{
+		queue->AddGarbageObject(fenceValue, _pendingDestroyUnknowns[i]);
+	}
+
+	_pendingDestroyObjects.resize(0);
+	_pendingDestroyUnknowns.resize(0);
 }
 
 ID3D12CommandList* RHIDeviceContext::GetCommandList() const

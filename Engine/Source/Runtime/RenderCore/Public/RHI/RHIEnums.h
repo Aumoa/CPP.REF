@@ -279,6 +279,7 @@ enum class ERHIShaderParameterType
 
     ParameterCollection,
     ScalarParameterConstants,
+    StructuredBuffer
 };
 
 enum class ERHIResourceFlags

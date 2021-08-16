@@ -6,9 +6,11 @@
 #include "Draw/SlateDrawElement.h"
 #include "Layout/SlateLayoutTransform.h"
 
+class GameEngine;
 class SWindow;
+class RHIDeviceContext;
 
-class SlateWindowElementList : virtual public Object
+class SLATECORE_API SlateWindowElementList : virtual public Object
 {
 public:
 	using Super = Object;
@@ -16,32 +18,41 @@ public:
 private:
 	const SWindow* _paintWindow = nullptr;
 	std::vector<SlateDrawElement> _drawElements;
+	RHIResource* _dynamicElementBuffer = nullptr;
 
 public:
-	SlateWindowElementList(const SWindow* paintWindow) : Super()
-		, _paintWindow(paintWindow)
-	{
-	}
+	SlateWindowElementList(const SWindow* paintWindow);
 
-	void SortByLayer()
+	void SortByLayer();
+	void Add(const SlateDrawElement& rhs);
+	void Clear();
+
+	template<class TShader>
+	uint64 ApplyAndCreateBuffer(RHIDeviceContext* deviceContext, TShader* shader)
 	{
-		auto _Pred = [](const SlateDrawElement& lhs, const SlateDrawElement& rhs)
+		using ShaderDrawType = decltype(shader->MakeElement(std::declval<SlateRenderTransform>(), std::declval<Vector2>(), std::declval<float>()));
+		std::vector<ShaderDrawType> drawElements(_drawElements.size());
+
+		for (size_t i = 0; i < drawElements.size(); ++i)
 		{
-			return lhs.Layer - rhs.Layer;
-		};
+			const SlateDrawElement& element = _drawElements[i];
 
-		sort(_drawElements.begin(), _drawElements.end(), _Pred);
+			if (element.Transform.HasRenderTransform())
+			{
+				drawElements[i] = shader->MakeElement(
+					element.Transform.GetAccumulatedRenderTransform(),
+					element.Transform.GetLocalSize(),
+					(float)element.Layer
+				);
+			}
+		}
+
+		return CreateBuffer(deviceContext, drawElements.data(), sizeof(ShaderDrawType) * drawElements.size());
 	}
 
-	std::span<SlateDrawElement const> GetSpan() const
-	{
-		return _drawElements;
-	}
-
-	void Add(const SlateDrawElement& rhs)
-	{
-		_drawElements.emplace_back(rhs);
-	}
+	std::span<SlateDrawElement const> GetSpan() const;
+	int32 Num() const;
+	const SWindow* GetPaintWindow() const;
 
 	template<class... TArgs>
 	SlateDrawElement& Emplace(TArgs&&... args)
@@ -49,13 +60,6 @@ public:
 		return _drawElements.emplace_back(std::forward<TArgs>(args)...);
 	}
 
-	int32 Num() const
-	{
-		return (int32)_drawElements.size();
-	}
-
-	const SWindow* GetPaintWindow() const
-	{
-		return _paintWindow;
-	}
+private:
+	uint64 CreateBuffer(RHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes);
 };

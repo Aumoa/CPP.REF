@@ -19,6 +19,12 @@ uint64 RHIResource::GetGPUVirtualAddress() const
 	return _resource->GetGPUVirtualAddress();
 }
 
+uint64 RHIResource::GetBufferSize() const
+{
+	D3D12_RESOURCE_DESC desc = _resource->GetDesc();
+	return desc.Width * desc.Height * desc.DepthOrArraySize;
+}
+
 void* RHIResource::GetMappingPointer() const
 {
 	if (_ptr == nullptr)

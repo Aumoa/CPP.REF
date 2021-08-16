@@ -70,6 +70,11 @@ public:
 	void WaitLastSignal();
 
 	/// <summary>
+	/// Get last signal number.
+	/// </summary>
+	uint64 GetLastSignal() const;
+
+	/// <summary>
 	/// Execute a device context.
 	/// </summary>
 	uint64 ExecuteDeviceContext(RHIDeviceContext* deviceContext)

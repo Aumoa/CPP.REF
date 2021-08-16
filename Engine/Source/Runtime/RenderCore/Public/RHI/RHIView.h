@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "RHIDeviceChild.h"
 
+class RHIShaderDescriptorView;
+
 /// <summary>
 /// Represents resource view for binding to gpu context.
 /// </summary>

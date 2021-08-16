@@ -8,6 +8,7 @@
 #include "Shaders/ColorShader/ColorVertexFactory.h"
 #include "Shaders/ColorShader/ColorShader.h"
 #include "Shaders/TransparentShader/TransparentShader.h"
+#include "Shaders/SlateShader/SlateShader.h"
 #include "Components/InputComponent.h"
 #include "Level/World.h"
 #include "Camera/PlayerCameraManager.h"
@@ -53,6 +54,8 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_dsv = CreateSubobject<RHIDepthStencilView>(_device, 1);
 	_transparentShader = CreateSubobject<TransparentShader>(_device);
 	_transparentShader->Compile(_colorVertexFactory);
+	_slateShader = CreateSubobject<SlateShader>(_device);
+	_slateShader->Compile(nullptr);
 
 	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
@@ -189,7 +192,9 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	LocalPlayer* localPlayer = _gameInstance->GetLocalPlayer();
 	if (localPlayer)
 	{
-		localPlayer->Render();
+		_deviceContext->SetGraphicsShader(_slateShader);
+		_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+		localPlayer->Render(_deviceContext, _slateShader);
 	}
 
 	_deviceContext->TransitionBarrier(1, &barrierEnd);

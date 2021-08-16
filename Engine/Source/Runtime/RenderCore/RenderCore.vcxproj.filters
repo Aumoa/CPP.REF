@@ -46,6 +46,12 @@
     <ClCompile Include="Private\RHI\RHICommandQueue.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\RHI\RHIShaderDescriptorView.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIShaderResourceView.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -124,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="Public\IWindowView.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIShaderDescriptorView.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIShaderResourceView.h">
+      <Filter>Public\RHI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -51,6 +51,11 @@ void RHICommandQueue::WaitLastSignal()
 	WaitSignal(_signalNumber);
 }
 
+uint64 RHICommandQueue::GetLastSignal() const
+{
+	return _signalNumber;
+}
+
 uint64 RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts)
 {
 	vector<ID3D12CommandList*> commandLists;
@@ -66,7 +71,14 @@ uint64 RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceCont
 	}
 
 	_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
-	return Signal();
+	uint64 fenceValue = Signal();
+
+	for (size_t i = 0; i < deviceContexts.size(); ++i)
+	{
+		deviceContexts[i]->FlushPendingDestroyObjects(fenceValue, this);
+	}
+
+	return fenceValue;
 }
 
 int32 RHICommandQueue::Collect()

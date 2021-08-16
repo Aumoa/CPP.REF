@@ -2,12 +2,10 @@
 
 #include "SlateCommon.hlsli"
 
-Texture2D gTexture : register(t0);
-SamplerState gSampler : register(s0);
-
 Pixel Main(in Fragment frag)
 {
 	Pixel px;
-	px.Color = gTexture.Sample(gSampler, frag.TexCoord);
+	//px.Color = gTexture.Sample(gSampler, frag.TexCoord);
+	px.Color = 1.0f;
 	return px;
 }

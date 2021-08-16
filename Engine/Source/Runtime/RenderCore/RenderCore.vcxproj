@@ -111,6 +111,8 @@
     <ClCompile Include="Private\RHI\RHIRenderTargetView.cpp" />
     <ClCompile Include="Private\RHI\RHIResource.cpp" />
     <ClCompile Include="Private\RHI\RHIShader.cpp" />
+    <ClCompile Include="Private\RHI\RHIShaderDescriptorView.cpp" />
+    <ClCompile Include="Private\RHI\RHIShaderResourceView.cpp" />
     <ClCompile Include="Private\RHI\RHISwapChain.cpp" />
     <ClCompile Include="Private\RHI\RHITexture.cpp" />
     <ClCompile Include="Private\RHI\RHITexture2D.cpp" />
@@ -138,6 +140,8 @@
     <ClInclude Include="Public\RHI\RHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\RHIResource.h" />
     <ClInclude Include="Public\RHI\RHIShader.h" />
+    <ClInclude Include="Public\RHI\RHIShaderDescriptorView.h" />
+    <ClInclude Include="Public\RHI\RHIShaderResourceView.h" />
     <ClInclude Include="Public\RHI\RHIStructures.h" />
     <ClInclude Include="Public\RHI\RHISwapChain.h" />
     <ClInclude Include="Public\RHI\RHITexture.h" />

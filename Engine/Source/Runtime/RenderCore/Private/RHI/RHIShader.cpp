@@ -42,7 +42,8 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 				{
 					.ShaderRegister = myParam.ParameterCollection.ShaderRegister,
 					.RegisterSpace = myParam.ParameterCollection.RegisterSpace
-				}
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
 			};
 			break;
 		case ERHIShaderParameterType::ScalarParameterConstants:
@@ -54,7 +55,20 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 					.ShaderRegister = myParam.ScalarConstantsParameter.ShaderRegister,
 					.RegisterSpace = myParam.ScalarConstantsParameter.RegisterSpace,
 					.Num32BitValues = myParam.ScalarConstantsParameter.Num32Bits
-				}
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+			};
+			break;
+		case ERHIShaderParameterType::StructuredBuffer:
+			rootParameters.emplace_back() =
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
+				.Descriptor =
+				{
+					.ShaderRegister = myParam.StructuredBuffer.ShaderRegister,
+					.RegisterSpace = 0
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
 			};
 			break;
 		default:
@@ -70,10 +84,11 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 		.pParameters = rootParameters.empty() ? nullptr : rootParameters.data(),
 		.NumStaticSamplers = 0,
 		.pStaticSamplers = nullptr,
-		.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+		.Flags
+			= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
 	};
 
 	ComPtr<ID3DBlob> blob, error;
@@ -96,23 +111,28 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 	HR(LogRHI, dev->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&_rs)));
 
 	// Make vertex declaration to input element.
-	vector<RHIVertexElement> declaration = vertexDeclaration->GetVertexDeclaration();
-	vector<D3D12_INPUT_ELEMENT_DESC> inputElements(declaration.size());
-
-	for (size_t i = 0; i < inputElements.size(); ++i)
+	vector<RHIVertexElement> declaration;
+	vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
+	if (vertexDeclaration)
 	{
-		auto& element = declaration[i];
+		declaration = vertexDeclaration->GetVertexDeclaration();
+		inputElements.resize(declaration.size());
 
-		inputElements[i] =
+		for (size_t i = 0; i < inputElements.size(); ++i)
 		{
-			.SemanticName = element.SemanticName.c_str(),
-			.SemanticIndex = element.SemanticIndex,
-			.Format = (DXGI_FORMAT)element.Format,
-			.InputSlot = element.InputSlot,
-			.AlignedByteOffset = element.AlignedByteOffset,
-			.InputSlotClass = (D3D12_INPUT_CLASSIFICATION)element.InputSlotClass,
-			.InstanceDataStepRate = 0
-		};
+			auto& element = declaration[i];
+
+			inputElements[i] =
+			{
+				.SemanticName = element.SemanticName.c_str(),
+				.SemanticIndex = element.SemanticIndex,
+				.Format = (DXGI_FORMAT)element.Format,
+				.InputSlot = element.InputSlot,
+				.AlignedByteOffset = element.AlignedByteOffset,
+				.InputSlotClass = (D3D12_INPUT_CLASSIFICATION)element.InputSlotClass,
+				.InstanceDataStepRate = 0
+			};
+		}
 	}
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psd =

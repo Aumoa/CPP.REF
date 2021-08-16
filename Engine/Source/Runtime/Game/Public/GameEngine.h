@@ -19,6 +19,7 @@ class ColorShader;
 class AssetImporter;
 class RHITexture2D;
 class TransparentShader;
+class SlateShader;
 
 /// <summary>
 /// Represents game engine that manage core resources.
@@ -43,6 +44,7 @@ private:
 	RHITexture2D* _depthBuffer = nullptr;
 	RHIDepthStencilView* _dsv = nullptr;
 	TransparentShader* _transparentShader = nullptr;
+	SlateShader* _slateShader = nullptr;
 
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;

@@ -29,6 +29,11 @@ public:
 	/// </summary>
 	virtual uint64 GetGPUVirtualAddress() const;
 
+	/// <summary>
+	/// Get buffer total size in bytes.
+	/// </summary>
+	virtual uint64 GetBufferSize() const;
+
 	virtual void* GetMappingPointer() const;
 
 public /*internal*/:

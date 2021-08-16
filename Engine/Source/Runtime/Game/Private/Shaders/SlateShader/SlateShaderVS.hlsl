@@ -26,6 +26,7 @@ Fragment Main(in uint vId : SV_VERTEXID, in uint iId : SV_INSTANCEID)
 	SlateElement myElement = gElements[iId];
 
 	Fragment frag;
+	//frag.Position = float4(gPos[vId], 0.0f, 1.0f);
 	frag.Position = float4(GetSlateNDCLocation(gConstants, myElement, gPos[vId]), 1.0f);
 	//frag.Position = float4(gPos[vId] / (gConstants.ScreenSize * 0.025f), 0, 1.0f);
 	frag.TexCoord = gTex[vId];

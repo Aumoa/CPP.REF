@@ -7,6 +7,7 @@
 #include "IFrameworkView.h"
 #include "Widgets/Window.h"
 #include "Draw/SlateWindowElementList.h"
+#include "Shaders/SlateShader/SlateShader.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -27,6 +28,8 @@ void LocalPlayer::Init(GameEngine* engine)
 	_frameworkView->Size.AddObject(this, &LocalPlayer::OnResizedApp);
 	// And apply size immediately.
 	_slateWindow->SetWindowSize(Vector2((float)_frameworkView->GetFrameworkWidth(), (float)_frameworkView->GetFrameworkHeight()));
+
+	_drawElements = CreateSubobject<SlateWindowElementList>(_slateWindow);
 }
 
 void LocalPlayer::Tick(duration<float> elapsedTime)
@@ -34,10 +37,13 @@ void LocalPlayer::Tick(duration<float> elapsedTime)
 	_slateWindow->ExecuteTick(elapsedTime);
 }
 
-void LocalPlayer::Render()
+void LocalPlayer::Render(RHIDeviceContext* deviceContext, SlateShader* shader)
 {
-	SlateWindowElementList drawElements(_slateWindow);
-	_slateWindow->ExecutePaint(&drawElements);
+	_drawElements->Clear();
+	_slateWindow->ExecutePaint(_drawElements);
+
+	_drawElements->Add(SlateDrawElement(SlateBrush(), PaintGeometry(Vector2(100.0f, 100.0f), SlateRenderTransform::Identity()), 0));
+	shader->RenderElements(deviceContext, _slateWindow->GetDesiredSize(), _drawElements);
 }
 
 void LocalPlayer::OnResizedApp(int32 x, int32 y)
