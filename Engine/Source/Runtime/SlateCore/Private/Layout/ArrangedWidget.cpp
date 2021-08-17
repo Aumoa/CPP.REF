@@ -5,15 +5,13 @@
 #include "Layout/LayoutImpl.h"
 #include "Widgets/Widget.h"
 
-using namespace std;
-
 ArrangedWidget::ArrangedWidget(SWidget* widget, const Geometry& geometry)
 	: _widget(widget)
 	, _geometry(geometry)
 {
 }
 
-wstring ArrangedWidget::ToString(wstring_view formatArgs) const
+std::wstring ArrangedWidget::ToString(std::wstring_view formatArgs) const
 {
 	return format(L"{} @ {}", _widget->ToString(formatArgs), _geometry.ToString(formatArgs));
 }

@@ -4,8 +4,6 @@
 #include "Container/BitArray.h"
 #include "CoreAssert.h"
 
-using namespace std;
-
 ConstBitIterator::ConstBitIterator()
 {
 }
@@ -39,7 +37,7 @@ BitArray::BitArray()
 {
 }
 
-BitArray::BitArray(initializer_list<bool> initializer)
+BitArray::BitArray(std::initializer_list<bool> initializer)
 {
 	Init(initializer);
 }
@@ -71,7 +69,7 @@ void BitArray::Init(bool bValue, size_t numBits)
 	memset(_bitsRaw, bValue ? 0xFF : 0, sizeof(int32) * _bits.size());
 }
 
-void BitArray::Init(initializer_list<bool> initializer)
+void BitArray::Init(std::initializer_list<bool> initializer)
 {
 	_numBits = initializer.size();
 

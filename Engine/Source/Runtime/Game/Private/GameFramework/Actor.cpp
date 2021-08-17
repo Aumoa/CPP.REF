@@ -6,16 +6,11 @@
 #include "Level/World.h"
 #include "Components/PrimitiveComponent.h"
 
-using namespace std;
-using namespace std::chrono;
-
-using enum ELogVerbosity;
-
-void AActor::ActorTickFunction::ExecuteTick(duration<float> elapsedTime)
+void AActor::ActorTickFunction::ExecuteTick(std::chrono::duration<float> elapsedTime)
 {
 	if (_target == nullptr)
 	{
-		LogSystem::Log(LogTicking, Error, L"Target is nullptr.");
+		SE_LOG(LogTicking, Error, L"Target is nullptr.");
 		return;
 	}
 
@@ -32,7 +27,7 @@ AActor::AActor() : Super()
 {
 }
 
-void AActor::TickActor(duration<float> elapsedTime, ActorTickFunction* tickFunction)
+void AActor::TickActor(std::chrono::duration<float> elapsedTime, ActorTickFunction* tickFunction)
 {
 }
 
@@ -114,7 +109,7 @@ void AActor::AddOwnedComponent(ActorComponent* component)
 	_components.emplace(component);
 }
 
-set<ActorComponent*> AActor::GetOwnedComponents() const
+std::set<ActorComponent*> AActor::GetOwnedComponents() const
 {
 	return _components;
 }
@@ -123,13 +118,13 @@ void AActor::SetRootComponent(SceneComponent* scene)
 {
 	if (scene == nullptr)
 	{
-		LogSystem::Log(LogComponent, Error, L"The root component could not be nullptr.");
+		SE_LOG(LogComponent, Error, L"The root component could not be nullptr.");
 		return;
 	}
 
 	if (_rootComponent != nullptr)
 	{
-		LogSystem::Log(LogComponent, Warning, L"The root component is not empty. Instance will be dangling.");
+		SE_LOG(LogComponent, Warning, L"The root component is not empty. Instance will be dangling.");
 	}
 
 	_rootComponent = scene;

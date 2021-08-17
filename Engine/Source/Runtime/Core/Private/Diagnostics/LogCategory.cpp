@@ -4,15 +4,9 @@
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 
-using namespace std;
-using namespace std::chrono;
-using namespace std::filesystem;
+std::optional<FileReference> LogCategory::_file;
 
-using enum ELogVerbosity;
-
-optional<FileReference> LogCategory::_file;
-
-LogCategory::LogCategory(wstring_view categoryName)
+LogCategory::LogCategory(std::wstring_view categoryName)
 	: _name(categoryName)
 {
 }
@@ -21,8 +15,10 @@ LogCategory::~LogCategory()
 {
 }
 
-wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
+std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
+	using enum ELogVerbosity;
+
 	switch (verbosity)
 	{
 	case Fatal: return L"Fatal";
@@ -34,8 +30,11 @@ wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 	}
 }
 
-void LogCategory::OnLog(ELogVerbosity logVerbosity, wstring_view message)
+void LogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 {
+	using namespace std;
+	using namespace std::chrono;
+
 	if (!_file.has_value())
 	{
 		_file = FileReference(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));

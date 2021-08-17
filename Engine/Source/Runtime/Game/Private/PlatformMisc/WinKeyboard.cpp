@@ -14,7 +14,7 @@
 
 static_assert(sizeof(KeyboardState) == (256 / 8), "Size mismatch for State");
 
-namespace
+namespace WinKeyboardInternal
 {
     inline void KeyDown(int key, KeyboardState& state) noexcept
     {
@@ -119,6 +119,8 @@ WinKeyboard::Impl* WinKeyboard::Impl::s_keyboard = nullptr;
 
 void WinKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 {
+    using namespace WinKeyboardInternal;
+
     auto pImpl = Impl::s_keyboard;
 
     if (!pImpl)

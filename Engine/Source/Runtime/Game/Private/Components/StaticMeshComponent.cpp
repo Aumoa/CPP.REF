@@ -7,10 +7,6 @@
 #include "Scene/StaticMeshRenderData.h"
 #include "Assets/StaticMesh.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
 StaticMeshComponent::StaticMeshComponent() : Super()
 {
 }
@@ -19,7 +15,7 @@ PrimitiveSceneProxy* StaticMeshComponent::CreateSceneProxy()
 {
 	if (_StaticMesh != nullptr)
 	{
-		return CreateSubobject<StaticMeshSceneProxy>(this, vector{ _batch });
+		return CreateSubobject<StaticMeshSceneProxy>(this, std::vector{ _batch });
 	}
 	else
 	{
@@ -79,7 +75,7 @@ Material* StaticMeshComponent::GetMaterial(int32 index) const
 {
 	if (index >= _materials.size())
 	{
-		LogSystem::Log(LogStaticMesh, Error, L"The index [{}] is not valid on this static mesh component.", index);
+		SE_LOG(LogStaticMesh, Error, L"The index [{}] is not valid on this static mesh component.", index);
 		return nullptr;
 	}
 	return _materials[index];

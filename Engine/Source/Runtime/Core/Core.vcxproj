@@ -23,6 +23,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -30,6 +31,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -118,6 +120,7 @@
     <ClCompile Include="Private\Threading\EventHandle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\DirectXInlineHelper.h" />
     <ClInclude Include="Private\pch.h" />
     <ClInclude Include="Public\Concepts\SupportsObject.h" />
     <ClInclude Include="Public\Container\BitArray.h" />

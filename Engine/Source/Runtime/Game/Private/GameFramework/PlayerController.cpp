@@ -12,11 +12,6 @@
 #include "Camera/CameraComponent.h"
 #include "Level/World.h"
 
-using namespace std;
-using namespace std::chrono;
-
-using enum ELogVerbosity;
-
 APlayerController::APlayerController() : Super()
 {
 	_inputComponent = CreateSubobject<InputComponent>();
@@ -39,7 +34,7 @@ void APlayerController::SpawnCameraManager(World* level)
 	_cameraManager = level->SpawnActor<APlayerCameraManager>();
 }
 
-void APlayerController::UpdateCameraManager(duration<float> elapsedTime)
+void APlayerController::UpdateCameraManager(std::chrono::duration<float> elapsedTime)
 {
 	_cameraManager->CachePlayerCamera(this);
 	_cameraManager->UpdateCamera(elapsedTime);
@@ -55,7 +50,7 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 	MinimalViewInfo view = _cameraManager->GetCachedCameraView();
 	if (view.bInit == false)
 	{
-		LogSystem::Log(LogPlayerController, Verbose, L"Player camera does not initialized. Abort.");
+		SE_LOG(LogPlayerController, Verbose, L"Player camera does not initialized. Abort.");
 		return {};
 	}
 

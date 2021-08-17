@@ -4,10 +4,6 @@
 #include "Materials/MaterialInstance.h"
 #include "LogGame.h"
 
-using enum ELogVerbosity;
-
-using namespace std;
-
 MaterialInstance::MaterialInstance(Material* source) : Super(source->GetShader())
 	, _source(source)
 {
@@ -55,12 +51,12 @@ void MaterialInstance::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 ind
 	if (index >= _storage.size())
 	{
 		// Does not contains any parameter value.
-		LogSystem::Log(LogMaterial, Warning, L"The default parameter does not setted at index [{}]. Can keep running, but material values are undefined.", index);
+		SE_LOG(LogMaterial, Warning, L"The default parameter does not setted at index [{}]. Can keep running, but material values are undefined.", index);
 		return;
 	}
 
 	const ShaderVars& vars = _storage[index];
-	if (vars.index() == variant_npos)
+	if (vars.index() == std::variant_npos)
 	{
 		// There is no override value.
 		Super::SetGraphicsParameterValue(dc, index);
@@ -81,12 +77,12 @@ bool MaterialInstance::HasVars(int32 index, T& outValue) const
 	else
 	{
 		const size_t vidx = _storage[index].index();
-		if (vidx == variant_npos)
+		if (vidx == std::variant_npos)
 		{
 			return false;
 		}
 
-		outValue = get<T>(_storage[index]);
+		outValue = std::get<T>(_storage[index]);
 		return true;
 	}
 }

@@ -6,9 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Assets/StaticMesh.h"
 
-using namespace std;
-
-StaticMeshSceneProxy::StaticMeshSceneProxy(StaticMeshComponent* inComponent, const vector<MeshBatch>& batches) : Super(inComponent)
+StaticMeshSceneProxy::StaticMeshSceneProxy(StaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches) : Super(inComponent)
 {
 	MeshBatches = batches;
 }

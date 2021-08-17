@@ -23,6 +23,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -30,6 +31,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -129,9 +131,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assets\AssetImporter.cpp" />
+    <ClCompile Include="Private\Assets\Mesh.cpp" />
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
     <ClCompile Include="Private\Assets\Parser\MDLParser.cpp" />
     <ClCompile Include="Private\Assets\StaticMesh.cpp" />
+    <ClCompile Include="Private\Assets\StreamableRenderAsset.cpp" />
     <ClCompile Include="Private\Camera\CameraComponent.cpp" />
     <ClCompile Include="Private\Camera\PlayerCameraManager.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
@@ -188,10 +192,12 @@
   <ItemGroup>
     <ClInclude Include="Private\pch.h" />
     <ClInclude Include="Public\Assets\AssetImporter.h" />
+    <ClInclude Include="Public\Assets\Mesh.h" />
     <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
     <ClInclude Include="Public\Assets\Parser\MDLParser.h" />
     <ClInclude Include="Public\Assets\Parser\ParserBase.h" />
     <ClInclude Include="Public\Assets\StaticMesh.h" />
+    <ClInclude Include="Public\Assets\StreamableRenderAsset.h" />
     <ClInclude Include="Public\Camera\CameraComponent.h" />
     <ClInclude Include="Public\Camera\PlayerCameraManager.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />

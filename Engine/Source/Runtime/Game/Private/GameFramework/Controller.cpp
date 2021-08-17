@@ -5,10 +5,6 @@
 #include "LogGame.h"
 #include "GameFramework/Pawn.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
 AController::AController() : Super()
 {
 	SetRootComponent(CreateSubobject<SceneComponent>());
@@ -18,7 +14,7 @@ void AController::Possess(APawn* pawn)
 {
 	if (_possessedPawn != nullptr)
 	{
-		LogSystem::Log(LogController, Error, L"The controller already possessed to pawn[{}]. Abort.", _possessedPawn->GetName());
+		SE_LOG(LogController, Error, L"The controller already possessed to pawn[{}]. Abort.", _possessedPawn->GetName());
 		return;
 	}
 
@@ -31,7 +27,7 @@ void AController::UnPossess()
 {
 	if (_possessedPawn == nullptr)
 	{
-		LogSystem::Log(LogController, Verbose, L"The controller already detached any pawn. Abort.");
+		SE_LOG(LogController, Verbose, L"The controller already detached any pawn. Abort.");
 		return;
 	}
 

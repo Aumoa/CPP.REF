@@ -8,11 +8,7 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-using enum ELogVerbosity;
-
-using namespace std;
-
-FileReference::FileReference(const filesystem::path& filepath) : Super(filepath)
+FileReference::FileReference(const std::filesystem::path& filepath) : Super(filepath)
 {
 }
 
@@ -21,22 +17,22 @@ FileReference::~FileReference()
 	FlushAndCloseSharedStream();
 }
 
-filesystem::path FileReference::GetFilename() const
+std::filesystem::path FileReference::GetFilename() const
 {
 	return GetPath().filename();
 }
 
-filesystem::path FileReference::GetName() const
+std::filesystem::path FileReference::GetName() const
 {
 	return GetPath().stem();
 }
 
-filesystem::path FileReference::GetExtension() const
+std::filesystem::path FileReference::GetExtension() const
 {
 	return GetPath().extension();
 }
 
-wfstream FileReference::OpenStream(ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
+std::wfstream FileReference::OpenStream(std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
 {
 	if (bCreateIfNotExists && !IsExists())
 	{
@@ -45,17 +41,17 @@ wfstream FileReference::OpenStream(ios_base::openmode mode, bool bCreateIfNotExi
 			GetParent().CreateIfNotExists(bCreateDirectoryRecursive);
 		}
 
-		mode = ios_base::in | ios_base::out | ios_base::trunc;
+		mode = std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
 	}
 
-	return wfstream(GetPath(), mode);
+	return std::wfstream(GetPath(), mode);
 }
 
-wfstream& FileReference::OpenSharedStream(const Object* sharingUser, ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
+std::wfstream& FileReference::OpenSharedStream(const Object* sharingUser, std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
 {
 	if (sharingUser == nullptr)
 	{
-		LogSystem::Log(LogCore, Error, L"The sharing user is nullptr. Abort.");
+		LogSystem::Log(LogCore, ELogVerbosity::Error, L"The sharing user is nullptr. Abort.");
 		return _sharedstream;
 	}
 
@@ -77,7 +73,7 @@ void FileReference::CloseSharedStream(const Object* sharingUser)
 {
 	if (sharingUser == nullptr)
 	{
-		LogSystem::Log(LogCore, Error, L"The sharing user is nullptr. Abort.");
+		LogSystem::Log(LogCore, ELogVerbosity::Error, L"The sharing user is nullptr. Abort.");
 		return;
 	}
 
@@ -93,7 +89,7 @@ void FileReference::CloseSharedStream(const Object* sharingUser)
 		return;
 	}
 
-	LogSystem::Log(LogCore, Verbose, L"The user {} is not contained from shared stream users.", sharingUser->ToString());
+	LogSystem::Log(LogCore, ELogVerbosity::Verbose, L"The user {} is not contained from shared stream users.", sharingUser->ToString());
 }
 
 void FileReference::FlushAndCloseSharedStream()

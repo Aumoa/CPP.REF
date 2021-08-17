@@ -4,7 +4,7 @@
 #include "Misc/GeometryGenerator.h"
 #include "Misc/Bezier.h"
 
-namespace
+namespace GeometryGeneratorInternal
 {
     constexpr float SQRT2 = 1.41421356237309504880f;
     constexpr float SQRT3 = 1.73205080756887729352f;
@@ -49,75 +49,6 @@ namespace
     Vector3 IdentityR0 = Vector3(1, 0, 0);
     Vector3 IdentityR1 = Vector3(0, 1, 0);
     Vector3 IdentityR2 = Vector3(0, 0, 1);
-
-    //inline Vector3 XMVectorMultiplyAdd(const Vector3& lh, const Vector3& rh, const Vector3& add)
-    //{
-    //    return lh * rh + add;
-    //}
-
-    //inline Vector2 XMVectorMultiplyAdd(const Vector2& lh, const Vector2& rh, const Vector2& add)
-    //{
-    //    return lh * rh + add;
-    //}
-
-    //template<size_t I1, size_t I2, size_t I3>
-    //inline Vector3 XMVectorSwizzle(const Vector3& lh)
-    //{
-    //    return Vector3(lh[I1], lh[I2], lh[I3]);
-    //}
-
-    //template<size_t I1, size_t I2>
-    //inline Vector2 XMVectorSwizzle(const Vector3& lh)
-    //{
-    //    return Vector2(lh[I1], lh[I2]);
-    //}
-
-    //inline Vector2 XMVectorAdd(const Vector2& lh, const Vector2& rh)
-    //{
-    //    return lh + rh;
-    //}
-
-    //inline Matrix4x4 XMMatrixTranslation(float x, float y, float z)
-    //{
-    //    Matrix4x4 m = Matrix4x4::Identity;
-    //    m._41 = x;
-    //    m._42 = y;
-    //    m._43 = z;
-    //    return m;
-    //}
-
-    //inline Matrix4x4 XMMatrixRotationY(float angle)
-    //{
-    //    return Matrix4x4::RotationY(angle);
-    //}
-
-    //inline Vector3 XMVector3Transform(const Vector3& pos, const Matrix4x4& transform)
-    //{
-    //    return transform.TransformVector(pos);
-    //}
-
-    //inline Vector3 XMVector3TransformNormal(const Vector3& normal, const Matrix4x4& transform)
-    //{
-    //    return transform.TransformVector(Vector4(normal, 0.0f)).Cast<Vector3>();
-    //}
-
-    //inline Vector2 XMVectorSet(float x, float y)
-    //{
-    //    return Vector2(x, y);
-    //}
-
-    //inline void assert(bool expression)
-    //{
-    //    if (expression == false)
-    //    {
-    //        throw std::bad_exception();
-    //    }
-    //}
-
-    //inline Vector3 XMVectorReplicate(float value)
-    //{
-    //    return value;
-    //}
 }
 
 
@@ -126,6 +57,8 @@ namespace
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeBox(VertexCollection& vertices, IndexCollection& indices, const Vector3& size, bool rhcoords, bool invertn)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -202,6 +135,8 @@ void GeometryGenerator::ComputeBox(VertexCollection& vertices, IndexCollection& 
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeSphere(VertexCollection& vertices, IndexCollection& indices, float diameter, size_t tessellation, bool rhcoords, bool invertn)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -277,6 +212,8 @@ void GeometryGenerator::ComputeSphere(VertexCollection& vertices, IndexCollectio
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollection& indices, float diameter, size_t tessellation, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -583,7 +520,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
 //--------------------------------------------------------------------------------------
 // Cylinder / Cone
 //--------------------------------------------------------------------------------------
-namespace
+namespace GeometryGeneratorInternal
 {
     // Helper computes a point on a unit circle, aligned to the x/z plane and centered on the origin.
     inline Vector3 GetCircleVector(size_t i, size_t tessellation)
@@ -653,6 +590,8 @@ namespace
 
 void GeometryGenerator::ComputeCylinder(VertexCollection& vertices, IndexCollection& indices, float height, float diameter, size_t tessellation, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -698,6 +637,8 @@ void GeometryGenerator::ComputeCylinder(VertexCollection& vertices, IndexCollect
 // Creates a cone primitive.
 void GeometryGenerator::ComputeCone(VertexCollection& vertices, IndexCollection& indices, float diameter, float height, size_t tessellation, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -745,6 +686,8 @@ void GeometryGenerator::ComputeCone(VertexCollection& vertices, IndexCollection&
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeTorus(VertexCollection& vertices, IndexCollection& indices, float diameter, float thickness, size_t tessellation, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -809,6 +752,8 @@ void GeometryGenerator::ComputeTorus(VertexCollection& vertices, IndexCollection
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexCollection& indices, float size, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -867,6 +812,8 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexCollection& indices, float size, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -931,6 +878,8 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCollection& indices, float size, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -1060,6 +1009,8 @@ void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCol
 //--------------------------------------------------------------------------------------
 void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexCollection& indices, float size, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     vertices.clear();
     indices.clear();
 
@@ -1145,7 +1096,7 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
 //--------------------------------------------------------------------------------------
 
 // Include the teapot control point data.
-namespace
+namespace GeometryGeneratorInternal
 {
 #include "Misc/TeapotData.inl"
 
@@ -1179,6 +1130,8 @@ namespace
 // Creates a teapot primitive.
 void GeometryGenerator::ComputeTeapot(VertexCollection& vertices, IndexCollection& indices, float size, size_t tessellation, bool rhcoords)
 {
+    using namespace GeometryGeneratorInternal;
+
     const Vector3 g_XMNegateX = Vector3(-1.0f, 1.0f, 1.0f);
     const Vector3 g_XMNegateZ = Vector3(1.0f, 1.0f, -1.0f);
 

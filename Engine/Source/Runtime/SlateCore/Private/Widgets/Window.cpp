@@ -7,15 +7,12 @@
 #include "Draw/PaintArgs.h"
 #include "Layout/Geometry.h"
 
-using namespace std;
-using namespace std::chrono;
-
 SWindow::SWindow() : Super()
-	, _lastDeltaTime(0ms)
+	, _lastDeltaTime(std::chrono::milliseconds(0))
 {
 }
 
-void SWindow::ExecuteTick(duration<float> deltaTime)
+void SWindow::ExecuteTick(std::chrono::duration<float> deltaTime)
 {
 	Tick(*(_cachedRootGeometry = MakeRootGeometry()), _lastDeltaTime = deltaTime);
 }

@@ -104,7 +104,7 @@ public:
 			}
 		}
 
-		if constexpr (derived_from<T, SceneComponent>)
+		if constexpr (std::derived_from<T, SceneComponent>)
 		{
 			// Else, find component from scene components.
 			T* item = nullptr;

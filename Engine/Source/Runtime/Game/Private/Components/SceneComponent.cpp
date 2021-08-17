@@ -4,10 +4,6 @@
 #include "Components/SceneComponent.h"
 #include "LogGame.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
 SceneComponent::SceneComponent() : Super()
 {
 }
@@ -40,9 +36,9 @@ void SceneComponent::UpdateComponentToWorld()
 	UpdateWorldTransform();
 }
 
-Transform SceneComponent::GetSocketTransform(const wstring& socketName, EComponentTransformSpace space) const
+Transform SceneComponent::GetSocketTransform(const std::wstring& socketName, EComponentTransformSpace space) const
 {
-	LogSystem::Log(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
+	SE_LOG(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
 
 	switch (space)
 	{
@@ -97,17 +93,17 @@ void SceneComponent::AttachToComponent(SceneComponent* attachTo)
 	AttachToSocket(attachTo, L"");
 }
 
-void SceneComponent::AttachToSocket(SceneComponent* attachTo, const wstring& socketName)
+void SceneComponent::AttachToSocket(SceneComponent* attachTo, const std::wstring& socketName)
 {
 	if (attachTo == nullptr)
 	{
-		LogSystem::Log(LogSceneComponent, Warning, L"attachTo is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.");
+		SE_LOG(LogSceneComponent, Warning, L"attachTo is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.");
 		return;
 	}
 
 	if (_attachment.AttachmentRoot == attachTo && _attachment.SocketName == socketName)
 	{
-		LogSystem::Log(LogSceneComponent, Verbose, L"Component is already attach to desired target. Abort.");
+		SE_LOG(LogSceneComponent, Verbose, L"Component is already attach to desired target. Abort.");
 		return;
 	}
 
@@ -135,14 +131,14 @@ void SceneComponent::DetachFromComponent()
 {
 	if (_attachment.AttachmentRoot == nullptr)
 	{
-		LogSystem::Log(LogSceneComponent, Verbose, L"Component is already detached from any components. Abort.");
+		SE_LOG(LogSceneComponent, Verbose, L"Component is already detached from any components. Abort.");
 		return;
 	}
 
 	auto it = find(_childComponents.begin(), _childComponents.end(), this);
 	if (it == _childComponents.end())
 	{
-		LogSystem::Log(LogSceneComponent, Error, L"Cannot found this component from child component list of parent component.");
+		SE_LOG(LogSceneComponent, Error, L"Cannot found this component from child component list of parent component.");
 	}
 	else
 	{
@@ -218,7 +214,7 @@ void SceneComponent::UpdateWorldTransform()
 {
 	if (HasBegunPlay() && _mobility != EComponentMobility::Movable)
 	{
-		LogSystem::Log(LogSceneComponent, Error, L"SceneComponent has been try move but it is not movable mobility.");
+		SE_LOG(LogSceneComponent, Error, L"SceneComponent has been try move but it is not movable mobility.");
 		return;
 	}
 

@@ -5,15 +5,12 @@
 #include "PlatformMisc/WinMouse.h"
 #include "PlatformMisc/WinKeyboard.h"
 
-using namespace std;
-using namespace std::chrono;
-
-set<InputComponent*> InputComponent::_inputComponents;
+std::set<InputComponent*> InputComponent::_inputComponents;
 
 MouseStateTracker InputComponent::_mouseTracker;
 KeyboardTracker InputComponent::_keyboardTracker;
-optional<int32> InputComponent::_lastMouseX;
-optional<int32> InputComponent::_lastMouseY;
+std::optional<int32> InputComponent::_lastMouseX;
+std::optional<int32> InputComponent::_lastMouseY;
 
 InputComponent::InputComponent() : Super()
 {
@@ -31,7 +28,7 @@ void InputComponent::EndPlay()
 	Super::EndPlay();
 }
 
-void InputComponent::StaticTick(duration<float> elapsedTime)
+void InputComponent::StaticTick(std::chrono::duration<float> elapsedTime)
 {
 	// Update tracking state.
 	WinMouse& wMouse = WinMouse::Get();

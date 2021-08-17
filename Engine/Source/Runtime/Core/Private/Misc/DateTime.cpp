@@ -3,15 +3,15 @@
 #include "pch.h"
 #include "Misc/DateTime.h"
 
-using namespace std::chrono;
-
 DateTime::DateTime()
 {
 }
 
 DateTime::DateTime(const _Myclock::time_point& tp)
-	: _localTime(zoned_time(current_zone(), tp).get_local_time())
+	: _localTime(std::chrono::zoned_time(std::chrono::current_zone(), tp).get_local_time())
 {
+	using namespace std::chrono;
+
 	auto ld = floor<days>(_localTime);
 	_ymd = year_month_day(ld);
 	_hms = hh_mm_ss(ld - _localTime);

@@ -7,13 +7,11 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
 
-using namespace std;
-
 SWidget::SWidget() : Super()
 {
 }
 
-wstring SWidget::ToString(wstring_view formatArgs) const
+std::wstring SWidget::ToString(std::wstring_view formatArgs) const
 {
 	return format(L"{}: [{}] ({})", StringUtils::AsUnicode(typeid(*this).name()), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
 }

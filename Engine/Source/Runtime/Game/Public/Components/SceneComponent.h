@@ -117,7 +117,7 @@ public:
 		while (!hierarchy.empty())
 		{
 			SceneComponent* top = hierarchy.front();
-			if constexpr (is_same_v<T, SceneComponent>)
+			if constexpr (std::is_same_v<T, SceneComponent>)
 			{
 				if (body(top))
 				{

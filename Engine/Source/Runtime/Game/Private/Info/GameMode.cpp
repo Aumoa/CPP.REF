@@ -4,8 +4,6 @@
 #include "Info/GameMode.h"
 #include "GameFramework/PlayerController.h"
 
-using namespace std;
-
 AGameMode::AGameMode() : Super()
 	, PlayerControllerClass(SubclassOf<APlayerController>::StaticClass())
 {

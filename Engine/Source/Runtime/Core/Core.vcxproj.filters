@@ -245,5 +245,8 @@
     <ClInclude Include="Public\Misc\DateTime.h">
       <Filter>Public\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Private\DirectXInlineHelper.h">
+      <Filter>Private</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

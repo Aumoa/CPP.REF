@@ -7,10 +7,6 @@
 #include "RHI/RHIDevice.h"
 #include "RHI/RHIVertexFactory.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
 RHIShader::RHIShader(RHIDevice* device) : Super(device)
 {
 }
@@ -21,12 +17,12 @@ RHIShader::~RHIShader()
 
 void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 {
-	span<uint8 const> vsBytecode = CompileVS();
-	span<uint8 const> psBytecode = CompilePS();
+	std::span<uint8 const> vsBytecode = CompileVS();
+	std::span<uint8 const> psBytecode = CompilePS();
 	ID3D12Device* dev = GetDevice()->GetDevice();
 
-	vector<RHIShaderParameterElement> shaderParameters = GetShaderParameterDeclaration();
-	vector<D3D12_ROOT_PARAMETER> rootParameters;
+	std::vector<RHIShaderParameterElement> shaderParameters = GetShaderParameterDeclaration();
+	std::vector<D3D12_ROOT_PARAMETER> rootParameters;
 
 	for (size_t i = 0; i < shaderParameters.size(); ++i)
 	{
@@ -72,7 +68,7 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 			};
 			break;
 		default:
-			LogSystem::Log(LogRHI, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
+			SE_LOG(LogRHI, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
 			rootParameters.emplace_back();
 			break;
 		}
@@ -98,7 +94,7 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 		// Compile error detected. Print error message and throw fatal exception.
 		if (error)
 		{
-			LogSystem::Log(LogRHI, Fatal,
+			SE_LOG(LogRHI, Fatal,
 				L"Could not compile root signature with follow reason:\n{}",
 				StringUtils::AsUnicode((const char*)error->GetBufferPointer()));
 		}
@@ -111,8 +107,8 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 	HR(LogRHI, dev->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&_rs)));
 
 	// Make vertex declaration to input element.
-	vector<RHIVertexElement> declaration;
-	vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
+	std::vector<RHIVertexElement> declaration;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
 	if (vertexDeclaration)
 	{
 		declaration = vertexDeclaration->GetVertexDeclaration();

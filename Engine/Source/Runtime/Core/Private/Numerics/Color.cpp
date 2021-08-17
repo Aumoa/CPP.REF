@@ -3,9 +3,7 @@
 #include "pch.h"
 #include "Numerics/Color.h"
 
-using namespace std;
-
-map<wstring_view, Color> gConvertTable =
+std::map<std::wstring_view, Color> gConvertTable =
 {
 	{ L"AliceBlue", NamedColors::AliceBlue },
 	{ L"AntiqueWhite", NamedColors::AntiqueWhite },
@@ -150,7 +148,7 @@ map<wstring_view, Color> gConvertTable =
 	{ L"YellowGreen", NamedColors::YellowGreen },
 };
 
-Color Color::FromHtml(wstring_view html)
+Color Color::FromHtml(std::wstring_view html)
 {
 	if (html == L"")
 	{
@@ -160,20 +158,20 @@ Color Color::FromHtml(wstring_view html)
 	// #AARRGGBB
 	if (html.length() == 9)
 	{
-		wistringstream wiss;
-		wiss.str(wstring(html.substr(1, 8)));
+		std::wistringstream wiss;
+		wiss.str(std::wstring(html.substr(1, 8)));
 		uint32 hexCode;
-		wiss >> hex >> hexCode;
+		wiss >> std::hex >> hexCode;
 		return Color::FromUInt(hexCode);
 	}
 
 	// #RRGGBB
 	if (html.length() == 7)
 	{
-		wistringstream wiss;
-		wiss.str(wstring(html.substr(1, 6)));
+		std::wistringstream wiss;
+		wiss.str(std::wstring(html.substr(1, 6)));
 		uint32 hexCode;
-		wiss >> hex >> hexCode;
+		wiss >> std::hex >> hexCode;
 		hexCode |= 0xFF000000;
 		return Color::FromUInt(hexCode);
 	}

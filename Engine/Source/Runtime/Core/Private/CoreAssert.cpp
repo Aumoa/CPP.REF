@@ -6,18 +6,14 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
-void CoreAssert::Assert(wstring_view msg, wstring_view file, int32 line)
+void CoreAssert::Assert(std::wstring_view msg, std::wstring_view file, int32 line)
 {
-	LogSystem::Log(LogAssert, Fatal, L"Assertion failed: {}({})\n{}", file, line, msg);
+	LogSystem::Log(LogAssert, ELogVerbosity::Fatal, L"Assertion failed: {}({})\n{}", file, line, msg);
 }
 
-void CoreAssert::Ensure(wstring_view msg, wstring_view file, int32 line)
+void CoreAssert::Ensure(std::wstring_view msg, std::wstring_view file, int32 line)
 {
-	LogSystem::Log(LogAssert, Error, L"Ensure failed: {}({})\n{}", file, line, msg);
+	LogSystem::Log(LogAssert, ELogVerbosity::Error, L"Ensure failed: {}({})\n{}", file, line, msg);
 }
 
 void CoreAssert::DebugBreak()

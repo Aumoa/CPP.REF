@@ -3,9 +3,6 @@
 #include "pch.h"
 #include "Ticking/TickFunction.h"
 
-using namespace std;
-using namespace std::chrono;
-
 TickFunction::TickFunction() : Super()
 {
 }
@@ -22,7 +19,7 @@ void TickFunction::Ready()
 	ComputeTickGroupDependency();
 }
 
-void TickFunction::ExecuteTick(duration<float> deltaTime)
+void TickFunction::ExecuteTick(std::chrono::duration<float> deltaTime)
 {
 	_bExecutedFrame = true;
 

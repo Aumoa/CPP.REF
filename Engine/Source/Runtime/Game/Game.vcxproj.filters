@@ -237,6 +237,12 @@
     <ClCompile Include="Private\Shaders\SlateShader\SlateShader.cpp">
       <Filter>Private\Shaders\SlateShader</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Assets\StreamableRenderAsset.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\Mesh.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h">
@@ -406,6 +412,12 @@
     </ClInclude>
     <ClInclude Include="Public\Ticking\TickingGroup.h">
       <Filter>Public\Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\StreamableRenderAsset.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\Mesh.h">
+      <Filter>Public\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

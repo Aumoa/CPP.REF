@@ -6,9 +6,6 @@
 #include "Scene/PrimitiveSceneProxy.h"
 #include "GameStructures.h"
 
-using namespace std;
-using namespace std::chrono;
-
 SceneVisibility::SceneVisibility(Scene* owner) : Super()
 	, _scene(owner)
 {
@@ -78,7 +75,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 
 void SceneVisibility::SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t idx)
 {
-	vector<RHIShaderParameterElement> elements = shader->GetShaderParameterDeclaration();
+	std::vector<RHIShaderParameterElement> elements = shader->GetShaderParameterDeclaration();
 	uint64 bufferLocation = _viewBuffer->GetGPUVirtualAddress() + sizeof(RHIViewConstants) * idx;
 	
 	for (size_t i = 0; i < elements.size(); ++i)

@@ -6,10 +6,6 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
 Object::Object()
 {
 }
@@ -29,7 +25,7 @@ Object::~Object() noexcept
 	}
 }
 
-wstring Object::ToString(wstring_view formatArgs) const
+std::wstring Object::ToString(std::wstring_view formatArgs) const
 {
 	return L"Object";
 }
@@ -75,7 +71,7 @@ void Object::InternalDetachSubobject(Object* subobject)
 		return;
 	}
 
-	LogSystem::Log(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
 }
 
 void Object::InternalAttachSubobject(Object* subobject)
@@ -96,5 +92,5 @@ void Object::InternalDestroySubobject(Object* subobject)
 		return;
 	}
 
-	LogSystem::Log(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
 }

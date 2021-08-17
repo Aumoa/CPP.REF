@@ -12,8 +12,6 @@
 #include "RHI/RHIShaderDescriptorView.h"
 #include "RHI/RHICommandQueue.h"
 
-using namespace std;
-
 RHIDeviceContext::RHIDeviceContext(RHIDevice* device, ERHICommandType commandType) : Super(device)
 	, _type(commandType)
 {
@@ -91,7 +89,7 @@ void RHIDeviceContext::ClearRenderTargetView(RHIRenderTargetView* rtv, int32 ind
 	_commandList->ClearRenderTargetView(rtv->GetCPUDescriptorHandle(index), (const FLOAT*)&color, 0, nullptr);
 }
 
-void RHIDeviceContext::ClearDepthStencilView(RHIDepthStencilView* rtv, int32 index, optional<float> depth, optional<uint8> stencil)
+void RHIDeviceContext::ClearDepthStencilView(RHIDepthStencilView* rtv, int32 index, std::optional<float> depth, std::optional<uint8> stencil)
 {
 	D3D12_CLEAR_FLAGS flags = depth.has_value() ? D3D12_CLEAR_FLAG_DEPTH : (D3D12_CLEAR_FLAGS)0;
 	flags |= stencil.has_value() ? D3D12_CLEAR_FLAG_STENCIL : (D3D12_CLEAR_FLAGS)0;
@@ -110,7 +108,7 @@ void RHIDeviceContext::RSSetViewports(int32 count, const RHIViewport* viewports)
 
 void RHIDeviceContext::TransitionBarrier(int32 count, const RHITransitionBarrier* barriers)
 {
-	vector<D3D12_RESOURCE_BARRIER> d3dbars(count);
+	std::vector<D3D12_RESOURCE_BARRIER> d3dbars(count);
 	for (int32 i = 0; i < count; ++i)
 	{
 		auto& barrier = barriers[i];
@@ -224,7 +222,7 @@ ID3D12CommandList* RHIDeviceContext::GetCommandList() const
 
 void RHIDeviceContext::SwapAllocator(ComPtr<ID3D12CommandAllocator>&& swap)
 {
-	ComPtr<ID3D12CommandAllocator> t = move(_allocator);
-	_allocator = move(swap);
-	swap = move(t);
+	ComPtr<ID3D12CommandAllocator> t = std::move(_allocator);
+	_allocator = std::move(swap);
+	swap = std::move(t);
 }

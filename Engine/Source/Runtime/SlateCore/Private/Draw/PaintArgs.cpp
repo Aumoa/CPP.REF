@@ -3,10 +3,7 @@
 #include "pch.h"
 #include "Draw/PaintArgs.h"
 
-using namespace std;
-using namespace std::chrono;
-
-PaintArgs::PaintArgs(const SWidget* parentWidget, duration<float> deltaTime) : Super()
+PaintArgs::PaintArgs(const SWidget* parentWidget, std::chrono::duration<float> deltaTime) : Super()
 	, _parent(parentWidget)
 	, _deltaTime(deltaTime)
 {

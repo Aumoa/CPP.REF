@@ -5,10 +5,6 @@
 #include "LogGame.h"
 #include "GameFramework/Controller.h"
 
-using namespace std;
-
-using enum ELogVerbosity;
-
 APawn::APawn() : Super()
 {
 }
@@ -17,7 +13,7 @@ void APawn::PossessedBy(AController* controller)
 {
 	if (_controller != nullptr)
 	{
-		LogSystem::Log(LogPawn, Error, L"The pawn already possessed by controller[{}]. Abort.", controller->GetName());
+		SE_LOG(LogPawn, Error, L"The pawn already possessed by controller[{}]. Abort.", controller->GetName());
 		return;
 	}
 

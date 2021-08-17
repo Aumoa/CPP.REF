@@ -6,9 +6,6 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-using namespace std;
-using namespace std::chrono;
-
 using enum ELogVerbosity;
 
 EventHandle::EventHandle() : Super()
@@ -30,7 +27,7 @@ EventHandle::~EventHandle()
 	}
 }
 
-auto EventHandle::Wait(milliseconds timeout) -> EStatus
+auto EventHandle::Wait(std::chrono::milliseconds timeout) -> EStatus
 {
 	DWORD status = WaitForSingleObject((HANDLE)_handle, (DWORD)timeout.count());
 	switch (status)

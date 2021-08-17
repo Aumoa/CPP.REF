@@ -6,9 +6,6 @@
 #include "Assets/StaticMesh.h"
 #include "Assets/Parser/AssimpParser.h"
 
-using namespace std;
-using namespace std::filesystem;
-
 AssetImporter::AssetImporter(GameEngine* engine, RHIVertexFactory* factory) : Super()
 	, _engine(engine)
 	, _factory(factory)
@@ -17,15 +14,15 @@ AssetImporter::AssetImporter(GameEngine* engine, RHIVertexFactory* factory) : Su
 
 void AssetImporter::SearchContents()
 {
-	queue<directory_iterator> iterators;
+	std::queue<std::filesystem::directory_iterator> iterators;
 }
 
-path AssetImporter::GetContentDir() const
+std::filesystem::path AssetImporter::GetContentDir() const
 {
-	return path(L"Content");
+	return std::filesystem::path(L"Content");
 }
 
-StaticMesh* AssetImporter::ImportStaticMesh(const path& importPath)
+StaticMesh* AssetImporter::ImportStaticMesh(const std::filesystem::path& importPath)
 {
 	AssimpParser aParse(_engine, _factory);
 	if (!aParse.TryParse(importPath))

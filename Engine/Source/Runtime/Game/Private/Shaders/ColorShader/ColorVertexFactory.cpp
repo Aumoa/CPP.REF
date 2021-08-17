@@ -3,15 +3,13 @@
 #include "pch.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
 
-using namespace std;
-
 ColorVertexFactory::ColorVertexFactory(RHIDevice* device) : Super(device)
 {
 }
 
 RHIResource* ColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
 {
-	vector<MyVertex> vertexBuffer(count);
+	std::vector<MyVertex> vertexBuffer(count);
 	for (size_t i = 0; i < count; ++i)
 	{
 		vertexBuffer[i] =
@@ -22,12 +20,12 @@ RHIResource* ColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, s
 		};
 	}
 
-	return GetDevice()->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertexBuffer.data(), span(vertexBuffer).size_bytes());
+	return GetDevice()->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertexBuffer.data(), std::span(vertexBuffer).size_bytes());
 }
 
-vector<RHIVertexElement> ColorVertexFactory::GetVertexDeclaration() const
+std::vector<RHIVertexElement> ColorVertexFactory::GetVertexDeclaration() const
 {
-	vector<RHIVertexElement> elements;
+	std::vector<RHIVertexElement> elements;
 
 	// POSITION
 	elements.emplace_back() =

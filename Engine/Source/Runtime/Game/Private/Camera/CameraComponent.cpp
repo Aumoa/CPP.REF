@@ -4,13 +4,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameStructures.h"
 
-using namespace std::chrono;
-
 CameraComponent::CameraComponent()
 {
 }
 
-MinimalViewInfo CameraComponent::GetViewInfo(duration<float> elapsedTime) const
+MinimalViewInfo CameraComponent::GetViewInfo(std::chrono::duration<float> elapsedTime) const
 {
 	MinimalViewInfo vinfo;
 	vinfo.bInit = true;

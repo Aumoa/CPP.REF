@@ -17,11 +17,6 @@
 #include "Assets/AssetImporter.h"
 #include "GameFramework/LocalPlayer.h"
 
-using enum ELogVerbosity;
-
-using namespace std;
-using namespace std::chrono;
-
 GameEngine* GameEngine::_gEngine = nullptr;
 
 GameEngine::GameEngine(bool bDebug) : Super()
@@ -35,12 +30,12 @@ GameEngine::~GameEngine()
 
 void GameEngine::InitEngine(GameInstance* gameInstance)
 {
-	LogSystem::Log(LogEngine, Info, L"Initialize engine.");
+	SE_LOG(LogEngine, Info, L"Initialize engine.");
 	_gEngine = this;
 
 	IFrameworkView* frameworkView = gameInstance->GetFrameworkView();
 
-	LogSystem::Log(LogEngine, Info, L"Initialize RHI subsystems.");
+	SE_LOG(LogEngine, Info, L"Initialize RHI subsystems.");
 	_gameInstance = gameInstance;
 	_device = CreateSubobject<RHIDevice>(_bDebug);
 	_primaryQueue = _device->GetPrimaryQueue();
@@ -57,7 +52,7 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_slateShader = CreateSubobject<SlateShader>(_device);
 	_slateShader->Compile(nullptr);
 
-	LogSystem::Log(LogEngine, Info, L"Register engine tick.");
+	SE_LOG(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
 	frameworkView->Size += [this](int32 width, int32 height) { ResizedApp(width, height); };
 
@@ -66,16 +61,21 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 
 void GameEngine::RegisterRHIGarbageCollector()
 {
+	using namespace std;
+
 	auto gc = [this]()
 	{
 		int32 count = _primaryQueue->Collect();
-		LogSystem::Log(LogEngine, Verbose, L"Collect {} RHI garbages.", count);
+		SE_LOG(LogEngine, Verbose, L"Collect {} RHI garbages.", count);
 	};
+
 	_scheduler.AddSchedule({ .Task = gc, .Delay = 10s, .InitDelay = 10s });
 }
 
 void GameEngine::TickEngine()
 {
+	using namespace std::chrono;
+
 	duration<float> deltaSeconds = 0ns;
 	steady_clock::time_point now = steady_clock::now();
 	if (_prev.has_value())
@@ -125,10 +125,10 @@ void GameEngine::ResizedApp(int32 width, int32 height)
 	_vpWidth = width;
 	_vpHeight = height;
 
-	LogSystem::Log(LogEngine, Info, L"Application resized to {}x{}.", width, height);
+	SE_LOG(LogEngine, Info, L"Application resized to {}x{}.", width, height);
 }
 
-void GameEngine::GameTick(duration<float> elapsedTime)
+void GameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 {
 	// Update input.
 	InputComponent::StaticTick(elapsedTime);
@@ -137,7 +137,7 @@ void GameEngine::GameTick(duration<float> elapsedTime)
 	_gameInstance->Tick(elapsedTime);
 }
 
-void GameEngine::RenderTick(duration<float> elapsedTime)
+void GameEngine::RenderTick(std::chrono::duration<float> elapsedTime)
 {
 	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
 
@@ -176,7 +176,7 @@ void GameEngine::RenderTick(duration<float> elapsedTime)
 	_deviceContext->TransitionBarrier(1, &barrierBegin);
 	_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
 	_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
-	_deviceContext->ClearDepthStencilView(_dsv, 0, 1.0f, nullopt);
+	_deviceContext->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
 	_deviceContext->RSSetScissorRects(1, &sc);
 	_deviceContext->RSSetViewports(1, &vp);
 

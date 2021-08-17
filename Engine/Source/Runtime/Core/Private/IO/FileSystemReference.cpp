@@ -4,18 +4,16 @@
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
 
-using namespace std;
-
-FileSystemReference::FileSystemReference(const filesystem::path& filepath) : _path(filesystem::absolute(filepath))
+FileSystemReference::FileSystemReference(const std::filesystem::path& filepath) : _path(std::filesystem::absolute(filepath))
 {
 }
 
 bool FileSystemReference::IsExists() const
 {
-	return filesystem::exists(_path.value_or(L"\\"));
+	return std::filesystem::exists(_path.value_or(L"\\"));
 }
 
-filesystem::path FileSystemReference::GetPath() const
+std::filesystem::path FileSystemReference::GetPath() const
 {
 	return _path.value_or(L"\\");
 }

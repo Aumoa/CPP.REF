@@ -6,13 +6,11 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Misc/StringUtils.h"
 
-using namespace std;
-
 LogSystem::fatal_exception::fatal_exception(const std::string& message) : exception(message.c_str())
 {
 }
 
-void LogSystem::InternalLog(LogCategory& category, ELogVerbosity logVerbosity, wstring& message)
+void LogSystem::InternalLog(LogCategory& category, ELogVerbosity logVerbosity, std::wstring& message)
 {
 	category.OnLog(logVerbosity, message);
 

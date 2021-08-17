@@ -3,18 +3,16 @@
 #include "pch.h"
 #include "GameObject.h"
 
-using namespace std;
-
 GameObject::GameObject() : Super()
 {
 }
 
-wstring GameObject::ToString() const
+std::wstring GameObject::ToString() const
 {
 	return GetName();
 }
 
-wstring GameObject::GetName() const
+std::wstring GameObject::GetName() const
 {
 	if (_name.length() == 0)
 	{

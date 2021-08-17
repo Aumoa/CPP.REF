@@ -2,9 +2,6 @@
 
 #include "pch.h"
 
-#undef min
-#undef max
-
 #include "Assets/Parser/AssimpParser.h"
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
@@ -18,29 +15,26 @@
 #include "RHI/RHIVertexFactory.h"
 #include "RHI/RHIResource.h"
 
-using namespace std;
-using namespace std::filesystem;
-
 using enum ELogVerbosity;
 
 class AssimpParser::Impl
 {
 public:
-	unique_ptr<Assimp::Importer> _importer;
+	std::unique_ptr<Assimp::Importer> _importer;
 	const aiScene* _scene = nullptr;
 };
 
 AssimpParser::AssimpParser(GameEngine* engine, RHIVertexFactory* vfactory) : Super(engine, vfactory)
 {
-	_impl = make_unique<Impl>();
-	_impl->_importer = make_unique<Assimp::Importer>();
+	_impl = std::make_unique<Impl>();
+	_impl->_importer = std::make_unique<Assimp::Importer>();
 }
 
 AssimpParser::~AssimpParser()
 {
 }
 
-bool AssimpParser::TryParse(const path& importPath)
+bool AssimpParser::TryParse(const std::filesystem::path& importPath)
 {
 	static constexpr int32 ReadOptions =
 		aiProcess_JoinIdenticalVertices |
@@ -53,7 +47,7 @@ bool AssimpParser::TryParse(const path& importPath)
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded;
 
-	string filepath_mb = importPath.string();
+	std::string filepath_mb = importPath.string();
 	_impl->_scene = _impl->_importer->ReadFile(filepath_mb.c_str(), ReadOptions);
 	if (_impl->_scene == nullptr)
 	{
@@ -196,8 +190,8 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 	MeshBatch& batch = renderData->MeshBatches.emplace_back();
 	batch.VertexFactory = GetVertexFactory();
 
-	vector<RHIVertex>& vertexBuffer = batch.VertexBuffer;
-	vector<uint32>& indexBuffer = batch.IndexBuffer;
+	std::vector<RHIVertex>& vertexBuffer = batch.VertexBuffer;
+	std::vector<uint32>& indexBuffer = batch.IndexBuffer;
 
 	// Query size for all containers preallocate.
 	size_t vertexCount = 0;

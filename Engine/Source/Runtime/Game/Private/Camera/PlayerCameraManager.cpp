@@ -7,15 +7,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
-using namespace std::chrono;
-
-using enum ELogVerbosity;
-
 APlayerCameraManager::APlayerCameraManager()
 {
 }
 
-void APlayerCameraManager::UpdateCamera(duration<float> elapsedTime)
+void APlayerCameraManager::UpdateCamera(std::chrono::duration<float> elapsedTime)
 {
 	if (_cachedBindCamera == nullptr)
 	{

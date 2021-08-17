@@ -4,12 +4,12 @@
 #include "Shaders/TransparentShader/TransparentShader.h"
 #include "Materials/Material.h"
 
+#ifndef BYTE
 #define BYTE uint8
+#endif
 
 #include "TransparentShaderVS.hlsl.h"
 #include "TransparentShaderPS.hlsl.h"
-
-using namespace std;
 
 TransparentShader::TransparentShader(RHIDevice* device) : Super(device)
 {
@@ -44,12 +44,12 @@ TransparentShader::TransparentShader(RHIDevice* device) : Super(device)
 	_material = CreateSubobject<TransparentShaderMaterial>(this);
 }
 
-span<uint8 const> TransparentShader::CompileVS()
+std::span<uint8 const> TransparentShader::CompileVS()
 {
 	return pTransparentShaderVS;
 }
 
-span<uint8 const> TransparentShader::CompilePS()
+std::span<uint8 const> TransparentShader::CompilePS()
 {
 	return pTransparentShaderPS;
 }
@@ -59,9 +59,9 @@ Material* TransparentShader::GetDefaultMaterial() const
 	return _material;
 }
 
-vector<RHIShaderParameterElement> TransparentShader::GetShaderParameterDeclaration() const
+std::vector<RHIShaderParameterElement> TransparentShader::GetShaderParameterDeclaration() const
 {
-	vector<RHIShaderParameterElement> elements;
+	std::vector<RHIShaderParameterElement> elements;
 
 	// [0] Camera constants.
 	elements.emplace_back() =

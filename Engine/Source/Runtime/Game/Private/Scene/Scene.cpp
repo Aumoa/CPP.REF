@@ -8,9 +8,6 @@
 #include "Components/PrimitiveComponent.h"
 #include "Materials/Material.h"
 
-using namespace std;
-using namespace std::chrono;
-
 Scene::Scene(World* worldOwner, RHIDevice* device) : Super()
 	, _world(worldOwner)
 	, _device(device)
@@ -22,7 +19,7 @@ Scene::~Scene()
 {
 }
 
-void Scene::UpdateScene(duration<float> elapsedTime)
+void Scene::UpdateScene(std::chrono::duration<float> elapsedTime)
 {
 	for (auto& proxy : _primitives)
 	{
@@ -57,7 +54,7 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 
 	// Collect primitive materials.
 	size_t renderers = 0;
-	set<RHIShader*> checks;
+	std::set<RHIShader*> checks;
 	for (PrimitiveSceneProxy*& proxy : _primitives)
 	{
 		if (proxy != nullptr)
@@ -68,7 +65,7 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 				{
 					if (materialSlot != nullptr)
 					{
-						map<size_t, vector<RHIShader*>>::iterator it;
+						std::map<size_t, std::vector<RHIShader*>>::iterator it;
 
 						size_t queueNumber = 0;
 						switch (materialSlot->GetBlendMode())
@@ -92,7 +89,7 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 						it = _renderQueue.find(queueNumber);
 						if (it == _renderQueue.end())
 						{
-							it = _renderQueue.emplace_hint(it, queueNumber, vector<RHIShader*>());
+							it = _renderQueue.emplace_hint(it, queueNumber, std::vector<RHIShader*>());
 						}
 
 						if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())

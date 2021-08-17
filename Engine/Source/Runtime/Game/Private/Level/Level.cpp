@@ -7,8 +7,6 @@
 #include "GameFramework/PlayerController.h"
 #include "Info/GameMode.h"
 
-using enum ELogVerbosity;
-
 Level::Level() : Super()
 	, GameModeClass(SubclassOf<AGameMode>::StaticClass())
 {
@@ -22,7 +20,7 @@ bool Level::LoadLevel(World* world)
 {
 	if (!GameModeClass.IsValid())
 	{
-		LogSystem::Log(LogWorld, Error, L"GameModeClass does not specified. Abort.");
+		SE_LOG(LogWorld, Error, L"GameModeClass does not specified. Abort.");
 		return false;
 	}
 

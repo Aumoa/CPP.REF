@@ -5,9 +5,7 @@
 #include "LogGame.h"
 #include "Scene/StaticMeshRenderData.h"
 
-using namespace std;
-
-StaticMesh::StaticMesh(wstring_view name, StaticMeshRenderData* renderData) : Super()
+StaticMesh::StaticMesh(std::wstring_view name, StaticMeshRenderData* renderData) : Super()
 	, _name(name)
 	, _renderData(renderData)
 {

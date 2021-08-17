@@ -9,9 +9,6 @@
 #include "Draw/SlateWindowElementList.h"
 #include "Shaders/SlateShader/SlateShader.h"
 
-using namespace std;
-using namespace std::chrono;
-
 LocalPlayer::LocalPlayer() : Super()
 {
 }
@@ -32,7 +29,7 @@ void LocalPlayer::Init(GameEngine* engine)
 	_drawElements = CreateSubobject<SlateWindowElementList>(_slateWindow);
 }
 
-void LocalPlayer::Tick(duration<float> elapsedTime)
+void LocalPlayer::Tick(std::chrono::duration<float> elapsedTime)
 {
 	_slateWindow->ExecuteTick(elapsedTime);
 }

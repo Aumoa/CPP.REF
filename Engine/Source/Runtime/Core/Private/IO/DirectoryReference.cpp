@@ -3,13 +3,11 @@
 #include "pch.h"
 #include "IO/DirectoryReference.h"
 
-using namespace std;
-
-DirectoryReference::DirectoryReference(const filesystem::path& filepath) : Super(filepath)
+DirectoryReference::DirectoryReference(const std::filesystem::path& filepath) : Super(filepath)
 {
 }
 
-filesystem::path DirectoryReference::GetName() const
+std::filesystem::path DirectoryReference::GetName() const
 {
 	return GetPath().stem();
 }
@@ -27,5 +25,5 @@ void DirectoryReference::CreateIfNotExists(bool bRecursive) const
 		dr.CreateIfNotExists(bRecursive);
 	}
 
-	filesystem::create_directory(GetPath() / filesystem::path());
+	std::filesystem::create_directory(GetPath() / std::filesystem::path());
 }

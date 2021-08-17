@@ -8,8 +8,6 @@
 #include "GameStructures.h"
 #include "Materials/Material.h"
 
-using namespace std;
-
 SceneRenderer::SceneRenderer(Scene* scene, RHIShader* shader) : Super()
 	, _scene(scene)
 	, _shader(shader)
@@ -32,7 +30,7 @@ SceneRenderer::~SceneRenderer()
 void SceneRenderer::CollectPrimitives(SceneVisibility* view)
 {
 	size_t primitives = _scene->_primitives.size();
-	_drawRelevances.resize(max(primitives, _drawRelevances.size()));
+	_drawRelevances.resize(std::max(primitives, _drawRelevances.size()));
 	_relevances = 0;
 
 	view->ForEachVisibleItem([&](size_t idx, size_t viewIndex)

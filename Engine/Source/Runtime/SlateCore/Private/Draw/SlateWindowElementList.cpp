@@ -7,8 +7,6 @@
 #include "RHI/RHIResource.h"
 #include "RHI/RHICommandQueue.h"
 
-using namespace std;
-
 SlateWindowElementList::SlateWindowElementList(const SWindow* paintWindow) : Super()
 	, _paintWindow(paintWindow)
 {
@@ -34,7 +32,7 @@ void SlateWindowElementList::Clear()
 	_drawElements.clear();
 }
 
-span<SlateDrawElement const> SlateWindowElementList::GetSpan() const
+std::span<SlateDrawElement const> SlateWindowElementList::GetSpan() const
 {
 	return _drawElements;
 }

@@ -3,8 +3,6 @@
 #include "pch.h"
 #include "GameFramework/AIController.h"
 
-using namespace std;
-
 AAIController::AAIController() : Super()
 {
 }

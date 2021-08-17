@@ -14,8 +14,11 @@
 #include "LogGame.h"
 #include "IFrameworkView.h"
 
-struct handle_closer { void operator()(HANDLE h) noexcept { if (h) CloseHandle(h); } };
-using ScopedHandle = std::unique_ptr<void, handle_closer>;
+namespace WinMouseInternal
+{
+    struct handle_closer { void operator()(HANDLE h) noexcept { if (h) CloseHandle(h); } };
+    using ScopedHandle = std::unique_ptr<void, handle_closer>;
+}
 
 //======================================================================================
 // Win32 desktop implementation
@@ -220,10 +223,10 @@ private:
     HWND            mWindow;
     EMousePositionMode mMode;
 
-    ScopedHandle    mScrollWheelValue;
-    ScopedHandle    mRelativeRead;
-    ScopedHandle    mAbsoluteMode;
-    ScopedHandle    mRelativeMode;
+    WinMouseInternal::ScopedHandle    mScrollWheelValue;
+    WinMouseInternal::ScopedHandle    mRelativeRead;
+    WinMouseInternal::ScopedHandle    mAbsoluteMode;
+    WinMouseInternal::ScopedHandle    mRelativeMode;
 
     int             mLastX;
     int             mLastY;

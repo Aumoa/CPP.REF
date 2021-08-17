@@ -4,12 +4,12 @@
 #include "Shaders/ColorShader/ColorShader.h"
 #include "Materials/Material.h"
 
+#ifndef BYTE
 #define BYTE uint8
+#endif
 
 #include "ColorShaderVS.hlsl.h"
 #include "ColorShaderPS.hlsl.h"
-
-using namespace std;
 
 ColorShader::ColorShader(RHIDevice* device) : Super(device)
 {
@@ -39,12 +39,12 @@ ColorShader::ColorShader(RHIDevice* device) : Super(device)
 	_material = CreateSubobject<ColorShaderMaterial>(this);
 }
 
-span<uint8 const> ColorShader::CompileVS()
+std::span<uint8 const> ColorShader::CompileVS()
 {
 	return pColorShaderVS;
 }
 
-span<uint8 const> ColorShader::CompilePS()
+std::span<uint8 const> ColorShader::CompilePS()
 {
 	return pColorShaderPS;
 }
@@ -54,9 +54,9 @@ Material* ColorShader::GetDefaultMaterial() const
 	return _material;
 }
 
-vector<RHIShaderParameterElement> ColorShader::GetShaderParameterDeclaration() const
+std::vector<RHIShaderParameterElement> ColorShader::GetShaderParameterDeclaration() const
 {
-	vector<RHIShaderParameterElement> elements;
+	std::vector<RHIShaderParameterElement> elements;
 
 	// [0] Camera constants.
 	elements.emplace_back() =

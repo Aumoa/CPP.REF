@@ -7,8 +7,6 @@
 #include "RHI/RHIDevice.h"
 #include "RHI/RHIDeviceContext.h"
 
-using namespace std;
-
 RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType) : Super(device)
 {
 	ID3D12Device* d3ddev = device->GetDevice();
@@ -56,9 +54,9 @@ uint64 RHICommandQueue::GetLastSignal() const
 	return _signalNumber;
 }
 
-uint64 RHICommandQueue::ExecuteDeviceContexts(span<RHIDeviceContext*> deviceContexts)
+uint64 RHICommandQueue::ExecuteDeviceContexts(std::span<RHIDeviceContext*> deviceContexts)
 {
-	vector<ID3D12CommandList*> commandLists;
+	std::vector<ID3D12CommandList*> commandLists;
 	commandLists.reserve(deviceContexts.size());
 
 	for (size_t i = 0; i < deviceContexts.size(); ++i)

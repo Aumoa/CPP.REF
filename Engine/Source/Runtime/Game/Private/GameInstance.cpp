@@ -9,14 +9,11 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/LocalPlayer.h"
 
-using namespace std;
-using namespace std::chrono;
-
 GameInstance::GameInstance() : Super()
 {
 }
 
-void GameInstance::Tick(duration<float> elapsedTime)
+void GameInstance::Tick(std::chrono::duration<float> elapsedTime)
 {
 	_world->LevelTick(elapsedTime);
 	_localPlayer->Tick(elapsedTime);

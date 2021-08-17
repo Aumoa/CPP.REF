@@ -4,9 +4,6 @@
 #include "Mathematics/MathEx.h"
 #include "Mathematics/Radians.h"
 
-using namespace std;
-using namespace std::numbers;
-
 float MathEx::Sin(const Radians& v)
 {
 	return sin(v.Value);
@@ -44,6 +41,8 @@ float MathEx::Atan2(float y, float x)
 
 void MathEx::SinCos(const Radians& x, float& sin, float& cos)
 {
+	using namespace std::numbers;
+
 	float quotient = (pi_v<float> *0.5f) * x.Value;
 	if (x >= 0)
 	{

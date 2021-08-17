@@ -6,12 +6,12 @@
 #include "SlateMinimal.h"
 #include "Draw/SlateWindowElementList.h"
 
+#ifndef BYTE
 #define BYTE uint8
+#endif
 
 #include "SlateShaderVS.hlsl.h"
 #include "SlateShaderPS.hlsl.h"
-
-using namespace std;
 
 SlateShader::SlateShader(RHIDevice* device) : Super(device)
 {
@@ -41,12 +41,12 @@ SlateShader::SlateShader(RHIDevice* device) : Super(device)
 	_material = CreateSubobject<SlateShaderMaterial>(this);
 }
 
-span<uint8 const> SlateShader::CompileVS()
+std::span<uint8 const> SlateShader::CompileVS()
 {
 	return pSlateShaderVS;
 }
 
-span<uint8 const> SlateShader::CompilePS()
+std::span<uint8 const> SlateShader::CompilePS()
 {
 	return pSlateShaderPS;
 }
@@ -74,9 +74,9 @@ void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2&
 	deviceContext->DrawInstanced(4, 1);
 }
 
-vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaration() const
+std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaration() const
 {
-	vector<RHIShaderParameterElement> elements;
+	std::vector<RHIShaderParameterElement> elements;
 
 	// [0] SlateConstants
 	elements.emplace_back() =

@@ -40,3 +40,5 @@ public:
 private:
 	static void InternalLog(LogCategory& category, ELogVerbosity logVerbosity, std::wstring& message);
 };
+
+#define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(Category, ELogVerbosity::Verbosity, Format, ##__VA_ARGS__)

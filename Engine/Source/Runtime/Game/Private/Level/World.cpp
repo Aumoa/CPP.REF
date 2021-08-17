@@ -10,11 +10,6 @@
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Camera/PlayerCameraManager.h"
 
-using enum ELogVerbosity;
-
-using namespace std;
-using namespace std::chrono;
-
 World::World(GameEngine* engine) : Super()
 	, _engine(engine)
 {
@@ -26,7 +21,7 @@ Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
 {
 	if (!levelToLoad.IsValid())
 	{
-		LogSystem::Log(LogWorld, Error, L"The parameter that specified class of desired to load level is nullptr. Abort.");
+		SE_LOG(LogWorld, Error, L"The parameter that specified class of desired to load level is nullptr. Abort.");
 		return nullptr;
 	}
 
@@ -40,7 +35,7 @@ Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
 	Level* levelInstance = levelToLoad.Instantiate(this);
 	if (!levelInstance->LoadLevel(this))
 	{
-		LogSystem::Log(LogWorld, Fatal, L"Could not load level.");
+		SE_LOG(LogWorld, Fatal, L"Could not load level.");
 		DestroySubobject(levelInstance);
 		return nullptr;
 	}
@@ -102,7 +97,7 @@ void World::UnregisterComponent(ActorComponent* component)
 	}
 }
 
-void World::LevelTick(duration<float> elapsedTime)
+void World::LevelTick(std::chrono::duration<float> elapsedTime)
 {
 	for (auto& func : _tickInstances)
 	{
