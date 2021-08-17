@@ -243,6 +243,12 @@
     <ClCompile Include="Private\Assets\Mesh.cpp">
       <Filter>Private\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Assets\Asset.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Misc\Paths.cpp">
+      <Filter>Private\Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h">
@@ -418,6 +424,12 @@
     </ClInclude>
     <ClInclude Include="Public\Assets\Mesh.h">
       <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\Asset.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\Paths.h">
+      <Filter>Public\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

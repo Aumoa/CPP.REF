@@ -17,12 +17,12 @@ public:
 private:
 	GameEngine* _engine = nullptr;
 	RHIVertexFactory* _factory = nullptr;
+	std::map<std::filesystem::path, Object*> _assets;
 
 public:
 	AssetImporter(GameEngine* engine, RHIVertexFactory* factory);
 
 	void SearchContents();
-	std::filesystem::path GetContentDir() const;
 
 	StaticMesh* ImportStaticMesh(const std::filesystem::path& importPath);
 };

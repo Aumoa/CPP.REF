@@ -46,6 +46,7 @@ void GameEngine::InitEngine(GameInstance* gameInstance)
 	_colorShader->Compile(_colorVertexFactory);
 	_rtv = CreateSubobject<RHIRenderTargetView>(_device, 3);
 	_assimp = CreateSubobject<AssetImporter>(this, _colorVertexFactory);
+	_assimp->SearchContents();
 	_dsv = CreateSubobject<RHIDepthStencilView>(_device, 1);
 	_transparentShader = CreateSubobject<TransparentShader>(_device);
 	_transparentShader->Compile(_colorVertexFactory);

@@ -2,9 +2,11 @@
 
 #include "pch.h"
 #include "Assets/AssetImporter.h"
-#include "GameEngine.h"
 #include "Assets/StaticMesh.h"
 #include "Assets/Parser/AssimpParser.h"
+#include "GameEngine.h"
+#include "LogGame.h"
+#include "Misc/Paths.h"
 
 AssetImporter::AssetImporter(GameEngine* engine, RHIVertexFactory* factory) : Super()
 	, _engine(engine)
@@ -14,12 +16,27 @@ AssetImporter::AssetImporter(GameEngine* engine, RHIVertexFactory* factory) : Su
 
 void AssetImporter::SearchContents()
 {
-	std::queue<std::filesystem::directory_iterator> iterators;
-}
+	using namespace std::filesystem;
 
-std::filesystem::path AssetImporter::GetContentDir() const
-{
-	return std::filesystem::path(L"Content");
+	std::queue<directory_iterator> iterators;
+	iterators.emplace(directory_iterator(Paths::GetContentPath()));
+
+	for (directory_iterator it; !iterators.empty(); iterators.pop())
+	{
+		it = iterators.front();
+
+		for (auto& entry : it)
+		{
+			if (entry.is_directory())
+			{
+				iterators.emplace(entry.path());
+			}
+			else
+			{
+				_assets.emplace(entry.path(), nullptr);
+			}
+		}
+	}
 }
 
 StaticMesh* AssetImporter::ImportStaticMesh(const std::filesystem::path& importPath)

@@ -130,6 +130,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Assets\Asset.cpp" />
     <ClCompile Include="Private\Assets\AssetImporter.cpp" />
     <ClCompile Include="Private\Assets\Mesh.cpp" />
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="Private\Materials\Material.cpp" />
     <ClCompile Include="Private\Materials\MaterialInstance.cpp" />
     <ClCompile Include="Private\Misc\GeometryGenerator.cpp" />
+    <ClCompile Include="Private\Misc\Paths.cpp" />
     <ClCompile Include="Private\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -191,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h" />
+    <ClInclude Include="Public\Assets\Asset.h" />
     <ClInclude Include="Public\Assets\AssetImporter.h" />
     <ClInclude Include="Public\Assets\Mesh.h" />
     <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
@@ -229,6 +232,7 @@
     <ClInclude Include="Public\Materials\MaterialInstance.h" />
     <ClInclude Include="Public\Misc\Bezier.h" />
     <ClInclude Include="Public\Misc\GeometryGenerator.h" />
+    <ClInclude Include="Public\Misc\Paths.h" />
     <ClInclude Include="Public\PlatformMisc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="Public\PlatformMisc\KeyboardTracker.h" />
     <ClInclude Include="Public\PlatformMisc\MouseStateTracker.h" />
