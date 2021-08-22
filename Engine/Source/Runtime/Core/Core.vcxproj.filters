@@ -55,6 +55,9 @@
     <ClCompile Include="Private\Misc\CommandLine.cpp">
       <Filter>Private\Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformModule.cpp">
+      <Filter>Private\PlatformMisc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -113,6 +116,12 @@
     </Filter>
     <Filter Include="Private\Misc">
       <UniqueIdentifier>{3a331db3-d4f4-4aa0-a54a-e80db945d4fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\PlatformMisc">
+      <UniqueIdentifier>{f7a69aa7-c008-4f86-b412-7631604aa4ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\PlatformMisc">
+      <UniqueIdentifier>{fa236b59-3a7c-4779-a645-cb588b069189}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="Public\Misc\CommandLine.h">
       <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\PlatformModule.h">
+      <Filter>Public\PlatformMisc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

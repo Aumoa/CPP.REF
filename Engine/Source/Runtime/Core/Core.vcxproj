@@ -118,6 +118,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Private\PlatformMisc\PlatformModule.cpp" />
     <ClCompile Include="Private\Threading\EventHandle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="Public\Numerics\Vector3.h" />
     <ClInclude Include="Public\Numerics\Vector4.h" />
     <ClInclude Include="Public\Object.h" />
+    <ClInclude Include="Public\PlatformMisc\PlatformModule.h" />
     <ClInclude Include="Public\PrimitiveTypes.h" />
     <ClInclude Include="Public\Threading\EventHandle.h" />
   </ItemGroup>
