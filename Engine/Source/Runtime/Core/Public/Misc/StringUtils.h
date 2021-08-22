@@ -7,6 +7,7 @@
 #include <span>
 #include <format>
 #include <sstream>
+#include <vector>
 #include "PrimitiveTypes.h"
 
 /// <summary>
@@ -69,4 +70,69 @@ public:
 	/// <param name="codePage"> The code page that desired converted. </param>
 	/// <returns> Converted multibyte string. </returns>
 	static std::string AsMultibyte(const std::wstring& unicode, uint32 codePage = 0);
+
+	/// <summary>
+	/// Returns a new string in which all leading and trailing occurrences of a set of specified characters from the current string are removed.
+	/// </summary>
+	static std::wstring Trim(const std::wstring& code, std::span<wchar_t const> trimChars);
+
+	/// <summary>
+	/// Returns a new string in which all leading and trailing occurrences of a set of specified characters from the current string are removed.
+	/// </summary>
+	static std::wstring Trim(const std::wstring& code)
+	{
+		wchar_t trimChars[] = { L' ' };
+		return Trim(code, trimChars);
+	}
+
+	/// <summary>
+	/// Returns a string array that contains the substrings in this instance that are delimited by elements of a specified string.
+	/// </summary>
+	/// <param name="formatStr"> The string to split. </param>
+	/// <param name="separator"> The string that delimit the substrings in this string. </param>
+	/// <param name="bRemoveEmptyEntries"> Remove empty entries. </param>
+	/// <param name="bTrim"> Trim left and right strings. </param>
+	template<template<class...> class TContainer = std::vector>
+	static TContainer<std::wstring> Split(std::wstring_view formatStr, std::wstring_view separator, bool bRemoveEmptyEntries = false, bool bTrim = false)
+	{
+		TContainer<std::wstring> results;
+
+		for (size_t i = 0; i < formatStr.length();)
+		{
+			std::optional<std::wstring> view;
+			size_t seekp = formatStr.find(separator, i);
+
+			if (seekp == std::wstring::npos)
+			{
+				// Could not found separator.
+				view = formatStr.substr(i);
+				i = std::wstring::npos;
+			}
+			else
+			{
+				size_t length = seekp - i;
+				if (length != 0 || !bRemoveEmptyEntries)
+				{
+					view = formatStr.substr(i, length);
+				}
+				i = seekp + separator.length();
+			}
+
+			if (view)
+			{
+				if (bTrim)
+				{
+					view = Trim(view.value());
+					if (bRemoveEmptyEntries && view->length() == 0)
+					{
+						continue;
+					}
+				}
+
+				results.emplace_back(view.value());
+			}
+		}
+
+		return results;
+	}
 };

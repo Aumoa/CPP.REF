@@ -107,6 +107,7 @@
     <ClCompile Include="Private\IO\FileSystemReference.cpp" />
     <ClCompile Include="Private\LogCore.cpp" />
     <ClCompile Include="Private\Mathematics\MathEx.cpp" />
+    <ClCompile Include="Private\Misc\CommandLine.cpp" />
     <ClCompile Include="Private\Misc\DateTime.cpp" />
     <ClCompile Include="Private\Misc\StringUtils.cpp" />
     <ClCompile Include="Private\Numerics\Color.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Public\Mathematics\MathEx.h" />
     <ClInclude Include="Public\Mathematics\Radians.h" />
     <ClInclude Include="Public\Memory\ScopedPtr.h" />
+    <ClInclude Include="Public\Misc\CommandLine.h" />
     <ClInclude Include="Public\Misc\DateTime.h" />
     <ClInclude Include="Public\Misc\StringUtils.h" />
     <ClInclude Include="Public\Misc\UniqueType.h" />

@@ -52,6 +52,9 @@
     <ClCompile Include="Private\Misc\DateTime.cpp">
       <Filter>Private\Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Misc\CommandLine.cpp">
+      <Filter>Private\Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="Private\DirectXInlineHelper.h">
       <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\CommandLine.h">
+      <Filter>Public\Misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
