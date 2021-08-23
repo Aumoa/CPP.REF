@@ -99,7 +99,7 @@ void Material::SetVector3ParameterValueByName(std::wstring_view parameterName, c
 
 Vector3 Material::GetVector3ParameterValueByIndex(int32 index) const
 {
-	checkIdxf(index, _parametersDecl.size(), 0);
+	checkIdxf(index, _parametersDecl.size(), 0.0f);
 	return get<Vector3>(_storage[index]);
 }
 
@@ -109,7 +109,7 @@ Vector3 Material::GetVector3ParameterValueByName(std::wstring_view parameterName
 	if (index == -1)
 	{
 		SE_LOG(LogMaterial, Error, L"The parameter name \"{}\" does not found from this shader program.", parameterName);
-		return 0;
+		return 0.0f;
 	}
 	return GetVector3ParameterValueByIndex(index);
 }

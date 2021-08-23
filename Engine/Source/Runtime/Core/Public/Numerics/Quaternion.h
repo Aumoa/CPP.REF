@@ -2,18 +2,17 @@
 
 #pragma once
 
-#include "Vector4.h"
 #include <initializer_list>
-#include "Vector3.h"
+#include "Vector.h"
 #include "Mathematics/MathEx.h"
 #include "Mathematics/Degrees.h"
 
-struct Quaternion : public Vector4
+struct Quaternion : public VectorImpl<Quaternion, 4>
 {
 	/// <summary>
 	/// Initialize new <see cref="Quaternion"/> instance.
 	/// </summary>
-	inline constexpr Quaternion()
+	inline constexpr Quaternion() : VectorImpl()
 	{
 	}
 
@@ -21,12 +20,8 @@ struct Quaternion : public Vector4
 	/// Initialize new <see cref="Quaternion"/> instance.
 	/// </summary>
 	/// <param name="v"> The initialize value. </param>
-	inline constexpr Quaternion(float v)
+	inline constexpr Quaternion(float v) : VectorImpl(v)
 	{
-		for (size_t i = 0; i < Num(); ++i)
-		{
-			Values[i] = v;
-		}
 	}
 
 	/// <summary>
@@ -36,7 +31,7 @@ struct Quaternion : public Vector4
 	/// <param name="y"> The Y value. </param>
 	/// <param name="z"> The Z value. </param>
 	/// <param name="w"> The Z value. </param>
-	inline constexpr Quaternion(float x, float y, float z, float w) : Vector4(x, y, z, w)
+	inline constexpr Quaternion(float x, float y, float z, float w) : VectorImpl(x, y, z, w)
 	{
 	}
 
@@ -48,7 +43,7 @@ struct Quaternion : public Vector4
 	{
 		for (size_t i = 0; i < MathEx::Min(initializer.size(), Num()); ++i)
 		{
-			Values[i] = initializer.begin()[i];
+			Scalars[i] = initializer.begin()[i];
 		}
 	}
 
@@ -60,7 +55,7 @@ struct Quaternion : public Vector4
 	{
 		for (size_t i = 0; i < Num(); ++i)
 		{
-			Values[i] = copy[i];
+			Scalars[i] = copy[i];
 		}
 	}
 
@@ -76,85 +71,13 @@ struct Quaternion : public Vector4
 		{
 			if (i < ON)
 			{
-				Values[i] = copy[i];
+				Scalars[i] = copy[i];
 			}
 			else
 			{
-				Values[i] = fill;
+				Scalars[i] = fill;
 			}
 		}
-	}
-
-	/// <summary>
-	/// Get X component.
-	/// </summary>
-	/// <returns> Reference of X component. </returns>
-	inline constexpr const float& X() const
-	{
-		return Values[0];
-	}
-
-	/// <summary>
-	/// Get Y component.
-	/// </summary>
-	/// <returns> Reference of Y component. </returns>
-	inline constexpr const float& Y() const
-	{
-		return Values[1];
-	}
-
-	/// <summary>
-	/// Get Z component.
-	/// </summary>
-	/// <returns> Reference of Z component. </returns>
-	inline constexpr const float& Z() const
-	{
-		return Values[2];
-	}
-
-	/// <summary>
-	/// Get W component.
-	/// </summary>
-	/// <returns> Reference of W component. </returns>
-	inline constexpr const float& W() const
-	{
-		return Values[3];
-	}
-
-	/// <summary>
-	/// Get X component.
-	/// </summary>
-	/// <returns> Reference of X component. </returns>
-	inline float& X()
-	{
-		return Values[0];
-	}
-
-	/// <summary>
-	/// Get Y component.
-	/// </summary>
-	/// <returns> Reference of Y component. </returns>
-	inline float& Y()
-	{
-		return Values[1];
-	}
-
-	/// <summary>
-	/// Get Z component.
-	/// </summary>
-	/// <returns> Reference of Z component. </returns>
-	inline float& Z()
-	{
-		return Values[2];
-	}
-
-	/// <summary>
-	/// Get W component.
-	/// </summary>
-	/// <returns> Reference of W component. </returns>
-	inline float& W()
-	{
-		return Values[3];
 	}
 
 	/// <summary>
@@ -162,9 +85,9 @@ struct Quaternion : public Vector4
 	/// </summary>
 	constexpr Vector3 RotateVector(const Vector3& V) const
 	{
-		Vector3 Q = Swiz<0, 1, 2>();
+		Vector3 Q(X, Y, Z);
 		Vector3 T = (Q ^ V) * 2.0f;
-		return V + (T * W()) + (Q ^ T);
+		return V + (T * W) + (Q ^ T);
 	}
 
 	/// <summary>
@@ -172,7 +95,7 @@ struct Quaternion : public Vector4
 	/// </summary>
 	constexpr Quaternion GetInverse() const
 	{
-		return Quaternion(-X(), -Y(), -Z(), W());
+		return Quaternion(-X, -Y, -Z, W);
 	}
 
 	/// <summary>

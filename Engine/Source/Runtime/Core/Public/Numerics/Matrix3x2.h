@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Matrix.h"
-#include "Vector2.h"
 #include "Mathematics/Radians.h"
 
 struct Matrix3x2 : public Matrix<3, 2>
@@ -47,7 +46,7 @@ struct Matrix3x2 : public Matrix<3, 2>
 		{
 			1.0f, 0.0f,
 			0.0f, 1.0f,
-			translation.X(), translation.Y()
+			translation.X, translation.Y
 		};
 	}
 
@@ -55,8 +54,8 @@ struct Matrix3x2 : public Matrix<3, 2>
 	{
 		return Matrix3x2
 		{
-			scale.X(), 0.0f,
-			0.0f, scale.Y(),
+			scale.X, 0.0f,
+			0.0f, scale.Y,
 			0.0f, 0.0f
 		};
 	}
@@ -78,8 +77,8 @@ struct Matrix3x2 : public Matrix<3, 2>
 	{
 		return Matrix3x2
 		{
-			1.0f, shear.Y(),
-			shear.X(), 1.0f,
+			1.0f, shear.Y,
+			shear.X, 1.0f,
 			0.0f, 1.0f
 		};
 	}

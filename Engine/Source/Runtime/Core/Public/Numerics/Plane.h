@@ -86,6 +86,6 @@ struct Plane
 private:
 	const float& operator [](size_t index) const
 	{
-		return (&Normal.Values[0])[index];
+		return (&Normal.X)[index];
 	}
 };

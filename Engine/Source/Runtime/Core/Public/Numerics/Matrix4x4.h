@@ -5,7 +5,6 @@
 #include "Matrix.h"
 #include <initializer_list>
 #include "Vector.h"
-#include "Vector3.h"
 #include "Quaternion.h"
 #include "Mathematics/Radians.h"
 
@@ -158,7 +157,7 @@ struct Matrix4x4 : public Matrix<4, 4>
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			translation.X(), translation.Y(), translation.Z(), 1.0f
+			translation.X, translation.Y, translation.Z, 1.0f
 		};
 	}
 };

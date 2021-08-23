@@ -28,8 +28,8 @@ struct Shear2D
 		// Compute the M (Shear Slot) = CoTan(90 - SlopeAngle)
 
 		// 0 is a special case because Tan(90) == infinity
-		float shearX = angles.X() == 0 ? 0 : (1.0f / MathEx::Tan(Degrees(90.0f - MathEx::Clamp(angles.X(), -89.0f, 89.0f)).ToRadians()));
-		float shearY = angles.Y() == 0 ? 0 : (1.0f / MathEx::Tan(Degrees(90.0f - MathEx::Clamp(angles.Y(), -89.0f, 89.0f)).ToRadians()));
+		float shearX = angles.X == 0 ? 0 : (1.0f / MathEx::Tan(Degrees(90.0f - MathEx::Clamp(angles.X, -89.0f, 89.0f)).ToRadians()));
+		float shearY = angles.Y == 0 ? 0 : (1.0f / MathEx::Tan(Degrees(90.0f - MathEx::Clamp(angles.Y, -89.0f, 89.0f)).ToRadians()));
 
 		return Shear2D(shearX, shearY);
 	}
@@ -38,8 +38,8 @@ struct Shear2D
 	{
 		return
 		{
-			point[0] + point[1] * Shear.X(),
-			point[1] + point[0] * Shear.Y()
+			point[0] + point[1] * Shear.X,
+			point[1] + point[0] * Shear.Y
 		};
 	}
 
@@ -50,10 +50,10 @@ struct Shear2D
 
 	constexpr Matrix3x2 Concatenate(const Shear2D& rhs) const
 	{
-		float XXA = Shear.X();
-		float YYA = Shear.Y();
-		float XXB = rhs.Shear.X();
-		float YYB = rhs.Shear.Y();
+		float XXA = Shear.X;
+		float YYA = Shear.Y;
+		float XXB = rhs.Shear.X;
+		float YYB = rhs.Shear.Y;
 		return Matrix3x2
 		{
 			1 + YYA * XXB, YYB * YYA,
@@ -69,11 +69,11 @@ struct Shear2D
 
 	constexpr Matrix3x2 Inverse() const
 	{
-		float invDet = 1.0f / (1.0f - Shear.X() * Shear.Y());
+		float invDet = 1.0f / (1.0f - Shear.X * Shear.Y);
 		return Matrix3x2
 		{
-			invDet, -Shear.Y() * invDet,
-			-Shear.X() * invDet, invDet,
+			invDet, -Shear.Y * invDet,
+			-Shear.X * invDet, invDet,
 			0, 0
 		};
 	}

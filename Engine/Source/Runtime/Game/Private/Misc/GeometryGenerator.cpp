@@ -30,7 +30,7 @@ namespace GeometryGeneratorInternal
 
         for (auto it = vertices.begin(); it != vertices.end(); ++it)
         {
-            it->TexCoord.X() = (1.f - it->TexCoord.X());
+            it->TexCoord.X = (1.f - it->TexCoord.X);
         }
     }
 
@@ -40,9 +40,9 @@ namespace GeometryGeneratorInternal
     {
         for (auto it = vertices.begin(); it != vertices.end(); ++it)
         {
-            it->Normal.X() = -it->Normal.X();
-            it->Normal.Y() = -it->Normal.Y();
-            it->Normal.Z() = -it->Normal.Z();
+            it->Normal.X = -it->Normal.X;
+            it->Normal.Y = -it->Normal.Y;
+            it->Normal.Z = -it->Normal.Z;
         }
     }
 
@@ -366,8 +366,8 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
         Vector3 normalFloat3 = Normal;
 
         // calculate texture coordinates for this vertex
-        float longitude = atan2(normalFloat3.X(), -normalFloat3.Z());
-        float latitude = acos(normalFloat3.Y());
+        float longitude = atan2(normalFloat3.X, -normalFloat3.Z);
+        float latitude = acos(normalFloat3.Y);
 
         float u = longitude / PIx2 + 0.5f;
         float v = latitude / std::numbers::pi_v<float>;
@@ -390,7 +390,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
     for (size_t i = 0; i < preFixupVertexCount; ++i)
     {
         // This vertex is on the prime meridian if Pos.x and texcoord.u are both zero (allowing for small epsilon).
-        bool isOnPrimeMeridian = Vector2(vertices[i].Position.X(), vertices[i].TexCoord.X()).NearlyEquals(Vector2::GetZero(), MathEx::SmallNumber);
+        bool isOnPrimeMeridian = Vector2(vertices[i].Position.X, vertices[i].TexCoord.X).NearlyEquals(Vector2::GetZero(), MathEx::SmallNumber);
 
         if (isOnPrimeMeridian)
         {
@@ -398,7 +398,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
 
             // copy this vertex, correct the texture coordinate, and add the vertex
             RHIVertex v = vertices[i];
-            v.TexCoord.X() = 1.0f;
+            v.TexCoord.X = 1.0f;
             vertices.emplace_back(v);
 
             // Now find all the triangles which contain this vertex and update them if necessary
@@ -436,8 +436,8 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
 
                 // check the other two vertices to see if we might need to fix this triangle
 
-                if (abs(v0.TexCoord.X() - v1.TexCoord.X()) > 0.5f ||
-                    abs(v0.TexCoord.X() - v2.TexCoord.X()) > 0.5f)
+                if (abs(v0.TexCoord.X - v1.TexCoord.X) > 0.5f ||
+                    abs(v0.TexCoord.X - v2.TexCoord.X) > 0.5f)
                 {
                     // yep; replace the specified index to point to the new, corrected vertex
                     *triIndex0 = static_cast<uint32>(newIndex);
@@ -492,8 +492,8 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
 
             // Calculate the texcoords for the new pole vertex, add it to the vertices and update the index
             RHIVertex newPoleVertex = poleVertex;
-            newPoleVertex.TexCoord.X() = (otherVertex0.TexCoord.X() + otherVertex1.TexCoord.X()) / 2;
-            newPoleVertex.TexCoord.Y() = poleVertex.TexCoord.Y();
+            newPoleVertex.TexCoord.X = (otherVertex0.TexCoord.X + otherVertex1.TexCoord.X) / 2;
+            newPoleVertex.TexCoord.Y = poleVertex.TexCoord.Y;
 
             if (!overwrittenPoleVertex)
             {

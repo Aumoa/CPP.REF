@@ -45,8 +45,8 @@ private:
 	{
 		const SlateLayoutTransform AccumulatedLayoutTransform = TransformCalculus2D::Concatenate(localLayoutTransform, parentAccumulatedLayoutTransform);
 		const Vector2& Translation = AccumulatedLayoutTransform.GetTranslation();
-		AbsolutePosition.Values[0] = Translation.Values[0];
-		AbsolutePosition.Values[1] = Translation.Values[1];
+		AbsolutePosition.Scalars[0] = Translation.Scalars[0];
+		AbsolutePosition.Scalars[1] = Translation.Scalars[1];
 		Scale = AccumulatedLayoutTransform.GetScale();
 	}
 
@@ -65,8 +65,8 @@ private:
 	{
 		const SlateLayoutTransform AccumulatedLayoutTransform = TransformCalculus2D::Concatenate(localLayoutTransform, parentAccumulatedLayoutTransform);
 		const Vector2& Translation = AccumulatedLayoutTransform.GetTranslation();
-		AbsolutePosition.Values[0] = Translation.Values[0];
-		AbsolutePosition.Values[1] = Translation.Values[1];
+		AbsolutePosition.Scalars[0] = Translation.Scalars[0];
+		AbsolutePosition.Scalars[1] = Translation.Scalars[1];
 		Scale = AccumulatedLayoutTransform.GetScale();
 	}
 

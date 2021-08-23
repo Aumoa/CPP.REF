@@ -79,7 +79,7 @@ struct SlateLayoutTransform
 		{
 			Scale, 0.0f,
 			0.0f, Scale,
-			Translation.X(), Translation.Y()
+			Translation.X, Translation.Y
 		};
 	}
 	

@@ -6,140 +6,275 @@
 #include <string>
 #include <span>
 #include <array>
+#include <type_traits>
+#include "PrimitiveTypes.h"
 #include "Mathematics/MathEx.h"
 #include "Misc/StringUtils.h"
+#include "Container/BitSet.h"
 
-/// <summary>
-/// Represents a vector with specified count floating values.
-/// </summary>
 template<size_t N>
-struct Vector
+struct VectorScalarsImpl
 {
+	static constexpr size_t Count = N;
+	
+	union
+	{
+		float Scalars[Count];
+		struct
+		{
+			float X;
+			float Y;
+			float Z;
+			float W;
+		};
+	};
+
+	constexpr VectorScalarsImpl(float scalar = 0)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = scalar;
+		}
+	}
+
+	constexpr VectorScalarsImpl(const VectorScalarsImpl& impl)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = impl.Scalars[i];
+		}
+	}
+
+	template<class... TArgs> requires (sizeof...(TArgs) <= Count && sizeof...(TArgs) >= 2)
+	constexpr VectorScalarsImpl(const TArgs&... args) : Scalars{ args... }
+	{
+	}
+};
+
+template<>
+struct VectorScalarsImpl<1>
+{
+	static constexpr size_t Count = 1;
+
+	union
+	{
+		float Scalars[Count];
+		struct
+		{
+			float X;
+		};
+	};
+
+	constexpr VectorScalarsImpl(float scalar = 0)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = scalar;
+		}
+	}
+
+	constexpr VectorScalarsImpl(const VectorScalarsImpl& impl)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = impl.Scalars[i];
+		}
+	}
+};
+
+template<>
+struct VectorScalarsImpl<2>
+{
+	static constexpr size_t Count = 2;
+
+	union
+	{
+		float Scalars[Count];
+		struct
+		{
+			float X;
+			float Y;
+		};
+	};
+
+	constexpr VectorScalarsImpl(float scalar = 0)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = scalar;
+		}
+	}
+
+	constexpr VectorScalarsImpl(const VectorScalarsImpl& impl)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = impl.Scalars[i];
+		}
+	}
+
+	template<class... TArgs> requires (sizeof...(TArgs) <= Count && sizeof...(TArgs) >= 2)
+	constexpr VectorScalarsImpl(const TArgs&... args) : Scalars{ args... }
+	{
+	}
+};
+
+template<>
+struct VectorScalarsImpl<3>
+{
+	static constexpr size_t Count = 3;
+
+	union
+	{
+		float Scalars[Count];
+		struct
+		{
+			float X;
+			float Y;
+			float Z;
+		};
+	};
+
+	constexpr VectorScalarsImpl(float scalar = 0)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = scalar;
+		}
+	}
+
+	constexpr VectorScalarsImpl(const VectorScalarsImpl& impl)
+	{
+		for (size_t i = 0; i < Count; ++i)
+		{
+			Scalars[i] = impl.Scalars[i];
+		}
+	}
+
+	template<class... TArgs> requires (sizeof...(TArgs) <= Count && sizeof...(TArgs) >= 2)
+	constexpr VectorScalarsImpl(const TArgs&... args) : Scalars{ args... }
+	{
+	}
+};
+
+template<class TVectorImpl, size_t N>
+struct VectorImpl : public VectorScalarsImpl<N>
+{
+	using ScalarsImpl = VectorScalarsImpl<N>;
+
+	constexpr VectorImpl() : ScalarsImpl()
+	{
+	}
+
+	constexpr VectorImpl(float scalar) : ScalarsImpl(scalar)
+	{
+	}
+
+	template<class T, class... TArgs> requires
+		(N >= 2 && (sizeof...(TArgs) + 1 >= 2) && (sizeof...(TArgs) + 1 <= ScalarsImpl::Count)) &&
+		requires { { MoveInternalIndexImpl<0, T>() } -> std::same_as<size_t>; }
+	constexpr VectorImpl(const T& first, const TArgs&... args)
+		: VectorImpl(GetValueTuple<0>(first, args...), std::make_index_sequence<N>{})
+	{
+	}
+
+	template<class TOtherImpl, size_t _ON>
+	constexpr VectorImpl(const VectorImpl<TOtherImpl, _ON>& impl)
+		: VectorImpl(GetValueTuple<0>(impl), std::make_index_sequence<_ON>{})
+	{
+	}
+
+	template<class TOtherImpl>
+	constexpr VectorImpl(const VectorImpl<TOtherImpl, N>& impl) : ScalarsImpl(impl)
+	{
+	}
+
+private:
+	template<class... TArgs, size_t... _Seq>
+	constexpr VectorImpl(const std::tuple<TArgs...>& valueTuple, const std::index_sequence<_Seq...>&)
+		: ScalarsImpl(std::get<_Seq>(valueTuple)...)
+	{
+	}
+
+	template<size_t _InternalIdx, class T>
+	static constexpr float GetValueTupleImpl(const T& value)
+	{
+		if constexpr (std::convertible_to<std::remove_const_t<std::remove_reference_t<T>>, float>)
+		{
+			return (float)value;
+		}
+		else
+		{
+			return (float)value.Scalars[_InternalIdx];
+		}
+	}
+
+	template<size_t _InternalIdx, class T> requires std::convertible_to<std::remove_const_t<std::remove_reference_t<T>>, float>
+	static consteval size_t MoveInternalIndexImpl()
+	{
+		return 0;
+	}
+
+	template<size_t _InternalIdx, class T, decltype(T::Count)* = nullptr>
+	static consteval size_t MoveInternalIndexImpl()
+	{
+		constexpr size_t _Nx = _InternalIdx + 1;
+		return (_Nx == T::Count) ? 0 : _Nx;
+	}
+
+	template<size_t _InternalIdx, class T, class... TArgs>
+	static constexpr auto GetValueTuple(const T& value, const TArgs&... args)
+	{
+		constexpr size_t _Nx = MoveInternalIndexImpl<_InternalIdx, T>();
+		std::tuple tup = std::make_tuple(GetValueTupleImpl<_InternalIdx, T>(value));
+
+		if constexpr (_Nx != 0)
+		{
+			return std::tuple_cat(tup, GetValueTuple<_Nx>(value, args...));
+		}
+		else if constexpr (sizeof...(TArgs) != 0)
+		{
+			return std::tuple_cat(tup, GetValueTuple<_Nx>(args...));
+		}
+		else
+		{
+			return tup;
+		}
+	}
+
+public:
 	struct SelectControl
 	{
-		friend struct Vector<N>;
+		BitSet<N> Bits;
 
-		int32 Bits = 0;
-
-		inline constexpr SelectControl(std::initializer_list<bool> init_bits)
+		template<class... TArgs> requires (sizeof...(TArgs) <= ScalarsImpl::Count)
+		inline constexpr SelectControl(TArgs&&... args) : Bits(std::forward<TArgs>(args)...)
 		{
-			int32 mybit = 1;
-			for (const bool* it = init_bits.begin(); it != init_bits.end(); ++it)
-			{
-				if (*it)
-				{
-					Bits = Bits | mybit;
-				}
-				mybit <<= 1;
-			}
 		}
 
-		static inline constexpr SelectControl Less(const Vector<N>& lhs, const Vector<N>& rhs)
+		static inline constexpr SelectControl Less(const TVectorImpl& lhs, const TVectorImpl& rhs)
 		{
 			return Less_impl(lhs, rhs, std::make_index_sequence<N>{});
 		}
 
-		static inline constexpr SelectControl Greater(const Vector<N>& lhs, const Vector<N>& rhs)
+		static inline constexpr SelectControl Greater(const TVectorImpl& lhs, const TVectorImpl& rhs)
 		{
 			return Greater_impl(lhs, rhs, std::make_index_sequence<N>{});
 		}
 
 	private:
 		template<size_t... idx>
-		static inline constexpr SelectControl Less_impl(const Vector<N>& lhs, const Vector<N>& rhs, std::index_sequence<idx...>&&)
+		static inline constexpr SelectControl Less_impl(const TVectorImpl& lhs, const TVectorImpl& rhs, std::index_sequence<idx...>&&)
 		{
-			std::initializer_list<bool> inits = { (lhs[idx] < rhs[idx])... };
-			return SelectControl(inits);
+			return SelectControl((lhs[idx] < rhs[idx])...);
 		}
 
 		template<size_t... idx>
-		static inline constexpr SelectControl Greater_impl(const Vector<N>& lhs, const Vector<N>& rhs, std::index_sequence<idx...>&&)
+		static inline constexpr SelectControl Greater_impl(const TVectorImpl& lhs, const TVectorImpl& rhs, std::index_sequence<idx...>&&)
 		{
-			std::initializer_list<bool> inits = { (lhs[idx] > rhs[idx])... };
-			return SelectControl(inits);
+			return SelectControl((lhs[idx] > rhs[idx])...);
 		}
 	};
-
-	/// <summary>
-	/// The values.
-	/// </summary>
-	float Values[N] = {};
-
-	/// <summary>
-	/// Initialize new <see cref="Vector"/> instance.
-	/// </summary>
-	inline constexpr Vector()
-	{
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Vector"/> instance.
-	/// </summary>
-	/// <param name="v"> The initialize value. </param>
-	inline constexpr Vector(float v)
-	{
-		for (size_t i = 0; i < N; ++i)
-		{
-			Values[i] = v;
-		}
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Vector"/> instance.
-	/// </summary>
-	inline constexpr Vector(const Vector<N - 1>& lhs, float rhs)
-	{
-		for (size_t i = 0; i < N - 1; ++i)
-		{
-			Values[i] = lhs.Values[i];
-		}
-		Values[N - 1] = rhs;
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Vector"/> instance.
-	/// </summary>
-	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Vector(std::initializer_list<float> initializer)
-	{
-		for (size_t i = 0; i < MathEx::Min(initializer.size(), (size_t)N); ++i)
-		{
-			Values[i] = initializer.begin()[i];
-		}
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Vector"/> instance.
-	/// </summary>
-	/// <param name="copy"> The copy vector to initialize vector values. </param>
-	inline constexpr Vector(const Vector& copy)
-	{
-		for (size_t i = 0; i < N; ++i)
-		{
-			Values[i] = copy[i];
-		}
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Vector"/> instance.
-	/// </summary>
-	/// <param name="copy"> The copy vector to initialize vector values. </param>
-	/// <param name="fill"> The fill value for placed without initialization. </param>
-	template<size_t ON>
-	inline constexpr Vector(const Vector<ON>& copy, float fill = 0.0f)
-	{
-		for (size_t i = 0; i < N; ++i)
-		{
-			if (i < ON)
-			{
-				Values[i] = copy[i];
-			}
-			else
-			{
-				Values[i] = fill;
-			}
-		}
-	}
 
 	/// <summary>
 	/// Get vector element count.
@@ -159,7 +294,7 @@ struct Vector
 		float v = 0;
 		for (size_t i = 0; i < N; ++i)
 		{
-			v += Values[i] * Values[i];
+			v += ScalarsImpl::Scalars[i] * ScalarsImpl::Scalars[i];
 		}
 		return v;
 	}
@@ -179,11 +314,11 @@ struct Vector
 	/// <param name="rhs"> The target vector. </param>
 	/// <param name="epsilon"> The epsilon value. If different of two components is lower than this values, is nearly equals. </param>
 	/// <returns> Indicate two vectors is nearly equals. </returns>
-	inline constexpr bool NearlyEquals(const Vector& rhs, float epsilon = MathEx::SmallNumber) const
+	inline constexpr bool NearlyEquals(const TVectorImpl& rhs, float epsilon = MathEx::SmallNumber) const
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			if (MathEx::Abs(Values[i] - rhs.Values[i]) > epsilon)
+			if (MathEx::Abs(ScalarsImpl::Scalars[i] - rhs.Scalars[i]) > epsilon)
 			{
 				return false;
 			}
@@ -193,19 +328,19 @@ struct Vector
 
 	inline constexpr const float& operator [](size_t idx) const
 	{
-		return Values[idx];
+		return ScalarsImpl::Scalars[idx];
 	}
 
 	inline float& operator [](size_t idx)
 	{
-		return Values[idx];
+		return ScalarsImpl::Scalars[idx];
 	}
 
-	inline constexpr bool operator ==(const Vector& rhs) const
+	inline constexpr bool operator ==(const TVectorImpl& rhs) const
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			if (Values[i] != rhs.Values[i])
+			if (ScalarsImpl::Scalars[i] != rhs.Scalars[i])
 			{
 				return false;
 			}
@@ -213,11 +348,11 @@ struct Vector
 		return true;
 	}
 
-	inline constexpr bool operator !=(const Vector& rhs) const
+	inline constexpr bool operator !=(const TVectorImpl& rhs) const
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			if (Values[i] == rhs.Values[i])
+			if (ScalarsImpl::Scalars[i] == rhs.Scalars[i])
 			{
 				return false;
 			}
@@ -231,7 +366,7 @@ struct Vector
 	/// <param name="lhs"> The first vector. </param>
 	/// <param name="rhs"> The second vector. </param>
 	/// <returns> The squared distance between two vectors. </returns>
-	static inline constexpr float GetDistanceSq(const Vector& lhs, const Vector& rhs)
+	static inline constexpr float GetDistanceSq(const TVectorImpl& lhs, const TVectorImpl& rhs)
 	{
 		return (rhs - lhs).GetLengthSq();
 	}
@@ -242,7 +377,7 @@ struct Vector
 	/// <param name="lhs"> The first vector. </param>
 	/// <param name="rhs"> The second vector. </param>
 	/// <returns> The distance between two vectors. </returns>
-	static inline float GetDistance(const Vector& lhs, const Vector& rhs)
+	static inline float GetDistance(const TVectorImpl& lhs, const TVectorImpl& rhs)
 	{
 		return (rhs - lhs).GetLength();
 	}
@@ -251,148 +386,148 @@ struct Vector
 	/// Get normalized vector.
 	/// </summary>
 	/// <returns> The normalized vector. </returns>
-	inline Vector GetNormal() const
+	inline TVectorImpl GetNormal() const
 	{
 		float invSqrt = MathEx::InvSqrt(GetLengthSq());
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] * invSqrt;
+			result.Scalars[i] = ScalarsImpl::Scalars[i] * invSqrt;
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator -() const
+	inline constexpr TVectorImpl operator -() const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = -Values[i];
+			result.Scalars[i] = -ScalarsImpl::Scalars[i];
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator +(const Vector& rhs) const
+	inline constexpr TVectorImpl operator +(const TVectorImpl& rhs) const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] + rhs.Values[i];
+			result.Scalars[i] = ScalarsImpl::Scalars[i] + rhs.Scalars[i];
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator -(const Vector& rhs) const
+	inline constexpr TVectorImpl operator -(const TVectorImpl& rhs) const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] - rhs.Values[i];
+			result.Scalars[i] = ScalarsImpl::Scalars[i] - rhs.Scalars[i];
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator *(const Vector& rhs) const
+	inline constexpr TVectorImpl operator *(const TVectorImpl& rhs) const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] * rhs.Values[i];
+			result.Scalars[i] = ScalarsImpl::Scalars[i] * rhs.Scalars[i];
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator /(const Vector& rhs) const
+	inline constexpr TVectorImpl operator /(const TVectorImpl& rhs) const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] / rhs.Values[i];
+			result.Scalars[i] = ScalarsImpl::Scalars[i] / rhs.Scalars[i];
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator *(float rhs) const
+	inline constexpr TVectorImpl operator *(float rhs) const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] * rhs;
+			result.Scalars[i] = ScalarsImpl::Scalars[i] * rhs;
 		}
 		return result;
 	}
 
-	inline constexpr Vector operator /(float rhs) const
+	inline constexpr TVectorImpl operator /(float rhs) const
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = Values[i] / rhs;
+			result.Scalars[i] = ScalarsImpl::Scalars[i] / rhs;
 		}
 		return result;
 	}
 
-	inline Vector& operator =(const Vector& rhs)
+	inline TVectorImpl& operator =(const TVectorImpl& rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] = rhs.Values[i];
+			ScalarsImpl::Scalars[i] = rhs.Scalars[i];
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
-	inline Vector& operator +=(const Vector& rhs)
+	inline TVectorImpl& operator +=(const TVectorImpl& rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] += rhs.Values[i];
+			ScalarsImpl::Scalars[i] += rhs.Scalars[i];
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
-	inline Vector& operator -=(const Vector& rhs)
+	inline TVectorImpl& operator -=(const TVectorImpl& rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] -= rhs.Values[i];
+			ScalarsImpl::Scalars[i] -= rhs.Scalars[i];
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
-	inline Vector& operator *=(const Vector& rhs)
+	inline TVectorImpl& operator *=(const TVectorImpl& rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] *= rhs.Values[i];
+			ScalarsImpl::Scalars[i] *= rhs.Scalars[i];
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
-	inline Vector& operator /=(const Vector& rhs)
+	inline TVectorImpl& operator /=(const TVectorImpl& rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] /= rhs.Values[i];
+			ScalarsImpl::Scalars[i] /= rhs.Scalars[i];
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
-	inline Vector& operator *=(float rhs)
+	inline TVectorImpl& operator *=(float rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] *= rhs;
+			ScalarsImpl::Scalars[i] *= rhs;
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
-	inline Vector& operator /=(float rhs)
+	inline TVectorImpl& operator /=(float rhs)
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			Values[i] /= rhs;
+			ScalarsImpl::Scalars[i] /= rhs;
 		}
-		return *this;
+		return static_cast<TVectorImpl&>(*this);
 	}
 
 	/// <summary>
@@ -401,12 +536,12 @@ struct Vector
 	/// <param name="lhs"> The first vector. </param>
 	/// <param name="rhs"> The second vector.</param>
 	/// <returns> The result vector. </returns>
-	static inline constexpr Vector Max(const Vector& lhs, const Vector& rhs)
+	static inline constexpr TVectorImpl Max(const TVectorImpl& lhs, const TVectorImpl& rhs)
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = MathEx::Max(lhs.Values[i], rhs.Values[i]);
+			result.Scalars[i] = MathEx::Max(lhs.Scalars[i], rhs.Scalars[i]);
 		}
 		return result;
 	}
@@ -417,12 +552,12 @@ struct Vector
 	/// <param name="lhs"> The first vector. </param>
 	/// <param name="rhs"> The second vector.</param>
 	/// <returns> The result vector. </returns>
-	static inline constexpr Vector Min(const Vector& lhs, const Vector& rhs)
+	static inline constexpr TVectorImpl Min(const TVectorImpl& lhs, const TVectorImpl& rhs)
 	{
-		Vector result;
+		TVectorImpl result;
 		for (size_t i = 0; i < N; ++i)
 		{
-			result.Values[i] = MathEx::Min(lhs.Values[i], rhs.Values[i]);
+			result.Scalars[i] = MathEx::Min(lhs.Scalars[i], rhs.Scalars[i]);
 		}
 		return result;
 	}
@@ -439,10 +574,109 @@ struct Vector
 		std::array<std::wstring, N> composed;
 		for (size_t i = 0; i < N; ++i)
 		{
-			composed[i] = std::format(placeholder, Values[i]);
+			composed[i] = std::format(placeholder, ScalarsImpl::Scalars[i]);
 		}
 
 		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
+	}
+
+	/// <summary>
+	/// Get zero vector.
+	/// </summary>
+	inline static constexpr TVectorImpl GetZero()
+	{
+		return TVectorImpl(VectorImpl());
+	}
+
+	inline constexpr TVectorImpl Round() const
+	{
+		TVectorImpl V;
+		for (size_t i = 0; i < N; ++i)
+		{
+			V.Scalars[i] = MathEx::Round(ScalarsImpl::Scalars[i]);
+		}
+		return V;
+	}
+
+	inline static constexpr TVectorImpl Select(const TVectorImpl& lhs, const TVectorImpl& rhs, const SelectControl& select)
+	{
+		TVectorImpl V;
+		for (size_t i = 0; i < N; ++i)
+		{
+			if (select.Bits.GetBit(i))
+			{
+				V[i] = rhs[i];
+			}
+			else
+			{
+				V[i] = lhs[i];
+			}
+		}
+		return V;
+	}
+};
+
+template<template<size_t> class TVectorImpl, size_t N, std::enable_if_t<std::is_base_of_v<VectorImpl<TVectorImpl<N>, N>, TVectorImpl<N>>, void*> = nullptr>
+inline constexpr TVectorImpl<N> operator *(float lhs, const TVectorImpl<N>& rhs)
+{
+	return TVectorImpl(VectorImpl<TVectorImpl<N>, N>(lhs) * rhs);
+}
+
+template<template<size_t> class TVectorImpl, size_t N, std::enable_if_t<std::is_base_of_v<VectorImpl<TVectorImpl<N>, N>, TVectorImpl<N>>, void*> = nullptr>
+inline constexpr TVectorImpl<N> operator /(float lhs, const TVectorImpl<N>& rhs)
+{
+	return TVectorImpl(VectorImpl<TVectorImpl<N>, N>(lhs) / rhs);
+}
+
+/// <summary>
+/// Represents a vector with specified count floating values.
+/// </summary>
+template<size_t N>
+struct Vector : public VectorImpl<Vector<N>, N>
+{
+	using Impl = VectorImpl<Vector<N>, N>;
+
+	/// <summary>
+	/// Initialize new <see cref="Vector"/> instance.
+	/// </summary>
+	template<class... TArgs> requires std::constructible_from<Impl, TArgs...>
+	inline constexpr Vector(const TArgs&... args) : Impl(args...)
+	{
+	}
+
+	/// <summary>
+	/// Calculate cross product.
+	/// </summary>
+	/// <param name="lhs"> The first value. </param>
+	/// <param name="rhs"> The second value. </param>
+	/// <returns> The vector of result of cross product. </returns>
+	template<class...> requires (N == 2)
+	inline static constexpr float CrossProduct(const Vector& lhs, const Vector& rhs)
+	{
+		return lhs.X * rhs.Y - lhs.Y * rhs.X;
+	}
+
+	/// <summary>
+	/// Calculate cross product.
+	/// </summary>
+	/// <param name="lhs"> The first value. </param>
+	/// <param name="rhs"> The second value. </param>
+	/// <returns> The vector of result of cross product. </returns>
+	template<class...> requires (N == 3)
+	inline static constexpr Vector CrossProduct(const Vector& lhs, const Vector& rhs)
+	{
+		return
+		{
+			lhs.Y * rhs.Z - lhs.Z * rhs.Y,
+			lhs.Z * rhs.X - lhs.X * rhs.Z,
+			lhs.X * rhs.Y - lhs.Y * rhs.X
+		};
+	}
+
+	template<class...> requires (N == 3)
+	inline constexpr Vector operator ^(const Vector& rhs) const
+	{
+		return CrossProduct(*this, rhs);
 	}
 
 	/// <summary>
@@ -452,58 +686,31 @@ struct Vector
 	template<size_t... Indexes>
 	inline constexpr Vector<sizeof...(Indexes)> Swiz() const
 	{
-		return Vector<sizeof...(Indexes)>{ Values[Indexes]... };
-	}
-
-	inline constexpr Vector Round() const
-	{
-		Vector V;
-		for (size_t i = 0; i < N; ++i)
-		{
-			V.Values[i] = MathEx::Round(Values[i]);
-		}
-		return V;
+		return Vector<sizeof...(Indexes)>{ Impl::Scalars[Indexes]... };
 	}
 
 	/// <summary>
-	/// Get zero vector.
+	/// Get vector that removed single scalar value.
 	/// </summary>
-	inline static constexpr Vector GetZero();
-
-	inline static constexpr Vector Select(const Vector& lhs, const Vector& rhs, const SelectControl& select)
+	template<class...> requires (N > 1)
+	inline constexpr Vector<N - 1> Minor(size_t idx) const
 	{
-		Vector V;
-		int32 mybit = 1;
+		Vector<N - 1> results;
 		for (size_t i = 0; i < N; ++i)
 		{
-			if (mybit & select.Bits)
+			if (i < idx)
 			{
-				V[i] = rhs[i];
+				results.Scalars[i] = Impl::Scalars[i];
 			}
-			else
+			else if (i > idx)
 			{
-				V[i] = lhs[i];
+				results.Scalars[i - 1] = Impl::Scalars[i];
 			}
-			mybit <<= 1;
 		}
-		return V;
+		return results;
 	}
 };
 
-template<size_t N>
-inline constexpr Vector<N> operator *(float lhs, const Vector<N>& rhs)
-{
-	return Vector<N>(lhs) * rhs;
-}
-
-template<size_t N>
-inline constexpr Vector<N> operator /(float lhs, const Vector<N>& rhs)
-{
-	return Vector<N>(lhs) / rhs;
-}
-
-template<size_t N>
-inline constexpr auto Vector<N>::GetZero() -> Vector
-{
-	return Vector();
-}
+using Vector2 = Vector<2>;
+using Vector3 = Vector<3>;
+using Vector4 = Vector<4>;

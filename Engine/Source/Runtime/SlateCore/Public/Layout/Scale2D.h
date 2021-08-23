@@ -44,7 +44,7 @@ struct Scale2D
 
 	constexpr Scale2D Inverse() const
 	{
-		return Scale2D(1.0f / Scale.X(), 1.0f / Scale.Y());
+		return Scale2D(1.0f / Scale.X, 1.0f / Scale.Y);
 	}
 
 	constexpr static float Concatenate(float lhs, float rhs)

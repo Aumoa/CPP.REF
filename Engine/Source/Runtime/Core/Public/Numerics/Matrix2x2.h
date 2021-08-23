@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Matrix.h"
-#include "Vector2.h"
 #include "Mathematics/Radians.h"
 
 struct Matrix2x2 : public Matrix<2, 2>
@@ -48,8 +47,8 @@ struct Matrix2x2 : public Matrix<2, 2>
 	{
 		return Matrix2x2
 		{
-			scale.X(), 0.0f,
-			0.0f, scale.Y()
+			scale.X, 0.0f,
+			0.0f, scale.Y
 		};
 	}
 
@@ -69,18 +68,17 @@ struct Matrix2x2 : public Matrix<2, 2>
 	{
 		return Matrix2x2
 		{
-			1.0f, shear.Y(),
-			shear.X(), 1.0f
+			1.0f, shear.Y,
+			shear.X, 1.0f
 		};
 	}
 
 	constexpr Vector2 TransformPoint(const Vector2& point) const
 	{
-		return
-		{
-			point.X() * V[0][0] + point.Y() * V[1][0],
-			point.X() * V[0][1] + point.Y() * V[1][1]
-		};
+		return Vector2(
+			point.X * V[0][0] + point.Y * V[1][0],
+			point.X * V[0][1] + point.Y * V[1][1]
+		);
 	}
 
 	constexpr Vector2 TransformVector(const Vector2& point) const

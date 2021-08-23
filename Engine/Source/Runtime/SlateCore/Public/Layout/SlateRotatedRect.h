@@ -42,10 +42,10 @@ struct SlateRotatedRect
 		};
 
 		return Rect(
-			MathEx::Min(MathEx::Min(MathEx::Min(Points[0].X(), Points[1].X()), Points[2].X()), Points[3].X()),
-			MathEx::Min(MathEx::Min(MathEx::Min(Points[0].Y(), Points[1].Y()), Points[2].Y()), Points[3].Y()),
-			MathEx::Max(MathEx::Max(MathEx::Max(Points[0].X(), Points[1].X()), Points[2].X()), Points[3].X()),
-			MathEx::Max(MathEx::Max(MathEx::Max(Points[0].Y(), Points[1].Y()), Points[2].Y()), Points[3].Y())
+			MathEx::Min(MathEx::Min(MathEx::Min(Points[0].X, Points[1].X), Points[2].X), Points[3].X),
+			MathEx::Min(MathEx::Min(MathEx::Min(Points[0].Y, Points[1].Y), Points[2].Y), Points[3].Y),
+			MathEx::Max(MathEx::Max(MathEx::Max(Points[0].X, Points[1].X), Points[2].X), Points[3].X),
+			MathEx::Max(MathEx::Max(MathEx::Max(Points[0].Y, Points[1].Y), Points[2].Y), Points[3].Y)
 		);
 	}
 

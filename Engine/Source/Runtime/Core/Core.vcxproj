@@ -126,6 +126,7 @@
     <ClInclude Include="Private\pch.h" />
     <ClInclude Include="Public\Concepts\SupportsObject.h" />
     <ClInclude Include="Public\Container\BitArray.h" />
+    <ClInclude Include="Public\Container\BitSet.h" />
     <ClInclude Include="Public\CoreAssert.h" />
     <ClInclude Include="Public\CoreMinimal.h" />
     <ClInclude Include="Public\Delegates\MulticastDelegate.h" />
@@ -162,9 +163,6 @@
     <ClInclude Include="Public\Numerics\Rect.h" />
     <ClInclude Include="Public\Numerics\Sphere.h" />
     <ClInclude Include="Public\Numerics\Vector.h" />
-    <ClInclude Include="Public\Numerics\Vector2.h" />
-    <ClInclude Include="Public\Numerics\Vector3.h" />
-    <ClInclude Include="Public\Numerics\Vector4.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformModule.h" />
     <ClInclude Include="Public\PrimitiveTypes.h" />

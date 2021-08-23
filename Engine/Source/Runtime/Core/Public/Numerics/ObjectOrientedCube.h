@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Vector3.h"
+#include "Vector.h"
 
 /// <summary>
 /// Represents object oriented cube.

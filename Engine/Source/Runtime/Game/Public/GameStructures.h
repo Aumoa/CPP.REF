@@ -345,8 +345,8 @@ struct Transform
     constexpr Vector4 TransformVector(const Vector4& v) const
     {
         const Vector4 scaled = v * Vector4(Scale, 1.0);
-        const Vector4 rotated = Rotation.RotateVector(scaled);
-        return rotated + Vector4(Translation * v.W(), v.W());
+        const Vector4 rotated = Rotation.RotateVector(scaled.Minor(3));
+        return rotated + Vector4(Translation * v.W, v.W);
     }
 
     /// <summary>

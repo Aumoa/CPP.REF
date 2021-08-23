@@ -22,9 +22,9 @@ Quaternion Quaternion::LookTo(const Vector3& forward, const Vector3& up)
 	U = Vector3::CrossProduct(F, R);
 
 	DirectX::XMMATRIX M = DirectX::XMMatrixSet(
-		R.X(), R.Y(), R.Z(), 0,
-		U.X(), U.Y(), U.Z(), 0,
-		F.X(), F.Y(), F.Z(), 0,
+		R.X, R.Y, R.Z, 0,
+		U.X, U.Y, U.Z, 0,
+		F.X, F.Y, F.Z, 0,
 		0, 0, 0, 1.0f
 	);
 

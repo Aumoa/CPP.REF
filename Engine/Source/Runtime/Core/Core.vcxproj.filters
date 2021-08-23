@@ -227,15 +227,6 @@
     <ClInclude Include="Public\Numerics\Vector.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Numerics\Vector2.h">
-      <Filter>Public\Numerics</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Numerics\Vector3.h">
-      <Filter>Public\Numerics</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Numerics\Vector4.h">
-      <Filter>Public\Numerics</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Numerics\AxisAlignedCube.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
@@ -265,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="Public\PlatformMisc\PlatformModule.h">
       <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Container\BitSet.h">
+      <Filter>Public\Container</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -50,7 +50,7 @@ public:
 	{
 		const Vector2 TL = TransformPoint(transform, Vector2(rect.Left, rect.Top));
 		const Vector2 RB = TransformPoint(transform, Vector2(rect.Right, rect.Bottom));
-		return Rect(MathEx::Min(TL.X(), RB.X()), MathEx::Min(TL.Y(), RB.Y()), MathEx::Max(TL.X(), RB.X()), MathEx::Max(TL.Y(), RB.Y()));
+		return Rect(MathEx::Min(TL.X, RB.X), MathEx::Min(TL.Y, RB.Y), MathEx::Max(TL.X, RB.X), MathEx::Max(TL.Y, RB.Y));
 	}
 
 	// LayoutImpl.h

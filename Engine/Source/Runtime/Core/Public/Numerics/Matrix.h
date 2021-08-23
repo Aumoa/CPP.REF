@@ -30,7 +30,7 @@ struct Matrix
 	{
 		for (size_t i = 0; i < MathEx::Max(values.size(), NRow * NCol); ++i)
 		{
-			V[i / NCol].Values[i % NCol] = values.begin()[i];
+			V[i / NCol].Scalars[i % NCol] = values.begin()[i];
 		}
 	}
 
@@ -161,10 +161,10 @@ struct Matrix
 		{
 			for (size_t j = 0; j < TCol; ++j)
 			{
-				m.V[i].Values[j] = 0;
+				m.V[i].Scalars[j] = 0;
 				for (size_t k = 0; k < NCol; ++k)
 				{
-					m.V[i].Values[j] += lhs.V[i].Values[k] * rhs.V[k].Values[j];
+					m.V[i].Scalars[j] += lhs.V[i].Scalars[k] * rhs.V[k].Scalars[j];
 				}
 			}
 		}

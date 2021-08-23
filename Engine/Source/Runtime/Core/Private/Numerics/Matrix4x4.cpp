@@ -35,14 +35,14 @@ void Matrix4x4::Decompose(Vector3& outTranslation, Vector3& outScale, Quaternion
 Vector3 Matrix4x4::TransformVector(const Vector3& vec) const
 {
 	DirectX::XMMATRIX M = XMLoadMatrix4x4(this);
-	DirectX::XMVECTOR V = DirectX::XMVector3Transform(DirectX::XMVectorSet(vec.X(), vec.Y(), vec.Z(), 1.0f), M);
+	DirectX::XMVECTOR V = DirectX::XMVector3Transform(DirectX::XMVectorSet(vec.X, vec.Y, vec.Z, 1.0f), M);
 	return XMStoreVector3(V);
 }
 
 Vector3 Matrix4x4::TransformNormal(const Vector3& vec) const
 {
 	DirectX::XMMATRIX M = XMLoadMatrix4x4(this);
-	DirectX::XMVECTOR V = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(vec.X(), vec.Y(), vec.Z(), 0.0f), M);
+	DirectX::XMVECTOR V = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(vec.X, vec.Y, vec.Z, 0.0f), M);
 	return XMStoreVector3(V);
 }
 

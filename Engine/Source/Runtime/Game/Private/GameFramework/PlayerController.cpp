@@ -75,20 +75,20 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 	float vy = (float)screenY / frameworkHeight;
 
 	Vector3 viewSpace;
-	viewSpace.X() = (vx * 2.0f - 1.0f - pm.V[2][0]) / pm.V[0][0];
-	viewSpace.Y() = (vy * -2.0f + 1.0f - pm.V[2][1]) / pm.V[1][1];
-	viewSpace.Z() = 1.0;
+	viewSpace.X = (vx * 2.0f - 1.0f - pm.V[2][0]) / pm.V[0][0];
+	viewSpace.Y = (vy * -2.0f + 1.0f - pm.V[2][1]) / pm.V[1][1];
+	viewSpace.Z = 1.0;
 
 	Vector3 dir;
 	Vector3 org;
 
-	dir.X() = viewSpace.X() * vminv.V[0][0] + viewSpace.Y() * vminv.V[1][0] + viewSpace.Z() * vminv.V[2][0];
-	dir.Y() = viewSpace.X() * vminv.V[0][1] + viewSpace.Y() * vminv.V[1][1] + viewSpace.Z() * vminv.V[2][1];
-	dir.Z() = viewSpace.X() * vminv.V[0][2] + viewSpace.Y() * vminv.V[1][2] + viewSpace.Z() * vminv.V[2][2];
+	dir.X = viewSpace.X * vminv.V[0][0] + viewSpace.Y * vminv.V[1][0] + viewSpace.Z * vminv.V[2][0];
+	dir.Y = viewSpace.X * vminv.V[0][1] + viewSpace.Y * vminv.V[1][1] + viewSpace.Z * vminv.V[2][1];
+	dir.Z = viewSpace.X * vminv.V[0][2] + viewSpace.Y * vminv.V[1][2] + viewSpace.Z * vminv.V[2][2];
 
-	org.X() = vminv.V[3][0];
-	org.Y() = vminv.V[3][1];
-	org.Z() = vminv.V[3][2];
+	org.X = vminv.V[3][0];
+	org.Y = vminv.V[3][1];
+	org.Z = vminv.V[3][2];
 
 	Ray<3> ray;
 	ray.Origin = org;

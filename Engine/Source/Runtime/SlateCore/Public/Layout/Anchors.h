@@ -39,12 +39,12 @@ struct Anchors
 
 	constexpr bool IsStretchedVertical() const
 	{
-		return Minimum.Y() != Maximum.Y();
+		return Minimum.Y != Maximum.Y;
 	}
 
 	constexpr bool IsStretchedHorizontal() const
 	{
-		return Minimum.X() != Maximum.X();
+		return Minimum.X != Maximum.X;
 	}
 
 	constexpr bool operator ==(const Anchors& rhs) const

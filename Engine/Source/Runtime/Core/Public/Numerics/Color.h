@@ -3,8 +3,8 @@
 #pragma once
 
 #include <string_view>
-#include "Vector4.h"
 #include "Mathematics/MathEx.h"
+#include "Numerics/Vector.h"
 
 /// <summary>
 /// Represents color, contains RGBA floating-point keys.
@@ -121,12 +121,12 @@ struct CORE_API Color
 
 	inline constexpr Color operator *(const Vector4& rhs) const
 	{
-		return Color(R * rhs.X(), G * rhs.Y(), B * rhs.Z(), A * rhs.W());
+		return Color(R * rhs.X, G * rhs.Y, B * rhs.Z, A * rhs.W);
 	}
 
 	inline constexpr Color operator /(const Vector4& rhs) const
 	{
-		return Color(R / rhs.X(), G / rhs.Y(), B / rhs.Z(), A / rhs.W());
+		return Color(R / rhs.X, G / rhs.Y, B / rhs.Z, A / rhs.W);
 	}
 
 	inline Color& operator =(const Color& rhs)
@@ -158,19 +158,19 @@ struct CORE_API Color
 
 	inline Color& operator *=(const Vector4& rhs)
 	{
-		R *= rhs.X();
-		G *= rhs.Y();
-		B *= rhs.Z();
-		A *= rhs.W();
+		R *= rhs.X;
+		G *= rhs.Y;
+		B *= rhs.Z;
+		A *= rhs.W;
 		return *this;
 	}
 
 	inline Color& operator /=(const Vector4& rhs)
 	{
-		R /= rhs.X();
-		G /= rhs.Y();
-		B /= rhs.Z();
-		A /= rhs.W();
+		R /= rhs.X;
+		G /= rhs.Y;
+		B /= rhs.Z;
+		A /= rhs.W;
 		return *this;
 	}
 

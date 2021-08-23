@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Vector2.h"
+#include "Vector.h"
 #include <initializer_list>
 
 struct Complex : public Vector2
@@ -10,77 +10,9 @@ struct Complex : public Vector2
 	/// <summary>
 	/// Initialize new <see cref="Complex"/> instance.
 	/// </summary>
-	inline constexpr Complex()
+	template<class... TArgs> requires std::constructible_from<Vector2, TArgs...>
+	inline constexpr Complex(const TArgs&... args) : Vector2(args...)
 	{
-	}
-
-	inline Complex(const Radians& rot)
-	{
-		MathEx::SinCos(rot, Values[0], Values[1]);
-	}
-
-	inline constexpr Complex(float x, float y) : Vector2(x, y)
-	{
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Complex"/> instance.
-	/// </summary>
-	/// <param name="initializer"> The initializer to initialize vector values. </param>
-	inline constexpr Complex(std::initializer_list<float> initializer)
-	{
-		for (size_t i = 0; i < MathEx::Min(initializer.size(), Num()); ++i)
-		{
-			Values[i] = initializer.begin()[i];
-		}
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="Complex"/> instance.
-	/// </summary>
-	/// <param name="copy"> The copy vector to initialize vector values. </param>
-	inline constexpr Complex(const Vector<2>& copy)
-	{
-		for (size_t i = 0; i < Num(); ++i)
-		{
-			Values[i] = copy[i];
-		}
-	}
-
-	/// <summary>
-	/// Get X component.
-	/// </summary>
-	/// <returns> Reference of X component. </returns>
-	inline constexpr const float& X() const
-	{
-		return Values[0];
-	}
-
-	/// <summary>
-	/// Get Y component.
-	/// </summary>
-	/// <returns> Reference of Y component. </returns>
-	inline constexpr const float& Y() const
-	{
-		return Values[1];
-	}
-
-	/// <summary>
-	/// Get X component.
-	/// </summary>
-	/// <returns> Reference of X component. </returns>
-	inline float& X()
-	{
-		return Values[0];
-	}
-
-	/// <summary>
-	/// Get Y component.
-	/// </summary>
-	/// <returns> Reference of Y component. </returns>
-	inline float& Y()
-	{
-		return Values[1];
 	}
 
 	/// <summary>
@@ -90,8 +22,8 @@ struct Complex : public Vector2
 	{
 		return
 		{
-			point[0] * X() - point[1] * Y(),
-			point[0] * Y() + point[1] * X()
+			point[0] * X - point[1] * Y,
+			point[0] * Y + point[1] * X
 		};
 	}
 	
@@ -112,7 +44,7 @@ struct Complex : public Vector2
 	/// </summary>
 	constexpr Complex GetInverse() const
 	{
-		return Complex(X(), -Y());
+		return Complex(X, -Y);
 	}
 
 	constexpr Complex Concatenate(const Complex& rhs) const
@@ -132,8 +64,8 @@ struct Complex : public Vector2
 	{
 		return Matrix2x2
 		{
-			X(), Y(),
-			-Y(), X()
+			X, Y,
+			-Y, X
 		};
 	}
 };

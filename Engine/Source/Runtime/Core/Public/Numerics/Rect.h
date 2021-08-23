@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Mathematics/MathEx.h"
-#include "Vector2.h"
+#include "Vector.h"
 
 struct Rect
 {
@@ -25,8 +25,8 @@ struct Rect
 	}
 
 	constexpr Rect(const Vector2& leftTop, const Vector2& rightBottom)
-		: Left(leftTop.X()), Top(leftTop.Y())
-		, Right(rightBottom.X()), Bottom(rightBottom.Y())
+		: Left(leftTop.X), Top(leftTop.Y)
+		, Right(rightBottom.X), Bottom(rightBottom.Y)
 	{
 	}
 
