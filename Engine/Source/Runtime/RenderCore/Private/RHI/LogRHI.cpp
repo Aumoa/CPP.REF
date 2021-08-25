@@ -3,4 +3,4 @@
 #include "pch.h"
 #include "RHI/LogRHI.h"
 
-LogCategory LogRHI(L"RHI");
+DEFINE_LOG_CATEGORY(LogRHI);

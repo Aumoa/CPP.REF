@@ -103,6 +103,12 @@
     <Filter Include="Private\Ticking">
       <UniqueIdentifier>{46ee6663-295b-49a7-84b1-d69c76704e01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\EngineSubsystems">
+      <UniqueIdentifier>{2edc2701-be21-4b96-9705-86cab5bc1a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\EngineSubsystems">
+      <UniqueIdentifier>{f72108d5-f0d6-47a3-b29e-2a3fda0d75cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -248,6 +254,21 @@
     </ClCompile>
     <ClCompile Include="Private\Misc\Paths.cpp">
       <Filter>Private\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Assets\SoftObjectPtr.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GameEngineSubsystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GameModuleSystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GameRenderSystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GameAssetSystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -430,6 +451,21 @@
     </ClInclude>
     <ClInclude Include="Public\Misc\Paths.h">
       <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\SoftObjectPtr.h">
+      <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GameEngineSubsystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GameModuleSystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GameRenderSystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GameAssetSystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

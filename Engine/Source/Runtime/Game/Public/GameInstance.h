@@ -66,3 +66,13 @@ protected:
 	/// </summary>
 	virtual void InitializeEngine();
 };
+
+#define DEFINE_GAME_MODULE(GameInstanceClass)			\
+extern "C"												\
+{														\
+	__declspec(dllexport)								\
+	GameInstance* LoadGameInstance()					\
+	{													\
+		return new GameInstanceClass();					\
+	}													\
+}

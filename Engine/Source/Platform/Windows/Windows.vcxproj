@@ -92,9 +92,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Game\Source\THStory\THStory.vcxproj">
-      <Project>{5f2c0713-688b-4c31-a3ef-ccf563add372}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>

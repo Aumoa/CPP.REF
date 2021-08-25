@@ -4,4 +4,4 @@
 
 #include "CoreMinimal.h"
 
-RENDERCORE_API extern LogCategory LogRHI;
+DECLARE_LOG_CATEGORY(RENDERCORE_API, LogRHI);

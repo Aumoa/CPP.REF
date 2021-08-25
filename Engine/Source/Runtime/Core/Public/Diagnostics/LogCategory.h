@@ -39,3 +39,6 @@ protected:
 	/// <param name="message"> The log message. </param>
 	virtual void OnLog(ELogVerbosity logVerbosity, std::wstring_view message);
 };
+
+#define DECLARE_LOG_CATEGORY(API, CategoryName) extern API LogCategory CategoryName;
+#define DEFINE_LOG_CATEGORY(CategoryName) LogCategory CategoryName(L ## #CategoryName);

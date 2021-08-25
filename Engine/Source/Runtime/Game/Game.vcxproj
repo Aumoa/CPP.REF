@@ -133,6 +133,7 @@
     <ClCompile Include="Private\Assets\Mesh.cpp" />
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
     <ClCompile Include="Private\Assets\Parser\MDLParser.cpp" />
+    <ClCompile Include="Private\Assets\SoftObjectPtr.cpp" />
     <ClCompile Include="Private\Assets\StaticMesh.cpp" />
     <ClCompile Include="Private\Assets\StreamableRenderAsset.cpp" />
     <ClCompile Include="Private\Camera\CameraComponent.cpp" />
@@ -143,6 +144,10 @@
     <ClCompile Include="Private\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
+    <ClCompile Include="Private\EngineSubsystems\GameAssetSystem.cpp" />
+    <ClCompile Include="Private\EngineSubsystems\GameEngineSubsystem.cpp" />
+    <ClCompile Include="Private\EngineSubsystems\GameModuleSystem.cpp" />
+    <ClCompile Include="Private\EngineSubsystems\GameRenderSystem.cpp" />
     <ClCompile Include="Private\GameEngine.cpp" />
     <ClCompile Include="Private\GameFramework\Actor.cpp" />
     <ClCompile Include="Private\GameFramework\AIController.cpp" />
@@ -197,6 +202,7 @@
     <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
     <ClInclude Include="Public\Assets\Parser\MDLParser.h" />
     <ClInclude Include="Public\Assets\Parser\ParserBase.h" />
+    <ClInclude Include="Public\Assets\SoftObjectPtr.h" />
     <ClInclude Include="Public\Assets\StaticMesh.h" />
     <ClInclude Include="Public\Assets\StreamableRenderAsset.h" />
     <ClInclude Include="Public\Camera\CameraComponent.h" />
@@ -207,6 +213,10 @@
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\EngineSubsystems\GameAssetSystem.h" />
+    <ClInclude Include="Public\EngineSubsystems\GameEngineSubsystem.h" />
+    <ClInclude Include="Public\EngineSubsystems\GameModuleSystem.h" />
+    <ClInclude Include="Public\EngineSubsystems\GameRenderSystem.h" />
     <ClInclude Include="Public\GameEngine.h" />
     <ClInclude Include="Public\GameEnums.h" />
     <ClInclude Include="Public\GameFramework\Actor.h" />

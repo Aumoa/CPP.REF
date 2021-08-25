@@ -33,21 +33,73 @@ void AssetImporter::SearchContents()
 			}
 			else
 			{
-				_assets.emplace(entry.path(), nullptr);
+				_assets.emplace(entry.path(), LoadedObjectData());
 			}
 		}
 	}
 }
 
-StaticMesh* AssetImporter::ImportStaticMesh(const std::filesystem::path& importPath)
+Asset* AssetImporter::LoadObject(const std::filesystem::path& importPath)
 {
-	AssimpParser aParse(_engine, _factory);
-	if (!aParse.TryParse(importPath))
+	auto find_it = _assets.find(importPath);
+	if (find_it == _assets.end())
 	{
+		SE_LOG(LogAssets, Error, L"Could not found asset path: {}", importPath.wstring());
 		return nullptr;
 	}
-	
-	StaticMesh* mesh = aParse.GetStaticMesh();
-	mesh->SetOuter(this);
-	return mesh;
+
+	LoadedObjectData& data = find_it->second;
+	if (data.Ptr == nullptr)
+	{
+		if (!importPath.has_extension())
+		{
+			SE_LOG(LogAssets, Error, L"It is not valid file extension for parsing.");
+			return nullptr;
+		}
+
+		std::filesystem::path ext = importPath.extension();
+		if (ext == L"jpg")
+		{
+			SE_LOG(LogAssets, Error, L"Could not supports jpg format yet.");
+			return nullptr;
+		}
+		else
+		{
+			data.Ptr = LoadAssimpObject(importPath);
+		}
+	}
+
+	return data.Ptr;
+}
+
+void AssetImporter::UnloadObject(const std::filesystem::path& importPath)
+{
+	auto find_it = _assets.find(importPath);
+	if (find_it == _assets.end())
+	{
+		SE_LOG(LogAssets, Error, L"Could not found asset path: {}", importPath.wstring());
+		return;
+	}
+
+	LoadedObjectData& data = find_it->second;
+	if (data.Ptr)
+	{
+		DestroySubobject(data.Ptr);
+		data.Ptr = nullptr;
+	}
+}
+
+Asset* AssetImporter::LoadAssimpObject(const std::filesystem::path& importPath)
+{
+	AssimpParser assimp(_engine, _factory);
+	if (!assimp.TryParse(importPath))
+	{
+		SE_LOG(LogAssets, Error, L"Could not parsing asset from file: {}", importPath.wstring());
+		return nullptr;
+	}
+
+	StaticMesh* loadedObject = assimp.GetStaticMesh();
+	loadedObject->SetOuter(this);
+
+	return loadedObject;
 }

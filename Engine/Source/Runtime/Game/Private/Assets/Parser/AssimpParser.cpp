@@ -56,6 +56,7 @@ bool AssimpParser::TryParse(const std::filesystem::path& importPath)
 	}
 
 	// Save directory name.
+	_path = importPath;
 	_name = importPath.stem();
 	_parent = importPath.parent_path();
 
@@ -268,6 +269,6 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 	ib->SetOuter(renderData);
 	batch.IndexBufferLocation = ib->GetGPUVirtualAddress();
 
-	_mesh = CreateSubobject<StaticMesh>(_name.wstring(), renderData);
+	_mesh = CreateSubobject<StaticMesh>(_path, _name.wstring(), renderData);
 	return true;
 }

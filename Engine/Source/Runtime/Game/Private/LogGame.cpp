@@ -3,16 +3,17 @@
 #include "pch.h"
 #include "LogGame.h"
 
-LogCategory LogEngine(L"Engine");
-LogCategory LogTicking(L"Ticking");
-LogCategory LogPawn(L"Pawn");
-LogCategory LogSceneComponent(L"SceneComponent");
-LogCategory LogController(L"Controller");
-LogCategory LogWorld(L"World");
-LogCategory LogCamera(L"Camera");
-LogCategory LogComponent(L"Component");
-LogCategory LogWindows(L"Windows");
-LogCategory LogAssets(L"Assets");
-LogCategory LogMaterial(L"Material");
-LogCategory LogStaticMesh(L"StaticMesh");
-LogCategory LogPlayerController(L"PlayerController");
+DEFINE_LOG_CATEGORY(LogEngine);
+DEFINE_LOG_CATEGORY(LogTicking);
+DEFINE_LOG_CATEGORY(LogPawn);
+DEFINE_LOG_CATEGORY(LogSceneComponent);
+DEFINE_LOG_CATEGORY(LogController);
+DEFINE_LOG_CATEGORY(LogWorld);
+DEFINE_LOG_CATEGORY(LogCamera);
+DEFINE_LOG_CATEGORY(LogComponent);
+DEFINE_LOG_CATEGORY(LogWindows);
+DEFINE_LOG_CATEGORY(LogAssets);
+DEFINE_LOG_CATEGORY(LogMaterial);
+DEFINE_LOG_CATEGORY(LogStaticMesh);
+DEFINE_LOG_CATEGORY(LogPlayerController);
+DEFINE_LOG_CATEGORY(LogModule);

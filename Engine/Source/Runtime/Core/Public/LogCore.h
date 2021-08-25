@@ -4,5 +4,5 @@
 
 #include "Diagnostics/LogCategory.h"
 
-extern CORE_API LogCategory LogCore;
-extern CORE_API LogCategory LogAssert;
+DECLARE_LOG_CATEGORY(CORE_API, LogCore);
+DECLARE_LOG_CATEGORY(CORE_API, LogAssert);

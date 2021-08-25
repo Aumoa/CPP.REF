@@ -3,5 +3,5 @@
 #include "pch.h"
 #include "LogCore.h"
 
-LogCategory LogCore(L"Core");
-LogCategory LogAssert(L"Assert");
+DEFINE_LOG_CATEGORY(LogCore);
+DEFINE_LOG_CATEGORY(LogAssert);

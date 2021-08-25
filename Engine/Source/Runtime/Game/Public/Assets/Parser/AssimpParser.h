@@ -15,6 +15,7 @@ private:
 	class Impl;
 
 	std::unique_ptr<Impl> _impl;
+	std::filesystem::path _path;
 	std::filesystem::path _name;
 	std::filesystem::path _parent;
 	StaticMesh* _mesh = nullptr;

@@ -41,7 +41,7 @@ void LogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 	}
 
 	wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
-	wstring composed = format(L"{}: Log{}: {}: {}\n", zoned_time(system_clock::now()).get_local_time(), _name, VerbosityToString(logVerbosity), message);
+	wstring composed = format(L"{}: {}: {}: {}\n", zoned_time(system_clock::now()).get_local_time(), _name, VerbosityToString(logVerbosity), message);
 	if (stream.is_open())
 	{
 		// Log to file.

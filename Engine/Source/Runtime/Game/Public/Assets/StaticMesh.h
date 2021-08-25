@@ -3,22 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Asset.h"
 
 class RHIVertexFactory;
 class StaticMeshRenderData;
 struct RHIVertex;
 
-class GAME_API StaticMesh : virtual public Object
+class GAME_API StaticMesh : public Asset
 {
 public:
-	using Super = Object;
+	using Super = Asset;
 
 private:
 	std::wstring _name;
 	StaticMeshRenderData* _renderData = nullptr;
 
 public:
-	StaticMesh(std::wstring_view name, StaticMeshRenderData* renderData);
+	StaticMesh(const std::filesystem::path& path, std::wstring_view name, StaticMeshRenderData* renderData);
 
 	std::wstring GetName() const { return _name; }
 

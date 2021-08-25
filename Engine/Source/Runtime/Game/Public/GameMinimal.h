@@ -10,3 +10,4 @@
 #include "SubclassOf.h"
 #include "GameFramework/Actor.h"
 #include "Misc/Paths.h"
+#include "Assets/SoftObjectPtr.h"

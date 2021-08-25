@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 
-extern GAME_API LogCategory LogEngine;
-extern GAME_API LogCategory LogTicking;
-extern GAME_API LogCategory LogPawn;
-extern GAME_API LogCategory LogSceneComponent;
-extern GAME_API LogCategory LogController;
-extern GAME_API LogCategory LogWorld;
-extern GAME_API LogCategory LogCamera;
-extern GAME_API LogCategory LogComponent;
-extern GAME_API LogCategory LogWindows;
-extern GAME_API LogCategory LogAssets;
-extern GAME_API LogCategory LogMaterial;
-extern GAME_API LogCategory LogStaticMesh;
-extern GAME_API LogCategory LogPlayerController;
+DECLARE_LOG_CATEGORY(GAME_API, LogEngine);
+DECLARE_LOG_CATEGORY(GAME_API, LogTicking);
+DECLARE_LOG_CATEGORY(GAME_API, LogPawn);
+DECLARE_LOG_CATEGORY(GAME_API, LogSceneComponent);
+DECLARE_LOG_CATEGORY(GAME_API, LogController);
+DECLARE_LOG_CATEGORY(GAME_API, LogWorld);
+DECLARE_LOG_CATEGORY(GAME_API, LogCamera);
+DECLARE_LOG_CATEGORY(GAME_API, LogComponent);
+DECLARE_LOG_CATEGORY(GAME_API, LogWindows);
+DECLARE_LOG_CATEGORY(GAME_API, LogAssets);
+DECLARE_LOG_CATEGORY(GAME_API, LogMaterial);
+DECLARE_LOG_CATEGORY(GAME_API, LogStaticMesh);
+DECLARE_LOG_CATEGORY(GAME_API, LogPlayerController);
+DECLARE_LOG_CATEGORY(GAME_API, LogModule);

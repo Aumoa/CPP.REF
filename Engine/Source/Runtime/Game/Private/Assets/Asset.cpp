@@ -17,3 +17,13 @@ std::filesystem::path Asset::GetAssetPath() const
 {
 	return _assetPath;
 }
+
+size_t Asset::AddRef()
+{
+	return ++_lockCount;
+}
+
+size_t Asset::ReleaseRef()
+{
+	return --_lockCount;
+}

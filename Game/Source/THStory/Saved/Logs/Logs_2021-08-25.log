@@ -1,0 +1,34 @@
+2021-08-25 14:55:27.5632979: LogEngine: Verbose: Initialize subsystems.
+2021-08-25 14:55:27.5639508: LogRender: Verbose: Beginning initialize GameRenderSystem.
+2021-08-25 14:55:27.5644561: LogRHI: Info: ----- Initialize Direct3D 12 debug layer.
+2021-08-25 14:55:27.5971693: LogRHI: Info: ----- Done!
+2021-08-25 14:55:27.5976585: LogRHI: Info: ----- Initialize COM subsystem.
+2021-08-25 14:55:27.5995664: LogRHI: Info: COM initialized.
+2021-08-25 14:55:27.6000694: LogRHI: Info: ----- Done!
+2021-08-25 14:55:27.6004305: LogRHI: Info: ----- Initialize DXGI subsystem.
+2021-08-25 14:55:27.6086730: LogRHI: Info: DXGI factory created.
+2021-08-25 14:55:27.6090399: LogRHI: Info: ----- Done!
+2021-08-25 14:55:27.6093205: LogRHI: Info: ----- Initialize D3D12 subsystem.
+2021-08-25 14:55:27.6097442: LogRHI: Info: Finding most suitable physical device.
+2021-08-25 14:55:27.6102284: LogRHI: Info: Suitable adapter found. Adapter: NVIDIA GeForce RTX 2070, VideoMemory: 7.8 GiB
+2021-08-25 14:55:27.8404603: LogRHI: Info: Direct3D 12 device created with feature level 11_0.
+2021-08-25 14:55:27.8408053: LogRHI: Info: ----- Done!
+2021-08-25 14:55:27.8544464: LogRender: Verbose: Register RHI garbage collector.
+2021-08-25 14:55:27.8548878: LogRender: Verbose: Finish to initialize GameRenderSystem.
+2021-08-25 14:55:49.3773494: LogEngine: Verbose: Initialize subsystems.
+2021-08-25 14:55:49.3778127: LogRender: Verbose: Beginning initialize GameRenderSystem.
+2021-08-25 14:55:49.3781397: LogRHI: Info: ----- Initialize Direct3D 12 debug layer.
+2021-08-25 14:55:49.3846546: LogRHI: Info: ----- Done!
+2021-08-25 14:55:49.3849940: LogRHI: Info: ----- Initialize COM subsystem.
+2021-08-25 14:55:49.4062640: LogRHI: Info: COM initialized.
+2021-08-25 14:55:49.4066512: LogRHI: Info: ----- Done!
+2021-08-25 14:55:49.4069868: LogRHI: Info: ----- Initialize DXGI subsystem.
+2021-08-25 14:55:49.4137966: LogRHI: Info: DXGI factory created.
+2021-08-25 14:55:49.4141702: LogRHI: Info: ----- Done!
+2021-08-25 14:55:49.4144287: LogRHI: Info: ----- Initialize D3D12 subsystem.
+2021-08-25 14:55:49.4147146: LogRHI: Info: Finding most suitable physical device.
+2021-08-25 14:55:49.4150495: LogRHI: Info: Suitable adapter found. Adapter: NVIDIA GeForce RTX 2070, VideoMemory: 7.8 GiB
+2021-08-25 14:55:49.5858108: LogRHI: Info: Direct3D 12 device created with feature level 11_0.
+2021-08-25 14:55:49.5861705: LogRHI: Info: ----- Done!
+2021-08-25 14:55:49.5935492: LogRender: Verbose: Register RHI garbage collector.
+2021-08-25 14:55:49.5939623: LogRender: Verbose: Finish to initialize GameRenderSystem.

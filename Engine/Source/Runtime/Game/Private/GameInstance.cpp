@@ -48,9 +48,6 @@ void GameInstance::InitializeEngine()
 	constexpr bool bDebug = false;
 #endif
 
-	_engine = CreateSubobject<GameEngine>(bDebug);
-	_engine->InitEngine(this);
-
 	_localPlayer = CreateSubobject<LocalPlayer>();
 	_localPlayer->Init(_engine);
 

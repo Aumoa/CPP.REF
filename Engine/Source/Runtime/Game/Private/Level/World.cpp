@@ -14,7 +14,7 @@ World::World(GameEngine* engine) : Super()
 	, _engine(engine)
 {
 	SetWorld(this);
-	_scene = CreateSubobject<Scene>(this, _engine->GetRHIDevice());
+	//_scene = CreateSubobject<Scene>(this, _engine->GetRHIDevice());
 }
 
 Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
