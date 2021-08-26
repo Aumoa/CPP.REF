@@ -5,7 +5,7 @@
 #include "PrimitiveTypes.h"
 #include "Object.h"
 #include "CoreAssert.h"
-#include "Concepts/SupportsObject.h"
+#include "Concepts/CoreConcepts.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"
 #include "Diagnostics/LogCategory.h"

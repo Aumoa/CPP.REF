@@ -11,6 +11,7 @@
 #include "Mathematics/MathEx.h"
 #include "Misc/StringUtils.h"
 #include "Container/BitSet.h"
+#include "Concepts/CoreConcepts.h"
 
 template<size_t N>
 struct VectorScalarsImpl
@@ -171,8 +172,7 @@ struct VectorImpl : public VectorScalarsImpl<N>
 	}
 
 	template<class T, class... TArgs> requires
-		(N >= 2 && (sizeof...(TArgs) + 1 >= 2) && (sizeof...(TArgs) + 1 <= ScalarsImpl::Count)) &&
-		requires { { MoveInternalIndexImpl<0, T>() } -> std::same_as<size_t>; }
+		(N >= 2 && (sizeof...(TArgs) + 1 >= 2) && (sizeof...(TArgs) + 1 <= ScalarsImpl::Count))
 	constexpr VectorImpl(const T& first, const TArgs&... args)
 		: VectorImpl(GetValueTuple<0>(first, args...), std::make_index_sequence<N>{})
 	{
@@ -639,7 +639,7 @@ struct Vector : public VectorImpl<Vector<N>, N>
 	/// <summary>
 	/// Initialize new <see cref="Vector"/> instance.
 	/// </summary>
-	template<class... TArgs> requires std::constructible_from<Impl, TArgs...>
+	template<class... TArgs> requires Constructible<Impl, TArgs...>
 	inline constexpr Vector(const TArgs&... args) : Impl(args...)
 	{
 	}

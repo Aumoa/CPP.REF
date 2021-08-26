@@ -13,3 +13,9 @@ concept SupportsObject = requires(T instance)
 {
 	{ instance.ToString(std::declval<std::wstring_view>()) } -> std::same_as<std::wstring>;
 };
+
+template<class T, class... TArgs>
+concept Constructible = requires(TArgs&&... args)
+{
+	{ T(std::forward<TArgs>(args)...) };
+};

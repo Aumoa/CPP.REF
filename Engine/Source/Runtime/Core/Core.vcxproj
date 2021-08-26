@@ -122,7 +122,7 @@
   <ItemGroup>
     <ClInclude Include="Private\DirectXInlineHelper.h" />
     <ClInclude Include="Private\pch.h" />
-    <ClInclude Include="Public\Concepts\SupportsObject.h" />
+    <ClInclude Include="Public\Concepts\CoreConcepts.h" />
     <ClInclude Include="Public\Container\BitArray.h" />
     <ClInclude Include="Public\Container\BitSet.h" />
     <ClInclude Include="Public\CoreAssert.h" />
