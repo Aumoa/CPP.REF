@@ -58,7 +58,7 @@ void RHISwapChain::ResizeBuffers(int32 width, int32 height)
 	{
 		ComPtr<ID3D12Resource> buffer;
 		HR(LogRHI, _swapChain->GetBuffer((UINT)i, IID_PPV_ARGS(&buffer)));
-		_buffers[i] = CreateSubobject<RHITexture2D>(GetDevice(), buffer.Get());
+		_buffers[i] = NewObject<RHITexture2D>(GetDevice(), buffer.Get());
 	}
 }
 

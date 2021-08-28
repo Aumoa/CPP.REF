@@ -19,7 +19,7 @@ RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType)
 	HR(LogRHI, d3ddev->CreateCommandQueue(&desc, IID_PPV_ARGS(&_queue)));
 	HR(LogRHI, d3ddev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
 
-	_fenceEvent = CreateSubobject<EventHandle>();
+	_fenceEvent = NewObject<EventHandle>();
 }
 
 RHICommandQueue::~RHICommandQueue()

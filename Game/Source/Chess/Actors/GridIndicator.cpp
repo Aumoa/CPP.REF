@@ -11,14 +11,14 @@ AGridIndicator::AGridIndicator() : Super()
 {
 	GameEngine* engine = GameEngine::GetEngine();
 
-	_StaticMeshComponent = CreateSubobject<StaticMeshComponent>();
+	_StaticMeshComponent = NewObject<StaticMeshComponent>();
 	SetRootComponent(_StaticMeshComponent);
 	_StaticMeshComponent->SetHiddenInGame(true);
 
-	_MeshObject = CreateSubobject<Cube>(L"CubeAsset", engine);
+	_MeshObject = NewObject<Cube>(L"CubeAsset", engine);
 	_StaticMeshComponent->SetStaticMesh(_MeshObject);
 
-	_materialInterface = CreateSubobject<MaterialInstance>(engine->GetTransparentShader()->GetDefaultMaterial());
+	_materialInterface = NewObject<MaterialInstance>(engine->GetTransparentShader()->GetDefaultMaterial());
 	_materialInterface->SetScalarParameterValueByName(L"Alpha", 0.5f);
 	_StaticMeshComponent->SetMaterial(0, _materialInterface);
 }

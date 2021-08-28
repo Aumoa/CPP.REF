@@ -12,7 +12,7 @@ SCompoundWidget::SCompoundWidget() : Super()
 
 int32 SCompoundWidget::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
-	auto* arrangedChildrens = drawElements->CreateSubobject<ArrangedChildrens>(ESlateVisibility::Visible);
+	auto* arrangedChildrens = drawElements->NewObject<ArrangedChildrens>(ESlateVisibility::Visible);
 	ArrangeChildren(arrangedChildrens, allottedGeometry);
 
 	return PaintArrangedChildrens(paintArgs, arrangedChildrens, allottedGeometry, cullingRect, drawElements, layer, bParentEnabled);

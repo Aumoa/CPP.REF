@@ -19,7 +19,7 @@ void SWindow::ExecuteTick(std::chrono::duration<float> deltaTime)
 
 void SWindow::ExecutePaint(SlateWindowElementList* drawElements) const
 {
-	ScopedPtr paintArgs = drawElements->CreateSubobject<PaintArgs>(this, _lastDeltaTime);
+	ScopedPtr paintArgs = drawElements->NewObject<PaintArgs>(this, _lastDeltaTime);
 	Paint(paintArgs.Get(), *_cachedRootGeometry, Rect(Vector2::GetZero(), GetDesiredSize()), drawElements, 0, IsEnabled());
 }
 

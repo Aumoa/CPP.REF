@@ -26,7 +26,7 @@ using enum ELogVerbosity;
 AChessBoard::AChessBoard() : Super()
 	, _built(this)
 {
-	StaticMeshComponent* smc = CreateSubobject<StaticMeshComponent>();
+	StaticMeshComponent* smc = NewObject<StaticMeshComponent>();
 	SetRootComponent(smc);
 
 	AssetImporter* assimp = GameEngine::GetEngine()->GetAssetImporter();
@@ -34,11 +34,11 @@ AChessBoard::AChessBoard() : Super()
 	smc->SetStaticMesh(sm);
 
 	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
-	MaterialInstance* black = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
+	MaterialInstance* black = NewObject<MaterialInstance>(cshader->GetDefaultMaterial());
 	black->SetVector3ParameterValueByName(L"Color", 0.2f);
 	smc->SetMaterial(0, black);
 
-	MaterialInstance* white = CreateSubobject<MaterialInstance>(cshader->GetDefaultMaterial());
+	MaterialInstance* white = NewObject<MaterialInstance>(cshader->GetDefaultMaterial());
 	white->SetVector3ParameterValueByName(L"Color", 0.8f);
 	smc->SetMaterial(1, white);
 }
@@ -96,7 +96,7 @@ void AChessBoard::InitBoard(World* world)
 
 AChessBoardProxy* AChessBoard::CreateProxy(EChessTeam team)
 {
-	AChessBoardProxy* proxy = CreateSubobject<AChessBoardProxy>(this);
+	AChessBoardProxy* proxy = NewObject<AChessBoardProxy>(this);
 	proxy->InitBoard(this, team);
 	return proxy;
 }

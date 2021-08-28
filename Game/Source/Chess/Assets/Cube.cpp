@@ -18,7 +18,7 @@ StaticMeshRenderData* Cube::GetRenderData(GameEngine* engine)
 	static StaticMeshRenderData* renderData = nullptr;
 	if (renderData == nullptr)
 	{
-		renderData = engine->CreateSubobject<StaticMeshRenderData>();
+		renderData = engine->NewObject<StaticMeshRenderData>();
 		MeshBatch & batch = renderData->MeshBatches.emplace_back();
 		batch.VertexFactory = engine->GetColorVertexFactory();
 		batch.MaterialSlots.emplace_back() = nullptr;

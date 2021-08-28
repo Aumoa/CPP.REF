@@ -51,7 +51,7 @@ public:
 	/// <param name="...args"> The constructor arguments. </param>
 	/// <returns> The instantiated pointer. </returns>
 	template<class T, class... TArgs>
-	T* CreateSubobject(TArgs&&... args)
+	T* NewObject(TArgs&&... args)
 	{
 		T* ptr = new T(std::forward<TArgs>(args)...);
 		_subobjects.emplace(ptr);

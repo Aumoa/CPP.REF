@@ -11,5 +11,5 @@ PaintArgs::PaintArgs(const SWidget* parentWidget, std::chrono::duration<float> d
 
 PaintArgs* PaintArgs::WithNewParent(const SWidget* parentWidget) const
 {
-	return GetOuter()->CreateSubobject<PaintArgs>(parentWidget, _deltaTime);
+	return GetOuter()->NewObject<PaintArgs>(parentWidget, _deltaTime);
 }
