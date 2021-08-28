@@ -11,8 +11,7 @@ class RHIResource;
 
 class RENDERCORE_API RHIVertexFactory : public RHIDeviceChild
 {
-public:
-	using Super = RHIDeviceChild;
+	CLASS_BODY(RHIVertexFactory)
 
 public:
 	RHIVertexFactory(RHIDevice* device);

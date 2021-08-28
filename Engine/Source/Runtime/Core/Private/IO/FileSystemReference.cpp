@@ -4,7 +4,8 @@
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
 
-FileSystemReference::FileSystemReference(const std::filesystem::path& filepath) : _path(std::filesystem::absolute(filepath))
+FileSystemReference::FileSystemReference(const std::filesystem::path& filepath) : Super()
+	, _path(std::filesystem::absolute(filepath))
 {
 }
 

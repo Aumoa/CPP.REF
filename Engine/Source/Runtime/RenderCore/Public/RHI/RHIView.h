@@ -12,8 +12,7 @@ class RHIShaderDescriptorView;
 /// </summary>
 class RENDERCORE_API RHIView : public RHIDeviceChild
 {
-public:
-	using Super = RHIDeviceChild;
+	CLASS_BODY(RHIView)
 
 public:
 	RHIView(RHIDevice* device);

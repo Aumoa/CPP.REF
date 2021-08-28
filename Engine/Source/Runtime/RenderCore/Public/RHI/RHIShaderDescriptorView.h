@@ -12,8 +12,7 @@ class RHIShaderResourceView;
 
 class RENDERCORE_API RHIShaderDescriptorView : public RHIDeviceChild
 {
-public:
-	using Super = RHIDeviceChild;
+	CLASS_BODY(RHIShaderDescriptorView)
 
 	// For access to internal, and collecting garbages.
 	friend class RHIDeviceContext;

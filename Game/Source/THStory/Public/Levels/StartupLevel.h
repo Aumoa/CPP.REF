@@ -7,8 +7,7 @@
 
 class THSTORY_API StartupLevel : public Level
 {
-public:
-	using Super = Level;
+	CLASS_BODY(StartupLevel)
 
 public:
 	StartupLevel();

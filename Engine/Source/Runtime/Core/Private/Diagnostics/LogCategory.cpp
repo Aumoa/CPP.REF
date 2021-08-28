@@ -37,7 +37,7 @@ void LogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 
 	if (!_file.has_value())
 	{
-		_file = FileReference(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));
+		_file.emplace(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));
 	}
 
 	wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);

@@ -12,8 +12,7 @@ class RHIDeviceContext;
 
 class SLATECORE_API SlateWindowElementList : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(SlateWindowElementList)
 
 private:
 	const SWindow* _paintWindow = nullptr;

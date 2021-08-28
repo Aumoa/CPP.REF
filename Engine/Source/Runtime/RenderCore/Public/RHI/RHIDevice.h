@@ -17,8 +17,7 @@ class RHITexture2D;
 /// </summary>
 class RENDERCORE_API RHIDevice : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(RHIDevice)
 
 private:
 	const uint8 _bDebug : 1;

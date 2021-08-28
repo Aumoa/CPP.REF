@@ -15,8 +15,7 @@ class RHITexture2D;
 /// </summary>
 class RENDERCORE_API RHIShaderResourceView : public RHIView
 {
-public:
-	using Super = RHIView;
+	CLASS_BODY(RHIShaderResourceView)
 
 private:
 	ComPtr<ID3D12DescriptorHeap> _descriptor;

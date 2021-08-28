@@ -15,8 +15,10 @@ enum class ELogVerbosity;
 /// </summary>
 class CORE_API LogCategory : virtual public Object
 {
+	CLASS_BODY(LogCategory)
 	friend class LogSystem;
 
+private:
 	static std::optional<FileReference> _file;
 	std::wstring _name;
 

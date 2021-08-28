@@ -14,8 +14,7 @@ class Object;
 /// </summary>
 class CORE_API FileReference : public FileSystemReference
 {
-public:
-	using Super = FileSystemReference;
+	CLASS_BODY(FileReference)
 
 private:
 	std::wfstream _sharedstream;

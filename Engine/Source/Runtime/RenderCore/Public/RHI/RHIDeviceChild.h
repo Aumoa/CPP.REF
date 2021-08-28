@@ -11,8 +11,7 @@ class RHIDevice;
 /// </summary>
 class RENDERCORE_API RHIDeviceChild : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(RHIDeviceChild)
 
 private:
 	RHIDevice* _device = nullptr;

@@ -7,8 +7,7 @@
 
 class THSTORY_API THGameInstance : public GameInstance
 {
-public:
-	using Super = GameInstance;
+	CLASS_BODY(THGameInstance)
 
 public:
 	THGameInstance();

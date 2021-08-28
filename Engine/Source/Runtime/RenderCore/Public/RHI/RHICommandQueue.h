@@ -21,8 +21,7 @@ class RHIDeviceContext;
 /// </summary>
 class RENDERCORE_API RHICommandQueue : public RHIDeviceChild
 {
-public:
-	using Super = RHIDeviceChild;
+	CLASS_BODY(RHIDeviceChild)
 
 private:
 	struct GarbageItem

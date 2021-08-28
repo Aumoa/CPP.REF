@@ -13,8 +13,7 @@ struct ID3D12Resource;
 /// </summary>
 class RENDERCORE_API RHIResource : public RHIDeviceChild
 {
-public:
-	using Super = RHIDeviceChild;
+	CLASS_BODY(RHIResource)
 
 private:
 	ComPtr<ID3D12Resource> _resource;

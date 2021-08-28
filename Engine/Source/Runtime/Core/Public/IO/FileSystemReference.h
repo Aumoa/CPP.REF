@@ -4,14 +4,18 @@
 
 #include <optional>
 #include <filesystem>
+#include "Object.h"
 
 class DirectoryReference;
 
 /// <summary>
 /// Represents file system reference.
 /// </summary>
-class CORE_API FileSystemReference
+class CORE_API FileSystemReference : virtual public Object
 {
+	CLASS_BODY(FileSystemReference)
+
+private:
 	std::optional<std::filesystem::path> _path;
 
 public:

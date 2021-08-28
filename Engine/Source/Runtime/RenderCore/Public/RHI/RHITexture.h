@@ -10,8 +10,7 @@
 /// </summary>
 class RENDERCORE_API RHITexture : public RHIResource
 {
-public:
-	using Super = RHIResource;
+	CLASS_BODY(RHITexture)
 
 public:
 	RHITexture(RHIDevice* device, ID3D12Resource* resource);

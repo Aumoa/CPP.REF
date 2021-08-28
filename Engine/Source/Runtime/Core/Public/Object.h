@@ -14,6 +14,10 @@
 /// </summary>
 class CORE_API Object
 {
+public:
+	using This = Object;
+
+private:
 	std::atomic<int32> _ref = 0;
 	Object* _outer = nullptr;
 	std::set<Object*> _subobjects;
@@ -78,3 +82,8 @@ private:
 	void InternalAttachSubobject(Object* subobject);
 	void InternalDestroySubobject(Object* subobject);
 };
+
+#define CLASS_BODY(Class)		\
+public:							\
+	using Super = This;			\
+	using This = Class;

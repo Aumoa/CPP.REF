@@ -10,8 +10,7 @@
 /// </summary>
 class CORE_API DirectoryReference : public FileSystemReference
 {
-public:
-	using Super = FileSystemReference;
+	CLASS_BODY(DirectoryReference)
 
 public:
 	/// <summary>

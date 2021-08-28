@@ -76,3 +76,6 @@ public:
 		return AddRaw(func);
 	}
 };
+
+#define DECLARE_MULTICAST_DELEGATE(DelegateName, ...)				\
+	using DelegateName = MulticastDelegate<void(__VA_ARGS__)>;
