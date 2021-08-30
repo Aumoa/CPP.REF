@@ -4,8 +4,6 @@
 
 #include "RenderMinimal.h"
 
-#include <Windows.h>
-
 #include <optional>
 #include <chrono>
 #include <string>

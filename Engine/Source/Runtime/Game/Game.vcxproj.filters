@@ -109,6 +109,9 @@
     <Filter Include="Private\EngineSubsystems">
       <UniqueIdentifier>{f72108d5-f0d6-47a3-b29e-2a3fda0d75cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\WindowsPlatform">
+      <UniqueIdentifier>{3f20b71c-78f8-476b-adee-abe4917d9f3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -198,12 +201,6 @@
     <ClCompile Include="Private\Materials\Material.cpp">
       <Filter>Private\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\WinKeyboard.cpp">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\PlatformMisc\WinMouse.cpp">
-      <Filter>Private\PlatformMisc</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Scene\StaticMeshSceneProxy.cpp">
       <Filter>Private\Scene</Filter>
     </ClCompile>
@@ -278,6 +275,15 @@
     </ClCompile>
     <ClCompile Include="Private\CoreDelegates.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp">
+      <Filter>Private\WindowsPlatform</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WindowsPlatform\WindowsPlatformKeyboard.cpp">
+      <Filter>Private\WindowsPlatform</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WindowsPlatform\WindowsPlatformMouse.cpp">
+      <Filter>Private\WindowsPlatform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -395,12 +401,6 @@
     <ClInclude Include="Public\PlatformMisc\MouseStateTracker.h">
       <Filter>Public\PlatformMisc</Filter>
     </ClInclude>
-    <ClInclude Include="Public\PlatformMisc\WinKeyboard.h">
-      <Filter>Public\PlatformMisc</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\PlatformMisc\WinMouse.h">
-      <Filter>Public\PlatformMisc</Filter>
-    </ClInclude>
     <ClInclude Include="Public\PlatformMisc\BitfieldInputChangeTracker.h">
       <Filter>Public\PlatformMisc</Filter>
     </ClInclude>
@@ -487,6 +487,21 @@
     </ClInclude>
     <ClInclude Include="Public\Misc\TickCalc.h">
       <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformHelper.h">
+      <Filter>Private\WindowsPlatform</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\IPlatformKeyboard.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformKeyboard.h">
+      <Filter>Private\WindowsPlatform</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformMisc\IPlatformMouse.h">
+      <Filter>Public\PlatformMisc</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformMouse.h">
+      <Filter>Private\WindowsPlatform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

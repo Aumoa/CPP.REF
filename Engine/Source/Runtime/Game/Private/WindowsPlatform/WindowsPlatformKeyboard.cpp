@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-// File: WinKeyboard.cpp
+// File: WindowsPlatformKeyboard.cpp
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -9,12 +9,12 @@
 //--------------------------------------------------------------------------------------
 
 #include "pch.h"
-#include "PlatformMisc/WinKeyboard.h"
-#include "LogGame.h"
+#include "WindowsPlatform/WindowsPlatformKeyboard.h"
+#include "WindowsPlatformHelper.h"
 
 static_assert(sizeof(KeyboardState) == (256 / 8), "Size mismatch for State");
 
-namespace WinKeyboardInternal
+namespace WindowsPlatformKeyboardInternal
 {
     inline void KeyDown(int key, KeyboardState& state) noexcept
     {
@@ -52,30 +52,30 @@ namespace WinKeyboardInternal
 //     {
 //
 //     case WM_ACTIVATEAPP:
-//         WinKeyboard::ProcessMessage(message, wParam, lParam);
+//         WindowsPlatformKeyboard::ProcessMessage(message, wParam, lParam);
 //         break;
 //
 //     case WM_KEYDOWN:
 //     case WM_SYSKEYDOWN:
 //     case WM_KEYUP:
 //     case WM_SYSKEYUP:
-//         WinKeyboard::ProcessMessage(message, wParam, lParam);
+//         WindowsPlatformKeyboard::ProcessMessage(message, wParam, lParam);
 //         break;
 //
 //     }
 // }
 //
 
-class WinKeyboard::Impl
+class WindowsPlatformKeyboard::Impl
 {
 public:
-    Impl(WinKeyboard* owner) :
+    Impl(WindowsPlatformKeyboard* owner) :
         mState{},
         mOwner(owner)
     {
         if (s_keyboard)
         {
-            throw std::logic_error("WinKeyboard is a singleton");
+            SE_LOG(LogWindows, Fatal, L"PlatformWindowsKeyboard is a singleton.");
         }
 
         s_keyboard = this;
@@ -108,18 +108,18 @@ public:
     }
 
     KeyboardState           mState;
-    WinKeyboard*       mOwner;
+    WindowsPlatformKeyboard* mOwner;
 
-    static WinKeyboard::Impl* s_keyboard;
+    static WindowsPlatformKeyboard::Impl* s_keyboard;
 };
 
 
-WinKeyboard::Impl* WinKeyboard::Impl::s_keyboard = nullptr;
+WindowsPlatformKeyboard::Impl* WindowsPlatformKeyboard::Impl::s_keyboard = nullptr;
 
 
-void WinKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
+void WindowsPlatformKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 {
-    using namespace WinKeyboardInternal;
+    using namespace WindowsPlatformKeyboardInternal;
 
     auto pImpl = Impl::s_keyboard;
 
@@ -130,45 +130,45 @@ void WinKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 
     switch (message)
     {
-        case WM_ACTIVATEAPP:
-            pImpl->Reset();
-            return;
+    case WM_ACTIVATEAPP:
+        pImpl->Reset();
+        return;
 
-        case WM_KEYDOWN:
-        case WM_SYSKEYDOWN:
-            down = true;
-            break;
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+        down = true;
+        break;
 
-        case WM_KEYUP:
-        case WM_SYSKEYUP:
-            break;
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+        break;
 
-        default:
-            return;
+    default:
+        return;
     }
 
     int vk = static_cast<int>(wParam);
     switch (vk)
     {
-        case VK_SHIFT:
-            vk = static_cast<int>(
-                MapVirtualKey((static_cast<UINT>(lParam) & 0x00ff0000) >> 16u,
-                    MAPVK_VSC_TO_VK_EX));
-            if (!down)
-            {
-                // Workaround to ensure left vs. right shift get cleared when both were pressed at same time
-                KeyUp(VK_LSHIFT, pImpl->mState);
-                KeyUp(VK_RSHIFT, pImpl->mState);
-            }
-            break;
+    case VK_SHIFT:
+        vk = static_cast<int>(
+            MapVirtualKey((static_cast<UINT>(lParam) & 0x00ff0000) >> 16u,
+                MAPVK_VSC_TO_VK_EX));
+        if (!down)
+        {
+            // Workaround to ensure left vs. right shift get cleared when both were pressed at same time
+            KeyUp(VK_LSHIFT, pImpl->mState);
+            KeyUp(VK_RSHIFT, pImpl->mState);
+        }
+        break;
 
-        case VK_CONTROL:
-            vk = (static_cast<UINT>(lParam) & 0x01000000) ? VK_RCONTROL : VK_LCONTROL;
-            break;
+    case VK_CONTROL:
+        vk = (static_cast<UINT>(lParam) & 0x01000000) ? VK_RCONTROL : VK_LCONTROL;
+        break;
 
-        case VK_MENU:
-            vk = (static_cast<UINT>(lParam) & 0x01000000) ? VK_RMENU : VK_LMENU;
-            break;
+    case VK_MENU:
+        vk = (static_cast<UINT>(lParam) & 0x01000000) ? VK_RMENU : VK_LMENU;
+        break;
     }
 
     if (down)
@@ -182,17 +182,17 @@ void WinKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 }
 
 // Public constructor.
-WinKeyboard::WinKeyboard() noexcept(false)
+WindowsPlatformKeyboard::WindowsPlatformKeyboard() noexcept(false)
     : pImpl(std::make_unique<Impl>(this))
 {
 }
 
-WinKeyboard::~WinKeyboard()
+WindowsPlatformKeyboard::~WindowsPlatformKeyboard()
 {
 }
 
 
-KeyboardState WinKeyboard::GetState() const
+KeyboardState WindowsPlatformKeyboard::GetState() const
 {
     KeyboardState state;
     pImpl->GetState(state);
@@ -200,23 +200,30 @@ KeyboardState WinKeyboard::GetState() const
 }
 
 
-void WinKeyboard::Reset() noexcept
+void WindowsPlatformKeyboard::Reset() noexcept
 {
     pImpl->Reset();
 }
 
 
-bool WinKeyboard::IsConnected() const
+bool WindowsPlatformKeyboard::IsConnected() const
 {
     return pImpl->IsConnected();
 }
 
-WinKeyboard& WinKeyboard::Get()
+WindowsPlatformKeyboard& WindowsPlatformKeyboard::Get()
 {
-    static WinKeyboard sInstance;
+    static WindowsPlatformKeyboard sInstance;
 
     if (!Impl::s_keyboard || !Impl::s_keyboard->mOwner)
-        LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WinKeyboard singleton not created");
+    {
+        SE_LOG(LogWindows, Fatal, L"WindowsPlatformKeyboard singleton not created");
+    }
 
     return *Impl::s_keyboard->mOwner;
+}
+
+IPlatformKeyboard& IPlatformKeyboard::Get()
+{
+    return WindowsPlatformKeyboard::Get();
 }

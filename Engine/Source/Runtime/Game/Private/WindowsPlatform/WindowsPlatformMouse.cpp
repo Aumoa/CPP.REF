@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-// File: WinMouse.cpp
+// File: WindowsPlatformMouse.cpp
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -9,12 +9,13 @@
 //--------------------------------------------------------------------------------------
 
 #include "pch.h"
-#include "PlatformMisc/WinMouse.h"
+#include "WindowsPlatformMouse.h"
 #include "GameEnums.h"
 #include "LogGame.h"
 #include "IFrameworkView.h"
+#include "WindowsPlatformHelper.h"
 
-namespace WinMouseInternal
+namespace WindowsPlatformMouseInternal
 {
     struct handle_closer { void operator()(HANDLE h) noexcept { if (h) CloseHandle(h); } };
     using ScopedHandle = std::unique_ptr<void, handle_closer>;
@@ -48,17 +49,17 @@ namespace WinMouseInternal
 //     case WM_XBUTTONDOWN:
 //     case WM_XBUTTONUP:
 //     case WM_MOUSEHOVER:
-//         WinMouse::ProcessMessage(message, wParam, lParam);
+//         WindowsPlatformMouse::ProcessMessage(message, wParam, lParam);
 //         break;
 //
 //     }
 // }
 //
 
-class WinMouse::Impl
+class WindowsPlatformMouse::Impl
 {
 public:
-    explicit Impl(WinMouse* owner) noexcept(false) :
+    explicit Impl(WindowsPlatformMouse* owner) noexcept(false) :
         mState{},
         mOwner(owner),
         mWindow(nullptr),
@@ -71,7 +72,7 @@ public:
     {
         if (s_mouse)
         {
-            LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WinMouse is a singleton");
+            SE_LOG(LogWindows, Fatal, L"WindowsPlatformMouse is a singleton");
         }
 
         s_mouse = this;
@@ -215,18 +216,18 @@ public:
 
     MouseState      mState;
 
-    WinMouse* mOwner;
+    WindowsPlatformMouse* mOwner;
 
-    static WinMouse::Impl* s_mouse;
+    static WindowsPlatformMouse::Impl* s_mouse;
 
 private:
     HWND            mWindow;
     EMousePositionMode mMode;
 
-    WinMouseInternal::ScopedHandle    mScrollWheelValue;
-    WinMouseInternal::ScopedHandle    mRelativeRead;
-    WinMouseInternal::ScopedHandle    mAbsoluteMode;
-    WinMouseInternal::ScopedHandle    mRelativeMode;
+    WindowsPlatformMouseInternal::ScopedHandle    mScrollWheelValue;
+    WindowsPlatformMouseInternal::ScopedHandle    mRelativeRead;
+    WindowsPlatformMouseInternal::ScopedHandle    mAbsoluteMode;
+    WindowsPlatformMouseInternal::ScopedHandle    mRelativeMode;
 
     int             mLastX;
     int             mLastY;
@@ -235,7 +236,7 @@ private:
 
     bool            mInFocus;
 
-    friend void WinMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
+    friend void WindowsPlatformMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
 
     void ClipToWindow() noexcept
     {
@@ -266,16 +267,16 @@ private:
 };
 
 
-WinMouse::Impl* WinMouse::Impl::s_mouse = nullptr;
+WindowsPlatformMouse::Impl* WindowsPlatformMouse::Impl::s_mouse = nullptr;
 
 
-void WinMouse::SetWindow(IFrameworkView* window)
+void WindowsPlatformMouse::SetWindow(IFrameworkView* window)
 {
     pImpl->SetWindow((HWND)window->GetWindowHandle());
 }
 
 
-void WinMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
+void WindowsPlatformMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 {
     auto pImpl = Impl::s_mouse;
 
@@ -488,17 +489,17 @@ void WinMouse::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 #pragma warning( disable : 4355 )
 
 // Public constructor.
-WinMouse::WinMouse() noexcept(false)
+WindowsPlatformMouse::WindowsPlatformMouse() noexcept(false)
     : pImpl(std::make_unique<Impl>(this))
 {
 }
 
-WinMouse::~WinMouse()
+WindowsPlatformMouse::~WindowsPlatformMouse()
 {
 }
 
 
-MouseState WinMouse::GetState() const
+MouseState WindowsPlatformMouse::GetState() const
 {
     MouseState state;
     pImpl->GetState(state);
@@ -506,39 +507,44 @@ MouseState WinMouse::GetState() const
 }
 
 
-void WinMouse::ResetScrollWheelValue() noexcept
+void WindowsPlatformMouse::ResetScrollWheelValue() noexcept
 {
     pImpl->ResetScrollWheelValue();
 }
 
 
-void WinMouse::SetMode(EMousePositionMode mode)
+void WindowsPlatformMouse::SetMode(EMousePositionMode mode)
 {
     pImpl->SetMode(mode);
 }
 
 
-bool WinMouse::IsConnected() const
+bool WindowsPlatformMouse::IsConnected() const
 {
     return pImpl->IsConnected();
 }
 
-bool WinMouse::IsVisible() const noexcept
+bool WindowsPlatformMouse::IsVisible() const noexcept
 {
     return pImpl->IsVisible();
 }
 
-void WinMouse::SetVisible(bool visible)
+void WindowsPlatformMouse::SetVisible(bool visible)
 {
     pImpl->SetVisible(visible);
 }
 
-WinMouse& WinMouse::Get()
+WindowsPlatformMouse& WindowsPlatformMouse::Get()
 {
-    static WinMouse sInstance;
+    static WindowsPlatformMouse sInstance;
 
     if (!Impl::s_mouse || !Impl::s_mouse->mOwner)
-        LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WinMouse singleton not created");
+        LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WindowsPlatformMouse singleton not created");
 
     return *Impl::s_mouse->mOwner;
+}
+
+IPlatformMouse& IPlatformMouse::Get()
+{
+    return WindowsPlatformMouse::Get();
 }

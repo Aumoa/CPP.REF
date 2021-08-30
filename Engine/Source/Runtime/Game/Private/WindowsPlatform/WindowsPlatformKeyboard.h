@@ -3,34 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlatformMisc/IPlatformKeyboard.h"
 #include <memory>
-#include "GameStructures.h"
 
-class GAME_API WinKeyboard : virtual public Object
+class WindowsPlatformKeyboard : virtual public Object, virtual public IPlatformKeyboard
 {
-    CLASS_BODY(WinKeyboard)
+    CLASS_BODY(WindowsPlatformKeyboard)
 
 public:
-    WinKeyboard();
-    ~WinKeyboard();
+    WindowsPlatformKeyboard();
+    ~WindowsPlatformKeyboard();
 
     // Retrieve the current state of the keyboard
-    KeyboardState GetState() const;
+    virtual KeyboardState GetState() const;
 
     // Reset the keyboard state
-    void Reset() noexcept;
+    virtual void Reset() noexcept;
 
     // Feature detection
-    bool IsConnected() const;
+    virtual bool IsConnected() const;
 
     static void ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
 
     // Singleton
-    static WinKeyboard& Get();
+    static WindowsPlatformKeyboard& Get();
 
 private:
     // Private implementation.
     class Impl;
-
     std::unique_ptr<Impl> pImpl;
 };

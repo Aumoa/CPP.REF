@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlatformMisc/IPlatformMouse.h"
 #include <memory>
-#include "GameStructures.h"
 
 struct IFrameworkView;
 
-class GAME_API WinMouse : virtual public Object
+class WindowsPlatformMouse : virtual public Object, virtual public IPlatformMouse
 {
-    CLASS_BODY(WinMouse)
+    CLASS_BODY(WindowsPlatformMouse)
 
 public:
-    WinMouse();
-    ~WinMouse();
+    WindowsPlatformMouse();
+    ~WindowsPlatformMouse();
 
     // Retrieve the current state of the mouse
     MouseState GetState() const;
@@ -36,7 +36,7 @@ public:
     static void ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
 
     // Singleton
-    static WinMouse& Get();
+    static WindowsPlatformMouse& Get();
 
 private:
     // Private implementation.
