@@ -6,7 +6,7 @@
 #include "PlatformMisc/IPlatformKeyboard.h"
 #include <memory>
 
-class WindowsPlatformKeyboard : virtual public Object, virtual public IPlatformKeyboard
+class GAME_API WindowsPlatformKeyboard : virtual public Object, virtual public IPlatformKeyboard
 {
     CLASS_BODY(WindowsPlatformKeyboard)
 

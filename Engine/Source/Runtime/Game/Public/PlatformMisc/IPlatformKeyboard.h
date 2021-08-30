@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameStructures.h"
 
-struct IPlatformKeyboard : virtual public Object
+struct GAME_API IPlatformKeyboard : virtual public Object
 {
 	virtual KeyboardState GetState() const = 0;
 	virtual void Reset() = 0;

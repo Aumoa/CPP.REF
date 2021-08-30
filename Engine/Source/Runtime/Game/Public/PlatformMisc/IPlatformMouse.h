@@ -7,7 +7,7 @@
 
 struct IFrameworkView;
 
-struct IPlatformMouse : virtual public Object
+struct GAME_API IPlatformMouse : virtual public Object
 {
 	virtual MouseState GetState() const = 0;
 	virtual void ResetScrollWheelValue() = 0;

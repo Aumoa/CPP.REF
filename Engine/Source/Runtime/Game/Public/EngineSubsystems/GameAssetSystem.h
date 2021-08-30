@@ -9,7 +9,14 @@ class GAME_API GameAssetSystem : public GameEngineSubsystem
 {
 	CLASS_BODY(GameAssetSystem)
 
+private:
+	std::map<std::filesystem::path, Object*> _assets;
+
 public:
 	GameAssetSystem();
 	virtual ~GameAssetSystem() override;
+
+	virtual void Init() override;
+
+	Object* LoadObject(const std::filesystem::path& assetPath);
 };

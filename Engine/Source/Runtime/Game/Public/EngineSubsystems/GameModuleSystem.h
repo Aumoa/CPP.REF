@@ -19,8 +19,6 @@ private:
 public:
 	GameModuleSystem();
 	virtual ~GameModuleSystem() override;
-
-	virtual void Init() override;
 	
 	void LoadGameModule(std::wstring_view gameModuleName);
 	GameInstance* LoadGameInstance();

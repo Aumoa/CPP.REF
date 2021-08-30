@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
-#include "PlatformMisc/MouseStateTracker.h"
-#include "PlatformMisc/KeyboardTracker.h"
+#include "Misc/MouseStateTracker.h"
+#include "Misc/KeyboardTracker.h"
 #include <optional>
 
 class GAME_API GameInputSystem : public GameEngineSubsystem

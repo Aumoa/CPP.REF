@@ -3,10 +3,10 @@
 #include "CoreWindow.h"
 #include <Windows.h>
 #include "LogGame.h"
-#include "PlatformMisc/WinMouse.h"
-#include "PlatformMisc/WinKeyboard.h"
+#include "WindowsPlatform/WindowsPlatformMouse.h"
+#include "WindowsPlatform/WindowsPlatformKeyboard.h"
 
-using enum ELogVerbosity;
+DEFINE_LOG_CATEGORY(LogWindowsLaunch);
 
 inline void SetupHwndParameters(HWND hWnd, LPARAM lParam)
 {
@@ -31,8 +31,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_ACTIVATEAPP:
-		WinMouse::ProcessMessage(uMsg, wParam, lParam);
-		WinKeyboard::ProcessMessage(uMsg, wParam, lParam);
+		WindowsPlatformMouse::ProcessMessage(uMsg, wParam, lParam);
+		WindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_INPUT:
 	case WM_MOUSEMOVE:
@@ -46,13 +46,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_XBUTTONDOWN:
 	case WM_XBUTTONUP:
 	case WM_MOUSEHOVER:
-		WinMouse::ProcessMessage(uMsg, wParam, lParam);
+		WindowsPlatformMouse::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
-		WinKeyboard::ProcessMessage(uMsg, wParam, lParam);
+		WindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_CREATE:
 		SetupHwndParameters(hWnd, lParam);
@@ -81,14 +81,14 @@ CoreWindow::CoreWindow() : Super()
 	wcex.hInstance = GetModuleHandleW(nullptr);
 	if (RegisterClassExW(&wcex) == 0)
 	{
-		LogSystem::Log(LogWindows, Fatal, L"Could not register window class with error code: {}. Abort.", ::GetLastError());
+		SE_LOG(LogWindowsLaunch, Fatal, L"Could not register window class with error code: {}. Abort.", ::GetLastError());
 		return;
 	}
 
 	HWND hWnd = CreateWindowExW(0, wcex.lpszClassName, ApplicationTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, wcex.hInstance, this);
 	if (hWnd == nullptr)
 	{
-		LogSystem::Log(LogWindows, Fatal, L"Could not create core window with error code: {}. Abort.", ::GetLastError());
+		SE_LOG(LogWindowsLaunch, Fatal, L"Could not create core window with error code: {}. Abort.", ::GetLastError());
 		return;
 	}
 

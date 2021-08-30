@@ -70,6 +70,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <EntryPointName>Main</EntryPointName>
@@ -102,6 +103,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <EntryPointName>Main</EntryPointName>
@@ -136,6 +138,7 @@
     <ClCompile Include="Private\Assets\SoftObjectPtr.cpp" />
     <ClCompile Include="Private\Assets\StaticMesh.cpp" />
     <ClCompile Include="Private\Assets\StreamableRenderAsset.cpp" />
+    <ClCompile Include="Private\Assets\Texture2D.cpp" />
     <ClCompile Include="Private\Camera\CameraComponent.cpp" />
     <ClCompile Include="Private\Camera\PlayerCameraManager.cpp" />
     <ClCompile Include="Private\Components\ActorComponent.cpp" />
@@ -194,13 +197,17 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Private\TIcking\TickFunction.cpp" />
+    <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp" />
+    <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImage.cpp" />
+    <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImageLoader.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformKeyboard.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformMouse.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h" />
-    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformKeyboard.h" />
-    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformMouse.h" />
+    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformHelper.h" />
+    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImage.h" />
+    <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImageLoader.h" />
     <ClInclude Include="Public\Assets\Asset.h" />
     <ClInclude Include="Public\Assets\AssetImporter.h" />
     <ClInclude Include="Public\Assets\Mesh.h" />
@@ -210,6 +217,7 @@
     <ClInclude Include="Public\Assets\SoftObjectPtr.h" />
     <ClInclude Include="Public\Assets\StaticMesh.h" />
     <ClInclude Include="Public\Assets\StreamableRenderAsset.h" />
+    <ClInclude Include="Public\Assets\Texture2D.h" />
     <ClInclude Include="Public\Camera\CameraComponent.h" />
     <ClInclude Include="Public\Camera\PlayerCameraManager.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
@@ -247,14 +255,16 @@
     <ClInclude Include="Public\Materials\Material.h" />
     <ClInclude Include="Public\Materials\MaterialInstance.h" />
     <ClInclude Include="Public\Misc\Bezier.h" />
+    <ClInclude Include="Public\Misc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="Public\Misc\GeometryGenerator.h" />
+    <ClInclude Include="Public\Misc\KeyboardTracker.h" />
+    <ClInclude Include="Public\Misc\MouseStateTracker.h" />
     <ClInclude Include="Public\Misc\Paths.h" />
     <ClInclude Include="Public\Misc\TickCalc.h" />
-    <ClInclude Include="Public\PlatformMisc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformKeyboard.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformMouse.h" />
-    <ClInclude Include="Public\PlatformMisc\KeyboardTracker.h" />
-    <ClInclude Include="Public\PlatformMisc\MouseStateTracker.h" />
+    <ClInclude Include="Public\PlatformMisc\IPlatformImage.h" />
+    <ClInclude Include="Public\PlatformMisc\IPlatformImageLoader.h" />
     <ClInclude Include="Public\Scene\PrimitiveSceneProxy.h" />
     <ClInclude Include="Public\Scene\Scene.h" />
     <ClInclude Include="Public\Scene\SceneRenderer.h" />
@@ -269,6 +279,8 @@
     <ClInclude Include="Public\Ticking\TickFunction.h" />
     <ClInclude Include="Public\Ticking\TickingGroup.h" />
     <ClInclude Include="Public\Ticking\TickScheduler.h" />
+    <ClInclude Include="Public\WindowsPlatform\WindowsPlatformKeyboard.h" />
+    <ClInclude Include="Public\WindowsPlatform\WindowsPlatformMouse.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Private\Shaders\SlateShader\SlateCommon.hlsli" />

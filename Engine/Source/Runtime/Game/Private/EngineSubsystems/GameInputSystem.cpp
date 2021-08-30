@@ -2,8 +2,8 @@
 
 #include "pch.h"
 #include "EngineSubsystems/GameInputSystem.h"
-#include "PlatformMisc/WinMouse.h"
-#include "PlatformMisc/WinKeyboard.h"
+#include "PlatformMisc/IPlatformMouse.h"
+#include "PlatformMisc/IPlatformKeyboard.h"
 
 MouseStateTracker GameInputSystem::_mouseTracker;
 KeyboardTracker GameInputSystem::_keyboardTracker;
@@ -21,8 +21,8 @@ GameInputSystem::~GameInputSystem()
 void GameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
 {
 	// Update tracking state.
-	WinMouse& wMouse = WinMouse::Get();
-	WinKeyboard& wKeyboard = WinKeyboard::Get();
+	IPlatformMouse& wMouse = IPlatformMouse::Get();
+	IPlatformKeyboard& wKeyboard = IPlatformKeyboard::Get();
 
 	_mouseTracker.Update(wMouse.GetState());
 	_keyboardTracker.Update(wKeyboard.GetState());

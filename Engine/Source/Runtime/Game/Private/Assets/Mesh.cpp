@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "Assets/Mesh.h"
 
-Mesh::Mesh() : Super()
+Mesh::Mesh(const std::filesystem::path& assetPath) : Super(assetPath)
 {
 }
 

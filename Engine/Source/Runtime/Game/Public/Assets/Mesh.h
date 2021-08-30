@@ -10,6 +10,6 @@ class GAME_API Mesh : public StreamableRenderAsset
 	CLASS_BODY(Mesh)
 
 public:
-	Mesh();
+	Mesh(const std::filesystem::path& assetPath);
 	~Mesh() override;
 };

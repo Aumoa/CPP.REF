@@ -13,14 +13,8 @@ GamePlayerSystem::~GamePlayerSystem()
 {
 }
 
-void GamePlayerSystem::Init()
-{
-	Super::Init();
-}
-
 void GamePlayerSystem::Tick(std::chrono::duration<float> elapsedTime)
 {
-	Super::Tick(elapsedTime);
 	_localPlayer->Tick(elapsedTime);
 }
 

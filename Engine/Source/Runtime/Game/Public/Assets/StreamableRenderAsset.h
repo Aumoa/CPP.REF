@@ -3,12 +3,15 @@
 #pragma once
 
 #include "RenderMinimal.h"
+#include "Asset.h"
 
-class GAME_API StreamableRenderAsset : virtual public Object
+class GAME_API StreamableRenderAsset : public Asset
 {
 	CLASS_BODY(StreamableRenderAsset)
 
 public:
-	StreamableRenderAsset();
+	StreamableRenderAsset(const std::filesystem::path& assetPath);
 	~StreamableRenderAsset() override;
+
+	virtual void StreamIn() = 0;
 };

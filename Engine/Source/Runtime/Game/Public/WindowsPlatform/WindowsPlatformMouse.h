@@ -8,7 +8,7 @@
 
 struct IFrameworkView;
 
-class WindowsPlatformMouse : virtual public Object, virtual public IPlatformMouse
+class GAME_API WindowsPlatformMouse : virtual public Object, virtual public IPlatformMouse
 {
     CLASS_BODY(WindowsPlatformMouse)
 

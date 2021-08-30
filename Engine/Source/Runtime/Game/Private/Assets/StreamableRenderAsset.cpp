@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "Assets/StreamableRenderAsset.h"
 
-StreamableRenderAsset::StreamableRenderAsset() : Super()
+StreamableRenderAsset::StreamableRenderAsset(const std::filesystem::path& assetPath) : Super(assetPath)
 {
 }
 

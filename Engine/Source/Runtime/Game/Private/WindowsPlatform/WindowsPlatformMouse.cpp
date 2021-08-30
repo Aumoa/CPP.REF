@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------------
 
 #include "pch.h"
-#include "WindowsPlatformMouse.h"
+#include "WindowsPlatform/WindowsPlatformMouse.h"
 #include "GameEnums.h"
 #include "LogGame.h"
 #include "IFrameworkView.h"

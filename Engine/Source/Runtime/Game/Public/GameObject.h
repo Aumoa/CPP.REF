@@ -41,6 +41,9 @@ public:
 	World* GetWorld() const;
 	void SetWorld(World* value);
 
+public:
+	static Object* LoadObject(const std::filesystem::path& assetPath);
+
 private:
 	mutable World* _WorldPrivate = nullptr;
 };

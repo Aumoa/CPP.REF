@@ -34,8 +34,6 @@ void GameRenderSystem::Init()
 {
 	using namespace std;
 
-	Super::Init();
-
 	SE_LOG(LogRender, Verbose, L"Beginning initialize GameRenderSystem.");
 
 	_scheduler = NewObject<TickScheduler>();

@@ -13,11 +13,6 @@ GameModuleSystem::~GameModuleSystem()
 {
 }
 
-void GameModuleSystem::Init()
-{
-	Super::Init();
-}
-
 void GameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 {
 	std::filesystem::path gameModulePath = gameModuleName;

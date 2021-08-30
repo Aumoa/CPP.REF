@@ -4,10 +4,12 @@
     <LocalDebuggerCommand>$(OutDir)Windows.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>--GameDll "THStory"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)Game\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>$(OutDir)Windows.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>--GameDll "THStory"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)Game\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

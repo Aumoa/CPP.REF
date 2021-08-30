@@ -19,7 +19,6 @@ public:
 	GamePlayerSystem();
 	virtual ~GamePlayerSystem() override;
 
-	virtual void Init() override;
 	virtual void Tick(std::chrono::duration<float> elapsedTime) override;
 
 	void SpawnLocalPlayer(IFrameworkView* frameworkView);
