@@ -18,11 +18,10 @@ struct MinimalViewInfo;
 
 class GAME_API Scene : virtual public Object
 {
+	CLASS_BODY(Scene)
+
 	friend class SceneVisibility;
 	friend class SceneRenderer;
-
-public:
-	using Super = Object;
 
 private:
 	static constexpr const size_t RenderQueue_Opaque = 1000;

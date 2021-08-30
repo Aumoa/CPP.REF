@@ -7,8 +7,7 @@
 
 class GAME_API MDLParser : public ParserBase
 {
-public:
-	using Super = ParserBase;
+	CLASS_BODY(MDLParser)
 
 public:
 	MDLParser(GameEngine* engine, RHIVertexFactory* vfactory);

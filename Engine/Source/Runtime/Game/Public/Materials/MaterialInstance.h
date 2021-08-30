@@ -7,8 +7,7 @@
 
 class GAME_API MaterialInstance : public Material
 {
-public:
-	using Super = Material;
+	CLASS_BODY(MaterialInstance)
 
 private:
 	Material* _source = nullptr;

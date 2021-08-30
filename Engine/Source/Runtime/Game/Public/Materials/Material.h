@@ -11,8 +11,7 @@ class RHIDeviceContext;
 
 class GAME_API Material : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(Material)
 	using ShaderVars = std::variant<float, Vector3>;
 
 private:

@@ -5,11 +5,7 @@
 #include "LogGame.h"
 #include "GameInstance.h"
 #include "IFrameworkView.h"
-#include "Shaders/ColorShader/ColorVertexFactory.h"
-#include "Shaders/ColorShader/ColorShader.h"
-#include "Shaders/TransparentShader/TransparentShader.h"
-#include "Shaders/SlateShader/SlateShader.h"
-#include "Components/InputComponent.h"
+#include "CoreDelegates.h"
 #include "Level/World.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Scene/Scene.h"
@@ -21,6 +17,9 @@
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameAssetSystem.h"
+#include "EngineSubsystems/GameLevelSystem.h"
+#include "EngineSubsystems/GamePlayerSystem.h"
+#include "EngineSubsystems/GameInputSystem.h"
 
 GameEngine* GameEngine::_gEngine = nullptr;
 
@@ -30,22 +29,39 @@ GameEngine::GameEngine() : Super()
 
 GameEngine::~GameEngine()
 {
+	for (size_t i = 0; i < _subsystems.size(); ++i)
+	{
+		// Delete game engine systems without module system
+		// for remove module system at last of destructor.
+		if (dynamic_cast<GameModuleSystem*>(_subsystems[i]) == nullptr)
+		{
+			DestroySubobject(_subsystems[i]);
+		}
+	}
+
+	// Remove game instance.
+	if (_gameInstance)
+	{
+		DestroySubobject(_gameInstance);
+		_gameInstance = nullptr;
+	}
 }
 
 bool GameEngine::InitEngine()
 {
 	_gEngine = this;
 	InitializeSubsystems();
+	CoreDelegates::PostEngineInit.Invoke();
 	return true;
 }
 
 void GameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 {
 	GetEngineSubsystem<GameRenderSystem>()->SetupFrameworkView(frameworkView);
+	GetEngineSubsystem<GamePlayerSystem>()->SpawnLocalPlayer(frameworkView);
 
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
-	frameworkView->Size += [this](int32 width, int32 height) { ResizedApp(width, height); };
 }
 
 bool GameEngine::LoadGameModule(std::wstring_view moduleName)
@@ -57,11 +73,28 @@ bool GameEngine::LoadGameModule(std::wstring_view moduleName)
 		SE_LOG(LogEngine, Fatal, L"LoadGameInstance function from {} module return nullptr.", moduleName);
 		return false;
 	}
+
+	_gameInstance->SetOuter(this);
+	_gameInstance->SetWorld(GetEngineSubsystem<GameLevelSystem>()->GetWorld());
+	if (!_gameInstance->StartupLevel.IsValid())
+	{
+		SE_LOG(LogEngine, Fatal, L"GameInstance::StartupLevel is not specified.");
+		return false;
+	}
+
+	if (!GetEngineSubsystem<GameLevelSystem>()->OpenLevel(_gameInstance->StartupLevel))
+	{
+		SE_LOG(LogEngine, Fatal, L"Could not startup level.");
+		return false;
+	}
+
 	return true;
 }
 
 int32 GameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs)
 {
+	CoreDelegates::BeginMainInvoked.Invoke();
+
 	CommandLine commandArgs = StringUtils::Split(platformArgs, L" ", true, true);
 	size_t gameModuleIdx = commandArgs.GetArgument(L"--GameDll");
 	if (gameModuleIdx == -1)
@@ -90,6 +123,11 @@ int32 GameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view p
 		return -1;
 	}
 
+	// Setup framework view.
+	engine->SetupFrameworkView(frameworkView);
+
+	// Start application now!
+	frameworkView->Start();
 	return 0;
 }
 
@@ -101,141 +139,39 @@ GameInstance* GameEngine::GetGameInstance() const
 void GameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
-	_subsystems.emplace_back(CreateSubobject<GameRenderSystem>())->Init();
-	_subsystems.emplace_back(CreateSubobject<GameAssetSystem>())->Init();
-	_subsystems.emplace_back(CreateSubobject<GameModuleSystem>())->Init();
+	_subsystems.emplace_back(NewObject<GameRenderSystem>())->Init();
+	_subsystems.emplace_back(NewObject<GameAssetSystem>())->Init();
+	_subsystems.emplace_back(NewObject<GameModuleSystem>())->Init();
+	_subsystems.emplace_back(NewObject<GameLevelSystem>())->Init();
+	_subsystems.emplace_back(NewObject<GamePlayerSystem>())->Init();
+	_subsystems.emplace_back(NewObject<GameInputSystem>())->Init();
 }
 
 void GameEngine::TickEngine()
 {
 	using namespace std::chrono;
 
-	duration<float> deltaSeconds = 0ns;
-	steady_clock::time_point now = steady_clock::now();
-	if (_prev.has_value())
-	{
-		deltaSeconds = now - _prev.value();
-	}
-	_prev = now;
-
-	GameTick(deltaSeconds);
-	RenderTick(deltaSeconds);
+	auto tick = _tickCalc.DoCalc();
+	SystemsTick(tick);
+	GameTick(tick);
+	RenderTick(tick);
 }
 
-void GameEngine::ResizedApp(int32 width, int32 height)
+void GameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 {
-	if (width == 0 || height == 0)
+	for (auto& system : _subsystems)
 	{
-		return;
+		system->Tick(elapsedTime);
 	}
-
-	// On the framework view is resized, wait all graphics commands for
-	// synchronize and cleanup resource lock states.
-	//_primaryQueue->WaitLastSignal();
-
-	//_frameworkViewChain->ResizeBuffers(width, height);
-
-	//for (int32 i = 0; i < 3; ++i)
-	//{
-	//	RHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
-	//	_rtv->CreateRenderTargetView(texture, i);
-	//}
-
-	// Resize depth stencil buffer.
-	//if (_depthBuffer != nullptr)
-	//{
-	//	DestroySubobject(_depthBuffer);
-	//}
-
-	//RHITexture2DClearValue clearValue =
-	//{
-	//	.Format = ERHIPixelFormat::D24_UNORM_S8_UINT,
-	//	.DepthStencil = { 1.0f, 0 }
-	//};
-
-	//_depthBuffer = _device->CreateTexture2D(ERHIResourceStates::DepthWrite, ERHIPixelFormat::D24_UNORM_S8_UINT, width, height, clearValue, ERHIResourceFlags::AllowDepthStencil);
-	//_dsv->CreateDepthStencilView(_depthBuffer, 0);
-
-	//_vpWidth = width;
-	//_vpHeight = height;
-
-	SE_LOG(LogEngine, Info, L"Application resized to {}x{}.", width, height);
 }
 
 void GameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 {
-	// Update input.
-	InputComponent::StaticTick(elapsedTime);
-
-	_gameInstance->Tick(elapsedTime);
+	World* world = GetEngineSubsystem<GameLevelSystem>()->GetWorld();
+	world->LevelTick(elapsedTime);
 }
 
 void GameEngine::RenderTick(std::chrono::duration<float> elapsedTime)
 {
-	//int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
-
-	//RHIViewport vp =
-	//{
-	//	.TopLeftX = 0,
-	//	.TopLeftY = 0,
-	//	.Width = (float)_vpWidth,
-	//	.Height = (float)_vpHeight,
-	//	.MinDepth = 0,
-	//	.MaxDepth = 1.0f
-	//};
-
-	//RHIScissorRect sc =
-	//{
-	//	.Left = 0,
-	//	.Top = 0,
-	//	.Right = _vpWidth,
-	//	.Bottom = _vpHeight
-	//};
-
-	//RHITransitionBarrier barrierBegin =
-	//{
-	//	.Resource = _frameworkViewChain->GetBuffer(bufferIdx),
-	//	.StateBefore = ERHIResourceStates::Present,
-	//	.StateAfter = ERHIResourceStates::RenderTarget
-	//};
-	//RHITransitionBarrier barrierEnd =
-	//{
-	//	.Resource = _frameworkViewChain->GetBuffer(bufferIdx),
-	//	.StateBefore = ERHIResourceStates::RenderTarget,
-	//	.StateAfter = ERHIResourceStates::Present
-	//};
-
-	//_deviceContext->Begin();
-	//_deviceContext->TransitionBarrier(1, &barrierBegin);
-	//_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
-	//_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
-	//_deviceContext->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
-	//_deviceContext->RSSetScissorRects(1, &sc);
-	//_deviceContext->RSSetViewports(1, &vp);
-
-	//World* world = _gameInstance->GetWorld();
-	//APlayerCameraManager* playerCamera = world->GetPlayerCamera();
-
-	//Scene* scene = _gameInstance->GetWorld()->GetScene();
-	//MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
-	//localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
-	//scene->InitViews(localPlayerView);
-	//scene->RenderScene(_deviceContext);
-
-	//LocalPlayer* localPlayer = _gameInstance->GetLocalPlayer();
-	//if (localPlayer)
-	//{
-	//	_deviceContext->SetGraphicsShader(_slateShader);
-	//	_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-	//	localPlayer->Render(_deviceContext, _slateShader);
-	//}
-
-	//_deviceContext->TransitionBarrier(1, &barrierEnd);
-	//_deviceContext->End();
-
-	//_primaryQueue->ExecuteDeviceContext(_deviceContext);
-
-	//_frameworkViewChain->Present();
-	//_primaryQueue->Signal();
-	//_primaryQueue->WaitLastSignal();
+	GetEngineSubsystem<GameRenderSystem>()->Present();
 }

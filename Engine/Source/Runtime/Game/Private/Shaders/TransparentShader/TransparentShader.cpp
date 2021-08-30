@@ -41,7 +41,7 @@ TransparentShader::TransparentShader(RHIDevice* device) : Super(device)
 		}
 	};
 
-	_material = CreateSubobject<TransparentShaderMaterial>(this);
+	_material = NewObject<TransparentShaderMaterial>(this);
 }
 
 std::span<uint8 const> TransparentShader::CompileVS()

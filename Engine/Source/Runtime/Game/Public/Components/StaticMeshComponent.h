@@ -9,8 +9,7 @@ class StaticMesh;
 
 class GAME_API StaticMeshComponent : public MeshComponent
 {
-public:
-	using Super = MeshComponent;
+	CLASS_BODY(StaticMeshComponent)
 
 private:
 	StaticMesh* _StaticMesh = nullptr;

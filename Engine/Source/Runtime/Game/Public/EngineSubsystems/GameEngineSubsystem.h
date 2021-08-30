@@ -8,12 +8,12 @@ class GameEngine;
 
 class GAME_API GameEngineSubsystem : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(GameEngineSubsystem)
 
 public:
 	GameEngineSubsystem();
 	virtual ~GameEngineSubsystem() override;
 
-	virtual void Init();
+	virtual void Init() {}
+	virtual void Tick(std::chrono::duration<float> elapsedTime) {}
 };

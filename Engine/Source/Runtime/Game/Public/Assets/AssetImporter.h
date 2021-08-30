@@ -12,8 +12,7 @@ class Asset;
 
 class GAME_API AssetImporter : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(AssetImporter)
 
 private:
 	struct LoadedObjectData

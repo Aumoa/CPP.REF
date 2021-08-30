@@ -9,8 +9,7 @@
 /// </summary>
 class GAME_API AAIController : public AController
 {
-public:
-	using Super = AController;
+	CLASS_BODY(AAIController)
 
 public:
 	/// <summary>

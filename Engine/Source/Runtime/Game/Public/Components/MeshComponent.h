@@ -7,8 +7,7 @@
 
 class GAME_API MeshComponent : public PrimitiveComponent
 {
-public:
-	using Super = PrimitiveComponent;
+	CLASS_BODY(MeshComponent)
 
 public:
 	MeshComponent();

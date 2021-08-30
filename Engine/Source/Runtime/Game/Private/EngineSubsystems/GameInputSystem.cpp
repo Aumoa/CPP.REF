@@ -1,34 +1,24 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "pch.h"
-#include "Components/InputComponent.h"
+#include "EngineSubsystems/GameInputSystem.h"
 #include "PlatformMisc/WinMouse.h"
 #include "PlatformMisc/WinKeyboard.h"
 
-std::set<InputComponent*> InputComponent::_inputComponents;
+MouseStateTracker GameInputSystem::_mouseTracker;
+KeyboardTracker GameInputSystem::_keyboardTracker;
+std::optional<int32> GameInputSystem::_lastMouseX;
+std::optional<int32> GameInputSystem::_lastMouseY;
 
-MouseStateTracker InputComponent::_mouseTracker;
-KeyboardTracker InputComponent::_keyboardTracker;
-std::optional<int32> InputComponent::_lastMouseX;
-std::optional<int32> InputComponent::_lastMouseY;
-
-InputComponent::InputComponent() : Super()
+GameInputSystem::GameInputSystem() : Super()
 {
 }
 
-void InputComponent::BeginPlay()
+GameInputSystem::~GameInputSystem()
 {
-	Super::BeginPlay();
-	_inputComponents.emplace(this);
 }
 
-void InputComponent::EndPlay()
-{
-	_inputComponents.erase(this);
-	Super::EndPlay();
-}
-
-void InputComponent::StaticTick(std::chrono::duration<float> elapsedTime)
+void GameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
 {
 	// Update tracking state.
 	WinMouse& wMouse = WinMouse::Get();
@@ -58,11 +48,11 @@ void InputComponent::StaticTick(std::chrono::duration<float> elapsedTime)
 
 			if (bPressed)
 			{
-				BroadcastMouseEventForAllComponents(idx, EMouseButtonEvent::Pressed);
+				Mouse.Invoke((EMouseButton)idx, EMouseButtonEvent::Pressed);
 			}
 			if (bReleased)
 			{
-				BroadcastMouseEventForAllComponents(idx, EMouseButtonEvent::Released);
+				Mouse.Invoke((EMouseButton)idx, EMouseButtonEvent::Released);
 			}
 
 			n <<= 1;
@@ -90,11 +80,11 @@ void InputComponent::StaticTick(std::chrono::duration<float> elapsedTime)
 
 			if (bPressed)
 			{
-				BroadcastKeyboardEventForAllComponents(idx, EKeyboardEvent::Pressed);
+				Keyboard.Invoke((EKey)idx, EKeyboardEvent::Pressed);
 			}
 			if (bReleased)
 			{
-				BroadcastKeyboardEventForAllComponents(idx, EKeyboardEvent::Released);
+				Keyboard.Invoke((EKey)idx, EKeyboardEvent::Released);
 			}
 
 			n <<= 1;
@@ -103,40 +93,18 @@ void InputComponent::StaticTick(std::chrono::duration<float> elapsedTime)
 
 	// Invoke mouse move event dispatcher.
 	MouseState mState = wMouse.GetState();
-	int32 dx = 0, dy = 0;
+	MouseMoveData data;
+	data.CurX = mState.X;
+	data.CurY = mState.Y;
 	if (_lastMouseX.has_value())
 	{
-		dx = mState.X - *_lastMouseX;
+		data.DeltaX = mState.X - *_lastMouseX;
 	}
 	if (_lastMouseY.has_value())
 	{
-		dy = mState.Y - *_lastMouseY;
+		data.DeltaY = mState.Y - *_lastMouseY;
 	}
 	_lastMouseX = mState.X;
 	_lastMouseY = mState.Y;
-	BroadcastMouseMoveEventForAllComponents(mState.X, mState.Y, dx, dy);
-}
-
-void InputComponent::BroadcastMouseEventForAllComponents(uint32 idx, EMouseButtonEvent buttonEvent)
-{
-	for (auto& cp : _inputComponents)
-	{
-		cp->MouseEvent.Invoke((EMouseButton)idx, buttonEvent);
-	}
-}
-
-void InputComponent::BroadcastKeyboardEventForAllComponents(uint32 idx, EKeyboardEvent keyboardEvent)
-{
-	for (auto& cp : _inputComponents)
-	{
-		cp->KeyboardEvent.Invoke((EKey)idx, keyboardEvent);
-	}
-}
-
-void InputComponent::BroadcastMouseMoveEventForAllComponents(int32 x, int32 y, int32 dx, int32 dy)
-{
-	for (auto& cp : _inputComponents)
-	{
-		cp->MouseMoveEvent.Invoke(x, y, dx, dy);
-	}
+	MouseMove.Invoke(data);
 }

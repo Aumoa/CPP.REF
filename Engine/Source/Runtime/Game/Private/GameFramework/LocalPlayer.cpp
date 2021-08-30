@@ -13,20 +13,18 @@ LocalPlayer::LocalPlayer() : Super()
 {
 }
 
-void LocalPlayer::Init(GameEngine* engine)
+void LocalPlayer::Init(IFrameworkView* frameworkView)
 {
-	_slateWindow = CreateSubobject<SWindow>();
+	_frameworkView = frameworkView;
 
-	GameInstance* gameInstance = engine->GetGameInstance();
-	_frameworkView = gameInstance->GetFrameworkView();
-	check(_frameworkView);
+	_slateWindow = NewObject<SWindow>();
 
 	// Register ResizeApp handler.
 	_frameworkView->Size.AddObject(this, &LocalPlayer::OnResizedApp);
 	// And apply size immediately.
 	_slateWindow->SetWindowSize(Vector2((float)_frameworkView->GetFrameworkWidth(), (float)_frameworkView->GetFrameworkHeight()));
 
-	_drawElements = CreateSubobject<SlateWindowElementList>(_slateWindow);
+	_drawElements = NewObject<SlateWindowElementList>(_slateWindow);
 }
 
 void LocalPlayer::Tick(std::chrono::duration<float> elapsedTime)

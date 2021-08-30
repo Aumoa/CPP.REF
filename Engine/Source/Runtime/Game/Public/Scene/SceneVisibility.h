@@ -13,8 +13,7 @@ struct MinimalViewInfo;
 
 class GAME_API SceneVisibility : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(SceneVisibility)
 
 private:
 	Scene* _scene = nullptr;

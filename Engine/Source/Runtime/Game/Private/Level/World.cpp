@@ -9,12 +9,12 @@
 #include "Scene/Scene.h"
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Camera/PlayerCameraManager.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 
-World::World(GameEngine* engine) : Super()
-	, _engine(engine)
+World::World() : Super()
 {
 	SetWorld(this);
-	//_scene = CreateSubobject<Scene>(this, _engine->GetRHIDevice());
+	_scene = NewObject<Scene>(this, GEngine->GetEngineSubsystem<GameRenderSystem>()->GetRHIDevice());
 }
 
 Level* World::LoadLevel(SubclassOf<Level> levelToLoad)

@@ -14,8 +14,7 @@ class Material;
 /// </summary>
 class GAME_API ColorShader : public RHIShader
 {
-public:
-	using Super = RHIShader;
+	CLASS_BODY(ColorShader)
 
 private:
 	std::vector<uint8> _vscode;

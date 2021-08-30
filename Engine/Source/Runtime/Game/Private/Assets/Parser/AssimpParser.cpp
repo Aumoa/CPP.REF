@@ -187,7 +187,7 @@ StaticMesh* AssimpParser::GetStaticMesh() const
 bool AssimpParser::ProcessStaticMeshSubsets()
 {
 	// Ready render data.
-	StaticMeshRenderData* renderData = CreateSubobject<StaticMeshRenderData>();
+	StaticMeshRenderData* renderData = NewObject<StaticMeshRenderData>();
 	MeshBatch& batch = renderData->MeshBatches.emplace_back();
 	batch.VertexFactory = GetVertexFactory();
 
@@ -269,6 +269,6 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 	ib->SetOuter(renderData);
 	batch.IndexBufferLocation = ib->GetGPUVirtualAddress();
 
-	_mesh = CreateSubobject<StaticMesh>(_path, _name.wstring(), renderData);
+	_mesh = NewObject<StaticMesh>(_path, _name.wstring(), renderData);
 	return true;
 }

@@ -6,6 +6,7 @@
 #include <optional>
 #include <chrono>
 #include "Ticking/TickScheduler.h"
+#include "Misc/TickCalc.h"
 
 class GameInstance;
 class ColorVertexFactory;
@@ -22,8 +23,7 @@ struct IFrameworkView;
 /// </summary>
 class GAME_API GameEngine : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(GameEngine)
 
 private:
 	GameInstance* _gameInstance = nullptr;
@@ -90,9 +90,12 @@ public:
 
 private:
 	void TickEngine();
-	void ResizedApp(int32 width, int32 height);
+	TickCalc<> _tickCalc;
 
 private:
+	void SystemsTick(std::chrono::duration<float> elapsedTime);
 	void GameTick(std::chrono::duration<float> elapsedTime);
 	void RenderTick(std::chrono::duration<float> elapsedTime);
 };
+
+#define GEngine (GameEngine::GetEngine())

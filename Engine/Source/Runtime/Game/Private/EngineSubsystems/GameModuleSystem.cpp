@@ -27,7 +27,7 @@ void GameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 		gameModulePath.replace_extension(L".dll");
 	}
 
-	_module = CreateSubobject<PlatformModule>(gameModulePath);
+	_module = NewObject<PlatformModule>(gameModulePath);
 	if (!_module->IsValid())
 	{
 		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", gameModuleName);

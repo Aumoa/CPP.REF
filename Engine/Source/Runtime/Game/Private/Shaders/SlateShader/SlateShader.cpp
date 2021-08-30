@@ -38,7 +38,7 @@ SlateShader::SlateShader(RHIDevice* device) : Super(device)
 		}
 	};
 
-	_material = CreateSubobject<SlateShaderMaterial>(this);
+	_material = NewObject<SlateShaderMaterial>(this);
 }
 
 std::span<uint8 const> SlateShader::CompileVS()

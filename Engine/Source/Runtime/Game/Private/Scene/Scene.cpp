@@ -12,7 +12,7 @@ Scene::Scene(World* worldOwner, RHIDevice* device) : Super()
 	, _world(worldOwner)
 	, _device(device)
 {
-	_localPlayerView = CreateSubobject<SceneVisibility>(this);
+	_localPlayerView = NewObject<SceneVisibility>(this);
 }
 
 Scene::~Scene()

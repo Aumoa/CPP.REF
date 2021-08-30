@@ -10,6 +10,8 @@ struct IFrameworkView;
 
 class GAME_API WinMouse : virtual public Object
 {
+    CLASS_BODY(WinMouse)
+
 public:
     WinMouse();
     ~WinMouse();

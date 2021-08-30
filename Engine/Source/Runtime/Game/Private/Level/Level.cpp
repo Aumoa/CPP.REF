@@ -27,6 +27,35 @@ bool Level::LoadLevel(World* world)
 	_gameMode = world->SpawnActor(GameModeClass);
 	_playerController = world->SpawnActor(_gameMode->PlayerControllerClass);
 	_playerController->SpawnCameraManager(world);
+	_world = world;
 
 	return true;
+}
+
+void Level::UnloadLevel()
+{
+	if (_gameMode)
+	{
+		_gameMode->DestroyActor();
+		DestroySubobject(_gameMode);
+		_gameMode = nullptr;
+	}
+
+	if (_playerController)
+	{
+		_playerController->DestroyActor();
+		DestroySubobject(_playerController);
+		_playerController = nullptr;
+	}
+
+	for (auto& actor : _persistentActors)
+	{
+		actor->DestroyActor();
+		DestroySubobject(actor);
+	}
+}
+
+void Level::InternalSpawnActor(AActor* actor)
+{
+	_persistentActors.emplace_back(actor);
 }

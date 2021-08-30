@@ -4,14 +4,8 @@
 
 #include "RenderMinimal.h"
 
-class GAME_API GeometryGenerator : virtual public Object
+class GAME_API GeometryGenerator abstract final
 {
-public:
-    using Super = Object;
-
-private:
-    GeometryGenerator() = delete;
-
 public:
     typedef std::vector<RHIVertex> VertexCollection;
     typedef std::vector<uint32> IndexCollection;

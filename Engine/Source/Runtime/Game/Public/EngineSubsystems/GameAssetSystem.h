@@ -7,12 +7,9 @@
 
 class GAME_API GameAssetSystem : public GameEngineSubsystem
 {
-public:
-	using Super = GameEngineSubsystem;
+	CLASS_BODY(GameAssetSystem)
 
 public:
 	GameAssetSystem();
 	virtual ~GameAssetSystem() override;
-
-	virtual void Init() override;
 };

@@ -13,8 +13,7 @@ class World;
 /// </summary>
 class GAME_API GameObject : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(GameObject)
 
 private:
 	mutable std::wstring _name;

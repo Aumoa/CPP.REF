@@ -13,9 +13,9 @@ class AActor;
 /// </summary>
 class GAME_API ActorComponent : public GameObject
 {
-public:
-	using Super = GameObject;
+	CLASS_BODY(ActorComponent)
 
+private:
 	/// <summary>
 	/// Represents tick function for targeted to actor component.
 	/// </summary>

@@ -22,7 +22,6 @@ public:
 
 private:
 	APlayerCameraManager* _cameraManager = nullptr;
-	InputComponent* _inputComponent = nullptr;
 	LocalPlayer* _localPlayer = nullptr;
 
 public:
@@ -35,7 +34,7 @@ public:
 	void SpawnCameraManager(World* level);
 	void UpdateCameraManager(std::chrono::duration<float> elapsedTime);
 	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY) const;
+	void SetLocalPlayer(LocalPlayer* localPlayer);
 
-	inline InputComponent* GetInputComponent() const { return _inputComponent; }
 	inline LocalPlayer* GetLocalPlayer() const { return _localPlayer; }
 };

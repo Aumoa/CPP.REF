@@ -11,8 +11,7 @@ struct MeshBatch;
 
 class GAME_API StaticMeshRenderData : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(StaticMeshRenderData)
 
 public:
 	StaticMeshRenderData();

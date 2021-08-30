@@ -7,8 +7,7 @@
 
 class GAME_API Mesh : public StreamableRenderAsset
 {
-public:
-	using Super = StreamableRenderAsset;
+	CLASS_BODY(Mesh)
 
 public:
 	Mesh();

@@ -10,8 +10,7 @@
 /// </summary>
 class GAME_API AInfo : public AActor
 {
-public:
-	using Super = AActor;
+	CLASS_BODY(AInfo)
 
 public:
 	AInfo();

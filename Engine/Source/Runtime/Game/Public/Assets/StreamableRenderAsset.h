@@ -6,8 +6,7 @@
 
 class GAME_API StreamableRenderAsset : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(StreamableRenderAsset)
 
 public:
 	StreamableRenderAsset();

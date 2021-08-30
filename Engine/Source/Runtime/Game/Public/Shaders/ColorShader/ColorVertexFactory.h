@@ -8,9 +8,9 @@
 
 class GAME_API ColorVertexFactory : public RHIVertexFactory
 {
-public:
-	using Super = RHIVertexFactory;
+	CLASS_BODY(ColorVertexFactory)
 
+public:
 #pragma pack(push, 4)
 	struct MyVertex
 	{

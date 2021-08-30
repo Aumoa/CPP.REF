@@ -10,8 +10,7 @@ class RHIVertexFactory;
 
 class GAME_API ParserBase : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(ParserBase)
 
 private:
 	GameEngine* _engine = nullptr;

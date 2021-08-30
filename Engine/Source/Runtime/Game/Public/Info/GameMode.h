@@ -13,8 +13,7 @@ class APlayerController;
 /// </summary>
 class GAME_API AGameMode : public AInfo
 {
-public:
-	using Super = AInfo;
+	CLASS_BODY(AGameMode)
 
 public:
 	SubclassOf<APlayerController> PlayerControllerClass;

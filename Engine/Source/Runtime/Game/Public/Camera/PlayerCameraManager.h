@@ -11,8 +11,7 @@ class APlayerController;
 
 class GAME_API APlayerCameraManager : public AActor
 {
-public:
-	using Super = AActor;
+	CLASS_BODY(APlayerCameraManager)
 
 private:
 	CameraComponent* _cachedBindCamera = nullptr;

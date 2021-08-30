@@ -12,8 +12,7 @@ class APawn;
 /// </summary>
 class GAME_API AController : public AActor
 {
-public:
-	using Super = AActor;
+	CLASS_BODY(AController)
 
 private:
 	APawn* _possessedPawn = nullptr;

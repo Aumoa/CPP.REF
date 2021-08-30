@@ -10,7 +10,3 @@ GameEngineSubsystem::GameEngineSubsystem() : Super()
 GameEngineSubsystem::~GameEngineSubsystem()
 {
 }
-
-void GameEngineSubsystem::Init()
-{
-}

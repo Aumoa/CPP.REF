@@ -13,8 +13,7 @@ class PrimitiveSceneProxy;
 
 class GAME_API SceneRenderer : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(SceneRenderer)
 
 private:
 	struct MeshBatchDrawRelevance

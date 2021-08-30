@@ -11,8 +11,7 @@ class Material;
 
 class GAME_API TransparentShader : public RHIShader
 {
-public:
-	using Super = RHIShader;
+	CLASS_BODY(TransparentShader)
 
 private:
 	std::vector<uint8> _vscode;

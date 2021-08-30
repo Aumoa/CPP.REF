@@ -23,9 +23,11 @@ private:
 public:
 	LocalPlayer();
 
-	void Init(GameEngine* engine);
+	void Init(IFrameworkView* frameworkView);
 	void Tick(std::chrono::duration<float> elapsedTime);
 	void Render(RHIDeviceContext* deviceContext, SlateShader* shader);
+
+	inline IFrameworkView* GetFrameworkView() const { return _frameworkView; }
 
 private:
 	void OnResizedApp(int32 x, int32 y);

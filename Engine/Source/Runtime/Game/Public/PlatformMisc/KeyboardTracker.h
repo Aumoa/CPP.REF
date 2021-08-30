@@ -8,8 +8,7 @@
 
 class KeyboardTracker : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(KeyboardTracker)
 
 private:
 	BitfieldInputChangeTracker<KeyboardState> _tracker;

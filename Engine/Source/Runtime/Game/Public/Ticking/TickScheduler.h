@@ -10,10 +10,9 @@
 
 class TickScheduler : virtual public Object
 {
-public:
-	using Super = Object;
-	using This = TickScheduler;
+	CLASS_BODY(TickScheduler)
 
+public:
 	struct TaskInfo
 	{
 		std::function<void()> Task;

@@ -150,9 +150,6 @@
     <ClCompile Include="Private\Components\ActorComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Components\InputComponent.cpp">
-      <Filter>Private\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Components\MeshComponent.cpp">
       <Filter>Private\Components</Filter>
     </ClCompile>
@@ -270,6 +267,18 @@
     <ClCompile Include="Private\EngineSubsystems\GameAssetSystem.cpp">
       <Filter>Private\EngineSubsystems</Filter>
     </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GameLevelSystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GamePlayerSystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\EngineSubsystems\GameInputSystem.cpp">
+      <Filter>Private\EngineSubsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\CoreDelegates.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h">
@@ -336,9 +345,6 @@
       <Filter>Public\Components</Filter>
     </ClInclude>
     <ClInclude Include="Public\Components\ActorComponent.h">
-      <Filter>Public\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Components\InputComponent.h">
       <Filter>Public\Components</Filter>
     </ClInclude>
     <ClInclude Include="Public\GameFramework\PlayerController.h">
@@ -466,6 +472,21 @@
     </ClInclude>
     <ClInclude Include="Public\EngineSubsystems\GameAssetSystem.h">
       <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GameLevelSystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\CoreDelegates.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GamePlayerSystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\EngineSubsystems\GameInputSystem.h">
+      <Filter>Public\EngineSubsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\TickCalc.h">
+      <Filter>Public\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -17,5 +17,5 @@ private:
 	using MulticastDelegate<F>::Invoke;
 };
 
-#define DECLARE_MULTICAST_EVENT(OwnerClass, EventName, ...)				\
-	using EventName = MulticastEvent<OwnerClass, void(__VA_ARGS__)>;
+#define DECLARE_MULTICAST_EVENT(EventName, ...)					\
+	using EventName = MulticastEvent<This, void(__VA_ARGS__)>;

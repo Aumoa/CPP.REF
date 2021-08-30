@@ -9,8 +9,7 @@ class PrimitiveSceneProxy;
 
 class GAME_API PrimitiveComponent : public SceneComponent
 {
-public:
-	using Super = SceneComponent;
+	CLASS_BODY(PrimitiveComponent)
 
 private:
 	uint8 _bHiddenInGame : 1 = false;

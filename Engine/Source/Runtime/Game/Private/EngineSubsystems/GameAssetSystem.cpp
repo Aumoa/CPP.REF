@@ -10,8 +10,3 @@ GameAssetSystem::GameAssetSystem() : Super()
 GameAssetSystem::~GameAssetSystem()
 {
 }
-
-void GameAssetSystem::Init()
-{
-	Super::Init();
-}

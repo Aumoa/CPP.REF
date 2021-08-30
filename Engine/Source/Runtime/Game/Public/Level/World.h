@@ -21,11 +21,9 @@ class TickFunction;
 /// </summary>
 class GAME_API World : public GameObject
 {
-public:
-	using Super = Object;
+	CLASS_BODY(World)
 
 private:
-	GameEngine* _engine = nullptr;
 	std::set<AActor*> _actors;
 	Level* _level = nullptr;
 	std::set<TickFunction*> _tickInstances;
@@ -38,7 +36,7 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="World"/> instance.
 	/// </summary>
-	World(GameEngine* engine);
+	World();
 
 	/// <summary>
 	/// Spawn actor to world.
@@ -48,7 +46,7 @@ public:
 	template<std::derived_from<AActor> T>
 	T* SpawnActor()
 	{
-		T* spawnedActor = CreateSubobject<T>();
+		T* spawnedActor = NewObject<T>();
 		if (!InternalSpawnActor(spawnedActor))
 		{
 			DestroySubobject(spawnedActor);
@@ -104,7 +102,6 @@ public:
 	Scene* GetScene() const { return _scene; }
 	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
 	Level* GetLevel() const { return _level; }
-	GameEngine* GetEngine() const { return _engine; }
 
 private:
 	bool InternalSpawnActor(AActor* instance);

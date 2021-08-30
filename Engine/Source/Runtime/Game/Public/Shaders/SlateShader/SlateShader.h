@@ -14,9 +14,9 @@ struct SlateRenderTransform;
 
 class GAME_API SlateShader : public RHIShader
 {
-public:
-	using Super = RHIShader;
+	CLASS_BODY(SlateShader)
 
+public:
 	struct DrawElement
 	{
 		Matrix2x2 M;

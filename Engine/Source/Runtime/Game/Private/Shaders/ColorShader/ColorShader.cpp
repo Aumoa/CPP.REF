@@ -36,7 +36,7 @@ ColorShader::ColorShader(RHIDevice* device) : Super(device)
 		}
 	};
 
-	_material = CreateSubobject<ColorShaderMaterial>(this);
+	_material = NewObject<ColorShaderMaterial>(this);
 }
 
 std::span<uint8 const> ColorShader::CompileVS()

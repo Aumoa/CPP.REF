@@ -4,28 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
-#include <chrono>
 #include "SubclassOf.h"
 
-struct IFrameworkView;
-class GameEngine;
 class Level;
-class LocalPlayer;
 
 /// <summary>
 /// Represents single game instance while application are running.
 /// </summary>
 class GAME_API GameInstance : public GameObject
 {
-public:
-	using Super = GameObject;
-	using PostInitializedEvent = MulticastEvent<GameInstance, void()>;
-
-private:
-	IFrameworkView* _frameworkView = nullptr;
-	GameEngine* _engine = nullptr;
-	World* _world = nullptr;
-	LocalPlayer* _localPlayer = nullptr;
+	CLASS_BODY(GameInstance)
 
 public:
 	SubclassOf<Level> StartupLevel;
@@ -35,36 +23,6 @@ public:
 	/// Initialize new <see cref="GameInstance"/> instance.
 	/// </summary>
 	GameInstance();
-
-	virtual void Tick(std::chrono::duration<float> elapsedTime);
-
-	/// <summary>
-	/// Run the application.
-	/// </summary>
-	/// <param name="frameworkView"> The core framework view window. </param>
-	/// <returns> Return primary exit code. </returns>
-	int32 Run(IFrameworkView* frameworkView);
-
-	/// <summary>
-	/// Event for game engine be initialized.
-	/// </summary>
-	PostInitializedEvent PostInitialized;
-
-	/// <summary>
-	/// Get core framework view.
-	/// </summary>
-	IFrameworkView* GetFrameworkView() const;
-
-	/// <summary>
-	/// Get local player.
-	/// </summary>
-	LocalPlayer* GetLocalPlayer() const;
-
-protected:
-	/// <summary>
-	/// Initialize the game engine.
-	/// </summary>
-	virtual void InitializeEngine();
 };
 
 #define DEFINE_GAME_MODULE(GameInstanceClass)			\

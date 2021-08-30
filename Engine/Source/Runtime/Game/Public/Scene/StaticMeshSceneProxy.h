@@ -9,8 +9,7 @@ class StaticMeshComponent;
 
 class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
 {
-public:
-	using Super = PrimitiveSceneProxy;
+	CLASS_BODY(StaticMeshSceneProxy)
 
 public:
 	StaticMeshSceneProxy(StaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches);

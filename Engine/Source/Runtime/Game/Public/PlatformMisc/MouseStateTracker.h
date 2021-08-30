@@ -8,8 +8,7 @@
 
 class MouseStateTracker : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(MouseStateTracker)
 
 private:
 	BitfieldInputChangeTracker<MouseState> _tracker;

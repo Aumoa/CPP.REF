@@ -137,7 +137,7 @@ public:
 		{
 			_myctor = [](Object* outer)
 			{
-				return static_cast<Object*>(outer->CreateSubobject<TBase>());
+				return static_cast<Object*>(outer->NewObject<TBase>());
 			};
 		}
 

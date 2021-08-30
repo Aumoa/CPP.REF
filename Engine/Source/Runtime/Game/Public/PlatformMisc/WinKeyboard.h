@@ -8,6 +8,8 @@
 
 class GAME_API WinKeyboard : virtual public Object
 {
+    CLASS_BODY(WinKeyboard)
+
 public:
     WinKeyboard();
     ~WinKeyboard();

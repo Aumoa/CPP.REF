@@ -14,8 +14,7 @@
 /// </summary>
 class GAME_API SceneComponent : public ActorComponent
 {
-public:
-	using Super = ActorComponent;
+	CLASS_BODY(SceneComponent)
 
 private:
 	struct SceneAttachment

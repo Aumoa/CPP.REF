@@ -7,8 +7,7 @@
 
 class GAME_API Asset : virtual public Object
 {
-public:
-	using Super = Object;
+	CLASS_BODY(Asset)
 
 private:
 	std::filesystem::path _assetPath;

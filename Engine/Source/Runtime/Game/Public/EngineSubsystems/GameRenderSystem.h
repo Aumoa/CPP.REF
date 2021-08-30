@@ -22,8 +22,7 @@ struct IFrameworkView;
 
 class GAME_API GameRenderSystem : public GameEngineSubsystem
 {
-public:
-	using Super = GameEngineSubsystem;
+	CLASS_BODY(GameRenderSystem)
 
 private:
 	IFrameworkView* _frameworkView = nullptr;
@@ -50,9 +49,13 @@ public:
 	virtual ~GameRenderSystem() override;
 
 	virtual void Init() override;
+	virtual void Present();
+
 	void SetupFrameworkView(IFrameworkView* frameworkView);
 	IFrameworkView* GetFrameworkView() const;
+	inline RHIDevice* GetRHIDevice() const { return _device; }
 
 private:
 	void Collect();
+	void ResizeApp(int32 width, int32 height);
 };

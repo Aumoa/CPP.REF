@@ -7,15 +7,13 @@
 #include "GameEngine.h"
 #include "IFrameworkView.h"
 #include "LogGame.h"
-#include "Components/InputComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/CameraComponent.h"
 #include "Level/World.h"
+#include "GameFramework/LocalPlayer.h"
 
 APlayerController::APlayerController() : Super()
 {
-	_inputComponent = CreateSubobject<InputComponent>();
-	AddOwnedComponent(_inputComponent);
 }
 
 CameraComponent* APlayerController::FindPlayerCameraComponent() const
@@ -36,8 +34,11 @@ void APlayerController::SpawnCameraManager(World* level)
 
 void APlayerController::UpdateCameraManager(std::chrono::duration<float> elapsedTime)
 {
-	_cameraManager->CachePlayerCamera(this);
-	_cameraManager->UpdateCamera(elapsedTime);
+	if (_cameraManager)
+	{
+		_cameraManager->CachePlayerCamera(this);
+		_cameraManager->UpdateCamera(elapsedTime);
+	}
 }
 
 Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
@@ -55,9 +56,7 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 	}
 
 	World* world = GetWorld();
-	GameEngine* engine = world->GetEngine();
-	GameInstance* gameInstance = engine->GetGameInstance();
-	IFrameworkView* frameworkView = gameInstance->GetFrameworkView();
+	IFrameworkView* frameworkView = GetLocalPlayer()->GetFrameworkView();
 
 	int32 frameworkWidth = frameworkView->GetFrameworkWidth();
 	int32 frameworkHeight = frameworkView->GetFrameworkHeight();
@@ -96,4 +95,9 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 	ray.Distance = view.FarPlane;
 
 	return ray;
+}
+
+void APlayerController::SetLocalPlayer(LocalPlayer* localPlayer)
+{
+	_localPlayer = localPlayer;
 }

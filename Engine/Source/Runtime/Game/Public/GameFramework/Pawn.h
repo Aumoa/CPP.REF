@@ -12,8 +12,7 @@ class AController;
 /// </summary>
 class GAME_API APawn : public AActor
 {
-public:
-	using Super = AActor;
+	CLASS_BODY(APawn)
 
 private:
 	AController* _controller = nullptr;
