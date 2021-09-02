@@ -3,10 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RHI/IRHIImageSourceView.h"
 
-struct GAME_API IPlatformImage : virtual public Object
+struct GAME_API IPlatformImage : virtual public Object, virtual public IRHIImageSourceView
 {
-	virtual void CopyPixels(uint32 stride, uint32 bufferSize, void* pBuffer) = 0;
-	virtual int32 GetWidth() const = 0;
-	virtual int32 GetHeight() const = 0;
 };

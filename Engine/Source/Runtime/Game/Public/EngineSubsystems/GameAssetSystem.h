@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
+class Texture2D;
+
 class GAME_API GameAssetSystem : public GameEngineSubsystem
 {
 	CLASS_BODY(GameAssetSystem)
@@ -19,4 +21,7 @@ public:
 	virtual void Init() override;
 
 	Object* LoadObject(const std::filesystem::path& assetPath);
+
+private:
+	Texture2D* LoadTexture2D(const std::filesystem::path& assetPath);
 };

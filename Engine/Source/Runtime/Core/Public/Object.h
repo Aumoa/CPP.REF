@@ -50,7 +50,7 @@ public:
 	/// <typeparam name="...TArgs"> The type sequence of constructor arguments. </typeparam>
 	/// <param name="...args"> The constructor arguments. </param>
 	/// <returns> The instantiated pointer. </returns>
-	template<class T, class... TArgs>
+	template<class T, class... TArgs> requires std::constructible_from<T, TArgs...>
 	T* NewObject(TArgs&&... args)
 	{
 		T* ptr = new T(std::forward<TArgs>(args)...);

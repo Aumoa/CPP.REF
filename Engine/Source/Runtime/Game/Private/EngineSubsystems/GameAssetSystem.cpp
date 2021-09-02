@@ -4,6 +4,7 @@
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "Misc/Paths.h"
 #include "LogGame.h"
+#include "Assets/Texture2D.h"
 
 template<class T>
 inline static auto pop_get(std::stack<T>& container)
@@ -80,16 +81,52 @@ Object* GameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 	// Load object.
 	if (it->second == nullptr)
 	{
-		std::ifstream binaryReader(it->first, std::ios::binary);
-		if (!binaryReader.is_open())
+		if (!exists(assetPath))
 		{
-			SE_LOG(LogAssets, Error, L"Could not open asset file from path: {}.", assetPath.wstring());
+			SE_LOG(LogAssets, Error, L"Could not found asset file from path: {}.", assetPath.wstring());
 			return nullptr;
 		}
 
-		// TODO: Read file.
-		binaryReader.close();
+		path ext = assetPath.extension();
+		Object* loadedObject = [&]() -> Object*
+		{
+			if (auto loaded = LoadTexture2D(assetPath); loaded)
+			{
+				return loaded;
+			}
+			else
+			{
+				return nullptr;
+			}
+		}();
+
+		it->second = loadedObject;
 	}
 
 	return it->second;
+}
+
+Texture2D* GameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath)
+{
+	constexpr std::array AllowExtensions =
+	{
+		L".png",
+		L".jpg", L"jpeg",
+		L".bmp",
+		L".gif",
+	};
+
+	if (assetPath.has_extension())
+	{
+		auto ext = assetPath.extension();
+		const bool bAllowed = std::find(AllowExtensions.begin(), AllowExtensions.end(), ext.wstring()) != AllowExtensions.end();
+		if (bAllowed)
+		{
+			auto* object = NewObject<Texture2D>(assetPath);
+			object->StreamIn();
+			return object;
+		}
+	}
+
+	return nullptr;
 }

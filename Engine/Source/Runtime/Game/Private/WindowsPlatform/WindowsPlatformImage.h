@@ -15,12 +15,14 @@ private:
 	ComPtr<IWICFormatConverter> _imageSource = nullptr;
 	int32 _width = 0;
 	int32 _height = 0;
+	ERHIPixelFormat _format = ERHIPixelFormat::Unknown;
 
 public:
-	WindowsPlatformImage(IWICFormatConverter* imageSource);
+	WindowsPlatformImage(IWICFormatConverter* imageSource, ERHIPixelFormat format);
 	virtual ~WindowsPlatformImage() override;
 
 	virtual void CopyPixels(uint32 stride, uint32 bufferSize, void* pBuffer) override;
 	virtual int32 GetWidth() const override;
 	virtual int32 GetHeight() const override;
+	virtual ERHIPixelFormat GetPixelFormat() const override;
 };

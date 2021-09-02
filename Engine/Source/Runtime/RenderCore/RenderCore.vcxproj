@@ -130,6 +130,7 @@
     <ClInclude Include="Public\ComPtr.h" />
     <ClInclude Include="Public\IWindowView.h" />
     <ClInclude Include="Public\RenderMinimal.h" />
+    <ClInclude Include="Public\RHI\IRHIImageSourceView.h" />
     <ClInclude Include="Public\RHI\LogRHI.h" />
     <ClInclude Include="Public\RHI\RHICommandQueue.h" />
     <ClInclude Include="Public\RHI\RHIDepthStencilView.h" />

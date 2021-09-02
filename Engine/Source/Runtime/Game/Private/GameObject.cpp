@@ -2,6 +2,8 @@
 
 #include "pch.h"
 #include "GameObject.h"
+#include "GameEngine.h"
+#include "EngineSubsystems/GameAssetSystem.h"
 
 GameObject::GameObject() : Super()
 {
@@ -38,4 +40,9 @@ World* GameObject::GetWorld() const
 void GameObject::SetWorld(World* value)
 {
 	_WorldPrivate = value;
+}
+
+Object* GameObject::LoadObject(const std::filesystem::path& assetPath)
+{
+	return GEngine->GetEngineSubsystem<GameAssetSystem>()->LoadObject(assetPath);
 }

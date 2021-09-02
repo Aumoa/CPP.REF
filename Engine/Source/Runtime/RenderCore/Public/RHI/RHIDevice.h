@@ -8,6 +8,7 @@
 
 struct IDXGIFactory2;
 struct ID3D12Device;
+struct IRHIImageSourceView;
 class RHICommandQueue;
 class RHIResource;
 class RHITexture2D;
@@ -49,6 +50,7 @@ public:
 	RHIResource* CreateDynamicBuffer(size_t length);
 
 	RHITexture2D* CreateTexture2D(ERHIResourceStates initialState, ERHIPixelFormat format, uint32 width, uint32 height, std::optional<RHITexture2DClearValue> clearValue, ERHIResourceFlags flags = ERHIResourceFlags::None);
+	RHITexture2D* CreateTexture2DFromImage(IRHIImageSourceView* imageSource);
 
 public /*internal*/:
 	IDXGIFactory2* GetFactory() const { return _factory.Get(); }

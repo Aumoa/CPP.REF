@@ -29,7 +29,7 @@ IPlatformImage* WindowsPlatformImageLoader::LoadImageFromFile(const std::filesys
 	HR(_factory->CreateFormatConverter(&converter));
 	HR(converter->Initialize(frame.Get(), GetPixelFormatGUID(desiredPixelFormat), WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
 
-	return NewObject<WindowsPlatformImage>(converter.Get());
+	return NewObject<WindowsPlatformImage>(converter.Get(), desiredPixelFormat);
 }
 
 const GUID& WindowsPlatformImageLoader::GetPixelFormatGUID(ERHIPixelFormat pixelFormat) const

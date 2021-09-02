@@ -5,8 +5,9 @@
 #include "WindowsPlatformHelper.h"
 #include <wincodec.h>
 
-WindowsPlatformImage::WindowsPlatformImage(IWICFormatConverter* imageSource) : Super()
+WindowsPlatformImage::WindowsPlatformImage(IWICFormatConverter* imageSource, ERHIPixelFormat format) : Super()
 	, _imageSource(imageSource)
+	, _format(format)
 {
 	UINT width, height;
 	HR(_imageSource->GetSize(&width, &height));
@@ -31,4 +32,9 @@ int32 WindowsPlatformImage::GetWidth() const
 int32 WindowsPlatformImage::GetHeight() const
 {
 	return _height;
+}
+
+ERHIPixelFormat WindowsPlatformImage::GetPixelFormat() const
+{
+	return _format;
 }

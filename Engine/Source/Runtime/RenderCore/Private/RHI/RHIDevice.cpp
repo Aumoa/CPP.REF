@@ -7,6 +7,7 @@
 #include "RHI/RHIDeviceContext.h"
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHITexture2D.h"
+#include "RHI/IRHIImageSourceView.h"
 
 RHIDevice::RHIDevice(bool bDebug) : Super()
 	, _bDebug(bDebug)
@@ -122,6 +123,86 @@ RHITexture2D* RHIDevice::CreateTexture2D(ERHIResourceStates initialState, ERHIPi
 
 	ComPtr<ID3D12Resource> resource;
 	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, (D3D12_RESOURCE_STATES)initialState, clearValue.has_value() ? (const D3D12_CLEAR_VALUE*)&clearValue.value() : nullptr, IID_PPV_ARGS(&resource)));
+
+	return NewObject<RHITexture2D>(this, resource.Get());
+}
+
+RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSource)
+{
+	D3D12_RESOURCE_DESC textureDesc =
+	{
+		.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		.Width = (UINT64)imageSource->GetWidth(),
+		.Height = (UINT32)imageSource->GetHeight(),
+		.DepthOrArraySize = 1,
+		.MipLevels = 1,
+		.Format = (DXGI_FORMAT)imageSource->GetPixelFormat(),
+		.SampleDesc = { 1, 0 },
+		.Flags = D3D12_RESOURCE_FLAG_NONE
+	};
+
+	D3D12_HEAP_PROPERTIES heap =
+	{
+		.Type = D3D12_HEAP_TYPE_DEFAULT,
+	};
+
+	ComPtr<ID3D12Resource> resource;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
+
+
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
+	uint64 totalBytes;
+	_device->GetCopyableFootprints(&textureDesc, 0, 1, 0, &footprint, nullptr, nullptr, &totalBytes);
+
+	D3D12_RESOURCE_DESC bufferDesc =
+	{
+		.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+		.Width = totalBytes,
+		.Height = 1,
+		.DepthOrArraySize = 1,
+		.MipLevels = 1,
+		.SampleDesc = { 1, 0 },
+		.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+		.Flags = D3D12_RESOURCE_FLAG_NONE,
+	};
+
+	ComPtr<ID3D12Resource> uploadHeap;
+	heap = { .Type = D3D12_HEAP_TYPE_UPLOAD };
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	void* pData;
+	HR(LogRHI, uploadHeap->Map(0, nullptr, &pData));
+	imageSource->CopyPixels((uint32)footprint.Footprint.RowPitch, (uint32)totalBytes, pData);
+	uploadHeap->Unmap(0, nullptr);
+
+	D3D12_RESOURCE_BARRIER barrier = { };
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	RHIDeviceContext* cmd = NewObject<RHIDeviceContext>(this, ERHICommandType::Direct);
+	cmd->Begin();
+	ComPtr<ID3D12GraphicsCommandList> cmdlist;
+	HR(LogRHI, cmd->GetCommandList()->QueryInterface(IID_PPV_ARGS(&cmdlist)));
+
+	D3D12_TEXTURE_COPY_LOCATION locationSrc = {};
+	locationSrc.pResource = uploadHeap.Get();
+	locationSrc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	locationSrc.PlacedFootprint = footprint;
+
+	D3D12_TEXTURE_COPY_LOCATION locationDst = {};
+	locationDst.pResource = resource.Get();
+	locationDst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	locationDst.SubresourceIndex = 0;
+
+	cmdlist->CopyTextureRegion(&locationDst, 0, 0, 0, &locationSrc, nullptr);
+	cmdlist->ResourceBarrier(1, &barrier);
+	cmd->End();
+
+	uint64 signalNumber = _queue->ExecuteDeviceContext(cmd);
+	_queue->AddGarbageObject(signalNumber, uploadHeap.Detach());
+	_queue->AddGarbageObject(signalNumber, cmd);
 
 	return NewObject<RHITexture2D>(this, resource.Get());
 }
