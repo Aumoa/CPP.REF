@@ -8,7 +8,7 @@
 
 class SLATECORE_API SWindow : public SCompoundWidget
 {
-	CLASS_BODY(SWindow)
+	GENERATED_BODY(SWindow)
 
 private:
 	Vector2 _localSize;

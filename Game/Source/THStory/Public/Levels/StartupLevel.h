@@ -7,7 +7,7 @@
 
 class THSTORY_API StartupLevel : public Level
 {
-	CLASS_BODY(StartupLevel)
+	GENERATED_BODY(StartupLevel)
 
 public:
 	StartupLevel();

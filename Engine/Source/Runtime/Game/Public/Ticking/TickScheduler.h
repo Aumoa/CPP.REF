@@ -10,7 +10,7 @@
 
 class TickScheduler : virtual public Object
 {
-	CLASS_BODY(TickScheduler)
+	GENERATED_BODY(TickScheduler)
 
 public:
 	struct TaskInfo

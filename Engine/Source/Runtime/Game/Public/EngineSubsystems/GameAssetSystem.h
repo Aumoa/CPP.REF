@@ -9,7 +9,7 @@ class Texture2D;
 
 class GAME_API GameAssetSystem : public GameEngineSubsystem
 {
-	CLASS_BODY(GameAssetSystem)
+	GENERATED_BODY(GameAssetSystem)
 
 private:
 	std::map<std::filesystem::path, Object*> _assets;

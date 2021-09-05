@@ -16,7 +16,7 @@ class RHICommandQueue;
 /// </summary>
 class RENDERCORE_API RHISwapChain : virtual public RHIDeviceChild
 {
-	CLASS_BODY(RHISwapChain)
+	GENERATED_BODY(RHISwapChain)
 
 private:
 	ComPtr<IDXGISwapChain4> _swapChain;

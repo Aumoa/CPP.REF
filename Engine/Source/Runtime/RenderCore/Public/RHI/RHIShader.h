@@ -18,7 +18,7 @@ class RHIVertexFactory;
 /// </summary>
 class RENDERCORE_API RHIShader : public RHIDeviceChild
 {
-	CLASS_BODY(RHIShader)
+	GENERATED_BODY(RHIShader)
 
 private:
 	RHIVertexFactory* _vfactory = nullptr;

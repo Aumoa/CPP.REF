@@ -7,7 +7,7 @@
 
 class GAME_API MaterialInstance : public Material
 {
-	CLASS_BODY(MaterialInstance)
+	GENERATED_BODY(MaterialInstance)
 
 private:
 	Material* _source = nullptr;

@@ -13,7 +13,7 @@ class World;
 /// </summary>
 class GAME_API GameObject : virtual public Object
 {
-	CLASS_BODY(GameObject)
+	GENERATED_BODY(GameObject)
 
 private:
 	mutable std::wstring _name;
@@ -43,6 +43,12 @@ public:
 
 public:
 	static Object* LoadObject(const std::filesystem::path& assetPath);
+
+	template<std::derived_from<Object> T>
+	static T* LoadObject(const std::filesystem::path& assetPath)
+	{
+		return dynamic_cast<T*>(LoadObject(assetPath));
+	}
 
 private:
 	mutable World* _WorldPrivate = nullptr;

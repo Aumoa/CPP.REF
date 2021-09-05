@@ -9,7 +9,7 @@ class StaticMesh;
 
 class GAME_API StaticMeshComponent : public MeshComponent
 {
-	CLASS_BODY(StaticMeshComponent)
+	GENERATED_BODY(StaticMeshComponent)
 
 private:
 	StaticMesh* _StaticMesh = nullptr;

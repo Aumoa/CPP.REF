@@ -22,7 +22,7 @@ struct IFrameworkView;
 
 class GAME_API GameRenderSystem : public GameEngineSubsystem
 {
-	CLASS_BODY(GameRenderSystem)
+	GENERATED_BODY(GameRenderSystem)
 
 private:
 	IFrameworkView* _frameworkView = nullptr;

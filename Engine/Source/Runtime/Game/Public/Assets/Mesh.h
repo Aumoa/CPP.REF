@@ -7,7 +7,7 @@
 
 class GAME_API Mesh : public StreamableRenderAsset
 {
-	CLASS_BODY(Mesh)
+	GENERATED_BODY(Mesh)
 
 public:
 	Mesh(const std::filesystem::path& assetPath);

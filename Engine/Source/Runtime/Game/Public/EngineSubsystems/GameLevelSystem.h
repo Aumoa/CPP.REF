@@ -10,7 +10,7 @@ class Level;
 
 class GAME_API GameLevelSystem : public GameEngineSubsystem
 {
-	CLASS_BODY(GameLevelSystem)
+	GENERATED_BODY(GameLevelSystem)
 
 private:
 	World* _world = nullptr;

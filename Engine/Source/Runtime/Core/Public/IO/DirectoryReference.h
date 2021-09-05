@@ -10,7 +10,7 @@
 /// </summary>
 class CORE_API DirectoryReference : public FileSystemReference
 {
-	CLASS_BODY(DirectoryReference)
+	GENERATED_BODY(DirectoryReference)
 
 public:
 	/// <summary>

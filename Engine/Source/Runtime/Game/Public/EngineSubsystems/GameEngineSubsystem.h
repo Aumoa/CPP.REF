@@ -8,7 +8,7 @@ class GameEngine;
 
 class GAME_API GameEngineSubsystem : virtual public Object
 {
-	CLASS_BODY(GameEngineSubsystem)
+	GENERATED_BODY(GameEngineSubsystem)
 
 public:
 	GameEngineSubsystem();

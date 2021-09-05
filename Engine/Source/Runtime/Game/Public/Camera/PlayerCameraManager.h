@@ -11,7 +11,7 @@ class APlayerController;
 
 class GAME_API APlayerCameraManager : public AActor
 {
-	CLASS_BODY(APlayerCameraManager)
+	GENERATED_BODY(APlayerCameraManager)
 
 private:
 	CameraComponent* _cachedBindCamera = nullptr;

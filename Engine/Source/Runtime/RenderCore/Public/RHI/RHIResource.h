@@ -13,7 +13,7 @@ struct ID3D12Resource;
 /// </summary>
 class RENDERCORE_API RHIResource : public RHIDeviceChild
 {
-	CLASS_BODY(RHIResource)
+	GENERATED_BODY(RHIResource)
 
 private:
 	ComPtr<ID3D12Resource> _resource;

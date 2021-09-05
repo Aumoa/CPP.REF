@@ -18,7 +18,7 @@ struct MinimalViewInfo;
 
 class GAME_API Scene : virtual public Object
 {
-	CLASS_BODY(Scene)
+	GENERATED_BODY(Scene)
 
 	friend class SceneVisibility;
 	friend class SceneRenderer;

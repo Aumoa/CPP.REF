@@ -25,7 +25,7 @@ class RHIShaderResourceView;
 /// </summary>
 class RENDERCORE_API RHIDeviceContext : public RHIDeviceChild
 {
-	CLASS_BODY(RHIDeviceContext)
+	GENERATED_BODY(RHIDeviceContext)
 
 private:
 	const ERHICommandType _type;

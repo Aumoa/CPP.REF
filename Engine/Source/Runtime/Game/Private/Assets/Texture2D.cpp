@@ -9,6 +9,7 @@
 
 Texture2D::Texture2D(const std::filesystem::path& assetPath) : Super(assetPath)
 {
+	_shaderResourceView = NewObject<RHIShaderResourceView>(GEngine->GetEngineSubsystem<GameRenderSystem>()->GetRHIDevice(), 1);
 }
 
 Texture2D::~Texture2D()
@@ -23,4 +24,24 @@ void Texture2D::StreamIn()
 
 	ScopedPtr<IPlatformImage> platformImage = imageLoader.LoadImageFromFile(GetAssetPath(), ERHIPixelFormat::B8G8R8A8_UNORM);
 	_texture = device->CreateTexture2DFromImage(platformImage.Get());
+	_shaderResourceView->CreateShaderResourceView(_texture, 0);
+}
+
+void Texture2D::GetPixelSize(int32* pWidth, int32* pHeight)
+{
+	if (_texture)
+	{
+		_texture->GetPixelSize(pWidth, pHeight);
+	}
+	else
+	{
+		if (pWidth)
+		{
+			*pWidth = 0;
+		}
+		if (pHeight)
+		{
+			*pHeight = 0;
+		}
+	}
 }

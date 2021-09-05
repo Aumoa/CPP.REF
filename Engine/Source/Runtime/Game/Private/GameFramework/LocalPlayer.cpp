@@ -9,6 +9,8 @@
 #include "Draw/SlateWindowElementList.h"
 #include "Shaders/SlateShader/SlateShader.h"
 
+#include "Assets/Texture2D.h"
+
 LocalPlayer::LocalPlayer() : Super()
 {
 }
@@ -37,7 +39,14 @@ void LocalPlayer::Render(RHIDeviceContext* deviceContext, SlateShader* shader)
 	_drawElements->Clear();
 	_slateWindow->ExecutePaint(_drawElements);
 
-	_drawElements->Add(SlateDrawElement(SlateBrush(), PaintGeometry(Vector2(100.0f, 100.0f), SlateRenderTransform::Identity()), 0));
+	auto* loadObject = LoadObject<Texture2D>(L"Content/THStory/Art/SampleImage.jpg");
+	int32 width, height;
+	loadObject->GetPixelSize(&width, &height);
+
+	SlateBrush brush;
+	brush.ImageSource = loadObject->GetShaderResourceView();
+	brush.ImageSize = Vector2((float)width, (float)height);
+	_drawElements->Add(SlateDrawElement(brush, PaintGeometry(Vector2(851.0f, 1087.0f), SlateRenderTransform::Identity()), 0));
 	shader->RenderElements(deviceContext, _slateWindow->GetDesiredSize(), _drawElements);
 }
 

@@ -16,7 +16,7 @@ class AActor;
 /// </summary>
 class GAME_API Level : virtual public Object
 {
-	CLASS_BODY(Level)
+	GENERATED_BODY(Level)
 
 public:
 	SubclassOf<AGameMode> GameModeClass;

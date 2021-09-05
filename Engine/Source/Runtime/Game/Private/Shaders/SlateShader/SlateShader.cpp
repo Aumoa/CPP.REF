@@ -4,7 +4,9 @@
 #include "Shaders/SlateShader/SlateShader.h"
 #include "Materials/Material.h"
 #include "SlateMinimal.h"
+#include "GameEngine.h"
 #include "Draw/SlateWindowElementList.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 
 #ifndef BYTE
 #define BYTE uint8
@@ -39,44 +41,26 @@ SlateShader::SlateShader(RHIDevice* device) : Super(device)
 	};
 
 	_material = NewObject<SlateShaderMaterial>(this);
+	_shaderDescriptorView = NewObject<RHIShaderDescriptorView>(GEngine->GetEngineSubsystem<GameRenderSystem>()->GetRHIDevice());
 }
 
-std::span<uint8 const> SlateShader::CompileVS()
+void SlateShader::Compile(RHIVertexFactory* vertexDeclaration)
 {
-	return pSlateShaderVS;
-}
+	_ranges.emplace_back() =
+	{
+		.RangeType = ERHIDescriptorRangeType::ShaderResourceView,
+		.NumDescriptors = 1,
+		.BaseShaderRegister = 1,
+		.RegisterSpace = 0,
+	};
 
-std::span<uint8 const> SlateShader::CompilePS()
-{
-	return pSlateShaderPS;
-}
-
-Material* SlateShader::GetDefaultMaterial() const
-{
-	return _material;
-}
-
-auto SlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const -> DrawElement
-{
-	DrawElement drawElement;
-	drawElement.M = geometry.GetMatrix();
-	drawElement.AbsolutePosition = geometry.GetTranslation();
-	drawElement.AbsoluteSize = localSize;
-	drawElement.Depth = depth;
-	return drawElement;
-}
-
-void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2& screenSize, SlateWindowElementList* elements)
-{
-	uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);
-	deviceContext->SetGraphicsRoot32BitConstants(0, 2, &screenSize, 0);
-	deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
-	deviceContext->DrawInstanced(4, 1);
+	Super::Compile(vertexDeclaration);
 }
 
 std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaration() const
 {
 	std::vector<RHIShaderParameterElement> elements;
+	elements.reserve(3);
 
 	// [0] SlateConstants
 	elements.emplace_back() =
@@ -99,5 +83,71 @@ std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaratio
 		}
 	};
 
+	// [2] ImageSource
+	elements.emplace_back() =
+	{
+		.Type = ERHIShaderParameterType::DescriptorTable,
+		.DescriptorTable =
+		{
+			.NumDescriptorRanges = (uint32)_ranges.size(),
+			.pDescriptorRanges = _ranges.data()
+		}
+	};
+
 	return elements;
+}
+
+Material* SlateShader::GetDefaultMaterial() const
+{
+	return _material;
+}
+
+auto SlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const -> DrawElement
+{
+	DrawElement drawElement;
+	drawElement.M = geometry.GetMatrix();
+	drawElement.AbsolutePosition = geometry.GetTranslation();
+	drawElement.AbsoluteSize = localSize;
+	drawElement.Depth = depth;
+	return drawElement;
+}
+
+void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2& screenSize, SlateWindowElementList* elements)
+{
+	// Caching max elements.
+	size_t maxDescriptors = 0;
+	for (auto& element : elements->GetSpan())
+	{
+		if (element.Brush.ImageSource)
+		{
+			maxDescriptors += 1;
+		}
+	}
+	
+	uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);
+	deviceContext->SetGraphicsRoot32BitConstants(0, 2, &screenSize, 0);
+	deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
+
+	_shaderDescriptorView->SetMaxDescriptorCount(maxDescriptors);
+	_shaderDescriptorView->ResetBindings();
+	deviceContext->SetShaderDescriptorViews(_shaderDescriptorView, nullptr);
+
+	for (auto& element : elements->GetSpan())
+	{
+		if (element.Brush.ImageSource)
+		{
+			deviceContext->SetGraphicsRootShaderResourceView(2, element.Brush.ImageSource);
+			deviceContext->DrawInstanced(4, 1);
+		}
+	}
+}
+
+std::span<uint8 const> SlateShader::CompileVS()
+{
+	return pSlateShaderVS;
+}
+
+std::span<uint8 const> SlateShader::CompilePS()
+{
+	return pSlateShaderPS;
 }

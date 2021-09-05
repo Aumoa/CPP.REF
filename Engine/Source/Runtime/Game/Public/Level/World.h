@@ -21,7 +21,7 @@ class TickFunction;
 /// </summary>
 class GAME_API World : public GameObject
 {
-	CLASS_BODY(World)
+	GENERATED_BODY(World)
 
 private:
 	std::set<AActor*> _actors;

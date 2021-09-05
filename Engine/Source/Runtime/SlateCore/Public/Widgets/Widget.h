@@ -16,7 +16,7 @@ class ArrangedWidget;
 
 class SLATECORE_API SWidget : virtual public Object
 {
-	CLASS_BODY(SWidget)
+	GENERATED_BODY(SWidget)
 
 private:
 	ESlateVisibility _Visibility = ESlateVisibility::Visible;

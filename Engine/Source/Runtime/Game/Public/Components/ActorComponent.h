@@ -13,7 +13,7 @@ class AActor;
 /// </summary>
 class GAME_API ActorComponent : public GameObject
 {
-	CLASS_BODY(ActorComponent)
+	GENERATED_BODY(ActorComponent)
 
 private:
 	/// <summary>

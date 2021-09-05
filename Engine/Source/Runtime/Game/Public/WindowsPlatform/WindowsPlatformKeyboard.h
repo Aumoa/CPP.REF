@@ -8,7 +8,7 @@
 
 class GAME_API WindowsPlatformKeyboard : virtual public Object, virtual public IPlatformKeyboard
 {
-    CLASS_BODY(WindowsPlatformKeyboard)
+    GENERATED_BODY(WindowsPlatformKeyboard)
 
 public:
     WindowsPlatformKeyboard();

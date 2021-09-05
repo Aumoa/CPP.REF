@@ -7,7 +7,7 @@
 
 class SLATECORE_API SCompoundWidget : public SWidget
 {
-	CLASS_BODY(SCompoundWidget)
+	GENERATED_BODY(SCompoundWidget)
 
 public:
 	SCompoundWidget();

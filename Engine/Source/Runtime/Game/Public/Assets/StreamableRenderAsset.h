@@ -7,7 +7,7 @@
 
 class GAME_API StreamableRenderAsset : public Asset
 {
-	CLASS_BODY(StreamableRenderAsset)
+	GENERATED_BODY(StreamableRenderAsset)
 
 public:
 	StreamableRenderAsset(const std::filesystem::path& assetPath);

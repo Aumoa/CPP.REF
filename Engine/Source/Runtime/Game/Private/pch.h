@@ -30,6 +30,8 @@
 #include "RHI/RHIShader.h"
 #include "RHI/RHIVertexFactory.h"
 #include "RHI/RHIResource.h"
+#include "RHI/RHIShaderDescriptorView.h"
+#include "RHI/RHIShaderResourceView.h"
 
 #undef min
 #undef max

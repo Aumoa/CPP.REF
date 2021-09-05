@@ -7,7 +7,7 @@
 
 class GAME_API Asset : virtual public Object
 {
-	CLASS_BODY(Asset)
+	GENERATED_BODY(Asset)
 
 private:
 	std::filesystem::path _assetPath;

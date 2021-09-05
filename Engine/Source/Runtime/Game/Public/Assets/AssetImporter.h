@@ -12,7 +12,7 @@ class Asset;
 
 class GAME_API AssetImporter : virtual public Object
 {
-	CLASS_BODY(AssetImporter)
+	GENERATED_BODY(AssetImporter)
 
 private:
 	struct LoadedObjectData

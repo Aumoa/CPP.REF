@@ -129,6 +129,7 @@ RHITexture2D* RHIDevice::CreateTexture2D(ERHIResourceStates initialState, ERHIPi
 
 RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSource)
 {
+	// Resource description for texture2D.
 	D3D12_RESOURCE_DESC textureDesc =
 	{
 		.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
@@ -141,19 +142,18 @@ RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSour
 		.Flags = D3D12_RESOURCE_FLAG_NONE
 	};
 
-	D3D12_HEAP_PROPERTIES heap =
-	{
-		.Type = D3D12_HEAP_TYPE_DEFAULT,
-	};
+	D3D12_HEAP_PROPERTIES heap = { .Type = D3D12_HEAP_TYPE_DEFAULT };
 
+	// Create texture2D resource.
 	ComPtr<ID3D12Resource> resource;
 	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
 
-
+	// Getting texture copy footprint information.
 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
 	uint64 totalBytes;
 	_device->GetCopyableFootprints(&textureDesc, 0, 1, 0, &footprint, nullptr, nullptr, &totalBytes);
 
+	// Resource description for upload buffer.
 	D3D12_RESOURCE_DESC bufferDesc =
 	{
 		.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
@@ -166,8 +166,10 @@ RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSour
 		.Flags = D3D12_RESOURCE_FLAG_NONE,
 	};
 
-	ComPtr<ID3D12Resource> uploadHeap;
 	heap = { .Type = D3D12_HEAP_TYPE_UPLOAD };
+
+	// Create upload buffer.
+	ComPtr<ID3D12Resource> uploadHeap;
 	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
 
 	void* pData;
@@ -175,16 +177,15 @@ RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSour
 	imageSource->CopyPixels((uint32)footprint.Footprint.RowPitch, (uint32)totalBytes, pData);
 	uploadHeap->Unmap(0, nullptr);
 
+	// Make resource barrier state.
 	D3D12_RESOURCE_BARRIER barrier = { };
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Transition.pResource = resource.Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
+	// Create device context and flush commands.
 	RHIDeviceContext* cmd = NewObject<RHIDeviceContext>(this, ERHICommandType::Direct);
-	cmd->Begin();
-	ComPtr<ID3D12GraphicsCommandList> cmdlist;
-	HR(LogRHI, cmd->GetCommandList()->QueryInterface(IID_PPV_ARGS(&cmdlist)));
 
 	D3D12_TEXTURE_COPY_LOCATION locationSrc = {};
 	locationSrc.pResource = uploadHeap.Get();
@@ -196,10 +197,14 @@ RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSour
 	locationDst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 	locationDst.SubresourceIndex = 0;
 
+	cmd->Begin();
+	ComPtr<ID3D12GraphicsCommandList> cmdlist;
+	HR(LogRHI, cmd->GetCommandList()->QueryInterface(IID_PPV_ARGS(&cmdlist)));
 	cmdlist->CopyTextureRegion(&locationDst, 0, 0, 0, &locationSrc, nullptr);
 	cmdlist->ResourceBarrier(1, &barrier);
 	cmd->End();
 
+	// Execute commands.
 	uint64 signalNumber = _queue->ExecuteDeviceContext(cmd);
 	_queue->AddGarbageObject(signalNumber, uploadHeap.Detach());
 	_queue->AddGarbageObject(signalNumber, cmd);

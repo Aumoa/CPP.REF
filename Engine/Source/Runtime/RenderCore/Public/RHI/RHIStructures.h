@@ -144,6 +144,20 @@ struct RHIStructuredBufferParameter
 	uint32 ShaderRegister;
 };
 
+struct RHIDescriptorRange
+{
+	ERHIDescriptorRangeType RangeType;
+	uint32 NumDescriptors;
+	uint32 BaseShaderRegister;
+	uint32 RegisterSpace;
+};
+
+struct RHIDescriptorTableParameter
+{
+	uint32 NumDescriptorRanges;
+	const RHIDescriptorRange* pDescriptorRanges;
+};
+
 /// <summary>
 /// Represents shader parameter element.
 /// </summary>
@@ -155,6 +169,7 @@ struct RHIShaderParameterElement
 		RHIParameterCollectionDeclaration ParameterCollection;
 		RHIScalarConstantsParameter ScalarConstantsParameter;
 		RHIStructuredBufferParameter StructuredBuffer;
+		RHIDescriptorTableParameter DescriptorTable;
 	};
 };
 

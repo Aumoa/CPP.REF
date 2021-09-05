@@ -14,7 +14,7 @@ class Material;
 /// </summary>
 class GAME_API ColorShader : public RHIShader
 {
-	CLASS_BODY(ColorShader)
+	GENERATED_BODY(ColorShader)
 
 private:
 	std::vector<uint8> _vscode;

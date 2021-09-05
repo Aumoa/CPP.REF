@@ -8,7 +8,7 @@
 
 class GAME_API AssimpParser : public ParserBase
 {
-	CLASS_BODY(AssimpParser)
+	GENERATED_BODY(AssimpParser)
 
 private:
 	class Impl;

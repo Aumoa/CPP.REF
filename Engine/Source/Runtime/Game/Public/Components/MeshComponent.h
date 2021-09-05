@@ -7,7 +7,7 @@
 
 class GAME_API MeshComponent : public PrimitiveComponent
 {
-	CLASS_BODY(MeshComponent)
+	GENERATED_BODY(MeshComponent)
 
 public:
 	MeshComponent();

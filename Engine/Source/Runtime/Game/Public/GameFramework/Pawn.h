@@ -12,7 +12,7 @@ class AController;
 /// </summary>
 class GAME_API APawn : public AActor
 {
-	CLASS_BODY(APawn)
+	GENERATED_BODY(APawn)
 
 private:
 	AController* _controller = nullptr;

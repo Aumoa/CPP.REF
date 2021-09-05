@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameObject.h"
 
-class GAME_API Player : virtual public Object
+class GAME_API Player : public GameObject
 {
-public:
-	using Super = Object;
+	GENERATED_BODY(Player)
 
 public:
 	Player();

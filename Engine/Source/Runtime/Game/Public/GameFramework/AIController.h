@@ -9,7 +9,7 @@
 /// </summary>
 class GAME_API AAIController : public AController
 {
-	CLASS_BODY(AAIController)
+	GENERATED_BODY(AAIController)
 
 public:
 	/// <summary>

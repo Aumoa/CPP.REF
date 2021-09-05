@@ -13,7 +13,7 @@ class Level;
 /// </summary>
 class GAME_API GameInstance : public GameObject
 {
-	CLASS_BODY(GameInstance)
+	GENERATED_BODY(GameInstance)
 
 public:
 	SubclassOf<Level> StartupLevel;

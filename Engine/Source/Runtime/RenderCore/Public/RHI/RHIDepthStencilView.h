@@ -15,7 +15,7 @@ class RHITexture2D;
 /// </summary>
 class RENDERCORE_API RHIDepthStencilView : public RHIView
 {
-	CLASS_BODY(RHIDepthStencilView)
+	GENERATED_BODY(RHIDepthStencilView)
 
 private:
 	ComPtr<ID3D12DescriptorHeap> _descriptor;

@@ -9,7 +9,7 @@
 
 class SLATECORE_API ArrangedChildrens : virtual public Object
 {
-	CLASS_BODY(ArrangedChildrens)
+	GENERATED_BODY(ArrangedChildrens)
 
 private:
 	const ESlateVisibility _VisibilityFilter;

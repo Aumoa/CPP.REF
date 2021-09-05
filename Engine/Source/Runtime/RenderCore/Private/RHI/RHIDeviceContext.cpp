@@ -157,7 +157,7 @@ void RHIDeviceContext::SetGraphicsRootShaderResourceView(uint32 index, uint64 bu
 
 void RHIDeviceContext::SetGraphicsRootShaderResourceView(uint32 index, RHIShaderResourceView* resourceView)
 {
-	size_t descriptorIndex = _resourceView->ApplyPayload(resourceView);
+	size_t descriptorIndex = _resourceView->Bind(resourceView);
 	_commandList->SetGraphicsRootDescriptorTable(index, _resourceView->GetGPUDescriptorHandle(descriptorIndex));
 }
 

@@ -15,7 +15,7 @@ enum class ELogVerbosity;
 /// </summary>
 class CORE_API LogCategory : virtual public Object
 {
-	CLASS_BODY(LogCategory)
+	GENERATED_BODY(LogCategory)
 	friend class LogSystem;
 
 private:

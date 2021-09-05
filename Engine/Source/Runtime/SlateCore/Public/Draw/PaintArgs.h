@@ -8,7 +8,7 @@ class SWidget;
 
 class SLATECORE_API PaintArgs : virtual public Object
 {
-	CLASS_BODY(PaintArgs)
+	GENERATED_BODY(PaintArgs)
 
 private:
 	const SWidget* _parent = nullptr;

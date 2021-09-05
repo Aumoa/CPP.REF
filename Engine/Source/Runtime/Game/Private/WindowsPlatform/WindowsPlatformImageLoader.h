@@ -10,7 +10,7 @@ struct IPlatformImage;
 
 class WindowsPlatformImageLoader : virtual public Object, virtual public IPlatformImageLoader
 {
-	CLASS_BODY(WindowsPlatformImageLoader)
+	GENERATED_BODY(WindowsPlatformImageLoader)
 
 public:
 	ComPtr<IWICImagingFactory> _factory;

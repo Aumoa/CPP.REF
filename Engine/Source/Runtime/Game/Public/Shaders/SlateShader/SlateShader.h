@@ -10,11 +10,12 @@
 class Material;
 class RHIDeviceContext;
 class SlateWindowElementList;
+class RHIShaderDescriptorView;
 struct SlateRenderTransform;
 
 class GAME_API SlateShader : public RHIShader
 {
-	CLASS_BODY(SlateShader)
+	GENERATED_BODY(SlateShader)
 
 public:
 	struct DrawElement
@@ -30,10 +31,13 @@ private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
 	Material* _material = nullptr;
+	RHIShaderDescriptorView* _shaderDescriptorView = nullptr;
+	std::vector<RHIDescriptorRange> _ranges;
 
 public:
 	SlateShader(RHIDevice* device);
 
+	virtual void Compile(RHIVertexFactory* vertexDeclaration) override;
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
 
 	Material* GetDefaultMaterial() const;

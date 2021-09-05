@@ -14,7 +14,7 @@
 /// </summary>
 class GAME_API SceneComponent : public ActorComponent
 {
-	CLASS_BODY(SceneComponent)
+	GENERATED_BODY(SceneComponent)
 
 private:
 	struct SceneAttachment

@@ -13,7 +13,7 @@ class DirectoryReference;
 /// </summary>
 class CORE_API FileSystemReference : virtual public Object
 {
-	CLASS_BODY(FileSystemReference)
+	GENERATED_BODY(FileSystemReference)
 
 private:
 	std::optional<std::filesystem::path> _path;

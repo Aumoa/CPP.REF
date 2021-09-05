@@ -23,7 +23,7 @@ struct IFrameworkView;
 /// </summary>
 class GAME_API GameEngine : virtual public Object
 {
-	CLASS_BODY(GameEngine)
+	GENERATED_BODY(GameEngine)
 
 private:
 	GameInstance* _gameInstance = nullptr;

@@ -10,7 +10,7 @@
 /// </summary>
 class RENDERCORE_API RHITexture2D : public RHITexture
 {
-	CLASS_BODY(RHITexture2D)
+	GENERATED_BODY(RHITexture2D)
 
 public:
 	RHITexture2D(RHIDevice* device, ID3D12Resource* resource);

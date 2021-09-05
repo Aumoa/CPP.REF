@@ -10,7 +10,7 @@
 
 class GAME_API GameInputSystem : public GameEngineSubsystem
 {
-	CLASS_BODY(GameInputSystem)
+	GENERATED_BODY(GameInputSystem)
 
 public:
 	struct MouseMoveData

@@ -9,7 +9,7 @@ class PrimitiveSceneProxy;
 
 class GAME_API PrimitiveComponent : public SceneComponent
 {
-	CLASS_BODY(PrimitiveComponent)
+	GENERATED_BODY(PrimitiveComponent)
 
 private:
 	uint8 _bHiddenInGame : 1 = false;

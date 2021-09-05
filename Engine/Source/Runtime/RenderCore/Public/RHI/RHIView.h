@@ -12,7 +12,7 @@ class RHIShaderDescriptorView;
 /// </summary>
 class RENDERCORE_API RHIView : public RHIDeviceChild
 {
-	CLASS_BODY(RHIView)
+	GENERATED_BODY(RHIView)
 
 public:
 	RHIView(RHIDevice* device);

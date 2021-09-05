@@ -9,10 +9,12 @@
 struct ID3D12DescriptorHeap;
 class RHIDeviceContext;
 class RHIShaderResourceView;
+struct D3D12_CPU_DESCRIPTOR_HANDLE;
+struct D3D12_GPU_DESCRIPTOR_HANDLE;
 
 class RENDERCORE_API RHIShaderDescriptorView : public RHIDeviceChild
 {
-	CLASS_BODY(RHIShaderDescriptorView)
+	GENERATED_BODY(RHIShaderDescriptorView)
 
 	// For access to internal, and collecting garbages.
 	friend class RHIDeviceContext;
@@ -38,7 +40,7 @@ public:
 	size_t GetMaxDescriptorCount() const;
 
 	void ResetBindings();
-	size_t ApplyPayload(RHIShaderResourceView* view);
+	size_t Bind(RHIShaderResourceView* view);
 
 private:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(size_t index) const;

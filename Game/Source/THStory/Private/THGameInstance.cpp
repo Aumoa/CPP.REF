@@ -14,5 +14,5 @@ THGameInstance::THGameInstance() : Super()
 	//SoftObjectPtr<StaticMesh> loadStaticMesh(L"Chess/Arts/Bishop/Mesh/bishop.fbx");
 	//StaticMesh* staticMesh = loadStaticMesh.LoadObject();
 
-	Texture2D* texture = dynamic_cast<Texture2D*>(LoadObject(L"Content/THStory/Art/SampleImage.jpg"));
+	auto* texture = dynamic_cast<Texture2D*>(LoadObject(L"Content/THStory/Art/SampleImage.jpg"));
 }

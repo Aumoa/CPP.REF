@@ -83,7 +83,7 @@ private:
 	void InternalDestroySubobject(Object* subobject);
 };
 
-#define CLASS_BODY(Class)		\
+#define GENERATED_BODY(Class)		\
 public:							\
 	using Super = This;			\
 	using This = Class;

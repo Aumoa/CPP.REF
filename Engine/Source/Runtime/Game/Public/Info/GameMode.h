@@ -13,7 +13,7 @@ class APlayerController;
 /// </summary>
 class GAME_API AGameMode : public AInfo
 {
-	CLASS_BODY(AGameMode)
+	GENERATED_BODY(AGameMode)
 
 public:
 	SubclassOf<APlayerController> PlayerControllerClass;

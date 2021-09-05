@@ -9,7 +9,7 @@ struct IWICFormatConverter;
 
 class WindowsPlatformImage : virtual public Object, virtual public IPlatformImage
 {
-	CLASS_BODY(WindowsPlatformImage)
+	GENERATED_BODY(WindowsPlatformImage)
 
 private:
 	ComPtr<IWICFormatConverter> _imageSource = nullptr;

@@ -11,7 +11,7 @@ struct RHIVertex;
 
 class GAME_API StaticMesh : public Asset
 {
-	CLASS_BODY(StaticMesh)
+	GENERATED_BODY(StaticMesh)
 
 private:
 	std::wstring _name;

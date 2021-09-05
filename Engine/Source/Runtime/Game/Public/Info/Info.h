@@ -10,7 +10,7 @@
 /// </summary>
 class GAME_API AInfo : public AActor
 {
-	CLASS_BODY(AInfo)
+	GENERATED_BODY(AInfo)
 
 public:
 	AInfo();

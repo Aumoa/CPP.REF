@@ -8,6 +8,7 @@
 #include "RHI/RHITexture2D.h"
 
 RHIShaderResourceView::RHIShaderResourceView(RHIDevice* device, uint32 descriptorCount) : Super(device)
+	, _descriptorCount(descriptorCount)
 {
 	ID3D12Device* dev = device->GetDevice();
 	D3D12_DESCRIPTOR_HEAP_DESC heapd =
@@ -30,14 +31,14 @@ void RHIShaderResourceView::CreateShaderResourceView(RHITexture2D* texture, int3
 	ID3D12Device* dev = GetDevice()->GetDevice();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _descriptor->GetCPUDescriptorHandleForHeapStart();
-	handle.ptr += _increment * index;
+	handle.ptr += (size_t)_increment * index;
 
-	dev->CreateDepthStencilView(resource, nullptr, handle);
+	dev->CreateShaderResourceView(resource, nullptr, handle);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE RHIShaderResourceView::GetCPUDescriptorHandle(int32 index) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _descriptor->GetCPUDescriptorHandleForHeapStart();
-	handle.ptr += _increment * index;
+	handle.ptr += (size_t)_increment * index;
 	return handle;
 }

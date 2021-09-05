@@ -10,7 +10,7 @@ class GameInstance;
 
 class GAME_API GameModuleSystem : public GameEngineSubsystem
 {
-	CLASS_BODY(GameModuleSystem)
+	GENERATED_BODY(GameModuleSystem)
 
 private:
 	PlatformModule* _module = nullptr;

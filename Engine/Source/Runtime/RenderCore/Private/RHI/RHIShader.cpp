@@ -24,6 +24,8 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 	std::vector<RHIShaderParameterElement> shaderParameters = GetShaderParameterDeclaration();
 	std::vector<D3D12_ROOT_PARAMETER> rootParameters;
 
+	std::vector<D3D12_DESCRIPTOR_RANGE> ranges;
+
 	for (size_t i = 0; i < shaderParameters.size(); ++i)
 	{
 		RHIShaderParameterElement& myParam = shaderParameters[i];
@@ -67,6 +69,36 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
 			};
 			break;
+		case ERHIShaderParameterType::DescriptorTable:
+		{
+			auto& tableRef = myParam.DescriptorTable;
+			ranges.reserve((size_t)tableRef.NumDescriptorRanges);
+			for (size_t i = 0; i < tableRef.NumDescriptorRanges; ++i)
+			{
+				auto& rangeRef = tableRef.pDescriptorRanges[i];
+
+				ranges.emplace_back() =
+				{
+					.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)rangeRef.RangeType,
+					.NumDescriptors = rangeRef.NumDescriptors,
+					.BaseShaderRegister = rangeRef.BaseShaderRegister,
+					.RegisterSpace = rangeRef.RegisterSpace,
+					.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
+				};
+			}
+
+			rootParameters.emplace_back() =
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+				.DescriptorTable =
+				{
+					.NumDescriptorRanges = tableRef.NumDescriptorRanges,
+					.pDescriptorRanges = ranges.data()
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+			};
+			break;
+		}
 		default:
 			SE_LOG(LogRHI, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
 			rootParameters.emplace_back();
@@ -74,12 +106,25 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 		}
 	}
 
+	std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers;
+	staticSamplers.emplace_back() =
+	{
+		.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+		.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+		.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+		.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
+		.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
+		.ShaderRegister = 0,
+		.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
+	};
+
 	D3D12_ROOT_SIGNATURE_DESC rsd =
 	{
 		.NumParameters = (UINT)rootParameters.size(),
 		.pParameters = rootParameters.empty() ? nullptr : rootParameters.data(),
-		.NumStaticSamplers = 0,
-		.pStaticSamplers = nullptr,
+		.NumStaticSamplers = 1,
+		.pStaticSamplers = staticSamplers.data(),
 		.Flags
 			= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS

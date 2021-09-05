@@ -16,7 +16,7 @@ class SceneComponent;
 /// </summary>
 class GAME_API AActor : public GameObject
 {
-	CLASS_BODY(AActor)
+	GENERATED_BODY(AActor)
 
 private:
 	/// <summary>

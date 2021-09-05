@@ -18,7 +18,7 @@ RHIShaderDescriptorView::~RHIShaderDescriptorView()
 
 void RHIShaderDescriptorView::SetMaxDescriptorCount(size_t count)
 {
-	const bool bRealloc = count > _count;
+	const bool bRealloc = !_descriptorHeap || count > _count;
 
 	if (bRealloc)
 	{
@@ -33,7 +33,7 @@ void RHIShaderDescriptorView::SetMaxDescriptorCount(size_t count)
 		D3D12_DESCRIPTOR_HEAP_DESC desc =
 		{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = (UINT)count,
+			.NumDescriptors = std::max((UINT)count, (UINT)1),
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 			.NodeMask = 0
 		};
@@ -53,7 +53,7 @@ void RHIShaderDescriptorView::ResetBindings()
 	_seekpos = 0;
 }
 
-size_t RHIShaderDescriptorView::ApplyPayload(RHIShaderResourceView* view)
+size_t RHIShaderDescriptorView::Bind(RHIShaderResourceView* view)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleSrc = view->GetCPUDescriptorHandle(0);
 	size_t count = view->GetDescriptorCount();

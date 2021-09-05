@@ -10,7 +10,7 @@ struct IFrameworkView;
 
 class GAME_API GamePlayerSystem : public GameEngineSubsystem
 {
-	CLASS_BODY(GamePlayerSystem);
+	GENERATED_BODY(GamePlayerSystem);
 
 private:
 	LocalPlayer* _localPlayer = nullptr;

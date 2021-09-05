@@ -12,7 +12,7 @@
 /// </summary>
 class GAME_API TickFunction : virtual public Object
 {
-	CLASS_BODY(TickFunction)
+	GENERATED_BODY(TickFunction)
 
 public:
 	/// <summary>

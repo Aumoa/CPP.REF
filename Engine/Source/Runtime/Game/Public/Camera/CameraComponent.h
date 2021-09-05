@@ -9,7 +9,7 @@ struct MinimalViewInfo;
 
 class GAME_API CameraComponent : public SceneComponent
 {
-	CLASS_BODY(CameraComponent)
+	GENERATED_BODY(CameraComponent)
 
 public:
 	CameraComponent();

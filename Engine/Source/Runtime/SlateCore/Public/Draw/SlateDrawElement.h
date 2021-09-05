@@ -10,7 +10,7 @@ struct SlateDrawElement
 {
 	SlateBrush Brush;
 	PaintGeometry Transform;
-	int32 Layer = 0;
+	int32 Layer = 0;;
 
 	SlateDrawElement()
 	{

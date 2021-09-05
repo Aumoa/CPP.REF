@@ -7,7 +7,7 @@
 
 class THSTORY_API THGameInstance : public GameInstance
 {
-	CLASS_BODY(THGameInstance)
+	GENERATED_BODY(THGameInstance)
 
 public:
 	THGameInstance();

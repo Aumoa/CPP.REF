@@ -10,7 +10,7 @@ class PrimitiveComponent;
 
 class GAME_API PrimitiveSceneProxy : virtual public Object
 {
-	CLASS_BODY(PrimitiveSceneProxy)
+	GENERATED_BODY(PrimitiveSceneProxy)
 
 private:
 	PrimitiveComponent* _MyComponent = nullptr;

@@ -279,7 +279,8 @@ enum class ERHIShaderParameterType
 
     ParameterCollection,
     ScalarParameterConstants,
-    StructuredBuffer
+    StructuredBuffer,
+    DescriptorTable,
 };
 
 enum class ERHIResourceFlags
@@ -294,6 +295,14 @@ enum class ERHIResourceFlags
     VideoDecodeReferenceOnly = 0x40
 };
 DEFINE_ENUM_FLAG_OPERATORS(ERHIResourceFlags);
+
+enum class ERHIDescriptorRangeType
+{
+    ShaderResourceView,
+    UnorderedAccessView,
+    ConstantBufferView,
+    Sampler,
+};
 
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")
