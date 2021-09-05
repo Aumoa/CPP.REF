@@ -197,6 +197,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Private\TIcking\TickFunction.cpp" />
+    <ClCompile Include="Private\Widgets\Images\Image.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImage.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImageLoader.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="Public\Ticking\TickFunction.h" />
     <ClInclude Include="Public\Ticking\TickingGroup.h" />
     <ClInclude Include="Public\Ticking\TickScheduler.h" />
+    <ClInclude Include="Public\Widgets\Images\Image.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformKeyboard.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformMouse.h" />
   </ItemGroup>

@@ -7,13 +7,14 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
 
-SWidget::SWidget() : Super()
+SWidget::SWidget(const std::wstring& name) : Super()
+    , _name(name)
 {
 }
 
 std::wstring SWidget::ToString(std::wstring_view formatArgs) const
 {
-	return format(L"{}: [{}] ({})", StringUtils::AsUnicode(typeid(*this).name()), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
+	return std::format(L"{}({}): [{}] ({})", _name, StringUtils::AsUnicode(typeid(*this).name()), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
 }
 
 int32 SWidget::Paint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
@@ -131,4 +132,11 @@ void SWidget::SetEnabled(bool bEnabled)
 bool SWidget::IsEnabled() const
 {
     return _bEnabled;
+}
+
+std::wstring SWidget::GenerateAutoNumberedName()
+{
+    static std::atomic<size_t> number;
+    static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SWidget).name());
+    return std::format(L"{}_{}", wc_name, number++);
 }

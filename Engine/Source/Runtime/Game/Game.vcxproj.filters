@@ -64,9 +64,6 @@
     <Filter Include="Public\PlatformMisc">
       <UniqueIdentifier>{fce18116-8143-4912-b013-a69446ae2e65}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\PlatformMisc">
-      <UniqueIdentifier>{064d2e71-8cfc-4915-9cd7-4faaf555d6fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Public\Scene">
       <UniqueIdentifier>{89dbcfc5-ef67-44b1-b738-567e3c7bbb4f}</UniqueIdentifier>
     </Filter>
@@ -114,6 +111,18 @@
     </Filter>
     <Filter Include="Public\WindowsPlatform">
       <UniqueIdentifier>{c1d8b10b-b950-4821-9a80-662538b3d224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets">
+      <UniqueIdentifier>{7805807f-b400-4700-a193-e6102057f572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Images">
+      <UniqueIdentifier>{cb6dda11-f5f4-4554-8195-034510e24e0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets">
+      <UniqueIdentifier>{eadec7f8-6ebc-4f38-a82e-188eea6288e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Images">
+      <UniqueIdentifier>{5c229d28-ff11-4e6b-9a0f-e5777630ae8b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -296,6 +305,9 @@
     </ClCompile>
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformMouse.cpp">
       <Filter>Private\WindowsPlatform</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Images\Image.cpp">
+      <Filter>Private\Widgets\Images</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -529,6 +541,9 @@
     </ClInclude>
     <ClInclude Include="Public\Misc\MouseStateTracker.h">
       <Filter>Public\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Images\Image.h">
+      <Filter>Public\Widgets\Images</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

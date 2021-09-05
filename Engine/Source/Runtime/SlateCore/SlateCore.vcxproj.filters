@@ -85,6 +85,9 @@
     <ClInclude Include="Public\Widgets\Window.h">
       <Filter>Public\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="Public\WIdgets\LeafWidget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -112,6 +115,9 @@
       <Filter>Private\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Private\Widgets\Window.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WIdgets\LeafWidget.cpp">
       <Filter>Private\Widgets</Filter>
     </ClCompile>
   </ItemGroup>

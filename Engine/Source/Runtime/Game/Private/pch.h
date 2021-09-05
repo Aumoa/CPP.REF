@@ -33,5 +33,7 @@
 #include "RHI/RHIShaderDescriptorView.h"
 #include "RHI/RHIShaderResourceView.h"
 
+#include "Draw/SlateWindowElementList.h"
+
 #undef min
 #undef max

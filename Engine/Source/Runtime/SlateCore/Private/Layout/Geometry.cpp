@@ -4,11 +4,20 @@
 #include "Layout/LayoutImpl.h"
 #include "Layout/Geometry.h"
 #include "Layout/ArrangedWidget.h"
+#include "Widgets/Widget.h"
 
 ArrangedWidget Geometry::MakeChild(const SWidget* childWidget, const Vector2& localSize, const SlateLayoutTransform& layoutTransform) const
 {
-	checkf(false, L"NOT IMPLEMENTED");
-	throw;
+    if (childWidget->HasRenderTransform())
+    {
+        SlateRenderTransform renderTransform = childWidget->GetRenderTransformWithRespectToFlowDirection();
+        Vector2 renderTransformPivot = childWidget->GetRenderTransformPivotWithRespectToFlowDirection();
+        return ArrangedWidget(childWidget, MakeChild(localSize, layoutTransform, renderTransform, renderTransformPivot));
+    }
+    else
+    {
+        return ArrangedWidget(childWidget, MakeChild(localSize, layoutTransform));
+    }
 }
 
 ArrangedWidget Geometry::MakeChild(const SWidget* childWidget, const LayoutGeometry& layoutGeometry) const

@@ -8,6 +8,7 @@
 class GameEngine;
 class SWindow;
 class SlateShader;
+class RHIDeviceContext;
 struct IFrameworkView;
 
 class GAME_API LocalPlayer : public Player
@@ -28,6 +29,7 @@ public:
 	void Render(RHIDeviceContext* deviceContext, SlateShader* shader);
 
 	inline IFrameworkView* GetFrameworkView() const { return _frameworkView; }
+	inline SWindow* GetSlateWindow() const { return _slateWindow; }
 
 private:
 	void OnResizedApp(int32 x, int32 y);

@@ -6,3 +6,7 @@
 GameInstance::GameInstance() : Super()
 {
 }
+
+void GameInstance::Init()
+{
+}

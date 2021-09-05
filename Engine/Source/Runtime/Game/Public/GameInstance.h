@@ -23,6 +23,11 @@ public:
 	/// Initialize new <see cref="GameInstance"/> instance.
 	/// </summary>
 	GameInstance();
+
+	/// <summary>
+	/// Initialize game instance subsystems.
+	/// </summary>
+	virtual void Init();
 };
 
 #define DEFINE_GAME_MODULE(GameInstanceClass)			\

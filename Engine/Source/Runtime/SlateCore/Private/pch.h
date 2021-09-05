@@ -4,4 +4,6 @@
 
 #include "RenderMinimal.h"
 
+#include "RHI/RHITexture2D.h"
+
 #include <algorithm>

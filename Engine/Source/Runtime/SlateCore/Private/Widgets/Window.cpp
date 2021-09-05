@@ -3,11 +3,14 @@
 #include "pch.h"
 #include "Widgets/Window.h"
 #include "Layout/LayoutImpl.h"
+#include "Layout/ArrangedChildrens.h"
 #include "Draw/SlateWindowElementList.h"
 #include "Draw/PaintArgs.h"
 #include "Layout/Geometry.h"
 
-SWindow::SWindow() : Super()
+DEFINE_LOG_CATEGORY(LogSlateWindow);
+
+SWindow::SWindow(const std::wstring& name) : Super(name)
 	, _lastDeltaTime(std::chrono::milliseconds(0))
 {
 }
@@ -33,6 +36,41 @@ void SWindow::SetWindowSize(const Vector2& localSize)
 	_localSize = localSize;
 }
 
+void SWindow::AddWidgetToScreen(SWidget* widget)
+{
+	check(widget);
+	_screenWidgets.emplace_back(widget);
+	widget->SetOuter(this);
+}
+
+SWidget* SWindow::GetWidgetInScreen(const std::wstring& name) const
+{
+	for (size_t i = 0; i < _screenWidgets.size(); ++i)
+	{
+		if (_screenWidgets[i]->GetName() == name)
+		{
+			return _screenWidgets[i];
+		}
+	}
+
+	return nullptr;
+}
+
+void SWindow::RemoveWidgetFromScreen(const std::wstring& name)
+{
+	for (auto it = _screenWidgets.begin(); it != _screenWidgets.end(); ++it)
+	{
+		if ((*it)->GetName() == name)
+		{
+			DestroySubobject(*it);
+			_screenWidgets.erase(it);
+			return;
+		}
+	}
+
+	SE_LOG(LogSlateWindow, Verbose, L"Could not found widget name: \"{}\". Abort.", name);
+}
+
 Vector2 SWindow::GetDesiredSize() const
 {
 	return _localSize;
@@ -40,4 +78,27 @@ Vector2 SWindow::GetDesiredSize() const
 
 void SWindow::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
 {
+	for (auto it = _screenWidgets.begin(); it != _screenWidgets.end(); ++it)
+	{
+		ESlateVisibility childVisibility = (*it)->GetVisibility();
+		if (arrangedChildrens->Accepts(childVisibility))
+		{
+			// Add the information about this child to the output list (ArrangedChildren)
+			arrangedChildrens->AddWidget(childVisibility, allottedGeometry.MakeChild(
+				// The child widget being arranged
+				*it,
+				// Child's local position (i.e. position within parent)
+				Vector2(0, 0),
+				// Child's size
+				_localSize
+			));
+		}
+	}
+}
+
+std::wstring SWindow::GenerateAutoNumberedName()
+{
+	static std::atomic<size_t> number;
+	static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SWindow).name());
+	return std::format(L"{}_{}", wc_name, number++);
 }

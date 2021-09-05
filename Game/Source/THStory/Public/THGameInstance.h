@@ -11,4 +11,6 @@ class THSTORY_API THGameInstance : public GameInstance
 
 public:
 	THGameInstance();
+
+	virtual void Init() override;
 };

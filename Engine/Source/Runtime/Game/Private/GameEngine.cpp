@@ -127,6 +127,7 @@ int32 GameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view p
 	engine->SetupFrameworkView(frameworkView);
 
 	// Start application now!
+	engine->_gameInstance->Init();
 	frameworkView->Start();
 	return 0;
 }

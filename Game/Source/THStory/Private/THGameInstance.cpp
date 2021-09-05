@@ -4,15 +4,28 @@
 #include "Levels/StartupLevel.h"
 #include "Assets/StaticMesh.h"
 #include "Assets/Texture2D.h"
+#include "GameEngine.h"
+#include "EngineSubsystems/GamePlayerSystem.h"
+#include "GameFramework/LocalPlayer.h"
+#include "Widgets/Window.h"
+#include "Widgets/Images/Image.h"
 
 DEFINE_GAME_MODULE(THGameInstance);
 
 THGameInstance::THGameInstance() : Super()
 {
 	StartupLevel = SubclassOf<::StartupLevel>::StaticClass();
+}
 
-	//SoftObjectPtr<StaticMesh> loadStaticMesh(L"Chess/Arts/Bishop/Mesh/bishop.fbx");
-	//StaticMesh* staticMesh = loadStaticMesh.LoadObject();
+void THGameInstance::Init()
+{
+	Super::Init();
 
-	auto* texture = dynamic_cast<Texture2D*>(LoadObject(L"Content/THStory/Art/SampleImage.jpg"));
+	auto* playerSystem = GEngine->GetEngineSubsystem<GamePlayerSystem>();
+	LocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
+	SWindow* slateWindow = localPlayer->GetSlateWindow();
+
+	auto* imageWidget = NewObject<SImage>();
+	imageWidget->SetTexture2D(LoadObject<Texture2D>(L"Content/THStory/Art/SampleImage.jpg"));
+	slateWindow->AddWidgetToScreen(imageWidget);
 }

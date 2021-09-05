@@ -9,15 +9,15 @@ class SWidget;
 
 class SLATECORE_API ArrangedWidget
 {
-	SWidget* _widget = nullptr;
+	const SWidget* _widget = nullptr;
 	Geometry _geometry;
 
 public:
-	ArrangedWidget(SWidget* widget, const Geometry& geometry);
+	ArrangedWidget(const SWidget* widget, const Geometry& geometry);
 
 	std::wstring ToString(std::wstring_view formatArgs = L"") const;
 
-	SWidget* GetWidget() const { return _widget; }
+	const SWidget* GetWidget() const { return _widget; }
 	const Geometry& GetGeometry() const { return _geometry; }
 
 	bool operator ==(const ArrangedWidget& rhs) const;

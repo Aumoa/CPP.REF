@@ -28,19 +28,23 @@ private:
 	uint8 _bEnabled : 1 = true;
 	uint8 _bHasRenderTransform : 1 = false;
 
+	std::wstring _name;
+
 public:
-	SWidget();
+	SWidget(const std::wstring& name = GenerateAutoNumberedName());
 
 	virtual std::wstring ToString(std::wstring_view formatArgs) const override;
 
 	int32 Paint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const;
 	void ArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const;
+	inline std::wstring GetName() const { return _name; }
 
 	virtual void Tick(const Geometry& allottedGeometry, std::chrono::duration<float> deltaTime);
 	virtual Vector2 GetDesiredSize() const;
 
 	Vector2 GetRenderTransformPivotWithRespectToFlowDirection() const;
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection() const;
+	inline bool HasRenderTransform() const { return _bHasRenderTransform; }
 
 protected:
 	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const = 0;
@@ -61,4 +65,7 @@ public:
 	SlateRenderTransform GetRenderTransform() const;
 	void SetEnabled(bool bEnabled);
 	bool IsEnabled() const;
+
+private:
+	static std::wstring GenerateAutoNumberedName();
 };
