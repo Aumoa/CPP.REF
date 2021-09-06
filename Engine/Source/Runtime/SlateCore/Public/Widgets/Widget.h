@@ -3,6 +3,8 @@
 #pragma once
 
 #include "RenderMinimal.h"
+#include "DeclarativeSyntaxSupports.h"
+#include "SlotBase.h"
 #include "Layout/FlowDirection.h"
 #include "Layout/SlateRenderTransform.h"
 #include "Draw/SlateVisibility.h"
@@ -53,7 +55,16 @@ protected:
 	bool IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild) const;
 	bool ShouldBeEnabled(bool bParentEnabled) const;
 
-public:
+public:					
+	BEGIN_SLATE_ATTRIBUTE
+		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility, Visibility)
+		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
+		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
+		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+	END_SLATE_ATTRIBUTE;
+
+	DECLARE_SLATE_CONSTRUCTOR();
+
 	void SetVisibility(ESlateVisibility visibility);
 	ESlateVisibility GetVisibility() const;
 	void SetFlowDirection(EFlowDirection flowDirection);
@@ -69,3 +80,10 @@ public:
 private:
 	static std::wstring GenerateAutoNumberedName();
 };
+
+template<std::derived_from<SWidget> TSlateClass, class TDeclarativeAttr>
+inline TSlateClass* operator <<(TSlateClass* slateInstance, TDeclarativeAttr&& attribute)
+{
+	slateInstance->Construct(std::move(attribute));
+	return slateInstance;
+}

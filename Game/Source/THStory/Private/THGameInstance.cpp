@@ -21,11 +21,11 @@ void THGameInstance::Init()
 {
 	Super::Init();
 
-	auto* playerSystem = GEngine->GetEngineSubsystem<GamePlayerSystem>();
-	LocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
-	SWindow* slateWindow = localPlayer->GetSlateWindow();
+	//auto* playerSystem = GEngine->GetEngineSubsystem<GamePlayerSystem>();
+	//LocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
+	//SWindow* slateWindow = localPlayer->GetSlateWindow();
 
-	auto* imageWidget = NewObject<SImage>();
-	imageWidget->SetTexture2D(LoadObject<Texture2D>(L"Content/THStory/Art/SampleImage.jpg"));
-	slateWindow->AddWidgetToScreen(imageWidget);
+	//auto* imageWidget = NewObject<SImage>();
+	//imageWidget->SetTexture2D(LoadObject<Texture2D>(L"Content/THStory/Art/SampleImage.jpg"));
+	//slateWindow->AddWidgetToScreen(imageWidget);
 }

@@ -198,11 +198,13 @@
     </ClCompile>
     <ClCompile Include="Private\TIcking\TickFunction.cpp" />
     <ClCompile Include="Private\Widgets\Images\Image.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\Panel.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImage.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImageLoader.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformKeyboard.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformMouse.cpp" />
+    <ClCompile Include="Public\Widgets\Panel\CanvasPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h" />
@@ -281,6 +283,8 @@
     <ClInclude Include="Public\Ticking\TickingGroup.h" />
     <ClInclude Include="Public\Ticking\TickScheduler.h" />
     <ClInclude Include="Public\Widgets\Images\Image.h" />
+    <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\Panel.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformKeyboard.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformMouse.h" />
   </ItemGroup>

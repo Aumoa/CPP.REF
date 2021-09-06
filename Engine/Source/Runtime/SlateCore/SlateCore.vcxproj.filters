@@ -88,6 +88,12 @@
     <ClInclude Include="Public\WIdgets\LeafWidget.h">
       <Filter>Public\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Widgets\SlotBase.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">

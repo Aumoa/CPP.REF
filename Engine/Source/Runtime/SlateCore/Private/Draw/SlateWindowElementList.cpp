@@ -70,8 +70,15 @@ uint64 SlateWindowElementList::CreateBuffer(RHIDeviceContext* deviceContext, con
 		_dynamicElementBuffer->SetOuter(this);
 	}
 
-	void* ptr = _dynamicElementBuffer->GetMappingPointer();
-	memcpy(ptr, drawElements, sizeInBytes);
+	if (_dynamicElementBuffer)
+	{
+		void* ptr = _dynamicElementBuffer->GetMappingPointer();
+		memcpy(ptr, drawElements, sizeInBytes);
 
-	return _dynamicElementBuffer->GetGPUVirtualAddress();
+		return _dynamicElementBuffer->GetGPUVirtualAddress();
+	}
+	else
+	{
+		return 0;
+	}
 }

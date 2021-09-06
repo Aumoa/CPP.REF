@@ -146,7 +146,7 @@ void SceneComponent::DetachFromComponent()
 	}
 
 	_attachment.AttachmentRoot = nullptr;
-	_attachment.SocketName = nullptr;
+	_attachment.SocketName = L"";
 
 	UpdateComponentToWorld();
 }

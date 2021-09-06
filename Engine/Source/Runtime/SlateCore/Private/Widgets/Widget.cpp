@@ -82,6 +82,14 @@ bool SWidget::ShouldBeEnabled(bool bParentEnabled) const
     return bParentEnabled && IsEnabled();
 }
 
+DEFINE_SLATE_CONSTRUCTOR(SWidget, attr)
+{
+    SetVisibility(attr._Visibility);
+    SetFlowDirection(attr._FlowDirection);
+    SetClipping(attr._Clipping);
+    SetEnabled(attr._bEnabled);
+}
+
 void SWidget::SetVisibility(ESlateVisibility visibility)
 {
     _Visibility = visibility;

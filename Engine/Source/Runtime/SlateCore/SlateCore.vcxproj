@@ -120,7 +120,9 @@
     <ClInclude Include="Public\Layout\TransformCalculus2D.h" />
     <ClInclude Include="Public\SlateMinimal.h" />
     <ClInclude Include="Public\Widgets\CompoundWidget.h" />
+    <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
     <ClInclude Include="Public\WIdgets\LeafWidget.h" />
+    <ClInclude Include="Public\Widgets\SlotBase.h" />
     <ClInclude Include="Public\Widgets\Widget.h" />
     <ClInclude Include="Public\Widgets\Window.h" />
   </ItemGroup>
