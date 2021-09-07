@@ -40,6 +40,12 @@ SlateBrush SImage::GetBrush() const
 	return _brush;
 }
 
+DEFINE_SLATE_CONSTRUCTOR(SImage, attr)
+{
+	Super::Construct(attr);
+	SetBrush(attr._Brush);
+}
+
 int32 SImage::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
 	SlateDrawElement element;

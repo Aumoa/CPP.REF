@@ -24,6 +24,13 @@ public:
 	void SetTexture2D(Texture2D* texture, bool bMatchSize = true);
 	SlateBrush GetBrush() const;
 
+public:
+	BEGIN_SLATE_ATTRIBUTE
+		DECLARE_SLATE_ATTRIBUTE(SlateBrush, Brush)
+	END_SLATE_ATTRIBUTE
+
+	DECLARE_SLATE_CONSTRUCTOR();
+
 protected:
 	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
 

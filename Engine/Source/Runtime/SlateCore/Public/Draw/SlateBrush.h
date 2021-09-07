@@ -21,6 +21,13 @@ struct SlateBrush
 	{
 	}
 
+	template<class TSource>
+	SlateBrush(const TSource* textureSource)
+		: ImageSource(textureSource->GetShaderResourceView())
+		, ImageSize(textureSource->GetSize())
+	{
+	}
+
 	std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
 		return std::format(L"DesiredSize: {}", ImageSize.ToString(formatArgs));

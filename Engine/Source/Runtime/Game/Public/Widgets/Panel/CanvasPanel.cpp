@@ -5,10 +5,6 @@
 #include "Layout/ArrangedChildrens.h"
 #include "Draw/PaintArgs.h"
 
-SCanvasPanel::Slot::Slot()
-{
-}
-
 SCanvasPanel::SCanvasPanel(const std::wstring& name) : Super(name)
 {
 }
@@ -17,9 +13,49 @@ SCanvasPanel::~SCanvasPanel()
 {
 }
 
+auto SCanvasPanel::AddSlot() -> Slot&
+{
+	return _slots.emplace_back();
+}
+
+bool SCanvasPanel::RemoveSlot(size_t index)
+{
+	if (_slots.size() <= index)
+	{
+		return false;
+	}
+
+	_slots.erase(_slots.begin() + index);
+	return true;
+}
+
+size_t SCanvasPanel::FindSlot(const SWidget* content) const
+{
+	for (size_t i = 0; i < _slots.size(); ++i)
+	{
+		if (_slots[i].GetContent() == content)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void SCanvasPanel::ClearSlots()
+{
+	_slots.resize(0);
+}
+
+size_t SCanvasPanel::NumSlots() const
+{
+	return _slots.size();
+}
+
 DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, attr)
 {
 	Super::Construct(attr);
+	_slots = std::move(attr.Slots);
 }
 
 int32 SCanvasPanel::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
@@ -52,25 +88,25 @@ int32 SCanvasPanel::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeomet
 
 void SCanvasPanel::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
 {
-	if (_childrens.size() > 0)
+	if (_slots.size() > 0)
 	{
 		// Sort the children based on zorder.
 		std::vector<ChildZOrder> slotOrder;
-		slotOrder.reserve(_childrens.size());
+		slotOrder.reserve(_slots.size());
 
-		for (size_t i = 0; i < _childrens.size(); ++i)
+		for (size_t i = 0; i < _slots.size(); ++i)
 		{
-			auto& curChild = _childrens[i];
+			auto& curChild = _slots[i];
 			slotOrder.emplace_back() =
 			{
 				.ChildIndex = (int32)i,
-				.ZOrder = curChild->_ZOrder
+				.ZOrder = curChild._ZOrder
 			};
 		}
 
 		static auto compareAscending = [](auto lh, auto rh)
 		{
-			return lh == rh ? 0 : lh < rh ? -1 : 1;
+			return lh < rh;
 		};
 
 		static auto sortSlotsByZOrder = [](auto& lhs, auto& rhs)
@@ -83,35 +119,35 @@ void SCanvasPanel::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const
 		std::sort(slotOrder.begin(), slotOrder.end(), sortSlotsByZOrder);
 
 		// Arrange the children now in their proper z-order.
-		for (size_t childIndex = 0; childIndex < _childrens.size(); ++childIndex)
+		for (size_t childIndex = 0; childIndex < _slots.size(); ++childIndex)
 		{
 			ChildZOrder curSlot = slotOrder[childIndex];
-			Slot* curChild = _childrens[curSlot.ChildIndex];
-			const SWidget* curWidget = curChild->GetContent();
+			const Slot& curChild = _slots[curSlot.ChildIndex];
+			const SWidget* curWidget = curChild.GetContent();
 
 			ESlateVisibility childVisibility = curWidget->GetVisibility();
 			if (arrangedChildrens->Accepts(childVisibility))
 			{
-				Margin offset = curChild->_Offset;
-				Vector2 alignment = curChild->_Alignment;
-				Anchors anchors = curChild->_Anchors;
+				const Margin& Offset = curChild._Offset;
+				const Vector2& Alignment = curChild._Alignment;
+				const Anchors& Anchors = curChild._Anchors;
+				const bool bAutoSize = curChild._bAutoSize;
 
-				bool bAutoSize = curChild->_bAutoSize;
+				const Margin AnchorPixels(
+					Anchors.Minimum.X * allottedGeometry.GetSize().X,
+					Anchors.Minimum.Y * allottedGeometry.GetSize().Y,
+					Anchors.Maximum.X * allottedGeometry.GetSize().X,
+					Anchors.Maximum.Y * allottedGeometry.GetSize().Y
+				);
 
-				auto anchorPixels = Margin(
-					anchors.Minimum.X * allottedGeometry.GetSize().X,
-					anchors.Minimum.Y * allottedGeometry.GetSize().Y,
-					anchors.Maximum.X * allottedGeometry.GetSize().X,
-					anchors.Maximum.Y * allottedGeometry.GetSize().Y);
+				const bool bIsHorizontalStretch = Anchors.Minimum.X != Anchors.Maximum.X;
+				const bool bIsVerticalStretch = Anchors.Minimum.Y != Anchors.Maximum.Y;
 
-				bool bIsHorizontalStretch = anchors.Minimum.X != anchors.Maximum.X;
-				bool bIsVerticalStretch = anchors.Minimum.Y != anchors.Maximum.Y;
-
-				auto slotSize = Vector2(offset.Right, offset.Bottom);
-				auto Size = bAutoSize ? curWidget->GetDesiredSize() : slotSize;
+				const auto SlotSize = Vector2(Offset.Right, Offset.Bottom);
+				const auto Size = bAutoSize ? curWidget->GetDesiredSize() : SlotSize;
 
 				// Calculate the offset based on the pivot position.
-				Vector2 alignmentOffset = Size * alignment;
+				const Vector2 AlignmentOffset = Size * Alignment;
 
 				// Calculate the local position based on the anchor and position offset.
 				Vector2 localPosition, localSize;
@@ -119,24 +155,24 @@ void SCanvasPanel::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const
 				// Calculate the position and size based on the horizontal stretch or non-stretch
 				if (bIsHorizontalStretch)
 				{
-					localPosition.X = anchorPixels.Left + offset.Left;
-					localSize.X = anchorPixels.Right - localPosition.X - offset.Right;
+					localPosition.X = AnchorPixels.Left + Offset.Left;
+					localSize.X = AnchorPixels.Right - localPosition.X - Offset.Right;
 				}
 				else
 				{
-					localPosition.X = anchorPixels.Left + offset.Left - alignmentOffset.X;
+					localPosition.X = AnchorPixels.Left + Offset.Left - AlignmentOffset.X;
 					localSize.X = Size.X;
 				}
 
 				// Calculate the position and size based on the vertical stretch or non-stretch
 				if (bIsVerticalStretch)
 				{
-					localPosition.Y = anchorPixels.Top + offset.Top;
-					localSize.Y = anchorPixels.Bottom - localPosition.Y - offset.Bottom;
+					localPosition.Y = AnchorPixels.Top + Offset.Top;
+					localSize.Y = AnchorPixels.Bottom - localPosition.Y - Offset.Bottom;
 				}
 				else
 				{
-					localPosition.Y = anchorPixels.Top + offset.Top - alignmentOffset.Y;
+					localPosition.Y = AnchorPixels.Top + Offset.Top - AlignmentOffset.Y;
 					localSize.Y = Size.Y;
 				}
 

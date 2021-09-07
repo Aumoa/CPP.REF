@@ -126,7 +126,6 @@ void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2&
 	
 	uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);
 	deviceContext->SetGraphicsRoot32BitConstants(0, 2, &screenSize, 0);
-	deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
 
 	_shaderDescriptorView->SetMaxDescriptorCount(maxDescriptors);
 	_shaderDescriptorView->ResetBindings();
@@ -136,9 +135,12 @@ void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2&
 	{
 		if (element.Brush.ImageSource)
 		{
+			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
 			deviceContext->SetGraphicsRootShaderResourceView(2, element.Brush.ImageSource);
 			deviceContext->DrawInstanced(4, 1);
 		}
+
+		gpuAddr += sizeof(DrawElement);
 	}
 }
 

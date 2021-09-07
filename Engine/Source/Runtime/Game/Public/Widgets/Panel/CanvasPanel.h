@@ -15,13 +15,15 @@ public:
 	class Slot : public TSlotBase<Slot>
 	{
 	public:
-		Slot();
-
-		DECLARE_SLATE_ATTRIBUTE(Margin, Offset);
-		DECLARE_SLATE_ATTRIBUTE(Anchors, Anchors);
+		Slot()
+		{
+		}
+		
+		DECLARE_SLATE_ATTRIBUTE(Margin, Offset, = Margin(0, 0, 1.0f, 1.0f));
+		DECLARE_SLATE_ATTRIBUTE(::Anchors, Anchors);
 		DECLARE_SLATE_ATTRIBUTE(Vector2, Alignment);
 		DECLARE_SLATE_ATTRIBUTE(float, ZOrder, = 0);
-		DECLARE_SLATE_ATTRIBUTE(bool, bAutoSize);
+		DECLARE_SLATE_ATTRIBUTE(bool, bAutoSize, = false);
 	};
 
 private:
@@ -32,11 +34,17 @@ private:
 	};
 
 private:
-	std::vector<Slot*> _childrens;
+	std::vector<Slot> _slots;
 
 public:
 	SCanvasPanel(const std::wstring& name = GenerateAutoNumberedName());
 	virtual ~SCanvasPanel() override;
+
+	Slot& AddSlot();
+	bool RemoveSlot(size_t index);
+	size_t FindSlot(const SWidget* content) const;
+	void ClearSlots();
+	size_t NumSlots() const;
 
 protected:
 	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;

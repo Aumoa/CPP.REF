@@ -63,7 +63,13 @@ This&& Var(const Type& value) &&				\
 {												\
 	_ ## Var = value;							\
 	return std::move(*static_cast<This*>(this));\
-}												
+}												\
+template<class... TArgs> requires std::constructible_from<Type, TArgs...>	\
+This&& Var(TArgs&&... args) &&												\
+{																			\
+	_ ## Var = Type(std::forward<TArgs>(args)...);							\
+	return std::move(*static_cast<This*>(this));							\
+}
 
 #define DECLARE_SLATE_CONSTRUCTOR() void Construct(DeclarativeAttr<>&&)
 #define DEFINE_SLATE_CONSTRUCTOR(SlateClass, AttrVar) void SlateClass::Construct(DeclarativeAttr<>&& AttrVar)
@@ -76,4 +82,4 @@ This&& operator +(SlotClass&& instanceSlot) &&				\
 	return std::move(*static_cast<This*>(this));			\
 }
 
-#define SNew(SlateClass) (new SlateClass()) << DeclarativeAttr<>()
+#define SNew(SlateClass) (new SlateClass()) << SlateClass::DeclarativeAttr<>()

@@ -27,7 +27,7 @@ void Texture2D::StreamIn()
 	_shaderResourceView->CreateShaderResourceView(_texture, 0);
 }
 
-void Texture2D::GetPixelSize(int32* pWidth, int32* pHeight)
+void Texture2D::GetPixelSize(int32* pWidth, int32* pHeight) const
 {
 	if (_texture)
 	{
@@ -44,4 +44,11 @@ void Texture2D::GetPixelSize(int32* pWidth, int32* pHeight)
 			*pHeight = 0;
 		}
 	}
+}
+
+Vector2 Texture2D::GetSize() const
+{
+	int32 width, height;
+	GetPixelSize(&width, &height);
+	return Vector2((float)width, (float)height);
 }
