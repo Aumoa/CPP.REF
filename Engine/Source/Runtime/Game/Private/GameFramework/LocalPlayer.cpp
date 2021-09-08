@@ -17,7 +17,7 @@ void LocalPlayer::Init(IFrameworkView* frameworkView)
 {
 	_frameworkView = frameworkView;
 
-	_slateWindow = NewObject<SWindow>();
+	_slateWindow = SNew(SWindow);
 
 	// Register ResizeApp handler.
 	_frameworkView->Size.AddObject(this, &LocalPlayer::OnResizedApp);

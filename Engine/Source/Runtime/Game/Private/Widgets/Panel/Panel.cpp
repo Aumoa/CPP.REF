@@ -7,10 +7,3 @@ SPanel::SPanel(const std::wstring& name) : Super(name)
 {
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }
-
-std::wstring SPanel::GenerateAutoNumberedName()
-{
-    static std::atomic<size_t> number;
-    static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SPanel).name());
-    return std::format(L"{}_{}", wc_name, number++);
-}

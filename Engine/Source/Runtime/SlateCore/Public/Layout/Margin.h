@@ -3,7 +3,7 @@
 #pragma once
 
 #include "RenderMinimal.h"
-#include "Layout/Orientation.h"
+#include "LayoutEnums.h"
 
 struct Margin
 {

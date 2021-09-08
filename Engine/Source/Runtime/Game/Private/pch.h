@@ -3,6 +3,7 @@
 #pragma once
 
 #include "RenderMinimal.h"
+#include "SlateMinimal.h"
 
 #include <optional>
 #include <chrono>
@@ -18,6 +19,7 @@
 #include <functional>
 #include <stack>
 #include <queue>
+#include <ranges>
 
 #include "IWindowView.h"
 #include "RHI/RHIDevice.h"
@@ -34,6 +36,8 @@
 #include "RHI/RHIShaderResourceView.h"
 
 #include "Draw/SlateWindowElementList.h"
+#include "Layout/AlignmentArrangeResult.h"
+#include "Layout/ArrangedChildrens.h"
 
 #undef min
 #undef max

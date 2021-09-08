@@ -36,10 +36,3 @@ int32 SCompoundWidget::PaintArrangedChildrens(PaintArgs* paintArgs, ArrangedChil
 
     return layer;
 }
-
-std::wstring SCompoundWidget::GenerateAutoNumberedName()
-{
-    static std::atomic<size_t> number;
-    static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SCompoundWidget).name());
-    return std::format(L"{}_{}", wc_name, number++);
-}

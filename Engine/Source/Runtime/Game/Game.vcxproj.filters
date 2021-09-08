@@ -321,6 +321,15 @@
     <ClCompile Include="Public\Widgets\Panel\CanvasPanel.cpp">
       <Filter>Private\Widgets\Panel</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\HorizontalBoxPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h">
@@ -561,6 +570,15 @@
       <Filter>Public\Widgets\Panel</Filter>
     </ClInclude>
     <ClInclude Include="Public\Widgets\Panel\Panel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\BoxPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h">
       <Filter>Public\Widgets\Panel</Filter>
     </ClInclude>
   </ItemGroup>

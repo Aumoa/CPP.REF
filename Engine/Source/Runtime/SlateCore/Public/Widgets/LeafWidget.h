@@ -10,12 +10,9 @@ class SLATECORE_API SLeafWidget : public SWidget
 	GENERATED_BODY(SLeafWidget)
 
 public:
-	SLeafWidget(const std::wstring& name = GenerateAutoNumberedName());
+	SLeafWidget(const std::wstring& name);
 	virtual ~SLeafWidget() override;
 
 protected:
 	virtual void OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
-
-private:
-	static std::wstring GenerateAutoNumberedName();
 };

@@ -95,10 +95,3 @@ void SWindow::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geom
 		}
 	}
 }
-
-std::wstring SWindow::GenerateAutoNumberedName()
-{
-	static std::atomic<size_t> number;
-	static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SWindow).name());
-	return std::format(L"{}_{}", wc_name, number++);
-}

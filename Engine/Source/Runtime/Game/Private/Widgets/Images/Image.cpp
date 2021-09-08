@@ -56,10 +56,3 @@ int32 SImage::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, co
 	drawElements->Add(element);
 	return layer;
 }
-
-std::wstring SImage::GenerateAutoNumberedName()
-{
-	static std::atomic<size_t> number;
-	static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SImage).name());
-	return std::format(L"{}_{}", wc_name, number++);
-}

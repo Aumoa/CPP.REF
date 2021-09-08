@@ -10,8 +10,5 @@ class GAME_API SPanel : public SCompoundWidget
 	GENERATED_BODY(SPanel)
 
 public:
-	SPanel(const std::wstring& name = GenerateAutoNumberedName());
-
-private:
-	static std::wstring GenerateAutoNumberedName();
+	SPanel(const std::wstring& name);
 };

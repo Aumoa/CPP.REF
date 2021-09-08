@@ -5,7 +5,7 @@
 #include "RenderMinimal.h"
 #include "LayoutImpl.h"
 #include "ArrangedWidget.h"
-#include "Draw/SlateVisibility.h"
+#include "LayoutEnums.h"
 
 class SLATECORE_API ArrangedChildrens : virtual public Object
 {

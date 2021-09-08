@@ -189,10 +189,3 @@ void SCanvasPanel::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const
 		}
 	}
 }
-
-std::wstring SCanvasPanel::GenerateAutoNumberedName()
-{
-    static std::atomic<size_t> number;
-    static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SPanel).name());
-    return std::format(L"{}_{}", wc_name, number++);
-}

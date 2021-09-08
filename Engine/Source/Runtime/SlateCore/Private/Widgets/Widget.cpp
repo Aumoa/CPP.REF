@@ -84,6 +84,7 @@ bool SWidget::ShouldBeEnabled(bool bParentEnabled) const
 
 DEFINE_SLATE_CONSTRUCTOR(SWidget, attr)
 {
+    _name = std::move(attr._Name);
     SetVisibility(attr._Visibility);
     SetFlowDirection(attr._FlowDirection);
     SetClipping(attr._Clipping);
@@ -140,11 +141,4 @@ void SWidget::SetEnabled(bool bEnabled)
 bool SWidget::IsEnabled() const
 {
     return _bEnabled;
-}
-
-std::wstring SWidget::GenerateAutoNumberedName()
-{
-    static std::atomic<size_t> number;
-    static std::wstring wc_name = ANSI_TO_WCHAR(typeid(SWidget).name());
-    return std::format(L"{}_{}", wc_name, number++);
 }

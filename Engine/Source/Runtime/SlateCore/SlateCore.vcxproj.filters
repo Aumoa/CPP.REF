@@ -13,9 +13,6 @@
     <ClInclude Include="Public\Draw\SlateWindowElementList.h">
       <Filter>Public\Draw</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Draw\WidgetClipping.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Draw\PaintArgs.h">
       <Filter>Public\Draw</Filter>
     </ClInclude>
@@ -25,13 +22,7 @@
     <ClInclude Include="Public\Draw\SlateDrawElement.h">
       <Filter>Public\Draw</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Draw\SlateVisibility.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Layout\Margin.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\Orientation.h">
       <Filter>Public\Layout</Filter>
     </ClInclude>
     <ClInclude Include="Public\Layout\PaintGeometry.h">
@@ -64,9 +55,6 @@
     <ClInclude Include="Public\Layout\ArrangedWidget.h">
       <Filter>Public\Layout</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Layout\FlowDirection.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Layout\Geometry.h">
       <Filter>Public\Layout</Filter>
     </ClInclude>
@@ -93,6 +81,18 @@
     </ClInclude>
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h">
       <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="PUblic\Layout\LayoutEnums.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SizeParam.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\LogSlate.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\AlignmentArrangeResult.h">
+      <Filter>Public\Layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +125,9 @@
     </ClCompile>
     <ClCompile Include="Private\WIdgets\LeafWidget.cpp">
       <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\LogSlate.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

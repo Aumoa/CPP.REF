@@ -10,13 +10,10 @@ class SLATECORE_API SCompoundWidget : public SWidget
 	GENERATED_BODY(SCompoundWidget)
 
 public:
-	SCompoundWidget(const std::wstring& name = GenerateAutoNumberedName());
+	SCompoundWidget(const std::wstring& name);
 
 protected:
 	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
 
 	int32 PaintArrangedChildrens(PaintArgs* paintArgs, ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const;
-
-private:
-	static std::wstring GenerateAutoNumberedName();
 };

@@ -4,6 +4,18 @@
 
 #include "RenderMinimal.h"
 
+enum class EFlowDirection
+{
+	LeftToRight,
+	RightToLeft
+};
+
+enum class EOrientation
+{
+	Horizontal,
+	Vertical
+};
+
 enum class ESlateVisibility
 {
 	Visible,
@@ -11,6 +23,35 @@ enum class ESlateVisibility
 	Hidden,
 	HitTestInvisible,
 	SelfHitTestInvisible
+};
+
+enum class EWidgetClipping
+{
+	Inherit,
+	ClipToBounds,
+	ClipToBoundsWithoutIntersection,
+};
+
+enum class EHorizontalAlignment
+{
+	Fill,
+	Left,
+	Center,
+	Right,
+};
+
+enum class EVerticalAlignment
+{
+	Fill,
+	Top,
+	Center,
+	Bottom,
+};
+
+enum class ESizeRule
+{
+	Auto,
+	Stretch
 };
 
 class SlateVisibilityExtensions abstract

@@ -15,7 +15,7 @@ private:
 	SlateBrush _brush;
 
 public:
-	SImage(const std::wstring& name = GenerateAutoNumberedName());
+	SImage(const std::wstring& name);
 	virtual ~SImage() override;
 
 	virtual Vector2 GetDesiredSize() const override;
@@ -33,7 +33,4 @@ public:
 
 protected:
 	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
-
-private:
-	static std::wstring GenerateAutoNumberedName();
 };

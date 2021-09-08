@@ -198,7 +198,10 @@
     </ClCompile>
     <ClCompile Include="Private\TIcking\TickFunction.cpp" />
     <ClCompile Include="Private\Widgets\Images\Image.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\HorizontalBoxPanel.cpp" />
     <ClCompile Include="Private\Widgets\Panel\Panel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImage.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImageLoader.cpp" />
@@ -283,8 +286,11 @@
     <ClInclude Include="Public\Ticking\TickingGroup.h" />
     <ClInclude Include="Public\Ticking\TickScheduler.h" />
     <ClInclude Include="Public\Widgets\Images\Image.h" />
+    <ClInclude Include="Public\Widgets\Panel\BoxPanel.h" />
     <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h" />
     <ClInclude Include="Public\Widgets\Panel\Panel.h" />
+    <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformKeyboard.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformMouse.h" />
   </ItemGroup>

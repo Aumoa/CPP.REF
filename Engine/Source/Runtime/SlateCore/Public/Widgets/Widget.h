@@ -5,10 +5,8 @@
 #include "RenderMinimal.h"
 #include "DeclarativeSyntaxSupports.h"
 #include "SlotBase.h"
-#include "Layout/FlowDirection.h"
+#include "Layout/LayoutEnums.h"
 #include "Layout/SlateRenderTransform.h"
-#include "Draw/SlateVisibility.h"
-#include "Draw/WidgetClipping.h"
 
 struct Geometry;
 class SlateWindowElementList;
@@ -33,7 +31,7 @@ private:
 	std::wstring _name;
 
 public:
-	SWidget(const std::wstring& name = GenerateAutoNumberedName());
+	SWidget(const std::wstring& name);
 
 	virtual std::wstring ToString(std::wstring_view formatArgs) const override;
 
@@ -61,6 +59,7 @@ public:
 		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
 		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+		DECLARE_SLATE_ATTRIBUTE(std::wstring, Name)
 	END_SLATE_ATTRIBUTE;
 
 	DECLARE_SLATE_CONSTRUCTOR();
@@ -76,9 +75,6 @@ public:
 	SlateRenderTransform GetRenderTransform() const;
 	void SetEnabled(bool bEnabled);
 	bool IsEnabled() const;
-
-private:
-	static std::wstring GenerateAutoNumberedName();
 };
 
 template<std::derived_from<SWidget> TSlateClass, class TDeclarativeAttr>

@@ -18,7 +18,7 @@ private:
 	std::vector<SWidget*> _screenWidgets;
 
 public:
-	SWindow(const std::wstring& name = GenerateAutoNumberedName());
+	SWindow(const std::wstring& name);
 
 	void ExecuteTick(std::chrono::duration<float> deltaTime);
 	void ExecutePaint(SlateWindowElementList* drawElements) const;
@@ -34,7 +34,4 @@ public:
 
 protected:
 	virtual void OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
-
-private:
-	static std::wstring GenerateAutoNumberedName();
 };

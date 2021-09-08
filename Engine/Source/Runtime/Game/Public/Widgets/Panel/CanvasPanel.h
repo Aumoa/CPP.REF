@@ -5,7 +5,6 @@
 #include "SlateMinimal.h"
 #include "Panel.h"
 #include "Widgets/SlotBase.h"
-#include "Widgets/DeclarativeSyntaxSupports.h"
 
 class GAME_API SCanvasPanel : public SPanel
 {
@@ -37,7 +36,7 @@ private:
 	std::vector<Slot> _slots;
 
 public:
-	SCanvasPanel(const std::wstring& name = GenerateAutoNumberedName());
+	SCanvasPanel(const std::wstring& name);
 	virtual ~SCanvasPanel() override;
 
 	Slot& AddSlot();
@@ -56,7 +55,4 @@ public:
 	END_SLATE_ATTRIBUTE
 
 	DECLARE_SLATE_CONSTRUCTOR();
-
-private:
-	static std::wstring GenerateAutoNumberedName();
 };

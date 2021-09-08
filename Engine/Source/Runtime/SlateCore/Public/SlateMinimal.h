@@ -4,11 +4,9 @@
 
 #include "RenderMinimal.h"
 
-#include "Layout/FlowDirection.h"
-#include "Layout/Orientation.h"
-#include "Draw/SlateVisibility.h"
-#include "Draw/WidgetClipping.h"
+#include "Layout/LayoutEnums.h"
 
+#include "LogSlate.h"
 #include "Layout/TransformCalculus2D.h"
 #include "Layout/SlateRenderTransform.h"
 #include "Layout/Scale2D.h"
@@ -19,6 +17,7 @@
 #include "Layout/LayoutGeometry.h"
 #include "Layout/PaintGeometry.h"
 #include "Layout/Anchors.h"
+#include "Layout/SizeParam.h"
 #include "Layout/LayoutImpl.h"
 #include "Widgets/Widget.h"
 #include "Draw/SlateBrush.h"
