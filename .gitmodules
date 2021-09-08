@@ -1,3 +1,6 @@
 [submodule "ThirdParty/Source/assimp"]
 	path = ThirdParty/Source/assimp
 	url = https://github.com/Aumoa/assimp
+[submodule "ThirdParty/Source/freetype"]
+	path = ThirdParty/Source/freetype
+	url = https://github.com/Aumoa/freetype
