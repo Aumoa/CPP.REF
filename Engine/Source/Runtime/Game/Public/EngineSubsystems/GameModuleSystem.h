@@ -7,6 +7,7 @@
 
 class PlatformModule;
 class GameInstance;
+class GameModule;
 
 class GAME_API GameModuleSystem : public GameEngineSubsystem
 {
@@ -14,7 +15,7 @@ class GAME_API GameModuleSystem : public GameEngineSubsystem
 
 private:
 	PlatformModule* _module = nullptr;
-	std::function<GameInstance*()> _gameInstanceLoader;
+	GameModule* _gameModule = nullptr;
 
 public:
 	GameModuleSystem();

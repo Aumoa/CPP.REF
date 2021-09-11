@@ -163,6 +163,7 @@
     <ClCompile Include="Private\GameFramework\Player.cpp" />
     <ClCompile Include="Private\GameFramework\PlayerController.cpp" />
     <ClCompile Include="Private\GameInstance.cpp" />
+    <ClCompile Include="Private\GameModule.cpp" />
     <ClCompile Include="Private\GameObject.cpp" />
     <ClCompile Include="Private\Info\GameMode.cpp" />
     <ClCompile Include="Private\Info\Info.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="Public\GameFramework\PlayerController.h" />
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameMinimal.h" />
+    <ClInclude Include="Public\GameModule.h" />
     <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameStructures.h" />
     <ClInclude Include="Public\IFrameworkView.h" />

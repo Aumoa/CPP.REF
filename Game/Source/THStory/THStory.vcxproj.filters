@@ -24,6 +24,9 @@
     <ClInclude Include="Public\Levels\StartupLevel.h">
       <Filter>Public\Levels</Filter>
     </ClInclude>
+    <ClInclude Include="Public\THGameModule.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\LogTHStory.cpp">
@@ -34,6 +37,9 @@
     </ClCompile>
     <ClCompile Include="Private\Levels\StartupLevel.cpp">
       <Filter>Private\Levels</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\THGameModule.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

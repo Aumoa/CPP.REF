@@ -5,6 +5,8 @@
 #include "Object.h"
 #include <filesystem>
 
+class GameInstance;
+
 class CORE_API PlatformModule : virtual public Object
 {
 public:

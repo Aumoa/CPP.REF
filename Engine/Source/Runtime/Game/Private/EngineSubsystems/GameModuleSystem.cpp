@@ -4,6 +4,7 @@
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "LogGame.h"
+#include "GameModule.h"
 
 GameModuleSystem::GameModuleSystem() : Super()
 {
@@ -29,15 +30,22 @@ void GameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 		return;
 	}
 
-	_gameInstanceLoader = _module->GetFunctionPointer<GameInstance*()>("LoadGameInstance");
-	if (!_gameInstanceLoader)
+	auto _gameModuleLoader = _module->GetFunctionPointer<GameModule*()>("LoadGameModule");
+	if (!_gameModuleLoader)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.");
+		return;
+	}
+
+	_gameModule = _gameModuleLoader();
+	if (!_gameModule)
+	{
+		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", gameModuleName);
 		return;
 	}
 }
 
 GameInstance* GameModuleSystem::LoadGameInstance()
 {
-	return _gameInstanceLoader();
+	return _gameModule->CreatePrimaryGameModule();
 }

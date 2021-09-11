@@ -29,13 +29,3 @@ public:
 	/// </summary>
 	virtual void Init();
 };
-
-#define DEFINE_GAME_MODULE(GameInstanceClass)			\
-extern "C"												\
-{														\
-	__declspec(dllexport)								\
-	GameInstance* LoadGameInstance()					\
-	{													\
-		return new GameInstanceClass();					\
-	}													\
-}

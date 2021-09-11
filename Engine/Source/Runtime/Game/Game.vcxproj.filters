@@ -330,6 +330,9 @@
     <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp">
       <Filter>Private\Widgets\Panel</Filter>
     </ClCompile>
+    <ClCompile Include="Private\GameModule.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h">
@@ -580,6 +583,9 @@
     </ClInclude>
     <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h">
       <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameModule.h">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

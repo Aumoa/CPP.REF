@@ -58,6 +58,9 @@
     <ClCompile Include="Private\PlatformMisc\PlatformModule.cpp">
       <Filter>Private\PlatformMisc</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Reflection\Type.cpp">
+      <Filter>Private\Reflection</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -122,6 +125,12 @@
     </Filter>
     <Filter Include="Private\PlatformMisc">
       <UniqueIdentifier>{fa236b59-3a7c-4779-a645-cb588b069189}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Reflection">
+      <UniqueIdentifier>{8c84b8e5-afca-4c8b-9dc1-82b6b2ff4a63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Reflection">
+      <UniqueIdentifier>{315a4b94-953a-4254-aebf-c6f4678155de}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +268,12 @@
     </ClInclude>
     <ClInclude Include="Public\Container\BitSet.h">
       <Filter>Public\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\Type.h">
+      <Filter>Public\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectionMacros.h">
+      <Filter>Public\Reflection</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

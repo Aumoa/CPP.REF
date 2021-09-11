@@ -106,11 +106,13 @@
     <ClInclude Include="Public\Levels\StartupLevel.h" />
     <ClInclude Include="Public\LogTHStory.h" />
     <ClInclude Include="Public\THGameInstance.h" />
+    <ClInclude Include="Public\THGameModule.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Levels\StartupLevel.cpp" />
     <ClCompile Include="Private\LogTHStory.cpp" />
     <ClCompile Include="Private\THGameInstance.cpp" />
+    <ClCompile Include="Private\THGameModule.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

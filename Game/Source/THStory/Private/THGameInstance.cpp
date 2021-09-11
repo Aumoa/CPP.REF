@@ -10,8 +10,6 @@
 #include "Widgets/Window.h"
 #include "Widgets/Images/Image.h"
 
-DEFINE_GAME_MODULE(THGameInstance);
-
 THGameInstance::THGameInstance() : Super()
 {
 	StartupLevel = SubclassOf<::StartupLevel>::StaticClass();

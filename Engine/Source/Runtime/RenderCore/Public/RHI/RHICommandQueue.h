@@ -21,7 +21,7 @@ class RHIDeviceContext;
 /// </summary>
 class RENDERCORE_API RHICommandQueue : public RHIDeviceChild
 {
-	GENERATED_BODY(RHIDeviceChild)
+	GENERATED_BODY(RHICommandQueue)
 
 private:
 	struct GarbageItem

@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 #include "PrimitiveTypes.h"
+#include "Reflection/ReflectionMacros.h"
 
 /// <summary>
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
@@ -14,8 +15,7 @@
 /// </summary>
 class CORE_API Object
 {
-public:
-	using This = Object;
+	GENERATED_BODY(Object)
 
 private:
 	std::atomic<int32> _ref = 0;
@@ -82,8 +82,3 @@ private:
 	void InternalAttachSubobject(Object* subobject);
 	void InternalDestroySubobject(Object* subobject);
 };
-
-#define GENERATED_BODY(Class)		\
-public:							\
-	using Super = This;			\
-	using This = Class;
