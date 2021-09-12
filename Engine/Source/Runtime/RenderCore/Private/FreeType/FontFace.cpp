@@ -74,6 +74,32 @@ bool FontFace::GetGlyphPixelSize(int32* pixelsX, int32* pixelsY) const
 	return true;
 }
 
+template<std::endian>
+struct BitView
+{
+	uint8 bView7 : 1;
+	uint8 bView6 : 1;
+	uint8 bView5 : 1;
+	uint8 bView4 : 1;
+	uint8 bView3 : 1;
+	uint8 bView2 : 1;
+	uint8 bView1 : 1;
+	uint8 bView0 : 1;
+};
+
+template<>
+struct BitView<std::endian::big>
+{
+	uint8 bView7 : 1;
+	uint8 bView6 : 1;
+	uint8 bView5 : 1;
+	uint8 bView4 : 1;
+	uint8 bView3 : 1;
+	uint8 bView2 : 1;
+	uint8 bView1 : 1;
+	uint8 bView0 : 1;
+};
+
 bool FontFace::CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, int32 locationY) const
 {
 	if (!_loadedGlyph.has_value())
@@ -92,13 +118,68 @@ bool FontFace::CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, i
 
 	int8* buffer_view = reinterpret_cast<int8*>(buffer);
 	const int32 CopyStride = locationXEnd - locationX;
-	for (int32 i = 0; i < (int32)bitmap.rows; ++i)
-	{
-		const int32 Y = i + locationY;
 
-		const int32 StartDst = Y * rowStride + locationX;
-		const int32 StartSrc = Y * bitmap.width;
-		memcpy(buffer_view + StartDst, bitmap.buffer + StartSrc, CopyStride);
+	if (bitmap.num_grays == 256)
+	{
+		for (int32 i = 0; i < (int32)bitmap.rows; ++i)
+		{
+			const int32 Y = i + locationY;
+
+			const int32 StartDst = Y * rowStride + locationX;
+			const int32 StartSrc = Y * bitmap.width;
+			memcpy(buffer_view + StartDst, bitmap.buffer + StartSrc, CopyStride);
+		}
+	}
+	else if (bitmap.num_grays == 2)
+	{
+		static auto set_value = [&bitmap, &buffer_view](int32 x, int32 index, uint8 value)
+		{
+			if (bitmap.width > (uint32)x)
+			{
+				buffer_view[index] = value;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		};
+
+		for (int32 i = 0; i < (int32)bitmap.rows; ++i)
+		{
+			const int32 Y = i + locationY;
+
+			const int32 StartDst = Y * rowStride + locationX;
+			const int32 StartSrc = Y * bitmap.pitch;
+
+			const int32 Iteration = (CopyStride - 1) / 8 + 1;
+			for (int32 j = 0; j < Iteration; ++j)
+			{
+				const int32 IterationX = j * 8;
+
+#define set_value_break(x) \
+				if (!set_value(IterationX + x, StartDst + IterationX + x, bitView.bView ## x ? 255 : 0)) \
+				{ \
+					break; \
+				}
+
+				BitView<std::endian::native>& bitView = reinterpret_cast<BitView<std::endian::native>&>(bitmap.buffer[StartSrc + j]);
+				set_value_break(0);
+				set_value_break(1);
+				set_value_break(2);
+				set_value_break(3);
+				set_value_break(4);
+				set_value_break(5);
+				set_value_break(6);
+				set_value_break(7);
+
+#undef set_value_break
+			}
+		}
+	}
+	else
+	{
+		check(false);
 	}
 
 	return true;

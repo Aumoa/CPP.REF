@@ -16,6 +16,7 @@
 #include <span>
 #include <optional>
 #include <vector>
+#include <bit>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
