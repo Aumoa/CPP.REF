@@ -24,7 +24,7 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 	std::vector<RHIShaderParameterElement> shaderParameters = GetShaderParameterDeclaration();
 	std::vector<D3D12_ROOT_PARAMETER> rootParameters;
 
-	std::vector<D3D12_DESCRIPTOR_RANGE> ranges;
+	std::vector<std::vector<D3D12_DESCRIPTOR_RANGE>> rangesCollection;
 
 	for (size_t i = 0; i < shaderParameters.size(); ++i)
 	{
@@ -71,6 +71,8 @@ void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
 			break;
 		case ERHIShaderParameterType::DescriptorTable:
 		{
+			auto& ranges = rangesCollection.emplace_back();
+
 			auto& tableRef = myParam.DescriptorTable;
 			ranges.reserve((size_t)tableRef.NumDescriptorRanges);
 			for (size_t i = 0; i < tableRef.NumDescriptorRanges; ++i)

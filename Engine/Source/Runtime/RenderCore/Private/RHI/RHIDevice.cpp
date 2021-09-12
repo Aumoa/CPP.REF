@@ -6,7 +6,7 @@
 #include "RHI/LogRHI.h"
 #include "RHI/RHIDeviceContext.h"
 #include "RHI/RHICommandQueue.h"
-#include "RHI/RHITexture2D.h"
+#include "RHI/RHIDynamicTexture2D.h"
 #include "RHI/IRHIImageSourceView.h"
 
 RHIDevice::RHIDevice(bool bDebug) : Super()
@@ -127,6 +127,56 @@ RHITexture2D* RHIDevice::CreateTexture2D(ERHIResourceStates initialState, ERHIPi
 	return NewObject<RHITexture2D>(this, resource.Get());
 }
 
+RHIDynamicTexture2D* RHIDevice::CreateDynamicTexture2D(ERHIResourceStates initialState, ERHIPixelFormat format, uint32 width, uint32 height, std::optional<RHITexture2DClearValue> clearValue, ERHIResourceFlags flags)
+{
+	D3D12_RESOURCE_DESC textureDesc =
+	{
+		.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		.Width = (UINT64)width,
+		.Height = height,
+		.DepthOrArraySize = 1,
+		.MipLevels = 1,
+		.Format = (DXGI_FORMAT)format,
+		.SampleDesc = { 1, 0 },
+		.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
+		.Flags = (D3D12_RESOURCE_FLAGS)flags
+	};
+
+	D3D12_HEAP_PROPERTIES heap =
+	{
+		.Type = D3D12_HEAP_TYPE_DEFAULT
+	};
+
+	ComPtr<ID3D12Resource> resource;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &textureDesc, (D3D12_RESOURCE_STATES)initialState, clearValue.has_value() ? (const D3D12_CLEAR_VALUE*)&clearValue.value() : nullptr, IID_PPV_ARGS(&resource)));
+
+	// Getting texture copy footprint information.
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
+	uint64 totalBytes;
+	_device->GetCopyableFootprints(&textureDesc, 0, 1, 0, &footprint, nullptr, nullptr, &totalBytes);
+
+	// Resource description for upload buffer.
+	D3D12_RESOURCE_DESC bufferDesc =
+	{
+		.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+		.Width = totalBytes,
+		.Height = 1,
+		.DepthOrArraySize = 1,
+		.MipLevels = 1,
+		.SampleDesc = { 1, 0 },
+		.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+		.Flags = D3D12_RESOURCE_FLAG_NONE,
+	};
+
+	heap = { .Type = D3D12_HEAP_TYPE_UPLOAD };
+
+	// Create upload buffer.
+	ComPtr<ID3D12Resource> uploadHeap;
+	HR(LogRHI, _device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadHeap)));
+
+	return NewObject<RHIDynamicTexture2D>(this, resource.Get(), uploadHeap.Get(), footprint);
+}
+
 RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSource)
 {
 	// Resource description for texture2D.
@@ -198,8 +248,7 @@ RHITexture2D* RHIDevice::CreateTexture2DFromImage(IRHIImageSourceView* imageSour
 	locationDst.SubresourceIndex = 0;
 
 	cmd->Begin();
-	ComPtr<ID3D12GraphicsCommandList> cmdlist;
-	HR(LogRHI, cmd->GetCommandList()->QueryInterface(IID_PPV_ARGS(&cmdlist)));
+	auto* cmdlist = static_cast<ID3D12GraphicsCommandList*>(cmd->GetCommandList());
 	cmdlist->CopyTextureRegion(&locationDst, 0, 0, 0, &locationSrc, nullptr);
 	cmdlist->ResourceBarrier(1, &barrier);
 	cmd->End();

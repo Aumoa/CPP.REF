@@ -61,7 +61,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)ThirdParty\Source\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -83,7 +83,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)ThirdParty\Source\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -99,6 +99,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\ComPtr.cpp" />
+    <ClCompile Include="Private\FreeType\FontCachingManager.cpp" />
+    <ClCompile Include="Private\FreeType\FontFace.cpp" />
+    <ClCompile Include="Private\FreeType\FontFaceCachingNode.cpp" />
+    <ClCompile Include="Private\FreeType\FreeTypeModule.cpp" />
+    <ClCompile Include="Private\FreeType\LogFreeType.cpp" />
     <ClCompile Include="Private\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -108,6 +113,7 @@
     <ClCompile Include="Private\RHI\RHIDepthStencilView.cpp" />
     <ClCompile Include="Private\RHI\RHIDevice.cpp" />
     <ClCompile Include="Private\RHI\RHIDeviceContext.cpp" />
+    <ClCompile Include="Private\RHI\RHIDynamicTexture2D.cpp" />
     <ClCompile Include="Private\RHI\RHIRenderTargetView.cpp" />
     <ClCompile Include="Private\RHI\RHIResource.cpp" />
     <ClCompile Include="Private\RHI\RHIShader.cpp" />
@@ -120,14 +126,24 @@
     <ClCompile Include="Private\RHI\RHIView.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\ThirdParty\Source\freetype\builds\windows\vc2019\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\FreeType\FontFace.Impl.h" />
+    <ClInclude Include="Private\FreeType\FontFaceCachingNode.h" />
+    <ClInclude Include="Private\FreeType\FreeTypeModule.Impl.h" />
+    <ClInclude Include="Private\FreeType\LogFreeType.h" />
     <ClInclude Include="Private\InternalComPtr.h" />
     <ClInclude Include="Private\pch.h" />
     <ClInclude Include="Public\ComPtr.h" />
+    <ClInclude Include="Public\FreeType\FontCachingManager.h" />
+    <ClInclude Include="Public\FreeType\FontFace.h" />
+    <ClInclude Include="Public\FreeType\FreeTypeModule.h" />
     <ClInclude Include="Public\IWindowView.h" />
     <ClInclude Include="Public\RenderMinimal.h" />
     <ClInclude Include="Public\RHI\IRHIImageSourceView.h" />
@@ -137,6 +153,7 @@
     <ClInclude Include="Public\RHI\RHIDevice.h" />
     <ClInclude Include="Public\RHI\RHIDeviceChild.h" />
     <ClInclude Include="Public\RHI\RHIDeviceContext.h" />
+    <ClInclude Include="Public\RHI\RHIDynamicTexture2D.h" />
     <ClInclude Include="Public\RHI\RHIEnums.h" />
     <ClInclude Include="Public\RHI\RHIRenderTargetView.h" />
     <ClInclude Include="Public\RHI\RHIResource.h" />

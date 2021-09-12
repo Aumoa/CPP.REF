@@ -8,3 +8,8 @@ std::filesystem::path Paths::GetContentPath()
 	// Simply implementation at now.
 	return L"Content";
 }
+
+std::filesystem::path Paths::GetPlatformFontPath()
+{
+	return L"C:\\Windows\\Fonts";
+}

@@ -46,11 +46,19 @@ SlateShader::SlateShader(RHIDevice* device) : Super(device)
 
 void SlateShader::Compile(RHIVertexFactory* vertexDeclaration)
 {
-	_ranges.emplace_back() =
+	_imageSourceRanges.emplace_back() =
 	{
 		.RangeType = ERHIDescriptorRangeType::ShaderResourceView,
 		.NumDescriptors = 1,
 		.BaseShaderRegister = 1,
+		.RegisterSpace = 0,
+	};
+
+	_fontFaceBufferRanges.emplace_back() =
+	{
+		.RangeType = ERHIDescriptorRangeType::ShaderResourceView,
+		.NumDescriptors = 1,
+		.BaseShaderRegister = 2,
 		.RegisterSpace = 0,
 	};
 
@@ -60,7 +68,7 @@ void SlateShader::Compile(RHIVertexFactory* vertexDeclaration)
 std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaration() const
 {
 	std::vector<RHIShaderParameterElement> elements;
-	elements.reserve(3);
+	elements.reserve(4);
 
 	// [0] SlateConstants
 	elements.emplace_back() =
@@ -89,8 +97,30 @@ std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaratio
 		.Type = ERHIShaderParameterType::DescriptorTable,
 		.DescriptorTable =
 		{
-			.NumDescriptorRanges = (uint32)_ranges.size(),
-			.pDescriptorRanges = _ranges.data()
+			.NumDescriptorRanges = (uint32)_imageSourceRanges.size(),
+			.pDescriptorRanges = _imageSourceRanges.data()
+		}
+	};
+
+	// [3] RenderMode
+	elements.emplace_back() =
+	{
+		.Type = ERHIShaderParameterType::ScalarParameterConstants,
+		.ScalarConstantsParameter =
+		{
+			.ShaderRegister = 1,
+			.Num32Bits = 1
+		}
+	};
+
+	// [4] FontFaceBuffer
+	elements.emplace_back() =
+	{
+		.Type = ERHIShaderParameterType::DescriptorTable,
+		.DescriptorTable =
+		{
+			.NumDescriptorRanges = (uint32)_fontFaceBufferRanges.size(),
+			.pDescriptorRanges = _fontFaceBufferRanges.data()
 		}
 	};
 
@@ -115,7 +145,7 @@ auto SlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector
 void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2& screenSize, SlateWindowElementList* elements)
 {
 	// Caching max elements.
-	size_t maxDescriptors = 0;
+	size_t maxDescriptors = 1;
 	for (auto& element : elements->GetSpan())
 	{
 		if (element.Brush.ImageSource)
@@ -135,13 +165,21 @@ void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2&
 	{
 		if (element.Brush.ImageSource)
 		{
+			const int32 RenderMode = (int32)ESlateRenderMode::ImageSource;
+
 			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
 			deviceContext->SetGraphicsRootShaderResourceView(2, element.Brush.ImageSource);
+			deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
 			deviceContext->DrawInstanced(4, 1);
 		}
 
 		gpuAddr += sizeof(DrawElement);
 	}
+
+	const int32 RenderModeDebug = (int32)ESlateRenderMode::Glyph;
+	deviceContext->SetGraphicsRootShaderResourceView(4, _textureDebug);
+	deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderModeDebug, 0);
+	deviceContext->DrawInstanced(4, 1);
 }
 
 std::span<uint8 const> SlateShader::CompileVS()

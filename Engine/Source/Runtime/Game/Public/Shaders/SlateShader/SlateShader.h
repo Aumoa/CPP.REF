@@ -27,12 +27,20 @@ public:
 		Vector3 pad;
 	};
 
+	enum class ESlateRenderMode
+	{
+		ImageSource,
+		Glyph,
+	};
+
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
 	Material* _material = nullptr;
 	RHIShaderDescriptorView* _shaderDescriptorView = nullptr;
-	std::vector<RHIDescriptorRange> _ranges;
+
+	std::vector<RHIDescriptorRange> _imageSourceRanges;
+	std::vector<RHIDescriptorRange> _fontFaceBufferRanges;
 
 public:
 	SlateShader(RHIDevice* device);
@@ -47,4 +55,8 @@ public:
 protected:
 	virtual std::span<uint8 const> CompileVS() override;
 	virtual std::span<uint8 const> CompilePS() override;
+
+public:
+	class RHIShaderResourceView* _textureDebug = nullptr;
+	void RenderDebug(class RHIShaderResourceView* texture) { _textureDebug = texture; }
 };

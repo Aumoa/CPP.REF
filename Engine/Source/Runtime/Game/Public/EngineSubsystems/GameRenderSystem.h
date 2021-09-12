@@ -18,6 +18,8 @@ class AssetImporter;
 class TransparentShader;
 class SlateShader;
 class TickScheduler;
+class FreeTypeModule;
+class FontCachingManager;
 struct IFrameworkView;
 
 class GAME_API GameRenderSystem : public GameEngineSubsystem
@@ -40,6 +42,8 @@ private:
 	RHIDepthStencilView* _dsv = nullptr;
 	TransparentShader* _transparentShader = nullptr;
 	SlateShader* _slateShader = nullptr;
+	FreeTypeModule* _freeTypeModule = nullptr;
+	FontCachingManager* _fontCachingManager = nullptr;
 
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;

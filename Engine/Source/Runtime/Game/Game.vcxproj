@@ -173,7 +173,6 @@
     <ClCompile Include="Private\Materials\Material.cpp" />
     <ClCompile Include="Private\Materials\MaterialInstance.cpp" />
     <ClCompile Include="Private\Misc\GeometryGenerator.cpp" />
-    <ClCompile Include="Private\Misc\Paths.cpp" />
     <ClCompile Include="Private\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -267,7 +266,6 @@
     <ClInclude Include="Public\Misc\GeometryGenerator.h" />
     <ClInclude Include="Public\Misc\KeyboardTracker.h" />
     <ClInclude Include="Public\Misc\MouseStateTracker.h" />
-    <ClInclude Include="Public\Misc\Paths.h" />
     <ClInclude Include="Public\Misc\TickCalc.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformKeyboard.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformMouse.h" />

@@ -83,12 +83,6 @@ public:
 	}
 
 private:
-	static GameEngine* _gEngine;
-
-public:
-	inline static GameEngine* GetEngine() { return _gEngine; }
-
-private:
 	void TickEngine();
 	TickCalc<> _tickCalc;
 
@@ -98,4 +92,4 @@ private:
 	void RenderTick(std::chrono::duration<float> elapsedTime);
 };
 
-#define GEngine (GameEngine::GetEngine())
+extern GAME_API GameEngine* GEngine;

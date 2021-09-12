@@ -130,6 +130,9 @@
     <Filter Include="Private\Widgets\Panel">
       <UniqueIdentifier>{fa511637-45b3-40e5-816e-f1abaf0616f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Shaders\FontShader">
+      <UniqueIdentifier>{b8c3756c-dd87-4dad-8c47-e5148430b068}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -263,9 +266,6 @@
     </ClCompile>
     <ClCompile Include="Private\Assets\Asset.cpp">
       <Filter>Private\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Misc\Paths.cpp">
-      <Filter>Private\Misc</Filter>
     </ClCompile>
     <ClCompile Include="Private\Assets\SoftObjectPtr.cpp">
       <Filter>Private\Assets</Filter>
@@ -493,9 +493,6 @@
     </ClInclude>
     <ClInclude Include="Public\Assets\Asset.h">
       <Filter>Public\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Misc\Paths.h">
-      <Filter>Public\Misc</Filter>
     </ClInclude>
     <ClInclude Include="Public\Assets\SoftObjectPtr.h">
       <Filter>Public\Assets</Filter>

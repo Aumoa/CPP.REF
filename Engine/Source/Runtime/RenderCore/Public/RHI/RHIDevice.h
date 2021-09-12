@@ -12,6 +12,7 @@ struct IRHIImageSourceView;
 class RHICommandQueue;
 class RHIResource;
 class RHITexture2D;
+class RHIDynamicTexture2D;
 
 /// <summary>
 /// Provide interface for control all render devices.
@@ -50,6 +51,7 @@ public:
 	RHIResource* CreateDynamicBuffer(size_t length);
 
 	RHITexture2D* CreateTexture2D(ERHIResourceStates initialState, ERHIPixelFormat format, uint32 width, uint32 height, std::optional<RHITexture2DClearValue> clearValue, ERHIResourceFlags flags = ERHIResourceFlags::None);
+	RHIDynamicTexture2D* CreateDynamicTexture2D(ERHIResourceStates initialState, ERHIPixelFormat format, uint32 width, uint32 height, std::optional<RHITexture2DClearValue> clearValue, ERHIResourceFlags flags = ERHIResourceFlags::None);
 	RHITexture2D* CreateTexture2DFromImage(IRHIImageSourceView* imageSource);
 
 public /*internal*/:

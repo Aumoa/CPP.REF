@@ -8,22 +8,20 @@
 
 Asset* SoftObjectPtrBase::InternalLoadObject(const std::filesystem::path& importPath)
 {
-	GameEngine* engine = GameEngine::GetEngine();
-	if (engine == nullptr)
+	if (GEngine == nullptr)
 	{
 		SE_LOG(LogAssets, Fatal, L"Engine instance does not initialized.");
 		return nullptr;
 	}
 
-	//AssetImporter* importer = engine->GetAssetImporter();
+	//AssetImporter* importer = GEngine->GetAssetImporter();
 	//return importer->LoadObject(importPath);
 	return nullptr;
 }
 
 void SoftObjectPtrBase::InternalUnloadObject(const std::filesystem::path& importPath)
 {
-	GameEngine* engine = GameEngine::GetEngine();
-	if (engine == nullptr)
+	if (GEngine)
 	{
 		SE_LOG(LogAssets, Fatal, L"Engine instance does not initialized.");
 		return;

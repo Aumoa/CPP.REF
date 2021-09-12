@@ -21,7 +21,7 @@
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "EngineSubsystems/GameInputSystem.h"
 
-GameEngine* GameEngine::_gEngine = nullptr;
+GameEngine* GEngine = nullptr;
 
 GameEngine::GameEngine() : Super()
 {
@@ -49,7 +49,7 @@ GameEngine::~GameEngine()
 
 bool GameEngine::InitEngine()
 {
-	_gEngine = this;
+	GEngine = this;
 	InitializeSubsystems();
 	CoreDelegates::PostEngineInit.Invoke();
 	return true;

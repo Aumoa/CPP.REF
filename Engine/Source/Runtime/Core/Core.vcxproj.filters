@@ -61,6 +61,9 @@
     <ClCompile Include="Private\Reflection\Type.cpp">
       <Filter>Private\Reflection</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Misc\Paths.cpp">
+      <Filter>Private\Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -274,6 +277,9 @@
     </ClInclude>
     <ClInclude Include="Public\Reflection\ReflectionMacros.h">
       <Filter>Public\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Misc\Paths.h">
+      <Filter>Public\Misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

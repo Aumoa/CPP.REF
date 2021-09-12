@@ -52,6 +52,24 @@
     <ClCompile Include="Private\RHI\RHIShaderResourceView.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\FreeType\FreeTypeModule.cpp">
+      <Filter>Private\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\FreeType\LogFreeType.cpp">
+      <Filter>Private\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\FreeType\FontFace.cpp">
+      <Filter>Private\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\FreeType\FontCachingManager.cpp">
+      <Filter>Private\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\FreeType\FontFaceCachingNode.cpp">
+      <Filter>Private\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\RHIDynamicTexture2D.cpp">
+      <Filter>Private\RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -65,6 +83,12 @@
     </Filter>
     <Filter Include="Private\RHI">
       <UniqueIdentifier>{c370a806-9677-400e-8b45-74368a553256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\FreeType">
+      <UniqueIdentifier>{f4ab9cf0-6c10-4211-ad26-9715765c860b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\FreeType">
+      <UniqueIdentifier>{bd589286-a147-4b42-bb8d-4914e73e8597}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +162,30 @@
       <Filter>Public\RHI</Filter>
     </ClInclude>
     <ClInclude Include="Public\RHI\IRHIImageSourceView.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\FreeType\FreeTypeModule.h">
+      <Filter>Public\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\FreeType\LogFreeType.h">
+      <Filter>Private\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\FreeType\FontFace.h">
+      <Filter>Public\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\FreeType\FreeTypeModule.Impl.h">
+      <Filter>Private\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\FreeType\FontFace.Impl.h">
+      <Filter>Private\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\FreeType\FontCachingManager.h">
+      <Filter>Public\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\FreeType\FontFaceCachingNode.h">
+      <Filter>Public\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIDynamicTexture2D.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
   </ItemGroup>

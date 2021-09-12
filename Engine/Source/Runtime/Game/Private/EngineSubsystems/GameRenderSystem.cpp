@@ -13,6 +13,11 @@
 #include "Shaders/SlateShader/SlateShader.h"
 #include "Ticking/TickScheduler.h"
 #include "GameFramework/LocalPlayer.h"
+#include "FreeType/FreeTypeModule.h"
+#include "FreeType/FontCachingManager.h"
+
+#include "FreeType/FontFace.h"
+#include "Assets/Texture2D.h"
 
 #if _DEBUG
 constexpr bool bDebug = true;
@@ -49,6 +54,14 @@ void GameRenderSystem::Init()
 	_transparentShader->Compile(_colorVertexFactory);
 	_slateShader = NewObject<SlateShader>(_device);
 	_slateShader->Compile(nullptr);
+	_freeTypeModule = NewObject<FreeTypeModule>();
+	_fontCachingManager = NewObject<FontCachingManager>(_device);
+
+	FontFace* ff = _freeTypeModule->CreateFontFace(L"Arial");
+	ff->SetFontSize(20);
+
+	_fontCachingManager->StreamGlyphs(ff, L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 ");
+	_fontCachingManager->Apply();
 
 	SE_LOG(LogRender, Verbose, L"Register RHI garbage collector.");
 	auto gc = [this]()
@@ -118,6 +131,7 @@ void GameRenderSystem::Present()
 	{
 		_deviceContext->SetGraphicsShader(_slateShader);
 		_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+		_slateShader->RenderDebug(_fontCachingManager->GetDebugTexture());
 		localPlayer->Render(_deviceContext, _slateShader);
 	}
 
