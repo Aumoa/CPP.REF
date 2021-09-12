@@ -62,6 +62,8 @@ void GameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
+
+	frameworkView->SetFrameworkTitle(_gameInstance->GetApplicationName());
 }
 
 bool GameEngine::LoadGameModule(std::wstring_view moduleName)

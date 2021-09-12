@@ -28,4 +28,9 @@ public:
 	/// Initialize game instance subsystems.
 	/// </summary>
 	virtual void Init();
+
+	/// <summary>
+	/// Get application name for setting framework title.
+	/// </summary>
+	virtual std::wstring GetApplicationName() const;
 };

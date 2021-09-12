@@ -9,6 +9,7 @@
 #include "GameFramework/LocalPlayer.h"
 #include "Widgets/Window.h"
 #include "Widgets/Images/Image.h"
+#include "Widgets/Panel/HorizontalBoxPanel.h"
 
 THGameInstance::THGameInstance() : Super()
 {
@@ -19,9 +20,9 @@ void THGameInstance::Init()
 {
 	Super::Init();
 
-	//auto* playerSystem = GEngine->GetEngineSubsystem<GamePlayerSystem>();
-	//LocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
-	//SWindow* slateWindow = localPlayer->GetSlateWindow();
+	auto* playerSystem = GEngine->GetEngineSubsystem<GamePlayerSystem>();
+	LocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
+	SWindow* slateWindow = localPlayer->GetSlateWindow();
 
 	auto* texture = LoadObject<Texture2D>(L"Content/THStory/Art/SampleImage.jpg");
 	slateWindow->AddWidgetToScreen(SNew(SHorizontalBoxPanel)

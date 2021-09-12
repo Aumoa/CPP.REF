@@ -10,3 +10,8 @@ GameInstance::GameInstance() : Super()
 void GameInstance::Init()
 {
 }
+
+std::wstring GameInstance::GetApplicationName() const
+{
+	return L"GameApp";
+}

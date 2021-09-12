@@ -14,7 +14,7 @@ public:
 	using Super = Object;
 
 public:
-	static constexpr wchar_t ApplicationTitle[] = L"ChessApp";
+	static constexpr wchar_t ApplicationTitle[] = L"GameApp";
 
 private:
 	void* _hwnd = nullptr;
@@ -44,4 +44,7 @@ public:
 
 	/// <inheritdoc/>
 	virtual int32 GetFrameworkHeight() const override;
+
+	/// <inheritdoc/>
+	virtual void SetFrameworkTitle(const std::wstring& frameworkTitle) override;
 };

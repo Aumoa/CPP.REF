@@ -151,3 +151,8 @@ int32 CoreWindow::GetFrameworkHeight() const
 	GetClientRect((HWND)_hwnd, &rc);
 	return rc.bottom - rc.top;
 }
+
+void CoreWindow::SetFrameworkTitle(const std::wstring& frameworkTitle)
+{
+	SetWindowTextW((HWND)_hwnd, frameworkTitle.c_str());
+}

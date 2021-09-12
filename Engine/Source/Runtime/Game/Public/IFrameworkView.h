@@ -40,6 +40,11 @@ struct IFrameworkView : virtual public Object, virtual public IWindowView
 	/// </summary>
 	virtual void SetLastError(int32 code) = 0;
 
+	/// <summary>
+	/// Set framework title.
+	/// </summary>
+	virtual void SetFrameworkTitle(const std::wstring& frameworkTitle) = 0;
+
 	virtual int32 GetFrameworkWidth() const = 0;
 	virtual int32 GetFrameworkHeight() const = 0;
 };
