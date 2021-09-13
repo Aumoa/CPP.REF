@@ -5,12 +5,12 @@
 #include "GameMinimal.h"
 #include "GameInstance.h"
 
-class THSTORY_API THGameInstance : public GameInstance
+class THSTORY_API STHGameInstance : public SGameInstance
 {
-	GENERATED_BODY(THGameInstance)
+	GENERATED_BODY(STHGameInstance)
 
 public:
-	THGameInstance();
+	STHGameInstance();
 
 	virtual void Init() override;
 	virtual std::wstring GetApplicationName() const override { return L"THStory"; }

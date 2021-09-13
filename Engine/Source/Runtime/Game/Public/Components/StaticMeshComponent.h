@@ -5,26 +5,26 @@
 #include "CoreMinimal.h"
 #include "MeshComponent.h"
 
-class StaticMesh;
+class SStaticMesh;
 
-class GAME_API StaticMeshComponent : public MeshComponent
+class GAME_API SStaticMeshComponent : public SMeshComponent
 {
-	GENERATED_BODY(StaticMeshComponent)
+	GENERATED_BODY(SStaticMeshComponent)
 
 private:
-	StaticMesh* _StaticMesh = nullptr;
+	SStaticMesh* _StaticMesh = nullptr;
 	MeshBatch _batch;
-	std::vector<Material*> _materials;
+	std::vector<SMaterial*> _materials;
 
 public:
-	StaticMeshComponent();
+	SStaticMeshComponent();
 
-	virtual PrimitiveSceneProxy* CreateSceneProxy() override;
+	virtual SPrimitiveSceneProxy* CreateSceneProxy() override;
 
-	virtual void SetStaticMesh(StaticMesh* inNewMesh);
-	StaticMesh* GetStaticMesh() const { return _StaticMesh; }
+	virtual void SetStaticMesh(SStaticMesh* inNewMesh);
+	SStaticMesh* GetStaticMesh() const { return _StaticMesh; }
 
-	void SetMaterial(int32 index, Material* material);
-	Material* GetMaterial(int32 index) const;
+	void SetMaterial(int32 index, SMaterial* material);
+	SMaterial* GetMaterial(int32 index) const;
 	int32 GetMaterialCount() const;
 };

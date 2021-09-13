@@ -3,6 +3,6 @@
 #include "pch.h"
 #include "Scene/StaticMeshRenderData.h"
 
-StaticMeshRenderData::StaticMeshRenderData() : Super()
+SStaticMeshRenderData::SStaticMeshRenderData() : Super()
 {
 }

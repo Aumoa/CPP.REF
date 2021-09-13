@@ -8,7 +8,7 @@
 
 using enum ELogVerbosity;
 
-EventHandle::EventHandle() : Super()
+SEventHandle::SEventHandle() : Super()
 {
 	_handle = CreateEventExW(nullptr, nullptr, 0, GENERIC_ALL);
 	if (_handle == nullptr)
@@ -18,7 +18,7 @@ EventHandle::EventHandle() : Super()
 	}
 }
 
-EventHandle::~EventHandle()
+SEventHandle::~SEventHandle()
 {
 	if (_handle != nullptr)
 	{
@@ -27,7 +27,7 @@ EventHandle::~EventHandle()
 	}
 }
 
-auto EventHandle::Wait(std::chrono::milliseconds timeout) -> EStatus
+auto SEventHandle::Wait(std::chrono::milliseconds timeout) -> EStatus
 {
 	DWORD status = WaitForSingleObject((HANDLE)_handle, (DWORD)timeout.count());
 	switch (status)
@@ -41,12 +41,12 @@ auto EventHandle::Wait(std::chrono::milliseconds timeout) -> EStatus
 	}
 }
 
-void EventHandle::Set()
+void SEventHandle::Set()
 {
 	SetEvent(_handle);
 }
 
-void EventHandle::Reset()
+void SEventHandle::Reset()
 {
 	ResetEvent(_handle);
 }

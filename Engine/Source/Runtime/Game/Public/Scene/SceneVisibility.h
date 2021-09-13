@@ -5,29 +5,29 @@
 #include "RenderMinimal.h"
 #include <vector>
 
-class Scene;
-class RHIResource;
-class RHIDeviceContext;
-class RHIShader;
+class SScene;
+class SRHIResource;
+class SRHIDeviceContext;
+class SRHIShader;
 struct MinimalViewInfo;
 
-class GAME_API SceneVisibility : virtual public Object
+class GAME_API SSceneVisibility : virtual public SObject
 {
-	GENERATED_BODY(SceneVisibility)
+	GENERATED_BODY(SSceneVisibility)
 
 private:
-	Scene* _scene = nullptr;
-	RHIResource* _viewBuffer = nullptr;
+	SScene* _scene = nullptr;
+	SRHIResource* _viewBuffer = nullptr;
 	size_t _viewBufCapa = 0;
 
 	BitArray _visibilityBits;
 	size_t _visibilityCnt = 0;
 
 public:
-	SceneVisibility(Scene* owner);
+	SSceneVisibility(SScene* owner);
 
 	void CalcVisibility(const MinimalViewInfo& view);
-	void SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t idx);
+	void SetupView(SRHIDeviceContext* dc, SRHIShader* shader, size_t idx);
 
 	inline void ForEachVisibleItem(std::function<void(size_t, size_t)> body)
 	{

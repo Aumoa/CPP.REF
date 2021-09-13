@@ -7,12 +7,12 @@
 #include "RHI/RHIResource.h"
 #include "RHI/RHICommandQueue.h"
 
-SlateWindowElementList::SlateWindowElementList(const SWindow* paintWindow) : Super()
+SSlateWindowElementList::SSlateWindowElementList(const SWindow* paintWindow) : Super()
 	, _paintWindow(paintWindow)
 {
 }
 
-void SlateWindowElementList::SortByLayer()
+void SSlateWindowElementList::SortByLayer()
 {
 	auto _Pred = [](const SlateDrawElement& lhs, const SlateDrawElement& rhs)
 	{
@@ -22,34 +22,34 @@ void SlateWindowElementList::SortByLayer()
 	sort(_drawElements.begin(), _drawElements.end(), _Pred);
 }
 
-void SlateWindowElementList::Add(const SlateDrawElement& rhs)
+void SSlateWindowElementList::Add(const SlateDrawElement& rhs)
 {
 	_drawElements.emplace_back(rhs);
 }
 
-void SlateWindowElementList::Clear()
+void SSlateWindowElementList::Clear()
 {
 	_drawElements.clear();
 }
 
-std::span<SlateDrawElement const> SlateWindowElementList::GetSpan() const
+std::span<SlateDrawElement const> SSlateWindowElementList::GetSpan() const
 {
 	return _drawElements;
 }
 
-int32 SlateWindowElementList::Num() const
+int32 SSlateWindowElementList::Num() const
 {
 	return (int32)_drawElements.size();
 }
 
-const SWindow* SlateWindowElementList::GetPaintWindow() const
+const SWindow* SSlateWindowElementList::GetPaintWindow() const
 {
 	return _paintWindow;
 }
 
-uint64 SlateWindowElementList::CreateBuffer(RHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes)
+uint64 SSlateWindowElementList::CreateBuffer(SRHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes)
 {
-	RHIDevice* device = deviceContext->GetDevice();
+	SRHIDevice* device = deviceContext->GetDevice();
 	uint64 cachedSize = 0;
 
 	if (_dynamicElementBuffer)
@@ -62,7 +62,7 @@ uint64 SlateWindowElementList::CreateBuffer(RHIDeviceContext* deviceContext, con
 		// We need reallocate dynamic buffer.
 		if (_dynamicElementBuffer)
 		{
-			RHICommandQueue* queue = device->GetPrimaryQueue();
+			SRHICommandQueue* queue = device->GetPrimaryQueue();
 			queue->AddGarbageObject(queue->GetLastSignal(), _dynamicElementBuffer);
 		}
 

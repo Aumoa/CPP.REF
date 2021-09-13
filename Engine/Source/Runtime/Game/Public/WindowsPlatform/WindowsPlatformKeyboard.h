@@ -6,13 +6,13 @@
 #include "PlatformMisc/IPlatformKeyboard.h"
 #include <memory>
 
-class GAME_API WindowsPlatformKeyboard : virtual public Object, virtual public IPlatformKeyboard
+class GAME_API SWindowsPlatformKeyboard : virtual public SObject, virtual public IPlatformKeyboard
 {
-    GENERATED_BODY(WindowsPlatformKeyboard)
+    GENERATED_BODY(SWindowsPlatformKeyboard)
 
 public:
-    WindowsPlatformKeyboard();
-    ~WindowsPlatformKeyboard();
+    SWindowsPlatformKeyboard();
+    ~SWindowsPlatformKeyboard();
 
     // Retrieve the current state of the keyboard
     virtual KeyboardState GetState() const;
@@ -26,7 +26,7 @@ public:
     static void ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
 
     // Singleton
-    static WindowsPlatformKeyboard& Get();
+    static SWindowsPlatformKeyboard& Get();
 
 private:
     // Private implementation.

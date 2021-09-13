@@ -3,10 +3,10 @@
 #include "pch.h"
 #include "Assets/StreamableRenderAsset.h"
 
-StreamableRenderAsset::StreamableRenderAsset(const std::filesystem::path& assetPath) : Super(assetPath)
+SStreamableRenderAsset::SStreamableRenderAsset(const std::filesystem::path& assetPath) : Super(assetPath)
 {
 }
 
-StreamableRenderAsset::~StreamableRenderAsset()
+SStreamableRenderAsset::~SStreamableRenderAsset()
 {
 }

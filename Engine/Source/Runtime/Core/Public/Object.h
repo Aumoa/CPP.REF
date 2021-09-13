@@ -13,27 +13,27 @@
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
 /// Represents unit that subobjects are binding and managed.
 /// </summary>
-class CORE_API Object
+class CORE_API SObject
 {
-	GENERATED_BODY(Object)
+	GENERATED_BODY(SObject)
 
 private:
 	std::atomic<int32> _ref = 0;
-	Object* _outer = nullptr;
-	std::set<Object*> _subobjects;
+	SObject* _outer = nullptr;
+	std::set<SObject*> _subobjects;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="Object"/> class instance.
+	/// Initialize new <see cref="SObject"/> class instance.
 	/// </summary>
-	Object();
+	SObject();
 
 protected:
-	virtual ~Object() noexcept;
+	virtual ~SObject() noexcept;
 
 private:
-	Object(const Object&) = delete;
-	Object(Object&&) = delete;
+	SObject(const SObject&) = delete;
+	SObject(SObject&&) = delete;
 
 public:
 	/// <summary>
@@ -63,22 +63,22 @@ public:
 	/// Get outer that owner of this object.
 	/// </summary>
 	/// <returns> The outer object. </returns>
-	Object* GetOuter() const;
+	SObject* GetOuter() const;
 
 	/// <summary>
-	/// Change outer. Object will destroy when outer be destroyed.
+	/// Change outer. SObject will destroy when outer be destroyed.
 	/// </summary>
 	/// <param name="newOuter"> The new outer. </param>
-	void SetOuter(Object* newOuter);
+	void SetOuter(SObject* newOuter);
 
 	/// <summary>
 	/// Destroy subobject.
 	/// </summary>
 	/// <param name="subobject"> The target object. </param>
-	static void DestroySubobject(Object* subobject);
+	static void DestroySubobject(SObject* subobject);
 
 private:
-	void InternalDetachSubobject(Object* subobject);
-	void InternalAttachSubobject(Object* subobject);
-	void InternalDestroySubobject(Object* subobject);
+	void InternalDetachSubobject(SObject* subobject);
+	void InternalAttachSubobject(SObject* subobject);
+	void InternalDestroySubobject(SObject* subobject);
 };

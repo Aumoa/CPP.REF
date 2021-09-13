@@ -7,12 +7,12 @@
 
 struct MinimalViewInfo;
 
-class GAME_API CameraComponent : public SceneComponent
+class GAME_API SCameraComponent : public SSceneComponent
 {
-	GENERATED_BODY(CameraComponent)
+	GENERATED_BODY(SCameraComponent)
 
 public:
-	CameraComponent();
+	SCameraComponent();
 
 	MinimalViewInfo GetViewInfo(std::chrono::duration<float> elapsedTime) const;
 };

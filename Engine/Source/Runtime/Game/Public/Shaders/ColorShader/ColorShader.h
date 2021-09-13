@@ -7,26 +7,26 @@
 #include <vector>
 #include <span>
 
-class Material;
+class SMaterial;
 
 /// <summary>
 /// Represents default shader bytecode.
 /// </summary>
-class GAME_API ColorShader : public RHIShader
+class GAME_API SColorShader : public SRHIShader
 {
-	GENERATED_BODY(ColorShader)
+	GENERATED_BODY(SColorShader)
 
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
-	Material* _material = nullptr;
+	SMaterial* _material = nullptr;
 
 public:
-	ColorShader(RHIDevice* device);
+	SColorShader(SRHIDevice* device);
 
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
 
-	Material* GetDefaultMaterial() const;
+	SMaterial* GetDefaultMaterial() const;
 
 protected:
 	virtual std::span<uint8 const> CompileVS() override;

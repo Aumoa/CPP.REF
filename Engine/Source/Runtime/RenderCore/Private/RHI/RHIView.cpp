@@ -3,6 +3,6 @@
 #include "pch.h"
 #include "RHI/RHIView.h"
 
-RHIView::RHIView(RHIDevice* device) : Super(device)
+SRHIView::SRHIView(SRHIDevice* device) : Super(device)
 {
 }

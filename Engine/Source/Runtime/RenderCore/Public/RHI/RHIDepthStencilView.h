@@ -8,14 +8,14 @@
 
 struct ID3D12DescriptorHeap;
 struct D3D12_CPU_DESCRIPTOR_HANDLE;
-class RHITexture2D;
+class SRHITexture2D;
 
 /// <summary>
 /// Represents depth stencil view for binding to gpu output.
 /// </summary>
-class RENDERCORE_API RHIDepthStencilView : public RHIView
+class RENDERCORE_API SRHIDepthStencilView : public SRHIView
 {
-	GENERATED_BODY(RHIDepthStencilView)
+	GENERATED_BODY(SRHIDepthStencilView)
 
 private:
 	ComPtr<ID3D12DescriptorHeap> _descriptor;
@@ -23,13 +23,13 @@ private:
 	uint32 _increment = 0;
 
 public:
-	RHIDepthStencilView(RHIDevice* device, uint32 descriptorCount);
-	~RHIDepthStencilView() override;
+	SRHIDepthStencilView(SRHIDevice* device, uint32 descriptorCount);
+	~SRHIDepthStencilView() override;
 
 	/// <summary>
 	/// Create depth stencil view.
 	/// </summary>
-	void CreateDepthStencilView(RHITexture2D* texture, int32 index);
+	void CreateDepthStencilView(SRHITexture2D* texture, int32 index);
 
 	/// <summary>
 	/// Get initialized descriptor count.

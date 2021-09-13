@@ -4,26 +4,26 @@
 #include "Assets/Asset.h"
 #include "Misc/Paths.h"
 
-Asset::Asset(const std::filesystem::path& path) : Super()
+SAsset::SAsset(const std::filesystem::path& path) : Super()
 	, _assetPath(path)
 {
 }
 
-Asset::~Asset()
+SAsset::~SAsset()
 {
 }
 
-std::filesystem::path Asset::GetAssetPath() const
+std::filesystem::path SAsset::GetAssetPath() const
 {
 	return _assetPath;
 }
 
-size_t Asset::AddRef()
+size_t SAsset::AddRef()
 {
 	return ++_lockCount;
 }
 
-size_t Asset::ReleaseRef()
+size_t SAsset::ReleaseRef()
 {
 	return --_lockCount;
 }

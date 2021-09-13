@@ -14,10 +14,10 @@ class SubclassOf
 	template<class>
 	friend class SubclassOf;
 
-	inline static std::function<Object* (Object*)> _myctor;
+	inline static std::function<SObject* (SObject*)> _myctor;
 
 	size_t _hash = 0;
-	std::function<Object* (Object*)> _ctor;
+	std::function<SObject* (SObject*)> _ctor;
 
 public:
 	/// <summary>
@@ -79,7 +79,7 @@ public:
 	/// Instantiate saved class as base class.
 	/// </summary>
 	/// <param name="outer"> Outer object of instance. </param>
-	inline TBase* Instantiate(Object* outer) const
+	inline TBase* Instantiate(SObject* outer) const
 	{
 		if (!IsValid())
 		{
@@ -135,9 +135,9 @@ public:
 	{
 		if (!_myctor)
 		{
-			_myctor = [](Object* outer)
+			_myctor = [](SObject* outer)
 			{
-				return static_cast<Object*>(outer->NewObject<TBase>());
+				return static_cast<SObject*>(outer->NewObject<TBase>());
 			};
 		}
 

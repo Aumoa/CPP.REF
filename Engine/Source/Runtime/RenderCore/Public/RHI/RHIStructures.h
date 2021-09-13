@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "RHIEnums.h"
 
-class RHIResource;
+class SRHIResource;
 
 #pragma pack(push, 4)
 
@@ -38,7 +38,7 @@ struct RHIScissorRect
 /// </summary>
 struct RHITransitionBarrier
 {
-	RHIResource* Resource = nullptr;
+	SRHIResource* Resource = nullptr;
 	ERHIResourceStates StateBefore = ERHIResourceStates::Common;
 	ERHIResourceStates StateAfter = ERHIResourceStates::Common;
 	uint32 SubresourceIndex = 0;

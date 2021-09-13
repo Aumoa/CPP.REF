@@ -7,7 +7,7 @@
 #include "RHI/RHIDevice.h"
 #include "RHI/RHIDeviceContext.h"
 
-RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType) : Super(device)
+SRHICommandQueue::SRHICommandQueue(SRHIDevice* device, ERHICommandType commandType) : Super(device)
 {
 	ID3D12Device* d3ddev = device->GetDevice();
 
@@ -19,23 +19,23 @@ RHICommandQueue::RHICommandQueue(RHIDevice* device, ERHICommandType commandType)
 	HR(LogRHI, d3ddev->CreateCommandQueue(&desc, IID_PPV_ARGS(&_queue)));
 	HR(LogRHI, d3ddev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
 
-	_fenceEvent = NewObject<EventHandle>();
+	_fenceEvent = NewObject<SEventHandle>();
 }
 
-RHICommandQueue::~RHICommandQueue()
+SRHICommandQueue::~SRHICommandQueue()
 {
 	WaitLastSignal();
 	Collect();
 }
 
-uint64 RHICommandQueue::Signal()
+uint64 SRHICommandQueue::Signal()
 {
 	uint64 fenceValue = ++_signalNumber;
 	HR(LogRHI, _queue->Signal(_fence.Get(), fenceValue));
 	return fenceValue;
 }
 
-void RHICommandQueue::WaitSignal(uint64 signalNumber)
+void SRHICommandQueue::WaitSignal(uint64 signalNumber)
 {
 	if (_fence->GetCompletedValue() < _signalNumber)
 	{
@@ -44,17 +44,17 @@ void RHICommandQueue::WaitSignal(uint64 signalNumber)
 	}
 }
 
-void RHICommandQueue::WaitLastSignal()
+void SRHICommandQueue::WaitLastSignal()
 {
 	WaitSignal(_signalNumber);
 }
 
-uint64 RHICommandQueue::GetLastSignal() const
+uint64 SRHICommandQueue::GetLastSignal() const
 {
 	return _signalNumber;
 }
 
-uint64 RHICommandQueue::ExecuteDeviceContexts(std::span<RHIDeviceContext*> deviceContexts)
+uint64 SRHICommandQueue::ExecuteDeviceContexts(std::span<SRHIDeviceContext*> deviceContexts)
 {
 	std::vector<ID3D12CommandList*> commandLists;
 	commandLists.reserve(deviceContexts.size());
@@ -79,7 +79,7 @@ uint64 RHICommandQueue::ExecuteDeviceContexts(std::span<RHIDeviceContext*> devic
 	return fenceValue;
 }
 
-int32 RHICommandQueue::Collect()
+int32 SRHICommandQueue::Collect()
 {
 	uint64 fenceValue = _signalNumber;
 	int32 count = 0;
@@ -109,7 +109,7 @@ int32 RHICommandQueue::Collect()
 	return count;
 }
 
-void RHICommandQueue::AddGarbageObject(uint64 fenceValue, Object* object)
+void SRHICommandQueue::AddGarbageObject(uint64 fenceValue, SObject* object)
 {
 	object->SetOuter(this);
 
@@ -121,7 +121,7 @@ void RHICommandQueue::AddGarbageObject(uint64 fenceValue, Object* object)
 	};
 }
 
-void RHICommandQueue::AddGarbageObject(uint64 fenceValue, IUnknown* unknown)
+void SRHICommandQueue::AddGarbageObject(uint64 fenceValue, IUnknown* unknown)
 {
 	_gcobjects.emplace() =
 	{

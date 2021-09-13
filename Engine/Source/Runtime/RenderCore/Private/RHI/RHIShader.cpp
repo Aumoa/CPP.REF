@@ -7,15 +7,15 @@
 #include "RHI/RHIDevice.h"
 #include "RHI/RHIVertexFactory.h"
 
-RHIShader::RHIShader(RHIDevice* device) : Super(device)
+SRHIShader::SRHIShader(SRHIDevice* device) : Super(device)
 {
 }
 
-RHIShader::~RHIShader()
+SRHIShader::~SRHIShader()
 {
 }
 
-void RHIShader::Compile(RHIVertexFactory* vertexDeclaration)
+void SRHIShader::Compile(SRHIVertexFactory* vertexDeclaration)
 {
 	std::span<uint8 const> vsBytecode = CompileVS();
 	std::span<uint8 const> psBytecode = CompilePS();

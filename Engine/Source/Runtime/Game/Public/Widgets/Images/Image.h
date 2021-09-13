@@ -5,7 +5,7 @@
 #include "SlateMinimal.h"
 #include "Widgets/LeafWidget.h"
 
-class Texture2D;
+class STexture2D;
 
 class GAME_API SImage : public SLeafWidget
 {
@@ -21,7 +21,7 @@ public:
 	virtual Vector2 GetDesiredSize() const override;
 
 	void SetBrush(const SlateBrush& brush);
-	void SetTexture2D(Texture2D* texture, bool bMatchSize = true);
+	void SetTexture2D(STexture2D* texture, bool bMatchSize = true);
 	SlateBrush GetBrush() const;
 
 public:
@@ -32,5 +32,5 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 protected:
-	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
+	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
 };

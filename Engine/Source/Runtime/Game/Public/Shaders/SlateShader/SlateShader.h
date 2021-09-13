@@ -7,15 +7,15 @@
 #include <vector>
 #include <span>
 
-class Material;
-class RHIDeviceContext;
-class SlateWindowElementList;
-class RHIShaderDescriptorView;
+class SMaterial;
+class SRHIDeviceContext;
+class SSlateWindowElementList;
+class SRHIShaderDescriptorView;
 struct SlateRenderTransform;
 
-class GAME_API SlateShader : public RHIShader
+class GAME_API SSlateShader : public SRHIShader
 {
-	GENERATED_BODY(SlateShader)
+	GENERATED_BODY(SSlateShader)
 
 public:
 	struct DrawElement
@@ -36,27 +36,27 @@ public:
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
-	Material* _material = nullptr;
-	RHIShaderDescriptorView* _shaderDescriptorView = nullptr;
+	SMaterial* _material = nullptr;
+	SRHIShaderDescriptorView* _shaderDescriptorView = nullptr;
 
 	std::vector<RHIDescriptorRange> _imageSourceRanges;
 	std::vector<RHIDescriptorRange> _fontFaceBufferRanges;
 
 public:
-	SlateShader(RHIDevice* device);
+	SSlateShader(SRHIDevice* device);
 
-	virtual void Compile(RHIVertexFactory* vertexDeclaration) override;
+	virtual void Compile(SRHIVertexFactory* vertexDeclaration) override;
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
 
-	Material* GetDefaultMaterial() const;
+	SMaterial* GetDefaultMaterial() const;
 	DrawElement MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const;
-	void RenderElements(RHIDeviceContext* deviceContext, const Vector2& screenSize, SlateWindowElementList* elements);
+	void RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements);
 
 protected:
 	virtual std::span<uint8 const> CompileVS() override;
 	virtual std::span<uint8 const> CompilePS() override;
 
 public:
-	class RHIShaderResourceView* _textureDebug = nullptr;
-	void RenderDebug(class RHIShaderResourceView* texture) { _textureDebug = texture; }
+	class SRHIShaderResourceView* _textureDebug = nullptr;
+	void RenderDebug(class SRHIShaderResourceView* texture) { _textureDebug = texture; }
 };

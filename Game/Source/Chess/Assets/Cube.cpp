@@ -9,16 +9,16 @@
 
 using namespace std;
 
-Cube::Cube(wstring_view name, GameEngine* engine) : Super(name, GetRenderData(engine))
+Cube::Cube(wstring_view name, SGameEngine* engine) : Super(name, GetRenderData(engine))
 {
 }
 
-StaticMeshRenderData* Cube::GetRenderData(GameEngine* engine)
+SStaticMeshRenderData* Cube::GetRenderData(SGameEngine* engine)
 {
-	static StaticMeshRenderData* renderData = nullptr;
+	static SStaticMeshRenderData* renderData = nullptr;
 	if (renderData == nullptr)
 	{
-		renderData = engine->NewObject<StaticMeshRenderData>();
+		renderData = engine->NewObject<SStaticMeshRenderData>();
 		MeshBatch & batch = renderData->MeshBatches.emplace_back();
 		batch.VertexFactory = engine->GetColorVertexFactory();
 		batch.MaterialSlots.emplace_back() = nullptr;
@@ -34,8 +34,8 @@ StaticMeshRenderData* Cube::GetRenderData(GameEngine* engine)
 			.MaterialSlotIndex = 0
 		};
 
-		RHIResource* vb = batch.VertexFactory->CreateVertexBuffer(batch.VertexBuffer.data(), batch.VertexBuffer.size());
-		RHIResource* ib = batch.VertexFactory->CreateIndexBuffer(batch.IndexBuffer.data(), batch.IndexBuffer.size());
+		SRHIResource* vb = batch.VertexFactory->CreateVertexBuffer(batch.VertexBuffer.data(), batch.VertexBuffer.size());
+		SRHIResource* ib = batch.VertexFactory->CreateIndexBuffer(batch.IndexBuffer.data(), batch.IndexBuffer.size());
 		vb->SetOuter(renderData);
 		ib->SetOuter(renderData);
 		batch.VertexBufferLocation = vb->GetGPUVirtualAddress();

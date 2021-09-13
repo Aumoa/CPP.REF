@@ -4,4 +4,4 @@
 
 #include "GameMinimal.h"
 
-extern LogCategory LogChessAI;
+extern SLogCategory LogChessAI;

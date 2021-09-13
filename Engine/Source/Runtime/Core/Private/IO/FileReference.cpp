@@ -8,31 +8,31 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-FileReference::FileReference(const std::filesystem::path& filepath) : Super(filepath)
+SFileReference::SFileReference(const std::filesystem::path& filepath) : Super(filepath)
 {
 }
 
-FileReference::~FileReference()
+SFileReference::~SFileReference()
 {
 	FlushAndCloseSharedStream();
 }
 
-std::filesystem::path FileReference::GetFilename() const
+std::filesystem::path SFileReference::GetFilename() const
 {
 	return GetPath().filename();
 }
 
-std::filesystem::path FileReference::GetName() const
+std::filesystem::path SFileReference::GetName() const
 {
 	return GetPath().stem();
 }
 
-std::filesystem::path FileReference::GetExtension() const
+std::filesystem::path SFileReference::GetExtension() const
 {
 	return GetPath().extension();
 }
 
-std::wfstream FileReference::OpenStream(std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
+std::wfstream SFileReference::OpenStream(std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
 {
 	if (bCreateIfNotExists && !IsExists())
 	{
@@ -47,7 +47,7 @@ std::wfstream FileReference::OpenStream(std::ios_base::openmode mode, bool bCrea
 	return std::wfstream(GetPath(), mode);
 }
 
-std::wfstream& FileReference::OpenSharedStream(const Object* sharingUser, std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
+std::wfstream& SFileReference::OpenSharedStream(const SObject* sharingUser, std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
 {
 	if (sharingUser == nullptr)
 	{
@@ -69,7 +69,7 @@ std::wfstream& FileReference::OpenSharedStream(const Object* sharingUser, std::i
 	return _sharedstream;
 }
 
-void FileReference::CloseSharedStream(const Object* sharingUser)
+void SFileReference::CloseSharedStream(const SObject* sharingUser)
 {
 	if (sharingUser == nullptr)
 	{
@@ -92,7 +92,7 @@ void FileReference::CloseSharedStream(const Object* sharingUser)
 	LogSystem::Log(LogCore, ELogVerbosity::Verbose, L"The user {} is not contained from shared stream users.", sharingUser->ToString());
 }
 
-void FileReference::FlushAndCloseSharedStream()
+void SFileReference::FlushAndCloseSharedStream()
 {
 	if (_sharedstream.is_open())
 	{

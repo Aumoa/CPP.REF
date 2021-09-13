@@ -6,19 +6,19 @@
 #include <vector>
 #include "GameStructures.h"
 
-class PrimitiveComponent;
+class SPrimitiveComponent;
 
-class GAME_API PrimitiveSceneProxy : virtual public Object
+class GAME_API SPrimitiveSceneProxy : virtual public SObject
 {
-	GENERATED_BODY(PrimitiveSceneProxy)
+	GENERATED_BODY(SPrimitiveSceneProxy)
 
 private:
-	PrimitiveComponent* _MyComponent = nullptr;
+	SPrimitiveComponent* _MyComponent = nullptr;
 
 public:
-	PrimitiveSceneProxy(PrimitiveComponent* inComponent);
+	SPrimitiveSceneProxy(SPrimitiveComponent* inComponent);
 
-	PrimitiveComponent* GetComponent() const { return _MyComponent; }
+	SPrimitiveComponent* GetComponent() const { return _MyComponent; }
 	void UpdateTransform_GameThread(const Transform& value);
 
 	std::vector<MeshBatch> MeshBatches;

@@ -6,15 +6,15 @@
 #include "LogGame.h"
 #include "GameModule.h"
 
-GameModuleSystem::GameModuleSystem() : Super()
+SGameModuleSystem::SGameModuleSystem() : Super()
 {
 }
 
-GameModuleSystem::~GameModuleSystem()
+SGameModuleSystem::~SGameModuleSystem()
 {
 }
 
-void GameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
+void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 {
 	std::filesystem::path gameModulePath = gameModuleName;
 	if (!gameModulePath.has_extension())
@@ -23,14 +23,14 @@ void GameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 		gameModulePath.replace_extension(L".dll");
 	}
 
-	_module = NewObject<PlatformModule>(gameModulePath);
+	_module = NewObject<SPlatformModule>(gameModulePath);
 	if (!_module->IsValid())
 	{
 		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", gameModuleName);
 		return;
 	}
 
-	auto _gameModuleLoader = _module->GetFunctionPointer<GameModule*()>("LoadGameModule");
+	auto _gameModuleLoader = _module->GetFunctionPointer<SGameModule*()>("LoadGameModule");
 	if (!_gameModuleLoader)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.");
@@ -45,7 +45,7 @@ void GameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 	}
 }
 
-GameInstance* GameModuleSystem::LoadGameInstance()
+SGameInstance* SGameModuleSystem::LoadGameInstance()
 {
 	return _gameModule->CreatePrimaryGameModule();
 }

@@ -11,27 +11,27 @@ class AActor;
 /// <summary>
 /// ActorComponent is the base class for components that define reusable behavior that can be added to different types of Actors.
 /// </summary>
-class GAME_API ActorComponent : public GameObject
+class GAME_API SActorComponent : public SGameObject
 {
-	GENERATED_BODY(ActorComponent)
+	GENERATED_BODY(SActorComponent)
 
 private:
 	/// <summary>
 	/// Represents tick function for targeted to actor component.
 	/// </summary>
-	class ComponentTickFunction : public TickFunction
+	class ComponentTickFunction : public STickFunction
 	{
 	public:
-		using Super = TickFunction;
+		using Super = STickFunction;
 
 	private:
-		ActorComponent* const _target = nullptr;
+		SActorComponent* const _target = nullptr;
 
 	public:
 		/// <summary>
 		/// Initialize new <see cref="ComponentTickFunction"/> instance.
 		/// </summary>
-		inline ComponentTickFunction(ActorComponent* target) : Super()
+		inline ComponentTickFunction(SActorComponent* target) : Super()
 			, _target(target)
 		{
 		}
@@ -39,7 +39,7 @@ private:
 		/// <summary>
 		/// Get tick function target.
 		/// </summary>
-		inline ActorComponent* GetTarget() const
+		inline SActorComponent* GetTarget() const
 		{
 			return _target;
 		}
@@ -58,7 +58,7 @@ private:
 	AActor* _owner = nullptr;
 
 public:
-	ActorComponent();
+	SActorComponent();
 
 	/// <summary>
 	/// Update frame tick.
@@ -74,8 +74,8 @@ public:
 	void SetActive(bool bActive);
 	inline bool IsActive() const { return _bActive; }
 	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
-	MulticastEvent<ActorComponent, void()> Activated;
-	MulticastEvent<ActorComponent, void()> Inactivated;
+	MulticastEvent<SActorComponent, void()> Activated;
+	MulticastEvent<SActorComponent, void()> Inactivated;
 
 	void RegisterComponentWithWorld(World* world);
 	void UnregisterComponent();

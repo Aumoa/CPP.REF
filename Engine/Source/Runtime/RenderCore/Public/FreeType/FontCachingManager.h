@@ -4,24 +4,24 @@
 
 #include "CoreMinimal.h"
 
-class RHIDevice;
-class FontFace;
-class FontFaceCachingNode;
+class SRHIDevice;
+class SFontFace;
+class SFontFaceCachingNode;
 
-class RENDERCORE_API FontCachingManager : virtual public Object
+class RENDERCORE_API SFontCachingManager : virtual public SObject
 {
-	GENERATED_BODY(FontCachingManager)
+	GENERATED_BODY(SFontCachingManager)
 
 private:
-	RHIDevice* _device = nullptr;
-	std::map<std::wstring, FontFaceCachingNode*> _nodes;
+	SRHIDevice* _device = nullptr;
+	std::map<std::wstring, SFontFaceCachingNode*> _nodes;
 
 public:
-	FontCachingManager(RHIDevice* device);
-	virtual ~FontCachingManager() override;
+	SFontCachingManager(SRHIDevice* device);
+	virtual ~SFontCachingManager() override;
 
-	void StreamGlyphs(FontFace* face, std::wstring_view glyphs);
+	void StreamGlyphs(SFontFace* face, std::wstring_view glyphs);
 	void Apply();
 
-	class RHIShaderResourceView* GetDebugTexture() const;
+	class SRHIShaderResourceView* GetDebugTexture() const;
 };

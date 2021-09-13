@@ -5,33 +5,33 @@
 #include <filesystem>
 #include "RenderMinimal.h"
 
-class GameEngine;
-class StaticMesh;
-class RHIVertexFactory;
-class Asset;
+class SGameEngine;
+class SStaticMesh;
+class SRHIVertexFactory;
+class SAsset;
 
-class GAME_API AssetImporter : virtual public Object
+class GAME_API SAssetImporter : virtual public SObject
 {
-	GENERATED_BODY(AssetImporter)
+	GENERATED_BODY(SAssetImporter)
 
 private:
 	struct LoadedObjectData
 	{
-		Asset* Ptr = nullptr;
+		SAsset* Ptr = nullptr;
 	};
 
 private:
-	GameEngine* _engine = nullptr;
-	RHIVertexFactory* _factory = nullptr;
+	SGameEngine* _engine = nullptr;
+	SRHIVertexFactory* _factory = nullptr;
 	std::map<std::filesystem::path, LoadedObjectData> _assets;
 
 public:
-	AssetImporter(GameEngine* engine, RHIVertexFactory* factory);
+	SAssetImporter(SGameEngine* engine, SRHIVertexFactory* factory);
 
 	void SearchContents();
-	Asset* LoadObject(const std::filesystem::path& importPath);
+	SAsset* LoadObject(const std::filesystem::path& importPath);
 	void UnloadObject(const std::filesystem::path& importPath);
 
 private:
-	Asset* LoadAssimpObject(const std::filesystem::path& importPath);
+	SAsset* LoadAssimpObject(const std::filesystem::path& importPath);
 };

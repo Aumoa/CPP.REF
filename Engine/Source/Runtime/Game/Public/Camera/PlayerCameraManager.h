@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameStructures.h"
 
-class CameraComponent;
+class SCameraComponent;
 class APlayerController;
 
 class GAME_API APlayerCameraManager : public AActor
@@ -14,7 +14,7 @@ class GAME_API APlayerCameraManager : public AActor
 	GENERATED_BODY(APlayerCameraManager)
 
 private:
-	CameraComponent* _cachedBindCamera = nullptr;
+	SCameraComponent* _cachedBindCamera = nullptr;
 	MinimalViewInfo _cachedView;
 
 public:

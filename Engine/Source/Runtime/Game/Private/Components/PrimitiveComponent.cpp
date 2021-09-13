@@ -5,11 +5,11 @@
 #include "Level/World.h"
 #include "Scene/PrimitiveSceneProxy.h"
 
-PrimitiveComponent::PrimitiveComponent() : Super()
+SPrimitiveComponent::SPrimitiveComponent() : Super()
 {
 }
 
-void PrimitiveComponent::SetHiddenInGame(bool bHidden)
+void SPrimitiveComponent::SetHiddenInGame(bool bHidden)
 {
 	if (_bHiddenInGame != bHidden)
 	{
@@ -22,7 +22,7 @@ void PrimitiveComponent::SetHiddenInGame(bool bHidden)
 	}
 }
 
-void PrimitiveComponent::MarkRenderStateDirty()
+void SPrimitiveComponent::MarkRenderStateDirty()
 {
 	if (SceneProxy == nullptr)
 	{

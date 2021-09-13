@@ -5,19 +5,19 @@
 #include "Object.h"
 #include <filesystem>
 
-class GameInstance;
+class SGameInstance;
 
-class CORE_API PlatformModule : virtual public Object
+class CORE_API SPlatformModule : virtual public SObject
 {
 public:
-	using Super = Object;
+	using Super = SObject;
 
 private:
 	void* _NativeHandle = nullptr;
 
 public:
-	PlatformModule(const std::filesystem::path& modulePath);
-	virtual ~PlatformModule() override;
+	SPlatformModule(const std::filesystem::path& modulePath);
+	virtual ~SPlatformModule() override;
 
 	bool IsValid() const;
 

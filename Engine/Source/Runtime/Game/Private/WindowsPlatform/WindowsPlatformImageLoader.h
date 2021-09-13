@@ -8,16 +8,16 @@
 struct IWICImagingFactory;
 struct IPlatformImage;
 
-class WindowsPlatformImageLoader : virtual public Object, virtual public IPlatformImageLoader
+class SWindowsPlatformImageLoader : virtual public SObject, virtual public IPlatformImageLoader
 {
-	GENERATED_BODY(WindowsPlatformImageLoader)
+	GENERATED_BODY(SWindowsPlatformImageLoader)
 
 public:
 	ComPtr<IWICImagingFactory> _factory;
 
 public:
-	WindowsPlatformImageLoader();
-	virtual ~WindowsPlatformImageLoader() override;
+	SWindowsPlatformImageLoader();
+	virtual ~SWindowsPlatformImageLoader() override;
 
 	virtual IPlatformImage* LoadImageFromFile(const std::filesystem::path& assetPath, ERHIPixelFormat desiredPixelFormat) override;
 

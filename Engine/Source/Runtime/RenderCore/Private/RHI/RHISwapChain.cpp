@@ -9,7 +9,7 @@
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHITexture2D.h"
 
-RHISwapChain::RHISwapChain(RHIDevice* device, IWindowView* view, RHICommandQueue* queue) : Super(device)
+SRHISwapChain::SRHISwapChain(SRHIDevice* device, IWindowView* view, SRHICommandQueue* queue) : Super(device)
 {
 	IDXGIFactory2* dxgi = device->GetFactory();
 
@@ -32,16 +32,16 @@ RHISwapChain::RHISwapChain(RHIDevice* device, IWindowView* view, RHICommandQueue
 	HR(LogRHI, swapChain1.CopyTo(&_swapChain));
 }
 
-RHISwapChain::~RHISwapChain()
+SRHISwapChain::~SRHISwapChain()
 {
 }
 
-void RHISwapChain::Present(uint8 vSyncLevel)
+void SRHISwapChain::Present(uint8 vSyncLevel)
 {
 	HR_E(LogRHI, _swapChain->Present((UINT)vSyncLevel, 0));
 }
 
-void RHISwapChain::ResizeBuffers(int32 width, int32 height)
+void SRHISwapChain::ResizeBuffers(int32 width, int32 height)
 {
 	for (int32 i = 0; i < 3; ++i)
 	{
@@ -58,16 +58,16 @@ void RHISwapChain::ResizeBuffers(int32 width, int32 height)
 	{
 		ComPtr<ID3D12Resource> buffer;
 		HR(LogRHI, _swapChain->GetBuffer((UINT)i, IID_PPV_ARGS(&buffer)));
-		_buffers[i] = NewObject<RHITexture2D>(GetDevice(), buffer.Get());
+		_buffers[i] = NewObject<SRHITexture2D>(GetDevice(), buffer.Get());
 	}
 }
 
-RHITexture2D* RHISwapChain::GetBuffer(int32 index) const
+SRHITexture2D* SRHISwapChain::GetBuffer(int32 index) const
 {
 	return _buffers[index];
 }
 
-int32 RHISwapChain::GetCurrentBackBufferIndex() const
+int32 SRHISwapChain::GetCurrentBackBufferIndex() const
 {
 	return (int32)_swapChain->GetCurrentBackBufferIndex();
 }

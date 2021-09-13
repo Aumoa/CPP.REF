@@ -7,7 +7,7 @@
 #include "RHI/RHIDevice.h"
 #include "RHI/RHITexture2D.h"
 
-RHIShaderResourceView::RHIShaderResourceView(RHIDevice* device, uint32 descriptorCount) : Super(device)
+SRHIShaderResourceView::SRHIShaderResourceView(SRHIDevice* device, uint32 descriptorCount) : Super(device)
 	, _descriptorCount(descriptorCount)
 {
 	ID3D12Device* dev = device->GetDevice();
@@ -21,11 +21,11 @@ RHIShaderResourceView::RHIShaderResourceView(RHIDevice* device, uint32 descripto
 	_increment = dev->GetDescriptorHandleIncrementSize(heapd.Type);
 }
 
-RHIShaderResourceView::~RHIShaderResourceView()
+SRHIShaderResourceView::~SRHIShaderResourceView()
 {
 }
 
-void RHIShaderResourceView::CreateShaderResourceView(RHITexture2D* texture, int32 index)
+void SRHIShaderResourceView::CreateShaderResourceView(SRHITexture2D* texture, int32 index)
 {
 	ID3D12Resource* resource = texture->GetResource();
 	ID3D12Device* dev = GetDevice()->GetDevice();
@@ -36,7 +36,7 @@ void RHIShaderResourceView::CreateShaderResourceView(RHITexture2D* texture, int3
 	dev->CreateShaderResourceView(resource, nullptr, handle);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE RHIShaderResourceView::GetCPUDescriptorHandle(int32 index) const
+D3D12_CPU_DESCRIPTOR_HANDLE SRHIShaderResourceView::GetCPUDescriptorHandle(int32 index) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _descriptor->GetCPUDescriptorHandleForHeapStart();
 	handle.ptr += (size_t)_increment * index;

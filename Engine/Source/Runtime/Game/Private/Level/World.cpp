@@ -14,10 +14,10 @@
 World::World() : Super()
 {
 	SetWorld(this);
-	_scene = NewObject<Scene>(this, GEngine->GetEngineSubsystem<GameRenderSystem>()->GetRHIDevice());
+	_scene = NewObject<SScene>(this, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
-Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
+SLevel* World::LoadLevel(SubclassOf<SLevel> levelToLoad)
 {
 	if (!levelToLoad.IsValid())
 	{
@@ -32,7 +32,7 @@ Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
 	}
 	_actors.clear();
 
-	Level* levelInstance = levelToLoad.Instantiate(this);
+	SLevel* levelInstance = levelToLoad.Instantiate(this);
 	if (!levelInstance->LoadLevel(this))
 	{
 		SE_LOG(LogWorld, Fatal, L"Could not load level.");
@@ -50,7 +50,7 @@ Level* World::LoadLevel(SubclassOf<Level> levelToLoad)
 	return levelInstance;
 }
 
-void World::RegisterTickFunction(TickFunction* function)
+void World::RegisterTickFunction(STickFunction* function)
 {
 	if (function->bCanEverTick)
 	{
@@ -58,11 +58,11 @@ void World::RegisterTickFunction(TickFunction* function)
 	}
 }
 
-void World::RegisterComponent(ActorComponent* component)
+void World::RegisterComponent(SActorComponent* component)
 {
-	if (auto* isPrimitive = dynamic_cast<PrimitiveComponent*>(component); isPrimitive != nullptr)
+	if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
 	{
-		PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
+		SPrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
 		if (isPrimitive->SceneProxy != nullptr)
 		{
 			// Actually need to remove previous scene proxy from scene.
@@ -80,14 +80,14 @@ void World::RegisterComponent(ActorComponent* component)
 	}
 }
 
-void World::UnregisterTickFunction(TickFunction* function)
+void World::UnregisterTickFunction(STickFunction* function)
 {
 	_tickInstances.erase(function);
 }
 
-void World::UnregisterComponent(ActorComponent* component)
+void World::UnregisterComponent(SActorComponent* component)
 {
-	if (auto* isPrimitive = dynamic_cast<PrimitiveComponent*>(component); isPrimitive != nullptr)
+	if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
 	{
 		if (isPrimitive->SceneProxy != nullptr)
 		{

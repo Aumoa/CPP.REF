@@ -6,12 +6,12 @@
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 
-std::wstring_view Type::GetFriendlyName() const
+const std::wstring& Type::GetFriendlyName() const
 {
 	return _friendlyName;
 }
 
-Object* Type::Instantiate() const
+SObject* Type::Instantiate() const
 {
 	if (_ctor)
 	{

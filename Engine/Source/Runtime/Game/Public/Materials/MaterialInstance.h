@@ -5,16 +5,16 @@
 #include "RenderMinimal.h"
 #include "Material.h"
 
-class GAME_API MaterialInstance : public Material
+class GAME_API SMaterialInstance : public SMaterial
 {
-	GENERATED_BODY(MaterialInstance)
+	GENERATED_BODY(SMaterialInstance)
 
 private:
-	Material* _source = nullptr;
+	SMaterial* _source = nullptr;
 	std::vector<ShaderVars> _storage;
 
 public:
-	MaterialInstance(Material* source);
+	SMaterialInstance(SMaterial* source);
 
 	virtual void SetScalarParameterValueByIndex(int32 index, float value) override;
 	virtual float GetScalarParameterValueByIndex(int32 index) const override;
@@ -25,7 +25,7 @@ public:
 	virtual bool IgnoreParameterType(ERHIShaderParameterType type) const override { return _source->IgnoreParameterType(type); }
 
 protected:
-	virtual void SetGraphicsParameterValue(RHIDeviceContext* dc, int32 index) const override;
+	virtual void SetGraphicsParameterValue(SRHIDeviceContext* dc, int32 index) const override;
 
 private:
 	template<class T>

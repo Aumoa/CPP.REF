@@ -4,19 +4,19 @@
 #include "Components/SceneComponent.h"
 #include "LogGame.h"
 
-SceneComponent::SceneComponent() : Super()
+SSceneComponent::SSceneComponent() : Super()
 {
 }
 
-void SceneComponent::UpdateChildTransforms()
+void SSceneComponent::UpdateChildTransforms()
 {
-	for (SceneComponent* child : _childComponents)
+	for (SSceneComponent* child : _childComponents)
 	{
 		child->UpdateComponentToWorld();
 	}
 }
 
-void SceneComponent::UpdateComponentToWorld()
+void SSceneComponent::UpdateComponentToWorld()
 {
 	if (GetAttachParent() == nullptr)
 	{
@@ -36,7 +36,7 @@ void SceneComponent::UpdateComponentToWorld()
 	UpdateWorldTransform();
 }
 
-Transform SceneComponent::GetSocketTransform(const std::wstring& socketName, EComponentTransformSpace space) const
+Transform SSceneComponent::GetSocketTransform(const std::wstring& socketName, EComponentTransformSpace space) const
 {
 	SE_LOG(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
 
@@ -49,7 +49,7 @@ Transform SceneComponent::GetSocketTransform(const std::wstring& socketName, ECo
 	return GetRelativeTransform();
 }
 
-bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
+bool SSceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
 {
 	Quaternion oldRotation = inSpace == EComponentTransformSpace::World ? GetComponentRotation() : GetRotation();
 	if (inMoveDelta.NearlyEquals(Vector3::GetZero()) && oldRotation.NearlyEquals(inNewRotation))
@@ -88,12 +88,12 @@ bool SceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion&
 	return true;
 }
 
-void SceneComponent::AttachToComponent(SceneComponent* attachTo)
+void SSceneComponent::AttachToComponent(SSceneComponent* attachTo)
 {
 	AttachToSocket(attachTo, L"");
 }
 
-void SceneComponent::AttachToSocket(SceneComponent* attachTo, const std::wstring& socketName)
+void SSceneComponent::AttachToSocket(SSceneComponent* attachTo, const std::wstring& socketName)
 {
 	if (attachTo == nullptr)
 	{
@@ -116,7 +116,7 @@ void SceneComponent::AttachToSocket(SceneComponent* attachTo, const std::wstring
 	_attachment.AttachmentRoot = attachTo;
 	_attachment.SocketName = socketName;
 
-	ForEachSceneComponents<SceneComponent>([attachTo](SceneComponent* sc)
+	ForEachSceneComponents<SSceneComponent>([attachTo](SSceneComponent* sc)
 	{
 		if (sc->GetOwner() == nullptr)
 		{
@@ -127,7 +127,7 @@ void SceneComponent::AttachToSocket(SceneComponent* attachTo, const std::wstring
 	UpdateComponentToWorld();
 }
 
-void SceneComponent::DetachFromComponent()
+void SSceneComponent::DetachFromComponent()
 {
 	if (_attachment.AttachmentRoot == nullptr)
 	{
@@ -151,66 +151,66 @@ void SceneComponent::DetachFromComponent()
 	UpdateComponentToWorld();
 }
 
-Transform SceneComponent::GetRelativeTransform() const
+Transform SSceneComponent::GetRelativeTransform() const
 {
 	return _transform;
 }
 
-void SceneComponent::SetRelativeTransform(const Transform& value)
+void SSceneComponent::SetRelativeTransform(const Transform& value)
 {
 	_transform = value;
 	UpdateWorldTransform();
 }
 
-Transform SceneComponent::GetComponentTransform() const
+Transform SSceneComponent::GetComponentTransform() const
 {
 	return _worldTransform;
 }
 
-Vector3 SceneComponent::GetLocation() const
+Vector3 SSceneComponent::GetLocation() const
 {
 	return _transform.Translation;
 }
 
-void SceneComponent::SetLocation(const Vector3& value)
+void SSceneComponent::SetLocation(const Vector3& value)
 {
 	_transform.Translation = value;
 	UpdateWorldTransform();
 }
 
-Vector3 SceneComponent::GetScale() const
+Vector3 SSceneComponent::GetScale() const
 {
 	return _transform.Scale;
 }
 
-void SceneComponent::SetScale(const Vector3& value)
+void SSceneComponent::SetScale(const Vector3& value)
 {
 	_transform.Scale = value;
 	UpdateWorldTransform();
 }
 
-Quaternion SceneComponent::GetRotation() const
+Quaternion SSceneComponent::GetRotation() const
 {
 	return _transform.Rotation;
 }
 
-void SceneComponent::SetRotation(const Quaternion& value)
+void SSceneComponent::SetRotation(const Quaternion& value)
 {
 	_transform.Rotation = value;
 	UpdateWorldTransform();
 }
 
-EComponentMobility SceneComponent::GetMobility() const
+EComponentMobility SSceneComponent::GetMobility() const
 {
 	return _mobility;
 }
 
-void SceneComponent::SetMobility(EComponentMobility value)
+void SSceneComponent::SetMobility(EComponentMobility value)
 {
 	_mobility = value;
 }
 
-void SceneComponent::UpdateWorldTransform()
+void SSceneComponent::UpdateWorldTransform()
 {
 	if (HasBegunPlay() && _mobility != EComponentMobility::Movable)
 	{

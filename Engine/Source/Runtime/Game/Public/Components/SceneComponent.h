@@ -12,14 +12,14 @@
 /// <summary>
 /// A SceneComponent has a transform and supports attachment, but has no rendering or collision capabilities.
 /// </summary>
-class GAME_API SceneComponent : public ActorComponent
+class GAME_API SSceneComponent : public SActorComponent
 {
-	GENERATED_BODY(SceneComponent)
+	GENERATED_BODY(SSceneComponent)
 
 private:
 	struct SceneAttachment
 	{
-		SceneComponent* AttachmentRoot = nullptr;
+		SSceneComponent* AttachmentRoot = nullptr;
 		std::wstring SocketName;
 
 		inline void Clear()
@@ -35,23 +35,23 @@ private:
 	EComponentMobility _mobility = EComponentMobility::Movable;
 
 	SceneAttachment _attachment;
-	std::vector<SceneComponent*> _childComponents;
+	std::vector<SSceneComponent*> _childComponents;
 
 public:
-	SceneComponent();
+	SSceneComponent();
 
 	virtual void UpdateChildTransforms();
 	virtual void UpdateComponentToWorld();
 	virtual Transform GetSocketTransform(const std::wstring& socketName, EComponentTransformSpace space = EComponentTransformSpace::World) const;
 	virtual bool MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace = EComponentTransformSpace::World);
 
-	void AttachToComponent(SceneComponent* attachTo);
-	void AttachToSocket(SceneComponent* attachTo, const std::wstring& socketName);
+	void AttachToComponent(SSceneComponent* attachTo);
+	void AttachToSocket(SSceneComponent* attachTo, const std::wstring& socketName);
 	void DetachFromComponent();
 
-	inline SceneComponent* GetAttachParent() const { return _attachment.AttachmentRoot; }
+	inline SSceneComponent* GetAttachParent() const { return _attachment.AttachmentRoot; }
 	inline std::wstring GetAttachSocketName() const { return _attachment.SocketName; }
-	inline const std::vector<SceneComponent*>& GetChildComponents() const { return _childComponents; }
+	inline const std::vector<SSceneComponent*>& GetChildComponents() const { return _childComponents; }
 	Transform GetRelativeTransform() const;
 	void SetRelativeTransform(const Transform& value);
 	Transform GetComponentTransform() const;
@@ -70,16 +70,16 @@ public:
 	EComponentMobility GetMobility() const;
 	void SetMobility(EComponentMobility value);
 
-	template<std::derived_from<SceneComponent> T>
+	template<std::derived_from<SSceneComponent> T>
 	void ForEachSceneComponents(std::function<bool(const T*)> body) const
 	{
-		std::queue<const SceneComponent*> hierarchy;
+		std::queue<const SSceneComponent*> hierarchy;
 		hierarchy.emplace(this);
 
 		while (!hierarchy.empty())
 		{
-			SceneComponent* top = hierarchy.front();
-			if constexpr (is_same_v<T, SceneComponent>)
+			SSceneComponent* top = hierarchy.front();
+			if constexpr (is_same_v<T, SSceneComponent>)
 			{
 				if (body(top))
 				{
@@ -97,7 +97,7 @@ public:
 				}
 			}
 
-			std::vector<SceneComponent*> childs = top->GetChildComponents();
+			std::vector<SSceneComponent*> childs = top->GetChildComponents();
 			for (auto& child : childs)
 			{
 				hierarchy.emplace(child);
@@ -107,16 +107,16 @@ public:
 		}
 	}
 
-	template<std::derived_from<SceneComponent> T>
+	template<std::derived_from<SSceneComponent> T>
 	void ForEachSceneComponents(std::function<bool(T*)> body)
 	{
-		std::queue<SceneComponent*> hierarchy;
+		std::queue<SSceneComponent*> hierarchy;
 		hierarchy.emplace(this);
 
 		while (!hierarchy.empty())
 		{
-			SceneComponent* top = hierarchy.front();
-			if constexpr (std::is_same_v<T, SceneComponent>)
+			SSceneComponent* top = hierarchy.front();
+			if constexpr (std::is_same_v<T, SSceneComponent>)
 			{
 				if (body(top))
 				{
@@ -134,7 +134,7 @@ public:
 				}
 			}
 
-			std::vector<SceneComponent*> childs = top->GetChildComponents();
+			std::vector<SSceneComponent*> childs = top->GetChildComponents();
 			for (auto& child : childs)
 			{
 				hierarchy.emplace(child);

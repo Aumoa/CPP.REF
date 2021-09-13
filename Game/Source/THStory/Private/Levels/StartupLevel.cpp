@@ -2,6 +2,6 @@
 
 #include "Levels/StartupLevel.h"
 
-StartupLevel::StartupLevel() : Super()
+SStartupLevel::SStartupLevel() : Super()
 {
 }

@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-class RENDERCORE_API FontFace : virtual public Object
+class RENDERCORE_API SFontFace : virtual public SObject
 {
-	GENERATED_BODY(FontFace)
+	GENERATED_BODY(SFontFace)
 
 public:
 	struct Impl;
@@ -19,8 +19,8 @@ private:
 	std::optional<wchar_t> _loadedGlyph;
 
 public:
-	FontFace(std::unique_ptr<Impl>&& impl, const std::wstring& faceName);
-	virtual ~FontFace() override;
+	SFontFace(std::unique_ptr<Impl>&& impl, const std::wstring& faceName);
+	virtual ~SFontFace() override;
 
 	bool SetFontSize(int32 fontSize, int32 dpiScale = 96);
 	bool LoadGlyph(wchar_t glyph);

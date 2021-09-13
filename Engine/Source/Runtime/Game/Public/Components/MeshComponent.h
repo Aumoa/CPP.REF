@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "PrimitiveComponent.h"
 
-class GAME_API MeshComponent : public PrimitiveComponent
+class GAME_API SMeshComponent : public SPrimitiveComponent
 {
-	GENERATED_BODY(MeshComponent)
+	GENERATED_BODY(SMeshComponent)
 
 public:
-	MeshComponent();
+	SMeshComponent();
 };

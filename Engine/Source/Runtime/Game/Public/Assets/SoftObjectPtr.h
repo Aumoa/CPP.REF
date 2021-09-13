@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include <filesystem>
 
-class Asset;
+class SAsset;
 
 class GAME_API SoftObjectPtrBase
 {
 protected:
-	static Asset* InternalLoadObject(const std::filesystem::path& importPath);
+	static SAsset* InternalLoadObject(const std::filesystem::path& importPath);
 	static void InternalUnloadObject(const std::filesystem::path& importPath);
 };
 

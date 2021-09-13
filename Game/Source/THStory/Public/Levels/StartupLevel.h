@@ -5,10 +5,10 @@
 #include "GameMinimal.h"
 #include "Level/Level.h"
 
-class THSTORY_API StartupLevel : public Level
+class THSTORY_API SStartupLevel : public SLevel
 {
-	GENERATED_BODY(StartupLevel)
+	GENERATED_BODY(SStartupLevel)
 
 public:
-	StartupLevel();
+	SStartupLevel();
 };

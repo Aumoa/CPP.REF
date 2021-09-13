@@ -6,18 +6,18 @@
 #include "WindowsPlatformImage.h"
 #include <wincodec.h>
 
-WindowsPlatformImageLoader::WindowsPlatformImageLoader() : Super()
+SWindowsPlatformImageLoader::SWindowsPlatformImageLoader() : Super()
 {
 	// Initialize COM subsystem.
 	HR(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
 	HR(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&_factory)));
 }
 
-WindowsPlatformImageLoader::~WindowsPlatformImageLoader()
+SWindowsPlatformImageLoader::~SWindowsPlatformImageLoader()
 {
 }
 
-IPlatformImage* WindowsPlatformImageLoader::LoadImageFromFile(const std::filesystem::path& assetPath, ERHIPixelFormat desiredPixelFormat)
+IPlatformImage* SWindowsPlatformImageLoader::LoadImageFromFile(const std::filesystem::path& assetPath, ERHIPixelFormat desiredPixelFormat)
 {
 	ComPtr<IWICBitmapDecoder> decoder;
 	HR(_factory->CreateDecoderFromFilename(assetPath.wstring().c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder));
@@ -29,10 +29,10 @@ IPlatformImage* WindowsPlatformImageLoader::LoadImageFromFile(const std::filesys
 	HR(_factory->CreateFormatConverter(&converter));
 	HR(converter->Initialize(frame.Get(), GetPixelFormatGUID(desiredPixelFormat), WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
 
-	return NewObject<WindowsPlatformImage>(converter.Get(), desiredPixelFormat);
+	return NewObject<SWindowsPlatformImage>(converter.Get(), desiredPixelFormat);
 }
 
-const GUID& WindowsPlatformImageLoader::GetPixelFormatGUID(ERHIPixelFormat pixelFormat) const
+const GUID& SWindowsPlatformImageLoader::GetPixelFormatGUID(ERHIPixelFormat pixelFormat) const
 {
 	switch (pixelFormat)
 	{
@@ -48,6 +48,6 @@ const GUID& WindowsPlatformImageLoader::GetPixelFormatGUID(ERHIPixelFormat pixel
 
 IPlatformImageLoader& IPlatformImageLoader::Get()
 {
-	static WindowsPlatformImageLoader loader;
+	static SWindowsPlatformImageLoader loader;
 	return loader;
 }

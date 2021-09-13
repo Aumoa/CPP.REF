@@ -8,18 +8,18 @@
 #include "Components/PrimitiveComponent.h"
 #include "Materials/Material.h"
 
-Scene::Scene(World* worldOwner, RHIDevice* device) : Super()
+SScene::SScene(World* worldOwner, SRHIDevice* device) : Super()
 	, _world(worldOwner)
 	, _device(device)
 {
-	_localPlayerView = NewObject<SceneVisibility>(this);
+	_localPlayerView = NewObject<SSceneVisibility>(this);
 }
 
-Scene::~Scene()
+SScene::~SScene()
 {
 }
 
-void Scene::UpdateScene(std::chrono::duration<float> elapsedTime)
+void SScene::UpdateScene(std::chrono::duration<float> elapsedTime)
 {
 	for (auto& proxy : _primitives)
 	{
@@ -36,13 +36,13 @@ void Scene::UpdateScene(std::chrono::duration<float> elapsedTime)
 				continue;
 			}
 
-			PrimitiveComponent* component = proxy->GetComponent();
+			SPrimitiveComponent* component = proxy->GetComponent();
 			proxy->UpdateTransform_GameThread(component->GetComponentTransform());
 		}
 	}
 }
 
-void Scene::InitViews(const MinimalViewInfo& localPlayerView)
+void SScene::InitViews(const MinimalViewInfo& localPlayerView)
 {
 	_localPlayerView->CalcVisibility(localPlayerView);
 
@@ -54,8 +54,8 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 
 	// Collect primitive materials.
 	size_t renderers = 0;
-	std::set<RHIShader*> checks;
-	for (PrimitiveSceneProxy*& proxy : _primitives)
+	std::set<SRHIShader*> checks;
+	for (SPrimitiveSceneProxy*& proxy : _primitives)
 	{
 		if (proxy != nullptr)
 		{
@@ -65,7 +65,7 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 				{
 					if (materialSlot != nullptr)
 					{
-						std::map<size_t, std::vector<RHIShader*>>::iterator it;
+						std::map<size_t, std::vector<SRHIShader*>>::iterator it;
 
 						size_t queueNumber = 0;
 						switch (materialSlot->GetBlendMode())
@@ -89,7 +89,7 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 						it = _renderQueue.find(queueNumber);
 						if (it == _renderQueue.end())
 						{
-							it = _renderQueue.emplace_hint(it, queueNumber, std::vector<RHIShader*>());
+							it = _renderQueue.emplace_hint(it, queueNumber, std::vector<SRHIShader*>());
 						}
 
 						if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())
@@ -112,13 +112,13 @@ void Scene::InitViews(const MinimalViewInfo& localPlayerView)
 	{
 		for (auto& slots : it.second)
 		{
-			SceneRenderer& renderer = _renderers.emplace_back(this, (RHIShader*)slots);
+			SSceneRenderer& renderer = _renderers.emplace_back(this, (SRHIShader*)slots);
 			renderer.CollectPrimitives(_localPlayerView);
 		}
 	}
 }
 
-void Scene::RenderScene(RHIDeviceContext* dc)
+void SScene::RenderScene(SRHIDeviceContext* dc)
 {
 	for (auto& renderer : _renderers)
 	{
@@ -126,7 +126,7 @@ void Scene::RenderScene(RHIDeviceContext* dc)
 	}
 }
 
-int64 Scene::AddPrimitive(PrimitiveSceneProxy* proxy)
+int64 SScene::AddPrimitive(SPrimitiveSceneProxy* proxy)
 {
 	// Change proxy's outer for manage lifecycle with render thread.
 	if (proxy->GetOuter() != this)
@@ -149,7 +149,7 @@ int64 Scene::AddPrimitive(PrimitiveSceneProxy* proxy)
 	}
 }
 
-void Scene::RemovePrimitive(int64 primitiveId)
+void SScene::RemovePrimitive(int64 primitiveId)
 {
 	// PrimitiveId < 0 ==> Invalid parameter.
 	if (primitiveId < 0)
@@ -174,9 +174,9 @@ void Scene::RemovePrimitive(int64 primitiveId)
 	_spaces.emplace(primitiveId);
 }
 
-PrimitiveSceneProxy* Scene::RecreateRenderSceneProxy(PrimitiveSceneProxy* proxy)
+SPrimitiveSceneProxy* SScene::RecreateRenderSceneProxy(SPrimitiveSceneProxy* proxy)
 {
-	PrimitiveComponent* component = proxy->GetComponent();
+	SPrimitiveComponent* component = proxy->GetComponent();
 	int64 primitiveId = proxy->PrimitiveId;
 	DestroySubobject(proxy);
 	proxy = component->CreateSceneProxy();

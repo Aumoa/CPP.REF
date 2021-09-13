@@ -14,8 +14,8 @@ bool ARook::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built
 	return DirectionalMovablePiece::QueryMovable(this, query, built, true, false, 8);
 }
 
-StaticMesh* ARook::GetStaticMesh() const
+SStaticMesh* ARook::GetStaticMesh() const
 {
-	static StaticMesh* globalMesh = GameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
+	static SStaticMesh* globalMesh = SGameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
 	return globalMesh;
 }

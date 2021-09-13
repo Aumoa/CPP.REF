@@ -15,15 +15,15 @@
 #include "SlateShaderVS.hlsl.h"
 #include "SlateShaderPS.hlsl.h"
 
-SlateShader::SlateShader(RHIDevice* device) : Super(device)
+SSlateShader::SSlateShader(SRHIDevice* device) : Super(device)
 {
-	class SlateShaderMaterial : public Material
+	class SlateShaderMaterial : public SMaterial
 	{
 	public:
-		using Super = Material;
+		using Super = SMaterial;
 
 	public:
-		SlateShaderMaterial(SlateShader* shader) : Super(shader)
+		SlateShaderMaterial(SSlateShader* shader) : Super(shader)
 		{
 		}
 
@@ -41,10 +41,10 @@ SlateShader::SlateShader(RHIDevice* device) : Super(device)
 	};
 
 	_material = NewObject<SlateShaderMaterial>(this);
-	_shaderDescriptorView = NewObject<RHIShaderDescriptorView>(GEngine->GetEngineSubsystem<GameRenderSystem>()->GetRHIDevice());
+	_shaderDescriptorView = NewObject<SRHIShaderDescriptorView>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
-void SlateShader::Compile(RHIVertexFactory* vertexDeclaration)
+void SSlateShader::Compile(SRHIVertexFactory* vertexDeclaration)
 {
 	_imageSourceRanges.emplace_back() =
 	{
@@ -65,7 +65,7 @@ void SlateShader::Compile(RHIVertexFactory* vertexDeclaration)
 	Super::Compile(vertexDeclaration);
 }
 
-std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaration() const
+std::vector<RHIShaderParameterElement> SSlateShader::GetShaderParameterDeclaration() const
 {
 	std::vector<RHIShaderParameterElement> elements;
 	elements.reserve(4);
@@ -127,12 +127,12 @@ std::vector<RHIShaderParameterElement> SlateShader::GetShaderParameterDeclaratio
 	return elements;
 }
 
-Material* SlateShader::GetDefaultMaterial() const
+SMaterial* SSlateShader::GetDefaultMaterial() const
 {
 	return _material;
 }
 
-auto SlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const -> DrawElement
+auto SSlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const -> DrawElement
 {
 	DrawElement drawElement;
 	drawElement.M = geometry.GetMatrix();
@@ -142,7 +142,7 @@ auto SlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector
 	return drawElement;
 }
 
-void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2& screenSize, SlateWindowElementList* elements)
+void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements)
 {
 	// Caching max elements.
 	size_t maxDescriptors = 1;
@@ -182,12 +182,12 @@ void SlateShader::RenderElements(RHIDeviceContext* deviceContext, const Vector2&
 	deviceContext->DrawInstanced(4, 1);
 }
 
-std::span<uint8 const> SlateShader::CompileVS()
+std::span<uint8 const> SSlateShader::CompileVS()
 {
 	return pSlateShaderVS;
 }
 
-std::span<uint8 const> SlateShader::CompilePS()
+std::span<uint8 const> SSlateShader::CompilePS()
 {
 	return pSlateShaderPS;
 }

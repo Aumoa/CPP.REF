@@ -14,8 +14,8 @@ bool ABishop::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& bui
 	return DirectionalMovablePiece::QueryMovable(this, query, built, false, true, 8);
 }
 
-StaticMesh* ABishop::GetStaticMesh() const
+SStaticMesh* ABishop::GetStaticMesh() const
 {
-	static StaticMesh* globalMesh = GameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
+	static SStaticMesh* globalMesh = SGameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
 	return globalMesh;
 }

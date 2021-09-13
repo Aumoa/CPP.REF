@@ -3,6 +3,6 @@
 #include "pch.h"
 #include "GameFramework/Player.h"
 
-Player::Player() : Super()
+SPlayer::SPlayer() : Super()
 {
 }

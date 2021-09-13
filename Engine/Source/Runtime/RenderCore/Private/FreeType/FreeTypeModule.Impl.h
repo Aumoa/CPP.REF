@@ -6,7 +6,7 @@
 #include FT_FREETYPE_H
 #include "FreeType/FreeTypeModule.h"
 
-struct FreeTypeModule::Impl
+struct SFreeTypeModule::Impl
 {
 	bool bInit = false;
 	FT_Library Library;

@@ -11,19 +11,19 @@ class World;
 /// <summary>
 /// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
 /// </summary>
-class GAME_API GameObject : virtual public Object
+class GAME_API SGameObject : virtual public SObject
 {
-	GENERATED_BODY(GameObject)
+	GENERATED_BODY(SGameObject)
 
 private:
 	mutable std::wstring _name;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="GameObject"/> instance.
+	/// Initialize new <see cref="SGameObject"/> instance.
 	/// </summary>
 	/// <param name="name"> The object name. </param>
-	GameObject();
+	SGameObject();
 
 	/// <inheritdoc/>
 	virtual std::wstring ToString() const;
@@ -42,9 +42,9 @@ public:
 	void SetWorld(World* value);
 
 public:
-	static Object* LoadObject(const std::filesystem::path& assetPath);
+	static SObject* LoadObject(const std::filesystem::path& assetPath);
 
-	template<std::derived_from<Object> T>
+	template<std::derived_from<SObject> T>
 	static T* LoadObject(const std::filesystem::path& assetPath)
 	{
 		return dynamic_cast<T*>(LoadObject(assetPath));

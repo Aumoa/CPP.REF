@@ -6,15 +6,15 @@
 #include "GameStructures.h"
 #include "BitfieldInputChangeTracker.h"
 
-class KeyboardTracker : virtual public Object
+class SKeyboardTracker : virtual public SObject
 {
-	GENERATED_BODY(KeyboardTracker)
+	GENERATED_BODY(SKeyboardTracker)
 
 private:
 	BitfieldInputChangeTracker<KeyboardState> _tracker;
 
 public:
-	inline KeyboardTracker()
+	inline SKeyboardTracker()
 	{
 	}
 

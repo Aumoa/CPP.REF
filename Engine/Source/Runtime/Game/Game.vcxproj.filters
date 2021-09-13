@@ -130,9 +130,6 @@
     <Filter Include="Private\Widgets\Panel">
       <UniqueIdentifier>{fa511637-45b3-40e5-816e-f1abaf0616f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\Shaders\FontShader">
-      <UniqueIdentifier>{b8c3756c-dd87-4dad-8c47-e5148430b068}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">

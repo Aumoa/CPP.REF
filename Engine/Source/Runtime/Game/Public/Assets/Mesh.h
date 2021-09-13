@@ -5,11 +5,11 @@
 #include "RenderMinimal.h"
 #include "StreamableRenderAsset.h"
 
-class GAME_API Mesh : public StreamableRenderAsset
+class GAME_API SMesh : public SStreamableRenderAsset
 {
-	GENERATED_BODY(Mesh)
+	GENERATED_BODY(SMesh)
 
 public:
-	Mesh(const std::filesystem::path& assetPath);
-	~Mesh() override;
+	SMesh(const std::filesystem::path& assetPath);
+	~SMesh() override;
 };

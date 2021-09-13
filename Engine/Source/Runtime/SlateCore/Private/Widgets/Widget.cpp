@@ -17,12 +17,12 @@ std::wstring SWidget::ToString(std::wstring_view formatArgs) const
 	return std::format(L"{}({}): [{}] ({})", _name, StringUtils::AsUnicode(typeid(*this).name()), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
 }
 
-int32 SWidget::Paint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SWidget::Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
 	return OnPaint(paintArgs, allottedGeometry, cullingRect, drawElements, layer, bParentEnabled);
 }
 
-void SWidget::ArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SWidget::ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
 {
 	OnArrangeChildren(arrangedChildrens, allottedGeometry);
 }

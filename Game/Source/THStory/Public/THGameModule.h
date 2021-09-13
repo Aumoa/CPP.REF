@@ -5,10 +5,10 @@
 #include "GameMinimal.h"
 #include "GameModule.h"
 
-class THSTORY_API THGameModule : public GameModule
+class THSTORY_API STHGameModule : public SGameModule
 {
-	GENERATED_BODY(THGameModule)
+	GENERATED_BODY(STHGameModule)
 
 public:
-	virtual GameInstance* CreatePrimaryGameModule() override;
+	virtual SGameInstance* CreatePrimaryGameModule() override;
 };

@@ -8,10 +8,10 @@
 class AChessBoard;
 class AChessBoardProxy;
 
-class ChessSystemComponent : public ActorComponent
+class ChessSystemComponent : public SActorComponent
 {
 public:
-	using Super = ActorComponent;
+	using Super = SActorComponent;
 
 private:
 	AChessBoard* _board = nullptr;

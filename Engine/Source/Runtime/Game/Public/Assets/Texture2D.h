@@ -5,25 +5,25 @@
 #include "RenderMinimal.h"
 #include "StreamableRenderAsset.h"
 
-class RHITexture2D;
-class RHIShaderResourceView;
+class SRHITexture2D;
+class SRHIShaderResourceView;
 
-class GAME_API Texture2D : public StreamableRenderAsset
+class GAME_API STexture2D : public SStreamableRenderAsset
 {
-	GENERATED_BODY(Texture2D)
+	GENERATED_BODY(STexture2D)
 
 private:
-	RHITexture2D* _texture = nullptr;
-	RHIShaderResourceView* _shaderResourceView = nullptr;
+	SRHITexture2D* _texture = nullptr;
+	SRHIShaderResourceView* _shaderResourceView = nullptr;
 
 public:
-	Texture2D(const std::filesystem::path& assetPath);
-	virtual ~Texture2D() override;
+	STexture2D(const std::filesystem::path& assetPath);
+	virtual ~STexture2D() override;
 
 	virtual void StreamIn() override;
 
-	RHITexture2D* GetRHITexture() const { return _texture; }
-	RHIShaderResourceView* GetShaderResourceView() const { return _shaderResourceView; }
+	SRHITexture2D* GetRHITexture() const { return _texture; }
+	SRHIShaderResourceView* GetShaderResourceView() const { return _shaderResourceView; }
 	void GetPixelSize(int32* pWidth, int32* pHeight) const;
 	Vector2 GetSize() const;
 };

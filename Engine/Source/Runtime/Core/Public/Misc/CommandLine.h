@@ -6,14 +6,14 @@
 #include <string_view>
 #include <vector>
 
-class CommandLine : virtual public Object
+class SCommandLine : virtual public SObject
 {
 private:
 	std::vector<std::wstring> _resolvedArgs;
 
 public:
 	template<class TString>
-	CommandLine(const std::vector<TString>& platformArgs)
+	SCommandLine(const std::vector<TString>& platformArgs)
 	{
 		std::optional<std::wostringstream> woss;
 

@@ -6,23 +6,23 @@
 #include "GameEngineSubsystem.h"
 #include "SubclassOf.h"
 
-class Level;
+class SLevel;
 
-class GAME_API GameLevelSystem : public GameEngineSubsystem
+class GAME_API SGameLevelSystem : public SGameEngineSubsystem
 {
-	GENERATED_BODY(GameLevelSystem)
+	GENERATED_BODY(SGameLevelSystem)
 
 private:
 	World* _world = nullptr;
-	Level* _loadedLevel = nullptr;
+	SLevel* _loadedLevel = nullptr;
 
 public:
-	GameLevelSystem();
-	virtual ~GameLevelSystem() override;
+	SGameLevelSystem();
+	virtual ~SGameLevelSystem() override;
 
 	virtual void Init() override;
 
 	World* GetWorld() const;
-	bool OpenLevel(SubclassOf<Level> levelToLoad);
-	Level* GetLevel() const;
+	bool OpenLevel(SubclassOf<SLevel> levelToLoad);
+	SLevel* GetLevel() const;
 };

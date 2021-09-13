@@ -9,25 +9,25 @@
 #include "LogGame.h"
 #include "GameFramework/Actor.h"
 
-class Level;
-class Scene;
-class GameEngine;
+class SLevel;
+class SScene;
+class SGameEngine;
 class APlayerController;
 class APlayerCameraManager;
-class TickFunction;
+class STickFunction;
 
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
 /// </summary>
-class GAME_API World : public GameObject
+class GAME_API World : public SGameObject
 {
 	GENERATED_BODY(World)
 
 private:
 	std::set<AActor*> _actors;
-	Level* _level = nullptr;
-	std::set<TickFunction*> _tickInstances;
-	Scene* _scene = nullptr;
+	SLevel* _level = nullptr;
+	std::set<STickFunction*> _tickInstances;
+	SScene* _scene = nullptr;
 
 	APlayerController* _playerController = nullptr;
 	APlayerCameraManager* _playerCamera = nullptr;
@@ -91,17 +91,17 @@ public:
 	/// <summary>
 	/// Load level.
 	/// </summary>
-	Level* LoadLevel(SubclassOf<Level> levelToLoad);
+	SLevel* LoadLevel(SubclassOf<SLevel> levelToLoad);
 
-	void RegisterTickFunction(TickFunction* function);
-	void RegisterComponent(ActorComponent* component);
-	void UnregisterTickFunction(TickFunction* function);
-	void UnregisterComponent(ActorComponent* component);
+	void RegisterTickFunction(STickFunction* function);
+	void RegisterComponent(SActorComponent* component);
+	void UnregisterTickFunction(STickFunction* function);
+	void UnregisterComponent(SActorComponent* component);
 
 	virtual void LevelTick(std::chrono::duration<float> elapsedTime);
-	Scene* GetScene() const { return _scene; }
+	SScene* GetScene() const { return _scene; }
 	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
-	Level* GetLevel() const { return _level; }
+	SLevel* GetLevel() const { return _level; }
 
 private:
 	bool InternalSpawnActor(AActor* instance);

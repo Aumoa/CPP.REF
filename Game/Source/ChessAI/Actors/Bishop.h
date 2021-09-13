@@ -19,5 +19,5 @@ public:
 	virtual bool QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built) const override;
 
 protected:
-	virtual StaticMesh* GetStaticMesh() const override;
+	virtual SStaticMesh* GetStaticMesh() const override;
 };

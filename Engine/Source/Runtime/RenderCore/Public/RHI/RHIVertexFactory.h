@@ -7,24 +7,24 @@
 #include <vector>
 #include "RHIStructures.h"
 
-class RHIResource;
+class SRHIResource;
 
-class RENDERCORE_API RHIVertexFactory : public RHIDeviceChild
+class RENDERCORE_API SRHIVertexFactory : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHIVertexFactory)
+	GENERATED_BODY(SRHIVertexFactory)
 
 public:
-	RHIVertexFactory(RHIDevice* device);
+	SRHIVertexFactory(SRHIDevice* device);
 
 	/// <summary>
 	/// Create vertex buffer using vertex declaration of this shader program.
 	/// </summary>
-	virtual RHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const;
+	virtual SRHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const;
 
 	/// <summary>
 	/// Create index buffer.
 	/// </summary>
-	virtual RHIResource* CreateIndexBuffer(const uint32* indices, size_t count) const;
+	virtual SRHIResource* CreateIndexBuffer(const uint32* indices, size_t count) const;
 
 	/// <summary>
 	/// Get vertex stride.

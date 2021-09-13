@@ -16,7 +16,7 @@ APlayerController::APlayerController() : Super()
 {
 }
 
-CameraComponent* APlayerController::FindPlayerCameraComponent() const
+SCameraComponent* APlayerController::FindPlayerCameraComponent() const
 {
 	APawn* pawn = GetPawn();
 	if (pawn == nullptr)
@@ -24,7 +24,7 @@ CameraComponent* APlayerController::FindPlayerCameraComponent() const
 		return nullptr;
 	}
 
-	return pawn->GetComponentAs<CameraComponent>();
+	return pawn->GetComponentAs<SCameraComponent>();
 }
 
 void APlayerController::SpawnCameraManager(World* level)
@@ -97,7 +97,7 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 	return ray;
 }
 
-void APlayerController::SetLocalPlayer(LocalPlayer* localPlayer)
+void APlayerController::SetLocalPlayer(SLocalPlayer* localPlayer)
 {
 	_localPlayer = localPlayer;
 }

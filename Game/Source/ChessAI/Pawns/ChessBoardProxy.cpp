@@ -8,7 +8,7 @@
 AChessBoardProxy::AChessBoardProxy(AChessBoard* chessBoard) : Super()
 	, _board(chessBoard)
 {
-	CameraComponent* cp = NewObject<CameraComponent>();
+	SCameraComponent* cp = NewObject<SCameraComponent>();
 	SetRootComponent(cp);
 }
 

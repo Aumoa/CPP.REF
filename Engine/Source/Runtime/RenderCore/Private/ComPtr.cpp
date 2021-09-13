@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "ComPtr.h"
 
-void HR(LogCategory& category, HRESULT hr)
+void HR(SLogCategory& category, HRESULT hr)
 {
     if (FAILED(hr))
     {
@@ -13,7 +13,7 @@ void HR(LogCategory& category, HRESULT hr)
     }
 }
 
-void HR_E(LogCategory& category, HRESULT hr)
+void HR_E(SLogCategory& category, HRESULT hr)
 {
     if (FAILED(hr))
     {

@@ -5,13 +5,13 @@
 #include "RenderMinimal.h"
 #include "Asset.h"
 
-class GAME_API StreamableRenderAsset : public Asset
+class GAME_API SStreamableRenderAsset : public SAsset
 {
-	GENERATED_BODY(StreamableRenderAsset)
+	GENERATED_BODY(SStreamableRenderAsset)
 
 public:
-	StreamableRenderAsset(const std::filesystem::path& assetPath);
-	~StreamableRenderAsset() override;
+	SStreamableRenderAsset(const std::filesystem::path& assetPath);
+	~SStreamableRenderAsset() override;
 
 	virtual void StreamIn() = 0;
 };

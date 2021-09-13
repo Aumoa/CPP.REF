@@ -27,37 +27,37 @@ constexpr bool bDebug = false;
 
 DEFINE_LOG_CATEGORY(LogRender);
 
-GameRenderSystem::GameRenderSystem() : Super()
+SGameRenderSystem::SGameRenderSystem() : Super()
 {
 }
 
-GameRenderSystem::~GameRenderSystem()
+SGameRenderSystem::~SGameRenderSystem()
 {
 }
 
-void GameRenderSystem::Init()
+void SGameRenderSystem::Init()
 {
 	using namespace std;
 
 	SE_LOG(LogRender, Verbose, L"Beginning initialize GameRenderSystem.");
 
-	_scheduler = NewObject<TickScheduler>();
-	_device = NewObject<RHIDevice>(bDebug);
+	_scheduler = NewObject<STickScheduler>();
+	_device = NewObject<SRHIDevice>(bDebug);
 	_primaryQueue = _device->GetPrimaryQueue();
-	_deviceContext = NewObject<RHIDeviceContext>(_device);
-	_colorVertexFactory = NewObject<ColorVertexFactory>(_device);
-	_colorShader = NewObject<ColorShader>(_device);
+	_deviceContext = NewObject<SRHIDeviceContext>(_device);
+	_colorVertexFactory = NewObject<SColorVertexFactory>(_device);
+	_colorShader = NewObject<SColorShader>(_device);
 	_colorShader->Compile(_colorVertexFactory);
-	_rtv = NewObject<RHIRenderTargetView>(_device, 3);
-	_dsv = NewObject<RHIDepthStencilView>(_device, 1);
-	_transparentShader = NewObject<TransparentShader>(_device);
+	_rtv = NewObject<SRHIRenderTargetView>(_device, 3);
+	_dsv = NewObject<SRHIDepthStencilView>(_device, 1);
+	_transparentShader = NewObject<STransparentShader>(_device);
 	_transparentShader->Compile(_colorVertexFactory);
-	_slateShader = NewObject<SlateShader>(_device);
+	_slateShader = NewObject<SSlateShader>(_device);
 	_slateShader->Compile(nullptr);
-	_freeTypeModule = NewObject<FreeTypeModule>();
-	_fontCachingManager = NewObject<FontCachingManager>(_device);
+	_freeTypeModule = NewObject<SFreeTypeModule>();
+	_fontCachingManager = NewObject<SFontCachingManager>(_device);
 
-	FontFace* ff = _freeTypeModule->CreateFontFace(L"Arial");
+	SFontFace* ff = _freeTypeModule->CreateFontFace(L"Arial");
 	ff->SetFontSize(20);
 
 	_fontCachingManager->StreamGlyphs(ff, L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 ");
@@ -73,7 +73,7 @@ void GameRenderSystem::Init()
 	SE_LOG(LogRender, Verbose, L"Finish to initialize GameRenderSystem.");
 }
 
-void GameRenderSystem::Present()
+void SGameRenderSystem::Present()
 {
 	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
 
@@ -116,7 +116,7 @@ void GameRenderSystem::Present()
 	_deviceContext->RSSetScissorRects(1, &sc);
 	_deviceContext->RSSetViewports(1, &vp);
 
-	GameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<GameLevelSystem>();
+	SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
 	World* world = levelSystem->GetWorld();
 	//APlayerCameraManager* playerCamera = world->GetPlayerCamera();
 
@@ -126,7 +126,7 @@ void GameRenderSystem::Present()
 	//scene->InitViews(localPlayerView);
 	//scene->RenderScene(_deviceContext);
 
-	LocalPlayer* localPlayer = GEngine->GetEngineSubsystem<GamePlayerSystem>()->GetLocalPlayer();
+	SLocalPlayer* localPlayer = GEngine->GetEngineSubsystem<SGamePlayerSystem>()->GetLocalPlayer();
 	if (localPlayer)
 	{
 		_deviceContext->SetGraphicsShader(_slateShader);
@@ -145,19 +145,19 @@ void GameRenderSystem::Present()
 	_primaryQueue->WaitLastSignal();
 }
 
-void GameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)
+void SGameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)
 {
 	_frameworkView = frameworkView;
-	_frameworkViewChain = NewObject<RHISwapChain>(_device, frameworkView, _primaryQueue);
-	_frameworkView->Size.AddObject(this, &GameRenderSystem::ResizeApp);
+	_frameworkViewChain = NewObject<SRHISwapChain>(_device, frameworkView, _primaryQueue);
+	_frameworkView->Size.AddObject(this, &SGameRenderSystem::ResizeApp);
 }
 
-IFrameworkView* GameRenderSystem::GetFrameworkView() const
+IFrameworkView* SGameRenderSystem::GetFrameworkView() const
 {
 	return _frameworkView;
 }
 
-void GameRenderSystem::Collect()
+void SGameRenderSystem::Collect()
 {
 	if (int32 collect = _primaryQueue->Collect(); collect)
 	{
@@ -165,7 +165,7 @@ void GameRenderSystem::Collect()
 	}
 }
 
-void GameRenderSystem::ResizeApp(int32 width, int32 height)
+void SGameRenderSystem::ResizeApp(int32 width, int32 height)
 {
 	if (width == 0 || height == 0)
 	{
@@ -180,7 +180,7 @@ void GameRenderSystem::ResizeApp(int32 width, int32 height)
 
 	for (int32 i = 0; i < 3; ++i)
 	{
-		RHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
+		SRHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
 		_rtv->CreateRenderTargetView(texture, i);
 	}
 

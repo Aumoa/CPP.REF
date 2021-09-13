@@ -7,17 +7,17 @@
 #include "ComPtr.h"
 
 struct ID3D12DescriptorHeap;
-class RHIDeviceContext;
-class RHIShaderResourceView;
+class SRHIDeviceContext;
+class SRHIShaderResourceView;
 struct D3D12_CPU_DESCRIPTOR_HANDLE;
 struct D3D12_GPU_DESCRIPTOR_HANDLE;
 
-class RENDERCORE_API RHIShaderDescriptorView : public RHIDeviceChild
+class RENDERCORE_API SRHIShaderDescriptorView : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHIShaderDescriptorView)
+	GENERATED_BODY(SRHIShaderDescriptorView)
 
 	// For access to internal, and collecting garbages.
-	friend class RHIDeviceContext;
+	friend class SRHIDeviceContext;
 
 private:
 	size_t _count = 0;
@@ -30,17 +30,17 @@ private:
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="RHIShaderDescriptorView"/> instance.
+	/// Initialize new <see cref="SRHIShaderDescriptorView"/> instance.
 	/// </summary>
 	/// <param name="device"> The logical device. </param>
-	RHIShaderDescriptorView(RHIDevice* device);
-	~RHIShaderDescriptorView() override;
+	SRHIShaderDescriptorView(SRHIDevice* device);
+	~SRHIShaderDescriptorView() override;
 
 	void SetMaxDescriptorCount(size_t count);
 	size_t GetMaxDescriptorCount() const;
 
 	void ResetBindings();
-	size_t Bind(RHIShaderResourceView* view);
+	size_t Bind(SRHIShaderResourceView* view);
 
 private:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(size_t index) const;

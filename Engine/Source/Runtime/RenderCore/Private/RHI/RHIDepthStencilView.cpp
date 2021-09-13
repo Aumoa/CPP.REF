@@ -7,7 +7,7 @@
 #include "RHI/RHIDevice.h"
 #include "RHI/RHITexture2D.h"
 
-RHIDepthStencilView::RHIDepthStencilView(RHIDevice* device, uint32 descriptorCount) : Super(device)
+SRHIDepthStencilView::SRHIDepthStencilView(SRHIDevice* device, uint32 descriptorCount) : Super(device)
 	, _descriptorCount(descriptorCount)
 {
 	ID3D12Device* dev = device->GetDevice();
@@ -21,11 +21,11 @@ RHIDepthStencilView::RHIDepthStencilView(RHIDevice* device, uint32 descriptorCou
 	_increment = dev->GetDescriptorHandleIncrementSize(heapd.Type);
 }
 
-RHIDepthStencilView::~RHIDepthStencilView()
+SRHIDepthStencilView::~SRHIDepthStencilView()
 {
 }
 
-void RHIDepthStencilView::CreateDepthStencilView(RHITexture2D* texture, int32 index)
+void SRHIDepthStencilView::CreateDepthStencilView(SRHITexture2D* texture, int32 index)
 {
 	ID3D12Resource* resource = texture->GetResource();
 	ID3D12Device* dev = GetDevice()->GetDevice();
@@ -36,7 +36,7 @@ void RHIDepthStencilView::CreateDepthStencilView(RHITexture2D* texture, int32 in
 	dev->CreateDepthStencilView(resource, nullptr, handle);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE RHIDepthStencilView::GetCPUDescriptorHandle(int32 index) const
+D3D12_CPU_DESCRIPTOR_HANDLE SRHIDepthStencilView::GetCPUDescriptorHandle(int32 index) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _descriptor->GetCPUDescriptorHandleForHeapStart();
 	handle.ptr += _increment * index;

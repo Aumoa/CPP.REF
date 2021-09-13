@@ -5,16 +5,16 @@
 #include "GameEngine.h"
 #include "EngineSubsystems/GameAssetSystem.h"
 
-GameObject::GameObject() : Super()
+SGameObject::SGameObject() : Super()
 {
 }
 
-std::wstring GameObject::ToString() const
+std::wstring SGameObject::ToString() const
 {
 	return GetName();
 }
 
-std::wstring GameObject::GetName() const
+std::wstring SGameObject::GetName() const
 {
 	if (_name.length() == 0)
 	{
@@ -23,12 +23,12 @@ std::wstring GameObject::GetName() const
 	return _name;
 }
 
-World* GameObject::GetWorld() const
+World* SGameObject::GetWorld() const
 {
 	if (_WorldPrivate == nullptr)
 	{
 		// Caching world instance with outer chain.
-		if (auto* isGameObject = dynamic_cast<GameObject*>(GetOuter()); isGameObject != nullptr)
+		if (auto* isGameObject = dynamic_cast<SGameObject*>(GetOuter()); isGameObject != nullptr)
 		{
 			_WorldPrivate = isGameObject->GetWorld();
 		}
@@ -37,12 +37,12 @@ World* GameObject::GetWorld() const
 	return _WorldPrivate;
 }
 
-void GameObject::SetWorld(World* value)
+void SGameObject::SetWorld(World* value)
 {
 	_WorldPrivate = value;
 }
 
-Object* GameObject::LoadObject(const std::filesystem::path& assetPath)
+SObject* SGameObject::LoadObject(const std::filesystem::path& assetPath)
 {
-	return GEngine->GetEngineSubsystem<GameAssetSystem>()->LoadObject(assetPath);
+	return GEngine->GetEngineSubsystem<SGameAssetSystem>()->LoadObject(assetPath);
 }

@@ -11,15 +11,15 @@
 #include "ColorShaderVS.hlsl.h"
 #include "ColorShaderPS.hlsl.h"
 
-ColorShader::ColorShader(RHIDevice* device) : Super(device)
+SColorShader::SColorShader(SRHIDevice* device) : Super(device)
 {
-	class ColorShaderMaterial : public Material
+	class ColorShaderMaterial : public SMaterial
 	{
 	public:
-		using Super = Material;
+		using Super = SMaterial;
 
 	public:
-		ColorShaderMaterial(ColorShader* shader) : Super(shader)
+		ColorShaderMaterial(SColorShader* shader) : Super(shader)
 		{
 		}
 
@@ -39,22 +39,22 @@ ColorShader::ColorShader(RHIDevice* device) : Super(device)
 	_material = NewObject<ColorShaderMaterial>(this);
 }
 
-std::span<uint8 const> ColorShader::CompileVS()
+std::span<uint8 const> SColorShader::CompileVS()
 {
 	return pColorShaderVS;
 }
 
-std::span<uint8 const> ColorShader::CompilePS()
+std::span<uint8 const> SColorShader::CompilePS()
 {
 	return pColorShaderPS;
 }
 
-Material* ColorShader::GetDefaultMaterial() const
+SMaterial* SColorShader::GetDefaultMaterial() const
 {
 	return _material;
 }
 
-std::vector<RHIShaderParameterElement> ColorShader::GetShaderParameterDeclaration() const
+std::vector<RHIShaderParameterElement> SColorShader::GetShaderParameterDeclaration() const
 {
 	std::vector<RHIShaderParameterElement> elements;
 

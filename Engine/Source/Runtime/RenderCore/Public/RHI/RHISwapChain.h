@@ -8,29 +8,29 @@
 
 struct IDXGISwapChain4;
 struct IWindowView;
-class RHITexture2D;
-class RHICommandQueue;
+class SRHITexture2D;
+class SRHICommandQueue;
 
 /// <summary>
 /// Represents interface implements one or more surfaces for storing rendered data before presenting it to an output.
 /// </summary>
-class RENDERCORE_API RHISwapChain : virtual public RHIDeviceChild
+class RENDERCORE_API SRHISwapChain : virtual public SRHIDeviceChild
 {
-	GENERATED_BODY(RHISwapChain)
+	GENERATED_BODY(SRHISwapChain)
 
 private:
 	ComPtr<IDXGISwapChain4> _swapChain;
-	RHITexture2D* _buffers[3] = {};
+	SRHITexture2D* _buffers[3] = {};
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="RHISwapChain"/> instance.
+	/// Initialize new <see cref="SRHISwapChain"/> instance.
 	/// </summary>
 	/// <param name="device"> The logical device. </param>
 	/// <param name="view"> The render target view. </param>
 	/// <param name="queue"> Specify command queue that swap chain be presenting. </param>
-	RHISwapChain(RHIDevice* device, IWindowView* view, RHICommandQueue* queue);
-	~RHISwapChain() override;
+	SRHISwapChain(SRHIDevice* device, IWindowView* view, SRHICommandQueue* queue);
+	~SRHISwapChain() override;
 
 	/// <summary>
 	/// Presents a rendered image to the view target.
@@ -46,7 +46,7 @@ public:
 	/// <summary>
 	/// Get allocated buffer.
 	/// </summary>
-	RHITexture2D* GetBuffer(int32 index) const;
+	SRHITexture2D* GetBuffer(int32 index) const;
 
 	/// <summary>
 	/// Get current back buffer index.

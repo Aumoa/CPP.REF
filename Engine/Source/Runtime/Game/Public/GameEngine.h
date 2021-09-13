@@ -8,33 +8,33 @@
 #include "Ticking/TickScheduler.h"
 #include "Misc/TickCalc.h"
 
-class GameInstance;
-class ColorVertexFactory;
-class ColorShader;
-class AssetImporter;
-class RHITexture2D;
-class TransparentShader;
-class SlateShader;
-class GameEngineSubsystem;
+class SGameInstance;
+class SColorVertexFactory;
+class SColorShader;
+class SAssetImporter;
+class SRHITexture2D;
+class STransparentShader;
+class SSlateShader;
+class SGameEngineSubsystem;
 struct IFrameworkView;
 
 /// <summary>
 /// Represents game engine that manage core resources.
 /// </summary>
-class GAME_API GameEngine : virtual public Object
+class GAME_API SGameEngine : virtual public SObject
 {
-	GENERATED_BODY(GameEngine)
+	GENERATED_BODY(SGameEngine)
 
 private:
-	GameInstance* _gameInstance = nullptr;
+	SGameInstance* _gameInstance = nullptr;
 	std::optional<std::chrono::steady_clock::time_point> _prev;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="GameEngine"/> instance.
+	/// Initialize new <see cref="SGameEngine"/> instance.
 	/// <summary>
-	GameEngine();
-	~GameEngine() override;
+	SGameEngine();
+	~SGameEngine() override;
 
 	/// <summary>
 	/// Initialize engine system.
@@ -45,11 +45,11 @@ public:
 
 	static int32 InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs);
 
-	GameInstance* GetGameInstance() const;
+	SGameInstance* GetGameInstance() const;
 
 private:
-	std::vector<GameEngineSubsystem*> _subsystems;
-	mutable std::map<size_t, GameEngineSubsystem*> _cachedMapSubsystems;
+	std::vector<SGameEngineSubsystem*> _subsystems;
+	mutable std::map<size_t, SGameEngineSubsystem*> _cachedMapSubsystems;
 
 	void InitializeSubsystems();
 
@@ -92,4 +92,4 @@ private:
 	void RenderTick(std::chrono::duration<float> elapsedTime);
 };
 
-extern GAME_API GameEngine* GEngine;
+extern GAME_API SGameEngine* GEngine;

@@ -3,10 +3,10 @@
 #include "pch.h"
 #include "EngineSubsystems/GameEngineSubsystem.h"
 
-GameEngineSubsystem::GameEngineSubsystem() : Super()
+SGameEngineSubsystem::SGameEngineSubsystem() : Super()
 {
 }
 
-GameEngineSubsystem::~GameEngineSubsystem()
+SGameEngineSubsystem::~SGameEngineSubsystem()
 {
 }

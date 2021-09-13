@@ -8,25 +8,25 @@
 #include "RHI/RHIDeviceContext.h"
 #include "InternalComPtr.h"
 
-RHIDynamicTexture2D::RHIDynamicTexture2D(RHIDevice* device, ID3D12Resource* texture, ID3D12Resource* uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout)
+SRHIDynamicTexture2D::SRHIDynamicTexture2D(SRHIDevice* device, ID3D12Resource* texture, ID3D12Resource* uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout)
 	: Super(device, texture)
 	, _texture(texture)
 	, _layout(layout)
 	, _uploadHeap(uploadHeap)
 {
 	HR(LogRHI, _uploadHeap->Map(0, nullptr, &_pointer));
-	_deviceContext = NewObject<RHIDeviceContext>(device);
+	_deviceContext = NewObject<SRHIDeviceContext>(device);
 }
 
-RHIDynamicTexture2D::~RHIDynamicTexture2D()
+SRHIDynamicTexture2D::~SRHIDynamicTexture2D()
 {
 }
 
-void RHIDynamicTexture2D::CloseUploadBuffer()
+void SRHIDynamicTexture2D::CloseUploadBuffer()
 {
 	if (_uploadHeap)
 	{
-		RHICommandQueue* queue = GetDevice()->GetPrimaryQueue();
+		SRHICommandQueue* queue = GetDevice()->GetPrimaryQueue();
 		queue->AddGarbageObject(queue->GetLastSignal(), _uploadHeap.Detach());
 		queue->AddGarbageObject(queue->GetLastSignal(), _deviceContext);
 
@@ -35,7 +35,7 @@ void RHIDynamicTexture2D::CloseUploadBuffer()
 	}
 }
 
-void RHIDynamicTexture2D::UpdatePixels(const void* buffer, int32 pixelStride, int32 sizeX, int32 sizeY, int32 locationX, int32 locationY)
+void SRHIDynamicTexture2D::UpdatePixels(const void* buffer, int32 pixelStride, int32 sizeX, int32 sizeY, int32 locationX, int32 locationY)
 {
 	check(_uploadHeap);
 	check(_pointer);
@@ -52,7 +52,7 @@ void RHIDynamicTexture2D::UpdatePixels(const void* buffer, int32 pixelStride, in
 	RefreshUpdateBox(locationX, locationY, locationX + sizeX, locationY + sizeY);
 }
 
-void RHIDynamicTexture2D::Apply()
+void SRHIDynamicTexture2D::Apply()
 {
 	check(_deviceContext);
 
@@ -105,13 +105,13 @@ void RHIDynamicTexture2D::Apply()
 
 	// Flushing graphics commands.
 	_deviceContext->End();
-	RHICommandQueue* queue = GetDevice()->GetPrimaryQueue();
+	SRHICommandQueue* queue = GetDevice()->GetPrimaryQueue();
 	queue->ExecuteDeviceContext(_deviceContext);
 
 	ResetUpdateBox();
 }
 
-void RHIDynamicTexture2D::RefreshUpdateBox(int32 left, int32 top, int32 right, int32 bottom)
+void SRHIDynamicTexture2D::RefreshUpdateBox(int32 left, int32 top, int32 right, int32 bottom)
 {
 	if (_updateBoxLeft == -1)
 	{
@@ -129,7 +129,7 @@ void RHIDynamicTexture2D::RefreshUpdateBox(int32 left, int32 top, int32 right, i
 	}
 }
 
-void RHIDynamicTexture2D::ResetUpdateBox()
+void SRHIDynamicTexture2D::ResetUpdateBox()
 {
 	_updateBoxLeft = -1;
 }

@@ -5,23 +5,23 @@
 #include "CoreMinimal.h"
 #include "Asset.h"
 
-class RHIVertexFactory;
-class StaticMeshRenderData;
+class SRHIVertexFactory;
+class SStaticMeshRenderData;
 struct RHIVertex;
 
-class GAME_API StaticMesh : public Asset
+class GAME_API SStaticMesh : public SAsset
 {
-	GENERATED_BODY(StaticMesh)
+	GENERATED_BODY(SStaticMesh)
 
 private:
 	std::wstring _name;
-	StaticMeshRenderData* _renderData = nullptr;
+	SStaticMeshRenderData* _renderData = nullptr;
 
 public:
-	StaticMesh(const std::filesystem::path& path, std::wstring_view name, StaticMeshRenderData* renderData);
+	SStaticMesh(const std::filesystem::path& path, std::wstring_view name, SStaticMeshRenderData* renderData);
 
 	std::wstring GetName() const { return _name; }
 
 public:
-	StaticMeshRenderData* GetRenderData() const { return _renderData; }
+	SStaticMeshRenderData* GetRenderData() const { return _renderData; }
 };

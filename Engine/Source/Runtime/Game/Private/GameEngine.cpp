@@ -21,19 +21,19 @@
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "EngineSubsystems/GameInputSystem.h"
 
-GameEngine* GEngine = nullptr;
+SGameEngine* GEngine = nullptr;
 
-GameEngine::GameEngine() : Super()
+SGameEngine::SGameEngine() : Super()
 {
 }
 
-GameEngine::~GameEngine()
+SGameEngine::~SGameEngine()
 {
 	for (size_t i = 0; i < _subsystems.size(); ++i)
 	{
 		// Delete game engine systems without module system
 		// for remove module system at last of destructor.
-		if (dynamic_cast<GameModuleSystem*>(_subsystems[i]) == nullptr)
+		if (dynamic_cast<SGameModuleSystem*>(_subsystems[i]) == nullptr)
 		{
 			DestroySubobject(_subsystems[i]);
 		}
@@ -47,7 +47,7 @@ GameEngine::~GameEngine()
 	}
 }
 
-bool GameEngine::InitEngine()
+bool SGameEngine::InitEngine()
 {
 	GEngine = this;
 	InitializeSubsystems();
@@ -55,10 +55,10 @@ bool GameEngine::InitEngine()
 	return true;
 }
 
-void GameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
+void SGameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 {
-	GetEngineSubsystem<GameRenderSystem>()->SetupFrameworkView(frameworkView);
-	GetEngineSubsystem<GamePlayerSystem>()->SpawnLocalPlayer(frameworkView);
+	GetEngineSubsystem<SGameRenderSystem>()->SetupFrameworkView(frameworkView);
+	GetEngineSubsystem<SGamePlayerSystem>()->SpawnLocalPlayer(frameworkView);
 
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle += [this]() { TickEngine(); };
@@ -66,9 +66,9 @@ void GameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 	frameworkView->SetFrameworkTitle(_gameInstance->GetApplicationName());
 }
 
-bool GameEngine::LoadGameModule(std::wstring_view moduleName)
+bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
 {
-	GameModuleSystem* system = GetEngineSubsystem<GameModuleSystem>();
+	SGameModuleSystem* system = GetEngineSubsystem<SGameModuleSystem>();
 	system->LoadGameModule(moduleName);
 	if (_gameInstance = system->LoadGameInstance(); _gameInstance == nullptr)
 	{
@@ -77,14 +77,14 @@ bool GameEngine::LoadGameModule(std::wstring_view moduleName)
 	}
 
 	_gameInstance->SetOuter(this);
-	_gameInstance->SetWorld(GetEngineSubsystem<GameLevelSystem>()->GetWorld());
+	_gameInstance->SetWorld(GetEngineSubsystem<SGameLevelSystem>()->GetWorld());
 	if (!_gameInstance->StartupLevel.IsValid())
 	{
-		SE_LOG(LogEngine, Fatal, L"GameInstance::StartupLevel is not specified.");
+		SE_LOG(LogEngine, Fatal, L"SGameInstance::StartupLevel is not specified.");
 		return false;
 	}
 
-	if (!GetEngineSubsystem<GameLevelSystem>()->OpenLevel(_gameInstance->StartupLevel))
+	if (!GetEngineSubsystem<SGameLevelSystem>()->OpenLevel(_gameInstance->StartupLevel))
 	{
 		SE_LOG(LogEngine, Fatal, L"Could not startup level.");
 		return false;
@@ -93,11 +93,11 @@ bool GameEngine::LoadGameModule(std::wstring_view moduleName)
 	return true;
 }
 
-int32 GameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs)
+int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs)
 {
 	CoreDelegates::BeginMainInvoked.Invoke();
 
-	CommandLine commandArgs = StringUtils::Split(platformArgs, L" ", true, true);
+	SCommandLine commandArgs = StringUtils::Split(platformArgs, L" ", true, true);
 	size_t gameModuleIdx = commandArgs.GetArgument(L"--GameDll");
 	if (gameModuleIdx == -1)
 	{
@@ -113,7 +113,7 @@ int32 GameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view p
 	}
 
 	// Create GameEngine instance and initialize it.
-	std::unique_ptr engine = std::make_unique<GameEngine>();
+	std::unique_ptr engine = std::make_unique<SGameEngine>();
 	if (!engine->InitEngine())
 	{
 		return -1;
@@ -134,23 +134,23 @@ int32 GameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view p
 	return 0;
 }
 
-GameInstance* GameEngine::GetGameInstance() const
+SGameInstance* SGameEngine::GetGameInstance() const
 {
 	return _gameInstance;
 }
 
-void GameEngine::InitializeSubsystems()
+void SGameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
-	_subsystems.emplace_back(NewObject<GameRenderSystem>())->Init();
-	_subsystems.emplace_back(NewObject<GameAssetSystem>())->Init();
-	_subsystems.emplace_back(NewObject<GameModuleSystem>())->Init();
-	_subsystems.emplace_back(NewObject<GameLevelSystem>())->Init();
-	_subsystems.emplace_back(NewObject<GamePlayerSystem>())->Init();
-	_subsystems.emplace_back(NewObject<GameInputSystem>())->Init();
+	_subsystems.emplace_back(NewObject<SGameRenderSystem>())->Init();
+	_subsystems.emplace_back(NewObject<SGameAssetSystem>())->Init();
+	_subsystems.emplace_back(NewObject<SGameModuleSystem>())->Init();
+	_subsystems.emplace_back(NewObject<SGameLevelSystem>())->Init();
+	_subsystems.emplace_back(NewObject<SGamePlayerSystem>())->Init();
+	_subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
 }
 
-void GameEngine::TickEngine()
+void SGameEngine::TickEngine()
 {
 	using namespace std::chrono;
 
@@ -160,7 +160,7 @@ void GameEngine::TickEngine()
 	RenderTick(tick);
 }
 
-void GameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
+void SGameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 {
 	for (auto& system : _subsystems)
 	{
@@ -168,13 +168,13 @@ void GameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 	}
 }
 
-void GameEngine::GameTick(std::chrono::duration<float> elapsedTime)
+void SGameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 {
-	World* world = GetEngineSubsystem<GameLevelSystem>()->GetWorld();
+	World* world = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
 	world->LevelTick(elapsedTime);
 }
 
-void GameEngine::RenderTick(std::chrono::duration<float> elapsedTime)
+void SGameEngine::RenderTick(std::chrono::duration<float> elapsedTime)
 {
-	GetEngineSubsystem<GameRenderSystem>()->Present();
+	GetEngineSubsystem<SGameRenderSystem>()->Present();
 }

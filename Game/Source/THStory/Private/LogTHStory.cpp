@@ -2,4 +2,4 @@
 
 #include "LogTHStory.h"
 
-LogCategory LogTH(L"TH");
+DEFINE_LOG_CATEGORY(LogTH);

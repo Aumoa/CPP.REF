@@ -5,9 +5,9 @@
 #include "GameMinimal.h"
 #include "GameFramework/Actor.h"
 
-class StaticMesh;
-class StaticMeshComponent;
-class MaterialInstance;
+class SStaticMesh;
+class SStaticMeshComponent;
+class SMaterialInstance;
 
 class AGridIndicator : public AActor
 {
@@ -15,9 +15,9 @@ public:
 	using Super = AActor;
 
 private:
-	StaticMesh* _MeshObject = nullptr;
-	StaticMeshComponent* _StaticMeshComponent = nullptr;
-	MaterialInstance* _materialInterface = nullptr;
+	SStaticMesh* _MeshObject = nullptr;
+	SStaticMeshComponent* _StaticMeshComponent = nullptr;
+	SMaterialInstance* _materialInterface = nullptr;
 
 public:
 	AGridIndicator();

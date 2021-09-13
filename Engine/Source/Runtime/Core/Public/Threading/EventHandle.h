@@ -8,10 +8,10 @@
 /// <summary>
 /// The system event handle.
 /// </summary>
-class CORE_API EventHandle : virtual public Object
+class CORE_API SEventHandle : virtual public SObject
 {
 public:
-	using Super = Object;
+	using Super = SObject;
 
 	/// <summary>
 	/// Represents waiting status.
@@ -39,10 +39,10 @@ private:
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="EventHandle"/> instance.
+	/// Initialize new <see cref="SEventHandle"/> instance.
 	/// </summary>
-	EventHandle();
-	~EventHandle() override;
+	SEventHandle();
+	~SEventHandle() override;
 
 	/// <summary>
 	/// Wait for signal.

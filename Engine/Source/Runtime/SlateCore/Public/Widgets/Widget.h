@@ -9,12 +9,12 @@
 #include "Layout/SlateRenderTransform.h"
 
 struct Geometry;
-class SlateWindowElementList;
-class PaintArgs;
-class ArrangedChildrens;
+class SSlateWindowElementList;
+class SPaintArgs;
+class SArrangedChildrens;
 class ArrangedWidget;
 
-class SLATECORE_API SWidget : virtual public Object
+class SLATECORE_API SWidget : virtual public SObject
 {
 	GENERATED_BODY(SWidget)
 
@@ -35,8 +35,8 @@ public:
 
 	virtual std::wstring ToString(std::wstring_view formatArgs) const override;
 
-	int32 Paint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const;
-	void ArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const;
+	int32 Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const;
+	void ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const;
 	inline std::wstring GetName() const { return _name; }
 
 	virtual void Tick(const Geometry& allottedGeometry, std::chrono::duration<float> deltaTime);
@@ -47,8 +47,8 @@ public:
 	inline bool HasRenderTransform() const { return _bHasRenderTransform; }
 
 protected:
-	virtual int32 OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const = 0;
-	virtual void OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const = 0;
+	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const = 0;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const = 0;
 
 	bool IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild) const;
 	bool ShouldBeEnabled(bool bParentEnabled) const;

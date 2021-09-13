@@ -5,17 +5,17 @@
 #include "FontFace.Impl.h"
 #include "LogFreeType.h"
 
-FontFace::FontFace(std::unique_ptr<Impl>&& impl, const std::wstring& faceName) : Super()
+SFontFace::SFontFace(std::unique_ptr<Impl>&& impl, const std::wstring& faceName) : Super()
 	, _impl(std::move(impl))
 	, _faceName(faceName)
 {
 }
 
-FontFace::~FontFace()
+SFontFace::~SFontFace()
 {
 }
 
-bool FontFace::SetFontSize(int32 fontSize, int32 dpiScale)
+bool SFontFace::SetFontSize(int32 fontSize, int32 dpiScale)
 {
 	ensure(dpiScale > 0);
 	ensure(fontSize > 0);
@@ -30,7 +30,7 @@ bool FontFace::SetFontSize(int32 fontSize, int32 dpiScale)
 	return true;
 }
 
-bool FontFace::LoadGlyph(wchar_t glyph)
+bool SFontFace::LoadGlyph(wchar_t glyph)
 {
 	ensure(glyph);
 	_loadedGlyph.reset();
@@ -53,7 +53,7 @@ bool FontFace::LoadGlyph(wchar_t glyph)
 	return true;
 }
 
-bool FontFace::GetGlyphPixelSize(int32* pixelsX, int32* pixelsY) const
+bool SFontFace::GetGlyphPixelSize(int32* pixelsX, int32* pixelsY) const
 {
 	if (!_loadedGlyph.has_value())
 	{
@@ -100,7 +100,7 @@ struct BitView<std::endian::big>
 	uint8 bView0 : 1;
 };
 
-bool FontFace::CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, int32 locationY) const
+bool SFontFace::CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, int32 locationY) const
 {
 	if (!_loadedGlyph.has_value())
 	{
@@ -185,7 +185,7 @@ bool FontFace::CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, i
 	return true;
 }
 
-int32 FontFace::GetMaxGlyphRenderHeight() const
+int32 SFontFace::GetMaxGlyphRenderHeight() const
 {
 	return _impl->Face->size->metrics.height >> 6;
 }

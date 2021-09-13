@@ -6,13 +6,13 @@
 #include "RHI/RHIShader.h"
 #include "RHI/RHIDeviceContext.h"
 
-Material::Material(RHIShader* shader) : Super()
+SMaterial::SMaterial(SRHIShader* shader) : Super()
 	, _shader(shader)
 	, _parametersDecl(shader->GetShaderParameterDeclaration())
 {
 }
 
-void Material::SetupMaterial(RHIDeviceContext* dc)
+void SMaterial::SetupMaterial(SRHIDeviceContext* dc)
 {
 	for (size_t i = 0; i < _parametersDecl.size(); ++i)
 	{
@@ -32,7 +32,7 @@ if (idx < 0 || idx >= (int32)(cnt)) \
 	return __VA_ARGS__;\
 }
 
-void Material::SetScalarParameterValueByIndex(int32 index, float value)
+void SMaterial::SetScalarParameterValueByIndex(int32 index, float value)
 {
 	checkIdxf(index, _parametersDecl.size());
 	if (_parametersDecl[index].Type != ERHIShaderParameterType::ScalarParameterConstants)
@@ -44,7 +44,7 @@ void Material::SetScalarParameterValueByIndex(int32 index, float value)
 	StoreValue(_storage, index, value);
 }
 
-void Material::SetScalarParameterValueByName(std::wstring_view parameterName, float value)
+void SMaterial::SetScalarParameterValueByName(std::wstring_view parameterName, float value)
 {
 	const int32 index = GetRootParameterMappingIndex(parameterName);
 	if (index == -1)
@@ -56,13 +56,13 @@ void Material::SetScalarParameterValueByName(std::wstring_view parameterName, fl
 	SetScalarParameterValueByIndex(index, value);
 }
 
-float Material::GetScalarParameterValueByIndex(int32 index) const
+float SMaterial::GetScalarParameterValueByIndex(int32 index) const
 {
 	checkIdxf(index, _parametersDecl.size(), 0);
 	return get<float>(_storage[index]);
 }
 
-float Material::GetScalarParameterValueByName(std::wstring_view parameterName) const
+float SMaterial::GetScalarParameterValueByName(std::wstring_view parameterName) const
 {
 	const int32 index = GetRootParameterMappingIndex(parameterName);
 	if (index == -1)
@@ -73,7 +73,7 @@ float Material::GetScalarParameterValueByName(std::wstring_view parameterName) c
 	return GetScalarParameterValueByIndex(index);
 }
 
-void Material::SetVector3ParameterValueByIndex(int32 index, const Vector3& value)
+void SMaterial::SetVector3ParameterValueByIndex(int32 index, const Vector3& value)
 {
 	checkIdxf(index, _parametersDecl.size());
 	if (_parametersDecl[index].Type != ERHIShaderParameterType::ScalarParameterConstants)
@@ -85,7 +85,7 @@ void Material::SetVector3ParameterValueByIndex(int32 index, const Vector3& value
 	StoreValue(_storage, index, value);
 }
 
-void Material::SetVector3ParameterValueByName(std::wstring_view parameterName, const Vector3& value)
+void SMaterial::SetVector3ParameterValueByName(std::wstring_view parameterName, const Vector3& value)
 {
 	const int32 index = GetRootParameterMappingIndex(parameterName);
 	if (index == -1)
@@ -97,13 +97,13 @@ void Material::SetVector3ParameterValueByName(std::wstring_view parameterName, c
 	SetVector3ParameterValueByIndex(index, value);
 }
 
-Vector3 Material::GetVector3ParameterValueByIndex(int32 index) const
+Vector3 SMaterial::GetVector3ParameterValueByIndex(int32 index) const
 {
 	checkIdxf(index, _parametersDecl.size(), 0.0f);
 	return get<Vector3>(_storage[index]);
 }
 
-Vector3 Material::GetVector3ParameterValueByName(std::wstring_view parameterName) const
+Vector3 SMaterial::GetVector3ParameterValueByName(std::wstring_view parameterName) const
 {
 	const int32 index = GetRootParameterMappingIndex(parameterName);
 	if (index == -1)
@@ -114,7 +114,7 @@ Vector3 Material::GetVector3ParameterValueByName(std::wstring_view parameterName
 	return GetVector3ParameterValueByIndex(index);
 }
 
-void Material::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 index) const
+void SMaterial::SetGraphicsParameterValue(SRHIDeviceContext* dc, int32 index) const
 {
 	if (index >= _storage.size())
 	{
@@ -126,7 +126,7 @@ void Material::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 index) cons
 	SetGraphicsParameterValueWithVariant(dc, index, _storage[index]);
 }
 
-void Material::SetGraphicsParameterValueWithVariant(RHIDeviceContext* dc, int32 index, const ShaderVars& vars) const
+void SMaterial::SetGraphicsParameterValueWithVariant(SRHIDeviceContext* dc, int32 index, const ShaderVars& vars) const
 {
 	[[maybe_unused]] float fvalue;
 	[[maybe_unused]] Vector3 v3;

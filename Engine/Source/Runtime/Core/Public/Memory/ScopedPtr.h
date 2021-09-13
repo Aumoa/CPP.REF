@@ -113,7 +113,7 @@ private:
 	{
 		if (_ptr)
 		{
-			Object::DestroySubobject(_ptr);
+			SObject::DestroySubobject(_ptr);
 			_ptr = nullptr;
 		}
 	}

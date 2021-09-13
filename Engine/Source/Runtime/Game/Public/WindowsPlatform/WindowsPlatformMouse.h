@@ -8,13 +8,13 @@
 
 struct IFrameworkView;
 
-class GAME_API WindowsPlatformMouse : virtual public Object, virtual public IPlatformMouse
+class GAME_API SWindowsPlatformMouse : virtual public SObject, virtual public IPlatformMouse
 {
-    GENERATED_BODY(WindowsPlatformMouse)
+    GENERATED_BODY(SWindowsPlatformMouse)
 
 public:
-    WindowsPlatformMouse();
-    ~WindowsPlatformMouse();
+    SWindowsPlatformMouse();
+    ~SWindowsPlatformMouse();
 
     // Retrieve the current state of the mouse
     MouseState GetState() const;
@@ -36,7 +36,7 @@ public:
     static void ProcessMessage(uint32 message, uint64 wParam, int64 lParam);
 
     // Singleton
-    static WindowsPlatformMouse& Get();
+    static SWindowsPlatformMouse& Get();
 
 private:
     // Private implementation.

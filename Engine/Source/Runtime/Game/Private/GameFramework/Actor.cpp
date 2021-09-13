@@ -41,7 +41,7 @@ void AActor::BeginPlay()
 	}
 
 	// Register all scene components.
-	ForEachSceneComponents<SceneComponent>([](SceneComponent* component)
+	ForEachSceneComponents<SSceneComponent>([](SSceneComponent* component)
 	{
 		component->BeginPlay();
 		return false;
@@ -79,7 +79,7 @@ void AActor::RegisterActorWithWorld(World* world)
 	}
 
 	// Register all scene components.
-	ForEachSceneComponents<SceneComponent>([world](SceneComponent* component)
+	ForEachSceneComponents<SSceneComponent>([world](SSceneComponent* component)
 	{
 		component->RegisterComponentWithWorld(world);
 		return false;
@@ -97,24 +97,24 @@ void AActor::DestroyActor()
 	}
 
 	// Register all scene components.
-	ForEachSceneComponents<SceneComponent>([world](SceneComponent* component)
+	ForEachSceneComponents<SSceneComponent>([world](SSceneComponent* component)
 	{
 		component->UnregisterComponent();
 		return false;
 	});
 }
 
-void AActor::AddOwnedComponent(ActorComponent* component)
+void AActor::AddOwnedComponent(SActorComponent* component)
 {
 	_components.emplace(component);
 }
 
-std::set<ActorComponent*> AActor::GetOwnedComponents() const
+std::set<SActorComponent*> AActor::GetOwnedComponents() const
 {
 	return _components;
 }
 
-void AActor::SetRootComponent(SceneComponent* scene)
+void AActor::SetRootComponent(SSceneComponent* scene)
 {
 	if (scene == nullptr)
 	{
@@ -128,20 +128,20 @@ void AActor::SetRootComponent(SceneComponent* scene)
 	}
 
 	_rootComponent = scene;
-	Object* outer = scene->GetOuter();
+	SObject* outer = scene->GetOuter();
 	if (outer != this)
 	{
 		scene->SetOuter(outer);
 	}
 
-	ForEachSceneComponents<SceneComponent>([this](SceneComponent* ptr)
+	ForEachSceneComponents<SSceneComponent>([this](SSceneComponent* ptr)
 	{
 		ptr->SetOwnerPrivate(this);
 		return false;
 	});
 }
 
-SceneComponent* AActor::GetRootComponent() const
+SSceneComponent* AActor::GetRootComponent() const
 {
 	return _rootComponent;
 }

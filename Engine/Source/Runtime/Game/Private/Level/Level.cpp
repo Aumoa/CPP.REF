@@ -7,16 +7,16 @@
 #include "GameFramework/PlayerController.h"
 #include "Info/GameMode.h"
 
-Level::Level() : Super()
+SLevel::SLevel() : Super()
 	, GameModeClass(SubclassOf<AGameMode>::StaticClass())
 {
 }
 
-Level::~Level()
+SLevel::~SLevel()
 {
 }
 
-bool Level::LoadLevel(World* world)
+bool SLevel::LoadLevel(World* world)
 {
 	if (!GameModeClass.IsValid())
 	{
@@ -32,7 +32,7 @@ bool Level::LoadLevel(World* world)
 	return true;
 }
 
-void Level::UnloadLevel()
+void SLevel::UnloadLevel()
 {
 	if (_gameMode)
 	{
@@ -55,7 +55,7 @@ void Level::UnloadLevel()
 	}
 }
 
-void Level::InternalSpawnActor(AActor* actor)
+void SLevel::InternalSpawnActor(AActor* actor)
 {
 	_persistentActors.emplace_back(actor);
 }

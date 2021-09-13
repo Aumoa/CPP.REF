@@ -3,15 +3,15 @@
 #include "pch.h"
 #include "GameInstance.h"
 
-GameInstance::GameInstance() : Super()
+SGameInstance::SGameInstance() : Super()
 {
 }
 
-void GameInstance::Init()
+void SGameInstance::Init()
 {
 }
 
-std::wstring GameInstance::GetApplicationName() const
+std::wstring SGameInstance::GetApplicationName() const
 {
 	return L"GameApp";
 }

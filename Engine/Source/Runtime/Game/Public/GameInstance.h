@@ -6,23 +6,23 @@
 #include "GameObject.h"
 #include "SubclassOf.h"
 
-class Level;
+class SLevel;
 
 /// <summary>
 /// Represents single game instance while application are running.
 /// </summary>
-class GAME_API GameInstance : public GameObject
+class GAME_API SGameInstance : public SGameObject
 {
-	GENERATED_BODY(GameInstance)
+	GENERATED_BODY(SGameInstance)
 
 public:
-	SubclassOf<Level> StartupLevel;
+	SubclassOf<SLevel> StartupLevel;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="GameInstance"/> instance.
+	/// Initialize new <see cref="SGameInstance"/> instance.
 	/// </summary>
-	GameInstance();
+	SGameInstance();
 
 	/// <summary>
 	/// Initialize game instance subsystems.

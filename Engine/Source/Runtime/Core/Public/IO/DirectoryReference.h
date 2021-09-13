@@ -8,30 +8,30 @@
 /// <summary>
 /// Represents directory reference.
 /// </summary>
-class CORE_API DirectoryReference : public FileSystemReference
+class CORE_API SDirectoryReference : public SFileSystemReference
 {
-	GENERATED_BODY(DirectoryReference)
+	GENERATED_BODY(SDirectoryReference)
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="DirectoryReference"/> instance.
+	/// Initialize new <see cref="SDirectoryReference"/> instance.
 	/// </summary>
-	DirectoryReference() = default;
+	SDirectoryReference() = default;
 
 	/// <summary>
-	/// Initialize new <see cref="DirectoryReference"/> instance.
+	/// Initialize new <see cref="SDirectoryReference"/> instance.
 	/// </summary>
-	DirectoryReference(const DirectoryReference& rhs) = default;
+	SDirectoryReference(const SDirectoryReference& rhs) = default;
 
 	/// <summary>
-	/// Initialize new <see cref="DirectoryReference"/> instance.
+	/// Initialize new <see cref="SDirectoryReference"/> instance.
 	/// </summary>
-	DirectoryReference(DirectoryReference&& rhs) = default;
+	SDirectoryReference(SDirectoryReference&& rhs) = default;
 
 	/// <summary>
-	/// Initialize new <see cref="DirectoryReference"/> instance.
+	/// Initialize new <see cref="SDirectoryReference"/> instance.
 	/// </summary>
-	DirectoryReference(const std::filesystem::path& filepath);
+	SDirectoryReference(const std::filesystem::path& filepath);
 
 	/// <summary>
 	/// Get directory name.
@@ -44,6 +44,6 @@ public:
 	/// <param name="bRecursive"> Create directory recursively. </param>
 	void CreateIfNotExists(bool bRecursive = false) const;
 
-	DirectoryReference& operator =(const DirectoryReference& rhs) = default;
-	DirectoryReference& operator =(DirectoryReference&& rhs) = default;
+	SDirectoryReference& operator =(const SDirectoryReference& rhs) = default;
+	SDirectoryReference& operator =(SDirectoryReference&& rhs) = default;
 };

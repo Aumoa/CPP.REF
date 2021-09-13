@@ -23,7 +23,7 @@ void SImage::SetBrush(const SlateBrush& brush)
 	_brush = brush;
 }
 
-void SImage::SetTexture2D(Texture2D* texture, bool bMatchSize)
+void SImage::SetTexture2D(STexture2D* texture, bool bMatchSize)
 {
 	_brush.ImageSource = texture->GetShaderResourceView();
 	
@@ -46,7 +46,7 @@ DEFINE_SLATE_CONSTRUCTOR(SImage, attr)
 	SetBrush(attr._Brush);
 }
 
-int32 SImage::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SImage::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
 	SlateDrawElement element;
 	element.Brush = _brush;

@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 
-class RHIDevice;
-class RHIDynamicTexture2D;
-class RHIShaderResourceView;
-class FontFace;
+class SRHIDevice;
+class SRHIDynamicTexture2D;
+class SRHIShaderResourceView;
+class SFontFace;
 
-class RENDERCORE_API FontFaceCachingNode : virtual public Object
+class RENDERCORE_API SFontFaceCachingNode : virtual public SObject
 {
-	GENERATED_BODY(FontFaceCachingNode)
+	GENERATED_BODY(SFontFaceCachingNode)
 
 private:
 	struct Glyph
@@ -43,21 +43,21 @@ private:
 	int32 _requiredMaxWidth = 0;
 	int32 _requiredMaxHeight = 0;
 
-	RHIDevice* _device = nullptr;
-	RHIDynamicTexture2D* _glyphBuffer = nullptr;
-	RHIShaderResourceView* _shaderResourceView = nullptr;
+	SRHIDevice* _device = nullptr;
+	SRHIDynamicTexture2D* _glyphBuffer = nullptr;
+	SRHIShaderResourceView* _shaderResourceView = nullptr;
 	bool _bNeedApply = false;
 
 public:
-	FontFaceCachingNode(RHIDevice* device);
-	virtual ~FontFaceCachingNode() override;
+	SFontFaceCachingNode(SRHIDevice* device);
+	virtual ~SFontFaceCachingNode() override;
 
-	void StreamGlyphs(FontFace* face, std::wstring_view glyphs);
+	void StreamGlyphs(SFontFace* face, std::wstring_view glyphs);
 	void Apply();
 
 private:
 	bool ReallocateBufferIfRequired();
 
 public:
-	class RHIShaderResourceView* GetDebugTexture() const;
+	class SRHIShaderResourceView* GetDebugTexture() const;
 };

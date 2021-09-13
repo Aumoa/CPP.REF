@@ -3,6 +3,6 @@
 #include "pch.h"
 #include "Components/MeshComponent.h"
 
-MeshComponent::MeshComponent() : Super()
+SMeshComponent::SMeshComponent() : Super()
 {
 }

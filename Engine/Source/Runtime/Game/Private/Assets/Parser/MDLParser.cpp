@@ -3,25 +3,25 @@
 #include "pch.h"
 #include "Assets/Parser/MDLParser.h"
 
-MDLParser::MDLParser(GameEngine* engine, RHIVertexFactory* vfactory) : Super(engine, vfactory)
+SMDLParser::SMDLParser(SGameEngine* engine, SRHIVertexFactory* vfactory) : Super(engine, vfactory)
 {
 }
 
-MDLParser::~MDLParser()
+SMDLParser::~SMDLParser()
 {
 }
 
-bool MDLParser::TryParse(const std::filesystem::path& importPath)
-{
-	return false;
-}
-
-bool MDLParser::IsStaticMesh() const
+bool SMDLParser::TryParse(const std::filesystem::path& importPath)
 {
 	return false;
 }
 
-StaticMesh* MDLParser::GetStaticMesh() const
+bool SMDLParser::IsStaticMesh() const
+{
+	return false;
+}
+
+SStaticMesh* SMDLParser::GetStaticMesh() const
 {
 	return nullptr;
 }

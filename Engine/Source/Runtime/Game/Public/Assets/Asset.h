@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include <atomic>
 
-class GAME_API Asset : virtual public Object
+class GAME_API SAsset : virtual public SObject
 {
-	GENERATED_BODY(Asset)
+	GENERATED_BODY(SAsset)
 
 private:
 	std::filesystem::path _assetPath;
 	std::atomic<size_t> _lockCount;
 
 public:
-	Asset(const std::filesystem::path& path);
-	~Asset() override;
+	SAsset(const std::filesystem::path& path);
+	~SAsset() override;
 
 	std::filesystem::path GetAssetPath() const;
 	

@@ -17,24 +17,24 @@
 
 using enum ELogVerbosity;
 
-class AssimpParser::Impl
+class SAssimpParser::Impl
 {
 public:
 	std::unique_ptr<Assimp::Importer> _importer;
 	const aiScene* _scene = nullptr;
 };
 
-AssimpParser::AssimpParser(GameEngine* engine, RHIVertexFactory* vfactory) : Super(engine, vfactory)
+SAssimpParser::SAssimpParser(SGameEngine* engine, SRHIVertexFactory* vfactory) : Super(engine, vfactory)
 {
 	_impl = std::make_unique<Impl>();
 	_impl->_importer = std::make_unique<Assimp::Importer>();
 }
 
-AssimpParser::~AssimpParser()
+SAssimpParser::~SAssimpParser()
 {
 }
 
-bool AssimpParser::TryParse(const std::filesystem::path& importPath)
+bool SAssimpParser::TryParse(const std::filesystem::path& importPath)
 {
 	static constexpr int32 ReadOptions =
 		aiProcess_JoinIdenticalVertices |
@@ -94,17 +94,17 @@ bool AssimpParser::TryParse(const std::filesystem::path& importPath)
 	return true;
 }
 
-bool AssimpParser::IsStaticMesh() const
+bool SAssimpParser::IsStaticMesh() const
 {
 	return _mesh != nullptr;
 }
 
-StaticMesh* AssimpParser::GetStaticMesh() const
+SStaticMesh* SAssimpParser::GetStaticMesh() const
 {
 	return _mesh;
 }
 //
-//bool AssimpParser::ProcessMaterials()
+//bool SAssimpParser::ProcessMaterials()
 //{
 //	DirectXDeviceBundle* deviceBundle = engine->GetDeviceBundle();
 //	COMDeviceBundle* comBundle = engine->GetCOMDevice();
@@ -184,10 +184,10 @@ StaticMesh* AssimpParser::GetStaticMesh() const
 //	return true;
 //}
 
-bool AssimpParser::ProcessStaticMeshSubsets()
+bool SAssimpParser::ProcessStaticMeshSubsets()
 {
 	// Ready render data.
-	StaticMeshRenderData* renderData = NewObject<StaticMeshRenderData>();
+	SStaticMeshRenderData* renderData = NewObject<SStaticMeshRenderData>();
 	MeshBatch& batch = renderData->MeshBatches.emplace_back();
 	batch.VertexFactory = GetVertexFactory();
 
@@ -261,14 +261,14 @@ bool AssimpParser::ProcessStaticMeshSubsets()
 		lastIndexLocation = (int32)indexBuffer.size();
 	}
 
-	RHIResource* vb = batch.VertexFactory->CreateVertexBuffer(vertexBuffer.data(), vertexBuffer.size());
+	SRHIResource* vb = batch.VertexFactory->CreateVertexBuffer(vertexBuffer.data(), vertexBuffer.size());
 	vb->SetOuter(renderData);
 	batch.VertexBufferLocation = vb->GetGPUVirtualAddress();
 
-	RHIResource* ib = batch.VertexFactory->CreateIndexBuffer(indexBuffer.data(), indexBuffer.size());
+	SRHIResource* ib = batch.VertexFactory->CreateIndexBuffer(indexBuffer.data(), indexBuffer.size());
 	ib->SetOuter(renderData);
 	batch.IndexBufferLocation = ib->GetGPUVirtualAddress();
 
-	_mesh = NewObject<StaticMesh>(_path, _name.wstring(), renderData);
+	_mesh = NewObject<SStaticMesh>(_path, _name.wstring(), renderData);
 	return true;
 }

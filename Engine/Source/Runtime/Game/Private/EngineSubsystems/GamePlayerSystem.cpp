@@ -5,26 +5,26 @@
 #include "GameFramework/LocalPlayer.h"
 #include "GameEngine.h"
 
-GamePlayerSystem::GamePlayerSystem() : Super()
+SGamePlayerSystem::SGamePlayerSystem() : Super()
 {
 }
 
-GamePlayerSystem::~GamePlayerSystem()
+SGamePlayerSystem::~SGamePlayerSystem()
 {
 }
 
-void GamePlayerSystem::Tick(std::chrono::duration<float> elapsedTime)
+void SGamePlayerSystem::Tick(std::chrono::duration<float> elapsedTime)
 {
 	_localPlayer->Tick(elapsedTime);
 }
 
-void GamePlayerSystem::SpawnLocalPlayer(IFrameworkView* frameworkView)
+void SGamePlayerSystem::SpawnLocalPlayer(IFrameworkView* frameworkView)
 {
-	_localPlayer = NewObject<LocalPlayer>();
+	_localPlayer = NewObject<SLocalPlayer>();
 	_localPlayer->Init(frameworkView);
 }
 
-LocalPlayer* GamePlayerSystem::GetLocalPlayer() const
+SLocalPlayer* SGamePlayerSystem::GetLocalPlayer() const
 {
 	return _localPlayer;
 }

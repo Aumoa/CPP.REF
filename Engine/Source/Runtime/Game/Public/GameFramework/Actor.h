@@ -8,13 +8,13 @@
 #include "Ticking/TickFunction.h"
 #include "Components/SceneComponent.h"
 
-class ActorComponent;
-class SceneComponent;
+class SActorComponent;
+class SSceneComponent;
 
 /// <summary>
 /// Represents actor that, spawn to world and interaction with other actors.
 /// </summary>
-class GAME_API AActor : public GameObject
+class GAME_API AActor : public SGameObject
 {
 	GENERATED_BODY(AActor)
 
@@ -22,10 +22,10 @@ private:
 	/// <summary>
 	/// Represents tick function for targeted to actor.
 	/// </summary>
-	class ActorTickFunction : public TickFunction
+	class ActorTickFunction : public STickFunction
 	{
 	public:
-		using Super = TickFunction;
+		using Super = STickFunction;
 
 	private:
 		AActor* const _target = nullptr;
@@ -87,12 +87,12 @@ public:
 	void DestroyActor();
 
 private:
-	std::set<ActorComponent*> _components;
+	std::set<SActorComponent*> _components;
 
 public:
-	void AddOwnedComponent(ActorComponent* component);
-	std::set<ActorComponent*> GetOwnedComponents() const;
-	template<std::derived_from<ActorComponent> T>
+	void AddOwnedComponent(SActorComponent* component);
+	std::set<SActorComponent*> GetOwnedComponents() const;
+	template<std::derived_from<SActorComponent> T>
 	T* GetComponentAs() const
 	{
 		// Find component from actor components.
@@ -104,7 +104,7 @@ public:
 			}
 		}
 
-		if constexpr (std::derived_from<T, SceneComponent>)
+		if constexpr (std::derived_from<T, SSceneComponent>)
 		{
 			// Else, find component from scene components.
 			T* item = nullptr;
@@ -121,18 +121,18 @@ public:
 	}
 
 private:
-	SceneComponent* _rootComponent = nullptr;
+	SSceneComponent* _rootComponent = nullptr;
 
 public:
-	void SetRootComponent(SceneComponent* scene);
-	SceneComponent* GetRootComponent() const;
-	template<std::derived_from<SceneComponent> T>
+	void SetRootComponent(SSceneComponent* scene);
+	SSceneComponent* GetRootComponent() const;
+	template<std::derived_from<SSceneComponent> T>
 	T* GetRootComponentAs() const
 	{
 		return dynamic_cast<T*>(GetRootComponent());
 	}
 
-	template<std::derived_from<SceneComponent> T>
+	template<std::derived_from<SSceneComponent> T>
 	void ForEachSceneComponents(std::function<bool(T*)> body) const
 	{
 		if (_rootComponent == nullptr)

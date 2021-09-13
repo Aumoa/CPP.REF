@@ -3,9 +3,9 @@
 #include "THGameModule.h"
 #include "THGameInstance.h"
 
-DEFINE_GAME_MODULE(THGameModule);
+DEFINE_GAME_MODULE(STHGameModule);
 
-GameInstance* THGameModule::CreatePrimaryGameModule()
+SGameInstance* STHGameModule::CreatePrimaryGameModule()
 {
-	return NewObject<THGameInstance>();
+	return NewObject<STHGameInstance>();
 }

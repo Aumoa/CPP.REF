@@ -8,11 +8,11 @@
 /// <summary>
 /// Provide functions that control texture resources.
 /// </summary>
-class RENDERCORE_API RHITexture : public RHIResource
+class RENDERCORE_API SRHITexture : public SRHIResource
 {
-	GENERATED_BODY(RHITexture)
+	GENERATED_BODY(SRHITexture)
 
 public:
-	RHITexture(RHIDevice* device, ID3D12Resource* resource);
-	~RHITexture() override;
+	SRHITexture(SRHIDevice* device, ID3D12Resource* resource);
+	~SRHITexture() override;
 };

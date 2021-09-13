@@ -4,18 +4,18 @@
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 
-std::optional<FileReference> LogCategory::_file;
+std::optional<SFileReference> SLogCategory::_file;
 
-LogCategory::LogCategory(std::wstring_view categoryName)
+SLogCategory::SLogCategory(std::wstring_view categoryName)
 	: _name(categoryName)
 {
 }
 
-LogCategory::~LogCategory()
+SLogCategory::~SLogCategory()
 {
 }
 
-std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
+std::wstring_view SLogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
 	using enum ELogVerbosity;
 
@@ -30,7 +30,7 @@ std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 	}
 }
 
-void LogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
+void SLogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 {
 	using namespace std;
 	using namespace std::chrono;

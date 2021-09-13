@@ -8,13 +8,13 @@
 #include "LogGame.h"
 #include "Misc/Paths.h"
 
-AssetImporter::AssetImporter(GameEngine* engine, RHIVertexFactory* factory) : Super()
+SAssetImporter::SAssetImporter(SGameEngine* engine, SRHIVertexFactory* factory) : Super()
 	, _engine(engine)
 	, _factory(factory)
 {
 }
 
-void AssetImporter::SearchContents()
+void SAssetImporter::SearchContents()
 {
 	using namespace std::filesystem;
 
@@ -39,7 +39,7 @@ void AssetImporter::SearchContents()
 	}
 }
 
-Asset* AssetImporter::LoadObject(const std::filesystem::path& importPath)
+SAsset* SAssetImporter::LoadObject(const std::filesystem::path& importPath)
 {
 	auto find_it = _assets.find(importPath);
 	if (find_it == _assets.end())
@@ -72,7 +72,7 @@ Asset* AssetImporter::LoadObject(const std::filesystem::path& importPath)
 	return data.Ptr;
 }
 
-void AssetImporter::UnloadObject(const std::filesystem::path& importPath)
+void SAssetImporter::UnloadObject(const std::filesystem::path& importPath)
 {
 	auto find_it = _assets.find(importPath);
 	if (find_it == _assets.end())
@@ -89,16 +89,16 @@ void AssetImporter::UnloadObject(const std::filesystem::path& importPath)
 	}
 }
 
-Asset* AssetImporter::LoadAssimpObject(const std::filesystem::path& importPath)
+SAsset* SAssetImporter::LoadAssimpObject(const std::filesystem::path& importPath)
 {
-	AssimpParser assimp(_engine, _factory);
+	SAssimpParser assimp(_engine, _factory);
 	if (!assimp.TryParse(importPath))
 	{
 		SE_LOG(LogAssets, Error, L"Could not parsing asset from file: {}", importPath.wstring());
 		return nullptr;
 	}
 
-	StaticMesh* loadedObject = assimp.GetStaticMesh();
+	SStaticMesh* loadedObject = assimp.GetStaticMesh();
 	loadedObject->SetOuter(this);
 
 	return loadedObject;

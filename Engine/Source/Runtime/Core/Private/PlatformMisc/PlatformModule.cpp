@@ -7,7 +7,7 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
 
-PlatformModule::PlatformModule(const std::filesystem::path& modulePath)
+SPlatformModule::SPlatformModule(const std::filesystem::path& modulePath)
 {
 	std::wstring wsPath = modulePath.wstring();
 	_NativeHandle = LoadLibraryW(wsPath.c_str());
@@ -19,7 +19,7 @@ PlatformModule::PlatformModule(const std::filesystem::path& modulePath)
 	}
 }
 
-PlatformModule::~PlatformModule()
+SPlatformModule::~SPlatformModule()
 {
 	if (_NativeHandle)
 	{
@@ -28,12 +28,12 @@ PlatformModule::~PlatformModule()
 	}
 }
 
-bool PlatformModule::IsValid() const
+bool SPlatformModule::IsValid() const
 {
 	return _NativeHandle;
 }
 
-void(*PlatformModule::InternalGetFunctionPointer(std::string_view functionName) const)()
+void(*SPlatformModule::InternalGetFunctionPointer(std::string_view functionName) const)()
 {
 	if (!IsValid())
 	{

@@ -5,22 +5,22 @@
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
-class PlatformModule;
-class GameInstance;
-class GameModule;
+class SPlatformModule;
+class SGameInstance;
+class SGameModule;
 
-class GAME_API GameModuleSystem : public GameEngineSubsystem
+class GAME_API SGameModuleSystem : public SGameEngineSubsystem
 {
-	GENERATED_BODY(GameModuleSystem)
+	GENERATED_BODY(SGameModuleSystem)
 
 private:
-	PlatformModule* _module = nullptr;
-	GameModule* _gameModule = nullptr;
+	SPlatformModule* _module = nullptr;
+	SGameModule* _gameModule = nullptr;
 
 public:
-	GameModuleSystem();
-	virtual ~GameModuleSystem() override;
+	SGameModuleSystem();
+	virtual ~SGameModuleSystem() override;
 	
 	void LoadGameModule(std::wstring_view gameModuleName);
-	GameInstance* LoadGameInstance();
+	SGameInstance* LoadGameInstance();
 };

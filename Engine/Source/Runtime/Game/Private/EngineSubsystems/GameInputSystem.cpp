@@ -5,20 +5,20 @@
 #include "PlatformMisc/IPlatformMouse.h"
 #include "PlatformMisc/IPlatformKeyboard.h"
 
-MouseStateTracker GameInputSystem::_mouseTracker;
-KeyboardTracker GameInputSystem::_keyboardTracker;
-std::optional<int32> GameInputSystem::_lastMouseX;
-std::optional<int32> GameInputSystem::_lastMouseY;
+SMouseStateTracker SGameInputSystem::_mouseTracker;
+SKeyboardTracker SGameInputSystem::_keyboardTracker;
+std::optional<int32> SGameInputSystem::_lastMouseX;
+std::optional<int32> SGameInputSystem::_lastMouseY;
 
-GameInputSystem::GameInputSystem() : Super()
+SGameInputSystem::SGameInputSystem() : Super()
 {
 }
 
-GameInputSystem::~GameInputSystem()
+SGameInputSystem::~SGameInputSystem()
 {
 }
 
-void GameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
+void SGameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
 {
 	// Update tracking state.
 	IPlatformMouse& wMouse = IPlatformMouse::Get();

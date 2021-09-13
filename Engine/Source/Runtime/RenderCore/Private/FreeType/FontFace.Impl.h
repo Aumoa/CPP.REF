@@ -7,7 +7,7 @@
 
 #include "FreeType/FontFace.h"
 
-struct FontFace::Impl
+struct SFontFace::Impl
 {
 	FT_Face Face;
 };

@@ -14,5 +14,5 @@ public:
 	virtual ~SLeafWidget() override;
 
 protected:
-	virtual void OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
 };

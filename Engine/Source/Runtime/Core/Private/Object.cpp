@@ -6,11 +6,11 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-Object::Object()
+SObject::SObject()
 {
 }
 
-Object::~Object() noexcept
+SObject::~SObject() noexcept
 {
 	if (_outer != nullptr)
 	{
@@ -25,17 +25,17 @@ Object::~Object() noexcept
 	}
 }
 
-std::wstring Object::ToString(std::wstring_view formatArgs) const
+std::wstring SObject::ToString(std::wstring_view formatArgs) const
 {
-	return L"Object";
+	return GetType().GetFriendlyName();
 }
 
-Object* Object::GetOuter() const
+SObject* SObject::GetOuter() const
 {
 	return _outer;
 }
 
-void Object::SetOuter(Object* newOuter)
+void SObject::SetOuter(SObject* newOuter)
 {
 	if (_outer != nullptr)
 	{
@@ -50,9 +50,9 @@ void Object::SetOuter(Object* newOuter)
 	_outer = newOuter;
 }
 
-void Object::DestroySubobject(Object* subobject)
+void SObject::DestroySubobject(SObject* subobject)
 {
-	Object* outer = subobject->_outer;
+	SObject* outer = subobject->_outer;
 	if (outer == nullptr)
 	{
 		delete outer;
@@ -62,7 +62,7 @@ void Object::DestroySubobject(Object* subobject)
 	outer->InternalDestroySubobject(subobject);
 }
 
-void Object::InternalDetachSubobject(Object* subobject)
+void SObject::InternalDetachSubobject(SObject* subobject)
 {
 	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
 	{
@@ -74,16 +74,16 @@ void Object::InternalDetachSubobject(Object* subobject)
 	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
 }
 
-void Object::InternalAttachSubobject(Object* subobject)
+void SObject::InternalAttachSubobject(SObject* subobject)
 {
 	_subobjects.emplace(subobject);
 }
 
-void Object::InternalDestroySubobject(Object* subobject)
+void SObject::InternalDestroySubobject(SObject* subobject)
 {
 	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
 	{
-		Object* ptr = *it;
+		SObject* ptr = *it;
 		ptr->_outer = nullptr;
 		_subobjects.erase(it);
 

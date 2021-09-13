@@ -8,15 +8,15 @@
 #include "RHI/RHIShaderResourceView.h"
 #include "InternalComPtr.h"
 
-RHIShaderDescriptorView::RHIShaderDescriptorView(RHIDevice* device) : Super(device)
+SRHIShaderDescriptorView::SRHIShaderDescriptorView(SRHIDevice* device) : Super(device)
 {
 }
 
-RHIShaderDescriptorView::~RHIShaderDescriptorView()
+SRHIShaderDescriptorView::~SRHIShaderDescriptorView()
 {
 }
 
-void RHIShaderDescriptorView::SetMaxDescriptorCount(size_t count)
+void SRHIShaderDescriptorView::SetMaxDescriptorCount(size_t count)
 {
 	const bool bRealloc = !_descriptorHeap || count > _count;
 
@@ -43,17 +43,17 @@ void RHIShaderDescriptorView::SetMaxDescriptorCount(size_t count)
 	}
 }
 
-size_t RHIShaderDescriptorView::GetMaxDescriptorCount() const
+size_t SRHIShaderDescriptorView::GetMaxDescriptorCount() const
 {
 	return _count;
 }
 
-void RHIShaderDescriptorView::ResetBindings()
+void SRHIShaderDescriptorView::ResetBindings()
 {
 	_seekpos = 0;
 }
 
-size_t RHIShaderDescriptorView::Bind(RHIShaderResourceView* view)
+size_t SRHIShaderDescriptorView::Bind(SRHIShaderResourceView* view)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleSrc = view->GetCPUDescriptorHandle(0);
 	size_t count = view->GetDescriptorCount();
@@ -68,14 +68,14 @@ size_t RHIShaderDescriptorView::Bind(RHIShaderResourceView* view)
 	return indexDst;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE RHIShaderDescriptorView::GetCPUDescriptorHandle(size_t index) const
+D3D12_CPU_DESCRIPTOR_HANDLE SRHIShaderDescriptorView::GetCPUDescriptorHandle(size_t index) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleBase = _descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	handleBase.ptr += (size_t)_incrementSize * index;
 	return handleBase;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE RHIShaderDescriptorView::GetGPUDescriptorHandle(size_t index) const
+D3D12_GPU_DESCRIPTOR_HANDLE SRHIShaderDescriptorView::GetGPUDescriptorHandle(size_t index) const
 {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleBase = _descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleBase.ptr += (UINT64)_incrementSize * index;

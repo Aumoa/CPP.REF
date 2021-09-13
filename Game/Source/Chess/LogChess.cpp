@@ -2,4 +2,4 @@
 
 #include "LogChess.h"
 
-LogCategory LogChess(L"Chess");
+SLogCategory LogChess(L"Chess");

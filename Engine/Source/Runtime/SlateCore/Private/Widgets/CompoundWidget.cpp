@@ -10,17 +10,17 @@ SCompoundWidget::SCompoundWidget(const std::wstring& name) : Super(name)
 {
 }
 
-int32 SCompoundWidget::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SCompoundWidget::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
-	auto* arrangedChildrens = drawElements->NewObject<ArrangedChildrens>(ESlateVisibility::Visible);
+	auto* arrangedChildrens = drawElements->NewObject<SArrangedChildrens>(ESlateVisibility::Visible);
 	ArrangeChildren(arrangedChildrens, allottedGeometry);
 
 	return PaintArrangedChildrens(paintArgs, arrangedChildrens, allottedGeometry, cullingRect, drawElements, layer, bParentEnabled);
 }
 
-int32 SCompoundWidget::PaintArrangedChildrens(PaintArgs* paintArgs, ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SCompoundWidget::PaintArrangedChildrens(SPaintArgs* paintArgs, SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
-    PaintArgs* newArgs = paintArgs->WithNewParent(this);
+    SPaintArgs* newArgs = paintArgs->WithNewParent(this);
     bool shouldBeEnabled = ShouldBeEnabled(bParentEnabled);
 
     for (const ArrangedWidget& arrangedWidget : arrangedChildrens->GetWidgets())

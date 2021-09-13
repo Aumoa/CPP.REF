@@ -4,24 +4,24 @@
 
 #include "CoreMinimal.h"
 
-class GameInstance;
+class SGameInstance;
 
-class GAME_API GameModule : virtual public Object
+class GAME_API SGameModule : virtual public SObject
 {
-	GENERATED_BODY(GameModule)
+	GENERATED_BODY(SGameModule)
 
 public:
-	GameModule();
-	virtual ~GameModule() override;
+	SGameModule();
+	virtual ~SGameModule() override;
 
-	virtual GameInstance* CreatePrimaryGameModule() = 0;
+	virtual SGameInstance* CreatePrimaryGameModule() = 0;
 };
 
 #define DEFINE_GAME_MODULE(GameModuleClass)		\
 extern "C"										\
 {												\
 	__declspec(dllexport)						\
-	GameModule* LoadGameModule()				\
+	SGameModule* LoadGameModule()				\
 	{											\
 		return new GameModuleClass();			\
 	}											\

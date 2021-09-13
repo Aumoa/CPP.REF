@@ -14,14 +14,14 @@
 struct IUnknown;
 struct ID3D12CommandQueue;
 struct ID3D12Fence;
-class RHIDeviceContext;
+class SRHIDeviceContext;
 
 /// <summary>
 /// Provides methods for submitting command lists that written by device context, synchronizing device context execution.
 /// </summary>
-class RENDERCORE_API RHICommandQueue : public RHIDeviceChild
+class RENDERCORE_API SRHICommandQueue : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHICommandQueue)
+	GENERATED_BODY(SRHICommandQueue)
 
 private:
 	struct GarbageItem
@@ -31,7 +31,7 @@ private:
 		union
 		{
 			IUnknown* IsUnknown;
-			Object* IsObject;
+			SObject* IsObject;
 		};
 	};
 
@@ -39,17 +39,17 @@ private:
 	ComPtr<ID3D12CommandQueue> _queue;
 	ComPtr<ID3D12Fence> _fence;
 	std::atomic<uint64> _signalNumber = 0;
-	EventHandle* _fenceEvent = nullptr;
+	SEventHandle* _fenceEvent = nullptr;
 	std::queue<GarbageItem> _gcobjects;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="RHICommandQueue"/> instance.
+	/// Initialize new <see cref="SRHICommandQueue"/> instance.
 	/// </summary>
 	/// <param name="device"> The logical device. </param>
 	/// <param name="commandType"> Specify command type for usage. </param>
-	RHICommandQueue(RHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
-	~RHICommandQueue() override;
+	SRHICommandQueue(SRHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
+	~SRHICommandQueue() override;
 
 	/// <summary>
 	/// Signal the last committed command list for reference from CPU commands and waiting.
@@ -76,16 +76,16 @@ public:
 	/// <summary>
 	/// Execute a device context.
 	/// </summary>
-	uint64 ExecuteDeviceContext(RHIDeviceContext* deviceContext)
+	uint64 ExecuteDeviceContext(SRHIDeviceContext* deviceContext)
 	{
-		RHIDeviceContext* deviceContextsSpan[] = { deviceContext };
+		SRHIDeviceContext* deviceContextsSpan[] = { deviceContext };
 		return ExecuteDeviceContexts(std::span(deviceContextsSpan));
 	}
 
 	/// <summary>
 	/// Execute multiple device contexts.
 	/// </summary>
-	uint64 ExecuteDeviceContexts(std::span<RHIDeviceContext*> deviceContexts);
+	uint64 ExecuteDeviceContexts(std::span<SRHIDeviceContext*> deviceContexts);
 
 	/// <summary>
 	/// Execute multiple device contexts.
@@ -93,7 +93,7 @@ public:
 	template<class... TDeviceContexts>
 	uint64 ExecuteDeviceContext(TDeviceContexts&&... deviceContexts)
 	{
-		RHIDeviceContext* deviceContextsSpan[] = { deviceContexts... };
+		SRHIDeviceContext* deviceContextsSpan[] = { deviceContexts... };
 		return ExecuteDeviceContexts(span(deviceContextsSpan));
 	}
 
@@ -106,7 +106,7 @@ public:
 	/// <summary>
 	/// Add garbage object. Object will destroy at Collect() called and outer will change to this object.
 	/// </summary>
-	void AddGarbageObject(uint64 fenceValue, Object* object);
+	void AddGarbageObject(uint64 fenceValue, SObject* object);
 
 public /*internal*/:
 	ID3D12CommandQueue* GetCommandQueue() const { return _queue.Get(); }

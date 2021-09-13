@@ -7,26 +7,26 @@
 
 DEFINE_LOG_CATEGORY(LogLevel);
 
-GameLevelSystem::GameLevelSystem() : Super()
+SGameLevelSystem::SGameLevelSystem() : Super()
 {
 }
 
-GameLevelSystem::~GameLevelSystem()
+SGameLevelSystem::~SGameLevelSystem()
 {
 }
 
-void GameLevelSystem::Init()
+void SGameLevelSystem::Init()
 {
 	Super::Init();
 	_world = NewObject<World>();
 }
 
-World* GameLevelSystem::GetWorld() const
+World* SGameLevelSystem::GetWorld() const
 {
 	return _world;
 }
 
-bool GameLevelSystem::OpenLevel(SubclassOf<Level> levelToLoad)
+bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> levelToLoad)
 {
 	if (!levelToLoad.IsValid())
 	{
@@ -34,7 +34,7 @@ bool GameLevelSystem::OpenLevel(SubclassOf<Level> levelToLoad)
 		return false;
 	}
 
-	Level* level = levelToLoad.Instantiate(this);
+	SLevel* level = levelToLoad.Instantiate(this);
 	if (!level->LoadLevel(_world))
 	{
 		SE_LOG(LogLevel, Error, L"Could not load level.");
@@ -51,7 +51,7 @@ bool GameLevelSystem::OpenLevel(SubclassOf<Level> levelToLoad)
 	return true;
 }
 
-Level* GameLevelSystem::GetLevel() const
+SLevel* SGameLevelSystem::GetLevel() const
 {
 	return _loadedLevel;
 }

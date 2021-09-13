@@ -4,18 +4,18 @@
 #include "Materials/MaterialInstance.h"
 #include "LogGame.h"
 
-MaterialInstance::MaterialInstance(Material* source) : Super(source->GetShader())
+SMaterialInstance::SMaterialInstance(SMaterial* source) : Super(source->GetShader())
 	, _source(source)
 {
 	_BlendMode = source->GetBlendMode();
 }
 
-void MaterialInstance::SetScalarParameterValueByIndex(int32 index, float value)
+void SMaterialInstance::SetScalarParameterValueByIndex(int32 index, float value)
 {
 	StoreValue(_storage, index, value);
 }
 
-float MaterialInstance::GetScalarParameterValueByIndex(int32 index) const
+float SMaterialInstance::GetScalarParameterValueByIndex(int32 index) const
 {
 	float v;
 	if (!HasVars<float>(index, v))
@@ -28,12 +28,12 @@ float MaterialInstance::GetScalarParameterValueByIndex(int32 index) const
 	}
 }
 
-void MaterialInstance::SetVector3ParameterValueByIndex(int32 index, const Vector3& value)
+void SMaterialInstance::SetVector3ParameterValueByIndex(int32 index, const Vector3& value)
 {
 	StoreValue(_storage, index, value);
 }
 
-Vector3 MaterialInstance::GetVector3ParameterValueByIndex(int32 index) const
+Vector3 SMaterialInstance::GetVector3ParameterValueByIndex(int32 index) const
 {
 	Vector3 v;
 	if (!HasVars<Vector3>(index, v))
@@ -46,7 +46,7 @@ Vector3 MaterialInstance::GetVector3ParameterValueByIndex(int32 index) const
 	}
 }
 
-void MaterialInstance::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 index) const
+void SMaterialInstance::SetGraphicsParameterValue(SRHIDeviceContext* dc, int32 index) const
 {
 	if (index >= _storage.size())
 	{
@@ -68,7 +68,7 @@ void MaterialInstance::SetGraphicsParameterValue(RHIDeviceContext* dc, int32 ind
 }
 
 template<class T>
-bool MaterialInstance::HasVars(int32 index, T& outValue) const
+bool SMaterialInstance::HasVars(int32 index, T& outValue) const
 {
 	if (_storage.size() <= index)
 	{

@@ -14,8 +14,8 @@ bool AKing::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& built
 	return DirectionalMovablePiece::QueryMovable(this, query, built, true, true, 2);
 }
 
-StaticMesh* AKing::GetStaticMesh() const
+SStaticMesh* AKing::GetStaticMesh() const
 {
-	static StaticMesh* globalMesh = GameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
+	static SStaticMesh* globalMesh = SGameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
 	return globalMesh;
 }

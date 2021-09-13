@@ -6,7 +6,7 @@
 
 struct IPlatformImage;
 
-struct GAME_API IPlatformImageLoader : virtual public Object
+struct GAME_API IPlatformImageLoader : virtual public SObject
 {
 	virtual IPlatformImage* LoadImageFromFile(const std::filesystem::path& assetPath, ERHIPixelFormat desiredPixelFormat) = 0;
 

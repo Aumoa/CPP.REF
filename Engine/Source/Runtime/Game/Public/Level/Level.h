@@ -14,9 +14,9 @@ class AActor;
 /// <summary>
 /// Represents actor placement unit.
 /// </summary>
-class GAME_API Level : virtual public Object
+class GAME_API SLevel : virtual public SObject
 {
-	GENERATED_BODY(Level)
+	GENERATED_BODY(SLevel)
 
 public:
 	SubclassOf<AGameMode> GameModeClass;
@@ -30,10 +30,10 @@ private:
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="Level"/> instance.
+	/// Initialize new <see cref="SLevel"/> instance.
 	/// </summary>
-	Level();
-	~Level();
+	SLevel();
+	~SLevel();
 
 	/// <summary>
 	/// Load level.

@@ -9,16 +9,16 @@
 
 AGridIndicator::AGridIndicator() : Super()
 {
-	GameEngine* engine = GameEngine::GetEngine();
+	SGameEngine* engine = SGameEngine::GetEngine();
 
-	_StaticMeshComponent = NewObject<StaticMeshComponent>();
+	_StaticMeshComponent = NewObject<SStaticMeshComponent>();
 	SetRootComponent(_StaticMeshComponent);
 	_StaticMeshComponent->SetHiddenInGame(true);
 
 	_MeshObject = NewObject<Cube>(L"CubeAsset", engine);
 	_StaticMeshComponent->SetStaticMesh(_MeshObject);
 
-	_materialInterface = NewObject<MaterialInstance>(engine->GetTransparentShader()->GetDefaultMaterial());
+	_materialInterface = NewObject<SMaterialInstance>(engine->GetTransparentShader()->GetDefaultMaterial());
 	_materialInterface->SetScalarParameterValueByName(L"Alpha", 0.5f);
 	_StaticMeshComponent->SetMaterial(0, _materialInterface);
 }

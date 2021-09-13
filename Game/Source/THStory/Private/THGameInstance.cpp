@@ -11,20 +11,20 @@
 #include "Widgets/Images/Image.h"
 #include "Widgets/Panel/HorizontalBoxPanel.h"
 
-THGameInstance::THGameInstance() : Super()
+STHGameInstance::STHGameInstance() : Super()
 {
-	StartupLevel = SubclassOf<::StartupLevel>::StaticClass();
+	StartupLevel = SubclassOf<::SStartupLevel>::StaticClass();
 }
 
-void THGameInstance::Init()
+void STHGameInstance::Init()
 {
 	Super::Init();
 
-	auto* playerSystem = GEngine->GetEngineSubsystem<GamePlayerSystem>();
-	LocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
+	auto* playerSystem = GEngine->GetEngineSubsystem<SGamePlayerSystem>();
+	SLocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
 	SWindow* slateWindow = localPlayer->GetSlateWindow();
 
-	auto* texture = LoadObject<Texture2D>(L"Content/THStory/Art/SampleImage.jpg");
+	auto* texture = LoadObject<STexture2D>(L"Content/THStory/Art/SampleImage.jpg");
 	slateWindow->AddWidgetToScreen(SNew(SHorizontalBoxPanel)
 		+SHorizontalBoxPanel::Slot()
 		.SizeParam(ESizeRule::Auto, 1.0f)

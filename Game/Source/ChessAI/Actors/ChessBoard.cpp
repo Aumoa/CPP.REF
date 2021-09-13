@@ -26,19 +26,19 @@ using enum ELogVerbosity;
 AChessBoard::AChessBoard() : Super()
 	, _built(this)
 {
-	StaticMeshComponent* smc = NewObject<StaticMeshComponent>();
+	SStaticMeshComponent* smc = NewObject<SStaticMeshComponent>();
 	SetRootComponent(smc);
 
-	AssetImporter* assimp = GameEngine::GetEngine()->GetAssetImporter();
-	StaticMesh* sm = assimp->ImportStaticMesh(L"Content/Chess/Arts/Board/Mesh/board.fbx");
+	SAssetImporter* assimp = SGameEngine::GetEngine()->GetAssetImporter();
+	SStaticMesh* sm = assimp->ImportStaticMesh(L"Content/Chess/Arts/Board/Mesh/board.fbx");
 	smc->SetStaticMesh(sm);
 
-	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
-	MaterialInstance* black = NewObject<MaterialInstance>(cshader->GetDefaultMaterial());
+	SColorShader* cshader = SGameEngine::GetEngine()->GetColorShader();
+	SMaterialInstance* black = NewObject<SMaterialInstance>(cshader->GetDefaultMaterial());
 	black->SetVector3ParameterValueByName(L"Color", 0.2f);
 	smc->SetMaterial(0, black);
 
-	MaterialInstance* white = NewObject<MaterialInstance>(cshader->GetDefaultMaterial());
+	SMaterialInstance* white = NewObject<SMaterialInstance>(cshader->GetDefaultMaterial());
 	white->SetVector3ParameterValueByName(L"Color", 0.8f);
 	smc->SetMaterial(1, white);
 }
@@ -112,7 +112,7 @@ Vector3 AChessBoard::GetBoardCellPosition(const GridIndex& index) const
 
 GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
 {
-	SceneComponent* parent = GetRootComponent();
+	SSceneComponent* parent = GetRootComponent();
 
 	// Calc world to local transform.
 	Transform worldToLocal;

@@ -3,25 +3,25 @@
 #include "pch.h"
 #include "Layout/ArrangedChildrens.h"
 
-ArrangedChildrens::ArrangedChildrens(ESlateVisibility visibilityFilter) : Super()
+SArrangedChildrens::SArrangedChildrens(ESlateVisibility visibilityFilter) : Super()
 	, _VisibilityFilter(visibilityFilter)
 {
 }
 
-void ArrangedChildrens::AddWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry)
+void SArrangedChildrens::AddWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry)
 {
 	check(Accepts(visibilityOverride));
 	_Widgets.emplace_back(widgetGeometry);
 }
 
-void ArrangedChildrens::InsertWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry, size_t index)
+void SArrangedChildrens::InsertWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry, size_t index)
 {
 	check(Accepts(visibilityOverride));
 	check(_Widgets.size() <= index);
 	_Widgets.insert(_Widgets.begin() + index, widgetGeometry);
 }
 
-bool ArrangedChildrens::Accepts(ESlateVisibility visibility) const
+bool SArrangedChildrens::Accepts(ESlateVisibility visibility) const
 {
 	return SlateVisibilityExtensions::DoesVisibilityPassFilter(visibility, _VisibilityFilter);
 }

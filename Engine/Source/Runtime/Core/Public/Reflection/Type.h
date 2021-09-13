@@ -6,13 +6,13 @@
 #include <functional>
 #include "PrimitiveTypes.h"
 
-class Object;
+class SObject;
 
 class CORE_API Type
 {
-	using ObjectCtor = std::function<Object*()>;
+	using ObjectCtor = std::function<SObject*()>;
 
-	std::wstring_view _friendlyName;
+	std::wstring _friendlyName;
 	ObjectCtor _ctor;
 
 public:
@@ -34,14 +34,14 @@ public:
 	{
 	}
 
-	std::wstring_view GetFriendlyName() const;
-	Object* Instantiate() const;
+	const std::wstring& GetFriendlyName() const;
+	SObject* Instantiate() const;
 
 private:
 	template<class TType> requires std::constructible_from<TType>
 	static ObjectCtor GetConstructorFunctionBody(int32)
 	{
-		return []() -> Object*
+		return []() -> SObject*
 		{
 			return new TType();
 		};

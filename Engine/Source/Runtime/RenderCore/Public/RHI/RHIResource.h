@@ -11,17 +11,17 @@ struct ID3D12Resource;
 /// <summary>
 /// Represents render resources.
 /// </summary>
-class RENDERCORE_API RHIResource : public RHIDeviceChild
+class RENDERCORE_API SRHIResource : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHIResource)
+	GENERATED_BODY(SRHIResource)
 
 private:
 	ComPtr<ID3D12Resource> _resource;
 	void* _ptr = nullptr;
 
 public:
-	RHIResource(RHIDevice* device, ID3D12Resource* resource);
-	~RHIResource() override;
+	SRHIResource(SRHIDevice* device, ID3D12Resource* resource);
+	~SRHIResource() override;
 
 	/// <summary>
 	/// Get GPU virtual address.

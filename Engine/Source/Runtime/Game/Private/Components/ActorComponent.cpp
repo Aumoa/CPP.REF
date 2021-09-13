@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Level/World.h"
 
-void ActorComponent::ComponentTickFunction::ExecuteTick(std::chrono::duration<float> elapsedTime)
+void SActorComponent::ComponentTickFunction::ExecuteTick(std::chrono::duration<float> elapsedTime)
 {
 	if (_target == nullptr)
 	{
@@ -28,26 +28,26 @@ void ActorComponent::ComponentTickFunction::ExecuteTick(std::chrono::duration<fl
 	}
 }
 
-ActorComponent::ActorComponent() : Super()
+SActorComponent::SActorComponent() : Super()
 	, PrimaryComponentTick(this)
 {
 }
 
-void ActorComponent::TickComponent(std::chrono::duration<float> elapsedTime, ComponentTickFunction* tickFunction)
+void SActorComponent::TickComponent(std::chrono::duration<float> elapsedTime, ComponentTickFunction* tickFunction)
 {
 }
 
-void ActorComponent::BeginPlay()
+void SActorComponent::BeginPlay()
 {
 	_bHasBegunPlay = true;
 }
 
-void ActorComponent::EndPlay()
+void SActorComponent::EndPlay()
 {
 	_bHasBegunPlay = false;
 }
 
-void ActorComponent::SetActive(bool bActive)
+void SActorComponent::SetActive(bool bActive)
 {
 	if (_bActive != bActive)
 	{
@@ -63,7 +63,7 @@ void ActorComponent::SetActive(bool bActive)
 	}
 }
 
-void ActorComponent::RegisterComponentWithWorld(World* world)
+void SActorComponent::RegisterComponentWithWorld(World* world)
 {
 	if (!_bIsRegistered)
 	{
@@ -73,7 +73,7 @@ void ActorComponent::RegisterComponentWithWorld(World* world)
 	}
 }
 
-void ActorComponent::UnregisterComponent()
+void SActorComponent::UnregisterComponent()
 {
 	if (_bIsRegistered)
 	{

@@ -11,14 +11,14 @@ DEFINE_LOG_CATEGORY(LogWindowsLaunch);
 inline void SetupHwndParameters(HWND hWnd, LPARAM lParam)
 {
 	auto lpCreateStruct = (LPCREATESTRUCTW)lParam;
-	auto* coreWindow = (CoreWindow*)lpCreateStruct->lpCreateParams;
+	auto* coreWindow = (SCoreWindow*)lpCreateStruct->lpCreateParams;
 
 	SetPropW(hWnd, L"this", coreWindow);
 }
 
-inline CoreWindow* GetThis(HWND hWnd)
+inline SCoreWindow* GetThis(HWND hWnd)
 {
-	return (CoreWindow*)GetPropW(hWnd, L"this");
+	return (SCoreWindow*)GetPropW(hWnd, L"this");
 }
 
 inline void FinallizeHwndParameters(HWND hWnd)
@@ -31,8 +31,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_ACTIVATEAPP:
-		WindowsPlatformMouse::ProcessMessage(uMsg, wParam, lParam);
-		WindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
+		SWindowsPlatformMouse::ProcessMessage(uMsg, wParam, lParam);
+		SWindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_INPUT:
 	case WM_MOUSEMOVE:
@@ -46,19 +46,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_XBUTTONDOWN:
 	case WM_XBUTTONUP:
 	case WM_MOUSEHOVER:
-		WindowsPlatformMouse::ProcessMessage(uMsg, wParam, lParam);
+		SWindowsPlatformMouse::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
-		WindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
+		SWindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_CREATE:
 		SetupHwndParameters(hWnd, lParam);
 		break;
 	case WM_SIZE:
-		if (CoreWindow* cw = GetThis(hWnd); cw != nullptr)
+		if (SCoreWindow* cw = GetThis(hWnd); cw != nullptr)
 		{
 			cw->Size.Invoke((int16)LOWORD(lParam), (int16)HIWORD(lParam));
 		}
@@ -72,7 +72,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-CoreWindow::CoreWindow() : Super()
+SCoreWindow::SCoreWindow() : Super()
 {
 	WNDCLASSEXW wcex = {};
 	wcex.cbSize = sizeof(wcex);
@@ -95,7 +95,7 @@ CoreWindow::CoreWindow() : Super()
 	_hwnd = hWnd;
 }
 
-void CoreWindow::Start()
+void SCoreWindow::Start()
 {
 	::ShowWindow((HWND)_hwnd, SW_SHOW);
 
@@ -123,36 +123,36 @@ void CoreWindow::Start()
 	}
 }
 
-void* CoreWindow::GetWindowHandle() const
+void* SCoreWindow::GetWindowHandle() const
 {
 	return _hwnd;
 }
 
-int32 CoreWindow::GetLastError() const
+int32 SCoreWindow::GetLastError() const
 {
 	return _lastError;
 }
 
-void CoreWindow::SetLastError(int32 code)
+void SCoreWindow::SetLastError(int32 code)
 {
 	_lastError = code;
 }
 
-int32 CoreWindow::GetFrameworkWidth() const
+int32 SCoreWindow::GetFrameworkWidth() const
 {
 	RECT rc;
 	GetClientRect((HWND)_hwnd, &rc);
 	return rc.right - rc.left;
 }
 
-int32 CoreWindow::GetFrameworkHeight() const
+int32 SCoreWindow::GetFrameworkHeight() const
 {
 	RECT rc;
 	GetClientRect((HWND)_hwnd, &rc);
 	return rc.bottom - rc.top;
 }
 
-void CoreWindow::SetFrameworkTitle(const std::wstring& frameworkTitle)
+void SCoreWindow::SetFrameworkTitle(const std::wstring& frameworkTitle)
 {
 	SetWindowTextW((HWND)_hwnd, frameworkTitle.c_str());
 }

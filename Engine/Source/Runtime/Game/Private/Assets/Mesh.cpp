@@ -3,10 +3,10 @@
 #include "pch.h"
 #include "Assets/Mesh.h"
 
-Mesh::Mesh(const std::filesystem::path& assetPath) : Super(assetPath)
+SMesh::SMesh(const std::filesystem::path& assetPath) : Super(assetPath)
 {
 }
 
-Mesh::~Mesh()
+SMesh::~SMesh()
 {
 }

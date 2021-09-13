@@ -5,28 +5,28 @@
 #include "SlateMinimal.h"
 #include "Player.h"
 
-class GameEngine;
+class SGameEngine;
 class SWindow;
-class SlateShader;
-class RHIDeviceContext;
+class SSlateShader;
+class SRHIDeviceContext;
 struct IFrameworkView;
 
-class GAME_API LocalPlayer : public Player
+class GAME_API SLocalPlayer : public SPlayer
 {
 public:
-	using Super = Player;
+	using Super = SPlayer;
 
 private:
 	IFrameworkView* _frameworkView = nullptr;
 	SWindow* _slateWindow = nullptr;
-	SlateWindowElementList* _drawElements = nullptr;
+	SSlateWindowElementList* _drawElements = nullptr;
 
 public:
-	LocalPlayer();
+	SLocalPlayer();
 
 	void Init(IFrameworkView* frameworkView);
 	void Tick(std::chrono::duration<float> elapsedTime);
-	void Render(RHIDeviceContext* deviceContext, SlateShader* shader);
+	void Render(SRHIDeviceContext* deviceContext, SSlateShader* shader);
 
 	inline IFrameworkView* GetFrameworkView() const { return _frameworkView; }
 	inline SWindow* GetSlateWindow() const { return _slateWindow; }

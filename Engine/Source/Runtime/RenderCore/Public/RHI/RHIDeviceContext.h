@@ -13,35 +13,35 @@ struct IUnknown;
 struct ID3D12CommandAllocator;
 struct ID3D12GraphicsCommandList;
 struct ID3D12CommandList;
-class RHIShader;
-class RHIRenderTargetView;
-class RHIDepthStencilView;
-class RHIShaderDescriptorView;
-class RHICommandQueue;
-class RHIShaderResourceView;
+class SRHIShader;
+class SRHIRenderTargetView;
+class SRHIDepthStencilView;
+class SRHIShaderDescriptorView;
+class SRHICommandQueue;
+class SRHIShaderResourceView;
 
 /// <summary>
 /// Represents a device context which generates rendering commands.
 /// </summary>
-class RENDERCORE_API RHIDeviceContext : public RHIDeviceChild
+class RENDERCORE_API SRHIDeviceContext : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHIDeviceContext)
+	GENERATED_BODY(SRHIDeviceContext)
 
 private:
 	const ERHICommandType _type;
 	ComPtr<ID3D12CommandAllocator> _allocator;
 	ComPtr<ID3D12GraphicsCommandList> _commandList;
 
-	RHIShaderDescriptorView* _resourceView = nullptr;
+	SRHIShaderDescriptorView* _resourceView = nullptr;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="RHIDeviceContext"/> instance.
+	/// Initialize new <see cref="SRHIDeviceContext"/> instance.
 	/// </summary>
 	/// <param name="device"> The logical device. </param>
 	/// <param name="commandType"> Specify command type for usage. </param>
-	RHIDeviceContext(RHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
-	~RHIDeviceContext() override;
+	SRHIDeviceContext(SRHIDevice* device, ERHICommandType commandType = ERHICommandType::Direct);
+	~SRHIDeviceContext() override;
 
 	/// <summary>
 	/// Mark the beginning of a series of commands.
@@ -71,27 +71,27 @@ public:
 	/// <summary>
 	/// Set graphics pipeline shader program.
 	/// </summary>
-	virtual void SetGraphicsShader(RHIShader* shader);
+	virtual void SetGraphicsShader(SRHIShader* shader);
 
 	/// <summary>
 	/// Set render target view.
 	/// </summary>
-	virtual void OMSetRenderTargets(RHIRenderTargetView* rtv);
+	virtual void OMSetRenderTargets(SRHIRenderTargetView* rtv);
 
 	/// <summary>
 	/// Set render target view.
 	/// </summary>
-	virtual void OMSetRenderTargets(RHIRenderTargetView* rtv, int32 rtvStart, int32 count, RHIDepthStencilView* dsv, int32 dsvStart);
+	virtual void OMSetRenderTargets(SRHIRenderTargetView* rtv, int32 rtvStart, int32 count, SRHIDepthStencilView* dsv, int32 dsvStart);
 
 	/// <summary>
 	/// Clear render target view as color.
 	/// </summary>
-	virtual void ClearRenderTargetView(RHIRenderTargetView* rtv, int32 index, const Color& color);
+	virtual void ClearRenderTargetView(SRHIRenderTargetView* rtv, int32 index, const Color& color);
 
 	/// <summary>
 	/// Clear render target view as color.
 	/// </summary>
-	virtual void ClearDepthStencilView(RHIDepthStencilView* dsv, int32 index, std::optional<float> depth, std::optional<uint8> stencil);
+	virtual void ClearDepthStencilView(SRHIDepthStencilView* dsv, int32 index, std::optional<float> depth, std::optional<uint8> stencil);
 
 	/// <summary>
 	/// Set scissor rects.
@@ -146,24 +146,24 @@ public:
 	/// </summary>
 	/// <param name="index"> The slot number for binding. </param>
 	/// <param name="shaderResourceView"> The resource view that contains GPU descriptor handle. </param>
-	virtual void SetGraphicsRootShaderResourceView(uint32 index, RHIShaderResourceView* resourceView);
+	virtual void SetGraphicsRootShaderResourceView(uint32 index, SRHIShaderResourceView* resourceView);
 
 	/// <summary>
 	/// Changes the currently bound descriptor views that are associated with a device context.
 	/// </summary>
 	/// <param name="resourceView"> A pointer to resource descriptors view. </param>
 	/// <param name="samplerView"> A pointer to sampler descriptors view. </param>
-	virtual void SetShaderDescriptorViews(RHIShaderDescriptorView* resourceView, RHIShaderDescriptorView* samplerView = nullptr);
+	virtual void SetShaderDescriptorViews(SRHIShaderDescriptorView* resourceView, SRHIShaderDescriptorView* samplerView = nullptr);
 
 private:
-	std::vector<Object*> _pendingDestroyObjects;
+	std::vector<SObject*> _pendingDestroyObjects;
 	std::vector<IUnknown*> _pendingDestroyUnknowns;
 
 public:
 	/// <summary>
 	/// Add pending destroy object. These will add to garbage object at CommandQueue object when this is commit.
 	/// </summary>
-	void AddPendingDestroyObject(Object* object);
+	void AddPendingDestroyObject(SObject* object);
 
 	/// <summary>
 	/// Add pending destroy IUnknown object. These will add to garbage object at CommandQueue object when this is commit.
@@ -173,7 +173,7 @@ public:
 	/// <summary>
 	/// Flush pending destroy objects to CommandQueue object.
 	/// </summary>
-	void FlushPendingDestroyObjects(uint64 fenceValue, RHICommandQueue* queue);
+	void FlushPendingDestroyObjects(uint64 fenceValue, SRHICommandQueue* queue);
 
 public /*internal*/:
 	ID3D12CommandList* GetCommandList() const;

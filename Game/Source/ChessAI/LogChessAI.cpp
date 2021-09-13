@@ -2,4 +2,4 @@
 
 #include "LogChessAI.h"
 
-LogCategory LogChessAI(L"ChessAI");
+SLogCategory LogChessAI(L"ChessAI");

@@ -56,12 +56,12 @@ size_t SBoxPanel::NumSlots() const
 	return _slots.size();
 }
 
-void SBoxPanel::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SBoxPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
 {
 	ArrangeChildrenAlong(_orientation, GetFlowDirection(), allottedGeometry, arrangedChildrens);
 }
 
-void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection inLayoutFlow, const Geometry& allottedGeometry, ArrangedChildrens* arrangedChildrens) const
+void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection inLayoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens) const
 {
 	// Allotted space will be given to fixed-size children first.
 	// Remaining space will be proportionately divided between stretch children (SizeRule_Stretch)

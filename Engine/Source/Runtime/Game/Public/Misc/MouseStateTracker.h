@@ -6,15 +6,15 @@
 #include "GameStructures.h"
 #include "BitfieldInputChangeTracker.h"
 
-class MouseStateTracker : virtual public Object
+class SMouseStateTracker : virtual public SObject
 {
-	GENERATED_BODY(MouseStateTracker)
+	GENERATED_BODY(SMouseStateTracker)
 
 private:
 	BitfieldInputChangeTracker<MouseState> _tracker;
 
 public:
-	inline MouseStateTracker()
+	inline SMouseStateTracker()
 	{
 	}
 

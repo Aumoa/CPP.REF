@@ -5,16 +5,16 @@
 #include "FreeType/FontFace.h"
 #include "FontFaceCachingNode.h"
 
-FontCachingManager::FontCachingManager(RHIDevice* device) : Super()
+SFontCachingManager::SFontCachingManager(SRHIDevice* device) : Super()
 	, _device(device)
 {
 }
 
-FontCachingManager::~FontCachingManager()
+SFontCachingManager::~SFontCachingManager()
 {
 }
 
-void FontCachingManager::StreamGlyphs(FontFace* face, std::wstring_view glyphs)
+void SFontCachingManager::StreamGlyphs(SFontFace* face, std::wstring_view glyphs)
 {
 	check(face);
 
@@ -22,14 +22,14 @@ void FontCachingManager::StreamGlyphs(FontFace* face, std::wstring_view glyphs)
 	auto node_it = _nodes.find(faceName);
 	if (node_it == _nodes.end())
 	{
-		node_it = _nodes.emplace(faceName, NewObject<FontFaceCachingNode>(_device)).first;
+		node_it = _nodes.emplace(faceName, NewObject<SFontFaceCachingNode>(_device)).first;
 	}
 
-	FontFaceCachingNode* node = node_it->second;
+	SFontFaceCachingNode* node = node_it->second;
 	node->StreamGlyphs(face, glyphs);
 }
 
-void FontCachingManager::Apply()
+void SFontCachingManager::Apply()
 {
 	for (auto& node_it : _nodes)
 	{
@@ -37,7 +37,7 @@ void FontCachingManager::Apply()
 	}
 }
 
-RHIShaderResourceView* FontCachingManager::GetDebugTexture() const
+SRHIShaderResourceView* SFontCachingManager::GetDebugTexture() const
 {
 	return _nodes.begin()->second->GetDebugTexture();
 }

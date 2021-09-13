@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "PrimitiveSceneProxy.h"
 
-class StaticMeshComponent;
+class SStaticMeshComponent;
 
-class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
+class GAME_API SStaticMeshSceneProxy : public SPrimitiveSceneProxy
 {
-	GENERATED_BODY(StaticMeshSceneProxy)
+	GENERATED_BODY(SStaticMeshSceneProxy)
 
 public:
-	StaticMeshSceneProxy(StaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches);
+	SStaticMeshSceneProxy(SStaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches);
 };

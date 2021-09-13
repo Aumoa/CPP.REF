@@ -4,4 +4,4 @@
 
 #include "GameMinimal.h"
 
-extern LogCategory LogChess;
+extern SLogCategory LogChess;

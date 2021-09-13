@@ -3,11 +3,11 @@
 #include "pch.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
 
-ColorVertexFactory::ColorVertexFactory(RHIDevice* device) : Super(device)
+SColorVertexFactory::SColorVertexFactory(SRHIDevice* device) : Super(device)
 {
 }
 
-RHIResource* ColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
+SRHIResource* SColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
 {
 	std::vector<MyVertex> vertexBuffer(count);
 	for (size_t i = 0; i < count; ++i)
@@ -23,7 +23,7 @@ RHIResource* ColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, s
 	return GetDevice()->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertexBuffer.data(), std::span(vertexBuffer).size_bytes());
 }
 
-std::vector<RHIVertexElement> ColorVertexFactory::GetVertexDeclaration() const
+std::vector<RHIVertexElement> SColorVertexFactory::GetVertexDeclaration() const
 {
 	std::vector<RHIVertexElement> elements;
 

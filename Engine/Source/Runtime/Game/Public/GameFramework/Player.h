@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameObject.h"
 
-class GAME_API Player : public GameObject
+class GAME_API SPlayer : public SGameObject
 {
-	GENERATED_BODY(Player)
+	GENERATED_BODY(SPlayer)
 
 public:
-	Player();
+	SPlayer();
 };

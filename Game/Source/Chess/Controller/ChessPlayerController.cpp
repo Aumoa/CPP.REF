@@ -21,7 +21,7 @@ void AChessPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	World* world = GetWorld();
-	Level* level = world->GetLevel();
+	SLevel* level = world->GetLevel();
 	GameLevel* gameLevel = dynamic_cast<GameLevel*>(level);
 	checkf(gameLevel != nullptr, L"Level is not a GameLevel class.");
 

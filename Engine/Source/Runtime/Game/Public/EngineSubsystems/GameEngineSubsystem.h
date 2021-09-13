@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 
-class GameEngine;
+class SGameEngine;
 
-class GAME_API GameEngineSubsystem : virtual public Object
+class GAME_API SGameEngineSubsystem : virtual public SObject
 {
-	GENERATED_BODY(GameEngineSubsystem)
+	GENERATED_BODY(SGameEngineSubsystem)
 
 public:
-	GameEngineSubsystem();
-	virtual ~GameEngineSubsystem() override;
+	SGameEngineSubsystem();
+	virtual ~SGameEngineSubsystem() override;
 
 	virtual void Init() {}
 	virtual void Tick(std::chrono::duration<float> elapsedTime) {}

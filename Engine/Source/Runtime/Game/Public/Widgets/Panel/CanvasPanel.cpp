@@ -58,15 +58,15 @@ DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, attr)
 	_slots = std::move(attr.Slots);
 }
 
-int32 SCanvasPanel::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SCanvasPanel::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
-	ArrangedChildrens arrangedChildren(ESlateVisibility::Visible);
+	SArrangedChildrens arrangedChildren(ESlateVisibility::Visible);
 	ArrangeChildren(&arrangedChildren, allottedGeometry);
 
 	bool forwardedEnabled = ShouldBeEnabled(bParentEnabled);
 	int maxLayer = layer;
 
-	PaintArgs* newArgs = paintArgs->WithNewParent(this);
+	SPaintArgs* newArgs = paintArgs->WithNewParent(this);
 	for (auto& curWidget : arrangedChildren.GetWidgets())
 	{
 		if (!IsChildWidgetCulled(cullingRect, curWidget))
@@ -86,7 +86,7 @@ int32 SCanvasPanel::OnPaint(PaintArgs* paintArgs, const Geometry& allottedGeomet
 	return maxLayer;
 }
 
-void SCanvasPanel::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
 {
 	if (_slots.size() > 0)
 	{

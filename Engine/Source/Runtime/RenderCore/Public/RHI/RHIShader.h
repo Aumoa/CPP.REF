@@ -11,28 +11,28 @@
 
 struct ID3D12RootSignature;
 struct ID3D12PipelineState;
-class RHIVertexFactory;
+class SRHIVertexFactory;
 
 /// <summary>
 /// Represents shader implements.
 /// </summary>
-class RENDERCORE_API RHIShader : public RHIDeviceChild
+class RENDERCORE_API SRHIShader : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHIShader)
+	GENERATED_BODY(SRHIShader)
 
 private:
-	RHIVertexFactory* _vfactory = nullptr;
+	SRHIVertexFactory* _vfactory = nullptr;
 	ComPtr<ID3D12RootSignature> _rs;
 	ComPtr<ID3D12PipelineState> _ps;
 
 public:
-	RHIShader(RHIDevice* device);
-	~RHIShader();
+	SRHIShader(SRHIDevice* device);
+	~SRHIShader();
 
 	/// <summary>
 	/// Compile and apply shader implements.
 	/// </summary>
-	virtual void Compile(RHIVertexFactory* vertexDeclaration);
+	virtual void Compile(SRHIVertexFactory* vertexDeclaration);
 
 	/// <summary>
 	/// Provide shader parameter declaration of this shader program.

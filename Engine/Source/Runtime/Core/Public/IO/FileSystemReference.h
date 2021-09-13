@@ -6,38 +6,38 @@
 #include <filesystem>
 #include "Object.h"
 
-class DirectoryReference;
+class SDirectoryReference;
 
 /// <summary>
 /// Represents file system reference.
 /// </summary>
-class CORE_API FileSystemReference : virtual public Object
+class CORE_API SFileSystemReference : virtual public SObject
 {
-	GENERATED_BODY(FileSystemReference)
+	GENERATED_BODY(SFileSystemReference)
 
 private:
 	std::optional<std::filesystem::path> _path;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="FileSystemReference"/> instance.
+	/// Initialize new <see cref="SFileSystemReference"/> instance.
 	/// </summary>
-	FileSystemReference() = default;
+	SFileSystemReference() = default;
 
 	/// <summary>
-	/// Initialize new <see cref="FileSystemReference"/> instance.
+	/// Initialize new <see cref="SFileSystemReference"/> instance.
 	/// </summary>
-	FileSystemReference(const FileSystemReference& rhs) = default;
+	SFileSystemReference(const SFileSystemReference& rhs) = default;
 
 	/// <summary>
-	/// Initialize new <see cref="FileSystemReference"/> instance.
+	/// Initialize new <see cref="SFileSystemReference"/> instance.
 	/// </summary>
-	FileSystemReference(FileSystemReference&& rhs) = default;
+	SFileSystemReference(SFileSystemReference&& rhs) = default;
 
 	/// <summary>
-	/// Initialize new <see cref="FileSystemReference"/> instance.
+	/// Initialize new <see cref="SFileSystemReference"/> instance.
 	/// </summary>
-	FileSystemReference(const std::filesystem::path& filepath);
+	SFileSystemReference(const std::filesystem::path& filepath);
 
 	/// <summary>
 	/// Represents the file is exists.
@@ -52,13 +52,13 @@ public:
 	/// <summary>
 	/// Get parent reference.
 	/// </summary>
-	DirectoryReference GetParent() const;
+	SDirectoryReference GetParent() const;
 
 	/// <summary>
 	/// Represents file refernce path is setted.
 	/// </summary>
 	bool IsSet() const;
 
-	FileSystemReference& operator =(const FileSystemReference& rhs) = default;
-	FileSystemReference& operator =(FileSystemReference&& rhs) = default;
+	SFileSystemReference& operator =(const SFileSystemReference& rhs) = default;
+	SFileSystemReference& operator =(SFileSystemReference&& rhs) = default;
 };

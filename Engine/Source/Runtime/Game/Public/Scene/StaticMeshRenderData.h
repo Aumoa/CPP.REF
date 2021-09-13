@@ -5,16 +5,16 @@
 #include "RenderMinimal.h"
 #include "GameStructures.h"
 
-class Material;
-class RHIVertexFactory;
+class SMaterial;
+class SRHIVertexFactory;
 struct MeshBatch;
 
-class GAME_API StaticMeshRenderData : virtual public Object
+class GAME_API SStaticMeshRenderData : virtual public SObject
 {
-	GENERATED_BODY(StaticMeshRenderData)
+	GENERATED_BODY(SStaticMeshRenderData)
 
 public:
-	StaticMeshRenderData();
+	SStaticMeshRenderData();
 
 	std::vector<MeshBatch> MeshBatches;
 };

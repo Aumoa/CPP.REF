@@ -4,4 +4,4 @@
 
 #include "GameMinimal.h"
 
-extern THSTORY_API LogCategory LogTH;
+DECLARE_LOG_CATEGORY(THSTORY_API, LogTH);

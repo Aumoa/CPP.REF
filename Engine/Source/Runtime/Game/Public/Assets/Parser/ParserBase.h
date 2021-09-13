@@ -4,20 +4,20 @@
 
 #include "RenderMinimal.h"
 
-class GameEngine;
-class StaticMesh;
-class RHIVertexFactory;
+class SGameEngine;
+class SStaticMesh;
+class SRHIVertexFactory;
 
-class GAME_API ParserBase : virtual public Object
+class GAME_API SParserBase : virtual public SObject
 {
-	GENERATED_BODY(ParserBase)
+	GENERATED_BODY(SParserBase)
 
 private:
-	GameEngine* _engine = nullptr;
-	RHIVertexFactory* _factory = nullptr;
+	SGameEngine* _engine = nullptr;
+	SRHIVertexFactory* _factory = nullptr;
 
 public:
-	ParserBase(GameEngine* engine, RHIVertexFactory* vfactory) : Super()
+	SParserBase(SGameEngine* engine, SRHIVertexFactory* vfactory) : Super()
 		, _engine(engine)
 		, _factory(vfactory)
 	{
@@ -26,8 +26,8 @@ public:
 	virtual bool TryParse(const std::filesystem::path& importPath) = 0;
 
 	virtual bool IsStaticMesh() const = 0;
-	virtual StaticMesh* GetStaticMesh() const = 0;
+	virtual SStaticMesh* GetStaticMesh() const = 0;
 
-	inline GameEngine* GetEngine() const { return _engine; }
-	inline RHIVertexFactory* GetVertexFactory() const { return _factory; }
+	inline SGameEngine* GetEngine() const { return _engine; }
+	inline SRHIVertexFactory* GetVertexFactory() const { return _factory; }
 };

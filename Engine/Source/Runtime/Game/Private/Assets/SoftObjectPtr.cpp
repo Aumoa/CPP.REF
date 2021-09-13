@@ -6,7 +6,7 @@
 #include "GameEngine.h"
 #include "LogGame.h"
 
-Asset* SoftObjectPtrBase::InternalLoadObject(const std::filesystem::path& importPath)
+SAsset* SoftObjectPtrBase::InternalLoadObject(const std::filesystem::path& importPath)
 {
 	if (GEngine == nullptr)
 	{
@@ -14,7 +14,7 @@ Asset* SoftObjectPtrBase::InternalLoadObject(const std::filesystem::path& import
 		return nullptr;
 	}
 
-	//AssetImporter* importer = GEngine->GetAssetImporter();
+	//SAssetImporter* importer = GEngine->GetAssetImporter();
 	//return importer->LoadObject(importPath);
 	return nullptr;
 }
@@ -27,6 +27,6 @@ void SoftObjectPtrBase::InternalUnloadObject(const std::filesystem::path& import
 		return;
 	}
 
-	//AssetImporter* importer = engine->GetAssetImporter();
+	//SAssetImporter* importer = engine->GetAssetImporter();
 	//importer->UnloadObject(importPath);
 }

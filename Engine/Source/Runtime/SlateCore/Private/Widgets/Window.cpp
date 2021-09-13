@@ -20,9 +20,9 @@ void SWindow::ExecuteTick(std::chrono::duration<float> deltaTime)
 	Tick(*(_cachedRootGeometry = MakeRootGeometry()), _lastDeltaTime = deltaTime);
 }
 
-void SWindow::ExecutePaint(SlateWindowElementList* drawElements) const
+void SWindow::ExecutePaint(SSlateWindowElementList* drawElements) const
 {
-	ScopedPtr paintArgs = drawElements->NewObject<PaintArgs>(this, _lastDeltaTime);
+	ScopedPtr paintArgs = drawElements->NewObject<SPaintArgs>(this, _lastDeltaTime);
 	Paint(paintArgs.Get(), *_cachedRootGeometry, Rect(Vector2::GetZero(), GetDesiredSize()), drawElements, 0, IsEnabled());
 }
 
@@ -76,7 +76,7 @@ Vector2 SWindow::GetDesiredSize() const
 	return _localSize;
 }
 
-void SWindow::OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SWindow::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
 {
 	for (auto it = _screenWidgets.begin(); it != _screenWidgets.end(); ++it)
 	{

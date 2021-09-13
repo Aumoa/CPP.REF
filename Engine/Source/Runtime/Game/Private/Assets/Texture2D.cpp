@@ -7,19 +7,19 @@
 #include "PlatformMisc/IPlatformImageLoader.h"
 #include "PlatformMisc/IPlatformImage.h"
 
-Texture2D::Texture2D(const std::filesystem::path& assetPath) : Super(assetPath)
+STexture2D::STexture2D(const std::filesystem::path& assetPath) : Super(assetPath)
 {
-	_shaderResourceView = NewObject<RHIShaderResourceView>(GEngine->GetEngineSubsystem<GameRenderSystem>()->GetRHIDevice(), 1);
+	_shaderResourceView = NewObject<SRHIShaderResourceView>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice(), 1);
 }
 
-Texture2D::~Texture2D()
+STexture2D::~STexture2D()
 {
 }
 
-void Texture2D::StreamIn()
+void STexture2D::StreamIn()
 {
-	auto* renderSystem = GEngine->GetEngineSubsystem<GameRenderSystem>();
-	RHIDevice* device = renderSystem->GetRHIDevice();
+	auto* renderSystem = GEngine->GetEngineSubsystem<SGameRenderSystem>();
+	SRHIDevice* device = renderSystem->GetRHIDevice();
 	IPlatformImageLoader& imageLoader = IPlatformImageLoader::Get();
 
 	ScopedPtr<IPlatformImage> platformImage = imageLoader.LoadImageFromFile(GetAssetPath(), ERHIPixelFormat::B8G8R8A8_UNORM);
@@ -27,7 +27,7 @@ void Texture2D::StreamIn()
 	_shaderResourceView->CreateShaderResourceView(_texture, 0);
 }
 
-void Texture2D::GetPixelSize(int32* pWidth, int32* pHeight) const
+void STexture2D::GetPixelSize(int32* pWidth, int32* pHeight) const
 {
 	if (_texture)
 	{
@@ -46,7 +46,7 @@ void Texture2D::GetPixelSize(int32* pWidth, int32* pHeight) const
 	}
 }
 
-Vector2 Texture2D::GetSize() const
+Vector2 STexture2D::GetSize() const
 {
 	int32 width, height;
 	GetPixelSize(&width, &height);

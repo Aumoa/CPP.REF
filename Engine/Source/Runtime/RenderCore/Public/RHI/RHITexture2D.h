@@ -8,13 +8,13 @@
 /// <summary>
 /// Represents 2D textures.
 /// </summary>
-class RENDERCORE_API RHITexture2D : public RHITexture
+class RENDERCORE_API SRHITexture2D : public SRHITexture
 {
-	GENERATED_BODY(RHITexture2D)
+	GENERATED_BODY(SRHITexture2D)
 
 public:
-	RHITexture2D(RHIDevice* device, ID3D12Resource* resource);
-	~RHITexture2D() override;
+	SRHITexture2D(SRHIDevice* device, ID3D12Resource* resource);
+	~SRHITexture2D() override;
 
 	/// <summary>
 	/// Get pixels resolution.

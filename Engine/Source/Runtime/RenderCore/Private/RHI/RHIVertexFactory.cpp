@@ -4,18 +4,18 @@
 #include "RHI/RHIVertexFactory.h"
 #include "RHI/RHIDevice.h"
 
-RHIVertexFactory::RHIVertexFactory(RHIDevice* device) : Super(device)
+SRHIVertexFactory::SRHIVertexFactory(SRHIDevice* device) : Super(device)
 {
 }
 
-RHIResource* RHIVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
+SRHIResource* SRHIVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
 {
-	RHIDevice* dev = GetDevice();
+	SRHIDevice* dev = GetDevice();
 	return dev->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertices, sizeof(RHIVertex) * count);
 }
 
-RHIResource* RHIVertexFactory::CreateIndexBuffer(const uint32* indices, size_t count) const
+SRHIResource* SRHIVertexFactory::CreateIndexBuffer(const uint32* indices, size_t count) const
 {
-	RHIDevice* dev = GetDevice();
+	SRHIDevice* dev = GetDevice();
 	return dev->CreateImmutableBuffer(ERHIResourceStates::IndexBuffer, (const uint8*)indices, sizeof(uint32) * count);
 }

@@ -115,7 +115,7 @@ void ActionRecord::Undo() const
 
 	if (_actorTaked != nullptr)
 	{
-		auto* primitive = _actorTaked->GetRootComponentAs<PrimitiveComponent>();
+		auto* primitive = _actorTaked->GetRootComponentAs<SPrimitiveComponent>();
 		primitive->SetHiddenInGame(false);
 	}
 }
@@ -125,7 +125,7 @@ void ActionRecord::TakeActor(APiece* actor)
 	checkf(_actorTaked == nullptr, L"Taked actor already assigned.");
 	checkf(actor != nullptr, L"Take actor is nullptr.");
 	_actorTaked = actor;
-	auto* primitive = actor->GetRootComponentAs<PrimitiveComponent>();
+	auto* primitive = actor->GetRootComponentAs<SPrimitiveComponent>();
 	primitive->SetHiddenInGame(true);
 }
 

@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
-class FontFace;
+class SFontFace;
 
-class RENDERCORE_API FreeTypeModule : virtual public Object
+class RENDERCORE_API SFreeTypeModule : virtual public SObject
 {
-	GENERATED_BODY(FreeTypeModule)
+	GENERATED_BODY(SFreeTypeModule)
 
 public:
 	struct Impl;
@@ -17,8 +17,8 @@ private:
 	std::unique_ptr<Impl> _impl;
 
 public:
-	FreeTypeModule();
-	virtual ~FreeTypeModule() override;
+	SFreeTypeModule();
+	virtual ~SFreeTypeModule() override;
 
-	FontFace* CreateFontFace(std::filesystem::path fontFace, int32 faceIndex = 0);
+	SFontFace* CreateFontFace(std::filesystem::path fontFace, int32 faceIndex = 0);
 };

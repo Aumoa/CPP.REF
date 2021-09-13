@@ -5,42 +5,42 @@
 #include "RenderMinimal.h"
 #include "GameStructures.h"
 
-class Scene;
-class RHIShader;
-class RHIDeviceContext;
-class SceneVisibility;
-class PrimitiveSceneProxy;
+class SScene;
+class SRHIShader;
+class SRHIDeviceContext;
+class SSceneVisibility;
+class SPrimitiveSceneProxy;
 
-class GAME_API SceneRenderer : virtual public Object
+class GAME_API SSceneRenderer : virtual public SObject
 {
-	GENERATED_BODY(SceneRenderer)
+	GENERATED_BODY(SSceneRenderer)
 
 private:
 	struct MeshBatchDrawRelevance
 	{
 		size_t ViewIndex;
-		PrimitiveSceneProxy* SceneProxy = nullptr;
+		SPrimitiveSceneProxy* SceneProxy = nullptr;
 		MeshBatch Batch;
 		std::vector<MeshBatchElement> Elements;
-		std::vector<Material*> Materials;
+		std::vector<SMaterial*> Materials;
 	};
 
 private:
-	Scene* _scene = nullptr;
-	RHIShader* _shader = nullptr;
-	SceneVisibility* _visibility = nullptr;
+	SScene* _scene = nullptr;
+	SRHIShader* _shader = nullptr;
+	SSceneVisibility* _visibility = nullptr;
 	std::vector<MeshBatchDrawRelevance> _drawRelevances;
 	size_t _relevances = 0;
 
 public:
-	SceneRenderer(Scene* scene, RHIShader* shader);
-	SceneRenderer(SceneRenderer&& rhs) noexcept;
-	~SceneRenderer() override;
+	SSceneRenderer(SScene* scene, SRHIShader* shader);
+	SSceneRenderer(SSceneRenderer&& rhs) noexcept;
+	~SSceneRenderer() override;
 
 public:
-	void CollectPrimitives(SceneVisibility* view);
-	void RenderScene(RHIDeviceContext* dc);
+	void CollectPrimitives(SSceneVisibility* view);
+	void RenderScene(SRHIDeviceContext* dc);
 
 private:
-	void RenderWithSceneVisibility(RHIDeviceContext* dc);
+	void RenderWithSceneVisibility(SRHIDeviceContext* dc);
 };

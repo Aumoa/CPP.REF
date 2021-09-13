@@ -10,9 +10,9 @@
 /// <summary>
 /// Represents tick function that proceed on game engine.
 /// </summary>
-class GAME_API TickFunction : virtual public Object
+class GAME_API STickFunction : virtual public SObject
 {
-	GENERATED_BODY(TickFunction)
+	GENERATED_BODY(STickFunction)
 
 public:
 	/// <summary>
@@ -40,7 +40,7 @@ public:
 	std::chrono::duration<float> TickInterval;
 
 private:
-	std::vector<TickFunction*> _pres;
+	std::vector<STickFunction*> _pres;
 	ETickingGroup _actualTickGroup = ETickingGroup::PrePhysics;
 
 public:
@@ -51,10 +51,10 @@ public:
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="TickFunction"/> instance.
+	/// Initialize new <see cref="STickFunction"/> instance.
 	/// </summary>
-	TickFunction();
-	~TickFunction();
+	STickFunction();
+	~STickFunction();
 
 	/// <summary>
 	/// Reset all states for ready to execute.
@@ -70,12 +70,12 @@ public:
 	/// <summary>
 	/// Add prerequisite function.
 	/// </summary>
-	void AddPrerequisiteFunction(TickFunction* function);
+	void AddPrerequisiteFunction(STickFunction* function);
 
 	/// <summary>
 	/// Remove prerequisite function.
 	/// </summary>
-	void RemovePrerequisiteFunction(TickFunction* function);
+	void RemovePrerequisiteFunction(STickFunction* function);
 
 private:
 	void ComputeTickGroupDependency();

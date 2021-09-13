@@ -3,16 +3,16 @@
 #include "pch.h"
 #include "IO/DirectoryReference.h"
 
-DirectoryReference::DirectoryReference(const std::filesystem::path& filepath) : Super(filepath)
+SDirectoryReference::SDirectoryReference(const std::filesystem::path& filepath) : Super(filepath)
 {
 }
 
-std::filesystem::path DirectoryReference::GetName() const
+std::filesystem::path SDirectoryReference::GetName() const
 {
 	return GetPath().stem();
 }
 
-void DirectoryReference::CreateIfNotExists(bool bRecursive) const
+void SDirectoryReference::CreateIfNotExists(bool bRecursive) const
 {
 	if (IsExists())
 	{
@@ -21,7 +21,7 @@ void DirectoryReference::CreateIfNotExists(bool bRecursive) const
 
 	if (bRecursive)
 	{
-		DirectoryReference dr = GetParent();
+		SDirectoryReference dr = GetParent();
 		dr.CreateIfNotExists(bRecursive);
 	}
 

@@ -8,14 +8,14 @@
 
 struct ID3D12DescriptorHeap;
 struct D3D12_CPU_DESCRIPTOR_HANDLE;
-class RHITexture2D;
+class SRHITexture2D;
 
 /// <summary>
 /// Represents shader resource view for binding to gpu input.
 /// </summary>
-class RENDERCORE_API RHIShaderResourceView : public RHIView
+class RENDERCORE_API SRHIShaderResourceView : public SRHIView
 {
-	GENERATED_BODY(RHIShaderResourceView)
+	GENERATED_BODY(SRHIShaderResourceView)
 
 private:
 	ComPtr<ID3D12DescriptorHeap> _descriptor;
@@ -23,13 +23,13 @@ private:
 	uint32 _increment = 0;
 
 public:
-	RHIShaderResourceView(RHIDevice* device, uint32 descriptorCount);
-	~RHIShaderResourceView() override;
+	SRHIShaderResourceView(SRHIDevice* device, uint32 descriptorCount);
+	~SRHIShaderResourceView() override;
 
 	/// <summary>
 	/// Create shader resource view.
 	/// </summary>
-	void CreateShaderResourceView(RHITexture2D* texture, int32 index);
+	void CreateShaderResourceView(SRHITexture2D* texture, int32 index);
 
 	/// <summary>
 	/// Get initialized descriptor count.

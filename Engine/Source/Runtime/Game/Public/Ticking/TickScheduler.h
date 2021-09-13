@@ -8,9 +8,9 @@
 #include <atomic>
 #include <map>
 
-class TickScheduler : virtual public Object
+class STickScheduler : virtual public SObject
 {
-	GENERATED_BODY(TickScheduler)
+	GENERATED_BODY(STickScheduler)
 
 public:
 	struct TaskInfo
@@ -35,7 +35,7 @@ private:
 	std::map<size_t, TickTaskInstance> _tasks;
 
 public:
-	inline TickScheduler()
+	inline STickScheduler()
 	{
 	}
 
@@ -64,7 +64,7 @@ public:
 		}
 	}
 
-	inline int64 AddSchedule(const TickScheduler::TaskInfo& taskInfo)
+	inline int64 AddSchedule(const STickScheduler::TaskInfo& taskInfo)
 	{
 		TickTaskInstance internalInfo;
 		internalInfo.Task = taskInfo.Task;

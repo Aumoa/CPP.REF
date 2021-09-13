@@ -7,7 +7,7 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
 
-size_t CommandLine::GetArgument(std::wstring_view start, std::wstring* optional_tail) const
+size_t SCommandLine::GetArgument(std::wstring_view start, std::wstring* optional_tail) const
 {
 	for (size_t i = 0; i < _resolvedArgs.size(); ++i)
 	{
@@ -28,7 +28,7 @@ size_t CommandLine::GetArgument(std::wstring_view start, std::wstring* optional_
 	return -1;
 }
 
-std::optional<std::wstring_view> CommandLine::GetArgument(size_t indexOf) const
+std::optional<std::wstring_view> SCommandLine::GetArgument(size_t indexOf) const
 {
 	if (_resolvedArgs.size() <= indexOf)
 	{

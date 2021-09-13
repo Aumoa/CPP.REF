@@ -21,7 +21,7 @@ public:
 	SWindow(const std::wstring& name);
 
 	void ExecuteTick(std::chrono::duration<float> deltaTime);
-	void ExecutePaint(SlateWindowElementList* drawElements) const;
+	void ExecutePaint(SSlateWindowElementList* drawElements) const;
 	Geometry MakeRootGeometry() const;
 
 	void SetWindowSize(const Vector2& localSize);
@@ -33,5 +33,5 @@ public:
 	virtual Vector2 GetDesiredSize() const;
 
 protected:
-	virtual void OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
 };

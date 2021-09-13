@@ -5,23 +5,23 @@
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
-class Texture2D;
+class STexture2D;
 
-class GAME_API GameAssetSystem : public GameEngineSubsystem
+class GAME_API SGameAssetSystem : public SGameEngineSubsystem
 {
-	GENERATED_BODY(GameAssetSystem)
+	GENERATED_BODY(SGameAssetSystem)
 
 private:
-	std::map<std::filesystem::path, Object*> _assets;
+	std::map<std::filesystem::path, SObject*> _assets;
 
 public:
-	GameAssetSystem();
-	virtual ~GameAssetSystem() override;
+	SGameAssetSystem();
+	virtual ~SGameAssetSystem() override;
 
 	virtual void Init() override;
 
-	Object* LoadObject(const std::filesystem::path& assetPath);
+	SObject* LoadObject(const std::filesystem::path& assetPath);
 
 private:
-	Texture2D* LoadTexture2D(const std::filesystem::path& assetPath);
+	STexture2D* LoadTexture2D(const std::filesystem::path& assetPath);
 };

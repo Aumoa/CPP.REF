@@ -7,15 +7,15 @@
 #include "Scene/StaticMeshRenderData.h"
 #include "Assets/StaticMesh.h"
 
-StaticMeshComponent::StaticMeshComponent() : Super()
+SStaticMeshComponent::SStaticMeshComponent() : Super()
 {
 }
 
-PrimitiveSceneProxy* StaticMeshComponent::CreateSceneProxy()
+SPrimitiveSceneProxy* SStaticMeshComponent::CreateSceneProxy()
 {
 	if (_StaticMesh != nullptr)
 	{
-		return NewObject<StaticMeshSceneProxy>(this, std::vector{ _batch });
+		return NewObject<SStaticMeshSceneProxy>(this, std::vector{ _batch });
 	}
 	else
 	{
@@ -23,7 +23,7 @@ PrimitiveSceneProxy* StaticMeshComponent::CreateSceneProxy()
 	}
 }
 
-void StaticMeshComponent::SetStaticMesh(StaticMesh* inNewMesh)
+void SStaticMeshComponent::SetStaticMesh(SStaticMesh* inNewMesh)
 {
 	if (_StaticMesh != inNewMesh)
 	{
@@ -49,7 +49,7 @@ void StaticMeshComponent::SetStaticMesh(StaticMesh* inNewMesh)
 	}
 }
 
-void StaticMeshComponent::SetMaterial(int32 index, Material* material)
+void SStaticMeshComponent::SetMaterial(int32 index, SMaterial* material)
 {
 	if (index >= _materials.size())
 	{
@@ -71,7 +71,7 @@ void StaticMeshComponent::SetMaterial(int32 index, Material* material)
 	}
 }
 
-Material* StaticMeshComponent::GetMaterial(int32 index) const
+SMaterial* SStaticMeshComponent::GetMaterial(int32 index) const
 {
 	if (index >= _materials.size())
 	{
@@ -81,7 +81,7 @@ Material* StaticMeshComponent::GetMaterial(int32 index) const
 	return _materials[index];
 }
 
-int32 StaticMeshComponent::GetMaterialCount() const
+int32 SStaticMeshComponent::GetMaterialCount() const
 {
 	return (int32)_materials.size();
 }

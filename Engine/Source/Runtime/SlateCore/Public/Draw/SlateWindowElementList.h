@@ -6,28 +6,27 @@
 #include "Draw/SlateDrawElement.h"
 #include "Layout/SlateLayoutTransform.h"
 
-class GameEngine;
 class SWindow;
-class RHIDeviceContext;
+class SRHIDeviceContext;
 
-class SLATECORE_API SlateWindowElementList : virtual public Object
+class SLATECORE_API SSlateWindowElementList : virtual public SObject
 {
-	GENERATED_BODY(SlateWindowElementList)
+	GENERATED_BODY(SSlateWindowElementList)
 
 private:
 	const SWindow* _paintWindow = nullptr;
 	std::vector<SlateDrawElement> _drawElements;
-	RHIResource* _dynamicElementBuffer = nullptr;
+	SRHIResource* _dynamicElementBuffer = nullptr;
 
 public:
-	SlateWindowElementList(const SWindow* paintWindow);
+	SSlateWindowElementList(const SWindow* paintWindow);
 
 	void SortByLayer();
 	void Add(const SlateDrawElement& rhs);
 	void Clear();
 
 	template<class TShader>
-	uint64 ApplyAndCreateBuffer(RHIDeviceContext* deviceContext, TShader* shader)
+	uint64 ApplyAndCreateBuffer(SRHIDeviceContext* deviceContext, TShader* shader)
 	{
 		using ShaderDrawType = decltype(shader->MakeElement(std::declval<SlateRenderTransform>(), std::declval<Vector2>(), std::declval<float>()));
 		std::vector<ShaderDrawType> drawElements(_drawElements.size());
@@ -60,5 +59,5 @@ public:
 	}
 
 private:
-	uint64 CreateBuffer(RHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes);
+	uint64 CreateBuffer(SRHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes);
 };

@@ -7,21 +7,21 @@
 #include <queue>
 
 class World;
-class RHIDevice;
-class RHIDeviceContext;
-class RHIShader;
-class SceneVisibility;
-class PrimitiveSceneProxy;
-class Material;
-class SceneRenderer;
+class SRHIDevice;
+class SRHIDeviceContext;
+class SRHIShader;
+class SSceneVisibility;
+class SPrimitiveSceneProxy;
+class SMaterial;
+class SSceneRenderer;
 struct MinimalViewInfo;
 
-class GAME_API Scene : virtual public Object
+class GAME_API SScene : virtual public SObject
 {
-	GENERATED_BODY(Scene)
+	GENERATED_BODY(SScene)
 
-	friend class SceneVisibility;
-	friend class SceneRenderer;
+	friend class SSceneVisibility;
+	friend class SSceneRenderer;
 
 private:
 	static constexpr const size_t RenderQueue_Opaque = 1000;
@@ -30,27 +30,27 @@ private:
 
 private:
 	World* _world = nullptr;
-	RHIDevice* _device = nullptr;
-	std::vector<PrimitiveSceneProxy*> _primitives;
+	SRHIDevice* _device = nullptr;
+	std::vector<SPrimitiveSceneProxy*> _primitives;
 	std::queue<int64> _spaces;
 
-	SceneVisibility* _localPlayerView = nullptr;
-	std::map<size_t, std::vector<RHIShader*>> _renderQueue;
-	std::vector<SceneRenderer> _renderers;
+	SSceneVisibility* _localPlayerView = nullptr;
+	std::map<size_t, std::vector<SRHIShader*>> _renderQueue;
+	std::vector<SSceneRenderer> _renderers;
 
 public:
-	Scene(World* worldOwner, RHIDevice* device);
-	~Scene() override;
+	SScene(World* worldOwner, SRHIDevice* device);
+	~SScene() override;
 
 	void UpdateScene(std::chrono::duration<float> elapsedTime);
 	void InitViews(const MinimalViewInfo& localPlayerView);
-	void RenderScene(RHIDeviceContext* dc);
+	void RenderScene(SRHIDeviceContext* dc);
 
-	int64 AddPrimitive(PrimitiveSceneProxy* proxy);
+	int64 AddPrimitive(SPrimitiveSceneProxy* proxy);
 	void RemovePrimitive(int64 primitiveId);
 
-	RHIDevice* GetDevice() const { return _device; }
+	SRHIDevice* GetDevice() const { return _device; }
 
 private:
-	PrimitiveSceneProxy* RecreateRenderSceneProxy(PrimitiveSceneProxy* proxy);
+	SPrimitiveSceneProxy* RecreateRenderSceneProxy(SPrimitiveSceneProxy* proxy);
 };

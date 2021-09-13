@@ -6,18 +6,18 @@
 
 class SWidget;
 
-class SLATECORE_API PaintArgs : virtual public Object
+class SLATECORE_API SPaintArgs : virtual public SObject
 {
-	GENERATED_BODY(PaintArgs)
+	GENERATED_BODY(SPaintArgs)
 
 private:
 	const SWidget* _parent = nullptr;
 	std::chrono::duration<float> _deltaTime;
 
 public:
-	PaintArgs(const SWidget* parentWidget, std::chrono::duration<float> deltaTime);
+	SPaintArgs(const SWidget* parentWidget, std::chrono::duration<float> deltaTime);
 
-	PaintArgs* WithNewParent(const SWidget* parentWidget) const;
+	SPaintArgs* WithNewParent(const SWidget* parentWidget) const;
 
 	const SWidget* GetParentWidget() const { return _parent; }
 	std::chrono::duration<float> GetDeltaTime() const { return _deltaTime; }

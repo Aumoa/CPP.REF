@@ -8,9 +8,9 @@
 #include "Misc/KeyboardTracker.h"
 #include <optional>
 
-class GAME_API GameInputSystem : public GameEngineSubsystem
+class GAME_API SGameInputSystem : public SGameEngineSubsystem
 {
-	GENERATED_BODY(GameInputSystem)
+	GENERATED_BODY(SGameInputSystem)
 
 public:
 	struct MouseMoveData
@@ -22,8 +22,8 @@ public:
 	};
 
 private:
-	static MouseStateTracker _mouseTracker;
-	static KeyboardTracker _keyboardTracker;
+	static SMouseStateTracker _mouseTracker;
+	static SKeyboardTracker _keyboardTracker;
 	static std::optional<int32> _lastMouseX;
 	static std::optional<int32> _lastMouseY;
 
@@ -36,8 +36,8 @@ public:
 	MouseMoveEvent MouseMove;
 
 public:
-	GameInputSystem();
-	virtual ~GameInputSystem() override;
+	SGameInputSystem();
+	virtual ~SGameInputSystem() override;
 
 	virtual void Tick(std::chrono::duration<float> elapsedTime) override;
 };

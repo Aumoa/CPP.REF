@@ -37,8 +37,8 @@ bool AKnight::QueryMovable(MovablePointsQuery& query, const ChessBoardBuilt& bui
 	return true;
 }
 
-StaticMesh* AKnight::GetStaticMesh() const
+SStaticMesh* AKnight::GetStaticMesh() const
 {
-	static StaticMesh* globalMesh = GameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
+	static SStaticMesh* globalMesh = SGameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
 	return globalMesh;
 }

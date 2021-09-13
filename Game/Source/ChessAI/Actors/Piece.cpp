@@ -12,7 +12,7 @@ using enum ELogVerbosity;
 
 APiece::APiece() : Super()
 {
-	_meshComponent = NewObject<StaticMeshComponent>();
+	_meshComponent = NewObject<SStaticMeshComponent>();
 	SetRootComponent(_meshComponent);
 }
 
@@ -29,8 +29,8 @@ void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
 	_team = team;
 	_myIndex = index;
 
-	ColorShader* cshader = GameEngine::GetEngine()->GetColorShader();
-	MaterialInstance* color = NewObject<MaterialInstance>(cshader->GetDefaultMaterial());
+	SColorShader* cshader = SGameEngine::GetEngine()->GetColorShader();
+	SMaterialInstance* color = NewObject<SMaterialInstance>(cshader->GetDefaultMaterial());
 	color->SetVector3ParameterValueByName(L"Color", team == EChessTeam::Black ? 0.2f : 0.8f);
 	_meshComponent->SetMaterial(0, color);
 

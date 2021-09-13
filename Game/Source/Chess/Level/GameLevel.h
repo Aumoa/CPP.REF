@@ -8,10 +8,10 @@
 class AChessBoard;
 class AGridIndicator;
 
-class GameLevel : public Level
+class GameLevel : public SLevel
 {
 public:
-	using Super = Level;
+	using Super = SLevel;
 
 private:
 	AChessBoard* _psBoard = nullptr;

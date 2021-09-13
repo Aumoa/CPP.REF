@@ -3,15 +3,15 @@
 #include "pch.h"
 #include "Ticking/TickFunction.h"
 
-TickFunction::TickFunction() : Super()
+STickFunction::STickFunction() : Super()
 {
 }
 
-TickFunction::~TickFunction()
+STickFunction::~STickFunction()
 {
 }
 
-void TickFunction::Ready()
+void STickFunction::Ready()
 {
 	_bExecutedFrame = false;
 	_actualTickGroup = TickGroup;
@@ -19,7 +19,7 @@ void TickFunction::Ready()
 	ComputeTickGroupDependency();
 }
 
-void TickFunction::ExecuteTick(std::chrono::duration<float> deltaTime)
+void STickFunction::ExecuteTick(std::chrono::duration<float> deltaTime)
 {
 	_bExecutedFrame = true;
 
@@ -34,12 +34,12 @@ void TickFunction::ExecuteTick(std::chrono::duration<float> deltaTime)
 	}
 }
 
-void TickFunction::AddPrerequisiteFunction(TickFunction* function)
+void STickFunction::AddPrerequisiteFunction(STickFunction* function)
 {
 	_pres.emplace_back(function);
 }
 
-void TickFunction::RemovePrerequisiteFunction(TickFunction* function)
+void STickFunction::RemovePrerequisiteFunction(STickFunction* function)
 {
 	if (auto it = find(_pres.begin(), _pres.end(), function); it != _pres.end())
 	{
@@ -52,7 +52,7 @@ inline int32 Compare(ETickingGroup lh, ETickingGroup rh)
 	return MathEx::Clamp<int32>((int32)lh - (int32)rh, -1, 1);
 }
 
-void TickFunction::ComputeTickGroupDependency()
+void STickFunction::ComputeTickGroupDependency()
 {
 	_actualTickGroup = TickGroup;
 	for (size_t i = 0; i < _pres.size(); ++i)

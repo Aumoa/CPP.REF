@@ -3,10 +3,10 @@
 #include "pch.h"
 #include "RHI/RHITexture.h"
 
-RHITexture::RHITexture(RHIDevice* device, ID3D12Resource* resource) : Super(device, resource)
+SRHITexture::SRHITexture(SRHIDevice* device, ID3D12Resource* resource) : Super(device, resource)
 {
 }
 
-RHITexture::~RHITexture()
+SRHITexture::~SRHITexture()
 {
 }

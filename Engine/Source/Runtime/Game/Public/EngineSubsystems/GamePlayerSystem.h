@@ -5,22 +5,22 @@
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
-class LocalPlayer;
+class SLocalPlayer;
 struct IFrameworkView;
 
-class GAME_API GamePlayerSystem : public GameEngineSubsystem
+class GAME_API SGamePlayerSystem : public SGameEngineSubsystem
 {
-	GENERATED_BODY(GamePlayerSystem);
+	GENERATED_BODY(SGamePlayerSystem);
 
 private:
-	LocalPlayer* _localPlayer = nullptr;
+	SLocalPlayer* _localPlayer = nullptr;
 
 public:
-	GamePlayerSystem();
-	virtual ~GamePlayerSystem() override;
+	SGamePlayerSystem();
+	virtual ~SGamePlayerSystem() override;
 
 	virtual void Tick(std::chrono::duration<float> elapsedTime) override;
 
 	void SpawnLocalPlayer(IFrameworkView* frameworkView);
-	LocalPlayer* GetLocalPlayer() const;
+	SLocalPlayer* GetLocalPlayer() const;
 };

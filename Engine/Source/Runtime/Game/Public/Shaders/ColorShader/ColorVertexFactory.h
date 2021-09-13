@@ -6,9 +6,9 @@
 #include "RHI/RHIVertexFactory.h"
 #include <vector>
 
-class GAME_API ColorVertexFactory : public RHIVertexFactory
+class GAME_API SColorVertexFactory : public SRHIVertexFactory
 {
-	GENERATED_BODY(ColorVertexFactory)
+	GENERATED_BODY(SColorVertexFactory)
 
 public:
 #pragma pack(push, 4)
@@ -21,9 +21,9 @@ public:
 #pragma pack(pop)
 
 public:
-	ColorVertexFactory(RHIDevice* device);
+	SColorVertexFactory(SRHIDevice* device);
 
-	virtual RHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const override;
+	virtual SRHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const override;
 	virtual uint32 GetVertexStride() const override { return sizeof(MyVertex); }
 	virtual std::vector<RHIVertexElement> GetVertexDeclaration() const override;
 };

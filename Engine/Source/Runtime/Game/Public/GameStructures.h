@@ -5,8 +5,8 @@
 #include "RenderMinimal.h"
 #include "GameEnums.h"
 
-class RHIVertexFactory;
-class Material;
+class SRHIVertexFactory;
+class SMaterial;
 
 struct MeshBatchElement
 {
@@ -26,8 +26,8 @@ struct MeshBatch
     uint64 IndexBufferLocation = 0;
 
 	std::vector<MeshBatchElement> Elements;
-    std::vector<Material*> MaterialSlots;
-	RHIVertexFactory* VertexFactory = nullptr;
+    std::vector<SMaterial*> MaterialSlots;
+	SRHIVertexFactory* VertexFactory = nullptr;
 };
 
 struct MinimalViewInfo

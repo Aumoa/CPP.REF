@@ -5,15 +5,15 @@
 #include "CoreMinimal.h"
 #include "RHIDeviceChild.h"
 
-class RHIShaderDescriptorView;
+class SRHIShaderDescriptorView;
 
 /// <summary>
 /// Represents resource view for binding to gpu context.
 /// </summary>
-class RENDERCORE_API RHIView : public RHIDeviceChild
+class RENDERCORE_API SRHIView : public SRHIDeviceChild
 {
-	GENERATED_BODY(RHIView)
+	GENERATED_BODY(SRHIView)
 
 public:
-	RHIView(RHIDevice* device);
+	SRHIView(SRHIDevice* device);
 };

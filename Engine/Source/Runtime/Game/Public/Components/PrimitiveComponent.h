@@ -5,20 +5,20 @@
 #include "CoreMinimal.h"
 #include "SceneComponent.h"
 
-class PrimitiveSceneProxy;
+class SPrimitiveSceneProxy;
 
-class GAME_API PrimitiveComponent : public SceneComponent
+class GAME_API SPrimitiveComponent : public SSceneComponent
 {
-	GENERATED_BODY(PrimitiveComponent)
+	GENERATED_BODY(SPrimitiveComponent)
 
 private:
 	uint8 _bHiddenInGame : 1 = false;
 
 public:
-	PrimitiveComponent();
+	SPrimitiveComponent();
 
-	virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
-	PrimitiveSceneProxy* SceneProxy = nullptr;
+	virtual SPrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
+	SPrimitiveSceneProxy* SceneProxy = nullptr;
 
 	void SetHiddenInGame(bool bHidden);
 	inline bool IsHiddenInGame() const { return _bHiddenInGame; }

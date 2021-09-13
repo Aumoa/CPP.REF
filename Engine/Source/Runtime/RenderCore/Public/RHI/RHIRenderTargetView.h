@@ -8,14 +8,14 @@
 
 struct ID3D12DescriptorHeap;
 struct D3D12_CPU_DESCRIPTOR_HANDLE;
-class RHITexture2D;
+class SRHITexture2D;
 
 /// <summary>
 /// Represents render target view for binding to gpu output.
 /// </summary>
-class RENDERCORE_API RHIRenderTargetView : public RHIView
+class RENDERCORE_API SRHIRenderTargetView : public SRHIView
 {
-	GENERATED_BODY(RHIRenderTargetView)
+	GENERATED_BODY(SRHIRenderTargetView)
 
 private:
 	ComPtr<ID3D12DescriptorHeap> _descriptor;
@@ -23,13 +23,13 @@ private:
 	uint32 _increment = 0;
 
 public:
-	RHIRenderTargetView(RHIDevice* device, uint32 descriptorCount);
-	~RHIRenderTargetView() override;
+	SRHIRenderTargetView(SRHIDevice* device, uint32 descriptorCount);
+	~SRHIRenderTargetView() override;
 
 	/// <summary>
 	/// Create render target view.
 	/// </summary>
-	void CreateRenderTargetView(RHITexture2D* texture, int32 index);
+	void CreateRenderTargetView(SRHITexture2D* texture, int32 index);
 
 	/// <summary>
 	/// Get initialized descriptor count.

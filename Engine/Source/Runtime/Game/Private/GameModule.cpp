@@ -3,10 +3,10 @@
 #include "pch.h"
 #include "GameModule.h"
 
-GameModule::GameModule() : Super()
+SGameModule::SGameModule() : Super()
 {
 }
 
-GameModule::~GameModule()
+SGameModule::~SGameModule()
 {
 }

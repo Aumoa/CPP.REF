@@ -6,12 +6,12 @@
 #include "Scene/PrimitiveSceneProxy.h"
 #include "GameStructures.h"
 
-SceneVisibility::SceneVisibility(Scene* owner) : Super()
+SSceneVisibility::SSceneVisibility(SScene* owner) : Super()
 	, _scene(owner)
 {
 }
 
-void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
+void SSceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 {
 	size_t cnt = _scene->_primitives.size();
 	_visibilityBits.Init(true, cnt);
@@ -27,7 +27,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 		BitArray::BitReference bit = _visibilityBits.AccessCorrespondingBit(relativeBit);
 		if (bit)
 		{
-			PrimitiveSceneProxy* primitive = _scene->_primitives[relativeBit.BitIndex];
+			SPrimitiveSceneProxy* primitive = _scene->_primitives[relativeBit.BitIndex];
 			if (primitive == nullptr)
 			{
 				bit = false;
@@ -62,7 +62,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 			RelativeBitReference relativeBit = bitIt.GetIndex();
 			if (_visibilityBits.AccessCorrespondingBit(relativeBit))
 			{
-				PrimitiveSceneProxy* primitive = _scene->_primitives[relativeBit.BitIndex];
+				SPrimitiveSceneProxy* primitive = _scene->_primitives[relativeBit.BitIndex];
 				Transform transform = primitive->ComponentTransform;
 				ptr->World = transform.GetMatrix();
 				ptr->WorldViewProj = Matrix4x4::Multiply(ptr->World, vp);
@@ -73,7 +73,7 @@ void SceneVisibility::CalcVisibility(const MinimalViewInfo& view)
 	}
 }
 
-void SceneVisibility::SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t idx)
+void SSceneVisibility::SetupView(SRHIDeviceContext* dc, SRHIShader* shader, size_t idx)
 {
 	std::vector<RHIShaderParameterElement> elements = shader->GetShaderParameterDeclaration();
 	uint64 bufferLocation = _viewBuffer->GetGPUVirtualAddress() + sizeof(RHIViewConstants) * idx;
@@ -89,7 +89,7 @@ void SceneVisibility::SetupView(RHIDeviceContext* dc, RHIShader* shader, size_t 
 	}
 }
 
-void SceneVisibility::FrustumCull()
+void SSceneVisibility::FrustumCull()
 {
 	for (ConstBitIterator bitIt(_visibilityBits); bitIt; ++bitIt)
 	{
@@ -102,9 +102,9 @@ void SceneVisibility::FrustumCull()
 	}
 }
 
-void SceneVisibility::ReadyBuffer(size_t capa, bool bAllowShrink)
+void SSceneVisibility::ReadyBuffer(size_t capa, bool bAllowShrink)
 {
-	RHIDevice* dev = _scene->GetDevice();
+	SRHIDevice* dev = _scene->GetDevice();
 	size_t prev = sizeof(RHIViewConstants) * _viewBufCapa;
 	size_t next = sizeof(RHIViewConstants) * capa;
 

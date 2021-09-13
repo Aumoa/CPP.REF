@@ -14,15 +14,15 @@ inline static auto pop_get(std::stack<T>& container)
 	return value;
 }
 
-GameAssetSystem::GameAssetSystem() : Super()
+SGameAssetSystem::SGameAssetSystem() : Super()
 {
 }
 
-GameAssetSystem::~GameAssetSystem()
+SGameAssetSystem::~SGameAssetSystem()
 {
 }
 
-void GameAssetSystem::Init()
+void SGameAssetSystem::Init()
 {
 	using namespace std;
 	using namespace std::filesystem;
@@ -61,7 +61,7 @@ void GameAssetSystem::Init()
 	SE_LOG(LogAssets, Verbose, L"{} content(s) found.", _assets.size());
 }
 
-Object* GameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
+SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 {
 	using namespace std::filesystem;
 
@@ -88,7 +88,7 @@ Object* GameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 		}
 
 		path ext = assetPath.extension();
-		Object* loadedObject = [&]() -> Object*
+		SObject* loadedObject = [&]() -> SObject*
 		{
 			if (auto loaded = LoadTexture2D(assetPath); loaded)
 			{
@@ -106,7 +106,7 @@ Object* GameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 	return it->second;
 }
 
-Texture2D* GameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath)
+STexture2D* SGameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath)
 {
 	constexpr std::array AllowExtensions =
 	{
@@ -122,7 +122,7 @@ Texture2D* GameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath
 		const bool bAllowed = std::find(AllowExtensions.begin(), AllowExtensions.end(), ext.wstring()) != AllowExtensions.end();
 		if (bAllowed)
 		{
-			auto* object = NewObject<Texture2D>(assetPath);
+			auto* object = NewObject<STexture2D>(assetPath);
 			object->StreamIn();
 			return object;
 		}

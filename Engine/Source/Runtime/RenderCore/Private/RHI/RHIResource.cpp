@@ -5,38 +5,38 @@
 #include "InternalComPtr.h"
 #include "RHI/LogRHI.h"
 
-RHIResource::RHIResource(RHIDevice* device, ID3D12Resource* resource) : Super(device)
+SRHIResource::SRHIResource(SRHIDevice* device, ID3D12Resource* resource) : Super(device)
 	, _resource(resource)
 {
 }
 
-RHIResource::~RHIResource()
+SRHIResource::~SRHIResource()
 {
 }
 
-uint64 RHIResource::GetGPUVirtualAddress() const
+uint64 SRHIResource::GetGPUVirtualAddress() const
 {
 	return _resource->GetGPUVirtualAddress();
 }
 
-uint64 RHIResource::GetBufferSize() const
+uint64 SRHIResource::GetBufferSize() const
 {
 	D3D12_RESOURCE_DESC desc = _resource->GetDesc();
 	return desc.Width * desc.Height * desc.DepthOrArraySize;
 }
 
-void* RHIResource::GetMappingPointer() const
+void* SRHIResource::GetMappingPointer() const
 {
 	if (_ptr == nullptr)
 	{
 		// Cache mapping buffer pointer on demand.
-		RHIResource* mutableThis = const_cast<RHIResource*>(this);
+		SRHIResource* mutableThis = const_cast<SRHIResource*>(this);
 		mutableThis->Mapping();
 	}
 	return _ptr;
 }
 
-void RHIResource::Mapping()
+void SRHIResource::Mapping()
 {
 	HR(LogRHI, _resource->Map(0, nullptr, &_ptr));
 }

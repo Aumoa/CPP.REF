@@ -10,7 +10,7 @@ LogSystem::fatal_exception::fatal_exception(const std::string& message) : except
 {
 }
 
-void LogSystem::InternalLog(LogCategory& category, ELogVerbosity logVerbosity, std::wstring& message)
+void LogSystem::InternalLog(SLogCategory& category, ELogVerbosity logVerbosity, std::wstring& message)
 {
 	category.OnLog(logVerbosity, message);
 

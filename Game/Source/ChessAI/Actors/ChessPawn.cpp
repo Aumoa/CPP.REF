@@ -89,9 +89,9 @@ bool AChessPawn::QueryInteractionWith(MovablePointsQuery& query, APiece* piece, 
 	return true;
 }
 
-StaticMesh* AChessPawn::GetStaticMesh() const
+SStaticMesh* AChessPawn::GetStaticMesh() const
 {
-	static StaticMesh* globalMesh = GameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
+	static SStaticMesh* globalMesh = SGameEngine::GetEngine()->GetAssetImporter()->ImportStaticMesh(AssetPath);
 	return globalMesh;
 }
 

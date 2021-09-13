@@ -6,9 +6,9 @@
 #include "ParserBase.h"
 #include <memory>
 
-class GAME_API AssimpParser : public ParserBase
+class GAME_API SAssimpParser : public SParserBase
 {
-	GENERATED_BODY(AssimpParser)
+	GENERATED_BODY(SAssimpParser)
 
 private:
 	class Impl;
@@ -17,16 +17,16 @@ private:
 	std::filesystem::path _path;
 	std::filesystem::path _name;
 	std::filesystem::path _parent;
-	StaticMesh* _mesh = nullptr;
+	SStaticMesh* _mesh = nullptr;
 
 public:
-	AssimpParser(GameEngine* engine, RHIVertexFactory* vfactory);
-	~AssimpParser() override;
+	SAssimpParser(SGameEngine* engine, SRHIVertexFactory* vfactory);
+	~SAssimpParser() override;
 
 	virtual bool TryParse(const std::filesystem::path& importPath) override;
 
 	virtual bool IsStaticMesh() const override;
-	virtual StaticMesh* GetStaticMesh() const override;
+	virtual SStaticMesh* GetStaticMesh() const override;
 
 private:
 	//bool ProcessMaterials();

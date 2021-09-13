@@ -11,15 +11,15 @@
 #include "TransparentShaderVS.hlsl.h"
 #include "TransparentShaderPS.hlsl.h"
 
-TransparentShader::TransparentShader(RHIDevice* device) : Super(device)
+STransparentShader::STransparentShader(SRHIDevice* device) : Super(device)
 {
-	class TransparentShaderMaterial : public Material
+	class TransparentShaderMaterial : public SMaterial
 	{
 	public:
-		using Super = Material;
+		using Super = SMaterial;
 
 	public:
-		TransparentShaderMaterial(TransparentShader* shader) : Super(shader)
+		TransparentShaderMaterial(STransparentShader* shader) : Super(shader)
 		{
 			_BlendMode = EMaterialBlendMode::Transparent;
 		}
@@ -44,22 +44,22 @@ TransparentShader::TransparentShader(RHIDevice* device) : Super(device)
 	_material = NewObject<TransparentShaderMaterial>(this);
 }
 
-std::span<uint8 const> TransparentShader::CompileVS()
+std::span<uint8 const> STransparentShader::CompileVS()
 {
 	return pTransparentShaderVS;
 }
 
-std::span<uint8 const> TransparentShader::CompilePS()
+std::span<uint8 const> STransparentShader::CompilePS()
 {
 	return pTransparentShaderPS;
 }
 
-Material* TransparentShader::GetDefaultMaterial() const
+SMaterial* STransparentShader::GetDefaultMaterial() const
 {
 	return _material;
 }
 
-std::vector<RHIShaderParameterElement> TransparentShader::GetShaderParameterDeclaration() const
+std::vector<RHIShaderParameterElement> STransparentShader::GetShaderParameterDeclaration() const
 {
 	std::vector<RHIShaderParameterElement> elements;
 

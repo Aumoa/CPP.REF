@@ -7,8 +7,8 @@
 #include "Queries/ChessQueries.h"
 
 class AChessBoard;
-class StaticMesh;
-class StaticMeshComponent;
+class SStaticMesh;
+class SStaticMeshComponent;
 class ChessBoardBuilt;
 
 class APiece : public AActor
@@ -18,7 +18,7 @@ public:
 
 private:
 	AChessBoard* _board = nullptr;
-	StaticMeshComponent* _meshComponent = nullptr;
+	SStaticMeshComponent* _meshComponent = nullptr;
 	EChessTeam _team = EChessTeam::Black;
 	GridIndex _myIndex;
 
@@ -38,5 +38,5 @@ public:
 	inline AChessBoard* GetBoard() const { return _board; }
 
 protected:
-	virtual StaticMesh* GetStaticMesh() const = 0;
+	virtual SStaticMesh* GetStaticMesh() const = 0;
 };

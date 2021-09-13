@@ -5,16 +5,16 @@
 #include "GameMinimal.h"
 #include "Assets/StaticMesh.h"
 
-class GameEngine;
+class SGameEngine;
 
-class Cube : public StaticMesh
+class Cube : public SStaticMesh
 {
 public:
-	using Super = StaticMesh;
+	using Super = SStaticMesh;
 
 public:
-	Cube(std::wstring_view name, GameEngine* engine);
+	Cube(std::wstring_view name, SGameEngine* engine);
 
 private:
-	static StaticMeshRenderData* GetRenderData(GameEngine* engine);
+	static SStaticMeshRenderData* GetRenderData(SGameEngine* engine);
 };

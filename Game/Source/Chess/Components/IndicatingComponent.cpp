@@ -38,7 +38,7 @@ void IndicatingComponent::SetupBoard(AChessBoardProxy* board)
 void IndicatingComponent::UpdateHoverIndicator(const Vector3& worldLocation)
 {
 	checkf(_hoverIndicator != nullptr, L"Board is not setted up. Please call SetupBoard() function to initialize system.");
-	auto* primitiveComponent = dynamic_cast<PrimitiveComponent*>(_hoverIndicator->GetRootComponent());
+	auto* primitiveComponent = dynamic_cast<SPrimitiveComponent*>(_hoverIndicator->GetRootComponent());
 	checkf(primitiveComponent != nullptr, L"The root component of hover indicator is not primitive component.");
 
 	AChessBoard* board = GetBoard();
@@ -57,7 +57,7 @@ void IndicatingComponent::UpdateHoverIndicator(const Vector3& worldLocation)
 
 void IndicatingComponent::UpdateSelected(optional<GridIndex> location)
 {
-	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<PrimitiveComponent>();
+	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<SPrimitiveComponent>();
 	GridIndex gridIndex = location.value_or(_hoverIndex);
 	AChessBoard* board = GetBoard();
 	AChessBoardProxy* proxy = GetProxy();
@@ -98,7 +98,7 @@ void IndicatingComponent::UpdateSelectIndicator(bool bActive)
 {
 	AChessBoard* board = GetBoard();
 	World* world = board->GetWorld();
-	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<PrimitiveComponent>();
+	auto* primitiveComponent = _selectedIndicator->GetRootComponentAs<SPrimitiveComponent>();
 
 	if (bActive)
 	{
@@ -193,7 +193,7 @@ void IndicatingComponent::UpdateIndicatorsImpl(vector<AGridIndicator*>& containe
 	{
 		for (size_t i = count; i < container.size(); ++i)
 		{
-			PrimitiveComponent* primitive = container[i]->GetRootComponentAs<PrimitiveComponent>();
+			SPrimitiveComponent* primitive = container[i]->GetRootComponentAs<SPrimitiveComponent>();
 			if (primitive != nullptr)
 			{
 				primitive->SetHiddenInGame(true);
@@ -211,7 +211,7 @@ void IndicatingComponent::UpdateIndicatorsImpl(vector<AGridIndicator*>& containe
 			{
 				AGridIndicator*& indicator = container[idx++];
 				SetIndicatorLocation(indicator, point);
-				if (auto* primitive = indicator->GetRootComponentAs<PrimitiveComponent>(); primitive != nullptr)
+				if (auto* primitive = indicator->GetRootComponentAs<SPrimitiveComponent>(); primitive != nullptr)
 				{
 					primitive->SetHiddenInGame(false);
 				}

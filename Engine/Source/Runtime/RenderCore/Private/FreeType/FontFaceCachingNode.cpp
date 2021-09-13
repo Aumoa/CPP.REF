@@ -8,17 +8,17 @@
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHIShaderResourceView.h"
 
-FontFaceCachingNode::FontFaceCachingNode(RHIDevice* device) : Super()
+SFontFaceCachingNode::SFontFaceCachingNode(SRHIDevice* device) : Super()
 	, _device(device)
 {
-	_shaderResourceView = NewObject<RHIShaderResourceView>(device, 1);
+	_shaderResourceView = NewObject<SRHIShaderResourceView>(device, 1);
 }
 
-FontFaceCachingNode::~FontFaceCachingNode()
+SFontFaceCachingNode::~SFontFaceCachingNode()
 {
 }
 
-void FontFaceCachingNode::StreamGlyphs(FontFace* face, std::wstring_view glyphs)
+void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyphs)
 {
 	int32 requiredMaxWidth = _requiredMaxWidth;
 	int32 requiredMaxHeight = 0;
@@ -78,7 +78,7 @@ void FontFaceCachingNode::StreamGlyphs(FontFace* face, std::wstring_view glyphs)
 
 #define ShouldBeReload(Body) (!(Body).bLoad || bForceReload)
 
-void FontFaceCachingNode::Apply()
+void SFontFaceCachingNode::Apply()
 {
 	if (!_bNeedApply)
 	{
@@ -128,7 +128,7 @@ inline static int32 Align256(const int32& value)
 	return (value + 255) & ~255;
 }
 
-bool FontFaceCachingNode::ReallocateBufferIfRequired()
+bool SFontFaceCachingNode::ReallocateBufferIfRequired()
 {
 	int32 pixelWidth = 0, pixelHeight = 0;
 	if (_glyphBuffer)
@@ -144,13 +144,13 @@ bool FontFaceCachingNode::ReallocateBufferIfRequired()
 
 	if (_glyphBuffer)
 	{
-		RHICommandQueue* queue = _device->GetPrimaryQueue();
+		SRHICommandQueue* queue = _device->GetPrimaryQueue();
 		queue->AddGarbageObject(queue->GetLastSignal(), _glyphBuffer);
 		_glyphBuffer = nullptr;
 	}
 
 	// Create new texture buffer.
-	RHIDynamicTexture2D* texture = _device->CreateDynamicTexture2D(
+	SRHIDynamicTexture2D* texture = _device->CreateDynamicTexture2D(
 		ERHIResourceStates::PixelShaderResource,
 		ERHIPixelFormat::R8_UNORM,
 		Align256(_requiredMaxWidth),
@@ -163,7 +163,7 @@ bool FontFaceCachingNode::ReallocateBufferIfRequired()
 	return true;
 }
 
-RHIShaderResourceView* FontFaceCachingNode::GetDebugTexture() const
+SRHIShaderResourceView* SFontFaceCachingNode::GetDebugTexture() const
 {
 	return _shaderResourceView;
 }

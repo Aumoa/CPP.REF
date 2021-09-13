@@ -9,37 +9,37 @@
 #include "Draw/SlateWindowElementList.h"
 #include "Shaders/SlateShader/SlateShader.h"
 
-LocalPlayer::LocalPlayer() : Super()
+SLocalPlayer::SLocalPlayer() : Super()
 {
 }
 
-void LocalPlayer::Init(IFrameworkView* frameworkView)
+void SLocalPlayer::Init(IFrameworkView* frameworkView)
 {
 	_frameworkView = frameworkView;
 
 	_slateWindow = SNew(SWindow);
 
 	// Register ResizeApp handler.
-	_frameworkView->Size.AddObject(this, &LocalPlayer::OnResizedApp);
+	_frameworkView->Size.AddObject(this, &SLocalPlayer::OnResizedApp);
 	// And apply size immediately.
 	_slateWindow->SetWindowSize(Vector2((float)_frameworkView->GetFrameworkWidth(), (float)_frameworkView->GetFrameworkHeight()));
 
-	_drawElements = NewObject<SlateWindowElementList>(_slateWindow);
+	_drawElements = NewObject<SSlateWindowElementList>(_slateWindow);
 }
 
-void LocalPlayer::Tick(std::chrono::duration<float> elapsedTime)
+void SLocalPlayer::Tick(std::chrono::duration<float> elapsedTime)
 {
 	_slateWindow->ExecuteTick(elapsedTime);
 }
 
-void LocalPlayer::Render(RHIDeviceContext* deviceContext, SlateShader* shader)
+void SLocalPlayer::Render(SRHIDeviceContext* deviceContext, SSlateShader* shader)
 {
 	_drawElements->Clear();
 	_slateWindow->ExecutePaint(_drawElements);
 	shader->RenderElements(deviceContext, _slateWindow->GetDesiredSize(), _drawElements);
 }
 
-void LocalPlayer::OnResizedApp(int32 x, int32 y)
+void SLocalPlayer::OnResizedApp(int32 x, int32 y)
 {
 	_slateWindow->SetWindowSize(Vector2((float)x, (float)y));
 }

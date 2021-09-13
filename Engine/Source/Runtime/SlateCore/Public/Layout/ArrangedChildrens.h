@@ -7,16 +7,16 @@
 #include "ArrangedWidget.h"
 #include "LayoutEnums.h"
 
-class SLATECORE_API ArrangedChildrens : virtual public Object
+class SLATECORE_API SArrangedChildrens : virtual public SObject
 {
-	GENERATED_BODY(ArrangedChildrens)
+	GENERATED_BODY(SArrangedChildrens)
 
 private:
 	const ESlateVisibility _VisibilityFilter;
 	std::vector<ArrangedWidget> _Widgets;
 
 public:
-	ArrangedChildrens(ESlateVisibility visibilityFilter);
+	SArrangedChildrens(ESlateVisibility visibilityFilter);
 
 	void AddWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry);
 	void InsertWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry, size_t index);

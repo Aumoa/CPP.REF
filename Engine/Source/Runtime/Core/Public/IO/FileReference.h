@@ -7,40 +7,40 @@
 #include <fstream>
 #include <filesystem>
 
-class Object;
+class SObject;
 
 /// <summary>
 /// Represents file reference.
 /// </summary>
-class CORE_API FileReference : public FileSystemReference
+class CORE_API SFileReference : public SFileSystemReference
 {
-	GENERATED_BODY(FileReference)
+	GENERATED_BODY(SFileReference)
 
 private:
 	std::wfstream _sharedstream;
-	std::set<const Object*> _shared;
+	std::set<const SObject*> _shared;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="FileReference"/> instance.
+	/// Initialize new <see cref="SFileReference"/> instance.
 	/// </summary>
-	FileReference() = default;
+	SFileReference() = default;
 
 	/// <summary>
-	/// Initialize new <see cref="FileReference"/> instance.
+	/// Initialize new <see cref="SFileReference"/> instance.
 	/// </summary>
-	FileReference(const FileReference& rhs) = default;
+	SFileReference(const SFileReference& rhs) = default;
 
 	/// <summary>
-	/// Initialize new <see cref="FileReference"/> instance.
+	/// Initialize new <see cref="SFileReference"/> instance.
 	/// </summary>
-	FileReference(FileReference&& rhs) = default;
+	SFileReference(SFileReference&& rhs) = default;
 
 	/// <summary>
-	/// Initialize new <see cref="FileReference"/> instance.
+	/// Initialize new <see cref="SFileReference"/> instance.
 	/// </summary>
-	FileReference(const std::filesystem::path& filepath);
-	~FileReference();
+	SFileReference(const std::filesystem::path& filepath);
+	~SFileReference();
 
 	/// <summary>
 	/// Get file name with extensions.
@@ -72,16 +72,16 @@ public:
 	/// <param name="mode"> The opening mode. </param>
 	/// <param name="bCreateIfNotExists"> Always create new file if not exists. </param>
 	/// <param name="bCreateDirectoryRecursive"> Create parent directory recursively. </param>
-	std::wfstream& OpenSharedStream(const Object* sharingUser, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out, bool bCreateIfNotExists = true, bool bCreateDirectoryRecursive = true);
+	std::wfstream& OpenSharedStream(const SObject* sharingUser, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out, bool bCreateIfNotExists = true, bool bCreateDirectoryRecursive = true);
 
 	/// <summary>
 	/// Close shared file stream.
 	/// </summary>
 	/// <param name="sharingUser"> Key for shared user list. </param>
-	void CloseSharedStream(const Object* sharingUser);
+	void CloseSharedStream(const SObject* sharingUser);
 
-	FileReference& operator =(const FileReference& rhs) = default;
-	FileReference& operator =(FileReference&& rhs) = default;
+	SFileReference& operator =(const SFileReference& rhs) = default;
+	SFileReference& operator =(SFileReference&& rhs) = default;
 
 private:
 	void FlushAndCloseSharedStream();

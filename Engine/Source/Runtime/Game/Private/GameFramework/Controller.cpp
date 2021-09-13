@@ -7,7 +7,7 @@
 
 AController::AController() : Super()
 {
-	SetRootComponent(NewObject<SceneComponent>());
+	SetRootComponent(NewObject<SSceneComponent>());
 }
 
 void AController::Possess(APawn* pawn)

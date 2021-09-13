@@ -4,31 +4,31 @@
 
 #include "CoreMinimal.h"
 
-class RHIDevice;
+class SRHIDevice;
 
 /// <summary>
 /// Represents classes created by logical device.
 /// </summary>
-class RENDERCORE_API RHIDeviceChild : virtual public Object
+class RENDERCORE_API SRHIDeviceChild : virtual public SObject
 {
-	GENERATED_BODY(RHIDeviceChild)
+	GENERATED_BODY(SRHIDeviceChild)
 
 private:
-	RHIDevice* _device = nullptr;
+	SRHIDevice* _device = nullptr;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="RHIDeviceChild"/> instance.
+	/// Initialize new <see cref="SRHIDeviceChild"/> instance.
 	/// </summary>
 	/// <param name="device"> The logical device. </param>
-	inline RHIDeviceChild(RHIDevice* device) : _device(device)
+	inline SRHIDeviceChild(SRHIDevice* device) : _device(device)
 	{
 	}
 
 	/// <summary>
 	/// Get logical device that create this instance.
 	/// </summary>
-	inline RHIDevice* GetDevice() const
+	inline SRHIDevice* GetDevice() const
 	{
 		return _device;
 	}

@@ -13,22 +13,22 @@ enum class ELogVerbosity;
 /// <summary>
 /// Represents log category that file logging state, display state, etc...
 /// </summary>
-class CORE_API LogCategory : virtual public Object
+class CORE_API SLogCategory : virtual public SObject
 {
-	GENERATED_BODY(LogCategory)
+	GENERATED_BODY(SLogCategory)
 	friend class LogSystem;
 
 private:
-	static std::optional<FileReference> _file;
+	static std::optional<SFileReference> _file;
 	std::wstring _name;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="LogCategory"/> instance.
+	/// Initialize new <see cref="SLogCategory"/> instance.
 	/// </summary>
 	/// <param name="categoryName"> The category name. </param>
-	LogCategory(std::wstring_view categoryName);
-	~LogCategory();
+	SLogCategory(std::wstring_view categoryName);
+	~SLogCategory();
 
 private:
 	static std::wstring_view VerbosityToString(ELogVerbosity verbosity);
@@ -42,5 +42,5 @@ protected:
 	virtual void OnLog(ELogVerbosity logVerbosity, std::wstring_view message);
 };
 
-#define DECLARE_LOG_CATEGORY(API, CategoryName) extern API LogCategory CategoryName;
-#define DEFINE_LOG_CATEGORY(CategoryName) LogCategory CategoryName(L ## #CategoryName);
+#define DECLARE_LOG_CATEGORY(API, CategoryName) extern API SLogCategory CategoryName;
+#define DEFINE_LOG_CATEGORY(CategoryName) SLogCategory CategoryName(L ## #CategoryName);

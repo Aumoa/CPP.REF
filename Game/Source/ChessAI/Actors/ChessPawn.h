@@ -25,7 +25,7 @@ public:
 	virtual bool QueryInteractionWith(MovablePointsQuery& query, APiece* piece, const ChessBoardBuilt& built) const override;
 
 protected:
-	virtual StaticMesh* GetStaticMesh() const override;
+	virtual SStaticMesh* GetStaticMesh() const override;
 
 private:
 	inline int32 GetIncrementer() const;

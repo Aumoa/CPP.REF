@@ -5,10 +5,10 @@
 #include "GameMinimal.h"
 #include "GameInstance.h"
 
-class ChessGameInstance : public GameInstance
+class ChessGameInstance : public SGameInstance
 {
 public:
-	using Super = GameInstance;
+	using Super = SGameInstance;
 
 public:
 	ChessGameInstance();

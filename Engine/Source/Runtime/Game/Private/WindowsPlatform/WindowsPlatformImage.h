@@ -7,9 +7,9 @@
 
 struct IWICFormatConverter;
 
-class WindowsPlatformImage : virtual public Object, virtual public IPlatformImage
+class SWindowsPlatformImage : virtual public SObject, virtual public IPlatformImage
 {
-	GENERATED_BODY(WindowsPlatformImage)
+	GENERATED_BODY(SWindowsPlatformImage)
 
 private:
 	ComPtr<IWICFormatConverter> _imageSource = nullptr;
@@ -18,8 +18,8 @@ private:
 	ERHIPixelFormat _format = ERHIPixelFormat::Unknown;
 
 public:
-	WindowsPlatformImage(IWICFormatConverter* imageSource, ERHIPixelFormat format);
-	virtual ~WindowsPlatformImage() override;
+	SWindowsPlatformImage(IWICFormatConverter* imageSource, ERHIPixelFormat format);
+	virtual ~SWindowsPlatformImage() override;
 
 	virtual void CopyPixels(uint32 stride, uint32 bufferSize, void* pBuffer) override;
 	virtual int32 GetWidth() const override;

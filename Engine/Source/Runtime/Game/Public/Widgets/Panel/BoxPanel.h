@@ -45,10 +45,10 @@ public:
 	inline EOrientation GetOrientation() const { return _orientation; }
 
 protected:
-	virtual void OnArrangeChildren(ArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
 
 private:
-	void ArrangeChildrenAlong(EOrientation orientation, EFlowDirection layoutFlow, const Geometry& allottedGeometry, ArrangedChildrens* arrangedChildrens) const;
+	void ArrangeChildrenAlong(EOrientation orientation, EFlowDirection layoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens) const;
 	static Vector2 ComputeDesiredSizeForBox(EOrientation orientation, const std::vector<Slot>& slots);
 
 	static constexpr Margin LayoutPaddingWithFlow(const Margin& padding, EFlowDirection layoutFlow)

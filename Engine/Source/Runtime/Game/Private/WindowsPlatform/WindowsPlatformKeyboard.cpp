@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-// File: WindowsPlatformKeyboard.cpp
+// File: SWindowsPlatformKeyboard.cpp
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -52,24 +52,24 @@ namespace WindowsPlatformKeyboardInternal
 //     {
 //
 //     case WM_ACTIVATEAPP:
-//         WindowsPlatformKeyboard::ProcessMessage(message, wParam, lParam);
+//         SWindowsPlatformKeyboard::ProcessMessage(message, wParam, lParam);
 //         break;
 //
 //     case WM_KEYDOWN:
 //     case WM_SYSKEYDOWN:
 //     case WM_KEYUP:
 //     case WM_SYSKEYUP:
-//         WindowsPlatformKeyboard::ProcessMessage(message, wParam, lParam);
+//         SWindowsPlatformKeyboard::ProcessMessage(message, wParam, lParam);
 //         break;
 //
 //     }
 // }
 //
 
-class WindowsPlatformKeyboard::Impl
+class SWindowsPlatformKeyboard::Impl
 {
 public:
-    Impl(WindowsPlatformKeyboard* owner) :
+    Impl(SWindowsPlatformKeyboard* owner) :
         mState{},
         mOwner(owner)
     {
@@ -108,16 +108,16 @@ public:
     }
 
     KeyboardState           mState;
-    WindowsPlatformKeyboard* mOwner;
+    SWindowsPlatformKeyboard* mOwner;
 
-    static WindowsPlatformKeyboard::Impl* s_keyboard;
+    static SWindowsPlatformKeyboard::Impl* s_keyboard;
 };
 
 
-WindowsPlatformKeyboard::Impl* WindowsPlatformKeyboard::Impl::s_keyboard = nullptr;
+SWindowsPlatformKeyboard::Impl* SWindowsPlatformKeyboard::Impl::s_keyboard = nullptr;
 
 
-void WindowsPlatformKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
+void SWindowsPlatformKeyboard::ProcessMessage(uint32 message, uint64 wParam, int64 lParam)
 {
     using namespace WindowsPlatformKeyboardInternal;
 
@@ -182,17 +182,17 @@ void WindowsPlatformKeyboard::ProcessMessage(uint32 message, uint64 wParam, int6
 }
 
 // Public constructor.
-WindowsPlatformKeyboard::WindowsPlatformKeyboard() noexcept(false)
+SWindowsPlatformKeyboard::SWindowsPlatformKeyboard() noexcept(false)
     : pImpl(std::make_unique<Impl>(this))
 {
 }
 
-WindowsPlatformKeyboard::~WindowsPlatformKeyboard()
+SWindowsPlatformKeyboard::~SWindowsPlatformKeyboard()
 {
 }
 
 
-KeyboardState WindowsPlatformKeyboard::GetState() const
+KeyboardState SWindowsPlatformKeyboard::GetState() const
 {
     KeyboardState state;
     pImpl->GetState(state);
@@ -200,20 +200,20 @@ KeyboardState WindowsPlatformKeyboard::GetState() const
 }
 
 
-void WindowsPlatformKeyboard::Reset() noexcept
+void SWindowsPlatformKeyboard::Reset() noexcept
 {
     pImpl->Reset();
 }
 
 
-bool WindowsPlatformKeyboard::IsConnected() const
+bool SWindowsPlatformKeyboard::IsConnected() const
 {
     return pImpl->IsConnected();
 }
 
-WindowsPlatformKeyboard& WindowsPlatformKeyboard::Get()
+SWindowsPlatformKeyboard& SWindowsPlatformKeyboard::Get()
 {
-    static WindowsPlatformKeyboard sInstance;
+    static SWindowsPlatformKeyboard sInstance;
 
     if (!Impl::s_keyboard || !Impl::s_keyboard->mOwner)
     {
@@ -225,5 +225,5 @@ WindowsPlatformKeyboard& WindowsPlatformKeyboard::Get()
 
 IPlatformKeyboard& IPlatformKeyboard::Get()
 {
-    return WindowsPlatformKeyboard::Get();
+    return SWindowsPlatformKeyboard::Get();
 }

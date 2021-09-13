@@ -3,15 +3,15 @@
 #include "pch.h"
 #include "RHI/RHITexture2D.h"
 
-RHITexture2D::RHITexture2D(RHIDevice* device, ID3D12Resource* resource) : Super(device, resource)
+SRHITexture2D::SRHITexture2D(SRHIDevice* device, ID3D12Resource* resource) : Super(device, resource)
 {
 }
 
-RHITexture2D::~RHITexture2D()
+SRHITexture2D::~SRHITexture2D()
 {
 }
 
-void RHITexture2D::GetPixelSize(int32* pWidth, int32* pHeight)
+void SRHITexture2D::GetPixelSize(int32* pWidth, int32* pHeight)
 {
 	D3D12_RESOURCE_DESC desc = GetResource()->GetDesc();
 	if (pWidth != nullptr)

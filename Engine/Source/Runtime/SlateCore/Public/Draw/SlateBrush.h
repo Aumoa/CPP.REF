@@ -4,18 +4,18 @@
 
 #include "RenderMinimal.h"
 
-class RHIShaderResourceView;
+class SRHIShaderResourceView;
 
 struct SlateBrush
 {
-	RHIShaderResourceView* ImageSource = nullptr;
+	SRHIShaderResourceView* ImageSource = nullptr;
 	Vector2 ImageSize;
 
 	SlateBrush()
 	{
 	}
 
-	SlateBrush(RHIShaderResourceView* imageSource, const Vector2& imageSize)
+	SlateBrush(SRHIShaderResourceView* imageSource, const Vector2& imageSize)
 		: ImageSource(imageSource)
 		, ImageSize(imageSize)
 	{

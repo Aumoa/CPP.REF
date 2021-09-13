@@ -8,10 +8,9 @@
 /// <summary>
 /// Represents the single window with input events and basic user interface behaviors.
 /// </summary>
-class CoreWindow : virtual public Object, virtual public IFrameworkView
+class SCoreWindow : virtual public SObject, virtual public IFrameworkView
 {
-public:
-	using Super = Object;
+	GENERATED_BODY(SCoreWindow)
 
 public:
 	static constexpr wchar_t ApplicationTitle[] = L"GameApp";
@@ -23,9 +22,9 @@ private:
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="CoreWindow"/> instance.
+	/// Initialize new <see cref="SCoreWindow"/> instance.
 	/// </summary>
-	CoreWindow();
+	SCoreWindow();
 
 	/// <inheritdoc/>
 	virtual void Start() override;
