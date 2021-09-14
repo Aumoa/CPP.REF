@@ -35,4 +35,41 @@ public:																						\
 	virtual const Type& GetType() const														\
 	{																						\
 		return StaticClass();																\
+	}																						\
+																							\
+public:																						\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_FunctionChain()										\
+	{																						\
+		return REFLECTION_FunctionChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<>																				\
+	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t>																		\
+	static consteval void REFLECTION_GetFunctionPointer(void*);								\
+	template<size_t>																		\
+	static consteval void REFLECTION_GetFunctionName(void*);
+
+#define SFUNCTION(FunctionName, ...)														\
+	template<>																				\
+	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	{																						\
+		return REFLECTION_FunctionChain<__LINE__ - 1>() + 1;								\
+	}																						\
+																							\
+	template<size_t N> requires (N == REFLECTION_FunctionChain<__LINE__>())					\
+	static consteval auto REFLECTION_GetFunctionPointer(int)								\
+	{																						\
+		return &This::FunctionName;															\
+	}																						\
+																							\
+	template<size_t N> requires (N == REFLECTION_FunctionChain<__LINE__>())					\
+	static consteval auto REFLECTION_GetFunctionName(int)									\
+	{																						\
+		return L ## #FunctionName;															\
 	}

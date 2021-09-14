@@ -24,18 +24,21 @@ INT __stdcall wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR
 	if (!loader)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. Game.dll is corrupted.");
+		return -1;
 	}
 
 	SGameModule* gameModule = loader();
 	if (gameModule == nullptr)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
+		return -1;
 	}
 
 	SGameEngine* gameEngine = gameModule->CreateGameEngine();
 	if (gameEngine == nullptr)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
+		return -1;
 	}
 
 	SCoreWindow frameworkView;

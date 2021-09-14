@@ -42,6 +42,7 @@ public:
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The string view instance. </returns>
 	virtual std::wstring ToString(std::wstring_view formatArgs = L"") const;
+	SFUNCTION(ToString);
 
 	/// <summary>
 	/// Create subobject which linked outer to this.
@@ -64,12 +65,14 @@ public:
 	/// </summary>
 	/// <returns> The outer object. </returns>
 	SObject* GetOuter() const;
+	SFUNCTION(GetOuter);
 
 	/// <summary>
 	/// Change outer. SObject will destroy when outer be destroyed.
 	/// </summary>
 	/// <param name="newOuter"> The new outer. </param>
 	void SetOuter(SObject* newOuter);
+	SFUNCTION(SetOuter);
 
 	/// <summary>
 	/// Destroy subobject.
