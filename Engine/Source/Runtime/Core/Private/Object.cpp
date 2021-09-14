@@ -55,7 +55,7 @@ void SObject::DestroySubobject(SObject* subobject)
 	SObject* outer = subobject->_outer;
 	if (outer == nullptr)
 	{
-		delete outer;
+		delete subobject;
 		return;
 	}
 
