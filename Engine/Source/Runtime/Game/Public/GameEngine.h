@@ -43,8 +43,7 @@ public:
 	virtual void SetupFrameworkView(IFrameworkView* frameworkView);
 	virtual bool LoadGameModule(std::wstring_view moduleName);
 
-	static int32 InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs);
-
+	int32 InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs);
 	SGameInstance* GetGameInstance() const;
 
 private:

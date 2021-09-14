@@ -30,14 +30,14 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 		return;
 	}
 
-	auto _gameModuleLoader = _module->GetFunctionPointer<SGameModule*()>("LoadGameModule");
-	if (!_gameModuleLoader)
+	auto loader = _module->GetFunctionPointer<SGameModule*()>("LoadGameModule");
+	if (!loader)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.");
 		return;
 	}
 
-	_gameModule = _gameModuleLoader();
+	_gameModule = loader();
 	if (!_gameModule)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", gameModuleName);

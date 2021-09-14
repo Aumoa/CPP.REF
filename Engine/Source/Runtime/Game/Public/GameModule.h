@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 class SGameInstance;
+class SGameEngine;
 
 class GAME_API SGameModule : virtual public SObject
 {
@@ -14,7 +15,8 @@ public:
 	SGameModule();
 	virtual ~SGameModule() override;
 
-	virtual SGameInstance* CreatePrimaryGameModule() = 0;
+	virtual SGameInstance* CreatePrimaryGameModule();
+	virtual SGameEngine* CreateGameEngine();
 };
 
 #define DEFINE_GAME_MODULE(GameModuleClass)		\

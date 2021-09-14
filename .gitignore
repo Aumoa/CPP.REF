@@ -7,3 +7,6 @@ Build/
 
 # Intermediate files.
 Intermediate/
+
+# Game saved files.
+Game/Saved/

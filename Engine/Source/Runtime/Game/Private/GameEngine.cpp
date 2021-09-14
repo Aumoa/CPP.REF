@@ -113,23 +113,23 @@ int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view 
 	}
 
 	// Create GameEngine instance and initialize it.
-	std::unique_ptr engine = std::make_unique<SGameEngine>();
-	if (!engine->InitEngine())
+	if (!InitEngine())
 	{
+		SE_LOG(LogEngine, Fatal, L"Could not initialize engine.");
 		return -1;
 	}
 
 	// Load game module.
-	if (!engine->LoadGameModule(*moduleName))
+	if (!LoadGameModule(*moduleName))
 	{
 		return -1;
 	}
 
 	// Setup framework view.
-	engine->SetupFrameworkView(frameworkView);
+	SetupFrameworkView(frameworkView);
 
 	// Start application now!
-	engine->_gameInstance->Init();
+	_gameInstance->Init();
 	frameworkView->Start();
 	return 0;
 }
