@@ -9,8 +9,7 @@ class SGameInstance;
 
 class CORE_API SPlatformModule : virtual public SObject
 {
-public:
-	using Super = SObject;
+	GENERATED_BODY(SPlatformModule)
 
 private:
 	void* _NativeHandle = nullptr;

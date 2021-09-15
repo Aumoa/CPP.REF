@@ -27,7 +27,7 @@ SObject::~SObject() noexcept
 
 std::wstring SObject::ToString(std::wstring_view formatArgs) const
 {
-	return GetType().GetFriendlyName();
+	return GetType()->GetFriendlyName();
 }
 
 SObject* SObject::GetOuter() const

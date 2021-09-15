@@ -26,13 +26,13 @@ public:																						\
 	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Class>::Type;			\
 	using This = Class;																		\
 																							\
-	static const Type& StaticClass()														\
+	static Type* StaticClass()																\
 	{																						\
 		static Type MyClassType(Type::TypeGenerator<Class>(L ## #Class));					\
-		return MyClassType;																	\
+		return &MyClassType;																\
 	}																						\
 																							\
-	virtual const Type& GetType() const														\
+	virtual Type* GetType() const															\
 	{																						\
 		return StaticClass();																\
 	}																						\
@@ -51,7 +51,7 @@ public:																						\
 	}																						\
 																							\
 	template<size_t>																		\
-	static consteval void REFLECTION_GetFunctionPointer(void*);								\
+	static void REFLECTION_GetFunctionPointer(void*);										\
 	template<size_t>																		\
 	static consteval void REFLECTION_GetFunctionName(void*);
 
@@ -63,7 +63,7 @@ public:																						\
 	}																						\
 																							\
 	template<size_t N> requires (N == REFLECTION_FunctionChain<__LINE__>())					\
-	static consteval auto REFLECTION_GetFunctionPointer(int)								\
+	static auto REFLECTION_GetFunctionPointer(int)											\
 	{																						\
 		return &This::FunctionName;															\
 	}																						\

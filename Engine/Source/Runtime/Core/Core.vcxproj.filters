@@ -281,5 +281,8 @@
     <ClInclude Include="Public\Misc\Paths.h">
       <Filter>Public\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Reflection\Method.h">
+      <Filter>Public\Reflection</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
