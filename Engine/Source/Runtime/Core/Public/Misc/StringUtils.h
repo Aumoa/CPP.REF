@@ -8,6 +8,7 @@
 #include <format>
 #include <sstream>
 #include <vector>
+#include <optional>
 #include "PrimitiveTypes.h"
 
 /// <summary>

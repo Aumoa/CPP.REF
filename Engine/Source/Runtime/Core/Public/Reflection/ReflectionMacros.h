@@ -22,6 +22,8 @@ namespace ReflectionMacros
 }
 
 #define GENERATED_BODY(Class)																\
+	friend class Type;																		\
+																							\
 public:																						\
 	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Class>::Type;			\
 	using This = Class;																		\
@@ -37,7 +39,7 @@ public:																						\
 		return StaticClass();																\
 	}																						\
 																							\
-public:																						\
+private:																					\
 	template<size_t _Line>																	\
 	static consteval size_t REFLECTION_FunctionChain()										\
 	{																						\
@@ -50,10 +52,24 @@ public:																						\
 		return -1;																			\
 	}																						\
 																							\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_PropertyChain()										\
+	{																						\
+		return REFLECTION_PropertyChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<>																				\
+	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
 	template<size_t>																		\
 	static void REFLECTION_GetFunctionPointer(void*);										\
 	template<size_t>																		\
-	static consteval void REFLECTION_GetFunctionName(void*);
+	static consteval void REFLECTION_GetFunctionName(void*);								\
+	template<size_t>																		\
+	static void REFLECTION_GetPropertyPointer(void*);
 
 #define SFUNCTION(FunctionName, ...)														\
 	template<>																				\
@@ -72,4 +88,31 @@ public:																						\
 	static consteval auto REFLECTION_GetFunctionName(int)									\
 	{																						\
 		return L ## #FunctionName;															\
+	}
+
+#define SPROPERTY(PropertyName, ...)														\
+	template<>																				\
+	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	{																						\
+		return REFLECTION_PropertyChain<__LINE__ - 1>() + 1;								\
+	}																						\
+																							\
+	template<size_t N> requires (N == REFLECTION_PropertyChain<__LINE__>())					\
+	static auto REFLECTION_GetPropertyPointer(int)											\
+	{																						\
+		using PT = decltype(This::PropertyName);											\
+		static Property::PropertyGenerator Generator =										\
+		{																					\
+			.Name = L ## #PropertyName,														\
+			.MemberType = Type::GetStaticClass<												\
+			std::remove_const_t<std::remove_pointer_t<decltype(This::PropertyName)>>>(),	\
+			.Setter = +[](SObject* _this, const void* _value)								\
+	{ dynamic_cast<This*>(_this)->PropertyName = *reinterpret_cast<const PT*>(_value); },	\
+			.Getter = +[](const SObject* _this) -> const void*								\
+			{ return &dynamic_cast<const This*>(_this)->PropertyName; },					\
+			.bIsPointer = std::is_pointer_v<PT>,											\
+			.bIsConst = std::is_const_v<PT>,												\
+			.bIsStatic = Property::__Internal_IsStaticMember(&This::PropertyName),			\
+		};																					\
+		return &Generator;																	\
 	}

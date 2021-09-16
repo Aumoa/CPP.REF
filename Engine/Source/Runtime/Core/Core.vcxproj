@@ -168,6 +168,7 @@
     <ClInclude Include="Public\PlatformMisc\PlatformModule.h" />
     <ClInclude Include="Public\PrimitiveTypes.h" />
     <ClInclude Include="Public\Reflection\Method.h" />
+    <ClInclude Include="Public\Reflection\Property.h" />
     <ClInclude Include="Public\Reflection\ReflectionMacros.h" />
     <ClInclude Include="Public\Reflection\Type.h" />
     <ClInclude Include="Public\Threading\EventHandle.h" />

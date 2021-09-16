@@ -100,3 +100,40 @@ const Method* Type::GetMethod(std::wstring_view friendlyName, bool bIncludeSuper
 
 	return super->GetMethod(friendlyName, true);
 }
+
+std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
+{
+	if (bIncludeSuperMembers)
+	{
+		std::vector<Property> properties = _properties;
+		for (const Type* super = this; super; super = super->GetSuper())
+		{
+			std::vector<Property> superProperties = super->GetProperties(false);
+			properties.insert(properties.end(), superProperties.begin(), superProperties.end());
+		}
+		return properties;
+	}
+	else
+	{
+		return _properties;
+	}
+}
+
+const Property* Type::GetProperty(std::wstring_view friendlyName, bool bIncludeSuperMembers) const
+{
+	for (size_t i = 0; i < _properties.size(); ++i)
+	{
+		if (_properties[i].GetFriendlyName() == friendlyName)
+		{
+			return &_properties[i];
+		}
+	}
+
+	Type* super = nullptr;
+	if (!bIncludeSuperMembers || !(super = GetSuper()))
+	{
+		return nullptr;
+	}
+
+	return super->GetProperty(friendlyName, true);
+}

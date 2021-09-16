@@ -6,6 +6,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <functional>
 #include "PrimitiveTypes.h"
 #include "Reflection/ReflectionMacros.h"
 

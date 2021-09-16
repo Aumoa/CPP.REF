@@ -12,6 +12,8 @@ class SRHIDeviceContext;
 class GAME_API SMaterial : virtual public SObject
 {
 	GENERATED_BODY(SMaterial)
+
+protected:
 	using ShaderVars = std::variant<float, Vector3>;
 
 private:

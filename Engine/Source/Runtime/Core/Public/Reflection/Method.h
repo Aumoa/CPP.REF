@@ -8,7 +8,6 @@
 #include "PrimitiveTypes.h"
 #include "CoreAssert.h"
 
-class Type;
 class SObject;
 
 class Method
@@ -18,12 +17,6 @@ class Method
 
 	uint8 _bMember : 1 = false;
 	uint8 _bConst : 1 = false;
-
-private:
-	template<class T>
-	struct ToFunction
-	{
-	};
 
 public:
 	template<class TRet, class TOwner, class... TArgs>
