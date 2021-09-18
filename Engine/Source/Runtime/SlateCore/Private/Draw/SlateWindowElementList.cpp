@@ -14,9 +14,26 @@ SSlateWindowElementList::SSlateWindowElementList(const SWindow* paintWindow) : S
 
 void SSlateWindowElementList::SortByLayer()
 {
-	auto _Pred = [](const SlateDrawElement& lhs, const SlateDrawElement& rhs)
+	static auto _GetLayer = +[](const GenericSlateElement& element)
 	{
-		return lhs.Layer - rhs.Layer;
+		if (auto element_s = std::get_if<SlateDrawElement>(&element))
+		{
+			return element_s->Layer;
+		}
+		else if (auto element_s = std::get_if<SlateFontElement>(&element))
+		{
+			return element_s->Layer;
+		}
+		else
+		{
+			check(false);
+			return (int32)0;
+		}
+	};
+
+	static auto _Pred = +[](const GenericSlateElement& lhs, const GenericSlateElement& rhs)
+	{
+		return _GetLayer(lhs) < _GetLayer(rhs);
 	};
 
 	sort(_drawElements.begin(), _drawElements.end(), _Pred);
@@ -32,7 +49,7 @@ void SSlateWindowElementList::Clear()
 	_drawElements.clear();
 }
 
-std::span<SlateDrawElement const> SSlateWindowElementList::GetSpan() const
+auto SSlateWindowElementList::GetSpan() const -> std::span<GenericSlateElement const>
 {
 	return _drawElements;
 }

@@ -23,10 +23,5 @@ StructuredBuffer<SlateElement> gElements : register(t0);
 
 Fragment Main(in uint vId : SV_VERTEXID, in uint iId : SV_INSTANCEID)
 {
-	SlateElement myElement = gElements[iId];
-
-	Fragment frag;
-	frag.Position = float4(GetSlateNDCLocation(gConstants, myElement, gPos[vId]), 1.0f);
-	frag.TexCoord = gTex[vId];
-	return frag;
+	return GetSlateFragment(gConstants, gElements[iId], gPos[vId], gTex[vId]);
 }

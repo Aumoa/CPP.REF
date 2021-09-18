@@ -131,7 +131,6 @@ void SGameRenderSystem::Present()
 	{
 		_deviceContext->SetGraphicsShader(_slateShader);
 		_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-		_slateShader->RenderDebug(_fontCachingManager->GetDebugTexture());
 		localPlayer->Render(_deviceContext, _slateShader);
 	}
 

@@ -5,7 +5,7 @@
 #include "SlateMinimal.h"
 #include "BoxPanel.h"
 
-class GAME_API SVerticalBoxPanel : public SBoxPanel
+class SLATECORE_API SVerticalBoxPanel : public SBoxPanel
 {
 	GENERATED_BODY(SVerticalBoxPanel)
 

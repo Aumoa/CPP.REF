@@ -3,10 +3,10 @@
 #pragma once
 
 #include "SlateMinimal.h"
-#include "Panel.h"
+#include "PanelWidget.h"
 #include "Widgets/SlotBase.h"
 
-class GAME_API SBoxPanel : public SPanel
+class SLATECORE_API SBoxPanel : public SPanelWidget
 {
 	GENERATED_BODY(SBoxPanel)
 

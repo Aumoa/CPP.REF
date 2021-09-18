@@ -4,12 +4,12 @@
 
 #include "RenderMinimal.h"
 #include "RHI/RHIShader.h"
+#include "Draw/SlateWindowElementList.h"
 #include <vector>
 #include <span>
 
 class SMaterial;
 class SRHIDeviceContext;
-class SSlateWindowElementList;
 class SRHIShaderDescriptorView;
 struct SlateRenderTransform;
 
@@ -18,11 +18,13 @@ class GAME_API SSlateShader : public SRHIShader
 	GENERATED_BODY(SSlateShader)
 
 public:
-	struct DrawElement
+	struct alignas(4) DrawElement
 	{
 		Matrix2x2 M;
 		Vector2 AbsolutePosition;
 		Vector2 AbsoluteSize;
+		Vector2 TexturePosition;
+		Vector2 TextureSize;
 		float Depth;
 		Vector3 pad;
 	};
@@ -49,14 +51,10 @@ public:
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
 
 	SMaterial* GetDefaultMaterial() const;
-	DrawElement MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const;
+	std::vector<DrawElement> MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const;
 	void RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements);
 
 protected:
 	virtual std::span<uint8 const> CompileVS() override;
 	virtual std::span<uint8 const> CompilePS() override;
-
-public:
-	class SRHIShaderResourceView* _textureDebug = nullptr;
-	void RenderDebug(class SRHIShaderResourceView* texture) { _textureDebug = texture; }
 };

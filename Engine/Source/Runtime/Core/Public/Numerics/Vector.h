@@ -580,14 +580,6 @@ public:
 		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(composed)));
 	}
 
-	/// <summary>
-	/// Get zero vector.
-	/// </summary>
-	inline static constexpr TVectorImpl GetZero()
-	{
-		return TVectorImpl(VectorImpl());
-	}
-
 	inline constexpr TVectorImpl Round() const
 	{
 		TVectorImpl V;
@@ -709,6 +701,9 @@ struct Vector : public VectorImpl<Vector<N>, N>
 		}
 		return results;
 	}
+
+	inline static constexpr Vector GetZero() { return Vector(); }
+	inline static constexpr Vector GetOneVector() { return Vector(1.0f); }
 };
 
 using Vector2 = Vector<2>;

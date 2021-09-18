@@ -17,6 +17,9 @@ public:
 
 	virtual SGameInstance* CreatePrimaryGameModule();
 	virtual SGameEngine* CreateGameEngine();
+
+	virtual std::vector<Type*> GetTypeCollection() const;
+	virtual Type* GetType(std::wstring_view friendlyName) const;
 };
 
 #define DEFINE_GAME_MODULE(GameModuleClass)		\

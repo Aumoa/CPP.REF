@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "FreeType/FontCachingManager.h"
 #include "FreeType/FontFace.h"
-#include "FontFaceCachingNode.h"
+#include "FreeType/FontFaceCachingNode.h"
 
 SFontCachingManager::SFontCachingManager(SRHIDevice* device) : Super()
 	, _device(device)
@@ -35,9 +35,4 @@ void SFontCachingManager::Apply()
 	{
 		node_it.second->Apply();
 	}
-}
-
-SRHIShaderResourceView* SFontCachingManager::GetDebugTexture() const
-{
-	return _nodes.begin()->second->GetDebugTexture();
 }

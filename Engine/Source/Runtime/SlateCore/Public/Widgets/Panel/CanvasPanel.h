@@ -3,10 +3,10 @@
 #pragma once
 
 #include "SlateMinimal.h"
-#include "Panel.h"
+#include "PanelWidget.h"
 #include "Widgets/SlotBase.h"
 
-class GAME_API SCanvasPanel : public SPanel
+class SLATECORE_API SCanvasPanel : public SPanelWidget
 {
 	GENERATED_BODY(SCanvasPanel)
 
@@ -17,7 +17,7 @@ public:
 		Slot()
 		{
 		}
-		
+
 		DECLARE_SLATE_ATTRIBUTE(Margin, Offset, = Margin(0, 0, 1.0f, 1.0f));
 		DECLARE_SLATE_ATTRIBUTE(::Anchors, Anchors);
 		DECLARE_SLATE_ATTRIBUTE(Vector2, Alignment);

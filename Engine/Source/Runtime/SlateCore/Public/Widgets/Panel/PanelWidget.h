@@ -5,10 +5,10 @@
 #include "SlateMinimal.h"
 #include "Widgets/CompoundWidget.h"
 
-class GAME_API SPanel : public SCompoundWidget
+class SLATECORE_API SPanelWidget : public SCompoundWidget
 {
-	GENERATED_BODY(SPanel)
+	GENERATED_BODY(SPanelWidget)
 
 public:
-	SPanel(const std::wstring& name);
+	SPanelWidget(const std::wstring& name);
 };

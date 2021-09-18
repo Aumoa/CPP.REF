@@ -182,11 +182,11 @@
     <ClInclude Include="Public\FreeType\FontCachingManager.h">
       <Filter>Public\FreeType</Filter>
     </ClInclude>
-    <ClInclude Include="Private\FreeType\FontFaceCachingNode.h">
-      <Filter>Public\FreeType</Filter>
-    </ClInclude>
     <ClInclude Include="Public\RHI\RHIDynamicTexture2D.h">
       <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\FreeType\FontFaceCachingNode.h">
+      <Filter>Public\FreeType</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

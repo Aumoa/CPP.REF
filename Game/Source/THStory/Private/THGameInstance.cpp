@@ -8,8 +8,9 @@
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "GameFramework/LocalPlayer.h"
 #include "Widgets/Window.h"
-#include "Widgets/Images/Image.h"
+#include "Widgets/Image/Image.h"
 #include "Widgets/Panel/HorizontalBoxPanel.h"
+#include "Widgets/Text/TextBlock.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -31,6 +32,12 @@ void STHGameInstance::Init()
 		[
 			SNew(SImage)
 			.Brush(texture)
+		]
+		+SHorizontalBoxPanel::Slot()
+		.SizeParam(ESizeRule::Auto, 1.0f)
+		[
+			SNew(STextBlock)
+			.Text(L"SampleText")
 		]
 	);
 

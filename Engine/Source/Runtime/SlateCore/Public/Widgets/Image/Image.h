@@ -7,7 +7,7 @@
 
 class STexture2D;
 
-class GAME_API SImage : public SLeafWidget
+class SLATECORE_API SImage : public SLeafWidget
 {
 	GENERATED_BODY(SImage)
 
@@ -21,7 +21,6 @@ public:
 	virtual Vector2 GetDesiredSize() const override;
 
 	void SetBrush(const SlateBrush& brush);
-	void SetTexture2D(STexture2D* texture, bool bMatchSize = true);
 	SlateBrush GetBrush() const;
 
 public:

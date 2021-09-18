@@ -135,7 +135,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\FreeType\FontFace.Impl.h" />
-    <ClInclude Include="Private\FreeType\FontFaceCachingNode.h" />
     <ClInclude Include="Private\FreeType\FreeTypeModule.Impl.h" />
     <ClInclude Include="Private\FreeType\LogFreeType.h" />
     <ClInclude Include="Private\InternalComPtr.h" />
@@ -143,6 +142,7 @@
     <ClInclude Include="Public\ComPtr.h" />
     <ClInclude Include="Public\FreeType\FontCachingManager.h" />
     <ClInclude Include="Public\FreeType\FontFace.h" />
+    <ClInclude Include="Public\FreeType\FontFaceCachingNode.h" />
     <ClInclude Include="Public\FreeType\FreeTypeModule.h" />
     <ClInclude Include="Public\IWindowView.h" />
     <ClInclude Include="Public\RenderMinimal.h" />

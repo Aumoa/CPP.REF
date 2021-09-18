@@ -57,13 +57,13 @@ struct DeclarativeAttr : public DeclarativeInheritanceIfImplements<Super, Declar
 #define END_SLATE_ATTRIBUTE		\
 };								
 
-#define DECLARE_SLATE_ATTRIBUTE(Type, Var, ...)	\
-Type _ ## Var __VA_ARGS__;						\
-This&& Var(const Type& value) &&				\
-{												\
-	_ ## Var = value;							\
-	return std::move(*static_cast<This*>(this));\
-}												\
+#define DECLARE_SLATE_ATTRIBUTE(Type, Var, ...)								\
+Type _ ## Var __VA_ARGS__;													\
+This&& Var(const Type& value) &&											\
+{																			\
+	_ ## Var = value;														\
+	return std::move(*static_cast<This*>(this));							\
+}																			\
 template<class... TArgs> requires std::constructible_from<Type, TArgs...>	\
 This&& Var(TArgs&&... args) &&												\
 {																			\

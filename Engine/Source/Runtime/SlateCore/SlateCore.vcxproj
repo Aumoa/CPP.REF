@@ -99,6 +99,8 @@
     <ClInclude Include="Public\Draw\PaintArgs.h" />
     <ClInclude Include="Public\Draw\SlateBrush.h" />
     <ClInclude Include="Public\Draw\SlateDrawElement.h" />
+    <ClInclude Include="Public\Draw\SlateFont.h" />
+    <ClInclude Include="Public\Draw\SlateFontElement.h" />
     <ClInclude Include="Public\Draw\SlateWindowElementList.h" />
     <ClInclude Include="Public\Layout\AlignmentArrangeResult.h" />
     <ClInclude Include="Public\Layout\Anchors.h" />
@@ -121,8 +123,15 @@
     <ClInclude Include="Public\SlateMinimal.h" />
     <ClInclude Include="Public\Widgets\CompoundWidget.h" />
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
+    <ClInclude Include="Public\Widgets\Image\Image.h" />
     <ClInclude Include="Public\WIdgets\LeafWidget.h" />
+    <ClInclude Include="Public\Widgets\Panel\BoxPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\PanelWidget.h" />
+    <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h" />
     <ClInclude Include="Public\Widgets\SlotBase.h" />
+    <ClInclude Include="Public\Widgets\Text\TextBlock.h" />
     <ClInclude Include="Public\Widgets\Widget.h" />
     <ClInclude Include="Public\Widgets\Window.h" />
   </ItemGroup>
@@ -138,7 +147,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Image\Image.cpp" />
     <ClCompile Include="Private\WIdgets\LeafWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\CanvasPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\HorizontalBoxPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\PanelWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Text\TextBlock.cpp" />
     <ClCompile Include="Private\Widgets\Widget.cpp" />
     <ClCompile Include="Private\Widgets\Window.cpp" />
   </ItemGroup>

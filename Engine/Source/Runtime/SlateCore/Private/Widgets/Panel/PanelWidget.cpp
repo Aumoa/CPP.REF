@@ -1,9 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "pch.h"
-#include "Widgets/Panel/Panel.h"
+#include "Widgets/Panel/PanelWidget.h"
 
-SPanel::SPanel(const std::wstring& name) : Super(name)
+SPanelWidget::SPanelWidget(const std::wstring& name) : Super(name)
 {
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }

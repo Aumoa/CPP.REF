@@ -24,7 +24,7 @@ Pixel Main(in Fragment frag)
 	else
 	{
 		Pixel px;
-		px.Color = float4((float3)0, gFontFaceBuffer.Sample(gSampler, frag.TexCoord));
+		px.Color = float4((float3)1, gFontFaceBuffer.Sample(gSampler, frag.TexCoord));
 		return px;
 	}
 }

@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "pch.h"
-#include "FontFaceCachingNode.h"
+#include "FreeType/FontFaceCachingNode.h"
 #include "FreeType/FontFace.h"
 #include "RHI/RHIDynamicTexture2D.h"
 #include "RHI/RHIDevice.h"

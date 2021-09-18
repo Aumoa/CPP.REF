@@ -64,6 +64,9 @@
     <ClCompile Include="Private\Misc\Paths.cpp">
       <Filter>Private\Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Threading\Thread.cpp">
+      <Filter>Private\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -286,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="Public\Reflection\Property.h">
       <Filter>Public\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Threading\Thread.h">
+      <Filter>Public\Threading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,3 +7,4 @@
 #include "RHI/RHITexture2D.h"
 
 #include <algorithm>
+#include <ranges>

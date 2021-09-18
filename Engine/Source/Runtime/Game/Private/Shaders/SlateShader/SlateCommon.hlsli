@@ -24,12 +24,16 @@ struct SlateElement
     float2x2 M;
     float2 AbsolutePosition;
     float2 AbsoluteSize;
+    float2 TexturePosition;
+    float2 TextureSize;
     float Depth;
     float3 pad;
 };
 
-float3 GetSlateNDCLocation(SlateConstants constants, SlateElement element, float2 vertexPos)
+Fragment GetSlateFragment(SlateConstants constants, SlateElement element, float2 vertexPos, float2 texturePos)
 {
+    Fragment frag;
+
     float2 slatePos = vertexPos;
     slatePos *= element.AbsoluteSize;
     slatePos = mul(element.M, slatePos);
@@ -40,7 +44,10 @@ float3 GetSlateNDCLocation(SlateConstants constants, SlateElement element, float
     ndc -= 1.0f;
     ndc.y = -ndc.y;
 
-    return float3(ndc, element.Depth);
+    frag.Position = float4(float3(ndc, element.Depth), 1.0f);
+    frag.TexCoord = texturePos * element.TextureSize + element.TexturePosition;
+
+    return frag;
 }
 
 #endif

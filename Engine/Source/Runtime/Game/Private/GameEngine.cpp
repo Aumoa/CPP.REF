@@ -20,6 +20,7 @@
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "EngineSubsystems/GameInputSystem.h"
+#include "Threading/Thread.h"
 
 SGameEngine* GEngine = nullptr;
 
@@ -52,6 +53,8 @@ bool SGameEngine::InitEngine()
 	GEngine = this;
 	InitializeSubsystems();
 	CoreDelegates::PostEngineInit.Invoke();
+
+	SThread::GetCurrentThread()->SetFriendlyName(L"[Main Thread]");
 	return true;
 }
 

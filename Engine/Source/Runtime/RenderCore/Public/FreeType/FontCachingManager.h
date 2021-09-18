@@ -22,6 +22,4 @@ public:
 
 	void StreamGlyphs(SFontFace* face, std::wstring_view glyphs);
 	void Apply();
-
-	class SRHIShaderResourceView* GetDebugTexture() const;
 };

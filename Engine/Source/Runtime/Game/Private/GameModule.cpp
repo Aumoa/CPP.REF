@@ -23,4 +23,14 @@ SGameEngine* SGameModule::CreateGameEngine()
 	return NewObject<SGameEngine>();
 }
 
+std::vector<Type*> SGameModule::GetTypeCollection() const
+{
+	return {};
+}
+
+Type* SGameModule::GetType(std::wstring_view friendlyName) const
+{
+	return nullptr;
+}
+
 DEFINE_GAME_MODULE(SGameModule);

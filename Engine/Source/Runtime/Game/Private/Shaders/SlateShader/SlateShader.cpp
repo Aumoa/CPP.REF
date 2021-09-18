@@ -132,25 +132,57 @@ SMaterial* SSlateShader::GetDefaultMaterial() const
 	return _material;
 }
 
-auto SSlateShader::MakeElement(const SlateRenderTransform& geometry, const Vector2& localSize, float depth) const -> DrawElement
+auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const -> std::vector<DrawElement>
 {
-	DrawElement drawElement;
-	drawElement.M = geometry.GetMatrix();
-	drawElement.AbsolutePosition = geometry.GetTranslation();
-	drawElement.AbsoluteSize = localSize;
-	drawElement.Depth = depth;
-	return drawElement;
+	std::vector<DrawElement> renderElements;
+	renderElements.reserve(elements.size());
+
+	for (size_t i = 0; i < elements.size(); ++i)
+	{
+		auto& element_d = renderElements.emplace_back();
+
+		if (auto element_s = std::get_if<SlateDrawElement>(&elements[i]))
+		{
+			if (element_s->Transform.HasRenderTransform())
+			{
+				const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
+				element_d.M = renderTransform.GetMatrix();
+				element_d.AbsolutePosition = renderTransform.GetTranslation();
+				element_d.AbsoluteSize = element_s->Transform.GetLocalSize();
+				element_d.Depth = (float)element_s->Layer;
+				element_d.TexturePosition = Vector2::GetZero();
+				element_d.TextureSize = Vector2::GetOneVector();
+			}
+		}
+		else if (auto element_s = std::get_if<SlateFontElement>(&elements[i]))
+		{
+		}
+	}
+
+	return renderElements;
 }
 
 void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements)
 {
+	auto elements_span = elements->GetSpan();
+
 	// Caching max elements.
-	size_t maxDescriptors = 1;
-	for (auto& element : elements->GetSpan())
+	size_t maxDescriptors = 0;
+	for (auto& element : elements_span)
 	{
-		if (element.Brush.ImageSource)
+		if (auto element_s = std::get_if<SlateDrawElement>(&element))
 		{
-			maxDescriptors += 1;
+			if (element_s->Brush.ImageSource)
+			{
+				maxDescriptors += 1;
+			}
+		}
+		else if (auto element_s = std::get_if<SlateFontElement>(&element))
+		{
+			if (element_s->CachingNode)
+			{
+				maxDescriptors += 1;
+			}
 		}
 	}
 	
@@ -161,25 +193,26 @@ void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector
 	_shaderDescriptorView->ResetBindings();
 	deviceContext->SetShaderDescriptorViews(_shaderDescriptorView, nullptr);
 
-	for (auto& element : elements->GetSpan())
+	for (auto& element : elements_span)
 	{
-		if (element.Brush.ImageSource)
+		if (auto element_s = std::get_if<SlateDrawElement>(&element))
 		{
-			const int32 RenderMode = (int32)ESlateRenderMode::ImageSource;
+			if (element_s->Brush.ImageSource)
+			{
+				const int32 RenderMode = (int32)ESlateRenderMode::ImageSource;
 
-			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
-			deviceContext->SetGraphicsRootShaderResourceView(2, element.Brush.ImageSource);
-			deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
-			deviceContext->DrawInstanced(4, 1);
+				deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
+				deviceContext->SetGraphicsRootShaderResourceView(2, element_s->Brush.ImageSource);
+				deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
+				deviceContext->DrawInstanced(4, 1);
+			}
+
+			gpuAddr += sizeof(DrawElement);
 		}
-
-		gpuAddr += sizeof(DrawElement);
+		else if (auto element_s = std::get_if<SlateFontElement>(&element))
+		{
+		}
 	}
-
-	const int32 RenderModeDebug = (int32)ESlateRenderMode::Glyph;
-	deviceContext->SetGraphicsRootShaderResourceView(4, _textureDebug);
-	deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderModeDebug, 0);
-	deviceContext->DrawInstanced(4, 1);
 }
 
 std::span<uint8 const> SSlateShader::CompileVS()
