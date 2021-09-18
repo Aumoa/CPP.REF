@@ -6,25 +6,20 @@
 #include "FreeType/FontFaceCachingNode.h"
 #include "Layout/PaintGeometry.h"
 
-struct SlateGlyphElement
-{
-	Vector2 TexturePosition;
-	Vector2 TextureSize;
-};
-
 struct SlateFontElement
 {
-	const SFontFaceCachingNode* CachingNode = nullptr;
+	SFontFace* FontFace = nullptr;
+	int32 FontSize = 0;
 	PaintGeometry Transform;
 	int32 Layer = 0;
-	std::vector<SlateGlyphElement> Glyphs;
+	std::wstring Text;
 
 	SlateFontElement()
 	{
 	}
 
-	SlateFontElement(const SFontFaceCachingNode* cachingNode, const PaintGeometry& transform, int32 layer)
-		: CachingNode(cachingNode)
+	SlateFontElement(SFontFace* fontFace, const PaintGeometry& transform, int32 layer)
+		: FontFace(fontFace)
 		, Transform(transform)
 		, Layer(layer)
 	{

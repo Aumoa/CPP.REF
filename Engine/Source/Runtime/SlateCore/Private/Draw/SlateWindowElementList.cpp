@@ -44,6 +44,11 @@ void SSlateWindowElementList::Add(const SlateDrawElement& rhs)
 	_drawElements.emplace_back(rhs);
 }
 
+void SSlateWindowElementList::Add(const SlateFontElement& rhs)
+{
+	_drawElements.emplace_back(rhs);
+}
+
 void SSlateWindowElementList::Clear()
 {
 	_drawElements.clear();

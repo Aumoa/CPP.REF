@@ -7,6 +7,8 @@
 #include "GameEngine.h"
 #include "Draw/SlateWindowElementList.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "FreeType/FontCachingManager.h"
+#include "FreeType/FontFace.h"
 
 #ifndef BYTE
 #define BYTE uint8
@@ -68,7 +70,7 @@ void SSlateShader::Compile(SRHIVertexFactory* vertexDeclaration)
 std::vector<RHIShaderParameterElement> SSlateShader::GetShaderParameterDeclaration() const
 {
 	std::vector<RHIShaderParameterElement> elements;
-	elements.reserve(4);
+	elements.reserve(3);
 
 	// [0] SlateConstants
 	elements.emplace_back() =
@@ -113,17 +115,6 @@ std::vector<RHIShaderParameterElement> SSlateShader::GetShaderParameterDeclarati
 		}
 	};
 
-	// [4] FontFaceBuffer
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::DescriptorTable,
-		.DescriptorTable =
-		{
-			.NumDescriptorRanges = (uint32)_fontFaceBufferRanges.size(),
-			.pDescriptorRanges = _fontFaceBufferRanges.data()
-		}
-	};
-
 	return elements;
 }
 
@@ -134,15 +125,16 @@ SMaterial* SSlateShader::GetDefaultMaterial() const
 
 auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const -> std::vector<DrawElement>
 {
+	SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
+
 	std::vector<DrawElement> renderElements;
 	renderElements.reserve(elements.size());
 
 	for (size_t i = 0; i < elements.size(); ++i)
 	{
-		auto& element_d = renderElements.emplace_back();
-
 		if (auto element_s = std::get_if<SlateDrawElement>(&elements[i]))
 		{
+			auto& element_d = renderElements.emplace_back();
 			if (element_s->Transform.HasRenderTransform())
 			{
 				const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
@@ -156,6 +148,41 @@ auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::Gener
 		}
 		else if (auto element_s = std::get_if<SlateFontElement>(&elements[i]))
 		{
+			if (element_s->FontFace && element_s->Text.length())
+			{
+				if (renderElements.capacity() <= renderElements.size() + element_s->Text.length())
+				{
+					// Reserve space for store glyph render informations.
+					renderElements.reserve(renderElements.capacity() + element_s->Text.length());
+				}
+
+				// TEST IMPLEMENTATION: Streaming glyphs.
+				element_s->FontFace->SetFontSize(element_s->FontSize);
+				fontCachingMgr->StreamGlyphs(element_s->FontFace, element_s->Text);
+				fontCachingMgr->Apply();
+
+				// Get font rendering info.
+				std::vector glyphInfos = fontCachingMgr->QueryGlyphsRenderInfo(element_s->FontFace, element_s->FontSize, element_s->Text);
+
+				Vector2 advance;
+				const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
+				const Vector2& localTranslation = renderTransform.GetTranslation();
+				const Vector2& localSize = element_s->Transform.GetLocalSize();
+				const Matrix2x2& localMatrix = renderTransform.GetMatrix();
+
+				for (auto& glyph : glyphInfos)
+				{
+					auto& element_d = renderElements.emplace_back();
+					element_d.M = localMatrix;
+					element_d.AbsolutePosition = localTranslation + advance + Vector2(0, localSize.Y) - glyph.LocalPosition * Vector2(-1.0f, 1.0f);
+					element_d.AbsoluteSize = glyph.AbsoluteSize;
+					element_d.Depth = (float)element_s->Layer;
+					element_d.TexturePosition = glyph.AbsolutePosition * glyph.AbsoluteToLocalScale;
+					element_d.TextureSize = glyph.AbsoluteSize * glyph.AbsoluteToLocalScale;
+
+					advance += glyph.LocalAdvance;
+				}
+			}
 		}
 	}
 
@@ -164,6 +191,7 @@ auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::Gener
 
 void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements)
 {
+	SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
 	auto elements_span = elements->GetSpan();
 
 	// Caching max elements.
@@ -179,7 +207,7 @@ void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector
 		}
 		else if (auto element_s = std::get_if<SlateFontElement>(&element))
 		{
-			if (element_s->CachingNode)
+			if (element_s->FontFace)
 			{
 				maxDescriptors += 1;
 			}
@@ -205,12 +233,24 @@ void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector
 				deviceContext->SetGraphicsRootShaderResourceView(2, element_s->Brush.ImageSource);
 				deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
 				deviceContext->DrawInstanced(4, 1);
-			}
 
-			gpuAddr += sizeof(DrawElement);
+				gpuAddr += sizeof(DrawElement);
+			}
 		}
 		else if (auto element_s = std::get_if<SlateFontElement>(&element))
 		{
+			if (element_s->FontFace)
+			{
+				SRHIShaderResourceView* imageSource = fontCachingMgr->GetFontFaceRenderingView(element_s->FontFace);
+				const int32 RenderMode = (int32)ESlateRenderMode::Glyph;
+
+				deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
+				deviceContext->SetGraphicsRootShaderResourceView(2, imageSource);
+				deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
+				deviceContext->DrawInstanced(4, (uint32)element_s->Text.length());
+
+				gpuAddr += sizeof(DrawElement) * element_s->Text.length();
+			}
 		}
 	}
 }

@@ -36,3 +36,30 @@ void SFontCachingManager::Apply()
 		node_it.second->Apply();
 	}
 }
+
+SRHIShaderResourceView* SFontCachingManager::GetFontFaceRenderingView(SFontFace* face) const
+{
+	check(face);
+	std::wstring faceName = face->GetName();
+	auto node_it = _nodes.find(faceName);
+	if (node_it == _nodes.end())
+	{
+		return nullptr;
+	}
+
+	return node_it->second->GetRenderingView();
+}
+
+std::vector<GlyphRenderInfo> SFontCachingManager::QueryGlyphsRenderInfo(SFontFace* face, int32 fontSize, std::wstring_view text) const
+{
+	check(face);
+	std::wstring faceName = face->GetName();
+	auto node_it = _nodes.find(faceName);
+	if (node_it == _nodes.end())
+	{
+		return {};
+	}
+
+	SFontFaceCachingNode* node = node_it->second;
+	return node->QueryGlyphsRenderInfo(face, fontSize, text);
+}

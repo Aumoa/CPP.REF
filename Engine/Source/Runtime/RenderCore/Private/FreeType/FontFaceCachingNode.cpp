@@ -21,7 +21,7 @@ SFontFaceCachingNode::~SFontFaceCachingNode()
 void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyphs)
 {
 	int32 requiredMaxWidth = _requiredMaxWidth;
-	int32 requiredMaxHeight = 0;
+	int32 requiredMaxHeight = _requiredMaxHeight;
 
 	for (size_t i = 0; i < glyphs.length(); ++i)
 	{
@@ -46,7 +46,7 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 		if (auto it = glyphsView.find(character); it != glyphsView.end())
 		{
 			collection.Glyphs[it->second].Hit += 1;
-			return;
+			continue;
 		}
 
 		// Caching new glyph information.
@@ -61,8 +61,11 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 		_bNeedApply = true;
 
 		glyph.Character = character;
+		glyph.GlyphIndex = face->GetGlyphIndex();
 		ensure(face->GetGlyphPixelSize(&glyph.PixelSizeX, &glyph.PixelSizeY));
 		glyph.Bitmap.resize((size_t)glyph.PixelSizeX * glyph.PixelSizeY);
+		glyph.LocalPosition = face->GetLocalPosition();
+		glyph.LocalAdvance = face->GetAdvance();
 
 		// Copy glyph pixels.
 		ensure(face->CopyGlyphPixels(glyph.Bitmap.data(), glyph.PixelSizeX, 0, 0));
@@ -122,6 +125,80 @@ void SFontFaceCachingNode::Apply()
 }
 
 #undef ShouldBeReload
+
+SRHIShaderResourceView* SFontFaceCachingNode::GetRenderingView() const
+{
+	return _shaderResourceView;
+}
+
+std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFace* face, int32 fontSize, std::wstring_view text) const
+{
+	if (_glyphBuffer == nullptr)
+	{
+		return {};
+	}
+
+	auto sizedGlyphsCollection_it = _glyphCollectionsView.find(fontSize);
+	if (sizedGlyphsCollection_it == _glyphCollectionsView.end())
+	{
+		return {};
+	}
+
+	const SizedGlyphCollection& collection = _glyphCollections[sizedGlyphsCollection_it->second];
+	if (!collection.bLoad)
+	{
+		return {};
+	}
+
+	int32 pixelSizeX, pixelSizeY;
+	_glyphBuffer->GetPixelSize(&pixelSizeX, &pixelSizeY);
+
+	std::vector<GlyphRenderInfo> glyphs;
+	glyphs.reserve(text.length());
+
+	std::vector<const Glyph*> loadedGlyphs;
+	loadedGlyphs.reserve(text.length());
+
+	// Load glyphs.
+	for (auto& ch : text)
+	{
+		auto glyph_view_it = collection.GlyphsView.find(ch);
+		if (glyph_view_it == collection.GlyphsView.end())
+		{
+			continue;
+		}
+
+		auto& glyph = collection.Glyphs[glyph_view_it->second];
+		if (!glyph.bLoad)
+		{
+			continue;
+		}
+
+		loadedGlyphs.emplace_back(&glyph);
+	}
+
+	// Make render info.
+	const auto absoluteToLocalScale = Vector2(1.0f / pixelSizeX, (float)1.0f / pixelSizeY);
+	for (size_t i = 0; i < loadedGlyphs.size(); ++i)
+	{
+		auto& glyph = loadedGlyphs[i];
+
+		GlyphRenderInfo& renderInfo = glyphs.emplace_back();
+		renderInfo.LocalPosition = glyph->LocalPosition;
+		renderInfo.LocalAdvance = glyph->LocalAdvance;
+
+		if (i < loadedGlyphs.size() - 1)
+		{
+			renderInfo.LocalAdvance += face->GetKerning(glyph->GlyphIndex, loadedGlyphs[i + 1]->GlyphIndex);
+		}
+
+		renderInfo.AbsolutePosition = Vector2((float)glyph->LocationX + 0.5f, (float)collection.LocationY + 0.5f);
+		renderInfo.AbsoluteSize = Vector2((float)glyph->PixelSizeX, (float)glyph->PixelSizeY);
+		renderInfo.AbsoluteToLocalScale = absoluteToLocalScale;
+	}
+
+	return glyphs;
+}
 
 inline static int32 Align256(const int32& value)
 {

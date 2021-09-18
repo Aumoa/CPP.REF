@@ -144,6 +144,7 @@
     <ClInclude Include="Public\FreeType\FontFace.h" />
     <ClInclude Include="Public\FreeType\FontFaceCachingNode.h" />
     <ClInclude Include="Public\FreeType\FreeTypeModule.h" />
+    <ClInclude Include="Public\FreeType\FreeTypeStructures.h" />
     <ClInclude Include="Public\IWindowView.h" />
     <ClInclude Include="Public\RenderMinimal.h" />
     <ClInclude Include="Public\RHI\IRHIImageSourceView.h" />

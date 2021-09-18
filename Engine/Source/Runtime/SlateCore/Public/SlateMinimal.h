@@ -22,3 +22,4 @@
 #include "Widgets/Widget.h"
 #include "Draw/SlateBrush.h"
 #include "Draw/SlateDrawElement.h"
+#include "Draw/SlateFontElement.h"

@@ -16,6 +16,7 @@ private:
 	const std::wstring _faceName;
 	int32 _fontSize = 0;
 	int32 _dpiScale = 0;
+	int32 _glyphIndex = 0;
 	std::optional<wchar_t> _loadedGlyph;
 
 public:
@@ -28,6 +29,11 @@ public:
 	bool GetGlyphPixelSize(int32* pixelsX, int32* pixelsY) const;
 	bool CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, int32 locationY) const;
 	int32 GetMaxGlyphRenderHeight() const;
+	Vector2 GetLocalPosition() const;
+	Vector2 GetAdvance() const;
+	int32 GetGlyphIndex() const;
+	bool HasKerning() const;
+	Vector2 GetKerning(int32 left, int32 right) const;
 
 	inline int32 GetFontSize() const { return _fontSize; }
 	inline int32 GetDPIScale() const { return _dpiScale; }

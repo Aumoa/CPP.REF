@@ -2,6 +2,8 @@
 
 #include "pch.h"
 #include "Widgets/Text/TextBlock.h"
+#include "Draw/SlateFontElement.h"
+#include "Draw/SlateWindowElementList.h"
 
 STextBlock::STextBlock(const std::wstring& name) : Super(name)
 {
@@ -38,6 +40,14 @@ SlateFont STextBlock::GetFont() const
 
 int32 STextBlock::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
+	SlateFontElement element;
+	element.FontFace = _font.FontFace;
+	element.FontSize = _font.FontSize;
+	element.Transform = allottedGeometry.ToPaintGeometry();
+	element.Layer = layer;
+	element.Text = _text;
+
+	drawElements->Add(element);
 	return layer;
 }
 

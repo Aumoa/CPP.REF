@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FreeTypeStructures.h"
 
 class SRHIDevice;
 class SFontFace;
 class SFontFaceCachingNode;
+class SRHIShaderResourceView;
 
 class RENDERCORE_API SFontCachingManager : virtual public SObject
 {
@@ -22,4 +24,7 @@ public:
 
 	void StreamGlyphs(SFontFace* face, std::wstring_view glyphs);
 	void Apply();
+
+	SRHIShaderResourceView* GetFontFaceRenderingView(SFontFace* face) const;
+	std::vector<GlyphRenderInfo> QueryGlyphsRenderInfo(SFontFace* face, int32 fontSize, std::wstring_view text) const;
 };

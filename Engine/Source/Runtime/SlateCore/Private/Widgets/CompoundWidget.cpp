@@ -12,15 +12,15 @@ SCompoundWidget::SCompoundWidget(const std::wstring& name) : Super(name)
 
 int32 SCompoundWidget::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
-	auto* arrangedChildrens = drawElements->NewObject<SArrangedChildrens>(ESlateVisibility::Visible);
-	ArrangeChildren(arrangedChildrens, allottedGeometry);
+	ScopedPtr arrangedChildrens = drawElements->NewObject<SArrangedChildrens>(ESlateVisibility::Visible);
+	ArrangeChildren(arrangedChildrens.Get(), allottedGeometry);
 
-	return PaintArrangedChildrens(paintArgs, arrangedChildrens, allottedGeometry, cullingRect, drawElements, layer, bParentEnabled);
+	return PaintArrangedChildrens(paintArgs, arrangedChildrens.Get(), allottedGeometry, cullingRect, drawElements, layer, bParentEnabled);
 }
 
 int32 SCompoundWidget::PaintArrangedChildrens(SPaintArgs* paintArgs, SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
 {
-    SPaintArgs* newArgs = paintArgs->WithNewParent(this);
+    ScopedPtr newArgs = paintArgs->WithNewParent(this);
     bool shouldBeEnabled = ShouldBeEnabled(bParentEnabled);
 
     for (const ArrangedWidget& arrangedWidget : arrangedChildrens->GetWidgets())
@@ -29,7 +29,7 @@ int32 SCompoundWidget::PaintArrangedChildrens(SPaintArgs* paintArgs, SArrangedCh
 
         if (!IsChildWidgetCulled(cullingRect, arrangedWidget))
         {
-            int32 curWidgetsMaxLayer = curWidget->Paint(newArgs, arrangedWidget.GetGeometry(), cullingRect, drawElements, layer, shouldBeEnabled);
+            int32 curWidgetsMaxLayer = curWidget->Paint(newArgs.Get(), arrangedWidget.GetGeometry(), cullingRect, drawElements, layer, shouldBeEnabled);
             layer = MathEx::Max(curWidgetsMaxLayer, layer);
         }
     }

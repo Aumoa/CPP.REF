@@ -6,11 +6,14 @@
 #include "Assets/Texture2D.h"
 #include "GameEngine.h"
 #include "EngineSubsystems/GamePlayerSystem.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 #include "GameFramework/LocalPlayer.h"
 #include "Widgets/Window.h"
 #include "Widgets/Image/Image.h"
 #include "Widgets/Panel/HorizontalBoxPanel.h"
+#include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Widgets/Text/TextBlock.h"
+#include "FreeType/FreeTypeModule.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -25,19 +28,46 @@ void STHGameInstance::Init()
 	SLocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
 	SWindow* slateWindow = localPlayer->GetSlateWindow();
 
+	auto* renderSystem = GEngine->GetEngineSubsystem<SGameRenderSystem>();
+	SFreeTypeModule* freeType = renderSystem->GetFreeTypeModule();
+	SFontFace* fontFace = freeType->CreateFontFace(L"Arial.ttf");
+	SFontFace* fontFace2 = freeType->CreateFontFace(L"Batang.ttc");
+
 	auto* texture = LoadObject<STexture2D>(L"Content/THStory/Art/SampleImage.jpg");
 	slateWindow->AddWidgetToScreen(SNew(SHorizontalBoxPanel)
 		+SHorizontalBoxPanel::Slot()
 		.SizeParam(ESizeRule::Auto, 1.0f)
 		[
 			SNew(SImage)
-			.Brush(texture)
+			.Brush(texture->GetShaderResourceView(), Vector2(425.5f, 425.5f))
 		]
 		+SHorizontalBoxPanel::Slot()
-		.SizeParam(ESizeRule::Auto, 1.0f)
 		[
-			SNew(STextBlock)
-			.Text(L"SampleText")
+			SNew(SVerticalBoxPanel)
+			+SVerticalBoxPanel::Slot()
+			[
+				SNew(STextBlock)
+				.Text(L"FreeType font engine test!!")
+				.Font(fontFace, 70)
+			]
+			+SVerticalBoxPanel::Slot()
+			[
+				SNew(STextBlock)
+				.Text(L"Text Advance Y Test")
+				.Font(fontFace, 60)
+			]
+			+SVerticalBoxPanel::Slot()
+			[
+				SNew(STextBlock)
+				.Text(L"Font Kerning Text: AVAVAVAV")
+				.Font(fontFace, 80)
+			]
+			+SVerticalBoxPanel::Slot()
+			[
+				SNew(STextBlock)
+				.Text(L"한글도 되나?? 바탕 글꼴")
+				.Font(fontFace2, 80)
+			]
 		]
 	);
 

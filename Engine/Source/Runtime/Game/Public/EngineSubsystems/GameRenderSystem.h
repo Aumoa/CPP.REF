@@ -59,6 +59,9 @@ public:
 	IFrameworkView* GetFrameworkView() const;
 	inline SRHIDevice* GetRHIDevice() const { return _device; }
 
+	SFreeTypeModule* GetFreeTypeModule() const { return _freeTypeModule; }
+	SFontCachingManager* GetFontCachingManager() const { return _fontCachingManager; }
+
 private:
 	void Collect();
 	void ResizeApp(int32 width, int32 height);

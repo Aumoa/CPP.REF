@@ -33,6 +33,10 @@ SGameRenderSystem::SGameRenderSystem() : Super()
 
 SGameRenderSystem::~SGameRenderSystem()
 {
+	if (_primaryQueue)
+	{
+		_primaryQueue->WaitLastSignal();
+	}
 }
 
 void SGameRenderSystem::Init()

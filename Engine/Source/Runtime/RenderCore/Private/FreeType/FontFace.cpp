@@ -49,6 +49,7 @@ bool SFontFace::LoadGlyph(wchar_t glyph)
 	}
 
 	_loadedGlyph = glyph;
+	_glyphIndex = (int32)glyphIndex;
 	auto r = _impl->Face->glyph->advance.x;
 	return true;
 }
@@ -188,4 +189,48 @@ bool SFontFace::CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, 
 int32 SFontFace::GetMaxGlyphRenderHeight() const
 {
 	return _impl->Face->size->metrics.height >> 6;
+}
+
+Vector2 SFontFace::GetLocalPosition() const
+{
+	return Vector2(
+		(float)_impl->Face->glyph->bitmap_left,
+		(float)_impl->Face->glyph->bitmap_top
+	);
+}
+
+Vector2 SFontFace::GetAdvance() const
+{
+	constexpr float Inv64 = 1.0f / 64.0f;
+	return Vector2(
+		(float)_impl->Face->glyph->advance.x * Inv64,
+		(float)_impl->Face->glyph->advance.y * Inv64
+	);
+}
+
+int32 SFontFace::GetGlyphIndex() const
+{
+	return _glyphIndex;
+}
+
+bool SFontFace::HasKerning() const
+{
+	return FT_HAS_KERNING(_impl->Face);
+}
+
+Vector2 SFontFace::GetKerning(int32 left, int32 right) const
+{
+	constexpr float Inv64 = 1.0f / 64.0f;
+
+	if (HasKerning())
+	{
+		FT_Vector kerningVector;
+		if (FT_Error error = FT_Get_Kerning(_impl->Face, (FT_UInt)left, (FT_UInt)right, FT_KERNING_DEFAULT, &kerningVector); error)
+		{
+			return {};
+		}
+
+		return Vector2(kerningVector.x * Inv64, kerningVector.y * Inv64);
+	}
+	return {};
 }

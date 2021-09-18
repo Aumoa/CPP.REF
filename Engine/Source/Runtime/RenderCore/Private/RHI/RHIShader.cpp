@@ -120,12 +120,23 @@ void SRHIShader::Compile(SRHIVertexFactory* vertexDeclaration)
 		.ShaderRegister = 0,
 		.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
 	};
+	staticSamplers.emplace_back() =
+	{
+		.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT,
+		.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+		.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+		.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+		.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
+		.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
+		.ShaderRegister = 1,
+		.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
+	};
 
 	D3D12_ROOT_SIGNATURE_DESC rsd =
 	{
 		.NumParameters = (UINT)rootParameters.size(),
 		.pParameters = rootParameters.empty() ? nullptr : rootParameters.data(),
-		.NumStaticSamplers = 1,
+		.NumStaticSamplers = (UINT)staticSamplers.size(),
 		.pStaticSamplers = staticSamplers.data(),
 		.Flags
 			= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT

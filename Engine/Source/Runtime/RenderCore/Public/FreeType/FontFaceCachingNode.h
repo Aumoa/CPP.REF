@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FreeTypeStructures.h"
 
 class SRHIDevice;
 class SRHIDynamicTexture2D;
@@ -17,12 +18,16 @@ private:
 	struct Glyph
 	{
 		wchar_t Character;
+		int32 GlyphIndex;
 		std::vector<uint8> Bitmap;
 		size_t Hit = 0;
 		int32 PixelSizeX = 0, PixelSizeY = 0;
 
 		bool bLoad = false;
 		int32 LocationX = 0;
+
+		Vector2 LocalPosition;
+		Vector2 LocalAdvance;
 	};
 
 	struct SizedGlyphCollection
@@ -54,6 +59,9 @@ public:
 
 	void StreamGlyphs(SFontFace* face, std::wstring_view glyphs);
 	void Apply();
+
+	SRHIShaderResourceView* GetRenderingView() const;
+	std::vector<GlyphRenderInfo> QueryGlyphsRenderInfo(SFontFace* face, int32 fontSize, std::wstring_view text) const;
 
 private:
 	bool ReallocateBufferIfRequired();

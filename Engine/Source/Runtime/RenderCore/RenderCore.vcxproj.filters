@@ -188,5 +188,8 @@
     <ClInclude Include="Public\FreeType\FontFaceCachingNode.h">
       <Filter>Public\FreeType</Filter>
     </ClInclude>
+    <ClInclude Include="Public\FreeType\FreeTypeStructures.h">
+      <Filter>Public\FreeType</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

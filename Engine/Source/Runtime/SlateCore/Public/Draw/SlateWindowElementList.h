@@ -28,6 +28,7 @@ public:
 
 	void SortByLayer();
 	void Add(const SlateDrawElement& rhs);
+	void Add(const SlateFontElement& rhs);
 	void Clear();
 
 	template<class TShader>
