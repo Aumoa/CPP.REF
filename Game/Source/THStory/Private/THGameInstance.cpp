@@ -28,9 +28,9 @@ void STHGameInstance::Init()
 	SLocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
 	SWindow* slateWindow = localPlayer->GetSlateWindow();
 
-	SFont* font = LoadObject<SFont>(L"Content/THStory/Fonts/arial.ttf");
+	SFont* font = LoadObject<SFont>(L"Engine/Content/Fonts/arial.ttf");
 
-	auto* texture = LoadObject<STexture2D>(L"Content/THStory/Art/SampleImage.jpg");
+	auto* texture = LoadObject<STexture2D>(L"Game/Content/THStory/Art/SampleImage.jpg");
 	slateWindow->AddWidgetToScreen(SNew(SHorizontalBoxPanel)
 		+SHorizontalBoxPanel::Slot()
 		.SizeParam(ESizeRule::Auto, 1.0f)

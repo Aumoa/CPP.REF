@@ -2,9 +2,10 @@
 
 #include "pch.h"
 #include "Assets/SoftObjectPtr.h"
-#include "Assets/AssetImporter.h"
+#include "Assets/Asset.h"
 #include "GameEngine.h"
 #include "LogGame.h"
+#include "GameObject.h"
 
 SAsset* SoftObjectPtrBase::InternalLoadObject(const std::filesystem::path& importPath)
 {
@@ -14,9 +15,7 @@ SAsset* SoftObjectPtrBase::InternalLoadObject(const std::filesystem::path& impor
 		return nullptr;
 	}
 
-	//SAssetImporter* importer = GEngine->GetAssetImporter();
-	//return importer->LoadObject(importPath);
-	return nullptr;
+	return SGameObject::LoadObject<SAsset>(importPath);
 }
 
 void SoftObjectPtrBase::InternalUnloadObject(const std::filesystem::path& importPath)
@@ -26,7 +25,4 @@ void SoftObjectPtrBase::InternalUnloadObject(const std::filesystem::path& import
 		SE_LOG(LogAssets, Fatal, L"Engine instance does not initialized.");
 		return;
 	}
-
-	//SAssetImporter* importer = engine->GetAssetImporter();
-	//importer->UnloadObject(importPath);
 }

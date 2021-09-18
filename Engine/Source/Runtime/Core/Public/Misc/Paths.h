@@ -7,6 +7,5 @@
 class CORE_API Paths abstract final
 {
 public:
-	static std::filesystem::path GetContentPath();
 	static std::filesystem::path GetPlatformFontPath();
 };

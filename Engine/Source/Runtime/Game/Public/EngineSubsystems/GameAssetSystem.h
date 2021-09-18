@@ -24,6 +24,7 @@ public:
 	SObject* LoadObject(const std::filesystem::path& assetPath);
 
 private:
+	void SearchDirectory(const std::filesystem::path& searchDirectory);
 	STexture2D* LoadTexture2D(const std::filesystem::path& assetPath);
 	SFont* LoadFont(const std::filesystem::path& assetPath);
 };

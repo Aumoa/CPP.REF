@@ -132,9 +132,6 @@
     <ClCompile Include="Private\Assets\StaticMesh.cpp">
       <Filter>Private\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Assets\AssetImporter.cpp">
-      <Filter>Private\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp">
       <Filter>Private\Assets\Parser</Filter>
     </ClCompile>
@@ -330,9 +327,6 @@
       <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\Assets\StaticMesh.h">
-      <Filter>Public\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Assets\AssetImporter.h">
       <Filter>Public\Assets</Filter>
     </ClInclude>
     <ClInclude Include="Public\Assets\Parser\MDLParser.h">

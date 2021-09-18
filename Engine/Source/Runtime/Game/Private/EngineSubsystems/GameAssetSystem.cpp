@@ -25,40 +25,8 @@ SGameAssetSystem::~SGameAssetSystem()
 
 void SGameAssetSystem::Init()
 {
-	using namespace std;
-	using namespace std::filesystem;
-
-	path searchDirectory = Paths::GetContentPath();
-	if (!exists(searchDirectory))
-	{
-		SE_LOG(LogAssets, Fatal, L"Content directory is not exists. Please check your work directory on debug settings.");
-	}
-
-	SE_LOG(LogAssets, Verbose, L"Search asset directory on {}", searchDirectory.wstring());
-
-	queue<path> searchRecursivePaths;
-	searchRecursivePaths.emplace(searchDirectory);
-
-	for (path directory; searchRecursivePaths.size();)
-	{
-		directory = move(searchRecursivePaths.front());
-
-		for (auto item : directory_iterator(directory))
-		{
-			path mypath = item.path();
-			if (item.is_directory())
-			{
-				searchRecursivePaths.emplace(mypath);
-			}
-			else
-			{
-				_assets.emplace(mypath, nullptr);
-			}
-		}
-
-		searchRecursivePaths.pop();
-	}
-
+	SearchDirectory(L"Game/Content");
+	SearchDirectory(L"Engine/Content");
 	SE_LOG(LogAssets, Verbose, L"{} content(s) found.", _assets.size());
 }
 
@@ -109,6 +77,42 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 	}
 
 	return it->second;
+}
+
+void SGameAssetSystem::SearchDirectory(const std::filesystem::path& searchDirectory)
+{
+	using namespace std;
+	using namespace std::filesystem;
+
+	if (!exists(searchDirectory))
+	{
+		SE_LOG(LogAssets, Fatal, L"Content directory is not exists. Please check your work directory on debug settings.");
+	}
+
+	SE_LOG(LogAssets, Verbose, L"Search asset directory on {}", searchDirectory.wstring());
+
+	queue<path> searchRecursivePaths;
+	searchRecursivePaths.emplace(searchDirectory);
+
+	for (path directory; searchRecursivePaths.size();)
+	{
+		directory = move(searchRecursivePaths.front());
+
+		for (auto item : directory_iterator(directory))
+		{
+			path mypath = item.path();
+			if (item.is_directory())
+			{
+				searchRecursivePaths.emplace(mypath);
+			}
+			else
+			{
+				_assets.emplace(mypath, nullptr);
+			}
+		}
+
+		searchRecursivePaths.pop();
+	}
 }
 
 STexture2D* SGameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath)
