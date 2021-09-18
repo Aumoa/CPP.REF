@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="Private\Assets\Asset.cpp" />
     <ClCompile Include="Private\Assets\AssetImporter.cpp" />
+    <ClCompile Include="Private\Assets\Font.cpp" />
     <ClCompile Include="Private\Assets\Mesh.cpp" />
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
     <ClCompile Include="Private\Assets\Parser\MDLParser.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImageLoader.h" />
     <ClInclude Include="Public\Assets\Asset.h" />
     <ClInclude Include="Public\Assets\AssetImporter.h" />
+    <ClInclude Include="Public\Assets\Font.h" />
     <ClInclude Include="Public\Assets\Mesh.h" />
     <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
     <ClInclude Include="Public\Assets\Parser\MDLParser.h" />

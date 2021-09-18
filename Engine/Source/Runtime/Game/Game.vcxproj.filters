@@ -294,6 +294,9 @@
     <ClCompile Include="Private\GameModule.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Assets\Font.cpp">
+      <Filter>Private\Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h">
@@ -526,6 +529,9 @@
     </ClInclude>
     <ClInclude Include="Public\GameModule.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Assets\Font.h">
+      <Filter>Public\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

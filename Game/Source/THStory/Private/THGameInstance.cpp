@@ -13,7 +13,7 @@
 #include "Widgets/Panel/HorizontalBoxPanel.h"
 #include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Widgets/Text/TextBlock.h"
-#include "FreeType/FreeTypeModule.h"
+#include "Assets/Font.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -28,10 +28,7 @@ void STHGameInstance::Init()
 	SLocalPlayer* localPlayer = playerSystem->GetLocalPlayer();
 	SWindow* slateWindow = localPlayer->GetSlateWindow();
 
-	auto* renderSystem = GEngine->GetEngineSubsystem<SGameRenderSystem>();
-	SFreeTypeModule* freeType = renderSystem->GetFreeTypeModule();
-	SFontFace* fontFace = freeType->CreateFontFace(L"Arial.ttf");
-	SFontFace* fontFace2 = freeType->CreateFontFace(L"Batang.ttc");
+	SFont* font = LoadObject<SFont>(L"Content/THStory/Fonts/arial.ttf");
 
 	auto* texture = LoadObject<STexture2D>(L"Content/THStory/Art/SampleImage.jpg");
 	slateWindow->AddWidgetToScreen(SNew(SHorizontalBoxPanel)
@@ -48,25 +45,19 @@ void STHGameInstance::Init()
 			[
 				SNew(STextBlock)
 				.Text(L"FreeType font engine test!!")
-				.Font(fontFace, 70)
+				.Font(font->GetFontFace(), 70)
 			]
 			+SVerticalBoxPanel::Slot()
 			[
 				SNew(STextBlock)
 				.Text(L"Text Advance Y Test")
-				.Font(fontFace, 60)
+				.Font(font->GetFontFace(), 60)
 			]
 			+SVerticalBoxPanel::Slot()
 			[
 				SNew(STextBlock)
 				.Text(L"Font Kerning Text: AVAVAVAV")
-				.Font(fontFace, 80)
-			]
-			+SVerticalBoxPanel::Slot()
-			[
-				SNew(STextBlock)
-				.Text(L"한글도 되나?? 바탕 글꼴")
-				.Font(fontFace2, 80)
+				.Font(font->GetFontFace(), 80)
 			]
 		]
 	);

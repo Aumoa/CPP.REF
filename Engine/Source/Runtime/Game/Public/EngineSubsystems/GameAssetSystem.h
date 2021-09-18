@@ -6,6 +6,7 @@
 #include "GameEngineSubsystem.h"
 
 class STexture2D;
+class SFont;
 
 class GAME_API SGameAssetSystem : public SGameEngineSubsystem
 {
@@ -24,4 +25,5 @@ public:
 
 private:
 	STexture2D* LoadTexture2D(const std::filesystem::path& assetPath);
+	SFont* LoadFont(const std::filesystem::path& assetPath);
 };
