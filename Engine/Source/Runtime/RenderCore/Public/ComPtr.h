@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include <comdef.h>
+
+#undef min
+#undef max
+
 #include <string>
 
 template <typename T>

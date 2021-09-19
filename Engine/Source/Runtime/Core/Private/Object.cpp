@@ -12,17 +12,6 @@ SObject::SObject()
 
 SObject::~SObject() noexcept
 {
-	if (_outer != nullptr)
-	{
-		_outer->InternalDetachSubobject(this);
-	}
-
-	// Destroy all subobjects.
-	for (auto it : _subobjects)
-	{
-		it->_outer = nullptr;
-		delete it;
-	}
 }
 
 std::wstring SObject::ToString(std::wstring_view formatArgs) const
@@ -35,19 +24,22 @@ SObject* SObject::GetOuter() const
 	return _outer;
 }
 
-void SObject::SetOuter(SObject* newOuter)
+std::shared_ptr<SObject> SObject::SetOuter(SObject* newOuter)
 {
+	std::shared_ptr<SObject> detached = shared_from_this();
+
 	if (_outer != nullptr)
 	{
-		_outer->InternalDetachSubobject(this);
+		detached = _outer->InternalDetachSubobject(std::move(detached));
 	}
 
 	if (newOuter != nullptr)
 	{
-		newOuter->InternalAttachSubobject(this);
+		newOuter->InternalAttachSubobject(std::move(detached));
 	}
 
 	_outer = newOuter;
+	return detached;
 }
 
 void SObject::DestroySubobject(SObject* subobject)
@@ -62,33 +54,33 @@ void SObject::DestroySubobject(SObject* subobject)
 	outer->InternalDestroySubobject(subobject);
 }
 
-void SObject::InternalDetachSubobject(SObject* subobject)
+std::shared_ptr<SObject> SObject::InternalDetachSubobject(std::shared_ptr<SObject> subobject)
 {
 	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
 	{
 		(*it)->_outer = nullptr;
 		_subobjects.erase(it);
-		return;
+		return std::move(subobject);
 	}
 
 	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+	return {};
 }
 
-void SObject::InternalAttachSubobject(SObject* subobject)
+void SObject::InternalAttachSubobject(std::shared_ptr<SObject> subobject)
 {
 	_subobjects.emplace(subobject);
 }
 
 void SObject::InternalDestroySubobject(SObject* subobject)
 {
-	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
+	if (auto it = _subobjects.find(subobject->shared_from_this()); it != _subobjects.end())
 	{
-		SObject* ptr = *it;
+		SObject* ptr = it->get();
 		ptr->_outer = nullptr;
 		_subobjects.erase(it);
 
 		// Will remove all subobjects on destructor of object.
-		delete ptr;
 		return;
 	}
 

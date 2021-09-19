@@ -177,8 +177,8 @@ auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::Gener
 					element_d.AbsolutePosition = localTranslation + advance + Vector2(0, localSize.Y) - glyph.LocalPosition * Vector2(-1.0f, 1.0f);
 					element_d.AbsoluteSize = glyph.AbsoluteSize;
 					element_d.Depth = (float)element_s->Layer;
-					element_d.TexturePosition = (glyph.AbsolutePosition + Vector2(0.5f, -0.5f)) * glyph.AbsoluteToLocalScale;
-					element_d.TextureSize = (glyph.AbsoluteSize + Vector2(-0.5f, 0.5f)) * glyph.AbsoluteToLocalScale;
+					element_d.TexturePosition = (glyph.AbsolutePosition + Vector2(0.5f, 0.0f)) * glyph.AbsoluteToLocalScale;
+					element_d.TextureSize = (glyph.AbsoluteSize + Vector2(-0.5f, 1.0f)) * glyph.AbsoluteToLocalScale;
 
 					advance += glyph.LocalAdvance;
 				}

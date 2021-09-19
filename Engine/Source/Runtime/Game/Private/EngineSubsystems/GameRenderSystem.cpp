@@ -59,7 +59,7 @@ void SGameRenderSystem::Init()
 	_slateShader = NewObject<SSlateShader>(_device);
 	_slateShader->Compile(nullptr);
 	_freeTypeModule = NewObject<SFreeTypeModule>();
-	_fontCachingManager = NewObject<SFontCachingManager>(_device);
+	_fontCachingManager = _freeTypeModule->CreateCachingMgr(_device);
 
 	SFontFace* ff = _freeTypeModule->CreateFontFace(L"Arial");
 	ff->SetFontSize(20);
@@ -152,7 +152,7 @@ void SGameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)
 {
 	_frameworkView = frameworkView;
 	_frameworkViewChain = NewObject<SRHISwapChain>(_device, frameworkView, _primaryQueue);
-	_frameworkView->Size.AddObject(this, &SGameRenderSystem::ResizeApp);
+	_frameworkView->Size.AddSObject(this, &SGameRenderSystem::ResizeApp);
 }
 
 IFrameworkView* SGameRenderSystem::GetFrameworkView() const

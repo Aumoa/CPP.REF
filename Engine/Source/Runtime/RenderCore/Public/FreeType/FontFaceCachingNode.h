@@ -43,6 +43,7 @@ private:
 	};
 
 private:
+	SFontFace* _face = nullptr;
 	std::vector<SizedGlyphCollection> _glyphCollections;
 	std::map<int32, size_t> _glyphCollectionsView;
 	int32 _requiredMaxWidth = 0;
@@ -54,14 +55,14 @@ private:
 	bool _bNeedApply = false;
 
 public:
-	SFontFaceCachingNode(SRHIDevice* device);
+	SFontFaceCachingNode(SFontFace* face, SRHIDevice* device);
 	virtual ~SFontFaceCachingNode() override;
 
-	void StreamGlyphs(SFontFace* face, std::wstring_view glyphs);
+	void StreamGlyphs(std::wstring_view glyphs);
 	void Apply();
 
 	SRHIShaderResourceView* GetRenderingView() const;
-	std::vector<GlyphRenderInfo> QueryGlyphsRenderInfo(SFontFace* face, int32 fontSize, std::wstring_view text) const;
+	std::vector<GlyphRenderInfo> QueryGlyphsRenderInfo(int32 fontSize, std::wstring_view text) const;
 
 private:
 	bool ReallocateBufferIfRequired();

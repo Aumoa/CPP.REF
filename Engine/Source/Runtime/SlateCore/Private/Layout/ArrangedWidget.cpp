@@ -5,7 +5,7 @@
 #include "Layout/LayoutImpl.h"
 #include "Widgets/Widget.h"
 
-ArrangedWidget::ArrangedWidget(const SWidget* widget, const Geometry& geometry)
+ArrangedWidget::ArrangedWidget(SWidget* widget, const Geometry& geometry)
 	: _widget(widget)
 	, _geometry(geometry)
 {

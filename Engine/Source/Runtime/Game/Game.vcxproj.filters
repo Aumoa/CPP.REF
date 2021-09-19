@@ -112,6 +112,12 @@
     <Filter Include="Public\WindowsPlatform">
       <UniqueIdentifier>{c1d8b10b-b950-4821-9a80-662538b3d224}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Widgets">
+      <UniqueIdentifier>{cbdd923b-ee7e-4152-be49-312e1e2f7dd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets">
+      <UniqueIdentifier>{d2ed2f9b-5d2e-41bf-97f5-e9b87865f528}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -293,6 +299,9 @@
     </ClCompile>
     <ClCompile Include="Private\Assets\Font.cpp">
       <Filter>Private\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\SlateApplication.cpp">
+      <Filter>Private\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -526,6 +535,9 @@
     </ClInclude>
     <ClInclude Include="Public\Assets\Font.h">
       <Filter>Public\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\SlateApplication.h">
+      <Filter>Public\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

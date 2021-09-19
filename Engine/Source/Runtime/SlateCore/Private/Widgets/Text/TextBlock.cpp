@@ -4,6 +4,9 @@
 #include "Widgets/Text/TextBlock.h"
 #include "Draw/SlateFontElement.h"
 #include "Draw/SlateWindowElementList.h"
+#include "FreeType/FontFace.h"
+#include "FreeType/FontCachingManager.h"
+#include "FreeType/FreeTypeModule.h"
 
 STextBlock::STextBlock(const std::wstring& name) : Super(name)
 {
@@ -15,7 +18,30 @@ STextBlock::~STextBlock()
 
 Vector2 STextBlock::GetDesiredSize() const
 {
-	return Vector2(100.0f, 100.0f);
+	if (_font.FontFace)
+	{
+		SFontCachingManager* cachingMgr = _font.FontFace->GetModule()->CreateCachingMgr(nullptr);
+		if (cachingMgr)
+		{
+			Vector2 desiredSize;
+			cachingMgr->StreamGlyphs(_font.FontFace, _text);
+			std::vector<GlyphRenderInfo> glyphs = cachingMgr->QueryGlyphsRenderInfo(_font.FontFace, _font.FontSize, _text);
+
+			if (glyphs.size())
+			{
+				for (auto& glyph : glyphs)
+				{
+					desiredSize.X += glyph.LocalAdvance.X;
+					desiredSize.Y = std::max(desiredSize.Y, glyph.AbsoluteSize.Y);
+				}
+
+				desiredSize.X += glyphs.back().AbsoluteSize.X - glyphs.back().LocalAdvance.X;
+				return desiredSize;
+			}
+		}
+	}
+
+	return Vector2::GetZero();
 }
 
 void STextBlock::SetText(std::wstring_view text)

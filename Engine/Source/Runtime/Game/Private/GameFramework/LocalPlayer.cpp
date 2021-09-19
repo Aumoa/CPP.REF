@@ -5,7 +5,7 @@
 #include "GameEngine.h"
 #include "GameInstance.h"
 #include "IFrameworkView.h"
-#include "Widgets/Window.h"
+#include "Widgets/SlateApplication.h"
 #include "Draw/SlateWindowElementList.h"
 #include "Shaders/SlateShader/SlateShader.h"
 
@@ -17,10 +17,11 @@ void SLocalPlayer::Init(IFrameworkView* frameworkView)
 {
 	_frameworkView = frameworkView;
 
-	_slateWindow = SNew(SWindow);
+	_slateWindow = SNew(SSlateApplication);
+	_slateWindow->Init();
 
 	// Register ResizeApp handler.
-	_frameworkView->Size.AddObject(this, &SLocalPlayer::OnResizedApp);
+	_frameworkView->Size.AddSObject(this, &SLocalPlayer::OnResizedApp);
 	// And apply size immediately.
 	_slateWindow->SetWindowSize(_frameworkView->GetFrameworkSize().Cast<float>());
 

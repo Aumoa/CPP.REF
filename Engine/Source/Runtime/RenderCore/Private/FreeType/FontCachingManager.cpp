@@ -22,11 +22,11 @@ void SFontCachingManager::StreamGlyphs(SFontFace* face, std::wstring_view glyphs
 	auto node_it = _nodes.find(faceName);
 	if (node_it == _nodes.end())
 	{
-		node_it = _nodes.emplace(faceName, NewObject<SFontFaceCachingNode>(_device)).first;
+		node_it = _nodes.emplace(faceName, NewObject<SFontFaceCachingNode>(face, _device)).first;
 	}
 
 	SFontFaceCachingNode* node = node_it->second;
-	node->StreamGlyphs(face, glyphs);
+	node->StreamGlyphs(glyphs);
 }
 
 void SFontCachingManager::Apply()
@@ -61,5 +61,5 @@ std::vector<GlyphRenderInfo> SFontCachingManager::QueryGlyphsRenderInfo(SFontFac
 	}
 
 	SFontFaceCachingNode* node = node_it->second;
-	return node->QueryGlyphsRenderInfo(face, fontSize, text);
+	return node->QueryGlyphsRenderInfo(fontSize, text);
 }

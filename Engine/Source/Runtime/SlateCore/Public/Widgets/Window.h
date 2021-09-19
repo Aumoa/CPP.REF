@@ -33,5 +33,8 @@ public:
 	virtual Vector2 GetDesiredSize() const;
 
 protected:
+	std::span<SWidget* const> GetWidgets() const { return _screenWidgets; }
+
+protected:
 	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
 };

@@ -20,6 +20,7 @@
 #include <stack>
 #include <queue>
 #include <ranges>
+#include <mutex>
 
 #include "IWindowView.h"
 #include "RHI/RHIDevice.h"

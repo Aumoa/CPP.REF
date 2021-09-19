@@ -33,6 +33,12 @@
     <ClInclude Include="Public\LogGameLauncher.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Private\ThirdParty\json.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\LaunchConfig.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -51,6 +57,9 @@
       <Filter>Private\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Private\LogGameLauncher.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\LaunchConfig.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,7 +5,7 @@
 #include "GameEngine.h"
 #include "GameLauncherInstance.h"
 #include "GameFramework/LocalPlayer.h"
-#include "Widgets/Window.h"
+#include "Widgets/SlateApplication.h"
 
 SUserWidget::SUserWidget() : Super()
 {
@@ -28,7 +28,7 @@ void SUserWidget::AddWidgetToScreen()
 	{
 		if (SLocalPlayer* localPlayer = GGameInstance->GetLocalPlayer(); localPlayer)
 		{
-			if (SWindow* mainWindow = localPlayer->GetSlateWindow(); mainWindow)
+			if (SSlateApplication* mainWindow = localPlayer->GetSlateWindow(); mainWindow)
 			{
 				if (_buildedContent = this->BuildSlateResources(); _buildedContent)
 				{
@@ -45,7 +45,7 @@ void SUserWidget::RemoveFromParent()
 	{
 		if (SLocalPlayer* localPlayer = GGameInstance->GetLocalPlayer(); localPlayer)
 		{
-			if (SWindow* mainWindow = localPlayer->GetSlateWindow(); mainWindow)
+			if (SSlateApplication* mainWindow = localPlayer->GetSlateWindow(); mainWindow)
 			{
 				mainWindow->RemoveWidgetFromScreen(_buildedContent->GetName());
 				ReleaseSlateResources();

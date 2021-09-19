@@ -74,8 +74,10 @@ public:
 	void SetActive(bool bActive);
 	inline bool IsActive() const { return _bActive; }
 	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
-	MulticastEvent<SActorComponent, void()> Activated;
-	MulticastEvent<SActorComponent, void()> Inactivated;
+
+	DECLARE_MULTICAST_EVENT(ActivatedEvent);
+	ActivatedEvent Activated;
+	ActivatedEvent Inactivated;
 
 	void RegisterComponentWithWorld(SWorld* world);
 	void UnregisterComponent();

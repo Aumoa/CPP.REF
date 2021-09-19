@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class SFreeTypeModule;
+
 class RENDERCORE_API SFontFace : virtual public SObject
 {
 	GENERATED_BODY(SFontFace)
@@ -12,6 +14,7 @@ public:
 	struct Impl;
 	
 private:
+	SFreeTypeModule* _module = nullptr;
 	std::unique_ptr<Impl> _impl;
 	const std::wstring _faceName;
 	int32 _fontSize = 0;
@@ -20,7 +23,7 @@ private:
 	std::optional<wchar_t> _loadedGlyph;
 
 public:
-	SFontFace(std::unique_ptr<Impl>&& impl, const std::wstring& faceName);
+	SFontFace(SFreeTypeModule* module, std::unique_ptr<Impl>&& impl, const std::wstring& faceName);
 	virtual ~SFontFace() override;
 
 	bool SetFontSize(int32 fontSize, int32 dpiScale = 96);
@@ -35,6 +38,7 @@ public:
 	bool HasKerning() const;
 	Vector2 GetKerning(int32 left, int32 right) const;
 
+	inline SFreeTypeModule* GetModule() const { return _module; }
 	inline int32 GetFontSize() const { return _fontSize; }
 	inline int32 GetDPIScale() const { return _dpiScale; }
 	inline std::wstring GetName() const { return _faceName; }

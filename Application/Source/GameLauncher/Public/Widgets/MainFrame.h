@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UserWidget.h"
 
+class SHorizontalBoxPanel;
 class SBorder;
 
 class GAMELAUNCHER_API SMainFrame : public SUserWidget
@@ -12,7 +13,7 @@ class GAMELAUNCHER_API SMainFrame : public SUserWidget
 	GENERATED_BODY(SMainFrame)
 
 private:
-	SWidget* _content = nullptr;
+	SHorizontalBoxPanel* _content = nullptr;
 
 public:
 	SMainFrame();
@@ -21,5 +22,5 @@ public:
 	virtual void ReleaseSlateResources() override;
 
 private:
-	SBorder* MakeSlot(std::wstring_view image, std::wstring_view name);
+	SBorder* MakeSlot(const std::filesystem::path& image, std::wstring_view name, const std::filesystem::path& redirect);
 };

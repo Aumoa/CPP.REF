@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameEngine.h"
 
 class SGameInstance;
 class SGameEngine;
@@ -22,12 +23,12 @@ public:
 	virtual Type* GetType(std::wstring_view friendlyName) const;
 };
 
-#define DEFINE_GAME_MODULE(GameModuleClass)		\
-extern "C"										\
-{												\
-	__declspec(dllexport)						\
-	SGameModule* LoadGameModule()				\
-	{											\
-		return new GameModuleClass();			\
-	}											\
+#define DEFINE_GAME_MODULE(GameModuleClass)					\
+extern "C"													\
+{															\
+	__declspec(dllexport)									\
+	SGameModule* LoadGameModule()							\
+	{														\
+		return SObject::NewStaticObject<GameModuleClass>();	\
+	}														\
 }

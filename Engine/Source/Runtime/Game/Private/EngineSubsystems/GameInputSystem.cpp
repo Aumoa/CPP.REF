@@ -24,8 +24,13 @@ void SGameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
 	IPlatformMouse& wMouse = IPlatformMouse::Get();
 	IPlatformKeyboard& wKeyboard = IPlatformKeyboard::Get();
 
-	_mouseTracker.Update(wMouse.GetState());
-	_keyboardTracker.Update(wKeyboard.GetState());
+	MouseState mState = wMouse.GetState();
+	KeyboardState kState = wKeyboard.GetState();
+
+	_mouseTracker.Update(mState);
+	_keyboardTracker.Update(kState);
+
+	Vector2N mLocation = Vector2N(mState.X, mState.Y);
 
 	// Invoke mouse dispatcher.
 	uint32 nMouse = ((_mouseTracker.GetNumBits() - 1) / 32) + 1;
@@ -48,11 +53,11 @@ void SGameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
 
 			if (bPressed)
 			{
-				Mouse.Invoke((EMouseButton)idx, EMouseButtonEvent::Pressed);
+				Mouse.Invoke(mLocation, (EMouseButton)idx, EMouseButtonEvent::Pressed);
 			}
 			if (bReleased)
 			{
-				Mouse.Invoke((EMouseButton)idx, EMouseButtonEvent::Released);
+				Mouse.Invoke(mLocation, (EMouseButton)idx, EMouseButtonEvent::Released);
 			}
 
 			n <<= 1;
@@ -92,7 +97,6 @@ void SGameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
 	}
 
 	// Invoke mouse move event dispatcher.
-	MouseState mState = wMouse.GetState();
 	MouseMoveData data;
 	data.CurX = mState.X;
 	data.CurY = mState.Y;

@@ -6,7 +6,7 @@
 #include "Player.h"
 
 class SGameEngine;
-class SWindow;
+class SSlateApplication;
 class SSlateShader;
 class SRHIDeviceContext;
 struct IFrameworkView;
@@ -17,7 +17,7 @@ class GAME_API SLocalPlayer : public SPlayer
 
 private:
 	IFrameworkView* _frameworkView = nullptr;
-	SWindow* _slateWindow = nullptr;
+	SSlateApplication* _slateWindow = nullptr;
 	SSlateWindowElementList* _drawElements = nullptr;
 
 public:
@@ -28,7 +28,7 @@ public:
 	void Render(SRHIDeviceContext* deviceContext, SSlateShader* shader);
 
 	inline IFrameworkView* GetFrameworkView() const { return _frameworkView; }
-	inline SWindow* GetSlateWindow() const { return _slateWindow; }
+	inline SSlateApplication* GetSlateWindow() const { return _slateWindow; }
 
 private:
 	void OnResizedApp(int32 x, int32 y);

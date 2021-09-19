@@ -8,6 +8,7 @@
 #include "Layout/LayoutEnums.h"
 #include "Layout/SlateRenderTransform.h"
 #include "Layout/Geometry.h"
+#include "Layout/LayoutImpl.h"
 
 class SSlateWindowElementList;
 class SPaintArgs;
@@ -48,12 +49,15 @@ public:
 	inline bool HasRenderTransform() const { return _bHasRenderTransform; }
 	std::optional<Geometry> GetCachedGeometry() const { return _cachedGeometry; }
 
-	void SendMouseEvent(EMouseButton button, EMouseButtonEvent event);
-	void SendKeyboardEvent(EKey key, EKeyboardEvent event);
+	bool SendMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event);
+	bool SendKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event);
 
 protected:
 	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const = 0;
 	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const = 0;
+
+	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) = 0;
+	virtual bool OnReceiveKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event) = 0;
 
 	bool IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild) const;
 	bool ShouldBeEnabled(bool bParentEnabled) const;

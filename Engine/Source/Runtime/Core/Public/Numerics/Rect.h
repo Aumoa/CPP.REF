@@ -66,4 +66,10 @@ struct Rect
 	{
 		return MathEx::Abs(Bottom - Top);
 	}
+
+	constexpr bool PtInRect(const Vector2& point) const
+	{
+		return Left <= point.X && point.X <= Right
+			&& Top <= point.Y && point.Y <= Bottom;
+	}
 };

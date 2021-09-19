@@ -21,7 +21,7 @@ class CORE_API SObject : public std::enable_shared_from_this<SObject>
 private:
 	std::atomic<int32> _ref = 0;
 	SObject* _outer = nullptr;
-	std::set<SObject*> _subobjects;
+	std::set<std::shared_ptr<SObject>> _subobjects;
 
 public:
 	/// <summary>
@@ -53,9 +53,24 @@ public:
 	template<class T, class... TArgs> requires std::constructible_from<T, TArgs...>
 	T* NewObject(TArgs&&... args)
 	{
-		T* ptr = new T(std::forward<TArgs>(args)...);
-		_subobjects.emplace(ptr);
+		std::shared_ptr shared = std::make_shared<T>(std::forward<TArgs>(args)...);
+		auto ptr = shared.get();
+		_subobjects.emplace(std::move(shared));
 		ptr->_outer = this;
+		return ptr;
+	}
+
+	/// <summary>
+	/// Create subobject which linked outer to this.
+	/// </summary>
+	/// <typeparam name="T"> Type of subobject. </typeparam>
+	/// <typeparam name="...TArgs"> The type sequence of constructor arguments. </typeparam>
+	/// <param name="...args"> The constructor arguments. </param>
+	/// <returns> The instantiated pointer. </returns>
+	template<class T, class... TArgs> requires std::constructible_from<T, TArgs...>
+	static T* NewStaticObject(TArgs&&... args)
+	{
+		T* ptr = new T(std::forward<TArgs>(args)...);
 		return ptr;
 	}
 
@@ -70,7 +85,8 @@ public:
 	/// Change outer. SObject will destroy when outer be destroyed.
 	/// </summary>
 	/// <param name="newOuter"> The new outer. </param>
-	void SetOuter(SObject* newOuter);
+	/// <returns> The object pointer if attachment is failed. </returns>
+	std::shared_ptr<SObject> SetOuter(SObject* newOuter);
 	SFUNCTION(SetOuter);
 
 	/// <summary>
@@ -80,7 +96,7 @@ public:
 	static void DestroySubobject(SObject* subobject);
 
 private:
-	void InternalDetachSubobject(SObject* subobject);
-	void InternalAttachSubobject(SObject* subobject);
+	std::shared_ptr<SObject> InternalDetachSubobject(std::shared_ptr<SObject> subobject);
+	void InternalAttachSubobject(std::shared_ptr<SObject> subobject);
 	void InternalDestroySubobject(SObject* subobject);
 };

@@ -8,7 +8,8 @@
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHIShaderResourceView.h"
 
-SFontFaceCachingNode::SFontFaceCachingNode(SRHIDevice* device) : Super()
+SFontFaceCachingNode::SFontFaceCachingNode(SFontFace* face, SRHIDevice* device) : Super()
+	, _face(face)
 	, _device(device)
 {
 	_shaderResourceView = NewObject<SRHIShaderResourceView>(device, 1);
@@ -18,7 +19,7 @@ SFontFaceCachingNode::~SFontFaceCachingNode()
 {
 }
 
-void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyphs)
+void SFontFaceCachingNode::StreamGlyphs(std::wstring_view glyphs)
 {
 	int32 requiredMaxWidth = _requiredMaxWidth;
 	int32 requiredMaxHeight = _requiredMaxHeight;
@@ -26,7 +27,7 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 	for (size_t i = 0; i < glyphs.length(); ++i)
 	{
 		wchar_t character = glyphs[i];
-		int32 fontSize = face->GetFontSize();
+		int32 fontSize = _face->GetFontSize();
 		auto collection_it = _glyphCollectionsView.find(fontSize);
 		if (collection_it == _glyphCollectionsView.end())
 		{
@@ -34,7 +35,7 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 			size_t index = _glyphCollections.size();
 			auto& collection = _glyphCollections.emplace_back();
 			collection_it = _glyphCollectionsView.emplace(fontSize, index).first;
-			collection.RequiredMaxHeight = face->GetMaxGlyphRenderHeight();
+			collection.RequiredMaxHeight = _face->GetMaxGlyphRenderHeight();
 			requiredMaxHeight += collection.RequiredMaxHeight;
 
 			_bNeedApply = true;
@@ -50,7 +51,7 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 		}
 
 		// Caching new glyph information.
-		if (!face->LoadGlyph(character))
+		if (!_face->LoadGlyph(character))
 		{
 			continue;
 		}
@@ -61,14 +62,14 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 		_bNeedApply = true;
 
 		glyph.Character = character;
-		glyph.GlyphIndex = face->GetGlyphIndex();
-		glyph.PixelSize = face->GetGlyphPixelSize();
+		glyph.GlyphIndex = _face->GetGlyphIndex();
+		glyph.PixelSize = _face->GetGlyphPixelSize();
 		glyph.Bitmap.resize((size_t)glyph.PixelSize.X * glyph.PixelSize.Y);
-		glyph.LocalPosition = face->GetLocalPosition();
-		glyph.LocalAdvance = face->GetAdvance();
+		glyph.LocalPosition = _face->GetLocalPosition();
+		glyph.LocalAdvance = _face->GetAdvance();
 
 		// Copy glyph pixels.
-		ensure(face->CopyGlyphPixels(glyph.Bitmap.data(), glyph.PixelSize.X, 0, 0));
+		ensure(_face->CopyGlyphPixels(glyph.Bitmap.data(), glyph.PixelSize.X, 0, 0));
 
 		// Update required sizes.
 		collection.RequiredMaxWidth += glyph.PixelSize.X;
@@ -131,7 +132,7 @@ SRHIShaderResourceView* SFontFaceCachingNode::GetRenderingView() const
 	return _shaderResourceView;
 }
 
-std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFace* face, int32 fontSize, std::wstring_view text) const
+std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(int32 fontSize, std::wstring_view text) const
 {
 	if (_glyphBuffer == nullptr)
 	{
@@ -188,7 +189,7 @@ std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFa
 
 		if (i < loadedGlyphs.size() - 1)
 		{
-			renderInfo.LocalAdvance += face->GetKerning(glyph->GlyphIndex, loadedGlyphs[i + 1]->GlyphIndex);
+			renderInfo.LocalAdvance += _face->GetKerning(glyph->GlyphIndex, loadedGlyphs[i + 1]->GlyphIndex);
 		}
 
 		renderInfo.AbsolutePosition = Vector2((float)glyph->LocationX, (float)collection.LocationY);

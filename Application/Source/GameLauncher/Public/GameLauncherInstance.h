@@ -6,6 +6,7 @@
 #include "GameInstance.h"
 
 class SUserWidget;
+class SLaunchConfig;
 
 class GAMELAUNCHER_API SGameLauncherInstance : public SGameInstance
 {
@@ -13,9 +14,11 @@ class GAMELAUNCHER_API SGameLauncherInstance : public SGameInstance
 
 private:
 	std::vector<SUserWidget*> _widgets;
+	SLaunchConfig* _config = nullptr;
 
 public:
 	virtual void Init() override;
+	SLaunchConfig* GetConfig() const { return _config; }
 };
 
 extern SGameLauncherInstance* GGameInstance;

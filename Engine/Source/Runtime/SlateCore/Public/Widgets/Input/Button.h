@@ -11,4 +11,11 @@ class SLATECORE_API SButton : public SBorder
 
 public:
 	SButton(const std::wstring& name);
+
+protected:
+	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) override;
+
+public:
+	DECLARE_MULTICAST_EVENT(ButtonClickedEvent, EMouseButton, EMouseButtonEvent);
+	ButtonClickedEvent ButtonClicked;
 };

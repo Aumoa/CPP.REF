@@ -62,7 +62,7 @@ void SGameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 	GetEngineSubsystem<SGamePlayerSystem>()->SpawnLocalPlayer(frameworkView);
 
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
-	frameworkView->Idle += [this]() { TickEngine(); };
+	frameworkView->Idle.AddSObject(this, &SGameEngine::TickEngine);
 
 	frameworkView->SetFrameworkTitle(_gameInstance->GetApplicationName());
 }

@@ -95,8 +95,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Private\pch.h" />
+    <ClInclude Include="Private\ThirdParty\json.hpp" />
     <ClInclude Include="Public\GameLauncherInstance.h" />
     <ClInclude Include="Public\GameLauncherModule.h" />
+    <ClInclude Include="Public\LaunchConfig.h" />
     <ClInclude Include="Public\LogGameLauncher.h" />
     <ClInclude Include="Public\Widgets\MainFrame.h" />
     <ClInclude Include="Public\Widgets\UserWidget.h" />
@@ -104,6 +106,7 @@
   <ItemGroup>
     <ClCompile Include="Private\GameLauncherInstance.cpp" />
     <ClCompile Include="Private\GameLauncherModule.cpp" />
+    <ClCompile Include="Private\LaunchConfig.cpp" />
     <ClCompile Include="Private\LogGameLauncher.cpp" />
     <ClCompile Include="Private\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

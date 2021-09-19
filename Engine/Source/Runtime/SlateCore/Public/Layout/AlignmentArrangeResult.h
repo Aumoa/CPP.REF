@@ -18,7 +18,7 @@ struct AlignmentArrangeResult
     {
     }
 
-	template<class TSlot> requires requires { { std::declval<TSlot>().GetContent() } -> std::same_as<const SWidget*>; }
+	template<class TSlot> requires requires { { std::declval<TSlot>().GetContent() } -> std::same_as<SWidget*>; }
     static AlignmentArrangeResult AlignChild(EOrientation orientation, EFlowDirection inLayoutFlow, float allottedSize, TSlot& childToArrange, Margin slotPadding, float contentScale = 1.0f, bool bClampToParent = true)
     {
 	    Margin margin = slotPadding;

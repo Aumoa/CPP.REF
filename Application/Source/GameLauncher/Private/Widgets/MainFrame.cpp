@@ -2,6 +2,10 @@
 
 #include "pch.h"
 #include "LogGameLauncher.h"
+#include "GameLauncherInstance.h"
+#include "LaunchConfig.h"
+#include "IFrameworkView.h"
+#include "GameFramework/LocalPlayer.h"
 
 SMainFrame::SMainFrame() : Super()
 {
@@ -9,19 +13,20 @@ SMainFrame::SMainFrame() : Super()
 
 SWidget* SMainFrame::BuildSlateResources()
 {
-	auto texture = LoadObject<STexture2D>(L"Game/Content/GameLauncher/GenshinImpact_103.jpg");
+	_content = SNew(SHorizontalBoxPanel);
 
-	_content = SNew(SHorizontalBoxPanel)
-		+SHorizontalBoxPanel::Slot()
-		.SizeParam(ESizeRule::Auto, 1.0f)
-		[
-			MakeSlot(L"GenshinImpact_103.jpg", L"Genshin Impact")
-		]
-		+SHorizontalBoxPanel::Slot()
-		.SizeParam(ESizeRule::Auto, 1.0f)
-		[
-			MakeSlot(L"GenshinImpact_103.jpg", L"Genshin Impact")
-		];
+	for (auto& element : GGameInstance->GetConfig()->GetElements())
+	{
+		SBorder* content = MakeSlot(element.Icon, element.Name, element.Redirect);
+		if (content)
+		{
+			std::move(_content->AddSlot())
+				.SizeParam(ESizeRule::Auto, 1.0f)
+				[
+					content
+				];
+		}
+	}
 
 	return _content;
 }
@@ -35,7 +40,7 @@ void SMainFrame::ReleaseSlateResources()
 	}
 }
 
-SBorder* SMainFrame::MakeSlot(std::wstring_view image, std::wstring_view name)
+SBorder* SMainFrame::MakeSlot(const std::filesystem::path& image, std::wstring_view name, const std::filesystem::path& redirect)
 {
 	std::filesystem::path imagePath = std::filesystem::path(L"Game/Content/GameLauncher");
 	imagePath /= image;
@@ -53,24 +58,42 @@ SBorder* SMainFrame::MakeSlot(std::wstring_view image, std::wstring_view name)
 		return nullptr;
 	}
 
-	auto view = SNew(SBorder)
-		.Padding(10.0f)
+	auto view = SNew(SButton)
 		[
 			SNew(SCanvasPanel)
 			+SCanvasPanel::Slot()
 			.bAutoSize(true)
 			[
-				SNew(SImage)
-				.Brush(texture->GetShaderResourceView(), Vector2(120.0f, 120.0f))
+				SNew(SBorder)
+				.Padding(20.0f, 20.0f, 20.0f, 20.0f)
+				[
+					SNew(SImage)
+					.Brush(texture->GetShaderResourceView(), Vector2(140.0f, 140.0f))
+				]
 			]
 			+SCanvasPanel::Slot()
-			.Offset(0.0f, 120.0f, 120.0f, 20.0f)
+			.Offset(0.0f, 140.0f, 140.0f, 20.0f)
 			[
-				SNew(STextBlock)
-				.Font(font->GetFontFace(), 11)
-				.Text(name)
+				SNew(SCanvasPanel)
+				+SCanvasPanel::Slot()
+				.Anchors(0.5f)
+				.Alignment(0.5f, 0.5f)
+				.bAutoSize(true)
+				[
+					SNew(STextBlock)
+					.Font(font->GetFontFace(), 11)
+					.Text(name)
+				]
 			]
 		];
+
+	view->ButtonClicked.AddRaw([&, redirect = redirect.wstring()](EMouseButton button, EMouseButtonEvent event)
+		{
+			if (button == EMouseButton::Left && event == EMouseButtonEvent::Pressed)
+			{
+				ShellExecuteW((HWND)GGameInstance->GetLocalPlayer()->GetFrameworkView()->GetWindowHandle(), L"open", redirect.c_str(), nullptr, nullptr, SW_SHOW);
+			}
+		});
 
 	return view;
 }

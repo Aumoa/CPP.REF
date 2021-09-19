@@ -28,7 +28,7 @@ void SWindow::ExecutePaint(SSlateWindowElementList* drawElements) const
 
 Geometry SWindow::MakeRootGeometry() const
 {
-	return Geometry::MakeRoot(Vector2(1, 1), SlateLayoutTransform());
+	return Geometry::MakeRoot(GetDesiredSize(), SlateLayoutTransform());
 }
 
 void SWindow::SetWindowSize(const Vector2& localSize)

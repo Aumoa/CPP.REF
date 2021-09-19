@@ -26,3 +26,4 @@
 #include <array>
 #include <utility>
 #include <typeinfo>
+#include <memory>

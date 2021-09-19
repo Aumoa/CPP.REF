@@ -6,7 +6,7 @@
 #include "Layout/ArrangedWidget.h"
 #include "Widgets/Widget.h"
 
-ArrangedWidget Geometry::MakeChild(const SWidget* childWidget, const Vector2& localSize, const SlateLayoutTransform& layoutTransform) const
+ArrangedWidget Geometry::MakeChild(SWidget* childWidget, const Vector2& localSize, const SlateLayoutTransform& layoutTransform) const
 {
     if (childWidget->HasRenderTransform())
     {
@@ -20,12 +20,12 @@ ArrangedWidget Geometry::MakeChild(const SWidget* childWidget, const Vector2& lo
     }
 }
 
-ArrangedWidget Geometry::MakeChild(const SWidget* childWidget, const LayoutGeometry& layoutGeometry) const
+ArrangedWidget Geometry::MakeChild(SWidget* childWidget, const LayoutGeometry& layoutGeometry) const
 {
 	return MakeChild(childWidget, layoutGeometry.GetSizeInLocalSpace(), layoutGeometry.GetLocalToParentTransform());
 }
 
-ArrangedWidget Geometry::MakeChild(const SWidget* childWidget, const Vector2& childOffset, const Vector2& localSize, float childScale) const
+ArrangedWidget Geometry::MakeChild(SWidget* childWidget, const Vector2& childOffset, const Vector2& localSize, float childScale) const
 {
 	return MakeChild(childWidget, localSize, SlateLayoutTransform(childScale, TransformCalculus2D::TransformPoint(childScale, childOffset)));
 }

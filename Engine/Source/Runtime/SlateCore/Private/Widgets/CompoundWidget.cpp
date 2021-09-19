@@ -36,3 +36,35 @@ int32 SCompoundWidget::PaintArrangedChildrens(SPaintArgs* paintArgs, SArrangedCh
 
     return layer;
 }
+
+bool SCompoundWidget::OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event)
+{
+    ScopedPtr arrangedChildrens = NewObject<SArrangedChildrens>(ESlateVisibility::Visible);
+    ArrangeChildren(arrangedChildrens.Get(), allottedGeometry);
+
+    for (auto& arrangedWidget : arrangedChildrens->GetWidgets())
+    {
+        if (arrangedWidget.GetWidget()->SendMouseEvent(arrangedWidget.GetGeometry(), location, button, event))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool SCompoundWidget::OnReceiveKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event)
+{
+    ScopedPtr arrangedChildrens = NewObject<SArrangedChildrens>(ESlateVisibility::Visible);
+    ArrangeChildren(arrangedChildrens.Get(), allottedGeometry);
+
+    for (auto& arrangedWidget : arrangedChildrens->GetWidgets())
+    {
+        if (arrangedWidget.GetWidget()->SendKeyboardEvent(arrangedWidget.GetGeometry(), key, event))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

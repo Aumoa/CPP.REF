@@ -57,7 +57,7 @@ struct SlateRotatedRect
 		const float S = -Vector2::CrossProduct(Offset, ExtentX) / Det;
 		if (MathEx::IsWithinInclusive(S, 0.0f, 1.0f))
 		{
-			const float T = Vector2::CrossProduct(Offset, ExtentX) / Det;
+			const float T = Vector2::CrossProduct(Offset, ExtentY) / Det;
 			return MathEx::IsWithinInclusive(T, 0.0f, 1.0f);
 		}
 		return false;

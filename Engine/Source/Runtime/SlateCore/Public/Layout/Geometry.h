@@ -109,9 +109,9 @@ public:
 		return Geometry(localSize, SlateLayoutTransform(childScale, TransformCalculus2D::TransformPoint(childScale, childOffset)), GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform(), bHasRenderTransform);
 	}
 
-	ArrangedWidget MakeChild(const SWidget* childWidget, const Vector2& localSize, const SlateLayoutTransform& layoutTransform) const;
-	ArrangedWidget MakeChild(const SWidget* childWidget, const LayoutGeometry& layoutGeometry) const;
-	ArrangedWidget MakeChild(const SWidget* childWidget, const Vector2& childOffset, const Vector2& localSize, float childScale = 1) const;
+	ArrangedWidget MakeChild(SWidget* childWidget, const Vector2& localSize, const SlateLayoutTransform& layoutTransform) const;
+	ArrangedWidget MakeChild(SWidget* childWidget, const LayoutGeometry& layoutGeometry) const;
+	ArrangedWidget MakeChild(SWidget* childWidget, const Vector2& childOffset, const Vector2& localSize, float childScale = 1) const;
 
 	constexpr PaintGeometry ToPaintGeometry() const
 	{

@@ -5,6 +5,87 @@
 #include <functional>
 #include <map>
 #include <atomic>
+#include <concepts>
+#include <mutex>
+#include <memory>
+
+class DelegateHandle;
+
+class MulticastDelegateBase
+{
+public:
+	virtual void Remove(DelegateHandle& handle) = 0;
+};
+
+class DelegateHandle
+{
+	template<class>
+	friend class MulticastDelegate;
+
+public:
+	struct Impl
+	{
+		MulticastDelegateBase* _delegate = nullptr;
+		std::weak_ptr<int64> _holder;
+		int64 _id = 0;
+	};
+
+private:
+	Impl _impl;
+
+public:
+	DelegateHandle()
+	{
+	}
+
+	DelegateHandle(const Impl& impl) : _impl(impl)
+	{
+	}
+
+	DelegateHandle(const DelegateHandle& rhs)
+		: _impl(rhs._impl)
+	{
+	}
+
+	DelegateHandle(DelegateHandle&& rhs)
+		: _impl(std::move(rhs._impl))
+	{
+	}
+	
+	~DelegateHandle()
+	{
+		Reset();
+	}
+
+	inline bool IsValid() const
+	{
+		return !_impl._holder.expired();
+	}
+
+	inline void Reset()
+	{
+		if (IsValid())
+		{
+			_impl._delegate->Remove(*this);
+			_impl._delegate = nullptr;
+			_impl._holder.reset();
+		}
+	}
+
+	DelegateHandle& operator =(const DelegateHandle& rhs)
+	{
+		Reset();
+		_impl = rhs._impl;
+		return *this;
+	}
+
+	DelegateHandle& operator =(DelegateHandle&& rhs)
+	{
+		Reset();
+		_impl = std::move(rhs._impl);
+		return *this;
+	}
+};
 
 /// <summary>
 /// Represents a multicast delegate that is, a delegate that can have more than one element in its invocation list.
@@ -19,10 +100,54 @@ class MulticastDelegate
 /// </summary>
 /// <typeparam name="...TArgs"> The type of function arguments. </typeparam>
 template<class... TArgs>
-class MulticastDelegate<void(TArgs...)>
+class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 {
-	std::map<int64, std::function<void(TArgs...)>> _functions;
-	std::atomic<int64> _id = 0;
+	using TPayload = std::function<void(TArgs...)>;
+
+	struct DelegateInstance
+	{
+		TPayload Body;
+		std::shared_ptr<int64> Id;
+
+		bool bHolder = false;
+		std::weak_ptr<SObject> Holder;
+
+		DelegateInstance(int64 id, TPayload payload)
+			: Body(std::move(payload))
+			, Id(std::make_shared<int64>(id))
+		{
+		}
+
+		DelegateInstance(int64 id, TPayload payload, std::weak_ptr<SObject> holder)
+			: Body(std::move(payload))
+			, Id(std::make_shared<int64>(id))
+			, bHolder(true)
+			, Holder(std::move(holder))
+		{
+		}
+
+		template<class... TInvokeArgs>
+		bool ApplyAfter(TInvokeArgs&&... args)
+		{
+			std::shared_ptr<SObject> lock;
+			if (bHolder)
+			{
+				if (Holder.expired())
+				{
+					return false;
+				}
+
+				lock = Holder.lock();
+			}
+
+			Body(std::forward<TInvokeArgs>(args)...);
+			return true;
+		}
+	};
+
+	std::mutex _lock;
+	std::map<int64, DelegateInstance> _payload;
+	int64 _id = 0;
 
 public:
 	~MulticastDelegate() noexcept
@@ -36,9 +161,20 @@ public:
 	template<class... TInvokeArgs>
 	void Invoke(TInvokeArgs&&... args)
 	{
-		for (auto it : _functions)
+		std::unique_lock locker(_lock);
+
+		std::vector<int64> removeList;
+		for (auto payload : _payload)
 		{
-			it.second(std::forward<TInvokeArgs>(args)...);
+			if (!payload.second.ApplyAfter(std::forward<TInvokeArgs>(args)...))
+			{
+				removeList.emplace_back(*payload.second.Id);
+			}
+		}
+
+		for (auto& id : removeList)
+		{
+			_payload.erase(id);
 		}
 	}
 
@@ -47,33 +183,53 @@ public:
 	/// </summary>
 	/// <param name="func"> The raw function. </param>
 	/// <returns> Return valid function id if succeeded to bind, otherwise return -1. </returns>
-	int64 AddRaw(std::function<void(TArgs...)> func)
+	DelegateHandle::Impl AddRaw(TPayload func)
 	{
+		std::unique_lock locker(_lock);
 		int64 id = _id++;
-		auto pair = _functions.emplace(id, move(func));
-		return pair.second ? id : -1;
+
+		DelegateInstance instance(id, std::move(func));
+		DelegateHandle::Impl handle;
+		handle._delegate = this;
+		handle._holder = instance.Id;
+		handle._id = *instance.Id;
+		_payload.emplace(id, std::move(instance));
+		return handle;
 	}
 
-	template<class O>
-	int64 AddObject(O* object, void (O::* func)(TArgs...))
+	template<std::derived_from<SObject> U>
+	DelegateHandle::Impl AddSObject(U* sobject, void(U::*payload)(TArgs...))
 	{
-		return AddRaw([object, func](TArgs&&... args)
-		{
-			(object->*func)(std::forward<TArgs>(args)...);
-		});
+		std::unique_lock locker(_lock);
+		int64 id = _id++;
+
+		DelegateInstance instance(id, [sobject, payload](TArgs&&... args)
+			{
+				(sobject->*payload)(std::forward<TArgs>(args)...);
+			}, sobject->weak_from_this());
+		DelegateHandle::Impl handle;
+		handle._delegate = this;
+		handle._holder = instance.Id;
+		handle._id = *instance.Id;
+		_payload.emplace(id, std::move(instance));
+		return handle;
 	}
 
 	/// <summary>
 	/// Remove binded function using delegate id.
 	/// </summary>
-	void Remove(int64 id)
+	virtual void Remove(DelegateHandle& handle) override
 	{
-		_functions.erase(id);
+		std::unique_lock locker(_lock);
+		if (handle.IsValid())
+		{
+			_payload.erase(handle._impl._id);
+		}
 	}
 
-	int64 operator +=(std::function<void(TArgs...)> func)
+	DelegateHandle::Impl operator +=(TPayload func)
 	{
-		return AddRaw(func);
+		return AddRaw(std::move(func));
 	}
 };
 

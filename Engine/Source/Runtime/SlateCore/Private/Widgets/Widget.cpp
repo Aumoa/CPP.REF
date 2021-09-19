@@ -47,16 +47,25 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection() con
 	return _RenderTransform;
 }
 
-void SWidget::SendMouseEvent(EMouseButton button, EMouseButtonEvent event)
+bool SWidget::SendMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event)
 {
-    // TODO:
-    check(false);
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+        allottedGeometry.GetLayoutBoundingRect().PtInRect(location.Cast<float>()))
+    {
+        return OnReceiveMouseEvent(allottedGeometry, location, button, event);
+    }
+
+    return false;
 }
 
-void SWidget::SendKeyboardEvent(EKey key, EKeyboardEvent event)
+bool SWidget::SendKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event)
 {
-    // TODO:
-    check(false);
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    {
+        return OnReceiveKeyboardEvent(allottedGeometry, key, event);
+    }
+
+    return false;
 }
 
 bool SWidget::IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild) const

@@ -5,7 +5,8 @@
 #include "FontFace.Impl.h"
 #include "LogFreeType.h"
 
-SFontFace::SFontFace(std::unique_ptr<Impl>&& impl, const std::wstring& faceName) : Super()
+SFontFace::SFontFace(SFreeTypeModule* module, std::unique_ptr<Impl>&& impl, const std::wstring& faceName) : Super()
+	, _module(module)
 	, _impl(std::move(impl))
 	, _faceName(faceName)
 {

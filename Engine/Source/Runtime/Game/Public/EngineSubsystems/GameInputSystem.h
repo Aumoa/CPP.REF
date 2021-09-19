@@ -30,7 +30,7 @@ private:
 public:
 	DECLARE_MULTICAST_EVENT(KeyboardEvent, EKey, EKeyboardEvent);
 	KeyboardEvent Keyboard;
-	DECLARE_MULTICAST_EVENT(MouseEvent, EMouseButton, EMouseButtonEvent);
+	DECLARE_MULTICAST_EVENT(MouseEvent, Vector2N, EMouseButton, EMouseButtonEvent);
 	MouseEvent Mouse;
 	DECLARE_MULTICAST_EVENT(MouseMoveEvent, const MouseMoveData&);
 	MouseMoveEvent MouseMove;

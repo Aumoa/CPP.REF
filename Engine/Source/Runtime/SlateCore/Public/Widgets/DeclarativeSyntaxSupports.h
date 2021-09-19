@@ -90,4 +90,4 @@ This&& operator +(SlotClass&& instanceSlot) &&				\
 	return std::move(*static_cast<This*>(this));			\
 }
 
-#define SNew(SlateClass) (new SlateClass(ANSI_TO_WCHAR(typeid(SlateClass).name()))) << SlateClass::DeclarativeAttr<>()
+#define SNew(SlateClass) (NewObject<SlateClass>(ANSI_TO_WCHAR(typeid(SlateClass).name()))) << SlateClass::DeclarativeAttr<>()

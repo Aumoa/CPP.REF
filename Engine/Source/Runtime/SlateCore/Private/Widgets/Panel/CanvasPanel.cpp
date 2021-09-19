@@ -157,7 +157,7 @@ void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, cons
 		{
 			ChildZOrder curSlot = slotOrder[childIndex];
 			const Slot& curChild = _slots[curSlot.ChildIndex];
-			const SWidget* curWidget = curChild.GetContent();
+			SWidget* curWidget = curChild.GetContent();
 
 			ESlateVisibility childVisibility = curWidget->GetVisibility();
 			if (arrangedChildrens->Accepts(childVisibility))

@@ -6,17 +6,12 @@
   },
   {
     "Name": "League of Legend",
-    "Icon": "LeagueClient_107.ico",
+    "Icon": "LeagueClient_107.png",
     "AppLink": "D:\\Riot Games\\League of Legends\\LeagueClient.exe"
   },
   {
-    "Name": "Blitz",
-    "Icon": "Blitz_1.ico",
-    "AppLink": "Blitz.lnk"
-  },
-  {
     "Name": "Battle.net",
-    "Icon": "Battle_130.ico",
+    "Icon": "Battle_130.png",
     "AppLink": "C:\\Program Files (x86)\\Battle.net\\Battle.net Launcher.exe"
   },
   {
@@ -26,12 +21,12 @@
   },
   {
     "Name": "Reign of Chaos",
-    "Icon": "Warcraft III_WAR3.ICO.ico",
+    "Icon": "Warcraft III_WAR3.ICO.png",
     "AppLink": "D:\\WarCraft III\\WarCraft III.exe"
   },
   {
     "Name": "Frozen Throne",
-    "Icon": "Warcraft III_WAR3X.ICO.ico",
+    "Icon": "Warcraft III_WAR3X.ICO.png",
     "AppLink": "D:\\WarCraft III\\Frozen Throne.exe"
   }
 ]
