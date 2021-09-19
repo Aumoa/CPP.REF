@@ -27,7 +27,7 @@ SCameraComponent* APlayerController::FindPlayerCameraComponent() const
 	return pawn->GetComponentAs<SCameraComponent>();
 }
 
-void APlayerController::SpawnCameraManager(World* level)
+void APlayerController::SpawnCameraManager(SWorld* level)
 {
 	_cameraManager = level->SpawnActor<APlayerCameraManager>();
 }
@@ -55,7 +55,7 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 		return {};
 	}
 
-	World* world = GetWorld();
+	SWorld* world = GetWorld();
 	IFrameworkView* frameworkView = GetLocalPlayer()->GetFrameworkView();
 
 	const auto [frameworkWidth, frameworkHeight] = frameworkView->GetFrameworkSize();

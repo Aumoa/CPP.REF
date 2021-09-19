@@ -11,13 +11,30 @@
 #include "Camera/PlayerCameraManager.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 
-World::World() : Super()
+SWorld::SWorld() : Super()
 {
 	SetWorld(this);
 	_scene = NewObject<SScene>(this, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
-SLevel* World::LoadLevel(SubclassOf<SLevel> levelToLoad)
+AActor* SWorld::SpawnActor(SubclassOf<AActor> actorClass)
+{
+	if (!actorClass.IsValid())
+	{
+		LogSystem::Log(LogWorld, ELogVerbosity::Error, L"Actor class does not specified. Abort.");
+		return nullptr;
+	}
+
+	AActor* spawnedActor = actorClass.Instantiate(this);
+	if (!InternalSpawnActor(spawnedActor))
+	{
+		DestroySubobject(spawnedActor);
+		return nullptr;
+	}
+	return spawnedActor;
+}
+
+SLevel* SWorld::LoadLevel(SubclassOf<SLevel> levelToLoad)
 {
 	if (!levelToLoad.IsValid())
 	{
@@ -50,7 +67,7 @@ SLevel* World::LoadLevel(SubclassOf<SLevel> levelToLoad)
 	return levelInstance;
 }
 
-void World::RegisterTickFunction(STickFunction* function)
+void SWorld::RegisterTickFunction(STickFunction* function)
 {
 	if (function->bCanEverTick)
 	{
@@ -58,7 +75,7 @@ void World::RegisterTickFunction(STickFunction* function)
 	}
 }
 
-void World::RegisterComponent(SActorComponent* component)
+void SWorld::RegisterComponent(SActorComponent* component)
 {
 	if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
 	{
@@ -80,12 +97,12 @@ void World::RegisterComponent(SActorComponent* component)
 	}
 }
 
-void World::UnregisterTickFunction(STickFunction* function)
+void SWorld::UnregisterTickFunction(STickFunction* function)
 {
 	_tickInstances.erase(function);
 }
 
-void World::UnregisterComponent(SActorComponent* component)
+void SWorld::UnregisterComponent(SActorComponent* component)
 {
 	if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
 	{
@@ -97,7 +114,7 @@ void World::UnregisterComponent(SActorComponent* component)
 	}
 }
 
-void World::LevelTick(std::chrono::duration<float> elapsedTime)
+void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
 {
 	for (auto& func : _tickInstances)
 	{
@@ -114,7 +131,7 @@ void World::LevelTick(std::chrono::duration<float> elapsedTime)
 	_scene->UpdateScene(elapsedTime);
 }
 
-bool World::InternalSpawnActor(AActor* instance)
+bool SWorld::InternalSpawnActor(AActor* instance)
 {
 	// Register.
 	instance->RegisterActorWithWorld(this);

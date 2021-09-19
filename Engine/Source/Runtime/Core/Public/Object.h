@@ -14,7 +14,7 @@
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
 /// Represents unit that subobjects are binding and managed.
 /// </summary>
-class CORE_API SObject
+class CORE_API SObject : public std::enable_shared_from_this<SObject>
 {
 	GENERATED_BODY(SObject)
 
@@ -28,8 +28,6 @@ public:
 	/// Initialize new <see cref="SObject"/> class instance.
 	/// </summary>
 	SObject();
-
-protected:
 	virtual ~SObject() noexcept;
 
 private:

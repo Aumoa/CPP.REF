@@ -52,6 +52,9 @@ public:
 	/// <inheritdoc/>
 	virtual ETickMode GetTickMode() const override;
 
+	/// <inheritdoc/>
+	virtual void Present() override;
+
 private:
 	// Functions for internal only.
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

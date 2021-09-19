@@ -13,8 +13,7 @@ struct IFrameworkView;
 
 class GAME_API SLocalPlayer : public SPlayer
 {
-public:
-	using Super = SPlayer;
+	GENERATED_BODY(SLocalPlayer)
 
 private:
 	IFrameworkView* _frameworkView = nullptr;

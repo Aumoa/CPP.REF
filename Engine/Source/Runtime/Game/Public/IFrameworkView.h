@@ -67,4 +67,9 @@ struct IFrameworkView : virtual public SObject, virtual public IWindowView
 	/// Get tick mode.
 	/// </summary>
 	virtual ETickMode GetTickMode() const = 0;
+
+	/// <summary>
+	/// Present for ETickMode::Ontime.
+	/// </summary>
+	virtual void Present() = 0;
 };

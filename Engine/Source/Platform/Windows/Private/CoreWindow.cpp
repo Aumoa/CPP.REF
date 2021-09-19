@@ -5,7 +5,8 @@
 #include "WindowsPlatform/WindowsPlatformMouse.h"
 #include "WindowsPlatform/WindowsPlatformKeyboard.h"
 
-#define WM_UPDATETICKMODE WM_APP + 1
+#define WM_UPDATETICKMODE		WM_APP + 1
+#define WM_PRESENT				WM_UPDATETICKMODE + 1
 
 DEFINE_LOG_CATEGORY(LogWindowsLaunch);
 
@@ -109,6 +110,14 @@ void SCoreWindow::SetTickMode(ETickMode tickMode)
 auto SCoreWindow::GetTickMode() const -> ETickMode
 {
 	return _tickMode;
+}
+
+void SCoreWindow::Present()
+{
+	if (_tickMode == ETickMode::Ontime)
+	{
+		SendMessageW(_hwnd, WM_PRESENT, 0, 0);
+	}
 }
 
 LRESULT CALLBACK SCoreWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

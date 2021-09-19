@@ -6,7 +6,7 @@
 #include <vector>
 #include <queue>
 
-class World;
+class SWorld;
 class SRHIDevice;
 class SRHIDeviceContext;
 class SRHIShader;
@@ -29,7 +29,7 @@ private:
 	static constexpr const size_t RenderQueue_Transparent = 3000;
 
 private:
-	World* _world = nullptr;
+	SWorld* _world = nullptr;
 	SRHIDevice* _device = nullptr;
 	std::vector<SPrimitiveSceneProxy*> _primitives;
 	std::queue<int64> _spaces;
@@ -39,7 +39,7 @@ private:
 	std::vector<SSceneRenderer> _renderers;
 
 public:
-	SScene(World* worldOwner, SRHIDevice* device);
+	SScene(SWorld* worldOwner, SRHIDevice* device);
 	~SScene() override;
 
 	void UpdateScene(std::chrono::duration<float> elapsedTime);

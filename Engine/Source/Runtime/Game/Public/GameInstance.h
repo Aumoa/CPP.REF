@@ -7,6 +7,7 @@
 #include "SubclassOf.h"
 
 class SLevel;
+class SLocalPlayer;
 
 /// <summary>
 /// Represents single game instance while application are running.
@@ -33,4 +34,9 @@ public:
 	/// Get application name for setting framework title.
 	/// </summary>
 	virtual std::wstring GetApplicationName() const;
+
+	/// <summary>
+	/// Get local player.
+	/// </summary>
+	SLocalPlayer* GetLocalPlayer() const;
 };

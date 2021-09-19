@@ -15,10 +15,7 @@ class SLocalPlayer;
 /// </summary>
 class GAME_API APlayerController : public AController
 {
-	friend class SGameInstance;
-
-public:
-	using Super = AController;
+	GENERATED_BODY(APlayerController)
 
 private:
 	APlayerCameraManager* _cameraManager = nullptr;
@@ -31,7 +28,7 @@ public:
 	APlayerController();
 
 	SCameraComponent* FindPlayerCameraComponent() const;
-	void SpawnCameraManager(World* level);
+	void SpawnCameraManager(SWorld* level);
 	void UpdateCameraManager(std::chrono::duration<float> elapsedTime);
 	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY) const;
 	void SetLocalPlayer(SLocalPlayer* localPlayer);

@@ -24,7 +24,7 @@ struct SlateBrush
 	template<class TSource>
 	SlateBrush(const TSource* textureSource)
 		: ImageSource(textureSource->GetShaderResourceView())
-		, ImageSize(textureSource->GetSize())
+		, ImageSize(textureSource->GetPixelSize().Cast<float>())
 	{
 	}
 

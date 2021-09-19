@@ -83,7 +83,7 @@ public:
 	MulticastEvent<AActor, void()> Activated;
 	MulticastEvent<AActor, void()> Inactivated;
 
-	void RegisterActorWithWorld(World* world);
+	void RegisterActorWithWorld(SWorld* world);
 	void DestroyActor();
 
 private:

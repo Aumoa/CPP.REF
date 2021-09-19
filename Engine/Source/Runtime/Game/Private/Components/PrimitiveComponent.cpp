@@ -26,7 +26,7 @@ void SPrimitiveComponent::MarkRenderStateDirty()
 {
 	if (SceneProxy == nullptr)
 	{
-		if (World* world = GetWorld(); world != nullptr)
+		if (SWorld* world = GetWorld(); world != nullptr)
 		{
 			// Re-register primitive component for add scene proxy to actual scene.
 			world->RegisterComponent(this);

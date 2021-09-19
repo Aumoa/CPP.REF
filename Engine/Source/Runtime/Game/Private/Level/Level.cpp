@@ -8,7 +8,7 @@
 #include "Info/GameMode.h"
 
 SLevel::SLevel() : Super()
-	, GameModeClass(SubclassOf<AGameMode>::StaticClass())
+	, GameModeClass(AGameMode::StaticClass())
 {
 }
 
@@ -16,7 +16,7 @@ SLevel::~SLevel()
 {
 }
 
-bool SLevel::LoadLevel(World* world)
+bool SLevel::LoadLevel(SWorld* world)
 {
 	if (!GameModeClass.IsValid())
 	{

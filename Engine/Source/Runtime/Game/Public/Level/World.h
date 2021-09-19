@@ -19,9 +19,9 @@ class STickFunction;
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
 /// </summary>
-class GAME_API World : public SGameObject
+class GAME_API SWorld : public SGameObject
 {
-	GENERATED_BODY(World)
+	GENERATED_BODY(SWorld)
 
 private:
 	std::set<AActor*> _actors;
@@ -34,9 +34,9 @@ private:
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="World"/> instance.
+	/// Initialize new <see cref="SWorld"/> instance.
 	/// </summary>
-	World();
+	SWorld();
 
 	/// <summary>
 	/// Spawn actor to world.
@@ -60,22 +60,7 @@ public:
 	/// </summary>
 	/// <param name="actorClass"> The actor class. </typeparam>
 	/// <returns> Spawned actor. </returns>
-	AActor* SpawnActor(SubclassOf<AActor> actorClass)
-	{
-		if (!actorClass.IsValid())
-		{
-			LogSystem::Log(LogWorld, ELogVerbosity::Error, L"Actor class does not specified. Abort.");
-			return nullptr;
-		}
-
-		AActor* spawnedActor = actorClass.Instantiate(this);
-		if (!InternalSpawnActor(spawnedActor))
-		{
-			DestroySubobject(spawnedActor);
-			return nullptr;
-		}
-		return spawnedActor;
-	}
+	AActor* SpawnActor(SubclassOf<AActor> actorClass);
 
 	/// <summary>
 	/// Spawn actor to world.

@@ -14,10 +14,7 @@ class SubclassOf
 	template<class>
 	friend class SubclassOf;
 
-	inline static std::function<SObject* (SObject*)> _myctor;
-
-	size_t _hash = 0;
-	std::function<SObject* (SObject*)> _ctor;
+	const Type* _type = nullptr;
 
 public:
 	/// <summary>
@@ -30,18 +27,7 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="SubclassOf"/> instance.
 	/// </summary>
-	inline SubclassOf(const SubclassOf& rhs)
-		: _hash(rhs._hash)
-		, _ctor(rhs._ctor)
-	{
-	}
-
-	/// <summary>
-	/// Initialize new <see cref="SubclassOf"/> instance.
-	/// </summary>
-	inline SubclassOf(SubclassOf&& rhs)
-		: _hash(rhs._hash)
-		, _ctor(move(rhs._ctor))
+	inline SubclassOf(const SubclassOf& rhs) : _type(rhs._type)
 	{
 	}
 
@@ -49,31 +35,33 @@ public:
 	/// Initialize new <see cref="SubclassOf"/> instance.
 	/// </summary>
 	template<std::derived_from<TBase> TOther>
-	inline SubclassOf(const SubclassOf<TOther>& rhs)
-		: _hash(rhs._hash)
-		, _ctor(rhs._ctor)
+	inline SubclassOf(const SubclassOf<TOther>& rhs) : _type(rhs._type)
 	{
 	}
 
-	/// <summary>
-	/// Initialize new <see cref="SubclassOf"/> instance.
-	/// </summary>
-	template<std::derived_from<TBase> TOther>
-	inline SubclassOf(SubclassOf<TOther>&& rhs)
-		: _hash(rhs._hash)
-		, _ctor(move(rhs._ctor))
+	inline SubclassOf(const Type* type) : _type(type)
 	{
+		if (type != nullptr)
+		{
+			check(type->IsDerivedFrom<TBase>());
+		}
 	}
 
 	/// <summary>
 	/// Get identifier hash code.
 	/// </summary>
-	inline size_t GetHashCode() const { return _hash; }
+	inline size_t GetHashCode() const
+	{
+		return _type ? _type->GetHashCode() : 0;
+	}
 
 	/// <summary>
 	/// Represents this is valid state.
 	/// </summary>
-	inline bool IsValid() const { return (bool)_ctor; }
+	inline bool IsValid() const
+	{
+		return _type != nullptr;
+	}
 
 	/// <summary>
 	/// Instantiate saved class as base class.
@@ -85,65 +73,40 @@ public:
 		{
 			return nullptr;
 		}
-		return dynamic_cast<TBase*>(_ctor(outer));
+		return dynamic_cast<TBase*>(_type->Instantiate());
 	}
 
 	inline SubclassOf& operator =(const SubclassOf& rhs)
 	{
-		_hash = rhs._hash;
-		_ctor = rhs._ctor;
-		return *this;
-	}
-
-	inline SubclassOf& operator =(SubclassOf&& rhs)
-	{
-		_hash = rhs._hash;
-		_ctor = move(rhs._ctor);
+		_type = rhs._type;
 		return *this;
 	}
 
 	template<std::derived_from<TBase> TOther>
 	inline SubclassOf& operator =(const SubclassOf<TOther>& rhs)
 	{
-		_hash = rhs._hash;
-		_ctor = rhs._ctor;
-		return *this;
-	}
-
-	template<std::derived_from<TBase> TOther>
-	inline SubclassOf& operator =(SubclassOf<TOther>&& rhs)
-	{
-		_hash = rhs._hash;
-		_ctor = move(rhs._ctor);
+		_type = rhs._type;
 		return *this;
 	}
 
 	inline bool operator ==(const SubclassOf& rhs) const
 	{
-		return _hash == rhs._hash;
+		if (_type == nullptr)
+		{
+			return rhs._type != nullptr;
+		}
+		else if (rhs._type == nullptr)
+		{
+			return _type != nullptr;
+		}
+		else
+		{
+			return _type->IsA(rhs._type);
+		}
 	}
 
 	inline bool operator !=(const SubclassOf& rhs) const
 	{
-		return _hash != rhs._hash;
-	}
-
-	/// <summary>
-	/// Get <see cref="SubclassOf"/> instance with current base class.
-	/// </summary>
-	inline static SubclassOf StaticClass()
-	{
-		if (!_myctor)
-		{
-			_myctor = [](SObject* outer)
-			{
-				return static_cast<SObject*>(outer->NewObject<TBase>());
-			};
-		}
-
-		SubclassOf ins;
-		ins._hash = UniqueType<TBase>::HashCode;
-		ins._ctor = _myctor;
-		return ins;
+		return !operator ==(rhs);
 	}
 };

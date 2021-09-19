@@ -47,6 +47,18 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection() con
 	return _RenderTransform;
 }
 
+void SWidget::SendMouseEvent(EMouseButton button, EMouseButtonEvent event)
+{
+    // TODO:
+    check(false);
+}
+
+void SWidget::SendKeyboardEvent(EKey key, EKeyboardEvent event)
+{
+    // TODO:
+    check(false);
+}
+
 bool SWidget::IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild) const
 {
     // 1) We check if the rendered bounding box overlaps with the culling rect.  Which is so that

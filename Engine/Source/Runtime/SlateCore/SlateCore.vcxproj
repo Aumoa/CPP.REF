@@ -124,6 +124,8 @@
     <ClInclude Include="Public\Widgets\CompoundWidget.h" />
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
     <ClInclude Include="Public\Widgets\Image\Image.h" />
+    <ClInclude Include="Public\Widgets\Input\Button.h" />
+    <ClInclude Include="Public\Widgets\Layout\Border.h" />
     <ClInclude Include="Public\WIdgets\LeafWidget.h" />
     <ClInclude Include="Public\Widgets\Panel\BoxPanel.h" />
     <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h" />
@@ -148,6 +150,8 @@
     </ClCompile>
     <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
     <ClCompile Include="Private\Widgets\Image\Image.cpp" />
+    <ClCompile Include="Private\Widgets\Input\Button.cpp" />
+    <ClCompile Include="Private\Widgets\Layout\Border.cpp" />
     <ClCompile Include="Private\WIdgets\LeafWidget.cpp" />
     <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp" />
     <ClCompile Include="Private\Widgets\Panel\CanvasPanel.cpp" />

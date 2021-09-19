@@ -13,6 +13,40 @@ SCanvasPanel::~SCanvasPanel()
 {
 }
 
+Vector2 SCanvasPanel::GetDesiredSize() const
+{
+	Vector2 finalDesiredSize(0, 0);
+
+	// Arrange the children now in their proper z-order.
+	for (size_t i = 0; i < _slots.size(); ++i)
+	{
+		const Slot& curChild = _slots[i];
+		const SWidget* widget = curChild.GetContent();
+		const ESlateVisibility childVisibility = widget->GetVisibility();
+
+		// As long as the widgets are not collapsed, they should contribute to the desired size.
+		if (childVisibility != ESlateVisibility::Collapsed)
+		{
+			const Margin& offset = curChild._Offset;
+			const Anchors& anchors = curChild._Anchors;
+
+			const Vector2& slotSize = Vector2(offset.Right, offset.Bottom);
+
+			const bool& bAutoSize = curChild._bAutoSize;
+
+			const Vector2 size = bAutoSize ? widget->GetDesiredSize() : slotSize;
+
+			const bool bIsDockedHorizontally = (anchors.Minimum.X == anchors.Maximum.X) && (anchors.Minimum.X == 0 || anchors.Minimum.X == 1);
+			const bool bIsDockedVertically = (anchors.Minimum.Y == anchors.Maximum.Y) && (anchors.Minimum.Y == 0 || anchors.Minimum.Y == 1);
+
+			finalDesiredSize.X = MathEx::Max(finalDesiredSize.X, size.X + (bIsDockedHorizontally ? MathEx::Abs(offset.Left) : 0.0f));
+			finalDesiredSize.Y = MathEx::Max(finalDesiredSize.Y, size.Y + (bIsDockedVertically ? MathEx::Abs(offset.Top) : 0.0f));
+		}
+	}
+
+	return finalDesiredSize;
+}
+
 auto SCanvasPanel::AddSlot() -> Slot&
 {
 	return _slots.emplace_back();

@@ -23,7 +23,7 @@ std::wstring SGameObject::GetName() const
 	return _name;
 }
 
-World* SGameObject::GetWorld() const
+SWorld* SGameObject::GetWorld() const
 {
 	if (_WorldPrivate == nullptr)
 	{
@@ -37,7 +37,7 @@ World* SGameObject::GetWorld() const
 	return _WorldPrivate;
 }
 
-void SGameObject::SetWorld(World* value)
+void SGameObject::SetWorld(SWorld* value)
 {
 	_WorldPrivate = value;
 }

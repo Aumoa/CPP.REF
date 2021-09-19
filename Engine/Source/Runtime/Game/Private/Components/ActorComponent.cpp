@@ -63,7 +63,7 @@ void SActorComponent::SetActive(bool bActive)
 	}
 }
 
-void SActorComponent::RegisterComponentWithWorld(World* world)
+void SActorComponent::RegisterComponentWithWorld(SWorld* world)
 {
 	if (!_bIsRegistered)
 	{
@@ -77,7 +77,7 @@ void SActorComponent::UnregisterComponent()
 {
 	if (_bIsRegistered)
 	{
-		World* const world = GetWorld();
+		SWorld* const world = GetWorld();
 		if (world != nullptr)
 		{
 			world->UnregisterTickFunction(&PrimaryComponentTick);

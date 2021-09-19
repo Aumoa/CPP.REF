@@ -5,6 +5,6 @@
 #include "GameFramework/PlayerController.h"
 
 AGameMode::AGameMode() : Super()
-	, PlayerControllerClass(SubclassOf<APlayerController>::StaticClass())
+	, PlayerControllerClass(APlayerController::StaticClass())
 {
 }

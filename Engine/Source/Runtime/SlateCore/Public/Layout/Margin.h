@@ -61,4 +61,9 @@ struct Margin
 			return 0;
 		}
 	}
+
+	constexpr Vector2 GetTotalSpaceAlong() const
+	{
+		return Vector2(GetTotalSpaceAlong(EOrientation::Horizontal), GetTotalSpaceAlong(EOrientation::Vertical));
+	}
 };

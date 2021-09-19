@@ -6,7 +6,7 @@
 #include "SubclassOf.h"
 #include "World.h"
 
-class World;
+class SWorld;
 class AGameMode;
 class APlayerController;
 class AActor;
@@ -22,7 +22,7 @@ public:
 	SubclassOf<AGameMode> GameModeClass;
 
 private:
-	World* _world = nullptr;
+	SWorld* _world = nullptr;
 	APlayerController* _playerController = nullptr;
 	AGameMode* _gameMode = nullptr;
 
@@ -39,7 +39,7 @@ public:
 	/// Load level.
 	/// </summary>
 	/// <param name="world"> The world that level be placed. </param>
-	virtual bool LoadLevel(World* world);
+	virtual bool LoadLevel(SWorld* world);
 
 	/// <summary>
 	/// Unload level. Persistent actor will be cleaned up.
@@ -47,7 +47,7 @@ public:
 	virtual void UnloadLevel();
 
 	inline APlayerController* GetPlayerController() const { return _playerController; }
-	inline World* GetWorld() const { return _world; }
+	inline SWorld* GetWorld() const { return _world; }
 
 protected:
 	template<class... TArgs>

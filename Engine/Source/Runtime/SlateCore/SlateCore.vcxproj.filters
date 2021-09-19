@@ -121,6 +121,12 @@
     <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h">
       <Filter>Public\Widgets\Panel</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Widgets\Layout\Border.h">
+      <Filter>Public\Widgets\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Input\Button.h">
+      <Filter>Public\Widgets\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -177,6 +183,12 @@
     <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp">
       <Filter>Private\Widgets\Panel</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Widgets\Layout\Border.cpp">
+      <Filter>Private\Widgets\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Input\Button.cpp">
+      <Filter>Private\Widgets\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -223,6 +235,18 @@
     </Filter>
     <Filter Include="Private\Widgets\Panel">
       <UniqueIdentifier>{d1176a81-357c-4a3f-8a1b-69736bc35b09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Layout">
+      <UniqueIdentifier>{fc8b419c-3a87-47d6-b72a-e749f2a93735}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Layout">
+      <UniqueIdentifier>{f81e263d-dc32-442f-8bd9-77d870283aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Input">
+      <UniqueIdentifier>{53577c9f-d735-46c4-865f-f87ca71d0cce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Input">
+      <UniqueIdentifier>{6732a5f8-4a6f-40e3-bdf3-19e646b8996e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

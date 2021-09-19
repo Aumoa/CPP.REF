@@ -7,8 +7,8 @@
 #include "SlotBase.h"
 #include "Layout/LayoutEnums.h"
 #include "Layout/SlateRenderTransform.h"
+#include "Layout/Geometry.h"
 
-struct Geometry;
 class SSlateWindowElementList;
 class SPaintArgs;
 class SArrangedChildrens;
@@ -27,6 +27,7 @@ private:
 	Vector2 _RenderTransformPivot = Vector2::GetZero();
 	uint8 _bEnabled : 1 = true;
 	uint8 _bHasRenderTransform : 1 = false;
+	std::optional<Geometry> _cachedGeometry;
 
 	std::wstring _name;
 
@@ -45,6 +46,10 @@ public:
 	Vector2 GetRenderTransformPivotWithRespectToFlowDirection() const;
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection() const;
 	inline bool HasRenderTransform() const { return _bHasRenderTransform; }
+	std::optional<Geometry> GetCachedGeometry() const { return _cachedGeometry; }
+
+	void SendMouseEvent(EMouseButton button, EMouseButtonEvent event);
+	void SendKeyboardEvent(EKey key, EKeyboardEvent event);
 
 protected:
 	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const = 0;

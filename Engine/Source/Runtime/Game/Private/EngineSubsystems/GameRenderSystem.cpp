@@ -121,7 +121,7 @@ void SGameRenderSystem::Present()
 	_deviceContext->RSSetViewports(1, &vp);
 
 	SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-	World* world = levelSystem->GetWorld();
+	SWorld* world = levelSystem->GetWorld();
 	//APlayerCameraManager* playerCamera = world->GetPlayerCamera();
 
 	//Scene* scene = _gameInstance->GetWorld()->GetScene();

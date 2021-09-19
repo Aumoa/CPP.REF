@@ -18,10 +18,10 @@ SGameLevelSystem::~SGameLevelSystem()
 void SGameLevelSystem::Init()
 {
 	Super::Init();
-	_world = NewObject<World>();
+	_world = NewObject<SWorld>();
 }
 
-World* SGameLevelSystem::GetWorld() const
+SWorld* SGameLevelSystem::GetWorld() const
 {
 	return _world;
 }

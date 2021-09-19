@@ -6,7 +6,7 @@
 #include <string>
 #include <string_view>
 
-class World;
+class SWorld;
 
 /// <summary>
 /// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
@@ -38,8 +38,8 @@ public:
 	/// </summary>
 	std::wstring GetName() const;
 
-	World* GetWorld() const;
-	void SetWorld(World* value);
+	SWorld* GetWorld() const;
+	void SetWorld(SWorld* value);
 
 public:
 	static SObject* LoadObject(const std::filesystem::path& assetPath);
@@ -51,5 +51,5 @@ public:
 	}
 
 private:
-	mutable World* _WorldPrivate = nullptr;
+	mutable SWorld* _WorldPrivate = nullptr;
 };

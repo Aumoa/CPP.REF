@@ -77,7 +77,7 @@ public:
 	MulticastEvent<SActorComponent, void()> Activated;
 	MulticastEvent<SActorComponent, void()> Inactivated;
 
-	void RegisterComponentWithWorld(World* world);
+	void RegisterComponentWithWorld(SWorld* world);
 	void UnregisterComponent();
 
 	void SetOwnerPrivate(AActor* owner) { _owner = owner; }

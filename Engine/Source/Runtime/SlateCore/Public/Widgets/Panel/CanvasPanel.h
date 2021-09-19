@@ -18,7 +18,7 @@ public:
 		{
 		}
 
-		DECLARE_SLATE_ATTRIBUTE(Margin, Offset, = Margin(0, 0, 1.0f, 1.0f));
+		DECLARE_SLATE_ATTRIBUTE(Margin, Offset, = Margin(0, 0, 100.0f, 100.0f));
 		DECLARE_SLATE_ATTRIBUTE(::Anchors, Anchors);
 		DECLARE_SLATE_ATTRIBUTE(Vector2, Alignment);
 		DECLARE_SLATE_ATTRIBUTE(float, ZOrder, = 0);
@@ -38,6 +38,8 @@ private:
 public:
 	SCanvasPanel(const std::wstring& name);
 	virtual ~SCanvasPanel() override;
+
+	virtual Vector2 GetDesiredSize() const override;
 
 	Slot& AddSlot();
 	bool RemoveSlot(size_t index);

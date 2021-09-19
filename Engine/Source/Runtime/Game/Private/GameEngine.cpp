@@ -11,7 +11,6 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneRenderer.h"
 #include "GameFramework/LocalPlayer.h"
-#include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
@@ -95,24 +94,9 @@ bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
 	return true;
 }
 
-int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view platformArgs)
+int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Invoke();
-
-	SCommandLine commandArgs = StringUtils::Split(platformArgs, L" ", true, true);
-	size_t gameModuleIdx = commandArgs.GetArgument(L"--GameDll");
-	if (gameModuleIdx == -1)
-	{
-		SE_LOG(LogEngine, Fatal, L"GameModule does not specified.");
-		return -1;
-	}
-
-	std::optional<std::wstring_view> moduleName = commandArgs.GetArgument(gameModuleIdx + 1);
-	if (!moduleName)
-	{
-		SE_LOG(LogEngine, Fatal, L"GameModule does not specified.");
-		return -1;
-	}
 
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine())
@@ -122,7 +106,7 @@ int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view 
 	}
 
 	// Load game module.
-	if (!LoadGameModule(*moduleName))
+	if (!LoadGameModule(gameModule))
 	{
 		return -1;
 	}
@@ -172,7 +156,7 @@ void SGameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 
 void SGameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 {
-	World* world = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
+	SWorld* world = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
 	world->LevelTick(elapsedTime);
 }
 

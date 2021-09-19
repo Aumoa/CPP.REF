@@ -23,3 +23,4 @@
 #include "Draw/SlateBrush.h"
 #include "Draw/SlateDrawElement.h"
 #include "Draw/SlateFontElement.h"
+#include "Draw/SlateFont.h"

@@ -8,7 +8,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Materials/Material.h"
 
-SScene::SScene(World* worldOwner, SRHIDevice* device) : Super()
+SScene::SScene(SWorld* worldOwner, SRHIDevice* device) : Super()
 	, _world(worldOwner)
 	, _device(device)
 {

@@ -6,6 +6,7 @@
 #include "GameEngine.h"
 #include "GameModule.h"
 #include "PlatformMisc/PlatformModule.h"
+#include "Misc/CommandLine.h"
 
 DECLARE_LOG_CATEGORY(, LogWindowsLaunch);
 
@@ -13,13 +14,41 @@ using namespace std::chrono;
 
 INT __stdcall wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd, _In_ INT show)
 {
-#if defined(_DEBUG)
-	constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
-#else
-	constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
-#endif
+	SCommandLine commandArgs = StringUtils::Split(cmd, L" ", true, true);
+	size_t gameModuleIdx = commandArgs.GetArgument(L"--GameDll");
+	if (gameModuleIdx == -1)
+	{
+		SE_LOG(LogWindowsLaunch, Fatal, L"GameModule does not specified.");
+		return -1;
+	}
 
-	SPlatformModule engineModule(GameEngineModuleName);
+	std::optional<std::wstring_view> moduleName = commandArgs.GetArgument(gameModuleIdx + 1);
+	if (!moduleName)
+	{
+		SE_LOG(LogWindowsLaunch, Fatal, L"GameModule does not specified.");
+		return -1;
+	}
+
+	std::wstring engineName;
+	if (size_t engineModuleIdx = commandArgs.GetArgument(L"--EngineDll"); engineModuleIdx != -1)
+	{
+		std::optional engineModuleName = commandArgs.GetArgument(engineModuleIdx + 1);
+		if (engineModuleName.has_value())
+		{
+			engineName = *engineModuleName;
+		}
+		else
+		{
+#if defined(_DEBUG)
+			constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
+#else
+			constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
+#endif
+			engineName = GameEngineModuleName;
+		}
+	}
+
+	SPlatformModule engineModule(engineName);
 	auto loader = engineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
 	if (!loader)
 	{
@@ -42,7 +71,7 @@ INT __stdcall wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR
 	}
 
 	SCoreWindow frameworkView;
-	int32 errorCode = gameEngine->InvokedMain(&frameworkView, cmd);
+	int32 errorCode = gameEngine->InvokedMain(&frameworkView, *moduleName);
 	if (errorCode != 0)
 	{
 		SE_LOG(LogWindowsLaunch, Error, L"Application has one more error({}).", errorCode);

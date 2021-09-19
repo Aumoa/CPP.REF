@@ -1,0 +1,37 @@
+﻿[
+  {
+    "Name": "Genshin Impact",
+    "Icon": "GenshinImpact_103.jpg",
+    "AppLink": "D:\\Genshin Impact\\Genshin Impact Game\\GenshinImpact.exe - 바로 가기.lnk"
+  },
+  {
+    "Name": "League of Legend",
+    "Icon": "LeagueClient_107.ico",
+    "AppLink": "D:\\Riot Games\\League of Legends\\LeagueClient.exe"
+  },
+  {
+    "Name": "Blitz",
+    "Icon": "Blitz_1.ico",
+    "AppLink": "Blitz.lnk"
+  },
+  {
+    "Name": "Battle.net",
+    "Icon": "Battle_130.ico",
+    "AppLink": "C:\\Program Files (x86)\\Battle.net\\Battle.net Launcher.exe"
+  },
+  {
+    "Name": "OP.GG",
+    "Icon": "OP_1.png",
+    "AppLink": "C:\\Users\\wkdgh\\AppData\\Local\\Programs\\opgg-electron-app\\OP.GG.exe"
+  },
+  {
+    "Name": "Reign of Chaos",
+    "Icon": "Warcraft III_WAR3.ICO.ico",
+    "AppLink": "D:\\WarCraft III\\WarCraft III.exe"
+  },
+  {
+    "Name": "Frozen Throne",
+    "Icon": "Warcraft III_WAR3X.ICO.ico",
+    "AppLink": "D:\\WarCraft III\\Frozen Throne.exe"
+  }
+]

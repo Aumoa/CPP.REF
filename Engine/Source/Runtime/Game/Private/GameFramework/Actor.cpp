@@ -69,7 +69,7 @@ void AActor::SetActive(bool bActive)
 	}
 }
 
-void AActor::RegisterActorWithWorld(World* world)
+void AActor::RegisterActorWithWorld(SWorld* world)
 {
 	world->RegisterTickFunction(&PrimaryActorTick);
 
@@ -88,7 +88,7 @@ void AActor::RegisterActorWithWorld(World* world)
 
 void AActor::DestroyActor()
 {
-	World* const world = GetWorld();
+	SWorld* const world = GetWorld();
 	ensureMsgf(world != nullptr, L"Actor does not spawned at world.");
 	
 	for (auto& component : _components)

@@ -67,7 +67,15 @@ This&& Var(const Type& value) &&											\
 template<class... TArgs> requires std::constructible_from<Type, TArgs...>	\
 This&& Var(TArgs&&... args) &&												\
 {																			\
-	_ ## Var = Type(std::forward<TArgs>(args)...);							\
+	_ ## Var = { std::forward<TArgs>(args)... };							\
+	return std::move(*static_cast<This*>(this));							\
+}
+
+#define DECLARE_SLATE_CONTENT(Type)											\
+SWidget* _Content = nullptr;												\
+This&& operator [](SWidget* value) &&										\
+{																			\
+	_Content = value;														\
 	return std::move(*static_cast<This*>(this));							\
 }
 

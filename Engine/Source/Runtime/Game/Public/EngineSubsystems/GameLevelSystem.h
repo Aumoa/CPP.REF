@@ -13,7 +13,7 @@ class GAME_API SGameLevelSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameLevelSystem)
 
 private:
-	World* _world = nullptr;
+	SWorld* _world = nullptr;
 	SLevel* _loadedLevel = nullptr;
 
 public:
@@ -22,7 +22,7 @@ public:
 
 	virtual void Init() override;
 
-	World* GetWorld() const;
+	SWorld* GetWorld() const;
 	bool OpenLevel(SubclassOf<SLevel> levelToLoad);
 	SLevel* GetLevel() const;
 };

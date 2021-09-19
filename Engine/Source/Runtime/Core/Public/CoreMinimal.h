@@ -36,3 +36,4 @@
 #include "Misc/UniqueType.h"
 #include "Container/BitArray.h"
 #include "Memory/ScopedPtr.h"
+#include "PlatformMisc/InputEnums.h"
