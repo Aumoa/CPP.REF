@@ -192,7 +192,7 @@ std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFa
 			renderInfo.LocalAdvance += face->GetKerning(glyph->GlyphIndex, loadedGlyphs[i + 1]->GlyphIndex);
 		}
 
-		renderInfo.AbsolutePosition = Vector2((float)glyph->LocationX + 0.5f, (float)collection.LocationY + 0.5f);
+		renderInfo.AbsolutePosition = Vector2((float)glyph->LocationX, (float)collection.LocationY);
 		renderInfo.AbsoluteSize = Vector2((float)glyph->PixelSizeX, (float)glyph->PixelSizeY);
 		renderInfo.AbsoluteToLocalScale = absoluteToLocalScale;
 	}
