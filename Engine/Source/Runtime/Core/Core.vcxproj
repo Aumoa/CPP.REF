@@ -165,6 +165,7 @@
     <ClInclude Include="Public\Numerics\Rect.h" />
     <ClInclude Include="Public\Numerics\Sphere.h" />
     <ClInclude Include="Public\Numerics\Vector.h" />
+    <ClInclude Include="Public\Numerics\VectorScalarsImpl.h" />
     <ClInclude Include="Public\Object.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformModule.h" />
     <ClInclude Include="Public\PrimitiveTypes.h" />

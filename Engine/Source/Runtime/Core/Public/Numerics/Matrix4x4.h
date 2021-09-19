@@ -29,7 +29,7 @@ struct Matrix4x4 : public Matrix<4, 4>
 	/// Initialize new <see cref="Matrix4x4"/> instance.
 	/// </summary>
 	/// <param name="values"> The initial vectors. </param>
-	constexpr Matrix4x4(std::initializer_list<Vector<Column()>> values) : Matrix(values)
+	constexpr Matrix4x4(std::initializer_list<Vector<float, Column()>> values) : Matrix(values)
 	{
 	}
 

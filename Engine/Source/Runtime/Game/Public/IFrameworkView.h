@@ -10,6 +10,12 @@
 /// </summary>
 struct IFrameworkView : virtual public SObject, virtual public IWindowView
 {
+	enum class ETickMode
+	{
+		Realtime,
+		Ontime,
+	};
+
 	/// <summary>
 	/// Start application.
 	/// </summary>
@@ -23,12 +29,14 @@ struct IFrameworkView : virtual public SObject, virtual public IWindowView
 	/// <summary>
 	/// Event that called every frame when the process is idle.
 	/// </summary>
-	MulticastDelegate<void()> Idle;
+	DECLARE_MULTICAST_DELEGATE(IdleEvent);
+	IdleEvent Idle;
 
 	/// <summary>
 	/// Event that called when the application size change.
 	/// </summary>
-	MulticastDelegate<void(int32, int32)> Size;
+	DECLARE_MULTICAST_DELEGATE(SizeEvent, int32, int32);
+	SizeEvent Size;
 
 	/// <summary>
 	/// Get latest error code.
@@ -41,10 +49,28 @@ struct IFrameworkView : virtual public SObject, virtual public IWindowView
 	virtual void SetLastError(int32 code) = 0;
 
 	/// <summary>
+	/// Get framework width.
+	/// </summary>
+	virtual int32 GetFrameworkWidth() const = 0;
+
+	/// <summary>
+	/// Get framework height.
+	/// </summary>
+	/// <returns></returns>
+	virtual int32 GetFrameworkHeight() const = 0;
+
+	/// <summary>
 	/// Set framework title.
 	/// </summary>
 	virtual void SetFrameworkTitle(const std::wstring& frameworkTitle) = 0;
 
-	virtual int32 GetFrameworkWidth() const = 0;
-	virtual int32 GetFrameworkHeight() const = 0;
+	/// <summary>
+	/// Set tick mode.
+	/// </summary>
+	virtual void SetTickMode(ETickMode tickMode) = 0;
+
+	/// <summary>
+	/// Get tick mode.
+	/// </summary>
+	virtual ETickMode GetTickMode() const = 0;
 };

@@ -293,5 +293,8 @@
     <ClInclude Include="Public\Threading\Thread.h">
       <Filter>Public\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Numerics\VectorScalarsImpl.h">
+      <Filter>Public\Numerics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

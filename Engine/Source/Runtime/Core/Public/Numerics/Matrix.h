@@ -13,7 +13,7 @@ struct Matrix
 	/// <summary>
 	/// The vector list.
 	/// </summary>
-	Vector<NCol> V[NRow];
+	Vector<float, NCol> V[NRow];
 
 	/// <summary>
 	/// Initialize new <see cref="Matrix"/> instance.
@@ -38,7 +38,7 @@ struct Matrix
 	/// Initialize new <see cref="Matrix"/> instance.
 	/// </summary>
 	/// <param name="values"> The initial vectors. </param>
-	constexpr Matrix(std::initializer_list<Vector<NCol>> values)
+	constexpr Matrix(std::initializer_list<Vector<float, NCol>> values)
 	{
 		for (size_t i = 0; i < MathEx::Max(values.size(), NRow); ++i)
 		{

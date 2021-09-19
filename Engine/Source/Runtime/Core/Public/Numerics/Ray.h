@@ -14,12 +14,12 @@ struct Ray
 	/// <summary>
 	/// The origin location.
 	/// </summary>
-	Vector<N> Origin;
+	Vector<float, N> Origin;
 
 	/// <summary>
 	/// The vector direction.
 	/// </summary>
-	Vector<N> Direction;
+	Vector<float, N> Direction;
 
 	/// <summary>
 	/// The distance. Represents infinity if it is nullopt.
@@ -39,7 +39,7 @@ struct Ray
 	/// <param name="origin"> The origin location. </param>
 	/// <param name="direction"> The vector direction. </param>
 	/// <param name="distance"> The distance. </param>
-	Ray(const Vector<N>& origin, const Vector<N>& direction, std::optional<float> distance = std::nullopt)
+	Ray(const Vector<float, N>& origin, const Vector<float, N>& direction, std::optional<float> distance = std::nullopt)
 		: Origin(origin)
 		, Direction(direction)
 		, Distance(distance)

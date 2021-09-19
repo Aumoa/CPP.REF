@@ -26,7 +26,7 @@ struct Matrix2x2 : public Matrix<2, 2>
 	/// Initialize new <see cref="Matrix2x2"/> instance.
 	/// </summary>
 	/// <param name="values"> The initial vectors. </param>
-	constexpr Matrix2x2(std::initializer_list<Vector<Column()>> values) : Matrix(values)
+	constexpr Matrix2x2(std::initializer_list<Vector<float, Column()>> values) : Matrix(values)
 	{
 	}
 

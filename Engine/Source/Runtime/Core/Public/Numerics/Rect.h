@@ -30,7 +30,7 @@ struct Rect
 	{
 	}
 
-	constexpr Rect(const Vector<4>& v) : Rect(v[0], v[1], v[2], v[3])
+	constexpr Rect(const Vector<float, 4>& v) : Rect(v[0], v[1], v[2], v[3])
 	{
 	}
 

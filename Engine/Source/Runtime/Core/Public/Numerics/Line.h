@@ -13,12 +13,12 @@ struct Line
 	/// <summary>
 	/// The start point.
 	/// </summary>
-	Vector<N> Start;
+	Vector<float, N> Start;
 
 	/// <summary>
 	/// The end point.
 	/// </summary>
-	Vector<N> End;
+	Vector<float, N> End;
 
 	/// <summary>
 	/// Initialize new <see cref="Line"/> instance.
@@ -32,7 +32,7 @@ struct Line
 	/// </summary>
 	/// <param name="start"> The start point. </param>
 	/// <param name="end"> The end point. </param>
-	constexpr Line(const Vector<N>& start, const Vector<N>& end)
+	constexpr Line(const Vector<float, N>& start, const Vector<float, N>& end)
 		: Start(start)
 		, End(end)
 	{
@@ -75,7 +75,7 @@ struct Line
 	/// </summary>
 	/// <param name="factor"> The interpolate factor. </param>
 	/// <returns> The point vector. </returns>
-	inline constexpr Vector<N> GetPoint(float factor) const
+	inline constexpr Vector<float, N> GetPoint(float factor) const
 	{
 		return Start + GetVector() * factor;
 	}
@@ -84,7 +84,7 @@ struct Line
 	/// Get vector of linked start to end.
 	/// </summary>
 	/// <returns> The vector. </returns>
-	inline constexpr Vector<N> GetVector() const
+	inline constexpr Vector<float, N> GetVector() const
 	{
 		return End - Start;
 	}

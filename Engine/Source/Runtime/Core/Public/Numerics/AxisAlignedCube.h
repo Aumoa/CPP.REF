@@ -15,12 +15,12 @@ struct AxisAlignedCube
 	/// <summary>
 	/// Minimum aligned offset.
 	/// </summary>
-	Vector<N> Min;
+	Vector<float, N> Min;
 
 	/// <summary>
 	/// Maximum aligned offset.
 	/// </summary>
-	Vector<N> Max;
+	Vector<float, N> Max;
 
 	/// <summary>
 	/// Initialize new <see cref="AxisAlignedCube"/> instance.
@@ -34,7 +34,7 @@ struct AxisAlignedCube
 	/// </summary>
 	/// <param name="min"> The minimum aligned offset. </param>
 	/// <param name="max"> The maximum aligned offset. </param>
-	constexpr AxisAlignedCube(const Vector<N>& min, const Vector<N>& max) : Min(min), Max(max)
+	constexpr AxisAlignedCube(const Vector<float, N>& min, const Vector<float, N>& max) : Min(min), Max(max)
 	{
 	}
 
@@ -72,7 +72,7 @@ struct AxisAlignedCube
 	/// Get center point.
 	/// </summary>
 	/// <returns> The center point vector. </returns>
-	constexpr Vector<N> GetCenter() const
+	constexpr Vector<float, N> GetCenter() const
 	{
 		return (Min + Max) * 0.5f;
 	}
@@ -81,7 +81,7 @@ struct AxisAlignedCube
 	/// Get extent vector.
 	/// </summary>
 	/// <returns> The extent vector. </returns>
-	constexpr Vector<N> GetExtent() const
+	constexpr Vector<float, N> GetExtent() const
 	{
 		return (Max - Min) * 0.5f;
 	}

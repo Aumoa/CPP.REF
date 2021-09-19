@@ -10,7 +10,6 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneRenderer.h"
-#include "Assets/AssetImporter.h"
 #include "GameFramework/LocalPlayer.h"
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"

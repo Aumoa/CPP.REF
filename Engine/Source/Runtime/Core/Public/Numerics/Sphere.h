@@ -13,7 +13,7 @@ struct Sphere
 	/// <summary>
 	/// The center location.
 	/// </summary>
-	Vector<N> Center;
+	Vector<float, N> Center;
 
 	/// <summary>
 	/// The sphere radius.
@@ -32,7 +32,7 @@ struct Sphere
 	/// </summary>
 	/// <param name="center"> The center location. </param>
 	/// <param name="radius"> The sphere radius. </param>
-	constexpr Sphere(const Vector<N>& center, float radius) : Center(center), Radius(radius)
+	constexpr Sphere(const Vector<float, N>& center, float radius) : Center(center), Radius(radius)
 	{
 	}
 

@@ -12,4 +12,7 @@ class EDITORENGINE_API SEditorEngine : public SGameEngine
 public:
 	SEditorEngine();
 	virtual ~SEditorEngine() override;
+
+	virtual bool InitEngine() override;
+	virtual void SetupFrameworkView(IFrameworkView* frameworkView) override;
 };

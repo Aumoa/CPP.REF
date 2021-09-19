@@ -4,6 +4,7 @@
 
 #include "GameMinimal.h"
 #include "IFrameworkView.h"
+#include <Windows.h>
 
 /// <summary>
 /// Represents the single window with input events and basic user interface behaviors.
@@ -16,9 +17,10 @@ public:
 	static constexpr wchar_t ApplicationTitle[] = L"GameApp";
 
 private:
-	void* _hwnd = nullptr;
+	HWND _hwnd = nullptr;
 	uint8 _bMainLoop : 1 = false;
 	int32 _lastError = 0;
+	ETickMode _tickMode = ETickMode::Realtime;
 
 public:
 	/// <summary>
@@ -46,4 +48,17 @@ public:
 
 	/// <inheritdoc/>
 	virtual void SetFrameworkTitle(const std::wstring& frameworkTitle) override;
+
+	/// <inheritdoc/>
+	virtual void SetTickMode(ETickMode tickMode) override;
+
+	/// <inheritdoc/>
+	virtual ETickMode GetTickMode() const override;
+
+private:
+	// Functions for internal only.
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static void SetupHwndParameters(HWND hWnd, LPARAM lParam);
+	static SCoreWindow* GetThis(HWND hWnd);
+	static void FinalizeHwndParameters(HWND hWnd);
 };

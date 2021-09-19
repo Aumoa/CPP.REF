@@ -1,32 +1,124 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "CoreWindow.h"
-#include <Windows.h>
 #include "LogGame.h"
 #include "WindowsPlatform/WindowsPlatformMouse.h"
 #include "WindowsPlatform/WindowsPlatformKeyboard.h"
 
+#define WM_UPDATETICKMODE WM_APP + 1
+
 DEFINE_LOG_CATEGORY(LogWindowsLaunch);
 
-inline void SetupHwndParameters(HWND hWnd, LPARAM lParam)
+SCoreWindow::SCoreWindow() : Super()
 {
-	auto lpCreateStruct = (LPCREATESTRUCTW)lParam;
-	auto* coreWindow = (SCoreWindow*)lpCreateStruct->lpCreateParams;
+	WNDCLASSEXW wcex = {};
+	wcex.cbSize = sizeof(wcex);
+	wcex.lpfnWndProc = WndProc;
+	wcex.lpszClassName = L"CoreWindow";
+	wcex.hInstance = GetModuleHandleW(nullptr);
+	if (RegisterClassExW(&wcex) == 0)
+	{
+		SE_LOG(LogWindowsLaunch, Fatal, L"Could not register window class with error code: {}. Abort.", ::GetLastError());
+		return;
+	}
 
-	SetPropW(hWnd, L"this", coreWindow);
+	HWND hWnd = CreateWindowExW(0, wcex.lpszClassName, ApplicationTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, wcex.hInstance, this);
+	if (hWnd == nullptr)
+	{
+		SE_LOG(LogWindowsLaunch, Fatal, L"Could not create core window with error code: {}. Abort.", ::GetLastError());
+		return;
+	}
+
+	_hwnd = hWnd;
 }
 
-inline SCoreWindow* GetThis(HWND hWnd)
+void SCoreWindow::Start()
 {
-	return (SCoreWindow*)GetPropW(hWnd, L"this");
+	::ShowWindow(_hwnd, SW_SHOW);
+
+	MSG msg{ };
+
+	_bMainLoop = true;
+	while (_bMainLoop)
+	{
+		if (_tickMode == ETickMode::Realtime)
+		{
+			if (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+			{
+				if (msg.message == WM_QUIT)
+				{
+					_bMainLoop = false;
+				}
+				else
+				{
+					TranslateMessage(&msg);
+					DispatchMessageW(&msg);
+				}
+			}
+			else
+			{
+				Idle.Invoke();
+			}
+		}
+		else
+		{
+			_bMainLoop = GetMessageW(&msg, nullptr, 0, 0);
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+			Idle.Invoke();
+		}
+	}
 }
 
-inline void FinallizeHwndParameters(HWND hWnd)
+void* SCoreWindow::GetWindowHandle() const
 {
-	RemovePropW(hWnd, L"this");
+	return _hwnd;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+int32 SCoreWindow::GetLastError() const
+{
+	return _lastError;
+}
+
+void SCoreWindow::SetLastError(int32 code)
+{
+	_lastError = code;
+}
+
+int32 SCoreWindow::GetFrameworkWidth() const
+{
+	RECT rc;
+	GetClientRect(_hwnd, &rc);
+	return rc.right - rc.left;
+}
+
+int32 SCoreWindow::GetFrameworkHeight() const
+{
+	RECT rc;
+	GetClientRect(_hwnd, &rc);
+	return rc.bottom - rc.top;
+}
+
+void SCoreWindow::SetFrameworkTitle(const std::wstring& frameworkTitle)
+{
+	SetWindowTextW(_hwnd, frameworkTitle.c_str());
+}
+
+void SCoreWindow::SetTickMode(ETickMode tickMode)
+{
+	_tickMode = tickMode;
+	if (tickMode == ETickMode::Realtime)
+	{
+		SendMessageW(_hwnd, WM_UPDATETICKMODE, 0, 0);
+	}
+}
+
+auto SCoreWindow::GetTickMode() const -> ETickMode
+{
+	return _tickMode;
+}
+
+LRESULT CALLBACK SCoreWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -64,7 +156,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
-		FinallizeHwndParameters(hWnd);
+		FinalizeHwndParameters(hWnd);
 		PostQuitMessage(0);
 		break;
 	}
@@ -72,87 +164,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-SCoreWindow::SCoreWindow() : Super()
+void SCoreWindow::SetupHwndParameters(HWND hWnd, LPARAM lParam)
 {
-	WNDCLASSEXW wcex = {};
-	wcex.cbSize = sizeof(wcex);
-	wcex.lpfnWndProc = WndProc;
-	wcex.lpszClassName = L"CoreWindow";
-	wcex.hInstance = GetModuleHandleW(nullptr);
-	if (RegisterClassExW(&wcex) == 0)
-	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"Could not register window class with error code: {}. Abort.", ::GetLastError());
-		return;
-	}
+	auto lpCreateStruct = (LPCREATESTRUCTW)lParam;
+	auto* coreWindow = (SCoreWindow*)lpCreateStruct->lpCreateParams;
 
-	HWND hWnd = CreateWindowExW(0, wcex.lpszClassName, ApplicationTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, wcex.hInstance, this);
-	if (hWnd == nullptr)
-	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"Could not create core window with error code: {}. Abort.", ::GetLastError());
-		return;
-	}
-
-	_hwnd = hWnd;
+	SetPropW(hWnd, L"this", coreWindow);
 }
 
-void SCoreWindow::Start()
+SCoreWindow* SCoreWindow::GetThis(HWND hWnd)
 {
-	::ShowWindow((HWND)_hwnd, SW_SHOW);
-
-	MSG msg{ };
-
-	_bMainLoop = true;
-	while (_bMainLoop)
-	{
-		if (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-			{
-				_bMainLoop = false;
-			}
-			else
-			{
-				TranslateMessage(&msg);
-				DispatchMessageW(&msg);
-			}
-		}
-		else
-		{
-			Idle.Invoke();
-		}
-	}
+	return (SCoreWindow*)GetPropW(hWnd, L"this");
 }
 
-void* SCoreWindow::GetWindowHandle() const
+void SCoreWindow::FinalizeHwndParameters(HWND hWnd)
 {
-	return _hwnd;
-}
-
-int32 SCoreWindow::GetLastError() const
-{
-	return _lastError;
-}
-
-void SCoreWindow::SetLastError(int32 code)
-{
-	_lastError = code;
-}
-
-int32 SCoreWindow::GetFrameworkWidth() const
-{
-	RECT rc;
-	GetClientRect((HWND)_hwnd, &rc);
-	return rc.right - rc.left;
-}
-
-int32 SCoreWindow::GetFrameworkHeight() const
-{
-	RECT rc;
-	GetClientRect((HWND)_hwnd, &rc);
-	return rc.bottom - rc.top;
-}
-
-void SCoreWindow::SetFrameworkTitle(const std::wstring& frameworkTitle)
-{
-	SetWindowTextW((HWND)_hwnd, frameworkTitle.c_str());
+	RemovePropW(hWnd, L"this");
 }
