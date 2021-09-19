@@ -27,7 +27,7 @@ public:
 	virtual ~SRHIDynamicTexture2D() override;
 
 	void CloseUploadBuffer();
-	void UpdatePixels(const void* buffer, int32 pixelStride, int32 sizeX, int32 sizeY, int32 locationX, int32 locationY);
+	void UpdatePixels(const void* buffer, int32 pixelStride, const Vector2N& size, const Vector2N& location);
 	void Apply();
 
 private:

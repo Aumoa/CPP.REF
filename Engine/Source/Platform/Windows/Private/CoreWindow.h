@@ -41,10 +41,7 @@ public:
 	virtual void SetLastError(int32 code) override;
 
 	/// <inheritdoc/>
-	virtual int32 GetFrameworkWidth() const override;
-
-	/// <inheritdoc/>
-	virtual int32 GetFrameworkHeight() const override;
+	virtual Vector2N GetFrameworkSize() const override;
 
 	/// <inheritdoc/>
 	virtual void SetFrameworkTitle(const std::wstring& frameworkTitle) override;

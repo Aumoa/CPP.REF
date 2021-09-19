@@ -62,16 +62,16 @@ void SFontFaceCachingNode::StreamGlyphs(SFontFace* face, std::wstring_view glyph
 
 		glyph.Character = character;
 		glyph.GlyphIndex = face->GetGlyphIndex();
-		ensure(face->GetGlyphPixelSize(&glyph.PixelSizeX, &glyph.PixelSizeY));
-		glyph.Bitmap.resize((size_t)glyph.PixelSizeX * glyph.PixelSizeY);
+		glyph.PixelSize = face->GetGlyphPixelSize();
+		glyph.Bitmap.resize((size_t)glyph.PixelSize.X * glyph.PixelSize.Y);
 		glyph.LocalPosition = face->GetLocalPosition();
 		glyph.LocalAdvance = face->GetAdvance();
 
 		// Copy glyph pixels.
-		ensure(face->CopyGlyphPixels(glyph.Bitmap.data(), glyph.PixelSizeX, 0, 0));
+		ensure(face->CopyGlyphPixels(glyph.Bitmap.data(), glyph.PixelSize.X, 0, 0));
 
 		// Update required sizes.
-		collection.RequiredMaxWidth += glyph.PixelSizeX;
+		collection.RequiredMaxWidth += glyph.PixelSize.X;
 		requiredMaxWidth = std::max(requiredMaxWidth, collection.RequiredMaxWidth);
 	}
 
@@ -109,12 +109,12 @@ void SFontFaceCachingNode::Apply()
 
 				// Update pixels.
 				glyph.LocationX = locationX;
-				_glyphBuffer->UpdatePixels(glyph.Bitmap.data(), pixelStride, glyph.PixelSizeX, glyph.PixelSizeY, glyph.LocationX, collection.LocationY);
+				_glyphBuffer->UpdatePixels(glyph.Bitmap.data(), pixelStride, glyph.PixelSize, Vector2N(glyph.LocationX, collection.LocationY));
 
 				glyph.bLoad = true;
 			}
 
-			locationX += glyph.PixelSizeX;
+			locationX += glyph.PixelSize.X;
 		}
 
 		locationY += collection.RequiredMaxHeight;
@@ -150,8 +150,7 @@ std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFa
 		return {};
 	}
 
-	int32 pixelSizeX, pixelSizeY;
-	_glyphBuffer->GetPixelSize(&pixelSizeX, &pixelSizeY);
+	const Vector2 pixelSize = _glyphBuffer->GetPixelSize().Cast<float>();
 
 	std::vector<GlyphRenderInfo> glyphs;
 	glyphs.reserve(text.length());
@@ -178,7 +177,7 @@ std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFa
 	}
 
 	// Make render info.
-	const auto absoluteToLocalScale = Vector2(1.0f / pixelSizeX, (float)1.0f / pixelSizeY);
+	const auto absoluteToLocalScale = 1.0f / pixelSize;
 	for (size_t i = 0; i < loadedGlyphs.size(); ++i)
 	{
 		auto& glyph = loadedGlyphs[i];
@@ -193,7 +192,7 @@ std::vector<GlyphRenderInfo> SFontFaceCachingNode::QueryGlyphsRenderInfo(SFontFa
 		}
 
 		renderInfo.AbsolutePosition = Vector2((float)glyph->LocationX, (float)collection.LocationY);
-		renderInfo.AbsoluteSize = Vector2((float)glyph->PixelSizeX, (float)glyph->PixelSizeY);
+		renderInfo.AbsoluteSize = glyph->PixelSize.Cast<float>();
 		renderInfo.AbsoluteToLocalScale = absoluteToLocalScale;
 	}
 
@@ -207,13 +206,13 @@ inline static int32 Align256(const int32& value)
 
 bool SFontFaceCachingNode::ReallocateBufferIfRequired()
 {
-	int32 pixelWidth = 0, pixelHeight = 0;
+	Vector2N pixelSize;
 	if (_glyphBuffer)
 	{
-		_glyphBuffer->GetPixelSize(&pixelWidth, &pixelHeight);
+		pixelSize = _glyphBuffer->GetPixelSize();
 	}
 
-	if (_requiredMaxWidth <= pixelWidth && _requiredMaxHeight <= pixelHeight)
+	if (_requiredMaxWidth <= pixelSize.X && _requiredMaxHeight <= pixelSize.Y)
 	{
 		// We need not to reallocate.
 		return false;

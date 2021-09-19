@@ -35,21 +35,21 @@ void SRHIDynamicTexture2D::CloseUploadBuffer()
 	}
 }
 
-void SRHIDynamicTexture2D::UpdatePixels(const void* buffer, int32 pixelStride, int32 sizeX, int32 sizeY, int32 locationX, int32 locationY)
+void SRHIDynamicTexture2D::UpdatePixels(const void* buffer, int32 pixelStride, const Vector2N& size, const Vector2N& location)
 {
 	check(_uploadHeap);
 	check(_pointer);
 
-	int32 rowpitch = pixelStride * sizeX;
+	int32 rowpitch = pixelStride * size.X;
 
-	for (int32 i = 0; i < sizeY; ++i)
+	for (int32 i = 0; i < size.Y; ++i)
 	{
-		const void* sourceBuf = reinterpret_cast<const int8*>(buffer) + sizeX * i;
-		void* destBuf = reinterpret_cast<int8*>(_pointer) + (size_t)_layout.Footprint.RowPitch * (i + locationY) + locationX * pixelStride;
+		const void* sourceBuf = reinterpret_cast<const int8*>(buffer) + size.X * i;
+		void* destBuf = reinterpret_cast<int8*>(_pointer) + (size_t)_layout.Footprint.RowPitch * (i + location.Y) + location.X * pixelStride;
 		memcpy(destBuf, sourceBuf, rowpitch);
 	}
 
-	RefreshUpdateBox(locationX, locationY, locationX + sizeX, locationY + sizeY);
+	RefreshUpdateBox(location.X, location.Y, location.X + size.X, location.Y + size.Y);
 }
 
 void SRHIDynamicTexture2D::Apply()

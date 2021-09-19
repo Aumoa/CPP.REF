@@ -11,15 +11,8 @@ SRHITexture2D::~SRHITexture2D()
 {
 }
 
-void SRHITexture2D::GetPixelSize(int32* pWidth, int32* pHeight)
+Vector2N SRHITexture2D::GetPixelSize() const
 {
 	D3D12_RESOURCE_DESC desc = GetResource()->GetDesc();
-	if (pWidth != nullptr)
-	{
-		*pWidth = (int32)desc.Width;
-	}
-	if (pHeight != nullptr)
-	{
-		*pHeight = (int32)desc.Height;
-	}
+	return Vector2N((int32)desc.Width, (int32)desc.Height);
 }

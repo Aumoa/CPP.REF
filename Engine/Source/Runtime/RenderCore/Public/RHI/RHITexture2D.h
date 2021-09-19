@@ -19,5 +19,5 @@ public:
 	/// <summary>
 	/// Get pixels resolution.
 	/// </summary>
-	virtual void GetPixelSize(int32* pWidth, int32* pHeight);
+	virtual Vector2N GetPixelSize() const;
 };

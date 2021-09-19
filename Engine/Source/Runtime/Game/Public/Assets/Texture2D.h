@@ -24,6 +24,5 @@ public:
 
 	SRHITexture2D* GetRHITexture() const { return _texture; }
 	SRHIShaderResourceView* GetShaderResourceView() const { return _shaderResourceView; }
-	void GetPixelSize(int32* pWidth, int32* pHeight) const;
-	Vector2 GetSize() const;
+	Vector2N GetPixelSize() const;
 };

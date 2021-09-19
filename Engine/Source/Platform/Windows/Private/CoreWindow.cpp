@@ -85,18 +85,11 @@ void SCoreWindow::SetLastError(int32 code)
 	_lastError = code;
 }
 
-int32 SCoreWindow::GetFrameworkWidth() const
+Vector2N SCoreWindow::GetFrameworkSize() const
 {
 	RECT rc;
 	GetClientRect(_hwnd, &rc);
-	return rc.right - rc.left;
-}
-
-int32 SCoreWindow::GetFrameworkHeight() const
-{
-	RECT rc;
-	GetClientRect(_hwnd, &rc);
-	return rc.bottom - rc.top;
+	return Vector2N(rc.right - rc.left, rc.bottom - rc.top);
 }
 
 void SCoreWindow::SetFrameworkTitle(const std::wstring& frameworkTitle)

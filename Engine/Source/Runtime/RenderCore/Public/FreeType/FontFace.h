@@ -26,7 +26,7 @@ public:
 	bool SetFontSize(int32 fontSize, int32 dpiScale = 96);
 	bool LoadGlyph(wchar_t glyph);
 	
-	bool GetGlyphPixelSize(int32* pixelsX, int32* pixelsY) const;
+	Vector2N GetGlyphPixelSize() const;
 	bool CopyGlyphPixels(void* buffer, int32 rowStride, int32 locationX, int32 locationY) const;
 	int32 GetMaxGlyphRenderHeight() const;
 	Vector2 GetLocalPosition() const;

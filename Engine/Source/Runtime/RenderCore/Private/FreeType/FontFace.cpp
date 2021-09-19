@@ -54,25 +54,15 @@ bool SFontFace::LoadGlyph(wchar_t glyph)
 	return true;
 }
 
-bool SFontFace::GetGlyphPixelSize(int32* pixelsX, int32* pixelsY) const
+Vector2N SFontFace::GetGlyphPixelSize() const
 {
-	if (!_loadedGlyph.has_value())
+	if (!ensureMsgf(_loadedGlyph.has_value(), L"Glyph does not loaded. See LoadGlyph function to load glyph."))
 	{
-		SE_LOG(LogFreeType, Error, L"Glyph does not loaded. See LoadGlyph function to load glyph.");
 		return false;
 	}
 
 	auto& bitmap = _impl->Face->glyph->bitmap;
-	if (pixelsX)
-	{
-		*pixelsX = (int32)bitmap.width;
-	}
-	if (pixelsY)
-	{
-		*pixelsY = (int32)bitmap.rows;
-	}
-
-	return true;
+	return Vector2N((int32)bitmap.width, (int32)bitmap.rows);
 }
 
 template<std::endian>

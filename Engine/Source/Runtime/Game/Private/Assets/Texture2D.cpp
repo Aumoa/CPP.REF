@@ -27,28 +27,14 @@ void STexture2D::StreamIn()
 	_shaderResourceView->CreateShaderResourceView(_texture, 0);
 }
 
-void STexture2D::GetPixelSize(int32* pWidth, int32* pHeight) const
+Vector2N STexture2D::GetPixelSize() const
 {
 	if (_texture)
 	{
-		_texture->GetPixelSize(pWidth, pHeight);
+		return _texture->GetPixelSize();
 	}
 	else
 	{
-		if (pWidth)
-		{
-			*pWidth = 0;
-		}
-		if (pHeight)
-		{
-			*pHeight = 0;
-		}
+		return Vector2N::GetZero();
 	}
-}
-
-Vector2 STexture2D::GetSize() const
-{
-	int32 width, height;
-	GetPixelSize(&width, &height);
-	return Vector2((float)width, (float)height);
 }

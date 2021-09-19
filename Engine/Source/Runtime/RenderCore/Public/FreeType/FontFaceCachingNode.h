@@ -21,7 +21,7 @@ private:
 		int32 GlyphIndex;
 		std::vector<uint8> Bitmap;
 		size_t Hit = 0;
-		int32 PixelSizeX = 0, PixelSizeY = 0;
+		Vector2N PixelSize;
 
 		bool bLoad = false;
 		int32 LocationX = 0;

@@ -58,8 +58,7 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
 	World* world = GetWorld();
 	IFrameworkView* frameworkView = GetLocalPlayer()->GetFrameworkView();
 
-	int32 frameworkWidth = frameworkView->GetFrameworkWidth();
-	int32 frameworkHeight = frameworkView->GetFrameworkHeight();
+	const auto [frameworkWidth, frameworkHeight] = frameworkView->GetFrameworkSize();
 
 	float aspectRatio = (float)frameworkWidth / frameworkHeight;
 

@@ -49,15 +49,9 @@ struct IFrameworkView : virtual public SObject, virtual public IWindowView
 	virtual void SetLastError(int32 code) = 0;
 
 	/// <summary>
-	/// Get framework width.
+	/// Get framework size.
 	/// </summary>
-	virtual int32 GetFrameworkWidth() const = 0;
-
-	/// <summary>
-	/// Get framework height.
-	/// </summary>
-	/// <returns></returns>
-	virtual int32 GetFrameworkHeight() const = 0;
+	virtual Vector2N GetFrameworkSize() const = 0;
 
 	/// <summary>
 	/// Set framework title.

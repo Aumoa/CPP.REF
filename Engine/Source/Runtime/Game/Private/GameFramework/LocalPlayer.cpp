@@ -22,7 +22,7 @@ void SLocalPlayer::Init(IFrameworkView* frameworkView)
 	// Register ResizeApp handler.
 	_frameworkView->Size.AddObject(this, &SLocalPlayer::OnResizedApp);
 	// And apply size immediately.
-	_slateWindow->SetWindowSize(Vector2((float)_frameworkView->GetFrameworkWidth(), (float)_frameworkView->GetFrameworkHeight()));
+	_slateWindow->SetWindowSize(_frameworkView->GetFrameworkSize().Cast<float>());
 
 	_drawElements = NewObject<SSlateWindowElementList>(_slateWindow);
 }
