@@ -29,30 +29,27 @@ INT __stdcall wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR
 		return -1;
 	}
 
-	std::wstring engineName;
+	std::optional<std::wstring> engineName;
 	if (size_t engineModuleIdx = commandArgs.GetArgument(L"--EngineDll"); engineModuleIdx != -1)
 	{
-		std::optional engineModuleName = commandArgs.GetArgument(engineModuleIdx + 1);
-		if (engineModuleName.has_value())
-		{
-			engineName = *engineModuleName;
-		}
-		else
-		{
-#if defined(_DEBUG)
-			constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
-#else
-			constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
-#endif
-			engineName = GameEngineModuleName;
-		}
+		engineName = commandArgs.GetArgument(engineModuleIdx + 1);
 	}
 
-	SPlatformModule engineModule(engineName);
+	if (!engineName.has_value())
+	{
+#if defined(_DEBUG)
+		constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
+#else
+		constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
+#endif
+		engineName = GameEngineModuleName;
+	}
+
+	SPlatformModule engineModule(*engineName);
 	auto loader = engineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
 	if (!loader)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. Game.dll is corrupted.");
+		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. {} is corrupted.", *engineName);
 		return -1;
 	}
 

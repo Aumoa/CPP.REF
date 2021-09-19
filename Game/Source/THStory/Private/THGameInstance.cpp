@@ -17,7 +17,7 @@
 
 STHGameInstance::STHGameInstance() : Super()
 {
-	StartupLevel = SubclassOf<::SStartupLevel>::StaticClass();
+	StartupLevel = ::SStartupLevel::StaticClass();
 }
 
 void STHGameInstance::Init()
