@@ -9,7 +9,7 @@ class SMaterial;
 class SRHIVertexFactory;
 struct MeshBatch;
 
-class GAME_API SStaticMeshRenderData : virtual public SObject
+class GAME_API SStaticMeshRenderData : implements SObject
 {
 	GENERATED_BODY(SStaticMeshRenderData)
 

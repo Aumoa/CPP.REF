@@ -6,7 +6,7 @@
 #include "GameStructures.h"
 #include "BitfieldInputChangeTracker.h"
 
-class SMouseStateTracker : virtual public SObject
+class SMouseStateTracker : implements SObject
 {
 	GENERATED_BODY(SMouseStateTracker)
 

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include <atomic>
 
-class GAME_API SAsset : virtual public SObject
+class GAME_API SAsset : implements SObject
 {
 	GENERATED_BODY(SAsset)
 

@@ -16,7 +16,7 @@ class SMaterial;
 class SSceneRenderer;
 struct MinimalViewInfo;
 
-class GAME_API SScene : virtual public SObject
+class GAME_API SScene : implements SObject
 {
 	GENERATED_BODY(SScene)
 

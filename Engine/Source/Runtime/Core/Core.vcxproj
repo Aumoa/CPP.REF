@@ -65,6 +65,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -86,6 +87,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,6 +137,7 @@
     <ClInclude Include="Public\Diagnostics\LogCategory.h" />
     <ClInclude Include="Public\Diagnostics\LogSystem.h" />
     <ClInclude Include="Public\Diagnostics\LogVerbosity.h" />
+    <ClInclude Include="Public\Interface.h" />
     <ClInclude Include="Public\IO\DirectoryReference.h" />
     <ClInclude Include="Public\IO\FileReference.h" />
     <ClInclude Include="Public\IO\FileSystemReference.h" />

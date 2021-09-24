@@ -6,7 +6,7 @@
 
 class SFreeTypeModule;
 
-class RENDERCORE_API SFontFace : virtual public SObject
+class RENDERCORE_API SFontFace : implements SObject
 {
 	GENERATED_BODY(SFontFace)
 

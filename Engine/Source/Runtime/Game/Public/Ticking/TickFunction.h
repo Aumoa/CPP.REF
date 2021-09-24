@@ -10,7 +10,7 @@
 /// <summary>
 /// Represents tick function that proceed on game engine.
 /// </summary>
-class GAME_API STickFunction : virtual public SObject
+class GAME_API STickFunction : implements SObject
 {
 	GENERATED_BODY(STickFunction)
 

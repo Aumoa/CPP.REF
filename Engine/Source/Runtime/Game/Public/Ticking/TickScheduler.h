@@ -8,7 +8,7 @@
 #include <atomic>
 #include <map>
 
-class STickScheduler : virtual public SObject
+class STickScheduler : implements SObject
 {
 	GENERATED_BODY(STickScheduler)
 

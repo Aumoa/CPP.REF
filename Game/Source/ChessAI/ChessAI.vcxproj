@@ -63,6 +63,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -82,6 +83,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>

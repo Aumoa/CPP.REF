@@ -9,7 +9,7 @@ class SRHIDevice;
 /// <summary>
 /// Represents classes created by logical device.
 /// </summary>
-class RENDERCORE_API SRHIDeviceChild : virtual public SObject
+class RENDERCORE_API SRHIDeviceChild : implements SObject
 {
 	GENERATED_BODY(SRHIDeviceChild)
 

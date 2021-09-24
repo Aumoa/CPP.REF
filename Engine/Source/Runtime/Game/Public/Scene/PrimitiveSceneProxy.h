@@ -8,7 +8,7 @@
 
 class SPrimitiveComponent;
 
-class GAME_API SPrimitiveSceneProxy : virtual public SObject
+class GAME_API SPrimitiveSceneProxy : implements SObject
 {
 	GENERATED_BODY(SPrimitiveSceneProxy)
 

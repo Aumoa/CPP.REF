@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-struct IWindowView : virtual public SObject
+interface IWindowView : implements SObject
 {
 	/// <summary>
 	/// Get window handle that platform specialized.

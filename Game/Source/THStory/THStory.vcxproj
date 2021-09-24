@@ -63,6 +63,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -82,6 +83,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>

@@ -6,7 +6,7 @@
 #include "GameStructures.h"
 #include "BitfieldInputChangeTracker.h"
 
-class SKeyboardTracker : virtual public SObject
+class SKeyboardTracker : implements SObject
 {
 	GENERATED_BODY(SKeyboardTracker)
 

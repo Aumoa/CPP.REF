@@ -63,6 +63,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(SolutionDir)Game\Source\ChessAI\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,6 +82,7 @@
       <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(SolutionDir)Game\Source\ChessAI\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

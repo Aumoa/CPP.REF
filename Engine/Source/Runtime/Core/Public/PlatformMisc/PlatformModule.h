@@ -7,7 +7,7 @@
 
 class SGameInstance;
 
-class CORE_API SPlatformModule : virtual public SObject
+class CORE_API SPlatformModule : implements SObject
 {
 	GENERATED_BODY(SPlatformModule)
 

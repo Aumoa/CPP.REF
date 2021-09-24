@@ -14,7 +14,7 @@ class SRHICommandQueue;
 /// <summary>
 /// Represents interface implements one or more surfaces for storing rendered data before presenting it to an output.
 /// </summary>
-class RENDERCORE_API SRHISwapChain : virtual public SRHIDeviceChild
+class RENDERCORE_API SRHISwapChain : implements SRHIDeviceChild
 {
 	GENERATED_BODY(SRHISwapChain)
 

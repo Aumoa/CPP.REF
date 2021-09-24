@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Threading/EventHandle.h"
 
 #define NOMINMAX
+
+#pragma push_macro("interface")
+#undef interface
 
 #include <comdef.h>
 #include <d3d12.h>
@@ -30,4 +34,4 @@ inline const char* FT_Error_String(FT_Error error)
 #include FT_ERRORS_H
 }
 
-#include "Threading/EventHandle.h"
+#pragma pop_macro("interface")

@@ -10,7 +10,7 @@ class SFontFace;
 class SFontFaceCachingNode;
 class SRHIShaderResourceView;
 
-class RENDERCORE_API SFontCachingManager : virtual public SObject
+class RENDERCORE_API SFontCachingManager : implements SObject
 {
 	GENERATED_BODY(SFontCachingManager)
 

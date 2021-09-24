@@ -7,7 +7,7 @@
 
 struct IWICFormatConverter;
 
-class SWindowsPlatformImage : virtual public SObject, virtual public IPlatformImage
+class SWindowsPlatformImage : implements SObject, implements IPlatformImage
 {
 	GENERATED_BODY(SWindowsPlatformImage)
 

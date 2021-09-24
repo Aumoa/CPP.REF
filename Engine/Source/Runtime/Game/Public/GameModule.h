@@ -8,7 +8,7 @@
 class SGameInstance;
 class SGameEngine;
 
-class GAME_API SGameModule : virtual public SObject
+class GAME_API SGameModule : implements SObject
 {
 	GENERATED_BODY(SGameModule)
 

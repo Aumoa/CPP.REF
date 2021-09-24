@@ -9,7 +9,7 @@
 class SRHIShader;
 class SRHIDeviceContext;
 
-class GAME_API SMaterial : virtual public SObject
+class GAME_API SMaterial : implements SObject
 {
 	GENERATED_BODY(SMaterial)
 

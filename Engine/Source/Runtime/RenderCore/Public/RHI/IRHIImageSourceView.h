@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "RHI/RHIEnums.h"
 
-struct RENDERCORE_API IRHIImageSourceView : virtual public SObject
+interface IRHIImageSourceView : implements SObject
 {
 	virtual void CopyPixels(uint32 stride, uint32 bufferSize, void* pBuffer) = 0;
 	virtual int32 GetWidth() const = 0;

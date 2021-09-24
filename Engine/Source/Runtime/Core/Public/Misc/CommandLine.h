@@ -6,8 +6,10 @@
 #include <string_view>
 #include <vector>
 
-class SCommandLine : virtual public SObject
+class SCommandLine : implements SObject
 {
+	GENERATED_BODY(SCommandLine)
+
 private:
 	std::vector<std::wstring> _resolvedArgs;
 

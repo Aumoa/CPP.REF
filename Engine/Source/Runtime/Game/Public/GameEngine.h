@@ -21,7 +21,7 @@ struct IFrameworkView;
 /// <summary>
 /// Represents game engine that manage core resources.
 /// </summary>
-class GAME_API SGameEngine : virtual public SObject
+class GAME_API SGameEngine : implements SObject
 {
 	GENERATED_BODY(SGameEngine)
 

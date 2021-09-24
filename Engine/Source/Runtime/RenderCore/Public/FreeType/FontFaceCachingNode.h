@@ -10,7 +10,7 @@ class SRHIDynamicTexture2D;
 class SRHIShaderResourceView;
 class SFontFace;
 
-class RENDERCORE_API SFontFaceCachingNode : virtual public SObject
+class RENDERCORE_API SFontFaceCachingNode : implements SObject
 {
 	GENERATED_BODY(SFontFaceCachingNode)
 

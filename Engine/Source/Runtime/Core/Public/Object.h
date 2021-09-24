@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <set>
 #include <string>
 #include <string_view>
@@ -19,7 +18,6 @@ class CORE_API SObject : public std::enable_shared_from_this<SObject>
 	GENERATED_BODY(SObject)
 
 private:
-	std::atomic<int32> _ref = 0;
 	SObject* _outer = nullptr;
 	std::set<std::shared_ptr<SObject>> _subobjects;
 
@@ -44,7 +42,7 @@ public:
 	SFUNCTION(ToString);
 
 	/// <summary>
-	/// Create subobject which linked outer to this.
+	/// Create object which linked outer to this.
 	/// </summary>
 	/// <typeparam name="T"> Type of subobject. </typeparam>
 	/// <typeparam name="...TArgs"> The type sequence of constructor arguments. </typeparam>
@@ -61,7 +59,7 @@ public:
 	}
 
 	/// <summary>
-	/// Create subobject which linked outer to this.
+	/// Create object without outer.
 	/// </summary>
 	/// <typeparam name="T"> Type of subobject. </typeparam>
 	/// <typeparam name="...TArgs"> The type sequence of constructor arguments. </typeparam>
@@ -95,8 +93,15 @@ public:
 	/// <param name="subobject"> The target object. </param>
 	static void DestroySubobject(SObject* subobject);
 
+	template<std::derived_from<SObject> T>
+	T* As() { return dynamic_cast<T*>(this); }
+	template<std::derived_from<SObject> T>
+	const T* As() const { return dynamic_cast<const T*>(this); }
+
 private:
 	std::shared_ptr<SObject> InternalDetachSubobject(std::shared_ptr<SObject> subobject);
 	void InternalAttachSubobject(std::shared_ptr<SObject> subobject);
 	void InternalDestroySubobject(SObject* subobject);
 };
+
+#define implements virtual public 

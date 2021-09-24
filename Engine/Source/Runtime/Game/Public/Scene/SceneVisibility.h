@@ -11,7 +11,7 @@ class SRHIDeviceContext;
 class SRHIShader;
 struct MinimalViewInfo;
 
-class GAME_API SSceneVisibility : virtual public SObject
+class GAME_API SSceneVisibility : implements SObject
 {
 	GENERATED_BODY(SSceneVisibility)
 

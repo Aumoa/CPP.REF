@@ -13,7 +13,7 @@ enum class ELogVerbosity;
 /// <summary>
 /// Provide logging functions.
 /// </summary>
-class CORE_API LogSystem abstract final
+class CORE_API LogSystem
 {
 	class fatal_exception : public std::exception
 	{
@@ -41,4 +41,4 @@ private:
 	static void InternalLog(SLogCategory& category, ELogVerbosity logVerbosity, std::wstring& message);
 };
 
-#define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(Category, ELogVerbosity::Verbosity, Format, ##__VA_ARGS__)
+#define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(Category, ELogVerbosity::Verbosity, Format __VA_OPT__(,) __VA_ARGS__)

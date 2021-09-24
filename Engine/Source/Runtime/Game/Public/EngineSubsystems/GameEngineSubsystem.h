@@ -6,7 +6,7 @@
 
 class SGameEngine;
 
-class GAME_API SGameEngineSubsystem : virtual public SObject
+class GAME_API SGameEngineSubsystem : implements SObject
 {
 	GENERATED_BODY(SGameEngineSubsystem)
 

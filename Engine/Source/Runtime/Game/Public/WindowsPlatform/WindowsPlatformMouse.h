@@ -8,7 +8,7 @@
 
 struct IFrameworkView;
 
-class GAME_API SWindowsPlatformMouse : virtual public SObject, virtual public IPlatformMouse
+class GAME_API SWindowsPlatformMouse : implements SObject, implements IPlatformMouse
 {
     GENERATED_BODY(SWindowsPlatformMouse)
 

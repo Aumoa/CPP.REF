@@ -8,7 +8,7 @@ class SFontFace;
 class SFontCachingManager;
 class SRHIDevice;
 
-class RENDERCORE_API SFreeTypeModule : virtual public SObject
+class RENDERCORE_API SFreeTypeModule : implements SObject
 {
 	GENERATED_BODY(SFreeTypeModule)
 

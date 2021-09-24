@@ -17,7 +17,7 @@ class SRHIDynamicTexture2D;
 /// <summary>
 /// Provide interface for control all render devices.
 /// </summary>
-class RENDERCORE_API SRHIDevice : virtual public SObject
+class RENDERCORE_API SRHIDevice : implements SObject
 {
 	GENERATED_BODY(SRHIDevice)
 

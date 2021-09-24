@@ -2,12 +2,16 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include <comdef.h>
+#pragma push_macro("interface")
 
+#undef interface
+#include <comdef.h>
 #undef min
 #undef max
 
+#pragma pop_macro("interface")
+
+#include "CoreMinimal.h"
 #include <string>
 
 template <typename T>

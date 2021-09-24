@@ -11,7 +11,7 @@ class SDirectoryReference;
 /// <summary>
 /// Represents file system reference.
 /// </summary>
-class CORE_API SFileSystemReference : virtual public SObject
+class CORE_API SFileSystemReference : implements SObject
 {
 	GENERATED_BODY(SFileSystemReference)
 

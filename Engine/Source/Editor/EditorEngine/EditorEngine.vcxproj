@@ -64,6 +64,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -84,6 +85,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

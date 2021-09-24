@@ -14,7 +14,7 @@ class AActor;
 /// <summary>
 /// Represents actor placement unit.
 /// </summary>
-class GAME_API SLevel : virtual public SObject
+class GAME_API SLevel : implements SObject
 {
 	GENERATED_BODY(SLevel)
 

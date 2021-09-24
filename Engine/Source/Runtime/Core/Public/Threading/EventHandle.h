@@ -8,7 +8,7 @@
 /// <summary>
 /// The system event handle.
 /// </summary>
-class CORE_API SEventHandle : virtual public SObject
+class CORE_API SEventHandle : implements SObject
 {
 public:
 	using Super = SObject;

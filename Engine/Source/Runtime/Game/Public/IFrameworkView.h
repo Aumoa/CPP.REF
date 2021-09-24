@@ -8,7 +8,7 @@
 /// <summary>
 /// Provide interface for platform specified application view.
 /// </summary>
-struct IFrameworkView : virtual public SObject, virtual public IWindowView
+struct IFrameworkView : implements SObject, implements IWindowView
 {
 	enum class ETickMode
 	{

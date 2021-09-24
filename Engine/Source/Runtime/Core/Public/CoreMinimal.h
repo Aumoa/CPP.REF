@@ -4,6 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "Object.h"
+#include "Interface.h"
 #include "CoreAssert.h"
 #include "Concepts/CoreConcepts.h"
 #include "Delegates/MulticastDelegate.h"

@@ -8,7 +8,7 @@ class SGameEngine;
 class SStaticMesh;
 class SRHIVertexFactory;
 
-class GAME_API SParserBase : virtual public SObject
+class GAME_API SParserBase : implements SObject
 {
 	GENERATED_BODY(SParserBase)
 

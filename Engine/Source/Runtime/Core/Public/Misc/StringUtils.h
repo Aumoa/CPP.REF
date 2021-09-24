@@ -14,7 +14,7 @@
 /// <summary>
 /// Provide extended functions for compose string.
 /// </summary>
-class CORE_API StringUtils abstract final
+class CORE_API StringUtils
 {
 public:
 	/// <summary>
@@ -138,17 +138,17 @@ public:
 	}
 };
 
-#define WCHAR_TO_ANSI(Text, ...)	(StringUtils::AsMultibyte(Text, ## __VA_ARGS__))
-#define ANSI_TO_WCHAR(Text, ...)	(StringUtils::AsUnicode(Text, ## __VA_ARGS__))
+#define WCHAR_TO_ANSI(Text, ...)	(StringUtils::AsMultibyte(Text __VA_OPT__(,) __VA_ARGS__))
+#define ANSI_TO_WCHAR(Text, ...)	(StringUtils::AsUnicode(Text __VA_OPT__(,) __VA_ARGS__))
 
 #if _UNICODE
 #define WCHAR_TO_TCHAR(Text, ...)	((std::wstring)Text)
 #define TCHAR_TO_WCHAR(Text, ...)	((std::wstring)Text)
-#define TCHAR_TO_ANSI(Text, ...)	WCHAR_TO_ANSI(Text, ## __VA_ARGS__)
-#define ANSI_TO_TCHAR(Text, ...)	ANSI_TO_WCHAR(Text, ## __VA_ARGS__)
+#define TCHAR_TO_ANSI(Text, ...)	WCHAR_TO_ANSI(Text __VA_OPT__(,) __VA_ARGS__)
+#define ANSI_TO_TCHAR(Text, ...)	ANSI_TO_WCHAR(Text __VA_OPT__(,) __VA_ARGS__)
 #else
 #define ANSI_TO_TCHAR(Text, ...)	((std::string)Text)
 #define TCHAR_TO_ANSI(Text, ...)	((std::string)Text)
-#define TCHAR_TO_WCHAR(Text, ...)	ANSI_TO_WCHAR(Text, ## __VA_ARGS__)
-#define WCHAR_TO_TCHAR(Text, ...)	WCHAR_TO_ANSI(Text, ## __VA_ARGS__)
+#define TCHAR_TO_WCHAR(Text, ...)	ANSI_TO_WCHAR(Text __VA_OPT__(,) __VA_ARGS__)
+#define WCHAR_TO_TCHAR(Text, ...)	WCHAR_TO_ANSI(Text __VA_OPT__(,) __VA_ARGS__)
 #endif

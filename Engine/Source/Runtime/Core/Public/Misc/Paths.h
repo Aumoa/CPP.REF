@@ -4,7 +4,7 @@
 
 #include <filesystem>
 
-class CORE_API Paths abstract final
+class CORE_API Paths
 {
 public:
 	static std::filesystem::path GetPlatformFontPath();

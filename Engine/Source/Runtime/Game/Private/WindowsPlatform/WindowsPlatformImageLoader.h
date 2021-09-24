@@ -8,7 +8,7 @@
 struct IWICImagingFactory;
 struct IPlatformImage;
 
-class SWindowsPlatformImageLoader : virtual public SObject, virtual public IPlatformImageLoader
+class SWindowsPlatformImageLoader : implements SObject, implements IPlatformImageLoader
 {
 	GENERATED_BODY(SWindowsPlatformImageLoader)
 

@@ -7,7 +7,7 @@
 #include "ArrangedWidget.h"
 #include "LayoutEnums.h"
 
-class SLATECORE_API SArrangedChildrens : virtual public SObject
+class SLATECORE_API SArrangedChildrens : implements SObject
 {
 	GENERATED_BODY(SArrangedChildrens)
 

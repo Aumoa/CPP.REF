@@ -11,7 +11,7 @@ class SRHIDeviceContext;
 class SSceneVisibility;
 class SPrimitiveSceneProxy;
 
-class GAME_API SSceneRenderer : virtual public SObject
+class GAME_API SSceneRenderer : implements SObject
 {
 	GENERATED_BODY(SSceneRenderer)
 

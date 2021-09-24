@@ -13,7 +13,7 @@ enum class ELogVerbosity;
 /// <summary>
 /// Represents log category that file logging state, display state, etc...
 /// </summary>
-class CORE_API SLogCategory : virtual public SObject
+class CORE_API SLogCategory : implements SObject
 {
 	GENERATED_BODY(SLogCategory)
 	friend class LogSystem;

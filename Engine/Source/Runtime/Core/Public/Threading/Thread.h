@@ -4,7 +4,7 @@
 
 #include "Object.h"
 
-class CORE_API SThread : virtual public SObject
+class CORE_API SThread : implements SObject
 {
 	GENERATED_BODY(SThread)
 
