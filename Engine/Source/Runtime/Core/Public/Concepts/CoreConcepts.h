@@ -22,3 +22,15 @@ concept Constructible = requires(TArgs&&... args)
 
 template<class T>
 concept HasSuper = requires { typename T::Super; } && !std::same_as<typename T::Super, void>;
+
+template<size_t _Depth>
+struct InheritSelector : public InheritSelector<_Depth - 1>
+{
+	constexpr static size_t Depth = _Depth;
+};
+
+template<>
+struct InheritSelector<0>
+{
+	constexpr static size_t Depth = 0;
+};

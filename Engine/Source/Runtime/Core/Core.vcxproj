@@ -179,6 +179,7 @@
     <ClInclude Include="Public\Reflection\Type.h" />
     <ClInclude Include="Public\Threading\EventHandle.h" />
     <ClInclude Include="Public\Threading\Thread.h" />
+    <ClInclude Include="Public\ValueType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

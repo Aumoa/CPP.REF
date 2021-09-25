@@ -302,5 +302,8 @@
     <ClInclude Include="Public\Interface.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\ValueType.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

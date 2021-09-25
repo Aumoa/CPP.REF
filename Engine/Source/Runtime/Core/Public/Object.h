@@ -7,7 +7,11 @@
 #include <string_view>
 #include <functional>
 #include "PrimitiveTypes.h"
+#include "LogCore.h"
+#include "Diagnostics/LogSystem.h"
 #include "Reflection/ReflectionMacros.h"
+
+class SValueType;
 
 /// <summary>
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
@@ -15,7 +19,7 @@
 /// </summary>
 class CORE_API SObject : public std::enable_shared_from_this<SObject>
 {
-	GENERATED_BODY(SObject)
+	GENERATED_BODY(SObject, virtual)
 
 private:
 	SObject* _outer = nullptr;
@@ -66,10 +70,9 @@ public:
 	/// <param name="...args"> The constructor arguments. </param>
 	/// <returns> The instantiated pointer. </returns>
 	template<class T, class... TArgs> requires std::constructible_from<T, TArgs...>
-	static T* NewStaticObject(TArgs&&... args)
+	static std::shared_ptr<T> NewStaticObject(TArgs&&... args)
 	{
-		T* ptr = new T(std::forward<TArgs>(args)...);
-		return ptr;
+		return std::make_shared<T>(std::forward<TArgs>(args)...);
 	}
 
 	/// <summary>
@@ -93,10 +96,58 @@ public:
 	/// <param name="subobject"> The target object. </param>
 	static void DestroySubobject(SObject* subobject);
 
-	template<std::derived_from<SObject> T>
+	template<class T> requires std::derived_from<T, SObject>
 	T* As() { return dynamic_cast<T*>(this); }
-	template<std::derived_from<SObject> T>
+	template<class T> requires std::derived_from<T, SObject>
 	const T* As() const { return dynamic_cast<const T*>(this); }
+
+	/// <summary>
+	/// Casts between two SObject classes.
+	/// </summary>
+	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
+	inline static TTo* Cast(TFrom* from)
+	{
+		return from->As<TTo>();
+	}
+
+	/// <summary>
+	/// Casts between two SObject classes.
+	/// </summary>
+	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
+	inline static const TTo* Cast(const TFrom* from)
+	{
+		return from->As<TTo>();
+	}
+
+	/// <summary>
+	/// Casts from native type to boxing object. This cast require instanced SObject for setting outer.
+	/// </summary>
+	template<std::same_as<SObject> TTo, class TFrom>
+	inline TTo* Cast(const TFrom& value) requires (!std::derived_from<TFrom, SObject>)
+	{
+		return NewObject<SValueType>(value);
+	}
+
+	/// <summary>
+	/// Casts from boxing object to native type.
+	/// </summary>
+	template<class TTo, std::same_as<SObject> TFrom>
+	static inline TTo Cast(const TFrom* value) requires (!std::derived_from<TTo, SObject>)
+	{
+		auto boxing = Cast<SValueType>(value);
+		if (boxing == nullptr)
+		{
+			SE_LOG(LogCasts, Fatal, L"Object is not boxing class.");
+		}
+
+		TTo value;
+		if (!boxing->Unboxing(&value))
+		{
+			SE_LOG(LogCasts, Fatal, L"The type of value contained at boxing object is not match with desired type.");
+		}
+
+		return value;
+	}
 
 private:
 	std::shared_ptr<SObject> InternalDetachSubobject(std::shared_ptr<SObject> subobject);
@@ -105,3 +156,4 @@ private:
 };
 
 #define implements virtual public 
+#include "ValueType.h"

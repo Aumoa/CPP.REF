@@ -38,7 +38,7 @@ public:
 		Type* SuperClass = nullptr;
 		bool bNative = false;
 
-		TypeGenerator(std::wstring_view friendlyName) requires std::derived_from<TType, SObject>
+		TypeGenerator(std::wstring_view friendlyName) requires requires { TType::StaticClass(); }
 			: FriendlyName(friendlyName)
 			, bNative(false)
 		{

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "Diagnostics/LogCategory.h"
+class SLogCategory;
 
-DECLARE_LOG_CATEGORY(CORE_API, LogCore);
-DECLARE_LOG_CATEGORY(CORE_API, LogAssert);
-DECLARE_LOG_CATEGORY(CORE_API, LogReflection);
+extern CORE_API SLogCategory LogCore;
+extern CORE_API SLogCategory LogAssert;
+extern CORE_API SLogCategory LogReflection;
+extern CORE_API SLogCategory LogCasts;

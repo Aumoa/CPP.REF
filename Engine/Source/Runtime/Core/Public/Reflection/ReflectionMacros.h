@@ -21,7 +21,7 @@ namespace ReflectionMacros
 	};
 }
 
-#define GENERATED_BODY(Class)																\
+#define GENERATED_BODY(Class, ...)															\
 	friend class Type;																		\
 																							\
 public:																						\
@@ -34,7 +34,7 @@ public:																						\
 		return &MyClassType;																\
 	}																						\
 																							\
-	virtual Type* GetType() const															\
+	__VA_ARGS__ Type* GetType() const														\
 	{																						\
 		return StaticClass();																\
 	}																						\
