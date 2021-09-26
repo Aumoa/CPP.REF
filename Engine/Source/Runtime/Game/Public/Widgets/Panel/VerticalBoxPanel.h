@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "BoxPanel.h"
 
-class SLATECORE_API SVerticalBoxPanel : public SBoxPanel
+class GAME_API SVerticalBoxPanel : public SBoxPanel
 {
 	GENERATED_BODY(SVerticalBoxPanel)
 

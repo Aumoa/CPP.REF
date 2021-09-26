@@ -30,12 +30,12 @@ std::shared_ptr<SObject> SObject::SetOuter(SObject* newOuter)
 
 	if (_outer != nullptr)
 	{
-		detached = _outer->InternalDetachSubobject(std::move(detached));
+		_outer->InternalDetachSubobject(detached.get());
 	}
 
 	if (newOuter != nullptr)
 	{
-		newOuter->InternalAttachSubobject(std::move(detached));
+		newOuter->InternalAttachSubobject(detached.get());
 	}
 
 	_outer = newOuter;
@@ -51,38 +51,46 @@ void SObject::DestroySubobject(SObject* subobject)
 		return;
 	}
 
-	outer->InternalDestroySubobject(subobject);
+	outer->InternalDetachSubobject(subobject);
 }
 
-std::shared_ptr<SObject> SObject::InternalDetachSubobject(std::shared_ptr<SObject> subobject)
+void* SObject::operator new(size_t size)
 {
-	if (auto it = _subobjects.find(subobject); it != _subobjects.end())
+	return new uint8[size];
+}
+
+void SObject::operator delete(void* block)
+{
+	delete[] reinterpret_cast<uint8*>(block);
+}
+
+void SObject::InternalDetachSubobject(SObject* subobject)
+{
+	if (auto it = _views.find(subobject); it != _views.end())
 	{
-		(*it)->_outer = nullptr;
-		_subobjects.erase(it);
-		return std::move(subobject);
-	}
+		auto subobject_it = _subobjects.begin() + it->second;
+		(*subobject_it)->_outer = nullptr;
 
-	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
-	return {};
-}
-
-void SObject::InternalAttachSubobject(std::shared_ptr<SObject> subobject)
-{
-	_subobjects.emplace(subobject);
-}
-
-void SObject::InternalDestroySubobject(SObject* subobject)
-{
-	if (auto it = _subobjects.find(subobject->shared_from_this()); it != _subobjects.end())
-	{
-		SObject* ptr = it->get();
-		ptr->_outer = nullptr;
-		_subobjects.erase(it);
-
-		// Will remove all subobjects on destructor of object.
+		subobject_it->reset();
+		_views.erase(it);
 		return;
 	}
 
 	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+}
+
+void SObject::InternalAttachSubobject(SObject* subobject)
+{
+	for (size_t i = 0; i < _subobjects.size(); ++i)
+	{
+		if (!_subobjects[i])
+		{
+			_views.emplace(subobject, i);
+			_subobjects[i] = subobject->shared_from_this();
+			return;
+		}
+	}
+
+	_views.emplace(subobject, _subobjects.size());
+	_subobjects.emplace_back(subobject->shared_from_this());
 }

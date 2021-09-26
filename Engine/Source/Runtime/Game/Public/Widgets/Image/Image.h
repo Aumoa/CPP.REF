@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "Widgets/LeafWidget.h"
+#include "Draw/SlateBrush.h"
 
 class STexture2D;
 
-class SLATECORE_API SImage : public SLeafWidget
+class GAME_API SImage : public SLeafWidget
 {
 	GENERATED_BODY(SImage)
 

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Widgets/Layout/Border.h"
 
-class SLATECORE_API SButton : public SBorder
+class GAME_API SButton : public SBorder
 {
 	GENERATED_BODY(SButton)
 

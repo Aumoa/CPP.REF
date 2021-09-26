@@ -29,7 +29,7 @@ SRHISwapChain::SRHISwapChain(SRHIDevice* device, IWindowView* view, SRHICommandQ
 	ComPtr<IDXGISwapChain1> swapChain1;
 	HWND hWnd = reinterpret_cast<HWND>(view->GetWindowHandle());
 	HR(LogRHI, dxgi->CreateSwapChainForHwnd(queue->GetCommandQueue(), hWnd, &chainDesc, nullptr, nullptr, &swapChain1));
-	HR(LogRHI, swapChain1.CopyTo(&_swapChain));
+	HR(LogRHI, swapChain1->QueryInterface(&_swapChain));
 }
 
 SRHISwapChain::~SRHISwapChain()

@@ -15,7 +15,7 @@ class SPaintArgs;
 class SArrangedChildrens;
 class ArrangedWidget;
 
-class SLATECORE_API SWidget : implements SObject
+class GAME_API SWidget : implements SObject
 {
 	GENERATED_BODY(SWidget)
 

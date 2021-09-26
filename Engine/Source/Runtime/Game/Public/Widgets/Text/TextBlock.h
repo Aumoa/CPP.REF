@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "Widgets/LeafWidget.h"
 #include "Draw/SlateFont.h"
 
 class SFontFace;
 
-class SLATECORE_API STextBlock : public SLeafWidget
+class GAME_API STextBlock : public SLeafWidget
 {
 	GENERATED_BODY(STextBlock)
 

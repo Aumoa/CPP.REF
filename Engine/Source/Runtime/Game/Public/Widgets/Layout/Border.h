@@ -6,7 +6,7 @@
 #include "Widgets/CompoundWidget.h"
 #include "Layout/Margin.h"
 
-class SLATECORE_API SBorder : public SCompoundWidget
+class GAME_API SBorder : public SCompoundWidget
 {
 	GENERATED_BODY(SBorder)
 

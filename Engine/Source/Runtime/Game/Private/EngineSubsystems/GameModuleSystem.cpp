@@ -12,6 +12,11 @@ SGameModuleSystem::SGameModuleSystem() : Super()
 
 SGameModuleSystem::~SGameModuleSystem()
 {
+	if (_gameModule)
+	{
+		DestroySubobject(_gameModule);
+		_gameModule = nullptr;
+	}
 }
 
 void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
@@ -30,14 +35,14 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 		return;
 	}
 
-	auto loader = _module->GetFunctionPointer<SGameModule*()>("LoadGameModule");
+	auto loader = _module->GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
 	if (!loader)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.");
 		return;
 	}
 
-	_gameModule = loader();
+	_gameModule = loader(this);
 	if (!_gameModule)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", gameModuleName);

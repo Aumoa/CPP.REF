@@ -14,7 +14,7 @@
 class SWidget;
 class ArrangedWidget;
 
-struct SLATECORE_API Geometry
+struct GAME_API Geometry
 {
 private:
 	constexpr Geometry(

@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <functional>
+#include <map>
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "Diagnostics/LogSystem.h"
@@ -23,7 +24,8 @@ class CORE_API SObject : public std::enable_shared_from_this<SObject>
 
 private:
 	SObject* _outer = nullptr;
-	std::set<std::shared_ptr<SObject>> _subobjects;
+	std::vector<std::shared_ptr<SObject>> _subobjects;
+	std::map<SObject*, size_t> _views;
 
 public:
 	/// <summary>
@@ -57,7 +59,7 @@ public:
 	{
 		std::shared_ptr shared = std::make_shared<T>(std::forward<TArgs>(args)...);
 		auto ptr = shared.get();
-		_subobjects.emplace(std::move(shared));
+		InternalAttachSubobject(ptr);
 		ptr->_outer = this;
 		return ptr;
 	}
@@ -149,10 +151,12 @@ public:
 		return value;
 	}
 
+	void* operator new(size_t);
+	void operator delete(void*);
+
 private:
-	std::shared_ptr<SObject> InternalDetachSubobject(std::shared_ptr<SObject> subobject);
-	void InternalAttachSubobject(std::shared_ptr<SObject> subobject);
-	void InternalDestroySubobject(SObject* subobject);
+	void InternalDetachSubobject(SObject* subobject);
+	void InternalAttachSubobject(SObject* subobject);
 };
 
 #define implements virtual public 

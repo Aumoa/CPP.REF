@@ -7,63 +7,6 @@
     <ClInclude Include="Public\SlateMinimal.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Concepts\LayoutTransform.h">
-      <Filter>Public\Concepts</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Draw\SlateWindowElementList.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Draw\PaintArgs.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Draw\SlateBrush.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Draw\SlateDrawElement.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\Margin.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\PaintGeometry.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\Scale2D.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\Shear2D.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\SlateLayoutTransform.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\SlateRenderTransform.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\SlateRotatedRect.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\TransformCalculus2D.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\Anchors.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\ArrangedChildrens.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\ArrangedWidget.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\Geometry.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\LayoutGeometry.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\LayoutImpl.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Widgets\CompoundWidget.h">
       <Filter>Public\Widgets</Filter>
     </ClInclude>
@@ -82,29 +25,14 @@
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h">
       <Filter>Public\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="PUblic\Layout\LayoutEnums.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\SizeParam.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
     <ClInclude Include="Public\LogSlate.h">
       <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Layout\AlignmentArrangeResult.h">
-      <Filter>Public\Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Draw\SlateFontElement.h">
-      <Filter>Public\Draw</Filter>
     </ClInclude>
     <ClInclude Include="Public\Widgets\Text\TextBlock.h">
       <Filter>Public\Widgets\Text</Filter>
     </ClInclude>
     <ClInclude Include="Public\Widgets\Image\Image.h">
       <Filter>Public\Widgets\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Draw\SlateFont.h">
-      <Filter>Public\Draw</Filter>
     </ClInclude>
     <ClInclude Include="Public\Widgets\Panel\PanelWidget.h">
       <Filter>Public\Widgets\Panel</Filter>
@@ -197,17 +125,8 @@
     <Filter Include="Private">
       <UniqueIdentifier>{06764065-65bd-4f78-ba62-0ad83ce74400}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\Concepts">
-      <UniqueIdentifier>{73e2cc12-354f-4edc-b8d7-c7edc46b0a53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Public\Draw">
-      <UniqueIdentifier>{792d1b92-cc97-428b-b50d-3944513cd5a7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\Draw">
       <UniqueIdentifier>{12025464-5ae9-4218-8504-9af96bafc365}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Public\Layout">
-      <UniqueIdentifier>{462dd766-ccf0-4579-b37e-7991cba20cc0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\Layout">
       <UniqueIdentifier>{11c43787-b3f2-4599-9a4d-22871f49b974}</UniqueIdentifier>

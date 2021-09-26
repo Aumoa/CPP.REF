@@ -11,7 +11,7 @@
 class SWindow;
 class SRHIDeviceContext;
 
-class SLATECORE_API SSlateWindowElementList : implements SObject
+class GAME_API SSlateWindowElementList : implements SObject
 {
 	GENERATED_BODY(SSlateWindowElementList)
 

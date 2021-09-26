@@ -2,11 +2,12 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "PanelWidget.h"
 #include "Widgets/SlotBase.h"
+#include "Layout/Anchors.h"
 
-class SLATECORE_API SCanvasPanel : public SPanelWidget
+class GAME_API SCanvasPanel : public SPanelWidget
 {
 	GENERATED_BODY(SCanvasPanel)
 

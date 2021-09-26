@@ -2,11 +2,12 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "PanelWidget.h"
 #include "Widgets/SlotBase.h"
+#include "Layout/SizeParam.h"
 
-class SLATECORE_API SBoxPanel : public SPanelWidget
+class GAME_API SBoxPanel : public SPanelWidget
 {
 	GENERATED_BODY(SBoxPanel)
 

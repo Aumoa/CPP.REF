@@ -2,10 +2,6 @@
 
 #include "pch.h"
 #include "Draw/SlateWindowElementList.h"
-#include "RHI/RHIDeviceContext.h"
-#include "RHI/RHIDevice.h"
-#include "RHI/RHIResource.h"
-#include "RHI/RHICommandQueue.h"
 
 SSlateWindowElementList::SSlateWindowElementList(const SWindow* paintWindow) : Super()
 	, _paintWindow(paintWindow)

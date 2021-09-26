@@ -4,7 +4,6 @@
 #include "WindowsPlatformImageLoader.h"
 #include "WindowsPlatformHelper.h"
 #include "WindowsPlatformImage.h"
-#include <wincodec.h>
 
 SWindowsPlatformImageLoader::SWindowsPlatformImageLoader() : Super()
 {

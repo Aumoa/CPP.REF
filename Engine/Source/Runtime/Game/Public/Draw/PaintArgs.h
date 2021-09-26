@@ -6,7 +6,7 @@
 
 class SWidget;
 
-class SLATECORE_API SPaintArgs : implements SObject
+class GAME_API SPaintArgs : implements SObject
 {
 	GENERATED_BODY(SPaintArgs)
 

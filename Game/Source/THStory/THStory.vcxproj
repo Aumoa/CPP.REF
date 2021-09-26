@@ -103,9 +103,6 @@
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\RenderCore\RenderCore.vcxproj">
       <Project>{f00c8c6a-83d9-4827-a043-fc6707a647d2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Engine\Source\Runtime\SlateCore\SlateCore.vcxproj">
-      <Project>{1f1a153e-420a-40e8-8185-2166b77fea98}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\Levels\StartupLevel.h" />

@@ -4,6 +4,7 @@
 #include "Widgets/Panel/BoxPanel.h"
 #include "Layout/AlignmentArrangeResult.h"
 #include "Layout/ArrangedChildrens.h"
+#include "LogGame.h"
 
 SBoxPanel::SBoxPanel(const std::wstring& name, EOrientation orientation) : Super(name)
 	, _orientation(orientation)

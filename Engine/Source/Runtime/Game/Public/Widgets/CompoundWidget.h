@@ -5,7 +5,7 @@
 #include "RenderMinimal.h"
 #include "Widget.h"
 
-class SLATECORE_API SCompoundWidget : public SWidget
+class GAME_API SCompoundWidget : public SWidget
 {
 	GENERATED_BODY(SCompoundWidget)
 

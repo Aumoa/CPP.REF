@@ -27,8 +27,8 @@ public:
 extern "C"													\
 {															\
 	__declspec(dllexport)									\
-	SGameModule* LoadGameModule()							\
+	SGameModule* LoadGameModule(SObject* outer)				\
 	{														\
-		return SObject::NewStaticObject<GameModuleClass>();	\
+		return outer->NewObject<GameModuleClass>();			\
 	}														\
 }

@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "Player.h"
 
 class SGameEngine;
 class SSlateApplication;
 class SSlateShader;
 class SRHIDeviceContext;
+class SSlateWindowElementList;
 struct IFrameworkView;
 
 class GAME_API SLocalPlayer : public SPlayer

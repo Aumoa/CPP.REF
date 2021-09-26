@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "SlateMinimal.h"
+#include "CoreMinimal.h"
 #include "Widgets/CompoundWidget.h"
 
-class SLATECORE_API SPanelWidget : public SCompoundWidget
+class GAME_API SPanelWidget : public SCompoundWidget
 {
 	GENERATED_BODY(SPanelWidget)
 

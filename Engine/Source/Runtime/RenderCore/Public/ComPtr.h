@@ -2,15 +2,6 @@
 
 #pragma once
 
-#pragma push_macro("interface")
-
-#undef interface
-#include <comdef.h>
-#undef min
-#undef max
-
-#pragma pop_macro("interface")
-
 #include "CoreMinimal.h"
 #include <string>
 
@@ -66,8 +57,8 @@ public:
         InternalAddRef();
     }
 
-    template<class U>
-    ComPtr(const ComPtr<U>& other, typename std::enable_if_t<std::is_base_of_v<T, U>, void*>* = 0) throw() :
+    template<std::derived_from<T> U>
+    ComPtr(const ComPtr<U>& other) throw() :
         _ptr(other._ptr)
     {
         InternalAddRef();
@@ -75,14 +66,14 @@ public:
 
     ComPtr(ComPtr&& other) throw() : _ptr(nullptr)
     {
-        if (this != reinterpret_cast<ComPtr*>(&reinterpret_cast<unsigned char&>(other)))
+        if (this != reinterpret_cast<ComPtr*>(&reinterpret_cast<uint8&>(other)))
         {
             Swap(other);
         }
     }
 
-    template<class U>
-    ComPtr(ComPtr<U>&& other, typename std::enable_if_t<std::is_base_of_v<T, U>, void*>* = 0) throw() :
+    template<std::derived_from<T> U>
+    ComPtr(ComPtr<U>&& other) throw() :
         _ptr(other._ptr)
     {
         other._ptr = nullptr;
@@ -93,7 +84,7 @@ public:
         InternalRelease();
     }
 
-    ComPtr& operator=(decltype(__nullptr)) throw()
+    ComPtr& operator=(decltype(nullptr)) throw()
     {
         InternalRelease();
         return *this;
@@ -214,37 +205,6 @@ public:
     unsigned long Reset()
     {
         return InternalRelease();
-    }
-
-    HRESULT CopyTo(InterfaceType** ptr) const throw()
-    {
-        InternalAddRef();
-        *ptr = _ptr;
-        return 0;
-    }
-
-    HRESULT CopyTo(IID& riid, void** ptr) const throw()
-    {
-        return _ptr->QueryInterface(riid, ptr);
-    }
-
-    template<typename U>
-    HRESULT CopyTo(U** ptr) const throw()
-    {
-        return _ptr->QueryInterface(__uuidof(U), reinterpret_cast<void**>(ptr));
-    }
-
-    // query for U interface
-    template<typename U>
-    HRESULT As(ComPtr<U>* p) const throw()
-    {
-        return _ptr->QueryInterface(__uuidof(U), reinterpret_cast<void**>(p->ReleaseAndGetAddressOf()));
-    }
-
-    // query for riid interface and return as IUnknown
-    HRESULT AsIID(IID& riid, ComPtr<IUnknown>* p) const throw()
-    {
-        return _ptr->QueryInterface(riid, reinterpret_cast<void**>(p->ReleaseAndGetAddressOf()));
     }
 
     bool IsSet() const

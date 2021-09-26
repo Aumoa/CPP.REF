@@ -57,12 +57,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SLATECORE_API=__declspec(dllimport);_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4275;</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -94,7 +94,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4275;</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -127,9 +127,6 @@
     <ProjectReference Include="..\RenderCore\RenderCore.vcxproj">
       <Project>{f00c8c6a-83d9-4827-a043-fc6707a647d2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\SlateCore\SlateCore.vcxproj">
-      <Project>{1f1a153e-420a-40e8-8185-2166b77fea98}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assets\Asset.cpp" />
@@ -149,6 +146,8 @@
     <ClCompile Include="Private\Components\SceneComponent.cpp" />
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
     <ClCompile Include="Private\CoreDelegates.cpp" />
+    <ClCompile Include="Private\Draw\PaintArgs.cpp" />
+    <ClCompile Include="Private\Draw\SlateWindowElementList.cpp" />
     <ClCompile Include="Private\EngineSubsystems\GameAssetSystem.cpp" />
     <ClCompile Include="Private\EngineSubsystems\GameEngineSubsystem.cpp" />
     <ClCompile Include="Private\EngineSubsystems\GameInputSystem.cpp" />
@@ -169,6 +168,9 @@
     <ClCompile Include="Private\GameObject.cpp" />
     <ClCompile Include="Private\Info\GameMode.cpp" />
     <ClCompile Include="Private\Info\Info.cpp" />
+    <ClCompile Include="Private\Layout\ArrangedChildrens.cpp" />
+    <ClCompile Include="Private\Layout\ArrangedWidget.cpp" />
+    <ClCompile Include="Private\Layout\Geometry.cpp" />
     <ClCompile Include="Private\Level\Level.cpp" />
     <ClCompile Include="Private\Level\World.cpp" />
     <ClCompile Include="Private\LogGame.cpp" />
@@ -199,7 +201,20 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Private\TIcking\TickFunction.cpp" />
+    <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Image\Image.cpp" />
+    <ClCompile Include="Private\Widgets\Input\Button.cpp" />
+    <ClCompile Include="Private\Widgets\Layout\Border.cpp" />
+    <ClCompile Include="Private\Widgets\LeafWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\CanvasPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\HorizontalBoxPanel.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\PanelWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp" />
     <ClCompile Include="Private\Widgets\SlateApplication.cpp" />
+    <ClCompile Include="Private\Widgets\Text\TextBlock.cpp" />
+    <ClCompile Include="Private\Widgets\Widget.cpp" />
+    <ClCompile Include="Private\Widgets\Window.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImage.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformImageLoader.cpp" />
@@ -228,7 +243,14 @@
     <ClInclude Include="Public\Components\PrimitiveComponent.h" />
     <ClInclude Include="Public\Components\SceneComponent.h" />
     <ClInclude Include="Public\Components\StaticMeshComponent.h" />
+    <ClInclude Include="Public\Concepts\LayoutTransform.h" />
     <ClInclude Include="Public\CoreDelegates.h" />
+    <ClInclude Include="Public\Draw\PaintArgs.h" />
+    <ClInclude Include="Public\Draw\SlateBrush.h" />
+    <ClInclude Include="Public\Draw\SlateDrawElement.h" />
+    <ClInclude Include="Public\Draw\SlateFont.h" />
+    <ClInclude Include="Public\Draw\SlateFontElement.h" />
+    <ClInclude Include="Public\Draw\SlateWindowElementList.h" />
     <ClInclude Include="Public\EngineSubsystems\GameAssetSystem.h" />
     <ClInclude Include="Public\EngineSubsystems\GameEngineSubsystem.h" />
     <ClInclude Include="Public\EngineSubsystems\GameInputSystem.h" />
@@ -253,6 +275,23 @@
     <ClInclude Include="Public\IFrameworkView.h" />
     <ClInclude Include="Public\Info\GameMode.h" />
     <ClInclude Include="Public\Info\Info.h" />
+    <ClInclude Include="Public\Layout\AlignmentArrangeResult.h" />
+    <ClInclude Include="Public\Layout\Anchors.h" />
+    <ClInclude Include="Public\Layout\ArrangedChildrens.h" />
+    <ClInclude Include="Public\Layout\ArrangedWidget.h" />
+    <ClInclude Include="Public\Layout\Geometry.h" />
+    <ClInclude Include="Public\Layout\LayoutEnums.h" />
+    <ClInclude Include="Public\Layout\LayoutGeometry.h" />
+    <ClInclude Include="Public\Layout\LayoutImpl.h" />
+    <ClInclude Include="Public\Layout\Margin.h" />
+    <ClInclude Include="Public\Layout\PaintGeometry.h" />
+    <ClInclude Include="Public\Layout\Scale2D.h" />
+    <ClInclude Include="Public\Layout\Shear2D.h" />
+    <ClInclude Include="Public\Layout\SizeParam.h" />
+    <ClInclude Include="Public\Layout\SlateLayoutTransform.h" />
+    <ClInclude Include="Public\Layout\SlateRenderTransform.h" />
+    <ClInclude Include="Public\Layout\SlateRotatedRect.h" />
+    <ClInclude Include="Public\Layout\TransformCalculus2D.h" />
     <ClInclude Include="Public\Level\Level.h" />
     <ClInclude Include="Public\Level\World.h" />
     <ClInclude Include="Public\LogGame.h" />
@@ -282,7 +321,22 @@
     <ClInclude Include="Public\Ticking\TickFunction.h" />
     <ClInclude Include="Public\Ticking\TickingGroup.h" />
     <ClInclude Include="Public\Ticking\TickScheduler.h" />
+    <ClInclude Include="Public\Widgets\CompoundWidget.h" />
+    <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
+    <ClInclude Include="Public\Widgets\Image\Image.h" />
+    <ClInclude Include="Public\Widgets\Input\Button.h" />
+    <ClInclude Include="Public\Widgets\Layout\Border.h" />
+    <ClInclude Include="Public\Widgets\LeafWidget.h" />
+    <ClInclude Include="Public\Widgets\Panel\BoxPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\PanelWidget.h" />
+    <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h" />
     <ClInclude Include="Public\Widgets\SlateApplication.h" />
+    <ClInclude Include="Public\Widgets\SlotBase.h" />
+    <ClInclude Include="Public\Widgets\Text\TextBlock.h" />
+    <ClInclude Include="Public\Widgets\Widget.h" />
+    <ClInclude Include="Public\Widgets\Window.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformKeyboard.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformMouse.h" />
   </ItemGroup>

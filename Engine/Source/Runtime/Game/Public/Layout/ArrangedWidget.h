@@ -7,7 +7,7 @@
 
 class SWidget;
 
-class SLATECORE_API ArrangedWidget
+class GAME_API ArrangedWidget
 {
 	SWidget* _widget = nullptr;
 	Geometry _geometry;

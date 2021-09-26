@@ -5,7 +5,7 @@
 #include "RenderMinimal.h"
 #include "Widget.h"
 
-class SLATECORE_API SLeafWidget : public SWidget
+class GAME_API SLeafWidget : public SWidget
 {
 	GENERATED_BODY(SLeafWidget)
 

@@ -3,7 +3,6 @@
 #include "pch.h"
 #include "Shaders/SlateShader/SlateShader.h"
 #include "Materials/Material.h"
-#include "SlateMinimal.h"
 #include "GameEngine.h"
 #include "Draw/SlateWindowElementList.h"
 #include "EngineSubsystems/GameRenderSystem.h"

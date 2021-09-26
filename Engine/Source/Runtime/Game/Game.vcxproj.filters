@@ -118,6 +118,51 @@
     <Filter Include="Private\Widgets">
       <UniqueIdentifier>{d2ed2f9b-5d2e-41bf-97f5-e9b87865f528}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Concepts">
+      <UniqueIdentifier>{e4ecc9c7-7431-4b9b-b8e1-a4eb15cdf3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Draw">
+      <UniqueIdentifier>{e1b4860f-28c1-4fde-ab50-b06f0f2f21f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Layout">
+      <UniqueIdentifier>{d4f9f6f7-17bb-4ba3-8c56-7713084dd730}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Image">
+      <UniqueIdentifier>{a2c4521f-4ec4-4faa-89eb-3c2b7c6f2f14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Input">
+      <UniqueIdentifier>{a8216f7b-7f41-4fbc-87e2-5b17a13f6050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Layout">
+      <UniqueIdentifier>{7b874a51-1ebb-45c7-9fcf-47a4f9648e60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Panel">
+      <UniqueIdentifier>{336ed722-e3be-4674-a319-fb8a310cdefc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets\Text">
+      <UniqueIdentifier>{55139754-583e-4881-b57e-4c73ea23f088}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Draw">
+      <UniqueIdentifier>{69d85547-8a2a-4be2-9bc5-9a0ede6b5531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Layout">
+      <UniqueIdentifier>{3a211f5a-e5e5-4588-9bcf-84c1bd148fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Image">
+      <UniqueIdentifier>{89208736-3dda-4a71-ad9f-a4ff1114b27c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Input">
+      <UniqueIdentifier>{5d62b210-26e4-45dd-822b-d9a28e57e833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Layout">
+      <UniqueIdentifier>{5462ef9f-fcef-47ab-b492-bbf7527536b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Panel">
+      <UniqueIdentifier>{f9a71f4a-e049-49a1-97be-c5be58271402}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Text">
+      <UniqueIdentifier>{dd82628d-ec81-4c5b-be4b-1a7c8effdb6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\pch.cpp">
@@ -302,6 +347,60 @@
     </ClCompile>
     <ClCompile Include="Private\Widgets\SlateApplication.cpp">
       <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Draw\PaintArgs.cpp">
+      <Filter>Private\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Draw\SlateWindowElementList.cpp">
+      <Filter>Private\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layout\ArrangedChildrens.cpp">
+      <Filter>Private\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layout\ArrangedWidget.cpp">
+      <Filter>Private\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layout\Geometry.cpp">
+      <Filter>Private\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\LeafWidget.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Widget.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Window.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\CompoundWidget.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Image\Image.cpp">
+      <Filter>Private\Widgets\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Input\Button.cpp">
+      <Filter>Private\Widgets\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Layout\Border.cpp">
+      <Filter>Private\Widgets\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\CanvasPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\HorizontalBoxPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\PanelWidget.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Text\TextBlock.cpp">
+      <Filter>Private\Widgets\Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -538,6 +637,123 @@
     </ClInclude>
     <ClInclude Include="Public\Widgets\SlateApplication.h">
       <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Concepts\LayoutTransform.h">
+      <Filter>Public\Concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\PaintArgs.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateBrush.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateDrawElement.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateWindowElementList.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Margin.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\PaintGeometry.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Scale2D.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Shear2D.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SizeParam.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SlateLayoutTransform.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SlateRenderTransform.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SlateRotatedRect.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\TransformCalculus2D.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\AlignmentArrangeResult.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Anchors.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\ArrangedChildrens.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\ArrangedWidget.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Geometry.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\LayoutEnums.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\LayoutGeometry.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\LayoutImpl.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\LeafWidget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\SlotBase.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Widget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Window.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\CompoundWidget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Image\Image.h">
+      <Filter>Public\Widgets\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Input\Button.h">
+      <Filter>Public\Widgets\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Layout\Border.h">
+      <Filter>Public\Widgets\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\BoxPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\PanelWidget.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Text\TextBlock.h">
+      <Filter>Public\Widgets\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateFont.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateFontElement.h">
+      <Filter>Public\Draw</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

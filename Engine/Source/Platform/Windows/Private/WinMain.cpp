@@ -46,14 +46,14 @@ INT __stdcall wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR
 	}
 
 	SPlatformModule engineModule(*engineName);
-	auto loader = engineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
+	auto loader = engineModule.GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
 	if (!loader)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. {} is corrupted.", *engineName);
 		return -1;
 	}
 
-	SGameModule* gameModule = loader();
+	SGameModule* gameModule = loader(&engineModule);
 	if (gameModule == nullptr)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");

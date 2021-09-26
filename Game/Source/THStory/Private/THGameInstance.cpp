@@ -8,7 +8,7 @@
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "GameFramework/LocalPlayer.h"
-#include "Widgets/Window.h"
+#include "Widgets/SlateApplication.h"
 #include "Widgets/Image/Image.h"
 #include "Widgets/Panel/HorizontalBoxPanel.h"
 #include "Widgets/Panel/VerticalBoxPanel.h"

@@ -6,7 +6,7 @@
 #include "CompoundWidget.h"
 #include "Layout/Geometry.h"
 
-class SLATECORE_API SWindow : public SCompoundWidget
+class GAME_API SWindow : public SCompoundWidget
 {
 	GENERATED_BODY(SWindow)
 

@@ -14,7 +14,7 @@ SWidget::SWidget(const std::wstring& name) : Super()
 
 std::wstring SWidget::ToString(std::wstring_view formatArgs) const
 {
-	return std::format(L"{}({}): [{}] ({})", _name, StringUtils::AsUnicode(typeid(*this).name()), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
+	return std::format(L"{}({}): [{}] ({})", _name, GetType()->GetFriendlyName(), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
 }
 
 int32 SWidget::Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const

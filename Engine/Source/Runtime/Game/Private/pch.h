@@ -3,7 +3,14 @@
 #pragma once
 
 #include "RenderMinimal.h"
-#include "SlateMinimal.h"
+
+#pragma push_macro("interface")
+#undef interface
+
+#include <guiddef.h>
+#include <wincodec.h>
+
+#pragma pop_macro("interface")
 
 #include <optional>
 #include <chrono>
@@ -36,9 +43,6 @@
 #include "RHI/RHIShaderDescriptorView.h"
 #include "RHI/RHIShaderResourceView.h"
 
-#include "Draw/SlateWindowElementList.h"
-#include "Layout/AlignmentArrangeResult.h"
-#include "Layout/ArrangedChildrens.h"
 
 #undef min
 #undef max
