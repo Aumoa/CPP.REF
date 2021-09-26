@@ -12,7 +12,7 @@ DECLARE_LOG_CATEGORY(, LogWindowsLaunch);
 
 using namespace std::chrono;
 
-INT __stdcall wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd, _In_ INT show)
+INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd, _In_ INT show)
 {
 	SCommandLine commandArgs = StringUtils::Split(cmd, L" ", true, true);
 	size_t gameModuleIdx = commandArgs.GetArgument(L"--GameDll");
