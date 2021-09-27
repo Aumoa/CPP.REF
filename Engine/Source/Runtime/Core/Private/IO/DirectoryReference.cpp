@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "IO/DirectoryReference.h"
 
 SDirectoryReference::SDirectoryReference(const std::filesystem::path& filepath) : Super(filepath)

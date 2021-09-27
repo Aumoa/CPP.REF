@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "IO/FileReference.h"
 #include "Object.h"
 #include "LogCore.h"

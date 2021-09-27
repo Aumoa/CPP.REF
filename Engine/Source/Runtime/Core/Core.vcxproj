@@ -61,8 +61,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -83,8 +81,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -115,10 +111,6 @@
     <ClCompile Include="Private\Numerics\Matrix4x4.cpp" />
     <ClCompile Include="Private\Numerics\Quaternion.cpp" />
     <ClCompile Include="Private\Object.cpp" />
-    <ClCompile Include="Private\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Private\PlatformMisc\PlatformModule.cpp" />
     <ClCompile Include="Private\Reflection\Type.cpp" />
     <ClCompile Include="Private\Threading\EventHandle.cpp" />
@@ -126,7 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\DirectXInlineHelper.h" />
-    <ClInclude Include="Private\pch.h" />
     <ClInclude Include="Public\Concepts\CoreConcepts.h" />
     <ClInclude Include="Public\Container\BitArray.h" />
     <ClInclude Include="Public\Container\BitSet.h" />
@@ -150,7 +141,6 @@
     <ClInclude Include="Public\Misc\DateTime.h" />
     <ClInclude Include="Public\Misc\Paths.h" />
     <ClInclude Include="Public\Misc\StringUtils.h" />
-    <ClInclude Include="Public\Misc\UniqueType.h" />
     <ClInclude Include="Public\Numerics\AxisAlignedCube.h" />
     <ClInclude Include="Public\Numerics\Color.h" />
     <ClInclude Include="Public\Numerics\Complex.h" />

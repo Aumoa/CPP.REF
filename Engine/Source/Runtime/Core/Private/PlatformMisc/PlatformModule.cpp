@@ -1,6 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
+#include <Windows.h>
 #include "PlatformMisc/PlatformModule.h"
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogSystem.h"

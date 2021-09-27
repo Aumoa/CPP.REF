@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "pch.h"
+#include <DirectXMath.h>
 #include "Numerics/Quaternion.h"
 #include "Numerics/Matrix4x4.h"
 

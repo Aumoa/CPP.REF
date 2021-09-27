@@ -4,9 +4,6 @@
     <ClCompile Include="Private\CoreAssert.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\pch.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\LogCore.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -155,9 +152,6 @@
     <ClInclude Include="Public\CoreMinimal.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Private\pch.h">
-      <Filter>Private</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Concepts\CoreConcepts.h">
       <Filter>Public\Concepts</Filter>
     </ClInclude>
@@ -255,9 +249,6 @@
       <Filter>Public\Threading</Filter>
     </ClInclude>
     <ClInclude Include="Public\Misc\StringUtils.h">
-      <Filter>Public\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Misc\UniqueType.h">
       <Filter>Public\Misc</Filter>
     </ClInclude>
     <ClInclude Include="Public\Misc\DateTime.h">

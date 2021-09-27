@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
 
