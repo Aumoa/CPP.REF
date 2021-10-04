@@ -170,14 +170,29 @@ void SD3D12CommandList::ExecuteCommandLists(std::span<IRHIDeviceContext*> device
 	SE_LOG(LogDirectX, Fatal, L"ExecuteCommandLists must be called with immediate context.");
 }
 
-DEFINE_CALL_DIRECT_SixParams(CopyTextureRegion, const D3D12_TEXTURE_COPY_LOCATION*, UINT, UINT, UINT, const D3D12_TEXTURE_COPY_LOCATION*, const D3D12_BOX*);
-DEFINE_CALL_DIRECT_TwoParams(CopyResource, ID3D12Resource*, ID3D12Resource*);
-
-void SD3D12CommandList::AddPendingObject(SObject* object)
+void SD3D12CommandList::PendingGarbageObject(SObject* object)
 {
 	object->SetOuter(this);
 	_pendingObjects.emplace_back(object);
 }
+
+void SD3D12CommandList::UpdateSubresource(IRHIResource* resource, uint32 subresource, const RHISubresourceData& data)
+{
+	auto resource_s = Cast<SD3D12Resource>(resource);
+	ID3D12Resource* uploadBuf = resource_s->GetUploadBuf();
+	if (uploadBuf == nullptr)
+	{
+		SE_LOG(LogDirectX, Fatal, L"Resource is not created with ERHIBufferUsage::Dynamic flag.");
+		return;
+	}
+
+	void* ptr;
+	HR(uploadBuf->Map(subresource, nullptr, &ptr));
+}
+
+DEFINE_CALL_DIRECT_SixParams(CopyTextureRegion, const D3D12_TEXTURE_COPY_LOCATION*, UINT, UINT, UINT, const D3D12_TEXTURE_COPY_LOCATION*, const D3D12_BOX*);
+DEFINE_CALL_DIRECT_TwoParams(CopyResource, ID3D12Resource*, ID3D12Resource*);
+DEFINE_CALL_DIRECT_TwoParams(ResourceBarrier, UINT, const D3D12_RESOURCE_BARRIER*);
 
 std::vector<SObject*> SD3D12CommandList::ClearPendingObjects()
 {

@@ -85,39 +85,22 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 
 		if (initialData)
 		{
-			int8* pData;
-			HR(uploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
-			if (initialData->SysMemPitch == layout.Footprint.RowPitch)
-			{
-				memcpy(pData, initialData->pSysMem, (size_t)totalBytes);
-			}
-			else
-			{
-				const size_t pitch = std::min((size_t)layout.Footprint.Width, (size_t)initialData->SysMemPitch);
-				for (uint32 i = 0; i < desc.Height; ++i)
-				{
-					int8*		dst = pData + i * (size_t)layout.Footprint.RowPitch;
-					int8 const* src = reinterpret_cast<const int8*>(initialData->pSysMem) + i * initialData->SysMemPitch;
-					memcpy(dst, src, pitch);
-				}
-			}
-			uploadBuf->Unmap(0, nullptr);
-
-			D3D12_TEXTURE_COPY_LOCATION dst = {};
-			dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-			dst.SubresourceIndex = 0;
-			D3D12_TEXTURE_COPY_LOCATION src = {};
-			src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-			src.PlacedFootprint = layout;
+			D3D12_RESOURCE_BARRIER barrier = {};
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Transition.pResource = textureBuf.Get();
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			barrier.Transition.StateAfter = (D3D12_RESOURCE_STATES)desc.InitialState;
+			barrier.Transition.Subresource = 0;
 
 			auto* commandList = NewObject<SD3D12CommandList>(_factory, this);
 			commandList->Begin(0, 0);
-			commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+			SD3D12Texture2D::UpdateSubresource(commandList, textureBuf.Get(), uploadBuf.Get(), 0, layout, totalBytes, initialData);
+			commandList->ResourceBarrier(1, &barrier);
 			commandList->End();
 
 			if (desc.Usage != ERHIBufferUsage::Dynamic)
 			{
-				commandList->AddPendingObject(Cast<SObject>(uploadBuf));
+				commandList->PendingGarbageObject(Cast<SObject>(uploadBuf));
 				uploadBuf.Reset();
 			}
 
@@ -165,19 +148,22 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 
 		if (initialData)
 		{
-			int8* pData;
-			HR(uploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
-			memcpy(pData, initialData->pSysMem, (size_t)bufferDesc.Width);
-			uploadBuf->Unmap(0, nullptr);
+			D3D12_RESOURCE_BARRIER barrier = {};
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Transition.pResource = buffer.Get();
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			barrier.Transition.StateAfter = (D3D12_RESOURCE_STATES)desc.InitialState;
+			barrier.Transition.Subresource = 0;
 
 			auto* commandList = NewObject<SD3D12CommandList>(_factory, this);
 			commandList->Begin(0, 0);
-			commandList->CopyResource(buffer.Get(), uploadBuf.Get());
+			SD3D12Buffer::UpdateSubresource(commandList, buffer.Get(), uploadBuf.Get(), 0, (uint64)desc.ByteWidth, initialData);
+			commandList->ResourceBarrier(1, &barrier);
 			commandList->End();
 
 			if (desc.Usage != ERHIBufferUsage::Dynamic)
 			{
-				commandList->AddPendingObject(Cast<SObject>(uploadBuf));
+				commandList->PendingGarbageObject(Cast<SObject>(uploadBuf));
 				uploadBuf.Reset();
 			}
 
