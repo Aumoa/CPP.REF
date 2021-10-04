@@ -304,5 +304,66 @@ enum class ERHIDescriptorRangeType
     Sampler,
 };
 
+enum class ERHIBufferUsage
+{
+    Default,
+    Immutable,
+};
+
+enum class ERHIRTVDimension
+{
+    Unknown,
+    Buffer,
+    Texture1D,
+    Texture1DArray,
+    Texture2D,
+    Texture2DArray,
+    Texture2DMS,
+    Texture2DMSArray,
+    Texture3D
+};
+
+enum class ERHIDSVDimension
+{
+    Unknown,
+    Texture1D,
+    Texture1DArray,
+    Texture2D,
+    Texture2DArray,
+    Texture2DMS,
+    Texture2DMSArray
+};
+
+enum class ERHISRVDimension
+{
+    Unknown,
+    Buffer,
+    Texture1D,
+    Texture1DArray,
+    Texture2D,
+    Texture2DArray,
+    Texture2DMS,
+    Texture2DMSArray,
+    Texture3D,
+    Texture3DCube,
+    Texture3DCubeArray,
+    RaytracingAccelerationStructure,
+};
+
+enum class ERHIDSVFlags
+{
+    None,
+    ReadOnlyDepth = 0x01,
+    ReadOnlyStencil = 0x02
+};
+DEFINE_ENUM_FLAG_OPERATORS(ERHIDSVFlags);
+
+enum class ERHIBufferSRVFlags
+{
+    None,
+    Raw = 0x1,
+};
+DEFINE_ENUM_FLAG_OPERATORS(ERHIBufferSRVFlags);
+
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

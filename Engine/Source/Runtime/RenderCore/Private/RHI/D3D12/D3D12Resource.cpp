@@ -1,0 +1,8 @@
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
+
+#include "D3D12Resource.h"
+
+SD3D12Resource::SD3D12Resource(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource) : Super(factory, device)
+	, _resource(std::move(resource))
+{
+}

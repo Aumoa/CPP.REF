@@ -3,4 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHI/DirectXCommon.h"
+#include "IRHIFactoryChild.h"
+
+interface IRHIAdapter : implements IRHIFactoryChild
+{
+};

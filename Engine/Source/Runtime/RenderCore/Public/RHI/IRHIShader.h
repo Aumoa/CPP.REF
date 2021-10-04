@@ -3,4 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHI/DirectXCommon.h"
+#include "IRHIDeviceChild.h"
+
+interface IRHIShader : implements IRHIDeviceChild
+{
+};

@@ -62,9 +62,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)ThirdParty\Source\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4250;</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -85,9 +83,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)ThirdParty\Source\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4250;</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -100,32 +96,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Private\ComPtr.cpp" />
-    <ClCompile Include="Private\FreeType\FontCachingManager.cpp" />
-    <ClCompile Include="Private\FreeType\FontFace.cpp" />
-    <ClCompile Include="Private\FreeType\FontFaceCachingNode.cpp" />
-    <ClCompile Include="Private\FreeType\FreeTypeModule.cpp" />
-    <ClCompile Include="Private\FreeType\LogFreeType.cpp" />
-    <ClCompile Include="Private\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="Private\Materials\Material.cpp" />
+    <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12Buffer.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12CommandList.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12CommandQueue.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12DepthStencilView.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12DescriptorHeap.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12Device.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12DeviceChild.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12RenderTargetView.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12Resource.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12Shader.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12ShaderResourceView.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12Texture2D.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12ThreadAllocatorContainer.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12ThreadDescriptorHeapContainer.cpp" />
+    <ClCompile Include="Private\RHI\D3D12\D3D12View.cpp" />
+    <ClCompile Include="Private\RHI\DirectXCommon.cpp" />
+    <ClCompile Include="Private\RHI\DXGI\DXGIAdapter.cpp" />
+    <ClCompile Include="Private\RHI\DXGI\DXGIFactory.cpp" />
+    <ClCompile Include="Private\RHI\DXGI\DXGIFactoryChild.cpp" />
+    <ClCompile Include="Private\RHI\DXGI\DXGISwapChain.cpp" />
+    <ClCompile Include="Private\RHI\IRHIFactory.cpp" />
     <ClCompile Include="Private\RHI\LogRHI.cpp" />
-    <ClCompile Include="Private\RHI\RHICommandQueue.cpp" />
-    <ClCompile Include="Private\RHI\RHIDepthStencilView.cpp" />
-    <ClCompile Include="Private\RHI\RHIDevice.cpp" />
-    <ClCompile Include="Private\RHI\RHIDeviceContext.cpp" />
-    <ClCompile Include="Private\RHI\RHIDynamicTexture2D.cpp" />
-    <ClCompile Include="Private\RHI\RHIRenderTargetView.cpp" />
-    <ClCompile Include="Private\RHI\RHIResource.cpp" />
-    <ClCompile Include="Private\RHI\RHIShader.cpp" />
-    <ClCompile Include="Private\RHI\RHIShaderDescriptorView.cpp" />
-    <ClCompile Include="Private\RHI\RHIShaderResourceView.cpp" />
-    <ClCompile Include="Private\RHI\RHISwapChain.cpp" />
-    <ClCompile Include="Private\RHI\RHITexture.cpp" />
-    <ClCompile Include="Private\RHI\RHITexture2D.cpp" />
-    <ClCompile Include="Private\RHI\RHIVertexFactory.cpp" />
-    <ClCompile Include="Private\RHI\RHIView.cpp" />
+    <ClCompile Include="Private\VertexFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\ThirdParty\Source\freetype\builds\windows\vc2019\freetype.vcxproj">
@@ -136,39 +131,52 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Private\FreeType\FontFace.Impl.h" />
-    <ClInclude Include="Private\FreeType\FreeTypeModule.Impl.h" />
-    <ClInclude Include="Private\FreeType\LogFreeType.h" />
-    <ClInclude Include="Private\InternalComPtr.h" />
-    <ClInclude Include="Private\pch.h" />
-    <ClInclude Include="Public\ComPtr.h" />
-    <ClInclude Include="Public\FreeType\FontCachingManager.h" />
-    <ClInclude Include="Public\FreeType\FontFace.h" />
-    <ClInclude Include="Public\FreeType\FontFaceCachingNode.h" />
-    <ClInclude Include="Public\FreeType\FreeTypeModule.h" />
-    <ClInclude Include="Public\FreeType\FreeTypeStructures.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12Buffer.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12CommandList.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12CommandQueue.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12DepthStencilView.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12Device.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12DeviceChild.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12RenderTargetView.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12Resource.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12Shader.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12ShaderResourceView.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12Texture2D.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12ThreadAllocatorContainer.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12ThreadDescriptorHeapContainer.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12View.h" />
+    <ClInclude Include="Private\RHI\D3D12\D3D12DescriptorHeap.h" />
+    <ClInclude Include="Private\RHI\DirectXCommon.h" />
+    <ClInclude Include="Private\RHI\DXGI\DXGIAdapter.h" />
+    <ClInclude Include="Private\RHI\DXGI\DXGIFactoryChild.h" />
+    <ClInclude Include="Private\RHI\DXGI\DXGIFactory.h" />
+    <ClInclude Include="Private\RHI\DXGI\DXGISwapChain.h" />
     <ClInclude Include="Public\IWindowView.h" />
-    <ClInclude Include="Public\RenderMinimal.h" />
+    <ClInclude Include="Public\Materials\Material.h" />
+    <ClInclude Include="Public\Materials\MaterialInstance.h" />
+    <ClInclude Include="Public\Materials\MaterialInstanceDynamic.h" />
+    <ClInclude Include="Public\Materials\MaterialInterface.h" />
+    <ClInclude Include="Public\RHI\IRHIAdapter.h" />
+    <ClInclude Include="Public\RHI\IRHIBuffer.h" />
+    <ClInclude Include="Public\RHI\IRHIDepthStencilView.h" />
+    <ClInclude Include="Public\RHI\IRHIDevice.h" />
+    <ClInclude Include="Public\RHI\IRHIDeviceContext.h" />
+    <ClInclude Include="Public\RHI\IRHIFactory.h" />
+    <ClInclude Include="Public\RHI\IRHIFactoryChild.h" />
     <ClInclude Include="Public\RHI\IRHIImageSourceView.h" />
+    <ClInclude Include="Public\RHI\IRHIDeviceChild.h" />
+    <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
+    <ClInclude Include="Public\RHI\IRHIResource.h" />
+    <ClInclude Include="Public\RHI\IRHIShader.h" />
+    <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
+    <ClInclude Include="Public\RHI\IRHISwapChain.h" />
+    <ClInclude Include="Public\RHI\IRHITexture2D.h" />
+    <ClInclude Include="Public\RHI\IRHIUnorderedAccessView.h" />
+    <ClInclude Include="Public\RHI\IRHIView.h" />
     <ClInclude Include="Public\RHI\LogRHI.h" />
-    <ClInclude Include="Public\RHI\RHICommandQueue.h" />
-    <ClInclude Include="Public\RHI\RHIDepthStencilView.h" />
-    <ClInclude Include="Public\RHI\RHIDevice.h" />
-    <ClInclude Include="Public\RHI\RHIDeviceChild.h" />
-    <ClInclude Include="Public\RHI\RHIDeviceContext.h" />
-    <ClInclude Include="Public\RHI\RHIDynamicTexture2D.h" />
     <ClInclude Include="Public\RHI\RHIEnums.h" />
-    <ClInclude Include="Public\RHI\RHIRenderTargetView.h" />
-    <ClInclude Include="Public\RHI\RHIResource.h" />
-    <ClInclude Include="Public\RHI\RHIShader.h" />
-    <ClInclude Include="Public\RHI\RHIShaderDescriptorView.h" />
-    <ClInclude Include="Public\RHI\RHIShaderResourceView.h" />
     <ClInclude Include="Public\RHI\RHIStructures.h" />
-    <ClInclude Include="Public\RHI\RHISwapChain.h" />
-    <ClInclude Include="Public\RHI\RHITexture.h" />
-    <ClInclude Include="Public\RHI\RHITexture2D.h" />
-    <ClInclude Include="Public\RHI\RHIVertexFactory.h" />
-    <ClInclude Include="Public\RHI\RHIView.h" />
+    <ClInclude Include="Public\VertexFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

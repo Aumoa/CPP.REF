@@ -3,4 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHI/DirectXCommon.h"
+#include "IRHIResource.h"
+
+interface IRHIBuffer : implements IRHIResource
+{
+};

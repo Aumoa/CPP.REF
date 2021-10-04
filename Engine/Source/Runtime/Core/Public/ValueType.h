@@ -8,7 +8,7 @@
 #include <sstream>
 #include "Misc/StringUtils.h"
 
-class CORE_API SValueType : implements SObject
+class SValueType : implements SObject
 {
 private:
 	std::any _value;
@@ -17,7 +17,7 @@ private:
 
 public:
 	template<class T>
-	SValueType(const T& value) : Super()
+	SValueType(const T& value) : SObject()
 		, _value(value)
 	{
 		_toString = Internal_ToString(value, InheritSelector<6>());
