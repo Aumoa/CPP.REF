@@ -11,7 +11,7 @@ SVertexFactory::SVertexFactory(IRHIDevice* device) : Super()
 IRHIBuffer* SVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
 {
 	RHIBufferDesc bufferDesc = {};
-	bufferDesc.ByteWidth = sizeof(RHIVertex) * count;
+	bufferDesc.ByteWidth = (uint32)(sizeof(RHIVertex) * count);
 	bufferDesc.InitialState = ERHIResourceStates::VertexAndConstantBuffer;
 	bufferDesc.Usage = ERHIBufferUsage::Immutable;
 	
@@ -25,7 +25,7 @@ IRHIBuffer* SVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t
 IRHIBuffer* SVertexFactory::CreateIndexBuffer(const uint32* indices, size_t count) const
 {
 	RHIBufferDesc bufferDesc = {};
-	bufferDesc.ByteWidth = sizeof(RHIVertex) * count;
+	bufferDesc.ByteWidth = (uint32)(sizeof(RHIVertex) * count);
 	bufferDesc.InitialState = ERHIResourceStates::IndexBuffer;
 	bufferDesc.Usage = ERHIBufferUsage::Immutable;
 

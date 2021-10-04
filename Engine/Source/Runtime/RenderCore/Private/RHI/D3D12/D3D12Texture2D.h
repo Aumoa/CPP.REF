@@ -14,7 +14,10 @@ private:
 	ComPtr<ID3D12Resource> _resource;
 	ComPtr<ID3D12Resource> _uploadHeap;
 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT _layout;
+	RHITexture2DDesc _desc;
 
 public:
-	SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout);
+	SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc);
+
+	virtual RHITexture2DDesc GetDesc() override { return _desc; }
 };

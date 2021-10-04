@@ -46,7 +46,7 @@ std::wfstream SFileReference::OpenStream(std::ios_base::openmode mode, bool bCre
 	return std::wfstream(GetPath(), mode);
 }
 
-std::wfstream& SFileReference::OpenSharedStream(const SObject* sharingUser, std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
+std::wfstream& SFileReference::OpenSharedStream(SObject* sharingUser, std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
 {
 	if (sharingUser == nullptr)
 	{
@@ -68,7 +68,7 @@ std::wfstream& SFileReference::OpenSharedStream(const SObject* sharingUser, std:
 	return _sharedstream;
 }
 
-void SFileReference::CloseSharedStream(const SObject* sharingUser)
+void SFileReference::CloseSharedStream(SObject* sharingUser)
 {
 	if (sharingUser == nullptr)
 	{

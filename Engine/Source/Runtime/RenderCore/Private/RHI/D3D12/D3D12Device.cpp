@@ -38,7 +38,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 	ComPtr<ID3D12Resource> textureBuf;
 	ComPtr<ID3D12Resource> uploadBuf;
 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT layout;
-	const bool bCreateDynamicBuffer = initialData || desc.Usage == ERHIBufferUsage::Default;
+	const bool bCreateDynamicBuffer = initialData || desc.Usage == ERHIBufferUsage::Dynamic;
 
 	// Create default texture buffer.
 	D3D12_RESOURCE_DESC textureDesc = {};
@@ -115,7 +115,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 			commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
 			commandList->End();
 
-			if (desc.Usage == ERHIBufferUsage::Immutable)
+			if (desc.Usage != ERHIBufferUsage::Dynamic)
 			{
 				commandList->AddPendingObject(Cast<SObject>(uploadBuf));
 				uploadBuf.Reset();
@@ -126,7 +126,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 		}
 	}
 
-	return NewObject<SD3D12Texture2D>(_factory, this, std::move(textureBuf), std::move(uploadBuf), layout);
+	return NewObject<SD3D12Texture2D>(_factory, this, std::move(textureBuf), std::move(uploadBuf), layout, desc);
 }
 
 IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubresourceData* initialData)
@@ -175,7 +175,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 			commandList->CopyResource(buffer.Get(), uploadBuf.Get());
 			commandList->End();
 
-			if (desc.Usage == ERHIBufferUsage::Immutable)
+			if (desc.Usage != ERHIBufferUsage::Dynamic)
 			{
 				commandList->AddPendingObject(Cast<SObject>(uploadBuf));
 				uploadBuf.Reset();
@@ -186,7 +186,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 		}
 	}
 
-	return NewObject<SD3D12Buffer>(_factory, this, std::move(buffer), std::move(uploadBuf));
+	return NewObject<SD3D12Buffer>(_factory, this, std::move(buffer), std::move(uploadBuf), desc);
 }
 
 IRHIShader* SD3D12Device::CompileMaterial(SMaterial* material, SVertexFactory* vertexDeclaration)

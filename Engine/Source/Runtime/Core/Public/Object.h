@@ -44,7 +44,7 @@ public:
 	/// </summary>
 	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
 	/// <returns> The string view instance. </returns>
-	virtual std::wstring ToString(std::wstring_view formatArgs = L"") const;
+	virtual std::wstring ToString(std::wstring_view formatArgs = L"");
 	SFUNCTION(ToString);
 
 	/// <summary>

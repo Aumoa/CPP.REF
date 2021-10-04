@@ -8,7 +8,6 @@
 interface IRHIImageSourceView : implements SObject
 {
 	virtual void CopyPixels(uint32 stride, uint32 bufferSize, void* pBuffer) = 0;
-	virtual int32 GetWidth() const = 0;
-	virtual int32 GetHeight() const = 0;
+	virtual Vector2N GetPixelSize() const = 0;
 	virtual ERHIPixelFormat GetPixelFormat() const = 0;
 };

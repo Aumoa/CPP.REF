@@ -72,13 +72,13 @@ public:
 	/// <param name="mode"> The opening mode. </param>
 	/// <param name="bCreateIfNotExists"> Always create new file if not exists. </param>
 	/// <param name="bCreateDirectoryRecursive"> Create parent directory recursively. </param>
-	std::wfstream& OpenSharedStream(const SObject* sharingUser, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out, bool bCreateIfNotExists = true, bool bCreateDirectoryRecursive = true);
+	std::wfstream& OpenSharedStream(SObject* sharingUser, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out, bool bCreateIfNotExists = true, bool bCreateDirectoryRecursive = true);
 
 	/// <summary>
 	/// Close shared file stream.
 	/// </summary>
 	/// <param name="sharingUser"> Key for shared user list. </param>
-	void CloseSharedStream(const SObject* sharingUser);
+	void CloseSharedStream(SObject* sharingUser);
 
 	SFileReference& operator =(const SFileReference& rhs) = default;
 	SFileReference& operator =(SFileReference&& rhs) = default;

@@ -6,3 +6,8 @@ SD3D12Resource::SD3D12Resource(SDXGIFactory* factory, SD3D12Device* device, ComP
 	, _resource(std::move(resource))
 {
 }
+
+uint64 SD3D12Resource::GetGPUVirtualAddress()
+{
+	return _resource->GetGPUVirtualAddress();
+}

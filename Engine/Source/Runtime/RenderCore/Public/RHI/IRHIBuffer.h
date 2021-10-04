@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "IRHIResource.h"
+#include "RHIStructures.h"
 
 interface IRHIBuffer : implements IRHIResource
 {
+	virtual RHIBufferDesc GetDesc() = 0;
 };

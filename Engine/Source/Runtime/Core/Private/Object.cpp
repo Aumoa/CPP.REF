@@ -13,7 +13,7 @@ SObject::~SObject() noexcept
 {
 }
 
-std::wstring SObject::ToString(std::wstring_view formatArgs) const
+std::wstring SObject::ToString(std::wstring_view formatArgs)
 {
 	return GetType()->GetFriendlyName();
 }

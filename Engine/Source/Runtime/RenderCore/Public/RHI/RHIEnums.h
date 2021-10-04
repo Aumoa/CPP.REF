@@ -308,6 +308,7 @@ enum class ERHIBufferUsage
 {
     Default,
     Immutable,
+    Dynamic,
 };
 
 enum class ERHIRTVDimension

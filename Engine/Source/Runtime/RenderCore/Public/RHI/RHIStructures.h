@@ -360,10 +360,10 @@ struct RHISubresourceData
 
 struct RHIBufferDesc
 {
-	size_t ByteWidth;
+	uint32 ByteWidth;
 	ERHIBufferUsage Usage;
 	ERHIResourceStates InitialState;
-	size_t StructureByteStride;
+	uint32 StructureByteStride;
 	ERHIResourceFlags Flags;
 };
 
