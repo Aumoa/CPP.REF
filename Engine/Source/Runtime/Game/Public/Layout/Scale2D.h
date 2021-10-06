@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 
 struct Scale2D
 {

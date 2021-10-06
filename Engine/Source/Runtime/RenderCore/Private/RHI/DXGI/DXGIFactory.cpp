@@ -50,6 +50,13 @@ IRHIDevice* SDXGIFactory::CreateDevice(IRHIAdapter* adapter)
 	auto instance = Cast<SDXGIAdapter>(adapter);
 	IDXGIAdapter1* actualAdapter = instance->GetAdapter();
 
+#if defined(_DEBUG)
+	if (ComPtr<ID3D12Debug> debug; SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug))))
+	{
+		debug->EnableDebugLayer();
+	}
+#endif
+
 	ComPtr<ID3D12Device> device;
 	HR(D3D12CreateDevice(actualAdapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device)));
 

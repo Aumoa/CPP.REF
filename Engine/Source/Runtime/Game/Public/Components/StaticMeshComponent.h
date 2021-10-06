@@ -22,9 +22,9 @@ public:
 	virtual SPrimitiveSceneProxy* CreateSceneProxy() override;
 
 	virtual void SetStaticMesh(SStaticMesh* inNewMesh);
-	SStaticMesh* GetStaticMesh() const { return _StaticMesh; }
+	SStaticMesh* GetStaticMesh() { return _StaticMesh; }
 
 	void SetMaterial(int32 index, SMaterial* material);
-	SMaterial* GetMaterial(int32 index) const;
-	int32 GetMaterialCount() const;
+	SMaterial* GetMaterial(int32 index);
+	int32 GetMaterialCount();
 };

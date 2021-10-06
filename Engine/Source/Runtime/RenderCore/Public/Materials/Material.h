@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "MaterialInterface.h"
-#include "RHI/RHIStructures.h"
 
 interface IRHIShader;
 class SVertexFactory;
@@ -28,7 +27,7 @@ public:
 	/// <summary>
 	/// Provide shader parameter declaration of this shader program.
 	/// </summary>
-	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const { return {}; }
+	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() { return {}; }
 
 	/// <summary>
 	/// Compile vertex shader bytecode.
@@ -39,4 +38,6 @@ public:
 	/// Compile pixel shader bytecode.
 	/// </summary>
 	virtual std::span<uint8 const> CompilePS() = 0;
+
+	IRHIShader* GetShader() { return _shader; }
 };

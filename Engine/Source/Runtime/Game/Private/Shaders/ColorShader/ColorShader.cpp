@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Shaders/ColorShader/ColorShader.h"
 #include "Materials/Material.h"
 
@@ -11,32 +10,44 @@
 #include "ColorShaderVS.hlsl.h"
 #include "ColorShaderPS.hlsl.h"
 
-SColorShader::SColorShader(SRHIDevice* device) : Super(device)
+SColorShader::SColorShader(IRHIDevice* device) : Super(device)
 {
-	class ColorShaderMaterial : public SMaterial
+	_parameters =
 	{
-	public:
-		using Super = SMaterial;
-
-	public:
-		ColorShaderMaterial(SColorShader* shader) : Super(shader)
+		// [0] Camera
 		{
-		}
-
-		virtual int32 GetRootParameterMappingIndex(std::wstring_view parameterName) const override
+			L"Camera",
+			ERHIShaderParameterType::ParameterCollection_CameraConstants,
+			0,
+		},
+		// [1] Camera
 		{
-			if (parameterName == L"Color")
+			L"Color",
+			ERHIShaderParameterType::ScalarParameterConstants,
+			1,
+		},
+	};
+
+	_elements =
+	{
+		// [0] Camera constants.
+		{
+			.Type = ERHIShaderParameterType::ParameterCollection_CameraConstants,
+			.ParameterCollection =
 			{
-				return 1;
+				.ShaderRegister = 0
 			}
-			else
+		},
+		// [1] gColor
+		{
+			.Type = ERHIShaderParameterType::ScalarParameterConstants,
+			.ScalarConstantsParameter =
 			{
-				return Super::GetRootParameterMappingIndex(parameterName);
+				.ShaderRegister = 1,
+				.Num32Bits = 3
 			}
 		}
 	};
-
-	_material = NewObject<ColorShaderMaterial>(this);
 }
 
 std::span<uint8 const> SColorShader::CompileVS()
@@ -47,37 +58,4 @@ std::span<uint8 const> SColorShader::CompileVS()
 std::span<uint8 const> SColorShader::CompilePS()
 {
 	return pColorShaderPS;
-}
-
-SMaterial* SColorShader::GetDefaultMaterial() const
-{
-	return _material;
-}
-
-std::vector<RHIShaderParameterElement> SColorShader::GetShaderParameterDeclaration() const
-{
-	std::vector<RHIShaderParameterElement> elements;
-
-	// [0] Camera constants.
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::ParameterCollection_CameraConstants,
-		.ParameterCollection =
-		{
-			.ShaderRegister = 0
-		}
-	};
-
-	// [1] gColor
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::ScalarParameterConstants,
-		.ScalarConstantsParameter =
-		{
-			.ShaderRegister = 1,
-			.Num32Bits = 3
-		}
-	};
-
-	return elements;
 }

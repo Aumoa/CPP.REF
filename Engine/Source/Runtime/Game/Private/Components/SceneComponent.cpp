@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Components/SceneComponent.h"
 #include "LogGame.h"
 
@@ -167,7 +166,7 @@ Transform SSceneComponent::GetComponentTransform() const
 	return _worldTransform;
 }
 
-Vector3 SSceneComponent::GetLocation() const
+Vector3 SSceneComponent::GetLocation()
 {
 	return _transform.Translation;
 }
@@ -178,7 +177,7 @@ void SSceneComponent::SetLocation(const Vector3& value)
 	UpdateWorldTransform();
 }
 
-Vector3 SSceneComponent::GetScale() const
+Vector3 SSceneComponent::GetScale()
 {
 	return _transform.Scale;
 }
@@ -189,7 +188,7 @@ void SSceneComponent::SetScale(const Vector3& value)
 	UpdateWorldTransform();
 }
 
-Quaternion SSceneComponent::GetRotation() const
+Quaternion SSceneComponent::GetRotation()
 {
 	return _transform.Rotation;
 }
@@ -200,7 +199,7 @@ void SSceneComponent::SetRotation(const Quaternion& value)
 	UpdateWorldTransform();
 }
 
-EComponentMobility SSceneComponent::GetMobility() const
+EComponentMobility SSceneComponent::GetMobility()
 {
 	return _mobility;
 }

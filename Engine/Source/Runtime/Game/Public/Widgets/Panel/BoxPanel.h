@@ -34,22 +34,22 @@ protected:
 	SBoxPanel(const std::wstring& name, EOrientation orientation);
 	virtual ~SBoxPanel() override;
 
-	virtual Vector2 GetDesiredSize() const override;
+	virtual Vector2 GetDesiredSize() override;
 
 public:
 	Slot& AddSlot();
 	bool RemoveSlot(size_t index);
-	size_t FindSlot(const SWidget* content) const;
+	size_t FindSlot(const SWidget* content);
 	void ClearSlots();
-	size_t NumSlots() const;
+	size_t NumSlots();
 
-	inline EOrientation GetOrientation() const { return _orientation; }
+	inline EOrientation GetOrientation() { return _orientation; }
 
 protected:
-	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) override;
 
 private:
-	void ArrangeChildrenAlong(EOrientation orientation, EFlowDirection layoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens) const;
+	void ArrangeChildrenAlong(EOrientation orientation, EFlowDirection layoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens);
 	static Vector2 ComputeDesiredSizeForBox(EOrientation orientation, const std::vector<Slot>& slots);
 
 	static constexpr Margin LayoutPaddingWithFlow(const Margin& padding, EFlowDirection layoutFlow)

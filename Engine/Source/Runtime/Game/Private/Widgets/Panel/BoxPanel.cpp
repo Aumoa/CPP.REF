@@ -1,10 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Widgets/Panel/BoxPanel.h"
 #include "Layout/AlignmentArrangeResult.h"
 #include "Layout/ArrangedChildrens.h"
 #include "LogGame.h"
+#include <ranges>
 
 SBoxPanel::SBoxPanel(const std::wstring& name, EOrientation orientation) : Super(name)
 	, _orientation(orientation)
@@ -15,7 +15,7 @@ SBoxPanel::~SBoxPanel()
 {
 }
 
-Vector2 SBoxPanel::GetDesiredSize() const
+Vector2 SBoxPanel::GetDesiredSize()
 {
 	return ComputeDesiredSizeForBox(_orientation, _slots);
 }
@@ -36,7 +36,7 @@ bool SBoxPanel::RemoveSlot(size_t index)
 	return true;
 }
 
-size_t SBoxPanel::FindSlot(const SWidget* content) const
+size_t SBoxPanel::FindSlot(const SWidget* content)
 {
 	for (size_t i = 0; i < _slots.size(); ++i)
 	{
@@ -54,17 +54,17 @@ void SBoxPanel::ClearSlots()
 	_slots.resize(0);
 }
 
-size_t SBoxPanel::NumSlots() const
+size_t SBoxPanel::NumSlots()
 {
 	return _slots.size();
 }
 
-void SBoxPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SBoxPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
 {
 	ArrangeChildrenAlong(_orientation, GetFlowDirection(), allottedGeometry, arrangedChildrens);
 }
 
-void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection inLayoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens) const
+void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection inLayoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens)
 {
 	// Allotted space will be given to fixed-size children first.
 	// Remaining space will be proportionately divided between stretch children (SizeRule_Stretch)

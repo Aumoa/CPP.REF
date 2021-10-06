@@ -69,7 +69,7 @@ private:
 
 	D3D12_RESOURCE_BARRIER Conv(const RHIResourceBarrier& value)
 	{
-		D3D12_RESOURCE_BARRIER barrier;
+		D3D12_RESOURCE_BARRIER barrier = {};
 		switch (value.index())
 		{
 		case 0:
@@ -80,6 +80,7 @@ private:
 			barrier.Transition.StateBefore = Conv(transition.StateBefore);
 			barrier.Transition.StateAfter = Conv(transition.StateAfter);
 			barrier.Transition.Subresource = Conv(transition.Subresource);
+			break;
 		}
 		case 1:
 		{
@@ -87,12 +88,14 @@ private:
 			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
 			barrier.Aliasing.pResourceBefore = Conv(aliasing.pResourceBefore);
 			barrier.Aliasing.pResourceAfter = Conv(aliasing.pResourceAfter);
+			break;
 		}
 		case 2:
 		{
 			const auto& uav = std::get<RHIResourceUAVBarrier>(value);
 			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
 			barrier.UAV.pResource = Conv(uav.pResource);
+			break;
 		}
 		}
 		return barrier;

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 
 class SWidget;
 
@@ -11,14 +11,14 @@ class GAME_API SPaintArgs : implements SObject
 	GENERATED_BODY(SPaintArgs)
 
 private:
-	const SWidget* _parent = nullptr;
+	SWidget* _parent = nullptr;
 	std::chrono::duration<float> _deltaTime;
 
 public:
-	SPaintArgs(const SWidget* parentWidget, std::chrono::duration<float> deltaTime);
+	SPaintArgs(SWidget* parentWidget, std::chrono::duration<float> deltaTime);
 
-	SPaintArgs* WithNewParent(const SWidget* parentWidget) const;
+	SPaintArgs* WithNewParent(SWidget* parentWidget);
 
-	const SWidget* GetParentWidget() const { return _parent; }
-	std::chrono::duration<float> GetDeltaTime() const { return _deltaTime; }
+	SWidget* GetParentWidget() { return _parent; }
+	std::chrono::duration<float> GetDeltaTime() { return _deltaTime; }
 };

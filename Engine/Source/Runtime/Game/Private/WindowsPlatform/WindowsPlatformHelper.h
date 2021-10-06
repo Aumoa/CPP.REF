@@ -4,7 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "LogGame.h"
+
+#pragma push_macro("interface")
+#undef interface
+
 #include <comdef.h>
+#include <wrl/client.h>
+#include <wincodec.h>
+
+using Microsoft::WRL::ComPtr;
+
+#pragma pop_macro("interface")
 
 DECLARE_LOG_CATEGORY(, LogWindows);
 

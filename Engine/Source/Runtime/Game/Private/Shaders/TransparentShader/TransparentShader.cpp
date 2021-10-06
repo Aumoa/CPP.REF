@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Shaders/TransparentShader/TransparentShader.h"
 #include "Materials/Material.h"
 
@@ -11,37 +10,59 @@
 #include "TransparentShaderVS.hlsl.h"
 #include "TransparentShaderPS.hlsl.h"
 
-STransparentShader::STransparentShader(SRHIDevice* device) : Super(device)
+STransparentShader::STransparentShader(IRHIDevice* device) : Super(device)
 {
-	class TransparentShaderMaterial : public SMaterial
+	_parameters =
 	{
-	public:
-		using Super = SMaterial;
-
-	public:
-		TransparentShaderMaterial(STransparentShader* shader) : Super(shader)
+		// [0] Camera
 		{
-			_BlendMode = EMaterialBlendMode::Transparent;
-		}
-
-		virtual int32 GetRootParameterMappingIndex(std::wstring_view parameterName) const override
+			L"Camera",
+			ERHIShaderParameterType::ParameterCollection_CameraConstants,
+			0
+		},
+		// [1] Color
 		{
-			if (parameterName == L"Color")
+			L"Color",
+			ERHIShaderParameterType::ScalarParameterConstants,
+			1
+		},
+		// [2] Alpha
+		{
+			L"Alpha",
+			ERHIShaderParameterType::ScalarParameterConstants,
+			2
+		},
+	};
+
+	_elements =
+	{
+		// [0] Camera constants.
+		{
+			.Type = ERHIShaderParameterType::ParameterCollection_CameraConstants,
+			.ParameterCollection =
 			{
-				return 1;
+				.ShaderRegister = 0
 			}
-			else if (parameterName == L"Alpha")
+		},
+		// [1] gColor
+		{
+			.Type = ERHIShaderParameterType::ScalarParameterConstants,
+			.ScalarConstantsParameter =
 			{
-				return 2;
+				.ShaderRegister = 1,
+				.Num32Bits = 3
 			}
-			else
+		},
+		// [2] gAlpha
+		{
+			.Type = ERHIShaderParameterType::ScalarParameterConstants,
+			.ScalarConstantsParameter =
 			{
-				return Super::GetRootParameterMappingIndex(parameterName);
+				.ShaderRegister = 2,
+				.Num32Bits = 1
 			}
 		}
 	};
-
-	_material = NewObject<TransparentShaderMaterial>(this);
 }
 
 std::span<uint8 const> STransparentShader::CompileVS()
@@ -52,48 +73,4 @@ std::span<uint8 const> STransparentShader::CompileVS()
 std::span<uint8 const> STransparentShader::CompilePS()
 {
 	return pTransparentShaderPS;
-}
-
-SMaterial* STransparentShader::GetDefaultMaterial() const
-{
-	return _material;
-}
-
-std::vector<RHIShaderParameterElement> STransparentShader::GetShaderParameterDeclaration() const
-{
-	std::vector<RHIShaderParameterElement> elements;
-
-	// [0] Camera constants.
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::ParameterCollection_CameraConstants,
-		.ParameterCollection =
-		{
-			.ShaderRegister = 0
-		}
-	};
-
-	// [1] gColor
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::ScalarParameterConstants,
-		.ScalarConstantsParameter =
-		{
-			.ShaderRegister = 1,
-			.Num32Bits = 3
-		}
-	};
-
-	// [2] gAlpha
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::ScalarParameterConstants,
-		.ScalarConstantsParameter =
-		{
-			.ShaderRegister = 2,
-			.Num32Bits = 1
-		}
-	};
-
-	return elements;
 }

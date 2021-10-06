@@ -6,10 +6,10 @@
 #include <vector>
 #include <queue>
 
+interface IRHIDevice;
+interface IRHIDeviceContext;
+interface IRHIShader;
 class SWorld;
-class SRHIDevice;
-class SRHIDeviceContext;
-class SRHIShader;
 class SSceneVisibility;
 class SPrimitiveSceneProxy;
 class SMaterial;
@@ -30,26 +30,26 @@ private:
 
 private:
 	SWorld* _world = nullptr;
-	SRHIDevice* _device = nullptr;
+	IRHIDevice* _device = nullptr;
 	std::vector<SPrimitiveSceneProxy*> _primitives;
 	std::queue<int64> _spaces;
 
 	SSceneVisibility* _localPlayerView = nullptr;
-	std::map<size_t, std::vector<SRHIShader*>> _renderQueue;
+	std::map<size_t, std::vector<IRHIShader*>> _renderQueue;
 	std::vector<SSceneRenderer> _renderers;
 
 public:
-	SScene(SWorld* worldOwner, SRHIDevice* device);
+	SScene(SWorld* worldOwner, IRHIDevice* device);
 	~SScene() override;
 
 	void UpdateScene(std::chrono::duration<float> elapsedTime);
 	void InitViews(const MinimalViewInfo& localPlayerView);
-	void RenderScene(SRHIDeviceContext* dc);
+	void RenderScene(IRHIDeviceContext* dc);
 
 	int64 AddPrimitive(SPrimitiveSceneProxy* proxy);
 	void RemovePrimitive(int64 primitiveId);
 
-	SRHIDevice* GetDevice() const { return _device; }
+	IRHIDevice* GetDevice() const { return _device; }
 
 private:
 	SPrimitiveSceneProxy* RecreateRenderSceneProxy(SPrimitiveSceneProxy* proxy);

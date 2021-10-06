@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "Player.h"
 
+interface IRHIDeviceContext;
 class SGameEngine;
 class SSlateApplication;
 class SSlateShader;
-class SRHIDeviceContext;
 class SSlateWindowElementList;
 struct IFrameworkView;
 
@@ -26,7 +26,7 @@ public:
 
 	void Init(IFrameworkView* frameworkView);
 	void Tick(std::chrono::duration<float> elapsedTime);
-	void Render(SRHIDeviceContext* deviceContext, SSlateShader* shader);
+	void Render(IRHIDeviceContext* deviceContext, SSlateShader* shader);
 
 	inline IFrameworkView* GetFrameworkView() const { return _frameworkView; }
 	inline SSlateApplication* GetSlateWindow() const { return _slateWindow; }

@@ -17,7 +17,7 @@ public:
 	SAsset(const std::filesystem::path& path);
 	~SAsset() override;
 
-	std::filesystem::path GetAssetPath() const;
+	std::filesystem::path GetAssetPath();
 	
 	size_t AddRef();
 	size_t ReleaseRef();

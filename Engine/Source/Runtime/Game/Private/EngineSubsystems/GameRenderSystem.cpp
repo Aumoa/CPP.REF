@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
@@ -13,11 +12,13 @@
 #include "Shaders/SlateShader/SlateShader.h"
 #include "Ticking/TickScheduler.h"
 #include "GameFramework/LocalPlayer.h"
-#include "FreeType/FreeTypeModule.h"
-#include "FreeType/FontCachingManager.h"
-
-#include "FreeType/FontFace.h"
-#include "Assets/Texture2D.h"
+#include "RHI/IRHIFactory.h"
+#include "RHI/IRHIDevice.h"
+#include "RHI/IRHISwapChain.h"
+#include "RHI/IRHITexture2D.h"
+#include "RHI/IRHIDeviceContext.h"
+#include "RHI/IRHIRenderTargetView.h"
+#include "RHI/IRHIDepthStencilView.h"
 
 #if _DEBUG
 constexpr bool bDebug = true;
@@ -33,10 +34,6 @@ SGameRenderSystem::SGameRenderSystem() : Super()
 
 SGameRenderSystem::~SGameRenderSystem()
 {
-	if (_primaryQueue)
-	{
-		_primaryQueue->WaitLastSignal();
-	}
 }
 
 void SGameRenderSystem::Init()
@@ -45,34 +42,21 @@ void SGameRenderSystem::Init()
 
 	SE_LOG(LogRender, Verbose, L"Beginning initialize GameRenderSystem.");
 
-	_scheduler = NewObject<STickScheduler>();
-	_device = NewObject<SRHIDevice>(bDebug);
-	_primaryQueue = _device->GetPrimaryQueue();
-	_deviceContext = NewObject<SRHIDeviceContext>(_device);
+	_factory = IRHIFactory::CreateFactory(this);
+
+	// Getting primary adapter for create device.
+	IRHIAdapter* adapter = _factory->GetAdapter(0);
+	_device = _factory->CreateDevice(adapter);
+	_primaryQueue = _device->GetImmediateContext();
 	_colorVertexFactory = NewObject<SColorVertexFactory>(_device);
 	_colorShader = NewObject<SColorShader>(_device);
 	_colorShader->Compile(_colorVertexFactory);
-	_rtv = NewObject<SRHIRenderTargetView>(_device, 3);
-	_dsv = NewObject<SRHIDepthStencilView>(_device, 1);
+	_rtv = _device->CreateRenderTargetView(3);
+	_dsv = _device->CreateDepthStencilView(1);
 	_transparentShader = NewObject<STransparentShader>(_device);
 	_transparentShader->Compile(_colorVertexFactory);
 	_slateShader = NewObject<SSlateShader>(_device);
 	_slateShader->Compile(nullptr);
-	_freeTypeModule = NewObject<SFreeTypeModule>();
-	_fontCachingManager = _freeTypeModule->CreateCachingMgr(_device);
-
-	SFontFace* ff = _freeTypeModule->CreateFontFace(L"Arial");
-	ff->SetFontSize(20);
-
-	_fontCachingManager->StreamGlyphs(ff, L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 ");
-	_fontCachingManager->Apply();
-
-	SE_LOG(LogRender, Verbose, L"Register RHI garbage collector.");
-	auto gc = [this]()
-	{
-		Collect();
-	};
-	_scheduler->AddSchedule({ .Task = gc, .Delay = 10s, .InitDelay = 10s });
 
 	SE_LOG(LogRender, Verbose, L"Finish to initialize GameRenderSystem.");
 }
@@ -81,44 +65,31 @@ void SGameRenderSystem::Present()
 {
 	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
 
-	RHIViewport vp =
-	{
-		.TopLeftX = 0,
-		.TopLeftY = 0,
-		.Width = (float)_vpWidth,
-		.Height = (float)_vpHeight,
-		.MinDepth = 0,
-		.MaxDepth = 1.0f
-	};
+	RHIViewport vp(0, 0, (float)_vpWidth, (float)_vpHeight, 0, 1.0f);
+	RHIScissorRect sc(0, 0, _vpWidth, _vpHeight);
 
-	RHIScissorRect sc =
+	RHIResourceTransitionBarrier barrierBegin =
 	{
-		.Left = 0,
-		.Top = 0,
-		.Right = _vpWidth,
-		.Bottom = _vpHeight
-	};
-
-	RHITransitionBarrier barrierBegin =
-	{
-		.Resource = _frameworkViewChain->GetBuffer(bufferIdx),
+		.pResource = _frameworkViewChain->GetBuffer(bufferIdx),
 		.StateBefore = ERHIResourceStates::Present,
 		.StateAfter = ERHIResourceStates::RenderTarget
 	};
-	RHITransitionBarrier barrierEnd =
+	RHIResourceTransitionBarrier barrierEnd =
 	{
-		.Resource = _frameworkViewChain->GetBuffer(bufferIdx),
+		.pResource = _frameworkViewChain->GetBuffer(bufferIdx),
 		.StateBefore = ERHIResourceStates::RenderTarget,
 		.StateAfter = ERHIResourceStates::Present
 	};
 
-	_deviceContext->Begin();
-	_deviceContext->TransitionBarrier(1, &barrierBegin);
-	_deviceContext->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
-	_deviceContext->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
-	_deviceContext->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
-	_deviceContext->RSSetScissorRects(1, &sc);
-	_deviceContext->RSSetViewports(1, &vp);
+	_device->BeginFrame();
+
+	_primaryQueue->Begin(0, 0);
+	_primaryQueue->ResourceBarrier(barrierBegin);
+	_primaryQueue->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
+	_primaryQueue->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
+	_primaryQueue->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
+	_primaryQueue->RSSetScissorRect(sc);
+	_primaryQueue->RSSetViewport(vp);
 
 	SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
 	SWorld* world = levelSystem->GetWorld();
@@ -128,44 +99,34 @@ void SGameRenderSystem::Present()
 	//MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
 	//localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
 	//scene->InitViews(localPlayerView);
-	//scene->RenderScene(_deviceContext);
+	//scene->RenderScene(_primaryQueue);
 
 	SLocalPlayer* localPlayer = GEngine->GetEngineSubsystem<SGamePlayerSystem>()->GetLocalPlayer();
 	if (localPlayer)
 	{
-		_deviceContext->SetGraphicsShader(_slateShader);
-		_deviceContext->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-		localPlayer->Render(_deviceContext, _slateShader);
+		_primaryQueue->SetGraphicsShader(_slateShader->GetShader());
+		_primaryQueue->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+		localPlayer->Render(_primaryQueue, _slateShader);
 	}
 
-	_deviceContext->TransitionBarrier(1, &barrierEnd);
-	_deviceContext->End();
-
-	_primaryQueue->ExecuteDeviceContext(_deviceContext);
+	_primaryQueue->ResourceBarrier(barrierEnd);
+	_primaryQueue->End();
 
 	_frameworkViewChain->Present();
-	_primaryQueue->Signal();
-	_primaryQueue->WaitLastSignal();
+
+	_device->EndFrame();
 }
 
 void SGameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)
 {
 	_frameworkView = frameworkView;
-	_frameworkViewChain = NewObject<SRHISwapChain>(_device, frameworkView, _primaryQueue);
+	_frameworkViewChain = _factory->CreateSwapChain(frameworkView, _device);
 	_frameworkView->Size.AddSObject(this, &SGameRenderSystem::ResizeApp);
 }
 
-IFrameworkView* SGameRenderSystem::GetFrameworkView() const
+IFrameworkView* SGameRenderSystem::GetFrameworkView()
 {
 	return _frameworkView;
-}
-
-void SGameRenderSystem::Collect()
-{
-	if (int32 collect = _primaryQueue->Collect(); collect)
-	{
-		SE_LOG(LogRender, Verbose, L"{} garbages are collected.", collect);
-	}
 }
 
 void SGameRenderSystem::ResizeApp(int32 width, int32 height)
@@ -175,35 +136,51 @@ void SGameRenderSystem::ResizeApp(int32 width, int32 height)
 		return;
 	}
 
-	// On the framework view is resized, wait all graphics commands for
-	// synchronize and cleanup resource lock states.
-	_primaryQueue->WaitLastSignal();
-
-	_frameworkViewChain->ResizeBuffers(width, height);
-
-	for (int32 i = 0; i < 3; ++i)
+	if (_device)
 	{
-		SRHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
-		_rtv->CreateRenderTargetView(texture, i);
+		// On the framework view is resized, wait all graphics commands for
+		// synchronize and cleanup resource lock states.	{
+		_device->BeginFrame();
+
+		_frameworkViewChain->ResizeBuffers(width, height);
+
+		for (int32 i = 0; i < 3; ++i)
+		{
+			IRHITexture2D* texture = _frameworkViewChain->GetBuffer(i);
+			_rtv->CreateRenderTargetView(i, texture, nullptr);
+		}
+
+		//// Resize depth stencil buffer.
+		if (_depthBuffer != nullptr)
+		{
+			DestroySubobject(_depthBuffer);
+		}
+
+		RHITexture2DClearValue clearValue =
+		{
+			.Format = ERHIPixelFormat::D24_UNORM_S8_UINT,
+			.DepthStencil = { 1.0f, 0 }
+		};
+
+		RHITexture2DDesc dsDesc = {};
+		dsDesc.Width = width;
+		dsDesc.Height = height;
+		dsDesc.DepthOrArraySize = 1;
+		dsDesc.MipLevels = 1;
+		dsDesc.ClearValue = clearValue;
+		dsDesc.Format = ERHIPixelFormat::D24_UNORM_S8_UINT;
+		dsDesc.InitialState = ERHIResourceStates::DepthWrite;
+		dsDesc.Flags = ERHIResourceFlags::AllowDepthStencil;
+		dsDesc.Usage = ERHIBufferUsage::Default;
+
+		_depthBuffer = _device->CreateTexture2D(dsDesc, nullptr);
+		_dsv->CreateDepthStencilView(0, _depthBuffer, nullptr);
+
+		_vpWidth = width;
+		_vpHeight = height;
+
+		SE_LOG(LogRender, Info, L"Application resized to {}x{}.", width, height);
+
+		_device->EndFrame();
 	}
-
-	// Resize depth stencil buffer.
-	if (_depthBuffer != nullptr)
-	{
-		DestroySubobject(_depthBuffer);
-	}
-
-	RHITexture2DClearValue clearValue =
-	{
-		.Format = ERHIPixelFormat::D24_UNORM_S8_UINT,
-		.DepthStencil = { 1.0f, 0 }
-	};
-
-	_depthBuffer = _device->CreateTexture2D(ERHIResourceStates::DepthWrite, ERHIPixelFormat::D24_UNORM_S8_UINT, width, height, clearValue, ERHIResourceFlags::AllowDepthStencil);
-	_dsv->CreateDepthStencilView(_depthBuffer, 0);
-
-	_vpWidth = width;
-	_vpHeight = height;
-
-	SE_LOG(LogRender, Info, L"Application resized to {}x{}.", width, height);
 }

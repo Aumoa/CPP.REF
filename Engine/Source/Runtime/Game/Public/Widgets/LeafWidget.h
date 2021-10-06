@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "Widget.h"
 
 class GAME_API SLeafWidget : public SWidget
@@ -14,7 +14,7 @@ public:
 	virtual ~SLeafWidget() override;
 
 protected:
-	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) override;
 
 	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) override;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event) override;

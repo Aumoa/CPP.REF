@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Widgets/Panel/CanvasPanel.h"
 #include "Layout/ArrangedChildrens.h"
 #include "Draw/PaintArgs.h"
@@ -13,16 +12,16 @@ SCanvasPanel::~SCanvasPanel()
 {
 }
 
-Vector2 SCanvasPanel::GetDesiredSize() const
+Vector2 SCanvasPanel::GetDesiredSize()
 {
 	Vector2 finalDesiredSize(0, 0);
 
 	// Arrange the children now in their proper z-order.
 	for (size_t i = 0; i < _slots.size(); ++i)
 	{
-		const Slot& curChild = _slots[i];
-		const SWidget* widget = curChild.GetContent();
-		const ESlateVisibility childVisibility = widget->GetVisibility();
+		Slot& curChild = _slots[i];
+		SWidget* widget = curChild.GetContent();
+		ESlateVisibility childVisibility = widget->GetVisibility();
 
 		// As long as the widgets are not collapsed, they should contribute to the desired size.
 		if (childVisibility != ESlateVisibility::Collapsed)
@@ -63,7 +62,7 @@ bool SCanvasPanel::RemoveSlot(size_t index)
 	return true;
 }
 
-size_t SCanvasPanel::FindSlot(const SWidget* content) const
+size_t SCanvasPanel::FindSlot(const SWidget* content)
 {
 	for (size_t i = 0; i < _slots.size(); ++i)
 	{
@@ -81,7 +80,7 @@ void SCanvasPanel::ClearSlots()
 	_slots.resize(0);
 }
 
-size_t SCanvasPanel::NumSlots() const
+size_t SCanvasPanel::NumSlots()
 {
 	return _slots.size();
 }
@@ -92,7 +91,7 @@ DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, attr)
 	_slots = std::move(attr.Slots);
 }
 
-int32 SCanvasPanel::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SCanvasPanel::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
 {
 	SArrangedChildrens arrangedChildren(ESlateVisibility::Visible);
 	ArrangeChildren(&arrangedChildren, allottedGeometry);
@@ -120,7 +119,7 @@ int32 SCanvasPanel::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeome
 	return maxLayer;
 }
 
-void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
 {
 	if (_slots.size() > 0)
 	{

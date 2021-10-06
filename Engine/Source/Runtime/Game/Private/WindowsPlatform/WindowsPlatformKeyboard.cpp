@@ -8,7 +8,6 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
-#include "pch.h"
 #include "WindowsPlatform/WindowsPlatformKeyboard.h"
 #include "WindowsPlatformHelper.h"
 

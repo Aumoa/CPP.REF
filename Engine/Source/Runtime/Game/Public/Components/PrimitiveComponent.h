@@ -21,7 +21,7 @@ public:
 	SPrimitiveSceneProxy* SceneProxy = nullptr;
 
 	void SetHiddenInGame(bool bHidden);
-	inline bool IsHiddenInGame() const { return _bHiddenInGame; }
+	inline bool IsHiddenInGame() { return _bHiddenInGame; }
 
 	virtual void MarkRenderStateDirty() override;
 };

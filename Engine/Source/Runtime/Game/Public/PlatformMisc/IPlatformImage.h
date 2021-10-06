@@ -5,6 +5,6 @@
 #include "CoreMinimal.h"
 #include "RHI/IRHIImageSourceView.h"
 
-struct GAME_API IPlatformImage : implements SObject, implements IRHIImageSourceView
+interface IPlatformImage : implements SObject, implements IRHIImageSourceView
 {
 };

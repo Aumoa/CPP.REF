@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "GameFramework/LocalPlayer.h"
 #include "GameEngine.h"
 #include "GameInstance.h"
@@ -33,7 +32,7 @@ void SLocalPlayer::Tick(std::chrono::duration<float> elapsedTime)
 	_slateWindow->ExecuteTick(elapsedTime);
 }
 
-void SLocalPlayer::Render(SRHIDeviceContext* deviceContext, SSlateShader* shader)
+void SLocalPlayer::Render(IRHIDeviceContext* deviceContext, SSlateShader* shader)
 {
 	_drawElements->Clear();
 	_slateWindow->ExecutePaint(_drawElements);

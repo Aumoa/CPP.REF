@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Widgets/Window.h"
 #include "Layout/LayoutImpl.h"
 #include "Layout/ArrangedChildrens.h"
@@ -20,13 +19,13 @@ void SWindow::ExecuteTick(std::chrono::duration<float> deltaTime)
 	Tick(*(_cachedRootGeometry = MakeRootGeometry()), _lastDeltaTime = deltaTime);
 }
 
-void SWindow::ExecutePaint(SSlateWindowElementList* drawElements) const
+void SWindow::ExecutePaint(SSlateWindowElementList* drawElements)
 {
 	ScopedPtr paintArgs = drawElements->NewObject<SPaintArgs>(this, _lastDeltaTime);
 	Paint(paintArgs.Get(), *_cachedRootGeometry, Rect(Vector2::GetZero(), GetDesiredSize()), drawElements, 0, IsEnabled());
 }
 
-Geometry SWindow::MakeRootGeometry() const
+Geometry SWindow::MakeRootGeometry()
 {
 	return Geometry::MakeRoot(GetDesiredSize(), SlateLayoutTransform());
 }
@@ -43,7 +42,7 @@ void SWindow::AddWidgetToScreen(SWidget* widget)
 	widget->SetOuter(this);
 }
 
-SWidget* SWindow::GetWidgetInScreen(const std::wstring& name) const
+SWidget* SWindow::GetWidgetInScreen(const std::wstring& name)
 {
 	for (size_t i = 0; i < _screenWidgets.size(); ++i)
 	{
@@ -71,12 +70,12 @@ void SWindow::RemoveWidgetFromScreen(const std::wstring& name)
 	SE_LOG(LogSlateWindow, Verbose, L"Could not found widget name: \"{}\". Abort.", name);
 }
 
-Vector2 SWindow::GetDesiredSize() const
+Vector2 SWindow::GetDesiredSize()
 {
 	return _localSize;
 }
 
-void SWindow::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SWindow::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
 {
 	for (auto it = _screenWidgets.begin(); it != _screenWidgets.end(); ++it)
 	{

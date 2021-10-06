@@ -10,6 +10,11 @@ SD3D12CommandQueue::SD3D12CommandQueue(SDXGIFactory* factory, SD3D12Device* devi
 	_event = NewObject<SEventHandle>();
 }
 
+SD3D12CommandQueue::~SD3D12CommandQueue()
+{
+	WaitCompleted();
+}
+
 void SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts)
 {
 	std::vector<ID3D12CommandList*> commandLists(deviceContexts.size());
@@ -53,5 +58,14 @@ void SD3D12CommandQueue::Collect()
 		{
 			break;
 		}
+	}
+}
+
+void SD3D12CommandQueue::WaitCompleted()
+{
+	if (_fence->GetCompletedValue() < _fenceValue)
+	{
+		_fence->SetEventOnCompletion(_fenceValue, _event->GetHandle());
+		_event->Wait();
 	}
 }

@@ -28,11 +28,13 @@ private:
 
 public:
 	SD3D12CommandQueue(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence);
+	virtual ~SD3D12CommandQueue() override;
 
 	virtual void ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts) override;
 
 	uint64 GetFenceValue();
 	void Collect();
+	void WaitCompleted();
 
 public:
 	DECLARE_GETTER(ID3D12CommandQueue, _queue);

@@ -49,63 +49,26 @@ public:
 	void AttachToSocket(SSceneComponent* attachTo, const std::wstring& socketName);
 	void DetachFromComponent();
 
-	inline SSceneComponent* GetAttachParent() const { return _attachment.AttachmentRoot; }
-	inline std::wstring GetAttachSocketName() const { return _attachment.SocketName; }
-	inline const std::vector<SSceneComponent*>& GetChildComponents() const { return _childComponents; }
+	inline SSceneComponent* GetAttachParent() { return _attachment.AttachmentRoot; }
+	inline std::wstring GetAttachSocketName() { return _attachment.SocketName; }
+	inline const std::vector<SSceneComponent*>& GetChildComponents() { return _childComponents; }
 	Transform GetRelativeTransform() const;
 	void SetRelativeTransform(const Transform& value);
 	Transform GetComponentTransform() const;
 
-	Vector3 GetLocation() const;
+	Vector3 GetLocation();
 	void SetLocation(const Vector3& value);
-	Vector3 GetScale() const;
+	Vector3 GetScale();
 	void SetScale(const Vector3& value);
-	Quaternion GetRotation() const;
+	Quaternion GetRotation();
 	void SetRotation(const Quaternion& value);
 
-	inline Vector3 GetComponentLocation() const { return _worldTransform.Translation; }
-	inline Vector3 GetComponentScale() const { return _worldTransform.Scale; }
-	inline Quaternion GetComponentRotation() const { return _worldTransform.Rotation; }
+	inline Vector3 GetComponentLocation() { return _worldTransform.Translation; }
+	inline Vector3 GetComponentScale() { return _worldTransform.Scale; }
+	inline Quaternion GetComponentRotation() { return _worldTransform.Rotation; }
 
-	EComponentMobility GetMobility() const;
+	EComponentMobility GetMobility();
 	void SetMobility(EComponentMobility value);
-
-	template<std::derived_from<SSceneComponent> T>
-	void ForEachSceneComponents(std::function<bool(const T*)> body) const
-	{
-		std::queue<const SSceneComponent*> hierarchy;
-		hierarchy.emplace(this);
-
-		while (!hierarchy.empty())
-		{
-			SSceneComponent* top = hierarchy.front();
-			if constexpr (is_same_v<T, SSceneComponent>)
-			{
-				if (body(top))
-				{
-					break;
-				}
-			}
-			else
-			{
-				if (auto* ptr = dynamic_cast<T*>(top); ptr != nullptr)
-				{
-					if (body(ptr))
-					{
-						break;
-					}
-				}
-			}
-
-			std::vector<SSceneComponent*> childs = top->GetChildComponents();
-			for (auto& child : childs)
-			{
-				hierarchy.emplace(child);
-			}
-
-			hierarchy.pop();
-		}
-	}
 
 	template<std::derived_from<SSceneComponent> T>
 	void ForEachSceneComponents(std::function<bool(T*)> body)

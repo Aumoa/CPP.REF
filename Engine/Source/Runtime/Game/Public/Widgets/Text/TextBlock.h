@@ -20,15 +20,15 @@ public:
 	STextBlock(const std::wstring& name);
 	virtual ~STextBlock() override;
 
-	virtual Vector2 GetDesiredSize() const override;
+	virtual Vector2 GetDesiredSize() override;
 
 	void SetText(std::wstring_view text);
-	std::wstring GetText() const;
+	std::wstring GetText();
 	void SetFont(const SlateFont& font);
-	SlateFont GetFont() const;
+	SlateFont GetFont();
 
 protected:
-	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
+	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) override;
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

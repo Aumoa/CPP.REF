@@ -3,32 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHI/RHIShader.h"
+#include "Materials/Material.h"
 #include <vector>
 #include <span>
-
-class SMaterial;
 
 /// <summary>
 /// Represents default shader bytecode.
 /// </summary>
-class GAME_API SColorShader : public SRHIShader
+class GAME_API SColorShader : public SMaterial
 {
 	GENERATED_BODY(SColorShader)
 
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
-	SMaterial* _material = nullptr;
+
+	std::vector<RHIMaterialParameterInfo> _parameters;
+	std::vector<RHIShaderParameterElement> _elements;
 
 public:
-	SColorShader(SRHIDevice* device);
+	SColorShader(IRHIDevice* device);
 
-	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
+	virtual std::vector<RHIMaterialParameterInfo> GetParametersInfo() override { return _parameters; }
 
-	SMaterial* GetDefaultMaterial() const;
-
-protected:
+	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() override { return _elements; }
 	virtual std::span<uint8 const> CompileVS() override;
 	virtual std::span<uint8 const> CompilePS() override;
 };

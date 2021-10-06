@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlatformMisc/IPlatformImageLoader.h"
+#include "WindowsPlatformHelper.h"
 #include <guiddef.h>
 
 struct IWICImagingFactory;

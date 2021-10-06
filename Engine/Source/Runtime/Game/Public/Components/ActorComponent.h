@@ -70,10 +70,10 @@ public:
 	virtual void BeginPlay();
 	virtual void EndPlay();
 
-	AActor* GetOwner() const { return _owner; }
+	AActor* GetOwner() { return _owner; }
 	void SetActive(bool bActive);
-	inline bool IsActive() const { return _bActive; }
-	inline bool HasBegunPlay() const { return _bHasBegunPlay; }
+	inline bool IsActive() { return _bActive; }
+	inline bool HasBegunPlay() { return _bHasBegunPlay; }
 
 	DECLARE_MULTICAST_EVENT(ActivatedEvent);
 	ActivatedEvent Activated;

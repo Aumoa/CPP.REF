@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
-#include "FreeType/FontFaceCachingNode.h"
+#include "CoreMinimal.h"
+//#include "FreeType/FontFaceCachingNode.h"
 #include "Layout/PaintGeometry.h"
+
+class SFontFace;
 
 struct SlateFontElement
 {

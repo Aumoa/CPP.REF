@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Asset.h"
 
-class SRHIVertexFactory;
 class SStaticMeshRenderData;
 struct RHIVertex;
 
@@ -20,8 +19,8 @@ private:
 public:
 	SStaticMesh(const std::filesystem::path& path, std::wstring_view name, SStaticMeshRenderData* renderData);
 
-	std::wstring GetName() const { return _name; }
+	std::wstring GetName() { return _name; }
 
 public:
-	SStaticMeshRenderData* GetRenderData() const { return _renderData; }
+	SStaticMeshRenderData* GetRenderData() { return _renderData; }
 };

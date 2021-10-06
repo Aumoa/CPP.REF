@@ -1,11 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "Misc/Paths.h"
 #include "LogGame.h"
 #include "Assets/Texture2D.h"
-#include "Assets/Font.h"
+#include <stack>
+#include <queue>
 
 template<class T>
 inline static auto pop_get(std::stack<T>& container)
@@ -63,10 +63,10 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 			{
 				return loaded;
 			}
-			else if (auto loaded = LoadFont(assetPath); loaded)
-			{
-				return loaded;
-			}
+			//else if (auto loaded = LoadFont(assetPath); loaded)
+			//{
+			//	return loaded;
+			//}
 			else
 			{
 				return nullptr;
@@ -140,26 +140,26 @@ STexture2D* SGameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPa
 	return nullptr;
 }
 
-SFont* SGameAssetSystem::LoadFont(const std::filesystem::path& assetPath)
-{
-	constexpr std::array AllowExtensions =
-	{
-		L".ttf",
-		L".ttc",
-		L".fon",
-	};
-
-	if (assetPath.has_extension())
-	{
-		auto ext = assetPath.extension();
-		const bool bAllowed = std::find(AllowExtensions.begin(), AllowExtensions.end(), ext.wstring()) != AllowExtensions.end();
-		if (bAllowed)
-		{
-			auto* object = NewObject<SFont>(assetPath);
-			object->StreamIn();
-			return object;
-		}
-	}
-
-	return nullptr;
-}
+//SFont* SGameAssetSystem::LoadFont(const std::filesystem::path& assetPath)
+//{
+//	constexpr std::array AllowExtensions =
+//	{
+//		L".ttf",
+//		L".ttc",
+//		L".fon",
+//	};
+//
+//	if (assetPath.has_extension())
+//	{
+//		auto ext = assetPath.extension();
+//		const bool bAllowed = std::find(AllowExtensions.begin(), AllowExtensions.end(), ext.wstring()) != AllowExtensions.end();
+//		if (bAllowed)
+//		{
+//			auto* object = NewObject<SFont>(assetPath);
+//			object->StreamIn();
+//			return object;
+//		}
+//	}
+//
+//	return nullptr;
+//}

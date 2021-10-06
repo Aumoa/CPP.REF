@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "Geometry.h"
 
 class SWidget;

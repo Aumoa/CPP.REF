@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHI/RHIVertexFactory.h"
-#include <vector>
+#include "VertexFactory.h"
 
-class GAME_API SColorVertexFactory : public SRHIVertexFactory
+class GAME_API SColorVertexFactory : public SVertexFactory
 {
 	GENERATED_BODY(SColorVertexFactory)
 
@@ -20,10 +19,13 @@ public:
 	};
 #pragma pack(pop)
 
-public:
-	SColorVertexFactory(SRHIDevice* device);
+private:
+	IRHIDevice* _device = nullptr;
 
-	virtual SRHIResource* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const override;
+public:
+	SColorVertexFactory(IRHIDevice* device);
+
+	virtual IRHIBuffer* CreateVertexBuffer(const RHIVertex* vertices, size_t count) const override;
 	virtual uint32 GetVertexStride() const override { return sizeof(MyVertex); }
 	virtual std::vector<RHIVertexElement> GetVertexDeclaration() const override;
 };

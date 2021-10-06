@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "TransformCalculus2D.h"
 #include "Scale2D.h"
 #include "SlateRenderTransform.h"

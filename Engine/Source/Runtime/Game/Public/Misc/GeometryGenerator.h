@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
+#include "RHI/RHIStructures.h"
 
 class GAME_API GeometryGenerator abstract final
 {

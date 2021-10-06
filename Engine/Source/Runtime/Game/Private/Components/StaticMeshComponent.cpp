@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Components/StaticMeshComponent.h"
 #include "LogGame.h"
 #include "Scene/StaticMeshSceneProxy.h"
@@ -71,7 +70,7 @@ void SStaticMeshComponent::SetMaterial(int32 index, SMaterial* material)
 	}
 }
 
-SMaterial* SStaticMeshComponent::GetMaterial(int32 index) const
+SMaterial* SStaticMeshComponent::GetMaterial(int32 index)
 {
 	if (index >= _materials.size())
 	{
@@ -81,7 +80,7 @@ SMaterial* SStaticMeshComponent::GetMaterial(int32 index) const
 	return _materials[index];
 }
 
-int32 SStaticMeshComponent::GetMaterialCount() const
+int32 SStaticMeshComponent::GetMaterialCount()
 {
 	return (int32)_materials.size();
 }

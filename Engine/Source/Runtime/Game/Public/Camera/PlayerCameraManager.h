@@ -23,5 +23,5 @@ public:
 	virtual void UpdateCamera(std::chrono::duration<float> elapsedTime);
 
 	void CachePlayerCamera(APlayerController* controller);
-	MinimalViewInfo GetCachedCameraView() const;
+	MinimalViewInfo GetCachedCameraView();
 };

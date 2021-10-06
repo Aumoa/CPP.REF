@@ -40,17 +40,17 @@ public:
 	SCanvasPanel(const std::wstring& name);
 	virtual ~SCanvasPanel() override;
 
-	virtual Vector2 GetDesiredSize() const override;
+	virtual Vector2 GetDesiredSize() override;
 
 	Slot& AddSlot();
 	bool RemoveSlot(size_t index);
-	size_t FindSlot(const SWidget* content) const;
+	size_t FindSlot(const SWidget* content);
 	void ClearSlots();
-	size_t NumSlots() const;
+	size_t NumSlots();
 
 protected:
-	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
-	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) override;
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

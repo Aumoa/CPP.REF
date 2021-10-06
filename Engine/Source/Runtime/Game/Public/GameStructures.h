@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "GameEnums.h"
+#include "RHI/RHIStructures.h"
 
-class SRHIVertexFactory;
+class SVertexFactory;
 class SMaterial;
 
 struct MeshBatchElement
@@ -27,7 +28,7 @@ struct MeshBatch
 
 	std::vector<MeshBatchElement> Elements;
     std::vector<SMaterial*> MaterialSlots;
-	SRHIVertexFactory* VertexFactory = nullptr;
+    SVertexFactory* VertexFactory = nullptr;
 };
 
 struct MinimalViewInfo

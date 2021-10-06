@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "EngineSubsystems/GamePlayerSystem.h"
 #include "GameFramework/LocalPlayer.h"
 #include "GameEngine.h"

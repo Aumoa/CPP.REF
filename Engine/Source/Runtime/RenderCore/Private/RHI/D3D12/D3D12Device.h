@@ -39,6 +39,8 @@ public:
 	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 count) override;
 	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 count) override;
 	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 count) override;
+	virtual void BeginFrame() override;
+	virtual void EndFrame() override;
 
 	ID3D12CommandAllocator* GetThreadPrimaryAllocator();
 	SD3D12DescriptorHeap* GetThreadPrimarySrvHeap(int32 count);

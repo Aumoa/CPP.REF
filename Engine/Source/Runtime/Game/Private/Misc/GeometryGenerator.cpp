@@ -1,8 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Misc/GeometryGenerator.h"
 #include "Misc/Bezier.h"
+#include <numbers>
 
 namespace GeometryGeneratorInternal
 {

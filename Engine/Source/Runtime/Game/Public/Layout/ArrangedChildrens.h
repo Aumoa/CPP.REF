@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "LayoutImpl.h"
 #include "ArrangedWidget.h"
 #include "LayoutEnums.h"

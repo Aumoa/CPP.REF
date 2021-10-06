@@ -2,20 +2,20 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 
-class SRHIShaderResourceView;
+interface IRHIRenderTargetView;
 
 struct SlateBrush
 {
-	SRHIShaderResourceView* ImageSource = nullptr;
+	IRHIRenderTargetView* ImageSource = nullptr;
 	Vector2 ImageSize;
 
 	SlateBrush()
 	{
 	}
 
-	SlateBrush(SRHIShaderResourceView* imageSource, const Vector2& imageSize)
+	SlateBrush(IRHIRenderTargetView* imageSource, const Vector2& imageSize)
 		: ImageSource(imageSource)
 		, ImageSize(imageSize)
 	{

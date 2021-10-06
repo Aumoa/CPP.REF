@@ -50,7 +50,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 	textureDesc.MipLevels = desc.MipLevels;
 	textureDesc.Format = (DXGI_FORMAT)desc.Format;
 	textureDesc.SampleDesc = { 1, 0 };
-	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	textureDesc.Flags = (D3D12_RESOURCE_FLAGS)desc.Flags;
 	D3D12_HEAP_PROPERTIES heapProp = { D3D12_HEAP_TYPE_DEFAULT };
 
@@ -448,6 +448,17 @@ IRHIShaderResourceView* SD3D12Device::CreateShaderResourceView(int32 count)
 	ComPtr<ID3D12DescriptorHeap> heap;
 	HR(_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap)));
 	return NewObject<SD3D12ShaderResourceView>(_factory, this, std::move(heap), count);
+}
+
+void SD3D12Device::BeginFrame()
+{
+	_immCon->Collect();
+	_immCon->WaitCompleted();
+}
+
+void SD3D12Device::EndFrame()
+{
+	_fenceValue = _immCon->GetFenceValue();
 }
 
 ID3D12CommandAllocator* SD3D12Device::GetThreadPrimaryAllocator()

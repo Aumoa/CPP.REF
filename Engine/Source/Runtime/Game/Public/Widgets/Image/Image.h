@@ -19,10 +19,10 @@ public:
 	SImage(const std::wstring& name);
 	virtual ~SImage() override;
 
-	virtual Vector2 GetDesiredSize() const override;
+	virtual Vector2 GetDesiredSize() override;
 
 	void SetBrush(const SlateBrush& brush);
-	SlateBrush GetBrush() const;
+	SlateBrush GetBrush();
 
 public:
 	BEGIN_SLATE_ATTRIBUTE
@@ -32,5 +32,5 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 protected:
-	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const override;
+	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) override;
 };

@@ -2,19 +2,17 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "StreamableRenderAsset.h"
 
-class SRHITexture2D;
-class SRHIShaderResourceView;
+interface IRHITexture2D;
 
 class GAME_API STexture2D : public SStreamableRenderAsset
 {
 	GENERATED_BODY(STexture2D)
 
 private:
-	SRHITexture2D* _texture = nullptr;
-	SRHIShaderResourceView* _shaderResourceView = nullptr;
+	IRHITexture2D* _texture = nullptr;
 
 public:
 	STexture2D(const std::filesystem::path& assetPath);
@@ -22,7 +20,6 @@ public:
 
 	virtual void StreamIn() override;
 
-	SRHITexture2D* GetRHITexture() const { return _texture; }
-	SRHIShaderResourceView* GetShaderResourceView() const { return _shaderResourceView; }
-	Vector2N GetPixelSize() const;
+	IRHITexture2D* GetRHITexture() { return _texture; }
+	Vector2N GetPixelSize();
 };

@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
+#include "Container/BitArray.h"
 #include <vector>
 
 class SScene;

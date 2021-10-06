@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "Level/World.h"
 #include "Level/Level.h"

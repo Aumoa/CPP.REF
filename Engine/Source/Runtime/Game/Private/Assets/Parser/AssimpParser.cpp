@@ -1,19 +1,17 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
-
 #include "Assets/Parser/AssimpParser.h"
-#include "assimp/scene.h"
-#include "assimp/Importer.hpp"
-#include "assimp/Exporter.hpp"
-#include "assimp/postprocess.h"
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/Exporter.hpp>
+#include <assimp/postprocess.h>
 #include "LogGame.h"
 #include "GameStructures.h"
 #include "GameEngine.h"
+#include "VertexFactory.h"
 #include "Assets/StaticMesh.h"
 #include "Scene/StaticMeshRenderData.h"
-#include "RHI/RHIVertexFactory.h"
-#include "RHI/RHIResource.h"
+#include "RHI/IRHIBuffer.h"
 
 using enum ELogVerbosity;
 
@@ -24,7 +22,7 @@ public:
 	const aiScene* _scene = nullptr;
 };
 
-SAssimpParser::SAssimpParser(SGameEngine* engine, SRHIVertexFactory* vfactory) : Super(engine, vfactory)
+SAssimpParser::SAssimpParser(SGameEngine* engine, SVertexFactory* vfactory) : Super(engine, vfactory)
 {
 	_impl = std::make_unique<Impl>();
 	_impl->_importer = std::make_unique<Assimp::Importer>();
@@ -94,12 +92,12 @@ bool SAssimpParser::TryParse(const std::filesystem::path& importPath)
 	return true;
 }
 
-bool SAssimpParser::IsStaticMesh() const
+bool SAssimpParser::IsStaticMesh()
 {
 	return _mesh != nullptr;
 }
 
-SStaticMesh* SAssimpParser::GetStaticMesh() const
+SStaticMesh* SAssimpParser::GetStaticMesh()
 {
 	return _mesh;
 }
@@ -261,11 +259,11 @@ bool SAssimpParser::ProcessStaticMeshSubsets()
 		lastIndexLocation = (int32)indexBuffer.size();
 	}
 
-	SRHIResource* vb = batch.VertexFactory->CreateVertexBuffer(vertexBuffer.data(), vertexBuffer.size());
+	IRHIBuffer* vb = batch.VertexFactory->CreateVertexBuffer(vertexBuffer.data(), vertexBuffer.size());
 	vb->SetOuter(renderData);
 	batch.VertexBufferLocation = vb->GetGPUVirtualAddress();
 
-	SRHIResource* ib = batch.VertexFactory->CreateIndexBuffer(indexBuffer.data(), indexBuffer.size());
+	IRHIBuffer* ib = batch.VertexFactory->CreateIndexBuffer(indexBuffer.data(), indexBuffer.size());
 	ib->SetOuter(renderData);
 	batch.IndexBufferLocation = ib->GetGPUVirtualAddress();
 

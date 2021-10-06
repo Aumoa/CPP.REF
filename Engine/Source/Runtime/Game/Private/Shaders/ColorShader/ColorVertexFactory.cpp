@@ -1,13 +1,14 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Shaders/ColorShader/ColorVertexFactory.h"
+#include "RHI/IRHIDevice.h"
 
-SColorVertexFactory::SColorVertexFactory(SRHIDevice* device) : Super(device)
+SColorVertexFactory::SColorVertexFactory(IRHIDevice* device) : Super(device)
+	, _device(device)
 {
 }
 
-SRHIResource* SColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
+IRHIBuffer* SColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices, size_t count) const
 {
 	std::vector<MyVertex> vertexBuffer(count);
 	for (size_t i = 0; i < count; ++i)
@@ -20,7 +21,16 @@ SRHIResource* SColorVertexFactory::CreateVertexBuffer(const RHIVertex* vertices,
 		};
 	}
 
-	return GetDevice()->CreateImmutableBuffer(ERHIResourceStates::VertexAndConstantBuffer, (const uint8*)vertexBuffer.data(), std::span(vertexBuffer).size_bytes());
+	RHIBufferDesc desc = {};
+	desc.ByteWidth = (uint32)(sizeof(MyVertex) * vertexBuffer.size());
+	desc.InitialState = ERHIResourceStates::VertexAndConstantBuffer;
+	desc.Usage = ERHIBufferUsage::Immutable;
+
+	RHISubresourceData initialData;
+	initialData.pSysMem = vertexBuffer.data();
+	initialData.SysMemPitch = desc.ByteWidth;
+
+	return _device->CreateBuffer(desc, &initialData);
 }
 
 std::vector<RHIVertexElement> SColorVertexFactory::GetVertexDeclaration() const

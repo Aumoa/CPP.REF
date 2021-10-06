@@ -2,18 +2,16 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
-#include "RHI/RHIShader.h"
+#include "CoreMinimal.h"
+#include "Materials/Material.h"
 #include "Draw/SlateWindowElementList.h"
 #include <vector>
 #include <span>
 
-class SMaterial;
-class SRHIDeviceContext;
-class SRHIShaderDescriptorView;
+interface IRHIDeviceContext;
 struct SlateRenderTransform;
 
-class GAME_API SSlateShader : public SRHIShader
+class GAME_API SSlateShader : public SMaterial
 {
 	GENERATED_BODY(SSlateShader)
 
@@ -38,23 +36,23 @@ public:
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
-	SMaterial* _material = nullptr;
-	SRHIShaderDescriptorView* _shaderDescriptorView = nullptr;
+
+	std::vector<RHIMaterialParameterInfo> _parameters;
+	std::vector<RHIShaderParameterElement> _elements;
 
 	std::vector<RHIDescriptorRange> _imageSourceRanges;
 	std::vector<RHIDescriptorRange> _fontFaceBufferRanges;
 
 public:
-	SSlateShader(SRHIDevice* device);
+	SSlateShader(IRHIDevice* device);
 
-	virtual void Compile(SRHIVertexFactory* vertexDeclaration) override;
-	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
+	virtual std::vector<RHIMaterialParameterInfo> GetParametersInfo() override { return _parameters; }
+
+	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() override { return _elements; }
+	virtual std::span<uint8 const> CompileVS() override;
+	virtual std::span<uint8 const> CompilePS() override;
 
 	SMaterial* GetDefaultMaterial() const;
 	std::vector<DrawElement> MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const;
-	void RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements);
-
-protected:
-	virtual std::span<uint8 const> CompileVS() override;
-	virtual std::span<uint8 const> CompilePS() override;
+	void RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements);
 };

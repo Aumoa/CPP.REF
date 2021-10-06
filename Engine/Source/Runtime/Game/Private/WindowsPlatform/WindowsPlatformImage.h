@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlatformMisc/IPlatformImage.h"
-
-struct IWICFormatConverter;
+#include "WindowsPlatformHelper.h"
 
 class SWindowsPlatformImage : implements SObject, implements IPlatformImage
 {
@@ -22,7 +21,6 @@ public:
 	virtual ~SWindowsPlatformImage() override;
 
 	virtual void CopyPixels(uint32 stride, uint32 bufferSize, void* pBuffer) override;
-	virtual int32 GetWidth() const override;
-	virtual int32 GetHeight() const override;
+	Vector2N GetPixelSize() const override;
 	virtual ERHIPixelFormat GetPixelFormat() const override;
 };

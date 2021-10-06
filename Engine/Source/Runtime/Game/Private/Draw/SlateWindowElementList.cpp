@@ -1,9 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Draw/SlateWindowElementList.h"
+#include "RHI/IRHIDeviceContext.h"
+#include "RHI/IRHIBuffer.h"
+#include "RHI/IRHIDevice.h"
 
-SSlateWindowElementList::SSlateWindowElementList(const SWindow* paintWindow) : Super()
+SSlateWindowElementList::SSlateWindowElementList(SWindow* paintWindow) : Super()
 	, _paintWindow(paintWindow)
 {
 }
@@ -16,10 +18,10 @@ void SSlateWindowElementList::SortByLayer()
 		{
 			return element_s->Layer;
 		}
-		else if (auto element_s = std::get_if<SlateFontElement>(&element))
-		{
-			return element_s->Layer;
-		}
+		//else if (auto element_s = std::get_if<SlateFontElement>(&element))
+		//{
+		//	return element_s->Layer;
+		//}
 		else
 		{
 			check(false);
@@ -40,10 +42,10 @@ void SSlateWindowElementList::Add(const SlateDrawElement& rhs)
 	_drawElements.emplace_back(rhs);
 }
 
-void SSlateWindowElementList::Add(const SlateFontElement& rhs)
-{
-	_drawElements.emplace_back(rhs);
-}
+//void SSlateWindowElementList::Add(const SlateFontElement& rhs)
+//{
+//	_drawElements.emplace_back(rhs);
+//}
 
 void SSlateWindowElementList::Clear()
 {
@@ -65,14 +67,14 @@ const SWindow* SSlateWindowElementList::GetPaintWindow() const
 	return _paintWindow;
 }
 
-uint64 SSlateWindowElementList::CreateBuffer(SRHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes)
+uint64 SSlateWindowElementList::CreateBuffer(IRHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes)
 {
-	SRHIDevice* device = deviceContext->GetDevice();
+	IRHIDevice* device = deviceContext->GetDevice();
 	uint64 cachedSize = 0;
 
 	if (_dynamicElementBuffer)
 	{
-		cachedSize = _dynamicElementBuffer->GetBufferSize();
+		cachedSize = _dynamicElementBuffer->GetDesc().ByteWidth;
 	}
 
 	if (cachedSize < (uint64)sizeInBytes)
@@ -80,19 +82,24 @@ uint64 SSlateWindowElementList::CreateBuffer(SRHIDeviceContext* deviceContext, c
 		// We need reallocate dynamic buffer.
 		if (_dynamicElementBuffer)
 		{
-			SRHICommandQueue* queue = device->GetPrimaryQueue();
-			queue->AddGarbageObject(queue->GetLastSignal(), _dynamicElementBuffer);
+			IRHIDeviceContext* queue = device->GetImmediateContext();
+			queue->PendingGarbageObject(_dynamicElementBuffer);
 		}
 
-		_dynamicElementBuffer = device->CreateDynamicBuffer((uint64)sizeInBytes);
+		RHIBufferDesc bufferDesc = {};
+		bufferDesc.ByteWidth = (uint32)sizeInBytes;
+		bufferDesc.InitialState = ERHIResourceStates::GenericRead;
+		bufferDesc.Usage = ERHIBufferUsage::Dynamic;
+		_dynamicElementBuffer = device->CreateBuffer(bufferDesc, nullptr);
 		_dynamicElementBuffer->SetOuter(this);
 	}
 
 	if (_dynamicElementBuffer)
 	{
-		void* ptr = _dynamicElementBuffer->GetMappingPointer();
-		memcpy(ptr, drawElements, sizeInBytes);
-
+		RHISubresourceData uploadData;
+		uploadData.pSysMem = drawElements;
+		uploadData.SysMemPitch = sizeInBytes;
+		deviceContext->UpdateSubresource(_dynamicElementBuffer, 0, uploadData);
 		return _dynamicElementBuffer->GetGPUVirtualAddress();
 	}
 	else

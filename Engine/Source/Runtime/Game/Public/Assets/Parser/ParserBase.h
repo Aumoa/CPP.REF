@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 
 class SGameEngine;
 class SStaticMesh;
-class SRHIVertexFactory;
+class SVertexFactory;
 
 class GAME_API SParserBase : implements SObject
 {
@@ -14,10 +14,10 @@ class GAME_API SParserBase : implements SObject
 
 private:
 	SGameEngine* _engine = nullptr;
-	SRHIVertexFactory* _factory = nullptr;
+	SVertexFactory* _factory = nullptr;
 
 public:
-	SParserBase(SGameEngine* engine, SRHIVertexFactory* vfactory) : Super()
+	SParserBase(SGameEngine* engine, SVertexFactory* vfactory) : Super()
 		, _engine(engine)
 		, _factory(vfactory)
 	{
@@ -25,9 +25,9 @@ public:
 
 	virtual bool TryParse(const std::filesystem::path& importPath) = 0;
 
-	virtual bool IsStaticMesh() const = 0;
-	virtual SStaticMesh* GetStaticMesh() const = 0;
+	virtual bool IsStaticMesh() = 0;
+	virtual SStaticMesh* GetStaticMesh() = 0;
 
-	inline SGameEngine* GetEngine() const { return _engine; }
-	inline SRHIVertexFactory* GetVertexFactory() const { return _factory; }
+	inline SGameEngine* GetEngine() { return _engine; }
+	inline SVertexFactory* GetVertexFactory() { return _factory; }
 };

@@ -8,7 +8,6 @@
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
 
-#include "pch.h"
 #include "WindowsPlatform/WindowsPlatformMouse.h"
 #include "GameEnums.h"
 #include "LogGame.h"

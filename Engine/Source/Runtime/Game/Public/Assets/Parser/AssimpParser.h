@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "ParserBase.h"
 #include <memory>
 
@@ -20,13 +20,13 @@ private:
 	SStaticMesh* _mesh = nullptr;
 
 public:
-	SAssimpParser(SGameEngine* engine, SRHIVertexFactory* vfactory);
+	SAssimpParser(SGameEngine* engine, SVertexFactory* vfactory);
 	~SAssimpParser() override;
 
 	virtual bool TryParse(const std::filesystem::path& importPath) override;
 
-	virtual bool IsStaticMesh() const override;
-	virtual SStaticMesh* GetStaticMesh() const override;
+	virtual bool IsStaticMesh() override;
+	virtual SStaticMesh* GetStaticMesh() override;
 
 private:
 	//bool ProcessMaterials();

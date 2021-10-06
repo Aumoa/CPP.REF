@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RHI/RHIEnums.h"
 
-struct IPlatformImage;
+interface IPlatformImage;
 
 struct GAME_API IPlatformImageLoader : implements SObject
 {

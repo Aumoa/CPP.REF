@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Assets/SoftObjectPtr.h"
 #include "Assets/Asset.h"
 #include "GameEngine.h"

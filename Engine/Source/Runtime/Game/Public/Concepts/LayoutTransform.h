@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 
 template<class T>
 concept LayoutTransform = requires(T transform)

@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Assets/Asset.h"
 #include "Misc/Paths.h"
 
@@ -13,7 +12,7 @@ SAsset::~SAsset()
 {
 }
 
-std::filesystem::path SAsset::GetAssetPath() const
+std::filesystem::path SAsset::GetAssetPath()
 {
 	return _assetPath;
 }

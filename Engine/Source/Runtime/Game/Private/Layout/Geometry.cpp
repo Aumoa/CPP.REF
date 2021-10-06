@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Layout/LayoutImpl.h"
 #include "Layout/Geometry.h"
 #include "Layout/ArrangedWidget.h"

@@ -36,7 +36,9 @@ interface IRHIDeviceContext : implements IRHIDeviceChild
 	virtual void PendingGarbageObject(SObject* object) = 0;
 	virtual void UpdateSubresource(IRHIResource* resource, uint32 subresource, const RHISubresourceData& data) = 0;
 
+	void RSSetScissorRect(const RHIScissorRect& scissorRect) { RSSetScissorRects(std::span<const RHIScissorRect>(&scissorRect, 1)); }
 	void RSSetScissorRects(std::span<RHIScissorRect> scissorRects) { RSSetScissorRects((std::span<const RHIScissorRect>)scissorRects); }
+	void RSSetViewport(const RHIViewport& viewport) { RSSetViewports(std::span<const RHIViewport>(&viewport, 1)); }
 	void RSSetViewports(std::span<RHIViewport> viewports) { RSSetViewports((std::span<const RHIViewport>)viewports); }
 	void ResourceBarrier(std::span<RHIResourceBarrier> barriers) { ResourceBarrier((std::span<const RHIResourceBarrier>)barriers); }
 	void IASetVertexBuffers(uint32 slotIndex, std::span<RHIVertexBufferView> views) { IASetVertexBuffers(slotIndex, (std::span<const RHIVertexBufferView>)views); }

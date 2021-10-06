@@ -29,7 +29,7 @@ if (HRESULT __hr = (x); FAILED(__hr))														\
 {																							\
 	_com_error com_error(__hr);																\
 	SE_LOG(LogDirectX, Fatal, L"An exception occurred with HRESULT: 0x{:08X}, Message: {}",	\
-		(int32)__hr, TCHAR_TO_WCHAR(com_error.ErrorMessage()));								\
+		(uint32)__hr, TCHAR_TO_WCHAR(com_error.ErrorMessage()));								\
 }
 
 #define DECLARE_GETTER(Type, Member)								\

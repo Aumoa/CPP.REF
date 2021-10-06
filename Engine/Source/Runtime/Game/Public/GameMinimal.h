@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RenderMinimal.h"
 #include "GameEnums.h"
 #include "GameStructures.h"
 #include "SubclassOf.h"

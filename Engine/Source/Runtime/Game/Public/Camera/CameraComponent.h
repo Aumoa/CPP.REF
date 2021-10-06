@@ -14,5 +14,5 @@ class GAME_API SCameraComponent : public SSceneComponent
 public:
 	SCameraComponent();
 
-	MinimalViewInfo GetViewInfo(std::chrono::duration<float> elapsedTime) const;
+	MinimalViewInfo GetViewInfo(std::chrono::duration<float> elapsedTime);
 };

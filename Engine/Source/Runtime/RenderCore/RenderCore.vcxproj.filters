@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Private\RHI\LogRHI.cpp">
-      <Filter>Private\RHI</Filter>
-    </ClCompile>
     <ClCompile Include="Private\RHI\IRHIFactory.cpp">
       <Filter>Private\RHI</Filter>
     </ClCompile>
@@ -76,6 +73,9 @@
     <ClCompile Include="Private\Materials\Material.cpp">
       <Filter>Private\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="Private\LogRenderCore.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -105,9 +105,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\RHI\RHIStructures.h">
-      <Filter>Public\RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\RHI\LogRHI.h">
       <Filter>Public\RHI</Filter>
     </ClInclude>
     <ClInclude Include="Public\RHI\RHIEnums.h">
@@ -241,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="Private\RHI\DXGI\DXGISwapChain.h">
       <Filter>Private\RHI\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\LogRenderCore.h">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

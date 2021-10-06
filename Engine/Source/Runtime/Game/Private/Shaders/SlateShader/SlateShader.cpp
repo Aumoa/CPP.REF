@@ -1,13 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Shaders/SlateShader/SlateShader.h"
 #include "Materials/Material.h"
 #include "GameEngine.h"
 #include "Draw/SlateWindowElementList.h"
 #include "EngineSubsystems/GameRenderSystem.h"
-#include "FreeType/FontCachingManager.h"
-#include "FreeType/FontFace.h"
 
 #ifndef BYTE
 #define BYTE uint8
@@ -16,36 +13,7 @@
 #include "SlateShaderVS.hlsl.h"
 #include "SlateShaderPS.hlsl.h"
 
-SSlateShader::SSlateShader(SRHIDevice* device) : Super(device)
-{
-	class SlateShaderMaterial : public SMaterial
-	{
-	public:
-		using Super = SMaterial;
-
-	public:
-		SlateShaderMaterial(SSlateShader* shader) : Super(shader)
-		{
-		}
-
-		virtual int32 GetRootParameterMappingIndex(std::wstring_view parameterName) const override
-		{
-			if (parameterName == L"Color")
-			{
-				return 1;
-			}
-			else
-			{
-				return Super::GetRootParameterMappingIndex(parameterName);
-			}
-		}
-	};
-
-	_material = NewObject<SlateShaderMaterial>(this);
-	_shaderDescriptorView = NewObject<SRHIShaderDescriptorView>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
-}
-
-void SSlateShader::Compile(SRHIVertexFactory* vertexDeclaration)
+SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 {
 	_imageSourceRanges.emplace_back() =
 	{
@@ -63,68 +31,77 @@ void SSlateShader::Compile(SRHIVertexFactory* vertexDeclaration)
 		.RegisterSpace = 0,
 	};
 
-	Super::Compile(vertexDeclaration);
-}
-
-std::vector<RHIShaderParameterElement> SSlateShader::GetShaderParameterDeclaration() const
-{
-	std::vector<RHIShaderParameterElement> elements;
-	elements.reserve(3);
-
-	// [0] SlateConstants
-	elements.emplace_back() =
+	_parameters =
 	{
-		.Type = ERHIShaderParameterType::ScalarParameterConstants,
-		.ScalarConstantsParameter =
+		// [0] SlateConstants
 		{
-			.ShaderRegister = 0,
-			.Num32Bits = 2,
+			.Name = L"SlateConstants",
+			.ElementType = ERHIShaderParameterType::ScalarParameterConstants,
+			.Index = 0
+		},
+		// [1] SlateElements
+		{
+			.Name = L"SlateElements",
+			.ElementType = ERHIShaderParameterType::StructuredBuffer,
+			.Index = 1
+		},
+		// [2] ImageSource
+		{
+			.Name = L"ImageSource",
+			.ElementType = ERHIShaderParameterType::DescriptorTable,
+			.Index = 2
+		},
+		// [3] RenderMode
+		{
+			.Name = L"RenderMode",
+			.ElementType = ERHIShaderParameterType::ScalarParameterConstants,
+			.Index = 3
 		}
 	};
 
-	// [1] SlateElements
-	elements.emplace_back() =
+	_elements =
 	{
-		.Type = ERHIShaderParameterType::StructuredBuffer,
-		.StructuredBuffer =
+		// [0] SlateConstants
 		{
-			.ShaderRegister = 0,
+			.Type = ERHIShaderParameterType::ScalarParameterConstants,
+			.ScalarConstantsParameter =
+			{
+				.ShaderRegister = 0,
+				.Num32Bits = 2,
+			}
+		},
+		// [1] SlateElements
+		{
+			.Type = ERHIShaderParameterType::StructuredBuffer,
+			.StructuredBuffer =
+			{
+				.ShaderRegister = 0,
+			}
+		},
+		// [2] ImageSource
+		{
+			.Type = ERHIShaderParameterType::DescriptorTable,
+			.DescriptorTable =
+			{
+				.NumDescriptorRanges = (uint32)_imageSourceRanges.size(),
+				.pDescriptorRanges = _imageSourceRanges.data()
+			}
+		},
+		// [3] RenderMode
+		{
+			.Type = ERHIShaderParameterType::ScalarParameterConstants,
+			.ScalarConstantsParameter =
+			{
+				.ShaderRegister = 1,
+				.Num32Bits = 1
+			}
 		}
 	};
-
-	// [2] ImageSource
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::DescriptorTable,
-		.DescriptorTable =
-		{
-			.NumDescriptorRanges = (uint32)_imageSourceRanges.size(),
-			.pDescriptorRanges = _imageSourceRanges.data()
-		}
-	};
-
-	// [3] RenderMode
-	elements.emplace_back() =
-	{
-		.Type = ERHIShaderParameterType::ScalarParameterConstants,
-		.ScalarConstantsParameter =
-		{
-			.ShaderRegister = 1,
-			.Num32Bits = 1
-		}
-	};
-
-	return elements;
-}
-
-SMaterial* SSlateShader::GetDefaultMaterial() const
-{
-	return _material;
 }
 
 auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const -> std::vector<DrawElement>
 {
-	SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
+	//SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
 
 	std::vector<DrawElement> renderElements;
 	renderElements.reserve(elements.size());
@@ -145,52 +122,52 @@ auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::Gener
 				element_d.TextureSize = Vector2::GetOneVector();
 			}
 		}
-		else if (auto element_s = std::get_if<SlateFontElement>(&elements[i]))
-		{
-			if (element_s->FontFace && element_s->Text.length())
-			{
-				if (renderElements.capacity() <= renderElements.size() + element_s->Text.length())
-				{
-					// Reserve space for store glyph render informations.
-					renderElements.reserve(renderElements.capacity() + element_s->Text.length());
-				}
+		//else if (auto element_s = std::get_if<SlateFontElement>(&elements[i]))
+		//{
+		//	if (element_s->FontFace && element_s->Text.length())
+		//	{
+		//		if (renderElements.capacity() <= renderElements.size() + element_s->Text.length())
+		//		{
+		//			// Reserve space for store glyph render informations.
+		//			renderElements.reserve(renderElements.capacity() + element_s->Text.length());
+		//		}
 
-				// TEST IMPLEMENTATION: Streaming glyphs.
-				element_s->FontFace->SetFontSize(element_s->FontSize);
-				fontCachingMgr->StreamGlyphs(element_s->FontFace, element_s->Text);
-				fontCachingMgr->Apply();
+		//		 TEST IMPLEMENTATION: Streaming glyphs.
+		//		element_s->FontFace->SetFontSize(element_s->FontSize);
+		//		fontCachingMgr->StreamGlyphs(element_s->FontFace, element_s->Text);
+		//		fontCachingMgr->Apply();
 
-				// Get font rendering info.
-				std::vector glyphInfos = fontCachingMgr->QueryGlyphsRenderInfo(element_s->FontFace, element_s->FontSize, element_s->Text);
+		//		 Get font rendering info.
+		//		std::vector glyphInfos = fontCachingMgr->QueryGlyphsRenderInfo(element_s->FontFace, element_s->FontSize, element_s->Text);
 
-				Vector2 advance;
-				const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
-				const Vector2& localTranslation = renderTransform.GetTranslation();
-				const Vector2& localSize = element_s->Transform.GetLocalSize();
-				const Matrix2x2& localMatrix = renderTransform.GetMatrix();
+		//		Vector2 advance;
+		//		const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
+		//		const Vector2& localTranslation = renderTransform.GetTranslation();
+		//		const Vector2& localSize = element_s->Transform.GetLocalSize();
+		//		const Matrix2x2& localMatrix = renderTransform.GetMatrix();
 
-				for (auto& glyph : glyphInfos)
-				{
-					auto& element_d = renderElements.emplace_back();
-					element_d.M = localMatrix;
-					element_d.AbsolutePosition = localTranslation + advance + Vector2(0, localSize.Y) - glyph.LocalPosition * Vector2(-1.0f, 1.0f);
-					element_d.AbsoluteSize = glyph.AbsoluteSize;
-					element_d.Depth = (float)element_s->Layer;
-					element_d.TexturePosition = (glyph.AbsolutePosition + Vector2(0.5f, 0.0f)) * glyph.AbsoluteToLocalScale;
-					element_d.TextureSize = (glyph.AbsoluteSize + Vector2(-0.5f, 1.0f)) * glyph.AbsoluteToLocalScale;
+		//		for (auto& glyph : glyphInfos)
+		//		{
+		//			auto& element_d = renderElements.emplace_back();
+		//			element_d.M = localMatrix;
+		//			element_d.AbsolutePosition = localTranslation + advance + Vector2(0, localSize.Y) - glyph.LocalPosition * Vector2(-1.0f, 1.0f);
+		//			element_d.AbsoluteSize = glyph.AbsoluteSize;
+		//			element_d.Depth = (float)element_s->Layer;
+		//			element_d.TexturePosition = (glyph.AbsolutePosition + Vector2(0.5f, 0.0f)) * glyph.AbsoluteToLocalScale;
+		//			element_d.TextureSize = (glyph.AbsoluteSize + Vector2(-0.5f, 1.0f)) * glyph.AbsoluteToLocalScale;
 
-					advance += glyph.LocalAdvance;
-				}
-			}
-		}
+		//			advance += glyph.LocalAdvance;
+		//		}
+		//	}
+		//}
 	}
 
 	return renderElements;
 }
 
-void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements)
+void SSlateShader::RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements)
 {
-	SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
+	//SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
 	auto elements_span = elements->GetSpan();
 
 	// Caching max elements.
@@ -204,54 +181,54 @@ void SSlateShader::RenderElements(SRHIDeviceContext* deviceContext, const Vector
 				maxDescriptors += 1;
 			}
 		}
-		else if (auto element_s = std::get_if<SlateFontElement>(&element))
-		{
-			if (element_s->FontFace)
-			{
-				maxDescriptors += 1;
-			}
-		}
+		//else if (auto element_s = std::get_if<SlateFontElement>(&element))
+		//{
+		//	if (element_s->FontFace)
+		//	{
+		//		maxDescriptors += 1;
+		//	}
+		//}
 	}
 	
-	uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);
-	deviceContext->SetGraphicsRoot32BitConstants(0, 2, &screenSize, 0);
+	//uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);
+	//deviceContext->SetGraphicsRoot32BitConstants(0, 2, &screenSize, 0);
 
-	_shaderDescriptorView->SetMaxDescriptorCount(maxDescriptors);
-	_shaderDescriptorView->ResetBindings();
-	deviceContext->SetShaderDescriptorViews(_shaderDescriptorView, nullptr);
+	//_shaderDescriptorView->SetMaxDescriptorCount(maxDescriptors);
+	//_shaderDescriptorView->ResetBindings();
+	//deviceContext->SetShaderDescriptorViews(_shaderDescriptorView, nullptr);
 
-	for (auto& element : elements_span)
-	{
-		if (auto element_s = std::get_if<SlateDrawElement>(&element))
-		{
-			if (element_s->Brush.ImageSource)
-			{
-				const int32 RenderMode = (int32)ESlateRenderMode::ImageSource;
+	//for (auto& element : elements_span)
+	//{
+	//	if (auto element_s = std::get_if<SlateDrawElement>(&element))
+	//	{
+	//		if (element_s->Brush.ImageSource)
+	//		{
+	//			const int32 RenderMode = (int32)ESlateRenderMode::ImageSource;
 
-				deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
-				deviceContext->SetGraphicsRootShaderResourceView(2, element_s->Brush.ImageSource);
-				deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
-				deviceContext->DrawInstanced(4, 1);
+	//			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
+	//			deviceContext->SetGraphicsRootShaderResourceView(2, element_s->Brush.ImageSource);
+	//			deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
+	//			deviceContext->DrawInstanced(4, 1);
 
-				gpuAddr += sizeof(DrawElement);
-			}
-		}
-		else if (auto element_s = std::get_if<SlateFontElement>(&element))
-		{
-			if (element_s->FontFace)
-			{
-				SRHIShaderResourceView* imageSource = fontCachingMgr->GetFontFaceRenderingView(element_s->FontFace);
-				const int32 RenderMode = (int32)ESlateRenderMode::Glyph;
+	//			gpuAddr += sizeof(DrawElement);
+	//		}
+	//	}
+	//	else if (auto element_s = std::get_if<SlateFontElement>(&element))
+	//	{
+	//		if (element_s->FontFace)
+	//		{
+	//			SRHIShaderResourceView* imageSource = fontCachingMgr->GetFontFaceRenderingView(element_s->FontFace);
+	//			const int32 RenderMode = (int32)ESlateRenderMode::Glyph;
 
-				deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
-				deviceContext->SetGraphicsRootShaderResourceView(2, imageSource);
-				deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
-				deviceContext->DrawInstanced(4, (uint32)element_s->Text.length());
+	//			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
+	//			deviceContext->SetGraphicsRootShaderResourceView(2, imageSource);
+	//			deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
+	//			deviceContext->DrawInstanced(4, (uint32)element_s->Text.length());
 
-				gpuAddr += sizeof(DrawElement) * element_s->Text.length();
-			}
-		}
-	}
+	//			gpuAddr += sizeof(DrawElement) * element_s->Text.length();
+	//		}
+	//	}
+	//}
 }
 
 std::span<uint8 const> SSlateShader::CompileVS()

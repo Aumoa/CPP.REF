@@ -2,30 +2,28 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
-#include "RHI/RHIShader.h"
+#include "CoreMinimal.h"
+#include "Materials/Material.h"
 #include <vector>
 #include <span>
 
-class SMaterial;
-
-class GAME_API STransparentShader : public SRHIShader
+class GAME_API STransparentShader : public SMaterial
 {
 	GENERATED_BODY(STransparentShader)
 
 private:
 	std::vector<uint8> _vscode;
 	std::vector<uint8> _pscode;
-	SMaterial* _material = nullptr;
+
+	std::vector<RHIMaterialParameterInfo> _parameters;
+	std::vector<RHIShaderParameterElement> _elements;
 
 public:
-	STransparentShader(SRHIDevice* device);
+	STransparentShader(IRHIDevice* device);
 
-	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() const override;
+	virtual std::vector<RHIMaterialParameterInfo> GetParametersInfo() override { return _parameters; }
 
-	SMaterial* GetDefaultMaterial() const;
-
-protected:
+	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() override { return _elements; }
 	virtual std::span<uint8 const> CompileVS() override;
 	virtual std::span<uint8 const> CompilePS() override;
 };

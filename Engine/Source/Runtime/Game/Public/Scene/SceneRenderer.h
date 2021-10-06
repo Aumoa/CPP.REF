@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "GameStructures.h"
 
+interface IRHIShader;
+interface IRHIDeviceContext;
 class SScene;
-class SRHIShader;
-class SRHIDeviceContext;
 class SSceneVisibility;
 class SPrimitiveSceneProxy;
 
@@ -27,20 +27,20 @@ private:
 
 private:
 	SScene* _scene = nullptr;
-	SRHIShader* _shader = nullptr;
+	IRHIShader* _shader = nullptr;
 	SSceneVisibility* _visibility = nullptr;
 	std::vector<MeshBatchDrawRelevance> _drawRelevances;
 	size_t _relevances = 0;
 
 public:
-	SSceneRenderer(SScene* scene, SRHIShader* shader);
+	SSceneRenderer(SScene* scene, IRHIShader* shader);
 	SSceneRenderer(SSceneRenderer&& rhs) noexcept;
 	~SSceneRenderer() override;
 
 public:
 	void CollectPrimitives(SSceneVisibility* view);
-	void RenderScene(SRHIDeviceContext* dc);
+	void RenderScene(IRHIDeviceContext* dc);
 
 private:
-	void RenderWithSceneVisibility(SRHIDeviceContext* dc);
+	void RenderWithSceneVisibility(IRHIDeviceContext* dc);
 };

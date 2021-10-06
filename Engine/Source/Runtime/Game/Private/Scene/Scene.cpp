@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Scene/Scene.h"
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Scene/SceneVisibility.h"
@@ -8,7 +7,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Materials/Material.h"
 
-SScene::SScene(SWorld* worldOwner, SRHIDevice* device) : Super()
+SScene::SScene(SWorld* worldOwner, IRHIDevice* device) : Super()
 	, _world(worldOwner)
 	, _device(device)
 {
@@ -65,39 +64,39 @@ void SScene::InitViews(const MinimalViewInfo& localPlayerView)
 				{
 					if (materialSlot != nullptr)
 					{
-						std::map<size_t, std::vector<SRHIShader*>>::iterator it;
+						//std::map<size_t, std::vector<SRHIShader*>>::iterator it;
 
-						size_t queueNumber = 0;
-						switch (materialSlot->GetBlendMode())
-						{
-						case EMaterialBlendMode::Opaque:
-							queueNumber = RenderQueue_Opaque;
-							break;
-						case EMaterialBlendMode::Masked:
-							queueNumber = RenderQueue_Masked;
-							break;
-						case EMaterialBlendMode::Transparent:
-							queueNumber = RenderQueue_Transparent;
-							break;
-						}
+						//size_t queueNumber = 0;
+						//switch (materialSlot->GetBlendMode())
+						//{
+						//case EMaterialBlendMode::Opaque:
+						//	queueNumber = RenderQueue_Opaque;
+						//	break;
+						//case EMaterialBlendMode::Masked:
+						//	queueNumber = RenderQueue_Masked;
+						//	break;
+						//case EMaterialBlendMode::Transparent:
+						//	queueNumber = RenderQueue_Transparent;
+						//	break;
+						//}
 
-						if (!ensureMsgf(queueNumber != 0, L"Render Queue Number is not setted."))
-						{
-							continue;
-						}
+						//if (!ensureMsgf(queueNumber != 0, L"Render Queue Number is not setted."))
+						//{
+						//	continue;
+						//}
 
-						it = _renderQueue.find(queueNumber);
-						if (it == _renderQueue.end())
-						{
-							it = _renderQueue.emplace_hint(it, queueNumber, std::vector<SRHIShader*>());
-						}
+						//it = _renderQueue.find(queueNumber);
+						//if (it == _renderQueue.end())
+						//{
+						//	it = _renderQueue.emplace_hint(it, queueNumber, std::vector<SRHIShader*>());
+						//}
 
-						if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())
-						{
-							checks.emplace_hint(ck, materialSlot->GetShader());
-							it->second.emplace_back(materialSlot->GetShader());
-							renderers += 1;
-						}
+						//if (auto ck = checks.find(materialSlot->GetShader()); ck == checks.end())
+						//{
+						//	checks.emplace_hint(ck, materialSlot->GetShader());
+						//	it->second.emplace_back(materialSlot->GetShader());
+						//	renderers += 1;
+						//}
 					}
 				}
 			}
@@ -108,17 +107,17 @@ void SScene::InitViews(const MinimalViewInfo& localPlayerView)
 	_renderers.reserve(renderers);
 
 	// Enqueue renderer.
-	for (auto& it : _renderQueue)
-	{
-		for (auto& slots : it.second)
-		{
-			SSceneRenderer& renderer = _renderers.emplace_back(this, (SRHIShader*)slots);
-			renderer.CollectPrimitives(_localPlayerView);
-		}
-	}
+	//for (auto& it : _renderQueue)
+	//{
+	//	for (auto& slots : it.second)
+	//	{
+	//		SSceneRenderer& renderer = _renderers.emplace_back(this, (SRHIShader*)slots);
+	//		renderer.CollectPrimitives(_localPlayerView);
+	//	}
+	//}
 }
 
-void SScene::RenderScene(SRHIDeviceContext* dc)
+void SScene::RenderScene(IRHIDeviceContext* dc)
 {
 	for (auto& renderer : _renderers)
 	{

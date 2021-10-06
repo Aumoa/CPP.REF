@@ -49,12 +49,6 @@
     <Filter Include="Private\Level">
       <UniqueIdentifier>{8cd3dc67-6396-4406-b9d5-06bd5555e75a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\Materials">
-      <UniqueIdentifier>{63909791-18c1-4935-8bff-748d747cef36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\Materials">
-      <UniqueIdentifier>{3cc07679-098a-48bd-8152-0147fded5ebb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Public\Misc">
       <UniqueIdentifier>{4d54c39c-43a1-4e01-9f1b-f9596334bf6d}</UniqueIdentifier>
     </Filter>
@@ -165,9 +159,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\pch.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\LogGame.cpp">
       <Filter>Private</Filter>
     </ClCompile>
@@ -242,12 +233,6 @@
     </ClCompile>
     <ClCompile Include="Private\Level\Level.cpp">
       <Filter>Private\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Materials\MaterialInstance.cpp">
-      <Filter>Private\Materials</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Materials\Material.cpp">
-      <Filter>Private\Materials</Filter>
     </ClCompile>
     <ClCompile Include="Private\Scene\StaticMeshSceneProxy.cpp">
       <Filter>Private\Scene</Filter>
@@ -342,9 +327,6 @@
     <ClCompile Include="Private\GameModule.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Assets\Font.cpp">
-      <Filter>Private\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Widgets\SlateApplication.cpp">
       <Filter>Private\Widgets</Filter>
     </ClCompile>
@@ -404,9 +386,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Private\pch.h">
-      <Filter>Private</Filter>
-    </ClInclude>
     <ClInclude Include="Public\GameStructures.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -499,12 +478,6 @@
     </ClInclude>
     <ClInclude Include="Public\Level\Level.h">
       <Filter>Public\Level</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Materials\MaterialInstance.h">
-      <Filter>Public\Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Materials\Material.h">
-      <Filter>Public\Materials</Filter>
     </ClInclude>
     <ClInclude Include="Public\Misc\Bezier.h">
       <Filter>Public\Misc</Filter>
@@ -631,9 +604,6 @@
     </ClInclude>
     <ClInclude Include="Public\GameModule.h">
       <Filter>Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Assets\Font.h">
-      <Filter>Public\Assets</Filter>
     </ClInclude>
     <ClInclude Include="Public\Widgets\SlateApplication.h">
       <Filter>Public\Widgets</Filter>

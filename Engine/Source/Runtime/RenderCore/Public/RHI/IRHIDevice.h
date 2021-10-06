@@ -25,4 +25,6 @@ interface IRHIDevice : implements IRHIFactoryChild
 	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 count) = 0;
 	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 count) = 0;
 	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 count) = 0;
+	virtual void BeginFrame() = 0;
+	virtual void EndFrame() = 0;
 };

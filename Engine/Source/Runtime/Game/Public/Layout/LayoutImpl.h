@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "SlateRotatedRect.h"
 #include "TransformCalculus2D.h"
 #include "SlateRenderTransform.h"

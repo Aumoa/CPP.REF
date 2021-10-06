@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "EngineSubsystems/GameInputSystem.h"
 #include "PlatformMisc/IPlatformMouse.h"
 #include "PlatformMisc/IPlatformKeyboard.h"

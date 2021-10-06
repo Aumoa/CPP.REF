@@ -2,37 +2,38 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "Draw/SlateDrawElement.h"
-#include "Draw/SlateFontElement.h"
+//#include "Draw/SlateFontElement.h"
 #include "Layout/SlateLayoutTransform.h"
 #include <variant>
 
+interface IRHIBuffer;
+interface IRHIDeviceContext;
 class SWindow;
-class SRHIDeviceContext;
 
 class GAME_API SSlateWindowElementList : implements SObject
 {
 	GENERATED_BODY(SSlateWindowElementList)
 
 public:
-	using GenericSlateElement = std::variant<SlateDrawElement, SlateFontElement>;
+	using GenericSlateElement = std::variant<SlateDrawElement>;
 
 private:
-	const SWindow* _paintWindow = nullptr;
+	SWindow* _paintWindow = nullptr;
 	std::vector<GenericSlateElement> _drawElements;
-	SRHIResource* _dynamicElementBuffer = nullptr;
+	IRHIBuffer* _dynamicElementBuffer = nullptr;
 
 public:
-	SSlateWindowElementList(const SWindow* paintWindow);
+	SSlateWindowElementList(SWindow* paintWindow);
 
 	void SortByLayer();
 	void Add(const SlateDrawElement& rhs);
-	void Add(const SlateFontElement& rhs);
+	//void Add(const SlateFontElement& rhs);
 	void Clear();
 
 	template<class TShader>
-	uint64 ApplyAndCreateBuffer(SRHIDeviceContext* deviceContext, TShader* shader)
+	uint64 ApplyAndCreateBuffer(IRHIDeviceContext* deviceContext, TShader* shader)
 	{
 		std::vector drawElements = shader->MakeElements(_drawElements);
 		return CreateBuffer(deviceContext, drawElements.data(), sizeof(typename decltype(drawElements)::value_type) * drawElements.size());
@@ -49,5 +50,5 @@ public:
 	}
 
 private:
-	uint64 CreateBuffer(SRHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes);
+	uint64 CreateBuffer(IRHIDeviceContext* deviceContext, const void* drawElements, size_t sizeInBytes);
 };

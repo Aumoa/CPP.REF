@@ -63,8 +63,6 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4275;</DisableSpecificWarnings>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -95,8 +93,6 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4275;</DisableSpecificWarnings>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -130,7 +126,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Assets\Asset.cpp" />
-    <ClCompile Include="Private\Assets\Font.cpp" />
     <ClCompile Include="Private\Assets\Mesh.cpp" />
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
     <ClCompile Include="Private\Assets\Parser\MDLParser.cpp" />
@@ -174,13 +169,7 @@
     <ClCompile Include="Private\Level\Level.cpp" />
     <ClCompile Include="Private\Level\World.cpp" />
     <ClCompile Include="Private\LogGame.cpp" />
-    <ClCompile Include="Private\Materials\Material.cpp" />
-    <ClCompile Include="Private\Materials\MaterialInstance.cpp" />
     <ClCompile Include="Private\Misc\GeometryGenerator.cpp" />
-    <ClCompile Include="Private\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Private\Scene\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneRenderer.cpp" />
@@ -222,12 +211,10 @@
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformMouse.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Private\pch.h" />
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformHelper.h" />
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImage.h" />
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImageLoader.h" />
     <ClInclude Include="Public\Assets\Asset.h" />
-    <ClInclude Include="Public\Assets\Font.h" />
     <ClInclude Include="Public\Assets\Mesh.h" />
     <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
     <ClInclude Include="Public\Assets\Parser\MDLParser.h" />
@@ -295,8 +282,6 @@
     <ClInclude Include="Public\Level\Level.h" />
     <ClInclude Include="Public\Level\World.h" />
     <ClInclude Include="Public\LogGame.h" />
-    <ClInclude Include="Public\Materials\Material.h" />
-    <ClInclude Include="Public\Materials\MaterialInstance.h" />
     <ClInclude Include="Public\Misc\Bezier.h" />
     <ClInclude Include="Public\Misc\BitfieldInputChangeTracker.h" />
     <ClInclude Include="Public\Misc\GeometryGenerator.h" />

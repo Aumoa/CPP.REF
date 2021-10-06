@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Widgets/Layout/Border.h"
 #include "Layout/Geometry.h"
 #include "Layout/ArrangedChildrens.h"
@@ -9,7 +8,7 @@ SBorder::SBorder(const std::wstring& name) : Super(name)
 {
 }
 
-Vector2 SBorder::GetDesiredSize() const
+Vector2 SBorder::GetDesiredSize()
 {
 	if (_content && _content->GetVisibility() != ESlateVisibility::Collapsed)
 	{
@@ -26,7 +25,7 @@ void SBorder::SetPadding(const Margin& padding)
 	_padding = padding;
 }
 
-Margin SBorder::GetPadding() const
+Margin SBorder::GetPadding()
 {
 	return _padding;
 }
@@ -36,12 +35,12 @@ void SBorder::SetContent(SWidget* content)
 	_content = content;
 }
 
-SWidget* SBorder::GetContent() const
+SWidget* SBorder::GetContent()
 {
 	return _content;
 }
 
-void SBorder::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SBorder::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
 {
 	if (_content && _content->GetVisibility() != ESlateVisibility::Collapsed)
 	{

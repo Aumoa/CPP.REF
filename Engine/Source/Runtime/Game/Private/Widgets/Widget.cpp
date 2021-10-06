@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Widgets/Widget.h"
 #include "Layout/Geometry.h"
 #include "Layout/ArrangedChildrens.h"
@@ -12,17 +11,17 @@ SWidget::SWidget(const std::wstring& name) : Super()
 {
 }
 
-std::wstring SWidget::ToString(std::wstring_view formatArgs) const
+std::wstring SWidget::ToString(std::wstring_view formatArgs)
 {
 	return std::format(L"{}({}): [{}] ({})", _name, GetType()->GetFriendlyName(), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
 }
 
-int32 SWidget::Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SWidget::Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
 {
 	return OnPaint(paintArgs, allottedGeometry, cullingRect, drawElements, layer, bParentEnabled);
 }
 
-void SWidget::ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const
+void SWidget::ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
 {
 	OnArrangeChildren(arrangedChildrens, allottedGeometry);
 }
@@ -31,17 +30,17 @@ void SWidget::Tick(const Geometry& allottedGeometry, std::chrono::duration<float
 {
 }
 
-Vector2 SWidget::GetDesiredSize() const
+Vector2 SWidget::GetDesiredSize()
 {
 	return Vector2::GetZero();
 }
 
-Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection() const
+Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
 {
 	return _RenderTransformPivot;
 }
 
-SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection() const
+SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 {
 	check(_bHasRenderTransform);
 	return _RenderTransform;
@@ -68,7 +67,7 @@ bool SWidget::SendKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKey
     return false;
 }
 
-bool SWidget::IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild) const
+bool SWidget::IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild)
 {
     // 1) We check if the rendered bounding box overlaps with the culling rect.  Which is so that
     //    a render transformed element is never culled if it would have been visible to the user.
@@ -98,7 +97,7 @@ bool SWidget::IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget&
     return true;
 }
 
-bool SWidget::ShouldBeEnabled(bool bParentEnabled) const
+bool SWidget::ShouldBeEnabled(bool bParentEnabled)
 {
     return bParentEnabled && IsEnabled();
 }
@@ -117,7 +116,7 @@ void SWidget::SetVisibility(ESlateVisibility visibility)
     _Visibility = visibility;
 }
 
-ESlateVisibility SWidget::GetVisibility() const
+ESlateVisibility SWidget::GetVisibility()
 {
     return _Visibility;
 }
@@ -127,7 +126,7 @@ void SWidget::SetFlowDirection(EFlowDirection flowDirection)
     _FlowDirection = flowDirection;
 }
 
-EFlowDirection SWidget::GetFlowDirection() const
+EFlowDirection SWidget::GetFlowDirection()
 {
     return _FlowDirection;
 }
@@ -137,7 +136,7 @@ void SWidget::SetClipping(EWidgetClipping clipping)
     _Clipping = clipping;
 }
 
-EWidgetClipping SWidget::GetClipping() const
+EWidgetClipping SWidget::GetClipping()
 {
     return _Clipping;
 }
@@ -148,7 +147,7 @@ void SWidget::SetRenderTransform(const SlateRenderTransform& renderTransform)
     _RenderTransform = renderTransform;
 }
 
-SlateRenderTransform SWidget::GetRenderTransform() const
+SlateRenderTransform SWidget::GetRenderTransform()
 {
     check(_bHasRenderTransform);
     return _RenderTransform;
@@ -159,7 +158,7 @@ void SWidget::SetEnabled(bool bEnabled)
     _bEnabled = bEnabled;
 }
 
-bool SWidget::IsEnabled() const
+bool SWidget::IsEnabled()
 {
     return _bEnabled;
 }

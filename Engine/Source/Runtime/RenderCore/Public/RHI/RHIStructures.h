@@ -610,4 +610,11 @@ struct RHIShaderResourceViewDesc
 	}
 };
 
+struct RHIMaterialParameterInfo
+{
+	std::wstring Name;
+	ERHIShaderParameterType ElementType;
+	int32 Index;
+};
+
 #pragma pack(pop)

@@ -96,6 +96,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\LogRenderCore.cpp" />
     <ClCompile Include="Private\Materials\Material.cpp" />
     <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
     <ClCompile Include="Private\RHI\D3D12\D3D12Buffer.cpp" />
@@ -119,7 +120,6 @@
     <ClCompile Include="Private\RHI\DXGI\DXGIFactoryChild.cpp" />
     <ClCompile Include="Private\RHI\DXGI\DXGISwapChain.cpp" />
     <ClCompile Include="Private\RHI\IRHIFactory.cpp" />
-    <ClCompile Include="Private\RHI\LogRHI.cpp" />
     <ClCompile Include="Private\VertexFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +152,7 @@
     <ClInclude Include="Private\RHI\DXGI\DXGIFactory.h" />
     <ClInclude Include="Private\RHI\DXGI\DXGISwapChain.h" />
     <ClInclude Include="Public\IWindowView.h" />
+    <ClInclude Include="Public\LogRenderCore.h" />
     <ClInclude Include="Public\Materials\Material.h" />
     <ClInclude Include="Public\Materials\MaterialInstance.h" />
     <ClInclude Include="Public\Materials\MaterialInstanceDynamic.h" />
@@ -173,7 +174,6 @@
     <ClInclude Include="Public\RHI\IRHITexture2D.h" />
     <ClInclude Include="Public\RHI\IRHIUnorderedAccessView.h" />
     <ClInclude Include="Public\RHI\IRHIView.h" />
-    <ClInclude Include="Public\RHI\LogRHI.h" />
     <ClInclude Include="Public\RHI\RHIEnums.h" />
     <ClInclude Include="Public\RHI\RHIStructures.h" />
     <ClInclude Include="Public\VertexFactory.h" />

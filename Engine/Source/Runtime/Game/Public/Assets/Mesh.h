@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "StreamableRenderAsset.h"
 
 class GAME_API SMesh : public SStreamableRenderAsset

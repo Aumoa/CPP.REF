@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Scene/SceneRenderer.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneVisibility.h"
@@ -8,7 +7,7 @@
 #include "GameStructures.h"
 #include "Materials/Material.h"
 
-SSceneRenderer::SSceneRenderer(SScene* scene, SRHIShader* shader) : Super()
+SSceneRenderer::SSceneRenderer(SScene* scene, IRHIShader* shader) : Super()
 	, _scene(scene)
 	, _shader(shader)
 {
@@ -50,7 +49,7 @@ void SSceneRenderer::CollectPrimitives(SSceneVisibility* view)
 					continue;
 				}
 
-				SRHIShader* mtShader = material->GetShader();
+				IRHIShader* mtShader = material->GetShader();
 				if (mtShader != _shader)
 				{
 					continue;
@@ -79,44 +78,44 @@ void SSceneRenderer::CollectPrimitives(SSceneVisibility* view)
 	_visibility = view;
 }
 
-void SSceneRenderer::RenderScene(SRHIDeviceContext* dc)
+void SSceneRenderer::RenderScene(IRHIDeviceContext* dc)
 {
-	dc->SetGraphicsShader(_shader);
-	dc->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
+	//dc->SetGraphicsShader(_shader);
+	//dc->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
 
 	RenderWithSceneVisibility(dc);
 }
 
-void SSceneRenderer::RenderWithSceneVisibility(SRHIDeviceContext* dc)
+void SSceneRenderer::RenderWithSceneVisibility(IRHIDeviceContext* dc)
 {
-	for (size_t i = 0; i < _relevances; ++i)
-	{
-		MeshBatchDrawRelevance& relevance = _drawRelevances[i];
-		_visibility->SetupView(dc, _shader, relevance.ViewIndex);
+	//for (size_t i = 0; i < _relevances; ++i)
+	//{
+	//	MeshBatchDrawRelevance& relevance = _drawRelevances[i];
+	//	_visibility->SetupView(dc, _shader, relevance.ViewIndex);
 
-		uint32 vStride = relevance.Batch.VertexFactory->GetVertexStride();
-		uint32 iStride = relevance.Batch.VertexFactory->GetIndexStride();
+	//	uint32 vStride = relevance.Batch.VertexFactory->GetVertexStride();
+	//	uint32 iStride = relevance.Batch.VertexFactory->GetIndexStride();
 
-		RHIVertexBufferView vbv;
-		vbv.BufferLocation = relevance.Batch.VertexBufferLocation;
-		vbv.SizeInBytes = vStride * (uint32)relevance.Batch.VertexBuffer.size();
-		vbv.StrideInBytes = vStride;
+	//	RHIVertexBufferView vbv;
+	//	vbv.BufferLocation = relevance.Batch.VertexBufferLocation;
+	//	vbv.SizeInBytes = vStride * (uint32)relevance.Batch.VertexBuffer.size();
+	//	vbv.StrideInBytes = vStride;
 
-		RHIIndexBufferView ibv;
-		ibv.BufferLocation = relevance.Batch.IndexBufferLocation;
-		ibv.SizeInBytes = sizeof(uint32) * (uint32)relevance.Batch.IndexBuffer.size();
-		ibv.Format = ERHIVertexElementFormat::R32_UINT;
+	//	RHIIndexBufferView ibv;
+	//	ibv.BufferLocation = relevance.Batch.IndexBufferLocation;
+	//	ibv.SizeInBytes = sizeof(uint32) * (uint32)relevance.Batch.IndexBuffer.size();
+	//	ibv.Format = ERHIVertexElementFormat::R32_UINT;
 
-		dc->IASetVertexBuffers(0, 1, &vbv);
-		dc->IASetIndexBuffer(ibv);
+	//	dc->IASetVertexBuffers(0, 1, &vbv);
+	//	dc->IASetIndexBuffer(ibv);
 
-		for (size_t j = 0; j < relevance.Elements.size(); ++j)
-		{
-			MeshBatchElement& element = relevance.Elements[j];
-			SMaterial*& material = relevance.Materials[j];
+	//	for (size_t j = 0; j < relevance.Elements.size(); ++j)
+	//	{
+	//		MeshBatchElement& element = relevance.Elements[j];
+	//		SMaterial*& material = relevance.Materials[j];
 
-			material->SetupMaterial(dc);
-			dc->DrawIndexedInstanced(element.IndexCount, 1, element.StartIndexLocation, element.BaseVertexLocation);
-		}
-	}
+	//		material->SetupMaterial(dc);
+	//		dc->DrawIndexedInstanced(element.IndexCount, 1, element.StartIndexLocation, element.BaseVertexLocation);
+	//	}
+	//}
 }

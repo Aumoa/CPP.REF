@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "GameStructures.h"
 
 class SMaterial;
-class SRHIVertexFactory;
 struct MeshBatch;
 
 class GAME_API SStaticMeshRenderData : implements SObject

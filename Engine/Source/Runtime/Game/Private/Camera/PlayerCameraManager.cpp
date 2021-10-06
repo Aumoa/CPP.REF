@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GameStructures.h"
 #include "LogGame.h"
@@ -33,7 +32,7 @@ void APlayerCameraManager::CachePlayerCamera(APlayerController* controller)
 	_cachedBindCamera = controller->FindPlayerCameraComponent();
 }
 
-MinimalViewInfo APlayerCameraManager::GetCachedCameraView() const
+MinimalViewInfo APlayerCameraManager::GetCachedCameraView()
 {
 	return _cachedView;
 }

@@ -1,6 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "Widgets/Image/Image.h"
 #include "Draw/SlateWindowElementList.h"
 
@@ -13,7 +12,7 @@ SImage::~SImage()
 {
 }
 
-Vector2 SImage::GetDesiredSize() const
+Vector2 SImage::GetDesiredSize()
 {
 	return _brush.ImageSize;
 }
@@ -23,7 +22,7 @@ void SImage::SetBrush(const SlateBrush& brush)
 	_brush = brush;
 }
 
-SlateBrush SImage::GetBrush() const
+SlateBrush SImage::GetBrush()
 {
 	return _brush;
 }
@@ -34,7 +33,7 @@ DEFINE_SLATE_CONSTRUCTOR(SImage, attr)
 	SetBrush(attr._Brush);
 }
 
-int32 SImage::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) const
+int32 SImage::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
 {
 	SlateDrawElement element;
 	element.Brush = _brush;

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "CompoundWidget.h"
 #include "Layout/Geometry.h"
 
@@ -21,20 +21,20 @@ public:
 	SWindow(const std::wstring& name);
 
 	void ExecuteTick(std::chrono::duration<float> deltaTime);
-	void ExecutePaint(SSlateWindowElementList* drawElements) const;
-	Geometry MakeRootGeometry() const;
+	void ExecutePaint(SSlateWindowElementList* drawElements);
+	Geometry MakeRootGeometry();
 
 	void SetWindowSize(const Vector2& localSize);
 
 	void AddWidgetToScreen(SWidget* widget);
-	SWidget* GetWidgetInScreen(const std::wstring& name) const;
+	SWidget* GetWidgetInScreen(const std::wstring& name);
 	void RemoveWidgetFromScreen(const std::wstring& name);
 
-	virtual Vector2 GetDesiredSize() const;
+	virtual Vector2 GetDesiredSize();
 
 protected:
-	std::span<SWidget* const> GetWidgets() const { return _screenWidgets; }
+	std::span<SWidget* const> GetWidgets() { return _screenWidgets; }
 
 protected:
-	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) const override;
+	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) override;
 };

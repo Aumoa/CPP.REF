@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RenderMinimal.h"
+#include "CoreMinimal.h"
 #include "Asset.h"
 
 class GAME_API SStreamableRenderAsset : public SAsset
