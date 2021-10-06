@@ -34,6 +34,11 @@ SGameRenderSystem::SGameRenderSystem() : Super()
 
 SGameRenderSystem::~SGameRenderSystem()
 {
+	if (_device)
+	{
+		DestroySubobject(_device);
+		_device = nullptr;
+	}
 }
 
 void SGameRenderSystem::Init()
@@ -88,33 +93,32 @@ void SGameRenderSystem::Present()
 	_primaryQueue->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
 	_primaryQueue->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
 	_primaryQueue->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
-	_primaryQueue->RSSetScissorRect(sc);
-	_primaryQueue->RSSetViewport(vp);
+	//_primaryQueue->RSSetScissorRect(sc);
+	//_primaryQueue->RSSetViewport(vp);
 
-	SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-	SWorld* world = levelSystem->GetWorld();
-	//APlayerCameraManager* playerCamera = world->GetPlayerCamera();
+	////SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
+	////SWorld* world = levelSystem->GetWorld();
+	////APlayerCameraManager* playerCamera = world->GetPlayerCamera();
 
-	//Scene* scene = _gameInstance->GetWorld()->GetScene();
-	//MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
-	//localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
-	//scene->InitViews(localPlayerView);
-	//scene->RenderScene(_primaryQueue);
+	////Scene* scene = _gameInstance->GetWorld()->GetScene();
+	////MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
+	////localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
+	////scene->InitViews(localPlayerView);
+	////scene->RenderScene(_primaryQueue);
 
-	SLocalPlayer* localPlayer = GEngine->GetEngineSubsystem<SGamePlayerSystem>()->GetLocalPlayer();
-	if (localPlayer)
-	{
-		_primaryQueue->SetGraphicsShader(_slateShader->GetShader());
-		_primaryQueue->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-		localPlayer->Render(_primaryQueue, _slateShader);
-	}
+	////SLocalPlayer* localPlayer = GEngine->GetEngineSubsystem<SGamePlayerSystem>()->GetLocalPlayer();
+	////if (localPlayer)
+	////{
+	////	_primaryQueue->SetGraphicsShader(_slateShader->GetShader());
+	////	_primaryQueue->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+	////	localPlayer->Render(_primaryQueue, _slateShader);
+	////}
 
 	_primaryQueue->ResourceBarrier(barrierEnd);
 	_primaryQueue->End();
 
-	_frameworkViewChain->Present();
-
 	_device->EndFrame();
+	_frameworkViewChain->Present();
 }
 
 void SGameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)
@@ -150,7 +154,7 @@ void SGameRenderSystem::ResizeApp(int32 width, int32 height)
 			_rtv->CreateRenderTargetView(i, texture, nullptr);
 		}
 
-		//// Resize depth stencil buffer.
+		// Resize depth stencil buffer.
 		if (_depthBuffer != nullptr)
 		{
 			DestroySubobject(_depthBuffer);

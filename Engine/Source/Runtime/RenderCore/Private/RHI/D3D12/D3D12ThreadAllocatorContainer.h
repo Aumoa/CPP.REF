@@ -20,6 +20,7 @@ private:
 private:
 	int64 _threadId = 0;
 	ID3D12Device* _device = nullptr;
+	AllocatorPendingBody _body;
 	std::queue<AllocatorPendingBody> _allocators;
 
 public:

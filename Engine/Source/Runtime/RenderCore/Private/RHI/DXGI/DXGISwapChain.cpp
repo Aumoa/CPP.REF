@@ -15,28 +15,44 @@ void SDXGISwapChain::Present(int32 vSyncLevel)
 
 void SDXGISwapChain::ResizeBuffers(int32 width, int32 height)
 {
+	for (size_t i = 0; i < 3; ++i)
+	{
+		if (_buffers[i])
+		{
+			DestroySubobject(_buffers[i]);
+			_buffers[i] = nullptr;
+		}
+	}
+
 	HR(_swapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, 0));
 }
 
 IRHITexture2D* SDXGISwapChain::GetBuffer(int32 index)
 {
-	ComPtr<ID3D12Resource> resource;
-	HR(_swapChain->GetBuffer((UINT)index, IID_PPV_ARGS(&resource)));
+	SD3D12Texture2D*& buf = _buffers[index];
 
-	D3D12_RESOURCE_DESC source = resource->GetDesc();
-	RHITexture2DDesc dest =
+	if (buf == nullptr)
 	{
-		.Width = (uint32)source.Width,
-		.Height = (uint32)source.Height,
-		.DepthOrArraySize = (uint16)source.DepthOrArraySize,
-		.MipLevels = (uint16)source.MipLevels,
-		.Format = (ERHIPixelFormat)source.Format,
-		.Usage = ERHIBufferUsage::Default,
-		.Flags = (ERHIResourceFlags)source.Flags,
-		.InitialState = ERHIResourceStates::Present
-	};
+		ComPtr<ID3D12Resource> resource;
+		HR(_swapChain->GetBuffer((UINT)index, IID_PPV_ARGS(&resource)));
 
-	return NewObject<SD3D12Texture2D>(_factory, _device, std::move(resource), ComPtr<ID3D12Resource>(), D3D12_PLACED_SUBRESOURCE_FOOTPRINT(), dest);
+		D3D12_RESOURCE_DESC source = resource->GetDesc();
+		RHITexture2DDesc dest =
+		{
+			.Width = (uint32)source.Width,
+			.Height = (uint32)source.Height,
+			.DepthOrArraySize = (uint16)source.DepthOrArraySize,
+			.MipLevels = (uint16)source.MipLevels,
+			.Format = (ERHIPixelFormat)source.Format,
+			.Usage = ERHIBufferUsage::Default,
+			.Flags = (ERHIResourceFlags)source.Flags,
+			.InitialState = ERHIResourceStates::Present
+		};
+
+		buf = NewObject<SD3D12Texture2D>(_factory, _device, std::move(resource), ComPtr<ID3D12Resource>(), D3D12_PLACED_SUBRESOURCE_FOOTPRINT(), dest);
+	}
+
+	return buf;
 }
 
 int32 SDXGISwapChain::GetCurrentBackBufferIndex()

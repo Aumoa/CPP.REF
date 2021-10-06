@@ -109,7 +109,11 @@ public:
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 	inline static TTo* Cast(TFrom* from)
 	{
-		return from->As<TTo>();
+		if (from)
+		{
+			return from->template As<TTo>();
+		}
+		return nullptr;
 	}
 
 	/// <summary>
@@ -118,7 +122,10 @@ public:
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 	inline static const TTo* Cast(const TFrom* from)
 	{
-		return from->As<TTo>();
+		if (from)
+		{
+			return from->template As<TTo>();
+		}
 	}
 
 	/// <summary>

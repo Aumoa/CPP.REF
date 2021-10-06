@@ -17,27 +17,42 @@ SD3D12CommandQueue::~SD3D12CommandQueue()
 
 void SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts)
 {
-	std::vector<ID3D12CommandList*> commandLists(deviceContexts.size());
+	std::vector<ID3D12CommandList*> commandLists;
+	commandLists.reserve(deviceContexts.size());
 	++_fenceValue;
 
 	for (size_t i = 0; i < deviceContexts.size(); ++i)
 	{
 		auto deviceContext_s = Cast<SD3D12CommandList>(deviceContexts[i]);
-		commandLists[i] = deviceContext_s->Get<ID3D12CommandList>();
-		
-		GC_Pending gc;
-		gc.MarkedValue = _fenceValue;
-		gc.Objects = deviceContext_s->ClearPendingObjects();
-		_gc.emplace(std::move(gc));
+		if (deviceContext_s)
+		{
+			if (auto commandList = deviceContext_s->Get<ID3D12CommandList>(); commandList)
+			{
+				commandLists.emplace_back(commandList);
+
+				GC_Pending gc;
+				gc.MarkedValue = _fenceValue;
+				gc.Objects = deviceContext_s->ClearPendingObjects();
+				_gc.emplace(std::move(gc));
+			}
+		}
 	}
 
-	_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
+	if (commandLists.size())
+	{
+		_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
+	}
 	_queue->Signal(_fence.Get(), _fenceValue);
 }
 
 uint64 SD3D12CommandQueue::GetFenceValue()
 {
 	return _fenceValue;
+}
+
+uint64 SD3D12CommandQueue::GetCompletedValue()
+{
+	return _fence->GetCompletedValue();
 }
 
 void SD3D12CommandQueue::Collect()

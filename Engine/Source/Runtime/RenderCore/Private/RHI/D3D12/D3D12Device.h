@@ -31,6 +31,7 @@ private:
 
 public:
 	SD3D12Device(SDXGIFactory* factory, ComPtr<ID3D12Device> device);
+	virtual ~SD3D12Device() override;
 
 	virtual IRHIDeviceContext* GetImmediateContext() override;
 	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData) override;

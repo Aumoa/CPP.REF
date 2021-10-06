@@ -7,12 +7,15 @@
 #include "RHI/IRHISwapChain.h"
 #include "RHI/DirectXCommon.h"
 
+class SD3D12Texture2D;
+
 class SDXGISwapChain : public SD3D12DeviceChild, implements IRHISwapChain
 {
 	GENERATED_BODY(SDXGISwapChain)
 
 private:
 	ComPtr<IDXGISwapChain4> _swapChain;
+	std::array<SD3D12Texture2D*, 3> _buffers = {};
 
 public:
 	SDXGISwapChain(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDXGISwapChain4> swapChain);

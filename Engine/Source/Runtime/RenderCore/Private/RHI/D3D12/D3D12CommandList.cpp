@@ -42,7 +42,10 @@ void SD3D12CommandList::Begin(int32 maxSrvCount, int32 maxSamplerCount)
 		heaps.emplace_back(_heapForSampler->Get<ID3D12DescriptorHeap>());
 	}
 
-	_commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
+	if (heaps.size())
+	{
+		_commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
+	}
 }
 
 void SD3D12CommandList::End()

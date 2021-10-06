@@ -12,8 +12,14 @@ SD3D12ThreadAllocatorContainer::SD3D12ThreadAllocatorContainer(int64 threadId, I
 
 ID3D12CommandAllocator* SD3D12ThreadAllocatorContainer::GetPrimaryAllocator(uint64 fenceValue)
 {
-	if (auto& pendingBody = _allocators.front(); pendingBody.FenceValue >= fenceValue)
+	if (auto& pendingBody = _allocators.front(); pendingBody.FenceValue <= fenceValue)
 	{
+		if (pendingBody.FenceValue != 0)
+		{
+			HR(pendingBody.Allocator->Reset());
+			pendingBody.FenceValue = 0;
+		}
+
 		return pendingBody.Allocator.Get();
 	}
 	else

@@ -33,6 +33,7 @@ public:
 	virtual void ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts) override;
 
 	uint64 GetFenceValue();
+	uint64 GetCompletedValue();
 	void Collect();
 	void WaitCompleted();
 

@@ -22,6 +22,16 @@ SD3D12Device::SD3D12Device(SDXGIFactory* factory, ComPtr<ID3D12Device> device) :
 	AllocateCommandQueue();
 }
 
+SD3D12Device::~SD3D12Device()
+{
+	if (_immCon)
+	{
+		// Flush and signal forcely.
+		_immCon->ExecuteCommandList(nullptr);
+		_immCon->WaitCompleted();
+	}
+}
+
 IRHIDeviceContext* SD3D12Device::GetImmediateContext()
 {
 	return _immCon;
@@ -458,7 +468,10 @@ void SD3D12Device::BeginFrame()
 
 void SD3D12Device::EndFrame()
 {
+	_immCon->ExecuteCommandList(_immCon);
+
 	_fenceValue = _immCon->GetFenceValue();
+	MarkPendingAllocatorAndHeaps(_fenceValue);
 }
 
 ID3D12CommandAllocator* SD3D12Device::GetThreadPrimaryAllocator()
@@ -478,7 +491,7 @@ ID3D12CommandAllocator* SD3D12Device::GetThreadPrimaryAllocator()
 		container = allocator_it->second;
 	}
 
-	return container->GetPrimaryAllocator(_fenceValue);
+	return container->GetPrimaryAllocator(_immCon->GetCompletedValue());
 }
 
 SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySrvHeap(int32 count)
@@ -498,7 +511,7 @@ SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySrvHeap(int32 count)
 		container = heaps_it->second;
 	}
 
-	return container->GetUsableHeap(_fenceValue, count);
+	return container->GetUsableHeap(_immCon->GetCompletedValue(), count);
 }
 
 SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySamplerHeap(int32 count)
@@ -518,7 +531,7 @@ SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySamplerHeap(int32 count)
 		container = heaps_it->second;
 	}
 
-	return container->GetUsableHeap(_fenceValue, count);
+	return container->GetUsableHeap(_immCon->GetCompletedValue(), count);
 }
 
 void SD3D12Device::MarkPendingAllocatorAndHeaps(uint64 fenceValue)
