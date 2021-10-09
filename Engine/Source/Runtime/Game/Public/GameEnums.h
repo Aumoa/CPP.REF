@@ -53,12 +53,5 @@ enum class EMousePositionMode
     Relative
 };
 
-enum class EMaterialBlendMode
-{
-    Opaque,
-    Masked,
-    Transparent,
-};
-
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

@@ -157,6 +157,12 @@
     <Filter Include="Private\Widgets\Text">
       <UniqueIdentifier>{dd82628d-ec81-4c5b-be4b-1a7c8effdb6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\GameThreads">
+      <UniqueIdentifier>{ddbab6d9-2827-4458-b4e6-3c7e1a1b4bef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\GameThreads">
+      <UniqueIdentifier>{8720cc83-1650-4202-9b91-d8f28e6e908d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\LogGame.cpp">
@@ -383,6 +389,9 @@
     </ClCompile>
     <ClCompile Include="Private\Widgets\Text\TextBlock.cpp">
       <Filter>Private\Widgets\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameThreads\RenderThread.cpp">
+      <Filter>Private\GameThreads</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -724,6 +733,9 @@
     </ClInclude>
     <ClInclude Include="Public\Draw\SlateFontElement.h">
       <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameThreads\RenderThread.h">
+      <Filter>Public\GameThreads</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

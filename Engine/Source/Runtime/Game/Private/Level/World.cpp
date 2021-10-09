@@ -10,6 +10,64 @@
 #include "Camera/PlayerCameraManager.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 
+template<ETickingGroup _Group>
+bool SWorld::TickGroup<_Group>::Add(STickFunction* function)
+{
+	check(function->TickGroup == Group);
+	return Functions.emplace(function).second;
+}
+
+template<ETickingGroup _Group>
+bool SWorld::TickGroup<_Group>::Remove(STickFunction* function)
+{
+	check(function->TickGroup == Group);
+	return Functions.erase(function) > 0;
+}
+
+template<ETickingGroup _Group>
+void SWorld::TickGroup<_Group>::ReadyForExecuteTick()
+{
+	for (auto& function : Functions) { function->Ready(); }
+}
+
+template<ETickingGroup _Group>
+void SWorld::TickGroup<_Group>::ExecuteTick(std::chrono::duration<float> elapsedTime)
+{
+	for (auto& function : Functions) { function->ExecuteTick(elapsedTime); }
+}
+
+bool SWorld::TickFunctions::Add(STickFunction* function)
+{
+	switch (function->TickGroup)
+	{
+	case ETickingGroup::PrePhysics: return PrePhysics.Add(function);
+	case ETickingGroup::DuringPhysics: return DuringPhysics.Add(function);
+	case ETickingGroup::PostPhysics: return PostPhysics.Add(function);
+	case ETickingGroup::PostUpdateWork: return PostUpdateWork.Add(function);
+	}
+	return ensure(false);
+}
+
+bool SWorld::TickFunctions::Remove(STickFunction* function)
+{
+	switch (function->TickGroup)
+	{
+	case ETickingGroup::PrePhysics: return PrePhysics.Remove(function);
+	case ETickingGroup::DuringPhysics: return DuringPhysics.Remove(function);
+	case ETickingGroup::PostPhysics: return PostPhysics.Remove(function);
+	case ETickingGroup::PostUpdateWork: return PostUpdateWork.Remove(function);
+	}
+	return ensure(false);
+}
+
+void SWorld::TickFunctions::ReadyForExecuteTick()
+{
+	PrePhysics.ReadyForExecuteTick();
+	DuringPhysics.ReadyForExecuteTick();
+	PostPhysics.ReadyForExecuteTick();
+	PostUpdateWork.ReadyForExecuteTick();
+}
+
 SWorld::SWorld() : Super()
 {
 	SetWorld(this);
@@ -70,7 +128,7 @@ void SWorld::RegisterTickFunction(STickFunction* function)
 {
 	if (function->bCanEverTick)
 	{
-		_tickInstances.emplace(function);
+		_tickFunctions.Add(function);
 	}
 }
 
@@ -98,7 +156,7 @@ void SWorld::RegisterComponent(SActorComponent* component)
 
 void SWorld::UnregisterTickFunction(STickFunction* function)
 {
-	_tickInstances.erase(function);
+	_tickFunctions.Remove(function);
 }
 
 void SWorld::UnregisterComponent(SActorComponent* component)
@@ -115,18 +173,13 @@ void SWorld::UnregisterComponent(SActorComponent* component)
 
 void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
 {
-	for (auto& func : _tickInstances)
-	{
-		func->Ready();
-	}
+	_tickFunctions.ReadyForExecuteTick();
 
-	for (auto& func : _tickInstances)
-	{
-		func->ExecuteTick(elapsedTime);
-	}
-
+	_tickFunctions.PrePhysics.ExecuteTick(elapsedTime);
+	_tickFunctions.DuringPhysics.ExecuteTick(elapsedTime);
+	_tickFunctions.PostPhysics.ExecuteTick(elapsedTime);
 	_playerController->UpdateCameraManager(elapsedTime);
-
+	_tickFunctions.PostUpdateWork.ExecuteTick(elapsedTime);
 	_scene->UpdateScene(elapsedTime);
 }
 

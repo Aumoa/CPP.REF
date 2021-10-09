@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameObject.h"
 #include <set>
+#include <ranges>
 #include "SubclassOf.h"
 #include "LogGame.h"
 #include "GameFramework/Actor.h"
@@ -24,10 +25,37 @@ class GAME_API SWorld : public SGameObject
 	GENERATED_BODY(SWorld)
 
 private:
-	std::set<AActor*> _actors;
+	template<ETickingGroup _Group>
+	struct TickGroup
+	{
+		static constexpr ETickingGroup Group = _Group;
+		std::set<STickFunction*> Functions;
+
+		bool Add(STickFunction* function);
+		bool Remove(STickFunction* function);
+
+		void ReadyForExecuteTick();
+		void ExecuteTick(std::chrono::duration<float> elapsedTime);
+	};
+
+	struct TickFunctions
+	{
+		TickGroup<ETickingGroup::PrePhysics> PrePhysics;
+		TickGroup<ETickingGroup::DuringPhysics> DuringPhysics;
+		TickGroup<ETickingGroup::PostPhysics> PostPhysics;
+		TickGroup<ETickingGroup::PostUpdateWork> PostUpdateWork;
+
+		bool Add(STickFunction* function);
+		bool Remove(STickFunction* function);
+
+		void ReadyForExecuteTick();
+	};
+
 	SLevel* _level = nullptr;
-	std::set<STickFunction*> _tickInstances;
 	SScene* _scene = nullptr;
+
+	std::set<AActor*> _actors;
+	TickFunctions _tickFunctions;
 
 	APlayerController* _playerController = nullptr;
 	APlayerCameraManager* _playerCamera = nullptr;

@@ -47,6 +47,7 @@ public:
 	SSlateShader(IRHIDevice* device);
 
 	virtual std::vector<RHIMaterialParameterInfo> GetParametersInfo() override { return _parameters; }
+	virtual EMaterialBlendMode GetBlendMode() override { return EMaterialBlendMode::UI; }
 
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() override { return _elements; }
 	virtual std::span<uint8 const> CompileVS() override;

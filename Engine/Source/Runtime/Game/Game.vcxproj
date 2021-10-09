@@ -161,6 +161,7 @@
     <ClCompile Include="Private\GameInstance.cpp" />
     <ClCompile Include="Private\GameModule.cpp" />
     <ClCompile Include="Private\GameObject.cpp" />
+    <ClCompile Include="Private\GameThreads\RenderThread.cpp" />
     <ClCompile Include="Private\Info\GameMode.cpp" />
     <ClCompile Include="Private\Info\Info.cpp" />
     <ClCompile Include="Private\Layout\ArrangedChildrens.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="Public\GameModule.h" />
     <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameStructures.h" />
+    <ClInclude Include="Public\GameThreads\RenderThread.h" />
     <ClInclude Include="Public\IFrameworkView.h" />
     <ClInclude Include="Public\Info\GameMode.h" />
     <ClInclude Include="Public\Info\Info.h" />
