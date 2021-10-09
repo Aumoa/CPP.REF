@@ -13,6 +13,8 @@ interface IRHIShader;
 interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
+interface IRHITextLayout;
+interface IRHITextFormat;
 class SMaterial;
 class SVertexFactory;
 
@@ -25,6 +27,7 @@ interface IRHIDevice : implements IRHIFactoryChild
 	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 count) = 0;
 	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 count) = 0;
 	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 count) = 0;
+	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout) = 0;
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 };

@@ -69,7 +69,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>DXGI.lib;D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DXGI.lib;D3D12.lib;D3D11.lib;D2D1.lib;DWrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -92,7 +92,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>DXGI.lib;D3D12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DXGI.lib;D3D12.lib;D3D11.lib;D2D1.lib;DWrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -115,6 +115,9 @@
     <ClCompile Include="Private\RHI\D3D12\D3D12ThreadDescriptorHeapContainer.cpp" />
     <ClCompile Include="Private\RHI\D3D12\D3D12View.cpp" />
     <ClCompile Include="Private\RHI\DirectXCommon.cpp" />
+    <ClCompile Include="Private\RHI\DWrite\DWriteFontCollection.cpp" />
+    <ClCompile Include="Private\RHI\DWrite\DWriteTextFormat.cpp" />
+    <ClCompile Include="Private\RHI\DWrite\DWriteTextLayout.cpp" />
     <ClCompile Include="Private\RHI\DXGI\DXGIAdapter.cpp" />
     <ClCompile Include="Private\RHI\DXGI\DXGIFactory.cpp" />
     <ClCompile Include="Private\RHI\DXGI\DXGIFactoryChild.cpp" />
@@ -147,6 +150,9 @@
     <ClInclude Include="Private\RHI\D3D12\D3D12View.h" />
     <ClInclude Include="Private\RHI\D3D12\D3D12DescriptorHeap.h" />
     <ClInclude Include="Private\RHI\DirectXCommon.h" />
+    <ClInclude Include="Private\RHI\DWrite\DWriteFontCollection.h" />
+    <ClInclude Include="Private\RHI\DWrite\DWriteTextFormat.h" />
+    <ClInclude Include="Private\RHI\DWrite\DWriteTextLayout.h" />
     <ClInclude Include="Private\RHI\DXGI\DXGIAdapter.h" />
     <ClInclude Include="Private\RHI\DXGI\DXGIFactoryChild.h" />
     <ClInclude Include="Private\RHI\DXGI\DXGIFactory.h" />
@@ -164,6 +170,7 @@
     <ClInclude Include="Public\RHI\IRHIDeviceContext.h" />
     <ClInclude Include="Public\RHI\IRHIFactory.h" />
     <ClInclude Include="Public\RHI\IRHIFactoryChild.h" />
+    <ClInclude Include="Public\RHI\IRHIFontCollection.h" />
     <ClInclude Include="Public\RHI\IRHIImageSourceView.h" />
     <ClInclude Include="Public\RHI\IRHIDeviceChild.h" />
     <ClInclude Include="Public\RHI\IRHIRenderTargetView.h" />
@@ -171,6 +178,8 @@
     <ClInclude Include="Public\RHI\IRHIShader.h" />
     <ClInclude Include="Public\RHI\IRHIShaderResourceView.h" />
     <ClInclude Include="Public\RHI\IRHISwapChain.h" />
+    <ClInclude Include="Public\RHI\IRHITextFormat.h" />
+    <ClInclude Include="Public\RHI\IRHITextLayout.h" />
     <ClInclude Include="Public\RHI\IRHITexture2D.h" />
     <ClInclude Include="Public\RHI\IRHIUnorderedAccessView.h" />
     <ClInclude Include="Public\RHI\IRHIView.h" />

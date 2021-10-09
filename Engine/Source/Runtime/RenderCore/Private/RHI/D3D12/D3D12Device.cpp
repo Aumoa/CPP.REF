@@ -11,6 +11,9 @@
 #include "D3D12RenderTargetView.h"
 #include "D3D12DepthStencilView.h"
 #include "D3D12ShaderResourceView.h"
+#include "RHI/DXGI/DXGIFactory.h"
+#include "RHI/DWrite/DWriteTextFormat.h"
+#include "RHI/DWrite/DWriteTextLayout.h"
 #include "VertexFactory.h"
 #include "Materials/Material.h"
 #include "Threading/Thread.h"
@@ -20,6 +23,7 @@ SD3D12Device::SD3D12Device(SDXGIFactory* factory, ComPtr<ID3D12Device> device) :
 	, _device(std::move(device))
 {
 	AllocateCommandQueue();
+	CreateInteropDevice();
 }
 
 SD3D12Device::~SD3D12Device()
@@ -460,6 +464,17 @@ IRHIShaderResourceView* SD3D12Device::CreateShaderResourceView(int32 count)
 	return NewObject<SD3D12ShaderResourceView>(_factory, this, std::move(heap), count);
 }
 
+IRHITextLayout* SD3D12Device::CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout)
+{
+	auto format_s = Cast<SDWriteTextFormat>(format);
+	auto factory = _factory->Get<IDWriteFactory5>();
+
+	ComPtr<IDWriteTextLayout> textLayout;
+	HR(factory->CreateTextLayout(text.data(), (UINT32)text.length(), format_s->Get<IDWriteTextFormat>(), layout.X, layout.Y, &textLayout));
+
+	return NewObject<SDWriteTextLayout>(_factory, this, std::move(textLayout));
+}
+
 void SD3D12Device::BeginFrame()
 {
 	_immCon->Collect();
@@ -570,4 +585,23 @@ void SD3D12Device::AllocateCommandQueue()
 	HR(_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 
 	_immCon = NewObject<SD3D12CommandQueue>(_factory, this, std::move(queue), std::move(fence));
+}
+
+void SD3D12Device::CreateInteropDevice()
+{
+	UINT deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#if defined(_DEBUG)
+	deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	ID3D12CommandQueue* primaryQueue = _immCon->Get<ID3D12CommandQueue>();
+	IUnknown** ppQueues = reinterpret_cast<IUnknown**>(&primaryQueue);
+	HR(D3D11On12CreateDevice(_device.Get(), deviceFlags, nullptr, 0, ppQueues, 1, 0, &_interop.Device, &_interop.DeviceContext, nullptr));
+	HR(_interop.Device.As(&_interop.InteropDevice));
+
+	ComPtr<IDXGIDevice> dxgiDevice;
+	HR(_interop.InteropDevice.As(&dxgiDevice));
+
+	HR(D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_MULTI_THREADED, D2D1_DEBUG_LEVEL_NONE, D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS), &_interop.Device2D));
+	HR(_interop.Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, &_interop.DeviceContext2D));
 }

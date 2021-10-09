@@ -76,6 +76,15 @@
     <ClCompile Include="Private\LogRenderCore.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="Private\RHI\DWrite\DWriteFontCollection.cpp">
+      <Filter>Private\RHI\DWrite</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\DWrite\DWriteTextFormat.cpp">
+      <Filter>Private\RHI\DWrite</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RHI\DWrite\DWriteTextLayout.cpp">
+      <Filter>Private\RHI\DWrite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -101,6 +110,9 @@
     </Filter>
     <Filter Include="Private\Materials">
       <UniqueIdentifier>{467ea5fa-1e98-41d4-9e27-c5bcc8d90bfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\RHI\DWrite">
+      <UniqueIdentifier>{98aabf8a-7058-40f6-b974-047d370b19d2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -241,6 +253,24 @@
     </ClInclude>
     <ClInclude Include="Public\LogRenderCore.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHITextFormat.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIFontCollection.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RHI\DWrite\DWriteFontCollection.h">
+      <Filter>Private\RHI\DWrite</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RHI\DWrite\DWriteTextFormat.h">
+      <Filter>Private\RHI\DWrite</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHITextLayout.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\RHI\DWrite\DWriteTextLayout.h">
+      <Filter>Private\RHI\DWrite</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

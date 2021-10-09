@@ -15,7 +15,7 @@
 #include <d3d11on12.h>
 #include <dxgi1_6.h>
 #include <d2d1_1.h>
-#include <dwrite.h>
+#include <dwrite_3.h>
 #include <wrl/client.h>
 
 using Microsoft::WRL::ComPtr;
@@ -35,3 +35,13 @@ if (HRESULT __hr = (x); FAILED(__hr))														\
 #define DECLARE_GETTER(Type, Member)								\
 	template<std::same_as<Type> T>									\
 	inline T* Get() { return static_cast<Type*>(Member.Get()); }
+
+inline UINT GetInteropBindFlag(D3D12_RESOURCE_FLAGS flags)
+{
+	UINT bindFlags = D3D11_BIND_SHADER_RESOURCE;
+	if (flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET)
+	{
+		bindFlags |= D3D11_BIND_RENDER_TARGET;
+	}
+	return bindFlags;
+}

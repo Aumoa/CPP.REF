@@ -2,6 +2,7 @@
 
 #include "D3D12Texture2D.h"
 #include "D3D12CommandList.h"
+#include "D3D12Device.h"
 
 SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc) : Super(factory, device, resource, uploadHeap)
 	, _resource(std::move(resource))

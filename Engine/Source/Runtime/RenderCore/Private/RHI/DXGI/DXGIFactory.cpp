@@ -7,6 +7,8 @@
 #include "RHI/D3D12/D3D12Device.h"
 #include "RHI/D3D12/D3D12CommandQueue.h"
 #include "RHI/IRHIDeviceContext.h"
+#include "RHI/DWrite/DWriteFontCollection.h"
+#include "RHI/DWrite/DWriteTextFormat.h"
 
 SDXGIFactory::SDXGIFactory() : Super()
 {
@@ -16,6 +18,7 @@ SDXGIFactory::SDXGIFactory() : Super()
 #endif
 
 	HR(CreateDXGIFactory2(flags, IID_PPV_ARGS(&_factory)));
+	HR(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), static_cast<IUnknown**>(&_writeFactory)));
 }
 
 IRHIAdapter* SDXGIFactory::GetAdapter(int32 index)
@@ -87,4 +90,37 @@ IRHISwapChain* SDXGIFactory::CreateSwapChain(IWindowView* window, IRHIDevice* de
 	HR(swapChain1.As<IDXGISwapChain4>(&swapChain4));
 
 	return NewObject<SDXGISwapChain>(this, Cast<SD3D12Device>(device), std::move(swapChain4));
+}
+
+IRHIFontCollection* SDXGIFactory::CreateFontCollection(const std::filesystem::path& path)
+{
+	ComPtr<IDWriteFontFile> fileReference;
+	HR(_writeFactory->CreateFontFileReference(path.wstring().c_str(), nullptr, &fileReference));
+
+	ComPtr<IDWriteFontSetBuilder1> fontSetBuilder;
+	HR(_writeFactory->CreateFontSetBuilder(&fontSetBuilder));
+	HR(fontSetBuilder->AddFontFile(fileReference.Get()));
+
+	ComPtr<IDWriteFontSet> fontSet;
+	HR(fontSetBuilder->CreateFontSet(&fontSet));
+
+	ComPtr<IDWriteFontCollection1> collection;
+	HR(_writeFactory->CreateFontCollectionFromFontSet(fontSet.Get(), &collection));
+
+	return NewObject<SDWriteFontCollection>(this, std::move(collection));
+}
+
+IRHITextFormat* SDXGIFactory::CreateTextFormat(std::wstring_view fontFamilyName, IRHIFontCollection* fontCollection, ERHIFontWeight fontWeight, ERHIFontStyle fontStyle, ERHIFontStretch fontStretch, float fontSize, std::wstring_view localeName)
+{
+	IDWriteFontCollection* fontCollection_d = nullptr;
+
+	if (auto fontCollection_s = Cast<SDWriteFontCollection>(fontCollection); fontCollection_s)
+	{
+		fontCollection_d = fontCollection_s->Get<IDWriteFontCollection>();
+	}
+
+	ComPtr<IDWriteTextFormat> format;
+	HR(_writeFactory->CreateTextFormat(fontFamilyName.data(), fontCollection_d, (DWRITE_FONT_WEIGHT)fontWeight, (DWRITE_FONT_STYLE)fontStyle, (DWRITE_FONT_STRETCH)fontStretch, fontSize, localeName.data(), &format));
+
+	return NewObject<SDWriteTextFormat>(this, std::move(format));
 }

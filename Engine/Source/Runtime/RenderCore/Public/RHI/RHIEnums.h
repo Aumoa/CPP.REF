@@ -366,5 +366,56 @@ enum class ERHIBufferSRVFlags
 };
 DEFINE_ENUM_FLAG_OPERATORS(ERHIBufferSRVFlags);
 
+enum class ERHIFontWeight
+{
+    Thin = 100,
+    ExtraLight = 200,
+    UltraLight = 200,
+    Light = 300,
+    SemiLight = 350,
+    Normal = 400,
+    Regular = 400,
+    Medium = 500,
+    DemiBold = 600,
+    SemiBold = 600,
+    Bold = 700,
+    ExtraBold = 800,
+    UltraBold = 800,
+    Black = 900,
+    Heavy = 900,
+    ExtraBlack = 950,
+    UltraBlack = 950
+};
+
+enum class ERHIFontStyle
+{
+    Normal,
+    Oblique,
+    Italic,
+};
+
+enum class ERHIFontStretch
+{
+    Undefined = 0,
+    UltraCondensed = 1,
+    ExtraCondensed = 2,
+    Condensed = 3,
+    SemiCondensed = 4,
+    Normal = 5,
+    Medium = 5,
+    SemiExpanded = 6,
+    Expanded = 7,
+    ExtraExpanded = 8,
+    UltraExpanded = 9,
+};
+
+enum class EMaterialBlendMode
+{
+    Opaque,
+    Masked,
+    Transparent,
+    UI,
+};
+
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

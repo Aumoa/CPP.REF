@@ -41,6 +41,7 @@ public:
 	virtual bool GetTexture2DParameterValueByIndex(int32 index, IRHITexture2D** value);
 	virtual int32 GetParameterMappingIndex(std::wstring_view parameterName);
 	virtual std::vector<RHIMaterialParameterInfo> GetParametersInfo() = 0;
+	virtual EMaterialBlendMode GetBlendMode() = 0;
 
 	bool SetScalarParameterValueByName(std::wstring_view parameterName, float value)
 	{

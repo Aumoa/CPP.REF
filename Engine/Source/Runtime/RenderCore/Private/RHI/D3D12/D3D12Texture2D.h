@@ -17,6 +17,9 @@ private:
 	RHITexture2DDesc _desc;
 	uint64 _totalBytes = 0;
 
+	ComPtr<ID3D11Resource> _wrappedResource;
+	ComPtr<ID2D1Bitmap1> _bitmap;
+
 public:
 	SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc);
 
