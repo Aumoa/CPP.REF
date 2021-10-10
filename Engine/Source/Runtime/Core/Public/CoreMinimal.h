@@ -37,6 +37,7 @@
 #include "Numerics/Ray.h"
 #include "Numerics/Sphere.h"
 #include "Numerics/Rect.h"
+#include "Numerics/Transform.h"
 #include "Misc/StringUtils.h"
 #include "Memory/ScopedPtr.h"
 #include "PlatformMisc/InputEnums.h"

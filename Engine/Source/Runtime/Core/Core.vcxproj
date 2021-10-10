@@ -157,6 +157,7 @@
     <ClInclude Include="Public\Numerics\Ray.h" />
     <ClInclude Include="Public\Numerics\Rect.h" />
     <ClInclude Include="Public\Numerics\Sphere.h" />
+    <ClInclude Include="Public\Numerics\Transform.h" />
     <ClInclude Include="Public\Numerics\Vector.h" />
     <ClInclude Include="Public\Numerics\VectorScalarsImpl.h" />
     <ClInclude Include="Public\Object.h" />
