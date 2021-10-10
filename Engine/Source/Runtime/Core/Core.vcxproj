@@ -138,6 +138,7 @@
     <ClInclude Include="Public\Mathematics\Radians.h" />
     <ClInclude Include="Public\Memory\ScopedPtr.h" />
     <ClInclude Include="Public\Misc\CommandLine.h" />
+    <ClInclude Include="Public\Misc\CrcHash.h" />
     <ClInclude Include="Public\Misc\DateTime.h" />
     <ClInclude Include="Public\Misc\Paths.h" />
     <ClInclude Include="Public\Misc\StringUtils.h" />

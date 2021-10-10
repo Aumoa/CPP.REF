@@ -299,5 +299,8 @@
     <ClInclude Include="Public\Numerics\Transform.h">
       <Filter>Public\Numerics</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Misc\CrcHash.h">
+      <Filter>Public\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
