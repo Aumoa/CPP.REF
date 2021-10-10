@@ -124,9 +124,6 @@
     <ClCompile Include="Private\VertexFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\ThirdParty\Source\freetype\builds\windows\vc2019\freetype.vcxproj">
-      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>
