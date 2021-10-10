@@ -19,13 +19,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -57,12 +57,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);GAME_API=__declspec(dllimport);CHESSAI_API=__declspec(dllexport);_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Private;$(ProjectDir)Public;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -77,12 +76,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);GAME_API=__declspec(dllimport);CHESSAI_API=__declspec(dllexport);NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Private;$(ProjectDir)Public;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -94,20 +92,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actors\Bishop.cpp" />
-    <ClCompile Include="Actors\ChessBoard.cpp" />
-    <ClCompile Include="Actors\ChessPawn.cpp" />
-    <ClCompile Include="Actors\FirstCheckPiece.cpp" />
-    <ClCompile Include="Actors\King.cpp" />
-    <ClCompile Include="Actors\Knight.cpp" />
-    <ClCompile Include="Actors\Piece.cpp" />
-    <ClCompile Include="Actors\Queen.cpp" />
-    <ClCompile Include="Actors\Rook.cpp" />
-    <ClCompile Include="LogChessAI.cpp" />
-    <ClCompile Include="Pawns\ChessBoardProxy.cpp" />
-    <ClCompile Include="Queries\ChessBoardBuilt.cpp" />
-    <ClCompile Include="Queries\ChessQueries.cpp" />
-    <ClCompile Include="Queries\DirectionalMovablePiece.cpp" />
+    <ClCompile Include="Private\Actors\Bishop.cpp" />
+    <ClCompile Include="Private\Actors\ChessBoard.cpp" />
+    <ClCompile Include="Private\Actors\ChessPawn.cpp" />
+    <ClCompile Include="Private\Actors\FirstCheckPiece.cpp" />
+    <ClCompile Include="Private\Actors\King.cpp" />
+    <ClCompile Include="Private\Actors\Knight.cpp" />
+    <ClCompile Include="Private\Actors\Piece.cpp" />
+    <ClCompile Include="Private\Actors\Queen.cpp" />
+    <ClCompile Include="Private\Actors\Rook.cpp" />
+    <ClCompile Include="Private\LogChessAI.cpp" />
+    <ClCompile Include="Private\Pawns\ChessBoardProxy.cpp" />
+    <ClCompile Include="Private\Queries\ChessBoardBuilt.cpp" />
+    <ClCompile Include="Private\Queries\ChessQueries.cpp" />
+    <ClCompile Include="Private\Queries\DirectionalMovablePiece.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Engine\Source\Runtime\Core\Core.vcxproj">
@@ -118,22 +116,22 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actors\Bishop.h" />
-    <ClInclude Include="Actors\ChessBoard.h" />
-    <ClInclude Include="Actors\ChessPawn.h" />
-    <ClInclude Include="Actors\FirstCheckPiece.h" />
-    <ClInclude Include="Actors\King.h" />
-    <ClInclude Include="Actors\Knight.h" />
-    <ClInclude Include="Actors\Piece.h" />
-    <ClInclude Include="Actors\Queen.h" />
-    <ClInclude Include="Actors\Rook.h" />
-    <ClInclude Include="ChessAIEnums.h" />
-    <ClInclude Include="ChessAIStructures.h" />
-    <ClInclude Include="LogChessAI.h" />
-    <ClInclude Include="Pawns\ChessBoardProxy.h" />
-    <ClInclude Include="Queries\ChessBoardBuilt.h" />
-    <ClInclude Include="Queries\ChessQueries.h" />
-    <ClInclude Include="Queries\DirectionalMovablePiece.h" />
+    <ClInclude Include="Public\Actors\Bishop.h" />
+    <ClInclude Include="Public\Actors\ChessBoard.h" />
+    <ClInclude Include="Public\Actors\ChessPawn.h" />
+    <ClInclude Include="Public\Actors\FirstCheckPiece.h" />
+    <ClInclude Include="Public\Actors\King.h" />
+    <ClInclude Include="Public\Actors\Knight.h" />
+    <ClInclude Include="Public\Actors\Piece.h" />
+    <ClInclude Include="Public\Actors\Queen.h" />
+    <ClInclude Include="Public\Actors\Rook.h" />
+    <ClInclude Include="Public\ChessAIEnums.h" />
+    <ClInclude Include="Public\ChessAIStructures.h" />
+    <ClInclude Include="Public\LogChessAI.h" />
+    <ClInclude Include="Public\Pawns\ChessBoardProxy.h" />
+    <ClInclude Include="Public\Queries\ChessBoardBuilt.h" />
+    <ClInclude Include="Public\Queries\ChessQueries.h" />
+    <ClInclude Include="Public\Queries\DirectionalMovablePiece.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

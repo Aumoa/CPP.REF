@@ -19,13 +19,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -57,12 +57,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);GAME_API=__declspec(dllimport);CHESSAI_API=__declspec(dllimport);CHESS_API=__declspec(dllexport);_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(SolutionDir)Game\Source\ChessAI\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Private\;$(ProjectDir)Public\;$(SolutionDir)Engine\Source\Runtime\Core\Public\;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public\;$(SolutionDir)Engine\Source\Runtime\Game\Public\;$(SolutionDir)Game\Source\ChessAI\Public\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -76,12 +75,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);GAME_API=__declspec(dllimport);CHESSAI_API=__declspec(dllimport);CHESS_API=__declspec(dllexport);NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <DisableSpecificWarnings>5050;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\;$(SolutionDir)Engine\Source\Runtime\RenderCore\;$(SolutionDir)Engine\Source\Runtime\Game\;$(SolutionDir)Game\Source\ChessAI\;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Private\;$(ProjectDir)Public\;$(SolutionDir)Engine\Source\Runtime\Core\Public\;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public\;$(SolutionDir)Engine\Source\Runtime\Game\Public\;$(SolutionDir)Game\Source\ChessAI\Public\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -103,28 +101,30 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Actors\GridIndicator.cpp" />
-    <ClCompile Include="Assets\Cube.cpp" />
-    <ClCompile Include="ChessGameInstance.cpp" />
-    <ClCompile Include="ChessGameMode.cpp" />
-    <ClCompile Include="Components\ChessSystemComponent.cpp" />
-    <ClCompile Include="Components\CommandComponent.cpp" />
-    <ClCompile Include="Components\IndicatingComponent.cpp" />
-    <ClCompile Include="Controller\ChessPlayerController.cpp" />
-    <ClCompile Include="Level\GameLevel.cpp" />
-    <ClCompile Include="LogChess.cpp" />
+    <ClInclude Include="Public\Actors\GridIndicator.h" />
+    <ClInclude Include="Public\Assets\Cube.h" />
+    <ClInclude Include="Public\ChessGameInstance.h" />
+    <ClInclude Include="Public\ChessGameMode.h" />
+    <ClInclude Include="Public\ChessGameModule.h" />
+    <ClInclude Include="Public\Components\ChessSystemComponent.h" />
+    <ClInclude Include="Public\Components\CommandComponent.h" />
+    <ClInclude Include="Public\Components\IndicatingComponent.h" />
+    <ClInclude Include="Public\Controller\ChessPlayerController.h" />
+    <ClInclude Include="Public\Level\GameLevel.h" />
+    <ClInclude Include="Public\LogChess.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actors\GridIndicator.h" />
-    <ClInclude Include="Assets\Cube.h" />
-    <ClInclude Include="ChessGameInstance.h" />
-    <ClInclude Include="ChessGameMode.h" />
-    <ClInclude Include="Components\ChessSystemComponent.h" />
-    <ClInclude Include="Components\CommandComponent.h" />
-    <ClInclude Include="Components\IndicatingComponent.h" />
-    <ClInclude Include="Controller\ChessPlayerController.h" />
-    <ClInclude Include="Level\GameLevel.h" />
-    <ClInclude Include="LogChess.h" />
+    <ClCompile Include="Private\Actors\GridIndicator.cpp" />
+    <ClCompile Include="Private\Assets\Cube.cpp" />
+    <ClCompile Include="Private\ChessGameInstance.cpp" />
+    <ClCompile Include="Private\ChessGameMode.cpp" />
+    <ClCompile Include="Private\ChessGameModule.cpp" />
+    <ClCompile Include="Private\Components\ChessSystemComponent.cpp" />
+    <ClCompile Include="Private\Components\CommandComponent.cpp" />
+    <ClCompile Include="Private\Components\IndicatingComponent.cpp" />
+    <ClCompile Include="Private\Controller\ChessPlayerController.cpp" />
+    <ClCompile Include="Private\Level\GameLevel.cpp" />
+    <ClCompile Include="Private\LogChess.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

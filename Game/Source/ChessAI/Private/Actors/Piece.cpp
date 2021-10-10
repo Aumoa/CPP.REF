@@ -1,0 +1,80 @@
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
+
+#include "Actors/Piece.h"
+#include "Actors/ChessBoard.h"
+#include "GameEngine.h"
+#include "LogChessAI.h"
+#include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstance.h"
+#include "Shaders/ColorShader/ColorShader.h"
+
+APiece::APiece() : Super()
+{
+	_meshComponent = NewObject<SStaticMeshComponent>();
+	SetRootComponent(_meshComponent);
+}
+
+void APiece::Init(AChessBoard* board, EChessTeam team, const GridIndex& index)
+{
+	if (_board != nullptr)
+	{
+		SE_LOG(LogChessAI, Error, L"APiece::Init() function can be call only first time.");
+		return;
+	}
+
+	_board = board;
+	_meshComponent->SetStaticMesh(GetStaticMesh());
+	_team = team;
+	_myIndex = index;
+
+	//SColorShader* cshader = SGameEngine::GetEngine()->GetColorShader();
+	//SMaterialInstance* color = NewObject<SMaterialInstance>(cshader->GetDefaultMaterial());
+	//color->SetVector3ParameterValueByName(L"Color", team == EChessTeam::Black ? 0.2f : 0.8f);
+	//_meshComponent->SetMaterial(0, color);
+
+	_meshComponent->SetLocation(board->GetBoardCellPosition(index));
+	if (team == EChessTeam::White)
+	{
+		_meshComponent->SetRotation(Quaternion::FromAxisAngle(Vector3(0, 1, 0), 180.0f));
+	}
+}
+
+ActionRecord APiece::Move(const GridIndex& index, const ChessBoardBuilt& built)
+{
+	MovablePointsQuery query;
+	if (!QueryMovable(query, built))
+	{
+		return false;
+	}
+
+	_board->SimulateMoveQuery(query);
+	auto [figure, figureIdx] = query.GetHit(index);
+	if (figure == nullptr)
+	{
+		return false;
+	}
+
+	_meshComponent->SetLocation(_board->GetBoardCellPosition(index));
+	GridIndex loc = _myIndex;
+	_myIndex = index;
+
+	ActionRecord record(
+		this,
+		[&, loc]()
+		{
+			_meshComponent->SetLocation(_board->GetBoardCellPosition(loc));
+			_myIndex = loc;
+		});
+
+	if (figure->Targets[figureIdx])
+	{
+		record.TakeActor(figure->Targets[figureIdx]);
+	}
+	
+	return record;
+}
+
+void APiece::SetIndex(const GridIndex& location)
+{
+	_myIndex = location;
+}
