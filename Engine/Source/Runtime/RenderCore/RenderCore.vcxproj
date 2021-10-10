@@ -62,7 +62,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)ThirdParty\Source\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4250;</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -83,7 +82,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)ThirdParty\Source\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4250;</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>

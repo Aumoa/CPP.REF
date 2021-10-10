@@ -62,7 +62,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4275;</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -92,7 +91,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;4275;</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>

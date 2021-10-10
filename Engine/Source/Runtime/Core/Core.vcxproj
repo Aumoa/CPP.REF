@@ -62,8 +62,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <DisableSpecificWarnings>4250;4251;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -82,8 +82,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <DisableSpecificWarnings>4250;4251;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -61,7 +61,6 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
@@ -82,7 +81,6 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Game\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
