@@ -17,27 +17,57 @@ class RenderThread
 	RenderThread() = delete;
 
 private:
-	static int64 _threadId;
-	static std::thread _thread;
-	static std::map<size_t, std::function<void()>> _works;
-	static std::map<size_t, std::function<void()>> _pendingWorks;
-	static std::mutex _locker;
-	static std::shared_ptr<SEventHandle> _executeEvent;
-	static std::atomic<bool> _bSwitch;
+	using WorksDictionary = std::map<size_t, std::function<void()>>;
+
+	struct WaitingThreadWorks
+	{
+		WorksDictionary Works;
+		std::function<void()> CompletedWork;
+	};
+
+	struct PendingThreadWork
+	{
+		WorksDictionary Works;
+		std::function<void()> CompletedWork;
+		std::shared_ptr<SEventHandle> ExecuteEvent;
+		std::shared_ptr<SEventHandle> CompletedEvent;
+
+		void Init();
+		void SwapExecute(WaitingThreadWorks& target);
+		void RunningWorks_RenderThread();
+	};
+
+	struct ThreadInfo
+	{
+		int64 ThreadId;
+		std::thread Thread;
+		std::atomic<bool> bRunning;
+		std::mutex CriticalSection;
+
+		void Init();
+		void Init_RenderThread();
+		void WaitToComplete();
+		void Worker();
+	};
+
+private:
+	inline static ThreadInfo _thread;
+	inline static WaitingThreadWorks _waitingWorks;
+	inline static PendingThreadWork _executingWorks;
 	
 public:
 	static void Init();
 	static void Shutdown();
 	static void EnqueueRenderThreadWork(size_t workingHash, std::function<void()> work);
-	static void ExecuteWorks();
+	static void ExecuteWorks(std::function<void()> completedWork);
+	static void WaitForLastWorks();
 
 	static bool IsInRenderThread()
 	{
 		static int64 Id = SThread::GetCurrentThread()->GetThreadId();
-		return Id == _threadId;
+		return Id == _thread.ThreadId;
 	}
 
 private:
 	static void InitThreadId();
-	static void Worker();
 };

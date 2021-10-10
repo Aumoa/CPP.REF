@@ -21,6 +21,7 @@
 #include "Level/World.h"
 #include "Scene/Scene.h"
 #include "Camera/PlayerCameraManager.h"
+#include "GameThreads/RenderThread.h"
 
 DEFINE_LOG_CATEGORY(LogRender);
 
@@ -30,6 +31,8 @@ SGameRenderSystem::SGameRenderSystem() : Super()
 
 SGameRenderSystem::~SGameRenderSystem()
 {
+	RenderThread::Shutdown();
+
 	if (_device)
 	{
 		DestroySubobject(_device);
@@ -59,64 +62,68 @@ void SGameRenderSystem::Init()
 	_slateShader = NewObject<SSlateShader>(_device);
 	_slateShader->Compile(nullptr);
 
-	IRHIFontCollection* fc = _factory->CreateFontCollection(L"Engine/Content/Fonts/NanumGothic.ttf");
+	RenderThread::Init();
 
 	SE_LOG(LogRender, Verbose, L"Finish to initialize GameRenderSystem.");
 }
 
 void SGameRenderSystem::Present()
 {
-	int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
-
-	RHIViewport vp(0, 0, (float)_vpWidth, (float)_vpHeight, 0, 1.0f);
-	RHIScissorRect sc(0, 0, _vpWidth, _vpHeight);
-
-	RHIResourceTransitionBarrier barrierBegin =
+	RenderThread::WaitForLastWorks();
+	RenderThread::ExecuteWorks([this]()
 	{
-		.pResource = _frameworkViewChain->GetBuffer(bufferIdx),
-		.StateBefore = ERHIResourceStates::Present,
-		.StateAfter = ERHIResourceStates::RenderTarget
-	};
-	RHIResourceTransitionBarrier barrierEnd =
-	{
-		.pResource = _frameworkViewChain->GetBuffer(bufferIdx),
-		.StateBefore = ERHIResourceStates::RenderTarget,
-		.StateAfter = ERHIResourceStates::Present
-	};
+		int32 bufferIdx = _frameworkViewChain->GetCurrentBackBufferIndex();
 
-	_device->BeginFrame();
+		RHIViewport vp(0, 0, (float)_vpWidth, (float)_vpHeight, 0, 1.0f);
+		RHIScissorRect sc(0, 0, _vpWidth, _vpHeight);
 
-	_primaryQueue->Begin(0, 0);
-	_primaryQueue->ResourceBarrier(barrierBegin);
-	_primaryQueue->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
-	_primaryQueue->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
-	_primaryQueue->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
-	_primaryQueue->RSSetScissorRect(sc);
-	_primaryQueue->RSSetViewport(vp);
+		RHIResourceTransitionBarrier barrierBegin =
+		{
+			.pResource = _frameworkViewChain->GetBuffer(bufferIdx),
+			.StateBefore = ERHIResourceStates::Present,
+			.StateAfter = ERHIResourceStates::RenderTarget
+		};
+		RHIResourceTransitionBarrier barrierEnd =
+		{
+			.pResource = _frameworkViewChain->GetBuffer(bufferIdx),
+			.StateBefore = ERHIResourceStates::RenderTarget,
+			.StateAfter = ERHIResourceStates::Present
+		};
 
-	SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-	SWorld* world = levelSystem->GetWorld();
-	APlayerCameraManager* playerCamera = world->GetPlayerCamera();
+		_device->BeginFrame();
 
-	SScene* scene = world->GetScene();
-	MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
-	localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
-	scene->InitViews(localPlayerView);
-	scene->RenderScene(_primaryQueue);
+		_primaryQueue->Begin(0, 0);
+		_primaryQueue->ResourceBarrier(barrierBegin);
+		_primaryQueue->OMSetRenderTargets(_rtv, bufferIdx, 1, _dsv, 0);
+		_primaryQueue->ClearRenderTargetView(_rtv, bufferIdx, NamedColors::Transparent);
+		_primaryQueue->ClearDepthStencilView(_dsv, 0, 1.0f, std::nullopt);
+		_primaryQueue->RSSetScissorRect(sc);
+		_primaryQueue->RSSetViewport(vp);
 
-	SLocalPlayer* localPlayer = GEngine->GetEngineSubsystem<SGamePlayerSystem>()->GetLocalPlayer();
-	if (localPlayer)
-	{
-		_primaryQueue->SetGraphicsShader(_slateShader->GetShader());
-		_primaryQueue->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-		localPlayer->Render(_primaryQueue, _slateShader);
-	}
+		SGameLevelSystem* levelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
+		SWorld* world = levelSystem->GetWorld();
+		APlayerCameraManager* playerCamera = world->GetPlayerCamera();
 
-	_primaryQueue->ResourceBarrier(barrierEnd);
-	_primaryQueue->End();
+		SScene* scene = world->GetScene();
+		MinimalViewInfo localPlayerView = playerCamera->GetCachedCameraView();
+		localPlayerView.AspectRatio = (float)_vpWidth / (float)_vpHeight;
+		scene->InitViews(localPlayerView);
+		scene->RenderScene(_primaryQueue);
 
-	_device->EndFrame();
-	_frameworkViewChain->Present();
+		SLocalPlayer* localPlayer = GEngine->GetEngineSubsystem<SGamePlayerSystem>()->GetLocalPlayer();
+		if (localPlayer)
+		{
+			_primaryQueue->SetGraphicsShader(_slateShader->GetShader());
+			_primaryQueue->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+			localPlayer->Render(_primaryQueue, _slateShader);
+		}
+
+		_primaryQueue->ResourceBarrier(barrierEnd);
+		_primaryQueue->End();
+
+		_device->EndFrame();
+		_frameworkViewChain->Present();
+	});
 }
 
 void SGameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)

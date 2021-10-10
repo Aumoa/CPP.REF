@@ -3,59 +3,93 @@
 #include "GameThreads/RenderThread.h"
 #include "Threading/EventHandle.h"
 
-int64 RenderThread::_threadId = 0;
-std::thread RenderThread::_thread;
-std::map<size_t, std::function<void()>> RenderThread::_works;
-std::map<size_t, std::function<void()>> RenderThread::_pendingWorks;
-std::mutex RenderThread::_locker;
-std::shared_ptr<SEventHandle> RenderThread::_executeEvent;
-std::atomic<bool> RenderThread::_bSwitch;
+void RenderThread::PendingThreadWork::Init()
+{
+	ExecuteEvent = std::make_shared<SEventHandle>();
+	CompletedEvent = std::make_shared<SEventHandle>();
+	CompletedEvent->Set();
+}
+
+void RenderThread::PendingThreadWork::SwapExecute(WaitingThreadWorks& target)
+{
+	std::swap(Works, target.Works);
+	std::swap(CompletedWork, target.CompletedWork);
+	ExecuteEvent->Set();
+}
+
+void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
+{
+	for (auto& pair : Works)
+	{
+		pair.second();
+	}
+
+	CompletedWork();
+}
+
+void RenderThread::ThreadInfo::Init()
+{
+	Thread = std::thread(std::bind(&ThreadInfo::Worker, &_thread));
+	bRunning = true;
+}
+
+void RenderThread::ThreadInfo::Init_RenderThread()
+{
+	SThread* CurrentThread = SThread::GetCurrentThread();
+	ThreadId = CurrentThread->GetThreadId();
+	CurrentThread->SetFriendlyName(L"[Render Thread]");
+}
+
+void RenderThread::ThreadInfo::WaitToComplete()
+{
+	std::unique_lock lock(CriticalSection);
+	bRunning = false;
+
+	// Flush executing event.
+	_executingWorks.ExecuteEvent->Set();
+
+	// Join executing thread.
+	lock.unlock();
+	Thread.join();
+}
+
+void RenderThread::ThreadInfo::Worker()
+{
+	Init_RenderThread();
+
+	while (bRunning)
+	{
+		_executingWorks.ExecuteEvent->Wait();
+		_executingWorks.RunningWorks_RenderThread();
+		_executingWorks.CompletedEvent->Set();
+	}
+}
 
 void RenderThread::Init()
 {
-	_thread = std::thread(Worker);
-	_executeEvent = std::make_shared<SEventHandle>();
-	_bSwitch = true;
+	_thread.Init();
+	_executingWorks.Init();
 }
 
 void RenderThread::Shutdown()
 {
-	std::unique_lock lock(_locker);
-	_bSwitch = false;
-	_executeEvent->Set();
-	_thread.join();
+	_thread.WaitToComplete();
 }
 
 void RenderThread::EnqueueRenderThreadWork(size_t workingHash, std::function<void()> work)
 {
-	_works.emplace(workingHash, work);
+	std::unique_lock lock(_thread.CriticalSection);
+	_waitingWorks.Works.emplace(workingHash, work);
 }
 
-void RenderThread::ExecuteWorks()
+void RenderThread::ExecuteWorks(std::function<void()> completedWork)
 {
-	std::unique_lock lock(_locker);
-	std::swap(_pendingWorks, _works);
-	_works.clear();
-	_executeEvent->Set();
+	std::unique_lock lock(_thread.CriticalSection);
+	_waitingWorks.CompletedWork = completedWork;
+	_executingWorks.SwapExecute(_waitingWorks);
 }
 
-void RenderThread::InitThreadId()
+void RenderThread::WaitForLastWorks()
 {
-	_threadId = SThread::GetCurrentThread()->GetThreadId();
-}
-
-void RenderThread::Worker()
-{
-	InitThreadId();
-
-	while (_bSwitch)
-	{
-		_executeEvent->Wait();
-
-		std::unique_lock lock(_locker);
-		for (auto& workPair : _pendingWorks)
-		{
-			workPair.second();
-		}
-	}
+	_executingWorks.CompletedEvent->Wait();
 }

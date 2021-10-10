@@ -143,6 +143,13 @@ void SGameEngine::TickEngine()
 	SystemsTick(tick);
 	GameTick(tick);
 	RenderTick(tick);
+
+	static int32 counter = 0;
+	if (++counter >= 100)
+	{
+		SE_LOG(LogEngine, Verbose, L"Avg: {}, FPS: {}", _tickCalc.GetAverageSeconds(), _tickCalc.GetAverageFPS());
+		counter = 0;
+	}
 }
 
 void SGameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)

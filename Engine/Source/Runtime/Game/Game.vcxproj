@@ -254,7 +254,6 @@
     <ClInclude Include="Public\GameFramework\Player.h" />
     <ClInclude Include="Public\GameFramework\PlayerController.h" />
     <ClInclude Include="Public\GameInstance.h" />
-    <ClInclude Include="Public\GameMinimal.h" />
     <ClInclude Include="Public\GameModule.h" />
     <ClInclude Include="Public\GameObject.h" />
     <ClInclude Include="Public\GameStructures.h" />

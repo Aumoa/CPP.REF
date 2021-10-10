@@ -2,11 +2,12 @@
 
 #pragma once
 
-#include "GameMinimal.h"
+#include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 #include "SubclassOf.h"
 
 class SLevel;
+class SWorld;
 
 class GAME_API SGameLevelSystem : public SGameEngineSubsystem
 {

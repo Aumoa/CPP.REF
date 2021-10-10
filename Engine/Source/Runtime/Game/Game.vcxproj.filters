@@ -416,9 +416,6 @@
     <ClInclude Include="Public\GameInstance.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\GameMinimal.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\GameObject.h">
       <Filter>Public</Filter>
     </ClInclude>
