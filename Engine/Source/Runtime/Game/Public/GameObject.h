@@ -26,7 +26,7 @@ public:
 	SGameObject();
 
 	/// <inheritdoc/>
-	virtual std::wstring ToString() const;
+	virtual std::wstring ToString(std::wstring_view formatArgs) override;
 
 	/// <summary>
 	/// Set object name to represents this object.
@@ -36,10 +36,12 @@ public:
 	/// <summary>
 	/// Get object name to represents this object.
 	/// </summary>
-	std::wstring GetName() const;
+	std::wstring GetName();
 
-	SWorld* GetWorld() const;
-	void SetWorld(SWorld* value);
+	/// <summary>
+	/// Get world that create this object.
+	/// </summary>
+	virtual SWorld* GetWorld();
 
 public:
 	static SObject* LoadObject(const std::filesystem::path& assetPath);

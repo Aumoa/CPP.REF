@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GameStructures.h"
+#include "MinimalViewInfo.h"
 
 class SCameraComponent;
 class APlayerController;
@@ -20,7 +20,7 @@ private:
 public:
 	APlayerCameraManager();
 
-	virtual void UpdateCamera(std::chrono::duration<float> elapsedTime);
+	virtual void UpdateCamera(float elapsedTime);
 
 	void CachePlayerCamera(APlayerController* controller);
 	MinimalViewInfo GetCachedCameraView();

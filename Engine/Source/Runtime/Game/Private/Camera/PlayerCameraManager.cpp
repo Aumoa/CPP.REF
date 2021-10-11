@@ -1,7 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Camera/PlayerCameraManager.h"
-#include "GameStructures.h"
 #include "LogGame.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -10,7 +9,7 @@ APlayerCameraManager::APlayerCameraManager()
 {
 }
 
-void APlayerCameraManager::UpdateCamera(std::chrono::duration<float> elapsedTime)
+void APlayerCameraManager::UpdateCamera(float elapsedTime)
 {
 	if (_cachedBindCamera == nullptr)
 	{

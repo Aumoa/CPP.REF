@@ -60,7 +60,10 @@ void RenderThread::ThreadInfo::Worker()
 	while (bRunning)
 	{
 		_executingWorks.ExecuteEvent->Wait();
-		_executingWorks.RunningWorks_RenderThread();
+		{
+			std::unique_lock lock(CriticalSection);
+			_executingWorks.RunningWorks_RenderThread();
+		}
 		_executingWorks.CompletedEvent->Set();
 	}
 }

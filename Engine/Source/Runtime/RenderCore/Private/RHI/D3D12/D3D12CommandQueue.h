@@ -30,7 +30,8 @@ public:
 	SD3D12CommandQueue(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence);
 	virtual ~SD3D12CommandQueue() override;
 
-	virtual void ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts) override;
+	virtual void End() override;
+	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal) override;
 
 	uint64 GetFenceValue();
 	uint64 GetCompletedValue();

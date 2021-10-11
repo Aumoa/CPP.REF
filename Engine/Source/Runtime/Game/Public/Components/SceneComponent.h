@@ -7,7 +7,6 @@
 #include <vector>
 #include <queue>
 #include "GameEnums.h"
-#include "GameStructures.h"
 
 /// <summary>
 /// A SceneComponent has a transform and supports attachment, but has no rendering or collision capabilities.

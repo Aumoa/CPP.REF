@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameStructures.h"
+#include "KeyboardState.h"
 
 struct GAME_API IPlatformKeyboard : implements SObject
 {

@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameStructures.h"
 #include "BitfieldInputChangeTracker.h"
+#include "KeyboardState.h"
+#include "MouseState.h"
 
 class SKeyboardTracker : implements SObject
 {

@@ -15,7 +15,7 @@ APlayerController::APlayerController() : Super()
 {
 }
 
-SCameraComponent* APlayerController::FindPlayerCameraComponent() const
+SCameraComponent* APlayerController::FindPlayerCameraComponent()
 {
 	APawn* pawn = GetPawn();
 	if (pawn == nullptr)
@@ -31,7 +31,7 @@ void APlayerController::SpawnCameraManager(SWorld* level)
 	_cameraManager = level->SpawnActor<APlayerCameraManager>();
 }
 
-void APlayerController::UpdateCameraManager(std::chrono::duration<float> elapsedTime)
+void APlayerController::UpdateCameraManager(float elapsedTime)
 {
 	if (_cameraManager)
 	{
@@ -40,7 +40,7 @@ void APlayerController::UpdateCameraManager(std::chrono::duration<float> elapsed
 	}
 }
 
-Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY) const
+Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 {
 	if (!ensureMsgf(_cameraManager != nullptr, L"PlayerCameraManager does not registered."))
 	{

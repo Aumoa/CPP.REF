@@ -44,9 +44,9 @@ public:
 	virtual void SetGraphicsRoot32BitConstants(uint32 index, uint32 num32BitsToSet, const void* srcData, uint32 destOffsetIn32BitValues) override;
 	virtual void SetGraphicsRootShaderResourceView(uint32 index, uint64 bufferLocation) override;
 	virtual void SetGraphicsRootShaderResourceView(uint32 index, IRHIShaderResourceView* view, int32 indexOf, int32 count) override;
-	virtual void ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts) override;
 	virtual void PendingGarbageObject(SObject* object) override;
 	virtual void UpdateSubresource(IRHIResource* resource, uint32 subresource, const RHISubresourceData& data) override;
+	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal) override;
 
 	virtual void CopyTextureRegion(const D3D12_TEXTURE_COPY_LOCATION* pDst, UINT DstX, UINT DstY, UINT DstZ, const D3D12_TEXTURE_COPY_LOCATION* pSrc, const D3D12_BOX* pSrcBox);
 	virtual void CopyResource(ID3D12Resource* dst, ID3D12Resource* src);

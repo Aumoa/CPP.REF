@@ -19,6 +19,7 @@ class SAssetImporter;
 class STransparentShader;
 class SSlateShader;
 class STickScheduler;
+class SScene;
 struct IFrameworkView;
 
 class GAME_API SGameRenderSystem : public SGameEngineSubsystem
@@ -42,6 +43,8 @@ private:
 	STransparentShader* _transparentShader = nullptr;
 	SSlateShader* _slateShader = nullptr;
 
+	SScene* _Scene = nullptr;
+
 	int32 _vpWidth = 0;
 	int32 _vpHeight = 0;
 
@@ -55,6 +58,7 @@ public:
 	void SetupFrameworkView(IFrameworkView* frameworkView);
 	IFrameworkView* GetFrameworkView();
 	inline IRHIDevice* GetRHIDevice() { return _device; }
+	inline SScene* GetScene() { return _Scene; }
 
 private:
 	void ResizeApp(int32 width, int32 height);

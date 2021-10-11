@@ -32,9 +32,9 @@ interface IRHIDeviceContext : implements IRHIDeviceChild
 	virtual void SetGraphicsRoot32BitConstants(uint32 index, uint32 num32BitsToSet, const void* srcData, uint32 destOffsetIn32BitValues) = 0;
 	virtual void SetGraphicsRootShaderResourceView(uint32 index, uint64 bufferLocation) = 0;
 	virtual void SetGraphicsRootShaderResourceView(uint32 index, IRHIShaderResourceView* view, int32 indexOf, int32 count) = 0;
-	virtual void ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts) = 0;
 	virtual void PendingGarbageObject(SObject* object) = 0;
 	virtual void UpdateSubresource(IRHIResource* resource, uint32 subresource, const RHISubresourceData& data) = 0;
+	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal = false) = 0;
 
 	void RSSetScissorRect(const RHIScissorRect& scissorRect) { RSSetScissorRects(std::span<const RHIScissorRect>(&scissorRect, 1)); }
 	void RSSetScissorRects(std::span<RHIScissorRect> scissorRects) { RSSetScissorRects((std::span<const RHIScissorRect>)scissorRects); }

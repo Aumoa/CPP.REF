@@ -5,7 +5,7 @@
 #include "Level/World.h"
 #include "Components/PrimitiveComponent.h"
 
-void AActor::ActorTickFunction::ExecuteTick(std::chrono::duration<float> elapsedTime)
+void AActor::SActorTickFunction::ExecuteTick(float elapsedTime)
 {
 	if (_target == nullptr)
 	{
@@ -26,8 +26,12 @@ AActor::AActor() : Super()
 {
 }
 
-void AActor::TickActor(std::chrono::duration<float> elapsedTime, ActorTickFunction* tickFunction)
+void AActor::TickActor(float elapsedTime, SActorTickFunction* tickFunction)
 {
+	if (tickFunction == &PrimaryActorTick)
+	{
+		Tick(elapsedTime);
+	}
 }
 
 void AActor::BeginPlay()
@@ -50,6 +54,10 @@ void AActor::BeginPlay()
 void AActor::EndPlay()
 {
 	_bHasBegunPlay = false;
+}
+
+void AActor::Tick(float elapsedTime)
+{
 }
 
 void AActor::SetActive(bool bActive)

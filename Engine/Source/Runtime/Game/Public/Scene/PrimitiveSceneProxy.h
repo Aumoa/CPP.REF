@@ -4,33 +4,27 @@
 
 #include "CoreMinimal.h"
 #include <vector>
-#include "GameStructures.h"
+#include "RHI/RHIStructures.h"
+#include "Scene/MeshBatch.h"
 
 class SPrimitiveComponent;
 
-class GAME_API SPrimitiveSceneProxy : implements SObject
+class GAME_API PrimitiveSceneProxy
 {
-	GENERATED_BODY(SPrimitiveSceneProxy)
-
-private:
-	SPrimitiveComponent* _MyComponent = nullptr;
-
 public:
-	SPrimitiveSceneProxy(SPrimitiveComponent* inComponent);
-
-	SPrimitiveComponent* GetComponent() const { return _MyComponent; }
-	void UpdateTransform_GameThread(const Transform& value);
-
+	SPrimitiveComponent* const PrimitiveComponent;
+	int64 PrimitiveId;
 	std::vector<MeshBatch> MeshBatches;
-	int64 PrimitiveId = -1;
 	Transform ComponentTransform;
-	uint8 bRenderStateDirty : 1 = false;
+	uint8 bRenderStateDirty : 1;
+	uint8 bHiddenInGame : 1;
 
-private:
-	uint8 _bHiddenInGame : 1 = false;
+	PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveComponent);
 
-public:
-	virtual void MarkRenderStateDirty_GameThread();
-	virtual void SetHiddenInGame_GameThread(bool bHiddenInGame);
-	bool IsHiddenInGame() const { return _bHiddenInGame; }
+	void UpdateTransform_GameThread(const Transform& InValue);
+	void UpdateTransform_RenderThread(const Transform& InValue);
+	void MarkRenderStateDirty_GameThread();
+	void MarkRenderStateDirty_RenderThread();
+	void SetHiddenInGame_GameThread(bool bHiddenInGame);
+	void SetHiddenInGame_RenderThread(bool bHiddenInGame);
 };

@@ -2,24 +2,51 @@
 
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Components/PrimitiveComponent.h"
+#include "GameThreads/RenderThread.h"
 
-SPrimitiveSceneProxy::SPrimitiveSceneProxy(SPrimitiveComponent* inComponent) : Super()
-	, _MyComponent(inComponent)
-{
-	_bHiddenInGame = inComponent->IsHiddenInGame();
+#define DEFINE_REDIRECT_RENDER_THREAD(FunctionName) \
+void PrimitiveSceneProxy::FunctionName ## _GameThread() \
+{ \
+	RenderThread::EnqueueRenderThreadWork<"PrimitiveSceneProxy::" #FunctionName>([this]() { FunctionName ## _RenderThread(); }); \
 }
 
-void SPrimitiveSceneProxy::UpdateTransform_GameThread(const Transform& value)
-{
-	ComponentTransform = value;
+#define DEFINE_REDIRECT_RENDER_THREAD_OneParam(FunctionName, Type1) \
+void PrimitiveSceneProxy::FunctionName ## _GameThread(Type1 Param1) \
+{ \
+	RenderThread::EnqueueRenderThreadWork<"PrimitiveSceneProxy::" #FunctionName>([this, Param1 = Param1]() { FunctionName ## _RenderThread(Param1); }); \
 }
 
-void SPrimitiveSceneProxy::MarkRenderStateDirty_GameThread()
+PrimitiveSceneProxy::PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveComponent) : PrimitiveComponent(InPrimitiveComponent)
+	, PrimitiveId(-1)
+	, ComponentTransform(InPrimitiveComponent->GetComponentTransform())
+	, bRenderStateDirty(true)
+	, bHiddenInGame(InPrimitiveComponent->IsHiddenInGame())
 {
+}
+
+DEFINE_REDIRECT_RENDER_THREAD_OneParam(UpdateTransform, const Transform&);
+
+void PrimitiveSceneProxy::UpdateTransform_RenderThread(const Transform& InValue)
+{
+	check(RenderThread::IsInRenderThread());
+	ComponentTransform = InValue;
+}
+
+DEFINE_REDIRECT_RENDER_THREAD(MarkRenderStateDirty);
+
+void PrimitiveSceneProxy::MarkRenderStateDirty_RenderThread()
+{
+	check(RenderThread::IsInRenderThread());
 	bRenderStateDirty = true;
 }
 
-void SPrimitiveSceneProxy::SetHiddenInGame_GameThread(bool bHiddenInGame)
+DEFINE_REDIRECT_RENDER_THREAD_OneParam(SetHiddenInGame, bool);
+
+void PrimitiveSceneProxy::SetHiddenInGame_RenderThread(bool bHiddenInGame)
 {
-	_bHiddenInGame = bHiddenInGame;
+	check(RenderThread::IsInRenderThread());
+	this->bHiddenInGame = bHiddenInGame;
 }
+
+#undef DEFINE_REDIRECT_RENDER_THREAD
+#undef DEFINE_REDIRECT_RENDER_THREAD_OneParam

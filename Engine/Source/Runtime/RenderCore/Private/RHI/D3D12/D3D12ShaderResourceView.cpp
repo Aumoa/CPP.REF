@@ -15,4 +15,6 @@ void SD3D12ShaderResourceView::CreateShaderResourceView(int32 index, IRHIResourc
 		Cast<SD3D12Resource>(resource)->Get<ID3D12Resource>(),
 		reinterpret_cast<const D3D12_SHADER_RESOURCE_VIEW_DESC*>(desc),
 		GetHandle(index));
+
+	AssignResource(index, resource);
 }

@@ -2,6 +2,7 @@
 
 #include "D3D12View.h"
 #include "D3D12Device.h"
+#include "D3D12Resource.h"
 
 SD3D12View::SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources, D3D12_DESCRIPTOR_HEAP_TYPE type) : Super(factory, device)
 	, _heap(std::move(heap))
@@ -21,7 +22,15 @@ IRHIResource* SD3D12View::GetResource(int32 indexOf)
 		return nullptr;
 	}
 
-	return _resources[indexOf].get();
+	if (auto ptr = _resources[indexOf].lock(); ptr)
+	{
+		return ptr.get();
+	}
+	else
+	{
+		SE_LOG(LogDirectX, Warning, L"The resources that bound to index[{}] is expired.", indexOf);
+		return nullptr;
+	}
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE SD3D12View::GetHandle(int32 indexOf)
@@ -29,4 +38,9 @@ D3D12_CPU_DESCRIPTOR_HANDLE SD3D12View::GetHandle(int32 indexOf)
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _base;
 	handle.ptr += (SIZE_T)_incrementSize * indexOf;
 	return handle;
+}
+
+void SD3D12View::AssignResource(int32 InIndexOf, IRHIResource* InResource)
+{
+	_resources[InIndexOf] = std::dynamic_pointer_cast<IRHIResource>(InResource->shared_from_this());
 }

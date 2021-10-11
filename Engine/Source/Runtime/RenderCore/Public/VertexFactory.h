@@ -43,4 +43,9 @@ public:
 	/// Get index stride.
 	/// </summary>
 	virtual uint32 GetIndexStride() const { return sizeof(uint32); }
+
+	/// <summary>
+	/// Get index format.
+	/// </summary>
+	virtual ERHIVertexElementFormat GetIndexFormat() const { return ERHIVertexElementFormat::R32_UINT; }
 };

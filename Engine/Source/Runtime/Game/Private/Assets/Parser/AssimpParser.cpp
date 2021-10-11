@@ -6,7 +6,6 @@
 #include <assimp/Exporter.hpp>
 #include <assimp/postprocess.h>
 #include "LogGame.h"
-#include "GameStructures.h"
 #include "GameEngine.h"
 #include "VertexFactory.h"
 #include "Assets/StaticMesh.h"

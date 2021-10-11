@@ -22,40 +22,33 @@ private:
 	/// <summary>
 	/// Represents tick function for targeted to actor.
 	/// </summary>
-	class ActorTickFunction : public STickFunction
+	class SActorTickFunction : public STickFunction
 	{
-	public:
-		using Super = STickFunction;
+		GENERATED_BODY(SActorTickFunction)
 
 	private:
 		AActor* const _target = nullptr;
 
 	public:
-		/// <summary>
-		/// Initialize new <see cref="ActorTickFunction"/> instance.
-		/// </summary>
-		inline ActorTickFunction(AActor* target) : Super()
+		inline SActorTickFunction(AActor* target) : Super()
 			, _target(target)
 		{
 		}
 
-		/// <summary>
-		/// Get tick function target.
-		/// </summary>
 		inline AActor* GetTarget() const
 		{
 			return _target;
 		}
 
 		/// <inheritdoc/>
-		virtual void ExecuteTick(std::chrono::duration<float> elapsedTime) override;
+		virtual void ExecuteTick(float elapsedTime) override;
 	};
 
 protected:
 	/// <summary>
 	/// Represents primary actor tick function that call AActor::TickActor().
 	/// </summary>
-	ActorTickFunction PrimaryActorTick;
+	SActorTickFunction PrimaryActorTick;
 
 private:
 	uint8 _bActive : 1;
@@ -72,10 +65,11 @@ public:
 	/// </summary>
 	/// <param name="elapsedTime"> The elapsed time from previous frame. </param>
 	/// <param name="tickFunction"> Tick function what called this. </param>
-	virtual void TickActor(std::chrono::duration<float> elapsedTime, ActorTickFunction* tickFunction);
+	virtual void TickActor(float elapsedTime, SActorTickFunction* tickFunction);
 
 	virtual void BeginPlay();
 	virtual void EndPlay();
+	virtual void Tick(float elapsedTime);
 
 	void SetActive(bool bActive);
 	inline bool IsActive() const { return _bActive; }

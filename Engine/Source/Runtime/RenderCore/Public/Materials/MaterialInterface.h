@@ -10,6 +10,7 @@
 interface IRHIDevice;
 interface IRHITexture2D;
 interface IRHIShaderResourceView;
+interface IRHIDeviceContext;
 
 class RENDERCORE_API SMaterialInterface : implements SObject
 {
@@ -42,6 +43,7 @@ public:
 	virtual int32 GetParameterMappingIndex(std::wstring_view parameterName);
 	virtual std::vector<RHIMaterialParameterInfo> GetParametersInfo() = 0;
 	virtual EMaterialBlendMode GetBlendMode() = 0;
+	virtual void SetupCommands(IRHIDeviceContext* InContext) = 0;
 
 	bool SetScalarParameterValueByName(std::wstring_view parameterName, float value)
 	{

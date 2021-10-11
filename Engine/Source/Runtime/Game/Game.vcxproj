@@ -57,11 +57,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SCENERENDER_API=__declspec(dllimport);_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SceneRender\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -86,11 +86,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SLATECORE_API=__declspec(dllimport);NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME_API=__declspec(dllexport);CORE_API=__declspec(dllimport);RENDERCORE_API=__declspec(dllimport);SCENERENDER_API=__declspec(dllimport);SLATECORE_API=__declspec(dllimport);NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\RenderCore\Public;$(SolutionDir)Engine\Source\Runtime\SceneRender\Public;$(SolutionDir)Engine\Source\Runtime\SlateCore\Public;$(SolutionDir)ThirdParty\Source\assimp\include;$(SolutionDir)ThirdParty\Source\assimp\generated\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -120,6 +120,9 @@
     </ProjectReference>
     <ProjectReference Include="..\RenderCore\RenderCore.vcxproj">
       <Project>{f00c8c6a-83d9-4827-a043-fc6707a647d2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SceneRender\SceneRender.vcxproj">
+      <Project>{b9466878-79e0-42c8-b9d4-a21e8d086033}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -170,9 +173,6 @@
     <ClCompile Include="Private\LogGame.cpp" />
     <ClCompile Include="Private\Misc\GeometryGenerator.cpp" />
     <ClCompile Include="Private\Scene\PrimitiveSceneProxy.cpp" />
-    <ClCompile Include="Private\Scene\Scene.cpp" />
-    <ClCompile Include="Private\Scene\SceneRenderer.cpp" />
-    <ClCompile Include="Private\Scene\SceneVisibility.cpp" />
     <ClCompile Include="Private\Scene\StaticMeshRenderData.cpp" />
     <ClCompile Include="Private\Scene\StaticMeshSceneProxy.cpp" />
     <ClCompile Include="Private\Shaders\ColorShader\ColorShader.cpp">
@@ -223,6 +223,7 @@
     <ClInclude Include="Public\Assets\StreamableRenderAsset.h" />
     <ClInclude Include="Public\Assets\Texture2D.h" />
     <ClInclude Include="Public\Camera\CameraComponent.h" />
+    <ClInclude Include="Public\Camera\MinimalViewInfo.h" />
     <ClInclude Include="Public\Camera\PlayerCameraManager.h" />
     <ClInclude Include="Public\Components\ActorComponent.h" />
     <ClInclude Include="Public\Components\MeshComponent.h" />
@@ -256,11 +257,11 @@
     <ClInclude Include="Public\GameInstance.h" />
     <ClInclude Include="Public\GameModule.h" />
     <ClInclude Include="Public\GameObject.h" />
-    <ClInclude Include="Public\GameStructures.h" />
     <ClInclude Include="Public\GameThreads\RenderThread.h" />
     <ClInclude Include="Public\IFrameworkView.h" />
     <ClInclude Include="Public\Info\GameMode.h" />
     <ClInclude Include="Public\Info\Info.h" />
+    <ClInclude Include="Public\KeyboardState.h" />
     <ClInclude Include="Public\Layout\AlignmentArrangeResult.h" />
     <ClInclude Include="Public\Layout\Anchors.h" />
     <ClInclude Include="Public\Layout\ArrangedChildrens.h" />
@@ -287,14 +288,12 @@
     <ClInclude Include="Public\Misc\KeyboardTracker.h" />
     <ClInclude Include="Public\Misc\MouseStateTracker.h" />
     <ClInclude Include="Public\Misc\TickCalc.h" />
+    <ClInclude Include="Public\MouseState.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformKeyboard.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformMouse.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformImage.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformImageLoader.h" />
     <ClInclude Include="Public\Scene\PrimitiveSceneProxy.h" />
-    <ClInclude Include="Public\Scene\Scene.h" />
-    <ClInclude Include="Public\Scene\SceneRenderer.h" />
-    <ClInclude Include="Public\Scene\SceneVisibility.h" />
     <ClInclude Include="Public\Scene\StaticMeshRenderData.h" />
     <ClInclude Include="Public\Scene\StaticMeshSceneProxy.h" />
     <ClInclude Include="Public\Shaders\ColorShader\ColorShader.h" />

@@ -11,7 +11,6 @@
 #include "GameFramework/Actor.h"
 
 class SLevel;
-class SScene;
 class SGameEngine;
 class APlayerController;
 class APlayerCameraManager;
@@ -35,7 +34,7 @@ private:
 		bool Remove(STickFunction* function);
 
 		void ReadyForExecuteTick();
-		void ExecuteTick(std::chrono::duration<float> elapsedTime);
+		void ExecuteTick(float elapsedTime);
 	};
 
 	struct TickFunctions
@@ -52,7 +51,6 @@ private:
 	};
 
 	SLevel* _level = nullptr;
-	SScene* _scene = nullptr;
 
 	std::set<AActor*> _actors;
 	TickFunctions _tickFunctions;
@@ -65,6 +63,8 @@ public:
 	/// Initialize new <see cref="SWorld"/> instance.
 	/// </summary>
 	SWorld();
+
+	virtual SWorld* GetWorld() override;
 
 	/// <summary>
 	/// Spawn actor to world.
@@ -112,7 +112,6 @@ public:
 	void UnregisterComponent(SActorComponent* component);
 
 	virtual void LevelTick(std::chrono::duration<float> elapsedTime);
-	SScene* GetScene() const { return _scene; }
 	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
 	SLevel* GetLevel() const { return _level; }
 

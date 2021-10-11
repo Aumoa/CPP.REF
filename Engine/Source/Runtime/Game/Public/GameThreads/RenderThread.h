@@ -8,6 +8,7 @@
 #include <mutex>
 #include <functional>
 #include "Threading/Thread.h"
+#include "Misc/CrcHash.h"
 
 class SThread;
 class SEventHandle;
@@ -66,6 +67,25 @@ public:
 	{
 		static int64 Id = SThread::GetCurrentThread()->GetThreadId();
 		return Id == _thread.ThreadId;
+	}
+
+private:
+	template<size_t _N>
+	struct StringLiteralHash
+	{
+		size_t Hs;
+
+		consteval StringLiteralHash(const char(&_Cstr)[_N])
+			: Hs(CrcHash::Hash(_Cstr))
+		{
+		}
+	};
+
+public:
+	template<StringLiteralHash _String>
+	static void EnqueueRenderThreadWork(std::function<void()> work)
+	{
+		EnqueueRenderThreadWork(_String.Hs, std::move(work));
 	}
 
 private:

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "SceneComponent.h"
 
-class SPrimitiveSceneProxy;
+class PrimitiveSceneProxy;
 
 class GAME_API SPrimitiveComponent : public SSceneComponent
 {
@@ -17,8 +17,8 @@ private:
 public:
 	SPrimitiveComponent();
 
-	virtual SPrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
-	SPrimitiveSceneProxy* SceneProxy = nullptr;
+	virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
+	PrimitiveSceneProxy* SceneProxy = nullptr;
 
 	void SetHiddenInGame(bool bHidden);
 	inline bool IsHiddenInGame() { return _bHiddenInGame; }

@@ -3,17 +3,18 @@
 #include "GameObject.h"
 #include "GameEngine.h"
 #include "EngineSubsystems/GameAssetSystem.h"
+#include "Level/World.h"
 
 SGameObject::SGameObject() : Super()
 {
 }
 
-std::wstring SGameObject::ToString() const
+std::wstring SGameObject::ToString(std::wstring_view formatArgs)
 {
 	return GetName();
 }
 
-std::wstring SGameObject::GetName() const
+std::wstring SGameObject::GetName()
 {
 	if (_name.length() == 0)
 	{
@@ -22,23 +23,23 @@ std::wstring SGameObject::GetName() const
 	return _name;
 }
 
-SWorld* SGameObject::GetWorld() const
+SWorld* SGameObject::GetWorld()
 {
 	if (_WorldPrivate == nullptr)
 	{
+		if (auto* isWorld = Cast<SWorld>(GetOuter()); isWorld != nullptr)
+		{
+			_WorldPrivate = isWorld;
+		}
+
 		// Caching world instance with outer chain.
-		if (auto* isGameObject = dynamic_cast<SGameObject*>(GetOuter()); isGameObject != nullptr)
+		else if (auto* isGameObject = Cast<SGameObject>(GetOuter()); isGameObject != nullptr)
 		{
 			_WorldPrivate = isGameObject->GetWorld();
 		}
 	}
 
 	return _WorldPrivate;
-}
-
-void SGameObject::SetWorld(SWorld* value)
-{
-	_WorldPrivate = value;
 }
 
 SObject* SGameObject::LoadObject(const std::filesystem::path& assetPath)

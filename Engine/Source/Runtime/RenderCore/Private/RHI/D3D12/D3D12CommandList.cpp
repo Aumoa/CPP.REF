@@ -168,11 +168,6 @@ void SD3D12CommandList::SetGraphicsRootShaderResourceView(uint32 index, IRHIShad
 	_commandList->SetGraphicsRootDescriptorTable(index, hgpu);
 }
 
-void SD3D12CommandList::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts)
-{
-	SE_LOG(LogDirectX, Fatal, L"ExecuteCommandLists must be called with immediate context.");
-}
-
 void SD3D12CommandList::PendingGarbageObject(SObject* object)
 {
 	object->SetOuter(this);
@@ -191,6 +186,12 @@ void SD3D12CommandList::UpdateSubresource(IRHIResource* resource, uint32 subreso
 
 	void* ptr;
 	HR(uploadBuf->Map(subresource, nullptr, &ptr));
+}
+
+uint64 SD3D12CommandList::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal)
+{
+	SE_LOG(LogDirectX, Fatal, L"ExecuteCommandLists must be called with immediate context.");
+	return 0;
 }
 
 DEFINE_CALL_DIRECT_SixParams(CopyTextureRegion, const D3D12_TEXTURE_COPY_LOCATION*, UINT, UINT, UINT, const D3D12_TEXTURE_COPY_LOCATION*, const D3D12_BOX*);

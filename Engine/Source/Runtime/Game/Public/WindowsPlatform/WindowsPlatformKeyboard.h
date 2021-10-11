@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlatformMisc/IPlatformKeyboard.h"
+#include "MouseState.h"
 #include <memory>
 
 class GAME_API SWindowsPlatformKeyboard : implements SObject, implements IPlatformKeyboard

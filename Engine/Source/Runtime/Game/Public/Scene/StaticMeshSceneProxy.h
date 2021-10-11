@@ -7,10 +7,8 @@
 
 class SStaticMeshComponent;
 
-class GAME_API SStaticMeshSceneProxy : public SPrimitiveSceneProxy
+class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
 {
-	GENERATED_BODY(SStaticMeshSceneProxy)
-
 public:
-	SStaticMeshSceneProxy(SStaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches);
+	StaticMeshSceneProxy(SStaticMeshComponent* InStaticMeshComponent, const std::vector<MeshBatch>& InBatches);
 };

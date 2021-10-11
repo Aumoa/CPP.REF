@@ -15,4 +15,6 @@ void SD3D12DepthStencilView::CreateDepthStencilView(int32 index, IRHIResource* r
 		Cast<SD3D12Resource>(resource)->Get<ID3D12Resource>(),
 		reinterpret_cast<const D3D12_DEPTH_STENCIL_VIEW_DESC*>(desc),
 		GetHandle(index));
+
+	AssignResource(index, resource);
 }

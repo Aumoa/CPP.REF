@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "MeshComponent.h"
+#include "Scene/MeshBatch.h"
 
 class SStaticMesh;
+class SMaterial;
 
 class GAME_API SStaticMeshComponent : public SMeshComponent
 {
@@ -19,7 +21,7 @@ private:
 public:
 	SStaticMeshComponent();
 
-	virtual SPrimitiveSceneProxy* CreateSceneProxy() override;
+	virtual PrimitiveSceneProxy* CreateSceneProxy() override;
 
 	virtual void SetStaticMesh(SStaticMesh* inNewMesh);
 	SStaticMesh* GetStaticMesh() { return _StaticMesh; }

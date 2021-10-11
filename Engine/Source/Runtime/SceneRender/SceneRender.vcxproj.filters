@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Public">
+      <UniqueIdentifier>{43ec9fa1-b450-4954-a095-0fd2d9a687be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{0aea37de-541f-4217-8769-8a0f478ab883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Scene">
+      <UniqueIdentifier>{70385fec-8626-45ab-8c67-fe81a9dc3698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Scene">
+      <UniqueIdentifier>{b972b84b-2b62-4a36-a8fc-8c5274aadfb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\SceneView">
+      <UniqueIdentifier>{84d0caea-5d56-4b96-8a66-3cb5a8f2eb57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\SceneView">
+      <UniqueIdentifier>{01bd5189-24e8-4885-86ab-8ffe8ea2f3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\SceneRendering">
+      <UniqueIdentifier>{5af865fd-0099-43f4-ae4f-860531c8d6a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\SceneRendering">
+      <UniqueIdentifier>{a3d9fbeb-5c44-4f3a-8f1f-77f0b38b1024}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\Scene\Scene.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\PrimitiveSceneInfo.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\MeshBatch.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Scene\MeshBatchElement.h">
+      <Filter>Public\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneView\SceneView.h">
+      <Filter>Public\SceneView</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneView\SceneViewScope.h">
+      <Filter>Public\SceneView</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneRenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\Scene\Scene.cpp">
+      <Filter>Private\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneView\SceneView.cpp">
+      <Filter>Private\SceneView</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

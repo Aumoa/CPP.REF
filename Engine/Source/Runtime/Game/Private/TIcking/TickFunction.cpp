@@ -18,7 +18,7 @@ void STickFunction::Ready()
 	ComputeTickGroupDependency();
 }
 
-void STickFunction::ExecuteTick(std::chrono::duration<float> deltaTime)
+void STickFunction::ExecuteTick(float deltaTime)
 {
 	_bExecutedFrame = true;
 

@@ -36,6 +36,10 @@ IRHITexture2D* SDXGISwapChain::GetBuffer(int32 index)
 		ComPtr<ID3D12Resource> resource;
 		HR(_swapChain->GetBuffer((UINT)index, IID_PPV_ARGS(&resource)));
 
+#if defined(_DEBUG)
+		HR(resource->SetName(std::format(L"SwapChain Buffer[{}]", index).c_str()));
+#endif
+
 		D3D12_RESOURCE_DESC source = resource->GetDesc();
 		RHITexture2DDesc dest =
 		{

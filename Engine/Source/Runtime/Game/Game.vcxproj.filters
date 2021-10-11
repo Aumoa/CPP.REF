@@ -246,15 +246,6 @@
     <ClCompile Include="Private\Scene\PrimitiveSceneProxy.cpp">
       <Filter>Private\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Scene\Scene.cpp">
-      <Filter>Private\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Scene\SceneRenderer.cpp">
-      <Filter>Private\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Scene\SceneVisibility.cpp">
-      <Filter>Private\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Scene\StaticMeshRenderData.cpp">
       <Filter>Private\Scene</Filter>
     </ClCompile>
@@ -395,9 +386,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public\GameStructures.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\IFrameworkView.h">
       <Filter>Public</Filter>
     </ClInclude>
@@ -490,15 +478,6 @@
     </ClInclude>
     <ClInclude Include="Public\Misc\GeometryGenerator.h">
       <Filter>Public\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Scene\Scene.h">
-      <Filter>Public\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Scene\SceneRenderer.h">
-      <Filter>Public\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Scene\SceneVisibility.h">
-      <Filter>Public\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Public\Scene\StaticMeshRenderData.h">
       <Filter>Public\Scene</Filter>
@@ -733,6 +712,15 @@
     </ClInclude>
     <ClInclude Include="Public\GameThreads\RenderThread.h">
       <Filter>Public\GameThreads</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Camera\MinimalViewInfo.h">
+      <Filter>Public\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\KeyboardState.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\MouseState.h">
+      <Filter>Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

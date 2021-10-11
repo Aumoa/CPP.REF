@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameStructures.h"
+#include "Scene/MeshBatch.h"
 
 class SMaterial;
-struct MeshBatch;
 
 class GAME_API SStaticMeshRenderData : implements SObject
 {

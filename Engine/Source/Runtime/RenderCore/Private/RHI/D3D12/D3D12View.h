@@ -13,7 +13,7 @@ class SD3D12View : public SD3D12DeviceChild, implements IRHIView
 
 private:
 	ComPtr<ID3D12DescriptorHeap> _heap;
-	std::vector<std::shared_ptr<IRHIResource>> _resources;
+	std::vector<std::weak_ptr<IRHIResource>> _resources;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE _base;
 	uint32 _incrementSize = 0;
@@ -24,4 +24,5 @@ public:
 	virtual IRHIResource* GetResource(int32 indexOf) override;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetHandle(int32 indexOf);
+	void AssignResource(int32 InIndexOf, IRHIResource* InResource);
 };

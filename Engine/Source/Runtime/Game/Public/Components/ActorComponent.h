@@ -19,10 +19,9 @@ private:
 	/// <summary>
 	/// Represents tick function for targeted to actor component.
 	/// </summary>
-	class ComponentTickFunction : public STickFunction
+	class SComponentTickFunction : public STickFunction
 	{
-	public:
-		using Super = STickFunction;
+		GENERATED_BODY(SComponentTickFunction)
 
 	private:
 		SActorComponent* const _target = nullptr;
@@ -31,7 +30,7 @@ private:
 		/// <summary>
 		/// Initialize new <see cref="ComponentTickFunction"/> instance.
 		/// </summary>
-		inline ComponentTickFunction(SActorComponent* target) : Super()
+		inline SComponentTickFunction(SActorComponent* target) : Super()
 			, _target(target)
 		{
 		}
@@ -45,16 +44,16 @@ private:
 		}
 
 		/// <inheritdoc/>
-		virtual void ExecuteTick(std::chrono::duration<float> elapsedTime) override;
+		virtual void ExecuteTick(float elapsedTime) override;
 	};
 
 protected:
-	ComponentTickFunction PrimaryComponentTick;
+	SComponentTickFunction PrimaryComponentTick;
 
 private:
 	uint8 _bActive : 1 = true;
 	uint8 _bHasBegunPlay : 1 = false;
-	uint8 _bIsRegistered : 1 = false;
+	uint8 _bRegistered : 1 = false;
 	AActor* _owner = nullptr;
 
 public:
@@ -65,10 +64,11 @@ public:
 	/// </summary>
 	/// <param name="elapsedTime"> The elapsed time from previous frame. </param>
 	/// <param name="tickFunction"> Tick function what called this. </param>
-	virtual void TickComponent(std::chrono::duration<float> elapsedTime, ComponentTickFunction* tickFunction);
+	virtual void TickComponent(float elapsedTime, SComponentTickFunction* tickFunction);
 
 	virtual void BeginPlay();
 	virtual void EndPlay();
+	virtual void Tick(float elapsedTime);
 
 	AActor* GetOwner() { return _owner; }
 	void SetActive(bool bActive);
@@ -79,8 +79,10 @@ public:
 	ActivatedEvent Activated;
 	ActivatedEvent Inactivated;
 
+	void RegisterComponent();
 	void RegisterComponentWithWorld(SWorld* world);
 	void UnregisterComponent();
+	bool IsRegistered();
 
 	void SetOwnerPrivate(AActor* owner) { _owner = owner; }
 };

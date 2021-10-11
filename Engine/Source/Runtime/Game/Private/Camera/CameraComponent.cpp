@@ -1,13 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Camera/CameraComponent.h"
-#include "GameStructures.h"
 
 SCameraComponent::SCameraComponent()
 {
 }
 
-MinimalViewInfo SCameraComponent::GetViewInfo(std::chrono::duration<float> elapsedTime)
+MinimalViewInfo SCameraComponent::GetViewInfo(float elapsedTime)
 {
 	MinimalViewInfo vinfo;
 	vinfo.bInit = true;

@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameStructures.h"
+#include "GameEnums.h"
+#include "MouseState.h"
 
 struct IFrameworkView;
 

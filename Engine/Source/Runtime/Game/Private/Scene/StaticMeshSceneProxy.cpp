@@ -1,11 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Scene/StaticMeshSceneProxy.h"
-#include "Scene/StaticMeshRenderData.h"
 #include "Components/StaticMeshComponent.h"
-#include "Assets/StaticMesh.h"
 
-SStaticMeshSceneProxy::SStaticMeshSceneProxy(SStaticMeshComponent* inComponent, const std::vector<MeshBatch>& batches) : Super(inComponent)
+StaticMeshSceneProxy::StaticMeshSceneProxy(SStaticMeshComponent* InStaticMeshComponent, const std::vector<MeshBatch>& InBatches)
+	: PrimitiveSceneProxy(InStaticMeshComponent)
 {
-	MeshBatches = batches;
+	MeshBatches = InBatches;
 }

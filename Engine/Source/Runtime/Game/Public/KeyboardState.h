@@ -3,44 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameEnums.h"
-#include "RHI/RHIStructures.h"
-
-class SVertexFactory;
-class SMaterial;
-
-struct MeshBatchElement
-{
-	uint32 IndexCount = 0;
-	uint32 InstanceCount = 0;
-	int32 StartIndexLocation = 0;
-	int32 BaseVertexLocation = 0;
-	uint32 VertexCount = 0;
-    uint32 MaterialSlotIndex = 0;
-};
-
-struct MeshBatch
-{
-    std::vector<RHIVertex> VertexBuffer;
-    std::vector<uint32> IndexBuffer;
-    uint64 VertexBufferLocation = 0;
-    uint64 IndexBufferLocation = 0;
-
-	std::vector<MeshBatchElement> Elements;
-    std::vector<SMaterial*> MaterialSlots;
-    SVertexFactory* VertexFactory = nullptr;
-};
-
-struct MinimalViewInfo
-{
-    uint8 bInit : 1 = false;
-	Vector3 Location;
-	Quaternion Rotation;
-	float AspectRatio = 1.0f;
-    Degrees FOVAngle;
-    float NearPlane;
-    float FarPlane;
-};
 
 struct KeyboardState
 {
@@ -260,17 +222,4 @@ struct KeyboardState
         }
         return false;
     }
-};
-
-struct MouseState
-{
-    uint8 bLeftButton : 1;
-    uint8 bMiddleButton : 1;
-    uint8 bRightButton : 1;
-    uint8 bXButton1 : 1;
-    uint8 bXButton2 : 1;
-    int32 X;
-    int32 Y;
-    int32 ScrollWheelValue;
-    EMousePositionMode Mode;
 };

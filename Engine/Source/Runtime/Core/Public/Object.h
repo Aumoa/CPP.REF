@@ -10,6 +10,7 @@
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "Diagnostics/LogSystem.h"
+#include "Diagnostics/LogVerbosity.h"
 #include "Reflection/ReflectionMacros.h"
 
 class SValueType;
@@ -98,22 +99,13 @@ public:
 	/// <param name="subobject"> The target object. </param>
 	static void DestroySubobject(SObject* subobject);
 
-	template<class T> requires std::derived_from<T, SObject>
-	T* As() { return dynamic_cast<T*>(this); }
-	template<class T> requires std::derived_from<T, SObject>
-	const T* As() const { return dynamic_cast<const T*>(this); }
-
 	/// <summary>
 	/// Casts between two SObject classes.
 	/// </summary>
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 	inline static TTo* Cast(TFrom* from)
 	{
-		if (from)
-		{
-			return from->template As<TTo>();
-		}
-		return nullptr;
+		return dynamic_cast<TTo*>(from);
 	}
 
 	/// <summary>
@@ -122,10 +114,7 @@ public:
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 	inline static const TTo* Cast(const TFrom* from)
 	{
-		if (from)
-		{
-			return from->template As<TTo>();
-		}
+		return dynamic_cast<const TTo*>(from);
 	}
 
 	/// <summary>

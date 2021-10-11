@@ -31,7 +31,7 @@ void SWorld::TickGroup<_Group>::ReadyForExecuteTick()
 }
 
 template<ETickingGroup _Group>
-void SWorld::TickGroup<_Group>::ExecuteTick(std::chrono::duration<float> elapsedTime)
+void SWorld::TickGroup<_Group>::ExecuteTick(float elapsedTime)
 {
 	for (auto& function : Functions) { function->ExecuteTick(elapsedTime); }
 }
@@ -70,8 +70,11 @@ void SWorld::TickFunctions::ReadyForExecuteTick()
 
 SWorld::SWorld() : Super()
 {
-	SetWorld(this);
-	_scene = NewObject<SScene>(this, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
+}
+
+SWorld* SWorld::GetWorld()
+{
+	return this;
 }
 
 AActor* SWorld::SpawnActor(SubclassOf<AActor> actorClass)
@@ -134,24 +137,25 @@ void SWorld::RegisterTickFunction(STickFunction* function)
 
 void SWorld::RegisterComponent(SActorComponent* component)
 {
-	if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
-	{
-		SPrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
-		if (isPrimitive->SceneProxy != nullptr)
-		{
-			// Actually need to remove previous scene proxy from scene.
-			_scene->RemovePrimitive(isPrimitive->SceneProxy->PrimitiveId);
-			DestroySubobject(isPrimitive->SceneProxy);
-		}
+	//if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
+	//{
+	//	PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
+	//	if (isPrimitive->SceneProxy != nullptr)
+	//	{
+	//		// Actually need to remove previous scene proxy from scene.
+	//		_scene->RemovePrimitive(isPrimitive->SceneProxy->PrimitiveId);
+	//		delete isPrimitive->SceneProxy;
+	//		isPrimitive->SceneProxy = nullptr;
+	//	}
 
-		if (proxy != nullptr)
-		{
-			int64 id = _scene->AddPrimitive(proxy);
-			proxy->PrimitiveId = id;
-		}
+	//	if (proxy != nullptr)
+	//	{
+	//		int64 id = _scene->AddPrimitive(proxy);
+	//		proxy->PrimitiveId = id;
+	//	}
 
-		isPrimitive->SceneProxy = proxy;
-	}
+	//	isPrimitive->SceneProxy = proxy;
+	//}
 }
 
 void SWorld::UnregisterTickFunction(STickFunction* function)
@@ -161,26 +165,27 @@ void SWorld::UnregisterTickFunction(STickFunction* function)
 
 void SWorld::UnregisterComponent(SActorComponent* component)
 {
-	if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
-	{
-		if (isPrimitive->SceneProxy != nullptr)
-		{
-			int64 id = isPrimitive->SceneProxy->PrimitiveId;
-			_scene->RemovePrimitive(id);
-		}
-	}
+	//if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
+	//{
+	//	if (isPrimitive->SceneProxy != nullptr)
+	//	{
+	//		int64 id = isPrimitive->SceneProxy->PrimitiveId;
+	//		_scene->RemovePrimitive(id);
+	//	}
+	//}
 }
 
 void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
 {
 	_tickFunctions.ReadyForExecuteTick();
 
-	_tickFunctions.PrePhysics.ExecuteTick(elapsedTime);
-	_tickFunctions.DuringPhysics.ExecuteTick(elapsedTime);
-	_tickFunctions.PostPhysics.ExecuteTick(elapsedTime);
-	_playerController->UpdateCameraManager(elapsedTime);
-	_tickFunctions.PostUpdateWork.ExecuteTick(elapsedTime);
-	_scene->UpdateScene(elapsedTime);
+	float Time = elapsedTime.count();
+
+	_tickFunctions.PrePhysics.ExecuteTick(Time);
+	_tickFunctions.DuringPhysics.ExecuteTick(Time);
+	_tickFunctions.PostPhysics.ExecuteTick(Time);
+	_playerController->UpdateCameraManager(Time);
+	_tickFunctions.PostUpdateWork.ExecuteTick(Time);
 }
 
 bool SWorld::InternalSpawnActor(AActor* instance)

@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-
-struct MinimalViewInfo;
+#include "MinimalViewInfo.h"
 
 class GAME_API SCameraComponent : public SSceneComponent
 {
@@ -14,5 +13,5 @@ class GAME_API SCameraComponent : public SSceneComponent
 public:
 	SCameraComponent();
 
-	MinimalViewInfo GetViewInfo(std::chrono::duration<float> elapsedTime);
+	MinimalViewInfo GetViewInfo(float elapsedTime);
 };

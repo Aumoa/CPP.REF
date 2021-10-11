@@ -5,16 +5,17 @@
 #include "Scene/StaticMeshSceneProxy.h"
 #include "Scene/StaticMeshRenderData.h"
 #include "Assets/StaticMesh.h"
+#include "Materials/Material.h"
 
 SStaticMeshComponent::SStaticMeshComponent() : Super()
 {
 }
 
-SPrimitiveSceneProxy* SStaticMeshComponent::CreateSceneProxy()
+PrimitiveSceneProxy* SStaticMeshComponent::CreateSceneProxy()
 {
 	if (_StaticMesh != nullptr)
 	{
-		return NewObject<SStaticMeshSceneProxy>(this, std::vector{ _batch });
+		return new StaticMeshSceneProxy(this, std::vector{ _batch });
 	}
 	else
 	{

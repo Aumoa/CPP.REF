@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameStructures.h"
 #include "BitfieldInputChangeTracker.h"
+#include "MouseState.h"
 
 class SMouseStateTracker : implements SObject
 {

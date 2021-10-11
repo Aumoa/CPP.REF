@@ -19,6 +19,8 @@ private:
 public:
 	SMaterial(IRHIDevice* device);
 
+	virtual void SetupCommands(IRHIDeviceContext* InContext) override { check(false); }
+
 	/// <summary>
 	/// Compile and apply shader implements.
 	/// </summary>

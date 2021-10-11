@@ -7,8 +7,6 @@
 #include "CoreDelegates.h"
 #include "Level/World.h"
 #include "Camera/PlayerCameraManager.h"
-#include "Scene/Scene.h"
-#include "Scene/SceneRenderer.h"
 #include "GameFramework/LocalPlayer.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "EngineSubsystems/GameRenderSystem.h"
@@ -35,13 +33,6 @@ SGameEngine::~SGameEngine()
 		{
 			DestroySubobject(_subsystems[i]);
 		}
-	}
-
-	// Remove game instance.
-	if (_gameInstance)
-	{
-		DestroySubobject(_gameInstance);
-		_gameInstance = nullptr;
 	}
 }
 
@@ -76,8 +67,8 @@ bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
 		return false;
 	}
 
-	_gameInstance->SetOuter(this);
-	_gameInstance->SetWorld(GetEngineSubsystem<SGameLevelSystem>()->GetWorld());
+	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
+	_gameInstance->SetOuter(GameWorld);
 	if (!_gameInstance->StartupLevel.IsValid())
 	{
 		SE_LOG(LogEngine, Fatal, L"SGameInstance::StartupLevel is not specified.");

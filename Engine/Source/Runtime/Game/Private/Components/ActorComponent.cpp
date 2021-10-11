@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Level/World.h"
 
-void SActorComponent::ComponentTickFunction::ExecuteTick(std::chrono::duration<float> elapsedTime)
+void SActorComponent::SComponentTickFunction::ExecuteTick(float elapsedTime)
 {
 	if (_target == nullptr)
 	{
@@ -32,8 +32,12 @@ SActorComponent::SActorComponent() : Super()
 {
 }
 
-void SActorComponent::TickComponent(std::chrono::duration<float> elapsedTime, ComponentTickFunction* tickFunction)
+void SActorComponent::TickComponent(float elapsedTime, SComponentTickFunction* tickFunction)
 {
+	if (tickFunction == &PrimaryComponentTick)
+	{
+		Tick(elapsedTime);
+	}
 }
 
 void SActorComponent::BeginPlay()
@@ -44,6 +48,10 @@ void SActorComponent::BeginPlay()
 void SActorComponent::EndPlay()
 {
 	_bHasBegunPlay = false;
+}
+
+void SActorComponent::Tick(float elapsedTime)
+{
 }
 
 void SActorComponent::SetActive(bool bActive)
@@ -62,19 +70,31 @@ void SActorComponent::SetActive(bool bActive)
 	}
 }
 
+void SActorComponent::RegisterComponent()
+{
+	AActor* MyOwner = GetOwner();
+	if (ensure(MyOwner))
+	{
+		if (SWorld* OwnerWorld = MyOwner->GetWorld(); ensure(OwnerWorld))
+		{
+			RegisterComponentWithWorld(OwnerWorld);
+		}
+	}
+}
+
 void SActorComponent::RegisterComponentWithWorld(SWorld* world)
 {
-	if (!_bIsRegistered)
+	if (!_bRegistered)
 	{
 		world->RegisterTickFunction(&PrimaryComponentTick);
 		world->RegisterComponent(this);
-		_bIsRegistered = true;
+		_bRegistered = true;
 	}
 }
 
 void SActorComponent::UnregisterComponent()
 {
-	if (_bIsRegistered)
+	if (_bRegistered)
 	{
 		SWorld* const world = GetWorld();
 		if (world != nullptr)
@@ -82,6 +102,11 @@ void SActorComponent::UnregisterComponent()
 			world->UnregisterTickFunction(&PrimaryComponentTick);
 			world->UnregisterComponent(this);
 		}
-		_bIsRegistered = false;
+		_bRegistered = false;
 	}
+}
+
+bool SActorComponent::IsRegistered()
+{
+	return _bRegistered;
 }

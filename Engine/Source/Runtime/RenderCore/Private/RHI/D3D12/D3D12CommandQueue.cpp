@@ -15,7 +15,13 @@ SD3D12CommandQueue::~SD3D12CommandQueue()
 	WaitCompleted();
 }
 
-void SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts)
+void SD3D12CommandQueue::End()
+{
+	Super::End();
+	ExecuteCommandList(this);
+}
+
+uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal)
 {
 	std::vector<ID3D12CommandList*> commandLists;
 	commandLists.reserve(deviceContexts.size());
@@ -42,7 +48,13 @@ void SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> devic
 	{
 		_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
 	}
-	_queue->Signal(_fence.Get(), _fenceValue);
+
+	if (bSignal)
+	{
+		_queue->Signal(_fence.Get(), _fenceValue);
+	}
+
+	return _fenceValue;
 }
 
 uint64 SD3D12CommandQueue::GetFenceValue()

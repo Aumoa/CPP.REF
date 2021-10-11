@@ -27,10 +27,10 @@ public:
 	/// </summary>
 	APlayerController();
 
-	SCameraComponent* FindPlayerCameraComponent() const;
+	SCameraComponent* FindPlayerCameraComponent();
 	void SpawnCameraManager(SWorld* level);
-	void UpdateCameraManager(std::chrono::duration<float> elapsedTime);
-	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY) const;
+	void UpdateCameraManager(float elapsedTime);
+	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY);
 	void SetLocalPlayer(SLocalPlayer* localPlayer);
 
 	inline SLocalPlayer* GetLocalPlayer() const { return _localPlayer; }

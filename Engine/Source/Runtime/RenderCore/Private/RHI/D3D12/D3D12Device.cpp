@@ -31,7 +31,7 @@ SD3D12Device::~SD3D12Device()
 	if (_immCon)
 	{
 		// Flush and signal forcely.
-		_immCon->ExecuteCommandList(nullptr);
+		_immCon->ExecuteCommandLists({}, true);
 		_immCon->WaitCompleted();
 	}
 }
@@ -483,9 +483,7 @@ void SD3D12Device::BeginFrame()
 
 void SD3D12Device::EndFrame()
 {
-	_immCon->ExecuteCommandList(_immCon);
-
-	_fenceValue = _immCon->GetFenceValue();
+	_fenceValue = _immCon->ExecuteCommandLists({}, true);
 	MarkPendingAllocatorAndHeaps(_fenceValue);
 }
 

@@ -65,7 +65,7 @@ public:
 	/// Execute tick function.
 	/// </summary>
 	/// <param name="elapsedTime"> The frame elapsed time. </param>
-	virtual void ExecuteTick(std::chrono::duration<float> elapsedTime);
+	virtual void ExecuteTick(float elapsedTime);
 
 	/// <summary>
 	/// Add prerequisite function.
