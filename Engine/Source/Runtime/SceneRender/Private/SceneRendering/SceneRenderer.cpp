@@ -11,14 +11,14 @@ SceneRenderer::SceneRenderer(SScene* InScene) : Scene(InScene)
 {
 }
 
-void SceneRenderer::InitViews(IRHIDeviceContext* Context, std::span<const SceneViewScope> InViews)
+void SceneRenderer::InitViews(std::span<const SceneViewScope> InViews)
 {
 	Views.reserve(InViews.size());
 
 	for (size_t i = 0; i < InViews.size(); ++i)
 	{
 		SceneView& View = Views.emplace_back(Scene);
-		View.InitViews(Context, InViews[i]);
+		View.InitViews(InViews[i]);
 	}
 }
 
@@ -57,6 +57,8 @@ void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context, const Scene
 		{
 			SceneView::PrimitiveViewInfo& ViewInfo = View.ViewIndexes[i];
 			const PrimitiveSceneInfo& PrimitiveInfo = *Primitives[ViewInfo.PrimitiveId];
+
+			Context->SetGraphicsRootShaderResourceView(0, BaseVirtualAddress);
 
 			for (const MeshBatch& Batch : PrimitiveInfo.MeshBatches)
 			{

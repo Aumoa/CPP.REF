@@ -159,5 +159,5 @@ void SGameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 
 void SGameEngine::RenderTick(std::chrono::duration<float> elapsedTime)
 {
-	GetEngineSubsystem<SGameRenderSystem>()->Present();
+	GetEngineSubsystem<SGameRenderSystem>()->ExecuteRenderThread();
 }

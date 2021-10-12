@@ -8,6 +8,15 @@ SPrimitiveComponent::SPrimitiveComponent() : Super()
 {
 }
 
+SPrimitiveComponent::~SPrimitiveComponent()
+{
+	if (!ensure(SceneProxy == nullptr))
+	{
+		delete SceneProxy;
+		SceneProxy = nullptr;
+	}
+}
+
 void SPrimitiveComponent::SetHiddenInGame(bool bHidden)
 {
 	if (_bHiddenInGame != bHidden)

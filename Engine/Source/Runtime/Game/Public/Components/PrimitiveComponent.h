@@ -16,6 +16,7 @@ private:
 
 public:
 	SPrimitiveComponent();
+	~SPrimitiveComponent() override;
 
 	virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
 	PrimitiveSceneProxy* SceneProxy = nullptr;

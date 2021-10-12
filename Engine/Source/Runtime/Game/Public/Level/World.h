@@ -15,6 +15,7 @@ class SGameEngine;
 class APlayerController;
 class APlayerCameraManager;
 class STickFunction;
+class PrimitiveSceneProxy;
 
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
@@ -54,6 +55,10 @@ private:
 
 	std::set<AActor*> _actors;
 	TickFunctions _tickFunctions;
+
+	std::vector<PrimitiveSceneProxy*> _SceneProxiesToUpdate;
+	std::vector<PrimitiveSceneProxy*> _SceneProxiesToRegister;
+	std::vector<PrimitiveSceneProxy*> _SceneProxiesToUnregister;
 
 	APlayerController* _playerController = nullptr;
 	APlayerCameraManager* _playerCamera = nullptr;
@@ -107,13 +112,15 @@ public:
 	SLevel* LoadLevel(SubclassOf<SLevel> levelToLoad);
 
 	void RegisterTickFunction(STickFunction* function);
-	void RegisterComponent(SActorComponent* component);
+	void RegisterComponent(SActorComponent* InComponent);
 	void UnregisterTickFunction(STickFunction* function);
-	void UnregisterComponent(SActorComponent* component);
+	void UnregisterComponent(SActorComponent* InComponent);
 
 	virtual void LevelTick(std::chrono::duration<float> elapsedTime);
 	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
 	SLevel* GetLevel() const { return _level; }
+
+	void GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister);
 
 private:
 	bool InternalSpawnActor(AActor* instance);

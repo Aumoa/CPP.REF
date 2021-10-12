@@ -35,7 +35,7 @@ public:
 public:
 	SceneView(SScene* InScene);
 
-	void InitViews(IRHIDeviceContext* Context, const SceneViewScope& InViewScope);
+	void InitViews(const SceneViewScope& InViewScope);
 	SScene* GetScene() const;
 	uint64 GetStructuredBufferViewAddress() const;
 

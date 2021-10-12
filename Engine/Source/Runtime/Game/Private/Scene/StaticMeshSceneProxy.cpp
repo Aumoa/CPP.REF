@@ -3,7 +3,7 @@
 #include "Scene/StaticMeshSceneProxy.h"
 #include "Components/StaticMeshComponent.h"
 
-StaticMeshSceneProxy::StaticMeshSceneProxy(SStaticMeshComponent* InStaticMeshComponent, const std::vector<MeshBatch>& InBatches)
+StaticMeshSceneProxy::StaticMeshSceneProxy(SStaticMeshComponent* InStaticMeshComponent, std::span<MeshBatch> InBatches)
 	: PrimitiveSceneProxy(InStaticMeshComponent)
 {
 	MeshBatches = InBatches;

@@ -53,12 +53,13 @@ public:
 	virtual ~SGameRenderSystem() override;
 
 	virtual void Init() override;
-	virtual void Present();
+	virtual void ExecuteRenderThread();
 
 	void SetupFrameworkView(IFrameworkView* frameworkView);
 	IFrameworkView* GetFrameworkView();
 	inline IRHIDevice* GetRHIDevice() { return _device; }
 	inline SScene* GetScene() { return _Scene; }
+	SColorVertexFactory* GetColorVertexFactory() { return _colorVertexFactory; }
 
 private:
 	void ResizeApp(int32 width, int32 height);

@@ -5,7 +5,7 @@
 #include "GameEngine.h"
 #include "Components/PrimitiveComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "Scene/Scene.h"
+#include "SceneRendering/Scene.h"
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Camera/PlayerCameraManager.h"
 #include "EngineSubsystems/GameRenderSystem.h"
@@ -135,27 +135,35 @@ void SWorld::RegisterTickFunction(STickFunction* function)
 	}
 }
 
-void SWorld::RegisterComponent(SActorComponent* component)
+void SWorld::RegisterComponent(SActorComponent* InComponent)
 {
-	//if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
-	//{
-	//	PrimitiveSceneProxy* proxy = isPrimitive->CreateSceneProxy();
-	//	if (isPrimitive->SceneProxy != nullptr)
-	//	{
-	//		// Actually need to remove previous scene proxy from scene.
-	//		_scene->RemovePrimitive(isPrimitive->SceneProxy->PrimitiveId);
-	//		delete isPrimitive->SceneProxy;
-	//		isPrimitive->SceneProxy = nullptr;
-	//	}
+	if (auto* IsPrimitive = Cast<SPrimitiveComponent>(InComponent); IsPrimitive != nullptr)
+	{
+		int64 Id = -1;
 
-	//	if (proxy != nullptr)
-	//	{
-	//		int64 id = _scene->AddPrimitive(proxy);
-	//		proxy->PrimitiveId = id;
-	//	}
+		PrimitiveSceneProxy* SceneProxy = IsPrimitive->CreateSceneProxy();
+		if (IsPrimitive->SceneProxy != nullptr)
+		{
+			Id = IsPrimitive->SceneProxy->PrimitiveId;
+			delete IsPrimitive->SceneProxy;
+			IsPrimitive->SceneProxy = nullptr;
+		}
 
-	//	isPrimitive->SceneProxy = proxy;
-	//}
+		if (SceneProxy != nullptr)
+		{
+			SceneProxy->PrimitiveId = Id;
+			if (Id != -1)
+			{
+				_SceneProxiesToUpdate.emplace_back(SceneProxy);
+			}
+			else
+			{
+				_SceneProxiesToRegister.emplace_back(SceneProxy);
+			}
+		}
+
+		IsPrimitive->SceneProxy = SceneProxy;
+	}
 }
 
 void SWorld::UnregisterTickFunction(STickFunction* function)
@@ -163,16 +171,19 @@ void SWorld::UnregisterTickFunction(STickFunction* function)
 	_tickFunctions.Remove(function);
 }
 
-void SWorld::UnregisterComponent(SActorComponent* component)
+void SWorld::UnregisterComponent(SActorComponent* InComponent)
 {
-	//if (auto* isPrimitive = dynamic_cast<SPrimitiveComponent*>(component); isPrimitive != nullptr)
-	//{
-	//	if (isPrimitive->SceneProxy != nullptr)
-	//	{
-	//		int64 id = isPrimitive->SceneProxy->PrimitiveId;
-	//		_scene->RemovePrimitive(id);
-	//	}
-	//}
+	if (auto* IsPrimitive = Cast<SPrimitiveComponent>(InComponent); IsPrimitive != nullptr)
+	{
+		PrimitiveSceneProxy* SceneProxy = IsPrimitive->SceneProxy;
+		if (SceneProxy != nullptr)
+		{
+			_SceneProxiesToUnregister.emplace_back(SceneProxy);
+			SceneProxy = nullptr;
+		}
+
+		IsPrimitive->SceneProxy = SceneProxy;
+	}
 }
 
 void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
@@ -186,6 +197,13 @@ void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
 	_tickFunctions.PostPhysics.ExecuteTick(Time);
 	_playerController->UpdateCameraManager(Time);
 	_tickFunctions.PostUpdateWork.ExecuteTick(Time);
+}
+
+void SWorld::GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister)
+{
+	OutToUpdate = std::move(_SceneProxiesToUpdate);
+	OutToRegister = std::move(_SceneProxiesToRegister);
+	OutToUnregister = std::move(_SceneProxiesToUnregister);
 }
 
 bool SWorld::InternalSpawnActor(AActor* instance)

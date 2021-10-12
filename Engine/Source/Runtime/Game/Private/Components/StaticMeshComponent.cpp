@@ -15,7 +15,7 @@ PrimitiveSceneProxy* SStaticMeshComponent::CreateSceneProxy()
 {
 	if (_StaticMesh != nullptr)
 	{
-		return new StaticMeshSceneProxy(this, std::vector{ _batch });
+		return new StaticMeshSceneProxy(this, std::span(&_batch, 1));
 	}
 	else
 	{

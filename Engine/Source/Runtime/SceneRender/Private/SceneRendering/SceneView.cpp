@@ -10,7 +10,7 @@ SceneView::SceneView(SScene* InScene) : _MyScene(InScene)
 {
 }
 
-void SceneView::InitViews(IRHIDeviceContext* Context, const SceneViewScope& InViewScope)
+void SceneView::InitViews(const SceneViewScope& InViewScope)
 {
 	const auto& Primitives = _MyScene->GetPrimitives();
 

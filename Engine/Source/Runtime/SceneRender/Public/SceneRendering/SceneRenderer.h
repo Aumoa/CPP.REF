@@ -19,6 +19,6 @@ public:
 public:
 	SceneRenderer(SScene* InScene);
 
-	void InitViews(IRHIDeviceContext* Context, std::span<const SceneViewScope> InViews);
+	void InitViews(std::span<const SceneViewScope> InViews);
 	void PopulateCommandLists(IRHIDeviceContext* Context, const SceneRenderTarget& InRenderTarget);
 };

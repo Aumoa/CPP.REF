@@ -40,9 +40,9 @@ void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* commandList, uint32 subr
 void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* commandList, ID3D12Resource* buf, ID3D12Resource* uploadBuf, uint32 subresource, uint64 totalBytes, const RHISubresourceData* uploadData)
 {
 	int8* pData;
-	HR(buf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
+	HR(uploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
 	memcpy(pData, uploadData->pSysMem, (size_t)totalBytes);
-	buf->Unmap(0, nullptr);
+	uploadBuf->Unmap(0, nullptr);
 
 	commandList->CopyResource(buf, uploadBuf);
 }

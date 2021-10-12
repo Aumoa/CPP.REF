@@ -13,12 +13,6 @@
     <Filter Include="Private\SceneRendering">
       <UniqueIdentifier>{a3d9fbeb-5c44-4f3a-8f1f-77f0b38b1024}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\Materials">
-      <UniqueIdentifier>{3a5006ba-8d75-4afc-a2ef-630fe15fe765}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\Materials">
-      <UniqueIdentifier>{8e784eae-95ae-449f-986c-0563cb60d875}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp">
@@ -32,12 +26,6 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp">
       <Filter>Private\SceneRendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Materials\Material.cpp">
-      <Filter>Private\Materials</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Materials\MaterialInterface.cpp">
-      <Filter>Private\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,18 +58,6 @@
     </ClInclude>
     <ClInclude Include="Public\SceneRendering\SceneStructuredBuffer.h">
       <Filter>Public\SceneRendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Materials\Material.h">
-      <Filter>Public\Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Materials\MaterialInstance.h">
-      <Filter>Public\Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Materials\MaterialInstanceDynamic.h">
-      <Filter>Public\Materials</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Materials\MaterialInterface.h">
-      <Filter>Public\Materials</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

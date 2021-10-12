@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MeshComponent.h"
-#include "Scene/MeshBatch.h"
+#include "SceneRendering/MeshBatch.h"
 
 class SStaticMesh;
 class SMaterial;

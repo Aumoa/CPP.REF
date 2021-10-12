@@ -33,6 +33,23 @@ int64 SScene::AddPrimitive(const PrimitiveSceneInfo& InPrimitive)
 	}
 }
 
+bool SScene::RemovePrimitive(int64 InPrimitiveId)
+{
+	if ((int64)_Primitives.size() > InPrimitiveId && _Primitives[InPrimitiveId].has_value())
+	{
+		_Primitives[InPrimitiveId].reset();
+		_PrimitiveIds.push(InPrimitiveId);
+		return true;
+	}
+
+	return false;
+}
+
+void SScene::UpdatePrimitive(int64 InPrimitiveId, const PrimitiveSceneInfo& InPrimitive)
+{
+	_Primitives[InPrimitiveId] = InPrimitive;
+}
+
 int64 SScene::AddLight(const LightSceneInfo& InLight)
 {
 	if (_LightIds.empty())
@@ -50,18 +67,6 @@ int64 SScene::AddLight(const LightSceneInfo& InLight)
 	}
 }
 
-bool SScene::RemovePrimitive(int64 InPrimitiveId)
-{
-	if ((int64)_Primitives.size() > InPrimitiveId && _Primitives[InPrimitiveId].has_value())
-	{
-		_Primitives[InPrimitiveId].reset();
-		_PrimitiveIds.push(InPrimitiveId);
-		return true;
-	}
-
-	return false;
-}
-
 bool SScene::RemoveLight(int64 InPrimitiveId)
 {
 	if ((int64)_Lights.size() > InPrimitiveId && _Lights[InPrimitiveId].has_value())
@@ -74,7 +79,12 @@ bool SScene::RemoveLight(int64 InPrimitiveId)
 	return false;
 }
 
-void SScene::BeginScene(IRHIDeviceContext* Context)
+void SScene::UpdateLight(int64 InPrimitiveId, const LightSceneInfo& InLight)
+{
+	_Lights[InPrimitiveId] = InLight;
+}
+
+void SScene::BeginScene()
 {
 	// Resize view buffers manually for keep capacity.
 	_NumViewBuffers = 0;
@@ -113,47 +123,57 @@ void SScene::ApplyViewBuffers(IRHIDeviceContext* InContext)
 {
 	_ViewBufferCachedMemory.resize((size_t)_RequiredSize);
 
-	uint8* pSysMem = _ViewBufferCachedMemory.data();
-	for (size_t i = 0; i < _ViewBufferSysMem.size(); ++i)
+	if (_RequiredSize)
 	{
-		size_t Stride = _ViewBufferSysMem[i].size();
-		memcpy(pSysMem, _ViewBufferSysMem[i].data(), Stride);
-		pSysMem += Stride;
-	}
-
-	RHISubresourceData InitialData =
-	{
-		.pSysMem = _ViewBufferCachedMemory.data(),
-		.SysMemPitch = _RequiredSize,
-	};
-
-	if (_ViewBuffer == nullptr || _ViewBuffer->GetDesc().ByteWidth < (uint32)_RequiredSize)
-	{
-		if (_ViewBuffer)
+		uint8* pSysMem = _ViewBufferCachedMemory.data();
+		for (size_t i = 0; i < _ViewBufferSysMem.size(); ++i)
 		{
-			DestroySubobject(_ViewBuffer);
-			_ViewBuffer = nullptr;
+			size_t Stride = _ViewBufferSysMem[i].size();
+			memcpy(pSysMem, _ViewBufferSysMem[i].data(), Stride);
+			pSysMem += Stride;
 		}
 
-		RHIBufferDesc NewDesc =
+		RHISubresourceData InitialData =
 		{
-			.ByteWidth = (uint32)_RequiredSize,
-			.Usage = ERHIBufferUsage::Default,
-			.InitialState = ERHIResourceStates::NonPixelShaderResource | ERHIResourceStates::PixelShaderResource,
-			.StructureByteStride = 0,
-			.Flags = ERHIResourceFlags::None
+			.pSysMem = _ViewBufferCachedMemory.data(),
+			.SysMemPitch = _RequiredSize,
 		};
 
-		_ViewBuffer = _Device->CreateBuffer(NewDesc, &InitialData);
-		_ViewBuffer->SetOuter(this);
-	}
-	else
-	{
-		InContext->UpdateSubresource(_ViewBuffer, 0, InitialData);
+		if (_ViewBuffer == nullptr || _ViewBuffer->GetDesc().ByteWidth < (uint32)_RequiredSize)
+		{
+			if (_ViewBuffer)
+			{
+				DestroySubobject(_ViewBuffer);
+				_ViewBuffer = nullptr;
+			}
+
+			RHIBufferDesc NewDesc =
+			{
+				.ByteWidth = (uint32)_RequiredSize,
+				.Usage = ERHIBufferUsage::Default,
+				.InitialState = ERHIResourceStates::NonPixelShaderResource | ERHIResourceStates::PixelShaderResource,
+				.StructureByteStride = 0,
+				.Flags = ERHIResourceFlags::None
+			};
+
+			_ViewBuffer = _Device->CreateBuffer(NewDesc, &InitialData);
+			_ViewBuffer->SetOuter(this);
+		}
+		else
+		{
+			InContext->UpdateSubresource(_ViewBuffer, 0, InitialData);
+		}
 	}
 }
 
 uint64 SScene::GetActualGPUVirtualAddress(const SceneStructuredBuffer& InBuffer)
 {
-	return _ViewBuffer->GetGPUVirtualAddress() + InBuffer.GPUVirtualAddressOffset;
+	if (_RequiredSize)
+	{
+		return _ViewBuffer->GetGPUVirtualAddress() + InBuffer.GPUVirtualAddressOffset;
+	}
+	else
+	{
+		return 0;
+	}
 }

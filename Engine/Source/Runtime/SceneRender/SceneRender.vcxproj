@@ -98,18 +98,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Materials\Material.cpp" />
-    <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneView.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public\Materials\Material.h" />
-    <ClInclude Include="Public\Materials\MaterialInstance.h" />
-    <ClInclude Include="Public\Materials\MaterialInstanceDynamic.h" />
-    <ClInclude Include="Public\Materials\MaterialInterface.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneInfo.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatchElement.h" />

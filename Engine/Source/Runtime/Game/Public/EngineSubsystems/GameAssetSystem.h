@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
+class SStaticMesh;
 class STexture2D;
 class SFont;
 
@@ -25,6 +26,7 @@ public:
 
 private:
 	void SearchDirectory(const std::filesystem::path& searchDirectory);
+	SStaticMesh* LoadStaticMesh(const std::filesystem::path& assetPath);
 	STexture2D* LoadTexture2D(const std::filesystem::path& assetPath);
 	//SFont* LoadFont(const std::filesystem::path& assetPath);
 };

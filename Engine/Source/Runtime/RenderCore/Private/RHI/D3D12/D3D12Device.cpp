@@ -151,7 +151,8 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 	bufferDesc.Flags = (D3D12_RESOURCE_FLAGS)desc.Flags;
 	D3D12_HEAP_PROPERTIES heapProp = { D3D12_HEAP_TYPE_DEFAULT };
 
-	HR(_device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, (D3D12_RESOURCE_STATES)desc.InitialState, nullptr, IID_PPV_ARGS(&buffer)));
+	D3D12_RESOURCE_STATES initialState = initialData ? D3D12_RESOURCE_STATE_COPY_DEST : (D3D12_RESOURCE_STATES)desc.InitialState;
+	HR(_device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &bufferDesc, initialState, nullptr, IID_PPV_ARGS(&buffer)));
 
 	// Create dynamic upload buffer if necessary.
 	const bool bCreateDynamicBuffer = initialData || desc.Usage == ERHIBufferUsage::Default;

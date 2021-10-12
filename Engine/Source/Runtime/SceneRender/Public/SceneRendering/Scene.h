@@ -28,7 +28,7 @@ private:
 	std::vector<std::optional<PrimitiveSceneInfo>> _Primitives;
 	std::vector<std::optional<LightSceneInfo>> _Lights;
 
-	IRHIBuffer* _ViewBuffer;
+	IRHIBuffer* _ViewBuffer = nullptr;
 	std::vector<std::vector<uint8>> _ViewBufferSysMem;
 	size_t _NumViewBuffers;
 	uint64 _RequiredSize;
@@ -39,15 +39,17 @@ public:
 	~SScene() override;
 
 	int64 AddPrimitive(const PrimitiveSceneInfo& InPrimitive);
-	int64 AddLight(const LightSceneInfo& InLight);
-
 	bool RemovePrimitive(int64 InPrimitiveId);
+	void UpdatePrimitive(int64 InPrimitiveId, const PrimitiveSceneInfo& InPrimitive);
+
+	int64 AddLight(const LightSceneInfo& InLight);
 	bool RemoveLight(int64 InLightId);
+	void UpdateLight(int64 InPrimitiveId, const LightSceneInfo& InLight);
 
 	inline const std::vector<std::optional<PrimitiveSceneInfo>>& GetPrimitives() const { return _Primitives; }
 	inline const std::vector<std::optional<LightSceneInfo>>& GetLights() const { return _Lights; }
 
-	void BeginScene(IRHIDeviceContext* Context);
+	void BeginScene();
 	void EndScene();
 
 	IRHIDevice* GetDevice();

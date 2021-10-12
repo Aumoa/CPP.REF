@@ -19,10 +19,13 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDepthStencilView.h"
 #include "Level/World.h"
-#include "Scene/Scene.h"
+#include "SceneRendering/Scene.h"
+#include "SceneRendering/SceneViewScope.h"
+#include "SceneRendering/SceneRenderer.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/MinimalViewInfo.h"
 #include "GameThreads/RenderThread.h"
+#include "Scene/PrimitiveSceneProxy.h"
 
 DEFINE_LOG_CATEGORY(LogRender);
 
@@ -69,11 +72,41 @@ void SGameRenderSystem::Init()
 	SE_LOG(LogRender, Verbose, L"Finish to initialize GameRenderSystem.");
 }
 
-void SGameRenderSystem::Present()
+void SGameRenderSystem::ExecuteRenderThread()
 {
-	RenderThread::WaitForLastWorks();
-	RenderThread::ExecuteWorks([this]()
+	SGameLevelSystem* LevelSys = GEngine->GetEngineSubsystem<SGameLevelSystem>();
+	SWorld* GameWorld = LevelSys->GetWorld();
+
+	std::vector<PrimitiveSceneProxy*> SceneProxiesToUpdate, SceneProxiesToRegister, SceneProxiesToUnregister;
+	if (GameWorld)
 	{
+		GameWorld->GetPendingSceneProxies(SceneProxiesToUpdate, SceneProxiesToRegister, SceneProxiesToUnregister);
+	}
+
+#define MoveCapture(Name) Name = std::move(Name)
+
+	RenderThread::WaitForLastWorks();
+	RenderThread::ExecuteWorks([this, MoveCapture(SceneProxiesToUpdate), MoveCapture(SceneProxiesToRegister), MoveCapture(SceneProxiesToUnregister)]()
+
+#undef MoveCapture
+	{
+		for (auto& SceneProxy : SceneProxiesToUpdate)
+		{
+			_Scene->UpdatePrimitive(SceneProxy->PrimitiveId, SceneProxy->ComposeSceneInfo());
+		}
+
+		for (auto& SceneProxy : SceneProxiesToRegister)
+		{
+			int64 Id = _Scene->AddPrimitive(SceneProxy->ComposeSceneInfo());
+			SceneProxy->PrimitiveId = Id;
+		}
+
+		for (auto& SceneProxy : SceneProxiesToUnregister)
+		{
+			_Scene->RemovePrimitive(SceneProxy->PrimitiveId);
+			delete SceneProxy;
+		}
+
 		int32 SwapChainIndex = _frameworkViewChain->GetCurrentBackBufferIndex();
 		SceneRenderTarget RenderTarget(_rtv, SwapChainIndex, _dsv, 0, ERHIResourceStates::Present);
 
@@ -88,27 +121,34 @@ void SGameRenderSystem::Present()
 			LocalPlayerView.AspectRatio = RenderTarget.Viewport.Width / RenderTarget.Viewport.Height;
 		}
 
-		SceneViewScope PrimarySceneView;
-		PrimarySceneView.InitFromCameraView(
-			LocalPlayerView.Location,
-			LocalPlayerView.Rotation,
-			LocalPlayerView.FOVAngle.ToRadians(),
-			LocalPlayerView.AspectRatio,
-			LocalPlayerView.NearPlane,
-			LocalPlayerView.FarPlane);
+		_Scene->BeginScene();
+		{
+			SceneViewScope PrimarySceneView;
+			PrimarySceneView.InitFromCameraView(
+				LocalPlayerView.Location,
+				LocalPlayerView.Rotation,
+				LocalPlayerView.FOVAngle.ToRadians(),
+				LocalPlayerView.AspectRatio,
+				LocalPlayerView.NearPlane,
+				LocalPlayerView.FarPlane);
 
-		// BEGIN OF FRAME.
-		_device->BeginFrame();
-		_primaryQueue->Begin(0, 0);
+			SceneRenderer Renderer(_Scene);
+			Renderer.InitViews(std::span(&PrimarySceneView, 1));
 
-		_Scene->InitViews(_primaryQueue, PrimarySceneView);
-		_Scene->PopulateCommandLists(_primaryQueue, RenderTarget);
+			// BEGIN OF FRAME.
+			_device->BeginFrame();
+			_primaryQueue->Begin(0, 0);
 
-		// END OF FRAME.
-		_primaryQueue->End();
-		_frameworkViewChain->Present();
+			_Scene->ApplyViewBuffers(_primaryQueue);
+			Renderer.PopulateCommandLists(_primaryQueue, RenderTarget);
 
-		_device->EndFrame();
+			// END OF FRAME.
+			_primaryQueue->End();
+			_frameworkViewChain->Present();
+
+			_device->EndFrame();
+		}
+		_Scene->EndScene();
 	});
 }
 

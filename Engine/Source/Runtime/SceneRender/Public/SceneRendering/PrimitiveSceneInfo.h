@@ -7,7 +7,7 @@
 
 struct PrimitiveSceneInfo
 {
-	std::vector<MeshBatch> MeshBatches;
+	std::span<MeshBatch> MeshBatches;
 	Transform ComponentTransform;
 	uint8 bHiddenInGame : 1;
 };

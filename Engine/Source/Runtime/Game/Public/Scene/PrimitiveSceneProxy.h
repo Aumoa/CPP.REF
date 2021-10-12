@@ -5,7 +5,8 @@
 #include "CoreMinimal.h"
 #include <vector>
 #include "RHI/RHIStructures.h"
-#include "Scene/MeshBatch.h"
+#include "SceneRendering/MeshBatch.h"
+#include "SceneRendering/PrimitiveSceneInfo.h"
 
 class SPrimitiveComponent;
 
@@ -14,7 +15,7 @@ class GAME_API PrimitiveSceneProxy
 public:
 	SPrimitiveComponent* const PrimitiveComponent;
 	int64 PrimitiveId;
-	std::vector<MeshBatch> MeshBatches;
+	std::span<MeshBatch> MeshBatches;
 	Transform ComponentTransform;
 	uint8 bRenderStateDirty : 1;
 	uint8 bHiddenInGame : 1;
@@ -27,4 +28,15 @@ public:
 	void MarkRenderStateDirty_RenderThread();
 	void SetHiddenInGame_GameThread(bool bHiddenInGame);
 	void SetHiddenInGame_RenderThread(bool bHiddenInGame);
+
+	PrimitiveSceneInfo ComposeSceneInfo() const
+	{
+		PrimitiveSceneInfo Info =
+		{
+			.MeshBatches = MeshBatches,
+			.ComponentTransform = ComponentTransform,
+			.bHiddenInGame = bHiddenInGame
+		};
+		return Info;
+	}
 };

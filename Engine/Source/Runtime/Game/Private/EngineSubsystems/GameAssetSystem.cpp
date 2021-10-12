@@ -1,9 +1,14 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameAssetSystem.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 #include "Misc/Paths.h"
 #include "LogGame.h"
+#include "GameEngine.h"
 #include "Assets/Texture2D.h"
+#include "Assets/StaticMesh.h"
+#include "Assets/Parser/AssimpParser.h"
+#include "Shaders/ColorShader/ColorVertexFactory.h"
 #include <stack>
 #include <queue>
 
@@ -59,11 +64,15 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 		path ext = assetPath.extension();
 		SObject* loadedObject = [&]() -> SObject*
 		{
+			if (auto loaded = LoadStaticMesh(assetPath); loaded)
+			{
+				return loaded;
+			}
 			if (auto loaded = LoadTexture2D(assetPath); loaded)
 			{
 				return loaded;
 			}
-			//else if (auto loaded = LoadFont(assetPath); loaded)
+			//if (auto loaded = LoadFont(assetPath); loaded)
 			//{
 			//	return loaded;
 			//}
@@ -112,6 +121,19 @@ void SGameAssetSystem::SearchDirectory(const std::filesystem::path& searchDirect
 		}
 
 		searchRecursivePaths.pop();
+	}
+}
+
+SStaticMesh* SGameAssetSystem::LoadStaticMesh(const std::filesystem::path& assetPath)
+{
+	SAssimpParser* Parser = NewObject<SAssimpParser>(GEngine, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetColorVertexFactory());
+	if (Parser->TryParse(assetPath))
+	{
+		return Parser->GetStaticMesh();
+	}
+	else
+	{
+		return nullptr;
 	}
 }
 

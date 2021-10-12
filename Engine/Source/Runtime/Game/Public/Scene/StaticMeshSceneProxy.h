@@ -10,5 +10,5 @@ class SStaticMeshComponent;
 class GAME_API StaticMeshSceneProxy : public PrimitiveSceneProxy
 {
 public:
-	StaticMeshSceneProxy(SStaticMeshComponent* InStaticMeshComponent, const std::vector<MeshBatch>& InBatches);
+	StaticMeshSceneProxy(SStaticMeshComponent* InStaticMeshComponent, std::span<MeshBatch> InBatches);
 };

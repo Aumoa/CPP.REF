@@ -25,6 +25,7 @@ uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> dev
 {
 	std::vector<ID3D12CommandList*> commandLists;
 	commandLists.reserve(deviceContexts.size());
+
 	++_fenceValue;
 
 	for (size_t i = 0; i < deviceContexts.size(); ++i)
@@ -39,6 +40,12 @@ uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> dev
 				GC_Pending gc;
 				gc.MarkedValue = _fenceValue;
 				gc.Objects = deviceContext_s->ClearPendingObjects();
+
+				for (auto& Object : gc.Objects)
+				{
+					Object->SetOuter(this);
+				}
+
 				_gc.emplace(std::move(gc));
 			}
 		}
@@ -52,9 +59,12 @@ uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> dev
 	if (bSignal)
 	{
 		_queue->Signal(_fence.Get(), _fenceValue);
+		return _fenceValue;
 	}
-
-	return _fenceValue;
+	else
+	{
+		return --_fenceValue;
+	}
 }
 
 uint64 SD3D12CommandQueue::GetFenceValue()
@@ -72,7 +82,7 @@ void SD3D12CommandQueue::Collect()
 	while (!_gc.empty())
 	{
 		auto& front = _gc.front();
-		if (front.MarkedValue <= _fenceValue)
+		if (front.MarkedValue <= _fence->GetCompletedValue())
 		{
 			for (size_t i = 0; i < front.Objects.size(); ++i)
 			{

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Scene/MeshBatch.h"
+#include "SceneRendering/MeshBatch.h"
 
 class SMaterial;
 
