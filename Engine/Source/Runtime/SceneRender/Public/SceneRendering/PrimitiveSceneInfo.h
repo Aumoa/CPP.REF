@@ -7,7 +7,6 @@
 
 struct PrimitiveSceneInfo
 {
-	int64 PrimitiveId;
 	std::vector<MeshBatch> MeshBatches;
 	Transform ComponentTransform;
 	uint8 bHiddenInGame : 1;

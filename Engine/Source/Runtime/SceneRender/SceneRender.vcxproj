@@ -90,28 +90,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Public\SceneRendering\SceneRenderTarget.h" />
-    <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
-    <ClInclude Include="Public\SceneView\SceneView.h" />
-    <ClInclude Include="Public\SceneView\SceneViewScope.h" />
-    <ClInclude Include="Public\Scene\MeshBatch.h" />
-    <ClInclude Include="Public\Scene\MeshBatchElement.h" />
-    <ClInclude Include="Public\Scene\PrimitiveSceneInfo.h" />
-    <ClInclude Include="Public\Scene\Scene.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
-    <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp" />
-    <ClCompile Include="Private\SceneView\SceneView.cpp" />
-    <ClCompile Include="Private\Scene\Scene.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RenderCore\RenderCore.vcxproj">
       <Project>{f00c8c6a-83d9-4827-a043-fc6707a647d2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\Materials\Material.cpp" />
+    <ClCompile Include="Private\Materials\MaterialInterface.cpp" />
+    <ClCompile Include="Private\SceneRendering\Scene.cpp" />
+    <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp" />
+    <ClCompile Include="Private\SceneRendering\SceneView.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Public\Materials\Material.h" />
+    <ClInclude Include="Public\Materials\MaterialInstance.h" />
+    <ClInclude Include="Public\Materials\MaterialInstanceDynamic.h" />
+    <ClInclude Include="Public\Materials\MaterialInterface.h" />
+    <ClInclude Include="Public\SceneRendering\LightSceneInfo.h" />
+    <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
+    <ClInclude Include="Public\SceneRendering\MeshBatchElement.h" />
+    <ClInclude Include="Public\SceneRendering\PrimitiveSceneInfo.h" />
+    <ClInclude Include="Public\SceneRendering\Scene.h" />
+    <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\SceneRenderTarget.h" />
+    <ClInclude Include="Public\SceneRendering\SceneStructuredBuffer.h" />
+    <ClInclude Include="Public\SceneRendering\SceneView.h" />
+    <ClInclude Include="Public\SceneRendering\SceneViewScope.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

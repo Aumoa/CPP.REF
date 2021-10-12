@@ -3,16 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SceneViewScope.h"
+#include "SceneView.h"
+#include "SceneRenderTarget.h"
 
 interface IRHIDeviceContext;
-class SceneView;
+class SScene;
 
 class SCENERENDER_API SceneRenderer
 {
-	SceneView* _View = nullptr;
+public:
+	SScene* const Scene;
+	std::vector<SceneView> Views;
 
 public:
-	SceneRenderer(SceneView* InView);
+	SceneRenderer(SScene* InScene);
 
-	void PopulateCommandLists(IRHIDeviceContext* Context);
+	void InitViews(IRHIDeviceContext* Context, std::span<const SceneViewScope> InViews);
+	void PopulateCommandLists(IRHIDeviceContext* Context, const SceneRenderTarget& InRenderTarget);
 };

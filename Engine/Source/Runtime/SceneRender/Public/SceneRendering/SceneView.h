@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SceneStructuredBuffer.h"
 
-interface IRHIBuffer;
 interface IRHIDeviceContext;
 class SScene;
 struct SceneViewScope;
@@ -12,7 +12,6 @@ struct SceneViewScope;
 class SCENERENDER_API SceneView
 {
 	SScene* _MyScene = nullptr;
-	IRHIBuffer* _ViewBuffer = nullptr;
 	size_t _CurrentViewSize = 0;
 
 private:
@@ -22,7 +21,8 @@ private:
 		Matrix4x4 WorldViewProj;
 	};
 
-	std::vector<ViewInfo> Views;
+	std::vector<ViewInfo> _Views;
+	SceneStructuredBuffer _ViewBuffer;
 
 public:
 	struct PrimitiveViewInfo
