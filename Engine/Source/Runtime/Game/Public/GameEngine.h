@@ -26,8 +26,7 @@ class GAME_API SGameEngine : implements SObject
 	GENERATED_BODY(SGameEngine)
 
 private:
-	SGameInstance* _gameInstance = nullptr;
-	std::optional<std::chrono::steady_clock::time_point> _prev;
+	SGameInstance* _GameInstance = nullptr;
 
 public:
 	/// <summary>
@@ -42,36 +41,37 @@ public:
 	virtual bool InitEngine();
 	virtual void SetupFrameworkView(IFrameworkView* frameworkView);
 	virtual bool LoadGameModule(std::wstring_view moduleName);
+	virtual void Shutdown();
 
 	int32 InvokedMain(IFrameworkView* frameworkView, std::wstring_view gameModule);
-	SGameInstance* GetGameInstance() const;
+	SGameInstance* GetGameInstance();
 
 private:
-	std::vector<SGameEngineSubsystem*> _subsystems;
-	mutable std::map<size_t, SGameEngineSubsystem*> _cachedMapSubsystems;
+	std::vector<SGameEngineSubsystem*> _Subsystems;
+	mutable std::map<size_t, SGameEngineSubsystem*> _CachedSubsystemsIndex;
 
 	void InitializeSubsystems();
 
 public:
 	template<class T>
-	T* GetEngineSubsystem() const
+	T* GetEngineSubsystem()
 	{
 		size_t hash = typeid(T).hash_code();
-		auto it = _cachedMapSubsystems.find(hash);
-		if (it == _cachedMapSubsystems.end())
+		auto it = _CachedSubsystemsIndex.find(hash);
+		if (it == _CachedSubsystemsIndex.end())
 		{
 			// Find subsystem.
-			for (size_t i = 0; i < _subsystems.size(); ++i)
+			for (size_t i = 0; i < _Subsystems.size(); ++i)
 			{
-				if (auto ptr = dynamic_cast<T*>(_subsystems[i]); ptr)
+				if (auto ptr = dynamic_cast<T*>(_Subsystems[i]); ptr)
 				{
-					it = _cachedMapSubsystems.emplace(hash, ptr).first;
+					it = _CachedSubsystemsIndex.emplace(hash, ptr).first;
 					break;
 				}
 			}
 
 			// Could not found any subsystem class.
-			if (it == _cachedMapSubsystems.end())
+			if (it == _CachedSubsystemsIndex.end())
 			{
 				return nullptr;
 			}
@@ -83,7 +83,7 @@ public:
 
 private:
 	void TickEngine();
-	TickCalc<> _tickCalc;
+	TickCalc<> _TickCalc;
 
 private:
 	void SystemsTick(std::chrono::duration<float> elapsedTime);

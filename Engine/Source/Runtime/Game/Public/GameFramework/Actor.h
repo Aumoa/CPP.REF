@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
-#include <set>
+#include "SubclassOf.h"
 #include "Ticking/TickFunction.h"
 #include "Components/SceneComponent.h"
+#include <set>
+
+DECLARE_LOG_CATEGORY(GAME_API, LogActor);
 
 class SActorComponent;
 class SSceneComponent;
@@ -44,7 +47,7 @@ private:
 		virtual void ExecuteTick(float elapsedTime) override;
 	};
 
-protected:
+public:
 	/// <summary>
 	/// Represents primary actor tick function that call AActor::TickActor().
 	/// </summary>
@@ -77,65 +80,54 @@ public:
 	MulticastEvent<AActor, void()> Activated;
 	MulticastEvent<AActor, void()> Inactivated;
 
-	void RegisterActorWithWorld(SWorld* world);
 	void DestroyActor();
 
 private:
-	std::set<SActorComponent*> _components;
+	std::set<SActorComponent*> _Components;
 
 public:
-	void AddOwnedComponent(SActorComponent* component);
-	std::set<SActorComponent*> GetOwnedComponents() const;
-	template<std::derived_from<SActorComponent> T>
-	T* GetComponentAs() const
-	{
-		// Find component from actor components.
-		for (auto& component : _components)
-		{
-			if (auto* ptr = dynamic_cast<T*>(component); ptr != nullptr)
-			{
-				return ptr;
-			}
-		}
+	void AddOwnedComponent(SActorComponent* InComponent);
+	const std::set<SActorComponent*>& GetOwnedComponents();
+	SActorComponent* GetComponentByClass(SubclassOf<SActorComponent> InComponentClass);
 
+	template<std::derived_from<SActorComponent> T>
+	T* GetComponentAs()
+	{
 		if constexpr (std::derived_from<T, SSceneComponent>)
 		{
-			// Else, find component from scene components.
-			T* item = nullptr;
-			ForEachSceneComponents<T>([&item](T* component)
+			for (auto& Component : GetSceneComponents())
+			{
+				if (auto* Ptr = dynamic_cast<T*>(Component))
 				{
-					item = component;
-					return false;
-				});
+					return Ptr;
+				}
+			}
 
-			return item;
+			return nullptr;
 		}
+		else  // T is derived from SActorComponent.
+		{
+			for (auto& Component : _Components)
+			{
+				if (auto* Ptr = dynamic_cast<T*>(Component))
+				{
+					return Ptr;
+				}
+			}
 
-		return nullptr;
+			return nullptr;
+		}
 	}
 
 private:
-	SSceneComponent* _rootComponent = nullptr;
+	SSceneComponent* _RootComponent = nullptr;
 
 public:
-	void SetRootComponent(SSceneComponent* scene);
-	SSceneComponent* GetRootComponent() const;
+	void SetRootComponent(SSceneComponent* InRootComponent);
+	SSceneComponent* GetRootComponent();
 	template<std::derived_from<SSceneComponent> T>
-	T* GetRootComponentAs() const
-	{
-		return dynamic_cast<T*>(GetRootComponent());
-	}
-
-	template<std::derived_from<SSceneComponent> T>
-	void ForEachSceneComponents(std::function<bool(T*)> body) const
-	{
-		if (_rootComponent == nullptr)
-		{
-			return;
-		}
-
-		_rootComponent->ForEachSceneComponents<T>(body);
-	}
+	T* GetRootComponentAs() { return dynamic_cast<T*>(GetRootComponent()); }
+	std::vector<SSceneComponent*> GetSceneComponents();
 
 public:
 	void SetActorLocation(const Vector3& location);

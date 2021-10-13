@@ -25,13 +25,13 @@ SGameEngine::SGameEngine() : Super()
 
 SGameEngine::~SGameEngine()
 {
-	for (size_t i = 0; i < _subsystems.size(); ++i)
+	for (size_t i = 0; i < _Subsystems.size(); ++i)
 	{
 		// Delete game engine systems without module system
 		// for remove module system at last of destructor.
-		if (dynamic_cast<SGameModuleSystem*>(_subsystems[i]) == nullptr)
+		if (dynamic_cast<SGameModuleSystem*>(_Subsystems[i]) == nullptr)
 		{
-			DestroySubobject(_subsystems[i]);
+			DestroySubobject(_Subsystems[i]);
 		}
 	}
 }
@@ -54,34 +54,42 @@ void SGameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle.AddSObject(this, &SGameEngine::TickEngine);
 
-	frameworkView->SetFrameworkTitle(_gameInstance->GetApplicationName());
+	frameworkView->SetFrameworkTitle(_GameInstance->GetApplicationName());
 }
 
 bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
 {
 	SGameModuleSystem* system = GetEngineSubsystem<SGameModuleSystem>();
 	system->LoadGameModule(moduleName);
-	if (_gameInstance = system->LoadGameInstance(); _gameInstance == nullptr)
+	if (_GameInstance = system->LoadGameInstance(); _GameInstance == nullptr)
 	{
 		SE_LOG(LogEngine, Fatal, L"LoadGameInstance function from {} module return nullptr.", moduleName);
 		return false;
 	}
 
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
-	_gameInstance->SetOuter(GameWorld);
-	if (!_gameInstance->StartupLevel.IsValid())
+	_GameInstance->SetOuter(GameWorld);
+	if (!_GameInstance->StartupLevel.IsValid())
 	{
 		SE_LOG(LogEngine, Fatal, L"SGameInstance::StartupLevel is not specified.");
 		return false;
 	}
 
-	if (!GetEngineSubsystem<SGameLevelSystem>()->OpenLevel(_gameInstance->StartupLevel))
+	if (!GetEngineSubsystem<SGameLevelSystem>()->OpenLevel(_GameInstance->StartupLevel))
 	{
 		SE_LOG(LogEngine, Fatal, L"Could not startup level.");
 		return false;
 	}
 
 	return true;
+}
+
+void SGameEngine::Shutdown()
+{
+	for (auto& System : _Subsystems)
+	{
+		System->Deinit();
+	}
 }
 
 int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view gameModule)
@@ -105,32 +113,34 @@ int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view 
 	SetupFrameworkView(frameworkView);
 
 	// Start application now!
-	_gameInstance->Init();
+	_GameInstance->Init();
 	frameworkView->Start();
+
+	Shutdown();
 	return 0;
 }
 
-SGameInstance* SGameEngine::GetGameInstance() const
+SGameInstance* SGameEngine::GetGameInstance()
 {
-	return _gameInstance;
+	return _GameInstance;
 }
 
 void SGameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
-	_subsystems.emplace_back(NewObject<SGameRenderSystem>())->Init();
-	_subsystems.emplace_back(NewObject<SGameAssetSystem>())->Init();
-	_subsystems.emplace_back(NewObject<SGameModuleSystem>())->Init();
-	_subsystems.emplace_back(NewObject<SGameLevelSystem>())->Init();
-	_subsystems.emplace_back(NewObject<SGamePlayerSystem>())->Init();
-	_subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
+	_Subsystems.emplace_back(NewObject<SGameRenderSystem>())->Init();
+	_Subsystems.emplace_back(NewObject<SGameAssetSystem>())->Init();
+	_Subsystems.emplace_back(NewObject<SGameModuleSystem>())->Init();
+	_Subsystems.emplace_back(NewObject<SGameLevelSystem>())->Init();
+	_Subsystems.emplace_back(NewObject<SGamePlayerSystem>())->Init();
+	_Subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
 }
 
 void SGameEngine::TickEngine()
 {
 	using namespace std::chrono;
 
-	auto tick = _tickCalc.DoCalc();
+	auto tick = _TickCalc.DoCalc();
 	SystemsTick(tick);
 	GameTick(tick);
 	RenderTick(tick);
@@ -138,14 +148,14 @@ void SGameEngine::TickEngine()
 	static int32 counter = 0;
 	if (++counter >= 100)
 	{
-		SE_LOG(LogEngine, Verbose, L"Avg: {}, FPS: {}", _tickCalc.GetAverageSeconds(), _tickCalc.GetAverageFPS());
+		SE_LOG(LogEngine, Verbose, L"Avg: {}, FPS: {}", _TickCalc.GetAverageSeconds(), _TickCalc.GetAverageFPS());
 		counter = 0;
 	}
 }
 
 void SGameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 {
-	for (auto& system : _subsystems)
+	for (auto& system : _Subsystems)
 	{
 		system->Tick(elapsedTime);
 	}

@@ -35,13 +35,6 @@ SGameRenderSystem::SGameRenderSystem() : Super()
 
 SGameRenderSystem::~SGameRenderSystem()
 {
-	RenderThread::Shutdown();
-
-	if (_device)
-	{
-		DestroySubobject(_device);
-		_device = nullptr;
-	}
 }
 
 void SGameRenderSystem::Init()
@@ -70,6 +63,17 @@ void SGameRenderSystem::Init()
 	_Scene = NewObject<SScene>(_device);
 
 	SE_LOG(LogRender, Verbose, L"Finish to initialize GameRenderSystem.");
+}
+
+void SGameRenderSystem::Deinit()
+{
+	RenderThread::Shutdown();
+
+	if (_device)
+	{
+		DestroySubobject(_device);
+		_device = nullptr;
+	}
 }
 
 void SGameRenderSystem::ExecuteRenderThread()

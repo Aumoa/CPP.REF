@@ -17,12 +17,20 @@ SGameLevelSystem::~SGameLevelSystem()
 void SGameLevelSystem::Init()
 {
 	Super::Init();
-	_world = NewObject<SWorld>();
+	_World = NewObject<SWorld>();
+}
+
+void SGameLevelSystem::Deinit()
+{
+	for (auto& Actor : _World->GetAllActors())
+	{
+		Actor->DestroyActor();
+	}
 }
 
 SWorld* SGameLevelSystem::GetWorld() const
 {
-	return _world;
+	return _World;
 }
 
 bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> levelToLoad)
@@ -34,23 +42,23 @@ bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> levelToLoad)
 	}
 
 	SLevel* level = levelToLoad.Instantiate(this);
-	if (!level->LoadLevel(_world))
+	if (!level->LoadLevel(_World))
 	{
 		SE_LOG(LogLevel, Error, L"Could not load level.");
 		return false;
 	}
 
-	if (_loadedLevel)
+	if (_LoadedLevel)
 	{
 		// TODO: Unload level.
-		_loadedLevel = nullptr;
+		_LoadedLevel = nullptr;
 	}
 
-	_loadedLevel = level;
+	_LoadedLevel = level;
 	return true;
 }
 
 SLevel* SGameLevelSystem::GetLevel() const
 {
-	return _loadedLevel;
+	return _LoadedLevel;
 }

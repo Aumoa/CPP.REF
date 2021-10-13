@@ -53,15 +53,15 @@ private:
 
 	SLevel* _level = nullptr;
 
-	std::set<AActor*> _actors;
-	TickFunctions _tickFunctions;
+	std::set<AActor*> _Actors;
+	TickFunctions _TickFunctions;
 
 	std::vector<PrimitiveSceneProxy*> _SceneProxiesToUpdate;
 	std::vector<PrimitiveSceneProxy*> _SceneProxiesToRegister;
 	std::vector<PrimitiveSceneProxy*> _SceneProxiesToUnregister;
 
-	APlayerController* _playerController = nullptr;
-	APlayerCameraManager* _playerCamera = nullptr;
+	APlayerController* _PlayerController = nullptr;
+	APlayerCameraManager* _PlayerCamera = nullptr;
 
 public:
 	/// <summary>
@@ -77,39 +77,45 @@ public:
 	/// <typeparam name="T"> The actor class. </typeparam>
 	/// <returns> Spawned actor. </returns>
 	template<std::derived_from<AActor> T>
-	T* SpawnActor()
-	{
-		T* spawnedActor = NewObject<T>();
-		if (!InternalSpawnActor(spawnedActor))
-		{
-			DestroySubobject(spawnedActor);
-			return nullptr;
-		}
-		return spawnedActor;
-	}
+	T* SpawnActor() { return SpawnActor<T>(T::StaticClass()); }
 
 	/// <summary>
 	/// Spawn actor to world.
 	/// </summary>
-	/// <param name="actorClass"> The actor class. </typeparam>
-	/// <returns> Spawned actor. </returns>
-	AActor* SpawnActor(SubclassOf<AActor> actorClass);
-
-	/// <summary>
-	/// Spawn actor to world.
-	/// </summary>
-	/// <param name="actorClass"> The actor class. </typeparam>
+	/// <typeparam name="T"> The actor class. </typeparam>
 	/// <returns> Spawned actor. </returns>
 	template<std::derived_from<AActor> T>
-	T* SpawnActor(SubclassOf<T> actorClass)
-	{
-		return dynamic_cast<T*>(SpawnActor(SubclassOf<AActor>(actorClass)));
-	}
+	T* SpawnActor(SubclassOf<T> InActorClass) { return static_cast<T*>(SpawnActor((SubclassOf<AActor>)InActorClass)); }
+
+	/// <summary>
+	/// Spawn actor to world.
+	/// </summary>
+	/// <param name="InActorClass"> The actor class. </typeparam>
+	/// <returns> Spawned actor. </returns>
+	AActor* SpawnActor(SubclassOf<AActor> InActorClass);
+	void DestroyActor(AActor* InActor);
 
 	/// <summary>
 	/// Load level.
 	/// </summary>
 	SLevel* LoadLevel(SubclassOf<SLevel> levelToLoad);
+
+	const std::set<AActor*>& GetAllActors();
+	std::set<AActor*> GetAllActorsOfClass(SubclassOf<AActor> InClass);
+
+	template<std::derived_from<AActor> T>
+	std::set<T*> GetAllActorsOfClass()
+	{
+		std::set<T*> ActorsOfClass;
+		for (auto& Actor : _Actors)
+		{
+			if (auto* Ptr = dynamic_cast<T*>(Actor); Ptr)
+			{
+				ActorsOfClass.emplace(Ptr);
+			}
+		}
+		return ActorsOfClass;
+	}
 
 	void RegisterTickFunction(STickFunction* function);
 	void RegisterComponent(SActorComponent* InComponent);
@@ -117,11 +123,8 @@ public:
 	void UnregisterComponent(SActorComponent* InComponent);
 
 	virtual void LevelTick(std::chrono::duration<float> elapsedTime);
-	APlayerCameraManager* GetPlayerCamera() const { return _playerCamera; }
+	APlayerCameraManager* GetPlayerCamera() const { return _PlayerCamera; }
 	SLevel* GetLevel() const { return _level; }
 
 	void GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister);
-
-private:
-	bool InternalSpawnActor(AActor* instance);
 };

@@ -5,6 +5,8 @@
 #include "Level/World.h"
 #include "Components/PrimitiveComponent.h"
 
+DEFINE_LOG_CATEGORY(LogActor);
+
 void AActor::SActorTickFunction::ExecuteTick(float elapsedTime)
 {
 	if (_target == nullptr)
@@ -37,18 +39,6 @@ void AActor::TickActor(float elapsedTime, SActorTickFunction* tickFunction)
 void AActor::BeginPlay()
 {
 	_bHasBegunPlay = true;
-
-	for (auto& component : _components)
-	{
-		component->BeginPlay();
-	}
-
-	// Register all scene components.
-	ForEachSceneComponents<SSceneComponent>([](SSceneComponent* component)
-	{
-		component->BeginPlay();
-		return false;
-	});
 }
 
 void AActor::EndPlay()
@@ -76,119 +66,154 @@ void AActor::SetActive(bool bActive)
 	}
 }
 
-void AActor::RegisterActorWithWorld(SWorld* world)
-{
-	world->RegisterTickFunction(&PrimaryActorTick);
-
-	for (auto& component : _components)
-	{
-		component->RegisterComponentWithWorld(world);
-	}
-
-	// Register all scene components.
-	ForEachSceneComponents<SSceneComponent>([world](SSceneComponent* component)
-	{
-		component->RegisterComponentWithWorld(world);
-		return false;
-	});
-}
-
 void AActor::DestroyActor()
 {
-	SWorld* const world = GetWorld();
-	ensureMsgf(world != nullptr, L"Actor does not spawned at world.");
-	
-	for (auto& component : _components)
+	SWorld* const World = GetWorld();
+	if (ensureMsgf(World != nullptr, L"Actor does not spawned at world."))
 	{
-		component->UnregisterComponent();
+		World->DestroyActor(this);
 	}
+}
 
-	// Register all scene components.
-	ForEachSceneComponents<SSceneComponent>([world](SSceneComponent* component)
+void AActor::AddOwnedComponent(SActorComponent* InComponent)
+{
+	if (InComponent->GetType()->IsDerivedFrom<SSceneComponent>())
 	{
-		component->UnregisterComponent();
-		return false;
-	});
-}
-
-void AActor::AddOwnedComponent(SActorComponent* component)
-{
-	_components.emplace(component);
-}
-
-std::set<SActorComponent*> AActor::GetOwnedComponents() const
-{
-	return _components;
-}
-
-void AActor::SetRootComponent(SSceneComponent* scene)
-{
-	if (scene == nullptr)
-	{
-		SE_LOG(LogComponent, Error, L"The root component could not be nullptr.");
+		SE_LOG(LogActor, Error, L"SceneComponent could not add to inline components array. Attach to root component of this actor for your desired do.");
 		return;
 	}
 
-	if (_rootComponent != nullptr)
-	{
-		SE_LOG(LogComponent, Warning, L"The root component is not empty. Instance will be dangling.");
-	}
-
-	_rootComponent = scene;
-	SObject* outer = scene->GetOuter();
-	if (outer != this)
-	{
-		scene->SetOuter(outer);
-	}
-
-	ForEachSceneComponents<SSceneComponent>([this](SSceneComponent* ptr)
-	{
-		ptr->SetOwnerPrivate(this);
-		return false;
-	});
+	_Components.emplace(InComponent);
 }
 
-SSceneComponent* AActor::GetRootComponent() const
+const std::set<SActorComponent*>& AActor::GetOwnedComponents()
 {
-	return _rootComponent;
+	return _Components;
+}
+
+SActorComponent* AActor::GetComponentByClass(SubclassOf<SActorComponent> InComponentClass)
+{
+	const Type* Class = InComponentClass.GetType();
+	if (Class->IsDerivedFrom<SSceneComponent>())
+	{
+		for (auto& Component : GetSceneComponents())
+		{
+			if (Component->GetType()->IsDerivedFrom(Class))
+			{
+				return Component;
+			}
+		}
+
+		return nullptr;
+	}
+	else  // InComponentClass is derived from SActorComponent.
+	{
+		for (auto& Component : _Components)
+		{
+			if (Component->GetType()->IsDerivedFrom(Class))
+			{
+				return Component;
+			}
+		}
+
+		return nullptr;
+	}
+}
+
+void AActor::SetRootComponent(SSceneComponent* InRootComponent)
+{
+	if (_RootComponent)
+	{
+		// RootComponent will be destroyed.
+		_RootComponent->DetachFromComponent();
+		if (_RootComponent->GetOuter() == this)
+		{
+			DestroySubobject(_RootComponent);
+		}
+		_RootComponent = nullptr;
+	}
+
+	_RootComponent = InRootComponent;
+	_RootComponent->SetOuter(this);
+
+	for (auto& ChildComponent : GetSceneComponents())
+	{
+		ChildComponent->SetOwnerPrivate(this);
+	}
+}
+
+SSceneComponent* AActor::GetRootComponent()
+{
+	return _RootComponent;
+}
+
+std::vector<SSceneComponent*> AActor::GetSceneComponents()
+{
+	std::vector<SSceneComponent*> ComponentsArray;
+	ComponentsArray.reserve(16);
+	ComponentsArray.emplace_back(GetRootComponent());
+	
+	std::vector<SSceneComponent*> Stack;
+	Stack.reserve(16);
+	Stack.emplace_back(GetRootComponent());
+	while (!Stack.empty())
+	{
+		SSceneComponent* MyRoot = Stack.back();
+		Stack.erase(--Stack.end());
+
+		// Add stack for search as new depth.
+		size_t ComponentsBegin = Stack.size();
+		for (auto& ChildComponent : MyRoot->GetChildComponents())
+		{
+			Stack.emplace_back(ChildComponent);
+		}
+
+		// Add components to result array.
+		if (ComponentsBegin != Stack.size())
+		{
+			ComponentsArray.assign(Stack.begin() + ComponentsBegin, Stack.end());
+		}
+	}
+
+	return ComponentsArray;
 }
 
 void AActor::SetActorLocation(const Vector3& location)
 {
-	if (_rootComponent == nullptr)
+	if (_RootComponent == nullptr)
 	{
 		return;
 	}
 
-	_rootComponent->SetLocation(location);
+	_RootComponent->SetLocation(location);
 }
 
 Vector3 AActor::GetActorLocation() const
 {
-	if (_rootComponent == nullptr)
+	if (_RootComponent == nullptr)
 	{
 		return Vector3();
 	}
 
-	return _rootComponent->GetLocation();
+	return _RootComponent->GetLocation();
 }
 
 void AActor::SetActorRotation(const Quaternion& rotation)
 {
-	if (_rootComponent == nullptr)
+	if (_RootComponent == nullptr)
 	{
 		return;
 	}
 
-	_rootComponent->SetRotation(rotation);
+	_RootComponent->SetRotation(rotation);
 }
 
 Quaternion AActor::GetActorRotation() const
 {
-	if (_rootComponent == nullptr)
+	if (_RootComponent == nullptr)
 	{
 		return Quaternion();
 	}
 
-	return _rootComponent->GetRotation();
+	return _RootComponent->GetRotation();
 }

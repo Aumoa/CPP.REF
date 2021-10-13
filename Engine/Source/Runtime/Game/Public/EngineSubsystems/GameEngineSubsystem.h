@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameEngine.h"
 
 class SGameEngine;
 
@@ -15,5 +16,17 @@ public:
 	virtual ~SGameEngineSubsystem() override;
 
 	virtual void Init() {}
+	virtual void Deinit() {};
 	virtual void Tick(std::chrono::duration<float> elapsedTime) {}
+
+public:
+	template<std::derived_from<SGameEngineSubsystem> T>
+	static T* Get()
+	{
+		if (GEngine)
+		{
+			return GEngine->GetEngineSubsystem<T>();
+		}
+		return nullptr;
+	}
 };

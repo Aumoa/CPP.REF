@@ -77,21 +77,77 @@ SWorld* SWorld::GetWorld()
 	return this;
 }
 
-AActor* SWorld::SpawnActor(SubclassOf<AActor> actorClass)
+AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
 {
-	if (!actorClass.IsValid())
+	if (!InActorClass.IsValid())
 	{
-		LogSystem::Log(LogWorld, ELogVerbosity::Error, L"Actor class does not specified. Abort.");
+		SE_LOG(LogWorld, Error, L"Actor class does not specified. Abort.");
 		return nullptr;
 	}
 
-	AActor* spawnedActor = actorClass.Instantiate(this);
-	if (!InternalSpawnActor(spawnedActor))
+	AActor* Actor = InActorClass.Instantiate(this);
+	if (Actor == nullptr)
 	{
-		DestroySubobject(spawnedActor);
+		SE_LOG(LogWorld, Error, L"Actor class does not support instantiate without any constructor arguments.");
 		return nullptr;
 	}
-	return spawnedActor;
+
+	// Register actor tick function.
+	RegisterTickFunction(&Actor->PrimaryActorTick);
+
+	for (auto& OwnedComponent : Actor->GetOwnedComponents())
+	{
+		if (!OwnedComponent->IsRegistered())
+		{
+			OwnedComponent->RegisterComponentWithWorld(this);
+		}
+	}
+
+	for (auto& SceneComponent : Actor->GetSceneComponents())
+	{
+		if (!SceneComponent->IsRegistered())
+		{
+			SceneComponent->RegisterComponentWithWorld(this);
+		}
+	}
+
+	return Actor;
+}
+
+void SWorld::DestroyActor(AActor* InActor)
+{
+	if (auto It = _Actors.find(InActor); It != _Actors.end())
+	{
+		for (auto& SceneComponent : InActor->GetSceneComponents())
+		{
+			if (!SceneComponent->IsRegistered())
+			{
+				SceneComponent->UnregisterComponent();
+			}
+		}
+
+		for (auto& OwnedComponent : InActor->GetOwnedComponents())
+		{
+			if (!OwnedComponent->IsRegistered())
+			{
+				OwnedComponent->UnregisterComponent();
+			}
+		}
+
+		UnregisterTickFunction(&InActor->PrimaryActorTick);
+
+		_Actors.erase(It);
+		
+		if (ensure(InActor->GetOuter() == this))
+		{
+			DestroySubobject(InActor);
+		}
+	}
+	else
+	{
+		SE_LOG(LogWorld, Error, L"Could not find actor that desired to destroy.");
+		return;
+	}
 }
 
 SLevel* SWorld::LoadLevel(SubclassOf<SLevel> levelToLoad)
@@ -103,11 +159,11 @@ SLevel* SWorld::LoadLevel(SubclassOf<SLevel> levelToLoad)
 	}
 
 	// Clear spawned actors.
-	for (auto& actor : _actors)
+	for (auto& actor : _Actors)
 	{
 		DestroySubobject(actor);
 	}
-	_actors.clear();
+	_Actors.clear();
 
 	SLevel* levelInstance = levelToLoad.Instantiate(this);
 	if (!levelInstance->LoadLevel(this))
@@ -119,7 +175,7 @@ SLevel* SWorld::LoadLevel(SubclassOf<SLevel> levelToLoad)
 
 	// Begin play for all actors.
 	_level = levelInstance;
-	for (auto& actor : _actors)
+	for (auto& actor : _Actors)
 	{
 		actor->BeginPlay();
 	}
@@ -127,11 +183,29 @@ SLevel* SWorld::LoadLevel(SubclassOf<SLevel> levelToLoad)
 	return levelInstance;
 }
 
+const std::set<AActor*>& SWorld::GetAllActors()
+{
+	return _Actors;
+}
+
+std::set<AActor*> SWorld::GetAllActorsOfClass(SubclassOf<AActor> InClass)
+{
+	std::set<AActor*> ActorsOfClass;
+	for (auto& Actor : _Actors)
+	{
+		if (Actor->GetType()->IsDerivedFrom(InClass.GetType()))
+		{
+			ActorsOfClass.emplace(Actor);
+		}
+	}
+	return ActorsOfClass;
+}
+
 void SWorld::RegisterTickFunction(STickFunction* function)
 {
 	if (function->bCanEverTick)
 	{
-		_tickFunctions.Add(function);
+		_TickFunctions.Add(function);
 	}
 }
 
@@ -168,7 +242,7 @@ void SWorld::RegisterComponent(SActorComponent* InComponent)
 
 void SWorld::UnregisterTickFunction(STickFunction* function)
 {
-	_tickFunctions.Remove(function);
+	_TickFunctions.Remove(function);
 }
 
 void SWorld::UnregisterComponent(SActorComponent* InComponent)
@@ -188,15 +262,15 @@ void SWorld::UnregisterComponent(SActorComponent* InComponent)
 
 void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
 {
-	_tickFunctions.ReadyForExecuteTick();
+	_TickFunctions.ReadyForExecuteTick();
 
 	float Time = elapsedTime.count();
 
-	_tickFunctions.PrePhysics.ExecuteTick(Time);
-	_tickFunctions.DuringPhysics.ExecuteTick(Time);
-	_tickFunctions.PostPhysics.ExecuteTick(Time);
-	_playerController->UpdateCameraManager(Time);
-	_tickFunctions.PostUpdateWork.ExecuteTick(Time);
+	_TickFunctions.PrePhysics.ExecuteTick(Time);
+	_TickFunctions.DuringPhysics.ExecuteTick(Time);
+	_TickFunctions.PostPhysics.ExecuteTick(Time);
+	_PlayerController->UpdateCameraManager(Time);
+	_TickFunctions.PostUpdateWork.ExecuteTick(Time);
 }
 
 void SWorld::GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister)
@@ -204,22 +278,4 @@ void SWorld::GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpda
 	OutToUpdate = std::move(_SceneProxiesToUpdate);
 	OutToRegister = std::move(_SceneProxiesToRegister);
 	OutToUnregister = std::move(_SceneProxiesToUnregister);
-}
-
-bool SWorld::InternalSpawnActor(AActor* instance)
-{
-	// Register.
-	instance->RegisterActorWithWorld(this);
-
-	if (auto* playerController = dynamic_cast<APlayerController*>(instance); playerController != nullptr)
-	{
-		_playerController = playerController;
-	}
-
-	if (auto* playerCamera = dynamic_cast<APlayerCameraManager*>(instance); playerCamera != nullptr)
-	{
-		_playerCamera = playerCamera;
-	}
-
-	return _actors.emplace(instance).second;
 }

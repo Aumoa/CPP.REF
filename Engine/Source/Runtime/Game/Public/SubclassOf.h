@@ -14,7 +14,7 @@ class SubclassOf
 	template<class>
 	friend class SubclassOf;
 
-	const Type* _type = nullptr;
+	const Type* _Type = nullptr;
 
 public:
 	/// <summary>
@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="SubclassOf"/> instance.
 	/// </summary>
-	inline SubclassOf(const SubclassOf& rhs) : _type(rhs._type)
+	inline SubclassOf(const SubclassOf& rhs) : _Type(rhs._Type)
 	{
 	}
 
@@ -35,11 +35,11 @@ public:
 	/// Initialize new <see cref="SubclassOf"/> instance.
 	/// </summary>
 	template<std::derived_from<TBase> TOther>
-	inline SubclassOf(const SubclassOf<TOther>& rhs) : _type(rhs._type)
+	inline SubclassOf(const SubclassOf<TOther>& rhs) : _Type(rhs._Type)
 	{
 	}
 
-	inline SubclassOf(const Type* type) : _type(type)
+	inline SubclassOf(const Type* type) : _Type(type)
 	{
 		if (type != nullptr)
 		{
@@ -52,7 +52,7 @@ public:
 	/// </summary>
 	inline size_t GetHashCode() const
 	{
-		return _type ? _type->GetHashCode() : 0;
+		return _Type ? _Type->GetHashCode() : 0;
 	}
 
 	/// <summary>
@@ -60,7 +60,12 @@ public:
 	/// </summary>
 	inline bool IsValid() const
 	{
-		return _type != nullptr;
+		return _Type != nullptr;
+	}
+
+	inline const Type* GetType() const
+	{
+		return _Type;
 	}
 
 	/// <summary>
@@ -73,35 +78,35 @@ public:
 		{
 			return nullptr;
 		}
-		return dynamic_cast<TBase*>(_type->Instantiate());
+		return dynamic_cast<TBase*>(_Type->Instantiate());
 	}
 
 	inline SubclassOf& operator =(const SubclassOf& rhs)
 	{
-		_type = rhs._type;
+		_Type = rhs._Type;
 		return *this;
 	}
 
 	template<std::derived_from<TBase> TOther>
 	inline SubclassOf& operator =(const SubclassOf<TOther>& rhs)
 	{
-		_type = rhs._type;
+		_Type = rhs._Type;
 		return *this;
 	}
 
 	inline bool operator ==(const SubclassOf& rhs) const
 	{
-		if (_type == nullptr)
+		if (_Type == nullptr)
 		{
-			return rhs._type != nullptr;
+			return rhs._Type != nullptr;
 		}
-		else if (rhs._type == nullptr)
+		else if (rhs._Type == nullptr)
 		{
-			return _type != nullptr;
+			return _Type != nullptr;
 		}
 		else
 		{
-			return _type->IsA(rhs._type);
+			return _Type->IsA(rhs._Type);
 		}
 	}
 
