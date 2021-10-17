@@ -15,46 +15,39 @@ SLevel::~SLevel()
 {
 }
 
-bool SLevel::LoadLevel(SWorld* world)
+bool SLevel::LoadLevel(SWorld* InWorld)
 {
-	if (!GameModeClass.IsValid())
-	{
-		SE_LOG(LogWorld, Error, L"GameModeClass does not specified. Abort.");
-		return false;
-	}
+	checkf(GameModeClass.IsValid(), L"GameModeClass does not specified.");
 
-	_gameMode = world->SpawnActor(GameModeClass);
-	_playerController = world->SpawnActor(_gameMode->PlayerControllerClass);
-	_playerController->SpawnCameraManager(world);
-	_world = world;
+	_World = InWorld;
+
+	_GameMode = InWorld->SpawnActor(GameModeClass);
+	_PlayerController = _GameMode->SpawnPlayerController();
 
 	return true;
 }
 
 void SLevel::UnloadLevel()
 {
-	if (_gameMode)
+	if (_PlayerController)
 	{
-		_gameMode->DestroyActor();
-		DestroySubobject(_gameMode);
-		_gameMode = nullptr;
+		_PlayerController->DestroyActor();
+		_PlayerController = nullptr;
 	}
 
-	if (_playerController)
+	if (_GameMode)
 	{
-		_playerController->DestroyActor();
-		DestroySubobject(_playerController);
-		_playerController = nullptr;
-	}
-
-	for (auto& actor : _persistentActors)
-	{
-		actor->DestroyActor();
-		DestroySubobject(actor);
+		_GameMode->DestroyActor();
+		_GameMode = nullptr;
 	}
 }
 
-void SLevel::InternalSpawnActor(AActor* actor)
+APlayerController* SLevel::GetPlayerController()
 {
-	_persistentActors.emplace_back(actor);
+	return _PlayerController;
+}
+
+SWorld* SLevel::GetWorld()
+{
+	return _World;
 }

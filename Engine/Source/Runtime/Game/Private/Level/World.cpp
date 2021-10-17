@@ -68,13 +68,19 @@ void SWorld::TickFunctions::ReadyForExecuteTick()
 	PostUpdateWork.ReadyForExecuteTick();
 }
 
-SWorld::SWorld() : Super()
+SWorld::SWorld(EWorldType InWorldType) : Super()
+	, _WorldType(InWorldType)
 {
 }
 
 SWorld* SWorld::GetWorld()
 {
 	return this;
+}
+
+EWorldType SWorld::GetWorldType()
+{
+	return _WorldType;
 }
 
 AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
@@ -110,6 +116,8 @@ AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
 			SceneComponent->RegisterComponentWithWorld(this);
 		}
 	}
+
+	Actor->PostInitializedComponents();
 
 	return Actor;
 }

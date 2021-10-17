@@ -12,6 +12,7 @@
 #include "GameFramework/LocalPlayer.h"
 
 APlayerController::APlayerController() : Super()
+	, PlayerCameraManagerClass(APlayerCameraManager::StaticClass())
 {
 }
 
@@ -26,28 +27,23 @@ SCameraComponent* APlayerController::FindPlayerCameraComponent()
 	return pawn->GetComponentAs<SCameraComponent>();
 }
 
-void APlayerController::SpawnCameraManager(SWorld* level)
-{
-	_cameraManager = level->SpawnActor<APlayerCameraManager>();
-}
-
 void APlayerController::UpdateCameraManager(float elapsedTime)
 {
-	if (_cameraManager)
+	if (_PlayerCameraManager)
 	{
-		_cameraManager->CachePlayerCamera(this);
-		_cameraManager->UpdateCamera(elapsedTime);
+		_PlayerCameraManager->CachePlayerCamera(this);
+		_PlayerCameraManager->UpdateCamera(elapsedTime);
 	}
 }
 
 Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 {
-	if (!ensureMsgf(_cameraManager != nullptr, L"PlayerCameraManager does not registered."))
+	if (!ensureMsgf(_PlayerCameraManager != nullptr, L"PlayerCameraManager does not registered."))
 	{
 		return {};
 	}
 
-	MinimalViewInfo view = _cameraManager->GetCachedCameraView();
+	MinimalViewInfo view = _PlayerCameraManager->GetCachedCameraView();
 	if (view.bInit == false)
 	{
 		SE_LOG(LogPlayerController, Verbose, L"Player camera does not initialized. Abort.");
@@ -95,7 +91,28 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 	return ray;
 }
 
-void APlayerController::SetLocalPlayer(SLocalPlayer* localPlayer)
+SLocalPlayer* APlayerController::GetLocalPlayer()
 {
-	_localPlayer = localPlayer;
+	auto LocalPlayer = Cast<SLocalPlayer>(GetOuter());
+	return LocalPlayer;
+}
+
+void APlayerController::PostInitializedComponents()
+{
+	SpawnPlayerCameraManager();
+}
+
+void APlayerController::SpawnPlayerCameraManager()
+{
+	SWorld* const World = GetWorld();
+	check(World);
+
+	if (_PlayerCameraManager)
+	{
+		_PlayerCameraManager->DestroyActor();
+		_PlayerCameraManager = nullptr;
+	}
+
+	_PlayerCameraManager = World->SpawnActor(PlayerCameraManagerClass);
+	_PlayerCameraManager->InitializeFor(this);
 }

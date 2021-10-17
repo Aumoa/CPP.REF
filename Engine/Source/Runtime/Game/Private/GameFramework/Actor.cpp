@@ -75,6 +75,10 @@ void AActor::DestroyActor()
 	}
 }
 
+void AActor::PostInitializedComponents()
+{
+}
+
 void AActor::AddOwnedComponent(SActorComponent* InComponent)
 {
 	if (InComponent->GetType()->IsDerivedFrom<SSceneComponent>())
@@ -149,6 +153,11 @@ SSceneComponent* AActor::GetRootComponent()
 
 std::vector<SSceneComponent*> AActor::GetSceneComponents()
 {
+	if (_RootComponent == nullptr)
+	{
+		return {};
+	}
+
 	std::vector<SSceneComponent*> ComponentsArray;
 	ComponentsArray.reserve(16);
 	ComponentsArray.emplace_back(GetRootComponent());

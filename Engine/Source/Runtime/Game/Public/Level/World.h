@@ -9,6 +9,7 @@
 #include "SubclassOf.h"
 #include "LogGame.h"
 #include "GameFramework/Actor.h"
+#include "Level/WorldType.h"
 
 class SLevel;
 class SGameEngine;
@@ -52,6 +53,7 @@ private:
 	};
 
 	SLevel* _level = nullptr;
+	EWorldType _WorldType;
 
 	std::set<AActor*> _Actors;
 	TickFunctions _TickFunctions;
@@ -67,9 +69,10 @@ public:
 	/// <summary>
 	/// Initialize new <see cref="SWorld"/> instance.
 	/// </summary>
-	SWorld();
+	SWorld(EWorldType InWorldType);
 
 	virtual SWorld* GetWorld() override;
+	EWorldType GetWorldType();
 
 	/// <summary>
 	/// Spawn actor to world.
@@ -126,5 +129,6 @@ public:
 	APlayerCameraManager* GetPlayerCamera() const { return _PlayerCamera; }
 	SLevel* GetLevel() const { return _level; }
 
+public:
 	void GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister);
 };

@@ -17,32 +17,51 @@ SGameLevelSystem::~SGameLevelSystem()
 void SGameLevelSystem::Init()
 {
 	Super::Init();
-	_World = NewObject<SWorld>();
 }
 
 void SGameLevelSystem::Deinit()
 {
-	for (auto& Actor : _World->GetAllActors())
+	for (auto& Actor : _GameWorld->GetAllActors())
 	{
 		Actor->DestroyActor();
 	}
 }
 
-SWorld* SGameLevelSystem::GetWorld() const
+SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 {
-	return _World;
+	if (InWorldType == EWorldType::GameWorld)
+	{
+		if (_GameWorld)
+		{
+			SE_LOG(LogLevel, Fatal, L"GameWorld cannot be multiple instantiated.");
+			return nullptr;
+		}
+
+		_GameWorld = NewObject<SWorld>(InWorldType);
+		return _GameWorld;
+	}
+	else
+	{
+		SE_LOG(LogLevel, Fatal, L"NOT IMPLEMENTED.");
+		return nullptr;
+	}
 }
 
-bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> levelToLoad)
+SWorld* SGameLevelSystem::GetGameWorld() const
 {
-	if (!levelToLoad.IsValid())
+	return _GameWorld;
+}
+
+bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> InLevelToLoad)
+{
+	if (!InLevelToLoad.IsValid())
 	{
 		SE_LOG(LogLevel, Error, L"Could not open level.");
 		return false;
 	}
 
-	SLevel* level = levelToLoad.Instantiate(this);
-	if (!level->LoadLevel(_World))
+	SLevel* LevelToLoad = InLevelToLoad.Instantiate(this);
+	if (!LevelToLoad->LoadLevel(_GameWorld))
 	{
 		SE_LOG(LogLevel, Error, L"Could not load level.");
 		return false;
@@ -54,7 +73,7 @@ bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> levelToLoad)
 		_LoadedLevel = nullptr;
 	}
 
-	_LoadedLevel = level;
+	_LoadedLevel = LevelToLoad;
 	return true;
 }
 

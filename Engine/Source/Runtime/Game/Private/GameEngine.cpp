@@ -67,7 +67,7 @@ bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
 		return false;
 	}
 
-	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
+	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 	_GameInstance->SetOuter(GameWorld);
 	if (!_GameInstance->StartupLevel.IsValid())
 	{
@@ -163,8 +163,8 @@ void SGameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 
 void SGameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 {
-	SWorld* world = GetEngineSubsystem<SGameLevelSystem>()->GetWorld();
-	world->LevelTick(elapsedTime);
+	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
+	GameWorld->LevelTick(elapsedTime);
 }
 
 void SGameEngine::RenderTick(std::chrono::duration<float> elapsedTime)

@@ -95,7 +95,7 @@ AChessBoardProxy* AChessBoard::CreateProxy(EChessTeam team)
 	return proxy;
 }
 
-Vector3 AChessBoard::GetBoardCellPosition(const GridIndex& index) const
+Vector3 AChessBoard::GetBoardCellPosition(const GridIndex& index)
 {
 	// In relevance of mesh, the zero index of grid is top-right based, and offset will
 	// increasingly to negative on cell moving.
@@ -104,7 +104,7 @@ Vector3 AChessBoard::GetBoardCellPosition(const GridIndex& index) const
 	return Vector3((float)actualX, 0, (float)actualY);
 }
 
-GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location) const
+GridIndex AChessBoard::GetGridIndexFromPosition(const Vector3& location)
 {
 	SSceneComponent* parent = GetRootComponent();
 
@@ -181,7 +181,7 @@ ActionRecord AChessBoard::MovePiece(const GridIndex& from, const GridIndex& to)
 		});
 }
 
-void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query) const
+void AChessBoard::SimulateMoveQuery(MovablePointsQuery& query)
 {
 	for (auto& result : query.Results)
 	{

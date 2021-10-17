@@ -82,6 +82,9 @@ public:
 
 	void DestroyActor();
 
+public:
+	virtual void PostInitializedComponents();
+
 private:
 	std::set<SActorComponent*> _Components;
 

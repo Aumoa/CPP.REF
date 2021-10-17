@@ -79,7 +79,7 @@ void SGameRenderSystem::Deinit()
 void SGameRenderSystem::ExecuteRenderThread()
 {
 	SGameLevelSystem* LevelSys = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-	SWorld* GameWorld = LevelSys->GetWorld();
+	SWorld* GameWorld = LevelSys->GetGameWorld();
 
 	std::vector<PrimitiveSceneProxy*> SceneProxiesToUpdate, SceneProxiesToRegister, SceneProxiesToUnregister;
 	if (GameWorld)
@@ -114,8 +114,9 @@ void SGameRenderSystem::ExecuteRenderThread()
 		int32 SwapChainIndex = _frameworkViewChain->GetCurrentBackBufferIndex();
 		SceneRenderTarget RenderTarget(_rtv, SwapChainIndex, _dsv, 0, ERHIResourceStates::Present);
 
+		// TODO: DO NOT REFERENCE GAME WORLD IN RENDER THREAD!
 		SGameLevelSystem* LevelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-		SWorld* GameWorld = LevelSystem->GetWorld();
+		SWorld* GameWorld = LevelSystem->GetGameWorld();
 		APlayerCameraManager* PlayerCamera = GameWorld->GetPlayerCamera();
 		MinimalViewInfo LocalPlayerView = PlayerCamera->GetCachedCameraView();
 

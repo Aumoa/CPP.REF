@@ -28,9 +28,9 @@ public:
 	void InitBoard(SWorld* world);
 	AChessBoardProxy* CreateProxy(EChessTeam team);
 
-	Vector3 GetBoardCellPosition(const GridIndex& index) const;
-	GridIndex GetGridIndexFromPosition(const Vector3& location) const;
-	inline const ChessBoardBuilt& GetBoardBuilt() const { return _built; }
+	Vector3 GetBoardCellPosition(const GridIndex& index);
+	GridIndex GetGridIndexFromPosition(const Vector3& location);
+	inline const ChessBoardBuilt& GetBoardBuilt() { return _built; }
 
 	template<std::derived_from<APiece> T>
 	T* SpawnPiece(EChessTeam team, const GridIndex& index)
@@ -43,7 +43,7 @@ public:
 
 	ActionRecord MovePiece(const GridIndex& from, const GridIndex& to);
 	inline EChessTeam GetTurn() const { return _turn; }
-	void SimulateMoveQuery(MovablePointsQuery& query) const;
+	void SimulateMoveQuery(MovablePointsQuery& query);
 	void RestorePiece(APiece* piece, const GridIndex& index);
 
 private:

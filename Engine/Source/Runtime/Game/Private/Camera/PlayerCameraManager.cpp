@@ -26,6 +26,16 @@ void APlayerCameraManager::UpdateCamera(float elapsedTime)
 	}
 }
 
+void APlayerCameraManager::InitializeFor(APlayerController* InController)
+{
+	_InitializedController = InController;
+}
+
+APlayerController* APlayerCameraManager::GetController()
+{
+	return _InitializedController;
+}
+
 void APlayerCameraManager::CachePlayerCamera(APlayerController* controller)
 {
 	_cachedBindCamera = controller->FindPlayerCameraComponent();

@@ -18,8 +18,11 @@ class GAME_API APlayerController : public AController
 	GENERATED_BODY(APlayerController)
 
 private:
-	APlayerCameraManager* _cameraManager = nullptr;
-	SLocalPlayer* _localPlayer = nullptr;
+	APlayerCameraManager* _PlayerCameraManager = nullptr;
+	SLocalPlayer* _LocalPlayer = nullptr;
+
+protected:
+	SubclassOf<APlayerCameraManager> PlayerCameraManagerClass;
 
 public:
 	/// <summary>
@@ -28,10 +31,13 @@ public:
 	APlayerController();
 
 	SCameraComponent* FindPlayerCameraComponent();
-	void SpawnCameraManager(SWorld* level);
 	void UpdateCameraManager(float elapsedTime);
 	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY);
-	void SetLocalPlayer(SLocalPlayer* localPlayer);
+	SLocalPlayer* GetLocalPlayer();
 
-	inline SLocalPlayer* GetLocalPlayer() const { return _localPlayer; }
+public:
+	virtual void PostInitializedComponents() override;
+
+private:
+	void SpawnPlayerCameraManager();
 };

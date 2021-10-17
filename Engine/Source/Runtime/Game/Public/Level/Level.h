@@ -22,11 +22,10 @@ public:
 	SubclassOf<AGameMode> GameModeClass;
 
 private:
-	SWorld* _world = nullptr;
-	APlayerController* _playerController = nullptr;
-	AGameMode* _gameMode = nullptr;
+	SWorld* _World = nullptr;
 
-	std::vector<AActor*> _persistentActors;
+	AGameMode* _GameMode = nullptr;
+	APlayerController* _PlayerController = nullptr;
 
 public:
 	/// <summary>
@@ -35,29 +34,9 @@ public:
 	SLevel();
 	~SLevel();
 
-	/// <summary>
-	/// Load level.
-	/// </summary>
-	/// <param name="world"> The world that level be placed. </param>
-	virtual bool LoadLevel(SWorld* world);
-
-	/// <summary>
-	/// Unload level. Persistent actor will be cleaned up.
-	/// </summary>
+	virtual bool LoadLevel(SWorld* InWorld);
 	virtual void UnloadLevel();
 
-	inline APlayerController* GetPlayerController() const { return _playerController; }
-	inline SWorld* GetWorld() const { return _world; }
-
-protected:
-	template<class... TArgs>
-	AActor* SpawnActor(TArgs&&... args)
-	{
-		AActor* spawnActor = _world->SpawnActor(std::forward<TArgs>(args)...);
-		InternalSpawnActor(spawnActor);
-		return spawnActor;
-	}
-
-private:
-	void InternalSpawnActor(AActor* actor);
+	APlayerController* GetPlayerController();
+	SWorld* GetWorld();
 };

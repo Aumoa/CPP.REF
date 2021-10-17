@@ -722,6 +722,9 @@
     <ClInclude Include="Public\MouseState.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Level\WorldType.h">
+      <Filter>Public\Level</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Misc\TeapotData.inl">

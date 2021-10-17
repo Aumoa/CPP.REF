@@ -281,6 +281,7 @@
     <ClInclude Include="Public\Layout\TransformCalculus2D.h" />
     <ClInclude Include="Public\Level\Level.h" />
     <ClInclude Include="Public\Level\World.h" />
+    <ClInclude Include="Public\Level\WorldType.h" />
     <ClInclude Include="Public\LogGame.h" />
     <ClInclude Include="Public\Misc\Bezier.h" />
     <ClInclude Include="Public\Misc\BitfieldInputChangeTracker.h" />
