@@ -25,6 +25,8 @@ void SGameLevelSystem::Deinit()
 	{
 		Actor->DestroyActor();
 	}
+
+	_GameWorld->DestroyWorld();
 }
 
 SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
@@ -38,6 +40,7 @@ SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 		}
 
 		_GameWorld = NewObject<SWorld>(InWorldType);
+		_GameWorld->InitWorld();
 		return _GameWorld;
 	}
 	else
@@ -52,32 +55,7 @@ SWorld* SGameLevelSystem::GetGameWorld() const
 	return _GameWorld;
 }
 
-bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> InLevelToLoad)
+bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 {
-	if (!InLevelToLoad.IsValid())
-	{
-		SE_LOG(LogLevel, Error, L"Could not open level.");
-		return false;
-	}
-
-	SLevel* LevelToLoad = InLevelToLoad.Instantiate(this);
-	if (!LevelToLoad->LoadLevel(_GameWorld))
-	{
-		SE_LOG(LogLevel, Error, L"Could not load level.");
-		return false;
-	}
-
-	if (_LoadedLevel)
-	{
-		// TODO: Unload level.
-		_LoadedLevel = nullptr;
-	}
-
-	_LoadedLevel = LevelToLoad;
-	return true;
-}
-
-SLevel* SGameLevelSystem::GetLevel() const
-{
-	return _LoadedLevel;
+	_GameWorld->OpenLevel(InLevelToOpen);
 }

@@ -28,4 +28,5 @@ enum class ETickingGroup
 	/// Tick update after all other ticking groups are updated.
 	/// </summary>
 	PostUpdateWork = 3,
+	NumGroups
 };

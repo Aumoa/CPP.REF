@@ -261,9 +261,6 @@
     <ClCompile Include="Private\Shaders\TransparentShader\TransparentShader.cpp">
       <Filter>Private\Shaders\TransparentShader</Filter>
     </ClCompile>
-    <ClCompile Include="Private\TIcking\TickFunction.cpp">
-      <Filter>Private\Ticking</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Shaders\SlateShader\SlateShader.cpp">
       <Filter>Private\Shaders\SlateShader</Filter>
     </ClCompile>
@@ -383,6 +380,9 @@
     </ClCompile>
     <ClCompile Include="Private\GameThreads\RenderThread.cpp">
       <Filter>Private\GameThreads</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Ticking\TickTaskLevelManager.cpp">
+      <Filter>Private\Ticking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -724,6 +724,9 @@
     </ClInclude>
     <ClInclude Include="Public\Level\WorldType.h">
       <Filter>Public\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Ticking\TickTaskLevelManager.h">
+      <Filter>Public\Ticking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

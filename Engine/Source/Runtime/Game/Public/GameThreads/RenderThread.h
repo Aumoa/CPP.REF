@@ -18,7 +18,7 @@ class RenderThread
 	RenderThread() = delete;
 
 private:
-	using WorksDictionary = std::map<size_t, std::function<void()>>;
+	using WorksDictionary = std::vector<std::function<void()>>;
 
 	struct WaitingThreadWorks
 	{
@@ -34,7 +34,7 @@ private:
 		std::shared_ptr<SEventHandle> CompletedEvent;
 
 		void Init();
-		void SwapExecute(WaitingThreadWorks& target);
+		void SwapExecute(WaitingThreadWorks& InTarget);
 		void RunningWorks_RenderThread();
 	};
 
@@ -52,21 +52,21 @@ private:
 	};
 
 private:
-	inline static ThreadInfo _thread;
-	inline static WaitingThreadWorks _waitingWorks;
-	inline static PendingThreadWork _executingWorks;
+	inline static ThreadInfo _Thread;
+	inline static WaitingThreadWorks _WaitingWorks;
+	inline static PendingThreadWork _ExecutingWorks;
 	
 public:
 	static void Init();
 	static void Shutdown();
-	static void EnqueueRenderThreadWork(size_t workingHash, std::function<void()> work);
+	static void EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody);
 	static void ExecuteWorks(std::function<void()> completedWork);
 	static void WaitForLastWorks();
 
 	static bool IsInRenderThread()
 	{
 		static int64 Id = SThread::GetCurrentThread()->GetThreadId();
-		return Id == _thread.ThreadId;
+		return Id == _Thread.ThreadId;
 	}
 
 private:
@@ -87,7 +87,4 @@ public:
 	{
 		EnqueueRenderThreadWork(_String.Hs, std::move(work));
 	}
-
-private:
-	static void InitThreadId();
 };

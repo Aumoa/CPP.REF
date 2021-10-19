@@ -188,7 +188,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Private\TIcking\TickFunction.cpp" />
+    <ClCompile Include="Private\Ticking\TickTaskLevelManager.cpp" />
     <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
     <ClCompile Include="Private\Widgets\Image\Image.cpp" />
     <ClCompile Include="Private\Widgets\Input\Button.cpp" />
@@ -305,6 +305,7 @@
     <ClInclude Include="Public\Ticking\TickFunction.h" />
     <ClInclude Include="Public\Ticking\TickingGroup.h" />
     <ClInclude Include="Public\Ticking\TickScheduler.h" />
+    <ClInclude Include="Public\Ticking\TickTaskLevelManager.h" />
     <ClInclude Include="Public\Widgets\CompoundWidget.h" />
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
     <ClInclude Include="Public\Widgets\Image\Image.h" />

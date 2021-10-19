@@ -9,68 +9,25 @@
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Camera/PlayerCameraManager.h"
 #include "EngineSubsystems/GameRenderSystem.h"
-
-template<ETickingGroup _Group>
-bool SWorld::TickGroup<_Group>::Add(STickFunction* function)
-{
-	check(function->TickGroup == Group);
-	return Functions.emplace(function).second;
-}
-
-template<ETickingGroup _Group>
-bool SWorld::TickGroup<_Group>::Remove(STickFunction* function)
-{
-	check(function->TickGroup == Group);
-	return Functions.erase(function) > 0;
-}
-
-template<ETickingGroup _Group>
-void SWorld::TickGroup<_Group>::ReadyForExecuteTick()
-{
-	for (auto& function : Functions) { function->Ready(); }
-}
-
-template<ETickingGroup _Group>
-void SWorld::TickGroup<_Group>::ExecuteTick(float elapsedTime)
-{
-	for (auto& function : Functions) { function->ExecuteTick(elapsedTime); }
-}
-
-bool SWorld::TickFunctions::Add(STickFunction* function)
-{
-	switch (function->TickGroup)
-	{
-	case ETickingGroup::PrePhysics: return PrePhysics.Add(function);
-	case ETickingGroup::DuringPhysics: return DuringPhysics.Add(function);
-	case ETickingGroup::PostPhysics: return PostPhysics.Add(function);
-	case ETickingGroup::PostUpdateWork: return PostUpdateWork.Add(function);
-	}
-	return ensure(false);
-}
-
-bool SWorld::TickFunctions::Remove(STickFunction* function)
-{
-	switch (function->TickGroup)
-	{
-	case ETickingGroup::PrePhysics: return PrePhysics.Remove(function);
-	case ETickingGroup::DuringPhysics: return DuringPhysics.Remove(function);
-	case ETickingGroup::PostPhysics: return PostPhysics.Remove(function);
-	case ETickingGroup::PostUpdateWork: return PostUpdateWork.Remove(function);
-	}
-	return ensure(false);
-}
-
-void SWorld::TickFunctions::ReadyForExecuteTick()
-{
-	PrePhysics.ReadyForExecuteTick();
-	DuringPhysics.ReadyForExecuteTick();
-	PostPhysics.ReadyForExecuteTick();
-	PostUpdateWork.ReadyForExecuteTick();
-}
+#include "Ticking/TickTaskLevelManager.h"
 
 SWorld::SWorld(EWorldType InWorldType) : Super()
 	, _WorldType(InWorldType)
 {
+}
+
+void SWorld::InitWorld()
+{
+	_Scene = NewObject<SScene>();
+}
+
+void SWorld::DestroyWorld()
+{
+	if (_Scene)
+	{
+		DestroySubobject(_Scene);
+		_Scene = nullptr;
+	}
 }
 
 SWorld* SWorld::GetWorld()
@@ -83,7 +40,38 @@ EWorldType SWorld::GetWorldType()
 	return _WorldType;
 }
 
-AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
+SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
+{
+	if (!InLevelToOpen.IsValid())
+	{
+		SE_LOG(LogWorld, Error, L"Class of level to open is not specified. Abort.");
+		return nullptr;
+	}
+
+	if (_Level)
+	{
+		_Level->UnloadLevel();
+		DestroySubobject(_Level);
+	}
+
+	SLevel* LevelInstance = InLevelToOpen.Instantiate(this);
+	if (!LevelInstance->LoadLevel(this))
+	{
+		SE_LOG(LogWorld, Fatal, L"Could not load level.");
+		DestroySubobject(LevelInstance);
+		return nullptr;
+	}
+
+	_Level = LevelInstance;
+	return LevelInstance;
+}
+
+SLevel* SWorld::GetLevel()
+{
+	return _Level;
+}
+
+AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental)
 {
 	if (!InActorClass.IsValid())
 	{
@@ -91,199 +79,60 @@ AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
 		return nullptr;
 	}
 
-	AActor* Actor = InActorClass.Instantiate(this);
+	AActor* Actor = InActorClass.Instantiate(_Level);
 	if (Actor == nullptr)
 	{
 		SE_LOG(LogWorld, Error, L"Actor class does not support instantiate without any constructor arguments.");
 		return nullptr;
 	}
 
-	// Register actor tick function.
-	RegisterTickFunction(&Actor->PrimaryActorTick);
-
-	for (auto& OwnedComponent : Actor->GetOwnedComponents())
+	if (bSpawnIncremental)
 	{
-		if (!OwnedComponent->IsRegistered())
-		{
-			OwnedComponent->RegisterComponentWithWorld(this);
-		}
+		_Level->ActorsToAdd.emplace_back(Actor);
 	}
-
-	for (auto& SceneComponent : Actor->GetSceneComponents())
+	else
 	{
-		if (!SceneComponent->IsRegistered())
-		{
-			SceneComponent->RegisterComponentWithWorld(this);
-		}
+		_Level->InternalAddActor(Actor);
 	}
-
-	Actor->PostInitializedComponents();
 
 	return Actor;
 }
 
 void SWorld::DestroyActor(AActor* InActor)
 {
-	if (auto It = _Actors.find(InActor); It != _Actors.end())
-	{
-		for (auto& SceneComponent : InActor->GetSceneComponents())
-		{
-			if (!SceneComponent->IsRegistered())
-			{
-				SceneComponent->UnregisterComponent();
-			}
-		}
-
-		for (auto& OwnedComponent : InActor->GetOwnedComponents())
-		{
-			if (!OwnedComponent->IsRegistered())
-			{
-				OwnedComponent->UnregisterComponent();
-			}
-		}
-
-		UnregisterTickFunction(&InActor->PrimaryActorTick);
-
-		_Actors.erase(It);
-		
-		if (ensure(InActor->GetOuter() == this))
-		{
-			DestroySubobject(InActor);
-		}
-	}
-	else
-	{
-		SE_LOG(LogWorld, Error, L"Could not find actor that desired to destroy.");
-		return;
-	}
+	_Level->ActorsToRemove.emplace_back(InActor);
 }
 
-SLevel* SWorld::LoadLevel(SubclassOf<SLevel> levelToLoad)
+const std::vector<AActor*>& SWorld::GetAllActors()
 {
-	if (!levelToLoad.IsValid())
-	{
-		SE_LOG(LogWorld, Error, L"The parameter that specified class of desired to load level is nullptr. Abort.");
-		return nullptr;
-	}
-
-	// Clear spawned actors.
-	for (auto& actor : _Actors)
-	{
-		DestroySubobject(actor);
-	}
-	_Actors.clear();
-
-	SLevel* levelInstance = levelToLoad.Instantiate(this);
-	if (!levelInstance->LoadLevel(this))
-	{
-		SE_LOG(LogWorld, Fatal, L"Could not load level.");
-		DestroySubobject(levelInstance);
-		return nullptr;
-	}
-
-	// Begin play for all actors.
-	_level = levelInstance;
-	for (auto& actor : _Actors)
-	{
-		actor->BeginPlay();
-	}
-
-	return levelInstance;
+	return _Level->Actors;
 }
 
-const std::set<AActor*>& SWorld::GetAllActors()
+std::vector<AActor*> SWorld::GetAllActorsOfClass(SubclassOf<AActor> InClass)
 {
-	return _Actors;
-}
-
-std::set<AActor*> SWorld::GetAllActorsOfClass(SubclassOf<AActor> InClass)
-{
-	std::set<AActor*> ActorsOfClass;
-	for (auto& Actor : _Actors)
+	std::vector<AActor*> ActorsOfClass;
+	for (auto& Actor : _Level->Actors)
 	{
 		if (Actor->GetType()->IsDerivedFrom(InClass.GetType()))
 		{
-			ActorsOfClass.emplace(Actor);
+			ActorsOfClass.emplace_back(Actor);
 		}
 	}
 	return ActorsOfClass;
 }
 
-void SWorld::RegisterTickFunction(STickFunction* function)
+void SWorld::LevelTick(float InDeltaTime)
 {
-	if (function->bCanEverTick)
+	_Level->IncrementalActorsApply();
+	if (STickTaskLevelManager* LevelTick = _Level->GetLevelTick())
 	{
-		_TickFunctions.Add(function);
+		LevelTick->BeginFrame();
+
+		LevelTick->IncrementalDispatchTick(ETickingGroup::PrePhysics, InDeltaTime);
+		LevelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, InDeltaTime);
+		LevelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, InDeltaTime);
+		LevelTick->IncrementalDispatchTick(ETickingGroup::PostUpdateWork, InDeltaTime);
+
+		LevelTick->EndFrame();
 	}
-}
-
-void SWorld::RegisterComponent(SActorComponent* InComponent)
-{
-	if (auto* IsPrimitive = Cast<SPrimitiveComponent>(InComponent); IsPrimitive != nullptr)
-	{
-		int64 Id = -1;
-
-		PrimitiveSceneProxy* SceneProxy = IsPrimitive->CreateSceneProxy();
-		if (IsPrimitive->SceneProxy != nullptr)
-		{
-			Id = IsPrimitive->SceneProxy->PrimitiveId;
-			delete IsPrimitive->SceneProxy;
-			IsPrimitive->SceneProxy = nullptr;
-		}
-
-		if (SceneProxy != nullptr)
-		{
-			SceneProxy->PrimitiveId = Id;
-			if (Id != -1)
-			{
-				_SceneProxiesToUpdate.emplace_back(SceneProxy);
-			}
-			else
-			{
-				_SceneProxiesToRegister.emplace_back(SceneProxy);
-			}
-		}
-
-		IsPrimitive->SceneProxy = SceneProxy;
-	}
-}
-
-void SWorld::UnregisterTickFunction(STickFunction* function)
-{
-	_TickFunctions.Remove(function);
-}
-
-void SWorld::UnregisterComponent(SActorComponent* InComponent)
-{
-	if (auto* IsPrimitive = Cast<SPrimitiveComponent>(InComponent); IsPrimitive != nullptr)
-	{
-		PrimitiveSceneProxy* SceneProxy = IsPrimitive->SceneProxy;
-		if (SceneProxy != nullptr)
-		{
-			_SceneProxiesToUnregister.emplace_back(SceneProxy);
-			SceneProxy = nullptr;
-		}
-
-		IsPrimitive->SceneProxy = SceneProxy;
-	}
-}
-
-void SWorld::LevelTick(std::chrono::duration<float> elapsedTime)
-{
-	_TickFunctions.ReadyForExecuteTick();
-
-	float Time = elapsedTime.count();
-
-	_TickFunctions.PrePhysics.ExecuteTick(Time);
-	_TickFunctions.DuringPhysics.ExecuteTick(Time);
-	_TickFunctions.PostPhysics.ExecuteTick(Time);
-	_PlayerController->UpdateCameraManager(Time);
-	_TickFunctions.PostUpdateWork.ExecuteTick(Time);
-}
-
-void SWorld::GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister)
-{
-	OutToUpdate = std::move(_SceneProxiesToUpdate);
-	OutToRegister = std::move(_SceneProxiesToRegister);
-	OutToUnregister = std::move(_SceneProxiesToUnregister);
 }

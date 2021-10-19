@@ -10,18 +10,18 @@ void RenderThread::PendingThreadWork::Init()
 	CompletedEvent->Set();
 }
 
-void RenderThread::PendingThreadWork::SwapExecute(WaitingThreadWorks& target)
+void RenderThread::PendingThreadWork::SwapExecute(WaitingThreadWorks& InTarget)
 {
-	std::swap(Works, target.Works);
-	std::swap(CompletedWork, target.CompletedWork);
+	std::swap(Works, InTarget.Works);
+	std::swap(CompletedWork, InTarget.CompletedWork);
 	ExecuteEvent->Set();
 }
 
 void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 {
-	for (auto& pair : Works)
+	for (auto& WorkBody : Works)
 	{
-		pair.second();
+		WorkBody();
 	}
 
 	CompletedWork();
@@ -29,7 +29,7 @@ void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 
 void RenderThread::ThreadInfo::Init()
 {
-	Thread = std::thread(std::bind(&ThreadInfo::Worker, &_thread));
+	Thread = std::thread(std::bind(&ThreadInfo::Worker, &_Thread));
 	bRunning = true;
 }
 
@@ -46,7 +46,7 @@ void RenderThread::ThreadInfo::WaitToComplete()
 	bRunning = false;
 
 	// Flush executing event.
-	_executingWorks.ExecuteEvent->Set();
+	_ExecutingWorks.ExecuteEvent->Set();
 
 	// Join executing thread.
 	lock.unlock();
@@ -59,40 +59,40 @@ void RenderThread::ThreadInfo::Worker()
 
 	while (bRunning)
 	{
-		_executingWorks.ExecuteEvent->Wait();
+		_ExecutingWorks.ExecuteEvent->Wait();
 		{
 			std::unique_lock lock(CriticalSection);
-			_executingWorks.RunningWorks_RenderThread();
+			_ExecutingWorks.RunningWorks_RenderThread();
 		}
-		_executingWorks.CompletedEvent->Set();
+		_ExecutingWorks.CompletedEvent->Set();
 	}
 }
 
 void RenderThread::Init()
 {
-	_thread.Init();
-	_executingWorks.Init();
+	_Thread.Init();
+	_ExecutingWorks.Init();
 }
 
 void RenderThread::Shutdown()
 {
-	_thread.WaitToComplete();
+	_Thread.WaitToComplete();
 }
 
-void RenderThread::EnqueueRenderThreadWork(size_t workingHash, std::function<void()> work)
+void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody)
 {
-	std::unique_lock lock(_thread.CriticalSection);
-	_waitingWorks.Works.emplace(workingHash, work);
+	std::unique_lock lock(_Thread.CriticalSection);
+	_WaitingWorks.Works.emplace_back(InWorkingHash, InWorkBody);
 }
 
 void RenderThread::ExecuteWorks(std::function<void()> completedWork)
 {
-	std::unique_lock lock(_thread.CriticalSection);
-	_waitingWorks.CompletedWork = completedWork;
-	_executingWorks.SwapExecute(_waitingWorks);
+	std::unique_lock lock(_Thread.CriticalSection);
+	_WaitingWorks.CompletedWork = completedWork;
+	_ExecutingWorks.SwapExecute(_WaitingWorks);
 }
 
 void RenderThread::WaitForLastWorks()
 {
-	_executingWorks.CompletedEvent->Wait();
+	_ExecutingWorks.CompletedEvent->Wait();
 }

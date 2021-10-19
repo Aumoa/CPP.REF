@@ -7,6 +7,7 @@
 #include "World.h"
 
 class SWorld;
+class STickTaskLevelManager;
 class AGameMode;
 class APlayerController;
 class AActor;
@@ -23,9 +24,15 @@ public:
 
 private:
 	SWorld* _World = nullptr;
+	STickTaskLevelManager* _LevelTick = nullptr;
 
 	AGameMode* _GameMode = nullptr;
 	APlayerController* _PlayerController = nullptr;
+
+public:
+	std::vector<AActor*> Actors;
+	std::vector<AActor*> ActorsToAdd;
+	std::vector<AActor*> ActorsToRemove;
 
 public:
 	/// <summary>
@@ -34,9 +41,15 @@ public:
 	SLevel();
 	~SLevel();
 
-	virtual bool LoadLevel(SWorld* InWorld);
+	virtual bool LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick = nullptr);
 	virtual void UnloadLevel();
+
+	void IncrementalActorsApply(size_t InLimit = 10);
 
 	APlayerController* GetPlayerController();
 	SWorld* GetWorld();
+	STickTaskLevelManager* GetLevelTick();
+
+	void InternalRemoveActor(AActor* InActor);
+	void InternalAddActor(AActor* InActor);
 };

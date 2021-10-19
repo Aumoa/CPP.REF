@@ -164,7 +164,7 @@ void SGameEngine::SystemsTick(std::chrono::duration<float> elapsedTime)
 void SGameEngine::GameTick(std::chrono::duration<float> elapsedTime)
 {
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
-	GameWorld->LevelTick(elapsedTime);
+	GameWorld->LevelTick(elapsedTime.count());
 }
 
 void SGameEngine::RenderTick(std::chrono::duration<float> elapsedTime)

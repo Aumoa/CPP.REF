@@ -16,7 +16,6 @@ class GAME_API SGameLevelSystem : public SGameEngineSubsystem
 
 private:
 	SWorld* _GameWorld = nullptr;
-	SLevel* _LoadedLevel = nullptr;
 
 public:
 	SGameLevelSystem();
@@ -28,6 +27,5 @@ public:
 	SWorld* SpawnWorld(EWorldType InWorldType);
 
 	SWorld* GetGameWorld() const;
-	bool OpenLevel(SubclassOf<SLevel> InLevelToLoad);
-	SLevel* GetLevel() const;
+	bool OpenLevel(SubclassOf<SLevel> InLevelToOpen);
 };

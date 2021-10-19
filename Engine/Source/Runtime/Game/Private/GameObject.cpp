@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "GameEngine.h"
 #include "EngineSubsystems/GameAssetSystem.h"
-#include "Level/World.h"
+#include "Level/Level.h"
 
 SGameObject::SGameObject() : Super()
 {
@@ -27,15 +27,15 @@ SWorld* SGameObject::GetWorld()
 {
 	if (_WorldPrivate == nullptr)
 	{
-		if (auto* isWorld = Cast<SWorld>(GetOuter()); isWorld != nullptr)
+		if (auto* IsLevel = Cast<SLevel>(GetOuter()); IsLevel != nullptr)
 		{
-			_WorldPrivate = isWorld;
+			_WorldPrivate = IsLevel->GetWorld();
 		}
 
-		// Caching world instance with outer chain.
-		else if (auto* isGameObject = Cast<SGameObject>(GetOuter()); isGameObject != nullptr)
+		else if (auto* IsGameObject = Cast<SGameObject>(GetOuter()); IsGameObject != nullptr)
 		{
-			_WorldPrivate = isGameObject->GetWorld();
+			// Do NOT cache world when world is derived from outer chain that is game object.
+			return IsGameObject->GetWorld();
 		}
 	}
 

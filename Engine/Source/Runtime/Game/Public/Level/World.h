@@ -4,19 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
-#include <set>
-#include <ranges>
 #include "SubclassOf.h"
-#include "LogGame.h"
 #include "GameFramework/Actor.h"
 #include "Level/WorldType.h"
 
+DECLARE_LOG_CATEGORY(GAME_API, LogWorld);
+
 class SLevel;
-class SGameEngine;
-class APlayerController;
-class APlayerCameraManager;
-class STickFunction;
-class PrimitiveSceneProxy;
+class SScene;
 
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
@@ -26,44 +21,9 @@ class GAME_API SWorld : public SGameObject
 	GENERATED_BODY(SWorld)
 
 private:
-	template<ETickingGroup _Group>
-	struct TickGroup
-	{
-		static constexpr ETickingGroup Group = _Group;
-		std::set<STickFunction*> Functions;
-
-		bool Add(STickFunction* function);
-		bool Remove(STickFunction* function);
-
-		void ReadyForExecuteTick();
-		void ExecuteTick(float elapsedTime);
-	};
-
-	struct TickFunctions
-	{
-		TickGroup<ETickingGroup::PrePhysics> PrePhysics;
-		TickGroup<ETickingGroup::DuringPhysics> DuringPhysics;
-		TickGroup<ETickingGroup::PostPhysics> PostPhysics;
-		TickGroup<ETickingGroup::PostUpdateWork> PostUpdateWork;
-
-		bool Add(STickFunction* function);
-		bool Remove(STickFunction* function);
-
-		void ReadyForExecuteTick();
-	};
-
-	SLevel* _level = nullptr;
+	SLevel* _Level = nullptr;
+	SScene* _Scene = nullptr;
 	EWorldType _WorldType;
-
-	std::set<AActor*> _Actors;
-	TickFunctions _TickFunctions;
-
-	std::vector<PrimitiveSceneProxy*> _SceneProxiesToUpdate;
-	std::vector<PrimitiveSceneProxy*> _SceneProxiesToRegister;
-	std::vector<PrimitiveSceneProxy*> _SceneProxiesToUnregister;
-
-	APlayerController* _PlayerController = nullptr;
-	APlayerCameraManager* _PlayerCamera = nullptr;
 
 public:
 	/// <summary>
@@ -71,40 +31,35 @@ public:
 	/// </summary>
 	SWorld(EWorldType InWorldType);
 
+	virtual void InitWorld();
+	virtual void DestroyWorld();
+
 	virtual SWorld* GetWorld() override;
 	EWorldType GetWorldType();
 
-	/// <summary>
-	/// Spawn actor to world.
-	/// </summary>
-	/// <typeparam name="T"> The actor class. </typeparam>
-	/// <returns> Spawned actor. </returns>
-	template<std::derived_from<AActor> T>
-	T* SpawnActor() { return SpawnActor<T>(T::StaticClass()); }
-
-	/// <summary>
-	/// Spawn actor to world.
-	/// </summary>
-	/// <typeparam name="T"> The actor class. </typeparam>
-	/// <returns> Spawned actor. </returns>
-	template<std::derived_from<AActor> T>
-	T* SpawnActor(SubclassOf<T> InActorClass) { return static_cast<T*>(SpawnActor((SubclassOf<AActor>)InActorClass)); }
-
-	/// <summary>
-	/// Spawn actor to world.
-	/// </summary>
-	/// <param name="InActorClass"> The actor class. </typeparam>
-	/// <returns> Spawned actor. </returns>
-	AActor* SpawnActor(SubclassOf<AActor> InActorClass);
+	AActor* SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental = false);
 	void DestroyActor(AActor* InActor);
 
-	/// <summary>
-	/// Load level.
-	/// </summary>
-	SLevel* LoadLevel(SubclassOf<SLevel> levelToLoad);
+	SLevel* OpenLevel(SubclassOf<SLevel> InLevelToOpen);
+	SLevel* GetLevel();
 
-	const std::set<AActor*>& GetAllActors();
-	std::set<AActor*> GetAllActorsOfClass(SubclassOf<AActor> InClass);
+	const std::vector<AActor*>& GetAllActors();
+	std::vector<AActor*> GetAllActorsOfClass(SubclassOf<AActor> InClass);
+
+	void LevelTick(float InDeltaTime);
+
+public:
+	template<std::derived_from<AActor> T>
+	T* SpawnActor()
+	{
+		return SpawnActor<T>(T::StaticClass());
+	}
+
+	template<std::derived_from<AActor> T>
+	T* SpawnActor(SubclassOf<T> InActorClass)
+	{
+		return static_cast<T*>(SpawnActor((SubclassOf<AActor>)InActorClass));
+	}
 
 	template<std::derived_from<AActor> T>
 	std::set<T*> GetAllActorsOfClass()
@@ -119,16 +74,4 @@ public:
 		}
 		return ActorsOfClass;
 	}
-
-	void RegisterTickFunction(STickFunction* function);
-	void RegisterComponent(SActorComponent* InComponent);
-	void UnregisterTickFunction(STickFunction* function);
-	void UnregisterComponent(SActorComponent* InComponent);
-
-	virtual void LevelTick(std::chrono::duration<float> elapsedTime);
-	APlayerCameraManager* GetPlayerCamera() const { return _PlayerCamera; }
-	SLevel* GetLevel() const { return _level; }
-
-public:
-	void GetPendingSceneProxies(std::vector<PrimitiveSceneProxy*>& OutToUpdate, std::vector<PrimitiveSceneProxy*>& OutToRegister, std::vector<PrimitiveSceneProxy*>& OutToUnregister);
 };
