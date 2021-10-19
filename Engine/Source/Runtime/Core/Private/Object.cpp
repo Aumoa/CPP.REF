@@ -5,7 +5,9 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-SObject::SObject()
+std::atomic<uint64> SObject::_InternalObjectIndexGenerator = 0;
+
+SObject::SObject() : _InternalObjectIndex(++_InternalObjectIndexGenerator)
 {
 }
 
@@ -39,6 +41,11 @@ std::shared_ptr<SObject> SObject::SetOuter(SObject* newOuter)
 
 	_outer = newOuter;
 	return detached;
+}
+
+uint64 SObject::GetInternalIndex()
+{
+	return _InternalObjectIndex;
 }
 
 void SObject::DestroySubobject(SObject* subobject)

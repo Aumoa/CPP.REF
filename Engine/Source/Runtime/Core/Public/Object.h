@@ -24,14 +24,13 @@ class CORE_API SObject : public std::enable_shared_from_this<SObject>
 	GENERATED_BODY(SObject, virtual)
 
 private:
+	static std::atomic<uint64> _InternalObjectIndexGenerator;
+	const uint64 _InternalObjectIndex;
 	SObject* _outer = nullptr;
 	std::vector<std::shared_ptr<SObject>> _subobjects;
 	std::map<SObject*, size_t> _views;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="SObject"/> class instance.
-	/// </summary>
 	SObject();
 	virtual ~SObject() noexcept;
 
@@ -40,21 +39,8 @@ private:
 	SObject(SObject&&) = delete;
 
 public:
-	/// <summary>
-	/// Get a simple string representing this object.
-	/// </summary>
-	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
-	/// <returns> The string view instance. </returns>
 	virtual std::wstring ToString(std::wstring_view formatArgs = L"");
-	SFUNCTION(ToString);
 
-	/// <summary>
-	/// Create object which linked outer to this.
-	/// </summary>
-	/// <typeparam name="T"> Type of subobject. </typeparam>
-	/// <typeparam name="...TArgs"> The type sequence of constructor arguments. </typeparam>
-	/// <param name="...args"> The constructor arguments. </param>
-	/// <returns> The instantiated pointer. </returns>
 	template<class T, class... TArgs> requires std::constructible_from<T, TArgs...>
 	T* NewObject(TArgs&&... args)
 	{
@@ -65,70 +51,30 @@ public:
 		return ptr;
 	}
 
-	/// <summary>
-	/// Create object without outer.
-	/// </summary>
-	/// <typeparam name="T"> Type of subobject. </typeparam>
-	/// <typeparam name="...TArgs"> The type sequence of constructor arguments. </typeparam>
-	/// <param name="...args"> The constructor arguments. </param>
-	/// <returns> The instantiated pointer. </returns>
-	template<class T, class... TArgs> requires std::constructible_from<T, TArgs...>
-	static std::shared_ptr<T> NewStaticObject(TArgs&&... args)
-	{
-		return std::make_shared<T>(std::forward<TArgs>(args)...);
-	}
-
-	/// <summary>
-	/// Get outer that owner of this object.
-	/// </summary>
-	/// <returns> The outer object. </returns>
 	SObject* GetOuter() const;
-	SFUNCTION(GetOuter);
-
-	/// <summary>
-	/// Change outer. SObject will destroy when outer be destroyed.
-	/// </summary>
-	/// <param name="newOuter"> The new outer. </param>
-	/// <returns> The object pointer if attachment is failed. </returns>
 	std::shared_ptr<SObject> SetOuter(SObject* newOuter);
-	SFUNCTION(SetOuter);
+	uint64 GetInternalIndex();
 
-	/// <summary>
-	/// Destroy subobject.
-	/// </summary>
-	/// <param name="subobject"> The target object. </param>
 	static void DestroySubobject(SObject* subobject);
 
-	/// <summary>
-	/// Casts between two SObject classes.
-	/// </summary>
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 	inline static TTo* Cast(TFrom* from)
 	{
 		return dynamic_cast<TTo*>(from);
 	}
 
-	/// <summary>
-	/// Casts between two SObject classes.
-	/// </summary>
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 	inline static const TTo* Cast(const TFrom* from)
 	{
 		return dynamic_cast<const TTo*>(from);
 	}
 
-	/// <summary>
-	/// Casts from native type to boxing object. This cast require instanced SObject for setting outer.
-	/// </summary>
 	template<std::same_as<SObject> TTo, class TFrom>
 	inline TTo* Cast(const TFrom& value) requires (!std::derived_from<TFrom, SObject>)
 	{
 		return NewObject<SValueType>(value);
 	}
 
-	/// <summary>
-	/// Casts from boxing object to native type.
-	/// </summary>
 	template<class TTo, std::same_as<SObject> TFrom>
 	static inline TTo Cast(const TFrom* value) requires (!std::derived_from<TTo, SObject>)
 	{
