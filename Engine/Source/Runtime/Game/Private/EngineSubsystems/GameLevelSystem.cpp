@@ -3,6 +3,7 @@
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "Level/World.h"
 #include "Level/Level.h"
+#include "Level/ActorIterator.h"
 
 DEFINE_LOG_CATEGORY(LogLevel);
 
@@ -21,7 +22,7 @@ void SGameLevelSystem::Init()
 
 void SGameLevelSystem::Deinit()
 {
-	for (auto& Actor : _GameWorld->GetAllActors())
+	for (auto Actor : ActorIterator(_GameWorld))
 	{
 		Actor->DestroyActor();
 	}

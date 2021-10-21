@@ -32,16 +32,4 @@ void SPrimitiveComponent::SetHiddenInGame(bool bHidden)
 
 void SPrimitiveComponent::MarkRenderStateDirty()
 {
-	if (SceneProxy == nullptr)
-	{
-		if (SWorld* world = GetWorld(); world != nullptr)
-		{
-			// Re-register primitive component for add scene proxy to actual scene.
-			world->RegisterComponent(this);
-		}
-	}
-	else
-	{
-		SceneProxy->MarkRenderStateDirty_GameThread();
-	}
 }

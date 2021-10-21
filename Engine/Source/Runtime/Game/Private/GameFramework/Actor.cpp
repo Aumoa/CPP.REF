@@ -124,26 +124,44 @@ SActorComponent* AActor::GetComponentByClass(SubclassOf<SActorComponent> InCompo
 	}
 }
 
-void AActor::SetRootComponent(SSceneComponent* InRootComponent)
+std::shared_ptr<SSceneComponent> AActor::SetRootComponent(SSceneComponent* InRootComponent)
 {
+	std::shared_ptr<SSceneComponent> PreviousRoot;
+
+	SSceneComponent* AttachParent = nullptr;
+	std::wstring SocketName;
+
 	if (_RootComponent)
 	{
+		AttachParent = _RootComponent->GetAttachParent();
+		SocketName = _RootComponent->GetAttachSocketName();
+
 		// RootComponent will be destroyed.
-		_RootComponent->DetachFromComponent();
-		if (_RootComponent->GetOuter() == this)
+		if (AttachParent)
 		{
-			DestroySubobject(_RootComponent);
+			_RootComponent->DetachFromComponent();
 		}
+
+		PreviousRoot = std::dynamic_pointer_cast<SSceneComponent>(_RootComponent->SetOuter(nullptr));
 		_RootComponent = nullptr;
 	}
 
 	_RootComponent = InRootComponent;
 	_RootComponent->SetOuter(this);
 
-	for (auto& ChildComponent : GetSceneComponents())
+	if (AttachParent)
 	{
-		ChildComponent->SetOwnerPrivate(this);
+		if (SocketName.length() == 0)
+		{
+			_RootComponent->AttachToComponent(AttachParent);
+		}
+		else
+		{
+			_RootComponent->AttachToSocket(AttachParent, SocketName);
+		}
 	}
+
+	return PreviousRoot;
 }
 
 SSceneComponent* AActor::GetRootComponent()

@@ -4,27 +4,25 @@
 #include "LogGame.h"
 #include "GameFramework/Actor.h"
 #include "Level/World.h"
+#include "Level/Level.h"
+#include "Ticking/TickTaskLevelManager.h"
 
-void SActorComponent::SComponentTickFunction::ExecuteTick(float elapsedTime)
+SActorComponent::SComponentTickFunction::SComponentTickFunction(SActorComponent* InTarget) : Super()
+	, _ComponentTarget(InTarget)
 {
-	if (_target == nullptr)
-	{
-		SE_LOG(LogTicking, Error, L"Target is nullptr.");
-		return;
-	}
+}
 
-	AActor* const owner = _target->GetOwner();
-	if (owner == nullptr)
+void SActorComponent::SComponentTickFunction::ExecuteTick(float InDeltaTime)
+{
+	if (_ComponentTarget->HasBegunPlay() && _ComponentTarget->IsActive())
 	{
-		SE_LOG(LogTicking, Error, L"Target have not any owner actor.");
-		return;
+		_ComponentTarget->TickComponent(InDeltaTime, this);
 	}
+}
 
-	if (owner->HasBegunPlay() && owner->IsActive() &&
-		_target->HasBegunPlay() && _target->IsActive())
-	{
-		_target->TickComponent(elapsedTime, this);
-	}
+SActorComponent* SActorComponent::SComponentTickFunction::GetTarget() const
+{
+	return _ComponentTarget;
 }
 
 SActorComponent::SActorComponent() : Super()
@@ -32,11 +30,11 @@ SActorComponent::SActorComponent() : Super()
 {
 }
 
-void SActorComponent::TickComponent(float elapsedTime, SComponentTickFunction* tickFunction)
+void SActorComponent::TickComponent(float InDeltaTime, SComponentTickFunction* InTickFunction)
 {
-	if (tickFunction == &PrimaryComponentTick)
+	if (InTickFunction == &PrimaryComponentTick)
 	{
-		Tick(elapsedTime);
+		Tick(InDeltaTime);
 	}
 }
 
@@ -50,8 +48,13 @@ void SActorComponent::EndPlay()
 	_bHasBegunPlay = false;
 }
 
-void SActorComponent::Tick(float elapsedTime)
+void SActorComponent::Tick(float InDeltaTime)
 {
+}
+
+AActor* SActorComponent::GetOwner()
+{
+	return _OwnerPrivate;
 }
 
 void SActorComponent::SetActive(bool bActive)
@@ -59,6 +62,7 @@ void SActorComponent::SetActive(bool bActive)
 	if (_bActive != bActive)
 	{
 		_bActive = bActive;
+		PrimaryComponentTick.SetTickFunctionEnable(bActive);
 		if (_bActive)
 		{
 			Activated.Invoke();
@@ -72,6 +76,8 @@ void SActorComponent::SetActive(bool bActive)
 
 void SActorComponent::RegisterComponent()
 {
+	MarkOwner();
+
 	AActor* MyOwner = GetOwner();
 	if (ensure(MyOwner))
 	{
@@ -82,31 +88,70 @@ void SActorComponent::RegisterComponent()
 	}
 }
 
-void SActorComponent::RegisterComponentWithWorld(SWorld* world)
+void SActorComponent::RegisterComponentWithWorld(SWorld* InWorld)
 {
-	if (!_bRegistered)
+	if (!IsRegistered())
 	{
-		world->RegisterTickFunction(&PrimaryComponentTick);
-		world->RegisterComponent(this);
-		_bRegistered = true;
+		SLevel* Level = InWorld->GetLevel();
+		RegisterAllTickFunctions(Level, true);
 	}
+
+	_bRegistered = true;
 }
 
 void SActorComponent::UnregisterComponent()
 {
 	if (_bRegistered)
 	{
-		SWorld* const world = GetWorld();
-		if (world != nullptr)
-		{
-			world->UnregisterTickFunction(&PrimaryComponentTick);
-			world->UnregisterComponent(this);
-		}
-		_bRegistered = false;
+		SWorld* World = GetWorld();
+		SLevel* Level = World->GetLevel();
+		RegisterAllTickFunctions(Level, false);
 	}
+
+	_bRegistered = false;
 }
 
 bool SActorComponent::IsRegistered()
 {
 	return _bRegistered;
+}
+
+void SActorComponent::MarkOwner()
+{
+	SObject* Outer = GetOuter();
+	if (auto* IsActor = Cast<AActor>(Outer); IsActor)
+	{
+		_OwnerPrivate = IsActor;
+	}
+	else if (auto* IsComponent = Cast<SActorComponent>(Outer); IsComponent)
+	{
+		_OwnerPrivate = IsComponent->GetOwner();
+	}
+	else
+	{
+		_OwnerPrivate = nullptr;
+	}
+}
+
+void SActorComponent::RegisterAllTickFunctions(SLevel* InLevel, bool bRegister)
+{
+	if (bRegister)
+	{
+		if (!PrimaryComponentTick.IsTickFunctionRegistered() && PrimaryComponentTick.bCanEverTick)
+		{
+			bool bEnabled = PrimaryComponentTick.bStartWithTickEnabled && PrimaryComponentTick.IsTickFunctionEnabled();
+			PrimaryComponentTick.SetTickFunctionEnable(bEnabled);
+
+			STickTaskLevelManager* LevelTick = InLevel->GetLevelTick();
+			LevelTick->AddTickFunction(&PrimaryComponentTick);
+		}
+	}
+	else
+	{
+		if (PrimaryComponentTick.IsTickFunctionRegistered())
+		{
+			STickTaskLevelManager* LevelTick = InLevel->GetLevelTick();
+			LevelTick->RemoveTickFunction(&PrimaryComponentTick);
+		}
+	}
 }

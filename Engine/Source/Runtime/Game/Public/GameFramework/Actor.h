@@ -126,7 +126,7 @@ private:
 	SSceneComponent* _RootComponent = nullptr;
 
 public:
-	void SetRootComponent(SSceneComponent* InRootComponent);
+	std::shared_ptr<SSceneComponent> SetRootComponent(SSceneComponent* InRootComponent);
 	SSceneComponent* GetRootComponent();
 	template<std::derived_from<SSceneComponent> T>
 	T* GetRootComponentAs() { return dynamic_cast<T*>(GetRootComponent()); }

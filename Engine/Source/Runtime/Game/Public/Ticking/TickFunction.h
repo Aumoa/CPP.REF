@@ -19,18 +19,25 @@ public:
 	struct InternalLevelData
 	{
 		STickTaskLevelManager* Level;
+
+		STickFunction* PrevPtr;
 		STickFunction* NextPtr;
 		ETickingGroup ActualTickGroup;
+		double TickPriority;
+
+		float Interval;
+		bool bTickExecuted;
 	};
 
 	std::unique_ptr<InternalLevelData> InternalData;
 
 public:
 	uint8 bCanEverTick : 1 = false;
-	uint8 bExecutedFrame : 1 = false;
+	uint8 bTickEnabled : 1 = false;
+	uint8 bStartWithTickEnabled : 1 = true;
 
 	ETickingGroup TickGroup = ETickingGroup::PrePhysics;
-	float TickInterval;
+	float TickInterval = 0.0f;
 	std::vector<STickFunction*> Prerequisites;
 
 protected:
@@ -39,9 +46,20 @@ protected:
 	}
 
 public:
-	/// <summary>
-	/// Execute tick function.
-	/// </summary>
-	/// <param name="InDeltaTime"> The frame elapsed time. </param>
 	virtual void ExecuteTick(float InDeltaTime) = 0;
+
+	void SetTickFunctionEnable(bool bEnabled)
+	{
+		bTickEnabled = bEnabled;
+	}
+
+	bool IsTickFunctionEnabled()
+	{
+		return bTickEnabled;
+	}
+
+	bool IsTickFunctionRegistered()
+	{
+		return static_cast<bool>(InternalData);
+	}
 };

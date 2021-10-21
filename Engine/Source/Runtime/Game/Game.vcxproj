@@ -168,6 +168,7 @@
     <ClCompile Include="Private\Layout\ArrangedChildrens.cpp" />
     <ClCompile Include="Private\Layout\ArrangedWidget.cpp" />
     <ClCompile Include="Private\Layout\Geometry.cpp" />
+    <ClCompile Include="Private\Level\ActorIterator.cpp" />
     <ClCompile Include="Private\Level\Level.cpp" />
     <ClCompile Include="Private\Level\World.cpp" />
     <ClCompile Include="Private\LogGame.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="Public\Layout\SlateRenderTransform.h" />
     <ClInclude Include="Public\Layout\SlateRotatedRect.h" />
     <ClInclude Include="Public\Layout\TransformCalculus2D.h" />
+    <ClInclude Include="Public\Level\ActorIterator.h" />
     <ClInclude Include="Public\Level\Level.h" />
     <ClInclude Include="Public\Level\World.h" />
     <ClInclude Include="Public\Level\WorldType.h" />

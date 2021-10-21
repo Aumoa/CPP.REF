@@ -1,7 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Components/SceneComponent.h"
-#include "LogGame.h"
+
+DEFINE_LOG_CATEGORY(LogSceneComponent);
 
 SSceneComponent::SSceneComponent() : Super()
 {
@@ -9,7 +10,7 @@ SSceneComponent::SSceneComponent() : Super()
 
 void SSceneComponent::UpdateChildTransforms()
 {
-	for (SSceneComponent* child : _childComponents)
+	for (SSceneComponent* child : _Childs)
 	{
 		child->UpdateComponentToWorld();
 	}
@@ -19,199 +20,191 @@ void SSceneComponent::UpdateComponentToWorld()
 {
 	if (GetAttachParent() == nullptr)
 	{
-		_localToWorld = Transform::GetIdentity();
+		_RelativeTransform = Transform::GetIdentity();
 		return;
 	}
 
 	if (GetAttachSocketName() != L"")
 	{
-		_localToWorld = GetAttachParent()->GetSocketTransform(GetAttachSocketName());
+		_RelativeTransform = GetAttachParent()->GetSocketTransform(GetAttachSocketName());
 	}
 	else
 	{
-		_localToWorld = GetAttachParent()->GetComponentTransform();
+		_RelativeTransform = GetAttachParent()->GetComponentTransform();
 	}
 
 	UpdateWorldTransform();
 }
 
-Transform SSceneComponent::GetSocketTransform(const std::wstring& socketName, EComponentTransformSpace space) const
+Transform SSceneComponent::GetSocketTransform(std::wstring_view InSocketName, EComponentTransformSpace InSpace) const
 {
 	SE_LOG(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
 
-	switch (space)
+	switch (InSpace)
 	{
 	case EComponentTransformSpace::World:
 		return GetComponentTransform();
+	default:
+		return GetRelativeTransform();
 	}
-
-	return GetRelativeTransform();
 }
 
-bool SSceneComponent::MoveComponent(const Vector3& inMoveDelta, const Quaternion& inNewRotation, EComponentTransformSpace inSpace)
+bool SSceneComponent::MoveComponent(const Vector3& InMoveDelta, const Quaternion& InNewRotation, EComponentTransformSpace InSpace)
 {
-	Quaternion oldRotation = inSpace == EComponentTransformSpace::World ? GetComponentRotation() : GetRotation();
-	if (inMoveDelta.NearlyEquals(Vector3::GetZero()) && oldRotation.NearlyEquals(inNewRotation))
+	Quaternion OldRotation = InSpace == EComponentTransformSpace::World ? GetComponentRotation() : GetRotation();
+	if (InMoveDelta.NearlyEquals(Vector3::GetZero()) && OldRotation.NearlyEquals(InNewRotation))
 	{
 		// MoveDelta and NewRotation is nearly equals to previous component transform.
 		// Skip moving and return state indicating that be not moved.
 		return false;
 	}
 
-	Vector3 relativeLocation;
-	Quaternion relativeRotation;
+	Vector3 RelativeLocation;
+	Quaternion RelativeRotation;
 
-	if (inSpace == EComponentTransformSpace::World && GetAttachParent() != nullptr)
+	if (InSpace == EComponentTransformSpace::World && GetAttachParent() != nullptr)
 	{
 		// Transform unit is only calculate from local space.
 		// Therefore, will convert world space unit to local space unit and apply it.
-		Vector3 newLocation = GetComponentLocation() + inMoveDelta;
-		Quaternion newRotation = inNewRotation;
+		Vector3 NewLocation = GetComponentLocation() + InMoveDelta;
+		Quaternion NewRotation = InNewRotation;
 
-		auto worldTransform = Transform(newLocation, GetComponentScale(), newRotation);
-		auto relativeTransform = Transform::GetRelativeTransform(worldTransform, GetAttachParent()->GetSocketTransform(GetAttachSocketName()));
+		auto WorldTransform = Transform(NewLocation, GetComponentScale(), NewRotation);
+		auto RelativeTransform = Transform::GetRelativeTransform(WorldTransform, GetAttachParent()->GetSocketTransform(GetAttachSocketName()));
 
-		relativeLocation = relativeTransform.Translation;
-		relativeRotation = relativeTransform.Rotation;
+		RelativeLocation = RelativeTransform.Translation;
+		RelativeRotation = RelativeTransform.Rotation;
 	}
 	else
 	{
-		relativeLocation = GetLocation() + inMoveDelta;
-		relativeRotation = inNewRotation;
+		RelativeLocation = GetLocation() + InMoveDelta;
+		RelativeRotation = InNewRotation;
 	}
 
-	_transform.Translation = relativeLocation;
-	_transform.Rotation = relativeRotation;
+	_RelativeTransform.Translation = RelativeLocation;
+	_RelativeTransform.Rotation = RelativeRotation;
 	UpdateWorldTransform();
 
 	return true;
 }
 
-void SSceneComponent::AttachToComponent(SSceneComponent* attachTo)
+void SSceneComponent::AttachToComponent(SSceneComponent* AttachTo)
 {
-	AttachToSocket(attachTo, L"");
+	AttachToSocket(AttachTo, L"");
 }
 
-void SSceneComponent::AttachToSocket(SSceneComponent* attachTo, const std::wstring& socketName)
+void SSceneComponent::AttachToSocket(SSceneComponent* AttachTo, const std::wstring& socketName)
 {
-	if (attachTo == nullptr)
+	if (AttachTo == nullptr)
 	{
-		SE_LOG(LogSceneComponent, Warning, L"attachTo is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.");
+		SE_LOG(LogSceneComponent, Warning, L"AttachTo is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.");
 		return;
 	}
 
-	if (_attachment.AttachmentRoot == attachTo && _attachment.SocketName == socketName)
+	if (_Attachment.AttachmentRoot == AttachTo && _Attachment.SocketName == socketName)
 	{
 		SE_LOG(LogSceneComponent, Verbose, L"Component is already attach to desired target. Abort.");
 		return;
 	}
 
-	if (_attachment.AttachmentRoot != nullptr)
+	if (_Attachment.AttachmentRoot != nullptr)
 	{
 		DetachFromComponent();
 	}
 
-	attachTo->_childComponents.emplace_back(this);
-	_attachment.AttachmentRoot = attachTo;
-	_attachment.SocketName = socketName;
+	AttachTo->_Childs.emplace_back(this);
+	_Attachment.AttachmentRoot = AttachTo;
+	_Attachment.SocketName = socketName;
 
-	ForEachSceneComponents<SSceneComponent>([attachTo](SSceneComponent* sc)
-	{
-		if (sc->GetOwner() == nullptr)
-		{
-			sc->SetOwnerPrivate(attachTo->GetOwner());
-		}
-		return false;
-	});
 	UpdateComponentToWorld();
+	OnAttachmentChanged();
 }
 
 void SSceneComponent::DetachFromComponent()
 {
-	if (_attachment.AttachmentRoot == nullptr)
+	if (_Attachment.AttachmentRoot == nullptr)
 	{
 		SE_LOG(LogSceneComponent, Verbose, L"Component is already detached from any components. Abort.");
 		return;
 	}
 
-	auto it = find(_childComponents.begin(), _childComponents.end(), this);
-	if (it == _childComponents.end())
+	auto It = find(_Childs.begin(), _Childs.end(), this);
+	if (It == _Childs.end())
 	{
 		SE_LOG(LogSceneComponent, Error, L"Cannot found this component from child component list of parent component.");
 	}
 	else
 	{
-		_childComponents.erase(it);
+		_Childs.erase(It);
 	}
 
-	_attachment.AttachmentRoot = nullptr;
-	_attachment.SocketName = L"";
+	_Attachment.AttachmentRoot = nullptr;
+	_Attachment.SocketName = L"";
 
 	UpdateComponentToWorld();
+	OnAttachmentChanged();
 }
 
 Transform SSceneComponent::GetRelativeTransform() const
 {
-	return _transform;
+	return _RelativeTransform;
 }
 
 void SSceneComponent::SetRelativeTransform(const Transform& value)
 {
-	_transform = value;
+	_RelativeTransform = value;
 	UpdateWorldTransform();
 }
 
 Transform SSceneComponent::GetComponentTransform() const
 {
-	return _worldTransform;
+	return _WorldTransform;
 }
 
 Vector3 SSceneComponent::GetLocation()
 {
-	return _transform.Translation;
+	return _RelativeTransform.Translation;
 }
 
 void SSceneComponent::SetLocation(const Vector3& value)
 {
-	_transform.Translation = value;
+	_RelativeTransform.Translation = value;
 	UpdateWorldTransform();
 }
 
 Vector3 SSceneComponent::GetScale()
 {
-	return _transform.Scale;
+	return _RelativeTransform.Scale;
 }
 
 void SSceneComponent::SetScale(const Vector3& value)
 {
-	_transform.Scale = value;
+	_RelativeTransform.Scale = value;
 	UpdateWorldTransform();
 }
 
 Quaternion SSceneComponent::GetRotation()
 {
-	return _transform.Rotation;
+	return _RelativeTransform.Rotation;
 }
 
 void SSceneComponent::SetRotation(const Quaternion& value)
 {
-	_transform.Rotation = value;
+	_RelativeTransform.Rotation = value;
 	UpdateWorldTransform();
 }
 
-EComponentMobility SSceneComponent::GetMobility()
+void SSceneComponent::OnAttachmentChanged()
 {
-	return _mobility;
-}
-
-void SSceneComponent::SetMobility(EComponentMobility value)
-{
-	_mobility = value;
+	for (auto& Child : _Childs)
+	{
+		Child->OnAttachmentChanged();
+	}
 }
 
 void SSceneComponent::UpdateWorldTransform()
 {
-	if (HasBegunPlay() && _mobility != EComponentMobility::Movable)
+	if (HasBegunPlay() && Mobility != EComponentMobility::Movable)
 	{
 		SE_LOG(LogSceneComponent, Error, L"SceneComponent has been try move but it is not movable mobility.");
 		return;
@@ -219,11 +212,11 @@ void SSceneComponent::UpdateWorldTransform()
 
 	if (GetAttachParent() != nullptr)
 	{
-		_worldTransform = Transform::Multiply(_transform, _localToWorld);
+		_WorldTransform = Transform::Multiply(_RelativeTransform, _RelativeTransform);
 	}
 	else
 	{
-		_worldTransform = _transform;
+		_WorldTransform = _RelativeTransform;
 	}
 
 	UpdateChildTransforms();

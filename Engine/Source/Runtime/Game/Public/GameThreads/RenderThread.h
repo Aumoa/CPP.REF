@@ -60,7 +60,7 @@ public:
 	static void Init();
 	static void Shutdown();
 	static void EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody);
-	static void ExecuteWorks(std::function<void()> completedWork);
+	static void ExecuteWorks(std::function<void()> InCompletionWork);
 	static void WaitForLastWorks();
 
 	static bool IsInRenderThread()

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "TickingGroup.h"
 
+DECLARE_LOG_CATEGORY(GAME_API, LogLevelTick);
+
 class SWorld;
 class STickFunction;
 

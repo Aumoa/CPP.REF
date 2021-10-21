@@ -82,13 +82,13 @@ void RenderThread::Shutdown()
 void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody)
 {
 	std::unique_lock lock(_Thread.CriticalSection);
-	_WaitingWorks.Works.emplace_back(InWorkingHash, InWorkBody);
+	_WaitingWorks.Works.emplace_back(InWorkBody);
 }
 
-void RenderThread::ExecuteWorks(std::function<void()> completedWork)
+void RenderThread::ExecuteWorks(std::function<void()> InCompletionWork)
 {
 	std::unique_lock lock(_Thread.CriticalSection);
-	_WaitingWorks.CompletedWork = completedWork;
+	_WaitingWorks.CompletedWork = InCompletionWork;
 	_ExecutingWorks.SwapExecute(_WaitingWorks);
 }
 

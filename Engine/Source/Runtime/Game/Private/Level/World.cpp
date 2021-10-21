@@ -18,7 +18,7 @@ SWorld::SWorld(EWorldType InWorldType) : Super()
 
 void SWorld::InitWorld()
 {
-	_Scene = NewObject<SScene>();
+	_Scene = NewObject<SScene>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
 void SWorld::DestroyWorld()
@@ -101,24 +101,6 @@ AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncrement
 void SWorld::DestroyActor(AActor* InActor)
 {
 	_Level->ActorsToRemove.emplace_back(InActor);
-}
-
-const std::vector<AActor*>& SWorld::GetAllActors()
-{
-	return _Level->Actors;
-}
-
-std::vector<AActor*> SWorld::GetAllActorsOfClass(SubclassOf<AActor> InClass)
-{
-	std::vector<AActor*> ActorsOfClass;
-	for (auto& Actor : _Level->Actors)
-	{
-		if (Actor->GetType()->IsDerivedFrom(InClass.GetType()))
-		{
-			ActorsOfClass.emplace_back(Actor);
-		}
-	}
-	return ActorsOfClass;
 }
 
 void SWorld::LevelTick(float InDeltaTime)

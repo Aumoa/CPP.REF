@@ -384,6 +384,9 @@
     <ClCompile Include="Private\Ticking\TickTaskLevelManager.cpp">
       <Filter>Private\Ticking</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Level\ActorIterator.cpp">
+      <Filter>Private\Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\IFrameworkView.h">
@@ -727,6 +730,9 @@
     </ClInclude>
     <ClInclude Include="Public\Ticking\TickTaskLevelManager.h">
       <Filter>Public\Ticking</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Level\ActorIterator.h">
+      <Filter>Public\Level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

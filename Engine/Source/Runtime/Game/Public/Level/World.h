@@ -20,6 +20,8 @@ class GAME_API SWorld : public SGameObject
 {
 	GENERATED_BODY(SWorld)
 
+	friend class ActorIterator;
+
 private:
 	SLevel* _Level = nullptr;
 	SScene* _Scene = nullptr;
@@ -43,9 +45,6 @@ public:
 	SLevel* OpenLevel(SubclassOf<SLevel> InLevelToOpen);
 	SLevel* GetLevel();
 
-	const std::vector<AActor*>& GetAllActors();
-	std::vector<AActor*> GetAllActorsOfClass(SubclassOf<AActor> InClass);
-
 	void LevelTick(float InDeltaTime);
 
 public:
@@ -59,19 +58,5 @@ public:
 	T* SpawnActor(SubclassOf<T> InActorClass)
 	{
 		return static_cast<T*>(SpawnActor((SubclassOf<AActor>)InActorClass));
-	}
-
-	template<std::derived_from<AActor> T>
-	std::set<T*> GetAllActorsOfClass()
-	{
-		std::set<T*> ActorsOfClass;
-		for (auto& Actor : _Actors)
-		{
-			if (auto* Ptr = dynamic_cast<T*>(Actor); Ptr)
-			{
-				ActorsOfClass.emplace(Ptr);
-			}
-		}
-		return ActorsOfClass;
 	}
 };
