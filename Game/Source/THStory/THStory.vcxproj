@@ -103,15 +103,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public\Levels\StartupLevel.h" />
+    <ClInclude Include="Public\Actors\SampleActor.h" />
+    <ClInclude Include="Public\Controller\THPlayerController.h" />
+    <ClInclude Include="Public\Level\StartupLevel.h" />
     <ClInclude Include="Public\LogTHStory.h" />
     <ClInclude Include="Public\THGameInstance.h" />
+    <ClInclude Include="Public\THGameMode.h" />
     <ClInclude Include="Public\THGameModule.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Levels\StartupLevel.cpp" />
+    <ClCompile Include="Private\Actors\SampleActor.cpp" />
+    <ClCompile Include="Private\Controller\THPlayerController.cpp" />
+    <ClCompile Include="Private\Level\StartupLevel.cpp" />
     <ClCompile Include="Private\LogTHStory.cpp" />
     <ClCompile Include="Private\THGameInstance.cpp" />
+    <ClCompile Include="Private\THGameMode.cpp" />
     <ClCompile Include="Private\THGameModule.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

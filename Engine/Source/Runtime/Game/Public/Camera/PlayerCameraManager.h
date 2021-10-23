@@ -16,7 +16,7 @@ class GAME_API APlayerCameraManager : public AActor
 private:
 	APlayerController* _InitializedController = nullptr;
 	SCameraComponent* _cachedBindCamera = nullptr;
-	MinimalViewInfo _cachedView;
+	MinimalViewInfo _CachedView;
 
 public:
 	APlayerCameraManager();

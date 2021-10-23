@@ -179,11 +179,8 @@ void SActorComponent::RegisterAllTickFunctions(SLevel* InLevel, bool bRegister)
 {
 	if (bRegister)
 	{
-		if (!PrimaryComponentTick.IsTickFunctionRegistered() && PrimaryComponentTick.bCanEverTick)
+		if (!PrimaryComponentTick.IsTickFunctionRegistered())
 		{
-			bool bEnabled = PrimaryComponentTick.bStartWithTickEnabled && PrimaryComponentTick.IsTickFunctionEnabled();
-			PrimaryComponentTick.SetTickFunctionEnable(bEnabled);
-
 			STickTaskLevelManager* LevelTick = InLevel->GetLevelTick();
 			LevelTick->AddTickFunction(&PrimaryComponentTick);
 		}

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameMinimal.h"
+#include "CoreMinimal.h"
 #include "GameInstance.h"
 
 class THSTORY_API STHGameInstance : public SGameInstance

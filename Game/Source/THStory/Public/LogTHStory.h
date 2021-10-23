@@ -2,6 +2,6 @@
 
 #pragma once
 
-#include "GameMinimal.h"
+#include "CoreMinimal.h"
 
 DECLARE_LOG_CATEGORY(THSTORY_API, LogTH);

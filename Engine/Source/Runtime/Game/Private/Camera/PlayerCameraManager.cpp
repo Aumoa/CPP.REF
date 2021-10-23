@@ -13,16 +13,16 @@ void APlayerCameraManager::UpdateCamera(float elapsedTime)
 {
 	if (_cachedBindCamera == nullptr)
 	{
-		_cachedView.bInit = true;
-		_cachedView.Location = GetActorLocation();
-		_cachedView.Rotation = GetActorRotation();
-		_cachedView.NearPlane = 0.1f;
-		_cachedView.FarPlane = 1000.0f;
-		_cachedView.FOVAngle = 45.0f;
+		_CachedView.bInit = true;
+		_CachedView.Location = GetActorLocation();
+		_CachedView.Rotation = GetActorRotation();
+		_CachedView.NearPlane = 0.1f;
+		_CachedView.FarPlane = 1000.0f;
+		_CachedView.FOVAngle = 45.0f;
 	}
 	else
 	{
-		_cachedView = _cachedBindCamera->GetViewInfo(elapsedTime);
+		_CachedView = _cachedBindCamera->GetViewInfo(elapsedTime);
 	}
 }
 
@@ -43,5 +43,5 @@ void APlayerCameraManager::CachePlayerCamera(APlayerController* controller)
 
 MinimalViewInfo APlayerCameraManager::GetCachedCameraView()
 {
-	return _cachedView;
+	return _CachedView;
 }

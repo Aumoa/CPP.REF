@@ -31,20 +31,26 @@ SWorld* STickTaskLevelManager::GetWorld()
 
 void STickTaskLevelManager::AddTickFunction(STickFunction* InFunction)
 {
-	// Initialize internal data.
-	auto* InternalData = (InFunction->InternalData = std::make_unique<STickFunction::InternalLevelData>()).get();
-	InternalData->Level = this;
+	if (InFunction->bCanEverTick)
+	{
+		bool bEnabled = InFunction->bStartWithTickEnabled || InFunction->IsTickFunctionEnabled();
+		InFunction->SetTickFunctionEnable(bEnabled);
 
-	InternalData->PrevPtr = nullptr;
-	InternalData->NextPtr = nullptr;
-	InternalData->ActualTickGroup = InFunction->TickGroup;
-	InternalData->TickPriority = 0;
+		// Initialize internal data.
+		auto* InternalData = (InFunction->InternalData = std::make_unique<STickFunction::InternalLevelData>()).get();
+		InternalData->Level = this;
 
-	InternalData->Interval = InFunction->TickInterval;
-	InternalData->bTickExecuted = false;
+		InternalData->PrevPtr = nullptr;
+		InternalData->NextPtr = nullptr;
+		InternalData->ActualTickGroup = InFunction->TickGroup;
+		InternalData->TickPriority = 0;
 
-	TickGroupHeader& Header = _TickGroups[(int32)InFunction->TickGroup];
-	Header.AddTickFunction(InFunction);
+		InternalData->Interval = InFunction->TickInterval;
+		InternalData->bTickExecuted = false;
+
+		TickGroupHeader& Header = _TickGroups[(int32)InFunction->TickGroup];
+		Header.AddTickFunction(InFunction);
+	}
 }
 
 void STickTaskLevelManager::RemoveTickFunction(STickFunction* InFunction)
@@ -65,29 +71,32 @@ void STickTaskLevelManager::BeginFrame()
 	{
 		for (auto& Function : Group.Functions)
 		{
-			if (_FrameHead == nullptr)
+			if (Function->IsTickFunctionEnabled())
 			{
-				_FrameHead = Function;
+				if (_FrameHead == nullptr)
+				{
+					_FrameHead = Function;
+				}
+
+				STickFunction::InternalLevelData* InternalData = Function->InternalData.get();
+
+				if (Tail)
+				{
+					Tail->InternalData->NextPtr = Function;
+					InternalData->PrevPtr = Tail;
+					InternalData->NextPtr = nullptr;
+					Tail = Function;
+				}
+				else
+				{
+					Tail = _FrameHead;
+				}
+
+				InternalData->TickPriority = PriorityCounter;
+				InternalData->bTickExecuted = false;
+
+				PriorityCounter += 1.0;
 			}
-
-			STickFunction::InternalLevelData* InternalData = Function->InternalData.get();
-
-			if (Tail)
-			{
-				Tail->InternalData->NextPtr = Function;
-				InternalData->PrevPtr = Tail;
-				InternalData->NextPtr = nullptr;
-				Tail = Function;
-			}
-			else
-			{
-				Tail = _FrameHead;
-			}
-
-			InternalData->TickPriority = PriorityCounter;
-			InternalData->bTickExecuted = false;
-
-			PriorityCounter += 1.0;
 		}
 	}
 
@@ -98,11 +107,14 @@ void STickTaskLevelManager::BeginFrame()
 		STickFunction* MaximumDependency = nullptr;
 		for (auto& Dependency : Head->Prerequisites)
 		{
-			double Priority = Dependency->InternalData->TickPriority;
-			if (Priority > MaximumPriority)
+			if (Dependency->IsTickFunctionRegistered() && Dependency->IsTickFunctionEnabled())
 			{
-				MaximumDependency = Dependency;
-				MaximumPriority = Priority;
+				double Priority = Dependency->InternalData->TickPriority;
+				if (Priority > MaximumPriority)
+				{
+					MaximumDependency = Dependency;
+					MaximumPriority = Priority;
+				}
 			}
 		}
 
@@ -115,7 +127,10 @@ void STickTaskLevelManager::BeginFrame()
 			{
 				InternalHead->PrevPtr->InternalData->NextPtr = InternalHead->NextPtr;
 			}
-			InternalHead->NextPtr->InternalData->PrevPtr = InternalHead->PrevPtr;
+			if (InternalHead->NextPtr)
+			{
+				InternalHead->NextPtr->InternalData->PrevPtr = InternalHead->PrevPtr;
+			}
 
 			auto InternalMax = MaximumDependency->InternalData.get();
 			InternalHead->NextPtr = InternalMax->NextPtr;
@@ -131,6 +146,17 @@ void STickTaskLevelManager::BeginFrame()
 			{
 				SE_LOG(LogLevelTick, Warning, L"Actual tick group is different to your desired. It is not an error, but not working as your desired.");
 				InternalHead->ActualTickGroup = InternalMax->ActualTickGroup;
+			}
+
+			InternalHead->TickPriority = InternalHead->PrevPtr->InternalData->TickPriority;
+			if (InternalHead->NextPtr)
+			{
+				InternalHead->TickPriority += InternalHead->NextPtr->InternalData->TickPriority;
+				InternalHead->TickPriority *= 0.5f;
+			}
+			else
+			{
+				InternalHead->TickPriority += 1.0f;
 			}
 		}
 

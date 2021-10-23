@@ -102,12 +102,18 @@ void SGameRenderSystem::ExecuteRenderThread()
 
 			if (MinimalPlayerView.has_value())
 			{
+				float AspectRatio = MinimalPlayerView->AspectRatio;
+				if (AspectRatio)
+				{
+					AspectRatio = RenderTarget.Viewport.Width / RenderTarget.Viewport.Height;
+				}
+
 				SceneViewScope PrimarySceneView;
 				PrimarySceneView.InitFromCameraView(
 					MinimalPlayerView->Location,
 					MinimalPlayerView->Rotation,
 					MinimalPlayerView->FOVAngle.ToRadians(),
-					MinimalPlayerView->AspectRatio,
+					AspectRatio,
 					MinimalPlayerView->NearPlane,
 					MinimalPlayerView->FarPlane);
 

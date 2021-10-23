@@ -31,12 +31,14 @@ bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick
 		_LevelTick = NewObject<STickTaskLevelManager>();
 	}
 
+	OnLoadLevel();
 	return true;
 }
 
 void SLevel::UnloadLevel()
 {
 	IncrementalActorsApply(0);
+	OnUnloadLevel();
 
 	for (auto Actor : Actors)
 	{
@@ -85,21 +87,19 @@ void SLevel::IncrementalActorsApply(size_t InLimit)
 	}
 
 	// Remove actors first.
-	auto EndIt = ActorsToRemove.end();
-	for (auto It = ActorsToRemove.begin(); InLimit-- && It != ActorsToRemove.end(); ++It)
+	auto EndIt = ActorsToRemove.rbegin();
+	for (; InLimit-- && EndIt != ActorsToRemove.rend(); ++EndIt)
 	{
-		InternalRemoveActor(*It);
-		std::swap(*It, *EndIt--);
+		InternalRemoveActor(*EndIt);
 	}
-	ActorsToRemove.erase(EndIt, ActorsToRemove.end());
+	ActorsToRemove.erase(EndIt.base(), ActorsToRemove.end());
 
-	EndIt = ActorsToAdd.end();
-	for (auto It = ActorsToAdd.begin(); InLimit-- && It != ActorsToAdd.end(); ++It)
+	EndIt = ActorsToAdd.rbegin();
+	for (; InLimit-- && EndIt != ActorsToAdd.rend(); ++EndIt)
 	{
-		InternalAddActor(*It);
-		std::swap(*It, *--EndIt);
+		InternalAddActor(*EndIt);
 	}
-	ActorsToAdd.erase(EndIt, ActorsToAdd.end());
+	ActorsToAdd.erase(EndIt.base(), ActorsToAdd.end());
 }
 
 APlayerController* SLevel::GetPlayerController()
@@ -151,7 +151,9 @@ void SLevel::InternalRemoveActor(AActor* InActor, bool bRemoveFromArray)
 
 void SLevel::InternalAddActor(AActor* InActor)
 {
-	if (InActor->PrimaryActorTick.bCanEverTick)
+	Actors.emplace_back(InActor);
+
+	if (!InActor->PrimaryActorTick.IsTickFunctionRegistered())
 	{
 		_LevelTick->AddTickFunction(&InActor->PrimaryActorTick);
 	}

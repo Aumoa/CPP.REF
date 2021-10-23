@@ -97,6 +97,12 @@ void SWorld::LevelTick(float InDeltaTime)
 		LevelTick->IncrementalDispatchTick(ETickingGroup::PrePhysics, InDeltaTime);
 		LevelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, InDeltaTime);
 		LevelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, InDeltaTime);
+
+		if (APlayerController* PlayerController = _Level->GetPlayerController())
+		{
+			PlayerController->UpdateCameraManager(InDeltaTime);
+		}
+
 		LevelTick->IncrementalDispatchTick(ETickingGroup::PostUpdateWork, InDeltaTime);
 
 		LevelTick->EndFrame();

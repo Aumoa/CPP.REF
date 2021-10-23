@@ -37,7 +37,7 @@ INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR 
 
 	if (!engineName.has_value())
 	{
-#if defined(_DEBUG)
+#if defined(_DEBUG) && 0
 		constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
 #else
 		constexpr const wchar_t* GameEngineModuleName = L"Game.dll";

@@ -41,8 +41,8 @@ public:
 	SLevel();
 	~SLevel();
 
-	virtual bool LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick = nullptr);
-	virtual void UnloadLevel();
+	bool LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick = nullptr);
+	void UnloadLevel();
 
 	AActor* SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental = true);
 	void DestroyActor(AActor* InActor);
@@ -54,4 +54,21 @@ public:
 
 	void InternalRemoveActor(AActor* InActor, bool bRemoveFromArray = false);
 	void InternalAddActor(AActor* InActor);
+
+protected:
+	virtual void OnLoadLevel() {};
+	virtual void OnUnloadLevel() {};
+
+public:
+	template<std::derived_from<AActor> T>
+	T* SpawnActor()
+	{
+		return SpawnActor<T>(T::StaticClass());
+	}
+
+	template<std::derived_from<AActor> T>
+	T* SpawnActor(SubclassOf<T> InActorClass)
+	{
+		return static_cast<T*>(SpawnActor((SubclassOf<AActor>)InActorClass));
+	}
 };

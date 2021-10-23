@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameMinimal.h"
+#include "CoreMinimal.h"
 #include "Level/Level.h"
 
 class THSTORY_API SStartupLevel : public SLevel
@@ -11,4 +11,7 @@ class THSTORY_API SStartupLevel : public SLevel
 
 public:
 	SStartupLevel();
+
+protected:
+	virtual void OnLoadLevel() override;
 };
