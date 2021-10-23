@@ -163,6 +163,12 @@
     <Filter Include="Private\GameThreads">
       <UniqueIdentifier>{8720cc83-1650-4202-9b91-d8f28e6e908d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\SceneRendering">
+      <UniqueIdentifier>{5552c730-4737-4a19-a302-31277c6e6f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\SceneRendering">
+      <UniqueIdentifier>{f19d49cb-4507-4ba2-84f4-87a0609c2a09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\LogGame.cpp">
@@ -386,6 +392,18 @@
     </ClCompile>
     <ClCompile Include="Private\Level\ActorIterator.cpp">
       <Filter>Private\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\Scene.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SceneView.cpp">
+      <Filter>Private\SceneRendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -733,6 +751,33 @@
     </ClInclude>
     <ClInclude Include="Public\Level\ActorIterator.h">
       <Filter>Public\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\LightSceneInfo.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\MeshBatch.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\MeshBatchElement.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\Scene.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneRenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneStructuredBuffer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneView.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneViewScope.h">
+      <Filter>Public\SceneRendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

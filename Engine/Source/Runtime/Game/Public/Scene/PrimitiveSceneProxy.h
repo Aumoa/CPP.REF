@@ -6,7 +6,6 @@
 #include <vector>
 #include "RHI/RHIStructures.h"
 #include "SceneRendering/MeshBatch.h"
-#include "SceneRendering/PrimitiveSceneInfo.h"
 
 class SPrimitiveComponent;
 
@@ -28,15 +27,4 @@ public:
 	void MarkRenderStateDirty_RenderThread();
 	void SetHiddenInGame_GameThread(bool bHiddenInGame);
 	void SetHiddenInGame_RenderThread(bool bHiddenInGame);
-
-	PrimitiveSceneInfo ComposeSceneInfo() const
-	{
-		PrimitiveSceneInfo Info =
-		{
-			.MeshBatches = MeshBatches,
-			.ComponentTransform = ComponentTransform,
-			.bHiddenInGame = bHiddenInGame
-		};
-		return Info;
-	}
 };

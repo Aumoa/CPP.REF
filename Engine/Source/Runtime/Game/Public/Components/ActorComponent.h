@@ -43,14 +43,15 @@ public:
 	SActorComponent();
 
 	virtual void TickComponent(float InDeltaTime, SComponentTickFunction* InTickFunction);
-
-	virtual void BeginPlay();
-	virtual void EndPlay();
 	virtual void Tick(float InDeltaTime);
+
+	virtual SLevel* GetLevel();
+	virtual SWorld* GetWorld();
 
 	AActor* GetOwner();
 
 	void SetActive(bool bActive);
+	void MarkOwner();
 	inline bool IsActive() { return _bActive; }
 	inline bool HasBegunPlay() { return _bHasBegunPlay; }
 
@@ -63,8 +64,12 @@ public:
 	void UnregisterComponent();
 	bool IsRegistered();
 
+	void DispatchBeginPlay();
+	void DispatchEndPlay();
+
 protected:
-	void MarkOwner();
+	virtual void BeginPlay();
+	virtual void EndPlay();
 
 protected:
 	virtual void RegisterAllTickFunctions(SLevel* InLevel, bool bRegister);

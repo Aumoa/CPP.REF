@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 
+class SLevel;
 class SWorld;
 
 /// <summary>
@@ -16,31 +17,16 @@ class GAME_API SGameObject : implements SObject
 	GENERATED_BODY(SGameObject)
 
 private:
-	mutable std::wstring _name;
+	std::wstring _Name;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="SGameObject"/> instance.
-	/// </summary>
-	/// <param name="name"> The object name. </param>
 	SGameObject();
 
-	/// <inheritdoc/>
 	virtual std::wstring ToString(std::wstring_view formatArgs) override;
-
-	/// <summary>
-	/// Set object name to represents this object.
-	/// </summary>
-	void SetName(std::wstring_view value) { _name = value; }
-
-	/// <summary>
-	/// Get object name to represents this object.
-	/// </summary>
+	void SetName(std::wstring_view InName);
 	std::wstring GetName();
 
-	/// <summary>
-	/// Get world that create this object.
-	/// </summary>
+	virtual SLevel* GetLevel();
 	virtual SWorld* GetWorld();
 
 public:

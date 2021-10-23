@@ -10,7 +10,7 @@
 interface IRHIDeviceContext;
 class SScene;
 
-class SCENERENDER_API SceneRenderer
+class GAME_API SceneRenderer
 {
 public:
 	SScene* const Scene;

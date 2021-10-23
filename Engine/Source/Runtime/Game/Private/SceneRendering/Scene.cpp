@@ -6,6 +6,9 @@
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHIBuffer.h"
 #include "RHI/IRHIDevice.h"
+#include "GameThreads/RenderThread.h"
+#include "Components/PrimitiveComponent.h"
+#include "Scene/PrimitiveSceneProxy.h"
 
 SScene::SScene(IRHIDevice* InDevice) : Super()
 	, _Device(InDevice)
@@ -16,72 +19,61 @@ SScene::~SScene()
 {
 }
 
-int64 SScene::AddPrimitive(const PrimitiveSceneInfo& InPrimitive)
+bool SScene::AddPrimitive(SPrimitiveComponent* InPrimitive)
 {
+	check(InPrimitive->SceneProxy == nullptr);
+
+	InPrimitive->SceneProxy = InPrimitive->CreateSceneProxy();
+	if (InPrimitive->SceneProxy == nullptr)
+	{
+		return false;
+	}
+
+	int64 Id;
 	if (_PrimitiveIds.empty())
 	{
-		int64 Id = (int64)_Primitives.size();
-		_Primitives.emplace_back(InPrimitive);
-		return Id;
+		Id = (int64)_PrimitiveComponents.size();
+		_PrimitiveComponents.emplace_back(InPrimitive);
 	}
 	else
 	{
-		int64 Id = _PrimitiveIds.front();
+		Id = _PrimitiveIds.front();
 		_PrimitiveIds.pop();
-		_Primitives[Id] = InPrimitive;
-		return Id;
+		_PrimitiveComponents[Id] = InPrimitive;
 	}
+
+	InPrimitive->SceneProxy->PrimitiveId = Id;
+	AddReferenceObject(InPrimitive);
+
+	RenderThread::EnqueueRenderThreadWork<"AddPrimitiveInfo">([&]()
+	{
+		AddSceneProxy_RenderThread(InPrimitive->SceneProxy);
+	});
+
+	return true;
 }
 
-bool SScene::RemovePrimitive(int64 InPrimitiveId)
+bool SScene::RemovePrimitive(SPrimitiveComponent* InPrimitive)
 {
-	if ((int64)_Primitives.size() > InPrimitiveId && _Primitives[InPrimitiveId].has_value())
+	if (InPrimitive->SceneProxy)
 	{
-		_Primitives[InPrimitiveId].reset();
-		_PrimitiveIds.push(InPrimitiveId);
+		int64 Id = InPrimitive->SceneProxy->PrimitiveId;
+		_PrimitiveIds.push(Id);
+		_PrimitiveComponents[Id] = nullptr;
+
+		// SceneProxy will delete in RemoveSceneProxy_RenderThread function.
+		InPrimitive->SceneProxy = nullptr;
+		RemoveReferenceObject(InPrimitive);
+
+		RenderThread::EnqueueRenderThreadWork<"RemovePrimitiveInfo">([&]()
+		{
+			RemoveSceneProxy_RenderThread(Id);
+		});
+
 		return true;
 	}
 
 	return false;
-}
-
-void SScene::UpdatePrimitive(int64 InPrimitiveId, const PrimitiveSceneInfo& InPrimitive)
-{
-	_Primitives[InPrimitiveId] = InPrimitive;
-}
-
-int64 SScene::AddLight(const LightSceneInfo& InLight)
-{
-	if (_LightIds.empty())
-	{
-		int64 Id = (int64)_Lights.size();
-		_Lights.emplace_back(InLight);
-		return Id;
-	}
-	else
-	{
-		int64 Id = _LightIds.front();
-		_LightIds.pop();
-		_Lights[Id] = InLight;
-		return Id;
-	}
-}
-
-bool SScene::RemoveLight(int64 InPrimitiveId)
-{
-	if ((int64)_Lights.size() > InPrimitiveId && _Lights[InPrimitiveId].has_value())
-	{
-		_Lights[InPrimitiveId].reset();
-		_LightIds.push(InPrimitiveId);
-		return true;
-	}
-
-	return false;
-}
-
-void SScene::UpdateLight(int64 InPrimitiveId, const LightSceneInfo& InLight)
-{
-	_Lights[InPrimitiveId] = InLight;
 }
 
 void SScene::BeginScene()
@@ -176,4 +168,26 @@ uint64 SScene::GetActualGPUVirtualAddress(const SceneStructuredBuffer& InBuffer)
 	{
 		return 0;
 	}
+}
+
+void SScene::AddSceneProxy_RenderThread(PrimitiveSceneProxy* InPrimitive)
+{
+	int64 Id = InPrimitive->PrimitiveId;
+	if (Primitives.size() <= (size_t)Id)
+	{
+		Primitives.resize(Id + 1);
+	}
+
+	Primitives[Id] = InPrimitive;
+}
+
+void SScene::RemoveSceneProxy_RenderThread(int64 InPrimitiveId)
+{
+	delete Primitives[InPrimitiveId];
+	Primitives[InPrimitiveId] = nullptr;
+}
+
+const std::vector<PrimitiveSceneProxy*>& SScene::GetPrimitives_RenderThread()
+{
+	return Primitives;
 }

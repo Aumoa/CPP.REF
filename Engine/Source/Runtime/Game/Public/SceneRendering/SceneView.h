@@ -9,7 +9,7 @@ interface IRHIDeviceContext;
 class SScene;
 struct SceneViewScope;
 
-class SCENERENDER_API SceneView
+class GAME_API SceneView
 {
 	SScene* _MyScene = nullptr;
 	size_t _CurrentViewSize = 0;

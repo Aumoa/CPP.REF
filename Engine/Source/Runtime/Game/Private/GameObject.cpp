@@ -14,32 +14,28 @@ std::wstring SGameObject::ToString(std::wstring_view formatArgs)
 	return GetName();
 }
 
+void SGameObject::SetName(std::wstring_view InName)
+{
+	_Name = InName;
+}
+
 std::wstring SGameObject::GetName()
 {
-	if (_name.length() == 0)
-	{
-		_name = StringUtils::AsUnicode(typeid(*this).name());
-	}
-	return _name;
+	return _Name;
+}
+
+SLevel* SGameObject::GetLevel()
+{
+	return Cast<SLevel>(GetOuter());
 }
 
 SWorld* SGameObject::GetWorld()
 {
-	if (_WorldPrivate == nullptr)
+	if (SLevel* Level = GetLevel())
 	{
-		if (auto* IsLevel = Cast<SLevel>(GetOuter()); IsLevel != nullptr)
-		{
-			_WorldPrivate = IsLevel->GetWorld();
-		}
-
-		else if (auto* IsGameObject = Cast<SGameObject>(GetOuter()); IsGameObject != nullptr)
-		{
-			// Do NOT cache world when world is derived from outer chain that is game object.
-			return IsGameObject->GetWorld();
-		}
+		return Level->GetWorld();
 	}
-
-	return _WorldPrivate;
+	return nullptr;
 }
 
 SObject* SGameObject::LoadObject(const std::filesystem::path& assetPath)

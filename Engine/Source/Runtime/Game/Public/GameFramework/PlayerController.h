@@ -34,6 +34,7 @@ public:
 	void UpdateCameraManager(float elapsedTime);
 	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY);
 	SLocalPlayer* GetLocalPlayer();
+	APlayerCameraManager* GetPlayerCameraManager();
 
 public:
 	virtual void PostInitializedComponents() override;

@@ -38,18 +38,26 @@ void SActorComponent::TickComponent(float InDeltaTime, SComponentTickFunction* I
 	}
 }
 
-void SActorComponent::BeginPlay()
-{
-	_bHasBegunPlay = true;
-}
-
-void SActorComponent::EndPlay()
-{
-	_bHasBegunPlay = false;
-}
-
 void SActorComponent::Tick(float InDeltaTime)
 {
+}
+
+SLevel* SActorComponent::GetLevel()
+{
+	if (AActor* Actor = GetOwner())
+	{
+		return Actor->GetLevel();
+	}
+	return nullptr;
+}
+
+SWorld* SActorComponent::GetWorld()
+{
+	if (AActor* Actor = GetOwner())
+	{
+		return Actor->GetWorld();
+	}
+	return nullptr;
 }
 
 AActor* SActorComponent::GetOwner()
@@ -74,6 +82,23 @@ void SActorComponent::SetActive(bool bActive)
 	}
 }
 
+void SActorComponent::MarkOwner()
+{
+	SObject* Outer = GetOuter();
+	if (auto* IsActor = Cast<AActor>(Outer); IsActor)
+	{
+		_OwnerPrivate = IsActor;
+	}
+	else if (auto* IsComponent = Cast<SActorComponent>(Outer); IsComponent)
+	{
+		_OwnerPrivate = IsComponent->GetOwner();
+	}
+	else
+	{
+		_OwnerPrivate = nullptr;
+	}
+}
+
 void SActorComponent::RegisterComponent()
 {
 	MarkOwner();
@@ -94,6 +119,12 @@ void SActorComponent::RegisterComponentWithWorld(SWorld* InWorld)
 	{
 		SLevel* Level = InWorld->GetLevel();
 		RegisterAllTickFunctions(Level, true);
+
+		AActor* MyOwner = GetOwner();
+		if (MyOwner->HasBegunPlay())
+		{
+			DispatchBeginPlay();
+		}
 	}
 
 	_bRegistered = true;
@@ -101,6 +132,8 @@ void SActorComponent::RegisterComponentWithWorld(SWorld* InWorld)
 
 void SActorComponent::UnregisterComponent()
 {
+	DispatchEndPlay();
+
 	if (_bRegistered)
 	{
 		SWorld* World = GetWorld();
@@ -116,21 +149,30 @@ bool SActorComponent::IsRegistered()
 	return _bRegistered;
 }
 
-void SActorComponent::MarkOwner()
+void SActorComponent::DispatchBeginPlay()
 {
-	SObject* Outer = GetOuter();
-	if (auto* IsActor = Cast<AActor>(Outer); IsActor)
+	if (!HasBegunPlay())
 	{
-		_OwnerPrivate = IsActor;
+		BeginPlay();
 	}
-	else if (auto* IsComponent = Cast<SActorComponent>(Outer); IsComponent)
+}
+
+void SActorComponent::DispatchEndPlay()
+{
+	if (HasBegunPlay())
 	{
-		_OwnerPrivate = IsComponent->GetOwner();
+		EndPlay();
 	}
-	else
-	{
-		_OwnerPrivate = nullptr;
-	}
+}
+
+void SActorComponent::BeginPlay()
+{
+	_bHasBegunPlay = true;
+}
+
+void SActorComponent::EndPlay()
+{
+	_bHasBegunPlay = false;
 }
 
 void SActorComponent::RegisterAllTickFunctions(SLevel* InLevel, bool bRegister)

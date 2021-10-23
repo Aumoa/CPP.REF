@@ -2,6 +2,8 @@
 
 #include "ObjectCollection.h"
 
+std::vector<std::shared_ptr<SObject>> ObjectCollection::MarkRemoved;
+
 void ObjectCollection::AddMarkedObject(SObject* InObject)
 {
 	MarkRemoved.emplace_back(InObject->shared_from_this());

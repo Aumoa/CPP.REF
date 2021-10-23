@@ -38,8 +38,9 @@ public:
 
 	virtual SWorld* GetWorld() override;
 	EWorldType GetWorldType();
+	SScene* GetScene();
 
-	AActor* SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental = false);
+	AActor* SpawnActor(SubclassOf<AActor> InActorClass);
 	void DestroyActor(AActor* InActor);
 
 	SLevel* OpenLevel(SubclassOf<SLevel> InLevelToOpen);

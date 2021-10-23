@@ -3,8 +3,8 @@
 #include "SceneRendering/SceneView.h"
 #include "SceneRendering/SceneViewScope.h"
 #include "SceneRendering/Scene.h"
-#include "SceneRendering/PrimitiveSceneInfo.h"
 #include "RHI/IRHIDevice.h"
+#include "Scene/PrimitiveSceneProxy.h"
 
 SceneView::SceneView(SScene* InScene) : _MyScene(InScene)
 {
@@ -12,7 +12,7 @@ SceneView::SceneView(SScene* InScene) : _MyScene(InScene)
 
 void SceneView::InitViews(const SceneViewScope& InViewScope)
 {
-	const auto& Primitives = _MyScene->GetPrimitives();
+	const std::vector<PrimitiveSceneProxy*>& Primitives = _MyScene->GetPrimitives_RenderThread();
 
 	// Cleanup views.
 	_Views.resize(0);
@@ -24,9 +24,9 @@ void SceneView::InitViews(const SceneViewScope& InViewScope)
 	for (size_t i = 0; i < Primitives.size(); ++i)
 	{
 		const int64 PrimitiveId = (int64)i;
-		const std::optional<PrimitiveSceneInfo>& PrimitiveInfo = Primitives[i];
+		PrimitiveSceneProxy* const& PrimitiveInfo = Primitives[i];
 
-		if (PrimitiveInfo.has_value() && PrimitiveInfo->bHiddenInGame)
+		if (PrimitiveInfo && PrimitiveInfo->bHiddenInGame)
 		{
 			Matrix4x4 World = PrimitiveInfo->ComponentTransform.GetMatrix();
 			Matrix4x4 WorldViewProj = Matrix4x4::Multiply(World, ViewProj);

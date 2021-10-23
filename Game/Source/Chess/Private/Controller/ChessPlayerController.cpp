@@ -15,6 +15,8 @@ AChessPlayerController::AChessPlayerController() : Super()
 {
 	_systems.emplace_back(_indicatingComponent = NewObject<IndicatingComponent>());
 	_systems.emplace_back(_commandComponent = NewObject<CommandComponent>());
+	AddOwnedComponent(_indicatingComponent);
+	AddOwnedComponent(_commandComponent);
 }
 
 void AChessPlayerController::BeginPlay()

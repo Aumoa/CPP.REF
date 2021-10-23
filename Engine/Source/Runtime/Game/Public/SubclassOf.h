@@ -4,10 +4,6 @@
 
 #include "CoreMinimal.h"
 
-/// <summary>
-/// Represents subclass of base type.
-/// </summary>
-/// <typeparam name="TBase"> The base class. </typeparam>
 template<class TBase>
 class SubclassOf
 {
@@ -17,23 +13,14 @@ class SubclassOf
 	const Type* _Type = nullptr;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="SubclassOf"/> instance.
-	/// </summary>
 	inline SubclassOf()
 	{
 	}
 
-	/// <summary>
-	/// Initialize new <see cref="SubclassOf"/> instance.
-	/// </summary>
 	inline SubclassOf(const SubclassOf& rhs) : _Type(rhs._Type)
 	{
 	}
 
-	/// <summary>
-	/// Initialize new <see cref="SubclassOf"/> instance.
-	/// </summary>
 	template<std::derived_from<TBase> TOther>
 	inline SubclassOf(const SubclassOf<TOther>& rhs) : _Type(rhs._Type)
 	{
@@ -47,17 +34,11 @@ public:
 		}
 	}
 
-	/// <summary>
-	/// Get identifier hash code.
-	/// </summary>
 	inline size_t GetHashCode() const
 	{
 		return _Type ? _Type->GetHashCode() : 0;
 	}
 
-	/// <summary>
-	/// Represents this is valid state.
-	/// </summary>
 	inline bool IsValid() const
 	{
 		return _Type != nullptr;
@@ -68,17 +49,13 @@ public:
 		return _Type;
 	}
 
-	/// <summary>
-	/// Instantiate saved class as base class.
-	/// </summary>
-	/// <param name="outer"> Outer object of instance. </param>
-	inline TBase* Instantiate(SObject* outer) const
+	inline TBase* Instantiate(SObject* InOuter) const
 	{
 		if (!IsValid())
 		{
 			return nullptr;
 		}
-		return dynamic_cast<TBase*>(_Type->Instantiate());
+		return dynamic_cast<TBase*>(_Type->Instantiate(InOuter));
 	}
 
 	inline SubclassOf& operator =(const SubclassOf& rhs)

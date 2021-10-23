@@ -22,7 +22,7 @@ bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick
 
 	_World = InWorld;
 
-	_GameMode = InWorld->SpawnActor(GameModeClass);
+	_GameMode = Cast<AGameMode>(SpawnActor(GameModeClass));
 	_PlayerController = _GameMode->SpawnPlayerController();
 
 	_LevelTick = InParentLevelTick;
@@ -37,6 +37,44 @@ bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick
 void SLevel::UnloadLevel()
 {
 	IncrementalActorsApply(0);
+
+	for (auto Actor : Actors)
+	{
+		InternalRemoveActor(Actor);
+	}
+	Actors.clear();
+}
+
+AActor* SLevel::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental)
+{
+	if (!InActorClass.IsValid())
+	{
+		SE_LOG(LogWorld, Error, L"Actor class does not specified. Abort.");
+		return nullptr;
+	}
+
+	AActor* Actor = InActorClass.Instantiate(this);
+	if (Actor == nullptr)
+	{
+		SE_LOG(LogWorld, Error, L"Actor class does not support instantiate without any constructor arguments.");
+		return nullptr;
+	}
+
+	if (bSpawnIncremental)
+	{
+		ActorsToAdd.emplace_back(Actor);
+	}
+	else
+	{
+		InternalAddActor(Actor);
+	}
+
+	return Actor;
+}
+
+void SLevel::DestroyActor(AActor* InActor)
+{
+	ActorsToRemove.emplace_back(InActor);
 }
 
 void SLevel::IncrementalActorsApply(size_t InLimit)
@@ -59,7 +97,7 @@ void SLevel::IncrementalActorsApply(size_t InLimit)
 	for (auto It = ActorsToAdd.begin(); InLimit-- && It != ActorsToAdd.end(); ++It)
 	{
 		InternalAddActor(*It);
-		std::swap(*It, *EndIt--);
+		std::swap(*It, *--EndIt);
 	}
 	ActorsToAdd.erase(EndIt, ActorsToAdd.end());
 }
@@ -79,14 +117,61 @@ STickTaskLevelManager* SLevel::GetLevelTick()
 	return _LevelTick;
 }
 
-void SLevel::InternalRemoveActor(AActor* InActor)
+void SLevel::InternalRemoveActor(AActor* InActor, bool bRemoveFromArray)
 {
-	// Unregister Actor!!
-	check(false);
+	InActor->DispatchEndPlay();
+
+	for (auto SceneComponent : InActor->GetSceneComponents())
+	{
+		if (SceneComponent->IsRegistered())
+		{
+			SceneComponent->UnregisterComponent();
+		}
+	}
+
+	for (auto ActorComponent : InActor->GetOwnedComponents())
+	{
+		if (ActorComponent->IsRegistered())
+		{
+			ActorComponent->UnregisterComponent();
+		}
+	}
+
+	if (InActor->PrimaryActorTick.IsTickFunctionRegistered())
+	{
+		_LevelTick->RemoveTickFunction(&InActor->PrimaryActorTick);
+	}
+
+	if (bRemoveFromArray)
+	{
+		auto It = std::find(Actors.begin(), Actors.end(), InActor);
+		Actors.erase(It);
+	}
 }
 
 void SLevel::InternalAddActor(AActor* InActor)
 {
-	// Register Actor!!
-	check(false);
+	if (InActor->PrimaryActorTick.bCanEverTick)
+	{
+		_LevelTick->AddTickFunction(&InActor->PrimaryActorTick);
+	}
+
+	for (auto ActorComponent : InActor->GetOwnedComponents())
+	{
+		if (!ActorComponent->IsRegistered())
+		{
+			ActorComponent->RegisterComponentWithWorld(GetWorld());
+		}
+	}
+
+	for (auto SceneComponent : InActor->GetSceneComponents())
+	{
+		if (!SceneComponent->IsRegistered())
+		{
+			SceneComponent->RegisterComponentWithWorld(GetWorld());
+		}
+	}
+
+	InActor->PostInitializedComponents();
+	InActor->DispatchBeginPlay();
 }

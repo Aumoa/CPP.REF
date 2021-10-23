@@ -53,8 +53,6 @@ void SGameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
 
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
 	frameworkView->Idle.AddSObject(this, &SGameEngine::TickEngine);
-
-	frameworkView->SetFrameworkTitle(_GameInstance->GetApplicationName());
 }
 
 bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
@@ -103,16 +101,17 @@ int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view 
 		return -1;
 	}
 
+	// Setup framework view.
+	SetupFrameworkView(frameworkView);
+
 	// Load game module.
 	if (!LoadGameModule(gameModule))
 	{
 		return -1;
 	}
 
-	// Setup framework view.
-	SetupFrameworkView(frameworkView);
-
 	// Start application now!
+	frameworkView->SetFrameworkTitle(_GameInstance->GetApplicationName());
 	_GameInstance->Init();
 	frameworkView->Start();
 

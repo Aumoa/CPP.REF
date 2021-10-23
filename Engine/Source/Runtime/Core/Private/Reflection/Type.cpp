@@ -20,11 +20,11 @@ Type* Type::GetSuper() const
 	return _superClass;
 }
 
-SObject* Type::Instantiate() const
+SObject* Type::Instantiate(SObject* InOuter) const
 {
 	if (_ctor)
 	{
-		return _ctor();
+		return _ctor(InOuter);
 	}
 	else
 	{

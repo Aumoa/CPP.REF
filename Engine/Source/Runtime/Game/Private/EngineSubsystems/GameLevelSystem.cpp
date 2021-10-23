@@ -18,6 +18,7 @@ SGameLevelSystem::~SGameLevelSystem()
 void SGameLevelSystem::Init()
 {
 	Super::Init();
+	SpawnWorld(EWorldType::GameWorld);
 }
 
 void SGameLevelSystem::Deinit()
@@ -58,5 +59,5 @@ SWorld* SGameLevelSystem::GetGameWorld() const
 
 bool SGameLevelSystem::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 {
-	_GameWorld->OpenLevel(InLevelToOpen);
+	return _GameWorld->OpenLevel(InLevelToOpen) != nullptr;
 }

@@ -10,16 +10,16 @@ GameLevel::GameLevel() : Super()
 	GameModeClass = AChessGameMode::StaticClass();
 }
 
-bool GameLevel::LoadLevel(SWorld* world)
+bool GameLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick)
 {
-	if (!Super::LoadLevel(world))
+	if (!Super::LoadLevel(InWorld))
 	{
 		return false;
 	}
 
-	_psBoard = world->SpawnActor<AChessBoard>();
+	_psBoard = Cast<AChessBoard>(SpawnActor(AChessBoard::StaticClass(), true));
 	_psBoard->SetActorLocation(Vector3(3.5f, 0, 3.5f));
-	_psBoard->InitBoard(world);
+	_psBoard->InitBoard(InWorld);
 
 	return true;
 }

@@ -12,18 +12,13 @@ SGamePlayerSystem::~SGamePlayerSystem()
 {
 }
 
-void SGamePlayerSystem::Tick(std::chrono::duration<float> elapsedTime)
-{
-	_localPlayer->Tick(elapsedTime);
-}
-
 void SGamePlayerSystem::SpawnLocalPlayer(IFrameworkView* frameworkView)
 {
-	_localPlayer = NewObject<SLocalPlayer>();
-	_localPlayer->Init(frameworkView);
+	_LocalPlayer = NewObject<SLocalPlayer>();
+	_LocalPlayer->Init(frameworkView);
 }
 
 SLocalPlayer* SGamePlayerSystem::GetLocalPlayer() const
 {
-	return _localPlayer;
+	return _LocalPlayer;
 }

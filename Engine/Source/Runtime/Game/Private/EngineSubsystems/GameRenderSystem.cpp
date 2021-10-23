@@ -2,7 +2,6 @@
 
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "EngineSubsystems/GamePlayerSystem.h"
-#include "EngineSubsystems/GameLevelSystem.h"
 #include "LogGame.h"
 #include "IFrameworkView.h"
 #include "GameEngine.h"
@@ -11,6 +10,7 @@
 #include "Shaders/TransparentShader/TransparentShader.h"
 #include "Shaders/SlateShader/SlateShader.h"
 #include "GameFramework/LocalPlayer.h"
+#include "GameFramework/PlayerController.h"
 #include "RHI/IRHIFactory.h"
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHISwapChain.h"
@@ -78,67 +78,41 @@ void SGameRenderSystem::Deinit()
 
 void SGameRenderSystem::ExecuteRenderThread()
 {
-	SGameLevelSystem* LevelSys = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-	SWorld* GameWorld = LevelSys->GetGameWorld();
+	SGamePlayerSystem* PlayerSystem = GEngine->GetEngineSubsystem<SGamePlayerSystem>();
+	SLocalPlayer* LocalPlayer = PlayerSystem->GetLocalPlayer();
 
-	std::vector<PrimitiveSceneProxy*> SceneProxiesToUpdate, SceneProxiesToRegister, SceneProxiesToUnregister;
-	if (GameWorld)
+	std::optional<MinimalViewInfo> MinimalPlayerView;
+	if (APlayerController* PlayerController = LocalPlayer->GetPlayerController(); PlayerController != nullptr)
 	{
-		GameWorld->GetPendingSceneProxies(SceneProxiesToUpdate, SceneProxiesToRegister, SceneProxiesToUnregister);
+		if (APlayerCameraManager* CameraManager = PlayerController->GetPlayerCameraManager(); CameraManager)
+		{
+			MinimalPlayerView.emplace(CameraManager->GetCachedCameraView());
+		}
 	}
 
-#define MoveCapture(Name) Name = std::move(Name)
-
 	RenderThread::WaitForLastWorks();
-	RenderThread::ExecuteWorks([this, MoveCapture(SceneProxiesToUpdate), MoveCapture(SceneProxiesToRegister), MoveCapture(SceneProxiesToUnregister)]()
-
-#undef MoveCapture
+	RenderThread::ExecuteWorks([this, MinimalPlayerView = std::move(MinimalPlayerView)]()
 	{
-		for (auto& SceneProxy : SceneProxiesToUpdate)
-		{
-			_Scene->UpdatePrimitive(SceneProxy->PrimitiveId, SceneProxy->ComposeSceneInfo());
-		}
-
-		for (auto& SceneProxy : SceneProxiesToRegister)
-		{
-			int64 Id = _Scene->AddPrimitive(SceneProxy->ComposeSceneInfo());
-			SceneProxy->PrimitiveId = Id;
-		}
-
-		for (auto& SceneProxy : SceneProxiesToUnregister)
-		{
-			_Scene->RemovePrimitive(SceneProxy->PrimitiveId);
-			delete SceneProxy;
-		}
-
 		int32 SwapChainIndex = _frameworkViewChain->GetCurrentBackBufferIndex();
 		SceneRenderTarget RenderTarget(_rtv, SwapChainIndex, _dsv, 0, ERHIResourceStates::Present);
 
-		// TODO: DO NOT REFERENCE GAME WORLD IN RENDER THREAD!
-		SGameLevelSystem* LevelSystem = GEngine->GetEngineSubsystem<SGameLevelSystem>();
-		SWorld* GameWorld = LevelSystem->GetGameWorld();
-		APlayerCameraManager* PlayerCamera = GameWorld->GetPlayerCamera();
-		MinimalViewInfo LocalPlayerView = PlayerCamera->GetCachedCameraView();
-
-		if (LocalPlayerView.AspectRatio == 0)
-		{
-			// Set it to the aspect ratio of default viewport.
-			LocalPlayerView.AspectRatio = RenderTarget.Viewport.Width / RenderTarget.Viewport.Height;
-		}
-
 		_Scene->BeginScene();
 		{
-			SceneViewScope PrimarySceneView;
-			PrimarySceneView.InitFromCameraView(
-				LocalPlayerView.Location,
-				LocalPlayerView.Rotation,
-				LocalPlayerView.FOVAngle.ToRadians(),
-				LocalPlayerView.AspectRatio,
-				LocalPlayerView.NearPlane,
-				LocalPlayerView.FarPlane);
-
 			SceneRenderer Renderer(_Scene);
-			Renderer.InitViews(std::span(&PrimarySceneView, 1));
+
+			if (MinimalPlayerView.has_value())
+			{
+				SceneViewScope PrimarySceneView;
+				PrimarySceneView.InitFromCameraView(
+					MinimalPlayerView->Location,
+					MinimalPlayerView->Rotation,
+					MinimalPlayerView->FOVAngle.ToRadians(),
+					MinimalPlayerView->AspectRatio,
+					MinimalPlayerView->NearPlane,
+					MinimalPlayerView->FarPlane);
+
+				Renderer.InitViews(std::span(&PrimarySceneView, 1));
+			}
 
 			// BEGIN OF FRAME.
 			_device->BeginFrame();

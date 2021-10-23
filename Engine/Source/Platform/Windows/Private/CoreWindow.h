@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameMinimal.h"
+#include "CoreMinimal.h"
 #include "IFrameworkView.h"
 #include <Windows.h>
 

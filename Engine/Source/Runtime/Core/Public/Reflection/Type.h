@@ -16,7 +16,7 @@ class Property;
 
 class CORE_API Type
 {
-	using ObjectCtor = SObject*(*)();
+	using ObjectCtor = SObject*(*)(SObject* InOuter);
 	Type() = delete;
 	Type(const Type&) = delete;
 
@@ -106,7 +106,7 @@ public:
 	size_t GetHashCode() const;
 
 	Type* GetSuper() const;
-	SObject* Instantiate() const;
+	SObject* Instantiate(SObject* InOuter) const;
 	inline bool IsNativeType() const { return _bNative; }
 
 	bool IsDerivedFrom(const Type* type) const;
@@ -142,9 +142,9 @@ private:
 	template<std::derived_from<SObject> TType> requires std::constructible_from<TType>
 	static ObjectCtor GetConstructorFunctionBody(int32)
 	{
-		return +[]() -> SObject*
+		return +[](SObject* InOuter) -> SObject*
 		{
-			return new TType();
+			return InOuter->template NewObject<TType>();
 		};
 	}
 

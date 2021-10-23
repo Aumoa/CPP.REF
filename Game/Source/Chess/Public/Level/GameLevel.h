@@ -18,7 +18,7 @@ private:
 public:
 	GameLevel();
 
-	virtual bool LoadLevel(SWorld* world) override;
+	virtual bool LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick = nullptr) override;
 
 	inline AChessBoard* GetPersistentChessBoard() const { return _psBoard; }
 };

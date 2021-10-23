@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "Level/World.h"
 #include "GameFramework/LocalPlayer.h"
+#include "EngineSubsystems/GamePlayerSystem.h"
 
 APlayerController::APlayerController() : Super()
 	, PlayerCameraManagerClass(APlayerCameraManager::StaticClass())
@@ -93,8 +94,13 @@ Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 
 SLocalPlayer* APlayerController::GetLocalPlayer()
 {
-	auto LocalPlayer = Cast<SLocalPlayer>(GetOuter());
-	return LocalPlayer;
+	auto* System = GEngine->GetEngineSubsystem<SGamePlayerSystem>();
+	return System->GetLocalPlayer();
+}
+
+APlayerCameraManager* APlayerController::GetPlayerCameraManager()
+{
+	return _PlayerCameraManager;
 }
 
 void APlayerController::PostInitializedComponents()

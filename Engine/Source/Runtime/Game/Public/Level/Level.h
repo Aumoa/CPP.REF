@@ -44,12 +44,14 @@ public:
 	virtual bool LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick = nullptr);
 	virtual void UnloadLevel();
 
+	AActor* SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental = true);
+	void DestroyActor(AActor* InActor);
 	void IncrementalActorsApply(size_t InLimit = 10);
 
 	APlayerController* GetPlayerController();
 	SWorld* GetWorld();
 	STickTaskLevelManager* GetLevelTick();
 
-	void InternalRemoveActor(AActor* InActor);
+	void InternalRemoveActor(AActor* InActor, bool bRemoveFromArray = false);
 	void InternalAddActor(AActor* InActor);
 };

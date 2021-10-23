@@ -4,33 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Player.h"
+#include "SubclassOf.h"
 
-interface IRHIDeviceContext;
-class SGameEngine;
-class SSlateApplication;
-class SSlateShader;
-class SSlateWindowElementList;
-struct IFrameworkView;
+interface IFrameworkView;
+class APlayerController;
 
 class GAME_API SLocalPlayer : public SPlayer
 {
 	GENERATED_BODY(SLocalPlayer)
 
 private:
-	IFrameworkView* _frameworkView = nullptr;
-	SSlateApplication* _slateWindow = nullptr;
-	SSlateWindowElementList* _drawElements = nullptr;
+	APlayerController* _PlayerController = nullptr;
+	IFrameworkView* _FrameworkView = nullptr;
 
 public:
 	SLocalPlayer();
 
-	void Init(IFrameworkView* frameworkView);
-	void Tick(std::chrono::duration<float> elapsedTime);
-	void Render(IRHIDeviceContext* deviceContext, SSlateShader* shader);
+	void Init(IFrameworkView* InFrameworkView);
+	IFrameworkView* GetFrameworkView();
 
-	inline IFrameworkView* GetFrameworkView() const { return _frameworkView; }
-	inline SSlateApplication* GetSlateWindow() const { return _slateWindow; }
-
-private:
-	void OnResizedApp(int32 x, int32 y);
+	void SetPlayerController(APlayerController* InController);
+	APlayerController* GetPlayerController();
 };

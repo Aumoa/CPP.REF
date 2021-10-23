@@ -79,6 +79,42 @@ void AActor::PostInitializedComponents()
 {
 }
 
+void AActor::DispatchBeginPlay()
+{
+	if (!HasBegunPlay())
+	{
+		BeginPlay();
+	}
+
+	for (auto ActorComponent : _Components)
+	{
+		ActorComponent->DispatchBeginPlay();
+	}
+
+	for (auto SceneComponent : GetSceneComponents())
+	{
+		SceneComponent->DispatchBeginPlay();
+	}
+}
+
+void AActor::DispatchEndPlay()
+{
+	for (auto SceneComponent : GetSceneComponents())
+	{
+		SceneComponent->DispatchEndPlay();
+	}
+
+	for (auto ActorComponent : _Components)
+	{
+		ActorComponent->DispatchEndPlay();
+	}
+
+	if (HasBegunPlay())
+	{
+		EndPlay();
+	}
+}
+
 void AActor::AddOwnedComponent(SActorComponent* InComponent)
 {
 	if (InComponent->GetType()->IsDerivedFrom<SSceneComponent>())
@@ -88,6 +124,8 @@ void AActor::AddOwnedComponent(SActorComponent* InComponent)
 	}
 
 	_Components.emplace(InComponent);
+	InComponent->SetOuter(this);
+	InComponent->MarkOwner();
 }
 
 const std::set<SActorComponent*>& AActor::GetOwnedComponents()
@@ -148,6 +186,7 @@ std::shared_ptr<SSceneComponent> AActor::SetRootComponent(SSceneComponent* InRoo
 
 	_RootComponent = InRootComponent;
 	_RootComponent->SetOuter(this);
+	_RootComponent->MarkOwner();
 
 	if (AttachParent)
 	{

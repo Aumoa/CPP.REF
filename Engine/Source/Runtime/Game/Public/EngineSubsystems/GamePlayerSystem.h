@@ -13,13 +13,11 @@ class GAME_API SGamePlayerSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGamePlayerSystem);
 
 private:
-	SLocalPlayer* _localPlayer = nullptr;
+	SLocalPlayer* _LocalPlayer = nullptr;
 
 public:
 	SGamePlayerSystem();
 	virtual ~SGamePlayerSystem() override;
-
-	virtual void Tick(std::chrono::duration<float> elapsedTime) override;
 
 	void SpawnLocalPlayer(IFrameworkView* frameworkView);
 	SLocalPlayer* GetLocalPlayer() const;

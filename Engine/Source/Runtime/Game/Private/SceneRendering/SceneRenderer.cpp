@@ -3,9 +3,11 @@
 #include "SceneRendering/SceneRenderer.h"
 #include "SceneRendering/SceneView.h"
 #include "SceneRendering/Scene.h"
+#include "SceneRendering/MeshBatch.h"
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHITexture2D.h"
 #include "Materials/MaterialInterface.h"
+#include "Scene/PrimitiveSceneProxy.h"
 
 SceneRenderer::SceneRenderer(SScene* InScene) : Scene(InScene)
 {
@@ -45,7 +47,7 @@ void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context, const Scene
 	Context->RSSetViewport(InRenderTarget.Viewport);
 	Context->RSSetScissorRect(InRenderTarget.ScissorRect);
 
-	const std::vector<std::optional<PrimitiveSceneInfo>>& Primitives = Scene->GetPrimitives();
+	const std::vector<PrimitiveSceneProxy*>& Primitives = Scene->GetPrimitives_RenderThread();
 
 	// Render for each views.
 	for (auto& View : Views)
@@ -56,7 +58,7 @@ void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context, const Scene
 		for (size_t i = 0; i < View.ViewIndexes.size(); ++i)
 		{
 			SceneView::PrimitiveViewInfo& ViewInfo = View.ViewIndexes[i];
-			const PrimitiveSceneInfo& PrimitiveInfo = *Primitives[ViewInfo.PrimitiveId];
+			const PrimitiveSceneProxy& PrimitiveInfo = *Primitives[ViewInfo.PrimitiveId];
 
 			Context->SetGraphicsRootShaderResourceView(0, BaseVirtualAddress);
 

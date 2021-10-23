@@ -9,5 +9,5 @@ SStaticMesh::SStaticMesh(const std::filesystem::path& path, std::wstring_view na
 	, _name(name)
 	, _renderData(renderData)
 {
-	_renderData->SetOuter(this);
+	//_renderData->SetOuter(this);
 }

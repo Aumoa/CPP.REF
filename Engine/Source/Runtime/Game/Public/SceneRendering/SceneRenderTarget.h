@@ -9,7 +9,7 @@ interface IRHITexture2D;
 interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
 
-class SCENERENDER_API SceneRenderTarget
+class GAME_API SceneRenderTarget
 {
 public:
 	SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState);

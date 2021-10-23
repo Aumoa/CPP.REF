@@ -11,6 +11,8 @@
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "Ticking/TickTaskLevelManager.h"
 
+DEFINE_LOG_CATEGORY(LogWorld);
+
 SWorld::SWorld(EWorldType InWorldType) : Super()
 	, _WorldType(InWorldType)
 {
@@ -40,6 +42,11 @@ EWorldType SWorld::GetWorldType()
 	return _WorldType;
 }
 
+SScene* SWorld::GetScene()
+{
+	return _Scene;
+}
+
 SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 {
 	if (!InLevelToOpen.IsValid())
@@ -54,16 +61,15 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 		DestroyObject(_Level);
 	}
 
-	SLevel* LevelInstance = InLevelToOpen.Instantiate(this);
-	if (!LevelInstance->LoadLevel(this))
+	_Level = InLevelToOpen.Instantiate(this);
+	if (!_Level->LoadLevel(this))
 	{
 		SE_LOG(LogWorld, Fatal, L"Could not load level.");
-		DestroyObject(LevelInstance);
+		DestroyObject(_Level);
 		return nullptr;
 	}
 
-	_Level = LevelInstance;
-	return LevelInstance;
+	return _Level;
 }
 
 SLevel* SWorld::GetLevel()
@@ -71,36 +77,14 @@ SLevel* SWorld::GetLevel()
 	return _Level;
 }
 
-AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncremental)
+AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
 {
-	if (!InActorClass.IsValid())
-	{
-		SE_LOG(LogWorld, Error, L"Actor class does not specified. Abort.");
-		return nullptr;
-	}
-
-	AActor* Actor = InActorClass.Instantiate(_Level);
-	if (Actor == nullptr)
-	{
-		SE_LOG(LogWorld, Error, L"Actor class does not support instantiate without any constructor arguments.");
-		return nullptr;
-	}
-
-	if (bSpawnIncremental)
-	{
-		_Level->ActorsToAdd.emplace_back(Actor);
-	}
-	else
-	{
-		_Level->InternalAddActor(Actor);
-	}
-
-	return Actor;
+	return _Level->SpawnActor(InActorClass, false);
 }
 
 void SWorld::DestroyActor(AActor* InActor)
 {
-	_Level->ActorsToRemove.emplace_back(InActor);
+	_Level->DestroyActor(InActor);
 }
 
 void SWorld::LevelTick(float InDeltaTime)
