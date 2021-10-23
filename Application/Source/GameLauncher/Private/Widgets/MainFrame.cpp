@@ -35,7 +35,7 @@ void SMainFrame::ReleaseSlateResources()
 {
 	if (_content)
 	{
-		DestroySubobject(_content);
+		DestroyObject(_content);
 		_content = nullptr;
 	}
 }

@@ -25,7 +25,7 @@ void SWorld::DestroyWorld()
 {
 	if (_Scene)
 	{
-		DestroySubobject(_Scene);
+		DestroyObject(_Scene);
 		_Scene = nullptr;
 	}
 }
@@ -51,14 +51,14 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 	if (_Level)
 	{
 		_Level->UnloadLevel();
-		DestroySubobject(_Level);
+		DestroyObject(_Level);
 	}
 
 	SLevel* LevelInstance = InLevelToOpen.Instantiate(this);
 	if (!LevelInstance->LoadLevel(this))
 	{
 		SE_LOG(LogWorld, Fatal, L"Could not load level.");
-		DestroySubobject(LevelInstance);
+		DestroyObject(LevelInstance);
 		return nullptr;
 	}
 

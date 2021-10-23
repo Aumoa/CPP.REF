@@ -71,7 +71,7 @@ void SGameRenderSystem::Deinit()
 
 	if (_device)
 	{
-		DestroySubobject(_device);
+		DestroyObject(_device);
 		_device = nullptr;
 	}
 }
@@ -196,7 +196,7 @@ void SGameRenderSystem::ResizeApp(int32 width, int32 height)
 			// Resize depth stencil buffer.
 			if (_depthBuffer != nullptr)
 			{
-				DestroySubobject(_depthBuffer);
+				DestroyObject(_depthBuffer);
 			}
 
 			RHITexture2DClearValue clearValue =

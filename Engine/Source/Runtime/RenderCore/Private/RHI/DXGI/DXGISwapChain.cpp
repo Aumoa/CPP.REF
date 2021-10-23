@@ -19,7 +19,7 @@ void SDXGISwapChain::ResizeBuffers(int32 width, int32 height)
 	{
 		if (_buffers[i])
 		{
-			DestroySubobject(_buffers[i]);
+			DestroyObject(_buffers[i]);
 			_buffers[i] = nullptr;
 		}
 	}

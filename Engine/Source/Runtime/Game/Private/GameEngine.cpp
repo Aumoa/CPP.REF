@@ -31,7 +31,7 @@ SGameEngine::~SGameEngine()
 		// for remove module system at last of destructor.
 		if (dynamic_cast<SGameModuleSystem*>(_Subsystems[i]) == nullptr)
 		{
-			DestroySubobject(_Subsystems[i]);
+			DestroyObject(_Subsystems[i]);
 		}
 	}
 }

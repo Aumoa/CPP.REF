@@ -13,7 +13,7 @@ SGameModuleSystem::~SGameModuleSystem()
 {
 	if (_gameModule)
 	{
-		DestroySubobject(_gameModule);
+		DestroyObject(_gameModule);
 		_gameModule = nullptr;
 	}
 }

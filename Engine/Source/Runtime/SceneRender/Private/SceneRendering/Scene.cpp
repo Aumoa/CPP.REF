@@ -143,7 +143,7 @@ void SScene::ApplyViewBuffers(IRHIDeviceContext* InContext)
 		{
 			if (_ViewBuffer)
 			{
-				DestroySubobject(_ViewBuffer);
+				DestroyObject(_ViewBuffer);
 				_ViewBuffer = nullptr;
 			}
 

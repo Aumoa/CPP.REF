@@ -119,7 +119,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 			}
 
 			_immCon->ExecuteCommandList(commandList);
-			DestroySubobject(commandList);
+			DestroyObject(commandList);
 		}
 	}
 
@@ -183,7 +183,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 			}
 
 			_immCon->ExecuteCommandList(commandList);
-			DestroySubobject(commandList);
+			DestroyObject(commandList);
 		}
 	}
 

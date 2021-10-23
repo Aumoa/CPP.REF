@@ -111,6 +111,7 @@
     <ClCompile Include="Private\Numerics\Matrix4x4.cpp" />
     <ClCompile Include="Private\Numerics\Quaternion.cpp" />
     <ClCompile Include="Private\Object.cpp" />
+    <ClCompile Include="Private\ObjectCollection.cpp" />
     <ClCompile Include="Private\PlatformMisc\PlatformModule.cpp" />
     <ClCompile Include="Private\Reflection\Type.cpp" />
     <ClCompile Include="Private\Threading\EventHandle.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Public\Numerics\Vector.h" />
     <ClInclude Include="Public\Numerics\VectorScalarsImpl.h" />
     <ClInclude Include="Public\Object.h" />
+    <ClInclude Include="Public\ObjectCollection.h" />
     <ClInclude Include="Public\PlatformMisc\InputEnums.h" />
     <ClInclude Include="Public\PlatformMisc\PlatformModule.h" />
     <ClInclude Include="Public\PrimitiveTypes.h" />

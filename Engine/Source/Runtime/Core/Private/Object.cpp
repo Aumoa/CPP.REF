@@ -5,9 +5,9 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
-std::atomic<uint64> SObject::_InternalObjectIndexGenerator = 0;
+std::atomic<uint64> SObject::InternalObjectIndexGenerator = 0;
 
-SObject::SObject() : _InternalObjectIndex(++_InternalObjectIndexGenerator)
+SObject::SObject() : Index(++InternalObjectIndexGenerator)
 {
 }
 
@@ -15,88 +15,93 @@ SObject::~SObject() noexcept
 {
 }
 
-std::wstring SObject::ToString(std::wstring_view formatArgs)
+std::wstring SObject::ToString(std::wstring_view InFormatArgs)
 {
 	return GetType()->GetFriendlyName();
 }
 
 SObject* SObject::GetOuter() const
 {
-	return _outer;
+	return Outer;
 }
 
-std::shared_ptr<SObject> SObject::SetOuter(SObject* newOuter)
+std::shared_ptr<SObject> SObject::SetOuter(SObject* InNewOuter)
 {
-	std::shared_ptr<SObject> detached = shared_from_this();
+	std::shared_ptr<SObject> Detached = shared_from_this();
 
-	if (_outer != nullptr)
+	if (Outer != nullptr)
 	{
-		_outer->InternalDetachSubobject(detached.get());
+		Outer->InternalDetachSubobject(Detached.get());
 	}
 
-	if (newOuter != nullptr)
+	if (InNewOuter != nullptr)
 	{
-		newOuter->InternalAttachSubobject(detached.get());
+		InNewOuter->InternalAttachSubobject(Detached.get());
 	}
 
-	_outer = newOuter;
-	return detached;
+	Outer = InNewOuter;
+	return Detached;
 }
 
-uint64 SObject::GetInternalIndex()
+void SObject::AddReferenceObject(SObject* InObject)
 {
-	return _InternalObjectIndex;
+	InternalAttachSubobject(InObject);
 }
 
-void SObject::DestroySubobject(SObject* subobject)
+void SObject::RemoveReferenceObject(SObject* InObject)
 {
-	SObject* outer = subobject->_outer;
+	InternalDetachSubobject(InObject);
+}
+
+void SObject::DestroyObject(SObject* InObject)
+{
+	SObject* outer = InObject->Outer;
 	if (outer == nullptr)
 	{
-		delete subobject;
+		delete InObject;
 		return;
 	}
 
-	outer->InternalDetachSubobject(subobject);
+	outer->InternalDetachSubobject(InObject);
 }
 
-void* SObject::operator new(size_t size)
+void* SObject::operator new(size_t AllocSize)
 {
-	return new uint8[size];
+	return new uint8[AllocSize];
 }
 
-void SObject::operator delete(void* block)
+void SObject::operator delete(void* MemBlock)
 {
-	delete[] reinterpret_cast<uint8*>(block);
+	delete[] reinterpret_cast<uint8*>(MemBlock);
 }
 
-void SObject::InternalDetachSubobject(SObject* subobject)
+void SObject::InternalDetachSubobject(SObject* Subobject)
 {
-	if (auto it = _views.find(subobject); it != _views.end())
+	if (auto it = Views.find(Subobject); it != Views.end())
 	{
-		auto subobject_it = _subobjects.begin() + it->second;
-		(*subobject_it)->_outer = nullptr;
+		auto subobject_it = Subobjects.begin() + it->second;
+		(*subobject_it)->Outer = nullptr;
 
 		subobject_it->reset();
-		_views.erase(it);
+		Views.erase(it);
 		return;
 	}
 
 	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
 }
 
-void SObject::InternalAttachSubobject(SObject* subobject)
+void SObject::InternalAttachSubobject(SObject* Subobject)
 {
-	for (size_t i = 0; i < _subobjects.size(); ++i)
+	for (size_t i = 0; i < Subobjects.size(); ++i)
 	{
-		if (!_subobjects[i])
+		if (!Subobjects[i])
 		{
-			_views.emplace(subobject, i);
-			_subobjects[i] = subobject->shared_from_this();
+			Views.emplace(Subobject, i);
+			Subobjects[i] = Subobject->shared_from_this();
 			return;
 		}
 	}
 
-	_views.emplace(subobject, _subobjects.size());
-	_subobjects.emplace_back(subobject->shared_from_this());
+	Views.emplace(Subobject, Subobjects.size());
+	Subobjects.emplace_back(Subobject->shared_from_this());
 }

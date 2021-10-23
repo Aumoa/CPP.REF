@@ -61,7 +61,7 @@ void SWindow::RemoveWidgetFromScreen(const std::wstring& name)
 	{
 		if ((*it)->GetName() == name)
 		{
-			DestroySubobject(*it);
+			DestroyObject(*it);
 			_screenWidgets.erase(it);
 			return;
 		}

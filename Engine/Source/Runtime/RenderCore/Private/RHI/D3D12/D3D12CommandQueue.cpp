@@ -86,7 +86,7 @@ void SD3D12CommandQueue::Collect()
 		{
 			for (size_t i = 0; i < front.Objects.size(); ++i)
 			{
-				DestroySubobject(front.Objects[i]);
+				DestroyObject(front.Objects[i]);
 			}
 
 			_gc.pop();
