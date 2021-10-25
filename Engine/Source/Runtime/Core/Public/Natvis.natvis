@@ -3,4 +3,47 @@
 	<Type Name="SObject">
 		<DisplayString>{Name}</DisplayString>
 	</Type>
+	<Type Name="Vector&lt;*,2&gt;">
+		<DisplayString>{{X={X} Y={Y}}}</DisplayString>
+		<Expand>
+			<Item Name="[Count]">2</Item>
+			<Item Name="[Size]">X*Y</Item>
+			<ArrayItems>
+				<Size>2</Size>
+				<ValuePointer>Scalars</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Vector&lt;*,3&gt;">
+		<DisplayString>{{X={X} Y={Y} Z={Z}}}</DisplayString>
+		<Expand>
+			<Item Name="[Count]">3</Item>
+			<Item Name="[Size]">X*Y*Z</Item>
+			<ArrayItems>
+				<Size>3</Size>
+				<ValuePointer>Scalars</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Vector&lt;*,4&gt;">
+		<DisplayString>{{X={X} Y={Y} Z={Z}, W={W}}}</DisplayString>
+		<Expand>
+			<Item Name="[Count]">4</Item>
+			<Item Name="[Size]">X*Y*Z*W</Item>
+			<ArrayItems>
+				<Size>4</Size>
+				<ValuePointer>Scalars</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Quaternion">
+		<DisplayString>{{X={X} Y={Y} Z={Z} W={W}}}</DisplayString>
+		<Expand>
+			<Item Name="[Count]">4</Item>
+			<ArrayItems>
+				<Size>4</Size>
+				<ValuePointer>Scalars</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
 </AutoVisualizer>
