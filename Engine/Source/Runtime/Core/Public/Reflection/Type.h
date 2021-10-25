@@ -4,6 +4,8 @@
 
 #include <typeinfo>
 #include <functional>
+#include <unordered_map>
+#include <mutex>
 #include "PrimitiveTypes.h"
 #include "Concepts/CoreConcepts.h"
 #include "Method.h"
@@ -20,13 +22,17 @@ class CORE_API Type
 	Type() = delete;
 	Type(const Type&) = delete;
 
-	size_t _typeHash = 0;
-	std::wstring _friendlyName;
-	Type* _superClass = nullptr;
-	ObjectCtor _ctor;
-	std::vector<Method> _functions;
-	std::vector<Property> _properties;
-	uint8 _bNative : 1 = false;
+private:
+	static std::unordered_map<size_t, uint64> TypeRegister;
+	static std::mutex TypeRegisterMutex;
+
+	size_t TypeHash = 0;
+	std::wstring FriendlyName;
+	Type* SuperClass = nullptr;
+	ObjectCtor Constructor;
+	std::vector<Method> Functions;
+	std::vector<Property> Properties;
+	uint8 bNative : 1 = false;
 
 public:
 	template<class TType>
@@ -92,13 +98,13 @@ public:
 public:
 	template<class TType>
 	Type(TypeGenerator<TType>&& generator)
-		: _typeHash(typeid(TType).hash_code())
-		, _friendlyName(std::move(generator.FriendlyName))
-		, _superClass(generator.SuperClass)
-		, _ctor(GetConstructorFunctionBody<TType>((int32)0))
-		, _functions(std::move(generator.Functions))
-		, _properties(std::move(generator.Properties))
-		, _bNative(generator.bNative)
+		: TypeHash(typeid(TType).hash_code())
+		, FriendlyName(std::move(generator.FriendlyName))
+		, SuperClass(generator.SuperClass)
+		, Constructor(GetConstructorFunctionBody<TType>((int32)0))
+		, Functions(std::move(generator.Functions))
+		, Properties(std::move(generator.Properties))
+		, bNative(generator.bNative)
 	{
 	}
 
@@ -107,7 +113,7 @@ public:
 
 	Type* GetSuper() const;
 	SObject* Instantiate(SObject* InOuter) const;
-	inline bool IsNativeType() const { return _bNative; }
+	inline bool IsNativeType() const { return bNative; }
 
 	bool IsDerivedFrom(const Type* type) const;
 	bool IsBaseOf(const Type* type) const;
@@ -125,6 +131,9 @@ public:
 	std::vector<Property> GetProperties(bool bIncludeSuperMembers = true) const;
 	const Property* GetProperty(std::wstring_view friendlyName, bool bIncludeSuperMembers = true) const;
 
+	std::wstring GenerateUniqueName();
+
+public:
 	template<class T> requires requires { T::StaticClass(); }
 	static auto GetStaticClass()
 	{

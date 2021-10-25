@@ -305,6 +305,13 @@
     <ClInclude Include="Public\Misc\CrcHash.h">
       <Filter>Public\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Public\ObjectCollection.h" />
+    <ClInclude Include="Public\ObjectCollection.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Public\Natvis.natvis">
+      <Filter>Public</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

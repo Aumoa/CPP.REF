@@ -5,30 +5,33 @@
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 
+std::unordered_map<size_t, uint64> Type::TypeRegister;
+std::mutex Type::TypeRegisterMutex;
+
 const std::wstring& Type::GetFriendlyName() const
 {
-	return _friendlyName;
+	return FriendlyName;
 }
 
 size_t Type::GetHashCode() const
 {
-	return _typeHash;
+	return TypeHash;
 }
 
 Type* Type::GetSuper() const
 {
-	return _superClass;
+	return SuperClass;
 }
 
 SObject* Type::Instantiate(SObject* InOuter) const
 {
-	if (_ctor)
+	if (Constructor)
 	{
-		return _ctor(InOuter);
+		return Constructor(InOuter);
 	}
 	else
 	{
-		SE_LOG(LogReflection, Fatal, L"Instantiate failed for {0} class. {0} class does not contained constructor without parameters.", _friendlyName);
+		SE_LOG(LogReflection, Fatal, L"Instantiate failed for {0} class. {0} class does not contained constructor without parameters.", FriendlyName);
 		return nullptr;
 	}
 }
@@ -67,7 +70,7 @@ std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
 {
 	if (bIncludeSuperMembers)
 	{
-		std::vector<Method> functions = _functions;
+		std::vector<Method> functions = Functions;
 		for (const Type* super = this; super; super = super->GetSuper())
 		{
 			std::vector<Method> superFunctions = super->GetMethods(false);
@@ -77,17 +80,17 @@ std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
 	}
 	else
 	{
-		return _functions;
+		return Functions;
 	}
 }
 
 const Method* Type::GetMethod(std::wstring_view friendlyName, bool bIncludeSuperMembers) const
 {
-	for (size_t i = 0; i < _functions.size(); ++i)
+	for (size_t i = 0; i < Functions.size(); ++i)
 	{
-		if (_functions[i].GetFriendlyName() == friendlyName)
+		if (Functions[i].GetFriendlyName() == friendlyName)
 		{
-			return &_functions[i];
+			return &Functions[i];
 		}
 	}
 
@@ -104,7 +107,7 @@ std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
 {
 	if (bIncludeSuperMembers)
 	{
-		std::vector<Property> properties = _properties;
+		std::vector<Property> properties = Properties;
 		for (const Type* super = this; super; super = super->GetSuper())
 		{
 			std::vector<Property> superProperties = super->GetProperties(false);
@@ -114,17 +117,17 @@ std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
 	}
 	else
 	{
-		return _properties;
+		return Properties;
 	}
 }
 
 const Property* Type::GetProperty(std::wstring_view friendlyName, bool bIncludeSuperMembers) const
 {
-	for (size_t i = 0; i < _properties.size(); ++i)
+	for (size_t i = 0; i < Properties.size(); ++i)
 	{
-		if (_properties[i].GetFriendlyName() == friendlyName)
+		if (Properties[i].GetFriendlyName() == friendlyName)
 		{
-			return &_properties[i];
+			return &Properties[i];
 		}
 	}
 
@@ -135,4 +138,11 @@ const Property* Type::GetProperty(std::wstring_view friendlyName, bool bIncludeS
 	}
 
 	return super->GetProperty(friendlyName, true);
+}
+
+std::wstring Type::GenerateUniqueName()
+{
+	std::unique_lock ScopedLock(TypeRegisterMutex);
+	uint64& Incrementer = TypeRegister[TypeHash];
+	return std::format(L"{}_{}", GetFriendlyName(), Incrementer++);
 }

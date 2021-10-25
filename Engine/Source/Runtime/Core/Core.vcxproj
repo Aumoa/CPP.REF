@@ -175,6 +175,9 @@
     <ClInclude Include="Public\Threading\Thread.h" />
     <ClInclude Include="Public\ValueType.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Public\Natvis.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

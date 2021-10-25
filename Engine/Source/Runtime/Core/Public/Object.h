@@ -12,6 +12,7 @@
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Reflection/ReflectionMacros.h"
+#include "Delegates/MulticastEvent.h"
 
 class SValueType;
 
@@ -32,6 +33,8 @@ private:
 	std::vector<std::shared_ptr<SObject>> Subobjects;
 	std::map<SObject*, size_t> Views;
 
+	std::wstring Name;
+
 public:
 	SObject();
 	virtual ~SObject() noexcept;
@@ -45,11 +48,18 @@ public:
 
 	SObject* GetOuter() const;
 	std::shared_ptr<SObject> SetOuter(SObject* InNewOuter);
+	void SetName(std::wstring_view InNewName);
+	std::wstring GetName();
 
 	void AddReferenceObject(SObject* InObject);
 	void RemoveReferenceObject(SObject* InObject);
 
-	static void DestroyObject(SObject* InObject);
+	void DestroyObject(SObject* InObject);
+
+	DECLARE_MULTICAST_EVENT(OuterChangedEvent, SObject* This);
+	OuterChangedEvent OuterChanged;
+	DECLARE_MULTICAST_EVENT(NameChangedEvent, SObject* This);
+	NameChangedEvent NameChanged;
 
 public:
 	template<class T, class... TArgs>
@@ -58,6 +68,7 @@ public:
 		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
 		auto Ptr = SharedPtr.get();
 		InternalAttachSubobject(Ptr);
+		InternalAttachObjectName(Ptr);
 		Ptr->Outer = this;
 		return Ptr;
 	}
@@ -98,6 +109,7 @@ public:
 private:
 	void InternalDetachSubobject(SObject* Subobject);
 	void InternalAttachSubobject(SObject* Subobject);
+	void InternalAttachObjectName(SObject* InObject);
 };
 
 #define implements virtual public 

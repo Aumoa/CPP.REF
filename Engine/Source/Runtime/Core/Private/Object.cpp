@@ -17,7 +17,7 @@ SObject::~SObject() noexcept
 
 std::wstring SObject::ToString(std::wstring_view InFormatArgs)
 {
-	return GetType()->GetFriendlyName();
+	return Name;
 }
 
 SObject* SObject::GetOuter() const
@@ -27,20 +27,39 @@ SObject* SObject::GetOuter() const
 
 std::shared_ptr<SObject> SObject::SetOuter(SObject* InNewOuter)
 {
-	std::shared_ptr<SObject> Detached = shared_from_this();
-
-	if (Outer != nullptr)
+	std::shared_ptr<SObject> Detached;
+	if (Outer != InNewOuter)
 	{
-		Outer->InternalDetachSubobject(Detached.get());
-	}
+		Detached = shared_from_this();
 
-	if (InNewOuter != nullptr)
-	{
-		InNewOuter->InternalAttachSubobject(Detached.get());
-	}
+		if (Outer != nullptr)
+		{
+			Outer->InternalDetachSubobject(Detached.get());
+		}
 
-	Outer = InNewOuter;
+		if (InNewOuter != nullptr)
+		{
+			InNewOuter->InternalAttachSubobject(Detached.get());
+		}
+
+		Outer = InNewOuter;
+		OuterChanged.Invoke(this);
+	}
 	return Detached;
+}
+
+void SObject::SetName(std::wstring_view InNewName)
+{
+	if (Name != InNewName)
+	{
+		Name = InNewName;
+		NameChanged.Invoke(this);
+	}
+}
+
+std::wstring SObject::GetName()
+{
+	return Name;
 }
 
 void SObject::AddReferenceObject(SObject* InObject)
@@ -55,14 +74,8 @@ void SObject::RemoveReferenceObject(SObject* InObject)
 
 void SObject::DestroyObject(SObject* InObject)
 {
-	SObject* outer = InObject->Outer;
-	if (outer == nullptr)
-	{
-		delete InObject;
-		return;
-	}
-
-	outer->InternalDetachSubobject(InObject);
+	checkf(InObject->Outer == this, L"DestroyObject must be called with outer object.");
+	InternalDetachSubobject(InObject);
 }
 
 void* SObject::operator new(size_t AllocSize)
@@ -87,7 +100,7 @@ void SObject::InternalDetachSubobject(SObject* Subobject)
 		return;
 	}
 
-	LogSystem::Log(LogCore, ELogVerbosity::Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+	SE_LOG(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
 }
 
 void SObject::InternalAttachSubobject(SObject* Subobject)
@@ -104,4 +117,9 @@ void SObject::InternalAttachSubobject(SObject* Subobject)
 
 	Views.emplace(Subobject, Subobjects.size());
 	Subobjects.emplace_back(Subobject->shared_from_this());
+}
+
+void SObject::InternalAttachObjectName(SObject* InObject)
+{
+	InObject->Name = InObject->GetType()->GenerateUniqueName();
 }
