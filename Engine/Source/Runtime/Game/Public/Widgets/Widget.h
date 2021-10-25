@@ -11,7 +11,7 @@
 #include "Layout/LayoutImpl.h"
 
 class SSlateWindowElementList;
-class SPaintArgs;
+class PaintArgs;
 class SArrangedChildrens;
 class ArrangedWidget;
 
@@ -29,16 +29,17 @@ private:
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
 	std::optional<Geometry> CachedGeometry;
+	std::optional<Vector2> CachedDesiredSize;
 
 public:
 	SWidget();
 
 	virtual std::wstring ToString(std::wstring_view formatArgs) override;
 
-	int32 Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled);
+	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled);
 	void ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry);
 
-	virtual void Tick(const Geometry& allottedGeometry, std::chrono::duration<float> deltaTime);
+	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
 	virtual Vector2 GetDesiredSize();
 
 	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
@@ -50,12 +51,12 @@ public:
 	bool SendKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event);
 
 protected:
-	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) = 0;
+	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled) = 0;
 	virtual void OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry) = 0;
 
 	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) = 0;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event) = 0;
-
+	
 	bool IsChildWidgetCulled(const Rect& cullingRect, const ArrangedWidget& arrangedChild);
 	bool ShouldBeEnabled(bool bParentEnabled);
 

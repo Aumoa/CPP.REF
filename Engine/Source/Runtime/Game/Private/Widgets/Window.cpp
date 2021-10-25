@@ -24,6 +24,15 @@ SViewport* SWindow::GetGameViewport()
 	return GameViewport;
 }
 
+Vector2 SWindow::GetDesiredSize()
+{
+	if (GameViewport)
+	{
+		return GameViewport->GetDesiredSize();
+	}
+	return Vector2::GetZero();
+}
+
 void SWindow::OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 	ESlateVisibility VpVisibility = GameViewport->GetVisibility();

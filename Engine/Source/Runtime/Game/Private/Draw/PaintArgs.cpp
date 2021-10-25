@@ -2,13 +2,15 @@
 
 #include "Draw/PaintArgs.h"
 
-SPaintArgs::SPaintArgs(SWidget* parentWidget, std::chrono::duration<float> deltaTime) : Super()
-	, _parent(parentWidget)
-	, _deltaTime(deltaTime)
+PaintArgs::PaintArgs(SWidget* InParentWidget, float InDeltaTime, IRHIDeviceContext* InDeviceContext, SceneRenderer* Renderer)
+	: Parent(InParentWidget)
+	, DeltaTime(InDeltaTime)
+	, DeviceContext(InDeviceContext)
+	, Renderer(Renderer)
 {
 }
 
-SPaintArgs* SPaintArgs::WithNewParent(SWidget* parentWidget)
+PaintArgs PaintArgs::WithNewParent(SWidget* InParentWidget) const
 {
-	return GetOuter()->NewObject<SPaintArgs>(parentWidget, _deltaTime);
+	return PaintArgs(InParentWidget, DeltaTime, DeviceContext, Renderer);
 }

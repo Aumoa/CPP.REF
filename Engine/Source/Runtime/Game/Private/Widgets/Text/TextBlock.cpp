@@ -60,7 +60,7 @@ SlateFont STextBlock::GetFont()
 	return _font;
 }
 
-int32 STextBlock::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
+int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	//SlateFontElement element;
 	//element.FontFace = _font.FontFace;
@@ -70,7 +70,7 @@ int32 STextBlock::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometr
 	//element.Text = _text;
 
 	//drawElements->Add(element);
-	return layer;
+	return InLayer;
 }
 
 DEFINE_SLATE_CONSTRUCTOR(STextBlock, attr)

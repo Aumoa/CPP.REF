@@ -91,25 +91,25 @@ DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, attr)
 	_slots = std::move(attr.Slots);
 }
 
-int32 SCanvasPanel::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
+int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	SArrangedChildrens arrangedChildren(ESlateVisibility::Visible);
-	ArrangeChildren(&arrangedChildren, allottedGeometry);
+	ArrangeChildren(&arrangedChildren, AllottedGeometry);
 
 	bool forwardedEnabled = ShouldBeEnabled(bParentEnabled);
-	int maxLayer = layer;
+	int maxLayer = InLayer;
 
-	SPaintArgs* newArgs = paintArgs->WithNewParent(this);
+	PaintArgs NewArgs = Args.WithNewParent(this);
 	for (auto& curWidget : arrangedChildren.GetWidgets())
 	{
-		if (!IsChildWidgetCulled(cullingRect, curWidget))
+		if (!IsChildWidgetCulled(CullingRect, curWidget))
 		{
 			int curWidgetsMaxLayerId = curWidget.GetWidget()->Paint(
-				newArgs,
+				NewArgs,
 				curWidget.GetGeometry(),
-				cullingRect,
-				drawElements,
-				layer,
+				CullingRect,
+				InDrawElements,
+				InLayer,
 				forwardedEnabled);
 
 			maxLayer = MathEx::Max(maxLayer, curWidgetsMaxLayerId);

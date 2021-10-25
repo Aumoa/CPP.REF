@@ -26,6 +26,8 @@
 #include "Camera/MinimalViewInfo.h"
 #include "GameThreads/RenderThread.h"
 #include "Scene/PrimitiveSceneProxy.h"
+#include "Application/SlateApplication.h"
+#include "Draw/PaintArgs.h"
 
 DEFINE_LOG_CATEGORY(LogRender);
 
@@ -80,7 +82,7 @@ void SGameRenderSystem::Tick(float InDeltaTime)
 {
 }
 
-void SGameRenderSystem::ExecuteRenderThread()
+void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp)
 {
 	SGamePlayerSystem* PlayerSystem = GEngine->GetEngineSubsystem<SGamePlayerSystem>();
 	SLocalPlayer* LocalPlayer = PlayerSystem->GetLocalPlayer();
@@ -95,7 +97,7 @@ void SGameRenderSystem::ExecuteRenderThread()
 	}
 
 	RenderThread::WaitForLastWorks();
-	RenderThread::ExecuteWorks([this, MinimalPlayerView = std::move(MinimalPlayerView)]()
+	RenderThread::ExecuteWorks([this, MinimalPlayerView = std::move(MinimalPlayerView), InDeltaTime, SlateApp]()
 	{
 		int32 SwapChainIndex = _frameworkViewChain->GetCurrentBackBufferIndex();
 		SceneRenderTarget RenderTarget(_rtv, SwapChainIndex, _dsv, 0, ERHIResourceStates::Present);
@@ -129,7 +131,9 @@ void SGameRenderSystem::ExecuteRenderThread()
 			_primaryQueue->Begin(0, 0);
 
 			_Scene->ApplyViewBuffers(_primaryQueue);
-			Renderer.PopulateCommandLists(_primaryQueue, RenderTarget);
+
+			PaintArgs NewArgs(nullptr, InDeltaTime, _primaryQueue, &Renderer);
+			SlateApp->PopulateCommandLists(NewArgs);
 
 			// END OF FRAME.
 			_primaryQueue->End();

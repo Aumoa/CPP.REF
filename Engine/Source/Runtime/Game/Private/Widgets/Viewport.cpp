@@ -4,7 +4,10 @@
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "RHI/IRHITexture2D.h"
 #include "RHI/IRHIDevice.h"
+#include "RHI/IRHIRenderTargetView.h"
+#include "RHI/IRHIDepthStencilView.h"
 #include "GameThreads/RenderThread.h"
+#include "Draw/PaintArgs.h"
 
 DEFINE_LOG_CATEGORY(LogViewport);
 
@@ -31,6 +34,17 @@ Vector2N SViewport::GetRenderSize()
 	return RenderSize;
 }
 
+void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext, SceneRenderer* Renderer)
+{
+	SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::CopySource);
+	Renderer->PopulateCommandLists(InDeviceContext, RenderTarget);
+}
+
+Vector2 SViewport::GetDesiredSize()
+{
+	return RenderSize.Cast<float>();
+}
+
 DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(InAttr);
@@ -41,6 +55,12 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 
 void SViewport::OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry)
 {
+}
+
+int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
+{
+	PopulateCommandLists(Args.DeviceContext, Args.Renderer);
+	return Super::OnPaint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer, bParentEnabled);
 }
 
 void SViewport::ReallocRenderTarget()
@@ -88,6 +108,12 @@ void SViewport::ReallocRenderTarget()
 			DepthStencil->SetOuter(this);
 			DepthStencil->SetDebugName(L"SViewport: DepthStencilTexture");
 
+			RTV = Device->CreateRenderTargetView(1);
+			DSV = Device->CreateDepthStencilView(1);
+
+			RTV->CreateRenderTargetView(0, RenderTarget, nullptr);
+			DSV->CreateDepthStencilView(0, DepthStencil, nullptr);
+
 			SE_LOG(LogViewport, Verbose, L"Viewport render targets are reallocated to [{}x{}].", RenderSize.X, RenderSize.Y);
 		}
 	}
@@ -95,26 +121,26 @@ void SViewport::ReallocRenderTarget()
 
 void SViewport::DestroyRenderTarget_GameThread()
 {
-	struct
+	auto MoveTemp = [](auto*& InObject)
 	{
-		std::shared_ptr<SObject> RenderTargetHolder;
-		std::shared_ptr<SObject> DepthStencilHolder;
-	} Holder;
+		SObject* Object = InObject;
+		InObject = nullptr;
+		return Object;
+	};
 
-	if (RenderTarget != nullptr)
-	{
-		Holder.RenderTargetHolder = RenderTarget->shared_from_this();
-		DestroyObject(RenderTarget);
-		RenderTarget = nullptr;
-	}
+	std::vector<std::shared_ptr<SObject>> Holders;
+	SObject* Objects[] = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
+	Holders.reserve(std::size(Objects));
 
-	if (DepthStencil != nullptr)
+	for (auto& Object : Objects)
 	{
-		Holder.DepthStencilHolder = DepthStencil->shared_from_this();
-		DestroyObject(DepthStencil);
-		DepthStencil = nullptr;
+		if (Object)
+		{
+			Holders.emplace_back(Object->shared_from_this());
+			DestroyObject(Object);
+		}
 	}
 
 	// Finalize textures in render thread.
-	RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = std::move(Holder)](){});
+	RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](){});
 }

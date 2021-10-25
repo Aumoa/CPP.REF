@@ -33,13 +33,13 @@ DEFINE_SLATE_CONSTRUCTOR(SImage, attr)
 	SetBrush(attr._Brush);
 }
 
-int32 SImage::OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
+int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	SlateDrawElement element;
 	element.Brush = _brush;
-	element.Layer = layer;
-	element.Transform = allottedGeometry.ToPaintGeometry();
+	element.Layer = InLayer;
+	element.Transform = AllottedGeometry.ToPaintGeometry();
 
-	drawElements->Add(element);
-	return layer;
+	InDrawElements->Add(element);
+	return InLayer;
 }

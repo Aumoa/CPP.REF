@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 interface IFrameworkView;
+class PaintArgs;
 class SLocalPlayer;
 class SWindow;
 
@@ -20,4 +21,7 @@ public:
 	SSlateApplication();
 
 	void InitWindow(SLocalPlayer* InLocalPlayer, IFrameworkView* InFrameworkView);
+
+	void Tick(float InDeltaTime);
+	void PopulateCommandLists(const PaintArgs& Args);
 };

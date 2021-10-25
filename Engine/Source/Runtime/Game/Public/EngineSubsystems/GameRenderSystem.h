@@ -20,6 +20,7 @@ class STransparentShader;
 class SSlateShader;
 class STickScheduler;
 class SScene;
+class SSlateApplication;
 struct IFrameworkView;
 
 class GAME_API SGameRenderSystem : public SGameEngineSubsystem
@@ -55,7 +56,7 @@ public:
 	virtual void Init() override;
 	virtual void Deinit() override;
 	virtual void Tick(float InDeltaTime) override;
-	virtual void ExecuteRenderThread();
+	virtual void ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp);
 
 	void SetupFrameworkView(IFrameworkView* frameworkView);
 	IFrameworkView* GetFrameworkView();

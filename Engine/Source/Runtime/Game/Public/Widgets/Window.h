@@ -22,6 +22,8 @@ public:
 	void InitViewport(IFrameworkView* InFrameworkView);
 	SViewport* GetGameViewport();
 
+	virtual Vector2 GetDesiredSize() override;
+
 protected:
 	virtual void OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry) override;
 };
