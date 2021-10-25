@@ -4,7 +4,7 @@
 #include "Draw/SlateFontElement.h"
 #include "Draw/SlateWindowElementList.h"
 
-STextBlock::STextBlock(const std::wstring& name) : Super(name)
+STextBlock::STextBlock() : Super()
 {
 }
 

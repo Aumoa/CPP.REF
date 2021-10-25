@@ -29,6 +29,7 @@ void SGameLevelSystem::Deinit()
 	}
 
 	_GameWorld->DestroyWorld();
+	CleanupSubobjects();
 }
 
 SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)

@@ -5,7 +5,7 @@
 #include "Draw/PaintArgs.h"
 #include "Layout/ArrangedChildrens.h"
 
-SCompoundWidget::SCompoundWidget(const std::wstring& name) : Super(name)
+SCompoundWidget::SCompoundWidget() : Super()
 {
 }
 

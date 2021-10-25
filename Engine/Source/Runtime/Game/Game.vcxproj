@@ -123,6 +123,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Application\SlateApplication.cpp" />
     <ClCompile Include="Private\Assets\Asset.cpp" />
     <ClCompile Include="Private\Assets\Mesh.cpp" />
     <ClCompile Include="Private\Assets\Parser\AssimpParser.cpp" />
@@ -201,8 +202,8 @@
     <ClCompile Include="Private\Widgets\Panel\HorizontalBoxPanel.cpp" />
     <ClCompile Include="Private\Widgets\Panel\PanelWidget.cpp" />
     <ClCompile Include="Private\Widgets\Panel\VerticalBoxPanel.cpp" />
-    <ClCompile Include="Private\Widgets\SlateApplication.cpp" />
     <ClCompile Include="Private\Widgets\Text\TextBlock.cpp" />
+    <ClCompile Include="Private\Widgets\Viewport.cpp" />
     <ClCompile Include="Private\Widgets\Widget.cpp" />
     <ClCompile Include="Private\Widgets\Window.cpp" />
     <ClCompile Include="Private\WindowsPlatform\WindowsPlatformHelper.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformHelper.h" />
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImage.h" />
     <ClInclude Include="Private\WindowsPlatform\WindowsPlatformImageLoader.h" />
+    <ClInclude Include="Public\Application\SlateApplication.h" />
     <ClInclude Include="Public\Assets\Asset.h" />
     <ClInclude Include="Public\Assets\Mesh.h" />
     <ClInclude Include="Public\Assets\Parser\AssimpParser.h" />
@@ -329,9 +331,9 @@
     <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h" />
     <ClInclude Include="Public\Widgets\Panel\PanelWidget.h" />
     <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h" />
-    <ClInclude Include="Public\Widgets\SlateApplication.h" />
     <ClInclude Include="Public\Widgets\SlotBase.h" />
     <ClInclude Include="Public\Widgets\Text\TextBlock.h" />
+    <ClInclude Include="Public\Widgets\Viewport.h" />
     <ClInclude Include="Public\Widgets\Widget.h" />
     <ClInclude Include="Public\Widgets\Window.h" />
     <ClInclude Include="Public\WindowsPlatform\WindowsPlatformKeyboard.h" />

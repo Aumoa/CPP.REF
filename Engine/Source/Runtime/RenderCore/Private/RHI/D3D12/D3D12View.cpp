@@ -4,7 +4,7 @@
 #include "D3D12Device.h"
 #include "D3D12Resource.h"
 
-SD3D12View::SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources, D3D12_DESCRIPTOR_HEAP_TYPE type) : Super(factory, device)
+SD3D12View::SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources, D3D12_DESCRIPTOR_HEAP_TYPE type) : Super(factory, device, heap.Get())
 	, _heap(std::move(heap))
 	, _resources(resources)
 {

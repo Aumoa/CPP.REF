@@ -4,7 +4,7 @@
 #include "Layout/Geometry.h"
 #include "Layout/ArrangedChildrens.h"
 
-SBorder::SBorder(const std::wstring& name) : Super(name)
+SBorder::SBorder() : Super()
 {
 }
 

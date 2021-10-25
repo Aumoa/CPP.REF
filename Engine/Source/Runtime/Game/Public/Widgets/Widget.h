@@ -20,41 +20,38 @@ class GAME_API SWidget : implements SObject
 	GENERATED_BODY(SWidget)
 
 private:
-	ESlateVisibility _Visibility = ESlateVisibility::Visible;
-	EFlowDirection _FlowDirection = EFlowDirection::LeftToRight;
-	EWidgetClipping _Clipping = EWidgetClipping::Inherit;
+	ESlateVisibility Visibility = ESlateVisibility::Visible;
+	EFlowDirection FlowDirection = EFlowDirection::LeftToRight;
+	EWidgetClipping Clipping = EWidgetClipping::Inherit;
 
-	SlateRenderTransform _RenderTransform = SlateRenderTransform::Identity();
-	Vector2 _RenderTransformPivot = Vector2::GetZero();
-	uint8 _bEnabled : 1 = true;
-	uint8 _bHasRenderTransform : 1 = false;
-	std::optional<Geometry> _cachedGeometry;
-
-	std::wstring _name;
+	SlateRenderTransform RenderTransform = SlateRenderTransform::Identity();
+	Vector2 RenderTransformPivot = Vector2::GetZero();
+	uint8 bEnabled : 1 = true;
+	uint8 bHasRenderTransform : 1 = false;
+	std::optional<Geometry> CachedGeometry;
 
 public:
-	SWidget(const std::wstring& name);
+	SWidget();
 
 	virtual std::wstring ToString(std::wstring_view formatArgs) override;
 
 	int32 Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled);
 	void ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry);
-	inline std::wstring GetName() { return _name; }
 
 	virtual void Tick(const Geometry& allottedGeometry, std::chrono::duration<float> deltaTime);
 	virtual Vector2 GetDesiredSize();
 
 	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
-	inline bool HasRenderTransform() { return _bHasRenderTransform; }
-	std::optional<Geometry> GetCachedGeometry() { return _cachedGeometry; }
+	inline bool HasRenderTransform() { return bHasRenderTransform; }
+	std::optional<Geometry> GetCachedGeometry() { return CachedGeometry; }
 
 	bool SendMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event);
 	bool SendKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event);
 
 protected:
 	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) = 0;
-	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) = 0;
+	virtual void OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry) = 0;
 
 	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) = 0;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event) = 0;
@@ -68,7 +65,6 @@ public:
 		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
 		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
-		DECLARE_SLATE_ATTRIBUTE(std::wstring, Name)
 	END_SLATE_ATTRIBUTE;
 
 	DECLARE_SLATE_CONSTRUCTOR();

@@ -69,11 +69,15 @@ void SGameRenderSystem::Deinit()
 {
 	RenderThread::Shutdown();
 
-	if (_device)
+	if (_factory && _device)
 	{
-		DestroyObject(_device);
+		_factory->DestroyObject(_device);
 		_device = nullptr;
 	}
+}
+
+void SGameRenderSystem::Tick(float InDeltaTime)
+{
 }
 
 void SGameRenderSystem::ExecuteRenderThread()

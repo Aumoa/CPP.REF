@@ -10,7 +10,7 @@ class GAME_API SLeafWidget : public SWidget
 	GENERATED_BODY(SLeafWidget)
 
 public:
-	SLeafWidget(const std::wstring& name);
+	SLeafWidget();
 	virtual ~SLeafWidget() override;
 
 protected:

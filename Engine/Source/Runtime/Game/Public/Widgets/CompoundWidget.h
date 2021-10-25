@@ -10,7 +10,7 @@ class GAME_API SCompoundWidget : public SWidget
 	GENERATED_BODY(SCompoundWidget)
 
 public:
-	SCompoundWidget(const std::wstring& name);
+	SCompoundWidget();
 
 protected:
 	virtual int32 OnPaint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled) override;

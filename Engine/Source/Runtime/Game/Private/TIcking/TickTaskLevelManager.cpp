@@ -90,6 +90,8 @@ void STickTaskLevelManager::BeginFrame()
 				else
 				{
 					Tail = _FrameHead;
+					Tail->InternalData->PrevPtr = nullptr;
+					Tail->InternalData->NextPtr = nullptr;
 				}
 
 				InternalData->TickPriority = PriorityCounter;

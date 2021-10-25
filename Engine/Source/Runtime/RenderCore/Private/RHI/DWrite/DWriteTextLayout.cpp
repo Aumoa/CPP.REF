@@ -4,7 +4,7 @@
 #include "RHI/D3D12/D3D12Device.h"
 #include "RHI/D3D12/D3D12CommandQueue.h"
 
-SDWriteTextLayout::SDWriteTextLayout(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDWriteTextLayout> layout) : Super(factory, device)
+SDWriteTextLayout::SDWriteTextLayout(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDWriteTextLayout> layout) : Super(factory, device, nullptr)
 	, _layout(std::move(layout))
 {
 }

@@ -6,14 +6,13 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
 
-SWidget::SWidget(const std::wstring& name) : Super()
-    , _name(name)
+SWidget::SWidget() : Super()
 {
 }
 
 std::wstring SWidget::ToString(std::wstring_view formatArgs)
 {
-	return std::format(L"{}({}): [{}] ({})", _name, GetType()->GetFriendlyName(), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(_Visibility));
+	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFriendlyName(), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(Visibility));
 }
 
 int32 SWidget::Paint(SPaintArgs* paintArgs, const Geometry& allottedGeometry, const Rect& cullingRect, SSlateWindowElementList* drawElements, int32 layer, bool bParentEnabled)
@@ -37,13 +36,13 @@ Vector2 SWidget::GetDesiredSize()
 
 Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
 {
-	return _RenderTransformPivot;
+	return RenderTransformPivot;
 }
 
 SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 {
-	check(_bHasRenderTransform);
-	return _RenderTransform;
+	check(bHasRenderTransform);
+	return RenderTransform;
 }
 
 bool SWidget::SendMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event)
@@ -104,7 +103,6 @@ bool SWidget::ShouldBeEnabled(bool bParentEnabled)
 
 DEFINE_SLATE_CONSTRUCTOR(SWidget, attr)
 {
-    _name = std::move(attr._Name);
     SetVisibility(attr._Visibility);
     SetFlowDirection(attr._FlowDirection);
     SetClipping(attr._Clipping);
@@ -113,52 +111,52 @@ DEFINE_SLATE_CONSTRUCTOR(SWidget, attr)
 
 void SWidget::SetVisibility(ESlateVisibility visibility)
 {
-    _Visibility = visibility;
+    Visibility = visibility;
 }
 
 ESlateVisibility SWidget::GetVisibility()
 {
-    return _Visibility;
+    return Visibility;
 }
 
 void SWidget::SetFlowDirection(EFlowDirection flowDirection)
 {
-    _FlowDirection = flowDirection;
+    FlowDirection = flowDirection;
 }
 
 EFlowDirection SWidget::GetFlowDirection()
 {
-    return _FlowDirection;
+    return FlowDirection;
 }
 
 void SWidget::SetClipping(EWidgetClipping clipping)
 {
-    _Clipping = clipping;
+    Clipping = clipping;
 }
 
 EWidgetClipping SWidget::GetClipping()
 {
-    return _Clipping;
+    return Clipping;
 }
 
 void SWidget::SetRenderTransform(const SlateRenderTransform& renderTransform)
 {
-    _bHasRenderTransform = true;
-    _RenderTransform = renderTransform;
+    bHasRenderTransform = true;
+    RenderTransform = renderTransform;
 }
 
 SlateRenderTransform SWidget::GetRenderTransform()
 {
-    check(_bHasRenderTransform);
-    return _RenderTransform;
+    check(bHasRenderTransform);
+    return RenderTransform;
 }
 
 void SWidget::SetEnabled(bool bEnabled)
 {
-    _bEnabled = bEnabled;
+    bEnabled = bEnabled;
 }
 
 bool SWidget::IsEnabled()
 {
-    return _bEnabled;
+    return bEnabled;
 }

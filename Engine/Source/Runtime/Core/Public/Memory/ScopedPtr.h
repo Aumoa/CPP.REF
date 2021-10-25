@@ -113,7 +113,10 @@ private:
 	{
 		if (_ptr)
 		{
-			SObject::DestroyObject(_ptr);
+			if (SObject* Outer = _ptr->GetOuter())
+			{
+				Outer->DestroyObject(_ptr);
+			}
 			_ptr = nullptr;
 		}
 	}

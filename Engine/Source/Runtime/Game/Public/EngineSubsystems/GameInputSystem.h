@@ -39,5 +39,5 @@ public:
 	SGameInputSystem();
 	virtual ~SGameInputSystem() override;
 
-	virtual void Tick(std::chrono::duration<float> elapsedTime) override;
+	virtual void Tick(float InDeltaTime) override;
 };

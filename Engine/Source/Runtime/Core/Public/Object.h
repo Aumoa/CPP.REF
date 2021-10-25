@@ -55,6 +55,7 @@ public:
 	void RemoveReferenceObject(SObject* InObject);
 
 	void DestroyObject(SObject* InObject);
+	void CleanupSubobjects();
 
 	DECLARE_MULTICAST_EVENT(OuterChangedEvent, SObject* This);
 	OuterChangedEvent OuterChanged;

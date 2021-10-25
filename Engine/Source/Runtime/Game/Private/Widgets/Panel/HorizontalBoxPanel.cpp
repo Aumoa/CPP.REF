@@ -2,7 +2,7 @@
 
 #include "Widgets/Panel/HorizontalBoxPanel.h"
 
-SHorizontalBoxPanel::SHorizontalBoxPanel(const std::wstring& name) : Super(name, EOrientation::Horizontal)
+SHorizontalBoxPanel::SHorizontalBoxPanel() : Super(EOrientation::Horizontal)
 {
 }
 

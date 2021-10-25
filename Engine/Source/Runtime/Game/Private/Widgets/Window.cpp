@@ -1,96 +1,38 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Widgets/Window.h"
-#include "Layout/LayoutImpl.h"
+#include "Widgets/Viewport.h"
+#include "IFrameworkView.h"
 #include "Layout/ArrangedChildrens.h"
-#include "Draw/SlateWindowElementList.h"
-#include "Draw/PaintArgs.h"
-#include "Layout/Geometry.h"
 
 DEFINE_LOG_CATEGORY(LogSlateWindow);
 
-SWindow::SWindow(const std::wstring& name) : Super(name)
-	, _lastDeltaTime(std::chrono::milliseconds(0))
+SWindow::SWindow() : Super()
 {
 }
 
-void SWindow::ExecuteTick(std::chrono::duration<float> deltaTime)
+void SWindow::InitViewport(IFrameworkView* InFrameworkView)
 {
-	Tick(*(_cachedRootGeometry = MakeRootGeometry()), _lastDeltaTime = deltaTime);
+	FrameworkView = InFrameworkView;
+	GameViewport = SNew(SViewport)
+		.RenderSize(InFrameworkView->GetFrameworkSize())
+		.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM);
 }
 
-void SWindow::ExecutePaint(SSlateWindowElementList* drawElements)
+SViewport* SWindow::GetGameViewport()
 {
-	ScopedPtr paintArgs = drawElements->NewObject<SPaintArgs>(this, _lastDeltaTime);
-	Paint(paintArgs.Get(), *_cachedRootGeometry, Rect(Vector2::GetZero(), GetDesiredSize()), drawElements, 0, IsEnabled());
+	return GameViewport;
 }
 
-Geometry SWindow::MakeRootGeometry()
+void SWindow::OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry)
 {
-	return Geometry::MakeRoot(GetDesiredSize(), SlateLayoutTransform());
-}
-
-void SWindow::SetWindowSize(const Vector2& localSize)
-{
-	_localSize = localSize;
-}
-
-void SWindow::AddWidgetToScreen(SWidget* widget)
-{
-	check(widget);
-	_screenWidgets.emplace_back(widget);
-	widget->SetOuter(this);
-}
-
-SWidget* SWindow::GetWidgetInScreen(const std::wstring& name)
-{
-	for (size_t i = 0; i < _screenWidgets.size(); ++i)
+	ESlateVisibility VpVisibility = GameViewport->GetVisibility();
+	if (ArrangedChildrens->Accepts(VpVisibility))
 	{
-		if (_screenWidgets[i]->GetName() == name)
-		{
-			return _screenWidgets[i];
-		}
-	}
-
-	return nullptr;
-}
-
-void SWindow::RemoveWidgetFromScreen(const std::wstring& name)
-{
-	for (auto it = _screenWidgets.begin(); it != _screenWidgets.end(); ++it)
-	{
-		if ((*it)->GetName() == name)
-		{
-			DestroyObject(*it);
-			_screenWidgets.erase(it);
-			return;
-		}
-	}
-
-	SE_LOG(LogSlateWindow, Verbose, L"Could not found widget name: \"{}\". Abort.", name);
-}
-
-Vector2 SWindow::GetDesiredSize()
-{
-	return _localSize;
-}
-
-void SWindow::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
-{
-	for (auto it = _screenWidgets.begin(); it != _screenWidgets.end(); ++it)
-	{
-		ESlateVisibility childVisibility = (*it)->GetVisibility();
-		if (arrangedChildrens->Accepts(childVisibility))
-		{
-			// Add the information about this child to the output list (ArrangedChildren)
-			arrangedChildrens->AddWidget(childVisibility, allottedGeometry.MakeChild(
-				// The child widget being arranged
-				*it,
-				// Child's local position (i.e. position within parent)
-				Vector2(0, 0),
-				// Child's size
-				_localSize
-			));
-		}
+		ArrangedChildrens->AddWidget(VpVisibility, AllottedGeometry.MakeChild(
+			GameViewport,
+			Vector2::GetZero(),
+			AllottedGeometry.GetLocalSize()
+		));
 	}
 }

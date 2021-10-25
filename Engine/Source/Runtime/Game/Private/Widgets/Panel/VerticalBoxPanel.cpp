@@ -2,7 +2,7 @@
 
 #include "Widgets/Panel/VerticalBoxPanel.h"
 
-SVerticalBoxPanel::SVerticalBoxPanel(const std::wstring& name) : Super(name, EOrientation::Vertical)
+SVerticalBoxPanel::SVerticalBoxPanel() : Super(EOrientation::Vertical)
 {
 }
 

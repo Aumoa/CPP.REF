@@ -8,7 +8,7 @@
 #include "D3D12Shader.h"
 #include "D3D12DescriptorHeap.h"
 
-SD3D12CommandList::SD3D12CommandList(SDXGIFactory* factory, SD3D12Device* device) : Super(factory, device)
+SD3D12CommandList::SD3D12CommandList(SDXGIFactory* factory, SD3D12Device* device) : Super(factory, device, nullptr)
 {
 }
 

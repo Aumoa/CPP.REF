@@ -58,7 +58,7 @@ struct DeclarativeAttr : public DeclarativeInheritanceIfImplements<Super, Declar
 };								
 
 #define DECLARE_SLATE_ATTRIBUTE(Type, Var, ...)								\
-Type _ ## Var __VA_ARGS__;													\
+Type _ ## Var __VA_OPT__(=) __VA_ARGS__;									\
 This&& Var(const Type& value) &&											\
 {																			\
 	_ ## Var = value;														\
@@ -81,6 +81,7 @@ This&& operator [](SWidget* value) &&										\
 
 #define DECLARE_SLATE_CONSTRUCTOR() void Construct(DeclarativeAttr<>&&)
 #define DEFINE_SLATE_CONSTRUCTOR(SlateClass, AttrVar) void SlateClass::Construct(DeclarativeAttr<>&& AttrVar)
+#define INVOKE_SLATE_CONSTRUCTOR_SUPER(AttrVar) Super::Construct(AttrVar)
 
 #define DECLARE_SLATE_SLOT_SUPPORTS(SlotClass)				\
 std::vector<SlotClass> Slots;								\
@@ -90,4 +91,5 @@ This&& operator +(SlotClass&& instanceSlot) &&				\
 	return std::move(*static_cast<This*>(this));			\
 }
 
-#define SNew(SlateClass) (NewObject<SlateClass>(ANSI_TO_WCHAR(typeid(SlateClass).name()))) << SlateClass::DeclarativeAttr<>()
+#define SNew(SlateClass) (NewObject<SlateClass>()) << SlateClass::DeclarativeAttr<>()
+#define SAssignNew(Var, SlateClass) (Var = NewObject<SlateClass>()) << SlateClass::DeclarativeAttr<>()

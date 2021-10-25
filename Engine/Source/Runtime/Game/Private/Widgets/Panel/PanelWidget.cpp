@@ -2,7 +2,7 @@
 
 #include "Widgets/Panel/PanelWidget.h"
 
-SPanelWidget::SPanelWidget(const std::wstring& name) : Super(name)
+SPanelWidget::SPanelWidget() : Super()
 {
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }

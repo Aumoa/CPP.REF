@@ -47,7 +47,6 @@ private:
 
 		void Init();
 		void Init_RenderThread();
-		void WaitToComplete();
 		void Worker();
 	};
 

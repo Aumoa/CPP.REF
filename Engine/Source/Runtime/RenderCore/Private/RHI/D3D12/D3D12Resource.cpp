@@ -2,7 +2,7 @@
 
 #include "D3D12Resource.h"
 
-SD3D12Resource::SD3D12Resource(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadBuf) : Super(factory, device)
+SD3D12Resource::SD3D12Resource(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadBuf) : Super(factory, device, resource.Get())
 	, _resource(std::move(resource))
 {
 }

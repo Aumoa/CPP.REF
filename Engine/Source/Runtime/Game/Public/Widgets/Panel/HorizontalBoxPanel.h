@@ -10,6 +10,6 @@ class GAME_API SHorizontalBoxPanel : public SBoxPanel
 	GENERATED_BODY(SHorizontalBoxPanel)
 
 public:
-	SHorizontalBoxPanel(const std::wstring& name);
+	SHorizontalBoxPanel();
 	virtual ~SHorizontalBoxPanel() override;
 };

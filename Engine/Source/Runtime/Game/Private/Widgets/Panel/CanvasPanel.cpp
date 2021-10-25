@@ -4,7 +4,7 @@
 #include "Layout/ArrangedChildrens.h"
 #include "Draw/PaintArgs.h"
 
-SCanvasPanel::SCanvasPanel(const std::wstring& name) : Super(name)
+SCanvasPanel::SCanvasPanel() : Super()
 {
 }
 

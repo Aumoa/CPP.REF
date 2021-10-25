@@ -78,6 +78,20 @@ void SObject::DestroyObject(SObject* InObject)
 	InternalDetachSubobject(InObject);
 }
 
+void SObject::CleanupSubobjects()
+{
+	for (size_t i = 0; i < Subobjects.size(); ++i)
+	{
+		if (Subobjects[i]->Outer == this)
+		{
+			Subobjects[i]->Outer = nullptr;
+		}
+	}
+
+	Subobjects.clear();
+	Views.clear();
+}
+
 void* SObject::operator new(size_t AllocSize)
 {
 	return new uint8[AllocSize];

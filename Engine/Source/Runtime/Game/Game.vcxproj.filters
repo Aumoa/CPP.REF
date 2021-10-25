@@ -169,6 +169,12 @@
     <Filter Include="Private\SceneRendering">
       <UniqueIdentifier>{f19d49cb-4507-4ba2-84f4-87a0609c2a09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Application">
+      <UniqueIdentifier>{f96476c4-dfe4-4b9e-9afd-b8d2cbaed86f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Application">
+      <UniqueIdentifier>{b6c08979-3a5c-4527-b0c2-c85ae54234ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\LogGame.cpp">
@@ -327,9 +333,6 @@
     <ClCompile Include="Private\GameModule.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Widgets\SlateApplication.cpp">
-      <Filter>Private\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Draw\PaintArgs.cpp">
       <Filter>Private\Draw</Filter>
     </ClCompile>
@@ -404,6 +407,12 @@
     </ClCompile>
     <ClCompile Include="Private\SceneRendering\SceneView.cpp">
       <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Application\SlateApplication.cpp">
+      <Filter>Private\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Viewport.cpp">
+      <Filter>Private\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -611,9 +620,6 @@
     <ClInclude Include="Public\GameModule.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Widgets\SlateApplication.h">
-      <Filter>Public\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Concepts\LayoutTransform.h">
       <Filter>Public\Concepts</Filter>
     </ClInclude>
@@ -778,6 +784,12 @@
     </ClInclude>
     <ClInclude Include="Public\SceneRendering\SceneViewScope.h">
       <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Application\SlateApplication.h">
+      <Filter>Public\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Viewport.h">
+      <Filter>Public\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

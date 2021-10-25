@@ -3,7 +3,7 @@
 #include "Widgets/LeafWidget.h"
 #include "Layout/LayoutImpl.h"
 
-SLeafWidget::SLeafWidget(const std::wstring& name) : Super(name)
+SLeafWidget::SLeafWidget() : Super()
 {
 }
 

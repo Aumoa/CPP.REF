@@ -3,7 +3,7 @@
 #include "Widgets/Input/Button.h"
 #include "Layout/ArrangedChildrens.h"
 
-SButton::SButton(const std::wstring& name) : Super(name)
+SButton::SButton() : Super()
 {
 }
 

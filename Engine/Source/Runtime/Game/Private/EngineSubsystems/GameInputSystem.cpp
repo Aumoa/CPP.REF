@@ -17,7 +17,7 @@ SGameInputSystem::~SGameInputSystem()
 {
 }
 
-void SGameInputSystem::Tick(std::chrono::duration<float> elapsedTime)
+void SGameInputSystem::Tick(float InDeltaTime)
 {
 	// Update tracking state.
 	IPlatformMouse& wMouse = IPlatformMouse::Get();

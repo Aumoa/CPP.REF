@@ -17,7 +17,7 @@ private:
 	SlateFont _font;
 
 public:
-	STextBlock(const std::wstring& name);
+	STextBlock();
 	virtual ~STextBlock() override;
 
 	virtual Vector2 GetDesiredSize() override;

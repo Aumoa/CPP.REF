@@ -24,7 +24,13 @@ void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 		WorkBody();
 	}
 
-	CompletedWork();
+	if (CompletedWork)
+	{
+		CompletedWork();
+	}
+
+	Works.clear();
+	CompletedWork = nullptr;
 }
 
 void RenderThread::ThreadInfo::Init()
@@ -38,19 +44,6 @@ void RenderThread::ThreadInfo::Init_RenderThread()
 	SThread* CurrentThread = SThread::GetCurrentThread();
 	ThreadId = CurrentThread->GetThreadId();
 	CurrentThread->SetFriendlyName(L"[Render Thread]");
-}
-
-void RenderThread::ThreadInfo::WaitToComplete()
-{
-	std::unique_lock lock(CriticalSection);
-	bRunning = false;
-
-	// Flush executing event.
-	_ExecutingWorks.ExecuteEvent->Set();
-
-	// Join executing thread.
-	lock.unlock();
-	Thread.join();
 }
 
 void RenderThread::ThreadInfo::Worker()
@@ -76,13 +69,19 @@ void RenderThread::Init()
 
 void RenderThread::Shutdown()
 {
-	_Thread.WaitToComplete();
+	_Thread.bRunning = false;
+
+	// Flush executing event.
+	ExecuteWorks(nullptr);
+
+	// Join executing thread.
+	_Thread.Thread.join();
 }
 
 void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody)
 {
 	std::unique_lock lock(_Thread.CriticalSection);
-	_WaitingWorks.Works.emplace_back(InWorkBody);
+	_WaitingWorks.Works.emplace_back(std::move(InWorkBody));
 }
 
 void RenderThread::ExecuteWorks(std::function<void()> InCompletionWork)

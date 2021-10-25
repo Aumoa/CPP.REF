@@ -10,7 +10,7 @@ class GAME_API SButton : public SBorder
 	GENERATED_BODY(SButton)
 
 public:
-	SButton(const std::wstring& name);
+	SButton();
 
 protected:
 	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) override;

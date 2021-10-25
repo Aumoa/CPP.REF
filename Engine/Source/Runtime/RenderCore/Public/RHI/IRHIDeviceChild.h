@@ -10,4 +10,5 @@ interface IRHIDevice;
 interface IRHIDeviceChild : implements IRHIFactoryChild
 {
 	virtual IRHIDevice* GetDevice() = 0;
+	virtual void SetDebugName(std::wstring_view InName) = 0;
 };

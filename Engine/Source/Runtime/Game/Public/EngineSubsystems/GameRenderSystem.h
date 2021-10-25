@@ -54,6 +54,7 @@ public:
 
 	virtual void Init() override;
 	virtual void Deinit() override;
+	virtual void Tick(float InDeltaTime) override;
 	virtual void ExecuteRenderThread();
 
 	void SetupFrameworkView(IFrameworkView* frameworkView);

@@ -6,7 +6,7 @@
 #include "LogGame.h"
 #include <ranges>
 
-SBoxPanel::SBoxPanel(const std::wstring& name, EOrientation orientation) : Super(name)
+SBoxPanel::SBoxPanel(EOrientation orientation) : Super()
 	, _orientation(orientation)
 {
 }

@@ -75,6 +75,6 @@ INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR 
 	}
 
 	// Cleanup GameEngineModule.
-	SObject::DestroyObject(gameModule);
+	engineModule.DestroyObject(gameModule);
 	return errorCode;
 }

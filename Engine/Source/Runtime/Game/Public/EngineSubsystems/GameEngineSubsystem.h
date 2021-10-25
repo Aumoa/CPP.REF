@@ -17,7 +17,7 @@ public:
 
 	virtual void Init() {}
 	virtual void Deinit() {};
-	virtual void Tick(std::chrono::duration<float> elapsedTime) {}
+	virtual void Tick(float InDeltaTime) {}
 
 public:
 	template<std::derived_from<SGameEngineSubsystem> T>

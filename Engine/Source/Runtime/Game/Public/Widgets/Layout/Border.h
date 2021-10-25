@@ -15,7 +15,7 @@ private:
 	SWidget* _content = nullptr;
 
 public:
-	SBorder(const std::wstring& name);
+	SBorder();
 
 	virtual Vector2 GetDesiredSize() override;
 

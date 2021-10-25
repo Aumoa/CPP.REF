@@ -3,7 +3,7 @@
 #include "DXGISwapChain.h"
 #include "RHI/D3D12/D3D12Texture2D.h"
 
-SDXGISwapChain::SDXGISwapChain(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDXGISwapChain4> swapChain) : Super(factory, device)
+SDXGISwapChain::SDXGISwapChain(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDXGISwapChain4> swapChain) : Super(factory, device, nullptr)
 	, _swapChain(std::move(swapChain))
 {
 }

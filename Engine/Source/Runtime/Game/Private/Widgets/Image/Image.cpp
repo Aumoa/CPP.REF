@@ -3,7 +3,7 @@
 #include "Widgets/Image/Image.h"
 #include "Draw/SlateWindowElementList.h"
 
-SImage::SImage(const std::wstring& name) : Super(name)
+SImage::SImage() : Super()
 {
 	SetRenderTransform(SlateRenderTransform::Identity());
 }

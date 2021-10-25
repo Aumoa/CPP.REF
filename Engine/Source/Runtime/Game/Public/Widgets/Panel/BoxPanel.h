@@ -19,11 +19,11 @@ public:
 		{
 		}
 
-		DECLARE_SLATE_ATTRIBUTE(EHorizontalAlignment, HAlignment, = EHorizontalAlignment::Left);
-		DECLARE_SLATE_ATTRIBUTE(EVerticalAlignment, VAlignment, = EVerticalAlignment::Top);
+		DECLARE_SLATE_ATTRIBUTE(EHorizontalAlignment, HAlignment, EHorizontalAlignment::Left);
+		DECLARE_SLATE_ATTRIBUTE(EVerticalAlignment, VAlignment, EVerticalAlignment::Top);
 		DECLARE_SLATE_ATTRIBUTE(::SizeParam, SizeParam);
 		DECLARE_SLATE_ATTRIBUTE(Margin, SlotPadding);
-		DECLARE_SLATE_ATTRIBUTE(float, MaxSize, = 0);
+		DECLARE_SLATE_ATTRIBUTE(float, MaxSize, 0);
 	};
 
 private:
@@ -31,7 +31,7 @@ private:
 	std::vector<Slot> _slots;
 
 protected:
-	SBoxPanel(const std::wstring& name, EOrientation orientation);
+	SBoxPanel(EOrientation orientation);
 	virtual ~SBoxPanel() override;
 
 	virtual Vector2 GetDesiredSize() override;

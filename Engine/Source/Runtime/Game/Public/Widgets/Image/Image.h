@@ -16,7 +16,7 @@ private:
 	SlateBrush _brush;
 
 public:
-	SImage(const std::wstring& name);
+	SImage();
 	virtual ~SImage() override;
 
 	virtual Vector2 GetDesiredSize() override;

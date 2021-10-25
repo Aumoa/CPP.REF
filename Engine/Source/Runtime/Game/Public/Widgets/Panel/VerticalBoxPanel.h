@@ -10,6 +10,6 @@ class GAME_API SVerticalBoxPanel : public SBoxPanel
 	GENERATED_BODY(SVerticalBoxPanel)
 
 public:
-	SVerticalBoxPanel(const std::wstring& name);
+	SVerticalBoxPanel();
 	virtual ~SVerticalBoxPanel() override;
 };

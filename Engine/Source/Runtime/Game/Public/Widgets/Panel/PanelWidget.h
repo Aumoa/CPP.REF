@@ -10,5 +10,5 @@ class GAME_API SPanelWidget : public SCompoundWidget
 	GENERATED_BODY(SPanelWidget)
 
 public:
-	SPanelWidget(const std::wstring& name);
+	SPanelWidget();
 };

@@ -3,19 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <optional>
-#include <chrono>
 #include "Ticking/TickScheduler.h"
 #include "Misc/TickCalc.h"
 
 class SGameInstance;
-class SColorVertexFactory;
-class SColorShader;
-class SAssetImporter;
-class SRHITexture2D;
-class STransparentShader;
-class SSlateShader;
 class SGameEngineSubsystem;
+class SSlateApplication;
 struct IFrameworkView;
 
 /// <summary>
@@ -26,7 +19,8 @@ class GAME_API SGameEngine : implements SObject
 	GENERATED_BODY(SGameEngine)
 
 private:
-	SGameInstance* _GameInstance = nullptr;
+	SGameInstance* GameInstance = nullptr;
+	SSlateApplication* SlateApplication = nullptr;
 
 public:
 	/// <summary>
@@ -86,9 +80,9 @@ private:
 	TickCalc<> _TickCalc;
 
 private:
-	void SystemsTick(std::chrono::duration<float> elapsedTime);
-	void GameTick(std::chrono::duration<float> elapsedTime);
-	void RenderTick(std::chrono::duration<float> elapsedTime);
+	void SystemsTick(std::chrono::duration<float> InDeltaTime);
+	void GameTick(std::chrono::duration<float> InDeltaTime);
+	void RenderTick(std::chrono::duration<float> InDeltaTime);
 };
 
 extern GAME_API SGameEngine* GEngine;

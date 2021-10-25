@@ -19,11 +19,11 @@ public:
 		{
 		}
 
-		DECLARE_SLATE_ATTRIBUTE(Margin, Offset, = Margin(0, 0, 100.0f, 100.0f));
+		DECLARE_SLATE_ATTRIBUTE(Margin, Offset, Margin(0, 0, 100.0f, 100.0f));
 		DECLARE_SLATE_ATTRIBUTE(::Anchors, Anchors);
 		DECLARE_SLATE_ATTRIBUTE(Vector2, Alignment);
-		DECLARE_SLATE_ATTRIBUTE(float, ZOrder, = 0);
-		DECLARE_SLATE_ATTRIBUTE(bool, bAutoSize, = false);
+		DECLARE_SLATE_ATTRIBUTE(float, ZOrder, 0);
+		DECLARE_SLATE_ATTRIBUTE(bool, bAutoSize, false);
 	};
 
 private:
@@ -37,7 +37,7 @@ private:
 	std::vector<Slot> _slots;
 
 public:
-	SCanvasPanel(const std::wstring& name);
+	SCanvasPanel();
 	virtual ~SCanvasPanel() override;
 
 	virtual Vector2 GetDesiredSize() override;
