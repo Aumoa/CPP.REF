@@ -41,6 +41,11 @@ IRHIDeviceContext* SD3D12Device::GetImmediateContext()
 	return _immCon;
 }
 
+IRHIDeviceContext* SD3D12Device::CreateDeviceContext()
+{
+	return NewObject<SD3D12CommandList>(_factory, this);
+}
+
 IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData)
 {
 	if (desc.Usage == ERHIBufferUsage::Immutable && initialData == nullptr)

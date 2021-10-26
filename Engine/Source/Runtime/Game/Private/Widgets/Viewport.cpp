@@ -11,6 +11,7 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateDrawElement.h"
 #include "Level/World.h"
+#include "SceneRendering/ForwardSceneRenderer.h"
 
 DEFINE_LOG_CATEGORY(LogViewport);
 
@@ -41,10 +42,14 @@ void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext)
 {
 	if (GameWorld)
 	{
-		SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::CopySource);
+		SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::PixelShaderResource);
 		// TODO: Render world.
 		ensure(false);
 	}
+
+	SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::PixelShaderResource);
+	ForwardSceneRenderer ForwardRenderer(RenderTarget, nullptr);
+	ForwardRenderer.PopulateCommandLists(InDeviceContext);
 }
 
 Vector2 SViewport::GetDesiredSize()
@@ -95,7 +100,7 @@ void SViewport::ReallocRenderTarget()
 			TextureDesc.Format = RenderTargetFormat;
 			TextureDesc.Usage = ERHIBufferUsage::Default;
 			TextureDesc.Flags = ERHIResourceFlags::AllowRenderTarget;
-			TextureDesc.InitialState = ERHIResourceStates::CopySource;
+			TextureDesc.InitialState = ERHIResourceStates::PixelShaderResource;
 			TextureDesc.ClearValue.emplace() =
 			{
 				.Format = TextureDesc.Format,

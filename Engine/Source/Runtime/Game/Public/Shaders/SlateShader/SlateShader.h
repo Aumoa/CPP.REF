@@ -27,10 +27,12 @@ public:
 		Vector3 pad;
 	};
 
-	enum class ESlateRenderMode
+	struct InitElementContext
 	{
-		ImageSource,
-		Glyph,
+		SSlateShader* Shader;
+		const std::vector<SlateDrawElement>* DrawElementsRef;
+		std::vector<DrawElement> RenderElements;
+		int32 NumDescriptors;
 	};
 
 private:
@@ -53,7 +55,9 @@ public:
 	virtual std::span<uint8 const> CompileVS() override;
 	virtual std::span<uint8 const> CompilePS() override;
 
-	SMaterial* GetDefaultMaterial() const;
-	std::vector<DrawElement> MakeElements(const std::vector<SlateDrawElement>& elements) const;
-	void RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, const SlateWindowElementList& elements);
+	InitElementContext InitElements(const SlateWindowElementList& DrawElements);
+	void RenderElements(IRHIDeviceContext* InContext, const Vector2& ScreenSize, const InitElementContext& InitCtx);
+
+private:
+	bool IsRenderElement(const SlateDrawElement& InElement) const;
 };

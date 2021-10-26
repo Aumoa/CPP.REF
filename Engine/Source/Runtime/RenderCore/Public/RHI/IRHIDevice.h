@@ -21,6 +21,7 @@ class SVertexFactory;
 interface IRHIDevice : implements IRHIFactoryChild
 {
 	virtual IRHIDeviceContext* GetImmediateContext() = 0;
+	virtual IRHIDeviceContext* CreateDeviceContext() = 0;
 	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData) = 0;
 	virtual IRHIBuffer* CreateBuffer(const RHIBufferDesc& desc, const RHISubresourceData* initialData) = 0;
 	virtual IRHIShader* CompileMaterial(SMaterial* material, SVertexFactory* vertexDeclaration) = 0;

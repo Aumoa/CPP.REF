@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 interface IFrameworkView;
+interface IRHIDeviceContext;
 class PaintArgs;
 class SLocalPlayer;
 class SWindow;
@@ -16,6 +17,8 @@ class GAME_API SSlateApplication : implements SObject
 private:
 	SLocalPlayer* LocalPlayer = nullptr;
 	SWindow* CoreWindow = nullptr;
+
+	IRHIDeviceContext* DeferredContext = nullptr;
 
 public:
 	SSlateApplication();

@@ -4,8 +4,10 @@
 #include "Materials/Material.h"
 #include "GameEngine.h"
 #include "Draw/SlateWindowElementList.h"
-#include "EngineSubsystems/GameRenderSystem.h"
 #include "Layout/LayoutImpl.h"
+#include "RHI/IRHIDeviceContext.h"
+#include "RHI/IRHIShaderResourceView.h"
+#include "Shaders/SlateShader/SlateShader.h"
 
 #ifndef BYTE
 #define BYTE uint8
@@ -20,15 +22,7 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 	{
 		.RangeType = ERHIDescriptorRangeType::ShaderResourceView,
 		.NumDescriptors = 1,
-		.BaseShaderRegister = 1,
-		.RegisterSpace = 0,
-	};
-
-	_fontFaceBufferRanges.emplace_back() =
-	{
-		.RangeType = ERHIDescriptorRangeType::ShaderResourceView,
-		.NumDescriptors = 1,
-		.BaseShaderRegister = 2,
+		.BaseShaderRegister = 0,
 		.RegisterSpace = 0,
 	};
 
@@ -43,7 +37,7 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 		// [1] SlateElements
 		{
 			.Name = L"SlateElements",
-			.ElementType = ERHIShaderParameterType::StructuredBuffer,
+			.ElementType = ERHIShaderParameterType::ScalarParameterConstants,
 			.Index = 1
 		},
 		// [2] ImageSource
@@ -52,12 +46,6 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 			.ElementType = ERHIShaderParameterType::DescriptorTable,
 			.Index = 2
 		},
-		// [3] RenderMode
-		{
-			.Name = L"RenderMode",
-			.ElementType = ERHIShaderParameterType::ScalarParameterConstants,
-			.Index = 3
-		}
 	};
 
 	_elements =
@@ -68,15 +56,16 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 			.ScalarConstantsParameter =
 			{
 				.ShaderRegister = 0,
-				.Num32Bits = 2,
+				.Num32Bits = sizeof(Vector2) / 4,
 			}
 		},
 		// [1] SlateElements
 		{
-			.Type = ERHIShaderParameterType::StructuredBuffer,
-			.StructuredBuffer =
+			.Type = ERHIShaderParameterType::ScalarParameterConstants,
+			.ScalarConstantsParameter =
 			{
-				.ShaderRegister = 0,
+				.ShaderRegister = 1,
+				.Num32Bits = sizeof(DrawElement) / 4,
 			}
 		},
 		// [2] ImageSource
@@ -87,134 +76,8 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 				.NumDescriptorRanges = (uint32)_imageSourceRanges.size(),
 				.pDescriptorRanges = _imageSourceRanges.data()
 			}
-		},
-		// [3] RenderMode
-		{
-			.Type = ERHIShaderParameterType::ScalarParameterConstants,
-			.ScalarConstantsParameter =
-			{
-				.ShaderRegister = 1,
-				.Num32Bits = 1
-			}
 		}
 	};
-}
-
-auto SSlateShader::MakeElements(const std::vector<SlateDrawElement>& elements) const -> std::vector<DrawElement>
-{
-	//SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
-
-	std::vector<DrawElement> renderElements;
-	renderElements.reserve(elements.size());
-
-	for (size_t i = 0; i < elements.size(); ++i)
-	{
-		const auto& element_s = elements[i];
-		auto& element_d = renderElements.emplace_back();
-		if (element_s.Transform.HasRenderTransform())
-		{
-			const SlateRenderTransform& renderTransform = element_s.Transform.GetAccumulatedRenderTransform();
-			element_d.M = renderTransform.GetMatrix();
-			element_d.AbsolutePosition = renderTransform.GetTranslation();
-			element_d.AbsoluteSize = element_s.Transform.GetLocalSize();
-			element_d.Depth = (float)element_s.Layer;
-			element_d.TexturePosition = Vector2::GetZero();
-			element_d.TextureSize = Vector2::GetOneVector();
-		}
-		//else if (auto element_s = std::get_if<SlateFontElement>(&elements[i]))
-		//{
-		//	if (element_s->FontFace && element_s->Text.length())
-		//	{
-		//		if (renderElements.capacity() <= renderElements.size() + element_s->Text.length())
-		//		{
-		//			// Reserve space for store glyph render informations.
-		//			renderElements.reserve(renderElements.capacity() + element_s->Text.length());
-		//		}
-
-		//		 TEST IMPLEMENTATION: Streaming glyphs.
-		//		element_s->FontFace->SetFontSize(element_s->FontSize);
-		//		fontCachingMgr->StreamGlyphs(element_s->FontFace, element_s->Text);
-		//		fontCachingMgr->Apply();
-
-		//		 Get font rendering info.
-		//		std::vector glyphInfos = fontCachingMgr->QueryGlyphsRenderInfo(element_s->FontFace, element_s->FontSize, element_s->Text);
-
-		//		Vector2 advance;
-		//		const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
-		//		const Vector2& localTranslation = renderTransform.GetTranslation();
-		//		const Vector2& localSize = element_s->Transform.GetLocalSize();
-		//		const Matrix2x2& localMatrix = renderTransform.GetMatrix();
-
-		//		for (auto& glyph : glyphInfos)
-		//		{
-		//			auto& element_d = renderElements.emplace_back();
-		//			element_d.M = localMatrix;
-		//			element_d.AbsolutePosition = localTranslation + advance + Vector2(0, localSize.Y) - glyph.LocalPosition * Vector2(-1.0f, 1.0f);
-		//			element_d.AbsoluteSize = glyph.AbsoluteSize;
-		//			element_d.Depth = (float)element_s->Layer;
-		//			element_d.TexturePosition = (glyph.AbsolutePosition + Vector2(0.5f, 0.0f)) * glyph.AbsoluteToLocalScale;
-		//			element_d.TextureSize = (glyph.AbsoluteSize + Vector2(-0.5f, 1.0f)) * glyph.AbsoluteToLocalScale;
-
-		//			advance += glyph.LocalAdvance;
-		//		}
-		//	}
-		//}
-	}
-
-	return renderElements;
-}
-
-void SSlateShader::RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, const SlateWindowElementList& elements)
-{
-	// Caching max elements.
-	size_t maxDescriptors = 0;
-	for (auto& element : elements.GetElements())
-	{
-		if (element.Brush.ImageSource)
-		{
-			maxDescriptors += 1;
-		}
-	}
-	
-	//uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);
-	//deviceContext->SetGraphicsRoot32BitConstants(0, 2, &screenSize, 0);
-
-	//_shaderDescriptorView->SetMaxDescriptorCount(maxDescriptors);
-	//_shaderDescriptorView->ResetBindings();
-	//deviceContext->SetShaderDescriptorViews(_shaderDescriptorView, nullptr);
-
-	//for (auto& element : elements_span)
-	//{
-	//	if (auto element_s = std::get_if<SlateDrawElement>(&element))
-	//	{
-	//		if (element_s->Brush.ImageSource)
-	//		{
-	//			const int32 RenderMode = (int32)ESlateRenderMode::ImageSource;
-
-	//			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
-	//			deviceContext->SetGraphicsRootShaderResourceView(2, element_s->Brush.ImageSource);
-	//			deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
-	//			deviceContext->DrawInstanced(4, 1);
-
-	//			gpuAddr += sizeof(DrawElement);
-	//		}
-	//	}
-	//	else if (auto element_s = std::get_if<SlateFontElement>(&element))
-	//	{
-	//		if (element_s->FontFace)
-	//		{
-	//			SRHIShaderResourceView* imageSource = fontCachingMgr->GetFontFaceRenderingView(element_s->FontFace);
-	//			const int32 RenderMode = (int32)ESlateRenderMode::Glyph;
-
-	//			deviceContext->SetGraphicsRootShaderResourceView(1, gpuAddr);
-	//			deviceContext->SetGraphicsRootShaderResourceView(2, imageSource);
-	//			deviceContext->SetGraphicsRoot32BitConstants(3, 1, &RenderMode, 0);
-	//			deviceContext->DrawInstanced(4, (uint32)element_s->Text.length());
-
-	//			gpuAddr += sizeof(DrawElement) * element_s->Text.length();
-	//		}
-	//	}
-	//}
 }
 
 std::span<uint8 const> SSlateShader::CompileVS()
@@ -225,4 +88,60 @@ std::span<uint8 const> SSlateShader::CompileVS()
 std::span<uint8 const> SSlateShader::CompilePS()
 {
 	return pSlateShaderPS;
+}
+
+auto SSlateShader::InitElements(const SlateWindowElementList& DrawElements) -> InitElementContext
+{
+	InitElementContext Ctx;
+
+	// Init render elements.
+	const std::vector<SlateDrawElement>& Elements = DrawElements.GetElements();
+	Ctx.Shader = this;
+	Ctx.DrawElementsRef = &Elements;
+	Ctx.RenderElements.reserve(Elements.size());
+
+	Ctx.NumDescriptors = 0;
+	for (auto& Element : DrawElements.GetElements())
+	{
+		if (IsRenderElement(Element))
+		{
+			const SlateRenderTransform& RenderTransform = Element.Transform.GetAccumulatedRenderTransform();
+
+			DrawElement& RenderElement = Ctx.RenderElements.emplace_back();
+			RenderElement.M = RenderTransform.GetMatrix();
+			RenderElement.AbsolutePosition = RenderTransform.GetTranslation();
+			RenderElement.AbsoluteSize = Element.Transform.GetLocalSize();
+			RenderElement.Depth = (float)Element.Layer;
+			RenderElement.TexturePosition = Vector2::GetZero();
+			RenderElement.TextureSize = Vector2::GetOneVector();
+
+			Ctx.NumDescriptors += 1;
+		}
+	}
+
+	return Ctx;
+}
+
+void SSlateShader::RenderElements(IRHIDeviceContext* InContext, const Vector2& ScreenSize, const InitElementContext& InitCtx)
+{
+	// Begin slate frame.
+	InContext->SetGraphicsShader(InitCtx.Shader->GetShader());
+	InContext->SetGraphicsRoot32BitConstants(0, ScreenSize, 0);
+
+	auto RenderIt = InitCtx.RenderElements.begin();
+	for (auto& Element : *InitCtx.DrawElementsRef)
+	{
+		if (IsRenderElement(Element))
+		{
+			InContext->SetGraphicsRoot32BitConstants(1, *RenderIt, 0);
+			InContext->SetGraphicsRootShaderResourceView(2, Element.Brush.ImageSource, 0, 1);
+			InContext->DrawInstanced(4, 1, 0, 0);
+			++RenderIt;
+		}
+	}
+}
+
+bool SSlateShader::IsRenderElement(const SlateDrawElement& InElement) const
+{
+	return InElement.Brush.ImageSource && InElement.Transform.HasRenderTransform();
 }

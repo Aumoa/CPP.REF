@@ -45,6 +45,7 @@ public:
 	virtual ~SD3D12Device() override;
 
 	virtual IRHIDeviceContext* GetImmediateContext() override;
+	virtual IRHIDeviceContext* CreateDeviceContext() override;
 	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData) override;
 	virtual IRHIBuffer* CreateBuffer(const RHIBufferDesc& desc, const RHISubresourceData* initialData) override;
 	virtual IRHIShader* CompileMaterial(SMaterial* material, SVertexFactory* vertexDeclaration) override;

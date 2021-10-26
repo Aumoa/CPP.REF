@@ -6,6 +6,8 @@
 #include "Draw/SlateWindowElementList.h"
 #include "SceneRendering/SlateRenderer.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "RHI/IRHIDevice.h"
+#include "RHI/IRHIDeviceContext.h"
 
 SSlateApplication::SSlateApplication() : Super()
 {
@@ -33,6 +35,20 @@ void SSlateApplication::PopulateCommandLists(const PaintArgs& Args)
 	SlateWindowElementList Elements(CoreWindow);
 	CoreWindow->Paint(Args, AllottedGeometry, CullingRect, Elements, 0, true);
 
-	SlateRenderer Renderer(*Args.RenderTarget, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader(), Elements);
-	Renderer.PopulateCommandLists(Args.DeviceContext);
+	if (DeferredContext == nullptr)
+	{
+		DeferredContext = Args.DeviceContext->GetDevice()->CreateDeviceContext();
+		DeferredContext->SetOuter(this);
+	}
+
+	SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
+	auto InitContext = Shader->InitElements(Elements);
+
+	DeferredContext->Begin(InitContext.NumDescriptors, 0);
+
+	SlateRenderer Renderer(*Args.RenderTarget, Shader, &InitContext);
+	Renderer.PopulateCommandLists(DeferredContext);
+
+	DeferredContext->End();
+	Args.DeviceContext->ExecuteCommandList(DeferredContext);
 }

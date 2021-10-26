@@ -14,18 +14,22 @@ ID3D12CommandAllocator* SD3D12ThreadAllocatorContainer::GetPrimaryAllocator(uint
 {
 	if (auto& pendingBody = _allocators.front(); pendingBody.FenceValue <= fenceValue)
 	{
+		ID3D12CommandAllocator* Allocator = pendingBody.IncrementGetAllocator(this);
 		if (pendingBody.FenceValue != 0)
 		{
-			HR(pendingBody.Allocator->Reset());
+			for (auto& Alloc : pendingBody.Allocators)
+			{
+				HR(Alloc->Reset());
+			}
 			pendingBody.FenceValue = 0;
 		}
 
-		return pendingBody.Allocator.Get();
+		return Allocator;
 	}
 	else
 	{
 		NewAllocator();
-		return _allocators.front().Allocator.Get();
+		return _allocators.front().IncrementGetAllocator(this);
 	}
 }
 
@@ -35,10 +39,19 @@ void SD3D12ThreadAllocatorContainer::MarkPendingAllocator(uint64 fenceValue)
 	_allocators.pop();
 
 	pendingBody.FenceValue = fenceValue;
+	pendingBody.AllocatorIndex = 0;
 	_allocators.emplace(std::move(pendingBody));
+}
+
+void SD3D12ThreadAllocatorContainer::NewAllocator(AllocatorPendingBody& InBody)
+{
+	HR(_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&InBody.Allocators.emplace_back())));
 }
 
 void SD3D12ThreadAllocatorContainer::NewAllocator()
 {
-	HR(_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_allocators.emplace().Allocator)));
+	AllocatorPendingBody NewBody = _allocators.emplace();
+	NewBody.FenceValue = 0;
+	NewBody.AllocatorIndex = 0;
+	NewAllocator(NewBody);
 }

@@ -19,9 +19,9 @@ static float2 gTex[] =
 };
 
 ConstantBuffer<SlateConstants> gConstants : register(b0);
-StructuredBuffer<SlateElement> gElements : register(t0);
+ConstantBuffer<SlateElement> gElements : register(b1);
 
 Fragment Main(in uint vId : SV_VERTEXID, in uint iId : SV_INSTANCEID)
 {
-	return GetSlateFragment(gConstants, gElements[iId], gPos[vId], gTex[vId]);
+	return GetSlateFragment(gConstants, gElements, gPos[vId], gTex[vId]);
 }

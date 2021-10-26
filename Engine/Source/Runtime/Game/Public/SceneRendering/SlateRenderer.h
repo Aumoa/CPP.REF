@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "SceneRenderer.h"
+#include "Shaders/SlateShader/SlateShader.h"
 
-class SSlateShader;
 class SlateWindowElementList;
 
 class GAME_API SlateRenderer : public SceneRenderer
@@ -14,10 +14,10 @@ class GAME_API SlateRenderer : public SceneRenderer
 
 public:
 	SSlateShader* const Shader;
-	const SlateWindowElementList& Elements;
+	const SSlateShader::InitElementContext* InitContext;
 
 public:
-	SlateRenderer(SceneRenderTarget& InRenderTarget, SSlateShader* SlateShader, const SlateWindowElementList& Elements);
+	SlateRenderer(SceneRenderTarget& InRenderTarget, SSlateShader* SlateShader, const SSlateShader::InitElementContext* InitContext);
 
 protected:
 	virtual void OnPopulateCommandLists(IRHIDeviceContext* Context) override;

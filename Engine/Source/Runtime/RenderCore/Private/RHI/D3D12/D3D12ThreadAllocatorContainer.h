@@ -13,8 +13,18 @@ class SD3D12ThreadAllocatorContainer : implements SObject
 private:
 	struct AllocatorPendingBody
 	{
-		ComPtr<ID3D12CommandAllocator> Allocator;
+		std::vector<ComPtr<ID3D12CommandAllocator>> Allocators;
 		uint64 FenceValue;
+		size_t AllocatorIndex;
+
+		ID3D12CommandAllocator* IncrementGetAllocator(SD3D12ThreadAllocatorContainer* This)
+		{
+			if (Allocators.size() <= AllocatorIndex)
+			{
+				This->NewAllocator(*this);
+			}
+			return Allocators[AllocatorIndex++].Get();
+		}
 	};
 
 private:
@@ -30,5 +40,6 @@ public:
 	void MarkPendingAllocator(uint64 fenceValue);
 
 private:
+	void NewAllocator(AllocatorPendingBody& InBody);
 	void NewAllocator();
 };

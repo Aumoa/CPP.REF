@@ -28,7 +28,9 @@ void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context)
 	Context->OMSetRenderTargets(RenderTarget.RTV, RenderTarget.IndexOfRTV, 1, RenderTarget.DSV, RenderTarget.IndexOfDSV);
 	if (RenderTarget.RTV)
 	{
-		Context->ClearRenderTargetView(RenderTarget.RTV, RenderTarget.IndexOfRTV, NamedColors::Transparent);
+		// TEST IMPLEMENTATION: Clear color is RED.
+		ensure(false);
+		Context->ClearRenderTargetView(RenderTarget.RTV, RenderTarget.IndexOfRTV, NamedColors::Red);
 	}
 	if (RenderTarget.DSV)
 	{
