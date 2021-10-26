@@ -33,12 +33,12 @@ Vector2 SWindow::GetDesiredSize()
 	return Vector2::GetZero();
 }
 
-void SWindow::OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry)
+void SWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 	ESlateVisibility VpVisibility = GameViewport->GetVisibility();
-	if (ArrangedChildrens->Accepts(VpVisibility))
+	if (ArrangedChildrens.Accepts(VpVisibility))
 	{
-		ArrangedChildrens->AddWidget(VpVisibility, AllottedGeometry.MakeChild(
+		ArrangedChildrens.AddWidget(VpVisibility, AllottedGeometry.MakeChild(
 			GameViewport,
 			Vector2::GetZero(),
 			AllottedGeometry.GetLocalSize()

@@ -7,21 +7,19 @@
 #include "ArrangedWidget.h"
 #include "LayoutEnums.h"
 
-class GAME_API SArrangedChildrens : implements SObject
+class GAME_API ArrangedChildrens
 {
-	GENERATED_BODY(SArrangedChildrens)
-
 private:
-	const ESlateVisibility _VisibilityFilter;
-	std::vector<ArrangedWidget> _Widgets;
+	const ESlateVisibility VisibilityFilter;
+	std::vector<ArrangedWidget> Widgets;
 
 public:
-	SArrangedChildrens(ESlateVisibility visibilityFilter);
+	ArrangedChildrens(ESlateVisibility InVisibilityFilter);
 
-	void AddWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry);
-	void InsertWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry, size_t index);
-	bool Accepts(ESlateVisibility visibility) const;
+	void AddWidget(ESlateVisibility VisibilityOverride, const ArrangedWidget& InArrangedWidget);
+	void InsertWidget(ESlateVisibility VisibilityOverride, const ArrangedWidget& InArrangedWidget, size_t Index);
+	bool Accepts(ESlateVisibility Visibility) const;
 
-	ESlateVisibility GetVisibilityFilter() const { return _VisibilityFilter; }
-	std::span<ArrangedWidget const> GetWidgets() const { return _Widgets; }
+	ESlateVisibility GetVisibilityFilter() const;
+	const std::vector<ArrangedWidget>& GetWidgets() const;
 };

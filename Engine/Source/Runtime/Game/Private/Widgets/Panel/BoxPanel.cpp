@@ -59,12 +59,12 @@ size_t SBoxPanel::NumSlots()
 	return _slots.size();
 }
 
-void SBoxPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
+void SBoxPanel::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
-	ArrangeChildrenAlong(_orientation, GetFlowDirection(), allottedGeometry, arrangedChildrens);
+	ArrangeChildrenAlong(_orientation, GetFlowDirection(), AllottedGeometry, ArrangedChildrens);
 }
 
-void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection inLayoutFlow, const Geometry& allottedGeometry, SArrangedChildrens* arrangedChildrens)
+void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection inLayoutFlow, const Geometry& allottedGeometry, ArrangedChildrens& ArrangedChildrens)
 {
 	// Allotted space will be given to fixed-size children first.
 	// Remaining space will be proportionately divided between stretch children (SizeRule_Stretch)
@@ -175,7 +175,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation orientation, EFlowDirection in
 			Vector2 localSize(xAlignmentResult.Size, yAlignmentResult.Size);
 
 			// Add the information about this child to the output list (ArrangedChildren)
-			arrangedChildrens->AddWidget(childVisibility, allottedGeometry.MakeChild(
+			ArrangedChildrens.AddWidget(childVisibility, allottedGeometry.MakeChild(
 				// The child widget being arranged
 				curChild.GetContent(),
 				// Child's local position (i.e. position within parent)

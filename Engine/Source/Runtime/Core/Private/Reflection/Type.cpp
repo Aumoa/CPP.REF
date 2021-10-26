@@ -36,9 +36,9 @@ SObject* Type::Instantiate(SObject* InOuter) const
 	}
 }
 
-bool Type::IsDerivedFrom(const Type* type) const
+bool Type::IsDerivedFrom(const Type* InType) const
 {
-	if (type->GetHashCode() == GetHashCode())
+	if (InType->GetHashCode() == GetHashCode())
 	{
 		return true;
 	}
@@ -46,7 +46,7 @@ bool Type::IsDerivedFrom(const Type* type) const
 	{
 		for (const Type* super = this; super; super = super->GetSuper())
 		{
-			if (type->GetHashCode() == super->GetHashCode())
+			if (InType->GetHashCode() == super->GetHashCode())
 			{
 				return true;
 			}
@@ -56,14 +56,14 @@ bool Type::IsDerivedFrom(const Type* type) const
 	}
 }
 
-bool Type::IsBaseOf(const Type* type) const
+bool Type::IsBaseOf(const Type* InType) const
 {
-	return type->IsDerivedFrom(this);
+	return InType->IsDerivedFrom(this);
 }
 
-bool Type::IsA(const Type* type) const
+bool Type::IsA(const Type* InType) const
 {
-	return GetHashCode() == type->GetHashCode();
+	return GetHashCode() == InType->GetHashCode();
 }
 
 std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
@@ -84,11 +84,11 @@ std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
 	}
 }
 
-const Method* Type::GetMethod(std::wstring_view friendlyName, bool bIncludeSuperMembers) const
+const Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
 {
 	for (size_t i = 0; i < Functions.size(); ++i)
 	{
-		if (Functions[i].GetFriendlyName() == friendlyName)
+		if (Functions[i].GetFriendlyName() == InFriendlyName)
 		{
 			return &Functions[i];
 		}
@@ -100,7 +100,7 @@ const Method* Type::GetMethod(std::wstring_view friendlyName, bool bIncludeSuper
 		return nullptr;
 	}
 
-	return super->GetMethod(friendlyName, true);
+	return super->GetMethod(InFriendlyName, true);
 }
 
 std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
@@ -121,11 +121,11 @@ std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
 	}
 }
 
-const Property* Type::GetProperty(std::wstring_view friendlyName, bool bIncludeSuperMembers) const
+const Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
 {
 	for (size_t i = 0; i < Properties.size(); ++i)
 	{
-		if (Properties[i].GetFriendlyName() == friendlyName)
+		if (Properties[i].GetFriendlyName() == InFriendlyName)
 		{
 			return &Properties[i];
 		}
@@ -137,7 +137,7 @@ const Property* Type::GetProperty(std::wstring_view friendlyName, bool bIncludeS
 		return nullptr;
 	}
 
-	return super->GetProperty(friendlyName, true);
+	return super->GetProperty(InFriendlyName, true);
 }
 
 std::wstring Type::GenerateUniqueName()
@@ -146,7 +146,7 @@ std::wstring Type::GenerateUniqueName()
 	uint64& Incrementer = TypeRegister[TypeHash];
 	if (uint64 Value = Incrementer++; Value != 0)
 	{
-		return std::format(L"{}_{}", GetFriendlyName(), Incrementer++);
+		return std::format(L"{}_{}", GetFriendlyName(), Value);
 	}
 	else
 	{

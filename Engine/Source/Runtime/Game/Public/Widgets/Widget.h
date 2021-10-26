@@ -10,9 +10,9 @@
 #include "Layout/Geometry.h"
 #include "Layout/LayoutImpl.h"
 
-class SSlateWindowElementList;
+class SlateWindowElementList;
 class PaintArgs;
-class SArrangedChildrens;
+class ArrangedChildrens;
 class ArrangedWidget;
 
 class GAME_API SWidget : implements SObject
@@ -36,8 +36,8 @@ public:
 
 	virtual std::wstring ToString(std::wstring_view formatArgs) override;
 
-	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled);
-	void ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry);
+	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled);
+	void ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry);
 
 	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
 	virtual Vector2 GetDesiredSize();
@@ -51,8 +51,8 @@ public:
 	bool SendKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event);
 
 protected:
-	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled) = 0;
-	virtual void OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry) = 0;
+	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) = 0;
+	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) = 0;
 
 	virtual bool OnReceiveMouseEvent(const Geometry& allottedGeometry, const Vector2N& location, EMouseButton button, EMouseButtonEvent event) = 0;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& allottedGeometry, EKey key, EKeyboardEvent event) = 0;

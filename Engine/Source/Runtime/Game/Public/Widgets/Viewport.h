@@ -13,6 +13,8 @@ interface IRHITexture2D;
 interface IRHIDeviceContext;
 interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
+interface IRHIShaderResourceView;
+class SWorld;
 
 class GAME_API SViewport : public SCompoundWidget
 {
@@ -24,8 +26,11 @@ private:
 
 	IRHIRenderTargetView* RTV = nullptr;
 	IRHIDepthStencilView* DSV = nullptr;
+	IRHIShaderResourceView* SRV = nullptr;
 	IRHITexture2D* RenderTarget = nullptr;
 	IRHITexture2D* DepthStencil = nullptr;
+
+	SWorld* GameWorld = nullptr;
 
 public:
 	SViewport();
@@ -34,7 +39,8 @@ public:
 	void SetRenderSize(const Vector2N& InRenderSize);
 	Vector2N GetRenderSize();
 
-	void PopulateCommandLists(IRHIDeviceContext* InDeviceContext, SceneRenderer* Renderer);
+	void SetGameWorld(SWorld* InGameWorld);
+	void PopulateCommandLists(IRHIDeviceContext* InDeviceContext);
 
 	virtual Vector2 GetDesiredSize() override;
 
@@ -47,8 +53,8 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 protected:
-	virtual void OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry) override;
-	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled) override;
+	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
+	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) override;
 
 private:
 	void ReallocRenderTarget();

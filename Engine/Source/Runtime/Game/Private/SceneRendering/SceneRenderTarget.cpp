@@ -6,19 +6,34 @@
 #include "RHI/IRHITexture2D.h"
 #include "RHI/RHIEnums.h"
 
-SceneRenderTarget::SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
-	: RTV(InRTV)
-	, DSV(InDSV)
-	, IndexOfRTV(IndexOfRTV)
-	, IndexOfDSV(IndexOfDSV)
-	, InitState(InInitState)
+SceneRenderTarget::SceneRenderTarget()
 {
+}
+
+SceneRenderTarget::SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
+{
+	InitTarget(InRTV, IndexOfRTV, InDSV, IndexOfDSV, InInitState);
+}
+
+void SceneRenderTarget::InitTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
+{
+	this->RTV = InRTV;
+	this->DSV = InDSV;
+	this->IndexOfRTV = IndexOfRTV;
+	this->IndexOfDSV = IndexOfDSV;
+	this->InitState = InInitState;
+
 	IRHITexture2D* ReferencedTexture = nullptr;
 
 	if (InRTV)
 	{
 		RTTexture = SObject::Cast<IRHITexture2D>(InRTV->GetResource(IndexOfRTV));
 		ReferencedTexture = RTTexture;
+	}
+	else
+	{
+		RTV = nullptr;
+		RTTexture = nullptr;
 	}
 
 	if (InDSV)
@@ -28,6 +43,11 @@ SceneRenderTarget::SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfR
 		{
 			ReferencedTexture = DSTexture;
 		}
+	}
+	else
+	{
+		DSV = nullptr;
+		DSTexture = nullptr;
 	}
 
 	if (ReferencedTexture)
@@ -48,4 +68,6 @@ SceneRenderTarget::SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfR
 		ScissorRect.Right = (int32)Desc.Width;
 		ScissorRect.Bottom = (int32)Desc.Height;
 	}
+
+	bHasBeenTransited = false;
 }

@@ -44,8 +44,8 @@ public:
 		Type* SuperClass = nullptr;
 		bool bNative = false;
 
-		TypeGenerator(std::wstring_view friendlyName) requires requires { TType::StaticClass(); }
-			: FriendlyName(friendlyName)
+		TypeGenerator(std::wstring_view InFriendlyName) requires requires { TType::StaticClass(); }
+			: FriendlyName(InFriendlyName)
 			, bNative(false)
 		{
 			Functions.reserve(100);
@@ -67,7 +67,7 @@ public:
 
 	private:
 		template<size_t N>
-		static void CollectFunctions(std::vector<Method>& methods)
+		static void CollectFunctions(std::vector<Method>& Methods)
 		{
 			if constexpr (std::same_as<decltype(TType::template REFLECTION_GetFunctionPointer<N>(0)), void>)
 			{
@@ -75,13 +75,13 @@ public:
 			}
 			else
 			{
-				methods.emplace_back(TType::template REFLECTION_GetFunctionPointer<N>(0), std::wstring_view(TType::template REFLECTION_GetFunctionName<N>(0)));
-				CollectFunctions<N + 1>(methods);
+				Methods.emplace_back(TType::template REFLECTION_GetFunctionPointer<N>(0), std::wstring_view(TType::template REFLECTION_GetFunctionName<N>(0)));
+				CollectFunctions<N + 1>(Methods);
 			}
 		}
 
 		template<size_t N>
-		static void CollectProperties(std::vector<Property>& properties)
+		static void CollectProperties(std::vector<Property>& Properties)
 		{
 			if constexpr (std::same_as<decltype(TType::template REFLECTION_GetPropertyPointer<N>(0)), void>)
 			{
@@ -89,22 +89,22 @@ public:
 			}
 			else
 			{
-				properties.emplace_back(TType::template REFLECTION_GetPropertyPointer<N>(0));
-				CollectProperties<N + 1>(properties);
+				Properties.emplace_back(TType::template REFLECTION_GetPropertyPointer<N>(0));
+				CollectProperties<N + 1>(Properties);
 			}
 		}
 	};
 
 public:
 	template<class TType>
-	Type(TypeGenerator<TType>&& generator)
+	Type(TypeGenerator<TType>&& Generator)
 		: TypeHash(typeid(TType).hash_code())
-		, FriendlyName(std::move(generator.FriendlyName))
-		, SuperClass(generator.SuperClass)
+		, FriendlyName(std::move(Generator.FriendlyName))
+		, SuperClass(Generator.SuperClass)
 		, Constructor(GetConstructorFunctionBody<TType>((int32)0))
-		, Functions(std::move(generator.Functions))
-		, Properties(std::move(generator.Properties))
-		, bNative(generator.bNative)
+		, Functions(std::move(Generator.Functions))
+		, Properties(std::move(Generator.Properties))
+		, bNative(Generator.bNative)
 	{
 	}
 
@@ -115,9 +115,9 @@ public:
 	SObject* Instantiate(SObject* InOuter) const;
 	inline bool IsNativeType() const { return bNative; }
 
-	bool IsDerivedFrom(const Type* type) const;
-	bool IsBaseOf(const Type* type) const;
-	bool IsA(const Type* type) const;
+	bool IsDerivedFrom(const Type* InType) const;
+	bool IsBaseOf(const Type* InType) const;
+	bool IsA(const Type* InType) const;
 
 	template<std::derived_from<SObject> T>
 	bool IsDerivedFrom() const { return IsDerivedFrom(T::StaticClass()); }
@@ -127,9 +127,9 @@ public:
 	bool IsA() const { return IsA(T::StaticClass()); }
 
 	std::vector<Method> GetMethods(bool bIncludeSuperMembers = true) const;
-	const Method* GetMethod(std::wstring_view friendlyName, bool bIncludeSuperMembers = true) const;
+	const Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
 	std::vector<Property> GetProperties(bool bIncludeSuperMembers = true) const;
-	const Property* GetProperty(std::wstring_view friendlyName, bool bIncludeSuperMembers = true) const;
+	const Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
 
 	std::wstring GenerateUniqueName();
 

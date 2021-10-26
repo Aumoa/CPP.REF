@@ -1,88 +1,46 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "SceneRendering/SceneRenderer.h"
-#include "SceneRendering/SceneView.h"
-#include "SceneRendering/Scene.h"
-#include "SceneRendering/MeshBatch.h"
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHITexture2D.h"
-#include "Materials/MaterialInterface.h"
-#include "Scene/PrimitiveSceneProxy.h"
 
-SceneRenderer::SceneRenderer(SScene* InScene) : Scene(InScene)
+SceneRenderer::SceneRenderer(SceneRenderTarget& InRenderTarget)
+	: RenderTarget(InRenderTarget)
 {
 }
 
-void SceneRenderer::InitViews(std::span<const SceneViewScope> InViews)
+void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context)
 {
-	Views.reserve(InViews.size());
-
-	for (size_t i = 0; i < InViews.size(); ++i)
-	{
-		SceneView& View = Views.emplace_back(Scene);
-		View.InitViews(InViews[i]);
-	}
-}
-
-void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context, const SceneRenderTarget& InRenderTarget)
-{
-	const bool bShouldBeTransition = InRenderTarget.InitState != ERHIResourceStates::RenderTarget;
+	const bool bShouldBeTransition = RenderTarget.RTTexture && RenderTarget.InitState != ERHIResourceStates::RenderTarget && !RenderTarget.bHasBeenTransited;
 
 	// Transition resource state to render target.
 	RHIResourceTransitionBarrier TransitionBarrier = {};
 	if (bShouldBeTransition)
 	{
-		TransitionBarrier.pResource = InRenderTarget.RTTexture;
-		TransitionBarrier.StateBefore = InRenderTarget.InitState;
+		TransitionBarrier.pResource = RenderTarget.RTTexture;
+		TransitionBarrier.StateBefore = RenderTarget.InitState;
 		TransitionBarrier.StateAfter = ERHIResourceStates::RenderTarget;
 		Context->ResourceBarrier(TransitionBarrier);
+		RenderTarget.bHasBeenTransited = true;
 	}
 
 	// Setup render targets.
-	Context->OMSetRenderTargets(InRenderTarget.RTV, InRenderTarget.IndexOfRTV, 1, InRenderTarget.DSV, InRenderTarget.IndexOfDSV);
-	Context->ClearRenderTargetView(InRenderTarget.RTV, InRenderTarget.IndexOfRTV, NamedColors::Transparent);
-	Context->ClearDepthStencilView(InRenderTarget.DSV, InRenderTarget.IndexOfDSV, 1.0f, 0);
+	Context->OMSetRenderTargets(RenderTarget.RTV, RenderTarget.IndexOfRTV, 1, RenderTarget.DSV, RenderTarget.IndexOfDSV);
+	if (RenderTarget.RTV)
+	{
+		Context->ClearRenderTargetView(RenderTarget.RTV, RenderTarget.IndexOfRTV, NamedColors::Transparent);
+	}
+	if (RenderTarget.DSV)
+	{
+		Context->ClearDepthStencilView(RenderTarget.DSV, RenderTarget.IndexOfDSV, 1.0f, 0);
+	}
 
 	// Setup viewports.
-	Context->RSSetViewport(InRenderTarget.Viewport);
-	Context->RSSetScissorRect(InRenderTarget.ScissorRect);
+	Context->RSSetViewport(RenderTarget.Viewport);
+	Context->RSSetScissorRect(RenderTarget.ScissorRect);
 
-	const std::vector<PrimitiveSceneProxy*>& Primitives = Scene->GetPrimitives_RenderThread();
-
-	// Render for each views.
-	for (auto& View : Views)
-	{
-		uint64 BaseVirtualAddress = View.GetStructuredBufferViewAddress();
-
-		// Render view elements.
-		for (size_t i = 0; i < View.ViewIndexes.size(); ++i)
-		{
-			SceneView::PrimitiveViewInfo& ViewInfo = View.ViewIndexes[i];
-			const PrimitiveSceneProxy& PrimitiveInfo = *Primitives[ViewInfo.PrimitiveId];
-
-			Context->SetGraphicsRootShaderResourceView(0, BaseVirtualAddress);
-
-			for (const MeshBatch& Batch : PrimitiveInfo.MeshBatches)
-			{
-				// Set vertex and index buffer.
-				RHIVertexBufferView Vbv = Batch.GetVertexBufferView();
-				RHIIndexBufferView Ibv = Batch.GetIndexBufferView();
-
-				Context->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
-				Context->IASetVertexBuffers(0, std::span(&Vbv, 1));
-				Context->IASetIndexBuffer(Ibv);
-
-				for (const MeshBatchElement& Elem : Batch.Elements)
-				{
-					SMaterialInterface* Material = Batch.MaterialSlots[Elem.MaterialSlotIndex];
-					Material->SetupCommands(Context);
-					Context->DrawIndexedInstanced(Elem.IndexCount, Elem.InstanceCount, Elem.StartIndexLocation, Elem.BaseVertexLocation, 0);
-				}
-			}
-
-			View.AdvanceViewAddress(BaseVirtualAddress, 1);
-		}
-	}
+	// Populate command lists.
+	OnPopulateCommandLists(Context);
 
 	// Finally, transition resource state to initial state.
 	if (bShouldBeTransition)

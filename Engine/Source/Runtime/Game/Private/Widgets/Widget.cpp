@@ -15,14 +15,14 @@ std::wstring SWidget::ToString(std::wstring_view formatArgs)
 	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFriendlyName(), GetDesiredSize().ToString(formatArgs), SlateVisibilityExtensions::ToString(Visibility));
 }
 
-int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	return OnPaint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer, bParentEnabled);
 }
 
-void SWidget::ArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
+void SWidget::ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry)
 {
-	OnArrangeChildren(arrangedChildrens, allottedGeometry);
+	OnArrangeChildren(InoutArrangedChildrens, AllottedGeometry);
 }
 
 void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)

@@ -26,7 +26,7 @@ public:
 	SWidget* GetContent();
 
 protected:
-	virtual void OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry) override;
+	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

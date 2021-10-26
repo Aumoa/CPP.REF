@@ -11,7 +11,7 @@ SLeafWidget::~SLeafWidget()
 {
 }
 
-void SLeafWidget::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
+void SLeafWidget::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 }
 

@@ -6,8 +6,11 @@
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDepthStencilView.h"
+#include "RHI/IRHIShaderResourceView.h"
 #include "GameThreads/RenderThread.h"
 #include "Draw/PaintArgs.h"
+#include "Draw/SlateDrawElement.h"
+#include "Level/World.h"
 
 DEFINE_LOG_CATEGORY(LogViewport);
 
@@ -34,10 +37,14 @@ Vector2N SViewport::GetRenderSize()
 	return RenderSize;
 }
 
-void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext, SceneRenderer* Renderer)
+void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext)
 {
-	SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::CopySource);
-	Renderer->PopulateCommandLists(InDeviceContext, RenderTarget);
+	if (GameWorld)
+	{
+		SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::CopySource);
+		// TODO: Render world.
+		ensure(false);
+	}
 }
 
 Vector2 SViewport::GetDesiredSize()
@@ -53,14 +60,20 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 	ReallocRenderTarget();
 }
 
-void SViewport::OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry)
+void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 }
 
-int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
-	PopulateCommandLists(Args.DeviceContext, Args.Renderer);
-	return Super::OnPaint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer, bParentEnabled);
+	PopulateCommandLists(Args.DeviceContext);
+
+	SlateBrush Brush;
+	Brush.ImageSource = SRV;
+	Brush.ImageSize = RenderSize.Cast<float>();
+	SlateDrawElement::MakeBox(InDrawElements, Brush, AllottedGeometry.ToPaintGeometry(), InLayer);
+
+	return Super::OnPaint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer + 1, bParentEnabled);
 }
 
 void SViewport::ReallocRenderTarget()
@@ -109,10 +122,15 @@ void SViewport::ReallocRenderTarget()
 			DepthStencil->SetDebugName(L"SViewport: DepthStencilTexture");
 
 			RTV = Device->CreateRenderTargetView(1);
+			RTV->SetOuter(this);
 			DSV = Device->CreateDepthStencilView(1);
+			DSV->SetOuter(this);
+			SRV = Device->CreateShaderResourceView(1);
+			SRV->SetOuter(this);
 
 			RTV->CreateRenderTargetView(0, RenderTarget, nullptr);
 			DSV->CreateDepthStencilView(0, DepthStencil, nullptr);
+			SRV->CreateShaderResourceView(0, RenderTarget, nullptr);
 
 			SE_LOG(LogViewport, Verbose, L"Viewport render targets are reallocated to [{}x{}].", RenderSize.X, RenderSize.Y);
 		}
@@ -129,7 +147,7 @@ void SViewport::DestroyRenderTarget_GameThread()
 	};
 
 	std::vector<std::shared_ptr<SObject>> Holders;
-	SObject* Objects[] = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
+	SObject* Objects[] = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(SRV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
 	Holders.reserve(std::size(Objects));
 
 	for (auto& Object : Objects)

@@ -414,6 +414,18 @@
     <ClCompile Include="Private\Widgets\Viewport.cpp">
       <Filter>Private\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Draw\SlateDrawElement.cpp">
+      <Filter>Private\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SwapChainRenderTarget.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\ForwardSceneRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\SceneRendering\SlateRenderer.cpp">
+      <Filter>Private\SceneRendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\IFrameworkView.h">
@@ -734,9 +746,6 @@
     <ClInclude Include="Public\Draw\SlateFont.h">
       <Filter>Public\Draw</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Draw\SlateFontElement.h">
-      <Filter>Public\Draw</Filter>
-    </ClInclude>
     <ClInclude Include="Public\GameThreads\RenderThread.h">
       <Filter>Public\GameThreads</Filter>
     </ClInclude>
@@ -790,6 +799,15 @@
     </ClInclude>
     <ClInclude Include="Public\Widgets\Viewport.h">
       <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SwapChainRenderTarget.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\ForwardSceneRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SlateRenderer.h">
+      <Filter>Public\SceneRendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

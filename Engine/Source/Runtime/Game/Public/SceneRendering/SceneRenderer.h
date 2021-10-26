@@ -12,13 +12,16 @@ class SScene;
 
 class GAME_API SceneRenderer
 {
-public:
-	SScene* const Scene;
-	std::vector<SceneView> Views;
+	GENERATED_BODY(SceneRenderer)
 
 public:
-	SceneRenderer(SScene* InScene);
+	SceneRenderTarget& RenderTarget;
 
-	void InitViews(std::span<const SceneViewScope> InViews);
-	void PopulateCommandLists(IRHIDeviceContext* Context, const SceneRenderTarget& InRenderTarget);
+public:
+	SceneRenderer(SceneRenderTarget& InRenderTarget);
+
+	void PopulateCommandLists(IRHIDeviceContext* Context);
+
+protected:
+	virtual void OnPopulateCommandLists(IRHIDeviceContext* Context) = 0;
 };

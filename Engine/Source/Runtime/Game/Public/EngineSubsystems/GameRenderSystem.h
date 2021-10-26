@@ -8,46 +8,30 @@
 interface IRHIFactory;
 interface IRHIDevice;
 interface IRHIDeviceContext;
-interface IRHISwapChain;
-interface IRHIDeviceContext;
-interface IRHIRenderTargetView;
-interface IRHIDepthStencilView;
-interface IRHITexture2D;
+interface IFrameworkView;
 class SColorVertexFactory;
 class SColorShader;
-class SAssetImporter;
 class STransparentShader;
 class SSlateShader;
-class STickScheduler;
-class SScene;
 class SSlateApplication;
-struct IFrameworkView;
+class SSwapChainRenderTarget;
 
 class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 {
 	GENERATED_BODY(SGameRenderSystem)
 
 private:
-	IFrameworkView* _frameworkView = nullptr;
+	IFrameworkView* FrameworkView = nullptr;
 
-	IRHIFactory* _factory = nullptr;
-	IRHIDevice* _device = nullptr;
-	IRHIDeviceContext* _primaryQueue = nullptr;
-	IRHISwapChain* _frameworkViewChain = nullptr;
-	IRHIDeviceContext* _deviceContext = nullptr;
-	SColorVertexFactory* _colorVertexFactory = nullptr;
-	SColorShader* _colorShader = nullptr;
-	IRHIRenderTargetView* _rtv = nullptr;
-	SAssetImporter* _assimp = nullptr;
-	IRHITexture2D* _depthBuffer = nullptr;
-	IRHIDepthStencilView* _dsv = nullptr;
-	STransparentShader* _transparentShader = nullptr;
-	SSlateShader* _slateShader = nullptr;
+	IRHIFactory* Factory = nullptr;
+	IRHIDevice* Device = nullptr;
+	IRHIDeviceContext* PrimaryQueue = nullptr;
+	SColorVertexFactory* ColorVertexFactory = nullptr;
+	SColorShader* ColorShader = nullptr;
+	STransparentShader* TransparentShader = nullptr;
+	SSlateShader* SlateShader = nullptr;
 
-	SScene* _Scene = nullptr;
-
-	int32 _vpWidth = 0;
-	int32 _vpHeight = 0;
+	SSwapChainRenderTarget* SwapChainRT = nullptr;
 
 public:
 	SGameRenderSystem();
@@ -60,9 +44,11 @@ public:
 
 	void SetupFrameworkView(IFrameworkView* frameworkView);
 	IFrameworkView* GetFrameworkView();
-	inline IRHIDevice* GetRHIDevice() { return _device; }
-	inline SScene* GetScene() { return _Scene; }
-	SColorVertexFactory* GetColorVertexFactory() { return _colorVertexFactory; }
+	IRHIDevice* GetRHIDevice();
+
+	// Test feature.
+	SColorVertexFactory* GetColorVertexFactory() { return ColorVertexFactory; }
+	SSlateShader* GetSlateShader() { return SlateShader; }
 
 private:
 	void ResizeApp(int32 width, int32 height);

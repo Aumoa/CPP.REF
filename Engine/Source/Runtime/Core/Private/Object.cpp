@@ -136,4 +136,5 @@ void SObject::InternalAttachSubobject(SObject* Subobject)
 void SObject::InternalAttachObjectName(SObject* InObject)
 {
 	InObject->Name = InObject->GetType()->GenerateUniqueName();
+	InObject->NameChanged.Invoke(InObject);
 }

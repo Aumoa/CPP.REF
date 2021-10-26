@@ -25,5 +25,5 @@ public:
 	virtual Vector2 GetDesiredSize() override;
 
 protected:
-	virtual void OnArrangeChildren(SArrangedChildrens* ArrangedChildrens, const Geometry& AllottedGeometry) override;
+	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 };

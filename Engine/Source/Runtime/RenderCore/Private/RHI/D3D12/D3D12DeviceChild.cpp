@@ -7,6 +7,10 @@ SD3D12DeviceChild::SD3D12DeviceChild(SDXGIFactory* factory, SD3D12Device* device
 	, Object(InConstructorObject)
 	, _device(device)
 {
+	NameChanged.AddRaw([this](SObject*)
+	{
+		SetDebugName(GetName());
+	});
 }
 
 IRHIDevice* SD3D12DeviceChild::GetDevice()

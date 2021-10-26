@@ -2,25 +2,35 @@
 
 #include "Layout/ArrangedChildrens.h"
 
-SArrangedChildrens::SArrangedChildrens(ESlateVisibility visibilityFilter) : Super()
-	, _VisibilityFilter(visibilityFilter)
+ArrangedChildrens::ArrangedChildrens(ESlateVisibility InVisibilityFilter)
+	: VisibilityFilter(InVisibilityFilter)
 {
 }
 
-void SArrangedChildrens::AddWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry)
+void ArrangedChildrens::AddWidget(ESlateVisibility VisibiilityOverride, const ArrangedWidget& InArrangedWidget)
 {
-	check(Accepts(visibilityOverride));
-	_Widgets.emplace_back(widgetGeometry);
+	check(Accepts(VisibiilityOverride));
+	Widgets.emplace_back(InArrangedWidget);
 }
 
-void SArrangedChildrens::InsertWidget(ESlateVisibility visibilityOverride, const ArrangedWidget& widgetGeometry, size_t index)
+void ArrangedChildrens::InsertWidget(ESlateVisibility VisibiilityOverride, const ArrangedWidget& InArrangedWidget, size_t Index)
 {
-	check(Accepts(visibilityOverride));
-	check(_Widgets.size() <= index);
-	_Widgets.insert(_Widgets.begin() + index, widgetGeometry);
+	check(Accepts(VisibiilityOverride));
+	check(Widgets.size() <= Index);
+	Widgets.insert(Widgets.begin() + Index, InArrangedWidget);
 }
 
-bool SArrangedChildrens::Accepts(ESlateVisibility visibility) const
+bool ArrangedChildrens::Accepts(ESlateVisibility visibility) const
 {
-	return SlateVisibilityExtensions::DoesVisibilityPassFilter(visibility, _VisibilityFilter);
+	return SlateVisibilityExtensions::DoesVisibilityPassFilter(visibility, VisibilityFilter);
+}
+
+ESlateVisibility ArrangedChildrens::GetVisibilityFilter() const
+{
+	return VisibilityFilter;
+}
+
+const std::vector<ArrangedWidget>& ArrangedChildrens::GetWidgets() const
+{
+	return Widgets;
 }

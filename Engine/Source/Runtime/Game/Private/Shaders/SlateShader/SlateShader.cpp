@@ -5,6 +5,7 @@
 #include "GameEngine.h"
 #include "Draw/SlateWindowElementList.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "Layout/LayoutImpl.h"
 
 #ifndef BYTE
 #define BYTE uint8
@@ -99,7 +100,7 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 	};
 }
 
-auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const -> std::vector<DrawElement>
+auto SSlateShader::MakeElements(const std::vector<SlateDrawElement>& elements) const -> std::vector<DrawElement>
 {
 	//SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
 
@@ -108,19 +109,17 @@ auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::Gener
 
 	for (size_t i = 0; i < elements.size(); ++i)
 	{
-		if (auto element_s = std::get_if<SlateDrawElement>(&elements[i]))
+		const auto& element_s = elements[i];
+		auto& element_d = renderElements.emplace_back();
+		if (element_s.Transform.HasRenderTransform())
 		{
-			auto& element_d = renderElements.emplace_back();
-			if (element_s->Transform.HasRenderTransform())
-			{
-				const SlateRenderTransform& renderTransform = element_s->Transform.GetAccumulatedRenderTransform();
-				element_d.M = renderTransform.GetMatrix();
-				element_d.AbsolutePosition = renderTransform.GetTranslation();
-				element_d.AbsoluteSize = element_s->Transform.GetLocalSize();
-				element_d.Depth = (float)element_s->Layer;
-				element_d.TexturePosition = Vector2::GetZero();
-				element_d.TextureSize = Vector2::GetOneVector();
-			}
+			const SlateRenderTransform& renderTransform = element_s.Transform.GetAccumulatedRenderTransform();
+			element_d.M = renderTransform.GetMatrix();
+			element_d.AbsolutePosition = renderTransform.GetTranslation();
+			element_d.AbsoluteSize = element_s.Transform.GetLocalSize();
+			element_d.Depth = (float)element_s.Layer;
+			element_d.TexturePosition = Vector2::GetZero();
+			element_d.TextureSize = Vector2::GetOneVector();
 		}
 		//else if (auto element_s = std::get_if<SlateFontElement>(&elements[i]))
 		//{
@@ -165,29 +164,16 @@ auto SSlateShader::MakeElements(const std::vector<SSlateWindowElementList::Gener
 	return renderElements;
 }
 
-void SSlateShader::RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements)
+void SSlateShader::RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, const SlateWindowElementList& elements)
 {
-	//SFontCachingManager* fontCachingMgr = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetFontCachingManager();
-	auto elements_span = elements->GetSpan();
-
 	// Caching max elements.
 	size_t maxDescriptors = 0;
-	for (auto& element : elements_span)
+	for (auto& element : elements.GetElements())
 	{
-		if (auto element_s = std::get_if<SlateDrawElement>(&element))
+		if (element.Brush.ImageSource)
 		{
-			if (element_s->Brush.ImageSource)
-			{
-				maxDescriptors += 1;
-			}
+			maxDescriptors += 1;
 		}
-		//else if (auto element_s = std::get_if<SlateFontElement>(&element))
-		//{
-		//	if (element_s->FontFace)
-		//	{
-		//		maxDescriptors += 1;
-		//	}
-		//}
 	}
 	
 	//uint64 gpuAddr = elements->ApplyAndCreateBuffer(deviceContext, this);

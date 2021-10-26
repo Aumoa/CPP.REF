@@ -4,27 +4,20 @@
 
 #include "CoreMinimal.h"
 
-interface IRHIRenderTargetView;
+interface IRHIShaderResourceView;
 
 struct SlateBrush
 {
-	IRHIRenderTargetView* ImageSource = nullptr;
+	IRHIShaderResourceView* ImageSource = nullptr;
 	Vector2 ImageSize;
 
 	SlateBrush()
 	{
 	}
 
-	SlateBrush(IRHIRenderTargetView* imageSource, const Vector2& imageSize)
-		: ImageSource(imageSource)
-		, ImageSize(imageSize)
-	{
-	}
-
-	template<class TSource>
-	SlateBrush(const TSource* textureSource)
-		: ImageSource(textureSource->GetShaderResourceView())
-		, ImageSize(textureSource->GetPixelSize().Cast<float>())
+	SlateBrush(IRHIShaderResourceView* InImageSource, const Vector2& InImageSize)
+		: ImageSource(InImageSource)
+		, ImageSize(InImageSize)
 	{
 	}
 

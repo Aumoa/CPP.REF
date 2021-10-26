@@ -5,21 +5,17 @@
 #include "CoreMinimal.h"
 #include "SlateBrush.h"
 #include "Layout/PaintGeometry.h"
+#include "Layout/LayoutImpl.h"
 
-struct SlateDrawElement
+class SlateWindowElementList;
+
+struct GAME_API SlateDrawElement
 {
 	SlateBrush Brush;
 	PaintGeometry Transform;
 	int32 Layer = 0;
 
-	SlateDrawElement()
-	{
-	}
+	SlateDrawElement();
 
-	SlateDrawElement(const SlateBrush& brush, const PaintGeometry& transform, int32 layer = 0)
-		: Brush(brush)
-		, Transform(transform)
-		, Layer(layer)
-	{
-	}
+	static SlateDrawElement& MakeBox(SlateWindowElementList& List, const SlateBrush& InBrush, const PaintGeometry& InTransform, int32 InLayer);
 };

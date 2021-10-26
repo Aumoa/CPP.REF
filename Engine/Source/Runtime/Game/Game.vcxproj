@@ -141,6 +141,7 @@
     <ClCompile Include="Private\Components\StaticMeshComponent.cpp" />
     <ClCompile Include="Private\CoreDelegates.cpp" />
     <ClCompile Include="Private\Draw\PaintArgs.cpp" />
+    <ClCompile Include="Private\Draw\SlateDrawElement.cpp" />
     <ClCompile Include="Private\Draw\SlateWindowElementList.cpp" />
     <ClCompile Include="Private\EngineSubsystems\GameAssetSystem.cpp" />
     <ClCompile Include="Private\EngineSubsystems\GameEngineSubsystem.cpp" />
@@ -171,10 +172,13 @@
     <ClCompile Include="Private\Level\World.cpp" />
     <ClCompile Include="Private\LogGame.cpp" />
     <ClCompile Include="Private\Misc\GeometryGenerator.cpp" />
+    <ClCompile Include="Private\SceneRendering\ForwardSceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\Scene.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderer.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneRenderTarget.cpp" />
     <ClCompile Include="Private\SceneRendering\SceneView.cpp" />
+    <ClCompile Include="Private\SceneRendering\SlateRenderer.cpp" />
+    <ClCompile Include="Private\SceneRendering\SwapChainRenderTarget.cpp" />
     <ClCompile Include="Private\Scene\PrimitiveSceneProxy.cpp" />
     <ClCompile Include="Private\Scene\StaticMeshRenderData.cpp" />
     <ClCompile Include="Private\Scene\StaticMeshSceneProxy.cpp" />
@@ -240,7 +244,6 @@
     <ClInclude Include="Public\Draw\SlateBrush.h" />
     <ClInclude Include="Public\Draw\SlateDrawElement.h" />
     <ClInclude Include="Public\Draw\SlateFont.h" />
-    <ClInclude Include="Public\Draw\SlateFontElement.h" />
     <ClInclude Include="Public\Draw\SlateWindowElementList.h" />
     <ClInclude Include="Public\EngineSubsystems\GameAssetSystem.h" />
     <ClInclude Include="Public\EngineSubsystems\GameEngineSubsystem.h" />
@@ -299,6 +302,7 @@
     <ClInclude Include="Public\PlatformMisc\IPlatformMouse.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformImage.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformImageLoader.h" />
+    <ClInclude Include="Public\SceneRendering\ForwardSceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\LightSceneInfo.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatchElement.h" />
@@ -308,6 +312,8 @@
     <ClInclude Include="Public\SceneRendering\SceneStructuredBuffer.h" />
     <ClInclude Include="Public\SceneRendering\SceneView.h" />
     <ClInclude Include="Public\SceneRendering\SceneViewScope.h" />
+    <ClInclude Include="Public\SceneRendering\SlateRenderer.h" />
+    <ClInclude Include="Public\SceneRendering\SwapChainRenderTarget.h" />
     <ClInclude Include="Public\Scene\PrimitiveSceneProxy.h" />
     <ClInclude Include="Public\Scene\StaticMeshRenderData.h" />
     <ClInclude Include="Public\Scene\StaticMeshSceneProxy.h" />

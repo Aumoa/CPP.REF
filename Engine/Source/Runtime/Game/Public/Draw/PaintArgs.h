@@ -5,20 +5,21 @@
 #include "CoreMinimal.h"
 
 interface IRHIDeviceContext;
-class SceneRenderer;
 class SWidget;
+class SceneRenderTarget;
 
 class GAME_API PaintArgs
 {
 public:
-	SWidget*			const Parent;
-	float				const DeltaTime;
+	SWidget*			const	Parent;
+	float				const	DeltaTime;
 
-	IRHIDeviceContext*  const DeviceContext;
-	SceneRenderer*		const Renderer;
+	IRHIDeviceContext*  const	DeviceContext;
+	SceneRenderTarget*	const	RenderTarget;
 
 public:
-	PaintArgs(SWidget* InParentWidget, float InDeltaTime, IRHIDeviceContext* InDeviceContext, SceneRenderer* Renderer);
+	PaintArgs(SWidget* InParentWidget, float InDeltaTime, IRHIDeviceContext* InDeviceContext, SceneRenderTarget* RT);
 
 	PaintArgs WithNewParent(SWidget* InParentWidget) const;
+	PaintArgs WithNewRenderTarget(SceneRenderTarget* RT) const;
 };

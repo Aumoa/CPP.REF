@@ -40,7 +40,7 @@ SWidget* SBorder::GetContent()
 	return _content;
 }
 
-void SBorder::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
+void SBorder::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 	if (_content && _content->GetVisibility() != ESlateVisibility::Collapsed)
 	{
@@ -48,7 +48,7 @@ void SBorder::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geo
 		Vector2 paddingLT = Vector2(_padding.Left, _padding.Top);
 		Vector2 paddingRB = Vector2(_padding.Right, _padding.Bottom);
 
-		arrangedChildrens->AddWidget(_content->GetVisibility(), allottedGeometry.MakeChild(
+		ArrangedChildrens.AddWidget(_content->GetVisibility(), AllottedGeometry.MakeChild(
 			_content,
 			paddingLT,
 			size - paddingRB - paddingLT

@@ -54,6 +54,6 @@ public:
 	virtual std::span<uint8 const> CompilePS() override;
 
 	SMaterial* GetDefaultMaterial() const;
-	std::vector<DrawElement> MakeElements(const std::vector<SSlateWindowElementList::GenericSlateElement>& elements) const;
-	void RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, SSlateWindowElementList* elements);
+	std::vector<DrawElement> MakeElements(const std::vector<SlateDrawElement>& elements) const;
+	void RenderElements(IRHIDeviceContext* deviceContext, const Vector2& screenSize, const SlateWindowElementList& elements);
 };

@@ -91,38 +91,55 @@ DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, attr)
 	_slots = std::move(attr.Slots);
 }
 
-int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateWindowElementList* InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
-	SArrangedChildrens arrangedChildren(ESlateVisibility::Visible);
-	ArrangeChildren(&arrangedChildren, AllottedGeometry);
+	ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+	std::vector<bool> ChildLayers;
+	ArrangeLayeredChildren(ArrangedChildren, AllottedGeometry, ChildLayers);
 
-	bool forwardedEnabled = ShouldBeEnabled(bParentEnabled);
-	int maxLayer = InLayer;
+	const bool bForwardedEnabled = ShouldBeEnabled(bParentEnabled);
 
-	PaintArgs NewArgs = Args.WithNewParent(this);
-	for (auto& curWidget : arrangedChildren.GetWidgets())
+	// Because we paint multiple children, we must track the maximum layer id that they produced in case one of our parents
+	// wants to an overlay for all of its contents.
+	int32 MaxLayerId = InLayer;
+	int32 ChildLayerId = InLayer;
+
+	const PaintArgs NewArgs = Args.WithNewParent(this);
+
+	const std::vector<ArrangedWidget>& ArrangedWidgets = ArrangedChildren.GetWidgets();
+	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)
 	{
-		if (!IsChildWidgetCulled(CullingRect, curWidget))
-		{
-			int curWidgetsMaxLayerId = curWidget.GetWidget()->Paint(
-				NewArgs,
-				curWidget.GetGeometry(),
-				CullingRect,
-				InDrawElements,
-				InLayer,
-				forwardedEnabled);
+		const ArrangedWidget& CurWidget = ArrangedWidgets[ChildIndex];
 
-			maxLayer = MathEx::Max(maxLayer, curWidgetsMaxLayerId);
+		if (!IsChildWidgetCulled(CullingRect, CurWidget))
+		{
+			// Bools in ChildLayers tell us whether to paint the next child in front of all previous
+			if (ChildLayers[ChildIndex])
+			{
+				ChildLayerId = MaxLayerId + 1;
+			}
+
+			const int32 CurWidgetsMaxLayerId = CurWidget.GetWidget()->Paint(NewArgs, CurWidget.GetGeometry(), CullingRect, InDrawElements, ChildLayerId, bForwardedEnabled);
+
+			MaxLayerId = MathEx::Max(MaxLayerId, CurWidgetsMaxLayerId);
 		}
 	}
 
-	return maxLayer;
+	return MaxLayerId;
 }
 
-void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, const Geometry& allottedGeometry)
+void SCanvasPanel::OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry)
+{
+	std::vector<bool> ChildLayers;
+	ArrangeLayeredChildren(InoutArrangedChildrens, AllottedGeometry, ChildLayers);
+}
+
+void SCanvasPanel::ArrangeLayeredChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry, std::vector<bool>& ChildLayers)
 {
 	if (_slots.size() > 0)
 	{
+		ChildLayers.reserve(_slots.size());
+
 		// Sort the children based on zorder.
 		std::vector<ChildZOrder> slotOrder;
 		slotOrder.reserve(_slots.size());
@@ -150,6 +167,7 @@ void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, cons
 		};
 
 		std::sort(slotOrder.begin(), slotOrder.end(), sortSlotsByZOrder);
+		float LastZOrder = std::numeric_limits<float>::min();
 
 		// Arrange the children now in their proper z-order.
 		for (size_t childIndex = 0; childIndex < _slots.size(); ++childIndex)
@@ -159,7 +177,7 @@ void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, cons
 			SWidget* curWidget = curChild.GetContent();
 
 			ESlateVisibility childVisibility = curWidget->GetVisibility();
-			if (arrangedChildrens->Accepts(childVisibility))
+			if (InoutArrangedChildrens.Accepts(childVisibility))
 			{
 				const Margin& Offset = curChild._Offset;
 				const Vector2& Alignment = curChild._Alignment;
@@ -167,10 +185,10 @@ void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, cons
 				const bool bAutoSize = curChild._bAutoSize;
 
 				const Margin AnchorPixels(
-					Anchors.Minimum.X * allottedGeometry.GetSize().X,
-					Anchors.Minimum.Y * allottedGeometry.GetSize().Y,
-					Anchors.Maximum.X * allottedGeometry.GetSize().X,
-					Anchors.Maximum.Y * allottedGeometry.GetSize().Y
+					Anchors.Minimum.X * AllottedGeometry.GetSize().X,
+					Anchors.Minimum.Y * AllottedGeometry.GetSize().Y,
+					Anchors.Maximum.X * AllottedGeometry.GetSize().X,
+					Anchors.Maximum.Y * AllottedGeometry.GetSize().Y
 				);
 
 				const bool bIsHorizontalStretch = Anchors.Minimum.X != Anchors.Maximum.X;
@@ -210,7 +228,7 @@ void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, cons
 				}
 
 				// Add the information about this child to the output list (ArrangedChildren)
-				arrangedChildrens->AddWidget(childVisibility, allottedGeometry.MakeChild(
+				InoutArrangedChildrens.AddWidget(childVisibility, AllottedGeometry.MakeChild(
 					// The child widget being arranged
 					curWidget,
 					// Child's local position (i.e. position within parent)
@@ -218,6 +236,18 @@ void SCanvasPanel::OnArrangeChildren(SArrangedChildrens* arrangedChildrens, cons
 					// Child's size
 					localSize
 				));
+
+				// Split children into discrete layers for the paint method
+				bool bNewLayer = false;
+				if (curSlot.ZOrder > LastZOrder + MathEx::SmallNumber)
+				{
+					if (ChildLayers.size() > 0)
+					{
+						bNewLayer = true;
+					}
+					LastZOrder = curSlot.ZOrder;
+				}
+				ChildLayers.emplace_back(bNewLayer);
 			}
 		}
 	}

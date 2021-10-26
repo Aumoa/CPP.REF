@@ -12,6 +12,7 @@ interface IRHIDepthStencilView;
 class GAME_API SceneRenderTarget
 {
 public:
+	SceneRenderTarget();
 	SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState);
 
 	IRHIRenderTargetView* RTV;
@@ -23,4 +24,8 @@ public:
 	ERHIResourceStates InitState;
 	RHIViewport Viewport;
 	RHIScissorRect ScissorRect;
+
+	uint8 bHasBeenTransited : 1;
+
+	void InitTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState);
 };
