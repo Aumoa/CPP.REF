@@ -144,5 +144,12 @@ std::wstring Type::GenerateUniqueName()
 {
 	std::unique_lock ScopedLock(TypeRegisterMutex);
 	uint64& Incrementer = TypeRegister[TypeHash];
-	return std::format(L"{}_{}", GetFriendlyName(), Incrementer++);
+	if (uint64 Value = Incrementer++; Value != 0)
+	{
+		return std::format(L"{}_{}", GetFriendlyName(), Incrementer++);
+	}
+	else
+	{
+		return GetFriendlyName();
+	}
 }
