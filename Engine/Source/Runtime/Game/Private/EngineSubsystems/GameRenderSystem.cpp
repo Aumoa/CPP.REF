@@ -15,6 +15,7 @@
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/SceneViewScope.h"
 #include "SceneRendering/SwapChainRenderTarget.h"
+#include "SceneRendering/SceneRenderContext.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/MinimalViewInfo.h"
 #include "GameThreads/RenderThread.h"
@@ -77,16 +78,16 @@ void SGameRenderSystem::Tick(float InDeltaTime)
 void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp)
 {
 	RenderThread::WaitForLastWorks();
-	RenderThread::ExecuteWorks([this, InDeltaTime, SlateApp]()
+	RenderThread::ExecuteWorks(PrimaryQueue, [this, InDeltaTime, SlateApp]()
 	{
 		SwapChainRT->ResolveTarget();
 
 		// BEGIN OF FRAME.
 		Device->BeginFrame();
-		PrimaryQueue->Begin(0, 0);
+		PrimaryQueue->Begin();
 
-		PaintArgs NewArgs(nullptr, InDeltaTime, PrimaryQueue, SwapChainRT);
-		SlateApp->PopulateCommandLists(NewArgs);
+		SceneRenderContext RenderContext(PrimaryQueue, SwapChainRT);
+		SlateApp->PopulateCommandLists(RenderContext);
 
 		// END OF FRAME.
 		PrimaryQueue->End();
@@ -123,7 +124,7 @@ void SGameRenderSystem::ResizeApp(int32 width, int32 height)
 	if (Device)
 	{
 		RenderThread::WaitForLastWorks();
-		RenderThread::ExecuteWorks([this, width, height]()
+		RenderThread::ExecuteWorks(PrimaryQueue, [this, width, height]()
 		{
 			// On the framework view is resized, wait all graphics commands for
 			// synchronize and cleanup resource lock states.

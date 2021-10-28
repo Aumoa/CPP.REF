@@ -158,7 +158,7 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 {
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 	GameWorld->LevelTick(InDeltaTime.count());
-	SlateApplication->Tick(InDeltaTime.count());
+	SlateApplication->TickAndPaint(InDeltaTime.count());
 }
 
 void SGameEngine::RenderTick(std::chrono::duration<float> InDeltaTime)

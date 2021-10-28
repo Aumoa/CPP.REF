@@ -15,6 +15,7 @@
 #include <d3d11on12.h>
 #include <dxgi1_6.h>
 #include <d2d1_1.h>
+#include <d3dcompiler.h>
 #include <dwrite_3.h>
 #include <wrl/client.h>
 

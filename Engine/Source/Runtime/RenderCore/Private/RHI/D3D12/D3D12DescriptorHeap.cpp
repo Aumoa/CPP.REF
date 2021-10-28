@@ -11,6 +11,9 @@ SD3D12DescriptorHeap::SD3D12DescriptorHeap(ID3D12Device* device, int32 count) : 
 	desc.NumDescriptors = (UINT)count;
 	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	HR(_device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&_heap)));
+
+	_handleCPU = _heap->GetCPUDescriptorHandleForHeapStart();
+	_handleGPU = _heap->GetGPUDescriptorHandleForHeapStart();
 }
 
 void SD3D12DescriptorHeap::MarkPendingHeap()

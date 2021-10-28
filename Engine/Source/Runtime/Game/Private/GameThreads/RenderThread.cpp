@@ -10,10 +10,11 @@ void RenderThread::PendingThreadWork::Init()
 	CompletedEvent->Set();
 }
 
-void RenderThread::PendingThreadWork::SwapExecute(WaitingThreadWorks& InTarget)
+void RenderThread::PendingThreadWork::SwapExecute(IRHIDeviceContext* InDeviceContext, WaitingThreadWorks& InTarget)
 {
 	std::swap(Works, InTarget.Works);
 	std::swap(CompletedWork, InTarget.CompletedWork);
+	DeviceContext = InDeviceContext;
 	ExecuteEvent->Set();
 }
 
@@ -21,7 +22,7 @@ void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 {
 	for (auto& WorkBody : Works)
 	{
-		WorkBody();
+		WorkBody(DeviceContext);
 	}
 
 	if (CompletedWork)
@@ -72,23 +73,23 @@ void RenderThread::Shutdown()
 	_Thread.bRunning = false;
 
 	// Flush executing event.
-	ExecuteWorks(nullptr);
+	ExecuteWorks(nullptr, nullptr);
 
 	// Join executing thread.
 	_Thread.Thread.join();
 }
 
-void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody)
+void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody)
 {
 	std::unique_lock lock(_Thread.CriticalSection);
 	_WaitingWorks.Works.emplace_back(std::move(InWorkBody));
 }
 
-void RenderThread::ExecuteWorks(std::function<void()> InCompletionWork)
+void RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork)
 {
 	std::unique_lock lock(_Thread.CriticalSection);
 	_WaitingWorks.CompletedWork = InCompletionWork;
-	_ExecutingWorks.SwapExecute(_WaitingWorks);
+	_ExecutingWorks.SwapExecute(InDeviceContext, _WaitingWorks);
 }
 
 void RenderThread::WaitForLastWorks()

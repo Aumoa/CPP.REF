@@ -7,13 +7,13 @@
 #define DEFINE_REDIRECT_RENDER_THREAD(FunctionName) \
 void PrimitiveSceneProxy::FunctionName ## _GameThread() \
 { \
-	RenderThread::EnqueueRenderThreadWork<"PrimitiveSceneProxy::" #FunctionName>([this]() { FunctionName ## _RenderThread(); }); \
+	RenderThread::EnqueueRenderThreadWork<"PrimitiveSceneProxy::" #FunctionName>([this](auto) { FunctionName ## _RenderThread(); }); \
 }
 
 #define DEFINE_REDIRECT_RENDER_THREAD_OneParam(FunctionName, Type1) \
 void PrimitiveSceneProxy::FunctionName ## _GameThread(Type1 Param1) \
 { \
-	RenderThread::EnqueueRenderThreadWork<"PrimitiveSceneProxy::" #FunctionName>([this, Param1 = Param1]() { FunctionName ## _RenderThread(Param1); }); \
+	RenderThread::EnqueueRenderThreadWork<"PrimitiveSceneProxy::" #FunctionName>([this, Param1 = Param1](auto) { FunctionName ## _RenderThread(Param1); }); \
 }
 
 PrimitiveSceneProxy::PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveComponent) : PrimitiveComponent(InPrimitiveComponent)

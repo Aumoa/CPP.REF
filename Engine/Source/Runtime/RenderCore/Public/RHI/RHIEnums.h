@@ -414,7 +414,12 @@ enum class EMaterialBlendMode
     Opaque,
     Masked,
     Transparent,
-    UI,
+};
+
+enum class EMaterialDomain
+{
+    Surface,
+    UserInterface,
 };
 
 #undef DEFINE_ENUM_FLAG_OPERATORS

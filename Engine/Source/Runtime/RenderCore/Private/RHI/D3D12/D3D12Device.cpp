@@ -112,7 +112,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 			barrier.Transition.Subresource = 0;
 
 			auto* commandList = NewObject<SD3D12CommandList>(_factory, this);
-			commandList->Begin(0, 0);
+			commandList->Begin();
 			SD3D12Texture2D::UpdateSubresource(commandList, textureBuf.Get(), uploadBuf.Get(), 0, layout, totalBytes, initialData);
 			commandList->ResourceBarrier(1, &barrier);
 			commandList->End();
@@ -176,7 +176,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 			barrier.Transition.Subresource = 0;
 
 			auto* commandList = NewObject<SD3D12CommandList>(_factory, this);
-			commandList->Begin(0, 0);
+			commandList->Begin();
 			SD3D12Buffer::UpdateSubresource(commandList, buffer.Get(), uploadBuf.Get(), 0, (uint64)desc.ByteWidth, initialData);
 			commandList->ResourceBarrier(1, &barrier);
 			commandList->End();

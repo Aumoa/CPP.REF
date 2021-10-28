@@ -3,6 +3,7 @@
 #include "SceneRendering/SceneRenderer.h"
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHITexture2D.h"
+#include "SceneRendering/ForwardSceneRenderer.h"
 
 SceneRenderer::SceneRenderer(SceneRenderTarget& InRenderTarget)
 	: RenderTarget(InRenderTarget)
@@ -29,8 +30,10 @@ void SceneRenderer::PopulateCommandLists(IRHIDeviceContext* Context)
 	if (RenderTarget.RTV)
 	{
 		// TEST IMPLEMENTATION: Clear color is RED.
-		ensure(false);
-		Context->ClearRenderTargetView(RenderTarget.RTV, RenderTarget.IndexOfRTV, NamedColors::Red);
+		if (dynamic_cast<ForwardSceneRenderer*>(this))
+		{
+			Context->ClearRenderTargetView(RenderTarget.RTV, RenderTarget.IndexOfRTV, NamedColors::Red);
+		}
 	}
 	if (RenderTarget.DSV)
 	{

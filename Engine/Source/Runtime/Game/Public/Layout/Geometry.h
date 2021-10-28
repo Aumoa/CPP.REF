@@ -207,7 +207,7 @@ public:
 
 	static constexpr Geometry MakeRoot(const Vector2& localSize, const SlateLayoutTransform& layoutTransform, const SlateRenderTransform& renderTransform)
 	{
-		return Geometry(localSize, layoutTransform, SlateLayoutTransform(), SlateRenderTransform(), !renderTransform.IsIdentity());
+		return Geometry(localSize, layoutTransform, SlateLayoutTransform(), renderTransform, true);
 	}
 
 private:

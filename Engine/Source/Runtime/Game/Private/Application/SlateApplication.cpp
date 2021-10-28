@@ -5,11 +5,17 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
 #include "SceneRendering/SlateRenderer.h"
+#include "SceneRendering/SceneRenderContext.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIDeviceContext.h"
+#include "GameThreads/RenderThread.h"
 
 SSlateApplication::SSlateApplication() : Super()
+{
+}
+
+SSlateApplication::~SSlateApplication()
 {
 }
 
@@ -19,36 +25,36 @@ void SSlateApplication::InitWindow(SLocalPlayer* InLocalPlayer, IFrameworkView* 
 	(CoreWindow = SNew(SWindow))->InitViewport(InFrameworkView);
 }
 
-void SSlateApplication::Tick(float InDeltaTime)
+void SSlateApplication::TickAndPaint(float InDeltaTime)
 {
 	Vector2 DesiredSize = CoreWindow->GetDesiredSize();
 	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::GetZero()), SlateRenderTransform(Vector2::GetZero()));
 	CoreWindow->Tick(AllottedGeometry, InDeltaTime);
-}
 
-void SSlateApplication::PopulateCommandLists(const PaintArgs& Args)
-{
-	Vector2 DesiredSize = CoreWindow->GetDesiredSize();
-	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::GetZero()), SlateRenderTransform(Vector2::GetZero()));
 	Rect CullingRect = Rect(0, 0, DesiredSize.X, DesiredSize.Y);
+	auto Elements = std::make_shared<SlateWindowElementList>(CoreWindow);
+	CoreWindow->Paint(PaintArgs(nullptr, InDeltaTime), AllottedGeometry, CullingRect, *Elements, 0, true);
 
-	SlateWindowElementList Elements(CoreWindow);
-	CoreWindow->Paint(Args, AllottedGeometry, CullingRect, Elements, 0, true);
-
-	if (DeferredContext == nullptr)
+	if (DeviceContext == nullptr)
 	{
-		DeferredContext = Args.DeviceContext->GetDevice()->CreateDeviceContext();
-		DeferredContext->SetOuter(this);
+		auto Dev = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice();
+		DeviceContext = Dev->CreateDeviceContext();
 	}
 
+	RenderThread::EnqueueRenderThreadWork<"TickAndPaint_InitContexts">([&, Elements = std::move(Elements)](auto)
+	{
+		SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
+		InitContext_RenderThread = Shader->InitElements(*Elements);
+	});
+}
+
+void SSlateApplication::PopulateCommandLists(SceneRenderContext& RenderContext)
+{
 	SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
-	auto InitContext = Shader->InitElements(Elements);
 
-	DeferredContext->Begin(InitContext.NumDescriptors, 0);
+	IRHIDeviceContext* DeviceContext = RenderContext.DeviceContext;
+	DeviceContext->SetDescriptorHeaps(InitContext_RenderThread.NumDescriptors, 0);
 
-	SlateRenderer Renderer(*Args.RenderTarget, Shader, &InitContext);
-	Renderer.PopulateCommandLists(DeferredContext);
-
-	DeferredContext->End();
-	Args.DeviceContext->ExecuteCommandList(DeferredContext);
+	SlateRenderer Renderer(*RenderContext.RenderTarget, Shader, &InitContext_RenderThread);
+	Renderer.PopulateCommandLists(DeviceContext);
 }

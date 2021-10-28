@@ -2,6 +2,7 @@
 
 #include "SceneRendering/SlateRenderer.h"
 #include "Shaders/SlateShader/SlateShader.h"
+#include "RHI/IRHIDeviceContext.h"
 
 SlateRenderer::SlateRenderer(SceneRenderTarget& InRenderTarget, SSlateShader* SlateShader, const SSlateShader::InitElementContext* InitContext) : Super(InRenderTarget)
 	, Shader(SlateShader)
@@ -11,6 +12,8 @@ SlateRenderer::SlateRenderer(SceneRenderTarget& InRenderTarget, SSlateShader* Sl
 
 void SlateRenderer::OnPopulateCommandLists(IRHIDeviceContext* Context)
 {
+	Context->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+
 	const Vector2 ViewportSz(RenderTarget.Viewport.Width, RenderTarget.Viewport.Height);
 	Shader->RenderElements(Context, ViewportSz, *InitContext);
 }

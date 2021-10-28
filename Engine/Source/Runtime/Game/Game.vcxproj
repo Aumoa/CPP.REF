@@ -307,6 +307,7 @@
     <ClInclude Include="Public\SceneRendering\MeshBatch.h" />
     <ClInclude Include="Public\SceneRendering\MeshBatchElement.h" />
     <ClInclude Include="Public\SceneRendering\Scene.h" />
+    <ClInclude Include="Public\SceneRendering\SceneRenderContext.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderer.h" />
     <ClInclude Include="Public\SceneRendering\SceneRenderTarget.h" />
     <ClInclude Include="Public\SceneRendering\SceneStructuredBuffer.h" />

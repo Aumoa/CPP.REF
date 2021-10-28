@@ -14,12 +14,8 @@ public:
 	SWidget*			const	Parent;
 	float				const	DeltaTime;
 
-	IRHIDeviceContext*  const	DeviceContext;
-	SceneRenderTarget*	const	RenderTarget;
-
 public:
-	PaintArgs(SWidget* InParentWidget, float InDeltaTime, IRHIDeviceContext* InDeviceContext, SceneRenderTarget* RT);
+	PaintArgs(SWidget* InParentWidget, float InDeltaTime);
 
 	PaintArgs WithNewParent(SWidget* InParentWidget) const;
-	PaintArgs WithNewRenderTarget(SceneRenderTarget* RT) const;
 };

@@ -7,6 +7,7 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIDepthStencilView.h"
 #include "RHI/IRHIShaderResourceView.h"
+#include "RHI/IRHIDeviceContext.h"
 #include "GameThreads/RenderThread.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateDrawElement.h"
@@ -40,16 +41,16 @@ Vector2N SViewport::GetRenderSize()
 
 void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext)
 {
-	if (GameWorld)
+	if (DeviceContext)
 	{
 		SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::PixelShaderResource);
-		// TODO: Render world.
-		ensure(false);
-	}
+		DeviceContext->Begin();
+		ForwardSceneRenderer ForwardRenderer(RenderTarget, GameWorld ? GameWorld->GetScene() : nullptr);
+		ForwardRenderer.PopulateCommandLists(DeviceContext);
+		DeviceContext->End();
 
-	SceneRenderTarget RenderTarget(RTV, 0, DSV, 0, ERHIResourceStates::PixelShaderResource);
-	ForwardSceneRenderer ForwardRenderer(RenderTarget, nullptr);
-	ForwardRenderer.PopulateCommandLists(InDeviceContext);
+		InDeviceContext->ExecuteCommandList(DeviceContext);
+	}
 }
 
 Vector2 SViewport::GetDesiredSize()
@@ -71,7 +72,10 @@ void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Ge
 
 int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
-	PopulateCommandLists(Args.DeviceContext);
+	RenderThread::EnqueueRenderThreadWork<"SViewport::PopulateCommandLists">([this](IRHIDeviceContext* ImmCon)
+	{
+		PopulateCommandLists(ImmCon);
+	});
 
 	SlateBrush Brush;
 	Brush.ImageSource = SRV;
@@ -137,6 +141,11 @@ void SViewport::ReallocRenderTarget()
 			DSV->CreateDepthStencilView(0, DepthStencil, nullptr);
 			SRV->CreateShaderResourceView(0, RenderTarget, nullptr);
 
+			if (DeviceContext == nullptr)
+			{
+				DeviceContext = Device->CreateDeviceContext();
+			}
+
 			SE_LOG(LogViewport, Verbose, L"Viewport render targets are reallocated to [{}x{}].", RenderSize.X, RenderSize.Y);
 		}
 	}
@@ -165,5 +174,5 @@ void SViewport::DestroyRenderTarget_GameThread()
 	}
 
 	// Finalize textures in render thread.
-	RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](){});
+	RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](auto){});
 }

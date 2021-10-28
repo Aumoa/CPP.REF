@@ -809,6 +809,9 @@
     <ClInclude Include="Public\SceneRendering\SlateRenderer.h">
       <Filter>Public\SceneRendering</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SceneRendering\SceneRenderContext.h">
+      <Filter>Public\SceneRendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Misc\TeapotData.inl">

@@ -10,6 +10,7 @@
 #include "Threading/Thread.h"
 #include "Misc/CrcHash.h"
 
+interface IRHIDeviceContext;
 class SThread;
 class SEventHandle;
 
@@ -18,7 +19,7 @@ class RenderThread
 	RenderThread() = delete;
 
 private:
-	using WorksDictionary = std::vector<std::function<void()>>;
+	using WorksDictionary = std::vector<std::function<void(IRHIDeviceContext*)>>;
 
 	struct WaitingThreadWorks
 	{
@@ -32,9 +33,10 @@ private:
 		std::function<void()> CompletedWork;
 		std::shared_ptr<SEventHandle> ExecuteEvent;
 		std::shared_ptr<SEventHandle> CompletedEvent;
+		IRHIDeviceContext* DeviceContext = nullptr;
 
 		void Init();
-		void SwapExecute(WaitingThreadWorks& InTarget);
+		void SwapExecute(IRHIDeviceContext* InDeviceContext, WaitingThreadWorks& InTarget);
 		void RunningWorks_RenderThread();
 	};
 
@@ -58,8 +60,8 @@ private:
 public:
 	static void Init();
 	static void Shutdown();
-	static void EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void()> InWorkBody);
-	static void ExecuteWorks(std::function<void()> InCompletionWork);
+	static void EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody);
+	static void ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork);
 	static void WaitForLastWorks();
 
 	static bool IsInRenderThread()
@@ -82,7 +84,7 @@ private:
 
 public:
 	template<StringLiteralHash _String>
-	static void EnqueueRenderThreadWork(std::function<void()> work)
+	static void EnqueueRenderThreadWork(std::function<void(IRHIDeviceContext*)> work)
 	{
 		EnqueueRenderThreadWork(_String.Hs, std::move(work));
 	}

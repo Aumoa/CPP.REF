@@ -29,6 +29,7 @@ private:
 	IRHIShaderResourceView* SRV = nullptr;
 	IRHITexture2D* RenderTarget = nullptr;
 	IRHITexture2D* DepthStencil = nullptr;
+	IRHIDeviceContext* DeviceContext = nullptr;
 
 	SWorld* GameWorld = nullptr;
 

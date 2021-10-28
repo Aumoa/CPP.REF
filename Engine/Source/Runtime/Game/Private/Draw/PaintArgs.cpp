@@ -2,20 +2,13 @@
 
 #include "Draw/PaintArgs.h"
 
-PaintArgs::PaintArgs(SWidget* InParentWidget, float InDeltaTime, IRHIDeviceContext* InDeviceContext, SceneRenderTarget* RT)
+PaintArgs::PaintArgs(SWidget* InParentWidget, float InDeltaTime)
 	: Parent(InParentWidget)
 	, DeltaTime(InDeltaTime)
-	, DeviceContext(InDeviceContext)
-	, RenderTarget(RT)
 {
 }
 
 PaintArgs PaintArgs::WithNewParent(SWidget* InParentWidget) const
 {
-	return PaintArgs(InParentWidget, DeltaTime, DeviceContext, RenderTarget);
-}
-
-PaintArgs PaintArgs::WithNewRenderTarget(SceneRenderTarget* RT) const
-{
-	return PaintArgs(Parent, DeltaTime, DeviceContext, RT);
+	return PaintArgs(InParentWidget, DeltaTime);
 }

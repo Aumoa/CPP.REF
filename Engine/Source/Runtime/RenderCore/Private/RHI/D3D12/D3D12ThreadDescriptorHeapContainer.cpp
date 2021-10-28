@@ -7,6 +7,7 @@ SD3D12ThreadDescriptorHeapContainer::SD3D12ThreadDescriptorHeapContainer(int64 t
 	, _threadId(threadId)
 	, _device(device)
 {
+	NewPendingHeap();
 }
 
 SD3D12DescriptorHeap* SD3D12ThreadDescriptorHeapContainer::GetUsableHeap(uint64 fenceValue, int32 reserveCount)

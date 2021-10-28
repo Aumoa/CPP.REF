@@ -14,8 +14,9 @@ interface IRHIShaderResourceView;
 
 interface IRHIDeviceContext : implements IRHIDeviceChild
 {
-	virtual void Begin(int32 maxSrvCount, int32 maxSamplerCount) = 0;
+	virtual void Begin() = 0;
 	virtual void End() = 0;
+	virtual void SetDescriptorHeaps(int32 MaxSRVCount, int32 MaxSamplerCount) = 0;
 	virtual void DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation) = 0;
 	virtual void DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount, uint32 baseVertexLocation, uint32 startInstanceLocation) = 0;
 	virtual void IASetPrimitiveTopology(ERHIPrimitiveTopology topology) = 0;

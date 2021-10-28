@@ -15,19 +15,18 @@ class SD3D12CommandList : public SD3D12DeviceChild, implements IRHIDeviceContext
 	GENERATED_BODY(SD3D12CommandList)
 
 private:
-	ComPtr<ID3D12GraphicsCommandList> _commandList;
-	std::vector<SObject*> _pendingObjects;
+	ComPtr<ID3D12GraphicsCommandList> CommandList;
+	std::vector<SObject*> PendingObjects;
 
-	int32 _maxSrvCount = 0;
-	int32 _maxSamplerCount = 0;
-	SD3D12DescriptorHeap* _heapForSRV = nullptr;
-	SD3D12DescriptorHeap* _heapForSampler = nullptr;
+	SD3D12DescriptorHeap* HeapForSRV = nullptr;
+	SD3D12DescriptorHeap* HeapForSampler = nullptr;
 
 public:
 	SD3D12CommandList(SDXGIFactory* factory, SD3D12Device* device);
 
-	virtual void Begin(int32 maxSrvCount, int32 maxSamplerCount) override;
+	virtual void Begin() override;
 	virtual void End() override;
+	virtual void SetDescriptorHeaps(int32 MaxSRVCount, int32 MaxSamplerCount) override;
 	virtual void DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation) override;
 	virtual void DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount, uint32 baseVertexLocation, uint32 startInstanceLocation) override;
 	virtual void IASetPrimitiveTopology(ERHIPrimitiveTopology topology) override;
@@ -55,8 +54,8 @@ public:
 	std::vector<SObject*> ClearPendingObjects();
 
 public:
-	DECLARE_GETTER(ID3D12GraphicsCommandList, _commandList);
-	DECLARE_GETTER(ID3D12CommandList, _commandList);
+	DECLARE_GETTER(ID3D12GraphicsCommandList, CommandList);
+	DECLARE_GETTER(ID3D12CommandList, CommandList);
 
 private:
 	template<class T>
