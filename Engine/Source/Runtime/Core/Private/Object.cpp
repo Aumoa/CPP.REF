@@ -13,6 +13,14 @@ SObject::SObject() : Index(++InternalObjectIndexGenerator)
 
 SObject::~SObject() noexcept
 {
+	for (auto& Subobject : Subobjects)
+	{
+		if (Subobject->Outer == this)
+		{
+			// Detach from outer.
+			Subobject->Outer = nullptr;
+		}
+	}
 }
 
 std::wstring SObject::ToString(std::wstring_view InFormatArgs)
