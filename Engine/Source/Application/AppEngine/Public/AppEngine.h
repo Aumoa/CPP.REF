@@ -3,16 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameEngine.h"
+#include "Misc/TickCalc.h"
 
-class APPENGINE_API SAppEngine : public SGameEngine
+interface IApplicationInterface;
+interface IRHIDevice;
+class SApplicationModule;
+class SWindow;
+
+class APPENGINE_API SAppEngine : implements SObject
 {
 	GENERATED_BODY(SAppEngine)
 
+private:
+	IRHIDevice* Device = nullptr;
+	SApplicationModule* AppModule = nullptr;
+	SWindow* CoreWindow = nullptr;
+	TickCalc<> TickCalc;
+
 public:
 	SAppEngine();
-	virtual ~SAppEngine() override;
 
-	virtual bool InitEngine() override;
-	virtual void SetupFrameworkView(IFrameworkView* frameworkView) override;
+	int32 GuardedMain(IApplicationInterface* Application);
+
+private:
+	void OnIdle();
+	void OnSized(Vector2N Size);
 };

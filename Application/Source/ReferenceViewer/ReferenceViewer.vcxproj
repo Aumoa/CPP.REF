@@ -13,8 +13,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{4ed74452-173e-41e2-9dc6-484e03b52000}</ProjectGuid>
-    <RootNamespace>AppEngine</RootNamespace>
+    <ProjectGuid>{ee7b32d4-d080-4d30-8fa3-ff40bd760e59}</ProjectGuid>
+    <RootNamespace>ReferenceViewer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -57,12 +57,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);APPENGINE_API=__declspec(dllexport);_DEBUG;EDITORENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REFERENCEVIEWER_API=__declspec(dllexport);CORE_API=__declspec(dllimport);APPENGINE_API=__declspec(dllimport);_DEBUG;REFERENCEVIEWER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Application\AppEngine\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -76,12 +75,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CORE_API=__declspec(dllimport);APPENGINE_API=__declspec(dllexport);NDEBUG;EDITORENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REFERENCEVIEWER_API=__declspec(dllexport);CORE_API=__declspec(dllimport);APPENGINE_API=__declspec(dllimport);NDEBUG;REFERENCEVIEWER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Application\AppEngine\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -92,57 +90,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Public\AppEngine.h" />
-    <ClInclude Include="Public\ApplicationModule.h" />
-    <ClInclude Include="Public\Draw\PaintArgs.h" />
-    <ClInclude Include="Public\Draw\SlateBrush.h" />
-    <ClInclude Include="Public\Draw\SlateDrawElement.h" />
-    <ClInclude Include="Public\Draw\SlateWindowElementList.h" />
-    <ClInclude Include="Public\Layout\AlignmentArrangeResult.h" />
-    <ClInclude Include="Public\Layout\Anchors.h" />
-    <ClInclude Include="Public\Layout\ArrangedChildrens.h" />
-    <ClInclude Include="Public\Layout\ArrangedWidget.h" />
-    <ClInclude Include="Public\Layout\Geometry.h" />
-    <ClInclude Include="Public\Layout\Layout.h" />
-    <ClInclude Include="Public\Layout\LayoutEnums.h" />
-    <ClInclude Include="Public\Layout\LayoutGeometry.h" />
-    <ClInclude Include="Public\Layout\LayoutImpl.h" />
-    <ClInclude Include="Public\Layout\Margin.h" />
-    <ClInclude Include="Public\Layout\PaintGeometry.h" />
-    <ClInclude Include="Public\Layout\Scale2D.h" />
-    <ClInclude Include="Public\Layout\Shear2D.h" />
-    <ClInclude Include="Public\Layout\SizeParam.h" />
-    <ClInclude Include="Public\Layout\SlateLayoutTransform.h" />
-    <ClInclude Include="Public\Layout\SlateRenderTransform.h" />
-    <ClInclude Include="Public\Layout\SlateRotatedRect.h" />
-    <ClInclude Include="Public\Layout\TransformCalculus2D.h" />
-    <ClInclude Include="Public\PlatformCore\IApplicationInterface.h" />
-    <ClInclude Include="Public\PlatformCore\ISlateApplication.h" />
-    <ClInclude Include="Public\PlatformCore\PlatformMacros.h" />
-    <ClInclude Include="Public\RHI\IRHIDevice.h" />
-    <ClInclude Include="Public\Widgets\CompoundWidget.h" />
-    <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
-    <ClInclude Include="Public\Widgets\SlotBase.h" />
-    <ClInclude Include="Public\Widgets\Viewport.h" />
-    <ClInclude Include="Public\Widgets\Widget.h" />
-    <ClInclude Include="Public\Widgets\Window.h" />
+    <ClInclude Include="Public\ReferenceViewerModule.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\AppEngine.cpp" />
-    <ClCompile Include="Private\ApplicationModule.cpp" />
-    <ClCompile Include="Private\Draw\PaintArgs.cpp" />
-    <ClCompile Include="Private\Draw\SlateDrawElement.cpp" />
-    <ClCompile Include="Private\Draw\SlateWindowElementList.cpp" />
-    <ClCompile Include="Private\Layout\ArrangedChildrens.cpp" />
-    <ClCompile Include="Private\Layout\ArrangedWidget.cpp" />
-    <ClCompile Include="Private\Layout\Geometry.cpp" />
-    <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
-    <ClCompile Include="Private\Widgets\Viewport.cpp" />
-    <ClCompile Include="Private\Widgets\Widget.cpp" />
-    <ClCompile Include="Private\Widgets\Window.cpp" />
+    <ClCompile Include="Private\ReferenceViewerModule.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Runtime\Core\Core.vcxproj">
+    <ProjectReference Include="..\..\..\Engine\Source\Application\AppEngine\AppEngine.vcxproj">
+      <Project>{4ed74452-173e-41e2-9dc6-484e03b52000}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Engine\Source\Runtime\Core\Core.vcxproj">
       <Project>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</Project>
     </ProjectReference>
   </ItemGroup>

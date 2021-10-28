@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Private">
+      <UniqueIdentifier>{1c9c4fbb-3361-45a2-912d-95d3d532c644}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\D3D11RHI">
+      <UniqueIdentifier>{23834f45-038b-4505-ac0c-4bbc0ac4a0e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Private\WinMain.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WindowsIncludes.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\WindowsApplicationInterface.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D11RHI\WindowsDevice.cpp">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Private\WindowsIncludes.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WindowsApplicationInterface.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D11RHI\WindowsDevice.h">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\WindowsErrors.inl">
+      <Filter>Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -7,27 +7,171 @@
     <Filter Include="Public">
       <UniqueIdentifier>{984cdf1c-c1e5-42bd-a3b0-f79e428d5045}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\PlatformCore">
+      <UniqueIdentifier>{135b7483-6d14-4365-8efa-91d5917d1e75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Widgets">
+      <UniqueIdentifier>{3cd32e9c-c7d0-4d74-8196-2899544189bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Layout">
+      <UniqueIdentifier>{c195d45e-5194-4069-88ff-05883c9d1070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Layout">
+      <UniqueIdentifier>{c4807097-0993-4f0d-9534-a3dd80dd947e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets">
+      <UniqueIdentifier>{afa539fe-3ce4-4161-9a70-e8a06d68f5f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\RHI">
+      <UniqueIdentifier>{b47fe359-9f92-493a-b862-bcba0930b894}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\Draw">
+      <UniqueIdentifier>{dfcea82a-f09f-41be-9a90-a02f63c3d47b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Draw">
+      <UniqueIdentifier>{856a5287-4a77-430a-aa1b-8ef76f485b88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Private\pch.h">
-      <Filter>Private</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\AppEngineModule.h">
-      <Filter>Public</Filter>
-    </ClInclude>
     <ClInclude Include="Public\AppEngine.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\PlatformCore\IApplicationInterface.h">
+      <Filter>Public\PlatformCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformCore\PlatformMacros.h">
+      <Filter>Public\PlatformCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Widget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\AlignmentArrangeResult.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Anchors.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\ArrangedChildrens.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\ArrangedWidget.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Geometry.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\LayoutEnums.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\LayoutGeometry.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\LayoutImpl.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Margin.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\PaintGeometry.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Scale2D.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Shear2D.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SizeParam.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SlateLayoutTransform.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SlateRenderTransform.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\SlateRotatedRect.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\TransformCalculus2D.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Layout\Layout.h">
+      <Filter>Public\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\SlotBase.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\ApplicationModule.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\PlatformCore\ISlateApplication.h">
+      <Filter>Public\PlatformCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIDevice.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\CompoundWidget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\PaintArgs.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Window.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Viewport.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateWindowElementList.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateDrawElement.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Draw\SlateBrush.h">
+      <Filter>Public\Draw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Private\pch.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\AppEngineModule.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
     <ClCompile Include="Private\AppEngine.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layout\ArrangedChildrens.cpp">
+      <Filter>Private\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layout\ArrangedWidget.cpp">
+      <Filter>Private\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layout\Geometry.cpp">
+      <Filter>Private\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Widget.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\ApplicationModule.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\CompoundWidget.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Draw\PaintArgs.cpp">
+      <Filter>Private\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Window.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Viewport.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Draw\SlateDrawElement.cpp">
+      <Filter>Private\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Draw\SlateWindowElementList.cpp">
+      <Filter>Private\Draw</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
