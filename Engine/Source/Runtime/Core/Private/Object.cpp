@@ -15,7 +15,7 @@ SObject::~SObject() noexcept
 {
 	for (auto& Subobject : Subobjects)
 	{
-		if (Subobject->Outer == this)
+		if (Subobject && Subobject->Outer == this)
 		{
 			// Detach from outer.
 			Subobject->Outer = nullptr;

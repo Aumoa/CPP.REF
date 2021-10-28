@@ -308,6 +308,9 @@
     <ClInclude Include="Public\ObjectCollection.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\AbstractClass.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Public\Natvis.natvis">

@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\DirectXInlineHelper.h" />
+    <ClInclude Include="Public\AbstractClass.h" />
     <ClInclude Include="Public\Concepts\CoreConcepts.h" />
     <ClInclude Include="Public\Container\BitArray.h" />
     <ClInclude Include="Public\Container\BitSet.h" />
