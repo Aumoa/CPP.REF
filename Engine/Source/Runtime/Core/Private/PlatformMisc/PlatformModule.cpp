@@ -17,10 +17,14 @@ SPlatformModule::SPlatformModule(const std::filesystem::path& modulePath)
 		SE_LOG(LogCore, Error, L"Could not load library from path: {}", wsPath);
 		return;
 	}
+
+	SetName(modulePath.wstring());
 }
 
 SPlatformModule::~SPlatformModule()
 {
+	CleanupSubobjects();
+
 	if (_NativeHandle)
 	{
 		FreeLibrary((HMODULE)_NativeHandle);

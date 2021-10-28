@@ -311,6 +311,9 @@
     <ClInclude Include="Public\AbstractClass.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Misc\TickCalc.h">
+      <Filter>Public\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Public\Natvis.natvis">

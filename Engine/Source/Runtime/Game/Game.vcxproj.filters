@@ -587,9 +587,6 @@
     <ClInclude Include="Public\EngineSubsystems\GameInputSystem.h">
       <Filter>Public\EngineSubsystems</Filter>
     </ClInclude>
-    <ClInclude Include="Public\Misc\TickCalc.h">
-      <Filter>Public\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="Public\Assets\Texture2D.h">
       <Filter>Public\Assets</Filter>
     </ClInclude>

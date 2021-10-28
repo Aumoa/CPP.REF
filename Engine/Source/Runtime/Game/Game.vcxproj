@@ -296,7 +296,6 @@
     <ClInclude Include="Public\Misc\GeometryGenerator.h" />
     <ClInclude Include="Public\Misc\KeyboardTracker.h" />
     <ClInclude Include="Public\Misc\MouseStateTracker.h" />
-    <ClInclude Include="Public\Misc\TickCalc.h" />
     <ClInclude Include="Public\MouseState.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformKeyboard.h" />
     <ClInclude Include="Public\PlatformMisc\IPlatformMouse.h" />

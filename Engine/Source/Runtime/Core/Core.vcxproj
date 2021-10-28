@@ -144,6 +144,7 @@
     <ClInclude Include="Public\Misc\DateTime.h" />
     <ClInclude Include="Public\Misc\Paths.h" />
     <ClInclude Include="Public\Misc\StringUtils.h" />
+    <ClInclude Include="Public\Misc\TickCalc.h" />
     <ClInclude Include="Public\Numerics\AxisAlignedCube.h" />
     <ClInclude Include="Public\Numerics\Color.h" />
     <ClInclude Include="Public\Numerics\Complex.h" />
