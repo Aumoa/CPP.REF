@@ -37,6 +37,12 @@
     <Filter Include="Private\Widgets\Image">
       <UniqueIdentifier>{34318f40-ceb3-421c-8fd8-60046b9430c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Widgets\Panel">
+      <UniqueIdentifier>{8749cde1-858b-48b6-b4d0-9f7a3c1643a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Panel">
+      <UniqueIdentifier>{8ca3bd8a-4cce-428c-8170-42a605751a30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\AppEngine.h">
@@ -162,6 +168,12 @@
     <ClInclude Include="Public\Widgets\IMage\Image.h">
       <Filter>Public\Widgets\Image</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\PanelWidget.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h">
+      <Filter>Public\Widgets\Panel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppEngine.cpp">
@@ -205,6 +217,12 @@
     </ClCompile>
     <ClCompile Include="Private\Widgets\Image\Image.cpp">
       <Filter>Private\Widgets\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\PanelWidget.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Panel\CanvasPanel.cpp">
+      <Filter>Private\Widgets\Panel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
