@@ -129,8 +129,11 @@
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
     <ClInclude Include="Public\Widgets\IMage\Image.h" />
     <ClInclude Include="Public\Widgets\LeafWidget.h" />
+    <ClInclude Include="Public\Widgets\Panel\BoxPanel.h" />
     <ClInclude Include="Public\Widgets\Panel\CanvasPanel.h" />
+    <ClInclude Include="Public\Widgets\Panel\HorizontalBoxPanel.h" />
     <ClInclude Include="Public\Widgets\Panel\PanelWidget.h" />
+    <ClInclude Include="Public\Widgets\Panel\VerticalBoxPanel.h" />
     <ClInclude Include="Public\Widgets\SlotBase.h" />
     <ClInclude Include="Public\Widgets\Viewport.h" />
     <ClInclude Include="Public\Widgets\Widget.h" />
@@ -148,6 +151,7 @@
     <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
     <ClCompile Include="Private\Widgets\Image\Image.cpp" />
     <ClCompile Include="Private\Widgets\LeafWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Panel\BoxPanel.cpp" />
     <ClCompile Include="Private\Widgets\Panel\CanvasPanel.cpp" />
     <ClCompile Include="Private\Widgets\Panel\PanelWidget.cpp" />
     <ClCompile Include="Private\Widgets\Viewport.cpp" />

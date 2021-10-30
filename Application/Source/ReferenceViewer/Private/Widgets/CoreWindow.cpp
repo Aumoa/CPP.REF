@@ -2,6 +2,7 @@
 
 #include "Widgets/CoreWindow.h"
 #include "Widgets/Panel/CanvasPanel.h"
+#include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Widgets/Image/Image.h"
 #include "Draw/PaintArgs.h"
 
@@ -22,7 +23,7 @@ int32 SCoreWindow::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeomet
 	if (CanvasPanel)
 	{
 		PaintArgs NewArgs = Args.WithNewParent(this);
-		return CanvasPanel->Paint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer, bParentEnabled);
+		return CanvasPanel->Paint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer, ShouldBeEnabled(bParentEnabled));
 	}
 	return InLayer;
 }
@@ -40,27 +41,72 @@ DEFINE_SLATE_CONSTRUCTOR(SCoreWindow, Attr)
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(std::move(Attr));
 	CanvasPanel = SNew(SCanvasPanel)
 		+SCanvasPanel::Slot()
-		.Offset(10.0f, 10.0f, 0.0f, 0.0f)
-		.bAutoSize(true)
-		.ZOrder(2.0f)
+		.Offset(10.0f, 10.0f, 100.0f, 300.0f)
 		[
-			SAssignNew(RedBox, SImage)
-			.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Red)
+			SNew(SVerticalBoxPanel)
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Red)
+			]
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Green)
+			]
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Blue)
+			]
 		]
 		+SCanvasPanel::Slot()
-		.Offset(10.0f, 60.0f, 0.0f, 0.0f)
-		.bAutoSize(true)
-		.ZOrder(3.0f)
+		.Offset(120.0f, 10.0f, 100.0f, 300.0f)
 		[
-			SAssignNew(GreenBox, SImage)
-			.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Green)
+			SNew(SVerticalBoxPanel)
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Red)
+			]
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Green)
+			]
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Blue)
+			]
 		]
 		+SCanvasPanel::Slot()
-		.Offset(10.0f, 110.0f, 0.0f, 0.0f)
-		.bAutoSize(true)
-		.ZOrder(1.0f)
+		.Offset(230.0f, 10.0f, 100.0f, 300.0f)
 		[
-			SAssignNew(BlueBox, SImage)
-			.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Blue)
+			SNew(SVerticalBoxPanel)
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Red)
+			]
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Green)
+			]
+			+SVerticalBoxPanel::Slot()
+			.SlotPadding(0.0f, 0.0f, 0.0f, 10.0f)
+			[
+				SNew(SImage)
+				.Brush(nullptr, Vector2(100.0f, 100.0f), NamedColors::Blue)
+			]
 		];
 }

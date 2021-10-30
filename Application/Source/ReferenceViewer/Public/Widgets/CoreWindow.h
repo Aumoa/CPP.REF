@@ -26,7 +26,4 @@ public:
 
 private:
 	SCanvasPanel* CanvasPanel = nullptr;
-	SImage* RedBox = nullptr;
-	SImage* GreenBox = nullptr;
-	SImage* BlueBox = nullptr;
 };

@@ -101,12 +101,12 @@ bool SWidget::ShouldBeEnabled(bool bParentEnabled)
     return bParentEnabled && IsEnabled();
 }
 
-DEFINE_SLATE_CONSTRUCTOR(SWidget, attr)
+DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
 {
-    SetVisibility(attr._Visibility);
-    SetFlowDirection(attr._FlowDirection);
-    SetClipping(attr._Clipping);
-    SetEnabled(attr._bEnabled);
+    SetVisibility(Attr._Visibility);
+    SetFlowDirection(Attr._FlowDirection);
+    SetClipping(Attr._Clipping);
+    SetEnabled(Attr._bEnabled);
 }
 
 void SWidget::SetVisibility(ESlateVisibility visibility)
@@ -153,7 +153,7 @@ SlateRenderTransform SWidget::GetRenderTransform()
 
 void SWidget::SetEnabled(bool bEnabled)
 {
-    bEnabled = bEnabled;
+    this->bEnabled = bEnabled;
 }
 
 bool SWidget::IsEnabled()

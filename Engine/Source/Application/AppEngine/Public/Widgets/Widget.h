@@ -63,7 +63,7 @@ public:
 		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility, Visibility)
 		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
 		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
-		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled, true)
 		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
 	END_SLATE_ATTRIBUTE;
 
