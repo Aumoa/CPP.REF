@@ -36,7 +36,7 @@ Vector2 STextBlock::GetDesiredSize()
 	//	}
 	//}
 
-	return Vector2::GetZero();
+	return Vector2::ZeroVector();
 }
 
 void STextBlock::SetText(std::wstring_view text)

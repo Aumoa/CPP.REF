@@ -56,6 +56,6 @@ Vector2N STexture2D::GetPixelSize()
 	}
 	else
 	{
-		return Vector2N::GetZero();
+		return Vector2N::ZeroVector();
 	}
 }

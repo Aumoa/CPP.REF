@@ -23,30 +23,30 @@ struct SlateRenderTransform
 	{
 	}
 
-	constexpr SlateRenderTransform(float uniformScale, const Vector2& translation = Vector2::GetZero())
+	constexpr SlateRenderTransform(float uniformScale, const Vector2& translation = Vector2::ZeroVector())
 		: SlateRenderTransform(Scale2D(uniformScale), translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Scale2D& scale, const Vector2& translation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Scale2D& scale, const Vector2& translation = Vector2::ZeroVector())
 		: M(Matrix2x2::Scale(scale.GetVector()))
 		, Translation(translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Shear2D& shear, const Vector2& translation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Shear2D& shear, const Vector2& translation = Vector2::ZeroVector())
 		: M(Matrix2x2::Shear(shear.GetVector()))
 		, Translation(translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Complex& rotation, const Vector2& translation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Complex& rotation, const Vector2& translation = Vector2::ZeroVector())
 		: M(rotation.ToMatrix())
 		, Translation(translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Matrix2x2& transform, const Vector2& translation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Matrix2x2& transform, const Vector2& translation = Vector2::ZeroVector())
 		: M(transform)
 		, Translation(translation)
 	{
@@ -100,7 +100,7 @@ struct SlateRenderTransform
 
 	constexpr bool IsIdentity() const
 	{
-		return M.IsIdentity() && Translation == Vector2::GetZero();
+		return M.IsIdentity() && Translation == Vector2::ZeroVector();
 	}
 
 	constexpr const Vector2& GetTranslation() const { return Translation; }
@@ -109,7 +109,7 @@ struct SlateRenderTransform
 
 	static constexpr SlateRenderTransform Identity()
 	{
-		return SlateRenderTransform(Matrix2x2::Identity(), Vector2::GetZero());
+		return SlateRenderTransform(Matrix2x2::Identity(), Vector2::ZeroVector());
 	}
 
 private:

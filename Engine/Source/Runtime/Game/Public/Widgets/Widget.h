@@ -25,7 +25,7 @@ private:
 	EWidgetClipping Clipping = EWidgetClipping::Inherit;
 
 	SlateRenderTransform RenderTransform = SlateRenderTransform::Identity();
-	Vector2 RenderTransformPivot = Vector2::GetZero();
+	Vector2 RenderTransformPivot = Vector2::ZeroVector();
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
 	std::optional<Geometry> CachedGeometry;

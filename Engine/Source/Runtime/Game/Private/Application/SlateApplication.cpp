@@ -28,7 +28,7 @@ void SSlateApplication::InitWindow(SLocalPlayer* InLocalPlayer, IFrameworkView* 
 void SSlateApplication::TickAndPaint(float InDeltaTime)
 {
 	Vector2 DesiredSize = CoreWindow->GetDesiredSize();
-	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::GetZero()), SlateRenderTransform(Vector2::GetZero()));
+	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
 	CoreWindow->Tick(AllottedGeometry, InDeltaTime);
 
 	Rect CullingRect = Rect(0, 0, DesiredSize.X, DesiredSize.Y);

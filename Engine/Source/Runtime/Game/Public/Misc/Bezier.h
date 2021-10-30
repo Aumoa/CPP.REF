@@ -72,7 +72,7 @@ public:
                 // Cross the two tangent vectors to compute the normal.
                 Vector3 normal = Vector3::CrossProduct(tangent1, tangent2);
 
-                if (!normal.NearlyEquals(Vector3::GetZero()))
+                if (!normal.NearlyEquals(Vector3::ZeroVector()))
                 {
                     normal = normal.GetNormal();
 
@@ -98,7 +98,7 @@ public:
 
                     const Vector3 IdentityR1 = Vector3(0, 1, 0);
                     const Vector3 IdentityR1Neg = Vector3(0, -1, 0);
-                    normal = Vector3::Select(IdentityR1, IdentityR1Neg, Vector3::SelectControl::Less(position, Vector3::GetZero()));
+                    normal = Vector3::Select(IdentityR1, IdentityR1Neg, Vector3::SelectControl::Less(position, Vector3::ZeroVector()));
                 }
 
                 // Compute the texture coordinate.

@@ -555,8 +555,8 @@ struct Vector : public VectorImpl<T, Vector<T, N>, N>
 		return CastImpl<U>(std::make_index_sequence<N>{});
 	}
 
-	inline static constexpr Vector GetZero() { return Vector(); }
-	inline static constexpr Vector GetOneVector() { return Vector((T)1); }
+	inline static constexpr Vector ZeroVector() { return Vector(); }
+	inline static constexpr Vector OneVector() { return Vector((T)1); }
 
 private:
 	template<class U, size_t... _Idx>

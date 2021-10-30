@@ -78,7 +78,7 @@ struct PaintGeometry
 
 	static constexpr PaintGeometry Identity()
 	{
-		return PaintGeometry(Vector2::GetZero());
+		return PaintGeometry(Vector2::ZeroVector());
 	}
 
 private:

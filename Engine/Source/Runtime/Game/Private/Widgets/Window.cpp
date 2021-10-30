@@ -30,7 +30,7 @@ Vector2 SWindow::GetDesiredSize()
 	{
 		return GameViewport->GetDesiredSize();
 	}
-	return Vector2::GetZero();
+	return Vector2::ZeroVector();
 }
 
 void SWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
@@ -40,7 +40,7 @@ void SWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geom
 	{
 		ArrangedChildrens.AddWidget(VpVisibility, AllottedGeometry.MakeChild(
 			GameViewport,
-			Vector2::GetZero(),
+			Vector2::ZeroVector(),
 			AllottedGeometry.GetLocalSize()
 		));
 	}

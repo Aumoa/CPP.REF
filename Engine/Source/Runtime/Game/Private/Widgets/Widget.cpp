@@ -31,7 +31,7 @@ void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 
 Vector2 SWidget::GetDesiredSize()
 {
-	return Vector2::GetZero();
+	return Vector2::ZeroVector();
 }
 
 Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()

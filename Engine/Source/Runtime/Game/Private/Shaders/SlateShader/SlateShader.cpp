@@ -112,8 +112,8 @@ auto SSlateShader::InitElements(const SlateWindowElementList& DrawElements) -> I
 			RenderElement.AbsolutePosition = RenderTransform.GetTranslation();
 			RenderElement.AbsoluteSize = Element.Transform.GetLocalSize();
 			RenderElement.Depth = (float)Element.Layer;
-			RenderElement.TexturePosition = Vector2::GetZero();
-			RenderElement.TextureSize = Vector2::GetOneVector();
+			RenderElement.TexturePosition = Vector2::ZeroVector();
+			RenderElement.TextureSize = Vector2::OneVector();
 
 			Ctx.NumDescriptors += 1;
 		}

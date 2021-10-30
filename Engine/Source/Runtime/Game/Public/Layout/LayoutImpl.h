@@ -67,7 +67,7 @@ constexpr Rect TransformCalculus2D::ExtendBy(const Rect& lhs, const Margin& rhs)
 
 constexpr bool Geometry::IsUnderLocation(const Vector2& absoluteCoordinate) const
 {
-	const SlateRotatedRect Rect = TransformCalculus2D::TransformRect(AccumulatedRenderTransform, SlateRotatedRect(::Rect(Vector2::GetZero(), GetSize())));
+	const SlateRotatedRect Rect = TransformCalculus2D::TransformRect(AccumulatedRenderTransform, SlateRotatedRect(::Rect(Vector2::ZeroVector(), GetSize())));
 	return Rect.IsUnderLocation(absoluteCoordinate);
 }
 
@@ -87,10 +87,10 @@ constexpr Rect Geometry::GetRenderBoundingRect(const Rect& localSpaceRect) const
 
 constexpr Rect Geometry::GetLayoutBoundingRect(const Margin& localSpaceExtendBy) const
 {
-	return TransformCalculus2D::ExtendBy(GetLayoutBoundingRect(Rect(Vector2::GetZero(), GetSize())), localSpaceExtendBy);
+	return TransformCalculus2D::ExtendBy(GetLayoutBoundingRect(Rect(Vector2::ZeroVector(), GetSize())), localSpaceExtendBy);
 }
 
 constexpr Rect Geometry::GetRenderBoundingRect(const Margin& localSpaceExtendBy) const
 {
-	return TransformCalculus2D::ExtendBy(GetRenderBoundingRect(Rect(Vector2::GetZero(), GetSize())), localSpaceExtendBy);
+	return TransformCalculus2D::ExtendBy(GetRenderBoundingRect(Rect(Vector2::ZeroVector(), GetSize())), localSpaceExtendBy);
 }

@@ -16,7 +16,7 @@ Vector2 SBorder::GetDesiredSize()
 	}
 	else
 	{
-		return Vector2::GetZero();
+		return Vector2::ZeroVector();
 	}
 }
 

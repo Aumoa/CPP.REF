@@ -390,7 +390,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
     for (size_t i = 0; i < preFixupVertexCount; ++i)
     {
         // This vertex is on the prime meridian if Pos.x and texcoord.u are both zero (allowing for small epsilon).
-        bool isOnPrimeMeridian = Vector2(vertices[i].Position.X, vertices[i].TexCoord.X).NearlyEquals(Vector2::GetZero(), MathEx::SmallNumber);
+        bool isOnPrimeMeridian = Vector2(vertices[i].Position.X, vertices[i].TexCoord.X).NearlyEquals(Vector2::ZeroVector(), MathEx::SmallNumber);
 
         if (isOnPrimeMeridian)
         {
@@ -664,7 +664,7 @@ void GeometryGenerator::ComputeCone(VertexCollection& vertices, IndexCollection&
         Normal = Normal.GetNormal();
 
         // Duplicate the top vertex for distinct normals
-        vertices.emplace_back(topOffset, Normal, NamedColors::White, Vector2::GetZero());
+        vertices.emplace_back(topOffset, Normal, NamedColors::White, Vector2::ZeroVector());
         vertices.emplace_back(pt, Normal, NamedColors::White, Tex + Vector2(0, 1.0f));
 
         index_push_back(indices, i * 2);
@@ -789,7 +789,7 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
 
         // Duplicate vertices to use face normals
         Vector3 Pos = verts[v0] * size;
-        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::GetZero());
+        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::ZeroVector());
 
         Pos = verts[v1] * size;
         vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2(1.0f, 0));
@@ -855,7 +855,7 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
 
         // Duplicate vertices to use face normals
         Vector3 Pos = verts[v0] * size;
-        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::GetZero());
+        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::ZeroVector());
 
         Pos = verts[v1] * size;
         vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2(1.0f, 0));
@@ -1073,7 +1073,7 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
 
         // Duplicate vertices to use face normals
         Vector3 Pos = verts[v0] * size;
-        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::GetZero());
+        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::ZeroVector());
 
         Pos = verts[v1] * size;
         vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2(1.0f, 0));

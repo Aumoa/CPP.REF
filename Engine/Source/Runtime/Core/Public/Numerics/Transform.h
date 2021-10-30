@@ -146,6 +146,6 @@ struct Transform
     /// </summary>
     static inline constexpr Transform GetIdentity()
     {
-        return Transform(Vector3(), Vector3::GetOneVector(), Quaternion::GetIdentity());
+        return Transform(Vector3(), Vector3::OneVector(), Quaternion::GetIdentity());
     }
 };

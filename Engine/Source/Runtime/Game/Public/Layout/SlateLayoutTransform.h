@@ -85,7 +85,7 @@ struct SlateLayoutTransform
 	
 	static constexpr SlateLayoutTransform Identity()
 	{
-		return SlateLayoutTransform(1.0f, Vector2::GetZero());
+		return SlateLayoutTransform(1.0f, Vector2::ZeroVector());
 	}
 
 private:

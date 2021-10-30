@@ -52,7 +52,7 @@ Transform SSceneComponent::GetSocketTransform(std::wstring_view InSocketName, EC
 bool SSceneComponent::MoveComponent(const Vector3& InMoveDelta, const Quaternion& InNewRotation, EComponentTransformSpace InSpace)
 {
 	Quaternion OldRotation = InSpace == EComponentTransformSpace::World ? GetComponentRotation() : GetRotation();
-	if (InMoveDelta.NearlyEquals(Vector3::GetZero()) && OldRotation.NearlyEquals(InNewRotation))
+	if (InMoveDelta.NearlyEquals(Vector3::ZeroVector()) && OldRotation.NearlyEquals(InNewRotation))
 	{
 		// MoveDelta and NewRotation is nearly equals to previous component transform.
 		// Skip moving and return state indicating that be not moved.
