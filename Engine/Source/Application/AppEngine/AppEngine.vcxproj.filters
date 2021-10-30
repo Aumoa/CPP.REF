@@ -31,6 +31,12 @@
     <Filter Include="Private\Draw">
       <UniqueIdentifier>{856a5287-4a77-430a-aa1b-8ef76f485b88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Widgets\Image">
+      <UniqueIdentifier>{4b9a20c6-d58e-4910-8cd7-50d304b04db3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets\Image">
+      <UniqueIdentifier>{34318f40-ceb3-421c-8fd8-60046b9430c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\AppEngine.h">
@@ -135,6 +141,27 @@
     <ClInclude Include="Public\Draw\SlateBrush.h">
       <Filter>Public\Draw</Filter>
     </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIBrush.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHISolidColorBrush.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\LeafWidget.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIEnums.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\IRHIStrokeStyle.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\RHI\RHIStructures.h">
+      <Filter>Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Widgets\IMage\Image.h">
+      <Filter>Public\Widgets\Image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\AppEngine.cpp">
@@ -172,6 +199,12 @@
     </ClCompile>
     <ClCompile Include="Private\Draw\SlateWindowElementList.cpp">
       <Filter>Private\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\LeafWidget.cpp">
+      <Filter>Private\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\Image\Image.cpp">
+      <Filter>Private\Widgets\Image</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

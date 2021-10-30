@@ -3,17 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Window.h"
+#include "Widgets/Window.h"
 
-interface IApplicationInterface;
+class SImage;
 
-class APPENGINE_API SViewport : public SWindow
+class REFERENCEVIEWER_API SCoreWindow : public SWindow
 {
-	GENERATED_BODY(SViewport)
+	GENERATED_BODY(SCoreWindow)
 
 public:
-	SViewport();
+	SCoreWindow();
 
 protected:
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) override;
+
+public:
+	DECLARE_SLATE_CONSTRUCTOR();
+
+private:
+	SImage* Image = nullptr;
 };

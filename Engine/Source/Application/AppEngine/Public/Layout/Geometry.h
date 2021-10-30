@@ -165,12 +165,12 @@ public:
 
 	constexpr Rect GetLayoutBoundingRect() const
 	{
-		return GetLayoutBoundingRect(Rect(Vector2::GetZero(), GetSize()));
+		return GetLayoutBoundingRect(Rect(Vector2::ZeroVector(), GetSize()));
 	}
 
 	constexpr Rect GetRenderBoundingRect() const
 	{
-		return GetRenderBoundingRect(Rect(Vector2::GetZero(), GetSize()));
+		return GetRenderBoundingRect(Rect(Vector2::ZeroVector(), GetSize()));
 	}
 
 	// LayoutImpl.h

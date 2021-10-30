@@ -10,8 +10,11 @@
 
 DEFINE_LOG_CATEGORY(LogEngine);
 
+SAppEngine* GEngine;
+
 SAppEngine::SAppEngine() : Super()
 {
+	GEngine = this;
 }
 
 int32 SAppEngine::GuardedMain(IApplicationInterface* Application)
@@ -38,19 +41,27 @@ int32 SAppEngine::GuardedMain(IApplicationInterface* Application)
 		SE_LOG(LogEngine, Fatal, L"ApplicationModule is nullptr. \"LoadAppModule\" function returns nullptr.");
 	}
 
-	CoreWindow = AppModule->CreateWindow();
-	CoreWindow->SetOuter(Application);
-
 	// Create graphics resources.
 	Device = Application->CreateDevice();
 	Device->SetOuter(this);
 
 	Application->Idle.AddSObject(this, &SAppEngine::OnIdle);
 	Application->Sized.AddSObject(this, &SAppEngine::OnSized);
+
+	AppModule->Init(Application);
+	CoreWindow = AppModule->CreateWindow();
+	CoreWindow->SetOuter(Application);
+
+	AppModule->Start();
 	Application->Start();
 
 	Application->DestroyObject(CoreWindow);
 	return 0;
+}
+
+IRHIDevice* SAppEngine::GetDevice()
+{
+	return Device;
 }
 
 void SAppEngine::OnIdle()

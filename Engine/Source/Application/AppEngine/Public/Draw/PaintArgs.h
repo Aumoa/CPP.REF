@@ -11,9 +11,10 @@ class APPENGINE_API PaintArgs
 public:
 	SWidget*	const	Parent;
 	float		const	DeltaTime;
+	float		const	RenderOpacity;
 
 public:
-	PaintArgs(SWidget* InParentWidget, float InDeltaTime);
+	PaintArgs(SWidget* InParentWidget, float InDeltaTime, float InRenderOpacity);
 
 	PaintArgs WithNewParent(SWidget* InParentWidget) const;
 };

@@ -23,30 +23,30 @@ struct SlateRenderTransform
 	{
 	}
 
-	constexpr SlateRenderTransform(float UniformScale, const Vector2& InTranslation = Vector2::GetZero())
+	constexpr SlateRenderTransform(float UniformScale, const Vector2& InTranslation = Vector2::ZeroVector())
 		: SlateRenderTransform(Scale2D(UniformScale), InTranslation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Scale2D& Scale, const Vector2& InTranslation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Scale2D& Scale, const Vector2& InTranslation = Vector2::ZeroVector())
 		: M(Matrix2x2::Scale(Scale.GetVector()))
 		, Translation(InTranslation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Shear2D& Shear, const Vector2& InTranslation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Shear2D& Shear, const Vector2& InTranslation = Vector2::ZeroVector())
 		: M(Matrix2x2::Shear(Shear.GetVector()))
 		, Translation(InTranslation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Complex& Rotation, const Vector2& InTranslation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Complex& Rotation, const Vector2& InTranslation = Vector2::ZeroVector())
 		: M(Rotation.ToMatrix())
 		, Translation(InTranslation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Matrix2x2& Transform, const Vector2& InTranslation = Vector2::GetZero())
+	constexpr SlateRenderTransform(const Matrix2x2& Transform, const Vector2& InTranslation = Vector2::ZeroVector())
 		: M(Transform)
 		, Translation(InTranslation)
 	{
@@ -100,16 +100,25 @@ struct SlateRenderTransform
 
 	constexpr bool IsIdentity() const
 	{
-		return M.IsIdentity() && Translation == Vector2::GetZero();
+		return M.IsIdentity() && Translation == Vector2::ZeroVector();
 	}
 
 	constexpr const Vector2& GetTranslation() const { return Translation; }
 	void SetTranslation(const Vector2& InTranslation) { Translation = InTranslation; }
 	constexpr const Matrix2x2& GetMatrix() const { return M; }
+	constexpr Matrix3x2 GetMatrix3x2() const
+	{
+		return Matrix3x2
+		{
+			M.V[0][0], M.V[0][1],
+			M.V[1][0], M.V[1][1],
+			M.V[2][0], M.V[2][1]
+		};
+	}
 
 	static constexpr SlateRenderTransform Identity()
 	{
-		return SlateRenderTransform(Matrix2x2::Identity(), Vector2::GetZero());
+		return SlateRenderTransform(Matrix2x2::Identity(), Vector2::ZeroVector());
 	}
 
 private:

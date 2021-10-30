@@ -22,9 +22,10 @@ private:
 	EWidgetClipping Clipping = EWidgetClipping::Inherit;
 
 	SlateRenderTransform RenderTransform = SlateRenderTransform::Identity();
-	Vector2 RenderTransformPivot = Vector2::GetZero();
+	Vector2 RenderTransformPivot = Vector2::ZeroVector();
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
+	float RenderOpacity = 1.0f;
 	std::optional<Geometry> CachedGeometry;
 	std::optional<Vector2> CachedDesiredSize;
 
@@ -63,16 +64,19 @@ public:
 		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
 		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
 	END_SLATE_ATTRIBUTE;
 
 	DECLARE_SLATE_CONSTRUCTOR();
 
-	void SetVisibility(ESlateVisibility InVisibility);
+	virtual void SetVisibility(ESlateVisibility InVisibility);
 	ESlateVisibility GetVisibility();
-	void SetFlowDirection(EFlowDirection InFlowDirection);
+	virtual void SetFlowDirection(EFlowDirection InFlowDirection);
 	EFlowDirection GetFlowDirection();
-	void SetClipping(EWidgetClipping InClipping);
+	virtual void SetClipping(EWidgetClipping InClipping);
 	EWidgetClipping GetClipping();
+	virtual void SetRenderOpacity(float InOpacity);
+	float GetRenderOpacity();
 
 	void SetRenderTransform(const SlateRenderTransform& InRenderTransform);
 	SlateRenderTransform GetRenderTransform();

@@ -79,7 +79,7 @@ This&& operator [](SWidget* value) &&										\
 	return std::move(*static_cast<This*>(this));							\
 }
 
-#define DECLARE_SLATE_CONSTRUCTOR() void Construct(DeclarativeAttr<>&&)
+#define DECLARE_SLATE_CONSTRUCTOR() virtual void Construct(DeclarativeAttr<>&&)
 #define DEFINE_SLATE_CONSTRUCTOR(SlateClass, AttrVar) void SlateClass::Construct(DeclarativeAttr<>&& AttrVar)
 #define INVOKE_SLATE_CONSTRUCTOR_SUPER(AttrVar) Super::Construct(AttrVar)
 

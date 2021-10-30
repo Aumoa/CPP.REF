@@ -21,6 +21,15 @@
     <ClCompile Include="Private\D3D11RHI\WindowsDevice.cpp">
       <Filter>Private\D3D11RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Private\D3D11RHI\WindowsBrush.cpp">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D11RHI\WindowsSolidColorBrush.cpp">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\D3D11RHI\WindowsStrokeStyle.cpp">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\WindowsIncludes.h">
@@ -35,5 +44,19 @@
     <ClInclude Include="Private\WindowsErrors.inl">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="Private\D3D11RHI\WindowsBrush.h">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D11RHI\WindowsSolidColorBrush.h">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\D3D11RHI\WindowsStrokeStyle.h">
+      <Filter>Private\D3D11RHI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Private\Transformation.inl">
+      <Filter>Private</Filter>
+    </None>
   </ItemGroup>
 </Project>

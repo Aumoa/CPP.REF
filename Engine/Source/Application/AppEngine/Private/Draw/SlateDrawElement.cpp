@@ -7,7 +7,7 @@ SlateDrawElement::SlateDrawElement()
 {
 }
 
-SlateDrawElement& SlateDrawElement::MakeBox(SlateWindowElementList& List, const SlateBrush& InBrush, const PaintGeometry& InTransform, int32 InLayer)
+SlateDrawElement& SlateDrawElement::MakeBox(SlateWindowElementList& List, IRHIBrush* InBrush, const PaintGeometry& InTransform, int32 InLayer)
 {
 	SlateDrawElement& Element = List.AddUninitialized();
 	Element.Brush = InBrush;

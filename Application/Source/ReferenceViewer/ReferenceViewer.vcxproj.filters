@@ -7,15 +7,27 @@
     <Filter Include="Private">
       <UniqueIdentifier>{a52555b2-19e3-4330-afbc-66aaef5d8ec0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\Widgets">
+      <UniqueIdentifier>{50916b5b-847f-4faa-8084-34bf8b85c962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\Widgets">
+      <UniqueIdentifier>{b22a1532-cb49-4e70-a71a-a9c8e4a62129}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\ReferenceViewerModule.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Widgets\CoreWindow.h">
+      <Filter>Public\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\ReferenceViewerModule.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Widgets\CoreWindow.cpp">
+      <Filter>Private\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

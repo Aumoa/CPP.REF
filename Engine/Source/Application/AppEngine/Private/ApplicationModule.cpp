@@ -8,7 +8,21 @@ SApplicationModule::SApplicationModule()
 {
 }
 
+void SApplicationModule::Init(IApplicationInterface* App)
+{
+	this->App = App;
+}
+
+void SApplicationModule::Start()
+{
+}
+
 SWindow* SApplicationModule::CreateWindow()
 {
 	return SNew(SViewport).Application(Cast<IApplicationInterface>(GetOuter()));
+}
+
+IApplicationInterface* SApplicationModule::GetApp()
+{
+	return App;
 }

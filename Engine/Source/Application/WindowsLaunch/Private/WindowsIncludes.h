@@ -17,6 +17,7 @@
 using Microsoft::WRL::ComPtr;
 
 #include "WindowsErrors.inl"
+#include "Transformation.inl"
 
 #define HR(X)						\
 if (HRESULT __E = (X); FAILED(__E))	\

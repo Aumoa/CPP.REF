@@ -5,7 +5,12 @@
 #include "CoreMinimal.h"
 #include "ApplicationModule.h"
 
+class SWindow;
+
 class REFERENCEVIEWER_API SReferenceViewerModule : public SApplicationModule
 {
 	GENERATED_BODY(SReferenceViewerModule)
+
+public:
+	virtual SWindow* CreateWindow() override;
 };

@@ -40,7 +40,7 @@ struct LayoutGeometry
 
 	constexpr Rect GetRectInLocalSpace() const
 	{
-		return Rect(Vector2::GetZero(), LocalSize);
+		return Rect(Vector2::ZeroVector(), LocalSize);
 	}
 
 	constexpr Rect GetRectInParentSpace() const

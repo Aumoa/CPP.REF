@@ -10,31 +10,30 @@ struct SlateBrush
 {
 	IRHITexture2D* ImageSource = nullptr;
 	Vector2 ImageSize;
+	Color TintColor;
 
 	SlateBrush()
 	{
 	}
 
-	SlateBrush(IRHITexture2D* InImageSource, const Vector2& InImageSize)
+	SlateBrush(IRHITexture2D* InImageSource, const Vector2& InImageSize, const Color& InTintColor)
 		: ImageSource(InImageSource)
 		, ImageSize(InImageSize)
+		, TintColor(InTintColor)
 	{
-	}
-
-	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
-	{
-		return std::format(L"DesiredSize: {}", ImageSize.ToString(InFormatArgs));
 	}
 
 	bool operator ==(const SlateBrush& Rhs) const
 	{
 		return ImageSource == Rhs.ImageSource
-			&& ImageSize == Rhs.ImageSize;
+			&& ImageSize == Rhs.ImageSize
+			&& TintColor == Rhs.TintColor;
 	}
 
 	bool operator !=(const SlateBrush& Rhs) const
 	{
 		return ImageSource != Rhs.ImageSource
-			|| ImageSize != Rhs.ImageSize;
+			|| ImageSize != Rhs.ImageSize
+			|| TintColor != Rhs.TintColor;
 	}
 };

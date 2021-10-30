@@ -28,7 +28,7 @@ void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 
 Vector2 SWidget::GetDesiredSize()
 {
-	return Vector2::GetZero();
+	return Vector2::ZeroVector();
 }
 
 Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
@@ -104,6 +104,7 @@ DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
     SetFlowDirection(Attr._FlowDirection);
     SetClipping(Attr._Clipping);
     SetEnabled(Attr._bEnabled);
+    SetRenderOpacity(Attr._RenderOpacity);
 }
 
 void SWidget::SetVisibility(ESlateVisibility InVisibility)
@@ -134,6 +135,16 @@ void SWidget::SetClipping(EWidgetClipping InClipping)
 EWidgetClipping SWidget::GetClipping()
 {
     return Clipping;
+}
+
+void SWidget::SetRenderOpacity(float InOpacity)
+{
+    RenderOpacity = InOpacity;
+}
+
+float SWidget::GetRenderOpacity()
+{
+    return RenderOpacity;
 }
 
 void SWidget::SetRenderTransform(const SlateRenderTransform& InRenderTransform)

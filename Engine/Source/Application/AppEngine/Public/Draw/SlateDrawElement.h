@@ -6,15 +6,16 @@
 #include "SlateBrush.h"
 #include "Layout/Layout.h"
 
+interface IRHIBrush;
 class SlateWindowElementList;
 
 struct APPENGINE_API SlateDrawElement
 {
-	SlateBrush Brush;
+	IRHIBrush* Brush = nullptr;
 	PaintGeometry Transform;
 	int32 Layer = 0;
 
 	SlateDrawElement();
 
-	static SlateDrawElement& MakeBox(SlateWindowElementList& List, const SlateBrush& InBrush, const PaintGeometry& InTransform, int32 InLayer);
+	static SlateDrawElement& MakeBox(SlateWindowElementList& List, IRHIBrush* InBrush, const PaintGeometry& InTransform, int32 InLayer);
 };

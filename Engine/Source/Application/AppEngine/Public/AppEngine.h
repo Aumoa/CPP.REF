@@ -7,6 +7,8 @@
 
 interface IApplicationInterface;
 interface IRHIDevice;
+interface IRHISolidColorBrush;
+interface IRHIStrokeStyle;
 class SApplicationModule;
 class SWindow;
 
@@ -24,8 +26,11 @@ public:
 	SAppEngine();
 
 	int32 GuardedMain(IApplicationInterface* Application);
+	IRHIDevice* GetDevice();
 
 private:
 	void OnIdle();
 	void OnSized(Vector2N Size);
 };
+
+extern SAppEngine* GEngine;

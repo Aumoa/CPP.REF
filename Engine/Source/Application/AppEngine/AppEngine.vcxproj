@@ -119,9 +119,16 @@
     <ClInclude Include="Public\PlatformCore\IApplicationInterface.h" />
     <ClInclude Include="Public\PlatformCore\ISlateApplication.h" />
     <ClInclude Include="Public\PlatformCore\PlatformMacros.h" />
+    <ClInclude Include="Public\RHI\IRHIBrush.h" />
     <ClInclude Include="Public\RHI\IRHIDevice.h" />
+    <ClInclude Include="Public\RHI\IRHISolidColorBrush.h" />
+    <ClInclude Include="Public\RHI\IRHIStrokeStyle.h" />
+    <ClInclude Include="Public\RHI\RHIEnums.h" />
+    <ClInclude Include="Public\RHI\RHIStructures.h" />
     <ClInclude Include="Public\Widgets\CompoundWidget.h" />
     <ClInclude Include="Public\Widgets\DeclarativeSyntaxSupports.h" />
+    <ClInclude Include="Public\Widgets\IMage\Image.h" />
+    <ClInclude Include="Public\Widgets\LeafWidget.h" />
     <ClInclude Include="Public\Widgets\SlotBase.h" />
     <ClInclude Include="Public\Widgets\Viewport.h" />
     <ClInclude Include="Public\Widgets\Widget.h" />
@@ -137,6 +144,8 @@
     <ClCompile Include="Private\Layout\ArrangedWidget.cpp" />
     <ClCompile Include="Private\Layout\Geometry.cpp" />
     <ClCompile Include="Private\Widgets\CompoundWidget.cpp" />
+    <ClCompile Include="Private\Widgets\Image\Image.cpp" />
+    <ClCompile Include="Private\Widgets\LeafWidget.cpp" />
     <ClCompile Include="Private\Widgets\Viewport.cpp" />
     <ClCompile Include="Private\Widgets\Widget.cpp" />
     <ClCompile Include="Private\Widgets\Window.cpp" />

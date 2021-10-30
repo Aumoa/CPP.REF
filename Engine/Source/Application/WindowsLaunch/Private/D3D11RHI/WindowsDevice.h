@@ -22,6 +22,7 @@ private:
 	ComPtr<ID3D11Texture2D> SwapChainBuf;
 	ComPtr<ID2D1Bitmap1> SwapChainBitmap;
 
+	ComPtr<ID2D1Factory> D2DFactory;
 	ComPtr<ID2D1Device> D2DDevice;
 	ComPtr<ID2D1DeviceContext> D2DContext;
 
@@ -31,6 +32,13 @@ public:
 	virtual void Present() override;
 	virtual void ResizeBuffers(const Vector2N& InPixelSize) override;
 
+	virtual IRHISolidColorBrush* CreateSolidColorBrush(const Color& InColor, float InOpacity, const SlateRenderTransform& InTransform) override;
+	virtual IRHIStrokeStyle* CreateStrokeStyle(const RHIStrokeStyleDesc& Desc, const std::vector<float>& CustomDashes) override;
+
 	virtual void BeginDraw(const Color& ClearColor) override;
 	virtual void EndDraw() override;
+	virtual void FillRectangle(IRHIBrush* InBrush, Rect InRect) override;
+	virtual void DrawRectangle(IRHIBrush* InBrush, Rect InRect, float StrokeWidth, IRHIStrokeStyle* StrokeStyle, ERHIStrokeDirection Direction) override;
+	virtual void SetTransform(const SlateRenderTransform& InTransform) override;
+	virtual SlateRenderTransform GetTransform() override;
 };

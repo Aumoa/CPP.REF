@@ -104,7 +104,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Private\D3D11RHI\WindowsBrush.cpp" />
     <ClCompile Include="Private\D3D11RHI\WindowsDevice.cpp" />
+    <ClCompile Include="Private\D3D11RHI\WindowsSolidColorBrush.cpp" />
+    <ClCompile Include="Private\D3D11RHI\WindowsStrokeStyle.cpp" />
     <ClCompile Include="Private\WindowsApplicationInterface.cpp" />
     <ClCompile Include="Private\WindowsIncludes.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -113,10 +116,16 @@
     <ClCompile Include="Private\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\D3D11RHI\WindowsBrush.h" />
     <ClInclude Include="Private\D3D11RHI\WindowsDevice.h" />
+    <ClInclude Include="Private\D3D11RHI\WindowsSolidColorBrush.h" />
+    <ClInclude Include="Private\D3D11RHI\WindowsStrokeStyle.h" />
     <ClInclude Include="Private\WindowsApplicationInterface.h" />
     <ClInclude Include="Private\WindowsErrors.inl" />
     <ClInclude Include="Private\WindowsIncludes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Private\Transformation.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,7 +19,7 @@ int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGe
 int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
     PaintArgs NewArgs = Args.WithNewParent(this);
-    bool shouldBeEnabled = ShouldBeEnabled(bParentEnabled);
+    bool bShouldBeEnabled = ShouldBeEnabled(bParentEnabled);
 
     for (const ArrangedWidget& Widget : ArrangedChildrens.GetWidgets())
     {
@@ -27,7 +27,7 @@ int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChi
 
         if (!IsChildWidgetCulled(CullingRect, Widget))
         {
-            int32 CurWidgetsMaxLayer = CurWidget->Paint(NewArgs, Widget.GetGeometry(), CullingRect, InDrawElements, InLayer, shouldBeEnabled);
+            int32 CurWidgetsMaxLayer = CurWidget->Paint(NewArgs, Widget.GetGeometry(), CullingRect, InDrawElements, InLayer, bShouldBeEnabled);
             InLayer = MathEx::Max(CurWidgetsMaxLayer, InLayer);
         }
     }

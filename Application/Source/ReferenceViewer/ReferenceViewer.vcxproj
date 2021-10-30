@@ -91,9 +91,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Public\ReferenceViewerModule.h" />
+    <ClInclude Include="Public\Widgets\CoreWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\ReferenceViewerModule.cpp" />
+    <ClCompile Include="Private\Widgets\CoreWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Engine\Source\Application\AppEngine\AppEngine.vcxproj">
