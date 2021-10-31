@@ -72,4 +72,7 @@
       <Filter>Private\Actors</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="THStory.xml" />
+  </ItemGroup>
 </Project>

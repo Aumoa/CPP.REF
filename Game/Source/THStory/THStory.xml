@@ -1,0 +1,11 @@
+<ProjectInfo Name="THStory" Path="THStory" Type="Game" >
+	<IncludePaths>
+		<Item RelativePath="Public" Access="Public" />
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+		<Item Name="RenderCore" Access="Public" />
+		<Item Name="Game" Access="Public" />
+	</ReferencedProjects>
+</ProjectInfo>

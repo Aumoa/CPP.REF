@@ -193,6 +193,10 @@ bool SBuildTool::TryParseProject(const std::filesystem::path& XmlPath, ProjectBu
 			}
 		}
 
+		if (XMLElement* Debugging = ProjectInfo->FirstChildElement("Debugging"))
+		{
+		}
+
 		return true;
 	}
 
@@ -677,13 +681,13 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 					{
 						NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
 					}
-					else if (IncludeItem.path().extension() == ".h")
+					else if (IncludeItem.path().extension() == ".h" || IncludeItem.path().extension() == ".inl")
 					{
 						NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
 					}
-					else if (IncludeItem.path().extension() == ".inl")
+					else if (IncludeItem.path().extension() == ".xml")
 					{
-						NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
+						NewElementItemInclude(ItemGroup, "Xml", IncludeItem.path().string());
 					}
 					else if (IncludeItem.path().extension() == ".natvis")
 					{
@@ -747,13 +751,13 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 					{
 						InnerItem = NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
 					}
-					else if (IncludeItem.path().extension() == ".h")
+					else if (IncludeItem.path().extension() == ".h" || IncludeItem.path().extension() == ".inl")
 					{
 						InnerItem = NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
 					}
-					else if (IncludeItem.path().extension() == ".inl")
+					else if (IncludeItem.path().extension() == ".xml")
 					{
-						InnerItem = NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
+						InnerItem = NewElementItemInclude(ItemGroup, "Xml", IncludeItem.path().string());
 					}
 					else if (IncludeItem.path().extension() == ".natvis")
 					{
@@ -766,8 +770,11 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 						size_t IndexOfFilterStart = IncludeItemPath.find(AbsolutePath) + AbsolutePath.length() + 1;
 
 						std::wstring FilterPath = std::filesystem::path(IncludeItemPath.substr(IndexOfFilterStart)).parent_path().wstring();
-						NewElement(InnerItem, "Filter", WCHAR_TO_ANSI(FilterPath));
-						Filters.emplace_back(FilterPath);
+						if (!FilterPath.empty())
+						{
+							NewElement(InnerItem, "Filter", WCHAR_TO_ANSI(FilterPath));
+							Filters.emplace_back(FilterPath);
+						}
 					}
 				}
 
@@ -802,6 +809,42 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 			return -1;
 		}
 
+		// Make debugger settings.
+		Doc.Clear();
+
+		Decl = Doc.NewDeclaration();
+		Doc.LinkEndChild(Decl);
+
+		Project = Doc.NewElement("Project");
+		Doc.LinkEndChild(Project);
+		{
+			Project->SetAttribute("ToolsVersion", "Current");
+			Project->SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+			
+			for (auto& Config : Configurations)
+			{
+				XMLElement* PropertyGroup = NewElementPropertyGroup(Project, Config.Condition);
+				{
+					NewElement(PropertyGroup, "LocalDebuggerWorkingDirectory", "$(SolutionDir)");
+					NewElement(PropertyGroup, "DebuggerFlavor", "WindowsLocalDebugger");
+					switch (Runtime->Metadata->Type)
+					{
+					case EType::Game:
+						NewElement(PropertyGroup, "LocalDebuggerCommand", "$(OutDir)Windows.exe");
+						NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--GameDll \"{}\"", WCHAR_TO_ANSI(Runtime->Metadata->Name)));
+						break;
+					}
+				}
+			}
+		}
+
+		Err = Doc.SaveFile((IntermediateProjectPath.string() + ".vcxproj.user").c_str());
+		if (Err != XMLError::XML_SUCCESS)
+		{
+			SE_LOG(LogBuildTool, Error, L"Failed to save project file.");
+			return -1;
+		}
+
 		Runtime->XmlFile.XmlPath = IntermediateProjectPath;
 		Runtime->bXmlFileGenerated = true;
 	}
@@ -823,6 +866,10 @@ EType SBuildTool::ParseType(const char* StringToken)
 		else if (Token == "Application")
 		{
 			return EType::Application;
+		}
+		else if (Token == "Game")
+		{
+			return EType::Game;
 		}
 	}
 

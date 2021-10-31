@@ -9,6 +9,7 @@ enum class EType
 	Module,
 	Console,
 	Application,
+	Game,
 };
 
 enum class EAccessKey
@@ -24,6 +25,9 @@ struct ProjectBuildMetadata
 	std::wstring Name;
 	std::wstring Path;
 	EType Type;
+
+	std::wstring Command;
+	std::wstring CommandArgs;
 
 	struct IncludePath
 	{
