@@ -13,8 +13,8 @@
 #define BYTE uint8
 #endif
 
-#include "SlateShaderVS.hlsl.h"
-#include "SlateShaderPS.hlsl.h"
+//#include "SlateShaderVS.hlsl.h"
+//#include "SlateShaderPS.hlsl.h"
 
 SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 {
@@ -82,12 +82,14 @@ SSlateShader::SSlateShader(IRHIDevice* device) : Super(device)
 
 std::span<uint8 const> SSlateShader::CompileVS()
 {
-	return pSlateShaderVS;
+//	return pSlateShaderVS;
+	return {};
 }
 
 std::span<uint8 const> SSlateShader::CompilePS()
 {
-	return pSlateShaderPS;
+//	return pSlateShaderPS;
+	return {};
 }
 
 auto SSlateShader::InitElements(const SlateWindowElementList& DrawElements) -> InitElementContext

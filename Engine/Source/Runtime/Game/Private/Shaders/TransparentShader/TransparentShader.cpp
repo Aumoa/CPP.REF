@@ -7,8 +7,8 @@
 #define BYTE uint8
 #endif
 
-#include "TransparentShaderVS.hlsl.h"
-#include "TransparentShaderPS.hlsl.h"
+//#include "TransparentShaderVS.hlsl.h"
+//#include "TransparentShaderPS.hlsl.h"
 
 STransparentShader::STransparentShader(IRHIDevice* device) : Super(device)
 {
@@ -67,10 +67,12 @@ STransparentShader::STransparentShader(IRHIDevice* device) : Super(device)
 
 std::span<uint8 const> STransparentShader::CompileVS()
 {
-	return pTransparentShaderVS;
+	//return pTransparentShaderVS;
+	return {};
 }
 
 std::span<uint8 const> STransparentShader::CompilePS()
 {
-	return pTransparentShaderPS;
+	//return pTransparentShaderPS;
+	return {};
 }

@@ -14,7 +14,10 @@ SBuildTool::SBuildTool() : Super()
 
 int32 SBuildTool::GuardedMain(std::vector<std::wstring_view> InArgs)
 {
+	TickCalc<> GlobalTimer;
 	TickCalc<> Timer;
+
+	GlobalTimer.DoCalc();
 
 	SE_LOG(LogBuildTool, Verbose, L"BuildTool Arguments: {}", StringUtils::Join(L", ", InArgs));
 	SE_LOG(LogBuildTool, Verbose, L"");
@@ -77,6 +80,15 @@ int32 SBuildTool::GuardedMain(std::vector<std::wstring_view> InArgs)
 		return Ret;
 	}
 	SE_LOG(LogBuildTool, Verbose, L"Generate completed. {} seconds elapsed.", Timer.DoCalc().count());
+
+	SE_LOG(LogBuildTool, Verbose, L"Cleanup solution cache.");
+	std::filesystem::path SolutionCache(L".vs");
+	if (std::filesystem::exists(SolutionCache))
+	{
+		std::filesystem::remove_all(SolutionCache);
+	}
+
+	SE_LOG(LogBuildTool, Verbose, L"Working successful! {} seconds elapsed.", GlobalTimer.DoCalc().count());
 
 	return 0;
 }
@@ -752,7 +764,7 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 				auto AbsolutePath = std::filesystem::absolute(ProjectRelativePath).wstring();
 				SDirectoryReference(AbsolutePath).CreateIfNotExists(true);
 
-				std::vector<std::wstring> Filters;
+				std::set<std::wstring> Filters;
 
 				for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 				{
@@ -783,7 +795,14 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 						if (!FilterPath.empty())
 						{
 							NewElement(InnerItem, "Filter", WCHAR_TO_ANSI(FilterPath));
-							Filters.emplace_back(FilterPath);
+							Filters.emplace(FilterPath);
+
+							size_t LastIndex;
+							while ((LastIndex = FilterPath.find_last_of(L'\\')) != std::wstring::npos)
+							{
+								FilterPath = FilterPath.substr(0, LastIndex);
+								Filters.emplace(FilterPath);
+							}
 						}
 					}
 				}
@@ -850,7 +869,7 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 
 int32 SBuildTool::GenerateSolutionFile()
 {
-	std::wofstream Builder(L"Solution.sln", std::ios::trunc);
+	std::wofstream Builder(std::format(L"{}.sln", SolutionName), std::ios::trunc);
 
 	constexpr std::wstring_view CppProjectGuid = L"8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
 	constexpr std::wstring_view SolutionDirectoryGuid = L"2150E333-8FDC-42A3-9474-1A3956D46DE8";

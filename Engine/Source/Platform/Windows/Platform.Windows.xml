@@ -1,0 +1,13 @@
+<ProjectInfo Name="Windows" Path="Platform.Windows" Type="Application" >
+	<IncludePaths>
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+		<Item Name="RenderCore" Access="Public" />
+        <Item Name="Game" Access="Public" />
+	</ReferencedProjects>
+	<ExternalLinks>
+		<Item Name="User32.lib" />
+	</ExternalLinks>
+</ProjectInfo>

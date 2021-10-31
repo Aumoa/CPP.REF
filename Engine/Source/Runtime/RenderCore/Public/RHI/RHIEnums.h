@@ -414,6 +414,7 @@ enum class EMaterialBlendMode
     Opaque,
     Masked,
     Transparent,
+    UI,
 };
 
 enum class EMaterialDomain

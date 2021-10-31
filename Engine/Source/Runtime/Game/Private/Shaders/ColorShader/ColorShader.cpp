@@ -7,8 +7,8 @@
 #define BYTE uint8
 #endif
 
-#include "ColorShaderVS.hlsl.h"
-#include "ColorShaderPS.hlsl.h"
+//#include "ColorShaderVS.hlsl.h"
+//#include "ColorShaderPS.hlsl.h"
 
 SColorShader::SColorShader(IRHIDevice* device) : Super(device)
 {
@@ -52,10 +52,12 @@ SColorShader::SColorShader(IRHIDevice* device) : Super(device)
 
 std::span<uint8 const> SColorShader::CompileVS()
 {
-	return pColorShaderVS;
+	//return pColorShaderVS;
+	return {};
 }
 
 std::span<uint8 const> SColorShader::CompilePS()
 {
-	return pColorShaderPS;
+	//return pColorShaderPS;
+	return {};
 }
