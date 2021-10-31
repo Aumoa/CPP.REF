@@ -1,6 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include <Windows.h>
+#include <iostream>
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 
@@ -51,4 +52,18 @@ void SLogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 
 	// Log to Visual Studio Output Console.
 	OutputDebugStringW(composed.c_str());
+
+	// Log to console if it is available.
+	switch (logVerbosity)
+	{
+	case ELogVerbosity::Verbose:
+	case ELogVerbosity::Warning:
+	case ELogVerbosity::Info:
+		std::wcout << composed;
+		break;
+	case ELogVerbosity::Error:
+	case ELogVerbosity::Fatal:
+		std::wcerr << composed;
+		break;
+	}
 }

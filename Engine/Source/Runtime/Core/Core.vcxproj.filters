@@ -64,9 +64,6 @@
     <ClCompile Include="Private\Threading\Thread.cpp">
       <Filter>Private\Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Private\ObjectCollection.cpp">
-      <Filter>Private</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Public">
@@ -304,9 +301,6 @@
     </ClInclude>
     <ClInclude Include="Public\Misc\CrcHash.h">
       <Filter>Public\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\ObjectCollection.h">
-      <Filter>Public</Filter>
     </ClInclude>
     <ClInclude Include="Public\AbstractClass.h">
       <Filter>Public</Filter>

@@ -30,6 +30,7 @@ private:
 	const uint64 Index;
 
 	SObject* Outer = nullptr;
+
 	std::vector<std::shared_ptr<SObject>> Subobjects;
 	std::map<SObject*, size_t> Views;
 
@@ -104,13 +105,21 @@ public:
 		return OutValue;
 	}
 
+	template<class T, class... TArgs>
+	static std::shared_ptr<T> MakeShared(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
+	{
+		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
+		InternalAttachObjectName(SharedPtr.get());
+		return SharedPtr;
+	}
+
 	void* operator new(size_t);
 	void operator delete(void*);
 
 private:
 	void InternalDetachSubobject(SObject* Subobject);
 	void InternalAttachSubobject(SObject* Subobject);
-	void InternalAttachObjectName(SObject* InObject);
+	static void InternalAttachObjectName(SObject* InObject);
 };
 
 #define implements virtual public 

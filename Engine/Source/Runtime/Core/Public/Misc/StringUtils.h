@@ -10,35 +10,56 @@
 #include <vector>
 #include <optional>
 #include "PrimitiveTypes.h"
+#include "Concepts/CoreConcepts.h"
 
 /// <summary>
 /// Provide extended functions for compose string.
 /// </summary>
 class CORE_API StringUtils
 {
-public:
-	/// <summary>
-	/// Join all string-convertible arguments with separator.
-	/// </summary>
-	/// <typeparam name="T"> Type of string convertible that implements std::formatter. </typeparam>
-	/// <param name="separator"> The separator. </param>
-	/// <param name="arguments"> The arguments. </param>
-	/// <returns> The composed string. </returns>
+private:
 	template<class T>
-	static std::wstring Join(std::wstring_view separator, std::span<T const> arguments)
+	static std::wstring ToString(const T& Arg, InheritSelector<1>&&) requires requires { std::wstring(Arg); }
 	{
-		if (arguments.size() == 0)
+		return std::wstring(Arg);
+	}
+
+	template<class T>
+	static const std::wstring& ToString(const T& Arg, InheritSelector<2>&&) requires std::same_as<T, std::wstring>
+	{
+		return Arg;
+	}
+
+	template<class T>
+	static std::wstring ToString(const T& Arg, InheritSelector<0>&&)
+	{
+		return std::format(L"{}", Arg);
+	}
+
+	template<class T>
+	static auto ToString(const T& Arg)
+	{
+		return ToString(Arg, InheritSelector<2>{});
+	}
+
+public:
+	template<class TContainer>
+	static std::wstring Join(std::wstring_view InSep, const TContainer& InArgs)
+	{
+		if (std::size(InArgs) == 0)
 		{
 			return L"";
 		}
 
-		std::wstringstream wss;
-		wss << std::format(L"{}", arguments[0]);
-		for (size_t i = 1; i < arguments.size(); ++i)
+		auto It = std::begin(InArgs);
+
+		std::wstringstream Wss;
+		Wss << ToString(*It++);
+		for (; It != std::end(InArgs); ++It)
 		{
-			wss << separator << std::format(L"{}", arguments[i]);
+			Wss << InSep << ToString(*It);
 		}
-		return std::move(wss).str();
+		return std::move(Wss).str();
 	}
 
 	/// <summary>
