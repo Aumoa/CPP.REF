@@ -4,7 +4,7 @@
 	</IncludePaths>
 	<ReferencedProjects>
 		<Item Name="Core" Access="Public" />
-		<Item Name="RenderCore" Access="Public" />
+		<Item Name="PlatformGeneric" Access="Public" />
         <Item Name="Game" Access="Public" />
 	</ReferencedProjects>
 	<ExternalLinks>

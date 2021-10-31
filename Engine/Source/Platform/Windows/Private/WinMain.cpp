@@ -1,12 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <crtdbg.h>
-#include <Windows.h>
-#include "CoreWindow.h"
+#include "WindowsIncludes.h"
 #include "GameEngine.h"
 #include "GameModule.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "Misc/CommandLine.h"
+#include "WindowsApplication.h"
 
 DECLARE_LOG_CATEGORY(, LogWindowsLaunch);
 
@@ -14,46 +13,46 @@ using namespace std::chrono;
 
 INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd, _In_ INT show)
 {
-	SCommandLine commandArgs = StringUtils::Split(cmd, L" ", true, true);
-	size_t gameModuleIdx = commandArgs.GetArgument(L"--GameDll");
-	if (gameModuleIdx == -1)
+	SCommandLine CommandArgs = StringUtils::Split(cmd, L" ", true, true);
+	size_t GameModuleIdx = CommandArgs.GetArgument(L"--GameDll");
+	if (GameModuleIdx == -1)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"GameModule does not specified.");
 		return -1;
 	}
 
-	std::optional<std::wstring_view> moduleName = commandArgs.GetArgument(gameModuleIdx + 1);
-	if (!moduleName)
+	std::optional<std::wstring_view> ModuleName = CommandArgs.GetArgument(GameModuleIdx + 1);
+	if (!ModuleName)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"GameModule does not specified.");
 		return -1;
 	}
 
-	std::optional<std::wstring> engineName;
-	if (size_t engineModuleIdx = commandArgs.GetArgument(L"--EngineDll"); engineModuleIdx != -1)
+	std::optional<std::wstring> EngineName;
+	if (size_t EngineModuleIdx = CommandArgs.GetArgument(L"--EngineDll"); EngineModuleIdx != -1)
 	{
-		engineName = commandArgs.GetArgument(engineModuleIdx + 1);
+		EngineName = CommandArgs.GetArgument(EngineModuleIdx + 1);
 	}
 
-	if (!engineName.has_value())
+	if (!EngineName.has_value())
 	{
 #if defined(_DEBUG) && 0
 		constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
 #else
 		constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
 #endif
-		engineName = GameEngineModuleName;
+		EngineName = GameEngineModuleName;
 	}
 
-	SPlatformModule engineModule(*engineName);
-	auto loader = engineModule.GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
+	SPlatformModule EngineModule(*EngineName);
+	auto loader = EngineModule.GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
 	if (!loader)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. {} is corrupted.", *engineName);
+		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
 		return -1;
 	}
 
-	SGameModule* gameModule = loader(&engineModule);
+	SGameModule* gameModule = loader(&EngineModule);
 	if (gameModule == nullptr)
 	{
 		SE_LOG(LogWindowsLaunch, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
@@ -67,14 +66,14 @@ INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR 
 		return -1;
 	}
 
-	SCoreWindow frameworkView;
-	int32 errorCode = gameEngine->InvokedMain(&frameworkView, *moduleName);
+	SWindowsApplication WinApp(hInstance);
+	int32 errorCode = gameEngine->InvokedMain(&WinApp, *ModuleName);
 	if (errorCode != 0)
 	{
 		SE_LOG(LogWindowsLaunch, Error, L"Application has one more error({}).", errorCode);
 	}
 
 	// Cleanup GameEngineModule.
-	engineModule.DestroyObject(gameModule);
+	EngineModule.DestroyObject(gameModule);
 	return errorCode;
 }

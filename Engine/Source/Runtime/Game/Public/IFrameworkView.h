@@ -41,7 +41,7 @@ struct IFrameworkView : implements SObject, implements IWindowView
 	/// <summary>
 	/// Get latest error code.
 	/// </summary>
-	virtual int32 GetLastError() const = 0;
+	virtual int32 GetLastError() = 0;
 
 	/// <summary>
 	/// Set latest error code.
@@ -51,7 +51,7 @@ struct IFrameworkView : implements SObject, implements IWindowView
 	/// <summary>
 	/// Get framework size.
 	/// </summary>
-	virtual Vector2N GetFrameworkSize() const = 0;
+	virtual Vector2N GetFrameworkSize() = 0;
 
 	/// <summary>
 	/// Set framework title.
@@ -66,10 +66,12 @@ struct IFrameworkView : implements SObject, implements IWindowView
 	/// <summary>
 	/// Get tick mode.
 	/// </summary>
-	virtual ETickMode GetTickMode() const = 0;
+	virtual ETickMode GetTickMode() = 0;
 
 	/// <summary>
 	/// Present for ETickMode::Ontime.
 	/// </summary>
 	virtual void Present() = 0;
+
+	virtual IRHIFactory* CreateFactory() = 0;
 };

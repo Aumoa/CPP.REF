@@ -5,12 +5,6 @@
 	</IncludePaths>
 	<ReferencedProjects>
 		<Item Name="Core" Access="Public" />
+		<Item Name="PlatformGeneric" Access="Public" />
 	</ReferencedProjects>
-	<ExternalLinks>
-		<Item Name="DXGI.lib" />
-		<Item Name="D3D12.lib" />
-		<Item Name="D3D11.lib" />
-		<Item Name="D2D1.lib" />
-		<Item Name="DWrite.lib" />
-	</ExternalLinks>
 </ProjectInfo>

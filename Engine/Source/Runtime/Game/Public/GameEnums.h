@@ -47,11 +47,5 @@ enum class EComponentTransformSpace
 	Component
 };
 
-enum class EMousePositionMode
-{
-    Absolute,
-    Relative
-};
-
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

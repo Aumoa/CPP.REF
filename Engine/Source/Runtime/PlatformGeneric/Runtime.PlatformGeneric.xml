@@ -1,11 +1,9 @@
-<ProjectInfo Name="Game" Path="Runtime.Game" Type="Module" >
+<ProjectInfo Name="PlatformGeneric" Path="Runtime.PlatformGeneric" Type="Module" >
 	<IncludePaths>
 		<Item RelativePath="Public" Access="Public" />
 		<Item RelativePath="Private" />
 	</IncludePaths>
 	<ReferencedProjects>
 		<Item Name="Core" Access="Public" />
-		<Item Name="PlatformGeneric" Access="Public" />
-		<Item Name="RenderCore" Access="Public" />
 	</ReferencedProjects>
 </ProjectInfo>
