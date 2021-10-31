@@ -6,10 +6,10 @@
 #include "Ticking/TickScheduler.h"
 #include "Misc/TickCalc.h"
 
+interface IApplicationInterface;
 class SGameInstance;
 class SGameEngineSubsystem;
 class SSlateApplication;
-struct IFrameworkView;
 
 /// <summary>
 /// Represents game engine that manage core resources.
@@ -33,11 +33,11 @@ public:
 	/// Initialize engine system.
 	/// </summary>
 	virtual bool InitEngine();
-	virtual void SetupFrameworkView(IFrameworkView* frameworkView);
+	virtual void SetupFrameworkView(IApplicationInterface* InApplication);
 	virtual bool LoadGameModule(std::wstring_view moduleName);
 	virtual void Shutdown();
 
-	int32 InvokedMain(IFrameworkView* frameworkView, std::wstring_view gameModule);
+	int32 InvokedMain(IApplicationInterface* InApplication, std::wstring_view gameModule);
 	SGameInstance* GetGameInstance();
 
 private:

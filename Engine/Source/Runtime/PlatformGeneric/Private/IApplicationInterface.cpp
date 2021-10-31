@@ -2,6 +2,15 @@
 
 #include "IApplicationInterface.h"
 
-void IApplicationInterface::Dummy()
+static IApplicationInterface* gApp;
+
+IApplicationInterface::IApplicationInterface()
 {
+	check(gApp == nullptr);
+	gApp = this;
+}
+
+IApplicationInterface& IApplicationInterface::Get()
+{
+	return *gApp;
 }

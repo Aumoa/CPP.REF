@@ -6,16 +6,16 @@
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHISwapChain.h"
-#include "IFrameworkView.h"
+#include "IApplicationInterface.h"
 
-SSwapChainRenderTarget::SSwapChainRenderTarget(IRHIFactory* InFactory, IRHIDevice* InDevice, IFrameworkView* InFrameworkView) : Super()
+SSwapChainRenderTarget::SSwapChainRenderTarget(IRHIFactory* InFactory, IRHIDevice* InDevice, IApplicationInterface* InFrameworkView) : Super()
 {
-	SwapChain = InFactory->CreateSwapChain(InFrameworkView, InDevice);
+	SwapChain = InFactory->CreateSwapChain(InDevice);
 	SwapChain->SetOuter(this);
 	RTV = InDevice->CreateRenderTargetView(NumBuffers);
 	RTV->SetOuter(this);
 
-	const auto [Width, Height] = InFrameworkView->GetFrameworkSize();
+	const auto [Width, Height] = InFrameworkView->GetViewportSize();
 	ReadyBuffers(Width, Height);
 }
 

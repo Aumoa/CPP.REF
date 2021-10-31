@@ -3,7 +3,7 @@
 #include "GameEngine.h"
 #include "LogGame.h"
 #include "GameInstance.h"
-#include "IFrameworkView.h"
+#include "IApplicationInterface.h"
 #include "CoreDelegates.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "Threading/Thread.h"
@@ -37,17 +37,17 @@ bool SGameEngine::InitEngine()
 	return true;
 }
 
-void SGameEngine::SetupFrameworkView(IFrameworkView* frameworkView)
+void SGameEngine::SetupFrameworkView(IApplicationInterface* InApplication)
 {
-	GetEngineSubsystem<SGameRenderSystem>()->SetupFrameworkView(frameworkView);
+	GetEngineSubsystem<SGameRenderSystem>()->SetupFrameworkView(InApplication);
 	auto PlayerSystem = GetEngineSubsystem<SGamePlayerSystem>();
-	PlayerSystem->SpawnLocalPlayer(frameworkView);
+	PlayerSystem->SpawnLocalPlayer(InApplication);
 
 	SE_LOG(LogEngine, Info, L"Register engine tick.");
-	frameworkView->Idle.AddSObject(this, &SGameEngine::TickEngine);
+	InApplication->Idle.AddSObject(this, &SGameEngine::TickEngine);
 
 	SlateApplication = NewObject<SSlateApplication>();
-	SlateApplication->InitWindow(PlayerSystem->GetLocalPlayer(), frameworkView);
+	SlateApplication->InitWindow(PlayerSystem->GetLocalPlayer(), InApplication);
 }
 
 bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
@@ -91,7 +91,7 @@ void SGameEngine::Shutdown()
 	}
 }
 
-int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view gameModule)
+int32 SGameEngine::InvokedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Invoke();
 
@@ -103,7 +103,7 @@ int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view 
 	}
 
 	// Setup framework view.
-	SetupFrameworkView(frameworkView);
+	SetupFrameworkView(InApplication);
 
 	// Load game module.
 	if (!LoadGameModule(gameModule))
@@ -112,9 +112,9 @@ int32 SGameEngine::InvokedMain(IFrameworkView* frameworkView, std::wstring_view 
 	}
 
 	// Start application now!
-	frameworkView->SetFrameworkTitle(GameInstance->GetApplicationName());
+	InApplication->SetTitle(GameInstance->GetApplicationName());
 	GameInstance->Init();
-	frameworkView->Start();
+	InApplication->Start();
 
 	Shutdown();
 	return 0;

@@ -30,5 +30,6 @@ interface IApplicationInterface : implements SObject
 	DECLARE_MULTICAST_DELEGATE(SizedDelegate, Vector2N);
 	SizedDelegate Sized;
 
-	static PLATFORMGENERIC_API void Dummy();
+	PLATFORMGENERIC_API IApplicationInterface();
+	PLATFORMGENERIC_API static IApplicationInterface& Get();
 };

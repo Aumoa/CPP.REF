@@ -23,7 +23,7 @@
 #include "Application/SlateApplication.h"
 #include "Draw/PaintArgs.h"
 #include "Layout/LayoutImpl.h"
-#include "IFrameworkView.h"
+#include "IApplicationInterface.h"
 
 DEFINE_LOG_CATEGORY(LogRender);
 
@@ -37,27 +37,7 @@ SGameRenderSystem::~SGameRenderSystem()
 
 void SGameRenderSystem::Init()
 {
-	using namespace std;
-
-	SE_LOG(LogRender, Verbose, L"Beginning initialize GameRenderSystem.");
-
-	Factory = IRHIFactory::CreateFactory(this);
-
-	// Getting primary adapter for create device.
-	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
-	Device = Factory->CreateDevice(PrimaryAdapter);
-	PrimaryQueue = Device->GetImmediateContext();
-	ColorVertexFactory = NewObject<SColorVertexFactory>(Device);
-	ColorShader = NewObject<SColorShader>(Device);
-	ColorShader->Compile(ColorVertexFactory);
-	TransparentShader = NewObject<STransparentShader>(Device);
-	TransparentShader->Compile(ColorVertexFactory);
-	SlateShader = NewObject<SSlateShader>(Device);
-	SlateShader->Compile(nullptr);
-
 	RenderThread::Init();
-
-	SE_LOG(LogRender, Verbose, L"Finish to initialize GameRenderSystem.");
 }
 
 void SGameRenderSystem::Deinit()
@@ -97,14 +77,26 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 	});
 }
 
-void SGameRenderSystem::SetupFrameworkView(IFrameworkView* frameworkView)
+void SGameRenderSystem::SetupFrameworkView(IApplicationInterface* InApplication)
 {
-	FrameworkView = frameworkView;
-	SwapChainRT = NewObject<SSwapChainRenderTarget>(Factory, Device, frameworkView);
-	FrameworkView->Size.AddSObject(this, &SGameRenderSystem::ResizeApp);
+	// Getting primary adapter for create device.
+	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
+	Device = Factory->CreateDevice(PrimaryAdapter);
+	PrimaryQueue = Device->GetImmediateContext();
+	ColorVertexFactory = NewObject<SColorVertexFactory>(Device);
+	ColorShader = NewObject<SColorShader>(Device);
+	ColorShader->Compile(ColorVertexFactory);
+	TransparentShader = NewObject<STransparentShader>(Device);
+	TransparentShader->Compile(ColorVertexFactory);
+	SlateShader = NewObject<SSlateShader>(Device);
+	SlateShader->Compile(nullptr);
+
+	FrameworkView = InApplication;
+	SwapChainRT = NewObject<SSwapChainRenderTarget>(Factory, Device, InApplication);
+	FrameworkView->Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
 }
 
-IFrameworkView* SGameRenderSystem::GetFrameworkView()
+IApplicationInterface* SGameRenderSystem::GetFrameworkView()
 {
 	return FrameworkView;
 }
@@ -114,9 +106,9 @@ IRHIDevice* SGameRenderSystem::GetRHIDevice()
 	return Device;
 }
 
-void SGameRenderSystem::ResizeApp(int32 width, int32 height)
+void SGameRenderSystem::ResizeApp(Vector2N Size)
 {
-	if (width == 0 || height == 0)
+	if (Size.Size() == 0)
 	{
 		return;
 	}
@@ -124,14 +116,14 @@ void SGameRenderSystem::ResizeApp(int32 width, int32 height)
 	if (Device)
 	{
 		RenderThread::WaitForLastWorks();
-		RenderThread::ExecuteWorks(PrimaryQueue, [this, width, height]()
+		RenderThread::ExecuteWorks(PrimaryQueue, [this, Size]()
 		{
 			// On the framework view is resized, wait all graphics commands for
 			// synchronize and cleanup resource lock states.
 			Device->BeginFrame();
 
-			SwapChainRT->ResizeBuffers(width, height);
-			SE_LOG(LogRender, Info, L"Application resized to {}x{}.", width, height);
+			SwapChainRT->ResizeBuffers(Size.X, Size.Y);
+			SE_LOG(LogRender, Info, L"Application resized to {}x{}.", Size.X, Size.Y);
 
 			Device->EndFrame();
 		});

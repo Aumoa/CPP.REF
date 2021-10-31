@@ -71,7 +71,7 @@ IRHIDevice* SDXGIFactory::CreateDevice(IRHIAdapter* adapter)
 	return NewObject<SD3D12Device>(this, std::move(device));
 }
 
-IRHISwapChain* SDXGIFactory::CreateSwapChain(IWindowView* window, IRHIDevice* device)
+IRHISwapChain* SDXGIFactory::CreateSwapChain(IRHIDevice* device)
 {
 	HWND wHandle = App->GetWindowHandle();
 

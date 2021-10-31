@@ -8,7 +8,7 @@
 interface IRHIFactory;
 interface IRHIDevice;
 interface IRHIDeviceContext;
-interface IFrameworkView;
+interface IApplicationInterface;
 class SColorVertexFactory;
 class SColorShader;
 class STransparentShader;
@@ -21,7 +21,7 @@ class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameRenderSystem)
 
 private:
-	IFrameworkView* FrameworkView = nullptr;
+	IApplicationInterface* FrameworkView = nullptr;
 
 	IRHIFactory* Factory = nullptr;
 	IRHIDevice* Device = nullptr;
@@ -42,8 +42,8 @@ public:
 	virtual void Tick(float InDeltaTime) override;
 	virtual void ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp);
 
-	void SetupFrameworkView(IFrameworkView* frameworkView);
-	IFrameworkView* GetFrameworkView();
+	void SetupFrameworkView(IApplicationInterface* frameworkView);
+	IApplicationInterface* GetFrameworkView();
 	IRHIDevice* GetRHIDevice();
 
 	// Test feature.
@@ -51,5 +51,5 @@ public:
 	SSlateShader* GetSlateShader() { return SlateShader; }
 
 private:
-	void ResizeApp(int32 width, int32 height);
+	void ResizeApp(Vector2N Size);
 };

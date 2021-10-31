@@ -18,7 +18,7 @@ interface IRHIFactory : implements SObject
 	virtual IApplicationInterface* GetApplication() = 0;
 	virtual IRHIAdapter* GetAdapter(int32 index) = 0;
 	virtual IRHIDevice* CreateDevice(IRHIAdapter* adapter) = 0;
-	virtual IRHISwapChain* CreateSwapChain(IWindowView* window, IRHIDevice* device) = 0;
+	virtual IRHISwapChain* CreateSwapChain(IRHIDevice* device) = 0;
 	virtual IRHIFontCollection* CreateFontCollection(const std::filesystem::path& path) = 0;
 	virtual IRHITextFormat* CreateTextFormat(std::wstring_view fontFamilyName, IRHIFontCollection* fontCollection, ERHIFontWeight fontWeight, ERHIFontStyle fontStyle, ERHIFontStretch fontStretch, float fontSize, std::wstring_view localeName) = 0;
 };
