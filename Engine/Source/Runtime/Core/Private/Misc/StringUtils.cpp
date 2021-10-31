@@ -16,9 +16,9 @@ std::wstring StringUtils::GetPlaceholder(std::wstring_view formatArgs)
 	return format(L"{{{}}}", formatArgs);
 }
 
-std::wstring StringUtils::AsUnicode(const std::string& multibyte, uint32 codePage)
+std::wstring StringUtils::AsUnicode(std::string_view multibyte, uint32 codePage)
 {
-	int32 length = MultiByteToWideChar(codePage, 0, multibyte.c_str(), (int32)multibyte.length(), nullptr, 0);
+	int32 length = MultiByteToWideChar(codePage, 0, multibyte.data(), (int32)multibyte.length(), nullptr, 0);
 	if (length == 0)
 	{
 		LogSystem::Log(LogCore, ELogVerbosity::Error, L"Cannot convert multibyte string to unicode string with CodePage[{}].", codePage);
@@ -27,14 +27,14 @@ std::wstring StringUtils::AsUnicode(const std::string& multibyte, uint32 codePag
 
 	std::wstring unicode;
 	unicode.resize(length);
-	MultiByteToWideChar(codePage, 0, multibyte.c_str(), (int32)multibyte.length(), unicode.data(), length);
+	MultiByteToWideChar(codePage, 0, multibyte.data(), (int32)multibyte.length(), unicode.data(), length);
 
 	return unicode;
 }
 
-std::string StringUtils::AsMultibyte(const std::wstring& unicode, uint32 codePage)
+std::string StringUtils::AsMultibyte(std::wstring_view unicode, uint32 codePage)
 {
-	int32 length = WideCharToMultiByte(codePage, 0, unicode.c_str(), (int32)unicode.length(), nullptr, 0, nullptr, nullptr);
+	int32 length = WideCharToMultiByte(codePage, 0, unicode.data(), (int32)unicode.length(), nullptr, 0, nullptr, nullptr);
 	if (length == 0)
 	{
 		LogSystem::Log(LogCore, ELogVerbosity::Error, L"Cannot convert unicode string to multibyte string with CodePage[{}].", codePage);
@@ -43,7 +43,7 @@ std::string StringUtils::AsMultibyte(const std::wstring& unicode, uint32 codePag
 
 	std::string multibyte;
 	multibyte.resize(length);
-	WideCharToMultiByte(codePage, 0, unicode.c_str(), (int32)unicode.length(), multibyte.data(), length, nullptr, nullptr);
+	WideCharToMultiByte(codePage, 0, unicode.data(), (int32)unicode.length(), multibyte.data(), length, nullptr, nullptr);
 
 	return multibyte;
 }

@@ -1,0 +1,55 @@
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+enum class EType
+{
+	Module,
+	Console,
+	Application,
+};
+
+enum class EAccessKey
+{
+	Public,
+	Private
+};
+
+struct ProjectBuildMetadata
+{
+	std::wstring BaseDirectory;
+
+	std::wstring Name;
+	std::wstring Path;
+	EType Type;
+
+	struct IncludePath
+	{
+		std::filesystem::path RelativePath;
+		EAccessKey Access = EAccessKey::Private;
+	};
+	std::vector<IncludePath> IncludePaths;
+
+	struct ReferencedProject
+	{
+		std::wstring Name;
+		EAccessKey Access = EAccessKey::Private;
+	};
+	std::vector<ReferencedProject> ReferencedProjects;
+
+	struct DisableWarning
+	{
+		int32 Number = -1;
+		EAccessKey Access = EAccessKey::Private;
+	};
+	std::vector<DisableWarning> DisableWarnings;
+
+	struct ExternalLink
+	{
+		std::wstring Name;
+		EAccessKey Access = EAccessKey::Private;
+	};
+	std::vector<ExternalLink> ExternalLinks;
+};

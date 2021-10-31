@@ -69,6 +69,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReferenceViewer", "Applicat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsLaunch", "Engine\Source\Application\WindowsLaunch\WindowsLaunch.vcxproj", "{7682B2EE-4B52-4B1F-9820-37E0E113846B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Program", "Program", "{085EEA14-3CA4-4AA6-BB72-7800461A199F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmartBuildTool", "Engine\Source\Program\SmartBuildTool\SmartBuildTool.vcxproj", "{474AD650-441F-4653-9EAD-8366019B69D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -139,6 +143,10 @@ Global
 		{7682B2EE-4B52-4B1F-9820-37E0E113846B}.Debug|x64.Build.0 = Debug|x64
 		{7682B2EE-4B52-4B1F-9820-37E0E113846B}.Release|x64.ActiveCfg = Release|x64
 		{7682B2EE-4B52-4B1F-9820-37E0E113846B}.Release|x64.Build.0 = Release|x64
+		{474AD650-441F-4653-9EAD-8366019B69D5}.Debug|x64.ActiveCfg = Debug|x64
+		{474AD650-441F-4653-9EAD-8366019B69D5}.Debug|x64.Build.0 = Debug|x64
+		{474AD650-441F-4653-9EAD-8366019B69D5}.Release|x64.ActiveCfg = Release|x64
+		{474AD650-441F-4653-9EAD-8366019B69D5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +174,8 @@ Global
 		{E73F6FB7-E4AE-44FD-9CF9-E33F4BE81AFD} = {4193C618-F393-4C23-9897-3BEDB9200A2A}
 		{EE7B32D4-D080-4D30-8FA3-FF40BD760E59} = {4193C618-F393-4C23-9897-3BEDB9200A2A}
 		{7682B2EE-4B52-4B1F-9820-37E0E113846B} = {24802A00-D987-4159-92A0-6261B9DD7953}
+		{085EEA14-3CA4-4AA6-BB72-7800461A199F} = {62F4D399-056A-4D97-A5BF-443F0E46B88E}
+		{474AD650-441F-4653-9EAD-8366019B69D5} = {085EEA14-3CA4-4AA6-BB72-7800461A199F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3B8A6A43-DD28-4861-8C4D-FB452750B113}

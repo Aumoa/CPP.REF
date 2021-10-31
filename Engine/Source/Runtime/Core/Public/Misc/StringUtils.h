@@ -83,7 +83,7 @@ public:
 	/// <param name="multibyte"> The multibyte string. </param>
 	/// <param name="codePage"> The code page that desired converted. </param>
 	/// <returns> Converted unicode string. </returns>
-	static std::wstring AsUnicode(const std::string& multibyte, uint32 codePage = 0);
+	static std::wstring AsUnicode(std::string_view multibyte, uint32 codePage = 0);
 
 	/// <summary>
 	/// Convert unicode string to multibyte string.
@@ -91,7 +91,7 @@ public:
 	/// <param name="unicode"> The unicode string. </param>
 	/// <param name="codePage"> The code page that desired converted. </param>
 	/// <returns> Converted multibyte string. </returns>
-	static std::string AsMultibyte(const std::wstring& unicode, uint32 codePage = 0);
+	static std::string AsMultibyte(std::wstring_view unicode, uint32 codePage = 0);
 
 	/// <summary>
 	/// Returns a new string in which all leading and trailing occurrences of a set of specified characters from the current string are removed.
