@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{bf0f709c-595e-42ee-a888-c2fa87d82d4b}</ProjectGuid>
+    <ProjectGuid>{BF0F709C-595E-42EE-A888-C2FA87D82D4B}</ProjectGuid>
     <RootNamespace>Core</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -22,6 +22,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -32,10 +33,8 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -56,17 +55,21 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Core\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllexport);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
-      <DisableSpecificWarnings>4250;4251;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4250;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <OptimizeReferences>false</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
@@ -80,10 +83,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Public;$(ProjectDir)Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>CORE_API=__declspec(dllexport);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\Runtime\Core\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CORE_API=__declspec(dllexport);$(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
-      <DisableSpecificWarnings>4250;4251;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4250;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,91 +97,86 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Container\BitArray.cpp" />
-    <ClCompile Include="Private\CoreAssert.cpp" />
-    <ClCompile Include="Private\Diagnostics\LogCategory.cpp" />
-    <ClCompile Include="Private\Diagnostics\LogSystem.cpp" />
-    <ClCompile Include="Private\IO\DirectoryReference.cpp" />
-    <ClCompile Include="Private\IO\FileReference.cpp" />
-    <ClCompile Include="Private\IO\FileSystemReference.cpp" />
-    <ClCompile Include="Private\LogCore.cpp" />
-    <ClCompile Include="Private\Mathematics\MathEx.cpp" />
-    <ClCompile Include="Private\Misc\CommandLine.cpp" />
-    <ClCompile Include="Private\Misc\DateTime.cpp" />
-    <ClCompile Include="Private\Misc\Paths.cpp" />
-    <ClCompile Include="Private\Misc\StringUtils.cpp" />
-    <ClCompile Include="Private\Numerics\Color.cpp" />
-    <ClCompile Include="Private\Numerics\Matrix4x4.cpp" />
-    <ClCompile Include="Private\Numerics\Quaternion.cpp" />
-    <ClCompile Include="Private\Object.cpp" />
-    <ClCompile Include="Private\PlatformMisc\PlatformModule.cpp" />
-    <ClCompile Include="Private\Reflection\Type.cpp" />
-    <ClCompile Include="Private\Threading\EventHandle.cpp" />
-    <ClCompile Include="Private\Threading\Thread.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Private\DirectXInlineHelper.h" />
-    <ClInclude Include="Public\AbstractClass.h" />
-    <ClInclude Include="Public\Concepts\CoreConcepts.h" />
-    <ClInclude Include="Public\Container\BitArray.h" />
-    <ClInclude Include="Public\Container\BitSet.h" />
-    <ClInclude Include="Public\CoreAssert.h" />
-    <ClInclude Include="Public\CoreMinimal.h" />
-    <ClInclude Include="Public\Delegates\MulticastDelegate.h" />
-    <ClInclude Include="Public\Delegates\MulticastEvent.h" />
-    <ClInclude Include="Public\Diagnostics\LogCategory.h" />
-    <ClInclude Include="Public\Diagnostics\LogSystem.h" />
-    <ClInclude Include="Public\Diagnostics\LogVerbosity.h" />
-    <ClInclude Include="Public\Interface.h" />
-    <ClInclude Include="Public\IO\DirectoryReference.h" />
-    <ClInclude Include="Public\IO\FileReference.h" />
-    <ClInclude Include="Public\IO\FileSystemReference.h" />
-    <ClInclude Include="Public\LogCore.h" />
-    <ClInclude Include="Public\Mathematics\Degrees.h" />
-    <ClInclude Include="Public\Mathematics\MathEx.h" />
-    <ClInclude Include="Public\Mathematics\Radians.h" />
-    <ClInclude Include="Public\Memory\ScopedPtr.h" />
-    <ClInclude Include="Public\Misc\CommandLine.h" />
-    <ClInclude Include="Public\Misc\CrcHash.h" />
-    <ClInclude Include="Public\Misc\DateTime.h" />
-    <ClInclude Include="Public\Misc\Paths.h" />
-    <ClInclude Include="Public\Misc\StringUtils.h" />
-    <ClInclude Include="Public\Misc\TickCalc.h" />
-    <ClInclude Include="Public\Numerics\AxisAlignedCube.h" />
-    <ClInclude Include="Public\Numerics\Color.h" />
-    <ClInclude Include="Public\Numerics\Complex.h" />
-    <ClInclude Include="Public\Numerics\Frustum.h" />
-    <ClInclude Include="Public\Numerics\Line.h" />
-    <ClInclude Include="Public\Numerics\Matrix.h" />
-    <ClInclude Include="Public\Numerics\Matrix2x2.h" />
-    <ClInclude Include="Public\Numerics\Matrix3x2.h" />
-    <ClInclude Include="Public\Numerics\Matrix4x4.h" />
-    <ClInclude Include="Public\Numerics\ObjectOrientedCube.h" />
-    <ClInclude Include="Public\Numerics\Plane.h" />
-    <ClInclude Include="Public\Numerics\Quaternion.h" />
-    <ClInclude Include="Public\Numerics\Range.h" />
-    <ClInclude Include="Public\Numerics\Ray.h" />
-    <ClInclude Include="Public\Numerics\Rect.h" />
-    <ClInclude Include="Public\Numerics\Sphere.h" />
-    <ClInclude Include="Public\Numerics\Transform.h" />
-    <ClInclude Include="Public\Numerics\Vector.h" />
-    <ClInclude Include="Public\Numerics\VectorScalarsImpl.h" />
-    <ClInclude Include="Public\Object.h" />
-    <ClInclude Include="Public\PlatformMisc\InputEnums.h" />
-    <ClInclude Include="Public\PlatformMisc\PlatformModule.h" />
-    <ClInclude Include="Public\PrimitiveTypes.h" />
-    <ClInclude Include="Public\Reflection\Method.h" />
-    <ClInclude Include="Public\Reflection\Property.h" />
-    <ClInclude Include="Public\Reflection\ReflectionMacros.h" />
-    <ClInclude Include="Public\Reflection\Type.h" />
-    <ClInclude Include="Public\Threading\EventHandle.h" />
-    <ClInclude Include="Public\Threading\Thread.h" />
-    <ClInclude Include="Public\ValueType.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="Public\Natvis.natvis" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Container\BitArray.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\CoreAssert.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Diagnostics\LogCategory.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Diagnostics\LogSystem.cpp" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\DirectXInlineHelper.h" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\IO\DirectoryReference.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\IO\FileReference.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\IO\FileSystemReference.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\LogCore.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Mathematics\MathEx.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Misc\CommandLine.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Misc\DateTime.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Misc\Paths.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Misc\StringUtils.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Numerics\Color.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Numerics\Matrix4x4.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Numerics\Quaternion.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Object.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\PlatformMisc\PlatformModule.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Reflection\Type.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Threading\EventHandle.cpp" />
+    <ClCompile Include="F:\CPP.REF\Engine\Source\Runtime\Core\Private\Threading\Thread.cpp" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\AbstractClass.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Concepts\CoreConcepts.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Container\BitArray.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Container\BitSet.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\CoreAssert.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\CoreMinimal.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Delegates\MulticastDelegate.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Delegates\MulticastEvent.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Diagnostics\LogCategory.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Diagnostics\LogSystem.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Diagnostics\LogVerbosity.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Interface.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\IO\DirectoryReference.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\IO\FileReference.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\IO\FileSystemReference.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\LogCore.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Mathematics\Degrees.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Mathematics\MathEx.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Mathematics\Radians.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Memory\ScopedPtr.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Misc\CommandLine.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Misc\CrcHash.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Misc\DateTime.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Misc\Paths.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Misc\StringUtils.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Misc\TickCalc.h" />
+    <Natvis Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Natvis.natvis" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\AxisAlignedCube.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Color.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Complex.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Frustum.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Line.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Matrix.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Matrix2x2.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Matrix3x2.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Matrix4x4.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\ObjectOrientedCube.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Plane.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Quaternion.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Range.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Ray.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Rect.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Sphere.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Transform.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\Vector.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Numerics\VectorScalarsImpl.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Object.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\PlatformMisc\InputEnums.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\PlatformMisc\PlatformModule.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\PrimitiveTypes.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Reflection\Method.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Reflection\Property.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Reflection\ReflectionMacros.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Reflection\Type.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Threading\EventHandle.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\Threading\Thread.h" />
+    <ClInclude Include="F:\CPP.REF\Engine\Source\Runtime\Core\Public\ValueType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

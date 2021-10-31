@@ -45,6 +45,10 @@ private:
 		std::set<int32> PublicDisableWarnings;
 		std::set<int32> PrivateDisableWarnings;
 		std::wstring DisableSpecificWarnings;
+
+		std::set<std::wstring> PublicExternalLinks;
+		std::set<std::wstring> PrivateExternalLinks;
+		std::wstring AdditionalDependencies;
 	};
 
 private:

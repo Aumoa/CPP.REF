@@ -1,0 +1,11 @@
+<ProjectInfo Name="SmartBuildTool" Path="Program.SmartBuildTool" Type="Console" >
+	<IncludePaths>
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+	</ReferencedProjects>
+	<ExternalLinks>
+		<Item Name="Rpcrt4.lib" />
+	</ExternalLinks>
+</ProjectInfo>

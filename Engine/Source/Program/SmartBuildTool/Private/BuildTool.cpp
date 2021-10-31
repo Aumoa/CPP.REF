@@ -81,7 +81,7 @@ int32 SBuildTool::SearchProjects(const std::filesystem::path& DirectoryPath)
 	}
 
 	int32 Count = 0;
-	for (auto Item : std::filesystem::directory_iterator(DirectoryPath))
+	for (auto Item : std::filesystem::recursive_directory_iterator(DirectoryPath))
 	{
 		if (Item.exists())
 		{
@@ -241,25 +241,27 @@ void SBuildTool::BuildRuntime(ProjectBuildRuntime* Runtime)
 			std::set<ProjectBuildRuntime*>* AccessReferences = nullptr;
 			std::set<std::wstring>* AccessIncludePaths = nullptr;
 			std::set<int32>* AccessDisableWarnings = nullptr;
+			std::set<std::wstring>* AccessExternalLinks = nullptr;
 			if (Reference.Access == EAccessKey::Public)
 			{
 				AccessReferences = &Runtime->PublicReferences;
 				AccessIncludePaths = &Runtime->PublicIncludePaths;
 				AccessDisableWarnings = &Runtime->PublicDisableWarnings;
+				AccessExternalLinks = &Runtime->PublicExternalLinks;
 			}
 			else
 			{
 				AccessReferences = &Runtime->PrivateReferences;
 				AccessIncludePaths = &Runtime->PrivateIncludePaths;
 				AccessDisableWarnings = &Runtime->PrivateDisableWarnings;
+				AccessExternalLinks = &Runtime->PrivateExternalLinks;
 			}
 
 			AccessReferences->insert(ReferencedRuntime->PublicReferences.begin(), ReferencedRuntime->PublicReferences.end());
 			AccessReferences->emplace(ReferencedRuntime);
-
 			AccessIncludePaths->insert(ReferencedRuntime->PublicIncludePaths.begin(), ReferencedRuntime->PublicIncludePaths.end());
-
 			AccessDisableWarnings->insert(ReferencedRuntime->PublicDisableWarnings.begin(), ReferencedRuntime->PublicDisableWarnings.end());
+			AccessExternalLinks->insert(ReferencedRuntime->PublicExternalLinks.begin(), ReferencedRuntime->PublicExternalLinks.end());
 		}
 
 		// ProjectPath
@@ -339,6 +341,31 @@ void SBuildTool::BuildRuntime(ProjectBuildRuntime* Runtime)
 			DisableSpecificWarnings.emplace_back(std::to_wstring(DisableWarning));
 		}
 		Runtime->DisableSpecificWarnings = StringUtils::Join(L";", DisableSpecificWarnings);
+
+		// AdditionalDependencies
+		for (auto& ExternalLink : Runtime->Metadata->ExternalLinks)
+		{
+			if (ExternalLink.Access == EAccessKey::Public)
+			{
+				Runtime->PublicExternalLinks.emplace(ExternalLink.Name);
+			}
+			else
+			{
+				Runtime->PrivateExternalLinks.emplace(ExternalLink.Name);
+			}
+		}
+
+		std::vector<std::wstring> AdditionalDependencies;
+		if (Runtime->PublicExternalLinks.size())
+		{
+			AdditionalDependencies.emplace_back(StringUtils::Join(L";", Runtime->PublicExternalLinks));
+		}
+		if (Runtime->PrivateExternalLinks.size())
+		{
+			AdditionalDependencies.emplace_back(StringUtils::Join(L";", Runtime->PrivateExternalLinks));
+		}
+		AdditionalDependencies.emplace_back(L"$(AdditionalDependencies)");
+		Runtime->AdditionalDependencies = StringUtils::Join(L";", AdditionalDependencies);
 
 		Runtime->bBuild = true;
 	}
@@ -626,6 +653,7 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 						NewElement(Link, "OptimizeReferences", BoolStr(Config.bOptimizeReferences));
 						NewElement(Link, "GenerateDebugInformation", "true");
 						NewElement(Link, "EnableUAC", "false");
+						NewElement(Link, "AdditionalDependencies", WCHAR_TO_ANSI(Runtime->AdditionalDependencies));
 					}
 				}
 			}
@@ -677,8 +705,97 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 		// Create directory.
 		SDirectoryReference(IntermediateProjectPath).CreateIfNotExists(true);
 
-		IntermediateProjectPath /= Runtime->Metadata->Name + L".vcxproj";
-		XMLError Err = Doc.SaveFile(IntermediateProjectPath.string().c_str());
+		IntermediateProjectPath /= Runtime->Metadata->Name;
+		XMLError Err = Doc.SaveFile((IntermediateProjectPath.string() + ".vcxproj").c_str());
+		if (Err != XMLError::XML_SUCCESS)
+		{
+			SE_LOG(LogBuildTool, Error, L"Failed to save project file.");
+			return -1;
+		}
+
+		// Make filters XML.
+		Doc.Clear();
+
+		Decl = Doc.NewDeclaration();
+		Doc.LinkEndChild(Decl);
+
+		Project = Doc.NewElement("Project");
+		Doc.LinkEndChild(Project);
+		{
+			Project->SetAttribute("ToolsVersion", "4.0");
+			Project->SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+			XMLElement* ItemGroup = NewElement(Project, "ItemGroup");
+			{
+				std::wstring ProjectRelativePath = Runtime->ProjectPath;
+				if (size_t IndexOf = ProjectRelativePath.find(L"$(SolutionDir)"); IndexOf != std::wstring::npos)
+				{
+					auto It = ProjectRelativePath.begin() + IndexOf;
+					size_t Count = std::size(L"$(SolutionDir)") - 1;
+					ProjectRelativePath = ProjectRelativePath.replace(It, It + Count, L".\\");
+				}
+
+				auto AbsolutePath = std::filesystem::absolute(ProjectRelativePath).wstring();
+				SDirectoryReference(AbsolutePath).CreateIfNotExists(true);
+
+				std::vector<std::wstring> Filters;
+
+				for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
+				{
+					XMLElement* InnerItem = nullptr;
+					if (IncludeItem.path().extension() == ".cpp")
+					{
+						InnerItem = NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
+					}
+					else if (IncludeItem.path().extension() == ".h")
+					{
+						InnerItem = NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
+					}
+					else if (IncludeItem.path().extension() == ".inl")
+					{
+						InnerItem = NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
+					}
+					else if (IncludeItem.path().extension() == ".natvis")
+					{
+						InnerItem = NewElementItemInclude(ItemGroup, "Natvis", IncludeItem.path().string());
+					}
+
+					if (InnerItem)
+					{
+						std::wstring IncludeItemPath = IncludeItem.path().wstring();
+						size_t IndexOfFilterStart = IncludeItemPath.find(AbsolutePath) + AbsolutePath.length() + 1;
+
+						std::wstring FilterPath = std::filesystem::path(IncludeItemPath.substr(IndexOfFilterStart)).parent_path().wstring();
+						NewElement(InnerItem, "Filter", WCHAR_TO_ANSI(FilterPath));
+						Filters.emplace_back(FilterPath);
+					}
+				}
+
+				for (auto& Filter : Filters)
+				{
+					UUID Guid;
+					if (UuidCreate(&Guid) != RPC_S_OK)
+					{
+						SE_LOG(LogBuildTool, Error, L"Could not create project GUID.");
+						return -1;
+					}
+
+					RPC_CSTR GuidStr;
+					if (UuidToStringA(&Guid, &GuidStr) != RPC_S_OK)
+					{
+						SE_LOG(LogBuildTool, Error, L"Unexpected error: Cannot convert UUID to string.");
+						return -1;
+					}
+
+					XMLElement* InnerItem = NewElementItemInclude(ItemGroup, "Filter", WCHAR_TO_ANSI(Filter));
+					NewElement(InnerItem, "UniqueIdentifier", std::format("{{{}}}", (const char*)GuidStr));
+
+					RpcStringFreeA(&GuidStr);
+				}
+			}
+		}
+
+		Err = Doc.SaveFile((IntermediateProjectPath.string() + ".vcxproj.filters").c_str());
 		if (Err != XMLError::XML_SUCCESS)
 		{
 			SE_LOG(LogBuildTool, Error, L"Failed to save project file.");

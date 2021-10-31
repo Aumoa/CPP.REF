@@ -1,0 +1,10 @@
+<ProjectInfo Name="Core" Path="Runtime.Core" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Public" Access="Public" />
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<DisableWarnings>
+		<Item Number="4250" Access="Public" />
+		<Item Number="4251" Access="Public" />
+	</DisableWarnings>
+</ProjectInfo>
