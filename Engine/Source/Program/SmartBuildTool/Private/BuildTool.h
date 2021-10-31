@@ -20,7 +20,7 @@ private:
 	struct ProjectBuildFile
 	{
 		std::filesystem::path XmlPath;
-		std::string Guid;
+		std::wstring Guid;
 	};
 
 	struct ProjectBuildRuntime
@@ -49,6 +49,9 @@ private:
 		std::set<std::wstring> PublicExternalLinks;
 		std::set<std::wstring> PrivateExternalLinks;
 		std::wstring AdditionalDependencies;
+
+		// While solution build.
+		std::wstring CachedSlicedSolutionDirectory;
 	};
 
 private:
@@ -66,8 +69,11 @@ private:
 	int32 GenerateProjectFiles();
 	int32 GenerateProjectFile(ProjectBuildRuntime* Runtime);
 
+	int32 GenerateSolutionFile();
+
 	static EType ParseType(const char* StringToken);
 	static EAccessKey ParseAccessKey(const char* StringToken);
 	static std::string GetTypeString(EType Type);
 	static std::string GetSubSystemString(EType Type);
+	static std::wstring NewGuid();
 };

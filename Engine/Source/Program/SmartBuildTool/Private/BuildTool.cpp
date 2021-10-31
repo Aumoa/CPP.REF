@@ -69,6 +69,15 @@ int32 SBuildTool::GuardedMain(std::vector<std::wstring_view> InArgs)
 	}
 	SE_LOG(LogBuildTool, Verbose, L"Generate completed. {} seconds elapsed.", Timer.DoCalc().count());
 
+	Timer.DoCalc();
+	SE_LOG(LogBuildTool, Verbose, L"");
+	SE_LOG(LogBuildTool, Verbose, L"Generate solution file.");
+	if (int32 Ret = GenerateSolutionFile())
+	{
+		return Ret;
+	}
+	SE_LOG(LogBuildTool, Verbose, L"Generate completed. {} seconds elapsed.", Timer.DoCalc().count());
+
 	return 0;
 }
 
@@ -371,6 +380,7 @@ void SBuildTool::BuildRuntime(ProjectBuildRuntime* Runtime)
 		AdditionalDependencies.emplace_back(L"$(AdditionalDependencies)");
 		Runtime->AdditionalDependencies = StringUtils::Join(L";", AdditionalDependencies);
 
+		Runtime->XmlFile.Guid = NewGuid();
 		Runtime->bBuild = true;
 	}
 }
@@ -569,29 +579,11 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 
 			XMLElement* PropertyGroup = NewElementPropertyGroup(Project, "", "Globals");
 			{
-				UUID Guid;
-				if (UuidCreate(&Guid) != RPC_S_OK)
-				{
-					SE_LOG(LogBuildTool, Error, L"Could not create project GUID.");
-					return -1;
-				}
-
-				RPC_CSTR GuidStr;
-				if (UuidToStringA(&Guid, &GuidStr) != RPC_S_OK)
-				{
-					SE_LOG(LogBuildTool, Error, L"Unexpected error: Cannot convert UUID to string.");
-					return -1;
-				}
-
-				Runtime->XmlFile.Guid = (const char*)GuidStr;
-
 				NewElement(PropertyGroup, "VCProjectVersion", "16.0");
 				NewElement(PropertyGroup, "Keyword", "Win32Proj");
-				NewElement(PropertyGroup, "ProjectGuid", std::format("{{{}}}", (const char*)GuidStr));
+				NewElement(PropertyGroup, "ProjectGuid", std::format("{{{}}}", WCHAR_TO_ANSI(Runtime->XmlFile.Guid)));
 				NewElement(PropertyGroup, "RootNamespace", WCHAR_TO_ANSI(Runtime->Metadata->Name));
 				NewElement(PropertyGroup, "WindowsTargetPlatformVersion", "10.0");
-
-				RpcStringFreeA(&GuidStr);
 			}
 
 			NewElementImport(Project, "$(VCTargetsPath)\\Microsoft.Cpp.Default.props");
@@ -696,6 +688,24 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 				}
 			}
 
+			ItemGroup = NewElement(Project, "ItemGroup");
+			{
+				for (auto Referenced : Runtime->PublicReferences)
+				{
+					std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
+					for (auto Split : StringUtils::Split(Referenced->Metadata->Path.c_str(), L".", true, true))
+					{
+						IntermediateProjectPath /= Split;
+					}
+
+					IntermediateProjectPath /= Referenced->Metadata->Name + L".vcxproj";
+					XMLElement* ProjectReference = NewElementItemInclude(ItemGroup, "ProjectReference", WCHAR_TO_ANSI(IntermediateProjectPath.wstring()));
+					{
+						NewElement(ProjectReference, "Project", std::format("{{{}}}", WCHAR_TO_ANSI(Referenced->XmlFile.Guid)));
+					}
+				}
+			}
+
 			NewElementImport(Project, "$(VCTargetsPath)\\Microsoft.Cpp.targets");
 			NewElementImportGroup(Project, "ExtensionTargets");
 		}
@@ -780,24 +790,8 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 
 				for (auto& Filter : Filters)
 				{
-					UUID Guid;
-					if (UuidCreate(&Guid) != RPC_S_OK)
-					{
-						SE_LOG(LogBuildTool, Error, L"Could not create project GUID.");
-						return -1;
-					}
-
-					RPC_CSTR GuidStr;
-					if (UuidToStringA(&Guid, &GuidStr) != RPC_S_OK)
-					{
-						SE_LOG(LogBuildTool, Error, L"Unexpected error: Cannot convert UUID to string.");
-						return -1;
-					}
-
 					XMLElement* InnerItem = NewElementItemInclude(ItemGroup, "Filter", WCHAR_TO_ANSI(Filter));
-					NewElement(InnerItem, "UniqueIdentifier", std::format("{{{}}}", (const char*)GuidStr));
-
-					RpcStringFreeA(&GuidStr);
+					NewElement(InnerItem, "UniqueIdentifier", std::format("{{{}}}", WCHAR_TO_ANSI(NewGuid())));
 				}
 			}
 		}
@@ -854,6 +848,149 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 
 #undef BoolStr
 
+int32 SBuildTool::GenerateSolutionFile()
+{
+	std::wofstream Builder(L"Solution.sln", std::ios::trunc);
+
+	constexpr std::wstring_view CppProjectGuid = L"8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
+	constexpr std::wstring_view SolutionDirectoryGuid = L"2150E333-8FDC-42A3-9474-1A3956D46DE8";
+
+	// Generate header.
+	Builder << std::endl;
+	Builder << L"Microsoft Visual Studio Solution File, Format Version 12.00" << std::endl;
+	Builder << L"# Visual Studio Version 16" << std::endl;
+	Builder << L"VisualStudioVersion = 16.0.31321.278" << std::endl;
+	Builder << L"MinimumVisualStudioVersion = 10.0.40219.1" << std::endl;
+
+	// Generate solution directory.
+	struct SolutionDirectoryPair
+	{
+		std::wstring RecursivePath;
+		std::wstring Guid;
+	};
+
+	std::map<std::wstring, SolutionDirectoryPair> SolutionDirectories;
+	for (auto& [Key, Value] : ProjectsRuntime)
+	{
+		std::vector<std::wstring> RecursivePathSlice = StringUtils::Split(Value.Metadata->Path, L".", true, true);
+		RecursivePathSlice.erase(RecursivePathSlice.end() - 1);
+		RecursivePathSlice.insert(RecursivePathSlice.begin(), Value.Metadata->BaseDirectory);
+
+		std::wstring RecursivePath;
+		for (auto& Slice : RecursivePathSlice)
+		{
+			RecursivePath += Slice;
+
+			auto [It, Status] = SolutionDirectories.emplace(Slice, SolutionDirectoryPair());
+			if (Status)
+			{
+				It->second.RecursivePath = RecursivePath;
+				It->second.Guid = NewGuid();
+			}
+
+			RecursivePath += L".";
+		}
+
+		Value.CachedSlicedSolutionDirectory = RecursivePathSlice.back();
+	}
+
+	for (auto& [Key, Value] : SolutionDirectories)
+	{
+		Builder << std::format(L"Project(\"{{{0}}}\") = \"{1}\", \"{1}\", \"{{{2}}}\"", SolutionDirectoryGuid, Key, Value.Guid) << std::endl;
+		Builder << L"EndProject" << std::endl;
+	}
+
+	// Generate C++ projects.
+	for (auto& [Key, Value] : ProjectsRuntime)
+	{
+		Builder << std::format(L"Project(\"{{{0}}}\") = \"{1}\", \"{2}.vcxproj\", \"{{{3}}}\"", CppProjectGuid, Key, Value.XmlFile.XmlPath.wstring(), Value.XmlFile.Guid) << std::endl;
+		Builder << L"EndProject" << std::endl;
+	}
+
+	struct BuildConfiguration
+	{
+		std::wstring Name;
+	};
+
+	BuildConfiguration Configurations[] =
+	{
+		{
+			.Name = L"Debug"
+		},
+		{
+			.Name = L"Release"
+		}
+	};
+
+	Builder << L"Global" << std::endl;
+	{
+		// SolutionConfigurationPlatforms
+		Builder << L"\tGlobalSection(SolutionConfigurationPlatforms) = preSolution" << std::endl;
+		{
+			for (auto& Config : Configurations)
+			{
+				Builder << std::format(L"\t\t{0}|x64 = {0}|x64", Config.Name) << std::endl;
+			}
+		}
+		Builder << L"\tEndGlobalSection" << std::endl;
+
+		// ProjectConfigurationPlatforms
+		Builder << L"\tGlobalSection(ProjectConfigurationPlatforms) = postSolution" << std::endl;
+		{
+			for (auto& [Key, Project] : ProjectsRuntime)
+			{
+				for (auto& Config : Configurations)
+				{
+					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.ActiveCfg = {1}|x64", Project.XmlFile.Guid, Config.Name) << std::endl;
+					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.Build.0 = {1}|x64", Project.XmlFile.Guid, Config.Name) << std::endl;
+				}
+			}
+		}
+		Builder << L"\tEndGlobalSection" << std::endl;
+
+		// SolutionProperties
+		Builder << L"\tGlobalSection(SolutionProperties) = preSolution" << std::endl;
+		{
+			Builder << L"\t\tHideSolutionNode = FALSE" << std::endl;
+		}
+		Builder << L"\tEndGlobalSection" << std::endl;
+
+		// NestedProjects
+		Builder << L"\tGlobalSection(NestedProjects) = preSolution" << std::endl;
+		{
+			for (auto& [Key, Value] : SolutionDirectories)
+			{
+				std::vector<std::wstring> Splits = StringUtils::Split(Value.RecursivePath, L".");
+				if (Splits.size() > 1)
+				{
+					std::wstring LastParent = Splits[Splits.size() - 2];
+					SolutionDirectoryPair LastParentInfo = SolutionDirectories[LastParent];
+					Builder << std::format(L"\t\t{{{}}} = {{{}}}", Value.Guid, LastParentInfo.Guid) << std::endl;
+				}
+			}
+
+			for (auto& [Key, Project] : ProjectsRuntime)
+			{
+				SolutionDirectoryPair ParentInfo = SolutionDirectories[Project.CachedSlicedSolutionDirectory];
+				Builder << std::format(L"\t\t{{{}}} = {{{}}}", Project.XmlFile.Guid, ParentInfo.Guid) << std::endl;
+			}
+		}
+		Builder << L"\tEndGlobalSection" << std::endl;
+
+		// ExtensibilityGlobals
+		Builder << L"\tGlobalSection(ExtensibilityGlobals) = postSolution" << std::endl;
+		{
+			Builder << std::format(L"\t\tSolutionGuid = {{{}}}", NewGuid()) << std::endl;
+		}
+		Builder << L"\tEndGlobalSection" << std::endl;
+	}
+	Builder << L"EndGlobal" << std::endl;
+
+	Builder << std::endl;
+	Builder.close();
+	return 0;
+}
+
 EType SBuildTool::ParseType(const char* StringToken)
 {
 	if (StringToken)
@@ -902,4 +1039,21 @@ std::string SBuildTool::GetSubSystemString(EType Type)
 	default:
 		return "Windows";
 	}
+}
+
+std::wstring SBuildTool::NewGuid()
+{
+	UUID Guid;
+	RPC_STATUS S = UuidCreate(&Guid);
+	check(S == RPC_S_OK);
+
+	RPC_CSTR GuidStr;
+	S = UuidToStringA(&Guid, &GuidStr);
+	check(S == RPC_S_OK);
+
+	std::wstring Wstr = ANSI_TO_WCHAR((const char*)GuidStr);
+	S = RpcStringFreeA(&GuidStr);
+	check(S == RPC_S_OK);
+
+	return Wstr;
 }
