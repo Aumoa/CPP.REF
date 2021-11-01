@@ -6,5 +6,6 @@
 	<DisableWarnings>
 		<Item Number="4250" Access="Public" />
 		<Item Number="4251" Access="Public" />
+		<Item Number="5105" Access="Public" />
 	</DisableWarnings>
 </ProjectInfo>
