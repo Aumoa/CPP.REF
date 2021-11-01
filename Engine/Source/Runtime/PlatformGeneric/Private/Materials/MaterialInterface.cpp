@@ -112,7 +112,7 @@ bool SMaterialInterface::SetParameterValue(int32 Index, T&& Value) requires requ
 
 	if (Index >= (int32)ShaderValues.size())
 	{
-		SE_LOG(LogMaterial, Error, L"Parameter Index({}) is not valid in this material.");
+		SE_LOG(LogMaterials, Error, L"Parameter Index({}) is not valid in this material.");
 		return false;
 	}
 
@@ -127,7 +127,7 @@ bool SMaterialInterface::GetParameterValue(int32 Index, T** Value) requires requ
 
 	if (Index >= (int32)ShaderValues.size())
 	{
-		SE_LOG(LogMaterial, Error, L"Parameter Index({}) is not valid in this material.");
+		SE_LOG(LogMaterials, Error, L"Parameter Index({}) is not valid in this material.");
 		return false;
 	}
 

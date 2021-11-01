@@ -4,7 +4,7 @@
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIShader.h"
 
-SMaterial::SMaterial(IRHIDevice* InDevice, EBaseShaderCode InBaseShaderCode) : Super()
+SMaterial::SMaterial(IRHIDevice* InDevice, EBaseShaderCode InBaseShaderCode) : Super(InDevice)
 	, BaseShaderCode(InBaseShaderCode)
 {
 }
