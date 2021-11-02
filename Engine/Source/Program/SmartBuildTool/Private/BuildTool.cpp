@@ -5,6 +5,7 @@
 #include "Misc/TickCalc.h"
 #include "Misc/CommandLine.h"
 #include "IO/DirectoryReference.h"
+#include "Guid.h"
 
 DEFINE_LOG_CATEGORY(LogBuildTool);
 
@@ -1085,17 +1086,5 @@ std::string SBuildTool::GetSubSystemString(EType Type)
 
 std::wstring SBuildTool::NewGuid()
 {
-	UUID Guid;
-	RPC_STATUS S = UuidCreate(&Guid);
-	check(S == RPC_S_OK);
-
-	RPC_CSTR GuidStr;
-	S = UuidToStringA(&Guid, &GuidStr);
-	check(S == RPC_S_OK);
-
-	std::wstring Wstr = ANSI_TO_WCHAR((const char*)GuidStr);
-	S = RpcStringFreeA(&GuidStr);
-	check(S == RPC_S_OK);
-
-	return Wstr;
+	return Guid::NewGuid().ToString();
 }
