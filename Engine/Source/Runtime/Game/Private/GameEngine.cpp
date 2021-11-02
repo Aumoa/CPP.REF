@@ -5,16 +5,13 @@
 #include "GameInstance.h"
 #include "IApplicationInterface.h"
 #include "CoreDelegates.h"
-#include "PlatformMisc/PlatformModule.h"
 #include "Threading/Thread.h"
 #include "Level/World.h"
 #include "Application/SlateApplication.h"
-#include "GameThreads/RenderThread.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
-#include "EngineSubsystems/GamePlayerSystem.h"
 #include "EngineSubsystems/GameInputSystem.h"
 
 SGameEngine* GEngine = nullptr;
@@ -27,9 +24,13 @@ SGameEngine::~SGameEngine()
 {
 }
 
-bool SGameEngine::InitEngine()
+bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 {
 	GEngine = this;
+
+	SlateApplication = NewObject<SSlateApplication>();
+	SlateApplication->Init(InApplication);
+
 	InitializeSubsystems();
 	CoreDelegates::PostEngineInit.Invoke();
 
@@ -37,26 +38,13 @@ bool SGameEngine::InitEngine()
 	return true;
 }
 
-void SGameEngine::SetupFrameworkView(IApplicationInterface* InApplication)
+bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 {
-	GetEngineSubsystem<SGameRenderSystem>()->SetupFrameworkView(InApplication);
-	auto PlayerSystem = GetEngineSubsystem<SGamePlayerSystem>();
-	PlayerSystem->SpawnLocalPlayer(InApplication);
-
-	SE_LOG(LogEngine, Info, L"Register engine tick.");
-	InApplication->Idle.AddSObject(this, &SGameEngine::TickEngine);
-
-	SlateApplication = NewObject<SSlateApplication>();
-	SlateApplication->InitWindow(PlayerSystem->GetLocalPlayer(), InApplication);
-}
-
-bool SGameEngine::LoadGameModule(std::wstring_view moduleName)
-{
-	SGameModuleSystem* system = GetEngineSubsystem<SGameModuleSystem>();
-	system->LoadGameModule(moduleName);
-	if (GameInstance = system->LoadGameInstance(); GameInstance == nullptr)
+	SGameModuleSystem* ModuleSystem = GetEngineSubsystem<SGameModuleSystem>();
+	ModuleSystem->LoadGameModule(InModuleName);
+	if (GameInstance = ModuleSystem->LoadGameInstance(); GameInstance == nullptr)
 	{
-		SE_LOG(LogEngine, Fatal, L"LoadGameInstance function from {} module return nullptr.", moduleName);
+		SE_LOG(LogEngine, Fatal, L"LoadGameInstance function from {} module return nullptr.", InModuleName);
 		return false;
 	}
 
@@ -85,34 +73,32 @@ void SGameEngine::Shutdown()
 		SlateApplication = nullptr;
 	}
 
-	for (auto& System : _Subsystems)
+	for (auto& System : Subsystems)
 	{
 		System->Deinit();
 	}
 }
 
-int32 SGameEngine::InvokedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
+int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Invoke();
 
 	// Create GameEngine instance and initialize it.
-	if (!InitEngine())
+	if (!InitEngine(InApplication))
 	{
 		SE_LOG(LogEngine, Fatal, L"Could not initialize engine.");
 		return -1;
 	}
-
-	// Setup framework view.
-	SetupFrameworkView(InApplication);
 
 	// Load game module.
 	if (!LoadGameModule(gameModule))
 	{
 		return -1;
 	}
+	InApplication->SetTitle(GameInstance->GetApplicationName());
 
 	// Start application now!
-	InApplication->SetTitle(GameInstance->GetApplicationName());
+	InApplication->Idle.AddSObject(this, &SGameEngine::TickEngine);
 	GameInstance->Init();
 	InApplication->Start();
 
@@ -125,22 +111,26 @@ SGameInstance* SGameEngine::GetGameInstance()
 	return GameInstance;
 }
 
+SSlateApplication* SGameEngine::GetSlateApplication()
+{
+	return SlateApplication;
+}
+
 void SGameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
-	_Subsystems.emplace_back(NewObject<SGameRenderSystem>())->Init();
-	_Subsystems.emplace_back(NewObject<SGameAssetSystem>())->Init();
-	_Subsystems.emplace_back(NewObject<SGameModuleSystem>())->Init();
-	_Subsystems.emplace_back(NewObject<SGameLevelSystem>())->Init();
-	_Subsystems.emplace_back(NewObject<SGamePlayerSystem>())->Init();
-	_Subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
+	Subsystems.emplace_back(NewObject<SGameRenderSystem>())->Init();
+	Subsystems.emplace_back(NewObject<SGameAssetSystem>())->Init();
+	Subsystems.emplace_back(NewObject<SGameModuleSystem>())->Init();
+	Subsystems.emplace_back(NewObject<SGameLevelSystem>())->Init();
+	Subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
 }
 
 void SGameEngine::TickEngine()
 {
 	using namespace std::chrono;
 
-	auto Tick = _TickCalc.DoCalc();
+	auto Tick = TickCalc.DoCalc();
 	SystemsTick(Tick);
 	GameTick(Tick);
 	RenderTick(Tick);
@@ -148,7 +138,7 @@ void SGameEngine::TickEngine()
 
 void SGameEngine::SystemsTick(std::chrono::duration<float> InDeltaTime)
 {
-	for (auto& System : _Subsystems)
+	for (auto& System : Subsystems)
 	{
 		System->Tick(InDeltaTime.count());
 	}

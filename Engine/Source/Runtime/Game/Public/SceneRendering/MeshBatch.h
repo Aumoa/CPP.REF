@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MeshBatchElement.h"
-#include "VertexFactory.h"
+//#include "VertexFactory.h"
 #include "RHI/RHIStructures.h"
 
 class SMaterialInterface;
@@ -19,29 +19,29 @@ struct MeshBatch
 
 	std::vector<MeshBatchElement> Elements;
 	std::vector<SMaterialInterface*> MaterialSlots;
-	SVertexFactory* VertexFactory;
+	//SVertexFactory* VertexFactory;
 
-	RHIVertexBufferView GetVertexBufferView() const
-	{
-		uint32 Stride = VertexFactory->GetVertexStride();
+	//RHIVertexBufferView GetVertexBufferView() const
+	//{
+	//	uint32 Stride = VertexFactory->GetVertexStride();
 
-		return RHIVertexBufferView
-		{
-			.BufferLocation = VertexBufferLocation,
-			.SizeInBytes = Stride * (uint32)VertexBuffer.size(),
-			.StrideInBytes = Stride
-		};
-	}
+	//	return RHIVertexBufferView
+	//	{
+	//		.BufferLocation = VertexBufferLocation,
+	//		.SizeInBytes = Stride * (uint32)VertexBuffer.size(),
+	//		.StrideInBytes = Stride
+	//	};
+	//}
 
-	RHIIndexBufferView GetIndexBufferView() const
-	{
-		uint32 Stride = VertexFactory->GetIndexStride();
+	//RHIIndexBufferView GetIndexBufferView() const
+	//{
+	//	uint32 Stride = VertexFactory->GetIndexStride();
 
-		return RHIIndexBufferView
-		{
-			.BufferLocation = IndexBufferLocation,
-			.SizeInBytes = Stride * (uint32)IndexBuffer.size(),
-			.Format = VertexFactory->GetIndexFormat(),
-		};
-	}
+	//	return RHIIndexBufferView
+	//	{
+	//		.BufferLocation = IndexBufferLocation,
+	//		.SizeInBytes = Stride * (uint32)IndexBuffer.size(),
+	//		.Format = VertexFactory->GetIndexFormat(),
+	//	};
+	//}
 };

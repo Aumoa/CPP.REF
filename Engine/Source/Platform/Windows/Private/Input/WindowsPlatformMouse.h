@@ -8,7 +8,7 @@
 
 class SWindowsApplication;
 
-class GAME_API SWindowsPlatformMouse : implements SObject, implements IPlatformMouse
+class SWindowsPlatformMouse : implements SObject, implements IPlatformMouse
 {
     GENERATED_BODY(SWindowsPlatformMouse)
 

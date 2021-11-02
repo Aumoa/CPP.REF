@@ -21,6 +21,7 @@ private:
 public:
 	SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources, D3D12_DESCRIPTOR_HEAP_TYPE type);
 
+	virtual int32 GetViewCount() override;
 	virtual IRHIResource* GetResource(int32 indexOf) override;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetHandle(int32 indexOf);

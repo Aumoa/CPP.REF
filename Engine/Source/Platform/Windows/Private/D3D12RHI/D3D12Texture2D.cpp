@@ -35,7 +35,7 @@ void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* commandList, uint32 s
 	}
 	else
 	{
-		SE_LOG(LogDirectX, Error, L"Texture is not created with ERHIBufferUsage::Dynamic flags.");
+		SE_LOG(LogWindows, Error, L"Texture is not created with ERHIBufferUsage::Dynamic flags.");
 	}
 }
 

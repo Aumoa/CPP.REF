@@ -6,7 +6,7 @@
 #include "Input/IPlatformKeyboard.h"
 #include "WindowsIncludes.h"
 
-class GAME_API SWindowsPlatformKeyboard : implements SObject, implements IPlatformKeyboard
+class SWindowsPlatformKeyboard : implements SObject, implements IPlatformKeyboard
 {
     GENERATED_BODY(SWindowsPlatformKeyboard)
 

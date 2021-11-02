@@ -21,8 +21,6 @@ class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameRenderSystem)
 
 private:
-	IApplicationInterface* FrameworkView = nullptr;
-
 	IRHIFactory* Factory = nullptr;
 	IRHIDevice* Device = nullptr;
 	IRHIDeviceContext* PrimaryQueue = nullptr;
@@ -42,8 +40,6 @@ public:
 	virtual void Tick(float InDeltaTime) override;
 	virtual void ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp);
 
-	void SetupFrameworkView(IApplicationInterface* frameworkView);
-	IApplicationInterface* GetFrameworkView();
 	IRHIDevice* GetRHIDevice();
 
 	// Test feature.

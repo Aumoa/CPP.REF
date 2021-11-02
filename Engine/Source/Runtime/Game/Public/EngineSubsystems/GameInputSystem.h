@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
-#include "Misc/MouseStateTracker.h"
-#include "Misc/KeyboardTracker.h"
+#include "Input/MouseStateTracker.h"
+#include "Input/KeyboardTracker.h"
 #include <optional>
 
 class GAME_API SGameInputSystem : public SGameEngineSubsystem
@@ -22,10 +22,10 @@ public:
 	};
 
 private:
-	static SMouseStateTracker _mouseTracker;
-	static SKeyboardTracker _keyboardTracker;
-	static std::optional<int32> _lastMouseX;
-	static std::optional<int32> _lastMouseY;
+	SMouseStateTracker MouseTracker;
+	SKeyboardTracker KeyboardTracker;
+	std::optional<int32> LastMouseX;
+	std::optional<int32> LastMouseY;
 
 public:
 	DECLARE_MULTICAST_EVENT(KeyboardEvent, EKey, EKeyboardEvent);
@@ -37,7 +37,6 @@ public:
 
 public:
 	SGameInputSystem();
-	virtual ~SGameInputSystem() override;
 
 	virtual void Tick(float InDeltaTime) override;
 };

@@ -18,6 +18,16 @@ SGameModuleSystem::~SGameModuleSystem()
 	}
 }
 
+void SGameModuleSystem::Init()
+{
+}
+
+void SGameModuleSystem::Deinit()
+{
+	_gameModule->CleanupSubobjects();
+	_module = nullptr;
+}
+
 void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 {
 	std::filesystem::path gameModulePath = gameModuleName;

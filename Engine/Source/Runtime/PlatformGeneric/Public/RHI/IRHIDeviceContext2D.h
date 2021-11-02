@@ -7,6 +7,6 @@
 
 interface IRHIDeviceContext2D : implements IRHIDeviceChild
 {
-	virtual void BeginDraw();
-	virtual void EndDraw();
+	virtual void BeginDraw() = 0;
+	virtual void EndDraw() = 0;
 };

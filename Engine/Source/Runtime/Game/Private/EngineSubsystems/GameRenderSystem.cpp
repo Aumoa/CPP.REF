@@ -1,11 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameRenderSystem.h"
-#include "EngineSubsystems/GamePlayerSystem.h"
-#include "Shaders/ColorShader/ColorShader.h"
-#include "Shaders/ColorShader/ColorVertexFactory.h"
-#include "Shaders/TransparentShader/TransparentShader.h"
-#include "Shaders/SlateShader/SlateShader.h"
+//#include "Shaders/ColorShader/ColorShader.h"
+//#include "Shaders/ColorShader/ColorVertexFactory.h"
+//#include "Shaders/TransparentShader/TransparentShader.h"
+//#include "Shaders/SlateShader/SlateShader.h"
 #include "GameFramework/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "RHI/IRHIFactory.h"
@@ -18,11 +17,11 @@
 #include "SceneRendering/SceneRenderContext.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/MinimalViewInfo.h"
-#include "GameThreads/RenderThread.h"
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Application/SlateApplication.h"
-#include "Draw/PaintArgs.h"
-#include "Layout/LayoutImpl.h"
+//#include "Draw/PaintArgs.h"
+//#include "Layout/LayoutImpl.h"
+#include "RenderThread.h"
 #include "IApplicationInterface.h"
 
 DEFINE_LOG_CATEGORY(LogRender);
@@ -38,6 +37,14 @@ SGameRenderSystem::~SGameRenderSystem()
 void SGameRenderSystem::Init()
 {
 	RenderThread::Init();
+
+	Factory = IApplicationInterface::Get().CreateFactory();
+	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
+	Device = Factory->CreateDevice(PrimaryAdapter);
+	PrimaryQueue = Device->GetImmediateContext();
+	SwapChainRT = NewObject<SSwapChainRenderTarget>(Factory, Device);
+
+	IApplicationInterface::Get().Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
 }
 
 void SGameRenderSystem::Deinit()
@@ -75,30 +82,6 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 
 		Device->EndFrame();
 	});
-}
-
-void SGameRenderSystem::SetupFrameworkView(IApplicationInterface* InApplication)
-{
-	// Getting primary adapter for create device.
-	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
-	Device = Factory->CreateDevice(PrimaryAdapter);
-	PrimaryQueue = Device->GetImmediateContext();
-	ColorVertexFactory = NewObject<SColorVertexFactory>(Device);
-	ColorShader = NewObject<SColorShader>(Device);
-	ColorShader->Compile(ColorVertexFactory);
-	TransparentShader = NewObject<STransparentShader>(Device);
-	TransparentShader->Compile(ColorVertexFactory);
-	SlateShader = NewObject<SSlateShader>(Device);
-	SlateShader->Compile(nullptr);
-
-	FrameworkView = InApplication;
-	SwapChainRT = NewObject<SSwapChainRenderTarget>(Factory, Device, InApplication);
-	FrameworkView->Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
-}
-
-IApplicationInterface* SGameRenderSystem::GetFrameworkView()
-{
-	return FrameworkView;
 }
 
 IRHIDevice* SGameRenderSystem::GetRHIDevice()

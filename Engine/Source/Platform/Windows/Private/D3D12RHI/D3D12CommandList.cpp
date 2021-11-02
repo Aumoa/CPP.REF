@@ -183,7 +183,7 @@ void SD3D12CommandList::UpdateSubresource(IRHIResource* resource, uint32 subreso
 	ID3D12Resource* uploadBuf = resource_s->GetUploadBuf();
 	if (uploadBuf == nullptr)
 	{
-		SE_LOG(LogDirectX, Fatal, L"Resource is not created with ERHIBufferUsage::Dynamic flag.");
+		SE_LOG(LogWindows, Fatal, L"Resource is not created with ERHIBufferUsage::Dynamic flag.");
 		return;
 	}
 
@@ -193,7 +193,7 @@ void SD3D12CommandList::UpdateSubresource(IRHIResource* resource, uint32 subreso
 
 uint64 SD3D12CommandList::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal)
 {
-	SE_LOG(LogDirectX, Fatal, L"ExecuteCommandLists must be called with immediate context.");
+	SE_LOG(LogWindows, Fatal, L"ExecuteCommandLists must be called with immediate context.");
 	return 0;
 }
 

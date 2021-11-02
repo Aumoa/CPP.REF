@@ -30,6 +30,8 @@ public:
 	virtual std::wstring GetTitle() override;
 
 	virtual IRHIFactory* CreateFactory() override;
+	virtual IPlatformKeyboard& GetPlatformKeyboard() override;
+	virtual IPlatformMouse& GetPlatformMouse() override;
 
 	HWND GetWindowHandle();
 

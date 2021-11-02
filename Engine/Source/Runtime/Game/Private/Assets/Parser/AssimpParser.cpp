@@ -7,7 +7,7 @@
 //#include <assimp/postprocess.h>
 #include "LogGame.h"
 #include "GameEngine.h"
-#include "VertexFactory.h"
+//#include "VertexFactory.h"
 #include "Assets/StaticMesh.h"
 #include "Scene/StaticMeshRenderData.h"
 #include "RHI/IRHIBuffer.h"

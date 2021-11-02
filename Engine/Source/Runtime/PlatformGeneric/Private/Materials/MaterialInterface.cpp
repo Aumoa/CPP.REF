@@ -3,6 +3,8 @@
 #include "Materials/MaterialInterface.h"
 #include "RHI/IRHIDevice.h"
 
+DEFINE_LOG_CATEGORY(LogMaterials);
+
 SMaterialInterface::SMaterialInterface(IRHIDevice* InDevice) : Super()
 	, Device(InDevice)
 {

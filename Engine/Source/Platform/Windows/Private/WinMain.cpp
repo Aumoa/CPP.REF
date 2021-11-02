@@ -7,8 +7,6 @@
 #include "Misc/CommandLine.h"
 #include "WindowsApplication.h"
 
-DECLARE_LOG_CATEGORY(, LogWindowsLaunch);
-
 using namespace std::chrono;
 
 INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd, _In_ INT show)
@@ -17,14 +15,14 @@ INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR 
 	size_t GameModuleIdx = CommandArgs.GetArgument(L"--GameDll");
 	if (GameModuleIdx == -1)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"GameModule does not specified.");
+		SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
 		return -1;
 	}
 
 	std::optional<std::wstring_view> ModuleName = CommandArgs.GetArgument(GameModuleIdx + 1);
 	if (!ModuleName)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"GameModule does not specified.");
+		SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
 		return -1;
 	}
 
@@ -45,35 +43,35 @@ INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR 
 	}
 
 	SPlatformModule EngineModule(*EngineName);
-	auto loader = EngineModule.GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
-	if (!loader)
+	auto Loader = EngineModule.GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
+	if (!Loader)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
+		SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
 		return -1;
 	}
 
-	SGameModule* gameModule = loader(&EngineModule);
-	if (gameModule == nullptr)
+	SGameModule* GameModule = Loader(&EngineModule);
+	if (GameModule == nullptr)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
+		SE_LOG(LogWindows, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
 		return -1;
 	}
 
-	SGameEngine* gameEngine = gameModule->CreateGameEngine();
-	if (gameEngine == nullptr)
+	SGameEngine* GameEngine = GameModule->CreateGameEngine();
+	if (GameEngine == nullptr)
 	{
-		SE_LOG(LogWindowsLaunch, Fatal, L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
+		SE_LOG(LogWindows, Fatal, L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
 		return -1;
 	}
 
 	SWindowsApplication WinApp(hInstance);
-	int32 errorCode = gameEngine->InvokedMain(&WinApp, *ModuleName);
-	if (errorCode != 0)
+	int32 ErrorCode = GameEngine->GuardedMain(&WinApp, *ModuleName);
+	if (ErrorCode != 0)
 	{
-		SE_LOG(LogWindowsLaunch, Error, L"Application has one more error({}).", errorCode);
+		SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
 	}
 
 	// Cleanup GameEngineModule.
-	EngineModule.DestroyObject(gameModule);
-	return errorCode;
+	EngineModule.DestroyObject(GameModule);
+	return ErrorCode;
 }

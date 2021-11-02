@@ -13,5 +13,5 @@ public:
 	STHGameInstance();
 
 	virtual void Init() override;
-	virtual std::wstring GetApplicationName() const override { return L"THStory"; }
+	virtual std::wstring GetApplicationName() override { return L"THStory"; }
 };

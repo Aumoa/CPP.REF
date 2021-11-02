@@ -14,11 +14,16 @@ SD3D12View::SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D1
 	_incrementSize = dev->GetDescriptorHandleIncrementSize(type);
 }
 
+int32 SD3D12View::GetViewCount()
+{
+	return (int32)_resources.size();
+}
+
 IRHIResource* SD3D12View::GetResource(int32 indexOf)
 {
 	if (_resources.size() <= indexOf)
 	{
-		SE_LOG(LogDirectX, Error, L"IndexOf is not valid. The number of resources that bound to this view is {}.", _resources.size());
+		SE_LOG(LogWindows, Error, L"IndexOf is not valid. The number of resources that bound to this view is {}.", _resources.size());
 		return nullptr;
 	}
 
@@ -28,7 +33,7 @@ IRHIResource* SD3D12View::GetResource(int32 indexOf)
 	}
 	else
 	{
-		SE_LOG(LogDirectX, Warning, L"The resources that bound to index[{}] is expired.", indexOf);
+		SE_LOG(LogWindows, Warning, L"The resources that bound to index[{}] is expired.", indexOf);
 		return nullptr;
 	}
 }

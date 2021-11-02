@@ -4,7 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/LocalPlayer.h"
 #include "Level/Level.h"
-#include "EngineSubsystems/GamePlayerSystem.h"
+#include "Level/World.h"
 
 AGameMode::AGameMode() : Super()
 	, PlayerControllerClass(APlayerController::StaticClass())
@@ -16,8 +16,8 @@ APlayerController* AGameMode::SpawnPlayerController()
 	SLevel* const Level = GetLevel();
 	APlayerController* PlayerController = Cast<APlayerController>(Level->SpawnActor(PlayerControllerClass, true));
 
-	auto* System = GEngine->GetEngineSubsystem<SGamePlayerSystem>();
-	SLocalPlayer* LocalPlayer = System->GetLocalPlayer();
+	SWorld* World = GetWorld();
+	SLocalPlayer* LocalPlayer = World->GetLocalPlayer();
 
 	LocalPlayer->SetPlayerController(PlayerController);
 	return PlayerController;

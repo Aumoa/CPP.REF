@@ -11,6 +11,7 @@
 		<Item Name="User32.lib" />
 		<Item Name="DXGI.lib" />
 		<Item Name="D3D12.lib" />
+		<Item Name="D3d11.lib" />
 		<Item Name="D2D1.lib" />
 		<Item Name="DWrite.lib" />
 	</ExternalLinks>

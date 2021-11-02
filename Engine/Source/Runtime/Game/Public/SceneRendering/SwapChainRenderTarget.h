@@ -8,7 +8,6 @@
 interface IRHIFactory;
 interface IRHIDevice;
 interface IRHISwapChain;
-interface IApplicationInterface;
 
 class GAME_API SSwapChainRenderTarget : implements SObject, public SceneRenderTarget
 {
@@ -24,7 +23,7 @@ private:
 	int32 PixelHeight;
 
 public:
-	SSwapChainRenderTarget(IRHIFactory* InFactory, IRHIDevice* InDevice, IApplicationInterface* InFrameworkView);
+	SSwapChainRenderTarget(IRHIFactory* InFactory, IRHIDevice* InDevice);
 
 	void ResizeBuffers(int32 InWidth, int32 InHeight);
 	void ResolveTarget();

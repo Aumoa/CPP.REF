@@ -46,19 +46,19 @@ void ForwardSceneRenderer::OnPopulateCommandLists(IRHIDeviceContext* Context)
 				for (const MeshBatch& Batch : PrimitiveInfo.MeshBatches)
 				{
 					// Set vertex and index buffer.
-					RHIVertexBufferView Vbv = Batch.GetVertexBufferView();
-					RHIIndexBufferView Ibv = Batch.GetIndexBufferView();
+					//RHIVertexBufferView Vbv = Batch.GetVertexBufferView();
+					//RHIIndexBufferView Ibv = Batch.GetIndexBufferView();
 
-					Context->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
-					Context->IASetVertexBuffers(0, std::span(&Vbv, 1));
-					Context->IASetIndexBuffer(Ibv);
+					//Context->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleList);
+					//Context->IASetVertexBuffers(0, std::span(&Vbv, 1));
+					//Context->IASetIndexBuffer(Ibv);
 
-					for (const MeshBatchElement& Elem : Batch.Elements)
-					{
-						SMaterialInterface* Material = Batch.MaterialSlots[Elem.MaterialSlotIndex];
-						Material->SetupCommands(Context);
-						Context->DrawIndexedInstanced(Elem.IndexCount, Elem.InstanceCount, Elem.StartIndexLocation, Elem.BaseVertexLocation, 0);
-					}
+					//for (const MeshBatchElement& Elem : Batch.Elements)
+					//{
+					//	SMaterialInterface* Material = Batch.MaterialSlots[Elem.MaterialSlotIndex];
+					//	Material->SetupCommands(Context);
+					//	Context->DrawIndexedInstanced(Elem.IndexCount, Elem.InstanceCount, Elem.StartIndexLocation, Elem.BaseVertexLocation, 0);
+					//}
 				}
 
 				View.AdvanceViewAddress(BaseVirtualAddress, 1);

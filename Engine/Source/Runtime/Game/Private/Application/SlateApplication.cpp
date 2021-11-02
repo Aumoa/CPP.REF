@@ -9,7 +9,8 @@
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIDeviceContext.h"
-#include "GameThreads/RenderThread.h"
+#include "RenderThread.h"
+#include "GameFramework/LocalPlayer.h"
 
 SSlateApplication::SSlateApplication() : Super()
 {
@@ -19,10 +20,10 @@ SSlateApplication::~SSlateApplication()
 {
 }
 
-void SSlateApplication::InitWindow(SLocalPlayer* InLocalPlayer, IFrameworkView* InFrameworkView)
+void SSlateApplication::Init(IApplicationInterface* InApplication)
 {
-	LocalPlayer = InLocalPlayer;
-	(CoreWindow = SNew(SWindow))->InitViewport(InFrameworkView);
+	LocalPlayer = NewObject<SLocalPlayer>();
+	(SAssignNew(CoreWindow, SWindow))->InitViewport(InApplication);
 }
 
 void SSlateApplication::TickAndPaint(float InDeltaTime)
@@ -41,20 +42,25 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 		DeviceContext = Dev->CreateDeviceContext();
 	}
 
-	RenderThread::EnqueueRenderThreadWork<"TickAndPaint_InitContexts">([&, Elements = std::move(Elements)](auto)
-	{
-		SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
-		InitContext_RenderThread = Shader->InitElements(*Elements);
-	});
+	//RenderThread::EnqueueRenderThreadWork<"TickAndPaint_InitContexts">([&, Elements = std::move(Elements)](auto)
+	//{
+	//	SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
+	//	InitContext_RenderThread = Shader->InitElements(*Elements);
+	//});
 }
 
 void SSlateApplication::PopulateCommandLists(SceneRenderContext& RenderContext)
 {
-	SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
+	//SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
 
-	IRHIDeviceContext* DeviceContext = RenderContext.DeviceContext;
-	DeviceContext->SetDescriptorHeaps(InitContext_RenderThread.NumDescriptors, 0);
+	//IRHIDeviceContext* DeviceContext = RenderContext.DeviceContext;
+	//DeviceContext->SetDescriptorHeaps(InitContext_RenderThread.NumDescriptors, 0);
 
-	SlateRenderer Renderer(*RenderContext.RenderTarget, Shader, &InitContext_RenderThread);
-	Renderer.PopulateCommandLists(DeviceContext);
+	//SlateRenderer Renderer(*RenderContext.RenderTarget, Shader, &InitContext_RenderThread);
+	//Renderer.PopulateCommandLists(DeviceContext);
+}
+
+SLocalPlayer* SSlateApplication::GetLocalPlayer()
+{
+	return LocalPlayer;
 }

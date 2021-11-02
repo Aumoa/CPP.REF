@@ -12,6 +12,8 @@ DECLARE_LOG_CATEGORY(GAME_API, LogWorld);
 
 class SLevel;
 class SScene;
+class SSlateApplication;
+class SLocalPlayer;
 
 /// <summary>
 /// Represents game world that contains spawned actor, physically state and environment.
@@ -39,6 +41,7 @@ public:
 	virtual SWorld* GetWorld() override;
 	EWorldType GetWorldType();
 	SScene* GetScene();
+	SLocalPlayer* GetLocalPlayer();
 
 	AActor* SpawnActor(SubclassOf<AActor> InActorClass);
 	void DestroyActor(AActor* InActor);

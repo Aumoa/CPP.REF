@@ -32,17 +32,17 @@ public:
 	/// <summary>
 	/// Initialize engine system.
 	/// </summary>
-	virtual bool InitEngine();
-	virtual void SetupFrameworkView(IApplicationInterface* InApplication);
-	virtual bool LoadGameModule(std::wstring_view moduleName);
+	virtual bool InitEngine(IApplicationInterface* InApplication);
+	virtual bool LoadGameModule(std::wstring_view InModuleName);
 	virtual void Shutdown();
 
-	int32 InvokedMain(IApplicationInterface* InApplication, std::wstring_view gameModule);
+	int32 GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule);
 	SGameInstance* GetGameInstance();
+	SSlateApplication* GetSlateApplication();
 
 private:
-	std::vector<SGameEngineSubsystem*> _Subsystems;
-	mutable std::map<size_t, SGameEngineSubsystem*> _CachedSubsystemsIndex;
+	std::vector<SGameEngineSubsystem*> Subsystems;
+	mutable std::map<size_t, SGameEngineSubsystem*> CachedSubsystems;
 
 	void InitializeSubsystems();
 
@@ -50,34 +50,34 @@ public:
 	template<class T>
 	T* GetEngineSubsystem()
 	{
-		size_t hash = typeid(T).hash_code();
-		auto it = _CachedSubsystemsIndex.find(hash);
-		if (it == _CachedSubsystemsIndex.end())
+		size_t Hash = typeid(T).hash_code();
+		auto It = CachedSubsystems.find(Hash);
+		if (It == CachedSubsystems.end())
 		{
 			// Find subsystem.
-			for (size_t i = 0; i < _Subsystems.size(); ++i)
+			for (size_t i = 0; i < Subsystems.size(); ++i)
 			{
-				if (auto ptr = dynamic_cast<T*>(_Subsystems[i]); ptr)
+				if (auto ptr = dynamic_cast<T*>(Subsystems[i]); ptr)
 				{
-					it = _CachedSubsystemsIndex.emplace(hash, ptr).first;
+					It = CachedSubsystems.emplace(Hash, ptr).first;
 					break;
 				}
 			}
 
 			// Could not found any subsystem class.
-			if (it == _CachedSubsystemsIndex.end())
+			if (It == CachedSubsystems.end())
 			{
 				return nullptr;
 			}
 		}
 
 		// Mapping pointer can be cast directly to desired class.
-		return static_cast<T*>(it->second);
+		return static_cast<T*>(It->second);
 	}
 
 private:
 	void TickEngine();
-	TickCalc<> _TickCalc;
+	TickCalc<> TickCalc;
 
 private:
 	void SystemsTick(std::chrono::duration<float> InDeltaTime);

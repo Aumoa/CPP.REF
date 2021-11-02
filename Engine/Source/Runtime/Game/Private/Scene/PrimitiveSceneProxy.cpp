@@ -2,7 +2,7 @@
 
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Components/PrimitiveComponent.h"
-#include "GameThreads/RenderThread.h"
+#include "RenderThread.h"
 
 #define DEFINE_REDIRECT_RENDER_THREAD(FunctionName) \
 void PrimitiveSceneProxy::FunctionName ## _GameThread() \

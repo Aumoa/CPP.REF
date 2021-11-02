@@ -115,6 +115,16 @@ IRHIFactory* SWindowsApplication::CreateFactory()
 	return NewObject<SDXGIFactory>(this);
 }
 
+IPlatformKeyboard& SWindowsApplication::GetPlatformKeyboard()
+{
+	return SWindowsPlatformKeyboard::Get();
+}
+
+IPlatformMouse& SWindowsApplication::GetPlatformMouse()
+{
+	return SWindowsPlatformMouse::Get();
+}
+
 HWND SWindowsApplication::GetWindowHandle()
 {
 	return hWnd;

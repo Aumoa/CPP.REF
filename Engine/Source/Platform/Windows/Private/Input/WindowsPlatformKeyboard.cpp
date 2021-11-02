@@ -180,7 +180,7 @@ void SWindowsPlatformKeyboard::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 // Public constructor.
-SWindowsPlatformKeyboard::SWindowsPlatformKeyboard() noexcept(false)
+SWindowsPlatformKeyboard::SWindowsPlatformKeyboard()
     : pImpl(std::make_unique<Impl>(this))
 {
 }
@@ -198,7 +198,7 @@ KeyboardState SWindowsPlatformKeyboard::GetState()
 }
 
 
-void SWindowsPlatformKeyboard::Reset() noexcept
+void SWindowsPlatformKeyboard::Reset()
 {
     pImpl->Reset();
 }

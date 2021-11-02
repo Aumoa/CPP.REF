@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 interface IRHIFactory;
+interface IPlatformKeyboard;
+interface IPlatformMouse;
 
 interface IApplicationInterface : implements SObject
 {
@@ -24,6 +26,8 @@ interface IApplicationInterface : implements SObject
 	virtual std::wstring GetTitle() = 0;
 
 	virtual IRHIFactory* CreateFactory() = 0;
+	virtual IPlatformKeyboard& GetPlatformKeyboard() = 0;
+	virtual IPlatformMouse& GetPlatformMouse() = 0;
 
 	DECLARE_MULTICAST_DELEGATE(IdleDelegate);
 	IdleDelegate Idle;

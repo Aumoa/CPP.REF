@@ -46,19 +46,20 @@ public:
 
 	virtual IRHIDeviceContext* GetImmediateContext() override;
 	virtual IRHIDeviceContext* CreateDeviceContext() override;
-	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData) override;
-	virtual IRHIBuffer* CreateBuffer(const RHIBufferDesc& desc, const RHISubresourceData* initialData) override;
-	virtual IRHIShader* CompileMaterial(SMaterial* material, SVertexFactory* vertexDeclaration) override;
-	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 count) override;
-	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 count) override;
-	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 count) override;
-	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout) override;
+	virtual IRHIDeviceContext2D* CreateDeviceContext2D() override;
+	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& Desc, const RHISubresourceData* InitialData) override;
+	virtual IRHIBuffer* CreateBuffer(const RHIBufferDesc& Desc, const RHISubresourceData* InitialData) override;
+	virtual IRHIShader* CompileShader(SMaterial* Material) override;
+	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 Count) override;
+	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 Count) override;
+	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 Count) override;
+	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* Format, std::wstring_view Text, const Vector2& Layout) override;
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
 
 	ID3D12CommandAllocator* GetThreadPrimaryAllocator();
-	SD3D12DescriptorHeap* GetThreadPrimarySrvHeap(int32 count);
-	SD3D12DescriptorHeap* GetThreadPrimarySamplerHeap(int32 count);
+	SD3D12DescriptorHeap* GetThreadPrimarySrvHeap(int32 Count);
+	SD3D12DescriptorHeap* GetThreadPrimarySamplerHeap(int32 Count);
 	void MarkPendingAllocatorAndHeaps(uint64 fenceValue);
 
 public:

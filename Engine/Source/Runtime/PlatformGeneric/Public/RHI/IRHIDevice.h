@@ -26,10 +26,10 @@ interface IRHIDevice : implements IRHIFactoryChild
 	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& InDesc, const RHISubresourceData* InitialData) = 0;
 	virtual IRHIBuffer* CreateBuffer(const RHIBufferDesc& InDesc, const RHISubresourceData* InitialData) = 0;
 	virtual IRHIShader* CompileShader(SMaterial* Material) = 0;
-	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 count) = 0;
-	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 count) = 0;
-	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 count) = 0;
-	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout) = 0;
+	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 Count) = 0;
+	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 Count) = 0;
+	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 Count) = 0;
+	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* Format, std::wstring_view Text, const Vector2& Layout) = 0;
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 };

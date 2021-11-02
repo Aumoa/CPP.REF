@@ -10,6 +10,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "Ticking/TickTaskLevelManager.h"
+#include "Application/SlateApplication.h"
 
 DEFINE_LOG_CATEGORY(LogWorld);
 
@@ -45,6 +46,11 @@ EWorldType SWorld::GetWorldType()
 SScene* SWorld::GetScene()
 {
 	return _Scene;
+}
+
+SLocalPlayer* SWorld::GetLocalPlayer()
+{
+	return GEngine->GetSlateApplication()->GetLocalPlayer();
 }
 
 SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)

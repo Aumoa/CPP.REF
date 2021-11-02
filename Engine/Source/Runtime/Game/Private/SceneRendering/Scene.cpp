@@ -6,7 +6,7 @@
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHIBuffer.h"
 #include "RHI/IRHIDevice.h"
-#include "GameThreads/RenderThread.h"
+#include "RenderThread.h"
 #include "Components/PrimitiveComponent.h"
 #include "Scene/PrimitiveSceneProxy.h"
 

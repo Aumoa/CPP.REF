@@ -1,19 +1,19 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "SceneRendering/SlateRenderer.h"
-#include "Shaders/SlateShader/SlateShader.h"
+//#include "Shaders/SlateShader/SlateShader.h"
 #include "RHI/IRHIDeviceContext.h"
 
-SlateRenderer::SlateRenderer(SceneRenderTarget& InRenderTarget, SSlateShader* SlateShader, const SSlateShader::InitElementContext* InitContext) : Super(InRenderTarget)
-	, Shader(SlateShader)
-	, InitContext(InitContext)
-{
-}
-
-void SlateRenderer::OnPopulateCommandLists(IRHIDeviceContext* Context)
-{
-	Context->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
-
-	const Vector2 ViewportSz(RenderTarget.Viewport.Width, RenderTarget.Viewport.Height);
-	Shader->RenderElements(Context, ViewportSz, *InitContext);
-}
+//SlateRenderer::SlateRenderer(SceneRenderTarget& InRenderTarget, SSlateShader* SlateShader, const SSlateShader::InitElementContext* InitContext) : Super(InRenderTarget)
+//	, Shader(SlateShader)
+//	, InitContext(InitContext)
+//{
+//}
+//
+//void SlateRenderer::OnPopulateCommandLists(IRHIDeviceContext* Context)
+//{
+//	Context->IASetPrimitiveTopology(ERHIPrimitiveTopology::TriangleStrip);
+//
+//	const Vector2 ViewportSz(RenderTarget.Viewport.Width, RenderTarget.Viewport.Height);
+//	Shader->RenderElements(Context, ViewportSz, *InitContext);
+//}

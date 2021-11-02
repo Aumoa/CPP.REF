@@ -14,7 +14,7 @@
 #include "DXGIFactory.h"
 #include "DWriteTextFormat.h"
 #include "DWriteTextLayout.h"
-#include "VertexFactory.h"
+#include "D2D1DeviceContext.h"
 #include "Materials/Material.h"
 #include "Threading/Thread.h"
 
@@ -46,11 +46,18 @@ IRHIDeviceContext* SD3D12Device::CreateDeviceContext()
 	return NewObject<SD3D12CommandList>(_factory, this);
 }
 
+IRHIDeviceContext2D* SD3D12Device::CreateDeviceContext2D()
+{
+	ComPtr<ID2D1DeviceContext> DeviceContext;
+	HR(_interop.Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &DeviceContext));
+	return NewObject<SD2D1DeviceContext>(_factory, this, DeviceContext.Get());
+}
+
 IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData)
 {
 	if (desc.Usage == ERHIBufferUsage::Immutable && initialData == nullptr)
 	{
-		SE_LOG(LogDirectX, Fatal, L"If buffer usage is ERHIBufferUsage::Immutable, you must specify initial data for initialize texture data.");
+		SE_LOG(LogWindows, Fatal, L"If buffer usage is ERHIBufferUsage::Immutable, you must specify initial data for initialize texture data.");
 		return nullptr;
 	}
 
@@ -135,7 +142,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 {
 	if (desc.Usage == ERHIBufferUsage::Immutable && initialData == nullptr)
 	{
-		SE_LOG(LogDirectX, Fatal, L"If buffer usage is ERHIBufferUsage::Immutable, you must specify initial data for initialize buffer data.");
+		SE_LOG(LogWindows, Fatal, L"If buffer usage is ERHIBufferUsage::Immutable, you must specify initial data for initialize buffer data.");
 		return nullptr;
 	}
 
@@ -195,246 +202,247 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 	return NewObject<SD3D12Buffer>(_factory, this, std::move(buffer), std::move(uploadBuf), desc);
 }
 
-IRHIShader* SD3D12Device::CompileMaterial(SMaterial* material, SVertexFactory* vertexDeclaration)
+IRHIShader* SD3D12Device::CompileShader(SMaterial* material)
 {
-	std::span<uint8 const> vsBytecode = material->CompileVS();
-	std::span<uint8 const> psBytecode = material->CompilePS();
+	//std::span<uint8 const> vsBytecode = material->CompileVS();
+	//std::span<uint8 const> psBytecode = material->CompilePS();
 
-	std::vector<RHIShaderParameterElement> shaderParameters = material->GetShaderParameterDeclaration();
-	std::vector<D3D12_ROOT_PARAMETER> rootParameters;
+	//std::vector<RHIShaderParameterElement> shaderParameters = material->GetShaderParameterDeclaration();
+	//std::vector<D3D12_ROOT_PARAMETER> rootParameters;
 
-	std::vector<std::vector<D3D12_DESCRIPTOR_RANGE>> rangesCollection;
+	//std::vector<std::vector<D3D12_DESCRIPTOR_RANGE>> rangesCollection;
 
-	for (size_t i = 0; i < shaderParameters.size(); ++i)
-	{
-		RHIShaderParameterElement& myParam = shaderParameters[i];
-		switch (myParam.Type)
-		{
-		case ERHIShaderParameterType::ParameterCollection:
-		case ERHIShaderParameterType::ParameterCollection_CameraConstants:
-			rootParameters.emplace_back() =
-			{
-				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
-				.Descriptor =
-				{
-					.ShaderRegister = myParam.ParameterCollection.ShaderRegister,
-					.RegisterSpace = myParam.ParameterCollection.RegisterSpace
-				},
-				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-			};
-			break;
-		case ERHIShaderParameterType::ScalarParameterConstants:
-			rootParameters.emplace_back() =
-			{
-				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
-				.Constants =
-				{
-					.ShaderRegister = myParam.ScalarConstantsParameter.ShaderRegister,
-					.RegisterSpace = myParam.ScalarConstantsParameter.RegisterSpace,
-					.Num32BitValues = myParam.ScalarConstantsParameter.Num32Bits
-				},
-				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-			};
-			break;
-		case ERHIShaderParameterType::StructuredBuffer:
-			rootParameters.emplace_back() =
-			{
-				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-				.Descriptor =
-				{
-					.ShaderRegister = myParam.StructuredBuffer.ShaderRegister,
-					.RegisterSpace = 0
-				},
-				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-			};
-			break;
-		case ERHIShaderParameterType::DescriptorTable:
-		{
-			auto& ranges = rangesCollection.emplace_back();
+	//for (size_t i = 0; i < shaderParameters.size(); ++i)
+	//{
+	//	RHIShaderParameterElement& myParam = shaderParameters[i];
+	//	switch (myParam.Type)
+	//	{
+	//	case ERHIShaderParameterType::ParameterCollection:
+	//	case ERHIShaderParameterType::ParameterCollection_CameraConstants:
+	//		rootParameters.emplace_back() =
+	//		{
+	//			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
+	//			.Descriptor =
+	//			{
+	//				.ShaderRegister = myParam.ParameterCollection.ShaderRegister,
+	//				.RegisterSpace = myParam.ParameterCollection.RegisterSpace
+	//			},
+	//			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+	//		};
+	//		break;
+	//	case ERHIShaderParameterType::ScalarParameterConstants:
+	//		rootParameters.emplace_back() =
+	//		{
+	//			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
+	//			.Constants =
+	//			{
+	//				.ShaderRegister = myParam.ScalarConstantsParameter.ShaderRegister,
+	//				.RegisterSpace = myParam.ScalarConstantsParameter.RegisterSpace,
+	//				.Num32BitValues = myParam.ScalarConstantsParameter.Num32Bits
+	//			},
+	//			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+	//		};
+	//		break;
+	//	case ERHIShaderParameterType::StructuredBuffer:
+	//		rootParameters.emplace_back() =
+	//		{
+	//			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
+	//			.Descriptor =
+	//			{
+	//				.ShaderRegister = myParam.StructuredBuffer.ShaderRegister,
+	//				.RegisterSpace = 0
+	//			},
+	//			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+	//		};
+	//		break;
+	//	case ERHIShaderParameterType::DescriptorTable:
+	//	{
+	//		auto& ranges = rangesCollection.emplace_back();
 
-			auto& tableRef = myParam.DescriptorTable;
-			ranges.reserve((size_t)tableRef.NumDescriptorRanges);
-			for (size_t i = 0; i < tableRef.NumDescriptorRanges; ++i)
-			{
-				auto& rangeRef = tableRef.pDescriptorRanges[i];
+	//		auto& tableRef = myParam.DescriptorTable;
+	//		ranges.reserve((size_t)tableRef.NumDescriptorRanges);
+	//		for (size_t i = 0; i < tableRef.NumDescriptorRanges; ++i)
+	//		{
+	//			auto& rangeRef = tableRef.pDescriptorRanges[i];
 
-				ranges.emplace_back() =
-				{
-					.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)rangeRef.RangeType,
-					.NumDescriptors = rangeRef.NumDescriptors,
-					.BaseShaderRegister = rangeRef.BaseShaderRegister,
-					.RegisterSpace = rangeRef.RegisterSpace,
-					.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
-				};
-			}
+	//			ranges.emplace_back() =
+	//			{
+	//				.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)rangeRef.RangeType,
+	//				.NumDescriptors = rangeRef.NumDescriptors,
+	//				.BaseShaderRegister = rangeRef.BaseShaderRegister,
+	//				.RegisterSpace = rangeRef.RegisterSpace,
+	//				.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
+	//			};
+	//		}
 
-			rootParameters.emplace_back() =
-			{
-				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-				.DescriptorTable =
-				{
-					.NumDescriptorRanges = tableRef.NumDescriptorRanges,
-					.pDescriptorRanges = ranges.data()
-				},
-				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-			};
-			break;
-		}
-		default:
-			SE_LOG(LogDirectX, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
-			rootParameters.emplace_back();
-			break;
-		}
-	}
+	//		rootParameters.emplace_back() =
+	//		{
+	//			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+	//			.DescriptorTable =
+	//			{
+	//				.NumDescriptorRanges = tableRef.NumDescriptorRanges,
+	//				.pDescriptorRanges = ranges.data()
+	//			},
+	//			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+	//		};
+	//		break;
+	//	}
+	//	default:
+	//		SE_LOG(LogWindows, Error, L"Shader parameter type({}) is corrupted.", (int32)myParam.Type);
+	//		rootParameters.emplace_back();
+	//		break;
+	//	}
+	//}
 
-	std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers;
-	staticSamplers.emplace_back() =
-	{
-		.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR,
-		.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-		.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-		.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-		.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
-		.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
-		.ShaderRegister = 0,
-		.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
-	};
-	staticSamplers.emplace_back() =
-	{
-		.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT,
-		.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-		.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-		.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
-		.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
-		.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
-		.ShaderRegister = 1,
-		.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
-	};
+	//std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers;
+	//staticSamplers.emplace_back() =
+	//{
+	//	.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+	//	.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	//	.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	//	.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	//	.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
+	//	.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
+	//	.ShaderRegister = 0,
+	//	.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
+	//};
+	//staticSamplers.emplace_back() =
+	//{
+	//	.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT,
+	//	.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	//	.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	//	.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	//	.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
+	//	.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
+	//	.ShaderRegister = 1,
+	//	.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
+	//};
 
-	D3D12_ROOT_SIGNATURE_DESC rsd =
-	{
-		.NumParameters = (UINT)rootParameters.size(),
-		.pParameters = rootParameters.empty() ? nullptr : rootParameters.data(),
-		.NumStaticSamplers = (UINT)staticSamplers.size(),
-		.pStaticSamplers = staticSamplers.data(),
-		.Flags
-			= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
-	};
+	//D3D12_ROOT_SIGNATURE_DESC rsd =
+	//{
+	//	.NumParameters = (UINT)rootParameters.size(),
+	//	.pParameters = rootParameters.empty() ? nullptr : rootParameters.data(),
+	//	.NumStaticSamplers = (UINT)staticSamplers.size(),
+	//	.pStaticSamplers = staticSamplers.data(),
+	//	.Flags
+	//		= D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+	//		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+	//		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+	//		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+	//};
 
-	ComPtr<ID3DBlob> blob, error;
-	HRESULT hr = D3D12SerializeRootSignature(&rsd, D3D_ROOT_SIGNATURE_VERSION_1_0, &blob, &error);
-	if (FAILED(hr))
-	{
-		// Compile error detected. Print error message and throw fatal exception.
-		if (error)
-		{
-			SE_LOG(LogDirectX, Fatal,
-				L"Could not compile root signature with follow reason:\n{}",
-				StringUtils::AsUnicode((const char*)error->GetBufferPointer()));
-		}
-		else
-		{
-			HR(hr);
-		}
-	}
+	//ComPtr<ID3DBlob> blob, error;
+	//HRESULT hr = D3D12SerializeRootSignature(&rsd, D3D_ROOT_SIGNATURE_VERSION_1_0, &blob, &error);
+	//if (FAILED(hr))
+	//{
+	//	// Compile error detected. Print error message and throw fatal exception.
+	//	if (error)
+	//	{
+	//		SE_LOG(LogWindows, Fatal,
+	//			L"Could not compile root signature with follow reason:\n{}",
+	//			StringUtils::AsUnicode((const char*)error->GetBufferPointer()));
+	//	}
+	//	else
+	//	{
+	//		HR(hr);
+	//	}
+	//}
 
-	ComPtr<ID3D12RootSignature> rs;
-	HR(_device->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&rs)));
+	//ComPtr<ID3D12RootSignature> rs;
+	//HR(_device->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&rs)));
 
-	// Make vertex declaration to input element.
-	std::vector<RHIVertexElement> declaration;
-	std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
-	if (vertexDeclaration)
-	{
-		declaration = vertexDeclaration->GetVertexDeclaration();
-		inputElements.resize(declaration.size());
+	//// Make vertex declaration to input element.
+	//std::vector<RHIVertexElement> declaration;
+	//std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
+	//if (vertexDeclaration)
+	//{
+	//	declaration = vertexDeclaration->GetVertexDeclaration();
+	//	inputElements.resize(declaration.size());
 
-		for (size_t i = 0; i < inputElements.size(); ++i)
-		{
-			auto& element = declaration[i];
+	//	for (size_t i = 0; i < inputElements.size(); ++i)
+	//	{
+	//		auto& element = declaration[i];
 
-			inputElements[i] =
-			{
-				.SemanticName = element.SemanticName.c_str(),
-				.SemanticIndex = element.SemanticIndex,
-				.Format = (DXGI_FORMAT)element.Format,
-				.InputSlot = element.InputSlot,
-				.AlignedByteOffset = element.AlignedByteOffset,
-				.InputSlotClass = (D3D12_INPUT_CLASSIFICATION)element.InputSlotClass,
-				.InstanceDataStepRate = 0
-			};
-		}
-	}
+	//		inputElements[i] =
+	//		{
+	//			.SemanticName = element.SemanticName.c_str(),
+	//			.SemanticIndex = element.SemanticIndex,
+	//			.Format = (DXGI_FORMAT)element.Format,
+	//			.InputSlot = element.InputSlot,
+	//			.AlignedByteOffset = element.AlignedByteOffset,
+	//			.InputSlotClass = (D3D12_INPUT_CLASSIFICATION)element.InputSlotClass,
+	//			.InstanceDataStepRate = 0
+	//		};
+	//	}
+	//}
 
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psd =
-	{
-		.pRootSignature = rs.Get(),
-		.VS =
-		{
-			.pShaderBytecode = vsBytecode.data(),
-			.BytecodeLength = vsBytecode.size()
-		},
-		.PS =
-		{
-			.pShaderBytecode = psBytecode.data(),
-			.BytecodeLength = psBytecode.size()
-		},
-		.BlendState =
-		{
-			.AlphaToCoverageEnable = FALSE,
-			.IndependentBlendEnable = FALSE,
-			.RenderTarget =
-			{
-				// [0]
-				{
-					.BlendEnable = TRUE,
-					.LogicOpEnable = FALSE,
-					.SrcBlend = D3D12_BLEND_SRC_ALPHA,
-					.DestBlend = D3D12_BLEND_INV_SRC_ALPHA,
-					.BlendOp = D3D12_BLEND_OP_ADD,
-					.SrcBlendAlpha = D3D12_BLEND_ONE,
-					.DestBlendAlpha = D3D12_BLEND_ZERO,
-					.BlendOpAlpha = D3D12_BLEND_OP_ADD,
-					.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
-				}
-			}
-		},
-		.SampleMask = 0xFFFFFFFF,
-		.RasterizerState =
-		{
-			.FillMode = D3D12_FILL_MODE_SOLID,
-			.CullMode = D3D12_CULL_MODE_NONE,
-		},
-		.DepthStencilState =
-		{
-			.DepthEnable = TRUE,
-			.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-			.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
-			.StencilEnable = FALSE
-		},
-		.InputLayout =
-		{
-			.pInputElementDescs = inputElements.empty() ? nullptr : inputElements.data(),
-			.NumElements = (UINT)inputElements.size()
-		},
-		.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-		.NumRenderTargets = 1,
-		.RTVFormats =
-		{
-			// [0]
-			DXGI_FORMAT_B8G8R8A8_UNORM
-		},
-		.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
-		.SampleDesc = { 1, 0 },
-	};
+	//D3D12_GRAPHICS_PIPELINE_STATE_DESC psd =
+	//{
+	//	.pRootSignature = rs.Get(),
+	//	.VS =
+	//	{
+	//		.pShaderBytecode = vsBytecode.data(),
+	//		.BytecodeLength = vsBytecode.size()
+	//	},
+	//	.PS =
+	//	{
+	//		.pShaderBytecode = psBytecode.data(),
+	//		.BytecodeLength = psBytecode.size()
+	//	},
+	//	.BlendState =
+	//	{
+	//		.AlphaToCoverageEnable = FALSE,
+	//		.IndependentBlendEnable = FALSE,
+	//		.RenderTarget =
+	//		{
+	//			// [0]
+	//			{
+	//				.BlendEnable = TRUE,
+	//				.LogicOpEnable = FALSE,
+	//				.SrcBlend = D3D12_BLEND_SRC_ALPHA,
+	//				.DestBlend = D3D12_BLEND_INV_SRC_ALPHA,
+	//				.BlendOp = D3D12_BLEND_OP_ADD,
+	//				.SrcBlendAlpha = D3D12_BLEND_ONE,
+	//				.DestBlendAlpha = D3D12_BLEND_ZERO,
+	//				.BlendOpAlpha = D3D12_BLEND_OP_ADD,
+	//				.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
+	//			}
+	//		}
+	//	},
+	//	.SampleMask = 0xFFFFFFFF,
+	//	.RasterizerState =
+	//	{
+	//		.FillMode = D3D12_FILL_MODE_SOLID,
+	//		.CullMode = D3D12_CULL_MODE_NONE,
+	//	},
+	//	.DepthStencilState =
+	//	{
+	//		.DepthEnable = TRUE,
+	//		.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
+	//		.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
+	//		.StencilEnable = FALSE
+	//	},
+	//	.InputLayout =
+	//	{
+	//		.pInputElementDescs = inputElements.empty() ? nullptr : inputElements.data(),
+	//		.NumElements = (UINT)inputElements.size()
+	//	},
+	//	.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+	//	.NumRenderTargets = 1,
+	//	.RTVFormats =
+	//	{
+	//		// [0]
+	//		DXGI_FORMAT_B8G8R8A8_UNORM
+	//	},
+	//	.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
+	//	.SampleDesc = { 1, 0 },
+	//};
 
-	ComPtr<ID3D12PipelineState> ps;
-	HR(_device->CreateGraphicsPipelineState(&psd, IID_PPV_ARGS(&ps)));
+	//ComPtr<ID3D12PipelineState> ps;
+	//HR(_device->CreateGraphicsPipelineState(&psd, IID_PPV_ARGS(&ps)));
 
-	return NewObject<SD3D12Shader>(_factory, this, std::move(rs), std::move(ps));
+	//return NewObject<SD3D12Shader>(_factory, this, std::move(rs), std::move(ps));
+	return nullptr;
 }
 
 IRHIRenderTargetView* SD3D12Device::CreateRenderTargetView(int32 count)

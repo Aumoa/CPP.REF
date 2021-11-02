@@ -8,7 +8,7 @@
 #include "Assets/Texture2D.h"
 #include "Assets/StaticMesh.h"
 #include "Assets/Parser/AssimpParser.h"
-#include "Shaders/ColorShader/ColorVertexFactory.h"
+//#include "Shaders/ColorShader/ColorVertexFactory.h"
 #include <stack>
 #include <queue>
 
@@ -126,15 +126,15 @@ void SGameAssetSystem::SearchDirectory(const std::filesystem::path& searchDirect
 
 SStaticMesh* SGameAssetSystem::LoadStaticMesh(const std::filesystem::path& assetPath)
 {
-	SAssimpParser* Parser = NewObject<SAssimpParser>(GEngine, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetColorVertexFactory());
-	if (Parser->TryParse(assetPath))
-	{
-		return Parser->GetStaticMesh();
-	}
-	else
-	{
+	//SAssimpParser* Parser = NewObject<SAssimpParser>(GEngine, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetColorVertexFactory());
+	//if (Parser->TryParse(assetPath))
+	//{
+	//	return Parser->GetStaticMesh();
+	//}
+	//else
+	//{
 		return nullptr;
-	}
+	//}
 }
 
 STexture2D* SGameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath)

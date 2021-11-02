@@ -3,15 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Shaders/SlateShader/SlateShader.h"
 
-interface IFrameworkView;
+interface IApplicationInterface;
 interface IRHIDeviceContext;
-class PaintArgs;
 class SLocalPlayer;
 class SWindow;
 class SceneRenderContext;
-class SlateWindowElementList;
 
 class GAME_API SSlateApplication : implements SObject
 {
@@ -22,13 +19,13 @@ private:
 	SWindow* CoreWindow = nullptr;
 	IRHIDeviceContext* DeviceContext = nullptr;
 
-	SSlateShader::InitElementContext InitContext_RenderThread;
-
 public:
 	SSlateApplication();
 	~SSlateApplication() override;
 
-	void InitWindow(SLocalPlayer* InLocalPlayer, IFrameworkView* InFrameworkView);
+	void Init(IApplicationInterface* InApplication);
 	void TickAndPaint(float InDeltaTime);
 	void PopulateCommandLists(SceneRenderContext& RenderContext);
+
+	SLocalPlayer* GetLocalPlayer();
 };

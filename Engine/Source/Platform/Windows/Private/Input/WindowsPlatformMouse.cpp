@@ -485,7 +485,7 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 #pragma warning( disable : 4355 )
 
 // Public constructor.
-SWindowsPlatformMouse::SWindowsPlatformMouse() noexcept(false)
+SWindowsPlatformMouse::SWindowsPlatformMouse()
     : pImpl(std::make_unique<Impl>(this))
 {
 }
@@ -503,7 +503,7 @@ MouseState SWindowsPlatformMouse::GetState()
 }
 
 
-void SWindowsPlatformMouse::ResetScrollWheelValue() noexcept
+void SWindowsPlatformMouse::ResetScrollWheelValue()
 {
     pImpl->ResetScrollWheelValue();
 }

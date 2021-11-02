@@ -33,10 +33,12 @@ public:
 	/// <summary>
 	/// Get application name for setting framework title.
 	/// </summary>
-	virtual std::wstring GetApplicationName() const;
+	virtual std::wstring GetApplicationName();
 
 	/// <summary>
 	/// Get local player.
 	/// </summary>
-	SLocalPlayer* GetLocalPlayer() const;
+	SLocalPlayer* GetLocalPlayer();
+
+	virtual SWorld* GetWorld() override;
 };
