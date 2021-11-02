@@ -90,7 +90,7 @@ void SObject::CleanupSubobjects()
 {
 	for (size_t i = 0; i < Subobjects.size(); ++i)
 	{
-		if (Subobjects[i]->Outer == this)
+		if (Subobjects[i] && Subobjects[i]->Outer == this)
 		{
 			Subobjects[i]->Outer = nullptr;
 		}
