@@ -712,7 +712,7 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 
 			ItemGroup = NewElement(Project, "ItemGroup");
 			{
-				for (auto Referenced : Runtime->PublicReferences)
+				auto ProjectReferenceBody = [&](auto Referenced)
 				{
 					std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
 					for (auto Split : StringUtils::Split(Referenced->Metadata->Path.c_str(), L".", true, true))
@@ -725,7 +725,10 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 					{
 						NewElement(ProjectReference, "Project", std::format("{{{}}}", WCHAR_TO_ANSI(Referenced->XmlFile.Guid)));
 					}
-				}
+				};
+
+				std::for_each(Runtime->PublicReferences.begin(), Runtime->PublicReferences.end(), ProjectReferenceBody);
+				std::for_each(Runtime->PrivateReferences.begin(), Runtime->PrivateReferences.end(), ProjectReferenceBody);
 			}
 
 			NewElementImport(Project, "$(VCTargetsPath)\\Microsoft.Cpp.targets");

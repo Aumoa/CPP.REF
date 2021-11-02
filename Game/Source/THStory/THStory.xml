@@ -7,5 +7,6 @@
 		<Item Name="Core" Access="Public" />
 		<Item Name="RenderCore" Access="Public" />
 		<Item Name="Game" Access="Public" />
+		<Item Name="Windows" />
 	</ReferencedProjects>
 </ProjectInfo>
