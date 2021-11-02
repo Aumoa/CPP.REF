@@ -4,8 +4,13 @@
 		<Item RelativePath="Private" />
 	</IncludePaths>
 	<DisableWarnings>
+		<!-- Warning: 'Class1': inherits 'Class2::Member' via dominance. -->
 		<Item Number="4250" Access="Public" />
+		<!-- Warning: 'Type': class 'Type1' needs to have dll-interface to be used by clients of class 'Type2'. -->
 		<Item Number="4251" Access="Public" />
+		<!-- Warning: Macro expansion producing 'defined' has undefined behavior. -->
 		<Item Number="5105" Access="Public" />
+		<!-- Warning: non DLL-interface class 'Class1' used as base for DLL-interface class 'Class2'. -->
+		<Item Number="4275" Access="Public" />
 	</DisableWarnings>
 </ProjectInfo>

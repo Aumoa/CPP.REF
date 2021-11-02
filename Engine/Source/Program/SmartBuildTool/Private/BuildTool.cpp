@@ -34,6 +34,16 @@ int32 SBuildTool::GuardedMain(std::vector<std::wstring_view> InArgs)
 		{
 			SolutionName = L"Engine";
 		}
+
+		if (size_t Idx = CommandLine.GetArgument(L"--FirstProject"); Idx != -1)
+		{
+			std::optional Value = CommandLine.GetArgument(Idx + 1);
+			FirstProjectName = Value.value_or(L"");
+		}
+		else
+		{
+			FirstProjectName = L"";
+		}
 	}
 
 	Timer.DoCalc();
@@ -915,15 +925,25 @@ int32 SBuildTool::GenerateSolutionFile()
 
 	for (auto& [Key, Value] : SolutionDirectories)
 	{
-		Builder << std::format(L"Project(\"{{{0}}}\") = \"{1}\", \"{1}\", \"{{{2}}}\"", SolutionDirectoryGuid, Key, Value.Guid) << std::endl;
+		Builder << std::format(LR"[](Project("{{{0}}}") = "{1}", "{1}", "{{{2}}}")[]", SolutionDirectoryGuid, Key, Value.Guid) << std::endl;
 		Builder << L"EndProject" << std::endl;
 	}
 
 	// Generate C++ projects.
+	std::vector<std::wstring> ProjectsSort;
+	ProjectsSort.reserve(ProjectsRuntime.size());
 	for (auto& [Key, Value] : ProjectsRuntime)
 	{
-		Builder << std::format(L"Project(\"{{{0}}}\") = \"{1}\", \"{2}.vcxproj\", \"{{{3}}}\"", CppProjectGuid, Key, Value.XmlFile.XmlPath.wstring(), Value.XmlFile.Guid) << std::endl;
-		Builder << L"EndProject" << std::endl;
+		std::wstring ProjectDeclare = std::format(LR"[](Project("{{{0}}}") = "{1}", "{2}.vcxproj", "{{{3}}}
+EndProject")[]", CppProjectGuid, Key, Value.XmlFile.XmlPath.wstring(), Value.XmlFile.Guid);
+
+		auto Where = Key == FirstProjectName ? ProjectsSort.begin() : ProjectsSort.end();
+		ProjectsSort.emplace(Where, ProjectDeclare);
+	}
+
+	for (auto& Declare : ProjectsSort)
+	{
+		Builder << Declare << std::endl;
 	}
 
 	struct BuildConfiguration

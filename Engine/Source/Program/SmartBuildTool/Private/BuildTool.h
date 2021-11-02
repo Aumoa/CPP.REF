@@ -56,6 +56,7 @@ private:
 
 private:
 	std::wstring SolutionName;
+	std::wstring FirstProjectName;
 	std::vector<ProjectBuildMetadata> ProjectsMetadata;
 	std::map<std::wstring, ProjectBuildRuntime> ProjectsRuntime;
 
