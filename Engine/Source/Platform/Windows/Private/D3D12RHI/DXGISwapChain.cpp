@@ -53,7 +53,7 @@ IRHITexture2D* SDXGISwapChain::GetBuffer(int32 index)
 			.InitialState = ERHIResourceStates::Present
 		};
 
-		buf = NewObject<SD3D12Texture2D>(_factory, _device, std::move(resource), ComPtr<ID3D12Resource>(), D3D12_PLACED_SUBRESOURCE_FOOTPRINT(), dest);
+		buf = NewObject<SD3D12Texture2D>(_factory, _device, std::move(resource), ComPtr<ID3D12Resource>(), D3D12_PLACED_SUBRESOURCE_FOOTPRINT(), dest, false);
 	}
 
 	return buf;

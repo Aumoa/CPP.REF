@@ -9,12 +9,17 @@ interface IRHIFactory;
 interface IRHIDevice;
 interface IRHIDeviceContext;
 interface IApplicationInterface;
+interface IRHIDeviceContext2D;
 class SColorVertexFactory;
 class SColorShader;
 class STransparentShader;
 class SSlateShader;
 class SSlateApplication;
 class SSwapChainRenderTarget;
+class SColorRenderTarget;
+
+// TEST
+interface IRHISolidColorBrush;
 
 class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 {
@@ -30,6 +35,12 @@ private:
 	SSlateShader* SlateShader = nullptr;
 
 	SSwapChainRenderTarget* SwapChainRT = nullptr;
+	IRHIDeviceContext* RenderContext = nullptr;
+	IRHIDeviceContext2D* DeviceContext2D = nullptr;
+	SColorRenderTarget* ColorRenderTarget = nullptr;
+
+	// TEST
+	IRHISolidColorBrush* SolidBrush = nullptr;
 
 public:
 	SGameRenderSystem();

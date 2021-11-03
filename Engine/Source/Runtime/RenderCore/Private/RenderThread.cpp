@@ -85,8 +85,13 @@ void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<v
 	_WaitingWorks.Works.emplace_back(std::move(InWorkBody));
 }
 
-void RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork)
+void RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork)
 {
+	if (bWaitPreviousWork)
+	{
+		WaitForLastWorks();
+	}
+
 	std::unique_lock lock(_Thread.CriticalSection);
 	_WaitingWorks.CompletedWork = InCompletionWork;
 	_ExecutingWorks.SwapExecute(InDeviceContext, _WaitingWorks);

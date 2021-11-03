@@ -18,6 +18,7 @@ interface IApplicationInterface : implements SObject
 
 	virtual void Start() = 0;
 	virtual Vector2N GetViewportSize() = 0;
+	virtual float GetDpi();
 
 	virtual void SetTickMode(ETickMode InTickMode) = 0;
 	virtual ETickMode GetTickMode() = 0;

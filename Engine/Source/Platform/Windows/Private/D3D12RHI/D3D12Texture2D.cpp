@@ -3,8 +3,9 @@
 #include "D3D12Texture2D.h"
 #include "D3D12CommandList.h"
 #include "D3D12Device.h"
+#include "IApplicationInterface.h"
 
-SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc) : Super(factory, device, resource, uploadHeap)
+SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc, bool bAllowInteropResource) : Super(factory, device, resource, uploadHeap)
 	, _resource(std::move(resource))
 	, _uploadHeap(std::move(uploadHeap))
 	, _layout(layout)
@@ -13,6 +14,33 @@ SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, Co
 	if (_uploadHeap)
 	{
 		_totalBytes = _uploadHeap->GetDesc().Width;
+	}
+
+	if (bAllowInteropResource)
+	{
+		auto DevInt = _device->Get<ID3D11On12Device>();
+
+		auto Flags = (D3D12_RESOURCE_FLAGS)desc.Flags;
+		D3D11_RESOURCE_FLAGS BindFlags =
+		{
+			.BindFlags = GetInteropBindFlag(Flags)
+		};
+
+		D3D12_RESOURCE_STATES InteropInitialState = (Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) != 0 ? D3D12_RESOURCE_STATE_RENDER_TARGET : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		HR(DevInt->CreateWrappedResource(_resource.Get(), &BindFlags, InteropInitialState, (D3D12_RESOURCE_STATES)desc.InitialState, IID_PPV_ARGS(&WrappedResource)));
+
+		ComPtr<IDXGISurface> Surf;
+		HR(WrappedResource.As(&Surf));
+
+		D2D1_BITMAP_OPTIONS Options = D2D1_BITMAP_OPTIONS_NONE;
+		if (Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET)
+		{
+			Options = D2D1_BITMAP_OPTIONS_TARGET;
+		}
+
+		float dpiScale = IApplicationInterface::Get().GetDpi();
+		auto DevCtx2D = _device->Get<ID2D1DeviceContext>();
+		HR(DevCtx2D->CreateBitmapFromDxgiSurface(Surf.Get(), D2D1::BitmapProperties1(Options, D2D1::PixelFormat((DXGI_FORMAT)desc.Format, D2D1_ALPHA_MODE_PREMULTIPLIED), dpiScale, dpiScale), &Bitmap));
 	}
 }
 

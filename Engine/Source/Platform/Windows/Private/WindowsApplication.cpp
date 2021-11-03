@@ -78,6 +78,11 @@ Vector2N SWindowsApplication::GetViewportSize()
 	return Vector2N(Rc.right - Rc.left, Rc.bottom - Rc.top);
 }
 
+float SWindowsApplication::GetDpi()
+{
+	return (float)GetDpiForWindow(hWnd);
+}
+
 void SWindowsApplication::SetTickMode(ETickMode InTickMode)
 {
 	if (TickMode != InTickMode)

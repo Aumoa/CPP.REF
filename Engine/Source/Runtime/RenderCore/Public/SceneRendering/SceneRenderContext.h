@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 
 interface IRHIDeviceContext;
-class SceneRenderTarget;
+class SSceneRenderTargetInterface;
 
-class GAME_API SceneRenderContext
+class SceneRenderContext
 {
 	GENERATED_BODY(SceneRenderContext)
 
 public:
 	IRHIDeviceContext* const DeviceContext;
-	SceneRenderTarget* const RenderTarget;
+	SSceneRenderTargetInterface* const RenderTarget;
 
 public:
-	SceneRenderContext(IRHIDeviceContext* InDeviceContext, SceneRenderTarget* InRenderTarget)
+	SceneRenderContext(IRHIDeviceContext* InDeviceContext, SSceneRenderTargetInterface* InRenderTarget)
 		: DeviceContext(InDeviceContext)
 		, RenderTarget(InRenderTarget)
 	{

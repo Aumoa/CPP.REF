@@ -154,6 +154,23 @@ struct RHIResourceTransitionBarrier
 	/// The "after" usages of the subresources, as a bitwise-OR'd combination of ERHIResourceStates enumeration constants.
 	/// </summary>
 	ERHIResourceStates StateAfter;
+
+	RHIResourceTransitionBarrier& SwapTransition() &
+	{
+		std::swap(StateBefore, StateAfter);
+		return *this;
+	}
+
+	RHIResourceTransitionBarrier&& SwapTransition() &&
+	{
+		std::swap(StateBefore, StateAfter);
+		return std::move(*this);
+	}
+
+	RHIResourceTransitionBarrier GetSwapTransition() const
+	{
+		return RHIResourceTransitionBarrier(*this).SwapTransition();
+	}
 };
 
 /// <summary>

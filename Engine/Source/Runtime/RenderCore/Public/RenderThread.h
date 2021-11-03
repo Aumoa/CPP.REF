@@ -61,7 +61,7 @@ public:
 	static void Init();
 	static void Shutdown();
 	static void EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody);
-	static void ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork);
+	static void ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork = true);
 	static void WaitForLastWorks();
 
 	static bool IsInRenderThread()

@@ -8,10 +8,11 @@ interface IRHIDevice;
 interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
 interface IRHITexture2D;
+interface IRHIDeviceContext;
 
-class RENDERCORE_API SSceneRenderTarget : implements SObject
+class RENDERCORE_API SSceneRenderTargetInterface : implements SObject
 {
-	GENERATED_BODY(SSceneRenderTarget)
+	GENERATED_BODY(SSceneRenderTargetInterface)
 
 private:
 	IRHIRenderTargetView* RTV = nullptr;
@@ -19,8 +20,14 @@ private:
 	bool bBindResources = false;
 
 public:
-	SSceneRenderTarget(IRHIDevice* InDevice, int32 InNumRTVs = 1, bool bUseDSV = false);
+	SSceneRenderTargetInterface(IRHIDevice* InDevice, int32 InNumRTVs = 1, bool bUseDSV = false);
 
 	void SetRenderTargets(IRHITexture2D* InColorBuf, IRHITexture2D* InDepthStencilBuf, bool bBindResources = false);
 	void CleanupRenderTargets();
+
+	virtual void CopyRenderTargetOutput(IRHIDeviceContext* DeviceContext, IRHITexture2D* ColorOutput);
+	virtual IRHITexture2D* GetRenderTexture();
+
+	IRHIRenderTargetView* GetRTV();
+	IRHIDepthStencilView* GetDSV();
 };

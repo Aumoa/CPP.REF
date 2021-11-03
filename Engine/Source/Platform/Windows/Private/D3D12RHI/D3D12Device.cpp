@@ -15,6 +15,7 @@
 #include "DWriteTextFormat.h"
 #include "DWriteTextLayout.h"
 #include "D2D1DeviceContext.h"
+#include "D2D1SolidColorBrush.h"
 #include "Materials/Material.h"
 #include "Threading/Thread.h"
 
@@ -50,7 +51,7 @@ IRHIDeviceContext2D* SD3D12Device::CreateDeviceContext2D()
 {
 	ComPtr<ID2D1DeviceContext> DeviceContext;
 	HR(_interop.Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &DeviceContext));
-	return NewObject<SD2D1DeviceContext>(_factory, this, DeviceContext.Get());
+	return NewObject<SD2D1DeviceContext>(_factory, this, DeviceContext.Get(), _interop.InteropDevice.Get());
 }
 
 IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData)
@@ -489,6 +490,13 @@ IRHITextLayout* SD3D12Device::CreateTextLayout(IRHITextFormat* format, std::wstr
 	return NewObject<SDWriteTextLayout>(_factory, this, std::move(textLayout));
 }
 
+IRHISolidColorBrush* SD3D12Device::CreateSolidColorBrush(const Color& InColor, float InOpacity)
+{
+	ComPtr<ID2D1SolidColorBrush> Brush;
+	HR(_interop.DeviceContext2D->CreateSolidColorBrush((const D2D1_COLOR_F&)InColor, &Brush));
+	return NewObject<SD2D1SolidColorBrush>(_factory, this, Brush.Get());
+}
+
 void SD3D12Device::BeginFrame()
 {
 	_immCon->Collect();
@@ -499,6 +507,11 @@ void SD3D12Device::EndFrame()
 {
 	_fenceValue = _immCon->ExecuteCommandLists({}, true);
 	MarkPendingAllocatorAndHeaps(_fenceValue);
+}
+
+void SD3D12Device::FlushCommands()
+{
+	_interop.DeviceContext->Flush();
 }
 
 ID3D12CommandAllocator* SD3D12Device::GetThreadPrimaryAllocator()

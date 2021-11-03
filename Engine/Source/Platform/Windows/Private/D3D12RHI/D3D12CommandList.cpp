@@ -191,6 +191,14 @@ void SD3D12CommandList::UpdateSubresource(IRHIResource* resource, uint32 subreso
 	HR(uploadBuf->Map(subresource, nullptr, &ptr));
 }
 
+void SD3D12CommandList::CopyResource(IRHIResource* DstResource, IRHIResource* SrcResource)
+{
+	auto DstResource_s = Cast<SD3D12Resource>(DstResource);
+	auto SrcResource_s = Cast<SD3D12Resource>(SrcResource);
+
+	CommandList->CopyResource(DstResource_s->Get<ID3D12Resource>(), SrcResource_s->Get<ID3D12Resource>());
+}
+
 uint64 SD3D12CommandList::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal)
 {
 	SE_LOG(LogWindows, Fatal, L"ExecuteCommandLists must be called with immediate context.");

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SceneRenderer.h"
 //#include "Shaders/SlateShader/SlateShader.h"
 //
 //class SlateWindowElementList;

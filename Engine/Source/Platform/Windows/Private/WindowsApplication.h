@@ -22,6 +22,7 @@ public:
 
 	virtual void Start() override;
 	virtual Vector2N GetViewportSize() override;
+	virtual float GetDpi() override;
 
 	virtual void SetTickMode(ETickMode InTickMode) override;
 	virtual ETickMode GetTickMode() override;
