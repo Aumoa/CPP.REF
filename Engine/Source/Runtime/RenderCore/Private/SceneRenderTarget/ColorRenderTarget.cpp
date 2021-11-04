@@ -8,7 +8,7 @@
 SColorRenderTarget::SColorRenderTarget(IRHIDevice* InDevice, const Vector2N& InitialViewportSize) : Super(InDevice, 1, false)
 	, Device(InDevice)
 {
-	InitialState = ERHIResourceStates::PixelShaderResource | ERHIResourceStates::CopySource;
+	InitialState = ERHIResourceStates::ResolveSource;
 	RenderTextureFormat = ERHIPixelFormat::B8G8R8A8_UNORM;
 	SetViewportSize(InitialViewportSize);
 }
@@ -37,7 +37,7 @@ void SColorRenderTarget::SetViewportSize(const Vector2N& InViewportSize)
 	Desc.Format = RenderTextureFormat;
 	Desc.Usage = ERHIBufferUsage::Default;
 	Desc.Flags = ERHIResourceFlags::AllowRenderTarget;
-	Desc.InitialState = ERHIResourceStates::PixelShaderResource | ERHIResourceStates::CopySource;
+	Desc.InitialState = ERHIResourceStates::ResolveSource;
 	Desc.ClearValue = ClearValue;
 	Desc.SampleDesc = { 4, 0 };
 

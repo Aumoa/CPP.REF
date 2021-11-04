@@ -2,6 +2,7 @@
 
 #include "Widgets/Image/Image.h"
 #include "Draw/SlateWindowElementList.h"
+#include "Draw/PaintArgs.h"
 
 SImage::SImage() : Super()
 {
@@ -35,9 +36,7 @@ DEFINE_SLATE_CONSTRUCTOR(SImage, Attr)
 
 int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
-	SlateDrawElement& Element = InDrawElements.AddUninitialized();
-	Element.Brush = Brush;
-	Element.Layer = InLayer;
-	Element.Transform = AllottedGeometry.ToPaintGeometry();
+	const PaintArgs NewArgs = Args.WithNewParent(this);
+	SlateDrawElement::MakeBox(InDrawElements, Brush, NewArgs.RenderOpacity, AllottedGeometry.ToPaintGeometry(), InLayer);
 	return InLayer;
 }

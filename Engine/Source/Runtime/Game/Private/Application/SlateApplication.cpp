@@ -1,9 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Application/SlateApplication.h"
-#include "Widgets/Window.h"
+#include "Application/Window.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
+#include "Draw/SlateRenderer.h"
 #include "SceneRendering/SlateRenderer.h"
 #include "SceneRendering/SceneRenderContext.h"
 #include "EngineSubsystems/GameRenderSystem.h"
@@ -36,31 +37,23 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 	auto Elements = std::make_shared<SlateWindowElementList>(CoreWindow);
 	CoreWindow->Paint(PaintArgs(nullptr, InDeltaTime), AllottedGeometry, CullingRect, *Elements, 0, true);
 
-	if (DeviceContext == nullptr)
+	RenderThread::EnqueueRenderThreadWork<"TickAndPaint">([this, Buf = std::move(Elements)](auto)
 	{
-		auto Dev = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice();
-		DeviceContext = Dev->CreateDeviceContext();
-	}
-
-	//RenderThread::EnqueueRenderThreadWork<"TickAndPaint_InitContexts">([&, Elements = std::move(Elements)](auto)
-	//{
-	//	SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
-	//	InitContext_RenderThread = Shader->InitElements(*Elements);
-	//});
+		SlateElements = std::move(Buf);
+	});
 }
 
-void SSlateApplication::PopulateCommandLists(SceneRenderContext& RenderContext)
+void SSlateApplication::DrawElements(SlateRenderer* Renderer)
 {
-	//SSlateShader* Shader = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetSlateShader();
-
-	//IRHIDeviceContext* DeviceContext = RenderContext.DeviceContext;
-	//DeviceContext->SetDescriptorHeaps(InitContext_RenderThread.NumDescriptors, 0);
-
-	//SlateRenderer Renderer(*RenderContext.RenderTarget, Shader, &InitContext_RenderThread);
-	//Renderer.PopulateCommandLists(DeviceContext);
+	Renderer->PopulateCommands(*SlateElements);
 }
 
 SLocalPlayer* SSlateApplication::GetLocalPlayer()
 {
 	return LocalPlayer;
+}
+
+SWindow* SSlateApplication::GetCoreWindow()
+{
+	return CoreWindow;
 }

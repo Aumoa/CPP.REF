@@ -20,12 +20,24 @@ SlateDrawElement& SlateWindowElementList::AddUninitialized()
 	return Elements.emplace_back();
 }
 
+void SlateWindowElementList::AddReferencedObject(std::shared_ptr<SObject> LockObject)
+{
+	ReferencedObjects.emplace_back(LockObject);
+}
+
 void SlateWindowElementList::Clear()
 {
 	Elements.clear();
+	ReferencedObjects.clear();
+	PayloadBufSeek = 0;
 }
 
 const std::vector<SlateDrawElement>& SlateWindowElementList::GetElements() const
 {
 	return Elements;
+}
+
+const uint8* SlateWindowElementList::GetPayloadBuffer() const
+{
+	return reinterpret_cast<const uint8*>(Payloads.data()->data());
 }

@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Widgets/Window.h"
-#include "Widgets/Viewport.h"
+#include "Application/Window.h"
+#include "Application/Viewport.h"
 #include "IApplicationInterface.h"
 
 DEFINE_LOG_CATEGORY(LogSlateWindow);

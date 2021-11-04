@@ -9,6 +9,17 @@ SCompoundWidget::SCompoundWidget() : Super()
 {
 }
 
+void SCompoundWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+{
+    ArrangedChildrens ArrangedChildren(ESlateVisibility::All);
+    ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+    for (auto& Arranged : ArrangedChildren.GetWidgets())
+    {
+        Arranged.GetWidget()->Tick(Arranged.GetGeometry(), InDeltaTime);
+    }
+}
+
 int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
@@ -19,7 +30,7 @@ int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGe
 
 int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
 {
-    PaintArgs NewArgs = Args.WithNewParent(this);
+    const PaintArgs NewArgs = Args.WithNewParent(this);
     bool bShouldBeEnabled = ShouldBeEnabled(bParentEnabled);
 
     for (const ArrangedWidget& Arranged : ArrangedChildrens.GetWidgets())

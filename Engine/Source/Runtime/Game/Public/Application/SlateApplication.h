@@ -9,6 +9,8 @@ interface IRHIDeviceContext;
 class SLocalPlayer;
 class SWindow;
 class SceneRenderContext;
+class SlateWindowElementList;
+class SlateRenderer;
 
 class GAME_API SSlateApplication : implements SObject
 {
@@ -19,13 +21,16 @@ private:
 	SWindow* CoreWindow = nullptr;
 	IRHIDeviceContext* DeviceContext = nullptr;
 
+	std::shared_ptr<SlateWindowElementList> SlateElements;
+
 public:
 	SSlateApplication();
 	~SSlateApplication() override;
 
 	void Init(IApplicationInterface* InApplication);
 	void TickAndPaint(float InDeltaTime);
-	void PopulateCommandLists(SceneRenderContext& RenderContext);
+	void DrawElements(SlateRenderer* Renderer);
 
 	SLocalPlayer* GetLocalPlayer();
+	SWindow* GetCoreWindow();
 };

@@ -22,11 +22,13 @@ private:
 	EWidgetClipping Clipping = EWidgetClipping::Inherit;
 
 	SlateRenderTransform RenderTransform = SlateRenderTransform::Identity();
-	Vector2 RenderTransformPivot = Vector2::ZeroVector();
+	Vector2 RenderTransformPivot = Vector2(0.5f, 0.5f);
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
 	std::optional<Geometry> CachedGeometry;
 	std::optional<Vector2> CachedDesiredSize;
+
+	float RenderOpacity = 1.0f;
 
 public:
 	SWidget();
@@ -63,6 +65,7 @@ public:
 		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
 		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
 	END_SLATE_ATTRIBUTE;
 
 	DECLARE_SLATE_CONSTRUCTOR();
@@ -78,6 +81,8 @@ public:
 	SlateRenderTransform GetRenderTransform();
 	void SetEnabled(bool bEnabled);
 	bool IsEnabled();
+	void SetRenderOpacity(float InOpacity);
+	float GetRenderOpacity();
 };
 
 template<std::derived_from<SWidget> TSlateClass, class TDeclarativeAttr>

@@ -40,28 +40,32 @@ float MathEx::Atan2(float y, float x)
 
 void MathEx::SinCos(const Radians& x, float& sin, float& cos)
 {
-	using namespace std::numbers;
-
-	float quotient = (pi_v<float> *0.5f) * x.Value;
-	if (x >= 0)
+	static constexpr float pi = std::numbers::pi_v<float>;
+	static constexpr float half_pi = pi * 0.5f;
+	static constexpr float inv_pi = std::numbers::inv_pi_v<float>;
+	
+	// Map Value to y in [-pi,pi], x = 2*pi*quotient + remainder.
+	float quotient = (inv_pi*0.5f)*x.Value;
+	if (x.Value >= 0.0f)
 	{
-		quotient = (float)((int32)(quotient + 0.5f));
+		quotient = (float)((int)(quotient + 0.5f));
 	}
 	else
 	{
-		quotient = (float)((int32)(quotient - 0.5f));
+		quotient = (float)((int)(quotient - 0.5f));
 	}
-	float y = x.Value - (2.0f * pi_v<float>) * quotient;
+	float y = x.Value - (2.0f*pi)*quotient;
 
+	// Map y to [-pi/2,pi/2] with sin(y) = sin(Value).
 	float sign;
-	if (y > (pi_v<float> *0.5f))
+	if (y > half_pi)
 	{
-		y = pi_v<float> -y;
+		y = pi - y;
 		sign = -1.0f;
 	}
-	else if (y < -(pi_v<float> *0.5f))
+	else if (y < -half_pi)
 	{
-		y = -pi_v<float> -y;
+		y = -pi - y;
 		sign = -1.0f;
 	}
 	else
@@ -71,10 +75,12 @@ void MathEx::SinCos(const Radians& x, float& sin, float& cos)
 
 	float y2 = y * y;
 
-	float p;
+	// 11-degree minimax approximation
 	sin = (((((-2.3889859e-08f * y2 + 2.7525562e-06f) * y2 - 0.00019840874f) * y2 + 0.0083333310f) * y2 - 0.16666667f) * y2 + 1.0f) * y;
-	p   = ((((-2.6051615e-07f * y2 + 2.4760495e-05f) * y2 - 0.0013888378f) * y2 + 0.041666638f) * y2 - 0.5f) * y2 + 1.0f;
-	cos = sign * p;
+
+	// 10-degree minimax approximation
+	float p = ((((-2.6051615e-07f * y2 + 2.4760495e-05f) * y2 - 0.0013888378f) * y2 + 0.041666638f) * y2 - 0.5f) * y2 + 1.0f;
+	cos = sign*p;
 }
 
 float MathEx::Sqrt(float x)

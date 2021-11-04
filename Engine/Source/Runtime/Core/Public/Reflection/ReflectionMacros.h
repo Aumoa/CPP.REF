@@ -39,6 +39,19 @@ public:																						\
 		return StaticClass();																\
 	}																						\
 																							\
+	template<class T = Class>																\
+	std::shared_ptr<T> SharedFromThis()														\
+	{																						\
+		if constexpr (std::derived_from<T, SObject>)										\
+		{																					\
+			return std::dynamic_pointer_cast<T>(((T*)this)->shared_from_this());			\
+		}																					\
+		else																				\
+		{																					\
+			return nullptr;																	\
+		}																					\
+	}																						\
+																							\
 private:																					\
 	template<size_t _Line>																	\
 	static consteval size_t REFLECTION_FunctionChain()										\

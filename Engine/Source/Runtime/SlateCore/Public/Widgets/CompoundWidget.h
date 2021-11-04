@@ -12,6 +12,8 @@ class SLATECORE_API SCompoundWidget : public SWidget
 public:
 	SCompoundWidget();
 
+	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
+
 protected:
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) override;
 

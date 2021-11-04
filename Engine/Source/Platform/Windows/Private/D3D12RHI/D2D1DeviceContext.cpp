@@ -51,11 +51,22 @@ void SD2D1DeviceContext::SetTarget(IRHITexture2D* InTarget, std::optional<Color>
 	}
 }
 
+void SD2D1DeviceContext::SetTransform(const Matrix3x2& Transform)
+{
+	DeviceContext->SetTransform((const D2D1_MATRIX_3X2_F&)Transform);
+}
+
+Matrix3x2 SD2D1DeviceContext::GetTransform()
+{
+	D2D1_MATRIX_3X2_F M;
+	DeviceContext->GetTransform(&M);
+	return (const Matrix3x2&)M;
+}
+
 void SD2D1DeviceContext::FillRectangle(IRHIBrush* InBrush, const Rect& Region)
 {
 	auto Brush_s = Cast<SD2D1Brush>(InBrush);
-	//DeviceContext->FillRectangle((const D2D1_RECT_F&)Region, Brush_s->Get<ID2D1Brush>());
-	DeviceContext->FillEllipse(D2D1::Ellipse((const D2D1_POINT_2F&)((Region.GetLeftTop() + Region.GetRightBottom()) * 0.5f), Region.GetWidth() * 0.5f, Region.GetHeight() * 0.5f), Brush_s->Get<ID2D1Brush>());
+	DeviceContext->FillRectangle((const D2D1_RECT_F&)Region, Brush_s->Get<ID2D1Brush>());
 }
 
 void SD2D1DeviceContext::DrawTextLayout(const Vector2& DrawOrigin, IRHITextLayout* Layout, IRHIBrush* InBrush, ERHIDrawTextOptions Options)

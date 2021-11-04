@@ -27,9 +27,7 @@
 //#include "Layout/LayoutImpl.h"
 #include "RenderThread.h"
 #include "IApplicationInterface.h"
-
-// TEST
-#include "RHI/IRHISolidColorBrush.h"
+#include "Draw/SlateRenderer.h"
 
 DEFINE_LOG_CATEGORY(LogRender);
 
@@ -56,11 +54,6 @@ void SGameRenderSystem::Init()
 	ColorRenderTarget = NewObject<SColorRenderTarget>(Device, IApplicationInterface::Get().GetViewportSize());
 
 	IApplicationInterface::Get().Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
-
-	// TEST
-	SolidBrush = Device->CreateSolidColorBrush(NamedColors::White);
-	TextFormat = Factory->CreateTextFormat(L"¸¼Àº °íµñ", nullptr, ERHIFontWeight::Bold, ERHIFontStyle::Normal, ERHIFontStretch::Normal, 50.0f, L"ko-kr");
-	TextLayout = Device->CreateTextLayout(TextFormat, L"¸¼Àº °íµñ SampleText", Vector2(400.0f, 400.0f));
 }
 
 void SGameRenderSystem::Deinit()
@@ -90,16 +83,19 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 		RenderContext->Begin();
 		DeviceContext2D->BeginDraw();
 
-		SceneRenderContext RenderingContext(RenderContext, ColorRenderTarget);
-		SceneRenderer Renderer(&RenderingContext, false);
+		{
+			SceneRenderContext RenderingContext(RenderContext, ColorRenderTarget);
+			SceneRenderer Renderer(&RenderingContext, false);
 
-		Renderer.BeginDraw();
-		SlateApp->PopulateCommandLists(RenderingContext);
-		Renderer.EndDraw();
+			Renderer.BeginDraw();
+			Renderer.EndDraw();
+		}
 
-		DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderTexture());
-		DeviceContext2D->FillRectangle(SolidBrush, Rect(10.0f, 10.0f, 210.0f, 210.0f));
-		DeviceContext2D->DrawTextLayout(Vector2(10.0f, 210.0f), TextLayout, SolidBrush, ERHIDrawTextOptions::None);
+		{
+			SlateRenderer Renderer(DeviceContext2D);
+			DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderTexture());
+			SlateApp->DrawElements(&Renderer);
+		}
 
 		// END OF 3D RENDERING.
 		RenderContext->End();
@@ -113,7 +109,7 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 		RHIResourceTransitionBarrier BarrierToCopyDst = {};
 		BarrierToCopyDst.pResource = SwapChainRT->RTTexture;
 		BarrierToCopyDst.StateBefore = ERHIResourceStates::Present;
-		BarrierToCopyDst.StateAfter = ERHIResourceStates::CopyDest;
+		BarrierToCopyDst.StateAfter = ERHIResourceStates::ResolveDest;
 
 		PrimaryQueue->Begin();
 		PrimaryQueue->ResourceBarrier(BarrierToCopyDst);

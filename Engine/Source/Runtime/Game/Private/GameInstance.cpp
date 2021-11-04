@@ -24,7 +24,7 @@ SLocalPlayer* SGameInstance::GetLocalPlayer()
 {
 	if (GEngine)
 	{
-		GEngine->GetSlateApplication()->GetLocalPlayer();
+		return GEngine->GetSlateApplication()->GetLocalPlayer();
 	}
 
 	return nullptr;

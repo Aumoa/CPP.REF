@@ -41,11 +41,6 @@ private:
 	IRHIDeviceContext2D* DeviceContext2D = nullptr;
 	SColorRenderTarget* ColorRenderTarget = nullptr;
 
-	// TEST
-	IRHISolidColorBrush* SolidBrush = nullptr;
-	IRHITextFormat* TextFormat = nullptr;
-	IRHITextLayout* TextLayout = nullptr;
-
 public:
 	SGameRenderSystem();
 	virtual ~SGameRenderSystem() override;

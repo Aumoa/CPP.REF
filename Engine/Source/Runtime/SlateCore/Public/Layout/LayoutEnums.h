@@ -22,7 +22,8 @@ enum class ESlateVisibility
 	Collapsed,
 	Hidden,
 	HitTestInvisible,
-	SelfHitTestInvisible
+	SelfHitTestInvisible,
+	All
 };
 
 enum class EWidgetClipping
@@ -113,6 +114,7 @@ private:
 		case ESlateVisibility::Hidden: return VIS_Hidden;
 		case ESlateVisibility::HitTestInvisible: return VIS_HitTestInvisible;
 		case ESlateVisibility::SelfHitTestInvisible: return VIS_SelfHitTestInvisible;
+		case ESlateVisibility::All: return VIS_All;
 		default:
 			check(false);
 			return 0;
@@ -128,6 +130,7 @@ private:
 		case ESlateVisibility::Hidden: return L"Hidden";
 		case ESlateVisibility::HitTestInvisible: return L"HitTestInvisible";
 		case ESlateVisibility::SelfHitTestInvisible: return L"SelfHitTestInvisible";
+		case ESlateVisibility::All: return L"All";
 		default: return std::format(L"({})", (int32)Visibility);
 		};
 	}

@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CompoundWidget.h"
+#include "Widgets/CompoundWidget.h"
 
 interface IApplicationInterface;
 class SViewport;
 
-class SLATECORE_API SWindow : public SCompoundWidget
+class GAME_API SWindow : public SCompoundWidget
 {
 	GENERATED_BODY(SWindow)
 

@@ -6,8 +6,9 @@
 #include "Player.h"
 #include "SubclassOf.h"
 
-interface IFrameworkView;
 class APlayerController;
+class SViewport;
+class SSlateApplication;
 
 class GAME_API SLocalPlayer : public SPlayer
 {
@@ -15,14 +16,13 @@ class GAME_API SLocalPlayer : public SPlayer
 
 private:
 	APlayerController* _PlayerController = nullptr;
-	IFrameworkView* _FrameworkView = nullptr;
 
 public:
 	SLocalPlayer();
 
-	void Init(IFrameworkView* InFrameworkView);
-	IFrameworkView* GetFrameworkView();
-
 	void SetPlayerController(APlayerController* InController);
 	APlayerController* GetPlayerController();
+
+	SSlateApplication* GetSlateApplication();
+	SViewport* GetGameViewport();
 };

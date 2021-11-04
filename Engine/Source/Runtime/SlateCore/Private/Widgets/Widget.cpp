@@ -105,6 +105,7 @@ DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
     SetFlowDirection(Attr._FlowDirection);
     SetClipping(Attr._Clipping);
     SetEnabled(Attr._bEnabled);
+    SetRenderOpacity(Attr._RenderOpacity);
 }
 
 void SWidget::SetVisibility(ESlateVisibility InVisibility)
@@ -157,4 +158,14 @@ void SWidget::SetEnabled(bool bEnabled)
 bool SWidget::IsEnabled()
 {
     return bEnabled;
+}
+
+void SWidget::SetRenderOpacity(float InOpacity)
+{
+    RenderOpacity = InOpacity;
+}
+
+float SWidget::GetRenderOpacity()
+{
+    return RenderOpacity;
 }

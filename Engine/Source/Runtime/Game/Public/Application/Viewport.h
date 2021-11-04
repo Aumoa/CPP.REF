@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CompoundWidget.h"
+#include "Widgets/CompoundWidget.h"
 #include "RHI/RHIEnums.h"
 
-DECLARE_LOG_CATEGORY(SLATECORE_API, LogViewport);
+DECLARE_LOG_CATEGORY(GAME_API, LogViewport);
 
 interface IRHITexture2D;
 interface IRHIDeviceContext;
@@ -15,7 +15,7 @@ interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 class SWorld;
 
-class SLATECORE_API SViewport : public SCompoundWidget
+class GAME_API SViewport : public SCompoundWidget
 {
 	GENERATED_BODY(SViewport)
 
@@ -43,6 +43,13 @@ public:
 	void PopulateCommandLists(IRHIDeviceContext* InDeviceContext);
 
 	virtual Vector2 GetDesiredSize() override;
+
+private:
+	std::vector<std::shared_ptr<SWidget>> Widgets;
+
+public:
+	void AddToViewport(SWidget* InWidget);
+	void RemoveFromViewport(SWidget* InWidget);
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

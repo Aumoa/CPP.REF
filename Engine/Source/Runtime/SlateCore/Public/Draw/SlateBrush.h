@@ -9,7 +9,8 @@ interface IRHITexture2D;
 struct SlateBrush
 {
 	IRHITexture2D* ImageSource = nullptr;
-	Vector2 ImageSize;
+	Vector2 ImageSize = Vector2::ZeroVector();
+	Color TintColor = NamedColors::White;
 
 	SlateBrush()
 	{
@@ -18,6 +19,11 @@ struct SlateBrush
 	SlateBrush(IRHITexture2D* InImageSource, const Vector2& InImageSize)
 		: ImageSource(InImageSource)
 		, ImageSize(InImageSize)
+	{
+	}
+
+	SlateBrush(const Color& TintColor)
+		: TintColor(TintColor)
 	{
 	}
 

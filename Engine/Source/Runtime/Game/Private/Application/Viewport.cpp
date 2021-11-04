@@ -1,6 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Widgets/Viewport.h"
+#include "Application/Viewport.h"
 #include "RHI/IRHITexture2D.h"
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIRenderTargetView.h"
@@ -18,6 +18,7 @@ SViewport::SViewport() : Super()
 
 SViewport::~SViewport()
 {
+	Widgets.clear();
 	DestroyRenderTarget_GameThread();
 }
 
@@ -37,14 +38,28 @@ Vector2N SViewport::GetRenderSize()
 
 void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext)
 {
-	if (DeviceContext)
-	{
-	}
 }
 
 Vector2 SViewport::GetDesiredSize()
 {
 	return RenderSize.Cast<float>();
+}
+
+void SViewport::AddToViewport(SWidget* InWidget)
+{
+	Widgets.emplace_back(InWidget->SharedFromThis());
+}
+
+void SViewport::RemoveFromViewport(SWidget* InWidget)
+{
+	for (auto It = Widgets.begin(); It != Widgets.end(); ++It)
+	{
+		if (It->get() == InWidget)
+		{
+			Widgets.erase(It);
+			break;
+		}
+	}
 }
 
 DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
@@ -57,6 +72,18 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 
 void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
+	for (auto& Widget : Widgets)
+	{
+		ESlateVisibility Visibility = Widget->GetVisibility();
+		if (ArrangedChildrens.Accepts(Visibility))
+		{
+			ArrangedChildrens.AddWidget(Visibility, AllottedGeometry.MakeChild(
+				Widget.get(),
+				Vector2(0.0f, 0.0f),
+				AllottedGeometry.GetLocalSize()
+			));
+		}
+	}
 }
 
 int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
