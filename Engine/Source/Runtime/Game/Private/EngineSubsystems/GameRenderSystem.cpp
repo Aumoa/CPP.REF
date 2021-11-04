@@ -58,7 +58,9 @@ void SGameRenderSystem::Init()
 	IApplicationInterface::Get().Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
 
 	// TEST
-	SolidBrush = Device->CreateSolidColorBrush(NamedColors::Red);
+	SolidBrush = Device->CreateSolidColorBrush(NamedColors::White);
+	TextFormat = Factory->CreateTextFormat(L"¸¼Àº °íµñ", nullptr, ERHIFontWeight::Bold, ERHIFontStyle::Normal, ERHIFontStretch::Normal, 50.0f, L"ko-kr");
+	TextLayout = Device->CreateTextLayout(TextFormat, L"¸¼Àº °íµñ SampleText", Vector2(400.0f, 400.0f));
 }
 
 void SGameRenderSystem::Deinit()
@@ -89,14 +91,15 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 		DeviceContext2D->BeginDraw();
 
 		SceneRenderContext RenderingContext(RenderContext, ColorRenderTarget);
-		SceneRenderer Renderer(&RenderingContext, ERHIResourceStates::PixelShaderResource | ERHIResourceStates::CopySource, false);
+		SceneRenderer Renderer(&RenderingContext, false);
 
 		Renderer.BeginDraw();
 		SlateApp->PopulateCommandLists(RenderingContext);
 		Renderer.EndDraw();
 
 		DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderTexture());
-		DeviceContext2D->FillRectangle(SolidBrush, Rect(10.0f, 10.0f, 110.0f, 110.0f));
+		DeviceContext2D->FillRectangle(SolidBrush, Rect(10.0f, 10.0f, 210.0f, 210.0f));
+		DeviceContext2D->DrawTextLayout(Vector2(10.0f, 210.0f), TextLayout, SolidBrush, ERHIDrawTextOptions::None);
 
 		// END OF 3D RENDERING.
 		RenderContext->End();
@@ -142,6 +145,7 @@ void SGameRenderSystem::ResizeApp(Vector2N Size)
 			// On the framework view is resized, wait all graphics commands for
 			// synchronize and cleanup resource lock states.
 			Device->BeginFrame();
+			Device->FlushCommands();
 
 			SwapChainRT->ResizeBuffers(Size.X, Size.Y);
 			ColorRenderTarget->SetViewportSize(Size);

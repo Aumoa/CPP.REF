@@ -355,6 +355,12 @@ struct RHITexture2DClearValue
 	};
 };
 
+struct RHISampleDesc
+{
+	uint32 Count;
+	uint32 Quality;
+};
+
 struct RHITexture2DDesc
 {
 	uint32 Width;
@@ -364,6 +370,7 @@ struct RHITexture2DDesc
 	ERHIPixelFormat Format;
 	ERHIBufferUsage Usage;
 	ERHIResourceFlags Flags;
+	RHISampleDesc SampleDesc;
 	ERHIResourceStates InitialState;
 	std::optional<RHITexture2DClearValue> ClearValue;
 };

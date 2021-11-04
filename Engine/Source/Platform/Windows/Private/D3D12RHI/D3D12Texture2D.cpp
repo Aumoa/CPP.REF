@@ -23,7 +23,8 @@ SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, Co
 		auto Flags = (D3D12_RESOURCE_FLAGS)desc.Flags;
 		D3D11_RESOURCE_FLAGS BindFlags =
 		{
-			.BindFlags = GetInteropBindFlag(Flags)
+			.BindFlags = GetInteropBindFlag(Flags),
+			.MiscFlags = D3D11_RESOURCE_MISC_SHARED
 		};
 
 		D3D12_RESOURCE_STATES InteropInitialState = (Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) != 0 ? D3D12_RESOURCE_STATE_RENDER_TARGET : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -35,12 +36,12 @@ SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, Co
 		D2D1_BITMAP_OPTIONS Options = D2D1_BITMAP_OPTIONS_NONE;
 		if (Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET)
 		{
-			Options = D2D1_BITMAP_OPTIONS_TARGET;
+			Options |= D2D1_BITMAP_OPTIONS_TARGET;
 		}
 
-		float dpiScale = IApplicationInterface::Get().GetDpi();
+		float DpiScale = IApplicationInterface::Get().GetDpi();
 		auto DevCtx2D = _device->Get<ID2D1DeviceContext>();
-		HR(DevCtx2D->CreateBitmapFromDxgiSurface(Surf.Get(), D2D1::BitmapProperties1(Options, D2D1::PixelFormat((DXGI_FORMAT)desc.Format, D2D1_ALPHA_MODE_PREMULTIPLIED), dpiScale, dpiScale), &Bitmap));
+		HR(DevCtx2D->CreateBitmapFromDxgiSurface(Surf.Get(), D2D1::BitmapProperties1(Options, D2D1::PixelFormat((DXGI_FORMAT)desc.Format, D2D1_ALPHA_MODE_PREMULTIPLIED), DpiScale, DpiScale), &Bitmap));
 	}
 }
 

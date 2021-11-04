@@ -423,5 +423,15 @@ enum class EMaterialDomain
     UserInterface,
 };
 
+enum class ERHIDrawTextOptions
+{
+    None = 0,
+    NoSnap = 0x1,
+    Clip = 0x2,
+    EnableColorFont = 0x4,
+    DisableColorBitmapSnapping = 0x8,
+};
+DEFINE_ENUM_FLAG_OPERATORS(ERHIDrawTextOptions);
+
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

@@ -199,6 +199,14 @@ void SD3D12CommandList::CopyResource(IRHIResource* DstResource, IRHIResource* Sr
 	CommandList->CopyResource(DstResource_s->Get<ID3D12Resource>(), SrcResource_s->Get<ID3D12Resource>());
 }
 
+void SD3D12CommandList::ResolveSubresource(IRHIResource* DstResource, uint32 DstSubresource, IRHIResource* SrcResource, uint32 SrcSubresource, ERHIPixelFormat Format)
+{
+	auto DstResource_s = Cast<SD3D12Resource>(DstResource);
+	auto SrcResource_s = Cast<SD3D12Resource>(SrcResource);
+
+	CommandList->ResolveSubresource(DstResource_s->Get<ID3D12Resource>(), DstSubresource, SrcResource_s->Get<ID3D12Resource>(), SrcSubresource, (DXGI_FORMAT)Format);
+}
+
 uint64 SD3D12CommandList::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal)
 {
 	SE_LOG(LogWindows, Fatal, L"ExecuteCommandLists must be called with immediate context.");

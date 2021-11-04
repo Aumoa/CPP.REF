@@ -6,32 +6,28 @@
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHITexture2D.h"
 
-SceneRenderer::SceneRenderer(SceneRenderContext* RenderContext, ERHIResourceStates InitialState, bool bRestoreTransition)
-	: InitialState(InitialState)
-	, bRestoreTransition(bRestoreTransition)
+SceneRenderer::SceneRenderer(SceneRenderContext* RenderContext, bool bRestoreTransition)
+	: bRestoreTransition(bRestoreTransition)
 	, RenderContext(RenderContext)
 {
 }
 
 void SceneRenderer::BeginDraw()
 {
-	RHIResourceTransitionBarrier TransitionBarrier = {};
-	TransitionBarrier.pResource = RenderContext->RenderTarget->GetRenderTexture();
-	TransitionBarrier.StateBefore = InitialState;
-	TransitionBarrier.StateAfter = ERHIResourceStates::RenderTarget;
+	IRHIDeviceContext* Context = RenderContext->DeviceContext;
+	SSceneRenderTargetInterface* RenderTarget = RenderContext->RenderTarget;
 
-	RenderContext->DeviceContext->ResourceBarrier(TransitionBarrier);
+	RenderTarget->TransitRenderTargetViews(Context, true);
+	RenderTarget->ClearRenderTargetViews(Context);
 }
 
 void SceneRenderer::EndDraw()
 {
+	IRHIDeviceContext* Context = RenderContext->DeviceContext;
+	SSceneRenderTargetInterface* RenderTarget = RenderContext->RenderTarget;
+
 	if (bRestoreTransition)
 	{
-		RHIResourceTransitionBarrier TransitionBarrier = {};
-		TransitionBarrier.pResource = RenderContext->RenderTarget->GetRenderTexture();
-		TransitionBarrier.StateBefore = ERHIResourceStates::RenderTarget;
-		TransitionBarrier.StateAfter = InitialState;
-
-		RenderContext->DeviceContext->ResourceBarrier(TransitionBarrier);
+		RenderTarget->TransitRenderTargetViews(Context, false);
 	}
 }

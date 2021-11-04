@@ -10,6 +10,8 @@ interface IRHIDevice;
 interface IRHIDeviceContext;
 interface IApplicationInterface;
 interface IRHIDeviceContext2D;
+interface IRHITextFormat;
+interface IRHITextLayout;
 class SColorVertexFactory;
 class SColorShader;
 class STransparentShader;
@@ -41,6 +43,8 @@ private:
 
 	// TEST
 	IRHISolidColorBrush* SolidBrush = nullptr;
+	IRHITextFormat* TextFormat = nullptr;
+	IRHITextLayout* TextLayout = nullptr;
 
 public:
 	SGameRenderSystem();

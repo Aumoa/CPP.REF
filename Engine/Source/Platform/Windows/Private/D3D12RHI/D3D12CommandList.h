@@ -46,6 +46,7 @@ public:
 	virtual void PendingGarbageObject(SObject* object) override;
 	virtual void UpdateSubresource(IRHIResource* resource, uint32 subresource, const RHISubresourceData& data) override;
 	virtual void CopyResource(IRHIResource* DstResource, IRHIResource* SrcResource) override;
+	virtual void ResolveSubresource(IRHIResource* DstResource, uint32 DstSubresource, IRHIResource* SrcResource, uint32 SrcSubresource, ERHIPixelFormat Format) override;
 	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal) override;
 
 	virtual void CopyTextureRegion(const D3D12_TEXTURE_COPY_LOCATION* pDst, UINT DstX, UINT DstY, UINT DstZ, const D3D12_TEXTURE_COPY_LOCATION* pSrc, const D3D12_BOX* pSrcBox);

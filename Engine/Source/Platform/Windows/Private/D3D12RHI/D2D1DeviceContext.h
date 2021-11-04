@@ -20,8 +20,9 @@ public:
 
 	virtual void BeginDraw() override;
 	virtual void EndDraw() override;
-	virtual void SetTarget(IRHITexture2D* InTarget) override;
+	virtual void SetTarget(IRHITexture2D* InTarget, std::optional<Color> ClearColor) override;
 	virtual void FillRectangle(IRHIBrush* InBrush, const Rect& Region) override;
+	virtual void DrawTextLayout(const Vector2& DrawOrigin, IRHITextLayout* Layout, IRHIBrush* InBrush, ERHIDrawTextOptions Options = ERHIDrawTextOptions::None) override;
 
 private:
 	void AcquireWrappedTarget();

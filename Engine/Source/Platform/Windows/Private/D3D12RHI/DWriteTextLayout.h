@@ -14,18 +14,11 @@ class SDWriteTextLayout : public SD3D12DeviceChild, implements IRHITextLayout
 private:
 	ComPtr<IDWriteTextLayout> _layout;
 
-	Vector2N _requiredSize;
-	ComPtr<ID3D12Resource> _resource;
-	ComPtr<ID3D11Resource> _wrapped;
-	ComPtr<ID2D1Bitmap1> _bitmap;
-	bool _bNeedRender = true;
-
 public:
 	SDWriteTextLayout(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDWriteTextLayout> layout);
 
 	virtual Vector2 GetMaxSize() override;
 
-private:
-	void AllocateBuffer(const Vector2N& required);
-	static constexpr int32 AlignAs128(int32 required);
+public:
+	DECLARE_GETTER(IDWriteTextLayout, _layout);
 };

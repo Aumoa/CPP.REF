@@ -76,7 +76,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 	textureDesc.DepthOrArraySize = (UINT16)desc.DepthOrArraySize;
 	textureDesc.MipLevels = desc.MipLevels;
 	textureDesc.Format = (DXGI_FORMAT)desc.Format;
-	textureDesc.SampleDesc = { 1, 0 };
+	textureDesc.SampleDesc = (const DXGI_SAMPLE_DESC&)desc.SampleDesc;
 	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	textureDesc.Flags = (D3D12_RESOURCE_FLAGS)desc.Flags;
 	D3D12_HEAP_PROPERTIES heapProp = { D3D12_HEAP_TYPE_DEFAULT };
@@ -88,7 +88,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 	}
 
 	D3D12_RESOURCE_STATES initialState = initialData ? D3D12_RESOURCE_STATE_COPY_DEST : (D3D12_RESOURCE_STATES)desc.InitialState;
-	HR(_device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &textureDesc, initialState, desc.ClearValue.has_value() ? &clearValue : nullptr, IID_PPV_ARGS(&textureBuf)));
+	HR(_device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_SHARED, &textureDesc, initialState, desc.ClearValue.has_value() ? &clearValue : nullptr, IID_PPV_ARGS(&textureBuf)));
 
 	// Create dynamic buffer if need.
 	if (bCreateDynamicBuffer)
@@ -627,6 +627,11 @@ void SD3D12Device::CreateInteropDevice()
 	ComPtr<IDXGIDevice> dxgiDevice;
 	HR(_interop.InteropDevice.As(&dxgiDevice));
 
-	HR(D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_MULTI_THREADED, D2D1_DEBUG_LEVEL_NONE, D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS), &_interop.Device2D));
+	D2D1_DEBUG_LEVEL DebugLevel = D2D1_DEBUG_LEVEL_NONE;
+#if defined(_DEBUG)
+	DebugLevel = D2D1_DEBUG_LEVEL_WARNING;
+#endif
+
+	HR(D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_MULTI_THREADED, DebugLevel, D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS), &_interop.Device2D));
 	HR(_interop.Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, &_interop.DeviceContext2D));
 }

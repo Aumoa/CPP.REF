@@ -12,14 +12,13 @@ class RENDERCORE_API SceneRenderer
 	GENERATED_BODY(SceneRenderer)
 
 private:
-	ERHIResourceStates InitialState;
 	bool bRestoreTransition;
 		
 public:
 	SceneRenderContext* const RenderContext = nullptr;
 
 public:
-	SceneRenderer(SceneRenderContext* RenderContext, ERHIResourceStates InitialState, bool bRestoreTransition = false);
+	SceneRenderer(SceneRenderContext* RenderContext, bool bRestoreTransition = false);
 
 	virtual void BeginDraw();
 	virtual void EndDraw();
