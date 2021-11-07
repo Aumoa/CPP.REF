@@ -28,6 +28,7 @@ public:
 	virtual IRHISwapChain* CreateSwapChain(IRHIDevice* device) override;
 	virtual IRHIFontCollection* CreateFontCollection(const std::filesystem::path& path) override;
 	virtual IRHITextFormat* CreateTextFormat(std::wstring_view fontFamilyName, IRHIFontCollection* fontCollection, ERHIFontWeight fontWeight, ERHIFontStyle fontStyle, ERHIFontStretch fontStretch, float fontSize, std::wstring_view localeName) override;
+	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* Format, std::wstring_view Text, const Vector2& Layout) override;
 
 public:
 	DECLARE_GETTER(IDWriteFactory5, _writeFactory);

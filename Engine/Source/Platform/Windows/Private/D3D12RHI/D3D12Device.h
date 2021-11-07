@@ -53,7 +53,6 @@ public:
 	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 Count) override;
 	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 Count) override;
 	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 Count) override;
-	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* Format, std::wstring_view Text, const Vector2& Layout) override;
 	virtual IRHISolidColorBrush* CreateSolidColorBrush(const Color& InColor, float InOpacity) override;
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;

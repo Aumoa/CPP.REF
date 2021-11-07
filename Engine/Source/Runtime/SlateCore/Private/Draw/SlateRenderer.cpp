@@ -38,9 +38,12 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 		else if (Element.Type == SlateDrawElement::EElementType::Text)
 		{
 			const auto& Payload = Element.GetTextPayload(Elements);
-			auto TintBrush = GetTintBrush(Payload.TintColor, Payload.RenderOpacity);
+			if (Payload.Text)
+			{
+				auto TintBrush = GetTintBrush(Payload.TintColor, Payload.RenderOpacity);
 
-			CommandList->DrawTextLayout(LocalPosition, Payload.Text, TintBrush, ERHIDrawTextOptions::None);
+				CommandList->DrawTextLayout(LocalPosition, Payload.Text, TintBrush, ERHIDrawTextOptions::None);
+			}
 		}
 	}
 }

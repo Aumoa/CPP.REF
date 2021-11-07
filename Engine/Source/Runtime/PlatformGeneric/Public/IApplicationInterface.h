@@ -26,7 +26,7 @@ interface IApplicationInterface : implements SObject
 	virtual void SetTitle(std::wstring_view InTitle) = 0;
 	virtual std::wstring GetTitle() = 0;
 
-	virtual IRHIFactory* CreateFactory() = 0;
+	virtual IRHIFactory* GetFactory() = 0;
 	virtual IPlatformKeyboard& GetPlatformKeyboard() = 0;
 	virtual IPlatformMouse& GetPlatformMouse() = 0;
 

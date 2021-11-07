@@ -37,7 +37,7 @@ SlateDrawElement& SlateDrawElement::MakeBox(SlateWindowElementList& List, const 
 SlateDrawElement& SlateDrawElement::MakeText(SlateWindowElementList& List, const Color& TintColor, IRHITextLayout* InLayout, float RenderOpacity, const PaintGeometry& InTransform, int32 InLayer)
 {
 	SlateDrawElement& Element = List.AddUninitialized();
-	Element.Type = EElementType::Box;
+	Element.Type = EElementType::Text;
 	Element.Transform = InTransform;
 	Element.Layer = InLayer;
 
@@ -46,7 +46,10 @@ SlateDrawElement& SlateDrawElement::MakeText(SlateWindowElementList& List, const
 	Payload.TintColor = TintColor;
 	Payload.RenderOpacity = RenderOpacity;
 
-	List.AddReferencedObject(InLayout->shared_from_this());
+	if (InLayout)
+	{
+		List.AddReferencedObject(InLayout->shared_from_this());
+	}
 
 	return Element;
 }

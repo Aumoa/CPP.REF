@@ -36,7 +36,7 @@ public:
 	SViewport();
 	~SViewport();
 
-	void SetRenderSize(const Vector2N& InRenderSize);
+	void SetRenderSize(Vector2N InRenderSize);
 	Vector2N GetRenderSize();
 
 	void SetGameWorld(SWorld* InGameWorld);

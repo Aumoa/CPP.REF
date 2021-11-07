@@ -115,9 +115,13 @@ std::wstring SWindowsApplication::GetTitle()
 	return Buf;
 }
 
-IRHIFactory* SWindowsApplication::CreateFactory()
+IRHIFactory* SWindowsApplication::GetFactory()
 {
-	return NewObject<SDXGIFactory>(this);
+	if (Factory == nullptr)
+	{
+		Factory = NewObject<SDXGIFactory>(this);
+	}
+	return Factory;
 }
 
 IPlatformKeyboard& SWindowsApplication::GetPlatformKeyboard()

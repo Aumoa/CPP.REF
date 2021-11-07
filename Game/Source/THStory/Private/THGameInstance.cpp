@@ -5,6 +5,8 @@
 #include "GameFramework/LocalPlayer.h"
 #include "Widgets/Image/Image.h"
 #include "Widgets/Panel/CanvasPanel.h"
+#include "Widgets/Panel/VerticalBoxPanel.h"
+#include "Widgets/Text/TextBlock.h"
 #include "Application/Viewport.h"
 
 STHGameInstance::STHGameInstance() : Super()
@@ -22,11 +24,31 @@ void STHGameInstance::Init()
 	SImage* RotatedImage;
 
 	auto* Root = SNew(SCanvasPanel)
+		//+SCanvasPanel::Slot()
+		//.Offset(10.0f, 10.0f, 200.0f, 200.0f)
+		//[
+		//	SNew(SImage)
+		//	.Brush(NamedColors::Red)
+		//]
 		+SCanvasPanel::Slot()
 		.Offset(10.0f, 10.0f, 200.0f, 200.0f)
+		.bAutoSize(true)
 		[
-			SNew(SImage)
-			.Brush(NamedColors::Red)
+			SNew(SVerticalBoxPanel)
+			+SVerticalBoxPanel::Slot()
+			[
+				SNew(STextBlock)
+				.Text(L"SampleText1")
+				.Font(L"Arial", 30.0f)
+				.TintColor(NamedColors::White)
+			]
+			+SVerticalBoxPanel::Slot()
+			[
+				SNew(STextBlock)
+				.Text(L"SampleText2")
+				.Font(L"Arial", 30.0f)
+				.TintColor(NamedColors::White)
+			]
 		]
 		+SCanvasPanel::Slot()
 		.Anchors(0.5f, 0.5f)

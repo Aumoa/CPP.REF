@@ -9,6 +9,7 @@
 #include "RHI/IRHIDeviceContext.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateDrawElement.h"
+#include "IApplicationInterface.h"
 
 DEFINE_LOG_CATEGORY(LogViewport);
 
@@ -22,7 +23,7 @@ SViewport::~SViewport()
 	DestroyRenderTarget_GameThread();
 }
 
-void SViewport::SetRenderSize(const Vector2N& InRenderSize)
+void SViewport::SetRenderSize(Vector2N InRenderSize)
 {
 	if (RenderSize != InRenderSize)
 	{
@@ -68,6 +69,8 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 	RenderSize = InAttr._RenderSize;
 	RenderTargetFormat = InAttr._RenderTargetFormat;
 	ReallocRenderTarget();
+
+	IApplicationInterface::Get().Sized.AddSObject(this, &SViewport::SetRenderSize);
 }
 
 void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)

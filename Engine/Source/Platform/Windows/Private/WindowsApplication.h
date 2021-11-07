@@ -6,6 +6,8 @@
 #include "IApplicationInterface.h"
 #include "WindowsIncludes.h"
 
+class SDXGIFactory;
+
 class SWindowsApplication : implements SObject, implements IApplicationInterface
 {
 	GENERATED_BODY(SWindowsApplication)
@@ -16,6 +18,7 @@ private:
 	HINSTANCE hInstance = nullptr;
 	HWND hWnd = nullptr;
 	ETickMode TickMode = ETickMode::Realtime;
+	SDXGIFactory* Factory = nullptr;
 
 public:
 	SWindowsApplication(HINSTANCE hInstance);
@@ -30,7 +33,7 @@ public:
 	virtual void SetTitle(std::wstring_view InTitle) override;
 	virtual std::wstring GetTitle() override;
 
-	virtual IRHIFactory* CreateFactory() override;
+	virtual IRHIFactory* GetFactory() override;
 	virtual IPlatformKeyboard& GetPlatformKeyboard() override;
 	virtual IPlatformMouse& GetPlatformMouse() override;
 

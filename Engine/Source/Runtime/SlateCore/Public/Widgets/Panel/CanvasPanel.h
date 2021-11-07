@@ -40,13 +40,6 @@ public:
 
 	virtual Vector2 GetDesiredSize() override;
 
-	float R = 0;
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override
-	{
-		R += InDeltaTime;
-		SetRenderTransform(Matrix2x2::Rotation(Radians(R).GetNormal()));
-	}
-
 	Slot& AddSlot();
 	bool RemoveSlot(size_t Index);
 	size_t FindSlot(const SWidget* Content);

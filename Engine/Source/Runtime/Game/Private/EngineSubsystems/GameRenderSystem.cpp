@@ -43,7 +43,7 @@ void SGameRenderSystem::Init()
 {
 	RenderThread::Init();
 
-	Factory = IApplicationInterface::Get().CreateFactory();
+	Factory = IApplicationInterface::Get().GetFactory();
 	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
 	Device = Factory->CreateDevice(PrimaryAdapter);
 	PrimaryQueue = Device->GetImmediateContext();

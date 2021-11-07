@@ -7,6 +7,7 @@
 #include "D3D12CommandQueue.h"
 #include "DWriteFontCollection.h"
 #include "DWriteTextFormat.h"
+#include "DWriteTextLayout.h"
 #include "WindowsApplication.h"
 
 SDXGIFactory::SDXGIFactory(SWindowsApplication* App) : Super()
@@ -128,4 +129,14 @@ IRHITextFormat* SDXGIFactory::CreateTextFormat(std::wstring_view fontFamilyName,
 	HR(_writeFactory->CreateTextFormat(fontFamilyName.data(), fontCollection_d, (DWRITE_FONT_WEIGHT)fontWeight, (DWRITE_FONT_STYLE)fontStyle, (DWRITE_FONT_STRETCH)fontStretch, fontSize, localeName.data(), &format));
 
 	return NewObject<SDWriteTextFormat>(this, std::move(format));
+}
+
+IRHITextLayout* SDXGIFactory::CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout)
+{
+	auto format_s = Cast<SDWriteTextFormat>(format);
+
+	ComPtr<IDWriteTextLayout> textLayout;
+	HR(_writeFactory->CreateTextLayout(text.data(), (UINT32)text.length(), format_s->Get<IDWriteTextFormat>(), layout.X, layout.Y, &textLayout));
+
+	return NewObject<SDWriteTextLayout>(this, std::move(textLayout));
 }

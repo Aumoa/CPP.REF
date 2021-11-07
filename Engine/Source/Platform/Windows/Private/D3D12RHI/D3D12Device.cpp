@@ -12,8 +12,6 @@
 #include "D3D12DepthStencilView.h"
 #include "D3D12ShaderResourceView.h"
 #include "DXGIFactory.h"
-#include "DWriteTextFormat.h"
-#include "DWriteTextLayout.h"
 #include "D2D1DeviceContext.h"
 #include "D2D1SolidColorBrush.h"
 #include "Materials/Material.h"
@@ -477,17 +475,6 @@ IRHIShaderResourceView* SD3D12Device::CreateShaderResourceView(int32 count)
 	ComPtr<ID3D12DescriptorHeap> heap;
 	HR(_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap)));
 	return NewObject<SD3D12ShaderResourceView>(_factory, this, std::move(heap), count);
-}
-
-IRHITextLayout* SD3D12Device::CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout)
-{
-	auto format_s = Cast<SDWriteTextFormat>(format);
-	auto factory = _factory->Get<IDWriteFactory5>();
-
-	ComPtr<IDWriteTextLayout> textLayout;
-	HR(factory->CreateTextLayout(text.data(), (UINT32)text.length(), format_s->Get<IDWriteTextFormat>(), layout.X, layout.Y, &textLayout));
-
-	return NewObject<SDWriteTextLayout>(_factory, this, std::move(textLayout));
 }
 
 IRHISolidColorBrush* SD3D12Device::CreateSolidColorBrush(const Color& InColor, float InOpacity)
