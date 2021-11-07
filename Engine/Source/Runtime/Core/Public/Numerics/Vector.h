@@ -222,12 +222,12 @@ public:
 	{
 		for (size_t i = 0; i < N; ++i)
 		{
-			if (ScalarsImpl::Scalars[i] == rhs.Scalars[i])
+			if (ScalarsImpl::Scalars[i] != rhs.Scalars[i])
 			{
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	/// <summary>
