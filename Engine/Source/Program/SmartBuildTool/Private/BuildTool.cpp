@@ -1,11 +1,11 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "pch.h"
 #include "BuildTool.h"
 #include "Misc/TickCalc.h"
 #include "Misc/CommandLine.h"
 #include "IO/DirectoryReference.h"
 #include "Guid.h"
+#include "Thirdparty/tinyxml2.h"
 
 DEFINE_LOG_CATEGORY(LogBuildTool);
 
