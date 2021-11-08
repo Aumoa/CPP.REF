@@ -10,4 +10,8 @@ interface IPlatformKeyboard : implements SObject
 	virtual KeyboardState GetState() = 0;
 	virtual void Reset() = 0;
 	virtual bool IsConnected() = 0;
+
+	DECLARE_MULTICAST_DELEGATE(KeyboardDelegate, EKey);
+	KeyboardDelegate KeyPressed;
+	KeyboardDelegate KeyReleased;
 };

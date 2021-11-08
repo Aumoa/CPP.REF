@@ -23,6 +23,8 @@ namespace WindowsPlatformKeyboardInternal
 
         unsigned int bf = 1u << (key & 0x1f);
         ptr[(key >> 5)] |= bf;
+
+        SWindowsPlatformKeyboard::Get().KeyPressed.Invoke((EKey)key);
     }
 
     inline void KeyUp(int key, KeyboardState& state) noexcept
@@ -34,6 +36,8 @@ namespace WindowsPlatformKeyboardInternal
 
         unsigned int bf = 1u << (key & 0x1f);
         ptr[(key >> 5)] &= ~bf;
+
+        SWindowsPlatformKeyboard::Get().KeyReleased.Invoke((EKey)key);
     }
 }
 

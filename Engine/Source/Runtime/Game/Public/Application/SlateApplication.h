@@ -33,4 +33,13 @@ public:
 
 	SLocalPlayer* GetLocalPlayer();
 	SWindow* GetCoreWindow();
+
+private:
+	void OnPlatformKeyPressed(EKey InKey);
+	void OnPlatformKeyReleased(EKey InKey);
+
+	void OnCursorMoved(Vector2N Location);
+	void OnMouseButtonPressed(Vector2N Location, EMouseButton Button);
+	void OnMouseButtonReleased(Vector2N Location, EMouseButton Button);
+	void OnMouseWheelScrolled(int32 ScrollDelta);
 };

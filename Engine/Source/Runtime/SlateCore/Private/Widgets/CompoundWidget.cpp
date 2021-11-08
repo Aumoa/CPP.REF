@@ -47,6 +47,38 @@ int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChi
     return InLayer;
 }
 
+bool SCompoundWidget::OnReceiveMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
+{
+    ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+    ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+    for (auto& Arranged : ArrangedChildren.GetWidgets())
+    {
+        if (Arranged.GetWidget()->SendMouseMoved(Arranged.GetGeometry(), Location))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool SCompoundWidget::OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta)
+{
+    ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+    ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+    for (auto& Arranged : ArrangedChildren.GetWidgets())
+    {
+        if (Arranged.GetWidget()->SendMouseWheelScrolled(Arranged.GetGeometry(), ScrollDelta))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool SCompoundWidget::OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event)
 {
     ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);

@@ -3,6 +3,8 @@
 #include "Widgets/Widget.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
+#include "IApplicationInterface.h"
+#include "Input/IPlatformMouse.h"
 
 SWidget::SWidget() : Super()
 {
@@ -41,6 +43,32 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 {
 	check(bHasRenderTransform);
 	return RenderTransform;
+}
+
+bool SWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
+{
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+        AllottedGeometry.GetLayoutBoundingRect().PtInRect(Location.Cast<float>()))
+    {
+        return OnReceiveMouseMoved(AllottedGeometry, Location);
+    }
+
+    return false;
+}
+
+bool SWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta)
+{
+    auto& PlatformMouse = IApplicationInterface::Get().GetPlatformMouse();
+    auto State = PlatformMouse.GetState();
+    Vector2 CursorPos = Vector2((float)State.X, (float)State.Y);
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+        AllottedGeometry.GetLayoutBoundingRect().PtInRect(CursorPos))
+    {
+        return OnReceiveMouseWheelScrolled(AllottedGeometry, ScrollDelta);
+    }
+
+    return false;
 }
 
 bool SWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event)

@@ -46,6 +46,8 @@ public:
 	inline bool HasRenderTransform() { return bHasRenderTransform; }
 	std::optional<Geometry> GetCachedGeometry() { return CachedGeometry; }
 
+	bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location);
+	bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta);
 	bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event);
 	bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event);
 
@@ -53,6 +55,8 @@ protected:
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) = 0;
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) = 0;
 
+	virtual bool OnReceiveMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location) = 0;
+	virtual bool OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) = 0;
 	virtual bool OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) = 0;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) = 0;
 	

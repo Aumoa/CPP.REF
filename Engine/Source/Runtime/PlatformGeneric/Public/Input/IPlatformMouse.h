@@ -13,4 +13,12 @@ interface IPlatformMouse : implements SObject
     virtual bool IsConnected() = 0;
     virtual bool IsVisible() = 0;
     virtual void SetVisible(bool bNewVisibility) = 0;
+
+    DECLARE_MULTICAST_DELEGATE(CursorDelegate, Vector2N);
+    CursorDelegate CursorMoved;
+    DECLARE_MULTICAST_DELEGATE(MouseButtonDelegate, Vector2N, EMouseButton);
+    MouseButtonDelegate MouseButtonPressed;
+    MouseButtonDelegate MouseButtonReleased;
+    DECLARE_MULTICAST_DELEGATE(MouseWheelDelegate, int32);
+    MouseWheelDelegate MouseWheelScrolled;
 };

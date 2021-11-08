@@ -331,6 +331,10 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "WaitForMultipleObjectsEx");
     }
 
+    // All mouse messages provide a new pointer position
+    int xPos = static_cast<short>(LOWORD(lParam)); // GET_X_LPARAM(lParam);
+    int yPos = static_cast<short>(HIWORD(lParam)); // GET_Y_LPARAM(lParam);
+
     switch (uMsg)
     {
     case WM_ACTIVATEAPP:
@@ -411,30 +415,37 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 
     case WM_LBUTTONDOWN:
         pImpl->mState.bLeftButton = true;
+        Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::Left);
         break;
 
     case WM_LBUTTONUP:
         pImpl->mState.bLeftButton = false;
+        Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::Left);
         break;
 
     case WM_RBUTTONDOWN:
         pImpl->mState.bRightButton = true;
+        Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::Right);
         break;
 
     case WM_RBUTTONUP:
         pImpl->mState.bRightButton = false;
+        Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::Right);
         break;
 
     case WM_MBUTTONDOWN:
         pImpl->mState.bMiddleButton = true;
+        Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::Middle);
         break;
 
     case WM_MBUTTONUP:
         pImpl->mState.bMiddleButton = false;
+        Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::Middle);
         break;
 
     case WM_MOUSEWHEEL:
         pImpl->mState.ScrollWheelValue += GET_WHEEL_DELTA_WPARAM(wParam);
+        Get().MouseWheelScrolled.Invoke(GET_WHEEL_DELTA_WPARAM(wParam));
         return;
 
     case WM_XBUTTONDOWN:
@@ -442,10 +453,12 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         {
         case XBUTTON1:
             pImpl->mState.bXButton1 = true;
+            Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::X1);
             break;
 
         case XBUTTON2:
             pImpl->mState.bXButton2 = true;
+            Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::X2);
             break;
         }
         break;
@@ -455,10 +468,12 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         {
         case XBUTTON1:
             pImpl->mState.bXButton1 = false;
+            Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::X1);
             break;
 
         case XBUTTON2:
             pImpl->mState.bXButton2 = false;
+            Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::X2);
             break;
         }
         break;
@@ -473,10 +488,6 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 
     if (pImpl->mMode == EMousePositionMode::Absolute)
     {
-        // All mouse messages provide a new pointer position
-        int xPos = static_cast<short>(LOWORD(lParam)); // GET_X_LPARAM(lParam);
-        int yPos = static_cast<short>(HIWORD(lParam)); // GET_Y_LPARAM(lParam);
-
         pImpl->mState.X = pImpl->mLastX = xPos;
         pImpl->mState.Y = pImpl->mLastY = yPos;
     }
