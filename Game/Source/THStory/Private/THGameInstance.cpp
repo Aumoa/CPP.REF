@@ -7,6 +7,7 @@
 #include "Widgets/Panel/CanvasPanel.h"
 #include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Widgets/Text/TextBlock.h"
+#include "Widgets/Input/Button.h"
 #include "Application/Viewport.h"
 
 STHGameInstance::STHGameInstance() : Super()
@@ -21,7 +22,7 @@ void STHGameInstance::Init()
 	SLocalPlayer* LocalPlayer = GetLocalPlayer();
 	SViewport* GameViewport = LocalPlayer->GetGameViewport();
 
-	SImage* RotatedImage;
+	SButton* Button;
 
 	auto* Root = SNew(SCanvasPanel)
 		//+SCanvasPanel::Slot()
@@ -79,11 +80,20 @@ void STHGameInstance::Init()
 		.Alignment(0.5f, 0.5f)
 		.Offset(-120.0f, +120.0f, 200.0f, 200.0f)
 		[
-			SAssignNew(RotatedImage, SImage)
-			.Brush(NamedColors::Red)
+			SAssignNew(Button, SButton)
+			[
+				SNew(SImage)
+				.Brush(NamedColors::Red)
+			]
 		];
 
-	RotatedImage->SetRenderTransform(Matrix2x2::Rotation(Degrees(45.0f).ToRadians()));
+	Button->ButtonClicked.AddRaw([Button]()
+	{
+		static Degrees Rotation = 0;
+		Rotation += 45.0f;
+		Rotation = Rotation.GetNormal();
+		Button->SetRenderTransform(Matrix2x2::Rotation(Rotation.ToRadians()));
+	});
 
 	GameViewport->AddToViewport(Root);
 }

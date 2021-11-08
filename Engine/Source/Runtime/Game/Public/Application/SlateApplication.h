@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Layout/Layout.h"
 
 interface IApplicationInterface;
 interface IRHIDeviceContext;
@@ -42,4 +43,6 @@ private:
 	void OnMouseButtonPressed(Vector2N Location, EMouseButton Button);
 	void OnMouseButtonReleased(Vector2N Location, EMouseButton Button);
 	void OnMouseWheelScrolled(int32 ScrollDelta);
+
+	Geometry MakeRoot();
 };

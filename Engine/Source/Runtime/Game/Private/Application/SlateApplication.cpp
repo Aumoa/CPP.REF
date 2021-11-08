@@ -73,46 +73,37 @@ SWindow* SSlateApplication::GetCoreWindow()
 
 void SSlateApplication::OnPlatformKeyPressed(EKey InKey)
 {
-	std::optional<Geometry> CachedGeometry = CoreWindow->GetCachedGeometry();
-	if (!CachedGeometry.has_value())
-	{
-		Vector2 DesiredSize = CoreWindow->GetDesiredSize();
-		CachedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
-	}
-
-	CoreWindow->SendKeyboardEvent(*CachedGeometry, InKey, EKeyboardEvent::Pressed);
+	CoreWindow->SendKeyboardEvent(MakeRoot(), InKey, EKeyboardEvent::Pressed);
 }
 
 void SSlateApplication::OnPlatformKeyReleased(EKey InKey)
 {
-	std::optional<Geometry> CachedGeometry = CoreWindow->GetCachedGeometry();
-	if (!CachedGeometry.has_value())
-	{
-		Vector2 DesiredSize = CoreWindow->GetDesiredSize();
-		CachedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
-	}
-
-	CoreWindow->SendKeyboardEvent(*CachedGeometry, InKey, EKeyboardEvent::Released);
+	CoreWindow->SendKeyboardEvent(MakeRoot(), InKey, EKeyboardEvent::Released);
 }
 
 void SSlateApplication::OnCursorMoved(Vector2N Location)
 {
-	std::optional<Geometry> CachedGeometry = CoreWindow->GetCachedGeometry();
-	if (!CachedGeometry.has_value())
-	{
-		Vector2 DesiredSize = CoreWindow->GetDesiredSize();
-		CachedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
-	}
+	CoreWindow->SendMouseMoved(MakeRoot(), Location);
 }
 
 void SSlateApplication::OnMouseButtonPressed(Vector2N Location, EMouseButton Button)
 {
+	CoreWindow->SendMouseEvent(MakeRoot(), Location, Button, EMouseButtonEvent::Pressed);
 }
 
 void SSlateApplication::OnMouseButtonReleased(Vector2N Location, EMouseButton Button)
 {
+	CoreWindow->SendMouseEvent(MakeRoot(), Location, Button, EMouseButtonEvent::Released);
 }
 
 void SSlateApplication::OnMouseWheelScrolled(int32 ScrollDelta)
 {
+	CoreWindow->SendMouseWheelScrolled(MakeRoot(), ScrollDelta);
+}
+
+Geometry SSlateApplication::MakeRoot()
+{
+	Vector2 DesiredSize = CoreWindow->GetDesiredSize();
+	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
+	return AllottedGeometry;
 }

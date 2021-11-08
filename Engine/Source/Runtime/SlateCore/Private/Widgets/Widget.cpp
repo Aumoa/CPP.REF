@@ -48,7 +48,7 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 bool SWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
 {
     if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetLayoutBoundingRect().PtInRect(Location.Cast<float>()))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
     {
         return OnReceiveMouseMoved(AllottedGeometry, Location);
     }
@@ -63,7 +63,7 @@ bool SWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 Scr
     Vector2 CursorPos = Vector2((float)State.X, (float)State.Y);
 
     if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetLayoutBoundingRect().PtInRect(CursorPos))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(CursorPos))
     {
         return OnReceiveMouseWheelScrolled(AllottedGeometry, ScrollDelta);
     }
@@ -74,7 +74,7 @@ bool SWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 Scr
 bool SWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event)
 {
     if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetLayoutBoundingRect().PtInRect(Location.Cast<float>()))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
     }

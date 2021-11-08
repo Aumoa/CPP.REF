@@ -42,7 +42,7 @@ void SBorder::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geom
 {
 	if (Content && Content->GetVisibility() != ESlateVisibility::Collapsed)
 	{
-		Vector2 Size = Content->GetDesiredSize();
+		Vector2 Size = AllottedGeometry.GetLocalSize();
 		Vector2 PaddingLT = Vector2(Padding.Left, Padding.Top);
 		Vector2 PaddingRB = Vector2(Padding.Right, Padding.Bottom);
 

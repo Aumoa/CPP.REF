@@ -25,8 +25,6 @@ private:
 	Vector2 RenderTransformPivot = Vector2(0.5f, 0.5f);
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
-	std::optional<Geometry> CachedGeometry;
-	std::optional<Vector2> CachedDesiredSize;
 
 	float RenderOpacity = 1.0f;
 
@@ -44,7 +42,6 @@ public:
 	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
 	inline bool HasRenderTransform() { return bHasRenderTransform; }
-	std::optional<Geometry> GetCachedGeometry() { return CachedGeometry; }
 
 	bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location);
 	bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta);

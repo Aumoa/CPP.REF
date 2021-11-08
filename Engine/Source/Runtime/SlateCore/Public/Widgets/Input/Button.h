@@ -16,6 +16,18 @@ protected:
 	virtual bool OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
 
 public:
-	DECLARE_MULTICAST_EVENT(ButtonClickedEvent, EMouseButton, EMouseButtonEvent);
+	DECLARE_MULTICAST_EVENT(ButtonClickedEvent);
 	ButtonClickedEvent ButtonClicked;
+
+private:
+	EMouseButton InterruptButton;
+	EMouseButtonEvent CaughtEvent;
+
+public:
+	BEGIN_SLATE_ATTRIBUTE
+		DECLARE_SLATE_ATTRIBUTE(EMouseButton, InterruptButton, EMouseButton::Left)
+		DECLARE_SLATE_ATTRIBUTE(EMouseButtonEvent, CaughtEvent, EMouseButtonEvent::Released)
+	END_SLATE_ATTRIBUTE
+
+	DECLARE_SLATE_CONSTRUCTOR();
 };

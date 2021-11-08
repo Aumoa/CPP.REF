@@ -94,17 +94,7 @@ void STextBlock::ReallocLayout()
 		IRHIFactory* Factory = IApplicationInterface::Get().GetFactory();
 		IRHITextFormat* Format = Factory->CreateTextFormat(Font.FamilyName, Font.Collection, ERHIFontWeight::Normal, ERHIFontStyle::Normal, ERHIFontStretch::Normal, Font.Size, L"ko-KR");
 
-		std::optional CachedGeometry = GetCachedGeometry();
-		Vector2 LocalSize;
-		if (CachedGeometry.has_value())
-		{
-			LocalSize = CachedGeometry->GetLocalSize();
-		}
-		else
-		{
-			LocalSize = Vector2(1048576.0f, 1048576.0f);
-		}
-
+		Vector2 LocalSize = Vector2(1048576.0f, 1048576.0f);
 		Layout = Factory->CreateTextLayout(Format, Text, LocalSize);
 		Format->SetOuter(Layout);
 		CachedLocalMaxSize = LocalSize;
