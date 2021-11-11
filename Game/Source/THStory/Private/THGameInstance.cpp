@@ -9,6 +9,10 @@
 #include "Widgets/Text/TextBlock.h"
 #include "Widgets/Input/Button.h"
 #include "Application/Viewport.h"
+#include "Animation/SlateAnimationContext.h"
+#include "Animation/SlateAnimationPlayer.h"
+#include "AnimCurves/CustomAnimationCurve.h"
+#include "AnimCurves/LinearAnimationCurve.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -87,13 +91,25 @@ void STHGameInstance::Init()
 			]
 		];
 
-	Button->ButtonClicked.AddRaw([Button]()
+	static Degrees StartRotation = 0;
+
+	auto* RotateAnim = NewObject<SSlateAnimationContext>(L"RotateAnim");
+	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SLinearAnimationCurve>>(0.0f, 45.0f, 0.0f, 0.5f, [Button](float Timing)
 	{
-		static Degrees Rotation = 0;
-		Rotation += 45.0f;
-		Rotation = Rotation.GetNormal();
+		Degrees Rotation = StartRotation + Timing;
 		Button->SetRenderTransform(Matrix2x2::Rotation(Rotation.ToRadians()));
+	}));
+
+	Button->GetAnimPlayer().AnimationFinished.AddRaw([Button, RotateAnim](std::wstring AnimName)
+	{
+		if (AnimName == RotateAnim->GetName())
+		{
+			StartRotation = (StartRotation + 45.0f).GetNormal();
+			Button->PlayAnimation(RotateAnim);
+		}
 	});
+
+	Button->PlayAnimation(RotateAnim);
 
 	GameViewport->AddToViewport(Root);
 }

@@ -48,6 +48,21 @@ public:																						\
 		}																					\
 		else																				\
 		{																					\
+			static_assert(false, "T is not derived from SObject.");							\
+			return nullptr;																	\
+		}																					\
+	}																						\
+																							\
+	template<class T = Class>																\
+	std::weak_ptr<T> WeakFromThis()															\
+	{																						\
+		if constexpr (std::derived_from<T, SObject>)										\
+		{																					\
+			return SharedFromThis<T>();														\
+		}																					\
+		else																				\
+		{																					\
+			static_assert(false, "T is not derived from SObject.");							\
 			return nullptr;																	\
 		}																					\
 	}																						\

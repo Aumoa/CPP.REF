@@ -11,6 +11,8 @@ class SlateWindowElementList;
 class PaintArgs;
 class ArrangedChildrens;
 class ArrangedWidget;
+class SSlateAnimationPlayer;
+class SSlateAnimationContext;
 
 class SLATECORE_API SWidget : implements SObject
 {
@@ -27,6 +29,7 @@ private:
 	uint8 bHasRenderTransform : 1 = false;
 
 	float RenderOpacity = 1.0f;
+	SSlateAnimationPlayer* AnimPlayer = nullptr;
 
 public:
 	SWidget();
@@ -84,6 +87,11 @@ public:
 	bool IsEnabled();
 	void SetRenderOpacity(float InOpacity);
 	float GetRenderOpacity();
+
+public:
+	bool PlayAnimation(SSlateAnimationContext* Animation);
+	void StopAnimations();
+	SSlateAnimationPlayer& GetAnimPlayer();
 };
 
 template<std::derived_from<SWidget> TSlateClass, class TDeclarativeAttr>

@@ -5,9 +5,12 @@
 #include "Draw/SlateWindowElementList.h"
 #include "IApplicationInterface.h"
 #include "Input/IPlatformMouse.h"
+#include "Animation/SlateAnimationPlayer.h"
+#include "Animation/SlateAnimationContext.h"
 
 SWidget::SWidget() : Super()
 {
+    AnimPlayer = NewObject<SSlateAnimationPlayer>();
 }
 
 std::wstring SWidget::ToString(std::wstring_view InFormatArgs)
@@ -27,6 +30,7 @@ void SWidget::ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const G
 
 void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
+    AnimPlayer->Tick(InDeltaTime);
 }
 
 Vector2 SWidget::GetDesiredSize()
@@ -196,4 +200,25 @@ void SWidget::SetRenderOpacity(float InOpacity)
 float SWidget::GetRenderOpacity()
 {
     return RenderOpacity;
+}
+
+bool SWidget::PlayAnimation(SSlateAnimationContext* Animation)
+{
+    if (Animation->IsPlaying())
+    {
+        Animation = Animation->Clone();
+        Animation->SetOuter(this);
+    }
+
+    return AnimPlayer->AddAnimation(Animation);
+}
+
+void SWidget::StopAnimations()
+{
+    AnimPlayer->RemoveAllAnimations();
+}
+
+SSlateAnimationPlayer& SWidget::GetAnimPlayer()
+{
+    return *AnimPlayer;
 }

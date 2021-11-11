@@ -11,6 +11,8 @@ SCompoundWidget::SCompoundWidget() : Super()
 
 void SCompoundWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
+    Super::Tick(AllottedGeometry, InDeltaTime);
+
     ArrangedChildrens ArrangedChildren(ESlateVisibility::All);
     ArrangeChildren(ArrangedChildren, AllottedGeometry);
 
