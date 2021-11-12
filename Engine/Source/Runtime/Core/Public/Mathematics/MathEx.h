@@ -182,65 +182,76 @@ public:
 	/// </summary>
 	static inline constexpr float SmallNumber = 0.0001f;
 
-private:
-	double easeInSine(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InSine)
 	{
 		return sin(1.5707963 * t);
 	}
 
-	double easeOutSine(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutSine)
 	{
 		return 1 + sin(1.5707963 * (--t));
 	}
 
-	double easeInOutSine(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutSine)
 	{
 		return 0.5 * (1 + sin(3.1415926 * (t - 0.5)));
 	}
 
-	double easeInQuad(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InQuad)
 	{
 		return t * t;
 	}
 
-	double easeOutQuad(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutQuad)
 	{
 		return t * (2 - t);
 	}
 
-	double easeInOutQuad(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutQuad)
 	{
 		return t < 0.5 ? 2 * t * t : t * (4 - 2 * t) - 1;
 	}
 
-	double easeInCubic(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InCubic)
 	{
 		return t * t * t;
 	}
 
-	double easeOutCubic(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutCubic)
 	{
 		return 1 + (--t) * t * t;
 	}
 
-	double easeInOutCubic(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutCubic)
 	{
 		return t < 0.5 ? 4 * t * t * t : 1 + (--t) * (2 * (--t)) * (2 * t);
 	}
 
-	double easeInQuart(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InQuart)
 	{
 		t *= t;
 		return t * t;
 	}
 
-	double easeOutQuart(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutQuart)
 	{
 		t = (--t) * t;
 		return 1 - t * t;
 	}
 
-	double easeInOutQuart(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutQuart)
 	{
 		if (t < 0.5)
 		{
@@ -254,19 +265,22 @@ private:
 		}
 	}
 
-	double easeInQuint(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InQuint)
 	{
 		double t2 = t * t;
 		return t * t2 * t2;
 	}
 
-	double easeOutQuint(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutQuint)
 	{
 		double t2 = (--t) * t;
 		return 1 + t * t2 * t2;
 	}
 
-	double easeInOutQuint(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutQuint)
 	{
 		double t2;
 		if (t < 0.5)
@@ -281,17 +295,20 @@ private:
 		}
 	}
 
-	double easeInExpo(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InExpo)
 	{
 		return (pow(2, 8 * t) - 1) / 255;
 	}
 
-	double easeOutExpo(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutExpo)
 	{
 		return 1 - pow(2, -8 * t);
 	}
 
-	double easeInOutExpo(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutExpo)
 	{
 		if (t < 0.5)
 		{
@@ -303,17 +320,20 @@ private:
 		}
 	}
 
-	double easeInCirc(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InCirc)
 	{
 		return 1 - sqrt(1 - t);
 	}
 
-	double easeOutCirc(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutCirc)
 	{
 		return sqrt(t);
 	}
 
-	double easeInOutCirc(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutCirc)
 	{
 		if (t < 0.5)
 		{
@@ -325,17 +345,20 @@ private:
 		}
 	}
 
-	double easeInBack(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InBack)
 	{
 		return t * t * (2.70158 * t - 1.70158);
 	}
 
-	double easeOutBack(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutBack)
 	{
 		return 1 + (--t) * t * (2.70158 * t + 1.70158);
 	}
 
-	double easeInOutBack(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutBack)
 	{
 		if (t < 0.5)
 		{
@@ -347,19 +370,22 @@ private:
 		}
 	}
 
-	double easeInElastic(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InElastic)
 	{
 		double t2 = t * t;
 		return t2 * t2 * sin(t * std::numbers::pi * 4.5);
 	}
 
-	double easeOutElastic(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutElastic)
 	{
 		double t2 = (t - 1) * (t - 1);
 		return 1 - t2 * t2 * cos(t * std::numbers::pi * 4.5);
 	}
 
-	double easeInOutElastic(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutElastic)
 	{
 		double t2;
 		if (t < 0.45)
@@ -378,17 +404,20 @@ private:
 		}
 	}
 
-	double easeInBounce(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InBounce)
 	{
 		return pow(2, 6 * (t - 1)) * abs(sin(t * std::numbers::pi * 3.5));
 	}
 
-	double easeOutBounce(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::OutBounce)
 	{
 		return 1 - pow(2, -6 * t) * abs(cos(t * std::numbers::pi * 3.5));
 	}
 
-	double easeInOutBounce(double t)
+	template<EEaseFunction Function>
+	static double EaseFunction(double t) requires (Function == EEaseFunction::InOutBounce)
 	{
 		if (t < 0.5)
 		{
@@ -400,11 +429,10 @@ private:
 		}
 	}
 
-public:
 	template<class T>
 	static T EaseFunction(EEaseFunction Function, T Value)
 	{
-#define EASE_CASE(NameDo) case EEaseFunction::NameDo: return (T)ease ## NameDo((double)Value);
+#define EASE_CASE(Function) case EEaseFunction::Function: return (T)EaseFunction<EEaseFunction::Function>(Value);
 		switch (Function)
 		{
 			EASE_CASE(InSine)
