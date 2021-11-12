@@ -25,21 +25,23 @@ namespace ReflectionMacros
 	friend class Type;																		\
 																							\
 public:																						\
-	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Class>::Type;			\
-	using This = Class;																		\
+	using Super = typename ReflectionMacros::SuperClassTypeDeclare							\
+		<Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>::Type;								\
+	using This = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>);								\
 																							\
 	static Type* StaticClass()																\
 	{																						\
-		static Type MyClassType(Type::TypeGenerator<Class>(L ## #Class));					\
+		static Type MyClassType(Type::TypeGenerator											\
+			<Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>(L ## #Class));					\
 		return &MyClassType;																\
 	}																						\
 																							\
-	__VA_ARGS__ Type* GetType() const														\
+	virtual Type* GetType() const															\
 	{																						\
 		return StaticClass();																\
 	}																						\
 																							\
-	template<class T = Class>																\
+	template<class T = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>						\
 	std::shared_ptr<T> SharedFromThis()														\
 	{																						\
 		if constexpr (std::derived_from<T, SObject>)										\
@@ -53,7 +55,7 @@ public:																						\
 		}																					\
 	}																						\
 																							\
-	template<class T = Class>																\
+	template<class T = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>						\
 	std::weak_ptr<T> WeakFromThis()															\
 	{																						\
 		if constexpr (std::derived_from<T, SObject>)										\

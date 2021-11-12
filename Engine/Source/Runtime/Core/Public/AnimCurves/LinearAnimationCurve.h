@@ -8,7 +8,7 @@
 template<class T>
 class SLinearAnimationCurve : public SAnimationCurve
 {
-	GENERATED_BODY(SLinearAnimationCurve<T>)
+	GENERATED_BODY(SLinearAnimationCurve, T)
 
 private:
 	T MyTarget;

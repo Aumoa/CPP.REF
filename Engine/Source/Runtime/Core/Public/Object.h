@@ -22,7 +22,7 @@ class SValueType;
 /// </summary>
 class CORE_API SObject : public std::enable_shared_from_this<SObject>
 {
-	GENERATED_BODY(SObject, virtual)
+	GENERATED_BODY(SObject)
 	friend class ObjectId;
 
 private:

@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "AnimationCurve.h"
 
-template<template<class> class AnimCurve>
+template<class AnimCurve>
 class SCustomAnimationCurve : public SAnimationCurve
 {
-	GENERATED_BODY(SCustomAnimationCurve<AnimCurve>)
+	GENERATED_BODY(SCustomAnimationCurve, AnimCurve)
 
 public:
 	using CurveFunction = std::function<void(float)>;
@@ -18,7 +18,7 @@ private:
 	const float EndValue;
 
 	float Timing;
-	AnimCurve<float>* SourceCurve = nullptr;
+	AnimCurve* SourceCurve = nullptr;
 	CurveFunction Function;
 
 public:
@@ -31,7 +31,7 @@ public:
 		, Function(Function)
 	{
 		check((bool)Function);
-		SourceCurve = NewObject<AnimCurve<float>>(Timing, StartValue, EndValue, CurveStart, CurveEnd);
+		SourceCurve = NewObject<AnimCurve>(Timing, StartValue, EndValue, CurveStart, CurveEnd);
 	}
 
 	virtual bool Tick(float InDeltaTime)
