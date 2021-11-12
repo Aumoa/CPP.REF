@@ -13,6 +13,7 @@
 #include "Animation/SlateAnimationPlayer.h"
 #include "AnimCurves/CustomAnimationCurve.h"
 #include "AnimCurves/LinearAnimationCurve.h"
+#include "AnimCurves/EaseAnimationCurve.h"
 #include "IApplicationInterface.h"
 
 STHGameInstance::STHGameInstance() : Super()
@@ -95,7 +96,7 @@ void STHGameInstance::Init()
 		];
 
 	auto* RotateAnim = NewObject<SSlateAnimationContext>(L"RotateAnim");
-	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SLinearAnimationCurve>>(0.0f, 90.0f, 0.0f, 0.5f, [Button](float Timing)
+	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SEaseAnimationCurve<float, EEaseFunction::InOutBounce>>>(0.0f, 90.0f, 0.0f, 2.0f, [Button](float Timing)
 	{
 		Degrees Rotation = Timing;
 		Button->SetRenderTransform(Matrix2x2::Rotation(Rotation.ToRadians()));
