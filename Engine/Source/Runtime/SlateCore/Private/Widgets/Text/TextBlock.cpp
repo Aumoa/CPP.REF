@@ -45,6 +45,34 @@ Color STextBlock::GetTintColor()
 	return TintColor;
 }
 
+void STextBlock::SetTextAlignment(ERHITextAlignment Alignment)
+{
+	TextAlignment = Alignment;
+	if (Layout)
+	{
+		Layout->SetTextAlignment(Alignment);
+	}
+}
+
+ERHITextAlignment STextBlock::GetTextAlignment()
+{
+	return TextAlignment;
+}
+
+void STextBlock::SetParagraphAlignment(ERHIParagraphAlignment Alignment)
+{
+	ParagraphAlignment = Alignment;
+	if (Layout)
+	{
+		Layout->SetParagraphAlignment(Alignment);
+	}
+}
+
+ERHIParagraphAlignment STextBlock::GetParagraphAlignment()
+{
+	return ParagraphAlignment;
+}
+
 Vector2 STextBlock::GetDesiredSize()
 {
 	if (Layout)
@@ -101,6 +129,9 @@ void STextBlock::ReallocLayout()
 
 		Layout->SetOuter(this);
 		bNeedToReallocateLayout = false;
+
+		Layout->SetTextAlignment(TextAlignment);
+		Layout->SetParagraphAlignment(ParagraphAlignment);
 	}
 }
 

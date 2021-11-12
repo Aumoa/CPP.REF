@@ -433,5 +433,20 @@ enum class ERHIDrawTextOptions
 };
 DEFINE_ENUM_FLAG_OPERATORS(ERHIDrawTextOptions);
 
+enum class ERHITextAlignment
+{
+    Leading,
+    Trailing,
+    Center,
+    Justified,
+};
+
+enum class ERHIParagraphAlignment
+{
+    Near,
+    Far,
+    Center
+};
+
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

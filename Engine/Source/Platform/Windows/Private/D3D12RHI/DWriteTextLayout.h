@@ -12,7 +12,7 @@ class SDWriteTextLayout : public SDXGIFactoryChild, implements IRHITextLayout
 	GENERATED_BODY(SDWriteTextLayout)
 
 private:
-	ComPtr<IDWriteTextLayout> _layout;
+	ComPtr<IDWriteTextLayout> Layout;
 
 public:
 	SDWriteTextLayout(SDXGIFactory* factory, ComPtr<IDWriteTextLayout> layout);
@@ -20,7 +20,11 @@ public:
 	virtual void SetMaxSize(const Vector2& InSize) override;
 	virtual Vector2 GetMaxSize() override;
 	virtual Vector2 GetDesiredSize() override;
+	virtual void SetTextAlignment(ERHITextAlignment Alignment) override;
+	virtual ERHITextAlignment GetTextAlignment() override;
+	virtual void SetParagraphAlignment(ERHIParagraphAlignment Alignment) override;
+	virtual ERHIParagraphAlignment GetParagraphAlignment() override;
 
 public:
-	DECLARE_GETTER(IDWriteTextLayout, _layout);
+	DECLARE_GETTER(IDWriteTextLayout, Layout);
 };
