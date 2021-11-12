@@ -4,6 +4,7 @@
 #include "Input/WindowsPlatformKeyboard.h"
 #include "Input/WindowsPlatformMouse.h"
 #include "D3D12RHI/DXGIFactory.h"
+#include "Multimedia/WindowsImage.h"
 
 #define WM_UPDATETICKMODE		WM_APP + 1
 #define WM_PRESENT				WM_UPDATETICKMODE + 1
@@ -29,6 +30,9 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 	{
 		ReportWindowsError(L"Could not create core window.");
 	}
+
+	HR(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
+	HR(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&ImagingFactory)));
 }
 
 void SWindowsApplication::Start()
@@ -169,6 +173,35 @@ IPlatformKeyboard& SWindowsApplication::GetPlatformKeyboard()
 IPlatformMouse& SWindowsApplication::GetPlatformMouse()
 {
 	return SWindowsPlatformMouse::Get();
+}
+
+IPlatformImage* SWindowsApplication::CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat)
+{
+	ComPtr<IWICBitmapDecoder> Decoder;
+	HR(ImagingFactory->CreateDecoderFromFilename(InAssetPath.wstring().c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &Decoder));
+
+	ComPtr<IWICBitmapFrameDecode> Frame;
+	HR(Decoder->GetFrame(0, &Frame));
+
+	WICPixelFormatGUID FormatGUID;
+
+	switch (PixelFormat)
+	{
+	case ERHIPixelFormat::B8G8R8A8_UNORM:
+		FormatGUID = GUID_WICPixelFormat32bppPBGRA;
+		break;
+	case ERHIPixelFormat::R8G8B8A8_UNORM:
+		FormatGUID = GUID_WICPixelFormat32bppPRGBA;
+		break;
+	default:
+		SE_LOG(LogWindows, Fatal, L"Not supported pixel format.");
+	}
+
+	ComPtr<IWICFormatConverter> Converter;
+	HR(ImagingFactory->CreateFormatConverter(&Converter));
+	HR(Converter->Initialize(Frame.Get(), FormatGUID, WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
+
+	return NewObject<SWindowsImage>(Converter.Get(), PixelFormat);
 }
 
 HWND SWindowsApplication::GetWindowHandle()

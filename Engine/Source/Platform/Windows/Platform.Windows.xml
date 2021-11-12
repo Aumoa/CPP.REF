@@ -14,5 +14,6 @@
 		<Item Name="D3d11.lib" />
 		<Item Name="D2D1.lib" />
 		<Item Name="DWrite.lib" />
+		<Item Name="WindowsCodecs.lib" />
 	</ExternalLinks>
 </ProjectInfo>

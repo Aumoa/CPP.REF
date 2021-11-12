@@ -40,10 +40,7 @@ struct RectT
 		return std::format(L"{{LT: {}, RB: {}, [{} * {}]}}", GetLeftTop().ToString(formatArgs), GetRightBottom().ToString(formatArgs), GetWidth(), GetHeight());
 	}
 
-	constexpr bool NearlyEquals(const RectT& rhs, T epsilon = MathEx::SmallNumber) const requires requires
-	{
-		{ T(MathEx::SmallNumber) < T(1) };
-	}
+	constexpr bool NearlyEquals(const RectT& rhs, T epsilon = MathEx::SmallNumber) const
 	{
 		return MathEx::Abs(Left - rhs.Left) <= epsilon
 			&& MathEx::Abs(Top - rhs.Top) <= epsilon

@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "IApplicationInterface.h"
 #include "WindowsIncludes.h"
+#include "Multimedia/IPlatformImageLoader.h"
 
 class SDXGIFactory;
 
-class SWindowsApplication : implements SObject, implements IApplicationInterface
+class SWindowsApplication : implements SObject, implements IApplicationInterface, implements IPlatformImageLoader
 {
 	GENERATED_BODY(SWindowsApplication)
 
@@ -19,12 +20,15 @@ private:
 	HWND hWnd = nullptr;
 	ETickMode TickMode = ETickMode::Realtime;
 	ETickMode ActualTickMode = ETickMode::Realtime;
-	SDXGIFactory* Factory = nullptr;
 	std::vector<std::weak_ptr<SObject>> RealtimeDemanders;
+
+	SDXGIFactory* Factory = nullptr;
+	ComPtr<IWICImagingFactory> ImagingFactory;
 
 public:
 	SWindowsApplication(HINSTANCE hInstance);
 
+	// IApplicationInterface
 	virtual void Start() override;
 	virtual Vector2N GetViewportSize() override;
 	virtual float GetDpi() override;
@@ -40,6 +44,11 @@ public:
 	virtual IRHIFactory* GetFactory() override;
 	virtual IPlatformKeyboard& GetPlatformKeyboard() override;
 	virtual IPlatformMouse& GetPlatformMouse() override;
+	// ~IApplicationInterface
+
+	// IPlatformImageLoader
+	virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
+	// ~IPlatformImageLoader
 
 	HWND GetWindowHandle();
 

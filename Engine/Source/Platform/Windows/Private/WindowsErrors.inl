@@ -25,3 +25,9 @@ inline void ReportCOMError(std::wstring_view InMessage, HRESULT Error)
 	_com_error ComError(Error);
 	SE_LOG(LogWindows, Fatal, L"An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", InMessage, (uint32)Error, TCHAR_TO_WCHAR(ComError.ErrorMessage()));
 }
+
+#define HR(x)								\
+if (HRESULT __HR__ = (x); FAILED(__HR__))	\
+{											\
+	ReportCOMError(L ## #x, __HR__);		\
+}

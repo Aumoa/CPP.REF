@@ -5,12 +5,6 @@
 #include "CoreMinimal.h"
 #include "WindowsIncludes.h"
 
-#define HR(x)								\
-if (HRESULT __HR__ = (x); FAILED(__HR__))	\
-{											\
-	ReportCOMError(L ## #x, __HR__);		\
-}
-
 #define DECLARE_GETTER(Type, Member)								\
 	template<std::same_as<Type> T>									\
 	inline T* Get() { return static_cast<Type*>(Member.Get()); }
