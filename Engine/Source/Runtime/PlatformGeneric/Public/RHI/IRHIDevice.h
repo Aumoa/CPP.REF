@@ -15,6 +15,7 @@ interface IRHIDepthStencilView;
 interface IRHIShaderResourceView;
 interface IRHIDeviceContext2D;
 interface IRHISolidColorBrush;
+interface IRHIBitmap;
 class SMaterial;
 
 interface IRHIDevice : implements IRHIFactoryChild
@@ -29,6 +30,8 @@ interface IRHIDevice : implements IRHIFactoryChild
 	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 Count) = 0;
 	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 Count) = 0;
 	virtual IRHISolidColorBrush* CreateSolidColorBrush(const Color& InColor, float InOpacity = 1.0f) = 0;
+	virtual IRHIBitmap* CreateBitmapFromTexture2D(IRHITexture2D* InTexture) = 0;
+
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 	virtual void FlushCommands() = 0;

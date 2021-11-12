@@ -14,6 +14,8 @@
 #include "DXGIFactory.h"
 #include "D2D1DeviceContext.h"
 #include "D2D1SolidColorBrush.h"
+#include "D2D1Bitmap.h"
+#include "IApplicationInterface.h"
 #include "Materials/Material.h"
 #include "Threading/Thread.h"
 
@@ -482,6 +484,42 @@ IRHISolidColorBrush* SD3D12Device::CreateSolidColorBrush(const Color& InColor, f
 	ComPtr<ID2D1SolidColorBrush> Brush;
 	HR(_interop.DeviceContext2D->CreateSolidColorBrush((const D2D1_COLOR_F&)InColor, &Brush));
 	return NewObject<SD2D1SolidColorBrush>(_factory, this, Brush.Get());
+}
+
+IRHIBitmap* SD3D12Device::CreateBitmapFromTexture2D(IRHITexture2D* InTexture)
+{
+	auto* Texture_s = Cast<SD3D12Texture2D>(InTexture);
+	auto* Texture_r = Texture_s->Get<ID3D12Resource>();
+
+	RHITexture2DDesc Desc = Texture_s->GetDesc();
+
+	auto Flags = (D3D12_RESOURCE_FLAGS)Desc.Flags;
+	D3D11_RESOURCE_FLAGS BindFlags =
+	{
+		.BindFlags = GetInteropBindFlag(Flags)
+	};
+
+	D3D12_RESOURCE_STATES InteropInitialState = (Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) != 0 ? D3D12_RESOURCE_STATE_RENDER_TARGET : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	ComPtr<ID3D11Resource> WrappedResource;
+	HR(_interop.InteropDevice->CreateWrappedResource(Texture_r, &BindFlags, InteropInitialState, (D3D12_RESOURCE_STATES)Desc.InitialState, IID_PPV_ARGS(&WrappedResource)));
+
+	ComPtr<IDXGISurface> Surf;
+	HR(WrappedResource.As(&Surf));
+
+	D2D1_BITMAP_OPTIONS Options = D2D1_BITMAP_OPTIONS_NONE;
+	if (Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET)
+	{
+		Options |= D2D1_BITMAP_OPTIONS_TARGET;
+	}
+
+	float DpiScale = IApplicationInterface::Get().GetDpi();
+	ComPtr<ID2D1Bitmap1> Bitmap;
+	HR(_interop.DeviceContext2D->CreateBitmapFromDxgiSurface(Surf.Get(), D2D1::BitmapProperties1(Options, D2D1::PixelFormat((DXGI_FORMAT)Desc.Format, D2D1_ALPHA_MODE_PREMULTIPLIED), DpiScale, DpiScale), &Bitmap));
+
+	auto* Result = NewObject<SD2D1Bitmap>(_factory, this, Bitmap.Get());
+	Result->InitWrappedResources(Texture_r, WrappedResource.Get());
+
+	return Result;
 }
 
 void SD3D12Device::BeginFrame()

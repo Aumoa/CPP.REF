@@ -4,6 +4,7 @@
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHITexture2D.h"
 #include "RHI/IRHIRenderTargetView.h"
+#include "RHI/IRHIBitmap.h"
 
 SColorRenderTarget::SColorRenderTarget(IRHIDevice* InDevice, const Vector2N& InitialViewportSize) : Super(InDevice, 1, false)
 	, Device(InDevice)
@@ -18,11 +19,23 @@ IRHITexture2D* SColorRenderTarget::GetRenderTexture()
 	return RenderTarget;
 }
 
+IRHIBitmap* SColorRenderTarget::GetRenderBitmap()
+{
+	return RenderBitmap;
+}
+
 void SColorRenderTarget::SetViewportSize(const Vector2N& InViewportSize)
 {
 	if (RenderTarget && RenderTarget->GetOuter() == this)
 	{
 		DestroyObject(RenderTarget);
+		RenderTarget = nullptr;
+	}
+
+	if (RenderBitmap && RenderBitmap->GetOuter() == this)
+	{
+		DestroyObject(RenderBitmap);
+		RenderBitmap = nullptr;
 	}
 
 	RHITexture2DClearValue ClearValue;
@@ -44,6 +57,9 @@ void SColorRenderTarget::SetViewportSize(const Vector2N& InViewportSize)
 	RenderTarget = Device->CreateTexture2D(Desc, nullptr);
 	RenderTarget->SetOuter(this);
 	GetRTV()->CreateRenderTargetView(0, RenderTarget, nullptr);
+
+	RenderBitmap = Device->CreateBitmapFromTexture2D(RenderTarget);
+	RenderBitmap->SetOuter(this);
 
 	bMultisampled = Desc.SampleDesc.Count != 1;
 }

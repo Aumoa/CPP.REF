@@ -5,9 +5,13 @@
 #include "CoreMinimal.h"
 #include "WindowsIncludes.h"
 
-#define DECLARE_GETTER(Type, Member)								\
-	template<std::same_as<Type> T>									\
-	inline T* Get() { return static_cast<Type*>(Member.Get()); }
+#define DECLARE_GETTER(Type, Member)												\
+	template<std::same_as<Type> T> requires requires { Member.Get(); }				\
+	inline T* Get(short) { return static_cast<Type*>(Member.Get()); }				\
+	template<std::same_as<Type> T> requires requires { static_cast<Type*>(Member); }\
+	inline T* Get(int) { return static_cast<Type*>(Member); }						\
+	template<std::same_as<Type> T>													\
+	inline T* Get() { return Get<T>(0); }
 
 inline UINT GetInteropBindFlag(D3D12_RESOURCE_FLAGS flags)
 {

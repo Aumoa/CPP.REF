@@ -54,6 +54,8 @@ public:
 	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 Count) override;
 	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 Count) override;
 	virtual IRHISolidColorBrush* CreateSolidColorBrush(const Color& InColor, float InOpacity) override;
+	virtual IRHIBitmap* CreateBitmapFromTexture2D(IRHITexture2D* InTexture) override;
+
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
 	virtual void FlushCommands() override;

@@ -2,7 +2,7 @@
 
 #include "D2D1DeviceContext.h"
 #include "D2D1Brush.h"
-#include "D3D12Texture2D.h"
+#include "D2D1Bitmap.h"
 #include "DWriteTextLayout.h"
 
 SD2D1DeviceContext::SD2D1DeviceContext(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1DeviceContext* InDeviceContext, ID3D11On12Device* InteropDevice) : Super(InFactory, InDevice, nullptr)
@@ -22,9 +22,9 @@ void SD2D1DeviceContext::EndDraw()
 	SetTarget(nullptr, std::nullopt);
 }
 
-void SD2D1DeviceContext::SetTarget(IRHITexture2D* InTarget, std::optional<Color> ClearColor)
+void SD2D1DeviceContext::SetTarget(IRHIImage* InTarget, std::optional<Color> ClearColor)
 {
-	auto Target_s = Cast<SD3D12Texture2D>(InTarget);
+	auto Target_s = Cast<SD2D1Bitmap>(InTarget);
 	if (Target_s)
 	{
 		DeviceContext->SetTarget(Target_s->Get<ID2D1Bitmap1>());
@@ -41,7 +41,7 @@ void SD2D1DeviceContext::SetTarget(IRHITexture2D* InTarget, std::optional<Color>
 			AcquireWrappedTarget();
 		}
 
-		const bool bMultisampled = InTarget->GetDesc().SampleDesc.Count != 1;
+		const bool bMultisampled = Target_s->IsMultisampled();
 		DeviceContext->SetAntialiasMode(bMultisampled ? D2D1_ANTIALIAS_MODE_ALIASED : D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 	}
 	else
@@ -80,9 +80,12 @@ void SD2D1DeviceContext::AcquireWrappedTarget()
 {
 	if (auto Ptr = WeakTarget.lock(); Ptr)
 	{
-		auto CastPtr = std::dynamic_pointer_cast<SD3D12Texture2D>(Ptr);
+		auto CastPtr = std::dynamic_pointer_cast<SD2D1Bitmap>(Ptr);
 		auto Resource = CastPtr->Get<ID3D11Resource>();
-		InteropDev->AcquireWrappedResources(&Resource, 1);
+		if (Resource)
+		{
+			InteropDev->AcquireWrappedResources(&Resource, 1);
+		}
 	}
 }
 
@@ -90,10 +93,12 @@ void SD2D1DeviceContext::ReleaseWrappedTarget()
 {
 	if (auto Ptr = WeakTarget.lock(); Ptr)
 	{
-		auto CastPtr = std::dynamic_pointer_cast<SD3D12Texture2D>(Ptr);
+		auto CastPtr = std::dynamic_pointer_cast<SD2D1Bitmap>(Ptr);
 		auto Resource = CastPtr->Get<ID3D11Resource>();
-		InteropDev->ReleaseWrappedResources(&Resource, 1);
-
+		if (Resource)
+		{
+			InteropDev->ReleaseWrappedResources(&Resource, 1);
+		}
 		WeakTarget.reset();
 	}
 }

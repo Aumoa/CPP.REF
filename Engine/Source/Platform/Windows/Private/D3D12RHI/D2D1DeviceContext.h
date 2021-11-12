@@ -20,7 +20,7 @@ public:
 
 	virtual void BeginDraw() override;
 	virtual void EndDraw() override;
-	virtual void SetTarget(IRHITexture2D* InTarget, std::optional<Color> ClearColor) override;
+	virtual void SetTarget(IRHIImage* InTarget, std::optional<Color> ClearColor) override;
 	virtual void SetTransform(const Matrix3x2& Transform) override;
 	virtual Matrix3x2 GetTransform() override;
 	virtual void FillRectangle(IRHIBrush* InBrush, const Rect& Region) override;

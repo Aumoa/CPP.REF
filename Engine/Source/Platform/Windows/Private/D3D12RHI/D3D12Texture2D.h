@@ -17,11 +17,8 @@ private:
 	RHITexture2DDesc _desc;
 	uint64 _totalBytes = 0;
 
-	ComPtr<ID3D11Resource> WrappedResource;
-	ComPtr<ID2D1Bitmap1> Bitmap;
-
 public:
-	SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc, bool bAllowInteropResource = true);
+	SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc);
 
 	virtual RHITexture2DDesc GetDesc() override { return _desc; }
 
@@ -37,6 +34,5 @@ public:
 		const RHISubresourceData* uploadData);
 
 public:
-	DECLARE_GETTER(ID3D11Resource, WrappedResource);
-	DECLARE_GETTER(ID2D1Bitmap1, Bitmap);
+	DECLARE_GETTER(ID3D12Resource, _resource);
 };

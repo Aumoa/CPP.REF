@@ -12,6 +12,7 @@
 #include "RHI/IRHIDeviceContext.h"
 #include "RHI/IRHIDeviceContext2D.h"
 #include "RHI/IRHITexture2D.h"
+#include "RHI/IRHIBitmap.h"
 #include "Level/World.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/SceneViewScope.h"
@@ -93,7 +94,7 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 
 		{
 			SlateRenderer Renderer(DeviceContext2D);
-			DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderTexture());
+			DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderBitmap());
 			SlateApp->DrawElements(&Renderer);
 		}
 
