@@ -22,6 +22,8 @@ interface IApplicationInterface : implements SObject
 
 	virtual void SetTickMode(ETickMode InTickMode) = 0;
 	virtual ETickMode GetTickMode() = 0;
+	virtual void AddRealtimeDemander(SObject* InObject) = 0;
+	virtual void RemoveRealtimeDemander(SObject* InObject) = 0;
 
 	virtual void SetTitle(std::wstring_view InTitle) = 0;
 	virtual std::wstring GetTitle() = 0;
@@ -30,7 +32,7 @@ interface IApplicationInterface : implements SObject
 	virtual IPlatformKeyboard& GetPlatformKeyboard() = 0;
 	virtual IPlatformMouse& GetPlatformMouse() = 0;
 
-	DECLARE_MULTICAST_DELEGATE(IdleDelegate);
+	DECLARE_MULTICAST_DELEGATE(IdleDelegate, ETickMode);
 	IdleDelegate Idle;
 	DECLARE_MULTICAST_DELEGATE(SizedDelegate, Vector2N);
 	SizedDelegate Sized;

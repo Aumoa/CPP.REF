@@ -13,6 +13,7 @@
 #include "Animation/SlateAnimationPlayer.h"
 #include "AnimCurves/CustomAnimationCurve.h"
 #include "AnimCurves/LinearAnimationCurve.h"
+#include "IApplicationInterface.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -27,6 +28,8 @@ void STHGameInstance::Init()
 	SViewport* GameViewport = LocalPlayer->GetGameViewport();
 
 	SButton* Button;
+
+	IApplicationInterface::Get().SetTickMode(IApplicationInterface::ETickMode::Ontime);
 
 	auto* Root = SNew(SCanvasPanel)
 		//+SCanvasPanel::Slot()
@@ -91,25 +94,17 @@ void STHGameInstance::Init()
 			]
 		];
 
-	static Degrees StartRotation = 0;
-
 	auto* RotateAnim = NewObject<SSlateAnimationContext>(L"RotateAnim");
-	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SLinearAnimationCurve>>(0.0f, 45.0f, 0.0f, 0.5f, [Button](float Timing)
+	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SLinearAnimationCurve>>(0.0f, 90.0f, 0.0f, 0.5f, [Button](float Timing)
 	{
-		Degrees Rotation = StartRotation + Timing;
+		Degrees Rotation = Timing;
 		Button->SetRenderTransform(Matrix2x2::Rotation(Rotation.ToRadians()));
 	}));
-
-	Button->GetAnimPlayer().AnimationFinished.AddRaw([Button, RotateAnim](std::wstring AnimName)
+	
+	Button->ButtonClicked.AddRaw([Button, RotateAnim]()
 	{
-		if (AnimName == RotateAnim->GetName())
-		{
-			StartRotation = (StartRotation + 45.0f).GetNormal();
-			Button->PlayAnimation(RotateAnim);
-		}
+		Button->PlayAnimation(RotateAnim);
 	});
-
-	Button->PlayAnimation(RotateAnim);
 
 	GameViewport->AddToViewport(Root);
 }

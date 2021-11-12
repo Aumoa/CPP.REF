@@ -3,7 +3,6 @@
 #include "GameEngine.h"
 #include "LogGame.h"
 #include "GameInstance.h"
-#include "IApplicationInterface.h"
 #include "CoreDelegates.h"
 #include "Threading/Thread.h"
 #include "Level/World.h"
@@ -126,11 +125,18 @@ void SGameEngine::InitializeSubsystems()
 	Subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
 }
 
-void SGameEngine::TickEngine()
+void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
 {
 	using namespace std::chrono;
 
 	auto Tick = TickCalc.DoCalc();
+
+	if (AppTickMode != ActualTickMode || ActualTickMode == IApplicationInterface::ETickMode::Ontime)
+	{
+		Tick = 0ms;
+		AppTickMode = ActualTickMode;
+	}
+
 	SystemsTick(Tick);
 	GameTick(Tick);
 	RenderTick(Tick);

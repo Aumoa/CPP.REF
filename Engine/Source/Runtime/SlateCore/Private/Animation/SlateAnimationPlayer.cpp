@@ -3,6 +3,7 @@
 #include "Animation/SlateAnimationPlayer.h"
 #include "Animation/SlateAnimationContext.h"
 #include "Widgets/Widget.h"
+#include "IApplicationInterface.h"
 
 SSlateAnimationPlayer::SSlateAnimationPlayer() : Super()
 {
@@ -36,6 +37,11 @@ void SSlateAnimationPlayer::Tick(float InDeltaTime)
 		RemoveReferenceObject(Value);
 		Animations.erase(It);
 	}
+
+	if (CompactList.size() && Animations.size() == 0)
+	{
+		IApplicationInterface::Get().RemoveRealtimeDemander(this);
+	}
 }
 
 SWidget* SSlateAnimationPlayer::GetWidget()
@@ -45,6 +51,8 @@ SWidget* SSlateAnimationPlayer::GetWidget()
 
 bool SSlateAnimationPlayer::AddAnimation(SSlateAnimationContext* Animation)
 {
+	const bool bUpdateDemander = Animations.size() == 0;
+
 	auto [It, bSucceeded] = Animations.emplace(Animation->GetName(), Animation);
 	if (!bSucceeded)
 	{
@@ -53,6 +61,12 @@ bool SSlateAnimationPlayer::AddAnimation(SSlateAnimationContext* Animation)
 
 	AddReferenceObject(Animation);
 	Animation->InitCurves();
+
+	if (bUpdateDemander)
+	{
+		IApplicationInterface::Get().AddRealtimeDemander(this);
+	}
+
 	return true;
 }
 

@@ -18,7 +18,9 @@ private:
 	HINSTANCE hInstance = nullptr;
 	HWND hWnd = nullptr;
 	ETickMode TickMode = ETickMode::Realtime;
+	ETickMode ActualTickMode = ETickMode::Realtime;
 	SDXGIFactory* Factory = nullptr;
+	std::vector<std::weak_ptr<SObject>> RealtimeDemanders;
 
 public:
 	SWindowsApplication(HINSTANCE hInstance);
@@ -29,6 +31,8 @@ public:
 
 	virtual void SetTickMode(ETickMode InTickMode) override;
 	virtual ETickMode GetTickMode() override;
+	virtual void AddRealtimeDemander(SObject* InObject) override;
+	virtual void RemoveRealtimeDemander(SObject* InObject) override;
 
 	virtual void SetTitle(std::wstring_view InTitle) override;
 	virtual std::wstring GetTitle() override;
@@ -38,6 +42,10 @@ public:
 	virtual IPlatformMouse& GetPlatformMouse() override;
 
 	HWND GetWindowHandle();
+
+private:
+	void ShrinkRealtimeDemanders();
+	void UpdateRealtimeDemanders();
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -39,7 +39,7 @@ void SWindowsApplication::Start()
 
 	while (true)
 	{
-		if (TickMode == ETickMode::Realtime)
+		if (ActualTickMode == ETickMode::Realtime)
 		{
 			if (PeekMessageW(&Msg, nullptr, 0, 0, PM_REMOVE))
 			{
@@ -55,7 +55,7 @@ void SWindowsApplication::Start()
 			}
 			else
 			{
-				Idle.Invoke();
+				Idle.Invoke(ActualTickMode);
 			}
 		}
 		else
@@ -66,7 +66,7 @@ void SWindowsApplication::Start()
 			}
 			TranslateMessage(&Msg);
 			DispatchMessageW(&Msg);
-			Idle.Invoke();
+			Idle.Invoke(ActualTickMode);
 		}
 	}
 }
@@ -88,16 +88,53 @@ void SWindowsApplication::SetTickMode(ETickMode InTickMode)
 	if (TickMode != InTickMode)
 	{
 		TickMode = InTickMode;
-		if (InTickMode == ETickMode::Realtime)
-		{
-			SendMessageW(hWnd, WM_UPDATETICKMODE, 0, 0);
-		}
+		UpdateRealtimeDemanders();
 	}
 }
 
 auto SWindowsApplication::GetTickMode() -> ETickMode
 {
 	return TickMode;
+}
+
+void SWindowsApplication::AddRealtimeDemander(SObject* InObject)
+{
+	RealtimeDemanders.emplace_back(InObject->WeakFromThis());
+	ShrinkRealtimeDemanders();
+	UpdateRealtimeDemanders();
+}
+
+void SWindowsApplication::RemoveRealtimeDemander(SObject* InObject)
+{
+	std::vector<size_t> CompactList;
+	bool bFound = false;
+
+	for (size_t i = 0; i < RealtimeDemanders.size(); ++i)
+	{
+		auto& Holder = RealtimeDemanders[i];
+		if (Holder.expired())
+		{
+			CompactList.emplace_back(i);
+			continue;
+		}
+
+		auto Ptr = Holder.lock();
+		if (Ptr.get() == InObject)
+		{
+			CompactList.emplace_back(i);
+			bFound = true;
+			break;
+		}
+	}
+
+	size_t NumRemoves = 0;
+	for (auto& Id : CompactList)
+	{
+		size_t Index = Id - NumRemoves++;
+		RealtimeDemanders.erase(RealtimeDemanders.begin() + Index);
+	}
+
+	UpdateRealtimeDemanders();
 }
 
 void SWindowsApplication::SetTitle(std::wstring_view InTitle)
@@ -137,6 +174,41 @@ IPlatformMouse& SWindowsApplication::GetPlatformMouse()
 HWND SWindowsApplication::GetWindowHandle()
 {
 	return hWnd;
+}
+
+void SWindowsApplication::ShrinkRealtimeDemanders()
+{
+	std::vector<size_t> CompactList;
+	for (size_t i = 0; i < RealtimeDemanders.size(); ++i)
+	{
+		auto& Holder = RealtimeDemanders[i];
+		if (Holder.expired())
+		{
+			CompactList.emplace_back(i);
+			continue;
+		}
+	}
+
+	size_t NumRemoves = 0;
+	for (auto& Id : CompactList)
+	{
+		size_t Index = Id - NumRemoves++;
+		RealtimeDemanders.erase(RealtimeDemanders.begin() + Index);
+	}
+}
+
+void SWindowsApplication::UpdateRealtimeDemanders()
+{
+	if (RealtimeDemanders.size())
+	{
+		ActualTickMode = ETickMode::Realtime;
+	}
+	else
+	{
+		ActualTickMode = TickMode;
+	}
+
+	PostMessageW(hWnd, WM_UPDATETICKMODE, 0, 0);
 }
 
 LRESULT CALLBACK SWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

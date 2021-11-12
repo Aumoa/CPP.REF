@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Ticking/TickScheduler.h"
 #include "Misc/TickCalc.h"
+#include "IApplicationInterface.h"
 
-interface IApplicationInterface;
 class SGameInstance;
 class SGameEngineSubsystem;
 class SSlateApplication;
@@ -76,8 +76,10 @@ public:
 	}
 
 private:
-	void TickEngine();
+	IApplicationInterface::ETickMode AppTickMode;
 	TickCalc<> TickCalc;
+
+	void TickEngine(IApplicationInterface::ETickMode ActualTickMode);
 
 private:
 	void SystemsTick(std::chrono::duration<float> InDeltaTime);
