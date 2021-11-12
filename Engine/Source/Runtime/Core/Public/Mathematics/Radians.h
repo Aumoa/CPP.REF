@@ -6,6 +6,7 @@
 #include <format>
 #include <numbers>
 #include "Misc/StringUtils.h"
+#include "MathEx.h"
 
 struct Degrees;
 

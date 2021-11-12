@@ -4,8 +4,8 @@
 
 #include <string>
 #include "Radians.h"
-#include "MathEx.h"
 #include "Misc/StringUtils.h"
+#include "MathEx.h"
 
 /// <summary>
 /// Represents the degrees value.

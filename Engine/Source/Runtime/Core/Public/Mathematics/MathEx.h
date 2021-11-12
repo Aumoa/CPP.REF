@@ -3,7 +3,9 @@
 #pragma once
 
 #include <concepts>
+#include <numbers>
 #include "PrimitiveTypes.h"
+#include "EaseFunction.h"
 
 struct Radians;
 
@@ -179,4 +181,265 @@ public:
 	/// Represents small number.
 	/// </summary>
 	static inline constexpr float SmallNumber = 0.0001f;
+
+private:
+	double easeInSine(double t)
+	{
+		return sin(1.5707963 * t);
+	}
+
+	double easeOutSine(double t)
+	{
+		return 1 + sin(1.5707963 * (--t));
+	}
+
+	double easeInOutSine(double t)
+	{
+		return 0.5 * (1 + sin(3.1415926 * (t - 0.5)));
+	}
+
+	double easeInQuad(double t)
+	{
+		return t * t;
+	}
+
+	double easeOutQuad(double t)
+	{
+		return t * (2 - t);
+	}
+
+	double easeInOutQuad(double t)
+	{
+		return t < 0.5 ? 2 * t * t : t * (4 - 2 * t) - 1;
+	}
+
+	double easeInCubic(double t)
+	{
+		return t * t * t;
+	}
+
+	double easeOutCubic(double t)
+	{
+		return 1 + (--t) * t * t;
+	}
+
+	double easeInOutCubic(double t)
+	{
+		return t < 0.5 ? 4 * t * t * t : 1 + (--t) * (2 * (--t)) * (2 * t);
+	}
+
+	double easeInQuart(double t)
+	{
+		t *= t;
+		return t * t;
+	}
+
+	double easeOutQuart(double t)
+	{
+		t = (--t) * t;
+		return 1 - t * t;
+	}
+
+	double easeInOutQuart(double t)
+	{
+		if (t < 0.5)
+		{
+			t *= t;
+			return 8 * t * t;
+		}
+		else
+		{
+			t = (--t) * t;
+			return 1 - 8 * t * t;
+		}
+	}
+
+	double easeInQuint(double t)
+	{
+		double t2 = t * t;
+		return t * t2 * t2;
+	}
+
+	double easeOutQuint(double t)
+	{
+		double t2 = (--t) * t;
+		return 1 + t * t2 * t2;
+	}
+
+	double easeInOutQuint(double t)
+	{
+		double t2;
+		if (t < 0.5)
+		{
+			t2 = t * t;
+			return 16 * t * t2 * t2;
+		}
+		else
+		{
+			t2 = (--t) * t;
+			return 1 + 16 * t * t2 * t2;
+		}
+	}
+
+	double easeInExpo(double t)
+	{
+		return (pow(2, 8 * t) - 1) / 255;
+	}
+
+	double easeOutExpo(double t)
+	{
+		return 1 - pow(2, -8 * t);
+	}
+
+	double easeInOutExpo(double t)
+	{
+		if (t < 0.5)
+		{
+			return (pow(2, 16 * t) - 1) / 510;
+		}
+		else
+		{
+			return 1 - 0.5 * pow(2, -16 * (t - 0.5));
+		}
+	}
+
+	double easeInCirc(double t)
+	{
+		return 1 - sqrt(1 - t);
+	}
+
+	double easeOutCirc(double t)
+	{
+		return sqrt(t);
+	}
+
+	double easeInOutCirc(double t)
+	{
+		if (t < 0.5)
+		{
+			return (1 - sqrt(1 - 2 * t)) * 0.5;
+		}
+		else
+		{
+			return (1 + sqrt(2 * t - 1)) * 0.5;
+		}
+	}
+
+	double easeInBack(double t)
+	{
+		return t * t * (2.70158 * t - 1.70158);
+	}
+
+	double easeOutBack(double t)
+	{
+		return 1 + (--t) * t * (2.70158 * t + 1.70158);
+	}
+
+	double easeInOutBack(double t)
+	{
+		if (t < 0.5)
+		{
+			return t * t * (7 * t - 2.5) * 2;
+		}
+		else
+		{
+			return 1 + (--t) * t * 2 * (7 * t + 2.5);
+		}
+	}
+
+	double easeInElastic(double t)
+	{
+		double t2 = t * t;
+		return t2 * t2 * sin(t * std::numbers::pi * 4.5);
+	}
+
+	double easeOutElastic(double t)
+	{
+		double t2 = (t - 1) * (t - 1);
+		return 1 - t2 * t2 * cos(t * std::numbers::pi * 4.5);
+	}
+
+	double easeInOutElastic(double t)
+	{
+		double t2;
+		if (t < 0.45)
+		{
+			t2 = t * t;
+			return 8 * t2 * t2 * sin(t * std::numbers::pi * 9);
+		}
+		else if (t < 0.55)
+		{
+			return 0.5 + 0.75 * sin(t * std::numbers::pi * 4);
+		}
+		else
+		{
+			t2 = (t - 1) * (t - 1);
+			return 1 - 8 * t2 * t2 * sin(t * std::numbers::pi * 9);
+		}
+	}
+
+	double easeInBounce(double t)
+	{
+		return pow(2, 6 * (t - 1)) * abs(sin(t * std::numbers::pi * 3.5));
+	}
+
+	double easeOutBounce(double t)
+	{
+		return 1 - pow(2, -6 * t) * abs(cos(t * std::numbers::pi * 3.5));
+	}
+
+	double easeInOutBounce(double t)
+	{
+		if (t < 0.5)
+		{
+			return 8 * pow(2, 8 * (t - 1)) * abs(sin(t * std::numbers::pi * 7));
+		}
+		else
+		{
+			return 1 - 8 * pow(2, -8 * t) * abs(sin(t * std::numbers::pi * 7));
+		}
+	}
+
+public:
+	template<class T>
+	static T EaseFunction(EEaseFunction Function, T Value)
+	{
+#define EASE_CASE(NameDo) case EEaseFunction::NameDo: return (T)ease ## NameDo((double)Value);
+		switch (Function)
+		{
+			EASE_CASE(InSine)
+			EASE_CASE(OutSine)
+			EASE_CASE(InOutSine)
+			EASE_CASE(InQuad)
+			EASE_CASE(OutQuad)
+			EASE_CASE(InOutQuad)
+			EASE_CASE(InCubic)
+			EASE_CASE(OutCubic)
+			EASE_CASE(InOutCubic)
+			EASE_CASE(InQuart)
+			EASE_CASE(OutQuart)
+			EASE_CASE(InOutQuart)
+			EASE_CASE(InQuint)
+			EASE_CASE(OutQuint)
+			EASE_CASE(InOutQuint)
+			EASE_CASE(InExpo)
+			EASE_CASE(OutExpo)
+			EASE_CASE(InOutExpo)
+			EASE_CASE(InCirc)
+			EASE_CASE(OutCirc)
+			EASE_CASE(InOutCirc)
+			EASE_CASE(InBack)
+			EASE_CASE(OutBack)
+			EASE_CASE(InOutBack)
+			EASE_CASE(InElastic)
+			EASE_CASE(OutElastic)
+			EASE_CASE(InOutElastic)
+			EASE_CASE(InBounce)
+			EASE_CASE(OutBounce)
+			EASE_CASE(InOutBounce)
+		default:
+			return Value;
+		}
+#undef EASE_CASE
+	}
 };
