@@ -411,6 +411,7 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         return;
 
     case WM_MOUSEMOVE:
+        Get().CursorMoved.Invoke(Vector2N(xPos, yPos));
         break;
 
     case WM_LBUTTONDOWN:

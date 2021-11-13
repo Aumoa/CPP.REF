@@ -30,6 +30,27 @@ void SWidget::ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const G
 
 void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(CachedMouseLocation))
+    {
+        const bool bHover = AllottedGeometry.IsUnderLocation(CachedMouseLocation);
+        if (!bMouseHover && bHover)
+        {
+            MouseHovered.Invoke(true);
+            bMouseHover = true;
+        }
+        else if (bMouseHover && !bHover)
+        {
+            MouseHovered.Invoke(false);
+            bMouseHover = false;
+        }
+    }
+    else if (bMouseHover)
+    {
+        MouseHovered.Invoke(false);
+        bMouseHover = false;
+    }
+
     AnimPlayer->Tick(InDeltaTime);
 }
 
@@ -51,8 +72,8 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 
 bool SWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
 {
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
+    CachedMouseLocation = Location.Cast<float>();
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
     {
         return OnReceiveMouseMoved(AllottedGeometry, Location);
     }

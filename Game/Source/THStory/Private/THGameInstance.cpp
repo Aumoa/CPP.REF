@@ -29,6 +29,7 @@ void STHGameInstance::Init()
 	SViewport* GameViewport = LocalPlayer->GetGameViewport();
 
 	SButton* Button;
+	SImage* Image;
 
 	IApplicationInterface::Get().SetTickMode(IApplicationInterface::ETickMode::Ontime);
 
@@ -90,7 +91,7 @@ void STHGameInstance::Init()
 		[
 			SAssignNew(Button, SButton)
 			[
-				SNew(SImage)
+				SAssignNew(Image, SImage)
 				.Brush(NamedColors::Red)
 			]
 		];
@@ -105,6 +106,13 @@ void STHGameInstance::Init()
 	Button->ButtonClicked.AddRaw([Button, RotateAnim]()
 	{
 		Button->PlayAnimation(RotateAnim);
+	});
+
+	Image->MouseHovered.AddRaw([Image](bool bHover)
+	{
+		SlateBrush Brush = Image->GetBrush();
+		Brush.TintColor = bHover ? NamedColors::Yellow : NamedColors::Red;
+		Image->SetBrush(Brush);
 	});
 
 	GameViewport->AddToViewport(Root);

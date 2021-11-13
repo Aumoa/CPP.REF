@@ -27,9 +27,11 @@ private:
 	Vector2 RenderTransformPivot = Vector2(0.5f, 0.5f);
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
+	uint8 bMouseHover : 1 = false;
 
 	float RenderOpacity = 1.0f;
 	SSlateAnimationPlayer* AnimPlayer = nullptr;
+	Vector2 CachedMouseLocation;
 
 public:
 	SWidget();
@@ -63,11 +65,15 @@ protected:
 	bool IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget& ArrangedChild);
 	bool ShouldBeEnabled(bool bParentEnabled);
 
+public:
+	DECLARE_MULTICAST_EVENT(MouseHoveredEvent, bool);
+	MouseHoveredEvent MouseHovered;
+
 public:					
 	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility, Visibility)
-		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection)
-		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping)
+		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility, Visibility, ESlateVisibility::Visible)
+		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection, EFlowDirection::LeftToRight)
+		DECLARE_SLATE_ATTRIBUTE(EWidgetClipping, Clipping, EWidgetClipping::Inherit)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
 		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
 	END_SLATE_ATTRIBUTE;
