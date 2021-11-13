@@ -22,6 +22,18 @@ SSlateApplication::SSlateApplication() : Super()
 
 SSlateApplication::~SSlateApplication()
 {
+	// Remove all delegates for dispose DLL link.
+	auto& App = IApplicationInterface::Get();
+
+	auto& PlatformKeyboard = App.GetPlatformKeyboard();
+	PlatformKeyboard.KeyPressed.RemoveAll(this);
+	PlatformKeyboard.KeyReleased.RemoveAll(this);
+
+	auto& PlatformMouse = App.GetPlatformMouse();
+	PlatformMouse.CursorMoved.RemoveAll(this);
+	PlatformMouse.MouseButtonPressed.RemoveAll(this);
+	PlatformMouse.MouseButtonReleased.RemoveAll(this);
+	PlatformMouse.MouseWheelScrolled.RemoveAll(this);
 }
 
 void SSlateApplication::Init(IApplicationInterface* InApplication)

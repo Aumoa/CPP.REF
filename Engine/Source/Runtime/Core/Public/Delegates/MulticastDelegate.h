@@ -129,15 +129,12 @@ class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 		template<class... TInvokeArgs>
 		bool ApplyAfter(TInvokeArgs&&... args)
 		{
-			std::shared_ptr<SObject> lock;
 			if (bHolder)
 			{
 				if (Holder.expired())
 				{
 					return false;
 				}
-
-				lock = Holder.lock();
 			}
 
 			Body(std::forward<TInvokeArgs>(args)...);
@@ -204,9 +201,9 @@ public:
 		int64 id = _id++;
 
 		DelegateInstance instance(id, [sobject, payload](TArgs&&... args)
-			{
-				(sobject->*payload)(std::forward<TArgs>(args)...);
-			}, sobject->weak_from_this());
+		{
+			(sobject->*payload)(std::forward<TArgs>(args)...);
+		}, sobject->weak_from_this());
 		DelegateHandle::Impl handle;
 		handle._delegate = this;
 		handle._holder = instance.Id;
@@ -224,6 +221,30 @@ public:
 		if (handle.IsValid())
 		{
 			_payload.erase(handle._impl._id);
+		}
+	}
+
+	void RemoveAll(SObject* InObject)
+	{
+		std::unique_lock locker(_lock);
+		std::vector<decltype(_payload.begin())> Compacts;
+
+		for (auto It = _payload.begin(); It != _payload.end(); ++It)
+		{
+			auto& [Key, Value] = *It;
+			if (Value.bHolder)
+			{
+				if (Value.Holder.expired() || Value.Holder.lock().get() == InObject)
+				{
+					Compacts.emplace_back(It);
+					continue;
+				}
+			}
+		}
+
+		for (auto& It : Compacts)
+		{
+			_payload.erase(It);
 		}
 	}
 
