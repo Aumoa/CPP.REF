@@ -448,5 +448,32 @@ enum class ERHIParagraphAlignment
     Center
 };
 
+enum class ERHIInterpolationMode
+{
+    NearestNeighbor,
+    Linear,
+    Cubic,
+    MultiSampleLinear,
+    Anisotropic,
+    HighQualityCubic,
+};
+
+enum class ERHICompositeMode
+{
+    SourceOver,
+    DestinationOver,
+    SourceIn,
+    DestinationIn,
+    SourceOut,
+    DestinationOut,
+    SourceAtop,
+    DestinationAtop,
+    Xor,
+    Plus,
+    SourceCopy,
+    BoundedSourceCopy,
+    MaskInvert
+};
+
 #undef DEFINE_ENUM_FLAG_OPERATORS
 #pragma pop_macro("DEFINE_ENUM_FLAG_OPERATORS")

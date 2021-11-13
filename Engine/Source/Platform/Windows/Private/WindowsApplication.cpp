@@ -175,6 +175,11 @@ IPlatformMouse& SWindowsApplication::GetPlatformMouse()
 	return SWindowsPlatformMouse::Get();
 }
 
+IPlatformImageLoader& SWindowsApplication::GetPlatformImageLoader()
+{
+	return *this;
+}
+
 IPlatformImage* SWindowsApplication::CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat)
 {
 	ComPtr<IWICBitmapDecoder> Decoder;

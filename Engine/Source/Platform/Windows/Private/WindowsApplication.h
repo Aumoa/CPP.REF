@@ -44,6 +44,7 @@ public:
 	virtual IRHIFactory* GetFactory() override;
 	virtual IPlatformKeyboard& GetPlatformKeyboard() override;
 	virtual IPlatformMouse& GetPlatformMouse() override;
+	virtual IPlatformImageLoader& GetPlatformImageLoader() override;
 	// ~IApplicationInterface
 
 	// IPlatformImageLoader

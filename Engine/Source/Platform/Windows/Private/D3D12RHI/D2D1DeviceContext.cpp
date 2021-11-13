@@ -76,6 +76,20 @@ void SD2D1DeviceContext::DrawTextLayout(const Vector2& DrawOrigin, IRHITextLayou
 	DeviceContext->DrawTextLayout((const D2D1_POINT_2F&)DrawOrigin, Layout_s->Get<IDWriteTextLayout>(), Brush_s->Get<ID2D1Brush>(), (D2D1_DRAW_TEXT_OPTIONS)Options);
 }
 
+void SD2D1DeviceContext::DrawImage(IRHIImage* Image, const Vector2* Offset, const Rect* SourceRect, ERHIInterpolationMode InterpolationMode, ERHICompositeMode CompositeMode)
+{
+	auto Image_s = Cast<SD2D1Image>(Image);
+	auto Image_r = Image_s->Get<ID2D1Image>();
+	DeviceContext->DrawImage(Image_r, (const D2D1_POINT_2F*)Offset, (const D2D1_RECT_F*)SourceRect, (D2D1_INTERPOLATION_MODE)InterpolationMode, (D2D1_COMPOSITE_MODE)CompositeMode);
+}
+
+void SD2D1DeviceContext::DrawBitmap(IRHIBitmap* Bitmap, const Rect* DestRect, float Opacity, ERHIInterpolationMode InterpolationMode, const Rect* SourceRect, const Matrix4x4* PerspectiveTransform)
+{
+	auto Bitmap_s = Cast<SD2D1Bitmap>(Bitmap);
+	auto Bitmap_r = Bitmap_s->Get<ID2D1Bitmap1>();
+	DeviceContext->DrawBitmap(Bitmap_r, (const D2D1_RECT_F*)DestRect, Opacity, (D2D1_INTERPOLATION_MODE)InterpolationMode, (const D2D1_RECT_F*)SourceRect, (const D2D1_MATRIX_4X4_F*)PerspectiveTransform);
+}
+
 void SD2D1DeviceContext::AcquireWrappedTarget()
 {
 	if (auto Ptr = WeakTarget.lock(); Ptr)

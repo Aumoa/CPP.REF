@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
-interface IRHITexture2D;
+interface IRHIBitmap;
 
 struct SlateBrush
 {
-	IRHITexture2D* ImageSource = nullptr;
+	IRHIBitmap* ImageSource = nullptr;
 	Vector2 ImageSize = Vector2::ZeroVector();
 	Color TintColor = NamedColors::White;
 
@@ -16,7 +16,7 @@ struct SlateBrush
 	{
 	}
 
-	SlateBrush(IRHITexture2D* InImageSource, const Vector2& InImageSize)
+	SlateBrush(IRHIBitmap* InImageSource, const Vector2& InImageSize)
 		: ImageSource(InImageSource)
 		, ImageSize(InImageSize)
 	{

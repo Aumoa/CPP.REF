@@ -50,7 +50,7 @@ void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* commandList, ID3D12Re
 	}
 	else
 	{
-		const size_t pitch = std::min((size_t)layout.Footprint.Width, (size_t)uploadData->SysMemPitch);
+		const size_t pitch = (size_t)uploadData->SysMemPitch;
 		for (uint32 i = 0; i < layout.Footprint.Height; ++i)
 		{
 			int8*		dst = pData + i * (size_t)layout.Footprint.RowPitch;
@@ -61,9 +61,11 @@ void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* commandList, ID3D12Re
 	uploadBuf->Unmap(0, nullptr);
 
 	D3D12_TEXTURE_COPY_LOCATION dst = {};
+	dst.pResource = textureBuf;
 	dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 	dst.SubresourceIndex = subresource;
 	D3D12_TEXTURE_COPY_LOCATION src = {};
+	src.pResource = uploadBuf;
 	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 	src.PlacedFootprint = layout;
 

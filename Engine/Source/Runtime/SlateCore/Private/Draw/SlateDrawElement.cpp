@@ -3,6 +3,7 @@
 #include "Draw/SlateDrawElement.h"
 #include "Draw/SlateWindowElementList.h"
 #include "RHI/IRHITextLayout.h"
+#include "RHI/IRHIBitmap.h"
 
 SlateDrawElement::SlateDrawElement()
 {
@@ -30,6 +31,11 @@ SlateDrawElement& SlateDrawElement::MakeBox(SlateWindowElementList& List, const 
 	auto& Payload = List.CreateUninitializedPayload<BoxPayload>(Element.SeekPayloadBuf);
 	Payload.Brush = InBrush;
 	Payload.RenderOpacity = RenderOpacity;
+
+	if (InBrush.ImageSource)
+	{
+		List.AddReferencedObject(InBrush.ImageSource->shared_from_this());
+	}
 
 	return Element;
 }

@@ -15,6 +15,8 @@
 #include "AnimCurves/LinearAnimationCurve.h"
 #include "AnimCurves/EaseAnimationCurve.h"
 #include "IApplicationInterface.h"
+#include "Multimedia/IPlatformImageLoader.h"
+#include "Assets/Texture2D.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -25,13 +27,17 @@ void STHGameInstance::Init()
 {
 	Super::Init();
 
+	IApplicationInterface& App = IApplicationInterface::Get();
+	App.SetTickMode(IApplicationInterface::ETickMode::Ontime);
+
 	SLocalPlayer* LocalPlayer = GetLocalPlayer();
 	SViewport* GameViewport = LocalPlayer->GetGameViewport();
 
 	SButton* Button;
 	SImage* Image;
 
-	IApplicationInterface::Get().SetTickMode(IApplicationInterface::ETickMode::Ontime);
+	STexture2D* ImageSource = LoadObject<STexture2D>(LR"(Game\Content\THStory\Art\SampleImage.jpg)");
+	ImageSource->SetOuter(this);
 
 	auto* Root = SNew(SCanvasPanel)
 		//+SCanvasPanel::Slot()
@@ -92,12 +98,12 @@ void STHGameInstance::Init()
 			SAssignNew(Button, SButton)
 			[
 				SAssignNew(Image, SImage)
-				.Brush(NamedColors::Red)
+				.Brush(ImageSource->GetRHIBitmap(), Vector2::ZeroVector())
 			]
 		];
 
 	auto* RotateAnim = NewObject<SSlateAnimationContext>(L"RotateAnim");
-	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SEaseAnimationCurve<float, EEaseFunction::InOutBounce>>>(0.0f, 90.0f, 0.0f, 2.0f, [Button](float Timing)
+	RotateAnim->AddCurve(NewObject<SCustomAnimationCurve<SEaseAnimationCurve<float, EEaseFunction::InOutExpo>>>(0.0f, 360.0f, 0.0f, 2.0f, [Button](float Timing)
 	{
 		Degrees Rotation = Timing;
 		Button->SetRenderTransform(Matrix2x2::Rotation(Rotation.ToRadians()));

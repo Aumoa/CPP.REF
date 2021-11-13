@@ -33,7 +33,15 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 			const auto& Payload = Element.GetBoxPayload(Elements);
 			auto TintBrush = GetTintBrush(Payload.Brush.TintColor, Payload.RenderOpacity);
 
-			CommandList->FillRectangle(TintBrush, Rect(LocalPosition, LocalSize + LocalPosition));
+			if (Payload.Brush.ImageSource)
+			{
+				Rect Destination(LocalPosition, LocalSize + LocalPosition);
+				CommandList->DrawBitmap(Payload.Brush.ImageSource, &Destination, Payload.RenderOpacity);
+			}
+			else
+			{
+				CommandList->FillRectangle(TintBrush, Rect(LocalPosition, LocalSize + LocalPosition));
+			}
 		}
 		else if (Element.Type == SlateDrawElement::EElementType::Text)
 		{
