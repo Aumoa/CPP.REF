@@ -16,7 +16,7 @@ class GAME_API SGameAssetSystem : public SGameEngineSubsystem
 
 private:
 	std::set<std::filesystem::path> AssetsToImport;
-	std::map<std::filesystem::path, SObject*> Assets;
+	std::map<std::filesystem::path, std::weak_ptr<SObject>> Assets;
 	SAssetsLoader* Assimp = nullptr;
 
 public:

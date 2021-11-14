@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Texture/Texture2D.h"
 
 interface IRHIBitmap;
+class STexture2D;
 
 struct SlateBrush
 {
@@ -20,6 +22,15 @@ struct SlateBrush
 		: ImageSource(InImageSource)
 		, ImageSize(InImageSize)
 	{
+	}
+
+	SlateBrush(STexture2D* InTexture)
+	{
+		if (InTexture)
+		{
+			ImageSource = InTexture->GetBitmap();
+			ImageSize = InTexture->GetSize().Cast<float>();
+		}
 	}
 
 	SlateBrush(const Color& TintColor)

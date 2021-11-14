@@ -30,10 +30,10 @@ public:
 	virtual SWorld* GetWorld();
 
 public:
-	static SObject* LoadObject(const std::filesystem::path& assetPath);
+	SObject* LoadObject(const std::filesystem::path& assetPath);
 
 	template<std::derived_from<SObject> T>
-	static T* LoadObject(const std::filesystem::path& assetPath)
+	T* LoadObject(const std::filesystem::path& assetPath)
 	{
 		return dynamic_cast<T*>(LoadObject(assetPath));
 	}

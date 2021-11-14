@@ -36,9 +36,6 @@ void STHGameInstance::Init()
 	SButton* Button;
 	SImage* Image;
 
-	STexture2D* ImageSource = LoadObject<STexture2D>(LR"(Game\Content\THStory\Art\SampleImage)");
-	ImageSource->SetOuter(this);
-
 	auto* Root = SNew(SCanvasPanel)
 		//+SCanvasPanel::Slot()
 		//.Offset(10.0f, 10.0f, 200.0f, 200.0f)
@@ -98,7 +95,7 @@ void STHGameInstance::Init()
 			SAssignNew(Button, SButton)
 			[
 				SAssignNew(Image, SImage)
-				.Brush(ImageSource->GetBitmap(), Vector2::ZeroVector())
+				.Brush(LoadObject<STexture2D>(LR"(Game\Content\THStory\Art\SampleImage)"))
 			]
 		];
 

@@ -26,6 +26,8 @@ public:
 	virtual bool StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBin) override;
 	static std::vector<uint8> StreamOut(SAssetsLoader* Loader, std::span<const uint8> AssetsBin);
 
+	Vector2N GetSize();
+
 	IPlatformImage* GetPlatformImage();
 	IRHITexture2D* GetTexture();
 	IRHIBitmap* GetBitmap();

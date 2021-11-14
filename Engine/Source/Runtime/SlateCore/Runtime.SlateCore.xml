@@ -6,6 +6,7 @@
 	<ReferencedProjects>
 		<Item Name="Core" Access="Public" />
 		<Item Name="PlatformGeneric" Access="Public" />
+		<Item Name="AssetsIO" Access="Public" />
 		<Item Name="RenderCore" Access="Public" />
 	</ReferencedProjects>
 </ProjectInfo>

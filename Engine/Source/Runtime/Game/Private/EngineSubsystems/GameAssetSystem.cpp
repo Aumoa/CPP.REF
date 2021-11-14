@@ -47,6 +47,12 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 	auto It = Assets.find(AssetPath);
 	if (It == Assets.end())
 	{
+		SE_LOG(LogAssets, Error, L"Could not found asset({}) from assets tree.", AssetPath.wstring());
+		return nullptr;
+	}
+
+	if (It->second.expired())
+	{
 		SObject* ImportObject = nullptr;
 
 		if (!AssetPath.has_extension())
@@ -57,17 +63,19 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 		{
 			ImportObject = Assimp->ImportFromFile(AssetPath);
 		}
+
 		if (ImportObject == nullptr)
 		{
 			SE_LOG(LogAssets, Error, L"Could not import asset: {}", AssetPath.wstring());
 			return nullptr;
 		}
 
-		bool bSucceeded;
-		std::tie(It, bSucceeded) = Assets.emplace(AssetPath, ImportObject);
-		check(bSucceeded);
+		// Outer will exchange to another object.
+		ImportObject->SetOuter(this);
+		It->second = ImportObject->WeakFromThis();
 	}
-	return It->second;
+
+	return It->second.lock().get();
 }
 
 void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirectory)
@@ -100,7 +108,7 @@ void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirect
 			{
 				if (Mypath.extension() == L".sasset")
 				{
-					Assets.emplace(Mypath, nullptr);
+					Assets.emplace(Mypath.replace_extension(), std::weak_ptr<SObject>());
 				}
 				else
 				{
@@ -118,20 +126,18 @@ void SGameAssetSystem::ConvertNativeAssets()
 	for (auto& NativePath : AssetsToImport)
 	{
 		std::filesystem::path ContentPath = NativePath;
-		ContentPath.replace_extension(L".sasset");
-
-		if (Assets.contains(ContentPath))
+		if (Assets.contains(ContentPath.replace_extension()))
 		{
 			continue;
 		}
 
-		if (!Assimp->ConvertAssets(NativePath, ContentPath))
+		if (!Assimp->ConvertAssets(NativePath, ContentPath.replace_extension(L".sasset")))
 		{
 			SE_LOG(LogAssets, Warning, L"Not supported native asset detected.");
 			continue;
 		}
 
-		Assets.emplace(ContentPath, nullptr);
+		Assets.emplace(ContentPath, std::weak_ptr<SObject>());
 	}
 
 	AssetsToImport.clear();

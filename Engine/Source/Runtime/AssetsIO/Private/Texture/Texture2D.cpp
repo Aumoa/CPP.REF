@@ -94,6 +94,11 @@ std::vector<uint8> STexture2D::StreamOut(SAssetsLoader* Loader, std::span<const 
 	return Body;
 }
 
+Vector2N STexture2D::GetSize()
+{
+	return ImageSource->GetPixelSize();
+}
+
 IPlatformImage* STexture2D::GetPlatformImage()
 {
 	return ImageSource;
