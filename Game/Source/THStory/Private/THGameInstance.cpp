@@ -16,7 +16,7 @@
 #include "AnimCurves/EaseAnimationCurve.h"
 #include "IApplicationInterface.h"
 #include "Multimedia/IPlatformImageLoader.h"
-#include "Assets/Texture2D.h"
+#include "Texture/Texture2D.h"
 
 STHGameInstance::STHGameInstance() : Super()
 {
@@ -98,7 +98,7 @@ void STHGameInstance::Init()
 			SAssignNew(Button, SButton)
 			[
 				SAssignNew(Image, SImage)
-				.Brush(ImageSource->GetRHIBitmap(), Vector2::ZeroVector())
+				.Brush(ImageSource->GetBitmap(), Vector2::ZeroVector())
 			]
 		];
 

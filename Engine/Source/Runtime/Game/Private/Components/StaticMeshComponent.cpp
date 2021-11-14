@@ -4,7 +4,6 @@
 #include "LogGame.h"
 #include "Scene/StaticMeshSceneProxy.h"
 #include "Scene/StaticMeshRenderData.h"
-#include "Assets/StaticMesh.h"
 #include "Materials/Material.h"
 
 SStaticMeshComponent::SStaticMeshComponent() : Super()
@@ -25,28 +24,28 @@ PrimitiveSceneProxy* SStaticMeshComponent::CreateSceneProxy()
 
 void SStaticMeshComponent::SetStaticMesh(SStaticMesh* inNewMesh)
 {
-	if (_StaticMesh != inNewMesh)
-	{
-		_StaticMesh = inNewMesh;
+	//if (_StaticMesh != inNewMesh)
+	//{
+	//	_StaticMesh = inNewMesh;
 
-		if (_StaticMesh != nullptr)
-		{
-			// StaticMeshComponent only render primary mesh batch.
-			_batch = _StaticMesh->GetRenderData()->MeshBatches[0];
+	//	if (_StaticMesh != nullptr)
+	//	{
+	//		// StaticMeshComponent only render primary mesh batch.
+	//		_batch = _StaticMesh->GetRenderData()->MeshBatches[0];
 
-			if (_materials.size() < _batch.MaterialSlots.size())
-			{
-				_materials.resize(_batch.MaterialSlots.size());
-			}
+	//		if (_materials.size() < _batch.MaterialSlots.size())
+	//		{
+	//			_materials.resize(_batch.MaterialSlots.size());
+	//		}
 
-			for (size_t i = 0; i < _batch.MaterialSlots.size(); ++i)
-			{
-				_batch.MaterialSlots[i] = _materials[i];
-			}
-		}
+	//		for (size_t i = 0; i < _batch.MaterialSlots.size(); ++i)
+	//		{
+	//			_batch.MaterialSlots[i] = _materials[i];
+	//		}
+	//	}
 
-		MarkRenderStateDirty();
-	}
+	//	MarkRenderStateDirty();
+	//}
 }
 
 void SStaticMeshComponent::SetMaterial(int32 index, SMaterial* material)

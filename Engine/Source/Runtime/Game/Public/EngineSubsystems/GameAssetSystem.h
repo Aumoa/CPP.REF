@@ -8,13 +8,16 @@
 class SStaticMesh;
 class STexture2D;
 class SFont;
+class SAssetsLoader;
 
 class GAME_API SGameAssetSystem : public SGameEngineSubsystem
 {
 	GENERATED_BODY(SGameAssetSystem)
 
 private:
-	std::map<std::filesystem::path, SObject*> _assets;
+	std::set<std::filesystem::path> AssetsToImport;
+	std::map<std::filesystem::path, SObject*> Assets;
+	SAssetsLoader* Assimp = nullptr;
 
 public:
 	SGameAssetSystem();
@@ -25,8 +28,6 @@ public:
 	SObject* LoadObject(const std::filesystem::path& assetPath);
 
 private:
-	void SearchDirectory(const std::filesystem::path& searchDirectory);
-	SStaticMesh* LoadStaticMesh(const std::filesystem::path& assetPath);
-	STexture2D* LoadTexture2D(const std::filesystem::path& assetPath);
-	//SFont* LoadFont(const std::filesystem::path& assetPath);
+	void SearchDirectory(const std::filesystem::path& SearchDirectory);
+	void ConvertNativeAssets();
 };

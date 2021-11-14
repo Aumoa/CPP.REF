@@ -49,6 +49,7 @@ public:
 
 	// IPlatformImageLoader
 	virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
+	virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
 	// ~IPlatformImageLoader
 
 	HWND GetWindowHandle();
@@ -56,6 +57,7 @@ public:
 private:
 	void ShrinkRealtimeDemanders();
 	void UpdateRealtimeDemanders();
+	ComPtr<IWICFormatConverter> DecodeImage(IWICBitmapDecoder* Decoder, int32 FrameIndex, ERHIPixelFormat PixelFormat);
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

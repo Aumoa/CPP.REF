@@ -5,10 +5,7 @@
 #include "Misc/Paths.h"
 #include "LogGame.h"
 #include "GameEngine.h"
-#include "Assets/Texture2D.h"
-#include "Assets/StaticMesh.h"
-#include "Assets/Parser/AssimpParser.h"
-//#include "Shaders/ColorShader/ColorVertexFactory.h"
+#include "AssetsLoader.h"
 #include <stack>
 #include <queue>
 
@@ -30,158 +27,85 @@ SGameAssetSystem::~SGameAssetSystem()
 
 void SGameAssetSystem::Init()
 {
+	Assimp = NewObject<SAssetsLoader>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
+	Assimp->SetOuter(this);
+
 	SearchDirectory(L"Game/Content");
 	SearchDirectory(L"Engine/Content");
-	SE_LOG(LogAssets, Verbose, L"{} content(s) found.", _assets.size());
+	
+	if (AssetsToImport.size())
+	{
+		SE_LOG(LogAssets, Verbose, L"{} native assets found.", AssetsToImport.size());
+		ConvertNativeAssets();
+	}
+
+	SE_LOG(LogAssets, Verbose, L"{} contents found.", Assets.size());
 }
 
 SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
 {
-	using namespace std::filesystem;
-
-	auto it = _assets.find(assetPath);
-	if (it == _assets.end())
-	{
-		// Pre-searched asset path is not found. Add path to contents list if file exists.
-		if (!exists(assetPath))
-		{
-			SE_LOG(LogAssets, Error, L"Could not found asset from path: {}.", assetPath.wstring());
-			return nullptr;
-		}
-
-		it = _assets.emplace(assetPath, nullptr).first;
-	}
-
-	// Load object.
-	if (it->second == nullptr)
-	{
-		if (!exists(assetPath))
-		{
-			SE_LOG(LogAssets, Error, L"Could not found asset file from path: {}.", assetPath.wstring());
-			return nullptr;
-		}
-
-		path ext = assetPath.extension();
-		SObject* loadedObject = [&]() -> SObject*
-		{
-			if (auto loaded = LoadStaticMesh(assetPath); loaded)
-			{
-				return loaded;
-			}
-			if (auto loaded = LoadTexture2D(assetPath); loaded)
-			{
-				return loaded;
-			}
-			//if (auto loaded = LoadFont(assetPath); loaded)
-			//{
-			//	return loaded;
-			//}
-			else
-			{
-				return nullptr;
-			}
-		}();
-
-		it->second = loadedObject;
-	}
-
-	return it->second;
+	check(false);
+	return nullptr;
 }
 
-void SGameAssetSystem::SearchDirectory(const std::filesystem::path& searchDirectory)
+void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirectory)
 {
 	using namespace std;
 	using namespace std::filesystem;
 
-	if (!exists(searchDirectory))
+	if (!exists(SearchDirectory))
 	{
-		SE_LOG(LogAssets, Fatal, L"Content directory({}) is not exists. Please check your work directory on debug settings.", searchDirectory.wstring());
+		SE_LOG(LogAssets, Fatal, L"Content directory({}) is not exists. Please check your work directory on debug settings.", SearchDirectory.wstring());
 	}
 
-	SE_LOG(LogAssets, Verbose, L"Search asset directory on {}", searchDirectory.wstring());
+	SE_LOG(LogAssets, Verbose, L"Search asset directory on {}", SearchDirectory.wstring());
 
-	queue<path> searchRecursivePaths;
-	searchRecursivePaths.emplace(searchDirectory);
+	queue<path> SearchRecursivePaths;
+	SearchRecursivePaths.emplace(SearchDirectory);
 
-	for (path directory; searchRecursivePaths.size();)
+	for (path Directory; SearchRecursivePaths.size();)
 	{
-		directory = move(searchRecursivePaths.front());
+		Directory = move(SearchRecursivePaths.front());
 
-		for (auto item : directory_iterator(directory))
+		for (auto Item : directory_iterator(Directory))
 		{
-			path mypath = item.path();
-			if (item.is_directory())
+			path Mypath = Item.path();
+			if (Item.is_directory())
 			{
-				searchRecursivePaths.emplace(mypath);
+				SearchRecursivePaths.emplace(Mypath);
 			}
 			else
 			{
-				_assets.emplace(mypath, nullptr);
+				if (Mypath.extension() == L"sasset")
+				{
+					Assets.emplace(Mypath, nullptr);
+				}
+				else
+				{
+					AssetsToImport.emplace(Mypath);
+				}
 			}
 		}
 
-		searchRecursivePaths.pop();
+		SearchRecursivePaths.pop();
 	}
 }
 
-SStaticMesh* SGameAssetSystem::LoadStaticMesh(const std::filesystem::path& assetPath)
+void SGameAssetSystem::ConvertNativeAssets()
 {
-	//SAssimpParser* Parser = NewObject<SAssimpParser>(GEngine, GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetColorVertexFactory());
-	//if (Parser->TryParse(assetPath))
-	//{
-	//	return Parser->GetStaticMesh();
-	//}
-	//else
-	//{
-		return nullptr;
-	//}
-}
-
-STexture2D* SGameAssetSystem::LoadTexture2D(const std::filesystem::path& assetPath)
-{
-	constexpr std::array AllowExtensions =
+	for (auto& NativePath : AssetsToImport)
 	{
-		L".png",
-		L".jpg", L"jpeg",
-		L".bmp",
-		L".gif",
-	};
+		std::filesystem::path ContentPath = NativePath;
+		ContentPath.replace_extension(L".sasset");
 
-	if (assetPath.has_extension())
-	{
-		auto ext = assetPath.extension();
-		const bool bAllowed = std::find(AllowExtensions.begin(), AllowExtensions.end(), ext.wstring()) != AllowExtensions.end();
-		if (bAllowed)
+		if (!Assimp->ConvertAssets(NativePath, ContentPath))
 		{
-			auto* object = NewObject<STexture2D>(assetPath);
-			object->StreamIn();
-			return object;
+			SE_LOG(LogAssets, Warning, L"Not supported native asset detected.");
+			continue;
 		}
+
+		Assets.emplace(ContentPath, nullptr);
 	}
 
-	return nullptr;
+	AssetsToImport.clear();
 }
-
-//SFont* SGameAssetSystem::LoadFont(const std::filesystem::path& assetPath)
-//{
-//	constexpr std::array AllowExtensions =
-//	{
-//		L".ttf",
-//		L".ttc",
-//		L".fon",
-//	};
-//
-//	if (assetPath.has_extension())
-//	{
-//		auto ext = assetPath.extension();
-//		const bool bAllowed = std::find(AllowExtensions.begin(), AllowExtensions.end(), ext.wstring()) != AllowExtensions.end();
-//		if (bAllowed)
-//		{
-//			auto* object = NewObject<SFont>(assetPath);
-//			object->StreamIn();
-//			return object;
-//		}
-//	}
-//
-//	return nullptr;
-//}

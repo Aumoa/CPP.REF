@@ -185,27 +185,20 @@ IPlatformImage* SWindowsApplication::CreateImageFromFile(const std::filesystem::
 	ComPtr<IWICBitmapDecoder> Decoder;
 	HR(ImagingFactory->CreateDecoderFromFilename(InAssetPath.wstring().c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &Decoder));
 
-	ComPtr<IWICBitmapFrameDecode> Frame;
-	HR(Decoder->GetFrame(0, &Frame));
+	ComPtr<IWICFormatConverter> Converter = DecodeImage(Decoder.Get(), FrameIndex, PixelFormat);
+	return NewObject<SWindowsImage>(Converter.Get(), PixelFormat);
+}
 
-	WICPixelFormatGUID FormatGUID;
+IPlatformImage* SWindowsApplication::CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat)
+{
+	ComPtr<IWICStream> BinaryStream;
+	HR(ImagingFactory->CreateStream(&BinaryStream));
+	HR(BinaryStream->InitializeFromMemory((BYTE*)AssetsBin.data(), (DWORD)AssetsBin.size()));
 
-	switch (PixelFormat)
-	{
-	case ERHIPixelFormat::B8G8R8A8_UNORM:
-		FormatGUID = GUID_WICPixelFormat32bppPBGRA;
-		break;
-	case ERHIPixelFormat::R8G8B8A8_UNORM:
-		FormatGUID = GUID_WICPixelFormat32bppPRGBA;
-		break;
-	default:
-		SE_LOG(LogWindows, Fatal, L"Not supported pixel format.");
-	}
+	ComPtr<IWICBitmapDecoder> Decoder;
+	HR(ImagingFactory->CreateDecoderFromStream(BinaryStream.Get(), NULL, WICDecodeMetadataCacheOnDemand, &Decoder));
 
-	ComPtr<IWICFormatConverter> Converter;
-	HR(ImagingFactory->CreateFormatConverter(&Converter));
-	HR(Converter->Initialize(Frame.Get(), FormatGUID, WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
-
+	ComPtr<IWICFormatConverter> Converter = DecodeImage(Decoder.Get(), FrameIndex, PixelFormat);
 	return NewObject<SWindowsImage>(Converter.Get(), PixelFormat);
 }
 
@@ -247,6 +240,32 @@ void SWindowsApplication::UpdateRealtimeDemanders()
 	}
 
 	PostMessageW(hWnd, WM_UPDATETICKMODE, 0, 0);
+}
+
+ComPtr<IWICFormatConverter> SWindowsApplication::DecodeImage(IWICBitmapDecoder* Decoder, int32 FrameIndex, ERHIPixelFormat PixelFormat)
+{
+	ComPtr<IWICBitmapFrameDecode> Frame;
+	HR(Decoder->GetFrame(FrameIndex, &Frame));
+
+	WICPixelFormatGUID FormatGUID;
+
+	switch (PixelFormat)
+	{
+	case ERHIPixelFormat::B8G8R8A8_UNORM:
+		FormatGUID = GUID_WICPixelFormat32bppPBGRA;
+		break;
+	case ERHIPixelFormat::R8G8B8A8_UNORM:
+		FormatGUID = GUID_WICPixelFormat32bppPRGBA;
+		break;
+	default:
+		SE_LOG(LogWindows, Fatal, L"Not supported pixel format.");
+	}
+
+	ComPtr<IWICFormatConverter> Converter;
+	HR(ImagingFactory->CreateFormatConverter(&Converter));
+	HR(Converter->Initialize(Frame.Get(), FormatGUID, WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
+
+	return Converter;
 }
 
 LRESULT CALLBACK SWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
