@@ -25,7 +25,7 @@ public:
 
 	virtual void Init() override;
 
-	SObject* LoadObject(const std::filesystem::path& assetPath);
+	SObject* LoadObject(const std::filesystem::path& AssetPath);
 
 private:
 	void SearchDirectory(const std::filesystem::path& SearchDirectory);

@@ -22,7 +22,7 @@ struct GenericAssetHeader
 
 class ScopedFile
 {
-	std::ifstream Fp;
+	std::fstream Fp;
 
 public:
 	template<class... TArgs>
@@ -42,6 +42,11 @@ public:
 	{
 		return &Fp;
 	}
+
+	auto& operator *()
+	{
+		return Fp;
+	}
 };
 
 SAssetsLoader::SAssetsLoader(IRHIDevice* InDevice) : Super()
@@ -55,7 +60,7 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 
 	static constexpr size_t HeaderSize = sizeof(GenericAssetHeader);
 	ScopedFile Fp(AssetPath, std::ios::binary | std::ios::in);
-	if (Fp->is_open())
+	if (!Fp->is_open())
 	{
 		ASSETS_LOG(L"Unable to access file.");
 		return nullptr;
@@ -69,7 +74,11 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 	}
 
 	GenericAssetHeader Header;
-	Fp->read((char*)&Header, HeaderSize);
+	if (Fp->seekg(0, std::ios::beg).read((char*)&Header, HeaderSize).bad())
+	{
+		ASSETS_LOG(std::format(L"Unable to access file."));
+		return nullptr;
+	}
 
 	if (Header.Version == 0 && Header.Version > ImporterVersion)
 	{
@@ -110,12 +119,54 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 
 bool SAssetsLoader::ConvertAssets(const std::filesystem::path& NativeAssetPath, const std::filesystem::path& ConvertPath)
 {
-	// TODO:
-	check(false);
+	static std::set<std::filesystem::path> ImageExt = { L".jpg", L".jpeg", L".png", L".bmp", L".gif" };
+	std::filesystem::path Ext = NativeAssetPath.extension();
+
+	ScopedFile FpSrc(NativeAssetPath, std::ios::binary | std::ios::in);
+
+	if (!FpSrc->is_open())
+	{
+		return false;
+	}
+
+	if (ImageExt.contains(Ext))
+	{
+		ScopedFile FpDst(ConvertPath, std::ios::binary | std::ios::out | std::ios::trunc);
+		return StreamOut_Texture2D(*FpSrc, *FpDst);
+	}
+
 	return false;
 }
 
 IRHIDevice* SAssetsLoader::GetDevice()
 {
 	return Device;
+}
+
+bool SAssetsLoader::StreamOut_Texture2D(std::fstream& Source, std::fstream& FileStream)
+{
+	size_t BodySize = Source.seekg(0, std::ios::end).tellg();
+	std::vector<uint8> Body(BodySize);
+	if (Source.seekg(0, std::ios::beg).read((char*)Body.data(), BodySize).bad())
+	{
+		return false;
+	}
+
+	std::vector<uint8> PackedImage = STexture2D::StreamOut(this, Body);
+
+	GenericAssetHeader Header;
+	Header.Version = ImporterVersion;
+	Header.Type = EAssetType::Image;
+	if (FileStream.write((const char*)&Header, sizeof(Header)).bad())
+	{
+		return false;
+	}
+
+	if (FileStream.write((const char*)PackedImage.data(), PackedImage.size()).bad())
+	{
+		return false;
+	}
+
+	FileStream.flush();
+	return true;
 }

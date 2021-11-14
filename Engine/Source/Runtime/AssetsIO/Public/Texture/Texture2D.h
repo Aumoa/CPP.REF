@@ -24,6 +24,7 @@ public:
 	STexture2D();
 
 	virtual bool StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBin) override;
+	static std::vector<uint8> StreamOut(SAssetsLoader* Loader, std::span<const uint8> AssetsBin);
 
 	IPlatformImage* GetPlatformImage();
 	IRHITexture2D* GetTexture();

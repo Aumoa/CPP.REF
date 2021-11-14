@@ -42,10 +42,32 @@ void SGameAssetSystem::Init()
 	SE_LOG(LogAssets, Verbose, L"{} contents found.", Assets.size());
 }
 
-SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& assetPath)
+SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 {
-	check(false);
-	return nullptr;
+	auto It = Assets.find(AssetPath);
+	if (It == Assets.end())
+	{
+		SObject* ImportObject = nullptr;
+
+		if (!AssetPath.has_extension())
+		{
+			ImportObject = Assimp->ImportFromFile(std::filesystem::path(AssetPath).replace_extension(L".sasset"));
+		}
+		else
+		{
+			ImportObject = Assimp->ImportFromFile(AssetPath);
+		}
+		if (ImportObject == nullptr)
+		{
+			SE_LOG(LogAssets, Error, L"Could not import asset: {}", AssetPath.wstring());
+			return nullptr;
+		}
+
+		bool bSucceeded;
+		std::tie(It, bSucceeded) = Assets.emplace(AssetPath, ImportObject);
+		check(bSucceeded);
+	}
+	return It->second;
 }
 
 void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirectory)
@@ -76,7 +98,7 @@ void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirect
 			}
 			else
 			{
-				if (Mypath.extension() == L"sasset")
+				if (Mypath.extension() == L".sasset")
 				{
 					Assets.emplace(Mypath, nullptr);
 				}
@@ -97,6 +119,11 @@ void SGameAssetSystem::ConvertNativeAssets()
 	{
 		std::filesystem::path ContentPath = NativePath;
 		ContentPath.replace_extension(L".sasset");
+
+		if (Assets.contains(ContentPath))
+		{
+			continue;
+		}
 
 		if (!Assimp->ConvertAssets(NativePath, ContentPath))
 		{

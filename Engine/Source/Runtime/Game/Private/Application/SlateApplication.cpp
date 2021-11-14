@@ -64,7 +64,7 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 
 	RenderThread::EnqueueRenderThreadWork<"TickAndPaint">([this, Buf = std::move(Elements)](auto)
 	{
-		SlateElements = std::move(Buf);
+		SlateElements = Buf;
 	});
 }
 

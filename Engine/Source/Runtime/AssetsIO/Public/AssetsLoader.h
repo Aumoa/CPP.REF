@@ -21,4 +21,7 @@ public:
 	bool ConvertAssets(const std::filesystem::path& NativeAssetPath, const std::filesystem::path& ConvertPath);
 
 	IRHIDevice* GetDevice();
+
+private:
+	bool StreamOut_Texture2D(std::fstream& Source, std::fstream& FileStream);
 };

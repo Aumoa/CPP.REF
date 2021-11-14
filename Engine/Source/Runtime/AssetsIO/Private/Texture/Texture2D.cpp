@@ -37,8 +37,10 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 		return false;
 	}
 
+	std::span<const uint8> Body(Seek, AssetsBin.size() - sizeof(Header));
+
 	IPlatformImageLoader& ImageLoader = IApplicationInterface::Get().GetPlatformImageLoader();
-	ImageSource = ImageLoader.CreateImageFromBinary(AssetsBin, 0, ERHIPixelFormat::B8G8R8A8_UNORM);
+	ImageSource = ImageLoader.CreateImageFromBinary(Body, 0, ERHIPixelFormat::B8G8R8A8_UNORM);
 	if (ImageSource)
 	{
 		ImageSource->SetOuter(this);
@@ -73,6 +75,23 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 	}
 
 	return ImageSource != nullptr;
+}
+
+std::vector<uint8> STexture2D::StreamOut(SAssetsLoader* Loader, std::span<const uint8> AssetsBin)
+{
+	Texture2DHeader Header;
+	Header.Version = ImporterVersion;
+
+	std::vector<uint8> Body(sizeof(Texture2DHeader) + AssetsBin.size());
+	uint8* Seek = Body.data();
+
+	memcpy(Seek, &Header, sizeof(Header));
+	Seek += sizeof(Header);
+
+	memcpy(Seek, AssetsBin.data(), AssetsBin.size_bytes());
+	Seek += AssetsBin.size_bytes();
+
+	return Body;
 }
 
 IPlatformImage* STexture2D::GetPlatformImage()

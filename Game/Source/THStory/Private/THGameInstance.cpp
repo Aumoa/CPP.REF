@@ -36,7 +36,7 @@ void STHGameInstance::Init()
 	SButton* Button;
 	SImage* Image;
 
-	STexture2D* ImageSource = LoadObject<STexture2D>(LR"(Game\Content\THStory\Art\SampleImage.jpg)");
+	STexture2D* ImageSource = LoadObject<STexture2D>(LR"(Game\Content\THStory\Art\SampleImage)");
 	ImageSource->SetOuter(this);
 
 	auto* Root = SNew(SCanvasPanel)
