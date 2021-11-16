@@ -43,6 +43,20 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 				CommandList->FillRectangle(TintBrush, Rect(LocalPosition, LocalSize + LocalPosition));
 			}
 		}
+		else if (Element.Type == SlateDrawElement::EElementType::Ellipse)
+		{
+			const auto& Payload = Element.GetBoxPayload(Elements);
+			auto TintBrush = GetTintBrush(Payload.Brush.TintColor, Payload.RenderOpacity);
+
+			if (Payload.Brush.ImageSource)
+			{
+				checkf(false, L"NOT IMPLEMENTED.");
+			}
+			else
+			{
+				CommandList->FillEllipse(TintBrush, Rect(LocalPosition, LocalSize + LocalPosition));
+			}
+		}
 		else if (Element.Type == SlateDrawElement::EElementType::Text)
 		{
 			const auto& Payload = Element.GetTextPayload(Elements);

@@ -58,6 +58,11 @@ struct RectT
 		return Vector<T, 2>(Right, Bottom);
 	}
 
+	constexpr Vector<T, 2> GetCenter() const
+	{
+		return ((GetRightBottom().Cast<double>() + GetLeftTop().Cast<double>()) * 0.5).Cast<T>();
+	}
+
 	constexpr T GetWidth() const
 	{
 		return MathEx::Abs(Right - Left);

@@ -69,6 +69,16 @@ void SD2D1DeviceContext::FillRectangle(IRHIBrush* InBrush, const Rect& Region)
 	DeviceContext->FillRectangle((const D2D1_RECT_F&)Region, Brush_s->Get<ID2D1Brush>());
 }
 
+void SD2D1DeviceContext::FillEllipse(IRHIBrush* InBrush, const Rect& Region)
+{
+	auto Brush_s = Cast<SD2D1Brush>(InBrush);
+	D2D1_ELLIPSE Ellipse;
+	Ellipse.point = (const D2D1_POINT_2F&)Region.GetCenter();
+	Ellipse.radiusX = Region.GetWidth() * 0.5f;
+	Ellipse.radiusY = Region.GetHeight() * 0.5f;
+	DeviceContext->FillEllipse(Ellipse, Brush_s->Get<ID2D1Brush>());
+}
+
 void SD2D1DeviceContext::DrawTextLayout(const Vector2& DrawOrigin, IRHITextLayout* Layout, IRHIBrush* InBrush, ERHIDrawTextOptions Options)
 {
 	auto Layout_s = Cast<SDWriteTextLayout>(Layout);
