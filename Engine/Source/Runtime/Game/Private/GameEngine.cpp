@@ -4,6 +4,7 @@
 #include "LogGame.h"
 #include "GameInstance.h"
 #include "CoreDelegates.h"
+#include "RenderThread.h"
 #include "Threading/Thread.h"
 #include "Level/World.h"
 #include "Application/SlateApplication.h"
@@ -66,6 +67,8 @@ bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 
 void SGameEngine::Shutdown()
 {
+	RenderThread::Shutdown();
+
 	if (SlateApplication)
 	{
 		DestroyObject(SlateApplication);

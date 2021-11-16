@@ -59,8 +59,6 @@ void SGameRenderSystem::Init()
 
 void SGameRenderSystem::Deinit()
 {
-	RenderThread::Shutdown();
-
 	if (Factory && Device)
 	{
 		Factory->DestroyObject(Device);
