@@ -157,6 +157,32 @@ public:
 
 		return results;
 	}
+
+	template<template<class...> class StringT, class CharT, class TransformF, class... _Left>
+	static std::basic_string<CharT> Transform(const StringT<CharT, _Left...>& InString, TransformF&& Body)
+	{
+		std::basic_string<CharT> Bstr;
+		Bstr.resize(InString.length());
+
+		for (size_t i = 0; i < Bstr.length(); ++i)
+		{
+			Bstr[i] = (CharT)Body(InString[i]);
+		}
+
+		return Bstr;
+	}
+
+	template<template<class...> class StringT, class CharT, class... _Left>
+	static std::basic_string<CharT> ToLower(const StringT<CharT, _Left...>& InString)
+	{
+		return Transform(InString, (int(*)(int))std::tolower);
+	}
+
+	template<template<class...> class StringT, class CharT, class... _Left>
+	static std::basic_string<CharT> ToUpper(const StringT<CharT, _Left...>& InString)
+	{
+		return Transform(InString, (int(*)(int))std::toupper);
+	}
 };
 
 #define WCHAR_TO_ANSI(Text, ...)	(StringUtils::AsMultibyte(Text __VA_OPT__(,) __VA_ARGS__))

@@ -5,9 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
-class SStaticMesh;
-class STexture2D;
-class SFont;
 class SAssetsLoader;
 
 class GAME_API SGameAssetSystem : public SGameEngineSubsystem
