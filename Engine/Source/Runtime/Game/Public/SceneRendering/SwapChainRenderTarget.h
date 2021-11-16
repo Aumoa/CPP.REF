@@ -27,7 +27,7 @@ public:
 
 	void ResizeBuffers(int32 InWidth, int32 InHeight);
 	void ResolveTarget();
-	void Present(bool bVSync = false);
+	void Present();
 
 private:
 	void ReadyBuffers(int32 InWidth, int32 InHeight);

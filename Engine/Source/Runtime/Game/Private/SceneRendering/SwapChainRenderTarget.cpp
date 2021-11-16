@@ -31,8 +31,9 @@ void SSwapChainRenderTarget::ResolveTarget()
 	InitTarget(RTV, Index, nullptr, 0, ERHIResourceStates::Present);
 }
 
-void SSwapChainRenderTarget::Present(bool bVSync)
+void SSwapChainRenderTarget::Present()
 {
+	bool bVSync = IApplicationInterface::Get().GetTickMode() == IApplicationInterface::ETickMode::Ontime;
 	SwapChain->Present(bVSync ? 1 : 0);
 }
 
