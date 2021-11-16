@@ -10,5 +10,5 @@ class THSTORY_API STHGameModule : public SGameModule
 	GENERATED_BODY(STHGameModule)
 
 public:
-	virtual SGameInstance* CreatePrimaryGameModule() override;
+	virtual SGameInstance* CreateGameInstance() override;
 };

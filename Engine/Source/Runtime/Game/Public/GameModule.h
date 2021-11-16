@@ -16,7 +16,7 @@ public:
 	SGameModule();
 	virtual ~SGameModule() override;
 
-	virtual SGameInstance* CreatePrimaryGameModule();
+	virtual SGameInstance* CreateGameInstance();
 	virtual SGameEngine* CreateGameEngine();
 
 	virtual std::vector<Type*> GetTypeCollection() const;

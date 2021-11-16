@@ -5,7 +5,7 @@
 
 DEFINE_GAME_MODULE(STHGameModule);
 
-SGameInstance* STHGameModule::CreatePrimaryGameModule()
+SGameInstance* STHGameModule::CreateGameInstance()
 {
 	return NewObject<STHGameInstance>();
 }

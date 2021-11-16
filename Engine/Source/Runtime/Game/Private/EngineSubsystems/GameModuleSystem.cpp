@@ -61,5 +61,5 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
 
 SGameInstance* SGameModuleSystem::LoadGameInstance()
 {
-	return _gameModule->CreatePrimaryGameModule();
+	return _gameModule->CreateGameInstance();
 }

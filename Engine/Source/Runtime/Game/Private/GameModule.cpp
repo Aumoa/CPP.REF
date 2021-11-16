@@ -12,7 +12,7 @@ SGameModule::~SGameModule()
 {
 }
 
-SGameInstance* SGameModule::CreatePrimaryGameModule()
+SGameInstance* SGameModule::CreateGameInstance()
 {
 	return NewObject<SGameInstance>();
 }
