@@ -141,4 +141,6 @@ DEFINE_SLATE_CONSTRUCTOR(STextBlock, Attr)
 	SetText(Attr._Text);
 	SetFont(Attr._Font);
 	SetTintColor(Attr._TintColor);
+	SetTextAlignment(Attr._TextAlignment);
+	SetParagraphAlignment(Attr._ParagraphAlignment);
 }
