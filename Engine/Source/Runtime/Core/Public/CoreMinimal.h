@@ -12,6 +12,7 @@
 #include "Interface.h"
 #include "CoreAssert.h"
 #include "AbstractClass.h"
+#include "NonCopyable.h"
 #include "Concepts/CoreConcepts.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"
