@@ -26,6 +26,12 @@ public:
 		return static_cast<TSlotClass&&>(std::move(*this));
 	}
 
+	TSlotClass& operator [](SWidget* InContent) &
+	{
+		SetContent(InContent);
+		return static_cast<TSlotClass&>(*this);
+	}
+
 	void SetContent(SWidget* InContent)
 	{
 		Content = InContent;
