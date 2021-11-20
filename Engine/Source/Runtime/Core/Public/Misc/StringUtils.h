@@ -183,6 +183,19 @@ public:
 	{
 		return Transform(InString, (int(*)(int))std::toupper);
 	}
+
+	template<class TFind, class TReplace, template<class...> class StringT, class CharT, class... _Left>
+	static std::basic_string<CharT> ReplaceAll(const StringT<CharT, _Left...>& InString, const TFind& FindStr, const TReplace& ReplaceStr)
+	{
+		std::basic_string<CharT> Str(InString);
+
+		for (size_t Idx = Str.find(FindStr); Idx != std::basic_string<CharT>::npos; Idx = Str.find(FindStr, Idx + 1))
+		{
+			Str = Str.replace(Idx, std::basic_string_view<CharT>(FindStr).length(), std::basic_string_view<CharT>(ReplaceStr));
+		}
+
+		return Str;
+	}
 };
 
 #define WCHAR_TO_ANSI(Text, ...)	(StringUtils::AsMultibyte(Text __VA_OPT__(,) __VA_ARGS__))
