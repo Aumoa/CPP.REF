@@ -9,6 +9,7 @@
 #include <sstream>
 #include <vector>
 #include <optional>
+#include <set>
 #include "PrimitiveTypes.h"
 #include "Concepts/CoreConcepts.h"
 
@@ -195,6 +196,167 @@ public:
 		}
 
 		return Str;
+	}
+
+	template<template<class...> class StringT, class CharT, class... _Left>
+	static std::basic_string<CharT> Pluralize(const StringT<CharT, _Left...>& InString, size_t Count = 2, bool bSpecial = false)
+	{
+#define MAKE_SPECIAL(X) Cast<CharT>(L ## X)
+		CharT Back = *(std::end(InString) - 1);
+		const bool bUpper = std::isupper(Back) != 0;
+		Back = (CharT)std::tolower(Back);
+
+		if (Count <= 1 || std::basic_string_view<CharT>(InString).length() == 0 || *(std::end(InString) - 1) == 0)
+		{
+			return std::basic_string<CharT>(InString);
+		}
+		else
+		{
+			std::basic_string<CharT> Pluralized(InString);
+
+			if (Pluralized.length() >= 2)
+			{
+				auto Tit = Pluralized.end();
+				CharT Rule[2] = { *--Tit, *--Tit };
+				if (Rule[0] == (CharT)'t' && Rule[1] == (CharT)'h' && bSpecial)
+				{
+					static std::set<std::basic_string<CharT>> Rules =
+					{
+						MAKE_SPECIAL("potato"),
+						MAKE_SPECIAL("tomato"),
+						MAKE_SPECIAL("hero"),
+						MAKE_SPECIAL("cargo"),
+						MAKE_SPECIAL("echo"),
+						MAKE_SPECIAL("torpedo"),
+						MAKE_SPECIAL("veto")
+					};
+
+					auto LowerStr = ToLower(InString);
+					if (Rules.contains(LowerStr))
+					{
+						Pluralized += Cast<CharT>(bUpper ? L"ES" : L"es");
+					}
+				}
+				else if (Rule[0] == (CharT)'f' && Rule[1] == (CharT)'e' && bSpecial)
+				{
+					static std::set<std::basic_string<CharT>> Rules =
+					{
+						MAKE_SPECIAL("knife"),
+						MAKE_SPECIAL("life"),
+						MAKE_SPECIAL("wife"),
+					};
+
+					auto LowerStr = ToLower(InString);
+					if (Rules.contains(LowerStr))
+					{
+						auto End = Pluralized.end();
+						Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"VES" : L"ves"));
+					}
+				}
+				else if (Rule[0] == (CharT)'o' && Rule[1] == (CharT)'n' && bSpecial)
+				{
+					static std::set<std::basic_string<CharT>> Rules =
+					{
+						MAKE_SPECIAL("criterion"),
+						MAKE_SPECIAL("phenomenon"),
+					};
+
+					auto LowerStr = ToLower(InString);
+					if (Rules.contains(LowerStr))
+					{
+						auto End = Pluralized.end();
+						Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"A" : L"a"));
+					}
+				}
+				else if (Rule[0] == (CharT)'i' && Rule[1] == (CharT)'s')
+				{
+					auto End = Pluralized.end();
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+				}
+				else if (Rule[0] == (CharT)'s' && Rule[1] == (CharT)'h')
+				{
+					auto End = Pluralized.end();
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+				}
+				else if (Rule[0] == (CharT)'c' && Rule[1] == (CharT)'h')
+				{
+					auto End = Pluralized.end();
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"I" : L"i"));
+				}
+				else if (Rule[0] == (CharT)'u' && Rule[1] == (CharT)'s')
+				{
+					auto End = Pluralized.end();
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+				}
+				else if (Rule[1] == (CharT)'y')
+				{
+					auto End = Pluralized.end();
+					switch (Rule[0])
+					{
+					case (CharT)'a':
+					case (CharT)'e':
+					case (CharT)'i':
+					case (CharT)'o':
+					case (CharT)'u':
+						break;
+					default:
+						Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"IES" : L"ies"));
+						break;
+					}
+				}
+			}
+
+			if (Pluralized.length() >= 1)
+			{
+				if (Back == (CharT)'f' && bSpecial)
+				{
+					static std::set<std::basic_string<CharT>> Rules =
+					{
+						MAKE_SPECIAL("calf"),
+						MAKE_SPECIAL("leaf"),
+					};
+
+					auto LowerStr = ToLower(InString);
+					if (Rules.contains(LowerStr))
+					{
+						auto End = Pluralized.end();
+						Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"VES" : L"ves"));
+					}
+				}
+				else if (Back == (CharT)'s' || Back == (CharT)'x' || Back == (CharT)'z')
+				{
+					auto End = Pluralized.end();
+					Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+				}
+				else if (Back == (CharT)'y')
+				{
+					auto End = Pluralized.end();
+					Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"IES" : L"ies"));
+				}
+			}
+
+			return Pluralized;
+		}
+#undef MAKE_SPECIAL
+	}
+
+	template<class CharTTo, template<class...> class StringT, class CharT, class... _Left>
+	static std::basic_string<CharTTo> Cast(const StringT<CharT, _Left...>& InString)
+	{
+		if constexpr (std::is_same_v<CharT, CharTTo>)
+		{
+			return std::basic_string<CharTTo>(InString);
+		}
+		else if constexpr (std::is_same_v<CharT, char> && std::is_same_v<CharTTo, wchar_t>)
+		{
+			return ANSI_TO_WCHAR(InString);
+		}
+		else if constexpr (std::is_same_v<CharT, wchar_t> && std::is_same_v<CharTTo, char>)
+		{
+			return WCHAR_TO_ANSI(InString);
+		}
+
+		// STATIC ASSERT
 	}
 };
 
