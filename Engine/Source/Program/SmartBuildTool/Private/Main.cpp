@@ -1,7 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "BuildTool.h"
-#include "Thirdparty/tinyxml2.h"
 
 int wmain(int argc, wchar_t* argv[])
 {

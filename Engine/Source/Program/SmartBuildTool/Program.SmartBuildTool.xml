@@ -3,6 +3,7 @@
 		<Item RelativePath="Private" />
 	</IncludePaths>
 	<ReferencedProjects>
+		<Item Name="tinyxml2" />
 		<Item Name="Core" Access="Public" />
 	</ReferencedProjects>
 </ProjectInfo>

@@ -18,6 +18,11 @@ std::wstring StringUtils::GetPlaceholder(std::wstring_view formatArgs)
 
 std::wstring StringUtils::AsUnicode(std::string_view multibyte, uint32 codePage)
 {
+	if (multibyte.length() == 0)
+	{
+		return L"";
+	}
+
 	int32 length = MultiByteToWideChar(codePage, 0, multibyte.data(), (int32)multibyte.length(), nullptr, 0);
 	if (length == 0)
 	{
@@ -34,6 +39,11 @@ std::wstring StringUtils::AsUnicode(std::string_view multibyte, uint32 codePage)
 
 std::string StringUtils::AsMultibyte(std::wstring_view unicode, uint32 codePage)
 {
+	if (unicode.length() == 0)
+	{
+		return "";
+	}
+
 	int32 length = WideCharToMultiByte(codePage, 0, unicode.data(), (int32)unicode.length(), nullptr, 0, nullptr, nullptr);
 	if (length == 0)
 	{

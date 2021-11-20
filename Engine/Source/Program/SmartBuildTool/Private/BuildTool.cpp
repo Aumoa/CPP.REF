@@ -5,7 +5,7 @@
 #include "Misc/CommandLine.h"
 #include "IO/DirectoryReference.h"
 #include "Guid.h"
-#include "Thirdparty/tinyxml2.h"
+#include "tinyxml2.h"
 
 DEFINE_LOG_CATEGORY(LogBuildTool);
 
