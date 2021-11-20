@@ -219,6 +219,19 @@ class CrcHash
 		return 0xFFFFFFFF;
 	}
 
+	static constexpr uint32 _Crc32(const char* str, size_t _Idx)
+	{
+		if (_Idx != (size_t)-1)
+		{
+			uint32 _Next = _Crc32(str, _Idx - 1);
+			return (_Next >> 8) ^ CrcTable32[(_Next ^ str[_Idx]) & 0xFF];
+		}
+		else
+		{
+			return 0xFFFFFFFF;
+		}
+	}
+
 	template<size_t _Idx>
 	static consteval uint64 _Crc64(const char* str)
 	{
@@ -232,21 +245,68 @@ class CrcHash
 		return 0xFFFFFFFFFFFFFFFF;
 	}
 
+	static constexpr uint64 _Crc64(const char* str, size_t _Idx)
+	{
+		if (_Idx != (size_t)-1)
+		{
+			uint64 _Next = _Crc64(str, _Idx - 1);
+			return (_Next >> 8) ^ CrcTable64[(_Next ^ str[_Idx]) & 0xFF];
+		}
+		else
+		{
+			return 0xFFFFFFFFFFFFFFFF;
+		}
+	}
+
 public:
+	template<size_t N>
+	static consteval uint32 Hash32(const char(&str)[N])
+	{
+		return (_Crc32<N - 1>(str) ^ 0xFFFFFFFF);
+	}
+
+	static constexpr uint32 Hash32(const char* str, size_t N)
+	{
+		return (_Crc32(str, N - 1) ^ 0xFFFFFFFF);
+	}
+
+	template<size_t N>
+	static consteval uint64 Hash64(const char(&str)[N])
+	{
+		return (_Crc64<N - 1>(str) ^ 0xFFFFFFFFFFFFFFFF);
+	}
+
+	static constexpr uint64 Hash64(const char* str, size_t N)
+	{
+		return (_Crc64(str, N - 1) ^ 0xFFFFFFFFFFFFFFFF);
+	}
+
 	template<size_t N>
 	static consteval size_t Hash(const char(&str)[N])
 	{
 		if constexpr (sizeof(size_t) == 4)
 		{
-			return (_Crc32<N - 2>(str) ^ 0xFFFFFFFF);
+			return (_Crc32<N - 1>(str) ^ 0xFFFFFFFF);
 		}
 		else if constexpr (sizeof(size_t) == 8)
 		{
-			return (_Crc64<N - 2>(str) ^ 0xFFFFFFFFFFFFFFFF);
+			return (_Crc64<N - 1>(str) ^ 0xFFFFFFFFFFFFFFFF);
 		}
 		else
 		{
 			static_assert(false);
+		}
+	}
+
+	static constexpr size_t Hash(const char* str, size_t N)
+	{
+		if constexpr (sizeof(size_t) == 4)
+		{
+			return (_Crc32(str, N - 1) ^ 0xFFFFFFFF);
+		}
+		else if constexpr (sizeof(size_t) == 8)
+		{
+			return (_Crc64(str, N - 1) ^ 0xFFFFFFFFFFFFFFFF);
 		}
 	}
 };
