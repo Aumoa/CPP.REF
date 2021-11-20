@@ -97,15 +97,45 @@ public:
 	/// <summary>
 	/// Returns a new string in which all leading and trailing occurrences of a set of specified characters from the current string are removed.
 	/// </summary>
-	static std::wstring Trim(const std::wstring& code, std::span<wchar_t const> trimChars);
+	template<template<class...> class StringT, class CharT, class... _Left>
+	static std::basic_string<CharT> Trim(const StringT<CharT, _Left...>& code, std::span<const CharT> trimChars)
+	{
+		size_t trimStart = 0;
+		for (size_t i = 0; i < code.length(); ++i)
+		{
+			if (auto it = std::find(trimChars.begin(), trimChars.end(), code[i]); it == trimChars.end())
+			{
+				trimStart = i;
+				break;
+			}
+		}
+
+		if (trimStart == code.length())
+		{
+			return L"";
+		}
+
+		size_t trimEnd = code.length();
+		for (size_t i = code.length() - 1; i > trimStart; --i)
+		{
+			if (auto it = std::find(trimChars.begin(), trimChars.end(), code[i]); it == trimChars.end())
+			{
+				trimEnd = i + 1;
+				break;
+			}
+		}
+
+		return code.substr(trimStart, trimEnd - trimStart);
+	}
 
 	/// <summary>
 	/// Returns a new string in which all leading and trailing occurrences of a set of specified characters from the current string are removed.
 	/// </summary>
-	static std::wstring Trim(const std::wstring& code)
+	template<template<class...> class StringT, class CharT, class... _Left>
+	static std::wstring Trim(const StringT<CharT, _Left...>& code)
 	{
 		wchar_t trimChars[] = { L' ' };
-		return Trim(code, trimChars);
+		return Trim(code, std::span<const CharT>(trimChars));
 	}
 
 	/// <summary>
@@ -115,21 +145,21 @@ public:
 	/// <param name="separator"> The string that delimit the substrings in this string. </param>
 	/// <param name="bRemoveEmptyEntries"> Remove empty entries. </param>
 	/// <param name="bTrim"> Trim left and right strings. </param>
-	template<template<class...> class TContainer = std::vector>
-	static TContainer<std::wstring> Split(std::wstring_view formatStr, std::wstring_view separator, bool bRemoveEmptyEntries = false, bool bTrim = false)
+	template<template<class...> class TContainer = std::vector, template<class...> class StringT, class CharT, class... _Left, class StringSepT>
+	static TContainer<std::basic_string<CharT>> Split(const StringT<CharT, _Left...>& formatStr, const StringSepT& separator, bool bRemoveEmptyEntries = false, bool bTrim = false)
 	{
-		TContainer<std::wstring> results;
+		TContainer<std::basic_string<CharT>> results;
 
 		for (size_t i = 0; i < formatStr.length();)
 		{
-			std::optional<std::wstring> view;
+			std::optional<std::basic_string<CharT>> view;
 			size_t seekp = formatStr.find(separator, i);
 
-			if (seekp == std::wstring::npos)
+			if (seekp == std::basic_string<CharT>::npos)
 			{
 				// Could not found separator.
 				view = formatStr.substr(i);
-				i = std::wstring::npos;
+				i = std::basic_string<CharT>::npos;
 			}
 			else
 			{
@@ -138,7 +168,7 @@ public:
 				{
 					view = formatStr.substr(i, length);
 				}
-				i = seekp + separator.length();
+				i = seekp + std::basic_string_view<CharT>(separator).length();
 			}
 
 			if (view)
@@ -213,6 +243,7 @@ public:
 		else
 		{
 			std::basic_string<CharT> Pluralized(InString);
+			bool bAppendS = true;
 
 			if (Pluralized.length() >= 2)
 			{
@@ -234,7 +265,7 @@ public:
 					auto LowerStr = ToLower(InString);
 					if (Rules.contains(LowerStr))
 					{
-						Pluralized += Cast<CharT>(bUpper ? L"ES" : L"es");
+						Pluralized += Cast<CharT>(bUpper ? L"E" : L"e");
 					}
 				}
 				else if (Rule[0] == (CharT)'f' && Rule[1] == (CharT)'e' && bSpecial)
@@ -250,7 +281,7 @@ public:
 					if (Rules.contains(LowerStr))
 					{
 						auto End = Pluralized.end();
-						Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"VES" : L"ves"));
+						Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"VE" : L"ve"));
 					}
 				}
 				else if (Rule[0] == (CharT)'o' && Rule[1] == (CharT)'n' && bSpecial)
@@ -266,27 +297,23 @@ public:
 					{
 						auto End = Pluralized.end();
 						Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"A" : L"a"));
+						bAppendS = false;
 					}
 				}
 				else if (Rule[0] == (CharT)'i' && Rule[1] == (CharT)'s')
 				{
 					auto End = Pluralized.end();
-					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"E" : L"e"));
 				}
-				else if (Rule[0] == (CharT)'s' && Rule[1] == (CharT)'h')
+				else if (Rule[0] == (CharT)'s' || Rule[0] == (CharT)'c' && Rule[1] == (CharT)'h')
 				{
 					auto End = Pluralized.end();
-					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
-				}
-				else if (Rule[0] == (CharT)'c' && Rule[1] == (CharT)'h')
-				{
-					auto End = Pluralized.end();
-					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"I" : L"i"));
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"E" : L"e"));
 				}
 				else if (Rule[0] == (CharT)'u' && Rule[1] == (CharT)'s')
 				{
 					auto End = Pluralized.end();
-					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+					Pluralized = Pluralized.replace(End - 2, End, Cast<CharT>(bUpper ? L"E" : L"e"));
 				}
 				else if (Rule[1] == (CharT)'y')
 				{
@@ -300,7 +327,7 @@ public:
 					case (CharT)'u':
 						break;
 					default:
-						Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"IES" : L"ies"));
+						Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"IE" : L"ie"));
 						break;
 					}
 				}
@@ -320,29 +347,37 @@ public:
 					if (Rules.contains(LowerStr))
 					{
 						auto End = Pluralized.end();
-						Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"VES" : L"ves"));
+						Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"VE" : L"ve"));
 					}
 				}
 				else if (Back == (CharT)'s' || Back == (CharT)'x' || Back == (CharT)'z')
 				{
 					auto End = Pluralized.end();
-					Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"ES" : L"es"));
+					Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"E" : L"e"));
 				}
 				else if (Back == (CharT)'y')
 				{
 					auto End = Pluralized.end();
-					Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"IES" : L"ies"));
+					Pluralized = Pluralized.replace(End - 1, End, Cast<CharT>(bUpper ? L"IE" : L"ie"));
 				}
 			}
 
-			return Pluralized;
+			if (bAppendS)
+			{
+				return Pluralized + (bUpper ? (CharT)'S' : (CharT)'s');
+			}
+			else
+			{
+				return Pluralized;
+			}
 		}
 #undef MAKE_SPECIAL
 	}
 
-	template<class CharTTo, template<class...> class StringT, class CharT, class... _Left>
-	static std::basic_string<CharTTo> Cast(const StringT<CharT, _Left...>& InString)
+	template<class CharTTo, class StringT>
+	static std::basic_string<CharTTo> Cast(const StringT& InString)
 	{
+		using CharT = std::remove_reference_t<std::remove_const_t<decltype(*std::begin(InString))>>;
 		if constexpr (std::is_same_v<CharT, CharTTo>)
 		{
 			return std::basic_string<CharTTo>(InString);
@@ -355,8 +390,10 @@ public:
 		{
 			return WCHAR_TO_ANSI(InString);
 		}
-
-		// STATIC ASSERT
+		else
+		{
+			return std::basic_string<CharTTo>();
+		}
 	}
 };
 

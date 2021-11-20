@@ -24,6 +24,7 @@ class CORE_API SObject : public std::enable_shared_from_this<SObject>
 {
 	GENERATED_BODY(SObject)
 	friend class ObjectId;
+	friend class Type;
 
 private:
 	static std::atomic<uint64> InternalObjectIndexGenerator;

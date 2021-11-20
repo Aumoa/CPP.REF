@@ -6,6 +6,7 @@
 #include <functional>
 #include <unordered_map>
 #include <mutex>
+#include <map>
 #include "PrimitiveTypes.h"
 #include "Concepts/CoreConcepts.h"
 #include "Method.h"
@@ -95,6 +96,9 @@ public:
 		}
 	};
 
+private:
+	void RegisterStaticClass();
+
 public:
 	template<class TType>
 	Type(TypeGenerator<TType>&& Generator)
@@ -106,6 +110,7 @@ public:
 		, Properties(std::move(Generator.Properties))
 		, bNative(Generator.bNative)
 	{
+		RegisterStaticClass();
 	}
 
 	const std::wstring& GetFriendlyName() const;
@@ -146,6 +151,8 @@ public:
 		static auto MyClassType = Type(TypeGenerator<T>());
 		return &MyClassType;
 	}
+
+	static Type* FindStaticClass(std::wstring_view InFriendlyName);
 
 private:
 	template<std::derived_from<SObject> TType> requires std::constructible_from<TType>

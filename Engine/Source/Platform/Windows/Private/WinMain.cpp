@@ -11,7 +11,9 @@ using namespace std::chrono;
 
 INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd, _In_ INT show)
 {
-	SCommandLine CommandArgs = StringUtils::Split(cmd, L" ", true, true);
+	using namespace std;
+
+	SCommandLine CommandArgs = StringUtils::Split(std::wstring_view(cmd), L" ", true, true);
 	size_t GameModuleIdx = CommandArgs.GetArgument(L"--GameDll");
 	if (GameModuleIdx == -1)
 	{

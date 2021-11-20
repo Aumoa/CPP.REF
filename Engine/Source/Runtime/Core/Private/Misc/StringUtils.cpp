@@ -57,33 +57,3 @@ std::string StringUtils::AsMultibyte(std::wstring_view unicode, uint32 codePage)
 
 	return multibyte;
 }
-
-std::wstring StringUtils::Trim(const std::wstring& code, std::span<wchar_t const> trimChars)
-{
-	size_t trimStart = 0;
-	for (size_t i = 0; i < code.length(); ++i)
-	{
-		if (auto it = std::find(trimChars.begin(), trimChars.end(), code[i]); it == trimChars.end())
-		{
-			trimStart = i;
-			break;
-		}
-	}
-
-	if (trimStart == code.length())
-	{
-		return L"";
-	}
-	
-	size_t trimEnd = code.length();
-	for (size_t i = code.length() - 1; i > trimStart; --i)
-	{
-		if (auto it = std::find(trimChars.begin(), trimChars.end(), code[i]); it == trimChars.end())
-		{
-			trimEnd = i + 1;
-			break;
-		}
-	}
-
-	return code.substr(trimStart, trimEnd - trimStart);
-}

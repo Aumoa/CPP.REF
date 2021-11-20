@@ -2,11 +2,21 @@
 
 #include "Reflection/Type.h"
 #include "LogCore.h"
+#include "Object.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 
 std::unordered_map<size_t, uint64> Type::TypeRegister;
 std::mutex Type::TypeRegisterMutex;
+
+std::map<std::wstring, Type*, std::less<>>* TypeCollectionPtr;
+
+void Type::RegisterStaticClass()
+{
+	static std::map<std::wstring, Type*, std::less<>> TypeCollection;
+	TypeCollectionPtr = &TypeCollection;
+	TypeCollection.emplace(GetFriendlyName(), this);
+}
 
 const std::wstring& Type::GetFriendlyName() const
 {
@@ -27,7 +37,8 @@ SObject* Type::Instantiate(SObject* InOuter) const
 {
 	if (Constructor)
 	{
-		return Constructor(InOuter);
+		SObject* SO = Constructor(InOuter);
+		return SO;
 	}
 	else
 	{
@@ -152,4 +163,13 @@ std::wstring Type::GenerateUniqueName()
 	{
 		return GetFriendlyName();
 	}
+}
+
+Type* Type::FindStaticClass(std::wstring_view InFriendlyName)
+{
+	if (auto It = TypeCollectionPtr->find(InFriendlyName); It != TypeCollectionPtr->end())
+	{
+		return It->second;
+	}
+	return nullptr;
 }

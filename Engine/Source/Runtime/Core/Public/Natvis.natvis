@@ -3,6 +3,9 @@
 	<Type Name="SObject">
 		<DisplayString>{Name}</DisplayString>
 	</Type>
+	<Type Name="Type">
+		<DisplayString>{FriendlyName}</DisplayString>
+	</Type>
 	<Type Name="Vector&lt;*,2&gt;">
 		<DisplayString>{{X={X} Y={Y}}}</DisplayString>
 		<Expand>
