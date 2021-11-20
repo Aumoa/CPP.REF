@@ -12,6 +12,7 @@
 #include <set>
 #include "PrimitiveTypes.h"
 #include "Concepts/CoreConcepts.h"
+#include "CoreAssert.h"
 
 /// <summary>
 /// Provide extended functions for compose string.
@@ -112,7 +113,14 @@ public:
 
 		if (trimStart == code.length())
 		{
-			return L"";
+			if constexpr (std::same_as<CharT, char>)
+			{
+				return "";
+			}
+			else if constexpr (std::same_as<CharT, wchar_t>)
+			{
+				return L"";
+			}
 		}
 
 		size_t trimEnd = code.length();
@@ -132,9 +140,9 @@ public:
 	/// Returns a new string in which all leading and trailing occurrences of a set of specified characters from the current string are removed.
 	/// </summary>
 	template<template<class...> class StringT, class CharT, class... _Left>
-	static std::wstring Trim(const StringT<CharT, _Left...>& code)
+	static std::basic_string<CharT> Trim(const StringT<CharT, _Left...>& code)
 	{
-		wchar_t trimChars[] = { L' ' };
+		CharT trimChars[] = { (CharT)' ' };
 		return Trim(code, std::span<const CharT>(trimChars));
 	}
 
@@ -229,11 +237,11 @@ public:
 	}
 
 	template<template<class...> class StringT, class CharT, class... _Left>
-	static std::basic_string<CharT> Pluralize(const StringT<CharT, _Left...>& InString, size_t Count = 2, bool bSpecial = false)
+	static std::basic_string<CharT> Pluralize(const StringT<CharT, _Left...>& InString, size_t Count = 2, bool bSpecial = false, bool bForceLower = true)
 	{
 #define MAKE_SPECIAL(X) Cast<CharT>(L ## X)
 		CharT Back = *(std::end(InString) - 1);
-		const bool bUpper = std::isupper(Back) != 0;
+		const bool bUpper = !bForceLower && std::isupper(Back) != 0;
 		Back = (CharT)std::tolower(Back);
 
 		if (Count <= 1 || std::basic_string_view<CharT>(InString).length() == 0 || *(std::end(InString) - 1) == 0)
@@ -378,11 +386,7 @@ public:
 	static std::basic_string<CharTTo> Cast(const StringT& InString)
 	{
 		using CharT = std::remove_reference_t<std::remove_const_t<decltype(*std::begin(InString))>>;
-		if constexpr (std::is_same_v<CharT, CharTTo>)
-		{
-			return std::basic_string<CharTTo>(InString);
-		}
-		else if constexpr (std::is_same_v<CharT, char> && std::is_same_v<CharTTo, wchar_t>)
+		if constexpr (std::is_same_v<CharT, char> && std::is_same_v<CharTTo, wchar_t>)
 		{
 			return ANSI_TO_WCHAR(InString);
 		}
@@ -392,7 +396,7 @@ public:
 		}
 		else
 		{
-			return std::basic_string<CharTTo>();
+			return std::basic_string<CharTTo>(InString);
 		}
 	}
 };

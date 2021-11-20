@@ -133,7 +133,6 @@ void SGameAssetSystem::ConvertNativeAssets()
 
 		if (!Assimp->ConvertAssets(NativePath, ContentPath.replace_extension(L".sasset")))
 		{
-			SE_LOG(LogAssets, Warning, L"Not supported native asset detected.");
 			continue;
 		}
 
