@@ -5,7 +5,6 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateWindowElementList.h"
 #include "Draw/SlateRenderer.h"
-#include "SceneRendering/SlateRenderer.h"
 #include "SceneRendering/SceneRenderContext.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "RHI/IRHIDevice.h"

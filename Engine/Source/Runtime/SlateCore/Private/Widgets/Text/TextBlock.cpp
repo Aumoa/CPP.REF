@@ -7,6 +7,7 @@
 #include "RHI/IRHITextLayout.h"
 #include "RHI/IRHIFactory.h"
 #include "IApplicationInterface.h"
+#include "RenderThread.h"
 
 STextBlock::STextBlock() : Super()
 {
@@ -52,10 +53,17 @@ Color STextBlock::GetTintColor()
 
 void STextBlock::SetTextAlignment(ERHITextAlignment Alignment)
 {
-	TextAlignment = Alignment;
-	if (Layout)
+	if (TextAlignment != Alignment)
 	{
-		Layout->SetTextAlignment(Alignment);
+		TextAlignment = Alignment;
+
+		if (Layout)
+		{
+			RenderThread::EnqueueRenderThreadWork<"STextBlock.SetTextAlignment">([&](auto)
+			{
+				Layout->SetTextAlignment(Alignment);
+			});
+		}
 	}
 }
 
@@ -66,10 +74,17 @@ ERHITextAlignment STextBlock::GetTextAlignment()
 
 void STextBlock::SetParagraphAlignment(ERHIParagraphAlignment Alignment)
 {
-	ParagraphAlignment = Alignment;
-	if (Layout)
+	if (ParagraphAlignment != Alignment)
 	{
-		Layout->SetParagraphAlignment(Alignment);
+		ParagraphAlignment = Alignment;
+
+		if (Layout)
+		{
+			RenderThread::EnqueueRenderThreadWork<"STextBlock.SetParagraphAlignment">([&](auto)
+			{
+				Layout->SetParagraphAlignment(Alignment);
+			});
+		}
 	}
 }
 
@@ -80,16 +95,7 @@ ERHIParagraphAlignment STextBlock::GetParagraphAlignment()
 
 Vector2 STextBlock::GetDesiredSize()
 {
-	if (Layout)
-	{
-		constexpr Vector2 SampleSize(1048576.0f, 1048576.0f);
-		Layout->SetMaxSize(SampleSize);
-		return Layout->GetDesiredSize();
-	}
-	else
-	{
-		return Vector2::ZeroVector();
-	}
+	return CachedDesiredSize;
 }
 
 int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
@@ -131,6 +137,7 @@ void STextBlock::ReallocLayout()
 		Layout = Factory->CreateTextLayout(Format, Text, LocalSize);
 		Format->SetOuter(Layout);
 		CachedLocalMaxSize = LocalSize;
+		CachedDesiredSize = Layout->GetDesiredSize();
 
 		Layout->SetOuter(this);
 		bNeedToReallocateLayout = false;
@@ -148,4 +155,5 @@ DEFINE_SLATE_CONSTRUCTOR(STextBlock, Attr)
 	SetTintColor(Attr._TintColor);
 	SetTextAlignment(Attr._TextAlignment);
 	SetParagraphAlignment(Attr._ParagraphAlignment);
+	ReallocLayout();
 }

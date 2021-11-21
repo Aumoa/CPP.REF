@@ -23,6 +23,7 @@ private:
 	ERHIParagraphAlignment ParagraphAlignment = ERHIParagraphAlignment::Near;
 
 	Vector2 CachedLocalMaxSize = Vector2::ZeroVector();
+	Vector2 CachedDesiredSize = Vector2::ZeroVector();
 
 public:
 	STextBlock();
