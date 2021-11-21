@@ -14,8 +14,11 @@ STextBlock::STextBlock() : Super()
 
 void STextBlock::SetText(std::wstring_view Text)
 {
-	this->Text = Text;
-	bNeedToReallocateLayout = true;
+	if (this->Text != Text)
+	{
+		this->Text = Text;
+		bNeedToReallocateLayout = true;
+	}
 }
 
 std::wstring STextBlock::GetText()
@@ -25,8 +28,11 @@ std::wstring STextBlock::GetText()
 
 void STextBlock::SetFont(const SlateFont& Font)
 {
-	this->Font = Font;
-	bNeedToReallocateLayout = true;
+	if (this->Font != Font)
+	{
+		this->Font = Font;
+		bNeedToReallocateLayout = true;
+	}
 }
 
 SlateFont STextBlock::GetFont()
@@ -37,7 +43,6 @@ SlateFont STextBlock::GetFont()
 void STextBlock::SetTintColor(const Color& TintColor)
 {
 	this->TintColor = TintColor;
-	bNeedToReallocateLayout = true;
 }
 
 Color STextBlock::GetTintColor()
