@@ -35,6 +35,7 @@ SObject* SObject::GetOuter() const
 
 std::shared_ptr<SObject> SObject::SetOuter(SObject* InNewOuter)
 {
+	std::unique_lock Lock(ObjectLock);
 	std::shared_ptr<SObject> Detached;
 	if (Outer != InNewOuter)
 	{
@@ -58,6 +59,7 @@ std::shared_ptr<SObject> SObject::SetOuter(SObject* InNewOuter)
 
 void SObject::SetName(std::wstring_view InNewName)
 {
+	std::unique_lock Lock(ObjectLock);
 	if (Name != InNewName)
 	{
 		Name = InNewName;
@@ -72,22 +74,26 @@ std::wstring SObject::GetName()
 
 void SObject::AddReferenceObject(SObject* InObject)
 {
+	std::unique_lock Lock(ObjectLock);
 	InternalAttachSubobject(InObject);
 }
 
 void SObject::RemoveReferenceObject(SObject* InObject)
 {
+	std::unique_lock Lock(ObjectLock);
 	InternalDetachSubobject(InObject);
 }
 
 void SObject::DestroyObject(SObject* InObject)
 {
+	std::unique_lock Lock(ObjectLock);
 	checkf(InObject->Outer == this, L"DestroyObject must be called with outer object.");
 	InternalDetachSubobject(InObject);
 }
 
 void SObject::CleanupSubobjects()
 {
+	std::unique_lock Lock(ObjectLock);
 	for (size_t i = 0; i < Subobjects.size(); ++i)
 	{
 		if (Subobjects[i] && Subobjects[i]->Outer == this)

@@ -7,6 +7,7 @@
 #include <string_view>
 #include <functional>
 #include <map>
+#include <mutex>
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "Diagnostics/LogSystem.h"
@@ -36,6 +37,7 @@ private:
 	std::map<SObject*, size_t> Views;
 
 	std::wstring Name;
+	std::mutex ObjectLock;
 
 public:
 	SObject();
@@ -68,6 +70,7 @@ public:
 	template<class T, class... TArgs>
 	T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
+		std::unique_lock Lock(ObjectLock);
 		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
 		auto Ptr = SharedPtr.get();
 		InternalAttachSubobject(Ptr);
