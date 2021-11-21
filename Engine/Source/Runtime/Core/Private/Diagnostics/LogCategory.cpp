@@ -42,16 +42,17 @@ void SLogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 	}
 
 	wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
-	wstring composed = format(L"{}: {}: {}: {}\n", zoned_time(system_clock::now()).get_local_time(), _name, VerbosityToString(logVerbosity), message);
+	wstring Composed = format(L"{}: {}: {}\n", _name, VerbosityToString(logVerbosity), message);
+	wstring TimeComposed = format(L"{}: {}", zoned_time(system_clock::now()).get_local_time(), Composed);
 	if (stream.is_open())
 	{
 		// Log to file.
-		stream << composed;
+		stream << TimeComposed;
 		stream.flush();
 	}
 
 	// Log to Visual Studio Output Console.
-	OutputDebugStringW(composed.c_str());
+	OutputDebugStringW(TimeComposed.c_str());
 
 	// Log to console if it is available.
 	switch (logVerbosity)
@@ -59,11 +60,11 @@ void SLogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
 	case ELogVerbosity::Verbose:
 	case ELogVerbosity::Warning:
 	case ELogVerbosity::Info:
-		std::wcout << composed;
+		std::wcout << Composed;
 		break;
 	case ELogVerbosity::Error:
 	case ELogVerbosity::Fatal:
-		std::wcerr << composed;
+		std::wcerr << Composed;
 		break;
 	}
 }
