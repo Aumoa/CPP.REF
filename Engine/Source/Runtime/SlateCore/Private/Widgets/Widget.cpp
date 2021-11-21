@@ -163,7 +163,11 @@ DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
 
 void SWidget::SetVisibility(ESlateVisibility InVisibility)
 {
-    Visibility = InVisibility;
+    if (InVisibility != Visibility)
+    {
+        Visibility = InVisibility;
+        VisibilityChanged.Invoke(InVisibility);
+    }
 }
 
 ESlateVisibility SWidget::GetVisibility()

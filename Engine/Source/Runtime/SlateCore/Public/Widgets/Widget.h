@@ -68,6 +68,8 @@ protected:
 public:
 	DECLARE_MULTICAST_EVENT(MouseHoveredEvent, bool);
 	MouseHoveredEvent MouseHovered;
+	DECLARE_MULTICAST_EVENT(VisibilityChangedEvent, ESlateVisibility);
+	VisibilityChangedEvent VisibilityChanged;
 
 public:					
 	BEGIN_SLATE_ATTRIBUTE

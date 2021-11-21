@@ -16,16 +16,16 @@ public:
 	struct TaskInfo
 	{
 		std::function<void()> Task;
-		std::chrono::duration<float> Delay;
-		std::chrono::duration<float> InitDelay;
+		float Delay = 0;
+		float InitDelay = 0;
 		bool bReliableCallCount : 1 = false;
 	};
 
 private:
 	struct TickTaskInstance
 	{
-		std::chrono::duration<float> Delay;
-		std::chrono::duration<float> ActualDelay;
+		float Delay = 0;
+		float ActualDelay = 0;
 		bool bReliableCallCount : 1 = false;
 
 		std::function<void()> Task;
@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	inline void Tick(std::chrono::duration<float> deltaTime)
+	inline void Tick(float deltaTime)
 	{
 		using namespace std::chrono;
 
@@ -48,7 +48,7 @@ public:
 			auto& info = task.second;
 
 			info.ActualDelay -= deltaTime;
-			if (info.ActualDelay <= 0ns)
+			if (info.ActualDelay <= 0)
 			{
 				info.Task();
 
