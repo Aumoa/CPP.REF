@@ -131,10 +131,17 @@ public:
 	template<std::derived_from<SObject> T>
 	bool IsA() const { return IsA(T::StaticClass()); }
 
+	template<class T> requires (!std::derived_from<T, SObject>)
+	bool IsDerivedFrom() const { return IsDerivedFrom(GetStaticClass<T>()); }
+	template<class T> requires (!std::derived_from<T, SObject>)
+	bool IsBaseOf() const { return IsBaseOf(GetStaticClass<T>()); }
+	template<class T> requires (!std::derived_from<T, SObject>)
+	bool IsA() const { return IsA(GetStaticClass<T>()); }
+
 	std::vector<Method> GetMethods(bool bIncludeSuperMembers = true) const;
-	const Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
+	Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
 	std::vector<Property> GetProperties(bool bIncludeSuperMembers = true) const;
-	const Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
+	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
 
 	std::wstring GenerateUniqueName();
 

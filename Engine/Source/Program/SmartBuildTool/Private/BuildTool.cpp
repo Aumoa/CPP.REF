@@ -96,11 +96,17 @@ int32 SBuildTool::GuardedMain(std::vector<std::wstring_view> InArgs)
 	std::filesystem::path SolutionCache(L".vs");
 	if (std::filesystem::exists(SolutionCache))
 	{
-		std::filesystem::remove_all(SolutionCache);
+		try
+		{
+			std::filesystem::remove_all(SolutionCache);
+		}
+		catch (...)
+		{
+			SE_LOG(LogBuildTool, Warning, L"Cleanup failed. Abort.");
+		}
 	}
 
 	SE_LOG(LogBuildTool, Verbose, L"Working successful! {} seconds elapsed.", GlobalTimer.DoCalc().count());
-
 	return 0;
 }
 
@@ -113,7 +119,7 @@ int32 SBuildTool::SearchProjects(const std::filesystem::path& DirectoryPath)
 	}
 
 	int32 Count = 0;
-	for (auto Item : std::filesystem::recursive_directory_iterator(DirectoryPath))
+	for (auto Item : std::filesystem::recursive_directory_iterator(DirectoryPath / L"Source"))
 	{
 		if (Item.exists())
 		{
@@ -716,7 +722,7 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 				auto ProjectReferenceBody = [&](auto Referenced)
 				{
 					std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
-					for (auto Split : StringUtils::Split(Referenced->Metadata->Path.c_str(), L".", true, true))
+					for (auto Split : StringUtils::Split(Referenced->Metadata->Path, L".", true, true))
 					{
 						IntermediateProjectPath /= Split;
 					}
@@ -737,7 +743,7 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 		}
 
 		std::filesystem::path IntermediateProjectPath = "Intermediate/ProjectFiles";
-		for (auto Split : StringUtils::Split(Runtime->Metadata->Path.c_str(), L".", true, true))
+		for (auto Split : StringUtils::Split(Runtime->Metadata->Path, L".", true, true))
 		{
 			IntermediateProjectPath /= Split;
 		}

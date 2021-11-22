@@ -95,13 +95,13 @@ std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
 	}
 }
 
-const Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
+Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
 {
 	for (size_t i = 0; i < Functions.size(); ++i)
 	{
 		if (Functions[i].GetFriendlyName() == InFriendlyName)
 		{
-			return &Functions[i];
+			return const_cast<Method*>(&Functions[i]);
 		}
 	}
 
@@ -132,13 +132,13 @@ std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
 	}
 }
 
-const Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
+Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
 {
 	for (size_t i = 0; i < Properties.size(); ++i)
 	{
 		if (Properties[i].GetFriendlyName() == InFriendlyName)
 		{
-			return &Properties[i];
+			return const_cast<Property*>(&Properties[i]);
 		}
 	}
 

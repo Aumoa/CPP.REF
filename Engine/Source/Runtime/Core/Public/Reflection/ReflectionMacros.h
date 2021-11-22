@@ -31,8 +31,7 @@ public:																						\
 																							\
 	static Type* StaticClass()																\
 	{																						\
-		static Type MyClassType(Type::TypeGenerator											\
-			<Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>(L ## #Class));					\
+		static Type MyClassType(Type::TypeGenerator<This>(L ## #Class));					\
 		return &MyClassType;																\
 	}																						\
 																							\
@@ -45,7 +44,7 @@ public:																						\
 		return StaticClass();																\
 	}																						\
 																							\
-	template<class T = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>						\
+	template<class T = This>																\
 	std::shared_ptr<T> SharedFromThis()														\
 	{																						\
 		if constexpr (std::derived_from<T, SObject>)										\
@@ -59,7 +58,7 @@ public:																						\
 		}																					\
 	}																						\
 																							\
-	template<class T = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>						\
+	template<class T = This>																\
 	std::weak_ptr<T> WeakFromThis()															\
 	{																						\
 		if constexpr (std::derived_from<T, SObject>)										\
