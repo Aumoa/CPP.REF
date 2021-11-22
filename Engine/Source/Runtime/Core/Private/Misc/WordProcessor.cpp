@@ -34,7 +34,7 @@ bool WordProcessor::Process(std::span<const uint8> Input, std::function<bool(std
 	CharBuf.reserve(256);
 
 	size_t Pos = 0;
-	size_t Line = 0;
+	size_t Line = 1;
 
 	auto Flush = [&]()
 	{
@@ -101,7 +101,7 @@ bool WordProcessor::Process(std::span<const uint8> Input, std::function<bool(std
 				if (IsSpace(Seekc))
 				{
 					FLUSH_RET();
-					continue;
+					goto CONTINUE;
 				}
 #define FLUSH2_RET() FLUSH_RET(); CharBuf.emplace_back(Seekc); FLUSH_RET();
 				else if (Seekc == '.')
@@ -109,7 +109,7 @@ bool WordProcessor::Process(std::span<const uint8> Input, std::function<bool(std
 					if (!IsNumber(Seekl))
 					{
 						FLUSH2_RET();
-						continue;
+						goto CONTINUE;
 					}
 				}
 				else if (Seekc == '-')
@@ -117,25 +117,26 @@ bool WordProcessor::Process(std::span<const uint8> Input, std::function<bool(std
 					if (Seekp + 1 == Endp || !IsNumber(*(Seekp + 1)))
 					{
 						FLUSH2_RET();
-						continue;
+						goto CONTINUE;
 					}
 				}
 				else if (IsSeparator(Seekc))
 				{
 					FLUSH2_RET();
-					continue;
+					goto CONTINUE;
 				}
 #undef FLUSH2_RET
 
 				CharBuf.emplace_back(Seekc);
 			}
+		}
 
-			Pos += 1;
-			if (Seekc == '\n')
-			{
-				Line += 1;
-				Pos = 0;
-			}
+	CONTINUE:
+		Pos += 1;
+		if (Seekc == '\n')
+		{
+			Line += 1;
+			Pos = 0;
 		}
 
 		Seekl = Seekc;
