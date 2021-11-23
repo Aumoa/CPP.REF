@@ -52,7 +52,6 @@ std::shared_ptr<SObject> SObject::SetOuter(SObject* InNewOuter)
 		}
 
 		Outer = InNewOuter;
-		OuterChanged.Invoke(this);
 	}
 	return Detached;
 }
@@ -63,7 +62,6 @@ void SObject::SetName(std::wstring_view InNewName)
 	if (Name != InNewName)
 	{
 		Name = InNewName;
-		NameChanged.Invoke(this);
 	}
 }
 
@@ -150,5 +148,4 @@ void SObject::InternalAttachSubobject(SObject* Subobject)
 void SObject::InternalAttachObjectName(SObject* InObject)
 {
 	InObject->Name = InObject->GetType()->GenerateUniqueName();
-	InObject->NameChanged.Invoke(InObject);
 }

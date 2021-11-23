@@ -61,11 +61,6 @@ public:
 	void DestroyObject(SObject* InObject);
 	void CleanupSubobjects();
 
-	DECLARE_MULTICAST_EVENT(OuterChangedEvent, SObject* This);
-	OuterChangedEvent OuterChanged;
-	DECLARE_MULTICAST_EVENT(NameChangedEvent, SObject* This);
-	NameChangedEvent NameChanged;
-
 public:
 	template<class T, class... TArgs>
 	T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
