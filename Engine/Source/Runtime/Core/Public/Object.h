@@ -7,7 +7,7 @@
 #include <string_view>
 #include <functional>
 #include <map>
-#include <mutex>
+#include <functional>
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "Diagnostics/LogSystem.h"
@@ -28,16 +28,9 @@ class CORE_API SObject : public std::enable_shared_from_this<SObject>
 	friend class Type;
 
 private:
-	static std::atomic<uint64> InternalObjectIndexGenerator;
-	const uint64 Index;
-
 	SObject* Outer = nullptr;
-
-	std::vector<std::shared_ptr<SObject>> Subobjects;
-	std::map<SObject*, size_t> Views;
-
+	std::set<std::shared_ptr<SObject>> Subobjects;
 	std::wstring Name;
-	std::mutex ObjectLock;
 
 public:
 	SObject();
@@ -65,7 +58,6 @@ public:
 	template<class T, class... TArgs>
 	T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
-		std::unique_lock Lock(ObjectLock);
 		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
 		auto Ptr = SharedPtr.get();
 		InternalAttachSubobject(Ptr);
