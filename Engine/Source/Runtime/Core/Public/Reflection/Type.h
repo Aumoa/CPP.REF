@@ -164,7 +164,9 @@ public:
 		return T::StaticClass();
 	}
 
-	template<class T> requires requires { std::remove_pointer_t<T>::StaticClass(); }
+	template<class T> requires
+		std::is_pointer_v<T> &&
+		requires { std::remove_pointer_t<T>::StaticClass(); }
 	static auto GetStaticClass()
 	{
 		return std::remove_pointer_t<T>::StaticClass();

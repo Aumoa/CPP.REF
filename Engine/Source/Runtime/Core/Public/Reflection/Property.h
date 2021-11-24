@@ -8,7 +8,7 @@
 class Type;
 class SObject;
 
-class Property
+class CORE_API Property
 {
 	std::wstring _name;
 	Type* _memberType = nullptr;
