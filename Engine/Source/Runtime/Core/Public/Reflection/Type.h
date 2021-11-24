@@ -35,6 +35,9 @@ private:
 	std::vector<Property> Properties;
 	uint8 bNative : 1 = false;
 
+	std::function<SObject* (void*)> ToObjectCast;
+	std::function<void* (SObject*)> FromObjectCast;
+
 public:
 	template<class TType>
 	struct TypeGenerator
@@ -44,10 +47,14 @@ public:
 		std::vector<Property> Properties;
 		Type* SuperClass = nullptr;
 		bool bNative = false;
+		std::function<SObject* (void*)> ToObjectCast;
+		std::function<void* (SObject*)> FromObjectCast;
 
 		TypeGenerator(std::wstring_view InFriendlyName) requires requires { TType::StaticClass(); }
 			: FriendlyName(InFriendlyName)
 			, bNative(false)
+			, ToObjectCast(+[](void* UnknownType) { return static_cast<SObject*>(reinterpret_cast<TType*>(UnknownType)); })
+			, FromObjectCast(+[](SObject* Object) { return reinterpret_cast<void*>(dynamic_cast<TType*>(Object)); })
 		{
 			Functions.reserve(100);
 			CollectFunctions<0>(Functions);
@@ -109,6 +116,8 @@ public:
 		, Functions(std::move(Generator.Functions))
 		, Properties(std::move(Generator.Properties))
 		, bNative(Generator.bNative)
+		, ToObjectCast(std::move(Generator.ToObjectCast))
+		, FromObjectCast(std::move(Generator.FromObjectCast))
 	{
 		RegisterStaticClass();
 	}
@@ -143,6 +152,9 @@ public:
 	std::vector<Property> GetProperties(bool bIncludeSuperMembers = true) const;
 	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
 
+	void* FromObject(SObject* Object) const { return FromObjectCast(Object); }
+	SObject* ToObject(void* UnknownType) const { return ToObjectCast(UnknownType); }
+
 	std::wstring GenerateUniqueName();
 
 public:
@@ -152,11 +164,26 @@ public:
 		return T::StaticClass();
 	}
 
-	template<class T> requires (!requires { T::StaticClass(); })
+	template<class T> requires requires { std::remove_pointer_t<T>::StaticClass(); }
+	static auto GetStaticClass()
+	{
+		return std::remove_pointer_t<T>::StaticClass();
+	}
+
+	template<class T> requires
+		(!requires { T::StaticClass(); }) &&
+		(!std::same_as<T, void>) &&
+		(!requires { std::remove_pointer_t<T>::StaticClass(); })
 	static auto GetStaticClass()
 	{
 		static auto MyClassType = Type(TypeGenerator<T>());
 		return &MyClassType;
+	}
+
+	template<std::same_as<void> T>
+	static Type* GetStaticClass()
+	{
+		return nullptr;
 	}
 
 	static Type* FindStaticClass(std::wstring_view InFriendlyName);
@@ -177,3 +204,24 @@ private:
 		return nullptr;
 	}
 };
+
+// Declared in Method.h
+template<bool bRet, class T, class... TArgs>
+void Method::ProcessParameters()
+{
+	Type* Myt = Type::GetStaticClass<T>();
+
+	if constexpr (bRet)
+	{
+		ReturnT = Myt;
+	}
+	else
+	{
+		Parameters.emplace_back(Type::GetStaticClass<T>());
+	}
+
+	if constexpr (sizeof...(TArgs) != 0)
+	{
+		ProcessParameters<false, TArgs...>();
+	}
+}

@@ -45,6 +45,7 @@ public:
 
 	SObject* GetOuter() const;
 	std::shared_ptr<SObject> SetOuter(SObject* InNewOuter);
+	SFUNCTION(SetName)
 	void SetName(std::wstring_view InNewName);
 	std::wstring GetName();
 

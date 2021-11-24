@@ -55,10 +55,13 @@ public:
 	}
 
 	template<class T>
-	T GetValue(const SObject* _this) const
+	T GetValue(SObject* _this) const
 	{
 		return *reinterpret_cast<const T*>(_getter(_this));
 	}
+
+	void SetObject(SObject* InThis, SObject* AssignValue) const;
+	SObject* GetObject(SObject* InThis) const;
 
 	template<class T>
 	consteval static bool __Internal_IsStaticMember();
