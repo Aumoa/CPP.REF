@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectBuildItem.h"
+#include "Misc/CommandLine.h"
 
 DECLARE_LOG_CATEGORY(, LogBuildTool);
 
@@ -14,7 +15,7 @@ class SBuildTool : implements SObject
 public:
 	SBuildTool();
 
-	int32 GuardedMain(std::vector<std::wstring_view> InArgs);
+	int32 Run(const SCommandLine& CommandArgs);
 
 private:
 	struct ProjectBuildFile

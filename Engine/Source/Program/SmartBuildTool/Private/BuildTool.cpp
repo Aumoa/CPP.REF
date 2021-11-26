@@ -2,7 +2,6 @@
 
 #include "BuildTool.h"
 #include "Misc/TickCalc.h"
-#include "Misc/CommandLine.h"
 #include "IO/DirectoryReference.h"
 #include "Guid.h"
 #include "tinyxml2.h"
@@ -13,38 +12,34 @@ SBuildTool::SBuildTool() : Super()
 {
 }
 
-int32 SBuildTool::GuardedMain(std::vector<std::wstring_view> InArgs)
+int32 SBuildTool::Run(const SCommandLine& CommandArgs)
 {
 	TickCalc<> GlobalTimer;
 	TickCalc<> Timer;
 
 	GlobalTimer.DoCalc();
 
-	SE_LOG(LogBuildTool, Verbose, L"BuildTool Arguments: {}", StringUtils::Join(L", ", InArgs));
+	SE_LOG(LogBuildTool, Verbose, L"BuildTool Arguments: {}", StringUtils::Join(L", ", CommandArgs.GetArguments()));
 	SE_LOG(LogBuildTool, Verbose, L"");
 
-	if (InArgs.size() > 1)
+	if (size_t Idx = CommandArgs.GetArgument(L"--Solution"); Idx != -1)
 	{
-		SCommandLine CommandLine(InArgs);
-		if (size_t Idx = CommandLine.GetArgument(L"--Solution"); Idx != -1)
-		{
-			std::optional Value = CommandLine.GetArgument(Idx + 1);
-			SolutionName = Value.value_or(L"Engine");
-		}
-		else
-		{
-			SolutionName = L"Engine";
-		}
+		std::optional Value = CommandArgs.GetArgument(Idx + 1);
+		SolutionName = Value.value_or(L"Engine");
+	}
+	else
+	{
+		SolutionName = L"Engine";
+	}
 
-		if (size_t Idx = CommandLine.GetArgument(L"--FirstProject"); Idx != -1)
-		{
-			std::optional Value = CommandLine.GetArgument(Idx + 1);
-			FirstProjectName = Value.value_or(L"");
-		}
-		else
-		{
-			FirstProjectName = L"";
-		}
+	if (size_t Idx = CommandArgs.GetArgument(L"--FirstProject"); Idx != -1)
+	{
+		std::optional Value = CommandArgs.GetArgument(Idx + 1);
+		FirstProjectName = Value.value_or(L"");
+	}
+	else
+	{
+		FirstProjectName = L"";
 	}
 
 	Timer.DoCalc();
@@ -866,6 +861,10 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 						NewElement(PropertyGroup, "LocalDebuggerCommand", "$(OutDir)Windows.exe");
 						NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--GameDll \"{}\"", WCHAR_TO_ANSI(Runtime->Metadata->Name)));
 						break;
+					case EType::Console:
+						NewElement(PropertyGroup, "LocalDebuggerCommand", "$(OutDir)WindowsConsole.exe");
+						NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--ConsoleDll \"{}\"", WCHAR_TO_ANSI(Runtime->Metadata->Name)));
+						break;
 					}
 				}
 			}
@@ -1057,6 +1056,10 @@ EType SBuildTool::ParseType(const char* StringToken)
 		{
 			return EType::Game;
 		}
+		else if (Token == "ConsoleApplication")
+		{
+			return EType::ConsoleApplication;
+		}
 	}
 
 	return EType::Module;
@@ -1071,7 +1074,7 @@ std::string SBuildTool::GetTypeString(EType Type)
 {
 	switch (Type)
 	{
-	case EType::Console:
+	case EType::ConsoleApplication:
 	case EType::Application:
 		return "Application";
 	default:
@@ -1083,7 +1086,7 @@ std::string SBuildTool::GetSubSystemString(EType Type)
 {
 	switch (Type)
 	{
-	case EType::Console:
+	case EType::ConsoleApplication:
 		return "Console";
 	default:
 		return "Windows";

@@ -1,2 +1,2 @@
 @echo off
-Binaries\SmartBuildTool.exe --Solution Engine --FirstProject THStory
+Binaries\WindowsConsole.exe --ConsoleDll SmartBuildTool --Solution Engine --FirstProject ReferenceViewer

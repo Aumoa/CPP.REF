@@ -7,8 +7,9 @@
 enum class EType
 {
 	Module,
-	Console,
+	ConsoleApplication,
 	Application,
+	Console,
 	Game,
 };
 

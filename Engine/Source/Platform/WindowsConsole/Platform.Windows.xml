@@ -1,0 +1,10 @@
+<ProjectInfo Name="WindowsConsole" Path="Platform.WindowsConsole" Type="ConsoleApplication" >
+	<IncludePaths>
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" />
+		<Item Name="Console" />
+		<Item Name="WindowsCommon" />
+	</ReferencedProjects>
+</ProjectInfo>

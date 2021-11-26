@@ -59,12 +59,19 @@ public:
 	template<class T, class... TArgs>
 	T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
-		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
+		std::shared_ptr<T> SharedPtr = NewShared<T>(std::forward<TArgs>(InArgs)...);
 		auto Ptr = SharedPtr.get();
 		InternalAttachSubobject(Ptr);
-		InternalAttachObjectName(Ptr);
 		Ptr->Outer = this;
 		return Ptr;
+	}
+
+	template<class T, class... TArgs>
+	static std::shared_ptr<T> NewShared(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
+	{
+		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
+		InternalAttachObjectName(SharedPtr.get());
+		return SharedPtr;
 	}
 
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
