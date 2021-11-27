@@ -30,8 +30,7 @@ void SGameAssetSystem::Init()
 	Assimp = NewObject<SAssetsLoader>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 	Assimp->SetOuter(this);
 
-	SearchDirectory(L"Game/Content");
-	SearchDirectory(L"Engine/Content");
+	SearchDirectory(L"Content");
 	
 	if (AssetsToImport.size())
 	{
