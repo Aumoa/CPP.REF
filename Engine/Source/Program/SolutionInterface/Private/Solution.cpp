@@ -8,7 +8,6 @@
 
 SSolution::SSolution(const SFileReference& SolutionXml) : Super()
 {
-	TickCalc<> GlobalTimer;
 	TickCalc<> LocalTimer;
 
 	SE_LOG(LogSolutionInterface, Verbose, L"Reading '{}'...", SolutionXml.GetFilename().wstring(), LocalTimer.DoCalc());
@@ -43,10 +42,14 @@ const std::map<std::wstring, ProjectBuildRuntime>& SSolution::GetProjectRuntimes
 
 ISolution* SSolution::GenerateProjects(IProjectGenerator* Generator)
 {
+	TickCalc<> LocalTimer;
+
+	SE_LOG(LogSolutionInterface, Verbose, L"Generate projects.", LocalTimer.DoCalc());
 	for (auto& [Key, Value] : ProjectRuntimes)
 	{
 		GenerateProject(Generator, &Value);
 	}
+	SE_LOG(LogSolutionInterface, Verbose, L"Done. ({} seconds)", LocalTimer.DoCalc().count());
 
 	return Generator->GenerateSolution();
 }
