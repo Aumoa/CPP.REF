@@ -343,7 +343,8 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	SDirectoryReference(IntermediateProjectPath).CreateIfNotExists(true);
 
 	IntermediateProjectPath /= RuntimeData.Metadata->Name;
-	XmlPath = IntermediateProjectPath.replace_extension(L".vcxproj");
+	XmlPath = IntermediateProjectPath;
+	XmlPath.replace_extension(L".vcxproj");
 	XMLError Err = Doc.SaveFile(XmlPath.string().c_str());
 	if (Err != XMLError::XML_SUCCESS)
 	{
