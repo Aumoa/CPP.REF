@@ -54,9 +54,9 @@ public:
 
 private:
 	HANDLE hProcess;
+	HANDLE hThread;
 	DWORD ProcessId;
 
-	HANDLE hCapturedThread;
 	LPEXCEPTION_POINTERS Exception;
 
 	std::vector<ModuleDesc> LoadedModule;

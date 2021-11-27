@@ -36,7 +36,11 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 		SE_LOG(LogWindowsCommon, Error, L"{:>2}  {}!{} [{}]", Callstack.FrameNumber, Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
 	}
 
+#if defined(_DEBUG)
+	return EXCEPTION_CONTINUE_SEARCH;
+#else
 	return EXCEPTION_EXECUTE_HANDLER;
+#endif
 }
 
 int32 GuardedMain(std::span<std::wstring> Argv)

@@ -112,16 +112,10 @@ DWORD64 WindowsStackTrace::SymbolInfo::GetDllBaseAddress() const
 
 WindowsStackTrace::WindowsStackTrace(PEXCEPTION_POINTERS InExceptions)
     : hProcess(GetCurrentProcess())
+    , hThread(GetCurrentThread())
     , ProcessId(GetCurrentProcessId())
     , Exception(InExceptions)
 {
-    HANDLE hExceptionThread = GetCurrentThread();
-    if (!DuplicateHandle(hProcess, hExceptionThread, hProcess, &hCapturedThread, 0, false, DUPLICATE_SAME_ACCESS))
-    {
-        ReportWindowsError(L"StackTrace failed. Could not capture exception thread.");
-        return;
-    }
-
     TraceStack();
 }
 
@@ -141,9 +135,10 @@ void WindowsStackTrace::SetupSymbolOptions()
 
 void WindowsStackTrace::TraceStack()
 {
-    CONTEXT& ThreadCtx = *Exception->ContextRecord;
-    SymbolScopeInstaller ScopedInstaller(hProcess);
+    CONTEXT ThreadCtx;
+    RtlCaptureContext(&ThreadCtx);
 
+    SymbolScopeInstaller ScopedInstaller(hProcess);
     SetupSymbolOptions();
     void* BaseSymbolAddr = LoadModuleSymbols();
 
@@ -159,7 +154,7 @@ void WindowsStackTrace::TraceStack()
     DWORD ImageType = ImageHeader->FileHeader.Machine;
 
     for (int32 FrameNumber = 0;
-        StackWalk64(ImageType, hProcess, hCapturedThread, &S, &ThreadCtx, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, NULL) &&
+        StackWalk64(ImageType, hProcess, hThread, &S, &ThreadCtx, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, NULL) &&
         S.AddrReturn.Offset != 0;
         ++FrameNumber)
     {
