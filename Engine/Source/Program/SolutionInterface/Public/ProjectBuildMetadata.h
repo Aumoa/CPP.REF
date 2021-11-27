@@ -22,6 +22,7 @@ struct ProjectBuildMetadata
 		Private
 	};
 
+	std::wstring AbsoluteDirectory;
 	std::wstring BaseDirectory;
 
 	std::wstring Name;

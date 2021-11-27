@@ -131,6 +131,7 @@ void SSolution::SearchProjects(const std::filesystem::path& Directory)
 				if (ProjectBuildMetadata Build; TryParseProject(XmlPath, Build))
 				{
 					SE_LOG(LogSolutionInterface, Verbose, L"Succeeded to load project metadata. XmlPath: {}", XmlPath.wstring());
+					Build.AbsoluteDirectory = std::filesystem::absolute(Directory);
 					Build.BaseDirectory = Directory.stem().wstring();
 					ProjectMetadatas.emplace_back(std::move(Build));
 				}
@@ -341,7 +342,7 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 
 		// ProjectPath
 		std::vector<std::wstring> SplitPath = StringUtils::Split(Runtime->Metadata->Path, L".", true, true);
-		Runtime->ProjectPath = std::format(L"$(SolutionDir){}\\Source\\{}", Runtime->Metadata->BaseDirectory, StringUtils::Join(L"\\", SplitPath));
+		Runtime->ProjectPath = std::format(L"{}\\Source\\{}", Runtime->Metadata->AbsoluteDirectory, StringUtils::Join(L"\\", SplitPath));
 
 		// AdditionalIncludeDirectories
 		for (auto& IncludePath : Runtime->Metadata->IncludePaths)
