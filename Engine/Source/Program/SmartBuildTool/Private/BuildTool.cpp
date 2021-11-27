@@ -226,10 +226,6 @@ bool SBuildTool::TryParseProject(const std::filesystem::path& XmlPath, ProjectBu
 			}
 		}
 
-		if (XMLElement* Debugging = ProjectInfo->FirstChildElement("Debugging"))
-		{
-		}
-
 		return true;
 	}
 
@@ -382,13 +378,16 @@ void SBuildTool::BuildRuntime(ProjectBuildRuntime* Runtime)
 		// AdditionalDependencies
 		for (auto& ExternalLink : Runtime->Metadata->ExternalLinks)
 		{
-			if (ExternalLink.Access == EAccessKey::Public)
+			if (auto It = ProjectsRuntime.find(ExternalLink.Name); It != ProjectsRuntime.end())
 			{
-				Runtime->PublicExternalLinks.emplace(ExternalLink.Name);
-			}
-			else
-			{
-				Runtime->PrivateExternalLinks.emplace(ExternalLink.Name);
+				if (ExternalLink.Access == EAccessKey::Public)
+				{
+					Runtime->PublicExternalLinks.emplace(ExternalLink.Name);
+				}
+				else
+				{
+					Runtime->PrivateExternalLinks.emplace(ExternalLink.Name);
+				}
 			}
 		}
 
@@ -716,16 +715,19 @@ int32 SBuildTool::GenerateProjectFile(ProjectBuildRuntime* Runtime)
 			{
 				auto ProjectReferenceBody = [&](auto Referenced)
 				{
-					std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
-					for (auto Split : StringUtils::Split(Referenced->Metadata->Path, L".", true, true))
+					if (Referenced->Metadata->Type != EType::None)
 					{
-						IntermediateProjectPath /= Split;
-					}
+						std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
+						for (auto Split : StringUtils::Split(Referenced->Metadata->Path, L".", true, true))
+						{
+							IntermediateProjectPath /= Split;
+						}
 
-					IntermediateProjectPath /= Referenced->Metadata->Name + L".vcxproj";
-					XMLElement* ProjectReference = NewElementItemInclude(ItemGroup, "ProjectReference", WCHAR_TO_ANSI(IntermediateProjectPath.wstring()));
-					{
-						NewElement(ProjectReference, "Project", std::format("{{{}}}", WCHAR_TO_ANSI(Referenced->XmlFile.Guid)));
+						IntermediateProjectPath /= Referenced->Metadata->Name + L".vcxproj";
+						XMLElement* ProjectReference = NewElementItemInclude(ItemGroup, "ProjectReference", WCHAR_TO_ANSI(IntermediateProjectPath.wstring()));
+						{
+							NewElement(ProjectReference, "Project", std::format("{{{}}}", WCHAR_TO_ANSI(Referenced->XmlFile.Guid)));
+						}
 					}
 				};
 
@@ -1060,9 +1062,13 @@ EType SBuildTool::ParseType(const char* StringToken)
 		{
 			return EType::ConsoleApplication;
 		}
+		else if (Token == "Module")
+		{
+			return EType::Module;
+		}
 	}
 
-	return EType::Module;
+	return EType::None;
 }
 
 EAccessKey SBuildTool::ParseAccessKey(const char* StringToken)

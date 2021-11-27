@@ -6,6 +6,7 @@
 
 enum class EType
 {
+	None,
 	Module,
 	ConsoleApplication,
 	Application,
