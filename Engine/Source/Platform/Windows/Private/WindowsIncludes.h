@@ -4,14 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "LogWindows.h"
-
-#undef interface
-#define NOMINMAX
-
-#include <comdef.h>
-#include <Windows.h>
+#include "WindowsMinimal.h"
 #include <wrl/client.h>
-#include <comdef.h>
 #include <d3d12.h>
 #include <d3d11.h>
 #include <d3d11on12.h>
@@ -21,7 +15,4 @@
 #include <dwrite_3.h>
 #include <wincodec.h>
 
-#undef GetCommandLine
 using Microsoft::WRL::ComPtr;
-
-#include "WindowsErrors.inl"

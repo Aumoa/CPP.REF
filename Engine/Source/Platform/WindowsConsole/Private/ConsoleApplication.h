@@ -10,5 +10,5 @@ class SConsoleApplication : implements SObject
 	GENERATED_BODY(SConsoleApplication)
 
 public:
-	static int32 GuardedMain(std::span<const std::wstring_view> Argv);
+	static int32 GuardedMain(std::span<const std::wstring> Argv);
 };

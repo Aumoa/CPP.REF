@@ -39,7 +39,7 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-int32 GuardedMain(std::span<std::wstring_view> Argv)
+int32 GuardedMain(std::span<std::wstring> Argv)
 {
 	__try
 	{
@@ -56,11 +56,17 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
 	setlocale(LC_ALL, "");
 
-	std::vector<std::wstring_view> Argv(argc);
+	std::vector<std::wstring> Argv(argc);
 	for (size_t i = 0; i < Argv.size(); ++i)
 	{
 		Argv[i] = argv[i];
 	}
 
+	return GuardedMain(Argv);
+}
+
+int wWinMain(HINSTANCE, HINSTANCE, wchar_t* argv, int)
+{
+	std::vector<std::wstring> Argv = StringUtils::Split((std::wstring)argv, L" ", true, true);
 	return GuardedMain(Argv);
 }

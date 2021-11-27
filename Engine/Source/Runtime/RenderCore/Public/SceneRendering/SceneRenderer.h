@@ -9,8 +9,6 @@ class SceneRenderContext;
 
 class RENDERCORE_API SceneRenderer
 {
-	GENERATED_BODY(SceneRenderer)
-
 private:
 	bool bRestoreTransition;
 		

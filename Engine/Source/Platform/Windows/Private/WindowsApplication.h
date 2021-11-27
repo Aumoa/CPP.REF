@@ -28,6 +28,8 @@ private:
 public:
 	SWindowsApplication(HINSTANCE hInstance);
 
+	static int32 GuardedMain(std::span<const std::wstring> Argv);
+
 	// IApplicationInterface
 	virtual void Start() override;
 	virtual Vector2N GetViewportSize() override;

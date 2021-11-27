@@ -8,7 +8,7 @@
 
 int32* GPointer;
 
-int32 SConsoleApplication::GuardedMain(std::span<const std::wstring_view> Argv)
+int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
 	using namespace std;
 	

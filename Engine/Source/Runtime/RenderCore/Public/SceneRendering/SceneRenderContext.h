@@ -9,8 +9,6 @@ class SSceneRenderTargetInterface;
 
 class SceneRenderContext
 {
-	GENERATED_BODY(SceneRenderContext)
-
 public:
 	IRHIDeviceContext* const DeviceContext;
 	SSceneRenderTargetInterface* const RenderTarget;

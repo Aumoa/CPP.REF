@@ -10,8 +10,6 @@ class SlateWindowElementList;
 
 class SLATECORE_API SlateRenderer
 {
-	GENERATED_BODY(SlateRenderer)
-
 private:
 	IRHIDeviceContext2D* CommandList;
 	std::shared_ptr<IRHISolidColorBrush> TintBrush;
