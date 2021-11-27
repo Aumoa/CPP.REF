@@ -164,6 +164,7 @@ void WindowsStackTrace::TraceStack()
         ++FrameNumber)
     {
         Callstack CurrentFrame = {};
+        CurrentFrame.FrameNumber = FrameNumber + 1;
         CurrentFrame.Symbol = std::make_unique<SymbolInfo>(hProcess, S.AddrPC.Offset);
         CurrentFrame.Module = FindModule(CurrentFrame.Symbol->GetDllBaseAddress());
         CurrentFrame.Counter = S.AddrPC.Offset;

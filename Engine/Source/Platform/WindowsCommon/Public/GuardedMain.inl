@@ -33,7 +33,7 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 
 	for (auto& Callstack : StackTrace.GetCallstacks())
 	{
-		SE_LOG(LogWindowsCommon, Error, L"{}!{} [{}]", Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
+		SE_LOG(LogWindowsCommon, Error, L"{:>2}  {}!{} [{}]", Callstack.FrameNumber, Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
 	}
 
 	return EXCEPTION_EXECUTE_HANDLER;

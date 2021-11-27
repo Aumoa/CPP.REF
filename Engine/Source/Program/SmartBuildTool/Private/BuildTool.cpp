@@ -14,6 +14,8 @@ SBuildTool::SBuildTool() : Super()
 
 int32 SBuildTool::Run(const SCommandLine& CommandArgs)
 {
+	checkf(false, L"Exception");
+
 	TickCalc<> GlobalTimer;
 	TickCalc<> Timer;
 
@@ -378,16 +380,13 @@ void SBuildTool::BuildRuntime(ProjectBuildRuntime* Runtime)
 		// AdditionalDependencies
 		for (auto& ExternalLink : Runtime->Metadata->ExternalLinks)
 		{
-			if (auto It = ProjectsRuntime.find(ExternalLink.Name); It != ProjectsRuntime.end())
+			if (ExternalLink.Access == EAccessKey::Public)
 			{
-				if (ExternalLink.Access == EAccessKey::Public)
-				{
-					Runtime->PublicExternalLinks.emplace(ExternalLink.Name);
-				}
-				else
-				{
-					Runtime->PrivateExternalLinks.emplace(ExternalLink.Name);
-				}
+				Runtime->PublicExternalLinks.emplace(ExternalLink.Name);
+			}
+			else
+			{
+				Runtime->PrivateExternalLinks.emplace(ExternalLink.Name);
 			}
 		}
 

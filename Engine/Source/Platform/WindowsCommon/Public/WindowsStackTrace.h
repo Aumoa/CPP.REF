@@ -43,6 +43,7 @@ public:
         ModuleDesc* Module;
 		DWORD64 Counter;
 
+		int32 FrameNumber;
         int32 LineNumber;
         std::wstring FileName;
 
