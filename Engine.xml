@@ -1,0 +1,5 @@
+<SolutionInfo Name="Engine">
+  <EngineRoot Path="Engine" />
+  <ThirdpartyRoot Path="ThirdParty" />
+  <FirstProject Name="Game" />
+</SolutionInfo>

@@ -1,0 +1,10 @@
+<ProjectInfo Name="SolutionInterface" Path="Program.SolutionInterface" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Private" />
+		<Item RelativePath="Public" Access="Public" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+		<Item Name="tinyxml2" />
+	</ReferencedProjects>
+</ProjectInfo>
