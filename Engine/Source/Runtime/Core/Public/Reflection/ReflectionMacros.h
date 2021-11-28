@@ -39,7 +39,7 @@ private:																					\
 	inline static Type* StaticRegisterClass = StaticClass();								\
 																							\
 public:																						\
-	virtual Type* GetType() const															\
+	Type* GetType() const																	\
 	{																						\
 		return StaticClass();																\
 	}																						\

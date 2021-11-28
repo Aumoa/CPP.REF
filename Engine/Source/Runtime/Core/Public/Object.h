@@ -17,14 +17,21 @@
 
 class SValueType;
 
+namespace SObject_Details
+{
+	class CORE_API SObjectBase
+	{
+		virtual Type* GetType() const = 0;
+	};
+}
+
 /// <summary>
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
 /// Represents unit that subobjects are binding and managed.
 /// </summary>
-class CORE_API SObject : public std::enable_shared_from_this<SObject>
+class CORE_API SObject : public SObject_Details::SObjectBase, public std::enable_shared_from_this<SObject>
 {
 	GENERATED_BODY(SObject)
-	friend class ObjectId;
 	friend class Type;
 
 private:
