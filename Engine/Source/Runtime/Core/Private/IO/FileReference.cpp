@@ -91,6 +91,50 @@ void SFileReference::CloseSharedStream(SObject* sharingUser)
 	LogSystem::Log(LogCore, ELogVerbosity::Verbose, L"The user {} is not contained from shared stream users.", sharingUser->ToString());
 }
 
+std::string SFileReference::ReadAllText()
+{
+	std::ifstream File(GetPath());
+	if (File.is_open())
+	{
+		std::string Buf;
+		Buf.resize(File.seekg(0, std::ios::end).tellg());
+		File.seekg(0, std::ios::beg);
+
+		if (File.read(Buf.data(), Buf.size()).bad())
+		{
+			File.close();
+			return "";
+		}
+
+		auto Rit = Buf.rbegin();
+		for (; Rit != Buf.rend(); ++Rit)
+		{
+			if (*Rit != 0)
+			{
+				break;
+			}
+		}
+
+		Buf.erase(Rit.base(), Buf.end());
+
+		File.close();
+		return Buf;
+	}
+	return "";
+}
+
+bool SFileReference::WriteAllText(std::string_view Text)
+{
+	std::ofstream File(GetPath(), std::ios::trunc);
+	if (File.is_open())
+	{
+		File << Text;
+		File.close();
+		return true;
+	}
+	return false;
+}
+
 void SFileReference::FlushAndCloseSharedStream()
 {
 	if (_sharedstream.is_open())
