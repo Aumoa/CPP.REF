@@ -8,11 +8,10 @@
 #include "Threading/Thread.h"
 #include "Level/World.h"
 #include "Application/SlateApplication.h"
-#include "EngineSubsystems/GameRenderSystem.h"
+#include "EngineSubsystems/GameEngineSubsystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
-#include "EngineSubsystems/GameAssetSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
-#include "EngineSubsystems/GameInputSystem.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 
 SGameEngine* GEngine = nullptr;
 
@@ -121,11 +120,21 @@ SSlateApplication* SGameEngine::GetSlateApplication()
 void SGameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
-	Subsystems.emplace_back(NewObject<SGameRenderSystem>())->Init();
-	Subsystems.emplace_back(NewObject<SGameAssetSystem>())->Init();
-	Subsystems.emplace_back(NewObject<SGameModuleSystem>())->Init();
-	Subsystems.emplace_back(NewObject<SGameLevelSystem>())->Init();
-	Subsystems.emplace_back(NewObject<SGameInputSystem>())->Init();
+
+	std::span Subclasses = Type::FindAllSubclass<SGameEngineSubsystem>();
+	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size());
+
+	for (auto& Subclass : Subclasses)
+	{
+		if (Subclass->IsA<SGameEngineSubsystem>())
+		{
+			continue;
+		}
+
+		auto Instance = Cast<SGameEngineSubsystem>(Subclass->Instantiate(this));
+		Instance->Init();
+		Subsystems.emplace_back(Instance);
+	}
 }
 
 void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)

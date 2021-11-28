@@ -25,7 +25,7 @@ private:
 public:
 	/// <summary>
 	/// Initialize new <see cref="SGameEngine"/> instance.
-	/// <summary>
+	/// </summary>
 	SGameEngine();
 	~SGameEngine() override;
 

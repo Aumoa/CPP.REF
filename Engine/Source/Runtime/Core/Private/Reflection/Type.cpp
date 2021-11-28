@@ -10,12 +10,28 @@ std::unordered_map<size_t, uint64> Type::TypeRegister;
 std::mutex Type::TypeRegisterMutex;
 
 std::map<std::wstring, Type*, std::less<>>* TypeCollectionPtr;
+std::map<size_t, std::vector<Type*>>* TypeHierarchyMapPtr;
 
 void Type::RegisterStaticClass()
 {
+	static std::set<size_t> Collection;
+	auto [It, bFlag] = Collection.emplace(GetHashCode());
+	if (!bFlag)
+	{
+		return;
+	}
+
 	static std::map<std::wstring, Type*, std::less<>> TypeCollection;
 	TypeCollectionPtr = &TypeCollection;
 	TypeCollection.emplace(GetFriendlyName(), this);
+
+	static std::map<size_t, std::vector<Type*>> TypeHierarchyMap;
+	TypeHierarchyMapPtr = &TypeHierarchyMap;
+
+	for (Type* Curr = this; Curr; Curr = Curr->GetSuper())
+	{
+		TypeHierarchyMap[Curr->GetHashCode()].emplace_back(this);
+	}
 }
 
 const std::wstring& Type::GetFriendlyName() const
@@ -172,4 +188,15 @@ Type* Type::FindStaticClass(std::wstring_view InFriendlyName)
 		return It->second;
 	}
 	return nullptr;
+}
+
+std::span<Type*> Type::FindAllSubclass(Type* BaseClass)
+{
+	auto It = TypeHierarchyMapPtr->find(BaseClass->GetHashCode());
+	if (It != TypeHierarchyMapPtr->end())
+	{
+		return It->second;
+	}
+
+	return std::span<Type*>();
 }

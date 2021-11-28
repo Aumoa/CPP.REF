@@ -189,6 +189,9 @@ public:
 	}
 
 	static Type* FindStaticClass(std::wstring_view InFriendlyName);
+	static std::span<Type*> FindAllSubclass(Type* BaseClass);
+	template<class T>
+	static std::span<Type*> FindAllSubclass() { return FindAllSubclass(GetStaticClass<T>()); }
 
 private:
 	template<std::derived_from<SObject> TType> requires std::constructible_from<TType>
