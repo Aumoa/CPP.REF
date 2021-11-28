@@ -8,6 +8,7 @@
 
 class SLevel;
 class SLocalPlayer;
+class SGameInstanceSubsystem;
 
 /// <summary>
 /// Represents single game instance while application are running.
@@ -18,6 +19,9 @@ class GAME_API SGameInstance : public SGameObject
 
 public:
 	SubclassOf<SLevel> StartupLevel;
+
+private:
+	std::vector<SGameInstanceSubsystem*> Subsystems;
 
 public:
 	/// <summary>
@@ -41,4 +45,14 @@ public:
 	SLocalPlayer* GetLocalPlayer();
 
 	virtual SWorld* GetWorld() override;
+
+	SGameInstanceSubsystem* GetSubsystem(Type* SubsystemClass, bool bAllowDerivedClass = true);
+	template<std::derived_from<SGameInstanceSubsystem> T>
+	T* GetSubsystem(bool bAllowDerivedClass = true)
+	{
+		return Cast<T>(GetSubsystem(T::StaticClass()));
+	}
+
+private:
+	void InitSubsystemCollection();
 };

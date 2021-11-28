@@ -122,7 +122,7 @@ void SGameEngine::InitializeSubsystems()
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
 
 	std::span Subclasses = Type::FindAllSubclass<SGameEngineSubsystem>();
-	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size());
+	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size() - 1);
 
 	for (auto& Subclass : Subclasses)
 	{

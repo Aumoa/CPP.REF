@@ -16,7 +16,7 @@ public:
 	virtual ~SGameEngineSubsystem() override;
 
 	virtual void Init() {}
-	virtual void Deinit() {};
+	virtual void Deinit() {}
 	virtual void Tick(float InDeltaTime) {}
 
 public:
