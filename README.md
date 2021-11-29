@@ -10,7 +10,7 @@
 5. Object 구현이 포함되는 모든 인터페이스는 I 접두사로 시작한다.
 
 # 프로젝트 생성
-## Visual Studio용 프로젝트 생성은 Engine/Binaries/VisualStudioProjects.dll 모듈을 통해 진행됩니다. 터미널을 통해 다음 과정을 따릅니다.
+- Visual Studio용 프로젝트 생성은 Engine/Binaries/VisualStudioProjects.dll 모듈을 통해 진행됩니다. 터미널을 통해 다음 과정을 따릅니다.
 ### 엔진 프로젝트 생성
 1. 엔진 프로젝트 루트로 이동
 2. GenerateProjects.bat 실행
