@@ -1,9 +1,9 @@
 ## gitignore for SmartComponent engine system.
 # Visual Studio Files
 .vs/
+*.sln
 
-# Output files
+#Intermediate directory.
 Build/
-
-# Intermediate files.
 Intermediate/
+Saved/

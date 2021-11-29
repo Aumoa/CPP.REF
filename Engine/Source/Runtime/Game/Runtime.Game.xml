@@ -1,0 +1,13 @@
+<ProjectInfo Name="Game" Path="Runtime.Game" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Public" Access="Public" />
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+		<Item Name="PlatformGeneric" Access="Public" />
+		<Item Name="RenderCore" Access="Public" />
+		<Item Name="SlateCore" Access="Public" />
+		<Item Name="AssetsIO" Access="Public" />
+	</ReferencedProjects>
+</ProjectInfo>

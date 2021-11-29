@@ -1,0 +1,13 @@
+<ProjectInfo Name="WindowsCommon" Path="Platform.WindowsCommon" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Private" />
+		<Item RelativePath="Public" Access="Public" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+	</ReferencedProjects>
+	<ExternalLinks>
+		<Item Name="psapi.lib" />
+		<Item Name="dbghelp.lib" />
+	</ExternalLinks>
+</ProjectInfo>

@@ -1,0 +1,9 @@
+<ProjectInfo Name="PlatformGeneric" Path="Runtime.PlatformGeneric" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Public" Access="Public" />
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+	</ReferencedProjects>
+</ProjectInfo>

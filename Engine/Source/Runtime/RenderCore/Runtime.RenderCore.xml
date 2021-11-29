@@ -1,0 +1,10 @@
+<ProjectInfo Name="RenderCore" Path="Runtime.RenderCore" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Public" Access="Public" />
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+		<Item Name="PlatformGeneric" Access="Public" />
+	</ReferencedProjects>
+</ProjectInfo>

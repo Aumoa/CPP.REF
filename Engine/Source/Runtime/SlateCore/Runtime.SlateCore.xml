@@ -1,0 +1,12 @@
+<ProjectInfo Name="SlateCore" Path="Runtime.SlateCore" Type="Module" >
+	<IncludePaths>
+		<Item RelativePath="Public" Access="Public" />
+		<Item RelativePath="Private" />
+	</IncludePaths>
+	<ReferencedProjects>
+		<Item Name="Core" Access="Public" />
+		<Item Name="PlatformGeneric" Access="Public" />
+		<Item Name="AssetsIO" Access="Public" />
+		<Item Name="RenderCore" Access="Public" />
+	</ReferencedProjects>
+</ProjectInfo>
