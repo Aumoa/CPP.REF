@@ -286,7 +286,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 
 			for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 			{
-				if (IncludeItem.path().extension() == ".cpp")
+				if (IncludeItem.path().extension() == ".cpp" || IncludeItem.path().extension() == ".ixx")
 				{
 					NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
 				}

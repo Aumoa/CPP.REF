@@ -41,6 +41,13 @@ SWorld* SGameObject::GetWorld()
 SObject* SGameObject::LoadObject(const std::filesystem::path& assetPath)
 {
 	SObject* LoadedObject = GEngine->GetEngineSubsystem<SGameAssetSystem>()->LoadObject(assetPath);
-	LoadedObject->SetOuter(this);
-	return LoadedObject;
+	if (LoadedObject)
+	{
+		LoadedObject->SetOuter(this);
+		return LoadedObject;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
