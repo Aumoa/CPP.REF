@@ -382,7 +382,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 			{
 				XMLElement* InnerItem = nullptr;
-				if (IncludeItem.path().extension() == ".cpp")
+				if (IncludeItem.path().extension() == ".cpp" || IncludeItem.path().extension() == ".ixx")
 				{
 					InnerItem = NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
 				}
