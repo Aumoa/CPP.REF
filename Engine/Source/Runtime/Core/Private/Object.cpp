@@ -5,45 +5,19 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
+GENERATE_BODY(SObject);
+
 SObject::SObject()
 {
 }
 
-SObject::~SObject() noexcept
+SObject::~SObject()
 {
-	CleanupSubobjects();
 }
 
-std::wstring SObject::ToString(std::wstring_view InFormatArgs)
+std::wstring SObject::ToString()
 {
 	return Name;
-}
-
-SObject* SObject::GetOuter() const
-{
-	return Outer;
-}
-
-std::shared_ptr<SObject> SObject::SetOuter(SObject* InNewOuter)
-{
-	std::shared_ptr<SObject> Detached;
-	if (Outer != InNewOuter)
-	{
-		Detached = shared_from_this();
-
-		if (Outer != nullptr)
-		{
-			Outer->InternalDetachSubobject(Detached.get());
-		}
-
-		if (InNewOuter != nullptr)
-		{
-			InNewOuter->InternalAttachSubobject(Detached.get());
-		}
-
-		Outer = InNewOuter;
-	}
-	return Detached;
 }
 
 void SObject::SetName(std::wstring_view InNewName)
@@ -59,68 +33,85 @@ std::wstring SObject::GetName()
 	return Name;
 }
 
-void SObject::AddReferenceObject(SObject* InObject)
+void SObject::PostConstruction()
 {
-	InternalAttachSubobject(InObject);
-}
-
-void SObject::RemoveReferenceObject(SObject* InObject)
-{
-	InternalDetachSubobject(InObject);
-}
-
-void SObject::DestroyObject(SObject* InObject)
-{
-	checkf(InObject->Outer == this, L"DestroyObject must be called with outer object.");
-	InternalDetachSubobject(InObject);
-}
-
-void SObject::CleanupSubobjects()
-{
-	for (auto& Subobject : Subobjects)
-	{
-		if (Subobject && Subobject->Outer == this)
-		{
-			// Detach from outer.
-			Subobject->Outer = nullptr;
-		}
-	}
-
-	Subobjects.clear();
+	Name = GetType()->GenerateUniqueName();
+	GC().Collection.emplace(this);
 }
 
 void* SObject::operator new(size_t AllocSize)
 {
-	return new uint8[AllocSize];
+	void* Block = ::operator new(AllocSize, std::nothrow);
+	if (Block == nullptr)
+	{
+		GC().Collect();
+	}
+	return Block;
 }
 
 void SObject::operator delete(void* MemBlock)
 {
-	delete[] reinterpret_cast<uint8*>(MemBlock);
+	::operator delete(MemBlock);
 }
 
-void SObject::InternalDetachSubobject(SObject* Subobject)
+auto SObject::GC() -> GarbageCollector&
 {
-	if (auto It = Subobjects.find(Subobject->SharedFromThis()); It != Subobjects.end())
-	{
-		if ((*It)->Outer == this)
-		{
-			(*It)->Outer = nullptr;
-		}
+	static thread_local GarbageCollector GC;
+	return GC;
+}
 
-		Subobjects.erase(It);
+void SObject::MarkAndSweep(uint64 Generation)
+{
+	if (this->Generation == Generation)
+	{
 		return;
 	}
 
-	SE_LOG(LogCore, Error, L"Request destroy subobject but target is not valid subobject. Outer have not this subobject.");
+	this->Generation = Generation;
+	for (auto& GCProp : GetType()->GetGCProperties())
+	{
+		SObject* Member = GCProp->GetObject(this);
+		if (Member)
+		{
+			Member->MarkAndSweep(Generation);
+		}
+	}
 }
 
-void SObject::InternalAttachSubobject(SObject* Subobject)
+SObject::GarbageCollector::GarbageCollector()
 {
-	Subobjects.emplace(Subobject->SharedFromThis());
 }
 
-void SObject::InternalAttachObjectName(SObject* InObject)
+void SObject::GarbageCollector::Collect()
 {
-	InObject->Name = InObject->GetType()->GenerateUniqueName();
+	++Generation;
+
+	for (auto& Root : Roots)
+	{
+		Root->MarkAndSweep(Generation);
+	}
+
+	static std::vector<std::set<SObject*>::iterator> Garbages;
+	Garbages.reserve(Collection.size());
+
+	for (auto It = Collection.begin(); It != Collection.end(); ++It)
+	{
+		if ((*It)->Generation != Generation)
+		{
+			Garbages.emplace_back(It);
+		}
+	}
+
+	for (auto& Garbage : Garbages)
+	{
+		delete *Garbage;
+		Collection.erase(Garbage);
+	}
+
+	Garbages.clear();
+}
+
+size_t SObject::GarbageCollector::NumThreadObjects()
+{
+	return Collection.size();
 }

@@ -10,6 +10,7 @@
 #include <functional>
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
+#include "NonCopyable.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Reflection/ReflectionMacros.h"
@@ -19,7 +20,7 @@ class SValueType;
 
 namespace SObject_Details
 {
-	class CORE_API SObjectBase
+	class CORE_API SObjectBase : public NonCopyable
 	{
 		virtual Type* GetType() const = 0;
 	};
@@ -29,15 +30,16 @@ namespace SObject_Details
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
 /// Represents unit that subobjects are binding and managed.
 /// </summary>
-class CORE_API SObject : public SObject_Details::SObjectBase, public std::enable_shared_from_this<SObject>
+class CORE_API SObject : public SObject_Details::SObjectBase
 {
 	GENERATED_BODY(SObject)
-	friend class Type;
+
+	template<class T>
+	friend class GCRoot;
 
 private:
-	SObject* Outer = nullptr;
-	std::set<std::shared_ptr<SObject>> Subobjects;
 	std::wstring Name;
+	uint64 Generation;
 
 public:
 	SObject();
@@ -48,37 +50,21 @@ private:
 	SObject(SObject&&) = delete;
 
 public:
-	virtual std::wstring ToString(std::wstring_view InFormatArgs = L"");
+	virtual std::wstring ToString();
 
-	SObject* GetOuter() const;
-	std::shared_ptr<SObject> SetOuter(SObject* InNewOuter);
-	SFUNCTION(SetName)
 	void SetName(std::wstring_view InNewName);
 	std::wstring GetName();
 
-	void AddReferenceObject(SObject* InObject);
-	void RemoveReferenceObject(SObject* InObject);
-
-	void DestroyObject(SObject* InObject);
-	void CleanupSubobjects();
+protected:
+	virtual void PostConstruction();
 
 public:
 	template<class T, class... TArgs>
-	T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
+	static T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
-		std::shared_ptr<T> SharedPtr = NewShared<T>(std::forward<TArgs>(InArgs)...);
-		auto Ptr = SharedPtr.get();
-		InternalAttachSubobject(Ptr);
-		Ptr->Outer = this;
+		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
+		Ptr->PostConstruction();
 		return Ptr;
-	}
-
-	template<class T, class... TArgs>
-	static std::shared_ptr<T> NewShared(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
-	{
-		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
-		InternalAttachObjectName(SharedPtr.get());
-		return SharedPtr;
 	}
 
 	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
@@ -88,13 +74,13 @@ public:
 	}
 
 	template<std::same_as<SObject> TTo, class TFrom>
-	inline TTo* Cast(const TFrom& InValue) requires (!std::derived_from<TFrom, SObject>)
+	inline static TTo* Cast(const TFrom& InValue) requires (!std::derived_from<TFrom, SObject>)
 	{
 		return NewObject<SValueType>(InValue);
 	}
 
 	template<class TTo, std::same_as<SObject> TFrom>
-	static inline TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>)
+	inline static TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>)
 	{
 		auto ValueTypePtr = Cast<SValueType>(InValue);
 		if (ValueTypePtr == nullptr)
@@ -111,21 +97,30 @@ public:
 		return OutValue;
 	}
 
-	template<class T, class... TArgs>
-	static std::shared_ptr<T> MakeShared(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
-	{
-		std::shared_ptr SharedPtr = std::make_shared<T>(std::forward<TArgs>(InArgs)...);
-		InternalAttachObjectName(SharedPtr.get());
-		return SharedPtr;
-	}
-
 	void* operator new(size_t);
 	void operator delete(void*);
 
-private:
-	void InternalDetachSubobject(SObject* Subobject);
-	void InternalAttachSubobject(SObject* Subobject);
-	static void InternalAttachObjectName(SObject* InObject);
+public:
+	class CORE_API GarbageCollector
+	{
+		template<class T>
+		friend class GCRoot;
+		friend class SObject;
+
+		std::set<SObject*> Collection;
+		std::set<SObject*> Roots;
+		uint64 Generation = 0;
+
+	private:
+		GarbageCollector();
+
+	public:
+		void Collect();
+		size_t NumThreadObjects();
+	};
+
+	static GarbageCollector& GC();
+	void MarkAndSweep(uint64 Generation);
 };
 
 #define implements virtual public 

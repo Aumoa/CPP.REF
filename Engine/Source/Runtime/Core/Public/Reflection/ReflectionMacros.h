@@ -25,51 +25,21 @@ namespace ReflectionMacros
 	friend class Type;																		\
 																							\
 public:																						\
-	using Super = typename ReflectionMacros::SuperClassTypeDeclare							\
+	using Super = 																			\
+		typename ReflectionMacros::SuperClassTypeDeclare									\
 		<Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>::Type;								\
 	using This = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>);								\
 																							\
-	static Type* StaticClass()																\
-	{																						\
-		static Type MyClassType(Type::TypeGenerator<This>(L ## #Class));					\
-		return &MyClassType;																\
-	}																						\
+	static Type* StaticClass();																\
+	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
 																							\
 private:																					\
-	inline static Type* StaticRegisterClass = StaticClass();								\
+	static Type* StaticRegisterClass;														\
 																							\
 public:																						\
 	Type* GetType() const																	\
 	{																						\
 		return StaticClass();																\
-	}																						\
-																							\
-	template<class T = This>																\
-	std::shared_ptr<T> SharedFromThis()														\
-	{																						\
-		if constexpr (std::derived_from<T, SObject>)										\
-		{																					\
-			return std::dynamic_pointer_cast<T>(((T*)this)->shared_from_this());			\
-		}																					\
-		else																				\
-		{																					\
-			static_assert(false, "T is not derived from SObject.");							\
-			return nullptr;																	\
-		}																					\
-	}																						\
-																							\
-	template<class T = This>																\
-	std::weak_ptr<T> WeakFromThis()															\
-	{																						\
-		if constexpr (std::derived_from<T, SObject>)										\
-		{																					\
-			return SharedFromThis<T>();														\
-		}																					\
-		else																				\
-		{																					\
-			static_assert(false, "T is not derived from SObject.");							\
-			return nullptr;																	\
-		}																					\
 	}																						\
 																							\
 private:																					\
@@ -103,6 +73,15 @@ private:																					\
 	static consteval void REFLECTION_GetFunctionName(void*);								\
 	template<size_t>																		\
 	static void REFLECTION_GetPropertyPointer(void*);
+
+#define GENERATE_BODY(Class, ...)															\
+Type* Class::StaticClass()																	\
+{																							\
+	static Type MyClassType(Type::TypeGenerator<This>(FriendlyName, L ## #Class));			\
+	return &MyClassType;																	\
+}																							\
+																							\
+Type* Class::StaticRegisterClass = Class::StaticClass();
 
 #define SFUNCTION(FunctionName, ...)														\
 	template<>																				\

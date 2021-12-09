@@ -27,7 +27,7 @@ private:
 public:
 	SAnimationCurve(std::wstring_view CurveName, float InCurveStart, float InCurveEnd);
 
-	virtual std::wstring ToString(std::wstring_view InFormatArgs) override;
+	virtual std::wstring ToString() override;
 	virtual bool Tick(float InDeltaTime);
 	virtual void Reset();
 

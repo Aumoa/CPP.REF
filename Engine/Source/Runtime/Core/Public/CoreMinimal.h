@@ -13,6 +13,7 @@
 #include "CoreAssert.h"
 #include "AbstractClass.h"
 #include "NonCopyable.h"
+#include "GCRoot.h"
 #include "Concepts/CoreConcepts.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"

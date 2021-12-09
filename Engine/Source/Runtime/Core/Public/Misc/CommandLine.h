@@ -6,16 +6,19 @@
 #include <string_view>
 #include <vector>
 
-class SCommandLine : implements SObject
+class CORE_API SCommandLine : implements SObject
 {
 	GENERATED_BODY(SCommandLine)
 
 private:
 	std::vector<std::wstring> ResolvedArgs;
 
+private:
+	SCommandLine();
+
 public:
 	template<class T>
-	SCommandLine(const T& InPlatformArgs)
+	SCommandLine(const T& InPlatformArgs) : SCommandLine()
 	{
 		std::optional<std::wostringstream> woss;
 
@@ -56,7 +59,7 @@ public:
 		}
 	}
 
-	CORE_API size_t GetArgument(std::wstring_view start, std::wstring* optional_tail = nullptr) const;
-	CORE_API std::optional<std::wstring_view> GetArgument(size_t indexOf) const;
-	CORE_API const std::vector<std::wstring>& GetArguments() const;
+	size_t GetArgument(std::wstring_view start, std::wstring* optional_tail = nullptr) const;
+	std::optional<std::wstring_view> GetArgument(size_t indexOf) const;
+	const std::vector<std::wstring>& GetArguments() const;
 };

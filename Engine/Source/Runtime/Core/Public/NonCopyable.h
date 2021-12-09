@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 class NonCopyable
 {
 	NonCopyable(const NonCopyable&) = delete;

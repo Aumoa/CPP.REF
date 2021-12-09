@@ -93,12 +93,51 @@ bool Type::IsA(const Type* InType) const
 	return GetHashCode() == InType->GetHashCode();
 }
 
-std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
+void Type::CacheProperties()
+{
+	if (!bPropertyCached)
+	{
+		CachedProperties.reserve(Properties.size());
+		CachedFullProperties.reserve(Properties.size());
+		CachedGCProperties.reserve(Properties.size());
+
+		for (auto& Prop : Properties)
+		{
+			CachedProperties.emplace_back(&Prop);
+			CachedFullProperties.emplace_back(&Prop);
+
+			if (!Prop.GetMemberType()->bNative)
+			{
+				CachedGCProperties.emplace_back(&Prop);
+			}
+		}
+
+		for (Type* Super = SuperClass; Super; Super = Super->SuperClass)
+		{
+			CachedFullProperties.reserve(CachedFullProperties.size() + Super->Properties.size());
+			CachedGCProperties.reserve(CachedGCProperties.size() + Super->Properties.size());
+
+			for (auto& Prop : Super->Properties)
+			{
+				CachedFullProperties.emplace_back(&Prop);
+
+				if (!Prop.GetMemberType()->bNative)
+				{
+					CachedGCProperties.emplace_back(&Prop);
+				}
+			}
+		}
+
+		bPropertyCached = true;
+	}
+}
+
+std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers)
 {
 	if (bIncludeSuperMembers)
 	{
 		std::vector<Method> functions = Functions;
-		for (const Type* super = this; super; super = super->GetSuper())
+		for (Type* super = this; super; super = super->GetSuper())
 		{
 			std::vector<Method> superFunctions = super->GetMethods(false);
 			functions.insert(functions.end(), superFunctions.begin(), superFunctions.end());
@@ -111,7 +150,7 @@ std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers) const
 	}
 }
 
-Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
+Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers)
 {
 	for (size_t i = 0; i < Functions.size(); ++i)
 	{
@@ -130,41 +169,41 @@ Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMemb
 	return super->GetMethod(InFriendlyName, true);
 }
 
-std::vector<Property> Type::GetProperties(bool bIncludeSuperMembers) const
+const std::vector<Property*>& Type::GetProperties(bool bIncludeSuperMembers)
 {
+	CacheProperties();
+
 	if (bIncludeSuperMembers)
 	{
-		std::vector<Property> properties = Properties;
-		for (const Type* super = this; super; super = super->GetSuper())
-		{
-			std::vector<Property> superProperties = super->GetProperties(false);
-			properties.insert(properties.end(), superProperties.begin(), superProperties.end());
-		}
-		return properties;
+		return CachedFullProperties;
 	}
 	else
 	{
-		return Properties;
+		return CachedProperties;
 	}
 }
 
-Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers) const
+const std::vector<Property*>& Type::GetGCProperties()
 {
-	for (size_t i = 0; i < Properties.size(); ++i)
+	CacheProperties();
+	return CachedGCProperties;
+}
+
+Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers)
+{
+	CacheProperties();
+
+	auto& List = bIncludeSuperMembers ? CachedFullProperties : CachedProperties;
+
+	for (auto& Prop : List)
 	{
-		if (Properties[i].GetFriendlyName() == InFriendlyName)
+		if (Prop->GetFriendlyName() == InFriendlyName)
 		{
-			return const_cast<Property*>(&Properties[i]);
+			return Prop;
 		}
 	}
 
-	Type* super = nullptr;
-	if (!bIncludeSuperMembers || !(super = GetSuper()))
-	{
-		return nullptr;
-	}
-
-	return super->GetProperty(InFriendlyName, true);
+	return nullptr;
 }
 
 std::wstring Type::GenerateUniqueName()

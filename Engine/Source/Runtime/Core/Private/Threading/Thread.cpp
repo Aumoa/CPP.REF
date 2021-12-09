@@ -3,34 +3,30 @@
 #include <Windows.h>
 #include "Threading/Thread.h"
 
-SThread::SThread() : Super()
+Thread::Thread()
 {
 	_handle = ::GetCurrentThread();
 	_threadId = ::GetThreadId(_handle);
 }
 
-SThread::~SThread()
-{
-}
-
-void SThread::SetFriendlyName(std::wstring_view friendlyName)
+void Thread::SetFriendlyName(std::wstring_view friendlyName)
 {
 	SetThreadDescription(_handle, friendlyName.data());
 	_friendlyName = friendlyName;
 }
 
-std::wstring SThread::GetFriendlyName() const
+std::wstring Thread::GetFriendlyName() const
 {
 	return _friendlyName;
 }
 
-int64 SThread::GetThreadId() const
+int64 Thread::GetThreadId() const
 {
 	return _threadId;
 }
 
-SThread* SThread::GetCurrentThread()
+Thread* Thread::GetCurrentThread()
 {
-	static thread_local SThread MyThread;
+	static thread_local Thread MyThread;
 	return &MyThread;
 }

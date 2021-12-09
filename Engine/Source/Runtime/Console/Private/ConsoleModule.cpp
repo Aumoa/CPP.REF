@@ -2,6 +2,8 @@
 
 #include "ConsoleModule.h"
 
+GENERATE_BODY(SConsoleModule);
+
 SConsoleModule::SConsoleModule() : Super()
 {
 }

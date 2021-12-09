@@ -6,6 +6,12 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
 
+GENERATE_BODY(SCommandLine);
+
+SCommandLine::SCommandLine()
+{
+}
+
 size_t SCommandLine::GetArgument(std::wstring_view start, std::wstring* optional_tail) const
 {
 	for (size_t i = 0; i < ResolvedArgs.size(); ++i)

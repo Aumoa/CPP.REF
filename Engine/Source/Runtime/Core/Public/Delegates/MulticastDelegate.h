@@ -8,8 +8,10 @@
 #include <concepts>
 #include <mutex>
 #include <memory>
+#include "WeakObjectPtr.h"
 
 class DelegateHandle;
+class SObject;
 
 class MulticastDelegateBase
 {
@@ -110,7 +112,7 @@ class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 		std::shared_ptr<int64> Id;
 
 		bool bHolder = false;
-		std::weak_ptr<SObject> Holder;
+		WeakObjectPtr<SObject> Holder;
 
 		DelegateInstance(int64 id, TPayload payload)
 			: Body(std::move(payload))
@@ -118,7 +120,7 @@ class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 		{
 		}
 
-		DelegateInstance(int64 id, TPayload payload, std::weak_ptr<SObject> holder)
+		DelegateInstance(int64 id, TPayload payload, WeakObjectPtr<SObject> holder)
 			: Body(std::move(payload))
 			, Id(std::make_shared<int64>(id))
 			, bHolder(true)

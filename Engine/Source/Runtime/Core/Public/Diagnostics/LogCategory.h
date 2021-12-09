@@ -2,33 +2,29 @@
 
 #pragma once
 
-#include "Object.h"
 #include <optional>
 #include <string>
 #include <string_view>
-#include "IO/FileReference.h"
 
 enum class ELogVerbosity;
 
 /// <summary>
 /// Represents log category that file logging state, display state, etc...
 /// </summary>
-class CORE_API SLogCategory : implements SObject
+class CORE_API LogCategory
 {
-	GENERATED_BODY(SLogCategory)
 	friend class LogSystem;
 
 private:
-	static std::optional<SFileReference> _file;
 	std::wstring _name;
 
 public:
 	/// <summary>
-	/// Initialize new <see cref="SLogCategory"/> instance.
+	/// Initialize new <see cref="LogCategory"/> instance.
 	/// </summary>
 	/// <param name="categoryName"> The category name. </param>
-	SLogCategory(std::wstring_view categoryName);
-	~SLogCategory();
+	LogCategory(std::wstring_view categoryName);
+	~LogCategory();
 
 private:
 	static std::wstring_view VerbosityToString(ELogVerbosity verbosity);
@@ -42,5 +38,5 @@ protected:
 	virtual void OnLog(ELogVerbosity logVerbosity, std::wstring_view message);
 };
 
-#define DECLARE_LOG_CATEGORY(API, CategoryName) extern API SLogCategory CategoryName;
-#define DEFINE_LOG_CATEGORY(CategoryName) SLogCategory CategoryName(L ## #CategoryName);
+#define DECLARE_LOG_CATEGORY(API, CategoryName) extern API LogCategory CategoryName;
+#define DEFINE_LOG_CATEGORY(CategoryName) LogCategory CategoryName(L ## #CategoryName);

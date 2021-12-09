@@ -2,9 +2,9 @@
 
 #pragma once
 
-class SLogCategory;
+class LogCategory;
 
-extern CORE_API SLogCategory LogCore;
-extern CORE_API SLogCategory LogAssert;
-extern CORE_API SLogCategory LogReflection;
-extern CORE_API SLogCategory LogCasts;
+extern CORE_API LogCategory LogCore;
+extern CORE_API LogCategory LogAssert;
+extern CORE_API LogCategory LogReflection;
+extern CORE_API LogCategory LogCasts;

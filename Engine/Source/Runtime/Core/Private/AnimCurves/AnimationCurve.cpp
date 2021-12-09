@@ -3,6 +3,8 @@
 #include "AnimCurves/AnimationCurve.h"
 #include "AnimCurves/LinearAnimationCurve.h"
 
+GENERATE_BODY(SAnimationCurve);
+
 SAnimationCurve::SAnimationCurve(std::wstring_view CurveName, float InCurveStart, float InCurveEnd) : Super()
 	, CurveName(CurveName)
 {
@@ -22,9 +24,9 @@ SAnimationCurve::SAnimationCurve(std::wstring_view CurveName, float InCurveStart
 	ElapsedTime = 0;
 }
 
-std::wstring SAnimationCurve::ToString(std::wstring_view InFormatArgs)
+std::wstring SAnimationCurve::ToString()
 {
-	return std::format(L"{} @ CurveName: {}", Super::ToString(InFormatArgs), CurveName);
+	return std::format(L"{} @ CurveName: {}", Super::ToString(), CurveName);
 }
 
 bool SAnimationCurve::Tick(float InDeltaTime)

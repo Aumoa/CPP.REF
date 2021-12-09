@@ -2,6 +2,8 @@
 
 #include "IO/DirectoryReference.h"
 
+GENERATE_BODY(SDirectoryReference);
+
 SDirectoryReference::SDirectoryReference(const std::filesystem::path& filepath) : Super(filepath)
 {
 }

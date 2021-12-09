@@ -29,11 +29,14 @@ private:
 
 	size_t TypeHash = 0;
 	std::wstring FriendlyName;
+	std::wstring FullName;
 	Type* SuperClass = nullptr;
 	ObjectCtor Constructor;
 	std::vector<Method> Functions;
 	std::vector<Property> Properties;
 	uint8 bNative : 1 = false;
+	uint8 bPropertyCached : 1 = false;
+	uint8 bFunctionCached : 1 = false;
 
 	std::function<SObject* (void*)> ToObjectCast;
 	std::function<void* (SObject*)> FromObjectCast;
@@ -43,6 +46,7 @@ public:
 	struct TypeGenerator
 	{
 		std::wstring FriendlyName;
+		std::wstring FullName;
 		std::vector<Method> Functions;
 		std::vector<Property> Properties;
 		Type* SuperClass = nullptr;
@@ -50,8 +54,9 @@ public:
 		std::function<SObject* (void*)> ToObjectCast;
 		std::function<void* (SObject*)> FromObjectCast;
 
-		TypeGenerator(std::wstring_view InFriendlyName) requires requires { TType::StaticClass(); }
+		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires requires { TType::StaticClass(); }
 			: FriendlyName(InFriendlyName)
+			, FullName(FullName)
 			, bNative(false)
 			, ToObjectCast(+[](void* UnknownType) { return static_cast<SObject*>(reinterpret_cast<TType*>(UnknownType)); })
 			, FromObjectCast(+[](SObject* Object) { return reinterpret_cast<void*>(dynamic_cast<TType*>(Object)); })
@@ -111,6 +116,7 @@ public:
 	Type(TypeGenerator<TType>&& Generator)
 		: TypeHash(typeid(TType).hash_code())
 		, FriendlyName(std::move(Generator.FriendlyName))
+		, FullName(std::move(Generator.FullName))
 		, SuperClass(Generator.SuperClass)
 		, Constructor(GetConstructorFunctionBody<TType>((int32)0))
 		, Functions(std::move(Generator.Functions))
@@ -147,11 +153,22 @@ public:
 	template<class T> requires (!std::derived_from<T, SObject>)
 	bool IsA() const { return IsA(GetStaticClass<T>()); }
 
-	std::vector<Method> GetMethods(bool bIncludeSuperMembers = true) const;
-	Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
-	std::vector<Property> GetProperties(bool bIncludeSuperMembers = true) const;
-	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true) const;
+private:
+	std::vector<Property*> CachedProperties;
+	std::vector<Property*> CachedFullProperties;
+	std::vector<Property*> CachedGCProperties;
 
+private:
+	void CacheProperties();
+
+public:
+	std::vector<Method> GetMethods(bool bIncludeSuperMembers = true);
+	Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
+	const std::vector<Property*>& GetProperties(bool bIncludeSuperMembers = true);
+	const std::vector<Property*>& GetGCProperties();
+	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
+
+public:
 	void* FromObject(SObject* Object) const { return FromObjectCast(Object); }
 	SObject* ToObject(void* UnknownType) const { return ToObjectCast(UnknownType); }
 

@@ -7,6 +7,8 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 
+GENERATE_BODY(SFileReference);
+
 SFileReference::SFileReference(const std::filesystem::path& filepath) : Super(filepath)
 {
 }

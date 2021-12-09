@@ -7,7 +7,7 @@
 #include <string_view>
 #include <format>
 
-class SLogCategory;
+class LogCategory;
 enum class ELogVerbosity;
 
 /// <summary>
@@ -31,14 +31,14 @@ public:
 	/// <param name="format"> The text format. </param>
 	/// <param name="...args"> The formatter args. </param>
 	template<class... TArgs>
-	static void Log(SLogCategory& category, ELogVerbosity logVerbosity, std::wstring_view format, TArgs&&... args)
+	static void Log(LogCategory& category, ELogVerbosity logVerbosity, std::wstring_view format, TArgs&&... args)
 	{
 		std::wstring message = std::format(format, std::forward<TArgs>(args)...);
 		InternalLog(category, logVerbosity, message);
 	}
 
 private:
-	static void InternalLog(SLogCategory& category, ELogVerbosity logVerbosity, std::wstring& message);
+	static void InternalLog(LogCategory& category, ELogVerbosity logVerbosity, std::wstring& message);
 };
 
 #define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(Category, ELogVerbosity::Verbosity, Format __VA_OPT__(,) __VA_ARGS__)

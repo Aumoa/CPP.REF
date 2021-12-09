@@ -2,20 +2,18 @@
 
 #pragma once
 
-#include "Object.h"
+#include "PrimitiveTypes.h"
+#include "NonCopyable.h"
+#include <string>
 
-class CORE_API SThread : implements SObject
+class CORE_API Thread : public NonCopyable
 {
-	GENERATED_BODY(SThread)
-
-private:
 	void* _handle = nullptr;
 	int64 _threadId = 0;
 	std::wstring _friendlyName;
 
 private:
-	SThread();
-	virtual ~SThread() override;
+	Thread();
 
 public:
 	void SetFriendlyName(std::wstring_view friendlyName);
@@ -23,5 +21,5 @@ public:
 	int64 GetThreadId() const;
 
 public:
-	static SThread* GetCurrentThread();
+	static Thread* GetCurrentThread();
 };

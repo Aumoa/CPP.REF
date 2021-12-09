@@ -7,6 +7,8 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
 
+GENERATE_BODY(SPlatformModule);
+
 SPlatformModule::SPlatformModule(const std::filesystem::path& modulePath)
 {
 	std::wstring wsPath = modulePath.wstring();
@@ -23,8 +25,6 @@ SPlatformModule::SPlatformModule(const std::filesystem::path& modulePath)
 
 SPlatformModule::~SPlatformModule()
 {
-	CleanupSubobjects();
-
 	if (_NativeHandle)
 	{
 		FreeLibrary((HMODULE)_NativeHandle);
