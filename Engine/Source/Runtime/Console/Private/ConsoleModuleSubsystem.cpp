@@ -11,3 +11,7 @@ SConsoleModuleSubsystem::SConsoleModuleSubsystem() : Super()
 void SConsoleModuleSubsystem::Init()
 {
 }
+
+void SConsoleModuleSubsystem::Deinit()
+{
+}

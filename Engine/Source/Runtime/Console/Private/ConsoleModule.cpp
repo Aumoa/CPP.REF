@@ -26,7 +26,12 @@ int32 SConsoleModule::Main(const SCommandLine& CommandArgs)
 
 	int32 ReturnCode = Run(CommandArgs);
 
-	// Cleanup objects.
+	// Cleanup subsystems.
+	for (auto& Subsystem : Subsystems)
+	{
+		Subsystem->Deinit();
+	}
+
 	Subsystems.clear();
 	GC().Collect();
 

@@ -36,7 +36,7 @@ public:
 	template<class T>
 	bool Unboxing(T* outValue) const
 	{
-		if (T* p = std::any_cast<T>(&_value); p)
+		if (const T* p = std::any_cast<T>(&_value); p)
 		{
 			*outValue = *p;
 			return true;

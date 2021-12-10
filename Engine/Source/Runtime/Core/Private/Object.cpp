@@ -4,6 +4,8 @@
 #include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
+#include "Misc/TickCalc.h"
+#include "Threading/Parallel.h"
 
 GENERATE_BODY(SObject);
 
@@ -101,16 +103,37 @@ SObject::GarbageCollector::GarbageCollector()
 
 void SObject::GarbageCollector::Collect(bool bLog)
 {
+	TickCalc<> Timer;
+
 	++Generation;
 	[[unlikely]]
 	if (bLog)
 	{
 		SE_LOG(LogGC, Verbose, L"Start collecting garbages with {} generation.", Generation);
+		Timer.DoCalc();
 	}
 
-	for (auto& Root : Roots)
+	if (Roots.size() > 4)
 	{
-		Root->MarkAndSweep(Generation);
+		std::vector<SObject*> FlattenRoots;
+		FlattenRoots.reserve(Roots.size());
+
+		for (auto& Root : Roots)
+		{
+			FlattenRoots.emplace_back(Root);
+		}
+
+		Parallel::For(FlattenRoots.size(), [&](size_t Idx)
+		{
+			FlattenRoots[Idx]->MarkAndSweep(Generation);
+		}, 4);
+	}
+	else
+	{
+		for (auto& Root : Roots)
+		{
+			Root->MarkAndSweep(Generation);
+		}
 	}
 
 	static std::vector<std::set<SObject*>::iterator> Garbages;
@@ -133,7 +156,8 @@ void SObject::GarbageCollector::Collect(bool bLog)
 	[[unlikely]]
 	if (bLog)
 	{
-		SE_LOG(LogGC, Verbose, L"{} garbages are collected.", Garbages.size());
+		float ElapsedTime = Timer.DoCalc().count() * 1000.0f;
+		SE_LOG(LogGC, Verbose, L"{} garbages are collected. (Total: {} objects, {} milliseconds elapsed.)", Garbages.size(), Collection.size(), ElapsedTime);
 	}
 	Garbages.clear();
 }
@@ -141,4 +165,9 @@ void SObject::GarbageCollector::Collect(bool bLog)
 size_t SObject::GarbageCollector::NumThreadObjects()
 {
 	return Collection.size();
+}
+
+void SObject::GarbageCollector::SuppressFinalize(SObject* Object)
+{
+	Collection.erase(Object);
 }

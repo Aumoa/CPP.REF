@@ -12,4 +12,5 @@ public:
 	SConsoleModuleSubsystem();
 
 	virtual void Init();
+	virtual void Deinit();
 };

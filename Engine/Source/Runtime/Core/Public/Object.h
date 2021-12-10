@@ -120,6 +120,7 @@ public:
 	public:
 		void Collect(bool bLog = false);
 		size_t NumThreadObjects();
+		void SuppressFinalize(SObject* Object);
 	};
 
 	static GarbageCollector& GC();

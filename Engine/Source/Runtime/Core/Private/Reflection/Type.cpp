@@ -116,11 +116,13 @@ void Type::CacheProperties()
 		for (Type* Super = SuperClass; Super; Super = Super->SuperClass)
 		{
 			CachedFullProperties.reserve(CachedFullProperties.size() + Super->Properties.size());
+			CachedFullProperties.insert(CachedFullProperties.begin(), Super->Properties.size(), nullptr);
 			CachedGCProperties.reserve(CachedGCProperties.size() + Super->Properties.size());
 
+			size_t Idx = 0;
 			for (auto& Prop : Super->Properties)
 			{
-				CachedFullProperties.emplace_back(&Prop);
+				CachedFullProperties[Idx++] = &Prop;
 
 				Type* MemberType = Prop.GetMemberType();
 				if (!MemberType->bNative || MemberType->bGCCollection)
