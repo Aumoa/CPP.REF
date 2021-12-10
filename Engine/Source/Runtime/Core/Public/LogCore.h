@@ -8,3 +8,4 @@ extern CORE_API LogCategory LogCore;
 extern CORE_API LogCategory LogAssert;
 extern CORE_API LogCategory LogReflection;
 extern CORE_API LogCategory LogCasts;
+extern CORE_API LogCategory LogGC;

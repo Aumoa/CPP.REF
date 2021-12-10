@@ -49,11 +49,11 @@ Type* Type::GetSuper() const
 	return SuperClass;
 }
 
-SObject* Type::Instantiate(SObject* InOuter) const
+SObject* Type::Instantiate() const
 {
 	if (Constructor)
 	{
-		SObject* SO = Constructor(InOuter);
+		SObject* SO = Constructor();
 		return SO;
 	}
 	else
@@ -106,7 +106,8 @@ void Type::CacheProperties()
 			CachedProperties.emplace_back(&Prop);
 			CachedFullProperties.emplace_back(&Prop);
 
-			if (!Prop.GetMemberType()->bNative)
+			Type* MemberType = Prop.GetMemberType();
+			if (!MemberType->bNative || MemberType->bGCCollection)
 			{
 				CachedGCProperties.emplace_back(&Prop);
 			}
@@ -121,7 +122,8 @@ void Type::CacheProperties()
 			{
 				CachedFullProperties.emplace_back(&Prop);
 
-				if (!Prop.GetMemberType()->bNative)
+				Type* MemberType = Prop.GetMemberType();
+				if (!MemberType->bNative || MemberType->bGCCollection)
 				{
 					CachedGCProperties.emplace_back(&Prop);
 				}
@@ -204,6 +206,13 @@ Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuper
 	}
 
 	return nullptr;
+}
+
+std::vector<SObject*> Type::GetCollectionObjects(SObject* Object, Property* CollectionProp)
+{
+	check(bGCCollection && Collector);
+	const uint8& CollectionPtr = CollectionProp->GetValue<uint8>(Object);
+	return Collector(&CollectionPtr);
 }
 
 std::wstring Type::GenerateUniqueName()

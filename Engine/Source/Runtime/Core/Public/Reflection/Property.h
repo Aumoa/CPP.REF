@@ -55,7 +55,7 @@ public:
 	}
 
 	template<class T>
-	T GetValue(SObject* _this) const
+	const T& GetValue(SObject* _this) const
 	{
 		return *reinterpret_cast<const T*>(_getter(_this));
 	}

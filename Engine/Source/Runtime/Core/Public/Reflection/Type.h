@@ -19,7 +19,7 @@ class Property;
 
 class CORE_API Type
 {
-	using ObjectCtor = SObject*(*)(SObject* InOuter);
+	using ObjectCtor = SObject*(*)();
 	Type() = delete;
 	Type(const Type&) = delete;
 
@@ -34,12 +34,16 @@ private:
 	ObjectCtor Constructor;
 	std::vector<Method> Functions;
 	std::vector<Property> Properties;
+	std::function<SObject* (void*)> ToObjectCast;
+	std::function<void* (SObject*)> FromObjectCast;
+
 	uint8 bNative : 1 = false;
 	uint8 bPropertyCached : 1 = false;
 	uint8 bFunctionCached : 1 = false;
 
-	std::function<SObject* (void*)> ToObjectCast;
-	std::function<void* (SObject*)> FromObjectCast;
+	uint8 bGCCollection : 1 = false;
+	Type* CollectionType = nullptr;
+	std::function<std::vector<SObject*>(const void*)> Collector;
 
 public:
 	template<class TType>
@@ -50,10 +54,15 @@ public:
 		std::vector<Method> Functions;
 		std::vector<Property> Properties;
 		Type* SuperClass = nullptr;
-		bool bNative = false;
 		std::function<SObject* (void*)> ToObjectCast;
 		std::function<void* (SObject*)> FromObjectCast;
+		uint8 bNative : 1 = false;
 
+		uint8 bGCCollection : 1 = false;
+		Type* CollectionType = nullptr;
+		std::function<std::vector<SObject*>(const void*)> Collector;
+
+		// SObject type.
 		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires requires { TType::StaticClass(); }
 			: FriendlyName(InFriendlyName)
 			, FullName(FullName)
@@ -70,6 +79,35 @@ public:
 				using SuperType = typename TType::Super;
 				SuperClass = SuperType::StaticClass();
 			}
+		}
+
+		// SObject container type.
+		TypeGenerator() requires requires(const TType& Collection)
+			{
+				{ Collection.begin() };
+				{ Collection.end() };
+				{ std::remove_reference_t<decltype(**Collection.begin())>::StaticClass() };
+			}
+			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, bNative(true)
+			, bGCCollection(true)
+			, CollectionType(std::remove_reference_t<decltype(**std::declval<const TType&>().begin())>::StaticClass())
+			, Collector([](const void* Ptr)
+			{
+				const TType* Collection = reinterpret_cast<const TType*>(Ptr);
+
+				size_t NumObjects = Collection->size();
+				std::vector<SObject*> GCCollection;
+				GCCollection.reserve(NumObjects);
+
+				for (auto It = Collection->begin(); It != Collection->end(); ++It)
+				{
+					GCCollection.emplace_back(dynamic_cast<SObject*>(*It));
+				}
+
+				return GCCollection;
+			})
+		{
 		}
 
 		TypeGenerator()
@@ -121,9 +159,12 @@ public:
 		, Constructor(GetConstructorFunctionBody<TType>((int32)0))
 		, Functions(std::move(Generator.Functions))
 		, Properties(std::move(Generator.Properties))
-		, bNative(Generator.bNative)
 		, ToObjectCast(std::move(Generator.ToObjectCast))
 		, FromObjectCast(std::move(Generator.FromObjectCast))
+		, bNative(Generator.bNative)
+		, bGCCollection(Generator.bGCCollection)
+		, CollectionType(Generator.CollectionType)
+		, Collector(std::move(Generator.Collector))
 	{
 		RegisterStaticClass();
 	}
@@ -132,8 +173,9 @@ public:
 	size_t GetHashCode() const;
 
 	Type* GetSuper() const;
-	SObject* Instantiate(SObject* InOuter) const;
+	SObject* Instantiate() const;
 	inline bool IsNativeType() const { return bNative; }
+	inline bool IsGCCollection() const { return bGCCollection; }
 
 	bool IsDerivedFrom(const Type* InType) const;
 	bool IsBaseOf(const Type* InType) const;
@@ -167,6 +209,7 @@ public:
 	const std::vector<Property*>& GetProperties(bool bIncludeSuperMembers = true);
 	const std::vector<Property*>& GetGCProperties();
 	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
+	std::vector<SObject*> GetCollectionObjects(SObject* Object, Property* CollectionProp);
 
 public:
 	void* FromObject(SObject* Object) const { return FromObjectCast(Object); }
@@ -214,9 +257,9 @@ private:
 	template<std::derived_from<SObject> TType> requires std::constructible_from<TType>
 	static ObjectCtor GetConstructorFunctionBody(int32)
 	{
-		return +[](SObject* InOuter) -> SObject*
+		return +[]() -> SObject*
 		{
-			return InOuter->template NewObject<TType>();
+			return SObject::template NewObject<TType>();
 		};
 	}
 

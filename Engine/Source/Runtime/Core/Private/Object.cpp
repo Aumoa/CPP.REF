@@ -37,6 +37,7 @@ void SObject::PostConstruction()
 {
 	Name = GetType()->GenerateUniqueName();
 	GC().Collection.emplace(this);
+	Generation = GC().Generation;
 }
 
 void* SObject::operator new(size_t AllocSize)
@@ -70,10 +71,24 @@ void SObject::MarkAndSweep(uint64 Generation)
 	this->Generation = Generation;
 	for (auto& GCProp : GetType()->GetGCProperties())
 	{
-		SObject* Member = GCProp->GetObject(this);
-		if (Member)
+		Type* PropertyType = GCProp->GetMemberType();
+		if (PropertyType->IsGCCollection())
 		{
-			Member->MarkAndSweep(Generation);
+			for (auto& CollectionMember : PropertyType->GetCollectionObjects(this, GCProp))
+			{
+				if (CollectionMember)
+				{
+					CollectionMember->MarkAndSweep(Generation);
+				}
+			}
+		}
+		else
+		{
+			SObject* Member = GCProp->GetObject(this);
+			if (Member)
+			{
+				Member->MarkAndSweep(Generation);
+			}
 		}
 	}
 }
@@ -85,6 +100,7 @@ SObject::GarbageCollector::GarbageCollector()
 void SObject::GarbageCollector::Collect()
 {
 	++Generation;
+	//SE_LOG(LogGC, Verbose, L"Start collecting garbages with {} generation.", Generation);
 
 	for (auto& Root : Roots)
 	{
@@ -108,6 +124,7 @@ void SObject::GarbageCollector::Collect()
 		Collection.erase(Garbage);
 	}
 
+	//SE_LOG(LogGC, Verbose, L"{} garbages are collected.", Garbages.size());
 	Garbages.clear();
 }
 

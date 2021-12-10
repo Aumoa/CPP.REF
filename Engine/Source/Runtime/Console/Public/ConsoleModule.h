@@ -5,14 +5,22 @@
 #include "CoreMinimal.h"
 #include "Misc/CommandLine.h"
 
+class SConsoleModuleSubsystem;
+
 class CONSOLE_API SConsoleModule : implements SObject
 {
 	GENERATED_BODY(SConsoleModule)
 
+private:
+	SPROPERTY(Subsystems)
+	std::set<SConsoleModuleSubsystem*> Subsystems;
+
 public:
 	SConsoleModule();
+	virtual ~SConsoleModule() noexcept override;
 
-	virtual int32 Main(const SCommandLine& CommandArgs) = 0;
+	int32 Main(const SCommandLine& CommandArgs);
+	virtual int32 Run(const SCommandLine& CommandArgs) = 0;
 };
 
 #define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)			\
