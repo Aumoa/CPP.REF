@@ -99,10 +99,14 @@ SObject::GarbageCollector::GarbageCollector()
 {
 }
 
-void SObject::GarbageCollector::Collect()
+void SObject::GarbageCollector::Collect(bool bLog)
 {
 	++Generation;
-	//SE_LOG(LogGC, Verbose, L"Start collecting garbages with {} generation.", Generation);
+	[[unlikely]]
+	if (bLog)
+	{
+		SE_LOG(LogGC, Verbose, L"Start collecting garbages with {} generation.", Generation);
+	}
 
 	for (auto& Root : Roots)
 	{
@@ -126,7 +130,11 @@ void SObject::GarbageCollector::Collect()
 		Collection.erase(Garbage);
 	}
 
-	//SE_LOG(LogGC, Verbose, L"{} garbages are collected.", Garbages.size());
+	[[unlikely]]
+	if (bLog)
+	{
+		SE_LOG(LogGC, Verbose, L"{} garbages are collected.", Garbages.size());
+	}
 	Garbages.clear();
 }
 

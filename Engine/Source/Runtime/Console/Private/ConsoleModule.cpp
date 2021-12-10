@@ -32,3 +32,20 @@ int32 SConsoleModule::Main(const SCommandLine& CommandArgs)
 
 	return ReturnCode;
 }
+
+SConsoleModuleSubsystem* SConsoleModule::GetSubsystem(Type* SubsystemClass)
+{
+	auto It = CachedSubsystemView.find(SubsystemClass->GetHashCode());
+	if (It == CachedSubsystemView.end())
+	{
+		for (auto& Subsystem : Subsystems)
+		{
+			if (Subsystem->GetType()->IsDerivedFrom(SubsystemClass))
+			{
+				CachedSubsystemView.emplace(SubsystemClass->GetHashCode(), Subsystem);
+				return Subsystem;
+			}
+		}
+	}
+	return It->second;
+}

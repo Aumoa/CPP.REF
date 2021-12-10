@@ -21,6 +21,16 @@ public:
 
 	int32 Main(const SCommandLine& CommandArgs);
 	virtual int32 Run(const SCommandLine& CommandArgs) = 0;
+
+	SConsoleModuleSubsystem* GetSubsystem(Type* SubsystemClass);
+	template<class T>
+	T* GetSubsystem()
+	{
+		return Cast<T>(GetSubsystem(T::StaticClass()));
+	}
+
+private:
+	std::map<size_t, SConsoleModuleSubsystem*> CachedSubsystemView;
 };
 
 #define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)			\

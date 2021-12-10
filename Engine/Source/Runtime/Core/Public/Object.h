@@ -118,7 +118,7 @@ public:
 		GarbageCollector();
 
 	public:
-		void Collect();
+		void Collect(bool bLog = false);
 		size_t NumThreadObjects();
 	};
 
