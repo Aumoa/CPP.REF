@@ -36,10 +36,13 @@ class CORE_API SObject : public SObject_Details::SObjectBase
 
 	template<class T>
 	friend class GCRoot;
+	template<class T>
+	friend class WeakObjectPtr;
 
 private:
 	std::wstring Name;
 	uint64 Generation;
+	std::shared_ptr<bool> WeakReferences;
 
 public:
 	SObject();

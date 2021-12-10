@@ -7,12 +7,14 @@
 
 GENERATE_BODY(SObject);
 
-SObject::SObject()
+SObject::SObject() : Generation(0)
 {
+	WeakReferences = std::make_shared<bool>(true);
 }
 
 SObject::~SObject()
 {
+	*WeakReferences = false;
 }
 
 std::wstring SObject::ToString()

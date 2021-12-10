@@ -133,7 +133,7 @@ class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 		{
 			if (bHolder)
 			{
-				if (Holder.expired())
+				if (!Holder.IsValid())
 				{
 					return false;
 				}
