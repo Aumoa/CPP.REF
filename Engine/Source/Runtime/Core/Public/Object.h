@@ -2,12 +2,8 @@
 
 #pragma once
 
-#include <set>
 #include <string>
 #include <string_view>
-#include <functional>
-#include <map>
-#include <functional>
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "NonCopyable.h"
@@ -38,6 +34,7 @@ class CORE_API SObject : public SObject_Details::SObjectBase
 	friend class GCRoot;
 	template<class T>
 	friend class WeakObjectPtr;
+	friend class GarbageCollector;
 
 private:
 	std::wstring Name;
@@ -117,29 +114,7 @@ public:
 	void operator delete(void*);
 
 public:
-	class CORE_API GarbageCollector
-	{
-		template<class T>
-		friend class GCRoot;
-		friend class SObject;
-
-		std::set<SObject*> Collection;
-		std::set<SObject*> Roots;
-		uint64 Generation = 0;
-
-	private:
-		GarbageCollector();
-
-	public:
-		void Collect(bool bLog = false);
-		size_t NumThreadObjects();
-		void SuppressFinalize(SObject* Object);
-
-		void Consume(GarbageCollector& AnotherThreadGC);
-	};
-
-	static GarbageCollector& GC();
-	void MarkAndSweep(uint64 Generation);
+	static class GarbageCollector& GC();
 };
 
 #define implements virtual public 

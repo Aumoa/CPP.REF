@@ -40,20 +40,6 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	OutputDebugStringW(TimeComposed.c_str());
 	OutputDebugStringW(L"\n");
 
-	// Log to console if it is available.
-	switch (Verbosity)
-	{
-	case ELogVerbosity::Verbose:
-	case ELogVerbosity::Warning:
-	case ELogVerbosity::Info:
-		wcout << Composed << endl;
-		break;
-	case ELogVerbosity::Error:
-	case ELogVerbosity::Fatal:
-		wcerr << Composed << endl;
-		break;
-	}
-
 	if (SLogModule* Module = SLogModule::Get(); Module && Module->IsRunning())
 	{
 		Module->EnqueueLogMessage(TimeComposed);

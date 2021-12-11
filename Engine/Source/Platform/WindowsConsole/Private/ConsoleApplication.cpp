@@ -48,6 +48,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	}
 
 	int32 ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
+	GC().Collect(true);
 
 	SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
 	LogModule->Shutdown();

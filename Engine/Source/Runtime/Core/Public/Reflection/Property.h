@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include "PrimitiveTypes.h"
 
 class Type;
@@ -17,6 +18,9 @@ class CORE_API Property
 	uint8 bIsPointer : 1;
 	uint8 bIsConst : 1;
 	uint8 bIsStatic : 1;
+
+	std::optional<intptr_t> ValOff;
+	std::optional<intptr_t> PtrOff;
 
 public:
 	struct PropertyGenerator
@@ -49,20 +53,24 @@ public:
 	inline Type* GetMemberType() const { return *DeferredMemberType; }
 
 	template<class T>
-	void SetValue(SObject* _this, const T& _value) const
+	void SetValue(SObject* InThis, const T& OutValue) const
 	{
-		Setter(_this, &_value);
+		Setter(InThis, &OutValue);
 	}
 
 	template<class T>
-	const T& GetValue(SObject* _this) const
+	const T& GetValue(SObject* InThis)
 	{
-		return *reinterpret_cast<const T*>(Getter(_this));
+		return *reinterpret_cast<const T*>(Internal_GetValue(InThis));
 	}
 
 	void SetObject(SObject* InThis, SObject* AssignValue) const;
-	SObject* GetObject(SObject* InThis) const;
+	SObject* GetObject(SObject* InThis);
 
+private:
+	void* Internal_GetValue(SObject* InThis);
+
+public:
 	template<class T>
 	consteval static bool __Internal_IsStaticMember();
 	template<class T>
