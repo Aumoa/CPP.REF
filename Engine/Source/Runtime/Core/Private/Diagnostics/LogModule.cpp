@@ -26,7 +26,11 @@ void SLogModule::RunTask()
 	std::filesystem::path Directory = L"Saved/Logs";
 	std::filesystem::path LogPath = std::format(L"{}.log", ModuleName);
 
-	if (std::filesystem::exists(Directory / LogPath))
+	if (!std::filesystem::exists(Directory))
+	{
+		std::filesystem::create_directories(Directory);
+	}
+	else if (std::filesystem::exists(Directory / LogPath))
 	{
 		auto BackupTime = std::chrono::zoned_time(std::chrono::system_clock::now()).get_local_time();
 		std::filesystem::path BackupPath = StringUtils::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");

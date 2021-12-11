@@ -1,6 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include <Windows.h>
+#undef GetObject
+
 #include "Threading/EventHandle.h"
 #include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"

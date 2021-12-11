@@ -1,6 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include <Windows.h>
+#undef GetObject
+
 #include "Threading/Thread.h"
 
 Thread::Thread()

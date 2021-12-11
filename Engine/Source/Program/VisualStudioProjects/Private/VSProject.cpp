@@ -218,6 +218,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 				NewElement(PropertyGroup, "PlatformToolset", "v142");
 				NewElement(PropertyGroup, "WholeProgramOptimization", BoolStr(Config.bWholeProgramOptimization));
 				NewElement(PropertyGroup, "CharacterSet", "Unicode");
+				NewElement(PropertyGroup, "EnableUnitySupport", "true");
 			}
 		}
 

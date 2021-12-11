@@ -7,6 +7,7 @@
 
 #undef interface
 #include <rpc.h>
+#undef GetObject
 #pragma comment(lib, "Rpcrt4.lib")
 
 std::wstring Guid::ToString() const
