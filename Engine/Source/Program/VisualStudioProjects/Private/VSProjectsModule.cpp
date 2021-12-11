@@ -5,6 +5,8 @@
 #include "VSProjectGenerator.h"
 #include "LogVSProjects.h"
 
+GENERATE_BODY(SVSProjectsModule);
+
 int32 SVSProjectsModule::Main(const SCommandLine& CommandArgs)
 {
 	SE_LOG(LogVSProjects, Verbose, L"BuildTool Arguments: {}", StringUtils::Join(L", ", CommandArgs.GetArguments()));

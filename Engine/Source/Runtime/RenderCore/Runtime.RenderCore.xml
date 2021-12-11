@@ -1,10 +1,11 @@
-<ProjectInfo Name="RenderCore" Path="Runtime.RenderCore" Type="Module" >
-	<IncludePaths>
-		<Item RelativePath="Public" Access="Public" />
-		<Item RelativePath="Private" />
-	</IncludePaths>
-	<ReferencedProjects>
-		<Item Name="Core" Access="Public" />
-		<Item Name="PlatformGeneric" Access="Public" />
-	</ReferencedProjects>
+<ProjectInfo Name="RenderCore" Path="Runtime.RenderCore" Type="Module">
+    <Guid>f76bf2ed-08f8-4b9e-996e-f61a7408917c</Guid>
+    <IncludePaths>
+        <Item RelativePath="Public" Access="Public"/>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
+    <ReferencedProjects>
+        <Item Name="Core" Access="Public"/>
+        <Item Name="PlatformGeneric" Access="Public"/>
+    </ReferencedProjects>
 </ProjectInfo>

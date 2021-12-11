@@ -17,8 +17,8 @@ struct ProjectBuildRuntime
 	Guid ProjectGuid;
 	IProject* GeneratedProject = nullptr;
 
-	std::set<ProjectBuildRuntime*> PublicReferences;
-	std::set<ProjectBuildRuntime*> PrivateReferences;
+	std::map<Guid, ProjectBuildRuntime*> PublicReferences;
+	std::map<Guid, ProjectBuildRuntime*> PrivateReferences;
 
 	std::set<std::wstring> PublicIncludePaths;
 	std::set<std::wstring> PrivateIncludePaths;

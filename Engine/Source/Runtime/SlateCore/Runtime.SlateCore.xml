@@ -1,12 +1,13 @@
-<ProjectInfo Name="SlateCore" Path="Runtime.SlateCore" Type="Module" >
-	<IncludePaths>
-		<Item RelativePath="Public" Access="Public" />
-		<Item RelativePath="Private" />
-	</IncludePaths>
-	<ReferencedProjects>
-		<Item Name="Core" Access="Public" />
-		<Item Name="PlatformGeneric" Access="Public" />
-		<Item Name="AssetsIO" Access="Public" />
-		<Item Name="RenderCore" Access="Public" />
-	</ReferencedProjects>
+<ProjectInfo Name="SlateCore" Path="Runtime.SlateCore" Type="Module">
+    <Guid>e2c4c1b0-bac0-4e25-8c64-0c032f474f47</Guid>
+    <IncludePaths>
+        <Item RelativePath="Public" Access="Public"/>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
+    <ReferencedProjects>
+        <Item Name="Core" Access="Public"/>
+        <Item Name="PlatformGeneric" Access="Public"/>
+        <Item Name="AssetsIO" Access="Public"/>
+        <Item Name="RenderCore" Access="Public"/>
+    </ReferencedProjects>
 </ProjectInfo>

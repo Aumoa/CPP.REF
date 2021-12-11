@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <filesystem>
 
 struct ProjectBuildMetadata
 {
@@ -28,6 +29,7 @@ struct ProjectBuildMetadata
 	std::wstring Name;
 	std::wstring Path;
 	EType Type;
+	Guid ProjectGuid;
 
 	std::wstring Command;
 	std::wstring CommandArgs;

@@ -133,7 +133,7 @@ public:
 			}
 		}
 
-		return code.substr(trimStart, trimEnd - trimStart);
+		return std::basic_string<CharT>(code.substr(trimStart, trimEnd - trimStart));
 	}
 
 	/// <summary>

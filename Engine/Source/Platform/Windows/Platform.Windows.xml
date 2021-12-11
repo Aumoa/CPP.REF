@@ -1,20 +1,21 @@
-<ProjectInfo Name="Windows" Path="Platform.Windows" Type="Application" >
-	<IncludePaths>
-		<Item RelativePath="Private" />
-	</IncludePaths>
-	<ReferencedProjects>
-		<Item Name="Core" />
-		<Item Name="PlatformGeneric" />
-        <Item Name="Game" />
-		<Item Name="WindowsCommon" />
-	</ReferencedProjects>
-	<ExternalLinks>
-		<Item Name="User32.lib" />
-		<Item Name="DXGI.lib" />
-		<Item Name="D3D12.lib" />
-		<Item Name="D3d11.lib" />
-		<Item Name="D2D1.lib" />
-		<Item Name="DWrite.lib" />
-		<Item Name="WindowsCodecs.lib" />
-	</ExternalLinks>
+<ProjectInfo Name="Windows" Path="Platform.Windows" Type="Application">
+    <Guid>0bd7f103-db64-4b5c-92f5-903c6b9eaee6</Guid>
+    <IncludePaths>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
+    <ReferencedProjects>
+        <Item Name="Core"/>
+        <Item Name="PlatformGeneric"/>
+        <Item Name="Game"/>
+        <Item Name="WindowsCommon"/>
+    </ReferencedProjects>
+    <ExternalLinks>
+        <Item Name="User32.lib"/>
+        <Item Name="DXGI.lib"/>
+        <Item Name="D3D12.lib"/>
+        <Item Name="D3d11.lib"/>
+        <Item Name="D2D1.lib"/>
+        <Item Name="DWrite.lib"/>
+        <Item Name="WindowsCodecs.lib"/>
+    </ExternalLinks>
 </ProjectInfo>

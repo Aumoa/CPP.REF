@@ -24,6 +24,8 @@ private:
 	std::vector<ProjectBuildMetadata> ProjectMetadatas;
 	std::map<std::wstring, ProjectBuildRuntime> ProjectRuntimes;
 
+	Guid SolutionGuid;
+
 public:
 	SSolution(const SFileReference& SolutionXml);
 
@@ -31,6 +33,8 @@ public:
 	std::wstring GetFirstProjectName();
 	const std::map<std::wstring, ProjectBuildRuntime>& GetProjectRuntimes();
 	ISolution* GenerateProjects(IProjectGenerator* Generator);
+
+	const Guid& GetSolutionGuid();
 
 private:
 	void ReadSolutionXml(const SFileReference& SolutionXml);

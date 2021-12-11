@@ -4,12 +4,16 @@
 #include "VSProjectGenerator.h"
 #include "Solution.h"
 #include "IProject.h"
+#include "GuidHelper.h"
+#include "Misc/CrcHash.h"
+
+GENERATE_BODY(SVSSolution);
 
 SVSSolution::SVSSolution(SVSProjectGenerator* Generator)
 {
 	SSolution* Solution = Generator->Solution;
 
-	std::wofstream Builder(std::format(L"{}.sln", Solution->GetSolutionName()), std::ios::trunc);
+	std::wstringstream Builder;
 
 	constexpr std::wstring_view CppProjectGuid = L"8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
 	constexpr std::wstring_view SolutionDirectoryGuid = L"2150E333-8FDC-42A3-9474-1A3956D46DE8";
@@ -46,7 +50,7 @@ SVSSolution::SVSSolution(SVSProjectGenerator* Generator)
 			if (Status)
 			{
 				It->second.RecursivePath = RecursivePath;
-				It->second.Guid = Guid::NewGuid().ToString();
+				It->second.Guid = GuidHelper::GenerateGuid(RecursivePath).ToString();
 			}
 
 			RecursivePath += L".";
@@ -57,7 +61,7 @@ SVSSolution::SVSSolution(SVSProjectGenerator* Generator)
 
 	for (auto& [Key, Value] : SolutionDirectories)
 	{
-		Builder << std::format(LR"[](Project("{{{0}}}") = "{1}", "{1}", "{{{2}}}")[]", SolutionDirectoryGuid, Key, Value.Guid) << std::endl;
+		Builder << std::format(LR"(Project("{{{0}}}") = "{1}", "{1}", "{{{2}}}")", SolutionDirectoryGuid, Key, Value.Guid) << std::endl;
 		Builder << L"EndProject" << std::endl;
 	}
 
@@ -69,8 +73,8 @@ SVSSolution::SVSSolution(SVSProjectGenerator* Generator)
 	ProjectsSort.reserve(ProjectRuntimes.size());
 	for (auto& [Key, Value] : ProjectRuntimes)
 	{
-		std::wstring ProjectDeclare = std::format(LR"[](Project("{{{0}}}") = "{1}", "{2}", "{{{3}}}
-EndProject")[]", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), Value.ProjectGuid.ToString());
+		std::wstring ProjectDeclare = std::format(LR"(Project("{{{0}}}") = "{1}", "{2}", "{{{3}}}"
+EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), Value.ProjectGuid.ToString());
 
 		auto Where = Key == FirstProjectName ? ProjectsSort.begin() : ProjectsSort.end();
 		ProjectsSort.emplace(Where, ProjectDeclare);
@@ -154,12 +158,20 @@ EndProject")[]", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(
 		// ExtensibilityGlobals
 		Builder << L"\tGlobalSection(ExtensibilityGlobals) = postSolution" << std::endl;
 		{
-			Builder << std::format(L"\t\tSolutionGuid = {{{}}}", Guid::NewGuid().ToString()) << std::endl;
+			Builder << std::format(L"\t\tSolutionGuid = {{{}}}", Solution->GetSolutionGuid().ToString()) << std::endl;
 		}
 		Builder << L"\tEndGlobalSection" << std::endl;
 	}
 	Builder << L"EndGlobal" << std::endl;
 
 	Builder << std::endl;
-	Builder.close();
+
+	std::filesystem::path SolutionFile = std::format(L"{}.sln", Solution->GetSolutionName());
+
+	std::string Previous = StringUtils::Trim(NewObject<SFileReference>(SolutionFile)->ReadAllText());
+	std::string Build = StringUtils::Trim(WCHAR_TO_ANSI(Builder.str()));
+	if (Previous != Build)
+	{
+		NewObject<SFileReference>(SolutionFile)->WriteAllText(Build);
+	}
 }

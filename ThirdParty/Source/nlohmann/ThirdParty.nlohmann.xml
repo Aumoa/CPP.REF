@@ -1,6 +1,7 @@
-<ProjectInfo Name="nlohmann" Path="nlohmann" Type="None" >
-	<IncludePaths>
-		<Item RelativePath="Public" Access="Public" />
-		<Item RelativePath="Private" />
-	</IncludePaths>
+<ProjectInfo Name="nlohmann" Path="nlohmann" Type="None">
+    <Guid>d9fe510e-fc88-4e97-8bc7-81ee03d3e664</Guid>
+    <IncludePaths>
+        <Item RelativePath="Public" Access="Public"/>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
 </ProjectInfo>

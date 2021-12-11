@@ -5,6 +5,7 @@
 #include "ConsoleModule.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "Misc/CommandLine.h"
+#include "Diagnostics/LogModule.h"
 
 int32* GPointer;
 
@@ -28,6 +29,9 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		return -1;
 	}
 
+	GCRoot LogModule = NewObject<SLogModule>(*ModuleName);
+	LogModule->RunTask();
+
 	GCRoot Module = NewObject<SPlatformModule>(*ModuleName);
 	auto Loader = Module->GetFunctionPointer<SConsoleModule* (SObject*)>("LoadConsoleModule");
 	if (!Loader)
@@ -43,5 +47,10 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		return -1;
 	}
 
-	return ConsoleModule->Main(*CommandArgs.Get());
+	int32 ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
+
+	SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
+	LogModule->Shutdown();
+
+	return ReturnCode;
 }

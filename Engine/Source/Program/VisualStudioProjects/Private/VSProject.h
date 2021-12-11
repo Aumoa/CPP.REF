@@ -7,6 +7,12 @@
 
 interface IProjectGenerator;
 
+namespace tinyxml2
+{
+	class XMLDocument;
+	enum XMLError;
+}
+
 class SVSProject : implements SObject, implements IProject
 {
 	GENERATED_BODY(SVSProject)
@@ -23,4 +29,7 @@ public:
 	SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& RuntimeData);
 
 	virtual std::filesystem::path GetPath() override;
+
+private:
+	tinyxml2::XMLError SaveAs(tinyxml2::XMLDocument* Doc, const std::filesystem::path& Path);
 };

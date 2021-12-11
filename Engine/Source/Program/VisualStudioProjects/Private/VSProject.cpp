@@ -3,7 +3,11 @@
 #include "VSProject.h"
 #include "tinyxml2.h"
 #include "LogVSProjects.h"
+#include "GuidHelper.h"
 #include "IO/DirectoryReference.h"
+#include "IO/FileReference.h"
+
+GENERATE_BODY(SVSProject);
 
 std::string SVSProject::GetTypeString(ProjectBuildMetadata::EType Type)
 {
@@ -307,8 +311,9 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 
 		ItemGroup = NewElement(Project, "ItemGroup");
 		{
-			auto ProjectReferenceBody = [&](auto Referenced)
+			auto ProjectReferenceBody = [&](auto It)
 			{
+				auto& [Guid, Referenced] = It;
 				if (Referenced->Metadata->Type != EType::None)
 				{
 					std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
@@ -345,8 +350,9 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	IntermediateProjectPath /= RuntimeData.Metadata->Name;
 	XmlPath = IntermediateProjectPath;
 	XmlPath.replace_extension(L".vcxproj");
-	XMLError Err = Doc.SaveFile(XmlPath.string().c_str());
-	if (Err != XMLError::XML_SUCCESS)
+
+	XMLError Err = SaveAs(&Doc, XmlPath);
+	if (Err != XML_SUCCESS)
 	{
 		SE_LOG(LogVSProjects, Fatal, L"Failed to save project file.");
 		return;
@@ -423,12 +429,12 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			for (auto& Filter : Filters)
 			{
 				XMLElement* InnerItem = NewElementItemInclude(ItemGroup, "Filter", WCHAR_TO_ANSI(Filter));
-				NewElement(InnerItem, "UniqueIdentifier", std::format("{{{}}}", WCHAR_TO_ANSI(Guid::NewGuid().ToString())));
+				NewElement(InnerItem, "UniqueIdentifier", std::format("{{{}}}", WCHAR_TO_ANSI(GuidHelper::GenerateGuid(Filter).ToString())));
 			}
 		}
 	}
 
-	Err = Doc.SaveFile((IntermediateProjectPath.string() + ".vcxproj.filters").c_str());
+	Err = SaveAs(&Doc, IntermediateProjectPath.string() + ".vcxproj.filters");
 	if (Err != XMLError::XML_SUCCESS)
 	{
 		SE_LOG(LogVSProjects, Fatal, L"Failed to save project file.");
@@ -467,7 +473,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 		}
 	}
 
-	Err = Doc.SaveFile((IntermediateProjectPath.string() + ".vcxproj.user").c_str());
+	Err = SaveAs(&Doc, IntermediateProjectPath.string() + ".vcxproj.user");
 	if (Err != XMLError::XML_SUCCESS)
 	{
 		SE_LOG(LogVSProjects, Fatal, L"Failed to save project file.");
@@ -477,4 +483,21 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 std::filesystem::path SVSProject::GetPath()
 {
 	return XmlPath;
+}
+
+tinyxml2::XMLError SVSProject::SaveAs(tinyxml2::XMLDocument* Doc, const std::filesystem::path& Path)
+{
+	using namespace tinyxml2;
+
+	XMLPrinter Print;
+	Doc->Accept(&Print);
+
+	std::string Previous = StringUtils::Trim(NewObject<SFileReference>(Path)->ReadAllText());
+	std::string Build = StringUtils::Trim(std::string_view(Print.CStr()));
+	if (Previous == Build)
+	{
+		return XML_SUCCESS;
+	}
+
+	return Doc->SaveFile(Path.string().c_str());
 }

@@ -6,6 +6,8 @@
 #include "IProjectGenerator.h"
 #include "Misc/TickCalc.h"
 
+GENERATE_BODY(SSolution);
+
 SSolution::SSolution(const SFileReference& SolutionXml) : Super()
 {
 	TickCalc<> LocalTimer;
@@ -54,6 +56,11 @@ ISolution* SSolution::GenerateProjects(IProjectGenerator* Generator)
 	return Generator->GenerateSolution();
 }
 
+const Guid& SSolution::GetSolutionGuid()
+{
+	return SolutionGuid;
+}
+
 void SSolution::ReadSolutionXml(const SFileReference& SolutionXml)
 {
 	using namespace tinyxml2;
@@ -62,6 +69,9 @@ void SSolution::ReadSolutionXml(const SFileReference& SolutionXml)
 
 	XMLDocument Doc;
 	XmlOp(Doc.LoadFile(SolutionXml.GetPath().string().c_str()));
+
+	bool bNeedToSave = false;
+
 	AssignNullCheck(SolutionInfo, Doc.FirstChildElement("SolutionInfo"));
 	{
 		auto InlineName = [this, SolutionInfo](std::wstring& OutName, XMLElement* Elem, const std::wstring& Default)
@@ -75,6 +85,18 @@ void SSolution::ReadSolutionXml(const SFileReference& SolutionXml)
 				OutName = Default;
 			}
 		};
+
+		if (XMLElement* SolutionGuid = SolutionInfo->FirstChildElement("Guid"))
+		{
+			this->SolutionGuid = Guid::FromString(ANSI_TO_WCHAR(SolutionGuid->GetText()));
+		}
+		else
+		{
+			this->SolutionGuid = Guid::NewGuid();
+			SolutionGuid = SolutionInfo->InsertNewChildElement("Guid");
+			SolutionGuid->SetText(WCHAR_TO_ANSI(this->SolutionGuid.ToString()).c_str());
+			bNeedToSave = true;
+		}
 
 		InlineName(SolutionName, SolutionInfo, SolutionXml.GetName().wstring());
 
@@ -107,6 +129,11 @@ void SSolution::ReadSolutionXml(const SFileReference& SolutionXml)
 	SE_LOG(LogSolutionInterface, Verbose, L"EngineRoot: {}", EngineRoot.wstring());
 	SE_LOG(LogSolutionInterface, Verbose, L"ThirdpartyRoot: {}", ThirdpartyRoot.wstring());
 	SE_LOG(LogSolutionInterface, Verbose, L"FirstProject: {}", FirstProject);
+
+	if (bNeedToSave)
+	{
+		Doc.SaveFile(SolutionXml.GetPath().string().c_str());
+	}
 }
 
 void SSolution::SearchProjects(const std::filesystem::path& Directory)
@@ -199,6 +226,7 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 		return false;
 	}
 
+	bool bNeedToSave = false;
 	XMLElement* ProjectInfo = Doc.FirstChildElement("ProjectInfo");
 	if (ProjectInfo)
 	{
@@ -211,6 +239,19 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 		OutBuild.Name = ANSI_TO_WCHAR(Name);
 		OutBuild.Path = ANSI_TO_WCHAR(Path);
 		OutBuild.Type = ParseType(ProjectInfo->Attribute("Type"));
+
+		if (XMLElement* ProjectGuid = ProjectInfo->FirstChildElement("Guid"))
+		{
+			OutBuild.ProjectGuid = Guid::FromString(ANSI_TO_WCHAR(ProjectGuid->GetText()));
+		}
+		else
+		{
+			OutBuild.ProjectGuid = Guid::NewGuid();
+			ProjectGuid = Doc.NewElement("Guid");
+			ProjectGuid->SetText(WCHAR_TO_ANSI(OutBuild.ProjectGuid.ToString()).c_str());
+			ProjectInfo->InsertFirstChild(ProjectGuid);
+			bNeedToSave = true;
+		}
 
 		if (XMLElement* IncludePaths = ProjectInfo->FirstChildElement("IncludePaths"))
 		{
@@ -272,6 +313,11 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 			}
 		}
 
+		if (bNeedToSave)
+		{
+			Doc.SaveFile(WCHAR_TO_ANSI(XmlPath.wstring()).c_str());
+		}
+
 		return true;
 	}
 
@@ -317,7 +363,7 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 				BuildRuntime(ReferencedRuntime);
 			}
 
-			std::set<ProjectBuildRuntime*>* AccessReferences = nullptr;
+			std::map<Guid, ProjectBuildRuntime*>* AccessReferences = nullptr;
 			std::set<std::wstring>* AccessIncludePaths = nullptr;
 			std::set<int32>* AccessDisableWarnings = nullptr;
 			std::set<std::wstring>* AccessExternalLinks = nullptr;
@@ -337,7 +383,7 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 			}
 
 			AccessReferences->insert(ReferencedRuntime->PublicReferences.begin(), ReferencedRuntime->PublicReferences.end());
-			AccessReferences->emplace(ReferencedRuntime);
+			AccessReferences->emplace(ReferencedRuntime->ProjectGuid, ReferencedRuntime);
 			AccessIncludePaths->insert(ReferencedRuntime->PublicIncludePaths.begin(), ReferencedRuntime->PublicIncludePaths.end());
 			AccessDisableWarnings->insert(ReferencedRuntime->PublicDisableWarnings.begin(), ReferencedRuntime->PublicDisableWarnings.end());
 			AccessExternalLinks->insert(ReferencedRuntime->PublicExternalLinks.begin(), ReferencedRuntime->PublicExternalLinks.end());
@@ -376,13 +422,13 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 
 		// PreprocessorDefinitions
 		std::vector<std::wstring> PreprocessorDefinitions;
-		for (auto& Reference : Runtime->PublicReferences)
+		for (auto& [Guid, Reference] : Runtime->PublicReferences)
 		{
 			std::wstring NameUpper = Reference->Metadata->Name;
 			std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
 			PreprocessorDefinitions.emplace_back(NameUpper + L"_API=__declspec(dllimport)");
 		}
-		for (auto& Reference : Runtime->PrivateReferences)
+		for (auto& [Guid, Reference] : Runtime->PrivateReferences)
 		{
 			std::wstring NameUpper = Reference->Metadata->Name;
 			std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
@@ -446,7 +492,7 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 		AdditionalDependencies.emplace_back(L"$(AdditionalDependencies)");
 		Runtime->AdditionalDependencies = StringUtils::Join(L";", AdditionalDependencies);
 
-		Runtime->ProjectGuid = Guid::NewGuid();
+		Runtime->ProjectGuid = Runtime->Metadata->ProjectGuid;
 		Runtime->bBuild = true;
 	}
 }
@@ -461,7 +507,7 @@ void SSolution::GenerateProject(IProjectGenerator* Generator, ProjectBuildRuntim
 
 	SE_LOG(LogSolutionInterface, Verbose, L"Check dependencies for '{}' project.", Runtime->Metadata->Name);
 
-	for (auto& Reference : Runtime->PrivateReferences)
+	for (auto& [Guid, Reference] : Runtime->PrivateReferences)
 	{
 		if (Reference->GeneratedProject == nullptr)
 		{
@@ -469,7 +515,7 @@ void SSolution::GenerateProject(IProjectGenerator* Generator, ProjectBuildRuntim
 		}
 	}
 
-	for (auto& Reference : Runtime->PublicReferences)
+	for (auto& [Guid, Reference] : Runtime->PublicReferences)
 	{
 		if (Reference->GeneratedProject == nullptr)
 		{

@@ -3,15 +3,13 @@
 #include <Windows.h>
 #include <iostream>
 #include <chrono>
+#include <fstream>
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
+#include "Diagnostics/LogModule.h"
 
-LogCategory::LogCategory(std::wstring_view categoryName)
-	: _name(categoryName)
-{
-}
-
-LogCategory::~LogCategory()
+LogCategory::LogCategory(std::wstring_view CategoryName)
+	: CategoryName(CategoryName)
 {
 }
 
@@ -30,40 +28,34 @@ std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 	}
 }
 
-void LogCategory::OnLog(ELogVerbosity logVerbosity, std::wstring_view message)
+void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 {
 	using namespace std;
 	using namespace std::chrono;
 
-	//if (!_file.has_value())
-	//{
-	//	_file.emplace(format(L"Saved\\Logs\\{}_{:%F}.log", L"Logs", zoned_time(system_clock::now())));
-	//}
-
-	//wfstream& stream = _file.value().OpenSharedStream(this, ios::app, true);
-	wstring Composed = format(L"{}: {}: {}\n", _name, VerbosityToString(logVerbosity), message);
+	wstring Composed = format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
 	wstring TimeComposed = format(L"{}: {}", zoned_time(system_clock::now()).get_local_time(), Composed);
-	//if (stream.is_open())
-	//{
-	//	// Log to file.
-	//	stream << TimeComposed;
-	//	stream.flush();
-	//}
 
 	// Log to Visual Studio Output Console.
 	OutputDebugStringW(TimeComposed.c_str());
+	OutputDebugStringW(L"\n");
 
 	// Log to console if it is available.
-	switch (logVerbosity)
+	switch (Verbosity)
 	{
 	case ELogVerbosity::Verbose:
 	case ELogVerbosity::Warning:
 	case ELogVerbosity::Info:
-		std::wcout << Composed;
+		wcout << Composed << endl;
 		break;
 	case ELogVerbosity::Error:
 	case ELogVerbosity::Fatal:
-		std::wcerr << Composed;
+		wcerr << Composed << endl;
 		break;
+	}
+
+	if (SLogModule* Module = SLogModule::Get(); Module && Module->IsRunning())
+	{
+		Module->EnqueueLogMessage(TimeComposed);
 	}
 }

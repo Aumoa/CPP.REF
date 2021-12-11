@@ -4,6 +4,8 @@
 #include "VSProject.h"
 #include "VSSolution.h"
 
+GENERATE_BODY(SVSProjectGenerator);
+
 SVSProjectGenerator::SVSProjectGenerator(SSolution* Solution)
 	: Super()
 	, Solution(Solution)
