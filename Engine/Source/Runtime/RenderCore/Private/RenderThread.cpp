@@ -42,7 +42,7 @@ void RenderThread::ThreadInfo::Init()
 
 void RenderThread::ThreadInfo::Init_RenderThread()
 {
-	SThread* CurrentThread = SThread::GetCurrentThread();
+	::Thread* CurrentThread = ::Thread::GetCurrentThread();
 	ThreadId = CurrentThread->GetThreadId();
 	CurrentThread->SetFriendlyName(L"[Render Thread]");
 }

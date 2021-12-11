@@ -66,7 +66,7 @@ public:
 
 	static bool IsInRenderThread()
 	{
-		static int64 Id = SThread::GetCurrentThread()->GetThreadId();
+		static int64 Id = Thread::GetCurrentThread()->GetThreadId();
 		return Id == _Thread.ThreadId;
 	}
 

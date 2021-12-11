@@ -18,7 +18,9 @@ class PLATFORMGENERIC_API SMaterial : public SMaterialInterface
 
 private:
 	EBaseShaderCode BaseShaderCode;
+	SPROPERTY(Device)
 	IRHIDevice* Device = nullptr;
+	SPROPERTY(ShaderCode)
 	IRHIShader* ShaderCode = nullptr;
 
 public:

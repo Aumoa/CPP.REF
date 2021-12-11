@@ -26,7 +26,7 @@ IRHIBitmap* SColorRenderTarget::GetRenderBitmap()
 
 void SColorRenderTarget::SetViewportSize(const Vector2N& InViewportSize)
 {
-	if (RenderTarget && RenderTarget->GetOuter() == this)
+	if (RenderTarget)
 	{
 		DestroyObject(RenderTarget);
 		RenderTarget = nullptr;

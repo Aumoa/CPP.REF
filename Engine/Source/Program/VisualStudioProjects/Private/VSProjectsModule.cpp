@@ -7,7 +7,7 @@
 
 GENERATE_BODY(SVSProjectsModule);
 
-int32 SVSProjectsModule::Main(const SCommandLine& CommandArgs)
+int32 SVSProjectsModule::Run(const SCommandLine& CommandArgs)
 {
 	SE_LOG(LogVSProjects, Verbose, L"BuildTool Arguments: {}", StringUtils::Join(L", ", CommandArgs.GetArguments()));
 

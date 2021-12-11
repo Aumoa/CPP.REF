@@ -10,5 +10,5 @@ class SVSProjectsModule : public SConsoleModule
 	GENERATED_BODY(SVSProjectsModule)
 
 public:
-	virtual int32 Main(const SCommandLine& CommandArgs) override;
+	virtual int32 Run(const SCommandLine& CommandArgs) override;
 };

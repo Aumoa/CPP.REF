@@ -37,8 +37,8 @@ private:
 extern "C"													\
 {															\
 	__declspec(dllexport)									\
-	SConsoleModule* LoadConsoleModule(SObject* Outer)		\
+	SConsoleModule* LoadConsoleModule()						\
 	{														\
-		return Outer->NewObject<ConsoleModuleClass>();		\
+		return SObject::NewObject<ConsoleModuleClass>();	\
 	}														\
 }

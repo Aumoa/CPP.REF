@@ -116,7 +116,7 @@ Type* Class::StaticRegisterClass = Class::StaticClass();
 		static Property::PropertyGenerator Generator =										\
 		{																					\
 			.Name = L ## #PropertyName,														\
-			.MemberType = Type::GetStaticClass<												\
+			.DeferredMemberType = Type::GetDeferredStaticClass<								\
 			std::remove_const_t<std::remove_pointer_t<decltype(This::PropertyName)>>>(),	\
 			.Setter = +[](SObject* _this, const void* _value)								\
 	{ dynamic_cast<This*>(_this)->PropertyName = *reinterpret_cast<const PT*>(_value); },	\

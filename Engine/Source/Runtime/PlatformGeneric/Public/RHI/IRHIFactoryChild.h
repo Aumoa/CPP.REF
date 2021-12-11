@@ -6,7 +6,7 @@
 
 interface IRHIFactory;
 
-interface IRHIFactoryChild : implements SObject
+interface IRHIFactoryChild : implements SObject, implements IDisposable
 {
 	virtual IRHIFactory* GetFactory() = 0;
 };

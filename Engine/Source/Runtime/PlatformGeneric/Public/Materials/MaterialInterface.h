@@ -21,6 +21,7 @@ protected:
 	using ShaderVars = std::variant<float, Vector4, std::vector<uint8>, IRHITexture2D*>;
 
 private:
+	SPROPERTY(Device)
 	IRHIDevice* Device = nullptr;
 	std::vector<ShaderVars> ShaderValues;
 
@@ -28,6 +29,7 @@ private:
 	uint8 bShaderResourceViewsCached : 1 = false;
 
 	std::vector<int32> ShaderMappingIndex;
+	SPROPERTY(SRV)
 	IRHIShaderResourceView* SRV = nullptr;
 
 public:

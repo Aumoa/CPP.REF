@@ -33,14 +33,14 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	LogModule->RunTask();
 
 	GCRoot Module = NewObject<SPlatformModule>(*ModuleName);
-	auto Loader = Module->GetFunctionPointer<SConsoleModule* (SObject*)>("LoadConsoleModule");
+	auto Loader = Module->GetFunctionPointer<SConsoleModule*()>("LoadConsoleModule");
 	if (!Loader)
 	{
 		SE_LOG(LogWindowsConsole, Fatal, L"Cannot found 'LoadConsoleModule' function from Module: {}.", *ModuleName);
 		return -1;
 	}
 
-	GCRoot ConsoleModule = Loader(Module.Get());
+	GCRoot ConsoleModule = Loader();
 	if (!ConsoleModule.IsValid())
 	{
 		SE_LOG(LogWindowsConsole, Fatal, L"LoadConsoleModule function return nullptr.");

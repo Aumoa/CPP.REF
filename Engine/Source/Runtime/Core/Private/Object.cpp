@@ -37,6 +37,11 @@ std::wstring SObject::GetName()
 	return Name;
 }
 
+SObject* SObject::GetOuter()
+{
+	return Outer;
+}
+
 void SObject::PostConstruction()
 {
 	Name = GetType()->GenerateUniqueName();
@@ -57,44 +62,6 @@ void* SObject::operator new(size_t AllocSize)
 void SObject::operator delete(void* MemBlock)
 {
 	::operator delete(MemBlock);
-}
-
-auto SObject::GC() -> GarbageCollector&
-{
-	static thread_local GarbageCollector GC;
-	return GC;
-}
-
-void SObject::MarkAndSweep(uint64 Generation)
-{
-	if (this->Generation == Generation)
-	{
-		return;
-	}
-
-	this->Generation = Generation;
-	for (auto& GCProp : GetType()->GetGCProperties())
-	{
-		Type* PropertyType = GCProp->GetMemberType();
-		if (PropertyType->IsGCCollection())
-		{
-			for (auto& CollectionMember : PropertyType->GetCollectionObjects(this, GCProp))
-			{
-				if (CollectionMember)
-				{
-					CollectionMember->MarkAndSweep(Generation);
-				}
-			}
-		}
-		else
-		{
-			SObject* Member = GCProp->GetObject(this);
-			if (Member)
-			{
-				Member->MarkAndSweep(Generation);
-			}
-		}
-	}
 }
 
 SObject::GarbageCollector::GarbageCollector()
@@ -170,4 +137,49 @@ size_t SObject::GarbageCollector::NumThreadObjects()
 void SObject::GarbageCollector::SuppressFinalize(SObject* Object)
 {
 	Collection.erase(Object);
+}
+
+void SObject::GarbageCollector::Consume(GarbageCollector& AnotherThreadGC)
+{
+	AnotherThreadGC.Collect();
+	Collection.insert(AnotherThreadGC.Collection.begin(), AnotherThreadGC.Collection.end());
+	Roots.insert(AnotherThreadGC.Roots.begin(), AnotherThreadGC.Roots.end());
+}
+
+auto SObject::GC() -> GarbageCollector&
+{
+	static thread_local GarbageCollector GC;
+	return GC;
+}
+
+void SObject::MarkAndSweep(uint64 Generation)
+{
+	if (this->Generation == Generation)
+	{
+		return;
+	}
+
+	this->Generation = Generation;
+	for (auto& GCProp : GetType()->GetGCProperties())
+	{
+		Type* PropertyType = GCProp->GetMemberType();
+		if (PropertyType->IsGCCollection())
+		{
+			for (auto& CollectionMember : PropertyType->GetCollectionObjects(this, GCProp))
+			{
+				if (CollectionMember)
+				{
+					CollectionMember->MarkAndSweep(Generation);
+				}
+			}
+		}
+		else
+		{
+			SObject* Member = GCProp->GetObject(this);
+			if (Member)
+			{
+				Member->MarkAndSweep(Generation);
+			}
+		}
+	}
 }

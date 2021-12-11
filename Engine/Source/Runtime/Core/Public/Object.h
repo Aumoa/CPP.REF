@@ -44,6 +44,9 @@ private:
 	uint64 Generation;
 	std::shared_ptr<bool> WeakReferences;
 
+	SPROPERTY(Outer)
+	SObject* Outer = nullptr;
+
 public:
 	SObject();
 	virtual ~SObject() noexcept;
@@ -57,6 +60,7 @@ public:
 
 	void SetName(std::wstring_view InNewName);
 	std::wstring GetName();
+	SObject* GetOuter();
 
 protected:
 	virtual void PostConstruction();
@@ -66,6 +70,15 @@ public:
 	static T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
 		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
+		Ptr->PostConstruction();
+		return Ptr;
+	}
+
+	template<class T, class... TArgs>
+	T* NewSubobject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
+	{
+		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
+		Ptr->Outer = this;
 		Ptr->PostConstruction();
 		return Ptr;
 	}
@@ -121,6 +134,8 @@ public:
 		void Collect(bool bLog = false);
 		size_t NumThreadObjects();
 		void SuppressFinalize(SObject* Object);
+
+		void Consume(GarbageCollector& AnotherThreadGC);
 	};
 
 	static GarbageCollector& GC();

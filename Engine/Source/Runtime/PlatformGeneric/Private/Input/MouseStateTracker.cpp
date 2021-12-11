@@ -2,6 +2,8 @@
 
 #include "Input/MouseStateTracker.h"
 
+GENERATE_BODY(SMouseStateTracker);
+
 SMouseStateTracker::SMouseStateTracker() : Super()
 {
 }

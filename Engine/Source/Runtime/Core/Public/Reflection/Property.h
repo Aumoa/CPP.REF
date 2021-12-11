@@ -10,19 +10,19 @@ class SObject;
 
 class CORE_API Property
 {
-	std::wstring _name;
-	Type* _memberType = nullptr;
-	void (*_setter)(SObject*, const void*);
-	const void* (*_getter)(const SObject*);
-	uint8 _bIsPointer : 1;
-	uint8 _bIsConst : 1;
-	uint8 _bIsStatic : 1;
+	std::wstring FriendlyName;
+	Type** DeferredMemberType = nullptr;
+	void (*Setter)(SObject*, const void*);
+	const void* (*Getter)(const SObject*);
+	uint8 bIsPointer : 1;
+	uint8 bIsConst : 1;
+	uint8 bIsStatic : 1;
 
 public:
 	struct PropertyGenerator
 	{
 		std::wstring_view Name;
-		Type* MemberType = nullptr;
+		Type** DeferredMemberType = nullptr;
 		void (*Setter)(SObject*, const void*);
 		const void* (*Getter)(const SObject*);
 		uint8 bIsPointer : 1;
@@ -31,33 +31,33 @@ public:
 	};
 
 public:
-	Property(const PropertyGenerator* generator)
-		: _name(generator->Name)
-		, _memberType(generator->MemberType)
-		, _setter(generator->Setter)
-		, _getter(generator->Getter)
-		, _bIsPointer(generator->bIsPointer)
-		, _bIsConst(generator->bIsConst)
-		, _bIsStatic(generator->bIsStatic)
+	Property(const PropertyGenerator* Generator)
+		: FriendlyName(Generator->Name)
+		, DeferredMemberType(Generator->DeferredMemberType)
+		, Setter(Generator->Setter)
+		, Getter(Generator->Getter)
+		, bIsPointer(Generator->bIsPointer)
+		, bIsConst(Generator->bIsConst)
+		, bIsStatic(Generator->bIsStatic)
 	{
 	}
 
-	inline const std::wstring& GetFriendlyName() const { return _name; }
-	inline Type* GetMemberType() const { return _memberType; }
-	inline bool IsPointer() const { return _bIsPointer; }
-	inline bool IsConst() const { return _bIsConst; }
-	inline bool IsStatic() const { return _bIsStatic; }
+	inline const std::wstring& GetFriendlyName() const { return FriendlyName; }
+	inline bool IsPointer() const { return bIsPointer; }
+	inline bool IsConst() const { return bIsConst; }
+	inline bool IsStatic() const { return bIsStatic; }
+	inline Type* GetMemberType() const { return *DeferredMemberType; }
 
 	template<class T>
 	void SetValue(SObject* _this, const T& _value) const
 	{
-		_setter(_this, &_value);
+		Setter(_this, &_value);
 	}
 
 	template<class T>
 	const T& GetValue(SObject* _this) const
 	{
-		return *reinterpret_cast<const T*>(_getter(_this));
+		return *reinterpret_cast<const T*>(Getter(_this));
 	}
 
 	void SetObject(SObject* InThis, SObject* AssignValue) const;

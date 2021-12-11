@@ -14,7 +14,7 @@ interface IRHIFontCollection;
 interface IRHITextLayout;
 interface IRHITextFormat;
 
-interface IRHIFactory : implements SObject
+interface IRHIFactory : implements SObject, implements IRHIFactory
 {
 	virtual IApplicationInterface* GetApplication() = 0;
 	virtual IRHIAdapter* GetAdapter(int32 index) = 0;

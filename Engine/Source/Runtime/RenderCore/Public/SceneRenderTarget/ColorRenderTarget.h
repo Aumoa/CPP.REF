@@ -13,8 +13,11 @@ class RENDERCORE_API SColorRenderTarget : public SSceneRenderTargetInterface
 	GENERATED_BODY(SColorRenderTarget)
 
 private:
+	SPROPERTY(Device)
 	IRHIDevice* Device = nullptr;
+	SPROPERTY(RenderTarget)
 	IRHITexture2D* RenderTarget = nullptr;
+	SPROPERTY(RenderBitmap)
 	IRHIBitmap* RenderBitmap = nullptr;
 
 public:

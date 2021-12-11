@@ -5,10 +5,10 @@
 
 void Property::SetObject(SObject* InThis, SObject* AssignValue) const
 {
-	SetValue(InThis, reinterpret_cast<int64>(_memberType->FromObject(AssignValue)));
+	SetValue(InThis, reinterpret_cast<int64>(GetMemberType()->FromObject(AssignValue)));
 }
 
 SObject* Property::GetObject(SObject* InThis) const
 {
-	return _memberType->ToObject(reinterpret_cast<void*>(GetValue<intptr_t>(InThis)));
+	return GetMemberType()->ToObject(reinterpret_cast<void*>(GetValue<intptr_t>(InThis)));
 }

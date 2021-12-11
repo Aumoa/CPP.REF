@@ -248,6 +248,29 @@ public:
 		return nullptr;
 	}
 
+	template<class T> requires requires { T::StaticClass(); }
+	static auto GetDeferredStaticClass()
+	{
+		return &T::StaticRegisterClass;
+	}
+
+	template<class T> requires
+		std::is_pointer_v<T> &&
+		requires { std::remove_pointer_t<T>::StaticClass(); }
+	static auto GetDeferredStaticClass()
+	{
+		return &std::remove_pointer_t<T>::StaticRegisterClass;
+	}
+
+	template<class T> requires
+		(!requires { T::StaticClass(); }) &&
+		(!requires { std::remove_pointer_t<T>::StaticClass(); })
+	static auto GetDeferredStaticClass()
+	{
+		static Type* DeferredClass = GetStaticClass<T>();
+		return &DeferredClass;
+	}
+
 	static Type* FindStaticClass(std::wstring_view InFriendlyName);
 	static std::span<Type*> FindAllSubclass(Type* BaseClass);
 	template<class T>

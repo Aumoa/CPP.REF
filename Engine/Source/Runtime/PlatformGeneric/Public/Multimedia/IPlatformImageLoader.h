@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "RHI/RHIEnums.h"
+#include <filesystem>
 
 interface IPlatformImage;
 
-interface IPlatformImageLoader : implements SObject
+interface IPlatformImageLoader : implements SObject, implements IDisposable
 {
 	virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) = 0;
 	virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) = 0;

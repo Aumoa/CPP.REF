@@ -2,7 +2,9 @@
 
 #include "Materials/MaterialInterface.h"
 #include "RHI/IRHIDevice.h"
+#include "RHI/IRHIShaderResourceView.h"
 
+GENERATE_BODY(SMaterialInterface);
 DEFINE_LOG_CATEGORY(LogMaterials);
 
 SMaterialInterface::SMaterialInterface(IRHIDevice* InDevice) : Super()
