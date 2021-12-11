@@ -7,6 +7,7 @@
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogModule.h"
+#include "Threading/Thread.h"
 
 LogCategory::LogCategory(std::wstring_view CategoryName)
 	: CategoryName(CategoryName)
@@ -34,14 +35,14 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	using namespace std::chrono;
 
 	wstring Composed = format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring TimeComposed = format(L"{}: {}", zoned_time(system_clock::now()).get_local_time(), Composed);
+	wstring DetailComposed = format(L"{}: {}: {}", zoned_time(system_clock::now()).get_local_time(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
 
 	// Log to Visual Studio Output Console.
-	OutputDebugStringW(TimeComposed.c_str());
+	OutputDebugStringW(DetailComposed.c_str());
 	OutputDebugStringW(L"\n");
 
 	if (SLogModule* Module = SLogModule::Get(); Module && Module->IsRunning())
 	{
-		Module->EnqueueLogMessage(TimeComposed);
+		Module->EnqueueLogMessage(DetailComposed);
 	}
 }

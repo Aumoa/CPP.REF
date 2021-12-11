@@ -20,6 +20,7 @@ class CORE_API GarbageCollector
 	std::set<SObject*> Roots;
 	uint64 Generation = 0;
 
+	std::set<SObject*> PendingFinalize;
 	std::list<SObject*> PendingKill;
 
 private:

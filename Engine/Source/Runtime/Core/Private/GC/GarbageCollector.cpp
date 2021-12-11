@@ -108,6 +108,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 	}
 
 	Garbages.clear();
+	PendingFinalize.clear();
 }
 
 size_t GarbageCollector::NumThreadObjects()
@@ -117,12 +118,13 @@ size_t GarbageCollector::NumThreadObjects()
 
 void GarbageCollector::SuppressFinalize(SObject* Object)
 {
-	Collection.erase(Object);
+	PendingFinalize.emplace(Object);
 }
 
 void GarbageCollector::Consume(GarbageCollector& AnotherThreadGC)
 {
-	AnotherThreadGC.Collect();
+	AnotherThreadGC.Collect(true);
+
 	Collection.insert(AnotherThreadGC.Collection.begin(), AnotherThreadGC.Collection.end());
 	Roots.insert(AnotherThreadGC.Roots.begin(), AnotherThreadGC.Roots.end());
 }
@@ -161,11 +163,23 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 				{
 					auto CollectionMember = PropertyType->GetCollectionObjects(Object, GCProp);
 					ReferencedObjects.insert(ReferencedObjects.end(), CollectionMember.begin(), CollectionMember.end());
+
+					// Member object of collection cannot be changed to nullptr from disposed object.
 				}
 				else
 				{
 					SObject* Member = GCProp->GetObject(Object);
-					ReferencedObjects.emplace_back(Member);
+
+					// If object is disposed,
+					if (PendingFinalize.contains(Member))
+					{
+						// Change property to nullptr.
+						GCProp->SetObject(Object, nullptr);
+					}
+					else
+					{
+						ReferencedObjects.emplace_back(Member);
+					}
 				}
 			}
 		}

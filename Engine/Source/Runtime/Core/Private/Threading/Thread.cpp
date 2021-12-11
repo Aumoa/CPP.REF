@@ -4,11 +4,25 @@
 #undef GetObject
 
 #include "Threading/Thread.h"
+#include "Misc/StringUtils.h"
 
 Thread::Thread()
 {
 	_handle = ::GetCurrentThread();
 	_threadId = ::GetThreadId(_handle);
+
+	PWSTR pwThreadDesc = nullptr;
+	::GetThreadDescription(_handle, &pwThreadDesc);
+
+	if (pwThreadDesc)
+	{
+		_friendlyName = pwThreadDesc;
+	}
+	
+	if (StringUtils::Trim(_friendlyName).empty())
+	{
+		_friendlyName = std::to_wstring(_threadId);
+	}
 }
 
 void Thread::SetFriendlyName(std::wstring_view friendlyName)

@@ -93,6 +93,7 @@ void SLogModule::Worker()
 			LogFile << WCHAR_TO_ANSI(MessageQueue[i]) << std::endl;;
 		}
 
+		Seekpos = Readp;
 		LogFile.flush();
 	}
 }
