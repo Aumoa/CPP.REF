@@ -17,9 +17,9 @@ SSolution::SSolution(const SFileReference& SolutionXml) : Super()
 	SE_LOG(LogSolutionInterface, Verbose, L"Finish to reading SolutionXml. ({} seconds)", LocalTimer.DoCalc().count());
 
 	SE_LOG(LogSolutionInterface, Verbose, L"Search all projects.", LocalTimer.DoCalc());
-	SearchProjects(ThirdpartyRoot);
-	SearchProjects(EngineRoot);
-	SearchProjects(GameRoot);
+	SearchProjects(ThirdpartyRoot, true);
+	SearchProjects(EngineRoot, true);
+	SearchProjects(GameRoot, false);
 	SE_LOG(LogSolutionInterface, Verbose, L"Finish to search projects. {} projects found. ({} seconds)", ProjectMetadatas.size(), LocalTimer.DoCalc().count());
 
 	SE_LOG(LogSolutionInterface, Verbose, L"Generate project runtime data.", LocalTimer.DoCalc());
@@ -136,7 +136,7 @@ void SSolution::ReadSolutionXml(const SFileReference& SolutionXml)
 	}
 }
 
-void SSolution::SearchProjects(const std::filesystem::path& Directory)
+void SSolution::SearchProjects(const std::filesystem::path& Directory, bool bIsEngine)
 {
 	if (!std::filesystem::exists(Directory))
 	{
@@ -163,6 +163,7 @@ void SSolution::SearchProjects(const std::filesystem::path& Directory)
 					SE_LOG(LogSolutionInterface, Verbose, L"Succeeded to load project metadata. XmlPath: {}", XmlPath.wstring());
 					Build.AbsoluteDirectory = std::filesystem::absolute(Directory);
 					Build.BaseDirectory = Directory.stem().wstring();
+					Build.bEngine = bIsEngine;
 					ProjectMetadatas.emplace_back(std::move(Build));
 				}
 				else

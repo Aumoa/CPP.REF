@@ -38,7 +38,7 @@ public:
 
 private:
 	void ReadSolutionXml(const SFileReference& SolutionXml);
-	void SearchProjects(const std::filesystem::path& Directory);
+	void SearchProjects(const std::filesystem::path& Directory, bool bIsEngine);
 	bool TryParseProject(const std::filesystem::path& XmlPath, ProjectBuildMetadata& OutBuild);
 	void GenerateProjectsRuntimeData();
 	void BuildRuntime(ProjectBuildRuntime* Runtime);

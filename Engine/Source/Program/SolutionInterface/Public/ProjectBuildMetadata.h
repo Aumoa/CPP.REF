@@ -30,6 +30,7 @@ struct ProjectBuildMetadata
 	std::wstring Path;
 	EType Type;
 	Guid ProjectGuid;
+	bool bEngine = false;
 
 	std::wstring Command;
 	std::wstring CommandArgs;

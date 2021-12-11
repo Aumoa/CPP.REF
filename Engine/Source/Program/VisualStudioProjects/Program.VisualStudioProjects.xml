@@ -8,5 +8,6 @@
         <Item Name="Console"/>
         <Item Name="tinyxml2"/>
         <Item Name="SolutionInterface"/>
+		<Item Name="WindowsConsole"/>
     </ReferencedProjects>
 </ProjectInfo>

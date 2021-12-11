@@ -88,15 +88,22 @@ EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), 
 	struct BuildConfiguration
 	{
 		std::wstring Name;
+		std::wstring EngineRedirect;
 	};
 
 	BuildConfiguration Configurations[] =
 	{
 		{
-			.Name = L"Debug"
+			.Name = L"Debug",
+			.EngineRedirect = L"Debug",
 		},
 		{
-			.Name = L"Release"
+			.Name = L"DebugGame",
+			.EngineRedirect = L"Release",
+		},
+		{
+			.Name = L"Release",
+			.EngineRedirect = L"Release",
 		}
 	};
 
@@ -119,8 +126,19 @@ EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), 
 			{
 				for (auto& Config : Configurations)
 				{
-					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.ActiveCfg = {1}|x64", Project.ProjectGuid.ToString(), Config.Name) << std::endl;
-					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.Build.0 = {1}|x64", Project.ProjectGuid.ToString(), Config.Name) << std::endl;
+					std::wstring RedirectName;
+
+					if (Project.Metadata->bEngine)
+					{
+						RedirectName = Config.EngineRedirect;
+					}
+					else
+					{
+						RedirectName = Config.Name;
+					}
+
+					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.ActiveCfg = {2}|x64", Project.ProjectGuid.ToString(), Config.Name, RedirectName) << std::endl;
+					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.Build.0 = {2}|x64", Project.ProjectGuid.ToString(), Config.Name, RedirectName) << std::endl;
 				}
 			}
 		}

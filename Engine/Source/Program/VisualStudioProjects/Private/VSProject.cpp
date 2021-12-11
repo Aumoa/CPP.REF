@@ -136,6 +136,8 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	{
 		std::string Name;
 		std::string Configuration;
+		std::string Optimization;
+		std::string BasicRuntimeChecks;
 		uint8 bUseDebugLibrary : 1;
 		uint8 bWholeProgramOptimization : 1;
 		uint8 bLinkIncremental : 1;
@@ -153,7 +155,22 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 		{
 			.Name = "Debug",
 			.Configuration = "Debug",
+			.Optimization = "Disabled",
+			.BasicRuntimeChecks = "EnableFastChecks",
 			.bUseDebugLibrary = true,
+			.bWholeProgramOptimization = false,
+			.bLinkIncremental = true,
+			.bFunctionLevelLinking = true,
+			.bIntrinsicFunctions = false,
+			.bEnableCOMDATFolding = false,
+			.bOptimizeReferences = false,
+		},
+		{
+			.Name = "DebugGame",
+			.Configuration = "DebugGame",
+			.Optimization = "Disabled",
+			.BasicRuntimeChecks = "EnableFastChecks",
+			.bUseDebugLibrary = false,
 			.bWholeProgramOptimization = false,
 			.bLinkIncremental = true,
 			.bFunctionLevelLinking = true,
@@ -164,6 +181,8 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 		{
 			.Name = "Release",
 			.Configuration = "Release",
+			.Optimization = "MaxSpeed",
+			.BasicRuntimeChecks = "Default",
 			.bUseDebugLibrary = false,
 			.bWholeProgramOptimization = true,
 			.bLinkIncremental = false,
@@ -240,7 +259,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			XMLElement* PropertyGroup = NewElementPropertyGroup(Project, Config.Condition);
 			{
 				NewElement(PropertyGroup, "LinkIncremental", BoolStr(Config.bLinkIncremental));
-				NewElement(PropertyGroup, "OutDir", "$(SolutionDir)Build\\$(Configuration)\\");
+				NewElement(PropertyGroup, "OutDir", "$(SolutionDir)Build\\");
 				NewElement(PropertyGroup, "IntDir", "$(SolutionDir)Intermediate\\$(Configuration)\\$(ProjectName)\\");
 			}
 		}
@@ -262,6 +281,8 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 					NewElement(ClCompile, "PreprocessorDefinitions", WCHAR_TO_ANSI(RuntimeData.PreprocessorDefinitions));
 					NewElement(ClCompile, "UseStandardPreprocessor", "true");
 					NewElement(ClCompile, "DisableSpecificWarnings", WCHAR_TO_ANSI(RuntimeData.DisableSpecificWarnings));
+					NewElement(ClCompile, "Optimization", Config.Optimization);
+					NewElement(ClCompile, "BasicRuntimeChecks", Config.BasicRuntimeChecks);
 				}
 
 				XMLElement* Link = NewElement(ItemDefinitionGroup, "Link");
