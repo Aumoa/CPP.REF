@@ -7,56 +7,107 @@
 template<class T>
 class WeakObjectPtr
 {
+	struct WeakReferencePtr
+	{
+		int32 bValid : 1 = true;
+		int32 WeakReferences : 31 = 0;
+	};
+
 	T* Ptr = nullptr;
-	std::shared_ptr<bool> WeakReferences;
+	WeakReferencePtr* WeakReferences = nullptr;
 
 public:
-	WeakObjectPtr()
+	inline WeakObjectPtr()
 	{
 	}
 
-	WeakObjectPtr(WeakObjectPtr&& InMove)
+	inline WeakObjectPtr(WeakObjectPtr&& InMove)
 		: Ptr(InMove.Ptr)
 		, WeakReferences(std::move(InMove.WeakReferences))
 	{
 		InMove.Ptr = nullptr;
+		InMove.WeakReferences = nullptr;
 	}
 
-	WeakObjectPtr(const WeakObjectPtr& InCopy)
+	inline WeakObjectPtr(const WeakObjectPtr& InCopy)
 		: Ptr(InCopy.Ptr)
 		, WeakReferences(InCopy.WeakReferences)
 	{
+		AddWeakRef();
 	}
 
-	WeakObjectPtr(T* InObject) : Ptr(InObject)
+	inline WeakObjectPtr(T* InObject) : Ptr(InObject)
 	{
 		if (Ptr)
 		{
-			WeakReferences = Ptr->WeakReferences;
+			WeakReferences = reinterpret_cast<WeakReferencePtr*>(Ptr->WeakReferences);
+			AddWeakRef();
 		}
 	}
 
-	bool IsValid()
+	inline ~WeakObjectPtr()
+	{
+		ReleaseWeakRef();
+	}
+
+	inline bool IsValid() const
+	{
+		return WeakReferences && WeakReferences->bValid;
+	}
+
+	inline T* Get() const
+	{
+		return IsValid() ? Ptr : nullptr;
+	}
+
+	inline void Reset(T* NewPtr)
+	{
+		ReleaseWeakRef();
+
+		Ptr = NewPtr;
+		WeakReferences = NewPtr ? reinterpret_cast<WeakReferencePtr*>(NewPtr->WeakReferences) : nullptr;
+
+		AddWeakRef();
+	}
+
+	inline WeakObjectPtr& operator =(const WeakObjectPtr& Ptr)
+	{
+		ReleaseWeakRef();
+
+		this->Ptr = Ptr.Ptr;
+		this->WeakReferences = Ptr.WeakReferences;
+
+		AddWeakRef();
+		return *this;
+	}
+
+	inline WeakObjectPtr& operator =(WeakObjectPtr&& Ptr)
+	{
+		ReleaseWeakRef();
+
+		this->Ptr = Ptr.Ptr;
+		this->WeakReferences = Ptr.WeakReferences;
+
+		Ptr.Ptr = nullptr;
+		Ptr.WeakReferences = nullptr;
+		return *this;
+	}
+
+private:
+	inline void AddWeakRef()
+	{
+		WeakReferences && ++WeakReferences->WeakReferences;
+	}
+
+	inline void ReleaseWeakRef()
 	{
 		if (WeakReferences)
 		{
-			return *WeakReferences;
+			if (--WeakReferences->WeakReferences == 0)
+			{
+				delete WeakReferences;
+				WeakReferences = nullptr;
+			}
 		}
-		else
-		{
-			return false;
-		}
-	}
-
-	T* Get()
-	{
-		check(IsValid());
-		return Ptr;
-	}
-
-	void Reset(T* NewPtr)
-	{
-		Ptr = NewPtr;
-		WeakReferences = NewPtr ? NewPtr->WeakReferences : nullptr;
 	}
 };

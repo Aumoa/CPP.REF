@@ -37,12 +37,15 @@ class CORE_API SObject : public SObject_Details::SObjectBase
 	friend class GarbageCollector;
 
 private:
-	std::wstring Name;
-	uint64 Generation;
-	std::shared_ptr<bool> WeakReferences;
+	struct WeakReferencePtr
+	{
+		int32 bValid : 1 = true;
+		int32 WeakReferences : 31 = 0;
+	};
 
-	SPROPERTY(Outer)
-	SObject* Outer = nullptr;
+private:
+	uint64 Generation = 0;
+	WeakReferencePtr* WeakReferences = nullptr;
 
 public:
 	SObject();
@@ -55,10 +58,6 @@ private:
 public:
 	virtual std::wstring ToString();
 
-	void SetName(std::wstring_view InNewName);
-	std::wstring GetName();
-	SObject* GetOuter();
-
 protected:
 	virtual void PostConstruction();
 
@@ -67,15 +66,6 @@ public:
 	static T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
 		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
-		Ptr->PostConstruction();
-		return Ptr;
-	}
-
-	template<class T, class... TArgs>
-	T* NewSubobject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
-	{
-		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
-		Ptr->Outer = this;
 		Ptr->PostConstruction();
 		return Ptr;
 	}

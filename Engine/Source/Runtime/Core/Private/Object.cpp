@@ -12,40 +12,27 @@ GENERATE_BODY(SObject);
 
 SObject::SObject() : Generation(0)
 {
-	WeakReferences = std::make_shared<bool>(true);
+	WeakReferences = new WeakReferencePtr();
 }
 
 SObject::~SObject()
 {
-	*WeakReferences = false;
+	WeakReferences->bValid = false;
+
+	if (WeakReferences->WeakReferences == 0)
+	{
+		delete WeakReferences;
+		WeakReferences = nullptr;
+	}
 }
 
 std::wstring SObject::ToString()
 {
-	return Name;
-}
-
-void SObject::SetName(std::wstring_view InNewName)
-{
-	if (Name != InNewName)
-	{
-		Name = InNewName;
-	}
-}
-
-std::wstring SObject::GetName()
-{
-	return Name;
-}
-
-SObject* SObject::GetOuter()
-{
-	return Outer;
+	return GetType()->GetFriendlyName();
 }
 
 void SObject::PostConstruction()
 {
-	Name = GetType()->GenerateUniqueName();
 	GC().RegisterObject(this);
 }
 

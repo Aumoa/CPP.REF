@@ -9,35 +9,39 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
 
-PlatformModule::PlatformModule(const std::filesystem::path& modulePath)
+PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 {
-	std::wstring wsPath = modulePath.wstring();
-	_NativeHandle = LoadLibraryW(wsPath.c_str());
+	std::wstring wsPath = InModulePath.wstring();
+	NativeHandle = LoadLibraryW(wsPath.c_str());
+	ModuleName = InModulePath.stem().wstring();
 
-	if (_NativeHandle == nullptr)
+	if (NativeHandle == nullptr)
 	{
 		SE_LOG(LogCore, Error, L"Could not load library from path: {}", wsPath);
 		return;
 	}
-
-	SetName(modulePath.wstring());
 }
 
-PlatformModule::~PlatformModule()
+PlatformModule::~PlatformModule() noexcept
 {
-	if (_NativeHandle)
+	if (NativeHandle)
 	{
-		FreeLibrary((HMODULE)_NativeHandle);
-		_NativeHandle = nullptr;
+		FreeLibrary((HMODULE)NativeHandle);
+		NativeHandle = nullptr;
 	}
+}
+
+std::wstring PlatformModule::ToString()
+{
+	return ModuleName;
 }
 
 bool PlatformModule::IsValid() const
 {
-	return _NativeHandle;
+	return NativeHandle;
 }
 
-void(*PlatformModule::InternalGetFunctionPointer(std::string_view functionName) const)()
+void(*PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) const)()
 {
 	if (!IsValid())
 	{
@@ -45,5 +49,5 @@ void(*PlatformModule::InternalGetFunctionPointer(std::string_view functionName) 
 		return nullptr;
 	}
 
-	return reinterpret_cast<void(*)()>(::GetProcAddress((HMODULE)_NativeHandle, functionName.data()));
+	return reinterpret_cast<void(*)()>(::GetProcAddress((HMODULE)NativeHandle, FunctionName.data()));
 }

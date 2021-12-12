@@ -7,29 +7,31 @@
 
 class SGameInstance;
 
-class CORE_API PlatformModule : implements SObject
+class CORE_API PlatformModule
 {
 private:
-	void* _NativeHandle = nullptr;
+	void* NativeHandle = nullptr;
+	std::wstring ModuleName;
 
 public:
-	PlatformModule(const std::filesystem::path& modulePath);
-	virtual ~PlatformModule() override;
+	PlatformModule(const std::filesystem::path& InModulePath);
+	~PlatformModule() noexcept;
 
+	std::wstring ToString();
 	bool IsValid() const;
 
 	template<class TFunction>
-	TFunction* GetFunctionPointer(std::string_view functionName) const
+	TFunction* GetFunctionPointer(std::string_view FunctionName) const
 	{
-		return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(functionName));
+		return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(FunctionName));
 	}
 
 	template<class TRet, class... TArgs>
-	TRet(*GetFunctionPointer(std::string_view functionName) const)(TArgs...)
+	TRet(*GetFunctionPointer(std::string_view FunctionName) const)(TArgs...)
 	{
-		return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(functionName));
+		return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
 	}
 
 private:
-	void(*InternalGetFunctionPointer(std::string_view functionName) const)();
+	void(*InternalGetFunctionPointer(std::string_view FunctionName) const)();
 };
