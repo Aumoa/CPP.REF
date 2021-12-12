@@ -18,13 +18,11 @@ class PLATFORMGENERIC_API SMaterial : public SMaterialInterface
 
 private:
 	EBaseShaderCode BaseShaderCode;
-	SPROPERTY(Device)
-	IRHIDevice* Device = nullptr;
-	SPROPERTY(ShaderCode)
-	IRHIShader* ShaderCode = nullptr;
+	std::shared_ptr<IRHIDevice> Device;
+	std::shared_ptr<IRHIShader> ShaderCode;
 
 public:
-	SMaterial(IRHIDevice* InDevice, EBaseShaderCode InBaseShaderCode);
+	SMaterial(std::shared_ptr<IRHIDevice> InDevice, EBaseShaderCode InBaseShaderCode);
 
 	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() { return {}; }
 

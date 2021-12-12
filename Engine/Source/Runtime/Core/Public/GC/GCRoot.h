@@ -7,6 +7,9 @@
 template<class T>
 class GCRoot : public NonCopyable
 {
+	template<class U>
+	friend class GCRoot;
+
 	T* Ptr = nullptr;
 
 public:
@@ -17,6 +20,11 @@ public:
 	GCRoot(T* InPtr) : Ptr(InPtr)
 	{
 		SafeAddToRoot();
+	}
+
+	GCRoot(GCRoot&& InMove) : Ptr(InMove.Ptr)
+	{
+		InMove.Ptr = nullptr;
 	}
 
 	template<class U>
@@ -54,6 +62,24 @@ public:
 	T* Get()
 	{
 		return Ptr;
+	}
+
+	GCRoot& operator =(GCRoot&& InMove)
+	{
+		SafeRemoveFromRoot();
+		Ptr = InMove.Ptr;
+		InMove.Ptr = nullptr;
+		return *this;
+	}
+
+	template<class U>
+	GCRoot& operator =(GCRoot<U>&& InMove)
+	{
+		SafeRemoveFromRoot();
+		Ptr = dynamic_cast<T*>(InMove.Ptr);
+		check(InMove.Ptr == nullptr || Ptr);
+		InMove.Ptr = nullptr;
+		return *this;
 	}
 
 private:

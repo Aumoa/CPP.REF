@@ -46,6 +46,7 @@ private:
 private:
 	uint64 Generation = 0;
 	WeakReferencePtr* WeakReferences = nullptr;
+	class GarbageCollector* MyGC = nullptr;
 
 public:
 	SObject();
@@ -105,7 +106,7 @@ public:
 	void operator delete(void*);
 
 public:
-	static class GarbageCollector& GC();
+	class GarbageCollector& GC();
 };
 
 #define implements virtual public 

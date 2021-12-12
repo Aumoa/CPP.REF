@@ -20,17 +20,17 @@ class SMaterial;
 
 interface IRHIDevice : implements IRHIFactoryChild
 {
-	virtual IRHIDeviceContext* GetImmediateContext() = 0;
-	virtual IRHIDeviceContext* CreateDeviceContext() = 0;
-	virtual IRHIDeviceContext2D* CreateDeviceContext2D() = 0;
-	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& InDesc, const RHISubresourceData* InitialData) = 0;
-	virtual IRHIBuffer* CreateBuffer(const RHIBufferDesc& InDesc, const RHISubresourceData* InitialData) = 0;
-	virtual IRHIShader* CompileShader(SMaterial* Material) = 0;
-	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 Count) = 0;
-	virtual IRHIDepthStencilView* CreateDepthStencilView(int32 Count) = 0;
-	virtual IRHIShaderResourceView* CreateShaderResourceView(int32 Count) = 0;
-	virtual IRHISolidColorBrush* CreateSolidColorBrush(const Color& InColor, float InOpacity = 1.0f) = 0;
-	virtual IRHIBitmap* CreateBitmapFromTexture2D(IRHITexture2D* InTexture) = 0;
+	virtual std::shared_ptr<IRHIDeviceContext> GetImmediateContext() = 0;
+	virtual std::shared_ptr<IRHIDeviceContext> CreateDeviceContext() = 0;
+	virtual std::shared_ptr<IRHIDeviceContext2D> CreateDeviceContext2D() = 0;
+	virtual std::shared_ptr<IRHITexture2D> CreateTexture2D(const RHITexture2DDesc& InDesc, const RHISubresourceData* InitialData) = 0;
+	virtual std::shared_ptr<IRHIBuffer> CreateBuffer(const RHIBufferDesc& InDesc, const RHISubresourceData* InitialData) = 0;
+	virtual std::shared_ptr<IRHIShader> CompileShader(SMaterial* Material) = 0;
+	virtual std::shared_ptr<IRHIRenderTargetView> CreateRenderTargetView(int32 Count) = 0;
+	virtual std::shared_ptr<IRHIDepthStencilView> CreateDepthStencilView(int32 Count) = 0;
+	virtual std::shared_ptr<IRHIShaderResourceView> CreateShaderResourceView(int32 Count) = 0;
+	virtual std::shared_ptr<IRHISolidColorBrush> CreateSolidColorBrush(const Color& InColor, float InOpacity = 1.0f) = 0;
+	virtual std::shared_ptr<IRHIBitmap> CreateBitmapFromTexture2D(IRHITexture2D* InTexture) = 0;
 
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;

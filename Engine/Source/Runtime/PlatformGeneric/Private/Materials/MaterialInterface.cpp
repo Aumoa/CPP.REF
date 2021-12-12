@@ -7,7 +7,7 @@
 GENERATE_BODY(SMaterialInterface);
 DEFINE_LOG_CATEGORY(LogMaterials);
 
-SMaterialInterface::SMaterialInterface(IRHIDevice* InDevice) : Super()
+SMaterialInterface::SMaterialInterface(std::shared_ptr<IRHIDevice> InDevice) : Super()
 	, Device(InDevice)
 {
 }

@@ -6,7 +6,7 @@
 
 interface IRHIFactory;
 
-interface IRHIFactoryChild : implements SObject, implements IDisposable
+interface IRHIFactoryChild
 {
-	virtual IRHIFactory* GetFactory() = 0;
+	virtual std::shared_ptr<IRHIFactory> GetFactory() = 0;
 };

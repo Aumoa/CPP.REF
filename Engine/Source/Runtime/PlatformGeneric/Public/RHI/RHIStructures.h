@@ -10,49 +10,16 @@ interface IRHIResource;
 
 #pragma pack(push, 4)
 
-/// <summary>
-/// Describes the dimensions of a viewport.
-/// </summary>
 struct RHIViewport
 {
-	/// <summary>
-	/// X position of the left hand side of the viewport.
-	/// </summary>
 	float TopLeftX;
-
-	/// <summary>
-	/// Y position of the top of the viewport.
-	/// </summary>
 	float TopLeftY;
-
-	/// <summary>
-	/// Width of the viewport.
-	/// </summary>
 	float Width;
-
-	/// <summary>
-	/// Height of the viewport.
-	/// </summary>
 	float Height;
-
-	/// <summary>
-	/// Minimum depth of the viewport. Ranges between 0 and 1.
-	/// </summary>
 	float MinDepth;
-
-	/// <summary>
-	/// Maximum depth of the viewport. Ranges between 0 and 1.
-	/// </summary>
 	float MaxDepth;
 
-	/// <summary>
-	/// New <see cref="RHIViewport"/> instance.
-	/// </summary>
 	RHIViewport() = default;
-
-	/// <summary>
-	/// Initialize new <see cref="RHIViewport"/> instance.
-	/// </summary>
 	constexpr RHIViewport(float topLeftX, float topLeftY, float width, float height, float minDepth, float maxDepth)
 		: TopLeftX(topLeftX)
 		, TopLeftY(topLeftY)
@@ -63,48 +30,20 @@ struct RHIViewport
 	{
 	}
 
-	/// <summary>
-	/// Get total depth space by 1 dimension value.
-	/// </summary>
 	constexpr float GetTotalSpaceAlongZ() const
 	{
 		return MaxDepth - MinDepth;
 	}
 };
 
-/// <summary>
-/// Describes the scissor area of viewport.
-/// </summary>
 struct RHIScissorRect
 {
-	/// <summary>
-	/// Left position of the scissor area.
-	/// </summary>
 	int32 Left;
-
-	/// <summary>
-	/// Top position of the scissor area.
-	/// </summary>
 	int32 Top;
-
-	/// <summary>
-	/// Right position of the scissor area.
-	/// </summary>
 	int32 Right;
-
-	/// <summary>
-	/// Bottom position of the scissor area.
-	/// </summary>
 	int32 Bottom;
 
-	/// <summary>
-	/// New <see cref="RHIScissorRect"/> instance.
-	/// </summary>
 	RHIScissorRect() = default;
-
-	/// <summary>
-	/// Initialize new <see cref="RHIScissorRect"/> instance.
-	/// </summary>
 	constexpr RHIScissorRect(int32 left, int32 top, int32 right, int32 bottom)
 		: Left(left)
 		, Top(top)
@@ -113,46 +52,22 @@ struct RHIScissorRect
 	{
 	}
 
-	/// <summary>
-	/// Get width.
-	/// </summary>
 	constexpr int32 GetTotalSpaceAlongVertical() const
 	{
 		return Right - Left;
 	}
 
-	/// <summary>
-	/// Get height.
-	/// </summary>
 	constexpr int32 GetTotalSpaceAlongHorizontal() const
 	{
 		return Bottom - Top;
 	}
 };
 
-/// <summary>
-/// Describes the transition of subresources between different usages.
-/// </summary>
 struct RHIResourceTransitionBarrier
 {
-	/// <summary>
-	/// A pointer to the IRHIResource object that represents the resource used in the transition.
-	/// </summary>
-	IRHIResource* pResource;
-
-	/// <summary>
-	/// The index of the subresource for the transition. Use the std::numeric_limits<uint32>::max() to transition all subresources in a resource at the same time.
-	/// </summary>
+	std::shared_ptr<IRHIResource> pResource;
 	uint32 Subresource;
-
-	/// <summary>
-	/// The "before" usages of the subresources, as a bitwise-OR'd combination of ERHIResourceStates enumeration constants.
-	/// </summary>
 	ERHIResourceStates StateBefore;
-
-	/// <summary>
-	/// The "after" usages of the subresources, as a bitwise-OR'd combination of ERHIResourceStates enumeration constants.
-	/// </summary>
 	ERHIResourceStates StateAfter;
 
 	RHIResourceTransitionBarrier& SwapTransition() &
@@ -173,103 +88,37 @@ struct RHIResourceTransitionBarrier
 	}
 };
 
-/// <summary>
-/// Describes the transition between usages of two different resources that have mappings into the same heap.
-/// </summary>
 struct RHIResourceAliasingBarrier
 {
-	/// <summary>
-	/// A pointer to the IRHIResource object that represents the before resource used in the transition.
-	/// </summary>
-	IRHIResource* pResourceBefore;
-
-	/// <summary>
-	/// A pointer to the IRHIResource object that represents the after resource used in the transition.
-	/// </summary>
-	IRHIResource* pResourceAfter;
+	std::shared_ptr<IRHIResource> pResourceBefore;
+	std::shared_ptr<IRHIResource> pResourceAfter;
 };
 
-/// <summary>
-/// Represents a resource in which all UAV accesses must complete before any future UAV accesses can begin.
-/// </summary>
 struct RHIResourceUAVBarrier
 {
-	/// <summary>
-	/// The resource used in the transition, as a pointer to IRHIResource.
-	/// </summary>
-	IRHIResource* pResource;
+	std::shared_ptr<IRHIResource> pResource;
 };
 
-/// <summary>
-/// An variant type of each resource barriers.
-/// </summary>
 using RHIResourceBarrier = std::variant<RHIResourceTransitionBarrier, RHIResourceAliasingBarrier, RHIResourceUAVBarrier>;
 
-/// <summary>
-/// Represents vertex element using input layout.
-/// </summary>
 struct RHIVertexElement
 {
-	/// <summary>
-	/// The semantic name.
-	/// </summary>
 	std::string SemanticName;
-
-	/// <summary>
-	/// The semantic index.
-	/// </summary>
 	uint32 SemanticIndex = 0;
-
-	/// <summary>
-	/// Buffer stride.
-	/// </summary>
 	uint32 AlignedByteOffset = 0;
-
-	/// <summary>
-	/// The vertex element format.
-	/// </summary>
 	ERHIVertexElementFormat Format = ERHIVertexElementFormat::Unknown;
-
-	/// <summary>
-	/// The input slot.
-	/// </summary>
 	uint32 InputSlot = 0;
-
-	/// <summary>
-	/// The input slot classification.
-	/// </summary>
 	ERHIInputClassification InputSlotClass = ERHIInputClassification::PerVertexData;
 };
 
-/// <summary>
-/// The full-spec vertex declaration.
-/// </summary>
 struct RHIVertex
 {
-	/// <summary>
-	/// The position.
-	/// </summary>
 	Vector3 Position;
-
-	/// <summary>
-	/// The normal vector.
-	/// </summary>
 	Vector3 Normal;
-
-	/// <summary>
-	/// Color.
-	/// </summary>
 	Color Color = NamedColors::White;
-
-	/// <summary>
-	/// Texture coordinates.
-	/// </summary>
 	Vector2 TexCoord;
 };
 
-/// <summary>
-/// Represents vertex buffer view.
-/// </summary>
 struct RHIVertexBufferView
 {
 	uint64 BufferLocation = 0;
@@ -284,9 +133,6 @@ struct RHIIndexBufferView
 	ERHIVertexElementFormat Format = ERHIVertexElementFormat::R32_UINT;
 };
 
-/// <summary>
-/// Describe parameter collection shader parameter.
-/// </summary>
 struct RHIParameterCollectionDeclaration
 {
 	uint32 ShaderRegister;
@@ -319,9 +165,6 @@ struct RHIDescriptorTableParameter
 	const RHIDescriptorRange* pDescriptorRanges;
 };
 
-/// <summary>
-/// Represents shader parameter element.
-/// </summary>
 struct RHIShaderParameterElement
 {
 	ERHIShaderParameterType Type = ERHIShaderParameterType::ParameterCollection;

@@ -43,12 +43,7 @@ std::vector<SObject*> SObject::GetGCMembers()
 
 void* SObject::operator new(size_t AllocSize)
 {
-	void* Block = ::operator new(AllocSize, std::nothrow);
-	if (Block == nullptr)
-	{
-		GC().Collect();
-	}
-	return Block;
+	return ::operator new(AllocSize);
 }
 
 void SObject::operator delete(void* MemBlock)
@@ -59,5 +54,9 @@ void SObject::operator delete(void* MemBlock)
 auto SObject::GC() -> GarbageCollector&
 {
 	static thread_local GarbageCollector GC;
-	return GC;
+	if (MyGC == nullptr)
+	{
+		MyGC = &GC;
+	}
+	return *MyGC;
 }
