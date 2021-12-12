@@ -51,9 +51,28 @@ void GarbageCollector::Collect(bool bFullPurge)
 	{
 		ScopedTimer Timer(L"  Mark");
 
-		for (auto& Root : Roots)
+		size_t NumRoots = Roots.size();
+		for (auto& StackRoot : StackRoots)
 		{
-			MarkAndSweep(Root);
+			NumRoots += StackRoot->NumRoots;
+		}
+
+		std::vector<SObject*> ActualRoots;
+		ActualRoots.reserve(NumRoots);
+
+		ActualRoots.insert(ActualRoots.end(), Roots.begin(), Roots.end());
+		for (auto& StackRoot : StackRoots)
+		{
+			auto Array = StackRoot->ToRootArray();
+			ActualRoots.insert(ActualRoots.end(), Array.begin(), Array.end());
+		}
+
+		for (auto& Root : ActualRoots)
+		{
+			if (Root)
+			{
+				MarkAndSweep(Root);
+			}
 		}
 	}
 
