@@ -60,6 +60,7 @@ public:
 
 protected:
 	virtual void PostConstruction();
+	virtual std::vector<SObject*> GetGCMembers();
 
 public:
 	template<class T, class... TArgs>

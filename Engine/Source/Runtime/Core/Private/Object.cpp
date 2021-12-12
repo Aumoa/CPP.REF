@@ -36,6 +36,11 @@ void SObject::PostConstruction()
 	GC().RegisterObject(this);
 }
 
+std::vector<SObject*> SObject::GetGCMembers()
+{
+	return {};
+}
+
 void* SObject::operator new(size_t AllocSize)
 {
 	void* Block = ::operator new(AllocSize, std::nothrow);

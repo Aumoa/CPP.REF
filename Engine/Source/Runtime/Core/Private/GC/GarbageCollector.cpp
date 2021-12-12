@@ -217,6 +217,11 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 					}
 				}
 			}
+
+			{
+				auto CollectionMember = Object->GetGCMembers();
+				ReferencedObjects.insert(ReferencedObjects.end(), CollectionMember.begin(), CollectionMember.end());
+			}
 		}
 	}
 }
