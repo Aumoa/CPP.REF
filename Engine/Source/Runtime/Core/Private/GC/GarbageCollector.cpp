@@ -34,7 +34,16 @@ void GarbageCollector::Collect(bool bFullPurge)
 {
 	static thread_local std::vector<std::set<SObject*>::iterator> Garbages;
 
-	++Generation;
+	if (!bFullPurge && PendingKill.size() > IncrementalDeleteObject * 10)
+	{
+		bFullPurge = true;
+	}
+
+	[[unlikely]]
+	if (bFullPurge)
+	{
+		++Generation;
+	}
 
 	SE_LOG(LogGC, Verbose, L"Start GC {}", Generation);
 	ScopedTimer Timer(L"Total");
@@ -66,11 +75,6 @@ void GarbageCollector::Collect(bool bFullPurge)
 		ScopedTimer Timer(L"  Delete");
 
 		size_t NumRemoves = 0;
-
-		if (!bFullPurge && PendingKill.size() > IncrementalDeleteObject * 10)
-		{
-			bFullPurge = true;
-		}
 
 		for (auto& Garbage : Garbages)
 		{
@@ -109,6 +113,18 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 	Garbages.clear();
 	PendingFinalize.clear();
+
+	[[unlikely]]
+	if (!bFullPurge)
+	{
+		++Generation;
+	}
+}
+
+void GarbageCollector::RegisterObject(SObject* Object)
+{
+	Collection.emplace(Object);
+	Object->Generation = Generation;
 }
 
 size_t GarbageCollector::NumThreadObjects()

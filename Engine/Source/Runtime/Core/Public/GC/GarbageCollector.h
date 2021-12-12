@@ -29,6 +29,7 @@ private:
 public:
 	void Collect(bool bFullPurge = false);
 	size_t NumThreadObjects();
+	void RegisterObject(SObject* Object);
 	void SuppressFinalize(SObject* Object);
 
 	void Consume(GarbageCollector& AnotherThreadGC);

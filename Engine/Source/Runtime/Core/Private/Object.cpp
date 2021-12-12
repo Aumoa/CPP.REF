@@ -46,8 +46,7 @@ SObject* SObject::GetOuter()
 void SObject::PostConstruction()
 {
 	Name = GetType()->GenerateUniqueName();
-	GC().Collection.emplace(this);
-	Generation = GC().Generation;
+	GC().RegisterObject(this);
 }
 
 void* SObject::operator new(size_t AllocSize)
