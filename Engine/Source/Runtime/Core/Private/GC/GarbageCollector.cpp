@@ -45,7 +45,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 		++Generation;
 	}
 
-	SE_LOG(LogGC, Verbose, L"Start GC {}", Generation);
+	SE_LOG(LogGC, Verbose, L"Start GC {}, with {} objects.", Generation, Collection.size());
 	ScopedTimer Timer(L"Total");
 
 	{

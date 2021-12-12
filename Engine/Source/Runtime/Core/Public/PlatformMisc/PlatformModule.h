@@ -7,16 +7,14 @@
 
 class SGameInstance;
 
-class CORE_API SPlatformModule : implements SObject
+class CORE_API PlatformModule : implements SObject
 {
-	GENERATED_BODY(SPlatformModule)
-
 private:
 	void* _NativeHandle = nullptr;
 
 public:
-	SPlatformModule(const std::filesystem::path& modulePath);
-	virtual ~SPlatformModule() override;
+	PlatformModule(const std::filesystem::path& modulePath);
+	virtual ~PlatformModule() override;
 
 	bool IsValid() const;
 

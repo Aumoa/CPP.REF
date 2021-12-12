@@ -4,6 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include <fstream>
+#include "Misc/DateTime.h"
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogModule.h"
@@ -35,7 +36,7 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	using namespace std::chrono;
 
 	wstring Composed = format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring DetailComposed = format(L"{}: {}: {}", zoned_time(system_clock::now()).get_local_time(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
+	wstring DetailComposed = format(L"{}: {}: {}", DateTime<>::Now().ToString(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
 
 	// Log to Visual Studio Output Console.
 	OutputDebugStringW(DetailComposed.c_str());

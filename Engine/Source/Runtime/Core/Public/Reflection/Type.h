@@ -84,23 +84,23 @@ public:
 		// SObject container type.
 		TypeGenerator() requires requires(const TType& Collection)
 			{
-				{ Collection.begin() };
-				{ Collection.end() };
-				{ std::remove_reference_t<decltype(**Collection.begin())>::StaticClass() };
+				{ std::begin(Collection) };
+				{ std::end(Collection) };
+				{ std::remove_reference_t<decltype(**std::begin(Collection))>::StaticClass() };
 			}
 			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
 			, bNative(true)
 			, bGCCollection(true)
-			, CollectionType(std::remove_reference_t<decltype(**std::declval<const TType&>().begin())>::StaticClass())
+			, CollectionType(std::remove_reference_t<decltype(**std::begin(std::declval<const TType&>()))>::StaticClass())
 			, Collector([](const void* Ptr)
 			{
 				const TType* Collection = reinterpret_cast<const TType*>(Ptr);
 
-				size_t NumObjects = Collection->size();
+				size_t NumObjects = std::size(*Collection);
 				std::vector<SObject*> GCCollection;
 				GCCollection.reserve(NumObjects);
 
-				for (auto It = Collection->begin(); It != Collection->end(); ++It)
+				for (auto It = std::begin(*Collection); It != std::end(*Collection); std::advance(It, 1))
 				{
 					GCCollection.emplace_back(dynamic_cast<SObject*>(*It));
 				}

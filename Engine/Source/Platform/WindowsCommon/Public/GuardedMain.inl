@@ -45,6 +45,8 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 
 int32 GuardedMain(std::span<std::wstring> Argv)
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	__try
 	{
 		GReturn = TApplicationClass::GuardedMain(Argv);

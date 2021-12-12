@@ -1,6 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Diagnostics/LogModule.h"
+#include "Misc/DateTime.h"
 #include <filesystem>
 #include <chrono>
 
@@ -32,7 +33,8 @@ void SLogModule::RunTask()
 	}
 	else if (std::filesystem::exists(Directory / LogPath))
 	{
-		auto BackupTime = std::chrono::zoned_time(std::chrono::system_clock::now()).get_local_time();
+		auto BackupTime = DateTime<>::Now().ToString();
+		//auto BackupTime = std::chrono::steady_clock::now().time_since_epoch().count();
 		std::filesystem::path BackupPath = StringUtils::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
 		std::filesystem::rename(Directory / LogPath, Directory / BackupPath);
 	}
@@ -48,16 +50,20 @@ void SLogModule::Shutdown()
 {
 	if (bRunning)
 	{
+		gModule = nullptr;
 		bRunning = false;
+
 		WorkerThread.join();
 		LogFile.close();
+
+		MessageQueue.clear();
 	}
 }
 
 void SLogModule::EnqueueLogMessage(std::wstring_view Message)
 {
 	size_t MyIdx = QueueIndex++ % MessageQueue.size();
-	MessageQueue[MyIdx] = Message;
+	MessageQueue[MyIdx] = std::wstring(Message);
 	++SeekIndex;
 }
 

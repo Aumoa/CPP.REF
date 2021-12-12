@@ -69,16 +69,4 @@ public:
 
 private:
 	void* Internal_GetValue(SObject* InThis);
-
-public:
-	template<class T>
-	consteval static bool __Internal_IsStaticMember();
-	template<class T>
-	consteval static bool __Internal_IsStaticMember(T*) { return true; }
-	template<class TOwner, class T>
-	consteval static bool __Internal_IsStaticMember(T(TOwner::*)) { return false; }
-	template<class T>
-	consteval static bool __Internal_IsStaticMember(const T*) { return true; }
-	template<class TOwner, class T>
-	consteval static bool __Internal_IsStaticMember(const T(TOwner::*)) { return false; }
 };

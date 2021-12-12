@@ -474,7 +474,7 @@ struct Vector : public VectorImpl<T, Vector<T, N>, N>
 	/// <summary>
 	/// Initialize new <see cref="Vector"/> instance.
 	/// </summary>
-	template<class... TArgs> requires Constructible<Impl, TArgs...>
+	template<class... TArgs> requires std::constructible_from<Impl, TArgs...>
 	inline constexpr Vector(const TArgs&... args) : Impl(args...)
 	{
 	}

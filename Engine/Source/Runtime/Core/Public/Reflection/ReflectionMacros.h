@@ -19,6 +19,24 @@ namespace ReflectionMacros
 	public:
 		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
 	};
+
+	template<class T>
+	consteval bool IsStaticMember();
+	template<class T>
+	consteval bool IsStaticMember(T*) { return true; }
+	template<class TOwner, class T>
+	consteval bool IsStaticMember(T(TOwner::*)) { return false; }
+	template<class T>
+	consteval bool IsStaticMember(const T*) { return true; }
+	template<class TOwner, class T>
+	consteval bool IsStaticMember(const T(TOwner::*)) { return false; }
+
+	template<class T>
+	inline T& Assign(T& Member, const void* Value)
+	{
+		Member = *reinterpret_cast<const T*>(Value);
+		return Member;
+	}
 }
 
 #define GENERATED_BODY(Class, ...)															\
@@ -119,12 +137,12 @@ Type* Class::StaticRegisterClass = Class::StaticClass();
 			.DeferredMemberType = Type::GetDeferredStaticClass<								\
 			std::remove_const_t<std::remove_pointer_t<decltype(This::PropertyName)>>>(),	\
 			.Setter = +[](SObject* _this, const void* _value)								\
-	{ dynamic_cast<This*>(_this)->PropertyName = *reinterpret_cast<const PT*>(_value); },	\
+			{ ReflectionMacros::Assign(dynamic_cast<This*>(_this)->PropertyName, _value); },\
 			.Getter = +[](const SObject* _this) -> const void*								\
 			{ return &dynamic_cast<const This*>(_this)->PropertyName; },					\
 			.bIsPointer = std::is_pointer_v<PT>,											\
 			.bIsConst = std::is_const_v<PT>,												\
-			.bIsStatic = Property::__Internal_IsStaticMember(&This::PropertyName),			\
+			.bIsStatic = ReflectionMacros::IsStaticMember(&This::PropertyName),				\
 		};																					\
 		return &Generator;																	\
 	}
