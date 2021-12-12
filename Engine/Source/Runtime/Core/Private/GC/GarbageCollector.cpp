@@ -5,6 +5,44 @@
 #include "Object.h"
 #include <string>
 
+class ScopedGuard : public NonCopyable
+{
+	std::atomic<bool>* Ptr = nullptr;
+
+public:
+	ScopedGuard() = default;
+	ScopedGuard(std::atomic<bool>* Ptr) : Ptr(Ptr)
+	{
+	}
+	ScopedGuard(ScopedGuard&& Rhs) : Ptr(Rhs.Ptr)
+	{
+		Rhs.Ptr = nullptr;
+	}
+	~ScopedGuard() noexcept
+	{
+		if (Ptr)
+		{
+			*Ptr = false;
+		}
+	}
+
+	ScopedGuard& operator =(ScopedGuard&& Rhs)
+	{
+		Ptr = Rhs.Ptr;
+		Rhs.Ptr = nullptr;
+		return *this;
+	}
+};
+
+#define SCOPED_LOCK() \
+std::unique_lock<std::mutex> Lock; \
+ScopedGuard Guard; \
+if (bool bExpect = false; bScoped.compare_exchange_strong(bExpect, true)) \
+{ \
+	Lock = std::unique_lock(Locker); \
+	Guard = ScopedGuard(&bScoped); \
+}
+
 namespace
 {
 	class ScopedTimer
@@ -30,8 +68,25 @@ GarbageCollector::GarbageCollector()
 {
 }
 
+void GarbageCollector::RegisterObject(SObject* Object)
+{
+	SCOPED_LOCK();
+
+	Collection.emplace(Object);
+	Object->Generation = Generation;
+}
+
+void GarbageCollector::UnregisterObject(SObject* Object)
+{
+	SCOPED_LOCK();
+
+	Collection.erase(Object);
+}
+
 void GarbageCollector::Collect(bool bFullPurge)
 {
+	SCOPED_LOCK();
+
 	static thread_local std::vector<std::set<SObject*>::iterator> Garbages;
 
 	if (!bFullPurge && PendingKill.size() > IncrementalDeleteObject * 10)
@@ -99,21 +154,20 @@ void GarbageCollector::Collect(bool bFullPurge)
 		{
 			if (NumRemoves++ < IncrementalDeleteObject || bFullPurge)
 			{
-				delete *Garbage;
+				PendingKill.erase(*Garbage);
+				(*Garbage)->UnmarkGC();
 			}
 			else
 			{
-				PendingKill.emplace_back(*Garbage);
+				PendingKill.emplace(*Garbage);
 			}
-
-			Collection.erase(Garbage);
 		}
 
-		size_t SizeIncrementalRemains = std::max((int64)IncrementalDeleteObject - (int64)NumRemoves, 0LL);
+		int64 SizeIncrementalRemains = std::max((int64)IncrementalDeleteObject - (int64)NumRemoves, 0LL);
 		for (auto It = PendingKill.begin(); It != PendingKill.end() && (SizeIncrementalRemains-- > 0 || bFullPurge);)
 		{
-			delete *It;
-			if (bFullPurge)
+			(*It)->UnmarkGC();
+			if (!bFullPurge)
 			{
 				PendingKill.erase(It);
 				It = PendingKill.begin();
@@ -140,12 +194,6 @@ void GarbageCollector::Collect(bool bFullPurge)
 	}
 }
 
-void GarbageCollector::RegisterObject(SObject* Object)
-{
-	Collection.emplace(Object);
-	Object->Generation = Generation;
-}
-
 size_t GarbageCollector::NumThreadObjects()
 {
 	return Collection.size();
@@ -153,20 +201,15 @@ size_t GarbageCollector::NumThreadObjects()
 
 void GarbageCollector::SuppressFinalize(SObject* Object)
 {
+	SCOPED_LOCK();
+
 	PendingFinalize.emplace(Object);
 }
 
-void GarbageCollector::Consume(GarbageCollector& AnotherThreadGC)
+GarbageCollector& GarbageCollector::GC()
 {
-	AnotherThreadGC.Collect(true);
-
-	Collection.insert(AnotherThreadGC.Collection.begin(), AnotherThreadGC.Collection.end());
-	Roots.insert(AnotherThreadGC.Roots.begin(), AnotherThreadGC.Roots.end());
-}
-
-void GarbageCollector::From(GarbageCollector& AnotherThreadGC)
-{
-	Roots.insert(AnotherThreadGC.Roots.begin(), AnotherThreadGC.Roots.end());
+	static GarbageCollector GC;
+	return GC;
 }
 
 void GarbageCollector::MarkAndSweep(SObject* Object)
@@ -189,7 +232,7 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 			}
 
 			// Mark generation.
-			Object->Generation = Generation;
+			Object->MarkGC(Generation);
 
 			for (auto& GCProp : Object->GetType()->GetGCProperties())
 			{

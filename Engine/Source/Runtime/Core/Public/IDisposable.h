@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
+#include "GC/SharedPtr.h"
 
 interface IDisposable : implements SObject
 {
@@ -12,16 +13,16 @@ interface IDisposable : implements SObject
 namespace IDisposable_Details
 {
 	template<std::derived_from<IDisposable> T>
-	class ScopedAutoDispose : public GCRoot<T>
+	class ScopedAutoDispose : public SharedPtr<T>
 	{
 	public:
-		ScopedAutoDispose(T* Disposable) : GCRoot(Disposable)
+		ScopedAutoDispose(T* Disposable) : SharedPtr(Disposable)
 		{
 		}
 
 		~ScopedAutoDispose() noexcept
 		{
-			GCRoot<T>::Get()->Dispose();
+			SharedPtr<T>::Get()->Dispose();
 		}
 	};
 

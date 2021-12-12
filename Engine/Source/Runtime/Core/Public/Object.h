@@ -4,13 +4,13 @@
 
 #include <string>
 #include <string_view>
+#include <atomic>
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "NonCopyable.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Reflection/ReflectionMacros.h"
-#include "Delegates/MulticastEvent.h"
 
 class SValueType;
 
@@ -24,29 +24,34 @@ namespace SObject_Details
 
 /// <summary>
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
-/// Represents unit that subobjects are binding and managed.
 /// </summary>
 class CORE_API SObject : public SObject_Details::SObjectBase
 {
 	GENERATED_BODY(SObject)
 
 	template<class T>
-	friend class GCRoot;
+	friend class SharedPtr;
 	template<class T>
-	friend class WeakObjectPtr;
+	friend class WeakPtr;
 	friend class GarbageCollector;
 
 private:
 	struct WeakReferencePtr
 	{
-		int32 bValid : 1 = true;
-		int32 WeakReferences : 31 = 0;
+		std::atomic<bool> bMarkAtGC = false;
+		std::atomic<bool> bDisposed = false;
+		std::atomic<int32> References = 0;
+		std::atomic<int32> WeakReferences = 0;
+
+		inline bool IsValid() const volatile
+		{
+			return !bDisposed && (bMarkAtGC || References != 0);
+		}
 	};
 
 private:
 	uint64 Generation = 0;
-	WeakReferencePtr* WeakReferences = nullptr;
-	class GarbageCollector* MyGC = nullptr;
+	WeakReferencePtr* ReferencePtr = nullptr;
 
 public:
 	SObject();
@@ -55,6 +60,12 @@ public:
 private:
 	SObject(const SObject&) = delete;
 	SObject(SObject&&) = delete;
+
+	void MarkGC(uint64 Generation);
+	void UnmarkGC();
+
+	void AddToRoot();
+	void RemoveFromRoot();
 
 public:
 	virtual std::wstring ToString();
@@ -106,7 +117,7 @@ public:
 	void operator delete(void*);
 
 public:
-	class GarbageCollector& GC();
+	static class GarbageCollector& GC();
 };
 
 #define implements virtual public 

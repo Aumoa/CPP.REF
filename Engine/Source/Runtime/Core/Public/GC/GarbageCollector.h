@@ -6,6 +6,7 @@
 #include <set>
 #include <list>
 #include <functional>
+#include <mutex>
 
 class SObject;
 
@@ -47,6 +48,9 @@ public:
 	};
 
 private:
+	std::mutex Locker;
+	std::atomic<bool> bScoped;
+
 	std::set<SObject*> Collection;
 	std::set<SObject*> Roots;
 	uint64 Generation = 0;
@@ -54,19 +58,23 @@ private:
 	std::set<StackRoot*> StackRoots;
 
 	std::set<SObject*> PendingFinalize;
-	std::list<SObject*> PendingKill;
+	std::set<SObject*> PendingKill;
 
 private:
 	GarbageCollector();
 
+private:
+	void RegisterObject(SObject* Object);
+	void UnregisterObject(SObject* Object);
+
 public:
 	void Collect(bool bFullPurge = false);
 	size_t NumThreadObjects();
-	void RegisterObject(SObject* Object);
 	void SuppressFinalize(SObject* Object);
 
-	void Consume(GarbageCollector& AnotherThreadGC);
-	void From(GarbageCollector& AnotherThreadGC);
+	static GarbageCollector& GC();
+
+private:
 	void MarkAndSweep(SObject* Object);
 };
 

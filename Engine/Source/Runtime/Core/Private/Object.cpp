@@ -12,18 +12,48 @@ GENERATE_BODY(SObject);
 
 SObject::SObject() : Generation(0)
 {
-	WeakReferences = new WeakReferencePtr();
+	ReferencePtr = new WeakReferencePtr();
 }
 
 SObject::~SObject()
 {
-	WeakReferences->bValid = false;
-
-	if (WeakReferences->WeakReferences == 0)
+	bool bExpect = false;
+	if (ReferencePtr->bDisposed.compare_exchange_strong(bExpect, true))
 	{
-		delete WeakReferences;
-		WeakReferences = nullptr;
+		GC().UnregisterObject(this);
 	}
+
+	if (ReferencePtr->WeakReferences == 0)
+	{
+		delete ReferencePtr;
+		ReferencePtr = nullptr;
+	}
+}
+
+void SObject::MarkGC(uint64 Generation)
+{
+	this->Generation = Generation;
+	this->ReferencePtr->bMarkAtGC = true;
+}
+
+void SObject::UnmarkGC()
+{
+	ReferencePtr->bMarkAtGC = false;
+	if (!ReferencePtr->IsValid())
+	{
+		delete this;
+		return;
+	}
+}
+
+void SObject::AddToRoot()
+{
+	GC().Roots.emplace(this);
+}
+
+void SObject::RemoveFromRoot()
+{
+	GC().Roots.erase(this);
 }
 
 std::wstring SObject::ToString()
@@ -53,10 +83,5 @@ void SObject::operator delete(void* MemBlock)
 
 auto SObject::GC() -> GarbageCollector&
 {
-	static thread_local GarbageCollector GC;
-	if (MyGC == nullptr)
-	{
-		MyGC = &GC;
-	}
-	return *MyGC;
+	return GarbageCollector::GC();
 }
