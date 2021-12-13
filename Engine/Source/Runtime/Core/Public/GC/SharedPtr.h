@@ -211,12 +211,6 @@ private:
 			if (bNoReferences)
 			{
 				Ptr->RemoveFromRoot();
-
-				if (!Ptr->ReferencePtr->bMarkAtGC)
-				{
-					delete Ptr;
-					Ptr = nullptr;
-				}
 			}
 		}
 	}

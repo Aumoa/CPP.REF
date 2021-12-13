@@ -33,7 +33,7 @@ int32 SConsoleModule::Main(const SCommandLine& CommandArgs)
 	}
 
 	Subsystems.clear();
-	GC().Collect();
+	GC.Collect();
 
 	return ReturnCode;
 }

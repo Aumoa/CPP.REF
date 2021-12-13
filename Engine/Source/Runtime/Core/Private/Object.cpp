@@ -20,7 +20,7 @@ SObject::~SObject()
 	bool bExpect = false;
 	if (ReferencePtr->bDisposed.compare_exchange_strong(bExpect, true))
 	{
-		GC().UnregisterObject(this);
+		GC.UnregisterObject(this);
 	}
 
 	if (ReferencePtr->WeakReferences == 0)
@@ -48,12 +48,12 @@ void SObject::UnmarkGC()
 
 void SObject::AddToRoot()
 {
-	GC().Roots.emplace(this);
+	GC.Roots.emplace(this);
 }
 
 void SObject::RemoveFromRoot()
 {
-	GC().Roots.erase(this);
+	GC.Roots.erase(this);
 }
 
 std::wstring SObject::ToString()
@@ -63,7 +63,7 @@ std::wstring SObject::ToString()
 
 void SObject::PostConstruction()
 {
-	GC().RegisterObject(this);
+	GC.RegisterObject(this);
 }
 
 std::vector<SObject*> SObject::GetGCMembers()
@@ -73,17 +73,19 @@ std::vector<SObject*> SObject::GetGCMembers()
 
 void* SObject::operator new(size_t AllocSize)
 {
+	GC.IncrementAllocGCMemory(AllocSize);
+
 	void* Block = ::operator new(AllocSize, std::nothrow);
 	if (Block == nullptr)
 	{
 		// First GC without full purge.
-		GC().Collect();
+		GC.Collect();
 		Block = ::operator new(AllocSize, std::nothrow);
 
 		if (Block == nullptr)
 		{
 			// Second GC with full purge.
-			GC().Collect(true);
+			GC.Collect(true);
 			Block = ::operator new(AllocSize);
 		}
 	}
@@ -93,9 +95,4 @@ void* SObject::operator new(size_t AllocSize)
 void SObject::operator delete(void* MemBlock)
 {
 	::operator delete(MemBlock);
-}
-
-auto SObject::GC() -> GarbageCollector&
-{
-	return GarbageCollector::GC();
 }

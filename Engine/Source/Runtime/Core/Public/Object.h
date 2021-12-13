@@ -143,9 +143,6 @@ public:
 
 	void* operator new(size_t);
 	void operator delete(void*);
-
-public:
-	static class GarbageCollector& GC();
 };
 
 #define implements virtual public 

@@ -6,6 +6,8 @@
 #include "PlatformMisc/PlatformModule.h"
 #include "Misc/CommandLine.h"
 #include "Diagnostics/LogModule.h"
+#include "Threading/Thread.h"
+#include <chrono>
 
 int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
@@ -43,19 +45,33 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			return -1;
 		}
 
-		SharedPtr ConsoleModule = Loader();
-		if (!ConsoleModule.IsValid())
 		{
-			SE_LOG(LogWindowsConsole, Fatal, L"LoadConsoleModule function return nullptr.");
-			return -1;
+			SharedPtr ConsoleModule = Loader();
+			if (!ConsoleModule.IsValid())
+			{
+				SE_LOG(LogWindowsConsole, Fatal, L"LoadConsoleModule function return nullptr.");
+				return -1;
+			}
+
+			auto ReturnValue = Thread::NewThread<int32>(L"[MainThread]", [&]()
+				{
+					return ConsoleModule->Main(*CommandArgs.Get());
+				});
+
+			using namespace std::literals;
+			while (ReturnValue.wait_for(10s) == std::future_status::timeout)
+			{
+				GC.Collect();
+			}
+
+			ReturnCode = ReturnValue.get();
 		}
 
-		ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
-
 		SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
+		GC.Collect(true);
+
 		LogModule->Shutdown();
 	}
 
-	GC().Collect(true);
 	return ReturnCode;
 }

@@ -5,20 +5,52 @@
 #include "PrimitiveTypes.h"
 #include "NonCopyable.h"
 #include <string>
+#include <future>
+#include <functional>
 
 class CORE_API Thread : public NonCopyable
 {
-	void* _handle = nullptr;
-	int64 _threadId = 0;
-	std::wstring _friendlyName;
+	void* ThreadHandle = nullptr;
+	int64 ThreadId = 0;
+	std::wstring FriendlyName;
+	bool bIsManaged = false;
 
 private:
 	Thread();
 
 public:
-	void SetFriendlyName(std::wstring_view friendlyName);
-	std::wstring GetFriendlyName() const;
-	int64 GetThreadId() const;
+	~Thread();
+
+	void SetFriendlyName(std::wstring_view InFriendlyName);
+	std::wstring GetFriendlyName();
+	int64 GetThreadId();
+	bool IsManaged();
+
+	void SuspendThread();
+	void ResumeThread();
+
+	template<class TReturn>
+	static std::future<TReturn> NewThread(std::wstring FriendlyName, std::function<TReturn()> Body)
+	{
+		auto ReturnFuture = std::make_shared<std::promise<TReturn>>();
+		Internal_NewThread(std::move(FriendlyName), [ReturnFuture, Body = std::move(Body)]()
+		{
+			if constexpr (std::same_as<TReturn, void>)
+			{
+				Body();
+				ReturnFuture->set_value();
+			}
+			else
+			{
+				TReturn ReturnValue = Body();
+				ReturnFuture->set_value(ReturnValue);
+			}
+		});
+		return ReturnFuture->get_future();
+	}
+
+private:
+	static void Internal_NewThread(std::wstring FriendlyName, std::function<void()> Body);
 
 public:
 	static Thread* GetCurrentThread();

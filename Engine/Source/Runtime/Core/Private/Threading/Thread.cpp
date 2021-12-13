@@ -5,40 +5,89 @@
 
 #include "Threading/Thread.h"
 #include "Misc/StringUtils.h"
+#include "GC/GarbageCollector.h"
 
 Thread::Thread()
 {
-	_handle = ::GetCurrentThread();
-	_threadId = ::GetThreadId(_handle);
+	HANDLE CurrentThread = ::GetCurrentThread();
+	ThreadId = ::GetThreadId(CurrentThread);
+	ThreadHandle = ::OpenThread(GENERIC_ALL, TRUE, (DWORD)ThreadId);
 
 	PWSTR pwThreadDesc = nullptr;
-	::GetThreadDescription(_handle, &pwThreadDesc);
+	::GetThreadDescription(CurrentThread, &pwThreadDesc);
 
 	if (pwThreadDesc)
 	{
-		_friendlyName = pwThreadDesc;
+		FriendlyName = pwThreadDesc;
 	}
 	
-	if (StringUtils::Trim(_friendlyName).empty())
+	if (StringUtils::Trim(FriendlyName).empty())
 	{
-		_friendlyName = std::to_wstring(_threadId);
+		FriendlyName = std::to_wstring(ThreadId);
 	}
 }
 
-void Thread::SetFriendlyName(std::wstring_view friendlyName)
+Thread::~Thread()
 {
-	SetThreadDescription(_handle, friendlyName.data());
-	_friendlyName = friendlyName;
+	if (ThreadHandle)
+	{
+		::CloseHandle(ThreadHandle);
+		ThreadHandle = nullptr;
+	}
 }
 
-std::wstring Thread::GetFriendlyName() const
+void Thread::SetFriendlyName(std::wstring_view InFriendlyName)
 {
-	return _friendlyName;
+	SetThreadDescription(ThreadHandle, InFriendlyName.data());
+	FriendlyName = InFriendlyName;
 }
 
-int64 Thread::GetThreadId() const
+std::wstring Thread::GetFriendlyName()
 {
-	return _threadId;
+	return FriendlyName;
+}
+
+int64 Thread::GetThreadId()
+{
+	return ThreadId;
+}
+
+bool Thread::IsManaged()
+{
+	return bIsManaged;
+}
+
+void Thread::SuspendThread()
+{
+	::SuspendThread(ThreadHandle);
+}
+
+void Thread::ResumeThread()
+{
+	::ResumeThread(ThreadHandle);
+}
+
+void Thread::Internal_NewThread(std::wstring FriendlyName, std::function<void()> Body)
+{
+	std::thread([Body, FriendlyName = std::move(FriendlyName)]()
+	{
+		Thread* MyThread = GetCurrentThread();
+		MyThread->SetFriendlyName(FriendlyName);
+		MyThread->bIsManaged = true;
+
+		try
+		{
+			GC.RegisterThread(MyThread);
+			Body();
+		}
+		catch (...)
+		{
+			GC.UnregisterThread(MyThread);
+			throw;
+		}
+
+		GC.UnregisterThread(MyThread);
+	}).detach();
 }
 
 Thread* Thread::GetCurrentThread()

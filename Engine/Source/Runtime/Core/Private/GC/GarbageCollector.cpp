@@ -2,8 +2,21 @@
 
 #include "GC/GarbageCollector.h"
 #include "Misc/TickCalc.h"
+#include "Threading/Thread.h"
 #include "Object.h"
 #include <string>
+
+class GarbageCollector::Instantiate
+{
+public:
+	static GarbageCollector& GC()
+	{
+		static GarbageCollector Instance;
+		return Instance;
+	}
+};
+
+GarbageCollector& GC = GarbageCollector::Instantiate::GC();
 
 class ScopedGuard : public NonCopyable
 {
@@ -71,7 +84,6 @@ GarbageCollector::GarbageCollector()
 void GarbageCollector::RegisterObject(SObject* Object)
 {
 	SCOPED_LOCK();
-
 	Collection.emplace(Object);
 	Object->Generation = Generation;
 }
@@ -79,20 +91,37 @@ void GarbageCollector::RegisterObject(SObject* Object)
 void GarbageCollector::UnregisterObject(SObject* Object)
 {
 	SCOPED_LOCK();
-
 	Collection.erase(Object);
+}
+
+void GarbageCollector::RegisterThread(Thread* ManagedThread)
+{
+	SCOPED_LOCK();
+	check(ManagedThread->IsManaged());
+	GCThreads.emplace(ManagedThread);
+}
+
+void GarbageCollector::UnregisterThread(Thread* ManagedThread)
+{
+	SCOPED_LOCK();
+	GCThreads.erase(ManagedThread);
+}
+
+void GarbageCollector::IncrementAllocGCMemory(size_t Amount)
+{
+	if (IncrementalGCMemory.fetch_add(Amount) > 104857600)
+	{
+		SE_LOG(LogGC, Verbose, L"Incremental GC memory is over than 100MB. Execute GC.");
+		Collect();
+	}
 }
 
 void GarbageCollector::Collect(bool bFullPurge)
 {
 	SCOPED_LOCK();
 
-	static thread_local std::vector<std::set<SObject*>::iterator> Garbages;
-
-	if (!bFullPurge && PendingKill.size() > IncrementalDeleteObject * 10)
-	{
-		bFullPurge = true;
-	}
+	static std::vector<std::set<SObject*>::iterator> Garbages;
+	Thread* MyThread = Thread::GetCurrentThread();
 
 	[[unlikely]]
 	if (bFullPurge)
@@ -102,6 +131,18 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 	SE_LOG(LogGC, Verbose, L"Start GC {}, with {} objects.", Generation, Collection.size());
 	ScopedTimer Timer(L"Total");
+
+	{
+		ScopedTimer Timer(L"  StopTheWorld");
+
+		for (auto& GCThread : GCThreads)
+		{
+			if (MyThread != GCThread)
+			{
+				GCThread->SuspendThread();
+			}
+		}
+	}
 
 	{
 		ScopedTimer Timer(L"  Mark");
@@ -131,7 +172,28 @@ void GarbageCollector::Collect(bool bFullPurge)
 		}
 	}
 
+	{
+		ScopedTimer Timer(L"  ResumeThreads");
+		for (auto& GCThread : GCThreads)
+		{
+			if (MyThread != GCThread)
+			{
+				GCThread->ResumeThread();
+			}
+		}
+	}
+
+	if (DeleteAction.valid())
+	{
+		ScopedTimer Timer(L"  Wait Delete");
+		DeleteAction.get();
+	}
+
+	IncrementalGCMemory = 0;
+	PendingFinalize.clear();
+
 	Garbages.reserve(Collection.size());
+	PendingKill.reserve(Collection.size());
 
 	{
 		ScopedTimer Timer(L"  Sweep");
@@ -141,51 +203,29 @@ void GarbageCollector::Collect(bool bFullPurge)
 			if ((*It)->Generation != Generation)
 			{
 				Garbages.emplace_back(It);
+				PendingKill.emplace_back(*It);
 			}
 		}
+
+		for (auto It : Garbages)
+		{
+			Collection.erase(It);
+		}
+
+		Garbages.clear();
 	}
 
+	DeleteAction = std::async([this, bFullPurge]()
 	{
-		ScopedTimer Timer(L"  Delete");
-
 		size_t NumRemoves = 0;
 
-		for (auto& Garbage : Garbages)
+		for (auto& Garbage : PendingKill)
 		{
-			if (NumRemoves++ < IncrementalDeleteObject || bFullPurge)
-			{
-				PendingKill.erase(*Garbage);
-				(*Garbage)->UnmarkGC();
-			}
-			else
-			{
-				PendingKill.emplace(*Garbage);
-			}
+			Garbage->UnmarkGC();
 		}
 
-		int64 SizeIncrementalRemains = std::max((int64)IncrementalDeleteObject - (int64)NumRemoves, 0LL);
-		for (auto It = PendingKill.begin(); It != PendingKill.end() && (SizeIncrementalRemains-- > 0 || bFullPurge);)
-		{
-			(*It)->UnmarkGC();
-			if (!bFullPurge)
-			{
-				PendingKill.erase(It);
-				It = PendingKill.begin();
-			}
-			else
-			{
-				++It;
-			}
-		}
-
-		if (bFullPurge)
-		{
-			PendingKill.clear();
-		}
-	}
-
-	Garbages.clear();
-	PendingFinalize.clear();
+		PendingKill.clear();
+	});
 
 	[[unlikely]]
 	if (!bFullPurge)
@@ -206,12 +246,6 @@ void GarbageCollector::SuppressFinalize(SObject* Object)
 	PendingFinalize.emplace(Object);
 }
 
-GarbageCollector& GarbageCollector::GC()
-{
-	static GarbageCollector GC;
-	return GC;
-}
-
 void GarbageCollector::MarkAndSweep(SObject* Object)
 {
 	static thread_local std::vector<SObject*> ReferencedObjects;
@@ -226,7 +260,7 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 
 		for (auto& Object : Current)
 		{
-			if (Object == nullptr || Object->Generation == Generation)
+			if (Object == nullptr || (Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC))
 			{
 				continue;
 			}

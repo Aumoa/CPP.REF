@@ -7,27 +7,32 @@
 #include <list>
 #include <functional>
 #include <mutex>
+#include <future>
 
 class SObject;
+class GarbageCollector;
+class Thread;
+
+CORE_API extern GarbageCollector& GC;
 
 class CORE_API GarbageCollector
 {
+public:
+	class Instantiate;
+
 	template<class T>
 	friend class GCRoot;
 	friend class SObject;
+	friend class Instantiate;
+	friend class Thread;
 
 public:
-	static constexpr size_t IncrementalDeleteObject = 1024;
-
 	class StackRoot
 	{
-		GarbageCollector& GC;
-
 	public:
 		template<class... TStackRootRef>
-		StackRoot(GarbageCollector& GC, TStackRootRef&... Roots)
-			: GC(GC)
-			, NumRoots(sizeof...(TStackRootRef))
+		StackRoot(TStackRootRef&... Roots)
+			: NumRoots(sizeof...(TStackRootRef))
 		{
 			ToRootArray = [&]()
 			{
@@ -58,7 +63,12 @@ private:
 	std::set<StackRoot*> StackRoots;
 
 	std::set<SObject*> PendingFinalize;
-	std::set<SObject*> PendingKill;
+	std::vector<SObject*> PendingKill;
+
+	std::future<void> DeleteAction;
+
+	std::set<Thread*> GCThreads;
+	std::atomic<size_t> IncrementalGCMemory;
 
 private:
 	GarbageCollector();
@@ -67,12 +77,15 @@ private:
 	void RegisterObject(SObject* Object);
 	void UnregisterObject(SObject* Object);
 
+	void RegisterThread(Thread* ManagedThread);
+	void UnregisterThread(Thread* ManagedThread);
+
+	void IncrementAllocGCMemory(size_t Amount);
+
 public:
 	void Collect(bool bFullPurge = false);
 	size_t NumThreadObjects();
 	void SuppressFinalize(SObject* Object);
-
-	static GarbageCollector& GC();
 
 private:
 	void MarkAndSweep(SObject* Object);
@@ -80,4 +93,4 @@ private:
 
 #define GCROOTS_CONCAT_INTERNAL(X1, X2) X1 ## X2
 #define GCROOTS_CONCAT(X1, X2) GCROOTS_CONCAT_INTERNAL(X1, X2)
-#define GCROOTS(...) GarbageCollector::StackRoot GCROOTS_CONCAT(__FRAME_STACKROOTS_, __LINE__)(GC(), __VA_ARGS__)
+#define GCROOTS(...) GarbageCollector::StackRoot GCROOTS_CONCAT(__FRAME_STACKROOTS_, __LINE__)(__VA_ARGS__)
