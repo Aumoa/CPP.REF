@@ -96,7 +96,11 @@ public:
 	}
 
 	template<class TTo, std::same_as<SObject> TFrom>
-	inline static TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>)
+	inline static TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>) && (!requires(const TTo& IsOpt)
+	{
+		{ IsOpt.has_value() } -> std::same_as<bool>;
+		{ *IsOpt };
+	})
 	{
 		auto ValueTypePtr = Cast<SValueType>(InValue);
 		if (ValueTypePtr == nullptr)
@@ -105,6 +109,30 @@ public:
 		}
 
 		TTo OutValue;
+		if (!ValueTypePtr->Unboxing(&OutValue))
+		{
+			SE_LOG(LogCasts, Fatal, L"The type of value contained at boxing object is not match with desired type.");
+		}
+
+		return OutValue;
+	}
+
+	template<class TTo, std::same_as<SObject> TFrom>
+	inline static TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>) && requires(const TTo& IsOpt)
+	{
+		{ IsOpt.has_value() } -> std::same_as<bool>;
+		{ *IsOpt };
+	}
+	{
+		using ValueT = std::remove_reference_t<decltype(*std::declval<TTo>())>;
+
+		auto ValueTypePtr = Cast<SValueType>(InValue);
+		if (ValueTypePtr == nullptr)
+		{
+			return std::nullopt;
+		}
+
+		ValueT OutValue;
 		if (!ValueTypePtr->Unboxing(&OutValue))
 		{
 			SE_LOG(LogCasts, Fatal, L"The type of value contained at boxing object is not match with desired type.");
