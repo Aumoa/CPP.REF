@@ -12,11 +12,13 @@ interface IDisposable : implements SObject
 
 namespace IDisposable_Details
 {
-	template<std::derived_from<IDisposable> T>
+	template<class T>
 	class ScopedAutoDispose : public SharedPtr<T>
 	{
+		static_assert(std::derived_from<T, IDisposable>);
+
 	public:
-		ScopedAutoDispose(T* Disposable) : SharedPtr(Disposable)
+		ScopedAutoDispose(T* Disposable) : SharedPtr<T>(Disposable)
 		{
 		}
 
@@ -28,6 +30,7 @@ namespace IDisposable_Details
 
 	class ScopedUsingExecutor
 	{
+	public:
 		template<class T>
 		auto operator <<(T&& InlineLambda)
 		{
@@ -36,4 +39,5 @@ namespace IDisposable_Details
 	};
 }
 
-#define dp_using(Type, Var, Exp) IDisposable_Details::ScopedUsingExecutor() << [Var = ScopedAutoDispose(Exp)]
+#define dp_using(Var, Exp) IDisposable_Details::ScopedUsingExecutor() \
+<< [&, Var = IDisposable_Details::ScopedAutoDispose(Exp)]() -> void

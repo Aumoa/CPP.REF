@@ -3,12 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <mutex>
 
 class CONSOLE_API Console : public AbstractClass
 {
+private:
+	static std::mutex Locker;
+
 public:
 	static void Write(std::wstring_view Message);
 	static void WriteLine(std::wstring_view Message);
+	static std::wstring ReadLine();
+	static void Clear();
 
 	template<class... TArgs>
 	static void Write(std::wstring_view Message, TArgs&&... InFormatArgs)
@@ -26,7 +32,27 @@ private:
 	template<std::derived_from<SObject> T>
 	static auto TransformArg(T&& InArg)
 	{
-		return InArg->ToString();
+		if (InArg)
+		{
+			return InArg->ToString();
+		}
+		else
+		{
+			return L"";
+		}
+	}
+
+	template<template<class> class TSmartPtr, std::derived_from<SObject> T>
+	static auto TransformArg(const TSmartPtr<T>& InArg)
+	{
+		if (auto Ptr = InArg.Get())
+		{
+			return Ptr->ToString();
+		}
+		else
+		{
+			return L"";
+		}
 	}
 
 	template<class T>

@@ -47,5 +47,4 @@
 #include "Numerics/Transform.h"
 #include "Misc/StringUtils.h"
 #include "Misc/DateTime.h"
-#include "Memory/ScopedPtr.h"
 #include "PlatformMisc/InputEnums.h"

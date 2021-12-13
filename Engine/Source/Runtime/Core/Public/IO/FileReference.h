@@ -80,7 +80,7 @@ public:
 	/// <param name="sharingUser"> Key for shared user list. </param>
 	void CloseSharedStream(SObject* sharingUser);
 
-	std::string ReadAllText();
+	std::wstring ReadAllText();
 	bool WriteAllText(std::string_view Text);
 
 	SFileReference& operator =(const SFileReference& rhs) = default;

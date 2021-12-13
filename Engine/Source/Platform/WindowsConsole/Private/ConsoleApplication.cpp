@@ -16,7 +16,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	std::unique_ptr<PlatformModule> Module;
 
 	{
-		GCRoot CommandArgs = NewObject<SCommandLine>(Argv);
+		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
 
 		size_t ConsoleModuleIdx = CommandArgs->GetArgument(L"--ConsoleDll");
 		if (ConsoleModuleIdx == -1)
@@ -32,7 +32,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			return -1;
 		}
 
-		GCRoot LogModule = NewObject<SLogModule>(*ModuleName);
+		SharedPtr LogModule = NewObject<SLogModule>(*ModuleName);
 		LogModule->RunTask();
 
 		Module = std::make_unique<PlatformModule>(*ModuleName);
@@ -43,7 +43,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			return -1;
 		}
 
-		GCRoot ConsoleModule = Loader();
+		SharedPtr ConsoleModule = Loader();
 		if (!ConsoleModule.IsValid())
 		{
 			SE_LOG(LogWindowsConsole, Fatal, L"LoadConsoleModule function return nullptr.");

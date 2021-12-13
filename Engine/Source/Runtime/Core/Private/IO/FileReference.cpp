@@ -93,7 +93,23 @@ void SFileReference::CloseSharedStream(SObject* sharingUser)
 	LogSystem::Log(LogCore, ELogVerbosity::Verbose, L"The user {} is not contained from shared stream users.", sharingUser->ToString());
 }
 
-std::string SFileReference::ReadAllText()
+template<class TChar, class... TChars>
+inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
+{
+	if ((unsigned char)Orign[0] == (unsigned char)Char)
+	{
+		if constexpr (sizeof...(TChars) != 0)
+		{
+			return BOMcheck(Orign + 1, std::forward<TChars>(Chars)...);
+		}
+		
+		return true;
+	}
+
+	return false;
+}
+
+std::wstring SFileReference::ReadAllText()
 {
 	std::ifstream File(GetPath());
 	if (File.is_open())
@@ -105,7 +121,7 @@ std::string SFileReference::ReadAllText()
 		if (File.read(Buf.data(), Buf.size()).bad())
 		{
 			File.close();
-			return "";
+			return L"";
 		}
 
 		auto Rit = Buf.rbegin();
@@ -118,11 +134,64 @@ std::string SFileReference::ReadAllText()
 		}
 
 		Buf.erase(Rit.base(), Buf.end());
-
 		File.close();
-		return Buf;
+
+		std::wstring Encoded;
+
+		auto EncodeIsUnicode = [&Buf, &Encoded](bool bBigEndian)
+		{
+			constexpr bool bPlatformBigEndian = std::endian::native == std::endian::big;
+
+			size_t TotalLengthUnicode = Buf.length() / 2 - 1;
+			Encoded.resize(TotalLengthUnicode + 1);
+
+			if (bPlatformBigEndian == bBigEndian)
+			{
+				memcpy(Encoded.data(), Buf.data() + 2, sizeof(wchar_t) * TotalLengthUnicode);
+			}
+			else
+			{
+				for (size_t i = 0; i < TotalLengthUnicode; ++i)
+				{
+					size_t CharIdx = (i + 1) * 2;
+					char& BufPtr = Buf[CharIdx];
+
+					// Swap endian.
+					std::swap(BufPtr, Buf[CharIdx + 1]);
+					Encoded[i] = reinterpret_cast<wchar_t&>(Buf[CharIdx]);
+				}
+			}
+		};
+
+		if (BOMcheck(Buf.data(), 0xEF, 0xBB, 0xBF))
+		{
+			// UTF-8
+			Encoded = ANSI_TO_WCHAR(Buf.substr(3), 65001);
+		}
+		else if (BOMcheck(Buf.data(), 0xFE, 0xFF))
+		{
+			// UTF-16 BE
+			EncodeIsUnicode(true);
+		}
+		else if (BOMcheck(Buf.data(), 0xFF, 0xFE))
+		{
+			// UTF-16 LE
+			EncodeIsUnicode(false);
+		}
+		else if (BOMcheck(Buf.data(), 0x2B, 0x2F, 0x76))
+		{
+			// UTF-7
+			Encoded = ANSI_TO_WCHAR(Buf.substr(3), 65000);
+		}
+		else
+		{
+			// Without BOM.
+			Encoded = ANSI_TO_WCHAR(Buf);
+		}
+
+		return Encoded;
 	}
-	return "";
+	return L"";
 }
 
 bool SFileReference::WriteAllText(std::string_view Text)
