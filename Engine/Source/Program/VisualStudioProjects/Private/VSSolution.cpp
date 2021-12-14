@@ -88,22 +88,22 @@ EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), 
 	struct BuildConfiguration
 	{
 		std::wstring Name;
-		std::wstring EngineRedirect;
+		std::wstring RedirectName;
 	};
 
 	BuildConfiguration Configurations[] =
 	{
 		{
 			.Name = L"Debug",
-			.EngineRedirect = L"Debug",
+			.RedirectName = L"Debug",
 		},
 		{
 			.Name = L"DebugGame",
-			.EngineRedirect = L"Release",
+			.RedirectName = L"DebugGame",
 		},
 		{
 			.Name = L"Release",
-			.EngineRedirect = L"Release",
+			.RedirectName = L"Release",
 		}
 	};
 
@@ -126,19 +126,8 @@ EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), 
 			{
 				for (auto& Config : Configurations)
 				{
-					std::wstring RedirectName;
-
-					if (Project.Metadata->bEngine)
-					{
-						RedirectName = Config.EngineRedirect;
-					}
-					else
-					{
-						RedirectName = Config.Name;
-					}
-
-					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.ActiveCfg = {2}|x64", Project.ProjectGuid.ToString(), Config.Name, RedirectName) << std::endl;
-					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.Build.0 = {2}|x64", Project.ProjectGuid.ToString(), Config.Name, RedirectName) << std::endl;
+					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.ActiveCfg = {2}|x64", Project.ProjectGuid.ToString(), Config.Name, Config.RedirectName) << std::endl;
+					Builder << std::format(L"\t\t{{{0}}}.{1}|x64.Build.0 = {2}|x64", Project.ProjectGuid.ToString(), Config.Name, Config.RedirectName) << std::endl;
 				}
 			}
 		}
@@ -186,8 +175,8 @@ EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), 
 
 	std::filesystem::path SolutionFile = std::format(L"{}.sln", Solution->GetSolutionName());
 
-	std::string Previous = StringUtils::Trim(NewObject<SFileReference>(SolutionFile)->ReadAllText());
-	std::string Build = StringUtils::Trim(WCHAR_TO_ANSI(Builder.str()));
+	std::wstring Previous = StringUtils::Trim(NewObject<SFileReference>(SolutionFile)->ReadAllText());
+	std::wstring Build = StringUtils::Trim(Builder.str());
 	if (Previous != Build)
 	{
 		NewObject<SFileReference>(SolutionFile)->WriteAllText(Build);

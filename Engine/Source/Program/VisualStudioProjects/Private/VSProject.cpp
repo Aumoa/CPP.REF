@@ -136,18 +136,32 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	{
 		std::string Name;
 		std::string Configuration;
-		std::string Optimization;
-		std::string BasicRuntimeChecks;
+		std::string Optimization[2];
+		std::string BasicRuntimeChecks[2];
+		std::string Macros;
 		uint8 bUseDebugLibrary : 1;
-		uint8 bWholeProgramOptimization : 1;
-		uint8 bLinkIncremental : 1;
+		uint8 bWholeProgramOptimization : 2;
+		uint8 bLinkIncremental : 2;
 		uint8 bFunctionLevelLinking : 1;
-		uint8 bIntrinsicFunctions : 1;
-		uint8 bEnableCOMDATFolding : 1;
-		uint8 bOptimizeReferences : 1;
+		uint8 bIntrinsicFunctions : 2;
+		uint8 bEnableCOMDATFolding : 2;
+		uint8 bOptimizeReferences : 2;
 
 		// AutoGenerate
 		std::string Condition;
+	};
+
+	// Engine/Game
+	auto DoubleBit = [](uint8 bDoubleBit, bool bFlag)
+	{
+		if (bFlag)
+		{
+			return (bDoubleBit & 0b01) != 0;
+		}
+		else
+		{
+			return (bDoubleBit & 0x10) != 0;
+		}
 	};
 
 	BuildConfiguration Configurations[] =
@@ -155,41 +169,44 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 		{
 			.Name = "Debug",
 			.Configuration = "Debug",
-			.Optimization = "Disabled",
-			.BasicRuntimeChecks = "EnableFastChecks",
+			.Optimization = { "Disabled", "Disabled" },
+			.BasicRuntimeChecks = { "EnableFastChecks", "EnableFastChecks" },
+			.Macros = "DO_CHECK=1;",
 			.bUseDebugLibrary = true,
-			.bWholeProgramOptimization = false,
-			.bLinkIncremental = true,
+			.bWholeProgramOptimization = 0b00,
+			.bLinkIncremental = 0b11,
 			.bFunctionLevelLinking = true,
-			.bIntrinsicFunctions = false,
-			.bEnableCOMDATFolding = false,
-			.bOptimizeReferences = false,
+			.bIntrinsicFunctions = 0b00,
+			.bEnableCOMDATFolding = 0b00,
+			.bOptimizeReferences = 0b00,
 		},
 		{
 			.Name = "DebugGame",
 			.Configuration = "DebugGame",
-			.Optimization = "Disabled",
-			.BasicRuntimeChecks = "EnableFastChecks",
+			.Optimization = { "Disabled", "MaxSpeed" },
+			.BasicRuntimeChecks = { "EnableFastChecks", "Default" },
+			.Macros = "DO_CHECK=1;",
 			.bUseDebugLibrary = false,
-			.bWholeProgramOptimization = false,
-			.bLinkIncremental = true,
+			.bWholeProgramOptimization = 0b01,
+			.bLinkIncremental = 0b10,
 			.bFunctionLevelLinking = true,
-			.bIntrinsicFunctions = false,
-			.bEnableCOMDATFolding = false,
-			.bOptimizeReferences = false,
+			.bIntrinsicFunctions = 0b01,
+			.bEnableCOMDATFolding = 0b01,
+			.bOptimizeReferences = 0b01,
 		},
 		{
 			.Name = "Release",
 			.Configuration = "Release",
-			.Optimization = "MaxSpeed",
-			.BasicRuntimeChecks = "Default",
+			.Optimization = { "MaxSpeed", "MaxSpeed" },
+			.BasicRuntimeChecks = { "Default", "Default" },
+			.Macros = "DO_CHECK=0;",
 			.bUseDebugLibrary = false,
-			.bWholeProgramOptimization = true,
-			.bLinkIncremental = false,
+			.bWholeProgramOptimization = 0b11,
+			.bLinkIncremental = 0b00,
 			.bFunctionLevelLinking = true,
-			.bIntrinsicFunctions = true,
-			.bEnableCOMDATFolding = true,
-			.bOptimizeReferences = true,
+			.bIntrinsicFunctions = 0b11,
+			.bEnableCOMDATFolding = 0b11,
+			.bOptimizeReferences = 0b11,
 		}
 	};
 
@@ -235,7 +252,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 				NewElement(PropertyGroup, "ConfigurationType", GetTypeString(RuntimeData.Metadata->Type));
 				NewElement(PropertyGroup, "UseDebugLibraries", BoolStr(Config.bUseDebugLibrary));
 				NewElement(PropertyGroup, "PlatformToolset", "v142");
-				NewElement(PropertyGroup, "WholeProgramOptimization", BoolStr(Config.bWholeProgramOptimization));
+				NewElement(PropertyGroup, "WholeProgramOptimization", BoolStr(DoubleBit(Config.bWholeProgramOptimization, RuntimeData.Metadata->bEngine)));
 				NewElement(PropertyGroup, "CharacterSet", "Unicode");
 				NewElement(PropertyGroup, "EnableUnitySupport", "true");
 			}
@@ -258,7 +275,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 		{
 			XMLElement* PropertyGroup = NewElementPropertyGroup(Project, Config.Condition);
 			{
-				NewElement(PropertyGroup, "LinkIncremental", BoolStr(Config.bLinkIncremental));
+				NewElement(PropertyGroup, "LinkIncremental", BoolStr(DoubleBit(Config.bLinkIncremental, RuntimeData.Metadata->bEngine)));
 				NewElement(PropertyGroup, "OutDir", "$(SolutionDir)Build\\");
 				NewElement(PropertyGroup, "IntDir", "$(SolutionDir)Intermediate\\$(Configuration)\\$(ProjectName)\\");
 			}
@@ -272,24 +289,24 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 				{
 					NewElement(ClCompile, "WarningLevel", "Level3");
 					NewElement(ClCompile, "FunctionLevelLinking", BoolStr(Config.bFunctionLevelLinking));
-					NewElement(ClCompile, "IntrinsicFunctions", BoolStr(Config.bIntrinsicFunctions));
+					NewElement(ClCompile, "IntrinsicFunctions", BoolStr(DoubleBit(Config.bIntrinsicFunctions, RuntimeData.Metadata->bEngine)));
 					NewElement(ClCompile, "SDLCheck", "true");
 					NewElement(ClCompile, "ConformanceMode", "true");
 					NewElement(ClCompile, "LanguageStandard", "stdcpplatest");
 					NewElement(ClCompile, "MultiProcessorCompilation", "true");
 					NewElement(ClCompile, "AdditionalIncludeDirectories", WCHAR_TO_ANSI(RuntimeData.AdditionalIncludeDirectories));
-					NewElement(ClCompile, "PreprocessorDefinitions", WCHAR_TO_ANSI(RuntimeData.PreprocessorDefinitions));
+					NewElement(ClCompile, "PreprocessorDefinitions", WCHAR_TO_ANSI(RuntimeData.PreprocessorDefinitions) + Config.Macros);
 					NewElement(ClCompile, "UseStandardPreprocessor", "true");
 					NewElement(ClCompile, "DisableSpecificWarnings", WCHAR_TO_ANSI(RuntimeData.DisableSpecificWarnings));
-					NewElement(ClCompile, "Optimization", Config.Optimization);
-					NewElement(ClCompile, "BasicRuntimeChecks", Config.BasicRuntimeChecks);
+					NewElement(ClCompile, "Optimization", Config.Optimization[RuntimeData.Metadata->bEngine]);
+					NewElement(ClCompile, "BasicRuntimeChecks", Config.BasicRuntimeChecks[RuntimeData.Metadata->bEngine]);
 				}
 
 				XMLElement* Link = NewElement(ItemDefinitionGroup, "Link");
 				{
 					NewElement(Link, "SubSystem", GetSubSystemString(RuntimeData.Metadata->Type));
-					NewElement(Link, "EnableCOMDATFolding", BoolStr(Config.bEnableCOMDATFolding));
-					NewElement(Link, "OptimizeReferences", BoolStr(Config.bOptimizeReferences));
+					NewElement(Link, "EnableCOMDATFolding", BoolStr(DoubleBit(Config.bEnableCOMDATFolding, RuntimeData.Metadata->bEngine)));
+					NewElement(Link, "OptimizeReferences", BoolStr(DoubleBit(Config.bOptimizeReferences, RuntimeData.Metadata->bEngine)));
 					NewElement(Link, "GenerateDebugInformation", "true");
 					NewElement(Link, "EnableUAC", "false");
 					NewElement(Link, "AdditionalDependencies", WCHAR_TO_ANSI(RuntimeData.AdditionalDependencies));
@@ -514,8 +531,8 @@ tinyxml2::XMLError SVSProject::SaveAs(tinyxml2::XMLDocument* Doc, const std::fil
 	XMLPrinter Print;
 	Doc->Accept(&Print);
 
-	std::string Previous = StringUtils::Trim(NewObject<SFileReference>(Path)->ReadAllText());
-	std::string Build = StringUtils::Trim(std::string_view(Print.CStr()));
+	std::wstring Previous = StringUtils::Trim(NewObject<SFileReference>(Path)->ReadAllText());
+	std::wstring Build = StringUtils::Trim(ANSI_TO_WCHAR(Print.CStr()));
 	if (Previous == Build)
 	{
 		return XML_SUCCESS;

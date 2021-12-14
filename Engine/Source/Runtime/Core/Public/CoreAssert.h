@@ -14,12 +14,6 @@ public:
 	static void DebugBreak();
 };
 
-#ifdef _DEBUG
-#define DO_CHECK 1
-#else
-#define DO_CHECK 0
-#endif
-
 #if DO_CHECK
 
 #define check(x) if (const bool b = (x); !b) { CoreAssert::Assert(L ## #x, __FILEW__, __LINE__); }

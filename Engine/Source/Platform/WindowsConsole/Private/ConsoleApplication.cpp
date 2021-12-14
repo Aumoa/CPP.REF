@@ -54,9 +54,9 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			}
 
 			auto ReturnValue = Thread::NewThread<int32>(L"[MainThread]", [&]()
-				{
-					return ConsoleModule->Main(*CommandArgs.Get());
-				});
+			{
+				return ConsoleModule->Main(*CommandArgs.Get());
+			});
 
 			using namespace std::literals;
 			while (ReturnValue.wait_for(10s) == std::future_status::timeout)

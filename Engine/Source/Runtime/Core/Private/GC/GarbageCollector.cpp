@@ -18,34 +18,37 @@ public:
 
 GarbageCollector& GC = GarbageCollector::Instantiate::GC();
 
-class ScopedGuard : public NonCopyable
+namespace
 {
-	std::atomic<bool>* Ptr = nullptr;
+	class ScopedGuard : public NonCopyable
+	{
+		std::atomic<bool>* Ptr = nullptr;
 
-public:
-	ScopedGuard() = default;
-	ScopedGuard(std::atomic<bool>* Ptr) : Ptr(Ptr)
-	{
-	}
-	ScopedGuard(ScopedGuard&& Rhs) : Ptr(Rhs.Ptr)
-	{
-		Rhs.Ptr = nullptr;
-	}
-	~ScopedGuard() noexcept
-	{
-		if (Ptr)
+	public:
+		ScopedGuard() = default;
+		ScopedGuard(std::atomic<bool>* Ptr) : Ptr(Ptr)
 		{
-			*Ptr = false;
 		}
-	}
+		ScopedGuard(ScopedGuard&& Rhs) : Ptr(Rhs.Ptr)
+		{
+			Rhs.Ptr = nullptr;
+		}
+		~ScopedGuard() noexcept
+		{
+			if (Ptr)
+			{
+				*Ptr = false;
+			}
+		}
 
-	ScopedGuard& operator =(ScopedGuard&& Rhs)
-	{
-		Ptr = Rhs.Ptr;
-		Rhs.Ptr = nullptr;
-		return *this;
-	}
-};
+		ScopedGuard& operator =(ScopedGuard&& Rhs)
+		{
+			Ptr = Rhs.Ptr;
+			Rhs.Ptr = nullptr;
+			return *this;
+		}
+	};
+}
 
 #define SCOPED_LOCK() \
 std::unique_lock<std::mutex> Lock; \
@@ -133,7 +136,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 	ScopedTimer Timer(L"Total");
 
 	{
-		ScopedTimer Timer(L"  StopTheWorld");
+		//ScopedTimer Timer(L"  StopTheWorld");
 
 		for (auto& GCThread : GCThreads)
 		{
@@ -173,7 +176,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 	}
 
 	{
-		ScopedTimer Timer(L"  ResumeThreads");
+		//ScopedTimer Timer(L"  ResumeThreads");
 		for (auto& GCThread : GCThreads)
 		{
 			if (MyThread != GCThread)
@@ -185,7 +188,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 	if (DeleteAction.valid())
 	{
-		ScopedTimer Timer(L"  Wait Delete");
+		//ScopedTimer Timer(L"  Wait Delete");
 		DeleteAction.get();
 	}
 
