@@ -167,6 +167,7 @@ public:
 	}
 
 	const std::wstring& GetFriendlyName() const;
+	const std::wstring& GetFullName() const;
 	size_t GetHashCode() const;
 
 	Type* GetSuper() const;

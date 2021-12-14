@@ -39,6 +39,11 @@ const std::wstring& Type::GetFriendlyName() const
 	return FriendlyName;
 }
 
+const std::wstring& Type::GetFullName() const
+{
+	return FullName;
+}
+
 size_t Type::GetHashCode() const
 {
 	return TypeHash;

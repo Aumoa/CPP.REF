@@ -15,30 +15,18 @@ enum class ELogVerbosity;
 /// </summary>
 class CORE_API LogSystem
 {
-	class fatal_exception : public std::exception
-	{
-	public:
-		fatal_exception(const std::string& message);
-	};
+	class SFatalException;
 
 public:
-	/// <summary>
-	/// Log message.
-	/// </summary>
-	/// <typeparam name="...TArgs"> Type of formatter args. </typeparam>
-	/// <param name="category"> The log category. </param>
-	/// <param name="logVerbosity"> The log verbosity. </param>
-	/// <param name="format"> The text format. </param>
-	/// <param name="...args"> The formatter args. </param>
 	template<class... TArgs>
-	static void Log(LogCategory& category, ELogVerbosity logVerbosity, std::wstring_view format, TArgs&&... args)
+	static void Log(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
 	{
-		std::wstring message = std::format(format, std::forward<TArgs>(args)...);
-		InternalLog(category, logVerbosity, message);
+		std::wstring Message = std::format(Format, std::forward<TArgs>(Args)...);
+		InternalLog(Category, LogVerbosity, Message);
 	}
 
 private:
-	static void InternalLog(LogCategory& category, ELogVerbosity logVerbosity, std::wstring& message);
+	static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message);
 };
 
 #define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(Category, ELogVerbosity::Verbosity, Format __VA_OPT__(,) __VA_ARGS__)

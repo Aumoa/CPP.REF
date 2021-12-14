@@ -4,17 +4,26 @@
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Misc/StringUtils.h"
+#include "Exceptions/Exception.h"
 
-LogSystem::fatal_exception::fatal_exception(const std::string& message) : exception(message.c_str())
+class LogSystem::SFatalException : public SException
 {
-}
+	GENERATED_BODY(SFatalException)
 
-void LogSystem::InternalLog(LogCategory& category, ELogVerbosity logVerbosity, std::wstring& message)
-{
-	category.OnLog(logVerbosity, message);
-
-	if (logVerbosity == ELogVerbosity::Fatal)
+public:
+	SFatalException(std::wstring_view Message) : Super(Message)
 	{
-		throw fatal_exception(StringUtils::AsMultibyte(message));
+	}
+};
+
+GENERATE_BODY(LogSystem::SFatalException);
+
+void LogSystem::InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message)
+{
+	Category.OnLog(LogVerbosity, Message);
+
+	if (LogVerbosity == ELogVerbosity::Fatal)
+	{
+		throw SObject::NewObject<SFatalException>(Message);
 	}
 }
