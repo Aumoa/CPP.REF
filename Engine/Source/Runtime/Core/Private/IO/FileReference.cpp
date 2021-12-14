@@ -194,12 +194,13 @@ std::wstring SFileReference::ReadAllText()
 	return L"";
 }
 
-bool SFileReference::WriteAllText(std::string_view Text)
+bool SFileReference::WriteAllText(std::wstring_view Text, uint32 Encoding)
 {
+	std::string EncodedText = WCHAR_TO_ANSI(Text, Encoding);
 	std::ofstream File(GetPath(), std::ios::trunc);
 	if (File.is_open())
 	{
-		File << Text;
+		File << EncodedText;
 		File.close();
 		return true;
 	}

@@ -81,7 +81,7 @@ public:
 	void CloseSharedStream(SObject* sharingUser);
 
 	std::wstring ReadAllText();
-	bool WriteAllText(std::string_view Text);
+	bool WriteAllText(std::wstring_view Text, uint32 Encoding = 0);
 
 	SFileReference& operator =(const SFileReference& rhs) = default;
 	SFileReference& operator =(SFileReference&& rhs) = default;
