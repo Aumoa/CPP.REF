@@ -393,7 +393,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	XMLError Err = SaveAs(&Doc, XmlPath);
 	if (Err != XML_SUCCESS)
 	{
-		SE_LOG(LogVSProjects, Fatal, L"Failed to save project file.");
+		FatalAndDisplay(L"Failed to save project file.");
 		return;
 	}
 
@@ -476,7 +476,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	Err = SaveAs(&Doc, IntermediateProjectPath.string() + ".vcxproj.filters");
 	if (Err != XMLError::XML_SUCCESS)
 	{
-		SE_LOG(LogVSProjects, Fatal, L"Failed to save project file.");
+		FatalAndDisplay(L"Failed to save project file.");
 	}
 
 	// Make debugger settings.
@@ -515,7 +515,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	Err = SaveAs(&Doc, IntermediateProjectPath.string() + ".vcxproj.user");
 	if (Err != XMLError::XML_SUCCESS)
 	{
-		SE_LOG(LogVSProjects, Fatal, L"Failed to save project file.");
+		FatalAndDisplay(L"Failed to save project file.");
 	}
 }
 

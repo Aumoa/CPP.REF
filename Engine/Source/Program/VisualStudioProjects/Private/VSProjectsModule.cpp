@@ -14,14 +14,14 @@ int32 SVSProjectsModule::Run(const SCommandLine& CommandArgs)
 	size_t Idx = CommandArgs.GetArgument(L"--Solution");
 	if (Idx == -1)
 	{
-		SE_LOG(LogVSProjects, Fatal, L"--Solution argument required.");
+		FatalAndDisplay(L"--Solution argument required.");
 		return -1;
 	}
 
 	auto* Solution = NewObject<SSolution>(*NewObject<SFileReference>(*CommandArgs.GetArgument(Idx + 1)));
 	Solution->GenerateProjects(NewObject<SVSProjectGenerator>(Solution));
 
-	SE_LOG(LogVSProjects, Verbose, L"VisualStudio Project Generated.");
+	LogAndDisplay(L"VisualStudio Project Generated.");
 	return 0;
 }
 
