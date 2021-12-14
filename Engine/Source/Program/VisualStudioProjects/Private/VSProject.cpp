@@ -295,7 +295,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 					NewElement(ClCompile, "LanguageStandard", "stdcpplatest");
 					NewElement(ClCompile, "MultiProcessorCompilation", "true");
 					NewElement(ClCompile, "AdditionalIncludeDirectories", WCHAR_TO_ANSI(RuntimeData.AdditionalIncludeDirectories));
-					NewElement(ClCompile, "PreprocessorDefinitions", WCHAR_TO_ANSI(RuntimeData.PreprocessorDefinitions) + Config.Macros);
+					NewElement(ClCompile, "PreprocessorDefinitions", Config.Macros + WCHAR_TO_ANSI(RuntimeData.PreprocessorDefinitions));
 					NewElement(ClCompile, "UseStandardPreprocessor", "true");
 					NewElement(ClCompile, "DisableSpecificWarnings", WCHAR_TO_ANSI(RuntimeData.DisableSpecificWarnings));
 					NewElement(ClCompile, "Optimization", Config.Optimization[RuntimeData.Metadata->bEngine]);
@@ -325,7 +325,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			}
 
 			auto AbsolutePath = std::filesystem::absolute(RelativePath);
-			SDirectoryReference(AbsolutePath).CreateIfNotExists(true);
+			NewObject<SDirectoryReference>(AbsolutePath)->CreateIfNotExists(true);
 
 			for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 			{
@@ -384,7 +384,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	}
 
 	// Create directory.
-	SDirectoryReference(IntermediateProjectPath).CreateIfNotExists(true);
+	NewObject<SDirectoryReference>(IntermediateProjectPath)->CreateIfNotExists(true);
 
 	IntermediateProjectPath /= RuntimeData.Metadata->Name;
 	XmlPath = IntermediateProjectPath;
@@ -420,7 +420,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			}
 
 			auto AbsolutePath = std::filesystem::absolute(ProjectRelativePath).wstring();
-			SDirectoryReference(AbsolutePath).CreateIfNotExists(true);
+			NewObject<SDirectoryReference>(AbsolutePath)->CreateIfNotExists(true);
 
 			std::set<std::wstring> Filters;
 

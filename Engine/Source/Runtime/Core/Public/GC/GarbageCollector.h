@@ -62,7 +62,8 @@ private:
 
 private:
 	// lock-free buffers.
-	std::array<std::vector<SObject*>, 16> ReferencedObjects_ThreadTemp;
+	static constexpr size_t NumGCThreads = 8;
+	std::array<std::vector<SObject*>, NumGCThreads> ReferencedObjects_ThreadTemp;
 
 private:
 	GarbageCollector();

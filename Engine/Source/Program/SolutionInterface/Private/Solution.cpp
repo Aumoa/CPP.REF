@@ -12,19 +12,19 @@ SSolution::SSolution(const SFileReference& SolutionXml) : Super()
 {
 	TickCalc<> LocalTimer;
 
-	SE_LOG(LogSolutionInterface, Verbose, L"Reading '{}'...", SolutionXml.GetFilename().wstring(), LocalTimer.DoCalc());
+	LogAndDisplay(L"Reading '{}'...", SolutionXml.GetFilename().wstring(), LocalTimer.DoCalc());
 	ReadSolutionXml(SolutionXml);
-	SE_LOG(LogSolutionInterface, Verbose, L"Finish to reading SolutionXml. ({} seconds)", LocalTimer.DoCalc().count());
+	LogAndDisplay(L"Finish to reading SolutionXml. ({} seconds)", LocalTimer.DoCalc().count());
 
-	SE_LOG(LogSolutionInterface, Verbose, L"Search all projects.", LocalTimer.DoCalc());
+	LogAndDisplay(L"Search all projects.", LocalTimer.DoCalc());
 	SearchProjects(ThirdpartyRoot, true);
 	SearchProjects(EngineRoot, true);
 	SearchProjects(GameRoot, false);
-	SE_LOG(LogSolutionInterface, Verbose, L"Finish to search projects. {} projects found. ({} seconds)", ProjectMetadatas.size(), LocalTimer.DoCalc().count());
+	LogAndDisplay(L"Finish to search projects. {} projects found. ({} seconds)", ProjectMetadatas.size(), LocalTimer.DoCalc().count());
 
-	SE_LOG(LogSolutionInterface, Verbose, L"Generate project runtime data.", LocalTimer.DoCalc());
+	LogAndDisplay(L"Generate project runtime data.", LocalTimer.DoCalc());
 	GenerateProjectsRuntimeData();
-	SE_LOG(LogSolutionInterface, Verbose, L"Done. ({} seconds)", LocalTimer.DoCalc().count());
+	LogAndDisplay(L"Done. ({} seconds)", LocalTimer.DoCalc().count());
 }
 
 std::wstring SSolution::GetSolutionName()
@@ -46,12 +46,12 @@ ISolution* SSolution::GenerateProjects(IProjectGenerator* Generator)
 {
 	TickCalc<> LocalTimer;
 
-	SE_LOG(LogSolutionInterface, Verbose, L"Generate projects.", LocalTimer.DoCalc());
+	LogAndDisplay(L"Generate projects.", LocalTimer.DoCalc());
 	for (auto& [Key, Value] : ProjectRuntimes)
 	{
 		GenerateProject(Generator, &Value);
 	}
-	SE_LOG(LogSolutionInterface, Verbose, L"Done. ({} seconds)", LocalTimer.DoCalc().count());
+	LogAndDisplay(L"Done. ({} seconds)", LocalTimer.DoCalc().count());
 
 	return Generator->GenerateSolution();
 }
@@ -123,12 +123,12 @@ void SSolution::ReadSolutionXml(const SFileReference& SolutionXml)
 		}
 	}
 
-	SE_LOG(LogSolutionInterface, Verbose, L"SolutionName: {}", SolutionName);
-	SE_LOG(LogSolutionInterface, Verbose, L"SolutionDirectory: {}", XmlBaseDirectory.wstring());
-	SE_LOG(LogSolutionInterface, Verbose, L"GameRoot: {}", GameRoot.wstring());
-	SE_LOG(LogSolutionInterface, Verbose, L"EngineRoot: {}", EngineRoot.wstring());
-	SE_LOG(LogSolutionInterface, Verbose, L"ThirdpartyRoot: {}", ThirdpartyRoot.wstring());
-	SE_LOG(LogSolutionInterface, Verbose, L"FirstProject: {}", FirstProject);
+	LogAndDisplay(L"SolutionName: {}", SolutionName);
+	LogAndDisplay(L"SolutionDirectory: {}", XmlBaseDirectory.wstring());
+	LogAndDisplay(L"GameRoot: {}", GameRoot.wstring());
+	LogAndDisplay(L"EngineRoot: {}", EngineRoot.wstring());
+	LogAndDisplay(L"ThirdpartyRoot: {}", ThirdpartyRoot.wstring());
+	LogAndDisplay(L"FirstProject: {}", FirstProject);
 
 	if (bNeedToSave)
 	{
@@ -140,14 +140,14 @@ void SSolution::SearchProjects(const std::filesystem::path& Directory, bool bIsE
 {
 	if (!std::filesystem::exists(Directory))
 	{
-		SE_LOG(LogSolutionInterface, Warning, L"Unable to found desired directory: {}. Abort.", Directory.wstring());
+		WarningAndDisplay(L"Unable to found desired directory: {}. Abort.", Directory.wstring());
 		return;
 	}
 
 	auto SourcePath = Directory / L"Source";
 	if (!std::filesystem::exists(SourcePath))
 	{
-		SE_LOG(LogSolutionInterface, Warning, L"Unable to found source directory: {}. Abort.", SourcePath.wstring());
+		WarningAndDisplay(L"Unable to found source directory: {}. Abort.", SourcePath.wstring());
 		return;
 	}
 
@@ -160,7 +160,7 @@ void SSolution::SearchProjects(const std::filesystem::path& Directory, bool bIsE
 			{
 				if (ProjectBuildMetadata Build; TryParseProject(XmlPath, Build))
 				{
-					SE_LOG(LogSolutionInterface, Verbose, L"Succeeded to load project metadata. XmlPath: {}", XmlPath.wstring());
+					LogAndDisplay(L"Succeeded to load project metadata. XmlPath: {}", XmlPath.wstring());
 					Build.AbsoluteDirectory = std::filesystem::absolute(Directory);
 					Build.BaseDirectory = Directory.stem().wstring();
 					Build.bEngine = bIsEngine;
@@ -168,7 +168,7 @@ void SSolution::SearchProjects(const std::filesystem::path& Directory, bool bIsE
 				}
 				else
 				{
-					SE_LOG(LogSolutionInterface, Warning, L"Failed to load project metadata. XmlPath: {}", XmlPath.wstring());
+					WarningAndDisplay(L"Failed to load project metadata. XmlPath: {}", XmlPath.wstring());
 				}
 			}
 		}
@@ -314,6 +314,21 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 			}
 		}
 
+		if (XMLElement* PreprocessorDefines = ProjectInfo->FirstChildElement("PreprocessorDefines"))
+		{
+			for (XMLElement* Item = PreprocessorDefines->FirstChildElement(); Item != nullptr; Item = Item->NextSiblingElement())
+			{
+				ProjectBuildMetadata::PreprocessorDefine PreprocessorDefine;
+
+				PreprocessorDefine.Define = ANSI_TO_WCHAR(Item->GetText());
+				if (!PreprocessorDefine.Define.empty())
+				{
+					PreprocessorDefine.Access = ParseAccessKey(Item->Attribute("Access"));
+					OutBuild.PreprocessorDefines.emplace_back(PreprocessorDefine);
+				}
+			}
+		}
+
 		if (bNeedToSave)
 		{
 			Doc.SaveFile(WCHAR_TO_ANSI(XmlPath.wstring()).c_str());
@@ -334,8 +349,7 @@ void SSolution::GenerateProjectsRuntimeData()
 		auto [It, Result] = ProjectRuntimes.emplace(Meta.Name, ProjectBuildRuntime());
 		if (!Result)
 		{
-			SE_LOG(LogSolutionInterface, Error, LR"(Duplicated project name("{}") detected!)", Meta.Name);
-			throw std::exception("Unhandled exception.");
+			FatalAndDisplay(LR"(Duplicated project name("{}") detected!)", Meta.Name);
 		}
 
 		auto& [Key, Value] = *It;
@@ -368,12 +382,14 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 			std::set<std::wstring>* AccessIncludePaths = nullptr;
 			std::set<int32>* AccessDisableWarnings = nullptr;
 			std::set<std::wstring>* AccessExternalLinks = nullptr;
+			std::set<std::wstring>* AccessPreprocessorDefines = nullptr;
 			if (Reference.Access == EAccessKey::Public)
 			{
 				AccessReferences = &Runtime->PublicReferences;
 				AccessIncludePaths = &Runtime->PublicIncludePaths;
 				AccessDisableWarnings = &Runtime->PublicDisableWarnings;
 				AccessExternalLinks = &Runtime->PublicExternalLinks;
+				AccessPreprocessorDefines = &Runtime->PublicPreprocessorDefines;
 			}
 			else
 			{
@@ -381,6 +397,7 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 				AccessIncludePaths = &Runtime->PrivateIncludePaths;
 				AccessDisableWarnings = &Runtime->PrivateDisableWarnings;
 				AccessExternalLinks = &Runtime->PrivateExternalLinks;
+				AccessPreprocessorDefines = &Runtime->PrivatePreprocessorDefines;
 			}
 
 			AccessReferences->insert(ReferencedRuntime->PublicReferences.begin(), ReferencedRuntime->PublicReferences.end());
@@ -388,6 +405,7 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 			AccessIncludePaths->insert(ReferencedRuntime->PublicIncludePaths.begin(), ReferencedRuntime->PublicIncludePaths.end());
 			AccessDisableWarnings->insert(ReferencedRuntime->PublicDisableWarnings.begin(), ReferencedRuntime->PublicDisableWarnings.end());
 			AccessExternalLinks->insert(ReferencedRuntime->PublicExternalLinks.begin(), ReferencedRuntime->PublicExternalLinks.end());
+			AccessPreprocessorDefines->insert(ReferencedRuntime->PublicPreprocessorDefines.begin(), ReferencedRuntime->PublicPreprocessorDefines.end());
 		}
 
 		// ProjectPath
@@ -440,6 +458,29 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 			std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
 			PreprocessorDefinitions.emplace_back(NameUpper + L"_API=__declspec(dllexport)");
 		}
+
+		for (auto& Define : Runtime->Metadata->PreprocessorDefines)
+		{
+			if (Define.Access == EAccessKey::Public)
+			{
+				Runtime->PublicPreprocessorDefines.emplace(Define.Define);
+			}
+			else
+			{
+				Runtime->PrivatePreprocessorDefines.emplace(Define.Define);
+			}
+		}
+
+		for (auto& Define : Runtime->PublicPreprocessorDefines)
+		{
+			PreprocessorDefinitions.emplace_back(Define);
+		}
+
+		for (auto& Define : Runtime->PrivatePreprocessorDefines)
+		{
+			PreprocessorDefinitions.emplace_back(Define);
+		}
+
 		PreprocessorDefinitions.emplace_back(L"$(PreprocessorDefinitions)");
 		Runtime->PreprocessorDefinitions = StringUtils::Join(L";", PreprocessorDefinitions);
 
@@ -506,7 +547,7 @@ void SSolution::GenerateProject(IProjectGenerator* Generator, ProjectBuildRuntim
 		return;
 	}
 
-	SE_LOG(LogSolutionInterface, Verbose, L"Check dependencies for '{}' project.", Runtime->Metadata->Name);
+	LogAndDisplay(L"Check dependencies for '{}' project.", Runtime->Metadata->Name);
 
 	for (auto& [Guid, Reference] : Runtime->PrivateReferences)
 	{
@@ -524,6 +565,6 @@ void SSolution::GenerateProject(IProjectGenerator* Generator, ProjectBuildRuntim
 		}
 	}
 
-	SE_LOG(LogSolutionInterface, Verbose, L"Generating '{}' project.", Runtime->Metadata->Name);
+	LogAndDisplay(L"Generating '{}' project.", Runtime->Metadata->Name);
 	Runtime->GeneratedProject = Generator->GenerateProject(*Runtime);
 }

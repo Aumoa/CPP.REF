@@ -24,6 +24,8 @@ struct ProjectBuildRuntime
 	std::set<std::wstring> PrivateIncludePaths;
 	std::wstring AdditionalIncludeDirectories;
 
+	std::set<std::wstring> PublicPreprocessorDefines;
+	std::set<std::wstring> PrivatePreprocessorDefines;
 	std::wstring PreprocessorDefinitions;
 
 	std::set<int32> PublicDisableWarnings;

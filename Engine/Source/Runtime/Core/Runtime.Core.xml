@@ -16,4 +16,7 @@
 		<!-- Warning: non DLL-interface class 'Class1' used as base for DLL-interface class 'Class2'. -->
 		<Item Number="4275" Access="Public"/>
     </DisableWarnings>
+	<PreprocessorDefines>
+		<Item Access="Private">NOMINMAX</Item>
+	</PreprocessorDefines>
 </ProjectInfo>

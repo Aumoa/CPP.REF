@@ -18,7 +18,7 @@ int32 SVSProjectsModule::Run(const SCommandLine& CommandArgs)
 		return -1;
 	}
 
-	auto* Solution = NewObject<SSolution>(SFileReference(*CommandArgs.GetArgument(Idx + 1)));
+	auto* Solution = NewObject<SSolution>(*NewObject<SFileReference>(*CommandArgs.GetArgument(Idx + 1)));
 	Solution->GenerateProjects(NewObject<SVSProjectGenerator>(Solution));
 
 	SE_LOG(LogVSProjects, Verbose, L"VisualStudio Project Generated.");

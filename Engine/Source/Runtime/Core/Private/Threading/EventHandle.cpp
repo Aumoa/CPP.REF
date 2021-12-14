@@ -1,7 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#define NOMINMAX
-
 #include <Windows.h>
 #undef GetObject
 

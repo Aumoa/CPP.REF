@@ -62,4 +62,11 @@ struct ProjectBuildMetadata
 		EAccessKey Access = EAccessKey::Private;
 	};
 	std::vector<ExternalLink> ExternalLinks;
+
+	struct PreprocessorDefine
+	{
+		std::wstring Define;
+		EAccessKey Access = EAccessKey::Private;
+	};
+	std::vector<PreprocessorDefine> PreprocessorDefines;
 };

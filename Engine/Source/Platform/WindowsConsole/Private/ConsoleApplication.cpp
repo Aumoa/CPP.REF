@@ -74,13 +74,15 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 			bRunningGCThread = false;
 			GCThread.get();
-		}
 
-		SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
-		GC.Collect(true);
+			SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
+			GC.Collect(true);
+		}
 
 		LogModule->Shutdown();
 	}
 
+	GC.Collect(true);
+	GC.Shutdown();
 	return ReturnCode;
 }

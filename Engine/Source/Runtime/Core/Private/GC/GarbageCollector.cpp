@@ -189,7 +189,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 				}
 
 				MarkAndSweep(Object, bFullPurge, ThreadIdx);
-			}, 16);
+			}, NumGCThreads);
 
 			ResumeThreads(MyThread);
 		}
@@ -220,7 +220,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 			{
 				PendingKill[ActualPendingKill++] = Object;
 			}
-		});
+		}, NumGCThreads);
 
 		// Compact pending kill list.
 		PendingKill.resize(ActualPendingKill);
@@ -268,6 +268,20 @@ void GarbageCollector::Shutdown()
 	{
 		DeleteAction.get();
 	}
+
+	// Final dispose.
+	for (auto& Item : Objects.Collection)
+	{
+		if (Item)
+		{
+			ensure(false);
+			delete Item;
+		}
+	}
+
+	Objects.Collection.clear();
+	Objects.PoolReserve.clear();
+	Roots.clear();
 }
 
 void GarbageCollector::SetAutoFlushInterval(float InSeconds)
