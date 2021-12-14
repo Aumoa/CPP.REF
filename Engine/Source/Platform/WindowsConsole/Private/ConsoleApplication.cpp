@@ -59,9 +59,9 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			});
 
 			using namespace std::literals;
-			while (ReturnValue.wait_for(10s) == std::future_status::timeout)
+			while (ReturnValue.wait_for(1s) == std::future_status::timeout)
 			{
-				GC.Collect();
+				GC.Tick(1.0f);
 			}
 
 			ReturnCode = ReturnValue.get();

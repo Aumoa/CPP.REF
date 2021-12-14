@@ -43,7 +43,7 @@ private:
 
 	uint8 bGCCollection : 1 = false;
 	Type* CollectionType = nullptr;
-	std::function<std::vector<SObject*>(const void*)> Collector;
+	std::function<void(std::vector<SObject*>&, const void*)> Collector;
 
 public:
 	template<class TType>
@@ -60,7 +60,7 @@ public:
 
 		uint8 bGCCollection : 1 = false;
 		Type* CollectionType = nullptr;
-		std::function<std::vector<SObject*>(const void*)> Collector;
+		std::function<void(std::vector<SObject*>&, const void*)> Collector;
 
 		// SObject type.
 		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires requires { TType::StaticClass(); }
@@ -92,20 +92,17 @@ public:
 			, bNative(true)
 			, bGCCollection(true)
 			, CollectionType(std::remove_reference_t<decltype(**std::begin(std::declval<const TType&>()))>::StaticClass())
-			, Collector([](const void* Ptr)
+			, Collector([](std::vector<SObject*>& OutBuf, const void* Ptr)
 			{
 				const TType* Collection = reinterpret_cast<const TType*>(Ptr);
 
 				size_t NumObjects = std::size(*Collection);
-				std::vector<SObject*> GCCollection;
-				GCCollection.reserve(NumObjects);
+				OutBuf.reserve(OutBuf.size() + NumObjects);
 
 				for (auto It = std::begin(*Collection); It != std::end(*Collection); std::advance(It, 1))
 				{
-					GCCollection.emplace_back(dynamic_cast<SObject*>(*It));
+					OutBuf.emplace_back(dynamic_cast<SObject*>(*It));
 				}
-
-				return GCCollection;
 			})
 		{
 		}
@@ -209,7 +206,7 @@ public:
 	const std::vector<Property*>& GetProperties(bool bIncludeSuperMembers = true);
 	const std::vector<Property*>& GetGCProperties();
 	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
-	std::vector<SObject*> GetCollectionObjects(SObject* Object, Property* CollectionProp);
+	void GetCollectionObjects(SObject* Object, Property* CollectionProp, std::vector<SObject*>& OutCollection);
 
 public:
 	void* FromObject(SObject* Object) const { return FromObjectCast(Object); }

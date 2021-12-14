@@ -13,16 +13,11 @@ GENERATE_BODY(SObject);
 SObject::SObject() : Generation(0)
 {
 	ReferencePtr = new WeakReferencePtr();
+	GC.RegisterObject(this);
 }
 
 SObject::~SObject()
 {
-	bool bExpect = false;
-	if (ReferencePtr->bDisposed.compare_exchange_strong(bExpect, true))
-	{
-		GC.UnregisterObject(this);
-	}
-
 	if (ReferencePtr->WeakReferences == 0)
 	{
 		delete ReferencePtr;
@@ -32,18 +27,16 @@ SObject::~SObject()
 
 void SObject::MarkGC(uint64 Generation)
 {
-	this->Generation = Generation;
-	this->ReferencePtr->bMarkAtGC = true;
+	if (this->Generation != Generation)
+	{
+		this->Generation = Generation;
+		this->ReferencePtr->bMarkAtGC = true;
+	}
 }
 
 void SObject::UnmarkGC()
 {
 	ReferencePtr->bMarkAtGC = false;
-	if (!ReferencePtr->IsValid())
-	{
-		delete this;
-		return;
-	}
 }
 
 void SObject::AddToRoot()
@@ -63,12 +56,7 @@ std::wstring SObject::ToString()
 
 void SObject::PostConstruction()
 {
-	GC.RegisterObject(this);
-}
-
-std::vector<SObject*> SObject::GetGCMembers()
-{
-	return {};
+	const auto& CachingDummy = GetType()->GetGCProperties();
 }
 
 void* SObject::operator new(size_t AllocSize)

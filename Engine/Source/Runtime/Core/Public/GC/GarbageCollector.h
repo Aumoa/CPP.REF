@@ -26,41 +26,27 @@ public:
 	friend class Instantiate;
 	friend class Thread;
 
-public:
-	class StackRoot
+private:
+	struct ObjectPool
 	{
-	public:
-		template<class... TStackRootRef>
-		StackRoot(TStackRootRef&... Roots)
-			: NumRoots(sizeof...(TStackRootRef))
-		{
-			ToRootArray = [&]()
-			{
-				std::vector<SObject*> Objects = { dynamic_cast<SObject*>(Roots)... };
-				return Objects;
-			};
+		std::vector<SObject*> Collection;
+		std::vector<size_t> PoolReserve;
 
-			GC.StackRoots.emplace(this);
-		}
+		size_t size();
+		SObject*& emplace(SObject* InObject);
+		void erase(SObject* InObject);
 
-		~StackRoot()
-		{
-			GC.StackRoots.erase(this);
-		}
-		
-		const size_t NumRoots;
-		std::function<std::vector<SObject*>()> ToRootArray;
+		[[nodiscard]] auto begin() { return Collection.begin(); }
+		[[nodiscard]] auto end() { return Collection.end(); }
 	};
 
 private:
 	std::mutex Locker;
 	std::atomic<bool> bScoped;
 
-	std::set<SObject*> Collection;
+	ObjectPool Objects;
 	std::set<SObject*> Roots;
 	uint64 Generation = 0;
-
-	std::set<StackRoot*> StackRoots;
 
 	std::set<SObject*> PendingFinalize;
 	std::vector<SObject*> PendingKill;
@@ -69,6 +55,14 @@ private:
 
 	std::set<Thread*> GCThreads;
 	std::atomic<size_t> IncrementalGCMemory;
+
+	float AutoFlushInterval = 60.0f;
+	int32 MinorGCCounter = 0;
+	std::atomic<bool> bManualGCTriggered;
+
+private:
+	// lock-free buffers.
+	std::array<std::vector<SObject*>, 16> ReferencedObjects_ThreadTemp;
 
 private:
 	GarbageCollector();
@@ -83,14 +77,17 @@ private:
 	void IncrementAllocGCMemory(size_t Amount);
 
 public:
+	void Tick(float InDeltaSeconds);
 	void Collect(bool bFullPurge = false);
 	size_t NumThreadObjects();
 	void SuppressFinalize(SObject* Object);
+	void Shutdown();
+
+	void SetAutoFlushInterval(float InSeconds);
+	float GetAutoFlushInterval();
 
 private:
-	void MarkAndSweep(SObject* Object);
+	void MarkAndSweep(SObject* Object, bool bFullPurge, size_t ThreadIdx);
+	void StopThreads(Thread* MyThread);
+	void ResumeThreads(Thread* MyThread);
 };
-
-#define GCROOTS_CONCAT_INTERNAL(X1, X2) X1 ## X2
-#define GCROOTS_CONCAT(X1, X2) GCROOTS_CONCAT_INTERNAL(X1, X2)
-#define GCROOTS(...) GarbageCollector::StackRoot GCROOTS_CONCAT(__FRAME_STACKROOTS_, __LINE__)(__VA_ARGS__)

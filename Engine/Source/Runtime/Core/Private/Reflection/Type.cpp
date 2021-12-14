@@ -210,11 +210,11 @@ Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuper
 	return nullptr;
 }
 
-std::vector<SObject*> Type::GetCollectionObjects(SObject* Object, Property* CollectionProp)
+void Type::GetCollectionObjects(SObject* Object, Property* CollectionProp, std::vector<SObject*>& OutCollection)
 {
 	check(bGCCollection && Collector);
 	const uint8& CollectionPtr = CollectionProp->GetValue<uint8>(Object);
-	return Collector(&CollectionPtr);
+	Collector(OutCollection, &CollectionPtr);
 }
 
 std::wstring Type::GenerateUniqueName()

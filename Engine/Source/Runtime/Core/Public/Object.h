@@ -51,6 +51,7 @@ private:
 
 private:
 	uint64 Generation = 0;
+	size_t InternalIndex = -1;
 	WeakReferencePtr* ReferencePtr = nullptr;
 
 public:
@@ -72,7 +73,6 @@ public:
 
 protected:
 	virtual void PostConstruction();
-	virtual std::vector<SObject*> GetGCMembers();
 
 public:
 	template<class T, class... TArgs>
