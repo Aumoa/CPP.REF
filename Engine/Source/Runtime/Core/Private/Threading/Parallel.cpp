@@ -50,8 +50,7 @@ void Parallel::ForEach(std::vector<std::future<void>>& Futures, std::function<vo
 	size_t ItemPerThread = (Count - 1) / NumThreads + 1;
 	Futures.reserve(NumThreads);
 
-	std::promise<void> AsyncLauncher;
-	std::shared_future<void> IsReady = AsyncLauncher.get_future();
+	std::atomic<bool> bBusylock = true;
 
 	// Create threads.
 	for (size_t i = 0; i < NumThreads; ++i)
@@ -59,9 +58,9 @@ void Parallel::ForEach(std::vector<std::future<void>>& Futures, std::function<vo
 		size_t StartIndex = i * ItemPerThread;
 		size_t EndIndex = std::min((i + 1) * ItemPerThread, Count);
 
-		Futures.emplace_back(std::async(std::launch::async, [&Body, StartIndex, EndIndex, ThreadIdx = i, &IsReady]()
+		Futures.emplace_back(std::async(std::launch::async, [&Body, StartIndex, EndIndex, ThreadIdx = i, &bBusylock]()
 		{
-			IsReady.get();
+			while (bBusylock);
 
 			for (size_t i = StartIndex; i < EndIndex; ++i)
 			{
@@ -75,11 +74,11 @@ void Parallel::ForEach(std::vector<std::future<void>>& Futures, std::function<vo
 		PreLaunch();
 	}
 
-	AsyncLauncher.set_value();
+	bBusylock = false;
 
 	// Waiting all threads.
 	for (size_t i = 0; i < NumThreads; ++i)
 	{
-		Futures[i].get();
+		Futures[i].wait();
 	}
 }

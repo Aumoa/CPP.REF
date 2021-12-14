@@ -53,18 +53,27 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 				return -1;
 			}
 
-			auto ReturnValue = Thread::NewThread<int32>(L"[MainThread]", [&]()
+			Thread* MainThread = Thread::GetCurrentThread();
+
+			MainThread->SetFriendlyName(L"[Main Thread]");
+			GC.RegisterThread(MainThread);
+
+			std::atomic<bool> bRunningGCThread = true;
+			auto GCThread = Thread::NewThread<void>(L"[GC Thread]", [&]()
 			{
-				return ConsoleModule->Main(*CommandArgs.Get());
+				while (bRunningGCThread)
+				{
+					using namespace std::literals;
+
+					GC.Tick(1.0f);
+					std::this_thread::sleep_for(1s);
+				}
 			});
 
-			using namespace std::literals;
-			while (ReturnValue.wait_for(1s) == std::future_status::timeout)
-			{
-				GC.Tick(1.0f);
-			}
+			ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
 
-			ReturnCode = ReturnValue.get();
+			bRunningGCThread = false;
+			GCThread.get();
 		}
 
 		SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);

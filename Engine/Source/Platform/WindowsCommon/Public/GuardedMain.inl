@@ -47,13 +47,17 @@ int32 GuardedMain(std::span<std::wstring> Argv)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
+#if !DO_CHECK
 	__try
 	{
+#endif
 		GReturn = TApplicationClass::GuardedMain(Argv);
+#if !DO_CHECK
 	}
 	__except (ReportCrash(GetExceptionCode(), GetExceptionInformation()))
 	{
 	}
+#endif
 
 	return GReturn;
 }

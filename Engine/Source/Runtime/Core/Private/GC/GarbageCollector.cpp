@@ -96,19 +96,6 @@ void GarbageCollector::UnregisterObject(SObject* Object)
 	Objects.erase(Object);
 }
 
-void GarbageCollector::RegisterThread(Thread* ManagedThread)
-{
-	SCOPED_LOCK();
-	check(ManagedThread->IsManaged());
-	GCThreads.emplace(ManagedThread);
-}
-
-void GarbageCollector::UnregisterThread(Thread* ManagedThread)
-{
-	SCOPED_LOCK();
-	GCThreads.erase(ManagedThread);
-}
-
 void GarbageCollector::IncrementAllocGCMemory(size_t Amount)
 {
 	if (IncrementalGCMemory.fetch_add(Amount) > 104857600)
@@ -117,6 +104,18 @@ void GarbageCollector::IncrementAllocGCMemory(size_t Amount)
 		bManualGCTriggered = true;
 		IncrementalGCMemory = 0;
 	}
+}
+
+void GarbageCollector::RegisterThread(Thread* ManagedThread)
+{
+	SCOPED_LOCK();
+	GCThreads.emplace(ManagedThread);
+}
+
+void GarbageCollector::UnregisterThread(Thread* ManagedThread)
+{
+	SCOPED_LOCK();
+	GCThreads.erase(ManagedThread);
 }
 
 void GarbageCollector::Tick(float InDeltaSeconds)

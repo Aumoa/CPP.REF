@@ -71,10 +71,11 @@ private:
 	void RegisterObject(SObject* Object);
 	void UnregisterObject(SObject* Object);
 
+	void IncrementAllocGCMemory(size_t Amount);
+
+public:
 	void RegisterThread(Thread* ManagedThread);
 	void UnregisterThread(Thread* ManagedThread);
-
-	void IncrementAllocGCMemory(size_t Amount);
 
 public:
 	void Tick(float InDeltaSeconds);
