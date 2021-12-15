@@ -135,7 +135,7 @@ public:
 		ValueT OutValue;
 		if (!ValueTypePtr->Unboxing(&OutValue))
 		{
-			SE_LOG(LogCasts, Fatal, L"The type of value contained at boxing object is not match with desired type.");
+			return std::nullopt;
 		}
 
 		return OutValue;
