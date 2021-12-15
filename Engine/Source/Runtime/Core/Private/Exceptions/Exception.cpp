@@ -16,7 +16,12 @@ SException::SException(std::wstring_view Message, SException* InnerException) : 
 
 std::wstring SException::ToString()
 {
-	return std::format(L"{}: {}", GetType()->GetFullName(), Message);
+	std::wstring WstrMsg = std::format(L"{}: {}", GetType()->GetFullName(), Message);
+	if (InnerException)
+	{
+		WstrMsg += std::format(L"  InnerException: {}", InnerException->ToString());
+	}
+	return WstrMsg;
 }
 
 std::wstring SException::GetName()

@@ -193,6 +193,15 @@ struct CORE_API Color
 		return AlphaBlend(*this, rhs, 1.0f);
 	}
 
+	inline constexpr uint32 ToUInt() const
+	{
+		return
+			(((uint32)(A * 255.0f) & 0xFF) << 24) |
+			(((uint32)(R * 255.0f) & 0xFF) << 16) |
+			(((uint32)(G * 255.0f) & 0xFF) <<  8) |
+			(((uint32)(B * 255.0f) & 0xFF) <<  0);
+	}
+
 	/// <summary>
 	/// Compose color value from unsigned 32bit integer.
 	/// </summary>

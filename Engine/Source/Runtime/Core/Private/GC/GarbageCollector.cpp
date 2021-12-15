@@ -128,7 +128,8 @@ void GarbageCollector::Tick(float InDeltaSeconds)
 	if (IncrementalTime >= AutoFlushInterval || bManualGCTriggered.compare_exchange_strong(bExpect, false))
 	{
 		bool bFullPurge = ++MinorGCCounter >= FullPurgeInterval;
-		Collect(bFullPurge);
+		// force full purge.
+		Collect(true);
 		bManualGCTriggered = false;
 
 		IncrementalTime -= AutoFlushInterval;
