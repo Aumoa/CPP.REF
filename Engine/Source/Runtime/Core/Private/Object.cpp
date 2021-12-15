@@ -66,16 +66,8 @@ void* SObject::operator new(size_t AllocSize)
 	void* Block = ::operator new(AllocSize, std::nothrow);
 	if (Block == nullptr)
 	{
-		// First GC without full purge.
 		GC.Collect();
-		Block = ::operator new(AllocSize, std::nothrow);
-
-		if (Block == nullptr)
-		{
-			// Second GC with full purge.
-			GC.Collect(true);
-			Block = ::operator new(AllocSize);
-		}
+		Block = ::operator new(AllocSize);
 	}
 	return Block;
 }

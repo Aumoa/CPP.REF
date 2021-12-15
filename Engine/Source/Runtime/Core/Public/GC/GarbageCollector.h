@@ -80,7 +80,7 @@ public:
 
 public:
 	void Tick(float InDeltaSeconds);
-	void Collect(bool bFullPurge = false);
+	void Collect();
 	size_t NumThreadObjects();
 	void SuppressFinalize(SObject* Object);
 	void Shutdown();
@@ -89,7 +89,7 @@ public:
 	float GetAutoFlushInterval();
 
 private:
-	void MarkAndSweep(SObject* Object, bool bFullPurge, size_t ThreadIdx);
+	void MarkAndSweep(SObject* Object);
 	void StopThreads(Thread* MyThread);
 	void ResumeThreads(Thread* MyThread);
 };

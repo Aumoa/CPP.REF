@@ -129,7 +129,7 @@ void GarbageCollector::Tick(float InDeltaSeconds)
 	{
 		bool bFullPurge = ++MinorGCCounter >= FullPurgeInterval;
 		// force full purge.
-		Collect(true);
+		Collect();
 		bManualGCTriggered = false;
 
 		IncrementalTime -= AutoFlushInterval;
@@ -137,63 +137,35 @@ void GarbageCollector::Tick(float InDeltaSeconds)
 	}
 }
 
-void GarbageCollector::Collect(bool bFullPurge)
+void GarbageCollector::Collect()
 {
 	SCOPED_LOCK();
 
 	Thread* MyThread = Thread::GetCurrentThread();
 
-	SE_LOG(LogGC, Verbose, L"Start {} GC {}, with {} objects.", bFullPurge ? L"full purge" : L"minor", Generation, Objects.size());
+	SE_LOG(LogGC, Verbose, L"Start GC {}, with {} objects.", Generation, Objects.size());
 	ScopedTimer Timer(L"Total");
 
 	{
 		ScopedTimer Timer(L"  Mark");
 
-		if (bFullPurge)
+		// Ready buffers for lock-free.
+		size_t FullCollectionSize = Objects.Collection.size();
+		ReferencedObjects_ThreadTemp[0].reserve(FullCollectionSize);
+		ReferencedObjects_ThreadTemp[1].reserve(FullCollectionSize);
+		ReferencedObjects_ThreadTemp[2].reserve(FullCollectionSize);
+
+		StopThreads(MyThread);
+
+		for (auto& Root : Roots)
 		{
-			// Ready buffers for lock-free.
-			size_t FullCollectionSize = Objects.Collection.size();
-			ReferencedObjects_ThreadTemp[0].reserve(FullCollectionSize);
-			ReferencedObjects_ThreadTemp[1].reserve(FullCollectionSize);
-			ReferencedObjects_ThreadTemp[2].reserve(FullCollectionSize);
-
-			StopThreads(MyThread);
-
-			for (auto& Root : Roots)
+			if (Root)
 			{
-				if (Root)
-				{
-					MarkAndSweep(Root, bFullPurge, 0);
-				}
+				MarkAndSweep(Root);
 			}
-
-			ResumeThreads(MyThread);
 		}
-		else
-		{
-			size_t FullCollectionSize = Objects.Collection.size();
-			std::vector<std::future<void>> Futures;
-			
-			for (auto& ThreadCollection : ReferencedObjects_ThreadTemp)
-			{
-				ThreadCollection.reserve(FullCollectionSize);
-			}
 
-			// Mark for each all objects with 1 depth.
-			Parallel::ForEach(Futures, [&]() { StopThreads(MyThread); }, FullCollectionSize, [&](size_t ThreadIdx, size_t ItemIdx)
-			{
-				SObject* Object = Objects.Collection[ItemIdx];
-
-				if (Object == nullptr)
-				{
-					return;
-				}
-
-				MarkAndSweep(Object, bFullPurge, ThreadIdx);
-			}, NumGCThreads);
-
-			ResumeThreads(MyThread);
-		}
+		ResumeThreads(MyThread);
 	}
 
 	if (DeleteAction.valid())
@@ -236,7 +208,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 	SE_LOG(LogGC, Verbose, L"{} objects is unreachable.", PendingKill.size());
 
-	DeleteAction = std::async([this, bFullPurge]()
+	DeleteAction = std::async([this]()
 	{
 		size_t NumRemoves = 0;
 
@@ -295,83 +267,41 @@ float GarbageCollector::GetAutoFlushInterval()
 	return AutoFlushInterval;
 }
 
-void GarbageCollector::MarkAndSweep(SObject* Object, bool bFullPurge, size_t ThreadIdx)
+void GarbageCollector::MarkAndSweep(SObject* Object)
 {
-	if (bFullPurge)
+	std::vector<SObject*>& ReferencedObjects = ReferencedObjects_ThreadTemp[0];
+	std::vector<SObject*>& Current = ReferencedObjects_ThreadTemp[1];
+	std::vector<SObject*>& CollectionMember = ReferencedObjects_ThreadTemp[2];
+
+	ReferencedObjects.emplace_back(Object);
+
+	while (ReferencedObjects.size())
 	{
-		std::vector<SObject*>& ReferencedObjects = ReferencedObjects_ThreadTemp[0];
-		std::vector<SObject*>& Current = ReferencedObjects_ThreadTemp[1];
-		std::vector<SObject*>& CollectionMember = ReferencedObjects_ThreadTemp[2];
+		Current.clear();
+		std::swap(Current, ReferencedObjects);
 
-		ReferencedObjects.emplace_back(Object);
-
-		while (ReferencedObjects.size())
+		for (auto& Object : Current)
 		{
-			Current.clear();
-			std::swap(Current, ReferencedObjects);
-
-			for (auto& Object : Current)
+			if (Object == nullptr || (Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC))
 			{
-				if (Object == nullptr || (Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC))
-				{
-					continue;
-				}
-
-				// Mark generation.
-				Object->MarkGC(Generation);
-
-				for (auto& GCProp : Object->GetType()->GetGCProperties())
-				{
-					Type* PropertyType = GCProp->GetMemberType();
-					if (PropertyType->IsGCCollection())
-					{
-						PropertyType->GetCollectionObjects(Object, GCProp, ReferencedObjects);
-						// Member object of collection cannot be changed to nullptr from disposed object.
-					}
-					else
-					{
-						SObject* Member = GCProp->GetObject(Object);
-
-						// If object is disposed,
-						if (PendingFinalize.contains(Member))
-						{
-							// Change property to nullptr.
-							GCProp->SetObject(Object, nullptr);
-						}
-						else
-						{
-							ReferencedObjects.emplace_back(Member);
-						}
-					}
-				}
+				continue;
 			}
-		}
-	}
-	else
-	{
-		std::vector<SObject*>& ThreadCollection = ReferencedObjects_ThreadTemp[ThreadIdx];
 
-		for (auto& GCProp : Object->GetType()->GetGCProperties())
-		{
-			Type* PropertyType = GCProp->GetMemberType();
-			if (PropertyType->IsGCCollection())
+			// Mark generation.
+			Object->MarkGC(Generation);
+
+			for (auto& GCProp : Object->GetType()->GetGCProperties())
 			{
-				PropertyType->GetCollectionObjects(Object, GCProp, ThreadCollection);
-				for (auto& Referenced : ThreadCollection)
+				Type* PropertyType = GCProp->GetMemberType();
+				if (PropertyType->IsGCCollection())
 				{
-					if (Referenced)
-					{
-						Referenced->MarkGC(Generation);
-					}
+					PropertyType->GetCollectionObjects(Object, GCProp, ReferencedObjects);
+					// Member object of collection cannot be changed to nullptr from disposed object.
 				}
-
-				// Member object of collection cannot be changed to nullptr from disposed object.
-			}
-			else
-			{
-				SObject* Member = GCProp->GetObject(Object);
-				if (Member)
+				else
 				{
+					SObject* Member = GCProp->GetObject(Object);
+
 					// If object is disposed,
 					if (PendingFinalize.contains(Member))
 					{
@@ -380,7 +310,7 @@ void GarbageCollector::MarkAndSweep(SObject* Object, bool bFullPurge, size_t Thr
 					}
 					else
 					{
-						Member->MarkGC(Generation);
+						ReferencedObjects.emplace_back(Member);
 					}
 				}
 			}
