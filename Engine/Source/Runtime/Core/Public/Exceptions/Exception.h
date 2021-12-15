@@ -19,4 +19,8 @@ public:
 	SException(std::wstring_view Message, SException* InnerException = nullptr);
 
 	virtual std::wstring ToString() override;
+
+	std::wstring GetName();
+	std::wstring GetMessage();
+	SException* GetInnerException();
 };

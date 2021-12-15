@@ -18,3 +18,18 @@ std::wstring SException::ToString()
 {
 	return std::format(L"{}: {}", GetType()->GetFullName(), Message);
 }
+
+std::wstring SException::GetName()
+{
+	return GetType()->GetFullName();
+}
+
+std::wstring SException::GetMessage()
+{
+	return Message;
+}
+
+SException* SException::GetInnerException()
+{
+	return InnerException;
+}

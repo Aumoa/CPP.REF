@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <thread>
 #include <atomic>
 #include <fstream>
+#include <future>
 
 class CORE_API SLogModule : implements SObject
 {
@@ -13,7 +13,7 @@ class CORE_API SLogModule : implements SObject
 
 private:
 	std::wstring ModuleName;
-	std::thread WorkerThread;
+	std::future<void> WorkerThread;
 	std::atomic<bool> bRunning;
 	std::ofstream LogFile;
 	

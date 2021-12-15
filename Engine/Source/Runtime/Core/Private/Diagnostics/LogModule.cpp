@@ -2,6 +2,7 @@
 
 #include "Diagnostics/LogModule.h"
 #include "Misc/DateTime.h"
+#include "Threading/Thread.h"
 #include <filesystem>
 #include <chrono>
 
@@ -43,7 +44,10 @@ void SLogModule::RunTask()
 	check(LogFile.is_open());
 
 	bRunning = true;
-	WorkerThread = std::thread(&SLogModule::Worker, this);
+	WorkerThread = Thread::NewThread<void>(L"[Log Module]", [&]()
+	{
+		Worker();
+	});
 }
 
 void SLogModule::Shutdown()
@@ -53,7 +57,7 @@ void SLogModule::Shutdown()
 		gModule = nullptr;
 		bRunning = false;
 
-		WorkerThread.join();
+		WorkerThread.get();
 		LogFile.close();
 
 		MessageQueue.clear();
