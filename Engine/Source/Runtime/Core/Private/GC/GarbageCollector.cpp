@@ -35,56 +35,6 @@ public:
 	}
 };
 
-GarbageCollector& GC = GarbageCollector::Instantiate::GC();
-
-void GarbageCollector::ReadyGCWorkers()
-{
-	size_t Index = 0;
-	bRunningWorkers = true;
-
-	for (auto& GCWorkerThread : GCWorkerThreads)
-	{
-		GCWorkerThread.ThreadJoin = Thread::NewThread<void>(std::format(L"[GC Worker Thread {}]", Index++), [&GCWorkerThread]()
-		{
-			GCWorkerThread.ThreadPtr = Thread::GetCurrentThread();
-			GC.UnregisterThread(GCWorkerThread.ThreadPtr);
-
-			std::mutex Mtx;
-			std::unique_lock Mtx_lock(Mtx);
-
-			while (GC.bRunningWorkers)
-			{
-				GC.cvExecuteWorkers.wait(Mtx_lock, [&GCWorkerThread]() { return (bool)GCWorkerThread.Work || !GC.bRunningWorkers; });
-
-				if (GCWorkerThread.Work)
-				{
-					GCWorkerThread.Work();
-					GCWorkerThread.Work = nullptr;
-				}
-
-				GCWorkerThread.WorkCompleted.set_value();
-				GCWorkerThread.WorkCompleted = std::promise<void>();
-			}
-		});
-	}
-}
-
-void GarbageCollector::ShutdownGCWorkers()
-{
-	bRunningWorkers = false;
-	ExecuteWorkers();
-
-	for (auto& Worker : GCWorkerThreads)
-	{
-		Worker.ThreadJoin.get();
-	}
-}
-
-void GarbageCollector::ExecuteWorkers()
-{
-	cvExecuteWorkers.notify_all();
-}
-
 size_t GarbageCollector::ObjectPool::size()
 {
 	return Collection.size() - PoolReserve.size();
@@ -119,6 +69,90 @@ void GarbageCollector::ObjectPool::erase(SObject* InObject)
 		PoolReserve.emplace_back(InObject->InternalIndex);
 		InObject->InternalIndex = -1;
 	}
+}
+
+GarbageCollector& GC = GarbageCollector::Instantiate::GC();
+
+void GarbageCollector::ReadyGCWorkers()
+{
+	size_t Index = 0;
+	bRunningWorkers = true;
+
+	for (auto& GCWorkerThread : GCWorkerThreads)
+	{
+		std::promise<void> Startline;
+		std::future<void> Startline_future = Startline.get_future();
+
+		GCWorkerThread.ThreadJoin = Thread::NewThread<void>(std::format(L"[GC Worker Thread {}]", Index++), [Worker = &GCWorkerThread, &Startline]()
+		{
+			Worker->ThreadPtr = Thread::GetCurrentThread();
+			GC.UnregisterThread(Worker->ThreadPtr);
+
+			std::unique_lock Mtx_lock(Worker->WorkerMtx);
+			Startline.set_value();
+
+			using namespace std::literals;
+			std::this_thread::sleep_for(10ms);
+
+			while (GC.bRunningWorkers)
+			{
+				{
+					std::unique_lock Atomic_lock(Worker->AtomicMtx);
+					GC.cvExecuteWorkers.wait(Mtx_lock);
+				}
+
+				if (Worker->Work)
+				{
+					Worker->Work();
+					Worker->Work = nullptr;
+				}
+			}
+		});
+
+		Startline_future.get();
+		GCWorkerThread.WorkerMtx.lock();
+	}
+}
+
+void GarbageCollector::ShutdownGCWorkers()
+{
+	bRunningWorkers = false;
+	ExecuteWorkers();
+
+	for (auto& Worker : GCWorkerThreads)
+	{
+		Worker.ThreadJoin.get();
+	}
+}
+
+void GarbageCollector::ExecuteWorkers(bool bWait)
+{
+	cvExecuteWorkers.notify_all();
+
+	if (bWait)
+	{
+		for (auto& Worker : GCWorkerThreads)
+		{
+			// Worker can running from wait condition variable.
+			Worker.WorkerMtx.unlock();
+			while (!Worker.AtomicMtx.try_lock())
+			{
+				cvExecuteWorkers.notify_all();
+			}
+		}
+
+		for (auto& Worker : GCWorkerThreads)
+		{
+			// Worker can running from wait condition variable.
+			Worker.AtomicMtx.unlock();
+			Worker.WorkerMtx.lock();
+		}
+	}
+}
+
+GarbageCollector::~GarbageCollector()
+{
+	Shutdown();
 }
 
 void GarbageCollector::RegisterObject(SObject* Object)
@@ -165,20 +199,16 @@ void GarbageCollector::Shutdown()
 
 void GarbageCollector::Tick(float InDeltaSeconds)
 {
-	static constexpr size_t FullPurgeInterval = 10;
+	static bool bInitialized = (Init(), true);
 	static float IncrementalTime = 0;
 
-	bool bExpect = true;
 	IncrementalTime += InDeltaSeconds;
-	if (IncrementalTime >= AutoFlushInterval || bManualGCTriggered.compare_exchange_strong(bExpect, false))
+	if (IncrementalTime >= AutoFlushInterval || bManualGCTriggered)
 	{
-		bool bFullPurge = ++MinorGCCounter >= FullPurgeInterval;
-		// force full purge.
-		Collect();
 		bManualGCTriggered = false;
+		Collect();
 
 		IncrementalTime -= AutoFlushInterval;
-		MinorGCCounter %= FullPurgeInterval;
 	}
 }
 
@@ -211,6 +241,62 @@ void GarbageCollector::Collect()
 		}
 
 		ResumeThreads(MyThread);
+	}
+
+	{
+		StopThreads(MyThread);
+
+		ScopedTimer Timer(L"  DummyWorks");
+
+		int64 Sum = 0;
+		for (int32 i = 0; i < 10; ++i)
+		{
+			for (auto& GCThread : GCWorkerThreads)
+			{
+				for (size_t i = 0; i < GCThread.DummyWorks.size(); ++i)
+				{
+					int64 Value = GCThread.DummyWorks[i] ^= i;
+					Sum += Value;
+				}
+			}
+		}
+
+		ResumeThreads(MyThread);
+
+		SE_LOG(LogGC, Verbose, L"  DummyWorksResults: {}", Sum);
+	}
+
+	{
+		ScopedTimer Timer(L"  DummyWorksMT");
+
+		std::atomic<int64> Sum = 0;
+
+		StopThreads(MyThread);
+
+		for (int32 i = 0; i < 10; ++i)
+		{
+			for (auto& GCThread : GCWorkerThreads)
+			{
+				GCThread.Work = [Worker = &GCThread, &Sum]()
+				{
+					int64 LocalSum = 0;
+
+					for (size_t i = 0; i < Worker->DummyWorks.size(); ++i)
+					{
+						int64 Value = Worker->DummyWorks[i] ^= i;
+						LocalSum += Value;
+					}
+
+					Sum += LocalSum;
+				};
+			}
+
+			ExecuteWorkers();
+		}
+
+		ResumeThreads(MyThread);
+
+		SE_LOG(LogGC, Verbose, L"  DummyWorksMTResults: {}", Sum.load());
 	}
 
 	if (DeleteAction.valid())
@@ -268,16 +354,16 @@ void GarbageCollector::Collect()
 	++Generation;
 }
 
-size_t GarbageCollector::NumThreadObjects()
-{
-	return Objects.size();
-}
-
 void GarbageCollector::SuppressFinalize(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
 
 	PendingFinalize.emplace(Object);
+}
+
+size_t GarbageCollector::NumThreadObjects()
+{
+	return Objects.size();
 }
 
 void GarbageCollector::SetAutoFlushInterval(float InSeconds)
@@ -302,6 +388,11 @@ void GarbageCollector::UnregisterThread(Thread* ManagedThread)
 	LogicThreads.erase(ManagedThread);
 }
 
+bool GarbageCollector::IsMarked(SObject* Object)
+{
+	return Object == nullptr || (Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC);
+}
+
 void GarbageCollector::MarkAndSweep(SObject* Object)
 {
 	std::vector<SObject*>& ReferencedObjects = ReferencedObjects_ThreadTemp[0];
@@ -317,7 +408,7 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 
 		for (auto& Object : Current)
 		{
-			if (Object == nullptr || (Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC))
+			if (IsMarked(Object))
 			{
 				continue;
 			}
@@ -345,7 +436,10 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 					}
 					else
 					{
-						ReferencedObjects.emplace_back(Member);
+						if (!IsMarked(Member))
+						{
+							ReferencedObjects.emplace_back(Member);
+						}
 					}
 				}
 			}

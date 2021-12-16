@@ -31,8 +31,12 @@ private:
 	{
 		Thread* ThreadPtr = nullptr;
 		std::future<void> ThreadJoin;
+		std::array<int64, 10240> DummyWorks;
+
+		std::mutex WorkerMtx;
+		std::mutex AtomicMtx;
+
 		std::function<void()> Work;
-		std::promise<void> WorkCompleted;
 	};
 
 	static constexpr size_t NumGCWorkerThreads = 16;
@@ -42,7 +46,7 @@ private:
 
 	void ReadyGCWorkers();
 	void ShutdownGCWorkers();
-	void ExecuteWorkers();
+	void ExecuteWorkers(bool bWait = true);
 
 private:
 	struct ObjectPool
@@ -63,16 +67,13 @@ private:
 	ObjectPool Objects;
 	std::set<SObject*> Roots;
 	uint64 Generation = 0;
-
 	std::set<SObject*> PendingFinalize;
 	std::vector<SObject*> PendingKill;
-
 	std::future<void> DeleteAction;
 
 	std::set<Thread*> LogicThreads;
 
 	float AutoFlushInterval = 60.0f;
-	int32 MinorGCCounter = 0;
 	std::atomic<bool> bManualGCTriggered;
 
 private:
@@ -82,6 +83,7 @@ private:
 
 private:
 	GarbageCollector() = default;
+	~GarbageCollector();
 
 private:
 	void RegisterObject(SObject* Object);
@@ -94,9 +96,9 @@ public:
 public:
 	void Tick(float InDeltaSeconds);
 	void Collect();
-	size_t NumThreadObjects();
 	void SuppressFinalize(SObject* Object);
 
+	size_t NumThreadObjects();
 	void SetAutoFlushInterval(float InSeconds);
 	float GetAutoFlushInterval();
 
@@ -104,6 +106,7 @@ public:
 	void UnregisterThread(Thread* ManagedThread);
 
 private:
+	bool IsMarked(SObject* Object);
 	void MarkAndSweep(SObject* Object);
 	void StopThreads(Thread* MyThread);
 	void ResumeThreads(Thread* MyThread);
