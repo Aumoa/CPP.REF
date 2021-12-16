@@ -1,2 +1,2 @@
 @echo off
-Binaries\WindowsConsole.exe --ConsoleDll "VisualStudioProjects.dll" --Solution "Engine.xml"
+Binaries\SolutionGenerator.exe --Solution "Engine.xml"
