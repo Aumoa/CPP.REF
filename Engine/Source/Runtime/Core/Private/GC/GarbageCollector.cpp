@@ -31,7 +31,7 @@ public:
 	~ScopedTimer() noexcept
 	{
 		float Time = Timer.DoCalc().count();
-		SE_LOG(LogGC, Verbose, L"{}: {} millisecond elapsed.", Name, Time * 1000.0f);
+		//SE_LOG(LogGC, Verbose, L"{}: {} millisecond elapsed.", Name, Time * 1000.0f);
 	}
 };
 
@@ -218,7 +218,7 @@ void GarbageCollector::Collect()
 
 	Thread* MyThread = Thread::GetCurrentThread();
 
-	SE_LOG(LogGC, Verbose, L"Start GC {}, with {} objects.", Generation, Objects.size());
+	//SE_LOG(LogGC, Verbose, L"Start GC {}, with {} objects.", Generation, Objects.size());
 	ScopedTimer Timer(L"Total");
 
 	{
@@ -263,7 +263,7 @@ void GarbageCollector::Collect()
 
 		ResumeThreads(MyThread);
 
-		SE_LOG(LogGC, Verbose, L"  DummyWorksResults: {}", Sum);
+		//SE_LOG(LogGC, Verbose, L"  DummyWorksResults: {}", Sum);
 	}
 
 	{
@@ -293,7 +293,7 @@ void GarbageCollector::Collect()
 
 		ResumeThreads(MyThread);
 
-		SE_LOG(LogGC, Verbose, L"  DummyWorksMTResults: {}", Sum.load());
+		//SE_LOG(LogGC, Verbose, L"  DummyWorksMTResults: {}", Sum.load());
 	}
 
 	if (DeleteAction.valid())
@@ -337,7 +337,7 @@ void GarbageCollector::Collect()
 		}
 	}
 
-	SE_LOG(LogGC, Verbose, L"{} objects is unreachable.", PendingKill.size());
+	//SE_LOG(LogGC, Verbose, L"{} objects is unreachable.", PendingKill.size());
 
 	DeleteAction = std::async([this]()
 	{
