@@ -97,8 +97,9 @@ void GarbageCollector::ReadyGCWorkers()
 			while (GC.bRunningWorkers)
 			{
 				{
-					std::unique_lock Atomic_lock(Worker->AtomicMtx);
+					Worker->AtomicMtx = true;
 					GC.cvExecuteWorkers.wait(Mtx_lock);
+					Worker->AtomicMtx = false;
 				}
 
 				if (Worker->Work)
@@ -135,7 +136,7 @@ void GarbageCollector::ExecuteWorkers(bool bWait)
 		{
 			// Worker can running from wait condition variable.
 			Worker.WorkerMtx.unlock();
-			while (!Worker.AtomicMtx.try_lock())
+			while (Worker.AtomicMtx)
 			{
 				cvExecuteWorkers.notify_all();
 			}
@@ -144,7 +145,6 @@ void GarbageCollector::ExecuteWorkers(bool bWait)
 		for (auto& Worker : GCWorkerThreads)
 		{
 			// Worker can running from wait condition variable.
-			Worker.AtomicMtx.unlock();
 			Worker.WorkerMtx.lock();
 		}
 	}

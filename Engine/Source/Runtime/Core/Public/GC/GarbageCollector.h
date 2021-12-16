@@ -34,12 +34,12 @@ private:
 		std::array<int64, 10240> DummyWorks;
 
 		std::mutex WorkerMtx;
-		std::mutex AtomicMtx;
+		std::atomic<bool> AtomicMtx;
 
 		std::function<void()> Work;
 	};
 
-	static constexpr size_t NumGCWorkerThreads = 16;
+	static constexpr size_t NumGCWorkerThreads = 8;
 	std::array<GCWorkerThread, NumGCWorkerThreads> GCWorkerThreads;
 	std::atomic<bool> bRunningWorkers;
 	std::condition_variable cvExecuteWorkers;
