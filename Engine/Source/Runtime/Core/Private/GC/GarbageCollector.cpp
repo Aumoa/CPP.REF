@@ -270,28 +270,25 @@ void GarbageCollector::Collect()
 		ScopedTimer Timer(L"  DummyWorksMT");
 
 		std::atomic<int64> Sum = 0;
+		std::vector<std::future<void>> Futures;
 
 		StopThreads(MyThread);
 
 		for (int32 i = 0; i < 10; ++i)
 		{
-			for (auto& GCThread : GCWorkerThreads)
+			Parallel::ForEach(Futures, NumGCWorkerThreads, [&Sum](size_t ThreadIdx, size_t StartIdx, size_t EndIdx)
 			{
-				GCThread.Work = [Worker = &GCThread, &Sum]()
+				int64 LocalSum = 0;
+				GCWorkerThread* Worker = &GC.GCWorkerThreads[ThreadIdx];
+
+				for (size_t i = 0; i < Worker->DummyWorks.size(); ++i)
 				{
-					int64 LocalSum = 0;
+					int64 Value = Worker->DummyWorks[i] ^= i;
+					LocalSum += Value;
+				}
 
-					for (size_t i = 0; i < Worker->DummyWorks.size(); ++i)
-					{
-						int64 Value = Worker->DummyWorks[i] ^= i;
-						LocalSum += Value;
-					}
-
-					Sum += LocalSum;
-				};
-			}
-
-			ExecuteWorkers();
+				Sum += LocalSum;
+			}, NumGCWorkerThreads);
 		}
 
 		ResumeThreads(MyThread);
@@ -317,12 +314,15 @@ void GarbageCollector::Collect()
 		PendingKill.resize(Objects.size());
 
 		// Sweeping.
-		Parallel::ForEach(ActualCollectionSize, [&](size_t ThreadIdx, size_t ItemIdx)
+		Parallel::ForEach(ActualCollectionSize, [&](size_t ThreadIdx, size_t StartIdx, size_t EndIdx)
 		{
-			SObject* Object = Objects.Collection[ItemIdx];
-			if (Object && Object->Generation != Generation && !Roots.contains(Object))
+			for (size_t ItemIdx = StartIdx; ItemIdx < EndIdx; ++ItemIdx)
 			{
-				PendingKill[ActualPendingKill++] = Object;
+				SObject* Object = Objects.Collection[ItemIdx];
+				if (Object && Object->Generation != Generation && !Roots.contains(Object))
+				{
+					PendingKill[ActualPendingKill++] = Object;
+				}
 			}
 		}, NumGCThreads);
 

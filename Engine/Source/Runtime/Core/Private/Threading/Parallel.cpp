@@ -38,16 +38,18 @@ void Parallel::For(size_t Count, std::function<void(size_t, size_t)> Body, size_
 	}
 }
 
-void Parallel::ForEach(size_t Count, std::function<void(size_t, size_t)> Body, size_t NumForceThreads)
+void Parallel::ForEach(size_t Count, std::function<void(size_t, size_t, size_t)> Body, size_t NumForceThreads)
 {
 	std::vector<std::future<void>> Futures;
-	ForEach(Futures, nullptr, Count, Body, NumForceThreads);
+	ForEach(Futures, Count, Body, NumForceThreads);
 }
 
-void Parallel::ForEach(std::vector<std::future<void>>& Futures, std::function<void()> PreLaunch, size_t Count, std::function<void(size_t, size_t)> Body, size_t NumForceThreads)
+void Parallel::ForEach(std::vector<std::future<void>>& Futures, size_t Count, std::function<void(size_t, size_t, size_t)> Body, size_t NumForceThreads)
 {
 	size_t NumThreads = NumForceThreads == 0 ? ThreadCount : NumForceThreads;
 	size_t ItemPerThread = (Count - 1) / NumThreads + 1;
+
+	Futures.clear();
 	Futures.reserve(NumThreads);
 
 	std::atomic<bool> bBusylock = true;
@@ -57,24 +59,8 @@ void Parallel::ForEach(std::vector<std::future<void>>& Futures, std::function<vo
 	{
 		size_t StartIndex = i * ItemPerThread;
 		size_t EndIndex = std::min((i + 1) * ItemPerThread, Count);
-
-		Futures.emplace_back(std::async(std::launch::async, [&Body, StartIndex, EndIndex, ThreadIdx = i, &bBusylock]()
-		{
-			while (bBusylock);
-
-			for (size_t i = StartIndex; i < EndIndex; ++i)
-			{
-				Body(ThreadIdx, i);
-			}
-		}));
+		Futures.emplace_back(std::async(std::launch::async, std::bind(Body, i, StartIndex, EndIndex)));
 	}
-
-	if (PreLaunch)
-	{
-		PreLaunch();
-	}
-
-	bBusylock = false;
 
 	// Waiting all threads.
 	for (size_t i = 0; i < NumThreads; ++i)

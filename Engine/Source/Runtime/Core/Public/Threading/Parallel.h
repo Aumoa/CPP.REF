@@ -10,6 +10,6 @@ class CORE_API Parallel : public AbstractClass
 
 public:
 	static void For(size_t Count, std::function<void(size_t ThreadIdx, size_t ItemIdx)> Body, size_t NumForceThreads = 0);
-	static void ForEach(size_t Count, std::function<void(size_t ThreadIdx, size_t ItemIdx)> Body, size_t NumForceThreads = 0);
-	static void ForEach(std::vector<std::future<void>>& Futures, std::function<void()> PreLaunch, size_t Count, std::function<void(size_t ThreadIdx, size_t ItemIdx)> Body, size_t NumForceThreads = 0);
+	static void ForEach(size_t Count, std::function<void(size_t ThreadIdx, size_t Start, size_t End)> Body, size_t NumForceThreads = 0);
+	static void ForEach(std::vector<std::future<void>>& Futures, size_t Count, std::function<void(size_t ThreadIdx, size_t Start, size_t End)> Body, size_t NumForceThreads = 0);
 };
