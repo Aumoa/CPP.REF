@@ -17,30 +17,72 @@ public:
 	}
 };
 
+class GarbageCollector::ScopedTimer
+{
+	std::wstring Name;
+	TickCalc<> Timer;
+
+public:
+	ScopedTimer(std::wstring_view Name) : Name(Name)
+	{
+		Timer.DoCalc();
+	}
+
+	~ScopedTimer() noexcept
+	{
+		float Time = Timer.DoCalc().count();
+		SE_LOG(LogGC, Verbose, L"{}: {} millisecond elapsed.", Name, Time * 1000.0f);
+	}
+};
+
 GarbageCollector& GC = GarbageCollector::Instantiate::GC();
 
-#define SCOPED_LOCK() \
-std::unique_lock<std::mutex> Lock(Locker);
-
-namespace
+void GarbageCollector::ReadyGCWorkers()
 {
-	class ScopedTimer
+	size_t Index = 0;
+	bRunningWorkers = true;
+
+	for (auto& GCWorkerThread : GCWorkerThreads)
 	{
-		std::wstring Name;
-		TickCalc<> Timer;
-
-	public:
-		ScopedTimer(std::wstring_view Name) : Name(Name)
+		GCWorkerThread.ThreadJoin = Thread::NewThread<void>(std::format(L"[GC Worker Thread {}]", Index++), [&GCWorkerThread]()
 		{
-			Timer.DoCalc();
-		}
+			GCWorkerThread.ThreadPtr = Thread::GetCurrentThread();
+			GC.UnregisterThread(GCWorkerThread.ThreadPtr);
 
-		~ScopedTimer() noexcept
-		{
-			float Time = Timer.DoCalc().count();
-			SE_LOG(LogGC, Verbose, L"{}: {} millisecond elapsed.", Name, Time * 1000.0f);
-		}
-	};
+			std::mutex Mtx;
+			std::unique_lock Mtx_lock(Mtx);
+
+			while (GC.bRunningWorkers)
+			{
+				GC.cvExecuteWorkers.wait(Mtx_lock, [&GCWorkerThread]() { return (bool)GCWorkerThread.Work || !GC.bRunningWorkers; });
+
+				if (GCWorkerThread.Work)
+				{
+					GCWorkerThread.Work();
+					GCWorkerThread.Work = nullptr;
+				}
+
+				GCWorkerThread.WorkCompleted.set_value();
+				GCWorkerThread.WorkCompleted = std::promise<void>();
+			}
+		});
+	}
+}
+
+void GarbageCollector::ShutdownGCWorkers()
+{
+	bRunningWorkers = false;
+	ExecuteWorkers();
+
+	for (auto& Worker : GCWorkerThreads)
+	{
+		Worker.ThreadJoin.get();
+	}
+}
+
+void GarbageCollector::ExecuteWorkers()
+{
+	cvExecuteWorkers.notify_all();
 }
 
 size_t GarbageCollector::ObjectPool::size()
@@ -79,43 +121,46 @@ void GarbageCollector::ObjectPool::erase(SObject* InObject)
 	}
 }
 
-GarbageCollector::GarbageCollector()
-{
-}
-
 void GarbageCollector::RegisterObject(SObject* Object)
 {
-	SCOPED_LOCK();
+	std::unique_lock GCMtx_lock(GCMtx);
 	Objects.emplace(Object);
 	Object->Generation = Generation;
 }
 
 void GarbageCollector::UnregisterObject(SObject* Object)
 {
-	SCOPED_LOCK();
+	std::unique_lock GCMtx_lock(GCMtx);
 	Objects.erase(Object);
 }
 
-void GarbageCollector::IncrementAllocGCMemory(size_t Amount)
+void GarbageCollector::Init()
 {
-	if (IncrementalGCMemory.fetch_add(Amount) > 104857600)
+	ReadyGCWorkers();
+}
+
+void GarbageCollector::Shutdown()
+{
+	ShutdownGCWorkers();
+
+	if (DeleteAction.valid())
 	{
-		SE_LOG(LogGC, Verbose, L"Incremental GC memory is over than 100MB. Execute GC.");
-		bManualGCTriggered = true;
-		IncrementalGCMemory = 0;
+		DeleteAction.get();
 	}
-}
 
-void GarbageCollector::RegisterThread(Thread* ManagedThread)
-{
-	SCOPED_LOCK();
-	GCThreads.emplace(ManagedThread);
-}
+	// Final dispose.
+	for (auto& Item : Objects.Collection)
+	{
+		if (Item)
+		{
+			ensure(false);
+			delete Item;
+		}
+	}
 
-void GarbageCollector::UnregisterThread(Thread* ManagedThread)
-{
-	SCOPED_LOCK();
-	GCThreads.erase(ManagedThread);
+	Objects.Collection.clear();
+	Objects.PoolReserve.clear();
+	Roots.clear();
 }
 
 void GarbageCollector::Tick(float InDeltaSeconds)
@@ -139,7 +184,7 @@ void GarbageCollector::Tick(float InDeltaSeconds)
 
 void GarbageCollector::Collect()
 {
-	SCOPED_LOCK();
+	std::unique_lock GCMtx_lock(GCMtx);
 
 	Thread* MyThread = Thread::GetCurrentThread();
 
@@ -230,31 +275,9 @@ size_t GarbageCollector::NumThreadObjects()
 
 void GarbageCollector::SuppressFinalize(SObject* Object)
 {
-	SCOPED_LOCK();
+	std::unique_lock GCMtx_lock(GCMtx);
 
 	PendingFinalize.emplace(Object);
-}
-
-void GarbageCollector::Shutdown()
-{
-	if (DeleteAction.valid())
-	{
-		DeleteAction.get();
-	}
-
-	// Final dispose.
-	for (auto& Item : Objects.Collection)
-	{
-		if (Item)
-		{
-			ensure(false);
-			delete Item;
-		}
-	}
-
-	Objects.Collection.clear();
-	Objects.PoolReserve.clear();
-	Roots.clear();
 }
 
 void GarbageCollector::SetAutoFlushInterval(float InSeconds)
@@ -265,6 +288,18 @@ void GarbageCollector::SetAutoFlushInterval(float InSeconds)
 float GarbageCollector::GetAutoFlushInterval()
 {
 	return AutoFlushInterval;
+}
+
+void GarbageCollector::RegisterThread(Thread* ManagedThread)
+{
+	std::unique_lock GCMtx_lock(GCMtx);
+	LogicThreads.emplace(ManagedThread);
+}
+
+void GarbageCollector::UnregisterThread(Thread* ManagedThread)
+{
+	std::unique_lock GCMtx_lock(GCMtx);
+	LogicThreads.erase(ManagedThread);
 }
 
 void GarbageCollector::MarkAndSweep(SObject* Object)
@@ -320,22 +355,22 @@ void GarbageCollector::MarkAndSweep(SObject* Object)
 
 void GarbageCollector::StopThreads(Thread* MyThread)
 {
-	for (auto& GCThread : GCThreads)
+	for (auto& LogicThread : LogicThreads)
 	{
-		if (MyThread->GetThreadId() != GCThread->GetThreadId())
+		if (MyThread->GetThreadId() != LogicThread->GetThreadId())
 		{
-			GCThread->SuspendThread();
+			LogicThread->SuspendThread();
 		}
 	}
 }
 
 void GarbageCollector::ResumeThreads(Thread* MyThread)
 {
-	for (auto& GCThread : GCThreads)
+	for (auto& LogicThread : LogicThreads)
 	{
-		if (MyThread != GCThread)
+		if (MyThread != LogicThread)
 		{
-			GCThread->ResumeThread();
+			LogicThread->ResumeThread();
 		}
 	}
 }

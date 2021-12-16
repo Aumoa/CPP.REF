@@ -61,15 +61,7 @@ void SObject::PostConstruction()
 
 void* SObject::operator new(size_t AllocSize)
 {
-	GC.IncrementAllocGCMemory(AllocSize);
-
-	void* Block = ::operator new(AllocSize, std::nothrow);
-	if (Block == nullptr)
-	{
-		GC.Collect();
-		Block = ::operator new(AllocSize);
-	}
-	return Block;
+	return ::operator new(AllocSize);
 }
 
 void SObject::operator delete(void* MemBlock)

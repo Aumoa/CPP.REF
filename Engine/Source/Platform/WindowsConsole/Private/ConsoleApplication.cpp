@@ -15,6 +15,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	using namespace std;
 	
 	int32 ReturnCode;
+	GC.Init();
 
 	std::unique_ptr<PlatformModule> Module;
 

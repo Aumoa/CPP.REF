@@ -19,12 +19,30 @@ class CORE_API GarbageCollector
 {
 public:
 	class Instantiate;
+	class ScopedTimer;
 
 	template<class T>
 	friend class GCRoot;
 	friend class SObject;
-	friend class Instantiate;
 	friend class Thread;
+
+private:
+	struct GCWorkerThread
+	{
+		Thread* ThreadPtr = nullptr;
+		std::future<void> ThreadJoin;
+		std::function<void()> Work;
+		std::promise<void> WorkCompleted;
+	};
+
+	static constexpr size_t NumGCWorkerThreads = 16;
+	std::array<GCWorkerThread, NumGCWorkerThreads> GCWorkerThreads;
+	std::atomic<bool> bRunningWorkers;
+	std::condition_variable cvExecuteWorkers;
+
+	void ReadyGCWorkers();
+	void ShutdownGCWorkers();
+	void ExecuteWorkers();
 
 private:
 	struct ObjectPool
@@ -40,9 +58,7 @@ private:
 		[[nodiscard]] auto end() { return Collection.end(); }
 	};
 
-private:
-	std::mutex Locker;
-	std::atomic<bool> bScoped;
+	std::mutex GCMtx;
 
 	ObjectPool Objects;
 	std::set<SObject*> Roots;
@@ -53,8 +69,7 @@ private:
 
 	std::future<void> DeleteAction;
 
-	std::set<Thread*> GCThreads;
-	std::atomic<size_t> IncrementalGCMemory;
+	std::set<Thread*> LogicThreads;
 
 	float AutoFlushInterval = 60.0f;
 	int32 MinorGCCounter = 0;
@@ -66,27 +81,27 @@ private:
 	std::array<std::vector<SObject*>, NumGCThreads> ReferencedObjects_ThreadTemp;
 
 private:
-	GarbageCollector();
+	GarbageCollector() = default;
 
 private:
 	void RegisterObject(SObject* Object);
 	void UnregisterObject(SObject* Object);
 
-	void IncrementAllocGCMemory(size_t Amount);
-
 public:
-	void RegisterThread(Thread* ManagedThread);
-	void UnregisterThread(Thread* ManagedThread);
+	void Init();
+	void Shutdown();
 
 public:
 	void Tick(float InDeltaSeconds);
 	void Collect();
 	size_t NumThreadObjects();
 	void SuppressFinalize(SObject* Object);
-	void Shutdown();
 
 	void SetAutoFlushInterval(float InSeconds);
 	float GetAutoFlushInterval();
+
+	void RegisterThread(Thread* ManagedThread);
+	void UnregisterThread(Thread* ManagedThread);
 
 private:
 	void MarkAndSweep(SObject* Object);
