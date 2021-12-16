@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "IProjectGenerator.h"
 
-class SSolution;
-
 class SVSProjectGenerator : implements SObject, implements IProjectGenerator
 {
 	GENERATED_BODY(SVSProjectGenerator)
@@ -18,6 +16,7 @@ private:
 public:
 	SVSProjectGenerator(SSolution* Solution);
 
+	virtual SSolution* GetSolution() override;
 	virtual IProject* GenerateProject(const ProjectBuildRuntime& RuntimeData) override;
 	virtual ISolution* GenerateSolution() override;
 };

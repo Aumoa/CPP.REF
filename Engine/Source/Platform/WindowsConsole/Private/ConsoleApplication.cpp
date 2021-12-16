@@ -7,6 +7,7 @@
 #include "Misc/CommandLine.h"
 #include "Diagnostics/LogModule.h"
 #include "Threading/Thread.h"
+#include "Console.h"
 #include <chrono>
 
 int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
@@ -20,6 +21,9 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	{
 		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
 
+#if SHIPPING
+		std::optional<std::wstring> ModuleName = ANSI_TO_WCHAR(SE_APPLICATION);
+#else
 		size_t ConsoleModuleIdx = CommandArgs->GetArgument(L"--ConsoleDll");
 		if (ConsoleModuleIdx == -1)
 		{
@@ -33,7 +37,9 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			SE_LOG(LogWindowsConsole, Fatal, L"ConsoleModule does not specified.");
 			return -1;
 		}
+#endif
 
+		Console::WriteLine(L"ModuleName: {}", *ModuleName);
 		SharedPtr LogModule = NewObject<SLogModule>(*ModuleName);
 		LogModule->RunTask();
 

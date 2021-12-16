@@ -12,6 +12,11 @@ SVSProjectGenerator::SVSProjectGenerator(SSolution* Solution)
 {
 }
 
+SSolution* SVSProjectGenerator::GetSolution()
+{
+	return Solution;
+}
+
 IProject* SVSProjectGenerator::GenerateProject(const ProjectBuildRuntime& RuntimeData)
 {
 	return NewObject<SVSProject>(this, RuntimeData);

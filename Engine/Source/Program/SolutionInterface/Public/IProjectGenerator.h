@@ -7,9 +7,11 @@
 
 interface IProject;
 interface ISolution;
+class SSolution;
 
 interface IProjectGenerator : implements SObject
 {
+	virtual SSolution* GetSolution() = 0;
 	virtual IProject* GenerateProject(const ProjectBuildRuntime& RuntimeData) = 0;
 	virtual ISolution* GenerateSolution() = 0;
 };

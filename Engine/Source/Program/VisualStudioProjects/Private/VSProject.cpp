@@ -4,6 +4,8 @@
 #include "tinyxml2.h"
 #include "LogVSProjects.h"
 #include "GuidHelper.h"
+#include "IProjectGenerator.h"
+#include "Solution.h"
 #include "IO/DirectoryReference.h"
 #include "IO/FileReference.h"
 
@@ -42,6 +44,9 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 {
 	using namespace tinyxml2;
 	using EType = ProjectBuildMetadata::EType;
+
+	SSolution* Solution = Generator->GetSolution();
+	std::wstring AppName = Solution->GetFirstProjectName();
 
 	XMLDocument Doc;
 
@@ -164,6 +169,8 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 		}
 	};
 
+	std::string BaseMacros = std::format("SE_APPLICATION=\"{}\";", WCHAR_TO_ANSI(AppName));
+
 	BuildConfiguration Configurations[] =
 	{
 		{
@@ -171,7 +178,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			.Configuration = "Debug",
 			.Optimization = { "Disabled", "Disabled" },
 			.BasicRuntimeChecks = { "EnableFastChecks", "EnableFastChecks" },
-			.Macros = "DO_CHECK=1;",
+			.Macros = BaseMacros + "DO_CHECK=1;SHIPPING=0;",
 			.bUseDebugLibrary = true,
 			.bWholeProgramOptimization = 0b00,
 			.bLinkIncremental = 0b11,
@@ -185,7 +192,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			.Configuration = "DebugGame",
 			.Optimization = { "Disabled", "MaxSpeed" },
 			.BasicRuntimeChecks = { "EnableFastChecks", "Default" },
-			.Macros = "DO_CHECK=1;",
+			.Macros = BaseMacros + "DO_CHECK=1;SHIPPING=0;",
 			.bUseDebugLibrary = false,
 			.bWholeProgramOptimization = 0b01,
 			.bLinkIncremental = 0b10,
@@ -199,7 +206,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			.Configuration = "Release",
 			.Optimization = { "MaxSpeed", "MaxSpeed" },
 			.BasicRuntimeChecks = { "Default", "Default" },
-			.Macros = "DO_CHECK=0;",
+			.Macros = BaseMacros + "DO_CHECK=0;SHIPPING=1;",
 			.bUseDebugLibrary = false,
 			.bWholeProgramOptimization = 0b11,
 			.bLinkIncremental = 0b00,

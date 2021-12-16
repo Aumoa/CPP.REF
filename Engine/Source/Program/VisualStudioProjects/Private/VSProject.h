@@ -6,6 +6,7 @@
 #include "IProject.h"
 
 interface IProjectGenerator;
+class SVSSolution;
 
 namespace tinyxml2
 {
