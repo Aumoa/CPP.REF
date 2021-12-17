@@ -91,7 +91,7 @@ GarbageCollector& GC = GarbageCollector::Instantiate::GC();
 
 GarbageCollector::~GarbageCollector()
 {
-	Shutdown();
+	Shutdown(false);
 }
 
 void GarbageCollector::RegisterObject(SObject* Object)
@@ -111,7 +111,7 @@ void GarbageCollector::Init()
 {
 }
 
-void GarbageCollector::Shutdown()
+void GarbageCollector::Shutdown(bool bNormal)
 {
 	if (DeleteAction.valid())
 	{
@@ -124,7 +124,7 @@ void GarbageCollector::Shutdown()
 		if (Item)
 		{
 			// Memory leak detected!
-			ensure(false);
+			ensure(!bNormal);
 			delete Item;
 		}
 	}
@@ -160,15 +160,12 @@ void GarbageCollector::Collect()
 
 		// Ready buffers for lock-free.
 		size_t FullCollectionSize = Objects.Collection.size();
-		GCMarkingBuffer[0].resize(FullCollectionSize);
-		memset(GCMarkingBuffer[0].data(), 0, FullCollectionSize * sizeof(int32));
-		GCMarkingBuffer[1].resize(FullCollectionSize);
-		memset(GCMarkingBuffer[1].data(), 0, FullCollectionSize * sizeof(int32));
+		GCMarkingBuffer.resize(FullCollectionSize);
+		memset(GCMarkingBuffer.data(), 0, FullCollectionSize * sizeof(int32));
 
-		IndexOfGCBuffer = 0;
 		for (auto& Root : Roots)
 		{
-			GCMarkingBuffer[IndexOfGCBuffer][Root->InternalIndex] = 1;
+			GCMarkingBuffer[Root->InternalIndex] = 1;
 		}
 		GCThreadFutures.resize(NumGCThreads);
 
@@ -185,20 +182,18 @@ void GarbageCollector::Collect()
 
 				for (size_t i = Start; i < End; ++i)
 				{
-					if (GCMarkingBuffer[IndexOfGCBuffer][i] == Depth)
+					if (GCMarkingBuffer[i] == Depth)
 					{
 						SObject* Object = Objects.Collection[i];
 						if (Object)
 						{
-							Count += MarkGC(Object, Depth + 1);
+							Count += MarkGC(Object, ThreadIdx, Depth + 1);
 						}
 					}
 				}
 
 				NumObjects += Count;
 			}, NumGCThreads);
-
-			IndexOfGCBuffer = (int32)!IndexOfGCBuffer;
 		}
 
 		ResumeThreads(MyThread);
@@ -341,40 +336,57 @@ bool GarbageCollector::IsMarked(SObject* Object)
 	return Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC;
 }
 
-int32 GarbageCollector::MarkGC(SObject* Object, int32 MarkDepth)
+int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth)
 {
-	if (IsMarked(Object))
-	{
-		return 0;
-	}
+	int32 Writep = 0;
+	auto& Buffer = GCThreadBuffers[ThreadIdx];
+	Buffer[Writep++] = Object;
 
 	// Mark generation.
-	Object->MarkGC(Generation);
 	int32 Count = 0;
-
-	for (auto& GCProp : Object->GetType()->GetGCProperties())
+	int32 Reap = 0;
+	while (Reap < Writep)
 	{
-		Type* PropertyType = GCProp->GetMemberType();
-		if (PropertyType->IsGCCollection())
-		{
-			Count += PropertyType->MarkCollectionObjects(Object, GCProp, MarkDepth);
-		}
-		else
-		{
-			SObject* Member = GCProp->GetObject(Object);
+		Object = Buffer[Reap++];
 
-			// If object is disposed,
-			if (PendingFinalize.contains(Member))
+		if (IsMarked(Object))
+		{
+			continue;
+		}
+
+		Object->MarkGC(Generation);
+
+		for (auto& GCProp : Object->GetType()->GetGCProperties())
+		{
+			Type* PropertyType = GCProp->GetMemberType();
+			if (PropertyType->IsGCCollection())
 			{
-				// Change property to nullptr.
-				GCProp->SetObject(Object, nullptr);
+				Count += PropertyType->MarkCollectionObjects(Object, GCProp, MarkDepth);
 			}
 			else
 			{
-				if (Member)
+				SObject* Member = GCProp->GetObject(Object);
+
+				// If object is disposed,
+				if (PendingFinalize.contains(Member))
 				{
-					GCMarkingBuffer[!IndexOfGCBuffer][Member->InternalIndex] = MarkDepth;
-					++Count;
+					// Change property to nullptr.
+					GCProp->SetObject(Object, nullptr);
+				}
+				else
+				{
+					if (Member)
+					{
+						if (Writep < (int32)Buffer.size())
+						{
+							Buffer[Writep++] = Member;
+						}
+						else
+						{
+							GCMarkingBuffer[Member->InternalIndex] = MarkDepth;
+						}
+						++Count;
+					}
 				}
 			}
 		}

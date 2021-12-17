@@ -114,7 +114,7 @@ public:
 					}
 					else
 					{
-						GC.GCMarkingBuffer[!GC.IndexOfGCBuffer][Object->InternalIndex] = Depth;
+						GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
 						++Count;
 					}
 

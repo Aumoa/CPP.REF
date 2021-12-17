@@ -88,6 +88,6 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	}
 
 	GC.Collect();
-	GC.Shutdown();
+	GC.Shutdown(true);
 	return ReturnCode;
 }

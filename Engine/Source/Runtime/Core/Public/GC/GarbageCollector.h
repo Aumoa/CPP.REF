@@ -68,8 +68,8 @@ private:
 	// lock-free buffers.
 	static constexpr size_t NumGCThreads = 14;
 	std::vector<std::future<void>> GCThreadFutures;
-	std::vector<int32> GCMarkingBuffer[2];
-	int32 IndexOfGCBuffer = 0;
+	std::vector<int32> GCMarkingBuffer;
+	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers;
 	EGCLogVerbosity Verbosity;
 
 private:
@@ -82,7 +82,7 @@ private:
 
 public:
 	void Init();
-	void Shutdown();
+	void Shutdown(bool bNormal);
 
 public:
 	void Tick(float InDeltaSeconds);
@@ -99,7 +99,7 @@ public:
 
 private:
 	bool IsMarked(SObject* Object);
-	int32 MarkGC(SObject* Object, int32 MarkDepth);
+	int32 MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth);
 	void StopThreads(Thread* MyThread);
 	void ResumeThreads(Thread* MyThread);
 };
