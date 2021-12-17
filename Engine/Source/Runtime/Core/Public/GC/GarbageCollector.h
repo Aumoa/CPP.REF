@@ -15,6 +15,14 @@ class Thread;
 
 CORE_API extern GarbageCollector& GC;
 
+enum class EGCLogVerbosity
+{
+	None,
+	Minimal,
+	Verbose,
+	VeryVerbose,
+};
+
 class CORE_API GarbageCollector
 {
 public:
@@ -25,34 +33,14 @@ public:
 	friend class GCRoot;
 	friend class SObject;
 	friend class Thread;
-
-private:
-	struct GCWorkerThread
-	{
-		Thread* ThreadPtr = nullptr;
-		std::future<void> ThreadJoin;
-		std::array<int64, 10240> DummyWorks;
-
-		std::mutex WorkerMtx;
-		std::atomic<bool> AtomicMtx;
-
-		std::function<void()> Work;
-	};
-
-	static constexpr size_t NumGCWorkerThreads = 8;
-	std::array<GCWorkerThread, NumGCWorkerThreads> GCWorkerThreads;
-	std::atomic<bool> bRunningWorkers;
-	std::condition_variable cvExecuteWorkers;
-
-	void ReadyGCWorkers();
-	void ShutdownGCWorkers();
-	void ExecuteWorkers(bool bWait = true);
+	friend class Type;
 
 private:
 	struct ObjectPool
 	{
 		std::vector<SObject*> Collection;
-		std::vector<size_t> PoolReserve;
+		std::set<size_t> PoolReserve;
+		size_t CompactSize = 0;
 
 		size_t size();
 		SObject*& emplace(SObject* InObject);
@@ -78,8 +66,11 @@ private:
 
 private:
 	// lock-free buffers.
-	static constexpr size_t NumGCThreads = 8;
-	std::array<std::vector<SObject*>, NumGCThreads> ReferencedObjects_ThreadTemp;
+	static constexpr size_t NumGCThreads = 14;
+	std::vector<std::future<void>> GCThreadFutures;
+	std::vector<int32> GCMarkingBuffer[2];
+	int32 IndexOfGCBuffer = 0;
+	EGCLogVerbosity Verbosity;
 
 private:
 	GarbageCollector() = default;
@@ -101,13 +92,14 @@ public:
 	size_t NumThreadObjects();
 	void SetAutoFlushInterval(float InSeconds);
 	float GetAutoFlushInterval();
+	void SetLogVerbosity(EGCLogVerbosity Verbosity);
 
 	void RegisterThread(Thread* ManagedThread);
 	void UnregisterThread(Thread* ManagedThread);
 
 private:
 	bool IsMarked(SObject* Object);
-	void MarkAndSweep(SObject* Object);
+	int32 MarkGC(SObject* Object, int32 MarkDepth);
 	void StopThreads(Thread* MyThread);
 	void ResumeThreads(Thread* MyThread);
 };

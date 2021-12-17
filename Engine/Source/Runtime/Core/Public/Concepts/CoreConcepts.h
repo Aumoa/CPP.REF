@@ -51,3 +51,9 @@ class NumGCTypes<TTupleClass<TTupleType, TTupleTypes...>>
 public:
 	static constexpr size_t Value = GetImpl();
 };
+
+template<class T>
+concept IsMutableCollection = requires (T& Collection)
+{
+	{ *Collection.begin() = {} };
+};

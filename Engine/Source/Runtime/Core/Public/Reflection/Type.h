@@ -11,6 +11,7 @@
 #include "Concepts/CoreConcepts.h"
 #include "Method.h"
 #include "Property.h"
+#include "GC/GarbageCollector.h"
 #include "Misc/StringUtils.h"
 
 class SObject;
@@ -43,7 +44,7 @@ private:
 
 	uint8 bGCCollection : 1 = false;
 	Type* CollectionType = nullptr;
-	std::function<void(std::vector<SObject*>&, const void*)> Collector;
+	std::function<int32(void*, int32)> Collector;
 
 public:
 	template<class TType>
@@ -60,7 +61,7 @@ public:
 
 		uint8 bGCCollection : 1 = false;
 		Type* CollectionType = nullptr;
-		std::function<void(std::vector<SObject*>&, const void*)> Collector;
+		std::function<int32(void*, int32)> Collector;
 
 		// SObject type.
 		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires requires { TType::StaticClass(); }
@@ -92,17 +93,34 @@ public:
 			, bNative(true)
 			, bGCCollection(true)
 			, CollectionType(std::remove_reference_t<decltype(**std::begin(std::declval<const TType&>()))>::StaticClass())
-			, Collector([](std::vector<SObject*>& OutBuf, const void* Ptr)
+			, Collector([](void* Ptr, int32 Depth) -> int32
 			{
-				const TType* Collection = reinterpret_cast<const TType*>(Ptr);
-
-				size_t NumObjects = std::size(*Collection);
-				OutBuf.reserve(OutBuf.size() + NumObjects);
-
-				for (auto It = std::begin(*Collection); It != std::end(*Collection); std::advance(It, 1))
+				TType& Collection = *reinterpret_cast<TType*>(Ptr);
+				int32 Count = 0;
+				for (auto It = Collection.begin(); It != Collection.end();)
 				{
-					OutBuf.emplace_back(dynamic_cast<SObject*>(*It));
+					auto& Object = *It;
+					if (GC.PendingFinalize.contains(Object))
+					{
+						if constexpr (IsMutableCollection<TType>)
+						{
+							Object = nullptr;
+						}
+						else
+						{
+							Collection.erase(It++);
+							continue;
+						}
+					}
+					else
+					{
+						GC.GCMarkingBuffer[!GC.IndexOfGCBuffer][Object->InternalIndex] = Depth;
+						++Count;
+					}
+
+					++It;
 				}
+				return Count;
 			})
 		{
 		}
@@ -207,7 +225,7 @@ public:
 	const std::vector<Property*>& GetProperties(bool bIncludeSuperMembers = true);
 	const std::vector<Property*>& GetGCProperties();
 	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
-	void GetCollectionObjects(SObject* Object, Property* CollectionProp, std::vector<SObject*>& OutCollection);
+	int32 MarkCollectionObjects(SObject* Object, Property* CollectionProp, int32 Depth);
 
 public:
 	void* FromObject(SObject* Object) const { return FromObjectCast(Object); }

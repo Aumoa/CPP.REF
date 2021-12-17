@@ -30,8 +30,8 @@ void SObject::MarkGC(uint64 Generation)
 	if (this->Generation != Generation)
 	{
 		this->Generation = Generation;
-		this->ReferencePtr->bMarkAtGC = true;
 	}
+	this->ReferencePtr->bMarkAtGC = true;
 }
 
 void SObject::UnmarkGC()
