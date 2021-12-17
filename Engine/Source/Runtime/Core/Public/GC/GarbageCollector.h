@@ -39,7 +39,7 @@ private:
 	struct ObjectPool
 	{
 		std::vector<SObject*> Collection;
-		std::set<size_t> PoolReserve;
+		std::vector<size_t> PoolReserve;
 
 		size_t size();
 		SObject*& emplace(SObject* InObject);

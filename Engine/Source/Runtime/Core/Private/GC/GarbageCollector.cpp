@@ -54,7 +54,7 @@ SObject*& GarbageCollector::ObjectPool::emplace(SObject* InObject)
 
 	if (PoolReserve.size())
 	{
-		auto It = PoolReserve.begin();
+		auto It = PoolReserve.end() - 1;
 		size_t Idx = *It;
 		PoolReserve.erase(It);
 
@@ -78,7 +78,7 @@ void GarbageCollector::ObjectPool::erase(SObject* InObject)
 	if (InObject->InternalIndex != -1)
 	{
 		Collection[InObject->InternalIndex] = nullptr;
-		PoolReserve.emplace(InObject->InternalIndex);
+		PoolReserve.emplace_back(InObject->InternalIndex);
 		InObject->InternalIndex = -1;
 	}
 }
@@ -271,7 +271,7 @@ void GarbageCollector::Collect()
 				break;
 			}
 
-			auto It = Objects.PoolReserve.begin();
+			auto It = Objects.PoolReserve.end() - 1;
 			size_t Idx = *It;
 			Objects.PoolReserve.erase(It);
 
