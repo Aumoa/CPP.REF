@@ -63,6 +63,7 @@ private:
 
 	float AutoFlushInterval = 60.0f;
 	std::atomic<bool> bManualGCTriggered;
+	std::atomic<bool> bLock;
 
 private:
 	// lock-free buffers.
@@ -96,6 +97,9 @@ public:
 
 	void RegisterThread(Thread* ManagedThread);
 	void UnregisterThread(Thread* ManagedThread);
+
+	void Lock();
+	void Unlock();
 
 private:
 	bool IsMarked(SObject* Object);

@@ -151,6 +151,11 @@ void GarbageCollector::Tick(float InDeltaSeconds)
 
 void GarbageCollector::Collect()
 {
+	if (bLock)
+	{
+		return;
+	}
+
 	Thread* MyThread = Thread::GetCurrentThread();
 	std::unique_lock GCMtx_lock(GCMtx);
 	ScopedTimer Timer(std::format(L"Start GC {}, with {} objects, with {} size table.", Generation, Objects.size(), Objects.Collection.size()), EGCLogVerbosity::Minimal);
@@ -329,6 +334,16 @@ void GarbageCollector::UnregisterThread(Thread* ManagedThread)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
 	LogicThreads.erase(ManagedThread);
+}
+
+void GarbageCollector::Lock()
+{
+	bLock = true;
+}
+
+void GarbageCollector::Unlock()
+{
+	bLock = false;
 }
 
 bool GarbageCollector::IsMarked(SObject* Object)
