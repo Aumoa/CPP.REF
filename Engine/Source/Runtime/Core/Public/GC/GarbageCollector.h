@@ -40,7 +40,6 @@ private:
 	{
 		std::vector<SObject*> Collection;
 		std::set<size_t> PoolReserve;
-		size_t CompactSize = 0;
 
 		size_t size();
 		SObject*& emplace(SObject* InObject);

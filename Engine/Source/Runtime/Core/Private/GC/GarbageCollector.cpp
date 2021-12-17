@@ -65,10 +65,6 @@ SObject*& GarbageCollector::ObjectPool::emplace(SObject* InObject)
 			InObject->InternalIndex = Idx;
 			return Ref;
 		}
-		else
-		{
-			CompactSize -= 1;
-		}
 	}
 
 	size_t Idx = Collection.size();
@@ -216,6 +212,7 @@ void GarbageCollector::Collect()
 	}
 
 	PendingFinalize.clear();
+	size_t LastObjectIndex = 0;
 
 	{
 		ScopedTimer Timer(L"  Sweep");
@@ -237,6 +234,7 @@ void GarbageCollector::Collect()
 				if (Object && Object->Generation != Generation && !Roots.contains(Object))
 				{
 					PendingKill[ActualPendingKill++] = Object;
+					Object->UnmarkGC();
 				}
 				else
 				{
@@ -250,7 +248,6 @@ void GarbageCollector::Collect()
 		// Compact objects list.
 		PendingKill.resize(ActualPendingKill);
 
-		size_t LastObjectIndex = 0;
 		for (auto& Index : ObjectCompactIndex)
 		{
 			if (Index > LastObjectIndex)
@@ -259,20 +256,43 @@ void GarbageCollector::Collect()
 			}
 		}
 
-		size_t BeforeCompact = Objects.Collection.size();
-		Objects.Collection.resize(LastObjectIndex + 1);
-		size_t CompactSize = BeforeCompact - Objects.Collection.size();
+	}
 
-		Objects.CompactSize += CompactSize;
+	// Swap-compact one item.
+	{
+		ScopedTimer Timer(L"  Compact object table.");
+
+		size_t BeforeCompact = Objects.Collection.size();
+		while (Objects.PoolReserve.size())
+		{
+			SObject* Object = Objects.Collection[LastObjectIndex];
+			if (Object == nullptr)
+			{
+				break;
+			}
+
+			auto It = Objects.PoolReserve.begin();
+			size_t Idx = *It;
+			Objects.PoolReserve.erase(It);
+
+			std::swap(Objects.Collection[Idx], Objects.Collection[LastObjectIndex--]);
+			Objects.Collection[Idx]->InternalIndex = Idx;
+		}
+		Objects.Collection.resize(LastObjectIndex + 1);
+
+		size_t AfterCompact = Objects.Collection.size();
 		if (Verbosity >= EGCLogVerbosity::VeryVerbose)
 		{
-			SE_LOG(LogGC, Verbose, L"  Compact GC objects table: {} -> {}, {} discounts.", BeforeCompact, Objects.Collection.size(), CompactSize);
+			SE_LOG(LogGC, Verbose, L"  Compact GC objects table: {} -> {}, {} discounts.", BeforeCompact, AfterCompact, BeforeCompact - AfterCompact);
 		}
+	}
+
+	{
+		ScopedTimer Timer(L"  Unmarking objects.");
 
 		// Unregister pending kill objects.
 		for (auto& Object : PendingKill)
 		{
-			Object->UnmarkGC();
 			Objects.erase(Object);
 		}
 	}
