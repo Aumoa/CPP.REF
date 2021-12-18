@@ -1,0 +1,10 @@
+<ProjectInfo Name="Console" Path="Runtime.Console" Type="Module">
+    <Guid>a9342fc0-59a0-4d83-bd0f-784f03008e78</Guid>
+    <IncludePaths>
+        <Item RelativePath="Public" Access="Public"/>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
+    <ReferencedProjects>
+        <Item Name="Core" Access="Public"/>
+    </ReferencedProjects>
+</ProjectInfo>

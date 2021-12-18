@@ -1,7 +1,0 @@
-<ProjectInfo Name="tinyxml2" Path="tinyxml2" Type="Module">
-    <Guid>a18b0eb7-d7ef-4064-9f03-6581cb22a123</Guid>
-    <IncludePaths>
-        <Item RelativePath="Public" Access="Public"/>
-        <Item RelativePath="Private"/>
-    </IncludePaths>
-</ProjectInfo>

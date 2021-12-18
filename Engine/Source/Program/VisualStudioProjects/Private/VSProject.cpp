@@ -319,6 +319,22 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 					NewElement(Link, "EnableUAC", "false");
 					NewElement(Link, "AdditionalDependencies", WCHAR_TO_ANSI(RuntimeData.AdditionalDependencies));
 				}
+
+				if (RuntimeData.Metadata->Type == EType::Vcpkg)
+				{
+					XMLElement* PostBuildEvent = NewElement(ItemDefinitionGroup, "PostBuildEvent");
+					{
+						std::vector<std::wstring> Commands =
+						{
+							std::format(LR"(pushd {}\..\vcpkg\)", RuntimeData.ProjectPath),
+							std::format(LR"(IF NOT EXIST "vcpkg.exe" ( bootstrap-vcpkg.bat ))"),
+							std::format(LR"(vcpkg.exe install {}:x64-windows)", RuntimeData.Metadata->Name),
+							std::format(LR"(vcpkg.exe integrate install)"),
+							std::format(LR"(popd)")
+						};
+						NewElement(PostBuildEvent, "Command", WCHAR_TO_ANSI(StringUtils::Join(L"\n", Commands)));
+					}
+				}
 			}
 		}
 
@@ -362,7 +378,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			auto ProjectReferenceBody = [&](auto It)
 			{
 				auto& [Guid, Referenced] = It;
-				if (Referenced->Metadata->Type != EType::None)
+				if (Referenced->Metadata->Type != EType::None && Referenced->Metadata->Type != EType::Vcpkg)
 				{
 					std::filesystem::path IntermediateProjectPath = "$(SolutionDir)Intermediate\\ProjectFiles";
 					for (auto Split : StringUtils::Split(Referenced->Metadata->Path, L".", true, true))
@@ -507,14 +523,13 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			{
 				NewElement(PropertyGroup, "LocalDebuggerWorkingDirectory", "$(SolutionDir)");
 				NewElement(PropertyGroup, "DebuggerFlavor", "WindowsLocalDebugger");
+				NewElement(PropertyGroup, "LocalDebuggerCommand", "$(OutDir)$(SolutionName).exe");
 				switch (RuntimeData.Metadata->Type)
 				{
 				case EType::Game:
-					NewElement(PropertyGroup, "LocalDebuggerCommand", "$(OutDir)Windows.exe");
 					NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--GameDll \"{}\"", WCHAR_TO_ANSI(RuntimeData.Metadata->Name)));
 					break;
 				case EType::Console:
-					NewElement(PropertyGroup, "LocalDebuggerCommand", "$(OutDir)WindowsConsole.exe");
 					NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--ConsoleDll \"{}\"", WCHAR_TO_ANSI(RuntimeData.Metadata->Name)));
 					break;
 				}

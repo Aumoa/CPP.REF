@@ -1,0 +1,13 @@
+<ProjectInfo Name="VisualStudioProjects" Path="Program.VisualStudioProjects" Type="Console">
+    <Guid>3b445170-afc8-44a3-bba6-b388828b31c5</Guid>
+    <IncludePaths>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
+    <ReferencedProjects>
+        <Item Name="Core"/>
+        <Item Name="Console"/>
+        <Item Name="tinyxml2"/>
+        <Item Name="SolutionInterface"/>
+		<Item Name="WindowsConsole"/>
+    </ReferencedProjects>
+</ProjectInfo>

@@ -15,6 +15,7 @@ struct ProjectBuildMetadata
 		Application,
 		Console,
 		Game,
+		Vcpkg,
 	};
 
 	enum class EAccessKey

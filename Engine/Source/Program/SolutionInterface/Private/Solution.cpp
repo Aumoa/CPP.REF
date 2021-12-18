@@ -156,7 +156,12 @@ void SSolution::SearchProjects(const std::filesystem::path& Directory, bool bIsE
 		if (Item.exists())
 		{
 			const std::filesystem::path& XmlPath = Item.path();
-			if (StringUtils::ToLower(XmlPath.extension().wstring()) == L".xml")
+
+			std::wstring XmlStem = StringUtils::ToLower(XmlPath.stem().wstring());
+			std::wstring Extension = StringUtils::ToLower(XmlPath.extension().wstring());
+			std::wstring ParentName = StringUtils::ToLower(XmlPath.parent_path().stem().wstring());
+
+			if (Extension == L".xml" && XmlStem == ParentName)
 			{
 				if (ProjectBuildMetadata Build; TryParseProject(XmlPath, Build))
 				{
@@ -199,6 +204,10 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 			{
 				return EType::Console;
 			}
+			else if (Token == "None")
+			{
+				return EType::None;
+			}
 			else if (Token == "Application")
 			{
 				return EType::Application;
@@ -214,6 +223,14 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 			else if (Token == "Module")
 			{
 				return EType::Module;
+			}
+			else if (Token == "Vcpkg")
+			{
+				return EType::Vcpkg;
+			}
+			else
+			{
+				FatalAndDisplay(L"Parsing token error! \"{}\" is not a valid project type.", ANSI_TO_WCHAR(StringToken));
 			}
 		}
 
