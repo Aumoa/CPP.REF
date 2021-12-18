@@ -145,7 +145,7 @@ void GarbageCollector::Tick(float InDeltaSeconds)
 	}
 }
 
-void GarbageCollector::Collect()
+void GarbageCollector::Collect(bool bFullPurge)
 {
 	if (bLock)
 	{
@@ -154,6 +154,12 @@ void GarbageCollector::Collect()
 
 	Thread* MyThread = Thread::GetCurrentThread();
 	std::unique_lock GCMtx_lock(GCMtx);
+
+	if (bFullPurge)
+	{
+		++Generation;
+	}
+
 	ScopedTimer Timer(std::format(L"Start GC {}, with {} objects, with {} size table.", Generation, Objects.size(), Objects.Collection.size()), EGCLogVerbosity::Minimal);
 
 	{
@@ -278,7 +284,6 @@ void GarbageCollector::Collect()
 			std::swap(Objects.Collection[Idx], Objects.Collection[LastObjectIndex--]);
 			Objects.Collection[Idx]->InternalIndex = Idx;
 		}
-		Objects.Collection.resize(LastObjectIndex + 1);
 
 		size_t AfterCompact = Objects.Collection.size();
 		if (Verbosity >= EGCLogVerbosity::VeryVerbose)
@@ -295,6 +300,8 @@ void GarbageCollector::Collect()
 		{
 			Objects.erase(Object);
 		}
+
+		Objects.Collection.resize(LastObjectIndex + 1);
 	}
 
 	if (Verbosity >= EGCLogVerbosity::VeryVerbose)

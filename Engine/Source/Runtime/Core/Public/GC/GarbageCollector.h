@@ -8,6 +8,7 @@
 #include <functional>
 #include <mutex>
 #include <future>
+#include <array>
 
 class SObject;
 class GarbageCollector;
@@ -86,7 +87,7 @@ public:
 
 public:
 	void Tick(float InDeltaSeconds);
-	void Collect();
+	void Collect(bool bFullPurge = false);
 	void SuppressFinalize(SObject* Object);
 
 	size_t NumThreadObjects();

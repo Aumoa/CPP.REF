@@ -7,10 +7,8 @@
 #include <fstream>
 #include <future>
 
-class CORE_API SLogModule : implements SObject
+class CORE_API LogModule
 {
-	GENERATED_BODY(SLogModule)
-
 private:
 	std::wstring ModuleName;
 	std::future<void> WorkerThread;
@@ -22,15 +20,15 @@ private:
 	std::atomic<size_t> SeekIndex = 0;
 
 public:
-	SLogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);
-	~SLogModule();
+	LogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);
+	~LogModule();
 
 	void RunTask();
 	void Shutdown();
 	void EnqueueLogMessage(std::wstring_view Message);
 	bool IsRunning();
 
-	static SLogModule* Get();
+	static LogModule* Get();
 
 private:
 	void Worker();

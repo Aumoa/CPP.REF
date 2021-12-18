@@ -3,7 +3,7 @@
 .vs/
 *.sln
 
-#Intermediate directory.
+# Intermediate directory.
 Build/
 Intermediate/
 Saved/

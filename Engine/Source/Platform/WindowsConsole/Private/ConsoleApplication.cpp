@@ -16,31 +16,29 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	
 	int32 ReturnCode;
 	std::unique_ptr<PlatformModule> Module;
+	auto Logger = std::make_unique<LogModule>(ANSI_TO_WCHAR(SE_APPLICATION));
+	Logger->RunTask();
 
 	{
 		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
 
-#if SHIPPING
-		std::optional<std::wstring> ModuleName = ANSI_TO_WCHAR(SE_APPLICATION);
-#else
+		std::optional<std::wstring> ModuleName;
 		size_t ConsoleModuleIdx = CommandArgs->GetArgument(L"--ConsoleDll");
-		if (ConsoleModuleIdx == -1)
+		if (ConsoleModuleIdx != -1)
 		{
-			SE_LOG(LogWindowsConsole, Fatal, L"ConsoleModule does not specified.");
-			return -1;
+			ModuleName = CommandArgs->GetArgument(ConsoleModuleIdx + 1);
+			if (!ModuleName)
+			{
+				SE_LOG(LogWindowsConsole, Fatal, L"ConsoleModule does not specified.");
+				return -1;
+			}
 		}
-
-		std::optional<std::wstring_view> ModuleName = CommandArgs->GetArgument(ConsoleModuleIdx + 1);
-		if (!ModuleName)
+		else
 		{
-			SE_LOG(LogWindowsConsole, Fatal, L"ConsoleModule does not specified.");
-			return -1;
+			ModuleName = ANSI_TO_WCHAR(SE_APPLICATION);
 		}
-#endif
 
 		Console::WriteLine(L"ModuleName: {}", *ModuleName);
-		SharedPtr LogModule = NewObject<SLogModule>(*ModuleName);
-		LogModule->RunTask();
 
 		Module = std::make_unique<PlatformModule>(*ModuleName);
 		auto Loader = Module->GetFunctionPointer<SConsoleModule* ()>("LoadConsoleModule");
@@ -81,13 +79,12 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			GCThread.get();
 
 			SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
-			GC.Collect();
 		}
-
-		LogModule->Shutdown();
 	}
 
-	GC.Collect();
+	GC.Collect(true);
 	GC.Shutdown(true);
+
+	Logger->Shutdown();
 	return ReturnCode;
 }

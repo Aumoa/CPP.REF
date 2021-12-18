@@ -6,24 +6,22 @@
 #include <filesystem>
 #include <chrono>
 
-GENERATE_BODY(SLogModule);
+static LogModule* gModule;
 
-static SLogModule* gModule;
-
-SLogModule::SLogModule(std::wstring_view ModuleName, size_t QueueSize) : Super()
-	, ModuleName(ModuleName)
+LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
+	: ModuleName(ModuleName)
 	, MessageQueue(QueueSize)
 {
 	check(gModule == nullptr);
 	gModule = this;
 }
 
-SLogModule::~SLogModule()
+LogModule::~LogModule()
 {
 	Shutdown();
 }
 
-void SLogModule::RunTask()
+void LogModule::RunTask()
 {
 	std::filesystem::path Directory = L"Saved/Logs";
 	std::filesystem::path LogPath = std::format(L"{}.log", ModuleName);
@@ -50,7 +48,7 @@ void SLogModule::RunTask()
 	});
 }
 
-void SLogModule::Shutdown()
+void LogModule::Shutdown()
 {
 	if (bRunning)
 	{
@@ -64,24 +62,24 @@ void SLogModule::Shutdown()
 	}
 }
 
-void SLogModule::EnqueueLogMessage(std::wstring_view Message)
+void LogModule::EnqueueLogMessage(std::wstring_view Message)
 {
 	size_t MyIdx = QueueIndex++ % MessageQueue.size();
 	MessageQueue[MyIdx] = std::wstring(Message);
 	++SeekIndex;
 }
 
-bool SLogModule::IsRunning()
+bool LogModule::IsRunning()
 {
 	return bRunning;
 }
 
-SLogModule* SLogModule::Get()
+LogModule* LogModule::Get()
 {
 	return gModule;
 }
 
-void SLogModule::Worker()
+void LogModule::Worker()
 {
 	using namespace std::literals;
 

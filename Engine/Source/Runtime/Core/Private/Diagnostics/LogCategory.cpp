@@ -41,7 +41,7 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	OutputDebugStringW(DetailComposed.c_str());
 	OutputDebugStringW(L"\n");
 
-	if (SLogModule* Module = SLogModule::Get(); Module && Module->IsRunning())
+	if (LogModule* Module = LogModule::Get(); Module && Module->IsRunning())
 	{
 		Module->EnqueueLogMessage(DetailComposed);
 	}

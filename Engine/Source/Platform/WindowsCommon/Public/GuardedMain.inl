@@ -59,7 +59,7 @@ int32 GuardedMain(std::span<std::wstring> Argv)
 	}
 	__except (ReportCrash(GetExceptionCode(), GetExceptionInformation()))
 	{
-		SLogModule::Get()->Shutdown();
+		LogModule::Get()->Shutdown();
 	}
 #endif
 
