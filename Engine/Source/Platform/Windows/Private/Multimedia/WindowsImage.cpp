@@ -2,6 +2,8 @@
 
 #include "WindowsImage.h"
 
+GENERATE_BODY(SWindowsImage);
+
 SWindowsImage::SWindowsImage(IWICBitmapSource* ImageSource, ERHIPixelFormat Format) : Super()
 	, ImageSource(ImageSource)
 	, Format(Format)

@@ -10,6 +10,8 @@
 #include "DWriteTextLayout.h"
 #include "WindowsApplication.h"
 
+GENERATE_BODY(SDXGIFactory);
+
 SDXGIFactory::SDXGIFactory(SWindowsApplication* App) : Super()
 	, App(App)
 {
@@ -20,6 +22,16 @@ SDXGIFactory::SDXGIFactory(SWindowsApplication* App) : Super()
 
 	HR(CreateDXGIFactory2(flags, IID_PPV_ARGS(&_factory)));
 	HR(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), static_cast<IUnknown**>(&_writeFactory)));
+}
+
+SDXGIFactory::~SDXGIFactory()
+{
+	Dispose(false);
+}
+
+void SDXGIFactory::Dispose()
+{
+	Dispose(true);
 }
 
 IApplicationInterface* SDXGIFactory::GetApplication()
@@ -139,4 +151,14 @@ IRHITextLayout* SDXGIFactory::CreateTextLayout(IRHITextFormat* format, std::wstr
 	HR(_writeFactory->CreateTextLayout(text.data(), (UINT32)text.length(), format_s->Get<IDWriteTextFormat>(), layout.X, layout.Y, &textLayout));
 
 	return NewObject<SDWriteTextLayout>(this, std::move(textLayout));
+}
+
+void SDXGIFactory::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		_factory.Reset();
+		_writeFactory.Reset();
+		_cachedAdapters.clear();
+	}
 }

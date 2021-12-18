@@ -3,6 +3,8 @@
 #include "Widgets/Panel/BoxPanel.h"
 #include <ranges>
 
+GENERATE_BODY(SBoxPanel);
+
 SBoxPanel::SBoxPanel(EOrientation Orientation) : Super()
 	, Orientation(Orientation)
 {

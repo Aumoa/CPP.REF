@@ -7,12 +7,13 @@
 #include <map>
 #include <mutex>
 #include <functional>
+#include <future>
 #include "Threading/Thread.h"
 #include "Misc/CrcHash.h"
 
 interface IRHIDeviceContext;
-class SThread;
 class SEventHandle;
+class Thread;
 
 class RENDERCORE_API RenderThread
 {
@@ -43,9 +44,9 @@ private:
 	struct ThreadInfo
 	{
 		int64 ThreadId;
-		std::thread Thread;
 		std::atomic<bool> bRunning;
 		std::mutex CriticalSection;
+		std::future<void> ThreadJoin;
 
 		void Init();
 		void Init_RenderThread();

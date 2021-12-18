@@ -2,6 +2,8 @@
 
 #include "GameFramework/Player.h"
 
+GENERATE_BODY(SPlayer);
+
 SPlayer::SPlayer() : Super()
 {
 }

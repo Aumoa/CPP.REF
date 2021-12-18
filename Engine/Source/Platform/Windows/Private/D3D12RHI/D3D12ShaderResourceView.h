@@ -11,7 +11,7 @@ class SD3D12ShaderResourceView : public SD3D12View, implements IRHIShaderResourc
 	GENERATED_BODY(SD3D12ShaderResourceView)
 
 public:
-	SD3D12ShaderResourceView(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources);
+	SD3D12ShaderResourceView(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12DescriptorHeap> Heap, size_t NumResources);
 
 	virtual void CreateShaderResourceView(int32 index, IRHIResource* resource, const RHIShaderResourceViewDesc* desc) override;
 };

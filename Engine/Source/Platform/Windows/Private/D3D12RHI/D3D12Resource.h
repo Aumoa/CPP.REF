@@ -19,7 +19,7 @@ private:
 	ComPtr<ID3D12Resource> _uploadBuf;
 
 public:
-	SD3D12Resource(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadBuf);
+	SD3D12Resource(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadBuf);
 
 	virtual uint64 GetGPUVirtualAddress() override;
 

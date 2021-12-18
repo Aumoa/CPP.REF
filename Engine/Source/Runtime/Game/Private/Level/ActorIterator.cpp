@@ -5,24 +5,24 @@
 #include "Level/Level.h"
 
 ActorIterator::ActorIterator(SWorld* InWorld)
-	: _MyWorld(InWorld)
-	, _CurrentLevel(InWorld->_Level)
-	, _CurrentIdx(0)
+	: MyWorld(InWorld)
+	, CurrentLevel(InWorld->Level)
+	, CurrentIdx(0)
 {
 }
 
 AActor* ActorIterator::operator *()
 {
-	return _CurrentLevel->Actors[_CurrentIdx];
+	return CurrentLevel->Actors[CurrentIdx];
 }
 
 ActorIterator& ActorIterator::operator ++()
 {
-	++_CurrentIdx;
+	++CurrentIdx;
 	return *this;
 }
 
 bool ActorIterator::operator !=(const ActorIterator&) const
 {
-	return _CurrentIdx != (int32)_CurrentLevel->Actors.size();
+	return CurrentIdx != (int32)CurrentLevel->Actors.size();
 }

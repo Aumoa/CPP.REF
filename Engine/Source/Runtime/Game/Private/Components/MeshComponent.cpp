@@ -2,6 +2,8 @@
 
 #include "Components/MeshComponent.h"
 
+GENERATE_BODY(SMeshComponent);
+
 SMeshComponent::SMeshComponent() : Super()
 {
 }

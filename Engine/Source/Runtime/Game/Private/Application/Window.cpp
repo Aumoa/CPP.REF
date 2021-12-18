@@ -4,6 +4,7 @@
 #include "Application/Viewport.h"
 #include "IApplicationInterface.h"
 
+GENERATE_BODY(SWindow);
 DEFINE_LOG_CATEGORY(LogSlateWindow);
 
 SWindow::SWindow() : Super()

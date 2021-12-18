@@ -36,7 +36,7 @@ void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 
 void RenderThread::ThreadInfo::Init()
 {
-	Thread = std::thread(std::bind(&ThreadInfo::Worker, &_Thread));
+	ThreadJoin = Thread::NewThread<void>(L"[Render Thread]", std::bind(&ThreadInfo::Worker, &_Thread));
 	bRunning = true;
 }
 
@@ -76,7 +76,7 @@ void RenderThread::Shutdown()
 	ExecuteWorks(nullptr, nullptr);
 
 	// Join executing thread.
-	_Thread.Thread.join();
+	_Thread.ThreadJoin.wait();
 }
 
 void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody)

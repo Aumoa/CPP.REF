@@ -27,30 +27,30 @@ class DelegateHandle
 public:
 	struct Impl
 	{
-		MulticastDelegateBase* _delegate = nullptr;
-		std::weak_ptr<int64> _holder;
-		int64 _id = 0;
+		MulticastDelegateBase* Delegate = nullptr;
+		std::weak_ptr<int64> Holder;
+		int64 Id = 0;
 	};
 
 private:
-	Impl _impl;
+	Impl _Impl;
 
 public:
 	DelegateHandle()
 	{
 	}
 
-	DelegateHandle(const Impl& impl) : _impl(impl)
+	DelegateHandle(const Impl& InImpl) : _Impl(InImpl)
 	{
 	}
 
-	DelegateHandle(const DelegateHandle& rhs)
-		: _impl(rhs._impl)
+	DelegateHandle(const DelegateHandle& Rhs)
+		: _Impl(Rhs._Impl)
 	{
 	}
 
-	DelegateHandle(DelegateHandle&& rhs)
-		: _impl(std::move(rhs._impl))
+	DelegateHandle(DelegateHandle&& Rhs)
+		: _Impl(std::move(Rhs._Impl))
 	{
 	}
 	
@@ -61,46 +61,39 @@ public:
 
 	inline bool IsValid() const
 	{
-		return !_impl._holder.expired();
+		return !_Impl.Holder.expired();
 	}
 
 	inline void Reset()
 	{
 		if (IsValid())
 		{
-			_impl._delegate->Remove(*this);
-			_impl._delegate = nullptr;
-			_impl._holder.reset();
+			_Impl.Delegate->Remove(*this);
+			_Impl.Delegate = nullptr;
+			_Impl.Holder.reset();
 		}
 	}
 
-	DelegateHandle& operator =(const DelegateHandle& rhs)
+	DelegateHandle& operator =(const DelegateHandle& Rhs)
 	{
 		Reset();
-		_impl = rhs._impl;
+		_Impl = Rhs._Impl;
 		return *this;
 	}
 
-	DelegateHandle& operator =(DelegateHandle&& rhs)
+	DelegateHandle& operator =(DelegateHandle&& Rhs)
 	{
 		Reset();
-		_impl = std::move(rhs._impl);
+		_Impl = std::move(Rhs._Impl);
 		return *this;
 	}
 };
 
-/// <summary>
-/// Represents a multicast delegate that is, a delegate that can have more than one element in its invocation list.
-/// </summary>
 template<class>
 class MulticastDelegate
 {
 };
 
-/// <summary>
-/// Represents a multicast delegate that is, a delegate that can have more than one element in its invocation list.
-/// </summary>
-/// <typeparam name="...TArgs"> The type of function arguments. </typeparam>
 template<class... TArgs>
 class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 {
@@ -129,7 +122,7 @@ class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 		}
 
 		template<class... TInvokeArgs>
-		bool ApplyAfter(TInvokeArgs&&... args)
+		bool ApplyAfter(TInvokeArgs&&... InArgs)
 		{
 			if (bHolder)
 			{
@@ -139,104 +132,92 @@ class MulticastDelegate<void(TArgs...)> : public MulticastDelegateBase
 				}
 			}
 
-			Body(std::forward<TInvokeArgs>(args)...);
+			Body(std::forward<TInvokeArgs>(InArgs)...);
 			return true;
 		}
 	};
 
-	std::mutex _lock;
-	std::map<int64, DelegateInstance> _payload;
-	int64 _id = 0;
+	std::mutex Mtx;
+	std::map<int64, DelegateInstance> Payload;
+	int64 Id = 0;
 
 public:
 	~MulticastDelegate() noexcept
 	{
 	}
 
-	/// <summary>
-	/// Invoke all functions.
-	/// </summary>
-	/// <param name="...args"> The function arguments. </param>
 	template<class... TInvokeArgs>
-	void Invoke(TInvokeArgs&&... args)
+	void Broadcast(TInvokeArgs&&... InArgs)
 	{
-		std::unique_lock locker(_lock);
+		std::unique_lock Mtx_lock(Mtx);
 
-		std::vector<int64> removeList;
-		for (auto payload : _payload)
+		std::vector<int64> CompactList;
+		for (auto Item : Payload)
 		{
-			if (!payload.second.ApplyAfter(std::forward<TInvokeArgs>(args)...))
+			if (!Item.second.ApplyAfter(std::forward<TInvokeArgs>(InArgs)...))
 			{
-				removeList.emplace_back(*payload.second.Id);
+				CompactList.emplace_back(*Item.second.Id);
 			}
 		}
 
-		for (auto& id : removeList)
+		for (auto& Id : CompactList)
 		{
-			_payload.erase(id);
+			Payload.erase(Id);
 		}
 	}
 
-	/// <summary>
-	/// Add raw function to multicast delegate.
-	/// </summary>
-	/// <param name="func"> The raw function. </param>
-	/// <returns> Return valid function id if succeeded to bind, otherwise return -1. </returns>
-	DelegateHandle::Impl AddRaw(TPayload func)
+	DelegateHandle::Impl AddRaw(TPayload Body)
 	{
-		std::unique_lock locker(_lock);
-		int64 id = _id++;
+		std::unique_lock Mtx_lock(Mtx);
+		int64 Myid = Id++;
 
-		DelegateInstance instance(id, std::move(func));
+		DelegateInstance instance(Myid, std::move(Body));
 		DelegateHandle::Impl handle;
-		handle._delegate = this;
-		handle._holder = instance.Id;
-		handle._id = *instance.Id;
-		_payload.emplace(id, std::move(instance));
+		handle.Delegate = this;
+		handle.Holder = instance.Id;
+		handle.Id = *instance.Id;
+		Payload.emplace(Myid, std::move(instance));
 		return handle;
 	}
 
 	template<std::derived_from<SObject> U>
-	DelegateHandle::Impl AddSObject(U* sobject, void(U::*payload)(TArgs...))
+	DelegateHandle::Impl AddSObject(U* Object, void(U::*Body)(TArgs...))
 	{
-		std::unique_lock locker(_lock);
-		int64 id = _id++;
+		std::unique_lock Mtx_lock(Mtx);
+		int64 Myid = Id++;
 
-		DelegateInstance instance(id, [sobject, payload](TArgs&&... args)
+		DelegateInstance Instance(Myid, [Object, Body](TArgs&&... InArgs)
 		{
-			(sobject->*payload)(std::forward<TArgs>(args)...);
-		}, sobject->weak_from_this());
-		DelegateHandle::Impl handle;
-		handle._delegate = this;
-		handle._holder = instance.Id;
-		handle._id = *instance.Id;
-		_payload.emplace(id, std::move(instance));
-		return handle;
+			(Object->*Body)(std::forward<TArgs>(InArgs)...);
+		}, Object);
+		DelegateHandle::Impl Handle;
+		Handle.Delegate = this;
+		Handle.Holder = Instance.Id;
+		Handle.Id = *Instance.Id;
+		Payload.emplace(Myid, std::move(Instance));
+		return Handle;
 	}
 
-	/// <summary>
-	/// Remove binded function using delegate id.
-	/// </summary>
-	virtual void Remove(DelegateHandle& handle) override
+	virtual void Remove(DelegateHandle& Handle) override
 	{
-		std::unique_lock locker(_lock);
-		if (handle.IsValid())
+		std::unique_lock Mtx_lock(Mtx);
+		if (Handle.IsValid())
 		{
-			_payload.erase(handle._impl._id);
+			Payload.erase(Handle._Impl.Id);
 		}
 	}
 
 	void RemoveAll(SObject* InObject)
 	{
-		std::unique_lock locker(_lock);
-		std::vector<decltype(_payload.begin())> Compacts;
+		std::unique_lock Mtx_lock(Mtx);
+		std::vector<decltype(Payload.begin())> Compacts;
 
-		for (auto It = _payload.begin(); It != _payload.end(); ++It)
+		for (auto It = Payload.begin(); It != Payload.end(); ++It)
 		{
 			auto& [Key, Value] = *It;
 			if (Value.bHolder)
 			{
-				if (Value.Holder.expired() || Value.Holder.lock().get() == InObject)
+				if (Value.Holder.IsValid() || Value.Holder.Get() == InObject)
 				{
 					Compacts.emplace_back(It);
 					continue;
@@ -246,13 +227,13 @@ public:
 
 		for (auto& It : Compacts)
 		{
-			_payload.erase(It);
+			Payload.erase(It);
 		}
 	}
 
-	DelegateHandle::Impl operator +=(TPayload func)
+	DelegateHandle::Impl operator +=(TPayload Body)
 	{
-		return AddRaw(std::move(func));
+		return AddRaw(std::move(Body));
 	}
 };
 

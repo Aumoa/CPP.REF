@@ -2,6 +2,8 @@
 
 #include "StreamableRenderAsset.h"
 
+GENERATE_BODY(SStreamableRenderAsset);
+
 SStreamableRenderAsset::SStreamableRenderAsset() : Super()
 {
 }

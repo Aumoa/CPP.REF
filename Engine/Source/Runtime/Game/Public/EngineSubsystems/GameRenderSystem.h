@@ -28,17 +28,28 @@ class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameRenderSystem)
 
 private:
+	SPROPERTY(Factory)
 	IRHIFactory* Factory = nullptr;
+	SPROPERTY(Device)
 	IRHIDevice* Device = nullptr;
+	SPROPERTY(PrimaryQueue)
 	IRHIDeviceContext* PrimaryQueue = nullptr;
-	SColorVertexFactory* ColorVertexFactory = nullptr;
-	SColorShader* ColorShader = nullptr;
-	STransparentShader* TransparentShader = nullptr;
-	SSlateShader* SlateShader = nullptr;
+	//SPROPERTY(ColorVertexFactory)
+	//SColorVertexFactory* ColorVertexFactory = nullptr;
+	//SPROPERTY(ColorShader)
+	//SColorShader* ColorShader = nullptr;
+	//SPROPERTY(TransparentShader)
+	//STransparentShader* TransparentShader = nullptr;
+	//SPROPERTY(SlateShader)
+	//SSlateShader* SlateShader = nullptr;
 
+	SPROPERTY(SwapChainRT)
 	SSwapChainRenderTarget* SwapChainRT = nullptr;
+	SPROPERTY(RenderContext)
 	IRHIDeviceContext* RenderContext = nullptr;
+	SPROPERTY(DeviceContext2D)
 	IRHIDeviceContext2D* DeviceContext2D = nullptr;
+	SPROPERTY(ColorRenderTarget)
 	SColorRenderTarget* ColorRenderTarget = nullptr;
 
 public:
@@ -53,8 +64,8 @@ public:
 	IRHIDevice* GetRHIDevice();
 
 	// Test feature.
-	SColorVertexFactory* GetColorVertexFactory() { return ColorVertexFactory; }
-	SSlateShader* GetSlateShader() { return SlateShader; }
+	//SColorVertexFactory* GetColorVertexFactory() { return ColorVertexFactory; }
+	//SSlateShader* GetSlateShader() { return SlateShader; }
 
 private:
 	void ResizeApp(Vector2N Size);

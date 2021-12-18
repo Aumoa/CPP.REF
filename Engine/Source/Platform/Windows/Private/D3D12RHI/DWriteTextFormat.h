@@ -15,7 +15,7 @@ private:
 	ComPtr<IDWriteTextFormat> _format;
 
 public:
-	SDWriteTextFormat(SDXGIFactory* factory, ComPtr<IDWriteTextFormat> format);
+	SDWriteTextFormat(SDXGIFactory* InFactory, ComPtr<IDWriteTextFormat> format);
 
 public:
 	DECLARE_GETTER(IDWriteTextFormat, _format);

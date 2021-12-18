@@ -2,6 +2,8 @@
 
 #include "D2D1SolidColorBrush.h"
 
+GENERATE_BODY(SD2D1SolidColorBrush);
+
 SD2D1SolidColorBrush::SD2D1SolidColorBrush(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1SolidColorBrush* InBrush) : Super(InFactory, InDevice, InBrush)
 	, Brush(InBrush)
 {

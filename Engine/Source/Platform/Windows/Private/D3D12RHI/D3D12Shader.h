@@ -16,7 +16,7 @@ private:
 	ComPtr<ID3D12PipelineState> _pipelineState;
 
 public:
-	SD3D12Shader(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12RootSignature> rootSignature, ComPtr<ID3D12PipelineState> pipelineState);
+	SD3D12Shader(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12RootSignature> rootSignature, ComPtr<ID3D12PipelineState> pipelineState);
 
 public:
 	DECLARE_GETTER(ID3D12RootSignature, _rootSignature);

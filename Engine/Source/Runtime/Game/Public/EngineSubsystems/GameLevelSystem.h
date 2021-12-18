@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
-#include "SubclassOf.h"
 #include "Level/WorldType.h"
 
 class SLevel;
@@ -21,7 +20,7 @@ public:
 	SGameLevelSystem();
 	virtual ~SGameLevelSystem() override;
 
-	virtual void Init() override;
+	virtual void PostInit() override;
 	virtual void Deinit() override;
 
 	SWorld* SpawnWorld(EWorldType InWorldType);

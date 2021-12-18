@@ -3,16 +3,13 @@
 #include "D3D12CommandQueue.h"
 #include "Threading/EventHandle.h"
 
-SD3D12CommandQueue::SD3D12CommandQueue(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence) : Super(factory, device)
+GENERATE_BODY(SD3D12CommandQueue);
+
+SD3D12CommandQueue::SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence) : Super(InFactory, InDevice)
 	, _queue(std::move(queue))
 	, _fence(std::move(fence))
 {
 	_event = NewObject<SEventHandle>();
-}
-
-SD3D12CommandQueue::~SD3D12CommandQueue()
-{
-	WaitCompleted();
 }
 
 void SD3D12CommandQueue::End()
@@ -37,16 +34,18 @@ uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> dev
 			{
 				commandLists.emplace_back(commandList);
 
-				GC_Pending gc;
-				gc.MarkedValue = _fenceValue;
-				gc.Objects = deviceContext_s->ClearPendingObjects();
+				std::vector<SObject*> Objects = deviceContext_s->ClearPendingObjects();
 
-				for (auto& Object : gc.Objects)
+				GC_Pending Pending;
+				Pending.MarkedValue = _fenceValue;
+				Pending.Objects.reserve(Objects.size());
+
+				for (auto& Obj : Objects)
 				{
-					Object->SetOuter(this);
+					Pending.Objects.emplace_back(Obj);
 				}
 
-				_gc.emplace(std::move(gc));
+				_gc.emplace(std::move(Pending));
 			}
 		}
 	}
@@ -86,7 +85,15 @@ void SD3D12CommandQueue::Collect()
 		{
 			for (size_t i = 0; i < front.Objects.size(); ++i)
 			{
-				DestroyObject(front.Objects[i]);
+				SObject* Object = front.Objects[i].Get();
+				if (auto* Disp = Cast<IDisposable>(Object))
+				{
+					Disp->Dispose();
+				}
+				else
+				{
+					GC.SuppressFinalize(Object);
+				}
 			}
 
 			_gc.pop();
@@ -105,4 +112,20 @@ void SD3D12CommandQueue::WaitCompleted()
 		_fence->SetEventOnCompletion(_fenceValue, _event->GetHandle());
 		_event->Wait();
 	}
+}
+
+void SD3D12CommandQueue::Dispose(bool bDisposing)
+{
+	WaitCompleted();
+
+	if (bDisposing)
+	{
+		_queue.Reset();
+		_fence.Reset();
+
+		std::queue<GC_Pending> Swap;
+		std::swap(Swap, _gc);
+	}
+
+	Super::Dispose(bDisposing);
 }

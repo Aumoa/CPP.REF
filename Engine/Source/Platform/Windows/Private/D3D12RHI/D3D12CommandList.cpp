@@ -8,23 +8,25 @@
 #include "D3D12Shader.h"
 #include "D3D12DescriptorHeap.h"
 
-SD3D12CommandList::SD3D12CommandList(SDXGIFactory* factory, SD3D12Device* device) : Super(factory, device, nullptr)
+GENERATE_BODY(SD3D12CommandList);
+
+SD3D12CommandList::SD3D12CommandList(SDXGIFactory* InFactory, SD3D12Device* InDevice) : Super(InFactory, InDevice, nullptr)
 {
 }
 
 void SD3D12CommandList::Begin()
 {
-	ID3D12CommandAllocator* allocator = _device->GetThreadPrimaryAllocator();
+	ID3D12CommandAllocator* Allocator = Device->GetThreadPrimaryAllocator();
 
 	if (CommandList)
 	{
-		HR(CommandList->Reset(allocator, nullptr));
+		HR(CommandList->Reset(Allocator, nullptr));
 	}
 	else
 	{
 		// For the first calling, we will create command list instance on demanding.
-		auto dev = _device->Get<ID3D12Device>();
-		HR(dev->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, nullptr, IID_PPV_ARGS(&CommandList)));
+		auto dev = Device->Get<ID3D12Device>();
+		HR(dev->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, Allocator, nullptr, IID_PPV_ARGS(&CommandList)));
 	}
 }
 
@@ -40,13 +42,13 @@ void SD3D12CommandList::SetDescriptorHeaps(int32 MaxSRVCount, int32 MaxSamplerCo
 
 	if (MaxSRVCount)
 	{
-		HeapForSRV = _device->GetThreadPrimarySrvHeap(MaxSRVCount);
+		HeapForSRV = Device->GetThreadPrimarySrvHeap(MaxSRVCount);
 		Heaps[NumHeaps++] = HeapForSRV->Get<ID3D12DescriptorHeap>();
 	}
 
 	if (MaxSamplerCount)
 	{
-		HeapForSampler = _device->GetThreadPrimarySamplerHeap(MaxSamplerCount);
+		HeapForSampler = Device->GetThreadPrimarySamplerHeap(MaxSamplerCount);
 		Heaps[NumHeaps++] = HeapForSampler->Get<ID3D12DescriptorHeap>();
 	}
 
@@ -165,7 +167,7 @@ void SD3D12CommandList::SetGraphicsRootShaderResourceView(uint32 index, IRHIShad
 	D3D12_CPU_DESCRIPTOR_HANDLE hcpu = HeapForSRV->GetCPUHandle();
 	HeapForSRV->Increment(count);
 
-	auto dev = _device->Get<ID3D12Device>();
+	auto dev = Device->Get<ID3D12Device>();
 	dev->CopyDescriptorsSimple((UINT)count, hcpu, view_h, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	CommandList->SetGraphicsRootDescriptorTable(index, hgpu);
@@ -173,7 +175,6 @@ void SD3D12CommandList::SetGraphicsRootShaderResourceView(uint32 index, IRHIShad
 
 void SD3D12CommandList::PendingGarbageObject(SObject* object)
 {
-	object->SetOuter(this);
 	PendingObjects.emplace_back(object);
 }
 

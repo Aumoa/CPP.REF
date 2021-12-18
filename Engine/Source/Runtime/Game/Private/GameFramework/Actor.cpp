@@ -5,63 +5,71 @@
 #include "Level/World.h"
 #include "Components/PrimitiveComponent.h"
 
+GENERATE_BODY(AActor);
 DEFINE_LOG_CATEGORY(LogActor);
 
-void AActor::SActorTickFunction::ExecuteTick(float elapsedTime)
+AActor::ActorTickFunction::ActorTickFunction(AActor* InTarget)
+	: Target(InTarget)
 {
-	if (_target == nullptr)
-	{
-		SE_LOG(LogTicking, Error, L"Target is nullptr.");
-		return;
-	}
+}
 
-	if (_target->HasBegunPlay() && _target->IsActive())
+AActor* AActor::ActorTickFunction::GetTarget() const
+{
+	return Target.Get();
+}
+
+void AActor::ActorTickFunction::ExecuteTick(float InDeltaTime)
+{
+	auto* Resolved = Target.Get();
+	checkf(Resolved, L"Target is disposed.");
+
+	if (Resolved->HasBegunPlay() && Resolved->IsActive())
 	{
-		_target->TickActor(elapsedTime, this);
+		Resolved->TickActor(InDeltaTime, this);
 	}
 }
 
 AActor::AActor() : Super()
 	, PrimaryActorTick(this)
-	, _bActive(true)
-	, _bHasBegunPlay(false)
+	, bActive(true)
+	, bHasBegunPlay(false)
 {
 }
 
-void AActor::TickActor(float elapsedTime, SActorTickFunction* tickFunction)
+void AActor::TickActor(float InDeltaTime, ActorTickFunction* ActorTickFunction)
 {
-	if (tickFunction == &PrimaryActorTick)
+	if (ActorTickFunction == &PrimaryActorTick)
 	{
-		Tick(elapsedTime);
+		Tick(InDeltaTime);
 	}
 }
 
 void AActor::BeginPlay()
 {
-	_bHasBegunPlay = true;
+	bHasBegunPlay = true;
 }
 
 void AActor::EndPlay()
 {
-	_bHasBegunPlay = false;
+	bHasBegunPlay = false;
 }
 
-void AActor::Tick(float elapsedTime)
+void AActor::Tick(float InDeltaTime)
 {
 }
 
 void AActor::SetActive(bool bActive)
 {
-	if (_bActive != bActive)
+	if (bActive != bActive)
 	{
-		_bActive = bActive;
-		if (_bActive)
+		bActive = bActive;
+		if (bActive)
 		{
-			Activated.Invoke();
+			Activated.Broadcast();
 		}
 		else
 		{
-			Inactivated.Invoke();
+			Inactivated.Broadcast();
 		}
 	}
 }
@@ -86,7 +94,7 @@ void AActor::DispatchBeginPlay()
 		BeginPlay();
 	}
 
-	for (auto ActorComponent : _Components)
+	for (auto ActorComponent : OwnedComponents)
 	{
 		ActorComponent->DispatchBeginPlay();
 	}
@@ -104,7 +112,7 @@ void AActor::DispatchEndPlay()
 		SceneComponent->DispatchEndPlay();
 	}
 
-	for (auto ActorComponent : _Components)
+	for (auto ActorComponent : OwnedComponents)
 	{
 		ActorComponent->DispatchEndPlay();
 	}
@@ -123,26 +131,37 @@ void AActor::AddOwnedComponent(SActorComponent* InComponent)
 		return;
 	}
 
-	_Components.emplace(InComponent);
+	OwnedComponents.emplace(InComponent);
 	InComponent->SetOuter(this);
 	InComponent->MarkOwner();
 }
 
 const std::set<SActorComponent*>& AActor::GetOwnedComponents()
 {
-	return _Components;
+	return OwnedComponents;
 }
 
 SActorComponent* AActor::GetComponentByClass(SubclassOf<SActorComponent> InComponentClass)
 {
-	const Type* Class = InComponentClass.GetType();
-	if (Class->IsDerivedFrom<SSceneComponent>())
+	if (InComponentClass->IsDerivedFrom<SSceneComponent>())
 	{
-		for (auto& Component : GetSceneComponents())
+		std::vector<SSceneComponent*> InlineComponentArray;
+		InlineComponentArray.reserve(16);
+		InlineComponentArray.emplace_back(RootComponent);
+
+		while (InlineComponentArray.size())
 		{
-			if (Component->GetType()->IsDerivedFrom(Class))
+			SSceneComponent* Back = InlineComponentArray.back();
+			InlineComponentArray.erase(InlineComponentArray.end() - 1);
+
+			if (Back->GetType()->IsDerivedFrom(InComponentClass))
 			{
-				return Component;
+				return Back;
+			}
+			else
+			{
+				const auto& ChildComponentArray = Back->GetChildComponents();
+				InlineComponentArray.insert(InlineComponentArray.end(), ChildComponentArray.begin(), ChildComponentArray.end());
 			}
 		}
 
@@ -150,9 +169,9 @@ SActorComponent* AActor::GetComponentByClass(SubclassOf<SActorComponent> InCompo
 	}
 	else  // InComponentClass is derived from SActorComponent.
 	{
-		for (auto& Component : _Components)
+		for (auto& Component : OwnedComponents)
 		{
-			if (Component->GetType()->IsDerivedFrom(Class))
+			if (Component->GetType()->IsDerivedFrom(InComponentClass))
 			{
 				return Component;
 			}
@@ -162,55 +181,50 @@ SActorComponent* AActor::GetComponentByClass(SubclassOf<SActorComponent> InCompo
 	}
 }
 
-std::shared_ptr<SSceneComponent> AActor::SetRootComponent(SSceneComponent* InRootComponent)
+void AActor::SetRootComponent(SSceneComponent* InRootComponent)
 {
-	std::shared_ptr<SSceneComponent> PreviousRoot;
-
 	SSceneComponent* AttachParent = nullptr;
 	std::wstring SocketName;
 
-	if (_RootComponent)
+	if (RootComponent)
 	{
-		AttachParent = _RootComponent->GetAttachParent();
-		SocketName = _RootComponent->GetAttachSocketName();
+		AttachParent = RootComponent->GetAttachParent();
+		SocketName = RootComponent->GetAttachSocketName();
 
 		// RootComponent will be destroyed.
 		if (AttachParent)
 		{
-			_RootComponent->DetachFromComponent();
+			RootComponent->DetachFromComponent();
 		}
 
-		PreviousRoot = std::dynamic_pointer_cast<SSceneComponent>(_RootComponent->SetOuter(nullptr));
-		_RootComponent = nullptr;
+		RootComponent = nullptr;
 	}
 
-	_RootComponent = InRootComponent;
-	_RootComponent->SetOuter(this);
-	_RootComponent->MarkOwner();
+	RootComponent = InRootComponent;
+	RootComponent->SetOuter(this);
+	RootComponent->MarkOwner();
 
 	if (AttachParent)
 	{
 		if (SocketName.length() == 0)
 		{
-			_RootComponent->AttachToComponent(AttachParent);
+			RootComponent->AttachToComponent(AttachParent);
 		}
 		else
 		{
-			_RootComponent->AttachToSocket(AttachParent, SocketName);
+			RootComponent->AttachToSocket(AttachParent, SocketName);
 		}
 	}
-
-	return PreviousRoot;
 }
 
 SSceneComponent* AActor::GetRootComponent()
 {
-	return _RootComponent;
+	return RootComponent;
 }
 
 std::vector<SSceneComponent*> AActor::GetSceneComponents()
 {
-	if (_RootComponent == nullptr)
+	if (RootComponent == nullptr)
 	{
 		return {};
 	}
@@ -218,7 +232,7 @@ std::vector<SSceneComponent*> AActor::GetSceneComponents()
 	std::vector<SSceneComponent*> ComponentsArray;
 	ComponentsArray.reserve(16);
 	ComponentsArray.emplace_back(GetRootComponent());
-	
+
 	std::vector<SSceneComponent*> Stack;
 	Stack.reserve(16);
 	Stack.emplace_back(GetRootComponent());
@@ -246,40 +260,40 @@ std::vector<SSceneComponent*> AActor::GetSceneComponents()
 
 void AActor::SetActorLocation(const Vector3& location)
 {
-	if (_RootComponent == nullptr)
+	if (RootComponent == nullptr)
 	{
 		return;
 	}
 
-	_RootComponent->SetLocation(location);
+	RootComponent->SetLocation(location);
 }
 
 Vector3 AActor::GetActorLocation() const
 {
-	if (_RootComponent == nullptr)
+	if (RootComponent == nullptr)
 	{
 		return Vector3();
 	}
 
-	return _RootComponent->GetLocation();
+	return RootComponent->GetLocation();
 }
 
 void AActor::SetActorRotation(const Quaternion& rotation)
 {
-	if (_RootComponent == nullptr)
+	if (RootComponent == nullptr)
 	{
 		return;
 	}
 
-	_RootComponent->SetRotation(rotation);
+	RootComponent->SetRotation(rotation);
 }
 
 Quaternion AActor::GetActorRotation() const
 {
-	if (_RootComponent == nullptr)
+	if (RootComponent == nullptr)
 	{
 		return Quaternion();
 	}
 
-	return _RootComponent->GetRotation();
+	return RootComponent->GetRotation();
 }

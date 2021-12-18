@@ -2,6 +2,8 @@
 
 #include "Widgets/Layout/Border.h"
 
+GENERATE_BODY(SBorder);
+
 SBorder::SBorder() : Super()
 {
 }

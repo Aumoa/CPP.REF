@@ -15,7 +15,7 @@ private:
 	ComPtr<IDWriteTextLayout> Layout;
 
 public:
-	SDWriteTextLayout(SDXGIFactory* factory, ComPtr<IDWriteTextLayout> layout);
+	SDWriteTextLayout(SDXGIFactory* InFactory, ComPtr<IDWriteTextLayout> layout);
 
 	virtual void SetMaxSize(const Vector2& InSize) override;
 	virtual Vector2 GetMaxSize() override;

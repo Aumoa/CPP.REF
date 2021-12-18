@@ -2,7 +2,9 @@
 
 #include "D2D1Bitmap.h"
 
-SD2D1Bitmap::SD2D1Bitmap(SDXGIFactory* Factory, SD3D12Device* Device, ID2D1Bitmap1* Bitmap) : Super(Factory, Device, Bitmap)
+GENERATE_BODY(SD2D1Bitmap);
+
+SD2D1Bitmap::SD2D1Bitmap(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1Bitmap1* Bitmap) : Super(InFactory, InDevice, Bitmap)
 	, Bitmap(Bitmap)
 {
 }

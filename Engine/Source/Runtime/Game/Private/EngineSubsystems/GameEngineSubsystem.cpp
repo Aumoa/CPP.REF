@@ -2,6 +2,8 @@
 
 #include "EngineSubsystems/GameEngineSubsystem.h"
 
+GENERATE_BODY(SGameEngineSubsystem);
+
 SGameEngineSubsystem::SGameEngineSubsystem() : Super()
 {
 }

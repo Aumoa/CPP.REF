@@ -1,9 +1,12 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "GameFramework/LocalPlayer.h"
+#include "GameFramework/PlayerController.h"
 #include "Level/World.h"
 #include "Application/SlateApplication.h"
 #include "Application/Window.h"
+
+GENERATE_BODY(SLocalPlayer);
 
 SLocalPlayer::SLocalPlayer() : Super()
 {
@@ -11,12 +14,12 @@ SLocalPlayer::SLocalPlayer() : Super()
 
 void SLocalPlayer::SetPlayerController(APlayerController* InController)
 {
-	_PlayerController = InController;
+	PlayerController = InController;
 }
 
 APlayerController* SLocalPlayer::GetPlayerController()
 {
-	return _PlayerController;
+	return PlayerController;
 }
 
 SSlateApplication* SLocalPlayer::GetSlateApplication()

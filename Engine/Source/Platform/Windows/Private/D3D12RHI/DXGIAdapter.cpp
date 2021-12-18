@@ -2,7 +2,9 @@
 
 #include "DXGIAdapter.h"
 
-SDXGIAdapter::SDXGIAdapter(SDXGIFactory* factory, ComPtr<IDXGIAdapter1> adapter) : Super(factory)
+GENERATE_BODY(SDXGIAdapter);
+
+SDXGIAdapter::SDXGIAdapter(SDXGIFactory* InFactory, ComPtr<IDXGIAdapter1> adapter) : Super(InFactory)
 	, _adapter(std::move(adapter))
 {
 }

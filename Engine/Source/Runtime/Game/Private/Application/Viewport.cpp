@@ -10,7 +10,9 @@
 #include "Draw/PaintArgs.h"
 #include "Draw/SlateDrawElement.h"
 #include "IApplicationInterface.h"
+#include "Level/World.h"
 
+GENERATE_BODY(SViewport);
 DEFINE_LOG_CATEGORY(LogViewport);
 
 SViewport::SViewport() : Super()
@@ -48,14 +50,14 @@ Vector2 SViewport::GetDesiredSize()
 
 void SViewport::AddToViewport(SWidget* InWidget)
 {
-	Widgets.emplace_back(InWidget->SharedFromThis());
+	Widgets.emplace_back(InWidget);
 }
 
 void SViewport::RemoveFromViewport(SWidget* InWidget)
 {
 	for (auto It = Widgets.begin(); It != Widgets.end(); ++It)
 	{
-		if (It->get() == InWidget)
+		if (*It == InWidget)
 		{
 			Widgets.erase(It);
 			break;
@@ -81,7 +83,7 @@ void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Ge
 		if (ArrangedChildrens.Accepts(Visibility))
 		{
 			ArrangedChildrens.AddWidget(Visibility, AllottedGeometry.MakeChild(
-				Widget.get(),
+				Widget,
 				Vector2(0.0f, 0.0f),
 				AllottedGeometry.GetLocalSize()
 			));
@@ -167,25 +169,14 @@ void SViewport::ReallocRenderTarget()
 
 void SViewport::DestroyRenderTarget_GameThread()
 {
-	auto MoveTemp = [](auto*& InObject)
+	auto MoveTemp = [](auto*& InObject) -> SharedPtr<SObject>
 	{
-		SObject* Object = InObject;
+		SharedPtr Object = InObject;
 		InObject = nullptr;
 		return Object;
 	};
 
-	std::vector<std::shared_ptr<SObject>> Holders;
-	SObject* Objects[] = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(SRV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
-	Holders.reserve(std::size(Objects));
-
-	for (auto& Object : Objects)
-	{
-		if (Object)
-		{
-			Holders.emplace_back(Object->shared_from_this());
-			DestroyObject(Object);
-		}
-	}
+	std::vector<SharedPtr<SObject>> Holders = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(SRV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
 
 	// Finalize textures in render thread.
 	//RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](auto){});

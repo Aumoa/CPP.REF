@@ -11,6 +11,8 @@
 #include "Input/WindowsPlatformMouse.h"
 #include "WindowsApplication.h"
 
+GENERATE_BODY(SWindowsPlatformMouse);
+
 namespace WindowsPlatformMouseInternal
 {
     struct handle_closer { void operator()(HANDLE h) noexcept { if (h) CloseHandle(h); } };
@@ -411,42 +413,42 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         return;
 
     case WM_MOUSEMOVE:
-        Get().CursorMoved.Invoke(Vector2N(xPos, yPos));
+        Get().CursorMoved.Broadcast(Vector2N(xPos, yPos));
         break;
 
     case WM_LBUTTONDOWN:
         pImpl->mState.bLeftButton = true;
-        Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::Left);
+        Get().MouseButtonPressed.Broadcast(Vector2N(xPos, yPos), EMouseButton::Left);
         break;
 
     case WM_LBUTTONUP:
         pImpl->mState.bLeftButton = false;
-        Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::Left);
+        Get().MouseButtonReleased.Broadcast(Vector2N(xPos, yPos), EMouseButton::Left);
         break;
 
     case WM_RBUTTONDOWN:
         pImpl->mState.bRightButton = true;
-        Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::Right);
+        Get().MouseButtonPressed.Broadcast(Vector2N(xPos, yPos), EMouseButton::Right);
         break;
 
     case WM_RBUTTONUP:
         pImpl->mState.bRightButton = false;
-        Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::Right);
+        Get().MouseButtonReleased.Broadcast(Vector2N(xPos, yPos), EMouseButton::Right);
         break;
 
     case WM_MBUTTONDOWN:
         pImpl->mState.bMiddleButton = true;
-        Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::Middle);
+        Get().MouseButtonPressed.Broadcast(Vector2N(xPos, yPos), EMouseButton::Middle);
         break;
 
     case WM_MBUTTONUP:
         pImpl->mState.bMiddleButton = false;
-        Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::Middle);
+        Get().MouseButtonReleased.Broadcast(Vector2N(xPos, yPos), EMouseButton::Middle);
         break;
 
     case WM_MOUSEWHEEL:
         pImpl->mState.ScrollWheelValue += GET_WHEEL_DELTA_WPARAM(wParam);
-        Get().MouseWheelScrolled.Invoke(GET_WHEEL_DELTA_WPARAM(wParam));
+        Get().MouseWheelScrolled.Broadcast(GET_WHEEL_DELTA_WPARAM(wParam));
         return;
 
     case WM_XBUTTONDOWN:
@@ -454,12 +456,12 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         {
         case XBUTTON1:
             pImpl->mState.bXButton1 = true;
-            Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::X1);
+            Get().MouseButtonPressed.Broadcast(Vector2N(xPos, yPos), EMouseButton::X1);
             break;
 
         case XBUTTON2:
             pImpl->mState.bXButton2 = true;
-            Get().MouseButtonPressed.Invoke(Vector2N(xPos, yPos), EMouseButton::X2);
+            Get().MouseButtonPressed.Broadcast(Vector2N(xPos, yPos), EMouseButton::X2);
             break;
         }
         break;
@@ -469,12 +471,12 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
         {
         case XBUTTON1:
             pImpl->mState.bXButton1 = false;
-            Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::X1);
+            Get().MouseButtonReleased.Broadcast(Vector2N(xPos, yPos), EMouseButton::X1);
             break;
 
         case XBUTTON2:
             pImpl->mState.bXButton2 = false;
-            Get().MouseButtonReleased.Invoke(Vector2N(xPos, yPos), EMouseButton::X2);
+            Get().MouseButtonReleased.Broadcast(Vector2N(xPos, yPos), EMouseButton::X2);
             break;
         }
         break;

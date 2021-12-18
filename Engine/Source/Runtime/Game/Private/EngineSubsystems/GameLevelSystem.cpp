@@ -5,6 +5,7 @@
 #include "Level/Level.h"
 #include "Level/ActorIterator.h"
 
+GENERATE_BODY(SGameLevelSystem);
 DEFINE_LOG_CATEGORY(LogLevel);
 
 SGameLevelSystem::SGameLevelSystem() : Super()
@@ -15,9 +16,8 @@ SGameLevelSystem::~SGameLevelSystem()
 {
 }
 
-void SGameLevelSystem::Init()
+void SGameLevelSystem::PostInit()
 {
-	Super::Init();
 	SpawnWorld(EWorldType::GameWorld);
 }
 
@@ -29,7 +29,6 @@ void SGameLevelSystem::Deinit()
 	}
 
 	_GameWorld->DestroyWorld();
-	CleanupSubobjects();
 }
 
 SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)

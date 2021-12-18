@@ -3,6 +3,8 @@
 #include "D3D12ThreadDescriptorHeapContainer.h"
 #include "D3D12DescriptorHeap.h"
 
+GENERATE_BODY(SD3D12ThreadDescriptorHeapContainer);
+
 SD3D12ThreadDescriptorHeapContainer::SD3D12ThreadDescriptorHeapContainer(int64 threadId, ID3D12Device* device) : Super()
 	, _threadId(threadId)
 	, _device(device)

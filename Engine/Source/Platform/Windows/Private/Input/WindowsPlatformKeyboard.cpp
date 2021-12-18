@@ -10,6 +10,8 @@
 
 #include "Input/WindowsPlatformKeyboard.h"
 
+GENERATE_BODY(SWindowsPlatformKeyboard);
+
 static_assert(sizeof(KeyboardState) == (256 / 8), "Size mismatch for State");
 
 namespace WindowsPlatformKeyboardInternal
@@ -24,7 +26,7 @@ namespace WindowsPlatformKeyboardInternal
         unsigned int bf = 1u << (key & 0x1f);
         ptr[(key >> 5)] |= bf;
 
-        SWindowsPlatformKeyboard::Get().KeyPressed.Invoke((EKey)key);
+        SWindowsPlatformKeyboard::Get().KeyPressed.Broadcast((EKey)key);
     }
 
     inline void KeyUp(int key, KeyboardState& state) noexcept
@@ -37,7 +39,7 @@ namespace WindowsPlatformKeyboardInternal
         unsigned int bf = 1u << (key & 0x1f);
         ptr[(key >> 5)] &= ~bf;
 
-        SWindowsPlatformKeyboard::Get().KeyReleased.Invoke((EKey)key);
+        SWindowsPlatformKeyboard::Get().KeyReleased.Broadcast((EKey)key);
     }
 }
 

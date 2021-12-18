@@ -21,17 +21,19 @@ protected:
 	using ShaderVars = std::variant<float, Vector4, std::vector<uint8>, IRHITexture2D*>;
 
 private:
-	std::shared_ptr<IRHIDevice> Device;
+	SPROPERTY(Device)
+	IRHIDevice* Device = nullptr;
 	std::vector<ShaderVars> ShaderValues;
 
 	uint8 bParamsCached : 1 = false;
 	uint8 bShaderResourceViewsCached : 1 = false;
 
 	std::vector<int32> ShaderMappingIndex;
-	std::shared_ptr<IRHIShaderResourceView> SRV;
+	SPROPERTY(SRV)
+	IRHIShaderResourceView* SRV = nullptr;
 
 public:
-	SMaterialInterface(std::shared_ptr<IRHIDevice> InDevice);
+	SMaterialInterface(IRHIDevice* InDevice);
 
 	virtual bool SetScalarParameterValueByIndex(int32 Index, float value);
 	virtual bool GetScalarParameterValueByIndex(int32 Index, float* value);

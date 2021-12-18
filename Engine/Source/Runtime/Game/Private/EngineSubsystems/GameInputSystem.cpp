@@ -5,8 +5,12 @@
 #include "Input/IPlatformMouse.h"
 #include "IApplicationInterface.h"
 
+GENERATE_BODY(SGameInputSystem);
+
 SGameInputSystem::SGameInputSystem() : Super()
 {
+	MouseTracker = NewObject<SMouseStateTracker>();
+	KeyboardTracker = NewObject<SKeyboardTracker>();
 }
 
 void SGameInputSystem::Tick(float InDeltaTime)
@@ -19,23 +23,23 @@ void SGameInputSystem::Tick(float InDeltaTime)
 	MouseState mState = wMouse.GetState();
 	KeyboardState kState = wKeyboard.GetState();
 
-	MouseTracker.Update(mState);
-	KeyboardTracker.Update(kState);
+	MouseTracker->Update(mState);
+	KeyboardTracker->Update(kState);
 
 	Vector2N mLocation = Vector2N(mState.X, mState.Y);
 
 	// Invoke mouse dispatcher.
-	uint32 nMouse = ((MouseTracker.GetNumBits() - 1) / 32) + 1;
+	uint32 nMouse = ((MouseTracker->GetNumBits() - 1) / 32) + 1;
 	for (uint32 i = 0; i < nMouse; ++i)
 	{
-		const uint32& PressedBits = MouseTracker.GetPressedBitsByIndex(i);
-		const uint32& ReleasedBits = MouseTracker.GetReleasedBitsByIndex(i);
+		const uint32& PressedBits = MouseTracker->GetPressedBitsByIndex(i);
+		const uint32& ReleasedBits = MouseTracker->GetReleasedBitsByIndex(i);
 
 		uint32 N = 1;
 		for (uint32 j = 0; j < 32; ++j)
 		{
 			uint32 Index = i * 32 + j;
-			if (Index >= MouseTracker.GetNumBits())
+			if (Index >= MouseTracker->GetNumBits())
 			{
 				continue;
 			}
@@ -45,11 +49,11 @@ void SGameInputSystem::Tick(float InDeltaTime)
 
 			if (bPressed)
 			{
-				Mouse.Invoke(mLocation, (EMouseButton)Index, EMouseButtonEvent::Pressed);
+				Mouse.Broadcast(mLocation, (EMouseButton)Index, EMouseButtonEvent::Pressed);
 			}
 			if (bReleased)
 			{
-				Mouse.Invoke(mLocation, (EMouseButton)Index, EMouseButtonEvent::Released);
+				Mouse.Broadcast(mLocation, (EMouseButton)Index, EMouseButtonEvent::Released);
 			}
 
 			N <<= 1;
@@ -57,17 +61,17 @@ void SGameInputSystem::Tick(float InDeltaTime)
 	}
 
 	// Invoke keyboard dispatcher.
-	uint32 nKeyboard = ((KeyboardTracker.GetNumBits() - 1) / 32) + 1;
+	uint32 nKeyboard = ((KeyboardTracker->GetNumBits() - 1) / 32) + 1;
 	for (uint32 i = 0; i < nKeyboard; ++i)
 	{
-		const uint32& PressedBits = KeyboardTracker.GetPressedBitsByIndex(i);
-		const uint32& ReleasedBits = KeyboardTracker.GetReleasedBitsByIndex(i);
+		const uint32& PressedBits = KeyboardTracker->GetPressedBitsByIndex(i);
+		const uint32& ReleasedBits = KeyboardTracker->GetReleasedBitsByIndex(i);
 
 		uint32 N = 1;
 		for (uint32 j = 0; j < 32; ++j)
 		{
 			uint32 Index = i * 32 + j;
-			if (Index >= KeyboardTracker.GetNumBits())
+			if (Index >= KeyboardTracker->GetNumBits())
 			{
 				continue;
 			}
@@ -77,11 +81,11 @@ void SGameInputSystem::Tick(float InDeltaTime)
 
 			if (bPressed)
 			{
-				Keyboard.Invoke((EKey)Index, EKeyboardEvent::Pressed);
+				Keyboard.Broadcast((EKey)Index, EKeyboardEvent::Pressed);
 			}
 			if (bReleased)
 			{
-				Keyboard.Invoke((EKey)Index, EKeyboardEvent::Released);
+				Keyboard.Broadcast((EKey)Index, EKeyboardEvent::Released);
 			}
 
 			N <<= 1;
@@ -102,5 +106,5 @@ void SGameInputSystem::Tick(float InDeltaTime)
 	}
 	LastMouseX = mState.X;
 	LastMouseY = mState.Y;
-	MouseMove.Invoke(Data);
+	MouseMove.Broadcast(Data);
 }

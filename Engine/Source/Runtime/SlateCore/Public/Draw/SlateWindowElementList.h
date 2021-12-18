@@ -13,7 +13,7 @@ class SLATECORE_API SlateWindowElementList
 
 	std::vector<SlateDrawElement> Elements;
 	std::vector<BytePadding_256> Payloads;
-	std::vector<std::shared_ptr<SObject>> ReferencedObjects;
+	std::vector<SharedPtr<SObject>> ReferencedObjects;
 	size_t PayloadBufSeek = 0;
 
 public:
@@ -24,7 +24,7 @@ public:
 
 	void SortByLayer();
 	SlateDrawElement& AddUninitialized();
-	void AddReferencedObject(std::shared_ptr<SObject> LockObject);
+	void AddReferencedObject(SharedPtr<SObject> LockObject);
 	void Clear();
 
 	const std::vector<SlateDrawElement>& GetElements() const;

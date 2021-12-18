@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <string>
-#include <string_view>
+#include <filesystem>
 
 class SLevel;
 class SWorld;
@@ -17,17 +16,35 @@ class GAME_API SGameObject : implements SObject
 	GENERATED_BODY(SGameObject)
 
 private:
-	std::wstring _Name;
+	SPROPERTY(Outer)
+	SGameObject* Outer = nullptr;
+	std::wstring Name;
 
 public:
 	SGameObject();
 
-	virtual std::wstring ToString(std::wstring_view formatArgs) override;
+	virtual std::wstring ToString() override;
+
+	void SetOuter(SGameObject* NewOuter);
+	SGameObject* GetOuter();
+	template<std::derived_from<SGameObject> T> T* GetOuter() { return Cast<T>(GetOuter()); }
+
 	void SetName(std::wstring_view InName);
 	std::wstring GetName();
 
 	virtual SLevel* GetLevel();
 	virtual SWorld* GetWorld();
+
+public:
+	using Super::NewObject;
+
+	template<std::derived_from<SGameObject> T>
+	static T* NewObject(SGameObject* Outer)
+	{
+		T* Obj = SObject::NewObject<T>();
+		Obj->SetOuter(Outer);
+		return Obj;
+	}
 
 public:
 	SObject* LoadObject(const std::filesystem::path& assetPath);

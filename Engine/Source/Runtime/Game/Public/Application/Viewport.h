@@ -23,13 +23,20 @@ private:
 	Vector2N RenderSize;
 	ERHIPixelFormat RenderTargetFormat = ERHIPixelFormat::Unknown;
 
+	SPROPERTY(RTV)
 	IRHIRenderTargetView* RTV = nullptr;
+	SPROPERTY(DSV)
 	IRHIDepthStencilView* DSV = nullptr;
+	SPROPERTY(SRV)
 	IRHIShaderResourceView* SRV = nullptr;
+	SPROPERTY(RenderTarget)
 	IRHITexture2D* RenderTarget = nullptr;
+	SPROPERTY(DepthStencil)
 	IRHITexture2D* DepthStencil = nullptr;
+	SPROPERTY(DeviceContext)
 	IRHIDeviceContext* DeviceContext = nullptr;
 
+	SPROPERTY(GameWorld)
 	SWorld* GameWorld = nullptr;
 
 public:
@@ -45,7 +52,8 @@ public:
 	virtual Vector2 GetDesiredSize() override;
 
 private:
-	std::vector<std::shared_ptr<SWidget>> Widgets;
+	SPROPERTY(Widgets)
+	std::vector<SWidget*> Widgets;
 
 public:
 	void AddToViewport(SWidget* InWidget);

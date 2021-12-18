@@ -4,6 +4,9 @@
 #include "LogAssetsIO.h"
 #include "IAssets.h"
 #include "Texture/Texture2D.h"
+#include <fstream>
+
+GENERATE_BODY(SAssetsLoader);
 
 #pragma pack(push, 1)
 

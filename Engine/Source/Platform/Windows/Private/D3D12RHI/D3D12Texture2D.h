@@ -11,28 +11,31 @@ class SD3D12Texture2D : public SD3D12Resource, implements IRHITexture2D
 	GENERATED_BODY(SD3D12Texture2D)
 
 private:
-	ComPtr<ID3D12Resource> _resource;
-	ComPtr<ID3D12Resource> _uploadHeap;
-	D3D12_PLACED_SUBRESOURCE_FOOTPRINT _layout;
-	RHITexture2DDesc _desc;
-	uint64 _totalBytes = 0;
+	ComPtr<ID3D12Resource> Resource;
+	ComPtr<ID3D12Resource> UploadHeap;
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT Layout;
+	RHITexture2DDesc Desc;
+	uint64 TotalBytes = 0;
 
 public:
-	SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc);
+	SD3D12Texture2D(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> Resource, ComPtr<ID3D12Resource> UploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& Layout, const RHITexture2DDesc& Desc);
 
-	virtual RHITexture2DDesc GetDesc() override { return _desc; }
-
-	virtual void UpdateSubresource(SD3D12CommandList* commandList, uint32 subresource, const RHISubresourceData* uploadData) override;
+	using Super::Dispose;
+	virtual RHITexture2DDesc GetDesc() override;
+	virtual void UpdateSubresource(SD3D12CommandList* CommandList, uint32 Subresource, const RHISubresourceData* UploadData) override;
 
 	static void UpdateSubresource(
-		SD3D12CommandList* commandList,
-		ID3D12Resource* textureBuf,
-		ID3D12Resource* uploadBuf,
-		uint32 subresource,
-		const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout,
-		uint64 totalBytes,
-		const RHISubresourceData* uploadData);
+		SD3D12CommandList* CommandList,
+		ID3D12Resource* TextureBuf,
+		ID3D12Resource* UploadBuf,
+		uint32 Subresource,
+		const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& Layout,
+		uint64 TotalBytes,
+		const RHISubresourceData* UploadData);
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 
 public:
-	DECLARE_GETTER(ID3D12Resource, _resource);
+	DECLARE_GETTER(ID3D12Resource, Resource);
 };

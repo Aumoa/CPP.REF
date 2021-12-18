@@ -25,15 +25,6 @@ SObject::~SObject()
 	}
 }
 
-void SObject::MarkGC(uint64 Generation)
-{
-	if (this->Generation != Generation)
-	{
-		this->Generation = Generation;
-	}
-	this->ReferencePtr->bMarkAtGC = true;
-}
-
 void SObject::UnmarkGC()
 {
 	ReferencePtr->bMarkAtGC = false;
@@ -42,6 +33,15 @@ void SObject::UnmarkGC()
 void SObject::AddToRoot()
 {
 	GC.Roots.emplace(this);
+}
+
+void SObject::MarkGC(uint64 Generation)
+{
+	if (this->Generation != Generation)
+	{
+		this->Generation = Generation;
+	}
+	this->ReferencePtr->bMarkAtGC = true;
 }
 
 void SObject::RemoveFromRoot()

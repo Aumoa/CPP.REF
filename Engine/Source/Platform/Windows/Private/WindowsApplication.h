@@ -20,8 +20,9 @@ private:
 	HWND hWnd = nullptr;
 	ETickMode TickMode = ETickMode::Realtime;
 	ETickMode ActualTickMode = ETickMode::Realtime;
-	std::vector<std::weak_ptr<SObject>> RealtimeDemanders;
+	std::vector<WeakPtr<SObject>> RealtimeDemanders;
 
+	SPROPERTY(Factory)
 	SDXGIFactory* Factory = nullptr;
 	ComPtr<IWICImagingFactory> ImagingFactory;
 

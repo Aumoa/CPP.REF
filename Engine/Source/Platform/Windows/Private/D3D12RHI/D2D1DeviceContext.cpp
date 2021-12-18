@@ -5,6 +5,8 @@
 #include "D2D1Bitmap.h"
 #include "DWriteTextLayout.h"
 
+GENERATE_BODY(SD2D1DeviceContext);
+
 SD2D1DeviceContext::SD2D1DeviceContext(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1DeviceContext* InDeviceContext, ID3D11On12Device* InteropDevice) : Super(InFactory, InDevice, nullptr)
 	, InteropDev(InteropDevice)
 	, DeviceContext(InDeviceContext)
@@ -34,10 +36,10 @@ void SD2D1DeviceContext::SetTarget(IRHIImage* InTarget, std::optional<Color> Cle
 			DeviceContext->Clear((const D2D1_COLOR_F&)*ClearColor);
 		}
 
-		if (Target_s != WeakTarget.lock().get())
+		if (InTarget != Target)
 		{
 			ReleaseWrappedTarget();
-			WeakTarget = InTarget->weak_from_this();
+			Target = InTarget;
 			AcquireWrappedTarget();
 		}
 
@@ -102,9 +104,8 @@ void SD2D1DeviceContext::DrawBitmap(IRHIBitmap* Bitmap, const Rect* DestRect, fl
 
 void SD2D1DeviceContext::AcquireWrappedTarget()
 {
-	if (auto Ptr = WeakTarget.lock(); Ptr)
+	if (auto CastPtr = Cast<SD2D1Bitmap>(Target))
 	{
-		auto CastPtr = std::dynamic_pointer_cast<SD2D1Bitmap>(Ptr);
 		auto Resource = CastPtr->Get<ID3D11Resource>();
 		if (Resource)
 		{
@@ -115,14 +116,13 @@ void SD2D1DeviceContext::AcquireWrappedTarget()
 
 void SD2D1DeviceContext::ReleaseWrappedTarget()
 {
-	if (auto Ptr = WeakTarget.lock(); Ptr)
+	if (auto CastPtr = Cast<SD2D1Bitmap>(Target))
 	{
-		auto CastPtr = std::dynamic_pointer_cast<SD2D1Bitmap>(Ptr);
 		auto Resource = CastPtr->Get<ID3D11Resource>();
 		if (Resource)
 		{
 			InteropDev->ReleaseWrappedResources(&Resource, 1);
 		}
-		WeakTarget.reset();
 	}
+	Target = nullptr;
 }

@@ -12,12 +12,17 @@ class SDWriteFontCollection : public SDXGIFactoryChild, implements IRHIFontColle
 	GENERATED_BODY(SDWriteFontCollection)
 
 private:
-	ComPtr<IDWriteFontCollection> _collection;
-	std::vector<ComPtr<IDWriteFontFamily>> _families;
+	ComPtr<IDWriteFontCollection> Collection;
+	std::vector<ComPtr<IDWriteFontFamily>> Families;
 
 public:
-	SDWriteFontCollection(SDXGIFactory* factory, ComPtr<IDWriteFontCollection> collection);
+	SDWriteFontCollection(SDXGIFactory* InFactory, ComPtr<IDWriteFontCollection> Collection);
+
+	using Super::Dispose;
+
+protected:
+	virtual void Dispose(bool bDisposing);
 
 public:
-	DECLARE_GETTER(IDWriteFontCollection, _collection);
+	DECLARE_GETTER(IDWriteFontCollection, Collection);
 };

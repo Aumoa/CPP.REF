@@ -5,7 +5,10 @@
 #include "Widgets/Widget.h"
 #include "IApplicationInterface.h"
 
-SSlateAnimationPlayer::SSlateAnimationPlayer() : Super()
+GENERATE_BODY(SSlateAnimationPlayer);
+
+SSlateAnimationPlayer::SSlateAnimationPlayer(SWidget* Outer) : Super()
+	, Outer(Outer)
 {
 }
 
@@ -34,7 +37,6 @@ void SSlateAnimationPlayer::Tick(float InDeltaTime)
 	{
 		auto& [Key, Value] = *It;
 		NotifyAnimFinished.emplace_back(Value->GetName());
-		RemoveReferenceObject(Value);
 		Animations.erase(It);
 	}
 
@@ -46,7 +48,7 @@ void SSlateAnimationPlayer::Tick(float InDeltaTime)
 
 SWidget* SSlateAnimationPlayer::GetWidget()
 {
-	return Cast<SWidget>(GetOuter());
+	return Outer;
 }
 
 bool SSlateAnimationPlayer::AddAnimation(SSlateAnimationContext* Animation)
@@ -59,7 +61,6 @@ bool SSlateAnimationPlayer::AddAnimation(SSlateAnimationContext* Animation)
 		return false;
 	}
 
-	AddReferenceObject(Animation);
 	Animation->InitCurves();
 
 	if (bUpdateDemander)
@@ -77,7 +78,6 @@ bool SSlateAnimationPlayer::RemoveAnimation(SSlateAnimationContext* Animation)
 		auto& [Key, Value] = *It;
 		Value->StopAnimation();
 		NotifyAnimFinished.emplace_back(Value->GetName());
-		RemoveReferenceObject(Value);
 
 		Animations.erase(It);
 		return true;
@@ -93,7 +93,6 @@ size_t SSlateAnimationPlayer::RemoveAllAnimations()
 	{
 		Value->StopAnimation();
 		NotifyAnimFinished.emplace_back(Value->GetName());
-		RemoveReferenceObject(Value);
 	}
 	Animations.clear();
 	return Count;
@@ -113,7 +112,7 @@ void SSlateAnimationPlayer::InvokeAnimFinishedEvents()
 {
 	for (auto& AnimName : NotifyAnimFinished)
 	{
-		AnimationFinished.Invoke(AnimName);
+		AnimationFinished.Broadcast(AnimName);
 	}
 	NotifyAnimFinished.clear();
 }

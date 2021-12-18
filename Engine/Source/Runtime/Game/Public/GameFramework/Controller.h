@@ -7,39 +7,22 @@
 
 class APawn;
 
-/// <summary>
-/// Represents controller that, possess to pawn and control the pawn.
-/// </summary>
 class GAME_API AController : public AActor
 {
 	GENERATED_BODY(AController)
 
 private:
-	APawn* _possessedPawn = nullptr;
+	SPROPERTY(PossessedPawn)
+	APawn* PossessedPawn = nullptr;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="AController"/> instance.
-	/// </summary>
-	/// <param name="name"> The controller name. </param>
 	AController();
 
-	/// <summary>
-	/// Possess to target pawn.
-	/// </summary>
-	void Possess(APawn* pawn);
-
-	/// <summary>
-	/// Unpossess from current target.
-	/// </summary>
+	void Possess(APawn* InNewPawn);
 	void UnPossess();
 
 	APawn* GetPawn() const;
-	template<std::derived_from<APawn> T>
-	T* GetPawn() const
-	{
-		return dynamic_cast<T*>(GetPawn());
-	}
+	template<std::derived_from<APawn> T> T* GetPawn() const { return Cast<T>(GetPawn()); }
 
 protected:
 	virtual void OnPossess(APawn* pawn) {}

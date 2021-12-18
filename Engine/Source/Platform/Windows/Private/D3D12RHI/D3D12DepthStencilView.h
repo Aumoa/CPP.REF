@@ -11,7 +11,7 @@ class SD3D12DepthStencilView : public SD3D12View, implements IRHIDepthStencilVie
 	GENERATED_BODY(SD3D12DepthStencilView)
 
 public:
-	SD3D12DepthStencilView(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources);
+	SD3D12DepthStencilView(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12DescriptorHeap> heap, size_t resources);
 
 	virtual void CreateDepthStencilView(int32 index, IRHIResource* resource, const RHIDepthStencilViewDesc* desc) override;
 };

@@ -11,11 +11,20 @@ class SDXGIFactoryChild : implements SObject, implements IRHIFactoryChild
 {
 	GENERATED_BODY(SDXGIFactoryChild)
 
+private:
+	bool bDisposed = false;
+
 protected:
-	SDXGIFactory* _factory = nullptr;
+	SPROPERTY(Factory)
+	SDXGIFactory* Factory = nullptr;
 
 public:
-	SDXGIFactoryChild(SDXGIFactory* factory);
+	SDXGIFactoryChild(SDXGIFactory* InFactory);
+	virtual ~SDXGIFactoryChild() noexcept override;
 
+	virtual void Dispose();
 	virtual IRHIFactory* GetFactory() override;
+
+protected:
+	virtual void Dispose(bool bDisposing);
 };

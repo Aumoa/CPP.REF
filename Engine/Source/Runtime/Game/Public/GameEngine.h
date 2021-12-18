@@ -11,27 +11,19 @@ class SGameInstance;
 class SGameEngineSubsystem;
 class SSlateApplication;
 
-/// <summary>
-/// Represents game engine that manage core resources.
-/// </summary>
 class GAME_API SGameEngine : implements SObject
 {
 	GENERATED_BODY(SGameEngine)
 
 private:
+	SPROPERTY(GameInstance)
 	SGameInstance* GameInstance = nullptr;
+	SPROPERTY(SlateApplication)
 	SSlateApplication* SlateApplication = nullptr;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="SGameEngine"/> instance.
-	/// </summary>
 	SGameEngine();
-	~SGameEngine() override;
 
-	/// <summary>
-	/// Initialize engine system.
-	/// </summary>
 	virtual bool InitEngine(IApplicationInterface* InApplication);
 	virtual bool LoadGameModule(std::wstring_view InModuleName);
 	virtual void Shutdown();
@@ -41,8 +33,9 @@ public:
 	SSlateApplication* GetSlateApplication();
 
 private:
+	SPROPERTY(Subsystems)
 	std::vector<SGameEngineSubsystem*> Subsystems;
-	mutable std::map<size_t, SGameEngineSubsystem*> CachedSubsystems;
+	mutable std::map<size_t, SGameEngineSubsystem*> SubsystemView;
 
 	void InitializeSubsystems();
 
@@ -50,29 +43,12 @@ public:
 	template<class T>
 	T* GetEngineSubsystem()
 	{
-		size_t Hash = typeid(T).hash_code();
-		auto It = CachedSubsystems.find(Hash);
-		if (It == CachedSubsystems.end())
+		auto It = SubsystemView.find(T::StaticClass()->GetHashCode());
+		if (It == SubsystemView.end())
 		{
-			// Find subsystem.
-			for (size_t i = 0; i < Subsystems.size(); ++i)
-			{
-				if (auto ptr = dynamic_cast<T*>(Subsystems[i]); ptr)
-				{
-					It = CachedSubsystems.emplace(Hash, ptr).first;
-					break;
-				}
-			}
-
-			// Could not found any subsystem class.
-			if (It == CachedSubsystems.end())
-			{
-				return nullptr;
-			}
+			return nullptr;
 		}
-
-		// Mapping pointer can be cast directly to desired class.
-		return static_cast<T*>(It->second);
+		return Cast<T>(It->second);
 	}
 
 private:

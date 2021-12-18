@@ -2,7 +2,9 @@
 
 #include "DWriteTextFormat.h"
 
-SDWriteTextFormat::SDWriteTextFormat(SDXGIFactory* factory, ComPtr<IDWriteTextFormat> format) : Super(factory)
+GENERATE_BODY(SDWriteTextFormat);
+
+SDWriteTextFormat::SDWriteTextFormat(SDXGIFactory* InFactory, ComPtr<IDWriteTextFormat> format) : Super(InFactory)
 	, _format(std::move(format))
 {
 }

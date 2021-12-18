@@ -4,6 +4,8 @@
 #include "Layout/ArrangedChildrens.h"
 #include "Draw/PaintArgs.h"
 
+GENERATE_BODY(SCanvasPanel);
+
 SCanvasPanel::SCanvasPanel() : Super()
 {
 }

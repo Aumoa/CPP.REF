@@ -4,6 +4,8 @@
 #include "Level/World.h"
 #include "Scene/PrimitiveSceneProxy.h"
 
+GENERATE_BODY(SPrimitiveComponent);
+
 SPrimitiveComponent::SPrimitiveComponent() : Super()
 {
 }

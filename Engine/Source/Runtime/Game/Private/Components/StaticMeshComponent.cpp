@@ -6,6 +6,8 @@
 #include "Scene/StaticMeshRenderData.h"
 #include "Materials/Material.h"
 
+GENERATE_BODY(SStaticMeshComponent);
+
 SStaticMeshComponent::SStaticMeshComponent() : Super()
 {
 }

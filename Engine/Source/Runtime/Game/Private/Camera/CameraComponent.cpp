@@ -2,6 +2,8 @@
 
 #include "Camera/CameraComponent.h"
 
+GENERATE_BODY(SCameraComponent);
+
 SCameraComponent::SCameraComponent()
 {
 }

@@ -28,7 +28,6 @@ private:
 	} _interop;
 
 private:
-	SDXGIFactory* _factory = nullptr;
 	ComPtr<ID3D12Device> _device;
 
 	std::mutex _allocatorLock;
@@ -41,7 +40,7 @@ private:
 	SD3D12CommandQueue* _immCon = nullptr;
 
 public:
-	SD3D12Device(SDXGIFactory* factory, ComPtr<ID3D12Device> device);
+	SD3D12Device(SDXGIFactory* InFactory, ComPtr<ID3D12Device> device);
 	virtual ~SD3D12Device() override;
 
 	virtual IRHIDeviceContext* GetImmediateContext() override;

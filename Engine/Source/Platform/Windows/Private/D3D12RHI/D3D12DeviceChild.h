@@ -17,10 +17,11 @@ private:
 	ID3D12DeviceChild* Object = nullptr;
 
 protected:
-	SD3D12Device* _device = nullptr;
+	SPROPERTY(Device)
+	SD3D12Device* Device = nullptr;
 
 public:
-	SD3D12DeviceChild(SDXGIFactory* factory, SD3D12Device* device, ID3D12DeviceChild* InConstructorObject);
+	SD3D12DeviceChild(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12DeviceChild* InConstructorObject);
 
 	virtual IRHIDevice* GetDevice() override;
 	virtual void SetDebugName(std::wstring_view InName) override;

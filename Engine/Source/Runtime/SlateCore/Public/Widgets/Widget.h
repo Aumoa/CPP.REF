@@ -19,6 +19,8 @@ class SLATECORE_API SWidget : implements SObject
 	GENERATED_BODY(SWidget)
 
 private:
+	std::wstring Name;
+
 	ESlateVisibility Visibility = ESlateVisibility::Visible;
 	EFlowDirection FlowDirection = EFlowDirection::LeftToRight;
 	EWidgetClipping Clipping = EWidgetClipping::Inherit;
@@ -36,7 +38,8 @@ private:
 public:
 	SWidget();
 
-	virtual std::wstring ToString(std::wstring_view InFormatArgs = L"") override;
+	virtual std::wstring ToString() override;
+	std::wstring GetName();
 
 	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled);
 	void ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry);
@@ -54,6 +57,8 @@ public:
 	bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event);
 
 protected:
+	virtual void PostConstruction() override;
+
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) = 0;
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) = 0;
 

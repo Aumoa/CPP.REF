@@ -7,18 +7,18 @@
 #include "RHI/IRHITexture2D.h"
 #include "RHI/IRHIDeviceContext.h"
 
+GENERATE_BODY(SSceneRenderTargetInterface);
+
 SSceneRenderTargetInterface::SSceneRenderTargetInterface(IRHIDevice* InDevice, int32 InNumRTVs, bool bUseDSV) : Super()
 {
 	if (InNumRTVs)
 	{
 		RTV = InDevice->CreateRenderTargetView(InNumRTVs);
-		RTV->SetOuter(this);
 	}
 
 	if (bUseDSV)
 	{
 		DSV = InDevice->CreateDepthStencilView(1);
-		DSV->SetOuter(this);
 	}
 }
 
@@ -30,22 +30,12 @@ void SSceneRenderTargetInterface::SetRenderTargets(IRHITexture2D* InColorBuf, IR
 	{
 		check(RTV);
 		RTV->CreateRenderTargetView(0, InColorBuf, nullptr);
-
-		if (bBindResources)
-		{
-			InColorBuf->SetOuter(this);
-		}
 	}
 
 	if (InDepthStencilBuf)
 	{
 		check(DSV);
 		DSV->CreateDepthStencilView(0, InDepthStencilBuf, nullptr);
-
-		if (bBindResources)
-		{
-			InDepthStencilBuf->SetOuter(this);
-		}
 	}
 
 	this->bBindResources = bBindResources;
@@ -60,18 +50,18 @@ void SSceneRenderTargetInterface::CleanupRenderTargets()
 			int32 Count = RTV->GetViewCount();
 			for (int32 i = 0; i < Count; ++i)
 			{
-				if (IRHIResource* R = RTV->GetResource(i); R && R->GetOuter() == this)
+				if (IRHIResource* R = RTV->GetResource(i))
 				{
-					DestroyObject(R);
+					R->Dispose();
 				}
 			}
 		}
 
 		if (DSV)
 		{
-			if (IRHIResource* R = DSV->GetResource(0); R && R->GetOuter() == this)
+			if (IRHIResource* R = DSV->GetResource(0))
 			{
-				DestroyObject(R);
+				R->Dispose();
 			}
 		}
 	}

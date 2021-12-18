@@ -4,12 +4,14 @@
 #include "AnimCurves/AnimationCurve.h"
 #include <ranges>
 
+GENERATE_BODY(SSlateAnimationContext);
+
 SSlateAnimationContext::SSlateAnimationContext(std::wstring_view AnimationName) : Super()
 	, Name(AnimationName)
 {
 }
 
-std::wstring SSlateAnimationContext::ToString(std::wstring_view InFormatArgs)
+std::wstring SSlateAnimationContext::ToString()
 {
 	return GetName();
 }
@@ -22,7 +24,6 @@ std::wstring SSlateAnimationContext::GetName()
 bool SSlateAnimationContext::AddCurve(SAnimationCurve* Curve)
 {
 	AnimCurves.emplace_back(Curve);
-	AddReferenceObject(Curve);
 	return true;
 }
 
@@ -30,7 +31,6 @@ bool SSlateAnimationContext::RemoveCurve(SAnimationCurve* Curve)
 {
 	if (auto It = std::find(AnimCurves.begin(), AnimCurves.end(), Curve); It != AnimCurves.end())
 	{
-		RemoveReferenceObject(*It);
 		AnimCurves.erase(It);
 		return true;
 	}
@@ -132,7 +132,6 @@ SSlateAnimationContext* SSlateAnimationContext::Clone()
 	{
 		SAnimationCurve* CloneCurve = Curve->Clone();
 		NewContext->AnimCurves.emplace_back(CloneCurve);
-		CloneCurve->SetOuter(NewContext);
 	}
 
 	return NewContext;

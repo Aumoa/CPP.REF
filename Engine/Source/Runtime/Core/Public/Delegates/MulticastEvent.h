@@ -14,7 +14,7 @@ class MulticastEvent : public MulticastDelegate<F>
 	friend T;
 
 private:
-	using MulticastDelegate<F>::Invoke;
+	using MulticastDelegate<F>::Broadcast;
 };
 
 #define DECLARE_MULTICAST_EVENT(EventName, ...)					\

@@ -6,9 +6,8 @@
 
 GENERATE_BODY(SMaterial);
 
-SMaterial::SMaterial(std::shared_ptr<IRHIDevice> InDevice, EBaseShaderCode InBaseShaderCode) : Super(InDevice)
+SMaterial::SMaterial(IRHIDevice* InDevice, EBaseShaderCode InBaseShaderCode) : Super(InDevice)
 	, BaseShaderCode(InBaseShaderCode)
-	, Device(InDevice)
 {
 }
 

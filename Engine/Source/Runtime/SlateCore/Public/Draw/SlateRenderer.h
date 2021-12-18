@@ -12,7 +12,7 @@ class SLATECORE_API SlateRenderer
 {
 private:
 	IRHIDeviceContext2D* CommandList;
-	std::shared_ptr<IRHISolidColorBrush> TintBrush;
+	SharedPtr<IRHISolidColorBrush> TintBrush;
 
 public:
 	SlateRenderer(IRHIDeviceContext2D* CommandList);

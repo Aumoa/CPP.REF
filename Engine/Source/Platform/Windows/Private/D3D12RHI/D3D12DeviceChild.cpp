@@ -3,15 +3,17 @@
 #include "D3D12DeviceChild.h"
 #include "D3D12Device.h"
 
-SD3D12DeviceChild::SD3D12DeviceChild(SDXGIFactory* factory, SD3D12Device* device, ID3D12DeviceChild* InConstructorObject) : Super(factory)
+GENERATE_BODY(SD3D12DeviceChild);
+
+SD3D12DeviceChild::SD3D12DeviceChild(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12DeviceChild* InConstructorObject) : Super(InFactory)
 	, Object(InConstructorObject)
-	, _device(device)
+	, Device(InDevice)
 {
 }
 
 IRHIDevice* SD3D12DeviceChild::GetDevice()
 {
-	return _device;
+	return Device;
 }
 
 void SD3D12DeviceChild::SetDebugName(std::wstring_view InName)

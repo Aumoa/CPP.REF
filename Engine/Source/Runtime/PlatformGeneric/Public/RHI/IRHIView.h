@@ -10,5 +10,5 @@ interface IRHIResource;
 interface IRHIView : implements IRHIDeviceChild
 {
 	virtual int32 GetViewCount() = 0;
-	virtual std::shared_ptr<IRHIResource> GetResource(int32 IndexOf) = 0;
+	virtual IRHIResource* GetResource(int32 indexOf) = 0;
 };

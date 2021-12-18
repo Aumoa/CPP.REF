@@ -10,6 +10,8 @@
 #include "RHI/IRHIBitmap.h"
 #include "RHI/IRHIDevice.h"
 
+GENERATE_BODY(STexture2D);
+
 #pragma pack(push, 1)
 
 struct Texture2DHeader
@@ -43,7 +45,6 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 	ImageSource = ImageLoader.CreateImageFromBinary(Body, 0, ERHIPixelFormat::B8G8R8A8_UNORM);
 	if (ImageSource)
 	{
-		ImageSource->SetOuter(this);
 		IRHIDevice* Device = Loader->GetDevice();
 
 		// Copy pixels to buffer.
@@ -68,10 +69,7 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 		InitialData.SysMemPitch = (size_t)PixelSize.X * 4;
 
 		Texture = Device->CreateTexture2D(Desc, &InitialData);
-		Texture->SetOuter(this);
-
 		Bitmap = Device->CreateBitmapFromTexture2D(Texture);
-		Bitmap->SetOuter(this);
 	}
 
 	return ImageSource != nullptr;

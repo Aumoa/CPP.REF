@@ -2,6 +2,8 @@
 
 #include "Widgets/Panel/HorizontalBoxPanel.h"
 
+GENERATE_BODY(SHorizontalBoxPanel);
+
 SHorizontalBoxPanel::SHorizontalBoxPanel() : Super(EOrientation::Horizontal)
 {
 }

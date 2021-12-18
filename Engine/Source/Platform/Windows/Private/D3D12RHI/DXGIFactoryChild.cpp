@@ -3,12 +3,32 @@
 #include "DXGIFactoryChild.h"
 #include "DXGIFactory.h"
 
-SDXGIFactoryChild::SDXGIFactoryChild(SDXGIFactory* factory) : Super()
-	, _factory(factory)
+GENERATE_BODY(SDXGIFactoryChild);
+
+SDXGIFactoryChild::SDXGIFactoryChild(SDXGIFactory* InFactory) : Super()
+	, Factory(InFactory)
 {
+}
+
+SDXGIFactoryChild::~SDXGIFactoryChild() noexcept
+{
+	Dispose(false);
+}
+
+void SDXGIFactoryChild::Dispose()
+{
+	Dispose(true);
 }
 
 IRHIFactory* SDXGIFactoryChild::GetFactory()
 {
-	return _factory;
+	return Factory;
+}
+
+void SDXGIFactoryChild::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		GC.SuppressFinalize(this);
+	}
 }

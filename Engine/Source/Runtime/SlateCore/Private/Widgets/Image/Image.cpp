@@ -4,6 +4,8 @@
 #include "Draw/SlateWindowElementList.h"
 #include "Draw/PaintArgs.h"
 
+GENERATE_BODY(SImage);
+
 SImage::SImage() : Super()
 {
 	SetRenderTransform(SlateRenderTransform::Identity());

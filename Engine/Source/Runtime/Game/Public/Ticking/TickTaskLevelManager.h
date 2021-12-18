@@ -8,7 +8,7 @@
 DECLARE_LOG_CATEGORY(GAME_API, LogLevelTick);
 
 class SWorld;
-class STickFunction;
+class TickFunction;
 
 class GAME_API STickTaskLevelManager : public SObject
 {
@@ -18,24 +18,26 @@ private:
 	struct TickGroupHeader
 	{
 		ETickingGroup TickGroup;
-		std::set<STickFunction*> Functions;
+		std::set<TickFunction*> Functions;
 
-		void AddTickFunction(STickFunction* InFunction);
-		void RemoveTickFunction(STickFunction* InFunction);
+		void AddTickFunction(TickFunction* InFunction);
+		void RemoveTickFunction(TickFunction* InFunction);
 	};
 
-	std::array<TickGroupHeader, (int32)ETickingGroup::NumGroups> _TickGroups;
+	SPROPERTY(World)
+	SWorld* World = nullptr;
+	std::array<TickGroupHeader, (int32)ETickingGroup::NumGroups> TickGroups;
 
 public:
-	STickTaskLevelManager();
+	STickTaskLevelManager(SWorld* InWorld);
 
 	SWorld* GetWorld();
 
-	void AddTickFunction(STickFunction* InFunction);
-	void RemoveTickFunction(STickFunction* InFunction);
+	void AddTickFunction(TickFunction* InFunction);
+	void RemoveTickFunction(TickFunction* InFunction);
 
 private:
-	STickFunction* _FrameHead = nullptr;
+	TickFunction* FrameHead = nullptr;
 
 public:
 	void BeginFrame();

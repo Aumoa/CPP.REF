@@ -22,8 +22,10 @@ public:
 	};
 
 private:
-	SMouseStateTracker MouseTracker;
-	SKeyboardTracker KeyboardTracker;
+	SPROPERTY(MouseTracker)
+	SMouseStateTracker* MouseTracker = nullptr;
+	SPROPERTY(KeyboardTracker)
+	SKeyboardTracker* KeyboardTracker = nullptr;
 	std::optional<int32> LastMouseX;
 	std::optional<int32> LastMouseY;
 

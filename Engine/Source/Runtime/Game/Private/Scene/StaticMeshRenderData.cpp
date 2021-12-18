@@ -2,6 +2,8 @@
 
 #include "Scene/StaticMeshRenderData.h"
 
+GENERATE_BODY(SStaticMeshRenderData);
+
 SStaticMeshRenderData::SStaticMeshRenderData() : Super()
 {
 }

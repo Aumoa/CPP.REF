@@ -2,6 +2,8 @@
 
 #include "GameFramework/AIController.h"
 
+GENERATE_BODY(AAIController);
+
 AAIController::AAIController() : Super()
 {
 }

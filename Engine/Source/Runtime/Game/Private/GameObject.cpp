@@ -5,23 +5,35 @@
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "Level/Level.h"
 
+GENERATE_BODY(SGameObject);
+
 SGameObject::SGameObject() : Super()
 {
 }
 
-std::wstring SGameObject::ToString(std::wstring_view formatArgs)
+std::wstring SGameObject::ToString()
 {
 	return GetName();
 }
 
+void SGameObject::SetOuter(SGameObject* NewOuter)
+{
+	Outer = NewOuter;
+}
+
+SGameObject* SGameObject::GetOuter()
+{
+	return Outer;
+}
+
 void SGameObject::SetName(std::wstring_view InName)
 {
-	_Name = InName;
+	Name = InName;
 }
 
 std::wstring SGameObject::GetName()
 {
-	return _Name;
+	return Name;
 }
 
 SLevel* SGameObject::GetLevel()
@@ -43,7 +55,6 @@ SObject* SGameObject::LoadObject(const std::filesystem::path& assetPath)
 	SObject* LoadedObject = GEngine->GetEngineSubsystem<SGameAssetSystem>()->LoadObject(assetPath);
 	if (LoadedObject)
 	{
-		LoadedObject->SetOuter(this);
 		return LoadedObject;
 	}
 	else

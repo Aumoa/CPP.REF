@@ -17,62 +17,62 @@ interface IRHIDeviceContext : implements IRHIDeviceChild
 	virtual void Begin() = 0;
 	virtual void End() = 0;
 	virtual void SetDescriptorHeaps(int32 MaxSRVCount, int32 MaxSamplerCount) = 0;
-	virtual void DrawIndexedInstanced(uint32 IndexCountPerInstance, uint32 InstanceCount, uint32 StartIndexLocation, int32 BaseVertexLocation, uint32 StartInstanceLocation) = 0;
-	virtual void DrawInstanced(uint32 VertexCountPerInstance, uint32 InstanceCount, uint32 BaseVertexLocation, uint32 StartInstanceLocation) = 0;
-	virtual void IASetPrimitiveTopology(ERHIPrimitiveTopology Topology) = 0;
-	virtual void OMSetRenderTargets(std::shared_ptr<IRHIRenderTargetView> RTV, int32 IndexOfRTV, int32 Count, std::shared_ptr<IRHIDepthStencilView> DSV, int32 IndexOfDSV) = 0;
-	virtual void ClearRenderTargetView(std::shared_ptr<IRHIRenderTargetView> RTV, int32 IndexOf, const Color& Color) = 0;
-	virtual void ClearDepthStencilView(std::shared_ptr<IRHIDepthStencilView> DSV, int32 IndexOf, std::optional<float> Depth = 1.0f, std::optional<uint8> Stencil = 0) = 0;
-	virtual void RSSetScissorRects(std::span<const RHIScissorRect> ScissorRects) = 0;
-	virtual void RSSetViewports(std::span<const RHIViewport> Viewports) = 0;
-	virtual void ResourceBarrier(std::span<const RHIResourceBarrier> Barriers) = 0;
-	virtual void IASetVertexBuffers(uint32 SlotIndex, std::span<const RHIVertexBufferView> Views) = 0;
-	virtual void IASetIndexBuffer(const RHIIndexBufferView& View) = 0;
-	virtual void SetGraphicsShader(std::shared_ptr<IRHIShader> Shader) = 0;
-	virtual void SetGraphicsRootConstantBufferView(uint32 Index, uint64 BufferLocation) = 0;
-	virtual void SetGraphicsRoot32BitConstants(uint32 Index, uint32 Num32BitsToSet, const void* SrcData, uint32 DestOffsetIn32BitValues) = 0;
-	virtual void SetGraphicsRootShaderResourceView(uint32 Index, uint64 BufferLocation) = 0;
-	virtual void SetGraphicsRootShaderResourceView(uint32 Index, IRHIShaderResourceView* View, int32 IndexOf, int32 Count) = 0;
-	virtual void PendingGarbageObject(std::shared_ptr<IRHIFactoryChild> Resource) = 0;
-	virtual void UpdateSubresource(std::shared_ptr<IRHIResource> Resource, uint32 Subresource, const RHISubresourceData& Data) = 0;
-	virtual void CopyResource(std::shared_ptr<IRHIResource> DstResource, std::shared_ptr<IRHIResource> SrcResource) = 0;
-	virtual void ResolveSubresource(std::shared_ptr<IRHIResource> DstResource, uint32 DstSubresource, std::shared_ptr<IRHIResource> SrcResource, uint32 SrcSubresource, ERHIPixelFormat Format) = 0;
-	virtual uint64 ExecuteCommandLists(std::span<std::shared_ptr<IRHIDeviceContext>> DeviceContexts, bool bSignal = false) = 0;
+	virtual void DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation) = 0;
+	virtual void DrawInstanced(uint32 vertexCountPerInstance, uint32 instanceCount, uint32 baseVertexLocation, uint32 startInstanceLocation) = 0;
+	virtual void IASetPrimitiveTopology(ERHIPrimitiveTopology topology) = 0;
+	virtual void OMSetRenderTargets(IRHIRenderTargetView* rtv, int32 indexOfRTV, int32 count, IRHIDepthStencilView* dsv, int32 indexOfDSV) = 0;
+	virtual void ClearRenderTargetView(IRHIRenderTargetView* rtv, int32 indexOf, const Color& color) = 0;
+	virtual void ClearDepthStencilView(IRHIDepthStencilView* dsv, int32 indexOf, std::optional<float> depth, std::optional<uint8> stencil) = 0;
+	virtual void RSSetScissorRects(std::span<const RHIScissorRect> scissorRects) = 0;
+	virtual void RSSetViewports(std::span<const RHIViewport> viewports) = 0;
+	virtual void ResourceBarrier(std::span<const RHIResourceBarrier> barriers) = 0;
+	virtual void IASetVertexBuffers(uint32 slotIndex, std::span<const RHIVertexBufferView> views) = 0;
+	virtual void IASetIndexBuffer(const RHIIndexBufferView& view) = 0;
+	virtual void SetGraphicsShader(IRHIShader* shader) = 0;
+	virtual void SetGraphicsRootConstantBufferView(uint32 index, uint64 bufferLocation) = 0;
+	virtual void SetGraphicsRoot32BitConstants(uint32 index, uint32 num32BitsToSet, const void* srcData, uint32 destOffsetIn32BitValues) = 0;
+	virtual void SetGraphicsRootShaderResourceView(uint32 index, uint64 bufferLocation) = 0;
+	virtual void SetGraphicsRootShaderResourceView(uint32 index, IRHIShaderResourceView* view, int32 indexOf, int32 count) = 0;
+	virtual void PendingGarbageObject(SObject* object) = 0;
+	virtual void UpdateSubresource(IRHIResource* resource, uint32 subresource, const RHISubresourceData& data) = 0;
+	virtual void CopyResource(IRHIResource* DstResource, IRHIResource* SrcResource) = 0;
+	virtual void ResolveSubresource(IRHIResource* DstResource, uint32 DstSubresource, IRHIResource* SrcResource, uint32 SrcSubresource, ERHIPixelFormat Format) = 0;
+	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal = false) = 0;
 
-	void RSSetScissorRect(const RHIScissorRect& ScissorRect) { RSSetScissorRects(std::span<const RHIScissorRect>(&ScissorRect, 1)); }
-	void RSSetScissorRects(std::span<RHIScissorRect> ScissorRects) { RSSetScissorRects((std::span<const RHIScissorRect>)ScissorRects); }
-	void RSSetViewport(const RHIViewport& Viewport) { RSSetViewports(std::span<const RHIViewport>(&Viewport, 1)); }
-	void RSSetViewports(std::span<RHIViewport> Viewports) { RSSetViewports((std::span<const RHIViewport>)Viewports); }
-	void ResourceBarrier(std::span<RHIResourceBarrier> Barriers) { ResourceBarrier((std::span<const RHIResourceBarrier>)Barriers); }
-	void IASetVertexBuffers(uint32 SlotIndex, std::span<RHIVertexBufferView> Views) { IASetVertexBuffers(SlotIndex, (std::span<const RHIVertexBufferView>)Views); }
+	void RSSetScissorRect(const RHIScissorRect& scissorRect) { RSSetScissorRects(std::span<const RHIScissorRect>(&scissorRect, 1)); }
+	void RSSetScissorRects(std::span<RHIScissorRect> scissorRects) { RSSetScissorRects((std::span<const RHIScissorRect>)scissorRects); }
+	void RSSetViewport(const RHIViewport& viewport) { RSSetViewports(std::span<const RHIViewport>(&viewport, 1)); }
+	void RSSetViewports(std::span<RHIViewport> viewports) { RSSetViewports((std::span<const RHIViewport>)viewports); }
+	void ResourceBarrier(std::span<RHIResourceBarrier> barriers) { ResourceBarrier((std::span<const RHIResourceBarrier>)barriers); }
+	void IASetVertexBuffers(uint32 slotIndex, std::span<RHIVertexBufferView> views) { IASetVertexBuffers(slotIndex, (std::span<const RHIVertexBufferView>)views); }
 
 	template<std::convertible_to<RHIResourceBarrier>... TBarriers>
-	void ResourceBarrier(TBarriers&&... Barriers)
+	void ResourceBarrier(TBarriers&&... barriers)
 	{
-		ResourceBarrier(std::array<RHIResourceBarrier, sizeof...(TBarriers)>{ std::forward<TBarriers>(Barriers)... });
+		ResourceBarrier(std::array<RHIResourceBarrier, sizeof...(TBarriers)>{ std::forward<TBarriers>(barriers)... });
 	}
 
 	template<std::convertible_to<RHIResourceBarrier> TBarrier>
-	void ResourceBarrier(std::span<TBarrier> Barriers_span)
+	void ResourceBarrier(std::span<TBarrier> barriers_span)
 	{
-		std::vector<RHIResourceBarrier> Barriers(Barriers_span.size());
-		for (size_t i = 0; i < Barriers.size(); ++i)
+		std::vector<RHIResourceBarrier> barriers(barriers_span.size());
+		for (size_t i = 0; i < barriers.size(); ++i)
 		{
-			Barriers[i] = Barriers_span[i];
+			barriers[i] = barriers_span[i];
 		}
-		ResourceBarrier(std::span<const RHIResourceBarrier>(Barriers));
+		ResourceBarrier(std::span<const RHIResourceBarrier>(barriers));
 	}
 
 	template<class T>
-	void SetGraphicsRoot32BitConstants(uint32 Index, T&& Value, uint32 DestOffsetIn32BitValues)
+	void SetGraphicsRoot32BitConstants(uint32 index, T&& value, uint32 destOffsetIn32BitValues)
 	{
-		uint32 Num32BitsToSet = (sizeof(Value) - 1) / 4 + 1;
-		SetGraphicsRoot32BitConstants(Index, Num32BitsToSet, &Value, DestOffsetIn32BitValues);
+		uint32 num32BitsToSet = (sizeof(value) - 1) / 4 + 1;
+		SetGraphicsRoot32BitConstants(index, num32BitsToSet, &value, destOffsetIn32BitValues);
 	}
 
-	void ExecuteCommandList(std::shared_ptr<IRHIDeviceContext> DeviceContext)
+	void ExecuteCommandList(IRHIDeviceContext* deviceContext)
 	{
-		std::shared_ptr<IRHIDeviceContext> DeviceContexts[] = { DeviceContext };
-		ExecuteCommandLists(DeviceContexts);
+		IRHIDeviceContext* deviceContexts[] = { deviceContext };
+		ExecuteCommandLists(deviceContexts);
 	}
 };

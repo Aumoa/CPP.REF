@@ -11,7 +11,7 @@ class SD3D12RenderTargetView : public SD3D12View, implements IRHIRenderTargetVie
 	GENERATED_BODY(SD3D12RenderTargetView)
 
 public:
-	SD3D12RenderTargetView(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources);
+	SD3D12RenderTargetView(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12DescriptorHeap> Heap, size_t NumResources);
 
-	virtual void CreateRenderTargetView(int32 index, IRHIResource* resource, const RHIRenderTargetViewDesc* desc) override;
+	virtual void CreateRenderTargetView(int32 Index, IRHIResource* Resource, const RHIRenderTargetViewDesc* Desc) override;
 };

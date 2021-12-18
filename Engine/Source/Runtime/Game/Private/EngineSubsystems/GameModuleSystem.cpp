@@ -5,17 +5,14 @@
 #include "LogGame.h"
 #include "GameModule.h"
 
+GENERATE_BODY(SGameModuleSystem);
+
 SGameModuleSystem::SGameModuleSystem() : Super()
 {
 }
 
 SGameModuleSystem::~SGameModuleSystem()
 {
-	if (_gameModule)
-	{
-		DestroyObject(_gameModule);
-		_gameModule = nullptr;
-	}
 }
 
 void SGameModuleSystem::Init()
@@ -24,42 +21,40 @@ void SGameModuleSystem::Init()
 
 void SGameModuleSystem::Deinit()
 {
-	_gameModule->CleanupSubobjects();
-	_module = nullptr;
 }
 
-void SGameModuleSystem::LoadGameModule(std::wstring_view gameModuleName)
+void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
 {
-	std::filesystem::path gameModulePath = gameModuleName;
-	if (!gameModulePath.has_extension())
+	std::filesystem::path GameModulePath = GameModuleName;
+	if (!GameModulePath.has_extension())
 	{
 		// Add .dll extension.
-		gameModulePath.replace_extension(L".dll");
+		GameModulePath.replace_extension(L".dll");
 	}
 
-	_module = NewObject<SPlatformModule>(gameModulePath);
-	if (!_module->IsValid())
+	Module = std::make_unique<PlatformModule>(GameModulePath);
+	if (!Module)
 	{
-		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", gameModuleName);
+		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", GameModuleName);
 		return;
 	}
 
-	auto loader = _module->GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
-	if (!loader)
+	auto ModuleLoader = Module->GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
+	if (!ModuleLoader)
 	{
 		SE_LOG(LogModule, Fatal, L"The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.");
 		return;
 	}
 
-	_gameModule = loader(this);
-	if (!_gameModule)
+	GameModule = ModuleLoader(this);
+	if (!GameModule)
 	{
-		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", gameModuleName);
+		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", GameModuleName);
 		return;
 	}
 }
 
 SGameInstance* SGameModuleSystem::LoadGameInstance()
 {
-	return _gameModule->CreateGameInstance();
+	return GameModule->CreateGameInstance();
 }

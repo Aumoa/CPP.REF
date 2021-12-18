@@ -3,44 +3,46 @@
 #include "DXGISwapChain.h"
 #include "D3D12Texture2D.h"
 
-SDXGISwapChain::SDXGISwapChain(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDXGISwapChain4> swapChain) : Super(factory, device, nullptr)
-	, _swapChain(std::move(swapChain))
+GENERATE_BODY(SDXGISwapChain);
+
+SDXGISwapChain::SDXGISwapChain(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<IDXGISwapChain4> SwapChain) : Super(InFactory, InDevice, nullptr)
+	, SwapChain(std::move(SwapChain))
 {
 }
 
 void SDXGISwapChain::Present(int32 vSyncLevel)
 {
-	HR(_swapChain->Present((UINT)vSyncLevel, 0));
+	HR(SwapChain->Present((UINT)vSyncLevel, 0));
 }
 
-void SDXGISwapChain::ResizeBuffers(int32 width, int32 height)
+void SDXGISwapChain::ResizeBuffers(int32 InWidth, int32 InHeight)
 {
 	for (size_t i = 0; i < 3; ++i)
 	{
-		if (_buffers[i])
+		if (Buffers[i])
 		{
-			DestroyObject(_buffers[i]);
-			_buffers[i] = nullptr;
+			Buffers[i]->Dispose();
+			Buffers[i] = nullptr;
 		}
 	}
 
-	HR(_swapChain->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, 0));
+	HR(SwapChain->ResizeBuffers(0, (UINT)InWidth, (UINT)InHeight, DXGI_FORMAT_UNKNOWN, 0));
 }
 
-IRHITexture2D* SDXGISwapChain::GetBuffer(int32 index)
+IRHITexture2D* SDXGISwapChain::GetBuffer(int32 Index)
 {
-	SD3D12Texture2D*& buf = _buffers[index];
+	SD3D12Texture2D*& Buf = Buffers[Index];
 
-	if (buf == nullptr)
+	if (Buf == nullptr)
 	{
-		ComPtr<ID3D12Resource> resource;
-		HR(_swapChain->GetBuffer((UINT)index, IID_PPV_ARGS(&resource)));
+		ComPtr<ID3D12Resource> Resource;
+		HR(SwapChain->GetBuffer((UINT)Index, IID_PPV_ARGS(&Resource)));
 
-#if defined(_DEBUG)
-		HR(resource->SetName(std::format(L"SwapChain Buffer[{}]", index).c_str()));
+#if DO_CHECK
+		HR(Resource->SetName(std::format(L"SwapChain Buffer[{}]", Index).c_str()));
 #endif
 
-		D3D12_RESOURCE_DESC source = resource->GetDesc();
+		D3D12_RESOURCE_DESC source = Resource->GetDesc();
 		RHITexture2DDesc dest =
 		{
 			.Width = (uint32)source.Width,
@@ -53,13 +55,13 @@ IRHITexture2D* SDXGISwapChain::GetBuffer(int32 index)
 			.InitialState = ERHIResourceStates::Present
 		};
 
-		buf = NewObject<SD3D12Texture2D>(_factory, _device, std::move(resource), ComPtr<ID3D12Resource>(), D3D12_PLACED_SUBRESOURCE_FOOTPRINT(), dest);
+		Buf = NewObject<SD3D12Texture2D>(Factory, Device, std::move(Resource), ComPtr<ID3D12Resource>(), D3D12_PLACED_SUBRESOURCE_FOOTPRINT(), dest);
 	}
 
-	return buf;
+	return Buf;
 }
 
 int32 SDXGISwapChain::GetCurrentBackBufferIndex()
 {
-	return (int32)_swapChain->GetCurrentBackBufferIndex();
+	return (int32)SwapChain->GetCurrentBackBufferIndex();
 }

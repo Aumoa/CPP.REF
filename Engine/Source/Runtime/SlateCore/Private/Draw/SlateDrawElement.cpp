@@ -45,7 +45,7 @@ SlateDrawElement& SlateDrawElement::MakeText(SlateWindowElementList& List, const
 
 	if (InLayout)
 	{
-		List.AddReferencedObject(InLayout->shared_from_this());
+		List.AddReferencedObject(InLayout);
 	}
 
 	return Element;
@@ -65,7 +65,7 @@ SlateDrawElement& SlateDrawElement::MakeShape(SlateWindowElementList& List, cons
 
 	if (InBrush.ImageSource)
 	{
-		List.AddReferencedObject(InBrush.ImageSource->shared_from_this());
+		List.AddReferencedObject(InBrush.ImageSource);
 	}
 
 	return Element;

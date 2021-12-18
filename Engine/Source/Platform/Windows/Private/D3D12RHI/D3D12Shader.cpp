@@ -2,7 +2,9 @@
 
 #include "D3D12Shader.h"
 
-SD3D12Shader::SD3D12Shader(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12RootSignature> rootSignature, ComPtr<ID3D12PipelineState> pipelineState) : Super(factory, device, nullptr)
+GENERATE_BODY(SD3D12Shader);
+
+SD3D12Shader::SD3D12Shader(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12RootSignature> rootSignature, ComPtr<ID3D12PipelineState> pipelineState) : Super(InFactory, InDevice, nullptr)
 	, _rootSignature(std::move(rootSignature))
 	, _pipelineState(std::move(pipelineState))
 {

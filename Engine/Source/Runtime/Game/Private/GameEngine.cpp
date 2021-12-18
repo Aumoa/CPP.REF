@@ -13,13 +13,11 @@
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 
+GENERATE_BODY(SGameEngine)
+
 SGameEngine* GEngine = nullptr;
 
 SGameEngine::SGameEngine() : Super()
-{
-}
-
-SGameEngine::~SGameEngine()
 {
 }
 
@@ -31,9 +29,9 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	SlateApplication->Init(InApplication);
 
 	InitializeSubsystems();
-	CoreDelegates::PostEngineInit.Invoke();
+	CoreDelegates::PostEngineInit.Broadcast();
 
-	SThread::GetCurrentThread()->SetFriendlyName(L"[Main Thread]");
+	Thread::GetCurrentThread()->SetFriendlyName(L"[Game Thread]");
 	return true;
 }
 
@@ -68,21 +66,18 @@ void SGameEngine::Shutdown()
 {
 	RenderThread::Shutdown();
 
-	if (SlateApplication)
-	{
-		DestroyObject(SlateApplication);
-		SlateApplication = nullptr;
-	}
-
 	for (auto& System : Subsystems)
 	{
 		System->Deinit();
 	}
+
+	Subsystems.clear();
+	SubsystemView.clear();
 }
 
 int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
-	CoreDelegates::BeginMainInvoked.Invoke();
+	CoreDelegates::BeginMainInvoked.Broadcast();
 
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine(InApplication))
@@ -96,7 +91,7 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstrin
 	{
 		return -1;
 	}
-	InApplication->SetTitle(GameInstance->GetApplicationName());
+	InApplication->SetTitle(ANSI_TO_WCHAR(SE_APPLICATION));
 
 	// Start application now!
 	InApplication->Idle.AddSObject(this, &SGameEngine::TickEngine);
@@ -131,9 +126,26 @@ void SGameEngine::InitializeSubsystems()
 			continue;
 		}
 
-		auto Instance = Cast<SGameEngineSubsystem>(Subclass->Instantiate(this));
+		auto Instance = Cast<SGameEngineSubsystem>(Subclass->Instantiate());
 		Instance->Init();
 		Subsystems.emplace_back(Instance);
+
+		Type* Class = Instance->GetType();
+		while (Class)
+		{
+			auto [It, bStatus] = SubsystemView.emplace(Class->GetHashCode(), Instance);
+			if (bStatus)
+			{
+				break;
+			}
+
+			Class = Class->GetSuper();
+		}
+	}
+
+	for (auto& Subsystem : Subsystems)
+	{
+		Subsystem->PostInit();
 	}
 }
 

@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
+GENERATE_BODY(APlayerCameraManager);
+
 APlayerCameraManager::APlayerCameraManager()
 {
 }

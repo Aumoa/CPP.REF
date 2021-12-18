@@ -6,14 +6,19 @@
 #include "D3D12DeviceChild.h"
 #include "RHI/IRHIDeviceContext2D.h"
 
+interface IRHIImage;
+
 class SD2D1DeviceContext : public SD3D12DeviceChild, implements IRHIDeviceContext2D
 {
 	GENERATED_BODY(SD2D1DeviceContext)
 
 private:
+	SPROPERTY(InteropDev)
 	ID3D11On12Device* InteropDev = nullptr;
+	SPROPERTY(Target)
+	IRHIImage* Target = nullptr;
+
 	ComPtr<ID2D1DeviceContext> DeviceContext;
-	std::weak_ptr<SObject> WeakTarget;
 
 public:
 	SD2D1DeviceContext(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1DeviceContext* InDeviceContext, ID3D11On12Device* InteropDevice);

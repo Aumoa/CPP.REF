@@ -16,7 +16,7 @@ private:
 	ID2D1Bitmap1* Bitmap = nullptr;
 
 public:
-	SD2D1Bitmap(SDXGIFactory* Factory, SD3D12Device* Device, ID2D1Bitmap1* Bitmap);
+	SD2D1Bitmap(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1Bitmap1* Bitmap);
 
 	virtual Vector2N GetSize() override;
 	

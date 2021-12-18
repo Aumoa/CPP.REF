@@ -30,6 +30,7 @@
 #include "IApplicationInterface.h"
 #include "Draw/SlateRenderer.h"
 
+GENERATE_BODY(SGameRenderSystem);
 DEFINE_LOG_CATEGORY(LogRender);
 
 SGameRenderSystem::SGameRenderSystem() : Super()
@@ -59,9 +60,9 @@ void SGameRenderSystem::Init()
 
 void SGameRenderSystem::Deinit()
 {
-	if (Factory && Device)
+	if (Device)
 	{
-		Factory->DestroyObject(Device);
+		Device->Dispose();
 		Device = nullptr;
 	}
 }

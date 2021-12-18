@@ -6,6 +6,8 @@
 #include "RHI/IRHIRenderTargetView.h"
 #include "RHI/IRHIBitmap.h"
 
+GENERATE_BODY(SColorRenderTarget);
+
 SColorRenderTarget::SColorRenderTarget(IRHIDevice* InDevice, const Vector2N& InitialViewportSize) : Super(InDevice, 1, false)
 	, Device(InDevice)
 {
@@ -26,18 +28,6 @@ IRHIBitmap* SColorRenderTarget::GetRenderBitmap()
 
 void SColorRenderTarget::SetViewportSize(const Vector2N& InViewportSize)
 {
-	if (RenderTarget)
-	{
-		DestroyObject(RenderTarget);
-		RenderTarget = nullptr;
-	}
-
-	if (RenderBitmap && RenderBitmap->GetOuter() == this)
-	{
-		DestroyObject(RenderBitmap);
-		RenderBitmap = nullptr;
-	}
-
 	RHITexture2DClearValue ClearValue;
 	ClearValue.Format = ERHIPixelFormat::B8G8R8A8_UNORM;
 	reinterpret_cast<Color&>(*ClearValue.ClearColor) = NamedColors::Transparent;
@@ -55,11 +45,8 @@ void SColorRenderTarget::SetViewportSize(const Vector2N& InViewportSize)
 	Desc.SampleDesc = { 4, 0 };
 
 	RenderTarget = Device->CreateTexture2D(Desc, nullptr);
-	RenderTarget->SetOuter(this);
 	GetRTV()->CreateRenderTargetView(0, RenderTarget, nullptr);
 
 	RenderBitmap = Device->CreateBitmapFromTexture2D(RenderTarget);
-	RenderBitmap->SetOuter(this);
-
 	bMultisampled = Desc.SampleDesc.Count != 1;
 }

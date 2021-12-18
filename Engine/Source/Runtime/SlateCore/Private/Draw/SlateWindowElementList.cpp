@@ -20,7 +20,7 @@ SlateDrawElement& SlateWindowElementList::AddUninitialized()
 	return Elements.emplace_back();
 }
 
-void SlateWindowElementList::AddReferencedObject(std::shared_ptr<SObject> LockObject)
+void SlateWindowElementList::AddReferencedObject(SharedPtr<SObject> LockObject)
 {
 	ReferencedObjects.emplace_back(LockObject);
 }

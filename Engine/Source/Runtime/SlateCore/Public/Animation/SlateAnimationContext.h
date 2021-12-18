@@ -13,17 +13,21 @@ class SLATECORE_API SSlateAnimationContext : implements SObject
 
 private:
 	std::wstring Name;
-	std::vector<SAnimationCurve*> AnimCurves;
 
+	SPROPERTY(AnimCurves)
+	std::vector<SAnimationCurve*> AnimCurves;
+	SPROPERTY(QueuedAnimCurves)
 	std::vector<SAnimationCurve*> QueuedAnimCurves;
+	SPROPERTY(PlayCurves)
 	std::vector<SAnimationCurve*> PlayCurves;
+
 	float ElapsedTime;
 	uint8 bCurveInit : 1 = false;
 
 public:
 	SSlateAnimationContext(std::wstring_view AnimationName);
 
-	virtual std::wstring ToString(std::wstring_view InFormatArgs) override;
+	virtual std::wstring ToString() override;
 	std::wstring GetName();
 
 	bool AddCurve(SAnimationCurve* Curve);

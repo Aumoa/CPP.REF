@@ -6,6 +6,8 @@
 #include "Level/Level.h"
 #include "Level/World.h"
 
+GENERATE_BODY(AGameMode);
+
 AGameMode::AGameMode() : Super()
 	, PlayerControllerClass(APlayerController::StaticClass())
 {

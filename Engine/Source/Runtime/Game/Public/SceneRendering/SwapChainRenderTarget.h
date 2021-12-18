@@ -17,8 +17,10 @@ public:
 	static constexpr int32 NumBuffers = 3;
 
 private:
+	SPROPERTY(SwapChain)
 	IRHISwapChain* SwapChain = nullptr;
-	IRHITexture2D* Buffers[NumBuffers] = {};
+	SPROPERTY(Buffers)
+	std::array<IRHITexture2D*, NumBuffers> Buffers = {};
 	int32 PixelWidth;
 	int32 PixelHeight;
 

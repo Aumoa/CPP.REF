@@ -2,14 +2,27 @@
 
 #include "DWriteFontCollection.h"
 
-SDWriteFontCollection::SDWriteFontCollection(SDXGIFactory* factory, ComPtr<IDWriteFontCollection> collection) : Super(factory)
-	, _collection(std::move(collection))
-{
-	uint32 count = _collection->GetFontFamilyCount();
-	_families.reserve(count);
+GENERATE_BODY(SDWriteFontCollection);
 
-	for (uint32 i = 0; i < count; ++i)
+SDWriteFontCollection::SDWriteFontCollection(SDXGIFactory* InFactory, ComPtr<IDWriteFontCollection> Collection) : Super(InFactory)
+	, Collection(std::move(Collection))
+{
+	uint32 Count = Collection->GetFontFamilyCount();
+	Families.reserve(Count);
+
+	for (uint32 i = 0; i < Count; ++i)
 	{
-		HR(_collection->GetFontFamily(i, &_families.emplace_back()));
+		HR(Collection->GetFontFamily(i, &Families.emplace_back()));
 	}
+}
+
+void SDWriteFontCollection::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		Collection.Reset();
+		Families.clear();
+	}
+
+	Super::Dispose(bDisposing);
 }

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Player.h"
-#include "SubclassOf.h"
 
 class APlayerController;
 class SViewport;
@@ -15,7 +14,8 @@ class GAME_API SLocalPlayer : public SPlayer
 	GENERATED_BODY(SLocalPlayer)
 
 private:
-	APlayerController* _PlayerController = nullptr;
+	SPROPERTY(PlayerController)
+	APlayerController* PlayerController = nullptr;
 
 public:
 	SLocalPlayer();

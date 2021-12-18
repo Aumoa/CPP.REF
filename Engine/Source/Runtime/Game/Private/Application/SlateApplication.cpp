@@ -15,6 +15,8 @@
 #include "Input/IPlatformKeyboard.h"
 #include "Input/IPlatformMouse.h"
 
+GENERATE_BODY(SSlateApplication);
+
 SSlateApplication::SSlateApplication() : Super()
 {
 }

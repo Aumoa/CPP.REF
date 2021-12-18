@@ -16,25 +16,31 @@ class SceneView;
 class SceneRenderTarget;
 class SceneStructuredBufferAllocator;
 
-class GAME_API SScene : implements SObject
+class GAME_API SScene : implements SObject, implements IDisposable
 {
 	GENERATED_BODY(SScene)
 
 private:
-	IRHIDevice* _Device = nullptr;
+	SPROPERTY(Device)
+	IRHIDevice* Device = nullptr;
+	bool bDisposed = false;
 
-	std::queue<int64> _PrimitiveIds;
-	std::vector<SPrimitiveComponent*> _PrimitiveComponents;
+	std::queue<int64> PrimitiveIds;
+	SPROPERTY(PrimitiveComponents)
+	std::vector<SPrimitiveComponent*> PrimitiveComponents;
 
-	IRHIBuffer* _ViewBuffer = nullptr;
-	std::vector<std::vector<uint8>> _ViewBufferSysMem;
-	size_t _NumViewBuffers;
-	uint64 _RequiredSize;
-	std::vector<uint8> _ViewBufferCachedMemory;
+	SPROPERTY(ViewBuffer)
+	IRHIBuffer* ViewBuffer = nullptr;
+	std::vector<std::vector<uint8>> ViewBufferSysMem;
+	size_t NumViewBuffers = 0;
+	uint64 RequiredSize = 0;
+	std::vector<uint8> ViewBufferCachedMemory;
 
 public:
 	SScene(IRHIDevice* InDevice);
 	~SScene() override;
+
+	virtual void Dispose();
 
 	bool AddPrimitive(SPrimitiveComponent* InPrimitive);
 	bool RemovePrimitive(SPrimitiveComponent* InPrimitive);

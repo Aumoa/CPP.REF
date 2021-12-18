@@ -11,17 +11,15 @@ class STickTaskLevelManager;
 /// <summary>
 /// Represents tick function that proceed on game engine.
 /// </summary>
-class GAME_API STickFunction : implements SObject
+class GAME_API TickFunction
 {
-	GENERATED_BODY(STickFunction)
-
 public:
 	struct InternalLevelData
 	{
 		STickTaskLevelManager* Level;
 
-		STickFunction* PrevPtr;
-		STickFunction* NextPtr;
+		TickFunction* PrevPtr;
+		TickFunction* NextPtr;
 		ETickingGroup ActualTickGroup;
 		double TickPriority;
 
@@ -38,10 +36,10 @@ public:
 
 	ETickingGroup TickGroup = ETickingGroup::PrePhysics;
 	float TickInterval = 0.0f;
-	std::vector<STickFunction*> Prerequisites;
+	std::vector<TickFunction*> Prerequisites;
 
 protected:
-	STickFunction()
+	TickFunction()
 	{
 	}
 

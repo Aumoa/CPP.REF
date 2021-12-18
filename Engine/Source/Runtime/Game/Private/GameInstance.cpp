@@ -7,6 +7,7 @@
 #include "EngineSubsystems/GameInstanceSubsystem.h"
 #include "Application/SlateApplication.h"
 
+GENERATE_BODY(SGameInstance);
 DEFINE_LOG_CATEGORY(LogGameInstance);
 
 SGameInstance::SGameInstance() : Super()
@@ -17,11 +18,6 @@ SGameInstance::SGameInstance() : Super()
 void SGameInstance::Init()
 {
 	InitSubsystemCollection();
-}
-
-std::wstring SGameInstance::GetApplicationName()
-{
-	return L"GameApp";
 }
 
 SLocalPlayer* SGameInstance::GetLocalPlayer()
@@ -77,8 +73,8 @@ void SGameInstance::InitSubsystemCollection()
 			continue;
 		}
 
-		auto Instance = Cast<SGameInstanceSubsystem>(Class->Instantiate(this));
-		Instance->Init();
+		auto Instance = Cast<SGameInstanceSubsystem>(Class->Instantiate());
+		Instance->Init(this);
 		Subsystems.emplace_back(Instance);
 	}
 }

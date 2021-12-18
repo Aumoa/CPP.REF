@@ -15,7 +15,7 @@ class SD3D12CommandQueue : public SD3D12CommandList
 private:
 	struct GC_Pending
 	{
-		std::vector<SObject*> Objects;
+		std::vector<SharedPtr<SObject>> Objects;
 		uint64 MarkedValue;
 	};
 
@@ -27,9 +27,9 @@ private:
 	std::queue<GC_Pending> _gc;
 
 public:
-	SD3D12CommandQueue(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence);
-	virtual ~SD3D12CommandQueue() override;
+	SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence);
 
+	using Super::Dispose;
 	virtual void End() override;
 	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal) override;
 
@@ -37,6 +37,9 @@ public:
 	uint64 GetCompletedValue();
 	void Collect();
 	void WaitCompleted();
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 
 public:
 	DECLARE_GETTER(ID3D12CommandQueue, _queue);

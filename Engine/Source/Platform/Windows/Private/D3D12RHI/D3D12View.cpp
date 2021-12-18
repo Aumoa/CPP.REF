@@ -4,48 +4,60 @@
 #include "D3D12Device.h"
 #include "D3D12Resource.h"
 
-SD3D12View::SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources, D3D12_DESCRIPTOR_HEAP_TYPE type) : Super(factory, device, heap.Get())
-	, _heap(std::move(heap))
-	, _resources(resources)
-{
-	_base = _heap->GetCPUDescriptorHandleForHeapStart();
+GENERATE_BODY(SD3D12View);
 
-	auto dev = _device->Get<ID3D12Device>();
-	_incrementSize = dev->GetDescriptorHandleIncrementSize(type);
+SD3D12View::SD3D12View(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12DescriptorHeap> Heap, size_t NumResources, D3D12_DESCRIPTOR_HEAP_TYPE HeapType)
+	: Super(InFactory, InDevice, Heap.Get())
+	, Heap(std::move(Heap))
+	, Resources(NumResources)
+{
+	Base = Heap->GetCPUDescriptorHandleForHeapStart();
+
+	auto Dev = Device->Get<ID3D12Device>();
+	IncrementSize = Dev->GetDescriptorHandleIncrementSize(HeapType);
 }
 
 int32 SD3D12View::GetViewCount()
 {
-	return (int32)_resources.size();
+	return (int32)Resources.size();
 }
 
-IRHIResource* SD3D12View::GetResource(int32 indexOf)
+IRHIResource* SD3D12View::GetResource(int32 IndexOf)
 {
-	if (_resources.size() <= indexOf)
+	if (Resources.size() <= IndexOf)
 	{
-		SE_LOG(LogWindows, Error, L"IndexOf is not valid. The number of resources that bound to this view is {}.", _resources.size());
+		SE_LOG(LogWindows, Error, L"IndexOf is not valid. The number of resources that bound to this view is {}.", Resources.size());
 		return nullptr;
 	}
 
-	if (auto ptr = _resources[indexOf].lock(); ptr)
+	IRHIResource* Resource = Resources[IndexOf];
+	if (Resource == nullptr)
 	{
-		return ptr.get();
+		SE_LOG(LogWindows, Warning, L"The resources that bound to index[{}] is disposed.", IndexOf);
 	}
-	else
-	{
-		SE_LOG(LogWindows, Warning, L"The resources that bound to index[{}] is expired.", indexOf);
-		return nullptr;
-	}
+
+	return Resource;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE SD3D12View::GetHandle(int32 indexOf)
+D3D12_CPU_DESCRIPTOR_HANDLE SD3D12View::GetHandle(int32 IndexOf)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = _base;
-	handle.ptr += (SIZE_T)_incrementSize * indexOf;
-	return handle;
+	D3D12_CPU_DESCRIPTOR_HANDLE Handle = Base;
+	Handle.ptr += (SIZE_T)IncrementSize * IndexOf;
+	return Handle;
 }
 
-void SD3D12View::AssignResource(int32 InIndexOf, IRHIResource* InResource)
+void SD3D12View::AssignResource(int32 IndexOf, IRHIResource* InResource)
 {
-	_resources[InIndexOf] = std::dynamic_pointer_cast<IRHIResource>(InResource->shared_from_this());
+	Resources[IndexOf] = InResource;
+}
+
+void SD3D12View::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		Heap.Reset();
+		Resources.clear();
+	}
+	
+	Super::Dispose(bDisposing);
 }

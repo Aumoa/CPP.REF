@@ -16,13 +16,16 @@ class SD3D12CommandList : public SD3D12DeviceChild, implements IRHIDeviceContext
 
 private:
 	ComPtr<ID3D12GraphicsCommandList> CommandList;
+	SPROPERTY(PendingObjects)
 	std::vector<SObject*> PendingObjects;
 
+	SPROPERTY(HeapForSRV)
 	SD3D12DescriptorHeap* HeapForSRV = nullptr;
+	SPROPERTY(HeapForSampler)
 	SD3D12DescriptorHeap* HeapForSampler = nullptr;
 
 public:
-	SD3D12CommandList(SDXGIFactory* factory, SD3D12Device* device);
+	SD3D12CommandList(SDXGIFactory* InFactory, SD3D12Device* InDevice);
 
 	virtual void Begin() override;
 	virtual void End() override;

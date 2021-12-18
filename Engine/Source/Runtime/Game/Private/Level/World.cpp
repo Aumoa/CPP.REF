@@ -12,24 +12,25 @@
 #include "Ticking/TickTaskLevelManager.h"
 #include "Application/SlateApplication.h"
 
+GENERATE_BODY(SWorld);
 DEFINE_LOG_CATEGORY(LogWorld);
 
 SWorld::SWorld(EWorldType InWorldType) : Super()
-	, _WorldType(InWorldType)
+	, WorldType(InWorldType)
 {
 }
 
 void SWorld::InitWorld()
 {
-	_Scene = NewObject<SScene>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
+	Scene = NewObject<SScene>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
 void SWorld::DestroyWorld()
 {
-	if (_Scene)
+	if (Scene)
 	{
-		DestroyObject(_Scene);
-		_Scene = nullptr;
+		Scene->Dispose();
+		Scene = nullptr;
 	}
 }
 
@@ -40,12 +41,12 @@ SWorld* SWorld::GetWorld()
 
 EWorldType SWorld::GetWorldType()
 {
-	return _WorldType;
+	return WorldType;
 }
 
 SScene* SWorld::GetScene()
 {
-	return _Scene;
+	return Scene;
 }
 
 SLocalPlayer* SWorld::GetLocalPlayer()
@@ -61,42 +62,40 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 		return nullptr;
 	}
 
-	if (_Level)
+	if (Level)
 	{
-		_Level->UnloadLevel();
-		DestroyObject(_Level);
+		Level->UnloadLevel();
 	}
 
-	_Level = InLevelToOpen.Instantiate(this);
-	if (!_Level->LoadLevel(this))
+	Level = Cast<SLevel>(InLevelToOpen->Instantiate());
+	if (!Level->LoadLevel(this))
 	{
 		SE_LOG(LogWorld, Fatal, L"Could not load level.");
-		DestroyObject(_Level);
 		return nullptr;
 	}
 
-	return _Level;
+	return Level;
 }
 
 SLevel* SWorld::GetLevel()
 {
-	return _Level;
+	return Level;
 }
 
 AActor* SWorld::SpawnActor(SubclassOf<AActor> InActorClass)
 {
-	return _Level->SpawnActor(InActorClass, false);
+	return Level->SpawnActor(InActorClass, false);
 }
 
 void SWorld::DestroyActor(AActor* InActor)
 {
-	_Level->DestroyActor(InActor);
+	Level->DestroyActor(InActor);
 }
 
 void SWorld::LevelTick(float InDeltaTime)
 {
-	_Level->IncrementalActorsApply();
-	if (STickTaskLevelManager* LevelTick = _Level->GetLevelTick())
+	Level->IncrementalActorsApply();
+	if (STickTaskLevelManager* LevelTick = Level->GetLevelTick())
 	{
 		LevelTick->BeginFrame();
 
@@ -104,7 +103,7 @@ void SWorld::LevelTick(float InDeltaTime)
 		LevelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, InDeltaTime);
 		LevelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, InDeltaTime);
 
-		if (APlayerController* PlayerController = _Level->GetPlayerController())
+		if (APlayerController* PlayerController = Level->GetPlayerController())
 		{
 			PlayerController->UpdateCameraManager(InDeltaTime);
 		}

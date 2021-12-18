@@ -8,13 +8,18 @@
 #include "RHI/RHIEnums.h"
 
 interface IRHITextLayout;
+interface IRHITextFormat;
 
 class SLATECORE_API STextBlock : public SLeafWidget
 {
 	GENERATED_BODY(STextBlock)
 
 private:
+	SPROPERTY(Layout)
 	IRHITextLayout* Layout = nullptr;
+	SPROPERTY(Format)
+	IRHITextFormat* Format = nullptr;
+
 	std::wstring Text;
 	SlateFont Font;
 	Color TintColor = NamedColors::Black;

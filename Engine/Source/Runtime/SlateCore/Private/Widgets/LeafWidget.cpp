@@ -3,6 +3,8 @@
 #include "Widgets/LeafWidget.h"
 #include "Layout/LayoutImpl.h"
 
+GENERATE_BODY(SLeafWidget);
+
 SLeafWidget::SLeafWidget() : Super()
 {
 }

@@ -5,34 +5,41 @@
 #include "D3D12Device.h"
 #include "IApplicationInterface.h"
 
-SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, const RHITexture2DDesc& desc) : Super(factory, device, resource, uploadHeap)
-	, _resource(std::move(resource))
-	, _uploadHeap(std::move(uploadHeap))
-	, _layout(layout)
-	, _desc(desc)
+GENERATE_BODY(SD3D12Texture2D);
+
+SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> Resource, ComPtr<ID3D12Resource> UploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& Layout, const RHITexture2DDesc& Desc) : Super(InFactory, InDevice, Resource, UploadHeap)
+	, Resource(std::move(Resource))
+	, UploadHeap(std::move(UploadHeap))
+	, Layout(Layout)
+	, Desc(Desc)
 {
-	if (_uploadHeap)
+	if (UploadHeap)
 	{
-		_totalBytes = _uploadHeap->GetDesc().Width;
+		TotalBytes = UploadHeap->GetDesc().Width;
 	}
 }
 
-void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* commandList, uint32 subresource, const RHISubresourceData* uploadData)
+RHITexture2DDesc SD3D12Texture2D::GetDesc()
 {
-	if (_totalBytes)
+	return Desc;
+}
+
+void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* CommandList, uint32 Subresource, const RHISubresourceData* UploadData)
+{
+	if (TotalBytes)
 	{
-		D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = _resource.Get();
-		barrier.Transition.StateBefore = (D3D12_RESOURCE_STATES)_desc.InitialState;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.Subresource = 0;
+		D3D12_RESOURCE_BARRIER Barrier = {};
+		Barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		Barrier.Transition.pResource = Resource.Get();
+		Barrier.Transition.StateBefore = (D3D12_RESOURCE_STATES)Desc.InitialState;
+		Barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+		Barrier.Transition.Subresource = 0;
 
-		commandList->ResourceBarrier(1, &barrier);
-		UpdateSubresource(commandList, _resource.Get(), _uploadHeap.Get(), subresource, _layout, _totalBytes, uploadData);
+		CommandList->ResourceBarrier(1, &Barrier);
+		UpdateSubresource(CommandList, Resource.Get(), UploadHeap.Get(), Subresource, Layout, TotalBytes, UploadData);
 
-		std::swap(barrier.Transition.StateBefore, barrier.Transition.StateAfter);
-		commandList->ResourceBarrier(1, &barrier);
+		std::swap(Barrier.Transition.StateBefore, Barrier.Transition.StateAfter);
+		CommandList->ResourceBarrier(1, &Barrier);
 	}
 	else
 	{
@@ -40,34 +47,45 @@ void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* commandList, uint32 s
 	}
 }
 
-void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* commandList, ID3D12Resource* textureBuf, ID3D12Resource* uploadBuf, uint32 subresource, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& layout, uint64 totalBytes, const RHISubresourceData* uploadData)
+void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* CommandList, ID3D12Resource* TextureBuf, ID3D12Resource* UploadBuf, uint32 Subresource, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& Layout, uint64 TotalBytes, const RHISubresourceData* UploadData)
 {
 	int8* pData;
-	HR(uploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
-	if (uploadData->SysMemPitch == layout.Footprint.RowPitch)
+	HR(UploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
+	if (UploadData->SysMemPitch == Layout.Footprint.RowPitch)
 	{
-		memcpy(pData, uploadData->pSysMem, (size_t)totalBytes);
+		memcpy(pData, UploadData->pSysMem, (size_t)TotalBytes);
 	}
 	else
 	{
-		const size_t pitch = (size_t)uploadData->SysMemPitch;
-		for (uint32 i = 0; i < layout.Footprint.Height; ++i)
+		const size_t pitch = (size_t)UploadData->SysMemPitch;
+		for (uint32 i = 0; i < Layout.Footprint.Height; ++i)
 		{
-			int8*		dst = pData + i * (size_t)layout.Footprint.RowPitch;
-			int8 const* src = reinterpret_cast<const int8*>(uploadData->pSysMem) + i * uploadData->SysMemPitch;
-			memcpy(dst, src, pitch);
+			int8* Dst = pData + i * (size_t)Layout.Footprint.RowPitch;
+			int8 const* Src = reinterpret_cast<const int8*>(UploadData->pSysMem) + i * UploadData->SysMemPitch;
+			memcpy(Dst, Src, pitch);
 		}
 	}
-	uploadBuf->Unmap(0, nullptr);
+	UploadBuf->Unmap(0, nullptr);
 
-	D3D12_TEXTURE_COPY_LOCATION dst = {};
-	dst.pResource = textureBuf;
-	dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-	dst.SubresourceIndex = subresource;
-	D3D12_TEXTURE_COPY_LOCATION src = {};
-	src.pResource = uploadBuf;
-	src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-	src.PlacedFootprint = layout;
+	D3D12_TEXTURE_COPY_LOCATION Dst = {};
+	Dst.pResource = TextureBuf;
+	Dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	Dst.SubresourceIndex = Subresource;
+	D3D12_TEXTURE_COPY_LOCATION Src = {};
+	Src.pResource = UploadBuf;
+	Src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	Src.PlacedFootprint = Layout;
 
-	commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+	CommandList->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);
+}
+
+void SD3D12Texture2D::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		Resource.Reset();
+		UploadHeap.Reset();
+	}
+
+	Super::Dispose(bDisposing);
 }

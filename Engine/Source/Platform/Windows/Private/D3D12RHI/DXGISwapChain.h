@@ -14,14 +14,15 @@ class SDXGISwapChain : public SD3D12DeviceChild, implements IRHISwapChain
 	GENERATED_BODY(SDXGISwapChain)
 
 private:
-	ComPtr<IDXGISwapChain4> _swapChain;
-	std::array<SD3D12Texture2D*, 3> _buffers = {};
+	ComPtr<IDXGISwapChain4> SwapChain;
+	SPROPERTY(Buffers)
+	std::array<SD3D12Texture2D*, 3> Buffers = {};
 
 public:
-	SDXGISwapChain(SDXGIFactory* factory, SD3D12Device* device, ComPtr<IDXGISwapChain4> swapChain);
+	SDXGISwapChain(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<IDXGISwapChain4> SwapChain);
 
 	virtual void Present(int32 vSyncLevel) override;
-	virtual void ResizeBuffers(int32 width, int32 height) override;
-	virtual IRHITexture2D* GetBuffer(int32 index) override;
+	virtual void ResizeBuffers(int32 InWidth, int32 InHeight) override;
+	virtual IRHITexture2D* GetBuffer(int32 Index) override;
 	virtual int32 GetCurrentBackBufferIndex() override;
 };

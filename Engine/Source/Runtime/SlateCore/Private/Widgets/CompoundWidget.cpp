@@ -5,6 +5,8 @@
 #include "Draw/PaintArgs.h"
 #include "Layout/ArrangedChildrens.h"
 
+GENERATE_BODY(SCompoundWidget);
+
 SCompoundWidget::SCompoundWidget() : Super()
 {
 }

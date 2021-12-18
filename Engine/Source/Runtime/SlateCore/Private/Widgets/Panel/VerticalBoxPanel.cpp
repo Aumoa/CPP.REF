@@ -2,6 +2,8 @@
 
 #include "Widgets/Panel/VerticalBoxPanel.h"
 
+GENERATE_BODY(SVerticalBoxPanel);
+
 SVerticalBoxPanel::SVerticalBoxPanel() : Super(EOrientation::Vertical)
 {
 }

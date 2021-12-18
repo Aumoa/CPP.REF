@@ -10,10 +10,14 @@ class GAME_API SGameInstanceSubsystem : implements SObject
 {
 	GENERATED_BODY(SGameInstanceSubsystem)
 
+private:
+	SPROPERTY(GameInstance)
+	SGameInstance* GameInstance = nullptr;
+
 public:
 	SGameInstanceSubsystem();
 	
-	virtual void Init() {}
+	virtual void Init(SGameInstance* GameInstance);
 	virtual void Deinit() {}
 
 	SGameInstance* GetGameInstance();

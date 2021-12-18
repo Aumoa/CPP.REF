@@ -10,9 +10,9 @@ ArrangedWidget::ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry)
 {
 }
 
-std::wstring ArrangedWidget::ToString(std::wstring_view InFormatArgs) const
+std::wstring ArrangedWidget::ToString() const
 {
-	return std::format(L"{} @ {}", Widget->ToString(InFormatArgs), MyGeometry.ToString(InFormatArgs));
+	return std::format(L"{} @ {}", Widget->ToString(), MyGeometry.ToString());
 }
 
 bool ArrangedWidget::operator ==(const ArrangedWidget& Rhs) const

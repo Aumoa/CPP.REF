@@ -17,7 +17,7 @@ private:
 	uint64 _totalBytes = 0;
 
 public:
-	SD3D12Buffer(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const RHIBufferDesc& desc);
+	SD3D12Buffer(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const RHIBufferDesc& desc);
 
 	virtual RHIBufferDesc GetDesc() override { return _desc; }
 

@@ -9,6 +9,8 @@
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
 
+GENERATE_BODY(SWindowsApplication);
+
 #define WM_UPDATETICKMODE		WM_APP + 1
 #define WM_PRESENT				WM_UPDATETICKMODE + 1
 
@@ -71,15 +73,15 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		EngineName = GameEngineModuleName;
 	}
 
-	SPlatformModule EngineModule(*EngineName);
-	auto Loader = EngineModule.GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
+	PlatformModule EngineModule(*EngineName);
+	auto Loader = EngineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
 	if (!Loader)
 	{
 		SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
 		return -1;
 	}
 
-	SGameModule* GameModule = Loader(&EngineModule);
+	SharedPtr<SGameModule> GameModule = Loader();
 	if (GameModule == nullptr)
 	{
 		SE_LOG(LogWindows, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
@@ -101,7 +103,9 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	}
 
 	// Cleanup GameEngineModule.
-	EngineModule.DestroyObject(GameModule);
+	GameModule = nullptr;
+	GC.Collect(true);
+
 	return ErrorCode;
 }
 
@@ -129,7 +133,7 @@ void SWindowsApplication::Start()
 			}
 			else
 			{
-				Idle.Invoke(ActualTickMode);
+				Idle.Broadcast(ActualTickMode);
 			}
 		}
 		else
@@ -140,7 +144,7 @@ void SWindowsApplication::Start()
 			}
 			TranslateMessage(&Msg);
 			DispatchMessageW(&Msg);
-			Idle.Invoke(ActualTickMode);
+			Idle.Broadcast(ActualTickMode);
 		}
 	}
 }
@@ -173,7 +177,7 @@ auto SWindowsApplication::GetTickMode() -> ETickMode
 
 void SWindowsApplication::AddRealtimeDemander(SObject* InObject)
 {
-	RealtimeDemanders.emplace_back(InObject->WeakFromThis());
+	RealtimeDemanders.emplace_back(InObject);
 	ShrinkRealtimeDemanders();
 	UpdateRealtimeDemanders();
 }
@@ -186,14 +190,13 @@ void SWindowsApplication::RemoveRealtimeDemander(SObject* InObject)
 	for (size_t i = 0; i < RealtimeDemanders.size(); ++i)
 	{
 		auto& Holder = RealtimeDemanders[i];
-		if (Holder.expired())
+		if (!Holder.IsValid())
 		{
 			CompactList.emplace_back(i);
 			continue;
 		}
 
-		auto Ptr = Holder.lock();
-		if (Ptr.get() == InObject)
+		if (Holder.Get() == InObject)
 		{
 			CompactList.emplace_back(i);
 			bFound = true;
@@ -283,7 +286,7 @@ void SWindowsApplication::ShrinkRealtimeDemanders()
 	for (size_t i = 0; i < RealtimeDemanders.size(); ++i)
 	{
 		auto& Holder = RealtimeDemanders[i];
-		if (Holder.expired())
+		if (!Holder.IsValid())
 		{
 			CompactList.emplace_back(i);
 			continue;
@@ -367,7 +370,7 @@ LRESULT CALLBACK SWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
 		SWindowsPlatformKeyboard::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	case WM_SIZE:
-		gApp->Sized.Invoke(Vector2N(LOWORD(lParam), HIWORD(lParam)));
+		gApp->Sized.Broadcast(Vector2N(LOWORD(lParam), HIWORD(lParam)));
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

@@ -2,6 +2,8 @@
 
 #include "Widgets/Panel/PanelWidget.h"
 
+GENERATE_BODY(SPanelWidget);
+
 SPanelWidget::SPanelWidget() : Super()
 {
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);

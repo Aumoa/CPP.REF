@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
+#include <filesystem>
 
 class SAssetsLoader;
 
@@ -13,14 +14,15 @@ class GAME_API SGameAssetSystem : public SGameEngineSubsystem
 
 private:
 	std::set<std::filesystem::path> AssetsToImport;
-	std::map<std::filesystem::path, std::weak_ptr<SObject>> Assets;
+	std::map<std::filesystem::path, WeakPtr<SObject>> Assets;
+	SPROPERTY(Assimp)
 	SAssetsLoader* Assimp = nullptr;
 
 public:
 	SGameAssetSystem();
 	virtual ~SGameAssetSystem() override;
 
-	virtual void Init() override;
+	virtual void PostInit() override;
 
 	SObject* LoadObject(const std::filesystem::path& AssetPath);
 

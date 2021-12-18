@@ -12,11 +12,14 @@ class SLATECORE_API SSlateAnimationPlayer : implements SObject
 	GENERATED_BODY(SSlateAnimationPlayer)
 
 private:
+	SPROPERTY(Outer)
+	SWidget* Outer = nullptr;
+
 	std::map<std::wstring, SSlateAnimationContext*, std::less<>> Animations;
 	std::vector<std::wstring> NotifyAnimFinished;
 
 public:
-	SSlateAnimationPlayer();
+	SSlateAnimationPlayer(SWidget* Outer);
 	virtual ~SSlateAnimationPlayer() override;
 
 	void Tick(float InDeltaTime);

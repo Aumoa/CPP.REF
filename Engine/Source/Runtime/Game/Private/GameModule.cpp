@@ -4,6 +4,8 @@
 #include "GameInstance.h"
 #include "GameEngine.h"
 
+GENERATE_BODY(SGameModule);
+
 SGameModule::SGameModule() : Super()
 {
 }

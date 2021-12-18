@@ -2,6 +2,7 @@
 
 #include "Components/SceneComponent.h"
 
+GENERATE_BODY(SSceneComponent);
 DEFINE_LOG_CATEGORY(LogSceneComponent);
 
 SSceneComponent::SSceneComponent() : Super()

@@ -10,6 +10,9 @@
 #include "Camera/CameraComponent.h"
 #include "Level/World.h"
 #include "GameFramework/LocalPlayer.h"
+#include "Components/SceneComponent.h"
+
+GENERATE_BODY(APlayerController);
 
 APlayerController::APlayerController() : Super()
 	, PlayerCameraManagerClass(APlayerCameraManager::StaticClass())

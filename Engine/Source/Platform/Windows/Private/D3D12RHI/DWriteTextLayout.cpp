@@ -4,7 +4,9 @@
 #include "D3D12Device.h"
 #include "D3D12CommandQueue.h"
 
-SDWriteTextLayout::SDWriteTextLayout(SDXGIFactory* factory, ComPtr<IDWriteTextLayout> layout) : Super(factory)
+GENERATE_BODY(SDWriteTextLayout);
+
+SDWriteTextLayout::SDWriteTextLayout(SDXGIFactory* InFactory, ComPtr<IDWriteTextLayout> layout) : Super(InFactory)
 	, Layout(std::move(layout))
 {
 }

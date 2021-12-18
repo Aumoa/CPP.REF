@@ -12,18 +12,23 @@ class SD3D12View : public SD3D12DeviceChild, implements IRHIView
 	GENERATED_BODY(SD3D12View)
 
 private:
-	ComPtr<ID3D12DescriptorHeap> _heap;
-	std::vector<std::weak_ptr<IRHIResource>> _resources;
+	ComPtr<ID3D12DescriptorHeap> Heap;
+	SPROPERTY(Resources)
+	std::vector<IRHIResource*> Resources;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE _base;
-	uint32 _incrementSize = 0;
+	D3D12_CPU_DESCRIPTOR_HANDLE Base;
+	uint32 IncrementSize = 0;
 
 public:
-	SD3D12View(SDXGIFactory* factory, SD3D12Device* device, ComPtr<ID3D12DescriptorHeap> heap, size_t resources, D3D12_DESCRIPTOR_HEAP_TYPE type);
+	SD3D12View(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12DescriptorHeap> Heap, size_t NumResources, D3D12_DESCRIPTOR_HEAP_TYPE HeapType);
 
+	using Super::Dispose;
 	virtual int32 GetViewCount() override;
-	virtual IRHIResource* GetResource(int32 indexOf) override;
+	virtual IRHIResource* GetResource(int32 IndexOf) override;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetHandle(int32 indexOf);
-	void AssignResource(int32 InIndexOf, IRHIResource* InResource);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetHandle(int32 IndexOf);
+	void AssignResource(int32 IndexOf, IRHIResource* InResource);
+
+protected:
+	virtual void Dispose(bool bDispsoing) override;
 };

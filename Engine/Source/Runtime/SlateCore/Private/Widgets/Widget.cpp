@@ -8,14 +8,21 @@
 #include "Animation/SlateAnimationPlayer.h"
 #include "Animation/SlateAnimationContext.h"
 
+GENERATE_BODY(SWidget);
+
 SWidget::SWidget() : Super()
 {
-    AnimPlayer = NewObject<SSlateAnimationPlayer>();
+    AnimPlayer = NewObject<SSlateAnimationPlayer>(this);
 }
 
-std::wstring SWidget::ToString(std::wstring_view InFormatArgs)
+std::wstring SWidget::ToString()
 {
-	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFriendlyName(), GetDesiredSize().ToString(InFormatArgs), SlateVisibilityExtensions::ToString(Visibility));
+	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), SlateVisibilityExtensions::ToString(Visibility));
+}
+
+std::wstring SWidget::GetName()
+{
+    return Name;
 }
 
 int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
@@ -36,18 +43,18 @@ void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
         const bool bHover = AllottedGeometry.IsUnderLocation(CachedMouseLocation);
         if (!bMouseHover && bHover)
         {
-            MouseHovered.Invoke(true);
+            MouseHovered.Broadcast(true);
             bMouseHover = true;
         }
         else if (bMouseHover && !bHover)
         {
-            MouseHovered.Invoke(false);
+            MouseHovered.Broadcast(false);
             bMouseHover = false;
         }
     }
     else if (bMouseHover)
     {
-        MouseHovered.Invoke(false);
+        MouseHovered.Broadcast(false);
         bMouseHover = false;
     }
 
@@ -117,6 +124,12 @@ bool SWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKey
     return false;
 }
 
+void SWidget::PostConstruction()
+{
+    Super::PostConstruction();
+    Name = GetType()->GenerateUniqueName();
+}
+
 bool SWidget::IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget& ArrangedChild)
 {
     // 1) We check if the rendered bounding box overlaps with the culling rect.  Which is so that
@@ -166,7 +179,7 @@ void SWidget::SetVisibility(ESlateVisibility InVisibility)
     if (InVisibility != Visibility)
     {
         Visibility = InVisibility;
-        VisibilityChanged.Invoke(InVisibility);
+        VisibilityChanged.Broadcast(InVisibility);
     }
 }
 
@@ -229,12 +242,7 @@ float SWidget::GetRenderOpacity()
 
 bool SWidget::PlayAnimation(SSlateAnimationContext* Animation)
 {
-    if (Animation->IsPlaying())
-    {
-        Animation = Animation->Clone();
-        Animation->SetOuter(this);
-    }
-
+    Animation = Animation->Clone();
     return AnimPlayer->AddAnimation(Animation);
 }
 

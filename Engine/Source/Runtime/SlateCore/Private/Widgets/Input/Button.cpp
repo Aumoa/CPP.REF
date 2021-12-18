@@ -3,6 +3,8 @@
 #include "Widgets/Input/Button.h"
 #include "Layout/ArrangedChildrens.h"
 
+GENERATE_BODY(SButton);
+
 SButton::SButton() : Super()
 {
 }
@@ -13,7 +15,7 @@ bool SButton::OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector
 	{
 		if (Button == InterruptButton && Event == CaughtEvent)
 		{
-			ButtonClicked.Invoke();
+			ButtonClicked.Broadcast();
 			return true;
 		}
 	}

@@ -14,6 +14,7 @@ class SDXGIFactory : implements SObject, implements IRHIFactory
 	GENERATED_BODY(SDXGIFactory)
 
 private:
+	SPROPERTY(App)
 	SWindowsApplication* App = nullptr;
 	ComPtr<IDXGIFactory4> _factory;
 	ComPtr<IDWriteFactory5> _writeFactory;
@@ -21,6 +22,9 @@ private:
 
 public:
 	SDXGIFactory(SWindowsApplication* App);
+	virtual ~SDXGIFactory() noexcept override;
+
+	virtual void Dispose() override;
 
 	virtual IApplicationInterface* GetApplication() override;
 	virtual IRHIAdapter* GetAdapter(int32 index) override;
@@ -29,6 +33,9 @@ public:
 	virtual IRHIFontCollection* CreateFontCollection(const std::filesystem::path& path) override;
 	virtual IRHITextFormat* CreateTextFormat(std::wstring_view fontFamilyName, IRHIFontCollection* fontCollection, ERHIFontWeight fontWeight, ERHIFontStyle fontStyle, ERHIFontStretch fontStretch, float fontSize, std::wstring_view localeName) override;
 	virtual IRHITextLayout* CreateTextLayout(IRHITextFormat* Format, std::wstring_view Text, const Vector2& Layout) override;
+
+protected:
+	virtual void Dispose(bool bDisposing);
 
 public:
 	DECLARE_GETTER(IDWriteFactory5, _writeFactory);

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
-#include "SubclassOf.h"
 #include "GameFramework/Actor.h"
 #include "Level/WorldType.h"
 
@@ -25,9 +24,11 @@ class GAME_API SWorld : public SGameObject
 	friend class ActorIterator;
 
 private:
-	SLevel* _Level = nullptr;
-	SScene* _Scene = nullptr;
-	EWorldType _WorldType;
+	SPROPERTY(Level)
+	SLevel* Level = nullptr;
+	SPROPERTY(Scene)
+	SScene* Scene = nullptr;
+	EWorldType WorldType;
 
 public:
 	/// <summary>

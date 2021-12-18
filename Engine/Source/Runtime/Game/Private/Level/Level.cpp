@@ -7,6 +7,8 @@
 #include "Info/GameMode.h"
 #include "Ticking/TickTaskLevelManager.h"
 
+GENERATE_BODY(SLevel);
+
 SLevel::SLevel() : Super()
 	, GameModeClass(AGameMode::StaticClass())
 {
@@ -20,15 +22,15 @@ bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick
 {
 	checkf(GameModeClass.IsValid(), L"GameModeClass does not specified.");
 
-	_World = InWorld;
+	World = InWorld;
 
-	_GameMode = Cast<AGameMode>(SpawnActor(GameModeClass));
-	_PlayerController = _GameMode->SpawnPlayerController();
+	GameMode = Cast<AGameMode>(SpawnActor(GameModeClass));
+	PlayerController = GameMode->SpawnPlayerController();
 
-	_LevelTick = InParentLevelTick;
-	if (_LevelTick == nullptr)
+	LevelTick = InParentLevelTick;
+	if (LevelTick == nullptr)
 	{
-		_LevelTick = NewObject<STickTaskLevelManager>();
+		LevelTick = NewObject<STickTaskLevelManager>(World);
 	}
 
 	OnLoadLevel();
@@ -55,13 +57,14 @@ AActor* SLevel::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncrement
 		return nullptr;
 	}
 
-	AActor* Actor = InActorClass.Instantiate(this);
+	AActor* Actor = Cast<AActor>(InActorClass->Instantiate());
 	if (Actor == nullptr)
 	{
 		SE_LOG(LogWorld, Error, L"Actor class does not support instantiate without any constructor arguments.");
 		return nullptr;
 	}
 
+	Actor->SetOuter(World);
 	if (bSpawnIncremental)
 	{
 		ActorsToAdd.emplace_back(Actor);
@@ -104,17 +107,17 @@ void SLevel::IncrementalActorsApply(size_t InLimit)
 
 APlayerController* SLevel::GetPlayerController()
 {
-	return _PlayerController;
+	return PlayerController;
 }
 
 SWorld* SLevel::GetWorld()
 {
-	return _World;
+	return World;
 }
 
 STickTaskLevelManager* SLevel::GetLevelTick()
 {
-	return _LevelTick;
+	return LevelTick;
 }
 
 void SLevel::InternalRemoveActor(AActor* InActor, bool bRemoveFromArray)
@@ -139,7 +142,7 @@ void SLevel::InternalRemoveActor(AActor* InActor, bool bRemoveFromArray)
 
 	if (InActor->PrimaryActorTick.IsTickFunctionRegistered())
 	{
-		_LevelTick->RemoveTickFunction(&InActor->PrimaryActorTick);
+		LevelTick->RemoveTickFunction(&InActor->PrimaryActorTick);
 	}
 
 	if (bRemoveFromArray)
@@ -155,7 +158,7 @@ void SLevel::InternalAddActor(AActor* InActor)
 
 	if (!InActor->PrimaryActorTick.IsTickFunctionRegistered())
 	{
-		_LevelTick->AddTickFunction(&InActor->PrimaryActorTick);
+		LevelTick->AddTickFunction(&InActor->PrimaryActorTick);
 	}
 
 	for (auto ActorComponent : InActor->GetOwnedComponents())

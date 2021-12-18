@@ -2,12 +2,13 @@
 
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
-#include "Misc/Paths.h"
 #include "LogGame.h"
 #include "GameEngine.h"
 #include "AssetsLoader.h"
 #include <stack>
 #include <queue>
+
+GENERATE_BODY(SGameAssetSystem);
 
 template<class T>
 inline static auto pop_get(std::stack<T>& container)
@@ -25,10 +26,9 @@ SGameAssetSystem::~SGameAssetSystem()
 {
 }
 
-void SGameAssetSystem::Init()
+void SGameAssetSystem::PostInit()
 {
 	Assimp = NewObject<SAssetsLoader>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
-	Assimp->SetOuter(this);
 
 	SearchDirectory(L"Content");
 	
@@ -50,7 +50,7 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 		return nullptr;
 	}
 
-	if (It->second.expired())
+	if (!It->second.IsValid())
 	{
 		SObject* ImportObject = nullptr;
 
@@ -70,11 +70,10 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 		}
 
 		// Outer will exchange to another object.
-		ImportObject->SetOuter(this);
-		It->second = ImportObject->WeakFromThis();
+		It->second = ImportObject;
 	}
 
-	return It->second.lock().get();
+	return It->second.Get();
 }
 
 void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirectory)
@@ -107,7 +106,7 @@ void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirect
 			{
 				if (Mypath.extension() == L".sasset")
 				{
-					Assets.emplace(Mypath.replace_extension(), std::weak_ptr<SObject>());
+					Assets.emplace(Mypath.replace_extension(), nullptr);
 				}
 				else
 				{
@@ -135,7 +134,7 @@ void SGameAssetSystem::ConvertNativeAssets()
 			continue;
 		}
 
-		Assets.emplace(ContentPath, std::weak_ptr<SObject>());
+		Assets.emplace(ContentPath, nullptr);
 	}
 
 	AssetsToImport.clear();

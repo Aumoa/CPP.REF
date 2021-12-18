@@ -2,6 +2,8 @@
 
 #include "D3D12ThreadAllocatorContainer.h"
 
+GENERATE_BODY(SD3D12ThreadAllocatorContainer);
+
 SD3D12ThreadAllocatorContainer::SD3D12ThreadAllocatorContainer(int64 threadId, ID3D12Device* device) : Super()
 	, _threadId(threadId)
 	, _device(device)

@@ -4,6 +4,8 @@
 #include "GameFramework/Controller.h"
 #include "LogGame.h"
 
+GENERATE_BODY(APawn);
+
 APawn::APawn() : Super()
 {
 }

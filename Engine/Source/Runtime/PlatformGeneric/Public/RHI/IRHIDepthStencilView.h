@@ -8,5 +8,5 @@
 
 interface IRHIDepthStencilView : implements IRHIView
 {
-	virtual void CreateDepthStencilView(int32 Index, std::shared_ptr<IRHIResource> Resource, const RHIDepthStencilViewDesc* pDesc) = 0;
+	virtual void CreateDepthStencilView(int32 index, IRHIResource* resource, const RHIDepthStencilViewDesc* desc) = 0;
 };

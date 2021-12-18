@@ -14,12 +14,10 @@ class GAME_API SActorComponent : public SGameObject
 	GENERATED_BODY(SActorComponent)
 
 private:
-	class SComponentTickFunction : public STickFunction
+	class SComponentTickFunction : public TickFunction
 	{
-		GENERATED_BODY(SComponentTickFunction)
-
 	private:
-		SActorComponent* _ComponentTarget = nullptr;
+		WeakPtr<SActorComponent> ComponentTarget;
 
 	public:
 		SComponentTickFunction(SActorComponent* InTarget);
@@ -33,11 +31,12 @@ protected:
 	SComponentTickFunction PrimaryComponentTick;
 
 private:
-	uint8 _bActive : 1 = true;
-	uint8 _bHasBegunPlay : 1 = false;
-	uint8 _bRegistered : 1 = false;
+	uint8 bActive : 1 = true;
+	uint8 bHasBegunPlay : 1 = false;
+	uint8 bRegistered : 1 = false;
 
-	AActor* _OwnerPrivate = nullptr;
+	SPROPERTY(OwnerPrivate)
+	AActor* OwnerPrivate = nullptr;
 
 public:
 	SActorComponent();
@@ -52,8 +51,8 @@ public:
 
 	void SetActive(bool bActive);
 	void MarkOwner();
-	inline bool IsActive() { return _bActive; }
-	inline bool HasBegunPlay() { return _bHasBegunPlay; }
+	inline bool IsActive() { return bActive; }
+	inline bool HasBegunPlay() { return bHasBegunPlay; }
 
 	DECLARE_MULTICAST_EVENT(ActivatedEvent);
 	ActivatedEvent Activated;

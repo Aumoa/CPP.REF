@@ -10,9 +10,9 @@ class AActor;
 
 class ActorIterator
 {
-	SWorld* _MyWorld;
-	SLevel* _CurrentLevel;
-	int32 _CurrentIdx;
+	SWorld* MyWorld;
+	SLevel* CurrentLevel;
+	int32 CurrentIdx;
 
 public:
 	ActorIterator(SWorld* InWorld);

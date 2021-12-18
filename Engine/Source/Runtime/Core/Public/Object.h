@@ -58,15 +58,15 @@ public:
 	SObject();
 	virtual ~SObject() noexcept;
 
+	void AddToRoot();
+	void RemoveFromRoot();
+
 private:
 	SObject(const SObject&) = delete;
 	SObject(SObject&&) = delete;
 
 	void MarkGC(uint64 Generation);
 	void UnmarkGC();
-
-	void AddToRoot();
-	void RemoveFromRoot();
 
 public:
 	virtual std::wstring ToString();
@@ -79,7 +79,7 @@ public:
 	static T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
 		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
-		Ptr->PostConstruction();
+		((SObject*)Ptr)->PostConstruction();
 		return Ptr;
 	}
 

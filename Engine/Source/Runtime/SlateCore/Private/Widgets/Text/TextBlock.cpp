@@ -9,6 +9,8 @@
 #include "IApplicationInterface.h"
 #include "RenderThread.h"
 
+GENERATE_BODY(STextBlock);
+
 STextBlock::STextBlock() : Super()
 {
 }
@@ -122,24 +124,19 @@ int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometr
 
 void STextBlock::ReallocLayout()
 {
-	if (Layout)
-	{
-		DestroyObject(Layout);
-		Layout = nullptr;
-	}
+	Layout = nullptr;
+	Format = nullptr;
 
 	if (!Text.empty() && !Font.FamilyName.empty() && Font.Size > 0.1f)
 	{
 		IRHIFactory* Factory = IApplicationInterface::Get().GetFactory();
-		IRHITextFormat* Format = Factory->CreateTextFormat(Font.FamilyName, Font.Collection, ERHIFontWeight::Normal, ERHIFontStyle::Normal, ERHIFontStretch::Normal, Font.Size, L"ko-KR");
+		Format = Factory->CreateTextFormat(Font.FamilyName, Font.Collection, ERHIFontWeight::Normal, ERHIFontStyle::Normal, ERHIFontStretch::Normal, Font.Size, L"ko-KR");
 
 		Vector2 LocalSize = Vector2(1048576.0f, 1048576.0f);
 		Layout = Factory->CreateTextLayout(Format, Text, LocalSize);
-		Format->SetOuter(Layout);
 		CachedLocalMaxSize = LocalSize;
 		CachedDesiredSize = Layout->GetDesiredSize();
 
-		Layout->SetOuter(this);
 		bNeedToReallocateLayout = false;
 
 		Layout->SetTextAlignment(TextAlignment);

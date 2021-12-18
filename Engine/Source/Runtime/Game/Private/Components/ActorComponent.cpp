@@ -7,22 +7,27 @@
 #include "Level/Level.h"
 #include "Ticking/TickTaskLevelManager.h"
 
-SActorComponent::SComponentTickFunction::SComponentTickFunction(SActorComponent* InTarget) : Super()
-	, _ComponentTarget(InTarget)
+GENERATE_BODY(SActorComponent);
+
+SActorComponent::SComponentTickFunction::SComponentTickFunction(SActorComponent* InTarget)
+	: ComponentTarget(InTarget)
 {
 }
 
 void SActorComponent::SComponentTickFunction::ExecuteTick(float InDeltaTime)
 {
-	if (_ComponentTarget->HasBegunPlay() && _ComponentTarget->IsActive())
+	SActorComponent* Resolved = ComponentTarget.Get();
+	checkf(Resolved, L"Component target is disposed.");
+
+	if (Resolved->HasBegunPlay() && Resolved->IsActive())
 	{
-		_ComponentTarget->TickComponent(InDeltaTime, this);
+		Resolved->TickComponent(InDeltaTime, this);
 	}
 }
 
 SActorComponent* SActorComponent::SComponentTickFunction::GetTarget() const
 {
-	return _ComponentTarget;
+	return ComponentTarget.Get();
 }
 
 SActorComponent::SActorComponent() : Super()
@@ -62,22 +67,22 @@ SWorld* SActorComponent::GetWorld()
 
 AActor* SActorComponent::GetOwner()
 {
-	return _OwnerPrivate;
+	return OwnerPrivate;
 }
 
 void SActorComponent::SetActive(bool bActive)
 {
-	if (_bActive != bActive)
+	if (bActive != bActive)
 	{
-		_bActive = bActive;
+		bActive = bActive;
 		PrimaryComponentTick.SetTickFunctionEnable(bActive);
-		if (_bActive)
+		if (bActive)
 		{
-			Activated.Invoke();
+			Activated.Broadcast();
 		}
 		else
 		{
-			Inactivated.Invoke();
+			Inactivated.Broadcast();
 		}
 	}
 }
@@ -87,15 +92,15 @@ void SActorComponent::MarkOwner()
 	SObject* Outer = GetOuter();
 	if (auto* IsActor = Cast<AActor>(Outer); IsActor)
 	{
-		_OwnerPrivate = IsActor;
+		OwnerPrivate = IsActor;
 	}
 	else if (auto* IsComponent = Cast<SActorComponent>(Outer); IsComponent)
 	{
-		_OwnerPrivate = IsComponent->GetOwner();
+		OwnerPrivate = IsComponent->GetOwner();
 	}
 	else
 	{
-		_OwnerPrivate = nullptr;
+		OwnerPrivate = nullptr;
 	}
 }
 
@@ -127,26 +132,26 @@ void SActorComponent::RegisterComponentWithWorld(SWorld* InWorld)
 		}
 	}
 
-	_bRegistered = true;
+	bRegistered = true;
 }
 
 void SActorComponent::UnregisterComponent()
 {
 	DispatchEndPlay();
 
-	if (_bRegistered)
+	if (bRegistered)
 	{
 		SWorld* World = GetWorld();
 		SLevel* Level = World->GetLevel();
 		RegisterAllTickFunctions(Level, false);
 	}
 
-	_bRegistered = false;
+	bRegistered = false;
 }
 
 bool SActorComponent::IsRegistered()
 {
-	return _bRegistered;
+	return bRegistered;
 }
 
 void SActorComponent::DispatchBeginPlay()
@@ -167,12 +172,12 @@ void SActorComponent::DispatchEndPlay()
 
 void SActorComponent::BeginPlay()
 {
-	_bHasBegunPlay = true;
+	bHasBegunPlay = true;
 }
 
 void SActorComponent::EndPlay()
 {
-	_bHasBegunPlay = false;
+	bHasBegunPlay = false;
 }
 
 void SActorComponent::RegisterAllTickFunctions(SLevel* InLevel, bool bRegister)

@@ -3,6 +3,8 @@
 #include "StaticMesh/StaticMesh.h"
 #include "LogAssetsIO.h"
 
+GENERATE_BODY(SStaticMesh);
+
 SStaticMesh::SStaticMesh() : Super()
 {
 }

@@ -74,8 +74,7 @@ IRHISolidColorBrush* SlateRenderer::GetTintBrush(const Color& TintColor, float R
 {
 	if (TintBrush == nullptr)
 	{
-		TintBrush = std::dynamic_pointer_cast<IRHISolidColorBrush>(CommandList->GetDevice()->CreateSolidColorBrush(TintColor, RenderOpacity)->shared_from_this());
-		TintBrush->SetOuter(nullptr);
+		TintBrush = CommandList->GetDevice()->CreateSolidColorBrush(TintColor, RenderOpacity);
 	}
 	else
 	{
@@ -83,5 +82,5 @@ IRHISolidColorBrush* SlateRenderer::GetTintBrush(const Color& TintColor, float R
 		TintBrush->SetOpacity(RenderOpacity);
 	}
 
-	return TintBrush.get();
+	return TintBrush.Get();
 }

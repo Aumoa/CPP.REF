@@ -15,7 +15,7 @@ class SLATECORE_API ArrangedWidget
 public:
 	ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry);
 
-	std::wstring ToString(std::wstring_view InFormatArgs = L"") const;
+	std::wstring ToString() const;
 
 	SWidget* GetWidget() const { return Widget; }
 	const Geometry& GetGeometry() const { return MyGeometry; }

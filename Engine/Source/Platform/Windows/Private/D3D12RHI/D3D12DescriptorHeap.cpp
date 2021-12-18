@@ -2,6 +2,8 @@
 
 #include "D3D12DescriptorHeap.h"
 
+GENERATE_BODY(SD3D12DescriptorHeap);
+
 SD3D12DescriptorHeap::SD3D12DescriptorHeap(ID3D12Device* device, int32 count) : Super()
 	, _device(device)
 	, _count(count)

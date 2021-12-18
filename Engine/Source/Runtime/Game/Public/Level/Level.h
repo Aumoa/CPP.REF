@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SubclassOf.h"
 #include "World.h"
 
 class SWorld;
@@ -12,9 +11,6 @@ class AGameMode;
 class APlayerController;
 class AActor;
 
-/// <summary>
-/// Represents actor placement unit.
-/// </summary>
 class GAME_API SLevel : implements SObject
 {
 	GENERATED_BODY(SLevel)
@@ -23,21 +19,25 @@ public:
 	SubclassOf<AGameMode> GameModeClass;
 
 private:
-	SWorld* _World = nullptr;
-	STickTaskLevelManager* _LevelTick = nullptr;
+	SPROPERTY(World)
+	SWorld* World = nullptr;
+	SPROPERTY(LevelTick)
+	STickTaskLevelManager* LevelTick = nullptr;
 
-	AGameMode* _GameMode = nullptr;
-	APlayerController* _PlayerController = nullptr;
+	SPROPERTY(GameMode)
+	AGameMode* GameMode = nullptr;
+	SPROPERTY(PlayerController)
+	APlayerController* PlayerController = nullptr;
 
 public:
+	SPROPERTY(Actors)
 	std::vector<AActor*> Actors;
+	SPROPERTY(ActorsToAdd)
 	std::vector<AActor*> ActorsToAdd;
+	SPROPERTY(ActorsToRemove)
 	std::vector<AActor*> ActorsToRemove;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="SLevel"/> instance.
-	/// </summary>
 	SLevel();
 	~SLevel();
 

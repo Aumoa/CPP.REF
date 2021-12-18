@@ -15,7 +15,7 @@ private:
 	ComPtr<IDXGIAdapter1> _adapter;
 
 public:
-	SDXGIAdapter(SDXGIFactory* factory, ComPtr<IDXGIAdapter1> adapter);
+	SDXGIAdapter(SDXGIFactory* InFactory, ComPtr<IDXGIAdapter1> adapter);
 
 	inline IDXGIAdapter1* GetAdapter() { return _adapter.Get(); }
 };

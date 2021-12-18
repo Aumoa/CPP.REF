@@ -8,12 +8,12 @@
 #include "RHI/IRHISwapChain.h"
 #include "IApplicationInterface.h"
 
+GENERATE_BODY(SSwapChainRenderTarget);
+
 SSwapChainRenderTarget::SSwapChainRenderTarget(IRHIFactory* InFactory, IRHIDevice* InDevice) : Super()
 {
 	SwapChain = InFactory->CreateSwapChain(InDevice);
-	SwapChain->SetOuter(this);
 	RTV = InDevice->CreateRenderTargetView(NumBuffers);
-	RTV->SetOuter(this);
 
 	const auto [Width, Height] = IApplicationInterface::Get().GetViewportSize();
 	ReadyBuffers(Width, Height);

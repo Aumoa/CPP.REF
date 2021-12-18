@@ -3,33 +3,35 @@
 #include "Ticking/TickTaskLevelManager.h"
 #include "Level/World.h"
 
+GENERATE_BODY(STickTaskLevelManager);
 DEFINE_LOG_CATEGORY(LogLevelTick);
 
-void STickTaskLevelManager::TickGroupHeader::AddTickFunction(STickFunction* InFunction)
+void STickTaskLevelManager::TickGroupHeader::AddTickFunction(TickFunction* InFunction)
 {
 	Functions.emplace(InFunction);
 }
 
-void STickTaskLevelManager::TickGroupHeader::RemoveTickFunction(STickFunction* InFunction)
+void STickTaskLevelManager::TickGroupHeader::RemoveTickFunction(TickFunction* InFunction)
 {
 	Functions.erase(InFunction);
 }
 
-STickTaskLevelManager::STickTaskLevelManager() : Super()
+STickTaskLevelManager::STickTaskLevelManager(SWorld* InWorld) : Super()
+	, World(InWorld)
 {
 	// Initialize tick group headers.
-	for (size_t i = 0; i < _TickGroups.size(); ++i)
+	for (size_t i = 0; i < TickGroups.size(); ++i)
 	{
-		_TickGroups[i].TickGroup = (ETickingGroup)i;
+		TickGroups[i].TickGroup = (ETickingGroup)i;
 	}
 }
 
 SWorld* STickTaskLevelManager::GetWorld()
 {
-	return Cast<SWorld>(GetOuter());
+	return World;
 }
 
-void STickTaskLevelManager::AddTickFunction(STickFunction* InFunction)
+void STickTaskLevelManager::AddTickFunction(TickFunction* InFunction)
 {
 	if (InFunction->bCanEverTick)
 	{
@@ -37,7 +39,7 @@ void STickTaskLevelManager::AddTickFunction(STickFunction* InFunction)
 		InFunction->SetTickFunctionEnable(bEnabled);
 
 		// Initialize internal data.
-		auto* InternalData = (InFunction->InternalData = std::make_unique<STickFunction::InternalLevelData>()).get();
+		auto* InternalData = (InFunction->InternalData = std::make_unique<TickFunction::InternalLevelData>()).get();
 		InternalData->Level = this;
 
 		InternalData->PrevPtr = nullptr;
@@ -48,37 +50,37 @@ void STickTaskLevelManager::AddTickFunction(STickFunction* InFunction)
 		InternalData->Interval = InFunction->TickInterval;
 		InternalData->bTickExecuted = false;
 
-		TickGroupHeader& Header = _TickGroups[(int32)InFunction->TickGroup];
+		TickGroupHeader& Header = TickGroups[(int32)InFunction->TickGroup];
 		Header.AddTickFunction(InFunction);
 	}
 }
 
-void STickTaskLevelManager::RemoveTickFunction(STickFunction* InFunction)
+void STickTaskLevelManager::RemoveTickFunction(TickFunction* InFunction)
 {
-	TickGroupHeader& Header = _TickGroups[(int32)InFunction->TickGroup];
+	TickGroupHeader& Header = TickGroups[(int32)InFunction->TickGroup];
 	Header.RemoveTickFunction(InFunction);
 }
 
 void STickTaskLevelManager::BeginFrame()
 {
 	// Initialize frame.
-	_FrameHead = nullptr;
+	FrameHead = nullptr;
 
 	// Sort by tick ordering.
-	STickFunction* Tail = nullptr;
+	TickFunction* Tail = nullptr;
 	double PriorityCounter = 0;
-	for (auto& Group : _TickGroups)
+	for (auto& Group : TickGroups)
 	{
 		for (auto& Function : Group.Functions)
 		{
 			if (Function->IsTickFunctionEnabled())
 			{
-				if (_FrameHead == nullptr)
+				if (FrameHead == nullptr)
 				{
-					_FrameHead = Function;
+					FrameHead = Function;
 				}
 
-				STickFunction::InternalLevelData* InternalData = Function->InternalData.get();
+				TickFunction::InternalLevelData* InternalData = Function->InternalData.get();
 
 				if (Tail)
 				{
@@ -89,7 +91,7 @@ void STickTaskLevelManager::BeginFrame()
 				}
 				else
 				{
-					Tail = _FrameHead;
+					Tail = FrameHead;
 					Tail->InternalData->PrevPtr = nullptr;
 					Tail->InternalData->NextPtr = nullptr;
 				}
@@ -103,10 +105,10 @@ void STickTaskLevelManager::BeginFrame()
 	}
 
 	// Make dependencies.
-	for (auto Head = _FrameHead; Head != nullptr;)
+	for (auto Head = FrameHead; Head != nullptr;)
 	{
 		double MaximumPriority = Head->InternalData->TickPriority;
-		STickFunction* MaximumDependency = nullptr;
+		TickFunction* MaximumDependency = nullptr;
 		for (auto& Dependency : Head->Prerequisites)
 		{
 			if (Dependency->IsTickFunctionRegistered() && Dependency->IsTickFunctionEnabled())
@@ -139,9 +141,9 @@ void STickTaskLevelManager::BeginFrame()
 			InternalHead->PrevPtr = MaximumDependency;
 			InternalMax->NextPtr = Head;
 
-			if (Head == _FrameHead)
+			if (Head == FrameHead)
 			{
-				_FrameHead = MaximumDependency;
+				FrameHead = MaximumDependency;
 			}
 
 			if (InternalHead->ActualTickGroup != InternalMax->ActualTickGroup)
@@ -168,18 +170,18 @@ void STickTaskLevelManager::BeginFrame()
 
 void STickTaskLevelManager::IncrementalDispatchTick(ETickingGroup InTickGroup, float InDeltaTime)
 {
-	for (; _FrameHead && _FrameHead->InternalData->ActualTickGroup == InTickGroup; _FrameHead = _FrameHead->InternalData->NextPtr)
+	for (; FrameHead && FrameHead->InternalData->ActualTickGroup == InTickGroup; FrameHead = FrameHead->InternalData->NextPtr)
 	{
-		if (_FrameHead->IsTickFunctionEnabled())
+		if (FrameHead->IsTickFunctionEnabled())
 		{
-			auto* InternalData = _FrameHead->InternalData.get();
+			auto* InternalData = FrameHead->InternalData.get();
 			InternalData->Interval -= InDeltaTime;
 
 			if (InternalData->Interval <= 0.0f)
 			{
-				_FrameHead->ExecuteTick(InDeltaTime);
+				FrameHead->ExecuteTick(InDeltaTime);
 				InternalData->bTickExecuted = true;
-				InternalData->Interval += _FrameHead->TickInterval;
+				InternalData->Interval += FrameHead->TickInterval;
 			}
 		}
 	}

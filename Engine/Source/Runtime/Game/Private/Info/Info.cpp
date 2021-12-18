@@ -2,6 +2,8 @@
 
 #include "Info/Info.h"
 
+GENERATE_BODY(AInfo);
+
 AInfo::AInfo() : Super()
 {
 }
