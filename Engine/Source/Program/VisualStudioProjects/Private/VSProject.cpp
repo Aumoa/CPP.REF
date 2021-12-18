@@ -20,6 +20,8 @@ std::string SVSProject::GetTypeString(ProjectBuildMetadata::EType Type)
 		return "Application";
 	default:
 		return "DynamicLibrary";
+	case ProjectBuildMetadata::EType::Vcpkg:
+		return "Utility";
 	}
 }
 
