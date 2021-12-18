@@ -1,2 +1,2 @@
 @echo off
-Binaries\SolutionGenerator.exe --Solution "Engine.xml"
+Binaries\VisualStudioGenerator.exe --Solution "Engine.xml"

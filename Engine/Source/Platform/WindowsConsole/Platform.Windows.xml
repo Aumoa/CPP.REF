@@ -8,4 +8,5 @@
         <Item Name="Console"/>
         <Item Name="WindowsCommon"/>
     </ReferencedProjects>
+	<TargetName>$(SolutionName)</TargetName>
 </ProjectInfo>

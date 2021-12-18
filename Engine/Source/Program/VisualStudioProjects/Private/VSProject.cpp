@@ -258,7 +258,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			{
 				NewElement(PropertyGroup, "ConfigurationType", GetTypeString(RuntimeData.Metadata->Type));
 				NewElement(PropertyGroup, "UseDebugLibraries", BoolStr(Config.bUseDebugLibrary));
-				NewElement(PropertyGroup, "PlatformToolset", "v142");
+				NewElement(PropertyGroup, "PlatformToolset", PlatformToolsets[gVSVersion]);
 				NewElement(PropertyGroup, "WholeProgramOptimization", BoolStr(DoubleBit(Config.bWholeProgramOptimization, RuntimeData.Metadata->bEngine)));
 				NewElement(PropertyGroup, "CharacterSet", "Unicode");
 				NewElement(PropertyGroup, "EnableUnitySupport", "true");
@@ -285,6 +285,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 				NewElement(PropertyGroup, "LinkIncremental", BoolStr(DoubleBit(Config.bLinkIncremental, RuntimeData.Metadata->bEngine)));
 				NewElement(PropertyGroup, "OutDir", "$(SolutionDir)Build\\");
 				NewElement(PropertyGroup, "IntDir", "$(SolutionDir)Intermediate\\$(Configuration)\\$(ProjectName)\\");
+				NewElement(PropertyGroup, "TargetName", WCHAR_TO_ANSI(RuntimeData.Metadata->TargetName));
 			}
 		}
 
@@ -336,19 +337,20 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 
 			for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 			{
-				if (IncludeItem.path().extension() == ".cpp" || IncludeItem.path().extension() == ".ixx")
+				std::string Ext = IncludeItem.path().extension().string();
+				if (Ext == ".cpp" || Ext == ".ixx" || Ext == ".c")
 				{
 					NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
 				}
-				else if (IncludeItem.path().extension() == ".h" || IncludeItem.path().extension() == ".inl")
+				else if (Ext == ".h" || Ext == ".inl")
 				{
 					NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
 				}
-				else if (IncludeItem.path().extension() == ".xml")
+				else if (Ext == ".xml")
 				{
 					NewElementItemInclude(ItemGroup, "Xml", IncludeItem.path().string());
 				}
-				else if (IncludeItem.path().extension() == ".natvis")
+				else if (Ext == ".natvis")
 				{
 					NewElementItemInclude(ItemGroup, "Natvis", IncludeItem.path().string());
 				}
@@ -434,19 +436,20 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 			{
 				XMLElement* InnerItem = nullptr;
-				if (IncludeItem.path().extension() == ".cpp" || IncludeItem.path().extension() == ".ixx")
+				std::string Ext = IncludeItem.path().extension().string();
+				if (Ext == ".cpp" || Ext == ".ixx" || Ext == ".c")
 				{
 					InnerItem = NewElementItemInclude(ItemGroup, "ClCompile", IncludeItem.path().string());
 				}
-				else if (IncludeItem.path().extension() == ".h" || IncludeItem.path().extension() == ".inl")
+				else if (Ext == ".h" || Ext == ".inl")
 				{
 					InnerItem = NewElementItemInclude(ItemGroup, "ClInclude", IncludeItem.path().string());
 				}
-				else if (IncludeItem.path().extension() == ".xml")
+				else if (Ext == ".xml")
 				{
 					InnerItem = NewElementItemInclude(ItemGroup, "Xml", IncludeItem.path().string());
 				}
-				else if (IncludeItem.path().extension() == ".natvis")
+				else if (Ext == ".natvis")
 				{
 					InnerItem = NewElementItemInclude(ItemGroup, "Natvis", IncludeItem.path().string());
 				}

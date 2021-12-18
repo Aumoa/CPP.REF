@@ -329,6 +329,15 @@ bool SSolution::TryParseProject(const std::filesystem::path& XmlPath, ProjectBui
 			}
 		}
 
+		if (XMLElement* TargetName = ProjectInfo->FirstChildElement("TargetName"))
+		{
+			OutBuild.TargetName = ANSI_TO_WCHAR(TargetName->GetText());
+		}
+		else
+		{
+			OutBuild.TargetName = L"$(ProjectName)";
+		}
+
 		if (bNeedToSave)
 		{
 			Doc.SaveFile(WCHAR_TO_ANSI(XmlPath.wstring()).c_str());

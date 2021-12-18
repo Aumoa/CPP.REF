@@ -31,6 +31,7 @@ struct ProjectBuildMetadata
 	EType Type;
 	Guid ProjectGuid;
 	bool bEngine = false;
+	std::wstring TargetName;
 
 	std::wstring Command;
 	std::wstring CommandArgs;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IProject.h"
+#include "VisualStudioVersion.h"
 
 interface IProjectGenerator;
 class SVSSolution;
@@ -17,6 +18,13 @@ namespace tinyxml2
 class SVSProject : implements SObject, implements IProject
 {
 	GENERATED_BODY(SVSProject)
+
+private:
+	std::map<EVisualStudioVersion, std::string> PlatformToolsets =
+	{
+		{ EVisualStudioVersion::VS2019, "v142" },
+		{ EVisualStudioVersion::VS2022, "v143" }
+	};
 
 private:
 	static std::string GetTypeString(ProjectBuildMetadata::EType Type);

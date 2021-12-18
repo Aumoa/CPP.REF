@@ -14,7 +14,7 @@ int32 SVSProjectsModule::Run(const SCommandLine& CommandArgs)
 	size_t Idx = CommandArgs.GetArgument(L"--Solution");
 	if (Idx == -1)
 	{
-		FatalAndDisplay(L"--Solution argument required.");
+		ErrorAndDisplay(L"--Solution argument required.");
 		return -1;
 	}
 
