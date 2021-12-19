@@ -6,7 +6,7 @@
 #include "Diagnostics/LogSystem.h"
 #include "Misc/TickCalc.h"
 #include "Threading/Parallel.h"
-#include "GC/GarbageCollector.h"
+#include "GC/GC.h"
 
 GENERATE_BODY(SObject);
 

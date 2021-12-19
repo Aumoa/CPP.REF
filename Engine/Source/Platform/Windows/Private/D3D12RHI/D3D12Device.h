@@ -37,6 +37,7 @@ private:
 	std::map<int64, SD3D12ThreadDescriptorHeapContainer*> _threadSamplerHeaps;
 	
 	uint64 _fenceValue = 0;
+	SPROPERTY(_immCon)
 	SD3D12CommandQueue* _immCon = nullptr;
 
 public:

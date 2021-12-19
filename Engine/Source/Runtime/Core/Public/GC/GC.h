@@ -48,11 +48,15 @@ public:
 	struct ObjectPool
 	{
 		std::vector<SObject*> Collection;
-		std::vector<size_t> PoolReserve;
+		std::vector<size_t> IndexPool;
+		size_t IndexPoolSize = 0;
+		size_t NumPoolCompact = 0;
 
-		size_t size();
-		SObject*& emplace(SObject* InObject);
-		void erase(SObject* InObject);
+		size_t NumObjects();
+		SObject*& Emplace(SObject* InObject);
+		void Remove(SObject* InObject);
+
+		void CompactIndexTable(size_t LiveIndex, std::vector<SObject*>& PendingKill);
 	};
 
 private:
@@ -79,7 +83,7 @@ private:
 
 private:
 	// lock-free buffers.
-	static constexpr size_t NumGCThreads = 1;
+	static constexpr size_t NumGCThreads = 16;
 	std::vector<std::future<void>> GCThreadFutures;
 	std::vector<int32> GCMarkingBuffer;
 	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers = { };
@@ -108,7 +112,7 @@ public:
 	void Hint();
 	void TriggerCollect();
 
-	size_t NumThreadObjects();
+	size_t NumObjects();
 	void SetAutoFlushInterval(float InSeconds);
 	float GetAutoFlushInterval();
 	void SetLogVerbosity(EGCLogVerbosity Verbosity);

@@ -46,54 +46,55 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 
 int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
+	int32 ErrorCode;
+
 	auto Logger = std::make_unique<LogModule>(ANSI_TO_WCHAR(SE_APPLICATION));
 	Logger->RunTask();
 
-	GC.Init();
-
-	SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
-	std::optional<std::wstring_view> ModuleName;
-	size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
-	if (GameModuleIdx != -1)
 	{
-		ModuleName = CommandArgs->GetArgument(GameModuleIdx + 1);
-		if (!ModuleName)
+		GC.Init();
+
+		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
+		std::optional<std::wstring_view> ModuleName;
+		size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
+		if (GameModuleIdx != -1)
 		{
-			SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
+			ModuleName = CommandArgs->GetArgument(GameModuleIdx + 1);
+			if (!ModuleName)
+			{
+				SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
+				return -1;
+			}
+		}
+		else
+		{
+			ModuleName = ANSI_TO_WCHAR(SE_APPLICATION_TARGET);
+		}
+
+		std::optional<std::wstring> EngineName;
+		if (size_t EngineModuleIdx = CommandArgs->GetArgument(L"--EngineDll"); EngineModuleIdx != -1)
+		{
+			EngineName = CommandArgs->GetArgument(EngineModuleIdx + 1);
+		}
+
+		if (!EngineName.has_value())
+		{
+#if defined(_DEBUG) && 0
+			constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
+#else
+			constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
+#endif
+			EngineName = GameEngineModuleName;
+		}
+
+		PlatformModule EngineModule(*EngineName);
+		auto Loader = EngineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
+		if (!Loader)
+		{
+			SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
 			return -1;
 		}
-	}
-	else
-	{
-		ModuleName = ANSI_TO_WCHAR(SE_APPLICATION_TARGET);
-	}
 
-	std::optional<std::wstring> EngineName;
-	if (size_t EngineModuleIdx = CommandArgs->GetArgument(L"--EngineDll"); EngineModuleIdx != -1)
-	{
-		EngineName = CommandArgs->GetArgument(EngineModuleIdx + 1);
-	}
-
-	if (!EngineName.has_value())
-	{
-#if defined(_DEBUG) && 0
-		constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
-#else
-		constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
-#endif
-		EngineName = GameEngineModuleName;
-	}
-
-	PlatformModule EngineModule(*EngineName);
-	auto Loader = EngineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
-	if (!Loader)
-	{
-		SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
-		return -1;
-	}
-
-	int32 ErrorCode;
-	{
 		SharedPtr<SGameModule> GameModule = Loader();
 		if (GameModule == nullptr)
 		{

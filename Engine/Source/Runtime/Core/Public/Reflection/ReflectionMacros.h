@@ -98,7 +98,7 @@ private:
 																							\
 	inline static Type* StaticClass()														\
 	{																						\
-		static Type MyClassType(Type::TypeGenerator<This>(FriendlyName, L ## #Interface));	\
+		static Type MyClassType(Type::TypeGenerator<Interface>(FriendlyName, L ## #Interface));\
 		return &MyClassType;																\
 	}																						\
 																							\

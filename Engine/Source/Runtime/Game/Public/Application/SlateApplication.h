@@ -18,8 +18,11 @@ class GAME_API SSlateApplication : implements SObject
 	GENERATED_BODY(SSlateApplication)
 
 private:
+	SPROPERTY(LocalPlayer)
 	SLocalPlayer* LocalPlayer = nullptr;
+	SPROPERTY(CoreWindow)
 	SWindow* CoreWindow = nullptr;
+	SPROPERTY(DeviceContext)
 	IRHIDeviceContext* DeviceContext = nullptr;
 
 	std::shared_ptr<SlateWindowElementList> SlateElements;

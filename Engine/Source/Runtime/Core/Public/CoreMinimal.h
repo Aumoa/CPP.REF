@@ -15,7 +15,7 @@
 #include "NonCopyable.h"
 #include "Guid.h"
 #include "IDisposable.h"
-#include "GC/GarbageCollector.h"
+#include "GC/GC.h"
 #include "GC/SharedPtr.h"
 #include "GC/WeakPtr.h"
 #include "Reflection/ReflectionMacros.h"

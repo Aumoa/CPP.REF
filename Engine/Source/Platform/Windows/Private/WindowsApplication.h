@@ -34,10 +34,6 @@ private:
 
 public:
 	SWindowsApplication(HINSTANCE hInstance);
-	~SWindowsApplication()
-	{
-		CoreAssert::DebugBreak();
-	}
 
 	static int32 GuardedMain(std::span<const std::wstring> Argv);
 

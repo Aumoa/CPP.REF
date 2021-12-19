@@ -11,7 +11,7 @@
 #include "Concepts/CoreConcepts.h"
 #include "Method.h"
 #include "Property.h"
-#include "GC/GarbageCollector.h"
+#include "GC/GC.h"
 #include "Misc/StringUtils.h"
 
 class SObject;

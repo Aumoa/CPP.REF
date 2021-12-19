@@ -1,6 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "GC/GarbageCollector.h"
+#include "GC/GC.h"
 #include "Misc/TickCalc.h"
 #include "Threading/Thread.h"
 #include "Threading/Parallel.h"
@@ -9,6 +9,11 @@
 
 namespace std
 {
+	[[nodiscard]] auto size(GarbageCollector::ObjectPool& Pool)
+	{
+		return Pool.NumObjects();
+	}
+
 	[[nodiscard]] auto begin(GarbageCollector::ObjectPool& Pool)
 	{
 		return Pool.Collection.begin();
@@ -56,43 +61,68 @@ public:
 	}
 };
 
-size_t GarbageCollector::ObjectPool::size()
+size_t GarbageCollector::ObjectPool::NumObjects()
 {
-	return Collection.size() - PoolReserve.size();
+	return Collection.size() - (IndexPoolSize - NumPoolCompact);
 }
 
-SObject*& GarbageCollector::ObjectPool::emplace(SObject* InObject)
+SObject*& GarbageCollector::ObjectPool::Emplace(SObject* InObject)
 {
 	check(InObject->InternalIndex == -1);
 
-	if (PoolReserve.size())
+	if (IndexPoolSize)
 	{
-		auto It = PoolReserve.end() - 1;
-		size_t Idx = *It;
-		PoolReserve.erase(It);
-
-		// If else, object size is compacted by GC.
-		if (Idx < Collection.size())
-		{
-			SObject*& Ref = Collection[Idx] = InObject;
-			InObject->InternalIndex = Idx;
-			return Ref;
-		}
+		size_t Index = IndexPool[--IndexPoolSize];
+		SObject*& Ref = Collection[Index] = InObject;
+		InObject->InternalIndex = Index;
+		return Ref;
 	}
 
 	size_t Idx = Collection.size();
 	SObject*& Ref = Collection.emplace_back(InObject);
+	IndexPool.emplace_back();
 	InObject->InternalIndex = Idx;
 	return Ref;
 }
 
-void GarbageCollector::ObjectPool::erase(SObject* InObject)
+void GarbageCollector::ObjectPool::Remove(SObject* InObject)
 {
 	if (InObject->InternalIndex != -1)
 	{
+		size_t Index = InObject->InternalIndex;
 		Collection[InObject->InternalIndex] = nullptr;
-		PoolReserve.emplace_back(InObject->InternalIndex);
+		IndexPool[IndexPoolSize++] = Index;
 		InObject->InternalIndex = -1;
+	}
+}
+
+void GarbageCollector::ObjectPool::CompactIndexTable(size_t LiveIndex, std::vector<SObject*>& PendingKill)
+{
+	for (SObject*& Object : PendingKill)
+	{
+		IndexPool[IndexPoolSize++] = Object->InternalIndex;
+	}
+
+	NumPoolCompact += Collection.size() - (LiveIndex + 1);
+	Collection.resize(LiveIndex + 1);
+
+	if (Collection.size())
+	{
+		size_t BackIterator = Collection.size() - 1;
+		while (IndexPoolSize && Collection[BackIterator] && BackIterator != -1)
+		{
+			size_t Index = IndexPool[--IndexPoolSize];
+			if (Index >= Collection.size())
+			{
+				NumPoolCompact -= 1;
+				continue;
+			}
+
+			Collection[BackIterator]->InternalIndex = Index;
+			std::swap(Collection[Index], Collection[BackIterator--]);
+		}
+
+		Collection.resize(BackIterator + 1);
 	}
 }
 
@@ -106,14 +136,14 @@ GarbageCollector::~GarbageCollector()
 void GarbageCollector::RegisterObject(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
-	Objects.emplace(Object);
+	Objects.Emplace(Object);
 	Object->Generation = Generation;
 }
 
 void GarbageCollector::UnregisterObject(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
-	Objects.erase(Object);
+	Objects.Remove(Object);
 }
 
 void GarbageCollector::Init()
@@ -122,6 +152,8 @@ void GarbageCollector::Init()
 
 void GarbageCollector::Shutdown(bool bNormal)
 {
+	std::unique_lock GCMtx_lock(GCMtx);
+
 	if (DeleteAction.valid())
 	{
 		DeleteAction.get();
@@ -139,7 +171,7 @@ void GarbageCollector::Shutdown(bool bNormal)
 	}
 
 	Objects.Collection.clear();
-	Objects.PoolReserve.clear();
+	Objects.IndexPool.clear();
 	Roots.clear();
 }
 
@@ -210,7 +242,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 		++Generation;
 	}
 
-	ScopedTimer Timer(std::format(L"Start GC {}, with {} objects, with {} size table.", Generation, Objects.size(), Objects.Collection.size()), EGCLogVerbosity::Minimal);
+	ScopedTimer Timer(std::format(L"Start GC {}, with {} objects, with {} size table.", Generation, Objects.NumObjects(), Objects.Collection.size()), EGCLogVerbosity::Minimal);
 
 	{
 		ScopedTimer Timer(L"  Mark");
@@ -278,7 +310,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 		// Ready pending kill buffer.
 		std::atomic<size_t> ActualPendingKill = 0;
 		std::vector<size_t> ObjectCompactIndex(NumGCThreads);
-		PendingKill.resize(Objects.size());
+		PendingKill.resize(Objects.NumObjects());
 
 		// Sweeping.
 		Parallel::ForEach(ActualCollectionSize, [&](size_t ThreadIdx, size_t StartIdx, size_t EndIdx)
@@ -291,6 +323,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 				{
 					PendingKill[ActualPendingKill++] = Object;
 					Object->UnmarkGC();
+					Objects.Collection[Object->InternalIndex] = nullptr;
 				}
 				else
 				{
@@ -318,29 +351,13 @@ void GarbageCollector::Collect(bool bFullPurge)
 		ScopedTimer Timer(L"  Compact object table.");
 
 		size_t BeforeCompact = Objects.Collection.size();
-		while (Objects.PoolReserve.size())
-		{
-			SObject* Object = Objects.Collection[LastObjectIndex];
-			if (Object == nullptr)
-			{
-				break;
-			}
-
-			auto It = Objects.PoolReserve.end() - 1;
-			size_t Idx = *It;
-			Objects.PoolReserve.erase(It);
-
-			std::swap(Objects.Collection[Idx], Objects.Collection[LastObjectIndex--]);
-			Objects.Collection[Idx]->InternalIndex = Idx;
-		}
-
+		Objects.CompactIndexTable(LastObjectIndex, PendingKill);
 		size_t AfterCompact = Objects.Collection.size();
+
 		if (Verbosity >= EGCLogVerbosity::VeryVerbose)
 		{
 			SE_LOG(LogGC, Verbose, L"  Compact GC objects table: {} -> {}, {} discounts.", BeforeCompact, AfterCompact, BeforeCompact - AfterCompact);
 		}
-
-		Objects.Collection.resize(LastObjectIndex + 1);
 	}
 
 	if (Verbosity >= EGCLogVerbosity::VeryVerbose)
@@ -394,9 +411,9 @@ void GarbageCollector::TriggerCollect()
 	bGCTriggered = true;
 }
 
-size_t GarbageCollector::NumThreadObjects()
+size_t GarbageCollector::NumObjects()
 {
-	return Objects.size();
+	return Objects.NumObjects();
 }
 
 void GarbageCollector::SetAutoFlushInterval(float InSeconds)

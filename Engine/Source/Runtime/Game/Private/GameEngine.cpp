@@ -74,7 +74,6 @@ void SGameEngine::Shutdown()
 	GC.SuppressFinalize(GameInstance);
 	GC.SuppressFinalize(SlateApplication);
 	GC.Collect(true);
-	GC.Collect(true);
 
 	Subsystems.clear();
 	SubsystemView.clear();

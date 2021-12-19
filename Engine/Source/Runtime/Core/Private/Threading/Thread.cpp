@@ -5,7 +5,7 @@
 
 #include "Threading/Thread.h"
 #include "Misc/StringUtils.h"
-#include "GC/GarbageCollector.h"
+#include "GC/GC.h"
 
 Thread::Thread()
 {
