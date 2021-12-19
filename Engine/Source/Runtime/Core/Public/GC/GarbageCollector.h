@@ -9,6 +9,7 @@
 #include <mutex>
 #include <future>
 #include <array>
+#include <condition_variable>
 
 class SObject;
 class GarbageCollector;
@@ -24,6 +25,13 @@ enum class EGCLogVerbosity
 	VeryVerbose,
 };
 
+enum class EGCThreadMode
+{
+	Manual,
+	SpecifiedThreadHint,
+	Auto,
+};
+
 class CORE_API GarbageCollector
 {
 public:
@@ -36,7 +44,7 @@ public:
 	friend class Thread;
 	friend class Type;
 
-private:
+public:
 	struct ObjectPool
 	{
 		std::vector<SObject*> Collection;
@@ -45,10 +53,11 @@ private:
 		size_t size();
 		SObject*& emplace(SObject* InObject);
 		void erase(SObject* InObject);
-
-		[[nodiscard]] auto begin() { return Collection.begin(); }
-		[[nodiscard]] auto end() { return Collection.end(); }
 	};
+
+private:
+	EGCLogVerbosity Verbosity = EGCLogVerbosity::Minimal;
+	EGCThreadMode ThreadMode = EGCThreadMode::Auto;
 
 	std::mutex GCMtx;
 
@@ -62,16 +71,18 @@ private:
 	std::set<Thread*> LogicThreads;
 
 	float AutoFlushInterval = 60.0f;
-	std::atomic<bool> bManualGCTriggered;
+	std::atomic<bool> bGCTriggered;
 	std::atomic<bool> bLock;
+
+	std::future<void> GCThread;
+	std::atomic<bool> bRunningGCThread;
 
 private:
 	// lock-free buffers.
 	static constexpr size_t NumGCThreads = 14;
 	std::vector<std::future<void>> GCThreadFutures;
 	std::vector<int32> GCMarkingBuffer;
-	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers;
-	EGCLogVerbosity Verbosity;
+	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers = { };
 
 private:
 	GarbageCollector() = default;
@@ -85,10 +96,17 @@ public:
 	void Init();
 	void Shutdown(bool bNormal);
 
+	void RunAutoThread();
+	void StopAutoThread();
+
 public:
 	void Tick(float InDeltaSeconds);
 	void Collect(bool bFullPurge = false);
 	void SuppressFinalize(SObject* Object);
+
+	void SetThreadMode(EGCThreadMode ThreadMode);
+	void Hint();
+	void TriggerCollect();
 
 	size_t NumThreadObjects();
 	void SetAutoFlushInterval(float InSeconds);

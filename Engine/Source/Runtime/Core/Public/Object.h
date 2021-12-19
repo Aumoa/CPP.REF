@@ -38,14 +38,13 @@ class CORE_API SObject : public SObject_Details::SObjectBase
 private:
 	struct WeakReferencePtr
 	{
-		std::atomic<bool> bMarkAtGC = false;
 		std::atomic<bool> bDisposed = false;
 		std::atomic<int32> References = 0;
 		std::atomic<int32> WeakReferences = 0;
 
 		inline bool IsValid() const volatile
 		{
-			return !bDisposed && (bMarkAtGC || References != 0);
+			return !bDisposed;
 		}
 	};
 

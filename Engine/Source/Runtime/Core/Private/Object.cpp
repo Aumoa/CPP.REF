@@ -27,7 +27,7 @@ SObject::~SObject()
 
 void SObject::UnmarkGC()
 {
-	ReferencePtr->bMarkAtGC = false;
+	ReferencePtr->bDisposed = true;
 }
 
 void SObject::AddToRoot()
@@ -41,7 +41,6 @@ void SObject::MarkGC(uint64 Generation)
 	{
 		this->Generation = Generation;
 	}
-	this->ReferencePtr->bMarkAtGC = true;
 }
 
 void SObject::RemoveFromRoot()

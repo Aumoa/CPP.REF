@@ -19,6 +19,8 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	auto Logger = std::make_unique<LogModule>(ANSI_TO_WCHAR(SE_APPLICATION));
 	Logger->RunTask();
 
+	GC.Init();
+
 	{
 		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
 
@@ -59,22 +61,9 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			MainThread->SetFriendlyName(L"[Main Thread]");
 			GC.RegisterThread(MainThread);
 
-			std::atomic<bool> bRunningGCThread = true;
-			auto GCThread = Thread::NewThread<void>(L"[GC Thread]", [&]()
-			{
-				while (bRunningGCThread)
-				{
-					using namespace std::literals;
-
-					GC.Tick(1.0f);
-					std::this_thread::sleep_for(1s);
-				}
-			});
-
+			GC.RunAutoThread();
 			ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
-
-			bRunningGCThread = false;
-			GCThread.get();
+			GC.StopAutoThread();
 
 			SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
 		}

@@ -8,6 +8,7 @@
 #include "Multimedia/WindowsImage.h"
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
+#include "Diagnostics/LogModule.h"
 
 GENERATE_BODY(SWindowsApplication);
 
@@ -42,6 +43,11 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 
 int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
+	auto Logger = std::make_unique<LogModule>(ANSI_TO_WCHAR(SE_APPLICATION));
+	Logger->RunTask();
+
+	GC.Init();
+
 	SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
 	std::optional<std::wstring_view> ModuleName;
 	size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
@@ -97,6 +103,8 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		return -1;
 	}
 
+	GC.RunAutoThread();
+
 	SWindowsApplication WinApp(GetModuleHandleW(nullptr));
 	int32 ErrorCode = GameEngine->GuardedMain(&WinApp, *ModuleName);
 	if (ErrorCode != 0)
@@ -104,10 +112,15 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
 	}
 
+	GC.StopAutoThread();
+
 	// Cleanup GameEngineModule.
 	GameModule = nullptr;
-	GC.Collect(true);
 
+	GC.Collect(true);
+	GC.Shutdown(true);
+
+	Logger->Shutdown();
 	return ErrorCode;
 }
 

@@ -7,6 +7,19 @@
 #include "Object.h"
 #include <string>
 
+namespace std
+{
+	[[nodiscard]] auto begin(GarbageCollector::ObjectPool& Pool)
+	{
+		return Pool.Collection.begin();
+	}
+
+	[[nodiscard]] auto end(GarbageCollector::ObjectPool& Pool)
+	{
+		return Pool.Collection.end();
+	}
+}
+
 class GarbageCollector::Instantiate
 {
 public:
@@ -130,16 +143,53 @@ void GarbageCollector::Shutdown(bool bNormal)
 	Roots.clear();
 }
 
+void GarbageCollector::RunAutoThread()
+{
+	GC.bRunningGCThread = true;
+
+	auto GCThread = Thread::NewThread<void>(L"[GC Thread]", [&]()
+	{
+		while (GC.bRunningGCThread)
+		{
+			using namespace std::literals;
+
+			GC.Tick(1.0f);
+			std::this_thread::sleep_for(1s);
+		}
+	});
+}
+
+void GarbageCollector::StopAutoThread()
+{
+	if (GCThread.valid())
+	{
+		GC.bRunningGCThread = false;
+		GCThread.get();
+	}
+}
+
 void GarbageCollector::Tick(float InDeltaSeconds)
 {
 	static bool bInitialized = (Init(), true);
 	static float IncrementalTime = 0;
 
-	IncrementalTime += InDeltaSeconds;
-	if (IncrementalTime >= AutoFlushInterval || bManualGCTriggered)
+	if (ThreadMode == EGCThreadMode::Manual)
 	{
-		bManualGCTriggered = false;
-		Collect();
+		return;
+	}
+
+	IncrementalTime += InDeltaSeconds;
+	if (IncrementalTime >= AutoFlushInterval)
+	{
+		if (ThreadMode == EGCThreadMode::Auto)
+		{
+			bGCTriggered = false;
+			Collect();
+		}
+		else
+		{
+			bGCTriggered = true;
+		}
 
 		IncrementalTime -= AutoFlushInterval;
 	}
@@ -261,7 +311,6 @@ void GarbageCollector::Collect(bool bFullPurge)
 				LastObjectIndex = Index;
 			}
 		}
-
 	}
 
 	// Swap-compact one item.
@@ -321,6 +370,11 @@ void GarbageCollector::Collect(bool bFullPurge)
 		PendingKill.clear();
 	});
 
+	if (bFullPurge)
+	{
+		DeleteAction.get();
+	}
+
 	++Generation;
 }
 
@@ -329,6 +383,24 @@ void GarbageCollector::SuppressFinalize(SObject* Object)
 	std::unique_lock GCMtx_lock(GCMtx);
 
 	PendingFinalize.emplace(Object);
+}
+
+void GarbageCollector::SetThreadMode(EGCThreadMode ThreadMode)
+{
+	this->ThreadMode = ThreadMode;
+}
+
+void GarbageCollector::Hint()
+{
+	if (ThreadMode == EGCThreadMode::SpecifiedThreadHint && bGCTriggered)
+	{
+		Collect();
+	}
+}
+
+void GarbageCollector::TriggerCollect()
+{
+	bGCTriggered = true;
 }
 
 size_t GarbageCollector::NumThreadObjects()
@@ -375,7 +447,7 @@ void GarbageCollector::Unlock()
 
 bool GarbageCollector::IsMarked(SObject* Object)
 {
-	return Object->Generation == Generation && Object->ReferencePtr->bMarkAtGC;
+	return Object->Generation == Generation;
 }
 
 int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth)

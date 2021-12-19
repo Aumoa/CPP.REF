@@ -10,7 +10,7 @@ void Property::SetObject(SObject* InThis, SObject* AssignValue) const
 
 SObject* Property::GetObject(SObject* InThis)
 {
-	uint8* Ptr = reinterpret_cast<uint8*>(GetValue<intptr_t>(InThis));
+	uint8* Ptr = reinterpret_cast<uint8*>(GetValue<uint64>(InThis));
 
 	if (!PtrOff.has_value() && Ptr)
 	{
