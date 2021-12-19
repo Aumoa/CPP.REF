@@ -14,11 +14,13 @@ class GAME_API SLocalPlayer : public SPlayer
 	GENERATED_BODY(SLocalPlayer)
 
 private:
+	SPROPERTY(SlateApp)
+	SSlateApplication* SlateApp = nullptr;
 	SPROPERTY(PlayerController)
 	APlayerController* PlayerController = nullptr;
 
 public:
-	SLocalPlayer();
+	SLocalPlayer(SSlateApplication* SlateApp);
 
 	void SetPlayerController(APlayerController* InController);
 	APlayerController* GetPlayerController();

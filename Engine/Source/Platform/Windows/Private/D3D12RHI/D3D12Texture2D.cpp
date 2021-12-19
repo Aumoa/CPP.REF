@@ -7,7 +7,8 @@
 
 GENERATE_BODY(SD3D12Texture2D);
 
-SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> Resource, ComPtr<ID3D12Resource> UploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& Layout, const RHITexture2DDesc& Desc) : Super(InFactory, InDevice, Resource, UploadHeap)
+SD3D12Texture2D::SD3D12Texture2D(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> Resource, ComPtr<ID3D12Resource> UploadHeap, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& Layout, const RHITexture2DDesc& Desc)
+	: Super(InFactory, InDevice, Resource.Get(), UploadHeap.Get())
 	, Resource(std::move(Resource))
 	, UploadHeap(std::move(UploadHeap))
 	, Layout(Layout)

@@ -11,7 +11,7 @@ SD3D12View::SD3D12View(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<I
 	, Heap(std::move(Heap))
 	, Resources(NumResources)
 {
-	Base = Heap->GetCPUDescriptorHandleForHeapStart();
+	Base = this->Heap->GetCPUDescriptorHandleForHeapStart();
 
 	auto Dev = Device->Get<ID3D12Device>();
 	IncrementSize = Dev->GetDescriptorHandleIncrementSize(HeapType);

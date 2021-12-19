@@ -339,16 +339,6 @@ void GarbageCollector::Collect(bool bFullPurge)
 		{
 			SE_LOG(LogGC, Verbose, L"  Compact GC objects table: {} -> {}, {} discounts.", BeforeCompact, AfterCompact, BeforeCompact - AfterCompact);
 		}
-	}
-
-	{
-		ScopedTimer Timer(L"  Unmarking objects.");
-
-		// Unregister pending kill objects.
-		for (auto& Object : PendingKill)
-		{
-			Objects.erase(Object);
-		}
 
 		Objects.Collection.resize(LastObjectIndex + 1);
 	}

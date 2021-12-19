@@ -11,3 +11,8 @@ SGameEngineSubsystem::SGameEngineSubsystem() : Super()
 SGameEngineSubsystem::~SGameEngineSubsystem()
 {
 }
+
+void SGameEngineSubsystem::Deinit()
+{
+	GC.SuppressFinalize(this);
+}

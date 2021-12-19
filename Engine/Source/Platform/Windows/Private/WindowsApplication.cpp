@@ -39,6 +39,9 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 
 	HR(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
 	HR(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&ImagingFactory)));
+
+	PlatformKeyboard = NewObject<SWindowsPlatformKeyboard>();
+	PlatformMouse = NewObject<SWindowsPlatformMouse>();
 }
 
 int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
@@ -89,33 +92,36 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		return -1;
 	}
 
-	SharedPtr<SGameModule> GameModule = Loader();
-	if (GameModule == nullptr)
+	int32 ErrorCode;
 	{
-		SE_LOG(LogWindows, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
-		return -1;
+		SharedPtr<SGameModule> GameModule = Loader();
+		if (GameModule == nullptr)
+		{
+			SE_LOG(LogWindows, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
+			return -1;
+		}
+
+		SharedPtr<SGameEngine> GameEngine = GameModule->CreateGameEngine();
+		if (GameEngine == nullptr)
+		{
+			SE_LOG(LogWindows, Fatal, L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
+			return -1;
+		}
+
+		GC.RunAutoThread();
+
+		SharedPtr WinApp = NewObject<SWindowsApplication>(GetModuleHandleW(nullptr));
+		ErrorCode = GameEngine->GuardedMain(WinApp.Get(), *ModuleName);
+		if (ErrorCode != 0)
+		{
+			SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
+		}
+
+		GC.StopAutoThread();
+
+		// Cleanup GameEngineModule.
+		GameModule = nullptr;
 	}
-
-	SGameEngine* GameEngine = GameModule->CreateGameEngine();
-	if (GameEngine == nullptr)
-	{
-		SE_LOG(LogWindows, Fatal, L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
-		return -1;
-	}
-
-	GC.RunAutoThread();
-
-	SWindowsApplication WinApp(GetModuleHandleW(nullptr));
-	int32 ErrorCode = GameEngine->GuardedMain(&WinApp, *ModuleName);
-	if (ErrorCode != 0)
-	{
-		SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
-	}
-
-	GC.StopAutoThread();
-
-	// Cleanup GameEngineModule.
-	GameModule = nullptr;
 
 	GC.Collect(true);
 	GC.Shutdown(true);

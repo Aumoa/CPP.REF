@@ -4,12 +4,14 @@
 
 GENERATE_BODY(SD3D12Resource);
 
-SD3D12Resource::SD3D12Resource(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadBuf) : Super(InFactory, InDevice, resource.Get())
-	, _resource(std::move(resource))
+SD3D12Resource::SD3D12Resource(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12Resource* Resource, ID3D12Resource* UploadBuf)
+	: Super(InFactory, InDevice, Resource)
+	, Resource(Resource)
+	, UploadBuf(UploadBuf)
 {
 }
 
 uint64 SD3D12Resource::GetGPUVirtualAddress()
 {
-	return _resource->GetGPUVirtualAddress();
+	return Resource->GetGPUVirtualAddress();
 }

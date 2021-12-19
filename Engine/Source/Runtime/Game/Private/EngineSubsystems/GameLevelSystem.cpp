@@ -29,6 +29,8 @@ void SGameLevelSystem::Deinit()
 	}
 
 	_GameWorld->DestroyWorld();
+
+	Super::Deinit();
 }
 
 SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)

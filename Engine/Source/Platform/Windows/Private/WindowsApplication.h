@@ -8,6 +8,8 @@
 #include "Multimedia/IPlatformImageLoader.h"
 
 class SDXGIFactory;
+class SWindowsPlatformKeyboard;
+class SWindowsPlatformMouse;
 
 class SWindowsApplication : implements SObject, implements IApplicationInterface, implements IPlatformImageLoader
 {
@@ -22,12 +24,20 @@ private:
 	ETickMode ActualTickMode = ETickMode::Realtime;
 	std::vector<WeakPtr<SObject>> RealtimeDemanders;
 
+	SPROPERTY(PlatformKeyboard)
+	SObject* PlatformKeyboard = nullptr;
+	SPROPERTY(PlatformMouse)
+	SObject* PlatformMouse = nullptr;
 	SPROPERTY(Factory)
 	SDXGIFactory* Factory = nullptr;
 	ComPtr<IWICImagingFactory> ImagingFactory;
 
 public:
 	SWindowsApplication(HINSTANCE hInstance);
+	~SWindowsApplication()
+	{
+		CoreAssert::DebugBreak();
+	}
 
 	static int32 GuardedMain(std::span<const std::wstring> Argv);
 

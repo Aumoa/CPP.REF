@@ -39,7 +39,7 @@ SSlateApplication::~SSlateApplication()
 
 void SSlateApplication::Init(IApplicationInterface* InApplication)
 {
-	LocalPlayer = NewObject<SLocalPlayer>();
+	LocalPlayer = NewObject<SLocalPlayer>(this);
 	(SAssignNew(CoreWindow, SWindow))->InitViewport(InApplication);
 
 	auto& PlatformKeyboard = InApplication->GetPlatformKeyboard();

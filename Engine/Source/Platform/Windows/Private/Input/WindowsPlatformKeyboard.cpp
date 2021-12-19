@@ -185,10 +185,14 @@ void SWindowsPlatformKeyboard::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM l
     }
 }
 
+SWindowsPlatformKeyboard* SWindowsPlatformKeyboard::sInstance;
+
 // Public constructor.
 SWindowsPlatformKeyboard::SWindowsPlatformKeyboard()
     : pImpl(std::make_unique<Impl>(this))
 {
+    check(sInstance == nullptr);
+    sInstance = this;
 }
 
 SWindowsPlatformKeyboard::~SWindowsPlatformKeyboard()
@@ -217,12 +221,5 @@ bool SWindowsPlatformKeyboard::IsConnected()
 
 SWindowsPlatformKeyboard& SWindowsPlatformKeyboard::Get()
 {
-    static SWindowsPlatformKeyboard sInstance;
-
-    if (!Impl::s_keyboard || !Impl::s_keyboard->mOwner)
-    {
-        SE_LOG(LogWindows, Fatal, L"WindowsPlatformKeyboard singleton not created");
-    }
-
-    return *Impl::s_keyboard->mOwner;
+    return *sInstance;
 }

@@ -5,7 +5,8 @@
 
 GENERATE_BODY(SD3D12Buffer);
 
-SD3D12Buffer::SD3D12Buffer(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const RHIBufferDesc& desc) : Super(InFactory, InDevice, resource, uploadHeap)
+SD3D12Buffer::SD3D12Buffer(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const RHIBufferDesc& desc)
+	: Super(InFactory, InDevice, resource.Get(), uploadHeap.Get())
 	, _resource(std::move(resource))
 	, _uploadHeap(std::move(uploadHeap))
 	, _desc(desc)

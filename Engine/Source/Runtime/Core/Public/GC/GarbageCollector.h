@@ -79,7 +79,7 @@ private:
 
 private:
 	// lock-free buffers.
-	static constexpr size_t NumGCThreads = 14;
+	static constexpr size_t NumGCThreads = 1;
 	std::vector<std::future<void>> GCThreadFutures;
 	std::vector<int32> GCMarkingBuffer;
 	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers = { };

@@ -8,7 +8,8 @@
 
 GENERATE_BODY(SLocalPlayer);
 
-SLocalPlayer::SLocalPlayer() : Super()
+SLocalPlayer::SLocalPlayer(SSlateApplication* SlateApp) : Super()
+	, SlateApp(SlateApp)
 {
 }
 
@@ -24,7 +25,7 @@ APlayerController* SLocalPlayer::GetPlayerController()
 
 SSlateApplication* SLocalPlayer::GetSlateApplication()
 {
-	return Cast<SSlateApplication>(GetOuter());
+	return SlateApp;
 }
 
 SViewport* SLocalPlayer::GetGameViewport()

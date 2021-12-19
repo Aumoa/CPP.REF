@@ -14,10 +14,6 @@ SLevel::SLevel() : Super()
 {
 }
 
-SLevel::~SLevel()
-{
-}
-
 bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick)
 {
 	checkf(GameModeClass.IsValid(), L"GameModeClass does not specified.");
@@ -64,7 +60,7 @@ AActor* SLevel::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncrement
 		return nullptr;
 	}
 
-	Actor->SetOuter(World);
+	Actor->SetOuter(this);
 	if (bSpawnIncremental)
 	{
 		ActorsToAdd.emplace_back(Actor);

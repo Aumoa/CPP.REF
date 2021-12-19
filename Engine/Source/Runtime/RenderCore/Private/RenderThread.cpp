@@ -1,13 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "RenderThread.h"
-#include "Threading/EventHandle.h"
 
 void RenderThread::PendingThreadWork::Init()
 {
-	ExecuteEvent = std::make_shared<SEventHandle>();
-	CompletedEvent = std::make_shared<SEventHandle>();
-	CompletedEvent->Set();
 }
 
 void RenderThread::PendingThreadWork::SwapExecute(IRHIDeviceContext* InDeviceContext, WaitingThreadWorks& InTarget)
@@ -15,7 +11,6 @@ void RenderThread::PendingThreadWork::SwapExecute(IRHIDeviceContext* InDeviceCon
 	std::swap(Works, InTarget.Works);
 	std::swap(CompletedWork, InTarget.CompletedWork);
 	DeviceContext = InDeviceContext;
-	ExecuteEvent->Set();
 }
 
 void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
@@ -36,8 +31,8 @@ void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 
 void RenderThread::ThreadInfo::Init()
 {
-	ThreadJoin = Thread::NewThread<void>(L"[Render Thread]", std::bind(&ThreadInfo::Worker, &_Thread));
 	bRunning = true;
+	ThreadJoin = Thread::NewThread<void>(L"[Render Thread]", std::bind(&ThreadInfo::Worker, &_Thread));
 }
 
 void RenderThread::ThreadInfo::Init_RenderThread()
@@ -51,14 +46,13 @@ void RenderThread::ThreadInfo::Worker()
 {
 	Init_RenderThread();
 
+	std::unique_lock WorkerMtx_lock(WorkerMtx);
+
 	while (bRunning)
 	{
-		_ExecutingWorks.ExecuteEvent->Wait();
-		{
-			std::unique_lock lock(CriticalSection);
-			_ExecutingWorks.RunningWorks_RenderThread();
-		}
-		_ExecutingWorks.CompletedEvent->Set();
+		cvWorker.wait(WorkerMtx_lock);
+		_ExecutingWorks.RunningWorks_RenderThread();
+		WorkerPromise.set_value();
 	}
 }
 
@@ -81,7 +75,7 @@ void RenderThread::Shutdown()
 
 void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody)
 {
-	std::unique_lock lock(_Thread.CriticalSection);
+	std::unique_lock lock(_Thread.WorkerMtx);
 	_WaitingWorks.Works.emplace_back(std::move(InWorkBody));
 }
 
@@ -92,12 +86,19 @@ void RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::functio
 		WaitForLastWorks();
 	}
 
-	std::unique_lock lock(_Thread.CriticalSection);
+	std::unique_lock lock(_Thread.WorkerMtx);
 	_WaitingWorks.CompletedWork = InCompletionWork;
 	_ExecutingWorks.SwapExecute(InDeviceContext, _WaitingWorks);
+
+	_Thread.WorkerPromise = std::promise<void>();
+	_Thread.WorkerFuture = _Thread.WorkerPromise.get_future();
+	_Thread.cvWorker.notify_one();
 }
 
 void RenderThread::WaitForLastWorks()
 {
-	_ExecutingWorks.CompletedEvent->Wait();
+	if (_Thread.WorkerFuture.valid())
+	{
+		_Thread.WorkerFuture.wait();
+	}
 }

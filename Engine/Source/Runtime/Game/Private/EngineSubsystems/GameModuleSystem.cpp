@@ -21,6 +21,10 @@ void SGameModuleSystem::Init()
 
 void SGameModuleSystem::Deinit()
 {
+	if (GameModule)
+	{
+		GC.SuppressFinalize(GameModule);
+	}
 }
 
 void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
@@ -33,7 +37,7 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
 	}
 
 	Module = std::make_unique<PlatformModule>(GameModulePath);
-	if (!Module)
+	if (!Module->IsValid())
 	{
 		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", GameModuleName);
 		return;

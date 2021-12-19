@@ -41,8 +41,7 @@ void SSwapChainRenderTarget::ReadyBuffers(int32 InWidth, int32 InHeight)
 {
 	for (int32 i = 0; i < NumBuffers; ++i)
 	{
-		Buffers[i] = SwapChain->GetBuffer(i);
-		RTV->CreateRenderTargetView(i, Buffers[i], nullptr);
+		RTV->CreateRenderTargetView(i, SwapChain->GetBuffer(i), nullptr);
 	}
 
 	PixelWidth = InWidth;

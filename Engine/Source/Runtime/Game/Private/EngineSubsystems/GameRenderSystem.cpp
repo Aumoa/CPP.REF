@@ -65,6 +65,8 @@ void SGameRenderSystem::Deinit()
 		Device->Dispose();
 		Device = nullptr;
 	}
+
+	Super::Deinit();
 }
 
 void SGameRenderSystem::Tick(float InDeltaTime)

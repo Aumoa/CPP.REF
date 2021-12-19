@@ -12,7 +12,6 @@
 #include "Misc/CrcHash.h"
 
 interface IRHIDeviceContext;
-class SEventHandle;
 class Thread;
 
 class RENDERCORE_API RenderThread
@@ -32,8 +31,6 @@ private:
 	{
 		WorksDictionary Works;
 		std::function<void()> CompletedWork;
-		std::shared_ptr<SEventHandle> ExecuteEvent;
-		std::shared_ptr<SEventHandle> CompletedEvent;
 		IRHIDeviceContext* DeviceContext = nullptr;
 
 		void Init();
@@ -45,8 +42,13 @@ private:
 	{
 		int64 ThreadId;
 		std::atomic<bool> bRunning;
-		std::mutex CriticalSection;
 		std::future<void> ThreadJoin;
+
+		std::mutex WorkerMtx;
+		std::condition_variable cvWorker;
+		
+		std::promise<void> WorkerPromise;
+		std::future<void> WorkerFuture;
 
 		void Init();
 		void Init_RenderThread();

@@ -11,7 +11,7 @@ class AGameMode;
 class APlayerController;
 class AActor;
 
-class GAME_API SLevel : implements SObject
+class GAME_API SLevel : public SGameObject
 {
 	GENERATED_BODY(SLevel)
 
@@ -39,7 +39,6 @@ public:
 
 public:
 	SLevel();
-	~SLevel();
 
 	bool LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick = nullptr);
 	void UnloadLevel();

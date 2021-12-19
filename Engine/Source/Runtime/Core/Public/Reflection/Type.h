@@ -100,22 +100,25 @@ public:
 				for (auto It = Collection.begin(); It != Collection.end();)
 				{
 					auto& Object = *It;
-					if (GC.PendingFinalize.contains(Object))
+					if (Object)
 					{
-						if constexpr (IsMutableCollection<TType>)
+						if (GC.PendingFinalize.contains(Object))
 						{
-							Object = nullptr;
+							if constexpr (IsMutableCollection<TType>)
+							{
+								Object = nullptr;
+							}
+							else
+							{
+								Collection.erase(It++);
+								continue;
+							}
 						}
 						else
 						{
-							Collection.erase(It++);
-							continue;
+							GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
+							++Count;
 						}
-					}
-					else
-					{
-						GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
-						++Count;
 					}
 
 					++It;

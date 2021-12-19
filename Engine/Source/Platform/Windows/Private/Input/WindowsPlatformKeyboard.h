@@ -10,6 +10,9 @@ class SWindowsPlatformKeyboard : implements SObject, implements IPlatformKeyboar
 {
     GENERATED_BODY(SWindowsPlatformKeyboard)
 
+private:
+    static SWindowsPlatformKeyboard* sInstance;
+
 public:
     SWindowsPlatformKeyboard();
     ~SWindowsPlatformKeyboard();

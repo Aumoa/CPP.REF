@@ -15,17 +15,17 @@ class SD3D12Resource : public SD3D12DeviceChild, implements IRHIResource
 	GENERATED_BODY(SD3D12Resource)
 
 private:
-	ComPtr<ID3D12Resource> _resource;
-	ComPtr<ID3D12Resource> _uploadBuf;
+	ID3D12Resource* Resource = nullptr;
+	ID3D12Resource* UploadBuf = nullptr;
 
 public:
-	SD3D12Resource(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadBuf);
+	SD3D12Resource(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12Resource* Resource, ID3D12Resource* UploadBuf);
 
 	virtual uint64 GetGPUVirtualAddress() override;
 
 	virtual void UpdateSubresource(SD3D12CommandList* commandList, uint32 subresource, const RHISubresourceData* uploadData) = 0;
 
 public:
-	DECLARE_GETTER(ID3D12Resource, _resource);
-	ID3D12Resource* GetUploadBuf() { return _uploadBuf.Get(); }
+	DECLARE_GETTER(ID3D12Resource, Resource);
+	ID3D12Resource* GetUploadBuf() { return UploadBuf; }
 };

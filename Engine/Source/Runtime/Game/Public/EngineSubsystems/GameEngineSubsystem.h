@@ -17,7 +17,7 @@ public:
 
 	virtual void Init() {}
 	virtual void PostInit() {}
-	virtual void Deinit() {}
+	virtual void Deinit();
 	virtual void Tick(float InDeltaTime) {}
 
 public:

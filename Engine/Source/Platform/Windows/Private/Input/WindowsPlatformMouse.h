@@ -12,6 +12,9 @@ class SWindowsPlatformMouse : implements SObject, implements IPlatformMouse
 {
     GENERATED_BODY(SWindowsPlatformMouse)
 
+private:
+    static SWindowsPlatformMouse* sInstance;
+
 public:
     SWindowsPlatformMouse();
     ~SWindowsPlatformMouse();

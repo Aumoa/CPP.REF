@@ -71,12 +71,20 @@ void SGameEngine::Shutdown()
 		System->Deinit();
 	}
 
+	GC.SuppressFinalize(GameInstance);
+	GC.SuppressFinalize(SlateApplication);
+	GC.Collect(true);
+	GC.Collect(true);
+
 	Subsystems.clear();
 	SubsystemView.clear();
+	GC.Collect(true);
 }
 
 int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
+	GC.SetThreadMode(EGCThreadMode::SpecifiedThreadHint);
+
 	CoreDelegates::BeginMainInvoked.Broadcast();
 
 	// Create GameEngine instance and initialize it.
@@ -160,6 +168,8 @@ void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
 		Tick = 0ms;
 		AppTickMode = ActualTickMode;
 	}
+
+	GC.Hint();
 
 	SystemsTick(Tick);
 	GameTick(Tick);

@@ -266,6 +266,7 @@ private:
 
 
 SWindowsPlatformMouse::Impl* SWindowsPlatformMouse::Impl::s_mouse = nullptr;
+SWindowsPlatformMouse* SWindowsPlatformMouse::sInstance;
 
 
 void SWindowsPlatformMouse::SetWindow(SWindowsApplication* Application)
@@ -502,6 +503,8 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 SWindowsPlatformMouse::SWindowsPlatformMouse()
     : pImpl(std::make_unique<Impl>(this))
 {
+    check(sInstance == nullptr);
+    sInstance = this;
 }
 
 SWindowsPlatformMouse::~SWindowsPlatformMouse()
@@ -546,10 +549,5 @@ void SWindowsPlatformMouse::SetVisible(bool visible)
 
 SWindowsPlatformMouse& SWindowsPlatformMouse::Get()
 {
-    static SWindowsPlatformMouse sInstance;
-
-    if (!Impl::s_mouse || !Impl::s_mouse->mOwner)
-        LogSystem::Log(LogWindows, ELogVerbosity::Fatal, L"WindowsPlatformMouse singleton not created");
-
-    return *Impl::s_mouse->mOwner;
+    return *sInstance;
 }
