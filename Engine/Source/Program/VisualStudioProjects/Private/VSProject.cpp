@@ -49,6 +49,13 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 
 	SSolution* Solution = Generator->GetSolution();
 	std::wstring AppName = Solution->GetFirstProjectName();
+	std::wstring AppTarget = AppName;
+
+	if (auto It = Solution->GetProjectRuntimes().find(AppName); It != Solution->GetProjectRuntimes().end())
+	{
+		AppTarget = It->second.Metadata->TargetName;
+		AppTarget = StringUtils::ReplaceAll(AppTarget, L"$(ProjectName)", AppName);
+	}
 
 	XMLDocument Doc;
 
@@ -172,6 +179,8 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	};
 
 	std::string BaseMacros = std::format("SE_APPLICATION=\"{}\";", WCHAR_TO_ANSI(AppName));
+	BaseMacros += std::format("SE_APPLICATION_TARGET=\"{}\";", WCHAR_TO_ANSI(AppTarget));
+	BaseMacros += "PLATFORM_WINDOWS=1;";
 
 	BuildConfiguration Configurations[] =
 	{
@@ -529,10 +538,10 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 				switch (RuntimeData.Metadata->Type)
 				{
 				case EType::Game:
-					NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--GameDll \"{}\"", WCHAR_TO_ANSI(RuntimeData.Metadata->Name)));
+					NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format(R"[](--GameDll "$(TargetName)")[]"));
 					break;
 				case EType::Console:
-					NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format("--ConsoleDll \"{}\"", WCHAR_TO_ANSI(RuntimeData.Metadata->Name)));
+					NewElement(PropertyGroup, "LocalDebuggerCommandArguments", std::format(R"[](--ConsoleDll "$(TargetName)")[]"));
 					break;
 				}
 			}

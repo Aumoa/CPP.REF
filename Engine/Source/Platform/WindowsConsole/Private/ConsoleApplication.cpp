@@ -35,10 +35,8 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		}
 		else
 		{
-			ModuleName = ANSI_TO_WCHAR(SE_APPLICATION);
+			ModuleName = ANSI_TO_WCHAR(SE_APPLICATION_TARGET);
 		}
-
-		Console::WriteLine(L"ModuleName: {}", *ModuleName);
 
 		Module = std::make_unique<PlatformModule>(*ModuleName);
 		auto Loader = Module->GetFunctionPointer<SConsoleModule* ()>("LoadConsoleModule");

@@ -42,25 +42,27 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 
 int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
-	SCommandLine CommandArgs = Argv;
-	size_t GameModuleIdx = CommandArgs.GetArgument(L"--GameDll");
-	if (GameModuleIdx == -1)
+	SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
+	std::optional<std::wstring_view> ModuleName;
+	size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
+	if (GameModuleIdx != -1)
 	{
-		SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
-		return -1;
+		ModuleName = CommandArgs->GetArgument(GameModuleIdx + 1);
+		if (!ModuleName)
+		{
+			SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
+			return -1;
+		}
 	}
-
-	std::optional<std::wstring_view> ModuleName = CommandArgs.GetArgument(GameModuleIdx + 1);
-	if (!ModuleName)
+	else
 	{
-		SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
-		return -1;
+		ModuleName = ANSI_TO_WCHAR(SE_APPLICATION_TARGET);
 	}
 
 	std::optional<std::wstring> EngineName;
-	if (size_t EngineModuleIdx = CommandArgs.GetArgument(L"--EngineDll"); EngineModuleIdx != -1)
+	if (size_t EngineModuleIdx = CommandArgs->GetArgument(L"--EngineDll"); EngineModuleIdx != -1)
 	{
-		EngineName = CommandArgs.GetArgument(EngineModuleIdx + 1);
+		EngineName = CommandArgs->GetArgument(EngineModuleIdx + 1);
 	}
 
 	if (!EngineName.has_value())
