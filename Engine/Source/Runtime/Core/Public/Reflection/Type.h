@@ -64,11 +64,12 @@ public:
 		std::function<int32(void*, int32)> Collector;
 
 		// SObject type.
-		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires requires { TType::StaticClass(); }
+		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires
+			requires { TType::StaticClass(); }
 			: FriendlyName(InFriendlyName)
 			, FullName(FullName)
 			, bNative(false)
-			, ToObjectCast(+[](void* UnknownType) { return static_cast<SObject*>(reinterpret_cast<TType*>(UnknownType)); })
+			, ToObjectCast(+[](void* UnknownType) { return dynamic_cast<SObject*>(reinterpret_cast<TType*>(UnknownType)); })
 			, FromObjectCast(+[](SObject* Object) { return reinterpret_cast<void*>(dynamic_cast<TType*>(Object)); })
 		{
 			Functions.reserve(100);

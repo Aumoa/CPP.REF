@@ -7,6 +7,8 @@
 
 interface IDisposable : implements SObject
 {
+	GENERATED_INTERFACE_BODY(IDisposable)
+
 	virtual void Dispose() = 0;
 };
 

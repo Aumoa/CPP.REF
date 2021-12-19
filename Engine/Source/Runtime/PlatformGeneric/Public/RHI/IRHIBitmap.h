@@ -7,5 +7,7 @@
 
 interface IRHIBitmap : implements IRHIImage
 {
+	GENERATED_INTERFACE_BODY(IRHIBitmap)
+
 	virtual Vector2N GetSize() = 0;
 };

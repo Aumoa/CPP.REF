@@ -8,7 +8,7 @@
 #include <atomic>
 #include <map>
 
-class STickScheduler : implements SObject
+class GAME_API STickScheduler : implements SObject
 {
 	GENERATED_BODY(STickScheduler)
 
@@ -31,54 +31,13 @@ private:
 		std::function<void()> Task;
 	};
 
-	std::atomic<int64> _id = 0;
-	std::map<size_t, TickTaskInstance> _tasks;
+	std::atomic<int64> Id = 0;
+	std::map<size_t, TickTaskInstance> Tasks;
 
 public:
-	inline STickScheduler()
-	{
-	}
+	STickScheduler();
 
-	inline void Tick(float deltaTime)
-	{
-		using namespace std::chrono;
-
-		for (auto& task : _tasks)
-		{
-			auto& info = task.second;
-
-			info.ActualDelay -= deltaTime;
-			if (info.ActualDelay <= 0)
-			{
-				info.Task();
-
-				if (info.bReliableCallCount)
-				{
-					info.ActualDelay += info.Delay;
-				}
-				else
-				{
-					info.ActualDelay = info.Delay;
-				}
-			}
-		}
-	}
-
-	inline int64 AddSchedule(const STickScheduler::TaskInfo& taskInfo)
-	{
-		TickTaskInstance internalInfo;
-		internalInfo.Task = taskInfo.Task;
-		internalInfo.Delay = taskInfo.Delay;
-		internalInfo.ActualDelay = taskInfo.InitDelay;
-		internalInfo.bReliableCallCount = taskInfo.bReliableCallCount;
-
-		int64 id = _id++;
-		_tasks.emplace(id, internalInfo);
-		return id;
-	}
-
-	inline void RemoveSchedule(int64 taskId)
-	{
-		_tasks.erase(taskId);
-	}
+	void Tick(float InDeltaTime);
+	int64 AddSchedule(const STickScheduler::TaskInfo& TaskInfo);
+	void RemoveSchedule(int64 TaskId);
 };

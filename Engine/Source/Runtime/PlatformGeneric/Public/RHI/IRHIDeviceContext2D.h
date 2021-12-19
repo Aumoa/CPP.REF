@@ -13,6 +13,8 @@ interface IRHITextLayout;
 
 interface IRHIDeviceContext2D : implements IRHIDeviceChild
 {
+	GENERATED_INTERFACE_BODY(IRHIDeviceContext2D)
+
 	virtual void BeginDraw() = 0;
 	virtual void EndDraw() = 0;
 	virtual void SetTarget(IRHIImage* InTarget, std::optional<Color> ClearColor = std::nullopt) = 0;

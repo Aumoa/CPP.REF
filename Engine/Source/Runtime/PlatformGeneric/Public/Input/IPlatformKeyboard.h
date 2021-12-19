@@ -7,6 +7,8 @@
 
 interface IPlatformKeyboard : implements SObject
 {
+	GENERATED_INTERFACE_BODY(IPlatformKeyboard)
+
 	virtual KeyboardState GetState() = 0;
 	virtual void Reset() = 0;
 	virtual bool IsConnected() = 0;

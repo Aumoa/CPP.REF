@@ -8,5 +8,7 @@ interface IRHIFactory;
 
 interface IRHIFactoryChild : implements SObject, implements IDisposable
 {
+	GENERATED_INTERFACE_BODY(IRHIFactoryChild)
+
 	virtual IRHIFactory* GetFactory() = 0;
 };

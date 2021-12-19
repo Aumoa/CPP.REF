@@ -382,7 +382,8 @@ void GarbageCollector::SetThreadMode(EGCThreadMode ThreadMode)
 
 void GarbageCollector::Hint()
 {
-	if (ThreadMode == EGCThreadMode::SpecifiedThreadHint && bGCTriggered)
+	bool bTrue = true;
+	if (ThreadMode == EGCThreadMode::SpecifiedThreadHint && bGCTriggered.compare_exchange_strong(bTrue, false))
 	{
 		Collect();
 	}

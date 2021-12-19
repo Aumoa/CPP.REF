@@ -7,4 +7,5 @@
 
 interface IRHIUnorderedAccessView : implements IRHIView
 {
+	GENERATED_INTERFACE_BODY(IRHIUnorderedAccessView)
 };

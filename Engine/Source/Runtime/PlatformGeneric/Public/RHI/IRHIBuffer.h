@@ -8,5 +8,7 @@
 
 interface IRHIBuffer : implements IRHIResource
 {
+	GENERATED_INTERFACE_BODY(IRHIBuffer)
+
 	virtual RHIBufferDesc GetDesc() = 0;
 };

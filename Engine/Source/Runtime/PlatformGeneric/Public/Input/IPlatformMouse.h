@@ -7,6 +7,8 @@
 
 interface IPlatformMouse : implements SObject
 {
+    GENERATED_INTERFACE_BODY(IPlatformMouse)
+
     virtual MouseState GetState() = 0;
     virtual void ResetScrollWheelValue() = 0;
     virtual void SetMode(EMousePositionMode InPositionMode) = 0;

@@ -7,4 +7,5 @@
 
 interface IRHIImage : implements IRHIDeviceChild
 {
+	GENERATED_INTERFACE_BODY(IRHIImage)
 };

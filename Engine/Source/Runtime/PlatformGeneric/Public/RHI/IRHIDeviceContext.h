@@ -14,6 +14,8 @@ interface IRHIShaderResourceView;
 
 interface IRHIDeviceContext : implements IRHIDeviceChild
 {
+	GENERATED_INTERFACE_BODY(IRHIDeviceContext)
+
 	virtual void Begin() = 0;
 	virtual void End() = 0;
 	virtual void SetDescriptorHeaps(int32 MaxSRVCount, int32 MaxSamplerCount) = 0;

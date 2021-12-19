@@ -8,5 +8,7 @@
 
 interface IRHIRenderTargetView : implements IRHIView
 {
+	GENERATED_INTERFACE_BODY(IRHIRenderTargetView)
+
 	virtual void CreateRenderTargetView(int32 index, IRHIResource* resource, const RHIRenderTargetViewDesc* desc) = 0;
 };

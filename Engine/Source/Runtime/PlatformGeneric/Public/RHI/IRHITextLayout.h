@@ -8,6 +8,8 @@
 
 interface IRHITextLayout : implements IRHIFactoryChild
 {
+	GENERATED_INTERFACE_BODY(IRHITextLayout)
+
 	virtual void SetMaxSize(const Vector2& InSize) = 0;
 	virtual Vector2 GetMaxSize() = 0;
 	virtual Vector2 GetDesiredSize() = 0;

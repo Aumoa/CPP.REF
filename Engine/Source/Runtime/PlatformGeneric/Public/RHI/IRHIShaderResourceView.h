@@ -8,5 +8,7 @@
 
 interface IRHIShaderResourceView : implements IRHIView
 {
+	GENERATED_INTERFACE_BODY(IRHIShaderResourceView)
+
 	virtual void CreateShaderResourceView(int32 index, IRHIResource* resource, const RHIShaderResourceViewDesc* desc) = 0;
 };

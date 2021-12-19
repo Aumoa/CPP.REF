@@ -7,4 +7,5 @@
 
 interface IRHITextFormat : implements IRHIFactoryChild
 {
+	GENERATED_INTERFACE_BODY(IRHITextFormat)
 };

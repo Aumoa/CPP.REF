@@ -17,6 +17,8 @@ interface IRHITextFormat;
 
 interface IRHIFactory : implements IDisposable
 {
+	GENERATED_INTERFACE_BODY(IRHIFactory)
+
 	virtual IApplicationInterface* GetApplication() = 0;
 	virtual IRHIAdapter* GetAdapter(int32 index) = 0;
 	virtual IRHIDevice* CreateDevice(IRHIAdapter* adapter) = 0;

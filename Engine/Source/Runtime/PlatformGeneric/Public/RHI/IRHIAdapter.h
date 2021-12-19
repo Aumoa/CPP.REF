@@ -7,4 +7,5 @@
 
 interface IRHIAdapter : implements IRHIFactoryChild
 {
+	GENERATED_INTERFACE_BODY(IRHIAdapter)
 };

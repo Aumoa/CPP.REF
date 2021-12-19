@@ -8,5 +8,7 @@
 
 interface IRHITexture2D : implements IRHIResource
 {
+	GENERATED_INTERFACE_BODY(IRHITexture2D)
+
 	virtual RHITexture2DDesc GetDesc() = 0;
 };

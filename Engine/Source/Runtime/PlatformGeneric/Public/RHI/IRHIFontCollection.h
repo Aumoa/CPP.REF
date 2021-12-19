@@ -7,4 +7,5 @@
 
 interface IRHIFontCollection : implements IRHIFactoryChild
 {
+	GENERATED_INTERFACE_BODY(IRHIFontCollection)
 };

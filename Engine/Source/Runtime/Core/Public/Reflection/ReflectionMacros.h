@@ -43,16 +43,15 @@ namespace ReflectionMacros
 	friend class Type;																		\
 																							\
 public:																						\
-	using Super = 																			\
-		typename ReflectionMacros::SuperClassTypeDeclare									\
-		<Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>)>::Type;								\
-	using This = Class __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>);								\
+	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Class>::Type;			\
+	using This = Class;																		\
 																							\
 	static Type* StaticClass();																\
+																							\
 	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
 																							\
 private:																					\
-	static Type* StaticRegisterClass;														\
+	inline static Type* StaticRegisterClass = StaticClass();								\
 																							\
 public:																						\
 	Type* GetType() const																	\
@@ -90,16 +89,70 @@ private:																					\
 	template<size_t>																		\
 	static consteval void REFLECTION_GetFunctionName(void*);								\
 	template<size_t>																		\
-	static void REFLECTION_GetPropertyPointer(void*);
+	static void REFLECTION_GetPropertyPointer(void*);										\
+																							\
+private:
+
+#define GENERATED_INTERFACE_BODY(Interface, ...)											\
+	friend class Type;																		\
+																							\
+	inline static Type* StaticClass()														\
+	{																						\
+		static Type MyClassType(Type::TypeGenerator<This>(FriendlyName, L ## #Interface));	\
+		return &MyClassType;																\
+	}																						\
+																							\
+	inline static constexpr std::wstring_view FriendlyName = L ## #Interface;				\
+																							\
+private:																					\
+	inline static Type* StaticRegisterClass = StaticClass();								\
+																							\
+public:																						\
+	Type* GetType() const																	\
+	{																						\
+		return StaticClass();																\
+	}																						\
+																							\
+private:																					\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_FunctionChain()										\
+	{																						\
+		return REFLECTION_FunctionChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<>																				\
+	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_PropertyChain()										\
+	{																						\
+		return REFLECTION_PropertyChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<>																				\
+	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t>																		\
+	static void REFLECTION_GetFunctionPointer(void*);										\
+	template<size_t>																		\
+	static consteval void REFLECTION_GetFunctionName(void*);								\
+	template<size_t>																		\
+	static void REFLECTION_GetPropertyPointer(void*);										\
+																							\
+public:
 
 #define GENERATE_BODY(Class, ...)															\
 Type* Class::StaticClass()																	\
 {																							\
 	static Type MyClassType(Type::TypeGenerator<This>(FriendlyName, L ## #Class));			\
 	return &MyClassType;																	\
-}																							\
-																							\
-Type* Class::StaticRegisterClass = Class::StaticClass();
+}
 
 #define SFUNCTION(FunctionName, ...)														\
 	template<>																				\

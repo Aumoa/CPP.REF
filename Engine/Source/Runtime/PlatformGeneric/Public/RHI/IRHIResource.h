@@ -7,5 +7,7 @@
 
 interface IRHIResource : implements IRHIDeviceChild
 {
+	GENERATED_INTERFACE_BODY(IRHIResource)
+
 	virtual uint64 GetGPUVirtualAddress() = 0;
 };

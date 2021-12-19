@@ -20,6 +20,8 @@ class SMaterial;
 
 interface IRHIDevice : implements IRHIFactoryChild
 {
+	GENERATED_INTERFACE_BODY(IRHIDevice)
+
 	virtual IRHIDeviceContext* GetImmediateContext() = 0;
 	virtual IRHIDeviceContext* CreateDeviceContext() = 0;
 	virtual IRHIDeviceContext2D* CreateDeviceContext2D() = 0;

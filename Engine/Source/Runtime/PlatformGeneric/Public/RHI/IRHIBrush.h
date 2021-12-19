@@ -7,6 +7,8 @@
 
 interface IRHIBrush : implements IRHIDeviceChild
 {
+	GENERATED_INTERFACE_BODY(IRHIBrush)
+
 	virtual void SetOpacity(float InValue) = 0;
 	virtual float GetOpacity() = 0;
 };

@@ -7,4 +7,5 @@
 
 interface IRHIShader : implements IRHIDeviceChild
 {
+	GENERATED_INTERFACE_BODY(IRHIShader)
 };

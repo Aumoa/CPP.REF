@@ -11,6 +11,8 @@ interface IPlatformImageLoader;
 
 interface IApplicationInterface : implements SObject
 {
+	GENERATED_INTERFACE_BODY(IApplicationInterface)
+
 	enum class ETickMode
 	{
 		Realtime,

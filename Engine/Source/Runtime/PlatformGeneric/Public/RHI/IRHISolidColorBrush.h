@@ -7,6 +7,8 @@
 
 interface IRHISolidColorBrush : implements IRHIBrush
 {
+	GENERATED_INTERFACE_BODY(IRHISolidColorBrush)
+
 	virtual void SetColor(const Color& InColor) = 0;
 	virtual Color GetColor() = 0;
 };
