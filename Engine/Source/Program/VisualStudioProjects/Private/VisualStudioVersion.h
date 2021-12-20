@@ -10,4 +10,4 @@ enum class EVisualStudioVersion
 	VS2022,
 };
 
-inline EVisualStudioVersion gVSVersion = EVisualStudioVersion::VS2022;
+inline EVisualStudioVersion gVSVersion = EVisualStudioVersion::VS2019;

@@ -10,6 +10,8 @@
 #include "Console.h"
 #include <chrono>
 
+GENERATE_BODY(SConsoleApplication);
+
 int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
 	using namespace std;
