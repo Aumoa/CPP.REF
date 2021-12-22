@@ -55,7 +55,7 @@ std::wstring SObject::ToString()
 
 void SObject::PostConstruction()
 {
-	const auto& CachingDummy = GetType()->GetGCProperties();
+	volatile const auto& CachingDummy = GetType()->GetGCProperties();
 }
 
 void* SObject::operator new(size_t AllocSize)

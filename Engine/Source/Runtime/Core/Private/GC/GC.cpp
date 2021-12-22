@@ -137,7 +137,6 @@ void GarbageCollector::RegisterObject(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
 	Objects.Emplace(Object);
-	Object->Generation = Generation;
 }
 
 void GarbageCollector::UnregisterObject(SObject* Object)
@@ -179,7 +178,7 @@ void GarbageCollector::RunAutoThread()
 {
 	GC.bRunningGCThread = true;
 
-	auto GCThread = Thread::NewThread<void>(L"[GC Thread]", [&]()
+	GCThread = Thread::NewThread<void>(L"[GC Thread]", [&]()
 	{
 		while (GC.bRunningGCThread)
 		{
