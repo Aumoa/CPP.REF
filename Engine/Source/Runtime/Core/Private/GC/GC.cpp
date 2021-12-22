@@ -137,6 +137,7 @@ void GarbageCollector::RegisterObject(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
 	Objects.Emplace(Object);
+	Object->Generation = Generation;
 }
 
 void GarbageCollector::UnregisterObject(SObject* Object)
