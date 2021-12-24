@@ -10,10 +10,12 @@ class SLATECORE_API SBoxPanel : public SPanelWidget
 	GENERATED_BODY(SBoxPanel)
 
 public:
-	class Slot : public TSlotBase<Slot>
+	class SLATECORE_API SSlot : public TSlotBase<SSlot>
 	{
+		GENERATED_BODY(SSlot)
+
 	public:
-		Slot()
+		SSlot() : Super()
 		{
 		}
 
@@ -26,7 +28,8 @@ public:
 
 private:
 	EOrientation Orientation;
-	std::vector<Slot> Slots;
+	SPROPERTY(Slots)
+	std::vector<SSlot*> Slots;
 
 protected:
 	SBoxPanel(EOrientation Orientation);
@@ -34,7 +37,7 @@ protected:
 	virtual Vector2 GetDesiredSize() override;
 
 public:
-	Slot& AddSlot();
+	SSlot& AddSlot();
 	bool RemoveSlot(size_t Index);
 	size_t FindSlot(const SWidget* Content);
 	void ClearSlots();
@@ -47,7 +50,7 @@ protected:
 
 private:
 	void ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection InLayoutFlow, const Geometry& AllottedGeometry, ArrangedChildrens& ArrangedChildrens);
-	static Vector2 ComputeDesiredSizeForBox(EOrientation InOrientation, const std::vector<Slot>& Slots);
+	static Vector2 ComputeDesiredSizeForBox(EOrientation InOrientation, const std::vector<SSlot*>& Slots);
 
 	static constexpr Margin LayoutPaddingWithFlow(const Margin& Padding, EFlowDirection LayoutFlow)
 	{
@@ -63,7 +66,7 @@ private:
 
 public:
 	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_SLOT_SUPPORTS(Slot)
+		DECLARE_SLATE_SLOT_SUPPORTS(SSlot)
 	END_SLATE_ATTRIBUTE
 
 	DECLARE_SLATE_CONSTRUCTOR();

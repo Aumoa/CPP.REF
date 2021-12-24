@@ -14,7 +14,7 @@ class ArrangedWidget;
 class SSlateAnimationPlayer;
 class SSlateAnimationContext;
 
-class SLATECORE_API SWidget : implements SObject
+class SLATECORE_API SWidget : implements SObject, implements IDisposable
 {
 	GENERATED_BODY(SWidget)
 
@@ -32,6 +32,7 @@ private:
 	uint8 bMouseHover : 1 = false;
 
 	float RenderOpacity = 1.0f;
+	SPROPERTY(AnimPlayer)
 	SSlateAnimationPlayer* AnimPlayer = nullptr;
 	Vector2 CachedMouseLocation;
 
@@ -39,6 +40,7 @@ public:
 	SWidget();
 
 	virtual std::wstring ToString() override;
+	virtual void Dispose() override;
 	std::wstring GetName();
 
 	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled);

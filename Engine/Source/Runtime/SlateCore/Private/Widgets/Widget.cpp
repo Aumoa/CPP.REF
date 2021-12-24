@@ -20,6 +20,10 @@ std::wstring SWidget::ToString()
 	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), SlateVisibilityExtensions::ToString(Visibility));
 }
 
+void SWidget::Dispose()
+{
+}
+
 std::wstring SWidget::GetName()
 {
     return Name;

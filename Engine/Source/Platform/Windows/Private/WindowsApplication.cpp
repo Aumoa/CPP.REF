@@ -109,16 +109,12 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 			return -1;
 		}
 
-		GC.RunAutoThread();
-
 		SharedPtr WinApp = NewObject<SWindowsApplication>(GetModuleHandleW(nullptr));
 		ErrorCode = GameEngine->GuardedMain(WinApp.Get(), *ModuleName);
 		if (ErrorCode != 0)
 		{
 			SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
 		}
-
-		GC.StopAutoThread();
 
 		// Cleanup GameEngineModule.
 		GameModule = nullptr;

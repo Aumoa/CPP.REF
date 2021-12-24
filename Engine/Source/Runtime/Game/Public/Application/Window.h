@@ -13,7 +13,9 @@ class GAME_API SWindow : public SCompoundWidget
 	GENERATED_BODY(SWindow)
 
 private:
+	SPROPERTY(Application)
 	IApplicationInterface* Application = nullptr;
+	SPROPERTY(GameViewport)
 	SViewport* GameViewport = nullptr;
 
 public:

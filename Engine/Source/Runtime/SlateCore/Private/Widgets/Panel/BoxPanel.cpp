@@ -4,6 +4,7 @@
 #include <ranges>
 
 GENERATE_BODY(SBoxPanel);
+GENERATE_BODY(SBoxPanel::SSlot);
 
 SBoxPanel::SBoxPanel(EOrientation Orientation) : Super()
 	, Orientation(Orientation)
@@ -15,9 +16,9 @@ Vector2 SBoxPanel::GetDesiredSize()
 	return ComputeDesiredSizeForBox(Orientation, Slots);
 }
 
-auto SBoxPanel::AddSlot() -> Slot&
+auto SBoxPanel::AddSlot() -> SSlot&
 {
-	return Slots.emplace_back();
+	return *Slots.emplace_back(NewObject<SSlot>());
 }
 
 bool SBoxPanel::RemoveSlot(size_t Index)
@@ -35,7 +36,7 @@ size_t SBoxPanel::FindSlot(const SWidget* Content)
 {
 	for (size_t i = 0; i < Slots.size(); ++i)
 	{
-		if (Slots[i].GetContent() == Content)
+		if (Slots[i]->GetContent() == Content)
 		{
 			return i;
 		}
@@ -73,22 +74,22 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 		bool bAnyChildVisible = false;
         // Compute the sum of stretch coefficients (SizeRule_Stretch) and space required by fixed-size widgets
         // (SizeRule_Auto).
-        for (const Slot& CurChild : Slots)
+        for (SSlot*& CurChild : Slots)
         {
-            if (CurChild.GetContent()->GetVisibility() != ESlateVisibility::Collapsed)
+            if (CurChild->GetContent()->GetVisibility() != ESlateVisibility::Collapsed)
             {
                 bAnyChildVisible = true;
                 // All widgets contribute their margin to the fixed space requirement
-                FixedTotal += CurChild._SlotPadding.GetTotalSpaceAlong(InOrientation);
+                FixedTotal += CurChild->_SlotPadding.GetTotalSpaceAlong(InOrientation);
 
-                if (CurChild._SizeParam.SizeRule == ESizeRule::Stretch)
+                if (CurChild->_SizeParam.SizeRule == ESizeRule::Stretch)
                 {
                     // for stretch children we save sum up the stretch coefficients
-                    StretchCoefficientTotal += CurChild._SizeParam.Value;
+                    StretchCoefficientTotal += CurChild->_SizeParam.Value;
                 }
                 else
                 {
-                    Vector2 ChildDesiredSize = CurChild.GetContent()->GetDesiredSize();
+                    Vector2 ChildDesiredSize = CurChild->GetContent()->GetDesiredSize();
 
                     // Auto-sized children contribute their desired size to the fixed space requirement
                     float ChildSize = (InOrientation == EOrientation::Vertical)
@@ -96,7 +97,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
                         : ChildDesiredSize.X;
 
                     // Clamp to the max size if it was specified
-                    float MaxSize = CurChild._MaxSize;
+                    float MaxSize = CurChild->_MaxSize;
                     FixedTotal += MaxSize > 0 ? MathEx::Min(MaxSize, ChildSize) : ChildSize;
                 }
             }
@@ -117,9 +118,9 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 		
 		// Now that we have the total fixed-space requirement and the total stretch coefficients we can
 		// arrange widgets top-to-bottom or left-to-right (depending on the InOrientation).
-		auto SlotIterationBody = [&](const Slot& CurChild)
+		auto SlotIterationBody = [&](SSlot*& CurChild)
 		{
-            ESlateVisibility ChildVisibility = CurChild.GetContent()->GetVisibility();
+            ESlateVisibility ChildVisibility = CurChild->GetContent()->GetVisibility();
 
 			// Figure out the area allocated to the child in the direction of BoxPanel
 			// The area allocated to the slot is ChildSize + the associated margin.
@@ -127,17 +128,17 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 			if (ChildVisibility != ESlateVisibility::Collapsed)
 			{
 				// The size of the widget depends on its size type
-				if (CurChild._SizeParam.SizeRule == ESizeRule::Stretch)
+				if (CurChild->_SizeParam.SizeRule == ESizeRule::Stretch)
 				{
 					if (StretchCoefficientTotal > 0)
 					{
 						// Stretch widgets get a fraction of the space remaining after all the fixed-space requirements are met
-						ChildSize = NonFixedSpace * CurChild._SizeParam.Value / StretchCoefficientTotal;
+						ChildSize = NonFixedSpace * CurChild->_SizeParam.Value / StretchCoefficientTotal;
 					}
 				}
 				else
 				{
-					Vector2 ChildDesiredSize = CurChild.GetContent()->GetDesiredSize();
+					Vector2 ChildDesiredSize = CurChild->GetContent()->GetDesiredSize();
 
 					// Auto-sized widgets get their desired-size value
 					ChildSize = (InOrientation == EOrientation::Vertical)
@@ -146,22 +147,22 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 				}
 
 				// Clamp to the max size if it was specified
-				float MaxSize = CurChild._MaxSize;
+				float MaxSize = CurChild->_MaxSize;
 				if (MaxSize > 0)
 				{
 					ChildSize = MathEx::Min(MaxSize, ChildSize);
 				}
 			}
 
-            Margin SlotPadding = LayoutPaddingWithFlow(CurChild._SlotPadding, LayoutFlow);
+            Margin SlotPadding = LayoutPaddingWithFlow(CurChild->_SlotPadding, LayoutFlow);
 
 			Vector2 SlotSize = (InOrientation == EOrientation::Vertical)
 				? Vector2(AllottedGeometry.GetSize().X, ChildSize + SlotPadding.GetTotalSpaceAlong(EOrientation::Vertical))
 				: Vector2(ChildSize + SlotPadding.GetTotalSpaceAlong(EOrientation::Horizontal), AllottedGeometry.GetSize().Y);
 
 			// Figure out the size and local position of the child within the slot			
-			auto xAlignmentResult = AlignmentArrangeResult::AlignChild(EOrientation::Horizontal, LayoutFlow, SlotSize.X, CurChild, SlotPadding);
-			auto yAlignmentResult = AlignmentArrangeResult::AlignChild(EOrientation::Vertical, LayoutFlow, SlotSize.Y, CurChild, SlotPadding);
+			auto xAlignmentResult = AlignmentArrangeResult::AlignChild(EOrientation::Horizontal, LayoutFlow, SlotSize.X, *CurChild, SlotPadding);
+			auto yAlignmentResult = AlignmentArrangeResult::AlignChild(EOrientation::Vertical, LayoutFlow, SlotSize.Y, *CurChild, SlotPadding);
 
 			Vector2 LocalPosition = (InOrientation == EOrientation::Vertical)
 				? Vector2(xAlignmentResult.Offset, PositionSoFar + yAlignmentResult.Offset)
@@ -172,7 +173,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 			// Add the information about this child to the output list (ArrangedChildren)
 			ArrangedChildrens.AddWidget(ChildVisibility, AllottedGeometry.MakeChild(
 				// The child widget being arranged
-				CurChild.GetContent(),
+				CurChild->GetContent(),
 				// Child's local position (i.e. position within parent)
 				LocalPosition,
 				// Child's size
@@ -190,7 +191,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 		{
 			case EFlowDirection::LeftToRight:
 			{
-				const auto& View = Slots;
+				auto& View = Slots;
 				std::for_each(View.begin(), View.end(), SlotIterationBody);
 				break;
 			}
@@ -209,7 +210,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 	}
 }
 
-Vector2 SBoxPanel::ComputeDesiredSizeForBox(EOrientation InOrientation, const std::vector<Slot>& slots)
+Vector2 SBoxPanel::ComputeDesiredSizeForBox(EOrientation InOrientation, const std::vector<SSlot*>& slots)
 {
     // The desired size of this panel is the total size desired by its children plus any margins specified in this panel.
     // The layout along the panel's axis is describe dy the SizeParam, while the perpendicular layout is described by the
@@ -217,41 +218,41 @@ Vector2 SBoxPanel::ComputeDesiredSizeForBox(EOrientation InOrientation, const st
 	Vector2 myDesiredSize;
     for (auto& CurChild : slots)
     {
-        if (CurChild.GetContent()->GetVisibility() != ESlateVisibility::Collapsed)
+        if (CurChild->GetContent()->GetVisibility() != ESlateVisibility::Collapsed)
         {
-            Vector2 CurChildDesiredSize = CurChild.GetContent()->GetDesiredSize();
+            Vector2 CurChildDesiredSize = CurChild->GetContent()->GetDesiredSize();
 
             if (InOrientation == EOrientation::Vertical)
             {
                 // For a vertical panel, we want to find the maximum desired width (including margin).
                 // That will be the desired width of the whole panel.
-                myDesiredSize.X = MathEx::Max(myDesiredSize.X, CurChildDesiredSize.X + CurChild._SlotPadding.GetTotalSpaceAlong(EOrientation::Horizontal));
+                myDesiredSize.X = MathEx::Max(myDesiredSize.X, CurChildDesiredSize.X + CurChild->_SlotPadding.GetTotalSpaceAlong(EOrientation::Horizontal));
 
                 // Clamp to the max size if it was specified
                 float finalChildDesiredSize = CurChildDesiredSize.Y;
-                float MaxSize = CurChild._MaxSize;
+                float MaxSize = CurChild->_MaxSize;
                 if (MaxSize > 0)
                 {
                     finalChildDesiredSize = MathEx::Min(MaxSize, finalChildDesiredSize);
                 }
 
-                myDesiredSize.Y += finalChildDesiredSize + CurChild._SlotPadding.GetTotalSpaceAlong(EOrientation::Vertical);
+                myDesiredSize.Y += finalChildDesiredSize + CurChild->_SlotPadding.GetTotalSpaceAlong(EOrientation::Vertical);
             }
             else
             {
                 // A horizontal panel is just a sideways vertical panel: the axes are swapped.
 
-                myDesiredSize.Y = MathEx::Max(myDesiredSize.Y, CurChildDesiredSize.Y + CurChild._SlotPadding.GetTotalSpaceAlong(EOrientation::Vertical));
+                myDesiredSize.Y = MathEx::Max(myDesiredSize.Y, CurChildDesiredSize.Y + CurChild->_SlotPadding.GetTotalSpaceAlong(EOrientation::Vertical));
 
                 // Clamp to the max size if it was specified
                 float finalChildDesiredSize = CurChildDesiredSize.X;
-                float MaxSize = CurChild._MaxSize;
+                float MaxSize = CurChild->_MaxSize;
                 if (MaxSize > 0)
                 {
                     finalChildDesiredSize = MathEx::Min(MaxSize, finalChildDesiredSize);
                 }
 
-                myDesiredSize.X += finalChildDesiredSize + CurChild._SlotPadding.GetTotalSpaceAlong(EOrientation::Horizontal);
+                myDesiredSize.X += finalChildDesiredSize + CurChild->_SlotPadding.GetTotalSpaceAlong(EOrientation::Horizontal);
             }
         }
     }
@@ -262,5 +263,10 @@ Vector2 SBoxPanel::ComputeDesiredSizeForBox(EOrientation InOrientation, const st
 DEFINE_SLATE_CONSTRUCTOR(SBoxPanel, Attr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
-	Slots = std::move(Attr.Slots);
+
+	Slots.reserve(Attr.Slots.size());
+	for (auto& Slot : Attr.Slots)
+	{
+		Slots.emplace_back(NewObject<SSlot>(std::move(Slot)));
+	}
 }

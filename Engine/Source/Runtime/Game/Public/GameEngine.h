@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Ticking/TickScheduler.h"
+#include "Misc/TickScheduler.h"
 #include "Misc/TickCalc.h"
 #include "IApplicationInterface.h"
 
@@ -52,7 +52,7 @@ public:
 	}
 
 private:
-	IApplicationInterface::ETickMode AppTickMode;
+	IApplicationInterface::ETickMode AppTickMode = IApplicationInterface::ETickMode::Realtime;
 	TickCalc<> TickCalc;
 
 	void TickEngine(IApplicationInterface::ETickMode ActualTickMode);

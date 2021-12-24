@@ -9,7 +9,7 @@ interface IRHIFactory;
 interface IRHIDevice;
 interface IRHISwapChain;
 
-class GAME_API SSwapChainRenderTarget : implements SObject, public SceneRenderTarget
+class GAME_API SSwapChainRenderTarget : public SSceneRenderTarget
 {
 	GENERATED_BODY(SSwapChainRenderTarget)
 

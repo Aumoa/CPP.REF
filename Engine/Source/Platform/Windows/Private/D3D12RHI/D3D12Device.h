@@ -31,10 +31,10 @@ private:
 	ComPtr<ID3D12Device> _device;
 
 	std::mutex _allocatorLock;
-	std::map<int64, SD3D12ThreadAllocatorContainer*> _threadAllocators;
+	std::map<int64, SharedPtr<SD3D12ThreadAllocatorContainer>> _threadAllocators;
 	std::mutex _heapsLock;
-	std::map<int64, SD3D12ThreadDescriptorHeapContainer*> _threadSrvHeaps;
-	std::map<int64, SD3D12ThreadDescriptorHeapContainer*> _threadSamplerHeaps;
+	std::map<int64, SharedPtr<SD3D12ThreadDescriptorHeapContainer>> _threadSrvHeaps;
+	std::map<int64, SharedPtr<SD3D12ThreadDescriptorHeapContainer>> _threadSamplerHeaps;
 	
 	uint64 _fenceValue = 0;
 	SPROPERTY(_immCon)
@@ -42,7 +42,6 @@ private:
 
 public:
 	SD3D12Device(SDXGIFactory* InFactory, ComPtr<ID3D12Device> device);
-	virtual ~SD3D12Device() override;
 
 	virtual IRHIDeviceContext* GetImmediateContext() override;
 	virtual IRHIDeviceContext* CreateDeviceContext() override;
@@ -64,6 +63,9 @@ public:
 	SD3D12DescriptorHeap* GetThreadPrimarySrvHeap(int32 Count);
 	SD3D12DescriptorHeap* GetThreadPrimarySamplerHeap(int32 Count);
 	void MarkPendingAllocatorAndHeaps(uint64 fenceValue);
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 
 public:
 	DECLARE_GETTER(ID3D12Device, _device);

@@ -17,7 +17,7 @@ class SValueType;
 
 namespace SObject_Details
 {
-	class CORE_API SObjectBase : public NonCopyable
+	class CORE_API SObjectBase
 	{
 		virtual Type* GetType() const = 0;
 	};
@@ -44,6 +44,7 @@ private:
 
 public:
 	SObject();
+	SObject(SObject&& Rhs);
 	virtual ~SObject() noexcept;
 
 	void AddToRoot();
@@ -51,7 +52,6 @@ public:
 
 private:
 	SObject(const SObject&) = delete;
-	SObject(SObject&&) = delete;
 
 	void MarkGC(uint64 Generation);
 	void UnmarkGC();

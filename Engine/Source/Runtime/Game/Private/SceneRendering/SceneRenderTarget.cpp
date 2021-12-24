@@ -6,16 +6,22 @@
 #include "RHI/IRHITexture2D.h"
 #include "RHI/RHIEnums.h"
 
-SceneRenderTarget::SceneRenderTarget()
+GENERATE_BODY(SSceneRenderTarget);
+
+SSceneRenderTarget::SSceneRenderTarget()
 {
 }
 
-SceneRenderTarget::SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
+SSceneRenderTarget::SSceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
 {
 	InitTarget(InRTV, IndexOfRTV, InDSV, IndexOfDSV, InInitState);
 }
 
-void SceneRenderTarget::InitTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
+SSceneRenderTarget::~SSceneRenderTarget()
+{
+}
+
+void SSceneRenderTarget::InitTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState)
 {
 	this->RTV = InRTV;
 	this->DSV = InDSV;
@@ -27,7 +33,7 @@ void SceneRenderTarget::InitTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV
 
 	if (InRTV)
 	{
-		RTTexture = SObject::Cast<IRHITexture2D>(InRTV->GetResource(IndexOfRTV));
+		RTTexture = Cast<IRHITexture2D>(InRTV->GetResource(IndexOfRTV));
 		ReferencedTexture = RTTexture;
 	}
 	else
@@ -38,7 +44,7 @@ void SceneRenderTarget::InitTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV
 
 	if (InDSV)
 	{
-		DSTexture = SObject::Cast<IRHITexture2D>(InDSV->GetResource(IndexOfDSV));
+		DSTexture = Cast<IRHITexture2D>(InDSV->GetResource(IndexOfDSV));
 		if (ReferencedTexture == nullptr)
 		{
 			ReferencedTexture = DSTexture;

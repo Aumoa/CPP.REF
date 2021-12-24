@@ -9,16 +9,23 @@ interface IRHITexture2D;
 interface IRHIRenderTargetView;
 interface IRHIDepthStencilView;
 
-class GAME_API SceneRenderTarget
+class GAME_API SSceneRenderTarget : implements SObject
 {
-public:
-	SceneRenderTarget();
-	SceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState);
+	GENERATED_BODY(SSceneRenderTarget)
 
-	IRHIRenderTargetView* RTV;
-	IRHIDepthStencilView* DSV;
-	IRHITexture2D* RTTexture;
-	IRHITexture2D* DSTexture;
+public:
+	SSceneRenderTarget();
+	SSceneRenderTarget(IRHIRenderTargetView* InRTV, int32 IndexOfRTV, IRHIDepthStencilView* InDSV, int32 IndexOfDSV, ERHIResourceStates InInitState);
+	~SSceneRenderTarget();
+
+	SPROPERTY(RTV)
+	IRHIRenderTargetView* RTV = nullptr;
+	SPROPERTY(DSV)
+	IRHIDepthStencilView* DSV = nullptr;
+	SPROPERTY(RTTexture)
+	IRHITexture2D* RTTexture = nullptr;
+	SPROPERTY(DSTexture)
+	IRHITexture2D* DSTexture = nullptr;
 	int32 IndexOfRTV;
 	int32 IndexOfDSV;
 	ERHIResourceStates InitState;

@@ -23,7 +23,7 @@ void Type::RegisterStaticClass()
 
 	static std::map<std::wstring, Type*, std::less<>> TypeCollection;
 	TypeCollectionPtr = &TypeCollection;
-	TypeCollection.emplace(GetFriendlyName(), this);
+	TypeCollection.emplace(GetFullName(), this);
 
 	static std::map<size_t, std::vector<Type*>> TypeHierarchyMap;
 	TypeHierarchyMapPtr = &TypeHierarchyMap;

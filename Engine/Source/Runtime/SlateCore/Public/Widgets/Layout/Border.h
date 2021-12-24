@@ -11,6 +11,7 @@ class SLATECORE_API SBorder : public SCompoundWidget
 
 private:
 	Margin Padding;
+	SPROPERTY(Content)
 	SWidget* Content = nullptr;
 
 public:

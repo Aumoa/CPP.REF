@@ -13,6 +13,8 @@
 #include "RHI/IRHIDeviceContext2D.h"
 #include "RHI/IRHITexture2D.h"
 #include "RHI/IRHIBitmap.h"
+#include "RHI/IRHIRenderTargetView.h"
+#include "RHI/IRHIDepthStencilView.h"
 #include "Level/World.h"
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/SceneViewScope.h"
@@ -44,6 +46,7 @@ SGameRenderSystem::~SGameRenderSystem()
 void SGameRenderSystem::Init()
 {
 	RenderThread::Init();
+	GC.PreGarbageCollect.AddSObject(this, &SGameRenderSystem::OnPreGarbageCollect);
 
 	Factory = IApplicationInterface::Get().GetFactory();
 	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
@@ -152,4 +155,11 @@ void SGameRenderSystem::ResizeApp(Vector2N Size)
 			Device->EndFrame();
 		});
 	}
+}
+
+void SGameRenderSystem::OnPreGarbageCollect()
+{
+	RenderThread::ExecuteWorks(PrimaryQueue, []()
+	{
+	});
 }

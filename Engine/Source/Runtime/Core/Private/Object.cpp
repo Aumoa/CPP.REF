@@ -15,6 +15,16 @@ SObject::SObject() : Generation(0)
 	ReferencePtr = new Referencer();
 }
 
+SObject::SObject(SObject&& Rhs)
+	: Generation(0)
+	, ReferencePtr(Rhs.ReferencePtr)
+	, InternalIndex(-1)
+{
+	Rhs.Generation = 0;
+	Rhs.ReferencePtr = nullptr;
+	Rhs.InternalIndex = -1;
+}
+
 SObject::~SObject()
 {
 	if (ReferencePtr && ReferencePtr->WeakReferences == 0)

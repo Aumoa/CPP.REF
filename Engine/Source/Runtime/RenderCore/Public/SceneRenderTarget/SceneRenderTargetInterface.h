@@ -16,7 +16,9 @@ class RENDERCORE_API SSceneRenderTargetInterface : implements SObject
 	GENERATED_BODY(SSceneRenderTargetInterface)
 
 private:
+	SPROPERTY(RTV)
 	IRHIRenderTargetView* RTV = nullptr;
+	SPROPERTY(DSV)
 	IRHIDepthStencilView* DSV = nullptr;
 	uint8 bBindResources : 1 = false;
 	

@@ -6,17 +6,30 @@
 
 class SWidget;
 
-template<class TSlotClass>
-class TSlotBase
+class SLATECORE_API SWidgetSlot : implements SObject
 {
-public:
-	using This = TSlotClass;
+	GENERATED_BODY(SWidgetSlot)
 
 private:
+	SPROPERTY(Content)
 	SWidget* Content = nullptr;
 
 public:
-	TSlotBase()
+	SWidgetSlot();
+
+	void SetContent(SWidget* InContent);
+	SWidget* GetContent();
+};
+
+template<class TSlotClass>
+class TSlotBase : public SWidgetSlot
+{
+public:
+	using Super = SWidgetSlot;
+	using This = TSlotBase<TSlotClass>;
+
+public:
+	TSlotBase() : Super()
 	{
 	}
 
@@ -30,15 +43,5 @@ public:
 	{
 		SetContent(InContent);
 		return static_cast<TSlotClass&>(*this);
-	}
-
-	void SetContent(SWidget* InContent)
-	{
-		Content = InContent;
-	}
-
-	SWidget* GetContent() const
-	{
-		return Content;
 	}
 };

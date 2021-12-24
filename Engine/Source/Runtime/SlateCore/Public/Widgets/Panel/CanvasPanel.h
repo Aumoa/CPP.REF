@@ -10,10 +10,12 @@ class SLATECORE_API SCanvasPanel : public SPanelWidget
 	GENERATED_BODY(SCanvasPanel)
 
 public:
-	class Slot : public TSlotBase<Slot>
+	class SLATECORE_API SSlot : public TSlotBase<SSlot>
 	{
+		GENERATED_BODY(SSlot)
+
 	public:
-		Slot()
+		SSlot() : Super()
 		{
 		}
 
@@ -32,7 +34,8 @@ private:
 	};
 
 private:
-	std::vector<Slot> Slots;
+	SPROPERTY(Slots)
+	std::vector<SSlot*> Slots;
 
 public:
 	SCanvasPanel();
@@ -40,7 +43,7 @@ public:
 
 	virtual Vector2 GetDesiredSize() override;
 
-	Slot& AddSlot();
+	SSlot& AddSlot();
 	bool RemoveSlot(size_t Index);
 	size_t FindSlot(const SWidget* Content);
 	void ClearSlots();
@@ -54,7 +57,7 @@ protected:
 
 public:
 	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_SLOT_SUPPORTS(Slot)
+		DECLARE_SLATE_SLOT_SUPPORTS(SSlot)
 	END_SLATE_ATTRIBUTE
 
 	DECLARE_SLATE_CONSTRUCTOR();

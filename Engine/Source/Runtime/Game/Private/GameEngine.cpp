@@ -25,6 +25,8 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 {
 	GEngine = this;
 
+	GC.SetFlushInterval(0);
+
 	SlateApplication = NewObject<SSlateApplication>();
 	SlateApplication->Init(InApplication);
 
@@ -77,13 +79,10 @@ void SGameEngine::Shutdown()
 
 	Subsystems.clear();
 	SubsystemView.clear();
-	GC.Collect(true);
 }
 
 int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
-	GC.SetThreadMode(EGCThreadMode::SpecifiedThreadHint);
-
 	CoreDelegates::BeginMainInvoked.Broadcast();
 
 	// Create GameEngine instance and initialize it.

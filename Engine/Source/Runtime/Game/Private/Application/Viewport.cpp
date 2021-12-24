@@ -169,15 +169,15 @@ void SViewport::ReallocRenderTarget()
 
 void SViewport::DestroyRenderTarget_GameThread()
 {
-	auto MoveTemp = [](auto*& InObject) -> SharedPtr<SObject>
-	{
-		SharedPtr Object = InObject;
-		InObject = nullptr;
-		return Object;
-	};
+	//auto MoveTemp = [](auto*& InObject) -> SharedPtr<SObject>
+	//{
+	//	SharedPtr Object = InObject;
+	//	InObject = nullptr;
+	//	return Object;
+	//};
 
-	std::vector<SharedPtr<SObject>> Holders = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(SRV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
+	//std::vector<SharedPtr<SObject>> Holders = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(SRV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
 
-	// Finalize textures in render thread.
-	//RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](auto){});
+	//// Finalize textures in render thread.
+	////RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](auto){});
 }

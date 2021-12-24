@@ -5,6 +5,7 @@
 #include "Draw/PaintArgs.h"
 
 GENERATE_BODY(SCanvasPanel);
+GENERATE_BODY(SCanvasPanel::SSlot);
 
 SCanvasPanel::SCanvasPanel() : Super()
 {
@@ -21,18 +22,18 @@ Vector2 SCanvasPanel::GetDesiredSize()
 	// Arrange the children now in their proper z-order.
 	for (size_t i = 0; i < Slots.size(); ++i)
 	{
-		Slot& CurChild = Slots[i];
-		SWidget* Widget = CurChild.GetContent();
+		SSlot* CurChild = Slots[i];
+		SWidget* Widget = CurChild->GetContent();
 		ESlateVisibility ChildVisibility = Widget->GetVisibility();
 
 		// As long as the widgets are not collapsed, they should contribute to the desired size.
 		if (ChildVisibility != ESlateVisibility::Collapsed)
 		{
-			const Margin& Offset = CurChild._Offset;
-			const Anchors& Anchors = CurChild._Anchors;
+			const Margin& Offset = CurChild->_Offset;
+			const Anchors& Anchors = CurChild->_Anchors;
 
 			const Vector2& SlotSize = Vector2(Offset.Right, Offset.Bottom);
-			const bool& bAutoSize = CurChild._bAutoSize;
+			const bool& bAutoSize = CurChild->_bAutoSize;
 			const Vector2 Size = bAutoSize ? Widget->GetDesiredSize() : SlotSize;
 
 			const bool bIsDockedHorizontally = (Anchors.Minimum.X == Anchors.Maximum.X) && (Anchors.Minimum.X == 0 || Anchors.Minimum.X == 1);
@@ -46,9 +47,9 @@ Vector2 SCanvasPanel::GetDesiredSize()
 	return FinalDesiredSize;
 }
 
-auto SCanvasPanel::AddSlot() -> Slot&
+auto SCanvasPanel::AddSlot() -> SSlot&
 {
-	return Slots.emplace_back();
+	return *Slots.emplace_back(NewObject<SSlot>());
 }
 
 bool SCanvasPanel::RemoveSlot(size_t Index)
@@ -66,7 +67,7 @@ size_t SCanvasPanel::FindSlot(const SWidget* Content)
 {
 	for (size_t i = 0; i < Slots.size(); ++i)
 	{
-		if (Slots[i].GetContent() == Content)
+		if (Slots[i]->GetContent() == Content)
 		{
 			return i;
 		}
@@ -88,7 +89,12 @@ size_t SCanvasPanel::NumSlots()
 DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Attr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
-	Slots = std::move(Attr.Slots);
+	
+	Slots.reserve(Attr.Slots.size());
+	for (auto& Slot : Attr.Slots)
+	{
+		Slots.emplace_back(NewObject<SSlot>(std::move(Slot)));
+	}
 }
 
 int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
@@ -150,7 +156,7 @@ void SCanvasPanel::ArrangeLayeredChildren(ArrangedChildrens& InoutArrangedChildr
 			SlotOrder.emplace_back() =
 			{
 				.ChildIndex = (int32)i,
-				.ZOrder = CurChild._ZOrder
+				.ZOrder = CurChild->_ZOrder
 			};
 		}
 
@@ -173,16 +179,16 @@ void SCanvasPanel::ArrangeLayeredChildren(ArrangedChildrens& InoutArrangedChildr
 		for (size_t ChildIndex = 0; ChildIndex < Slots.size(); ++ChildIndex)
 		{
 			ChildZOrder CurSlot = SlotOrder[ChildIndex];
-			const Slot& CurChild = Slots[CurSlot.ChildIndex];
-			SWidget* CurWidget = CurChild.GetContent();
+			SSlot* CurChild = Slots[CurSlot.ChildIndex];
+			SWidget* CurWidget = CurChild->GetContent();
 
 			ESlateVisibility ChildVisibility = CurWidget->GetVisibility();
 			if (InoutArrangedChildrens.Accepts(ChildVisibility))
 			{
-				const Margin& Offset = CurChild._Offset;
-				const Vector2& Alignment = CurChild._Alignment;
-				const Anchors& Anchors = CurChild._Anchors;
-				const bool bAutoSize = CurChild._bAutoSize;
+				const Margin& Offset = CurChild->_Offset;
+				const Vector2& Alignment = CurChild->_Alignment;
+				const Anchors& Anchors = CurChild->_Anchors;
+				const bool bAutoSize = CurChild->_bAutoSize;
 
 				const Margin AnchorPixels(
 					Anchors.Minimum.X * AllottedGeometry.GetSize().X,

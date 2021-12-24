@@ -28,16 +28,6 @@ SD3D12Device::SD3D12Device(SDXGIFactory* InFactory, ComPtr<ID3D12Device> device)
 	CreateInteropDevice();
 }
 
-SD3D12Device::~SD3D12Device()
-{
-	if (_immCon)
-	{
-		// Flush and signal forcely.
-		_immCon->ExecuteCommandLists({}, true);
-		_immCon->WaitCompleted();
-	}
-}
-
 IRHIDeviceContext* SD3D12Device::GetImmediateContext()
 {
 	return _immCon;
@@ -552,7 +542,7 @@ ID3D12CommandAllocator* SD3D12Device::GetThreadPrimaryAllocator()
 	}
 	else
 	{
-		container = allocator_it->second;
+		container = allocator_it->second.Get();
 	}
 
 	return container->GetPrimaryAllocator(_immCon->GetCompletedValue());
@@ -572,7 +562,7 @@ SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySrvHeap(int32 count)
 	}
 	else
 	{
-		container = heaps_it->second;
+		container = heaps_it->second.Get();
 	}
 
 	return container->GetUsableHeap(_immCon->GetCompletedValue(), count);
@@ -592,7 +582,7 @@ SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySamplerHeap(int32 count)
 	}
 	else
 	{
-		container = heaps_it->second;
+		container = heaps_it->second.Get();
 	}
 
 	return container->GetUsableHeap(_immCon->GetCompletedValue(), count);
@@ -618,6 +608,21 @@ void SD3D12Device::MarkPendingAllocatorAndHeaps(uint64 fenceValue)
 	{
 		pair.second->MarkPendingHeap(fenceValue);
 	}
+}
+
+void SD3D12Device::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		if (_immCon)
+		{
+			// Flush and signal forcely.
+			_immCon->ExecuteCommandLists({}, true);
+			_immCon->WaitCompleted();
+		}
+	}
+
+	Super::Dispose(bDisposing);
 }
 
 void SD3D12Device::AllocateCommandQueue()
