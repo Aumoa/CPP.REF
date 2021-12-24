@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Object.h"
 #include "SharedPtr.h"
+#include "GC/Referencer.h"
 
 template<class T>
 class WeakPtr
@@ -13,7 +13,7 @@ class WeakPtr
 
 private:
 	T* Ptr = nullptr;
-	SObject::WeakReferencePtr* ReferencePtr = nullptr;
+	Referencer* ReferencePtr = nullptr;
 
 public:
 	inline WeakPtr()

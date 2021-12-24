@@ -8,10 +8,10 @@
 template<class Clock = std::chrono::system_clock>
 class DateTime
 {
-	Clock::time_point TimePoint;
+	typename Clock::time_point TimePoint;
 
 public:
-	constexpr DateTime(Clock::time_point TimePoint) : TimePoint(TimePoint)
+	constexpr DateTime(typename Clock::time_point TimePoint) : TimePoint(TimePoint)
 	{
 	}
 

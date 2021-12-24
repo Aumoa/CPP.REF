@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Object.h"
-
 template<class T>
 class SharedPtr
 {

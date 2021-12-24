@@ -74,19 +74,7 @@ void Thread::Internal_NewThread(std::wstring FriendlyName, std::function<void()>
 		Thread* MyThread = GetCurrentThread();
 		MyThread->SetFriendlyName(FriendlyName);
 		MyThread->bIsManaged = true;
-
-		try
-		{
-			GC.RegisterThread(MyThread);
-			Body();
-		}
-		catch (...)
-		{
-			GC.UnregisterThread(MyThread);
-			throw;
-		}
-
-		GC.UnregisterThread(MyThread);
+		Body();
 	}).detach();
 }
 

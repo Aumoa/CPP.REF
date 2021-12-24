@@ -1,0 +1,51 @@
+// Copyright 2020-2021 Aumoa.lib. All right reserved.
+
+#pragma once
+
+#include <chrono>
+#include "CoreAssert.h"
+
+template<class T, class Clock = std::chrono::steady_clock>
+class CORE_API ScopedTimer
+{
+	using TimePoint = typename Clock::time_point;
+	using Report = void(T::*)(float);
+
+private:
+	T* Instance;
+	TimePoint StartTime;
+	Report Reporter;
+
+public:
+	inline ScopedTimer(T* Instance, Report InReporter)
+		: Instance(Instance)
+		, StartTime(Clock::now())
+		, Reporter(InReporter)
+	{
+		check(Instance);
+	}
+
+	inline ~ScopedTimer()
+	{
+		InternalStop();
+	}
+
+	inline void Stop()
+	{
+		checkf(Instance, L"Timer already stopped.");
+		InternalStop();
+	}
+
+private:
+	inline void InternalStop()
+	{
+		if (Instance)
+		{
+			TimePoint EndTime = Clock::now();
+			auto Dur = EndTime - StartTime;
+			(Instance->*Reporter)(std::chrono::duration_cast<std::chrono::duration<float>>(Dur).count());
+
+			Instance = nullptr;
+		}
+	}
+};

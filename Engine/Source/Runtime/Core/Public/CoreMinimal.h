@@ -7,10 +7,12 @@
 #pragma warning(disable: 4251)
 #endif
 
+#include "CoreMacros.h"
 #include "PrimitiveTypes.h"
 #include "Object.h"
-#include "Interface.h"
+#include "Casts.h"
 #include "CoreAssert.h"
+#include "ValueType.h"
 #include "AbstractClass.h"
 #include "NonCopyable.h"
 #include "Guid.h"
@@ -18,7 +20,6 @@
 #include "GC/GC.h"
 #include "GC/SharedPtr.h"
 #include "GC/WeakPtr.h"
-#include "Reflection/ReflectionMacros.h"
 #include "Reflection/Type.h"
 #include "Reflection/Method.h"
 #include "Reflection/Property.h"
@@ -29,6 +30,8 @@
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
+#include "Diagnostics/CycleCounterNamespace.h"
+#include "Diagnostics/CycleCounterUnit.h"
 #include "Mathematics/MathEx.h"
 #include "Mathematics/Degrees.h"
 #include "Mathematics/Radians.h"

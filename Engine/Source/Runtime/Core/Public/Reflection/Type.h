@@ -18,6 +18,41 @@ class SObject;
 class Method;
 class Property;
 
+namespace ReflectionMacros
+{
+	template<class T>
+	struct SuperClassTypeDeclare
+	{
+	private:
+		template<class U> requires requires { typename U::This; }
+		static auto Impl(int32) -> decltype(std::declval<typename U::This>());
+
+		template<class U> requires (!requires { typename U::This; })
+		static auto Impl(int16) -> void;
+
+	public:
+		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
+	};
+
+	template<class T>
+	consteval bool IsStaticMember();
+	template<class T>
+	consteval bool IsStaticMember(T*) { return true; }
+	template<class TOwner, class T>
+	consteval bool IsStaticMember(T(TOwner::*)) { return false; }
+	template<class T>
+	consteval bool IsStaticMember(const T*) { return true; }
+	template<class TOwner, class T>
+	consteval bool IsStaticMember(const T(TOwner::*)) { return false; }
+
+	template<class T>
+	inline T& Assign(T& Member, const void* Value)
+	{
+		Member = *reinterpret_cast<const T*>(Value);
+		return Member;
+	}
+}
+
 class CORE_API Type
 {
 	using ObjectCtor = SObject*(*)();
@@ -29,6 +64,7 @@ private:
 	static std::mutex TypeRegisterMutex;
 
 	size_t TypeHash = 0;
+	size_t SizeOf = 0;
 	std::wstring FriendlyName;
 	std::wstring FullName;
 	Type* SuperClass = nullptr;
@@ -172,6 +208,7 @@ public:
 	template<class TType>
 	Type(TypeGenerator<TType>&& Generator)
 		: TypeHash(typeid(TType).hash_code())
+		, SizeOf(sizeof(TType))
 		, FriendlyName(std::move(Generator.FriendlyName))
 		, FullName(std::move(Generator.FullName))
 		, SuperClass(Generator.SuperClass)
@@ -191,6 +228,7 @@ public:
 	const std::wstring& GetFriendlyName() const;
 	const std::wstring& GetFullName() const;
 	size_t GetHashCode() const;
+	size_t GetSizeOf() const;
 
 	Type* GetSuper() const;
 	SObject* Instantiate() const;
@@ -226,8 +264,10 @@ private:
 public:
 	std::vector<Method> GetMethods(bool bIncludeSuperMembers = true);
 	Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
+
 	const std::vector<Property*>& GetProperties(bool bIncludeSuperMembers = true);
 	const std::vector<Property*>& GetGCProperties();
+
 	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
 	int32 MarkCollectionObjects(SObject* Object, Property* CollectionProp, int32 Depth);
 

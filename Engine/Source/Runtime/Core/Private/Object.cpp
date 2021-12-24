@@ -12,13 +12,12 @@ GENERATE_BODY(SObject);
 
 SObject::SObject() : Generation(0)
 {
-	ReferencePtr = new WeakReferencePtr();
-	GC.RegisterObject(this);
+	ReferencePtr = new Referencer();
 }
 
 SObject::~SObject()
 {
-	if (ReferencePtr->WeakReferences == 0)
+	if (ReferencePtr && ReferencePtr->WeakReferences == 0)
 	{
 		delete ReferencePtr;
 		ReferencePtr = nullptr;
@@ -56,6 +55,7 @@ std::wstring SObject::ToString()
 void SObject::PostConstruction()
 {
 	volatile const auto& CachingDummy = GetType()->GetGCProperties();
+	GC.RegisterObject(this);
 }
 
 void* SObject::operator new(size_t AllocSize)

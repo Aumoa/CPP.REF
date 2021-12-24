@@ -2,15 +2,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include <chrono>
 #include <numeric>
 #include <list>
 
-template<class TTimer = std::chrono::steady_clock>
+template<class Clock = std::chrono::steady_clock>
 class TickCalc
 {
-	std::optional<typename TTimer::time_point> TimePoint;
+	std::optional<typename Clock::time_point> TimePoint;
 	std::chrono::duration<float> LastDeltaSeconds = std::chrono::duration<float>(0);
 
 public:
@@ -26,7 +25,7 @@ public:
 	{
 		using namespace std;
 
-		typename TTimer::time_point Now = TTimer::now();
+		typename Clock::time_point Now = Clock::now();
 		std::chrono::duration<float> DeltaSeconds = 0ns;
 
 		if (TimePoint.has_value())

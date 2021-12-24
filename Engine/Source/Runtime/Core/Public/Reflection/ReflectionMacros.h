@@ -2,43 +2,6 @@
 
 #pragma once
 
-#include "Type.h"
-
-namespace ReflectionMacros
-{
-	template<class T>
-	struct SuperClassTypeDeclare
-	{
-	private:
-		template<class U> requires requires { typename U::This; }
-		static auto Impl(int32) -> decltype(std::declval<typename U::This>());
-
-		template<class U> requires (!requires { typename U::This; })
-		static auto Impl(int16) -> void;
-
-	public:
-		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
-	};
-
-	template<class T>
-	consteval bool IsStaticMember();
-	template<class T>
-	consteval bool IsStaticMember(T*) { return true; }
-	template<class TOwner, class T>
-	consteval bool IsStaticMember(T(TOwner::*)) { return false; }
-	template<class T>
-	consteval bool IsStaticMember(const T*) { return true; }
-	template<class TOwner, class T>
-	consteval bool IsStaticMember(const T(TOwner::*)) { return false; }
-
-	template<class T>
-	inline T& Assign(T& Member, const void* Value)
-	{
-		Member = *reinterpret_cast<const T*>(Value);
-		return Member;
-	}
-}
-
 #define GENERATED_BODY(Class, ...)															\
 	friend class Type;																		\
 																							\
@@ -146,6 +109,64 @@ private:																					\
 	static void REFLECTION_GetPropertyPointer(void*);										\
 																							\
 public:
+
+#define GENERATED_STRUCT_BODY(Struct, ...)													\
+	friend class Type;																		\
+																							\
+	inline static Type* StaticClass()														\
+	{																						\
+		static Type MyClassType(Type::TypeGenerator<Struct>(FriendlyName, L ## #Struct));	\
+		return &MyClassType;																\
+	}																						\
+																							\
+	inline static constexpr std::wstring_view FriendlyName = L ## #Struct;					\
+																							\
+private:																					\
+	inline static Type* StaticRegisterClass = StaticClass();								\
+																							\
+public:																						\
+	Type* GetType() const																	\
+	{																						\
+		return StaticClass();																\
+	}																						\
+																							\
+private:																					\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_FunctionChain()										\
+	{																						\
+		return REFLECTION_FunctionChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<>																				\
+	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_PropertyChain()										\
+	{																						\
+		return REFLECTION_PropertyChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<>																				\
+	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t>																		\
+	static void REFLECTION_GetFunctionPointer(void*);										\
+	template<size_t>																		\
+	static consteval void REFLECTION_GetFunctionName(void*);								\
+	template<size_t>																		\
+	static void REFLECTION_GetPropertyPointer(void*);										\
+																							\
+public:																						\
+	inline operator SObject* () const														\
+	{																						\
+		return Cast<SObject>(*this);														\
+	}
 
 #define GENERATE_BODY(Class, ...)															\
 Type* Class::StaticClass()																	\

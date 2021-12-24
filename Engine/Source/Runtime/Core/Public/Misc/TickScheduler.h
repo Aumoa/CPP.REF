@@ -8,7 +8,7 @@
 #include <atomic>
 #include <map>
 
-class GAME_API STickScheduler : implements SObject
+class CORE_API STickScheduler : implements SObject
 {
 	GENERATED_BODY(STickScheduler)
 

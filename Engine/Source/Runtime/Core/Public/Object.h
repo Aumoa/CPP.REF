@@ -8,9 +8,10 @@
 #include "PrimitiveTypes.h"
 #include "LogCore.h"
 #include "NonCopyable.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogVerbosity.h"
 #include "Reflection/ReflectionMacros.h"
+#include "Reflection/Type.h"
+#include "Casts.h"
+#include "GC/Referencer.h"
 
 class SValueType;
 
@@ -34,24 +35,12 @@ class CORE_API SObject : public SObject_Details::SObjectBase
 	template<class T>
 	friend class WeakPtr;
 	friend class GarbageCollector;
-
-private:
-	struct WeakReferencePtr
-	{
-		std::atomic<bool> bDisposed = false;
-		std::atomic<int32> References = 0;
-		std::atomic<int32> WeakReferences = 0;
-
-		inline bool IsValid() const volatile
-		{
-			return !bDisposed;
-		}
-	};
+	friend class ObjectHashTable;
 
 private:
 	uint64 Generation = 0;
 	size_t InternalIndex = -1;
-	WeakReferencePtr* ReferencePtr = nullptr;
+	Referencer* ReferencePtr = nullptr;
 
 public:
 	SObject();
@@ -77,67 +66,9 @@ public:
 	template<class T, class... TArgs>
 	static T* NewObject(TArgs&&... InArgs) requires std::constructible_from<T, TArgs...>
 	{
-		T* Ptr = new T(std::forward<TArgs>(InArgs)...);
-		((SObject*)Ptr)->PostConstruction();
-		return Ptr;
-	}
-
-	template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
-	inline static TTo* Cast(TFrom* InFrom)
-	{
-		return dynamic_cast<TTo*>(InFrom);
-	}
-
-	template<std::same_as<SObject> TTo, class TFrom>
-	inline static TTo* Cast(const TFrom& InValue) requires (!std::derived_from<TFrom, SObject>)
-	{
-		return NewObject<SValueType>(InValue);
-	}
-
-	template<class TTo, std::same_as<SObject> TFrom>
-	inline static TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>) && (!requires(const TTo& IsOpt)
-	{
-		{ IsOpt.has_value() } -> std::same_as<bool>;
-		{ *IsOpt };
-	})
-	{
-		auto ValueTypePtr = Cast<SValueType>(InValue);
-		if (ValueTypePtr == nullptr)
-		{
-			SE_LOG(LogCasts, Fatal, L"Object is not boxing class.");
-		}
-
-		TTo OutValue;
-		if (!ValueTypePtr->Unboxing(&OutValue))
-		{
-			SE_LOG(LogCasts, Fatal, L"The type of value contained at boxing object is not match with desired type.");
-		}
-
-		return OutValue;
-	}
-
-	template<class TTo, std::same_as<SObject> TFrom>
-	inline static TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>) && requires(const TTo& IsOpt)
-	{
-		{ IsOpt.has_value() } -> std::same_as<bool>;
-		{ *IsOpt };
-	}
-	{
-		using ValueT = std::remove_reference_t<decltype(*std::declval<TTo>())>;
-
-		auto ValueTypePtr = Cast<SValueType>(InValue);
-		if (ValueTypePtr == nullptr)
-		{
-			return std::nullopt;
-		}
-
-		ValueT OutValue;
-		if (!ValueTypePtr->Unboxing(&OutValue))
-		{
-			return std::nullopt;
-		}
-
-		return OutValue;
+		SObject* Ptr = new T(std::forward<TArgs>(InArgs)...);
+		Ptr->PostConstruction();
+		return dynamic_cast<T*>(Ptr);
 	}
 
 	void* operator new(size_t);
@@ -145,4 +76,3 @@ public:
 };
 
 #define implements virtual public 
-#include "ValueType.h"
