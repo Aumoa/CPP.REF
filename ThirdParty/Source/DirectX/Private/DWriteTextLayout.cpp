@@ -48,3 +48,10 @@ ERHIParagraphAlignment SDWriteTextLayout::GetParagraphAlignment()
 {
 	return (ERHIParagraphAlignment)Layout->GetParagraphAlignment();
 }
+
+void SDWriteTextLayout::Dispose(bool bDisposing)
+{
+	Layout.Reset();
+
+	Super::Dispose(bDisposing);
+}

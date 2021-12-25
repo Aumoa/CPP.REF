@@ -30,11 +30,17 @@ class CORE_API SObject : public SObjectDetails::SObjectBase
 	friend class GarbageCollector;
 	friend class ObjectHashTable;
 	friend class SObjectDetails::GCNewBinder;
+	friend struct IDisposable;
 
 private:
-	bool bMarkAtGC = false;
+	uint8 bMarkAtGC : 1 = false;
+	uint8 bHasFinalizer : 1 = false;
 	size_t InternalIndex = -1;
 	Referencer* ReferencePtr = nullptr;
+
+#if DO_CHECK
+	SObject* GC_ContainsOwner = nullptr;
+#endif
 
 public:
 	SObject();
@@ -52,6 +58,7 @@ public:
 
 protected:
 	virtual void PostConstruction();
+	virtual void Dispose(bool bDisposing);
 
 public:
 	void* operator new(size_t);

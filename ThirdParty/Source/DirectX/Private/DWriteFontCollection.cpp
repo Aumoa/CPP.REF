@@ -18,11 +18,8 @@ SDWriteFontCollection::SDWriteFontCollection(SDXGIFactory* InFactory, ComPtr<IDW
 
 void SDWriteFontCollection::Dispose(bool bDisposing)
 {
-	if (bDisposing)
-	{
-		Collection.Reset();
-		Families.clear();
-	}
+	Collection.Reset();
+	Families.clear();
 
 	Super::Dispose(bDisposing);
 }

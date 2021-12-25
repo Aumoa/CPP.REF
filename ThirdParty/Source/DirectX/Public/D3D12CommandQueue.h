@@ -13,29 +13,25 @@ class DIRECTX_API SD3D12CommandQueue : public SD3D12CommandList
 	GENERATED_BODY(SD3D12CommandQueue)
 
 private:
-	struct GC_Pending
+	struct LockedGarbages
 	{
-		std::vector<SharedPtr<SObject>> Objects;
-		uint64 MarkedValue;
+		uint64 MarkedValue = 0;
+		std::vector<SharedPtr<IDisposable>> Objects;
 	};
 
-	ComPtr<ID3D12CommandQueue> _queue;
-	ComPtr<ID3D12Fence> _fence;
-	uint64 _fenceValue = 0;
-	SEventHandle* _event = nullptr;
+	ComPtr<ID3D12CommandQueue> Queue;
+	ComPtr<ID3D12Fence> Fence;
+	uint64 FenceValue = 0;
 
-	std::queue<GC_Pending> _gc;
+	SPROPERTY(Event)
+	SEventHandle* Event = nullptr;
+	std::queue<LockedGarbages> PendingGarbages;
 
 public:
-	SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence);
-	virtual ~SD3D12CommandQueue() noexcept override
-	{
-		int32 Break = 0;
-	}
+	SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12CommandQueue> Queue, ComPtr<ID3D12Fence> Fence);
 
-	using Super::Dispose;
 	virtual void End() override;
-	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal) override;
+	virtual uint64 ExecuteCommandLists(std::span<IRHIDeviceContext*> DeviceContexts, bool bSignal) override;
 
 	uint64 GetFenceValue();
 	uint64 GetCompletedValue();
@@ -46,6 +42,6 @@ protected:
 	virtual void Dispose(bool bDisposing) override;
 
 public:
-	DECLARE_GETTER(ID3D12CommandQueue, _queue);
-	DECLARE_GETTER(ID3D12Fence, _fence);
+	DECLARE_GETTER(ID3D12CommandQueue, Queue);
+	DECLARE_GETTER(ID3D12Fence, Fence);
 };

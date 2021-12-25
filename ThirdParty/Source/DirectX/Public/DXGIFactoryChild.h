@@ -20,11 +20,10 @@ protected:
 
 public:
 	SDXGIFactoryChild(SDXGIFactory* InFactory);
-	virtual ~SDXGIFactoryChild() noexcept override;
 
-	virtual void Dispose();
+	virtual void Dispose() override;
 	virtual IRHIFactory* GetFactory() override;
 
 protected:
-	virtual void Dispose(bool bDisposing);
+	virtual void Dispose(bool bDisposing) override;
 };

@@ -18,3 +18,9 @@ float SD2D1Brush::GetOpacity()
 {
 	return BrushObject->GetOpacity();
 }
+
+void SD2D1Brush::Dispose(bool bDisposing)
+{
+	BrushObject.Reset();
+	Super::Dispose(bDisposing);
+}

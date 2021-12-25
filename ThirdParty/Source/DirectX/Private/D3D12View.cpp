@@ -53,9 +53,10 @@ void SD3D12View::AssignResource(int32 IndexOf, IRHIResource* InResource)
 
 void SD3D12View::Dispose(bool bDisposing)
 {
+	Heap.Reset();
+
 	if (bDisposing)
 	{
-		Heap.Reset();
 		Resources.clear();
 	}
 	

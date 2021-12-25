@@ -18,4 +18,7 @@ public:
 
 	virtual void SetColor(const Color& InColor) override;
 	virtual Color GetColor() override;
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 };

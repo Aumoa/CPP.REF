@@ -51,6 +51,10 @@ void SObject::PostConstruction()
 	GC.RegisterObject(this);
 }
 
+void SObject::Dispose(bool bDisposing)
+{
+}
+
 void* SObject::operator new(size_t AllocSize)
 {
 	return ::operator new(AllocSize);

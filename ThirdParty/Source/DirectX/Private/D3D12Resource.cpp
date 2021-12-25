@@ -15,3 +15,11 @@ uint64 SD3D12Resource::GetGPUVirtualAddress()
 {
 	return Resource->GetGPUVirtualAddress();
 }
+
+void SD3D12Resource::Dispose(bool bDisposing)
+{
+	Resource = nullptr;
+	UploadBuf = nullptr;
+
+	Super::Dispose(bDisposing);
+}

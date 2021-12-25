@@ -17,6 +17,11 @@ private:
 public:
 	SDWriteTextFormat(SDXGIFactory* InFactory, ComPtr<IDWriteTextFormat> format);
 
+	using Super::Dispose;
+
+protected:
+	virtual void Dispose(bool bDisposing);
+
 public:
 	DECLARE_GETTER(IDWriteTextFormat, _format);
 };

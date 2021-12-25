@@ -102,6 +102,19 @@ void SD2D1DeviceContext::DrawBitmap(IRHIBitmap* Bitmap, const Rect* DestRect, fl
 	DeviceContext->DrawBitmap(Bitmap_r, (const D2D1_RECT_F*)DestRect, Opacity, (D2D1_INTERPOLATION_MODE)InterpolationMode, (const D2D1_RECT_F*)SourceRect, (const D2D1_MATRIX_4X4_F*)PerspectiveTransform);
 }
 
+void SD2D1DeviceContext::Dispose(bool bDisposing)
+{
+	InteropDev.Reset();
+	DeviceContext.Reset();
+
+	if (bDisposing)
+	{
+		Target = nullptr;
+	}
+
+	Super::Dispose(bDisposing);
+}
+
 void SD2D1DeviceContext::AcquireWrappedTarget()
 {
 	if (auto CastPtr = Cast<SD2D1Bitmap>(Target))

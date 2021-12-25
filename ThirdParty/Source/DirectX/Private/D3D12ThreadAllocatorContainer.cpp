@@ -12,6 +12,12 @@ SD3D12ThreadAllocatorContainer::SD3D12ThreadAllocatorContainer(int64 threadId, I
 	NewAllocator();
 }
 
+void SD3D12ThreadAllocatorContainer::Dispose()
+{
+	Dispose(true);
+	GC.SuppressFinalize(this);
+}
+
 ID3D12CommandAllocator* SD3D12ThreadAllocatorContainer::GetPrimaryAllocator(uint64 fenceValue)
 {
 	if (auto& pendingBody = _allocators.front(); pendingBody.FenceValue <= fenceValue)
@@ -43,6 +49,19 @@ void SD3D12ThreadAllocatorContainer::MarkPendingAllocator(uint64 fenceValue)
 	pendingBody.FenceValue = fenceValue;
 	pendingBody.AllocatorIndex = 0;
 	_allocators.emplace(std::move(pendingBody));
+}
+
+void SD3D12ThreadAllocatorContainer::Dispose(bool bDisposing)
+{
+	{
+		std::queue<AllocatorPendingBody> Swap;
+		std::swap(Swap, _allocators);
+	}
+
+	_device = nullptr;
+	_body.Allocators.clear();
+
+	Super::Dispose(bDisposing);
 }
 
 void SD3D12ThreadAllocatorContainer::NewAllocator(AllocatorPendingBody& InBody)

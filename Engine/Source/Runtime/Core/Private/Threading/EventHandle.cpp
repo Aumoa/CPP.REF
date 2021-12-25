@@ -10,6 +10,8 @@
 
 using enum ELogVerbosity;
 
+GENERATE_BODY(SEventHandle);
+
 SEventHandle::SEventHandle() : Super()
 {
 	_handle = CreateEventExW(nullptr, nullptr, 0, GENERIC_ALL);

@@ -16,6 +16,9 @@ private:
 public:
 	SD2D1Image(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1Image* Image);
 
+protected:
+	virtual void Dispose(bool bDisposing) override;
+
 public:
 	DECLARE_GETTER(ID2D1Image, ImageSource);
 };

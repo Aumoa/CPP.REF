@@ -12,6 +12,12 @@ SD3D12ThreadDescriptorHeapContainer::SD3D12ThreadDescriptorHeapContainer(int64 t
 	NewPendingHeap();
 }
 
+void SD3D12ThreadDescriptorHeapContainer::Dispose()
+{
+	Dispose(true);
+	GC.SuppressFinalize(this);
+}
+
 SD3D12DescriptorHeap* SD3D12ThreadDescriptorHeapContainer::GetUsableHeap(uint64 fenceValue, int32 reserveCount)
 {
 	if (auto& pendingBody = _heaps.front(); pendingBody.FenceValue >= fenceValue)
@@ -34,6 +40,18 @@ void SD3D12ThreadDescriptorHeapContainer::MarkPendingHeap(uint64 fenceValue)
 	_heaps.emplace(std::move(pendingBody));
 }
 
+void SD3D12ThreadDescriptorHeapContainer::Dispose(bool bDisposing)
+{
+	{
+		std::queue<HeapPendingBody> Swap;
+		std::swap(Swap, _heaps);
+	}
+
+	_device = nullptr;
+
+	Super::Dispose(bDisposing);
+}
+
 void SD3D12ThreadDescriptorHeapContainer::NewPendingHeap()
 {
 	_heaps.emplace();
@@ -45,14 +63,14 @@ SD3D12DescriptorHeap* SD3D12ThreadDescriptorHeapContainer::GetSuitableHeap(HeapP
 	SD3D12DescriptorHeap* suitableHeap = nullptr;
 	for (size_t i = 0; i < pendingBody.Heaps.size(); ++i)
 	{
-		SD3D12DescriptorHeap* heap = pendingBody.Heaps[i];
+		SD3D12DescriptorHeap* heap = pendingBody.Heaps[i].Get();
 		if (heap->Slack() >= (int32)reserveCount)
 		{
 			int32 updatedSlack = heap->Slack() - reserveCount;
 			if (minimumSlack > updatedSlack)
 			{
 				minimumSlack = updatedSlack;
-				suitableHeap = pendingBody.Heaps[i];
+				suitableHeap = pendingBody.Heaps[i].Get();
 			}
 		}
 	}

@@ -82,11 +82,8 @@ void SD3D12Texture2D::UpdateSubresource(SD3D12CommandList* CommandList, ID3D12Re
 
 void SD3D12Texture2D::Dispose(bool bDisposing)
 {
-	if (bDisposing)
-	{
-		Resource.Reset();
-		UploadHeap.Reset();
-	}
+	Resource.Reset();
+	UploadHeap.Reset();
 
 	Super::Dispose(bDisposing);
 }

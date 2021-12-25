@@ -9,3 +9,11 @@ SD3D12Shader::SD3D12Shader(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComP
 	, _pipelineState(std::move(pipelineState))
 {
 }
+
+void SD3D12Shader::Dispose(bool bDisposing)
+{
+	_rootSignature.Reset();
+	_pipelineState.Reset();
+
+	Super::Dispose(bDisposing);
+}

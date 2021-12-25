@@ -8,3 +8,10 @@ SDWriteTextFormat::SDWriteTextFormat(SDXGIFactory* InFactory, ComPtr<IDWriteText
 	, _format(std::move(format))
 {
 }
+
+void SDWriteTextFormat::Dispose(bool bDisposing)
+{
+	_format.Reset();
+
+	Super::Dispose(bDisposing);
+}

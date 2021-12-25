@@ -6,7 +6,7 @@
 #include "DirectXCommon.h"
 #include <queue>
 
-class DIRECTX_API SD3D12ThreadAllocatorContainer : implements SObject
+class DIRECTX_API SD3D12ThreadAllocatorContainer : implements SObject, implements IDisposable
 {
 	GENERATED_BODY(SD3D12ThreadAllocatorContainer)
 
@@ -36,8 +36,13 @@ private:
 public:
 	SD3D12ThreadAllocatorContainer(int64 threadId, ID3D12Device* device);
 
+	virtual void Dispose();
+
 	ID3D12CommandAllocator* GetPrimaryAllocator(uint64 fenceValue);
 	void MarkPendingAllocator(uint64 fenceValue);
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 
 private:
 	void NewAllocator(AllocatorPendingBody& InBody);

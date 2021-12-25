@@ -5,34 +5,34 @@
 
 GENERATE_BODY(SD3D12Buffer);
 
-SD3D12Buffer::SD3D12Buffer(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> resource, ComPtr<ID3D12Resource> uploadHeap, const RHIBufferDesc& desc)
-	: Super(InFactory, InDevice, resource.Get(), uploadHeap.Get())
-	, _resource(std::move(resource))
-	, _uploadHeap(std::move(uploadHeap))
-	, _desc(desc)
+SD3D12Buffer::SD3D12Buffer(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12Resource> InResource, ComPtr<ID3D12Resource> InUploadHeap, const RHIBufferDesc& InDesc)
+	: Super(InFactory, InDevice, InResource.Get(), InUploadHeap.Get())
+	, Resource(std::move(InResource))
+	, UploadHeap(std::move(InUploadHeap))
+	, Desc(InDesc)
 {
-	if (_uploadHeap)
+	if (UploadHeap)
 	{
-		_totalBytes = (uint64)resource->GetDesc().Width;
+		TotalBytes = (uint64)InResource->GetDesc().Width;
 	}
 }
 
-void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* commandList, uint32 subresource, const RHISubresourceData* uploadData)
+void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* InCommandList, uint32 InSubresource, const RHISubresourceData* InUploadData)
 {
-	if (_totalBytes)
+	if (TotalBytes)
 	{
-		D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = _resource.Get();
-		barrier.Transition.StateBefore = (D3D12_RESOURCE_STATES)_desc.InitialState;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.Subresource = 0;
+		D3D12_RESOURCE_BARRIER Barrier = {};
+		Barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		Barrier.Transition.pResource = Resource.Get();
+		Barrier.Transition.StateBefore = (D3D12_RESOURCE_STATES)Desc.InitialState;
+		Barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+		Barrier.Transition.Subresource = 0;
 
-		commandList->ResourceBarrier(1, &barrier);
-		UpdateSubresource(commandList, _resource.Get(), _uploadHeap.Get(), subresource, _totalBytes, uploadData);
+		InCommandList->ResourceBarrier(1, &Barrier);
+		UpdateSubresource(InCommandList, Resource.Get(), UploadHeap.Get(), InSubresource, TotalBytes, InUploadData);
 
-		std::swap(barrier.Transition.StateBefore, barrier.Transition.StateAfter);
-		commandList->ResourceBarrier(1, &barrier);
+		std::swap(Barrier.Transition.StateBefore, Barrier.Transition.StateAfter);
+		InCommandList->ResourceBarrier(1, &Barrier);
 	}
 	else
 	{
@@ -40,12 +40,19 @@ void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* commandList, uint32 subr
 	}
 }
 
-void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* commandList, ID3D12Resource* buf, ID3D12Resource* uploadBuf, uint32 subresource, uint64 totalBytes, const RHISubresourceData* uploadData)
+void SD3D12Buffer::UpdateSubresource(SD3D12CommandList* InCommandList, ID3D12Resource* InBuf, ID3D12Resource* InUploadBuf, uint32 InSubresource, uint64 InTotalBytes, const RHISubresourceData* InUploadData)
 {
 	int8* pData;
-	HR(uploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
-	memcpy(pData, uploadData->pSysMem, (size_t)totalBytes);
-	uploadBuf->Unmap(0, nullptr);
+	HR(InUploadBuf->Map(0, nullptr, reinterpret_cast<void**>(&pData)));
+	memcpy(pData, InUploadData->pSysMem, (size_t)InTotalBytes);
+	InUploadBuf->Unmap(0, nullptr);
 
-	commandList->CopyResource(buf, uploadBuf);
+	InCommandList->CopyResource(InBuf, InUploadBuf);
+}
+
+void SD3D12Buffer::Dispose(bool bDisposing)
+{
+	Resource.Reset();
+	UploadHeap.Reset();
+	Super::Dispose(bDisposing);
 }

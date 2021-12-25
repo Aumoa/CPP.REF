@@ -23,6 +23,9 @@ public:
 	void InitWrappedResources(ID3D12Resource* pResource, ID3D11Resource* pWrapped);
 	bool IsMultisampled();
 
+protected:
+	virtual void Dispose(bool bDisposing) override;
+
 public:
 	DECLARE_GETTER(ID2D1Bitmap1, Bitmap);
 	DECLARE_GETTER(ID3D11Resource, WrappedResource);

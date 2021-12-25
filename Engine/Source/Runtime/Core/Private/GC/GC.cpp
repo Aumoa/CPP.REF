@@ -185,6 +185,10 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 			for (auto& Garbage : PendingKill)
 			{
+				if (Garbage->bHasFinalizer)
+				{
+					Garbage->Dispose(false);
+				}
 				delete Garbage;
 			}
 
@@ -206,6 +210,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 void GarbageCollector::SuppressFinalize(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
+	Object->bHasFinalizer = false;
 	PendingFinalize.emplace(Object);
 }
 
@@ -297,6 +302,10 @@ int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDept
 							GCMarkingBuffer[Member->InternalIndex] = MarkDepth;
 						}
 						++Count;
+
+#if DO_CHECK
+						Member->GC_ContainsOwner = Object;
+#endif
 					}
 				}
 			}

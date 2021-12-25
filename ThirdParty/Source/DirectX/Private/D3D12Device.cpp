@@ -619,8 +619,30 @@ void SD3D12Device::Dispose(bool bDisposing)
 			// Flush and signal forcely.
 			_immCon->ExecuteCommandLists({}, true);
 			_immCon->WaitCompleted();
+			_immCon = nullptr;
 		}
+
+		for (auto& [Key, Object] : _threadAllocators)
+		{
+			Object->Dispose();
+		}
+		_threadAllocators.clear();
+
+		for (auto& [Key, Object] : _threadSrvHeaps)
+		{
+			Object->Dispose();
+		}
+		_threadSrvHeaps.clear();
+
+		for (auto& [Key, Object] : _threadSamplerHeaps)
+		{
+			Object->Dispose();
+		}
+		_threadSamplerHeaps.clear();
 	}
+
+	_device.Reset();
+	_interop.ResetAll();
 
 	Super::Dispose(bDisposing);
 }

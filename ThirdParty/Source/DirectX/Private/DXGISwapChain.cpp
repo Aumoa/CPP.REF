@@ -65,3 +65,22 @@ int32 SDXGISwapChain::GetCurrentBackBufferIndex()
 {
 	return (int32)SwapChain->GetCurrentBackBufferIndex();
 }
+
+void SDXGISwapChain::Dispose(bool bDisposing)
+{
+	SwapChain.Reset();
+
+	if (bDisposing)
+	{
+		for (auto& Buf : Buffers)
+		{
+			if (Buf)
+			{
+				Buf->Dispose();
+				Buf = nullptr;
+			}
+		}
+	}
+
+	Super::Dispose(bDisposing);
+}

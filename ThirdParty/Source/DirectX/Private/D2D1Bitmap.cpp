@@ -30,3 +30,12 @@ bool SD2D1Bitmap::IsMultisampled()
 	}
 	return false;
 }
+
+void SD2D1Bitmap::Dispose(bool bDisposing)
+{
+	Resource.Reset();
+	WrappedResource.Reset();
+	Bitmap = nullptr;
+
+	Super::Dispose(bDisposing);
+}

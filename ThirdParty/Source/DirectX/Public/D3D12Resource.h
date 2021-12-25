@@ -21,9 +21,13 @@ private:
 public:
 	SD3D12Resource(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12Resource* Resource, ID3D12Resource* UploadBuf);
 
+	using Super::Dispose;
 	virtual uint64 GetGPUVirtualAddress() override;
 
 	virtual void UpdateSubresource(SD3D12CommandList* commandList, uint32 subresource, const RHISubresourceData* uploadData) = 0;
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 
 public:
 	DECLARE_GETTER(ID3D12Resource, Resource);

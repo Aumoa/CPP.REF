@@ -8,3 +8,9 @@ SD2D1Image::SD2D1Image(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID2D1Ima
 	, ImageSource(Image)
 {
 }
+
+void SD2D1Image::Dispose(bool bDisposing)
+{
+	ImageSource.Reset();
+	Super::Dispose(bDisposing);
+}

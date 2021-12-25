@@ -25,4 +25,7 @@ public:
 	virtual void ResizeBuffers(int32 InWidth, int32 InHeight) override;
 	virtual IRHITexture2D* GetBuffer(int32 Index) override;
 	virtual int32 GetCurrentBackBufferIndex() override;
+
+protected:
+	virtual void Dispose(bool bDisposing);
 };

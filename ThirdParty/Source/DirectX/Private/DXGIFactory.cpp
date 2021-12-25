@@ -23,14 +23,10 @@ SDXGIFactory::SDXGIFactory() : Super()
 	HR(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), static_cast<IUnknown**>(&_writeFactory)));
 }
 
-SDXGIFactory::~SDXGIFactory()
-{
-	Dispose(false);
-}
-
 void SDXGIFactory::Dispose()
 {
 	Dispose(true);
+	GC.SuppressFinalize(this);
 }
 
 IRHIAdapter* SDXGIFactory::GetAdapter(int32 index)
@@ -149,10 +145,18 @@ IRHITextLayout* SDXGIFactory::CreateTextLayout(IRHITextFormat* format, std::wstr
 
 void SDXGIFactory::Dispose(bool bDisposing)
 {
+	_factory.Reset();
+	_writeFactory.Reset();
+
 	if (bDisposing)
 	{
-		_factory.Reset();
-		_writeFactory.Reset();
+		for (auto& Adapter : _cachedAdapters)
+		{
+			Adapter->Dispose();
+		}
+
 		_cachedAdapters.clear();
 	}
+
+	Super::Dispose(bDisposing);
 }

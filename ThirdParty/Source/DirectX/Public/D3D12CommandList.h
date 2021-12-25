@@ -58,6 +58,9 @@ public:
 
 	std::vector<SObject*> ClearPendingObjects();
 
+protected:
+	virtual void Dispose(bool bDisposing) override;
+
 public:
 	DECLARE_GETTER(ID3D12GraphicsCommandList, CommandList);
 	DECLARE_GETTER(ID3D12CommandList, CommandList);

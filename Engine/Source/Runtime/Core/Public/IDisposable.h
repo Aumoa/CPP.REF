@@ -9,5 +9,11 @@ interface IDisposable : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IDisposable)
 
+	// Special constructor for IDisposable.
+	IDisposable()
+	{
+		this->SObject::bHasFinalizer = true;
+	}
+
 	virtual void Dispose() = 0;
 };

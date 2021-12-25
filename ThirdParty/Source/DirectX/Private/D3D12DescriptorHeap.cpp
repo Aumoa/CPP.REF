@@ -4,49 +4,59 @@
 
 GENERATE_BODY(SD3D12DescriptorHeap);
 
-SD3D12DescriptorHeap::SD3D12DescriptorHeap(ID3D12Device* device, int32 count) : Super()
-	, _device(device)
-	, _count(count)
+SD3D12DescriptorHeap::SD3D12DescriptorHeap(ID3D12Device* InDevice, int32 Count) : Super()
+	, Device(InDevice)
+	, Count(Count)
 {
-	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-	desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	desc.NumDescriptors = (UINT)count;
-	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	HR(_device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&_heap)));
+	D3D12_DESCRIPTOR_HEAP_DESC Desc = {};
+	Desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	Desc.NumDescriptors = (UINT)Count;
+	Desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	HR(Device->CreateDescriptorHeap(&Desc, IID_PPV_ARGS(&Heap)));
 
-	_handleCPU = _heap->GetCPUDescriptorHandleForHeapStart();
-	_handleGPU = _heap->GetGPUDescriptorHandleForHeapStart();
+	HandleCPU = Heap->GetCPUDescriptorHandleForHeapStart();
+	HandleGPU = Heap->GetGPUDescriptorHandleForHeapStart();
 }
 
 void SD3D12DescriptorHeap::MarkPendingHeap()
 {
-	_index = 0;
+	Index = 0;
 }
 
-int32 SD3D12DescriptorHeap::Increment(int32 count)
+int32 SD3D12DescriptorHeap::Increment(int32 Count)
 {
-	int32 index = _index;
-	_index += count;
-	return index;
+	int32 MyIndex = Index;
+	Index += Count;
+	return MyIndex;
 }
 
 int32 SD3D12DescriptorHeap::Slack()
 {
-	return _count - _index;
+	return Count - Index;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE SD3D12DescriptorHeap::GetCPUHandle(std::optional<int32> index)
+D3D12_CPU_DESCRIPTOR_HANDLE SD3D12DescriptorHeap::GetCPUHandle(std::optional<int32> InIndex)
 {
-	if (!index.has_value()) { index = _index; }
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = _handleCPU;
-	handle.ptr += (SIZE_T)_incrementSize * *index;
-	return handle;
+	if (!InIndex.has_value()) { InIndex = Index; }
+	D3D12_CPU_DESCRIPTOR_HANDLE Handle = HandleCPU;
+	Handle.ptr += (SIZE_T)IncrementSize * *InIndex;
+	return Handle;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE SD3D12DescriptorHeap::GetGPUHandle(std::optional<int32> index)
+D3D12_GPU_DESCRIPTOR_HANDLE SD3D12DescriptorHeap::GetGPUHandle(std::optional<int32> InIndex)
 {
-	if (!index.has_value()) { index = _index; }
-	D3D12_GPU_DESCRIPTOR_HANDLE handle = _handleGPU;
-	handle.ptr += (UINT64)_incrementSize * *index;
-	return handle;
+	if (!InIndex.has_value()) { InIndex = Index; }
+	D3D12_GPU_DESCRIPTOR_HANDLE Handle = HandleGPU;
+	Handle.ptr += (UINT64)IncrementSize * *InIndex;
+	return Handle;
+}
+
+void SD3D12DescriptorHeap::Dispose(bool bDisposing)
+{
+	Device = nullptr;
+	Heap.Reset();
+	HandleCPU = {};
+	HandleGPU = {};
+
+	Super::Dispose(bDisposing);
 }

@@ -16,11 +16,12 @@ class DIRECTX_API SDXGIFactory : implements SObject, implements IRHIFactory
 private:
 	ComPtr<IDXGIFactory4> _factory;
 	ComPtr<IDWriteFactory5> _writeFactory;
+
+	SPROPERTY(_cachedAdapters)
 	std::vector<SDXGIAdapter*> _cachedAdapters;
 
 public:
 	SDXGIFactory();
-	virtual ~SDXGIFactory() noexcept override;
 
 	virtual void Dispose() override;
 

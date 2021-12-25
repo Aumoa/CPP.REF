@@ -17,6 +17,7 @@ private:
 public:
 	SDWriteTextLayout(SDXGIFactory* InFactory, ComPtr<IDWriteTextLayout> layout);
 
+	using Super::Dispose;
 	virtual void SetMaxSize(const Vector2& InSize) override;
 	virtual Vector2 GetMaxSize() override;
 	virtual Vector2 GetDesiredSize() override;
@@ -24,6 +25,9 @@ public:
 	virtual ERHITextAlignment GetTextAlignment() override;
 	virtual void SetParagraphAlignment(ERHIParagraphAlignment Alignment) override;
 	virtual ERHIParagraphAlignment GetParagraphAlignment() override;
+
+protected:
+	virtual void Dispose(bool bDisposing);
 
 public:
 	DECLARE_GETTER(IDWriteTextLayout, Layout);

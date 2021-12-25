@@ -19,6 +19,9 @@ public:
 	virtual void SetOpacity(float InValue) override;
 	virtual float GetOpacity() override;
 
+protected:
+	virtual void Dispose(bool bDisposing) override;
+
 public:
 	DECLARE_GETTER(ID2D1Brush, BrushObject);
 };

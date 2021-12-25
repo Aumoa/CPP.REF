@@ -23,6 +23,10 @@ protected:
 public:
 	SD3D12DeviceChild(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12DeviceChild* InConstructorObject);
 
+	using Super::Dispose;
 	virtual IRHIDevice* GetDevice() override;
 	virtual void SetDebugName(std::wstring_view InName) override;
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 };

@@ -18,3 +18,9 @@ Color SD2D1SolidColorBrush::GetColor()
 {
 	return (Color&)Brush->GetColor();
 }
+
+void SD2D1SolidColorBrush::Dispose(bool bDisposing)
+{
+	Brush = nullptr;
+	Super::Dispose(bDisposing);
+}

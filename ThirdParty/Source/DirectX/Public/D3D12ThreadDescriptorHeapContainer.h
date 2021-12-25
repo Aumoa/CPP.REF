@@ -8,7 +8,7 @@
 
 class SD3D12DescriptorHeap;
 
-class DIRECTX_API SD3D12ThreadDescriptorHeapContainer : implements SObject
+class DIRECTX_API SD3D12ThreadDescriptorHeapContainer : implements SObject, implements IDisposable
 {
 	GENERATED_BODY(SD3D12ThreadDescriptorHeapContainer)
 
@@ -16,7 +16,7 @@ private:
 	struct HeapPendingBody
 	{
 		uint64 FenceValue;
-		std::vector<SD3D12DescriptorHeap*> Heaps;
+		std::vector<SharedPtr<SD3D12DescriptorHeap>> Heaps;
 	};
 
 private:
@@ -27,8 +27,13 @@ private:
 public:
 	SD3D12ThreadDescriptorHeapContainer(int64 threadId, ID3D12Device* device);
 
+	virtual void Dispose() override;
+
 	SD3D12DescriptorHeap* GetUsableHeap(uint64 fenceValue, int32 reserveCount);
 	void MarkPendingHeap(uint64 fenceValue);
+
+protected:
+	virtual void Dispose(bool bDisposing) override;
 
 private:
 	void NewPendingHeap();

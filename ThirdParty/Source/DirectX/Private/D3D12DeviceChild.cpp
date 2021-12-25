@@ -5,7 +5,8 @@
 
 GENERATE_BODY(SD3D12DeviceChild);
 
-SD3D12DeviceChild::SD3D12DeviceChild(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12DeviceChild* InConstructorObject) : Super(InFactory)
+SD3D12DeviceChild::SD3D12DeviceChild(SDXGIFactory* InFactory, SD3D12Device* InDevice, ID3D12DeviceChild* InConstructorObject)
+	: Super(InFactory)
 	, Object(InConstructorObject)
 	, Device(InDevice)
 {
@@ -22,4 +23,15 @@ void SD3D12DeviceChild::SetDebugName(std::wstring_view InName)
 	{
 		HR(Object->SetName(InName.data()));
 	}
+}
+
+void SD3D12DeviceChild::Dispose(bool bDisposing)
+{
+	if (bDisposing)
+	{
+		Device = nullptr;
+	}
+
+	Object = nullptr;
+	Super::Dispose(bDisposing);
 }

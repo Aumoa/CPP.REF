@@ -18,6 +18,9 @@ private:
 public:
 	SD3D12Shader(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12RootSignature> rootSignature, ComPtr<ID3D12PipelineState> pipelineState);
 
+protected:
+	virtual void Dispose(bool bDisposing) override;
+
 public:
 	DECLARE_GETTER(ID3D12RootSignature, _rootSignature);
 	DECLARE_GETTER(ID3D12PipelineState, _pipelineState);

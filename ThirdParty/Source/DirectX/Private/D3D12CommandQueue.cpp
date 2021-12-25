@@ -5,11 +5,11 @@
 
 GENERATE_BODY(SD3D12CommandQueue);
 
-SD3D12CommandQueue::SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12CommandQueue> queue, ComPtr<ID3D12Fence> fence) : Super(InFactory, InDevice)
-	, _queue(std::move(queue))
-	, _fence(std::move(fence))
+SD3D12CommandQueue::SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* InDevice, ComPtr<ID3D12CommandQueue> Queue, ComPtr<ID3D12Fence> Fence) : Super(InFactory, InDevice)
+	, Queue(std::move(Queue))
+	, Fence(std::move(Fence))
 {
-	_event = gcnew SEventHandle();
+	Event = gcnew SEventHandle();
 }
 
 void SD3D12CommandQueue::End()
@@ -18,85 +18,77 @@ void SD3D12CommandQueue::End()
 	ExecuteCommandList(this);
 }
 
-uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> deviceContexts, bool bSignal)
+uint64 SD3D12CommandQueue::ExecuteCommandLists(std::span<IRHIDeviceContext*> DeviceContexts, bool bSignal)
 {
-	std::vector<ID3D12CommandList*> commandLists;
-	commandLists.reserve(deviceContexts.size());
+	std::vector<ID3D12CommandList*> CommandLists;
+	CommandLists.reserve(DeviceContexts.size());
 
-	++_fenceValue;
+	++FenceValue;
 
-	for (size_t i = 0; i < deviceContexts.size(); ++i)
+	for (size_t i = 0; i < DeviceContexts.size(); ++i)
 	{
-		auto deviceContext_s = Cast<SD3D12CommandList>(deviceContexts[i]);
-		if (deviceContext_s)
+		auto s_DeviceContext = Cast<SD3D12CommandList>(DeviceContexts[i]);
+		if (s_DeviceContext)
 		{
-			if (auto commandList = deviceContext_s->Get<ID3D12CommandList>(); commandList)
+			if (auto CommandList = s_DeviceContext->Get<ID3D12CommandList>(); CommandList)
 			{
-				commandLists.emplace_back(commandList);
+				CommandLists.emplace_back(CommandList);
 
-				std::vector<SObject*> Objects = deviceContext_s->ClearPendingObjects();
+				std::vector<SObject*> Objects = s_DeviceContext->ClearPendingObjects();
 
-				GC_Pending Pending;
-				Pending.MarkedValue = _fenceValue;
-				Pending.Objects.reserve(Objects.size());
+				LockedGarbages Garbage;
+				Garbage.MarkedValue = FenceValue;
+				Garbage.Objects.reserve(Objects.size());
 
 				for (auto& Obj : Objects)
 				{
-					Pending.Objects.emplace_back(Obj);
+					Garbage.Objects.emplace_back(Cast<IDisposable>(Obj));
 				}
 
-				_gc.emplace(std::move(Pending));
+				PendingGarbages.emplace(std::move(Garbage));
 			}
 		}
 	}
 
-	if (commandLists.size())
+	if (CommandLists.size())
 	{
-		_queue->ExecuteCommandLists((UINT)commandLists.size(), commandLists.data());
+		Queue->ExecuteCommandLists((UINT)CommandLists.size(), CommandLists.data());
 	}
 
 	if (bSignal)
 	{
-		_queue->Signal(_fence.Get(), _fenceValue);
-		return _fenceValue;
+		Queue->Signal(Fence.Get(), FenceValue);
+		return FenceValue;
 	}
 	else
 	{
-		return --_fenceValue;
+		return --FenceValue;
 	}
 }
 
 uint64 SD3D12CommandQueue::GetFenceValue()
 {
-	return _fenceValue;
+	return FenceValue;
 }
 
 uint64 SD3D12CommandQueue::GetCompletedValue()
 {
-	return _fence->GetCompletedValue();
+	return Fence->GetCompletedValue();
 }
 
 void SD3D12CommandQueue::Collect()
 {
-	while (!_gc.empty())
+	while (!PendingGarbages.empty())
 	{
-		auto& front = _gc.front();
-		if (front.MarkedValue <= _fence->GetCompletedValue())
+		auto& Front = PendingGarbages.front();
+		if (Front.MarkedValue <= Fence->GetCompletedValue())
 		{
-			for (size_t i = 0; i < front.Objects.size(); ++i)
+			for (size_t i = 0; i < Front.Objects.size(); ++i)
 			{
-				SObject* Object = front.Objects[i].Get();
-				if (auto* Disp = Cast<IDisposable>(Object))
-				{
-					Disp->Dispose();
-				}
-				else
-				{
-					GC.SuppressFinalize(Object);
-				}
+				Front.Objects[i]->Dispose();
 			}
 
-			_gc.pop();
+			PendingGarbages.pop();
 		}
 		else
 		{
@@ -107,10 +99,10 @@ void SD3D12CommandQueue::Collect()
 
 void SD3D12CommandQueue::WaitCompleted()
 {
-	if (_fence->GetCompletedValue() < _fenceValue)
+	if (Fence->GetCompletedValue() < FenceValue)
 	{
-		_fence->SetEventOnCompletion(_fenceValue, _event->GetHandle());
-		_event->Wait();
+		Fence->SetEventOnCompletion(FenceValue, Event->GetHandle());
+		Event->Wait();
 	}
 }
 
@@ -118,13 +110,14 @@ void SD3D12CommandQueue::Dispose(bool bDisposing)
 {
 	WaitCompleted();
 
+	Queue.Reset();
+	Fence.Reset();
+
 	if (bDisposing)
 	{
-		_queue.Reset();
-		_fence.Reset();
-
-		std::queue<GC_Pending> Swap;
-		std::swap(Swap, _gc);
+		std::queue<LockedGarbages> Swap;
+		std::swap(Swap, PendingGarbages);
+		Event = nullptr;
 	}
 
 	Super::Dispose(bDisposing);

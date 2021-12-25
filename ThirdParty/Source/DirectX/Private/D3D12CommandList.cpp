@@ -223,6 +223,20 @@ std::vector<SObject*> SD3D12CommandList::ClearPendingObjects()
 	return std::move(PendingObjects);
 }
 
+void SD3D12CommandList::Dispose(bool bDisposing)
+{
+	CommandList.Reset();
+
+	if (bDisposing)
+	{
+		PendingObjects.clear();
+		HeapForSRV = nullptr;
+		HeapForSampler = nullptr;
+	}
+
+	Super::Dispose(bDisposing);
+}
+
 #undef DEFINE_CALL_DIRECT_OneParam
 #undef DEFINE_CALL_DIRECT_TwoParams
 #undef DEFINE_CALL_DIRECT_FourParams

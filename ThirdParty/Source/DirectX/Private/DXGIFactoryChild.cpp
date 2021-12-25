@@ -2,6 +2,7 @@
 
 #include "DXGIFactoryChild.h"
 #include "DXGIFactory.h"
+#include "Exceptions/ObjectDisposedException.h"
 
 GENERATE_BODY(SDXGIFactoryChild);
 
@@ -10,13 +11,13 @@ SDXGIFactoryChild::SDXGIFactoryChild(SDXGIFactory* InFactory) : Super()
 {
 }
 
-SDXGIFactoryChild::~SDXGIFactoryChild() noexcept
-{
-	Dispose(false);
-}
-
 void SDXGIFactoryChild::Dispose()
 {
+	if (bDisposed)
+	{
+		throw gcnew SObjectDisposedException(GetType()->GetFullName());
+	}
+
 	Dispose(true);
 }
 
@@ -31,4 +32,6 @@ void SDXGIFactoryChild::Dispose(bool bDisposing)
 	{
 		GC.SuppressFinalize(this);
 	}
+
+	bDisposed = true;
 }

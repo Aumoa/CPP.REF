@@ -10,9 +10,9 @@
 /// </summary>
 class CORE_API SEventHandle : implements SObject
 {
-public:
-	using Super = SObject;
+	GENERATED_BODY(SEventHandle)
 
+public:
 	/// <summary>
 	/// Represents waiting status.
 	/// </summary>

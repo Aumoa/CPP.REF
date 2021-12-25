@@ -25,6 +25,16 @@ private:
 
 		ComPtr<ID2D1Device> Device2D;
 		ComPtr<ID2D1DeviceContext> DeviceContext2D;
+
+		void ResetAll()
+		{
+			Device.Reset();
+			DeviceContext.Reset();
+			InteropDevice.Reset();
+
+			Device2D.Reset();
+			DeviceContext2D.Reset();
+		}
 	} _interop;
 
 private:
