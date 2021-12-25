@@ -9,8 +9,8 @@ GENERATE_BODY(SGameInputSystem);
 
 SGameInputSystem::SGameInputSystem() : Super()
 {
-	MouseTracker = NewObject<SMouseStateTracker>();
-	KeyboardTracker = NewObject<SKeyboardTracker>();
+	MouseTracker = gcnew SMouseStateTracker();
+	KeyboardTracker = gcnew SKeyboardTracker();
 }
 
 void SGameInputSystem::Tick(float InDeltaTime)

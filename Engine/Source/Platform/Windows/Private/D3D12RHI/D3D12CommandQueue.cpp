@@ -9,7 +9,7 @@ SD3D12CommandQueue::SD3D12CommandQueue(SDXGIFactory* InFactory, SD3D12Device* In
 	, _queue(std::move(queue))
 	, _fence(std::move(fence))
 {
-	_event = NewObject<SEventHandle>();
+	_event = gcnew SEventHandle();
 }
 
 void SD3D12CommandQueue::End()

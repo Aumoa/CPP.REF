@@ -16,12 +16,12 @@ SGameModule::~SGameModule()
 
 SGameInstance* SGameModule::CreateGameInstance()
 {
-	return NewObject<SGameInstance>();
+	return gcnew SGameInstance();
 }
 
 SGameEngine* SGameModule::CreateGameEngine()
 {
-	return NewObject<SGameEngine>();
+	return gcnew SGameEngine();
 }
 
 std::vector<Type*> SGameModule::GetTypeCollection() const

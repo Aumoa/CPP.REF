@@ -35,14 +35,14 @@ IRHIDeviceContext* SD3D12Device::GetImmediateContext()
 
 IRHIDeviceContext* SD3D12Device::CreateDeviceContext()
 {
-	return NewObject<SD3D12CommandList>(Factory, this);
+	return gcnew SD3D12CommandList(Factory, this);
 }
 
 IRHIDeviceContext2D* SD3D12Device::CreateDeviceContext2D()
 {
 	ComPtr<ID2D1DeviceContext> DeviceContext;
 	HR(_interop.Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &DeviceContext));
-	return NewObject<SD2D1DeviceContext>(Factory, this, DeviceContext.Get(), _interop.InteropDevice.Get());
+	return gcnew SD2D1DeviceContext(Factory, this, DeviceContext.Get(), _interop.InteropDevice.Get());
 }
 
 IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const RHISubresourceData* initialData)
@@ -110,7 +110,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 			barrier.Transition.StateAfter = (D3D12_RESOURCE_STATES)desc.InitialState;
 			barrier.Transition.Subresource = 0;
 
-			auto* commandList = NewObject<SD3D12CommandList>(Factory, this);
+			auto* commandList = gcnew SD3D12CommandList(Factory, this);
 			commandList->Begin();
 			SD3D12Texture2D::UpdateSubresource(commandList, textureBuf.Get(), uploadBuf.Get(), 0, layout, totalBytes, initialData);
 			commandList->ResourceBarrier(1, &barrier);
@@ -126,7 +126,7 @@ IRHITexture2D* SD3D12Device::CreateTexture2D(const RHITexture2DDesc& desc, const
 		}
 	}
 
-	return NewObject<SD3D12Texture2D>(Factory, this, std::move(textureBuf), std::move(uploadBuf), layout, desc);
+	return gcnew SD3D12Texture2D(Factory, this, std::move(textureBuf), std::move(uploadBuf), layout, desc);
 }
 
 IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubresourceData* initialData)
@@ -173,7 +173,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 			barrier.Transition.StateAfter = (D3D12_RESOURCE_STATES)desc.InitialState;
 			barrier.Transition.Subresource = 0;
 
-			auto* commandList = NewObject<SD3D12CommandList>(Factory, this);
+			auto* commandList = gcnew SD3D12CommandList(Factory, this);
 			commandList->Begin();
 			SD3D12Buffer::UpdateSubresource(commandList, buffer.Get(), uploadBuf.Get(), 0, (uint64)desc.ByteWidth, initialData);
 			commandList->ResourceBarrier(1, &barrier);
@@ -189,7 +189,7 @@ IRHIBuffer* SD3D12Device::CreateBuffer(const RHIBufferDesc& desc, const RHISubre
 		}
 	}
 
-	return NewObject<SD3D12Buffer>(Factory, this, std::move(buffer), std::move(uploadBuf), desc);
+	return gcnew SD3D12Buffer(Factory, this, std::move(buffer), std::move(uploadBuf), desc);
 }
 
 IRHIShader* SD3D12Device::CompileShader(SMaterial* material)
@@ -431,7 +431,7 @@ IRHIShader* SD3D12Device::CompileShader(SMaterial* material)
 	//ComPtr<ID3D12PipelineState> ps;
 	//HR(_device->CreateGraphicsPipelineState(&psd, IID_PPV_ARGS(&ps)));
 
-	//return NewObject<SD3D12Shader>(Factory, this, std::move(rs), std::move(ps));
+	//return gcnew SD3D12Shader(Factory, this, std::move(rs), std::move(ps));
 	return nullptr;
 }
 
@@ -443,7 +443,7 @@ IRHIRenderTargetView* SD3D12Device::CreateRenderTargetView(int32 count)
 
 	ComPtr<ID3D12DescriptorHeap> heap;
 	HR(_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap)));
-	return NewObject<SD3D12RenderTargetView>(Factory, this, std::move(heap), count);
+	return gcnew SD3D12RenderTargetView(Factory, this, std::move(heap), count);
 }
 
 IRHIDepthStencilView* SD3D12Device::CreateDepthStencilView(int32 count)
@@ -454,7 +454,7 @@ IRHIDepthStencilView* SD3D12Device::CreateDepthStencilView(int32 count)
 
 	ComPtr<ID3D12DescriptorHeap> heap;
 	HR(_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap)));
-	return NewObject<SD3D12DepthStencilView>(Factory, this, std::move(heap), count);
+	return gcnew SD3D12DepthStencilView(Factory, this, std::move(heap), count);
 }
 
 IRHIShaderResourceView* SD3D12Device::CreateShaderResourceView(int32 count)
@@ -465,14 +465,14 @@ IRHIShaderResourceView* SD3D12Device::CreateShaderResourceView(int32 count)
 
 	ComPtr<ID3D12DescriptorHeap> heap;
 	HR(_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap)));
-	return NewObject<SD3D12ShaderResourceView>(Factory, this, std::move(heap), count);
+	return gcnew SD3D12ShaderResourceView(Factory, this, std::move(heap), count);
 }
 
 IRHISolidColorBrush* SD3D12Device::CreateSolidColorBrush(const Color& InColor, float InOpacity)
 {
 	ComPtr<ID2D1SolidColorBrush> Brush;
 	HR(_interop.DeviceContext2D->CreateSolidColorBrush((const D2D1_COLOR_F&)InColor, &Brush));
-	return NewObject<SD2D1SolidColorBrush>(Factory, this, Brush.Get());
+	return gcnew SD2D1SolidColorBrush(Factory, this, Brush.Get());
 }
 
 IRHIBitmap* SD3D12Device::CreateBitmapFromTexture2D(IRHITexture2D* InTexture)
@@ -505,7 +505,7 @@ IRHIBitmap* SD3D12Device::CreateBitmapFromTexture2D(IRHITexture2D* InTexture)
 	ComPtr<ID2D1Bitmap1> Bitmap;
 	HR(_interop.DeviceContext2D->CreateBitmapFromDxgiSurface(Surf.Get(), D2D1::BitmapProperties1(Options, D2D1::PixelFormat((DXGI_FORMAT)Desc.Format, D2D1_ALPHA_MODE_PREMULTIPLIED), DpiScale, DpiScale), &Bitmap));
 
-	auto* Result = NewObject<SD2D1Bitmap>(Factory, this, Bitmap.Get());
+	auto* Result = gcnew SD2D1Bitmap(Factory, this, Bitmap.Get());
 	Result->InitWrappedResources(Texture_r, WrappedResource.Get());
 
 	return Result;
@@ -537,7 +537,7 @@ ID3D12CommandAllocator* SD3D12Device::GetThreadPrimaryAllocator()
 	auto allocator_it = _threadAllocators.find(threadId);
 	if (allocator_it == _threadAllocators.end())
 	{
-		container = NewObject<SD3D12ThreadAllocatorContainer>(threadId, _device.Get());
+		container = gcnew SD3D12ThreadAllocatorContainer(threadId, _device.Get());
 		_threadAllocators.emplace_hint(allocator_it, threadId, container);
 	}
 	else
@@ -557,7 +557,7 @@ SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySrvHeap(int32 count)
 	auto heaps_it = _threadSrvHeaps.find(threadId);
 	if (heaps_it == _threadSrvHeaps.end())
 	{
-		container = NewObject<SD3D12ThreadDescriptorHeapContainer>(threadId, _device.Get());
+		container = gcnew SD3D12ThreadDescriptorHeapContainer(threadId, _device.Get());
 		_threadSrvHeaps.emplace_hint(heaps_it, threadId, container);
 	}
 	else
@@ -577,7 +577,7 @@ SD3D12DescriptorHeap* SD3D12Device::GetThreadPrimarySamplerHeap(int32 count)
 	auto heaps_it = _threadSamplerHeaps.find(threadId);
 	if (heaps_it == _threadSamplerHeaps.end())
 	{
-		container = NewObject<SD3D12ThreadDescriptorHeapContainer>(threadId, _device.Get());
+		container = gcnew SD3D12ThreadDescriptorHeapContainer(threadId, _device.Get());
 		_threadSamplerHeaps.emplace_hint(heaps_it, threadId, container);
 	}
 	else
@@ -638,7 +638,7 @@ void SD3D12Device::AllocateCommandQueue()
 	ComPtr<ID3D12Fence> fence;
 	HR(_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 
-	_immCon = NewObject<SD3D12CommandQueue>(Factory, this, std::move(queue), std::move(fence));
+	_immCon = gcnew SD3D12CommandQueue(Factory, this, std::move(queue), std::move(fence));
 }
 
 void SD3D12Device::CreateInteropDevice()

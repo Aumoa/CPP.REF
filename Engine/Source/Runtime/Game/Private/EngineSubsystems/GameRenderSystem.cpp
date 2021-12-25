@@ -53,10 +53,10 @@ void SGameRenderSystem::Init()
 	Device = Factory->CreateDevice(PrimaryAdapter);
 	PrimaryQueue = Device->GetImmediateContext();
 
-	SwapChainRT = NewObject<SSwapChainRenderTarget>(Factory, Device);
+	SwapChainRT = gcnew SSwapChainRenderTarget(Factory, Device);
 	RenderContext = Device->CreateDeviceContext();
 	DeviceContext2D = Device->CreateDeviceContext2D();
-	ColorRenderTarget = NewObject<SColorRenderTarget>(Device, IApplicationInterface::Get().GetViewportSize());
+	ColorRenderTarget = gcnew SColorRenderTarget(Device, IApplicationInterface::Get().GetViewportSize());
 
 	IApplicationInterface::Get().Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
 }

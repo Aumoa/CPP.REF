@@ -8,7 +8,7 @@ GENERATE_BODY(AController);
 
 AController::AController() : Super()
 {
-	SetRootComponent(NewObject<SSceneComponent>(this));
+	SetRootComponent(gcnew SSceneComponent());
 }
 
 void AController::Possess(APawn* InNewPawn)

@@ -18,7 +18,7 @@ Vector2 SBoxPanel::GetDesiredSize()
 
 auto SBoxPanel::AddSlot() -> SSlot&
 {
-	return *Slots.emplace_back(NewObject<SSlot>());
+	return *Slots.emplace_back(gcnew SSlot());
 }
 
 bool SBoxPanel::RemoveSlot(size_t Index)
@@ -267,6 +267,6 @@ DEFINE_SLATE_CONSTRUCTOR(SBoxPanel, Attr)
 	Slots.reserve(Attr.Slots.size());
 	for (auto& Slot : Attr.Slots)
 	{
-		Slots.emplace_back(NewObject<SSlot>(std::move(Slot)));
+		Slots.emplace_back(gcnew SSlot(std::move(Slot)));
 	}
 }

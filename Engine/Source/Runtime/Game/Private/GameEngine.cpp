@@ -27,7 +27,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 
 	GC.SetFlushInterval(0);
 
-	SlateApplication = NewObject<SSlateApplication>();
+	SlateApplication = gcnew SSlateApplication();
 	SlateApplication->Init(InApplication);
 
 	InitializeSubsystems();

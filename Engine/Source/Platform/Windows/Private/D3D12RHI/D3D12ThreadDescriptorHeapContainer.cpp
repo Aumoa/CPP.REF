@@ -59,7 +59,7 @@ SD3D12DescriptorHeap* SD3D12ThreadDescriptorHeapContainer::GetSuitableHeap(HeapP
 
 	if (suitableHeap == nullptr)
 	{
-		suitableHeap = NewObject<SD3D12DescriptorHeap>(_device, CalcReserveCount(reserveCount));
+		suitableHeap = gcnew SD3D12DescriptorHeap(_device, CalcReserveCount(reserveCount));
 		pendingBody.Heaps.emplace_back(suitableHeap);
 	}
 

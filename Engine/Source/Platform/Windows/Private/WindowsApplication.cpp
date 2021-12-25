@@ -40,8 +40,8 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 	HR(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
 	HR(CoCreateInstance(CLSID_WICImagingFactory2, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&ImagingFactory)));
 
-	PlatformKeyboard = NewObject<SWindowsPlatformKeyboard>();
-	PlatformMouse = NewObject<SWindowsPlatformMouse>();
+	PlatformKeyboard = gcnew SWindowsPlatformKeyboard();
+	PlatformMouse = gcnew SWindowsPlatformMouse();
 }
 
 int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
@@ -54,7 +54,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	{
 		GC.Init();
 
-		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
+		SharedPtr CommandArgs = gcnew SCommandLine(Argv);
 		std::optional<std::wstring_view> ModuleName;
 		size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
 		if (GameModuleIdx != -1)
@@ -109,7 +109,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 			return -1;
 		}
 
-		SharedPtr WinApp = NewObject<SWindowsApplication>(GetModuleHandleW(nullptr));
+		SharedPtr WinApp = gcnew SWindowsApplication(GetModuleHandleW(nullptr));
 		ErrorCode = GameEngine->GuardedMain(WinApp.Get(), *ModuleName);
 		if (ErrorCode != 0)
 		{
@@ -251,7 +251,7 @@ IRHIFactory* SWindowsApplication::GetFactory()
 {
 	if (Factory == nullptr)
 	{
-		Factory = NewObject<SDXGIFactory>(this);
+		Factory = gcnew SDXGIFactory(this);
 	}
 	return Factory;
 }
@@ -277,7 +277,7 @@ IPlatformImage* SWindowsApplication::CreateImageFromFile(const std::filesystem::
 	HR(ImagingFactory->CreateDecoderFromFilename(InAssetPath.wstring().c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &Decoder));
 
 	ComPtr<IWICFormatConverter> Converter = DecodeImage(Decoder.Get(), FrameIndex, PixelFormat);
-	return NewObject<SWindowsImage>(Converter.Get(), PixelFormat);
+	return gcnew SWindowsImage(Converter.Get(), PixelFormat);
 }
 
 IPlatformImage* SWindowsApplication::CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat)
@@ -290,7 +290,7 @@ IPlatformImage* SWindowsApplication::CreateImageFromBinary(std::span<const uint8
 	HR(ImagingFactory->CreateDecoderFromStream(BinaryStream.Get(), NULL, WICDecodeMetadataCacheOnDemand, &Decoder));
 
 	ComPtr<IWICFormatConverter> Converter = DecodeImage(Decoder.Get(), FrameIndex, PixelFormat);
-	return NewObject<SWindowsImage>(Converter.Get(), PixelFormat);
+	return gcnew SWindowsImage(Converter.Get(), PixelFormat);
 }
 
 HWND SWindowsApplication::GetWindowHandle()

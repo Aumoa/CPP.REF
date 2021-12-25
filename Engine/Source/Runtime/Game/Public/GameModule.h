@@ -23,12 +23,12 @@ public:
 	virtual Type* GetType(std::wstring_view friendlyName) const;
 };
 
-#define DEFINE_GAME_MODULE(GameModuleClass)					\
-extern "C"													\
-{															\
-	__declspec(dllexport)									\
-	SGameModule* LoadGameModule()							\
-	{														\
-		return SObject::NewObject<GameModuleClass>();		\
-	}														\
+#define DEFINE_GAME_MODULE(GameModuleClass)	\
+extern "C"									\
+{											\
+	__declspec(dllexport)					\
+	SGameModule* LoadGameModule()			\
+	{										\
+		return gcnew GameModuleClass();		\
+	}										\
 }

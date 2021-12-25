@@ -10,19 +10,14 @@
 
 GENERATE_BODY(SObject);
 
-SObject::SObject() : Generation(0)
+SObject::SObject()
+	: bMarkAtGC(false)
 {
-	ReferencePtr = new Referencer();
 }
 
-SObject::SObject(SObject&& Rhs)
-	: Generation(0)
-	, ReferencePtr(Rhs.ReferencePtr)
-	, InternalIndex(-1)
+SObject::SObject(SObject&& Rhs) noexcept
+	: bMarkAtGC(false)
 {
-	Rhs.Generation = 0;
-	Rhs.ReferencePtr = nullptr;
-	Rhs.InternalIndex = -1;
 }
 
 SObject::~SObject()
@@ -34,22 +29,9 @@ SObject::~SObject()
 	}
 }
 
-void SObject::UnmarkGC()
-{
-	ReferencePtr->bDisposed = true;
-}
-
 void SObject::AddToRoot()
 {
 	GC.Roots.emplace(this);
-}
-
-void SObject::MarkGC(uint64 Generation)
-{
-	if (this->Generation != Generation)
-	{
-		this->Generation = Generation;
-	}
 }
 
 void SObject::RemoveFromRoot()
@@ -64,6 +46,7 @@ std::wstring SObject::ToString()
 
 void SObject::PostConstruction()
 {
+	ReferencePtr = new Referencer();
 	volatile const auto& CachingDummy = GetType()->GetGCProperties();
 	GC.RegisterObject(this);
 }

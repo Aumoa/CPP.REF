@@ -103,5 +103,5 @@ This&& operator +(SlotClass&& instanceSlot) &&				\
 	return std::move(*static_cast<This*>(this));			\
 }
 
-#define SNew(SlateClass) (NewObject<SlateClass>()) << SlateClass::DeclarativeAttr<>()
-#define SAssignNew(Var, SlateClass) (Var = NewObject<SlateClass>()) << SlateClass::DeclarativeAttr<>()
+#define SNew(SlateClass) (gcnew SlateClass()) << SlateClass::DeclarativeAttr<>()
+#define SAssignNew(Var, SlateClass) (Var = gcnew SlateClass()) << SlateClass::DeclarativeAttr<>()

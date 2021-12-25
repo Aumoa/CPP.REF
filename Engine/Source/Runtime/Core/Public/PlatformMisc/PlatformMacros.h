@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 #ifndef PLATFORM_WINDOWS
 #define PLATFORM_WINDOWS 0
 #endif

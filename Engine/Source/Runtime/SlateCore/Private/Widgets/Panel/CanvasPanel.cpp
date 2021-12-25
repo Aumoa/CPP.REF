@@ -49,7 +49,7 @@ Vector2 SCanvasPanel::GetDesiredSize()
 
 auto SCanvasPanel::AddSlot() -> SSlot&
 {
-	return *Slots.emplace_back(NewObject<SSlot>());
+	return *Slots.emplace_back(gcnew SSlot());
 }
 
 bool SCanvasPanel::RemoveSlot(size_t Index)
@@ -93,7 +93,7 @@ DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Attr)
 	Slots.reserve(Attr.Slots.size());
 	for (auto& Slot : Attr.Slots)
 	{
-		Slots.emplace_back(NewObject<SSlot>(std::move(Slot)));
+		Slots.emplace_back(gcnew SSlot(std::move(Slot)));
 	}
 }
 

@@ -24,6 +24,6 @@ void LogSystem::InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, s
 
 	if (LogVerbosity == ELogVerbosity::Fatal)
 	{
-		throw SObject::NewObject<SFatalException>(Message);
+		throw gcnew SFatalException(Message);
 	}
 }

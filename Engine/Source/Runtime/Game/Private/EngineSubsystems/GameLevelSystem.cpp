@@ -43,7 +43,7 @@ SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 			return nullptr;
 		}
 
-		_GameWorld = NewObject<SWorld>(InWorldType);
+		_GameWorld = gcnew SWorld(InWorldType);
 		_GameWorld->InitWorld();
 		return _GameWorld;
 	}

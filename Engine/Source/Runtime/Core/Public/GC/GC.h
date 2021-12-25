@@ -90,6 +90,5 @@ public:
 	GCEvent PostGarbageCollect;
 
 private:
-	bool IsMarked(SObject* Object);
 	int32 MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth);
 };

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "LogCore.h"
+#include "CoreMacros.h"
+#include "ObjectBase.h"
 #include "Concepts/CoreConcepts.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
@@ -20,7 +22,7 @@ inline TTo* Cast(TFrom* InFrom)
 template<std::same_as<SObject> TTo, class TFrom>
 inline TTo* Cast(const TFrom& InValue) requires (!std::derived_from<TFrom, SObject>)
 {
-	return TTo::template NewObject<SValueType>(InValue);
+	return gcnew SValueType(InValue);
 }
 
 template<class TTo, std::same_as<SObject> TFrom>

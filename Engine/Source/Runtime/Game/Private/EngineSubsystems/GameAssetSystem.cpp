@@ -28,7 +28,7 @@ SGameAssetSystem::~SGameAssetSystem()
 
 void SGameAssetSystem::PostInit()
 {
-	Assimp = NewObject<SAssetsLoader>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
+	Assimp = gcnew SAssetsLoader(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 
 	SearchDirectory(L"Content");
 	

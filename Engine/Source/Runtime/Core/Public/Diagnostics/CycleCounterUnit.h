@@ -46,4 +46,6 @@ public:
 	CycleCounterUnit(CycleCounterNamespace* NamespacePtr, std::wstring_view Name);
 
 	Instance GetScopedTimer();
+	std::wstring GetName();
+	float GetAverageTime();
 };

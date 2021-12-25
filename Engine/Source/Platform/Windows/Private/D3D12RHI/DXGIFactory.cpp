@@ -57,7 +57,7 @@ IRHIAdapter* SDXGIFactory::GetAdapter(int32 index)
 		HR(("_factory->EnumAdapters1", hr));
 	}
 
-	auto* instance = NewObject<SDXGIAdapter>(this, std::move(adapter));
+	auto* instance = gcnew SDXGIAdapter(this, std::move(adapter));
 	if (_cachedAdapters.size() <= (size_t)index)
 	{
 		_cachedAdapters.resize((size_t)index + 1);
@@ -81,7 +81,7 @@ IRHIDevice* SDXGIFactory::CreateDevice(IRHIAdapter* adapter)
 	ComPtr<ID3D12Device> device;
 	HR(D3D12CreateDevice(actualAdapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device)));
 
-	return NewObject<SD3D12Device>(this, std::move(device));
+	return gcnew SD3D12Device(this, std::move(device));
 }
 
 IRHISwapChain* SDXGIFactory::CreateSwapChain(IRHIDevice* device)
@@ -107,7 +107,7 @@ IRHISwapChain* SDXGIFactory::CreateSwapChain(IRHIDevice* device)
 	ComPtr<IDXGISwapChain4> swapChain4;
 	HR(swapChain1.As<IDXGISwapChain4>(&swapChain4));
 
-	return NewObject<SDXGISwapChain>(this, Cast<SD3D12Device>(device), std::move(swapChain4));
+	return gcnew SDXGISwapChain(this, Cast<SD3D12Device>(device), std::move(swapChain4));
 }
 
 IRHIFontCollection* SDXGIFactory::CreateFontCollection(const std::filesystem::path& path)
@@ -125,7 +125,7 @@ IRHIFontCollection* SDXGIFactory::CreateFontCollection(const std::filesystem::pa
 	ComPtr<IDWriteFontCollection1> collection;
 	HR(_writeFactory->CreateFontCollectionFromFontSet(fontSet.Get(), &collection));
 
-	return NewObject<SDWriteFontCollection>(this, std::move(collection));
+	return gcnew SDWriteFontCollection(this, std::move(collection));
 }
 
 IRHITextFormat* SDXGIFactory::CreateTextFormat(std::wstring_view fontFamilyName, IRHIFontCollection* fontCollection, ERHIFontWeight fontWeight, ERHIFontStyle fontStyle, ERHIFontStretch fontStretch, float fontSize, std::wstring_view localeName)
@@ -140,7 +140,7 @@ IRHITextFormat* SDXGIFactory::CreateTextFormat(std::wstring_view fontFamilyName,
 	ComPtr<IDWriteTextFormat> format;
 	HR(_writeFactory->CreateTextFormat(fontFamilyName.data(), fontCollection_d, (DWRITE_FONT_WEIGHT)fontWeight, (DWRITE_FONT_STYLE)fontStyle, (DWRITE_FONT_STRETCH)fontStretch, fontSize, localeName.data(), &format));
 
-	return NewObject<SDWriteTextFormat>(this, std::move(format));
+	return gcnew SDWriteTextFormat(this, std::move(format));
 }
 
 IRHITextLayout* SDXGIFactory::CreateTextLayout(IRHITextFormat* format, std::wstring_view text, const Vector2& layout)
@@ -150,7 +150,7 @@ IRHITextLayout* SDXGIFactory::CreateTextLayout(IRHITextFormat* format, std::wstr
 	ComPtr<IDWriteTextLayout> textLayout;
 	HR(_writeFactory->CreateTextLayout(text.data(), (UINT32)text.length(), format_s->Get<IDWriteTextFormat>(), layout.X, layout.Y, &textLayout));
 
-	return NewObject<SDWriteTextLayout>(this, std::move(textLayout));
+	return gcnew SDWriteTextLayout(this, std::move(textLayout));
 }
 
 void SDXGIFactory::Dispose(bool bDisposing)

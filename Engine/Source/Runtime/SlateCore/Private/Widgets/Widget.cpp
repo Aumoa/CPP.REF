@@ -12,7 +12,7 @@ GENERATE_BODY(SWidget);
 
 SWidget::SWidget() : Super()
 {
-    AnimPlayer = NewObject<SSlateAnimationPlayer>(this);
+    AnimPlayer = gcnew SSlateAnimationPlayer(this);
 }
 
 std::wstring SWidget::ToString()

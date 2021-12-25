@@ -9,10 +9,12 @@
 #include <map>
 #include "PrimitiveTypes.h"
 #include "Concepts/CoreConcepts.h"
-#include "Method.h"
-#include "Property.h"
 #include "GC/GC.h"
 #include "Misc/StringUtils.h"
+#include "CoreMacros.h"
+#include "Method.h"
+#include "Property.h"
+#include "ObjectBase.h"
 
 class SObject;
 class Method;
@@ -342,7 +344,7 @@ private:
 	{
 		return +[]() -> SObject*
 		{
-			return SObject::template NewObject<TType>();
+			return gcnew TType();
 		};
 	}
 

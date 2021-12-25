@@ -36,17 +36,6 @@ public:
 	virtual SWorld* GetWorld();
 
 public:
-	using Super::NewObject;
-
-	template<std::derived_from<SGameObject> T>
-	static T* NewObject(SGameObject* Outer)
-	{
-		T* Obj = SObject::NewObject<T>();
-		Obj->SetOuter(Outer);
-		return Obj;
-	}
-
-public:
 	SObject* LoadObject(const std::filesystem::path& assetPath);
 
 	template<std::derived_from<SObject> T>

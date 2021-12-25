@@ -22,7 +22,7 @@ SWorld::SWorld(EWorldType InWorldType) : Super()
 
 void SWorld::InitWorld()
 {
-	Scene = NewObject<SScene>(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
+	Scene = gcnew SScene(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
 void SWorld::DestroyWorld()

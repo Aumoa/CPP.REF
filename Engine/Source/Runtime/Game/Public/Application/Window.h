@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/CompoundWidget.h"
+#include "Widgets/DebugCanvas.h"
 
 interface IApplicationInterface;
 class SViewport;
+class SDebugCanvas;
 
 class GAME_API SWindow : public SCompoundWidget
 {
@@ -17,6 +19,8 @@ private:
 	IApplicationInterface* Application = nullptr;
 	SPROPERTY(GameViewport)
 	SViewport* GameViewport = nullptr;
+	SPROPERTY(DebugCanvas)
+	SDebugCanvas* DebugCanvas = nullptr;
 
 public:
 	SWindow();

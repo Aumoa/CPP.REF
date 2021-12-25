@@ -26,7 +26,7 @@ bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick
 	LevelTick = InParentLevelTick;
 	if (LevelTick == nullptr)
 	{
-		LevelTick = NewObject<STickTaskLevelManager>(World);
+		LevelTick = gcnew STickTaskLevelManager(World);
 	}
 
 	OnLoadLevel();

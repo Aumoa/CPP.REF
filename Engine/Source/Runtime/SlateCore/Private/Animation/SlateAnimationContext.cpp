@@ -123,7 +123,7 @@ bool SSlateAnimationContext::IsPlaying()
 
 SSlateAnimationContext* SSlateAnimationContext::Clone()
 {
-	SSlateAnimationContext* NewContext = NewObject<SSlateAnimationContext>(Name);
+	SSlateAnimationContext* NewContext = gcnew SSlateAnimationContext(Name);
 	NewContext->AnimCurves.reserve(AnimCurves.size());
 	NewContext->ElapsedTime = 0;
 	NewContext->bCurveInit = false;

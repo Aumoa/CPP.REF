@@ -17,6 +17,7 @@ void SWindow::InitViewport(IApplicationInterface* InApplication)
 	GameViewport = SNew(SViewport)
 		.RenderSize(InApplication->GetViewportSize())
 		.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM);
+	GameViewport->AddToViewport(SAssignNew(DebugCanvas, SDebugCanvas));
 }
 
 SViewport* SWindow::GetGameViewport()

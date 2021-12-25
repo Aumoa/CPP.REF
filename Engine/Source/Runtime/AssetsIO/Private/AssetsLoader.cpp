@@ -104,7 +104,7 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 	switch (Header.Type)
 	{
 	case EAssetType::Image:
-		Asset = NewObject<STexture2D>();
+		Asset = gcnew STexture2D();
 		break;
 	default:
 		ASSETS_LOG(std::format(L"Item type mismatch. Type: (EAssetType){}", (int32)Header.Type));

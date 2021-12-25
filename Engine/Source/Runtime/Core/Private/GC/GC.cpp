@@ -138,15 +138,19 @@ void GarbageCollector::Collect(bool bFullPurge)
 				for (size_t ItemIdx = StartIdx; ItemIdx < EndIdx; ++ItemIdx)
 				{
 					SObject* Object = Objects.Get(ItemIdx);
-					if (Object && Object->Generation != Generation && !Roots.contains(Object))
+					if (Object)
 					{
-						PendingKill[ActualPendingKill++] = Object;
-						Object->UnmarkGC();
-						Objects.Set(Object->InternalIndex, nullptr);
-					}
-					else
-					{
-						MaxLiveNumber = ItemIdx;
+						if (!Object->bMarkAtGC && !Roots.contains(Object))
+						{
+							PendingKill[ActualPendingKill++] = Object;
+							Object->ReferencePtr->bDisposed = true;
+							Objects.Set(Object->InternalIndex, nullptr);
+						}
+						else
+						{
+							Object->bMarkAtGC = false;
+							MaxLiveNumber = ItemIdx;
+						}
 					}
 				}
 
@@ -243,11 +247,6 @@ GarbageCollector& GarbageCollector::Get()
 	return Singleton;
 }
 
-bool GarbageCollector::IsMarked(SObject* Object)
-{
-	return Object->Generation == Generation;
-}
-
 int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth)
 {
 	int32 Writep = 0;
@@ -261,12 +260,12 @@ int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDept
 	{
 		Object = Buffer[Reap++];
 
-		if (IsMarked(Object) || PendingFinalize.contains(Object))
+		if (Object == nullptr || Object->bMarkAtGC || PendingFinalize.contains(Object))
 		{
 			continue;
 		}
 
-		Object->MarkGC(Generation);
+		Object->bMarkAtGC = true;
 
 		for (auto& GCProp : Object->GetType()->GetGCProperties())
 		{
