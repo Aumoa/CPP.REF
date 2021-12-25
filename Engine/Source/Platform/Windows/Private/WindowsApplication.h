@@ -39,8 +39,10 @@ public:
 
 	// IApplicationInterface
 	virtual void Start() override;
+
 	virtual Vector2N GetViewportSize() override;
 	virtual float GetDpi() override;
+	virtual void* GetWindowHandle() override;
 
 	virtual void SetTickMode(ETickMode InTickMode) override;
 	virtual ETickMode GetTickMode() override;
@@ -60,8 +62,6 @@ public:
 	virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
 	virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
 	// ~IPlatformImageLoader
-
-	HWND GetWindowHandle();
 
 private:
 	void ShrinkRealtimeDemanders();

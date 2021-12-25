@@ -167,6 +167,80 @@ public:
 		{
 		}
 
+		// SObject dictionary type(Value).
+		TypeGenerator() requires requires(const TType& Collection)
+			{
+				{ std::begin(Collection) };
+				{ std::end(Collection) };
+				{ std::remove_reference_t<decltype(*std::begin(Collection)->second)>::StaticClass() };
+			}
+			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, bNative(true)
+			, bGCCollection(true)
+			, CollectionType(std::remove_reference_t<decltype(*std::begin(std::declval<const TType&>())->second)>::StaticClass())
+			, Collector([](void* Ptr, int32 Depth) -> int32
+			{
+				TType& Collection = *reinterpret_cast<TType*>(Ptr);
+				int32 Count = 0;
+				for (auto& [Key, Object] : Collection)
+				{
+					if (Object)
+					{
+						if (GC.PendingFinalize.contains(Object))
+						{
+							Object = nullptr;
+						}
+						else
+						{
+							GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
+							++Count;
+						}
+					}
+				}
+				return Count;
+			})
+		{
+		}
+
+		// SObject dictionary type(Key).
+		TypeGenerator() requires requires(const TType& Collection)
+			{
+				{ std::begin(Collection) };
+				{ std::end(Collection) };
+				{ std::remove_reference_t<decltype(*std::begin(Collection)->first)>::StaticClass() };
+			}
+			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, bNative(true)
+			, bGCCollection(true)
+			, CollectionType(std::remove_reference_t<decltype(*std::begin(std::declval<const TType&>())->first)>::StaticClass())
+			, Collector([](void* Ptr, int32 Depth) -> int32
+			{
+				TType& Collection = *reinterpret_cast<TType*>(Ptr);
+				int32 Count = 0;
+				for (auto It = Collection.begin(); It != Collection.end();)
+				{
+					auto& Object = It->second;
+					if (Object)
+					{
+						if (GC.PendingFinalize.contains(Object))
+						{
+							Collection.erase(It++);
+							continue;
+						}
+						else
+						{
+							GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
+							++Count;
+						}
+					}
+
+					++It;
+				}
+				return Count;
+			})
+		{
+		}
+
 		TypeGenerator()
 			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
 			, bNative(true)

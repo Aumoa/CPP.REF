@@ -271,7 +271,7 @@ SWindowsPlatformMouse* SWindowsPlatformMouse::sInstance;
 
 void SWindowsPlatformMouse::SetWindow(SWindowsApplication* Application)
 {
-    pImpl->SetWindow(Application->GetWindowHandle());
+    pImpl->SetWindow((HWND)Application->GetWindowHandle());
 }
 
 

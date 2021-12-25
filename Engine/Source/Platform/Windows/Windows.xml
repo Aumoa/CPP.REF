@@ -8,6 +8,7 @@
         <Item Name="PlatformGeneric"/>
         <Item Name="Game"/>
         <Item Name="WindowsCommon"/>
+		<Item Name="DirectX"/>
     </ReferencedProjects>
     <ExternalLinks>
         <Item Name="User32.lib"/>

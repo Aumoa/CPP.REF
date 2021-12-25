@@ -2,9 +2,9 @@
 
 #include "WindowsApplication.h"
 #include "GameModule.h"
+#include "DXGIFactory.h"
 #include "Input/WindowsPlatformKeyboard.h"
 #include "Input/WindowsPlatformMouse.h"
-#include "D3D12RHI/DXGIFactory.h"
 #include "Multimedia/WindowsImage.h"
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
@@ -179,6 +179,11 @@ float SWindowsApplication::GetDpi()
 	return (float)GetDpiForWindow(hWnd);
 }
 
+void* SWindowsApplication::GetWindowHandle()
+{
+	return hWnd;
+}
+
 void SWindowsApplication::SetTickMode(ETickMode InTickMode)
 {
 	if (TickMode != InTickMode)
@@ -251,7 +256,7 @@ IRHIFactory* SWindowsApplication::GetFactory()
 {
 	if (Factory == nullptr)
 	{
-		Factory = gcnew SDXGIFactory(this);
+		Factory = gcnew SDXGIFactory();
 	}
 	return Factory;
 }
@@ -291,11 +296,6 @@ IPlatformImage* SWindowsApplication::CreateImageFromBinary(std::span<const uint8
 
 	ComPtr<IWICFormatConverter> Converter = DecodeImage(Decoder.Get(), FrameIndex, PixelFormat);
 	return gcnew SWindowsImage(Converter.Get(), PixelFormat);
-}
-
-HWND SWindowsApplication::GetWindowHandle()
-{
-	return hWnd;
 }
 
 void SWindowsApplication::ShrinkRealtimeDemanders()
