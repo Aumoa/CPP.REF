@@ -22,6 +22,7 @@ std::wstring SWidget::ToString()
 
 void SWidget::Dispose()
 {
+    GC.SuppressFinalize(this);
 }
 
 std::wstring SWidget::GetName()

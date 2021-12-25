@@ -18,9 +18,8 @@ SObject::SObject()
 
 SObject::SObject(SObject&& Rhs) noexcept
 	: bMarkAtGC(false)
-	, ReferencePtr(Rhs.ReferencePtr)
+	, ReferencePtr(new Referencer())
 {
-	Rhs.ReferencePtr = nullptr;
 }
 
 SObject::~SObject()

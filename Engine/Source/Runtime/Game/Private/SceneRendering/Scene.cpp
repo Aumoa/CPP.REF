@@ -23,6 +23,7 @@ SScene::~SScene()
 
 void SScene::Dispose()
 {
+	GC.SuppressFinalize(this);
 }
 
 bool SScene::AddPrimitive(SPrimitiveComponent* InPrimitive)
