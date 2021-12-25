@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IProjectGenerator.h"
+#include "VisualStudioVersion.h"
 
 class SVSProjectGenerator : implements SObject, implements IProjectGenerator
 {
@@ -11,12 +12,16 @@ class SVSProjectGenerator : implements SObject, implements IProjectGenerator
 	friend class SVSSolution;
 
 private:
+	SPROPERTY(Solution)
 	SSolution* Solution;
+	EVisualStudioVersion VSVersion;
 
 public:
-	SVSProjectGenerator(SSolution* Solution);
+	SVSProjectGenerator(SSolution* Solution, EVisualStudioVersion InVersion);
 
 	virtual SSolution* GetSolution() override;
 	virtual IProject* GenerateProject(const ProjectBuildRuntime& RuntimeData) override;
 	virtual ISolution* GenerateSolution() override;
+
+	EVisualStudioVersion GetVSVersion() { return VSVersion; }
 };

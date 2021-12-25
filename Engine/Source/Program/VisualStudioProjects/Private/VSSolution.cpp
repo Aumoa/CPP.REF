@@ -175,10 +175,10 @@ EndProject)", CppProjectGuid, Key, Value.GeneratedProject->GetPath().wstring(), 
 
 	std::filesystem::path SolutionFile = std::format(L"{}.sln", Solution->GetSolutionName());
 
-	std::wstring Previous = StringUtils::Trim(NewObject<SFileReference>(SolutionFile)->ReadAllText());
+	std::wstring Previous = StringUtils::Trim((gcnew SFileReference(SolutionFile))->ReadAllText());
 	std::wstring Build = StringUtils::Trim(Builder.str());
 	if (Previous != Build)
 	{
-		NewObject<SFileReference>(SolutionFile)->WriteAllText(Build);
+		(gcnew SFileReference(SolutionFile))->WriteAllText(Build);
 	}
 }

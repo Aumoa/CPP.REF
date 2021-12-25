@@ -6,9 +6,10 @@
 
 GENERATE_BODY(SVSProjectGenerator);
 
-SVSProjectGenerator::SVSProjectGenerator(SSolution* Solution)
+SVSProjectGenerator::SVSProjectGenerator(SSolution* Solution, EVisualStudioVersion InVersion)
 	: Super()
 	, Solution(Solution)
+	, VSVersion(InVersion)
 {
 }
 
@@ -19,10 +20,10 @@ SSolution* SVSProjectGenerator::GetSolution()
 
 IProject* SVSProjectGenerator::GenerateProject(const ProjectBuildRuntime& RuntimeData)
 {
-	return NewObject<SVSProject>(this, RuntimeData);
+	return gcnew SVSProject(this, RuntimeData);
 }
 
 ISolution* SVSProjectGenerator::GenerateSolution()
 {
-	return NewObject<SVSSolution>(this);
+	return gcnew SVSSolution(this);
 }

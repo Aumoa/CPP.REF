@@ -6,6 +6,7 @@
 #include "GuidHelper.h"
 #include "IProjectGenerator.h"
 #include "Solution.h"
+#include "VSProjectGenerator.h"
 #include "IO/DirectoryReference.h"
 #include "IO/FileReference.h"
 
@@ -46,6 +47,13 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 {
 	using namespace tinyxml2;
 	using EType = ProjectBuildMetadata::EType;
+
+	EVisualStudioVersion VSVersion = EVisualStudioVersion::VS2019;
+
+	if (auto VSGen = Cast<SVSProjectGenerator>(Generator))
+	{
+		VSVersion = VSGen->GetVSVersion();
+	}
 
 	SSolution* Solution = Generator->GetSolution();
 	std::wstring AppName = Solution->GetFirstProjectName();
@@ -269,7 +277,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			{
 				NewElement(PropertyGroup, "ConfigurationType", GetTypeString(RuntimeData.Metadata->Type));
 				NewElement(PropertyGroup, "UseDebugLibraries", BoolStr(Config.bUseDebugLibrary));
-				NewElement(PropertyGroup, "PlatformToolset", PlatformToolsets[gVSVersion]);
+				NewElement(PropertyGroup, "PlatformToolset", PlatformToolsets[VSVersion]);
 				NewElement(PropertyGroup, "WholeProgramOptimization", BoolStr(DoubleBit(Config.bWholeProgramOptimization, RuntimeData.Metadata->bEngine)));
 				NewElement(PropertyGroup, "CharacterSet", "Unicode");
 				NewElement(PropertyGroup, "EnableUnitySupport", "true");
@@ -360,7 +368,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			}
 
 			auto AbsolutePath = std::filesystem::absolute(RelativePath);
-			NewObject<SDirectoryReference>(AbsolutePath)->CreateIfNotExists(true);
+			(gcnew SDirectoryReference(AbsolutePath))->CreateIfNotExists(true);
 
 			for (auto IncludeItem : std::filesystem::recursive_directory_iterator(AbsolutePath))
 			{
@@ -420,7 +428,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 	}
 
 	// Create directory.
-	NewObject<SDirectoryReference>(IntermediateProjectPath)->CreateIfNotExists(true);
+	(gcnew SDirectoryReference(IntermediateProjectPath))->CreateIfNotExists(true);
 
 	IntermediateProjectPath /= RuntimeData.Metadata->Name;
 	XmlPath = IntermediateProjectPath;
@@ -456,7 +464,7 @@ SVSProject::SVSProject(IProjectGenerator* Generator, const ProjectBuildRuntime& 
 			}
 
 			auto AbsolutePath = std::filesystem::absolute(ProjectRelativePath).wstring();
-			NewObject<SDirectoryReference>(AbsolutePath)->CreateIfNotExists(true);
+			(gcnew SDirectoryReference(AbsolutePath))->CreateIfNotExists(true);
 
 			std::set<std::wstring> Filters;
 
@@ -567,7 +575,7 @@ tinyxml2::XMLError SVSProject::SaveAs(tinyxml2::XMLDocument* Doc, const std::fil
 	XMLPrinter Print;
 	Doc->Accept(&Print);
 
-	std::wstring Previous = StringUtils::Trim(NewObject<SFileReference>(Path)->ReadAllText());
+	std::wstring Previous = StringUtils::Trim((gcnew SFileReference(Path))->ReadAllText());
 	std::wstring Build = StringUtils::Trim(ANSI_TO_WCHAR(Print.CStr()));
 	if (Previous == Build)
 	{

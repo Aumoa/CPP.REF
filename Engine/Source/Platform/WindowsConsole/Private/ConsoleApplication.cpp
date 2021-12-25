@@ -24,7 +24,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	GC.Init();
 
 	{
-		SharedPtr CommandArgs = NewObject<SCommandLine>(Argv);
+		SharedPtr CommandArgs = gcnew SCommandLine(Argv);
 
 		std::optional<std::wstring> ModuleName;
 		size_t ConsoleModuleIdx = CommandArgs->GetArgument(L"--ConsoleDll");
@@ -61,11 +61,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 			Thread* MainThread = Thread::GetCurrentThread();
 
 			MainThread->SetFriendlyName(L"[Main Thread]");
-			GC.RegisterThread(MainThread);
-
-			GC.RunAutoThread();
 			ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
-			GC.StopAutoThread();
 
 			SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
 		}

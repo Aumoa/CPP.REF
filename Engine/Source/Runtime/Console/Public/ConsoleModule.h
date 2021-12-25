@@ -39,6 +39,6 @@ extern "C"													\
 	__declspec(dllexport)									\
 	SConsoleModule* LoadConsoleModule()						\
 	{														\
-		return SObject::NewObject<ConsoleModuleClass>();	\
+		return gcnew ConsoleModuleClass();	\
 	}														\
 }
