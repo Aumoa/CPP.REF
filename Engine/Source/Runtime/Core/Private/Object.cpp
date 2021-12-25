@@ -12,12 +12,15 @@ GENERATE_BODY(SObject);
 
 SObject::SObject()
 	: bMarkAtGC(false)
+	, ReferencePtr(new Referencer())
 {
 }
 
 SObject::SObject(SObject&& Rhs) noexcept
 	: bMarkAtGC(false)
+	, ReferencePtr(Rhs.ReferencePtr)
 {
+	Rhs.ReferencePtr = nullptr;
 }
 
 SObject::~SObject()
@@ -46,7 +49,6 @@ std::wstring SObject::ToString()
 
 void SObject::PostConstruction()
 {
-	ReferencePtr = new Referencer();
 	volatile const auto& CachingDummy = GetType()->GetGCProperties();
 	GC.RegisterObject(this);
 }
