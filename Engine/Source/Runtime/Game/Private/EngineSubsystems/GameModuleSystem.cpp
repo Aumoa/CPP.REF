@@ -36,7 +36,7 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
 		GameModulePath.replace_extension(L".dll");
 	}
 
-	Module = std::make_unique<PlatformModule>(GameModulePath);
+	std::unique_ptr Module = std::make_unique<PlatformModule>(GameModulePath);
 	if (!Module->IsValid())
 	{
 		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", GameModuleName);
@@ -56,6 +56,9 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
 		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", GameModuleName);
 		return;
 	}
+
+	// Keep module object while application is running.
+	IApplicationInterface::Get().ConsumeModule(std::move(Module));
 }
 
 SGameInstance* SGameModuleSystem::LoadGameInstance()

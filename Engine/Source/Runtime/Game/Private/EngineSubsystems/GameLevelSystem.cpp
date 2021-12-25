@@ -29,6 +29,7 @@ void SGameLevelSystem::Deinit()
 	}
 
 	_GameWorld->DestroyWorld();
+	GC.SuppressFinalize(_GameWorld);
 
 	Super::Deinit();
 }

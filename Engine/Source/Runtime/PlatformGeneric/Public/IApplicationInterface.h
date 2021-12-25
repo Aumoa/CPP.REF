@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+class PlatformModule;
 interface IRHIFactory;
 interface IPlatformKeyboard;
 interface IPlatformMouse;
@@ -20,6 +21,7 @@ interface IApplicationInterface : implements SObject
 	};
 
 	virtual void Start() = 0;
+	virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) = 0;
 
 	virtual Vector2N GetViewportSize() = 0;
 	virtual float GetDpi() = 0;

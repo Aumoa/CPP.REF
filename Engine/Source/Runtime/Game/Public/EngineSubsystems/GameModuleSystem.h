@@ -14,7 +14,6 @@ class GAME_API SGameModuleSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameModuleSystem)
 
 private:
-	std::unique_ptr<PlatformModule> Module;
 	SPROPERTY(GameModule)
 	SGameModule* GameModule = nullptr;
 

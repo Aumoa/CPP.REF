@@ -10,6 +10,7 @@
 class SDXGIFactory;
 class SWindowsPlatformKeyboard;
 class SWindowsPlatformMouse;
+class PlatformModule;
 
 class SWindowsApplication : implements SObject, implements IApplicationInterface, implements IPlatformImageLoader
 {
@@ -32,6 +33,8 @@ private:
 	SDXGIFactory* Factory = nullptr;
 	ComPtr<IWICImagingFactory> ImagingFactory;
 
+	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
+
 public:
 	SWindowsApplication(HINSTANCE hInstance);
 
@@ -39,6 +42,7 @@ public:
 
 	// IApplicationInterface
 	virtual void Start() override;
+	virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) override;
 
 	virtual Vector2N GetViewportSize() override;
 	virtual float GetDpi() override;

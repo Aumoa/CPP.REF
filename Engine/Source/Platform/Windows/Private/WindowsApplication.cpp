@@ -51,6 +51,8 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	auto Logger = std::make_unique<LogModule>(ANSI_TO_WCHAR(SE_APPLICATION));
 	Logger->RunTask();
 
+	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
+
 	{
 		GC.Init();
 
@@ -116,8 +118,8 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 			SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
 		}
 
-		// Cleanup GameEngineModule.
-		GameModule = nullptr;
+		// Save platform modules for finish to dispose.
+		PlatformModules = std::move(WinApp->PlatformModules);
 	}
 
 	GC.Collect(true);
@@ -165,6 +167,11 @@ void SWindowsApplication::Start()
 			Idle.Broadcast(ActualTickMode);
 		}
 	}
+}
+
+void SWindowsApplication::ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr)
+{
+	PlatformModules.emplace_back(std::move(ModulePtr));
 }
 
 Vector2N SWindowsApplication::GetViewportSize()
