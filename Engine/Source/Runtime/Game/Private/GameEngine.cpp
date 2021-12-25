@@ -15,6 +15,12 @@
 
 GENERATE_BODY(SGameEngine)
 
+DECLARE_STAT_GROUP("Engine", STATGROUP_Engine);
+DECLARE_CYCLE_STAT("Tick", STAT_Tick, STATGROUP_Engine);
+DECLARE_CYCLE_STAT("  SystemTick", STAT_SystemTick, STATGROUP_Engine);
+DECLARE_CYCLE_STAT("  GameTick", STAT_GameTick, STATGROUP_Engine);
+DECLARE_CYCLE_STAT("  ExecuteRenderThread", STAT_ExecuteRenderThread, STATGROUP_Engine);
+
 SGameEngine* GEngine = nullptr;
 
 SGameEngine::SGameEngine() : Super()
@@ -25,6 +31,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 {
 	GEngine = this;
 
+	// CollectGarbageEveryFrame = true
 	GC.SetFlushInterval(0);
 
 	SlateApplication = gcnew SSlateApplication();
@@ -159,6 +166,7 @@ void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
 {
 	using namespace std::chrono;
 
+	SCOPE_CYCLE_COUNTER(STAT_Tick);
 	auto Tick = TickCalc.DoCalc();
 
 	if (AppTickMode != ActualTickMode || ActualTickMode == IApplicationInterface::ETickMode::Ontime)
@@ -176,6 +184,8 @@ void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
 
 void SGameEngine::SystemsTick(std::chrono::duration<float> InDeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_SystemTick);
+
 	for (auto& System : Subsystems)
 	{
 		System->Tick(InDeltaTime.count());
@@ -184,6 +194,8 @@ void SGameEngine::SystemsTick(std::chrono::duration<float> InDeltaTime)
 
 void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_GameTick);
+
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 	GameWorld->LevelTick(InDeltaTime.count());
 	SlateApplication->TickAndPaint(InDeltaTime.count());
@@ -191,5 +203,7 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 
 void SGameEngine::RenderTick(std::chrono::duration<float> InDeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_ExecuteRenderThread);
+
 	GetEngineSubsystem<SGameRenderSystem>()->ExecuteRenderThread(InDeltaTime.count(), SlateApplication);
 }

@@ -16,6 +16,7 @@ SDebugCanvas::SDebugCanvas() : Super()
 void SDebugCanvas::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
 	Super::Tick(AllottedGeometry, InDeltaTime);
+	++TickCounter;
 	RefreshTimer->Tick(InDeltaTime);
 }
 
@@ -38,7 +39,15 @@ DEFINE_SLATE_CONSTRUCTOR(SDebugCanvas, Attr)
 		+SVerticalBoxPanel::SSlot()
 		.SizeParam(ESizeRule::Auto, 1.0f)
 		[
-			SAssignNew(GCTracer, STextBlock)
+			SAssignNew(STATGROUP_GC, STextBlock)
+			.Text(L"")
+			.Font(L"Consolas", 15.0f)
+			.TintColor(NamedColors::White)
+		]
+		+SVerticalBoxPanel::SSlot()
+		.SizeParam(ESizeRule::Auto, 1.0f)
+		[
+			SAssignNew(STATGROUP_Engine, STextBlock)
 			.Text(L"")
 			.Font(L"Consolas", 15.0f)
 			.TintColor(NamedColors::White)
@@ -56,8 +65,9 @@ DEFINE_SLATE_CONSTRUCTOR(SDebugCanvas, Attr)
 
 void SDebugCanvas::UpdateTexts()
 {
-	GCCounter->SetText(std::format(L"DebugCanvas: Total objects: {}", GC.NumObjects()));
+	GCCounter->SetText(std::format(L"DebugCanvas:\n  Total objects: {}\n  FPS: {}", GC.NumObjects(), TickCounter));
+	TickCounter = 0;
 
-	CycleCounterNamespace* GCNamespace = CycleCounter::Get().GetNamespace(L"GC");
-	GCTracer->SetText(GCNamespace->Trace());
+	STATGROUP_GC->SetText(CycleCounter::Get().GetNamespace(L"GC")->Trace());
+	STATGROUP_Engine->SetText(CycleCounter::Get().GetNamespace(L"Engine")->Trace());
 }

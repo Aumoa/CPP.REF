@@ -24,12 +24,16 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 private:
+	uint64 TickCounter = 0;
+
 	SPROPERTY(RefreshTimer)
 	STickScheduler* RefreshTimer = nullptr;
 	SPROPERTY(GCCounter)
 	STextBlock* GCCounter = nullptr;
-	SPROPERTY(GCTracer)
-	STextBlock* GCTracer = nullptr;
+	SPROPERTY(STATGROUP_GC)
+	STextBlock* STATGROUP_GC = nullptr;
+	SPROPERTY(STATGROUP_Engine)
+	STextBlock* STATGROUP_Engine = nullptr;
 
 private:
 	void UpdateTexts();
