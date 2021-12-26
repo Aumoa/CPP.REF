@@ -50,6 +50,10 @@ void SObject::PostConstruction()
 {
 	volatile const auto& CachingDummy = GetType()->GetGCProperties();
 	GC.RegisterObject(this);
+
+#if DO_CHECK
+	CachedTypeName = GetType()->GetFullName();
+#endif
 }
 
 void SObject::Dispose(bool bDisposing)

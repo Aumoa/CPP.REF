@@ -17,7 +17,7 @@ private:
 	class SComponentTickFunction : public TickFunction
 	{
 	private:
-		WeakPtr<SActorComponent> ComponentTarget;
+		SActorComponent* ComponentTarget = nullptr;
 
 	public:
 		SComponentTickFunction(SActorComponent* InTarget);

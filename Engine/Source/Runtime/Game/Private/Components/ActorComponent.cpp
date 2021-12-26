@@ -16,18 +16,15 @@ SActorComponent::SComponentTickFunction::SComponentTickFunction(SActorComponent*
 
 void SActorComponent::SComponentTickFunction::ExecuteTick(float InDeltaTime)
 {
-	SActorComponent* Resolved = ComponentTarget.Get();
-	checkf(Resolved, L"Component target is disposed.");
-
-	if (Resolved->HasBegunPlay() && Resolved->IsActive())
+	if (ComponentTarget->HasBegunPlay() && ComponentTarget->IsActive())
 	{
-		Resolved->TickComponent(InDeltaTime, this);
+		ComponentTarget->TickComponent(InDeltaTime, this);
 	}
 }
 
 SActorComponent* SActorComponent::SComponentTickFunction::GetTarget() const
 {
-	return ComponentTarget.Get();
+	return ComponentTarget;
 }
 
 SActorComponent::SActorComponent() : Super()

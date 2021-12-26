@@ -21,7 +21,7 @@ private:
 	class ActorTickFunction : public TickFunction
 	{
 	private:
-		WeakPtr<AActor> Target;
+		AActor* Target = nullptr;
 
 	public:
 		ActorTickFunction(AActor* InTarget);

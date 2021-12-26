@@ -15,17 +15,14 @@ AActor::ActorTickFunction::ActorTickFunction(AActor* InTarget)
 
 AActor* AActor::ActorTickFunction::GetTarget() const
 {
-	return Target.Get();
+	return Target;
 }
 
 void AActor::ActorTickFunction::ExecuteTick(float InDeltaTime)
 {
-	auto* Resolved = Target.Get();
-	checkf(Resolved, L"Target is disposed.");
-
-	if (Resolved->HasBegunPlay() && Resolved->IsActive())
+	if (Target->HasBegunPlay() && Target->IsActive())
 	{
-		Resolved->TickActor(InDeltaTime, this);
+		Target->TickActor(InDeltaTime, this);
 	}
 }
 

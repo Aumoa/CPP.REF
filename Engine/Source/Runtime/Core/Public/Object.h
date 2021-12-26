@@ -39,6 +39,7 @@ private:
 	Referencer* ReferencePtr = nullptr;
 
 #if DO_CHECK
+	std::wstring CachedTypeName;
 	SObject* GC_ContainsOwner = nullptr;
 #endif
 
