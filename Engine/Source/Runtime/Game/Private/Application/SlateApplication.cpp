@@ -40,7 +40,8 @@ SSlateApplication::~SSlateApplication()
 void SSlateApplication::Init(IApplicationInterface* InApplication)
 {
 	LocalPlayer = gcnew SLocalPlayer(this);
-	(SAssignNew(CoreWindow, SWindow))->InitViewport(InApplication);
+	CoreWindow = CreateCoreWindow();
+	CoreWindow->InitViewport();
 
 	auto& PlatformKeyboard = InApplication->GetPlatformKeyboard();
 	PlatformKeyboard.KeyPressed.AddSObject(this, &SSlateApplication::OnPlatformKeyPressed);
@@ -82,6 +83,11 @@ SLocalPlayer* SSlateApplication::GetLocalPlayer()
 SWindow* SSlateApplication::GetCoreWindow()
 {
 	return CoreWindow;
+}
+
+SWindow* SSlateApplication::CreateCoreWindow()
+{
+	return SNew(SWindow);
 }
 
 void SSlateApplication::OnPlatformKeyPressed(EKey InKey)

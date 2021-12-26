@@ -2,6 +2,7 @@
 
 #include "WindowsApplication.h"
 #include "GameModule.h"
+#include "GameEngine.h"
 #include "DXGIFactory.h"
 #include "Input/WindowsPlatformKeyboard.h"
 #include "Input/WindowsPlatformMouse.h"
@@ -81,16 +82,16 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 		if (!EngineName.has_value())
 		{
-#if defined(_DEBUG) && 0
-			constexpr const wchar_t* GameEngineModuleName = L"EditorEngine.dll";
+#if !SHIPPING
+			constexpr const wchar_t* GameEngineModuleName = L"Editor.dll";
 #else
 			constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
 #endif
 			EngineName = GameEngineModuleName;
 		}
 
-		PlatformModule EngineModule(*EngineName);
-		auto Loader = EngineModule.GetFunctionPointer<SGameModule*()>("LoadGameModule");
+		std::unique_ptr EngineModule = std::make_unique<PlatformModule>(*EngineName);
+		auto Loader = EngineModule->GetFunctionPointer<SGameModule*()>("LoadGameModule");
 		if (!Loader)
 		{
 			SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
@@ -120,6 +121,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 		// Save platform modules for finish to dispose.
 		PlatformModules = std::move(WinApp->PlatformModules);
+		PlatformModules.emplace_back(std::move(EngineModule));
 	}
 
 	GC.Collect(true);

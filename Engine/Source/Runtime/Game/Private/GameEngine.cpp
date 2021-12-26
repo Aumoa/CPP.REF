@@ -34,7 +34,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	// CollectGarbageEveryFrame = true
 	GC.SetFlushInterval(0);
 
-	SlateApplication = gcnew SSlateApplication();
+	SlateApplication = CreateSlateApplication();
 	SlateApplication->Init(InApplication);
 
 	InitializeSubsystems();
@@ -123,6 +123,11 @@ SGameInstance* SGameEngine::GetGameInstance()
 SSlateApplication* SGameEngine::GetSlateApplication()
 {
 	return SlateApplication;
+}
+
+SSlateApplication* SGameEngine::CreateSlateApplication()
+{
+	return gcnew SSlateApplication();
 }
 
 void SGameEngine::InitializeSubsystems()

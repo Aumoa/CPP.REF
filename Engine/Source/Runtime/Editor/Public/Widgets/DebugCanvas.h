@@ -8,7 +8,7 @@
 class STickScheduler;
 class STextBlock;
 
-class GAME_API SDebugCanvas : public SCanvasPanel
+class EDITOR_API SDebugCanvas : public SCanvasPanel
 {
 	GENERATED_BODY(SDebugCanvas)
 

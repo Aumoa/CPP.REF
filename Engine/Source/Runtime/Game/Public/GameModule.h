@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameEngine.h"
 
 class SGameInstance;
 class SGameEngine;
@@ -18,9 +17,6 @@ public:
 
 	virtual SGameInstance* CreateGameInstance();
 	virtual SGameEngine* CreateGameEngine();
-
-	virtual std::vector<Type*> GetTypeCollection() const;
-	virtual Type* GetType(std::wstring_view friendlyName) const;
 };
 
 #define DEFINE_GAME_MODULE(GameModuleClass)	\

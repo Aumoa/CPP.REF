@@ -38,6 +38,9 @@ public:
 	SLocalPlayer* GetLocalPlayer();
 	SWindow* GetCoreWindow();
 
+protected:
+	virtual SWindow* CreateCoreWindow();
+
 private:
 	void OnPlatformKeyPressed(EKey InKey);
 	void OnPlatformKeyReleased(EKey InKey);

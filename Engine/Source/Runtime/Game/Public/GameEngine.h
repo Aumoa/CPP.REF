@@ -32,6 +32,9 @@ public:
 	SGameInstance* GetGameInstance();
 	SSlateApplication* GetSlateApplication();
 
+protected:
+	virtual SSlateApplication* CreateSlateApplication();
+
 private:
 	SPROPERTY(Subsystems)
 	std::vector<SGameEngineSubsystem*> Subsystems;

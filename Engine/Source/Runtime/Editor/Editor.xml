@@ -1,0 +1,11 @@
+<ProjectInfo Name="Editor" Path="Runtime.Editor" Type="Module">
+    <Guid>7f5ccedb-316a-42d8-a8b4-e0b938c2324c</Guid>
+    <IncludePaths>
+        <Item RelativePath="Public" Access="Public"/>
+        <Item RelativePath="Private"/>
+    </IncludePaths>
+    <ReferencedProjects>
+        <Item Name="Core" Access="Public"/>
+        <Item Name="Game" Access="Public"/>
+    </ReferencedProjects>
+</ProjectInfo>

@@ -11,13 +11,11 @@ SWindow::SWindow() : Super()
 {
 }
 
-void SWindow::InitViewport(IApplicationInterface* InApplication)
+void SWindow::InitViewport()
 {
-	Application = InApplication;
 	GameViewport = SNew(SViewport)
-		.RenderSize(InApplication->GetViewportSize())
+		.RenderSize(IApplicationInterface::Get().GetViewportSize())
 		.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM);
-	GameViewport->AddToViewport(SAssignNew(DebugCanvas, SDebugCanvas));
 }
 
 SViewport* SWindow::GetGameViewport()

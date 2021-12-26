@@ -3,25 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/CompoundWidget.h"
+#include "Application/Window.h"
 
-interface IApplicationInterface;
 class SViewport;
 class SDebugCanvas;
 
-class GAME_API SWindow : public SCompoundWidget
+class EDITOR_API SEditorWindow : public SWindow
 {
-	GENERATED_BODY(SWindow)
+	GENERATED_BODY(SEditorWindow)
 
 private:
-	SPROPERTY(GameViewport)
-	SViewport* GameViewport = nullptr;
+	SPROPERTY(EditorViewport)
+	SViewport* EditorViewport = nullptr;
+	SPROPERTY(DebugCanvas)
+	SDebugCanvas* DebugCanvas = nullptr;
 
 public:
-	SWindow();
+	SEditorWindow();
 
 	virtual void InitViewport();
-	SViewport* GetGameViewport();
+	SViewport* GetEditorViewport();
 
 	virtual Vector2 GetDesiredSize() override;
 
