@@ -8,18 +8,19 @@ interface IRHIDeviceContext2D;
 interface IRHISolidColorBrush;
 class SlateWindowElementList;
 
-class SLATECORE_API SlateRenderer
+class SLATECORE_API SSlateRenderer : implements SObject
 {
+	GENERATED_BODY(SSlateRenderer)
+
 private:
-	IRHIDeviceContext2D* CommandList;
-	SharedPtr<IRHISolidColorBrush> TintBrush;
+	SPROPERTY(TintBrush)
+	IRHISolidColorBrush* TintBrush = nullptr;
 
 public:
-	SlateRenderer(IRHIDeviceContext2D* CommandList);
-	~SlateRenderer();
+	SSlateRenderer();
 
-	void PopulateCommands(SlateWindowElementList& Elements);
+	void PopulateCommands(IRHIDeviceContext2D* CommandList, SlateWindowElementList& Elements);
 
 private:
-	IRHISolidColorBrush* GetTintBrush(const Color& TintColor, float RenderOpacity);
+	IRHISolidColorBrush* GetTintBrush(IRHIDeviceContext2D* CommandList, const Color& TintColor, float RenderOpacity);
 };

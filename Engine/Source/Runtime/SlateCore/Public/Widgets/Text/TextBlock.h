@@ -44,6 +44,7 @@ public:
 	void SetParagraphAlignment(ERHIParagraphAlignment Alignment);
 	ERHIParagraphAlignment GetParagraphAlignment();
 
+	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
 	virtual Vector2 GetDesiredSize() override;
 
 protected:

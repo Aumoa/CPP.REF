@@ -37,6 +37,7 @@ DEFINE_LOG_CATEGORY(LogRender);
 
 SGameRenderSystem::SGameRenderSystem() : Super()
 {
+	SlateRenderer = gcnew SSlateRenderer();
 }
 
 SGameRenderSystem::~SGameRenderSystem()
@@ -97,9 +98,8 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 		}
 
 		{
-			SlateRenderer Renderer(DeviceContext2D);
 			DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderBitmap());
-			SlateApp->DrawElements(&Renderer);
+			SlateApp->DrawElements(DeviceContext2D, SlateRenderer);
 		}
 
 		// END OF 3D RENDERING.

@@ -70,9 +70,9 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 	});
 }
 
-void SSlateApplication::DrawElements(SlateRenderer* Renderer)
+void SSlateApplication::DrawElements(IRHIDeviceContext2D* CommandList, SSlateRenderer* Renderer)
 {
-	Renderer->PopulateCommands(*SlateElements);
+	Renderer->PopulateCommands(CommandList, *SlateElements);
 }
 
 SLocalPlayer* SSlateApplication::GetLocalPlayer()

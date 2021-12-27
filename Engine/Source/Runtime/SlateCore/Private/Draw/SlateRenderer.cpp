@@ -6,15 +6,13 @@
 #include "RHI/IRHIDeviceContext2D.h"
 #include "RHI/IRHIDevice.h"
 
-SlateRenderer::SlateRenderer(IRHIDeviceContext2D* CommandList) : CommandList(CommandList)
+GENERATE_BODY(SSlateRenderer)
+
+SSlateRenderer::SSlateRenderer()
 {
 }
 
-SlateRenderer::~SlateRenderer()
-{
-}
-
-void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
+void SSlateRenderer::PopulateCommands(IRHIDeviceContext2D* CommandList, SlateWindowElementList& Elements)
 {
 	Elements.SortByLayer();
 
@@ -31,7 +29,7 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 		if (Element.Type == SlateDrawElement::EElementType::Box)
 		{
 			const auto& Payload = Element.GetBoxPayload(Elements);
-			auto TintBrush = GetTintBrush(Payload.Brush.TintColor, Payload.RenderOpacity);
+			auto TintBrush = GetTintBrush(CommandList, Payload.Brush.TintColor, Payload.RenderOpacity);
 
 			if (Payload.Brush.ImageSource)
 			{
@@ -46,7 +44,7 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 		else if (Element.Type == SlateDrawElement::EElementType::Ellipse)
 		{
 			const auto& Payload = Element.GetBoxPayload(Elements);
-			auto TintBrush = GetTintBrush(Payload.Brush.TintColor, Payload.RenderOpacity);
+			auto TintBrush = GetTintBrush(CommandList, Payload.Brush.TintColor, Payload.RenderOpacity);
 
 			if (Payload.Brush.ImageSource)
 			{
@@ -62,7 +60,7 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 			const auto& Payload = Element.GetTextPayload(Elements);
 			if (Payload.Text)
 			{
-				auto TintBrush = GetTintBrush(Payload.TintColor, Payload.RenderOpacity);
+				auto TintBrush = GetTintBrush(CommandList, Payload.TintColor, Payload.RenderOpacity);
 
 				CommandList->DrawTextLayout(LocalPosition, Payload.Text, TintBrush, ERHIDrawTextOptions::None);
 			}
@@ -70,7 +68,7 @@ void SlateRenderer::PopulateCommands(SlateWindowElementList& Elements)
 	}
 }
 
-IRHISolidColorBrush* SlateRenderer::GetTintBrush(const Color& TintColor, float RenderOpacity)
+IRHISolidColorBrush* SSlateRenderer::GetTintBrush(IRHIDeviceContext2D* CommandList, const Color& TintColor, float RenderOpacity)
 {
 	if (TintBrush == nullptr)
 	{
@@ -82,5 +80,5 @@ IRHISolidColorBrush* SlateRenderer::GetTintBrush(const Color& TintColor, float R
 		TintBrush->SetOpacity(RenderOpacity);
 	}
 
-	return TintBrush.Get();
+	return TintBrush;
 }

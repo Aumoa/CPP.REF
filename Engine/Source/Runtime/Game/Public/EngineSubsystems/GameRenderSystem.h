@@ -19,6 +19,7 @@ class SSlateShader;
 class SSlateApplication;
 class SSwapChainRenderTarget;
 class SColorRenderTarget;
+class SSlateRenderer;
 
 // TEST
 interface IRHISolidColorBrush;
@@ -51,6 +52,9 @@ private:
 	IRHIDeviceContext2D* DeviceContext2D = nullptr;
 	SPROPERTY(ColorRenderTarget)
 	SColorRenderTarget* ColorRenderTarget = nullptr;
+
+	SPROPERTY(SlateRenderer)
+	SSlateRenderer* SlateRenderer = nullptr;
 
 public:
 	SGameRenderSystem();

@@ -7,11 +7,12 @@
 
 interface IApplicationInterface;
 interface IRHIDeviceContext;
+interface IRHIDeviceContext2D;
 class SLocalPlayer;
 class SWindow;
 class SceneRenderContext;
 class SlateWindowElementList;
-class SlateRenderer;
+class SSlateRenderer;
 
 class GAME_API SSlateApplication : implements SObject
 {
@@ -33,7 +34,7 @@ public:
 
 	void Init(IApplicationInterface* InApplication);
 	void TickAndPaint(float InDeltaTime);
-	void DrawElements(SlateRenderer* Renderer);
+	void DrawElements(IRHIDeviceContext2D* CommandList, SSlateRenderer* Renderer);
 
 	SLocalPlayer* GetLocalPlayer();
 	SWindow* GetCoreWindow();

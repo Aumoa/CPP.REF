@@ -95,6 +95,16 @@ ERHIParagraphAlignment STextBlock::GetParagraphAlignment()
 	return ParagraphAlignment;
 }
 
+void STextBlock::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+{
+	if (bNeedToReallocateLayout)
+	{
+		ReallocLayout();
+	}
+
+	Super::Tick(AllottedGeometry, InDeltaTime);
+}
+
 Vector2 STextBlock::GetDesiredSize()
 {
 	return CachedDesiredSize;
