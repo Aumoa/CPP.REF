@@ -39,6 +39,8 @@ private:
 	std::set<SObject*> PendingFinalize;
 	std::vector<SObject*> PendingKill;
 	std::future<void> DeleteAction;
+	size_t CachedMemorySize = 0;
+	size_t AppendMemorySize = 0;
 
 	std::future<void> GCThread;
 	std::atomic<bool> bRunningGCThread;
@@ -75,6 +77,8 @@ public:
 	void TriggerCollect();
 
 	size_t NumObjects();
+	size_t MemorySize();
+
 	void SetFlushInterval(float InSeconds);
 	float GetFlushInterval();
 

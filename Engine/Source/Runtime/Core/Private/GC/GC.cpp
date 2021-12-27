@@ -25,6 +25,12 @@ void GarbageCollector::RegisterObject(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
 	Objects.Emplace(Object);
+	AppendMemorySize += Object->GetType()->GetSizeOf();
+
+	if (AppendMemorySize > CachedMemorySize / 3 && !bGCTrigger)
+	{
+		TriggerCollect();
+	}
 }
 
 void GarbageCollector::UnregisterObject(SObject* Object)
@@ -129,12 +135,15 @@ void GarbageCollector::Collect(bool bFullPurge)
 			// Ready pending kill buffer.
 			std::atomic<size_t> ActualPendingKill = 0;
 			std::vector<size_t> ObjectCompactIndex(NumGCThreads);
+			std::atomic<size_t> TotalMemorySize;
 			PendingKill.resize(Objects.NumObjects());
 
 			// Sweeping.
 			Parallel::ForEach(ActualCollectionSize, [&](size_t ThreadIdx, size_t StartIdx, size_t EndIdx)
 			{
 				size_t MaxLiveNumber = 0;
+				size_t MemorySize = 0;
+
 				for (size_t ItemIdx = StartIdx; ItemIdx < EndIdx; ++ItemIdx)
 				{
 					SObject* Object = Objects.Get(ItemIdx);
@@ -150,15 +159,19 @@ void GarbageCollector::Collect(bool bFullPurge)
 						{
 							Object->bMarkAtGC = false;
 							MaxLiveNumber = ItemIdx;
+							MemorySize += Object->GetType()->GetSizeOf();
 						}
 					}
 				}
 
 				ObjectCompactIndex[ThreadIdx] = MaxLiveNumber;
+				TotalMemorySize += MemorySize;
 			}, NumGCThreads);
 
 			// Compact objects list.
 			PendingKill.resize(ActualPendingKill);
+			CachedMemorySize = TotalMemorySize;
+			AppendMemorySize = 0;
 
 			for (auto& Index : ObjectCompactIndex)
 			{
@@ -234,6 +247,11 @@ void GarbageCollector::TriggerCollect()
 size_t GarbageCollector::NumObjects()
 {
 	return Objects.NumObjects();
+}
+
+size_t GarbageCollector::MemorySize()
+{
+	return CachedMemorySize + AppendMemorySize;
 }
 
 void GarbageCollector::SetFlushInterval(float InSeconds)

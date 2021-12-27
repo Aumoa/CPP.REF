@@ -49,6 +49,11 @@ size_t Type::GetHashCode() const
 	return TypeHash;
 }
 
+size_t Type::GetSizeOf() const
+{
+	return SizeOf;
+}
+
 Type* Type::GetSuper() const
 {
 	return SuperClass;

@@ -32,7 +32,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	GEngine = this;
 
 	// CollectGarbageEveryFrame = true
-	GC.SetFlushInterval(0);
+	GC.SetFlushInterval(60);
 
 	SlateApplication = CreateSlateApplication();
 	SlateApplication->Init(InApplication);
@@ -91,6 +91,7 @@ void SGameEngine::Shutdown()
 int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Broadcast();
+	GC.Collect();
 
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine(InApplication))

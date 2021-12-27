@@ -65,7 +65,9 @@ DEFINE_SLATE_CONSTRUCTOR(SDebugCanvas, Attr)
 
 void SDebugCanvas::UpdateTexts()
 {
-	GCCounter->SetText(std::format(L"DebugCanvas:\n  Total objects: {}\n  FPS: {}", GC.NumObjects(), TickCounter));
+	static constexpr size_t Megabyte = 1024 * 1024;
+
+	GCCounter->SetText(std::format(L"DebugCanvas:\n  Total objects: {}\n  GC Memory: {:.4f} MB\n  FPS: {}", GC.NumObjects(), GC.MemorySize() / (float)Megabyte, TickCounter));
 	TickCounter = 0;
 
 	STATGROUP_GC->SetText(CycleCounter::Get().GetNamespace(L"GC")->Trace());
