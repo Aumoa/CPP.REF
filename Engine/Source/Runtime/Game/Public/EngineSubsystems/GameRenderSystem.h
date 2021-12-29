@@ -73,5 +73,4 @@ public:
 
 private:
 	void ResizeApp(Vector2N Size);
-	void OnPreGarbageCollect();
 };

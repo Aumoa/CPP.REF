@@ -102,3 +102,15 @@ void RenderThread::WaitForLastWorks()
 		_Thread.WorkerFuture.wait();
 	}
 }
+
+void RenderThread::OnPreGarbageCollect()
+{
+	if (_Thread.WorkerFuture.valid())
+	{
+		_Thread.WorkerFuture.get();
+	}
+}
+
+void RenderThread::OnPostGarbageCollect()
+{
+}

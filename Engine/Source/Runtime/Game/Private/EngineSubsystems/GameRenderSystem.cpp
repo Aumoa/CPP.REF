@@ -47,7 +47,8 @@ SGameRenderSystem::~SGameRenderSystem()
 void SGameRenderSystem::Init()
 {
 	RenderThread::Init();
-	GC.PreGarbageCollect.AddSObject(this, &SGameRenderSystem::OnPreGarbageCollect);
+	GC.PreGarbageCollect.AddRaw(&RenderThread::OnPreGarbageCollect);
+	GC.PostGarbageCollect.AddRaw(&RenderThread::OnPostGarbageCollect);
 
 	Factory = IApplicationInterface::Get().GetFactory();
 	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
@@ -155,11 +156,4 @@ void SGameRenderSystem::ResizeApp(Vector2N Size)
 			Device->EndFrame();
 		});
 	}
-}
-
-void SGameRenderSystem::OnPreGarbageCollect()
-{
-	RenderThread::ExecuteWorks(PrimaryQueue, []()
-	{
-	});
 }

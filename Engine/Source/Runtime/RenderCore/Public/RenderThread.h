@@ -67,6 +67,9 @@ public:
 	static void ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork = true);
 	static void WaitForLastWorks();
 
+	static void OnPreGarbageCollect();
+	static void OnPostGarbageCollect();
+
 	static bool IsInRenderThread()
 	{
 		static int64 Id = Thread::GetCurrentThread()->GetThreadId();
