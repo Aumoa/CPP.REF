@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Threading/Parallel.h"
+#include "PlatformMisc/MemoryStatus.h"
 #include <string>
 
 DECLARE_STAT_GROUP("GC", STATGROUP_GC);
@@ -25,9 +26,9 @@ void GarbageCollector::RegisterObject(SObject* Object)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
 	Objects.Emplace(Object);
-	AppendMemorySize += Object->GetType()->GetSizeOf();
+	AppendMemorySize = MemoryStatus::Capture().ProcessUsedMemory;
 
-	if (AppendMemorySize > CachedMemorySize / 3 && !bGCTrigger)
+	if (AppendMemorySize > CachedMemorySize + CachedMemorySize / 3 && !bGCTrigger)
 	{
 		TriggerCollect();
 	}
@@ -170,8 +171,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 			// Compact objects list.
 			PendingKill.resize(ActualPendingKill);
-			CachedMemorySize = TotalMemorySize;
-			AppendMemorySize = 0;
+			CachedMemorySize = AppendMemorySize;
 
 			for (auto& Index : ObjectCompactIndex)
 			{
@@ -251,7 +251,7 @@ size_t GarbageCollector::NumObjects()
 
 size_t GarbageCollector::MemorySize()
 {
-	return CachedMemorySize + AppendMemorySize;
+	return AppendMemorySize;
 }
 
 void GarbageCollector::SetFlushInterval(float InSeconds)

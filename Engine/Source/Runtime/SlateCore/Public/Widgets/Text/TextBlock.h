@@ -9,16 +9,22 @@
 
 interface IRHITextLayout;
 interface IRHITextFormat;
+interface IRHISolidColorBrush;
 
 class SLATECORE_API STextBlock : public SLeafWidget
 {
 	GENERATED_BODY(STextBlock)
 
 private:
+	class SRenderElement;
+
+private:
 	SPROPERTY(Layout)
 	IRHITextLayout* Layout = nullptr;
 	SPROPERTY(Format)
 	IRHITextFormat* Format = nullptr;
+	SPROPERTY(TintBrush)
+	IRHISolidColorBrush* TintBrush = nullptr;
 
 	std::wstring Text;
 	SlateFont Font;
@@ -48,7 +54,7 @@ public:
 	virtual Vector2 GetDesiredSize() override;
 
 protected:
-	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) override;
+	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
 
 private:
 	void ReallocLayout();

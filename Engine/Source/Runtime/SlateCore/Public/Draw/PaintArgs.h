@@ -4,19 +4,22 @@
 
 #include "CoreMinimal.h"
 
-interface IRHIDeviceContext;
+interface IRHIDevice;
 class SWidget;
 class SceneRenderTarget;
 
 class SLATECORE_API PaintArgs
 {
 public:
-	SWidget*			const	Parent;
-	float				const	DeltaTime;
-	float				const	RenderOpacity;
+	IRHIDevice* const Device;
+	SWidget*	const Parent;
+	float		const DeltaTime;
+	float		const RenderOpacity;
+
+private:
+	PaintArgs(IRHIDevice* Device, SWidget* InParentWidget, float InDeltaTime, float RenderOpacity = 1.0f);
 
 public:
-	PaintArgs(SWidget* InParentWidget, float InDeltaTime, float RenderOpacity = 1.0f);
-
+	static PaintArgs InitPaintArgs(IRHIDevice* Device, float InDeltaTime);
 	PaintArgs WithNewParent(SWidget* InParentWidget) const;
 };

@@ -1,7 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Widgets/CompoundWidget.h"
-#include "Draw/SlateWindowElementList.h"
 #include "Draw/PaintArgs.h"
 #include "Layout/ArrangedChildrens.h"
 
@@ -24,15 +23,15 @@ void SCompoundWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
     }
 }
 
-int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
 	ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
 	ArrangeChildren(ArrangedChildren, AllottedGeometry);
 
-	return PaintArrangedChildrens(Args, ArrangedChildren, AllottedGeometry, CullingRect, InDrawElements, InLayer, bParentEnabled);
+	return PaintArrangedChildrens(Args, ArrangedChildren, AllottedGeometry, CullingRect, DrawCollector, InLayer, bParentEnabled);
 }
 
-int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
     const PaintArgs NewArgs = Args.WithNewParent(this);
     bool bShouldBeEnabled = ShouldBeEnabled(bParentEnabled);
@@ -43,7 +42,7 @@ int32 SCompoundWidget::PaintArrangedChildrens(const PaintArgs& Args, ArrangedChi
 
         if (!IsChildWidgetCulled(CullingRect, Arranged))
         {
-            int32 CurChildsMaxLayer = CurChild->Paint(NewArgs, Arranged.GetGeometry(), CullingRect, InDrawElements, InLayer, bShouldBeEnabled);
+            int32 CurChildsMaxLayer = CurChild->Paint(NewArgs, Arranged.GetGeometry(), CullingRect, DrawCollector, InLayer, bShouldBeEnabled);
             InLayer = MathEx::Max(CurChildsMaxLayer, InLayer);
         }
     }

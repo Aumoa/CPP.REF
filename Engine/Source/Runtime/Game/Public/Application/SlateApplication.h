@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "Layout/Layout.h"
 
+interface IRHIDevice;
 interface IApplicationInterface;
 interface IRHIDeviceContext;
 interface IRHIDeviceContext2D;
+interface IRenderSlateElement;
 class SLocalPlayer;
 class SWindow;
 class SceneRenderContext;
-class SlateWindowElementList;
+class SSlateDrawCollector;
 class SSlateRenderer;
 
 class GAME_API SSlateApplication : implements SObject
@@ -19,14 +21,22 @@ class GAME_API SSlateApplication : implements SObject
 	GENERATED_BODY(SSlateApplication)
 
 private:
+	SPROPERTY(Device)
+	IRHIDevice* Device = nullptr;
+
 	SPROPERTY(LocalPlayer)
 	SLocalPlayer* LocalPlayer = nullptr;
 	SPROPERTY(CoreWindow)
 	SWindow* CoreWindow = nullptr;
 	SPROPERTY(DeviceContext)
 	IRHIDeviceContext* DeviceContext = nullptr;
+	SPROPERTY(DrawCollector)
+	SSlateDrawCollector* DrawCollector = nullptr;
 
-	std::shared_ptr<SlateWindowElementList> SlateElements;
+	SPROPERTY(CachedElements)
+	std::vector<IRenderSlateElement*> CachedElements;
+	SPROPERTY(RenderElements)
+	std::vector<IRenderSlateElement*> RenderElements;
 
 public:
 	SSlateApplication();

@@ -97,7 +97,7 @@ DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Attr)
 	}
 }
 
-int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
 	ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
 	std::vector<bool> ChildLayers;
@@ -125,7 +125,7 @@ int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeome
 				ChildLayerId = MaxLayerId + 1;
 			}
 
-			const int32 CurWidgetsMaxLayerId = CurWidget.GetWidget()->Paint(NewArgs, CurWidget.GetGeometry(), CullingRect, InDrawElements, ChildLayerId, bForwardedEnabled);
+			const int32 CurWidgetsMaxLayerId = CurWidget.GetWidget()->Paint(NewArgs, CurWidget.GetGeometry(), CullingRect, DrawCollector, ChildLayerId, bForwardedEnabled);
 
 			MaxLayerId = MathEx::Max(MaxLayerId, CurWidgetsMaxLayerId);
 		}

@@ -7,7 +7,8 @@
 #include "SlotBase.h"
 #include "Layout/Layout.h"
 
-class SlateWindowElementList;
+interface IRHIDevice;
+class SSlateDrawCollector;
 class PaintArgs;
 class ArrangedChildrens;
 class ArrangedWidget;
@@ -30,11 +31,13 @@ private:
 	uint8 bEnabled : 1 = true;
 	uint8 bHasRenderTransform : 1 = false;
 	uint8 bMouseHover : 1 = false;
+	uint8 bInvalidateLayout : 1 = true;
 
 	float RenderOpacity = 1.0f;
 	SPROPERTY(AnimPlayer)
 	SSlateAnimationPlayer* AnimPlayer = nullptr;
 	Vector2 CachedMouseLocation;
+	Vector2 CachedDesiredSize;
 
 public:
 	SWidget();
@@ -43,7 +46,7 @@ public:
 	virtual void Dispose() override;
 	std::wstring GetName();
 
-	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled);
+	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled);
 	void ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry);
 
 	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
@@ -61,7 +64,7 @@ public:
 protected:
 	virtual void PostConstruction() override;
 
-	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled) = 0;
+	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) = 0;
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) = 0;
 
 	virtual bool OnReceiveMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location) = 0;

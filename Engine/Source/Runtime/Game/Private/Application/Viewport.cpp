@@ -8,7 +8,7 @@
 #include "RHI/IRHIShaderResourceView.h"
 #include "RHI/IRHIDeviceContext.h"
 #include "Draw/PaintArgs.h"
-#include "Draw/SlateDrawElement.h"
+#include "Draw/SlateDrawCollector.h"
 #include "IApplicationInterface.h"
 #include "Level/World.h"
 #include "EngineSubsystems/GameRenderSystem.h"
@@ -99,14 +99,14 @@ void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Ge
 	}
 }
 
-int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
 	//SlateBrush Brush;
 	//Brush.ImageSource = SRV;
 	//Brush.ImageSize = RenderSize.Cast<float>();
 	//SlateDrawElement::MakeBox(InDrawElements, Brush, AllottedGeometry.ToPaintGeometry(), InLayer);
 
-	return Super::OnPaint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer + 1, bParentEnabled);
+	return Super::OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer + 1, bParentEnabled);
 }
 
 void SViewport::ReallocRenderTarget()

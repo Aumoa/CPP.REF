@@ -3,14 +3,20 @@
 #include "Draw/PaintArgs.h"
 #include "Widgets/Widget.h"
 
-PaintArgs::PaintArgs(SWidget* InParentWidget, float InDeltaTime, float RenderOpacity)
-	: Parent(InParentWidget)
+PaintArgs::PaintArgs(IRHIDevice* Device, SWidget* InParentWidget, float InDeltaTime, float RenderOpacity)
+	: Device(Device)
+	, Parent(InParentWidget)
 	, DeltaTime(InDeltaTime)
 	, RenderOpacity(RenderOpacity * (InParentWidget ? InParentWidget->GetRenderOpacity() : 1.0f))
 {
 }
 
+PaintArgs PaintArgs::InitPaintArgs(IRHIDevice* Device, float InDeltaTime)
+{
+	return PaintArgs(Device, nullptr, InDeltaTime, 1.0f);
+}
+
 PaintArgs PaintArgs::WithNewParent(SWidget* InParentWidget) const
 {
-	return PaintArgs(InParentWidget, DeltaTime, RenderOpacity);
+	return PaintArgs(Device, InParentWidget, DeltaTime, RenderOpacity * InParentWidget->GetRenderOpacity());
 }

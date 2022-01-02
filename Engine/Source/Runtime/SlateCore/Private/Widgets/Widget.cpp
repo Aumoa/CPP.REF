@@ -2,7 +2,6 @@
 
 #include "Widgets/Widget.h"
 #include "Draw/PaintArgs.h"
-#include "Draw/SlateWindowElementList.h"
 #include "IApplicationInterface.h"
 #include "Input/IPlatformMouse.h"
 #include "Animation/SlateAnimationPlayer.h"
@@ -30,9 +29,9 @@ std::wstring SWidget::GetName()
     return Name;
 }
 
-int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SlateWindowElementList& InDrawElements, int32 InLayer, bool bParentEnabled)
+int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
-	return OnPaint(Args, AllottedGeometry, CullingRect, InDrawElements, InLayer, bParentEnabled);
+	return OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer, bParentEnabled);
 }
 
 void SWidget::ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry)

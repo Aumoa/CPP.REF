@@ -12,11 +12,6 @@ struct SlateBrush
 {
 	IRHIBitmap* ImageSource = nullptr;
 	Vector2 ImageSize = Vector2::ZeroVector();
-	Color TintColor = NamedColors::White;
-
-	SlateBrush()
-	{
-	}
 
 	SlateBrush(IRHIBitmap* InImageSource, const Vector2& InImageSize)
 		: ImageSource(InImageSource)
@@ -33,8 +28,8 @@ struct SlateBrush
 		}
 	}
 
-	SlateBrush(const Color& TintColor)
-		: TintColor(TintColor)
+	SlateBrush(const Vector2& ImageSize = Vector2(128.0f, 128.0f))
+		: ImageSize(ImageSize)
 	{
 	}
 

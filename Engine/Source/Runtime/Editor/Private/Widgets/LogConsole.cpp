@@ -31,7 +31,7 @@ DEFINE_SLATE_CONSTRUCTOR(SLogConsole, Attr)
 		.Anchors(0.0f, 0.0f, 1.0f, 1.0f)
 		[
 			SNew(SImage)
-			.Brush(NamedColors::DarkSlateGray)
+			.TintColor(NamedColors::DarkSlateGray)
 		];
 
 	AddSlot()

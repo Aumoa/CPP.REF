@@ -48,7 +48,7 @@ void SEditorWindow::InitViewport()
 		.VAlignment(EVerticalAlignment::Fill)
 		[
 			SNew(SImage)
-			.Brush(NamedColors::LightGreen)
+			.TintColor(NamedColors::LightGreen)
 		]
 		;
 
