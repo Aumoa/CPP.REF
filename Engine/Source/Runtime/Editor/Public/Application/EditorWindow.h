@@ -6,17 +6,18 @@
 #include "Application/Window.h"
 
 class SViewport;
-class SDebugCanvas;
+class SPanelWidget;
 
 class EDITOR_API SEditorWindow : public SWindow
 {
 	GENERATED_BODY(SEditorWindow)
 
 private:
+	SPROPERTY(EditorLayout)
+	SPanelWidget* EditorLayout = nullptr;
+
 	SPROPERTY(EditorViewport)
 	SViewport* EditorViewport = nullptr;
-	SPROPERTY(DebugCanvas)
-	SDebugCanvas* DebugCanvas = nullptr;
 
 public:
 	SEditorWindow();

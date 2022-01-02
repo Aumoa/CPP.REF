@@ -52,6 +52,8 @@ void LogModule::Shutdown()
 {
 	if (bRunning)
 	{
+		Logged.Clear();
+
 		gModule = nullptr;
 		bRunning = false;
 
@@ -64,6 +66,8 @@ void LogModule::Shutdown()
 
 void LogModule::EnqueueLogMessage(std::wstring_view Message)
 {
+	Logged.Broadcast(Message);
+
 	size_t MyIdx = QueueIndex++ % MessageQueue.size();
 	MessageQueue[MyIdx] = std::wstring(Message);
 	++SeekIndex;

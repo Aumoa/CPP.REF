@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Delegates/MulticastEvent.h"
 #include <exception>
 #include <string>
 #include <string_view>
@@ -15,6 +16,7 @@ enum class ELogVerbosity;
 /// </summary>
 class CORE_API LogSystem
 {
+	using This = LogSystem;
 	class SFatalException;
 
 public:

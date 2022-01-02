@@ -37,4 +37,5 @@ private:
 
 private:
 	void UpdateTexts();
+	void ConstructDisplayStats();
 };

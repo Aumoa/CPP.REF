@@ -166,6 +166,13 @@ public:
 		}
 	}
 
+	void Clear()
+	{
+		std::unique_lock Mtx_lock(Mtx);
+		Payload.clear();
+		Id = 0;
+	}
+
 	DelegateHandle::Impl AddRaw(TPayload Body)
 	{
 		std::unique_lock Mtx_lock(Mtx);

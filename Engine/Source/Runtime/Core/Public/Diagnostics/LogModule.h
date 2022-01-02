@@ -9,6 +9,8 @@
 
 class CORE_API LogModule
 {
+	using This = LogModule;
+
 private:
 	std::wstring ModuleName;
 	std::future<void> WorkerThread;
@@ -29,6 +31,10 @@ public:
 	bool IsRunning();
 
 	static LogModule* Get();
+
+public:
+	DECLARE_MULTICAST_EVENT(LoggedEvent, std::wstring_view);
+	LoggedEvent Logged;
 
 private:
 	void Worker();

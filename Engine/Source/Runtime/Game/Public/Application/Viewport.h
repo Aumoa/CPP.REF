@@ -43,10 +43,11 @@ public:
 	SViewport();
 	~SViewport();
 
+	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
+
 	void SetRenderSize(Vector2N InRenderSize);
 	Vector2N GetRenderSize();
 
-	void SetGameWorld(SWorld* InGameWorld);
 	void PopulateCommandLists(IRHIDeviceContext* InDeviceContext);
 
 	virtual Vector2 GetDesiredSize() override;

@@ -14,6 +14,11 @@ LogCategory::LogCategory(std::wstring_view CategoryName)
 {
 }
 
+std::wstring_view LogCategory::GetName() const
+{
+	return CategoryName;
+}
+
 std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
 	using enum ELogVerbosity;

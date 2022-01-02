@@ -18,7 +18,7 @@ private:
 public:
 	LogCategory(std::wstring_view CategoryName);
 
-private:
+	std::wstring_view GetName() const;
 	static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
 
 protected:

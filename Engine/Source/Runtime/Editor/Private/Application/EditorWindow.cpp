@@ -4,6 +4,11 @@
 #include "Application/Viewport.h"
 #include "IApplicationInterface.h"
 #include "Widgets/DebugCanvas.h"
+#include "Widgets/LogConsole.h"
+#include "Widgets/Panel/CanvasPanel.h"
+#include "Widgets/Panel/VerticalBoxPanel.h"
+#include "Widgets/Panel/HorizontalBoxPanel.h"
+#include "Widgets/Image/Image.h"
 
 GENERATE_BODY(SEditorWindow);
 
@@ -15,10 +20,39 @@ void SEditorWindow::InitViewport()
 {
 	Super::InitViewport();
 
-	EditorViewport = SNew(SViewport)
-		.RenderSize(IApplicationInterface::Get().GetViewportSize())
-		.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM);
-	EditorViewport->AddToViewport(SAssignNew(DebugCanvas, SDebugCanvas));
+	EditorLayout =
+		SNew(SHorizontalBoxPanel)
+		+SHorizontalBoxPanel::SSlot()
+		.SizeParam(ESizeRule::Stretch, 1.0f)
+		.HAlignment(EHorizontalAlignment::Fill)
+		.VAlignment(EVerticalAlignment::Fill)
+		[
+			SNew(SVerticalBoxPanel)
+			// GameViewport
+			+SVerticalBoxPanel::SSlot()
+			.SizeParam(ESizeRule::Stretch, 1.0f)
+			[
+				SAssignNew(EditorViewport, SViewport)
+				.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM)
+			]
+			// LogConsole
+			+SVerticalBoxPanel::SSlot()
+			.SizeParam(ESizeRule::Auto, 1.0f)
+			.HAlignment(EHorizontalAlignment::Fill)
+			[
+				SNew(SLogConsole)
+			]
+		]
+		+SHorizontalBoxPanel::SSlot()
+		.SizeParam(ESizeRule::Auto, 1.0f)
+		.VAlignment(EVerticalAlignment::Fill)
+		[
+			SNew(SImage)
+			.Brush(NamedColors::LightGreen)
+		]
+		;
+
+	EditorViewport->AddToViewport(SNew(SDebugCanvas));
 }
 
 SViewport* SEditorWindow::GetEditorViewport()
@@ -37,13 +71,5 @@ Vector2 SEditorWindow::GetDesiredSize()
 
 void SEditorWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
-	ESlateVisibility VpVisibility = EditorViewport->GetVisibility();
-	if (ArrangedChildrens.Accepts(VpVisibility))
-	{
-		ArrangedChildrens.AddWidget(VpVisibility, AllottedGeometry.MakeChild(
-			EditorViewport,
-			Vector2::ZeroVector(),
-			AllottedGeometry.GetLocalSize()
-		));
-	}
+	EditorLayout->ArrangeChildren(ArrangedChildrens, AllottedGeometry);
 }

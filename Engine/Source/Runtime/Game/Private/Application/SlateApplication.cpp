@@ -56,7 +56,7 @@ void SSlateApplication::Init(IApplicationInterface* InApplication)
 
 void SSlateApplication::TickAndPaint(float InDeltaTime)
 {
-	Vector2 DesiredSize = CoreWindow->GetDesiredSize();
+	Vector2 DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
 	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
 	CoreWindow->Tick(AllottedGeometry, InDeltaTime);
 

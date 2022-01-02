@@ -11,6 +11,8 @@
 #include "Draw/SlateDrawElement.h"
 #include "IApplicationInterface.h"
 #include "Level/World.h"
+#include "EngineSubsystems/GameRenderSystem.h"
+#include "GameEngine.h"
 
 GENERATE_BODY(SViewport);
 DEFINE_LOG_CATEGORY(LogViewport);
@@ -23,6 +25,14 @@ SViewport::~SViewport()
 {
 	Widgets.clear();
 	DestroyRenderTarget_GameThread();
+}
+
+void SViewport::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+{
+	Super::Tick(AllottedGeometry, InDeltaTime);
+
+	Vector2N LocalSize = AllottedGeometry.GetLocalSize().Cast<int32>();
+	SetRenderSize(LocalSize);
 }
 
 void SViewport::SetRenderSize(Vector2N InRenderSize)
@@ -71,8 +81,6 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 	RenderSize = InAttr._RenderSize;
 	RenderTargetFormat = InAttr._RenderTargetFormat;
 	ReallocRenderTarget();
-
-	IApplicationInterface::Get().Sized.AddSObject(this, &SViewport::SetRenderSize);
 }
 
 void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
@@ -105,9 +113,9 @@ void SViewport::ReallocRenderTarget()
 {
 	DestroyRenderTarget_GameThread();
 
-	//auto RenderSystem = GEngine->GetEngineSubsystem<SGameRenderSystem>();
-	//if (RenderSystem)
-	//{
+	auto RenderSystem = GEngine->GetEngineSubsystem<SGameRenderSystem>();
+	if (RenderSystem)
+	{
 	//	if (ensure(RenderSize.X != 0) && ensure(RenderSize.Y != 0))
 	//	{
 	//		IRHIDevice* Device = RenderSystem->GetRHIDevice();
@@ -162,9 +170,9 @@ void SViewport::ReallocRenderTarget()
 	//			DeviceContext = Device->CreateDeviceContext();
 	//		}
 
-	//		SE_LOG(LogViewport, Verbose, L"Viewport render targets are reallocated to [{}x{}].", RenderSize.X, RenderSize.Y);
+			SE_LOG(LogViewport, Verbose, L"Viewport render targets are reallocated to [{}x{}].", RenderSize.X, RenderSize.Y);
 	//	}
-	//}
+	}
 }
 
 void SViewport::DestroyRenderTarget_GameThread()
