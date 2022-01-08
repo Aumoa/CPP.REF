@@ -8,7 +8,7 @@
 template<class T>
 class ManualTask : public CustomTaskBase<T>
 {
-	using MyAwaiter = CustomTaskBase<T>::MyAwaiter;
+	using MyAwaiter = typename CustomTaskBase<T>::MyAwaiter;
 
 public:
 	ManualTask() : CustomTaskBase<T>(std::make_shared<MyAwaiter>())

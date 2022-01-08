@@ -8,7 +8,7 @@
 template<class T>
 class ContinuousTask : public CustomTaskBase<T>
 {
-	using MyAwaiter = CustomTaskBase<T>::MyAwaiter;
+	using MyAwaiter = typename CustomTaskBase<T>::MyAwaiter;
 
 public:
 	ContinuousTask()

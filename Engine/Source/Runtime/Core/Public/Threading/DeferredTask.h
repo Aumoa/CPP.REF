@@ -9,7 +9,7 @@
 template<class T>
 class DeferredTask : public CustomTaskBase<T>
 {
-	using MyAwaiter = CustomTaskBase<T>::MyAwaiter;
+	using MyAwaiter = typename CustomTaskBase<T>::MyAwaiter;
 
 public:
 	DeferredTask()

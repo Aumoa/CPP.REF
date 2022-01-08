@@ -23,7 +23,7 @@ private:
 	};
 
 public:
-	template<class U>
+	template<class U, class _Void = void>
 	struct PromiseBase
 	{
 		std::shared_ptr<MyAwaiter> Awaiter = std::make_shared<MyAwaiter>();
@@ -34,8 +34,8 @@ public:
 		}
 	};
 
-	template<>
-	struct PromiseBase<void>
+	template<class _Void>
+	struct PromiseBase<void, _Void>
 	{
 		std::shared_ptr<MyAwaiter> Awaiter = std::make_shared<MyAwaiter>();
 
