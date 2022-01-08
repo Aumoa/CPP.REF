@@ -64,6 +64,11 @@ protected:
 	{
 	}
 
+	MyAwaiter* GetMyAwaiter() const
+	{
+		return Awaiter.get();
+	}
+
 public:
 	template<class _Fn>
 	auto Then(_Fn&& Body)
