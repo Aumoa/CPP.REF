@@ -2,186 +2,202 @@
 
 #pragma once
 
-#include <functional>
-#include <future>
+#include "CoreMinimal.h"
+#include "AwaiterBase.h"
+#include "AwaitableSharedPointer.h"
 #include <coroutine>
-#include <exception>
-#include "AwaitableTask.h"
-#include "ContinuousTask.h"
+#include <memory>
 
 template<class T = void>
 class Task
 {
 	template<class U>
 	friend class Task;
-	template<class U, template<class> class TTask>
-	friend struct AwaitableTask;
 
-public:
-	using promise_type = AwaitableTask<T, Task>;
-	using MyCoroutine = std::coroutine_handle<promise_type>;
-	using ResultType = T;
+	Task(const Task&) = delete;
+	Task& operator =(const Task&) = delete;
 
 private:
-	ContinuousTask<T> CTask;
-	MyCoroutine Coroutine;
-	std::future<T> Coroutine_Return;
-		
-	Task(const Task&) = delete;
+	class MyAwaiter : public Threading::Tasks::AwaiterBase<T>
+	{
+	};
+
+public:
+	template<class U>
+	struct PromiseBase
+	{
+		std::shared_ptr<MyAwaiter> Awaiter = std::make_shared<MyAwaiter>();
+
+		void return_value(U ReturnValue)
+		{
+			Awaiter->SetValue(std::move(ReturnValue));
+		}
+	};
+
+	template<>
+	struct PromiseBase<void>
+	{
+		std::shared_ptr<MyAwaiter> Awaiter = std::make_shared<MyAwaiter>();
+
+		void return_void()
+		{
+			Awaiter->SetValue();
+		}
+	};
+
+	struct promise_type : public PromiseBase<T>
+	{
+		promise_type()
+		{
+		}
+
+		Task get_return_object()
+		{
+			return Task(*this);
+		}
+
+		void unhandled_exception()
+		{
+		}
+
+		auto initial_suspend() noexcept
+		{
+			return std::suspend_never();
+		}
+
+		auto final_suspend() noexcept
+		{
+			return std::suspend_never();
+		}
+
+		template<class AwaitableTask>
+		auto await_transform(AwaitableTask&& ATask) requires requires
+		{
+			{ ATask.GetAwaiter() };
+		}
+		{
+			return Threading::Tasks::AwaitableSharedPointer(ATask.GetAwaiter());
+		}
+	};
+
+private:
+	using CoroutineHandle = std::coroutine_handle<promise_type>;
+
+private:
+	std::optional<CoroutineHandle> Coroutine;
+	std::shared_ptr<IAwaitable<T>> Awaiter;
+
+private:
+	Task(promise_type& Awaitable)
+		: Coroutine(CoroutineHandle::from_promise(Awaitable))
+		, Awaiter(Awaitable.Awaiter)
+	{
+	}
 
 public:
 	Task()
 	{
 	}
 
-	Task(promise_type& Await)
-		: Coroutine(MyCoroutine::from_promise(Await))
-	{
-		Coroutine_Return = Await.Promise.get_future();
-	}
-
-	Task(ContinuousTask<T> CTask)
-		: CTask(std::move(CTask))
+	Task(Task&& Rhs)
+		: Coroutine(std::move(Rhs.Coroutine))
+		, Awaiter(std::move(Rhs.Awaiter))
 	{
 	}
 
-	Task(Task&& Rhs) noexcept
-		: CTask(std::move(Rhs.CTask))
-		, Coroutine(std::move(Rhs.Coroutine))
-		, Coroutine_Return(std::move(Rhs.Coroutine_Return))
+	Task(std::shared_ptr<IAwaitable<T>> Awaiter)
+		: Awaiter(std::move(Awaiter))
 	{
 	}
 
-private:
-	std::promise<T> Resume_Promise;
-	std::future<T> Resume;
-
-public:
-	[[nodiscard]]
-	bool await_ready() const
+	template<class TTask>
+	Task(TTask&& OtherTask) requires requires
 	{
-		return false;
+		{ OtherTask.GetAwaiter() } -> std::same_as<IAwaitable<T>>;
+	}
+		: Awaiter(OtherTask.GetAwaiter())
+	{
 	}
 
-	template<class U>
-	void await_suspend(std::coroutine_handle<AwaitableTask<U, Task>> Coroutine)
-	{
-		Resume_Promise = {};
-		Resume = Resume_Promise.get_future();
-
-		if constexpr (std::same_as<T, void>)
-		{
-			auto CompletionTask = [this, Coroutine]()
-			{
-				Resume_Promise.set_value();
-				Coroutine.resume();
-			};
-
-			if (CTask)
-			{
-				AwaitableTask<U, Task>& Task = Coroutine.promise();
-				Task.Consume(std::move(CTask), CTask.Then<void>(CompletionTask));
-			}
-			else
-			{
-				AwaitableTask<T, Task>& Task = this->Coroutine.promise();
-				Task.CompletionTask = CompletionTask;
-			}
-		}
-		else
-		{
-			auto CompletionTask = [this, Coroutine](T ReturnValue)
-			{
-				Resume_Promise.set_value(ReturnValue);
-				Coroutine.resume();
-			};
-
-			if (CTask)
-			{
-				AwaitableTask<U, Task>& Task = Coroutine.promise();
-				Task.Consume(std::move(CTask), CTask.Then<void>(CompletionTask));
-			}
-			else
-			{
-				AwaitableTask<T, Task>& Task = this->Coroutine.promise();
-				Task.CompletionTask = CompletionTask;
-			}
-		}
-	}
-
-	T await_resume()
-	{
-		return Resume.get();
-	}
-
-public:
-	[[nodiscard]]
 	bool IsValid() const
 	{
-		if (CTask)
-		{
-			return true;
-		}
-		else if (Coroutine_Return.valid())
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return (bool)Awaiter;
 	}
 
 	void Wait()
 	{
-		check(IsValid());
-
-		if (CTask)
-		{
-			CTask.Wait();
-		}
-		else if (Coroutine_Return.valid())
-		{
-			Coroutine_Return.wait();
-		}
+		Awaiter->Wait();
 	}
 
-	[[nodiscard]]
-	T GetResult()
+	T GetValue()
 	{
-		if (CTask)
+		return Awaiter->GetValue();
+	}
+
+	std::shared_ptr<IAwaitable<T>> GetAwaiter() const
+	{
+		return Awaiter;
+	}
+
+	Task& operator =(Task&& Rhs)
+	{
+		Coroutine = std::move(Rhs.Coroutine);
+		Awaiter = std::move(Rhs.Awaiter);
+		return *this;
+	}
+
+private:
+	template<class _Fn>
+	static auto FunctionBodyReturnTypeTraits(int, _Fn&& Body) -> decltype(Body(std::declval<T>()));
+	template<class _Fn>
+	static auto FunctionBodyReturnTypeTraits(short, _Fn&& Body) -> decltype(Body());
+
+	template<class _Fn>
+	using FunctionReturnType = decltype(FunctionBodyReturnTypeTraits(0, std::declval<_Fn>()));
+
+public:
+	template<class _Fn>
+	auto Then(_Fn&& Body) -> Task<FunctionReturnType<_Fn>>
+	{
+		using ReturnType = FunctionReturnType<_Fn>;
+		check(IsValid());
+
+		std::shared_ptr NewAwaiter = std::make_shared<typename Task<ReturnType>::MyAwaiter>();
+		NewAwaiter->SetRunner(Awaiter->GetRunner());
+
+		if constexpr (std::same_as<T, void>)
 		{
-			return CTask.GetResult();
+			Awaiter->Then([Body = std::move(Body), NewAwaiter]() -> void
+			{
+				if constexpr (std::same_as<ReturnType, void>)
+				{
+					Body();
+					NewAwaiter->SetValue();
+				}
+				else
+				{
+					ReturnType ReturnValue = Body();
+					NewAwaiter->SetValue(std::move(ReturnValue));
+				}
+			});
 		}
 		else
 		{
-			return Coroutine_Return.get();
+			Awaiter->Then([Body = std::move(Body), NewAwaiter](T Result) -> void
+			{
+				if constexpr (std::same_as<ReturnType, void>)
+				{
+					Body(Result);
+					NewAwaiter->SetValue();
+				}
+				else
+				{
+					ReturnType ReturnValue = Body(Result);
+					NewAwaiter->SetValue(std::move(ReturnValue));
+				}
+			});
 		}
-	}
 
-	[[nodiscard]]
-	operator T() requires !std::is_same_v<T, void>
-	{
-		return GetResult();
-	}
-
-	[[nodiscard]]
-	operator bool() const
-	{
-		return IsValid();
-	}
-
-public:
-	[[nodiscard]]
-	static Task Run(std::function<T()> Body)
-	{
-		return ContinuousTask<T>::Run(Body);
-	}
-
-	template<class U = void>
-	[[nodiscard]]
-	ContinuousTask<U> Then(std::function<U(T)> Body)
-	{
-		return CTask.Then(Body);
+		return Task<ReturnType>(std::move(NewAwaiter));
 	}
 };
