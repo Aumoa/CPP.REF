@@ -87,6 +87,50 @@ public:
 	template<class TType>
 	struct TypeGenerator
 	{
+	private:
+		template<class U>
+		static bool CollectSingleNode(int32& Counter, U*& Node, int32& Depth) requires
+			std::derived_from<U, SObject> &&
+			requires { Node = nullptr; }
+		{
+			if (Node)
+			{
+				if (GC.PendingFinalize.contains(Node))
+				{
+					Node = nullptr;
+				}
+				else
+				{
+					GC.GCMarkingBuffer[Node->InternalIndex] = Depth;
+					++Counter;
+				}
+			}
+
+			return true;
+		}
+
+		template<class U>
+		static bool CollectSingleNode(int32& Counter, U* const& Node, int32& Depth) requires
+			std::derived_from<U, SObject> &&
+			(!requires { Node = nullptr; })
+		{
+			if (Node)
+			{
+				if (GC.PendingFinalize.contains(Node))
+				{
+					return false;
+				}
+				else
+				{
+					GC.GCMarkingBuffer[Node->InternalIndex] = Depth;
+					++Counter;
+				}
+			}
+
+			return true;
+		}
+
+	public:
 		std::wstring FriendlyName;
 		std::wstring FullName;
 		std::vector<Method> Functions;
@@ -192,27 +236,14 @@ public:
 				for (auto It = Collection.begin(); It != Collection.end();)
 				{
 					auto& Object = *It;
-					if (Object)
+					if (!CollectSingleNode(Count, Object, Depth))
 					{
-						if (GC.PendingFinalize.contains(Object))
+						if constexpr (!IsMutableCollection<TType>)
 						{
-							if constexpr (IsMutableCollection<TType>)
-							{
-								Object = nullptr;
-							}
-							else
-							{
-								Collection.erase(It++);
-								continue;
-							}
-						}
-						else
-						{
-							GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
-							++Count;
+							Collection.erase(It++);
+							continue;
 						}
 					}
-
 					++It;
 				}
 				return Count;
@@ -237,18 +268,7 @@ public:
 				int32 Count = 0;
 				for (auto& [Key, Object] : Collection)
 				{
-					if (Object)
-					{
-						if (GC.PendingFinalize.contains(Object))
-						{
-							Object = nullptr;
-						}
-						else
-						{
-							GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
-							++Count;
-						}
-					}
+					CollectSingleNode(Count, Object, Depth);
 				}
 				return Count;
 			})
@@ -273,20 +293,14 @@ public:
 				for (auto It = Collection.begin(); It != Collection.end();)
 				{
 					auto& Object = It->second;
-					if (Object)
+					if (!CollectSingleNode(Count, Object, Depth))
 					{
-						if (GC.PendingFinalize.contains(Object))
+						if constexpr (!IsMutableCollection<TType>)
 						{
 							Collection.erase(It++);
 							continue;
 						}
-						else
-						{
-							GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
-							++Count;
-						}
 					}
-
 					++It;
 				}
 				return Count;
