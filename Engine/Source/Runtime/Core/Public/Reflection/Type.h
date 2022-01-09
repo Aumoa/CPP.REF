@@ -153,6 +153,38 @@ public:
 			return b1 || b2;
 		}
 
+		template<class... U>
+		static bool CollectSingleNode(int32& Counter, std::tuple<U...>& Node, int32& Depth)
+		{
+			return CollectSingleNode(Counter, Node, Depth, std::make_index_sequence<sizeof...(U)>{});
+		}
+
+		template<class... U, size_t... _Idx>
+		static bool CollectSingleNode(int32& Counter, std::tuple<U...>& Node, int32& Depth, std::index_sequence<_Idx...>&&)
+		{
+			std::array<bool, sizeof...(U)> Booleans = { CollectSingleNode(Counter, std::get<_Idx>(Node), Depth)... };
+			for (auto& Bool : Booleans)
+			{
+				if (Bool)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		template<class U>
+		static bool CollectSingleNode(int32& Counter, U& Node, int32& Depth) requires requires
+		{
+			{ std::begin(Node) };
+			{ std::end(Node) };
+		}
+		{
+			Type* CollectionType = Type::GetStaticClass<U>();
+			Counter += CollectionType->Collector(&Node, Depth);
+			return true;
+		}
+
 	public:
 		std::wstring FriendlyName;
 		std::wstring FullName;
