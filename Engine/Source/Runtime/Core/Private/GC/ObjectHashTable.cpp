@@ -11,6 +11,11 @@ SObject*& ObjectHashTable::Emplace(SObject* InObject)
 	if (IndexPoolSize)
 	{
 		size_t Index = IndexPool[--IndexPoolSize];
+		// Consume over indexes.
+		while (Index >= Collection.size())
+		{
+			NumPoolCompact -= 1;
+		}
 		SObject*& Ref = Collection[Index] = InObject;
 		InObject->InternalIndex = Index;
 		return Ref;

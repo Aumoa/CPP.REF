@@ -113,7 +113,7 @@ public:
 	template<class TTask>
 	Task(TTask&& OtherTask) requires requires
 	{
-		{ OtherTask.GetAwaiter() } -> std::same_as<IAwaitable<T>>;
+		{ OtherTask.GetAwaiter() } -> std::same_as<std::shared_ptr<IAwaitable<T>>>;
 	}
 		: Awaiter(OtherTask.GetAwaiter())
 	{
