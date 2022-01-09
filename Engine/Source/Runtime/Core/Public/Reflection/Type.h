@@ -81,7 +81,6 @@ private:
 	uint8 bFunctionCached : 1 = false;
 
 	uint8 bGCCollection : 1 = false;
-	Type* CollectionType = nullptr;
 	std::function<int32(void*, int32)> Collector;
 
 public:
@@ -98,7 +97,6 @@ public:
 		uint8 bNative : 1 = false;
 
 		uint8 bGCCollection : 1 = false;
-		Type* CollectionType = nullptr;
 		std::function<int32(void*, int32)> Collector;
 
 		// SObject type.
@@ -121,6 +119,61 @@ public:
 			}
 		}
 
+		// Struct type.
+		TypeGenerator(std::wstring_view InFriendlyName) requires
+			requires { TType::StaticClass(); }
+			: FriendlyName(InFriendlyName)
+			, FullName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, bNative(true)
+			, bGCCollection(true)
+		{
+			Functions.reserve(100);
+			CollectFunctions<0>(Functions);
+			CollectProperties<0>(Properties);
+
+			if constexpr (HasSuper<TType>)
+			{
+				using SuperType = typename TType::Super;
+				SuperClass = SuperType::StaticClass();
+			}
+
+			Collector = [](void* Ptr, int32 Depth) -> int32
+			{
+				TType& Struct = *reinterpret_cast<TType*>(Ptr);
+				Type* StructType = Struct.GetType();
+
+				int32 Count = 0;
+				for (auto& Prop : StructType->GetGCProperties())
+				{
+					Type* PropertyType = Prop->GetMemberType();
+					if (PropertyType->IsGCCollection())
+					{
+						// Mark collection objects.
+						uint8& CollectionPtr = const_cast<uint8&>(Prop->template GetValue<uint8>(Struct));
+						Count += PropertyType->Collector(&CollectionPtr, Depth);
+					}
+					else
+					{
+						SObject* Object = Prop->GetObject(Struct);
+						if (Object)
+						{
+							if (GC.PendingFinalize.contains(Object))
+							{
+								Prop->SetObject(Struct, nullptr);
+							}
+							else
+							{
+								GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
+								++Count;
+							}
+						}
+					}
+				}
+
+				return Count;
+			};
+		}
+
 		// SObject container type.
 		TypeGenerator() requires requires(const TType& Collection)
 			{
@@ -129,9 +182,9 @@ public:
 				{ std::remove_reference_t<decltype(**std::begin(Collection))>::StaticClass() };
 			}
 			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, FullName(FriendlyName)
 			, bNative(true)
 			, bGCCollection(true)
-			, CollectionType(std::remove_reference_t<decltype(**std::begin(std::declval<const TType&>()))>::StaticClass())
 			, Collector([](void* Ptr, int32 Depth) -> int32
 			{
 				TType& Collection = *reinterpret_cast<TType*>(Ptr);
@@ -175,9 +228,9 @@ public:
 				{ std::remove_reference_t<decltype(*std::begin(Collection)->second)>::StaticClass() };
 			}
 			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, FullName(FriendlyName)
 			, bNative(true)
 			, bGCCollection(true)
-			, CollectionType(std::remove_reference_t<decltype(*std::begin(std::declval<const TType&>())->second)>::StaticClass())
 			, Collector([](void* Ptr, int32 Depth) -> int32
 			{
 				TType& Collection = *reinterpret_cast<TType*>(Ptr);
@@ -210,9 +263,9 @@ public:
 				{ std::remove_reference_t<decltype(*std::begin(Collection)->first)>::StaticClass() };
 			}
 			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, FullName(FriendlyName)
 			, bNative(true)
 			, bGCCollection(true)
-			, CollectionType(std::remove_reference_t<decltype(*std::begin(std::declval<const TType&>())->first)>::StaticClass())
 			, Collector([](void* Ptr, int32 Depth) -> int32
 			{
 				TType& Collection = *reinterpret_cast<TType*>(Ptr);
@@ -295,7 +348,6 @@ public:
 		, FromObjectCast(std::move(Generator.FromObjectCast))
 		, bNative(Generator.bNative)
 		, bGCCollection(Generator.bGCCollection)
-		, CollectionType(Generator.CollectionType)
 		, Collector(std::move(Generator.Collector))
 	{
 		RegisterStaticClass();

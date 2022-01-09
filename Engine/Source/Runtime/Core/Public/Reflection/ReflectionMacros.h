@@ -113,9 +113,13 @@ public:
 #define GENERATED_STRUCT_BODY(Struct, ...)													\
 	friend class Type;																		\
 																							\
+public:																						\
+	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Struct>::Type;			\
+	using This = Struct;																	\
+																							\
 	inline static Type* StaticClass()														\
 	{																						\
-		static Type MyClassType(Type::TypeGenerator<Struct>(FriendlyName, L ## #Struct));	\
+		static Type MyClassType = Type::TypeGenerator<Struct>(FriendlyName);				\
 		return &MyClassType;																\
 	}																						\
 																							\
@@ -214,6 +218,10 @@ Type* Class::StaticClass()																	\
 			{ ReflectionMacros::Assign(dynamic_cast<This*>(_this)->PropertyName, _value); },\
 			.Getter = +[](const SObject* _this) -> const void*								\
 			{ return &dynamic_cast<const This*>(_this)->PropertyName; },					\
+			.Setter_Struct = +[](void* _this, const void* _value) { ReflectionMacros		\
+			::Assign(reinterpret_cast<This*>(_this)->PropertyName, _value); },				\
+			.Getter_Struct = +[](const void* _this) -> const void*							\
+			{ return &reinterpret_cast<const This*>(_this)->PropertyName; },				\
 			.bIsPointer = std::is_pointer_v<PT>,											\
 			.bIsConst = std::is_const_v<PT>,												\
 			.bIsStatic = ReflectionMacros::IsStaticMember(&This::PropertyName),				\
