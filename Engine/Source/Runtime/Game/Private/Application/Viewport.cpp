@@ -35,12 +35,25 @@ void SViewport::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 	SetRenderSize(LocalSize);
 }
 
+bool SViewport::PrepassLayout()
+{
+	bool bShouldBePrepass = false;
+
+	if (ShouldBePrepassLayout())
+	{
+		ReallocRenderTarget();
+		bShouldBePrepass = true;
+	}
+
+	return Super::PrepassLayout() || bShouldBePrepass;
+}
+
 void SViewport::SetRenderSize(Vector2N InRenderSize)
 {
 	if (RenderSize != InRenderSize)
 	{
 		RenderSize = InRenderSize;
-		ReallocRenderTarget();
+		InvalidateLayoutAndVolatility();
 	}
 }
 
@@ -51,11 +64,6 @@ Vector2N SViewport::GetRenderSize()
 
 void SViewport::PopulateCommandLists(IRHIDeviceContext* InDeviceContext)
 {
-}
-
-Vector2 SViewport::GetDesiredSize()
-{
-	return RenderSize.Cast<float>();
 }
 
 void SViewport::AddToViewport(SWidget* InWidget)
@@ -83,6 +91,11 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 	ReallocRenderTarget();
 }
 
+Vector2 SViewport::ComputeDesiredSize()
+{
+	return RenderSize.Cast<float>();
+}
+
 void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 	for (auto& Widget : Widgets)
@@ -107,6 +120,16 @@ int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry
 	//SlateDrawElement::MakeBox(InDrawElements, Brush, AllottedGeometry.ToPaintGeometry(), InLayer);
 
 	return Super::OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer + 1, bParentEnabled);
+}
+
+size_t SViewport::NumChildrens()
+{
+	return Widgets.size();
+}
+
+SWidget* SViewport::GetChildrenAt(size_t IndexOf)
+{
+	return Widgets[IndexOf];
 }
 
 void SViewport::ReallocRenderTarget()

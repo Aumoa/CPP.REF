@@ -6,6 +6,7 @@
 #include <vector>
 #include "RHI/RHIStructures.h"
 #include "SceneRendering/MeshBatch.h"
+#include "Threading/Task.h"
 
 class SPrimitiveComponent;
 
@@ -21,10 +22,10 @@ public:
 
 	PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveComponent);
 
-	void UpdateTransform_GameThread(const Transform& InValue);
+	Task<void> UpdateTransform_GameThread(Transform InValue);
 	void UpdateTransform_RenderThread(const Transform& InValue);
-	void MarkRenderStateDirty_GameThread();
+	Task<void> MarkRenderStateDirty_GameThread();
 	void MarkRenderStateDirty_RenderThread();
-	void SetHiddenInGame_GameThread(bool bHiddenInGame);
+	Task<void> SetHiddenInGame_GameThread(bool bHiddenInGame);
 	void SetHiddenInGame_RenderThread(bool bHiddenInGame);
 };

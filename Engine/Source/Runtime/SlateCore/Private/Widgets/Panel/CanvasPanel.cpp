@@ -15,7 +15,70 @@ SCanvasPanel::~SCanvasPanel()
 {
 }
 
-Vector2 SCanvasPanel::GetDesiredSize()
+auto SCanvasPanel::AddSlot() -> SSlot&
+{
+	InvalidateLayoutAndVolatility();
+	return *Slots.emplace_back(gcnew SSlot());
+}
+
+bool SCanvasPanel::RemoveSlot(size_t Index)
+{
+	if (Slots.size() <= Index)
+	{
+		return false;
+	}
+
+	InvalidateLayoutAndVolatility();
+	Slots.erase(Slots.begin() + Index);
+	return true;
+}
+
+size_t SCanvasPanel::FindSlot(const SWidget* Content)
+{
+	for (size_t i = 0; i < Slots.size(); ++i)
+	{
+		if (Slots[i]->GetContent() == Content)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void SCanvasPanel::ClearSlots()
+{
+	Slots.resize(0);
+	InvalidateLayoutAndVolatility();
+}
+
+size_t SCanvasPanel::NumSlots()
+{
+	return Slots.size();
+}
+
+size_t SCanvasPanel::NumChildrens()
+{
+	return Slots.size();
+}
+
+SWidget* SCanvasPanel::GetChildrenAt(size_t IndexOf)
+{
+	return Slots[IndexOf]->GetContent();
+}
+
+DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Attr)
+{
+	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
+	
+	Slots.reserve(Attr.Slots.size());
+	for (auto& Slot : Attr.Slots)
+	{
+		Slots.emplace_back(gcnew SSlot(std::move(Slot)));
+	}
+}
+
+Vector2 SCanvasPanel::ComputeDesiredSize()
 {
 	Vector2 FinalDesiredSize(0, 0);
 
@@ -45,56 +108,6 @@ Vector2 SCanvasPanel::GetDesiredSize()
 	}
 
 	return FinalDesiredSize;
-}
-
-auto SCanvasPanel::AddSlot() -> SSlot&
-{
-	return *Slots.emplace_back(gcnew SSlot());
-}
-
-bool SCanvasPanel::RemoveSlot(size_t Index)
-{
-	if (Slots.size() <= Index)
-	{
-		return false;
-	}
-
-	Slots.erase(Slots.begin() + Index);
-	return true;
-}
-
-size_t SCanvasPanel::FindSlot(const SWidget* Content)
-{
-	for (size_t i = 0; i < Slots.size(); ++i)
-	{
-		if (Slots[i]->GetContent() == Content)
-		{
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-void SCanvasPanel::ClearSlots()
-{
-	Slots.resize(0);
-}
-
-size_t SCanvasPanel::NumSlots()
-{
-	return Slots.size();
-}
-
-DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Attr)
-{
-	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
-	
-	Slots.reserve(Attr.Slots.size());
-	for (auto& Slot : Attr.Slots)
-	{
-		Slots.emplace_back(gcnew SSlot(std::move(Slot)));
-	}
 }
 
 int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)

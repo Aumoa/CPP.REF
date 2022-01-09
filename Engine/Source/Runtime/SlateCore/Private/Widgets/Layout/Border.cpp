@@ -8,21 +8,13 @@ SBorder::SBorder() : Super()
 {
 }
 
-Vector2 SBorder::GetDesiredSize()
-{
-	if (Content && Content->GetVisibility() != ESlateVisibility::Collapsed)
-	{
-		return Content->GetDesiredSize() + Padding.GetTotalSpaceAlong();
-	}
-	else
-	{
-		return Vector2::ZeroVector();
-	}
-}
-
 void SBorder::SetPadding(const Margin& InPadding)
 {
-	Padding = InPadding;
+	if (Padding != InPadding)
+	{
+		Padding = InPadding;
+		InvalidateLayoutAndVolatility();
+	}
 }
 
 Margin SBorder::GetPadding()
@@ -32,12 +24,28 @@ Margin SBorder::GetPadding()
 
 void SBorder::SetContent(SWidget* InContent)
 {
-	Content = InContent;
+	if (Content != InContent)
+	{
+		Content = InContent;
+		InvalidateLayoutAndVolatility();
+	}
 }
 
 SWidget* SBorder::GetContent()
 {
 	return Content;
+}
+
+Vector2 SBorder::ComputeDesiredSize()
+{
+	if (Content && Content->GetVisibility() != ESlateVisibility::Collapsed)
+	{
+		return Content->GetDesiredSize() + Padding.GetTotalSpaceAlong();
+	}
+	else
+	{
+		return Vector2::ZeroVector();
+	}
 }
 
 void SBorder::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)

@@ -20,29 +20,37 @@ class STextBlock::SRenderElement : implements SObject, implements IRenderSlateEl
 public:
 	const PaintArgs Args;
 
-	const int32 Layer = 0;
-	const Geometry CachedGeometry;
+	int32 CachedLayer;
+	Geometry CachedGeometry;
+	Vector2 CachedLayoutSize;
 
 	SPROPERTY(TintBrush)
 	IRHISolidColorBrush* TintBrush = nullptr;
 	SPROPERTY(Layout)
 	IRHITextLayout* Layout = nullptr;
 
+	Geometry RenderGeometry;
+	int32 RenderLayer;
+
 public:
 	SRenderElement(STextBlock* Source, const PaintArgs& InPaintArgs, int32 InLayer, const Geometry& AllottedGeometry)
 		: Super()
 		, Args(InPaintArgs)
-		, Layer(InLayer)
+		, CachedLayer(InLayer)
 		, CachedGeometry(AllottedGeometry)
+		, CachedLayoutSize(Source->Layout->GetMaxSize())
 
 		, TintBrush(Source->TintBrush)
 		, Layout(Source->Layout)
+
+		, RenderGeometry(AllottedGeometry)
+		, RenderLayer(InLayer)
 	{
 	}
 
 	virtual int32 GetLayer() override
 	{
-		return Layer;
+		return RenderLayer;
 	}
 
 	virtual Geometry GetCachedGeometry() override
@@ -53,6 +61,30 @@ public:
 	virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
 	{
 		CommandBuffer->DrawTextLayout(LocalLayout.LocalPosition, Layout, TintBrush);
+	}
+
+	Task<void> SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
+	{
+		if (CachedGeometry != AllottedGeometry || CachedLayer != Layer)
+		{
+			CachedGeometry = AllottedGeometry;
+			CachedLayer = Layer;
+
+			co_await RenderThread::EnqueueRenderThreadAwaiter();
+			RenderGeometry = AllottedGeometry;
+			RenderLayer = Layer;
+		}
+	}
+
+	Task<void> SetMaxLayoutSize_GameThread(Vector2 LayoutSize)
+	{
+		if (CachedLayoutSize != LayoutSize)
+		{
+			CachedLayoutSize = LayoutSize;
+
+			co_await RenderThread::EnqueueRenderThreadAwaiter();
+			Layout->SetMaxSize(LayoutSize);
+		}
 	}
 };
 
@@ -68,7 +100,7 @@ void STextBlock::SetText(std::wstring_view Text)
 	if (this->Text != Text)
 	{
 		this->Text = Text;
-		bNeedToReallocateLayout = true;
+		InvalidateLayoutAndVolatility();
 	}
 }
 
@@ -82,7 +114,7 @@ void STextBlock::SetFont(const SlateFont& Font)
 	if (this->Font != Font)
 	{
 		this->Font = Font;
-		bNeedToReallocateLayout = true;
+		InvalidateLayoutAndVolatility();
 	}
 }
 
@@ -101,41 +133,9 @@ Color STextBlock::GetTintColor()
 	return TintColor;
 }
 
-void STextBlock::SetTextAlignment(ERHITextAlignment Alignment)
-{
-	if (TextAlignment != Alignment)
-	{
-		TextAlignment = Alignment;
-
-		if (Layout)
-		{
-			RenderThread::EnqueueRenderThreadWork<"STextBlock.SetTextAlignment">([&](auto)
-			{
-				Layout->SetTextAlignment(Alignment);
-			});
-		}
-	}
-}
-
 ERHITextAlignment STextBlock::GetTextAlignment()
 {
 	return TextAlignment;
-}
-
-void STextBlock::SetParagraphAlignment(ERHIParagraphAlignment Alignment)
-{
-	if (ParagraphAlignment != Alignment)
-	{
-		ParagraphAlignment = Alignment;
-
-		if (Layout)
-		{
-			RenderThread::EnqueueRenderThreadWork<"STextBlock.SetParagraphAlignment">([&](auto)
-			{
-				Layout->SetParagraphAlignment(Alignment);
-			});
-		}
-	}
 }
 
 ERHIParagraphAlignment STextBlock::GetParagraphAlignment()
@@ -143,28 +143,25 @@ ERHIParagraphAlignment STextBlock::GetParagraphAlignment()
 	return ParagraphAlignment;
 }
 
-void STextBlock::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+bool STextBlock::PrepassLayout()
 {
-	if (bNeedToReallocateLayout)
+	bool bShouldBePrepass = false;
+	if (ShouldBePrepassLayout())
 	{
 		ReallocLayout();
+		bShouldBePrepass = true;
 	}
 
-	Super::Tick(AllottedGeometry, InDeltaTime);
+	return Super::PrepassLayout() || bShouldBePrepass;
 }
 
-Vector2 STextBlock::GetDesiredSize()
+Vector2 STextBlock::ComputeDesiredSize()
 {
 	return CachedDesiredSize;
 }
 
 int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
-	if (bNeedToReallocateLayout)
-	{
-		ReallocLayout();
-	}
-
 	if (TintBrush)
 	{
 		TintBrush->SetColor(TintColor);
@@ -174,21 +171,27 @@ int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometr
 		TintBrush = Args.Device->CreateSolidColorBrush(TintColor);
 	}
 
-	if (Layout)
+	if (CachedRenderElement == nullptr && Layout)
 	{
-		Vector2 LocalSize = AllottedGeometry.GetLocalSize();
-		if (!CachedLocalMaxSize.NearlyEquals(LocalSize))
-		{
-			Layout->SetMaxSize(LocalSize);
-			CachedLocalMaxSize = LocalSize;
-		}
+		CachedRenderElement = gcnew SRenderElement(this,
+			Args.WithNewParent(this),
+			InLayer,
+			AllottedGeometry
+		);
 	}
 
-	DrawCollector->AddRenderElement(gcnew SRenderElement(this,
-		Args.WithNewParent(this),
-		InLayer,
-		AllottedGeometry
-	));
+	if (CachedRenderElement)
+	{
+		Vector2 LocalSize = AllottedGeometry.GetLocalSize();
+		CachedRenderElement->SetMaxLayoutSize_GameThread(LocalSize);
+		CachedRenderElement->SetGeometry_GameThread(InLayer, AllottedGeometry);
+	}
+
+	if (CachedRenderElement)
+	{
+		DrawCollector->AddRenderElement(CachedRenderElement);
+	}
+
 	return InLayer;
 }
 
@@ -196,6 +199,7 @@ void STextBlock::ReallocLayout()
 {
 	Layout = nullptr;
 	Format = nullptr;
+	CachedRenderElement = nullptr;
 
 	if (!Text.empty() && !Font.FamilyName.empty() && Font.Size > 0.1f)
 	{
@@ -204,13 +208,39 @@ void STextBlock::ReallocLayout()
 
 		Vector2 LocalSize = Vector2(1048576.0f, 1048576.0f);
 		Layout = Factory->CreateTextLayout(Format, Text, LocalSize);
-		CachedLocalMaxSize = LocalSize;
-		CachedDesiredSize = Layout->GetDesiredSize();
-
-		bNeedToReallocateLayout = false;
-
 		Layout->SetTextAlignment(TextAlignment);
 		Layout->SetParagraphAlignment(ParagraphAlignment);
+
+		CachedLocalMaxSize = LocalSize;
+		CachedDesiredSize = Layout->GetDesiredSize();
+	}
+}
+
+Task<void> STextBlock::SetTextAlignment_GameThread(ERHITextAlignment Alignment)
+{
+	if (TextAlignment != Alignment)
+	{
+		TextAlignment = Alignment;
+
+		if (Layout)
+		{
+			co_await RenderThread::EnqueueRenderThreadAwaiter();
+			Layout->SetTextAlignment(Alignment);
+		}
+	}
+}
+
+Task<void> STextBlock::SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignment)
+{
+	if (ParagraphAlignment != Alignment)
+	{
+		ParagraphAlignment = Alignment;
+
+		if (Layout)
+		{
+			co_await RenderThread::EnqueueRenderThreadAwaiter();
+			Layout->SetParagraphAlignment(Alignment);
+		}
 	}
 }
 

@@ -23,8 +23,10 @@ public:
 	virtual void InitViewport();
 	SViewport* GetGameViewport();
 
-	virtual Vector2 GetDesiredSize() override;
-
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
+
+	virtual size_t NumChildrens();
+	virtual SWidget* GetChildrenAt(size_t IndexOf) override;
 };

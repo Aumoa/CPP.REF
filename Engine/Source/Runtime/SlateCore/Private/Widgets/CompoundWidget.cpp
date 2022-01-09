@@ -23,6 +23,28 @@ void SCompoundWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
     }
 }
 
+bool SCompoundWidget::PrepassLayout()
+{
+    bool bShouldBePrepass = false;
+    size_t NumChildrens = this->NumChildrens();
+
+    for (size_t ChildIndex = 0; ChildIndex < NumChildrens; ++ChildIndex)
+    {
+        if (GetChildrenAt(ChildIndex)->PrepassLayout())
+        {
+            bShouldBePrepass = true;
+        }
+    }
+
+    if (ShouldBePrepassLayout() || bShouldBePrepass)
+    {
+        CacheDesiredSize();
+        bShouldBePrepass = true;
+    }
+
+    return Super::PrepassLayout() || bShouldBePrepass;
+}
+
 int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
 	ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);

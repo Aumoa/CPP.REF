@@ -15,9 +15,9 @@ void RenderThread::PendingThreadWork::SwapExecute(IRHIDeviceContext* InDeviceCon
 
 void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
 {
-	for (auto& WorkBody : Works)
+	for (auto& Awaiter : Works)
 	{
-		WorkBody(DeviceContext);
+		Awaiter.SetValue(DeviceContext);
 	}
 
 	if (CompletedWork)
@@ -73,10 +73,10 @@ void RenderThread::Shutdown()
 	_Thread.ThreadJoin.wait();
 }
 
-void RenderThread::EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody)
+Task<IRHIDeviceContext*> RenderThread::EnqueueRenderThreadAwaiter()
 {
 	std::unique_lock lock(_Thread.WorkerMtx);
-	_WaitingWorks.Works.emplace_back(std::move(InWorkBody));
+	return _WaitingWorks.Works.emplace_back();
 }
 
 void RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork)

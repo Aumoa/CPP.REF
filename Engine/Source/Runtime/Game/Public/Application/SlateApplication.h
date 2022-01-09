@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Layout/Layout.h"
+#include "Threading/Task.h"
 
 interface IRHIDevice;
 interface IApplicationInterface;
@@ -61,5 +62,6 @@ private:
 	void OnMouseButtonReleased(Vector2N Location, EMouseButton Button);
 	void OnMouseWheelScrolled(int32 ScrollDelta);
 
+	Task<void> CacheRenderElements_GameThread(std::vector<IRenderSlateElement*> Elements);
 	Geometry MakeRoot();
 };

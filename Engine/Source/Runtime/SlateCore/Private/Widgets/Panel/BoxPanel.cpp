@@ -11,13 +11,9 @@ SBoxPanel::SBoxPanel(EOrientation Orientation) : Super()
 {
 }
 
-Vector2 SBoxPanel::GetDesiredSize()
-{
-	return ComputeDesiredSizeForBox(Orientation, Slots);
-}
-
 auto SBoxPanel::AddSlot() -> SSlot&
 {
+	InvalidateLayoutAndVolatility();
 	return *Slots.emplace_back(gcnew SSlot());
 }
 
@@ -29,6 +25,7 @@ bool SBoxPanel::RemoveSlot(size_t Index)
 	}
 
 	Slots.erase(Slots.begin() + Index);
+	InvalidateLayoutAndVolatility();
 	return true;
 }
 
@@ -47,12 +44,36 @@ size_t SBoxPanel::FindSlot(const SWidget* Content)
 
 void SBoxPanel::ClearSlots()
 {
-	Slots.resize(0);
+	if (Slots.size())
+	{
+		Slots.resize(0);
+		InvalidateLayoutAndVolatility();
+	}
 }
 
 size_t SBoxPanel::NumSlots()
 {
 	return Slots.size();
+}
+
+EOrientation SBoxPanel::GetOrientation()
+{
+	return Orientation;
+}
+
+size_t SBoxPanel::NumChildrens()
+{
+	return Slots.size();
+}
+
+SWidget* SBoxPanel::GetChildrenAt(size_t IndexOf)
+{
+	return Slots[IndexOf]->GetContent();
+}
+
+Vector2 SBoxPanel::ComputeDesiredSize()
+{
+	return ComputeDesiredSizeForBox(Orientation, Slots);
 }
 
 void SBoxPanel::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)

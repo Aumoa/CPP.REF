@@ -8,6 +8,7 @@
 #include "RHI/IRHISolidColorBrush.h"
 #include "RHI/IRHIDevice.h"
 #include "RHI/IRHIBitmap.h"
+#include "RenderThread.h"
 
 class SImage::SRenderElement : implements SObject, implements IRenderSlateElement
 {
@@ -16,8 +17,8 @@ class SImage::SRenderElement : implements SObject, implements IRenderSlateElemen
 public:
 	const PaintArgs Args;
 
-	const int32 Layer = 0;
-	const Geometry CachedGeometry;
+	int32 CachedLayer;
+	Geometry CachedGeometry;
 
 	const Vector2 ImageSize;
 	SPROPERTY(ImageSource)
@@ -25,27 +26,33 @@ public:
 	SPROPERTY(TintBrush)
 	IRHISolidColorBrush* TintBrush = nullptr;
 
+	Geometry RenderGeometry;
+	int32 RenderLayer;
+
 public:
 	SRenderElement(SImage* Source, const PaintArgs& InPaintArgs, int32 InLayer, const Geometry& AllottedGeometry)
 		: Super()
 		, Args(InPaintArgs)
-		, Layer(InLayer)
+		, CachedLayer(InLayer)
 		, CachedGeometry(AllottedGeometry)
 
 		, ImageSize(Source->ImageSize)
 		, ImageSource(Source->ImageSource)
 		, TintBrush(Source->TintBrush)
+
+		, RenderGeometry(AllottedGeometry)
+		, RenderLayer(InLayer)
 	{
 	}
 
 	virtual int32 GetLayer() override
 	{
-		return Layer;
+		return RenderLayer;
 	}
 
 	virtual Geometry GetCachedGeometry() override
 	{
-		return CachedGeometry;
+		return RenderGeometry;
 	}
 
 	virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
@@ -67,6 +74,19 @@ public:
 			CommandBuffer->FillRectangle(TintBrush, DrawRect);
 		}
 	}
+
+	Task<void> SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
+	{
+		if (CachedGeometry != AllottedGeometry || CachedLayer != Layer)
+		{
+			CachedGeometry = AllottedGeometry;
+			CachedLayer = Layer;
+
+			co_await RenderThread::EnqueueRenderThreadAwaiter();
+			RenderGeometry = AllottedGeometry;
+			RenderLayer = Layer;
+		}
+	}
 };
 
 GENERATE_BODY(SImage);
@@ -77,15 +97,19 @@ SImage::SImage() : Super()
 	SetRenderTransform(SlateRenderTransform::Identity());
 }
 
-Vector2 SImage::GetDesiredSize()
-{
-	return ImageSize;
-}
-
 void SImage::SetBrush(const SlateBrush& InBrush)
 {
-	ImageSource = InBrush.ImageSource;
-	ImageSize = InBrush.ImageSize;
+	if (ImageSource != InBrush.ImageSource)
+	{
+		ImageSource = InBrush.ImageSource;
+		CachedRenderElement = nullptr;
+	}
+
+	if (ImageSize != InBrush.ImageSize)
+	{
+		ImageSize = InBrush.ImageSize;
+		InvalidateLayoutAndVolatility();
+	}
 }
 
 SlateBrush SImage::GetBrush()
@@ -110,6 +134,11 @@ DEFINE_SLATE_CONSTRUCTOR(SImage, Attr)
 	SetTintColor(Attr._TintColor);
 }
 
+Vector2 SImage::ComputeDesiredSize()
+{
+	return ImageSize;
+}
+
 int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
 	if (ImageSource == nullptr)
@@ -124,11 +153,22 @@ int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, c
 		}
 	}
 
-	DrawCollector->AddRenderElement(gcnew SRenderElement(this,
-		Args.WithNewParent(this),
-		InLayer,
-		AllottedGeometry
-	));
+	if (CachedRenderElement == nullptr)
+	{
+		CachedRenderElement = gcnew SRenderElement(this,
+			Args.WithNewParent(this),
+			InLayer,
+			AllottedGeometry
+		);
+	}
+	else
+	{
+		CachedRenderElement->SetGeometry_GameThread(InLayer, AllottedGeometry);
+	}
 
+	if (CachedRenderElement)
+	{
+		DrawCollector->AddRenderElement(CachedRenderElement);
+	}
 	return InLayer;
 }

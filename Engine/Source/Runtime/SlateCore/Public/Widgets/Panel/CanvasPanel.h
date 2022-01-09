@@ -41,15 +41,17 @@ public:
 	SCanvasPanel();
 	virtual ~SCanvasPanel() override;
 
-	virtual Vector2 GetDesiredSize() override;
-
 	SSlot& AddSlot();
 	bool RemoveSlot(size_t Index);
 	size_t FindSlot(const SWidget* Content);
 	void ClearSlots();
 	size_t NumSlots();
 
+	virtual size_t NumChildrens() override;
+	virtual SWidget* GetChildrenAt(size_t IndexOf) override;
+
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) override;
 	

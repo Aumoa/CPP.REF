@@ -17,8 +17,6 @@ private:
 public:
 	SBorder();
 
-	virtual Vector2 GetDesiredSize() override;
-
 public:
 	void SetPadding(const Margin& InPadding);
 	Margin GetPadding();
@@ -26,6 +24,7 @@ public:
 	SWidget* GetContent();
 
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 
 public:

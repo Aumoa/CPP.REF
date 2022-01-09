@@ -24,16 +24,15 @@ void SEditorWindow::InitViewport()
 		SNew(SHorizontalBoxPanel)
 		+SHorizontalBoxPanel::SSlot()
 		.SizeParam(ESizeRule::Stretch, 1.0f)
-		.HAlignment(EHorizontalAlignment::Fill)
 		.VAlignment(EVerticalAlignment::Fill)
+		.HAlignment(EHorizontalAlignment::Fill)
 		[
 			SNew(SVerticalBoxPanel)
 			// GameViewport
 			+SVerticalBoxPanel::SSlot()
 			.SizeParam(ESizeRule::Stretch, 1.0f)
 			[
-				SAssignNew(EditorViewport, SViewport)
-				.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM)
+				EditorViewport = GetGameViewport()
 			]
 			// LogConsole
 			+SVerticalBoxPanel::SSlot()
@@ -60,16 +59,22 @@ SViewport* SEditorWindow::GetEditorViewport()
 	return EditorViewport;
 }
 
-Vector2 SEditorWindow::GetDesiredSize()
+Vector2 SEditorWindow::ComputeDesiredSize()
 {
-	if (EditorViewport)
-	{
-		return EditorViewport->GetDesiredSize();
-	}
-	return Vector2::ZeroVector();
+	return EditorLayout->GetDesiredSize();
 }
 
 void SEditorWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 	EditorLayout->ArrangeChildren(ArrangedChildrens, AllottedGeometry);
+}
+
+size_t SEditorWindow::NumChildrens()
+{
+	return EditorLayout->NumChildrens();
+}
+
+SWidget* SEditorWindow::GetChildrenAt(size_t IndexOf)
+{
+	return EditorLayout->GetChildrenAt(IndexOf);
 }

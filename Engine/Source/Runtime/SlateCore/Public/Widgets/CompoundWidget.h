@@ -13,6 +13,10 @@ public:
 	SCompoundWidget();
 
 	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
+	virtual bool PrepassLayout() override;
+
+	virtual size_t NumChildrens() = 0;
+	virtual SWidget* GetChildrenAt(size_t IndexOf) = 0;
 
 protected:
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;

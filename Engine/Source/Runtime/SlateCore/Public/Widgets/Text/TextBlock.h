@@ -6,6 +6,7 @@
 #include "Widgets/LeafWidget.h"
 #include "Draw/SlateFont.h"
 #include "RHI/RHIEnums.h"
+#include "Threading/Task.h"
 
 interface IRHITextLayout;
 interface IRHITextFormat;
@@ -26,10 +27,12 @@ private:
 	SPROPERTY(TintBrush)
 	IRHISolidColorBrush* TintBrush = nullptr;
 
+	SPROPERTY(CachedRenderElement)
+	SRenderElement* CachedRenderElement = nullptr;
+
 	std::wstring Text;
 	SlateFont Font;
 	Color TintColor = NamedColors::Black;
-	bool bNeedToReallocateLayout = false;
 	ERHITextAlignment TextAlignment = ERHITextAlignment::Leading;
 	ERHIParagraphAlignment ParagraphAlignment = ERHIParagraphAlignment::Near;
 
@@ -45,19 +48,21 @@ public:
 	SlateFont GetFont();
 	void SetTintColor(const Color& TintColor);
 	Color GetTintColor();
-	void SetTextAlignment(ERHITextAlignment Alignment);
+	void SetTextAlignment(ERHITextAlignment Alignment) { SetTextAlignment_GameThread(Alignment); }
 	ERHITextAlignment GetTextAlignment();
-	void SetParagraphAlignment(ERHIParagraphAlignment Alignment);
+	void SetParagraphAlignment(ERHIParagraphAlignment Alignment) { SetParagraphAlignment_GameThread(Alignment); }
 	ERHIParagraphAlignment GetParagraphAlignment();
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
-	virtual Vector2 GetDesiredSize() override;
+	virtual bool PrepassLayout() override;
 
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
 
 private:
 	void ReallocLayout();
+	Task<void> SetTextAlignment_GameThread(ERHITextAlignment Alignment);
+	Task<void> SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignment);
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

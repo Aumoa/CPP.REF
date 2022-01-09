@@ -15,7 +15,8 @@ public:
 	SLogConsole();
 	virtual ~SLogConsole() noexcept override;
 
-	virtual Vector2 GetDesiredSize() override;
+protected:
+	virtual Vector2 ComputeDesiredSize() override;
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

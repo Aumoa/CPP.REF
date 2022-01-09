@@ -16,6 +16,8 @@ void SWindow::InitViewport()
 	GameViewport = SNew(SViewport)
 		.RenderSize(IApplicationInterface::Get().GetViewportSize())
 		.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM);
+
+	InvalidateLayoutAndVolatility();
 }
 
 SViewport* SWindow::GetGameViewport()
@@ -23,7 +25,7 @@ SViewport* SWindow::GetGameViewport()
 	return GameViewport;
 }
 
-Vector2 SWindow::GetDesiredSize()
+Vector2 SWindow::ComputeDesiredSize()
 {
 	if (GameViewport)
 	{
@@ -43,4 +45,14 @@ void SWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geom
 			AllottedGeometry.GetLocalSize()
 		));
 	}
+}
+
+size_t SWindow::NumChildrens()
+{
+	return GameViewport ? 1 : 0;
+}
+
+SWidget* SWindow::GetChildrenAt(size_t IndexOf)
+{
+	return GameViewport;
 }

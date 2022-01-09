@@ -64,6 +64,9 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 		Device = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice();
 	}
 
+	// Calculate prepass layout.
+	CoreWindow->PrepassLayout();
+
 	Vector2 DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
 	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
 	CoreWindow->Tick(AllottedGeometry, InDeltaTime);
@@ -75,10 +78,7 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 	CachedElements.clear();
 	DrawCollector->FlushElements(CachedElements);
 
-	RenderThread::EnqueueRenderThreadWork<"TickAndPaint">([this, Buf = CachedElements](auto) mutable
-	{
-		RenderElements = std::move(Buf);
-	});
+	CacheRenderElements_GameThread(CachedElements);
 }
 
 void SSlateApplication::DrawElements(IRHIDeviceContext2D* CommandList, SSlateRenderer* Renderer)
@@ -129,6 +129,12 @@ void SSlateApplication::OnMouseButtonReleased(Vector2N Location, EMouseButton Bu
 void SSlateApplication::OnMouseWheelScrolled(int32 ScrollDelta)
 {
 	CoreWindow->SendMouseWheelScrolled(MakeRoot(), ScrollDelta);
+}
+
+Task<void> SSlateApplication::CacheRenderElements_GameThread(std::vector<IRenderSlateElement*> Elements)
+{
+	co_await RenderThread::EnqueueRenderThreadAwaiter();
+	RenderElements = std::move(Elements);
 }
 
 Geometry SSlateApplication::MakeRoot()

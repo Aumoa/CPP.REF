@@ -13,6 +13,8 @@ public:
 	SLeafWidget();
 	virtual ~SLeafWidget() override;
 
+	virtual bool PrepassLayout() override;
+
 protected:
 	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 

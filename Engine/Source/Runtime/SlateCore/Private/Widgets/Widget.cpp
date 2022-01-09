@@ -39,6 +39,11 @@ void SWidget::ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const G
 	OnArrangeChildren(InoutArrangedChildrens, AllottedGeometry);
 }
 
+void SWidget::InvalidateLayoutAndVolatility()
+{
+    bInvalidateLayout = true;
+}
+
 void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
     if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
@@ -65,9 +70,15 @@ void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
     AnimPlayer->Tick(InDeltaTime);
 }
 
+bool SWidget::PrepassLayout()
+{
+    bInvalidateLayout = false;
+    return false;
+}
+
 Vector2 SWidget::GetDesiredSize()
 {
-	return Vector2::ZeroVector();
+    return CachedDesiredSize;
 }
 
 Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
@@ -134,6 +145,11 @@ void SWidget::PostConstruction()
     Name = GetType()->GenerateUniqueName();
 }
 
+Vector2 SWidget::ComputeDesiredSize()
+{
+    return Vector2::ZeroVector();
+}
+
 bool SWidget::IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget& ArrangedChild)
 {
     // 1) We check if the rendered bounding box overlaps with the culling rect.  Which is so that
@@ -167,6 +183,16 @@ bool SWidget::IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget&
 bool SWidget::ShouldBeEnabled(bool bParentEnabled)
 {
     return bParentEnabled && IsEnabled();
+}
+
+bool SWidget::ShouldBePrepassLayout()
+{
+    return bInvalidateLayout;
+}
+
+void SWidget::CacheDesiredSize()
+{
+    CachedDesiredSize = ComputeDesiredSize();
 }
 
 DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)

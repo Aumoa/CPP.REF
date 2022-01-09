@@ -12,6 +12,7 @@
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "Threading/DeferredTask.h"
 
 GENERATE_BODY(SGameEngine)
 
@@ -31,7 +32,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 {
 	GEngine = this;
 
-	// CollectGarbageEveryFrame = true
+	// CollectGarbageEveryFrame = false
 	GC.SetFlushInterval(60);
 
 	SlateApplication = CreateSlateApplication();
@@ -203,7 +204,14 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 	SCOPE_CYCLE_COUNTER(STAT_GameTick);
 
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
+
+	// Flush all deferred task with this frame.
+	DeferredTaskRunner<0>::Run();
+
+	// Execute level tick.
 	GameWorld->LevelTick(InDeltaTime.count());
+
+	// Tick and paint.
 	SlateApplication->TickAndPaint(InDeltaTime.count());
 }
 

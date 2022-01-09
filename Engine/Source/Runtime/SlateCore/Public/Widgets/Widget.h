@@ -48,9 +48,11 @@ public:
 
 	int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled);
 	void ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry);
+	void InvalidateLayoutAndVolatility();
 
 	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
-	virtual Vector2 GetDesiredSize();
+	virtual bool PrepassLayout();
+	Vector2 GetDesiredSize();
 
 	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
@@ -63,6 +65,7 @@ public:
 
 protected:
 	virtual void PostConstruction() override;
+	virtual Vector2 ComputeDesiredSize();
 
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) = 0;
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) = 0;
@@ -74,6 +77,9 @@ protected:
 	
 	bool IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget& ArrangedChild);
 	bool ShouldBeEnabled(bool bParentEnabled);
+
+	bool ShouldBePrepassLayout();
+	void CacheDesiredSize();
 
 public:
 	DECLARE_MULTICAST_EVENT(MouseHoveredEvent, bool);

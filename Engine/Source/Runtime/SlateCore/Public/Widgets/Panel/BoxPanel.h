@@ -34,8 +34,6 @@ private:
 protected:
 	SBoxPanel(EOrientation Orientation);
 
-	virtual Vector2 GetDesiredSize() override;
-
 public:
 	SSlot& AddSlot();
 	bool RemoveSlot(size_t Index);
@@ -45,7 +43,11 @@ public:
 
 	EOrientation GetOrientation();
 
+	virtual size_t NumChildrens() override;
+	virtual SWidget* GetChildrenAt(size_t IndexOf) override;
+
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 
 private:

@@ -13,6 +13,18 @@ SLeafWidget::~SLeafWidget()
 {
 }
 
+bool SLeafWidget::PrepassLayout()
+{
+    bool bShouldBePrepass = false;
+    if (ShouldBePrepassLayout())
+    {
+        CacheDesiredSize();
+        bShouldBePrepass = true;
+    }
+
+    return Super::PrepassLayout() || bShouldBePrepass;
+}
+
 void SLeafWidget::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 }

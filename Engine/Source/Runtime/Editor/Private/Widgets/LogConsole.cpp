@@ -17,7 +17,7 @@ SLogConsole::~SLogConsole() noexcept
 	LogModule::Get()->Logged.RemoveAll(this);
 }
 
-Vector2 SLogConsole::GetDesiredSize()
+Vector2 SLogConsole::ComputeDesiredSize()
 {
 	return Vector2(0.0f, 140.0f);
 }

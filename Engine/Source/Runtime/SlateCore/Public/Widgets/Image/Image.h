@@ -22,13 +22,14 @@ private:
 	SPROPERTY(TintBrush)
 	IRHISolidColorBrush* TintBrush = nullptr;
 
+	SPROPERTY(CachedRenderElement)
+	SRenderElement* CachedRenderElement = nullptr;
+
 	Vector2 ImageSize;
 	Color TintColor;
 
 public:
 	SImage();
-
-	virtual Vector2 GetDesiredSize() override;
 
 	void SetBrush(const SlateBrush& InBrush);
 	SlateBrush GetBrush();
@@ -44,5 +45,6 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
 };

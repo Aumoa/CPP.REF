@@ -9,6 +9,7 @@
 #include <functional>
 #include <future>
 #include "Threading/Thread.h"
+#include "Threading/ManualTask.h"
 #include "Misc/CrcHash.h"
 
 interface IRHIDeviceContext;
@@ -19,17 +20,15 @@ class RENDERCORE_API RenderThread
 	RenderThread() = delete;
 
 private:
-	using WorksDictionary = std::vector<std::function<void(IRHIDeviceContext*)>>;
-
 	struct WaitingThreadWorks
 	{
-		WorksDictionary Works;
+		std::vector<ManualTask<IRHIDeviceContext*>> Works;
 		std::function<void()> CompletedWork;
 	};
 
 	struct PendingThreadWork
 	{
-		WorksDictionary Works;
+		std::vector<ManualTask<IRHIDeviceContext*>> Works;
 		std::function<void()> CompletedWork;
 		IRHIDeviceContext* DeviceContext = nullptr;
 
@@ -63,7 +62,7 @@ private:
 public:
 	static void Init();
 	static void Shutdown();
-	static void EnqueueRenderThreadWork(size_t InWorkingHash, std::function<void(IRHIDeviceContext*)> InWorkBody);
+	static Task<IRHIDeviceContext*> EnqueueRenderThreadAwaiter();
 	static void ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork = true);
 	static void WaitForLastWorks();
 
@@ -87,11 +86,4 @@ private:
 		{
 		}
 	};
-
-public:
-	template<StringLiteralHash _String>
-	static void EnqueueRenderThreadWork(std::function<void(IRHIDeviceContext*)> Work)
-	{
-		EnqueueRenderThreadWork(_String.Hs, std::move(Work));
-	}
 };

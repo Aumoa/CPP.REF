@@ -25,8 +25,10 @@ public:
 	virtual void InitViewport();
 	SViewport* GetEditorViewport();
 
-	virtual Vector2 GetDesiredSize() override;
-
 protected:
+	virtual Vector2 ComputeDesiredSize() override;
 	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
+
+	virtual size_t NumChildrens() override;
+	virtual SWidget* GetChildrenAt(size_t IndexOf) override;
 };
