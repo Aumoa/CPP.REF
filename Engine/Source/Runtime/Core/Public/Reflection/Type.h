@@ -130,6 +130,29 @@ public:
 			return true;
 		}
 
+		template<class U>
+		static bool CollectSingleNode(int32& Counter, U& Node, int32& Depth) requires
+			requires { U::StaticClass(); }
+		{
+			Type* StructType = Node.GetType();
+			Counter += StructType->Collector(&Node, Depth);
+			return true;
+		}
+
+		template<class U>
+		static bool CollectSingleNode(int32& Counter, const U& Node, int32& Depth)
+		{
+			return true;
+		}
+
+		template<class U1, class U2>
+		static bool CollectSingleNode(int32& Counter, std::pair<U1, U2>& Node, int32& Depth)
+		{
+			bool b1 = CollectSingleNode(Counter, Node.first, Depth);
+			bool b2 = CollectSingleNode(Counter, Node.second, Depth);
+			return b1 || b2;
+		}
+
 	public:
 		std::wstring FriendlyName;
 		std::wstring FullName;
@@ -223,7 +246,6 @@ public:
 			{
 				{ std::begin(Collection) };
 				{ std::end(Collection) };
-				{ std::remove_reference_t<decltype(**std::begin(Collection))>::StaticClass() };
 			}
 			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
 			, FullName(FriendlyName)
@@ -236,63 +258,6 @@ public:
 				for (auto It = Collection.begin(); It != Collection.end();)
 				{
 					auto& Object = *It;
-					if (!CollectSingleNode(Count, Object, Depth))
-					{
-						if constexpr (!IsMutableCollection<TType>)
-						{
-							Collection.erase(It++);
-							continue;
-						}
-					}
-					++It;
-				}
-				return Count;
-			})
-		{
-		}
-
-		// SObject dictionary type(Value).
-		TypeGenerator() requires requires(const TType& Collection)
-			{
-				{ std::begin(Collection) };
-				{ std::end(Collection) };
-				{ std::remove_reference_t<decltype(*std::begin(Collection)->second)>::StaticClass() };
-			}
-			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
-			, FullName(FriendlyName)
-			, bNative(true)
-			, bGCCollection(true)
-			, Collector([](void* Ptr, int32 Depth) -> int32
-			{
-				TType& Collection = *reinterpret_cast<TType*>(Ptr);
-				int32 Count = 0;
-				for (auto& [Key, Object] : Collection)
-				{
-					CollectSingleNode(Count, Object, Depth);
-				}
-				return Count;
-			})
-		{
-		}
-
-		// SObject dictionary type(Key).
-		TypeGenerator() requires requires(const TType& Collection)
-			{
-				{ std::begin(Collection) };
-				{ std::end(Collection) };
-				{ std::remove_reference_t<decltype(*std::begin(Collection)->first)>::StaticClass() };
-			}
-			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
-			, FullName(FriendlyName)
-			, bNative(true)
-			, bGCCollection(true)
-			, Collector([](void* Ptr, int32 Depth) -> int32
-			{
-				TType& Collection = *reinterpret_cast<TType*>(Ptr);
-				int32 Count = 0;
-				for (auto It = Collection.begin(); It != Collection.end();)
-				{
-					auto& Object = It->second;
 					if (!CollectSingleNode(Count, Object, Depth))
 					{
 						if constexpr (!IsMutableCollection<TType>)
