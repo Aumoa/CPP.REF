@@ -9,6 +9,7 @@ interface IRHIFactory;
 interface IPlatformKeyboard;
 interface IPlatformMouse;
 interface IPlatformImageLoader;
+interface IPlatformIME;
 
 interface IApplicationInterface : implements SObject
 {
@@ -39,6 +40,7 @@ interface IApplicationInterface : implements SObject
 	virtual IPlatformKeyboard& GetPlatformKeyboard() = 0;
 	virtual IPlatformMouse& GetPlatformMouse() = 0;
 	virtual IPlatformImageLoader& GetPlatformImageLoader() = 0;
+	virtual IPlatformIME& GetPlatformIME() = 0;
 
 	DECLARE_MULTICAST_DELEGATE(IdleDelegate, ETickMode);
 	IdleDelegate Idle;

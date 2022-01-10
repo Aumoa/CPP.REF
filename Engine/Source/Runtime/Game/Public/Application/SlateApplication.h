@@ -6,6 +6,7 @@
 #include "Layout/Layout.h"
 #include "Threading/Task.h"
 #include "Draw/SlateDrawCollector.h"
+#include "Input/IMEEvent.h"
 
 interface IRHIDevice;
 interface IApplicationInterface;
@@ -62,6 +63,7 @@ private:
 	void OnMouseButtonPressed(Vector2N Location, EMouseButton Button);
 	void OnMouseButtonReleased(Vector2N Location, EMouseButton Button);
 	void OnMouseWheelScrolled(int32 ScrollDelta);
+	void OnIME(IMEEvent EventArgs);
 
 	Task<void> CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements);
 	Geometry MakeRoot();

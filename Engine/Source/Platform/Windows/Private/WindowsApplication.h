@@ -10,6 +10,7 @@
 class SDXGIFactory;
 class SWindowsPlatformKeyboard;
 class SWindowsPlatformMouse;
+class SWindowsIMEController;
 class PlatformModule;
 
 class SWindowsApplication : implements SObject, implements IApplicationInterface, implements IPlatformImageLoader
@@ -26,9 +27,11 @@ private:
 	std::vector<WeakPtr<SObject>> RealtimeDemanders;
 
 	SPROPERTY(PlatformKeyboard)
-	SObject* PlatformKeyboard = nullptr;
+	SWindowsPlatformKeyboard* PlatformKeyboard = nullptr;
 	SPROPERTY(PlatformMouse)
-	SObject* PlatformMouse = nullptr;
+	SWindowsPlatformMouse* PlatformMouse = nullptr;
+	SPROPERTY(PlatformIME)
+	SWindowsIMEController* PlatformIME = nullptr;
 	SPROPERTY(Factory)
 	SDXGIFactory* Factory = nullptr;
 	ComPtr<IWICImagingFactory> ImagingFactory;
@@ -60,6 +63,7 @@ public:
 	virtual IPlatformKeyboard& GetPlatformKeyboard() override;
 	virtual IPlatformMouse& GetPlatformMouse() override;
 	virtual IPlatformImageLoader& GetPlatformImageLoader() override;
+	virtual IPlatformIME& GetPlatformIME() override;
 	// ~IApplicationInterface
 
 	// IPlatformImageLoader

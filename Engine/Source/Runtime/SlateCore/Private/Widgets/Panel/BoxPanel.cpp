@@ -11,6 +11,15 @@ SBoxPanel::SBoxPanel(EOrientation Orientation) : Super()
 {
 }
 
+void SBoxPanel::SetOrientation(EOrientation Orientation)
+{
+	if (this->Orientation != Orientation)
+	{
+		this->Orientation = Orientation;
+		InvalidateLayoutAndVolatility();
+	}
+}
+
 auto SBoxPanel::AddSlot() -> SSlot&
 {
 	InvalidateLayoutAndVolatility();

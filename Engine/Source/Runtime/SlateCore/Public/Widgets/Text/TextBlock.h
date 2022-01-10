@@ -6,7 +6,6 @@
 #include "Widgets/LeafWidget.h"
 #include "Draw/SlateFont.h"
 #include "RHI/RHIEnums.h"
-#include "Threading/Task.h"
 
 interface IRHITextLayout;
 interface IRHITextFormat;

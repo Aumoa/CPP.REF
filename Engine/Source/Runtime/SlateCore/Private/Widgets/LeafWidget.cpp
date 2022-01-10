@@ -81,6 +81,18 @@ bool SLeafWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, 
     return false;
 }
 
+bool SLeafWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs)
+{
+    Super::SendIMEEvent(AllottedGeometry, EventArgs);
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    {
+        return OnReceiveIMEEvent(AllottedGeometry, EventArgs);
+    }
+
+    return false;
+}
+
 void SLeafWidget::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
 }
@@ -101,6 +113,11 @@ bool SLeafWidget::OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Ve
 }
 
 bool SLeafWidget::OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event)
+{
+    return false;
+}
+
+bool SLeafWidget::OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs)
 {
     return false;
 }

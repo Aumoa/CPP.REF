@@ -3,9 +3,14 @@
 #include "Widgets/LogConsole.h"
 #include "Widgets/Image/Image.h"
 #include "Widgets/Text/TextBlock.h"
+#include "Widgets/Text/TextBox.h"
+#include "Widgets/Layout/ScrollBox.h"
+#include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Diagnostics/LogModule.h"
 
 GENERATE_BODY(SLogConsole);
+
+DEFINE_LOG_CATEGORY(LogEditorConsole);
 
 SLogConsole::SLogConsole() : Super()
 {
@@ -39,19 +44,55 @@ DEFINE_SLATE_CONSTRUCTOR(SLogConsole, Attr)
 		.Anchors(0.0f, 0.0f, 1.0f, 1.0f)
 		.ZOrder(1.0f)
 		[
-			SAssignNew(LogText, STextBlock)
-			.TintColor(NamedColors::White)
-			.Font(L"Consolas", 12.0f)
+			SNew(SVerticalBoxPanel)
+			+SVerticalBoxPanel::SSlot()
+			.HAlignment(EHorizontalAlignment::Fill)
+			.VAlignment(EVerticalAlignment::Fill)
+			.SizeParam(ESizeRule::Stretch, 1.0f)
+			[
+				SAssignNew(ScrollBox, SScrollBox)
+				+SScrollBox::SSlot()
+				.HAlignment(EHorizontalAlignment::Fill)
+				[
+					SAssignNew(LogText, STextBlock)
+					.TintColor(NamedColors::White)
+					.Font(L"Consolas", 12.0f)
+				]
+			]
+			+SVerticalBoxPanel::SSlot()
+			.HAlignment(EHorizontalAlignment::Fill)
+			.SizeParam(ESizeRule::Auto, 1.0f)
+			[
+				SAssignNew(ConsoleInput, STextBox)
+				.TintColor(NamedColors::White)
+				.Font(L"Consolas", 12.0f)
+				.Text(L"여기에 입력")
+			]
 		];
+
+	ConsoleInput->TextCommitted.AddSObject(this, &SLogConsole::OnConsoleCommitted);
 }
 
 void SLogConsole::OnLogged(std::wstring_view Message)
 {
-	if (Stream.size() >= 10)
+	Task<>::Deferred([&, Message = std::wstring(Message), Holder = WeakPtr(this)]()
 	{
-		Stream.erase(Stream.begin());
-	}
-	Stream.emplace_back(Message);
+		if (Holder.IsValid())
+		{
+			if (!Stream.empty())
+			{
+				Stream += L"\n";
+			}
 
-	LogText->SetText(StringUtils::Join(L"\n", Stream));
+			Stream += Message;
+			LogText->SetText(Stream);
+
+			ScrollBox->ScrollToBottom();
+		}
+	});
+}
+
+void SLogConsole::OnConsoleCommitted(std::wstring_view ConsoleInput)
+{
+	SE_LOG(LogEditorConsole, Verbose, L"ConsoleInput: {}", ConsoleInput);
 }

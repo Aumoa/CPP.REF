@@ -32,7 +32,9 @@ private:
 	std::vector<SSlot*> Slots;
 
 protected:
-	SBoxPanel(EOrientation Orientation);
+	SBoxPanel(EOrientation Orientation = EOrientation::Vertical);
+
+	void SetOrientation(EOrientation InOrientation);
 
 public:
 	SSlot& AddSlot();

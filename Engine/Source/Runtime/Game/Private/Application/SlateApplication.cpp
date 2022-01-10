@@ -13,6 +13,7 @@
 #include "GameFramework/LocalPlayer.h"
 #include "Input/IPlatformKeyboard.h"
 #include "Input/IPlatformMouse.h"
+#include "Input/IPlatformIME.h"
 #include "RenderThread.h"
 #include "IApplicationInterface.h"
 
@@ -55,6 +56,9 @@ void SSlateApplication::Init(IApplicationInterface* InApplication)
 	PlatformMouse.MouseButtonPressed.AddSObject(this, &SSlateApplication::OnMouseButtonPressed);
 	PlatformMouse.MouseButtonReleased.AddSObject(this, &SSlateApplication::OnMouseButtonReleased);
 	PlatformMouse.MouseWheelScrolled.AddSObject(this, &SSlateApplication::OnMouseWheelScrolled);
+
+	auto& PlatformIME = InApplication->GetPlatformIME();
+	PlatformIME.IME.AddSObject(this, &SSlateApplication::OnIME);
 }
 
 void SSlateApplication::TickAndPaint(float InDeltaTime)
@@ -131,7 +135,12 @@ void SSlateApplication::OnMouseWheelScrolled(int32 ScrollDelta)
 	CoreWindow->SendMouseWheelScrolled(MakeRoot(), ScrollDelta);
 }
 
-Task<void> SSlateApplication::CacheRenderElements_GameThread(std::vector<IRenderSlateElement*> Elements)
+void SSlateApplication::OnIME(IMEEvent EventArgs)
+{
+	CoreWindow->SendIMEEvent(MakeRoot(), EventArgs);
+}
+
+Task<void> SSlateApplication::CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements)
 {
 	co_await RenderThread::EnqueueRenderThreadAwaiter();
 	RenderElements = std::move(Elements);
@@ -139,7 +148,7 @@ Task<void> SSlateApplication::CacheRenderElements_GameThread(std::vector<IRender
 
 Geometry SSlateApplication::MakeRoot()
 {
-	Vector2 DesiredSize = CoreWindow->GetDesiredSize();
+	Vector2 DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
 	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
 	return AllottedGeometry;
 }

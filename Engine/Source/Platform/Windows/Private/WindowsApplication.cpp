@@ -6,6 +6,7 @@
 #include "DXGIFactory.h"
 #include "Input/WindowsPlatformKeyboard.h"
 #include "Input/WindowsPlatformMouse.h"
+#include "Input/WindowsIMEController.h"
 #include "Multimedia/WindowsImage.h"
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
@@ -43,6 +44,7 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 
 	PlatformKeyboard = gcnew SWindowsPlatformKeyboard();
 	PlatformMouse = gcnew SWindowsPlatformMouse();
+	PlatformIME = gcnew SWindowsIMEController();
 }
 
 int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
@@ -273,17 +275,22 @@ IRHIFactory* SWindowsApplication::GetFactory()
 
 IPlatformKeyboard& SWindowsApplication::GetPlatformKeyboard()
 {
-	return SWindowsPlatformKeyboard::Get();
+	return *PlatformKeyboard;
 }
 
 IPlatformMouse& SWindowsApplication::GetPlatformMouse()
 {
-	return SWindowsPlatformMouse::Get();
+	return *PlatformMouse;
 }
 
 IPlatformImageLoader& SWindowsApplication::GetPlatformImageLoader()
 {
 	return *this;
+}
+
+IPlatformIME& SWindowsApplication::GetPlatformIME()
+{
+	return *PlatformIME;
 }
 
 IPlatformImage* SWindowsApplication::CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat)
@@ -402,6 +409,10 @@ LRESULT CALLBACK SWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+	case WM_CHAR:
+	case WM_IME_CHAR:
+		SWindowsIMEController::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	}
 

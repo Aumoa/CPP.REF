@@ -666,9 +666,6 @@ void SD3D12Device::AllocateCommandQueue()
 void SD3D12Device::CreateInteropDevice()
 {
 	UINT deviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#if defined(_DEBUG)
-	deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
 
 	ID3D12CommandQueue* primaryQueue = _immCon->Get<ID3D12CommandQueue>();
 	IUnknown** ppQueues = reinterpret_cast<IUnknown**>(&primaryQueue);
@@ -679,9 +676,6 @@ void SD3D12Device::CreateInteropDevice()
 	HR(_interop.InteropDevice.As(&dxgiDevice));
 
 	D2D1_DEBUG_LEVEL DebugLevel = D2D1_DEBUG_LEVEL_NONE;
-#if defined(_DEBUG)
-	DebugLevel = D2D1_DEBUG_LEVEL_WARNING;
-#endif
 
 	HR(D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_MULTI_THREADED, DebugLevel, D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS), &_interop.Device2D));
 	HR(_interop.Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, &_interop.DeviceContext2D));

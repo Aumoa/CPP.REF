@@ -6,6 +6,7 @@
 #include "DeclarativeSyntaxSupports.h"
 #include "SlotBase.h"
 #include "Layout/Layout.h"
+#include "Input/IMEEvent.h"
 
 interface IRHIDevice;
 class SSlateDrawCollector;
@@ -58,10 +59,11 @@ public:
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
 	inline bool HasRenderTransform() { return bHasRenderTransform; }
 
-	virtual bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location) = 0;
-	virtual bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) = 0;
-	virtual bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) = 0;
-	virtual bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) = 0;
+	virtual bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location);
+	virtual bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta);
+	virtual bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event);
+	virtual bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event);
+	virtual bool SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs);
 
 protected:
 	virtual void PostConstruction() override;
@@ -74,6 +76,7 @@ protected:
 	virtual bool OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) = 0;
 	virtual bool OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) = 0;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) = 0;
+	virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) = 0;
 	
 	bool IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget& ArrangedChild);
 	bool ShouldBeEnabled(bool bParentEnabled);

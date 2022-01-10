@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Widgets/Panel/CanvasPanel.h"
 
+class SScrollBox;
 class STextBlock;
+class STextBox;
 
 class EDITOR_API SLogConsole : public SCanvasPanel
 {
@@ -25,11 +27,16 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 private:
+	SPROPERTY(ScrollBox)
+	SScrollBox* ScrollBox = nullptr;
 	SPROPERTY(LogText)
 	STextBlock* LogText = nullptr;
-	std::list<std::wstring> Stream;
+	SPROPERTY(ConsoleInput)
+	STextBox* ConsoleInput = nullptr;
+	std::wstring Stream;
 
 private:
 	void UpdateLogText();
 	void OnLogged(std::wstring_view Message);
+	void OnConsoleCommitted(std::wstring_view ConsoleInput);
 };

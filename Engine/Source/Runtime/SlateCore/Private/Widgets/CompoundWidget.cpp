@@ -157,6 +157,32 @@ bool SCompoundWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey K
     return false;
 }
 
+bool SCompoundWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs)
+{
+    Super::SendIMEEvent(AllottedGeometry, EventArgs);
+
+    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    {
+        ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+        ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+        for (auto& Arranged : ArrangedChildren.GetWidgets())
+        {
+            if (Arranged.GetWidget()->SendIMEEvent(Arranged.GetGeometry(), EventArgs))
+            {
+                return true;
+            }
+        }
+    }
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    {
+        return OnReceiveIMEEvent(AllottedGeometry, EventArgs);
+    }
+
+    return false;
+}
+
 int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
 	ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
@@ -240,6 +266,22 @@ bool SCompoundWidget::OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, E
     for (auto& ArrangedWidget : ArrangedChildren.GetWidgets())
     {
         if (ArrangedWidget.GetWidget()->SendKeyboardEvent(ArrangedWidget.GetGeometry(), Key, Event))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool SCompoundWidget::OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs)
+{
+    ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+    ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+    for (auto& ArrangedWidget : ArrangedChildren.GetWidgets())
+    {
+        if (ArrangedWidget.GetWidget()->SendIMEEvent(ArrangedWidget.GetGeometry(), EventArgs))
         {
             return true;
         }

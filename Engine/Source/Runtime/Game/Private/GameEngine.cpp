@@ -30,9 +30,7 @@ SGameEngine::SGameEngine() : Super()
 bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 {
 	GEngine = this;
-
-	// CollectGarbageEveryFrame = false
-	GC.SetFlushInterval(60);
+	Thread::GetCurrentThread()->SetFriendlyName(L"[Game Thread]");
 
 	SlateApplication = CreateSlateApplication();
 	SlateApplication->Init(InApplication);
@@ -40,7 +38,6 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	InitializeSubsystems();
 	CoreDelegates::PostEngineInit.Broadcast();
 
-	Thread::GetCurrentThread()->SetFriendlyName(L"[Game Thread]");
 	return true;
 }
 

@@ -98,17 +98,17 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 			Renderer.EndDraw();
 		}
 
+		// END OF 3D RENDERING.
+		RenderContext->End();
+		PrimaryQueue->ExecuteCommandList(RenderContext);
+
 		{
 			DeviceContext2D->SetTarget(ColorRenderTarget->GetRenderBitmap());
 			SlateApp->DrawElements(DeviceContext2D, SlateRenderer);
 		}
 
-		// END OF 3D RENDERING.
-		RenderContext->End();
+		// Execute 2D commands in ordering.
 		DeviceContext2D->EndDraw();
-
-		// Execute 3D commands and 2D commands in ordering.
-		PrimaryQueue->ExecuteCommandList(RenderContext);
 		Device->FlushCommands();
 
 		// Postprocess.

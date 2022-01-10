@@ -126,6 +126,11 @@ bool SWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKey
     return false;
 }
 
+bool SWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs)
+{
+    return false;
+}
+
 void SWidget::PostConstruction()
 {
     Super::PostConstruction();

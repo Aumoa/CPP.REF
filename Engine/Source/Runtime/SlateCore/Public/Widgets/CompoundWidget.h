@@ -19,6 +19,7 @@ public:
 	virtual bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) override;
 	virtual bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
 	virtual bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
+	virtual bool SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
 
 	virtual size_t NumChildrens() = 0;
 	virtual SWidget* GetChildrenAt(size_t IndexOf) = 0;
@@ -32,4 +33,5 @@ protected:
 	virtual bool OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) override;
 	virtual bool OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
 	virtual bool OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
+	virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
 };
