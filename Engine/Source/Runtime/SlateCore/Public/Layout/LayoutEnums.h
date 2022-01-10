@@ -30,7 +30,6 @@ enum class EWidgetClipping
 {
 	Inherit,
 	ClipToBounds,
-	ClipToBoundsWithoutIntersection,
 };
 
 enum class EHorizontalAlignment

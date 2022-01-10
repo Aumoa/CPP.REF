@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Layout/Layout.h"
 #include "Threading/Task.h"
+#include "Draw/SlateDrawCollector.h"
 
 interface IRHIDevice;
 interface IApplicationInterface;
@@ -35,9 +36,9 @@ private:
 	SSlateDrawCollector* DrawCollector = nullptr;
 
 	SPROPERTY(CachedElements)
-	std::vector<IRenderSlateElement*> CachedElements;
+	std::vector<SSlateDrawCollector::RenderElement> CachedElements;
 	SPROPERTY(RenderElements)
-	std::vector<IRenderSlateElement*> RenderElements;
+	std::vector<SSlateDrawCollector::RenderElement> RenderElements;
 
 public:
 	SSlateApplication();
@@ -62,6 +63,6 @@ private:
 	void OnMouseButtonReleased(Vector2N Location, EMouseButton Button);
 	void OnMouseWheelScrolled(int32 ScrollDelta);
 
-	Task<void> CacheRenderElements_GameThread(std::vector<IRenderSlateElement*> Elements);
+	Task<void> CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements);
 	Geometry MakeRoot();
 };

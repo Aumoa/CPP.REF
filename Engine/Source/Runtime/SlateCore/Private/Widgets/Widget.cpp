@@ -6,6 +6,7 @@
 #include "Input/IPlatformMouse.h"
 #include "Animation/SlateAnimationPlayer.h"
 #include "Animation/SlateAnimationContext.h"
+#include "Draw/SlateDrawCollector.h"
 
 GENERATE_BODY(SWidget);
 
@@ -31,7 +32,19 @@ std::wstring SWidget::GetName()
 
 int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
-	return OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer, bParentEnabled);
+    if (Clipping == EWidgetClipping::ClipToBounds)
+    {
+        DrawCollector->PushClipLayer(AllottedGeometry);
+    }
+
+	int32 Layer = OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer, bParentEnabled);
+
+    if (Clipping == EWidgetClipping::ClipToBounds)
+    {
+        DrawCollector->PopClipLayer();
+    }
+
+    return Layer;
 }
 
 void SWidget::ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry)
@@ -95,47 +108,21 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 bool SWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
 {
     CachedMouseLocation = Location.Cast<float>();
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
-    {
-        return OnReceiveMouseMoved(AllottedGeometry, Location);
-    }
-
     return false;
 }
 
 bool SWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta)
 {
-    auto& PlatformMouse = IApplicationInterface::Get().GetPlatformMouse();
-    auto State = PlatformMouse.GetState();
-    Vector2 CursorPos = Vector2((float)State.X, (float)State.Y);
-
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(CursorPos))
-    {
-        return OnReceiveMouseWheelScrolled(AllottedGeometry, ScrollDelta);
-    }
-
     return false;
 }
 
 bool SWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event)
 {
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
-    {
-        return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
-    }
-
     return false;
 }
 
 bool SWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event)
 {
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
-    {
-        return OnReceiveKeyboardEvent(AllottedGeometry, Key, Event);
-    }
-
     return false;
 }
 
@@ -166,13 +153,6 @@ bool SWidget::IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget&
     //    and therefore not ticked or painted.  The best way around this for now seems to be to simply
     //    check both rects to see if either one is overlapping the culling volume.
     if (TransformCalculus2D::IsIntersect(CullingRect, ArrangedChild.GetGeometry().GetLayoutBoundingRect()))
-    {
-        return false;
-    }
-
-    // There's a special condition if the widget's clipping state is set does not intersect with clipping bounds, they in effect
-    // will be setting a new culling rect, so let them pass being culling from this step.
-    if (ArrangedChild.GetWidget()->GetClipping() == EWidgetClipping::ClipToBoundsWithoutIntersection)
     {
         return false;
     }

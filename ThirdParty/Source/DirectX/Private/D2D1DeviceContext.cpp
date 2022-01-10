@@ -102,6 +102,16 @@ void SD2D1DeviceContext::DrawBitmap(IRHIBitmap* Bitmap, const Rect* DestRect, fl
 	DeviceContext->DrawBitmap(Bitmap_r, (const D2D1_RECT_F*)DestRect, Opacity, (D2D1_INTERPOLATION_MODE)InterpolationMode, (const D2D1_RECT_F*)SourceRect, (const D2D1_MATRIX_4X4_F*)PerspectiveTransform);
 }
 
+void SD2D1DeviceContext::PushAxisAlignedClip(const Rect& ClipRect)
+{
+	DeviceContext->PushAxisAlignedClip((const D2D1_RECT_F*)&ClipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+}
+
+void SD2D1DeviceContext::PopAxisAlignedClip()
+{
+	DeviceContext->PopAxisAlignedClip();
+}
+
 void SD2D1DeviceContext::Dispose(bool bDisposing)
 {
 	InteropDev.Reset();

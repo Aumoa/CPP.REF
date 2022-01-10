@@ -3,6 +3,8 @@
 #include "Widgets/CompoundWidget.h"
 #include "Draw/PaintArgs.h"
 #include "Layout/ArrangedChildrens.h"
+#include "IApplicationInterface.h"
+#include "Input/IPlatformMouse.h"
 
 GENERATE_BODY(SCompoundWidget);
 
@@ -43,6 +45,116 @@ bool SCompoundWidget::PrepassLayout()
     }
 
     return Super::PrepassLayout() || bShouldBePrepass;
+}
+
+bool SCompoundWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
+{
+    Super::SendMouseMoved(AllottedGeometry, Location);
+
+    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    {
+        ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+        ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+        for (auto& Arranged : ArrangedChildren.GetWidgets())
+        {
+            if (Arranged.GetWidget()->SendMouseMoved(Arranged.GetGeometry(), Location))
+            {
+                return true;
+            }
+        }
+    }
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    {
+        return OnReceiveMouseMoved(AllottedGeometry, Location);
+    }
+
+    return false;
+}
+
+bool SCompoundWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta)
+{
+    Super::SendMouseWheelScrolled(AllottedGeometry, ScrollDelta);
+
+    auto& PlatformMouse = IApplicationInterface::Get().GetPlatformMouse();
+    auto State = PlatformMouse.GetState();
+    Vector2 CursorPos = Vector2((float)State.X, (float)State.Y);
+
+    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    {
+        ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+        ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+        for (auto& Arranged : ArrangedChildren.GetWidgets())
+        {
+            if (Arranged.GetWidget()->SendMouseWheelScrolled(Arranged.GetGeometry(), ScrollDelta))
+            {
+                return true;
+            }
+        }
+    }
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(CursorPos))
+    {
+        return OnReceiveMouseWheelScrolled(AllottedGeometry, ScrollDelta);
+    }
+
+    return false;
+}
+
+bool SCompoundWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event)
+{
+    Super::SendMouseEvent(AllottedGeometry, Location, Button, Event);
+
+    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    {
+        ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+        ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+        for (auto& Arranged : ArrangedChildren.GetWidgets())
+        {
+            if (Arranged.GetWidget()->SendMouseEvent(Arranged.GetGeometry(), Location, Button, Event))
+            {
+                return true;
+            }
+        }
+    }
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
+    {
+        return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
+    }
+
+    return false;
+}
+
+bool SCompoundWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event)
+{
+    Super::SendKeyboardEvent(AllottedGeometry, Key, Event);
+
+    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    {
+        ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+        ArrangeChildren(ArrangedChildren, AllottedGeometry);
+
+        for (auto& Arranged : ArrangedChildren.GetWidgets())
+        {
+            if (Arranged.GetWidget()->SendKeyboardEvent(Arranged.GetGeometry(), Key, Event))
+            {
+                return true;
+            }
+        }
+    }
+
+    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    {
+        return OnReceiveKeyboardEvent(AllottedGeometry, Key, Event);
+    }
+
+    return false;
 }
 
 int32 SCompoundWidget::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)

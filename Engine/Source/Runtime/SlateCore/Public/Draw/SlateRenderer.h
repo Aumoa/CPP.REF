@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Draw/SlateDrawCollector.h"
 
 interface IRHIDeviceContext2D;
 interface IRHISolidColorBrush;
 interface IRenderSlateElement;
-class SSlateDrawCollector;
 
 class SLATECORE_API SSlateRenderer : implements SObject
 {
@@ -16,5 +16,5 @@ class SLATECORE_API SSlateRenderer : implements SObject
 public:
 	SSlateRenderer();
 
-	void PopulateCommands(IRHIDeviceContext2D* CommandList, std::vector<IRenderSlateElement*>& Collector);
+	void PopulateCommands(IRHIDeviceContext2D* CommandList, std::vector<SSlateDrawCollector::RenderElement>& Collector);
 };

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "IRenderSlateElement.h"
+#include "Layout/Layout.h"
 
 interface IRenderSlateElement;
 
@@ -10,14 +12,37 @@ class SLATECORE_API SSlateDrawCollector : implements SObject
 {
 	GENERATED_BODY(SSlateDrawCollector)
 
+public:
+	enum class EElementType
+	{
+		RenderElement,
+		PushClipLayer,
+		PopClipLayer,
+	};
+
+	struct RenderElement
+	{
+		GENERATED_STRUCT_BODY(RenderElement)
+
+	public:
+		EElementType ElementType;
+
+		SPROPERTY(Element)
+		IRenderSlateElement* Element = nullptr;
+		std::optional<Geometry> AllottedGeometry;
+	};
+
 private:
 	SPROPERTY(Elements)
-	std::vector<IRenderSlateElement*> Elements;
+	std::vector<RenderElement> Elements;
 
 public:
 	SSlateDrawCollector();
 
 	void AddRenderElement(IRenderSlateElement* Element);
+	void PushClipLayer(const Geometry& ClipGeometry);
+	void PopClipLayer();
+
 	void SortByLayer();
-	void FlushElements(std::vector<IRenderSlateElement*>& SwapElements);
+	void FlushElements(std::vector<RenderElement>& SwapElements);
 };

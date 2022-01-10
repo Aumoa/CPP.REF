@@ -15,6 +15,11 @@ public:
 	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
 	virtual bool PrepassLayout() override;
 
+	virtual bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location) override;
+	virtual bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) override;
+	virtual bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
+	virtual bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
+
 	virtual size_t NumChildrens() = 0;
 	virtual SWidget* GetChildrenAt(size_t IndexOf) = 0;
 

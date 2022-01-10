@@ -58,10 +58,10 @@ public:
 	SlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
 	inline bool HasRenderTransform() { return bHasRenderTransform; }
 
-	bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location);
-	bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta);
-	bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event);
-	bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event);
+	virtual bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location) = 0;
+	virtual bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) = 0;
+	virtual bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) = 0;
+	virtual bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) = 0;
 
 protected:
 	virtual void PostConstruction() override;
@@ -87,7 +87,7 @@ public:
 	DECLARE_MULTICAST_EVENT(VisibilityChangedEvent, ESlateVisibility);
 	VisibilityChangedEvent VisibilityChanged;
 
-public:					
+public:
 	BEGIN_SLATE_ATTRIBUTE
 		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility, Visibility, ESlateVisibility::Visible)
 		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection, EFlowDirection::LeftToRight)

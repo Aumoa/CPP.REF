@@ -32,6 +32,8 @@ public:
 	virtual void DrawTextLayout(const Vector2& DrawOrigin, IRHITextLayout* Layout, IRHIBrush* InBrush, ERHIDrawTextOptions Options = ERHIDrawTextOptions::None) override;
 	virtual void DrawImage(IRHIImage* Image, const Vector2* Offset, const Rect* SourceRect, ERHIInterpolationMode InterpolationMode = ERHIInterpolationMode::NearestNeighbor, ERHICompositeMode CompositeMode = ERHICompositeMode::SourceOver) override;
 	virtual void DrawBitmap(IRHIBitmap* Bitmap, const Rect* DestRect, float Opacity = 1.0f, ERHIInterpolationMode InterpolationMode = ERHIInterpolationMode::NearestNeighbor, const Rect* SourceRect = nullptr, const Matrix4x4* PerspectiveTransform = nullptr) override;
+	virtual void PushAxisAlignedClip(const Rect& ClipRect) override;
+	virtual void PopAxisAlignedClip() override;
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

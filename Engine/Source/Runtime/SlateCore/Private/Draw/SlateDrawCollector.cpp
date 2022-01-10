@@ -11,20 +11,59 @@ SSlateDrawCollector::SSlateDrawCollector()
 
 void SSlateDrawCollector::AddRenderElement(IRenderSlateElement* Element)
 {
-	Elements.emplace_back(Element);
+	RenderElement Elem;
+	Elem.ElementType = EElementType::RenderElement;
+	Elem.Element = Element;
+
+	Elements.emplace_back(Elem);
+}
+
+void SSlateDrawCollector::PushClipLayer(const Geometry& ClipGeometry)
+{
+	RenderElement Elem;
+	Elem.ElementType = EElementType::PushClipLayer;
+	Elem.AllottedGeometry = ClipGeometry;
+
+	Elements.emplace_back(Elem);
+}
+
+void SSlateDrawCollector::PopClipLayer()
+{
+	RenderElement Elem;
+	Elem.ElementType = EElementType::PopClipLayer;
+
+	Elements.emplace_back(Elem);
 }
 
 void SSlateDrawCollector::SortByLayer()
 {
-	auto AscendSorter = [](IRenderSlateElement* Lhs, IRenderSlateElement* Rhs)
+	auto AscendSorter = [](RenderElement& Lhs, RenderElement& Rhs)
 	{
-		return Lhs->GetLayer() < Rhs->GetLayer();
+		return Lhs.Element->GetLayer() < Rhs.Element->GetLayer();
 	};
 
-	std::sort(Elements.begin(), Elements.end(), AscendSorter);
+	auto Beg = Elements.begin();
+	for (auto It = Elements.begin(); It != Elements.end(); ++It)
+	{
+		if (It->ElementType != EElementType::RenderElement)
+		{
+			auto End = It;
+			if (End != Beg)
+			{
+				--End;
+				size_t NumSorts = End - Beg;
+				if (End - Beg > 1)
+				{
+					std::sort(Beg, End, AscendSorter);
+				}
+			}
+			Beg = It;
+			std::advance(Beg, 1);
+		}
+	}
 }
 
-void SSlateDrawCollector::FlushElements(std::vector<IRenderSlateElement*>& SwapElements)
+void SSlateDrawCollector::FlushElements(std::vector<RenderElement>& SwapElements)
 {
 	std::swap(SwapElements, Elements);
 }

@@ -15,6 +15,11 @@ public:
 
 	virtual bool PrepassLayout() override;
 
+	virtual bool SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location) override;
+	virtual bool SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) override;
+	virtual bool SendMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
+	virtual bool SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
+
 protected:
 	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 
