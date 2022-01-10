@@ -26,7 +26,7 @@ private:
 	}
 
 public:
-	template<size_t RunnerNumber = 0, class _Fn>
+	template<class _Fn>
 	static DeferredTask Run(_Fn&& Body)
 	{
 		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
@@ -45,7 +45,7 @@ public:
 			}
 		}));
 
-		DeferredTaskRunner<RunnerNumber>::RegisterRunner(Awaiter.get());
+		DeferredTaskRunner::RegisterRunner(Awaiter.get());
 		return DeferredTask(std::move(Awaiter));
 	}
 };

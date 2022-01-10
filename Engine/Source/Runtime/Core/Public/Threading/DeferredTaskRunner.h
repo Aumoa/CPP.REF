@@ -5,14 +5,13 @@
 #include "CoreMinimal.h"
 #include <future>
 
-template<size_t Number = 0>
-class DeferredTaskRunner
+class CORE_API DeferredTaskRunner
 {
 	DeferredTaskRunner() = delete;
 
 private:
-	inline static std::vector<std::future<void>> Runners;
-	inline static std::vector<std::future<void>> Runners_Back;
+	static std::vector<std::future<void>> Runners;
+	static std::vector<std::future<void>> Runners_Back;
 
 public:
 	template<class DeferredAwaiter>
@@ -24,13 +23,5 @@ public:
 		Runners_Back.emplace_back(Awaiter->GetRunner());
 	}
 
-	static void Run()
-	{
-		std::swap(Runners, Runners_Back);
-		for (auto& Runner : Runners)
-		{
-			Runner.get();
-		}
-		Runners.clear();
-	}
+	static void Run();
 };
