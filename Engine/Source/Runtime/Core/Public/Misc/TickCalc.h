@@ -46,44 +46,31 @@ public:
 
 	float GetAverageSeconds() const
 	{
-		size_t Samples = ElapsedSeconds.size();
-		if (Samples)
-		{
-			float Avg = std::accumulate(ElapsedSeconds.begin(), ElapsedSeconds.end(), 0.0f);
-			return Avg / Samples;
-		}
-		else
-		{
-			return 0;
-		}
+		return AvgTime;
 	}
 
 	float GetAverageFPS() const
 	{
-		float Avg = GetAverageSeconds();
-		if (Avg == 0)
-		{
-			return 0;
-		}
-		else
-		{
-			return 1.0f / Avg;
-		}
+		return AvgFPS;
 	}
 
 private:
-	std::list<float> ElapsedSeconds;
+	uint64 Ticks = 0;
 	float ElapsedTime = 0;
+
+	float AvgTime = 0;
+	float AvgFPS = 0;
 
 	void AddTime(float InElapsedSeconds)
 	{
-		ElapsedSeconds.emplace_back(InElapsedSeconds);
 		ElapsedTime += InElapsedSeconds;
+		++Ticks;
 
 		if (ElapsedTime > 1.0f)
 		{
-			ElapsedTime -= ElapsedSeconds.front();
-			ElapsedSeconds.erase(ElapsedSeconds.begin());
+			AvgTime = ElapsedTime / Ticks;
+			AvgFPS = Ticks * ElapsedTime;
+			ElapsedTime = 0;
 		}
 	}
 };
