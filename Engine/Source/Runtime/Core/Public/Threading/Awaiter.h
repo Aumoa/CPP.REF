@@ -9,13 +9,23 @@
 
 namespace Threading::Tasks
 {
+	enum class EStatus
+	{
+		Running,
+		Completed,
+		Canceled,
+	};
+
 	template<class T>
 	class Awaiter
 	{
 		std::mutex Mutex;
 		std::condition_variable Cvar;
 		VoidableOptional<T> Value;
+		bool bCancel = false;
+
 		std::vector<VoidableFunction<T>> ThenProc;
+		std::vector<std::function<void()>> ElseProc;
 
 	public:
 		using ReturnType = T;
@@ -27,12 +37,12 @@ namespace Threading::Tasks
 
 		bool IsReady() const
 		{
-			return Value.has_value();
+			return !bCancel && Value.has_value();
 		}
 
 		void Wait()
 		{
-			if (!Value.has_value())
+			if (!bCancel && !Value.has_value())
 			{
 				std::unique_lock Mutex_lock(Mutex);
 				Cvar.wait(Mutex_lock);
@@ -42,7 +52,24 @@ namespace Threading::Tasks
 		T GetValue()
 		{
 			Wait();
+			check(!bCancel);
 			return Value.value();
+		}
+
+		EStatus GetStatus() const
+		{
+			if (bCancel)
+			{
+				return EStatus::Canceled;
+			}
+			else if (Value.has_value())
+			{
+				return EStatus::Completed;
+			}
+			else
+			{
+				return EStatus::Running;
+			}
 		}
 
 		void Then(VoidableFunction<T> Proc)
@@ -66,28 +93,31 @@ namespace Threading::Tasks
 			}
 		}
 
-		template<class U>
-		void SetValue(U&& Value) requires (!std::same_as<T, void>)
+		void Else(std::function<void()> Proc)
 		{
 			std::unique_lock Mutex_lock(Mutex);
-			this->Value.emplace(std::forward<U>(Value));
-			Cvar.notify_all();
-
-			std::vector<VoidableFunction<T>> Procedures;
-			std::swap(Procedures, ThenProc);
-			Mutex_lock.unlock();
-
-			for (auto& Proc : Procedures)
+			if (bCancel)
 			{
-				Proc(*this->Value);
+				Mutex_lock.unlock();
+				Proc();
+			}
+			else
+			{
+				ElseProc.emplace_back(std::move(Proc));
 			}
 		}
 
-		void SetValue() requires (std::same_as<T, void>)
+		template<class... U>
+		void SetValue(U&&... Value)
 		{
 			std::unique_lock Mutex_lock(Mutex);
-			this->Value.emplace();
+			this->Value.emplace(Value...);
 			Cvar.notify_all();
+
+			if (bCancel)
+			{
+				return;
+			}
 
 			std::vector<VoidableFunction<T>> Procedures;
 			std::swap(Procedures, ThenProc);
@@ -95,8 +125,33 @@ namespace Threading::Tasks
 
 			for (auto& Proc : Procedures)
 			{
-				Proc();
+				Proc(Value...);
 			}
+		}
+
+		bool Cancel()
+		{
+			std::unique_lock Mutex_lock(Mutex);
+			if (!bCancel)
+			{
+				if (Value.has_value())
+				{
+					return false;
+				}
+
+				bCancel = true;
+
+				std::vector<std::function<void()>> Procedures;
+				std::swap(Procedures, ElseProc);
+				Mutex_lock.unlock();
+
+				for (auto& Proc : Procedures)
+				{
+					Proc();
+				}
+			}
+
+			return true;
 		}
 
 	public:
@@ -108,20 +163,33 @@ namespace Threading::Tasks
 		template<class TCoroutineHandle>
 		void await_suspend(TCoroutineHandle Coroutine) noexcept
 		{
+			auto Awaiter = Coroutine.promise().Awaiter;
+
 			if constexpr (std::same_as<T, void>)
 			{
-				Then([Coroutine = std::move(Coroutine)]()
+				Then([Coroutine, Awaiter]()
 				{
-					Coroutine.resume();
+					if (Awaiter->GetStatus() != EStatus::Canceled)
+					{
+						Coroutine.resume();
+					}
 				});
 			}
 			else
 			{
-				Then([Coroutine = std::move(Coroutine)](T)
+				Then([Coroutine, Awaiter](T)
 				{
-					Coroutine.resume();
+					if (Awaiter->GetStatus() != EStatus::Canceled)
+					{
+						Coroutine.resume();
+					}
 				});
 			}
+
+			Else([Coroutine, Awaiter]()
+			{
+				Awaiter->Cancel();
+			});
 		}
 
 		T await_resume() noexcept

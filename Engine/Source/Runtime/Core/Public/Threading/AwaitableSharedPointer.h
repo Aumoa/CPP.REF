@@ -22,7 +22,8 @@ namespace Threading::Tasks
 			return Ptr->await_ready();
 		}
 
-		void await_suspend(std::coroutine_handle<> Coroutine) const noexcept
+		template<class TCoroutine>
+		void await_suspend(TCoroutine Coroutine) const noexcept
 		{
 			Ptr->await_suspend(std::move(Coroutine));
 		}
@@ -30,6 +31,11 @@ namespace Threading::Tasks
 		T await_resume() const noexcept
 		{
 			return Ptr->await_resume();
+		}
+
+		Awaiter<T>* operator ->() const
+		{
+			return Ptr.get();
 		}
 	};
 }

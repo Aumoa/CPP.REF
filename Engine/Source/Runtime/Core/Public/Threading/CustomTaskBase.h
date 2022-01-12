@@ -46,9 +46,19 @@ public:
 		return Awaiter->GetValue();
 	}
 
+	Threading::Tasks::EStatus GetStatus() const
+	{
+		return Awaiter->GetStatus();
+	}
+
 	std::shared_ptr<MyAwaiter> GetAwaiter() const
 	{
 		return Awaiter;
+	}
+
+	bool Cancel()
+	{
+		return Awaiter->Cancel();
 	}
 
 	CustomTaskBase& operator =(CustomTaskBase&& Rhs)
@@ -71,6 +81,12 @@ public:
 	template<class _Fn>
 	auto Then(_Fn&& Body)
 	{
-		return Task<T>(GetAwaiter()).Then(std::forward<_Fn>(Body));
+		return Task<T>(Awaiter).Then(std::forward<_Fn>(Body));
+	}
+
+	template<class _Fn>
+	void Else(_Fn&& Body)
+	{
+		Awaiter->Else(std::forward<_Fn>(Body));
 	}
 };

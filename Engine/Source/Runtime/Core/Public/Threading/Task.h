@@ -90,6 +90,10 @@ private:
 		: Coroutine(CoroutineHandle::from_promise(Awaitable))
 		, Awaiter(Awaitable.Awaiter)
 	{
+		Else([this]()
+		{
+			Coroutine->destroy();
+		});
 	}
 
 public:
@@ -132,9 +136,19 @@ public:
 		return Awaiter->GetValue();
 	}
 
+	Threading::Tasks::EStatus GetStatus() const
+	{
+		return Awaiter->GetStatus();
+	}
+
 	std::shared_ptr<MyAwaiter> GetAwaiter() const
 	{
 		return Awaiter;
+	}
+
+	bool Cancel()
+	{
+		return Awaiter->Cancel();
 	}
 
 	Task& operator =(Task&& Rhs)
@@ -165,7 +179,7 @@ public:
 
 		if constexpr (std::same_as<T, void>)
 		{
-			Awaiter->Then([Body = std::move(Body), NewAwaiter]() -> void
+			Awaiter->Then([Body = std::forward(Body), NewAwaiter]() -> void
 			{
 				if constexpr (std::same_as<ReturnType, void>)
 				{
@@ -181,7 +195,7 @@ public:
 		}
 		else
 		{
-			Awaiter->Then([Body = std::move(Body), NewAwaiter](T Result) -> void
+			Awaiter->Then([Body = std::forward(Body), NewAwaiter](T Result) -> void
 			{
 				if constexpr (std::same_as<ReturnType, void>)
 				{
@@ -197,5 +211,11 @@ public:
 		}
 
 		return Task<ReturnType>(std::move(NewAwaiter));
+	}
+
+	template<class _Fn>
+	void Else(_Fn&& Body)
+	{
+		Awaiter->Else(std::forward<_Fn>(Body));
 	}
 };
