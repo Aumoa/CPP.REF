@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AwaiterBase.h"
+#include "Awaiter.h"
 #include "Task.h"
 #include <memory>
 
@@ -17,9 +17,7 @@ class CustomTaskBase
 	CustomTaskBase& operator =(const CustomTaskBase&) = delete;
 
 protected:
-	class MyAwaiter : public Threading::Tasks::AwaiterBase<T>
-	{
-	};
+	using MyAwaiter = Threading::Tasks::Awaiter<T>;
 
 private:
 	std::shared_ptr<MyAwaiter> Awaiter;
@@ -48,7 +46,7 @@ public:
 		return Awaiter->GetValue();
 	}
 
-	std::shared_ptr<IAwaitable<T>> GetAwaiter() const
+	std::shared_ptr<MyAwaiter> GetAwaiter() const
 	{
 		return Awaiter;
 	}

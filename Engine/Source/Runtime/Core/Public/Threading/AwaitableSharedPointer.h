@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "IAwaitable.h"
+#include "Awaiter.h"
 
 namespace Threading::Tasks
 {
 	template<class T>
 	class AwaitableSharedPointer
 	{
-		std::shared_ptr<IAwaitable<T>> Ptr;
+		std::shared_ptr<Awaiter<T>> Ptr;
 
 	public:
-		AwaitableSharedPointer(std::shared_ptr<IAwaitable<T>> Ptr) : Ptr(std::move(Ptr))
+		AwaitableSharedPointer(std::shared_ptr<Awaiter<T>> Ptr) : Ptr(std::move(Ptr))
 		{
 		}
 

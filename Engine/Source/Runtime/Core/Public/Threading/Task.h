@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AwaiterBase.h"
+#include "Awaiter.h"
 #include "AwaitableSharedPointer.h"
 #include <coroutine>
 #include <memory>
@@ -18,9 +18,7 @@ class Task
 	Task& operator =(const Task&) = delete;
 
 private:
-	class MyAwaiter : public Threading::Tasks::AwaiterBase<T>
-	{
-	};
+	using MyAwaiter = Threading::Tasks::Awaiter<T>;
 
 public:
 	template<class U, class _Void = void>
@@ -85,7 +83,7 @@ private:
 
 private:
 	std::optional<CoroutineHandle> Coroutine;
-	std::shared_ptr<IAwaitable<T>> Awaiter;
+	std::shared_ptr<MyAwaiter> Awaiter;
 
 private:
 	Task(promise_type& Awaitable)
@@ -105,7 +103,7 @@ public:
 	{
 	}
 
-	Task(std::shared_ptr<IAwaitable<T>> Awaiter)
+	Task(std::shared_ptr<MyAwaiter> Awaiter)
 		: Awaiter(std::move(Awaiter))
 	{
 	}
@@ -113,7 +111,7 @@ public:
 	template<class TTask>
 	Task(TTask&& OtherTask) requires requires
 	{
-		{ OtherTask.GetAwaiter() } -> std::same_as<std::shared_ptr<IAwaitable<T>>>;
+		{ OtherTask.GetAwaiter() } -> std::same_as<std::shared_ptr<MyAwaiter>>;
 	}
 		: Awaiter(OtherTask.GetAwaiter())
 	{
@@ -134,7 +132,7 @@ public:
 		return Awaiter->GetValue();
 	}
 
-	std::shared_ptr<IAwaitable<T>> GetAwaiter() const
+	std::shared_ptr<MyAwaiter> GetAwaiter() const
 	{
 		return Awaiter;
 	}

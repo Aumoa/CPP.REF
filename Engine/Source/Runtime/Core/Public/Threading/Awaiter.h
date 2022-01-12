@@ -3,35 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "IAwaitable.h"
 #include "VoidableOptional.h"
+#include "VoidableFunction.h"
 #include <coroutine>
 
 namespace Threading::Tasks
 {
 	template<class T>
-	class AwaiterBase : public IAwaitable<T>
+	class Awaiter
 	{
 		std::mutex Mutex;
 		std::condition_variable Cvar;
 		VoidableOptional<T> Value;
-		std::vector<std::function<void(T)>> ThenProc;
-		std::future<void> Runner;
+		std::vector<VoidableFunction<T>> ThenProc;
 
 	public:
 		using ReturnType = T;
 
 	public:
-		AwaiterBase()
+		Awaiter()
 		{
 		}
 
-		virtual bool IsReady() const override
+		bool IsReady() const
 		{
 			return Value.has_value();
 		}
 
-		virtual void Wait() override
+		void Wait()
 		{
 			if (!Value.has_value())
 			{
@@ -40,13 +39,13 @@ namespace Threading::Tasks
 			}
 		}
 
-		virtual T GetValue() override
+		T GetValue()
 		{
 			Wait();
 			return Value.value();
 		}
 
-		virtual void Then(std::function<void(T)> Proc) override
+		void Then(VoidableFunction<T> Proc)
 		{
 			std::unique_lock Mutex_lock(Mutex);
 			if (Value.has_value())
@@ -67,16 +66,6 @@ namespace Threading::Tasks
 			}
 		}
 
-		virtual void SetRunner(std::future<void> Runner) override
-		{
-			this->Runner = std::move(Runner);
-		}
-
-		virtual std::future<void> GetRunner() override
-		{
-			return std::move(this->Runner);
-		}
-
 		template<class U>
 		void SetValue(U&& Value) requires (!std::same_as<T, void>)
 		{
@@ -84,7 +73,7 @@ namespace Threading::Tasks
 			this->Value.emplace(std::forward<U>(Value));
 			Cvar.notify_all();
 
-			std::vector<std::function<void(T)>> Procedures;
+			std::vector<VoidableFunction<T>> Procedures;
 			std::swap(Procedures, ThenProc);
 			Mutex_lock.unlock();
 
@@ -100,7 +89,7 @@ namespace Threading::Tasks
 			this->Value.emplace();
 			Cvar.notify_all();
 
-			std::vector<std::function<void(T)>> Procedures;
+			std::vector<VoidableFunction<T>> Procedures;
 			std::swap(Procedures, ThenProc);
 			Mutex_lock.unlock();
 
@@ -111,20 +100,31 @@ namespace Threading::Tasks
 		}
 
 	public:
-		virtual bool await_ready() override
+		bool await_ready()
 		{
 			return IsReady();
 		}
 
-		virtual void await_suspend(std::coroutine_handle<> Coroutine) noexcept override
+		template<class TCoroutineHandle>
+		void await_suspend(TCoroutineHandle Coroutine) noexcept
 		{
-			Then([Coroutine = std::move(Coroutine)](T)
+			if constexpr (std::same_as<T, void>)
 			{
-				Coroutine.resume();
-			});
+				Then([Coroutine = std::move(Coroutine)]()
+				{
+					Coroutine.resume();
+				});
+			}
+			else
+			{
+				Then([Coroutine = std::move(Coroutine)](T)
+				{
+					Coroutine.resume();
+				});
+			}
 		}
 
-		virtual T await_resume() noexcept override
+		T await_resume() noexcept
 		{
 			return GetValue();
 		}

@@ -31,7 +31,7 @@ public:
 	{
 		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
 
-		Awaiter->SetRunner(std::async(std::launch::deferred, [Awaiter, Body = std::move(Body)]() mutable -> void
+		std::future<void> Runner = std::async(std::launch::deferred, [Awaiter, Body = std::move(Body)]() mutable -> void
 		{
 			if constexpr (std::same_as<T, void>)
 			{
@@ -43,9 +43,9 @@ public:
 				T ReturnValue = Body();
 				Awaiter->SetValue(std::move(ReturnValue));
 			}
-		}));
+		});
 
-		DeferredTaskRunner::RegisterRunner(Awaiter.get());
+		DeferredTaskRunner::RegisterRunner(std::move(Runner));
 		return DeferredTask(std::move(Awaiter));
 	}
 };
