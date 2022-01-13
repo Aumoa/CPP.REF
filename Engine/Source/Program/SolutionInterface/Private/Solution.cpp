@@ -469,15 +469,21 @@ void SSolution::BuildRuntime(ProjectBuildRuntime* Runtime)
 		std::vector<std::wstring> PreprocessorDefinitions;
 		for (auto& [Guid, Reference] : Runtime->PublicReferences)
 		{
-			std::wstring NameUpper = Reference->Metadata->Name;
-			std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
-			PreprocessorDefinitions.emplace_back(NameUpper + L"_API=__declspec(dllimport)");
+			if (Reference->Metadata->Type != ProjectBuildMetadata::EType::Vcpkg)
+			{
+				std::wstring NameUpper = Reference->Metadata->Name;
+				std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
+				PreprocessorDefinitions.emplace_back(NameUpper + L"_API=__declspec(dllimport)");
+			}
 		}
 		for (auto& [Guid, Reference] : Runtime->PrivateReferences)
 		{
-			std::wstring NameUpper = Reference->Metadata->Name;
-			std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
-			PreprocessorDefinitions.emplace_back(NameUpper + L"_API=__declspec(dllimport)");
+			if (Reference->Metadata->Type != ProjectBuildMetadata::EType::Vcpkg)
+			{
+				std::wstring NameUpper = Reference->Metadata->Name;
+				std::transform(NameUpper.begin(), NameUpper.end(), NameUpper.begin(), (int(*)(int))std::toupper);
+				PreprocessorDefinitions.emplace_back(NameUpper + L"_API=__declspec(dllimport)");
+			}
 		}
 		{
 			std::wstring NameUpper = Runtime->Metadata->Name;

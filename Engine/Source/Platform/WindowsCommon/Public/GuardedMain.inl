@@ -6,7 +6,6 @@
 #include "WindowsStackTrace.h"
 #include "Misc/CommandLine.h"
 #include "Diagnostics/LogModule.h"
-
 #include <iostream>
 
 static int32 GReturn = 0;
