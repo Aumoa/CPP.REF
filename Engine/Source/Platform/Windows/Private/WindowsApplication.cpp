@@ -10,6 +10,7 @@
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "Diagnostics/LogModule.h"
+#include "Threading/DeferredTask.h"
 
 GENERATE_BODY(SWindowsApplication);
 
@@ -122,6 +123,8 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		// Save platform modules for finish to dispose.
 		PlatformModules = std::move(WinApp->PlatformModules);
 		PlatformModules.emplace_back(std::move(EngineModule));
+
+		DeferredTaskRunner::Stop();
 	}
 
 	GC.Collect(true);

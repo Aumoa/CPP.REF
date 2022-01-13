@@ -10,6 +10,7 @@ class CORE_API DeferredTaskRunner
 	DeferredTaskRunner() = delete;
 
 public:
-	static void RegisterRunner(std::future<void> Runner);
+	static void RegisterRunner(std::function<void()> Runner);
 	static void Run();
+	static void Stop();
 };

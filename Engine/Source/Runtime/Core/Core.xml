@@ -19,4 +19,7 @@
 	<PreprocessorDefines>
 		<Item Access="Private">NOMINMAX</Item>
 	</PreprocessorDefines>
+	<ReferencedProjects>
+		<Item Name="boost-asio" Access="Public"/>
+	</ReferencedProjects>
 </ProjectInfo>

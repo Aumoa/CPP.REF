@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CustomTaskBase.h"
+#include "DeferredTask.h"
 
 template<class T>
 class ContinuousTask : public CustomTaskBase<T>
@@ -49,12 +50,20 @@ public:
 			if constexpr (std::same_as<T, void>)
 			{
 				Body();
-				Awaiter->SetValue();
+
+				DeferredTask<void>::Run([Awaiter = std::move(Awaiter)]()
+				{
+					Awaiter->SetValue();
+				});
 			}
 			else
 			{
 				T ReturnValue = Body();
-				Awaiter->SetValue(std::move(ReturnValue));
+
+				DeferredTask<void>::Run([ReturnValue = std::move(ReturnValue), Awaiter = std::move(Awaiter)]() mutable
+				{
+					Awaiter->SetValue(std::move(ReturnValue));
+				});
 			}
 
 			Awaiter.reset();

@@ -1,28 +1,30 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Threading/DeferredTaskRunner.h"
-#include <mutex>
+#include <boost/asio/io_service.hpp>
 
-static std::mutex Runners_mutex;
-static std::vector<std::future<void>> Runners;
-static std::vector<std::future<void>> Runners_Back;
+std::unique_ptr Service = std::make_unique<boost::asio::io_service>();
 
-void DeferredTaskRunner::RegisterRunner(std::future<void> Runner)
+void DeferredTaskRunner::RegisterRunner(std::function<void()> Runner)
 {
-	std::unique_lock Runners_lock(Runners_mutex);
-	Runners_Back.emplace_back(std::move(Runner));
+	if (Service)
+	{
+		Service->post(Runner);
+	}
+	else
+	{
+		// Application will shutting down.
+		Runner();
+	}
 }
 
 void DeferredTaskRunner::Run()
 {
-	{
-		std::unique_lock Runners_lock(Runners_mutex);
-		std::swap(Runners, Runners_Back);
-	}
+	Service->poll();
+}
 
-	for (auto& Runner : Runners)
-	{
-		Runner.get();
-	}
-	Runners.clear();
+void DeferredTaskRunner::Stop()
+{
+	Service->poll();
+	Service.reset();
 }
