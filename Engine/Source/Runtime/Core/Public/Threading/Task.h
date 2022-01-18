@@ -175,11 +175,10 @@ public:
 		check(IsValid());
 
 		std::shared_ptr NewAwaiter = std::make_shared<typename Task<ReturnType>::MyAwaiter>();
-		NewAwaiter->SetRunner(Awaiter->GetRunner());
 
 		if constexpr (std::same_as<T, void>)
 		{
-			Awaiter->Then([Body = std::forward(Body), NewAwaiter]() -> void
+			Awaiter->Then([Body = Body, NewAwaiter]() -> void
 			{
 				if constexpr (std::same_as<ReturnType, void>)
 				{
@@ -195,7 +194,7 @@ public:
 		}
 		else
 		{
-			Awaiter->Then([Body = std::forward(Body), NewAwaiter](T Result) -> void
+			Awaiter->Then([Body = Body, NewAwaiter](T Result) -> void
 			{
 				if constexpr (std::same_as<ReturnType, void>)
 				{

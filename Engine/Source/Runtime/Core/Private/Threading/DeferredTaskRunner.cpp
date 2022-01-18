@@ -3,7 +3,7 @@
 #include "Threading/DeferredTaskRunner.h"
 #include <boost/asio/io_service.hpp>
 
-std::unique_ptr Service = std::make_unique<boost::asio::io_service>();
+static std::unique_ptr Service = std::make_unique<boost::asio::io_service>();
 
 void DeferredTaskRunner::RegisterRunner(std::function<void()> Runner)
 {

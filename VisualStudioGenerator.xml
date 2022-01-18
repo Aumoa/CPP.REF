@@ -1,6 +1,0 @@
-<SolutionInfo Name="VisualStudioGenerator">
-    <EngineRoot Path="Engine"/>
-    <ThirdpartyRoot Path="ThirdParty"/>
-    <FirstProject Name="VisualStudioProjects"/>
-    <Guid>257627a4-fc8d-4843-bcb6-710dca75284c</Guid>
-</SolutionInfo>

@@ -1,2 +1,2 @@
 @echo off
-Binaries\VisualStudioGenerator.exe --Solution "Engine.xml"
+dotnet Binaries\BuildTool\BuildTool.dll --Solution "Engine.Solution.cs" --VSVersion VS2022
