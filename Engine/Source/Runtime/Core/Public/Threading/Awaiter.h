@@ -26,6 +26,7 @@ namespace Threading::Tasks
 
 		std::vector<VoidableFunction<T>> ThenProc;
 		std::vector<std::function<void()>> ElseProc;
+		std::exception_ptr CaughtException;
 
 	public:
 		using ReturnType = T;
@@ -47,12 +48,15 @@ namespace Threading::Tasks
 				std::unique_lock Mutex_lock(Mutex);
 				Cvar.wait(Mutex_lock);
 			}
+
+			CheckAndRethrow();
 		}
 
 		T GetValue()
 		{
 			Wait();
 			check(!bCancel);
+			CheckAndRethrow();
 			return Value.value();
 		}
 
@@ -152,6 +156,20 @@ namespace Threading::Tasks
 			}
 
 			return true;
+		}
+
+		void SetExceptionPtr(std::exception_ptr Ptr)
+		{
+			CaughtException = std::move(Ptr);
+		}
+
+	private:
+		void CheckAndRethrow()
+		{
+			if (CaughtException)
+			{
+				std::rethrow_exception(CaughtException);
+			}
 		}
 
 	public:

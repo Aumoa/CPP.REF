@@ -25,9 +25,8 @@ private:
 	{
 	}
 
-public:
-	template<class _Fn>
-	static ContinuousTask Run(_Fn&& Body)
+private:
+	static std::future<void>& GetTaskPoolAddress()
 	{
 		static thread_local std::vector<std::future<void>> TaskPool;
 		static thread_local std::vector<size_t> TaskPoolReserved;
@@ -45,40 +44,73 @@ public:
 			}
 		}
 
-		std::future NewTask = std::async(std::launch::async, [Awaiter, Body = std::move(Body)]() mutable -> void
+		if (TaskPoolReserved.size())
+		{
+			size_t Id = TaskPoolReserved.back();
+			TaskPoolReserved.erase(TaskPoolReserved.end() - 1);
+			return TaskPool[Id];
+		}
+		else
+		{
+			return TaskPool.emplace_back();
+		}
+	}
+
+public:
+	template<class _Fn, bool bFallbackToDeferred = true>
+	static ContinuousTask Run(_Fn&& Body)
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		GetTaskPoolAddress() = std::async(std::launch::async, [Awaiter, Body = std::move(Body)]() mutable -> void
 		{
 			if constexpr (std::same_as<T, void>)
 			{
 				Body();
 
-				DeferredTask<void>::Run([Awaiter = std::move(Awaiter)]()
+				if (bFallbackToDeferred)
+				{
+					DeferredTask<void>::Run([Awaiter = std::move(Awaiter)]()
+					{
+						Awaiter->SetValue();
+					});
+				}
+				else
 				{
 					Awaiter->SetValue();
-				});
+				}
 			}
 			else
 			{
 				T ReturnValue = Body();
 
-				DeferredTask<void>::Run([ReturnValue = std::move(ReturnValue), Awaiter = std::move(Awaiter)]() mutable
+				if (bFallbackToDeferred)
+				{
+					DeferredTask<void>::Run([ReturnValue = std::move(ReturnValue), Awaiter = std::move(Awaiter)]() mutable
+					{
+						Awaiter->SetValue(std::move(ReturnValue));
+					});
+				}
+				else
 				{
 					Awaiter->SetValue(std::move(ReturnValue));
-				});
+				}
 			}
 
 			Awaiter.reset();
 		});
 
-		if (TaskPoolReserved.size())
+		return ContinuousTask(std::move(Awaiter));
+	}
+
+	static ContinuousTask YieldTask() requires std::same_as<T, void>
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		GetTaskPoolAddress() = std::async(std::launch::async, [Awaiter]() mutable -> void
 		{
-			size_t Id = TaskPoolReserved.back();
-			TaskPoolReserved.erase(TaskPoolReserved.end() - 1);
-			TaskPool[Id] = std::move(NewTask);
-		}
-		else
-		{
-			TaskPool.emplace_back(std::move(NewTask));
-		}
+			Awaiter->SetValue();
+		});
 
 		return ContinuousTask(std::move(Awaiter));
 	}

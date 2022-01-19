@@ -47,4 +47,16 @@ public:
 
 		return DeferredTask(std::move(Awaiter));
 	}
+
+	static DeferredTask YieldTask() requires std::same_as<T, void>
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		DeferredTaskRunner::RegisterRunner([Awaiter]() -> void
+		{
+			Awaiter->SetValue();
+		});
+
+		return DeferredTask(std::move(Awaiter));
+	}
 };

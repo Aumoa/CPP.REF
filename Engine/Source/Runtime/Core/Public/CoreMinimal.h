@@ -56,3 +56,4 @@
 #include "Misc/StringUtils.h"
 #include "Misc/DateTime.h"
 #include "PlatformMisc/InputEnums.h"
+#include "Threading/Task.h"

@@ -56,6 +56,7 @@ public:
 
 		void unhandled_exception()
 		{
+			this->Awaiter->SetExceptionPtr(std::current_exception());
 		}
 
 		auto initial_suspend() noexcept
