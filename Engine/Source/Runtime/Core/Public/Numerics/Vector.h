@@ -9,10 +9,10 @@
 #include <type_traits>
 #include "PrimitiveTypes.h"
 #include "VectorScalarsImpl.h"
+#include "CoreConcepts.h"
 #include "Mathematics/MathEx.h"
 #include "Misc/StringUtils.h"
 #include "Container/BitSet.h"
-#include "Concepts/CoreConcepts.h"
 
 template<class T, class TVector, size_t N>
 struct VectorImpl : public VectorScalarsImpl<T, N>

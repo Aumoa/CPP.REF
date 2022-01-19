@@ -4,9 +4,9 @@ using CodeProjectConfiguration;
 
 using System;
 
-public class Core : ModuleRule
+public class CoreSObject : ModuleRule
 {
-    public Core()
+    public CoreSObject()
     {
         TargetType = TargetType.Engine;
 
@@ -15,7 +15,8 @@ public class Core : ModuleRule
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
 
-        PublicDisableWarnings.AddRange(new[] {
+        PublicDisableWarnings.AddRange(new[]
+        {
             4250,
             4251,
             5105,
@@ -32,10 +33,7 @@ public class Core : ModuleRule
             });
         }
 
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "CoreSObject",
-            "Boost.Asio"
-        });
+        PrivatePreprocessorDefines.Add("NOMINMAX");
+        PublicDependencyModuleNames.Add("Boost.Asio");
     }
 }
