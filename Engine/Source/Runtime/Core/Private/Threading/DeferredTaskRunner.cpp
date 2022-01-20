@@ -1,9 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Threading/DeferredTaskRunner.h"
-#ifdef _WINSOCKAPI_
-#error E
-#endif
 #include <boost/asio/io_service.hpp>
 
 static std::unique_ptr Service = std::make_unique<boost::asio::io_service>();
