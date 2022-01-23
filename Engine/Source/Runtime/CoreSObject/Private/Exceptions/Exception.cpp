@@ -12,6 +12,7 @@ SException::SException(std::wstring_view Message, SException* InnerException) : 
 	, Message(Message)
 	, InnerException(InnerException)
 {
+	AMessage = WCHAR_TO_ANSI(this->Message);
 }
 
 std::wstring SException::ToString()
@@ -37,4 +38,9 @@ std::wstring SException::GetMessage()
 SException* SException::GetInnerException()
 {
 	return InnerException;
+}
+
+const char* SException::what() const noexcept
+{
+	return AMessage.c_str();
 }

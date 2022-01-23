@@ -4,13 +4,14 @@
 
 #include "Object.h"
 
-class CORESOBJECT_API SException : implements SObject
+class CORESOBJECT_API SException : implements SObject, public std::exception
 {
 	GENERATED_BODY(SException)
 
 private:
 	SPROPERTY(Message)
 	std::wstring Message;
+	std::string AMessage;
 	SPROPERTY(InnerException)
 	SException* InnerException = nullptr;
 
@@ -23,4 +24,7 @@ public:
 	std::wstring GetName();
 	std::wstring GetMessage();
 	SException* GetInnerException();
+
+public:
+	virtual const char* what() const noexcept override;
 };
