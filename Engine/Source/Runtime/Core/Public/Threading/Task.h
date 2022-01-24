@@ -14,9 +14,6 @@ class Task
 	template<class U>
 	friend class Task;
 
-	Task(const Task&) = delete;
-	Task& operator =(const Task&) = delete;
-
 private:
 	using MyAwaiter = Threading::Tasks::Awaiter<T>;
 
@@ -102,6 +99,12 @@ public:
 	{
 	}
 
+	Task(const Task& Rhs)
+		: Coroutine(Rhs.Coroutine)
+		, Awaiter(Rhs.Awaiter)
+	{
+	}
+
 	Task(Task&& Rhs)
 		: Coroutine(std::move(Rhs.Coroutine))
 		, Awaiter(std::move(Rhs.Awaiter))
@@ -116,12 +119,29 @@ public:
 	template<class TTask>
 	Task(TTask&& OtherTask) requires requires
 	{
-		{ OtherTask.GetAwaiter() } -> std::same_as<std::shared_ptr<MyAwaiter>>;
-	}
-		: Awaiter(OtherTask.GetAwaiter())
+		Task(std::forward<TTask>(OtherTask), 0);
+	} : Task(std::forward<TTask>(OtherTask), 0)
 	{
 	}
 
+private:
+	template<class TTask>
+	Task(TTask&& OtherTask, int) requires requires
+	{
+		{ OtherTask.GetAwaiter() } -> std::same_as<std::shared_ptr<MyAwaiter>>;
+	} : Awaiter(OtherTask.GetAwaiter())
+	{
+	}
+
+	template<class TTask>
+	Task(TTask&& OtherTask, short) requires std::same_as<T, void> && requires
+	{
+		{ AsVoidTask(std::forward<TTask>(OtherTask)) };
+	} : Task(AsVoidTask(std::forward<TTask>(OtherTask)))
+	{
+	}
+
+public:
 	bool IsValid() const
 	{
 		return (bool)Awaiter;
@@ -152,6 +172,13 @@ public:
 		return Awaiter->Cancel();
 	}
 
+	Task& operator =(const Task& Rhs)
+	{
+		Coroutine = Rhs.Coroutine;
+		Awaiter = Rhs.Awaiter;
+		return *this;
+	}
+
 	Task& operator =(Task&& Rhs)
 	{
 		Coroutine = std::move(Rhs.Coroutine);
@@ -159,7 +186,19 @@ public:
 		return *this;
 	}
 
-private:
+	auto operator <=>(const Task& Rhs) const
+	{
+		return Awaiter <=> Rhs.Awaiter;
+	}
+
+	auto operator < (const Task& Rhs) const { return operator <=>(Rhs) < 0; }
+	auto operator > (const Task& Rhs) const { return operator <=>(Rhs) > 0; }
+	auto operator <=(const Task& Rhs) const { return operator <=>(Rhs) <= 0; }
+	auto operator >=(const Task& Rhs) const { return operator <=>(Rhs) >= 0; }
+	auto operator ==(const Task& Rhs) const { return operator <=>(Rhs) == 0; }
+	auto operator !=(const Task& Rhs) const { return operator <=>(Rhs) != 0; }
+
+public:
 	template<class _Fn>
 	static auto FunctionBodyReturnTypeTraits(int, _Fn&& Body) -> decltype(Body(std::declval<T>()));
 	template<class _Fn>
@@ -167,6 +206,12 @@ private:
 
 	template<class _Fn>
 	using FunctionReturnType = decltype(FunctionBodyReturnTypeTraits(0, std::declval<_Fn>()));
+
+	template<class TAnyTask>
+	static Task<> AsVoidTask(TAnyTask&& AnyTask)
+	{
+		co_await AnyTask;
+	}
 
 public:
 	template<class _Fn>
@@ -217,5 +262,71 @@ public:
 	void Else(_Fn&& Body)
 	{
 		Awaiter->Else(std::forward<_Fn>(Body));
+	}
+
+public:
+	template<class TEnuemrable>
+	static Task<> WhenAll(TEnuemrable&& Enumerable) requires requires
+	{
+		{ std::begin(Enumerable) } -> std::forward_iterator;
+		{ std::end(Enumerable) } -> std::forward_iterator;
+		{ std::size(Enumerable) } -> std::same_as<size_t>;
+	}
+	{
+		class WhenAllAwaiter : public Threading::Tasks::Awaiter<void>
+		{
+			const size_t Desired;
+			std::atomic<size_t> Counter;
+
+		public:
+			WhenAllAwaiter(size_t Desired) : Desired(Desired)
+			{
+			}
+
+			void IncrementSetValue()
+			{
+				size_t MyCounter = ++Counter;
+				if (MyCounter == Desired)
+				{
+					SetValue();
+				}
+			}
+		};
+
+		std::shared_ptr Awaiter = std::make_shared<WhenAllAwaiter>(std::size(Enumerable));
+
+		for (auto& It : Enumerable)
+		{
+			if constexpr (std::same_as<decltype(It.GetValue()), void>)
+			{
+				It.Then([Awaiter]()
+				{
+					Awaiter->IncrementSetValue();
+				});
+			}
+			else
+			{
+				It.Then([Awaiter](auto)
+				{
+					Awaiter->IncrementSetValue();
+				});
+			}
+
+			It.Else([Awaiter]()
+			{
+				Awaiter->Cancel();
+			});
+		}
+
+		return Task<>(Awaiter);
+	}
+
+	template<class... TTaskParams>
+	static Task<> WhenAll(TTaskParams&&... Tasks) requires requires
+	{
+		{ std::vector{ Task<>(std::forward<TTaskParams>(Tasks))... } };
+	}
+	{
+		return WhenAll(std::vector{ Task<>(std::forward<TTaskParams>(Tasks))... });
 	}
 };

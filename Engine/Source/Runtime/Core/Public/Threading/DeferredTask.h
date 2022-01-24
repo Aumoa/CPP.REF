@@ -6,7 +6,7 @@
 #include "CustomTaskBase.h"
 #include "DeferredTaskRunner.h"
 
-template<class T>
+template<class T = void>
 class DeferredTask : public CustomTaskBase<T>
 {
 	using MyAwaiter = typename CustomTaskBase<T>::MyAwaiter;
@@ -48,7 +48,7 @@ public:
 		return DeferredTask(std::move(Awaiter));
 	}
 
-	static DeferredTask YieldTask() requires std::same_as<T, void>
+	static Task<> YieldTask() requires std::same_as<T, void>
 	{
 		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
 
@@ -58,5 +58,32 @@ public:
 		});
 
 		return DeferredTask(std::move(Awaiter));
+	}
+
+	template<class TDuration>
+	static Task<> Delay(TDuration Timespan) requires requires
+	{
+		{ (std::chrono::steady_clock::now() - std::chrono::steady_clock::now()) >= Timespan } -> std::convertible_to<bool>;
+	}
+	{
+		using namespace std::chrono;
+
+		auto StartTime = steady_clock::now();
+		while (true)
+		{
+			auto CurrTime = steady_clock::now();
+			auto Dur = CurrTime - StartTime;
+			if (Dur >= Timespan)
+			{
+				break;
+			}
+
+			co_await YieldTask();
+		}
+	}
+
+	static Task<> Delay(int32 Milliseconds)
+	{
+		return Delay(std::chrono::milliseconds(Milliseconds));
 	}
 };

@@ -115,13 +115,13 @@ namespace Threading::Tasks
 		void SetValue(U&&... Value)
 		{
 			std::unique_lock Mutex_lock(Mutex);
-			this->Value.emplace(Value...);
-			Cvar.notify_all();
-
 			if (bCancel)
 			{
 				return;
 			}
+
+			this->Value.emplace(Value...);
+			Cvar.notify_all();
 
 			std::vector<VoidableFunction<T>> Procedures;
 			std::swap(Procedures, ThenProc);
@@ -144,6 +144,7 @@ namespace Threading::Tasks
 				}
 
 				bCancel = true;
+				Cvar.notify_all();
 
 				std::vector<std::function<void()>> Procedures;
 				std::swap(Procedures, ElseProc);

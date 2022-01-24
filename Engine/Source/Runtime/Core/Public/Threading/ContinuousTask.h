@@ -6,7 +6,7 @@
 #include "CustomTaskBase.h"
 #include "DeferredTask.h"
 
-template<class T>
+template<class T = void>
 class ContinuousTask : public CustomTaskBase<T>
 {
 	using MyAwaiter = typename CustomTaskBase<T>::MyAwaiter;
@@ -103,7 +103,7 @@ public:
 		return ContinuousTask(std::move(Awaiter));
 	}
 
-	static ContinuousTask YieldTask() requires std::same_as<T, void>
+	static Task<> YieldTask() requires std::same_as<T, void>
 	{
 		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
 
