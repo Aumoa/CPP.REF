@@ -4,18 +4,89 @@
 
 #include "CoreMinimal.h"
 #include "Awaiter.h"
-#include "AwaitableSharedPointer.h"
 #include <coroutine>
 #include <memory>
 
+namespace Threading::Tasks
+{
+	template<class T>
+	class TaskSource
+	{
+	protected:
+		using SourceAwaiter = Awaiter<T>;
+		std::shared_ptr<SourceAwaiter> Awaiter;
+
+	public:
+		TaskSource()
+		{
+		}
+
+		TaskSource(std::shared_ptr<SourceAwaiter> Awaiter)
+			: Awaiter(std::move(Awaiter))
+		{
+		}
+	};
+
+	template<>
+	class TaskSource<void>
+	{
+	protected:
+		using SourceAwaiter = IAwaitable;
+		std::shared_ptr<IAwaitable> Awaiter;
+
+	public:
+		TaskSource()
+		{
+		}
+
+		TaskSource(std::shared_ptr<SourceAwaiter> Awaiter)
+			: Awaiter(std::move(Awaiter))
+		{
+		}
+	};
+}
+
 template<class T = void>
-class Task
+class Task : private Threading::Tasks::TaskSource<T>
 {
 	template<class U>
 	friend class Task;
 
 private:
 	using MyAwaiter = Threading::Tasks::Awaiter<T>;
+	using Super = Threading::Tasks::TaskSource<T>;
+	using SourceAwaiter = Super::SourceAwaiter;
+
+	class AwaitableSharedPointer
+	{
+		std::shared_ptr<SourceAwaiter> Ptr;
+
+	public:
+		AwaitableSharedPointer(std::shared_ptr<SourceAwaiter> Ptr) : Ptr(std::move(Ptr))
+		{
+		}
+
+		bool await_ready()
+		{
+			return Ptr->await_ready();
+		}
+
+		template<class TCoroutine>
+		void await_suspend(TCoroutine Coroutine) const noexcept
+		{
+			Ptr->await_suspend(std::move(Coroutine));
+		}
+
+		T await_resume() const noexcept
+		{
+			return Ptr->await_resume();
+		}
+
+		SourceAwaiter* operator ->() const
+		{
+			return Ptr.get();
+		}
+	};
 
 public:
 	template<class U, class _Void = void>
@@ -72,7 +143,7 @@ public:
 			{ ATask.GetAwaiter() };
 		}
 		{
-			return Threading::Tasks::AwaitableSharedPointer(ATask.GetAwaiter());
+			return AwaitableSharedPointer(ATask.GetAwaiter());
 		}
 	};
 
@@ -81,12 +152,11 @@ private:
 
 private:
 	std::optional<CoroutineHandle> Coroutine;
-	std::shared_ptr<MyAwaiter> Awaiter;
 
 private:
 	Task(promise_type& Awaitable)
-		: Coroutine(CoroutineHandle::from_promise(Awaitable))
-		, Awaiter(Awaitable.Awaiter)
+		: Super(Awaitable.Awaiter)
+		, Coroutine(CoroutineHandle::from_promise(Awaitable))
 	{
 		Else([this]()
 		{
@@ -95,100 +165,83 @@ private:
 	}
 
 public:
-	Task()
+	Task() : Super()
 	{
 	}
 
 	Task(const Task& Rhs)
-		: Coroutine(Rhs.Coroutine)
-		, Awaiter(Rhs.Awaiter)
+		: Super(Rhs.Awaiter)
+		, Coroutine(Rhs.Coroutine)
 	{
 	}
 
 	Task(Task&& Rhs)
-		: Coroutine(std::move(Rhs.Coroutine))
-		, Awaiter(std::move(Rhs.Awaiter))
+		: Super(std::move(Rhs.Awaiter))
+		, Coroutine(std::move(Rhs.Coroutine))
 	{
 	}
 
 	Task(std::shared_ptr<MyAwaiter> Awaiter)
-		: Awaiter(std::move(Awaiter))
+		: Super(std::move(Awaiter))
 	{
 	}
 
 	template<class TTask>
 	Task(TTask&& OtherTask) requires requires
 	{
-		Task(std::forward<TTask>(OtherTask), 0);
-	} : Task(std::forward<TTask>(OtherTask), 0)
-	{
-	}
-
-private:
-	template<class TTask>
-	Task(TTask&& OtherTask, int) requires requires
-	{
-		{ OtherTask.GetAwaiter() } -> std::same_as<std::shared_ptr<MyAwaiter>>;
-	} : Awaiter(OtherTask.GetAwaiter())
-	{
-	}
-
-	template<class TTask>
-	Task(TTask&& OtherTask, short) requires std::same_as<T, void> && requires
-	{
-		{ AsVoidTask(std::forward<TTask>(OtherTask)) };
-	} : Task(AsVoidTask(std::forward<TTask>(OtherTask)))
+		{ Super(OtherTask.GetAwaiter()) };
+	} : Super(OtherTask.GetAwaiter())
 	{
 	}
 
 public:
 	bool IsValid() const
 	{
-		return (bool)Awaiter;
+		return (bool)Super::Awaiter;
 	}
 
 	void Wait()
 	{
-		Awaiter->Wait();
+		Super::Awaiter->Wait();
 	}
 
 	T GetValue()
 	{
-		return Awaiter->GetValue();
+		return Super::Awaiter->GetValue();
 	}
 
 	Threading::Tasks::EStatus GetStatus() const
 	{
-		return Awaiter->GetStatus();
+		return Super::Awaiter->GetStatus();
 	}
 
-	std::shared_ptr<MyAwaiter> GetAwaiter() const
+	std::shared_ptr<SourceAwaiter> GetAwaiter() const
 	{
-		return Awaiter;
+		return Super::Awaiter;
 	}
 
 	bool Cancel()
 	{
-		return Awaiter->Cancel();
+		return Super::Awaiter->Cancel();
 	}
 
 	Task& operator =(const Task& Rhs)
 	{
 		Coroutine = Rhs.Coroutine;
-		Awaiter = Rhs.Awaiter;
+		Super::Awaiter = Rhs.Awaiter;
 		return *this;
 	}
 
 	Task& operator =(Task&& Rhs)
 	{
 		Coroutine = std::move(Rhs.Coroutine);
-		Awaiter = std::move(Rhs.Awaiter);
+		Super::Awaiter = std::move(Rhs.Awaiter);
 		return *this;
 	}
 
 	auto operator <=>(const Task& Rhs) const
 	{
-		return Awaiter <=> Rhs.Awaiter;
+		return Super::Awaiter <=> Rhs.Awaiter;
 	}
 
 	auto operator < (const Task& Rhs) const { return operator <=>(Rhs) < 0; }
@@ -207,12 +260,6 @@ public:
 	template<class _Fn>
 	using FunctionReturnType = decltype(FunctionBodyReturnTypeTraits(0, std::declval<_Fn>()));
 
-	template<class TAnyTask>
-	static Task<> AsVoidTask(TAnyTask&& AnyTask)
-	{
-		co_await AnyTask;
-	}
-
 public:
 	template<class _Fn>
 	auto Then(_Fn&& Body) -> Task<FunctionReturnType<_Fn>>
@@ -224,7 +271,7 @@ public:
 
 		if constexpr (std::same_as<T, void>)
 		{
-			Awaiter->Then([Body = Body, NewAwaiter]() -> void
+			Super::Awaiter->Then([Body = Body, NewAwaiter]() mutable -> void
 			{
 				if constexpr (std::same_as<ReturnType, void>)
 				{
@@ -240,7 +287,7 @@ public:
 		}
 		else
 		{
-			Awaiter->Then([Body = Body, NewAwaiter](T Result) -> void
+			Super::Awaiter->Then([Body = Body, NewAwaiter](T Result) mutable -> void
 			{
 				if constexpr (std::same_as<ReturnType, void>)
 				{
@@ -261,7 +308,7 @@ public:
 	template<class _Fn>
 	void Else(_Fn&& Body)
 	{
-		Awaiter->Else(std::forward<_Fn>(Body));
+		Super::Awaiter->Else(std::forward<_Fn>(Body));
 	}
 
 public:
@@ -297,22 +344,13 @@ public:
 
 		for (auto& It : Enumerable)
 		{
-			if constexpr (std::same_as<decltype(It.GetValue()), void>)
+			Task<> UniversalTask = It;
+			UniversalTask.Then([Awaiter]()
 			{
-				It.Then([Awaiter]()
-				{
-					Awaiter->IncrementSetValue();
-				});
-			}
-			else
-			{
-				It.Then([Awaiter](auto)
-				{
-					Awaiter->IncrementSetValue();
-				});
-			}
+				Awaiter->IncrementSetValue();
+			});
 
-			It.Else([Awaiter]()
+			UniversalTask.Else([Awaiter]()
 			{
 				Awaiter->Cancel();
 			});
@@ -324,7 +362,7 @@ public:
 	template<class... TTaskParams>
 	static Task<> WhenAll(TTaskParams&&... Tasks) requires requires
 	{
-		{ std::vector{ Task<>(std::forward<TTaskParams>(Tasks))... } };
+		std::initializer_list{ Task<>(std::declval<TTaskParams>())... };
 	}
 	{
 		return WhenAll(std::vector{ Task<>(std::forward<TTaskParams>(Tasks))... });

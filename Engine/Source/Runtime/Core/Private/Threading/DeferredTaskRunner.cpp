@@ -33,6 +33,7 @@ void DeferredTaskRunner::Run()
 
 void DeferredTaskRunner::Stop()
 {
-	Service->poll();
-	Service.reset();
+	std::unique_ptr Swap = std::move(Service);
+	Swap->poll();
+	Swap.reset();
 }
