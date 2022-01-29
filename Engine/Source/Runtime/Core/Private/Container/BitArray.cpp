@@ -192,7 +192,7 @@ size_t BitArray::AddUninitialized(size_t numToAdd)
 
 void BitArray::SetRange(size_t index, size_t numBitsToSet, bool bValue)
 {
-	check(index >= 0 && numBitsToSet >= 0 && index + numBitsToSet <= _numBits);
+	checkf(index >= 0 && numBitsToSet >= 0 && index + numBitsToSet <= _numBits, L"Arguments is not valid.");
 
 	if (numBitsToSet == 0)
 	{

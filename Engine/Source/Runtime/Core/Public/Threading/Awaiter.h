@@ -197,7 +197,7 @@ namespace Threading::Tasks
 		T GetValue()
 		{
 			Wait();
-			check(!bCancel);
+			checkf(!bCancel, L"Task is already canceled.");
 			CheckAndRethrow();
 			return Value.value();
 		}

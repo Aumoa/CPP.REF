@@ -25,11 +25,11 @@ MemoryStatus MemoryStatus::Capture()
 	MEMORYSTATUSEX StatusEx;
 	StatusEx.dwLength = sizeof(MEMORYSTATUSEX);
 	BOOL bStatus = GlobalMemoryStatusEx(&StatusEx);
-	check(bStatus);
+	checkf(bStatus, L"Internal windows error. ErrorCode: {}", GetLastError());
 
 	PROCESS_MEMORY_COUNTERS ProcessMem;
 	bStatus = GetProcessMemoryInfo(GetCurrentProcess(), &ProcessMem, sizeof(ProcessMem));
-	check(bStatus);
+	checkf(bStatus, L"Internal windows error. ErrorCode: {}", GetLastError());
 
 	return MemoryStatus(
 		(size_t)StatusEx.ullTotalPhys,

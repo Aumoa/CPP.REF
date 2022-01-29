@@ -179,7 +179,7 @@ public:
 	template<class TRet, class TOwner, class... TArgs>
 	inline TRet Invoke(const TOwner* caller, TArgs&&... args) const
 	{
-		check(IsConst());
+		checkf(IsConst(), L"Function is not const type.");
 		return Invoke<TRet, TOwner, TArgs...>(const_cast<TOwner*>(caller), std::forward<TArgs>(args)...);
 	}
 

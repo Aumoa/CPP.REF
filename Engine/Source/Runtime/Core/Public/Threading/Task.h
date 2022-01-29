@@ -265,7 +265,7 @@ public:
 	auto Then(_Fn&& Body) -> Task<FunctionReturnType<_Fn>>
 	{
 		using ReturnType = FunctionReturnType<_Fn>;
-		check(IsValid());
+		checkf(IsValid(), L"Task not valid.");
 
 		std::shared_ptr NewAwaiter = std::make_shared<typename Task<ReturnType>::MyAwaiter>();
 

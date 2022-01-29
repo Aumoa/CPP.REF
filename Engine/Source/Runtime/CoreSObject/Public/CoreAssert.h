@@ -16,7 +16,6 @@ public:
 
 #if DO_CHECK
 
-#define check(x) if (const bool b = (bool)(x); !b) { CoreAssert::Assert(L ## #x, __FILEW__, __LINE__); }
 #define checkf(x, fmt, ...) if (const bool b = (bool)(x); !b) { CoreAssert::Assert(std::format(fmt __VA_OPT__(,) __VA_ARGS__), __FILEW__, __LINE__); }
 #define ensure(x) \
 [b = (bool)(x)]()\

@@ -6,7 +6,7 @@
 
 SObject*& ObjectHashTable::Emplace(SObject* InObject)
 {
-	check(InObject->InternalIndex == -1);
+	checkf(InObject->InternalIndex == -1, L"Internal object hash value is not valid.");
 
 	if (IndexPoolSize)
 	{

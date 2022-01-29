@@ -22,7 +22,7 @@ public:
 		, StartTime(Clock::now())
 		, Reporter(InReporter)
 	{
-		check(Instance);
+		checkf(Instance, L"Instance is nullptr.");
 	}
 
 	inline ~ScopedTimer()

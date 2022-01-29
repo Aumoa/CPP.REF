@@ -222,7 +222,7 @@ Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuper
 
 int32 Type::MarkCollectionObjects(SObject* Object, Property* CollectionProp, int32 Depth)
 {
-	check(bGCCollection && Collector);
+	checkf(bGCCollection && Collector, L"Type is not GCCollector type.");
 	uint8& CollectionPtr = const_cast<uint8&>(CollectionProp->GetValue<uint8>(Object));
 	return Collector(&CollectionPtr, Depth);
 }

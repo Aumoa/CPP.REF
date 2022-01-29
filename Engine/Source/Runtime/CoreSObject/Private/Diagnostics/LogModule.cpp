@@ -13,7 +13,7 @@ LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
 	: ModuleName(ModuleName)
 	, MessageQueue(QueueSize)
 {
-	check(gModule == nullptr);
+	checkf(gModule == nullptr, L"Module is already initialized.");
 	gModule = this;
 }
 
@@ -40,7 +40,7 @@ void LogModule::RunTask()
 	}
 
 	LogFile.open(Directory / LogPath, std::ios::trunc | std::ios::out);
-	check(LogFile.is_open());
+	checkf(LogFile.is_open(), L"Couldn't open log file.");
 
 	bRunning = true;
 	WorkerThread = Thread::NewThread<void>(L"[Log Module]", [&]()
