@@ -39,17 +39,17 @@ namespace Threading::Tasks
 		{
 			auto Awaiter = Coroutine.promise().Awaiter;
 
+			Else([Awaiter]()
+			{
+				Awaiter->Cancel();
+			});
+
 			Then([Coroutine, Awaiter]()
 			{
 				if (Awaiter->GetStatus() != EStatus::Canceled)
 				{
 					Coroutine.resume();
 				}
-			});
-
-			Else([Coroutine, Awaiter]()
-			{
-				Awaiter->Cancel();
 			});
 		}
 

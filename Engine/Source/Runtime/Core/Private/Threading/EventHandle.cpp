@@ -1,8 +1,5 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-#undef GetObject
-
 #include "Threading/EventHandle.h"
 #include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"
@@ -11,6 +8,9 @@
 using enum ELogVerbosity;
 
 GENERATE_BODY(SEventHandle);
+
+#if PLATFORM_WINDOWS
+#include "PlatformMisc/WindowsPlatformCommon.h"
 
 SEventHandle::SEventHandle() : Super()
 {
@@ -54,3 +54,5 @@ void SEventHandle::Reset()
 {
 	ResetEvent(_handle);
 }
+
+#endif

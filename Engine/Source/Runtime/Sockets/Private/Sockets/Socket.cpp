@@ -3,7 +3,6 @@
 #include "Sockets/Socket.h"
 #include "Sockets/SocketException.h"
 #include "Net/IPEndPoint.h"
-#include "Threading/DeferredTask.h"
 #include <mutex>
 
 GENERATE_BODY(SSocket);
@@ -88,32 +87,26 @@ SSocket::~SSocket()
 	ensureMsgf(bClosed, L"Socket does not closed.");
 }
 
-Task<void> SSocket::Connect(const IPEndPoint& EndPoint)
+Task<> SSocket::Connect(const IPEndPoint& EndPoint)
 {
 	auto InAddr = GetSOCKADDR_IN(EndPoint);
 	if (connect(Impl->Socket, (SOCKADDR*)&InAddr, sizeof(InAddr)) != SOCKET_ERROR)
 	{
-		co_return;
+		return Task<>::CompletedTask();
 	}
 
-	while (!IsReadyToRead(std::chrono::milliseconds(1)))
-	{
-		co_await DeferredTask<void>::YieldTask();
-	}
+	return Task<>::WaitUntil(std::bind(&SSocket::IsReadyToRead, this, std::chrono::milliseconds(1)));
 }
 
-Task<void> SSocket::Bind(const IPEndPoint& EndPoint)
+Task<> SSocket::Bind(const IPEndPoint& EndPoint)
 {
 	auto InAddr = GetSOCKADDR_IN(EndPoint);
 	if (bind(Impl->Socket, (SOCKADDR*)&InAddr, sizeof(InAddr)) != SOCKET_ERROR)
 	{
-		co_return;
+		return Task<>::CompletedTask();
 	}
 
-	while (!IsReadyToRead(std::chrono::milliseconds(1)))
-	{
-		co_await DeferredTask<void>::YieldTask();
-	}
+	return Task<>::WaitUntil(std::bind(&SSocket::IsReadyToRead, this, std::chrono::milliseconds(1)));
 }
 
 void SSocket::Close()

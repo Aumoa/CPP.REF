@@ -22,8 +22,8 @@ public:
 	SSocket(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType);
 	virtual ~SSocket() noexcept override;
 
-	Task<void> Connect(const IPEndPoint& EndPoint);
-	Task<void> Bind(const IPEndPoint& EndPoint);
+	Task<> Connect(const IPEndPoint& EndPoint);
+	Task<> Bind(const IPEndPoint& EndPoint);
 	void Close();
 
 public:

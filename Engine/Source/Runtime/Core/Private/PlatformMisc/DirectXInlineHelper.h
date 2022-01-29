@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include <DirectXMath.h>
+#if PLATFORM_WINDOWS
+
+#include "WindowsPlatformCommon.h"
 #include "Numerics/Quaternion.h"
 #include "Numerics/Matrix4x4.h"
 
@@ -43,3 +45,5 @@ inline Matrix4x4 XMStoreMatrix4x4(DirectX::FXMMATRIX M)
 	DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m, M);
 	return m;
 }
+
+#endif

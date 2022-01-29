@@ -1,13 +1,13 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-#undef GetObject
-
 #include "PlatformMisc/PlatformModule.h"
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "LogCore.h"
+
+#if PLATFORM_WINDOWS
+#include "WindowsPlatformCommon.h"
 
 PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 {
@@ -51,3 +51,5 @@ void(*PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) 
 
 	return reinterpret_cast<void(*)()>(::GetProcAddress((HMODULE)NativeHandle, FunctionName.data()));
 }
+
+#endif

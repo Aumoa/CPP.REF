@@ -1,7 +1,10 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Numerics/Quaternion.h"
-#include "DirectXInlineHelper.h"
+
+#if PLATFORM_WINDOWS
+
+#include "PlatformMisc/DirectXInlineHelper.h"
 
 Quaternion Quaternion::FromAxisAngle(const Vector3& axis, Degrees angle)
 {
@@ -30,3 +33,5 @@ Quaternion Quaternion::LookTo(const Vector3& forward, const Vector3& up)
 	DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationMatrix(M);
 	return XMStoreQuaternion(Q);
 }
+
+#endif

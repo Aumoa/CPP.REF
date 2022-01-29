@@ -1,7 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Numerics/Matrix4x4.h"
-#include "DirectXInlineHelper.h"
+
+#if PLATFORM_WINDOWS
+#include "PlatformMisc/DirectXInlineHelper.h"
 
 float Matrix4x4::GetDeterminant() const
 {
@@ -87,3 +89,5 @@ Matrix4x4 Matrix4x4::RotationZ(Radians angle)
 	DirectX::XMMATRIX M = DirectX::XMMatrixRotationZ(angle.Value);
 	return XMStoreMatrix4x4(M);
 }
+
+#endif

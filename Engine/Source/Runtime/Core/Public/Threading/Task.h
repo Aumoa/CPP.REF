@@ -6,6 +6,13 @@
 #include "Awaiter.h"
 #include <coroutine>
 #include <memory>
+#include <chrono>
+
+class ThreadGroup;
+
+#ifndef TASK_FALLBACK_DEFERRED_DEFAULT
+#define TASK_FALLBACK_DEFERRED_DEFAULT 0
+#endif
 
 namespace Threading::Tasks
 {
@@ -28,26 +35,31 @@ namespace Threading::Tasks
 	};
 
 	template<>
-	class TaskSource<void>
+	class CORE_API TaskSource<void>
 	{
 	protected:
 		using SourceAwaiter = IAwaitable;
 		std::shared_ptr<IAwaitable> Awaiter;
 
 	public:
-		TaskSource()
-		{
-		}
+		static std::optional<bool> bFallbackToDeferred;
 
-		TaskSource(std::shared_ptr<SourceAwaiter> Awaiter)
-			: Awaiter(std::move(Awaiter))
-		{
-		}
+	public:
+		TaskSource();
+		TaskSource(std::shared_ptr<SourceAwaiter> Awaiter);
+
+		static void FlushDeferred();
+
+	protected:
+		static void Run(std::function<void()> Body);
+		static void Deferred(std::function<void()> Body);
+		static void Delay(std::chrono::milliseconds Timeout, std::function<void()> Body);
+		static std::shared_ptr<Tasks::Awaiter<void>> CompletedAwaiter();
 	};
 }
 
 template<class T = void>
-class Task : private Threading::Tasks::TaskSource<T>
+class Task : public Threading::Tasks::TaskSource<T>
 {
 	template<class U>
 	friend class Task;
@@ -56,6 +68,8 @@ private:
 	using MyAwaiter = Threading::Tasks::Awaiter<T>;
 	using Super = Threading::Tasks::TaskSource<T>;
 	using SourceAwaiter = Super::SourceAwaiter;
+	template<class U>
+	using TaskSource = Threading::Tasks::TaskSource<U>;
 
 	class AwaitableSharedPointer
 	{
@@ -143,7 +157,8 @@ public:
 			{ ATask.GetAwaiter() };
 		}
 		{
-			return AwaitableSharedPointer(ATask.GetAwaiter());
+			using NakedTask = std::remove_const_t<std::remove_reference_t<decltype(ATask)>>;
+			return typename NakedTask::AwaitableSharedPointer(ATask.GetAwaiter());
 		}
 	};
 
@@ -176,13 +191,13 @@ public:
 	}
 
 	Task(Task&& Rhs)
-		: Super(std::move(Rhs.Awaiter))
+		: Super(Rhs.Awaiter)
 		, Coroutine(std::move(Rhs.Coroutine))
 	{
 	}
 
 	Task(std::shared_ptr<MyAwaiter> Awaiter)
-		: Super(std::move(Awaiter))
+		: Super(Awaiter)
 	{
 	}
 
@@ -366,5 +381,141 @@ public:
 	}
 	{
 		return WhenAll(std::vector{ Task<>(std::forward<TTaskParams>(Tasks))... });
+	}
+	
+	template<bool bConstFallbackToDeferred = (bool)TASK_FALLBACK_DEFERRED_DEFAULT, class _Fn>
+	static auto Run(_Fn&& Body) requires std::same_as<T, void>
+	{
+		using ReturnType = FunctionReturnType<_Fn>;
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		TaskSource<void>::Run([Awaiter, Body = std::move(Body)]() mutable -> void
+		{
+			if constexpr (std::same_as<ReturnType, void>)
+			{
+				Body();
+
+				if (TaskSource<void>::bFallbackToDeferred.value_or(bConstFallbackToDeferred))
+				{
+					TaskSource<void>::Deferred([Awaiter = std::move(Awaiter)]()
+					{
+						Awaiter->SetValue();
+					});
+				}
+				else
+				{
+					Awaiter->SetValue();
+				}
+			}
+			else
+			{
+				ReturnType ReturnValue = Body();
+
+				if (TaskSource<void>::bFallbackToDeferred.value_or(bConstFallbackToDeferred))
+				{
+					TaskSource<void>::Deferred([ReturnValue = std::move(ReturnValue), Awaiter = std::move(Awaiter)]() mutable
+					{
+						Awaiter->SetValue(std::move(ReturnValue));
+					});
+				}
+				else
+				{
+					Awaiter->SetValue(std::move(ReturnValue));
+				}
+			}
+
+			Awaiter.reset();
+		});
+
+		return Awaiter;
+	}
+
+	static Task<> Yield() requires std::same_as<T, void>
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		TaskSource<void>::Run([Awaiter]() mutable -> void
+		{
+			Awaiter->SetValue();
+		});
+
+		return Awaiter;
+	}
+
+	template<class _Fn>
+	static auto Deferred(_Fn&& Body) requires std::same_as<T, void>
+	{
+		using ReturnType = FunctionReturnType<_Fn>;
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		TaskSource<void>::Deferred([Awaiter, Body = std::move(Body)]() mutable -> void
+		{
+			if constexpr (std::same_as<ReturnType, void>)
+			{
+				Body();
+				Awaiter->SetValue();
+			}
+			else
+			{
+				ReturnType ReturnValue = Body();
+				Awaiter->SetValue(std::move(ReturnValue));
+			}
+		});
+
+		return Awaiter;
+	}
+
+	static Task<> Deferred() requires std::same_as<T, void>
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		TaskSource<void>::Deferred([Awaiter]() mutable -> void
+		{
+			Awaiter->SetValue();
+		});
+
+		return Awaiter;
+	}
+
+	static Task<> Delay(uint32 Timeout) requires std::same_as<T, void> { return Delay(std::chrono::milliseconds(Timeout)); }
+	static Task<> Delay(std::chrono::milliseconds Timeout) requires std::same_as<T, void>
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+
+		TaskSource<void>::Delay(Timeout, [Awaiter]() mutable -> void
+		{
+			Awaiter->SetValue();
+		});
+
+		return Awaiter;
+	}
+
+	template<class T, class U>
+	static void SetManual(Task<T>& Task, U&& Value)
+	{
+		Task.Awaiter->SetValue(std::forward<U>(Value));
+	}
+
+	template<bool bConstFallbackToDeferred = (bool)TASK_FALLBACK_DEFERRED_DEFAULT, class _Fn>
+	static Task<> WaitUntil(_Fn&& ConditionBody) requires requires
+	{
+		{ std::declval<_Fn>()() } -> std::convertible_to<bool>;
+	}
+	{
+		auto Body = std::forward<_Fn>(ConditionBody);
+		while (!Body())
+		{
+			co_await Yield();
+		}
+
+		if (TaskSource<void>::bFallbackToDeferred.value_or(bConstFallbackToDeferred))
+		{
+			co_await Deferred();
+		}
+	}
+
+	static Task<> CompletedTask()
+	{
+		return TaskSource<void>::CompletedAwaiter();
 	}
 };
