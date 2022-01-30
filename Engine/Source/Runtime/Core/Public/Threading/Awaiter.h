@@ -28,9 +28,11 @@ namespace Threading::Tasks
 		virtual void Else(VoidableFunction<void> Proc) = 0;
 		virtual bool Cancel() = 0;
 		virtual void SetExceptionPtr(std::exception_ptr Ptr) = 0;
+		virtual void ThrowIfFailed() = 0;
 
 		bool await_ready()
 		{
+			ThrowIfFailed();
 			return IsReady();
 		}
 
@@ -53,8 +55,9 @@ namespace Threading::Tasks
 			});
 		}
 
-		void await_resume() noexcept
+		void await_resume()
 		{
+			ThrowIfFailed();
 		}
 	};
 
@@ -91,7 +94,7 @@ namespace Threading::Tasks
 				Cvar.wait(Mutex_lock);
 			}
 
-			CheckAndRethrow();
+			ThrowIfFailed();
 		}
 
 		virtual EStatus GetStatus() const override
@@ -192,13 +195,29 @@ namespace Threading::Tasks
 		virtual void SetExceptionPtr(std::exception_ptr Ptr) override
 		{
 			CaughtException = std::move(Ptr);
+			if constexpr (std::same_as<T, void>)
+			{
+				SetValue();
+			}
+			else
+			{
+				SetValue(T());
+			}
+		}
+
+		virtual void ThrowIfFailed() override
+		{
+			if (CaughtException)
+			{
+				std::rethrow_exception(CaughtException);
+			}
 		}
 
 		T GetValue()
 		{
 			Wait();
 			checkf(!bCancel, L"Task is already canceled.");
-			CheckAndRethrow();
+			ThrowIfFailed();
 			return Value.value();
 		}
 
@@ -221,15 +240,6 @@ namespace Threading::Tasks
 			for (auto& Proc : Procedures)
 			{
 				Proc(Value...);
-			}
-		}
-
-	private:
-		void CheckAndRethrow()
-		{
-			if (CaughtException)
-			{
-				std::rethrow_exception(CaughtException);
 			}
 		}
 
@@ -266,7 +276,7 @@ namespace Threading::Tasks
 			});
 		}
 
-		T await_resume() noexcept
+		T await_resume()
 		{
 			return GetValue();
 		}

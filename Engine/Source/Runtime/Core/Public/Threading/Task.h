@@ -91,7 +91,7 @@ private:
 			Ptr->await_suspend(std::move(Coroutine));
 		}
 
-		T await_resume() const noexcept
+		T await_resume() const
 		{
 			return Ptr->await_resume();
 		}
