@@ -4,16 +4,39 @@
 
 #include "PrimitiveTypes.h"
 #include "NonCopyable.h"
+#include "SuspendToken.h"
 #include <string>
 #include <future>
 #include <functional>
 
 class CORESOBJECT_API Thread : public NonCopyable
 {
+public:
+	class CORESOBJECT_API ThreadSuspendToken : public SuspendToken
+	{
+		friend class Thread;
+		Thread* CurrentThread;
+
+		std::optional<std::promise<void>> SuspendPromise;
+
+	private:
+		ThreadSuspendToken(Thread* CurrentThread);
+
+	public:
+		virtual std::future<void> Suspend() override;
+		virtual void Resume() override;
+
+		void Join();
+	};
+
 	void* ThreadHandle = nullptr;
 	int64 ThreadId = 0;
 	std::wstring FriendlyName;
 	bool bIsManaged = false;
+	ThreadSuspendToken* SToken = nullptr;
+
+	std::promise<void> JoinPromise;
+	std::future<void> JoinFuture;
 
 private:
 	Thread();
@@ -22,35 +45,16 @@ public:
 	~Thread();
 
 	void SetFriendlyName(std::wstring_view InFriendlyName);
-	std::wstring GetFriendlyName();
-	int64 GetThreadId();
-	bool IsManaged();
-
 	void SuspendThread();
 	void ResumeThread();
+	void Join();
 
-	template<class TReturn>
-	static std::future<TReturn> NewThread(std::wstring FriendlyName, std::function<TReturn()> Body)
-	{
-		auto ReturnFuture = std::make_shared<std::promise<TReturn>>();
-		Internal_NewThread(std::move(FriendlyName), [ReturnFuture, Body = std::move(Body)]()
-		{
-			if constexpr (std::same_as<TReturn, void>)
-			{
-				Body();
-				ReturnFuture->set_value();
-			}
-			else
-			{
-				TReturn ReturnValue = Body();
-				ReturnFuture->set_value(ReturnValue);
-			}
-		});
-		return ReturnFuture->get_future();
-	}
+	std::wstring GetFriendlyName() const;
+	int64 GetThreadId() const;
+	bool IsManaged() const;
+	ThreadSuspendToken* GetSuspendToken() const;
 
-private:
-	static void Internal_NewThread(std::wstring FriendlyName, std::function<void()> Body);
+	static Thread* CreateThread(std::wstring_view FriendlyName, std::function<void()> ThreadEntry);
 
 public:
 	static Thread* GetCurrentThread();

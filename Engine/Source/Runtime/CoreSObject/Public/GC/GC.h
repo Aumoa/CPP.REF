@@ -14,6 +14,7 @@
 class SObject;
 class GarbageCollector;
 class Thread;
+class SuspendToken;
 
 CORESOBJECT_API extern GarbageCollector& GC;
 
@@ -82,8 +83,13 @@ public:
 	void SetFlushInterval(float InSeconds);
 	float GetFlushInterval();
 
-	void Lock();
-	void Unlock();
+private:
+	std::mutex SuspendTokenMtx;
+	std::set<SuspendToken*> SuspendTokens;
+
+public:
+	void AddSuspendToken(SuspendToken* Token);
+	void RemoveSuspendToken(SuspendToken* Token);
 
 public:
 	static GarbageCollector& Get();

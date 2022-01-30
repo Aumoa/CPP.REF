@@ -1,11 +1,44 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-#undef GetObject
-
 #include "Threading/Thread.h"
 #include "Misc/StringUtils.h"
 #include "GC/GC.h"
+
+Thread::ThreadSuspendToken::ThreadSuspendToken(Thread* CurrentThread)
+	: CurrentThread(CurrentThread)
+{
+}
+
+std::future<void> Thread::ThreadSuspendToken::Suspend()
+{
+	checkf(!SuspendPromise.has_value(), L"Thread already wait for suspend.");
+	return SuspendPromise.emplace().get_future();
+}
+
+void Thread::ThreadSuspendToken::Resume()
+{
+	if (SuspendPromise.has_value())
+	{
+		SuspendPromise.reset();
+		CurrentThread->ResumeThread();
+	}
+}
+
+void Thread::ThreadSuspendToken::Join()
+{
+	if (!SuspendPromise.has_value())
+	{
+		return;
+	}
+
+	SuspendPromise->set_value();
+	CurrentThread->SuspendThread();
+}
+
+#if PLATFORM_WINDOWS
+
+#include <Windows.h>
+#undef GetObject
 
 Thread::Thread()
 {
@@ -25,6 +58,9 @@ Thread::Thread()
 	{
 		FriendlyName = std::to_wstring(ThreadId);
 	}
+
+	SToken = new ThreadSuspendToken(this);
+	JoinFuture = JoinPromise.get_future();
 }
 
 Thread::~Thread()
@@ -34,27 +70,14 @@ Thread::~Thread()
 		::CloseHandle(ThreadHandle);
 		ThreadHandle = nullptr;
 	}
+
+	delete SToken;
 }
 
 void Thread::SetFriendlyName(std::wstring_view InFriendlyName)
 {
 	SetThreadDescription(ThreadHandle, InFriendlyName.data());
 	FriendlyName = InFriendlyName;
-}
-
-std::wstring Thread::GetFriendlyName()
-{
-	return FriendlyName;
-}
-
-int64 Thread::GetThreadId()
-{
-	return ThreadId;
-}
-
-bool Thread::IsManaged()
-{
-	return bIsManaged;
 }
 
 void Thread::SuspendThread()
@@ -67,15 +90,48 @@ void Thread::ResumeThread()
 	::ResumeThread(ThreadHandle);
 }
 
-void Thread::Internal_NewThread(std::wstring FriendlyName, std::function<void()> Body)
+void Thread::Join()
 {
-	std::thread([Body, FriendlyName = std::move(FriendlyName)]()
+	JoinFuture.get();
+}
+
+std::wstring Thread::GetFriendlyName() const
+{
+	return FriendlyName;
+}
+
+int64 Thread::GetThreadId() const
+{
+	return ThreadId;
+}
+
+bool Thread::IsManaged() const
+{
+	return bIsManaged;
+}
+
+auto Thread::GetSuspendToken() const -> ThreadSuspendToken*
+{
+	return SToken;
+}
+
+Thread* Thread::CreateThread(std::wstring_view FriendlyName, std::function<void()> ThreadEntry)
+{
+	std::promise<Thread*> ThreadPtr;
+	std::future<Thread*> ThreadPtrFuture = ThreadPtr.get_future();
+
+	std::thread([ThreadEntry, FriendlyName = std::wstring(FriendlyName), &ThreadPtr]()
 	{
 		Thread* MyThread = GetCurrentThread();
 		MyThread->SetFriendlyName(FriendlyName);
 		MyThread->bIsManaged = true;
-		Body();
+
+		ThreadPtr.set_value(MyThread);
+		ThreadEntry();
+		MyThread->JoinPromise.set_value();
 	}).detach();
+
+	return ThreadPtrFuture.get();
 }
 
 Thread* Thread::GetCurrentThread()
@@ -83,3 +139,5 @@ Thread* Thread::GetCurrentThread()
 	static thread_local Thread MyThread;
 	return &MyThread;
 }
+
+#endif

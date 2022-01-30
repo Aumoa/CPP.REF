@@ -7,15 +7,20 @@
 #include <future>
 #include "Delegates/MulticastEvent.h"
 
+class Thread;
+
 class CORESOBJECT_API LogModule
 {
 	using This = LogModule;
 
 private:
 	std::wstring ModuleName;
-	std::future<void> WorkerThread;
+	Thread* WorkerThread = nullptr;
 	std::atomic<bool> bRunning;
 	std::ofstream LogFile;
+
+	struct Storage;
+	Storage* Impl = nullptr;
 	
 	std::vector<std::wstring> MessageQueue;
 	std::atomic<size_t> QueueIndex = 0;

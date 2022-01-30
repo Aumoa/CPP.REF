@@ -8,9 +8,11 @@
 class CORE_API ThreadGroup
 {
 	struct Impl;
+	class ThreadGroupSuspendToken;
 
 private:
 	Impl* _Impl;
+	ThreadGroupSuspendToken* SuspendToken = nullptr;
 	std::wstring GroupName;
 
 public:

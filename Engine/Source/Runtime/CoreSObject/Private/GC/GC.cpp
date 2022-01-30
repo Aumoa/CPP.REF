@@ -1,11 +1,15 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
+#include "GC/GC.h"
 #include "Threading/Parallel.h"
 #include "PlatformMisc/MemoryStatus.h"
 #include "Diagnostics/CycleCounterNamespace.h"
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Diagnostics/CycleCounterMacros.h"
+#include "Threading/SuspendToken.h"
+#include "Object.h"
 #include <string>
+#include <future>
 
 DECLARE_STAT_GROUP("GC", STATGROUP_GC);
 
@@ -16,6 +20,8 @@ DECLARE_CYCLE_STAT("  CompactObjectTable", STAT_CompactObjectTable, STATGROUP_GC
 DECLARE_CYCLE_STAT("  Finalize", STAT_Finalize, STATGROUP_GC);
 DECLARE_CYCLE_STAT("  PreCollect", STAT_PreCollect, STATGROUP_GC);
 DECLARE_CYCLE_STAT("  PostCollect", STAT_PostCollect, STATGROUP_GC);
+DECLARE_CYCLE_STAT("  SuspendToken", STAT_SuspendToken, STATGROUP_GC);
+DECLARE_CYCLE_STAT("  ResumeToken", STAT_ResumeToken, STATGROUP_GC);
 
 GarbageCollector& GC = GarbageCollector::Get();
 
@@ -80,6 +86,23 @@ void GarbageCollector::Collect(bool bFullPurge)
 	}
 
 	{
+		SCOPE_CYCLE_COUNTER(STAT_SuspendToken);
+		std::vector<std::future<void>> SuspendReady;
+		SuspendReady.reserve(SuspendTokens.size());
+
+		for (auto& Token : SuspendTokens)
+		{
+			SuspendReady.emplace_back(Token->Suspend());
+		}
+
+		// When all tokens are ready.
+		for (auto& Ready : SuspendReady)
+		{
+			Ready.get();
+		}
+	}
+
+	{
 		std::unique_lock GCMtx_lock(GCMtx);
 		++Generation;
 
@@ -119,6 +142,14 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 					NumObjects += Count;
 				}, NumGCThreads);
+			}
+		}
+
+		{
+			SCOPE_CYCLE_COUNTER(STAT_ResumeToken);
+			for (auto& Token : SuspendTokens)
+			{
+				Token->Resume();
 			}
 		}
 
@@ -264,6 +295,20 @@ void GarbageCollector::SetFlushInterval(float InSeconds)
 float GarbageCollector::GetFlushInterval()
 {
 	return FlushInterval;
+}
+
+void GarbageCollector::AddSuspendToken(SuspendToken* Token)
+{
+	SuspendTokenMtx.lock();
+	SuspendTokens.emplace(Token);
+	SuspendTokenMtx.unlock();
+}
+
+void GarbageCollector::RemoveSuspendToken(SuspendToken* Token)
+{
+	SuspendTokenMtx.lock();
+	SuspendTokens.erase(Token);
+	SuspendTokenMtx.unlock();
 }
 
 GarbageCollector& GarbageCollector::Get()

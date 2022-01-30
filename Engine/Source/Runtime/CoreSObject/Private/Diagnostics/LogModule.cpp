@@ -6,8 +6,17 @@
 #include "Threading/Thread.h"
 #include <filesystem>
 #include <chrono>
+#include <atomic>
+#include <boost/asio/io_service.hpp>
 
 static LogModule* gModule;
+
+struct LogModule::Storage
+{
+	boost::asio::io_service IO;
+	std::atomic<std::size_t> Pending;
+	std::vector<std::wstring> Buffers;
+};
 
 LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
 	: ModuleName(ModuleName)
@@ -15,38 +24,38 @@ LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
 {
 	checkf(gModule == nullptr, L"Module is already initialized.");
 	gModule = this;
+	Impl = new Storage();
 }
 
 LogModule::~LogModule()
 {
 	Shutdown();
+	delete Impl;
 }
 
 void LogModule::RunTask()
 {
-	std::filesystem::path Directory = L"Saved/Logs";
-	std::filesystem::path LogPath = std::format(L"{}.log", ModuleName);
+	using namespace std::filesystem;
 
-	if (!std::filesystem::exists(Directory))
+	path Directory = L"Saved/Logs";
+	path LogPath = std::format(L"{}.log", ModuleName);
+
+	if (!exists(Directory))
 	{
-		std::filesystem::create_directories(Directory);
+		create_directories(Directory);
 	}
-	else if (std::filesystem::exists(Directory / LogPath))
+	else if (exists(Directory / LogPath))
 	{
 		auto BackupTime = DateTime<>::Now().ToString();
-		//auto BackupTime = std::chrono::steady_clock::now().time_since_epoch().count();
-		std::filesystem::path BackupPath = StringUtils::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
-		std::filesystem::rename(Directory / LogPath, Directory / BackupPath);
+		path BackupPath = StringUtils::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
+		rename(Directory / LogPath, Directory / BackupPath);
 	}
 
 	LogFile.open(Directory / LogPath, std::ios::trunc | std::ios::out);
 	checkf(LogFile.is_open(), L"Couldn't open log file.");
 
 	bRunning = true;
-	WorkerThread = Thread::NewThread<void>(L"[Log Module]", [&]()
-	{
-		Worker();
-	});
+	WorkerThread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this));
 }
 
 void LogModule::Shutdown()
@@ -58,7 +67,7 @@ void LogModule::Shutdown()
 		gModule = nullptr;
 		bRunning = false;
 
-		WorkerThread.get();
+		WorkerThread->Join();
 		LogFile.close();
 
 		MessageQueue.clear();
@@ -68,10 +77,11 @@ void LogModule::Shutdown()
 void LogModule::EnqueueLogMessage(std::wstring_view Message)
 {
 	Logged.Broadcast(Message);
-
-	size_t MyIdx = QueueIndex++ % MessageQueue.size();
-	MessageQueue[MyIdx] = std::wstring(Message);
-	++SeekIndex;
+	Impl->IO.post([&, Message = std::wstring(Message)]() mutable
+	{
+		Impl->Buffers.emplace_back(std::move(Message));
+	});
+	++Impl->Pending;
 }
 
 bool LogModule::IsRunning()
@@ -87,26 +97,41 @@ LogModule* LogModule::Get()
 void LogModule::Worker()
 {
 	using namespace std::literals;
+	using namespace std::chrono;
 
 	const size_t QueueSize = MessageQueue.size();
 	size_t Seekpos = 0;
 
+	steady_clock::time_point Curr = steady_clock::now();
+
 	while (bRunning)
 	{
-		std::this_thread::sleep_for(1s);
-		size_t Readp = SeekIndex % QueueSize;
+		// Load
+		size_t Pending = Impl->Pending;
+		size_t Consume = 0;
 
-		for (size_t i = Seekpos; i != Readp; ++i)
+		Impl->Buffers.clear();
+		for (size_t i = 0; i < Pending; ++i)
 		{
-			if (i >= QueueSize)
-			{
-				i -= QueueSize;
-			}
-
-			LogFile << WCHAR_TO_ANSI(MessageQueue[i]) << std::endl;;
+			// Consume
+			Consume += Impl->IO.poll_one();
 		}
 
-		Seekpos = Readp;
-		LogFile.flush();
+		// Apply
+		Impl->Pending -= Consume;
+
+		// Write messages.
+		if (Impl->Buffers.size())
+		{
+			for (auto& Message : Impl->Buffers)
+			{
+				LogFile << WCHAR_TO_ANSI(Message) << std::endl;
+			}
+			LogFile.flush();
+		}
+
+		// Waiting for next frame.
+		Curr += milliseconds(16);
+		std::this_thread::sleep_until(Curr);
 	}
 }
