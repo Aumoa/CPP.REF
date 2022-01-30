@@ -3,20 +3,12 @@
 #include "Sockets/Socket.h"
 #include "Sockets/SocketException.h"
 #include "Net/IPEndPoint.h"
-#include <mutex>
 
 GENERATE_BODY(SSocket);
 
+#if PLATFORM_WINDOWS
 #include "Socket.Windows.inl"
-
-inline SOCKADDR_IN GetSOCKADDR_IN(const IPEndPoint& EndPoint)
-{
-	SOCKADDR_IN InAddr = {};
-	InAddr.sin_family = AF_INET;
-	InAddr.sin_addr.s_addr = EndPoint.IP.Address;
-	InAddr.sin_port = EndPoint.GetNetPort();
-	return InAddr;
-}
+#endif
 
 inline int32 GetRawFamily(EAddressFamily Family)
 {
@@ -89,24 +81,17 @@ SSocket::~SSocket()
 
 Task<> SSocket::Connect(const IPEndPoint& EndPoint)
 {
-	auto InAddr = GetSOCKADDR_IN(EndPoint);
-	if (connect(Impl->Socket, (SOCKADDR*)&InAddr, sizeof(InAddr)) != SOCKET_ERROR)
-	{
-		return Task<>::CompletedTask();
-	}
-
-	return Task<>::WaitUntil(std::bind(&SSocket::IsReadyToRead, this, std::chrono::milliseconds(1)));
+	return Impl->Connect(EndPoint);
 }
 
-Task<> SSocket::Bind(const IPEndPoint& EndPoint)
+Task<> SSocket::Send(const void* Buf, size_t Size)
 {
-	auto InAddr = GetSOCKADDR_IN(EndPoint);
-	if (bind(Impl->Socket, (SOCKADDR*)&InAddr, sizeof(InAddr)) != SOCKET_ERROR)
-	{
-		return Task<>::CompletedTask();
-	}
+	return Impl->Send(Buf, Size);
+}
 
-	return Task<>::WaitUntil(std::bind(&SSocket::IsReadyToRead, this, std::chrono::milliseconds(1)));
+Task<size_t> SSocket::Receive(void* OutBuf, size_t Size, bool bVerifiedLength)
+{
+	return Impl->Receive(OutBuf, Size, bVerifiedLength);
 }
 
 void SSocket::Close()
@@ -124,7 +109,7 @@ SSocket* SSocket::NewTCPSocket()
 	return gcnew SSocket(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::TCP);
 }
 
-bool SSocket::IsReadyToRead(std::chrono::microseconds Timeout) const
+bool SSocket::IsReadyToRead(std::chrono::microseconds Timeout)
 {
 	using namespace std::chrono;
 
@@ -136,10 +121,16 @@ bool SSocket::IsReadyToRead(std::chrono::microseconds Timeout) const
 	timeval Timeval = MakeTimeval(Timeout);
 	int32 SocketAvailable = select(0, &ReadSet, nullptr, nullptr, &Timeval);
 
+	if (SocketAvailable == SOCKET_ERROR)
+	{
+		//AbortWithError(errno, L"IsReadyToRead()");
+		return true;
+	}
+
 	return SocketAvailable > 0 && FD_ISSET(Impl->Socket, &ReadSet) != 0;
 }
 
-bool SSocket::IsReadyToWrite(std::chrono::microseconds Timeout) const
+bool SSocket::IsReadyToWrite(std::chrono::microseconds Timeout)
 {
 	using namespace std::chrono;
 
@@ -150,6 +141,12 @@ bool SSocket::IsReadyToWrite(std::chrono::microseconds Timeout) const
 
 	timeval Timeval = MakeTimeval(Timeout);
 	int32 SocketAvailable = select(0, nullptr, &WriteSet, nullptr, &Timeval);
+
+	if (SocketAvailable == SOCKET_ERROR)
+	{
+		//AbortWithError(errno, L"IsReadyToWrite()");
+		return true;
+	}
 
 	return SocketAvailable > 0 && FD_ISSET(Impl->Socket, &WriteSet) != 0;
 }

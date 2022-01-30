@@ -32,7 +32,7 @@ public class Sockets : ModuleRule
 
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
         });
     }
 }

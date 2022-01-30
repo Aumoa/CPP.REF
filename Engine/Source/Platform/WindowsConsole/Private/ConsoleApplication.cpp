@@ -7,7 +7,6 @@
 #include "Misc/CommandLine.h"
 #include "Diagnostics/LogModule.h"
 #include "Threading/Thread.h"
-#include "Threading/DeferredTaskRunner.h"
 #include "Console.h"
 #include <chrono>
 
@@ -63,8 +62,6 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 			MainThread->SetFriendlyName(L"[Main Thread]");
 			ReturnCode = ConsoleModule->Main(*CommandArgs.Get());
-
-			DeferredTaskRunner::Stop();
 			SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
 		}
 	}
