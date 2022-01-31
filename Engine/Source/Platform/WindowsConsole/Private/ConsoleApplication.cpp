@@ -70,5 +70,6 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	GC.Shutdown(true);
 
 	Logger->Shutdown();
+	Task<>::Cleanup();
 	return ReturnCode;
 }

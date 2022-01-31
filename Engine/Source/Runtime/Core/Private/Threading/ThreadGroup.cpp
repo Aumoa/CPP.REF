@@ -98,6 +98,7 @@ ThreadGroup::~ThreadGroup()
 {
 	GC.RemoveSuspendToken(SuspendToken);
 
+	_Impl->CoreWork.reset();
 	_Impl->bRunning = false;
 	_Impl->IO.stop();
 	_Impl->Threads.join_all();

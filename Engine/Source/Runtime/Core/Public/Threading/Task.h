@@ -49,6 +49,7 @@ namespace Threading::Tasks
 		TaskSource(std::shared_ptr<SourceAwaiter> Awaiter);
 
 		static void FlushDeferred();
+		static void Cleanup();
 
 	protected:
 		static void Run(std::function<void()> Body);

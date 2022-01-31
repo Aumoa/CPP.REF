@@ -128,6 +128,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	GC.Shutdown(true);
 
 	Logger->Shutdown();
+	Task<>::Cleanup();
 	return ErrorCode;
 }
 

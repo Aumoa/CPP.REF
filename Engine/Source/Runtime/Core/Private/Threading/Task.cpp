@@ -7,7 +7,7 @@
 
 namespace Threading::Tasks
 {
-	ThreadGroup ThreadPool(L"TaskWorker");
+	std::optional<ThreadGroup> ThreadPool(L"TaskWorker");
 	boost::asio::io_service DeferredIO;
 	std::atomic<size_t> DeferredIOCount;
 
@@ -33,9 +33,14 @@ namespace Threading::Tasks
 		DeferredIOCount -= Consume;
 	}
 
+	void TaskSource<void>::Cleanup()
+	{
+		ThreadPool.reset();
+	}
+
 	void TaskSource<void>::Run(std::function<void()> Body)
 	{
-		ThreadPool.Run(Body);
+		ThreadPool->Run(Body);
 	}
 
 	void TaskSource<void>::Deferred(std::function<void()> Body)
@@ -48,7 +53,7 @@ namespace Threading::Tasks
 
 	void TaskSource<void>::Delay(std::chrono::milliseconds Timeout, std::function<void()> Body)
 	{
-		ThreadPool.Delay(Timeout, std::move(Body));
+		ThreadPool->Delay(Timeout, std::move(Body));
 	}
 
 	std::shared_ptr<Awaiter<void>> TaskSource<void>::CompletedAwaiter()
