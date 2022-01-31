@@ -33,7 +33,7 @@ IPAddress IPAddress::Any()
 	{
 		auto Conv = htonl(INADDR_ANY);
 		IPAddress Addr;
-		memcpy(Addr.ByteAddress, &Addr, sizeof(Conv));
+		memcpy(Addr.ByteAddress, &Conv, sizeof(Conv));
 		return Addr;
 	}();
 
@@ -46,11 +46,18 @@ IPAddress IPAddress::Loopback()
 	{
 		auto Conv = htonl(INADDR_LOOPBACK);
 		IPAddress Addr;
-		memcpy(Addr.ByteAddress, &Addr, sizeof(Conv));
+		memcpy(Addr.ByteAddress, &Conv, sizeof(Conv));
 		return Addr;
 	}();
 
 	return AddrLoopback;
+}
+
+IPAddress IPAddress::FromIPv4(uint8 V1, uint8 V2, uint8 V3, uint8 V4)
+{
+	IPAddress Addr;
+	Addr.Address = htonl(((uint32)V1 << 24) | ((uint32)V2 << 16) | ((uint32)V3 << 8) | ((uint32)V4));
+	return Addr;
 }
 
 bool IPAddress::TryParse(std::wstring_view IPString, IPAddress* RefAddress)

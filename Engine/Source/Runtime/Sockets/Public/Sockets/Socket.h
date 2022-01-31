@@ -25,12 +25,31 @@ public:
 
 	Task<> Connect(const IPEndPoint& EndPoint);
 	Task<> Send(const void* Buf, size_t Size);
-	Task<size_t> Receive(void* OutBuf, size_t RecvSize, bool bVerifiedLength = false);
+	Task<size_t> Recv(void* OutBuf, size_t RecvSize, bool bVerifiedLength = false);
 	void Close();
 
 public:
-	Task<> Send(std::string_view StringBuf) { return Send(StringBuf.data(), StringBuf.size()); }
-	Task<> Send(std::wstring_view StringBuf) { return Send(StringBuf.data(), StringBuf.size() * sizeof(wchar_t)); }
+	template<class TRandomAccess>
+	Task<> Send(const TRandomAccess& Container) requires requires
+	{
+		{ std::size(Container) };
+		{ std::data(Container) };
+	}
+	{
+		using T = decltype(*std::data(Container));
+		return Send((const char*)std::data(Container), sizeof(T) * std::size(Container));
+	}
+
+	template<class TRandomAccess>
+	Task<size_t> Recv(TRandomAccess& Container, bool bVerifiedLength = false) requires requires
+	{
+		{ std::size(Container) } -> std::same_as<size_t>;
+		{ std::data(Container) };
+	}
+	{
+		using T = decltype(*std::data(Container));
+		return Recv((char*)std::data(Container), std::size(Container), bVerifiedLength);
+	}
 
 public:
 	static SSocket* NewTCPSocket();

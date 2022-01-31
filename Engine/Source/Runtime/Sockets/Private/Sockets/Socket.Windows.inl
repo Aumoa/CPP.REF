@@ -128,7 +128,7 @@ public:
 		}
 	}
 
-	Task<size_t> Receive(void* OutBuf, size_t Size, bool bVerifiedLength)
+	Task<size_t> Recv(void* OutBuf, size_t Size, bool bVerifiedLength)
 	{
 		size_t TotalSize = 0;
 
@@ -181,7 +181,7 @@ private:
 
 		while (true)
 		{
-			DWORD Status = WSAWaitForMultipleEvents(1, &hSockEvent, true, 0, false);
+			DWORD Status = WSAWaitForMultipleEvents(1, &hSockEvent, true, 32, false);
 			if (Status == WSA_WAIT_FAILED)
 			{
 				AbortWithError(WSAGetLastError(), Op);

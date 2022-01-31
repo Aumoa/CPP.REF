@@ -89,9 +89,9 @@ Task<> SSocket::Send(const void* Buf, size_t Size)
 	return Impl->Send(Buf, Size);
 }
 
-Task<size_t> SSocket::Receive(void* OutBuf, size_t Size, bool bVerifiedLength)
+Task<size_t> SSocket::Recv(void* OutBuf, size_t Size, bool bVerifiedLength)
 {
-	return Impl->Receive(OutBuf, Size, bVerifiedLength);
+	return Impl->Recv(OutBuf, Size, bVerifiedLength);
 }
 
 void SSocket::Close()

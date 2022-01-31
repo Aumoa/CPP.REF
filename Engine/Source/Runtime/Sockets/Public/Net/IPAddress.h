@@ -16,6 +16,7 @@ struct SOCKETS_API IPAddress
 
 	static IPAddress Any();
 	static IPAddress Loopback();
+	static IPAddress FromIPv4(uint8 V1, uint8 V2, uint8 V3, uint8 V4);
 	static bool TryParse(std::wstring_view IPString, IPAddress* RefAddress);
 	static bool TryParseHostname(std::wstring_view Hostname, std::vector<IPAddress>* RefAddresses);
 };
