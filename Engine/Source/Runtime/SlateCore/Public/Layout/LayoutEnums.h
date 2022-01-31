@@ -115,7 +115,7 @@ private:
 		case ESlateVisibility::SelfHitTestInvisible: return VIS_SelfHitTestInvisible;
 		case ESlateVisibility::All: return VIS_All;
 		default:
-			check(false);
+			checkf(false, L"Invalid argument: Visibility({})", (int32)Visibility);
 			return 0;
 		};
 	}

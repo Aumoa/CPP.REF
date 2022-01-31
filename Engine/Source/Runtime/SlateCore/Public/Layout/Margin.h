@@ -57,7 +57,7 @@ struct Margin
 		case EOrientation::Horizontal: return Left + Right;
 		case EOrientation::Vertical: return Top + Bottom;
 		default:
-			check(false);
+			checkf(false, L"Invalid argument: Orientation({})", (int32)Orientation);
 			return 0;
 		}
 	}

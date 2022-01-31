@@ -144,7 +144,7 @@ public:
 
         SetEvent((mode == EMousePositionMode::Absolute) ? mAbsoluteMode.get() : mRelativeMode.get());
 
-        check(mWindow != nullptr);
+        checkf(mWindow, L"Internal logic error.");
 
         TRACKMOUSEEVENT tme;
         tme.cbSize = sizeof(tme);
@@ -197,7 +197,7 @@ public:
         if (mWindow == window)
             return;
 
-        check(window != nullptr);
+        checkf(window != nullptr, L"Internal logic error.");
 
         RAWINPUTDEVICE Rid;
         Rid.usUsagePage = 0x1 /* HID_USAGE_PAGE_GENERIC */;
@@ -238,7 +238,7 @@ private:
 
     void ClipToWindow() noexcept
     {
-        check(mWindow != nullptr);
+        checkf(mWindow != nullptr, L"internal logic error.");
 
         RECT rect;
         GetClientRect(mWindow, &rect);
@@ -503,7 +503,7 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 SWindowsPlatformMouse::SWindowsPlatformMouse()
     : pImpl(std::make_unique<Impl>(this))
 {
-    check(sInstance == nullptr);
+    checkf(sInstance == nullptr, L"Internal logic error.");
     sInstance = this;
 }
 

@@ -20,7 +20,7 @@ Task<void> PrimitiveSceneProxy::UpdateTransform_GameThread(Transform InValue)
 
 void PrimitiveSceneProxy::UpdateTransform_RenderThread(const Transform& InValue)
 {
-	check(RenderThread::IsInRenderThread());
+	checkf(RenderThread::IsInRenderThread(), L"Callstack is not in render thread.");
 	ComponentTransform = InValue;
 }
 
@@ -32,7 +32,7 @@ Task<void> PrimitiveSceneProxy::MarkRenderStateDirty_GameThread()
 
 void PrimitiveSceneProxy::MarkRenderStateDirty_RenderThread()
 {
-	check(RenderThread::IsInRenderThread());
+	checkf(RenderThread::IsInRenderThread(), L"Callstack is not in render thread.");
 	bRenderStateDirty = true;
 }
 
@@ -44,6 +44,6 @@ Task<void> PrimitiveSceneProxy::SetHiddenInGame_GameThread(bool bHiddenInGame)
 
 void PrimitiveSceneProxy::SetHiddenInGame_RenderThread(bool bHiddenInGame)
 {
-	check(RenderThread::IsInRenderThread());
+	checkf(RenderThread::IsInRenderThread(), L"Callstack is not in render thread.");
 	this->bHiddenInGame = bHiddenInGame;
 }

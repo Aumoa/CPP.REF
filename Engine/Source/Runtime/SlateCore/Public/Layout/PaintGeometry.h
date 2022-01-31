@@ -38,7 +38,7 @@ struct PaintGeometry
 
 	PaintGeometry& AppendTransform(const SlateLayoutTransform& LayoutTransform)
 	{
-		check(bHasRenderTransform);
+		checkf(bHasRenderTransform, L"Geometry haven't render transform.");
 		AccumulatedRenderTransform = TransformCalculus2D::Concatenate(AccumulatedRenderTransform, LayoutTransform);
 		return *this;
 	}

@@ -12,7 +12,6 @@
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
-#include "Threading/DeferredTask.h"
 
 GENERATE_BODY(SGameEngine)
 
@@ -206,7 +205,7 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 
 	// Flush all deferred task with this frame.
-	DeferredTaskRunner<0>::Run();
+	Task<>::FlushDeferred();
 
 	// Execute level tick.
 	GameWorld->LevelTick(InDeltaTime.count());

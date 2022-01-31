@@ -10,7 +10,6 @@
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "Diagnostics/LogModule.h"
-#include "Threading/DeferredTask.h"
 
 GENERATE_BODY(SWindowsApplication);
 
@@ -20,7 +19,7 @@ GENERATE_BODY(SWindowsApplication);
 SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 	, hInstance(hInstance)
 {
-	check(gApp == nullptr);
+	checkf(gApp == nullptr, L"Singleton instance duplicated.");
 	gApp = this;
 
 	WNDCLASSEXW Wcex = {};
@@ -123,8 +122,6 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		// Save platform modules for finish to dispose.
 		PlatformModules = std::move(WinApp->PlatformModules);
 		PlatformModules.emplace_back(std::move(EngineModule));
-
-		DeferredTaskRunner::Stop();
 	}
 
 	GC.Collect(true);

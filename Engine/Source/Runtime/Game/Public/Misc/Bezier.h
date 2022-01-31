@@ -34,10 +34,7 @@ public:
     template<size_t NumPatch, typename TOutputFunc>
     static void CreatePatchVertices(const Vector3(&patch)[NumPatch], size_t tessellation, bool bMirrored, TOutputFunc outputVertex)
     {
-        if constexpr (NumPatch <= 16)
-        {
-            check(NumPatch <= 16);
-        }
+        static_assert(NumPatch <= 16, "Patches number overflow.");
 
         for (size_t i = 0; i <= tessellation; i++)
         {

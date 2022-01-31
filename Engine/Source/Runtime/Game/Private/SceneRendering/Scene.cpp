@@ -28,7 +28,7 @@ void SScene::Dispose()
 
 bool SScene::AddPrimitive(SPrimitiveComponent* InPrimitive)
 {
-	check(InPrimitive->SceneProxy == nullptr);
+	checkf(InPrimitive->SceneProxy == nullptr, L"Primitive already have scene proxy.");
 
 	InPrimitive->SceneProxy = InPrimitive->CreateSceneProxy();
 	if (InPrimitive->SceneProxy == nullptr)

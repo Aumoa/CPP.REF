@@ -10,7 +10,7 @@ SWidgetSlot::SWidgetSlot() : Super()
 
 void SWidgetSlot::SetContent(SWidget* InContent)
 {
-	check(Content == nullptr);
+	checkf(Content == nullptr, L"Content already setted.");
 	Content = InContent;
 }
 

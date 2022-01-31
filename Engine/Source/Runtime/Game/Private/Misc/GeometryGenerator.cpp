@@ -272,7 +272,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
 
     for (size_t iSubdivision = 0; iSubdivision < tessellation; ++iSubdivision)
     {
-        check(indices.size() % 3 == 0); // sanity
+        checkf(indices.size() % 3 == 0, L"Internal logic error."); // sanity
 
         // We use this to keep track of which edges have already been subdivided.
         EdgeSubdivisionMap subdividedEdges;
@@ -427,7 +427,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
                 }
 
                 // If we got to this point then triIndex0 is the pointer to the index to the vertex we're looking at
-                check(*triIndex0 == i);
+                checkf(*triIndex0 == i, L"Internal logic error.");
                 checkf(*triIndex1 != i && *triIndex2 != i, L"assume no degenerate triangles");
 
                 const RHIVertex& v0 = vertices[*triIndex0];
@@ -802,8 +802,8 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    check(vertices.size() == 4 * 3);
-    check(indices.size() == 4 * 3);
+    checkf(vertices.size() == 4 * 3, L"Internal logic error!");
+    checkf(indices.size() == 4 * 3, L"Internal logic error!");
 }
 
 
@@ -868,8 +868,8 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    check(vertices.size() == 8 * 3);
-    check(indices.size() == 8 * 3);
+    checkf(vertices.size() == 8 * 3, L"Internal logic error.");
+    checkf(indices.size() == 8 * 3, L"Internal logic error.");
 }
 
 
@@ -999,8 +999,8 @@ void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCol
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    check(vertices.size() == 12 * 5);
-    check(indices.size() == 12 * 3 * 3);
+    checkf(vertices.size() == 12 * 5, L"Internal logic error.");
+    checkf(indices.size() == 12 * 3 * 3, L"Internal logic error.");
 }
 
 
@@ -1086,8 +1086,8 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    check(vertices.size() == 20 * 3);
-    check(indices.size() == 20 * 3);
+    checkf(vertices.size() == 20 * 3, L"Internal logic error.");
+    checkf(indices.size() == 20 * 3, L"Internal logic error.");
 }
 
 

@@ -9,14 +9,14 @@ ArrangedChildrens::ArrangedChildrens(ESlateVisibility InVisibilityFilter)
 
 void ArrangedChildrens::AddWidget(ESlateVisibility VisibiilityOverride, const ArrangedWidget& InArrangedWidget)
 {
-	check(Accepts(VisibiilityOverride));
+	checkf(Accepts(VisibiilityOverride), L"Cannot accept widget visibility. Check visibility with 'Accept' function first.");
 	Widgets.emplace_back(InArrangedWidget);
 }
 
 void ArrangedChildrens::InsertWidget(ESlateVisibility VisibiilityOverride, const ArrangedWidget& InArrangedWidget, size_t Index)
 {
-	check(Accepts(VisibiilityOverride));
-	check(Widgets.size() <= Index);
+	checkf(Accepts(VisibiilityOverride), L"Cannot accept widget visibility. Check visibility with 'Accept' function first.");
+	checkf(Widgets.size() <= Index, L"Widget index overflow.");
 	Widgets.insert(Widgets.begin() + Index, InArrangedWidget);
 }
 

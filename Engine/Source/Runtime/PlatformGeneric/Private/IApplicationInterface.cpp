@@ -6,7 +6,7 @@ static IApplicationInterface* gApp;
 
 IApplicationInterface::IApplicationInterface()
 {
-	check(gApp == nullptr);
+	checkf(gApp == nullptr, L"Application is registered as duplicate.");
 	gApp = this;
 }
 

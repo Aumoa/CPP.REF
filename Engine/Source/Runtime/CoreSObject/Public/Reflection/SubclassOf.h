@@ -38,7 +38,7 @@ public:
 
 	inline SubclassOf(Type* NewType) : MyType(NewType)
 	{
-		check(NewType == nullptr || NewType->IsDerivedFrom<T>());
+		checkf(NewType == nullptr || NewType->IsDerivedFrom<T>(), L"Couldn't convert super class.");
 	}
 
 	inline bool IsValid() const

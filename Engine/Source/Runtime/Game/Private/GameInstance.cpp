@@ -37,8 +37,6 @@ SWorld* SGameInstance::GetWorld()
 
 SGameInstanceSubsystem* SGameInstance::GetSubsystem(Type* SubsystemClass, bool bAllowDerivedClass)
 {
-	check(SubsystemClass);
-
 	for (auto& Subsystem : Subsystems)
 	{
 		if (bAllowDerivedClass)

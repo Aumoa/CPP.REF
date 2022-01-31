@@ -41,7 +41,7 @@ private:
 	{
 		int64 ThreadId;
 		std::atomic<bool> bRunning;
-		std::future<void> ThreadJoin;
+		Thread* ThreadJoin = nullptr;
 
 		std::mutex WorkerMtx;
 		std::condition_variable cvWorker;

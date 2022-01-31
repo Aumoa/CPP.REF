@@ -191,7 +191,7 @@ SWindowsPlatformKeyboard* SWindowsPlatformKeyboard::sInstance;
 SWindowsPlatformKeyboard::SWindowsPlatformKeyboard()
     : pImpl(std::make_unique<Impl>(this))
 {
-    check(sInstance == nullptr);
+    checkf(sInstance == nullptr, L"Singleton instance duplicated.");
     sInstance = this;
 }
 

@@ -28,13 +28,11 @@ void SSceneRenderTargetInterface::SetRenderTargets(IRHITexture2D* InColorBuf, IR
 
 	if (InColorBuf)
 	{
-		check(RTV);
 		RTV->CreateRenderTargetView(0, InColorBuf, nullptr);
 	}
 
 	if (InDepthStencilBuf)
 	{
-		check(DSV);
 		DSV->CreateDepthStencilView(0, InDepthStencilBuf, nullptr);
 	}
 
