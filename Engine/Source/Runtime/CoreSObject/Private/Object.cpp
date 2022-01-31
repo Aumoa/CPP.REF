@@ -51,7 +51,7 @@ void SObject::PostConstruction()
 	volatile const auto& CachingDummy = GetType()->GetGCProperties();
 	GC.RegisterObject(this);
 
-#if DO_CHECK
+#if !SHIPPING
 	CachedTypeName = GetType()->GetFullName();
 #endif
 }

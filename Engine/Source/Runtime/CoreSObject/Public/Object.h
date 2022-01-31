@@ -36,7 +36,7 @@ private:
 	size_t InternalIndex = -1;
 	Referencer* ReferencePtr = nullptr;
 
-#if DO_CHECK
+#if !SHIPPING
 	std::wstring CachedTypeName;
 	SObject* GC_ContainsOwner = nullptr;
 #endif

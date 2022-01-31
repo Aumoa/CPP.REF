@@ -368,7 +368,7 @@ int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDept
 						}
 						++Count;
 
-#if DO_CHECK
+#if !SHIPPING
 						Member->GC_ContainsOwner = Object;
 #endif
 					}

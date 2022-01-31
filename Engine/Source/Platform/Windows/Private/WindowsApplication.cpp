@@ -58,7 +58,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		GC.Init();
 
 		SharedPtr CommandArgs = gcnew SCommandLine(Argv);
-		std::optional<std::wstring_view> ModuleName;
+		std::optional<std::wstring> ModuleName;
 		size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
 		if (GameModuleIdx != -1)
 		{
