@@ -30,5 +30,10 @@ namespace Threading::Tasks
 		void value()
 		{
 		}
+
+		void reset()
+		{
+			bHasValue = false;
+		}
 	};
 }

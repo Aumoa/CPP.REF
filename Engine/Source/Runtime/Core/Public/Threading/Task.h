@@ -203,10 +203,8 @@ public:
 	}
 
 	template<class TTask>
-	Task(TTask&& OtherTask) requires requires
-	{
-		{ Super(OtherTask.GetAwaiter()) };
-	} : Super(OtherTask.GetAwaiter())
+	Task(TTask&& OtherTask) requires std::derived_from<typename std::remove_reference_t<TTask>::MyAwaiter, SourceAwaiter>
+		: Super(std::static_pointer_cast<SourceAwaiter>(OtherTask.GetAwaiter()))
 	{
 	}
 
@@ -231,9 +229,9 @@ public:
 		return Super::Awaiter->GetStatus();
 	}
 
-	std::shared_ptr<SourceAwaiter> GetAwaiter() const
+	std::shared_ptr<MyAwaiter> GetAwaiter() const
 	{
-		return Super::Awaiter;
+		return std::static_pointer_cast<MyAwaiter>(Super::Awaiter);
 	}
 
 	bool Cancel()
@@ -491,10 +489,10 @@ public:
 		return Awaiter;
 	}
 
-	template<class T, class U>
-	static void SetManual(Task<T>& Task, U&& Value)
+	template<class T, class... U>
+	static void SetManual(Task<T>& Task, U&&... Value)
 	{
-		Task.Awaiter->SetValue(std::forward<U>(Value));
+		std::static_pointer_cast<typename ::Task<T>::MyAwaiter>(Task.Awaiter)->SetValue(std::forward<U>(Value)...);
 	}
 
 	template<bool bConstFallbackToDeferred = (bool)TASK_FALLBACK_DEFERRED_DEFAULT, class _Fn>
@@ -518,5 +516,11 @@ public:
 	static Task<> CompletedTask()
 	{
 		return TaskSource<void>::CompletedAwaiter();
+	}
+
+	static Task<> ManualTask() requires std::same_as<T, void>
+	{
+		std::shared_ptr Awaiter = std::make_shared<MyAwaiter>();
+		return Awaiter;
 	}
 };

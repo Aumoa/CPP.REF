@@ -91,7 +91,11 @@ namespace Threading::Tasks
 			if (!bCancel && !Value.has_value())
 			{
 				std::unique_lock Mutex_lock(Mutex);
-				Cvar.wait(Mutex_lock);
+				// Multi-check for avoid lock mutex.
+				if (!bCancel && !Value.has_value())
+				{
+					Cvar.wait(Mutex_lock);
+				}
 			}
 
 			ThrowIfFailed();
@@ -241,6 +245,17 @@ namespace Threading::Tasks
 			{
 				Proc(Value...);
 			}
+		}
+
+		void Reset()
+		{
+			std::unique_lock Mutex_lock(Mutex);
+
+			Value.reset();
+			bCancel = false;
+			ThenProc.clear();
+			ElseProc.clear();
+			CaughtException = std::exception_ptr();
 		}
 
 	public:
