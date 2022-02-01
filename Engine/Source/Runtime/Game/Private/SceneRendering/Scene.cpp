@@ -51,7 +51,7 @@ bool SScene::AddPrimitive(SPrimitiveComponent* InPrimitive)
 
 	InPrimitive->SceneProxy->PrimitiveId = Id;
 
-	RenderThread::EnqueueRenderThreadAwaiter().Then([&](auto)
+	RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
 	{
 		AddSceneProxy_RenderThread(InPrimitive->SceneProxy);
 	});
@@ -70,7 +70,7 @@ bool SScene::RemovePrimitive(SPrimitiveComponent* InPrimitive)
 		// SceneProxy will delete in RemoveSceneProxy_RenderThread function.
 		InPrimitive->SceneProxy = nullptr;
 
-		RenderThread::EnqueueRenderThreadAwaiter().Then([&](auto)
+		RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
 		{
 			RemoveSceneProxy_RenderThread(Id);
 		});

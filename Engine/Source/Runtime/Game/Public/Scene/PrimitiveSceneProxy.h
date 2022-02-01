@@ -22,10 +22,10 @@ public:
 
 	PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveComponent);
 
-	Task<void> UpdateTransform_GameThread(Transform InValue);
+	void UpdateTransform_GameThread(Transform InValue);
 	void UpdateTransform_RenderThread(const Transform& InValue);
-	Task<void> MarkRenderStateDirty_GameThread();
+	void MarkRenderStateDirty_GameThread();
 	void MarkRenderStateDirty_RenderThread();
-	Task<void> SetHiddenInGame_GameThread(bool bHiddenInGame);
+	void SetHiddenInGame_GameThread(bool bHiddenInGame);
 	void SetHiddenInGame_RenderThread(bool bHiddenInGame);
 };

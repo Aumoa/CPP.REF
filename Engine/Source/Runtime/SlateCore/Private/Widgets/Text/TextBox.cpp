@@ -117,5 +117,6 @@ void STextBox::Enter()
 {
 	TextCommitted.Broadcast(GetText());
 	SetText(L"");
+	Text = L"";
 	Caret = 0;
 }

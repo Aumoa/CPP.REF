@@ -60,8 +60,8 @@ protected:
 
 private:
 	void ReallocLayout();
-	Task<void> SetTextAlignment_GameThread(ERHITextAlignment Alignment);
-	Task<void> SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignment);
+	void SetTextAlignment_GameThread(ERHITextAlignment Alignment);
+	void SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignment);
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

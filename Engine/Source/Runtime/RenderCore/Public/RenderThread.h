@@ -3,87 +3,38 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <thread>
-#include <map>
-#include <mutex>
 #include <functional>
-#include <future>
-#include "Threading/Thread.h"
-#include "Threading/ManualTask.h"
-#include "Misc/CrcHash.h"
+#include <atomic>
 
-interface IRHIDeviceContext;
 class Thread;
+interface IRHIDeviceContext;
 
 class RENDERCORE_API RenderThread
 {
-	RenderThread() = delete;
-
 private:
-	struct WaitingThreadWorks
-	{
-		std::vector<ManualTask<IRHIDeviceContext*>> Works;
-		std::function<void()> CompletedWork;
-	};
+	static RenderThread* sInstance;
 
-	struct PendingThreadWork
-	{
-		std::vector<ManualTask<IRHIDeviceContext*>> Works;
-		std::function<void()> CompletedWork;
-		IRHIDeviceContext* DeviceContext = nullptr;
+	Thread* RemoteThread = nullptr;
+	volatile bool bRunning = false;
 
-		void Init();
-		void SwapExecute(IRHIDeviceContext* InDeviceContext, WaitingThreadWorks& InTarget);
-		void RunningWorks_RenderThread();
-	};
+	struct Impl_t;
+	Impl_t* Impl[2] = {};
+	std::atomic<size_t> BufferIndex;
 
-	struct ThreadInfo
-	{
-		int64 ThreadId;
-		std::atomic<bool> bRunning;
-		Thread* ThreadJoin = nullptr;
+	Task<> Runner = Task<>::ManualTask();
+	Task<> Completed = Task<>::CompletedTask();
 
-		std::mutex WorkerMtx;
-		std::condition_variable cvWorker;
-		
-		std::promise<void> WorkerPromise;
-		std::future<void> WorkerFuture;
-
-		void Init();
-		void Init_RenderThread();
-		void Worker();
-	};
-
-private:
-	inline static ThreadInfo _Thread;
-	inline static WaitingThreadWorks _WaitingWorks;
-	inline static PendingThreadWork _ExecutingWorks;
-	
 public:
-	static void Init();
-	static void Shutdown();
-	static Task<IRHIDeviceContext*> EnqueueRenderThreadAwaiter();
-	static void ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork = true);
-	static void WaitForLastWorks();
+	RenderThread();
+	~RenderThread() noexcept;
 
-	static void OnPreGarbageCollect();
-	static void OnPostGarbageCollect();
+	void EnqueueRenderThreadWork(std::function<void(IRHIDeviceContext*)> Work);
+	Task<> ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void(IRHIDeviceContext*)> InCompletionWork);
+	static bool InRenderThread();
 
-	static bool IsInRenderThread()
-	{
-		static int64 Id = Thread::GetCurrentThread()->GetThreadId();
-		return Id == _Thread.ThreadId;
-	}
+public:
+	static RenderThread* Get() { return sInstance; }
 
 private:
-	template<size_t _N>
-	struct StringLiteralHash
-	{
-		size_t Hs;
-
-		consteval StringLiteralHash(const char(&_Cstr)[_N])
-			: Hs(CrcHash::Hash(_Cstr))
-		{
-		}
-	};
+	void Run();
 };

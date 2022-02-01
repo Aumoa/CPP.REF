@@ -19,6 +19,13 @@
 
 GENERATE_BODY(SSlateApplication);
 
+DECLARE_STAT_GROUP("Slate", STATGROUP_Slate);
+DECLARE_CYCLE_STAT("TickAndPaint", STAT_TickAndPaint, STATGROUP_Slate);
+DECLARE_CYCLE_STAT("  Prepass", STAT_Prepass, STATGROUP_Slate);
+DECLARE_CYCLE_STAT("  Tick", STAT_Tick, STATGROUP_Slate);
+DECLARE_CYCLE_STAT("  Paint", STAT_Paint, STATGROUP_Slate);
+DECLARE_CYCLE_STAT("  SortAndFlush", STAT_SortAndFlush, STATGROUP_Slate);
+
 SSlateApplication::SSlateApplication() : Super()
 {
 }
@@ -63,24 +70,41 @@ void SSlateApplication::Init(IApplicationInterface* InApplication)
 
 void SSlateApplication::TickAndPaint(float InDeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_TickAndPaint);
+
 	if (Device == nullptr)
 	{
 		Device = GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice();
 	}
 
 	// Calculate prepass layout.
-	CoreWindow->PrepassLayout();
+	Vector2 DesiredSize;
+	std::optional<Geometry> AllottedGeometry;
 
-	Vector2 DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
-	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
-	CoreWindow->Tick(AllottedGeometry, InDeltaTime);
+	{
+		SCOPE_CYCLE_COUNTER(STAT_Prepass);
+		CoreWindow->PrepassLayout();
+		DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
+		AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
+	}
 
-	Rect CullingRect = Rect(0, 0, DesiredSize.X, DesiredSize.Y);
-	CoreWindow->Paint(PaintArgs::InitPaintArgs(Device, InDeltaTime), AllottedGeometry, CullingRect, DrawCollector, 0, true);
+	{
+		SCOPE_CYCLE_COUNTER(STAT_Tick);
+		CoreWindow->Tick(*AllottedGeometry, InDeltaTime);
+	}
 
-	DrawCollector->SortByLayer();
-	CachedElements.clear();
-	DrawCollector->FlushElements(CachedElements);
+	{
+		SCOPE_CYCLE_COUNTER(STAT_Paint);
+		Rect CullingRect = Rect(0, 0, DesiredSize.X, DesiredSize.Y);
+		CoreWindow->Paint(PaintArgs::InitPaintArgs(Device, InDeltaTime), *AllottedGeometry, CullingRect, DrawCollector, 0, true);
+	}
+
+	{
+		SCOPE_CYCLE_COUNTER(STAT_SortAndFlush);
+		DrawCollector->SortByLayer();
+		CachedElements.clear();
+		DrawCollector->FlushElements(CachedElements);
+	}
 
 	CacheRenderElements_GameThread(CachedElements);
 }
@@ -140,10 +164,12 @@ void SSlateApplication::OnIME(IMEEvent EventArgs)
 	CoreWindow->SendIMEEvent(MakeRoot(), EventArgs);
 }
 
-Task<void> SSlateApplication::CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements)
+void SSlateApplication::CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements)
 {
-	co_await RenderThread::EnqueueRenderThreadAwaiter();
-	RenderElements = std::move(Elements);
+	RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+	{
+		RenderElements = std::move(Elements);
+	});
 }
 
 Geometry SSlateApplication::MakeRoot()

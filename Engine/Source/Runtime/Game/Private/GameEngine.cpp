@@ -71,8 +71,6 @@ bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 
 void SGameEngine::Shutdown()
 {
-	RenderThread::Shutdown();
-
 	for (auto& System : Subsystems)
 	{
 		System->Deinit();

@@ -1,116 +1,159 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "RenderThread.h"
+#include "Threading/Thread.h"
+#include <mutex>
+#include <condition_variable>
+#include <boost/asio/io_service.hpp>
 
-void RenderThread::PendingThreadWork::Init()
+RenderThread* RenderThread::sInstance;
+
+DECLARE_STAT_GROUP("RenderThread", STATGROUP_RenderThread);
+DECLARE_CYCLE_STAT("ExecuteWorks", STAT_ExecuteWorks, STATGROUP_RenderThread);
+DECLARE_CYCLE_STAT("  WaitPreviousComplete", STAT_WaitPreviousComplete, STATGROUP_RenderThread);
+DECLARE_CYCLE_STAT("  ExecuteCurrentWorks", STAT_ExecuteCurrentWorks, STATGROUP_RenderThread);
+
+struct RenderThread::Impl_t
 {
-}
+	boost::asio::io_service IO;
+	IRHIDeviceContext* Context = nullptr;
 
-void RenderThread::PendingThreadWork::SwapExecute(IRHIDeviceContext* InDeviceContext, WaitingThreadWorks& InTarget)
+	std::function<void(IRHIDeviceContext*)> CompletionWork;
+};
+
+RenderThread::RenderThread()
 {
-	std::swap(Works, InTarget.Works);
-	std::swap(CompletedWork, InTarget.CompletedWork);
-	DeviceContext = InDeviceContext;
-}
+	checkf(sInstance == nullptr, L"Singleton instance duplicated.");
+	sInstance = this;
 
-void RenderThread::PendingThreadWork::RunningWorks_RenderThread()
-{
-	for (auto& Awaiter : Works)
-	{
-		Awaiter.SetValue(DeviceContext);
-	}
+	Impl[0] = new Impl_t();
+	Impl[1] = new Impl_t();
 
-	if (CompletedWork)
-	{
-		CompletedWork();
-	}
-
-	Works.clear();
-	CompletedWork = nullptr;
-}
-
-void RenderThread::ThreadInfo::Init()
-{
 	bRunning = true;
-	ThreadJoin = Thread::CreateThread(L"[Render Thread]", std::bind(&ThreadInfo::Worker, &_Thread));
+	RemoteThread = Thread::CreateThread(L"[Render Thread]", std::bind(&RenderThread::Run, this));
 }
 
-void RenderThread::ThreadInfo::Init_RenderThread()
+RenderThread::~RenderThread()
 {
-	::Thread* CurrentThread = ::Thread::GetCurrentThread();
-	ThreadId = CurrentThread->GetThreadId();
-	CurrentThread->SetFriendlyName(L"[Render Thread]");
+	bRunning = false;
+	Task<>::SetManual(Runner);
+	RemoteThread->Join();
+
+	delete Impl[0];
+	delete Impl[1];
+	sInstance = nullptr;
 }
 
-void RenderThread::ThreadInfo::Worker()
+void RenderThread::EnqueueRenderThreadWork(std::function<void(IRHIDeviceContext*)> Work)
 {
-	Init_RenderThread();
+	size_t Index = BufferIndex % 2;
+	Impl[Index]->IO.post([this, Index, Work = std::move(Work)]() mutable
+	{
+		Work(Impl[Index]->Context);
+	});
+}
 
-	std::unique_lock WorkerMtx_lock(WorkerMtx);
+Task<> RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void(IRHIDeviceContext*)> InCompletionWork)
+{
+	SCOPE_CYCLE_COUNTER(STAT_ExecuteWorks);
+
+	size_t Index = BufferIndex++ % 2;
+	auto Impl = this->Impl[Index];
+
+	{
+		SCOPE_CYCLE_COUNTER(STAT_WaitPreviousComplete);
+		Completed.Wait();
+		Completed.GetAwaiter()->Reset();
+	}
+
+	Impl->CompletionWork = InCompletionWork;
+	Impl->Context = InDeviceContext;
+
+	{
+		SCOPE_CYCLE_COUNTER(STAT_ExecuteCurrentWorks);
+		Task<>::SetManual(Runner);
+		co_await Completed;
+	}
+}
+
+bool RenderThread::InRenderThread()
+{
+	return Thread::GetCurrentThread()->GetThreadId() == Get()->RemoteThread->GetThreadId();
+}
+
+void RenderThread::Run()
+{
+	Thread* CurrentThread = Thread::GetCurrentThread();
+
+	class RenderThreadSuspendToken : public SuspendToken
+	{
+		RenderThread* Owner;
+		Thread* CurrentThread;
+
+		std::optional<std::promise<void>> SuspendPromise;
+
+	public:
+		RenderThreadSuspendToken(RenderThread* Owner, Thread* CurrentThread)
+			: Owner(Owner)
+			, CurrentThread(CurrentThread)
+		{
+		}
+
+		virtual std::future<void> Suspend() override
+		{
+			checkf(!SuspendPromise.has_value(), L"Thread already wait for suspend.");
+			Task<>::SetManual(Owner->Runner);
+			return SuspendPromise.emplace().get_future();
+		}
+
+		virtual void Resume() override
+		{
+			if (SuspendPromise.has_value())
+			{
+				SuspendPromise.reset();
+				CurrentThread->ResumeThread();
+			}
+		}
+
+		void Join()
+		{
+			if (!SuspendPromise.has_value())
+			{
+				return;
+			}
+
+			SuspendPromise->set_value();
+			CurrentThread->SuspendThread();
+		}
+	};
+
+	std::unique_ptr Token = std::make_unique<RenderThreadSuspendToken>(this, CurrentThread);
+	GC.AddSuspendToken(Token.get());
 
 	while (bRunning)
 	{
-		cvWorker.wait(WorkerMtx_lock);
-		_ExecutingWorks.RunningWorks_RenderThread();
-		WorkerPromise.set_value();
-	}
-}
+		Token->Join();
 
-void RenderThread::Init()
-{
-	_Thread.Init();
-	_ExecutingWorks.Init();
-}
+		auto This = this;
+		size_t Index = BufferIndex % 2;
+		auto Impl = this->Impl[Index];
 
-void RenderThread::Shutdown()
-{
-	_Thread.bRunning = false;
+		// Waiting for event 'Run'.
+		Runner.Wait();
+		Runner.GetAwaiter()->Reset();
 
-	// Flush executing event.
-	ExecuteWorks(nullptr, nullptr);
-
-	// Join executing thread.
-	_Thread.ThreadJoin->Join();
-}
-
-Task<IRHIDeviceContext*> RenderThread::EnqueueRenderThreadAwaiter()
-{
-	std::unique_lock lock(_Thread.WorkerMtx);
-	return _WaitingWorks.Works.emplace_back();
-}
-
-void RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void()> InCompletionWork, bool bWaitPreviousWork)
-{
-	if (bWaitPreviousWork)
-	{
-		WaitForLastWorks();
+		if (Impl->CompletionWork)
+		{
+			Impl->IO.run();
+			Impl->CompletionWork(Impl->Context);
+			Task<>::SetManual(Completed);
+		}
+		else
+		{
+			// Continue for GC without complete.
+			continue;
+		}
 	}
 
-	std::unique_lock lock(_Thread.WorkerMtx);
-	_WaitingWorks.CompletedWork = InCompletionWork;
-	_ExecutingWorks.SwapExecute(InDeviceContext, _WaitingWorks);
-
-	_Thread.WorkerPromise = std::promise<void>();
-	_Thread.WorkerFuture = _Thread.WorkerPromise.get_future();
-	_Thread.cvWorker.notify_one();
-}
-
-void RenderThread::WaitForLastWorks()
-{
-	if (_Thread.WorkerFuture.valid())
-	{
-		_Thread.WorkerFuture.wait();
-	}
-}
-
-void RenderThread::OnPreGarbageCollect()
-{
-	if (_Thread.WorkerFuture.valid())
-	{
-		_Thread.WorkerFuture.get();
-	}
-}
-
-void RenderThread::OnPostGarbageCollect()
-{
+	GC.RemoveSuspendToken(Token.get());
 }

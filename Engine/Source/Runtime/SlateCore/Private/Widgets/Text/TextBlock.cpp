@@ -63,27 +63,31 @@ public:
 		CommandBuffer->DrawTextLayout(LocalLayout.LocalPosition, Layout, TintBrush);
 	}
 
-	Task<void> SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
+	void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
 	{
 		if (CachedGeometry != AllottedGeometry || CachedLayer != Layer)
 		{
 			CachedGeometry = AllottedGeometry;
 			CachedLayer = Layer;
 
-			co_await RenderThread::EnqueueRenderThreadAwaiter();
-			RenderGeometry = AllottedGeometry;
-			RenderLayer = Layer;
+			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			{
+				RenderGeometry = AllottedGeometry;
+				RenderLayer = Layer;
+			});
 		}
 	}
 
-	Task<void> SetMaxLayoutSize_GameThread(Vector2 LayoutSize)
+	void SetMaxLayoutSize_GameThread(Vector2 LayoutSize)
 	{
 		if (CachedLayoutSize != LayoutSize)
 		{
 			CachedLayoutSize = LayoutSize;
 
-			co_await RenderThread::EnqueueRenderThreadAwaiter();
-			Layout->SetMaxSize(LayoutSize);
+			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			{
+				Layout->SetMaxSize(LayoutSize);
+			});
 		}
 	}
 };
@@ -216,7 +220,7 @@ void STextBlock::ReallocLayout()
 	}
 }
 
-Task<void> STextBlock::SetTextAlignment_GameThread(ERHITextAlignment Alignment)
+void STextBlock::SetTextAlignment_GameThread(ERHITextAlignment Alignment)
 {
 	if (TextAlignment != Alignment)
 	{
@@ -224,13 +228,15 @@ Task<void> STextBlock::SetTextAlignment_GameThread(ERHITextAlignment Alignment)
 
 		if (Layout)
 		{
-			co_await RenderThread::EnqueueRenderThreadAwaiter();
-			Layout->SetTextAlignment(Alignment);
+			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			{
+				Layout->SetTextAlignment(Alignment);
+			});
 		}
 	}
 }
 
-Task<void> STextBlock::SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignment)
+void STextBlock::SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignment)
 {
 	if (ParagraphAlignment != Alignment)
 	{
@@ -238,8 +244,10 @@ Task<void> STextBlock::SetParagraphAlignment_GameThread(ERHIParagraphAlignment A
 
 		if (Layout)
 		{
-			co_await RenderThread::EnqueueRenderThreadAwaiter();
-			Layout->SetParagraphAlignment(Alignment);
+			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			{
+				Layout->SetParagraphAlignment(Alignment);
+			});
 		}
 	}
 }

@@ -15,6 +15,9 @@
 GENERATE_BODY(SWorld);
 DEFINE_LOG_CATEGORY(LogWorld);
 
+DECLARE_STAT_GROUP("World", STATGROUP_World);
+DECLARE_CYCLE_STAT("LevelTick", STAT_LevelTick, STATGROUP_World);
+
 SWorld::SWorld(EWorldType InWorldType) : Super()
 	, WorldType(InWorldType)
 {
@@ -94,6 +97,8 @@ void SWorld::DestroyActor(AActor* InActor)
 
 void SWorld::LevelTick(float InDeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_LevelTick);
+
 	Level->IncrementalActorsApply();
 	if (STickTaskLevelManager* LevelTick = Level->GetLevelTick())
 	{

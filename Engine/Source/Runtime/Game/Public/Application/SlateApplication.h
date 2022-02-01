@@ -65,6 +65,6 @@ private:
 	void OnMouseWheelScrolled(int32 ScrollDelta);
 	void OnIME(IMEEvent EventArgs);
 
-	Task<void> CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements);
+	void CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements);
 	Geometry MakeRoot();
 };

@@ -12,38 +12,44 @@ PrimitiveSceneProxy::PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveCompone
 {
 }
 
-Task<void> PrimitiveSceneProxy::UpdateTransform_GameThread(Transform InValue)
+void PrimitiveSceneProxy::UpdateTransform_GameThread(Transform InValue)
 {
-	co_await RenderThread::EnqueueRenderThreadAwaiter();
-	UpdateTransform_RenderThread(InValue);
+	RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+	{
+		UpdateTransform_RenderThread(InValue);
+	});
 }
 
 void PrimitiveSceneProxy::UpdateTransform_RenderThread(const Transform& InValue)
 {
-	checkf(RenderThread::IsInRenderThread(), L"Callstack is not in render thread.");
+	checkf(RenderThread::InRenderThread(), L"Callstack is not in render thread.");
 	ComponentTransform = InValue;
 }
 
-Task<void> PrimitiveSceneProxy::MarkRenderStateDirty_GameThread()
+void PrimitiveSceneProxy::MarkRenderStateDirty_GameThread()
 {
-	co_await RenderThread::EnqueueRenderThreadAwaiter();
-	MarkRenderStateDirty_RenderThread();
+	RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+	{
+		MarkRenderStateDirty_RenderThread();
+	});
 }
 
 void PrimitiveSceneProxy::MarkRenderStateDirty_RenderThread()
 {
-	checkf(RenderThread::IsInRenderThread(), L"Callstack is not in render thread.");
+	checkf(RenderThread::InRenderThread(), L"Callstack is not in render thread.");
 	bRenderStateDirty = true;
 }
 
-Task<void> PrimitiveSceneProxy::SetHiddenInGame_GameThread(bool bHiddenInGame)
+void PrimitiveSceneProxy::SetHiddenInGame_GameThread(bool bHiddenInGame)
 {
-	co_await RenderThread::EnqueueRenderThreadAwaiter();
-	SetHiddenInGame_RenderThread(bHiddenInGame);
+	RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+	{
+		SetHiddenInGame_RenderThread(bHiddenInGame);
+	});
 }
 
 void PrimitiveSceneProxy::SetHiddenInGame_RenderThread(bool bHiddenInGame)
 {
-	checkf(RenderThread::IsInRenderThread(), L"Callstack is not in render thread.");
+	checkf(RenderThread::InRenderThread(), L"Callstack is not in render thread.");
 	this->bHiddenInGame = bHiddenInGame;
 }

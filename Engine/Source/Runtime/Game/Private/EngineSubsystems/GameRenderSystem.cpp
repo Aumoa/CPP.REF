@@ -46,9 +46,7 @@ SGameRenderSystem::~SGameRenderSystem()
 
 void SGameRenderSystem::Init()
 {
-	RenderThread::Init();
-	GC.PreGarbageCollect.AddRaw(&RenderThread::OnPreGarbageCollect);
-	GC.PostGarbageCollect.AddRaw(&RenderThread::OnPostGarbageCollect);
+	RenderThread.emplace();
 
 	Factory = IApplicationInterface::Get().GetFactory();
 	IRHIAdapter* PrimaryAdapter = Factory->GetAdapter(0);
@@ -65,6 +63,8 @@ void SGameRenderSystem::Init()
 
 void SGameRenderSystem::Deinit()
 {
+	RenderThread.reset();
+
 	if (Device)
 	{
 		Device->Dispose();
@@ -80,7 +80,7 @@ void SGameRenderSystem::Tick(float InDeltaTime)
 
 void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp)
 {
-	RenderThread::ExecuteWorks(PrimaryQueue, [this, InDeltaTime, SlateApp]()
+	RenderThread::Get()->ExecuteWorks(PrimaryQueue, [this, InDeltaTime, SlateApp](auto)
 	{
 		SwapChainRT->ResolveTarget();
 
@@ -142,7 +142,7 @@ void SGameRenderSystem::ResizeApp(Vector2N Size)
 
 	if (Device)
 	{
-		RenderThread::ExecuteWorks(PrimaryQueue, [this, Size]()
+		RenderThread::Get()->ExecuteWorks(PrimaryQueue, [this, Size](auto)
 		{
 			// On the framework view is resized, wait all graphics commands for
 			// synchronize and cleanup resource lock states.

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
+#include "RenderThread.h"
 
 interface IRHIFactory;
 interface IRHIDevice;
@@ -29,6 +30,8 @@ class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameRenderSystem)
 
 private:
+	std::optional<RenderThread> RenderThread;
+
 	SPROPERTY(Factory)
 	IRHIFactory* Factory = nullptr;
 	SPROPERTY(Device)

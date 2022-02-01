@@ -75,16 +75,18 @@ public:
 		}
 	}
 
-	Task<void> SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
+	void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
 	{
 		if (CachedGeometry != AllottedGeometry || CachedLayer != Layer)
 		{
 			CachedGeometry = AllottedGeometry;
 			CachedLayer = Layer;
 
-			co_await RenderThread::EnqueueRenderThreadAwaiter();
-			RenderGeometry = AllottedGeometry;
-			RenderLayer = Layer;
+			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			{
+				RenderGeometry = AllottedGeometry;
+				RenderLayer = Layer;
+			});
 		}
 	}
 };
