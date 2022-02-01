@@ -410,8 +410,15 @@ LRESULT CALLBACK SWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	case WM_IME_STARTCOMPOSITION:
+		SWindowsIMEController::ProcessMessage(uMsg, wParam, lParam);
+		return TRUE;
 	case WM_CHAR:
 	case WM_IME_CHAR:
+	case WM_IME_ENDCOMPOSITION:
+	case WM_IME_COMPOSITION:
+	case WM_IME_SETCONTEXT:
+	case WM_IME_NOTIFY:
 		SWindowsIMEController::ProcessMessage(uMsg, wParam, lParam);
 		break;
 	}

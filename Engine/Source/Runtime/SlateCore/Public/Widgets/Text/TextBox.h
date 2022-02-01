@@ -19,6 +19,7 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 protected:
+	virtual bool OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
 	virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
 
 public:
@@ -27,6 +28,12 @@ public:
 
 private:
 	void ProcessChar(wchar_t Ch);
+	void Composition(wchar_t Ch);
 	void Backspace();
 	void Enter();
+
+private:
+	std::wstring Text;
+	std::optional<wchar_t> ComposingChar;
+	size_t Caret = 0;
 };

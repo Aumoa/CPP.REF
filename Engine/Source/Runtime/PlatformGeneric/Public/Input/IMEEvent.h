@@ -6,7 +6,10 @@
 
 enum class EIMEEvent
 {
-	Char
+	Char,
+	StartComposition,
+	EndComposition,
+	Composition,
 };
 
 struct IMEEvent
@@ -19,6 +22,21 @@ struct IMEEvent
 		{
 			wchar_t ComposedChar;
 		} Char;
+
+		struct
+		{
+			uint8 __Unused;
+		} StartComposition;
+
+		struct
+		{
+			uint8 __Unused;
+		} EndComposition;
+
+		struct
+		{
+			wchar_t ComposingChar;
+		} Composition;
 	};
 
 	IMEEvent(EIMEEvent Event) : Event(Event)

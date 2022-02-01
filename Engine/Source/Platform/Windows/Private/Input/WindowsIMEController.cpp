@@ -21,7 +21,21 @@ void SWindowsIMEController::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 	case WM_CHAR:
 		Event.emplace(EIMEEvent::Char);
 		Event->Char.ComposedChar = (wchar_t)wParam;
-		sInstance->IME.Broadcast(*Event);
 		break;
+	case WM_IME_STARTCOMPOSITION:
+		Event.emplace(EIMEEvent::StartComposition);
+		break;
+	case WM_IME_ENDCOMPOSITION:
+		Event.emplace(EIMEEvent::EndComposition);
+		break;
+	case WM_IME_COMPOSITION:
+		Event.emplace(EIMEEvent::Composition);
+		Event->Composition.ComposingChar = (wchar_t)wParam;
+		break;
+	}
+
+	if (Event.has_value())
+	{
+		sInstance->IME.Broadcast(*Event);
 	}
 }
