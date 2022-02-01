@@ -8,7 +8,7 @@
 namespace Threading::Tasks
 {
 	std::optional<ThreadGroup> ThreadPool(L"TaskWorker");
-	boost::asio::io_service DeferredIO;
+	std::optional DeferredIO = std::make_optional<boost::asio::io_service>();
 	std::atomic<size_t> DeferredIOCount;
 
 	std::optional<bool> TaskSource<void>::bFallbackToDeferred;
@@ -28,7 +28,7 @@ namespace Threading::Tasks
 		size_t Consume = 0;
 		for (size_t i = 0; i < Works; ++i)
 		{
-			Consume += DeferredIO.poll_one();
+			Consume += DeferredIO->poll_one();
 		}
 		DeferredIOCount -= Consume;
 	}
@@ -36,6 +36,7 @@ namespace Threading::Tasks
 	void TaskSource<void>::Cleanup()
 	{
 		ThreadPool.reset();
+		DeferredIO.reset();
 	}
 
 	void TaskSource<void>::Run(std::function<void()> Body)
@@ -48,7 +49,7 @@ namespace Threading::Tasks
 		// Increment IO count first. If does not consume deferred action actually, count will not decrement.
 		// DeferredIOCount just check count that execute per frame.
 		++DeferredIOCount;
-		DeferredIO.post(Body);
+		DeferredIO->post(Body);
 	}
 
 	void TaskSource<void>::Delay(std::chrono::milliseconds Timeout, std::function<void()> Body)

@@ -21,10 +21,6 @@ private:
 
 	struct Storage;
 	Storage* Impl = nullptr;
-	
-	std::vector<std::wstring> MessageQueue;
-	std::atomic<size_t> QueueIndex = 0;
-	std::atomic<size_t> SeekIndex = 0;
 
 public:
 	LogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);

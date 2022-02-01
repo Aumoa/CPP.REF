@@ -20,7 +20,6 @@ struct LogModule::Storage
 
 LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
 	: ModuleName(ModuleName)
-	, MessageQueue(QueueSize)
 {
 	checkf(gModule == nullptr, L"Module is already initialized.");
 	gModule = this;
@@ -30,7 +29,6 @@ LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
 LogModule::~LogModule()
 {
 	Shutdown();
-	delete Impl;
 }
 
 void LogModule::RunTask()
@@ -70,7 +68,8 @@ void LogModule::Shutdown()
 		WorkerThread->Join();
 		LogFile.close();
 
-		MessageQueue.clear();
+		delete Impl;
+		Impl = nullptr;
 	}
 }
 
@@ -98,9 +97,6 @@ void LogModule::Worker()
 {
 	using namespace std::literals;
 	using namespace std::chrono;
-
-	const size_t QueueSize = MessageQueue.size();
-	size_t Seekpos = 0;
 
 	steady_clock::time_point Curr = steady_clock::now();
 
