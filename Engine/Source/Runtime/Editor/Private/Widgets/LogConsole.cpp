@@ -1,6 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "Widgets/LogConsole.h"
+#include "Widgets/DebugCanvas.h"
 #include "Widgets/Image/Image.h"
 #include "Widgets/Text/TextBlock.h"
 #include "Widgets/Text/TextBox.h"
@@ -67,7 +68,6 @@ DEFINE_SLATE_CONSTRUCTOR(SLogConsole, Attr)
 				SAssignNew(ConsoleInput, STextBox)
 				.TintColor(NamedColors::White)
 				.Font(L"Consolas", 12.0f)
-				.Text(L"여기에 입력")
 			]
 		];
 
@@ -95,15 +95,23 @@ void SLogConsole::OnLogged(std::wstring_view Message)
 
 void SLogConsole::OnConsoleCommitted(std::wstring_view ConsoleInput)
 {
-	size_t IndexOf = ConsoleInput.find(' ');
-	if (IndexOf == std::wstring::npos)
+	if (auto* DebugCanvas = SDebugCanvas::Get(); ConsoleInput.starts_with(L"stat ") && DebugCanvas)
 	{
-		Details::AutoConsoleVariableBase::TryProcessConsoleVar(ConsoleInput, L"");
+		ConsoleInput.remove_prefix(5);
+		DebugCanvas->ToggleSTAT(ConsoleInput);
 	}
 	else
 	{
-		std::wstring_view Key = ConsoleInput.substr(0, IndexOf);
-		std::wstring_view Arguments = ConsoleInput.substr(IndexOf + 1);
-		Details::AutoConsoleVariableBase::TryProcessConsoleVar(Key, Arguments);
+		size_t IndexOf = ConsoleInput.find(' ');
+		if (IndexOf == std::wstring::npos)
+		{
+			Details::AutoConsoleVariableBase::TryProcessConsoleVar(ConsoleInput, L"");
+		}
+		else
+		{
+			std::wstring_view Key = ConsoleInput.substr(0, IndexOf);
+			std::wstring_view Arguments = ConsoleInput.substr(IndexOf + 1);
+			Details::AutoConsoleVariableBase::TryProcessConsoleVar(Key, Arguments);
+		}
 	}
 }

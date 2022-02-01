@@ -52,7 +52,6 @@ public:
 
 #else
 
-#define check(x)
 #define checkf(x, format, ...)
 #define ensure(x) (x)
 #define ensureMsgf(x, format, ...) (x)

@@ -119,7 +119,7 @@ void SD3D12CommandList::ClearDepthStencilView(IRHIDepthStencilView* dsv, int32 i
 		flags |= D3D12_CLEAR_FLAG_STENCIL;
 	}
 
-	check(flags);
+	checkf(flags, L"Internal error.");
 	CommandList->ClearDepthStencilView(GET_VIEW(dsv, indexOf), flags, depth.value_or(1.0f), stencil.value_or(0), 0, nullptr);
 }
 
@@ -160,7 +160,7 @@ DEFINE_CALL_DIRECT_TwoParams(SetGraphicsRootShaderResourceView, uint32, uint64);
 
 void SD3D12CommandList::SetGraphicsRootShaderResourceView(uint32 index, IRHIShaderResourceView* view, int32 indexOf, int32 count)
 {
-	check(HeapForSRV->Slack() >= count);
+	checkf(HeapForSRV->Slack() >= count, L"Internal error.");
 
 	auto view_h = GET_VIEW(view, indexOf);
 	D3D12_GPU_DESCRIPTOR_HANDLE hgpu = HeapForSRV->GetGPUHandle();

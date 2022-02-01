@@ -5,12 +5,23 @@
 #include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Misc/TickScheduler.h"
 #include "Diagnostics/CycleCounter.h"
+#include <boost/algorithm/string.hpp>
 
 GENERATE_BODY(SDebugCanvas);
+DEFINE_LOG_CATEGORY(LogDebugCanvas);
+
+SDebugCanvas* SDebugCanvas::sInstance;
 
 SDebugCanvas::SDebugCanvas() : Super()
 {
+	checkf(sInstance == nullptr, L"Duplicated singleton instance.");
+	sInstance = this;
 	RefreshTimer = gcnew STickScheduler();
+}
+
+SDebugCanvas::~SDebugCanvas()
+{
+	sInstance = nullptr;
 }
 
 void SDebugCanvas::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
@@ -20,18 +31,59 @@ void SDebugCanvas::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 	RefreshTimer->Tick(InDeltaTime);
 }
 
+void SDebugCanvas::ToggleSTAT(std::wstring_view Stat)
+{
+	auto It = STATGROUPS.find(Stat);
+	if (It == STATGROUPS.end())
+	{
+		StatGroupView View;
+		View.Namespace = CycleCounter::Get().GetNamespace(Stat);
+		if (View.Namespace == nullptr)
+		{
+			SE_LOG(LogDebugCanvas, Warning, L"Couldn't find STATGROUP({}).", Stat);
+			return;
+		}
+
+		VBox->AddSlot()
+			.SizeParam(ESizeRule::Auto, 1.0f)
+			[
+				SAssignNew(View.TextBlock, STextBlock)
+				.Font(L"Consolas", 15.0f)
+				.TintColor(NamedColors::White)
+				.Text(View.Namespace->Trace())
+			];
+
+		STATGROUPS.emplace(std::wstring(Stat), View);
+	}
+	else
+	{
+		StatGroupView& View = It->second;
+		size_t IndexOf = VBox->FindSlot(View.TextBlock);
+		if (IndexOf == -1)
+		{
+			return;
+		}
+
+		VBox->RemoveSlot(IndexOf);
+		STATGROUPS.erase(It);
+	}
+}
+
+SDebugCanvas* SDebugCanvas::Get()
+{
+	return sInstance;
+}
+
 DEFINE_SLATE_CONSTRUCTOR(SDebugCanvas, Attr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
 
 	ConstructDisplayStats();
-
-	RefreshTimer->AddSchedule(STickScheduler::TaskInfo
+	RefreshTimer->AddSchedule(
 	{
-		.Task = [this]() { UpdateTexts(); },
+		.Task = std::bind(&SDebugCanvas::UpdateTexts, this),
 		.Delay = 1.0f,
-		.InitDelay = 0.0f,
-		.bReliableCallCount = false
+		.InitDelay = 1.0f
 	});
 }
 
@@ -42,8 +94,10 @@ void SDebugCanvas::UpdateTexts()
 	GCCounter->SetText(std::format(L"DebugCanvas:\n  Total objects: {}\n  Used Memory: {:.4f} MB\n  FPS: {}", GC.NumObjects(), GC.MemorySize() / (float)Megabyte, TickCounter));
 	TickCounter = 0;
 
-	STATGROUP_GC->SetText(CycleCounter::Get().GetNamespace(L"GC")->Trace());
-	STATGROUP_Engine->SetText(CycleCounter::Get().GetNamespace(L"Engine")->Trace());
+	for (auto& [Key, View] : STATGROUPS)
+	{
+		View.TextBlock->SetText(View.Namespace->Trace());
+	}
 }
 
 void SDebugCanvas::ConstructDisplayStats()
@@ -51,28 +105,12 @@ void SDebugCanvas::ConstructDisplayStats()
 	AddSlot()
 		.bAutoSize(true)
 		[
-			SNew(SVerticalBoxPanel)
+			SAssignNew(VBox, SVerticalBoxPanel)
 			+SVerticalBoxPanel::SSlot()
 			.SizeParam(ESizeRule::Auto, 1.0f)
 			[
 				SAssignNew(GCCounter, STextBlock)
 				.Text(L"Objects: 0")
-				.Font(L"Consolas", 15.0f)
-				.TintColor(NamedColors::White)
-			]
-			+SVerticalBoxPanel::SSlot()
-			.SizeParam(ESizeRule::Auto, 1.0f)
-			[
-				SAssignNew(STATGROUP_GC, STextBlock)
-				.Text(L"")
-				.Font(L"Consolas", 15.0f)
-				.TintColor(NamedColors::White)
-			]
-			+SVerticalBoxPanel::SSlot()
-			.SizeParam(ESizeRule::Auto, 1.0f)
-			[
-				SAssignNew(STATGROUP_Engine, STextBlock)
-				.Text(L"")
 				.Font(L"Consolas", 15.0f)
 				.TintColor(NamedColors::White)
 			]
