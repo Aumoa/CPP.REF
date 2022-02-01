@@ -7,6 +7,7 @@
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Diagnostics/CycleCounterMacros.h"
 #include "Threading/SuspendToken.h"
+#include "LogCore.h"
 #include "Object.h"
 #include <string>
 #include <future>
@@ -79,6 +80,7 @@ void GarbageCollector::Shutdown(bool bNormal)
 void GarbageCollector::Collect(bool bFullPurge)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GC);
+	SE_LOG(LogGC, Verbose, L"GC.Collect() triggered.");
 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_PreCollect);
