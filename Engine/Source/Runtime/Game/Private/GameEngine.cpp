@@ -12,6 +12,7 @@
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "Misc/AutoConsoleVariable.h"
 
 GENERATE_BODY(SGameEngine)
 
@@ -85,10 +86,24 @@ void SGameEngine::Shutdown()
 	SubsystemView.clear();
 }
 
+namespace AutoConsoleVars
+{
+	namespace GC
+	{
+		AutoConsoleVariable<float> CollectInterval(L"GC.CollectInterval", 60.0f);
+	}
+}
+
 int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Broadcast();
 	GC.Collect();
+
+	GC.SetFlushInterval(AutoConsoleVars::GC::CollectInterval.GetValue());
+	AutoConsoleVars::GC::CollectInterval.VariableCommitted.AddRaw([](AutoConsoleVariable<float>& V)
+	{
+		GC.SetFlushInterval(V.GetValue());
+	});
 
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine(InApplication))

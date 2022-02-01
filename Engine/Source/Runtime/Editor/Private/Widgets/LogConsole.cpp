@@ -7,6 +7,7 @@
 #include "Widgets/Layout/ScrollBox.h"
 #include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Diagnostics/LogModule.h"
+#include "Misc/AutoConsoleVariable.h"
 
 GENERATE_BODY(SLogConsole);
 
@@ -94,5 +95,15 @@ void SLogConsole::OnLogged(std::wstring_view Message)
 
 void SLogConsole::OnConsoleCommitted(std::wstring_view ConsoleInput)
 {
-	SE_LOG(LogEditorConsole, Verbose, L"ConsoleInput: {}", ConsoleInput);
+	size_t IndexOf = ConsoleInput.find(' ');
+	if (IndexOf == std::wstring::npos)
+	{
+		Details::AutoConsoleVariableBase::TryProcessConsoleVar(ConsoleInput, L"");
+	}
+	else
+	{
+		std::wstring_view Key = ConsoleInput.substr(0, IndexOf);
+		std::wstring_view Arguments = ConsoleInput.substr(IndexOf + 1);
+		Details::AutoConsoleVariableBase::TryProcessConsoleVar(Key, Arguments);
+	}
 }
