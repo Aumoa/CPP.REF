@@ -2,6 +2,7 @@
 
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "Misc/Paths.h"
 #include "LogGame.h"
 #include "GameEngine.h"
 #include "AssetsLoader.h"
@@ -43,7 +44,10 @@ void SGameAssetSystem::PostInit()
 
 SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 {
-	auto It = Assets.find(AssetPath);
+	using namespace std::filesystem;
+	path PhysicalPath = Paths::AsPhysicalPath(AssetPath);
+
+	auto It = Assets.find(PhysicalPath);
 	if (It == Assets.end())
 	{
 		SE_LOG(LogAssets, Error, L"Could not found asset({}) from assets tree.", AssetPath.wstring());
@@ -54,13 +58,13 @@ SObject* SGameAssetSystem::LoadObject(const std::filesystem::path& AssetPath)
 	{
 		SObject* ImportObject = nullptr;
 
-		if (!AssetPath.has_extension())
+		if (!PhysicalPath.has_extension())
 		{
-			ImportObject = Assimp->ImportFromFile(std::filesystem::path(AssetPath).replace_extension(L".sasset"));
+			ImportObject = Assimp->ImportFromFile(PhysicalPath.replace_extension(L".sasset"));
 		}
 		else
 		{
-			ImportObject = Assimp->ImportFromFile(AssetPath);
+			ImportObject = Assimp->ImportFromFile(PhysicalPath);
 		}
 
 		if (ImportObject == nullptr)
