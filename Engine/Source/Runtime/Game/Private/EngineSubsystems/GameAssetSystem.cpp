@@ -3,9 +3,9 @@
 #include "EngineSubsystems/GameAssetSystem.h"
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "Misc/Paths.h"
+#include "Assets/AssetsLoader.h"
 #include "LogGame.h"
 #include "GameEngine.h"
-#include "AssetsLoader.h"
 #include <stack>
 #include <queue>
 

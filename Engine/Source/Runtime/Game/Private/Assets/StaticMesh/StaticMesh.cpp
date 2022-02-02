@@ -1,7 +1,7 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "StaticMesh/StaticMesh.h"
-#include "LogAssetsIO.h"
+#include "Assets/StaticMesh/StaticMesh.h"
+#include "LogGame.h"
 
 GENERATE_BODY(SStaticMesh);
 

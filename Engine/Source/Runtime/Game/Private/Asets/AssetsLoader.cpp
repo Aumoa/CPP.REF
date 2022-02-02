@@ -1,9 +1,8 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "AssetsLoader.h"
-#include "LogAssetsIO.h"
-#include "IAssets.h"
-#include "Texture/Texture2D.h"
+#include "Assets/AssetsLoader.h"
+#include "Assets/Texture/Texture2D.h"
+#include "LogGame.h"
 #include <fstream>
 
 GENERATE_BODY(SAssetsLoader);
@@ -59,7 +58,7 @@ SAssetsLoader::SAssetsLoader(IRHIDevice* InDevice) : Super()
 
 SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 {
-#define ASSETS_LOG(Message) SE_LOG(LogAssetsIO, Error, L"Could not import assets from file '{}': {}", AssetPath.wstring(), Message)
+#define ASSETS_LOG(Message) SE_LOG(LogAssets, Error, L"Could not import assets from file '{}': {}", AssetPath.wstring(), Message)
 
 	static constexpr size_t HeaderSize = sizeof(GenericAssetHeader);
 	ScopedFile Fp(AssetPath, std::ios::binary | std::ios::in);
@@ -100,7 +99,7 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 
 	Fp->close();
 
-	IAssets* Asset = nullptr;
+	SStreamableRenderAsset* Asset = nullptr;
 	switch (Header.Type)
 	{
 	case EAssetType::Image:
@@ -116,6 +115,8 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 		ASSETS_LOG(L"Could not parsing assets binary.");
 		return nullptr;
 	}
+
+#undef ASSETS_LOG
 
 	return Asset;
 }

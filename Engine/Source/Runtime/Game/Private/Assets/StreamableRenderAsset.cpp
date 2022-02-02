@@ -1,6 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "StreamableRenderAsset.h"
+#include "Assets/StreamableRenderAsset.h"
 
 GENERATE_BODY(SStreamableRenderAsset);
 

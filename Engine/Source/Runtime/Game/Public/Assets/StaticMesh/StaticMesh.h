@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StreamableRenderAsset.h"
+#include "Assets/StreamableRenderAsset.h"
 
-class ASSETSIO_API SStaticMesh : public SStreamableRenderAsset
+class GAME_API SStaticMesh : public SStreamableRenderAsset
 {
 	GENERATED_BODY(SStaticMesh)
 

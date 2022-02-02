@@ -20,8 +20,7 @@ public class Game : ModuleRule
             "Core",
             "PlatformGeneric",
             "RenderCore",
-            "SlateCore",
-            "AssetsIO"
+            "SlateCore"
         });
     }
 }

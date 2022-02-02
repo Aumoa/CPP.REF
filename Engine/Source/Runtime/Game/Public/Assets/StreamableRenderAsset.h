@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "IAssets.h"
 
-class ASSETSIO_API SStreamableRenderAsset : implements SObject, implements IAssets
+class SAssetsLoader;
+
+class GAME_API SStreamableRenderAsset : implements SObject
 {
 	GENERATED_BODY(SStreamableRenderAsset)
 
 public:
 	SStreamableRenderAsset();
+
+	virtual bool StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBin) = 0;
 };

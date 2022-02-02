@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StreamableRenderAsset.h"
+#include "Assets/StreamableRenderAsset.h"
 
 interface IPlatformImage;
 interface IRHITexture2D;
 interface IRHIBitmap;
 
-class ASSETSIO_API STexture2D : public SStreamableRenderAsset
+class GAME_API STexture2D : public SStreamableRenderAsset
 {
 	GENERATED_BODY(STexture2D)
 

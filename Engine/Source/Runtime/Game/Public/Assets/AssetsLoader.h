@@ -7,7 +7,7 @@
 
 interface IRHIDevice;
 
-class ASSETSIO_API SAssetsLoader : implements SObject
+class GAME_API SAssetsLoader : implements SObject
 {
 	GENERATED_BODY(SAssetsLoader)
 

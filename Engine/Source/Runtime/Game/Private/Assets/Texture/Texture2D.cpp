@@ -1,9 +1,9 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-#include "Texture/Texture2D.h"
-#include "LogAssetsIO.h"
+#include "Assets/Texture/Texture2D.h"
+#include "Assets/AssetsLoader.h"
+#include "LogGame.h"
 #include "IApplicationInterface.h"
-#include "AssetsLoader.h"
 #include "Multimedia/IPlatformImageLoader.h"
 #include "Multimedia/IPlatformImage.h"
 #include "RHI/IRHITexture2D.h"
@@ -35,7 +35,7 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 
 	if (Header.Version == 0 || Header.Version > ImporterVersion)
 	{
-		SE_LOG(LogAssetsIO, Error, L"Assets version mismatch. AssetVersion: {}, ImporterVersion: {}", Header.Version, ImporterVersion);
+		SE_LOG(LogAssets, Error, L"Assets version mismatch. AssetVersion: {}, ImporterVersion: {}", Header.Version, ImporterVersion);
 		return false;
 	}
 
