@@ -95,7 +95,12 @@ void SLogConsole::OnLogged(std::wstring_view Message)
 
 void SLogConsole::OnConsoleCommitted(std::wstring_view ConsoleInput)
 {
-	if (auto* DebugCanvas = SDebugCanvas::Get(); ConsoleInput.starts_with(L"stat ") && DebugCanvas)
+	if (ConsoleInput == L"clear")
+	{
+		Stream = L"";
+		LogText->SetText(Stream);
+	}
+	else if (auto* DebugCanvas = SDebugCanvas::Get(); ConsoleInput.starts_with(L"stat ") && DebugCanvas)
 	{
 		ConsoleInput.remove_prefix(5);
 		DebugCanvas->ToggleSTAT(ConsoleInput);

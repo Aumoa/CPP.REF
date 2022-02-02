@@ -36,8 +36,6 @@ private:
 	SPROPERTY(DrawCollector)
 	SSlateDrawCollector* DrawCollector = nullptr;
 
-	SPROPERTY(CachedElements)
-	std::vector<SSlateDrawCollector::RenderElement> CachedElements;
 	SPROPERTY(RenderElements)
 	std::vector<SSlateDrawCollector::RenderElement> RenderElements;
 

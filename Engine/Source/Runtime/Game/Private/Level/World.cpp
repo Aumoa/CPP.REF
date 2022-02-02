@@ -17,6 +17,11 @@ DEFINE_LOG_CATEGORY(LogWorld);
 
 DECLARE_STAT_GROUP("World", STATGROUP_World);
 DECLARE_CYCLE_STAT("LevelTick", STAT_LevelTick, STATGROUP_World);
+DECLARE_CYCLE_STAT("  BeginFrame", STAT_BeginFrame, STATGROUP_World);
+DECLARE_CYCLE_STAT("  PrePhysics", STAT_PrePhysics, STATGROUP_World);
+DECLARE_CYCLE_STAT("  DuringPhysics", STAT_DuringPhysics, STATGROUP_World);
+DECLARE_CYCLE_STAT("  PostPhysics", STAT_PostPhysics, STATGROUP_World);
+DECLARE_CYCLE_STAT("  PostUpdateWork", STAT_PostUpdateWork, STATGROUP_World);
 
 SWorld::SWorld(EWorldType InWorldType) : Super()
 	, WorldType(InWorldType)
@@ -102,18 +107,35 @@ void SWorld::LevelTick(float InDeltaTime)
 	Level->IncrementalActorsApply();
 	if (STickTaskLevelManager* LevelTick = Level->GetLevelTick())
 	{
-		LevelTick->BeginFrame();
+		{
+			SCOPE_CYCLE_COUNTER(STAT_BeginFrame);
+			LevelTick->BeginFrame();
+		}
 
-		LevelTick->IncrementalDispatchTick(ETickingGroup::PrePhysics, InDeltaTime);
-		LevelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, InDeltaTime);
-		LevelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, InDeltaTime);
+		{
+			SCOPE_CYCLE_COUNTER(STAT_PrePhysics);
+			LevelTick->IncrementalDispatchTick(ETickingGroup::PrePhysics, InDeltaTime);
+		}
+
+		{
+			SCOPE_CYCLE_COUNTER(STAT_DuringPhysics);
+			LevelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, InDeltaTime);
+		}
+
+		{
+			SCOPE_CYCLE_COUNTER(STAT_PostPhysics);
+			LevelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, InDeltaTime);
+		}
 
 		if (APlayerController* PlayerController = Level->GetPlayerController())
 		{
 			PlayerController->UpdateCameraManager(InDeltaTime);
 		}
 
-		LevelTick->IncrementalDispatchTick(ETickingGroup::PostUpdateWork, InDeltaTime);
+		{
+			SCOPE_CYCLE_COUNTER(STAT_PostUpdateWork);
+			LevelTick->IncrementalDispatchTick(ETickingGroup::PostUpdateWork, InDeltaTime);
+		}
 
 		LevelTick->EndFrame();
 	}

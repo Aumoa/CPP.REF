@@ -100,17 +100,24 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 	}
 
 	{
+		std::vector<SSlateDrawCollector::RenderElement> CachedElements;
 		SCOPE_CYCLE_COUNTER(STAT_SortAndFlush);
 		DrawCollector->SortByLayer();
-		CachedElements.clear();
 		DrawCollector->FlushElements(CachedElements);
-	}
 
-	CacheRenderElements_GameThread(CachedElements);
+		CacheRenderElements_GameThread(std::move(CachedElements));
+	}
 }
 
 void SSlateApplication::DrawElements(IRHIDeviceContext2D* CommandList, SSlateRenderer* Renderer)
 {
+	for (auto& Element : RenderElements)
+	{
+		if (Element.Element)
+		{
+			Element.Element->ToString();
+		}
+	}
 	Renderer->PopulateCommands(CommandList, RenderElements);
 }
 

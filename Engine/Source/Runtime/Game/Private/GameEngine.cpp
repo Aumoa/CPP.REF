@@ -211,14 +211,13 @@ void SGameEngine::SystemsTick(std::chrono::duration<float> InDeltaTime)
 void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GameTick);
-
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
-
-	// Flush all deferred task with this frame.
-	Task<>::FlushDeferred();
 
 	// Execute level tick.
 	GameWorld->LevelTick(InDeltaTime.count());
+
+	// Flush all deferred task with this frame.
+	Task<>::FlushDeferred();
 
 	// Tick and paint.
 	SlateApplication->TickAndPaint(InDeltaTime.count());

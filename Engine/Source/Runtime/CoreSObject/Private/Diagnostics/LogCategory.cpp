@@ -43,8 +43,7 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	wstring DetailComposed = format(L"{}: {}: {}", DateTime<>::Now().ToString(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
 
 	// Log to Visual Studio Output Console.
-	OutputDebugStringW(DetailComposed.c_str());
-	OutputDebugStringW(L"\n");
+	OutputDebugStringW((DetailComposed + L"\n").c_str());
 
 	if (LogModule* Module = LogModule::Get(); Module && Module->IsRunning())
 	{
