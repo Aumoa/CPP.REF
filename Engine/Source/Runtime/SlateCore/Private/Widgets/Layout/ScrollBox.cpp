@@ -46,7 +46,7 @@ void SScrollBox::ScrollToBottom()
 
 void SScrollBox::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
 {
-	Super::OnArrangeChildren(ArrangedChildrens, AllottedGeometry.MakeChild(Vector2(0.0f, -ScrollAmount), AllottedGeometry.GetLocalSize()));
+	Super::OnArrangeChildren(ArrangedChildrens, AllottedGeometry.MakeChild(Vector2(0.0f, -ScrollAmount), AllottedGeometry.GetLocalSize() + Vector2(0, ScrollAmount)));
 }
 
 DEFINE_SLATE_CONSTRUCTOR(SScrollBox, Attr)
