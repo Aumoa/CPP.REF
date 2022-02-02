@@ -14,17 +14,19 @@ SObject::SObject()
 	: bMarkAtGC(false)
 	, ReferencePtr(new Referencer())
 {
+	++ReferencePtr->WeakReferences;
 }
 
 SObject::SObject(SObject&& Rhs) noexcept
 	: bMarkAtGC(false)
 	, ReferencePtr(new Referencer())
 {
+	++ReferencePtr->WeakReferences;
 }
 
 SObject::~SObject()
 {
-	if (ReferencePtr && ReferencePtr->WeakReferences == 0)
+	if (ReferencePtr && --ReferencePtr->WeakReferences == 0)
 	{
 		delete ReferencePtr;
 		ReferencePtr = nullptr;
