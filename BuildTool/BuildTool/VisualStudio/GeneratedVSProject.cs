@@ -4,7 +4,6 @@ using CodeProjectConfiguration;
 
 using DotNETUtilities;
 
-using System.Security.Cryptography;
 using System.Xml;
 
 namespace BuildTool;
@@ -380,6 +379,10 @@ class GeneratedVSProject : IGeneratedProject
             PlatformID.Win32NT => $"PLATFORM_WINDOWS=1;",
             _ => throw new PlatformNotSupportedException()
         };
+
+        static string ReplaceEscape(string S) => S.Replace("\\", "\\\\");
+        ApplicationMacros += $"ENGINE_ROOT=\"{ReplaceEscape(Path.GetFullPath(SlnGenerator.Solution.CompiledRule.EngineRoot))}\";";
+        ApplicationMacros += $"GAME_ROOT=\"{ReplaceEscape(Path.GetFullPath(Environment.CurrentDirectory))}\";";
     }
 
     private void GenerateXml()
