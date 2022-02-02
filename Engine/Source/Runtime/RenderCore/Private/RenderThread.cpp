@@ -16,9 +16,6 @@ DECLARE_CYCLE_STAT("  ExecuteCurrentWorks", STAT_ExecuteCurrentWorks, STATGROUP_
 struct RenderThread::Impl_t
 {
 	boost::asio::io_service IO;
-	IRHIDeviceContext* Context = nullptr;
-
-	std::function<void(IRHIDeviceContext*)> CompletionWork;
 };
 
 RenderThread::RenderThread()
@@ -44,12 +41,15 @@ RenderThread::~RenderThread()
 	sInstance = nullptr;
 }
 
-void RenderThread::EnqueueRenderThreadWork(std::function<void(IRHIDeviceContext*)> Work)
+void RenderThread::EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHIDeviceContext*)> Work)
 {
 	size_t Index = BufferIndex % 2;
-	Impl[Index]->IO.post([this, Index, Work = std::move(Work)]() mutable
+	Impl[Index]->IO.post([this, Work = std::move(Work), bNullHolder = Object == nullptr, Holder = WeakPtr(Object)]() mutable
 	{
-		Work(Impl[Index]->Context);
+		if (bNullHolder || Holder.IsValid())
+		{
+			Work(Context);
+		}
 	});
 }
 
@@ -66,8 +66,9 @@ Task<> RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::funct
 		Completed.GetAwaiter()->Reset();
 	}
 
-	Impl->CompletionWork = InCompletionWork;
-	Impl->Context = InDeviceContext;
+	CompletionWork = InCompletionWork;
+	Context = InDeviceContext;
+	RenderBufferIndex = Index;
 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ExecuteCurrentWorks);
@@ -102,8 +103,12 @@ void RenderThread::Run()
 		virtual std::future<void> Suspend() override
 		{
 			checkf(!SuspendPromise.has_value(), L"Thread already wait for suspend.");
+			SuspendPromise.emplace();
+
+			Owner->Completed.Wait();
 			Task<>::SetManual(Owner->Runner);
-			return SuspendPromise.emplace().get_future();
+
+			return SuspendPromise->get_future();
 		}
 
 		virtual void Resume() override
@@ -134,23 +139,27 @@ void RenderThread::Run()
 	{
 		Token->Join();
 
-		auto This = this;
-		size_t Index = BufferIndex % 2;
-		auto Impl = this->Impl[Index];
-
 		// Waiting for event 'Run'.
 		Runner.Wait();
 		Runner.GetAwaiter()->Reset();
 
-		if (Impl->CompletionWork)
+		size_t Index = RenderBufferIndex;
+		auto Impl = this->Impl[Index];
+
+		if (CompletionWork)
 		{
 			Impl->IO.run();
-			Impl->CompletionWork(Impl->Context);
+			CompletionWork(Context);
+
+			Context = nullptr;
+			CompletionWork = nullptr;
+
 			Task<>::SetManual(Completed);
 		}
 		else
 		{
 			// Continue for GC without complete.
+			Impl->IO.reset();
 			continue;
 		}
 	}

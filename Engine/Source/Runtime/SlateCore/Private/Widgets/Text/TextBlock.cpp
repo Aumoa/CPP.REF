@@ -70,7 +70,7 @@ public:
 			CachedGeometry = AllottedGeometry;
 			CachedLayer = Layer;
 
-			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
 			{
 				RenderGeometry = AllottedGeometry;
 				RenderLayer = Layer;
@@ -84,7 +84,7 @@ public:
 		{
 			CachedLayoutSize = LayoutSize;
 
-			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
 			{
 				Layout->SetMaxSize(LayoutSize);
 			});
@@ -228,7 +228,7 @@ void STextBlock::SetTextAlignment_GameThread(ERHITextAlignment Alignment)
 
 		if (Layout)
 		{
-			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
 			{
 				Layout->SetTextAlignment(Alignment);
 			});
@@ -244,7 +244,7 @@ void STextBlock::SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignme
 
 		if (Layout)
 		{
-			RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
 			{
 				Layout->SetParagraphAlignment(Alignment);
 			});

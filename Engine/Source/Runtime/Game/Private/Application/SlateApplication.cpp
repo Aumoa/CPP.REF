@@ -166,7 +166,7 @@ void SSlateApplication::OnIME(IMEEvent EventArgs)
 
 void SSlateApplication::CacheRenderElements_GameThread(std::vector<SSlateDrawCollector::RenderElement> Elements)
 {
-	RenderThread::Get()->EnqueueRenderThreadWork([=](auto)
+	RenderThread::Get()->EnqueueRenderThreadWork(this, [this, Elements = std::move(Elements)](auto) mutable
 	{
 		RenderElements = std::move(Elements);
 	});

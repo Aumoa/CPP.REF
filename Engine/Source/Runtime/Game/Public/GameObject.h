@@ -41,7 +41,7 @@ public:
 	template<std::derived_from<SObject> T>
 	T* LoadObject(const std::filesystem::path& assetPath)
 	{
-		return dynamic_cast<T*>(LoadObject(assetPath));
+		return Cast<T>(LoadObject(assetPath));
 	}
 
 private:

@@ -20,15 +20,18 @@ private:
 	struct Impl_t;
 	Impl_t* Impl[2] = {};
 	std::atomic<size_t> BufferIndex;
+	size_t RenderBufferIndex = 0;
 
 	Task<> Runner = Task<>::ManualTask();
 	Task<> Completed = Task<>::CompletedTask();
+	IRHIDeviceContext* Context = nullptr;
+	std::function<void(IRHIDeviceContext*)> CompletionWork;
 
 public:
 	RenderThread();
 	~RenderThread() noexcept;
 
-	void EnqueueRenderThreadWork(std::function<void(IRHIDeviceContext*)> Work);
+	void EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHIDeviceContext*)> Work);
 	Task<> ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void(IRHIDeviceContext*)> InCompletionWork);
 	static bool InRenderThread();
 

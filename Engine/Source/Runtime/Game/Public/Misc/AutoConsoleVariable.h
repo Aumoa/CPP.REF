@@ -10,8 +10,6 @@ namespace Details
 {
 	class GAME_API AutoConsoleVariableBase
 	{
-		static std::map<std::wstring, AutoConsoleVariableBase*> StaticVars;
-
 	private:
 		std::wstring Name;
 
