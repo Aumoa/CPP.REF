@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 // The teapot model consists of 10 bezier patches. Each patch has 16 control
 // points, plus a flag indicating whether it should be mirrored in the Z axis

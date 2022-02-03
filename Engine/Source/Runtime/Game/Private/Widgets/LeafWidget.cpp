@@ -1,7 +1,6 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/LeafWidget.h"
-#include "Layout/LayoutImpl.h"
 #include "IApplicationInterface.h"
 #include "Input/IPlatformMouse.h"
 
@@ -61,7 +60,7 @@ bool SLeafWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vector2
     Super::SendMouseEvent(AllottedGeometry, Location, Button, Event);
 
     if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Vector<>::Cast<float>(Location)))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
     }

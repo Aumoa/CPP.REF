@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Assets/AssetsLoader.h"
 #include "Assets/Texture/Texture2D.h"
@@ -9,10 +9,9 @@ GENERATE_BODY(SAssetsLoader);
 
 #pragma pack(push, 1)
 
-enum class EAssetType : uint8
-{
+SENUM(EAssetType, uint8,
 	Image,
-};
+);
 
 struct GenericAssetHeader
 {

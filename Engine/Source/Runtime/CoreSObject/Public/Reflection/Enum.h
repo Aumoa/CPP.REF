@@ -1,10 +1,11 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
 #include "Misc/RecursiveMacroHelper.h"
+#include <map>
 
 namespace Enum
 {
@@ -35,6 +36,23 @@ namespace Enum
 		{
 			return std::string_view(ConstString.Str);
 		}
+
+		template<std::integral U>
+		explicit constexpr operator U() const
+		{
+			return static_cast<U>(Value);
+		}
+
+		template<class U>
+		explicit constexpr operator U() const requires std::is_enum_v<U>
+		{
+			return static_cast<U>(Value);
+		}
+
+		constexpr operator __Tag__() const
+		{
+			return static_cast<__Tag__>(Value);
+		}
 	};
 
 	template<class TBase, std::integral T>
@@ -52,9 +70,16 @@ namespace Enum
 		{
 		}
 
-		constexpr explicit operator const T&() const
+		template<std::integral U>
+		explicit constexpr operator U() const
 		{
-			return Value;
+			return static_cast<U>(Value);
+		}
+
+		template<class U>
+		explicit constexpr operator U() const requires std::is_enum_v<U>
+		{
+			return static_cast<U>(Value);
 		}
 
 		constexpr EEnumBase& operator =(const T& Value)
@@ -65,6 +90,8 @@ namespace Enum
 
 		template<class TTag, Cstr ConstString>
 		using MyKeyValuePair = KeyValuePair<TTag, T, ConstString>;
+
+		constexpr auto operator <=>(const EEnumBase& Rhs) const = default;
 	};
 }
 
@@ -77,14 +104,13 @@ namespace Enum
 struct Name : public Enum::EEnumBase<Name, Type>													\
 {																									\
 	using __Type__ = Name;																			\
-	struct __Tag__																					\
-	{																								\
-	};																								\
 																									\
 	enum class EEnum : Type																			\
 	{																								\
 		MACRO_RECURSIVE_FOR_EACH_2(SENUM_DECLARE_ENUM_ELEMENT, __VA_ARGS__)							\
 	};																								\
+																									\
+	using __Tag__ = EEnum;																			\
 																									\
 	MACRO_RECURSIVE_FOR_EACH_2(SENUM_DECLARE_CONSTEXPR_ELEMENT, __VA_ARGS__);						\
 																									\
@@ -136,5 +162,29 @@ struct Name : public Enum::EEnumBase<Name, Type>													\
 		{																							\
 			return std::format(L"(" L ## #Name L"){}", this->Value);								\
 		}																							\
+	}																								\
+																									\
+	template<class TKeyValuePair>																	\
+	constexpr auto operator ==(const TKeyValuePair& Rhs) const										\
+	{ return operator <=>(Rhs.Value) == 0; }														\
+	template<class TKeyValuePair>																	\
+	constexpr auto operator !=(const TKeyValuePair& Rhs) const										\
+	{ return operator <=>(Rhs.Value) != 0; }														\
+	template<class TKeyValuePair>																	\
+	constexpr auto operator <=(const TKeyValuePair& Rhs) const										\
+	{ return operator <=>(Rhs.Value) <= 0; }														\
+	template<class TKeyValuePair>																	\
+	constexpr auto operator >=(const TKeyValuePair& Rhs) const										\
+	{ return operator <=>(Rhs.Value) >= 0; }														\
+	template<class TKeyValuePair>																	\
+	constexpr auto operator < (const TKeyValuePair& Rhs) const										\
+	{ return operator <=>(Rhs.Value) <  0; }														\
+	template<class TKeyValuePair>																	\
+	constexpr auto operator > (const TKeyValuePair& Rhs) const										\
+	{ return operator <=>(Rhs.Value) >  0; }														\
+																									\
+	constexpr operator __Tag__() const																\
+	{																								\
+		return static_cast<__Tag__>(this->Value);													\
 	}																								\
 };

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -8,12 +8,10 @@
 
 DECLARE_LOG_CATEGORY(GAME_API, LogViewport);
 
-interface IRHITexture2D;
 interface IRHIDeviceContext;
-interface IRHIRenderTargetView;
-interface IRHIDepthStencilView;
-interface IRHIShaderResourceView;
 class SWorld;
+class SImage;
+class SRaytraceSceneRenderTarget;
 
 class GAME_API SViewport : public SCompoundWidget
 {
@@ -21,23 +19,13 @@ class GAME_API SViewport : public SCompoundWidget
 
 private:
 	Vector2N RenderSize;
-	ERHIPixelFormat RenderTargetFormat = ERHIPixelFormat::Unknown;
 
-	SPROPERTY(RTV)
-	IRHIRenderTargetView* RTV = nullptr;
-	SPROPERTY(DSV)
-	IRHIDepthStencilView* DSV = nullptr;
-	SPROPERTY(SRV)
-	IRHIShaderResourceView* SRV = nullptr;
+	SPROPERTY(SceneImage)
+	SImage* SceneImage = nullptr;
+
+private:
 	SPROPERTY(RenderTarget)
-	IRHITexture2D* RenderTarget = nullptr;
-	SPROPERTY(DepthStencil)
-	IRHITexture2D* DepthStencil = nullptr;
-	SPROPERTY(DeviceContext)
-	IRHIDeviceContext* DeviceContext = nullptr;
-
-	SPROPERTY(GameWorld)
-	SWorld* GameWorld = nullptr;
+	SRaytraceSceneRenderTarget* RenderTarget = nullptr;
 
 public:
 	SViewport();
@@ -62,7 +50,6 @@ public:
 public:
 	BEGIN_SLATE_ATTRIBUTE
 		DECLARE_SLATE_ATTRIBUTE(Vector2N, RenderSize)
-		DECLARE_SLATE_ATTRIBUTE(ERHIPixelFormat, RenderTargetFormat, ERHIPixelFormat::B8G8R8A8_UNORM)
 	END_SLATE_ATTRIBUTE
 
 	DECLARE_SLATE_CONSTRUCTOR();
@@ -77,5 +64,4 @@ protected:
 
 private:
 	void ReallocRenderTarget();
-	void DestroyRenderTarget_GameThread();
 };

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "GameEngine.h"
 #include "LogGame.h"
@@ -220,7 +220,7 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 	Task<>::FlushDeferred();
 
 	// Tick and paint.
-	SlateApplication->TickAndPaint(InDeltaTime.count());
+	//SlateApplication->TickAndPaint(InDeltaTime.count());
 }
 
 void SGameEngine::RenderTick(std::chrono::duration<float> InDeltaTime)

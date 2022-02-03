@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -67,11 +67,11 @@ public:
                 Vector3 tangent2 = CubicTangent(q1, q2, q3, q4, u);
 
                 // Cross the two tangent vectors to compute the normal.
-                Vector3 normal = Vector3::CrossProduct(tangent1, tangent2);
+                Vector3 normal = tangent1 ^ tangent2;
 
-                if (!normal.NearlyEquals(Vector3::ZeroVector()))
+                if (!normal.NearlyEquals(Vector3::Zero(), MathEx::SmallNumber))
                 {
-                    normal = normal.GetNormal();
+                    normal = Vector<>::Normalize(normal);
 
                     // If this patch is mirrored, we must invert the normal.
                     if (bMirrored)
@@ -95,7 +95,7 @@ public:
 
                     const Vector3 IdentityR1 = Vector3(0, 1, 0);
                     const Vector3 IdentityR1Neg = Vector3(0, -1, 0);
-                    normal = Vector3::Select(IdentityR1, IdentityR1Neg, Vector3::SelectControl::Less(position, Vector3::ZeroVector()));
+                    normal = Vector<>::Select(IdentityR1, IdentityR1Neg, position, Vector3::Zero(), std::less());
                 }
 
                 // Compute the texture coordinate.

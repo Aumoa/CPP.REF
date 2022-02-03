@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "RenderThread.h"
 #include "Threading/Thread.h"
@@ -41,7 +41,7 @@ RenderThread::~RenderThread()
 	sInstance = nullptr;
 }
 
-void RenderThread::EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHIDeviceContext*)> Work)
+void RenderThread::EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHICommandBuffer*)> Work)
 {
 	size_t Index = BufferIndex % 2;
 	Impl[Index]->IO.post([this, Work = std::move(Work), bNullHolder = Object == nullptr, Holder = WeakPtr(Object)]() mutable
@@ -53,7 +53,7 @@ void RenderThread::EnqueueRenderThreadWork(SObject* Object, std::function<void(I
 	});
 }
 
-Task<> RenderThread::ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void(IRHIDeviceContext*)> InCompletionWork)
+Task<> RenderThread::ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::function<void(IRHICommandBuffer*)> InCompletionWork)
 {
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteWorks);
 

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -13,12 +13,11 @@ class GAME_API SSlateDrawCollector : implements SObject
 	GENERATED_BODY(SSlateDrawCollector)
 
 public:
-	enum class EElementType
-	{
-		RenderElement,
-		PushClipLayer,
+	SENUM(EElementType, int32,
+		RenderElement,,
+		PushClipLayer,,
 		PopClipLayer,
-	};
+	);
 
 	struct RenderElement
 	{

@@ -1,17 +1,10 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Application/Viewport.h"
-#include "RHI/IRHITexture2D.h"
-#include "RHI/IRHIDevice.h"
-#include "RHI/IRHIRenderTargetView.h"
-#include "RHI/IRHIDepthStencilView.h"
-#include "RHI/IRHIShaderResourceView.h"
-#include "RHI/IRHIDeviceContext.h"
-#include "Draw/PaintArgs.h"
 #include "Draw/SlateDrawCollector.h"
-#include "IApplicationInterface.h"
-#include "Level/World.h"
+#include "Widgets/Image/Image.h"
 #include "EngineSubsystems/GameRenderSystem.h"
+#include "SceneRendering/RenderTargets/RaytraceSceneRenderTarget.h"
 #include "GameEngine.h"
 
 GENERATE_BODY(SViewport);
@@ -24,14 +17,13 @@ SViewport::SViewport() : Super()
 SViewport::~SViewport()
 {
 	Widgets.clear();
-	DestroyRenderTarget_GameThread();
 }
 
 void SViewport::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
 	Super::Tick(AllottedGeometry, InDeltaTime);
 
-	Vector2N LocalSize = AllottedGeometry.GetLocalSize().Cast<int32>();
+	Vector2N LocalSize = Vector<>::Cast<Vector2N>(AllottedGeometry.GetLocalSize());
 	SetRenderSize(LocalSize);
 }
 
@@ -87,13 +79,13 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(InAttr);
 	RenderSize = InAttr._RenderSize;
-	RenderTargetFormat = InAttr._RenderTargetFormat;
+	RenderTarget = gcnew SRaytraceSceneRenderTarget();
 	ReallocRenderTarget();
 }
 
 Vector2 SViewport::ComputeDesiredSize()
 {
-	return RenderSize.Cast<float>();
+	return Cast<Vector2>(RenderSize);
 }
 
 void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
@@ -110,15 +102,19 @@ void SViewport::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Ge
 			));
 		}
 	}
+
+	if (SceneImage)
+	{
+		ArrangedChildrens.AddWidget(ESlateVisibility::Visible, AllottedGeometry.MakeChild(
+			SceneImage,
+			Vector2::Zero(),
+			AllottedGeometry.GetLocalSize()
+		));
+	}
 }
 
 int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
-	//SlateBrush Brush;
-	//Brush.ImageSource = SRV;
-	//Brush.ImageSize = RenderSize.Cast<float>();
-	//SlateDrawElement::MakeBox(InDrawElements, Brush, AllottedGeometry.ToPaintGeometry(), InLayer);
-
 	return Super::OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer + 1, bParentEnabled);
 }
 
@@ -134,81 +130,12 @@ SWidget* SViewport::GetChildrenAt(size_t IndexOf)
 
 void SViewport::ReallocRenderTarget()
 {
-	DestroyRenderTarget_GameThread();
-
 	auto RenderSystem = GEngine->GetEngineSubsystem<SGameRenderSystem>();
 	if (RenderSystem)
 	{
-	//	if (ensure(RenderSize.X != 0) && ensure(RenderSize.Y != 0))
-	//	{
-	//		IRHIDevice* Device = RenderSystem->GetRHIDevice();
-
-	//		RHITexture2DDesc TextureDesc = {};
-	//		TextureDesc.Width = (uint32)RenderSize.X;
-	//		TextureDesc.Height = (uint32)RenderSize.Y;
-	//		TextureDesc.DepthOrArraySize = 1;
-	//		TextureDesc.MipLevels = 1;
-	//		TextureDesc.Format = RenderTargetFormat;
-	//		TextureDesc.Usage = ERHIBufferUsage::Default;
-	//		TextureDesc.Flags = ERHIResourceFlags::AllowRenderTarget;
-	//		TextureDesc.InitialState = ERHIResourceStates::PixelShaderResource;
-	//		TextureDesc.ClearValue.emplace() =
-	//		{
-	//			.Format = TextureDesc.Format,
-	//			.ClearColor = {}
-	//		};
-	//		RenderTarget = Device->CreateTexture2D(TextureDesc, nullptr);
-	//		RenderTarget->SetOuter(this);
-	//		RenderTarget->SetDebugName(L"SViewport: RenderTargetTexture");
-
-	//		TextureDesc.Format = ERHIPixelFormat::D24_UNORM_S8_UINT;
-	//		TextureDesc.Flags = ERHIResourceFlags::AllowDepthStencil;
-	//		TextureDesc.InitialState = ERHIResourceStates::DepthWrite;
-	//		TextureDesc.ClearValue.emplace() =
-	//		{
-	//			.Format = TextureDesc.Format,
-	//			.DepthStencil =
-	//			{
-	//				.Depth = 1.0f,
-	//				.Stencil = 0
-	//			}
-	//		};
-	//		DepthStencil = Device->CreateTexture2D(TextureDesc, nullptr);
-	//		DepthStencil->SetOuter(this);
-	//		DepthStencil->SetDebugName(L"SViewport: DepthStencilTexture");
-
-	//		RTV = Device->CreateRenderTargetView(1);
-	//		RTV->SetOuter(this);
-	//		DSV = Device->CreateDepthStencilView(1);
-	//		DSV->SetOuter(this);
-	//		SRV = Device->CreateShaderResourceView(1);
-	//		SRV->SetOuter(this);
-
-	//		RTV->CreateRenderTargetView(0, RenderTarget, nullptr);
-	//		DSV->CreateDepthStencilView(0, DepthStencil, nullptr);
-	//		SRV->CreateShaderResourceView(0, RenderTarget, nullptr);
-
-	//		if (DeviceContext == nullptr)
-	//		{
-	//			DeviceContext = Device->CreateDeviceContext();
-	//		}
-
+		if (ensure(RenderSize.X != 0 && RenderSize.Y != 0))
+		{
 			SE_LOG(LogViewport, Verbose, L"Viewport render targets are reallocated to [{}x{}].", RenderSize.X, RenderSize.Y);
-	//	}
+		}
 	}
-}
-
-void SViewport::DestroyRenderTarget_GameThread()
-{
-	//auto MoveTemp = [](auto*& InObject) -> SharedPtr<SObject>
-	//{
-	//	SharedPtr Object = InObject;
-	//	InObject = nullptr;
-	//	return Object;
-	//};
-
-	//std::vector<SharedPtr<SObject>> Holders = { MoveTemp(RTV), MoveTemp(DSV), MoveTemp(SRV), MoveTemp(RenderTarget), MoveTemp(DepthStencil) };
-
-	//// Finalize textures in render thread.
-	////RenderThread::EnqueueRenderThreadWork<"DestroyRenderTarget_RenderThread">([Holder = Holders](auto){});
 }

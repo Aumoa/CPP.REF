@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -25,23 +25,28 @@ public:
 
 	virtual std::wstring ToString() override;
 
-	void SetOuter(SGameObject* NewOuter);
-	SGameObject* GetOuter();
-	template<std::derived_from<SGameObject> T> T* GetOuter() { return Cast<T>(GetOuter()); }
-
-	void SetName(std::wstring_view InName);
-	std::wstring GetName();
+	SGameObject* GetOuter() const;
+	void SetOuter(SGameObject* Value);
+	std::wstring_view GetName() const;
+	void SetName(std::wstring_view Value);
 
 	virtual SLevel* GetLevel();
 	virtual SWorld* GetWorld();
 
 public:
-	SObject* LoadObject(const std::filesystem::path& assetPath);
+	static SObject* LoadObject(const std::filesystem::path& assetPath);
 
+public:
 	template<std::derived_from<SObject> T>
-	T* LoadObject(const std::filesystem::path& assetPath)
+	static T* LoadObject(const std::filesystem::path& assetPath)
 	{
 		return Cast<T>(LoadObject(assetPath));
+	}
+
+	template<std::derived_from<SGameObject> T>
+	T* GetOuter()
+	{
+		return Cast<T>(GetOuter());
 	}
 
 private:

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Layout/Border.h"
 
@@ -44,7 +44,7 @@ Vector2 SBorder::ComputeDesiredSize()
 	}
 	else
 	{
-		return Vector2::ZeroVector();
+		return Vector2::Zero();
 	}
 }
 

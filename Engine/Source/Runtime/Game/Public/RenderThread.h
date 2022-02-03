@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include <atomic>
 
 class Thread;
-interface IRHIDeviceContext;
+interface IRHICommandBuffer;
 
 class GAME_API RenderThread
 {
@@ -24,15 +24,15 @@ private:
 
 	Task<> Runner = Task<>::ManualTask();
 	Task<> Completed = Task<>::CompletedTask();
-	IRHIDeviceContext* Context = nullptr;
-	std::function<void(IRHIDeviceContext*)> CompletionWork;
+	IRHICommandBuffer* Context = nullptr;
+	std::function<void(IRHICommandBuffer*)> CompletionWork;
 
 public:
 	RenderThread();
 	~RenderThread() noexcept;
 
-	void EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHIDeviceContext*)> Work);
-	Task<> ExecuteWorks(IRHIDeviceContext* InDeviceContext, std::function<void(IRHIDeviceContext*)> InCompletionWork);
+	void EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHICommandBuffer*)> Work);
+	Task<> ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::function<void(IRHICommandBuffer*)> InCompletionWork);
 	static bool InRenderThread();
 
 public:

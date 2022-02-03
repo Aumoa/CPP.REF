@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -31,8 +31,8 @@ private:
 	SLocalPlayer* LocalPlayer = nullptr;
 	SPROPERTY(CoreWindow)
 	SWindow* CoreWindow = nullptr;
-	SPROPERTY(DeviceContext)
-	IRHIDeviceContext* DeviceContext = nullptr;
+	//SPROPERTY(DeviceContext)
+	//IRHIDeviceContext* DeviceContext = nullptr;
 	SPROPERTY(DrawCollector)
 	SSlateDrawCollector* DrawCollector = nullptr;
 

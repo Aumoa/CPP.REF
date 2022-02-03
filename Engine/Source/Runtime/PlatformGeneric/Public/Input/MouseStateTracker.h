@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -20,8 +20,8 @@ public:
 	void Reset();
 	const MouseState& GetLast();
 	bool IsButtonPressed(EMouseButton inButton);
-	const uint32& GetPressedBitsByIndex(uint32 bitIndex);
+	int32 GetPressedBitsByIndex(int32 bitIndex);
 	bool IsButtonReleased(EMouseButton inButton);
-	const uint32& GetReleasedBitsByIndex(uint32 bitIndex);
-	uint32 GetNumBits();
+	int32 GetReleasedBitsByIndex(int32 bitIndex);
+	int32 GetNumBits();
 };

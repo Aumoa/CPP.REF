@@ -9,7 +9,8 @@ public class DirectX : ModuleRule
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            TargetType = TargetType.ThirdParty;
+            //TargetType = TargetType.ThirdParty;
+            TargetType = TargetType.Engine;
             ModuleType = ModuleType.GameModule;
             RelativePath = "ThirdParty";
 
@@ -29,7 +30,8 @@ public class DirectX : ModuleRule
                 "D3D12.lib",
                 "D3D11.lib",
                 "D2D1.lib",
-                "DWrite.lib"
+                "DWrite.lib",
+                "D3DCompiler.lib"
             });
         }
         else

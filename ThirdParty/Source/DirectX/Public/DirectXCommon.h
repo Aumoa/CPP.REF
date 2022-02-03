@@ -1,9 +1,10 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "WindowsMinimal.h"
+#include "RHI/RHIEnums.h"
 #include <wrl/client.h>
 #include <d3d12.h>
 #include <d3d11.h>
@@ -31,6 +32,27 @@ inline UINT GetInteropBindFlag(D3D12_RESOURCE_FLAGS flags)
 		bindFlags |= D3D11_BIND_RENDER_TARGET;
 	}
 	return bindFlags;
+}
+
+inline std::string_view ShaderTypeToTarget(ERHIShaderType Type)
+{
+	switch (Type)
+	{
+	case ERHIShaderType::VertexShader:
+		return "vs_5_0";
+	case ERHIShaderType::PixelShader:
+		return "ps_5_0";
+	case ERHIShaderType::DomainShader:
+		return "ds_5_0";
+	case ERHIShaderType::HullShader:
+		return "hs_5_0";
+	case ERHIShaderType::GeometryShader:
+		return "gs_5_0";
+	case ERHIShaderType::ComputeShader:
+		return "cs_5_0";
+	default:
+		return "";
+	}
 }
 
 using Microsoft::WRL::ComPtr;

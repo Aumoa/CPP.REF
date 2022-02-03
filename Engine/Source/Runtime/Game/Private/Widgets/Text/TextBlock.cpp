@@ -1,15 +1,10 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Text/TextBlock.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/IRenderSlateElement.h"
 #include "Draw/SlateDrawCollector.h"
-#include "RHI/IRHITextFormat.h"
-#include "RHI/IRHITextLayout.h"
-#include "RHI/IRHIFactory.h"
-#include "RHI/IRHIDeviceContext2D.h"
-#include "RHI/IRHISolidColorBrush.h"
-#include "RHI/IRHIDevice.h"
+#include "RHI/RHIInterfaces.h"
 #include "IApplicationInterface.h"
 #include "RenderThread.h"
 
@@ -24,10 +19,10 @@ public:
 	Geometry CachedGeometry;
 	Vector2 CachedLayoutSize;
 
-	SPROPERTY(TintBrush)
-	IRHISolidColorBrush* TintBrush = nullptr;
-	SPROPERTY(Layout)
-	IRHITextLayout* Layout = nullptr;
+	//SPROPERTY(TintBrush)
+	//IRHISolidColorBrush* TintBrush = nullptr;
+	//SPROPERTY(Layout)
+	//IRHITextLayout* Layout = nullptr;
 
 	Geometry RenderGeometry;
 	int32 RenderLayer;
@@ -38,10 +33,10 @@ public:
 		, Args(InPaintArgs)
 		, CachedLayer(InLayer)
 		, CachedGeometry(AllottedGeometry)
-		, CachedLayoutSize(Source->Layout->GetMaxSize())
+		//, CachedLayoutSize(Source->Layout->GetMaxSize())
 
-		, TintBrush(Source->TintBrush)
-		, Layout(Source->Layout)
+		//, TintBrush(Source->TintBrush)
+		//, Layout(Source->Layout)
 
 		, RenderGeometry(AllottedGeometry)
 		, RenderLayer(InLayer)
@@ -60,7 +55,7 @@ public:
 
 	virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
 	{
-		CommandBuffer->DrawTextLayout(LocalLayout.LocalPosition, Layout, TintBrush);
+		//CommandBuffer->DrawTextLayout(LocalLayout.LocalPosition, Layout, TintBrush);
 	}
 
 	void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
@@ -86,7 +81,7 @@ public:
 
 			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
 			{
-				Layout->SetMaxSize(LayoutSize);
+				//Layout->SetMaxSize(LayoutSize);
 			});
 		}
 	}
@@ -166,23 +161,23 @@ Vector2 STextBlock::ComputeDesiredSize()
 
 int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
-	if (TintBrush)
-	{
-		TintBrush->SetColor(TintColor);
-	}
-	else
-	{
-		TintBrush = Args.Device->CreateSolidColorBrush(TintColor);
-	}
+	//if (TintBrush)
+	//{
+	//	TintBrush->SetColor(TintColor);
+	//}
+	//else
+	//{
+	//	TintBrush = Args.Device->CreateSolidColorBrush(TintColor);
+	//}
 
-	if (CachedRenderElement == nullptr && Layout)
-	{
-		CachedRenderElement = gcnew SRenderElement(this,
-			Args.WithNewParent(this),
-			InLayer,
-			AllottedGeometry
-		);
-	}
+	//if (CachedRenderElement == nullptr && Layout)
+	//{
+	//	CachedRenderElement = gcnew SRenderElement(this,
+	//		Args.WithNewParent(this),
+	//		InLayer,
+	//		AllottedGeometry
+	//	);
+	//}
 
 	if (CachedRenderElement)
 	{
@@ -201,22 +196,22 @@ int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometr
 
 void STextBlock::ReallocLayout()
 {
-	Layout = nullptr;
-	Format = nullptr;
+	//Layout = nullptr;
+	//Format = nullptr;
 	CachedRenderElement = nullptr;
 
 	if (!Text.empty() && !Font.FamilyName.empty() && Font.Size > 0.1f)
 	{
 		IRHIFactory* Factory = IApplicationInterface::Get().GetFactory();
-		Format = Factory->CreateTextFormat(Font.FamilyName, Font.Collection, ERHIFontWeight::Normal, ERHIFontStyle::Normal, ERHIFontStretch::Normal, Font.Size, L"ko-KR");
+		//Format = Factory->CreateTextFormat(Font.FamilyName, Font.Collection, ERHIFontWeight::Normal, ERHIFontStyle::Normal, ERHIFontStretch::Normal, Font.Size, L"ko-KR");
 
-		Vector2 LocalSize = Vector2(1048576.0f, 1048576.0f);
-		Layout = Factory->CreateTextLayout(Format, Text, LocalSize);
-		Layout->SetTextAlignment(TextAlignment);
-		Layout->SetParagraphAlignment(ParagraphAlignment);
+		//Vector2 LocalSize = Vector2(1048576.0f, 1048576.0f);
+		//Layout = Factory->CreateTextLayout(Format, Text, LocalSize);
+		//Layout->SetTextAlignment(TextAlignment);
+		//Layout->SetParagraphAlignment(ParagraphAlignment);
 
-		CachedLocalMaxSize = LocalSize;
-		CachedDesiredSize = Layout->GetDesiredSize();
+		//CachedLocalMaxSize = LocalSize;
+		//CachedDesiredSize = Layout->GetDesiredSize();
 	}
 }
 
@@ -226,13 +221,13 @@ void STextBlock::SetTextAlignment_GameThread(ERHITextAlignment Alignment)
 	{
 		TextAlignment = Alignment;
 
-		if (Layout)
-		{
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
-			{
-				Layout->SetTextAlignment(Alignment);
-			});
-		}
+		//if (Layout)
+		//{
+		//	RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
+		//	{
+		//		Layout->SetTextAlignment(Alignment);
+		//	});
+		//}
 	}
 }
 
@@ -242,13 +237,13 @@ void STextBlock::SetParagraphAlignment_GameThread(ERHIParagraphAlignment Alignme
 	{
 		ParagraphAlignment = Alignment;
 
-		if (Layout)
-		{
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
-			{
-				Layout->SetParagraphAlignment(Alignment);
-			});
-		}
+		//if (Layout)
+		//{
+		//	RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
+		//	{
+		//		Layout->SetParagraphAlignment(Alignment);
+		//	});
+		//}
 	}
 }
 

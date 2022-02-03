@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -17,10 +17,10 @@ private:
 	class SRenderElement;
 
 private:
-	SPROPERTY(ImageSource)
-	IRHIBitmap* ImageSource = nullptr;
-	SPROPERTY(TintBrush)
-	IRHISolidColorBrush* TintBrush = nullptr;
+	//SPROPERTY(ImageSource)
+	//IRHIBitmap* ImageSource = nullptr;
+	//SPROPERTY(TintBrush)
+	//IRHISolidColorBrush* TintBrush = nullptr;
 
 	SPROPERTY(CachedRenderElement)
 	SRenderElement* CachedRenderElement = nullptr;

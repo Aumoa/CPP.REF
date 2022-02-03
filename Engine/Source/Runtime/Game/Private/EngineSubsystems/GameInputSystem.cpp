@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameInputSystem.h"
 #include "Input/IPlatformKeyboard.h"
@@ -29,16 +29,16 @@ void SGameInputSystem::Tick(float InDeltaTime)
 	Vector2N mLocation = Vector2N(mState.X, mState.Y);
 
 	// Invoke mouse dispatcher.
-	uint32 nMouse = ((MouseTracker->GetNumBits() - 1) / 32) + 1;
-	for (uint32 i = 0; i < nMouse; ++i)
+	int32 nMouse = ((MouseTracker->GetNumBits() - 1) / 32) + 1;
+	for (int32 i = 0; i < nMouse; ++i)
 	{
-		const uint32& PressedBits = MouseTracker->GetPressedBitsByIndex(i);
-		const uint32& ReleasedBits = MouseTracker->GetReleasedBitsByIndex(i);
+		const int32& PressedBits = MouseTracker->GetPressedBitsByIndex(i);
+		const int32& ReleasedBits = MouseTracker->GetReleasedBitsByIndex(i);
 
-		uint32 N = 1;
-		for (uint32 j = 0; j < 32; ++j)
+		int32 N = 1;
+		for (int32 j = 0; j < 32; ++j)
 		{
-			uint32 Index = i * 32 + j;
+			int32 Index = i * 32 + j;
 			if (Index >= MouseTracker->GetNumBits())
 			{
 				continue;
@@ -61,16 +61,16 @@ void SGameInputSystem::Tick(float InDeltaTime)
 	}
 
 	// Invoke keyboard dispatcher.
-	uint32 nKeyboard = ((KeyboardTracker->GetNumBits() - 1) / 32) + 1;
-	for (uint32 i = 0; i < nKeyboard; ++i)
+	int32 nKeyboard = ((KeyboardTracker->GetNumBits() - 1) / 32) + 1;
+	for (int32 i = 0; i < nKeyboard; ++i)
 	{
-		const uint32& PressedBits = KeyboardTracker->GetPressedBitsByIndex(i);
-		const uint32& ReleasedBits = KeyboardTracker->GetReleasedBitsByIndex(i);
+		const int32& PressedBits = KeyboardTracker->GetPressedBitsByIndex(i);
+		const int32& ReleasedBits = KeyboardTracker->GetReleasedBitsByIndex(i);
 
-		uint32 N = 1;
-		for (uint32 j = 0; j < 32; ++j)
+		int32 N = 1;
+		for (int32 j = 0; j < 32; ++j)
 		{
-			uint32 Index = i * 32 + j;
+			int32 Index = i * 32 + j;
 			if (Index >= KeyboardTracker->GetNumBits())
 			{
 				continue;

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -199,5 +199,5 @@ SENUM(EMouseButton, int32,
 
 SENUM(EMouseButtonEvent, int32,
     Pressed,,
-    Release,
+    Released,
 );

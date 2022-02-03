@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -21,8 +21,8 @@ public:
 	void Reset();
 	const KeyboardState& GetLast();
 	bool IsKeyPressed(EKey Key);
-	const uint32& GetPressedBitsByIndex(uint32 BitIndex);
+	int32 GetPressedBitsByIndex(int32 BitIndex);
 	bool IsKeyReleased(EKey Key);
-	const uint32& GetReleasedBitsByIndex(uint32 BitIndex);
-	uint32 GetNumBits();
+	int32 GetReleasedBitsByIndex(int32 BitIndex);
+	int32 GetNumBits();
 };

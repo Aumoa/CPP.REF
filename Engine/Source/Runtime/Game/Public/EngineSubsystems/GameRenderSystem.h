@@ -1,30 +1,13 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 #include "RenderThread.h"
+#include "RHI/RHIInterfaces.h"
 
-interface IRHIFactory;
-interface IRHIDevice;
-interface IRHIDeviceContext;
-interface IApplicationInterface;
-interface IRHIDeviceContext2D;
-interface IRHITextFormat;
-interface IRHITextLayout;
-class SColorVertexFactory;
-class SColorShader;
-class STransparentShader;
-class SSlateShader;
 class SSlateApplication;
-class SSwapChainRenderTarget;
-class SColorRenderTarget;
-class SSlateRenderer;
-class SRaytraceSceneRenderer;
-
-// TEST
-interface IRHISolidColorBrush;
 
 class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 {
@@ -38,29 +21,26 @@ private:
 	SPROPERTY(Device)
 	IRHIDevice* Device = nullptr;
 	SPROPERTY(PrimaryQueue)
-	IRHIDeviceContext* PrimaryQueue = nullptr;
-	//SPROPERTY(ColorVertexFactory)
-	//SColorVertexFactory* ColorVertexFactory = nullptr;
-	//SPROPERTY(ColorShader)
-	//SColorShader* ColorShader = nullptr;
-	//SPROPERTY(TransparentShader)
-	//STransparentShader* TransparentShader = nullptr;
-	//SPROPERTY(SlateShader)
-	//SSlateShader* SlateShader = nullptr;
+	IRHICommandQueue* PrimaryQueue = nullptr;
 
-	SPROPERTY(SwapChainRT)
-	SSwapChainRenderTarget* SwapChainRT = nullptr;
-	SPROPERTY(RenderContext)
-	IRHIDeviceContext* RenderContext = nullptr;
-	SPROPERTY(DeviceContext2D)
-	IRHIDeviceContext2D* DeviceContext2D = nullptr;
-	SPROPERTY(ColorRenderTarget)
-	SColorRenderTarget* ColorRenderTarget = nullptr;
+	SPROPERTY(SwapChain)
+	IRHISwapChain* SwapChain = nullptr;
+	Vector2N SwapChainSize;
 
-	SPROPERTY(SceneRenderer)
-	SRaytraceSceneRenderer* SceneRenderer = nullptr;
-	SPROPERTY(SlateRenderer)
-	SSlateRenderer* SlateRenderer = nullptr;
+	SPROPERTY(CommandAllocator)
+	IRHICommandAllocator* CommandAllocator = nullptr;
+	SPROPERTY(CommandBuffer)
+	IRHICommandBuffer* CommandBuffer = nullptr;
+	SPROPERTY(CommandFence)
+	IRHIFence* CommandFence = nullptr;
+
+	SPROPERTY(RTV)
+	IRHIRenderTargetView* RTV = nullptr;
+	SPROPERTY(RenderPasses)
+	std::vector<IRHIRenderPass*> RenderPasses;
+
+	SPROPERTY(ShaderCodeWorkspace)
+	IRHIShaderCodeWorkspace* ShaderCodeWorkspace = nullptr;
 
 public:
 	SGameRenderSystem();
@@ -68,15 +48,14 @@ public:
 
 	virtual void Init() override;
 	virtual void Deinit() override;
-	virtual void Tick(float InDeltaTime) override;
 	virtual void ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp);
 
 	IRHIDevice* GetRHIDevice();
 
-	// Test feature.
-	//SColorVertexFactory* GetColorVertexFactory() { return ColorVertexFactory; }
-	//SSlateShader* GetSlateShader() { return SlateShader; }
-
 private:
 	void ResizeApp(Vector2N Size);
+	void OnPreDestroyApp();
+
+	void OnRender_RenderThread(IRHICommandBuffer* Cmdbuf);
+	void OnResizeApp_RenderThread(IRHICommandBuffer* Cmdbuf, Vector2N Size);
 };

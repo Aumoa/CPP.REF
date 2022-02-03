@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/GeometryGenerator.h"
 #include "Misc/Bezier.h"
@@ -94,8 +94,8 @@ void GeometryGenerator::ComputeBox(VertexCollection& vertices, IndexCollection& 
         // Get two vectors perpendicular both to the face Normal and to each other.
         Vector3 basis = (i >= 4) ? IdentityR2 : IdentityR1;
 
-        Vector3 side1 = Vector3::CrossProduct(Normal, basis);
-        Vector3 side2 = Vector3::CrossProduct(Normal, side1);
+        Vector3 side1 = Normal ^ basis;
+        Vector3 side2 = Normal ^ side1;
 
         // Six indices (two triangles) per face.
         size_t vbase = vertices.size();
@@ -360,7 +360,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
     {
         auto vertexValue = *it;
 
-        auto Normal = vertexValue.GetNormal();
+        auto Normal = Vector<>::Normalize(vertexValue);
         auto pos = Normal * radius;
 
         Vector3 normalFloat3 = Normal;
@@ -390,7 +390,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
     for (size_t i = 0; i < preFixupVertexCount; ++i)
     {
         // This vertex is on the prime meridian if Pos.x and texcoord.u are both zero (allowing for small epsilon).
-        bool isOnPrimeMeridian = Vector2(vertices[i].Position.X, vertices[i].TexCoord.X).NearlyEquals(Vector2::ZeroVector(), MathEx::SmallNumber);
+        bool isOnPrimeMeridian = Vector2(vertices[i].Position.X, vertices[i].TexCoord.X).NearlyEquals(Vector2::Zero(), MathEx::SmallNumber);
 
         if (isOnPrimeMeridian)
         {
@@ -581,7 +581,7 @@ namespace GeometryGeneratorInternal
         {
             Vector3 circleVector = GetCircleVector(i, tessellation);
             Vector3 Pos = (circleVector * radius) + (Normal * height);
-            Vector2 Tex = circleVector.Swiz<0, 2>() * textureScale + 0.5f;
+            Vector2 Tex = Vector<>::Swizzling<0, 2>(circleVector) * textureScale + Vector2(0.5f);
 
             vertices.emplace_back(Pos, Normal, NamedColors::White, Tex);
         }
@@ -661,10 +661,10 @@ void GeometryGenerator::ComputeCone(VertexCollection& vertices, IndexCollection&
         Vector2 Tex = u;
         Vector3 pt = sideOffset - topOffset;
         Vector3 Normal = GetCircleTangent(i, tessellation) ^ (topOffset - pt);
-        Normal = Normal.GetNormal();
+        Normal = Vector<>::Normalize(Normal);
 
         // Duplicate the top vertex for distinct normals
-        vertices.emplace_back(topOffset, Normal, NamedColors::White, Vector2::ZeroVector());
+        vertices.emplace_back(topOffset, Normal, NamedColors::White, Vector2::Zero());
         vertices.emplace_back(pt, Normal, NamedColors::White, Tex + Vector2(0, 1.0f));
 
         index_push_back(indices, i * 2);
@@ -722,8 +722,8 @@ void GeometryGenerator::ComputeTorus(VertexCollection& vertices, IndexCollection
             Vector3 Pos = Normal * (thickness * 0.5f);
             Vector2 Tex = Vector2(u, v);
 
-            Pos = transform.TransformVector(Pos);
-            Normal = transform.TransformNormal(Normal);
+            Pos = transform.TransformPoint(Pos);
+            Normal = transform.TransformVector(Normal);
 
             vertices.emplace_back(Pos, Normal, NamedColors::White, Tex);
 
@@ -779,8 +779,8 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
         uint32_t v1 = faces[j + 1];
         uint32_t v2 = faces[j + 2];
 
-        Vector3 Normal = Vector3::CrossProduct(verts[v1] - verts[v0], verts[v2] - verts[v0]);
-        Normal = Normal.GetNormal();
+        Vector3 Normal = Vector<>::Cross(verts[v1] - verts[v0], verts[v2] - verts[v0]);
+        Normal = Vector<>::Normalize(Normal);
 
         size_t base = vertices.size();
         index_push_back(indices, base);
@@ -789,7 +789,7 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
 
         // Duplicate vertices to use face normals
         Vector3 Pos = verts[v0] * size;
-        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::ZeroVector());
+        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::Zero());
 
         Pos = verts[v1] * size;
         vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2(1.0f, 0));
@@ -845,8 +845,8 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
         uint32_t v1 = faces[j + 1];
         uint32_t v2 = faces[j + 2];
 
-        Vector3 Normal = Vector3::CrossProduct(verts[v1] - verts[v0], verts[v2] - verts[v0]);
-        Normal = Normal.GetNormal();
+        Vector3 Normal = Vector<>::Cross(verts[v1] - verts[v0], verts[v2] - verts[v0]);
+        Normal = Vector<>::Normalize(Normal);
 
         size_t base = vertices.size();
         index_push_back(indices, base);
@@ -855,7 +855,7 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
 
         // Duplicate vertices to use face normals
         Vector3 Pos = verts[v0] * size;
-        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::ZeroVector());
+        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::Zero());
 
         Pos = verts[v1] * size;
         vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2(1.0f, 0));
@@ -961,8 +961,8 @@ void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCol
         uint32_t v3 = faces[j + 3];
         uint32_t v4 = faces[j + 4];
 
-        Vector3 Normal = Vector3::CrossProduct(verts[v1] - verts[v0], verts[v2] - verts[v0]);
-        Normal = Normal.GetNormal();
+        Vector3 Normal = Vector<>::Cross(verts[v1] - verts[v0], verts[v2] - verts[v0]);
+        Normal = Vector<>::Normalize(Normal);
 
         size_t base = vertices.size();
 
@@ -1063,8 +1063,8 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
         uint32_t v1 = faces[j + 1];
         uint32_t v2 = faces[j + 2];
 
-        Vector3 Normal = Vector3::CrossProduct(verts[v1] - verts[v0], verts[v2] - verts[v0]);
-        Normal = Normal.GetNormal();
+        Vector3 Normal = Vector<>::Cross(verts[v1] - verts[v0], verts[v2] - verts[v0]);
+        Normal = Vector<>::Normalize(Normal);
 
         size_t base = vertices.size();
         index_push_back(indices, base);
@@ -1073,7 +1073,7 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
 
         // Duplicate vertices to use face normals
         Vector3 Pos = verts[v0] * size;
-        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::ZeroVector());
+        vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2::Zero());
 
         Pos = verts[v1] * size;
         vertices.emplace_back(Pos, Normal, NamedColors::White, Vector2(1.0f, 0));

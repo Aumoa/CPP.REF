@@ -1,13 +1,10 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Image/Image.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/IRenderSlateElement.h"
 #include "Draw/SlateDrawCollector.h"
-#include "RHI/IRHIDeviceContext2D.h"
-#include "RHI/IRHISolidColorBrush.h"
-#include "RHI/IRHIDevice.h"
-#include "RHI/IRHIBitmap.h"
+#include "RHI/RHIInterfaces.h"
 #include "RenderThread.h"
 
 class SImage::SRenderElement : implements SObject, implements IRenderSlateElement
@@ -21,10 +18,10 @@ public:
 	Geometry CachedGeometry;
 
 	const Vector2 ImageSize;
-	SPROPERTY(ImageSource)
-	IRHIBitmap* ImageSource = nullptr;
-	SPROPERTY(TintBrush)
-	IRHISolidColorBrush* TintBrush = nullptr;
+	//SPROPERTY(ImageSource)
+	//IRHIBitmap* ImageSource = nullptr;
+	//SPROPERTY(TintBrush)
+	//IRHISolidColorBrush* TintBrush = nullptr;
 
 	Geometry RenderGeometry;
 	int32 RenderLayer;
@@ -37,8 +34,8 @@ public:
 		, CachedGeometry(AllottedGeometry)
 
 		, ImageSize(Source->ImageSize)
-		, ImageSource(Source->ImageSource)
-		, TintBrush(Source->TintBrush)
+		//, ImageSource(Source->ImageSource)
+		//, TintBrush(Source->TintBrush)
 
 		, RenderGeometry(AllottedGeometry)
 		, RenderLayer(InLayer)
@@ -65,14 +62,14 @@ public:
 		DrawRect.Right = RB.X;
 		DrawRect.Bottom = RB.Y;
 
-		if (ImageSource)
-		{
-			CommandBuffer->DrawBitmap(ImageSource, &DrawRect, Args.RenderOpacity, ERHIInterpolationMode::Anisotropic);
-		}
-		else
-		{
-			CommandBuffer->FillRectangle(TintBrush, DrawRect);
-		}
+		//if (ImageSource)
+		//{
+		//	CommandBuffer->DrawBitmap(ImageSource, &DrawRect, Args.RenderOpacity, ERHIInterpolationMode::Anisotropic);
+		//}
+		//else
+		//{
+		//	CommandBuffer->FillRectangle(TintBrush, DrawRect);
+		//}
 	}
 
 	void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
@@ -101,11 +98,11 @@ SImage::SImage() : Super()
 
 void SImage::SetBrush(const SlateBrush& InBrush)
 {
-	if (ImageSource != InBrush.ImageSource)
-	{
-		ImageSource = InBrush.ImageSource;
-		CachedRenderElement = nullptr;
-	}
+	//if (ImageSource != InBrush.ImageSource)
+	//{
+	//	ImageSource = InBrush.ImageSource;
+	//	CachedRenderElement = nullptr;
+	//}
 
 	if (ImageSize != InBrush.ImageSize)
 	{
@@ -116,7 +113,8 @@ void SImage::SetBrush(const SlateBrush& InBrush)
 
 SlateBrush SImage::GetBrush()
 {
-	return SlateBrush(ImageSource, ImageSize);
+	//return SlateBrush(ImageSource, ImageSize);
+	throw;
 }
 
 void SImage::SetTintColor(const Color& InTintColor)
@@ -143,17 +141,17 @@ Vector2 SImage::ComputeDesiredSize()
 
 int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
 {
-	if (ImageSource == nullptr)
-	{
-		if (TintBrush)
-		{
-			TintBrush->SetColor(TintColor);
-		}
-		else
-		{
-			TintBrush = Args.Device->CreateSolidColorBrush(TintColor);
-		}
-	}
+	//if (ImageSource == nullptr)
+	//{
+	//	if (TintBrush)
+	//	{
+	//		TintBrush->SetColor(TintColor);
+	//	}
+	//	else
+	//	{
+	//		TintBrush = Args.Device->CreateSolidColorBrush(TintColor);
+	//	}
+	//}
 
 	if (CachedRenderElement == nullptr)
 	{

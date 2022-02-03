@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -6,7 +6,6 @@
 #include "SlateRenderTransform.h"
 #include "SlateLayoutTransform.h"
 #include "LayoutGeometry.h"
-#include "SlateRotatedRect.h"
 #include "Margin.h"
 #include "PaintGeometry.h"
 #include <optional>
@@ -18,36 +17,36 @@ struct GAME_API Geometry
 {
 private:
 	constexpr Geometry(
-		const Vector2& LocalSize,
+		const Scale2D& LocalSize,
 		const SlateLayoutTransform& LocalLayoutTransform,
 		const SlateRenderTransform& LocalRenderTransform,
-		const Vector2& LocalRenderTransformPivot,
+		const Translate2D& LocalRenderTransformPivot,
 		const SlateLayoutTransform& ParentAccumulatedLayoutTransform,
 		const SlateRenderTransform& ParentAccumulatedRenderTransform)
 		: Size(LocalSize)
 		, Scale(1.0f)
 		, AbsolutePosition(0.0f, 0.0f)
 		, AccumulatedRenderTransform(
-			TransformCalculus2D::Concatenate(
+			Transform::Concatenate(
 				// convert the pivot to local space and make it the origin
-				TransformCalculus2D::Inverse(TransformCalculus2D::TransformPoint(Scale2D(LocalSize), LocalRenderTransformPivot)),
+				LocalSize.TransformPoint(LocalRenderTransformPivot).Inverse(),
 				// apply the render transform in local space centered around the pivot
 				LocalRenderTransform,
 				// translate the pivot point back.
-				TransformCalculus2D::TransformPoint(Scale2D(LocalSize), LocalRenderTransformPivot),
+				LocalSize.TransformPoint(LocalRenderTransformPivot),
 				// apply the layout transform next.
 				LocalLayoutTransform,
 				// finally apply the parent accumulated transform, which takes us to the root.
 				ParentAccumulatedRenderTransform
 			)
 		), bHasRenderTransform(true)
-		, Position(LocalLayoutTransform.GetTranslation())
+		, Position(LocalLayoutTransform.Translation)
 	{
-		const SlateLayoutTransform AccumulatedLayoutTransform = TransformCalculus2D::Concatenate(LocalLayoutTransform, ParentAccumulatedLayoutTransform);
-		const Vector2& Translation = AccumulatedLayoutTransform.GetTranslation();
-		AbsolutePosition.Scalars[0] = Translation.Scalars[0];
-		AbsolutePosition.Scalars[1] = Translation.Scalars[1];
-		Scale = AccumulatedLayoutTransform.GetScale();
+		const SlateLayoutTransform AccumulatedLayoutTransform = Transform::Concatenate(LocalLayoutTransform, ParentAccumulatedLayoutTransform);
+		const Translate2D& Translation = AccumulatedLayoutTransform.Translation;
+		AbsolutePosition.X = Translation.X;
+		AbsolutePosition.Y = Translation.Y;
+		Scale = AccumulatedLayoutTransform.Scale;
 	}
 
 	constexpr Geometry(
@@ -59,59 +58,68 @@ private:
 		: Size(LocalSize)
 		, Scale(1.0f)
 		, AbsolutePosition(0.0f, 0.0f)
-		, AccumulatedRenderTransform(TransformCalculus2D::Concatenate(LocalLayoutTransform, ParentAccumulatedRenderTransform))
+		, AccumulatedRenderTransform(Transform::Concatenate(LocalLayoutTransform, ParentAccumulatedRenderTransform))
 		, bHasRenderTransform(bParentHasRenderTransform)
-		, Position(LocalLayoutTransform.GetTranslation())
+		, Position(LocalLayoutTransform.Translation)
 	{
-		const SlateLayoutTransform AccumulatedLayoutTransform = TransformCalculus2D::Concatenate(LocalLayoutTransform, ParentAccumulatedLayoutTransform);
-		const Vector2& Translation = AccumulatedLayoutTransform.GetTranslation();
-		AbsolutePosition.Scalars[0] = Translation.Scalars[0];
-		AbsolutePosition.Scalars[1] = Translation.Scalars[1];
-		Scale = AccumulatedLayoutTransform.GetScale();
+		const SlateLayoutTransform AccumulatedLayoutTransform = Transform::Concatenate(LocalLayoutTransform, ParentAccumulatedLayoutTransform);
+		const Translate2D& Translation = AccumulatedLayoutTransform.Translation;
+		AbsolutePosition.X = Translation.X;
+		AbsolutePosition.Y = Translation.Y;
+		Scale = AccumulatedLayoutTransform.Scale;
 	}
 
 public:
 	constexpr Vector2 GetSize() const { return Size; }
-	constexpr float GetScale() const { return Scale; }
+	constexpr Scale2D GetScale() const { return Scale; }
 	constexpr Vector2 GetAbsolutePosition() const { return AbsolutePosition; }
 	constexpr Vector2 GetPosition() const { return Position; }
 
-	constexpr bool operator ==(const Geometry& Rhs) const
-	{
-		return Size == Rhs.Size
-			&& Scale == Rhs.Scale
-			&& AbsolutePosition == Rhs.AbsolutePosition
-			&& Position == Rhs.Position;
-	}
+	constexpr auto operator <=>(const Geometry& Rhs) const = default;
 
-	constexpr bool operator !=(const Geometry& Rhs) const
+	constexpr Geometry MakeChild(const Vector2& LocalSize, const SlateLayoutTransform& LayoutTransform, const SlateRenderTransform& RenderTransform, const Translate2D& RenderTransformPivot) const
 	{
-		return !operator ==(Rhs);
-	}
-
-	constexpr Geometry MakeChild(const Vector2& LocalSize, const SlateLayoutTransform& LayoutTransform, const SlateRenderTransform& RenderTransform, const Vector2& RenderTransformPivot) const
-	{
-		return Geometry(LocalSize, LayoutTransform, RenderTransform, RenderTransformPivot, GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform());
+		return Geometry(
+			LocalSize,
+			LayoutTransform,
+			RenderTransform,
+			RenderTransformPivot,
+			GetAccumulatedLayoutTransform(),
+			GetAccumulatedRenderTransform()
+		);
 	}
 
 	constexpr Geometry MakeChild(const Vector2& LocalSize, const SlateLayoutTransform& LayoutTransform) const
 	{
-		return Geometry(LocalSize, LayoutTransform, GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform(), bHasRenderTransform);
+		return Geometry(
+			LocalSize,
+			LayoutTransform,
+			GetAccumulatedLayoutTransform(),
+			GetAccumulatedRenderTransform(),
+			bHasRenderTransform
+		);
 	}
 
-	constexpr Geometry MakeChild(const SlateRenderTransform& RenderTransform, const Vector2& RenderTransformPivot = Vector2(0.5f, 0.5f)) const
+	constexpr Geometry MakeChild(const SlateRenderTransform& RenderTransform, const Translate2D& RenderTransformPivot = Translate2D(0.5f, 0.5f)) const
 	{
-		return Geometry(GetLocalSize(), SlateLayoutTransform(), RenderTransform, RenderTransformPivot, GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform());
+		return Geometry(
+			GetLocalSize(),
+			SlateLayoutTransform(),
+			RenderTransform,
+			RenderTransformPivot,
+			GetAccumulatedLayoutTransform(),
+			GetAccumulatedRenderTransform()
+		);
 	}
 
 	constexpr Geometry MakeChild(const Vector2& ChildOffset, const Vector2& LocalSize, float ChildScale = 1.0f) const
 	{
-		return Geometry(LocalSize, SlateLayoutTransform(ChildScale, TransformCalculus2D::TransformPoint(ChildScale, ChildOffset)), GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform(), bHasRenderTransform);
+		return Geometry(LocalSize, SlateLayoutTransform(ChildScale, Scale2D(ChildScale).TransformPoint(ChildOffset)), GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform(), bHasRenderTransform);
 	}
 
 	ArrangedWidget MakeChild(SWidget* ChildWidget, const Vector2& LocalSize, const SlateLayoutTransform& LayoutTransform) const;
-	ArrangedWidget MakeChild(SWidget* ChildWidget, const LayoutGeometry& layoutGeometry) const;
-	ArrangedWidget MakeChild(SWidget* ChildWidget, const Vector2& ChildOffset, const Vector2& LocalSize, float ChildScale = 1) const;
+	ArrangedWidget MakeChild(SWidget* ChildWidget, const LayoutGeometry& LayoutGeometry) const;
+	ArrangedWidget MakeChild(SWidget* ChildWidget, const Translate2D& ChildOffset, const Vector2& LocalSize, const Scale2D& ChildScale = Scale2D::Identity()) const;
 
 	constexpr PaintGeometry ToPaintGeometry() const
 	{
@@ -121,7 +129,7 @@ public:
 	constexpr PaintGeometry ToPaintGeometry(const Vector2& LocalSize, const SlateLayoutTransform& LayoutTransform) const
 	{
 		return PaintGeometry(
-			TransformCalculus2D::Concatenate(LayoutTransform, GetAccumulatedRenderTransform()),
+			Transform::Concatenate(LayoutTransform, GetAccumulatedRenderTransform()),
 			LocalSize,
 			bHasRenderTransform
 		);
@@ -137,46 +145,67 @@ public:
 		return ToPaintGeometry(Size, LayoutTransform);
 	}
 
-	constexpr PaintGeometry ToPaintGeometry(const Vector2& LocalOffset, const Vector2& LocalSize, float LocalScale)
+	constexpr PaintGeometry ToPaintGeometry(const Translate2D& LocalOffset, const Vector2& LocalSize, const Scale2D& LocalScale)
 	{
-		return ToPaintGeometry(LocalSize, SlateLayoutTransform(LocalScale, Scale2D(LocalScale).TransformPoint(LocalOffset)));
+		return ToPaintGeometry(LocalSize, SlateLayoutTransform(LocalScale, LocalScale.TransformPoint(LocalOffset)));
 	}
 
-	// LayoutImpl.h
-	constexpr bool IsUnderLocation(const Vector2& AbsoluteCoordinate) const;
-
-	constexpr Vector2 AbsoluteToLocal(const Vector2& AbsoluteCoordinate) const
+	constexpr bool IsUnderLocation(const Translate2D& AbsoluteCoordinate) const
 	{
-		return TransformCalculus2D::TransformPoint(TransformCalculus2D::Inverse(AccumulatedRenderTransform), AbsoluteCoordinate);
+		const RotatedRect RRect = RotatedRect::TransformRect(AccumulatedRenderTransform, RotatedRect(Rect(Vector2::Zero(), GetSize())));
+		return RRect.IsUnderLocation(AbsoluteCoordinate);
 	}
 
-	constexpr Vector2 LocalToAbsolute(const Vector2& LocalCoordinate) const
+	constexpr Translate2D AbsoluteToLocal(const Translate2D& AbsoluteCoordinate) const
 	{
-		return TransformCalculus2D::TransformPoint(AccumulatedRenderTransform, LocalCoordinate);
+		return AccumulatedRenderTransform.Inverse().TransformPoint(AbsoluteCoordinate);
 	}
 
-	constexpr Vector2 LocalToRoundedLocal(const Vector2& LocalCoordinate) const
+	constexpr Translate2D LocalToAbsolute(const Translate2D& LocalCoordinate) const
 	{
-		const Vector2 AbsoluteCoordinate = LocalToAbsolute(LocalCoordinate);
-		const Vector2 AbsoluteCoordinateRounded = AbsoluteCoordinate.Round();
+		return AccumulatedRenderTransform.TransformPoint(LocalCoordinate);
+	}
+
+	constexpr Translate2D LocalToRoundedLocal(const Translate2D& LocalCoordinate) const
+	{
+		const Translate2D AbsoluteCoordinate = LocalToAbsolute(LocalCoordinate);
+		const Translate2D AbsoluteCoordinateRounded = AbsoluteCoordinate.Round();
 		return AbsoluteToLocal(AbsoluteCoordinateRounded);
 	}
 
 	constexpr Rect GetLayoutBoundingRect() const
 	{
-		return GetLayoutBoundingRect(Rect(Vector2::ZeroVector(), GetSize()));
+		return GetLayoutBoundingRect(Rect(Vector2::Zero(), GetSize()));
 	}
 
 	constexpr Rect GetRenderBoundingRect() const
 	{
-		return GetRenderBoundingRect(Rect(Vector2::ZeroVector(), GetSize()));
+		return GetRenderBoundingRect(Rect(Vector2::Zero(), GetSize()));
 	}
 
-	// LayoutImpl.h
-	constexpr Rect GetLayoutBoundingRect(const Rect& LocalSpaceRect) const;
-	constexpr Rect GetRenderBoundingRect(const Rect& LocalSpaceRect) const;
-	constexpr Rect GetLayoutBoundingRect(const Margin& LocalSpaceExtendBy) const;
-	constexpr Rect GetRenderBoundingRect(const Margin& LocalSpaceExtendBy) const;
+	constexpr Rect GetLayoutBoundingRect(const Rect& LocalSpaceRect) const
+	{
+		return RotatedRect::TransformRect(
+			GetAccumulatedLayoutTransform(),
+			RotatedRect(LocalSpaceRect)).ToBoundingRect();
+	}
+
+	constexpr Rect GetRenderBoundingRect(const Rect& LocalSpaceRect) const
+	{
+		return RotatedRect::TransformRect(
+			GetAccumulatedRenderTransform(),
+			RotatedRect(LocalSpaceRect)).ToBoundingRect();
+	}
+
+	constexpr Rect GetLayoutBoundingRect(const Margin& LocalSpaceExtendBy) const
+	{
+		return GetLayoutBoundingRect(Rect(Vector2::Zero(), GetSize())).Extend(LocalSpaceExtendBy);
+	}
+
+	constexpr Rect GetRenderBoundingRect(const Margin& LocalSpaceExtendBy) const
+	{
+		return GetRenderBoundingRect(Rect(Vector2::Zero(), GetSize())).Extend(LocalSpaceExtendBy);
+	}
 
 	constexpr SlateLayoutTransform GetAccumulatedLayoutTransform() const
 	{
@@ -190,7 +219,7 @@ public:
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		std::wstring scaleText = std::format(StringUtils::GetPlaceholder(InFormatArgs), Scale);
+		std::wstring scaleText = std::format(StringUtils::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
 		return std::format(L"[Abs={}, Scale={}, Size={}]", AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
 	}
 
@@ -211,9 +240,9 @@ public:
 
 private:
 	Vector2 Size;
-	float Scale = 1.0f;
-	Vector2 AbsolutePosition;
-	Vector2 Position;
+	Scale2D Scale = Scale2D::Identity();
+	Translate2D AbsolutePosition;
+	Translate2D Position;
 	SlateRenderTransform AccumulatedRenderTransform;
 	bool bHasRenderTransform = false;
 };

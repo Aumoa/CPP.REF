@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Input/MouseStateTracker.h"
 
@@ -25,25 +25,25 @@ const MouseState& SMouseStateTracker::GetLast()
 
 bool SMouseStateTracker::IsButtonPressed(EMouseButton Button)
 {
-	return Tracker.IsPressedByBitIndex((uint32)Button);
+	return Tracker.IsPressedByBitIndex((int32)Button);
 }
 
-const uint32& SMouseStateTracker::GetPressedBitsByIndex(uint32 bitIndex)
+int32 SMouseStateTracker::GetPressedBitsByIndex(int32 bitIndex)
 {
 	return Tracker.GetPressedBitIndex(bitIndex);
 }
 
 bool SMouseStateTracker::IsButtonReleased(EMouseButton inButton)
 {
-	return Tracker.IsReleasedByBitIndex((uint32)inButton);
+	return Tracker.IsReleasedByBitIndex((int32)inButton);
 }
 
-const uint32& SMouseStateTracker::GetReleasedBitsByIndex(uint32 bitIndex)
+int32 SMouseStateTracker::GetReleasedBitsByIndex(int32 bitIndex)
 {
 	return Tracker.GetReleasedBitIndex(bitIndex);
 }
 
-uint32 SMouseStateTracker::GetNumBits()
+int32 SMouseStateTracker::GetNumBits()
 {
 	return 5;
 }

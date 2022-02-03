@@ -1,11 +1,7 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "SceneRendering/Scene.h"
-#include "SceneRendering/SceneRenderer.h"
-#include "SceneRendering/SceneRenderTarget.h"
-#include "RHI/IRHIDeviceContext.h"
-#include "RHI/IRHIBuffer.h"
-#include "RHI/IRHIDevice.h"
+#include "RHI/RHIInterfaces.h"
 #include "RenderThread.h"
 #include "Components/PrimitiveComponent.h"
 #include "Scene/PrimitiveSceneProxy.h"
@@ -136,33 +132,33 @@ void SScene::ApplyViewBuffers(IRHIDeviceContext* InContext)
 			.SysMemPitch = RequiredSize,
 		};
 
-		if (ViewBuffer == nullptr || ViewBuffer->GetDesc().ByteWidth < (uint32)RequiredSize)
-		{
-			RHIBufferDesc NewDesc =
-			{
-				.ByteWidth = (uint32)RequiredSize,
-				.Usage = ERHIBufferUsage::Default,
-				.InitialState = ERHIResourceStates::NonPixelShaderResource | ERHIResourceStates::PixelShaderResource,
-				.StructureByteStride = 0,
-				.Flags = ERHIResourceFlags::None
-			};
+		//if (ViewBuffer == nullptr || ViewBuffer->GetDesc().ByteWidth < (uint32)RequiredSize)
+		//{
+		//	RHIBufferDesc NewDesc =
+		//	{
+		//		.ByteWidth = (uint32)RequiredSize,
+		//		.Usage = ERHIBufferUsage::Default,
+		//		.InitialState = ERHIResourceStates::NonPixelShaderResource | ERHIResourceStates::PixelShaderResource,
+		//		.StructureByteStride = 0,
+		//		.Flags = ERHIResourceFlags::None
+		//	};
 
-			ViewBuffer = Device->CreateBuffer(NewDesc, &InitialData);
-		}
-		else
-		{
-			InContext->UpdateSubresource(ViewBuffer, 0, InitialData);
-		}
+		//	ViewBuffer = Device->CreateBuffer(NewDesc, &InitialData);
+		//}
+		//else
+		//{
+		//	InContext->UpdateSubresource(ViewBuffer, 0, InitialData);
+		//}
 	}
 }
 
 uint64 SScene::GetActualGPUVirtualAddress(const SceneStructuredBuffer& InBuffer)
 {
-	if (RequiredSize)
+	//if (RequiredSize)
 	{
-		return ViewBuffer->GetGPUVirtualAddress() + InBuffer.GPUVirtualAddressOffset;
+		//return ViewBuffer->GetGPUVirtualAddress() + InBuffer.GPUVirtualAddressOffset;
 	}
-	else
+	//else
 	{
 		return 0;
 	}

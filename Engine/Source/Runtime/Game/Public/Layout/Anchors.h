@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -57,5 +57,54 @@ struct Anchors
 	{
 		return Minimum != Rhs.Minimum
 			|| Maximum != Rhs.Maximum;
+	}
+
+public:
+	using Type = float;
+	using VectorType = Vector2;
+
+	static constexpr size_t Row()
+	{
+		return 2;
+	}
+
+	static constexpr size_t Column()
+	{
+		return 2;
+	}
+
+	constexpr Anchors operator -() const
+	{
+		return { -Minimum, -Maximum };
+	}
+
+	constexpr const Vector2& operator [](size_t N) const
+	{
+		return N == 0 ? Minimum : Maximum;
+	}
+
+	constexpr Vector2& operator [](size_t N)
+	{
+		return N == 0 ? Minimum : Maximum;
+	}
+
+	template<TIsMatrix<float, 2, 2> IMatrix>
+	constexpr Anchors& operator =(const IMatrix& M)
+	{
+		Minimum = M[0];
+		Maximum = M[1];
+		return *this;
+	}
+
+public:
+	inline std::wstring ToString(std::wstring_view FormatArgs) const
+	{
+		return std::format(L"{{{Minimum={}, Maximum={}}}", Minimum.ToString(FormatArgs), Maximum.ToString(FormatArgs));
+	}
+
+	template<TIsMatrix<float, 2, 2> IMatrix>
+	inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
+	{
+		return Matrix<>::NearlyEquals(*this, M, Epsilon);
 	}
 };

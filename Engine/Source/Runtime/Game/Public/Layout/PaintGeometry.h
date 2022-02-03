@@ -1,10 +1,10 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "SlateRenderTransform.h"
-#include "TransformCalculus2D.h"
+#include "SlateLayoutTransform.h"
 
 struct PaintGeometry
 {
@@ -33,13 +33,13 @@ struct PaintGeometry
 
 	constexpr PaintGeometry AppendTransform(const SlateLayoutTransform& LayoutTransform) const
 	{
-		return PaintGeometry(LocalSize, TransformCalculus2D::Concatenate(AccumulatedRenderTransform, LayoutTransform));
+		return PaintGeometry(LocalSize, AccumulatedRenderTransform.Concatenate(LayoutTransform));
 	}
 
 	PaintGeometry& AppendTransform(const SlateLayoutTransform& LayoutTransform)
 	{
 		checkf(bHasRenderTransform, L"Geometry haven't render transform.");
-		AccumulatedRenderTransform = TransformCalculus2D::Concatenate(AccumulatedRenderTransform, LayoutTransform);
+		AccumulatedRenderTransform = Transform::Concatenate(AccumulatedRenderTransform, LayoutTransform);
 		return *this;
 	}
 
@@ -78,7 +78,7 @@ struct PaintGeometry
 
 	static constexpr PaintGeometry Identity()
 	{
-		return PaintGeometry(Vector2::ZeroVector());
+		return PaintGeometry(Vector2::Zero());
 	}
 
 private:

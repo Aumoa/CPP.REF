@@ -1,8 +1,7 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Materials/MaterialInterface.h"
-#include "RHI/IRHIDevice.h"
-#include "RHI/IRHIShaderResourceView.h"
+#include "RHI/RHIInterfaces.h"
 
 GENERATE_BODY(SMaterialInterface);
 DEFINE_LOG_CATEGORY(LogMaterials);
@@ -165,7 +164,7 @@ void SMaterialInterface::CacheParamsStorage()
 
 		if (tableViews != 0)
 		{
-			SRV = Device->CreateShaderResourceView((int32)tableViews);
+			//SRV = Device->CreateShaderResourceView((int32)tableViews);
 			bShaderResourceViewsCached = false;
 		}
 

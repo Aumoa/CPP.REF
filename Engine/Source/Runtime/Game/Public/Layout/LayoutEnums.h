@@ -1,58 +1,51 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 
-enum class EFlowDirection
-{
-	LeftToRight,
-	RightToLeft
-};
+SENUM(EFlowDirection, int32,
+	LeftToRight,,
+	RightToLeft,
+);
 
-enum class EOrientation
-{
-	Horizontal,
-	Vertical
-};
+SENUM(EOrientation, int32,
+	Horizontal,,
+	Vertical,
+);
 
-enum class ESlateVisibility
-{
-	Visible,
-	Collapsed,
-	Hidden,
-	HitTestInvisible,
-	SelfHitTestInvisible,
-	All
-};
+SENUM(ESlateVisibility, int32,
+	Visible,,
+	Collapsed,,
+	Hidden,,
+	HitTestInvisible,,
+	SelfHitTestInvisible,,
+	All,
+);
 
-enum class EWidgetClipping
-{
-	Inherit,
+SENUM(EWidgetClipping, int32,
+	Inherit,,
 	ClipToBounds,
-};
+);
 
-enum class EHorizontalAlignment
-{
-	Fill,
-	Left,
-	Center,
+SENUM(EHorizontalAlignment, int32,
+	Fill,,
+	Left,,
+	Center,,
 	Right,
-};
+);
 
-enum class EVerticalAlignment
-{
-	Fill,
-	Top,
-	Center,
+SENUM(EVerticalAlignment, int32,
+	Fill,,
+	Top,,
+	Center,,
 	Bottom,
-};
+);
 
-enum class ESizeRule
-{
-	Auto,
-	Stretch
-};
+SENUM(ESizeRule, int32,
+	Auto,,
+	Stretch,
+);
 
 class SlateVisibilityExtensions abstract
 {
@@ -91,18 +84,6 @@ public:
 		return 0 != (GetValue(Visibility) & VIS_Visible);
 	}
 
-	static std::wstring ToString(ESlateVisibility Visibility, std::wstring_view InFormatArgs = L"")
-	{
-		if (InFormatArgs == L"base")
-		{
-			return std::format(L"ESlateVisibility:{}", GetName(Visibility));
-		}
-		else
-		{
-			return GetName(Visibility);
-		}
-	}
-
 private:
 	static int32 GetValue(ESlateVisibility Visibility)
 	{
@@ -117,20 +98,6 @@ private:
 		default:
 			checkf(false, L"Invalid argument: Visibility({})", (int32)Visibility);
 			return 0;
-		};
-	}
-
-	static std::wstring GetName(ESlateVisibility Visibility)
-	{
-		switch (Visibility)
-		{
-		case ESlateVisibility::Visible: return L"Visible";
-		case ESlateVisibility::Collapsed: return L"Collapsed";
-		case ESlateVisibility::Hidden: return L"Hidden";
-		case ESlateVisibility::HitTestInvisible: return L"HitTestInvisible";
-		case ESlateVisibility::SelfHitTestInvisible: return L"SelfHitTestInvisible";
-		case ESlateVisibility::All: return L"All";
-		default: return std::format(L"({})", (int32)Visibility);
 		};
 	}
 };

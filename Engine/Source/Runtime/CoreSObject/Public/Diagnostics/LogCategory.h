@@ -1,12 +1,11 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include <optional>
 #include <string>
 #include <string_view>
-
-enum class ELogVerbosity;
+#include "LogVerbosity.h"
 
 class CORESOBJECT_API LogCategory
 {

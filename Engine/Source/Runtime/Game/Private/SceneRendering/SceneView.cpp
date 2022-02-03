@@ -1,9 +1,9 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "SceneRendering/SceneView.h"
 #include "SceneRendering/SceneViewScope.h"
 #include "SceneRendering/Scene.h"
-#include "RHI/IRHIDevice.h"
+#include "RHI/RHIInterfaces.h"
 #include "Scene/PrimitiveSceneProxy.h"
 
 SceneView::SceneView(SScene* InScene) : _MyScene(InScene)

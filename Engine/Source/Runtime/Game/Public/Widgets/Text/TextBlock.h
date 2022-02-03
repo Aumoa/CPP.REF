@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -19,12 +19,12 @@ private:
 	class SRenderElement;
 
 private:
-	SPROPERTY(Layout)
-	IRHITextLayout* Layout = nullptr;
-	SPROPERTY(Format)
-	IRHITextFormat* Format = nullptr;
-	SPROPERTY(TintBrush)
-	IRHISolidColorBrush* TintBrush = nullptr;
+	//SPROPERTY(Layout)
+	//IRHITextLayout* Layout = nullptr;
+	//SPROPERTY(Format)
+	//IRHITextFormat* Format = nullptr;
+	//SPROPERTY(TintBrush)
+	//IRHISolidColorBrush* TintBrush = nullptr;
 
 	SPROPERTY(CachedRenderElement)
 	SRenderElement* CachedRenderElement = nullptr;
@@ -35,8 +35,8 @@ private:
 	ERHITextAlignment TextAlignment = ERHITextAlignment::Leading;
 	ERHIParagraphAlignment ParagraphAlignment = ERHIParagraphAlignment::Near;
 
-	Vector2 CachedLocalMaxSize = Vector2::ZeroVector();
-	Vector2 CachedDesiredSize = Vector2::ZeroVector();
+	Vector2 CachedLocalMaxSize = Vector2::Zero();
+	Vector2 CachedDesiredSize = Vector2::Zero();
 
 public:
 	STextBlock();

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Application/SlateApplication.h"
 #include "Application/Window.h"
@@ -8,8 +8,7 @@
 #include "Draw/IRenderSlateElement.h"
 #include "SceneRendering/SceneRenderContext.h"
 #include "EngineSubsystems/GameRenderSystem.h"
-#include "RHI/IRHIDevice.h"
-#include "RHI/IRHIDeviceContext.h"
+#include "RHI/RHIInterfaces.h"
 #include "GameFramework/LocalPlayer.h"
 #include "Input/IPlatformKeyboard.h"
 #include "Input/IPlatformMouse.h"
@@ -35,15 +34,15 @@ SSlateApplication::~SSlateApplication()
 	// Remove all delegates for dispose DLL link.
 	auto& App = IApplicationInterface::Get();
 
-	auto& PlatformKeyboard = App.GetPlatformKeyboard();
-	PlatformKeyboard.KeyPressed.RemoveAll(this);
-	PlatformKeyboard.KeyReleased.RemoveAll(this);
+	//auto& PlatformKeyboard = App.GetPlatformKeyboard();
+	//PlatformKeyboard.KeyPressed.RemoveAll(this);
+	//PlatformKeyboard.KeyReleased.RemoveAll(this);
 
-	auto& PlatformMouse = App.GetPlatformMouse();
-	PlatformMouse.CursorMoved.RemoveAll(this);
-	PlatformMouse.MouseButtonPressed.RemoveAll(this);
-	PlatformMouse.MouseButtonReleased.RemoveAll(this);
-	PlatformMouse.MouseWheelScrolled.RemoveAll(this);
+	//auto& PlatformMouse = App.GetPlatformMouse();
+	//PlatformMouse.CursorMoved.RemoveAll(this);
+	//PlatformMouse.MouseButtonPressed.RemoveAll(this);
+	//PlatformMouse.MouseButtonReleased.RemoveAll(this);
+	//PlatformMouse.MouseWheelScrolled.RemoveAll(this);
 }
 
 void SSlateApplication::Init(IApplicationInterface* InApplication)
@@ -54,15 +53,15 @@ void SSlateApplication::Init(IApplicationInterface* InApplication)
 	CoreWindow = CreateCoreWindow();
 	CoreWindow->InitViewport();
 
-	auto& PlatformKeyboard = InApplication->GetPlatformKeyboard();
-	PlatformKeyboard.KeyPressed.AddSObject(this, &SSlateApplication::OnPlatformKeyPressed);
-	PlatformKeyboard.KeyReleased.AddSObject(this, &SSlateApplication::OnPlatformKeyReleased);
+	//auto& PlatformKeyboard = InApplication->GetPlatformKeyboard();
+	//PlatformKeyboard.KeyPressed.AddSObject(this, &SSlateApplication::OnPlatformKeyPressed);
+	//PlatformKeyboard.KeyReleased.AddSObject(this, &SSlateApplication::OnPlatformKeyReleased);
 
-	auto& PlatformMouse = InApplication->GetPlatformMouse();
-	PlatformMouse.CursorMoved.AddSObject(this, &SSlateApplication::OnCursorMoved);
-	PlatformMouse.MouseButtonPressed.AddSObject(this, &SSlateApplication::OnMouseButtonPressed);
-	PlatformMouse.MouseButtonReleased.AddSObject(this, &SSlateApplication::OnMouseButtonReleased);
-	PlatformMouse.MouseWheelScrolled.AddSObject(this, &SSlateApplication::OnMouseWheelScrolled);
+	//auto& PlatformMouse = InApplication->GetPlatformMouse();
+	//PlatformMouse.CursorMoved.AddSObject(this, &SSlateApplication::OnCursorMoved);
+	//PlatformMouse.MouseButtonPressed.AddSObject(this, &SSlateApplication::OnMouseButtonPressed);
+	//PlatformMouse.MouseButtonReleased.AddSObject(this, &SSlateApplication::OnMouseButtonReleased);
+	//PlatformMouse.MouseWheelScrolled.AddSObject(this, &SSlateApplication::OnMouseWheelScrolled);
 
 	auto& PlatformIME = InApplication->GetPlatformIME();
 	PlatformIME.IME.AddSObject(this, &SSlateApplication::OnIME);
@@ -84,8 +83,8 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_Prepass);
 		CoreWindow->PrepassLayout();
-		DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
-		AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
+		DesiredSize = Cast<float>(IApplicationInterface::Get().GetViewportSize());
+		AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::Zero()), SlateRenderTransform(Translate2D::Identity()));
 	}
 
 	{
@@ -95,7 +94,7 @@ void SSlateApplication::TickAndPaint(float InDeltaTime)
 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_Paint);
-		Rect CullingRect = Rect(0, 0, DesiredSize.X, DesiredSize.Y);
+		Rect CullingRect = Rect(0.0f, 0.0f, DesiredSize.X, DesiredSize.Y);
 		CoreWindow->Paint(PaintArgs::InitPaintArgs(Device, InDeltaTime), *AllottedGeometry, CullingRect, DrawCollector, 0, true);
 	}
 
@@ -181,7 +180,7 @@ void SSlateApplication::CacheRenderElements_GameThread(std::vector<SSlateDrawCol
 
 Geometry SSlateApplication::MakeRoot()
 {
-	Vector2 DesiredSize = IApplicationInterface::Get().GetViewportSize().Cast<float>();
-	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::ZeroVector()), SlateRenderTransform(Vector2::ZeroVector()));
+	Vector2 DesiredSize = Cast<float>(IApplicationInterface::Get().GetViewportSize());
+	Geometry AllottedGeometry = Geometry::MakeRoot(DesiredSize, SlateLayoutTransform(Vector2::Zero()), SlateRenderTransform(Translate2D::Identity()));
 	return AllottedGeometry;
 }

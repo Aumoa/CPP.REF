@@ -1,20 +1,20 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 
 interface IRHIDeviceContext;
-class SSceneRenderTargetInterface;
+class SSceneRenderTarget;
 
 class SceneRenderContext
 {
 public:
 	IRHIDeviceContext* const DeviceContext;
-	SSceneRenderTargetInterface* const RenderTarget;
+	SSceneRenderTarget* const RenderTarget;
 
 public:
-	SceneRenderContext(IRHIDeviceContext* InDeviceContext, SSceneRenderTargetInterface* InRenderTarget)
+	SceneRenderContext(IRHIDeviceContext* InDeviceContext, SSceneRenderTarget* InRenderTarget)
 		: DeviceContext(InDeviceContext)
 		, RenderTarget(InRenderTarget)
 	{

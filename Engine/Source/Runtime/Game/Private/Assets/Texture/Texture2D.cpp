@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Assets/Texture/Texture2D.h"
 #include "Assets/AssetsLoader.h"
@@ -6,9 +6,7 @@
 #include "IApplicationInterface.h"
 #include "Multimedia/IPlatformImageLoader.h"
 #include "Multimedia/IPlatformImage.h"
-#include "RHI/IRHITexture2D.h"
-#include "RHI/IRHIBitmap.h"
-#include "RHI/IRHIDevice.h"
+#include "RHI/RHIInterfaces.h"
 
 GENERATE_BODY(STexture2D);
 
@@ -69,7 +67,7 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 		InitialData.SysMemPitch = (size_t)PixelSize.X * 4;
 
 		Texture = Device->CreateTexture2D(Desc, &InitialData);
-		Bitmap = Device->CreateBitmapFromTexture2D(Texture);
+		//Bitmap = Device->CreateBitmapFromTexture2D(Texture);
 	}
 
 	return ImageSource != nullptr;

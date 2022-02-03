@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "GameObject.h"
 #include "GameEngine.h"
@@ -13,27 +13,27 @@ SGameObject::SGameObject() : Super()
 
 std::wstring SGameObject::ToString()
 {
-	return GetName();
+	return Name;
 }
 
-void SGameObject::SetOuter(SGameObject* NewOuter)
-{
-	Outer = NewOuter;
-}
-
-SGameObject* SGameObject::GetOuter()
+SGameObject* SGameObject::GetOuter() const
 {
 	return Outer;
 }
 
-void SGameObject::SetName(std::wstring_view InName)
+void SGameObject::SetOuter(SGameObject* Value)
 {
-	Name = InName;
+	Outer = Value;
 }
 
-std::wstring SGameObject::GetName()
+std::wstring_view SGameObject::GetName() const
 {
 	return Name;
+}
+
+void SGameObject::SetName(std::wstring_view Value)
+{
+	Name = Value;
 }
 
 SLevel* SGameObject::GetLevel()

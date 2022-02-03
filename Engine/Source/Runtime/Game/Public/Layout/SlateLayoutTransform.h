@@ -1,25 +1,25 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TransformCalculus2D.h"
-#include "Scale2D.h"
-#include "SlateRenderTransform.h"
 
 struct SlateLayoutTransform
 {
+	Scale2D Scale = Scale2D::Identity();
+	Translate2D Translation = Translate2D::Identity();
+
 	constexpr SlateLayoutTransform()
 	{
 	}
 
-	constexpr SlateLayoutTransform(float Scale, const Vector2& Translation)
+	constexpr SlateLayoutTransform(const Scale2D& Scale, const Translate2D& Translation)
 		: Scale(Scale)
 		, Translation(Translation)
 	{
 	}
 
-	constexpr SlateLayoutTransform(const Vector2& Translation)
+	constexpr SlateLayoutTransform(const Translate2D& Translation)
 		: Scale(1.0f)
 		, Translation(Translation)
 	{
@@ -27,76 +27,89 @@ struct SlateLayoutTransform
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		return std::format(L"Translation: {}, Scale: {}", Translation.ToString(InFormatArgs), std::format(StringUtils::GetPlaceholder(InFormatArgs), Scale));
+		return std::format(L"Translation: {}, Scale: {}", Translation.ToString(InFormatArgs), std::format(StringUtils::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs)));
 	}
 
-	template<class T>
-	constexpr T TransformPoint(const T& Point) const
-	{
-		return TransformCalculus2D::TransformPoint(Translation, Scale2D(Scale).TransformPoint(Point));
-	}
-
-	template<class T>
-	constexpr T TransformVector(const T& Point) const
-	{
-		return TransformCalculus2D::TransformVector(Translation, Scale2D(Scale).TransformVector(Point));
-	}
-
-	constexpr SlateLayoutTransform Concatenate(const SlateLayoutTransform& Rhs) const
-	{
-		return SlateLayoutTransform(TransformCalculus2D::Concatenate(Scale, Rhs.Scale), Rhs.TransformPoint(Translation));
-	}
-
-	constexpr SlateLayoutTransform Inverse() const
-	{
-		float InvScale = 1.0f / Scale;
-		return SlateLayoutTransform(InvScale, -Translation * InvScale);
-	}
-
-	constexpr bool operator ==(const SlateLayoutTransform& Rhs) const
-	{
-		return Scale == Rhs.Scale && Translation == Rhs.Translation;
-	}
-
-	constexpr bool operator !=(const SlateLayoutTransform& Rhs) const
-	{
-		return Scale != Rhs.Scale || Translation != Rhs.Translation;
-	}
-
-	constexpr float GetScale() const
-	{
-		return Scale;
-	}
-
-	constexpr const Vector2& GetTranslation() const
-	{
-		return Translation;
-	}
+	constexpr auto operator <=>(const SlateLayoutTransform& Rhs) const = default;
 
 	constexpr Matrix3x2 ToMatrix() const
 	{
 		return
 		{
-			Scale, 0.0f,
-			0.0f, Scale,
+			Scale.X, 0.0f,
+			0.0f, Scale.Y,
 			Translation.X, Translation.Y
 		};
 	}
-	
-	static constexpr SlateLayoutTransform Identity()
+
+public:
+	static constexpr SlateLayoutTransform Inverse(const SlateLayoutTransform& T)
 	{
-		return SlateLayoutTransform(1.0f, Vector2::ZeroVector());
+		Scale2D InvScale = T.Scale.Inverse();
+		return SlateLayoutTransform(InvScale, InvScale.TransformPoint(T.Translation.Inverse()));
 	}
 
-private:
-	float Scale = 1.0f;
-	Vector2 Translation;
-};
+	constexpr SlateLayoutTransform Inverse() const
+	{
+		return Inverse(*this);
+	}
 
-constexpr SlateRenderTransform TransformCalculus2D::Concatenate(const SlateRenderTransform& Transform, const SlateLayoutTransform& Layout)
-{
-	return SlateRenderTransform(
-		Matrix2x2::Multiply(Transform.GetMatrix(), Matrix2x2::Scale(Layout.GetScale())),
-		Layout.TransformPoint(Transform.GetTranslation())
-	);
-}
+	static constexpr SlateLayoutTransform Identity()
+	{
+		return SlateLayoutTransform(Scale2D::Identity(), Translate2D::Identity());
+	}
+
+	static constexpr SlateLayoutTransform Concatenate(const SlateLayoutTransform& TL, const SlateLayoutTransform& TR)
+	{
+		return SlateLayoutTransform(TL.Scale.Concatenate(TR.Scale), TR.TransformPoint(TL.Translation));
+	}
+
+	constexpr SlateLayoutTransform Concatenate(const SlateLayoutTransform& T) const
+	{
+		return Concatenate(*this, T);
+	}
+
+	template<TIsVector<float, 2> IVector>
+	static constexpr IVector TransformPoint(const SlateLayoutTransform& T, const IVector& Point)
+	{
+		return T.Translation.TransformPoint(T.Scale.TransformPoint(Point));
+	}
+
+	template<TIsVector<float, 2> IVector>
+	constexpr IVector TransformPoint(const IVector& Point) const
+	{
+		return TransformPoint(*this, Point);
+	}
+
+	template<TIsVector<float, 2> IVector>
+	static constexpr IVector TransformVector(const SlateLayoutTransform& T, const IVector& Vector)
+	{
+		return T.Translation.TransformVector(T.Scale.TransformVector(Vector));
+	}
+
+	template<TIsVector<float, 2> IVector>
+	constexpr IVector TransformVector(const IVector& Vector) const
+	{
+		return TransformVector(*this, Vector);
+	}
+
+public:
+	template<class ISlateRenderTransform>
+	static constexpr ISlateRenderTransform Concatenate(const SlateLayoutTransform& TL, const ISlateRenderTransform& TR) requires requires
+	{
+		{ ISlateRenderTransform(std::declval<SlateLayoutTransform>().ToMatrix()) };
+		{ std::declval<ISlateRenderTransform>().Concatenate(std::declval<ISlateRenderTransform>()) };
+	}
+	{
+		return ISlateRenderTransform(TL.ToMatrix()).Concatenate(TR);
+	}
+
+	template<class ISlateRenderTransform>
+	constexpr SlateRenderTransform Concatenate(const ISlateRenderTransform& T) const requires requires
+	{
+		Concatenate(std::declval<SlateLayoutTransform>(), std::declval<ISlateRenderTransform>());
+	}
+	{
+		return Concatenate(*this, T);
+	}
+};

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "ConsoleModule.h"
 #include "ConsoleModuleSubsystem.h"
@@ -13,7 +13,7 @@ SConsoleModule::~SConsoleModule() noexcept
 {
 }
 
-int32 SConsoleModule::Main(const SCommandLine& CommandArgs)
+int32 SConsoleModule::Main(const CommandLine& CommandArgs)
 {
 	for (auto& SubsystemClass : Type::FindAllSubclass<SConsoleModuleSubsystem>())
 	{

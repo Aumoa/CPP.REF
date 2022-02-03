@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/CommandLine.h"
 #include "Misc/StringUtils.h"
@@ -27,6 +27,19 @@ CommandLine::CommandLine(int32 Argc, wchar_t* const* Argv)
 	Parse(Argc, Argv);
 }
 
+CommandLine::CommandLine(std::span<const std::wstring> Args)
+{
+	std::vector<const wchar_t*> Buffers;
+	Buffers.reserve(Args.size());
+
+	for (auto& Item : Args)
+	{
+		Buffers.emplace_back(Item.c_str());
+	}
+
+	Parse((int32)Args.size(), Buffers.data());
+}
+
 bool CommandLine::ContainsKey(std::wstring_view Key) const
 {
 	return KeyValuePairs.contains(Key);
@@ -48,8 +61,10 @@ bool CommandLine::TryGetValue(std::wstring_view Key, std::span<const std::wstrin
 template<class TChar>
 void CommandLine::Parse(int32 Argc, TChar* const* Args)
 {
-	static constexpr bool bWstr = std::same_as<TChar, wchar_t>;
-	using StringView_t = std::basic_string_view<TChar>;
+	using TNakedChar = std::remove_const_t<TChar>;
+
+	static constexpr bool bWstr = std::same_as<TNakedChar, wchar_t>;
+	using StringView_t = std::basic_string_view<TNakedChar>;
 
 	StringView_t CurrKey;
 	std::vector<std::wstring> Values;
@@ -57,43 +72,49 @@ void CommandLine::Parse(int32 Argc, TChar* const* Args)
 	char StringCtxKey = 0;
 	std::wstring StringCtxAppend;
 
-	for (int32 i = 0; i < Argc; ++i)
+	StringView_t Doublehyphen;
+	if constexpr (bWstr)
 	{
-		auto Sview = StringView_t(Args[i]);
-		StringView_t Doublehyphen;
+		Doublehyphen = L"--";
+	}
+	else
+	{
+		Doublehyphen = "--";
+	}
+
+	auto FlushAll = [&]()
+	{
+		std::vector<std::wstring> Clone;
+		std::swap(Clone, Values);
+
 		if constexpr (bWstr)
 		{
-			Doublehyphen = L"--";
+			auto Emplaced = KeyValuePairs.emplace(CurrKey, std::move(Clone));
+			if (!Emplaced.second)
+			{
+				throw gcnew SCommandLineParserException(std::format(L"Duplicated command line key({}).", CurrKey));
+			}
 		}
 		else
 		{
-			Doublehyphen = "--";
+			auto WCurrKey = ANSI_TO_WCHAR(CurrKey);
+			auto Emplaced = KeyValuePairs.emplace(WCurrKey, std::move(Clone));
+			if (!Emplaced.second)
+			{
+				throw gcnew SCommandLineParserException(std::format(L"Duplicated command line key({}).", WCurrKey));
+			}
 		}
+	};
+
+	for (int32 i = 0; i < Argc; ++i)
+	{
+		auto Sview = StringView_t(Args[i]);
 
 		if (StringCtxKey == 0 && Sview.starts_with(Doublehyphen))
 		{
 			if (!CurrKey.empty())
 			{
-				std::vector<std::wstring> Clone;
-				std::swap(Clone, Values);
-
-				if constexpr (bWstr)
-				{
-					auto Emplaced = KeyValuePairs.emplace(CurrKey, std::move(Clone));
-					if (!Emplaced.second)
-					{
-						throw gcnew SCommandLineParserException(std::format(L"Duplicated command line key({}).", CurrKey));
-					}
-				}
-				else
-				{
-					auto WCurrKey = ANSI_TO_WCHAR(CurrKey);
-					auto Emplaced = KeyValuePairs.emplace(WCurrKey, std::move(Clone));
-					if (!Emplaced.second)
-					{
-						throw gcnew SCommandLineParserException(std::format(L"Duplicated command line key({}).", WCurrKey));
-					}
-				}
+				FlushAll();
 			}
 
 			CurrKey = Sview.substr(2);
@@ -143,9 +164,11 @@ void CommandLine::Parse(int32 Argc, TChar* const* Args)
 				{
 					std::wstring Clone;
 					std::swap(Clone, StringCtxAppend);
-					Values.emplace_back(std::move(StringCtxAppend));
+					Values.emplace_back(std::move(Clone));
 				}
 			}
 		}
 	}
+
+	FlushAll();
 }

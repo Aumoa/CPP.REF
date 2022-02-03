@@ -1,6 +1,5 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Layout/LayoutImpl.h"
 #include "Layout/Geometry.h"
 #include "Layout/ArrangedWidget.h"
 #include "Widgets/Widget.h"
@@ -24,7 +23,7 @@ ArrangedWidget Geometry::MakeChild(SWidget* ChildWidget, const LayoutGeometry& L
 	return MakeChild(ChildWidget, LayoutGeometry.GetSizeInLocalSpace(), LayoutGeometry.GetLocalToParentTransform());
 }
 
-ArrangedWidget Geometry::MakeChild(SWidget* ChildWidget, const Vector2& ChildOffset, const Vector2& LocalSize, float ChildScale) const
+ArrangedWidget Geometry::MakeChild(SWidget* ChildWidget, const Translate2D& ChildOffset, const Vector2& LocalSize, const Scale2D& ChildScale) const
 {
-	return MakeChild(ChildWidget, LocalSize, SlateLayoutTransform(ChildScale, TransformCalculus2D::TransformPoint(ChildScale, ChildOffset)));
+	return MakeChild(ChildWidget, LocalSize, SlateLayoutTransform(ChildScale, ChildScale.TransformPoint(ChildOffset)));
 }

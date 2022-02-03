@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -30,22 +30,22 @@ struct LayoutGeometry
 
 	constexpr Vector2 GetSizeInParentSpace() const
 	{
-		return TransformCalculus2D::TransformVector(LocalToParent, LocalSize);
+		return LocalToParent.TransformVector(LocalSize);
 	}
 
 	constexpr Vector2 GetOffsetInParentSpace() const
 	{
-		return LocalToParent.GetTranslation();
+		return LocalToParent.Translation;
 	}
 
 	constexpr Rect GetRectInLocalSpace() const
 	{
-		return Rect(Vector2::ZeroVector(), LocalSize);
+		return Rect(Vector2::Zero(), LocalSize);
 	}
 
 	constexpr Rect GetRectInParentSpace() const
 	{
-		return TransformCalculus2D::TransformRect(LocalToParent, GetRectInLocalSpace());
+		return Rect::TransformRect(LocalToParent, GetRectInLocalSpace());
 	}
 
 private:

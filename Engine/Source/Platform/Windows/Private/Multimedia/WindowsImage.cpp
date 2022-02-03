@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "WindowsImage.h"
 
@@ -17,8 +17,8 @@ void SWindowsImage::CopyPixels(const RectN* CopyRect, int32 Stride, int32 Buffer
 	{
 		WRect.X = CopyRect->Left;
 		WRect.Y = CopyRect->Top;
-		WRect.Width = CopyRect->GetWidth();
-		WRect.Height = CopyRect->GetHeight();
+		WRect.Width = Rect::Width(*CopyRect);
+		WRect.Height = Rect::Height(*CopyRect);
 	}
 
 	HR(ImageSource->CopyPixels(CopyRect ? &WRect : nullptr, (UINT)Stride, (UINT)BufferSize, (BYTE*)OutBuffer));

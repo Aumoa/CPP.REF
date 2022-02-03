@@ -1,15 +1,8 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Scale2D.h"
-#include "Shear2D.h"
-#include "TransformCalculus2D.h"
-#include <format>
-#include <string>
-
-struct SlateLayoutTransform;
 
 struct SlateRenderTransform
 {
@@ -17,102 +10,156 @@ struct SlateRenderTransform
 	{
 	}
 
-	constexpr SlateRenderTransform(const Vector2& Translation)
+	constexpr SlateRenderTransform(const Translate2D& Translation)
 		: M(Matrix2x2::Identity())
 		, Translation(Translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(float uniformScale, const Vector2& Translation = Vector2::ZeroVector())
-		: SlateRenderTransform(Scale2D(uniformScale), Translation)
+	constexpr SlateRenderTransform(float UniformScale, const Translate2D& Translation = Translate2D::Identity())
+		: SlateRenderTransform(Scale2D(UniformScale), Translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Scale2D& Scale, const Vector2& Translation = Vector2::ZeroVector())
-		: M(Matrix2x2::Scale(Scale.GetVector()))
+	constexpr SlateRenderTransform(const Scale2D& Scale, const Translate2D& Translation = Translate2D::Identity())
+		: M(Matrix2x2::Scale(Scale))
 		, Translation(Translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Shear2D& Shear, const Vector2& Translation = Vector2::ZeroVector())
-		: M(Matrix2x2::Shear(Shear.GetVector()))
+	constexpr SlateRenderTransform(const Shear2D& Shear, const Translate2D& Translation = Translate2D::Identity())
+		: M(Matrix2x2::Shear(Shear))
 		, Translation(Translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Complex& Rotation, const Vector2& Translation = Vector2::ZeroVector())
-		: M(Rotation.ToMatrix())
+	constexpr SlateRenderTransform(const Complex& Rotation, const Translate2D& Translation = Translate2D::Identity())
+		: M(Matrix3x2::Rotation<Matrix2x2>(Rotation))
 		, Translation(Translation)
 	{
 	}
 
-	constexpr SlateRenderTransform(const Matrix2x2& Transform, const Vector2& Translation = Vector2::ZeroVector())
+	constexpr SlateRenderTransform(const Matrix2x2& Transform, const Translate2D& Translation)
 		: M(Transform)
 		, Translation(Translation)
 	{
 	}
 
 	constexpr SlateRenderTransform(const Matrix3x2& Transform)
-		: M{ Transform.Get(0, 0), Transform.Get(0, 1), Transform.Get(1, 0), Transform.Get(1, 1) }
-		, Translation(Transform.Get(2, 0), Transform.Get(2, 1))
+		: M(Transform)
+		, Translation(Transform[2][0], Transform[2][1])
 	{
 	}
 
-	constexpr Vector2 TransformPoint(const Vector2& Point) const
-	{
-		return TransformCalculus2D::TransformPoint(Translation, TransformCalculus2D::TransformPoint(M, Point));
-	}
+	constexpr auto operator <=>(const SlateRenderTransform&) const = default;
 
-	constexpr Vector2 TransformVector(const Vector2& Vector) const
+public:
+	static constexpr SlateRenderTransform Inverse(const SlateRenderTransform& T)
 	{
-		return TransformCalculus2D::TransformVector(M, Vector);
-	}
-
-	constexpr SlateRenderTransform Concatenate(const SlateRenderTransform& Rhs) const
-	{
-		return SlateRenderTransform(
-			Matrix2x2::Multiply(M, Rhs.M),
-			TransformCalculus2D::Concatenate(TransformCalculus2D::TransformPoint(Rhs.M, Translation), Rhs.Translation)
-		);
+		Matrix2x2 IM = Matrix<>::Inverse(T.M);
+		Translate2D IT = Matrix<>::TransformVector(IM, -T.Translation);
+		return SlateRenderTransform(IM, IT);
 	}
 
 	constexpr SlateRenderTransform Inverse() const
 	{
-		Matrix2x2 invM = TransformCalculus2D::Inverse(M);
-		Vector2 invTrans = invM.TransformPoint(-Translation);
-		return SlateRenderTransform(invM, invTrans);
+		return Inverse(*this);
 	}
 
-	constexpr bool operator ==(const SlateRenderTransform& Rhs) const
+	static constexpr SlateRenderTransform Identity()
 	{
-		return M == Rhs.M && Translation == Rhs.Translation;
+		return
+		{
+			Matrix2x2::Identity(),
+			Translate2D::Identity()
+		};
 	}
 
-	constexpr bool operator !=(const SlateRenderTransform& Rhs) const
+	static constexpr SlateRenderTransform Concatenate(const SlateRenderTransform& TL, const SlateRenderTransform& TR)
 	{
-		return M != Rhs.M || Translation != Rhs.Translation;
+		return SlateRenderTransform
+		{
+			Matrix<>::Multiply(TL.M, TR.M),
+			Translate2D::Concatenate(Matrix<>::TransformVector(TR.M, TL.Translation), TR.Translation)
+		};
 	}
 
+	constexpr SlateRenderTransform Concatenate(const SlateRenderTransform& T) const
+	{
+		return Concatenate(*this, T);
+	}
+
+	template<TIsVector<float, 2> IPoint>
+	static constexpr IPoint TransformPoint(const SlateRenderTransform& T, const IPoint& Point)
+	{
+		return T.Translation.TransformPoint(Matrix<>::TransformVector(T.M, Point));
+	}
+
+	template<TIsVector<float, 2> IPoint>
+	constexpr IPoint TransformPoint(const IPoint& Point) const
+	{
+		return TransformPoint(*this, Point);
+	}
+
+	template<TIsVector<float, 2> INormal>
+	static constexpr INormal TransformVector(const SlateRenderTransform& T, const INormal& Normal)
+	{
+		return T.M.TransformVector(Normal);
+	}
+
+	template<TIsVector<float, 2> INormal>
+	constexpr INormal TransformVector(const INormal& Vector) const
+	{
+		return TransformVector(*this, Vector);
+	}
+
+public:
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
 		return std::format(L"M: {}, Translation: {}", M.ToString(InFormatArgs), Translation.ToString(InFormatArgs));
 	}
 
-	constexpr bool IsIdentity() const
+	static constexpr bool IsIdentity(const SlateRenderTransform& T, float Epsilon = 0)
 	{
-		return M.IsIdentity() && Translation == Vector2::ZeroVector();
+		return Matrix<>::IsIdentity(T.M, Epsilon) && T.Translation.NearlyEquals(T.Translation.Identity(), Epsilon);
 	}
 
-	constexpr const Vector2& GetTranslation() const { return Translation; }
-	void SetTranslation(const Vector2& Translation) { this->Translation = Translation; }
-	constexpr const Matrix2x2& GetMatrix() const { return M; }
-
-	static constexpr SlateRenderTransform Identity()
+	constexpr bool IsIdentity(float Epsilon = 0) const
 	{
-		return SlateRenderTransform(Matrix2x2::Identity(), Vector2::ZeroVector());
+		return IsIdentity(*this, Epsilon);
 	}
 
-private:
+	template<class ISlateLayoutTransform>
+	static constexpr SlateRenderTransform Concatenate(const SlateRenderTransform& TL, const ISlateLayoutTransform& TR) requires requires
+	{
+		{ std::declval<ISlateLayoutTransform>().Scale };
+		{ std::declval<ISlateLayoutTransform>().TransformPoint(std::declval<Translate2D>()) };
+	}
+	{
+		return SlateRenderTransform(
+			Matrix<>::Multiply(TL.M, Matrix2x2::Scale(TR.Scale)),
+			TR.TransformPoint(TL.Translation)
+		);
+	}
+
+	template<class ISlateLayoutTransform>
+	constexpr SlateRenderTransform Concatenate(const ISlateLayoutTransform& T) const requires requires
+	{
+		{ std::declval<ISlateLayoutTransform>().Scale };
+		{ std::declval<ISlateLayoutTransform>().TransformPoint(std::declval<Translate2D>()) };
+	}
+	{
+		return Concatenate(*this, T);
+	}
+
+	static constexpr SlateRenderTransform Concatenate(const Translate2D& Translation, const SlateRenderTransform& T)
+	{
+		return SlateRenderTransform(
+			T.M,
+			T.M.TransformPoint(Translation).Concatenate(T.Translation)
+		);
+	}
+
 	Matrix2x2 M = Matrix2x2::Identity();
-	Vector2 Translation;
+	Translate2D Translation = Translate2D::Identity();
 };

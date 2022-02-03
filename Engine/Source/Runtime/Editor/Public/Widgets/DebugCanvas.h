@@ -1,12 +1,12 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/TickScheduler.h"
 #include "Widgets/Panel/CanvasPanel.h"
 #include "Widgets/Text/TextBlock.h"
 
-class STickScheduler;
 class STextBlock;
 class SVerticalBoxPanel;
 class CycleCounterNamespace;
@@ -36,9 +36,8 @@ public:
 
 private:
 	uint64 TickCounter = 0;
+	TickScheduler RefreshTimer;
 
-	SPROPERTY(RefreshTimer)
-	STickScheduler* RefreshTimer = nullptr;
 	SPROPERTY(GCCounter)
 	STextBlock* GCCounter = nullptr;
 

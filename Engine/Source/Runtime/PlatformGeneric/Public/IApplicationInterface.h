@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -15,11 +15,10 @@ interface IApplicationInterface : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IApplicationInterface)
 
-	enum class ETickMode
-	{
-		Realtime,
-		Ontime
-	};
+	SENUM(ETickMode, int32,
+		Realtime,,
+		Ontime,
+	);
 
 	virtual void Start() = 0;
 	virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) = 0;
@@ -46,6 +45,8 @@ interface IApplicationInterface : implements SObject
 	IdleDelegate Idle;
 	DECLARE_MULTICAST_DELEGATE(SizedDelegate, Vector2N);
 	SizedDelegate Sized;
+	DECLARE_MULTICAST_DELEGATE(PreDestroyAppDelegate);
+	PreDestroyAppDelegate PreDestroyApp;
 
 	PLATFORMGENERIC_API IApplicationInterface();
 	PLATFORMGENERIC_API static IApplicationInterface& Get();

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -29,8 +29,8 @@ private:
 	uint8 bShaderResourceViewsCached : 1 = false;
 
 	std::vector<int32> ShaderMappingIndex;
-	SPROPERTY(SRV)
-	IRHIShaderResourceView* SRV = nullptr;
+	//SPROPERTY(SRV)
+	//IRHIShaderResourceView* SRV = nullptr;
 
 public:
 	SMaterialInterface(IRHIDevice* InDevice);

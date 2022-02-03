@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -19,8 +19,8 @@ public:
 	SConsoleModule();
 	virtual ~SConsoleModule() noexcept override;
 
-	int32 Main(const SCommandLine& CommandArgs);
-	virtual int32 Run(const SCommandLine& CommandArgs) = 0;
+	int32 Main(const CommandLine& CommandArgs);
+	virtual int32 Run(const CommandLine& CommandArgs) = 0;
 
 	SConsoleModuleSubsystem* GetSubsystem(Type* SubsystemClass);
 	template<class T>

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/CompoundWidget.h"
 #include "Draw/PaintArgs.h"
@@ -123,7 +123,7 @@ bool SCompoundWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vec
     }
 
     if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(Location.Cast<float>()))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Cast<Vector2>(Location)))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
     }

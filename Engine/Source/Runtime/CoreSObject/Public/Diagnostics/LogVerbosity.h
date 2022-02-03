@@ -1,34 +1,13 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
-/// <summary>
-/// Represents log verbosity.
-/// </summary>
-enum class ELogVerbosity
-{
-	/// <summary>
-	/// Fatal error. Process will be terminate.
-	/// </summary>
-	Fatal,
+#include "Reflection/Enum.h"
 
-	/// <summary>
-	/// Error occurred. Process keep running but unstable.
-	/// </summary>
-	Error,
-
-	/// <summary>
-	/// Warning occurred. Process will bypassing errors, but have potential risks.
-	/// </summary>
-	Warning,
-
-	/// <summary>
-	/// Display information.
-	/// </summary>
-	Info,
-
-	/// <summary>
-	/// Display verbose logging.
-	/// </summary>
+SENUM(ELogVerbosity, int32,
+	Fatal,,
+	Error,,
+	Warning,,
+	Info,,
 	Verbose,
-};
+);

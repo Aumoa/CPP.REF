@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Application/Window.h"
 #include "Application/Viewport.h"
@@ -14,8 +14,7 @@ SWindow::SWindow() : Super()
 void SWindow::InitViewport()
 {
 	GameViewport = SNew(SViewport)
-		.RenderSize(IApplicationInterface::Get().GetViewportSize())
-		.RenderTargetFormat(ERHIPixelFormat::B8G8R8A8_UNORM);
+		.RenderSize(IApplicationInterface::Get().GetViewportSize());
 
 	InvalidateLayoutAndVolatility();
 }
@@ -31,7 +30,7 @@ Vector2 SWindow::ComputeDesiredSize()
 	{
 		return GameViewport->GetDesiredSize();
 	}
-	return Vector2::ZeroVector();
+	return Vector2::Zero();
 }
 
 void SWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
@@ -41,7 +40,7 @@ void SWindow::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geom
 	{
 		ArrangedChildrens.AddWidget(VpVisibility, AllottedGeometry.MakeChild(
 			GameViewport,
-			Vector2::ZeroVector(),
+			Vector2::Zero(),
 			AllottedGeometry.GetLocalSize()
 		));
 	}

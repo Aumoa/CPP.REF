@@ -1,11 +1,11 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "SceneRenderer.h"
 
-class SRaytraceSceneRenderer : public SSceneRenderer
+class GAME_API SRaytraceSceneRenderer : public SSceneRenderer
 {
 	GENERATED_BODY(SRaytraceSceneRenderer)
 

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 [[noreturn]]
 inline void ReportWindowsError(std::wstring_view InMessage = L"", int32 Error = (int32)GetLastError())
@@ -26,8 +26,8 @@ inline void ReportCOMError(std::wstring_view InMessage, HRESULT Error)
 	SE_LOG(LogWindowsCommon, Fatal, L"An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", InMessage, (uint32)Error, TCHAR_TO_WCHAR(ComError.ErrorMessage()));
 }
 
-#define HR(x)								\
-if (HRESULT __HR__ = (x); FAILED(__HR__))	\
-{											\
-	ReportCOMError(L ## #x, __HR__);		\
+#define HR(x) \
+if (HRESULT __HR__ = (x); __HR__ != DXGI_ERROR_NOT_FOUND && FAILED(__HR__)) \
+{ \
+	ReportCOMError(L ## #x, __HR__); \
 }

@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Components/SceneComponent.h"
 
@@ -21,7 +21,7 @@ void SSceneComponent::UpdateComponentToWorld()
 {
 	if (GetAttachParent() == nullptr)
 	{
-		_RelativeTransform = Transform::GetIdentity();
+		_RelativeTransform = Transform::Identity();
 		return;
 	}
 
@@ -53,7 +53,7 @@ Transform SSceneComponent::GetSocketTransform(std::wstring_view InSocketName, EC
 bool SSceneComponent::MoveComponent(const Vector3& InMoveDelta, const Quaternion& InNewRotation, EComponentTransformSpace InSpace)
 {
 	Quaternion OldRotation = InSpace == EComponentTransformSpace::World ? GetComponentRotation() : GetRotation();
-	if (InMoveDelta.NearlyEquals(Vector3::ZeroVector()) && OldRotation.NearlyEquals(InNewRotation))
+	if (InMoveDelta.NearlyEquals(Vector3::Zero(), MathEx::SmallNumber) && OldRotation.NearlyEquals(InNewRotation, MathEx::SmallNumber))
 	{
 		// MoveDelta and NewRotation is nearly equals to previous component transform.
 		// Skip moving and return state indicating that be not moved.

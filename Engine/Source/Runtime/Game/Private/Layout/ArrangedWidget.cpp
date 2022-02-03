@@ -1,7 +1,6 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Layout/ArrangedWidget.h"
-#include "Layout/LayoutImpl.h"
 #include "Widgets/Widget.h"
 
 ArrangedWidget::ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry)

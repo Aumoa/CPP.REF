@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -11,17 +11,16 @@ class PLATFORMGENERIC_API SMaterial : public SMaterialInterface
 {
 	GENERATED_BODY(SMaterial)
 
-	enum class EBaseShaderCode
-	{
-		UI
-	};
+	SENUM(EBaseShaderCode, int32,
+		UI,
+	);
 
 private:
 	EBaseShaderCode BaseShaderCode;
 	SPROPERTY(Device)
 	IRHIDevice* Device = nullptr;
-	SPROPERTY(ShaderCode)
-	IRHIShader* ShaderCode = nullptr;
+	//SPROPERTY(ShaderCode)
+	//IRHIShader* ShaderCode = nullptr;
 
 public:
 	SMaterial(IRHIDevice* InDevice, EBaseShaderCode InBaseShaderCode);

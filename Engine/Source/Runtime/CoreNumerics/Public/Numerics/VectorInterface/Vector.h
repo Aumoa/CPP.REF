@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -631,31 +631,41 @@ constexpr bool operator !=(const IVectorL& VL, const IVectorR& VR) requires TIsC
 }
 
 
-namespace std
-{
-	template<TIsVectorBase IVector>
-	struct tuple_size<IVector> : public integral_constant<size_t, IVector::Size()>
-	{
-	};
-
-	template<size_t Idx, TIsVectorBase IVector>
-	struct tuple_element<Idx, IVector>
-	{
-		using type = typename IVector::Type;
-	};
-
-	template<size_t Idx, TIsVectorBase IVector>
-	inline tuple_element_t<Idx, IVector>& get(IVector& V)
-	{
-		return V[Idx];
-	}
-
-	template<size_t Idx, TIsVectorBase IVector>
-	inline const tuple_element_t<Idx, IVector>& get(const IVector& V)
-	{
-		return V[Idx];
-	}
-}
+//namespace std
+//{
+//	template<TIsVectorBase IVector>
+//	struct tuple_size<IVector> : public integral_constant<size_t, IVector::Size()>
+//	{
+//	};
+//
+//	template<TIsVectorBase IVector>
+//	struct tuple_size<const IVector> : public tuple_size<IVector>
+//	{
+//	};
+//
+//	template<size_t Idx, TIsVectorBase IVector>
+//	struct tuple_element<Idx, IVector>
+//	{
+//		using type = typename IVector::Type;
+//	};
+//
+//	template<size_t Idx, TIsVectorBase IVector>
+//	struct tuple_element<Idx, const IVector> : public tuple_element<Idx, IVector>
+//	{
+//	};
+//
+//	template<size_t Idx, TIsVectorBase IVector>
+//	inline tuple_element_t<Idx, IVector>& get(IVector& V)
+//	{
+//		return V[Idx];
+//	}
+//
+//	template<size_t Idx, TIsVectorBase IVector>
+//	inline const tuple_element_t<Idx, IVector>& get(const IVector& V)
+//	{
+//		return V[Idx];
+//	}
+//}
 
 using Vector2 = Vector<float, 2>;
 using Vector3 = Vector<float, 3>;

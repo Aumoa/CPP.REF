@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include <variant>
 
 interface IRHIResource;
+interface IRHIRenderTargetView;
 
 #pragma pack(push, 4)
 
@@ -353,6 +354,23 @@ struct RHITexture2DClearValue
 			uint8 Stencil;
 		} DepthStencil;
 	};
+
+	static RHITexture2DClearValue InitColor(ERHIPixelFormat Format, const Color& InColor)
+	{
+		RHITexture2DClearValue Value = {};
+		Value.Format = Format;
+		memcpy(Value.ClearColor, &InColor, sizeof(Color));
+		return Value;
+	}
+
+	static RHITexture2DClearValue InitDepth(ERHIPixelFormat Format, float Depth, uint8 Stencil = 0)
+	{
+		RHITexture2DClearValue Value = {};
+		Value.Format = Format;
+		Value.DepthStencil.Depth = Depth;
+		Value.DepthStencil.Stencil = Stencil;
+		return Value;
+	}
 };
 
 struct RHISampleDesc
@@ -639,6 +657,23 @@ struct RHIMaterialParameterInfo
 	std::wstring Name;
 	ERHIShaderParameterType ElementType;
 	int32 Index;
+};
+
+struct RHIRenderPassAttachment
+{
+	ERHIPixelFormat Format;
+	RHISampleDesc SampleDesc;
+	ERHIAttachmentLoadOp LoadOp;
+	ERHIAttachmentStoreOp StoreOp;
+	ERHIResourceStates BeforeState;
+	ERHIResourceStates AfterState;
+};
+
+struct RHIShaderCode
+{
+	std::string HLSLCode;
+	std::string EntryPoint;
+	ERHIShaderType ShaderType;
 };
 
 #pragma pack(pop)

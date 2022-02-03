@@ -25,6 +25,7 @@ public class Windows : ModuleRule
                 "Game",
                 "WindowsCommon",
                 "DirectX",
+                //"Vulkan",
             });
 
             PrivateAdditionalLibraries.AddRange(new[]

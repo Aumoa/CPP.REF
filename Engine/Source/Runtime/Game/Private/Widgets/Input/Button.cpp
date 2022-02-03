@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Input/Button.h"
 #include "Layout/ArrangedChildrens.h"
@@ -11,7 +11,7 @@ SButton::SButton() : Super()
 
 bool SButton::OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event)
 {
-	if (AllottedGeometry.IsUnderLocation(Location.Cast<float>()))
+	if (AllottedGeometry.IsUnderLocation(Vector<>::Cast<Vector2>(Location)))
 	{
 		if (Button == InterruptButton && Event == CaughtEvent)
 		{

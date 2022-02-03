@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Application/EditorWindow.h"
 #include "Application/Viewport.h"
@@ -20,38 +20,38 @@ void SEditorWindow::InitViewport()
 {
 	Super::InitViewport();
 
-	EditorLayout =
-		SNew(SHorizontalBoxPanel)
-		+SHorizontalBoxPanel::SSlot()
-		.SizeParam(ESizeRule::Stretch, 1.0f)
-		.VAlignment(EVerticalAlignment::Fill)
-		.HAlignment(EHorizontalAlignment::Fill)
-		[
-			SNew(SVerticalBoxPanel)
-			// GameViewport
-			+SVerticalBoxPanel::SSlot()
-			.SizeParam(ESizeRule::Stretch, 1.0f)
-			[
-				EditorViewport = GetGameViewport()
-			]
-			// LogConsole
-			+SVerticalBoxPanel::SSlot()
-			.SizeParam(ESizeRule::Auto, 1.0f)
-			.HAlignment(EHorizontalAlignment::Fill)
-			[
-				SNew(SLogConsole)
-			]
-		]
-		+SHorizontalBoxPanel::SSlot()
-		.SizeParam(ESizeRule::Auto, 1.0f)
-		.VAlignment(EVerticalAlignment::Fill)
-		[
-			SNew(SImage)
-			.TintColor(NamedColors::LightGreen)
-		]
-		;
+	//EditorLayout =
+	//	SNew(SHorizontalBoxPanel)
+	//	+SHorizontalBoxPanel::SSlot()
+	//	.SizeParam(ESizeRule::Stretch, 1.0f)
+	//	.VAlignment(EVerticalAlignment::Fill)
+	//	.HAlignment(EHorizontalAlignment::Fill)
+	//	[
+	//		SNew(SVerticalBoxPanel)
+	//		// GameViewport
+	//		+SVerticalBoxPanel::SSlot()
+	//		.SizeParam(ESizeRule::Stretch, 1.0f)
+	//		[
+	//			EditorViewport = GetGameViewport()
+	//		]
+	//		// LogConsole
+	//		+SVerticalBoxPanel::SSlot()
+	//		.SizeParam(ESizeRule::Auto, 1.0f)
+	//		.HAlignment(EHorizontalAlignment::Fill)
+	//		[
+	//			SNew(SLogConsole)
+	//		]
+	//	]
+	//	+SHorizontalBoxPanel::SSlot()
+	//	.SizeParam(ESizeRule::Auto, 1.0f)
+	//	.VAlignment(EVerticalAlignment::Fill)
+	//	[
+	//		SNew(SImage)
+	//		.TintColor(NamedColors::LightGreen)
+	//	]
+	//	;
 
-	EditorViewport->AddToViewport(SNew(SDebugCanvas));
+	//EditorViewport->AddToViewport(SNew(SDebugCanvas));
 }
 
 SViewport* SEditorWindow::GetEditorViewport()

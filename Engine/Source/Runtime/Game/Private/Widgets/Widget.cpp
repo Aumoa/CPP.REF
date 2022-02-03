@@ -1,23 +1,20 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Widget.h"
 #include "Draw/PaintArgs.h"
 #include "IApplicationInterface.h"
 #include "Input/IPlatformMouse.h"
-#include "Animation/SlateAnimationPlayer.h"
-#include "Animation/SlateAnimationContext.h"
 #include "Draw/SlateDrawCollector.h"
 
 GENERATE_BODY(SWidget);
 
 SWidget::SWidget() : Super()
 {
-    AnimPlayer = gcnew SSlateAnimationPlayer(this);
 }
 
 std::wstring SWidget::ToString()
 {
-	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), SlateVisibilityExtensions::ToString(Visibility));
+	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), Visibility.ToString());
 }
 
 void SWidget::Dispose()
@@ -79,8 +76,6 @@ void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
         MouseHovered.Broadcast(false);
         bMouseHover = false;
     }
-
-    AnimPlayer->Tick(InDeltaTime);
 }
 
 bool SWidget::PrepassLayout()
@@ -107,7 +102,7 @@ SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 
 bool SWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2N& Location)
 {
-    CachedMouseLocation = Location.Cast<float>();
+    CachedMouseLocation = Vector<>::Cast<Vector2>(Location);
     return false;
 }
 
@@ -139,14 +134,14 @@ void SWidget::PostConstruction()
 
 Vector2 SWidget::ComputeDesiredSize()
 {
-    return Vector2::ZeroVector();
+    return Vector2::Zero();
 }
 
 bool SWidget::IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget& ArrangedChild)
 {
     // 1) We check if the rendered bounding box overlaps with the culling rect.  Which is so that
     //    a render transformed element is never culled if it would have been visible to the user.
-    if (TransformCalculus2D::IsIntersect(CullingRect, ArrangedChild.GetGeometry().GetRenderBoundingRect()))
+    if (Rect::IsIntersect(CullingRect, ArrangedChild.GetGeometry().GetRenderBoundingRect()))
     {
         return false;
     }
@@ -157,7 +152,7 @@ bool SWidget::IsChildWidgetCulled(const Rect& CullingRect, const ArrangedWidget&
     //    keeps the widget on the screen, the render transform alone would have caused it to be culled
     //    and therefore not ticked or painted.  The best way around this for now seems to be to simply
     //    check both rects to see if either one is overlapping the culling volume.
-    if (TransformCalculus2D::IsIntersect(CullingRect, ArrangedChild.GetGeometry().GetLayoutBoundingRect()))
+    if (Rect::IsIntersect(CullingRect, ArrangedChild.GetGeometry().GetLayoutBoundingRect()))
     {
         return false;
     }
@@ -253,20 +248,4 @@ void SWidget::SetRenderOpacity(float InOpacity)
 float SWidget::GetRenderOpacity()
 {
     return RenderOpacity;
-}
-
-bool SWidget::PlayAnimation(SSlateAnimationContext* Animation)
-{
-    Animation = Animation->Clone();
-    return AnimPlayer->AddAnimation(Animation);
-}
-
-void SWidget::StopAnimations()
-{
-    AnimPlayer->RemoveAllAnimations();
-}
-
-SSlateAnimationPlayer& SWidget::GetAnimPlayer()
-{
-    return *AnimPlayer;
 }

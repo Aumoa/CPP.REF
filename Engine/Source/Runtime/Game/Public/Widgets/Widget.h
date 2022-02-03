@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -13,8 +13,6 @@ class SSlateDrawCollector;
 class PaintArgs;
 class ArrangedChildrens;
 class ArrangedWidget;
-class SSlateAnimationPlayer;
-class SSlateAnimationContext;
 
 class GAME_API SWidget : implements SObject, implements IDisposable
 {
@@ -35,8 +33,6 @@ private:
 	uint8 bInvalidateLayout : 1 = true;
 
 	float RenderOpacity = 1.0f;
-	SPROPERTY(AnimPlayer)
-	SSlateAnimationPlayer* AnimPlayer = nullptr;
 	Vector2 CachedMouseLocation;
 	Vector2 CachedDesiredSize;
 
@@ -114,11 +110,6 @@ public:
 	bool IsEnabled();
 	void SetRenderOpacity(float InOpacity);
 	float GetRenderOpacity();
-
-public:
-	bool PlayAnimation(SSlateAnimationContext* Animation);
-	void StopAnimations();
-	SSlateAnimationPlayer& GetAnimPlayer();
 };
 
 template<std::derived_from<SWidget> TSlateClass, class TDeclarativeAttr>

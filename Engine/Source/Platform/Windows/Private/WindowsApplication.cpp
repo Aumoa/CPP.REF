@@ -1,9 +1,8 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "WindowsApplication.h"
 #include "GameModule.h"
 #include "GameEngine.h"
-#include "DXGIFactory.h"
 #include "Input/WindowsPlatformKeyboard.h"
 #include "Input/WindowsPlatformMouse.h"
 #include "Input/WindowsIMEController.h"
@@ -11,6 +10,11 @@
 #include "Misc/CommandLine.h"
 #include "PlatformMisc/PlatformModule.h"
 #include "Diagnostics/LogModule.h"
+
+// Vulkan
+//#include "VkFactory.h"
+// DirectX
+#include "DirectXFactory.h"
 
 GENERATE_BODY(SWindowsApplication);
 
@@ -59,30 +63,16 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	{
 		GC.Init();
 
-		SharedPtr CommandArgs = gcnew SCommandLine(Argv);
-		std::optional<std::wstring> ModuleName;
-		size_t GameModuleIdx = CommandArgs->GetArgument(L"--GameDll");
-		if (GameModuleIdx != -1)
-		{
-			ModuleName = CommandArgs->GetArgument(GameModuleIdx + 1);
-			if (!ModuleName)
-			{
-				SE_LOG(LogWindows, Fatal, L"GameModule does not specified.");
-				return -1;
-			}
-		}
-		else
+		auto CommandArgs = CommandLine(Argv);
+		std::wstring ModuleName;
+
+		if (!CommandArgs.TryGetValue(L"GameDll", ModuleName))
 		{
 			ModuleName = ANSI_TO_WCHAR(SE_APPLICATION_TARGET);
 		}
 
-		std::optional<std::wstring> EngineName;
-		if (size_t EngineModuleIdx = CommandArgs->GetArgument(L"--EngineDll"); EngineModuleIdx != -1)
-		{
-			EngineName = CommandArgs->GetArgument(EngineModuleIdx + 1);
-		}
-
-		if (!EngineName.has_value())
+		std::wstring EngineName;
+		if (!CommandArgs.TryGetValue(L"EngineDll", EngineName))
 		{
 #if !SHIPPING
 			constexpr const wchar_t* GameEngineModuleName = L"Editor.dll";
@@ -92,11 +82,11 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 			EngineName = GameEngineModuleName;
 		}
 
-		std::unique_ptr EngineModule = std::make_unique<PlatformModule>(*EngineName);
+		std::unique_ptr EngineModule = std::make_unique<PlatformModule>(EngineName);
 		auto Loader = EngineModule->GetFunctionPointer<SGameModule*()>("LoadGameModule");
 		if (!Loader)
 		{
-			SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", *EngineName);
+			SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", EngineName);
 			return -1;
 		}
 
@@ -115,7 +105,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		}
 
 		SharedPtr WinApp = gcnew SWindowsApplication(GetModuleHandleW(nullptr));
-		ErrorCode = GameEngine->GuardedMain(WinApp.Get(), *ModuleName);
+		ErrorCode = GameEngine->GuardedMain(WinApp.Get(), ModuleName);
 		if (ErrorCode != 0)
 		{
 			SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
@@ -268,7 +258,7 @@ IRHIFactory* SWindowsApplication::GetFactory()
 {
 	if (Factory == nullptr)
 	{
-		Factory = gcnew SDXGIFactory();
+		Factory = gcnew SDirectXFactory(true);
 	}
 	return Factory;
 }
@@ -420,6 +410,9 @@ LRESULT CALLBACK SWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	case WM_IME_SETCONTEXT:
 	case WM_IME_NOTIFY:
 		SWindowsIMEController::ProcessMessage(uMsg, wParam, lParam);
+		break;
+	case WM_CLOSE:
+		Get().PreDestroyApp.Broadcast();
 		break;
 	}
 

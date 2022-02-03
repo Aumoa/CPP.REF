@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -40,14 +40,21 @@ struct Margin
 	{
 	}
 
-	constexpr bool operator ==(const Margin& Rhs) const
+	constexpr Margin(const Margin& M)
+		: Left(M.Left)
+		, Top(M.Top)
+		, Right(M.Right)
+		, Bottom(M.Bottom)
 	{
-		return Left == Rhs.Left && Top == Rhs.Top && Right == Rhs.Right && Bottom == Rhs.Bottom;
 	}
 
-	constexpr bool operator !=(const Margin& Rhs) const
+	template<TIsVector<float, 4> IMargin>
+	constexpr Margin(const IMargin& M)
+		: Left(M[0])
+		, Top(M[1])
+		, Right(M[2])
+		, Bottom(M[3])
 	{
-		return Left != Rhs.Left || Top != Rhs.Top || Right != Rhs.Right || Bottom != Rhs.Bottom;
 	}
 
 	constexpr float GetTotalSpaceAlong(EOrientation Orientation) const
@@ -65,5 +72,60 @@ struct Margin
 	constexpr Vector2 GetTotalSpaceAlong() const
 	{
 		return Vector2(GetTotalSpaceAlong(EOrientation::Horizontal), GetTotalSpaceAlong(EOrientation::Vertical));
+	}
+
+public:
+	using Type = float;
+
+	static constexpr size_t Size()
+	{
+		return 4;
+	}
+
+	constexpr Margin operator -() const
+	{
+		return { -Left, -Top, -Right, -Bottom };
+	}
+
+	constexpr const float& operator [](size_t N) const
+	{
+		switch (N)
+		{
+		case 0:
+			return Left;
+		case 1:
+			return Top;
+		case 2:
+			return Right;
+		case 3:
+		default:
+			return Bottom;
+		}
+	}
+
+	constexpr float& operator [](size_t N)
+	{
+		switch (N)
+		{
+		case 0:
+			return Left;
+		case 1:
+			return Top;
+		case 2:
+			return Right;
+		case 3:
+		default:
+			return Bottom;
+		}
+	}
+
+	template<TIsVector<float, 4> IMargin>
+	constexpr Margin& operator =(const IMargin& M)
+	{
+		Left = M[0];
+		Top = M[1];
+		Right = M[2];
+		Bottom = M[3];
+		return *this;
 	}
 };

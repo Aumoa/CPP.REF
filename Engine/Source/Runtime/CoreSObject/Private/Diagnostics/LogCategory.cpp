@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include <Windows.h>
 #include <chrono>
@@ -21,15 +21,13 @@ std::wstring_view LogCategory::GetName() const
 
 std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
-	using enum ELogVerbosity;
-
 	switch (verbosity)
 	{
-	case Fatal: return L"Fatal";
-	case Error: return L"Error";
-	case Warning: return L"Warning";
-	case Info: return L"Info";
-	case Verbose: return L"Verbose";
+	case ELogVerbosity::Fatal: return L"Fatal";
+	case ELogVerbosity::Error: return L"Error";
+	case ELogVerbosity::Warning: return L"Warning";
+	case ELogVerbosity::Info: return L"Info";
+	case ELogVerbosity::Verbose: return L"Verbose";
 	default: return L"";
 	}
 }

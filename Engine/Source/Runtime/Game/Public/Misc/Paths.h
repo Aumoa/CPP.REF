@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -7,11 +7,10 @@
 
 class GAME_API Paths : public AbstractClass
 {
-	enum class ERoot
-	{
-		Game,
-		Engine
-	};
+	SENUM(ERoot, int32,
+		Game,,
+		Engine,
+	);
 
 public:
 	static std::filesystem::path AsPhysicalPath(std::filesystem::path InLogicalPath);

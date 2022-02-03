@@ -1,11 +1,9 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Threading/EventHandle.h"
 #include "LogCore.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
-
-using enum ELogVerbosity;
 
 GENERATE_BODY(SEventHandle);
 
@@ -17,7 +15,7 @@ SEventHandle::SEventHandle() : Super()
 	_handle = CreateEventExW(nullptr, nullptr, 0, GENERIC_ALL);
 	if (_handle == nullptr)
 	{
-		LogSystem::Log(LogCore, Error, L"Could not create event handle. GetLastError(): {}", GetLastError());
+		LogSystem::Log(LogCore, ELogVerbosity::Error, L"Could not create event handle. GetLastError(): {}", GetLastError());
 		return;
 	}
 }

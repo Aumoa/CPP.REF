@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/DebugCanvas.h"
 #include "Widgets/Text/TextBlock.h"
@@ -16,7 +16,6 @@ SDebugCanvas::SDebugCanvas() : Super()
 {
 	checkf(sInstance == nullptr, L"Duplicated singleton instance.");
 	sInstance = this;
-	RefreshTimer = gcnew STickScheduler();
 }
 
 SDebugCanvas::~SDebugCanvas()
@@ -28,7 +27,7 @@ void SDebugCanvas::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
 	Super::Tick(AllottedGeometry, InDeltaTime);
 	++TickCounter;
-	RefreshTimer->Tick(InDeltaTime);
+	RefreshTimer.Tick(InDeltaTime);
 }
 
 void SDebugCanvas::ToggleSTAT(std::wstring_view Stat)
@@ -79,7 +78,7 @@ DEFINE_SLATE_CONSTRUCTOR(SDebugCanvas, Attr)
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
 
 	ConstructDisplayStats();
-	RefreshTimer->AddSchedule(
+	RefreshTimer.AddSchedule(
 	{
 		.Task = std::bind(&SDebugCanvas::UpdateTexts, this),
 		.Delay = 1.0f,

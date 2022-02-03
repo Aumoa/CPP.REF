@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Ticking/TickTaskLevelManager.h"
 #include "Level/World.h"
@@ -22,7 +22,7 @@ STickTaskLevelManager::STickTaskLevelManager(SWorld* InWorld) : Super()
 	// Initialize tick group headers.
 	for (size_t i = 0; i < TickGroups.size(); ++i)
 	{
-		TickGroups[i].TickGroup = (ETickingGroup)i;
+		TickGroups[i].TickGroup = (ETickingGroup)(int32)i;
 	}
 }
 

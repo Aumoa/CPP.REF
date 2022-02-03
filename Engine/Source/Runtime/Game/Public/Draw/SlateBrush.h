@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -10,7 +10,7 @@ class STexture2D;
 struct SlateBrush
 {
 	IRHIBitmap* ImageSource = nullptr;
-	Vector2 ImageSize = Vector2::ZeroVector();
+	Vector2 ImageSize = Vector2::Zero();
 
 	SlateBrush(IRHIBitmap* InImageSource, const Vector2& InImageSize)
 		: ImageSource(InImageSource)

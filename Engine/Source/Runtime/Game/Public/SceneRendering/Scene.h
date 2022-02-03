@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -29,8 +29,8 @@ private:
 	SPROPERTY(PrimitiveComponents)
 	std::vector<SPrimitiveComponent*> PrimitiveComponents;
 
-	SPROPERTY(ViewBuffer)
-	IRHIBuffer* ViewBuffer = nullptr;
+	//SPROPERTY(ViewBuffer)
+	//IRHIBuffer* ViewBuffer = nullptr;
 	std::vector<std::vector<uint8>> ViewBufferSysMem;
 	size_t NumViewBuffers = 0;
 	uint64 RequiredSize = 0;

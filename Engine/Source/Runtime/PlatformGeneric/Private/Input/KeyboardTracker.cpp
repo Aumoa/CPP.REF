@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Input/KeyboardTracker.h"
 
@@ -25,25 +25,25 @@ const KeyboardState& SKeyboardTracker::GetLast()
 
 bool SKeyboardTracker::IsKeyPressed(EKey Key)
 {
-	return Tracker.IsPressedByBitIndex((uint32)Key);
+	return Tracker.IsPressedByBitIndex((int32)Key);
 }
 
-const uint32& SKeyboardTracker::GetPressedBitsByIndex(uint32 BitIndex)
+int32 SKeyboardTracker::GetPressedBitsByIndex(int32 BitIndex)
 {
 	return Tracker.GetPressedBitIndex(BitIndex);
 }
 
 bool SKeyboardTracker::IsKeyReleased(EKey Key)
 {
-	return Tracker.IsReleasedByBitIndex((uint32)Key);
+	return Tracker.IsReleasedByBitIndex((int32)Key);
 }
 
-const uint32& SKeyboardTracker::GetReleasedBitsByIndex(uint32 BitIndex)
+int32 SKeyboardTracker::GetReleasedBitsByIndex(int32 BitIndex)
 {
 	return Tracker.GetReleasedBitIndex(BitIndex);
 }
 
-uint32 SKeyboardTracker::GetNumBits()
+int32 SKeyboardTracker::GetNumBits()
 {
-	return (uint32)EKey::Max;
+	return (int32)EKey::Max;
 }
