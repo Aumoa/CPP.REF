@@ -1,10 +1,6 @@
 // Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameRenderSystem.h"
-//#include "Shaders/ColorShader/ColorShader.h"
-//#include "Shaders/ColorShader/ColorVertexFactory.h"
-//#include "Shaders/TransparentShader/TransparentShader.h"
-//#include "Shaders/SlateShader/SlateShader.h"
 #include "GameFramework/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "RHI/IRHIFactory.h"
@@ -19,15 +15,12 @@
 #include "SceneRendering/Scene.h"
 #include "SceneRendering/SceneViewScope.h"
 #include "SceneRendering/SwapChainRenderTarget.h"
-#include "SceneRendering/SceneRenderContext.h"
-#include "SceneRendering/SceneRenderer.h"
+#include "SceneRendering/RaytraceSceneRenderer.h"
 #include "SceneRenderTarget/ColorRenderTarget.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/MinimalViewInfo.h"
 #include "Scene/PrimitiveSceneProxy.h"
 #include "Application/SlateApplication.h"
-//#include "Draw/PaintArgs.h"
-//#include "Layout/LayoutImpl.h"
 #include "RenderThread.h"
 #include "IApplicationInterface.h"
 #include "Draw/SlateRenderer.h"
@@ -37,6 +30,7 @@ DEFINE_LOG_CATEGORY(LogRender);
 
 SGameRenderSystem::SGameRenderSystem() : Super()
 {
+	SceneRenderer = gcnew SRaytraceSceneRenderer();
 	SlateRenderer = gcnew SSlateRenderer();
 }
 
@@ -91,11 +85,8 @@ void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication
 		DeviceContext2D->BeginDraw();
 
 		{
-			SceneRenderContext RenderingContext(RenderContext, ColorRenderTarget);
-			SceneRenderer Renderer(&RenderingContext, false);
-
-			Renderer.BeginDraw();
-			Renderer.EndDraw();
+			SceneRenderer->BeginDraw(SceneRenderContext(RenderContext, ColorRenderTarget));
+			SceneRenderer->EndDraw();
 		}
 
 		// END OF 3D RENDERING.

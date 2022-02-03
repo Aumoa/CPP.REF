@@ -18,9 +18,7 @@ public class Game : ModuleRule
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "PlatformGeneric",
-            "RenderCore",
-            "SlateCore"
+            "PlatformGeneric"
         });
     }
 }

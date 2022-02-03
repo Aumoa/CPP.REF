@@ -21,6 +21,7 @@ class SSlateApplication;
 class SSwapChainRenderTarget;
 class SColorRenderTarget;
 class SSlateRenderer;
+class SRaytraceSceneRenderer;
 
 // TEST
 interface IRHISolidColorBrush;
@@ -56,6 +57,8 @@ private:
 	SPROPERTY(ColorRenderTarget)
 	SColorRenderTarget* ColorRenderTarget = nullptr;
 
+	SPROPERTY(SceneRenderer)
+	SRaytraceSceneRenderer* SceneRenderer = nullptr;
 	SPROPERTY(SlateRenderer)
 	SSlateRenderer* SlateRenderer = nullptr;
 
