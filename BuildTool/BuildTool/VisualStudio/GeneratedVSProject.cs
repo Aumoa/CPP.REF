@@ -351,6 +351,7 @@ class GeneratedVSProject : IGeneratedProject
         {
             var Rule = CompiledProject.CompiledRule;
             Rule.GenerateAdditionalIncludeDirectories(CompiledProject.ProjectDir.FullPath);
+            Rule.GenerateAdditionalLibraries(CompiledProject.ProjectDir.FullPath);
 
             AdditionalIncludeDirectories.AddRange(Rule.PublicIncludePaths);
             AdditionalIncludeDirectories.AddRange(Rule.PrivateIncludePaths);
