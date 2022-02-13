@@ -7,6 +7,17 @@
 	<Type Name="Type">
 		<DisplayString>{FriendlyName}</DisplayString>
 	</Type>
+	<Type Name="Vector&lt;*,*&gt;">
+		<DisplayString>{{Count={Size()}}}</DisplayString>
+		<Expand>
+			<Item Name="[Count]">Size()</Item>
+			<Item Name="[Size]">X*Y</Item>
+			<ArrayItems>
+				<Size>Size()</Size>
+				<ValuePointer>Scalars</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
 	<Type Name="Vector&lt;*,2&gt;">
 		<DisplayString>{{X={X} Y={Y}}}</DisplayString>
 		<Expand>

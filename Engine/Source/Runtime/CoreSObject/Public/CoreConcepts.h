@@ -57,3 +57,24 @@ concept IsMutableCollection = requires (T & Collection)
 {
 	{ *Collection.begin() = {} };
 };
+
+namespace CoreSObject::Concepts::Impl
+{
+	template<class T, size_t N, class TForward, class... TArgs>
+	struct SameAsVariadic_t : public std::bool_constant<SameAsVariadic_t<T, N - 1, TArgs...>::value>
+	{
+	};
+
+	template<class T, class TForward, class... TArgs>
+	struct SameAsVariadic_t<T, 0, TForward, TArgs...> : public std::bool_constant<std::same_as<T, TForward>>
+	{
+	};
+
+	template<class T, size_t N, class TForward>
+	struct SameAsVariadic_t<T, N, TForward> : public std::bool_constant<false>
+	{
+	};
+}
+
+template<class T, size_t N, class... TArgs>
+concept SameAsVariadic = CoreSObject::Concepts::Impl::SameAsVariadic_t<T, N, TArgs...>::value;

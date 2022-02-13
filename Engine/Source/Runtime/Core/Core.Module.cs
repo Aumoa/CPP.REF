@@ -35,6 +35,7 @@ public class Core : ModuleRule
         PublicDependencyModuleNames.AddRange(new[]
         {
             "CoreSObject",
+            "CoreNumerics",
             "Boost.Asio"
         });
     }
