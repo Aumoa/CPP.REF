@@ -253,6 +253,12 @@ public:
 		return *this;
 	}
 
+	template<class U>
+	explicit operator Task<U>() const
+	{
+		return std::dynamic_pointer_cast<typename Task<U>::Awaiter>(GetAwaiter());
+	}
+
 	auto operator <=>(const Task& Rhs) const
 	{
 		return Super::Awaiter <=> Rhs.Awaiter;
