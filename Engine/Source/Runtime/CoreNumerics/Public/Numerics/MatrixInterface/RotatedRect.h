@@ -163,8 +163,14 @@ public:
 		return false;
 	}
 
+	template<TIsVector<float, 2> IVector>
+	constexpr bool IsUnderLocation(const IVector& V) const
+	{
+		return IsUnderLocation(*this, V);
+	}
+
 	template<TIsVector<float, 4> IRect, TIsTransform<Rect> ITransform>
-	static constexpr RotatedRect MakeRotatedRect(const IRect& R, const ITransform& T)
+	static constexpr RotatedRect MakeRotatedRect(const ITransform& T, const IRect& R)
 	{
 		const RotatedRect RRect = Rect::TransformRect<Rect>(T, R);
 
@@ -177,5 +183,17 @@ public:
 			TopRight - RRect.TopLeft,
 			BottomLeft - RRect.TopLeft
 		};
+	}
+
+	template<TIsMatrix<float, 3, 2> IRotatedRectResult = RotatedRect
+		, TIsMatrix<float, 3, 2> IRotatedRect
+		, TIsTransform<Vector2> ITransform>
+	static constexpr IRotatedRectResult TransformRect(const ITransform& T, const IRotatedRect& R)
+	{
+		IRotatedRectResult Result;
+		Result[0] = T.TransformPoint(R[0]);
+		Result[1] = T.TransformVector(R[1]);
+		Result[2] = T.TransformVector(R[2]);
+		return Result;
 	}
 };

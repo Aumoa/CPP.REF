@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Matrix.h"
+#include "Numerics/TransformConcepts.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/TransformInterface/Translate3D.h"
 #include "Numerics/TransformInterface/Scale3D.h"
@@ -133,12 +134,6 @@ public:
 		return Determinant(Matrix4x4(M));
 	}
 
-	template<TIsMatrix<float, 4, 4> IMatrix>
-	static auto Inverse(const IMatrix& M)
-	{
-		return Inverse(Matrix4x4(M));
-	}
-
 	template<TIsMatrix<float, 4, 4> IMatrix, TIsVector<float, 3> ITranslation, TIsVector<float, 3> IScale, TIsVector<float, 4> IQuaternion>
 	static auto Decompose(const IMatrix& M, ITranslation& OutT, IScale& OutS, IQuaternion& OutQ)
 	{
@@ -161,18 +156,6 @@ public:
 	auto Decompose(ITranslation& OutT, IScale& OutS, IQuaternion& OutQ) const
 	{
 		return Decompose(*this, OutT, OutS, OutQ);
-	}
-
-	template<TIsMatrix<float, 4, 4> IMatrix, TIsVector<float, 3> IPoint>
-	static auto TransformPoint(const IMatrix& M, const IPoint& P)
-	{
-		return TransformPoint(Matrix4x4(M), Vector3(P));
-	}
-
-	template<TIsMatrix<float, 4, 4> IMatrix, TIsVector<float, 3> IVector>
-	static auto TransformVector(const IMatrix& M, const IVector& V)
-	{
-		return TransformVector(Matrix4x4(M), Vector3(V));
 	}
 
 	template<TIsMatrix<float, 4, 4> IMatrixL, TIsMatrix<float, 4, 4> IMatrixR>
@@ -224,6 +207,30 @@ public:
 	}
 
 
+
+	inline std::wstring ToString(std::wstring_view FormatArgs) const
+	{
+		return Matrix<>::ToString(*this, FormatArgs);
+	}
+
+	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
+	{
+		return Matrix<>::NearlyEquals(M, Epsilon);
+	}
+
+public:
+	template<TIsMatrix<float, 4, 4> IMatrix>
+	static auto Inverse(const IMatrix& M)
+	{
+		return Inverse(Matrix4x4(M));
+	}
+
+	auto Inverse() const
+	{
+		return Inverse(*this);
+	}
+
 	inline static constexpr Matrix4x4 Identity()
 	{
 		return Matrix4x4
@@ -235,14 +242,39 @@ public:
 		};
 	}
 
-	inline std::wstring ToString(std::wstring_view FormatArgs) const
+	template<TIsMatrix<float, 4, 4> IMatrixL, TIsMatrix<float, 4, 4> IMatrixR>
+	static auto Concatenate(const IMatrixL& ML, const IMatrixR& MR)
 	{
-		return Matrix<>::ToString(*this, FormatArgs);
+		return Multiply(ML, MR);
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
-	inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
+	template<TIsMatrix<float, 4, 4> IMatrix>
+	auto Concatenate(const IMatrix& M) const
 	{
-		return Matrix<>::NearlyEquals(M, Epsilon);
+		return Multiply(*this, M);
+	}
+
+	template<TIsMatrix<float, 4, 4> IMatrix, TIsVector<float, 3> IPoint>
+	static IPoint TransformPoint(const IMatrix& M, const IPoint& P)
+	{
+		return TransformPoint(Matrix4x4(M), Vector3(P));
+	}
+
+	template<TIsVector<float, 3> IPoint>
+	IPoint TransformPoint(const IPoint& P) const
+	{
+		return TransformPoint(*this, Vector3(P));
+	}
+
+	template<TIsMatrix<float, 4, 4> IMatrix, TIsVector<float, 3> IVector>
+	static IVector TransformVector(const IMatrix& M, const IVector& V)
+	{
+		return TransformVector(Matrix4x4(M), Vector3(V));
+	}
+
+	template<TIsVector<float, 3> IVector>
+	IVector TransformVector(const IVector& V) const
+	{
+		return TransformVector(*this, Vector3(V));
 	}
 };

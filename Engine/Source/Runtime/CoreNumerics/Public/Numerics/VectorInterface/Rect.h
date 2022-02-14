@@ -175,6 +175,12 @@ struct Rect : public RectT<float>
 			&& R[1] <= P[1] && P[1] <= R[3];
 	}
 
+	template<TIsVector<Type, 2> IPoint>
+	constexpr bool PtInRect(const IPoint& P)
+	{
+		return PtInRect(*this, P);
+	}
+
 	template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IRectR>
 	static constexpr bool IsIntersect(const IRectL& RL, const IRectR& RR) requires std::same_as<typename IRectL::Type, typename IRectR::Type>
 	{
@@ -232,7 +238,7 @@ struct Rect : public RectT<float>
 		V[3] += E1;
 		return V;
 	}
-
+	
 	template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IExtent>
 	static constexpr IRectL Extend(const IRectL& R, const IExtent& E) requires
 		std::same_as<typename IRectL::Type, typename IExtent::Type>
@@ -245,7 +251,13 @@ struct Rect : public RectT<float>
 		return V;
 	}
 
-	template<TIsVector<float, 4> IRectResult = Rect, TIsTransformBase ITransform2D, TIsVector<float, 4> IRect>
+	template<TIsVector<Type, 2> IExtent>
+	constexpr Rect Extend(const IExtent& E) const
+	{
+		return Extend(*this, E);
+	}
+
+	template<TIsVector<float, 4> IRectResult = Rect, TIsTransform<Vector2> ITransform2D, TIsVector<float, 4> IRect>
 	static constexpr IRectResult TransformRect(const ITransform2D& Transform, const IRect& InRect)
 	{
 		const auto TL = Transform.TransformPoint(Rect::LeftTop(InRect));

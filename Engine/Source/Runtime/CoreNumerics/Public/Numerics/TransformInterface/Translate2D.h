@@ -127,4 +127,9 @@ public:
 	{
 		return Vector<>::NearlyEquals(*this, T, Epsilon);
 	}
+
+	constexpr Translate2D Round() const
+	{
+		return { MathEx::Round(X), MathEx::Round(Y) };
+	}
 };

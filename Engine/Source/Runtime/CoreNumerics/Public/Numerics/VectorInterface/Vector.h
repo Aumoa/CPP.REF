@@ -134,7 +134,7 @@ public:
 	}
 
 public:
-	std::wstring ToString(std::wstring_view FormatArgs) const;
+	std::wstring ToString(std::wstring_view FormatArgs = L"") const;
 	template<TIsVector<T, N> IVector>
 	constexpr bool NearlyEquals(const IVector& V, const T& Epsilon) const;
 
@@ -321,12 +321,25 @@ struct Vector<void, 0>
 	}
 
 	template<TIsVectorBase IVectorResult, TIsVectorBase IVector>
-	static inline constexpr IVectorResult Cast(const IVector& V) requires (IVector::Size() == IVectorResult::Size())
+	static inline constexpr IVectorResult Cast(const IVector& V)
 	{
 		IVectorResult R;
-		for (size_t i = 0; i < V.Size(); ++i)
+		size_t Size = MathEx::Min(V.Size(), IVectorResult::Size());
+		for (size_t i = 0; i < Size; ++i)
 		{
 			R[i] = static_cast<typename IVectorResult::Type>(V[i]);
+		}
+		return R;
+	}
+
+	template<class PrimitiveType, TIsVectorBase IVector>
+	static inline constexpr auto Cast(const IVector& V) -> Vector<PrimitiveType, IVector::Size()>
+		requires (!TIsVectorBase<PrimitiveType>)
+	{
+		Vector<PrimitiveType, IVector::Size()> R;
+		for (size_t i = 0; i < V.Size(); ++i)
+		{
+			R[i] = static_cast<PrimitiveType>(V[i]);
 		}
 		return R;
 	}
@@ -359,6 +372,32 @@ struct Vector<void, 0>
 			{
 				R[i - 1] = V[i];
 			}
+		}
+		return R;
+	}
+
+	template<TIsVectorBase IVectorL, TIsVectorBase IVectorR, class _Fn>
+	static inline constexpr auto Select(const IVectorL& VL, const IVectorR& VR, _Fn&& Op) requires TIsCompatibleVector<IVectorL, IVectorR>
+	{
+		Vector<typename IVectorL::Type, IVectorL::Size()> R;
+		for (size_t i = 0; i < R.Size(); ++i)
+		{
+			auto VVL = VL[i], VVR = VR[i];
+			R[i] = Op(VVL, VVR) ? VVL : VVR;
+		}
+		return R;
+	}
+
+	template<TIsVectorBase IVectorL, TIsVectorBase IVectorR, TIsVectorBase IConditionL, TIsVectorBase IConditionR, class _Fn>
+	static inline constexpr auto Select(const IVectorL& VL, const IVectorR& VR, const IConditionL& CL, const IConditionR& CR, _Fn&& Op) requires
+		TIsCompatibleVector<IVectorL, IVectorR> &&
+		TIsCompatibleVector<IVectorL, IConditionL> &&
+		TIsCompatibleVector<IVectorL, IConditionR>
+	{
+		Vector<typename IVectorL::Type, IVectorL::Size()> R;
+		for (size_t i = 0; i < R.Size(); ++i)
+		{
+			R[i] = Op(CL[i], CR[i]) ? VL[i] : VR[i];
 		}
 		return R;
 	}
@@ -637,4 +676,15 @@ template<TIsVector<T, N> IVector>
 constexpr bool Vector<T, N>::NearlyEquals(const IVector& V, const T& Epsilon) const
 {
 	return Vector<>::NearlyEquals(*this, V, Epsilon);
+}
+
+
+// Supports for Casts.h
+template<class TTo, class TFrom>
+inline auto Cast(const TFrom& From) requires requires
+{
+	{ Vector<>::Cast<TTo>(std::declval<TFrom>()) };
+}
+{
+	return Vector<>::Cast<TTo>(From);
 }

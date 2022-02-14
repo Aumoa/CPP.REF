@@ -371,27 +371,6 @@ struct Matrix<void, 0, 0>
 			return M;
 		}
 	}
-
-private:
-	template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
-	static constexpr auto Multiply(int, const IMatrixL& ML, const IMatrixR& MR) requires
-		(IMatrixR::Row() >= IMatrixL::Column()) &&
-		std::same_as<typename IMatrixL::Type, typename IMatrixR::Type>
-	{
-		Matrix<typename IMatrixL::Type, IMatrixL::Row(), IMatrixR::Column()> R;
-		for (size_t i = 0; i < IMatrixL::Row(); ++i)
-		{
-			for (size_t j = 0; j < IMatrixR::Column(); ++j)
-			{
-				R[i][j] = {};
-				for (size_t k = 0; k < IMatrixL::Column(); ++k)
-				{
-					R[i][j] += ML[i][k] * MR[k][j];
-				}
-			}
-		}
-		return R;
-	}
 };
 
 

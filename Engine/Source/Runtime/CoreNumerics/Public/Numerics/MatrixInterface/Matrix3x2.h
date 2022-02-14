@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Matrix.h"
+#include "Numerics/TransformConcepts.h"
 #include "Mathematics/Radians.h"
 #include "Numerics/VectorInterface/Vector.h"
 
@@ -114,16 +115,6 @@ public:
 		return Matrix<>::NearlyEquals(*this, M, Epsilon);
 	}
 
-	static constexpr Matrix3x2 Identity()
-	{
-		return Matrix3x2
-		{
-			1.0f, 0.0f,
-			0.0f, 1.0f,
-			0.0f, 0.0f
-		};
-	}
-
 	template<TIsMatrix<float, 3, 2> IMatrix = Matrix3x2, TIsVector<float, Column()> ITranslation>
 	static constexpr IMatrix Translation(const ITranslation& T)
 	{
@@ -177,37 +168,21 @@ public:
 	}
 
 	template<TIsMatrix<float, Row(), Column()> IMatrix, TIsVector<float, Column()> IPoint>
-	static constexpr Vector2 TransformPoint(const IMatrix& M, const IPoint& P)
+	static constexpr IPoint TransformPoint(const IMatrix& M, const IPoint& P)
 	{
-		return Vector2
-		{
-			P[0] * M[0][0] + P[1] * M[1][0] + M[2][0],
-			P[0] * M[0][1] + P[1] * M[1][1] + M[2][1]
-		};
+		IPoint R;
+		R[0] = P[0] * M[0][0] + P[1] * M[1][0] + M[2][0];
+		R[1] = P[0] * M[0][1] + P[1] * M[1][1] + M[2][1];
+		return R;
 	}
 
 	template<TIsMatrix<float, Row(), Column()> IMatrix, TIsVector<float, Column()> IVector>
-	static constexpr Vector2 TransformVector(const IMatrix& M, const IVector& V)
+	static constexpr IVector TransformVector(const IMatrix& M, const IVector& V)
 	{
-		return Vector2
-		{
-			V[0] * M[0][0] + V[1] * M[1][0],
-			V[0] * M[0][1] + V[1] * M[1][1]
-		};
-	}
-
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
-	static constexpr Matrix3x2 Inverse(const IMatrix& M)
-	{
-		float A = M[0][0], B = M[0][1], C = M[1][0], D = M[1][1];
-		float Det = A * D - B * C;
-		float InvDet = 1.0f / Det;
-		return
-		{
-			D * InvDet, -B * InvDet,
-			-C * InvDet, A * InvDet,
-			-M[2][0], -M[2][1],
-		};
+		IVector R;
+		R[0] = V[0] * M[0][0] + V[1] * M[1][0];
+		R[1] = V[0] * M[0][1] + V[1] * M[1][1];
+		return R;
 	}
 
 	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> ITranslate, TIsVector<float, 2> IScale, TIsVector<float, 2> IComplex>
@@ -261,5 +236,94 @@ public:
 			R[2][1] = T[1];
 		}
 		return R;
+	}
+
+public:
+	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	static constexpr Matrix3x2 Inverse(const IMatrix& M)
+	{
+		float A = M[0][0], B = M[0][1], C = M[1][0], D = M[1][1];
+		float Det = A * D - B * C;
+		float InvDet = 1.0f / Det;
+		return
+		{
+			D * InvDet, -B * InvDet,
+			-C * InvDet, A * InvDet,
+			-M[2][0], -M[2][1],
+		};
+	}
+
+	constexpr Matrix3x2 Inverse() const
+	{
+		return Inverse(*this);
+	}
+
+	template<TIsMatrix<float, Row(), Column()> IMatrixL, TIsMatrix<float, Row(), Column()> IMatrixR>
+	static constexpr Matrix3x2 Concatenate(const IMatrixL& ML, const IMatrixR& MR)
+	{
+		Matrix<float, 3, 3> ML33 = ToMatrix3x3(ML);
+		Matrix<float, 3, 3> MR33 = ToMatrix3x3(MR);
+
+		return Matrix<>::Multiply(ML33, MR33);
+	}
+
+	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	constexpr Matrix3x2 Concatenate(const IMatrix& M) const
+	{
+		return Concatenate(*this, M);
+	}
+
+	static constexpr Matrix3x2 Identity()
+	{
+		return Matrix3x2
+		{
+			1.0f, 0.0f,
+			0.0f, 1.0f,
+			0.0f, 0.0f
+		};
+	}
+
+	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
+	static constexpr IVector TransformVector(const IMatrix& M, const IVector& V)
+	{
+		return Matrix<>::TransformVector(M, Vector3(V[0], V[1], 0.0f));
+	}
+
+	template<TIsVector<float, 2> IVector>
+	constexpr IVector TransformVector(const IVector& V) const
+	{
+		return TransformVector(*this, V);
+	}
+
+	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
+	static constexpr IVector TransformPoint(const IMatrix& M, const IVector& V)
+	{
+		return Matrix<>::TransformVector(M, Vector3(V[0], V[1], 1.0f));
+	}
+
+	template<TIsVector<float, 2> IVector>
+	constexpr IVector TransformPoint(const IVector& V) const
+	{
+		return TransformPoint(*this, V);
+	}
+
+private:
+	template<TIsMatrix<float, 3, 2> IMatrix>
+	static constexpr Matrix<float, 3, 3> ToMatrix3x3(const IMatrix& M)
+	{
+		Matrix<float, 3, 3> M33;
+		if constexpr (IMatrix::Column() >= 3)
+		{
+			M33[0] = M[0];
+			M33[1] = M[1];
+			M33[2] = M[2];
+		}
+		else
+		{
+			M33[0] = Vector3(M[0], 0);
+			M33[1] = Vector3(M[1], 0);
+			M33[2] = Vector3(M[2], 0);
+		}
+		return M33;
 	}
 };

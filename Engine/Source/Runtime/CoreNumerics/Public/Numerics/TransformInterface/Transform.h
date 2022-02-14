@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Numerics/NumericConcepts.h"
+#include "Numerics/TransformConcepts.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/VectorInterface/Rect.h"
 #include "Numerics/MatrixInterface/Matrix4x4.h"
@@ -162,4 +163,37 @@ public:
     }
 
     constexpr auto operator <=>(const Transform& T) const = default;
+
+public:
+    template<class ITransformL, class ITransformR, class... TTransforms>
+    static constexpr auto Concatenate(const ITransformL& TL, const ITransformR& TR, const TTransforms&... Args)
+    {
+        if constexpr (sizeof...(TTransforms) > 0)
+        {
+            return Concatenate(ConcatenateTransparent(0, TL, TR), Args...);
+        }
+        else
+        {
+            return ConcatenateTransparent(0, TL, TR);
+        }
+    }
+
+private:
+    template<class ITransformL, class ITransformR>
+    static constexpr auto ConcatenateTransparent(int, const ITransformL& TL, const ITransformR& TR) requires requires
+    {
+        { std::declval<ITransformL>().Concatenate(std::declval<ITransformR>()) };
+    }
+    {
+        return TL.Concatenate(TR);
+    }
+
+    template<class ITransformL, class ITransformR>
+    static constexpr auto ConcatenateTransparent(short, const ITransformL& TL, const ITransformR& TR) requires requires
+    {
+        { ITransformR::Concatenate(std::declval<ITransformL>(), std::declval<ITransformR>()) };
+    }
+    {
+        return ITransformR::Concatenate(TL, TR);
+    }
 };
