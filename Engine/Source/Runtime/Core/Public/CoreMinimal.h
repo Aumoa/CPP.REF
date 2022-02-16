@@ -25,6 +25,7 @@
 #include "Reflection/Method.h"
 #include "Reflection/Property.h"
 #include "Reflection/SubclassOf.h"
+#include "Reflection/Enum.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"
 #include "Diagnostics/LogCategory.h"
