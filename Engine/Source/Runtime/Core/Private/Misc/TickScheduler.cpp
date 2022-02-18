@@ -2,38 +2,48 @@
 
 #include "Misc/TickScheduler.h"
 
-GENERATE_BODY(STickScheduler);
-
-STickScheduler::STickScheduler() : Super()
+TickScheduler::TickScheduler()
 {
 }
 
-void STickScheduler::Tick(float InDetlaTime)
+void TickScheduler::Tick(float InDetlaTime)
 {
 	using namespace std::chrono;
 
-	for (auto& Task : Tasks)
+	std::vector<std::map<size_t, TickTaskInstance>::iterator> CompactList;
+	for (auto It = Tasks.begin(); It != Tasks.end(); ++It)
 	{
-		auto& Info = Task.second;
+		auto& Instance = It->second;
 
-		Info.ActualDelay -= InDetlaTime;
-		if (Info.ActualDelay <= 0)
+		if (Instance.Validator && !Instance.Validator())
 		{
-			Info.Task();
+			CompactList.emplace_back(It);
+			continue;
+		}
 
-			if (Info.bReliableCallCount)
+		Instance.ActualDelay -= InDetlaTime;
+		if (Instance.ActualDelay <= 0)
+		{
+			Instance.Task();
+
+			if (Instance.bReliableCallCount)
 			{
-				Info.ActualDelay += Info.Delay;
+				Instance.ActualDelay += Instance.Delay;
 			}
 			else
 			{
-				Info.ActualDelay = Info.Delay;
+				Instance.ActualDelay = Instance.Delay;
 			}
 		}
 	}
+
+	for (auto& It : CompactList)
+	{
+		Tasks.erase(It);
+	}
 }
 
-int64 STickScheduler::AddSchedule(const STickScheduler::TaskInfo& TaskInfo)
+int64 TickScheduler::AddSchedule(const TaskInfo& TaskInfo)
 {
 	TickTaskInstance InternalInfo;
 	InternalInfo.Task = TaskInfo.Task;
@@ -46,7 +56,21 @@ int64 STickScheduler::AddSchedule(const STickScheduler::TaskInfo& TaskInfo)
 	return MyId;
 }
 
-void STickScheduler::RemoveSchedule(int64 TaskId)
+int64 TickScheduler::AddSchedule(SObject* InValidator, const TaskInfo& TaskInfo)
+{
+	TickTaskInstance InternalInfo;
+	InternalInfo.Validator = [Holder = WeakPtr(InValidator)]{ return Holder.IsValid(); };
+	InternalInfo.Task = TaskInfo.Task;
+	InternalInfo.Delay = TaskInfo.Delay;
+	InternalInfo.ActualDelay = TaskInfo.InitDelay;
+	InternalInfo.bReliableCallCount = TaskInfo.bReliableCallCount;
+
+	int64 MyId = Id++;
+	Tasks.emplace(MyId, InternalInfo);
+	return MyId;
+}
+
+void TickScheduler::RemoveSchedule(int64 TaskId)
 {
 	Tasks.erase(TaskId);
 }

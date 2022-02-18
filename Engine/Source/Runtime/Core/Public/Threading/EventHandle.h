@@ -3,65 +3,29 @@
 #pragma once
 
 #include "Object.h"
+#include "Reflection/Enum.h"
 #include <chrono>
 
-/// <summary>
-/// The system event handle.
-/// </summary>
 class CORE_API SEventHandle : implements SObject
 {
 	GENERATED_BODY(SEventHandle)
 
 public:
-	/// <summary>
-	/// Represents waiting status.
-	/// </summary>
-	enum class EStatus
-	{
-		/// <summary>
-		/// Waiting succeeded.
-		/// </summary>
-		Succeeded,
-
-		/// <summary>
-		/// Waiting is timed out.
-		/// </summary>
-		Timeout,
-
-		/// <summary>
-		/// Waiting operation failed.
-		/// </summary>
+	SENUM(EStatus, int32,
+		Succeeded,,
+		Timeout,,
 		Failed,
-	};
+	);
 
 private:
 	void* _handle = nullptr;
 
 public:
-	/// <summary>
-	/// Initialize new <see cref="SEventHandle"/> instance.
-	/// </summary>
 	SEventHandle();
 	~SEventHandle() override;
 
-	/// <summary>
-	/// Wait for signal.
-	/// </summary>
-	/// <param name="timeout"> Thread will be return forcely with failed status at timed out. </param>
-	EStatus Wait(std::chrono::milliseconds timeout = std::chrono::milliseconds(0xFFFFFFFF));
-
-	/// <summary>
-	/// Set event to signal state.
-	/// </summary>
+	EStatus Wait(std::chrono::milliseconds timeout = 0xFFFFFFFFms);
 	void Set();
-
-	/// <summary>
-	/// Reset event from signal state.
-	/// </summary>
 	void Reset();
-
-	/// <summary>
-	/// Get native event handle.
-	/// </summary>
 	void* GetHandle() const { return _handle; }
 };

@@ -9,12 +9,11 @@
 
 namespace Threading::Tasks
 {
-	enum class EStatus
-	{
-		Running,
-		Completed,
+	SENUM(EStatus, int32,
+		Running,,
+		Completed,,
 		Canceled,
-	};
+	);
 
 	class IAwaitable
 	{

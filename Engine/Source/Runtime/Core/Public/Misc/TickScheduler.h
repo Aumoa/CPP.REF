@@ -8,10 +8,8 @@
 #include <atomic>
 #include <map>
 
-class CORE_API STickScheduler : implements SObject
+class CORE_API TickScheduler
 {
-	GENERATED_BODY(STickScheduler)
-
 public:
 	struct TaskInfo
 	{
@@ -29,15 +27,17 @@ private:
 		bool bReliableCallCount : 1 = false;
 
 		std::function<void()> Task;
+		std::function<bool()> Validator;
 	};
 
-	std::atomic<int64> Id = 0;
+	int64 Id = 0;
 	std::map<size_t, TickTaskInstance> Tasks;
 
 public:
-	STickScheduler();
+	TickScheduler();
 
 	void Tick(float InDeltaTime);
-	int64 AddSchedule(const STickScheduler::TaskInfo& TaskInfo);
+	int64 AddSchedule(const TaskInfo& TaskInfo);
+	int64 AddSchedule(SObject* InValidator, const TaskInfo& TaskInfo);
 	void RemoveSchedule(int64 TaskId);
 };

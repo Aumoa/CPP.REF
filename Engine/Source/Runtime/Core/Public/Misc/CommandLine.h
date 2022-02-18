@@ -2,64 +2,25 @@
 
 #pragma once
 
-#include "Object.h"
+#include "PrimitiveTypes.h"
 #include <string_view>
-#include <vector>
+#include <span>
+#include <map>
 
-class CORE_API SCommandLine : implements SObject
+class CORE_API CommandLine
 {
-	GENERATED_BODY(SCommandLine)
-
 private:
-	std::vector<std::wstring> ResolvedArgs;
-
-private:
-	SCommandLine();
+	std::wstring Source;
+	std::map<std::wstring, std::vector<std::wstring>, std::less<>> KeyValuePairs;
 
 public:
-	template<class T>
-	SCommandLine(const T& InPlatformArgs) : SCommandLine()
-	{
-		std::optional<std::wostringstream> woss;
+	CommandLine(int32 Argc, char* const* Argv);
+	CommandLine(int32 Argc, wchar_t* const* Argv);
 
-		ResolvedArgs.reserve(InPlatformArgs.size());
-		for (auto& Arg : InPlatformArgs)
-		{
-			if (!woss)
-			{
-				if (Arg[0] == L'\"')
-				{
-					if (Arg.back() == L'\"')
-					{
-						ResolvedArgs.emplace_back(Arg.substr(1, Arg.length() - 2));
-					}
-					else
-					{
-						woss.emplace(std::wstring(Arg.substr(1)));
-					}
-				}
-				else
-				{
-					ResolvedArgs.emplace_back(Arg);
-				}
-			}
-			else
-			{
-				if (Arg.back() == L'\"')
-				{
-					*woss << Arg.substr(0, Arg.length() - 1);
-					ResolvedArgs.emplace_back(woss->str());
-					woss.reset();
-				}
-				else
-				{
-					*woss << Arg;
-				}
-			}
-		}
-	}
+	bool ContainsKey(std::wstring_view Key) const;
+	bool TryGetValue(std::wstring_view Key, std::span<const std::wstring>& OutValues) const;
 
-	size_t GetArgument(std::wstring_view start, std::wstring* optional_tail = nullptr) const;
-	std::optional<std::wstring_view> GetArgument(size_t indexOf) const;
-	const std::vector<std::wstring>& GetArguments() const;
+private:
+	template<class TChar>
+	void Parse(int32 Argc, TChar* const* Args);
 };
