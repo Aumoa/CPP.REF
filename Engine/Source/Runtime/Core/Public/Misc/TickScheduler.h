@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
 #include <functional>
-#include <chrono>
-#include <atomic>
 #include <map>
 
 class CORE_API TickScheduler
@@ -38,6 +36,6 @@ public:
 
 	void Tick(float InDeltaTime);
 	int64 AddSchedule(const TaskInfo& TaskInfo);
-	int64 AddSchedule(SObject* InValidator, const TaskInfo& TaskInfo);
+	int64 AddSchedule(std::function<bool()> InValidator, const TaskInfo& TaskInfo);
 	void RemoveSchedule(int64 TaskId);
 };

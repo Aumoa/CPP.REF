@@ -1,34 +1,25 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Threading/ThreadGroup.h"
-#include "Threading/SuspendToken.h"
 #include "Threading/Thread.h"
+#include "Threading/ISuspendToken.h"
+#include "Threading/SuspendTokenCollection.h"
+#include "Misc/Exceptions.h"
+#include "Misc/TickCalc.h"
 #include <future>
-#include <boost/asio/io_service.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/asio/deadline_timer.hpp>
-#include <boost/asio/spawn.hpp>
 
-struct ThreadGroup::Impl
+class ThreadGroup::ThreadGroupSuspendToken : public ISuspendToken
 {
-	boost::asio::io_service IO;
-	std::optional<boost::asio::io_service::work> CoreWork;
-	boost::thread_group Threads;
-	volatile bool bRunning = true;
-};
+	ThreadGroup* _source;
+	std::optional<std::promise<void>> _promise;
 
-class ThreadGroup::ThreadGroupSuspendToken : public SuspendToken
-{
-	Impl* _Impl;
-	std::optional<std::promise<void>> SuspendPromise;
-
-	std::vector<Thread*> SuspendThreads;
-	std::atomic<size_t> SuspendThreadsIdx;
+	std::vector<Thread*> _threads;
+	std::atomic<size_t> _threadsIdx;
 
 public:
-	ThreadGroupSuspendToken(Impl* _Impl, size_t NumThreads)
-		: _Impl(_Impl)
-		, SuspendThreads(NumThreads)
+	ThreadGroupSuspendToken(ThreadGroup* source, size_t NumThreads)
+		: _source(source)
+		, _threads(NumThreads)
 	{
 	}
 
@@ -38,21 +29,22 @@ public:
 
 	virtual std::future<void> Suspend() override
 	{
-		checkf(!SuspendPromise.has_value(), L"ThreadGroup already wait for suspend.");
-		SuspendPromise.emplace();
+		if (_promise.has_value())
+		{
+			throw invalid_operation("ThreadGroup already wait for suspend.");
+		}
 
-		SuspendThreadsIdx = 0;
-		_Impl->IO.stop();
+		_promise.emplace();
 
-		return SuspendPromise->get_future();
+		_threadsIdx = 0;
+		return _promise->get_future();
 	}
 
 	virtual void Resume() override
 	{
-		SuspendPromise.reset();
-		_Impl->IO.restart();
+		_promise.reset();
 
-		for (auto& SuspendThread : SuspendThreads)
+		for (auto& SuspendThread : _threads)
 		{
 			SuspendThread->ResumeThread();
 		}
@@ -60,14 +52,14 @@ public:
 
 	void Join(Thread* MyThread)
 	{
-		if (SuspendPromise.has_value())
+		if (_promise.has_value())
 		{
-			size_t Myidx = SuspendThreadsIdx++;
-			SuspendThreads[Myidx] = MyThread;
+			size_t Myidx = _threadsIdx++;
+			_threads[Myidx] = MyThread;
 
-			if (Myidx == SuspendThreads.size() - 1)
+			if (Myidx == _threads.size() - 1)
 			{
-				SuspendPromise->set_value();
+				_promise->set_value();
 			}
 
 			MyThread->SuspendThread();
@@ -75,66 +67,84 @@ public:
 	}
 };
 
-ThreadGroup::ThreadGroup(std::wstring_view GroupName, size_t NumThreads)
-	: _Impl(new Impl())
-	, GroupName(GroupName)
+ThreadGroup::ThreadGroup(std::wstring_view groupName, size_t numThreads)
+	: _groupName(groupName)
 {
-	if (NumThreads == 0)
+	if (numThreads == 0)
 	{
-		NumThreads = (size_t)std::thread::hardware_concurrency();
+		numThreads = (size_t)std::thread::hardware_concurrency();
 	}
 
-	SuspendToken = new ThreadGroupSuspendToken(_Impl, NumThreads);
-	GC.AddSuspendToken(SuspendToken);
-	_Impl->CoreWork.emplace(_Impl->IO);
+	_suspendToken = new ThreadGroupSuspendToken(this, numThreads);
+	SuspendTokenCollection::Add(_suspendToken);
 
-	for (size_t i = 0; i < NumThreads; ++i)
+	for (size_t i = 0; i < numThreads; ++i)
 	{
-		_Impl->Threads.create_thread(std::bind(&ThreadGroup::Worker, this, i));
+		_threads.emplace_back(std::jthread(std::bind(&ThreadGroup::Worker, this, i, std::placeholders::_1)));
 	}
 }
 
 ThreadGroup::~ThreadGroup()
 {
-	GC.RemoveSuspendToken(SuspendToken);
+	SuspendTokenCollection::Remove(_suspendToken);
 
-	_Impl->CoreWork.reset();
-	_Impl->bRunning = false;
-	_Impl->IO.stop();
-	_Impl->Threads.join_all();
-
-	delete SuspendToken;
-	delete _Impl;
-}
-
-void ThreadGroup::Run(std::function<void()> Body)
-{
-	_Impl->IO.post(Body);
-}
-
-void ThreadGroup::Delay(std::chrono::milliseconds Timeout, std::function<void()> Body)
-{
-	boost::asio::spawn(_Impl->IO, [this, Body = std::move(Body), Timeout](boost::asio::yield_context Coroutine) mutable
+	for (auto& Thread : _threads)
 	{
-		boost::asio::deadline_timer Timer(boost::asio::get_associated_executor(Coroutine));
-		Timer.expires_from_now(boost::posix_time::millisec(Timeout.count()));
-		Timer.async_wait(Coroutine);
-
-		Run(std::move(Body));
-	});
+		if (Thread.joinable())
+		{
+			Thread.request_stop();
+			Thread.join();
+		}
+	}
 }
 
-void ThreadGroup::Worker(size_t Index)
+void ThreadGroup::Run(std::function<void()> body)
 {
-	Thread* MyThread = Thread::GetCurrentThread();
+	std::unique_lock lock(_lock);
+	_works.emplace(Work{ .Body = body });
+	_cv.notify_one();
+}
 
-	std::wstring ThreadWorkerName = std::format(L"[{} #{}]", GroupName, Index);
-	MyThread->SetFriendlyName(ThreadWorkerName);
+void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()> body)
+{
+	std::unique_lock lock(_lock);
+	_works.emplace(Work{ .Delay = timeout, .Body = body });
+	_cv.notify_one();
+}
+
+void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
+{
+	Thread* mythread = Thread::GetCurrentThread();
+	mythread->SetFriendlyName(std::format(L"[{} #{}]", _groupName, index));
+
+	TickCalc<> timer;
 
 	// Blocking the thread for all times.
-	while (_Impl->bRunning)
+	while (!cancellationToken.stop_requested())
 	{
-		SuspendToken->Join(MyThread);
-		_Impl->IO.run();
+		auto elapsed = timer.DoCalc();
+		_suspendToken->Join(mythread);
+
+		std::unique_lock lock(_lock);
+		if (!_works.empty())
+		{
+			Work front = std::move(_works.front());
+			_works.pop();
+
+			if (front.Delay <= 0ms)
+			{
+				lock.unlock();
+				front.Body();
+			}
+			else
+			{
+				front.Delay -= std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+				_works.emplace(std::move(front));
+			}
+		}
+		else
+		{
+			_cv.wait_for(lock, 1ms);
+		}
 	}
 }

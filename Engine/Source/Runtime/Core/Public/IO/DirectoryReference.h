@@ -5,45 +5,20 @@
 #include "FileSystemReference.h"
 #include <filesystem>
 
-/// <summary>
-/// Represents directory reference.
-/// </summary>
-class CORE_API SDirectoryReference : public SFileSystemReference
+class CORE_API DirectoryReference : public FileSystemReference
 {
-	GENERATED_BODY(SDirectoryReference)
-
 public:
-	/// <summary>
-	/// Initialize new <see cref="SDirectoryReference"/> instance.
-	/// </summary>
-	SDirectoryReference() = default;
+	DirectoryReference() = default;
+	DirectoryReference(const DirectoryReference& rhs) = default;
+	DirectoryReference(DirectoryReference&& rhs) = default;
+	DirectoryReference(const std::filesystem::path& filepath);
 
-	/// <summary>
-	/// Initialize new <see cref="SDirectoryReference"/> instance.
-	/// </summary>
-	SDirectoryReference(const SDirectoryReference& rhs) = default;
-
-	/// <summary>
-	/// Initialize new <see cref="SDirectoryReference"/> instance.
-	/// </summary>
-	SDirectoryReference(SDirectoryReference&& rhs) = default;
-
-	/// <summary>
-	/// Initialize new <see cref="SDirectoryReference"/> instance.
-	/// </summary>
-	SDirectoryReference(const std::filesystem::path& filepath);
-
-	/// <summary>
-	/// Get directory name.
-	/// </summary>
 	std::filesystem::path GetName() const;
-
-	/// <summary>
-	/// Create directory if not exists.
-	/// </summary>
-	/// <param name="bRecursive"> Create directory recursively. </param>
 	void CreateIfNotExists(bool bRecursive = false) const;
 
-	SDirectoryReference& operator =(const SDirectoryReference& rhs) = default;
-	SDirectoryReference& operator =(SDirectoryReference&& rhs) = default;
+	DirectoryReference& operator =(const DirectoryReference& rhs) = default;
+	DirectoryReference& operator =(DirectoryReference&& rhs) = default;
+
+	auto operator <=>(const DirectoryReference&) const = default;
+	bool operator ==(const DirectoryReference&) const = default;
 };

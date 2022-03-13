@@ -2,30 +2,40 @@
 
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
+#include "Misc/Exceptions.h"
 
-GENERATE_BODY(SFileSystemReference);
-
-SFileSystemReference::SFileSystemReference(const std::filesystem::path& filepath) : Super()
-	, _path(std::filesystem::absolute(filepath))
+FileSystemReference::FileSystemReference(const std::filesystem::path& filepath)
+	: _path(std::filesystem::absolute(filepath))
 {
 }
 
-bool SFileSystemReference::IsExists() const
+bool FileSystemReference::IsExists() const
 {
+	Xassert(IsSet(), "Path is not setted.");
 	return std::filesystem::exists(_path.value_or(L"\\"));
 }
 
-std::filesystem::path SFileSystemReference::GetPath() const
+std::filesystem::path FileSystemReference::GetPath() const
 {
+	Xassert(IsSet(), "Path is not setted.");
 	return _path.value_or(L"\\");
 }
 
-SDirectoryReference SFileSystemReference::GetParent() const
+DirectoryReference FileSystemReference::GetParent() const
 {
+	Xassert(IsSet(), "Path is not setted.");
 	return _path.value_or(L"\\").parent_path();
 }
 
-bool SFileSystemReference::IsSet() const
+bool FileSystemReference::IsSet() const
 {
 	return _path.has_value();
+}
+
+void FileSystemReference::Xassert(bool expression, std::string_view message)
+{
+	if (!expression)
+	{
+		throw invalid_operation(message);
+	}
 }

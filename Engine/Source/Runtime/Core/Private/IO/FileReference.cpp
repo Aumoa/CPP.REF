@@ -1,39 +1,30 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/FileReference.h"
-#include "Object.h"
-#include "LogCore.h"
 #include "IO/DirectoryReference.h"
-#include "Diagnostics/LogVerbosity.h"
-#include "Diagnostics/LogSystem.h"
+#include "Misc/String.h"
 
-GENERATE_BODY(SFileReference);
-
-SFileReference::SFileReference(const std::filesystem::path& filepath) : Super(filepath)
+FileReference::FileReference(const std::filesystem::path& filepath)
+	: FileSystemReference(filepath)
 {
 }
 
-SFileReference::~SFileReference()
-{
-	FlushAndCloseSharedStream();
-}
-
-std::filesystem::path SFileReference::GetFilename() const
+std::filesystem::path FileReference::GetFilename() const
 {
 	return GetPath().filename();
 }
 
-std::filesystem::path SFileReference::GetName() const
+std::filesystem::path FileReference::GetName() const
 {
 	return GetPath().stem();
 }
 
-std::filesystem::path SFileReference::GetExtension() const
+std::filesystem::path FileReference::GetExtension() const
 {
 	return GetPath().extension();
 }
 
-std::wfstream SFileReference::OpenStream(std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
+std::wfstream FileReference::OpenStream(std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
 {
 	if (bCreateIfNotExists && !IsExists())
 	{
@@ -46,51 +37,6 @@ std::wfstream SFileReference::OpenStream(std::ios_base::openmode mode, bool bCre
 	}
 
 	return std::wfstream(GetPath(), mode);
-}
-
-std::wfstream& SFileReference::OpenSharedStream(SObject* sharingUser, std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive)
-{
-	if (sharingUser == nullptr)
-	{
-		LogSystem::Log(LogCore, ELogVerbosity::Error, L"The sharing user is nullptr. Abort.");
-		return _sharedstream;
-	}
-
-	if (_shared.size() == 0)
-	{
-		_sharedstream = OpenStream(mode, bCreateIfNotExists, bCreateDirectoryRecursive);
-	}
-
-	auto it = _shared.find(sharingUser);
-	if (it == _shared.end())
-	{
-		_shared.emplace(sharingUser);
-	}
-
-	return _sharedstream;
-}
-
-void SFileReference::CloseSharedStream(SObject* sharingUser)
-{
-	if (sharingUser == nullptr)
-	{
-		LogSystem::Log(LogCore, ELogVerbosity::Error, L"The sharing user is nullptr. Abort.");
-		return;
-	}
-
-	if (auto it = _shared.find(sharingUser); it != _shared.end())
-	{
-		_shared.erase(it);
-
-		if (_shared.size() == 0)
-		{
-			FlushAndCloseSharedStream();
-		}
-
-		return;
-	}
-
-	LogSystem::Log(LogCore, ELogVerbosity::Verbose, L"The user {} is not contained from shared stream users.", sharingUser->ToString());
 }
 
 template<class TChar, class... TChars>
@@ -109,7 +55,7 @@ inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
 	return false;
 }
 
-std::wstring SFileReference::ReadAllText()
+std::wstring FileReference::ReadAllText()
 {
 	std::ifstream File(GetPath());
 	if (File.is_open())
@@ -166,7 +112,7 @@ std::wstring SFileReference::ReadAllText()
 		if (BOMcheck(Buf.data(), 0xEF, 0xBB, 0xBF))
 		{
 			// UTF-8
-			Encoded = ANSI_TO_WCHAR(Buf.substr(3), 65001);
+			Encoded = String::AsUnicode(Buf.substr(3), 65001);
 		}
 		else if (BOMcheck(Buf.data(), 0xFE, 0xFF))
 		{
@@ -181,12 +127,12 @@ std::wstring SFileReference::ReadAllText()
 		else if (BOMcheck(Buf.data(), 0x2B, 0x2F, 0x76))
 		{
 			// UTF-7
-			Encoded = ANSI_TO_WCHAR(Buf.substr(3), 65000);
+			Encoded = String::AsUnicode(Buf.substr(3), 65000);
 		}
 		else
 		{
 			// Without BOM.
-			Encoded = ANSI_TO_WCHAR(Buf);
+			Encoded = String::AsUnicode(Buf);
 		}
 
 		return Encoded;
@@ -194,9 +140,9 @@ std::wstring SFileReference::ReadAllText()
 	return L"";
 }
 
-bool SFileReference::WriteAllText(std::wstring_view Text, uint32 Encoding)
+bool FileReference::WriteAllText(std::wstring_view Text, uint32 Encoding)
 {
-	std::string EncodedText = WCHAR_TO_ANSI(Text, Encoding);
+	std::string EncodedText = String::AsMultibyte(Text, Encoding);
 	std::ofstream File(GetPath(), std::ios::trunc);
 	if (File.is_open())
 	{
@@ -205,13 +151,4 @@ bool SFileReference::WriteAllText(std::wstring_view Text, uint32 Encoding)
 		return true;
 	}
 	return false;
-}
-
-void SFileReference::FlushAndCloseSharedStream()
-{
-	if (_sharedstream.is_open())
-	{
-		_sharedstream.flush();
-		_sharedstream.close();
-	}
 }

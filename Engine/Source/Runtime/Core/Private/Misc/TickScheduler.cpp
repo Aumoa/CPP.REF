@@ -8,8 +8,6 @@ TickScheduler::TickScheduler()
 
 void TickScheduler::Tick(float InDetlaTime)
 {
-	using namespace std::chrono;
-
 	std::vector<std::map<size_t, TickTaskInstance>::iterator> CompactList;
 	for (auto It = Tasks.begin(); It != Tasks.end(); ++It)
 	{
@@ -56,10 +54,10 @@ int64 TickScheduler::AddSchedule(const TaskInfo& TaskInfo)
 	return MyId;
 }
 
-int64 TickScheduler::AddSchedule(SObject* InValidator, const TaskInfo& TaskInfo)
+int64 TickScheduler::AddSchedule(std::function<bool()> InValidator, const TaskInfo& TaskInfo)
 {
 	TickTaskInstance InternalInfo;
-	InternalInfo.Validator = [Holder = WeakPtr(InValidator)]{ return Holder.IsValid(); };
+	InternalInfo.Validator = InValidator;
 	InternalInfo.Task = TaskInfo.Task;
 	InternalInfo.Delay = TaskInfo.Delay;
 	InternalInfo.ActualDelay = TaskInfo.InitDelay;

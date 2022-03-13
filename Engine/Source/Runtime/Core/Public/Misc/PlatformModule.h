@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include "Object.h"
 #include <filesystem>
-
-class SGameInstance;
 
 class CORE_API PlatformModule
 {

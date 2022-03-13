@@ -2,18 +2,17 @@
 
 #include "IO/DirectoryReference.h"
 
-GENERATE_BODY(SDirectoryReference);
-
-SDirectoryReference::SDirectoryReference(const std::filesystem::path& filepath) : Super(filepath)
+DirectoryReference::DirectoryReference(const std::filesystem::path& filepath)
+	: FileSystemReference(filepath)
 {
 }
 
-std::filesystem::path SDirectoryReference::GetName() const
+std::filesystem::path DirectoryReference::GetName() const
 {
 	return GetPath().stem();
 }
 
-void SDirectoryReference::CreateIfNotExists(bool bRecursive) const
+void DirectoryReference::CreateIfNotExists(bool bRecursive) const
 {
 	if (IsExists())
 	{
@@ -22,7 +21,7 @@ void SDirectoryReference::CreateIfNotExists(bool bRecursive) const
 
 	if (bRecursive)
 	{
-		SDirectoryReference dr = GetParent();
+		DirectoryReference dr = GetParent();
 		dr.CreateIfNotExists(bRecursive);
 	}
 

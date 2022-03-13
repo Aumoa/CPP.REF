@@ -1,13 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "PlatformMisc/PlatformModule.h"
-#include "Diagnostics/LogCategory.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogVerbosity.h"
-#include "LogCore.h"
+#include "Misc/PlatformMacros.h"
 
 #if PLATFORM_WINDOWS
-#include "WindowsPlatformCommon.h"
+
+#include <Windows.h>
+#include "Misc/PlatformModule.h"
+#include "Misc/Exceptions.h"
 
 PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 {
@@ -17,8 +16,7 @@ PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 
 	if (NativeHandle == nullptr)
 	{
-		SE_LOG(LogCore, Error, L"Could not load library from path: {}", wsPath);
-		return;
+		throw invalid_operation(std::format(L"Could not load library from path: {}", wsPath));
 	}
 }
 
@@ -45,8 +43,7 @@ void(*PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) 
 {
 	if (!IsValid())
 	{
-		SE_LOG(LogCore, Error, L"Module not be initialized.");
-		return nullptr;
+		throw invalid_operation("Module not be initialized.");
 	}
 
 	return reinterpret_cast<void(*)()>(::GetProcAddress((HMODULE)NativeHandle, FunctionName.data()));

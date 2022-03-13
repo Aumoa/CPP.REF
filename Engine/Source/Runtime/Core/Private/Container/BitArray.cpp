@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Container/BitArray.h"
-#include "CoreAssert.h"
+#include "Misc/Exceptions.h"
 
 ConstBitIterator::ConstBitIterator()
 {
@@ -192,7 +192,10 @@ size_t BitArray::AddUninitialized(size_t numToAdd)
 
 void BitArray::SetRange(size_t index, size_t numBitsToSet, bool bValue)
 {
-	checkf(index >= 0 && numBitsToSet >= 0 && index + numBitsToSet <= _numBits, L"Arguments is not valid.");
+	if (!(index >= 0 && numBitsToSet >= 0 && index + numBitsToSet <= _numBits))
+	{
+		throw invalid_operation("Arguments is not valid.");
+	}
 
 	if (numBitsToSet == 0)
 	{

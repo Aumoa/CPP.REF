@@ -2,43 +2,99 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
+#include "Misc/String.h"
+#include <array>
+#include <vector>
+#include <random>
+#include <string>
 
-struct CORE_API Guid
+class CORE_API Guid
 {
-	uint32 Data1;
-	uint16 Data2;
-	uint16 Data3;
-	uint8 Data4[8];
+	uint32 _data1;
+	uint16 _data2;
+	uint16 _data3;
+	uint8 _data4[8];
 
+	struct _InternalPad
+	{
+		uint64 _data4 : 16;
+		uint64 _data5 : 48;
+	};
+
+	struct _InternalUnion
+	{
+		int64 _uniform1;
+		int64 _uniform2;
+	};
+
+public:
 	constexpr Guid()
-		: Data1(0)
-		, Data2(0)
-		, Data3(0)
-		, Data4{}
+		: _data1(0)
+		, _data2(0)
+		, _data3(0)
+		, _data4{}
 	{
 	}
 
-	constexpr Guid(uint32 Data1, uint16 Data2, uint16 Data3, uint8(&Data4)[8])
-		: Data1(Data1)
-		, Data2(Data2)
-		, Data3(Data3)
-		, Data4{ Data4[0], Data4[1], Data4[2], Data4[3], Data4[4], Data4[5], Data4[6], Data4[7] }
+	constexpr Guid(uint32 data1, uint16 data2, uint16 data3, uint8 data40, uint8 data41, uint8 data42, uint8 data43, uint8 data44, uint8 data45, uint8 data46, uint8 data47)
+		: _data1(data1)
+		, _data2(data2)
+		, _data3(data3)
+		, _data4{ data40, data41, data42, data43, data44, data45, data46, data47 }
 	{
 	}
 
-	constexpr Guid(uint32 Data1, uint16 Data2, uint16 Data3, uint8 Data40, uint8 Data41, uint8 Data42, uint8 Data43, uint8 Data44, uint8 Data45, uint8 Data46, uint8 Data47)
-		: Data1(Data1)
-		, Data2(Data2)
-		, Data3(Data3)
-		, Data4{ Data40, Data41, Data42, Data43, Data44, Data45, Data46, Data47 }
+	std::wstring ToString() const
 	{
+		const _InternalPad& iPad = *reinterpret_cast<const _InternalPad*>(_data4);
+		return std::format(L"{:0>8X}-{:0>4X}-{:0>4X}-{:0>4X}-{:0>12X}", _data1, _data2, _data3, iPad._data4, iPad._data5);
 	}
 
-	std::wstring ToString() const;
+	static bool TryParse(std::wstring_view formattedString, Guid& outResult)
+	{
+		std::wstring trimmedString = String::Trim(formattedString, std::array<wchar_t, 5>{ L'{', L'}', L' ', L'\t', L'\n' });
+		static_assert(IString<wchar_t[10], wchar_t>, "!IString");
+		std::vector<std::wstring> splits = String::Split(trimmedString, L"-", true, true);
+		if (splits.size() != 5)
+		{
+			return false;
+		}
 
-	static Guid FromString(std::wstring_view InGuidFormat);
-	static Guid NewGuid();
+		try
+		{
+			uint32 data1 = std::stoul(splits[0], nullptr, 16);
+			uint16 data2 = (uint16)std::stoul(splits[1], nullptr, 16);
+			uint16 data3 = (uint16)std::stoul(splits[2], nullptr, 16);
 
-	constexpr auto operator <=>(const Guid& Rhs) const = default;
+			_InternalPad iPad;
+			iPad._data4 = (uint16)std::stoul(splits[3], nullptr, 16);
+			iPad._data5 = (uint64)std::stoull(splits[4], nullptr, 16);
+
+			outResult._data1 = data1;
+			outResult._data2 = data2;
+			outResult._data3 = data3;
+			memcpy(outResult._data4, &iPad, sizeof(_InternalPad));
+			return true;
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
+	}
+
+	static Guid NewGuid()
+	{
+		static thread_local std::random_device rd;
+		static thread_local std::mt19937_64 gen(rd());
+
+		int64 gen_1 = gen();
+		int64 gen_2 = gen();
+
+		_InternalUnion uv;
+		uv._uniform1 = gen();
+		uv._uniform2 = gen();
+
+		return reinterpret_cast<Guid&>(uv);
+	}
 };
