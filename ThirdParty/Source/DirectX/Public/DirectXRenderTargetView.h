@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "DirectXView.h"
 
 class DIRECTX_API SDirectXRenderTargetView : public SDirectXView, implements IRHIRenderTargetView

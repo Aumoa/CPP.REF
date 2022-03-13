@@ -219,7 +219,7 @@ public:
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		std::wstring scaleText = std::format(StringUtils::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
+		std::wstring scaleText = std::format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
 		return std::format(L"[Abs={}, Scale={}, Size={}]", AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
 	}
 

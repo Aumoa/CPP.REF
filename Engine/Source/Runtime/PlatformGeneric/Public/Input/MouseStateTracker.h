@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "BitfieldInputChangeTracker.h"
 #include "Input/IPlatformMouse.h"
 

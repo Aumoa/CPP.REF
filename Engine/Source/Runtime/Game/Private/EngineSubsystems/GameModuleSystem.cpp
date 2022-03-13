@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameModuleSystem.h"
-#include "PlatformMisc/PlatformModule.h"
+#include "Misc/PlatformModule.h"
 #include "LogGame.h"
 #include "GameModule.h"
 

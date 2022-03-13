@@ -13,6 +13,7 @@
 #include "Input/IPlatformKeyboard.h"
 #include "Input/IPlatformMouse.h"
 #include "Input/IPlatformIME.h"
+#include "Numerics/VectorInterface/Vector.h"
 #include "RenderThread.h"
 #include "IApplicationInterface.h"
 
@@ -64,7 +65,7 @@ void SSlateApplication::Init(IApplicationInterface* InApplication)
 	//PlatformMouse.MouseWheelScrolled.AddSObject(this, &SSlateApplication::OnMouseWheelScrolled);
 
 	auto& PlatformIME = InApplication->GetPlatformIME();
-	PlatformIME.IME.AddSObject(this, &SSlateApplication::OnIME);
+	PlatformIME.IME.AddObject(this, &SSlateApplication::OnIME);
 }
 
 void SSlateApplication::TickAndPaint(float InDeltaTime)

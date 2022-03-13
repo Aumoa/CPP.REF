@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
+#include "Misc/InputEnums.h"
 
 struct KeyboardState
 {

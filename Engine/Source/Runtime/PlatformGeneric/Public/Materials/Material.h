@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "MaterialInterface.h"
 
 interface IRHIShader;

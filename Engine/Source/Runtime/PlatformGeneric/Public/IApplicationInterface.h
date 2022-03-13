@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
+#include "Numerics/VectorInterface/Vector.h"
+#include "Reflection/Enum.h"
 
 class PlatformModule;
 interface IRHIFactory;

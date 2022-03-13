@@ -118,12 +118,12 @@ namespace ConsoleVars
 		}
 		catch (const std::invalid_argument& E)
 		{
-			SE_LOG(LogConsoleVar, Warning, L"Invalid argument detected while parsing console variable: {}", ANSI_TO_WCHAR(E.what()));
+			SE_LOG(LogConsoleVar, Warning, L"Invalid argument detected while parsing console variable: {}", String::AsUnicode(E.what()));
 			return false;
 		}
 		catch (const std::out_of_range& E)
 		{
-			SE_LOG(LogConsoleVar, Warning, L"Out of range detected while parsing console variable: {}", ANSI_TO_WCHAR(E.what()));
+			SE_LOG(LogConsoleVar, Warning, L"Out of range detected while parsing console variable: {}", String::AsUnicode(E.what()));
 			return false;
 		}
 	}

@@ -390,4 +390,14 @@ public:
 	// String.{Platform}.cpp
 	static std::wstring AsUnicode(std::string_view source, uint32 codepage = 0);
 	static std::string AsMultibyte(std::wstring_view source, uint32 codepage = 0);
+
+	static std::wstring AsUnicode(std::wstring_view source, uint32 codepage = 0)
+	{
+		return std::wstring(source);
+	}
+
+	static std::string AsMultibyte(std::string_view source, uint32 codepage = 0)
+	{
+		return std::string(source);
+	}
 };

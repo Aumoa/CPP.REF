@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "DirectXFactoryChild.h"
 
 class SDirectXAdapter : public SDirectXFactoryChild, implements IRHIAdapter

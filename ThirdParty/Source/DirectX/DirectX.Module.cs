@@ -19,7 +19,7 @@ public class DirectX : ModuleRule
 
             PublicDependencyModuleNames.AddRange(new[]
             {
-                "Core",
+                "CoreSObject",
                 "PlatformGeneric",
                 "WindowsCommon",
             });

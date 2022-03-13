@@ -2,26 +2,26 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Exceptions/Exception.h"
+#include "Misc/Exceptions.h"
 
-class PLATFORMGENERIC_API SRHIException : public SException
+class shader_compiler_exception : public std::exception
 {
-	GENERATED_BODY(SRHIException)
-
-private:
-	std::wstring APIName;
+	std::string _api;
+	std::string _message;
+	std::source_location _location;
+	std::string _what;
 
 public:
-	SRHIException(std::wstring_view API, std::wstring_view Message, SException* InnerException = nullptr);
+	shader_compiler_exception(std::string_view API, std::string_view Message, const std::source_location& location = std::source_location::current())
+		: _api(API)
+		, _message(Message)
+		, _location(location)
+	{
+		_what = std::format("{} in '{}' API\n  at {} in {}:{}", _message, _api, _location.function_name(), _location.file_name(), _location.line());
+	}
 
-	std::wstring_view GetAPIName();
-};
-
-class PLATFORMGENERIC_API SRHIShaderCompilerException : public SRHIException
-{
-	GENERATED_BODY(SRHIShaderCompilerException)
-
-public:
-	SRHIShaderCompilerException(std::wstring_view API, std::wstring_view Message, SException* InnerException = nullptr);
+	virtual const char* what() const noexcept override
+	{
+		return _what.c_str();
+	}
 };

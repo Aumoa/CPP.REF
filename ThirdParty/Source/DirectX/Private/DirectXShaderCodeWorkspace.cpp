@@ -18,7 +18,7 @@ void SDirectXShaderCodeWorkspace::AddShaderCode(std::wstring_view Name, RHIShade
 	auto Emplace_it = ShaderCodes.emplace(Name, Code);
 	if (!Emplace_it.second)
 	{
-		throw gcnew SRHIShaderCompilerException(L"DirectX", L"ShaderCodeName duplicated.");
+		throw shader_compiler_exception("DirectX", "ShaderCodeName duplicated.");
 	}
 }
 
@@ -28,7 +28,7 @@ void SDirectXShaderCodeWorkspace::Compile()
 	{
 		if (!Code.EntryPoint.empty())
 		{
-			std::string AId = WCHAR_TO_ANSI(Id);
+			std::string AId = String::AsMultibyte(Id);
 			std::string_view ATarget = ShaderTypeToTarget(Code.ShaderType);
 
 			ComPtr<ID3DBlob> pBlob;
@@ -38,7 +38,7 @@ void SDirectXShaderCodeWorkspace::Compile()
 			{
 				if (pError)
 				{
-					throw gcnew SRHIShaderCompilerException(L"DirectX", std::format(L"Compile error occurred while compile '{}' shader code. ErrorTrace: \n{}", Id, ANSI_TO_WCHAR(std::string_view((const char*)pError->GetBufferPointer()))));
+					throw shader_compiler_exception("DirectX", std::format("Compile error occurred while compile '{}' shader code. ErrorTrace: \n{}", AId, std::string_view((const char*)pError->GetBufferPointer())));
 				}
 				else
 				{

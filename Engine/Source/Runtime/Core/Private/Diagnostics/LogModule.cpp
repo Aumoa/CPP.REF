@@ -1,5 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "CoreAssert.h"
 #include "Diagnostics/LogModule.h"
 #include "Misc/DateTime.h"
 #include "Misc/String.h"
@@ -7,15 +8,17 @@
 #include <filesystem>
 #include <chrono>
 #include <atomic>
-#include <boost/asio/io_service.hpp>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
 
 static LogModule* gModule;
 
 struct LogModule::Storage
 {
-	boost::asio::io_service IO;
-	std::atomic<std::size_t> Pending;
-	std::vector<std::wstring> Buffers;
+	std::mutex Lock;
+	std::queue<std::wstring> Works;
+	std::condition_variable Cond;
 };
 
 LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
@@ -75,12 +78,10 @@ void LogModule::Shutdown()
 
 void LogModule::EnqueueLogMessage(std::wstring_view Message)
 {
+	std::unique_lock Lock(Impl->Lock);
 	Logged.Broadcast(Message);
-	Impl->IO.post([&, Message = std::wstring(Message)]() mutable
-	{
-		Impl->Buffers.emplace_back(std::move(Message));
-	});
-	++Impl->Pending;
+	Impl->Works.emplace(std::wstring(Message));
+	Impl->Cond.notify_one();
 }
 
 bool LogModule::IsRunning()
@@ -102,32 +103,22 @@ void LogModule::Worker()
 
 	while (bRunning)
 	{
-		// Load
-		size_t Pending = Impl->Pending;
-		size_t Consume = 0;
+		std::unique_lock Lock(Impl->Lock);
+		Impl->Cond.wait(Lock);
 
-		Impl->Buffers.clear();
-		for (size_t i = 0; i < Pending; ++i)
-		{
-			// Consume
-			Consume += Impl->IO.poll_one();
-		}
+		std::queue<std::wstring> Works;
+		std::swap(Works, Impl->Works);
 
-		// Apply
-		Impl->Pending -= Consume;
+		Lock.unlock();
 
 		// Write messages.
-		if (Impl->Buffers.size())
+		while (!Works.empty())
 		{
-			for (auto& Message : Impl->Buffers)
-			{
-				LogFile << String::AsMultibyte(Message) << std::endl;
-			}
-			LogFile.flush();
+			auto& Wstr = Works.front();
+			LogFile << String::AsMultibyte(Wstr) << std::endl;
+			Works.pop();
 		}
 
-		// Waiting for next frame.
-		Curr += milliseconds(16);
-		std::this_thread::sleep_until(Curr);
+		LogFile.flush();
 	}
 }

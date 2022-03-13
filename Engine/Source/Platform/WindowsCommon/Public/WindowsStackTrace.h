@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
 #include "WindowsMinimal.h"
 
 class WINDOWSCOMMON_API WindowsStackTrace

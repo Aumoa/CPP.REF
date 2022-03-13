@@ -27,7 +27,7 @@ struct SlateLayoutTransform
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		return std::format(L"Translation: {}, Scale: {}", Translation.ToString(InFormatArgs), std::format(StringUtils::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs)));
+		return std::format(L"Translation: {}, Scale: {}", Translation.ToString(InFormatArgs), std::format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs)));
 	}
 
 	constexpr auto operator <=>(const SlateLayoutTransform& Rhs) const = default;

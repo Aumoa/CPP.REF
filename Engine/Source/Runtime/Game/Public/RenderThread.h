@@ -4,34 +4,40 @@
 
 #include "CoreMinimal.h"
 #include <functional>
-#include <atomic>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
 
 class Thread;
 interface IRHICommandBuffer;
 
 class GAME_API RenderThread
 {
+	struct Work
+	{
+		WeakPtr<SObject> Holder;
+		std::function<void(IRHICommandBuffer*)> Body;
+	};
+
 private:
 	static RenderThread* sInstance;
 
-	Thread* RemoteThread = nullptr;
-	volatile bool bRunning = false;
+	Thread* _rthread = nullptr;
+	bool _running = false;
 
-	struct Impl_t;
-	Impl_t* Impl[2] = {};
-	std::atomic<size_t> BufferIndex;
-	size_t RenderBufferIndex = 0;
+	std::mutex _lock;
+	std::queue<Work> _queuedWorks;
+	std::condition_variable _invoke;
+	IRHICommandBuffer* _deviceContext = nullptr;
+	std::function<void(IRHICommandBuffer*)> _completion;
+	TaskCompletionSource<> _taskCompletionSource;
 
-	Task<> Runner = Task<>::ManualTask();
-	Task<> Completed = Task<>::CompletedTask();
-	IRHICommandBuffer* Context = nullptr;
-	std::function<void(IRHICommandBuffer*)> CompletionWork;
 
 public:
 	RenderThread();
 	~RenderThread() noexcept;
 
-	void EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHICommandBuffer*)> Work);
+	void EnqueueRenderThreadWork(SObject* object, std::function<void(IRHICommandBuffer*)> work);
 	Task<> ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::function<void(IRHICommandBuffer*)> InCompletionWork);
 	static bool InRenderThread();
 

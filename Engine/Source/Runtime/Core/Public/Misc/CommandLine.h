@@ -4,6 +4,8 @@
 
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
+#include "Misc/String.h"
+#include "Misc/Exceptions.h"
 #include <string_view>
 #include <span>
 #include <map>
@@ -24,7 +26,7 @@ public:
 			args[i] = argv[i];
 		}
 
-		DoParse(args);
+		DoParse<TChar>(args);
 	}
 
 	template<class TList>
@@ -37,7 +39,7 @@ public:
 		if constexpr (std::same_as<EnumerableItem_t<TList>, std::basic_string_view<Char_t>>)
 		{
 			// Is span convertible. Just pass.
-			DoParse(args);
+			DoParse<Char_t>(args);
 		}
 		else
 		{
@@ -46,7 +48,7 @@ public:
 			{
 				args_sv[i] = std::basic_string_view<Char_t>(args[i]);
 			}
-			DoParse(args_sv);
+			DoParse<Char_t>(args_sv);
 		}
 	}
 
@@ -116,16 +118,16 @@ private:
 				auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
 				if (!emplaced.second)
 				{
-					throw commandline_parser_error(std::format(L"Duplicated command line key({}).", currKey));
+					throw invalid_operation(std::format(L"Duplicated command line key({}).", currKey));
 				}
 			}
 			else
 			{
-				auto wCurrKey = Cast<std::wstring>(currKey);
+				auto wCurrKey = String::AsUnicode(currKey);
 				auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
 				if (!emplaced.second)
 				{
-					throw commandline_parser_error(std::format(L"Duplicated command line key({}).", wCurrKey));
+					throw invalid_operation(std::format(L"Duplicated command line key({}).", wCurrKey));
 				}
 			}
 		};

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "DirectXResource.h"
 
 class DIRECTX_API SDirectXTexture2D : public SDirectXResource, implements IRHITexture2D

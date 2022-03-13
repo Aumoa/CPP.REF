@@ -7,7 +7,7 @@
 #include <string_view>
 #include "LogVerbosity.h"
 
-class CORESOBJECT_API LogCategory
+class CORE_API LogCategory
 {
 	friend class LogSystem;
 
@@ -18,6 +18,7 @@ public:
 	LogCategory(std::wstring_view CategoryName);
 
 	std::wstring_view GetName() const;
+	static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
 
 protected:
 	virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message);

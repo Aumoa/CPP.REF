@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "DirectXFence.h"
-#include "Threading/EventHandle.h"
 
 GENERATE_BODY(SDirectXFence);
 

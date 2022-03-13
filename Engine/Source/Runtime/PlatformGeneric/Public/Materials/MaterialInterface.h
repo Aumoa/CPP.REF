@@ -2,8 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
+#include "Misc/MemoryStatus.h"
 #include "RHI/RHIStructures.h"
+#include "Diagnostics/LogCategory.h"
+#include "Numerics/VectorInterface/Vector.h"
 #include <variant>
 
 interface IRHIDevice;

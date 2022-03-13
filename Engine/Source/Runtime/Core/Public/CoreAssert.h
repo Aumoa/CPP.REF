@@ -7,7 +7,7 @@
 #include <format>
 #include <source_location>
 
-class CORESOBJECT_API CoreAssert
+class CORE_API CoreAssert
 {
 public:
 	static void Assert(std::wstring_view msg, const std::source_location& location = std::source_location::current());

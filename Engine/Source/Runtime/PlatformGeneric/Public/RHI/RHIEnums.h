@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Reflection/Enum.h"
 
 SENUM(ERHIPrimitiveTopology, int32,
     TriangleList, 4,

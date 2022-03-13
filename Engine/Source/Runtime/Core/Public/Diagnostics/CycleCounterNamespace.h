@@ -9,7 +9,7 @@
 
 class CycleCounterUnit;
 
-class CORESOBJECT_API CycleCounterNamespace
+class CORE_API CycleCounterNamespace
 {
 	std::wstring Name;
 	std::wstring GroupName;

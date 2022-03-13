@@ -7,7 +7,7 @@
 
 class CycleCounterNamespace;
 
-class CORESOBJECT_API CycleCounter
+class CORE_API CycleCounter
 {
 	CycleCounter() = default;
 	~CycleCounter() = default;

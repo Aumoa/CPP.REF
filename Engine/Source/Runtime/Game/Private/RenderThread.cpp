@@ -2,9 +2,10 @@
 
 #include "RenderThread.h"
 #include "Threading/Thread.h"
+#include "Threading/ThreadGroup.h"
+#include "Threading/SuspendTokenCollection.h"
 #include <mutex>
 #include <condition_variable>
-#include <boost/asio/io_service.hpp>
 
 RenderThread* RenderThread::sInstance;
 
@@ -13,43 +14,29 @@ DECLARE_CYCLE_STAT("ExecuteWorks", STAT_ExecuteWorks, STATGROUP_RenderThread);
 DECLARE_CYCLE_STAT("  WaitPreviousComplete", STAT_WaitPreviousComplete, STATGROUP_RenderThread);
 DECLARE_CYCLE_STAT("  ExecuteCurrentWorks", STAT_ExecuteCurrentWorks, STATGROUP_RenderThread);
 
-struct RenderThread::Impl_t
-{
-	boost::asio::io_service IO;
-};
-
 RenderThread::RenderThread()
 {
 	checkf(sInstance == nullptr, L"Singleton instance duplicated.");
 	sInstance = this;
 
-	Impl[0] = new Impl_t();
-	Impl[1] = new Impl_t();
-
-	bRunning = true;
-	RemoteThread = Thread::CreateThread(L"[Render Thread]", std::bind(&RenderThread::Run, this));
+	_running = true;
+	_rthread = Thread::CreateThread(L"[Render Thread]", std::bind(&RenderThread::Run, this));
 }
 
 RenderThread::~RenderThread()
 {
-	bRunning = false;
-	Task<>::SetManual(Runner);
-	RemoteThread->Join();
+	_running = false;
+	_rthread->Join();
 
-	delete Impl[0];
-	delete Impl[1];
 	sInstance = nullptr;
 }
 
-void RenderThread::EnqueueRenderThreadWork(SObject* Object, std::function<void(IRHICommandBuffer*)> Work)
+void RenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(IRHICommandBuffer*)> work)
 {
-	size_t Index = BufferIndex % 2;
-	Impl[Index]->IO.post([this, Work = std::move(Work), bNullHolder = Object == nullptr, Holder = WeakPtr(Object)]() mutable
+	_queuedWorks.emplace(Work
 	{
-		if (bNullHolder || Holder.IsValid())
-		{
-			Work(Context);
-		}
+		.Holder = object,
+		.Body = work
 	});
 }
 
@@ -57,36 +44,35 @@ Task<> RenderThread::ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::funct
 {
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteWorks);
 
-	size_t Index = BufferIndex++ % 2;
-	auto Impl = this->Impl[Index];
-
+	if (_taskCompletionSource.IsValid())
 	{
-		SCOPE_CYCLE_COUNTER(STAT_WaitPreviousComplete);
-		Completed.Wait();
-		Completed.GetAwaiter()->Reset();
+		co_await _taskCompletionSource.GetTask();
 	}
 
-	CompletionWork = InCompletionWork;
-	Context = InDeviceContext;
-	RenderBufferIndex = Index;
+	{
+		std::unique_lock lock(_lock);
+		_taskCompletionSource = TaskCompletionSource<>::Create();
+		_completion = InCompletionWork;
+	}
+
+	_invoke.notify_one();
 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ExecuteCurrentWorks);
-		Task<>::SetManual(Runner);
-		co_await Completed;
+		co_await _taskCompletionSource.GetTask();
 	}
 }
 
 bool RenderThread::InRenderThread()
 {
-	return Thread::GetCurrentThread()->GetThreadId() == Get()->RemoteThread->GetThreadId();
+	return Thread::GetCurrentThread()->GetThreadId() == Get()->_rthread->GetThreadId();
 }
 
 void RenderThread::Run()
 {
 	Thread* CurrentThread = Thread::GetCurrentThread();
 
-	class RenderThreadSuspendToken : public SuspendToken
+	class RenderThreadSuspendToken : public ISuspendToken
 	{
 		RenderThread* Owner;
 		Thread* CurrentThread;
@@ -105,8 +91,8 @@ void RenderThread::Run()
 			checkf(!SuspendPromise.has_value(), L"Thread already wait for suspend.");
 			SuspendPromise.emplace();
 
-			Owner->Completed.Wait();
-			Task<>::SetManual(Owner->Runner);
+			Owner->_taskCompletionSource.GetTask().Wait();
+			Owner->_invoke.notify_one();
 
 			return SuspendPromise->get_future();
 		}
@@ -133,36 +119,41 @@ void RenderThread::Run()
 	};
 
 	std::unique_ptr Token = std::make_unique<RenderThreadSuspendToken>(this, CurrentThread);
-	GC.AddSuspendToken(Token.get());
+	SuspendTokenCollection::Add(Token.get());
 
-	while (bRunning)
+	while (_running)
 	{
 		Token->Join();
 
 		// Waiting for event 'Run'.
-		Runner.Wait();
-		Runner.GetAwaiter()->Reset();
+		std::unique_lock lock(_lock);
+		_invoke.wait(lock);
 
-		size_t Index = RenderBufferIndex;
-		auto Impl = this->Impl[Index];
+		std::queue<Work> works;
+		std::swap(works, _queuedWorks);
 
-		if (CompletionWork)
+		IRHICommandBuffer* deviceContext = _deviceContext;
+		std::function<void(IRHICommandBuffer*)> completion = std::move(_completion);
+
+		lock.unlock();
+
+		while (!works.empty())
 		{
-			Impl->IO.run();
-			CompletionWork(Context);
-
-			Context = nullptr;
-			CompletionWork = nullptr;
-
-			Task<>::SetManual(Completed);
+			Work& work = works.front();
+			if (work.Holder.IsValid())
+			{
+				work.Body(deviceContext);
+			}
+			works.pop();
 		}
-		else
+
+		if (completion)
 		{
-			// Continue for GC without complete.
-			Impl->IO.reset();
-			continue;
+			completion(deviceContext);
 		}
+
+		_taskCompletionSource.SetResult();
 	}
 
-	GC.RemoveSuspendToken(Token.get());
+	SuspendTokenCollection::Remove(Token.get());
 }

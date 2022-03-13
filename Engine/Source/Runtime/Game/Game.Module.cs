@@ -18,6 +18,8 @@ public class Game : ModuleRule
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
+            "CoreSObject",
+            "CoreNumerics",
             "PlatformGeneric"
         });
     }

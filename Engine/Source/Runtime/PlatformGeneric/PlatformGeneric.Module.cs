@@ -13,6 +13,11 @@ public class PlatformGeneric : ModuleRule
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
 
-        PublicDependencyModuleNames.Add("Core");
+        PublicDependencyModuleNames.AddRange(new[]
+        {
+            "Core",
+            "CoreSObject",
+            "CoreNumerics"
+        });
     }
 }

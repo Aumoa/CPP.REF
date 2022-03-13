@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "WindowsMinimal.h"
 #include "RHI/RHIEnums.h"
 #include <wrl/client.h>

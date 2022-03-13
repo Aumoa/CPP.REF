@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "BitfieldInputChangeTracker.h"
 #include "KeyboardState.h"
 #include "MouseState.h"
+#include "Misc/InputEnums.h"
 
 class PLATFORMGENERIC_API SKeyboardTracker : implements SObject
 {

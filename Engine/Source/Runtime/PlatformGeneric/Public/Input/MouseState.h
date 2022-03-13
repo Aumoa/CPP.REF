@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
+#include "Reflection/Enum.h"
 
 SENUM(EMousePositionMode, int32,
     Absolute,,

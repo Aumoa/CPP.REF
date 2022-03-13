@@ -9,7 +9,7 @@
 
 class Thread;
 
-class CORESOBJECT_API LogModule
+class CORE_API LogModule
 {
 	using This = LogModule;
 

@@ -115,10 +115,10 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstrin
 	{
 		return -1;
 	}
-	InApplication->SetTitle(ANSI_TO_WCHAR(SE_APPLICATION));
+	InApplication->SetTitle(String::AsUnicode(SE_APPLICATION));
 
 	// Start application now!
-	InApplication->Idle.AddSObject(this, &SGameEngine::TickEngine);
+	InApplication->Idle.AddObject(this, &SGameEngine::TickEngine);
 	GameInstance->Init();
 	InApplication->Start();
 
@@ -215,9 +215,6 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 
 	// Execute level tick.
 	GameWorld->LevelTick(InDeltaTime.count());
-
-	// Flush all deferred task with this frame.
-	Task<>::FlushDeferred();
 
 	// Tick and paint.
 	//SlateApplication->TickAndPaint(InDeltaTime.count());

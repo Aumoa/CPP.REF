@@ -4,7 +4,6 @@
 #include "DirectXFence.h"
 #include "DirectXDevice.h"
 #include "DirectXTexture2D.h"
-#include "Threading/EventHandle.h"
 
 GENERATE_BODY(SDirectXSwapChain);
 

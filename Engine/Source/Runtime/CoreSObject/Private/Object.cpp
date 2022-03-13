@@ -7,6 +7,7 @@
 #include "Misc/TickCalc.h"
 #include "Threading/Parallel.h"
 #include "GC/GC.h"
+#include "GC/WeakPtr.h"
 
 GENERATE_BODY(SObject);
 
@@ -41,6 +42,14 @@ void SObject::AddToRoot()
 void SObject::RemoveFromRoot()
 {
 	GC.Roots.erase(this);
+}
+
+std::function<bool()> SObject::GetHolder()
+{
+	return [ptr = WeakPtr(this)]()
+	{
+		return ptr.IsValid();
+	};
 }
 
 std::wstring SObject::ToString()

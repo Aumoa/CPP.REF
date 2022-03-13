@@ -13,6 +13,8 @@
 #include <string>
 #include <future>
 
+DEFINE_LOG_CATEGORY(LogGC);
+
 DECLARE_STAT_GROUP("GC", STATGROUP_GC);
 
 DECLARE_CYCLE_STAT("GC", STAT_GC, STATGROUP_GC);

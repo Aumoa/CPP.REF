@@ -80,6 +80,6 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 
 int wWinMain(HINSTANCE, HINSTANCE, wchar_t* argv, int)
 {
-	std::vector<std::wstring> Argv = StringUtils::Split((std::wstring)argv, L" ", true, true);
+	std::vector<std::wstring> Argv = String::Split((std::wstring)argv, L" ", true, true);
 	return GuardedMain(Argv);
 }

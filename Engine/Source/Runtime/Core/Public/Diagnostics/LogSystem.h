@@ -4,6 +4,8 @@
 
 #include "Delegates/MulticastEvent.h"
 #include "LogVerbosity.h"
+#include "LogCategory.h"
+#include "LogVerbosity.h"
 #include <exception>
 #include <string>
 #include <string_view>
@@ -15,7 +17,7 @@ class LogCategory;
 /// <summary>
 /// Provide logging functions.
 /// </summary>
-class CORESOBJECT_API LogSystem
+class CORE_API LogSystem
 {
 	using This = LogSystem;
 

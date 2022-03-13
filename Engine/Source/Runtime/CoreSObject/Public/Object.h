@@ -51,6 +51,7 @@ public:
 
 	void AddToRoot();
 	void RemoveFromRoot();
+	std::function<bool()> GetHolder();
 
 private:
 	SObject(const SObject&) = delete;

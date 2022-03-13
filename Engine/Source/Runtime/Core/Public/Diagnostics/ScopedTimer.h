@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <chrono>
 #include "CoreAssert.h"
+#include <chrono>
 
 template<class T, class Clock = std::chrono::steady_clock>
 class ScopedTimer

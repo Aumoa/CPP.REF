@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "DirectXFactoryChild.h"
 
 class DIRECTX_API SDirectXDevice : public SDirectXFactoryChild, implements IRHIDevice

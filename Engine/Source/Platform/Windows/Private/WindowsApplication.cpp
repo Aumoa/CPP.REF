@@ -8,7 +8,7 @@
 #include "Input/WindowsIMEController.h"
 #include "Multimedia/WindowsImage.h"
 #include "Misc/CommandLine.h"
-#include "PlatformMisc/PlatformModule.h"
+#include "Misc/PlatformModule.h"
 #include "Diagnostics/LogModule.h"
 
 // Vulkan
@@ -55,7 +55,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 {
 	int32 ErrorCode;
 
-	auto Logger = std::make_unique<LogModule>(ANSI_TO_WCHAR(SE_APPLICATION));
+	auto Logger = std::make_unique<LogModule>(String::AsUnicode(SE_APPLICATION));
 	Logger->RunTask();
 
 	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
@@ -68,7 +68,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 		if (!CommandArgs.TryGetValue(L"GameDll", ModuleName))
 		{
-			ModuleName = ANSI_TO_WCHAR(SE_APPLICATION_TARGET);
+			ModuleName = String::AsUnicode(SE_APPLICATION_TARGET);
 		}
 
 		std::wstring EngineName;
@@ -120,7 +120,6 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	GC.Shutdown(true);
 
 	Logger->Shutdown();
-	Task<>::Cleanup();
 	return ErrorCode;
 }
 

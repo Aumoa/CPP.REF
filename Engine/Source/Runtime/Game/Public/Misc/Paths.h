@@ -5,12 +5,15 @@
 #include "CoreMinimal.h"
 #include <filesystem>
 
-class GAME_API Paths : public AbstractClass
+class GAME_API Paths
 {
 	SENUM(ERoot, int32,
 		Game,,
 		Engine,
 	);
+
+public:
+	Paths() = delete;
 
 public:
 	static std::filesystem::path AsPhysicalPath(std::filesystem::path InLogicalPath);

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "DirectXDeviceChild.h"
 
 class DIRECTX_API SDirectXShaderCodeBlob : public SDirectXDeviceChild, implements IRHIShaderCodeBlob

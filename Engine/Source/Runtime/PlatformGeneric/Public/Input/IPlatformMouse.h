@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "MouseState.h"
 
 interface IPlatformMouse : implements SObject

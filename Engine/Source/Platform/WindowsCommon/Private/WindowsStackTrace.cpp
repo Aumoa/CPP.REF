@@ -70,7 +70,7 @@ std::wstring WindowsStackTrace::SymbolInfo::GetName() const
 {
     if (IsSymbolLoaded())
     {
-        return ANSI_TO_WCHAR(GetSymbolPtr()->Name);
+        return String::AsUnicode(GetSymbolPtr()->Name);
     }
     else
     {
@@ -91,11 +91,11 @@ std::wstring WindowsStackTrace::SymbolInfo::GetUndecoratedName() const
     DWORD Len = UnDecorateSymbolName(GetSymbolPtr()->Name, Undeco.data(), (DWORD)MaxNameLength, UNDNAME_COMPLETE);
     if (Len == 0)
     {
-        return ANSI_TO_WCHAR(GetSymbolPtr()->Name);
+        return String::AsUnicode(GetSymbolPtr()->Name);
     }
 
     Undeco.resize(Len);
-    return ANSI_TO_WCHAR(Undeco);
+    return String::AsUnicode(Undeco);
 }
 
 DWORD64 WindowsStackTrace::SymbolInfo::GetDllBaseAddress() const
@@ -169,7 +169,7 @@ void WindowsStackTrace::TraceStack()
         if (SymGetLineFromAddr64(hProcess, S.AddrPC.Offset, &_, &Line))
         {
             CurrentFrame.LineNumber = Line.LineNumber;
-            CurrentFrame.FileName = ANSI_TO_WCHAR(Line.FileName);
+            CurrentFrame.FileName = String::AsUnicode(Line.FileName);
             CurrentFrame.SourceLocation = std::format(L"{}:{}", CurrentFrame.FileName, CurrentFrame.LineNumber);
         }
         else
@@ -243,8 +243,8 @@ void* WindowsStackTrace::LoadModuleSymbols()
 
         LoadedModule.emplace_back() =
         {
-            .ImageName = ANSI_TO_WCHAR(ModuleFilenameBuf),
-            .ModuleName = ANSI_TO_WCHAR(ModuleBasenameBuf),
+            .ImageName = String::AsUnicode(ModuleFilenameBuf),
+            .ModuleName = String::AsUnicode(ModuleBasenameBuf),
             .BaseAddress = Info.lpBaseOfDll,
             .LoadSize = Info.SizeOfImage
         };

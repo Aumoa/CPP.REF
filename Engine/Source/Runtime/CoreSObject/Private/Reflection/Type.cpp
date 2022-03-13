@@ -6,6 +6,8 @@
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 
+DEFINE_LOG_CATEGORY(LogReflection);
+
 std::unordered_map<size_t, uint64> Type::TypeRegister;
 std::mutex Type::TypeRegisterMutex;
 

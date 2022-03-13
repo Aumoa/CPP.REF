@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/Paths.h"
-#include "Exceptions/InvalidArgumentException.h"
+#include <stdexcept>
 
 std::filesystem::path Paths::AsPhysicalPath(std::filesystem::path InLogicalPath)
 {
@@ -38,6 +38,6 @@ std::filesystem::path Paths::GetPhysicalRoot(ERoot Root)
 	case ERoot::Game:
 		return GAME_ROOT;
 	default:
-		throw gcnew SInvalidArgumentException(L"An invalid argument specified in 'Root' argument.");
+		throw std::invalid_argument("An invalid argument specified in 'Root' argument.");
 	}
 }

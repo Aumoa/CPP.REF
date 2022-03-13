@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
 
 template<class TBitfield>
 class BitfieldInputChangeTracker

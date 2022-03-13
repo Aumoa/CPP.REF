@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
+#include "IDisposable.h"
 #include "RHIStructures.h"
+#include "Numerics/VectorInterface/Rect.h"
 #include <span>
 
 interface IRHIFactory;

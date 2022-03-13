@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "RHIEnums.h"
+#include "Numerics/VectorInterface/Vector.h"
+#include "Numerics/VectorInterface/Color.h"
+#include "Numerics/MatrixInterface/Matrix4x4.h"
 #include <variant>
 
 interface IRHIResource;

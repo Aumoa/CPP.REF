@@ -48,8 +48,8 @@ void SGameRenderSystem::Init()
 		});
 	}
 
-	IApplicationInterface::Get().Sized.AddSObject(this, &SGameRenderSystem::ResizeApp);
-	IApplicationInterface::Get().PreDestroyApp.AddSObject(this, &SGameRenderSystem::OnPreDestroyApp);
+	IApplicationInterface::Get().Sized.AddObject(this, &SGameRenderSystem::ResizeApp);
+	IApplicationInterface::Get().PreDestroyApp.AddObject(this, &SGameRenderSystem::OnPreDestroyApp);
 }
 
 void SGameRenderSystem::Deinit()
