@@ -12,6 +12,7 @@ public class WindowsConsole : ModuleRule
         {
             TargetType = TargetType.Engine;
             ModuleType = ModuleType.ConsoleApplication;
+            NonUnityBuild = true;
 
             RelativePath = "Engine.Platform";
             TargetName = "$(SolutionName)";
@@ -21,6 +22,7 @@ public class WindowsConsole : ModuleRule
             PublicDependencyModuleNames.AddRange(new[]
             {
                 "Core",
+                "CoreSObject",
                 "Console",
                 "WindowsCommon"
             });

@@ -2,6 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Diagnostics/LogCategory.h"
 
 DECLARE_LOG_CATEGORY(, LogWindowsConsole);

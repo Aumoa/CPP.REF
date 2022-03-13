@@ -11,7 +11,7 @@ public class WindowsCommon : ModuleRule
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         { 
             TargetType = TargetType.Engine;
-
+            NonUnityBuild = true;
             RelativePath = "Engine.Platform";
 
             PublicIncludePaths.Add("Public");

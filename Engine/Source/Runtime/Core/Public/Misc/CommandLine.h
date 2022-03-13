@@ -132,7 +132,7 @@ private:
 			}
 		};
 
-		for (size_t i = 0; i < args.size(); ++i)
+		for (size_t i = 1; i < args.size(); ++i)
 		{
 			auto sView = StringView_t(args[i]);
 

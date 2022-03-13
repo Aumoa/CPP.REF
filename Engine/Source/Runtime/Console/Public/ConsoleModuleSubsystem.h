@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 
 class CONSOLE_API SConsoleModuleSubsystem : implements SObject
 {

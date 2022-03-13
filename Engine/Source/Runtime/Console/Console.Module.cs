@@ -9,7 +9,7 @@ public class Console : ModuleRule
     public Console()
     {
         TargetType = TargetType.Engine;
-
+        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");
@@ -18,6 +18,7 @@ public class Console : ModuleRule
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
+            "CoreSObject"
         });
     }
 }

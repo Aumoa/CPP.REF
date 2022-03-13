@@ -7,10 +7,11 @@ public class Vulkan : ModuleRule
 {
     public Vulkan()
     {
-        //TargetType = TargetType.ThirdParty;
-        TargetType = TargetType.Engine;
+        TargetType = TargetType.ThirdParty;
+        //TargetType = TargetType.Engine;
         ModuleType = ModuleType.GameModule;
         RelativePath = "ThirdParty";
+        NonUnityBuild = true;
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 #include "Misc/CommandLine.h"
 
 class SConsoleApplication : implements SObject

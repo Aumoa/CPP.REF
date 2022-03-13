@@ -68,6 +68,7 @@ void LogModule::Shutdown()
 		gModule = nullptr;
 		bRunning = false;
 
+		Impl->Cond.notify_all();
 		WorkerThread->Join();
 		LogFile.close();
 

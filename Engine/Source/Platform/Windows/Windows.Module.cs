@@ -12,6 +12,7 @@ public class Windows : ModuleRule
         {
             TargetType = TargetType.Engine;
             ModuleType = ModuleType.Application;
+            NonUnityBuild = true;
 
             RelativePath = "Engine.Platform";
             TargetName = "$(SolutionName)";

@@ -9,7 +9,7 @@ public class Game : ModuleRule
     public Game()
     {
         TargetType = TargetType.Engine;
-
+        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");

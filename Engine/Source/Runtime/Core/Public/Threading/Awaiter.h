@@ -21,7 +21,11 @@ class Awaiter : public IAwaiter
 	bool _freezed = false;
 
 public:
-	Awaiter() = default;
+	Awaiter()
+	{
+		_future = _promise.get_future();
+	}
+
 	Awaiter(const Awaiter&) = delete;
 
 	virtual ETaskStatus GetStatus() const override

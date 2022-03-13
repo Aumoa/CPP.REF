@@ -9,7 +9,7 @@ public class Sockets : ModuleRule
     public Sockets()
     {
         TargetType = TargetType.Engine;
-
+        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");

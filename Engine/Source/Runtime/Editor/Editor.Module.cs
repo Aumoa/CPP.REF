@@ -9,7 +9,7 @@ public class Editor : ModuleRule
     public Editor()
     {
         TargetType = TargetType.Engine;
-
+        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");

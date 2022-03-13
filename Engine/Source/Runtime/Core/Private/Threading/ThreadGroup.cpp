@@ -108,7 +108,7 @@ void ThreadGroup::Run(std::function<void()> body)
 void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()> body)
 {
 	std::unique_lock lock(_lock);
-	_works.emplace(Work{ .Delay = timeout, .Body = body });
+	_works.emplace(Work{ .ExpireTime = clock::now() + timeout, .Body = body });
 	_cv.notify_one();
 }
 
@@ -122,29 +122,37 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 	// Blocking the thread for all times.
 	while (!cancellationToken.stop_requested())
 	{
-		auto elapsed = timer.DoCalc();
+		auto now = clock::now();
 		_suspendToken->Join(mythread);
 
 		std::unique_lock lock(_lock);
-		if (!_works.empty())
+		size_t nonExpired = 0;
+		std::optional<std::chrono::milliseconds> waitFor;
+
+		while (_works.size() > nonExpired)
 		{
 			Work front = std::move(_works.front());
 			_works.pop();
 
-			if (front.Delay <= 0ms)
+			if (front.ExpireTime <= now)
 			{
 				lock.unlock();
 				front.Body();
+				lock.lock();
 			}
 			else
 			{
-				front.Delay -= std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+				auto rem = front.ExpireTime - clock::now() - 1ms;
+				if (!waitFor.has_value() || waitFor.value() > rem)
+				{
+					waitFor = std::chrono::duration_cast<std::chrono::milliseconds>(rem);
+				}
+
 				_works.emplace(std::move(front));
+				nonExpired += 1;
 			}
 		}
-		else
-		{
-			_cv.wait_for(lock, 1ms);
-		}
+
+		_cv.wait_for(lock, waitFor.value_or(1ms));
 	}
 }

@@ -4,6 +4,8 @@
 
 #include "Object.h"
 #include "MouseState.h"
+#include "Numerics/VectorInterface/Vector.h"
+#include "Misc/InputEnums.h"
 
 interface IPlatformMouse : implements SObject
 {

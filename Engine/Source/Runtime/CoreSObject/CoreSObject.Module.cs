@@ -9,7 +9,7 @@ public class CoreSObject : ModuleRule
     public CoreSObject()
     {
         TargetType = TargetType.Engine;
-
+        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");

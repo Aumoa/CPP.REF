@@ -9,10 +9,11 @@ public class DirectX : ModuleRule
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            //TargetType = TargetType.ThirdParty;
-            TargetType = TargetType.Engine;
+            TargetType = TargetType.ThirdParty;
+            //TargetType = TargetType.Engine;
             ModuleType = ModuleType.GameModule;
             RelativePath = "ThirdParty";
+            NonUnityBuild = true;
 
             PublicIncludePaths.Add("Public");
             PrivateIncludePaths.Add("Private");

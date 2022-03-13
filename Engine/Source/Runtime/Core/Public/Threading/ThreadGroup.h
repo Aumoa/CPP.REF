@@ -14,10 +14,11 @@
 class CORE_API ThreadGroup
 {
 	class ThreadGroupSuspendToken;
+	using clock = std::chrono::steady_clock;
 
 	struct Work
 	{
-		std::chrono::milliseconds Delay;
+		clock::time_point ExpireTime;
 		std::function<void()> Body;
 	};
 

@@ -47,7 +47,8 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 
 int32 GuardedMain(std::span<std::wstring> Argv)
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	// std::chrono::zoned_time is causes memory leak logs.
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 #if !DO_CHECK
 	__try
