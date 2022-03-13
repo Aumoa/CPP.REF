@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Net/IPAddress.h"
+#include "Misc/String.h"
 #include <exception>
 
 #if PLATFORM_WINDOWS
@@ -74,7 +75,7 @@ bool IPAddress::TryParse(std::wstring_view IPString, IPAddress* RefAddress)
 	}
 	else
 	{
-		std::vector<std::wstring> Bytes = StringUtils::Split(IPString, L".", true, true);
+		std::vector<std::wstring> Bytes = String::Split(IPString, L".", true, true);
 		if (Bytes.size() != 4)
 		{
 			*RefAddress = Any();
@@ -111,7 +112,7 @@ bool IPAddress::TryParse(std::wstring_view IPString, IPAddress* RefAddress)
 
 bool IPAddress::TryParseHostname(std::wstring_view Hostname, std::vector<IPAddress>* RefAddresses)
 {
-	std::string AHostname = WCHAR_TO_ANSI(Hostname);
+	std::string AHostname = String::AsMultibyte(Hostname);
 	struct hostent* Entry = gethostbyname(AHostname.c_str());
 
 	if (Entry->h_addr_list == nullptr)

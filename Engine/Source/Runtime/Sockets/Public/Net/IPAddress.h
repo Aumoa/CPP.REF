@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
 
 struct SOCKETS_API IPAddress
 {

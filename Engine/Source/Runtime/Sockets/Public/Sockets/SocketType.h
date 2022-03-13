@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-SENUM(ESocketType, int32,
+enum class ESocketType
+{
 	Stream,
-);
+};

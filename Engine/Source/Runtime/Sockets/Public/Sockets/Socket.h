@@ -2,31 +2,41 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
 #include "SocketType.h"
 #include "Net/AddressFamily.h"
 #include "Net/ProtocolType.h"
+#include "Threading/Task.h"
 #include <functional>
 
 struct IPEndPoint;
 
-class SOCKETS_API SSocket : implements SObject
+class SOCKETS_API Socket
 {
-	GENERATED_BODY(SSocket)
-
 private:
 	struct SocketImpl;
-	std::unique_ptr<SocketImpl> Impl;
-	bool bClosed = false;
+	std::shared_ptr<SocketImpl> Impl;
 
 public:
-	SSocket(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType);
-	virtual ~SSocket() noexcept override;
+	Socket() = default;
+	Socket(const Socket&) = default;
+	Socket(Socket&&) = default;
 
+	Socket(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType);
+	virtual ~Socket() noexcept;
+
+	bool IsValid() const;
 	Task<> Connect(const IPEndPoint& EndPoint);
 	Task<> Send(const void* Buf, size_t Size);
 	Task<size_t> Recv(void* OutBuf, size_t RecvSize, bool bVerifiedLength = false);
+	void Bind(const IPEndPoint& endpoint);
 	void Close();
+
+	Socket& operator =(const Socket&) = default;
+	Socket& operator =(Socket&&) = default;
+
+	auto operator <=>(const Socket& InSock) const { return Impl <=> InSock.Impl; }
+	bool operator ==(const Socket& InSock) const { return Impl == InSock.Impl; }
 
 public:
 	template<class TRandomAccess>
@@ -52,7 +62,7 @@ public:
 	}
 
 public:
-	static SSocket* NewTCPSocket();
+	static Socket NewTCPSocket();
 
 public:
 	bool IsReadyToRead(std::chrono::microseconds Timeout = std::chrono::microseconds(0));

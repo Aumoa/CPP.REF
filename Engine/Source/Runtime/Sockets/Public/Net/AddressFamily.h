@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-SENUM(EAddressFamily, int32,
+enum class EAddressFamily
+{
 	InterNetwork,
-);
+};

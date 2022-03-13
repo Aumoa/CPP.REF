@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Net/IPEndPoint.h"
+#include "Misc/String.h"
 
 #if PLATFORM_WINDOWS
 
@@ -53,7 +54,7 @@ bool IPEndPoint::TryParse(std::wstring_view IPString, IPEndPoint* RefEndPoint)
 {
 	if (IPString.find(L':') != std::wstring::npos)
 	{
-		std::vector<std::wstring> Splits = StringUtils::Split(IPString, L":", true, true);
+		std::vector<std::wstring> Splits = String::Split(IPString, L":", true, true);
 		if (!IPAddress::TryParse(Splits[0], &RefEndPoint->IP))
 		{
 			return false;

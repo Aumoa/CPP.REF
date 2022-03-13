@@ -6,7 +6,7 @@
 #include <WinSock2.h>
 #undef Yield
 
-struct SSocket::SocketImpl
+struct Socket::SocketImpl
 {
 	inline static volatile bool bStaticInit = false;
 	inline static std::atomic<size_t> ReferenceCount;
@@ -16,6 +16,7 @@ struct SSocket::SocketImpl
 	SOCKET Socket = 0;
 	HANDLE hSockSendEvent = nullptr;
 	HANDLE hSockRecvEvent = nullptr;
+	bool bClosed = false;
 
 public:
 	SocketImpl(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType)
@@ -31,7 +32,7 @@ public:
 				int32 Result = WSAStartup(MAKEWORD(2, 2), &WSAData);
 				if (Result)
 				{
-					throw gcnew SSocketException(std::format(L"Couldn't initialize WinSock2 with error code: {}", Result));
+					throw socket_exception(std::format("Couldn't initialize WinSock2 with error code: {}", Result));
 				}
 
 				bStaticInit = true;
@@ -170,6 +171,16 @@ public:
 		co_return TotalSize;
 	}
 
+	void Bind(const IPEndPoint& EndPoint)
+	{
+		SOCKADDR_IN sAddr = GetSOCKADDR_IN(EndPoint);
+		int code = bind(Socket, (const sockaddr*)&sAddr, sizeof(sAddr));
+		if (code == SOCKET_ERROR)
+		{
+			AbortWithError(WSAGetLastError(), L"Bind");
+		}
+	}
+
 private:
 	Task<int32> WaitSocketEvent(HANDLE& hSockEvent, int32 ConnectBit, std::wstring_view Op)
 	{
@@ -228,7 +239,7 @@ private:
 			Wstr = nullptr;
 		}
 
-		throw gcnew SSocketException(std::format(L"{} operation return error code: {}, message: {}", Operation, PlatformErrorCode, Message));
+		throw socket_exception(std::format(L"{} operation return error code: {}, message: {}", Operation, PlatformErrorCode, Message));
 	}
 
 	inline SOCKADDR_IN GetSOCKADDR_IN(const IPEndPoint& EndPoint)

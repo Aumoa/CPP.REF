@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "IPAddress.h"
 
 struct SOCKETS_API IPEndPoint

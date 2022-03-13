@@ -107,7 +107,7 @@ namespace libty::Threading::Tasks::Impl
 		template<class U>
 		void return_value(U&& value) requires requires
 		{
-			{ std::declval<Awaiter<T>>().SetResult(std::forward<U>()) };
+			{ std::declval<Awaiter<T>>().SetResult(std::declval<U>()) };
 		}
 		{
 			this->_awaiter->SetResult(std::forward<U>(value));
@@ -298,7 +298,6 @@ public:
 		return Task<U>(std::move(awaiter));
 	}
 
-	template<class TBody>
 	static auto Yield()
 	{
 		return Run([] {});

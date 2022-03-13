@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-SENUM(EProtocolType, int32,
+enum class EProtocolType
+{
 	TCP,
-);
+};
