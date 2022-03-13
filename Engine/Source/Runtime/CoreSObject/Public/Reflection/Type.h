@@ -7,13 +7,14 @@
 #include <unordered_map>
 #include <mutex>
 #include <map>
+#include <span>
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
 #include "Method.h"
 #include "Property.h"
 #include "ObjectBase.h"
 #include "GC/GC.h"
-#include "Misc/StringUtils.h"
+#include "Misc/String.h"
 #include "Reflection/ReflectionMacros.h"
 
 class SObject;
@@ -222,7 +223,7 @@ public:
 		TypeGenerator(std::wstring_view InFriendlyName) requires
 			requires { TType::StaticClass(); }
 			: FriendlyName(InFriendlyName)
-			, FullName(ANSI_TO_WCHAR(typeid(TType).name()))
+			, FullName(String::AsUnicode(typeid(TType).name()))
 			, bNative(true)
 			, bGCCollection(true)
 		{
@@ -279,7 +280,7 @@ public:
 				{ std::begin(Collection) };
 				{ std::end(Collection) };
 			}
-			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			: FriendlyName(String::AsUnicode(typeid(TType).name()))
 			, FullName(FriendlyName)
 			, bNative(true)
 			, bGCCollection(true)
@@ -306,7 +307,7 @@ public:
 		}
 
 		TypeGenerator()
-			: FriendlyName(ANSI_TO_WCHAR(typeid(TType).name()))
+			: FriendlyName(String::AsUnicode(typeid(TType).name()))
 			, bNative(true)
 		{
 		}

@@ -6,7 +6,19 @@
 #include "CoreConcepts.h"
 #include <any>
 #include <sstream>
-#include "Misc/StringUtils.h"
+#include "Misc/String.h"
+
+template<size_t _Depth>
+struct InheritSelector : public InheritSelector<_Depth - 1>
+{
+	constexpr static size_t Depth = _Depth;
+};
+
+template<>
+struct InheritSelector<0>
+{
+	constexpr static size_t Depth = 0;
+};
 
 class SValueType : implements SObject
 {
@@ -48,19 +60,19 @@ public:
 	template<class T>
 	inline static std::wstring Internal_ToString(const T& value, InheritSelector<0>&&)
 	{
-		return ANSI_TO_WCHAR(typeid(T).name());
+		return String::AsUnicode(typeid(T).name());
 	}
 
 	template<std::convertible_to<std::string> T>
 	inline static std::wstring Internal_ToString(const T& value, InheritSelector<1>&&)
 	{
-		return ANSI_TO_WCHAR((std::string)value);
+		return String::AsUnicode((std::string)value);
 	}
 
 	template<class T>
 	inline static std::wstring Internal_ToString(const T& value, InheritSelector<2>&&) requires requires { std::to_string(value); }
 	{
-		return ANSI_TO_WCHAR(std::to_string(value));
+		return String::AsUnicode(std::to_string(value));
 	}
 
 	template<class T>
@@ -68,7 +80,7 @@ public:
 	{
 		std::ostringstream os;
 		os << value;
-		return ANSI_TO_WCHAR(os.str());
+		return String::AsUnicode(os.str());
 	}
 
 	template<std::convertible_to<std::wstring> T>

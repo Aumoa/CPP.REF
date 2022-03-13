@@ -3,11 +3,12 @@
 #pragma once
 
 #include "Delegates/MulticastEvent.h"
+#include "LogVerbosity.h"
 #include <exception>
 #include <string>
 #include <string_view>
 #include <format>
-#include "LogVerbosity.h"
+#include <source_location>
 
 class LogCategory;
 
@@ -17,18 +18,17 @@ class LogCategory;
 class CORESOBJECT_API LogSystem
 {
 	using This = LogSystem;
-	class SFatalException;
 
 public:
 	template<class... TArgs>
-	static void Log(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
+	static void Log(const std::source_location& Location, LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
 	{
 		std::wstring Message = std::format(Format, std::forward<TArgs>(Args)...);
-		InternalLog(Category, LogVerbosity, Message);
+		InternalLog(Category, LogVerbosity, Message, Location);
 	}
 
 private:
-	static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message);
+	static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message, const std::source_location& Location = std::source_location::current());
 };
 
-#define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(Category, ELogVerbosity::Verbosity, Format __VA_OPT__(,) __VA_ARGS__)
+#define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(std::source_location::current(), Category, ELogVerbosity::Verbosity, Format __VA_OPT__(,) __VA_ARGS__)

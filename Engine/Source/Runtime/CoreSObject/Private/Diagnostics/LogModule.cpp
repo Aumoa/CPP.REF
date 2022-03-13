@@ -2,7 +2,7 @@
 
 #include "Diagnostics/LogModule.h"
 #include "Misc/DateTime.h"
-#include "Misc/StringUtils.h"
+#include "Misc/String.h"
 #include "Threading/Thread.h"
 #include <filesystem>
 #include <chrono>
@@ -44,8 +44,8 @@ void LogModule::RunTask()
 	}
 	else if (exists(Directory / LogPath))
 	{
-		auto BackupTime = DateTime<>::Now().ToString();
-		path BackupPath = StringUtils::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
+		auto BackupTime = DateTime::Now().ToString<libty::DateTimeFormat::File>();
+		path BackupPath = String::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
 		rename(Directory / LogPath, Directory / BackupPath);
 	}
 
@@ -121,7 +121,7 @@ void LogModule::Worker()
 		{
 			for (auto& Message : Impl->Buffers)
 			{
-				LogFile << WCHAR_TO_ANSI(Message) << std::endl;
+				LogFile << String::AsMultibyte(Message) << std::endl;
 			}
 			LogFile.flush();
 		}

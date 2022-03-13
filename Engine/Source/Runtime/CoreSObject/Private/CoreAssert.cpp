@@ -4,15 +4,16 @@
 #include "LogCore.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
+#include "Diagnostics/LogCategory.h"
 
-void CoreAssert::Assert(std::wstring_view msg, std::wstring_view file, int32 line)
+void CoreAssert::Assert(std::wstring_view msg, const std::source_location& location)
 {
-	LogSystem::Log(LogAssert, ELogVerbosity::Fatal, L"Assertion failed: {}({})\n{}", file, line, msg);
+	LogSystem::Log(location, LogAssert, ELogVerbosity::Fatal, L"Assertion failed: {}", msg);
 }
 
-void CoreAssert::Ensure(std::wstring_view msg, std::wstring_view file, int32 line)
+void CoreAssert::Ensure(std::wstring_view msg, const std::source_location& location)
 {
-	LogSystem::Log(LogAssert, ELogVerbosity::Error, L"Ensure failed: {}({})\n{}", file, line, msg);
+	LogSystem::Log(location, LogAssert, ELogVerbosity::Error, L"Ensure failed: {}", msg);
 }
 
 void CoreAssert::DebugBreak()

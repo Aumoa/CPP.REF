@@ -14,9 +14,46 @@
 class SObject;
 class GarbageCollector;
 class Thread;
-class SuspendToken;
 
 CORESOBJECT_API extern GarbageCollector& GC;
+
+template<class T>
+concept IsGCClass = requires
+{
+	{ std::remove_reference_t<std::remove_pointer_t<T>>::StaticClass() };
+};
+
+template<class TTupleClass>
+struct NumGCTypes
+{
+	static constexpr size_t Value = 0;
+};
+
+template<template<class...> class TTupleClass, class TTupleType, class... TTupleTypes>
+class NumGCTypes<TTupleClass<TTupleType, TTupleTypes...>>
+{
+	static consteval size_t GetImpl()
+	{
+		constexpr bool Test = IsGCClass<TTupleType>;
+		if constexpr (sizeof...(TTupleTypes) == 0)
+		{
+			return Test ? 1 : 0;
+		}
+		else
+		{
+			return (Test ? 1 : 0) + NumGCTypes<TTupleClass<TTupleTypes...>>::GetImpl();
+		}
+	}
+
+public:
+	static constexpr size_t Value = GetImpl();
+};
+
+template<class T>
+concept IsMutableCollection = requires (T & Collection)
+{
+	{ *Collection.begin() = {} };
+};
 
 class CORESOBJECT_API GarbageCollector
 {
@@ -49,7 +86,6 @@ private:
 private:
 	// lock-free buffers.
 	static constexpr size_t NumGCThreads = 16;
-	std::vector<std::future<void>> GCThreadFutures;
 	std::vector<int32> GCMarkingBuffer;
 	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers = { };
 
@@ -82,14 +118,6 @@ public:
 
 	void SetFlushInterval(float InSeconds);
 	float GetFlushInterval();
-
-private:
-	std::mutex SuspendTokenMtx;
-	std::set<SuspendToken*> SuspendTokens;
-
-public:
-	void AddSuspendToken(SuspendToken* Token);
-	void RemoveSuspendToken(SuspendToken* Token);
 
 public:
 	static GarbageCollector& Get();

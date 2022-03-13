@@ -18,7 +18,6 @@ public:
 	LogCategory(std::wstring_view CategoryName);
 
 	std::wstring_view GetName() const;
-	static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
 
 protected:
 	virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message);

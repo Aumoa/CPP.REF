@@ -19,26 +19,13 @@ std::wstring_view LogCategory::GetName() const
 	return CategoryName;
 }
 
-std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
-{
-	switch (verbosity)
-	{
-	case ELogVerbosity::Fatal: return L"Fatal";
-	case ELogVerbosity::Error: return L"Error";
-	case ELogVerbosity::Warning: return L"Warning";
-	case ELogVerbosity::Info: return L"Info";
-	case ELogVerbosity::Verbose: return L"Verbose";
-	default: return L"";
-	}
-}
-
 void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 {
 	using namespace std;
 	using namespace std::chrono;
 
-	wstring Composed = format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring DetailComposed = format(L"{}: {}: {}", DateTime<>::Now().ToString(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
+	wstring Composed = format(L"{}: {}: {}", CategoryName, Verbosity.ToString(), Message);
+	wstring DetailComposed = format(L"{}: {}: {}", DateTime::Now().ToString<libty::DateTimeFormat::File>(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
 
 	// Log to Visual Studio Output Console.
 	OutputDebugStringW((DetailComposed + L"\n").c_str());

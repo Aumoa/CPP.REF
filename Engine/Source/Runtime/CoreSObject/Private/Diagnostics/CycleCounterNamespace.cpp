@@ -3,7 +3,7 @@
 #include "Diagnostics/CycleCounterNamespace.h"
 #include "Diagnostics/CycleCounter.h"
 #include "Diagnostics/CycleCounterUnit.h"
-#include "Misc/StringUtils.h"
+#include "Misc/String.h"
 
 CycleCounterNamespace::CycleCounterNamespace(std::wstring_view Name, std::wstring_view GroupName)
 	: Name(Name)
@@ -39,5 +39,5 @@ std::wstring CycleCounterNamespace::Trace()
 		Traces.emplace_back(std::format(L"  {:<30}: {:.4f} ms", Unit->GetName(), Unit->GetAverageTime() * 1000.0f));
 	}
 
-	return StringUtils::Join(L"\n", Traces);
+	return String::Join(L"\n", Traces);
 }

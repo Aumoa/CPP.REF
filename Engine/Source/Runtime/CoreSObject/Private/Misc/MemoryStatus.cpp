@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "PlatformMisc/MemoryStatus.h"
+#include "Misc/MemoryStatus.h"
 #include "CoreAssert.h"
 
 MemoryStatus::MemoryStatus(

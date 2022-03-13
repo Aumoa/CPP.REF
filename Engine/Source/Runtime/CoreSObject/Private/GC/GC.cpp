@@ -2,11 +2,12 @@
 
 #include "GC/GC.h"
 #include "Threading/Parallel.h"
-#include "PlatformMisc/MemoryStatus.h"
+#include "Misc/MemoryStatus.h"
 #include "Diagnostics/CycleCounterNamespace.h"
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Diagnostics/CycleCounterMacros.h"
-#include "Threading/SuspendToken.h"
+#include "Threading/SuspendTokenCollection.h"
+#include "Threading/ISuspendToken.h"
 #include "LogCore.h"
 #include "Object.h"
 #include <string>
@@ -90,6 +91,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_SuspendToken);
 		std::vector<std::future<void>> SuspendReady;
+		auto& SuspendTokens = SuspendTokenCollection::Collection();
 		SuspendReady.reserve(SuspendTokens.size());
 
 		for (auto& Token : SuspendTokens)
@@ -120,13 +122,12 @@ void GarbageCollector::Collect(bool bFullPurge)
 			{
 				GCMarkingBuffer[Root->InternalIndex] = 1;
 			}
-			GCThreadFutures.resize(NumGCThreads);
 
 			std::atomic<int32> NumObjects = (int32)Roots.size();
 			for (int32 Depth = 1; NumObjects != 0; ++Depth)
 			{
 				NumObjects = 0;
-				Parallel::ForEach(GCThreadFutures, FullCollectionSize, [&](size_t ThreadIdx, size_t Start, size_t End)
+				Parallel::ForEach(FullCollectionSize, [&](size_t ThreadIdx, size_t Start, size_t End)
 				{
 					int32 Count = 0;
 
@@ -149,6 +150,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 		{
 			SCOPE_CYCLE_COUNTER(STAT_ResumeToken);
+			auto& SuspendTokens = SuspendTokenCollection::Collection();
 			for (auto& Token : SuspendTokens)
 			{
 				Token->Resume();
@@ -297,20 +299,6 @@ void GarbageCollector::SetFlushInterval(float InSeconds)
 float GarbageCollector::GetFlushInterval()
 {
 	return FlushInterval;
-}
-
-void GarbageCollector::AddSuspendToken(SuspendToken* Token)
-{
-	SuspendTokenMtx.lock();
-	SuspendTokens.emplace(Token);
-	SuspendTokenMtx.unlock();
-}
-
-void GarbageCollector::RemoveSuspendToken(SuspendToken* Token)
-{
-	SuspendTokenMtx.lock();
-	SuspendTokens.erase(Token);
-	SuspendTokenMtx.unlock();
 }
 
 GarbageCollector& GarbageCollector::Get()

@@ -3,27 +3,34 @@
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
-#include "Misc/StringUtils.h"
-#include "Exceptions/Exception.h"
+#include "Misc/String.h"
 
-class LogSystem::SFatalException : public SException
+class fatal_exception : public std::exception
 {
-	GENERATED_BODY(SFatalException)
+	std::string _message;
+	std::source_location _location;
+	std::string _what;
 
 public:
-	SFatalException(std::wstring_view Message) : Super(Message)
+	fatal_exception(std::wstring_view message, const std::source_location& location = std::source_location::current())
+		: _message(String::AsMultibyte(message))
+		, _location(location)
 	{
+		_what = std::format("{}\n  at {} in {}:{}", _message, _location.function_name(), _location.file_name(), _location.line());
+	}
+
+	virtual const char* what() const noexcept override
+	{
+		return _what.c_str();
 	}
 };
 
-GENERATE_BODY(LogSystem::SFatalException);
-
-void LogSystem::InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message)
+void LogSystem::InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message, const std::source_location& Location)
 {
 	Category.OnLog(LogVerbosity, Message);
 
 	if (LogVerbosity == ELogVerbosity::Fatal)
 	{
-		throw gcnew SFatalException(Message);
+		throw fatal_exception(Message, Location);
 	}
 }

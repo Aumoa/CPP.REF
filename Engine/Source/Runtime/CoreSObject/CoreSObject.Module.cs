@@ -34,6 +34,9 @@ public class CoreSObject : ModuleRule
         }
 
         PrivatePreprocessorDefines.Add("NOMINMAX");
-        PublicDependencyModuleNames.Add("Boost.Asio");
+        PublicDependencyModuleNames.AddRange(new[]
+        {
+            "Core"
+        });
     }
 }
