@@ -9,15 +9,15 @@ public class CoreNumerics : ModuleRule
     public CoreNumerics()
     {
         TargetType = TargetType.Engine;
-
         RelativePath = "Engine.Runtime";
+        NonUnityBuild = true;
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
 
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "CoreSObject"
+            "Core"
         });
     }
 }

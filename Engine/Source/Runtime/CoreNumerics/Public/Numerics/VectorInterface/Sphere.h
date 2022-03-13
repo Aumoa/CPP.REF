@@ -82,7 +82,7 @@ struct Sphere<0>
 	template<TIsVectorTyped<float> IVector>
 	static std::wstring ToString(const IVector& S, std::wstring_view FormatArgs = L"")
 	{
-		std::wstring PH = StringUtils::GetPlaceholder(FormatArgs);
+		std::wstring PH = String::GetPlaceholder(FormatArgs);
 		auto Center = Vector<>::Minor(S, S.Size() - 1);
 		auto Radius = S[S.Size() - 1];
 		return std::format(L"Center: {}, Radius: {}", Vector<>::ToString(Center, FormatArgs), std::format(PH, Radius));

@@ -356,7 +356,7 @@ struct Matrix<void, 0, 0>
 			Composed[i] = M[i].ToString(FormatArgs);
 		}
 
-		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(Composed)));
+		return std::format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
 	}
 
 	template<TIsMatrixBase IMatrix>

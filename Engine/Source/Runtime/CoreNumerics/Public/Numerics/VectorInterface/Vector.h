@@ -6,10 +6,11 @@
 #include "CoreConcepts.h"
 #include "Numerics/NumericConcepts.h"
 #include "Mathematics/MathEx.h"
-#include "Misc/StringUtils.h"
+#include "Misc/String.h"
 #include <string_view>
 #include <string>
 #include <array>
+#include <span>
 
 template<class T = void, size_t N = 0>
 struct Vector : public VectorScalarsImpl<T, N>
@@ -259,7 +260,7 @@ struct Vector<void, 0>
 	static inline std::wstring ToString(const IVector& V, std::wstring_view FormatArgs = L"")
 	{
 		constexpr size_t N = IVector::Size();
-		std::wstring Placeholder = StringUtils::GetPlaceholder(FormatArgs);
+		std::wstring Placeholder = String::GetPlaceholder(FormatArgs);
 
 		std::array<std::wstring, N> Composed;
 		for (size_t i = 0; i < N; ++i)
@@ -267,7 +268,7 @@ struct Vector<void, 0>
 			Composed[i] = std::format(Placeholder, V[i]);
 		}
 
-		return std::format(L"{{{}}}", StringUtils::Join(L", ", std::span<std::wstring const>(Composed)));
+		return std::format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
 	}
 
 	template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
@@ -691,7 +692,7 @@ constexpr bool Vector<T, N>::NearlyEquals(const IVector& V, const T& Epsilon) co
 
 // Supports for Casts.h
 template<class TTo, class TFrom>
-inline auto Cast(const TFrom& From) requires requires
+inline auto Cast(TFrom&& From) requires requires
 {
 	{ Vector<>::Cast<TTo>(std::declval<TFrom>()) };
 }

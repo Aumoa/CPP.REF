@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <string>
 #include "Radians.h"
-#include "Misc/StringUtils.h"
+#include "Misc/String.h"
 #include "MathEx.h"
 
 /// <summary>
@@ -36,7 +35,7 @@ struct Degrees
 	/// <returns> The simple string value. </returns>
 	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		std::wstring placeholder = StringUtils::GetPlaceholder(formatArgs) + L"¡Æ";
+		std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"¡Æ";
 		return std::format(placeholder, Value);
 	}
 

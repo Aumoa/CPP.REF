@@ -96,7 +96,7 @@ public:
 public:
 	std::wstring ToString(std::wstring_view FormatArgs = L"") const
 	{
-		std::wstring placeholder = StringUtils::GetPlaceholder(FormatArgs);
+		std::wstring placeholder = String::GetPlaceholder(FormatArgs);
 		return std::format(L"Normal: {}, Distance: {}", Vector<>::ToString(Normal, FormatArgs), std::format(placeholder, Distance));
 	}
 
