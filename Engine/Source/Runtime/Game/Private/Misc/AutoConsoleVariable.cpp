@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/AutoConsoleVariable.h"
-#include <boost/algorithm/string.hpp>
 
 DEFINE_LOG_CATEGORY(LogConsoleVar);
 
@@ -15,7 +14,7 @@ namespace Details
 		StaticVars = &StaticVars_Impl;
 
 		Name = std::wstring(Key);
-		std::wstring Key_v = boost::algorithm::to_lower_copy(Name);
+		std::wstring Key_v = String::ToLower(Name);
 
 		auto [It, bResult] = StaticVars_Impl.emplace(Key_v, this);
 		checkf(bResult, L"Duplicated AutoConsoleVariable detected. Key: '{}'", Key);
@@ -28,8 +27,7 @@ namespace Details
 
 	bool AutoConsoleVariableBase::TryProcessConsoleVar(std::wstring_view Key, std::wstring_view Arguments)
 	{
-		std::wstring Key_v = std::wstring(Key);
-		boost::algorithm::to_lower(Key_v);
+		std::wstring Key_v = String::ToLower(std::wstring(Key));
 
 		auto It = StaticVars->find(Key_v);
 		if (It == StaticVars->end())

@@ -119,6 +119,7 @@ public:
 		{
 			_status = ETaskStatus::Faulted;
 			_promise.set_exception(ptr);
+			_exception = ptr;
 
 			lock.unlock();
 			InvokeThens();

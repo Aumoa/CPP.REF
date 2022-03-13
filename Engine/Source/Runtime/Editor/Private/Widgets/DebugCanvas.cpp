@@ -5,7 +5,6 @@
 #include "Widgets/Panel/VerticalBoxPanel.h"
 #include "Misc/TickScheduler.h"
 #include "Diagnostics/CycleCounter.h"
-#include <boost/algorithm/string.hpp>
 
 GENERATE_BODY(SDebugCanvas);
 DEFINE_LOG_CATEGORY(LogDebugCanvas);
