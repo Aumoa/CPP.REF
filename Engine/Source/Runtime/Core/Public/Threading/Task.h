@@ -125,9 +125,6 @@ namespace libty::Threading::Tasks::Impl
 			this->_awaiter->SetResult();
 		}
 	};
-
-	void CORE_API Run(std::function<void()> body);
-	void CORE_API Delay(std::chrono::milliseconds delay, std::function<void()> body);
 }
 
 template<class T = void>
@@ -226,6 +223,14 @@ public:
 		return Task<U>(std::dynamic_pointer_cast<Awaiter<U>>(_awaiter));
 	}
 
+	template<class U>
+	operator Task<U>() const requires
+		std::same_as<U, void> &&
+		(!std::same_as<T, void>)
+	{
+		return Task<U>(_awaiter);
+	}
+
 	constexpr auto operator <=>(const Task&) const = default;
 	constexpr bool operator ==(const Task&) const = default;
 
@@ -240,92 +245,150 @@ private:
 
 public:
 	template<class TBody>
-	auto Then(TBody&& body) -> Task<FunctionReturn_t<TBody, Task>>
+	auto Then(TBody&& body, const std::source_location& source = std::source_location::current()) -> Task<FunctionReturn_t<TBody, Task>>
 	{
 		using U = FunctionReturn_t<TBody, Task>;
 
 		ThrowInvalid();
 		std::shared_ptr uAwaiter = std::make_shared<Awaiter<U>>();
 
-		_awaiter->Then([body = std::forward<TBody>(body), uAwaiter](Task<> result) mutable
+		_awaiter->Then([body = std::forward<TBody>(body), uAwaiter, source = source](Task<> result) mutable
 		{
 			if constexpr (std::same_as<U, void>)
 			{
 				body((Task<T>)result);
-				uAwaiter->SetResult();
+				uAwaiter->SetResult(source);
 			}
 			else
 			{
 				auto r = body((Task<T>)result);
-				uAwaiter->SetResult(std::move(r));
+				uAwaiter->SetResult(std::move(r), source);
 			}
 		});
 
 		return Task<U>(std::move(uAwaiter));
 	}
 
+private:
+	static void RunImpl(std::function<void()> body)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
+	}
+
+	static void DelayImpl(std::chrono::milliseconds delay, std::function<void()> body)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
+	}
+
 public:
 	template<class TBody>
-	static auto Run(TBody&& body) -> Task<FunctionReturn_t<TBody>>
+	static auto Run(TBody&& body, const std::source_location& source = std::source_location::current()) -> Task<FunctionReturn_t<TBody>>
 	{
-		using U = FunctionReturn_t<TBody>;
-		std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
-		awaiter->WaitingToRun();
-
-		libty::Threading::Tasks::Impl::Run([awaiter, body = std::forward<TBody>(body)]() mutable
-		{
-			awaiter->Running();
-
-			try
-			{
-				if constexpr (std::same_as<U, void>)
-				{
-					body();
-					awaiter->SetResult();
-				}
-				else
-				{
-					U result = body();
-					awaiter->SetResult(result);
-				}
-			}
-			catch (...)
-			{
-				awaiter->SetException(std::current_exception());
-			}
-		});
-
-		return Task<U>(std::move(awaiter));
+		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
 	}
 
-	static auto Yield()
+	static auto Yield(const std::source_location& source = std::source_location::current())
 	{
-		return Run([] {});
+		static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
 	}
 
-	static Task<> Delay(std::chrono::milliseconds delay)
+	static Task<> Delay(std::chrono::milliseconds delay, const std::source_location& source = std::source_location::current())
 	{
-		std::shared_ptr awaiter = std::make_shared<Awaiter<void>>();
-		awaiter->WaitingToRun();
-
-		libty::Threading::Tasks::Impl::Delay(delay, [awaiter]() mutable
-		{
-			awaiter->Running();
-			awaiter->SetResult();
-		});
-
-		return Task<>(std::move(awaiter));
+		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 	}
 
 	static Task<> CompletedTask()
 	{
-		static thread_local std::shared_ptr awaiter = []
-		{
-			auto ptr = std::make_shared<Awaiter<void>>();
-			ptr->Freeze();
-			return ptr;
-		};
+		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask instead.");
+	}
 
-		return Task<>(awaiter);
+	template<class U> requires (!std::same_as<U, void>)
+	static Task<> CompletedTask(U value, const std::source_location& source = std::source_location::current())
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask<U> instead.");
 	}
 };
+
+template<>
+void CORE_API Task<>::RunImpl(std::function<void()> body);
+
+template<>
+void CORE_API Task<>::DelayImpl(std::chrono::milliseconds delay, std::function<void()> body);
+
+template<>
+template<class TBody>
+auto Task<>::Run(TBody&& body, const std::source_location& source) -> Task<FunctionReturn_t<TBody>>
+{
+	using U = FunctionReturn_t<TBody>;
+	std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
+	awaiter->WaitingToRun();
+
+	RunImpl([awaiter, body = std::forward<TBody>(body), source = source]() mutable
+	{
+		awaiter->Running();
+
+		try
+		{
+			if constexpr (std::same_as<U, void>)
+			{
+				body();
+				awaiter->SetResult((const std::source_location&)source);
+			}
+			else
+			{
+				U result = body();
+				awaiter->SetResult(result, source);
+			}
+		}
+		catch (...)
+		{
+			awaiter->SetException(std::current_exception(), source);
+		}
+	});
+
+	return Task<U>(std::move(awaiter));
+}
+
+template<>
+auto Task<>::Yield(const std::source_location& source)
+{
+	return Run([] {}, source);
+}
+
+template<>
+Task<> Task<>::Delay(std::chrono::milliseconds delay, const std::source_location& source)
+{
+	std::shared_ptr awaiter = std::make_shared<Awaiter<void>>();
+	awaiter->WaitingToRun();
+
+	DelayImpl(delay, [awaiter, source = source]() mutable
+	{
+		awaiter->Running();
+		awaiter->SetResult((const std::source_location&)source);
+	});
+
+	return Task<>(std::move(awaiter));
+}
+
+template<>
+Task<> Task<>::CompletedTask()
+{
+	static thread_local std::shared_ptr awaiter = []
+	{
+		auto ptr = std::make_shared<Awaiter<void>>();
+		ptr->SetResult();
+		ptr->Freeze();
+		return ptr;
+	}();
+
+	return Task<>(awaiter);
+}
+
+template<>
+template<class U> requires (!std::same_as<U, void>)
+Task<> Task<>::CompletedTask(U value, const std::source_location& source)
+{
+	auto ptr = std::make_shared<Awaiter<U>>();
+	ptr->SetResult(std::move(value), source);
+	return ptr;
+}

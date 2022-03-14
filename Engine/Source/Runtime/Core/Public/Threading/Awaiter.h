@@ -19,6 +19,7 @@ class Awaiter : public IAwaiter
 	std::queue<std::function<void(Task<void>)>> _thens;
 	std::exception_ptr _exception;
 	bool _freezed = false;
+	std::source_location _source;
 
 public:
 	Awaiter()
@@ -86,7 +87,7 @@ public:
 		}
 	}
 
-	virtual void Cancel() override
+	virtual void Cancel(const std::source_location& source = std::source_location::current()) override
 	{
 		auto lock = std::unique_lock(_lock);
 		if (_freezed)
@@ -98,6 +99,7 @@ public:
 			_status = ETaskStatus::Canceled;
 			_exception = std::make_exception_ptr(task_canceled());
 			_promise.set_exception(_exception);
+			_source = source;
 
 			lock.unlock();
 			InvokeThens();
@@ -108,7 +110,7 @@ public:
 		}
 	}
 
-	virtual void SetException(std::exception_ptr ptr) override
+	virtual void SetException(std::exception_ptr ptr, const std::source_location& source = std::source_location::current()) override
 	{
 		auto lock = std::unique_lock(_lock);
 		if (_freezed)
@@ -120,6 +122,7 @@ public:
 			_status = ETaskStatus::Faulted;
 			_promise.set_exception(ptr);
 			_exception = ptr;
+			_source = source;
 
 			lock.unlock();
 			InvokeThens();
@@ -136,26 +139,25 @@ public:
 		return _exception;
 	}
 
-	template<class... U>
-	void SetResult(U&&... result)
+	void SetResult(const std::source_location& source = std::source_location::current())
 	{
-		auto lock = std::unique_lock(_lock);
-		if (_freezed)
-		{
-			throw invalid_operation("Task is freezed.");
-		}
-		if (!IsCompleted())
-		{
-			_status = ETaskStatus::RanToCompletion;
-			_promise.set_value(std::forward<U>(result)...);
+		SetResultImpl(source);
+	}
 
-			lock.unlock();
-			InvokeThens();
-		}
-		else
-		{
-			throw invalid_operation("Task already completed.");
-		}
+	template<class U>
+	void SetResult(U&& result, const std::source_location& source = std::source_location::current())
+	{
+		SetResultImpl(source, std::forward<U>(result));
+	}
+
+	T GetResult() const
+	{
+		return _future.get();
+	}
+
+	std::source_location GetSourceCode() const
+	{
+		return _source;
 	}
 
 	void Freeze()
@@ -170,6 +172,29 @@ public:
 	}
 
 private:
+	template<class... U>
+	void SetResultImpl(const std::source_location& source, U&&... result)
+	{
+		auto lock = std::unique_lock(_lock);
+		if (_freezed)
+		{
+			throw invalid_operation("Task is freezed.");
+		}
+		if (!IsCompleted())
+		{
+			_status = ETaskStatus::RanToCompletion;
+			_promise.set_value(std::forward<U>(result)...);
+			_source = source;
+
+			lock.unlock();
+			InvokeThens();
+		}
+		else
+		{
+			throw invalid_operation("Task already completed.");
+		}
+	}
+
 	void InvokeThens()
 	{
 		for (; !_thens.empty(); _thens.pop())

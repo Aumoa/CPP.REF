@@ -38,7 +38,7 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	using namespace std::chrono;
 
 	wstring Composed = format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring DetailComposed = format(L"{}: {}: {}", DateTime::Now().ToString<libty::DateTimeFormat::File>(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
+	wstring DetailComposed = format(L"{}: {}: {}", DateTime::Now().ToString<libty::DateTimeFormat::Json>(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
 
 	// Log to Visual Studio Output Console.
 	OutputDebugStringW((DetailComposed + L"\n").c_str());

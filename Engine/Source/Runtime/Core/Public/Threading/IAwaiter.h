@@ -5,6 +5,7 @@
 #include "TaskStatus.h"
 #include <memory>
 #include <functional>
+#include <source_location>
 
 template<class T>
 class Task;
@@ -27,9 +28,9 @@ public:
 	virtual void Running() = 0;
 	virtual void Wait() = 0;
 	virtual void Then(std::function<void(Task<void>)> proc) = 0;
-	virtual void Cancel() = 0;
+	virtual void Cancel(const std::source_location& source = std::source_location::current()) = 0;
 
-	virtual void SetException(std::exception_ptr ptr) = 0;
+	virtual void SetException(std::exception_ptr ptr, const std::source_location& source = std::source_location::current()) = 0;
 	virtual std::exception_ptr GetException() = 0;
 
 	bool await_ready()

@@ -3,17 +3,16 @@
 #include "Threading/Task.h"
 #include "Threading/ThreadGroup.h"
 
-namespace libty::Threading::Tasks::Impl
+static ThreadGroup group(L"TaskWorker");
+
+template<>
+void Task<>::RunImpl(std::function<void()> body)
 {
-	static ThreadGroup group(L"TaskWorker");
+	group.Run(std::move(body));
+}
 
-	void Run(std::function<void()> body)
-	{
-		group.Run(std::move(body));
-	}
-
-	void Delay(std::chrono::milliseconds delay, std::function<void()> body)
-	{
-		group.Delay(delay, body);
-	}
+template<>
+void Task<>::DelayImpl(std::chrono::milliseconds delay, std::function<void()> body)
+{
+	group.Delay(delay, body);
 }

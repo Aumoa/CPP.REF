@@ -4,6 +4,7 @@
 
 #include "Awaiter.h"
 #include "Task.h"
+#include <source_location>
 
 template<class T = void>
 class TaskCompletionSource
@@ -26,23 +27,27 @@ public:
 		return (bool)_awaiter;
 	}
 
-	template<class... U>
-	void SetResult(U&&... result)
+	void SetResult(const std::source_location& source = std::source_location::current())
 	{
-		Xassert(IsValid(), "Awaiter is null.");
-		_awaiter->SetResult(std::forward<U>(result)...);
+		SetResultImpl(source);
 	}
 
-	void SetException(std::exception_ptr ptr)
+	template<class U>
+	void SetResult(U&& result, const std::source_location& source = std::source_location::current())
 	{
-		Xassert(IsValid(), "Awaiter is null.");
-		_awaiter->SetException(std::move(ptr));
+		SetResultImpl(source, std::forward<U>(result));
 	}
 
-	void SetCanceled()
+	void SetException(std::exception_ptr ptr, const std::source_location& source = std::source_location::current())
 	{
 		Xassert(IsValid(), "Awaiter is null.");
-		_awaiter->Cancel();
+		_awaiter->SetException(std::move(ptr), source);
+	}
+
+	void SetCanceled(const std::source_location& source = std::source_location::current())
+	{
+		Xassert(IsValid(), "Awaiter is null.");
+		_awaiter->Cancel(source);
 	}
 
 	Task<T> GetTask()
@@ -60,6 +65,13 @@ public:
 	}
 
 private:
+	template<class... U>
+	void SetResultImpl(const std::source_location& source, U&&... result)
+	{
+		Xassert(IsValid(), "Awaiter is null.");
+		_awaiter->SetResult(std::forward<U>(result)...);
+	}
+
 	void Xassert(bool x, std::string_view message)
 	{
 		if (!x)
