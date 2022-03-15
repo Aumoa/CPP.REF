@@ -139,13 +139,16 @@ public:
 		return _exception;
 	}
 
-	void SetResult(const std::source_location& source = std::source_location::current())
+	void SetResult(const std::source_location& source = std::source_location::current()) requires
+		std::same_as<T, void>
 	{
 		SetResultImpl(source);
 	}
 
 	template<class U>
-	void SetResult(U&& result, const std::source_location& source = std::source_location::current())
+	void SetResult(U&& result, const std::source_location& source = std::source_location::current()) requires
+		(!std::same_as<T, void>) &&
+		(!std::same_as<std::remove_const_t<std::remove_reference_t<U>>, void>)
 	{
 		SetResultImpl(source, std::forward<U>(result));
 	}

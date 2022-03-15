@@ -7,6 +7,7 @@
 #include <coroutine>
 #include <memory>
 #include <chrono>
+#include <array>
 
 class ThreadGroup;
 
@@ -186,7 +187,7 @@ public:
 	T GetResult()
 	{
 		ThrowInvalid();
-		return _awaiter->GetResult();
+		return ((Awaiter<T>*)_awaiter.get())->GetResult();
 	}
 
 	std::exception_ptr GetException()
@@ -307,6 +308,37 @@ public:
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask<U> instead.");
 	}
+
+public:
+	template<class TTasks>
+	static Task<> WhenAll(TTasks tasks) requires
+		IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
+		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+	}
+
+	template<class... TTasks>
+	static Task<> WhenAll(TTasks... tasks) requires
+		(std::constructible_from<Task<>, TTasks> && ...)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+	}
+
+	template<class TTasks>
+	static Task<Task<>> WhenAny(TTasks tasks) requires
+		IEnumerable<TTasks, EnumerableItem_t<TTasks>>&&
+		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+	}
+
+	template<class... TTasks>
+	static Task<Task<>> WhenAny(TTasks... tasks) requires
+		(std::constructible_from<Task<>, TTasks> && ...)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+	}
 };
 
 template<>
@@ -317,7 +349,7 @@ void CORE_API Task<>::DelayImpl(std::chrono::milliseconds delay, std::function<v
 
 template<>
 template<class TBody>
-auto Task<>::Run(TBody&& body, const std::source_location& source) -> Task<FunctionReturn_t<TBody>>
+inline auto Task<>::Run(TBody&& body, const std::source_location& source) -> Task<FunctionReturn_t<TBody>>
 {
 	using U = FunctionReturn_t<TBody>;
 	std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
@@ -350,13 +382,13 @@ auto Task<>::Run(TBody&& body, const std::source_location& source) -> Task<Funct
 }
 
 template<>
-auto Task<>::Yield(const std::source_location& source)
+inline auto Task<>::Yield(const std::source_location& source)
 {
 	return Run([] {}, source);
 }
 
 template<>
-Task<> Task<>::Delay(std::chrono::milliseconds delay, const std::source_location& source)
+inline Task<> Task<>::Delay(std::chrono::milliseconds delay, const std::source_location& source)
 {
 	std::shared_ptr awaiter = std::make_shared<Awaiter<void>>();
 	awaiter->WaitingToRun();
@@ -371,7 +403,7 @@ Task<> Task<>::Delay(std::chrono::milliseconds delay, const std::source_location
 }
 
 template<>
-Task<> Task<>::CompletedTask()
+inline Task<> Task<>::CompletedTask()
 {
 	static thread_local std::shared_ptr awaiter = []
 	{
@@ -386,9 +418,72 @@ Task<> Task<>::CompletedTask()
 
 template<>
 template<class U> requires (!std::same_as<U, void>)
-Task<> Task<>::CompletedTask(U value, const std::source_location& source)
+inline Task<> Task<>::CompletedTask(U value, const std::source_location& source)
 {
 	auto ptr = std::make_shared<Awaiter<U>>();
 	ptr->SetResult(std::move(value), source);
 	return ptr;
+}
+
+template<>
+template<class TTasks>
+inline Task<> Task<>::WhenAll(TTasks tasks) requires
+	IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
+	std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
+{
+	for (auto& task : tasks)
+	{
+		co_await task;
+	}
+}
+
+template<>
+template<class... TTasks>
+inline Task<> Task<>::WhenAll(TTasks... tasks) requires
+	(std::constructible_from<Task<>, TTasks> && ...)
+{
+	std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
+	return WhenAll(tasksArray);
+}
+
+template<>
+template<class TTasks>
+inline Task<Task<>> Task<>::WhenAny(TTasks tasks) requires
+	IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
+	std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
+{
+	class WhenAnyAwaiter : public Awaiter<Task<>>
+	{
+		std::atomic<bool> _alreadyBound;
+
+	public:
+		void Join(Task<> result)
+		{
+			bool expected = false;
+			if (_alreadyBound.compare_exchange_strong(expected, true))
+			{
+				SetResult(std::move(result));
+			}
+		}
+	};
+
+	std::shared_ptr awaiter = std::make_shared<WhenAnyAwaiter>();
+	for (auto& task : tasks)
+	{
+		task.Then([awaiter](Task<> result) mutable
+		{
+			awaiter->Join(std::move(result));
+		});
+	}
+
+	return Task<Task<>>(awaiter);
+}
+
+template<>
+template<class... TTasks>
+inline Task<Task<>> Task<>::WhenAny(TTasks... tasks) requires
+	(std::constructible_from<Task<>, TTasks> && ...)
+{
+	std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
+	return WhenAny(tasksArray);
 }
