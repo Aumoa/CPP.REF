@@ -39,7 +39,7 @@ void LogModule::RunTask()
 	using namespace std::filesystem;
 
 	path Directory = L"Saved/Logs";
-	path LogPath = std::format(L"{}.log", ModuleName);
+	path LogPath = String::Format(L"{}.log", ModuleName);
 
 	if (!exists(Directory))
 	{
@@ -48,7 +48,7 @@ void LogModule::RunTask()
 	else if (exists(Directory / LogPath))
 	{
 		auto BackupTime = DateTime::Now().ToString<libty::DateTimeFormat::File>();
-		path BackupPath = String::ReplaceAll(std::format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
+		path BackupPath = String::ReplaceAll(String::Format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
 		rename(Directory / LogPath, Directory / BackupPath);
 	}
 

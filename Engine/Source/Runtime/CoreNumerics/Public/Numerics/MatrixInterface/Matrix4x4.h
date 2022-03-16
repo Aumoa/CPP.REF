@@ -4,6 +4,7 @@
 
 #include "Matrix.h"
 #include "Numerics/TransformConcepts.h"
+#include "Numerics/NumericConcepts.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/TransformInterface/Translate3D.h"
 #include "Numerics/TransformInterface/Scale3D.h"
@@ -95,7 +96,7 @@ public:
 		return V[N];
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 4, 4> IMatrix>
 	constexpr Matrix4x4& operator =(const IMatrix& M)
 	{
 		for (size_t i = 0; i < Row(); ++i)
@@ -213,7 +214,7 @@ public:
 		return Matrix<>::ToString(*this, FormatArgs);
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 4, 4> IMatrix>
 	inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
 	{
 		return Matrix<>::NearlyEquals(M, Epsilon);

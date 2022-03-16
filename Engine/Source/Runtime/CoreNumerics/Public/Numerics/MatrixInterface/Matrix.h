@@ -75,7 +75,7 @@ private:
 	template<class... TArgs>
 	constexpr Matrix(Private&&, short, TArgs&&... Args) requires (sizeof...(TArgs) == NRow) && requires
 	{
-		{ std::initializer_list<Vector<T, NCol>>{ std::declval<TArgs>() } };
+		{ std::initializer_list<Vector<T, NCol>>{ std::declval<TArgs>()... } };
 	}
 	: V{ std::forward<TArgs>(Args)... }
 	{
@@ -178,8 +178,8 @@ struct Matrix<void, 0, 0>
 	template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 	static constexpr bool NearlyEquals(const IMatrixL& ML, IMatrixR& MR, const typename IMatrixL::Type& Epsilon) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 	{
-		static constexpr size_t Row = ML.Row();
-		static constexpr size_t Col = ML.Column();
+		constexpr size_t Row = ML.Row();
+		constexpr size_t Col = ML.Column();
 
 		for (size_t i = 0; i < Row; ++i)
 		{
@@ -356,7 +356,7 @@ struct Matrix<void, 0, 0>
 			Composed[i] = M[i].ToString(FormatArgs);
 		}
 
-		return std::format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
+		return String::Format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
 	}
 
 	template<TIsMatrixBase IMatrix>

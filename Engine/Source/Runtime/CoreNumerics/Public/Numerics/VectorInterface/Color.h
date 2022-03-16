@@ -113,7 +113,7 @@ public:
 
 	inline std::wstring ToString() const
 	{
-		return std::format(L"#{:0>8X}", ToUInt());
+		return String::Format(L"#{:0>8X}", ToUInt());
 	}
 
 	template<TIsVector<float, 4> IVectorL, TIsVector<float, 4> IVectorR>

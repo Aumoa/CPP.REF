@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ObjectBase.h"
+
 #define GENERATED_BODY(Class, ...)															\
 	friend class Type;																		\
 																							\
@@ -29,8 +31,8 @@ private:																					\
 		return REFLECTION_FunctionChain<_Line - 1>();										\
 	}																						\
 																							\
-	template<>																				\
-	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_FunctionChain()										\
 	{																						\
 		return -1;																			\
 	}																						\
@@ -41,8 +43,8 @@ private:																					\
 		return REFLECTION_PropertyChain<_Line - 1>();										\
 	}																						\
 																							\
-	template<>																				\
-	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_PropertyChain()										\
 	{																						\
 		return -1;																			\
 	}																						\
@@ -199,8 +201,8 @@ Type* Class::StaticClass()																	\
 	}
 
 #define SPROPERTY(PropertyName, ...)														\
-	template<>																				\
-	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_PropertyChain()										\
 	{																						\
 		return REFLECTION_PropertyChain<__LINE__ - 1>() + 1;								\
 	}																						\

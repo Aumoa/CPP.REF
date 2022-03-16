@@ -118,7 +118,7 @@ private:
 				auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
 				if (!emplaced.second)
 				{
-					throw invalid_operation(std::format(L"Duplicated command line key({}).", currKey));
+					throw invalid_operation(String::Format(L"Duplicated command line key({}).", currKey));
 				}
 			}
 			else
@@ -127,7 +127,7 @@ private:
 				auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
 				if (!emplaced.second)
 				{
-					throw invalid_operation(std::format(L"Duplicated command line key({}).", wCurrKey));
+					throw invalid_operation(String::Format(L"Duplicated command line key({}).", wCurrKey));
 				}
 			}
 		};

@@ -186,6 +186,12 @@ public:
 			return true;
 		}
 
+		template<class T>
+		static auto GetInternalIndex(T* sObject)
+		{
+			return sObject->InternalIndex;
+		}
+
 	public:
 		std::wstring FriendlyName;
 		std::wstring FullName;
@@ -263,7 +269,7 @@ public:
 							}
 							else
 							{
-								GC.GCMarkingBuffer[Object->InternalIndex] = Depth;
+								GC.GCMarkingBuffer[GetInternalIndex(Object)] = Depth;
 								++Count;
 							}
 						}

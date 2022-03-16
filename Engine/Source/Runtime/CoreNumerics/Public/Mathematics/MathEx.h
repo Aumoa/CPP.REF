@@ -12,8 +12,10 @@ struct Radians;
 /// <summary>
 /// Provide standard math functions.
 /// </summary>
-class CORENUMERICS_API MathEx abstract final
+class CORENUMERICS_API MathEx
 {
+	MathEx() = delete;
+
 public:
 	/// <summary>
 	/// Get sine value.

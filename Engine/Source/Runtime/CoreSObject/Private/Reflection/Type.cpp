@@ -235,7 +235,7 @@ std::wstring Type::GenerateUniqueName()
 	uint64& Incrementer = TypeRegister[TypeHash];
 	if (uint64 Value = Incrementer++; Value != 0)
 	{
-		return std::format(L"{}_{}", GetFriendlyName(), Value);
+		return String::Format(L"{}_{}", GetFriendlyName(), Value);
 	}
 	else
 	{

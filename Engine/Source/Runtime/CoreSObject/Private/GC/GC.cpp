@@ -12,6 +12,7 @@
 #include "Object.h"
 #include <string>
 #include <future>
+#include <cstring>
 
 DEFINE_LOG_CATEGORY(LogGC);
 

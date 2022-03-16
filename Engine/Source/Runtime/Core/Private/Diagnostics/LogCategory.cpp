@@ -1,13 +1,18 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
-#include <chrono>
-#include <fstream>
 #include "Misc/DateTime.h"
+#include "Misc/PlatformMacros.h"
+#include "Misc/String.h"
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogModule.h"
 #include "Threading/Thread.h"
+#include <chrono>
+#include <fstream>
+
+#if PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
 
 LogCategory::LogCategory(std::wstring_view CategoryName)
 	: CategoryName(CategoryName)
@@ -37,11 +42,13 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
 	using namespace std;
 	using namespace std::chrono;
 
-	wstring Composed = format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring DetailComposed = format(L"{}: {}: {}", DateTime::Now().ToString<libty::DateTimeFormat::Json>(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
+	wstring Composed = String::Format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
+	wstring DetailComposed = String::Format(L"{}: {}: {}", DateTime::Now().ToString<libty::DateTimeFormat::Json>(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
 
+#if PLATFORM_WINDOWS
 	// Log to Visual Studio Output Console.
 	OutputDebugStringW((DetailComposed + L"\n").c_str());
+#endif
 
 	if (LogModule* Module = LogModule::Get(); Module && Module->IsRunning())
 	{

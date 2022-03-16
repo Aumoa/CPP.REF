@@ -4,7 +4,6 @@
 
 #include "Misc/String.h"
 #include <exception>
-#include <format>
 #include <string>
 #include <string_view>
 #include <source_location>
@@ -20,7 +19,7 @@ public:
 		: _message(message)
 		, _source(source)
 	{
-		_what = std::format("{}\n  at {} in {}:{}", _message, source.function_name(), source.file_name(), source.line());
+		_what = String::Format("{}\n  at {} in {}:{}", _message, source.function_name(), source.file_name(), source.line());
 	}
 
 	invalid_operation(std::wstring_view message, const std::source_location& source = std::source_location::current())
@@ -45,7 +44,7 @@ public:
 		: _message("Task was aborted.")
 		, _source(source)
 	{
-		_what = std::format("{}\n  at {} in {}:{}", _message, source.function_name(), source.file_name(), source.line());
+		_what = String::Format("{}\n  at {} in {}:{}", _message, source.function_name(), source.file_name(), source.line());
 	}
 
 	virtual const char* what() const noexcept override

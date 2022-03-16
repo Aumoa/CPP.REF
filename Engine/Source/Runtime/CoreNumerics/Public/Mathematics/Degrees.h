@@ -1,4 +1,4 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+ï»¿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -31,12 +31,12 @@ struct Degrees
 	/// <summary>
 	/// Get simple string represents this degrees value.
 	/// </summary>
-	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
+	/// <param name="formatArgs"> The formatting args that use to String::Format. </param>
 	/// <returns> The simple string value. </returns>
 	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
-		std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"¡Æ";
-		return std::format(placeholder, Value);
+		std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"Â°";
+		return String::Format(placeholder, Value);
 	}
 
 	/// <summary>

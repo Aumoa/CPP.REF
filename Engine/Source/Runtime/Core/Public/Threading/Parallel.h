@@ -26,7 +26,7 @@ public:
 		// Create threads.
 		for (size_t i = 0; i < ThreadCount; ++i)
 		{
-			futures[i] = std::async([&seek, &body, count = std::size(list), i]()
+			futures[i] = std::async([&seek, &body, list, count = std::size(list), i]()
 			{
 				while (true)
 				{

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
+#include "Misc/String.h"
 #include <string_view>
-#include <format>
 #include <source_location>
 
 class CORE_API CoreAssert
@@ -17,7 +17,7 @@ public:
 
 #if DO_CHECK
 
-#define checkf(x, fmt, ...) if (const bool b = (bool)(x); !b) { CoreAssert::Assert(std::format(fmt __VA_OPT__(,) __VA_ARGS__)); }
+#define checkf(x, fmt, ...) if (const bool b = (bool)(x); !b) { CoreAssert::Assert(String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); }
 #define ensure(x) \
 [b = (bool)(x)](const std::source_location& location = std::source_location::current())\
 {\
@@ -39,7 +39,7 @@ public:
 {\
 	if (!b)\
 	{\
-		CoreAssert::Ensure(std::format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
+		CoreAssert::Ensure(String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\

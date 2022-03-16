@@ -2,6 +2,7 @@
 
 #include "Container/BitArray.h"
 #include "Misc/Exceptions.h"
+#include <cstring>
 
 ConstBitIterator::ConstBitIterator()
 {

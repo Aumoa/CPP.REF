@@ -16,7 +16,7 @@ public:
 		: _message(String::AsMultibyte(message))
 		, _location(location)
 	{
-		_what = std::format("{}\n  at {} in {}:{}", _message, _location.function_name(), _location.file_name(), _location.line());
+		_what = String::Format("{}\n  at {} in {}:{}", _message, _location.function_name(), _location.file_name(), _location.line());
 	}
 
 	virtual const char* what() const noexcept override

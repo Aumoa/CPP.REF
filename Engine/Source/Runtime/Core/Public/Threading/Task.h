@@ -232,8 +232,8 @@ public:
 		return Task<U>(_awaiter);
 	}
 
-	constexpr auto operator <=>(const Task&) const = default;
-	constexpr bool operator ==(const Task&) const = default;
+	auto operator <=>(const Task&) const = default;
+	bool operator ==(const Task&) const = default;
 
 private:
 	void ThrowInvalid()
@@ -274,11 +274,13 @@ private:
 	static void RunImpl(std::function<void()> body)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
+		throw;
 	}
 
 	static void DelayImpl(std::chrono::milliseconds delay, std::function<void()> body)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
+		throw;
 	}
 
 public:
@@ -286,27 +288,32 @@ public:
 	static auto Run(TBody&& body, const std::source_location& source = std::source_location::current()) -> Task<FunctionReturn_t<TBody>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
+		throw;
 	}
 
 	static auto Yield(const std::source_location& source = std::source_location::current())
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
+		throw;
 	}
 
 	static Task<> Delay(std::chrono::milliseconds delay, const std::source_location& source = std::source_location::current())
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
+		throw;
 	}
 
 	static Task<> CompletedTask()
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask instead.");
+		throw;
 	}
 
 	template<class U> requires (!std::same_as<U, void>)
 	static Task<> CompletedTask(U value, const std::source_location& source = std::source_location::current())
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask<U> instead.");
+		throw;
 	}
 
 public:
@@ -316,6 +323,7 @@ public:
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+		throw;
 	}
 
 	template<class... TTasks>
@@ -323,6 +331,7 @@ public:
 		(std::constructible_from<Task<>, TTasks> && ...)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+		throw;
 	}
 
 	template<class TTasks>
@@ -331,6 +340,7 @@ public:
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+		throw;
 	}
 
 	template<class... TTasks>
@@ -338,6 +348,7 @@ public:
 		(std::constructible_from<Task<>, TTasks> && ...)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+		throw;
 	}
 };
 

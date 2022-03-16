@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <string>
-#include <format>
-#include <numbers>
 #include "Misc/String.h"
 #include "MathEx.h"
+#include <string>
+#include <numbers>
 
 struct Degrees;
 
@@ -35,12 +34,12 @@ struct Radians
 	/// <summary>
 	/// Get simple string represents this radians value.
 	/// </summary>
-	/// <param name="formatArgs"> The formatting args that use to std::format. </param>
+	/// <param name="formatArgs"> The formatting args that use to String::Format. </param>
 	/// <returns> The simple string value. </returns>
 	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
 	{
 		std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"rad";
-		return std::format(placeholder, Value);
+		return String::Format(placeholder, Value);
 	}
 
 	/// <summary>

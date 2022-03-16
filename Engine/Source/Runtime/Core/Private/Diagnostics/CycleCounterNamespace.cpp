@@ -32,11 +32,11 @@ std::wstring CycleCounterNamespace::Trace()
 
 	std::vector<std::wstring> Traces;
 	Traces.reserve(Units.size());
-	Traces.emplace_back(std::format(L"{} ({})", Name, GroupName));
+	Traces.emplace_back(String::Format(L"{} ({})", Name, GroupName));
 
 	for (auto& Unit : Units)
 	{
-		Traces.emplace_back(std::format(L"  {:<30}: {:.4f} ms", Unit->GetName(), Unit->GetAverageTime() * 1000.0f));
+		Traces.emplace_back(String::Format(L"  {:<30}: {:.4f} ms", Unit->GetName(), Unit->GetAverageTime() * 1000.0f));
 	}
 
 	return String::Join(L"\n", Traces);

@@ -3,6 +3,8 @@
 #include "IO/FileReference.h"
 #include "IO/DirectoryReference.h"
 #include "Misc/String.h"
+#include <bit>
+#include <cstring>
 
 FileReference::FileReference(const std::filesystem::path& filepath)
 	: FileSystemReference(filepath)

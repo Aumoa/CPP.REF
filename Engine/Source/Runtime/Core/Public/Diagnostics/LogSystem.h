@@ -6,10 +6,10 @@
 #include "LogVerbosity.h"
 #include "LogCategory.h"
 #include "LogVerbosity.h"
+#include "Misc/String.h"
 #include <exception>
 #include <string>
 #include <string_view>
-#include <format>
 #include <source_location>
 
 class LogCategory;
@@ -25,7 +25,7 @@ public:
 	template<class... TArgs>
 	static void Log(const std::source_location& Location, LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
 	{
-		std::wstring Message = std::format(Format, std::forward<TArgs>(Args)...);
+		std::wstring Message = String::Format(Format, std::forward<TArgs>(Args)...);
 		InternalLog(Category, LogVerbosity, Message, Location);
 	}
 

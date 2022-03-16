@@ -111,11 +111,11 @@ public:
 		// Atomic lock operation.
 		if (ReferencePtr)
 		{
-			// Guard for delete.
+			// Guard delete.
 			bool bNoReferences = ReferencePtr->References++ == 0;
 
 			// Disposed by GC.
-			if (bNoReferences && !ReferencePtr->bMarkAtGC)
+			if (bNoReferences)
 			{
 				--ReferencePtr->References;
 				return nullptr;
@@ -123,7 +123,7 @@ public:
 
 			SharedPtr<T> AtomicPtr(Ptr);
 			--ReferencePtr->References;
-			
+
 			return AtomicPtr;
 		}
 

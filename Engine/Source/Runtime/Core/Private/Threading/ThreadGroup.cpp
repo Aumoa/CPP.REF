@@ -115,7 +115,7 @@ void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()>
 void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 {
 	Thread* mythread = Thread::GetCurrentThread();
-	mythread->SetFriendlyName(std::format(L"[{} #{}]", _groupName, index));
+	mythread->SetFriendlyName(String::Format(L"[{} #{}]", _groupName, index));
 
 	TickCalc<> timer;
 

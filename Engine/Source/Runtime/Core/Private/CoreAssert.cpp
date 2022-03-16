@@ -2,6 +2,7 @@
 
 #include "CoreAssert.h"
 #include "LogCore.h"
+#include "Misc/PlatformMacros.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogCategory.h"
@@ -18,6 +19,8 @@ void CoreAssert::Ensure(std::wstring_view msg, const std::source_location& locat
 
 void CoreAssert::DebugBreak()
 {
+#if !SHIPPING && PLATFORM_WINDOWS
 	// Call built-in function.
 	__debugbreak();
+#endif
 }

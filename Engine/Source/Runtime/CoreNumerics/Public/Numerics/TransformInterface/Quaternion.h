@@ -308,7 +308,7 @@ public:
 		const float T = A1 + B2 + C3;
 		Quaternion Q;
 
-		if (T > 0f)
+		if (T > 0.0f)
 		{
 			const float S = MathEx::Sqrt(1 + T) * 2.0f;
 			Q[0] = (C2 - B3) / S;

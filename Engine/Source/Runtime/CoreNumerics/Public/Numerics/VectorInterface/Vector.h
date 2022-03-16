@@ -113,14 +113,14 @@ public:
 		return V;
 	}
 
-	constexpr const T& operator [](size_t N) const
+	constexpr const T& operator [](size_t I) const
 	{
-		return Super::Scalars[N];
+		return Super::Scalars[I];
 	}
 
-	constexpr T& operator [](size_t N)
+	constexpr T& operator [](size_t I)
 	{
-		return Super::Scalars[N];
+		return Super::Scalars[I];
 	}
 
 	template<TIsVector<T, N> IVector>
@@ -265,10 +265,10 @@ struct Vector<void, 0>
 		std::array<std::wstring, N> Composed;
 		for (size_t i = 0; i < N; ++i)
 		{
-			Composed[i] = std::format(Placeholder, V[i]);
+			Composed[i] = String::Format(Placeholder, V[i]);
 		}
 
-		return std::format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
+		return String::Format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
 	}
 
 	template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>

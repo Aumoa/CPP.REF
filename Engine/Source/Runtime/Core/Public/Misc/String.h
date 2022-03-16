@@ -6,15 +6,30 @@
 #include "CoreConcepts.h"
 #include <exception>
 #include <vector>
-#include <format>
 #include <set>
 #include <array>
+#include <optional>
+
+#if PLATFORM_WINDOWS
+#include <format>
+#endif
 
 class CORE_API String
 {
 	String() = delete;
 
 public:
+	template<class TFormat, class... TArgs>
+	static auto Format(TFormat&& format, TArgs&&... args) requires
+		IString<TFormat, StringChar_t<TFormat>>
+	{
+#if PLATFORM_WINDOWS
+		return std::format(std::forward<TFormat>(format), std::forward<TArgs>(args)...);
+#else
+		return std::basic_string<StringChar_t<TFormat>>(std::forward<TFormat>(format));
+#endif
+	}
+
 	template<class StringT, class SpanT, class CharT = StringChar_t<StringT>> requires
 		IString<StringT, CharT>&&
 		IEnumerable<SpanT, CharT>
@@ -344,11 +359,11 @@ public:
 	{
 		if (formatArgs.empty())
 		{
-			return std::format(L"{{{}}}", number);
+			return Format(L"{{{}}}", number);
 		}
 		else
 		{
-			return std::format(L"{{{}:{}}}", number, formatArgs);
+			return Format(L"{{{}:{}}}", number, formatArgs);
 		}
 	}
 
@@ -360,7 +375,7 @@ public:
 		}
 		else
 		{
-			return std::format(L"{{:{}}}", formatArgs);
+			return Format(L"{{:{}}}", formatArgs);
 		}
 	}
 

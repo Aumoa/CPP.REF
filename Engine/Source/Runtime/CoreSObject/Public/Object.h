@@ -14,9 +14,6 @@
 
 class SValueType;
 
-template<class T>
-concept HasSuper = requires { typename T::Super; } && !std::same_as<typename T::Super, void>;
-
 /// <summary>
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
 /// </summary>

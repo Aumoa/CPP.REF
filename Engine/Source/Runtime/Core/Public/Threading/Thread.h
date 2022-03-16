@@ -8,6 +8,7 @@
 #include <string>
 #include <future>
 #include <functional>
+#include <optional>
 
 class CORE_API Thread : public NonCopyable
 {

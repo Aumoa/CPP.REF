@@ -5,6 +5,9 @@
 class SObject;
 class Type;
 
+template<class T>
+concept HasSuper = requires { typename T::Super; } && !std::same_as<typename T::Super, void>;
+
 namespace SObjectDetails
 {
 	class SObjectBase
@@ -22,7 +25,7 @@ namespace SObjectDetails
 		template<class T>
 		T* operator << (T* Ptr)
 		{
-			((SObject*)Ptr)->PostConstruction();
+			Ptr->PostConstruction();
 			return Ptr;
 		}
 	};

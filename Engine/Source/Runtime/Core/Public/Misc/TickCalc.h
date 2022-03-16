@@ -5,6 +5,7 @@
 #include <chrono>
 #include <numeric>
 #include <list>
+#include <optional>
 
 template<class Clock = std::chrono::steady_clock>
 class TickCalc
