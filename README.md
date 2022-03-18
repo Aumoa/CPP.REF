@@ -10,37 +10,4 @@
 5. Object 구현이 포함되는 모든 인터페이스는 I 접두사로 시작한다.
 
 # 프로젝트 생성
-- Visual Studio용 프로젝트 생성은 Engine/Binaries/VisualStudioProjects.dll 모듈을 통해 진행됩니다. 터미널을 통해 다음 과정을 따릅니다.
-### 엔진 프로젝트 생성
-1. 엔진 프로젝트 루트로 이동
-2. GenerateProjects.bat 실행
-### 게임 프로젝트 생성
-1. 게임 프로젝트 워크스페이스로 이동.
-2. 프로젝트 정의 솔루션 XML 파일 생성.
-3. 모듈 프로젝트 XML 파일 생성 (Source/%ModuleName%/%ModuleName%.xml)
-4. 터미널 명령 "%EngineRoot%/Binaries/WindowsConsole.exe --ConsoleDll "VisualStudioProjects.dll" --Solution "%SolutionXml%"
-### 게임 솔루션 XML 파일 예시
-```xml
-<SolutionInfo Name="MyGame">
-  <EngineRoot Path="../CPP.REF/Engine" />
-  <ThirdpartyRoot Path="../CPP.REF/ThirdParty" />
-  <FirstProject Name="MyGame" />
-</SolutionInfo>
-```
-### 게임 모듈 프로젝트 XML 파일 예시
-```xml
-<ProjectInfo Name="MyGameModule" Path="MyGameModule" Type="Game" >
-	<IncludePaths>
-		<Item RelativePath="Public" Access="Public" />
-		<Item RelativePath="Private" />
-	</IncludePaths>
-	<ReferencedProjects>
-		<Item Name="Core" />
-		<Item Name="Game" />
-	</ReferencedProjects>
-</ProjectInfo>
-```
-
-# 개요
-- 이 프로젝트는 영리를 목적으로 사용되지 않습니다. 순수하게 학습의 목적입니다.
-- 언리얼 엔진의 구성을 많이 참고하였습니다.
+- 변경 사항이 완료되면 다시 작성
