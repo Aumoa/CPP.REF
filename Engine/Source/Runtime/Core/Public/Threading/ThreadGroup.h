@@ -16,18 +16,43 @@ class CORE_API ThreadGroup
 	class ThreadGroupSuspendToken;
 	using clock = std::chrono::steady_clock;
 
-	struct Work
+	struct ImmediateWork
 	{
-		clock::time_point ExpireTime;
 		std::function<void()> Body;
+	};
+
+	struct DelayedWork
+	{
+		clock::time_point StartsWith;
+		std::function<void()> Body;
+	};
+
+	template<class TWork>
+	struct WorkQueue
+	{
+		std::mutex lock;
+		std::queue<TWork> queue;
+		std::condition_variable cv;
+
+		void enqueue(TWork&& work)
+		{
+			queue.emplace(std::move(work));
+			cv.notify_one();
+		}
+
+		TWork dequeue()
+		{
+			auto work = std::move(queue.front());
+			queue.pop();
+			return std::move(work);
+		}
 	};
 
 private:
 	std::vector<std::jthread> _threads;
 
-	std::mutex _lock;
-	std::queue<Work> _works;
-	std::condition_variable _cv;
+	WorkQueue<ImmediateWork> _immQueue;
+	WorkQueue<DelayedWork> _delQueue;
 
 	ThreadGroupSuspendToken* _suspendToken = nullptr;
 	std::wstring _groupName;
@@ -41,4 +66,5 @@ public:
 
 private:
 	void Worker(size_t index, std::stop_token cancellationToken);
+	void Timer(std::stop_token cancellationToken);
 };

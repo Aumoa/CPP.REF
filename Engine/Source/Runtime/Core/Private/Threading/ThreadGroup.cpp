@@ -35,9 +35,10 @@ public:
 			throw invalid_operation("ThreadGroup already wait for suspend.");
 		}
 
-		_promise.emplace();
-
 		_threadsIdx = 0;
+		_promise.emplace();
+		_source->_immQueue.cv.notify_all();
+
 		return _promise->get_future();
 	}
 
@@ -83,9 +84,11 @@ ThreadGroup::ThreadGroup(std::wstring_view groupName, size_t numThreads)
 	{
 		_threads.emplace_back(std::jthread(std::bind(&ThreadGroup::Worker, this, i, std::placeholders::_1)));
 	}
+
+	_threads.emplace_back(std::jthread(std::bind(&ThreadGroup::Timer, this, std::placeholders::_1)));
 }
 
-ThreadGroup::~ThreadGroup()
+ThreadGroup::~ThreadGroup() noexcept
 {
 	SuspendTokenCollection::Remove(_suspendToken);
 
@@ -101,16 +104,14 @@ ThreadGroup::~ThreadGroup()
 
 void ThreadGroup::Run(std::function<void()> body)
 {
-	std::unique_lock lock(_lock);
-	_works.emplace(Work{ .Body = body });
-	_cv.notify_one();
+	std::unique_lock lock(_immQueue.lock);
+	_immQueue.enqueue(ImmediateWork{ .Body = body });
 }
 
 void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()> body)
 {
-	std::unique_lock lock(_lock);
-	_works.emplace(Work{ .ExpireTime = clock::now() + timeout, .Body = body });
-	_cv.notify_one();
+	std::unique_lock lock(_delQueue.lock);
+	_delQueue.enqueue(DelayedWork{ .StartsWith = clock::now() + timeout, .Body = body });
 }
 
 void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
@@ -126,34 +127,72 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 		auto now = clock::now();
 		_suspendToken->Join(mythread);
 
-		std::unique_lock lock(_lock);
+		std::unique_lock lock(_immQueue.lock);
 		size_t nonExpired = 0;
-		std::optional<std::chrono::milliseconds> waitFor;
 
-		while (_works.size() > nonExpired)
+		while (_immQueue.queue.size() > nonExpired)
 		{
-			Work front = std::move(_works.front());
-			_works.pop();
+			auto front = _immQueue.dequeue();
+			lock.unlock();
+			front.Body();
+			_suspendToken->Join(mythread);
+			lock.lock();
+		}
 
-			if (front.ExpireTime <= now)
+		_immQueue.cv.wait(lock);
+	}
+}
+
+void ThreadGroup::Timer(std::stop_token cancellationToken)
+{
+	Thread* mythread = Thread::GetCurrentThread();
+	mythread->SetFriendlyName(String::Format(L"[{} #Timer]", _groupName));
+
+	TickCalc<> timer;
+
+	// Blocking the thread for all times.
+	while (!cancellationToken.stop_requested())
+	{
+		std::unique_lock lock(_delQueue.lock);
+		size_t nonExpired = 0;
+		std::optional<clock::time_point> wait;
+
+		while (_delQueue.queue.size() > nonExpired)
+		{
+			auto now = clock::now();
+
+			auto front = _delQueue.dequeue();
+			if (front.StartsWith <= now)
 			{
 				lock.unlock();
 				front.Body();
 				lock.lock();
+				continue;
+			}
+
+			if (wait.has_value())
+			{
+				if (*wait > now)
+				{
+					wait = now;
+				}
 			}
 			else
 			{
-				auto rem = front.ExpireTime - clock::now() - 1ms;
-				if (!waitFor.has_value() || waitFor.value() > rem)
-				{
-					waitFor = std::chrono::duration_cast<std::chrono::milliseconds>(rem);
-				}
-
-				_works.emplace(std::move(front));
-				nonExpired += 1;
+				wait = now;
 			}
+
+			_delQueue.enqueue(std::move(front));
+			++nonExpired;
 		}
 
-		_cv.wait_for(lock, waitFor.value_or(1ms));
+		if (wait.has_value())
+		{
+			_delQueue.cv.wait_until(lock, *wait);
+		}
+		else
+		{
+			_delQueue.cv.wait(lock);
+		}
 	}
 }

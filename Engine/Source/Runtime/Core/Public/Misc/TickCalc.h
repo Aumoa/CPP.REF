@@ -16,6 +16,7 @@ class TickCalc
 public:
 	TickCalc()
 	{
+		DoCalc();
 	}
 
 	~TickCalc()

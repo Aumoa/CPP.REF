@@ -11,6 +11,8 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <iostream>
+#include <syncstream>
 
 static LogModule* gModule;
 
@@ -80,7 +82,6 @@ void LogModule::Shutdown()
 void LogModule::EnqueueLogMessage(std::wstring_view Message)
 {
 	std::unique_lock Lock(Impl->Lock);
-	Logged.Broadcast(Message);
 	Impl->Works.emplace(std::wstring(Message));
 	Impl->Cond.notify_one();
 }
@@ -117,6 +118,8 @@ void LogModule::Worker()
 		{
 			auto& Wstr = Works.front();
 			LogFile << String::AsMultibyte(Wstr) << std::endl;
+			Logged.Broadcast(Wstr);
+			std::wosyncstream(std::wcout) << Wstr << std::endl;
 			Works.pop();
 		}
 

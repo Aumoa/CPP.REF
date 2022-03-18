@@ -38,7 +38,11 @@ public:
 	std::wstring ToString() const
 	{
 		Xassert(IsValid(), "Time is not setted.");
+#if PLATFORM_WINDOWS
 		return TDateFormatter::ToString(std::chrono::zoned_time(_zone, *_tp));
+#else
+		return TDateFormatter::ToString(*_tp);
+#endif
 	}
 
 	auto GetTimePoint() const
