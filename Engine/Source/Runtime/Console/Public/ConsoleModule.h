@@ -33,6 +33,8 @@ private:
 	std::map<size_t, SConsoleModuleSubsystem*> CachedSubsystemView;
 };
 
+#if PLATFORM_DYNAMIC_LIBRARY
+
 #define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)			\
 extern "C"													\
 {															\
@@ -42,3 +44,16 @@ extern "C"													\
 		return gcnew ConsoleModuleClass();	\
 	}														\
 }
+
+#else
+
+#define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)			\
+extern "C"													\
+{															\
+	SConsoleModule* LoadConsoleModule()						\
+	{														\
+		return gcnew ConsoleModuleClass();	\
+	}														\
+}
+
+#endif

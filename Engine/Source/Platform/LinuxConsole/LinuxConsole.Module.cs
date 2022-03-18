@@ -4,32 +4,27 @@ using CodeProjectConfiguration;
 
 using System;
 
-public class WindowsConsole : ModuleRule
+public class LinuxConsole : ModuleRule
 {
-    public WindowsConsole()
+    public LinuxConsole()
     {
         TargetType = TargetType.Engine;
         ModuleType = ModuleType.ConsoleApplication;
         NonUnityBuild = true;
-
         RelativePath = "Engine.Platform";
         TargetName = "$(SolutionName)";
 
         PrivateIncludePaths.Add("Private");
-
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
             "CoreSObject",
             "Console",
+            "LinuxCommon"
         });
 
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            PublicDependencyModuleNames.AddRange(new[]
-            {
-                "WindowsCommon"
-            });
         }
         else
         {

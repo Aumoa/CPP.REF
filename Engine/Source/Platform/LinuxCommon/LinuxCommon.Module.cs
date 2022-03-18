@@ -4,9 +4,9 @@ using CodeProjectConfiguration;
 
 using System;
 
-public class WindowsCommon : ModuleRule
+public class LinuxCommon : ModuleRule
 {
-    public WindowsCommon()
+    public LinuxCommon()
     {
         TargetType = TargetType.Engine;
         NonUnityBuild = true;
@@ -14,16 +14,10 @@ public class WindowsCommon : ModuleRule
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
-
         PublicDependencyModuleNames.Add("Core");
 
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            PrivateAdditionalLibraries.AddRange(new[]
-            {
-                "psapi.lib",
-                "dbghelp.lib"
-            });
         }
         else
         {

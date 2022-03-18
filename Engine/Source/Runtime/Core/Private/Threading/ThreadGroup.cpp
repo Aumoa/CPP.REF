@@ -6,6 +6,7 @@
 #include "Threading/SuspendTokenCollection.h"
 #include "Misc/Exceptions.h"
 #include "Misc/TickCalc.h"
+#include "Misc/String.h"
 #include <future>
 
 class ThreadGroup::ThreadGroupSuspendToken : public ISuspendToken

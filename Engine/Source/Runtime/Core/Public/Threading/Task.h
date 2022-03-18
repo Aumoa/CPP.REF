@@ -323,7 +323,10 @@ public:
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
-		throw;
+		for (auto& task : tasks)
+		{
+			co_await task;
+		}
 	}
 
 	template<class... TTasks>
@@ -331,7 +334,8 @@ public:
 		(std::constructible_from<Task<>, TTasks> && ...)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
-		throw;
+		std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
+		return WhenAll(tasksArray);
 	}
 
 	template<class TTasks>
@@ -340,7 +344,31 @@ public:
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
-		throw;
+		class WhenAnyAwaiter : public Awaiter<Task<>>
+		{
+			std::atomic<bool> _alreadyBound;
+
+		public:
+			void Join(Task<> result)
+			{
+				bool expected = false;
+				if (_alreadyBound.compare_exchange_strong(expected, true))
+				{
+					SetResult(std::move(result));
+				}
+			}
+		};
+
+		std::shared_ptr awaiter = std::make_shared<WhenAnyAwaiter>();
+		for (auto& task : tasks)
+		{
+			task.Then([awaiter](Task<> result) mutable
+			{
+				awaiter->Join(std::move(result));
+			});
+		}
+
+		return Task<Task<>>(awaiter);
 	}
 
 	template<class... TTasks>
@@ -348,7 +376,8 @@ public:
 		(std::constructible_from<Task<>, TTasks> && ...)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
-		throw;
+		std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
+		return WhenAny(tasksArray);
 	}
 };
 
@@ -434,67 +463,4 @@ inline Task<> Task<>::CompletedTask(U value, const std::source_location& source)
 	auto ptr = std::make_shared<Awaiter<U>>();
 	ptr->SetResult(std::move(value), source);
 	return ptr;
-}
-
-template<>
-template<class TTasks>
-inline Task<> Task<>::WhenAll(TTasks tasks) requires
-	IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
-	std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
-{
-	for (auto& task : tasks)
-	{
-		co_await task;
-	}
-}
-
-template<>
-template<class... TTasks>
-inline Task<> Task<>::WhenAll(TTasks... tasks) requires
-	(std::constructible_from<Task<>, TTasks> && ...)
-{
-	std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
-	return WhenAll(tasksArray);
-}
-
-template<>
-template<class TTasks>
-inline Task<Task<>> Task<>::WhenAny(TTasks tasks) requires
-	IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
-	std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
-{
-	class WhenAnyAwaiter : public Awaiter<Task<>>
-	{
-		std::atomic<bool> _alreadyBound;
-
-	public:
-		void Join(Task<> result)
-		{
-			bool expected = false;
-			if (_alreadyBound.compare_exchange_strong(expected, true))
-			{
-				SetResult(std::move(result));
-			}
-		}
-	};
-
-	std::shared_ptr awaiter = std::make_shared<WhenAnyAwaiter>();
-	for (auto& task : tasks)
-	{
-		task.Then([awaiter](Task<> result) mutable
-		{
-			awaiter->Join(std::move(result));
-		});
-	}
-
-	return Task<Task<>>(awaiter);
-}
-
-template<>
-template<class... TTasks>
-inline Task<Task<>> Task<>::WhenAny(TTasks... tasks) requires
-	(std::constructible_from<Task<>, TTasks> && ...)
-{
-	std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
-	return WhenAny(tasksArray);
 }

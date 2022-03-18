@@ -8,22 +8,25 @@ public class Windows : ModuleRule
 {
     public Windows()
     {
+        TargetType = TargetType.Engine;
+        ModuleType = ModuleType.Application;
+        NonUnityBuild = true;
+
+        RelativePath = "Engine.Platform";
+        TargetName = "$(SolutionName)";
+        PrivateIncludePaths.Add("Private");
+
+        PublicDependencyModuleNames.AddRange(new[]
+        {
+            "Core",
+            "PlatformGeneric",
+            "Game",
+        });
+
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            TargetType = TargetType.Engine;
-            ModuleType = ModuleType.Application;
-            NonUnityBuild = true;
-
-            RelativePath = "Engine.Platform";
-            TargetName = "$(SolutionName)";
-
-            PrivateIncludePaths.Add("Private");
-
             PublicDependencyModuleNames.AddRange(new[]
             {
-                "Core",
-                "PlatformGeneric",
-                "Game",
                 "WindowsCommon",
                 "DirectX",
                 //"Vulkan",
@@ -37,7 +40,6 @@ public class Windows : ModuleRule
         }
         else
         {
-            TargetType = TargetType.None;
             ModuleType = ModuleType.None;
         }
     }

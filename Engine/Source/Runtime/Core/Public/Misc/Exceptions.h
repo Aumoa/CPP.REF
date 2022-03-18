@@ -2,53 +2,32 @@
 
 #pragma once
 
-#include "Misc/String.h"
 #include <exception>
 #include <string>
 #include <string_view>
 #include <source_location>
 
-class invalid_operation : public std::exception
+class CORE_API invalid_operation : public std::exception
 {
 	std::string _message;
 	std::source_location _source;
 	std::string _what;
 
 public:
-	invalid_operation(std::string_view message, const std::source_location& source = std::source_location::current())
-		: _message(message)
-		, _source(source)
-	{
-		_what = String::Format("{}\n  at {} in {}:{}", _message, source.function_name(), source.file_name(), source.line());
-	}
+	invalid_operation(std::string_view message, const std::source_location& source = std::source_location::current());
+	invalid_operation(std::wstring_view message, const std::source_location& source = std::source_location::current());
 
-	invalid_operation(std::wstring_view message, const std::source_location& source = std::source_location::current())
-		: invalid_operation(String::Cast<std::string>(message), source)
-	{
-	}
-
-	virtual const char* what() const noexcept override
-	{
-		return _what.c_str();
-	}
+	virtual const char* what() const noexcept override;
 };
 
-class task_canceled : public std::exception
+class CORE_API task_canceled : public std::exception
 {
 	std::string _message;
 	std::source_location _source;
 	std::string _what;
 
 public:
-	task_canceled(const std::source_location& source = std::source_location::current())
-		: _message("Task was aborted.")
-		, _source(source)
-	{
-		_what = String::Format("{}\n  at {} in {}:{}", _message, source.function_name(), source.file_name(), source.line());
-	}
+	task_canceled(const std::source_location& source = std::source_location::current());
 
-	virtual const char* what() const noexcept override
-	{
-		return _what.c_str();
-	}
+	virtual const char* what() const noexcept override;
 };

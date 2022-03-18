@@ -7,6 +7,10 @@
 class CORE_API PlatformModule
 {
 private:
+	template<class TRet, class... TArgs>
+	using FunctionPointer = TRet(*)(TArgs...);
+
+private:
 	void* NativeHandle = nullptr;
 	std::wstring ModuleName;
 
@@ -24,11 +28,11 @@ public:
 	}
 
 	template<class TRet, class... TArgs>
-	TRet(*GetFunctionPointer(std::string_view FunctionName) const)(TArgs...)
+	FunctionPointer<TRet, TArgs...> GetFunctionPointer(std::string_view FunctionName) const
 	{
 		return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
 	}
 
 private:
-	void(*InternalGetFunctionPointer(std::string_view FunctionName) const)();
+	FunctionPointer<void> InternalGetFunctionPointer(std::string_view FunctionName) const;
 };

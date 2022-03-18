@@ -5,10 +5,13 @@
 #include "PrimitiveTypes.h"
 #include "ISuspendToken.h"
 #include "Misc/NonCopyable.h"
+#include "Misc/PlatformMacros.h"
 #include <string>
 #include <future>
 #include <functional>
 #include <optional>
+#include <mutex>
+#include <condition_variable>
 
 class CORE_API Thread : public NonCopyable
 {
@@ -30,14 +33,19 @@ public:
 		void Join();
 	};
 
+#if PLATFORM_WINDOWS
 	void* ThreadHandle = nullptr;
-	int64 ThreadId = 0;
+#endif
+
+	std::thread::id ThreadId;
 	std::wstring FriendlyName;
 	bool bIsManaged = false;
 	ThreadSuspendToken* SToken = nullptr;
 
 	std::promise<void> JoinPromise;
 	std::future<void> JoinFuture;
+	std::mutex SuspendMtx;
+	std::condition_variable SuspendCv;
 
 private:
 	Thread();
@@ -51,7 +59,7 @@ public:
 	void Join();
 
 	std::wstring GetFriendlyName() const;
-	int64 GetThreadId() const;
+	std::thread::id GetThreadId() const;
 	bool IsManaged() const;
 	ThreadSuspendToken* GetSuspendToken() const;
 

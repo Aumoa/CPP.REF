@@ -4,7 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
-#include <exception>
+#include "Exceptions.h"
 #include <vector>
 #include <set>
 #include <array>
@@ -18,6 +18,15 @@ class CORE_API String
 {
 	String() = delete;
 
+private:
+	template<class Char_t, class T>
+	static auto GetTupleStringImpl(T&& arg)
+	{
+		std::basic_ostringstream<Char_t> oss;
+		oss << std::forward<T>(arg);
+		return oss.str();
+	}
+
 public:
 	template<class TFormat, class... TArgs>
 	static auto Format(TFormat&& format, TArgs&&... args) requires
@@ -26,7 +35,53 @@ public:
 #if PLATFORM_WINDOWS
 		return std::format(std::forward<TFormat>(format), std::forward<TArgs>(args)...);
 #else
-		return std::basic_string<StringChar_t<TFormat>>(std::forward<TFormat>(format));
+		using Char_t = StringChar_t<TFormat>;
+		using String_t = std::basic_string<Char_t>;
+		using StringView_t = std::basic_string_view<Char_t>;
+
+		StringView_t format_sv = format;
+		std::basic_stringstream<Char_t> ss;
+		std::vector<String_t> args_v = { GetTupleStringImpl<Char_t>(std::forward<TArgs>(args))... };
+
+		size_t last = 0;
+		size_t param = 0;
+		for (size_t i = format_sv.find((Char_t)'{'); i != format_sv.npos; i = format_sv.find((Char_t)'{', i))
+		{
+			ss << format_sv.substr(last, i - last);
+
+			if (format_sv.length() > i && format_sv[i + 1] == (Char_t)'{')
+			{
+				ss << (Char_t)'{';
+				last = i + 1;
+				continue;
+			}
+
+			size_t startp = i + 1;
+			size_t endp = format_sv.find((Char_t)'}', i + 1);
+			if (endp == format_sv.npos)
+			{
+				throw invalid_operation("Formatter is not closed with '}' token.");
+			}
+
+			StringView_t scope = format_sv.substr(startp, endp - startp);
+			Char_t sep[2] = { (Char_t)':', 0 };
+			std::vector splits = Split(scope, sep, false, true);
+
+			size_t local = 0;
+			if (!(splits.size() == 0 || splits[0].empty()))
+			{
+				param = std::stoi(splits[0]);
+			}
+
+			local = param++;
+
+			ss << args_v[local];
+			i = endp + 1;
+			last = i;
+		}
+
+		ss << format_sv.substr(last);
+		return ss.str();
 #endif
 	}
 

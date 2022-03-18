@@ -15,11 +15,9 @@ public:
 	using time_point = clock::time_point;
 
 private:
+	std::optional<time_point> _tp;
 #if __cpp_lib_chrono >= 201907L
 	const std::chrono::time_zone* _zone = std::chrono::current_zone();
-	std::optional<std::chrono::local_time<clock::duration>> _tp;
-#else
-	std::optional<time_point> _tp;
 #endif
 
 public:
@@ -27,13 +25,8 @@ public:
 	{
 	}
 
-	DateTime(const time_point& tp)
+	DateTime(const time_point& tp) : _tp(tp)
 	{
-#if __cpp_lib_chrono >= 201907L
-		_tp = _zone->to_local(tp);
-#else
-		_tp = tp;
-#endif
 	}
 
 	constexpr bool IsValid() const
@@ -45,7 +38,7 @@ public:
 	std::wstring ToString() const
 	{
 		Xassert(IsValid(), "Time is not setted.");
-		return TDateFormatter::ToString(*_tp);
+		return TDateFormatter::ToString(std::chrono::zoned_time(_zone, *_tp));
 	}
 
 	auto GetTimePoint() const

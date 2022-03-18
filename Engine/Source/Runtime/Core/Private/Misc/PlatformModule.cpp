@@ -1,12 +1,14 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/PlatformMacros.h"
+#include "Misc/PlatformModule.h"
+#include "Misc/Exceptions.h"
+
+#if PLATFORM_DYNAMIC_LIBRARY
 
 #if PLATFORM_WINDOWS
 
 #include <Windows.h>
-#include "Misc/PlatformModule.h"
-#include "Misc/Exceptions.h"
 
 PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 {
@@ -39,14 +41,42 @@ bool PlatformModule::IsValid() const
 	return NativeHandle;
 }
 
-void(*PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) const)()
+auto PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) const -> FunctionPointer<void>
 {
 	if (!IsValid())
 	{
 		throw invalid_operation("Module not be initialized.");
 	}
 
-	return reinterpret_cast<void(*)()>(::GetProcAddress((HMODULE)NativeHandle, FunctionName.data()));
+	return reinterpret_cast<FunctionPointer<void>>(::GetProcAddress((HMODULE)NativeHandle, FunctionName.data()));
+}
+
+#endif
+
+#else
+
+PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
+{
+	throw invalid_operation("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+}
+
+PlatformModule::~PlatformModule() noexcept
+{
+}
+
+std::wstring PlatformModule::ToString()
+{
+	throw invalid_operation("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+}
+
+bool PlatformModule::IsValid() const
+{
+	throw invalid_operation("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+}
+
+auto PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) const -> FunctionPointer<void>
+{
+	throw invalid_operation("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
 }
 
 #endif
