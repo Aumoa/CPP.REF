@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Enum::EEnumBase&lt;*,*&gt;">
+		<DisplayString>{($T1::EEnum)Value}</DisplayString>
+	</Type>
+	<Type Name="SObject">
+		<DisplayString>{{Type={CachedTypeName} InternalIndex={InternalIndex}}}</DisplayString>
+		<Expand>
+			<Item Name="[Reference]">ReferencePtr->References</Item>
+			<Item Name="[WeakReference]">ReferencePtr->WeakReferences</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>
