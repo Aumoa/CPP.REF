@@ -4,9 +4,9 @@ using CodeProjectConfiguration;
 
 using System;
 
-public class Game : ModuleRule
+public class RenderCore : ModuleRule
 {
-    public Game()
+    public RenderCore()
     {
         TargetType = TargetType.Engine;
         RelativePath = "Engine.Runtime";
@@ -17,10 +17,7 @@ public class Game : ModuleRule
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "CoreSObject",
-            "CoreNumerics",
-            "PlatformGeneric",
-            "RenderCore"
+            "PlatformGeneric"
         });
     }
 }

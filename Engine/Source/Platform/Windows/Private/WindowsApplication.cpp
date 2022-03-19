@@ -11,9 +11,7 @@
 #include "Misc/PlatformModule.h"
 #include "Diagnostics/LogModule.h"
 
-// Vulkan
 //#include "VkFactory.h"
-// DirectX
 #include "DirectXFactory.h"
 
 GENERATE_BODY(SWindowsApplication);
@@ -74,11 +72,11 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		std::wstring EngineName;
 		if (!CommandArgs.TryGetValue(L"EngineDll", EngineName))
 		{
-#if !SHIPPING
-			constexpr const wchar_t* GameEngineModuleName = L"Editor.dll";
-#else
+//#if !SHIPPING
+//			constexpr const wchar_t* GameEngineModuleName = L"Editor.dll";
+//#else
 			constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
-#endif
+//#endif
 			EngineName = GameEngineModuleName;
 		}
 

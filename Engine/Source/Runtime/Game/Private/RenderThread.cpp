@@ -152,6 +152,7 @@ void RenderThread::Run()
 			completion(deviceContext);
 		}
 
+		lock.lock();
 		_taskCompletionSource.SetResult();
 	}
 
