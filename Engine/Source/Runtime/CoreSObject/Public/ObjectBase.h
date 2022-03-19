@@ -23,10 +23,6 @@ namespace SObjectDetails
 		}
 
 		template<class T>
-		T* operator << (T* Ptr)
-		{
-			Ptr->PostConstruction();
-			return Ptr;
-		}
+		T* operator << (T* Ptr);
 	};
 }

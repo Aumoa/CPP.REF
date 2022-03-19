@@ -6,8 +6,8 @@
 #include "Widgets/LeafWidget.h"
 #include "Draw/SlateBrush.h"
 
-interface IRHIBitmap;
-interface IRHISolidColorBrush;
+struct IRHIBitmap;
+struct IRHISolidColorBrush;
 
 class GAME_API SImage : public SLeafWidget
 {

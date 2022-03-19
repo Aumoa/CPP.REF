@@ -219,8 +219,8 @@ public:
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		std::wstring scaleText = std::format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
-		return std::format(L"[Abs={}, Scale={}, Size={}]", AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
+		std::wstring scaleText = String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
+		return String::Format(L"[Abs={}, Scale={}, Size={}]", AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
 	}
 
 	constexpr const Vector2& GetLocalSize() const

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Widgets/CompoundWidget.h"
 
-interface IApplicationInterface;
+struct IApplicationInterface;
 class SViewport;
 class SDebugCanvas;
 

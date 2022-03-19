@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "KeyboardState.h"
 
-interface IPlatformKeyboard : implements SObject
+struct IPlatformKeyboard : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IPlatformKeyboard)
 

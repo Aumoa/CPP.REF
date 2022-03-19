@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "SceneStructuredBuffer.h"
 
-interface IRHIDeviceContext;
+struct IRHIDeviceContext;
 class SScene;
 struct SceneViewScope;
 

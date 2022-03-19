@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "RHI/RHIStructures.h"
 
-class GAME_API GeometryGenerator abstract final
+class GAME_API GeometryGenerator
 {
+    GeometryGenerator() = delete;
+
 public:
     typedef std::vector<RHIVertex> VertexCollection;
     typedef std::vector<uint32> IndexCollection;

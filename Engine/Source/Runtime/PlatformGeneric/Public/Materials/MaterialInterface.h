@@ -3,16 +3,15 @@
 #pragma once
 
 #include "Object.h"
-#include "Misc/MemoryStatus.h"
 #include "RHI/RHIStructures.h"
 #include "Diagnostics/LogCategory.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include <variant>
 
-interface IRHIDevice;
-interface IRHITexture2D;
-interface IRHIShaderResourceView;
-interface IRHIDeviceContext;
+struct IRHIDevice;
+struct IRHITexture2D;
+struct IRHIShaderResourceView;
+struct IRHIDeviceContext;
 
 DECLARE_LOG_CATEGORY(PLATFORMGENERIC_API, LogMaterials);
 

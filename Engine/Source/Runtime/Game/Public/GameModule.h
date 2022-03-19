@@ -19,6 +19,8 @@ public:
 	virtual SGameEngine* CreateGameEngine();
 };
 
+#if PLATFORM_DYNAMIC_LIBRARY
+
 #define DEFINE_GAME_MODULE(GameModuleClass)	\
 extern "C"									\
 {											\
@@ -28,3 +30,16 @@ extern "C"									\
 		return gcnew GameModuleClass();		\
 	}										\
 }
+
+#else
+
+#define DEFINE_GAME_MODULE(GameModuleClass)	\
+extern "C"									\
+{											\
+	SGameModule* LoadGameModule()			\
+	{										\
+		return gcnew GameModuleClass();		\
+	}										\
+}
+
+#endif

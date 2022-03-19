@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-interface IRHIFontCollection;
+struct IRHIFontCollection;
 
 struct SlateFont
 {
@@ -25,7 +25,7 @@ struct SlateFont
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		return std::format(L"FamilyName={} Size={}", FamilyName, Size);
+		return String::Format(L"FamilyName={} Size={}", FamilyName, Size);
 	}
 
 	bool operator ==(const SlateFont& Rhs) const

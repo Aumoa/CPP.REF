@@ -3,17 +3,18 @@
 #pragma once
 
 #include "Object.h"
+#include "Reflection/ReflectionMacros.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Reflection/Enum.h"
 
 class PlatformModule;
-interface IRHIFactory;
-interface IPlatformKeyboard;
-interface IPlatformMouse;
-interface IPlatformImageLoader;
-interface IPlatformIME;
+struct IRHIFactory;
+struct IPlatformKeyboard;
+struct IPlatformMouse;
+struct IPlatformImageLoader;
+struct IPlatformIME;
 
-interface IApplicationInterface : implements SObject
+struct IApplicationInterface : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IApplicationInterface)
 

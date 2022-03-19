@@ -6,7 +6,7 @@
 #include "IRenderSlateElement.h"
 #include "Layout/Layout.h"
 
-interface IRenderSlateElement;
+struct IRenderSlateElement;
 
 class GAME_API SSlateDrawCollector : implements SObject
 {

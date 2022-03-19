@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "GC/SharedPtr.h"
 
-interface IDisposable : implements SObject
+struct IDisposable : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IDisposable)
 

@@ -89,7 +89,7 @@ public:
 		return V[N];
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 3, 2> IMatrix>
 	constexpr Matrix3x2& operator =(const IMatrix& M)
 	{
 		for (size_t i = 0; i < Row(); ++i)
@@ -109,13 +109,13 @@ public:
 		return Matrix<>::ToString(*this, FormatArgs);
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 3, 2> IMatrix>
 	inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
 	{
 		return Matrix<>::NearlyEquals(*this, M, Epsilon);
 	}
 
-	template<TIsMatrix<float, 3, 2> IMatrix = Matrix3x2, TIsVector<float, Column()> ITranslation>
+	template<TIsMatrix<float, 3, 2> IMatrix = Matrix3x2, TIsVector<float, 2> ITranslation>
 	static constexpr IMatrix Translation(const ITranslation& T)
 	{
 		IMatrix R = IMatrix::Identity();
@@ -124,7 +124,7 @@ public:
 		return R;
 	}
 
-	template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, Column()> IScale>
+	template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, 2> IScale>
 	static constexpr IMatrix Scale(const IScale& S)
 	{
 		IMatrix R = IMatrix::Identity();
@@ -158,7 +158,7 @@ public:
 		return R;
 	}
 
-	template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, Column()> IShear>
+	template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, 2> IShear>
 	static constexpr IMatrix Shear(const IShear& S)
 	{
 		IMatrix R = IMatrix::Identity();
@@ -167,7 +167,7 @@ public:
 		return R;
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix, TIsVector<float, Column()> IPoint>
+	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IPoint>
 	static constexpr IPoint TransformPoint(const IMatrix& M, const IPoint& P)
 	{
 		IPoint R;
@@ -176,7 +176,7 @@ public:
 		return R;
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix, TIsVector<float, Column()> IVector>
+	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
 	static constexpr IVector TransformVector(const IMatrix& M, const IVector& V)
 	{
 		IVector R;
@@ -239,7 +239,7 @@ public:
 	}
 
 public:
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 3, 2> IMatrix>
 	static constexpr Matrix3x2 Inverse(const IMatrix& M)
 	{
 		float A = M[0][0], B = M[0][1], C = M[1][0], D = M[1][1];
@@ -258,7 +258,7 @@ public:
 		return Inverse(*this);
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrixL, TIsMatrix<float, Row(), Column()> IMatrixR>
+	template<TIsMatrix<float, 3, 2> IMatrixL, TIsMatrix<float, 3, 2> IMatrixR>
 	static constexpr Matrix3x2 Concatenate(const IMatrixL& ML, const IMatrixR& MR)
 	{
 		Matrix<float, 3, 3> ML33 = ToMatrix3x3(ML);
@@ -267,7 +267,7 @@ public:
 		return Matrix<>::Multiply(ML33, MR33);
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 3, 2> IMatrix>
 	constexpr Matrix3x2 Concatenate(const IMatrix& M) const
 	{
 		return Concatenate(*this, M);
@@ -283,22 +283,10 @@ public:
 		};
 	}
 
-	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
-	static constexpr IVector TransformVector(const IMatrix& M, const IVector& V)
-	{
-		return Matrix<>::TransformVector(M, Vector3(V[0], V[1], 0.0f));
-	}
-
 	template<TIsVector<float, 2> IVector>
 	constexpr IVector TransformVector(const IVector& V) const
 	{
 		return TransformVector(*this, V);
-	}
-
-	template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
-	static constexpr IVector TransformPoint(const IMatrix& M, const IVector& V)
-	{
-		return Matrix<>::TransformVector(M, Vector3(V[0], V[1], 1.0f));
 	}
 
 	template<TIsVector<float, 2> IVector>

@@ -6,9 +6,9 @@
 #include "RHI/RHIEnums.h"
 #include <filesystem>
 
-interface IPlatformImage;
+struct IPlatformImage;
 
-interface IPlatformImageLoader : implements SObject
+struct IPlatformImageLoader : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IPlatformImageLoader)
 

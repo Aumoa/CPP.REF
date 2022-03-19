@@ -7,9 +7,9 @@
 #include "SceneStructuredBuffer.h"
 #include <queue>
 
-interface IRHIDevice;
-interface IRHIDeviceContext;
-interface IRHIBuffer;
+struct IRHIDevice;
+struct IRHIDeviceContext;
+struct IRHIBuffer;
 class SPrimitiveComponent;
 class PrimitiveSceneProxy;
 class SceneView;

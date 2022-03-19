@@ -154,7 +154,7 @@ public:
 	{
 	}
 
-	void AutoConsoleVariable::ProcessConsoleVar(std::wstring_view Argument)
+	void ProcessConsoleVar(std::wstring_view Argument)
 	{
 		if (Argument.empty())
 		{

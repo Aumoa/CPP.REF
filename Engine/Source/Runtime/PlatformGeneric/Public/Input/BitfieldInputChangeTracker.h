@@ -3,6 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
+#include <cstring>
 
 template<class TBitfield>
 class BitfieldInputChangeTracker

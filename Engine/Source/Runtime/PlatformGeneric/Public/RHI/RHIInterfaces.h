@@ -8,36 +8,36 @@
 #include "Numerics/VectorInterface/Rect.h"
 #include <span>
 
-interface IRHIFactory;
-interface IRHIDevice;
+struct IRHIFactory;
+struct IRHIDevice;
 
-interface IRHIFactoryChild : implements SObject, implements IDisposable
+struct IRHIFactoryChild : implements SObject, implements IDisposable
 {
 	GENERATED_INTERFACE_BODY(IRHIFactoryChild)
 
 	virtual IRHIFactory* GetFactory() = 0;
 };
 
-interface IRHIAdapter : implements IRHIFactoryChild
+struct IRHIAdapter : implements IRHIFactoryChild
 {
 	GENERATED_INTERFACE_BODY(IRHIAdapter)
 
 	virtual std::wstring GetDeviceName() = 0;
 };
 
-interface IRHIDeviceChild : implements IRHIFactoryChild
+struct IRHIDeviceChild : implements IRHIFactoryChild
 {
 	GENERATED_INTERFACE_BODY(IRHIDeviceChild)
 
 	virtual IRHIDevice* GetDevice() = 0;
 };
 
-interface IRHIResource : implements IRHIDeviceChild
+struct IRHIResource : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIResource)
 };
 
-interface IRHIView : implements IRHIDeviceChild
+struct IRHIView : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIView)
 
@@ -45,14 +45,14 @@ interface IRHIView : implements IRHIDeviceChild
 	virtual IRHIResource* GetResource(int32 IndexOf) = 0;
 };
 
-interface IRHIRenderTargetView : implements IRHIView
+struct IRHIRenderTargetView : implements IRHIView
 {
 	GENERATED_INTERFACE_BODY(IRHIRenderTargetView)
 
 	virtual void CreateRenderTargetView(int32 Index, IRHIResource* Resource, const RHIRenderTargetViewDesc* Desc) = 0;
 };
 
-interface IRHIRenderPass : implements IRHIDeviceChild
+struct IRHIRenderPass : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIRenderPass)
 
@@ -60,14 +60,14 @@ interface IRHIRenderPass : implements IRHIDeviceChild
 	virtual void Apply(std::span<std::pair<IRHIView*, int32> const> AttachViews, const Vector2N& Size) = 0;
 };
 
-interface IRHICommandAllocator : implements IRHIDeviceChild
+struct IRHICommandAllocator : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHICommandAllocator)
 
 	virtual void Reset() = 0;
 };
 
-interface IRHICommandBuffer : implements IRHIDeviceChild
+struct IRHICommandBuffer : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHICommandBuffer)
 
@@ -79,14 +79,14 @@ interface IRHICommandBuffer : implements IRHIDeviceChild
 	virtual void EndRenderPass() = 0;
 };
 
-interface IRHITexture2D : implements IRHIResource
+struct IRHITexture2D : implements IRHIResource
 {
 	GENERATED_INTERFACE_BODY(IRHITexture2D)
 
 	virtual Vector2N GetPixelSize() = 0;
 };
 
-interface IRHIShaderCodeBlob : implements IRHIDeviceChild
+struct IRHIShaderCodeBlob : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIShaderCodeBlob)
 
@@ -95,7 +95,7 @@ interface IRHIShaderCodeBlob : implements IRHIDeviceChild
 	virtual ERHIShaderType GetShaderCodeType() = 0;
 };
 
-interface IRHIShaderCodeWorkspace : implements IRHIDeviceChild
+struct IRHIShaderCodeWorkspace : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIShaderCodeWorkspace)
 
@@ -104,7 +104,7 @@ interface IRHIShaderCodeWorkspace : implements IRHIDeviceChild
 	virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::wstring_view Name) = 0;
 };
 
-interface IRHIFence : implements IRHIDeviceChild
+struct IRHIFence : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIFence)
 
@@ -112,7 +112,7 @@ interface IRHIFence : implements IRHIDeviceChild
 	virtual bool IsReady() = 0;
 };
 
-interface IRHISwapChain : implements IRHIFence
+struct IRHISwapChain : implements IRHIFence
 {
 	GENERATED_INTERFACE_BODY(IRHISwapChain)
 
@@ -120,7 +120,7 @@ interface IRHISwapChain : implements IRHIFence
 	virtual IRHITexture2D* GetBuffer(int32 Index) = 0;
 };
 
-interface IRHICommandQueue : implements IRHIDeviceChild
+struct IRHICommandQueue : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHICommandQueue)
 		
@@ -135,7 +135,7 @@ interface IRHICommandQueue : implements IRHIDeviceChild
 	}
 };
 
-interface IRHIDevice : implements IRHIFactoryChild
+struct IRHIDevice : implements IRHIFactoryChild
 {
 	GENERATED_INTERFACE_BODY(IRHIDevice)
 
@@ -149,7 +149,7 @@ interface IRHIDevice : implements IRHIFactoryChild
 	virtual IRHIShaderCodeWorkspace* CreateShaderCodeWorkspace() = 0;
 };
 
-interface IRHIFactory : implements IDisposable
+struct IRHIFactory : implements IDisposable
 {
 	GENERATED_INTERFACE_BODY(IRHIFactory)
 

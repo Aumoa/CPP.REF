@@ -14,7 +14,7 @@ pushd Intermediate
   fi
 
   pushd CMake
-    cmake ../..
-    make -j20
+    cmake -GNinja ../..
+    ninja -j20
   popd
 popd

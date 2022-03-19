@@ -49,7 +49,7 @@ struct Transform
 
     static std::wstring ToString(const Transform& T, std::wstring_view FormatArgs = L"")
     {
-        return std::format(L"{{T: {}, S: {}, R: {}}}",
+        return String::Format(L"{{T: {}, S: {}, R: {}}}",
             T.Translation.ToString(FormatArgs),
             T.Scale.ToString(FormatArgs),
             T.Rotation.ToString(FormatArgs));
@@ -157,7 +157,7 @@ public:
     }
 
     template<TIsMatrix<float, 4, 4> IMatrix = Matrix4x4>
-    auto GetMatrix() const
+    IMatrix GetMatrix() const
     {
         return GetMatrix<IMatrix>(*this);
     }

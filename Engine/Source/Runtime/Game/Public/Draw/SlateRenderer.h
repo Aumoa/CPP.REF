@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Draw/SlateDrawCollector.h"
 
-interface IRHIDeviceContext2D;
-interface IRHISolidColorBrush;
-interface IRenderSlateElement;
+struct IRHIDeviceContext2D;
+struct IRHISolidColorBrush;
+struct IRenderSlateElement;
 
 class GAME_API SSlateRenderer : implements SObject
 {

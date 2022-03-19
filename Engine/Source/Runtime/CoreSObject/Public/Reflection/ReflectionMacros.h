@@ -85,8 +85,8 @@ private:																					\
 		return REFLECTION_FunctionChain<_Line - 1>();										\
 	}																						\
 																							\
-	template<>																				\
-	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_FunctionChain()										\
 	{																						\
 		return -1;																			\
 	}																						\
@@ -97,8 +97,8 @@ private:																					\
 		return REFLECTION_PropertyChain<_Line - 1>();										\
 	}																						\
 																							\
-	template<>																				\
-	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_PropertyChain()										\
 	{																						\
 		return -1;																			\
 	}																						\
@@ -143,8 +143,8 @@ private:																					\
 		return REFLECTION_FunctionChain<_Line - 1>();										\
 	}																						\
 																							\
-	template<>																				\
-	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_FunctionChain()										\
 	{																						\
 		return -1;																			\
 	}																						\
@@ -155,8 +155,8 @@ private:																					\
 		return REFLECTION_PropertyChain<_Line - 1>();										\
 	}																						\
 																							\
-	template<>																				\
-	static consteval size_t REFLECTION_PropertyChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_PropertyChain()										\
 	{																						\
 		return -1;																			\
 	}																						\
@@ -231,6 +231,5 @@ Type* Class::StaticClass()																	\
 		return &Generator;																	\
 	}
 
-#define interface struct __declspec(novtable)
 #define implements virtual public 
 #define gcnew SObjectDetails::GCNewBinder() << new

@@ -9,7 +9,7 @@
 #include <condition_variable>
 
 class Thread;
-interface IRHICommandBuffer;
+struct IRHICommandBuffer;
 
 class GAME_API RenderThread
 {

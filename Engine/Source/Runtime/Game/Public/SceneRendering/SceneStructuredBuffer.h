@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-interface IRHIResource;
+struct IRHIResource;
 
 struct SceneStructuredBuffer
 {

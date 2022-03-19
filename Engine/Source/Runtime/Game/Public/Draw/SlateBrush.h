@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-interface IRHIBitmap;
+struct IRHIBitmap;
 class STexture2D;
 
 struct SlateBrush
@@ -35,7 +35,7 @@ struct SlateBrush
 
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		return std::format(L"DesiredSize: {}", ImageSize.ToString(InFormatArgs));
+		return String::Format(L"DesiredSize: {}", ImageSize.ToString(InFormatArgs));
 	}
 
 	bool operator ==(const SlateBrush& Rhs) const

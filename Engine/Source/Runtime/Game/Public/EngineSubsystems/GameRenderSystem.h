@@ -14,7 +14,7 @@ class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 	GENERATED_BODY(SGameRenderSystem)
 
 private:
-	std::optional<RenderThread> RenderThread;
+	std::optional<::RenderThread> RenderThread;
 
 	SPROPERTY(Factory)
 	IRHIFactory* Factory = nullptr;

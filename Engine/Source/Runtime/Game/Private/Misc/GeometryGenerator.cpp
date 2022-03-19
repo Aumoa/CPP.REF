@@ -765,7 +765,7 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
         {      -SQRT2 / 3.f, -SQRT6 / 3.f, -1.f / 3.f }
     };
 
-    static const uint32_t faces[4 * 3] =
+    static const std::array<uint32_t, 4 * 3> faces =
     {
         0, 1, 2,
         0, 2, 3,
@@ -773,7 +773,7 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
         1, 3, 2,
     };
 
-    for (size_t j = 0; j < _countof(faces); j += 3)
+    for (size_t j = 0; j < faces.size(); j += 3)
     {
         uint32_t v0 = faces[j];
         uint32_t v1 = faces[j + 1];
@@ -827,7 +827,7 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
         {  0,  0, -1 }
     };
 
-    static const uint32_t faces[8 * 3] =
+    static const std::array<uint32_t, 8 * 3> faces =
     {
         4, 0, 2,
         4, 2, 1,
@@ -839,7 +839,7 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
         5, 0, 3
     };
 
-    for (size_t j = 0; j < _countof(faces); j += 3)
+    for (size_t j = 0; j < faces.size(); j += 3)
     {
         uint32_t v0 = faces[j];
         uint32_t v1 = faces[j + 1];
@@ -911,7 +911,7 @@ void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCol
         {  0, -b, -c }
     };
 
-    static const uint32_t faces[12 * 5] =
+    static const std::array<uint32_t, 12 * 5> faces =
     {
         0, 8, 9, 4, 16,
         0, 16, 17, 2, 12,
@@ -953,7 +953,7 @@ void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCol
     };
 
     size_t t = 0;
-    for (size_t j = 0; j < _countof(faces); j += 5, ++t)
+    for (size_t j = 0; j < faces.size(); j += 5, ++t)
     {
         uint32_t v0 = faces[j];
         uint32_t v1 = faces[j + 1];
@@ -1033,7 +1033,7 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
         {       0,   -t / t2, -1.f / t2 }
     };
 
-    static const uint32_t faces[20 * 3] =
+    static const std::array<uint32_t, 20 * 3> faces =
     {
         0, 8, 4,
         0, 5, 10,
@@ -1057,7 +1057,7 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
         11, 7, 5
     };
 
-    for (size_t j = 0; j < _countof(faces); j += 3)
+    for (size_t j = 0; j < faces.size(); j += 3)
     {
         uint32_t v0 = faces[j];
         uint32_t v1 = faces[j + 1];
@@ -1147,7 +1147,8 @@ void GeometryGenerator::ComputeTeapot(VertexCollection& vertices, IndexCollectio
     Vector3 scaleNegateZ = scaleVector * g_XMNegateZ;
     Vector3 scaleNegateXZ = scaleVector * g_XMNegateX * g_XMNegateZ;
 
-    for (size_t i = 0; i < _countof(TeapotPatches); i++)
+    static constexpr size_t countof = sizeof(TeapotPatches) / sizeof(TeapotPatches[0]);
+    for (size_t i = 0; i < countof; i++)
     {
         TeapotPatch const& patch = TeapotPatches[i];
 

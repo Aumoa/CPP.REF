@@ -56,7 +56,7 @@ public:
 
 private:
 	IApplicationInterface::ETickMode AppTickMode = IApplicationInterface::ETickMode::Realtime;
-	TickCalc<> TickCalc;
+	::TickCalc<> TickCalc;
 
 	void TickEngine(IApplicationInterface::ETickMode ActualTickMode);
 

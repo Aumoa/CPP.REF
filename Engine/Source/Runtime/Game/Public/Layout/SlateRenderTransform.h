@@ -116,7 +116,7 @@ public:
 public:
 	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
 	{
-		return std::format(L"M: {}, Translation: {}", M.ToString(InFormatArgs), Translation.ToString(InFormatArgs));
+		return String::Format(L"M: {}, Translation: {}", M.ToString(InFormatArgs), Translation.ToString(InFormatArgs));
 	}
 
 	static constexpr bool IsIdentity(const SlateRenderTransform& T, float Epsilon = 0)

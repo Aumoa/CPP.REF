@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-interface IRHIDevice;
+struct IRHIDevice;
 class SWidget;
 class SceneRenderTarget;
 

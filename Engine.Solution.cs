@@ -8,6 +8,6 @@ public class Engine : SolutionRule
     {
         EngineRoot = "./Engine";
         ThirdPartyRoot = "./ThirdParty";
-        PrimaryModule = "Core";
+        PrimaryModule = "Game";
     }
 }

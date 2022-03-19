@@ -165,7 +165,7 @@ struct Rect : public RectT<float>
 		auto W = Width(R);
 		auto H = Height(R);
 
-		return std::format(L"{{LT: {}, RB: {}, [{} * {}]}}", Vector<>::ToString(LT, FormatArgs), Vector<>::ToString(RB, FormatArgs), W, H);
+		return String::Format(L"{{LT: {}, RB: {}, [{} * {}]}}", Vector<>::ToString(LT, FormatArgs), Vector<>::ToString(RB, FormatArgs), W, H);
 	}
 
 	template<TIsVectorSized<4> IRect, TIsVectorSized<2> IPoint>

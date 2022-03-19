@@ -64,3 +64,10 @@ public:
 	void* operator new(size_t);
 	void operator delete(void*);
 };
+
+template<class T>
+T* SObjectDetails::GCNewBinder::operator << (T* Ptr)
+{
+	((SObject*)Ptr)->PostConstruction();
+	return Ptr;
+}

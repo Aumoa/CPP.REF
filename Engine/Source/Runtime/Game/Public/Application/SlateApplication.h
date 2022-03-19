@@ -8,11 +8,11 @@
 #include "Draw/SlateDrawCollector.h"
 #include "Input/IMEEvent.h"
 
-interface IRHIDevice;
-interface IApplicationInterface;
-interface IRHIDeviceContext;
-interface IRHIDeviceContext2D;
-interface IRenderSlateElement;
+struct IRHIDevice;
+struct IApplicationInterface;
+struct IRHIDeviceContext;
+struct IRHIDeviceContext2D;
+struct IRenderSlateElement;
 class SLocalPlayer;
 class SWindow;
 class SceneRenderContext;

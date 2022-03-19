@@ -7,9 +7,9 @@
 #include "Draw/SlateFont.h"
 #include "RHI/RHIEnums.h"
 
-interface IRHITextLayout;
-interface IRHITextFormat;
-interface IRHISolidColorBrush;
+struct IRHITextLayout;
+struct IRHITextFormat;
+struct IRHISolidColorBrush;
 
 class GAME_API STextBlock : public SLeafWidget
 {

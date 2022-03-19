@@ -85,7 +85,7 @@ struct Sphere<0>
 		std::wstring PH = String::GetPlaceholder(FormatArgs);
 		auto Center = Vector<>::Minor(S, S.Size() - 1);
 		auto Radius = S[S.Size() - 1];
-		return std::format(L"Center: {}, Radius: {}", Vector<>::ToString(Center, FormatArgs), std::format(PH, Radius));
+		return String::Format(L"Center: {}, Radius: {}", Vector<>::ToString(Center, FormatArgs), String::Format(PH, Radius));
 	}
 };
 

@@ -33,14 +33,14 @@ public:
 		return Line(-Start, -End);
 	}
 
-	constexpr const VectorType& operator [](size_t N) const
+	constexpr const VectorType& operator [](size_t I) const
 	{
-		return N == 0 ? Start : End;
+		return I == 0 ? Start : End;
 	}
 
-	constexpr VectorType& operator [](size_t N)
+	constexpr VectorType& operator [](size_t I)
 	{
-		return N == 0 ? Start : End;
+		return I == 0 ? Start : End;
 	}
 
 	template<TIsMatrix<float, 2, N> IMatrix>
@@ -96,7 +96,7 @@ struct Line<0>
 	template<TIsLine IMatrix>
 	static std::wstring ToString(const IMatrix& M, std::wstring_view FormatArgs = L"")
 	{
-		return std::format(L"Start: {}, End: {}", Vector<>::ToString(M[0], FormatArgs), Vector<>::ToString(M[1], FormatArgs));
+		return String::Format(L"Start: {}, End: {}", Vector<>::ToString(M[0], FormatArgs), Vector<>::ToString(M[1], FormatArgs));
 	}
 
 	template<TIsLine IMatrix>

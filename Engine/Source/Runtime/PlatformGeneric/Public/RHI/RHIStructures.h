@@ -7,9 +7,10 @@
 #include "Numerics/VectorInterface/Color.h"
 #include "Numerics/MatrixInterface/Matrix4x4.h"
 #include <variant>
+#include <cstring>
 
-interface IRHIResource;
-interface IRHIRenderTargetView;
+struct IRHIResource;
+struct IRHIRenderTargetView;
 
 #pragma pack(push, 4)
 
@@ -262,7 +263,7 @@ struct RHIVertex
 	/// <summary>
 	/// Color.
 	/// </summary>
-	Color Color = NamedColors::White;
+	::Color Color = NamedColors::White;
 
 	/// <summary>
 	/// Texture coordinates.
@@ -350,7 +351,7 @@ struct RHITexture2DClearValue
 	union
 	{
 		float ClearColor[4];
-		struct DepthStencilValue
+		struct
 		{
 			float Depth;
 			uint8 Stencil;

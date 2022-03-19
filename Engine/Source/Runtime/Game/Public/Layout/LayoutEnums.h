@@ -47,8 +47,10 @@ SENUM(ESizeRule, int32,
 	Stretch,
 );
 
-class SlateVisibilityExtensions abstract
+class SlateVisibilityExtensions
 {
+	SlateVisibilityExtensions() = delete;
+
 	static constexpr int32 VISPRIVATE_Visible = 0x1 << 0;
 	static constexpr int32 VISPRIVATE_Collapsed = 0x1 << 1;
 	static constexpr int32 VISPRIVATE_Hidden = 0x1 << 2;

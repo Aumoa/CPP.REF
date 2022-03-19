@@ -14,7 +14,7 @@ SWidget::SWidget() : Super()
 
 std::wstring SWidget::ToString()
 {
-	return std::format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), Visibility.ToString());
+	return String::Format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), Visibility.ToString());
 }
 
 void SWidget::Dispose()

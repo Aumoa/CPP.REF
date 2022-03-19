@@ -8,7 +8,7 @@
 
 DECLARE_LOG_CATEGORY(GAME_API, LogViewport);
 
-interface IRHIDeviceContext;
+struct IRHIDeviceContext;
 class SWorld;
 class SImage;
 class SRaytraceSceneRenderTarget;

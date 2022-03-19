@@ -85,7 +85,7 @@ public:
 		return V[N];
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 2, 2> IMatrix>
 	constexpr Matrix2x2& operator =(const IMatrix& M)
 	{
 		for (size_t i = 0; i < Row(); ++i)
@@ -105,13 +105,13 @@ public:
 		return Matrix<>::ToString(*this, FormatArgs);
 	}
 
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 2, 2> IMatrix>
 	inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
 	{
 		return Matrix<>::NearlyEquals(*this, M, Epsilon);
 	}
 
-	template<TIsVector<float, Column()> IScale>
+	template<TIsVector<float, 2> IScale>
 	static constexpr Matrix2x2 Scale(const IScale& S)
 	{
 		return Matrix2x2
@@ -133,7 +133,7 @@ public:
 		};
 	}
 
-	template<TIsVector<float, Column()> IShear>
+	template<TIsVector<float, 2> IShear>
 	static constexpr Matrix2x2 Shear(const IShear& S)
 	{
 		return Matrix2x2
@@ -144,7 +144,7 @@ public:
 	}
 
 public:
-	template<TIsMatrix<float, Row(), Column()> IMatrix>
+	template<TIsMatrix<float, 2, 2> IMatrix>
 	static constexpr Matrix2x2 Inverse(const IMatrix& M)
 	{
 		float A = M[0][0], B = M[0][1], C = M[1][0], D = M[1][1];

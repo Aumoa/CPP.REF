@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "IMEEvent.h"
 
-interface IPlatformIME : implements SObject
+struct IPlatformIME : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IPlatformIME)
 

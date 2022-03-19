@@ -99,7 +99,7 @@ public:
 public:
 	inline std::wstring ToString(std::wstring_view FormatArgs) const
 	{
-		return std::format(L"{{{Minimum={}, Maximum={}}}", Minimum.ToString(FormatArgs), Maximum.ToString(FormatArgs));
+		return String::Format(L"{{{Minimum={}, Maximum={}}}", Minimum.ToString(FormatArgs), Maximum.ToString(FormatArgs));
 	}
 
 	template<TIsMatrix<float, 2, 2> IMatrix>

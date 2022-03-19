@@ -77,13 +77,13 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 	GenericAssetHeader Header;
 	if (Fp->seekg(0, std::ios::beg).read((char*)&Header, HeaderSize).bad())
 	{
-		ASSETS_LOG(std::format(L"Unable to access file."));
+		ASSETS_LOG(String::Format(L"Unable to access file."));
 		return nullptr;
 	}
 
 	if (Header.Version == 0 && Header.Version > ImporterVersion)
 	{
-		ASSETS_LOG(std::format(L"Not supported import version. FileVersion: {}, ImporterVersion: {}", Header.Version, ImporterVersion));
+		ASSETS_LOG(String::Format(L"Not supported import version. FileVersion: {}, ImporterVersion: {}", Header.Version, ImporterVersion));
 		return nullptr;
 	}
 
@@ -105,7 +105,7 @@ SObject* SAssetsLoader::ImportFromFile(const std::filesystem::path& AssetPath)
 		Asset = gcnew STexture2D();
 		break;
 	default:
-		ASSETS_LOG(std::format(L"Item type mismatch. Type: (EAssetType){}", (int32)Header.Type));
+		ASSETS_LOG(String::Format(L"Item type mismatch. Type: (EAssetType){}", (int32)Header.Type));
 		return nullptr;
 	}
 

@@ -57,6 +57,6 @@ struct Ray<0>
 	template<size_t N>
 	static std::wstring ToString(const Ray<N>& R, std::wstring_view FormatArgs = L"")
 	{
-		return std::format(L"Origin: {}, Direction: {}", R.Origin.ToString(FormatArgs), R.Direction.ToString(FormatArgs));
+		return String::Format(L"Origin: {}, Direction: {}", R.Origin.ToString(FormatArgs), R.Direction.ToString(FormatArgs));
 	}
 };

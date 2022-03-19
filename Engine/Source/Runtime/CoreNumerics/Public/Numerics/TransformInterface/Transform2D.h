@@ -46,7 +46,7 @@ struct Transform2D
 
     static std::wstring ToString(const Transform2D& T, std::wstring_view FormatArgs = L"")
     {
-        return std::format(L"{{T: {}, S: {}, R: {}}}",
+        return String::Format(L"{{T: {}, S: {}, R: {}}}",
             T.Translation.ToString(FormatArgs),
             T.Scale.ToString(FormatArgs),
             T.Rotation.ToString(FormatArgs));

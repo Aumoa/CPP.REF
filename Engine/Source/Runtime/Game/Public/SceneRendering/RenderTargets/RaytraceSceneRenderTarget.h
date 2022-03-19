@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "SceneRenderTarget.h"
 
-interface IRHITexture2D;
+struct IRHITexture2D;
 
 class GAME_API SRaytraceSceneRenderTarget : public SSceneRenderTarget
 {

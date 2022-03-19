@@ -34,7 +34,10 @@ struct DeclarativeVoidTypeImpl<void, TImpl>
 };
 
 template<class U>
-concept DeclarativeAttrShouldBeCast = requires { typename U::template DeclarativeAttr<void>; };
+concept DeclarativeAttrShouldBeCast = requires
+{
+	{ std::declval<typename U::DeclarativeAttrVoid>() };
+};
 
 #define BEGIN_SLATE_ATTRIBUTE																			\
 template<class TThis = void>																			\
@@ -42,20 +45,15 @@ struct DeclarativeAttr : public DeclarativeInheritanceIfImplements<Super, Declar
 {																										\
 	using This = typename DeclarativeVoidTypeImpl<TThis, DeclarativeAttr>::Type;						\
 																										\
-	operator decltype(auto) () &																		\
+	template<DeclarativeAttrShouldBeCast U = Super>														\
+	operator typename U::DeclarativeAttrVoid&& () &														\
 	{																									\
-		if constexpr (DeclarativeAttrShouldBeCast<Super>)												\
-		{																								\
-			return std::move(*reinterpret_cast<typename Super::template DeclarativeAttr<void>*>(this));	\
-		}																								\
-		else																							\
-		{																								\
-			return std::move(*this);																	\
-		}																								\
+		return std::move(reinterpret_cast<typename U::DeclarativeAttrVoid&>(*this));					\
 	}
 
-#define END_SLATE_ATTRIBUTE		\
-};								
+#define END_SLATE_ATTRIBUTE								\
+};														\
+using DeclarativeAttrVoid = DeclarativeAttr<void>;
 
 #define DECLARE_SLATE_ATTRIBUTE(Type, Var, ...)								\
 Type _ ## Var __VA_OPT__(=) __VA_ARGS__;									\

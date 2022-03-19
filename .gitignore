@@ -2,6 +2,9 @@
 .vs/
 /*.sln
 
+# CMake files.
+CMakeLists.txt
+
 # Intermediate directory.
 Build/
 Intermediate/

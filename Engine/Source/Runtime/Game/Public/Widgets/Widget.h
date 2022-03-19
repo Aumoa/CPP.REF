@@ -8,7 +8,7 @@
 #include "Layout/Layout.h"
 #include "Input/IMEEvent.h"
 
-interface IRHIDevice;
+struct IRHIDevice;
 class SSlateDrawCollector;
 class PaintArgs;
 class ArrangedChildrens;

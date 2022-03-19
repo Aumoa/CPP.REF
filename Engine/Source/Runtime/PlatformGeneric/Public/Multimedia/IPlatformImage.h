@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "RHI/RHIEnums.h"
 
-interface IPlatformImage : implements SObject
+struct IPlatformImage : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IPlatformImage)
 

@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 
-class CoreDelegates abstract final
+class CoreDelegates
 {
+	CoreDelegates() = delete;
+
 public:
 	DECLARE_MULTICAST_DELEGATE(BeginMainInvokedDelegate);
 	static BeginMainInvokedDelegate BeginMainInvoked;

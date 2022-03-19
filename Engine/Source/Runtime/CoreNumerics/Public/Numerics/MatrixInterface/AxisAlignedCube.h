@@ -33,14 +33,14 @@ public:
 		return AxisAlignedCube(-Min, -Max);
 	}
 
-	constexpr const VectorType& operator [](size_t N) const
+	constexpr const VectorType& operator [](size_t I) const
 	{
-		return N == 0 ? Min : Max;
+		return I == 0 ? Min : Max;
 	}
 
-	constexpr VectorType& operator [](size_t N)
+	constexpr VectorType& operator [](size_t I)
 	{
-		return N == 0 ? Min : Max;
+		return I == 0 ? Min : Max;
 	}
 
 	template<TIsMatrix<float, 2, N> IMatrix>
@@ -94,7 +94,7 @@ struct AxisAlignedCube<0>
 	template<TIsAxisAlignedCube IMatrix>
 	static std::wstring ToString(const IMatrix& M, std::wstring_view FormatArgs = L"")
 	{
-		return std::format(L"Min: {}, Max: {}", Vector<>::ToString(M[0], FormatArgs), Vector<>::ToString(M[1], FormatArgs));
+		return String::Format(L"Min: {}, Max: {}", Vector<>::ToString(M[0], FormatArgs), Vector<>::ToString(M[1], FormatArgs));
 	}
 
 	template<TIsAxisAlignedCube IMatrix>

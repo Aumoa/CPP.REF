@@ -4,7 +4,7 @@
 
 #include "MaterialInterface.h"
 
-interface IRHIShader;
+struct IRHIShader;
 
 class PLATFORMGENERIC_API SMaterial : public SMaterialInterface
 {

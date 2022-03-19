@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include <filesystem>
 
-interface IRHIDevice;
+struct IRHIDevice;
 
 class GAME_API SAssetsLoader : implements SObject
 {

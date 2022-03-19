@@ -6,9 +6,9 @@
 #include "LocalRenderLayout.h"
 #include "Layout/Layout.h"
 
-interface IRHIDeviceContext2D;
+struct IRHIDeviceContext2D;
 
-interface IRenderSlateElement : implements SObject
+struct IRenderSlateElement : implements SObject
 {
 	GENERATED_INTERFACE_BODY(IRenderSlateElement)
 		

@@ -5,6 +5,7 @@
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
 #include "Misc/RecursiveMacroHelper.h"
+#include "Misc/String.h"
 #include <map>
 
 namespace Enum
@@ -160,7 +161,7 @@ struct Name : public Enum::EEnumBase<Name, Type>													\
 		}																							\
 		else																						\
 		{																							\
-			return std::format(L"(" L ## #Name L"){}", this->Value);								\
+			return String::Format(L"(" L ## #Name L"){}", this->Value);								\
 		}																							\
 	}																								\
 																									\

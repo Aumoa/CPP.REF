@@ -31,7 +31,7 @@ struct ObjectOrientedCube
 
 	static std::wstring ToString(const ObjectOrientedCube& OO, std::wstring_view FormatArgs = L"")
 	{
-		return std::format(
+		return String::Format(
 			L"Center: {}, Extent: {}, Rotation{}",
 			OO.Center.ToString(FormatArgs),
 			OO.Extent.ToString(FormatArgs),

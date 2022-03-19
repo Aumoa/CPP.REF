@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Assets/StreamableRenderAsset.h"
 
-interface IPlatformImage;
-interface IRHITexture2D;
-interface IRHIBitmap;
+struct IPlatformImage;
+struct IRHITexture2D;
+struct IRHIBitmap;
 
 class GAME_API STexture2D : public SStreamableRenderAsset
 {
