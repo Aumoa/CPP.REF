@@ -14,7 +14,7 @@ PrimitiveSceneProxy::PrimitiveSceneProxy(SPrimitiveComponent* InPrimitiveCompone
 
 void PrimitiveSceneProxy::UpdateTransform_GameThread(Transform InValue)
 {
-	RenderThread::Get()->EnqueueRenderThreadWork(nullptr, [=](auto)
+	RenderThread::Get()->EnqueueRenderThreadWork(nullptr, [this, InValue](auto)
 	{
 		UpdateTransform_RenderThread(InValue);
 	});
@@ -28,7 +28,7 @@ void PrimitiveSceneProxy::UpdateTransform_RenderThread(const Transform& InValue)
 
 void PrimitiveSceneProxy::MarkRenderStateDirty_GameThread()
 {
-	RenderThread::Get()->EnqueueRenderThreadWork(nullptr, [=](auto)
+	RenderThread::Get()->EnqueueRenderThreadWork(nullptr, [this](auto)
 	{
 		MarkRenderStateDirty_RenderThread();
 	});
@@ -42,7 +42,7 @@ void PrimitiveSceneProxy::MarkRenderStateDirty_RenderThread()
 
 void PrimitiveSceneProxy::SetHiddenInGame_GameThread(bool bHiddenInGame)
 {
-	RenderThread::Get()->EnqueueRenderThreadWork(nullptr, [=](auto)
+	RenderThread::Get()->EnqueueRenderThreadWork(nullptr, [this, bHiddenInGame](auto)
 	{
 		SetHiddenInGame_RenderThread(bHiddenInGame);
 	});

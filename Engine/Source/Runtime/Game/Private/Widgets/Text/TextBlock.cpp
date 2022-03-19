@@ -65,7 +65,7 @@ public:
 			CachedGeometry = AllottedGeometry;
 			CachedLayer = Layer;
 
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [this, AllottedGeometry, Layer](auto)
 			{
 				RenderGeometry = AllottedGeometry;
 				RenderLayer = Layer;
@@ -79,7 +79,7 @@ public:
 		{
 			CachedLayoutSize = LayoutSize;
 
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [this, LayoutSize](auto)
 			{
 				//Layout->SetMaxSize(LayoutSize);
 			});

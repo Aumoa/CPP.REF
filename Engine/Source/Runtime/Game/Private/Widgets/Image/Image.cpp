@@ -79,7 +79,7 @@ public:
 			CachedGeometry = AllottedGeometry;
 			CachedLayer = Layer;
 
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [=](auto)
+			RenderThread::Get()->EnqueueRenderThreadWork(this, [this, Layer, AllottedGeometry](auto)
 			{
 				RenderGeometry = AllottedGeometry;
 				RenderLayer = Layer;
