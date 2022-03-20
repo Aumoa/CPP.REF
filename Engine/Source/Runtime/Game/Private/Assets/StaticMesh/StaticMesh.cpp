@@ -11,6 +11,5 @@ SStaticMesh::SStaticMesh() : Super()
 
 bool SStaticMesh::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBin)
 {
-	checkf(false, L"NOT IMPLEMENTED");
-	return false;
+	throw fatal_exception("NOT IMPLEMENTED");
 }

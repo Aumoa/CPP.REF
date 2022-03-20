@@ -70,8 +70,7 @@ SObject* Type::Instantiate() const
 	}
 	else
 	{
-		SE_LOG(LogReflection, Fatal, L"Instantiate failed for {0} class. {0} class does not contained constructor without parameters.", FriendlyName);
-		return nullptr;
+		throw fatal_exception(String::Format(L"Instantiate failed for {0} class. {0} class does not contained constructor without parameters.", FriendlyName));
 	}
 }
 

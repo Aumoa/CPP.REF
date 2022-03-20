@@ -7,14 +7,26 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogCategory.h"
 
-void CoreAssert::Assert(std::wstring_view msg, const std::source_location& location)
+void CoreAssert::Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location)
 {
-	LogSystem::Log(location, LogAssert, ELogVerbosity::Fatal, L"Assertion failed: {}", msg);
+	if (msg.empty())
+	{
+		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})",
+			String::AsUnicode(exp)
+		);
+	}
+	else
+	{
+		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})\n{}",
+			String::AsUnicode(exp),
+			msg
+		);
+	}
 }
 
-void CoreAssert::Ensure(std::wstring_view msg, const std::source_location& location)
+void CoreAssert::Ensure(std::string_view exp, std::string_view msg, const std::source_location& location)
 {
-	LogSystem::Log(location, LogAssert, ELogVerbosity::Error, L"Ensure failed: {}", msg);
+	Ensure(exp, String::AsUnicode(msg), location);
 }
 
 void CoreAssert::DebugBreak()

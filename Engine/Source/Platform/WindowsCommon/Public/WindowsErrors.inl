@@ -19,14 +19,14 @@ inline void ReportWindowsError(std::wstring_view InMessage = L"", int32 Error = 
 		ScopedBuf = L"<Unknown>";
 	}
 
-	SE_LOG(LogWindowsCommon, Fatal, L"An error occurred from Windows: {}\nErrorCode: {}, FormattedMessage: {}", InMessage, Error, ScopedBuf);
+	throw fatal_exception(String::Format(L"An error occurred from Windows: {}\nErrorCode: {}, FormattedMessage: {}", InMessage, Error, ScopedBuf));
 }
 
 [[noreturn]]
 inline void ReportCOMError(std::wstring_view InMessage, HRESULT Error)
 {
 	_com_error ComError(Error);
-	SE_LOG(LogWindowsCommon, Fatal, L"An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", InMessage, (uint32)Error, String::AsUnicode(ComError.ErrorMessage()));
+	throw fatal_exception(String::Format(L"An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", InMessage, (uint32)Error, String::AsUnicode(ComError.ErrorMessage())));
 }
 
 #define HR(x) \

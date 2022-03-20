@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "LogCore.h"
 #include "ObjectBase.h"
 #include "CoreConcepts.h"
-#include "Reflection/ReflectionMacros.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogVerbosity.h"
+#include "Misc/Exceptions.h"
 #include <optional>
 
 class SObject;
@@ -35,13 +32,13 @@ inline TTo Cast(TFrom* InValue) requires (!std::derived_from<TTo, SObject>) && (
 	auto ValueTypePtr = Cast<SValueType>(InValue);
 	if (ValueTypePtr == nullptr)
 	{
-		SE_LOG(LogCasts, Fatal, L"Object is not boxing class.");
+		throw fatal_exception(L"Object is not boxing class.");
 	}
 
 	TTo OutValue;
 	if (!ValueTypePtr->Unboxing(&OutValue))
 	{
-		SE_LOG(LogCasts, Fatal, L"The type of value contained at boxing object is not match with desired type.");
+		throw fatal_exception(L"The type of value contained at boxing object is not match with desired type.");
 	}
 
 	return OutValue;

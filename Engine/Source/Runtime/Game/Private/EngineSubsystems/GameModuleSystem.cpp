@@ -39,22 +39,19 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
 	std::unique_ptr Module = std::make_unique<PlatformModule>(GameModulePath);
 	if (!Module->IsValid())
 	{
-		SE_LOG(LogModule, Fatal, L"Could not initialize game module({}).", GameModuleName);
-		return;
+		throw fatal_exception(String::Format(L"Could not initialize game module({}).", GameModuleName));
 	}
 
 	auto ModuleLoader = Module->GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
 	if (!ModuleLoader)
 	{
-		SE_LOG(LogModule, Fatal, L"The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.");
-		return;
+		throw fatal_exception(String::Format("The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.", GameModulePath.string()));
 	}
 
 	GameModule = ModuleLoader(this);
 	if (!GameModule)
 	{
-		SE_LOG(LogModule, Fatal, L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", GameModuleName);
-		return;
+		throw fatal_exception(String::Format(L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", GameModuleName));
 	}
 
 	// Keep module object while application is running.

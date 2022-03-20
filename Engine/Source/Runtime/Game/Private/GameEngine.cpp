@@ -48,22 +48,19 @@ bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 	ModuleSystem->LoadGameModule(InModuleName);
 	if (GameInstance = ModuleSystem->LoadGameInstance(); GameInstance == nullptr)
 	{
-		SE_LOG(LogEngine, Fatal, L"LoadGameInstance function from {} module return nullptr.", InModuleName);
-		return false;
+		throw fatal_exception(String::Format(L"LoadGameInstance function from {} module return nullptr.", InModuleName));
 	}
 
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 	GameInstance->SetOuter(GameWorld);
 	if (!GameInstance->StartupLevel.IsValid())
 	{
-		SE_LOG(LogEngine, Fatal, L"SGameInstance::StartupLevel is not specified.");
-		return false;
+		throw fatal_exception("SGameInstance::StartupLevel is not specified.");
 	}
 
 	if (!GetEngineSubsystem<SGameLevelSystem>()->OpenLevel(GameInstance->StartupLevel))
 	{
-		SE_LOG(LogEngine, Fatal, L"Could not startup level.");
-		return false;
+		throw fatal_exception("Could not startup level.");
 	}
 
 	return true;
@@ -106,8 +103,7 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstrin
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine(InApplication))
 	{
-		SE_LOG(LogEngine, Fatal, L"Could not initialize engine.");
-		return -1;
+		throw fatal_exception("Could not initialize engine.");
 	}
 
 	// Load game module.

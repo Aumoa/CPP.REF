@@ -22,7 +22,7 @@ public:
 		, StartTime(Clock::now())
 		, Reporter(InReporter)
 	{
-		checkf(Instance, L"Instance is nullptr.");
+		checkf(Instance, "Instance is nullptr.");
 	}
 
 	inline ~ScopedTimer()
@@ -32,7 +32,7 @@ public:
 
 	inline void Stop()
 	{
-		checkf(Instance, L"Timer already stopped.");
+		checkf(Instance, "Timer already stopped.");
 		InternalStop();
 	}
 

@@ -87,7 +87,7 @@ void SGameAssetSystem::SearchDirectory(const std::filesystem::path& SearchDirect
 
 	if (!exists(SearchDirectory))
 	{
-		SE_LOG(LogAssets, Fatal, L"Content directory({}) is not exists. Please check your work directory on debug settings.", SearchDirectory.wstring());
+		throw fatal_exception(String::Format("Content directory({}) is not exists. Please check your work directory on debug settings.", SearchDirectory.string()));
 	}
 
 	SE_LOG(LogAssets, Verbose, L"Search asset directory on {}", SearchDirectory.wstring());

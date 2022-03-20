@@ -25,9 +25,12 @@ RenderThread::RenderThread()
 
 RenderThread::~RenderThread()
 {
+	std::unique_lock lock(_lock);
 	_running = false;
-	_rthread->Join();
+	_invoke.notify_all();
+	lock.unlock();
 
+	_rthread->Join();
 	sInstance = nullptr;
 }
 
@@ -46,7 +49,7 @@ Task<> RenderThread::ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::funct
 
 	if (_taskCompletionSource.IsValid())
 	{
-		co_await _taskCompletionSource.GetTask();
+		_taskCompletionSource.GetTask().Wait();
 	}
 
 	{

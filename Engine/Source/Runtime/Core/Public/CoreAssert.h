@@ -4,26 +4,38 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
+#include "Misc/Exceptions.h"
 #include <string_view>
 #include <source_location>
 
 class CORE_API CoreAssert
 {
 public:
-	static void Assert(std::wstring_view msg, const std::source_location& location = std::source_location::current());
-	static void Ensure(std::wstring_view msg, const std::source_location& location = std::source_location::current());
+	static void Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location = std::source_location::current());
+	static void Ensure(std::string_view exp, std::string_view msg, const std::source_location& location = std::source_location::current());
 	static void DebugBreak();
 };
 
 #if DO_CHECK
 
-#define checkf(x, fmt, ...) if (const bool b = (bool)(x); !b) { CoreAssert::Assert(String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); }
+#define check(x) \
+if (const bool b = (bool)(x); !b) \
+{ \
+	throw assert_exception(#x); \
+}
+
+#define checkf(x, fmt, ...) \
+if (const bool b = (bool)(x); !b) \
+{ \
+	throw assert_exception(#x, String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+}
+
 #define ensure(x) \
 [b = (bool)(x)](const std::source_location& location = std::source_location::current())\
 {\
 	if (!b)\
 	{\
-		CoreAssert::Ensure(L ## #x, location);\
+		CoreAssert::Ensure(#x, "", location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
@@ -39,7 +51,7 @@ public:
 {\
 	if (!b)\
 	{\
-		CoreAssert::Ensure(String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
+		CoreAssert::Ensure(#x, String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\

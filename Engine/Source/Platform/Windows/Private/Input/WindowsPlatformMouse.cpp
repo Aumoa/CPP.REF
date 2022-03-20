@@ -70,7 +70,7 @@ public:
     {
         if (s_mouse)
         {
-            SE_LOG(LogWindows, Fatal, L"WindowsPlatformMouse is a singleton");
+            throw fatal_exception("WindowsPlatformMouse is a singleton");
         }
 
         s_mouse = this;
@@ -236,7 +236,7 @@ private:
 
     friend void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void ClipToWindow() noexcept
+    void ClipToWindow()
     {
         checkf(mWindow != nullptr, L"internal logic error.");
 

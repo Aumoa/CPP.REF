@@ -41,8 +41,7 @@ void APlayerController::UpdateCameraManager(float elapsedTime)
 
 Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 {
-	checkf(false, L"NOT IMPLEMENTED");
-	return {};
+	throw fatal_exception("NOT IMPLEMENTED");
 	//if (!ensureMsgf(_PlayerCameraManager != nullptr, L"PlayerCameraManager does not registered."))
 	//{
 	//	return {};

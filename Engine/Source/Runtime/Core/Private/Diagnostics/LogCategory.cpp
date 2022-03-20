@@ -28,7 +28,6 @@ std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
 	switch (verbosity)
 	{
-	case ELogVerbosity::Fatal: return L"Fatal";
 	case ELogVerbosity::Error: return L"Error";
 	case ELogVerbosity::Warning: return L"Warning";
 	case ELogVerbosity::Info: return L"Info";
@@ -37,13 +36,18 @@ std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 	}
 }
 
-void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message)
+void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src)
 {
 	using namespace std;
 	using namespace std::chrono;
 
 	wstring Composed = String::Format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring DetailComposed = String::Format(L"{}: {}: {}", DateTime::Now().ToString<libty::DateTimeFormat::Json>(), Thread::GetCurrentThread()->GetFriendlyName(), Composed);
+	wstring DetailComposed = String::Format(L"{}: {}: {}\n  at {} in {}:{}",
+		DateTime::Now().ToString<libty::DateTimeFormat::Json>(),
+		Thread::GetCurrentThread()->GetFriendlyName(),
+		Composed,
+		String::AsUnicode(Src.function_name()), String::AsUnicode(Src.file_name()), Src.line()
+	);
 
 #if PLATFORM_WINDOWS
 	// Log to Visual Studio Output Console.

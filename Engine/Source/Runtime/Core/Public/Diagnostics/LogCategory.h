@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <source_location>
 #include "LogVerbosity.h"
 
 class CORE_API LogCategory
@@ -21,7 +22,7 @@ public:
 	static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
 
 protected:
-	virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message);
+	virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src = std::source_location::current());
 };
 
 #define DECLARE_LOG_CATEGORY(API, CategoryName) extern API LogCategory CategoryName;

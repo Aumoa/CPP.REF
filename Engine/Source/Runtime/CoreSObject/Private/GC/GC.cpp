@@ -5,6 +5,8 @@
 #include "Diagnostics/CycleCounterNamespace.h"
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Diagnostics/CycleCounterMacros.h"
+#include "Diagnostics/LogSystem.h"
+#include "Diagnostics/LogVerbosity.h"
 #include "Threading/SuspendTokenCollection.h"
 #include "Threading/ISuspendToken.h"
 #include "LogCore.h"

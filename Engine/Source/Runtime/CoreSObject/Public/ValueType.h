@@ -4,9 +4,9 @@
 
 #include "Object.h"
 #include "CoreConcepts.h"
+#include "Misc/String.h"
 #include <any>
 #include <sstream>
-#include "Misc/String.h"
 
 template<size_t _Depth>
 struct InheritSelector : public InheritSelector<_Depth - 1>
@@ -20,7 +20,7 @@ struct InheritSelector<0>
 	constexpr static size_t Depth = 0;
 };
 
-class SValueType : implements SObject
+class SValueType : virtual public SObject
 {
 private:
 	std::any _value;

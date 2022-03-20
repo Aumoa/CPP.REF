@@ -5,6 +5,8 @@
 #include "Object.h"
 #include "RHI/RHIStructures.h"
 #include "Diagnostics/LogCategory.h"
+#include "Diagnostics/LogSystem.h"
+#include "Diagnostics/LogVerbosity.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include <variant>
 

@@ -84,22 +84,19 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		auto Loader = EngineModule->GetFunctionPointer<SGameModule*()>("LoadGameModule");
 		if (!Loader)
 		{
-			SE_LOG(LogWindows, Fatal, L"GameEngine does not initialized. {} is corrupted.", EngineName);
-			return -1;
+			throw fatal_exception(String::Format(L"GameEngine does not initialized. {} is corrupted.", EngineName));
 		}
 
 		SharedPtr<SGameModule> GameModule = Loader();
 		if (GameModule == nullptr)
 		{
-			SE_LOG(LogWindows, Fatal, L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
-			return -1;
+			throw fatal_exception(L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
 		}
 
 		SharedPtr<SGameEngine> GameEngine = GameModule->CreateGameEngine();
 		if (GameEngine == nullptr)
 		{
-			SE_LOG(LogWindows, Fatal, L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
-			return -1;
+			throw fatal_exception(L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
 		}
 
 		SharedPtr WinApp = gcnew SWindowsApplication(GetModuleHandleW(nullptr));
@@ -353,7 +350,7 @@ ComPtr<IWICFormatConverter> SWindowsApplication::DecodeImage(IWICBitmapDecoder* 
 		FormatGUID = GUID_WICPixelFormat32bppPRGBA;
 		break;
 	default:
-		SE_LOG(LogWindows, Fatal, L"Not supported pixel format.");
+		throw fatal_exception(L"Not supported pixel format.");
 	}
 
 	ComPtr<IWICFormatConverter> Converter;

@@ -71,3 +71,5 @@ T* SObjectDetails::GCNewBinder::operator << (T* Ptr)
 	((SObject*)Ptr)->PostConstruction();
 	return Ptr;
 }
+
+#include "ObjectCasts.h"

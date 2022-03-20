@@ -79,7 +79,7 @@ public:
     {
         if (s_keyboard)
         {
-            SE_LOG(LogWindows, Fatal, L"PlatformWindowsKeyboard is a singleton.");
+            throw fatal_exception("PlatformWindowsKeyboard is a singleton.");
         }
 
         s_keyboard = this;

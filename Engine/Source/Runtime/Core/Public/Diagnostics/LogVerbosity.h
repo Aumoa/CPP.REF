@@ -4,7 +4,6 @@
 
 enum class ELogVerbosity
 {
-	Fatal,
 	Error,
 	Warning,
 	Info,

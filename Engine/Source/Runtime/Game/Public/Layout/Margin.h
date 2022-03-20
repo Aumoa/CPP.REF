@@ -64,8 +64,7 @@ struct Margin
 		case EOrientation::Horizontal: return Left + Right;
 		case EOrientation::Vertical: return Top + Bottom;
 		default:
-			checkf(false, L"Invalid argument: Orientation({})", (int32)Orientation);
-			return 0;
+			throw fatal_exception(String::Format("Invalid argument: Orientation({})", (int32)Orientation));
 		}
 	}
 
