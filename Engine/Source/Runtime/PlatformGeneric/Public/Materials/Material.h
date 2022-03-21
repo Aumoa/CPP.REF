@@ -24,7 +24,7 @@ private:
 public:
 	SMaterial(IRHIDevice* InDevice, EBaseShaderCode InBaseShaderCode);
 
-	virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() { return {}; }
+	//virtual std::vector<RHIShaderParameterElement> GetShaderParameterDeclaration() { return {}; }
 
 	void Compile();
 	EBaseShaderCode GetBaseShaderCode();

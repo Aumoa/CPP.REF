@@ -11,20 +11,20 @@ SDirectXRenderTargetView::SDirectXRenderTargetView(SDirectXDevice* Owner, ComPtr
 {
 }
 
-void SDirectXRenderTargetView::CreateRenderTargetView(int32 Index, IRHIResource* Resource, const RHIRenderTargetViewDesc* Desc)
+void SDirectXRenderTargetView::CreateRenderTargetView(size_t index, IRHIResource* pResource, const RHIRenderTargetViewDesc* pDesc)
 {
 	auto* sDevice = Cast<SDirectXDevice>(GetDevice());
-	auto* sResource = Cast<SDirectXResource>(Resource);
+	auto* sResource = Cast<SDirectXResource>(pResource);
 
-	ID3D12Device* pDevice = sDevice->pDevice.Get();
-	ID3D12Resource* pResource = sResource ? sResource->pResource.Get() : nullptr;
+	ID3D12Device* lpDevice = sDevice->pDevice.Get();
+	ID3D12Resource* lpResource = sResource ? sResource->pResource.Get() : nullptr;
 
 	std::optional<D3D12_RENDER_TARGET_VIEW_DESC> RTVDesc;
-	if (Desc)
+	if (pDesc)
 	{
-		memcpy(&RTVDesc.emplace(), Desc, sizeof(RHIRenderTargetViewDesc));
+		memcpy(&RTVDesc.emplace(), pDesc, sizeof(RHIRenderTargetViewDesc));
 	}
 
-	pDevice->CreateRenderTargetView(pResource, RTVDesc ? &*RTVDesc : nullptr, GetCPUHandle(Index));
-	BindResources[Index] = Resource;
+	lpDevice->CreateRenderTargetView(lpResource, RTVDesc ? &*RTVDesc : nullptr, GetCPUHandle(index));
+	BindResources[index] = pResource;
 }

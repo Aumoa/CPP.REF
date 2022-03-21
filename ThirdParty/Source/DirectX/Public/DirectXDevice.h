@@ -18,13 +18,16 @@ public:
 	using Super::Dispose;
 
 	virtual IRHICommandQueue* CreateCommandQueue() override;
-	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& InDesc, const RHISubresourceData* InitialData) override { throw; }
-	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 Count) override;
+	virtual IRHIResource* CreateCommittedResource(const RHIHeapProperties& heapProperties, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* pOptimizedClearValue) override;
+	virtual IRHIRenderTargetView* CreateRenderTargetView(size_t count) override;
+	virtual IRHIDepthStencilView* CreateDepthStencilView(size_t count) override;
+	virtual IRHIShaderResourceView* CreateShaderResourceView(size_t count) override;
 	virtual IRHIFence* CreateFence() override;
-	virtual IRHICommandAllocator* CreateCommandAllocator() override;
-	virtual IRHICommandBuffer* CreateCommandBuffer(IRHICommandAllocator* Allocator) override;
-	virtual IRHIRenderPass* CreateRenderPass() override;
+	virtual IRHICommandAllocator* CreateCommandAllocator(ERHICommandListType type) override;
+	virtual IRHIGraphicsCommandList* CreateCommandList(IRHICommandAllocator* pAllocator, ERHICommandListType type, IRHIPipelineState* pInitialState) override;
 	virtual IRHIShaderCodeWorkspace* CreateShaderCodeWorkspace() override;
+	virtual IRHIRootSignature* CreateRootSignature(const RHIRootSignatureDesc& desc) override;
+	virtual IRHIPipelineState* CreateGraphicsPipelineState(const RHIGraphicsPipelineStateDesc& desc) override;
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

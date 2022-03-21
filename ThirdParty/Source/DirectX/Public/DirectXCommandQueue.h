@@ -17,9 +17,8 @@ public:
 
 	using Super::Dispose;
 
-	virtual int32 AcquireSwapChainImage(IRHISwapChain* SwapChain) override;
-	virtual void Present(IRHISwapChain* SwapChain, int32 BufferIndex) override;
-	virtual void Submit(std::span<IRHICommandBuffer* const> CommandBuffers, IRHIFence* Fence) override;
+	virtual void ExecuteCommandBuffers(std::span<IRHIGraphicsCommandList* const> commandLists) override;
+	virtual void Signal(IRHIFence* pFence, uint64 fenceValue) override;
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

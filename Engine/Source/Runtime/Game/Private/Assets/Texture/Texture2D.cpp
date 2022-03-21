@@ -43,30 +43,31 @@ bool STexture2D::StreamIn(SAssetsLoader* Loader, std::span<const uint8> AssetsBi
 	ImageSource = ImageLoader.CreateImageFromBinary(Body, 0, ERHIPixelFormat::B8G8R8A8_UNORM);
 	if (ImageSource)
 	{
-		IRHIDevice* Device = Loader->GetDevice();
+		//IRHIDevice* Device = Loader->GetDevice();
 
-		// Copy pixels to buffer.
-		Vector2N PixelSize = ImageSource->GetPixelSize();
-		std::vector<uint8> PixelsData((size_t)PixelSize.Size() * 4);
-		int32 Stride = PixelSize.X * 4;
-		ImageSource->CopyPixels(nullptr, Stride, (int32)PixelsData.size(), PixelsData.data());
+		//// Copy pixels to buffer.
+		//Vector2N PixelSize = ImageSource->GetPixelSize();
+		//std::vector<uint8> PixelsData((size_t)PixelSize.Size() * 4);
+		//int32 Stride = PixelSize.X * 4;
+		//ImageSource->CopyPixels(nullptr, Stride, (int32)PixelsData.size(), PixelsData.data());
 
-		// Create texture data.
-		RHITexture2DDesc Desc = {};
-		Desc.Width = PixelSize.X;
-		Desc.Height = PixelSize.Y;
-		Desc.DepthOrArraySize = 1;
-		Desc.MipLevels = 1;
-		Desc.Format = ERHIPixelFormat::B8G8R8A8_UNORM;
-		Desc.Usage = ERHIBufferUsage::Immutable;
-		Desc.InitialState = ERHIResourceStates::PixelShaderResource;
-		Desc.SampleDesc = { 1, 0 };
+		//// Create texture data.
+		//RHIResourceDesc Desc =
+		//{
+		//	.Dimension = ERHIResourceDimension::Texture2D,
+		//	.Width = PixelSize.X,
+		//	.Height = PixelSize.Y,
+		//	.DepthOrArraySize = 1,
+		//	.MipLevels = 1,
+		//	.Format = ERHIPixelFormat::B8G8R8A8_UNORM,
+		//	.SampleDesc = { 1, 0 }
+		//};
 
-		RHISubresourceData InitialData;
-		InitialData.pSysMem = PixelsData.data();
-		InitialData.SysMemPitch = (size_t)PixelSize.X * 4;
+		//RHISubresourceData InitialData;
+		//InitialData.pSysMem = PixelsData.data();
+		//InitialData.SysMemPitch = (size_t)PixelSize.X * 4;
 
-		Texture = Device->CreateTexture2D(Desc, &InitialData);
+		//Texture = Device->CreateTexture2D(Desc, &InitialData);
 		//Bitmap = Device->CreateBitmapFromTexture2D(Texture);
 	}
 

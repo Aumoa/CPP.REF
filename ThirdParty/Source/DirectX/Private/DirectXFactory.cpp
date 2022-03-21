@@ -28,10 +28,10 @@ void SDirectXFactory::Dispose()
 	Dispose(true);
 }
 
-IRHIAdapter* SDirectXFactory::GetAdapter(int32 Index)
+IRHIAdapter* SDirectXFactory::GetAdapter(size_t index)
 {
 	ComPtr<IDXGIAdapter1> pAdapter;
-	HR(pFactory->EnumAdapters1((UINT)Index, &pAdapter));
+	HR(pFactory->EnumAdapters1((UINT)index, &pAdapter));
 
 	if (pAdapter)
 	{
@@ -43,9 +43,9 @@ IRHIAdapter* SDirectXFactory::GetAdapter(int32 Index)
 	}
 }
 
-IRHIDevice* SDirectXFactory::CreateDevice(IRHIAdapter* Adapter)
+IRHIDevice* SDirectXFactory::CreateDevice(IRHIAdapter* pAdapter)
 {
-	auto sAdapter = Cast<SDirectXAdapter>(Adapter);
+	auto sAdapter = Cast<SDirectXAdapter>(pAdapter);
 
 	ComPtr<ID3D12Device> pDevice;
 	HR(D3D12CreateDevice(sAdapter->pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice)));
@@ -53,7 +53,7 @@ IRHIDevice* SDirectXFactory::CreateDevice(IRHIAdapter* Adapter)
 	return gcnew SDirectXDevice(this, std::move(pDevice));
 }
 
-IRHISwapChain* SDirectXFactory::CreateSwapChain(IRHICommandQueue* Queue, size_t NumBuffers)
+IRHISwapChain* SDirectXFactory::CreateSwapChain(IRHICommandQueue* pQueue, size_t numBuffers)
 {
 	Vector2N Size = IApplicationInterface::Get().GetViewportSize();
 	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc =
@@ -63,22 +63,22 @@ IRHISwapChain* SDirectXFactory::CreateSwapChain(IRHICommandQueue* Queue, size_t 
 		.Format = DXGI_FORMAT_B8G8R8A8_UNORM,
 		.SampleDesc = { 1, 0 },
 		.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
-		.BufferCount = (UINT)NumBuffers,
+		.BufferCount = (UINT)numBuffers,
 		.Scaling = DXGI_SCALING_STRETCH,
 		.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
 		.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED
 	};
 
-	auto sQueue = Cast<SDirectXCommandQueue>(Queue);
-	ID3D12CommandQueue* pQueue = sQueue->pQueue.Get();
+	auto sQueue = Cast<SDirectXCommandQueue>(pQueue);
+	ID3D12CommandQueue* lQueue = sQueue->pQueue.Get();
 
 	ComPtr<IDXGISwapChain1> pSwapChain1;
-	HR(pFactory->CreateSwapChainForHwnd(pQueue, (HWND)IApplicationInterface::Get().GetWindowHandle(), &SwapChainDesc, nullptr, nullptr, &pSwapChain1));
+	HR(pFactory->CreateSwapChainForHwnd(lQueue, (HWND)IApplicationInterface::Get().GetWindowHandle(), &SwapChainDesc, nullptr, nullptr, &pSwapChain1));
 
 	ComPtr<IDXGISwapChain4> pSwapChain4;
 	HR(pSwapChain1.As(&pSwapChain4));
 
-	return gcnew SDirectXSwapChain(Cast<SDirectXDevice>(Queue->GetDevice()), std::move(pSwapChain4), NumBuffers);
+	return gcnew SDirectXSwapChain(Cast<SDirectXDevice>(pQueue->GetDevice()), std::move(pSwapChain4), numBuffers);
 }
 
 void SDirectXFactory::Dispose(bool bDisposing)

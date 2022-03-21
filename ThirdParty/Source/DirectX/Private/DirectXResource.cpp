@@ -10,6 +10,12 @@ SDirectXResource::SDirectXResource(IRHIDevice* Owner, ComPtr<ID3D12Resource> pRe
 {
 }
 
+RHIResourceDesc SDirectXResource::GetDesc()
+{
+	D3D12_RESOURCE_DESC desc = pResource->GetDesc();
+	return reinterpret_cast<const RHIResourceDesc&>(desc);
+}
+
 void SDirectXResource::Dispose(bool bDisposing)
 {
 	pResource.Reset();

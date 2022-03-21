@@ -13,17 +13,17 @@ SDirectXView::SDirectXView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> p
 	IncrementSize = Owner->pDevice->GetDescriptorHandleIncrementSize(this->pDescriptorHeap->GetDesc().Type);
 }
 
-int32 SDirectXView::GetViewCount()
+size_t SDirectXView::GetViewCount()
 {
-	return (int32)BindResources.size();
+	return BindResources.size();
 }
 
-IRHIResource* SDirectXView::GetResource(int32 IndexOf)
+IRHIResource* SDirectXView::GetResource(size_t indexOf)
 {
-	return BindResources[IndexOf];
+	return BindResources[indexOf];
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE SDirectXView::GetCPUHandle(int32 IndexOf)
+D3D12_CPU_DESCRIPTOR_HANDLE SDirectXView::GetCPUHandle(size_t indexOf)
 {
 	if (!BaseCPUHandle.has_value())
 	{
@@ -31,11 +31,11 @@ D3D12_CPU_DESCRIPTOR_HANDLE SDirectXView::GetCPUHandle(int32 IndexOf)
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE Base = *BaseCPUHandle;
-	Base.ptr += (uint32)IndexOf * IncrementSize;
+	Base.ptr += (SIZE_T)indexOf * IncrementSize;
 	return Base;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE SDirectXView::GetGPUHandle(int32 IndexOf)
+D3D12_GPU_DESCRIPTOR_HANDLE SDirectXView::GetGPUHandle(size_t indexOf)
 {
 	if (!BaseGPUHandle.has_value())
 	{
@@ -43,7 +43,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE SDirectXView::GetGPUHandle(int32 IndexOf)
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE Base = *BaseGPUHandle;
-	Base.ptr += (uint32)IndexOf * IncrementSize;
+	Base.ptr += (UINT64)indexOf * IncrementSize;
 	return Base;
 }
 

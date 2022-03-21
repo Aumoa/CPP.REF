@@ -4,7 +4,6 @@
 #include "Draw/SlateDrawCollector.h"
 #include "Widgets/Image/Image.h"
 #include "EngineSubsystems/GameRenderSystem.h"
-#include "SceneRendering/RenderTargets/RaytraceSceneRenderTarget.h"
 #include "GameEngine.h"
 
 GENERATE_BODY(SViewport);
@@ -79,7 +78,6 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, InAttr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(InAttr);
 	RenderSize = InAttr._RenderSize;
-	RenderTarget = gcnew SRaytraceSceneRenderTarget();
 	ReallocRenderTarget();
 }
 

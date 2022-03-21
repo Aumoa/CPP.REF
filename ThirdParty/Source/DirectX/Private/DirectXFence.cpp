@@ -8,31 +8,95 @@ SDirectXFence::SDirectXFence(IRHIDevice* Owner, ComPtr<ID3D12Fence> pFence)
 	: Super(Owner)
 	, pFence(std::move(pFence))
 {
-	hFenceEvent = CreateEventExW(nullptr, nullptr, 0, GENERIC_ALL);
 }
 
-void SDirectXFence::Wait()
+Task<> SDirectXFence::SetEventOnCompletion(uint64 fenceValue, std::optional<std::chrono::milliseconds> timeout)
 {
-	if (IsReady())
+	if (GetCompletedValue() < fenceValue)
 	{
-		HR(pFence->SetEventOnCompletion(FenceValue, hFenceEvent));
-		WaitForSingleObject(hFenceEvent, INFINITE);
+		std::unique_lock lock(_lock);
+		WaitContext* pContext = nullptr;
+		for (size_t i = 0; i < _contexts.size(); ++i)
+		{
+			if (_contexts[i]->bReady)
+			{
+				pContext = _contexts[i].get();
+				break;
+			}
+		}
+
+		if (pContext == nullptr)
+		{
+			pContext = _contexts.emplace_back(std::make_unique<WaitContext>()).get();
+			pContext->hEvent = CreateEventExW(nullptr, nullptr, 0, GENERIC_ALL);
+		}
+
+		pContext->TCS = TaskCompletionSource<>::Create();
+		pContext->bReady = false;
+
+		auto task = pContext->TCS.GetTask();
+		lock.unlock();
+
+		HR(pFence->SetEventOnCompletion(FenceValue, pContext->hEvent));
+		BOOL bResult = RegisterWaitForSingleObject(
+			&pContext->hWait,
+			pContext->hEvent,
+			&SDirectXFence::OnConnect,
+			pContext,
+			(ULONG)timeout.value_or(std::chrono::milliseconds(INFINITE)).count(),
+			WT_EXECUTEONLYONCE);
+		if (!bResult)
+		{
+			pContext->TCS.SetException(std::make_exception_ptr(invalid_operation("Failed to create callback procedure for waiting event.")));
+			pContext->bReady = true;
+		}
+
+		return task;
 	}
+
+	return Task<>::CompletedTask();
 }
 
-bool SDirectXFence::IsReady()
+uint64 SDirectXFence::GetCompletedValue()
 {
-	return pFence->GetCompletedValue() == FenceValue;
+	return pFence->GetCompletedValue();
 }
 
 void SDirectXFence::Dispose(bool bDisposing)
 {
-	if (hFenceEvent)
+	for (auto& ctx : _contexts)
 	{
-		CloseHandle(hFenceEvent);
-		hFenceEvent = nullptr;
+		if (!ctx)
+		{
+			continue;
+		}
+
+		ctx->TCS.GetTask().Wait();
+
+		if (ctx->hEvent)
+		{
+			CloseHandle(ctx->hEvent);
+			ctx->hEvent = nullptr;
+		}
 	}
 
 	pFence.Reset();
 	Super::Dispose(bDisposing);
+}
+
+VOID CALLBACK SDirectXFence::OnConnect(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+{
+	WaitContext* pContext = reinterpret_cast<WaitContext*>(lpParameter);
+	if (TimerOrWaitFired)
+	{
+		pContext->TCS.SetException(std::make_exception_ptr(task_canceled()));
+	}
+	else
+	{
+		pContext->TCS.SetResult();
+	}
+
+	CloseHandle(pContext->hWait);
+	pContext->hWait = nullptr;
+	pContext->bReady = true;
 }

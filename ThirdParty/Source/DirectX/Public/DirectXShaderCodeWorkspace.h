@@ -14,19 +14,19 @@ class DIRECTX_API SDirectXShaderCodeWorkspace : public SDirectXDeviceChild, impl
 private:
 	std::map<std::wstring, RHIShaderCode, std::less<>> ShaderCodes;
 	SPROPERTY(CompiledShaderBlobs)
-	std::map<std::wstring, SDirectXShaderCodeBlob*, std::less<>> CompiledShaderBlobs;
+	std::map<std::string_view, SDirectXShaderCodeBlob*, std::less<>> CompiledShaderBlobs;
 
 public:
 	SDirectXShaderCodeWorkspace(SDirectXDevice* Owner);
 
 	using Super::Dispose;
 
-	virtual void AddShaderCode(std::wstring_view Name, RHIShaderCode Code) override;
+	virtual void AddShaderCode(std::wstring_view Name, const RHIShaderCode& Code) override;
 	virtual void Compile() override;
-	virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::wstring_view Name) override;
+	virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::string_view EntryPointName) override;
 
-	virtual HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
-	virtual HRESULT __stdcall Close(LPCVOID pData) override;
+	virtual HRESULT CALLBACK Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
+	virtual HRESULT CALLBACK Close(LPCVOID pData) override;
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

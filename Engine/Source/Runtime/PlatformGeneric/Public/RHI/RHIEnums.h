@@ -9,11 +9,14 @@ SENUM(ERHIPrimitiveTopology, int32,
     TriangleStrip, 5
 );
 
-SENUM(ERHICommandType, int32,
+SENUM(ERHICommandListType, int32,
     Direct, 0,
     Bundle, 1,
     Compute, 2,
-    Copy, 3
+    Copy, 3,
+    VideoDecode, 4,
+    VideoProcess, 5,
+    VideoEncode, 6
 );
 
 SENUM(ERHIResourceStates, int32,
@@ -409,4 +412,290 @@ SENUM(ERHIShaderType, int32,
     HullShader,,
     GeometryShader,,
     ComputeShader,
+);
+
+SENUM(ERHIRootParameterType, int32,
+    DescriptorTable, 0,
+    _32BitConstants,,
+    ConstantBuffer,,
+    ShaderResource,,
+    UnorderedAccess,
+);
+
+SENUM(ERHIShaderVisibility, int32,
+    All, 0,
+    Vertex,,
+    Hull,,
+    Domain,,
+    Geometry,,
+    Pixel,,
+    Amplification,,
+    Mesh,
+);
+
+SENUM(ERHISamplerFilter, int32,
+    MIN_MAG_MIP_POINT, 0,
+    MIN_MAG_POINT_MIP_LINEAR, 0x1,
+    MIN_POINT_MAG_LINEAR_MIP_POINT, 0x4,
+    MIN_POINT_MAG_MIP_LINEAR, 0x5,
+    MIN_LINEAR_MAG_MIP_POINT, 0x10,
+    MIN_LINEAR_MAG_POINT_MIP_LINEAR, 0x11,
+    MIN_MAG_LINEAR_MIP_POINT, 0x14,
+    MIN_MAG_MIP_LINEAR, 0x15,
+    ANISOTROPIC, 0x55,
+    COMPARISON_MIN_MAG_MIP_POINT, 0x80,
+    COMPARISON_MIN_MAG_POINT_MIP_LINEAR, 0x81,
+    COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT, 0x84,
+    COMPARISON_MIN_POINT_MAG_MIP_LINEAR, 0x85,
+    COMPARISON_MIN_LINEAR_MAG_MIP_POINT, 0x90,
+    COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR, 0x91,
+    COMPARISON_MIN_MAG_LINEAR_MIP_POINT, 0x94,
+    COMPARISON_MIN_MAG_MIP_LINEAR, 0x95,
+    COMPARISON_ANISOTROPIC, 0xd5,
+    MINIMUM_MIN_MAG_MIP_POINT, 0x100,
+    MINIMUM_MIN_MAG_POINT_MIP_LINEAR, 0x101,
+    MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, 0x104,
+    MINIMUM_MIN_POINT_MAG_MIP_LINEAR, 0x105,
+    MINIMUM_MIN_LINEAR_MAG_MIP_POINT, 0x110,
+    MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, 0x111,
+    MINIMUM_MIN_MAG_LINEAR_MIP_POINT, 0x114,
+    MINIMUM_MIN_MAG_MIP_LINEAR, 0x115,
+    MINIMUM_ANISOTROPIC, 0x155,
+    MAXIMUM_MIN_MAG_MIP_POINT, 0x180,
+    MAXIMUM_MIN_MAG_POINT_MIP_LINEAR, 0x181,
+    MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT, 0x184,
+    MAXIMUM_MIN_POINT_MAG_MIP_LINEAR, 0x185,
+    MAXIMUM_MIN_LINEAR_MAG_MIP_POINT, 0x190,
+    MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR, 0x191,
+    MAXIMUM_MIN_MAG_LINEAR_MIP_POINT, 0x194,
+    MAXIMUM_MIN_MAG_MIP_LINEAR, 0x195,
+    MAXIMUM_ANISOTROPIC, 0x1d5
+);
+
+SENUM(ERHITextureAddressMode, int32,
+    Wrap, 1,
+    Mirror, 2,
+    Clamp, 3,
+    Border, 4,
+    MirrorOnce, 5
+);
+
+SENUM(ERHIComparisonFunc, int32,
+    Never, 1,
+    Less, 2,
+    Equal, 3,
+    LessEqual, 4,
+    Greater, 5,
+    NotEqual, 6,
+    GreaterEqual, 7,
+    Always, 8
+);
+
+SENUM(ERHIStaticBorderColor, int32,
+    TransparentBlack, 0,
+    OpaqueBlack, TransparentBlack + 1,
+    OpaqueWhite, OpaqueBlack + 1
+);
+
+SENUM(ERHIRootSignatureFlags, int32,
+    None, 0,
+    AllowInputAssemblerInputLayout, 0x1,
+    DenyVertexShaderRootAccess, 0x2,
+    DenyHullShaderRootAccess, 0x4,
+    DenyDomainShaderRootAccess, 0x8,
+    DenyGeometryShaderRootAccess, 0x10,
+    DenyPixelShaderRootAccess, 0x20,
+    AllowStreamOutput, 0x40,
+    LocalRootSignature, 0x80,
+    DenyAmplificationShaderRootAccess, 0x100,
+    DenyMeshShaderRootAccess, 0x200,
+    CbvSrvUavHeapDirectlyIndexed, 0x400,
+    SamplerHeapDirectlyIndexed, 0x800
+);
+
+SENUM(ERHIBlend, int32,
+    Zero, 1,
+    One, 2,
+    SrcColor, 3,
+    InvSrcColor, 4,
+    SrcAlpha, 5,
+    InvSrcAlpha, 6,
+    DestAlpha, 7,
+    InvDestAlpha, 8,
+    DestColor, 9,
+    InvDestColor, 10,
+    SrcAlphaSat, 11,
+    BlendFactor, 14,
+    InvBlendFactor, 15,
+    Src1Color, 16,
+    InvSrc1Color, 17,
+    Src1Alpha, 18,
+    InvSrc1Alpha, 19
+);
+
+SENUM(ERHIBlendOp, int32,
+    Add, 1,
+    Subtract, 2,
+    RevSubtract, 3,
+    Min, 4,
+    Max, 5
+);
+
+SENUM(ERHILogicOp, int32,
+    Clear, 0,
+    Set, (Clear + 1),
+    Copy, (Set + 1),
+    CopyInverted, (Copy + 1),
+    Noop, (CopyInverted + 1),
+    Invert, (Noop + 1),
+    And, (Invert + 1),
+    Nand, (And + 1),
+    Or, (Nand + 1),
+    Nor, (Or + 1),
+    Xor, (Nor + 1),
+    Equiv, (Xor + 1),
+    AndReverse, (Equiv + 1),
+    AndInverted, (AndReverse + 1),
+    OrReverse, (AndInverted + 1),
+    OrInverted, (OrReverse + 1)
+);
+
+SENUM(ERHIFillMode, int32,
+    Wireframe, 2,
+    Solid, 3
+);
+
+SENUM(ERHICullMode, int32,
+    None, 1,
+    Front, 2,
+    Back, 3
+);
+
+SENUM(ERHIConservativeRasterizationMode, int32,
+    Off, 0,
+    On, 1
+);
+
+SENUM(ERHIDepthWriteMask, int32,
+    Zero, 0,
+    All, 1
+);
+
+SENUM(ERHIStencilOp, int32,
+    Keep, 1,
+    Zero, 2,
+    Replace, 3,
+    Incr_sat, 4,
+    Decr_sat, 5,
+    Invert, 6,
+    Incr, 7,
+    Decr, 8
+);
+
+SENUM(ERHIIndexBufferStripCutValue, int32,
+    Disabled, 0,
+    FFFF, 1,
+    FFFFFFFF, 2
+);
+
+SENUM(ERHIPrimitiveTopologyType, int32,
+    Undefined, 0,
+    Point, 1,
+    Line, 2,
+    Triangle, 3,
+    Patch, 4
+);
+
+SENUM(ERHIPipelineStateFlags, int32,
+    None, 0,
+    ToolDebug, 1
+);
+
+SENUM(ERHIColorWriteEnable, uint8,
+    Red, 1,
+    Green, 2,
+    Blue, 4,
+    Alpha, 8,
+    All, (Red | Green | Blue | Alpha)
+);
+
+SENUM(ERHIResourceBarrierType, int32,
+    Transition, 0,
+    Aliasing, Transition + 1,
+    UAV, Aliasing + 1
+);
+
+SENUM(ERHIResourceBarrierFlags, int32,
+    None, 0,
+    BeginOnly, 0x1,
+    EndOnly, 0x2
+);
+
+SENUM(ERHIUAVDimension, int32,
+    Unknown, 0,
+    Buffer, 1,
+    Texture1D, 2,
+    Texture1DArray, 3,
+    Texture2D, 4,
+    Texture2DArray, 5,
+    Texture3D, 8
+);
+
+SENUM(ERHIBufferUAVFlags, int32,
+    None, 0,
+    Raw, 0x1
+);
+
+SENUM(ERHIHeapType, int32,
+    Default, 1,
+    Upload, 2,
+    Readback, 3,
+    Custom, 4
+);
+
+SENUM(ERHICPUPageProperty, int32,
+    Unknown, 0,
+    NotAvailable, 1,
+    WriteCombine, 2,
+    WriteBack, 3
+);
+
+SENUM(ERHIMemoryPool, int32,
+    Unknown, 0,
+    L0, 1,
+    L1, 2
+);
+
+SENUM(ERHIHeapFlags, int32,
+    None, 0,
+    Shared, 0x1,
+    DenyBuffers, 0x4,
+    AllowDisplay, 0x8,
+    SharedCrossAdapter, 0x20,
+    DenyRtDsTextures, 0x40,
+    DenyNonRtDsTextures, 0x80,
+    HardwareProtected, 0x100,
+    AllowWriteWatch, 0x200,
+    AllowShaderAtomics, 0x400,
+    CreateNotResident, 0x800,
+    CreateNotZeroed, 0x1000,
+    AllowAllBuffersAndTextures, 0,
+    AllowOnlyBuffers, 0xc0,
+    AllowOnlyNonRtDsTextures, 0x44,
+    AllowOnlyRtDsTextures, 0x84
+);
+
+SENUM(ERHIResourceDimension, int32,
+    Unknown, 0,
+    Buffer, 1,
+    Texture1D, 2,
+    Texture2D, 3,
+    Texture3D, 4
+);
+
+SENUM(ERHITextureLayout, int32,
+    Unknown, 0,
+    RowMajor, 1,
+    UndefinedSwizzle64KB, 2,
+    StandardSwizzle64KB, 3
 );

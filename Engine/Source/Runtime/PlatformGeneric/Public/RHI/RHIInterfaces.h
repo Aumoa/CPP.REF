@@ -6,7 +6,9 @@
 #include "IDisposable.h"
 #include "RHIStructures.h"
 #include "Numerics/VectorInterface/Rect.h"
+#include "Threading/Task.h"
 #include <span>
+#include <optional>
 
 struct IRHIFactory;
 struct IRHIDevice;
@@ -32,32 +34,51 @@ struct IRHIDeviceChild : implements IRHIFactoryChild
 	virtual IRHIDevice* GetDevice() = 0;
 };
 
+struct IRHIRootSignature : implements IRHIDeviceChild
+{
+	GENERATED_INTERFACE_BODY(IRHIRootSignature)
+};
+
+struct IRHIPipelineState : implements IRHIDeviceChild
+{
+	GENERATED_INTERFACE_BODY(IRHIPipelineState)
+};
+
 struct IRHIResource : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIResource)
+
+	virtual RHIResourceDesc GetDesc() = 0;
 };
 
 struct IRHIView : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIView)
 
-	virtual int32 GetViewCount() = 0;
-	virtual IRHIResource* GetResource(int32 IndexOf) = 0;
+	virtual size_t GetViewCount() = 0;
+	virtual IRHIResource* GetResource(size_t indexOf) = 0;
 };
 
 struct IRHIRenderTargetView : implements IRHIView
 {
 	GENERATED_INTERFACE_BODY(IRHIRenderTargetView)
 
-	virtual void CreateRenderTargetView(int32 Index, IRHIResource* Resource, const RHIRenderTargetViewDesc* Desc) = 0;
+	virtual void CreateRenderTargetView(size_t index, IRHIResource* pResource, const RHIRenderTargetViewDesc* pDesc) = 0;
 };
 
-struct IRHIRenderPass : implements IRHIDeviceChild
+struct IRHIDepthStencilView : implements IRHIView
 {
-	GENERATED_INTERFACE_BODY(IRHIRenderPass)
+	GENERATED_INTERFACE_BODY(IRHIDepthStencilView)
 
-	virtual void AddColorAttachment(const RHIRenderPassAttachment& AttachDesc) = 0;
-	virtual void Apply(std::span<std::pair<IRHIView*, int32> const> AttachViews, const Vector2N& Size) = 0;
+	virtual void CreateDepthStencilView(size_t index, IRHIResource* pResource, const RHIDepthStencilViewDesc* pDesc) = 0;
+};
+
+struct IRHIShaderResourceView : implements IRHIView
+{
+	GENERATED_INTERFACE_BODY(IRHIShaderResourceView)
+
+	virtual void CreateShaderResourceView(size_t index, IRHIResource* pResource, const RHIShaderResourceViewDesc* pDesc) = 0;
+	virtual void CreateUnorderedAccessView(size_t index, IRHIResource* pResource, IRHIResource* pCounter, const RHIUnorderedAccessViewDesc* pDesc) = 0;
 };
 
 struct IRHICommandAllocator : implements IRHIDeviceChild
@@ -67,23 +88,14 @@ struct IRHICommandAllocator : implements IRHIDeviceChild
 	virtual void Reset() = 0;
 };
 
-struct IRHICommandBuffer : implements IRHIDeviceChild
+struct IRHIGraphicsCommandList : implements IRHIDeviceChild
 {
-	GENERATED_INTERFACE_BODY(IRHICommandBuffer)
+	GENERATED_INTERFACE_BODY(IRHIGraphicsCommandList)
 
-	virtual void BeginRecord() = 0;
-	virtual void EndRecord() = 0;
-	virtual void ResourceBarrier(std::span<const RHIResourceBarrier> InBarriers) = 0;
-	virtual void ClearRenderTargetView(IRHIRenderTargetView* RTV, int32 IndexOf, const Color& InColor) = 0;
-	virtual void BeginRenderPass(IRHIRenderPass* RenderPass, const RectN& ScissorRect, std::span<Color const> InColor) = 0;
-	virtual void EndRenderPass() = 0;
-};
-
-struct IRHITexture2D : implements IRHIResource
-{
-	GENERATED_INTERFACE_BODY(IRHITexture2D)
-
-	virtual Vector2N GetPixelSize() = 0;
+	virtual void Reset(IRHICommandAllocator* pAllocator, IRHIPipelineState* pInitialState) = 0;
+	virtual void Close() = 0;
+	virtual void ResourceBarrier(std::span<const RHIResourceBarrier> barriers) = 0;
+	virtual void ClearRenderTargetView(IRHIRenderTargetView* pRTV, size_t indexOf, const Color& color, std::span<const RectN> rects) = 0;
 };
 
 struct IRHIShaderCodeBlob : implements IRHIDeviceChild
@@ -99,39 +111,40 @@ struct IRHIShaderCodeWorkspace : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIShaderCodeWorkspace)
 
-	virtual void AddShaderCode(std::wstring_view Name, RHIShaderCode Code) = 0;
+	virtual void AddShaderCode(std::wstring_view name, const RHIShaderCode& code) = 0;
 	virtual void Compile() = 0;
-	virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::wstring_view Name) = 0;
+	virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::string_view entryPointName) = 0;
 };
 
 struct IRHIFence : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHIFence)
 
-	virtual void Wait() = 0;
-	virtual bool IsReady() = 0;
+	virtual Task<> SetEventOnCompletion(uint64 fenceValue, std::optional<std::chrono::milliseconds> timeout) = 0;
+	virtual uint64 GetCompletedValue() = 0;
 };
 
-struct IRHISwapChain : implements IRHIFence
+struct IRHISwapChain : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHISwapChain)
 
-	virtual void ResizeBuffers(const Vector2N& Size) = 0;
-	virtual IRHITexture2D* GetBuffer(int32 Index) = 0;
+	virtual void ResizeBuffers(const Vector2N& size) = 0;
+	virtual IRHIResource* GetBuffer(size_t index) = 0;
+	virtual void Present() = 0;
+	virtual size_t GetCurrentBackBufferIndex() = 0;
 };
 
 struct IRHICommandQueue : implements IRHIDeviceChild
 {
 	GENERATED_INTERFACE_BODY(IRHICommandQueue)
 		
-	virtual int32 AcquireSwapChainImage(IRHISwapChain* SwapChain) = 0;
-	virtual void Present(IRHISwapChain* SwapChain, int32 BufferIndex) = 0;
-	virtual void Submit(std::span<IRHICommandBuffer* const> CommandBuffers, IRHIFence* Fence) = 0;
+	virtual void ExecuteCommandBuffers(std::span<IRHIGraphicsCommandList* const> commandLists) = 0;
+	virtual void Signal(IRHIFence* pFence, uint64 fenceValue) = 0;
 
 	template<class... TArgs>
-	void Submit(IRHIFence* Fence, TArgs&&... CommandBuffers) requires requires { std::initializer_list{ std::declval<TArgs>()... }; }
+	void ExecuteCommandBuffers(TArgs&&... commandLists) requires std::constructible_from<const IRHIGraphicsCommandList*, TArgs...>
 	{
-		Submit(std::initializer_list{ std::forward<TArgs>(CommandBuffers)... }, Fence);
+		ExecuteCommandBuffers(std::vector{ std::forward<TArgs>(commandLists)... });
 	}
 };
 
@@ -140,20 +153,23 @@ struct IRHIDevice : implements IRHIFactoryChild
 	GENERATED_INTERFACE_BODY(IRHIDevice)
 
 	virtual IRHICommandQueue* CreateCommandQueue() = 0;
-	virtual IRHITexture2D* CreateTexture2D(const RHITexture2DDesc& InDesc, const RHISubresourceData* InitialData) = 0;
-	virtual IRHIRenderTargetView* CreateRenderTargetView(int32 Count) = 0;
+	virtual IRHIResource* CreateCommittedResource(const RHIHeapProperties& heapProperties, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* pOptimizedClearValue) = 0;
+	virtual IRHIRenderTargetView* CreateRenderTargetView(size_t count) = 0;
+	virtual IRHIDepthStencilView* CreateDepthStencilView(size_t count) = 0;
+	virtual IRHIShaderResourceView* CreateShaderResourceView(size_t count) = 0;
 	virtual IRHIFence* CreateFence() = 0;
-	virtual IRHICommandAllocator* CreateCommandAllocator() = 0;
-	virtual IRHICommandBuffer* CreateCommandBuffer(IRHICommandAllocator* Allocator) = 0;
-	virtual IRHIRenderPass* CreateRenderPass() = 0;
+	virtual IRHICommandAllocator* CreateCommandAllocator(ERHICommandListType type) = 0;
+	virtual IRHIGraphicsCommandList* CreateCommandList(IRHICommandAllocator* pAllocator, ERHICommandListType type, IRHIPipelineState* pInitialState) = 0;
 	virtual IRHIShaderCodeWorkspace* CreateShaderCodeWorkspace() = 0;
+	virtual IRHIRootSignature* CreateRootSignature(const RHIRootSignatureDesc& desc) = 0;
+	virtual IRHIPipelineState* CreateGraphicsPipelineState(const RHIGraphicsPipelineStateDesc& desc) = 0;
 };
 
 struct IRHIFactory : implements IDisposable
 {
 	GENERATED_INTERFACE_BODY(IRHIFactory)
 
-	virtual IRHIAdapter* GetAdapter(int32 Index) = 0;
-	virtual IRHIDevice* CreateDevice(IRHIAdapter* Adapter) = 0;
-	virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* Queue, size_t NumBuffers) = 0;
+	virtual IRHIAdapter* GetAdapter(size_t index) = 0;
+	virtual IRHIDevice* CreateDevice(IRHIAdapter* pAdapter) = 0;
+	virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* pQueue, size_t numBuffers) = 0;
 };

@@ -11,7 +11,6 @@ DECLARE_LOG_CATEGORY(GAME_API, LogViewport);
 struct IRHIDeviceContext;
 class SWorld;
 class SImage;
-class SRaytraceSceneRenderTarget;
 
 class GAME_API SViewport : public SCompoundWidget
 {
@@ -22,10 +21,6 @@ private:
 
 	SPROPERTY(SceneImage)
 	SImage* SceneImage = nullptr;
-
-private:
-	SPROPERTY(RenderTarget)
-	SRaytraceSceneRenderTarget* RenderTarget = nullptr;
 
 public:
 	SViewport();

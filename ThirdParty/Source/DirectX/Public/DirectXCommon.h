@@ -3,8 +3,11 @@
 #pragma once
 
 #include "Object.h"
-#include "WindowsMinimal.h"
 #include "RHI/RHIEnums.h"
+#include "RHI/RHIStructures.h"
+#include "RHI/RHIInterfaces.h"
+
+#include "WindowsMinimal.h"
 #include <wrl/client.h>
 #include <d3d12.h>
 #include <d3d11.h>
@@ -13,6 +16,7 @@
 #include <d2d1_1.h>
 #include <d3dcompiler.h>
 #include <dwrite_3.h>
+#undef Yield
 
 DECLARE_LOG_CATEGORY(DIRECTX_API, LogDirectX);
 
@@ -56,3 +60,6 @@ inline std::string_view ShaderTypeToTarget(ERHIShaderType Type)
 }
 
 using Microsoft::WRL::ComPtr;
+
+void ReplaceNativePointer(std::vector<D3D12_RESOURCE_BARRIER>& dst, std::span<const RHIResourceBarrier> src);
+void ReplaceNativePointer(std::vector<ID3D12CommandList*>& dst, std::span<IRHIGraphicsCommandList* const> src);

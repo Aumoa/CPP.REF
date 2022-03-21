@@ -17,6 +17,8 @@ public:
 
 	using Super::Dispose;
 
+	virtual RHIResourceDesc GetDesc() override;
+
 protected:
 	virtual void Dispose(bool bDisposing) override;
 };

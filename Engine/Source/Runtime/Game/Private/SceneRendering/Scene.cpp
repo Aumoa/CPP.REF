@@ -126,11 +126,11 @@ void SScene::ApplyViewBuffers(IRHIDeviceContext* InContext)
 			pSysMem += Stride;
 		}
 
-		RHISubresourceData InitialData =
-		{
-			.pSysMem = ViewBufferCachedMemory.data(),
-			.SysMemPitch = RequiredSize,
-		};
+		//RHISubresourceData InitialData =
+		//{
+		//	.pSysMem = ViewBufferCachedMemory.data(),
+		//	.SysMemPitch = RequiredSize,
+		//};
 
 		//if (ViewBuffer == nullptr || ViewBuffer->GetDesc().ByteWidth < (uint32)RequiredSize)
 		//{

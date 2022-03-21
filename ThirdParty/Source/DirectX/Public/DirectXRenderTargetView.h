@@ -12,5 +12,5 @@ class DIRECTX_API SDirectXRenderTargetView : public SDirectXView, implements IRH
 public:
 	SDirectXRenderTargetView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> pDescriptorHeap, size_t NumViews);
 
-	virtual void CreateRenderTargetView(int32 Index, IRHIResource* Resource, const RHIRenderTargetViewDesc* Desc) override;
+	virtual void CreateRenderTargetView(size_t index, IRHIResource* pResource, const RHIRenderTargetViewDesc* pDesc) override;
 };

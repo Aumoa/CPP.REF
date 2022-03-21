@@ -7,7 +7,7 @@
 
 class SDirectXDevice;
 class SDirectXFence;
-class SDirectXTexture2D;
+class SDirectXResource;
 class SEventHandle;
 
 class DIRECTX_API SDirectXSwapChain : public SDirectXDeviceChild, implements IRHISwapChain
@@ -17,22 +17,17 @@ class DIRECTX_API SDirectXSwapChain : public SDirectXDeviceChild, implements IRH
 public:
 	ComPtr<IDXGISwapChain4> pSwapChain;
 	SPROPERTY(Buffers)
-	std::vector<SDirectXTexture2D*> Buffers;
-
-	HANDLE hFenceEvent = nullptr;
-	ComPtr<ID3D12Fence> pFence;
-	uint64 FenceValue = 0;
+	std::vector<SDirectXResource*> Buffers;
 
 public:
 	SDirectXSwapChain(SDirectXDevice* Owner, ComPtr<IDXGISwapChain4> pSwapChain, size_t BufferCount);
 
 	using Super::Dispose;
 
-	virtual bool IsReady() override;
-	virtual void Wait() override;
-
-	virtual void ResizeBuffers(const Vector2N& Size) override;
-	virtual IRHITexture2D* GetBuffer(int32 Index) override;
+	virtual void ResizeBuffers(const Vector2N& size) override;
+	virtual IRHIResource* GetBuffer(size_t index) override;
+	virtual void Present() override;
+	virtual size_t GetCurrentBackBufferIndex() override;
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

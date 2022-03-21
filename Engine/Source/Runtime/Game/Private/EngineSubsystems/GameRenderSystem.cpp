@@ -2,6 +2,7 @@
 
 #include "EngineSubsystems/GameRenderSystem.h"
 #include "RHI/RHIInterfaces.h"
+#include "ShaderWorkspaces/ColorShaderWorkspace.h"
 
 GENERATE_BODY(SGameRenderSystem);
 DEFINE_LOG_CATEGORY(LogRender);
@@ -25,28 +26,8 @@ void SGameRenderSystem::Init()
 
 	SwapChain = Factory->CreateSwapChain(PrimaryQueue, 3);
 
-	CommandAllocator = Device->CreateCommandAllocator();
-	CommandBuffer = Device->CreateCommandBuffer(CommandAllocator);
-	CommandFence = Device->CreateFence();
-
-	RTV = Device->CreateRenderTargetView(3);
-	RenderPasses.resize(3);
-
-	ShaderCodeWorkspace = Device->CreateShaderCodeWorkspace();
-
-	for (auto& RenderPass : RenderPasses)
-	{
-		RenderPass = Device->CreateRenderPass();
-		RenderPass->AddColorAttachment(RHIRenderPassAttachment
-		{
-			.Format = ERHIPixelFormat::B8G8R8A8_UNORM,
-			.SampleDesc = { 1, 0 },
-			.LoadOp = ERHIAttachmentLoadOp::Clear,
-			.StoreOp = ERHIAttachmentStoreOp::Store,
-			.BeforeState = ERHIResourceStates::RenderTarget,
-			.AfterState = ERHIResourceStates::Present,
-		});
-	}
+	ShaderCodeWorkspace = gcnew SColorShaderWorkspace(Device);
+	ShaderCodeWorkspace->Compile();
 
 	IApplicationInterface::Get().Sized.AddObject(this, &SGameRenderSystem::ResizeApp);
 	IApplicationInterface::Get().PreDestroyApp.AddObject(this, &SGameRenderSystem::OnPreDestroyApp);
@@ -58,7 +39,7 @@ void SGameRenderSystem::Deinit()
 
 	if (CommandFence)
 	{
-		CommandFence->Wait();
+		CommandFence->SetEventOnCompletion(_fenceValue, std::nullopt).Wait();
 		CommandFence->Dispose();
 		CommandFence = nullptr;
 	}
@@ -69,31 +50,10 @@ void SGameRenderSystem::Deinit()
 		ShaderCodeWorkspace = nullptr;
 	}
 
-	for (auto& RenderPass : RenderPasses)
-	{
-		if (RenderPass)
-		{
-			RenderPass->Dispose();
-			RenderPass = nullptr;
-		}
-	}
-
 	if (RTV)
 	{
 		RTV->Dispose();
 		RTV = nullptr;
-	}
-
-	if (CommandBuffer)
-	{
-		CommandBuffer->Dispose();
-		CommandBuffer = nullptr;
-	}
-
-	if (CommandAllocator)
-	{
-		CommandAllocator->Dispose();
-		CommandAllocator = nullptr;
 	}
 
 	if (SwapChain)
@@ -125,7 +85,7 @@ void SGameRenderSystem::Deinit()
 
 void SGameRenderSystem::ExecuteRenderThread(float InDeltaTime, SSlateApplication* SlateApp)
 {
-	RenderThread::Get()->ExecuteWorks(CommandBuffer, std::bind(&SGameRenderSystem::OnRender_RenderThread, this, std::placeholders::_1));
+	RenderThread::Get()->ExecuteWorks(nullptr, std::bind(&SGameRenderSystem::OnRender_RenderThread, this, std::placeholders::_1));
 }
 
 IRHIDevice* SGameRenderSystem::GetRHIDevice()
@@ -142,7 +102,7 @@ void SGameRenderSystem::ResizeApp(Vector2N Size)
 
 	if (Device)
 	{
-		RenderThread::Get()->ExecuteWorks(CommandBuffer, std::bind(&SGameRenderSystem::OnResizeApp_RenderThread,
+		RenderThread::Get()->ExecuteWorks(nullptr, std::bind(&SGameRenderSystem::OnResizeApp_RenderThread,
 			this,
 			std::placeholders::_1,
 			Size
@@ -155,50 +115,52 @@ void SGameRenderSystem::OnPreDestroyApp()
 	RenderThread.reset();
 }
 
-void SGameRenderSystem::OnRender_RenderThread(IRHICommandBuffer* Cmdbuf)
+void SGameRenderSystem::OnRender_RenderThread(IRHIGraphicsCommandList* Cmdbuf)
 {
-	int32 CurrentIndex = PrimaryQueue->AcquireSwapChainImage(SwapChain);
-	RectN ClearArea = RectN(0, 0, SwapChainSize.X, SwapChainSize.Y);
+	//int32 CurrentIndex = PrimaryQueue->AcquireSwapChainImage(SwapChain);
+	//RectN ClearArea = RectN(0, 0, SwapChainSize.X, SwapChainSize.Y);
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	CommandAllocator->Reset();
+	//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	//CommandAllocator->Reset();
 
-	CommandBuffer->BeginRecord();
-	RHIResourceTransitionBarrier ToRenderTarget =
-	{
-		.pResource = SwapChain->GetBuffer(CurrentIndex),
-		.StateBefore = ERHIResourceStates::Present,
-		.StateAfter = ERHIResourceStates::RenderTarget,
-	};
-	CommandBuffer->ResourceBarrier(std::vector{ RHIResourceBarrier(ToRenderTarget) });
+	//CommandBuffer->BeginRecord();
+	//{
+	//	RHIResourceTransitionBarrier ToRenderTarget =
+	//	{
+	//		.pResource = SwapChain->GetBuffer(CurrentIndex),
+	//		.StateBefore = ERHIResourceStates::Present,
+	//		.StateAfter = ERHIResourceStates::RenderTarget,
+	//	};
+	//	CommandBuffer->ResourceBarrier(std::vector{ RHIResourceBarrier(ToRenderTarget) });
 
-	CommandBuffer->BeginRenderPass(RenderPasses[CurrentIndex], ClearArea, std::vector{ NamedColors::Red });
-	CommandBuffer->EndRenderPass();
-	CommandBuffer->EndRecord();
+	//	CommandBuffer->BeginRenderPass(RenderPasses[CurrentIndex], ClearArea, std::vector{ NamedColors::Transparent });
+	//	CommandBuffer->EndRenderPass();
+	//}
+	//CommandBuffer->EndRecord();
 
-	PrimaryQueue->Submit(CommandFence, CommandBuffer);
-	PrimaryQueue->Present(SwapChain, CurrentIndex);
+	//PrimaryQueue->Submit(CommandFence, CommandBuffer);
+	//PrimaryQueue->Present(SwapChain, CurrentIndex);
 
-	CommandFence->Wait();
-	SwapChain->Wait();
+	//CommandFence->Wait();
+	//SwapChain->Wait();
 }
 
-void SGameRenderSystem::OnResizeApp_RenderThread(IRHICommandBuffer* Cmdbuf, Vector2N Size)
+void SGameRenderSystem::OnResizeApp_RenderThread(IRHIGraphicsCommandList* Cmdbuf, Vector2N Size)
 {
-	SwapChain->ResizeBuffers(Size);
-	SwapChainSize = Size;
+	//SwapChain->ResizeBuffers(Size);
+	//SwapChainSize = Size;
 
-	for (int32 i = 0; i < 3; ++i)
-	{
-		RHIRenderTargetViewDesc RTVDesc =
-		{
-			.Format = ERHIPixelFormat::B8G8R8A8_UNORM,
-			.ViewDimension = ERHIRTVDimension::Texture2D,
-		};
+	//for (int32 i = 0; i < 3; ++i)
+	//{
+	//	RHIRenderTargetViewDesc RTVDesc =
+	//	{
+	//		.Format = ERHIPixelFormat::B8G8R8A8_UNORM,
+	//		.ViewDimension = ERHIRTVDimension::Texture2D,
+	//	};
 
-		IRHITexture2D* Buffer = SwapChain->GetBuffer(i);
-		RTV->CreateRenderTargetView(i, Buffer, &RTVDesc);
+	//	IRHITexture2D* Buffer = SwapChain->GetBuffer(i);
+	//	RTV->CreateRenderTargetView(i, Buffer, &RTVDesc);
 
-		RenderPasses[i]->Apply(std::vector{ std::make_pair((IRHIView*)RTV, i) }, Size);
-	}
+	//	RenderPasses[i]->Apply(std::vector{ std::make_pair((IRHIView*)RTV, i) }, Size);
+	//}
 }

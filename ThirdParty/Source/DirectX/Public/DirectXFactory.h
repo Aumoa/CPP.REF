@@ -18,9 +18,9 @@ public:
 
 	virtual void Dispose() override;
 
-	virtual IRHIAdapter* GetAdapter(int32 Index) override;
-	virtual IRHIDevice* CreateDevice(IRHIAdapter* Adapter) override;
-	virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* Queue, size_t NumBuffers) override;
+	virtual IRHIAdapter* GetAdapter(size_t index) override;
+	virtual IRHIDevice* CreateDevice(IRHIAdapter* pAdapter) override;
+	virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* pQueue, size_t numBuffers) override;
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

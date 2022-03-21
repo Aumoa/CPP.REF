@@ -27,6 +27,7 @@ RenderThread::~RenderThread()
 {
 	std::unique_lock lock(_lock);
 	_running = false;
+	_taskCompletionSource = TaskCompletionSource<>::Create();
 	_invoke.notify_all();
 	lock.unlock();
 
@@ -34,7 +35,7 @@ RenderThread::~RenderThread()
 	sInstance = nullptr;
 }
 
-void RenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(IRHICommandBuffer*)> work)
+void RenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(IRHIGraphicsCommandList*)> work)
 {
 	_queuedWorks.emplace(Work
 	{
@@ -43,7 +44,7 @@ void RenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(I
 	});
 }
 
-Task<> RenderThread::ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::function<void(IRHICommandBuffer*)> InCompletionWork)
+Task<> RenderThread::ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std::function<void(IRHIGraphicsCommandList*)> InCompletionWork)
 {
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteWorks);
 
@@ -135,8 +136,9 @@ void RenderThread::Run()
 		std::queue<Work> works;
 		std::swap(works, _queuedWorks);
 
-		IRHICommandBuffer* deviceContext = _deviceContext;
-		std::function<void(IRHICommandBuffer*)> completion = std::move(_completion);
+		TaskCompletionSource<> completionSrc = _taskCompletionSource;
+		IRHIGraphicsCommandList* deviceContext = _deviceContext;
+		std::function<void(IRHIGraphicsCommandList*)> completion = std::move(_completion);
 
 		lock.unlock();
 
@@ -156,7 +158,7 @@ void RenderThread::Run()
 		}
 
 		lock.lock();
-		_taskCompletionSource.SetResult();
+		completionSrc.SetResult();
 	}
 
 	SuspendTokenCollection::Remove(Token.get());

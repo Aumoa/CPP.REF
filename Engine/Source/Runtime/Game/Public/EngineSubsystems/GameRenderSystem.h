@@ -8,6 +8,7 @@
 #include "RHI/RHIInterfaces.h"
 
 class SSlateApplication;
+class SColorShaderWorkspace;
 
 class GAME_API SGameRenderSystem : public SGameEngineSubsystem
 {
@@ -27,20 +28,15 @@ private:
 	IRHISwapChain* SwapChain = nullptr;
 	Vector2N SwapChainSize;
 
-	SPROPERTY(CommandAllocator)
-	IRHICommandAllocator* CommandAllocator = nullptr;
-	SPROPERTY(CommandBuffer)
-	IRHICommandBuffer* CommandBuffer = nullptr;
 	SPROPERTY(CommandFence)
 	IRHIFence* CommandFence = nullptr;
+	uint64 _fenceValue = 0;
 
 	SPROPERTY(RTV)
 	IRHIRenderTargetView* RTV = nullptr;
-	SPROPERTY(RenderPasses)
-	std::vector<IRHIRenderPass*> RenderPasses;
 
 	SPROPERTY(ShaderCodeWorkspace)
-	IRHIShaderCodeWorkspace* ShaderCodeWorkspace = nullptr;
+	SColorShaderWorkspace* ShaderCodeWorkspace = nullptr;
 
 public:
 	SGameRenderSystem();
@@ -56,6 +52,6 @@ private:
 	void ResizeApp(Vector2N Size);
 	void OnPreDestroyApp();
 
-	void OnRender_RenderThread(IRHICommandBuffer* Cmdbuf);
-	void OnResizeApp_RenderThread(IRHICommandBuffer* Cmdbuf, Vector2N Size);
+	void OnRender_RenderThread(IRHIGraphicsCommandList* Cmdbuf);
+	void OnResizeApp_RenderThread(IRHIGraphicsCommandList* Cmdbuf, Vector2N Size);
 };

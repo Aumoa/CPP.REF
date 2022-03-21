@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RHI/RHIInterfaces.h"
 #include <functional>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 
 class Thread;
-struct IRHICommandBuffer;
 
 class GAME_API RenderThread
 {
 	struct Work
 	{
 		WeakPtr<SObject> Holder;
-		std::function<void(IRHICommandBuffer*)> Body;
+		std::function<void(IRHIGraphicsCommandList*)> Body;
 	};
 
 private:
@@ -28,8 +28,8 @@ private:
 	std::mutex _lock;
 	std::queue<Work> _queuedWorks;
 	std::condition_variable _invoke;
-	IRHICommandBuffer* _deviceContext = nullptr;
-	std::function<void(IRHICommandBuffer*)> _completion;
+	IRHIGraphicsCommandList* _deviceContext = nullptr;
+	std::function<void(IRHIGraphicsCommandList*)> _completion;
 	TaskCompletionSource<> _taskCompletionSource;
 
 
@@ -37,8 +37,8 @@ public:
 	RenderThread();
 	~RenderThread() noexcept;
 
-	void EnqueueRenderThreadWork(SObject* object, std::function<void(IRHICommandBuffer*)> work);
-	Task<> ExecuteWorks(IRHICommandBuffer* InDeviceContext, std::function<void(IRHICommandBuffer*)> InCompletionWork);
+	void EnqueueRenderThreadWork(SObject* object, std::function<void(IRHIGraphicsCommandList*)> work);
+	Task<> ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std::function<void(IRHIGraphicsCommandList*)> InCompletionWork);
 	static bool InRenderThread();
 
 public:

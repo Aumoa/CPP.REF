@@ -24,11 +24,11 @@ public:
 
 	using Super::Dispose;
 
-	virtual int32 GetViewCount() override;
-	virtual IRHIResource* GetResource(int32 IndexOf) override;
+	virtual size_t GetViewCount() override;
+	virtual IRHIResource* GetResource(size_t indexOf) override;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(int32 IndexOf);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(int32 IndexOf);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(size_t indexOf);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(size_t indexOf);
 
 protected:
 	virtual void Dispose(bool bDisposing) override;

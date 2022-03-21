@@ -13,39 +13,16 @@ SDirectXCommandQueue::SDirectXCommandQueue(IRHIDevice* Owner, ComPtr<ID3D12Comma
 {
 }
 
-int32 SDirectXCommandQueue::AcquireSwapChainImage(IRHISwapChain* SwapChain)
+void SDirectXCommandQueue::ExecuteCommandBuffers(std::span<IRHIGraphicsCommandList* const> commandLists)
 {
-	auto sSwapChain = Cast<SDirectXSwapChain>(SwapChain);
-	int32 Index = (int32)sSwapChain->pSwapChain->GetCurrentBackBufferIndex();
-	return Index;
+	std::vector<ID3D12CommandList*> l_commandLists;
+	ReplaceNativePointer(l_commandLists, commandLists);
+	pQueue->ExecuteCommandLists((UINT)l_commandLists.size(), l_commandLists.data());
 }
 
-void SDirectXCommandQueue::Present(IRHISwapChain* SwapChain, int32 BufferIndex)
+void SDirectXCommandQueue::Signal(IRHIFence* pFence, uint64 fenceValue)
 {
-	auto sSwapChain = Cast<SDirectXSwapChain>(SwapChain);
-	HR(sSwapChain->pSwapChain->Present(0, 0));
-	HR(pQueue->Signal(sSwapChain->pFence.Get(), ++sSwapChain->FenceValue));
-}
-
-void SDirectXCommandQueue::Submit(std::span<IRHICommandBuffer* const> CommandBuffers, IRHIFence* Fence)
-{
-	std::vector<ID3D12CommandList*> pCommandLists;
-	pCommandLists.reserve(CommandBuffers.size());
-
-	for (auto& CommandBuffer : CommandBuffers)
-	{
-		auto sCommandBuffer = Cast<SDirectXCommandList>(CommandBuffer);
-		pCommandLists.emplace_back(sCommandBuffer->pCommandList.Get());
-	}
-
-	pQueue->ExecuteCommandLists((UINT)pCommandLists.size(), pCommandLists.data());
-
-	if (auto* sFence = Cast<SDirectXFence>(Fence); sFence)
-	{
-		ID3D12Fence* pFence = sFence->pFence.Get();
-		UINT64 FenceValue = ++sFence->FenceValue;
-		HR(pQueue->Signal(pFence, FenceValue));
-	}
+	HR(pQueue->Signal(Cast<SDirectXFence>(pFence)->pFence.Get(), fenceValue));
 }
 
 void SDirectXCommandQueue::Dispose(bool bDisposing)

@@ -13,7 +13,7 @@ SDirectXShaderCodeWorkspace::SDirectXShaderCodeWorkspace(SDirectXDevice* Owner)
 {
 }
 
-void SDirectXShaderCodeWorkspace::AddShaderCode(std::wstring_view Name, RHIShaderCode Code)
+void SDirectXShaderCodeWorkspace::AddShaderCode(std::wstring_view Name, const RHIShaderCode& Code)
 {
 	auto Emplace_it = ShaderCodes.emplace(Name, Code);
 	if (!Emplace_it.second)
@@ -46,14 +46,14 @@ void SDirectXShaderCodeWorkspace::Compile()
 				}
 			}
 
-			CompiledShaderBlobs.emplace(Id, gcnew SDirectXShaderCodeBlob(Cast<SDirectXDevice>(GetDevice()), std::move(pBlob), Code.ShaderType));
+			CompiledShaderBlobs.emplace(Code.EntryPoint, gcnew SDirectXShaderCodeBlob(Cast<SDirectXDevice>(GetDevice()), std::move(pBlob), Code.ShaderType));
 		}
 	}
 }
 
-IRHIShaderCodeBlob* SDirectXShaderCodeWorkspace::GetCompiledShaderCodeBlob(std::wstring_view Name)
+IRHIShaderCodeBlob* SDirectXShaderCodeWorkspace::GetCompiledShaderCodeBlob(std::string_view EntryPointName)
 {
-	auto It = CompiledShaderBlobs.find(Name);
+	auto It = CompiledShaderBlobs.find(EntryPointName);
 	if (It == CompiledShaderBlobs.end())
 	{
 		return nullptr;
@@ -62,12 +62,9 @@ IRHIShaderCodeBlob* SDirectXShaderCodeWorkspace::GetCompiledShaderCodeBlob(std::
 	return It->second;
 }
 
-HRESULT __stdcall SDirectXShaderCodeWorkspace::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+HRESULT CALLBACK SDirectXShaderCodeWorkspace::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
 {
-	std::filesystem::path Path = pFileName;
-	std::filesystem::path Stem = Path.stem();
-
-	auto It = ShaderCodes.find(Stem.wstring());
+	auto It = ShaderCodes.find(String::AsUnicode(pFileName));
 	if (It == ShaderCodes.end())
 	{
 		return E_FAIL;
@@ -82,7 +79,7 @@ HRESULT __stdcall SDirectXShaderCodeWorkspace::Open(D3D_INCLUDE_TYPE IncludeType
 	return S_OK;
 }
 
-HRESULT __stdcall SDirectXShaderCodeWorkspace::Close(LPCVOID pData)
+HRESULT CALLBACK SDirectXShaderCodeWorkspace::Close(LPCVOID pData)
 {
 	return S_OK;
 }

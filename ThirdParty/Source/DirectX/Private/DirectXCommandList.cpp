@@ -3,121 +3,45 @@
 #include "DirectXCommandList.h"
 #include "DirectXResource.h"
 #include "DirectXRenderTargetView.h"
-#include "DirectXRenderPass.h"
+#include "DirectXCommandAllocator.h"
+#include "DirectXPipelineState.h"
 
 GENERATE_BODY(SDirectXCommandList);
 
 SDirectXCommandList::SDirectXCommandList(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator, ComPtr<ID3D12GraphicsCommandList4> pCommandList)
 	: Super(Owner)
-	, pAllocator(std::move(pAllocator))
 	, pCommandList(std::move(pCommandList))
 {
 }
 
-void SDirectXCommandList::BeginRecord()
+void SDirectXCommandList::Reset(IRHICommandAllocator* pAllocator, IRHIPipelineState* pInitialState)
 {
-	pCommandList->Reset(pAllocator.Get(), nullptr);
+	auto* sAllocator = Cast<SDirectXCommandAllocator>(pAllocator);
+	auto* sInitialState = Cast<SDirectXPipelineState>(pInitialState);
+	HR(pCommandList->Reset(sAllocator->pAllocator.Get(), sInitialState ? sInitialState->pPipelineState.Get() : nullptr));
 }
 
-void SDirectXCommandList::EndRecord()
+void SDirectXCommandList::Close()
 {
 	HR(pCommandList->Close());
 }
 
-void SDirectXCommandList::ResourceBarrier(std::span<const RHIResourceBarrier> InBarriers)
+void SDirectXCommandList::ResourceBarrier(std::span<const RHIResourceBarrier> barriers)
 {
-	std::vector<D3D12_RESOURCE_BARRIER> Barriers;
-	Barriers.reserve(InBarriers.size());
-
-	for (auto& Barrier : InBarriers)
-	{
-		switch (Barrier.index())
-		{
-		case 0:
-		{
-			auto& Transit = std::get<RHIResourceTransitionBarrier>(Barrier);
-			Barriers.emplace_back() =
-			{
-				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-				.Transition =
-				{
-					.pResource = Cast<SDirectXResource>(Transit.pResource)->pResource.Get(),
-					.Subresource = 0,
-					.StateBefore = (D3D12_RESOURCE_STATES)Transit.StateBefore,
-					.StateAfter = (D3D12_RESOURCE_STATES)Transit.StateAfter,
-				}
-			};
-			break;
-		}
-		case 1:
-		{
-			auto& Alias = std::get<RHIResourceAliasingBarrier>(Barrier);
-			Barriers.emplace_back() =
-			{
-				.Type = D3D12_RESOURCE_BARRIER_TYPE_ALIASING,
-				.Aliasing =
-				{
-					.pResourceBefore = Cast<SDirectXResource>(Alias.pResourceBefore)->pResource.Get(),
-					.pResourceAfter = Cast<SDirectXResource>(Alias.pResourceAfter)->pResource.Get()
-				}
-			};
-			break;
-		}
-		case 2:
-		{
-			auto& UAV = std::get<RHIResourceUAVBarrier>(Barrier);
-			Barriers.emplace_back() =
-			{
-				.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV,
-				.UAV =
-				{
-					.pResource = Cast<SDirectXResource>(UAV.pResource)->pResource.Get()
-				}
-			};
-			break;
-		}
-		}
-	}
-
-	pCommandList->ResourceBarrier((UINT)Barriers.size(), Barriers.data());
+	std::vector<D3D12_RESOURCE_BARRIER> r_barriers;
+	ReplaceNativePointer(r_barriers, barriers);
+	pCommandList->ResourceBarrier((UINT)r_barriers.size(), r_barriers.data());
 }
 
-void SDirectXCommandList::ClearRenderTargetView(IRHIRenderTargetView* RTV, int32 IndexOf, const Color& InColor)
+void SDirectXCommandList::ClearRenderTargetView(IRHIRenderTargetView* pRTV, size_t indexOf, const Color& color, std::span<const RectN> rects)
 {
-	auto* sRTV = Cast<SDirectXRenderTargetView>(RTV);
-	D3D12_CPU_DESCRIPTOR_HANDLE Handle = sRTV->GetCPUHandle(IndexOf);
-	pCommandList->ClearRenderTargetView(Handle, (const FLOAT*)&InColor, 0, nullptr);
-}
-
-void SDirectXCommandList::BeginRenderPass(IRHIRenderPass* RenderPass, const RectN& ScissorRect, std::span<Color const> InColor)
-{
-	auto* sRenderPass = Cast<SDirectXRenderPass>(RenderPass);
-	std::vector RenderTargets = sRenderPass->RenderTargets;
-
-	size_t ClearIndex = 0;
-	for (size_t i = 0; i < RenderTargets.size();)
-	{
-		auto& RenderTarget = RenderTargets[i++];
-		if (RenderTarget.BeginningAccess.Type == D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_CLEAR)
-		{
-			memcpy(RenderTarget.BeginningAccess.Clear.ClearValue.Color, &InColor[ClearIndex++], sizeof(Color));
-		}
-	}
-
-	pCommandList->BeginRenderPass((UINT)RenderTargets.size(), RenderTargets.data(), nullptr, D3D12_RENDER_PASS_FLAG_NONE);
-	RunningRenderPass = sRenderPass;
-}
-
-void SDirectXCommandList::EndRenderPass()
-{
-	pCommandList->EndRenderPass();
-	pCommandList->ResourceBarrier((UINT)RunningRenderPass->TransitionBarriers.size(), RunningRenderPass->TransitionBarriers.data());
-	RunningRenderPass = nullptr;
+	auto sRTV = Cast<SDirectXRenderTargetView>(pRTV);
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = sRTV->GetCPUHandle(indexOf);
+	pCommandList->ClearRenderTargetView(handle, reinterpret_cast<const FLOAT*>(&color), (UINT)rects.size(), rects.size() == 0 ? nullptr : reinterpret_cast<const D3D12_RECT*>(rects.data()));
 }
 
 void SDirectXCommandList::Dispose(bool bDisposing)
 {
-	pAllocator.Reset();
 	pCommandList.Reset();
 	Super::Dispose(bDisposing);
 }
