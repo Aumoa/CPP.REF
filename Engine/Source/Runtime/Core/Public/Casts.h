@@ -5,29 +5,32 @@
 #include "Misc/String.h"
 #include <utility>
 
-namespace libty::Casts::Impl
+namespace libty::Core::Casts::Impl
 {
-	template<class TTo, class TFrom> requires requires
+	template<class TTo, class TFrom>
+	inline static TTo DoCast(short, TFrom&& from) requires requires
 	{
 		{ static_cast<TTo>(std::declval<TFrom>()) };
 	}
-	inline static TTo DoCast(TFrom&& from)
 	{
 		return static_cast<TTo>(std::forward<TFrom>(from));
 	}
 
-	template<class TTo, class TFrom> requires requires
+	template<class TTo, class TFrom>
+	static TTo DoCast(int, TFrom&& from) requires requires
 	{
 		{ String::Cast<TTo>(std::declval<TFrom>()) };
 	}
-	static TTo DoCast(TFrom&& from)
 	{
 		return String::Cast<TTo>(std::forward<TFrom>(from));
 	}
 }
 
 template<class TTo, class TFrom>
-inline auto Cast(TFrom&& from)
+inline auto Cast(TFrom&& from) requires requires
 {
-	return libty::Casts::Impl::DoCast<TTo, TFrom>(0, std::forward<TFrom>(from));
+	{ libty::Core::Casts::Impl::DoCast<TTo, TFrom>(std::declval<int>(), std::declval<TFrom>()) };
+}
+{
+	return libty::Core::Casts::Impl::DoCast<TTo, TFrom>(0, std::forward<TFrom>(from));
 }

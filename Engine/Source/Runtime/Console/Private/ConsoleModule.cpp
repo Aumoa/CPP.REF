@@ -15,9 +15,11 @@ SConsoleModule::~SConsoleModule() noexcept
 
 int32 SConsoleModule::Main(const CommandLine& CommandArgs)
 {
-	for (auto& SubsystemClass : Type::FindAllSubclass<SConsoleModuleSubsystem>())
+	using T = decltype(Subsystems);
+	constexpr bool b = IEnumerable<T, SObject*>;
+	for (auto& SubsystemClass : SType::GetDerivedTypes(typeof(SConsoleModuleSubsystem)))
 	{
-		if (!SubsystemClass->IsA<SConsoleModuleSubsystem>())
+		if (!SubsystemClass->IsA(typeof(SConsoleModuleSubsystem)))
 		{
 			auto* Subsystem = *Subsystems.emplace(Cast<SConsoleModuleSubsystem>(SubsystemClass->Instantiate())).first;
 			Subsystem->Init();
@@ -37,7 +39,7 @@ int32 SConsoleModule::Main(const CommandLine& CommandArgs)
 	return ReturnCode;
 }
 
-SConsoleModuleSubsystem* SConsoleModule::GetSubsystem(Type* SubsystemClass)
+SConsoleModuleSubsystem* SConsoleModule::GetSubsystem(SType* SubsystemClass)
 {
 	auto It = CachedSubsystemView.find(SubsystemClass->GetHashCode());
 	if (It == CachedSubsystemView.end())

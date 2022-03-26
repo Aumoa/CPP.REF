@@ -2,13 +2,22 @@
 
 #pragma once
 
-#include "ObjectBase.h"
+#include "gcnew.h"
 #include "CoreConcepts.h"
 #include "Misc/Exceptions.h"
 #include <optional>
 
 class SObject;
 class SValueType;
+
+namespace libty::Casts::Impl
+{
+	template<std::same_as<SObject> TTo, class TFrom>
+	inline static TTo DoCast(const TFrom& from)
+	{
+		return gcnew SValueType(from);
+	}
+}
 
 template<std::derived_from<SObject> TTo, std::derived_from<SObject> TFrom>
 inline TTo* Cast(TFrom* InFrom)

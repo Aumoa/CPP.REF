@@ -2,32 +2,82 @@
 
 #pragma once
 
+#include "PrimitiveTypes.h"
+#include "Casts.h"
+#include "gcnew.h"
+#include "Reflection/ReflectionMacros.h"
+#include "Reflection/TypeInfoMetadataGenerator.h"
+#include "Reflection/FieldInfoMetadataGenerator.h"
+#include "GC/Referencer.h"
 #include <string>
 #include <string_view>
 #include <atomic>
-#include "PrimitiveTypes.h"
-#include "Casts.h"
-#include "ObjectBase.h"
-#include "Reflection/ReflectionMacros.h"
-#include "Reflection/Type.h"
-#include "GC/Referencer.h"
+#include <functional>
 
-class SValueType;
+class SType;
 
 /// <summary>
 /// Supports all classes in the smart component hierarchy and provides low-level services to derived classes.
 /// </summary>
-class CORESOBJECT_API SObject : public SObjectDetails::SObjectBase
+class CORESOBJECT_API SObject
 {
-	GENERATED_BODY(SObject)
+	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;
 
+public:
+	using This = SObject;
+
+	inline static constexpr std::wstring_view FriendlyName = L"SObject";
+
+private:
+	static SType StaticClass;
+
+public:
+	static inline SType* TypeId = &StaticClass;
+	virtual SType* GetType() const
+	{
+		return TypeId;
+	}
+	
+private:
+	template<size_t _Line>
+	static consteval size_t REFLECTION_FunctionChain()
+	{
+		return REFLECTION_FunctionChain<_Line - 1>();
+	}
+
+	template<size_t _Line> requires (_Line == __LINE__)
+	static consteval size_t REFLECTION_FunctionChain()
+	{
+		return -1;
+	}
+
+	template<size_t _Line>
+	static consteval size_t REFLECTION_PropertyChain()
+	{
+		return REFLECTION_PropertyChain<_Line - 1>();
+	}
+
+	template<size_t _Line> requires (_Line == __LINE__)
+	static consteval size_t REFLECTION_PropertyChain()
+	{
+		return -1;
+	}
+
+	template<size_t>
+	static void REFLECTION_GetFunctionPointer(void*);
+	template<size_t>
+	static consteval void REFLECTION_GetFunctionName(void*);
+	template<size_t>
+	static void REFLECTION_GetPropertyPointer(void*);
+
+private:
 	template<class T>
 	friend class SharedPtr;
 	template<class T>
 	friend class WeakPtr;
 	friend class GarbageCollector;
 	friend class ObjectHashTable;
-	friend class SObjectDetails::GCNewBinder;
+	friend class libty::Core::Reflection::GCNewBinder;
 	friend struct IDisposable;
 
 private:
@@ -66,7 +116,7 @@ public:
 };
 
 template<class T>
-T* SObjectDetails::GCNewBinder::operator << (T* Ptr)
+T* libty::Core::Reflection::GCNewBinder::operator << (T* Ptr)
 {
 	((SObject*)Ptr)->PostConstruction();
 	return Ptr;

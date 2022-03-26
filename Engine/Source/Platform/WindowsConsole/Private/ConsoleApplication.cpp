@@ -6,6 +6,7 @@
 #include "Misc/PlatformModule.h"
 #include "Misc/CommandLine.h"
 #include "Diagnostics/LogModule.h"
+#include "Diagnostics/LogSystem.h"
 #include "Threading/Thread.h"
 #include "GC/SharedPtr.h"
 #include <chrono>
@@ -36,22 +37,21 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		auto Loader = Module->GetFunctionPointer<SConsoleModule* ()>("LoadConsoleModule");
 		if (!Loader)
 		{
-			SE_LOG(LogWindowsConsole, Fatal, L"Cannot found 'LoadConsoleModule' function from Module: {}.", ModuleName);
-			return -1;
+			throw fatal_exception(std::format(L"Cannot found 'LoadConsoleModule' function from Module: {}.", ModuleName));
 		}
 
 		{
 			SharedPtr ConsoleModule = Loader();
 			if (!ConsoleModule.IsValid())
 			{
-				SE_LOG(LogWindowsConsole, Fatal, L"LoadConsoleModule function return nullptr.");
-				return -1;
+				throw fatal_exception(L"LoadConsoleModule function return nullptr.");
 			}
 
 			Thread* MainThread = Thread::GetCurrentThread();
 
 			MainThread->SetFriendlyName(L"[Main Thread]");
 			ReturnCode = ConsoleModule->Main(CommandArgs);
+
 			SE_LOG(LogWindowsConsole, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
 		}
 	}

@@ -74,7 +74,6 @@ private:
 	ObjectHashTable Objects;
 	std::set<SObject*> Roots;
 	uint64 Generation = 0;
-	std::set<SObject*> PendingFinalize;
 	std::vector<SObject*> PendingKill;
 	std::future<void> DeleteAction;
 

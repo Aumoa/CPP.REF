@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Numerics/VectorInterface/Vector.h"
+#include "Numerics/MatrixInterface/Matrix3x2.h"
 #include "Numerics/MatrixInterface/Matrix2x2.h"
 
 struct Complex

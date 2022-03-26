@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Matrix.h"
+#include "Numerics/MatrixInterface/Matrix2x2.h"
 #include "Numerics/TransformConcepts.h"
 #include "Mathematics/Radians.h"
 #include "Numerics/VectorInterface/Vector.h"

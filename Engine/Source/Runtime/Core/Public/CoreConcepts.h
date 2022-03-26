@@ -5,7 +5,22 @@
 #include <string_view>
 #include <type_traits>
 
-namespace CoreSObject::Concepts::Impl
+template<size_t _Depth>
+struct InheritSelector : public InheritSelector<_Depth - 1>
+{
+	constexpr static size_t Depth = _Depth;
+};
+
+template<>
+struct InheritSelector<0>
+{
+	constexpr static size_t Depth = 0;
+};
+
+template<size_t N>
+using inh_select = InheritSelector<N>;
+
+namespace libty::Core::Concepts::Impl
 {
 	template<class T, size_t N, class TForward, class... TArgs>
 	struct SameAsVariadic_t : public std::bool_constant<SameAsVariadic_t<T, N - 1, TArgs...>::value>
@@ -20,7 +35,7 @@ namespace CoreSObject::Concepts::Impl
 }
 
 template<class T, size_t N, class... TArgs>
-concept SameAsVariadic = CoreSObject::Concepts::Impl::SameAsVariadic_t<T, N, TArgs...>::value;
+concept SameAsVariadic = libty::Core::Concepts::Impl::SameAsVariadic_t<T, N, TArgs...>::value;
 
 template<class T, class TChar>
 concept IString = requires
@@ -69,4 +84,68 @@ template<class TBody, class... TArgs>
 concept IInvoke = requires
 {
 	{ std::declval<TBody>()(std::declval<TArgs>()...) };
+};
+
+template<class T, class UKey, class UValue>
+concept IDictionary = requires
+{
+	{ std::begin(std::declval<T>())->first } -> std::convertible_to<UKey>;
+	{ std::begin(std::declval<T>())->second } -> std::convertible_to<UValue>;
+	{ std::declval<T>()[std::declval<UKey>()] } -> std::convertible_to<UValue>;
+	{ std::begin(std::declval<T>()) != std::end(std::declval<T>()) } -> std::convertible_to<bool>;
+};
+
+template<class TDictionary>
+using DictionaryKey_t = std::remove_const_t<std::remove_reference_t<decltype(std::begin(std::declval<TDictionary>())->first)>>;
+
+template<class TDictionary>
+using DictionaryValue_t = std::remove_const_t<std::remove_reference_t<decltype(std::begin(std::declval<TDictionary>())->second)>>;
+
+namespace libty::Core::Concepts::Impl
+{
+	template<class TTuple, class... TCompareTypes>
+	struct TupleConvertibleTo
+	{
+	private:
+		template<size_t N, class TCompare, class... TLeft>
+		static consteval bool DoCheck() requires requires { std::get<N>(std::declval<TTuple>()); }
+		{
+			using TCurrent = std::remove_const_t<std::remove_reference_t<decltype(std::get<N>(std::declval<TTuple>()))>>;
+			if constexpr (std::same_as<TCurrent, TCompare>)
+			{
+				if constexpr (sizeof...(TLeft))
+				{
+					return DoCheck<N + 1, TLeft...>();
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		template<size_t N, class TCompare, class... TLeft>
+		static consteval bool DoCheck()
+		{
+			return false;
+		}
+
+	public:
+		static constexpr bool Value = std::tuple_size_v<TTuple> == sizeof...(TCompareTypes) and DoCheck<0, TCompareTypes...>();
+	};
+}
+
+template<class T, class... TValueTypes>
+concept ITuple = libty::Core::Concepts::Impl::TupleConvertibleTo<T, TValueTypes...>::Value;
+
+template<class T>
+concept IGenericTuple = requires
+{
+	{ std::get<0>(std::declval<T>()) };
+	{ std::tuple_size_v<T> } -> std::convertible_to<size_t>;
+	{ std::declval<std::tuple_element_t<0, T>>() };
 };

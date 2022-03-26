@@ -2,184 +2,114 @@
 
 #pragma once
 
-#include "ObjectBase.h"
+#include "Misc/RecursiveMacroHelper.h"
+
+namespace libty::Core::Reflection
+{
+	template<class T>
+	struct SuperClassTypeDeclare
+	{
+	private:
+		template<class U> requires requires { typename U::This; }
+		static auto Impl(int32) -> decltype(std::declval<typename U::This>());
+
+		template<class U> requires (!requires { typename U::This; })
+		static auto Impl(int16) -> void;
+
+	public:
+		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
+	};
+}
+
+class SType;
+
+#define REFLECTION_FOREACH_ATTRIBUTE_NAME(X) SAttribute ## X
+
+#define GENERATED_BODY_DECLARE_REFLECTION_CHAINS() 											\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_FunctionChain()										\
+	{																						\
+		return REFLECTION_FunctionChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_FunctionChain()										\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t _Line>																	\
+	static consteval size_t REFLECTION_PropertyChain()										\
+	{																						\
+		return REFLECTION_PropertyChain<_Line - 1>();										\
+	}																						\
+																							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_PropertyChain()										\
+	{																						\
+		return -1;																			\
+	}																						\
+																							\
+	template<size_t>																		\
+	static void REFLECTION_GetFunctionPointer(void*);										\
+	template<size_t>																		\
+	static consteval void REFLECTION_GetFunctionName(void*);								\
+	template<size_t>																		\
+	static void REFLECTION_GetPropertyPointer(void*);
 
 #define GENERATED_BODY(Class, ...)															\
-	friend class Type;																		\
+	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;						\
 																							\
 public:																						\
-	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Class>::Type;			\
+	using Super = typename libty::Core::Reflection::SuperClassTypeDeclare<Class>::Type;		\
 	using This = Class;																		\
-																							\
-	static Type* StaticClass();																\
 																							\
 	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
 																							\
 private:																					\
-	inline static Type* StaticRegisterClass = StaticClass();								\
+	static SType StaticClass;																\
+	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
+		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)			\
+	));																						\
 																							\
 public:																						\
-	Type* GetType() const																	\
+	static inline SType* TypeId = &StaticClass;												\
+	SType* GetType() const																	\
 	{																						\
-		return StaticClass();																\
+		return TypeId;																		\
 	}																						\
 																							\
 private:																					\
-	template<size_t _Line>																	\
-	static consteval size_t REFLECTION_FunctionChain()										\
-	{																						\
-		return REFLECTION_FunctionChain<_Line - 1>();										\
-	}																						\
-																							\
-	template<size_t _Line> requires (_Line == __LINE__)										\
-	static consteval size_t REFLECTION_FunctionChain()										\
-	{																						\
-		return -1;																			\
-	}																						\
-																							\
-	template<size_t _Line>																	\
-	static consteval size_t REFLECTION_PropertyChain()										\
-	{																						\
-		return REFLECTION_PropertyChain<_Line - 1>();										\
-	}																						\
-																							\
-	template<size_t _Line> requires (_Line == __LINE__)										\
-	static consteval size_t REFLECTION_PropertyChain()										\
-	{																						\
-		return -1;																			\
-	}																						\
-																							\
-	template<size_t>																		\
-	static void REFLECTION_GetFunctionPointer(void*);										\
-	template<size_t>																		\
-	static consteval void REFLECTION_GetFunctionName(void*);								\
-	template<size_t>																		\
-	static void REFLECTION_GetPropertyPointer(void*);										\
+	GENERATED_BODY_DECLARE_REFLECTION_CHAINS()												\
 																							\
 private:
 
+#define GENERATE_BODY(Class, ...)															\
+SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenerator			\
+	::GenerateClass<Class>(Class::FriendlyName, #Class, AttributeCollection));
+
 #define GENERATED_INTERFACE_BODY(Interface, ...)											\
-	friend class Type;																		\
+	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;						\
 																							\
-	inline static Type* StaticClass()														\
-	{																						\
-		static Type MyClassType(Type::TypeGenerator<Interface>(FriendlyName, L ## #Interface));\
-		return &MyClassType;																\
-	}																						\
+	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
+		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)			\
+	));																						\
+	static inline SType StaticClass = libty::Core::Reflection::TypeInfoMetadataGenerator	\
+	::GenerateClass<Interface>(Interface::FriendlyName, #Interface, AttributeCollection);	\
 																							\
 	inline static constexpr std::wstring_view FriendlyName = L ## #Interface;				\
 																							\
-private:																					\
-	inline static Type* StaticRegisterClass = StaticClass();								\
-																							\
 public:																						\
-	Type* GetType() const																	\
+	static inline SType* TypeId = &StaticClass;												\
+	SType* GetType() const																	\
 	{																						\
-		return StaticClass();																\
+		return TypeId;																		\
 	}																						\
 																							\
 private:																					\
-	template<size_t _Line>																	\
-	static consteval size_t REFLECTION_FunctionChain()										\
-	{																						\
-		return REFLECTION_FunctionChain<_Line - 1>();										\
-	}																						\
-																							\
-	template<size_t _Line> requires (_Line == __LINE__)										\
-	static consteval size_t REFLECTION_FunctionChain()										\
-	{																						\
-		return -1;																			\
-	}																						\
-																							\
-	template<size_t _Line>																	\
-	static consteval size_t REFLECTION_PropertyChain()										\
-	{																						\
-		return REFLECTION_PropertyChain<_Line - 1>();										\
-	}																						\
-																							\
-	template<size_t _Line> requires (_Line == __LINE__)										\
-	static consteval size_t REFLECTION_PropertyChain()										\
-	{																						\
-		return -1;																			\
-	}																						\
-																							\
-	template<size_t>																		\
-	static void REFLECTION_GetFunctionPointer(void*);										\
-	template<size_t>																		\
-	static consteval void REFLECTION_GetFunctionName(void*);								\
-	template<size_t>																		\
-	static void REFLECTION_GetPropertyPointer(void*);										\
+	GENERATED_BODY_DECLARE_REFLECTION_CHAINS()												\
 																							\
 public:
-
-#define GENERATED_STRUCT_BODY(Struct, ...)													\
-	friend class Type;																		\
-																							\
-public:																						\
-	using Super = typename ReflectionMacros::SuperClassTypeDeclare<Struct>::Type;			\
-	using This = Struct;																	\
-																							\
-	inline static Type* StaticClass()														\
-	{																						\
-		static Type MyClassType = Type::TypeGenerator<Struct>(FriendlyName);				\
-		return &MyClassType;																\
-	}																						\
-																							\
-	inline static constexpr std::wstring_view FriendlyName = L ## #Struct;					\
-																							\
-private:																					\
-	inline static Type* StaticRegisterClass = StaticClass();								\
-																							\
-public:																						\
-	Type* GetType() const																	\
-	{																						\
-		return StaticClass();																\
-	}																						\
-																							\
-private:																					\
-	template<size_t _Line>																	\
-	static consteval size_t REFLECTION_FunctionChain()										\
-	{																						\
-		return REFLECTION_FunctionChain<_Line - 1>();										\
-	}																						\
-																							\
-	template<size_t _Line> requires (_Line == __LINE__)										\
-	static consteval size_t REFLECTION_FunctionChain()										\
-	{																						\
-		return -1;																			\
-	}																						\
-																							\
-	template<size_t _Line>																	\
-	static consteval size_t REFLECTION_PropertyChain()										\
-	{																						\
-		return REFLECTION_PropertyChain<_Line - 1>();										\
-	}																						\
-																							\
-	template<size_t _Line> requires (_Line == __LINE__)										\
-	static consteval size_t REFLECTION_PropertyChain()										\
-	{																						\
-		return -1;																			\
-	}																						\
-																							\
-	template<size_t>																		\
-	static void REFLECTION_GetFunctionPointer(void*);										\
-	template<size_t>																		\
-	static consteval void REFLECTION_GetFunctionName(void*);								\
-	template<size_t>																		\
-	static void REFLECTION_GetPropertyPointer(void*);										\
-																							\
-public:																						\
-	inline operator SObject* () const														\
-	{																						\
-		return Cast<SObject>(*this);														\
-	}
-
-#define GENERATE_BODY(Class, ...)															\
-Type* Class::StaticClass()																	\
-{																							\
-	static Type MyClassType(Type::TypeGenerator<This>(FriendlyName, L ## #Class));			\
-	return &MyClassType;																	\
-}
 
 #define SFUNCTION(FunctionName, ...)														\
 	template<>																				\
@@ -210,26 +140,13 @@ Type* Class::StaticClass()																	\
 	template<size_t N> requires (N == REFLECTION_PropertyChain<__LINE__>())					\
 	static auto REFLECTION_GetPropertyPointer(int)											\
 	{																						\
-		using PT = decltype(This::PropertyName);											\
-		static Property::PropertyGenerator Generator =										\
-		{																					\
-			.Name = L ## #PropertyName,														\
-			.DeferredMemberType = Type::GetDeferredStaticClass<								\
-			std::remove_const_t<std::remove_pointer_t<decltype(This::PropertyName)>>>(),	\
-			.Setter = +[](SObject* _this, const void* _value)								\
-			{ ReflectionMacros::Assign(dynamic_cast<This*>(_this)->PropertyName, _value); },\
-			.Getter = +[](const SObject* _this) -> const void*								\
-			{ return &dynamic_cast<const This*>(_this)->PropertyName; },					\
-			.Setter_Struct = +[](void* _this, const void* _value) { ReflectionMacros		\
-			::Assign(reinterpret_cast<This*>(_this)->PropertyName, _value); },				\
-			.Getter_Struct = +[](const void* _this) -> const void*							\
-			{ return &reinterpret_cast<const This*>(_this)->PropertyName; },				\
-			.bIsPointer = std::is_pointer_v<PT>,											\
-			.bIsConst = std::is_const_v<PT>,												\
-			.bIsStatic = ReflectionMacros::IsStaticMember(&This::PropertyName),				\
-		};																					\
-		return &Generator;																	\
+		static SFieldInfo FieldInfo = libty::Core::Reflection::FieldInfoMetadataGenerator	\
+		(																					\
+			&This::PropertyName,															\
+			#PropertyName,																	\
+			{}																				\
+		);																					\
+		return &FieldInfo;																	\
 	}
 
 #define implements virtual public 
-#define gcnew SObjectDetails::GCNewBinder() << new

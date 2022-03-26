@@ -5,42 +5,31 @@
 #include "Object.h"
 #include "CoreConcepts.h"
 #include "Misc/String.h"
+#include "typeof.h"
 #include <any>
 #include <sstream>
-
-template<size_t _Depth>
-struct InheritSelector : public InheritSelector<_Depth - 1>
-{
-	constexpr static size_t Depth = _Depth;
-};
-
-template<>
-struct InheritSelector<0>
-{
-	constexpr static size_t Depth = 0;
-};
 
 class SValueType : virtual public SObject
 {
 private:
 	std::any _value;
 	std::wstring _toString;
-	Type* _type = nullptr;
+	SType* _type = nullptr;
 
 public:
 	template<class T>
 	SValueType(const T& value) : SObject()
 		, _value(value)
 	{
-		_toString = Internal_ToString(value, InheritSelector<6>());
-		_type = Type::GetStaticClass<T>();
+		_toString = Internal_ToString(value, inh_select<6>());
+		_type = typeof(T);
 	}
 
 	virtual ~SValueType() noexcept override
 	{
 	}
 
-	virtual Type* GetType() const override
+	virtual SType* GetType() const override
 	{
 		return _type;
 	}

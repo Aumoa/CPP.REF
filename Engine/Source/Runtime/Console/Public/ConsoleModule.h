@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "CoreMinimal.h"
 #include "Misc/CommandLine.h"
 
 class SConsoleModuleSubsystem;
@@ -22,7 +22,7 @@ public:
 	int32 Main(const CommandLine& CommandArgs);
 	virtual int32 Run(const CommandLine& CommandArgs) = 0;
 
-	SConsoleModuleSubsystem* GetSubsystem(Type* SubsystemClass);
+	SConsoleModuleSubsystem* GetSubsystem(SType* SubsystemClass);
 	template<class T>
 	T* GetSubsystem()
 	{

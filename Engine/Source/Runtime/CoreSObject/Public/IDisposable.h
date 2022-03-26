@@ -16,4 +16,5 @@ struct IDisposable : implements SObject
 	}
 
 	virtual void Dispose() = 0;
+	virtual bool IsDisposed() = 0;
 };

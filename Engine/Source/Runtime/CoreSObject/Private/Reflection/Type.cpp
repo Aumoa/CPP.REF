@@ -1,263 +1,111 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Reflection/Type.h"
-#include "LogCore.h"
-#include "Object.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogVerbosity.h"
+#include "Reflection/FieldInfo.h"
+#include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 
-DEFINE_LOG_CATEGORY(LogReflection);
+GENERATE_BODY(SType);
 
-std::unordered_map<size_t, uint64> Type::TypeRegister;
-std::mutex Type::TypeRegisterMutex;
+SType::StaticCollection* SType::_staticCollection;
 
-std::map<std::wstring, Type*, std::less<>>* TypeCollectionPtr;
-std::map<size_t, std::vector<Type*>>* TypeHierarchyMapPtr;
-
-void Type::RegisterStaticClass()
+SType::SType(MetadataGenerator&& generator)
+	: Super()
+	, _meta(std::move(generator))
 {
-	static std::set<size_t> Collection;
-	auto [It, bFlag] = Collection.emplace(GetHashCode());
-	if (!bFlag)
+	static StaticCollection __STATIC_COLLECTION__;
+	_staticCollection = &__STATIC_COLLECTION__;
+
+	// Add to dictionary for search by name.
+	_staticCollection->FullQualifiedNameView.emplace(_meta.FullQualifiedClassName, this);
+	
+	// Add to dictionary for search by hierarchy.
+	for (SType* curr = this; curr != nullptr; curr = curr->_meta.SuperClass)
 	{
-		return;
-	}
-
-	static std::map<std::wstring, Type*, std::less<>> TypeCollection;
-	TypeCollectionPtr = &TypeCollection;
-	TypeCollection.emplace(GetFullName(), this);
-
-	static std::map<size_t, std::vector<Type*>> TypeHierarchyMap;
-	TypeHierarchyMapPtr = &TypeHierarchyMap;
-
-	for (Type* Curr = this; Curr; Curr = Curr->GetSuper())
-	{
-		TypeHierarchyMap[Curr->GetHashCode()].emplace_back(this);
+		_staticCollection->HierarchyView[curr].emplace(this);
 	}
 }
 
-const std::wstring& Type::GetFriendlyName() const
+std::wstring_view SType::GetName()
 {
-	return FriendlyName;
+	return _meta.ClassName;
 }
 
-const std::wstring& Type::GetFullName() const
+SType* SType::GetSuperType()
 {
-	return FullName;
+	return _meta.SuperClass;
 }
 
-size_t Type::GetHashCode() const
+std::wstring_view SType::GetFullQualifiedName()
 {
-	return TypeHash;
+	return _meta.FullQualifiedClassName;
 }
 
-size_t Type::GetSizeOf() const
+std::span<SFieldInfo* const> SType::GetFields()
 {
-	return SizeOf;
+	return _meta.Fields;
 }
 
-Type* Type::GetSuper() const
+size_t SType::GetHashCode()
 {
-	return SuperClass;
+	return _meta.TypeHash;
 }
 
-SObject* Type::Instantiate() const
+bool SType::IsValueType()
 {
-	if (Constructor)
+	return !_meta.bIsClass;
+}
+
+bool SType::IsNativeType()
+{
+	return _meta.bIsNative;
+}
+
+bool SType::IsA(SType* compareType)
+{
+	return _meta.TypeHash == compareType->_meta.TypeHash;
+}
+
+bool SType::IsDerivedFrom(SType* compareType)
+{
+	for (SType* curr = this; curr != nullptr; curr = curr->_meta.SuperClass)
 	{
-		SObject* SO = Constructor();
-		return SO;
+		if (curr->_meta.TypeHash == compareType->_meta.TypeHash)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+SObject* SType::Instantiate()
+{
+	if (_meta.Constructor)
+	{
+		return _meta.Constructor();
 	}
 	else
-	{
-		throw fatal_exception(String::Format(L"Instantiate failed for {0} class. {0} class does not contained constructor without parameters.", FriendlyName));
-	}
-}
-
-bool Type::IsDerivedFrom(const Type* InType) const
-{
-	if (InType->GetHashCode() == GetHashCode())
-	{
-		return true;
-	}
-	else
-	{
-		for (const Type* super = this; super; super = super->GetSuper())
-		{
-			if (InType->GetHashCode() == super->GetHashCode())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-}
-
-bool Type::IsBaseOf(const Type* InType) const
-{
-	return InType->IsDerivedFrom(this);
-}
-
-bool Type::IsA(const Type* InType) const
-{
-	return GetHashCode() == InType->GetHashCode();
-}
-
-void Type::CacheProperties()
-{
-	if (!bPropertyCached)
-	{
-		CachedProperties.reserve(Properties.size());
-		CachedFullProperties.reserve(Properties.size());
-		CachedGCProperties.reserve(Properties.size());
-
-		for (auto& Prop : Properties)
-		{
-			CachedProperties.emplace_back(&Prop);
-			CachedFullProperties.emplace_back(&Prop);
-
-			Type* MemberType = Prop.GetMemberType();
-			if (!MemberType->bNative || MemberType->bGCCollection)
-			{
-				CachedGCProperties.emplace_back(&Prop);
-			}
-		}
-
-		for (Type* Super = SuperClass; Super; Super = Super->SuperClass)
-		{
-			CachedFullProperties.reserve(CachedFullProperties.size() + Super->Properties.size());
-			CachedFullProperties.insert(CachedFullProperties.begin(), Super->Properties.size(), nullptr);
-			CachedGCProperties.reserve(CachedGCProperties.size() + Super->Properties.size());
-
-			size_t Idx = 0;
-			for (auto& Prop : Super->Properties)
-			{
-				CachedFullProperties[Idx++] = &Prop;
-
-				Type* MemberType = Prop.GetMemberType();
-				if (!MemberType->bNative || MemberType->bGCCollection)
-				{
-					CachedGCProperties.emplace_back(&Prop);
-				}
-			}
-		}
-
-		bPropertyCached = true;
-	}
-}
-
-std::vector<Method> Type::GetMethods(bool bIncludeSuperMembers)
-{
-	if (bIncludeSuperMembers)
-	{
-		std::vector<Method> functions = Functions;
-		for (Type* super = this; super; super = super->GetSuper())
-		{
-			std::vector<Method> superFunctions = super->GetMethods(false);
-			functions.insert(functions.end(), superFunctions.begin(), superFunctions.end());
-		}
-		return functions;
-	}
-	else
-	{
-		return Functions;
-	}
-}
-
-Method* Type::GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers)
-{
-	for (size_t i = 0; i < Functions.size(); ++i)
-	{
-		if (Functions[i].GetFriendlyName() == InFriendlyName)
-		{
-			return const_cast<Method*>(&Functions[i]);
-		}
-	}
-
-	Type* super = nullptr;
-	if (!bIncludeSuperMembers || !(super = GetSuper()))
 	{
 		return nullptr;
 	}
-
-	return super->GetMethod(InFriendlyName, true);
 }
 
-const std::vector<Property*>& Type::GetProperties(bool bIncludeSuperMembers)
+SType* SType::GetType(std::wstring_view fullQualifiedName)
 {
-	CacheProperties();
-
-	if (bIncludeSuperMembers)
+	auto it = _staticCollection->FullQualifiedNameView.find(fullQualifiedName);
+	if (it == _staticCollection->FullQualifiedNameView.end())
 	{
-		return CachedFullProperties;
+		return nullptr;
 	}
-	else
-	{
-		return CachedProperties;
-	}
+	return it->second;
 }
 
-const std::vector<Property*>& Type::GetGCProperties()
+std::set<SType*> SType::GetDerivedTypes(SType* baseType)
 {
-	CacheProperties();
-	return CachedGCProperties;
-}
-
-Property* Type::GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers)
-{
-	CacheProperties();
-
-	auto& List = bIncludeSuperMembers ? CachedFullProperties : CachedProperties;
-
-	for (auto& Prop : List)
+	auto it = _staticCollection->HierarchyView.find(baseType);
+	if (it == _staticCollection->HierarchyView.end())
 	{
-		if (Prop->GetFriendlyName() == InFriendlyName)
-		{
-			return Prop;
-		}
+		return {};
 	}
-
-	return nullptr;
-}
-
-int32 Type::MarkCollectionObjects(SObject* Object, Property* CollectionProp, int32 Depth)
-{
-	checkf(bGCCollection && Collector, L"Type is not GCCollector type.");
-	uint8& CollectionPtr = const_cast<uint8&>(CollectionProp->GetValue<uint8>(Object));
-	return Collector(&CollectionPtr, Depth);
-}
-
-std::wstring Type::GenerateUniqueName()
-{
-	std::unique_lock ScopedLock(TypeRegisterMutex);
-	uint64& Incrementer = TypeRegister[TypeHash];
-	if (uint64 Value = Incrementer++; Value != 0)
-	{
-		return String::Format(L"{}_{}", GetFriendlyName(), Value);
-	}
-	else
-	{
-		return GetFriendlyName();
-	}
-}
-
-Type* Type::FindStaticClass(std::wstring_view InFriendlyName)
-{
-	if (auto It = TypeCollectionPtr->find(InFriendlyName); It != TypeCollectionPtr->end())
-	{
-		return It->second;
-	}
-	return nullptr;
-}
-
-std::span<Type*> Type::FindAllSubclass(Type* BaseClass)
-{
-	auto It = TypeHierarchyMapPtr->find(BaseClass->GetHashCode());
-	if (It != TypeHierarchyMapPtr->end())
-	{
-		return It->second;
-	}
-
-	return std::span<Type*>();
+	return it->second;
 }

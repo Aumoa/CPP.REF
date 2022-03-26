@@ -9,6 +9,8 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Threading/SuspendTokenCollection.h"
 #include "Threading/ISuspendToken.h"
+#include "Reflection/Type.h"
+#include "Reflection/FieldInfo.h"
 #include "LogCore.h"
 #include "Object.h"
 #include <string>
@@ -171,14 +173,12 @@ void GarbageCollector::Collect(bool bFullPurge)
 			// Ready pending kill buffer.
 			std::atomic<size_t> ActualPendingKill = 0;
 			std::vector<size_t> ObjectCompactIndex(NumGCThreads);
-			std::atomic<size_t> TotalMemorySize;
 			PendingKill.resize(Objects.NumObjects());
 
 			// Sweeping.
 			Parallel::ForEach(ActualCollectionSize, [&](size_t ThreadIdx, size_t StartIdx, size_t EndIdx)
 			{
 				size_t MaxLiveNumber = 0;
-				size_t MemorySize = 0;
 
 				for (size_t ItemIdx = StartIdx; ItemIdx < EndIdx; ++ItemIdx)
 				{
@@ -195,13 +195,11 @@ void GarbageCollector::Collect(bool bFullPurge)
 						{
 							Object->bMarkAtGC = false;
 							MaxLiveNumber = ItemIdx;
-							MemorySize += Object->GetType()->GetSizeOf();
 						}
 					}
 				}
 
 				ObjectCompactIndex[ThreadIdx] = MaxLiveNumber;
-				TotalMemorySize += MemorySize;
 			}, NumGCThreads);
 
 			// Compact objects list.
@@ -225,7 +223,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 			size_t AfterCompact = Objects.TableSize();
 		}
 
-		DeleteAction = std::async([this, Finalized = std::move(PendingFinalize)]()
+		DeleteAction = std::async([this]()
 		{
 			SCOPE_CYCLE_COUNTER(STAT_Finalize);
 			size_t NumRemoves = 0;
@@ -256,9 +254,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 void GarbageCollector::SuppressFinalize(SObject* Object)
 {
-	std::unique_lock GCMtx_lock(GCMtx);
 	Object->bHasFinalizer = false;
-	PendingFinalize.emplace(Object);
 }
 
 void GarbageCollector::Hint()
@@ -312,49 +308,44 @@ int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDept
 	{
 		Object = Buffer[Reap++];
 
-		if (Object == nullptr || Object->bMarkAtGC || PendingFinalize.contains(Object))
+		if (Object == nullptr || Object->bMarkAtGC)
 		{
 			continue;
 		}
 
 		Object->bMarkAtGC = true;
 
-		for (auto& GCProp : Object->GetType()->GetGCProperties())
+		// Do NOT declare it as std::function because, that interfere function inlining.
+		auto Marker = [&](SObject* Member)
 		{
-			Type* PropertyType = GCProp->GetMemberType();
-			if (PropertyType->IsGCCollection())
+			if (Writep < (int32)Buffer.size())
 			{
-				Count += PropertyType->MarkCollectionObjects(Object, GCProp, MarkDepth);
+				Buffer[Writep++] = Member;
 			}
 			else
 			{
-				SObject* Member = GCProp->GetObject(Object);
-
-				// If object is disposed,
-				if (PendingFinalize.contains(Member))
-				{
-					// Change property to nullptr.
-					GCProp->SetObject(Object, nullptr);
-				}
-				else
-				{
-					if (Member)
-					{
-						if (Writep < (int32)Buffer.size())
-						{
-							Buffer[Writep++] = Member;
-						}
-						else
-						{
-							GCMarkingBuffer[Member->InternalIndex] = MarkDepth;
-						}
-						++Count;
+				GCMarkingBuffer[Member->InternalIndex] = MarkDepth;
+			}
+			++Count;
 
 #if !SHIPPING
-						Member->GC_ContainsOwner = Object;
+			Member->GC_ContainsOwner = Object;
 #endif
-					}
-				}
+		};
+
+		libty::Core::Reflection::FieldInfoMetadataGenerator::NativeGCInvoke MarkerFnc = Marker;
+
+		for (auto& Field : Object->GetType()->GetFields())
+		{
+			SType* FieldType = Field->GetFieldType();
+			if (!FieldType->IsValueType())
+			{
+				SObject* Member = Field->GetValue(Object);
+				Marker(Member);
+			}
+			else if (Field->_meta.Collection)
+			{
+				Field->_meta.Collection(Object, MarkerFnc);
 			}
 		}
 	}

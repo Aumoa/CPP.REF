@@ -11,7 +11,7 @@ class SubclassOf
 	friend class SubclassOf;
 
 private:
-	Type* MyType = nullptr;
+	SType* MyType = nullptr;
 
 public:
 	inline SubclassOf() = default;
@@ -36,9 +36,9 @@ public:
 		Rhs.MyType = nullptr;
 	}
 
-	inline SubclassOf(Type* NewType) : MyType(NewType)
+	inline SubclassOf(SType* NewType) : MyType(NewType)
 	{
-		checkf(NewType == nullptr || NewType->IsDerivedFrom<T>(), L"Couldn't convert super class.");
+		checkf(NewType == nullptr || NewType->IsDerivedFrom(typeof(T)), L"Couldn't convert super class.");
 	}
 
 	inline bool IsValid() const

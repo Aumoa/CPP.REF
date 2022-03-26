@@ -8,7 +8,7 @@
 #include "Misc/String.h"
 #include <map>
 
-namespace Enum
+namespace libty::Enum
 {
 	template<size_t N>
 	struct Cstr
@@ -101,8 +101,8 @@ namespace Enum
 #define SENUM_DECLARE_DICTIONARY_PAIR_PARSE(Name, ...) { L ## #Name, __Type__(Name) },
 #define SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING(Name, ...) { Name.Value, L ## #Name },
 
-#define SENUM(Name, Type, ...)																		\
-struct Name : public Enum::EEnumBase<Name, Type>													\
+#define SENUM_BEGIN(Name, Type, ...)																\
+struct Name : public libty::Enum::EEnumBase<Name, Type>												\
 {																									\
 	using __Type__ = Name;																			\
 																									\
@@ -187,5 +187,11 @@ struct Name : public Enum::EEnumBase<Name, Type>													\
 	constexpr operator __Tag__() const																\
 	{																								\
 		return static_cast<__Tag__>(this->Value);													\
-	}																								\
+	}
+
+#define SENUM_END() \
 };
+
+#define SENUM(Name, Type, ...) \
+SENUM_BEGIN(Name, Type __VA_OPT__(, __VA_ARGS__)) \
+SENUM_END();

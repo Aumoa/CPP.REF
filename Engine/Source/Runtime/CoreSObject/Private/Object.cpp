@@ -8,8 +8,12 @@
 #include "Threading/Parallel.h"
 #include "GC/GC.h"
 #include "GC/WeakPtr.h"
+#include "Reflection/Type.h"
+#include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 
-GENERATE_BODY(SObject);
+SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator::GenerateClass<SObject>(
+	FriendlyName, "SObject", std::make_tuple()
+));
 
 SObject::SObject()
 	: bMarkAtGC(false)
@@ -54,16 +58,15 @@ std::function<bool()> SObject::GetHolder()
 
 std::wstring SObject::ToString()
 {
-	return GetType()->GetFriendlyName();
+	return std::wstring(GetType()->GetFullQualifiedName());
 }
 
 void SObject::PostConstruction()
 {
-	volatile const auto& CachingDummy = GetType()->GetGCProperties();
 	GC.RegisterObject(this);
 
 #if !SHIPPING
-	CachedTypeName = GetType()->GetFullName();
+	CachedTypeName = GetType()->GetFullQualifiedName();
 #endif
 }
 

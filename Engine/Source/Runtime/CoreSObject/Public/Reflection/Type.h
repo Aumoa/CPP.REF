@@ -2,520 +2,113 @@
 
 #pragma once
 
-#include <typeinfo>
-#include <functional>
-#include <unordered_map>
-#include <mutex>
-#include <map>
+#include "Object.h"
+#include "TypeInfoMetadataGenerator.h"
 #include <span>
-#include "PrimitiveTypes.h"
-#include "CoreConcepts.h"
-#include "Method.h"
-#include "Property.h"
-#include "ObjectBase.h"
-#include "GC/GC.h"
-#include "Misc/String.h"
-#include "Reflection/ReflectionMacros.h"
+#include <map>
+#include <set>
 
-class SObject;
-class Method;
-class Property;
-
-namespace ReflectionMacros
+/// <summary>
+/// Represents type declarations: class types, interface types, value types, and enumeration types.
+/// </summary>
+class CORESOBJECT_API SType : implements SObject
 {
-	template<class T>
-	struct SuperClassTypeDeclare
+	GENERATED_BODY(SType);
+
+public:
+	using MetadataGenerator = libty::Core::Reflection::TypeInfoMetadataGenerator;
+
+private:
+	struct StaticCollection
 	{
-	private:
-		template<class U> requires requires { typename U::This; }
-		static auto Impl(int32) -> decltype(std::declval<typename U::This>());
-
-		template<class U> requires (!requires { typename U::This; })
-		static auto Impl(int16) -> void;
-
-	public:
-		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
+		std::map<std::wstring, SType*, std::less<>> FullQualifiedNameView;
+		std::map<SType*, std::set<SType*>> HierarchyView;
 	};
 
-	template<class T>
-	consteval bool IsStaticMember();
-	template<class T>
-	consteval bool IsStaticMember(T*) { return true; }
-	template<class TOwner, class T>
-	consteval bool IsStaticMember(T(TOwner::*)) { return false; }
-	template<class T>
-	consteval bool IsStaticMember(const T*) { return true; }
-	template<class TOwner, class T>
-	consteval bool IsStaticMember(const T(TOwner::*)) { return false; }
+	static StaticCollection* _staticCollection;
 
-	template<class T>
-	inline T& Assign(T& Member, const void* Value)
-	{
-		Member = *reinterpret_cast<const T*>(Value);
-		return Member;
-	}
-}
-
-class CORESOBJECT_API Type
-{
-	using ObjectCtor = SObject*(*)();
-	Type() = delete;
-	Type(const Type&) = delete;
-
-private:
-	static std::unordered_map<size_t, uint64> TypeRegister;
-	static std::mutex TypeRegisterMutex;
-
-	size_t TypeHash = 0;
-	size_t SizeOf = 0;
-	std::wstring FriendlyName;
-	std::wstring FullName;
-	Type* SuperClass = nullptr;
-	ObjectCtor Constructor;
-	std::vector<Method> Functions;
-	std::vector<Property> Properties;
-	std::function<SObject* (void*)> ToObjectCast;
-	std::function<void* (SObject*)> FromObjectCast;
-
-	uint8 bNative : 1 = false;
-	uint8 bPropertyCached : 1 = false;
-	uint8 bFunctionCached : 1 = false;
-
-	uint8 bGCCollection : 1 = false;
-	std::function<int32(void*, int32)> Collector;
+	MetadataGenerator _meta;
+	std::vector<SFieldInfo*> _cachedGCFields;
 
 public:
-	template<class TType>
-	struct TypeGenerator
-	{
-	private:
-		template<class U>
-		static bool CollectSingleNode(int32& Counter, U*& Node, int32& Depth) requires
-			std::derived_from<U, SObject> &&
-			requires { Node = nullptr; }
-		{
-			if (Node)
-			{
-				if (GC.PendingFinalize.contains(Node))
-				{
-					Node = nullptr;
-				}
-				else
-				{
-					GC.GCMarkingBuffer[Node->InternalIndex] = Depth;
-					++Counter;
-				}
-			}
+	SType(MetadataGenerator&& generator);
 
-			return true;
-		}
+	/// <summary>
+	/// Gets the simply name of the type.
+	/// </summary>
+	virtual std::wstring_view GetName();
 
-		template<class U>
-		static bool CollectSingleNode(int32& Counter, U* const& Node, int32& Depth) requires
-			std::derived_from<U, SObject> &&
-			(!requires { Node = nullptr; })
-		{
-			if (Node)
-			{
-				if (GC.PendingFinalize.contains(Node))
-				{
-					return false;
-				}
-				else
-				{
-					GC.GCMarkingBuffer[Node->InternalIndex] = Depth;
-					++Counter;
-				}
-			}
+	/// <summary>
+	/// Gets the type from which the current Type directly inherits.
+	/// </summary>
+	virtual SType* GetSuperType();
 
-			return true;
-		}
+	/// <summary>
+	/// Gets the fully qualified name of the type, including its namespace but not its assembly.
+	/// </summary>
+	virtual std::wstring_view GetFullQualifiedName();
 
-		template<class U>
-		static bool CollectSingleNode(int32& Counter, U& Node, int32& Depth) requires
-			requires { U::StaticClass(); }
-		{
-			Type* StructType = Node.GetType();
-			Counter += StructType->Collector(&Node, Depth);
-			return true;
-		}
+	/// <summary>
+	/// Returns all the fields of the current Type.
+	/// </summary>
+	virtual std::span<SFieldInfo* const> GetFields();
 
-		template<class U>
-		static bool CollectSingleNode(int32& Counter, const U& Node, int32& Depth)
-		{
-			return true;
-		}
+	/// <summary>
+	/// Returns the hash code for this type.
+	/// </summary>
+	virtual size_t GetHashCode();
 
-		template<class U1, class U2>
-		static bool CollectSingleNode(int32& Counter, std::pair<U1, U2>& Node, int32& Depth)
-		{
-			bool b1 = CollectSingleNode(Counter, Node.first, Depth);
-			bool b2 = CollectSingleNode(Counter, Node.second, Depth);
-			return b1 || b2;
-		}
+	/// <summary>
+	/// Gets a value indicating whether the Type is a value type.
+	/// </summary>
+	virtual bool IsValueType();
 
-		template<class... U>
-		static bool CollectSingleNode(int32& Counter, std::tuple<U...>& Node, int32& Depth)
-		{
-			return CollectSingleNode(Counter, Node, Depth, std::make_index_sequence<sizeof...(U)>{});
-		}
+	/// <summary>
+	/// Gets a value indicating whether the Type is a native type.
+	/// </summary>
+	virtual bool IsNativeType();
 
-		template<class... U, size_t... _Idx>
-		static bool CollectSingleNode(int32& Counter, std::tuple<U...>& Node, int32& Depth, std::index_sequence<_Idx...>&&)
-		{
-			std::array<bool, sizeof...(U)> Booleans = { CollectSingleNode(Counter, std::get<_Idx>(Node), Depth)... };
-			for (auto& Bool : Booleans)
-			{
-				if (Bool)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
+	/// <summary>
+	/// Gets a valud indicating whether the Type equals to specified type.
+	/// </summary>
+	/// <param name="compareType"> The type what to compare. </param>
+	virtual bool IsA(SType* compareType);
 
-		template<class U>
-		static bool CollectSingleNode(int32& Counter, U& Node, int32& Depth) requires requires
-		{
-			{ std::begin(Node) };
-			{ std::end(Node) };
-		}
-		{
-			Type* CollectionType = Type::GetStaticClass<U>();
-			Counter += CollectionType->Collector(&Node, Depth);
-			return true;
-		}
+	/// <summary>
+	/// Gets a valud indicating whether the Type derived from specified type.
+	/// </summary>
+	/// <param name="baseType"> The type what to compare. </param>
+	virtual bool IsDerivedFrom(SType* baseType);
 
-		template<class T>
-		static auto GetInternalIndex(T* sObject)
-		{
-			return sObject->InternalIndex;
-		}
+	/// <summary>
+	/// Instantiate specified type with default constructor.
+	/// </summary>
+	virtual SObject* Instantiate();
 
-	public:
-		std::wstring FriendlyName;
-		std::wstring FullName;
-		std::vector<Method> Functions;
-		std::vector<Property> Properties;
-		Type* SuperClass = nullptr;
-		std::function<SObject* (void*)> ToObjectCast;
-		std::function<void* (SObject*)> FromObjectCast;
-		uint8 bNative : 1 = false;
+	/// <summary>
+	/// Gets the Type with the specified full qualified name, performing a case-sensitive search.
+	/// </summary>
+	/// <param name="fullQualifiedName"> The full qualified name of the type to get. </param>
+	/// <returns> The type with the specified name, if found; otherwise, null. </returns>
+	static SType* GetType(std::wstring_view fullQualifiedName);
 
-		uint8 bGCCollection : 1 = false;
-		std::function<int32(void*, int32)> Collector;
+	/// <summary>
+	/// Get all derived types from specified base type.
+	/// </summary>
+	/// <param name="baseType"> The base type of results. </param>
+	static std::set<SType*> GetDerivedTypes(SType* baseType);
 
-		// SObject type.
-		TypeGenerator(std::wstring_view InFriendlyName, std::wstring_view FullName) requires
-			requires { TType::StaticClass(); }
-			: FriendlyName(InFriendlyName)
-			, FullName(FullName)
-			, bNative(false)
-			, ToObjectCast(+[](void* UnknownType) { return dynamic_cast<SObject*>(reinterpret_cast<TType*>(UnknownType)); })
-			, FromObjectCast(+[](SObject* Object) { return reinterpret_cast<void*>(dynamic_cast<TType*>(Object)); })
-		{
-			Functions.reserve(100);
-			CollectFunctions<0>(Functions);
-			CollectProperties<0>(Properties);
-
-			if constexpr (HasSuper<TType>)
-			{
-				using SuperType = typename TType::Super;
-				SuperClass = SuperType::StaticClass();
-			}
-		}
-
-		// Struct type.
-		TypeGenerator(std::wstring_view InFriendlyName) requires
-			requires { TType::StaticClass(); }
-			: FriendlyName(InFriendlyName)
-			, FullName(String::AsUnicode(typeid(TType).name()))
-			, bNative(true)
-			, bGCCollection(true)
-		{
-			Functions.reserve(100);
-			CollectFunctions<0>(Functions);
-			CollectProperties<0>(Properties);
-
-			if constexpr (HasSuper<TType>)
-			{
-				using SuperType = typename TType::Super;
-				SuperClass = SuperType::StaticClass();
-			}
-
-			Collector = [](void* Ptr, int32 Depth) -> int32
-			{
-				TType& Struct = *reinterpret_cast<TType*>(Ptr);
-				Type* StructType = Struct.GetType();
-
-				int32 Count = 0;
-				for (auto& Prop : StructType->GetGCProperties())
-				{
-					Type* PropertyType = Prop->GetMemberType();
-					if (PropertyType->IsGCCollection())
-					{
-						// Mark collection objects.
-						uint8& CollectionPtr = const_cast<uint8&>(Prop->template GetValue<uint8>(Struct));
-						Count += PropertyType->Collector(&CollectionPtr, Depth);
-					}
-					else
-					{
-						SObject* Object = Prop->GetObject(Struct);
-						if (Object)
-						{
-							if (GC.PendingFinalize.contains(Object))
-							{
-								Prop->SetObject(Struct, nullptr);
-							}
-							else
-							{
-								GC.GCMarkingBuffer[GetInternalIndex(Object)] = Depth;
-								++Count;
-							}
-						}
-					}
-				}
-
-				return Count;
-			};
-		}
-
-		// SObject container type.
-		TypeGenerator() requires requires(const TType& Collection)
-			{
-				{ std::begin(Collection) };
-				{ std::end(Collection) };
-			}
-			: FriendlyName(String::AsUnicode(typeid(TType).name()))
-			, FullName(FriendlyName)
-			, bNative(true)
-			, bGCCollection(true)
-			, Collector([](void* Ptr, int32 Depth) -> int32
-			{
-				TType& Collection = *reinterpret_cast<TType*>(Ptr);
-				int32 Count = 0;
-				for (auto It = Collection.begin(); It != Collection.end();)
-				{
-					auto& Object = *It;
-					if (!CollectSingleNode(Count, Object, Depth))
-					{
-						if constexpr (!IsMutableCollection<TType>)
-						{
-							Collection.erase(It++);
-							continue;
-						}
-					}
-					++It;
-				}
-				return Count;
-			})
-		{
-		}
-
-		TypeGenerator()
-			: FriendlyName(String::AsUnicode(typeid(TType).name()))
-			, bNative(true)
-		{
-		}
-
-	private:
-		template<size_t N>
-		static void CollectFunctions(std::vector<Method>& Methods)
-		{
-			if constexpr (std::same_as<decltype(TType::template REFLECTION_GetFunctionPointer<N>(0)), void>)
-			{
-				return;
-			}
-			else
-			{
-				Methods.emplace_back(TType::template REFLECTION_GetFunctionPointer<N>(0), std::wstring_view(TType::template REFLECTION_GetFunctionName<N>(0)));
-				CollectFunctions<N + 1>(Methods);
-			}
-		}
-
-		template<size_t N>
-		static void CollectProperties(std::vector<Property>& Properties)
-		{
-			if constexpr (std::same_as<decltype(TType::template REFLECTION_GetPropertyPointer<N>(0)), void>)
-			{
-				return;
-			}
-			else
-			{
-				Properties.emplace_back(TType::template REFLECTION_GetPropertyPointer<N>(0));
-				CollectProperties<N + 1>(Properties);
-			}
-		}
-	};
-
-private:
-	void RegisterStaticClass();
-
-public:
-	template<class TType>
-	Type(TypeGenerator<TType>&& Generator)
-		: TypeHash(typeid(TType).hash_code())
-		, SizeOf(sizeof(TType))
-		, FriendlyName(std::move(Generator.FriendlyName))
-		, FullName(std::move(Generator.FullName))
-		, SuperClass(Generator.SuperClass)
-		, Constructor(GetConstructorFunctionBody<TType>((int32)0))
-		, Functions(std::move(Generator.Functions))
-		, Properties(std::move(Generator.Properties))
-		, ToObjectCast(std::move(Generator.ToObjectCast))
-		, FromObjectCast(std::move(Generator.FromObjectCast))
-		, bNative(Generator.bNative)
-		, bGCCollection(Generator.bGCCollection)
-		, Collector(std::move(Generator.Collector))
-	{
-		RegisterStaticClass();
-	}
-
-	const std::wstring& GetFriendlyName() const;
-	const std::wstring& GetFullName() const;
-	size_t GetHashCode() const;
-	size_t GetSizeOf() const;
-
-	Type* GetSuper() const;
-	SObject* Instantiate() const;
-	inline bool IsNativeType() const { return bNative; }
-	inline bool IsGCCollection() const { return bGCCollection; }
-
-	bool IsDerivedFrom(const Type* InType) const;
-	bool IsBaseOf(const Type* InType) const;
-	bool IsA(const Type* InType) const;
-
-	template<std::derived_from<SObject> T>
-	bool IsDerivedFrom() const { return IsDerivedFrom(T::StaticClass()); }
-	template<std::derived_from<SObject> T>
-	bool IsBaseOf() const { return IsBaseOf(T::StaticClass()); }
-	template<std::derived_from<SObject> T>
-	bool IsA() const { return IsA(T::StaticClass()); }
-
-	template<class T> requires (!std::derived_from<T, SObject>)
-	bool IsDerivedFrom() const { return IsDerivedFrom(GetStaticClass<T>()); }
-	template<class T> requires (!std::derived_from<T, SObject>)
-	bool IsBaseOf() const { return IsBaseOf(GetStaticClass<T>()); }
-	template<class T> requires (!std::derived_from<T, SObject>)
-	bool IsA() const { return IsA(GetStaticClass<T>()); }
-
-private:
-	std::vector<Property*> CachedProperties;
-	std::vector<Property*> CachedFullProperties;
-	std::vector<Property*> CachedGCProperties;
-
-private:
-	void CacheProperties();
-
-public:
-	std::vector<Method> GetMethods(bool bIncludeSuperMembers = true);
-	Method* GetMethod(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
-
-	const std::vector<Property*>& GetProperties(bool bIncludeSuperMembers = true);
-	const std::vector<Property*>& GetGCProperties();
-
-	Property* GetProperty(std::wstring_view InFriendlyName, bool bIncludeSuperMembers = true);
-	int32 MarkCollectionObjects(SObject* Object, Property* CollectionProp, int32 Depth);
-
-public:
-	void* FromObject(SObject* Object) const { return FromObjectCast(Object); }
-	SObject* ToObject(void* UnknownType) const { return ToObjectCast(UnknownType); }
-
-	std::wstring GenerateUniqueName();
-
-public:
-	template<class T> requires requires { T::StaticClass(); }
-	static auto GetStaticClass()
-	{
-		return T::StaticClass();
-	}
-
-	template<class T> requires
-		std::is_pointer_v<T> &&
-		requires { std::remove_pointer_t<T>::StaticClass(); }
-	static auto GetStaticClass()
-	{
-		return std::remove_pointer_t<T>::StaticClass();
-	}
-
-	template<class T> requires
-		(!requires { T::StaticClass(); }) &&
-		(!std::same_as<T, void>) &&
-		(!requires { std::remove_pointer_t<T>::StaticClass(); })
-	static auto GetStaticClass()
-	{
-		static auto MyClassType = Type(TypeGenerator<T>());
-		return &MyClassType;
-	}
-
-	template<std::same_as<void> T>
-	static Type* GetStaticClass()
-	{
-		return nullptr;
-	}
-
-	template<class T> requires requires { T::StaticClass(); }
-	static auto GetDeferredStaticClass()
-	{
-		return &T::StaticRegisterClass;
-	}
-
-	template<class T> requires
-		std::is_pointer_v<T> &&
-		requires { std::remove_pointer_t<T>::StaticClass(); }
-	static auto GetDeferredStaticClass()
-	{
-		return &std::remove_pointer_t<T>::StaticRegisterClass;
-	}
-
-	template<class T> requires
-		(!requires { T::StaticClass(); }) &&
-		(!requires { std::remove_pointer_t<T>::StaticClass(); })
-	static auto GetDeferredStaticClass()
-	{
-		static Type* DeferredClass = GetStaticClass<T>();
-		return &DeferredClass;
-	}
-
-	static Type* FindStaticClass(std::wstring_view InFriendlyName);
-	static std::span<Type*> FindAllSubclass(Type* BaseClass);
 	template<class T>
-	static std::span<Type*> FindAllSubclass() { return FindAllSubclass(GetStaticClass<T>()); }
-
-private:
-	template<std::derived_from<SObject> TType> requires std::constructible_from<TType>
-	static ObjectCtor GetConstructorFunctionBody(int32)
+	static SType* TypeOf()
 	{
-		return +[]() -> SObject*
-		{
-			return gcnew TType();
-		};
+		static SType StaticClass = SType(MetadataGenerator::GenerateNative<T>());
+		return &StaticClass;
 	}
 
-	template<class TType>
-	static ObjectCtor GetConstructorFunctionBody(float)
+	template<class T>
+	static SType* TypeOf() requires requires
+		{ { T::TypeId } -> std::same_as<SType*>; }
 	{
-		return nullptr;
+		return T::TypeId;
 	}
 };
-
-// Declared in Method.h
-template<bool bRet, class T, class... TArgs>
-void Method::ProcessParameters()
-{
-	Type* Myt = Type::GetStaticClass<T>();
-
-	if constexpr (bRet)
-	{
-		ReturnT = Myt;
-	}
-	else
-	{
-		Parameters.emplace_back(Type::GetStaticClass<T>());
-	}
-
-	if constexpr (sizeof...(TArgs) != 0)
-	{
-		ProcessParameters<false, TArgs...>();
-	}
-}
