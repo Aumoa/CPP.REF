@@ -2,7 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Numerics/TransformInterface/Scale2D.h"
+#include "Numerics/TransformInterface/Translate2D.h"
+#include "Numerics/TransformInterface/Transform.h"
+#include "Numerics/MatrixInterface/RotatedRect.h"
 #include "SlateRenderTransform.h"
 #include "SlateLayoutTransform.h"
 #include "LayoutGeometry.h"
@@ -13,7 +16,7 @@
 class SWidget;
 class ArrangedWidget;
 
-struct GAME_API Geometry
+struct SLATECORE_API Geometry
 {
 private:
 	constexpr Geometry(

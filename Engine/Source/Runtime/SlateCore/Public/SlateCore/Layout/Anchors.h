@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Numerics/VectorInterface/Vector.h"
 
 struct Anchors
 {

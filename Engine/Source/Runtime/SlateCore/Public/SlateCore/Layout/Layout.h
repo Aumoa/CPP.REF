@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AlignmentArrangeResult.h"
 #include "Anchors.h"
 #include "ArrangedChildrens.h"

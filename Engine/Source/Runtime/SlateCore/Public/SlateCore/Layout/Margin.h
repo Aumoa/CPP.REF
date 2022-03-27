@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "LayoutEnums.h"
+#include "Numerics/NumericConcepts.h"
+#include "Numerics/VectorInterface/Vector.h"
 
 struct Margin
 {

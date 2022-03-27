@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
+#include "GC/WeakPtr.h"
 #include "Geometry.h"
 
 class SWidget;
 
-class GAME_API ArrangedWidget
+class SLATECORE_API ArrangedWidget
 {
-	SWidget* Widget = nullptr;
+	WeakPtr<SWidget> Widget = nullptr;
 	Geometry MyGeometry;
 
 public:
@@ -17,7 +18,7 @@ public:
 
 	std::wstring ToString() const;
 
-	SWidget* GetWidget() const { return Widget; }
+	SWidget* GetWidget() const { return Widget.Get(); }
 	const Geometry& GetGeometry() const { return MyGeometry; }
 
 	bool operator ==(const ArrangedWidget& Rhs) const;

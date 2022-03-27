@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "DeclarativeSyntaxSupports.h"
+#include "Object.h"
+#include "IDisposable.h"
+#include "DeclarativeSyntaxSupport.h"
 #include "SlotBase.h"
 #include "Layout/Layout.h"
 #include "Input/IMEEvent.h"
+#include "Misc/InputEnums.h"
 
 struct IRHIDevice;
 class SSlateDrawCollector;
@@ -14,7 +16,7 @@ class PaintArgs;
 class ArrangedChildrens;
 class ArrangedWidget;
 
-class GAME_API SWidget : implements SObject, implements IDisposable
+class SLATECORE_API SWidget : implements SObject, implements IDisposable
 {
 	GENERATED_BODY(SWidget)
 

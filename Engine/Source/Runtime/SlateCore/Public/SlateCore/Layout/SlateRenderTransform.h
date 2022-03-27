@@ -2,7 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Numerics/MatrixInterface/Matrix2x2.h"
+#include "Numerics/TransformInterface/Complex.h"
+#include "Numerics/TransformInterface/Translate2D.h"
+#include "Numerics/TransformInterface/Shear2D.h"
 
 struct SlateRenderTransform
 {

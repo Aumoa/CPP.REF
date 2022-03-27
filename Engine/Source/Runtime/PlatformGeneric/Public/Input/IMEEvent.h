@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Reflection/Enum.h"
 
 SENUM(EIMEEvent, int32,
 	Char,,

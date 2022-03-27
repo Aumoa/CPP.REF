@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Widget.h"
+#include "SlateCore/Widgets/Widget.h"
 #include "Draw/PaintArgs.h"
 #include "IApplicationInterface.h"
 #include "Input/IPlatformMouse.h"

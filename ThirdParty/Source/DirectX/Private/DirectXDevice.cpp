@@ -21,11 +21,11 @@ SDirectXDevice::SDirectXDevice(SDirectXFactory* Owner, ComPtr<ID3D12Device> pDev
 {
 }
 
-IRHICommandQueue* SDirectXDevice::CreateCommandQueue()
+IRHICommandQueue* SDirectXDevice::CreateCommandQueue(ERHICommandListType type)
 {
 	D3D12_COMMAND_QUEUE_DESC QueueDesc =
 	{
-		.Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
+		.Type = (D3D12_COMMAND_LIST_TYPE)type,
 		.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL
 	};
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Reflection/Enum.h"
 
 SENUM(EFlowDirection, int32,
 	LeftToRight,,
@@ -12,15 +12,6 @@ SENUM(EFlowDirection, int32,
 SENUM(EOrientation, int32,
 	Horizontal,,
 	Vertical,
-);
-
-SENUM(ESlateVisibility, int32,
-	Visible,,
-	Collapsed,,
-	Hidden,,
-	HitTestInvisible,,
-	SelfHitTestInvisible,,
-	All,
 );
 
 SENUM(EWidgetClipping, int32,
@@ -47,10 +38,16 @@ SENUM(ESizeRule, int32,
 	Stretch,
 );
 
-class SlateVisibilityExtensions
-{
-	SlateVisibilityExtensions() = delete;
+SENUM_BEGIN(ESlateVisibility, int32,
+	Visible, ,
+	Collapsed, ,
+	Hidden, ,
+	HitTestInvisible, ,
+	SelfHitTestInvisible, ,
+	All,
+	)
 
+private:
 	static constexpr int32 VISPRIVATE_Visible = 0x1 << 0;
 	static constexpr int32 VISPRIVATE_Collapsed = 0x1 << 1;
 	static constexpr int32 VISPRIVATE_Hidden = 0x1 << 2;
@@ -71,9 +68,19 @@ public:
 		return 0 != (GetValue(Visibility) & GetValue(Filter));
 	}
 
+	bool DoesVisibilityPassFilter(ESlateVisibility Filter) const
+	{
+		return DoesVisibilityPassFilter(*this, Filter);
+	}
+
 	static bool AreChildrenHitTestVisible(ESlateVisibility Visibility)
 	{
 		return 0 != (GetValue(Visibility) & VISPRIVATE_ChildrenHitTestVisible);
+	}
+
+	bool AreChildrenHitTestVisible() const
+	{
+		return AreChildrenHitTestVisible(*this);
 	}
 
 	static bool IsHitTestVisible(ESlateVisibility Visibility)
@@ -81,9 +88,19 @@ public:
 		return 0 != (GetValue(Visibility) & VISPRIVATE_SelfHitTestVisible);
 	}
 
+	bool IsHitTestVisible() const
+	{
+		return IsHitTestVisible(*this);
+	}
+
 	static bool IsVisible(ESlateVisibility Visibility)
 	{
 		return 0 != (GetValue(Visibility) & VIS_Visible);
+	}
+
+	bool IsVisible() const
+	{
+		return IsVisible(*this);
 	}
 
 private:
@@ -101,4 +118,9 @@ private:
 			throw fatal_exception(String::Format("Invalid argument: Visibility({})", (int32)Visibility));
 		};
 	}
-};
+
+	int32 GetValue() const
+	{
+		return GetValue(*this);
+	}
+SENUM_END()

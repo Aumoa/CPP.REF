@@ -1,8 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Layout/Geometry.h"
-#include "Layout/ArrangedWidget.h"
-#include "Widgets/Widget.h"
+#include "SlateCore/Layout/Geometry.h"
+#include "SlateCore/Layout/ArrangedWidget.h"
+#include "SlateCore/SWidget.h"
 
 ArrangedWidget Geometry::MakeChild(SWidget* ChildWidget, const Vector2& LocalSize, const SlateLayoutTransform& LayoutTransform) const
 {

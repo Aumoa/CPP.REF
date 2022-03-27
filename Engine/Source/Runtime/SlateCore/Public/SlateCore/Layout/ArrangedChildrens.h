@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ArrangedWidget.h"
 #include "LayoutEnums.h"
 
-class GAME_API ArrangedChildrens
+class SLATECORE_API ArrangedChildrens
 {
 private:
 	const ESlateVisibility VisibilityFilter;

@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Layout/ArrangedChildrens.h"
+#include "SlateCore/Layout/ArrangedChildrens.h"
 
 ArrangedChildrens::ArrangedChildrens(ESlateVisibility InVisibilityFilter)
 	: VisibilityFilter(InVisibilityFilter)
@@ -20,9 +20,9 @@ void ArrangedChildrens::InsertWidget(ESlateVisibility VisibiilityOverride, const
 	Widgets.insert(Widgets.begin() + Index, InArrangedWidget);
 }
 
-bool ArrangedChildrens::Accepts(ESlateVisibility visibility) const
+bool ArrangedChildrens::Accepts(ESlateVisibility Visibility) const
 {
-	return SlateVisibilityExtensions::DoesVisibilityPassFilter(visibility, VisibilityFilter);
+	return Visibility.DoesVisibilityPassFilter(VisibilityFilter);
 }
 
 ESlateVisibility ArrangedChildrens::GetVisibilityFilter() const

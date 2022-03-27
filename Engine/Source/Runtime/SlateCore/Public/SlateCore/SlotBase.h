@@ -2,30 +2,33 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 
 class SWidget;
 
-class GAME_API SWidgetSlot : implements SObject
+namespace libty::SlateCore::Details
 {
-	GENERATED_BODY(SWidgetSlot)
+	class SLATECORE_API SSlotBase : implements SObject
+	{
+		GENERATED_BODY(SSlotBase)
 
-private:
-	SPROPERTY(Content)
-	SWidget* Content = nullptr;
+	private:
+		SPROPERTY(Content)
+		SWidget* Content = nullptr;
 
-public:
-	SWidgetSlot();
+	public:
+		SSlotBase();
 
-	void SetContent(SWidget* InContent);
-	SWidget* GetContent();
-};
+		SWidget* GetContent();
+		void SetContent(SWidget* Content);
+	};
+}
 
 template<class TSlotClass>
-class TSlotBase : public SWidgetSlot
+class TSlotBase : public libty::SlateCore::Details::SSlotBase
 {
 public:
-	using Super = SWidgetSlot;
+	using Super = libty::SlateCore::Details::SSlotBase;
 	using This = TSlotBase<TSlotClass>;
 
 public:

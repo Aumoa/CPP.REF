@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Layout/ArrangedWidget.h"
-#include "Widgets/Widget.h"
+#include "SlateCore/Layout/ArrangedWidget.h"
+#include "SlateCore/SWidget.h"
 
 ArrangedWidget::ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry)
 	: Widget(InWidget)

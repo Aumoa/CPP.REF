@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Layout/Margin.h"
+#include "PrimitiveTypes.h"
+#include "CoreConcepts.h"
+#include "SlateCore/Layout/Margin.h"
 
 class SWidget;
 

@@ -17,7 +17,7 @@ public:
 
 	using Super::Dispose;
 
-	virtual IRHICommandQueue* CreateCommandQueue() override;
+	virtual IRHICommandQueue* CreateCommandQueue(ERHICommandListType type) override;
 	virtual IRHIResource* CreateCommittedResource(const RHIHeapProperties& heapProperties, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* pOptimizedClearValue) override;
 	virtual IRHIRenderTargetView* CreateRenderTargetView(size_t count) override;
 	virtual IRHIDepthStencilView* CreateDepthStencilView(size_t count) override;

@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Numerics/TransformInterface/Scale2D.h"
+#include "Numerics/TransformInterface/Translate2D.h"
+#include "Numerics/MatrixInterface/Matrix3x2.h"
 
 struct SlateLayoutTransform
 {

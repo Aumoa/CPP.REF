@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "CoreConcepts.h"
 
 template<class T, class TDesiredClass>
 struct DeclarativeInheritanceIfImplements

@@ -2,9 +2,11 @@
 
 using CodeProjectConfiguration;
 
-public class PlatformGeneric : ModuleRule
+using System;
+
+public class SlateCore : ModuleRule
 {
-    public PlatformGeneric()
+    public SlateCore()
     {
         TargetType = TargetType.Engine;
         RelativePath = "Engine.Runtime";
@@ -16,7 +18,7 @@ public class PlatformGeneric : ModuleRule
         {
             "Core",
             "CoreSObject",
-            "CoreNumerics"
+            "RenderCore"
         });
     }
 }

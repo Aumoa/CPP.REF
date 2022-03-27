@@ -152,7 +152,7 @@ struct IRHIDevice : implements IRHIFactoryChild
 {
 	GENERATED_INTERFACE_BODY(IRHIDevice)
 
-	virtual IRHICommandQueue* CreateCommandQueue() = 0;
+	virtual IRHICommandQueue* CreateCommandQueue(ERHICommandListType type) = 0;
 	virtual IRHIResource* CreateCommittedResource(const RHIHeapProperties& heapProperties, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* pOptimizedClearValue) = 0;
 	virtual IRHIRenderTargetView* CreateRenderTargetView(size_t count) = 0;
 	virtual IRHIDepthStencilView* CreateDepthStencilView(size_t count) = 0;
