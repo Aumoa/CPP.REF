@@ -45,6 +45,21 @@ std::span<SFieldInfo* const> SType::GetFields()
 	return _meta.Fields;
 }
 
+SFieldInfo* SType::GetField(std::wstring_view fieldName)
+{
+	auto it = std::find_if(_meta.Fields.begin(), _meta.Fields.end(), [&fieldName](SFieldInfo* field)
+	{
+		return field->GetName() == fieldName;
+	});
+
+	if (it == _meta.Fields.end())
+	{
+		return nullptr;
+	}
+
+	return *it;
+}
+
 size_t SType::GetHashCode()
 {
 	return _meta.TypeHash;

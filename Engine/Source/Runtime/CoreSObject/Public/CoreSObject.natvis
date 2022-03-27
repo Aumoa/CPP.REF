@@ -10,4 +10,10 @@
 			<Item Name="[WeakReference]">ReferencePtr->WeakReferences</Item>
 		</Expand>
 	</Type>
+	<Type Name="SType">
+		<DisplayString>{_meta.FullQualifiedClassName}</DisplayString>
+	</Type>
+	<Type Name="SFieldInfo">
+		<DisplayString>{{Field={_meta.FieldName} ReflectType={*_meta.FieldType}}</DisplayString>
+	</Type>
 </AutoVisualizer>

@@ -4,6 +4,7 @@
 
 #include "FieldInfoMetadataGenerator.h"
 #include "typeof.h"
+#include "ReflectionTypeTraits.h"
 #include <array>
 
 namespace libty::Core::Reflection
@@ -15,11 +16,12 @@ namespace libty::Core::Reflection
 		, bIsConst(false)
 		, bIsStatic(false)
 	{
+		using TReflectType = RemoveObjectPointer_t<TMemberType>;
 
 		Setter = [field](SObject* _This, SObject* _Value)
 		{
 			auto This = Cast<TOwningClass>(_This);
-			auto Value = Cast<TMemberType>(_Value);
+			auto Value = Cast<TReflectType>(_Value);
 			(This->*field) = Value;
 		};
 
@@ -29,8 +31,8 @@ namespace libty::Core::Reflection
 			return Cast<SObject>(This->*field);
 		};
 
-		FieldType = typeof(TMemberType);
-		SupportNativeObjectCollection<TMemberType>(inh_select<2>());
+		FieldType = typeof(TReflectType);
+		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
 	}
 		
 	template<class TMemberType>
@@ -40,6 +42,8 @@ namespace libty::Core::Reflection
 		, bIsConst(false)
 		, bIsStatic(true)
 	{
+		using TReflectType = RemoveObjectPointer_t<TMemberType>;
+
 		Setter = [field](SObject* _This, SObject* _Value)
 		{
 			auto Value = Cast<TMemberType>(_Value);
@@ -62,6 +66,8 @@ namespace libty::Core::Reflection
 		, bIsConst(true)
 		, bIsStatic(false)
 	{
+		using TReflectType = RemoveObjectPointer_t<TMemberType>;
+
 		Setter = nullptr;
 
 		Getter = [field](SObject* _This)
@@ -70,8 +76,8 @@ namespace libty::Core::Reflection
 			return Cast<SObject>(This->*field);
 		};
 
-		FieldType = typeof(TMemberType);
-		SupportNativeObjectCollection<TMemberType>(inh_select<2>());
+		FieldType = typeof(TReflectType);
+		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
 	}
 
 	template<class TMemberType>
@@ -81,6 +87,8 @@ namespace libty::Core::Reflection
 		, bIsConst(true)
 		, bIsStatic(true)
 	{
+		using TReflectType = RemoveObjectPointer_t<TMemberType>;
+
 		Setter = nullptr;
 
 		Getter = [field](SObject* _This)
@@ -88,8 +96,8 @@ namespace libty::Core::Reflection
 			return Cast<SObject>(*field);
 		};
 
-		FieldType = typeof(TMemberType);
-		SupportNativeObjectCollection<TMemberType>(inh_select<2>());
+		FieldType = typeof(TReflectType);
+		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
 	}
 
 	template<class TMemberType>

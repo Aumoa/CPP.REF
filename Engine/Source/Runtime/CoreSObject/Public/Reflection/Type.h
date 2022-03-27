@@ -54,6 +54,11 @@ public:
 	virtual std::span<SFieldInfo* const> GetFields();
 
 	/// <summary>
+	/// Returns specified field of the current Type.
+	/// </summary>
+	virtual SFieldInfo* GetField(std::wstring_view fieldName);
+
+	/// <summary>
 	/// Returns the hash code for this type.
 	/// </summary>
 	virtual size_t GetHashCode();
@@ -99,15 +104,16 @@ public:
 	static std::set<SType*> GetDerivedTypes(SType* baseType);
 
 	template<class T>
-	static SType* TypeOf()
+	static SType* TypeOf() requires
+		(!requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; })
 	{
 		static SType StaticClass = SType(MetadataGenerator::GenerateNative<T>());
 		return &StaticClass;
 	}
 
 	template<class T>
-	static SType* TypeOf() requires requires
-		{ { T::TypeId } -> std::same_as<SType*>; }
+	static SType* TypeOf() requires
+		requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }
 	{
 		return T::TypeId;
 	}
