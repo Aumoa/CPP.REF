@@ -32,8 +32,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		SharedPtr ConsoleModule = LoadConsoleModule();
 		if (!ConsoleModule.IsValid())
 		{
-			SE_LOG(LogLinuxCommon, Fatal, L"LoadConsoleModule function return nullptr.");
-			return -1;
+			throw fatal_exception("LoadConsoleModule function return nullptr.");
 		}
 
 		Thread* MainThread = Thread::GetCurrentThread();

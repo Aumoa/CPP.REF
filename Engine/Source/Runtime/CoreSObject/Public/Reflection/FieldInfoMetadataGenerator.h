@@ -32,17 +32,17 @@ namespace libty::Core::Reflection
 		SType* FieldType;
 		NativeGCCollection Collection;
 
-		template<class TMemberType, class TOwningClass>
-		FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, FieldAttributeCollection attributes);
+		template<class TMemberType, class TOwningClass, class... TAttributeCollection>
+		FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
 
-		template<class TMemberType>
-		FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, FieldAttributeCollection attributes);
+		template<class TMemberType, class... TAttributeCollection>
+		FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
 
-		template<class TMemberType, class TOwningClass>
-		FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, FieldAttributeCollection attributes);
+		template<class TMemberType, class TOwningClass, class... TAttributeCollection>
+		FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
 
-		template<class TMemberType>
-		FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, FieldAttributeCollection attributes);
+		template<class TMemberType, class... TAttributeCollection>
+		FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 	private:
 		template<class TMemberType>
@@ -74,5 +74,11 @@ namespace libty::Core::Reflection
 
 		template<class T>
 		SObject* MakeObjectPointerOrNull(T& value);
+
+		template<class... TAttributeCollection, size_t... Idx>
+		static std::vector<SAttributeField*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+		{
+			return std::vector<SAttributeField*>{ (&std::get<Idx>(attributes))... };
+		}
 	};
 }

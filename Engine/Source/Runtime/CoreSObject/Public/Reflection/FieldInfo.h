@@ -4,6 +4,7 @@
 
 #include "MemberInfo.h"
 #include "FieldInfoMetadataGenerator.h"
+#include <span>
 
 /// <summary>
 /// Discovers the attributes of a field and provides access to field metadata.
@@ -53,7 +54,12 @@ public:
 	/// <summary>
 	/// Returns the attributes of a field declared by a given object.
 	/// </summary>
-	virtual std::vector<SFieldAttribute*> GetAttributes();
+	virtual std::span<SAttributeField* const> GetAttributes();
+
+	/// <summary>
+	/// Returns the attribute of a field declared by a given object.
+	/// </summary>
+	virtual SAttributeField* GetAttribute(SType* attributeType);
 
 	/// <summary>
 	/// Gets the type of this field object.

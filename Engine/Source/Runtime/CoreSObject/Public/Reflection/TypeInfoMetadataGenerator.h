@@ -31,14 +31,14 @@ namespace libty::Core::Reflection
 		ClassFieldsCollection Fields;
 
 		template<class TOwningClass, class... TAttributeCollection>
-		static TypeInfoMetadataGenerator GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, const std::tuple<TAttributeCollection...>& attributes);
+		static TypeInfoMetadataGenerator GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, std::tuple<TAttributeCollection...>& attributes);
 
 		template<class TNativeClass>
 		static TypeInfoMetadataGenerator GenerateNative();
 
 	private:
 		template<class... TAttributeCollection, size_t... Idx>
-		static std::vector<SAttributeClass*> MakeVectorCollection(const std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+		static std::vector<SAttributeClass*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
 		{
 			return std::vector<SAttributeClass*>{ (&std::get<Idx>(attributes))... };
 		}

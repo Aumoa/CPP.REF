@@ -9,10 +9,9 @@
 
 namespace libty::Core::Reflection
 {
-	template<class TMemberType, class TOwningClass>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, FieldAttributeCollection attributes)
+	template<class TMemberType, class TOwningClass, class... TAttributeCollection>
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes)
 		: FieldName(String::AsUnicode(fieldName))
-		, Attributes(std::move(attributes))
 		, bIsConst(false)
 		, bIsStatic(false)
 	{
@@ -33,12 +32,12 @@ namespace libty::Core::Reflection
 
 		FieldType = typeof(TReflectType);
 		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
+		Attributes = MakeVectorCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 	}
-		
-	template<class TMemberType>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, FieldAttributeCollection attributes)
+
+	template<class TMemberType, class... TAttributeCollection>
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes)
 		: FieldName(String::AsUnicode(fieldName))
-		, Attributes(std::move(attributes))
 		, bIsConst(false)
 		, bIsStatic(true)
 	{
@@ -57,12 +56,12 @@ namespace libty::Core::Reflection
 
 		FieldType = typeof(TMemberType);
 		SupportNativeObjectCollection<TMemberType>(inh_select<2>());
+		Attributes = MakeVectorCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 	}
-		
-	template<class TMemberType, class TOwningClass>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, FieldAttributeCollection attributes)
+
+	template<class TMemberType, class TOwningClass, class... TAttributeCollection>
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes)
 		: FieldName(String::AsUnicode(fieldName))
-		, Attributes(std::move(attributes))
 		, bIsConst(true)
 		, bIsStatic(false)
 	{
@@ -78,12 +77,12 @@ namespace libty::Core::Reflection
 
 		FieldType = typeof(TReflectType);
 		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
+		Attributes = MakeVectorCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 	}
 
-	template<class TMemberType>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, FieldAttributeCollection attributes)
+	template<class TMemberType, class... TAttributeCollection>
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes)
 		: FieldName(String::AsUnicode(fieldName))
-		, Attributes(std::move(attributes))
 		, bIsConst(true)
 		, bIsStatic(true)
 	{
@@ -98,6 +97,7 @@ namespace libty::Core::Reflection
 
 		FieldType = typeof(TReflectType);
 		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
+		Attributes = MakeVectorCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 	}
 
 	template<class TMemberType>

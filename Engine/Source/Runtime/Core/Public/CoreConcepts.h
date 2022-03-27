@@ -4,6 +4,7 @@
 
 #include <string_view>
 #include <type_traits>
+#include <tuple>
 
 template<size_t _Depth>
 struct InheritSelector : public InheritSelector<_Depth - 1>
@@ -135,7 +136,7 @@ namespace libty::Core::Concepts::Impl
 		}
 
 	public:
-		static constexpr bool Value = std::tuple_size_v<TTuple> == sizeof...(TCompareTypes) and DoCheck<0, TCompareTypes...>();
+		static constexpr bool Value = std::tuple_size<TTuple>::value == sizeof...(TCompareTypes) and DoCheck<0, TCompareTypes...>();
 	};
 }
 
@@ -146,6 +147,6 @@ template<class T>
 concept IGenericTuple = requires
 {
 	{ std::get<0>(std::declval<T>()) };
-	{ std::tuple_size_v<T> } -> std::convertible_to<size_t>;
+	{ std::tuple_size<T>::value } -> std::convertible_to<size_t>;
 	{ std::declval<std::tuple_element_t<0, T>>() };
 };

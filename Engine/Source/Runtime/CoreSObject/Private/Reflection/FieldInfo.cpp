@@ -3,6 +3,7 @@
 #include "Reflection/FieldInfo.h"
 #include "Reflection/Type.h"
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
+#include "Attributes/AttributeField.h"
 
 GENERATE_BODY(SFieldInfo);
 
@@ -52,9 +53,24 @@ SObject* SFieldInfo::GetValue(SObject* obj)
 	return _meta.Getter(obj);
 }
 
-std::vector<SFieldAttribute*> SFieldInfo::GetAttributes()
+std::span<SAttributeField* const> SFieldInfo::GetAttributes()
 {
 	return _meta.Attributes;
+}
+
+SAttributeField* SFieldInfo::GetAttribute(SType* attributeType)
+{
+	auto it = std::find_if(_meta.Attributes.begin(), _meta.Attributes.end(), [&attributeType](SAttributeField* field)
+	{
+		return field->GetType()->IsA(attributeType);
+	});
+
+	if (it == _meta.Attributes.end())
+	{
+		return nullptr;
+	}
+
+	return *it;
 }
 
 SType* SFieldInfo::GetFieldType()

@@ -140,11 +140,14 @@ public:
 	template<size_t N> requires (N == REFLECTION_PropertyChain<__LINE__>())					\
 	static auto REFLECTION_GetPropertyPointer(int)											\
 	{																						\
+		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
+			MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)		\
+		));																					\
 		static SFieldInfo FieldInfo = libty::Core::Reflection::FieldInfoMetadataGenerator	\
 		(																					\
 			&This::PropertyName,															\
 			#PropertyName,																	\
-			{}																				\
+			AttributeCollection																\
 		);																					\
 		return &FieldInfo;																	\
 	}

@@ -10,7 +10,7 @@
 namespace libty::Core::Reflection
 {
 	template<class TOwningClass, class... TAttributeCollection>
-	static TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, const std::tuple<TAttributeCollection...>& attributes)
+	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, std::tuple<TAttributeCollection...>& attributes)
 	{
 		TypeInfoMetadataGenerator gen;
 		gen.ClassName = className;
@@ -25,7 +25,7 @@ namespace libty::Core::Reflection
 	}
 
 	template<class TNativeClass>
-	static TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateNative()
+	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateNative()
 	{
 		TypeInfoMetadataGenerator gen;
 		gen.ClassName = String::AsUnicode(typeid(TNativeClass).name());
@@ -39,7 +39,7 @@ namespace libty::Core::Reflection
 	}
 
 	template<class TOwningClass>
-	static SType* TypeInfoMetadataGenerator::GetSuperClass() requires
+	SType* TypeInfoMetadataGenerator::GetSuperClass() requires
 		requires { std::declval<typename TOwningClass::Super>(); } &&
 		(not std::same_as<typename TOwningClass::Super, void>)
 	{
@@ -47,7 +47,7 @@ namespace libty::Core::Reflection
 	}
 
 	template<class TOwningClass>
-	static SType* TypeInfoMetadataGenerator::GetSuperClass()
+	SType* TypeInfoMetadataGenerator::GetSuperClass()
 	{
 		return nullptr;
 	}

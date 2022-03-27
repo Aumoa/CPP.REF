@@ -46,7 +46,7 @@ public:
 		return MyType != nullptr;
 	}
 
-	inline Type* Get()
+	inline SType* Get()
 	{
 		return MyType;
 	}
@@ -84,5 +84,5 @@ public:
 	inline auto operator <=>(const SubclassOf& Rhs) const = default;
 
 	inline operator bool() const { return IsValid(); }
-	inline operator Type* () const { return MyType; }
+	inline operator SType* () const { return MyType; }
 };

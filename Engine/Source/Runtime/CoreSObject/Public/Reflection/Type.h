@@ -28,7 +28,8 @@ private:
 	static StaticCollection* _staticCollection;
 
 	MetadataGenerator _meta;
-	std::vector<SFieldInfo*> _cachedGCFields;
+	std::vector<SFieldInfo*> _recursiveFields;
+	std::vector<SAttributeClass*> _recursiveAttributes;
 
 public:
 	SType(MetadataGenerator&& generator);
@@ -51,12 +52,22 @@ public:
 	/// <summary>
 	/// Returns all the fields of the current Type.
 	/// </summary>
-	virtual std::span<SFieldInfo* const> GetFields();
+	virtual std::span<SFieldInfo* const> GetFields(bool bRecursive = true);
 
 	/// <summary>
 	/// Returns specified field of the current Type.
 	/// </summary>
-	virtual SFieldInfo* GetField(std::wstring_view fieldName);
+	virtual SFieldInfo* GetField(std::wstring_view fieldName, bool bRecursive = true);
+
+	/// <summary>
+	/// Return custom attributes applied to this Type.
+	/// </summary>
+	virtual std::span<SAttributeClass* const> GetCustomAttributes(bool bRecursive = true);
+
+	/// <summary>
+	/// Returns custom attribute that first item of match with specified type.
+	/// </summary>
+	virtual SAttributeClass* GetCustomAttribute(SType* attributeType, bool bRecursive = true);
 
 	/// <summary>
 	/// Returns the hash code for this type.
