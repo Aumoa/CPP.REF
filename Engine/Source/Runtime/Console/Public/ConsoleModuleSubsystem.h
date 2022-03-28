@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-class CONSOLE_API SConsoleModuleSubsystem : implements SObject
+class CONSOLE_API SConsoleModuleSubsystem : virtual public SObject
 {
-	GENERATED_BODY(SConsoleModuleSubsystem)
+	GENERATED_BODY(SConsoleModuleSubsystem);
 
 public:
 	SConsoleModuleSubsystem();

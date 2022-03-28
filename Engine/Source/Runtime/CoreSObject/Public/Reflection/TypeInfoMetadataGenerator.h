@@ -9,6 +9,7 @@
 class SObject;
 class SAttributeClass;
 class SFieldInfo;
+class SAssembly;
 
 namespace libty::Core::Reflection
 {
@@ -16,32 +17,42 @@ namespace libty::Core::Reflection
 	{
 		using ClassAttributeCollection = std::vector<SAttributeClass*>;
 		using ClassFieldsCollection = std::vector<SFieldInfo*>;
+		using InterfaceCollection = std::vector<SType*>;
 
 		// ** Common metadata **
 		std::wstring ClassName;
 		std::wstring FullQualifiedClassName;
+		SAssembly* Assembly;
 		ClassAttributeCollection Attributes;
+		InterfaceCollection Interfaces;
 		SType* SuperClass;
 		size_t TypeHash;
 		std::function<SObject* ()> Constructor;
 		uint8 bIsNative : 1;
 		uint8 bIsClass : 1;
+		uint8 bIsInterface : 1;
 
 		// ** Linked metadata **
 		ClassFieldsCollection Fields;
 
 		template<class TOwningClass, class... TAttributeCollection>
-		static TypeInfoMetadataGenerator GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, std::tuple<TAttributeCollection...>& attributes);
+		static TypeInfoMetadataGenerator GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, SAssembly* assembly, std::tuple<TAttributeCollection...>& attributes);
+
+		template<class TInterface, class... TAttributeCollection>
+		static TypeInfoMetadataGenerator GenerateInterface(std::wstring_view interfaceName, std::tuple<TAttributeCollection...>& attributes);
 
 		template<class TNativeClass>
 		static TypeInfoMetadataGenerator GenerateNative();
 
 	private:
 		template<class... TAttributeCollection, size_t... Idx>
-		static std::vector<SAttributeClass*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+		static std::vector<SAttributeClass*> MakeAttributeCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
 		{
 			return std::vector<SAttributeClass*>{ (&std::get<Idx>(attributes))... };
 		}
+
+		template<class TOwningClass>
+		static std::vector<SType*> MakeInterfaceCollection();
 
 		template<class TOwningClass>
 		static SType* GetSuperClass() requires

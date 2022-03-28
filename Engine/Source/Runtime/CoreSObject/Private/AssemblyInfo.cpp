@@ -2,4 +2,4 @@
 
 #include "Reflection/Assembly.h"
 
-DEFINE_ASSEMBLY_INFO();
+DEFINE_ASSEMBLY_INFO;

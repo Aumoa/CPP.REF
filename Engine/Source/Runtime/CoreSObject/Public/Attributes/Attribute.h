@@ -4,7 +4,7 @@
 
 #include "Object.h"
 
-class CORESOBJECT_API SAttribute : implements SObject
+class CORESOBJECT_API SAttribute : virtual public SObject
 {
 	GENERATED_BODY(SAttribute);
 

@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "Object.h"
-#include "GC/SharedPtr.h"
+#include "CoreMinimal.h"
 
-struct IDisposable : implements SObject
+struct IDisposable : virtual public SObject
 {
-	GENERATED_INTERFACE_BODY(IDisposable)
+	GENERATED_INTERFACE_BODY(IDisposable);
 
 	// Special constructor for IDisposable.
 	IDisposable()

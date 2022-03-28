@@ -20,6 +20,7 @@
 #include "Reflection/FieldInfo.h"
 #include "Reflection/SubclassOf.h"
 #include "Reflection/Enum.h"
+#include "Reflection/Assembly.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"
 #include "Diagnostics/CycleCounterMacros.h"

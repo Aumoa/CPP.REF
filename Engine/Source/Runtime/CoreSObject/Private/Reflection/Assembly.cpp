@@ -8,16 +8,35 @@
 
 GENERATE_BODY(SAssembly);
 
-class SSampleClass : public SObject
-{
-	GENERATED_BODY(SSampleClass);
-
-public:
-	SPROPERTY(Value)
-	int32 Value = 10;
-};
-
 SAssembly::SAssembly(std::string_view assemblyName)
 	: _assemblyName(String::AsUnicode(assemblyName))
 {
+}
+
+SAssembly::~SAssembly()
+{
+	if (_types)
+	{
+		delete _types;
+	}
+}
+
+std::wstring SAssembly::GetName()
+{
+	return _assemblyName;
+}
+
+std::set<SType*> SAssembly::GetTypes()
+{
+	return *_types;
+}
+
+void SAssembly::AddType(SType* type)
+{
+	if (_types == nullptr)
+	{
+		_types = new std::set<SType*>();
+	}
+
+	_types->emplace(type);
 }

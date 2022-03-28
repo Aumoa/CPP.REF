@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-class SConsoleApplication : implements SObject
+class SConsoleApplication : virtual public SObject
 {
 	GENERATED_BODY(SConsoleApplication)
 

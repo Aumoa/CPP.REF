@@ -25,6 +25,7 @@ class CORESOBJECT_API SObject
 
 public:
 	using This = SObject;
+	using IsClass = SObject;
 
 	inline static constexpr std::wstring_view FriendlyName = L"SObject";
 

@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "Misc/CommandLine.h"
 
-class SConsoleApplication : implements SObject
+class SConsoleApplication : virtual public SObject
 {
 	GENERATED_BODY(SConsoleApplication)
 

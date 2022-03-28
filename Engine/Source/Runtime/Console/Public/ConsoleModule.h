@@ -7,9 +7,9 @@
 
 class SConsoleModuleSubsystem;
 
-class CONSOLE_API SConsoleModule : implements SObject
+class CONSOLE_API SConsoleModule : virtual public SObject
 {
-	GENERATED_BODY(SConsoleModule)
+	GENERATED_BODY(SConsoleModule);
 
 private:
 	SPROPERTY(Subsystems)

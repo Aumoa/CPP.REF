@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Misc/RecursiveMacroHelper.h"
+#include <tuple>
 
 namespace libty::Core::Reflection
 {
@@ -11,13 +12,33 @@ namespace libty::Core::Reflection
 	{
 	private:
 		template<class U> requires requires { typename U::This; }
-		static auto Impl(int32) -> decltype(std::declval<typename U::This>());
+		static auto Impl(int) -> decltype(std::declval<typename U::This>());
 
 		template<class U> requires (!requires { typename U::This; })
-		static auto Impl(int16) -> void;
+		static auto Impl(short) -> void;
 
 	public:
 		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
+	};
+
+	template<class... TInterfaces>
+	class InterfaceCollector : virtual public TInterfaces...
+	{
+	public:
+		template<class T>
+		struct InterfaceCollection_t
+		{
+			template<class U> requires requires { std::declval<typename U::InterfaceCollection>(); }
+			static auto Declare(int) -> typename U::InterfaceCollection;
+
+			template<class U>
+			static auto Declare(short) -> std::tuple<>;
+
+			using Type = decltype(Declare<T>(0));
+		};
+
+	public:
+		using InterfaceCollection = decltype(std::tuple_cat(std::declval<std::tuple<TInterfaces...>>(), std::declval<typename InterfaceCollection_t<TInterfaces>::Type>()...));
 	};
 }
 
@@ -85,8 +106,9 @@ private:																					\
 private:
 
 #define GENERATE_BODY(Class, ...)															\
+extern SAssembly SE_ASSEMBLY_INFO;															\
 SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenerator			\
-	::GenerateClass<Class>(Class::FriendlyName, #Class, AttributeCollection));
+	::GenerateClass<Class>(Class::FriendlyName, #Class, &SE_ASSEMBLY_INFO, AttributeCollection));
 
 #define GENERATED_INTERFACE_BODY(Interface, ...)											\
 	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;						\
@@ -95,16 +117,10 @@ SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenera
 		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)			\
 	));																						\
 	static inline SType StaticClass = libty::Core::Reflection::TypeInfoMetadataGenerator	\
-	::GenerateClass<Interface>(Interface::FriendlyName, #Interface, AttributeCollection);	\
-																							\
-	inline static constexpr std::wstring_view FriendlyName = L ## #Interface;				\
+	::GenerateInterface<Interface>(L ## #Interface, AttributeCollection);					\
 																							\
 public:																						\
 	static inline SType* TypeId = &StaticClass;												\
-	SType* GetType() const																	\
-	{																						\
-		return TypeId;																		\
-	}																						\
 																							\
 private:																					\
 	GENERATED_BODY_DECLARE_REFLECTION_CHAINS()												\
@@ -152,4 +168,4 @@ public:
 		return &FieldInfo;																	\
 	}
 
-#define implements virtual public 
+#define implements(...) public libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>

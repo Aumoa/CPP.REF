@@ -3,6 +3,7 @@
 #include "Reflection/Type.h"
 #include "Reflection/FieldInfo.h"
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
+#include "Reflection/Assembly.h"
 #include "Attributes/AttributeClass.h"
 
 GENERATE_BODY(SType);
@@ -30,6 +31,11 @@ SType::SType(MetadataGenerator&& generator)
 
 		auto attributes = GetCustomAttributes(false);
 		_recursiveAttributes.insert(_recursiveAttributes.end(), attributes.begin(), attributes.end());
+	}
+
+	if (_meta.Assembly)
+	{
+		_meta.Assembly->AddType(this);
 	}
 }
 
@@ -104,6 +110,16 @@ SAttributeClass* SType::GetCustomAttribute(SType* attributeType, bool bRecursive
 	return *it;
 }
 
+std::span<SType* const> SType::GetInterfaces()
+{
+	return _meta.Interfaces;
+}
+
+SAssembly* SType::GetAssembly()
+{
+	return _meta.Assembly;
+}
+
 size_t SType::GetHashCode()
 {
 	return _meta.TypeHash;
@@ -117,6 +133,11 @@ bool SType::IsValueType()
 bool SType::IsNativeType()
 {
 	return _meta.bIsNative;
+}
+
+bool SType::IsInterfaceType()
+{
+	return _meta.bIsInterface;
 }
 
 bool SType::IsA(SType* compareType)
@@ -135,6 +156,24 @@ bool SType::IsDerivedFrom(SType* compareType)
 	}
 
 	return false;
+}
+
+bool SType::IsImplemented(SType* baseTypeOrInterface)
+{
+	if (baseTypeOrInterface->IsInterfaceType())
+	{
+		auto pred = [hash = baseTypeOrInterface->GetHashCode()](SType* type)
+		{
+			return type->GetHashCode() == hash;
+		};
+
+		auto it = std::find_if(_meta.Interfaces.begin(), _meta.Interfaces.end(), pred);
+		return it != _meta.Interfaces.end();
+	}
+	else
+	{
+		return IsDerivedFrom(baseTypeOrInterface);
+	}
 }
 
 SObject* SType::Instantiate()

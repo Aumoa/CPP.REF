@@ -7,7 +7,7 @@
 /// <summary>
 /// Obtains information about the attributes of a member and provides access to member metadata.
 /// </summary>
-class CORESOBJECT_API SMemberInfo : implements SObject
+class CORESOBJECT_API SMemberInfo : virtual public SObject
 {
 	GENERATED_BODY(SMemberInfo);
 

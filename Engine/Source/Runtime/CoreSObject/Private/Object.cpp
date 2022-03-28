@@ -12,8 +12,10 @@
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 
 static std::tuple<> EmptyAttributes = std::make_tuple();
+extern SAssembly CoreSObject_AssemblyInfo;
+
 SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator::GenerateClass<SObject>(
-	FriendlyName, "SObject", EmptyAttributes
+	FriendlyName, "SObject", &CoreSObject_AssemblyInfo, EmptyAttributes
 ));
 
 SObject::SObject()

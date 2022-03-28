@@ -11,7 +11,7 @@
 /// <summary>
 /// Represents type declarations: class types, interface types, value types, and enumeration types.
 /// </summary>
-class CORESOBJECT_API SType : implements SObject
+class CORESOBJECT_API SType : virtual public SObject
 {
 	GENERATED_BODY(SType);
 
@@ -70,6 +70,16 @@ public:
 	virtual SAttributeClass* GetCustomAttribute(SType* attributeType, bool bRecursive = true);
 
 	/// <summary>
+	/// Returns imlemented interfaces collection.
+	/// </summary>
+	virtual std::span<SType* const> GetInterfaces();
+
+	/// <summary>
+	/// Gets the Assembly in which the type is declared.
+	/// </summary>
+	virtual SAssembly* GetAssembly();
+
+	/// <summary>
 	/// Returns the hash code for this type.
 	/// </summary>
 	virtual size_t GetHashCode();
@@ -85,16 +95,27 @@ public:
 	virtual bool IsNativeType();
 
 	/// <summary>
-	/// Gets a valud indicating whether the Type equals to specified type.
+	/// Gets a value indicating whether the Type is a interface type.
+	/// </summary>
+	virtual bool IsInterfaceType();
+
+	/// <summary>
+	/// Gets a value indicating whether the Type equals to specified type.
 	/// </summary>
 	/// <param name="compareType"> The type what to compare. </param>
 	virtual bool IsA(SType* compareType);
 
 	/// <summary>
-	/// Gets a valud indicating whether the Type derived from specified type.
+	/// Gets a value indicating whether the Type derived from specified type.
 	/// </summary>
 	/// <param name="baseType"> The type what to compare. </param>
 	virtual bool IsDerivedFrom(SType* baseType);
+
+	/// <summary>
+	/// Gets a value indicating whether the Type derived from specified type or implements interface.
+	/// </summary>
+	/// <param name="baseTypeOrInterface"> The type what to check. </param>
+	virtual bool IsImplemented(SType* baseTypeOrInterface);
 
 	/// <summary>
 	/// Instantiate specified type with default constructor.
