@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "CoreMinimal.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Reflection/Enum.h"

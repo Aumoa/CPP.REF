@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "Renderer/SceneRenderer.h"
+#include "CoreMinimal.h"
+#include "RHI/RHIInterfaces.h"
 
 class SRenderContext;
+class SViewport;
 
 class SLATECORE_API SSlateRenderer : implements SObject
 {
@@ -14,5 +16,6 @@ public:
 	SSlateRenderer(IRHIDevice* device);
 
 	virtual void BeginFrame(SRenderContext* renderContext);
+	virtual void RenderViewport(SViewport* viewport);
 	virtual void EndFrame();
 };
