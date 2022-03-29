@@ -9,7 +9,7 @@
 #include <functional>
 
 class SObject;
-class SAttributeField;
+class SFieldAttribute;
 class SType;
 
 namespace libty::Core::Reflection
@@ -18,7 +18,7 @@ namespace libty::Core::Reflection
 	{
 		using SetterFunc = std::function<void(SObject* _This, SObject* _Value)>;
 		using GetterFunc = std::function<SObject*(SObject* _This)>;
-		using FieldAttributeCollection = std::vector<SAttributeField*>;
+		using FieldAttributeCollection = std::vector<SFieldAttribute*>;
 		using NativeGCInvoke = std::function<void(SObject* _Obj)>;
 		using NativeGCCollection = std::function<void(SObject*, NativeGCInvoke&)>;
 
@@ -76,9 +76,9 @@ namespace libty::Core::Reflection
 		SObject* MakeObjectPointerOrNull(T& value);
 
 		template<class... TAttributeCollection, size_t... Idx>
-		static std::vector<SAttributeField*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+		static std::vector<SFieldAttribute*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
 		{
-			return std::vector<SAttributeField*>{ (&std::get<Idx>(attributes))... };
+			return std::vector<SFieldAttribute*>{ (&std::get<Idx>(attributes))... };
 		}
 	};
 }

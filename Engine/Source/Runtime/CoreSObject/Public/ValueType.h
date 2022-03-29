@@ -21,8 +21,8 @@ public:
 	SValueType(const T& value) : SObject()
 		, _value(value)
 	{
-		_toString = Internal_ToString(value, inh_select<6>());
 		_type = typeof(T);
+		_toString = Internal_ToString(0, value);
 	}
 
 	virtual ~SValueType() noexcept override
@@ -32,6 +32,11 @@ public:
 	virtual SType* GetType() const override
 	{
 		return _type;
+	}
+
+	virtual std::wstring ToString() override
+	{
+		return _toString;
 	}
 
 	template<class T>
@@ -45,50 +50,17 @@ public:
 		return false;
 	}
 
-public:
+private:
 	template<class T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<0>&&)
+	inline static std::wstring Internal_ToString(int, const T& value) requires
+		requires { std::declval<T>().ToString(); }
+	{
+		return value.ToString();
+	}
+
+	template<class T>
+	inline static std::wstring Internal_ToString(short, const T& value)
 	{
 		return String::AsUnicode(typeid(T).name());
-	}
-
-	template<std::convertible_to<std::string> T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<1>&&)
-	{
-		return String::AsUnicode((std::string)value);
-	}
-
-	template<class T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<2>&&) requires requires { std::to_string(value); }
-	{
-		return String::AsUnicode(std::to_string(value));
-	}
-
-	template<class T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<3>&&) requires requires { std::declval<std::ostringstream>() << value; }
-	{
-		std::ostringstream os;
-		os << value;
-		return String::AsUnicode(os.str());
-	}
-
-	template<std::convertible_to<std::wstring> T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<4>&&)
-	{
-		return (std::wstring)value;
-	}
-
-	template<class T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<5>&&) requires requires { std::to_wstring(value); }
-	{
-		return std::to_wstring(value);
-	}
-
-	template<class T>
-	inline static std::wstring Internal_ToString(const T& value, InheritSelector<6>&&) requires requires { std::declval<std::wostringstream>() << value; }
-	{
-		std::wostringstream os;
-		os << value;
-		return os.str();
 	}
 };

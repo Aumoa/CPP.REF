@@ -14,6 +14,8 @@
 class CORESOBJECT_API SType : virtual public SObject
 {
 	GENERATED_BODY(SType);
+	friend class GarbageCollector;
+	friend class SEnum;
 
 public:
 	using MetadataGenerator = libty::Core::Reflection::TypeInfoMetadataGenerator;
@@ -29,7 +31,8 @@ private:
 
 	MetadataGenerator _meta;
 	std::vector<SFieldInfo*> _recursiveFields;
-	std::vector<SAttributeClass*> _recursiveAttributes;
+	std::vector<SMethodInfo*> _recursiveMethods;
+	std::vector<SClassAttribute*> _recursiveAttributes;
 
 public:
 	SType(MetadataGenerator&& generator);
@@ -60,14 +63,33 @@ public:
 	virtual SFieldInfo* GetField(std::wstring_view fieldName, bool bRecursive = true);
 
 	/// <summary>
+	/// Returns all the methods of the current Type.
+	/// </summary>
+	virtual std::span<SMethodInfo* const> GetMethods(bool bRecursive = true);
+
+	/// <summary>
+	/// Returns specified method of the current Type.
+	/// </summary>
+	virtual SMethodInfo* GetMethod(std::wstring_view methodName, bool bRecursive = true);
+
+	/// <summary>
 	/// Return custom attributes applied to this Type.
 	/// </summary>
-	virtual std::span<SAttributeClass* const> GetCustomAttributes(bool bRecursive = true);
+	virtual std::span<SClassAttribute* const> GetCustomAttributes(bool bRecursive = true);
 
 	/// <summary>
 	/// Returns custom attribute that first item of match with specified type.
 	/// </summary>
-	virtual SAttributeClass* GetCustomAttribute(SType* attributeType, bool bRecursive = true);
+	virtual SClassAttribute* GetCustomAttribute(SType* attributeType, bool bRecursive = true);
+
+	/// <summary>
+	/// Returns custom attribute that first item of match with specified type.
+	/// </summary>
+	template<std::derived_from<SClassAttribute> T>
+	T* GetCustomAttribute(bool bRecursive = true)
+	{
+		return Cast<T>(GetCustomAttribute(TypeOf<T>(), bRecursive));
+	}
 
 	/// <summary>
 	/// Returns imlemented interfaces collection.
@@ -98,6 +120,11 @@ public:
 	/// Gets a value indicating whether the Type is a interface type.
 	/// </summary>
 	virtual bool IsInterfaceType();
+
+	/// <summary>
+	/// Gets a value indicating whether the Type is a enum type.
+	/// </summary>
+	virtual bool IsEnum();
 
 	/// <summary>
 	/// Gets a value indicating whether the Type equals to specified type.
@@ -137,7 +164,8 @@ public:
 
 	template<class T>
 	static SType* TypeOf() requires
-		(!requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; })
+		(!requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }) &&
+		(!std::same_as<T, void>)
 	{
 		static SType StaticClass = SType(MetadataGenerator::GenerateNative<T>());
 		return &StaticClass;
@@ -148,5 +176,11 @@ public:
 		requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }
 	{
 		return T::TypeId;
+	}
+
+	template<class T>
+	static SType* TypeOf() requires std::same_as<T, void>
+	{
+		return nullptr;
 	}
 };

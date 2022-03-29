@@ -25,4 +25,7 @@ namespace libty::Core::Reflection
 
 	template<class T>
 	using RemoveObjectPointer_t = typename Details::RemoveObjectPointer<T>::Type;
+
+	template<class T>
+	concept IEnum = std::is_enum_v<typename T::__Tag__>;
 }

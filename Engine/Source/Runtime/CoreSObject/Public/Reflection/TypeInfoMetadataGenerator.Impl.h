@@ -5,43 +5,80 @@
 #include "TypeInfoMetadataGenerator.h"
 #include "Misc/String.h"
 #include "typeof.h"
+#include "Enum.h"
 #include <typeinfo>
 
 namespace libty::Core::Reflection
 {
-	template<class TOwningClass, class... TAttributeCollection>
-	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, SAssembly* assembly, std::tuple<TAttributeCollection...>& attributes)
+	template<char ClassType, class TOwningClass, class... TAttributeCollection>
+	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateManaged
+	(
+		std::wstring_view className,
+		std::wstring_view fullQualifiedClassName,
+		SAssembly* assembly,
+		std::tuple<TAttributeCollection...>& attributes
+	)
 	{
+		constexpr bool IsObject = std::derived_from<TOwningClass, SObject>;
+		constexpr bool IsInterface = IsObject && IInternalAccessModifierIsPublic<TOwningClass>;
+		constexpr bool IsEnum = IEnum<TOwningClass>;
+		constexpr bool IsClass = IsObject && !IsInterface;
+		constexpr bool IsStruct = !IsObject && !IsEnum;
+
+		static_assert(!IsClass || is_class_name<ClassType>::value,
+			"Unsupported first character for class name. See libty::Core::Reflection::is_class_name.");
+		static_assert(!IsInterface || is_interface_name<ClassType>::value,
+			"Unsupported first character for interface name. See libty::Core::Reflection::is_interface_name.");
+		static_assert(!IsStruct || is_struct_name<ClassType>::value,
+			"Unsupported first character for struct name. See libty::Core::Reflection::is_struct_name.");
+		static_assert(!IsEnum || is_enum_name<ClassType>::value,
+			"Unsupported first character for enum name. See libty::Core::Reflection::is_enum_name.");
+
 		TypeInfoMetadataGenerator gen;
 		gen.ClassName = className;
-		gen.FullQualifiedClassName = String::AsUnicode(fullQualifiedClassName);
+		gen.FullQualifiedClassName = fullQualifiedClassName;
 		gen.Assembly = assembly;
 		gen.Attributes = MakeAttributeCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 		gen.Interfaces = MakeInterfaceCollection<TOwningClass>();
 		gen.SuperClass = GetSuperClass<TOwningClass>();
 		gen.TypeHash = typeid(TOwningClass).hash_code();
-		gen.bIsClass = std::derived_from<TOwningClass, SObject>;
 		gen.bIsNative = false;
-		gen.bIsInterface = false;
+		gen.bIsValueType = !IsObject;
+		gen.bIsInterface = IsInterface;
+		gen.bIsEnum = !IsObject && IsEnum;
 		gen.CollectFields<TOwningClass, 0>();
-		return gen;
-	}
+		gen.CollectMethods<TOwningClass, 0>();
 
-	template<class TOwningClass, class... TAttributeCollection>
-	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateInterface(std::wstring_view interfaceName, std::tuple<TAttributeCollection...>& attributes)
-	{
-		TypeInfoMetadataGenerator gen;
-		gen.ClassName = interfaceName;
-		gen.FullQualifiedClassName = interfaceName;
-		gen.Assembly = nullptr;
-		gen.Attributes = MakeAttributeCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
-		gen.Interfaces = MakeInterfaceCollection<TOwningClass>();
-		gen.SuperClass = nullptr;
-		gen.TypeHash = typeid(TOwningClass).hash_code();
-		gen.bIsClass = true;
-		gen.bIsNative = false;
-		gen.bIsInterface = true;
-		gen.CollectFields<TOwningClass, 0>();
+		if constexpr (IsEnum)
+		{
+			gen.EnumTryParseObj = +[](std::wstring_view format, SObject*& value) -> bool
+			{
+				TOwningClass ov;
+				bool result = TOwningClass::TryParse(format, ov);
+				if (!result)
+				{
+					value = nullptr;
+					return false;
+				}
+
+				value = Cast<SObject>(ov);
+				return true;
+			};
+
+			gen.EnumTryParse = +[](std::wstring_view format, int64& value) -> bool
+			{
+				TOwningClass ov;
+				bool result = TOwningClass::TryParse(format, ov);
+				if (!result)
+				{
+					return false;
+				}
+
+				value = (int64)ov.Value;
+				return true;
+			};
+		}
+
 		return gen;
 	}
 
@@ -56,9 +93,10 @@ namespace libty::Core::Reflection
 		gen.Interfaces = {};
 		gen.SuperClass = nullptr;
 		gen.TypeHash = typeid(TNativeClass).hash_code();
-		gen.bIsClass = false;
 		gen.bIsNative = true;
+		gen.bIsValueType = true;
 		gen.bIsInterface = false;
+		gen.bIsEnum = false;
 		return gen;
 	}
 
@@ -81,10 +119,8 @@ namespace libty::Core::Reflection
 			static std::vector<SType*> Generate()
 			{
 				std::vector<SType*> list = { TInterfaces::TypeId... };
-				static auto less = +[](SType* lhs, SType* rhs) { return lhs->GetHashCode() < rhs->GetHashCode(); };
-				std::sort(list.begin(), list.end(), less);
-				static auto equals = +[](SType* lhs, SType* rhs) { return lhs->GetHashCode() == rhs->GetHashCode(); };
-				auto unique_end = std::unique(list.begin(), list.end(), equals);
+				std::sort(list.begin(), list.end());
+				auto unique_end = std::unique(list.begin(), list.end());
 				list.erase(unique_end, list.end());
 				return list;
 			}

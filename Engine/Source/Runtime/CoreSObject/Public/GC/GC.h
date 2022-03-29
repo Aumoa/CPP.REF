@@ -14,6 +14,7 @@
 class SObject;
 class GarbageCollector;
 class Thread;
+class SFieldInfo;
 
 CORESOBJECT_API extern GarbageCollector& GC;
 
@@ -76,6 +77,7 @@ private:
 	uint64 Generation = 0;
 	std::vector<SObject*> PendingKill;
 	std::future<void> DeleteAction;
+	std::optional<std::vector<SFieldInfo*>> StaticRoots;
 
 	std::future<void> GCThread;
 	std::atomic<bool> bRunningGCThread;

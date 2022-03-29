@@ -4,6 +4,7 @@
 
 #include "MemberInfo.h"
 #include "FieldInfoMetadataGenerator.h"
+#include "Type.h"
 #include <span>
 
 /// <summary>
@@ -54,12 +55,21 @@ public:
 	/// <summary>
 	/// Returns the attributes of a field declared by a given object.
 	/// </summary>
-	virtual std::span<SAttributeField* const> GetAttributes();
+	virtual std::span<SFieldAttribute* const> GetAttributes();
 
 	/// <summary>
 	/// Returns the attribute of a field declared by a given object.
 	/// </summary>
-	virtual SAttributeField* GetAttribute(SType* attributeType);
+	virtual SFieldAttribute* GetAttribute(SType* attributeType);
+
+	/// <summary>
+	/// Returns the attribute of a field declared by a given object.
+	/// </summary>
+	template<std::derived_from<SFieldAttribute> T>
+	T* GetAttribute()
+	{
+		return Cast<T>(GetAttribute(SType::template TypeOf<T>()));
+	}
 
 	/// <summary>
 	/// Gets the type of this field object.

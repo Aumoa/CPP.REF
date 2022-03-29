@@ -123,6 +123,29 @@ void GarbageCollector::Collect(bool bFullPurge)
 				GCMarkingBuffer[Root->InternalIndex] = 1;
 			}
 
+			if (!StaticRoots.has_value())
+			{
+				StaticRoots.emplace();
+				for (auto& [Name, StaticClass] : SType::_staticCollection->FullQualifiedNameView)
+				{
+					for (auto& Field : StaticClass->GetFields())
+					{
+						if (Field->IsStatic() && !Field->GetFieldType()->IsValueType())
+						{
+							StaticRoots->emplace_back(Field);
+						}
+					}
+				}
+			}
+
+			for (auto& RField : *StaticRoots)
+			{
+				if (SObject* Value = RField->GetValue(nullptr); Value)
+				{
+					GCMarkingBuffer[Value->InternalIndex] = 1;
+				}
+			}
+
 			std::atomic<int32> NumObjects = (int32)Roots.size();
 			for (int32 Depth = 1; NumObjects != 0; ++Depth)
 			{
@@ -318,6 +341,11 @@ int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDept
 		// Do NOT declare it as std::function because, that interfere function inlining.
 		auto Marker = [&](SObject* Member)
 		{
+			if (Member == nullptr)
+			{
+				return;
+			}
+
 			if (Writep < (int32)Buffer.size())
 			{
 				Buffer[Writep++] = Member;

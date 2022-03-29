@@ -8,6 +8,7 @@
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/TypeInfoMetadataGenerator.h"
 #include "Reflection/FieldInfoMetadataGenerator.h"
+#include "Reflection/MethodInfoMetadataGenerator.h"
 #include "GC/Referencer.h"
 #include <string>
 #include <string_view>
@@ -97,7 +98,9 @@ public:
 	SObject(SObject&& Rhs) noexcept;
 	virtual ~SObject() noexcept;
 
+	SFUNCTION(AddToRoot)
 	void AddToRoot();
+	SFUNCTION(RemoveFromRoot)
 	void RemoveFromRoot();
 	std::function<bool()> GetHolder();
 
@@ -105,6 +108,7 @@ private:
 	SObject(const SObject&) = delete;
 
 public:
+	SFUNCTION(ToString)
 	virtual std::wstring ToString();
 
 protected:

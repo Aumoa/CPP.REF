@@ -3,3 +3,7 @@
 #include "Reflection/Assembly.h"
 
 DEFINE_ASSEMBLY_INFO;
+
+#include "IDisposable.h"
+
+GENERATE_BODY(IDisposable);

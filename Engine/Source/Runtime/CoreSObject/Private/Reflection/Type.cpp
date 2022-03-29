@@ -2,9 +2,10 @@
 
 #include "Reflection/Type.h"
 #include "Reflection/FieldInfo.h"
+#include "Reflection/MethodInfo.h"
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 #include "Reflection/Assembly.h"
-#include "Attributes/AttributeClass.h"
+#include "Attributes/ClassAttribute.h"
 
 GENERATE_BODY(SType);
 
@@ -28,6 +29,9 @@ SType::SType(MetadataGenerator&& generator)
 		
 		auto fields = GetFields(false);
 		_recursiveFields.insert(_recursiveFields.end(), fields.begin(), fields.end());
+
+		auto methods = GetMethods(false);
+		_recursiveMethods.insert(_recursiveMethods.end(), methods.begin(), methods.end());
 
 		auto attributes = GetCustomAttributes(false);
 		_recursiveAttributes.insert(_recursiveAttributes.end(), attributes.begin(), attributes.end());
@@ -82,7 +86,35 @@ SFieldInfo* SType::GetField(std::wstring_view fieldName, bool bRecursive)
 	return *it;
 }
 
-std::span<SAttributeClass* const> SType::GetCustomAttributes(bool bRecursive)
+std::span<SMethodInfo* const> SType::GetMethods(bool bRecursive)
+{
+	if (bRecursive)
+	{
+		return _meta.Methods;
+	}
+	else
+	{
+		return _recursiveMethods;
+	}
+}
+
+SMethodInfo* SType::GetMethod(std::wstring_view methodName, bool bRecursive)
+{
+	auto& collection = bRecursive ? _meta.Methods : _recursiveMethods;
+	auto it = std::find_if(collection.begin(), collection.end(), [&methodName](SMethodInfo* method)
+	{
+		return method->GetName() == methodName;
+	});
+
+	if (it == collection.end())
+	{
+		return nullptr;
+	}
+
+	return *it;
+}
+
+std::span<SClassAttribute* const> SType::GetCustomAttributes(bool bRecursive)
 {
 	if (bRecursive)
 	{
@@ -94,10 +126,10 @@ std::span<SAttributeClass* const> SType::GetCustomAttributes(bool bRecursive)
 	}
 }
 
-SAttributeClass* SType::GetCustomAttribute(SType* attributeType, bool bRecursive)
+SClassAttribute* SType::GetCustomAttribute(SType* attributeType, bool bRecursive)
 {
 	auto& collection = bRecursive ? _meta.Attributes : _recursiveAttributes;
-	auto it = std::find_if(collection.begin(), collection.end(), [&attributeType](SAttributeClass* attr)
+	auto it = std::find_if(collection.begin(), collection.end(), [&attributeType](SClassAttribute* attr)
 	{
 		return attr->GetType()->IsA(attributeType);
 	});
@@ -127,7 +159,7 @@ size_t SType::GetHashCode()
 
 bool SType::IsValueType()
 {
-	return !_meta.bIsClass;
+	return _meta.bIsValueType;
 }
 
 bool SType::IsNativeType()
@@ -138,6 +170,11 @@ bool SType::IsNativeType()
 bool SType::IsInterfaceType()
 {
 	return _meta.bIsInterface;
+}
+
+bool SType::IsEnum()
+{
+	return _meta.bIsEnum;
 }
 
 bool SType::IsA(SType* compareType)

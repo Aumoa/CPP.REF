@@ -45,7 +45,7 @@ namespace libty::Core::Reflection
 
 		Setter = [field](SObject* _This, SObject* _Value)
 		{
-			auto Value = Cast<TMemberType>(_Value);
+			auto Value = Cast<TReflectType>(_Value);
 			*field = Value;
 		};
 
@@ -54,8 +54,8 @@ namespace libty::Core::Reflection
 			return Cast<SObject>(*field);
 		};
 
-		FieldType = typeof(TMemberType);
-		SupportNativeObjectCollection<TMemberType>(inh_select<2>());
+		FieldType = typeof(TReflectType);
+		SupportNativeObjectCollection<TReflectType>(inh_select<2>());
 		Attributes = MakeVectorCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 	}
 

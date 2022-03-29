@@ -6,7 +6,7 @@
 
 struct IDisposable : virtual public SObject
 {
-	GENERATED_INTERFACE_BODY(IDisposable);
+	GENERATED_BODY(IDisposable);
 
 	// Special constructor for IDisposable.
 	IDisposable()

@@ -7,16 +7,44 @@
 #include <functional>
 
 class SObject;
-class SAttributeClass;
+class SClassAttribute;
 class SFieldInfo;
+class SMethodInfo;
 class SAssembly;
 
 namespace libty::Core::Reflection
 {
+	template<class TOwningClass>
+	concept IInternalAccessModifierIsPublic = requires
+	{
+		{ TOwningClass::__INTERNAL_AccessModifierChecker() } -> std::same_as<int32>;
+	};
+
+	template<char C>
+	struct is_class_name : public std::bool_constant<C == 'S'>
+	{
+	};
+
+	template<char C>
+	struct is_interface_name : public std::bool_constant<C == 'I'>
+	{
+	};
+
+	template<char C>
+	struct is_struct_name : public std::bool_constant<true>
+	{
+	};
+
+	template<char C>
+	struct is_enum_name : public std::bool_constant<C == 'E'>
+	{
+	};
+
 	struct TypeInfoMetadataGenerator
 	{
-		using ClassAttributeCollection = std::vector<SAttributeClass*>;
+		using ClassAttributeCollection = std::vector<SClassAttribute*>;
 		using ClassFieldsCollection = std::vector<SFieldInfo*>;
+		using ClassMethodsCollection = std::vector<SMethodInfo*>;
 		using InterfaceCollection = std::vector<SType*>;
 
 		// ** Common metadata **
@@ -29,26 +57,37 @@ namespace libty::Core::Reflection
 		size_t TypeHash;
 		std::function<SObject* ()> Constructor;
 		uint8 bIsNative : 1;
-		uint8 bIsClass : 1;
+		uint8 bIsValueType : 1;
 		uint8 bIsInterface : 1;
+		uint8 bIsEnum : 1;
 
 		// ** Linked metadata **
 		ClassFieldsCollection Fields;
+		ClassMethodsCollection Methods;
 
-		template<class TOwningClass, class... TAttributeCollection>
-		static TypeInfoMetadataGenerator GenerateClass(std::wstring_view className, std::string_view fullQualifiedClassName, SAssembly* assembly, std::tuple<TAttributeCollection...>& attributes);
+		// ** Enum Specialization **
+		using EnumTryParseObjFunc = bool(*)(std::wstring_view, SObject*&);
+		EnumTryParseObjFunc EnumTryParseObj;
+		using EnumTryParseFunc = bool(*)(std::wstring_view, int64&);
+		EnumTryParseFunc EnumTryParse;
 
-		template<class TInterface, class... TAttributeCollection>
-		static TypeInfoMetadataGenerator GenerateInterface(std::wstring_view interfaceName, std::tuple<TAttributeCollection...>& attributes);
+		template<char ClassType, class TOwningClass, class... TAttributeCollection>
+		static TypeInfoMetadataGenerator GenerateManaged
+		(
+			std::wstring_view className,
+			std::wstring_view fullQualifiedClassName,
+			SAssembly* assembly,
+			std::tuple<TAttributeCollection...>& attributes
+		);
 
 		template<class TNativeClass>
 		static TypeInfoMetadataGenerator GenerateNative();
 
 	private:
 		template<class... TAttributeCollection, size_t... Idx>
-		static std::vector<SAttributeClass*> MakeAttributeCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+		static std::vector<SClassAttribute*> MakeAttributeCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
 		{
-			return std::vector<SAttributeClass*>{ (&std::get<Idx>(attributes))... };
+			return std::vector<SClassAttribute*>{ (&std::get<Idx>(attributes))... };
 		}
 
 		template<class TOwningClass>
@@ -73,6 +112,20 @@ namespace libty::Core::Reflection
 			{
 				Fields.emplace_back(TOwningClass::template REFLECTION_GetPropertyPointer<N>(0));
 				CollectFields<TOwningClass, N + 1>();
+			}
+		}
+
+		template<class TOwningClass, size_t N>
+		void CollectMethods()
+		{
+			if constexpr (std::same_as<decltype(TOwningClass::template REFLECTION_GetFunctionPointer<N>(0)), void>)
+			{
+				return;
+			}
+			else
+			{
+				Methods.emplace_back(TOwningClass::template REFLECTION_GetFunctionPointer<N>(0));
+				CollectMethods<TOwningClass, N + 1>();
 			}
 		}
 

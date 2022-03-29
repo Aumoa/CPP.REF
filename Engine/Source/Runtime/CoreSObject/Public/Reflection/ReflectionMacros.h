@@ -5,6 +5,9 @@
 #include "Misc/RecursiveMacroHelper.h"
 #include <tuple>
 
+class SType;
+class SObject;
+
 namespace libty::Core::Reflection
 {
 	template<class T>
@@ -37,14 +40,19 @@ namespace libty::Core::Reflection
 			using Type = decltype(Declare<T>(0));
 		};
 
+		virtual SType* GetType() const override
+		{
+			return (TInterfaces::SObject::TypeId, ...);
+		}
+
 	public:
 		using InterfaceCollection = decltype(std::tuple_cat(std::declval<std::tuple<TInterfaces...>>(), std::declval<typename InterfaceCollection_t<TInterfaces>::Type>()...));
 	};
 }
 
-class SType;
-
-#define REFLECTION_FOREACH_ATTRIBUTE_NAME(X) SAttribute ## X
+#define REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME(X) SClassAttribute ## X
+#define REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME(X) SFieldAttribute ## X
+#define REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME(X) SMethodAttribute ## X
 
 #define GENERATED_BODY_DECLARE_REFLECTION_CHAINS() 											\
 	template<size_t _Line>																	\
@@ -80,6 +88,8 @@ class SType;
 
 #define GENERATED_BODY(Class, ...)															\
 	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;						\
+	friend struct libty::Core::Reflection::MethodInfoMetadataGenerator;						\
+	static consteval int32 __INTERNAL_AccessModifierChecker();								\
 																							\
 public:																						\
 	using Super = typename libty::Core::Reflection::SuperClassTypeDeclare<Class>::Type;		\
@@ -90,7 +100,7 @@ public:																						\
 private:																					\
 	static SType StaticClass;																\
 	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
-		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)			\
+		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME, __VA_ARGS__)		\
 	));																						\
 																							\
 public:																						\
@@ -106,30 +116,21 @@ private:																					\
 private:
 
 #define GENERATE_BODY(Class, ...)															\
+inline constexpr bool __ ## Class ## __pred													\
+	= libty::Core::Reflection::IInternalAccessModifierIsPublic<Class>;						\
 extern SAssembly SE_ASSEMBLY_INFO;															\
 SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenerator			\
-	::GenerateClass<Class>(Class::FriendlyName, #Class, &SE_ASSEMBLY_INFO, AttributeCollection));
-
-#define GENERATED_INTERFACE_BODY(Interface, ...)											\
-	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;						\
-																							\
-	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
-		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)			\
-	));																						\
-	static inline SType StaticClass = libty::Core::Reflection::TypeInfoMetadataGenerator	\
-	::GenerateInterface<Interface>(L ## #Interface, AttributeCollection);					\
-																							\
-public:																						\
-	static inline SType* TypeId = &StaticClass;												\
-																							\
-private:																					\
-	GENERATED_BODY_DECLARE_REFLECTION_CHAINS()												\
-																							\
-public:
+	::GenerateManaged<(#Class)[0], Class>(													\
+		Class::FriendlyName,																\
+		L ## #Class,																		\
+		&SE_ASSEMBLY_INFO,																	\
+		AttributeCollection																	\
+	)																						\
+);
 
 #define SFUNCTION(FunctionName, ...)														\
-	template<>																				\
-	static consteval size_t REFLECTION_FunctionChain<__LINE__>()							\
+	template<size_t _Line> requires (_Line == __LINE__)										\
+	static consteval size_t REFLECTION_FunctionChain()										\
 	{																						\
 		return REFLECTION_FunctionChain<__LINE__ - 1>() + 1;								\
 	}																						\
@@ -137,13 +138,16 @@ public:
 	template<size_t N> requires (N == REFLECTION_FunctionChain<__LINE__>())					\
 	static auto REFLECTION_GetFunctionPointer(int)											\
 	{																						\
-		return &This::FunctionName;															\
-	}																						\
-																							\
-	template<size_t N> requires (N == REFLECTION_FunctionChain<__LINE__>())					\
-	static consteval auto REFLECTION_GetFunctionName(int)									\
-	{																						\
-		return L ## #FunctionName;															\
+		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
+			MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME, __VA_ARGS__)	\
+		));																					\
+		static SMethodInfo MethodInfo = libty::Core::Reflection::MethodInfoMetadataGenerator\
+			::Generate(																		\
+				&This::FunctionName,														\
+				#FunctionName,																\
+				AttributeCollection															\
+			);																				\
+		return &MethodInfo;																	\
 	}
 
 #define SPROPERTY(PropertyName, ...)														\
@@ -157,7 +161,7 @@ public:
 	static auto REFLECTION_GetPropertyPointer(int)											\
 	{																						\
 		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
-			MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_ATTRIBUTE_NAME, __VA_ARGS__)		\
+			MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME, __VA_ARGS__)	\
 		));																					\
 		static SFieldInfo FieldInfo = libty::Core::Reflection::FieldInfoMetadataGenerator	\
 		(																					\

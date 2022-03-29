@@ -10,13 +10,17 @@
 #include "GC/WeakPtr.h"
 #include "Reflection/Type.h"
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
+#include "Reflection/MethodInfo.h"
+#include "Reflection/MethodInfoMetadataGenerator.Impl.h"
 
 static std::tuple<> EmptyAttributes = std::make_tuple();
 extern SAssembly CoreSObject_AssemblyInfo;
 
-SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator::GenerateClass<SObject>(
-	FriendlyName, "SObject", &CoreSObject_AssemblyInfo, EmptyAttributes
-));
+SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator
+	::GenerateManaged<"SObject"[0], SObject>(
+		FriendlyName, L"SObject", &CoreSObject_AssemblyInfo, EmptyAttributes
+	)
+);
 
 SObject::SObject()
 	: bMarkAtGC(false)

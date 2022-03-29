@@ -1,17 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Attributes/Attribute.h"
+#include "Attributes/ClassAttribute.h"
 #include "Reflection/Type.h"
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 
-GENERATE_BODY(SAttribute);
+GENERATE_BODY(SClassAttribute);
 
-SAttribute::SAttribute()
-	: Super()
-{
-}
-
-SAttribute::SAttribute(SAttribute&&) noexcept
+SClassAttribute::SClassAttribute()
 	: Super()
 {
 }

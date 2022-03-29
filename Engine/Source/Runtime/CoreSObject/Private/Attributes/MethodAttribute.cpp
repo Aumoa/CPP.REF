@@ -1,12 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Attributes/AttributeField.h"
+#include "Attributes/MethodAttribute.h"
 #include "Reflection/Type.h"
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 
-GENERATE_BODY(SAttributeField);
+GENERATE_BODY(SMethodAttribute);
 
-SAttributeField::SAttributeField()
+SMethodAttribute::SMethodAttribute()
 	: Super()
 {
 }

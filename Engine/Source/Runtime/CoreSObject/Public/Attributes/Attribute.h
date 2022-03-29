@@ -10,5 +10,5 @@ class CORESOBJECT_API SAttribute : virtual public SObject
 
 public:
 	SAttribute();
-	SAttribute(SAttribute&&);
+	SAttribute(SAttribute&&) noexcept;
 };
