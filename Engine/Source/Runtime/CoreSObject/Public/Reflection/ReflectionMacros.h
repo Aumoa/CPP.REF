@@ -116,11 +116,14 @@ private:																					\
 private:
 
 #define GENERATE_BODY(Class, ...)															\
-inline constexpr bool __ ## Class ## __pred													\
-	= libty::Core::Reflection::IInternalAccessModifierIsPublic<Class>;						\
+namespace libty::Generator::Class															\
+{																							\
+	inline constexpr bool __pred__															\
+		= ::libty::Core::Reflection::IInternalAccessModifierIsPublic<::Class>;				\
+}																							\
 extern SAssembly SE_ASSEMBLY_INFO;															\
 SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenerator			\
-	::GenerateManaged<(#Class)[0], Class>(													\
+	::GenerateManaged<(char)Class::FriendlyName[0], Class>(									\
 		Class::FriendlyName,																\
 		L ## #Class,																		\
 		&SE_ASSEMBLY_INFO,																	\
