@@ -57,3 +57,9 @@ public:
 	assert_exception(std::string_view exp, std::string_view msg, const std::source_location& src = std::source_location::current());
 	assert_exception(std::string_view exp, std::wstring_view msg, const std::source_location& src = std::source_location::current());
 };
+
+class CORE_API not_implemented : public fatal_exception
+{
+public:
+	not_implemented(const std::source_location& src = std::source_location::current());
+};

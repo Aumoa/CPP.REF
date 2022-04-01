@@ -133,6 +133,16 @@ public:
 	virtual bool IsA(SType* compareType);
 
 	/// <summary>
+	/// Gets a value indicating whether the Type equals to specified type.
+	/// </summary>
+	/// <typeparam name="T"> The type what to compare. </typeparam>
+	template<class T>
+	bool IsA()
+	{
+		return IsA(TypeOf<T>());
+	}
+
+	/// <summary>
 	/// Gets a value indicating whether the Type derived from specified type.
 	/// </summary>
 	/// <param name="baseType"> The type what to compare. </param>

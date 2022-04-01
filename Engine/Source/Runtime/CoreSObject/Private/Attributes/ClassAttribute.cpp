@@ -10,3 +10,13 @@ SClassAttribute::SClassAttribute()
 	: Super()
 {
 }
+
+void SClassAttribute::SetBindType(SType* bindType)
+{
+	_bindType = bindType;
+}
+
+SType* SClassAttribute::GetBindType()
+{
+	return _bindType;
+}

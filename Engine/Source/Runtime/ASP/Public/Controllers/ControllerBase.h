@@ -4,6 +4,11 @@
 
 #include "CoreMinimal.h"
 
+namespace libty::Asp::inline RestApi
+{
+	class SOkObjectResult;
+}
+
 namespace libty::Asp::inline Controllers
 {
 	class ASP_API SControllerBase : virtual public SObject
@@ -12,5 +17,7 @@ namespace libty::Asp::inline Controllers
 
 	protected:
 		SControllerBase();
+
+		SOkObjectResult* Ok(SObject* value);
 	};
 }

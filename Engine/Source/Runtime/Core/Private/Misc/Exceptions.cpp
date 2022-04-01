@@ -35,6 +35,7 @@ std::string_view fatal_exception::message() const noexcept
 	return _message;
 }
 
+
 assert_exception::assert_exception(std::string_view exp, const std::source_location& src)
 	: fatal_exception(String::Format("Assertion failed: !({})", exp), src)
 {
@@ -47,5 +48,11 @@ assert_exception::assert_exception(std::string_view exp, std::string_view msg, c
 
 assert_exception::assert_exception(std::string_view exp, std::wstring_view msg, const std::source_location& src)
 	: fatal_exception(String::Format("Assertion failed: !({})\n{}", exp, String::AsMultibyte(msg)), src)
+{
+}
+
+
+not_implemented::not_implemented(const std::source_location& src)
+	: fatal_exception(L"Not implemented.", src)
 {
 }

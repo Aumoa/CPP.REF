@@ -6,6 +6,7 @@
 #include "Misc/String.h"
 #include "typeof.h"
 #include "Enum.h"
+#include "Attributes/ClassAttribute.h"
 #include <typeinfo>
 
 namespace libty::Core::Reflection
@@ -38,7 +39,7 @@ namespace libty::Core::Reflection
 		gen.ClassName = className;
 		gen.FullQualifiedClassName = fullQualifiedClassName;
 		gen.Assembly = assembly;
-		gen.Attributes = MakeAttributeCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
+		gen.Attributes = MakeAttributeCollection<TOwningClass>(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 		gen.Interfaces = MakeInterfaceCollection<TOwningClass>();
 		gen.SuperClass = GetSuperClass<TOwningClass>();
 		gen.TypeHash = typeid(TOwningClass).hash_code();
@@ -98,6 +99,18 @@ namespace libty::Core::Reflection
 		gen.bIsInterface = false;
 		gen.bIsEnum = false;
 		return gen;
+	}
+
+	template<class TOwningClass, class... TAttributeCollection, size_t... Idx>
+	std::vector<SClassAttribute*> TypeInfoMetadataGenerator::MakeAttributeCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+	{
+		auto collection = std::vector<SClassAttribute*>{ (&std::get<Idx>(attributes))... };
+
+		for (auto& item : collection)
+		{
+			item->SetBindType(TOwningClass::TypeId);
+		}
+		return collection;
 	}
 
 	namespace Details

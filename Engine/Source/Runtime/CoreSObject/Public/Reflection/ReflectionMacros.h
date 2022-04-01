@@ -100,7 +100,7 @@ public:																						\
 private:																					\
 	static SType StaticClass;																\
 	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
-		MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME, __VA_ARGS__)		\
+		MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME, __VA_ARGS__)	\
 	));																						\
 																							\
 public:																						\
@@ -142,7 +142,7 @@ SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenera
 	static auto REFLECTION_GetFunctionPointer(int)											\
 	{																						\
 		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
-			MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME, __VA_ARGS__)	\
+			MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME, __VA_ARGS__)\
 		));																					\
 		static SMethodInfo MethodInfo = libty::Core::Reflection::MethodInfoMetadataGenerator\
 			::Generate(																		\
@@ -164,7 +164,7 @@ SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenera
 	static auto REFLECTION_GetPropertyPointer(int)											\
 	{																						\
 		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
-			MACRO_RECURSIVE_FOR_EACH(REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME, __VA_ARGS__)	\
+			MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME, __VA_ARGS__)\
 		));																					\
 		static SFieldInfo FieldInfo = libty::Core::Reflection::FieldInfoMetadataGenerator	\
 		(																					\

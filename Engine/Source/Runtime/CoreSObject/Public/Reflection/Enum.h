@@ -203,13 +203,13 @@ SENUM_END();
 
 namespace std
 {
-	template<libty::Core::Reflection::IEnum TEnum>
+	template<::libty::Core::Reflection::IEnum TEnum>
 	struct underlying_type<TEnum>
 	{
 		using type = typename std::underlying_type<typename TEnum::__Tag__>::type;
 	};
 
-	template<libty::Core::Reflection::IEnum TEnum>
+	template<::libty::Core::Reflection::IEnum TEnum>
 	struct is_enum<TEnum> : public bool_constant<true>
 	{
 	};
@@ -237,7 +237,7 @@ public:
 	/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
 	/// <param name="result"> When this method returns, contains an object of type TEnum whose value is represented by value if the parse operation succeeds. If the parse operation fails, contains the default value of the underlying type of TEnum. This value need not be a member of the TEnum enumeration. This parameter is passed uninitialized. </param>
 	/// <returns> true if the conversion succeeded; false otherwise. </returns>
-	template<libty::Core::Reflection::IEnum TEnum>
+	template<::libty::Core::Reflection::IEnum TEnum>
 	static bool TryParse(std::wstring_view format, TEnum& result)
 	{
 		int64 uvalue;

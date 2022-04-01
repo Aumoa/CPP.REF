@@ -5,6 +5,16 @@
 #include "CoreMinimal.h"
 #include "Misc/CommandLine.h"
 
+namespace libty::Asp::inline DependencyInjection
+{
+	class SServiceCollection;
+}
+
+namespace libty::Asp::inline Controllers
+{
+	class SControllerBase;
+}
+
 namespace libty::Asp::inline Builder
 {
 	class SAspApplicationBuilder;
@@ -12,11 +22,20 @@ namespace libty::Asp::inline Builder
 	class ASP_API SAspApplication : virtual public SObject
 	{
 		GENERATED_BODY(SAspApplication);
+		friend class SAspApplicationBuilder;
+
+	private:
+		std::vector<SControllerBase*> _controllers;
 
 	private:
 		SAspApplication();
 
+		void ApplyControllers(SServiceCollection* collection);
+
 	public:
-		SAspApplicationBuilder* CreateBuilder(const CommandLine& args);
+		virtual int32 Run();
+
+	public:
+		static SAspApplicationBuilder* CreateBuilder(const CommandLine& args);
 	};
 }

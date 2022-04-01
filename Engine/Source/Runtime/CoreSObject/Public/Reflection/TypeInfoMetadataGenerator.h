@@ -84,11 +84,8 @@ namespace libty::Core::Reflection
 		static TypeInfoMetadataGenerator GenerateNative();
 
 	private:
-		template<class... TAttributeCollection, size_t... Idx>
-		static std::vector<SClassAttribute*> MakeAttributeCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
-		{
-			return std::vector<SClassAttribute*>{ (&std::get<Idx>(attributes))... };
-		}
+		template<class TOwningClass, class... TAttributeCollection, size_t... Idx>
+		static std::vector<SClassAttribute*> MakeAttributeCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&);
 
 		template<class TOwningClass>
 		static std::vector<SType*> MakeInterfaceCollection();

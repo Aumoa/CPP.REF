@@ -15,6 +15,7 @@
 #include "GC/WeakPtr.h"
 #include "Attributes/ClassAttribute.h"
 #include "Attributes/FieldAttribute.h"
+#include "Attributes/MethodAttribute.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/Type.h"
 #include "Reflection/FieldInfo.h"
@@ -40,3 +41,4 @@
 
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 #include "Reflection/FieldInfoMetadataGenerator.Impl.h"
+#include "Reflection/MethodInfoMetadataGenerator.Impl.h"
