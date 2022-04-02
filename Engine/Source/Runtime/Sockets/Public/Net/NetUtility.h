@@ -14,7 +14,7 @@ namespace libty::Sockets::inline Net
 
 	public:
 		template<std::integral T>
-		static constexpr T HostToNetwork(T value) noexcept requires (sizeof(T) == 4)
+		static constexpr T HostToNetwork(T value) noexcept requires (sizeof(T) >= 4)
 		{
 			if constexpr (std::endian::native == std::endian::little)
 			{
@@ -30,7 +30,7 @@ namespace libty::Sockets::inline Net
 		}
 		
 		template<std::integral T>
-		static constexpr T HostToNetwork(T value) noexcept requires (sizeof(T) == 2)
+		static constexpr T HostToNetwork(T value) noexcept requires (sizeof(T) <= 2)
 		{
 			if constexpr (std::endian::native == std::endian::little)
 			{

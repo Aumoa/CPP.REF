@@ -10,5 +10,7 @@
 #include "Net/NetUtility.h"
 
 #include "Sockets/SocketType.h"
+#include "Sockets/SocketFlags.h"
+#include "Sockets/Socket.h"
 
 #include "Web/HttpStatusCode.h"

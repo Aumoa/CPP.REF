@@ -108,28 +108,38 @@ void GarbageCollector::Collect(bool bFullPurge)
 		}
 
 		// When all tokens are ready.
-		auto timeout = std::chrono::steady_clock::now() + 10ms;
+		auto timeout = std::chrono::steady_clock::now() + 20ms;
 		bool timedOut = false;
 		for (auto& Ready : SuspendReady)
 		{
-			std::future_status status = Ready.wait_until(timeout);
-			if (status == std::future_status::timeout)
-			{
-				timedOut = true;
-				break;
-			}
+			//std::future_status status = Ready.wait_until(timeout);
+			//if (status == std::future_status::timeout)
+			//{
+			//	timedOut = true;
+			//	break;
+			//}
+			Ready.wait();
 		}
 
 		if (timedOut)
 		{
-			SE_LOG(LogGC, Verbose, L"Timed out for waiting all Managed Threads. GC will execute next timing.");
+			SE_LOG(LogGC, Verbose, L"Timed out detected for waiting that all threads are suspend.");
 
-			SCOPE_CYCLE_COUNTER(STAT_ResumeToken);
-			auto& SuspendTokens = SuspendTokenCollection::Collection();
-			for (auto& Token : SuspendTokens)
 			{
-				Token->Resume();
+				SCOPE_CYCLE_COUNTER(STAT_ResumeToken);
+				auto& SuspendTokens = SuspendTokenCollection::Collection();
+				for (auto& Token : SuspendTokens)
+				{
+					Token->Resume();
+				}
 			}
+
+			{
+				SCOPE_CYCLE_COUNTER(STAT_PostCollect);
+				PostGarbageCollect.Broadcast();
+			}
+
+			return;
 		}
 	}
 
@@ -272,28 +282,28 @@ void GarbageCollector::Collect(bool bFullPurge)
 			Objects.CompactIndexTable(LastObjectIndex, PendingKill);
 			size_t AfterCompact = Objects.TableSize();
 		}
+	}
 
-		DeleteAction = std::async([this]()
+	DeleteAction = std::async([this]()
+	{
+		SCOPE_CYCLE_COUNTER(STAT_Finalize);
+		size_t NumRemoves = 0;
+
+		for (auto& Garbage : PendingKill)
 		{
-			SCOPE_CYCLE_COUNTER(STAT_Finalize);
-			size_t NumRemoves = 0;
-
-			for (auto& Garbage : PendingKill)
+			if (Garbage->bHasFinalizer)
 			{
-				if (Garbage->bHasFinalizer)
-				{
-					Garbage->Dispose(false);
-				}
-				delete Garbage;
+				Garbage->Dispose(false);
 			}
-
-			PendingKill.clear();
-		});
-
-		if (bFullPurge)
-		{
-			DeleteAction.get();
+			delete Garbage;
 		}
+
+		PendingKill.clear();
+	});
+
+	if (bFullPurge)
+	{
+		DeleteAction.get();
 	}
 
 	{

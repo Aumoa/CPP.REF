@@ -83,7 +83,7 @@ namespace libty::inline Core::inline Threading::inline Tasks
 			// Waiting all threads.
 			for (size_t i = 0; i < threads; ++i)
 			{
-				futures[i].wait();
+				while (futures[i].wait_for(1ms) != std::future_status::ready);
 			}
 		}
 

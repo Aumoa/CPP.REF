@@ -5,38 +5,37 @@
 #include <netdb.h>
 #include <netinet/ip_icmp.h>
 #include <arpa/inet.h>
+#include <sys/ioctl.h>
 
-using SOCKET = int;
+constexpr int SOCKET_ERROR = -1;
 constexpr int INVALID_SOCKET = -1;
+using SOCKET = int;
 
-struct Socket::SocketImpl
+using ReadbackBuf = void*;
+
+#define ioctlsocket ioctl
+
+struct SSocket::SocketImpl
 {
-	int Socket = INVALID_SOCKET;
+	int Socket = -1;
 	bool bClosed = false;
 
-	SocketImpl(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType)
+	void Close()
 	{
-		throw not_implemented();
+		if (!bClosed)
+		{
+			if (close(Socket) == SOCKET_ERROR)
+			{
+				throw socket_exception("Failed to close socket handle.");
+			}
+			bClosed = true;
+		}
 	}
 
-	Task<> Connect(const IPEndPoint& EndPoint)
+	[[noreturn]]
+	void AbortWithError(const std::source_location& src = std::source_location::current())
 	{
-		throw not_implemented();
-	}
-
-	Task<> Send(const void* Buf, size_t Size)
-	{
-		throw not_implemented();
-	}
-
-	Task<size_t> Recv(void* OutBuf, size_t Size, bool bVerifiedLength)
-	{
-		throw not_implemented();
-	}
-
-	void Bind(const IPEndPoint& EndPoint)
-	{
-		throw not_implemented();
+		throw socket_exception(String::Format(L"An exception occurred while processing socket. errno: {}", errno), src);
 	}
 };
 

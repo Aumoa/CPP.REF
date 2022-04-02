@@ -4,12 +4,21 @@
 #include "Builder/AspApplicationBuilder.h"
 #include "DependencyInjection/ServiceCollection.h"
 #include "Controllers/ControllerBase.h"
+#include "Sockets/Socket.h"
+#include "Net/IPEndPoint.h"
+#include "Diagnostics/CycleCounter.h"
 
-using namespace libty::Asp;
+using namespace ::libty::Asp;
+using namespace ::libty::Sockets;
 
 SAspApplication::SAspApplication()
 	: Super()
 {
+}
+
+SAspApplication::~SAspApplication()
+{
+	SE_LOG(LogTemp, Verbose, L"~SAspApplication");
 }
 
 void SAspApplication::ApplyControllers(SServiceCollection* collection)
@@ -22,11 +31,38 @@ void SAspApplication::ApplyControllers(SServiceCollection* collection)
 
 int32 SAspApplication::Run()
 {
-	
+	GC.SetFlushInterval(1.0f);
 
-	while (true)
+	size_t prev = 0;
+	GC.PreGarbageCollect += [&prev]()
 	{
-		std::this_thread::sleep_for(10ms);
+		prev = GC.NumObjects();
+	};
+
+	GC.PostGarbageCollect += [&prev]()
+	{
+		size_t now = GC.NumObjects();
+		//SE_LOG(LogTemp, Verbose, L"GC Stat: Objects {} -> {} ({})\n{}", prev, now, (int32)now - (int32)prev, CycleCounter::Get().GetNamespace(L"GC")->Trace());
+	};
+
+	_socket = gcnew SSocket(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::TCP);
+	_socket->Bind(IPEndPoint::Parse(L"0.0.0.0:5001"));
+
+	_socket->Listen();
+	while (SSocket* client = _socket->Accept())
+	{
+		SE_LOG(LogTemp, Verbose, L"Client accepted.");
+
+		Task<>::Run([client]()
+		{
+			std::vector<char> buf(1024);
+			size_t read = client->Recv(buf.data(), 1024).GetResult();
+
+			SE_LOG(LogTemp, Verbose, L"Received: {}", String::AsUnicode(std::string_view(buf.data(), read)));
+			client->Close();
+		});
+
+		GC.Hint();
 	}
 
 	return 0;

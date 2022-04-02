@@ -15,6 +15,11 @@ namespace libty::Asp::inline Controllers
 	class SControllerBase;
 }
 
+namespace libty::Sockets
+{
+	class SSocket;
+}
+
 namespace libty::Asp::inline Builder
 {
 	class SAspApplicationBuilder;
@@ -28,8 +33,12 @@ namespace libty::Asp::inline Builder
 		SPROPERTY(_controllers)
 		std::vector<SControllerBase*> _controllers;
 
+		SPROPERTY(_socket)
+		Sockets::SSocket* _socket;
+
 	private:
 		SAspApplication();
+		virtual ~SAspApplication() noexcept override;
 
 		void ApplyControllers(SServiceCollection* collection);
 

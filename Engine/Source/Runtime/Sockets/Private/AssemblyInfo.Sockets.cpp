@@ -9,5 +9,7 @@ GENERATE_BODY(libty::Sockets::Net::EProtocolType);
 GENERATE_BODY(libty::Sockets::Net::SNetUtility);
 
 GENERATE_BODY(libty::Sockets::ESocketType);
+GENERATE_BODY(libty::Sockets::ESocketFlags);
+GENERATE_BODY(libty::Sockets::SSocket);
 
 GENERATE_BODY(libty::Sockets::Web::EHttpStatusCode);

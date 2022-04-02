@@ -46,12 +46,12 @@ public:
 
 	virtual void Resume() override
 	{
-		_promise.reset();
-
 		for (auto& SuspendThread : _threads)
 		{
 			SuspendThread->ResumeThread();
 		}
+
+		_promise.reset();
 	}
 
 	void Join(Thread* MyThread)

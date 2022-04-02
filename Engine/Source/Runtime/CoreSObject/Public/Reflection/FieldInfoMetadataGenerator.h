@@ -7,6 +7,7 @@
 #include "CoreConcepts.h"
 #include <vector>
 #include <functional>
+#include <any>
 
 namespace libty::inline Core
 {
@@ -24,6 +25,7 @@ namespace libty::inline Core
 		{
 			using SetterFunc = std::function<void(SObject* _This, SObject* _Value)>;
 			using GetterFunc = std::function<SObject* (SObject* _This)>;
+			using GetterFuncAny = std::function<std::any(SObject* _This)>;
 			using FieldAttributeCollection = std::vector<SFieldAttribute*>;
 			using NativeGCInvoke = std::function<void(SObject* _Obj)>;
 			using NativeGCCollection = std::function<void(FieldInfoMetadataGenerator*, SObject*, NativeGCInvoke&)>;
@@ -35,6 +37,7 @@ namespace libty::inline Core
 
 			SetterFunc Setter;
 			GetterFunc Getter;
+			GetterFuncAny GetterAny;
 			SType* FieldType;
 			NativeGCCollection Collection;
 

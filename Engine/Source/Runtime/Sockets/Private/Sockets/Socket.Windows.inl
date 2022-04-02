@@ -6,7 +6,10 @@
 #include <WinSock2.h>
 #undef Yield
 
-struct Socket::SocketImpl
+using socklen_t = int;
+using ReadbackBuf = char*;
+
+struct SSocket::SocketImpl
 {
 	inline static volatile bool bStaticInit = false;
 	inline static std::atomic<size_t> ReferenceCount;
@@ -19,7 +22,7 @@ struct Socket::SocketImpl
 	bool bClosed = false;
 
 public:
-	SocketImpl(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType)
+	SocketImpl()
 	{
 		[[unlikely]]
 		if (!bStaticInit)
@@ -45,7 +48,7 @@ public:
 		hSockRecvEvent = WSACreateEvent();
 	}
 
-	inline void CloseHandle(HANDLE& hSockEvent)
+	inline static void CloseHandle(HANDLE& hSockEvent)
 	{
 		if (hSockEvent)
 		{
@@ -66,159 +69,22 @@ public:
 		}
 	}
 
-	Task<> Connect(const IPEndPoint& EndPoint)
+	void Close()
 	{
-		auto InAddr = GetSOCKADDR_IN(EndPoint);
-		int32 SocketError = connect(Socket, (SOCKADDR*)&InAddr, sizeof(InAddr));
-		if (SocketError == 0)
+		if (!bClosed)
 		{
-			co_return;
-		}
-
-		int32 ConnectCode = WSAGetLastError();
-		int32 CodeSize = sizeof(int32);
-
-		if (ConnectCode == 0)
-		{
-			co_return;
-		}
-		else if (ConnectCode == WSAEWOULDBLOCK)
-		{
-			ConnectCode = co_await WaitSocketEvent(hSockSendEvent, FD_CONNECT_BIT, L"Connect()");
-			switch (ConnectCode)
+			if (closesocket(Socket) == SOCKET_ERROR)
 			{
-			case 0:
-				co_return;
-			default:
-				AbortWithError(ConnectCode, L"Connect()");
+				throw socket_exception("Failed to close socket handle.");
 			}
+			bClosed = true;
 		}
-
-		AbortWithError(ConnectCode, L"Connect()");
-	}
-
-	Task<> Send(const void* Buf, size_t Size)
-	{
-		while (Size > 0)
-		{
-			int32 SendBuf = ClampToInt(Size);
-			SendBuf = send(Socket, (const char*)Buf, SendBuf, 0);
-
-			if (SendBuf == -1)
-			{
-				int32 Status = WSAGetLastError();
-				if (Status == WSAEWOULDBLOCK)
-				{
-					Status = co_await WaitSocketEvent(hSockSendEvent, FD_WRITE_BIT, L"Send()");
-					if (Status < 0)
-					{
-						AbortWithError(Status, L"Send()");
-					}
-					else
-					{
-						SendBuf = Status;
-					}
-				}
-				else
-				{
-					AbortWithError(Status, L"Send()");
-				}
-			}
-
-			Size -= (size_t)SendBuf;
-		}
-	}
-
-	Task<size_t> Recv(void* OutBuf, size_t Size, bool bVerifiedLength)
-	{
-		size_t TotalSize = 0;
-
-		while (Size > 0)
-		{
-			int32 RecvBuf = ClampToInt(Size);
-			RecvBuf = recv(Socket, (char*)OutBuf, RecvBuf, 0);
-
-			if (RecvBuf == -1)
-			{
-				int32 Status = WSAGetLastError();
-				if (Status == WSAEWOULDBLOCK)
-				{
-					Status = co_await WaitSocketEvent(hSockRecvEvent, FD_READ_BIT, L"Recevie()");
-					if (Status < 0)
-					{
-						AbortWithError(Status, L"Recevie()");
-					}
-					else
-					{
-						RecvBuf = Status;
-					}
-				}
-				else
-				{
-					AbortWithError(Status, L"Send()");
-				}
-			}
-
-			if (!bVerifiedLength && RecvBuf == 0)
-			{
-				break;
-			}
-
-			Size -= (size_t)RecvBuf;
-			TotalSize += (size_t)RecvBuf;
-		}
-
-		co_return TotalSize;
-	}
-
-	void Bind(const IPEndPoint& EndPoint)
-	{
-		SOCKADDR_IN sAddr = GetSOCKADDR_IN(EndPoint);
-		int code = bind(Socket, (const sockaddr*)&sAddr, sizeof(sAddr));
-		if (code == SOCKET_ERROR)
-		{
-			AbortWithError(WSAGetLastError(), L"Bind");
-		}
-	}
-
-private:
-	Task<int32> WaitSocketEvent(HANDLE& hSockEvent, int32 ConnectBit, std::wstring_view Op)
-	{
-		WSAResetEvent(hSockEvent);
-		if (WSAEventSelect(Socket, hSockEvent, 1 << ConnectBit) == SOCKET_ERROR)
-		{
-			AbortWithError(WSAGetLastError(), Op);
-		}
-
-		while (true)
-		{
-			DWORD Status = WSAWaitForMultipleEvents(1, &hSockEvent, true, 32, false);
-			if (Status == WSA_WAIT_FAILED)
-			{
-				AbortWithError(WSAGetLastError(), Op);
-			}
-			else if (Status == WSA_WAIT_TIMEOUT)
-			{
-				co_await Task<>::Yield();
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		WSANETWORKEVENTS Events;
-		if (WSAEnumNetworkEvents(Socket, hSockEvent, &Events) == SOCKET_ERROR)
-		{
-			AbortWithError(WSAGetLastError(), Op);
-		}
-
-		co_return Events.iErrorCode[ConnectBit];
 	}
 
 	[[noreturn]]
-	static void AbortWithError(int32 PlatformErrorCode, std::wstring_view Operation)
+	static void AbortWithError(const std::source_location& src = std::source_location::current())
 	{
+		int32 PlatformErrorCode = WSAGetLastError();
 		wchar_t* Wstr = nullptr;
 		std::wstring Message;
 
@@ -239,16 +105,7 @@ private:
 			Wstr = nullptr;
 		}
 
-		throw socket_exception(std::format(L"{} operation return error code: {}, message: {}", Operation, PlatformErrorCode, Message));
-	}
-
-	inline SOCKADDR_IN GetSOCKADDR_IN(const IPEndPoint& EndPoint)
-	{
-		SOCKADDR_IN InAddr = {};
-		InAddr.sin_family = AF_INET;
-		InAddr.sin_addr.s_addr = SNetUtility::HostToNetwork(EndPoint.GetAddress());
-		InAddr.sin_port = SNetUtility::HostToNetwork(EndPoint.GetPort());
-		return InAddr;
+		throw socket_exception(std::format(L"Socket operation return error code: {}, message: {}", PlatformErrorCode, Message), src);
 	}
 
 	inline int32 ClampToInt(size_t Size)

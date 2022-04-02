@@ -5,13 +5,13 @@
 #include "Net/IPEndPoint.h"
 #include "CoreAssert.h"
 
-using namespace libty;
-using namespace libty::Sockets;
+using namespace ::libty;
+using namespace ::libty::Sockets;
 
 #include "Socket.Windows.inl"
 #include "Socket.Linux.inl"
 
-inline int32 GetRawFamily(EAddressFamily Family)
+inline int GetRawFamily(EAddressFamily Family)
 {
 	switch (Family)
 	{
@@ -22,7 +22,7 @@ inline int32 GetRawFamily(EAddressFamily Family)
 	}
 }
 
-inline int32 GetRawSocketType(ESocketType SocketType)
+inline int GetRawSocketType(ESocketType SocketType)
 {
 	switch (SocketType)
 	{
@@ -33,7 +33,7 @@ inline int32 GetRawSocketType(ESocketType SocketType)
 	}
 }
 
-inline int32 GetRawProtocolType(EProtocolType ProtocolType)
+inline int GetRawProtocolType(EProtocolType ProtocolType)
 {
 	switch (ProtocolType)
 	{
@@ -55,114 +55,114 @@ inline timeval MakeTimeval(std::chrono::microseconds Value)
 	return Timeval;
 }
 
-Socket::Socket(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType)
+inline sockaddr_in GetSOCKADDR_IN(const IPEndPoint& EndPoint)
 {
-	Impl = std::make_unique<SocketImpl>(Family, SocketType, ProtocolType);
-
-	int32 RawFamily = GetRawFamily(Family);
-	int32 RawSocketType = GetRawSocketType(SocketType);
-	int32 RawProtocolType = GetRawProtocolType(ProtocolType);
-	Impl->Socket = socket(RawFamily, RawSocketType, RawProtocolType);
-	if (Impl->Socket == INVALID_SOCKET)
-	{
-		throw socket_exception("Couldn't create new socket.");
-	}
-
-	u_long NonBlockingMode = 1;
-	//if (ioctlsocket(Impl->Socket, FIONBIO, &NonBlockingMode) != 0)
-	//{
-	//	throw socket_exception("Couldn't create non-blocking socket.");
-	//}
-	throw not_implemented();
+	sockaddr_in InAddr = {};
+	InAddr.sin_family = AF_INET;
+	InAddr.sin_addr.s_addr = SNetUtility::HostToNetwork(EndPoint.GetAddress());
+	InAddr.sin_port = SNetUtility::HostToNetwork(EndPoint.GetPort());
+	return InAddr;
 }
 
-Socket::~Socket()
+SSocket::SSocket()
+	: Super()
 {
-	if (IsValid() && !Impl->bClosed)
+}
+
+SSocket::SSocket(EAddressFamily Family, ESocketType SocketType, EProtocolType ProtocolType)
+	: Super()
+{
+	Impl = std::make_unique<SocketImpl>();
+	Impl->Socket = socket(GetRawFamily(Family), GetRawSocketType(SocketType), GetRawProtocolType(ProtocolType));
+
+	if (Impl->Socket == INVALID_SOCKET)
+	{
+		Impl->AbortWithError();
+	}
+}
+
+SSocket::~SSocket()
+{
+	if (!GC.IsTearingDown() && IsValid() && !ensure(Impl->bClosed))
 	{
 		Close();
 	}
 }
 
-bool Socket::IsValid() const
+bool SSocket::IsValid() const
 {
-	return (bool)Impl;
+	return (bool)Impl && !Impl->bClosed;
 }
 
-Task<> Socket::Connect(const IPEndPoint& EndPoint)
+void SSocket::Bind(const IPEndPoint& endpoint)
 {
-	return Impl->Connect(EndPoint);
-}
-
-Task<> Socket::Send(const void* Buf, size_t Size)
-{
-	return Impl->Send(Buf, Size);
-}
-
-Task<size_t> Socket::Recv(void* OutBuf, size_t Size, bool bVerifiedLength)
-{
-	return Impl->Recv(OutBuf, Size, bVerifiedLength);
-}
-
-void Socket::Bind(const IPEndPoint& endpoint)
-{
-	return Impl->Bind(endpoint);
-}
-
-void Socket::Close()
-{
-	//if (closesocket(Impl->Socket) != 0)
-	//{
-	//	throw socket_exception("Couldn't close socket. 'closesocket' function return SOCKET_ERROR.");
-	//}
-
-	throw not_implemented();
-	Impl->bClosed = true;
-}
-
-Socket Socket::NewTCPSocket()
-{
-	return Socket(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::TCP);
-}
-
-bool Socket::IsReadyToRead(std::chrono::microseconds Timeout)
-{
-	using namespace std::chrono;
-
-	fd_set ReadSet;
-	FD_ZERO(&ReadSet);
-
-	FD_SET(Impl->Socket, &ReadSet);
-
-	timeval Timeval = MakeTimeval(Timeout);
-	int32 SocketAvailable = select(0, &ReadSet, nullptr, nullptr, &Timeval);
-
-	if (SocketAvailable != 0)
+	sockaddr_in sAddr = GetSOCKADDR_IN(endpoint);
+	int code = bind(Impl->Socket, (const sockaddr*)&sAddr, sizeof(sAddr));
+	if (code == SOCKET_ERROR)
 	{
-		//AbortWithError(errno, L"IsReadyToRead()");
-		return true;
+		Impl->AbortWithError();
+	}
+}
+
+void SSocket::Close()
+{
+	Impl->Close();
+}
+
+void SSocket::Listen(int32 backlog)
+{
+	if (listen(Impl->Socket, backlog) == SOCKET_ERROR)
+	{
+		Impl->AbortWithError();
+	}
+}
+
+SSocket* SSocket::Accept()
+{
+	sockaddr addr;
+	socklen_t szAddr = sizeof(addr);
+
+	SOCKET sock = accept(Impl->Socket, &addr, &szAddr);
+	if (sock == INVALID_SOCKET)
+	{
+		Impl->AbortWithError();
 	}
 
-	return SocketAvailable > 0 && FD_ISSET(Impl->Socket, &ReadSet) != 0;
+	SSocket* client = gcnew SSocket();
+	client->Impl = std::make_unique<SocketImpl>();
+	client->Impl->Socket = sock;
+
+	return client;
 }
 
-bool Socket::IsReadyToWrite(std::chrono::microseconds Timeout)
+Task<size_t> SSocket::Recv(void* buf, size_t len, ESocketFlags flags)
 {
-	using namespace std::chrono;
+	size_t total = 0;
 
-	fd_set WriteSet;
-	FD_ZERO(&WriteSet);
-
-	FD_SET(Impl->Socket, &WriteSet);
-
-	timeval Timeval = MakeTimeval(Timeout);
-	int32 SocketAvailable = select(0, nullptr, &WriteSet, nullptr, &Timeval);
-
-	if (SocketAvailable < 0)
+	while (len > 0)
 	{
-		//AbortWithError(errno, L"IsReadyToWrite()");
-		return true;
+		u_long available = 0;
+		if (ioctlsocket(Impl->Socket, FIONREAD, &available) == SOCKET_ERROR)
+		{
+			Impl->AbortWithError();
+		}
+
+		if (available == 0)
+		{
+			break;
+		}
+
+		size_t rb = len > 0x7FFFFFFF ? 0x7FFFFFFF : len;
+		int sz = recv(Impl->Socket, (ReadbackBuf)buf, (int)rb, (int)flags);
+		if (sz == 0)
+		{
+			break;
+		}
+
+		len -= sz;
+		buf = (char*)buf + sz;
+		total += sz;
 	}
 
-	return SocketAvailable > 0 && FD_ISSET(Impl->Socket, &WriteSet) != 0;
+	co_return total;
 }
