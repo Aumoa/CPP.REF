@@ -104,9 +104,9 @@ namespace libty::inline Core::Reflection
 	void FieldInfoMetadataGenerator::SupportNativeObjectCollection(InheritSelector<2>&&) requires
 		IEnumerable<TMemberType, SObject*>
 	{
-		Collection = [this](SObject* _This, NativeGCInvoke& _GCInvoke)
+		Collection = [](FieldInfoMetadataGenerator* _Caller, SObject* _This, NativeGCInvoke& _GCInvoke)
 		{
-			for (auto& item : Cast<TMemberType>(Getter(_This)))
+			for (auto& item : Cast<TMemberType>(_Caller->Getter(_This)))
 			{
 				_GCInvoke(item);
 			}
@@ -117,9 +117,9 @@ namespace libty::inline Core::Reflection
 	void FieldInfoMetadataGenerator::SupportNativeObjectCollection(InheritSelector<2>&&) requires
 		IDictionary<TMemberType, SObject*, SObject*>
 	{
-		Collection = [this](SObject* _This, NativeGCInvoke& _GCInvoke)
+		Collection = [](FieldInfoMetadataGenerator* _Caller, SObject* _This, NativeGCInvoke& _GCInvoke)
 		{
-			for (auto& [key, value] : Cast<TMemberType>(Getter(_This)))
+			for (auto& [key, value] : Cast<TMemberType>(_Caller->Getter(_This)))
 			{
 				_GCInvoke(key);
 				_GCInvoke(value);
@@ -131,9 +131,9 @@ namespace libty::inline Core::Reflection
 	void FieldInfoMetadataGenerator::SupportNativeObjectCollection(InheritSelector<1>&&) requires
 		IDictionary<TMemberType, DictionaryKey_t<TMemberType>, SObject*>
 	{
-		Collection = [this](SObject* _This, NativeGCInvoke& _GCInvoke)
+		Collection = [](FieldInfoMetadataGenerator* _Caller, SObject* _This, NativeGCInvoke& _GCInvoke)
 		{
-			for (auto& [key, value] : Cast<TMemberType>(Getter(_This)))
+			for (auto& [key, value] : Cast<TMemberType>(_Caller->Getter(_This)))
 			{
 				_GCInvoke(value);
 			}
@@ -144,9 +144,9 @@ namespace libty::inline Core::Reflection
 	void FieldInfoMetadataGenerator::SupportNativeObjectCollection(InheritSelector<1>&&) requires
 		IDictionary<TMemberType, SObject*, DictionaryValue_t<TMemberType>>
 	{
-		Collection = [this](SObject* _This, NativeGCInvoke& _GCInvoke)
+		Collection = [](FieldInfoMetadataGenerator* _Caller, SObject* _This, NativeGCInvoke& _GCInvoke)
 		{
-			for (auto& [key, value] : Cast<TMemberType>(Getter(_This)))
+			for (auto& [key, value] : Cast<TMemberType>(_Caller->Getter(_This)))
 			{
 				_GCInvoke(key);
 			}
@@ -169,10 +169,10 @@ namespace libty::inline Core::Reflection
 	template<class TMemberType, size_t... Idx>
 	void FieldInfoMetadataGenerator::SupportNativeObjectCollectionTupleImpl(std::index_sequence<Idx...>&&)
 	{
-		Collection = [this](SObject* _This, NativeGCInvoke& _GCInvoke)
+		Collection = [](FieldInfoMetadataGenerator* _Caller, SObject* _This, NativeGCInvoke& _GCInvoke)
 		{
-			auto tuple = Cast<TMemberType>(Getter(_This));
-			for (auto& obj : { MakeObjectPointerOrNull(std::get<Idx>(tuple))... })
+			auto tuple = Cast<TMemberType>(_Caller->Getter(_This));
+			for (auto& obj : { _Caller->MakeObjectPointerOrNull(std::get<Idx>(tuple))... })
 			{
 				_GCInvoke(obj);
 			}

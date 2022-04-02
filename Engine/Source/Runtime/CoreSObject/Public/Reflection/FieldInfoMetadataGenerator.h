@@ -26,7 +26,7 @@ namespace libty::inline Core
 			using GetterFunc = std::function<SObject* (SObject* _This)>;
 			using FieldAttributeCollection = std::vector<SFieldAttribute*>;
 			using NativeGCInvoke = std::function<void(SObject* _Obj)>;
-			using NativeGCCollection = std::function<void(SObject*, NativeGCInvoke&)>;
+			using NativeGCCollection = std::function<void(FieldInfoMetadataGenerator*, SObject*, NativeGCInvoke&)>;
 
 			std::wstring FieldName;
 			FieldAttributeCollection Attributes;

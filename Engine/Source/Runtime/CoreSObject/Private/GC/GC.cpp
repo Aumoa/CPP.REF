@@ -59,6 +59,7 @@ void GarbageCollector::Init()
 void GarbageCollector::Shutdown(bool bNormal)
 {
 	std::unique_lock GCMtx_lock(GCMtx);
+	bTearingDown = true;
 
 	if (DeleteAction.valid())
 	{
@@ -78,6 +79,11 @@ void GarbageCollector::Shutdown(bool bNormal)
 
 	Objects.Clear();
 	Roots.clear();
+}
+
+bool GarbageCollector::IsTearingDown()
+{
+	return bTearingDown;
 }
 
 void GarbageCollector::Collect(bool bFullPurge)
@@ -102,9 +108,28 @@ void GarbageCollector::Collect(bool bFullPurge)
 		}
 
 		// When all tokens are ready.
+		auto timeout = std::chrono::steady_clock::now() + 10ms;
+		bool timedOut = false;
 		for (auto& Ready : SuspendReady)
 		{
-			Ready.get();
+			std::future_status status = Ready.wait_until(timeout);
+			if (status == std::future_status::timeout)
+			{
+				timedOut = true;
+				break;
+			}
+		}
+
+		if (timedOut)
+		{
+			SE_LOG(LogGC, Verbose, L"Timed out for waiting all Managed Threads. GC will execute next timing.");
+
+			SCOPE_CYCLE_COUNTER(STAT_ResumeToken);
+			auto& SuspendTokens = SuspendTokenCollection::Collection();
+			for (auto& Token : SuspendTokens)
+			{
+				Token->Resume();
+			}
 		}
 	}
 
@@ -375,7 +400,7 @@ int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDept
 			}
 			else if (Field->_meta.Collection)
 			{
-				Field->_meta.Collection(Object, MarkerFnc);
+				Field->_meta.Collection(&Field->_meta, Object, MarkerFnc);
 			}
 		}
 	}

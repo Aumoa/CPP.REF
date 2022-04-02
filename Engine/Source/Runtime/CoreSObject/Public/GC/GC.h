@@ -42,6 +42,7 @@ namespace libty::inline Core
 
 		std::future<void> GCThread;
 		std::atomic<bool> bRunningGCThread;
+		bool bTearingDown = false;
 
 	private:
 		// lock-free buffers.
@@ -65,6 +66,7 @@ namespace libty::inline Core
 	public:
 		void Init();
 		void Shutdown(bool bNormal);
+		bool IsTearingDown();
 
 	public:
 		void Collect(bool bFullPurge = false);
