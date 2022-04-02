@@ -4,10 +4,13 @@
 
 #include "Attribute.h"
 
-class CORESOBJECT_API SMethodAttribute : public SAttribute
+namespace libty::inline Core::inline Attributes
 {
-	GENERATED_BODY(SMethodAttribute);
+	class CORESOBJECT_API SMethodAttribute : public SAttribute
+	{
+		GENERATED_BODY(SMethodAttribute);
 
-public:
-	SMethodAttribute();
-};
+	public:
+		SMethodAttribute();
+	};
+}

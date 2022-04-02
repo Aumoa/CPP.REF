@@ -6,6 +6,8 @@
 #include <bit>
 #include <cstring>
 
+using namespace libty;
+
 FileReference::FileReference(const std::filesystem::path& filepath)
 	: FileSystemReference(filepath)
 {

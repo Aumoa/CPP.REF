@@ -3,7 +3,8 @@
 #include "ConsoleModule.h"
 #include "ConsoleModuleSubsystem.h"
 
-GENERATE_BODY(SConsoleModule);
+using namespace libty;
+using namespace libty::Console;
 
 SConsoleModule::SConsoleModule() : Super()
 {
@@ -15,8 +16,6 @@ SConsoleModule::~SConsoleModule() noexcept
 
 int32 SConsoleModule::Main(const CommandLine& CommandArgs)
 {
-	using T = decltype(Subsystems);
-	constexpr bool b = IEnumerable<T, SObject*>;
 	for (auto& SubsystemClass : SType::GetDerivedTypes(typeof(SConsoleModuleSubsystem)))
 	{
 		if (!SubsystemClass->IsA(typeof(SConsoleModuleSubsystem)))

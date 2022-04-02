@@ -5,32 +5,35 @@
 #include "Misc/String.h"
 #include <utility>
 
-namespace libty::Core::Casts::Impl
+namespace libty::inline Core::inline Casts
 {
-	template<class TTo, class TFrom>
-	inline static TTo DoCast(short, TFrom&& from) requires requires
+	namespace Impl
 	{
-		{ static_cast<TTo>(std::declval<TFrom>()) };
-	}
-	{
-		return static_cast<TTo>(std::forward<TFrom>(from));
+		template<class TTo, class TFrom>
+		inline static TTo DoCast(short, TFrom&& from) requires requires
+		{
+			{ static_cast<TTo>(std::declval<TFrom>()) };
+		}
+		{
+			return static_cast<TTo>(std::forward<TFrom>(from));
+		}
+
+		template<class TTo, class TFrom>
+		static TTo DoCast(int, TFrom&& from) requires requires
+		{
+			{ String::Cast<TTo>(std::declval<TFrom>()) };
+		}
+		{
+			return String::Cast<TTo>(std::forward<TFrom>(from));
+		}
 	}
 
 	template<class TTo, class TFrom>
-	static TTo DoCast(int, TFrom&& from) requires requires
+	inline auto Cast(TFrom&& from) requires requires
 	{
-		{ String::Cast<TTo>(std::declval<TFrom>()) };
+		{ libty::Core::Casts::Impl::DoCast<TTo, TFrom>(std::declval<int>(), std::declval<TFrom>()) };
 	}
 	{
-		return String::Cast<TTo>(std::forward<TFrom>(from));
+		return libty::Core::Casts::Impl::DoCast<TTo, TFrom>(0, std::forward<TFrom>(from));
 	}
-}
-
-template<class TTo, class TFrom>
-inline auto Cast(TFrom&& from) requires requires
-{
-	{ libty::Core::Casts::Impl::DoCast<TTo, TFrom>(std::declval<int>(), std::declval<TFrom>()) };
-}
-{
-	return libty::Core::Casts::Impl::DoCast<TTo, TFrom>(0, std::forward<TFrom>(from));
 }

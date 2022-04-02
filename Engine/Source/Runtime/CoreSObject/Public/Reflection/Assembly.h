@@ -6,31 +6,38 @@
 #include "PrimitiveTypes.h"
 #include <set>
 
-class CORESOBJECT_API SAssembly : virtual public SObject
+namespace libty::inline Core::Reflection
 {
-	GENERATED_BODY(SAssembly);
-	friend class SType;
+	class CORESOBJECT_API SAssembly : virtual public SObject
+	{
+		GENERATED_BODY(SAssembly);
+		friend class libty::Core::SType;
 
-private:
-	std::wstring _assemblyName;
-	std::set<SType*>* volatile _types;
+	private:
+		std::wstring _assemblyName;
+		std::set<SType*>* volatile _types;
 
-public:
-	SAssembly(std::string_view assemblyName);
-	virtual ~SAssembly() noexcept override;
+	public:
+		SAssembly(std::string_view assemblyName);
+		virtual ~SAssembly() noexcept override;
 
-	/// <summary>
-	/// Gets assembly name.
-	/// </summary>
-	virtual std::wstring GetName();
+		/// <summary>
+		/// Gets assembly name.
+		/// </summary>
+		virtual std::wstring GetName();
 
-	/// <summary>
-	/// Gets all types declared in current assembly.
-	/// </summary>
-	virtual std::set<SType*> GetTypes();
+		/// <summary>
+		/// Gets all types declared in current assembly.
+		/// </summary>
+		virtual std::set<SType*> GetTypes();
 
-private:
-	void AddType(SType* type);
-};
+	private:
+		void AddType(SType* type);
+	};
 
-#define DEFINE_ASSEMBLY_INFO SAssembly SE_ASSEMBLY_INFO(SE_ASSEMBLY_NAME)
+	#define DEFINE_ASSEMBLY_INFO \
+namespace libty::inline Generated::Assemblies \
+{ \
+	::libty::Core::Reflection::SAssembly SE_ASSEMBLY_INFO(SE_ASSEMBLY_NAME); \
+}
+}

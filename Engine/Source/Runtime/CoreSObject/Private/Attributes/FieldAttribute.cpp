@@ -2,6 +2,8 @@
 
 #include "Attributes/FieldAttribute.h"
 
+using namespace libty;
+
 SFieldAttribute::SFieldAttribute()
 	: Super()
 {

@@ -6,53 +6,56 @@
 #include "MethodInfoMetadataGenerator.h"
 #include "Type.h"
 
-class CORESOBJECT_API SMethodInfo : public SMemberInfo
+namespace libty::inline Core::Reflection
 {
-	GENERATED_BODY(SMethodInfo);
-
-public:
-	using MetadataGenerator = libty::Core::Reflection::MethodInfoMetadataGenerator;
-
-private:
-	MetadataGenerator _meta;
-
-public:
-	SMethodInfo(MetadataGenerator&& generator);
-
-	/// <summary>
-	/// Gets the name of current field.
-	/// </summary>
-	virtual std::wstring GetName() override;
-
-	/// <summary>
-	/// Gets a value indicating whether the field is static.
-	/// </summary>
-	virtual bool IsStatic();
-
-	/// <summary>
-	/// Returns the attributes of a field declared by a given object.
-	/// </summary>
-	virtual std::span<SMethodAttribute* const> GetAttributes();
-
-	/// <summary>
-	/// Returns the attribute of a field declared by a given object.
-	/// </summary>
-	virtual SMethodAttribute* GetAttribute(SType* attributeType);
-
-	/// <summary>
-	/// Returns the attribute of a field declared by a given object.
-	/// </summary>
-	template<std::derived_from<SMethodAttribute> T>
-	T* GetAttribute()
+	class CORESOBJECT_API SMethodInfo : public SMemberInfo
 	{
-		return Cast<T>(GetAttribute(SType::TypeOf<T>()));
-	}
+		GENERATED_BODY(SMethodInfo);
 
-	/// <summary>
-	/// Invokes the method represented by the current instance, using the specified parameters.
-	/// </summary>
-	/// <param name="self"> The object on which to invoke the method. If a method is static, this argument is ignored. </param>
-	/// <param name="args"> An argument list for the invoked method. This is an array of objects with the same number, order, and type as the parameters of the method to be invoked. If there are no parameters, parameters should be zero span. </param>
-	/// <returns> An object containing the return value of the invoked method. </returns>
-	virtual SObject* Invoke(SObject* self, std::span<SObject* const> args);
-};
+	public:
+		using MetadataGenerator = libty::Core::Reflection::MethodInfoMetadataGenerator;
+
+	private:
+		MetadataGenerator _meta;
+
+	public:
+		SMethodInfo(MetadataGenerator&& generator);
+
+		/// <summary>
+		/// Gets the name of current field.
+		/// </summary>
+		virtual std::wstring GetName() override;
+
+		/// <summary>
+		/// Gets a value indicating whether the field is static.
+		/// </summary>
+		virtual bool IsStatic();
+
+		/// <summary>
+		/// Returns the attributes of a field declared by a given object.
+		/// </summary>
+		virtual std::span<SMethodAttribute* const> GetAttributes();
+
+		/// <summary>
+		/// Returns the attribute of a field declared by a given object.
+		/// </summary>
+		virtual SMethodAttribute* GetAttribute(SType* attributeType);
+
+		/// <summary>
+		/// Returns the attribute of a field declared by a given object.
+		/// </summary>
+		template<std::derived_from<SMethodAttribute> T>
+		T* GetAttribute()
+		{
+			return Cast<T>(GetAttribute(SType::TypeOf<T>()));
+		}
+
+		/// <summary>
+		/// Invokes the method represented by the current instance, using the specified parameters.
+		/// </summary>
+		/// <param name="self"> The object on which to invoke the method. If a method is static, this argument is ignored. </param>
+		/// <param name="args"> An argument list for the invoked method. This is an array of objects with the same number, order, and type as the parameters of the method to be invoked. If there are no parameters, parameters should be zero span. </param>
+		/// <returns> An object containing the return value of the invoked method. </returns>
+		virtual SObject* Invoke(SObject* self, std::span<SObject* const> args);
+	};
+}

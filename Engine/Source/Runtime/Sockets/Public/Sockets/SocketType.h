@@ -2,7 +2,11 @@
 
 #pragma once
 
-enum class ESocketType
+#include "CoreMinimal.h"
+
+namespace libty::Sockets
 {
-	Stream,
-};
+	SENUM(ESocketType, int32,
+		Stream,
+	);
+}

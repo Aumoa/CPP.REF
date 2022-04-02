@@ -2,23 +2,27 @@
 
 #pragma once
 
+#include "PrimitiveTypes.h"
 #include <map>
 #include <string>
 
-class CycleCounterNamespace;
-
-class CORE_API CycleCounter
+namespace libty::inline Core::inline Diagnostics
 {
-	CycleCounter() = default;
-	~CycleCounter() = default;
+	class CycleCounterNamespace;
 
-private:
-	std::map<std::wstring, CycleCounterNamespace*, std::less<>> Namespaces;
+	class CORE_API CycleCounter
+	{
+		CycleCounter() = default;
+		~CycleCounter() = default;
 
-public:
-	void Register(CycleCounterNamespace* Namespace);
-	CycleCounterNamespace* GetNamespace(std::wstring_view Name) const;
+	private:
+		std::map<std::wstring, CycleCounterNamespace*, std::less<>> Namespaces;
 
-public:
-	static CycleCounter& Get();
-};
+	public:
+		void Register(CycleCounterNamespace* Namespace);
+		CycleCounterNamespace* GetNamespace(std::wstring_view Name) const;
+
+	public:
+		static CycleCounter& Get();
+	};
+}

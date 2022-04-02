@@ -2,6 +2,8 @@
 
 #include "Attributes/Attribute.h"
 
+using namespace libty;
+
 SAttribute::SAttribute()
 	: Super()
 {

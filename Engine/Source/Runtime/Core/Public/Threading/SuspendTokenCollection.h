@@ -5,19 +5,22 @@
 #include <set>
 #include <mutex>
 
-class ISuspendToken;
-
-class CORE_API SuspendTokenCollection
+namespace libty::inline Core::inline Threading
 {
-	SuspendTokenCollection() = delete;
+	class ISuspendToken;
 
-private:
-	static std::set<ISuspendToken*> _tokens;
-	static std::mutex _lock;
+	class CORE_API SuspendTokenCollection
+	{
+		SuspendTokenCollection() = delete;
 
-public:
-	static bool Add(ISuspendToken* token);
-	static bool Remove(ISuspendToken* token);
-	static bool Contains(ISuspendToken* token);
-	static const std::set<ISuspendToken*>& Collection();
-};
+	private:
+		static std::set<ISuspendToken*> _tokens;
+		static std::mutex _lock;
+
+	public:
+		static bool Add(ISuspendToken* token);
+		static bool Remove(ISuspendToken* token);
+		static bool Contains(ISuspendToken* token);
+		static const std::set<ISuspendToken*>& Collection();
+	};
+}

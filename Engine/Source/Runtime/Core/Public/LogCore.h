@@ -2,9 +2,15 @@
 
 #pragma once
 
-class LogCategory;
+namespace libty::inline Core::inline Diagnostics
+{
+	class LogCategory;
+}
 
-extern CORE_API LogCategory LogCore;
-extern CORE_API LogCategory LogAssert;
-extern CORE_API LogCategory LogCasts;
-extern CORE_API LogCategory LogTemp;
+namespace libty::inline Generated::LogCategories
+{
+	extern CORE_API ::libty::Core::Diagnostics::LogCategory LogCore;
+	extern CORE_API ::libty::Core::Diagnostics::LogCategory LogAssert;
+	extern CORE_API ::libty::Core::Diagnostics::LogCategory LogCasts;
+	extern CORE_API ::libty::Core::Diagnostics::LogCategory LogTemp;
+}

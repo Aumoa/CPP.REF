@@ -6,29 +6,31 @@
 #include <exception>
 #include <source_location>
 #include <string>
-#include <format>
 
-class socket_exception : public std::exception
+namespace libty::Sockets
 {
-	std::string _message;
-	std::source_location _location;
-	std::string _what;
-
-public:
-	socket_exception(std::string_view message, const std::source_location& location = std::source_location::current())
-		: _message(message)
-		, _location(location)
+	class socket_exception : public std::exception
 	{
-		_what = std::format("{}: {}\n  at {} in {}:{}", typeid(*this).name(), _message, location.function_name(), location.file_name(), location.line());
-	}
+		std::string _message;
+		std::source_location _location;
+		std::string _what;
 
-	socket_exception(std::wstring_view message, const std::source_location& location = std::source_location::current())
-		: socket_exception(String::AsMultibyte(message), location)
-	{
-	}
+	public:
+		socket_exception(std::string_view message, const std::source_location& location = std::source_location::current())
+			: _message(message)
+			, _location(location)
+		{
+			_what = String::Format("{}: {}\n  at {} in {}:{}", typeid(*this).name(), _message, location.function_name(), location.file_name(), location.line());
+		}
 
-	virtual const char* what() const noexcept override
-	{
-		return _what.c_str();
-	}
-};
+		socket_exception(std::wstring_view message, const std::source_location& location = std::source_location::current())
+			: socket_exception(String::AsMultibyte(message), location)
+		{
+		}
+
+		virtual const char* what() const noexcept override
+		{
+			return _what.c_str();
+		}
+	};
+}

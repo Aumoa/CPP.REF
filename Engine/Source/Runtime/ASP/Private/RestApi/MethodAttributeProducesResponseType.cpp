@@ -2,7 +2,8 @@
 
 #include "RestApi/MethodAttributeProducesResponseType.h"
 
-using namespace libty::Asp;
+using namespace ::Attributes;
+using namespace ::libty::Sockets;
 
 SMethodAttributeProducesResponseType::SMethodAttributeProducesResponseType(EHttpStatusCode statusCode)
 	: _statusCode(statusCode)

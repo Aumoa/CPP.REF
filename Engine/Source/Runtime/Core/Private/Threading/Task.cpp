@@ -1,7 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Threading/Task.h"
+#include "Threading/Tasks/Task.h"
 #include "Threading/ThreadGroup.h"
+
+using namespace libty;
 
 static ThreadGroup group(L"TaskWorker");
 

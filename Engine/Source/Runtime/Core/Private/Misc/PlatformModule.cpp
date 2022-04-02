@@ -4,6 +4,8 @@
 #include "Misc/PlatformModule.h"
 #include "Misc/Exceptions.h"
 
+using namespace libty;
+
 #if PLATFORM_DYNAMIC_LIBRARY
 
 #if PLATFORM_WINDOWS

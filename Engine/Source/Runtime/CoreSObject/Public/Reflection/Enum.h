@@ -11,7 +11,7 @@
 #include "Misc/String.h"
 #include <map>
 
-namespace libty::Enum
+namespace libty::inline Core::Reflection
 {
 	template<size_t N>
 	struct Cstr
@@ -106,7 +106,7 @@ namespace libty::Enum
 #define SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING(Name, ...) { Name.Value, L ## #Name },
 
 #define SENUM_BEGIN(Name, Type, ...)																\
-struct Name : public libty::Enum::EEnumBase<Name, Type>												\
+struct Name : public ::libty::Core::Reflection::EEnumBase<Name, Type>								\
 {																									\
 	using __Type__ = Name;																			\
 																									\
@@ -124,14 +124,15 @@ public:																								\
 	{																								\
 	}																								\
 																									\
-	constexpr explicit Name(const Type& Value) : EEnumBase<Name, Type>(Value)						\
+	constexpr explicit Name(const Type& Value)														\
+		: ::libty::Core::Reflection::EEnumBase<Name, Type>(Value)									\
 	{																								\
 	}																								\
 																									\
 	template<class TKeyValuePair>																	\
 	constexpr Name(const TKeyValuePair& V) requires													\
 		std::same_as<typename TKeyValuePair::__Tag__, __Tag__>										\
-		: EEnumBase<Name, Type>(V.Value)															\
+		: ::libty::Core::Reflection::EEnumBase<Name, Type>(V.Value)									\
 	{																								\
 	}																								\
 																									\
@@ -201,54 +202,54 @@ public:																								\
 SENUM_BEGIN(Name, Type __VA_OPT__(, __VA_ARGS__)) \
 SENUM_END();
 
-namespace std
+template<::libty::Core::Reflection::IEnum TEnum>
+struct std::underlying_type<TEnum>
 {
-	template<::libty::Core::Reflection::IEnum TEnum>
-	struct underlying_type<TEnum>
-	{
-		using type = typename std::underlying_type<typename TEnum::__Tag__>::type;
-	};
+	using type = typename std::underlying_type<typename TEnum::__Tag__>::type;
+};
 
-	template<::libty::Core::Reflection::IEnum TEnum>
-	struct is_enum<TEnum> : public bool_constant<true>
+template<::libty::Core::Reflection::IEnum TEnum>
+struct std::is_enum<TEnum> : public bool_constant<true>
+{
+};
+
+namespace libty::inline Core::Reflection
+{
+	class CORESOBJECT_API SEnum : virtual public SObject
 	{
+		GENERATED_BODY(SEnum);
+		SEnum() = delete;
+
+	public:
+		/// <summary>
+		/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object. The return value indicates whether the conversion succeeded.
+		/// </summary>
+		/// <param name="type"> The enum type to use for parsing. </param>
+		/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
+		/// <param name="result"> When this method returns true, contains an enumeration constant that represents the parsed value. </param>
+		/// <returns> true if the conversion succeeded; false otherwise. </returns>
+		static bool TryParse(SType* type, std::wstring_view format, SObject*& result);
+
+		/// <summary>
+		/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object. The return value indicates whether the conversion succeeded.
+		/// </summary>
+		/// <typeparam name="TEnum"> The enumeration type to which to convert value. </typeparam>
+		/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
+		/// <param name="result"> When this method returns, contains an object of type TEnum whose value is represented by value if the parse operation succeeds. If the parse operation fails, contains the default value of the underlying type of TEnum. This value need not be a member of the TEnum enumeration. This parameter is passed uninitialized. </param>
+		/// <returns> true if the conversion succeeded; false otherwise. </returns>
+		template<::libty::Core::Reflection::IEnum TEnum>
+		static bool TryParse(std::wstring_view format, TEnum& result)
+		{
+			int64 uvalue;
+			if (TryParse(TEnum::TypeId, format, uvalue))
+			{
+				result = TEnum((typename std::underlying_type<TEnum>::type)uvalue);
+				return true;
+			}
+			return false;
+		}
+
+	private:
+		static bool TryParse(SType* type, std::wstring_view format, int64& result);
 	};
 }
-
-class CORESOBJECT_API SEnum : virtual public SObject
-{
-	GENERATED_BODY(SEnum);
-	SEnum() = delete;
-
-public:
-	/// <summary>
-	/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object. The return value indicates whether the conversion succeeded.
-	/// </summary>
-	/// <param name="type"> The enum type to use for parsing. </param>
-	/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
-	/// <param name="result"> When this method returns true, contains an enumeration constant that represents the parsed value. </param>
-	/// <returns> true if the conversion succeeded; false otherwise. </returns>
-	static bool TryParse(SType* type, std::wstring_view format, SObject*& result);	
-
-	/// <summary>
-	/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object. The return value indicates whether the conversion succeeded.
-	/// </summary>
-	/// <typeparam name="TEnum"> The enumeration type to which to convert value. </typeparam>
-	/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
-	/// <param name="result"> When this method returns, contains an object of type TEnum whose value is represented by value if the parse operation succeeds. If the parse operation fails, contains the default value of the underlying type of TEnum. This value need not be a member of the TEnum enumeration. This parameter is passed uninitialized. </param>
-	/// <returns> true if the conversion succeeded; false otherwise. </returns>
-	template<::libty::Core::Reflection::IEnum TEnum>
-	static bool TryParse(std::wstring_view format, TEnum& result)
-	{
-		int64 uvalue;
-		if (TryParse(TEnum::TypeId, format, uvalue))
-		{
-			result = TEnum((typename std::underlying_type<TEnum>::type)uvalue);
-			return true;
-		}
-		return false;
-	}
-
-private:
-	static bool TryParse(SType* type, std::wstring_view format, int64& result);
-};

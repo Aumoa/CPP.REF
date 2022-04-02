@@ -4,6 +4,9 @@
 #include "Reflection/MethodInfoMetadataGenerator.Impl.h"
 #include "Attributes/MethodAttribute.h"
 
+using namespace libty;
+using namespace libty::Reflection;
+
 SMethodInfo::SMethodInfo(MetadataGenerator&& generator)
 	: Super()
 	, _meta(std::move(generator))

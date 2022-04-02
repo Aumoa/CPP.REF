@@ -9,7 +9,7 @@
 #include "Attributes/ClassAttribute.h"
 #include <typeinfo>
 
-namespace libty::Core::Reflection
+namespace libty::inline Core::Reflection
 {
 	template<char ClassType, class TOwningClass, class... TAttributeCollection>
 	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateManaged

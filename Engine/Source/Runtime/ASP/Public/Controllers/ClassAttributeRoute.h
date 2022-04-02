@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Attributes/ClassAttribute.h"
 
-namespace libty::Asp::inline Controllers
+namespace Attributes::inline libty::inline Asp
 {
-	class ASP_API SClassAttributeRoute : public SClassAttribute
+	class ASP_API SClassAttributeRoute : public ::libty::SClassAttribute
 	{
 		GENERATED_BODY(SClassAttributeRoute);
 

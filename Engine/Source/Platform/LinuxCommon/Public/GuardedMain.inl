@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 
+using namespace libty;
+
 int32 GuardedMain(std::span<std::wstring> argv)
 {
 	return TApplicationClass::GuardedMain(argv);

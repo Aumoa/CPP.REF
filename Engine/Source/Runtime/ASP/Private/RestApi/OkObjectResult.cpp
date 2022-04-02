@@ -2,7 +2,8 @@
 
 #include "RestApi/OkObjectResult.h"
 
-using namespace libty::Asp::RestApi;
+using namespace libty::Asp;
+using namespace libty::Sockets;
 
 SOkObjectResult::SOkObjectResult(SObject* value)
 	: Super(value, EHttpStatusCode::OK)

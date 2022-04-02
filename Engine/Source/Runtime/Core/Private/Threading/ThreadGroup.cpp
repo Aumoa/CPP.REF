@@ -9,6 +9,8 @@
 #include "Misc/String.h"
 #include <future>
 
+using namespace libty;
+
 class ThreadGroup::ThreadGroupSuspendToken : public ISuspendToken
 {
 	ThreadGroup* _source;

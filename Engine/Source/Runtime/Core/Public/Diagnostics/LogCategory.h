@@ -8,22 +8,34 @@
 #include <source_location>
 #include "LogVerbosity.h"
 
-class CORE_API LogCategory
+namespace libty::inline Core::inline Diagnostics
 {
-	friend class LogSystem;
+	class CORE_API LogCategory
+	{
+		friend class LogSystem;
 
-private:
-	std::wstring CategoryName;
+	private:
+		std::wstring CategoryName;
 
-public:
-	LogCategory(std::wstring_view CategoryName);
+	public:
+		LogCategory(std::wstring_view CategoryName);
 
-	std::wstring_view GetName() const;
-	static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
+		std::wstring_view GetName() const;
+		static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
 
-protected:
-	virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src = std::source_location::current());
-};
+	protected:
+		virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src = std::source_location::current());
+	};
+}
 
-#define DECLARE_LOG_CATEGORY(API, CategoryName) extern API LogCategory CategoryName;
-#define DEFINE_LOG_CATEGORY(CategoryName) LogCategory CategoryName(L ## #CategoryName);
+#define DECLARE_LOG_CATEGORY(API, CategoryName) \
+namespace libty::inline Generated::LogCategories \
+{ \
+	extern API ::libty::Core::Diagnostics::LogCategory CategoryName; \
+} \
+
+#define DEFINE_LOG_CATEGORY(CategoryName) \
+namespace libty::inline Generated::LogCategories \
+{ \
+	::libty::Core::Diagnostics::LogCategory CategoryName(L ## #CategoryName); \
+}

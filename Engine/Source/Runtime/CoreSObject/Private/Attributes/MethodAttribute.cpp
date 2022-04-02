@@ -2,6 +2,8 @@
 
 #include "Attributes/MethodAttribute.h"
 
+using namespace libty;
+
 SMethodAttribute::SMethodAttribute()
 	: Super()
 {

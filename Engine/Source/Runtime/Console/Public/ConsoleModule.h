@@ -5,55 +5,58 @@
 #include "CoreMinimal.h"
 #include "Misc/CommandLine.h"
 
-class SConsoleModuleSubsystem;
-
-class CONSOLE_API SConsoleModule : virtual public SObject
+namespace libty::Console
 {
-	GENERATED_BODY(SConsoleModule);
+	class SConsoleModuleSubsystem;
 
-private:
-	SPROPERTY(Subsystems)
-	std::set<SConsoleModuleSubsystem*> Subsystems;
-
-public:
-	SConsoleModule();
-	virtual ~SConsoleModule() noexcept override;
-
-	int32 Main(const CommandLine& CommandArgs);
-	virtual int32 Run(const CommandLine& CommandArgs) = 0;
-
-	SConsoleModuleSubsystem* GetSubsystem(SType* SubsystemClass);
-	template<class T>
-	T* GetSubsystem()
+	class CONSOLE_API SConsoleModule : virtual public SObject
 	{
-		return Cast<T>(GetSubsystem(T::StaticClass()));
-	}
+		GENERATED_BODY(SConsoleModule);
 
-private:
-	std::map<size_t, SConsoleModuleSubsystem*> CachedSubsystemView;
-};
+	private:
+		SPROPERTY(Subsystems)
+		std::set<SConsoleModuleSubsystem*> Subsystems;
+
+	public:
+		SConsoleModule();
+		virtual ~SConsoleModule() noexcept override;
+
+		int32 Main(const CommandLine& CommandArgs);
+		virtual int32 Run(const CommandLine& CommandArgs) = 0;
+
+		SConsoleModuleSubsystem* GetSubsystem(SType* SubsystemClass);
+		template<class T>
+		T* GetSubsystem()
+		{
+			return Cast<T>(GetSubsystem(T::StaticClass()));
+		}
+
+	private:
+		std::map<size_t, SConsoleModuleSubsystem*> CachedSubsystemView;
+	};
+}
 
 #if PLATFORM_DYNAMIC_LIBRARY
 
-#define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)			\
-extern "C"													\
-{															\
-	__declspec(dllexport)									\
-	SConsoleModule* LoadConsoleModule()						\
-	{														\
-		return gcnew ConsoleModuleClass();	\
-	}														\
-}
+#define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)				\
+	extern "C"													\
+	{															\
+		__declspec(dllexport)									\
+		::libty::Console::SConsoleModule* LoadConsoleModule()	\
+		{														\
+			return gcnew ::ConsoleModuleClass();				\
+		}														\
+	}
 
 #else
 
-#define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)			\
-extern "C"													\
-{															\
-	SConsoleModule* LoadConsoleModule()						\
-	{														\
-		return gcnew ConsoleModuleClass();	\
-	}														\
-}
+#define DEFINE_CONSOLE_MODULE(ConsoleModuleClass)				\
+	extern "C"													\
+	{															\
+		::libty::Console::SConsoleModule* LoadConsoleModule()	\
+		{														\
+			return gcnew ::ConsoleModuleClass();				\
+		}														\
+	}
 
 #endif

@@ -7,6 +7,9 @@
 #include "Reflection/Assembly.h"
 #include "Attributes/ClassAttribute.h"
 
+using namespace libty;
+using namespace libty::Reflection;
+
 SType::StaticCollection* SType::_staticCollection;
 
 SType::SType(MetadataGenerator&& generator)

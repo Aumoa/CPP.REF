@@ -5,31 +5,34 @@
 #include <optional>
 #include <filesystem>
 
-class DirectoryReference;
-
-class CORE_API FileSystemReference
+namespace libty::inline Core::inline IO
 {
-private:
-	std::optional<std::filesystem::path> _path;
+	class DirectoryReference;
 
-public:
-	FileSystemReference() = default;
-	FileSystemReference(const FileSystemReference& rhs) = default;
-	FileSystemReference(FileSystemReference&& rhs) = default;
-	FileSystemReference(const std::filesystem::path& filepath);
-	virtual ~FileSystemReference() noexcept = default;
+	class CORE_API FileSystemReference
+	{
+	private:
+		std::optional<std::filesystem::path> _path;
 
-	bool IsExists() const;
-	std::filesystem::path GetPath() const;
-	DirectoryReference GetParent() const;
-	bool IsSet() const;
+	public:
+		FileSystemReference() = default;
+		FileSystemReference(const FileSystemReference& rhs) = default;
+		FileSystemReference(FileSystemReference&& rhs) = default;
+		FileSystemReference(const std::filesystem::path& filepath);
+		virtual ~FileSystemReference() noexcept = default;
 
-	FileSystemReference& operator =(const FileSystemReference& rhs) = default;
-	FileSystemReference& operator =(FileSystemReference&& rhs) = default;
+		bool IsExists() const;
+		std::filesystem::path GetPath() const;
+		DirectoryReference GetParent() const;
+		bool IsSet() const;
 
-	auto operator <=>(const FileSystemReference&) const = default;
-	bool operator ==(const FileSystemReference&) const = default;
+		FileSystemReference& operator =(const FileSystemReference& rhs) = default;
+		FileSystemReference& operator =(FileSystemReference&& rhs) = default;
 
-private:
-	static void Xassert(bool expression, std::string_view message);
-};
+		auto operator <=>(const FileSystemReference&) const = default;
+		bool operator ==(const FileSystemReference&) const = default;
+
+	private:
+		static void Xassert(bool expression, std::string_view message);
+	};
+}

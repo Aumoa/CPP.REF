@@ -5,6 +5,8 @@
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Misc/String.h"
 
+using namespace libty;
+
 CycleCounterNamespace::CycleCounterNamespace(std::wstring_view Name, std::wstring_view GroupName)
 	: Name(Name)
 	, GroupName(GroupName)

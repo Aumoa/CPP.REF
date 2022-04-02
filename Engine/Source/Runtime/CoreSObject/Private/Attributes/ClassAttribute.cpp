@@ -2,6 +2,8 @@
 
 #include "Attributes/ClassAttribute.h"
 
+using namespace libty;
+
 SClassAttribute::SClassAttribute()
 	: Super()
 {

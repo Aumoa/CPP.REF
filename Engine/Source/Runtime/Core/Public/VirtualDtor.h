@@ -4,10 +4,13 @@
 
 #include "PrimitiveTypes.h"
 
-class VirtualDtor
+namespace libty::inline Core
 {
-public:
-	virtual ~VirtualDtor()
+	class VirtualDtor
 	{
-	}
-};
+	public:
+		virtual ~VirtualDtor()
+		{
+		}
+	};
+}

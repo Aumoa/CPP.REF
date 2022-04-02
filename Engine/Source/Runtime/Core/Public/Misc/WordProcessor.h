@@ -2,161 +2,164 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "PrimitiveTypes.h"
 #include <span>
 #include <functional>
 
-class CORE_API WordProcessor
+namespace libty::inline Core::inline Misc
 {
-public:
-	WordProcessor()
+	class WordProcessor
 	{
-		IsSeparator = [](char Ch) -> bool
+	public:
+		WordProcessor()
 		{
-			return (Ch >= 0x21 && Ch <= 0x2F) ||
-				(Ch >= 0x3A && Ch <= 0x40) ||
-				(Ch >= 0x5B && Ch <= 0x60) ||
-				(Ch >= 0x7B && Ch <= 0x7E);
-		};
-
-		IsSpace = [](char Ch) -> bool
-		{
-			return (Ch >= 0x09 && Ch <= 0x0D) || (Ch == 0x20);
-		};
-
-		IsNumber = [](char Ch) -> bool
-		{
-			return (Ch >= 0x30 && Ch <= 0x39);
-		};
-	}
-
-	std::function<bool(char)> IsSeparator;
-	std::function<bool(char)> IsSpace;
-	std::function<bool(char)> IsNumber;
-
-	uint8 bProcessString : 1 = true;
-
-	bool Process(std::span<const uint8> Input, std::function<bool(std::string_view, size_t, size_t)> Processor)
-	{
-		const uint8* Seekp = Input.data();
-		const uint8* Endp = Seekp + Input.size_bytes();
-
-		bool bString = false;
-		bool bSpecial = false;
-		std::vector<char> CharBuf;
-		CharBuf.reserve(256);
-
-		size_t Pos = 0;
-		size_t Line = 1;
-
-		auto Flush = [&]()
-		{
-			if (CharBuf.size() == 0)
+			IsSeparator = [](char Ch) -> bool
 			{
-				return true;
-			}
+				return (Ch >= 0x21 && Ch <= 0x2F) ||
+					(Ch >= 0x3A && Ch <= 0x40) ||
+					(Ch >= 0x5B && Ch <= 0x60) ||
+					(Ch >= 0x7B && Ch <= 0x7E);
+			};
 
-			std::string_view Sv(CharBuf.data(), CharBuf.size());
-			if (!Processor(Sv, Line, Pos))
+			IsSpace = [](char Ch) -> bool
 			{
-				return false;
-			}
+				return (Ch >= 0x09 && Ch <= 0x0D) || (Ch == 0x20);
+			};
 
-			CharBuf.resize(0);
-			return true;
-		};
+			IsNumber = [](char Ch) -> bool
+			{
+				return (Ch >= 0x30 && Ch <= 0x39);
+			};
+		}
 
-#define FLUSH_RET() if (!Flush()) { return false; }
+		std::function<bool(char)> IsSeparator;
+		std::function<bool(char)> IsSpace;
+		std::function<bool(char)> IsNumber;
 
-		char Seekl = 0;
-		for (; Seekp != Endp; ++Seekp)
+		uint8 bProcessString : 1 = true;
+
+		bool Process(std::span<const uint8> Input, std::function<bool(std::string_view, size_t, size_t)> Processor)
 		{
-			char Seekc = *Seekp;
+			const uint8* Seekp = Input.data();
+			const uint8* Endp = Seekp + Input.size_bytes();
 
-			if (bString)
+			bool bString = false;
+			bool bSpecial = false;
+			std::vector<char> CharBuf;
+			CharBuf.reserve(256);
+
+			size_t Pos = 0;
+			size_t Line = 1;
+
+			auto Flush = [&]()
 			{
-				if (Seekc == '\\')
+				if (CharBuf.size() == 0)
 				{
-					bSpecial = true;
+					return true;
+				}
+
+				std::string_view Sv(CharBuf.data(), CharBuf.size());
+				if (!Processor(Sv, Line, Pos))
+				{
+					return false;
+				}
+
+				CharBuf.resize(0);
+				return true;
+			};
+
+	#define FLUSH_RET() if (!Flush()) { return false; }
+
+			char Seekl = 0;
+			for (; Seekp != Endp; ++Seekp)
+			{
+				char Seekc = *Seekp;
+
+				if (bString)
+				{
+					if (Seekc == '\\')
+					{
+						bSpecial = true;
+					}
+					else
+					{
+						CharBuf.emplace_back(Seekc);
+
+						if (Seekc == '\"' && !bSpecial)
+						{
+							bString = false;
+
+							if (!Flush())
+							{
+								return false;
+							}
+						}
+
+						bSpecial = false;
+					}
 				}
 				else
 				{
-					CharBuf.emplace_back(Seekc);
-
-					if (Seekc == '\"' && !bSpecial)
+					if (Seekc == '\"' && bProcessString)
 					{
-						bString = false;
-
 						if (!Flush())
 						{
 							return false;
 						}
-					}
 
-					bSpecial = false;
-				}
-			}
-			else
-			{
-				if (Seekc == '\"' && bProcessString)
-				{
-					if (!Flush())
-					{
-						return false;
+						CharBuf.emplace_back('\"');
+						bString = true;
+						bSpecial = false;
 					}
-
-					CharBuf.emplace_back('\"');
-					bString = true;
-					bSpecial = false;
-				}
-				else
-				{
-					if (IsSpace(Seekc))
+					else
 					{
-						FLUSH_RET();
-						goto CONTINUE;
-					}
+						if (IsSpace(Seekc))
+						{
+							FLUSH_RET();
+							goto CONTINUE;
+						}
 #define FLUSH2_RET() FLUSH_RET(); CharBuf.emplace_back(Seekc); FLUSH_RET();
-					else if (Seekc == '.')
-					{
-						if (!IsNumber(Seekl))
+						else if (Seekc == '.')
+						{
+							if (!IsNumber(Seekl))
+							{
+								FLUSH2_RET();
+								goto CONTINUE;
+							}
+						}
+						else if (Seekc == '-')
+						{
+							if (Seekp + 1 == Endp || !IsNumber(*(Seekp + 1)))
+							{
+								FLUSH2_RET();
+								goto CONTINUE;
+							}
+						}
+						else if (IsSeparator(Seekc))
 						{
 							FLUSH2_RET();
 							goto CONTINUE;
 						}
-					}
-					else if (Seekc == '-')
-					{
-						if (Seekp + 1 == Endp || !IsNumber(*(Seekp + 1)))
-						{
-							FLUSH2_RET();
-							goto CONTINUE;
-						}
-					}
-					else if (IsSeparator(Seekc))
-					{
-						FLUSH2_RET();
-						goto CONTINUE;
-					}
 #undef FLUSH2_RET
 
-					CharBuf.emplace_back(Seekc);
+						CharBuf.emplace_back(Seekc);
+					}
 				}
-			}
 
-		CONTINUE:
-			Pos += 1;
-			if (Seekc == '\n')
-			{
-				Line += 1;
-				Pos = 0;
-			}
+			CONTINUE:
+				Pos += 1;
+				if (Seekc == '\n')
+				{
+					Line += 1;
+					Pos = 0;
+				}
 
-			Seekl = Seekc;
-		}
+				Seekl = Seekc;
+			}
 
 #undef FLUSH_RET
 
-		return true;
-	}
-};
+			return true;
+		}
+	};
+}

@@ -18,7 +18,8 @@ public class ASP : ModuleRule
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "CoreSObject"
+            "CoreSObject",
+            "Sockets"
         });
     }
 }

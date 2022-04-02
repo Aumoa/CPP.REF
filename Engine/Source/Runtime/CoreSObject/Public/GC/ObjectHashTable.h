@@ -4,63 +4,66 @@
 
 #include <vector>
 
-class SObject;
-
-class CORESOBJECT_API ObjectHashTable
+namespace libty::inline Core
 {
-	std::vector<SObject*> Collection;
-	std::vector<size_t> IndexPool;
-	size_t IndexPoolSize = 0;
-	size_t NumPoolCompact = 0;
+	class SObject;
 
-public:
-	inline ObjectHashTable()
+	class CORESOBJECT_API ObjectHashTable
 	{
-	}
+		std::vector<SObject*> Collection;
+		std::vector<size_t> IndexPool;
+		size_t IndexPoolSize = 0;
+		size_t NumPoolCompact = 0;
 
-	SObject*& Emplace(SObject* InObject);
-	void Remove(SObject* InObject);
+	public:
+		inline ObjectHashTable()
+		{
+		}
 
-	inline size_t NumObjects() const
-	{
-		return Collection.size() - (IndexPoolSize - NumPoolCompact);
-	}
+		SObject*& Emplace(SObject* InObject);
+		void Remove(SObject* InObject);
 
-	inline SObject* Get(size_t IndexOf) const
-	{
-		return Collection[IndexOf];
-	}
+		inline size_t NumObjects() const
+		{
+			return Collection.size() - (IndexPoolSize - NumPoolCompact);
+		}
 
-	inline void Set(size_t IndexOf, SObject* Value)
-	{
-		Collection[IndexOf] = Value;
-	}
+		inline SObject* Get(size_t IndexOf) const
+		{
+			return Collection[IndexOf];
+		}
 
-	inline void Clear()
-	{
-		Collection.clear();
-		IndexPool.clear();
-	}
+		inline void Set(size_t IndexOf, SObject* Value)
+		{
+			Collection[IndexOf] = Value;
+		}
 
-	size_t TableSize() const
-	{
-		return Collection.size();
-	}
+		inline void Clear()
+		{
+			Collection.clear();
+			IndexPool.clear();
+		}
 
-	void CompactIndexTable(size_t LiveIndex, std::vector<SObject*>& PendingKill);
+		size_t TableSize() const
+		{
+			return Collection.size();
+		}
 
-	[[nodiscard]] inline auto size() const
-	{
-		return NumObjects();
-	}
+		void CompactIndexTable(size_t LiveIndex, std::vector<SObject*>& PendingKill);
 
-	[[nodiscard]] inline auto begin() const
-	{
-		return Collection.begin();
-	}
+		[[nodiscard]] inline auto size() const
+		{
+			return NumObjects();
+		}
 
-	[[nodiscard]] inline auto end() const
-	{
-		return Collection.end();
-	}
-};
+		[[nodiscard]] inline auto begin() const
+		{
+			return Collection.begin();
+		}
+
+		[[nodiscard]] inline auto end() const
+		{
+			return Collection.end();
+		}
+	};
+}

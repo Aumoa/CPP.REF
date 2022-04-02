@@ -5,7 +5,7 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogSystem.h"
 #include "Misc/TickCalc.h"
-#include "Threading/Parallel.h"
+#include "Threading/Tasks/Parallel.h"
 #include "GC/GC.h"
 #include "GC/WeakPtr.h"
 #include "Reflection/Type.h"
@@ -13,12 +13,18 @@
 #include "Reflection/MethodInfo.h"
 #include "Reflection/MethodInfoMetadataGenerator.Impl.h"
 
+using namespace libty;
+using namespace libty::Reflection;
+
 static std::tuple<> EmptyAttributes = std::make_tuple();
-extern SAssembly CoreSObject_AssemblyInfo;
+namespace libty::inline Generated::Assemblies
+{
+	extern SAssembly CoreSObject_AssemblyInfo;
+}
 
 SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator
 	::GenerateManaged<"SObject"[0], SObject>(
-		FriendlyName, L"SObject", &CoreSObject_AssemblyInfo, EmptyAttributes
+		FriendlyName, L"SObject", &libty::Assemblies::CoreSObject_AssemblyInfo, EmptyAttributes
 	)
 );
 

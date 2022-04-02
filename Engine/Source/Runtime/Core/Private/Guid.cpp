@@ -7,6 +7,8 @@
 #include <string>
 #include <cstring>
 
+using namespace libty;
+
 std::wstring Guid::ToString() const
 {
 	const _InternalPad& iPad = *reinterpret_cast<const _InternalPad*>(_data4.data());

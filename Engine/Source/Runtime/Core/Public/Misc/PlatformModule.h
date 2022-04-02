@@ -4,35 +4,38 @@
 
 #include <filesystem>
 
-class CORE_API PlatformModule
+namespace libty::inline Core::inline Misc
 {
-private:
-	template<class TRet, class... TArgs>
-	using FunctionPointer = TRet(*)(TArgs...);
-
-private:
-	void* NativeHandle = nullptr;
-	std::wstring ModuleName;
-
-public:
-	PlatformModule(const std::filesystem::path& InModulePath);
-	~PlatformModule() noexcept;
-
-	std::wstring ToString();
-	bool IsValid() const;
-
-	template<class TFunction>
-	TFunction* GetFunctionPointer(std::string_view FunctionName) const
+	class CORE_API PlatformModule
 	{
-		return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(FunctionName));
-	}
+	private:
+		template<class TRet, class... TArgs>
+		using FunctionPointer = TRet(*)(TArgs...);
 
-	template<class TRet, class... TArgs>
-	FunctionPointer<TRet, TArgs...> GetFunctionPointer(std::string_view FunctionName) const
-	{
-		return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
-	}
+	private:
+		void* NativeHandle = nullptr;
+		std::wstring ModuleName;
 
-private:
-	FunctionPointer<void> InternalGetFunctionPointer(std::string_view FunctionName) const;
-};
+	public:
+		PlatformModule(const std::filesystem::path& InModulePath);
+		~PlatformModule() noexcept;
+
+		std::wstring ToString();
+		bool IsValid() const;
+
+		template<class TFunction>
+		TFunction* GetFunctionPointer(std::string_view FunctionName) const
+		{
+			return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(FunctionName));
+		}
+
+		template<class TRet, class... TArgs>
+		FunctionPointer<TRet, TArgs...> GetFunctionPointer(std::string_view FunctionName) const
+		{
+			return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
+		}
+
+	private:
+		FunctionPointer<void> InternalGetFunctionPointer(std::string_view FunctionName) const;
+	};
+}

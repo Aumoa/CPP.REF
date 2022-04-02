@@ -15,6 +15,8 @@
 #include <Windows.h>
 #endif
 
+using namespace libty;
+
 LogCategory::LogCategory(std::wstring_view CategoryName)
 	: CategoryName(CategoryName)
 {

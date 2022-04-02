@@ -4,6 +4,8 @@
 #include "Object.h"
 #include "CoreAssert.h"
 
+using namespace libty;
+
 SObject*& ObjectHashTable::Emplace(SObject* InObject)
 {
 	checkf(InObject->InternalIndex == -1, L"Internal object hash value is not valid.");

@@ -2,10 +2,13 @@
 
 #pragma once
 
-enum class ELogVerbosity
+namespace libty::inline Core::inline Diagnostics
 {
-	Error,
-	Warning,
-	Info,
-	Verbose,
-};
+	enum class ELogVerbosity
+	{
+		Error,
+		Warning,
+		Info,
+		Verbose,
+	};
+}

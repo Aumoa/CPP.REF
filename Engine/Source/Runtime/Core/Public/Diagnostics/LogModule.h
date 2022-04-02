@@ -7,36 +7,42 @@
 #include <future>
 #include "Delegates/MulticastEvent.h"
 
-class Thread;
-
-class CORE_API LogModule
+namespace libty::inline Core::inline Threading
 {
-	using This = LogModule;
+	class Thread;
+}
 
-private:
-	std::wstring ModuleName;
-	Thread* WorkerThread = nullptr;
-	std::atomic<bool> bRunning;
-	std::ofstream LogFile;
+namespace libty::inline Core::inline Diagnostics
+{
+	class CORE_API LogModule
+	{
+		using This = LogModule;
 
-	struct Storage;
-	Storage* Impl = nullptr;
+	private:
+		std::wstring ModuleName;
+		Thread* WorkerThread = nullptr;
+		std::atomic<bool> bRunning;
+		std::ofstream LogFile;
 
-public:
-	LogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);
-	~LogModule();
+		struct Storage;
+		Storage* Impl = nullptr;
 
-	void RunTask();
-	void Shutdown();
-	void EnqueueLogMessage(std::wstring_view Message);
-	bool IsRunning();
+	public:
+		LogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);
+		~LogModule();
 
-	static LogModule* Get();
+		void RunTask();
+		void Shutdown();
+		void EnqueueLogMessage(std::wstring_view Message);
+		bool IsRunning();
 
-public:
-	DECLARE_MULTICAST_EVENT(LoggedEvent, std::wstring_view);
-	LoggedEvent Logged;
+		static LogModule* Get();
 
-private:
-	void Worker();
-};
+	public:
+		DECLARE_MULTICAST_EVENT(LoggedEvent, std::wstring_view);
+		LoggedEvent Logged;
+
+	private:
+		void Worker();
+	};
+}

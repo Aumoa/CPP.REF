@@ -2,5 +2,5 @@
 
 #include "ConsoleApplication.h"
 
-using TApplicationClass = SConsoleApplication;
+using TApplicationClass = libty::Windows::SConsoleApplication;
 #include "GuardedMain.inl"

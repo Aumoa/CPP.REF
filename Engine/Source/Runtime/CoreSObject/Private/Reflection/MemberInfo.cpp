@@ -2,6 +2,8 @@
 
 #include "Reflection/MemberInfo.h"
 
+using namespace libty::Reflection;
+
 SMemberInfo::SMemberInfo()
 	: Super()
 {

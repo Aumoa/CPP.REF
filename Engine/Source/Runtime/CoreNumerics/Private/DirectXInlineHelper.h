@@ -20,28 +20,28 @@ inline DirectX::XMVECTOR XMLoadVector3(const void* v)
 	return DirectX::XMLoadFloat3(float3);
 }
 
-inline Vector3 XMStoreVector3(DirectX::FXMVECTOR V)
+inline libty::Vector3 XMStoreVector3(DirectX::FXMVECTOR V)
 {
-	Vector3 float3;
+	libty::Vector3 float3;
 	DirectX::XMStoreFloat3((DirectX::XMFLOAT3*)&float3, V);
 	return float3;
 }
 
-inline Quaternion XMStoreQuaternion(DirectX::FXMVECTOR V)
+inline libty::Quaternion XMStoreQuaternion(DirectX::FXMVECTOR V)
 {
-	Quaternion q;
+	libty::Quaternion q;
 	DirectX::XMStoreFloat4((DirectX::XMFLOAT4*)&q, V);
 	return q;
 }
 
-inline DirectX::XMMATRIX XMLoadMatrix4x4(const Matrix4x4* m)
+inline DirectX::XMMATRIX XMLoadMatrix4x4(const libty::Matrix4x4* m)
 {
 	return DirectX::XMLoadFloat4x4((const DirectX::XMFLOAT4X4*)m);
 }
 
-inline Matrix4x4 XMStoreMatrix4x4(DirectX::FXMMATRIX M)
+inline libty::Matrix4x4 XMStoreMatrix4x4(DirectX::FXMMATRIX M)
 {
-	Matrix4x4 m;
+	libty::Matrix4x4 m;
 	DirectX::XMStoreFloat4x4((DirectX::XMFLOAT4X4*)&m, M);
 	return m;
 }

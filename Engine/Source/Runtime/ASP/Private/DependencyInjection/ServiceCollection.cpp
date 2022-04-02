@@ -2,8 +2,6 @@
 
 #include "DependencyInjection/ServiceCollection.h"
 
-GENERATE_BODY(libty::Asp::DependencyInjection::SServiceCollection);
-
 using namespace libty::Asp::DependencyInjection;
 
 SServiceCollection::SServiceCollection()

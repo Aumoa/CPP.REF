@@ -2,25 +2,29 @@
 
 #pragma once
 
+#include "PrimitiveTypes.h"
 #include <string>
 #include <string_view>
 #include <vector>
 #include <mutex>
 
-class CycleCounterUnit;
-
-class CORE_API CycleCounterNamespace
+namespace libty::inline Core::inline Diagnostics
 {
-	std::wstring Name;
-	std::wstring GroupName;
-	std::mutex Mtx;
-	std::vector<CycleCounterUnit*> Units;
+	class CycleCounterUnit;
 
-public:
-	CycleCounterNamespace(std::wstring_view Name, std::wstring_view GroupName);
+	class CORE_API CycleCounterNamespace
+	{
+		std::wstring Name;
+		std::wstring GroupName;
+		std::mutex Mtx;
+		std::vector<CycleCounterUnit*> Units;
 
-	std::wstring_view GetName() const;
+	public:
+		CycleCounterNamespace(std::wstring_view Name, std::wstring_view GroupName);
 
-	void Register(CycleCounterUnit* Unit);
-	std::wstring Trace();
-};
+		std::wstring_view GetName() const;
+
+		void Register(CycleCounterUnit* Unit);
+		std::wstring Trace();
+	};
+}

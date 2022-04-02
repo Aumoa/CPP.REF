@@ -2,6 +2,8 @@
 
 #include "IO/DirectoryReference.h"
 
+using namespace libty;
+
 DirectoryReference::DirectoryReference(const std::filesystem::path& filepath)
 	: FileSystemReference(filepath)
 {

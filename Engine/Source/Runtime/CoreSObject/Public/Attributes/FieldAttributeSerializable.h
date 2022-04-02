@@ -5,10 +5,13 @@
 #include "CoreMinimal.h"
 #include "FieldAttribute.h"
 
-class CORESOBJECT_API SFieldAttributeSerializable : public SFieldAttribute
+namespace Attributes::inline Core
 {
-	GENERATED_BODY(SFieldAttributeSerializable);
+	class CORESOBJECT_API SFieldAttributeSerializable : public ::libty::Core::Attributes::SFieldAttribute
+	{
+		GENERATED_BODY(SFieldAttributeSerializable);
 
-public:
-	SFieldAttributeSerializable();
-};
+	public:
+		SFieldAttributeSerializable();
+	};
+}

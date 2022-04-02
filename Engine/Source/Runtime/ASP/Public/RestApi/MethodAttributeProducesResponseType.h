@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "Web/HttpStatusCode.h"
 
-namespace libty::Asp::inline RestApi
+namespace Attributes::inline libty::inline Asp
 {
-	class ASP_API SMethodAttributeProducesResponseType : public SMethodAttribute
+	class ASP_API SMethodAttributeProducesResponseType : public ::libty::SMethodAttribute
 	{
 		GENERATED_BODY(SMethodAttributeProducesResponseType);
 
 	private:
-		EHttpStatusCode _statusCode;
+		::libty::Sockets::EHttpStatusCode _statusCode;
 
 	public:
-		SMethodAttributeProducesResponseType(EHttpStatusCode statusCode);
+		SMethodAttributeProducesResponseType(::libty::Sockets::EHttpStatusCode statusCode);
 
-		EHttpStatusCode GetProducesCode();
+		::libty::Sockets::EHttpStatusCode GetProducesCode();
 	};
 }

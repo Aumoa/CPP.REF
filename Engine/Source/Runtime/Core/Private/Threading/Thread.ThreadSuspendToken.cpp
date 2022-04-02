@@ -4,6 +4,8 @@
 #include "Misc/Exceptions.h"
 #include "Misc/String.h"
 
+using namespace libty;
+
 Thread::ThreadSuspendToken::ThreadSuspendToken(Thread* CurrentThread)
 	: CurrentThread(CurrentThread)
 {

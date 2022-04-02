@@ -4,28 +4,31 @@
 
 #include "CoreConcepts.h"
 
-class SObject;
-
-namespace libty::Core::Reflection
+namespace libty::inline Core
 {
-	namespace Details
+	class SObject;
+
+	namespace Reflection
 	{
+		namespace Details
+		{
+			template<class T>
+			struct RemoveObjectPointer
+			{
+				using Type = T;
+			};
+
+			template<std::derived_from<SObject> T>
+			struct RemoveObjectPointer<T*>
+			{
+				using Type = T;
+			};
+		}
+
 		template<class T>
-		struct RemoveObjectPointer
-		{
-			using Type = T;
-		};
+		using RemoveObjectPointer_t = typename Details::RemoveObjectPointer<T>::Type;
 
-		template<std::derived_from<SObject> T>
-		struct RemoveObjectPointer<T*>
-		{
-			using Type = T;
-		};
+		template<class T>
+		concept IEnum = std::is_enum_v<typename T::__Tag__>;
 	}
-
-	template<class T>
-	using RemoveObjectPointer_t = typename Details::RemoveObjectPointer<T>::Type;
-
-	template<class T>
-	concept IEnum = std::is_enum_v<typename T::__Tag__>;
 }

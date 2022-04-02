@@ -5,10 +5,13 @@
 #include "Object.h"
 #include "Misc/CommandLine.h"
 
-class SConsoleApplication : virtual public SObject
+namespace libty::inline Windows
 {
-	GENERATED_BODY(SConsoleApplication)
+	class SConsoleApplication : virtual public SObject
+	{
+		GENERATED_BODY(SConsoleApplication)
 
-public:
-	static int32 GuardedMain(std::span<const std::wstring> Argv);
-};
+	public:
+		static int32 GuardedMain(std::span<const std::wstring> Argv);
+	};
+}

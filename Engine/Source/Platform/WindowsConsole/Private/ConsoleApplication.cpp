@@ -11,7 +11,8 @@
 #include "GC/SharedPtr.h"
 #include <chrono>
 
-GENERATE_BODY(SConsoleApplication);
+using namespace ::libty;
+using namespace ::libty::Console;
 
 int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 {

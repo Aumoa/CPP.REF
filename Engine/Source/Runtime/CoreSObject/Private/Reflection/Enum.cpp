@@ -3,6 +3,8 @@
 #include "Reflection/Enum.h"
 #include "Reflection/Type.h"
 
+using namespace libty::Reflection;
+
 bool SEnum::TryParse(SType* type, std::wstring_view format, SObject*& result)
 {
 	if (!type->IsEnum())

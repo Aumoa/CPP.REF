@@ -14,6 +14,8 @@
 #include <iostream>
 #include <syncstream>
 
+using namespace libty;
+
 static LogModule* gModule;
 
 struct LogModule::Storage

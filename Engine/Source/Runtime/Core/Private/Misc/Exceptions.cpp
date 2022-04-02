@@ -7,6 +7,8 @@
 
 DEFINE_LOG_CATEGORY(LogException);
 
+using namespace libty;
+
 fatal_exception::fatal_exception(std::string_view message, const std::source_location& src)
 	: _message(message)
 	, _src(src)

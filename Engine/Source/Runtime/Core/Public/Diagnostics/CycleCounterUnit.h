@@ -7,45 +7,48 @@
 #include <string>
 #include <atomic>
 
-class CycleCounterNamespace;
-
-class CORE_API CycleCounterUnit
+namespace libty::inline Core::inline Diagnostics
 {
-	CycleCounterNamespace* Namespace;
-	std::wstring Name;
-	std::array<float, 1024> Stats;
-	std::atomic<size_t> NumStats = 0;
+	class CycleCounterNamespace;
 
-public:
-	class Instance
+	class CORE_API CycleCounterUnit
 	{
-		friend class CycleCounterUnit;
-
-		CycleCounterUnit* Source;
-		size_t Index;
-		ScopedTimer<Instance> Timer;
-
-		Instance(CycleCounterUnit* Source, size_t Index)
-			: Source(Source)
-			, Index(Index % Source->Stats.size())
-			, Timer(this, &Instance::Report)
-		{
-		}
+		CycleCounterNamespace* Namespace;
+		std::wstring Name;
+		std::array<float, 1024> Stats;
+		std::atomic<size_t> NumStats = 0;
 
 	public:
-		~Instance() = default;
-
-	private:
-		void Report(float Time)
+		class Instance
 		{
-			Source->Stats[Index] = Time;
-		}
+			friend class CycleCounterUnit;
+
+			CycleCounterUnit* Source;
+			size_t Index;
+			ScopedTimer<Instance> Timer;
+
+			Instance(CycleCounterUnit* Source, size_t Index)
+				: Source(Source)
+				, Index(Index% Source->Stats.size())
+				, Timer(this, &Instance::Report)
+			{
+			}
+
+		public:
+			~Instance() = default;
+
+		private:
+			void Report(float Time)
+			{
+				Source->Stats[Index] = Time;
+			}
+		};
+
+	public:
+		CycleCounterUnit(CycleCounterNamespace* NamespacePtr, std::wstring_view Name);
+
+		Instance GetScopedTimer();
+		std::wstring GetName();
+		float GetAverageTime();
 	};
-
-public:
-	CycleCounterUnit(CycleCounterNamespace* NamespacePtr, std::wstring_view Name);
-
-	Instance GetScopedTimer();
-	std::wstring GetName();
-	float GetAverageTime();
-};
+}

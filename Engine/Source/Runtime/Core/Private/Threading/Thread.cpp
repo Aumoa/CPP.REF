@@ -4,6 +4,8 @@
 #include "Misc/PlatformMacros.h"
 #include "Misc/String.h"
 
+using namespace libty;
+
 #if PLATFORM_WINDOWS
 #include <Windows.h>
 #undef GetObject

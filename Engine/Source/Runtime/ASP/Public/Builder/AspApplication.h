@@ -25,6 +25,7 @@ namespace libty::Asp::inline Builder
 		friend class SAspApplicationBuilder;
 
 	private:
+		SPROPERTY(_controllers)
 		std::vector<SControllerBase*> _controllers;
 
 	private:

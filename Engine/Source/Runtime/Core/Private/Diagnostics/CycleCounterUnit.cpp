@@ -3,6 +3,8 @@
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Diagnostics/CycleCounterNamespace.h"
 
+using namespace libty;
+
 CycleCounterUnit::CycleCounterUnit(CycleCounterNamespace* Namespace, std::wstring_view Name)
 	: Namespace(Namespace)
 	, Name(Name)

@@ -10,192 +10,195 @@
 #include <span>
 #include <map>
 
-class CommandLine
+namespace libty::inline Core::inline Misc
 {
-private:
-	std::wstring _source;
-	std::map<std::wstring, std::vector<std::wstring>, std::less<>> _keyValuePairs;
-
-public:
-	template<class TChar>
-	CommandLine(size_t argc, TChar* const* argv)
+	class CommandLine
 	{
-		std::vector<std::basic_string_view<TChar>> args(argc);
-		for (size_t i = 0; i < args.size(); ++i)
-		{
-			args[i] = argv[i];
-		}
+	private:
+		std::wstring _source;
+		std::map<std::wstring, std::vector<std::wstring>, std::less<>> _keyValuePairs;
 
-		DoParse<TChar>(args);
-	}
-
-	template<class TList>
-	CommandLine(const TList& args) requires
-		IString<EnumerableItem_t<TList>, StringChar_t<EnumerableItem_t<TList>>>
-	{
-		using String_t = EnumerableItem_t<TList>;
-		using Char_t = StringChar_t<String_t>;
-
-		if constexpr (std::same_as<EnumerableItem_t<TList>, std::basic_string_view<Char_t>>)
+	public:
+		template<class TChar>
+		CommandLine(size_t argc, TChar* const* argv)
 		{
-			// Is span convertible. Just pass.
-			DoParse<Char_t>(args);
-		}
-		else
-		{
-			std::vector<std::basic_string_view<Char_t>> args_sv(args.size());
+			std::vector<std::basic_string_view<TChar>> args(argc);
 			for (size_t i = 0; i < args.size(); ++i)
 			{
-				args_sv[i] = std::basic_string_view<Char_t>(args[i]);
+				args[i] = argv[i];
 			}
-			DoParse<Char_t>(args_sv);
-		}
-	}
 
-	bool ContainsKey(std::wstring_view key) const
-	{
-		return _keyValuePairs.contains(key);
-	}
-
-	bool TryGetValue(std::wstring_view key, std::span<const std::wstring>& outValues) const
-	{
-		if (auto it = _keyValuePairs.find(key); it != _keyValuePairs.end())
-		{
-			outValues = it->second;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	bool TryGetValue(std::wstring_view key, std::wstring& outValues) const
-	{
-		if (std::span<const std::wstring> values; TryGetValue(key, values) && values.size() > 0)
-		{
-			outValues = values[0];
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-private:
-	template<class TChar>
-	void DoParse(std::span<const std::basic_string_view<TChar>> args)
-	{
-		using TNakedChar = std::remove_const_t<TChar>;
-
-		static constexpr bool bWstr = std::same_as<TNakedChar, wchar_t>;
-		using StringView_t = std::basic_string_view<TNakedChar>;
-
-		StringView_t currKey;
-		std::vector<std::wstring> values;
-
-		char stringCtxKey = 0;
-		std::wstring stringCtxAppend;
-
-		StringView_t doublehyphen;
-		if constexpr (bWstr)
-		{
-			doublehyphen = L"--";
-		}
-		else
-		{
-			doublehyphen = "--";
+			DoParse<TChar>(args);
 		}
 
-		auto flushAll = [&]()
+		template<class TList>
+		CommandLine(const TList& args) requires
+			IString<EnumerableItem_t<TList>, StringChar_t<EnumerableItem_t<TList>>>
 		{
-			std::vector<std::wstring> clone;
-			std::swap(clone, values);
+			using String_t = EnumerableItem_t<TList>;
+			using Char_t = StringChar_t<String_t>;
 
+			if constexpr (std::same_as<EnumerableItem_t<TList>, std::basic_string_view<Char_t>>)
+			{
+				// Is span convertible. Just pass.
+				DoParse<Char_t>(args);
+			}
+			else
+			{
+				std::vector<std::basic_string_view<Char_t>> args_sv(args.size());
+				for (size_t i = 0; i < args.size(); ++i)
+				{
+					args_sv[i] = std::basic_string_view<Char_t>(args[i]);
+				}
+				DoParse<Char_t>(args_sv);
+			}
+		}
+
+		bool ContainsKey(std::wstring_view key) const
+		{
+			return _keyValuePairs.contains(key);
+		}
+
+		bool TryGetValue(std::wstring_view key, std::span<const std::wstring>& outValues) const
+		{
+			if (auto it = _keyValuePairs.find(key); it != _keyValuePairs.end())
+			{
+				outValues = it->second;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		bool TryGetValue(std::wstring_view key, std::wstring& outValues) const
+		{
+			if (std::span<const std::wstring> values; TryGetValue(key, values) && values.size() > 0)
+			{
+				outValues = values[0];
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+	private:
+		template<class TChar>
+		void DoParse(std::span<const std::basic_string_view<TChar>> args)
+		{
+			using TNakedChar = std::remove_const_t<TChar>;
+
+			static constexpr bool bWstr = std::same_as<TNakedChar, wchar_t>;
+			using StringView_t = std::basic_string_view<TNakedChar>;
+
+			StringView_t currKey;
+			std::vector<std::wstring> values;
+
+			char stringCtxKey = 0;
+			std::wstring stringCtxAppend;
+
+			StringView_t doublehyphen;
 			if constexpr (bWstr)
 			{
-				auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
-				if (!emplaced.second)
-				{
-					throw invalid_operation(String::Format(L"Duplicated command line key({}).", currKey));
-				}
+				doublehyphen = L"--";
 			}
 			else
 			{
-				auto wCurrKey = String::AsUnicode(currKey);
-				auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
-				if (!emplaced.second)
-				{
-					throw invalid_operation(String::Format(L"Duplicated command line key({}).", wCurrKey));
-				}
+				doublehyphen = "--";
 			}
-		};
 
-		for (size_t i = 1; i < args.size(); ++i)
-		{
-			auto sView = StringView_t(args[i]);
-
-			if (stringCtxKey == 0 && sView.starts_with(doublehyphen))
+			auto flushAll = [&]()
 			{
-				if (!currKey.empty())
-				{
-					flushAll();
-				}
+				std::vector<std::wstring> clone;
+				std::swap(clone, values);
 
-				currKey = sView.substr(2);
-				stringCtxAppend = L"";
-			}
-			else
-			{
-				if (stringCtxKey == 0)
+				if constexpr (bWstr)
 				{
-					if (sView.length() > 0 && (sView[0] == '\"' || sView[0] == '\'' || sView[0] == '`'))
+					auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
+					if (!emplaced.second)
 					{
-						stringCtxKey = (char)sView[0];
-						sView = sView.substr(1);
+						throw invalid_operation(String::Format(L"Duplicated command line key({}).", currKey));
 					}
-					else
+				}
+				else
+				{
+					auto wCurrKey = String::AsUnicode(currKey);
+					auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
+					if (!emplaced.second)
 					{
-						if constexpr (bWstr)
+						throw invalid_operation(String::Format(L"Duplicated command line key({}).", wCurrKey));
+					}
+				}
+			};
+
+			for (size_t i = 1; i < args.size(); ++i)
+			{
+				auto sView = StringView_t(args[i]);
+
+				if (stringCtxKey == 0 && sView.starts_with(doublehyphen))
+				{
+					if (!currKey.empty())
+					{
+						flushAll();
+					}
+
+					currKey = sView.substr(2);
+					stringCtxAppend = L"";
+				}
+				else
+				{
+					if (stringCtxKey == 0)
+					{
+						if (sView.length() > 0 && (sView[0] == '\"' || sView[0] == '\'' || sView[0] == '`'))
 						{
-							values.emplace_back(sView);
+							stringCtxKey = (char)sView[0];
+							sView = sView.substr(1);
 						}
 						else
 						{
-							values.emplace_back(ANSI_TO_WCHAR(sView));
+							if constexpr (bWstr)
+							{
+								values.emplace_back(sView);
+							}
+							else
+							{
+								values.emplace_back(ANSI_TO_WCHAR(sView));
+							}
+						}
+					}
+
+					if (stringCtxKey != 0)
+					{
+						size_t last = sView.length() - 1;
+						if (last != -1 && (sView[last] == stringCtxKey))
+						{
+							stringCtxKey = 0;
+							sView = sView.substr(0, sView.length() - 1);
+						}
+
+						if constexpr (bWstr)
+						{
+							stringCtxAppend += sView;
+						}
+						else
+						{
+							stringCtxAppend += Cast<std::wstring>(sView);
+						}
+
+						if (stringCtxKey == 0)
+						{
+							std::wstring clone;
+							std::swap(clone, stringCtxAppend);
+							values.emplace_back(std::move(clone));
 						}
 					}
 				}
-
-				if (stringCtxKey != 0)
-				{
-					size_t last = sView.length() - 1;
-					if (last != -1 && (sView[last] == stringCtxKey))
-					{
-						stringCtxKey = 0;
-						sView = sView.substr(0, sView.length() - 1);
-					}
-
-					if constexpr (bWstr)
-					{
-						stringCtxAppend += sView;
-					}
-					else
-					{
-						stringCtxAppend += Cast<std::wstring>(sView);
-					}
-
-					if (stringCtxKey == 0)
-					{
-						std::wstring clone;
-						std::swap(clone, stringCtxAppend);
-						values.emplace_back(std::move(clone));
-					}
-				}
 			}
-		}
 
-		flushAll();
-	}
-};
+			flushAll();
+		}
+	};
+}

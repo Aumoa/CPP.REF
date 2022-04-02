@@ -15,12 +15,12 @@ namespace libty::Asp::inline RestApi
 	private:
 		SPROPERTY(_response);
 		SObject* _response = nullptr;
-		EHttpStatusCode _statusCode;
+		Sockets::EHttpStatusCode _statusCode;
 
 	protected:
-		SObjectResult(SObject* object, EHttpStatusCode statusCode);
+		SObjectResult(SObject* object, Sockets::EHttpStatusCode statusCode);
 
-		virtual EHttpStatusCode GetStatusCode();
+		virtual Sockets::EHttpStatusCode GetStatusCode();
 		virtual SObject* GetValue();
 	};
 }

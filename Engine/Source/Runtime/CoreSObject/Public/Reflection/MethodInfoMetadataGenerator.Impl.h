@@ -8,7 +8,7 @@
 #include "ValueType.h"
 #include "Misc/String.h"
 
-namespace libty::Core::Reflection
+namespace libty::inline Core::Reflection
 {
 	template<class TOwningClass, class TReturnType, class... TArgs, class... TAttributeCollection, size_t... Idx>
 	MethodInfoMetadataGenerator MethodInfoMetadataGenerator::Generate

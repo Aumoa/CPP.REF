@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-namespace libty::Asp::inline RestApi
+namespace Attributes::inline libty::inline Asp
 {
-	class ASP_API SMethodAttributeHttpGet : public SMethodAttribute
+	class ASP_API SMethodAttributeHttpGet : public ::libty::SMethodAttribute
 	{
 		GENERATED_BODY(SMethodAttributeHttpGet);
 

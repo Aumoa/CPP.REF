@@ -3,6 +3,8 @@
 #include "Diagnostics/CycleCounter.h"
 #include "Diagnostics/CycleCounterNamespace.h"
 
+using namespace libty;
+
 void CycleCounter::Register(CycleCounterNamespace* Namespace)
 {
 	Namespaces.emplace(Namespace->GetName(), Namespace);

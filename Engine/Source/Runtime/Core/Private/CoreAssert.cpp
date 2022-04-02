@@ -7,17 +7,19 @@
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogCategory.h"
 
+using namespace libty;
+
 void CoreAssert::Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location)
 {
 	if (msg.empty())
 	{
-		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})",
+		LogSystem::Log(location, LogCategories::LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})",
 			String::AsUnicode(exp)
 		);
 	}
 	else
 	{
-		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})\n{}",
+		LogSystem::Log(location, LogCategories::LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})\n{}",
 			String::AsUnicode(exp),
 			msg
 		);

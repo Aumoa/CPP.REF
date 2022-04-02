@@ -7,6 +7,8 @@
 #include <utility>
 #include <tuple>
 
+namespace libty::inline CoreNumerics::inline VectorInterface
+{
 #define VECTOR_SCALARS_CONSTEXPR_CTORS \
 	constexpr VectorScalarsImpl(const T& S = 0) : Scalars{} \
 	{ \
@@ -15,7 +17,7 @@
 			Scalars[i] = S; \
 		} \
 	} \
- \
+	\
 	constexpr VectorScalarsImpl(const VectorScalarsImpl& Impl) \
 	{ \
 		for (size_t i = 0; i < Count; ++i) \
@@ -23,7 +25,7 @@
 			Scalars[i] = Impl.Scalars[i]; \
 		} \
 	} \
- \
+	\
 	template<class... TArgs> \
 	constexpr VectorScalarsImpl(const TArgs&... Args) \
 		requires (sizeof...(TArgs) >= Count) && \
@@ -31,7 +33,7 @@
 		: VectorScalarsImpl(std::make_tuple(Args...), std::make_index_sequence<Count>{}) \
 	{ \
 	} \
- \
+	\
 private: \
 	template<class TTuple, size_t... Indexes> \
 	constexpr VectorScalarsImpl(TTuple&& Args, std::index_sequence<Indexes...>&&) \
@@ -40,27 +42,27 @@ private: \
 	{ \
 	}
 
-template<class T, size_t N>
-struct VectorScalarsImpl
-{
-	static_assert(N != 0, "!(N == 0)");
-
-	static constexpr size_t Count = N;
-	
-	union
+	template<class T, size_t N>
+	struct VectorScalarsImpl
 	{
-		T Scalars[Count];
-		struct
-		{
-			T X;
-			T Y;
-			T Z;
-			T W;
-		};
-	};
+		static_assert(N != 0, "!(N == 0)");
 
-	VECTOR_SCALARS_CONSTEXPR_CTORS;
-};
+		static constexpr size_t Count = N;
+
+		union
+		{
+			T Scalars[Count];
+			struct
+			{
+				T X;
+				T Y;
+				T Z;
+				T W;
+			};
+		};
+
+		VECTOR_SCALARS_CONSTEXPR_CTORS;
+	};
 
 #define DECLARE_VECTOR_SCALARS_IMPL(ScalarsCount, Members)	\
 template<class T>											\
@@ -80,9 +82,10 @@ struct VectorScalarsImpl<T, ScalarsCount>					\
 	VECTOR_SCALARS_CONSTEXPR_CTORS;							\
 }
 
-DECLARE_VECTOR_SCALARS_IMPL(1, T X;);
-DECLARE_VECTOR_SCALARS_IMPL(2, T X; T Y;);
-DECLARE_VECTOR_SCALARS_IMPL(3, T X; T Y; T Z;);
+	DECLARE_VECTOR_SCALARS_IMPL(1, T X;);
+	DECLARE_VECTOR_SCALARS_IMPL(2, T X; T Y;);
+	DECLARE_VECTOR_SCALARS_IMPL(3, T X; T Y; T Z;);
 
 #undef DECLARE_VECTOR_SCALARS_IMPL
 #undef VECTOR_SCALARS_CONSTEXPR_CTORS
+}

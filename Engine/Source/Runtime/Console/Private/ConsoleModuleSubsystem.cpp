@@ -2,7 +2,8 @@
 
 #include "ConsoleModuleSubsystem.h"
 
-GENERATE_BODY(SConsoleModuleSubsystem);
+using namespace libty;
+using namespace libty::Console;
 
 SConsoleModuleSubsystem::SConsoleModuleSubsystem() : Super()
 {

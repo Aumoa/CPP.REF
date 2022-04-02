@@ -3,6 +3,8 @@
 #include "WindowsStackTrace.h"
 #include <iostream>
 
+using namespace libty;
+
 class SymbolScopeInstaller
 {
 	HANDLE hProcess;

@@ -2,6 +2,8 @@
 
 #include "Threading/SuspendTokenCollection.h"
 
+using namespace libty;
+
 std::set<ISuspendToken*> SuspendTokenCollection::_tokens;
 std::mutex SuspendTokenCollection::_lock;
 

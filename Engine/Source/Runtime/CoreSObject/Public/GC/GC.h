@@ -11,120 +11,84 @@
 #include "Misc/TickCalc.h"
 #include "Delegates/MulticastEvent.h"
 
-class SObject;
-class GarbageCollector;
-class Thread;
-class SFieldInfo;
-
-CORESOBJECT_API extern GarbageCollector& GC;
-
-template<class T>
-concept IsGCClass = requires
+namespace libty::inline Core
 {
-	{ std::remove_reference_t<std::remove_pointer_t<T>>::StaticClass() };
-};
+	class SObject;
 
-template<class TTupleClass>
-struct NumGCTypes
-{
-	static constexpr size_t Value = 0;
-};
-
-template<template<class...> class TTupleClass, class TTupleType, class... TTupleTypes>
-class NumGCTypes<TTupleClass<TTupleType, TTupleTypes...>>
-{
-	static consteval size_t GetImpl()
+	namespace Reflection
 	{
-		constexpr bool Test = IsGCClass<TTupleType>;
-		if constexpr (sizeof...(TTupleTypes) == 0)
-		{
-			return Test ? 1 : 0;
-		}
-		else
-		{
-			return (Test ? 1 : 0) + NumGCTypes<TTupleClass<TTupleTypes...>>::GetImpl();
-		}
+		class SFieldInfo;
 	}
 
-public:
-	static constexpr size_t Value = GetImpl();
-};
+	class CORESOBJECT_API GarbageCollector
+	{
+	public:
+		using This = GarbageCollector;
+		class Instantiate;
+		class ScopedTimer;
 
-template<class T>
-concept IsMutableCollection = requires (T & Collection)
-{
-	{ *Collection.begin() = {} };
-};
+		friend class libty::Core::SObject;
+		friend class libty::Core::Reflection::SFieldInfo;
 
-class CORESOBJECT_API GarbageCollector
-{
-public:
-	using This = GarbageCollector;
-	class Instantiate;
-	class ScopedTimer;
+	private:
+		std::mutex GCMtx;
 
-	template<class T>
-	friend class GCRoot;
-	friend class SObject;
-	friend class Thread;
-	friend class Type;
+		ObjectHashTable Objects;
+		std::set<SObject*> Roots;
+		uint64 Generation = 0;
+		std::vector<SObject*> PendingKill;
+		std::future<void> DeleteAction;
+		std::optional<std::vector<Reflection::SFieldInfo*>> StaticRoots;
 
-private:
-	std::mutex GCMtx;
+		std::future<void> GCThread;
+		std::atomic<bool> bRunningGCThread;
 
-	ObjectHashTable Objects;
-	std::set<SObject*> Roots;
-	uint64 Generation = 0;
-	std::vector<SObject*> PendingKill;
-	std::future<void> DeleteAction;
-	std::optional<std::vector<SFieldInfo*>> StaticRoots;
+	private:
+		// lock-free buffers.
+		static constexpr size_t NumGCThreads = 16;
+		std::vector<int32> GCMarkingBuffer;
+		std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers = { };
 
-	std::future<void> GCThread;
-	std::atomic<bool> bRunningGCThread;
+		TickCalc<> GCTimer;
+		float FlushInterval = 60.0f;
+		float TimeElapsed = 0.0f;
+		std::atomic<bool> bGCTrigger = false;
 
-private:
-	// lock-free buffers.
-	static constexpr size_t NumGCThreads = 16;
-	std::vector<int32> GCMarkingBuffer;
-	std::array<std::array<SObject*, 1024>, NumGCThreads> GCThreadBuffers = { };
+	private:
+		GarbageCollector() = default;
+		~GarbageCollector();
 
-	TickCalc<> GCTimer;
-	float FlushInterval = 60.0f;
-	float TimeElapsed = 0.0f;
-	std::atomic<bool> bGCTrigger = false;
+	private:
+		void RegisterObject(SObject* Object);
+		void UnregisterObject(SObject* Object);
 
-private:
-	GarbageCollector() = default;
-	~GarbageCollector();
+	public:
+		void Init();
+		void Shutdown(bool bNormal);
 
-private:
-	void RegisterObject(SObject* Object);
-	void UnregisterObject(SObject* Object);
+	public:
+		void Collect(bool bFullPurge = false);
+		void SuppressFinalize(SObject* Object);
 
-public:
-	void Init();
-	void Shutdown(bool bNormal);
+		void Hint();
+		void TriggerCollect();
 
-public:
-	void Collect(bool bFullPurge = false);
-	void SuppressFinalize(SObject* Object);
+		size_t NumObjects();
 
-	void Hint();
-	void TriggerCollect();
+		void SetFlushInterval(float InSeconds);
+		float GetFlushInterval();
 
-	size_t NumObjects();
+	public:
+		static GarbageCollector& Get();
 
-	void SetFlushInterval(float InSeconds);
-	float GetFlushInterval();
+	public:
+		DECLARE_MULTICAST_EVENT(GCEvent);
+		GCEvent PreGarbageCollect;
+		GCEvent PostGarbageCollect;
 
-public:
-	static GarbageCollector& Get();
+	private:
+		int32 MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth);
+	};
 
-public:
-	DECLARE_MULTICAST_EVENT(GCEvent);
-	GCEvent PreGarbageCollect;
-	GCEvent PostGarbageCollect;
-
-private:
-	int32 MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth);
-};
+	CORESOBJECT_API extern GarbageCollector& GC;
+}

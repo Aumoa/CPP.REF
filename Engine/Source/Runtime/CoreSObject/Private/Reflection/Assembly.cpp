@@ -2,6 +2,9 @@
 
 #include "Reflection/Assembly.h"
 
+using namespace libty;
+using namespace libty::Reflection;
+
 SAssembly::SAssembly(std::string_view assemblyName)
 	: _assemblyName(String::AsUnicode(assemblyName))
 {

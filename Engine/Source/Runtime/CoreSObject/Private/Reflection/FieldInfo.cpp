@@ -5,6 +5,9 @@
 #include "Reflection/Type.h"
 #include "Attributes/FieldAttribute.h"
 
+using namespace libty;
+using namespace libty::Reflection;
+
 SFieldInfo::SFieldInfo(MetadataGenerator&& generator)
 	: Super()
 	, _meta(std::move(generator))

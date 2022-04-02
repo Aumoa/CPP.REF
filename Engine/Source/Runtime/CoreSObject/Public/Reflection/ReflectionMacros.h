@@ -6,54 +6,59 @@
 #include <tuple>
 #include <iostream>
 
-class SType;
-class SObject;
-
-namespace libty::Core::Reflection
+namespace libty::inline Core
 {
-	template<class T>
-	struct SuperClassTypeDeclare
+	class SObject;
+	class SType;
+
+	namespace Reflection
 	{
-	private:
-		template<class U> requires requires { typename U::This; }
-		static auto Impl(int) -> decltype(std::declval<typename U::This>());
+		class SAssembly;
 
-		template<class U> requires (!requires { typename U::This; })
-		static auto Impl(short) -> void;
-
-	public:
-		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
-	};
-
-	template<class... TInterfaces>
-	class InterfaceCollector : virtual public TInterfaces...
-	{
-	public:
 		template<class T>
-		struct InterfaceCollection_t
+		struct SuperClassTypeDeclare
 		{
-			template<class U> requires requires { std::declval<typename U::InterfaceCollection>(); }
-			static auto Declare(int) -> typename U::InterfaceCollection;
+		private:
+			template<class U> requires requires { typename U::This; }
+			static auto Impl(int) -> decltype(std::declval<typename U::This>());
 
-			template<class U>
-			static auto Declare(short) -> std::tuple<>;
+			template<class U> requires (!requires { typename U::This; })
+			static auto Impl(short) -> void;
 
-			using Type = decltype(Declare<T>(0));
+		public:
+			using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
 		};
 
-		virtual SType* GetType() const override
+		template<class... TInterfaces>
+		class InterfaceCollector : virtual public TInterfaces...
 		{
-			return (TInterfaces::SObject::TypeId, ...);
-		}
+		public:
+			template<class T>
+			struct InterfaceCollection_t
+			{
+				template<class U> requires requires { std::declval<typename U::InterfaceCollection>(); }
+				static auto Declare(int) -> typename U::InterfaceCollection;
 
-	public:
-		using InterfaceCollection = decltype(std::tuple_cat(std::declval<std::tuple<TInterfaces...>>(), std::declval<typename InterfaceCollection_t<TInterfaces>::Type>()...));
-	};
+				template<class U>
+				static auto Declare(short) -> std::tuple<>;
+
+				using Type = decltype(Declare<T>(0));
+			};
+
+			virtual SType* GetType() const override
+			{
+				return (TInterfaces::SObject::TypeId, ...);
+			}
+
+		public:
+			using InterfaceCollection = decltype(std::tuple_cat(std::declval<std::tuple<TInterfaces...>>(), std::declval<typename InterfaceCollection_t<TInterfaces>::Type>()...));
+		};
+	}
 }
 
-#define REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME(X) SClassAttribute ## X
-#define REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME(X) SFieldAttribute ## X
-#define REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME(X) SMethodAttribute ## X
+#define REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME(X) ::Attributes::SClassAttribute ## X
+#define REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME(X) ::Attributes::SFieldAttribute ## X
+#define REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME(X) ::Attributes::SMethodAttribute ## X
 
 #define GENERATED_BODY_DECLARE_REFLECTION_CHAINS() 											\
 	template<size_t _Line>																	\
@@ -88,25 +93,25 @@ namespace libty::Core::Reflection
 	static void REFLECTION_GetPropertyPointer(void*);
 
 #define GENERATED_BODY(Class, ...)															\
-	friend struct libty::Core::Reflection::TypeInfoMetadataGenerator;						\
-	friend struct libty::Core::Reflection::MethodInfoMetadataGenerator;						\
-	static consteval int32 __INTERNAL_AccessModifierChecker();								\
+	friend struct ::libty::Core::Reflection::TypeInfoMetadataGenerator;						\
+	friend struct ::libty::Core::Reflection::MethodInfoMetadataGenerator;					\
+	static consteval ::libty::int32 __INTERNAL_AccessModifierChecker();						\
 																							\
 public:																						\
-	using Super = typename libty::Core::Reflection::SuperClassTypeDeclare<Class>::Type;		\
+	using Super = typename ::libty::Core::Reflection::SuperClassTypeDeclare<Class>::Type;	\
 	using This = Class;																		\
 																							\
 	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
 																							\
 private:																					\
-	static SType StaticClass;																\
+	static ::libty::Core::SType StaticClass;												\
 	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
 		MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME, __VA_ARGS__)	\
 	));																						\
 																							\
 public:																						\
-	static inline SType* TypeId = &StaticClass;												\
-	SType* GetType() const																	\
+	static inline ::libty::Core::SType* TypeId = &StaticClass;								\
+	::libty::Core::SType* GetType() const													\
 	{																						\
 		return TypeId;																		\
 	}																						\
@@ -117,20 +122,26 @@ private:																					\
 private:
 
 #define GENERATE_BODY(Class, ...)															\
-namespace libty::Generator::Class															\
+namespace libty::inline Generated::Assemblies												\
+{																							\
+	extern ::libty::Core::Reflection::SAssembly SE_ASSEMBLY_INFO;							\
+}																							\
+																							\
+namespace libty::inline Generated::Class													\
 {																							\
 	inline constexpr bool __pred__															\
 		= ::libty::Core::Reflection::IInternalAccessModifierIsPublic<::Class>;				\
 }																							\
-extern SAssembly SE_ASSEMBLY_INFO;															\
-SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenerator			\
-	::GenerateManaged<(char)Class::FriendlyName[0], Class>(									\
-		Class::FriendlyName,																\
+																							\
+::libty::Core::SType Class::StaticClass =													\
+	::libty::Core::SType(::libty::Core::Reflection											\
+	::TypeInfoMetadataGenerator::GenerateManaged<(char)FriendlyName[0], ::Class>(			\
+		FriendlyName,																		\
 		L ## #Class,																		\
-		&SE_ASSEMBLY_INFO,																	\
+		&::libty::Generated::Assemblies::SE_ASSEMBLY_INFO,									\
 		AttributeCollection																	\
 	)																						\
-);
+);																							\
 
 #define SFUNCTION(FunctionName, ...)														\
 	template<size_t _Line> requires (_Line == __LINE__)										\
@@ -143,10 +154,13 @@ SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenera
 	static auto REFLECTION_GetFunctionPointer(int)											\
 	{																						\
 		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
-			MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME, __VA_ARGS__)\
+			MACRO_RECURSIVE_FOR_EACH_DOT(													\
+				REFLECTION_FOREACH_METHOD_ATTRIBUTE_NAME,									\
+				__VA_ARGS__																	\
+			)																				\
 		));																					\
-		static SMethodInfo MethodInfo = libty::Core::Reflection::MethodInfoMetadataGenerator\
-			::Generate(																		\
+		static ::libty::Core::Reflection::SMethodInfo MethodInfo = ::libty::Core::Reflection\
+			::MethodInfoMetadataGenerator::Generate(										\
 				&This::FunctionName,														\
 				#FunctionName,																\
 				AttributeCollection															\
@@ -165,15 +179,19 @@ SType Class::StaticClass = SType(libty::Core::Reflection::TypeInfoMetadataGenera
 	static auto REFLECTION_GetPropertyPointer(int)											\
 	{																						\
 		static std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(					\
-			MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME, __VA_ARGS__)\
+			MACRO_RECURSIVE_FOR_EACH_DOT(													\
+				REFLECTION_FOREACH_FIELD_ATTRIBUTE_NAME,									\
+				__VA_ARGS__																	\
+			)																				\
 		));																					\
-		static SFieldInfo FieldInfo = libty::Core::Reflection::FieldInfoMetadataGenerator	\
-		(																					\
-			&This::PropertyName,															\
-			#PropertyName,																	\
-			AttributeCollection																\
-		);																					\
+		static ::libty::Core::Reflection::SFieldInfo FieldInfo = ::libty::Core::Reflection	\
+			::FieldInfoMetadataGenerator													\
+			(																				\
+				&This::PropertyName,														\
+				#PropertyName,																\
+				AttributeCollection															\
+			);																				\
 		return &FieldInfo;																	\
 	}
 
-#define implements(...) public libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>
+#define implements(...) public ::libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>

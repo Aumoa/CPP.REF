@@ -5,39 +5,42 @@
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/TransformInterface/Quaternion.h"
 
-struct ObjectOrientedCube
+inline namespace libty::CoreNumerics
 {
-	Vector3 Center;
-	Vector3 Extent;
-	Quaternion Rotation;
-
-	constexpr ObjectOrientedCube()
+	struct ObjectOrientedCube
 	{
-	}
+		Vector3 Center;
+		Vector3 Extent;
+		Quaternion Rotation;
 
-	constexpr ObjectOrientedCube(const Vector3& C, const Vector3& E, const Quaternion& Q)
-		: Center(C)
-		, Extent(E)
-		, Rotation(Q)
-	{
-	}
-	
-	static constexpr bool NearlyEquals(const ObjectOrientedCube& OOL, const ObjectOrientedCube& OOR, float Epsilon)
-	{
-		return Vector<>::NearlyEquals(OOL.Center, OOR.Center, Epsilon)
-			&& Vector<>::NearlyEquals(OOL.Extent, OOR.Extent, Epsilon)
-			&& Vector<>::NearlyEquals(OOL.Rotation, OOR.Rotation, Epsilon);
-	}
+		constexpr ObjectOrientedCube()
+		{
+		}
 
-	static std::wstring ToString(const ObjectOrientedCube& OO, std::wstring_view FormatArgs = L"")
-	{
-		return String::Format(
-			L"Center: {}, Extent: {}, Rotation{}",
-			OO.Center.ToString(FormatArgs),
-			OO.Extent.ToString(FormatArgs),
-			OO.Rotation.ToString(FormatArgs)
-		);
-	}
+		constexpr ObjectOrientedCube(const Vector3& C, const Vector3& E, const Quaternion& Q)
+			: Center(C)
+			, Extent(E)
+			, Rotation(Q)
+		{
+		}
 
-	constexpr auto operator <=>(const ObjectOrientedCube& O) const = default;
-};
+		static constexpr bool NearlyEquals(const ObjectOrientedCube& OOL, const ObjectOrientedCube& OOR, float Epsilon)
+		{
+			return Vector<>::NearlyEquals(OOL.Center, OOR.Center, Epsilon)
+				&& Vector<>::NearlyEquals(OOL.Extent, OOR.Extent, Epsilon)
+				&& Vector<>::NearlyEquals(OOL.Rotation, OOR.Rotation, Epsilon);
+		}
+
+		static std::wstring ToString(const ObjectOrientedCube& OO, std::wstring_view FormatArgs = L"")
+		{
+			return String::Format(
+				L"Center: {}, Extent: {}, Rotation{}",
+				OO.Center.ToString(FormatArgs),
+				OO.Extent.ToString(FormatArgs),
+				OO.Rotation.ToString(FormatArgs)
+			);
+		}
+
+		constexpr auto operator <=>(const ObjectOrientedCube& O) const = default;
+	};
+}

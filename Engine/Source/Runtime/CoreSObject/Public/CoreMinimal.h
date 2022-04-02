@@ -36,8 +36,8 @@
 #include "Misc/String.h"
 #include "Misc/DateTime.h"
 #include "Misc/InputEnums.h"
-#include "Threading/Task.h"
-#include "Threading/TaskCompletionSource.h"
+#include "Threading/Tasks/Task.h"
+#include "Threading/Tasks/TaskCompletionSource.h"
 
 #include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 #include "Reflection/FieldInfoMetadataGenerator.Impl.h"

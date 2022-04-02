@@ -9,6 +9,8 @@
 #include <locale>
 #include <string>
 
+using namespace libty;
+
 class string_conversion_error : public std::exception
 {
 	std::string _message;

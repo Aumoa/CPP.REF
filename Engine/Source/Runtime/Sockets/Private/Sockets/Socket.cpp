@@ -5,9 +5,11 @@
 #include "Net/IPEndPoint.h"
 #include "CoreAssert.h"
 
-#if PLATFORM_WINDOWS
+using namespace libty;
+using namespace libty::Sockets;
+
 #include "Socket.Windows.inl"
-#endif
+#include "Socket.Linux.inl"
 
 inline int32 GetRawFamily(EAddressFamily Family)
 {
@@ -16,7 +18,7 @@ inline int32 GetRawFamily(EAddressFamily Family)
 	case EAddressFamily::InterNetwork:
 		return AF_INET;
 	default:
-		throw socket_exception(std::format("Unknown address family type({}).", (int32)Family));
+		throw socket_exception(String::Format("Unknown address family type({}).", (int32)Family));
 	}
 }
 
@@ -27,7 +29,7 @@ inline int32 GetRawSocketType(ESocketType SocketType)
 	case ESocketType::Stream:
 		return SOCK_STREAM;
 	default:
-		throw socket_exception(std::format("Unknown socket type({}).", (int32)SocketType));
+		throw socket_exception(String::Format("Unknown socket type({}).", (int32)SocketType));
 	}
 }
 
@@ -38,7 +40,7 @@ inline int32 GetRawProtocolType(EProtocolType ProtocolType)
 	case EProtocolType::TCP:
 		return IPPROTO_TCP;
 	default:
-		throw socket_exception(std::format("Unknown protocol type({}).", (int32)ProtocolType));
+		throw socket_exception(String::Format("Unknown protocol type({}).", (int32)ProtocolType));
 	}
 }
 
@@ -67,10 +69,11 @@ Socket::Socket(EAddressFamily Family, ESocketType SocketType, EProtocolType Prot
 	}
 
 	u_long NonBlockingMode = 1;
-	if (ioctlsocket(Impl->Socket, FIONBIO, &NonBlockingMode) == SOCKET_ERROR)
-	{
-		throw socket_exception("Couldn't create non-blocking socket.");
-	}
+	//if (ioctlsocket(Impl->Socket, FIONBIO, &NonBlockingMode) != 0)
+	//{
+	//	throw socket_exception("Couldn't create non-blocking socket.");
+	//}
+	throw not_implemented();
 }
 
 Socket::~Socket()
@@ -108,11 +111,12 @@ void Socket::Bind(const IPEndPoint& endpoint)
 
 void Socket::Close()
 {
-	if (closesocket(Impl->Socket) == SOCKET_ERROR)
-	{
-		throw socket_exception("Couldn't close socket. 'closesocket' function return SOCKET_ERROR.");
-	}
+	//if (closesocket(Impl->Socket) != 0)
+	//{
+	//	throw socket_exception("Couldn't close socket. 'closesocket' function return SOCKET_ERROR.");
+	//}
 
+	throw not_implemented();
 	Impl->bClosed = true;
 }
 
@@ -133,7 +137,7 @@ bool Socket::IsReadyToRead(std::chrono::microseconds Timeout)
 	timeval Timeval = MakeTimeval(Timeout);
 	int32 SocketAvailable = select(0, &ReadSet, nullptr, nullptr, &Timeval);
 
-	if (SocketAvailable == SOCKET_ERROR)
+	if (SocketAvailable != 0)
 	{
 		//AbortWithError(errno, L"IsReadyToRead()");
 		return true;
@@ -154,7 +158,7 @@ bool Socket::IsReadyToWrite(std::chrono::microseconds Timeout)
 	timeval Timeval = MakeTimeval(Timeout);
 	int32 SocketAvailable = select(0, nullptr, &WriteSet, nullptr, &Timeval);
 
-	if (SocketAvailable == SOCKET_ERROR)
+	if (SocketAvailable < 0)
 	{
 		//AbortWithError(errno, L"IsReadyToWrite()");
 		return true;

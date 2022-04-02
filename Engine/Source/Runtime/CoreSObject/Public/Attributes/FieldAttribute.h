@@ -4,10 +4,13 @@
 
 #include "Attribute.h"
 
-class CORESOBJECT_API SFieldAttribute : public SAttribute
+namespace libty::inline Core::inline Attributes
 {
-	GENERATED_BODY(SFieldAttribute);
+	class CORESOBJECT_API SFieldAttribute : public SAttribute
+	{
+		GENERATED_BODY(SFieldAttribute);
 
-public:
-	SFieldAttribute();
-};
+	public:
+		SFieldAttribute();
+	};
+}

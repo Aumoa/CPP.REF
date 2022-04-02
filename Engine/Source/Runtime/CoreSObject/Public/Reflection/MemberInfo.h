@@ -4,19 +4,22 @@
 
 #include "Object.h"
 
-/// <summary>
-/// Obtains information about the attributes of a member and provides access to member metadata.
-/// </summary>
-class CORESOBJECT_API SMemberInfo : virtual public SObject
+namespace libty::inline Core::Reflection
 {
-	GENERATED_BODY(SMemberInfo);
-
-protected:
-	SMemberInfo();
-
-public:
 	/// <summary>
-	/// Gets the name of current member.
+	/// Obtains information about the attributes of a member and provides access to member metadata.
 	/// </summary>
-	virtual std::wstring GetName() = 0;
-};
+	class CORESOBJECT_API SMemberInfo : virtual public SObject
+	{
+		GENERATED_BODY(SMemberInfo);
+
+	protected:
+		SMemberInfo();
+
+	public:
+		/// <summary>
+		/// Gets the name of current member.
+		/// </summary>
+		virtual std::wstring GetName() = 0;
+	};
+}

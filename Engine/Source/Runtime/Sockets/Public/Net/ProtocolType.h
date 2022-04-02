@@ -2,7 +2,11 @@
 
 #pragma once
 
-enum class EProtocolType
+#include "CoreMinimal.h"
+
+namespace libty::Sockets::inline Net
 {
-	TCP,
-};
+	SENUM(EProtocolType, int32,
+		TCP,
+	);
+}

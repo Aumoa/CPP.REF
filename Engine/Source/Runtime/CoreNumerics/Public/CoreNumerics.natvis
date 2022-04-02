@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="SObject">
-		<DisplayString>{{Type={CachedTypeName} InternalIndex={InternalIndex} bMarkAtGC={bMarkAtGC}}}</DisplayString>
-		<DisplayString Condition="InternalIndex==-1">[Disposed]</DisplayString>
-	</Type>
-	<Type Name="Type">
-		<DisplayString>{FriendlyName}</DisplayString>
-	</Type>
 	<Type Name="Vector&lt;*,*&gt;">
 		<DisplayString>{{Count={Size()}}}</DisplayString>
 		<Expand>

@@ -11,6 +11,6 @@ NetEngine* NetEngine::Get()
 
 void NetEngine::CreatePassiveSession()
 {
-	_passiveSession = Socket::NewTCPSocket();
-	_passiveSession.Bind(IPEndPoint(IPAddress::Any(), 11000));
+	//_passiveSession = Socket::NewTCPSocket();
+	//_passiveSession.Bind(IPEndPoint(IPAddress::Any(), 11000));
 }

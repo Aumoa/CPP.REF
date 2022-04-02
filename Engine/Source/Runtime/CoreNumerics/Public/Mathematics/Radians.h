@@ -7,171 +7,174 @@
 #include <string>
 #include <numbers>
 
-struct Degrees;
-
-/// <summary>
-/// Represents the radians value.
-/// </summary>
-struct Radians
+namespace libty::inline CoreNumerics::inline Mathematics
 {
-	float Value = 0;
+	struct Degrees;
 
 	/// <summary>
-	/// Initialize new <see cref="Radians"/> instance.
+	/// Represents the radians value.
 	/// </summary>
-	inline constexpr Radians()
+	struct Radians
 	{
-	}
+		float Value = 0;
 
-	/// <summary>
-	/// Initialize new <see cref="Radians"/> instance.
-	/// </summary>
-	/// <param name="value"> The initial value. </param>
-	inline constexpr Radians(float value) : Value(value)
-	{
-	}
-
-	/// <summary>
-	/// Get simple string represents this radians value.
-	/// </summary>
-	/// <param name="formatArgs"> The formatting args that use to String::Format. </param>
-	/// <returns> The simple string value. </returns>
-	inline std::wstring ToString(std::wstring_view formatArgs = L"") const
-	{
-		std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"rad";
-		return String::Format(placeholder, Value);
-	}
-
-	/// <summary>
-	/// Compare nearly equals to target radians with epsilon value.
-	/// </summary>
-	/// <param name="rhs"> The target radians. </param>
-	/// <param name="epsilon"> The epsilon value. If different of two components is lower than this values, is nearly equals. </param>
-	/// <returns> Indicate two radians is nearly equals. </returns>
-	inline constexpr bool NearlyEquals(const Radians& rhs, float epsilon) const
-	{
-		return MathEx::Abs(Value - rhs.Value) <= epsilon;
-	}
-
-	/// <summary>
-	/// Get clamped angle.
-	/// </summary>
-	/// <returns> The clamped value. </returns>
-	inline constexpr Radians GetClamped() const
-	{
-		return MathEx::Mod(Value, AngleMax);
-	}
-
-	/// <summary>
-	/// Get normalized angle.
-	/// </summary>
-	/// <returns> The normalized value. </returns>
-	inline constexpr Radians GetNormal() const
-	{
-		Radians clamped = GetClamped();
-		if (clamped.Value > AngleHalf)
+		/// <summary>
+		/// Initialize new <see cref="Radians"/> instance.
+		/// </summary>
+		inline constexpr Radians()
 		{
-			return clamped.Value - AngleMax;
 		}
-		else
+
+		/// <summary>
+		/// Initialize new <see cref="Radians"/> instance.
+		/// </summary>
+		/// <param name="value"> The initial value. </param>
+		inline constexpr Radians(float value) : Value(value)
 		{
-			return clamped;
 		}
-	}
 
-	/// <summary>
-	/// Convert radians to degrees.
-	/// </summary>
-	/// <returns> The degrees value. </returns>
-	inline constexpr Degrees ToDegrees() const;
+		/// <summary>
+		/// Get simple string represents this radians value.
+		/// </summary>
+		/// <param name="formatArgs"> The formatting args that use to String::Format. </param>
+		/// <returns> The simple string value. </returns>
+		inline std::wstring ToString(std::wstring_view formatArgs = L"") const
+		{
+			std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"rad";
+			return String::Format(placeholder, Value);
+		}
 
-	inline constexpr bool operator ==(const Radians& rhs) const
-	{
-		return Value == rhs.Value;
-	}
+		/// <summary>
+		/// Compare nearly equals to target radians with epsilon value.
+		/// </summary>
+		/// <param name="rhs"> The target radians. </param>
+		/// <param name="epsilon"> The epsilon value. If different of two components is lower than this values, is nearly equals. </param>
+		/// <returns> Indicate two radians is nearly equals. </returns>
+		inline constexpr bool NearlyEquals(const Radians& rhs, float epsilon) const
+		{
+			return MathEx::Abs(Value - rhs.Value) <= epsilon;
+		}
 
-	inline constexpr bool operator !=(const Radians& rhs) const
-	{
-		return Value != rhs.Value;
-	}
+		/// <summary>
+		/// Get clamped angle.
+		/// </summary>
+		/// <returns> The clamped value. </returns>
+		inline constexpr Radians GetClamped() const
+		{
+			return MathEx::Mod(Value, AngleMax);
+		}
 
-	inline constexpr auto operator <(const Radians& rhs) const
-	{
-		return Value < rhs.Value;
-	}
+		/// <summary>
+		/// Get normalized angle.
+		/// </summary>
+		/// <returns> The normalized value. </returns>
+		inline constexpr Radians GetNormal() const
+		{
+			Radians clamped = GetClamped();
+			if (clamped.Value > AngleHalf)
+			{
+				return clamped.Value - AngleMax;
+			}
+			else
+			{
+				return clamped;
+			}
+		}
 
-	inline constexpr auto operator <=(const Radians& rhs) const
-	{
-		return Value <= rhs.Value;
-	}
+		/// <summary>
+		/// Convert radians to degrees.
+		/// </summary>
+		/// <returns> The degrees value. </returns>
+		inline constexpr Degrees ToDegrees() const;
 
-	inline constexpr auto operator >(const Radians& rhs) const
-	{
-		return Value > rhs.Value;
-	}
+		inline constexpr bool operator ==(const Radians& rhs) const
+		{
+			return Value == rhs.Value;
+		}
 
-	inline constexpr auto operator >=(const Radians& rhs) const
-	{
-		return Value >= rhs.Value;
-	}
+		inline constexpr bool operator !=(const Radians& rhs) const
+		{
+			return Value != rhs.Value;
+		}
 
-	inline Radians& operator =(const Radians& rhs)
-	{
-		Value = rhs.Value;
-		return *this;
-	}
+		inline constexpr auto operator <(const Radians& rhs) const
+		{
+			return Value < rhs.Value;
+		}
 
-	inline Radians& operator +=(const Radians& rhs)
-	{
-		Value += rhs.Value;
-		return *this;
-	}
+		inline constexpr auto operator <=(const Radians& rhs) const
+		{
+			return Value <= rhs.Value;
+		}
 
-	inline Radians& operator -=(const Radians& rhs)
-	{
-		Value -= rhs.Value;
-		return *this;
-	}
+		inline constexpr auto operator >(const Radians& rhs) const
+		{
+			return Value > rhs.Value;
+		}
 
-	inline Radians& operator *=(const Radians& rhs)
-	{
-		Value *= rhs.Value;
-		return *this;
-	}
+		inline constexpr auto operator >=(const Radians& rhs) const
+		{
+			return Value >= rhs.Value;
+		}
 
-	inline Radians& operator /=(const Radians& rhs)
-	{
-		Value /= rhs.Value;
-		return *this;
-	}
+		inline Radians& operator =(const Radians& rhs)
+		{
+			Value = rhs.Value;
+			return *this;
+		}
 
-	inline constexpr Radians operator -() const
-	{
-		return Radians(-Value);
-	}
+		inline Radians& operator +=(const Radians& rhs)
+		{
+			Value += rhs.Value;
+			return *this;
+		}
 
-	inline constexpr Radians operator +(const Radians& rhs) const
-	{
-		return Radians(Value + rhs.Value);
-	}
+		inline Radians& operator -=(const Radians& rhs)
+		{
+			Value -= rhs.Value;
+			return *this;
+		}
 
-	inline constexpr Radians operator -(const Radians& rhs) const
-	{
-		return Radians(Value - rhs.Value);
-	}
+		inline Radians& operator *=(const Radians& rhs)
+		{
+			Value *= rhs.Value;
+			return *this;
+		}
 
-	inline constexpr Radians operator *(const Radians& rhs) const
-	{
-		return Radians(Value * rhs.Value);
-	}
+		inline Radians& operator /=(const Radians& rhs)
+		{
+			Value /= rhs.Value;
+			return *this;
+		}
 
-	inline constexpr Radians operator /(const Radians& rhs) const
-	{
-		return Radians(Value / rhs.Value);
-	}
+		inline constexpr Radians operator -() const
+		{
+			return Radians(-Value);
+		}
 
-private:
-	static constexpr float AngleHalf = std::numbers::pi_v<float>;
-	static constexpr float AngleMax = AngleHalf * 2.0f;
-	static constexpr float _180PI = 180.0f / std::numbers::pi_v<float>;
-};
+		inline constexpr Radians operator +(const Radians& rhs) const
+		{
+			return Radians(Value + rhs.Value);
+		}
+
+		inline constexpr Radians operator -(const Radians& rhs) const
+		{
+			return Radians(Value - rhs.Value);
+		}
+
+		inline constexpr Radians operator *(const Radians& rhs) const
+		{
+			return Radians(Value * rhs.Value);
+		}
+
+		inline constexpr Radians operator /(const Radians& rhs) const
+		{
+			return Radians(Value / rhs.Value);
+		}
+
+	private:
+		static constexpr float AngleHalf = std::numbers::pi_v<float>;
+		static constexpr float AngleMax = AngleHalf * 2.0f;
+		static constexpr float _180PI = 180.0f / std::numbers::pi_v<float>;
+	};
+}

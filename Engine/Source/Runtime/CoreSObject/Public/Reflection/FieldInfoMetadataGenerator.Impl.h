@@ -7,7 +7,7 @@
 #include "ReflectionTypeTraits.h"
 #include <array>
 
-namespace libty::Core::Reflection
+namespace libty::inline Core::Reflection
 {
 	template<class TMemberType, class TOwningClass, class... TAttributeCollection>
 	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes)

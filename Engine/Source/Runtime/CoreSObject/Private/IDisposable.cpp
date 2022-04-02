@@ -2,6 +2,8 @@
 
 #include "IDisposable.h"
 
+using namespace libty;
+
 IDisposable::IDisposable()
 {
 	SObject::bHasFinalizer = true;

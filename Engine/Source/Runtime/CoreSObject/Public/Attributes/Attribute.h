@@ -4,11 +4,14 @@
 
 #include "Object.h"
 
-class CORESOBJECT_API SAttribute : virtual public SObject
+namespace libty::inline Core::inline Attributes
 {
-	GENERATED_BODY(SAttribute);
+	class CORESOBJECT_API SAttribute : virtual public SObject
+	{
+		GENERATED_BODY(SAttribute);
 
-public:
-	SAttribute();
-	SAttribute(SAttribute&&) noexcept;
-};
+	public:
+		SAttribute();
+		SAttribute(SAttribute&&) noexcept;
+	};
+}

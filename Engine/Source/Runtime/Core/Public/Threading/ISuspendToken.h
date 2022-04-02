@@ -4,11 +4,14 @@
 
 #include <future>
 
-class CORE_API ISuspendToken
+namespace libty::inline Core::inline Threading
 {
-public:
-	virtual ~ISuspendToken() noexcept = default;
+	class CORE_API ISuspendToken
+	{
+	public:
+		virtual ~ISuspendToken() noexcept = default;
 
-	virtual std::future<void> Suspend() = 0;
-	virtual void Resume() = 0;
-};
+		virtual std::future<void> Suspend() = 0;
+		virtual void Resume() = 0;
+	};
+}

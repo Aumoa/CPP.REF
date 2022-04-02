@@ -6,36 +6,39 @@
 #include <functional>
 #include <map>
 
-class CORE_API TickScheduler
+namespace libty::inline Core::inline Misc
 {
-public:
-	struct TaskInfo
+	class CORE_API TickScheduler
 	{
-		std::function<void()> Task;
-		float Delay = 0;
-		float InitDelay = 0;
-		bool bReliableCallCount : 1 = false;
+	public:
+		struct TaskInfo
+		{
+			std::function<void()> Task;
+			float Delay = 0;
+			float InitDelay = 0;
+			bool bReliableCallCount : 1 = false;
+		};
+
+	private:
+		struct TickTaskInstance
+		{
+			float Delay = 0;
+			float ActualDelay = 0;
+			bool bReliableCallCount : 1 = false;
+
+			std::function<void()> Task;
+			std::function<bool()> Validator;
+		};
+
+		int64 Id = 0;
+		std::map<size_t, TickTaskInstance> Tasks;
+
+	public:
+		TickScheduler();
+
+		void Tick(float InDeltaTime);
+		int64 AddSchedule(const TaskInfo& TaskInfo);
+		int64 AddSchedule(std::function<bool()> InValidator, const TaskInfo& TaskInfo);
+		void RemoveSchedule(int64 TaskId);
 	};
-
-private:
-	struct TickTaskInstance
-	{
-		float Delay = 0;
-		float ActualDelay = 0;
-		bool bReliableCallCount : 1 = false;
-
-		std::function<void()> Task;
-		std::function<bool()> Validator;
-	};
-
-	int64 Id = 0;
-	std::map<size_t, TickTaskInstance> Tasks;
-
-public:
-	TickScheduler();
-
-	void Tick(float InDeltaTime);
-	int64 AddSchedule(const TaskInfo& TaskInfo);
-	int64 AddSchedule(std::function<bool()> InValidator, const TaskInfo& TaskInfo);
-	void RemoveSchedule(int64 TaskId);
-};
+}

@@ -2,7 +2,11 @@
 
 #pragma once
 
-enum class EAddressFamily
+#include "CoreMinimal.h"
+
+namespace libty::Sockets::inline Net
 {
-	InterNetwork,
-};
+	SENUM(EAddressFamily, int32,
+		InterNetwork,
+	);
+}

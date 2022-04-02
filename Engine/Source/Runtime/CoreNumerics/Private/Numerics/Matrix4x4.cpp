@@ -5,6 +5,8 @@
 #if PLATFORM_WINDOWS
 #include "DirectXInlineHelper.h"
 
+using namespace libty;
+
 float Matrix4x4::Determinant(const Matrix4x4& M)
 {
 	DirectX::XMMATRIX XM = XMLoadMatrix4x4(&M);

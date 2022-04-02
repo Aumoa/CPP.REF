@@ -3,23 +3,63 @@
 #pragma once
 
 #include "IPAddress.h"
+#include "NetUtility.h"
 
-struct SOCKETS_API IPEndPoint
+namespace libty::Sockets::inline Net
 {
-private:
-	uint16 NetPort;
+	struct SOCKETS_API IPEndPoint
+	{
+	private:
+		IPAddress _address;
+		uint16 _port;
 
-public:
-	IPAddress IP;
+	public:
+		constexpr IPEndPoint() noexcept
+			: _port(0)
+		{
+		}
 
-	IPEndPoint();
-	IPEndPoint(const IPAddress& IP, uint16 Port);
-	
-	void SetPort(uint16 InPort);
-	uint16 GetPort() const;
-	uint16 GetNetPort() const;
+		constexpr IPEndPoint(const IPAddress& addr, uint16 port)
+			: _address(addr)
+			, _port(port)
+		{
+		}
 
-	std::wstring ToString() const;
+		constexpr uint32 GetAddress() const
+		{
+			return _address.GetAddress();
+		}
 
-	static bool TryParse(std::wstring_view IPString, IPEndPoint* RefEndPoint);
-};
+		constexpr uint16 GetPort() const
+		{
+			return _port;
+		}
+
+		std::wstring ToString() const
+		{
+			return String::Format(L"{}:{}", _address, _port);
+		}
+
+		static IPEndPoint Parse(std::wstring_view epstr)
+		{
+			if (epstr.find(L':') != std::wstring_view::npos)
+			{
+				IPEndPoint ep;
+
+				std::vector<std::wstring> splits = String::Split(epstr , L":", true, true);
+				ep._address = IPAddress::Parse(splits[0]);
+				
+				int32 value = std::stoi(splits[1]);
+				if (value < 0 || value > 65535)
+				{
+					throw invalid_operation("Out of range detected while parsing port component. Value must between 0 ~ 65535.");
+				}
+
+				ep._port = (uint16)value;
+				return ep;
+			}
+
+			throw invalid_operation("Port is not specified.");
+		}
+	};
+}

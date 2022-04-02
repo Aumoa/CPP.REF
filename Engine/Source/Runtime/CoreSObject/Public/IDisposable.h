@@ -4,15 +4,18 @@
 
 #include "CoreMinimal.h"
 
-struct CORESOBJECT_API IDisposable : virtual public SObject
+namespace libty::inline Core
 {
-	GENERATED_BODY(IDisposable);
+	struct CORESOBJECT_API IDisposable : virtual public SObject
+	{
+		GENERATED_BODY(IDisposable);
 
-public:
-	virtual void Dispose() = 0;
-	virtual bool IsDisposed() = 0;
+	public:
+		virtual void Dispose() = 0;
+		virtual bool IsDisposed() = 0;
 
-protected:
-	// Special Interface Constructor.
-	IDisposable();
-};
+	protected:
+		// Special Interface Constructor.
+		IDisposable();
+	};
+}

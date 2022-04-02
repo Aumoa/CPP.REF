@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-namespace libty::Asp::inline Web
+namespace libty::Sockets::inline Web
 {
     SENUM(EHttpStatusCode, int32,
         Continue, 100,

@@ -9,7 +9,7 @@ class SOCKETS_API NetEngine
 	NetEngine() = default;
 
 private:
-	Socket _passiveSession;
+	//Socket _passiveSession;
 
 public:
 	static NetEngine* Get();

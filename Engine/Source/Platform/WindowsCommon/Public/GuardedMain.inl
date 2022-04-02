@@ -8,6 +8,8 @@
 #include "Diagnostics/LogModule.h"
 #include <iostream>
 
+using namespace libty;
+
 static int32 GReturn = 0;
 
 DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException)

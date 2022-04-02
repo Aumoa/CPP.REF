@@ -4,6 +4,8 @@
 #include "IO/DirectoryReference.h"
 #include "Misc/Exceptions.h"
 
+using namespace libty;
+
 FileSystemReference::FileSystemReference(const std::filesystem::path& filepath)
 	: _path(std::filesystem::absolute(filepath))
 {

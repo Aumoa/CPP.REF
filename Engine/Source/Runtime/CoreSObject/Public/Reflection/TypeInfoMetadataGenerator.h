@@ -6,14 +6,22 @@
 #include <vector>
 #include <functional>
 
-class SObject;
-class SClassAttribute;
-class SFieldInfo;
-class SMethodInfo;
-class SAssembly;
-
-namespace libty::Core::Reflection
+namespace libty::inline Core
 {
+	class SObject;
+
+	inline namespace Attributes
+	{
+		class SClassAttribute;
+	}
+}
+
+namespace libty::inline Core::Reflection
+{
+	class SFieldInfo;
+	class SMethodInfo;
+	class SAssembly;
+
 	template<class TOwningClass>
 	concept IInternalAccessModifierIsPublic = requires
 	{

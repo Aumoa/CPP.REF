@@ -4,16 +4,19 @@
 
 #include "Attribute.h"
 
-class CORESOBJECT_API SClassAttribute : public SAttribute
+namespace libty::inline Core::inline Attributes
 {
-	GENERATED_BODY(SClassAttribute);
+	class CORESOBJECT_API SClassAttribute : public SAttribute
+	{
+		GENERATED_BODY(SClassAttribute);
 
-private:
-	SType* _bindType = nullptr;
+	private:
+		SType* _bindType = nullptr;
 
-public:
-	SClassAttribute();
+	public:
+		SClassAttribute();
 
-	virtual void SetBindType(SType* bindType);
-	virtual SType* GetBindType();
-};
+		virtual void SetBindType(SType* bindType);
+		virtual SType* GetBindType();
+	};
+}

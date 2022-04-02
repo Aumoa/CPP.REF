@@ -8,26 +8,29 @@
 #include <string_view>
 #include <source_location>
 
-class CORE_API CoreAssert
+namespace libty::inline Core
 {
-public:
-	static void Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location = std::source_location::current());
-	static void Ensure(std::string_view exp, std::string_view msg, const std::source_location& location = std::source_location::current());
-	static void DebugBreak();
-};
+	class CORE_API CoreAssert
+	{
+	public:
+		static void Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location = std::source_location::current());
+		static void Ensure(std::string_view exp, std::string_view msg, const std::source_location& location = std::source_location::current());
+		static void DebugBreak();
+	};
+}
 
 #if DO_CHECK
 
 #define check(x) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw assert_exception(#x); \
+	throw ::libty::Core::Misc::assert_exception(#x); \
 }
 
 #define checkf(x, fmt, ...) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw assert_exception(#x, String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+	throw ::libty::Core::Misc::assert_exception(#x, ::libty::Core::Misc::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
 }
 
 #define ensure(x) \
@@ -35,11 +38,11 @@ if (const bool b = (bool)(x); !b) \
 {\
 	if (!b)\
 	{\
-		CoreAssert::Ensure(#x, "", location);\
+		::libty::Core::CoreAssert::Ensure(#x, "", location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
-			CoreAssert::DebugBreak();\
+			::libty::Core::CoreAssert::DebugBreak();\
 			bSwitchLocal = false;\
 		}\
 	}\
@@ -51,11 +54,11 @@ if (const bool b = (bool)(x); !b) \
 {\
 	if (!b)\
 	{\
-		CoreAssert::Ensure(#x, String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
+		::libty::Core::CoreAssert::Ensure(#x, ::libty::Core::Misc::String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
-			CoreAssert::DebugBreak();\
+			::libty::Core::CoreAssert::DebugBreak();\
 			bSwitchLocal = false;\
 		}\
 	}\

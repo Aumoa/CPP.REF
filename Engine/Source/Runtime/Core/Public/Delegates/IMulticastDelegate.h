@@ -2,11 +2,16 @@
 
 #pragma once
 
-class DelegateHandle;
+#include "PrimitiveTypes.h"
 
-class IMulticastDelegate
+namespace libty::inline Core::inline Delegates
 {
-public:
-	virtual ~IMulticastDelegate() noexcept = default;
-	virtual void Remove(DelegateHandle&) = 0;
-};
+	class DelegateHandle;
+
+	class IMulticastDelegate
+	{
+	public:
+		virtual ~IMulticastDelegate() noexcept = default;
+		virtual void Remove(DelegateHandle&) = 0;
+	};
+}

@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "GC/GC.h"
-#include "Threading/Parallel.h"
+#include "Threading/Tasks/Parallel.h"
 #include "Diagnostics/CycleCounterNamespace.h"
 #include "Diagnostics/CycleCounterUnit.h"
 #include "Diagnostics/CycleCounterMacros.h"
@@ -31,7 +31,9 @@ DECLARE_CYCLE_STAT("  PostCollect", STAT_PostCollect, STATGROUP_GC);
 DECLARE_CYCLE_STAT("  SuspendToken", STAT_SuspendToken, STATGROUP_GC);
 DECLARE_CYCLE_STAT("  ResumeToken", STAT_ResumeToken, STATGROUP_GC);
 
-GarbageCollector& GC = GarbageCollector::Get();
+using namespace libty;
+
+GarbageCollector& libty::Core::GC = GarbageCollector::Get();
 
 GarbageCollector::~GarbageCollector()
 {

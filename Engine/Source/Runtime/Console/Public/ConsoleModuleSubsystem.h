@@ -4,13 +4,16 @@
 
 #include "CoreMinimal.h"
 
-class CONSOLE_API SConsoleModuleSubsystem : virtual public SObject
+namespace libty::Console
 {
-	GENERATED_BODY(SConsoleModuleSubsystem);
+	class CONSOLE_API SConsoleModuleSubsystem : virtual public SObject
+	{
+		GENERATED_BODY(SConsoleModuleSubsystem);
 
-public:
-	SConsoleModuleSubsystem();
+	public:
+		SConsoleModuleSubsystem();
 
-	virtual void Init();
-	virtual void Deinit();
-};
+		virtual void Init();
+		virtual void Deinit();
+	};
+}

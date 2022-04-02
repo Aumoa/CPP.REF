@@ -13,7 +13,7 @@ struct Socket::SocketImpl
 	inline static WSADATA WSAData;
 	inline static std::mutex StaticMtx;
 
-	SOCKET Socket = 0;
+	SOCKET Socket = INVALID_SOCKET;
 	HANDLE hSockSendEvent = nullptr;
 	HANDLE hSockRecvEvent = nullptr;
 	bool bClosed = false;
@@ -246,8 +246,8 @@ private:
 	{
 		SOCKADDR_IN InAddr = {};
 		InAddr.sin_family = AF_INET;
-		InAddr.sin_addr.s_addr = EndPoint.IP.Address;
-		InAddr.sin_port = EndPoint.GetNetPort();
+		InAddr.sin_addr.s_addr = SNetUtility::HostToNetwork(EndPoint.GetAddress());
+		InAddr.sin_port = SNetUtility::HostToNetwork(EndPoint.GetPort());
 		return InAddr;
 	}
 

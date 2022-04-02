@@ -7,7 +7,8 @@
 #include "RestApi/MethodAttributeProducesResponseType.h"
 #include "Controllers/ClassAttributeRoute.h"
 
-using namespace libty::Asp;
+using namespace ::libty::Asp;
+using namespace ::Attributes;
 
 IServiceCollection* SServiceCollectionExtensions::AddControllers(IServiceCollection* collection)
 {

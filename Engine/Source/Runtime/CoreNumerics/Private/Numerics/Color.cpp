@@ -3,6 +3,8 @@
 #include "Numerics/VectorInterface/Color.h"
 #include <map>
 
+using namespace libty;
+
 static std::map<std::wstring_view, Color> gConvertTable =
 {
 	{ L"AliceBlue", NamedColors::AliceBlue },

@@ -8,77 +8,84 @@
 #include <vector>
 #include <functional>
 
-class SObject;
-class SFieldAttribute;
-class SType;
-
-namespace libty::Core::Reflection
+namespace libty::inline Core
 {
-	struct FieldInfoMetadataGenerator
+	class SObject;
+	class SType;
+
+	inline namespace Attributes
 	{
-		using SetterFunc = std::function<void(SObject* _This, SObject* _Value)>;
-		using GetterFunc = std::function<SObject*(SObject* _This)>;
-		using FieldAttributeCollection = std::vector<SFieldAttribute*>;
-		using NativeGCInvoke = std::function<void(SObject* _Obj)>;
-		using NativeGCCollection = std::function<void(SObject*, NativeGCInvoke&)>;
+		class SFieldAttribute;
+	}
 
-		std::wstring FieldName;
-		FieldAttributeCollection Attributes;
-		uint8 bIsConst : 1;
-		uint8 bIsStatic : 1;
-
-		SetterFunc Setter;
-		GetterFunc Getter;
-		SType* FieldType;
-		NativeGCCollection Collection;
-
-		template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-		FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
-
-		template<class TMemberType, class... TAttributeCollection>
-		FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
-
-		template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-		FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
-
-		template<class TMemberType, class... TAttributeCollection>
-		FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
-
-	private:
-		template<class TMemberType>
-		void SupportNativeObjectCollection(InheritSelector<2>&&) requires
-			IEnumerable<TMemberType, SObject*>;
-
-		template<class TMemberType>
-		void SupportNativeObjectCollection(InheritSelector<2>&&) requires
-			IDictionary<TMemberType, SObject*, SObject*>;
-
-		template<class TMemberType>
-		void SupportNativeObjectCollection(InheritSelector<1>&&) requires
-			IDictionary<TMemberType, DictionaryKey_t<TMemberType>, SObject*>;
-
-		template<class TMemberType>
-		void SupportNativeObjectCollection(InheritSelector<1>&&) requires
-			IDictionary<TMemberType, SObject*, DictionaryValue_t<TMemberType>>;
-
-		template<class TMemberType>
-		void SupportNativeObjectCollection(InheritSelector<1>&&) requires
-			IGenericTuple<TMemberType>;
-
-		template<class TMemberType>
-		void SupportNativeObjectCollection(InheritSelector<0>&&);
-
-	private:
-		template<class TMemberType, size_t... Idx>
-		void SupportNativeObjectCollectionTupleImpl(std::index_sequence<Idx...>&&);
-
-		template<class T>
-		SObject* MakeObjectPointerOrNull(T& value);
-
-		template<class... TAttributeCollection, size_t... Idx>
-		static std::vector<SFieldAttribute*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+	namespace Reflection
+	{
+		struct FieldInfoMetadataGenerator
 		{
-			return std::vector<SFieldAttribute*>{ (&std::get<Idx>(attributes))... };
-		}
-	};
+			using SetterFunc = std::function<void(SObject* _This, SObject* _Value)>;
+			using GetterFunc = std::function<SObject* (SObject* _This)>;
+			using FieldAttributeCollection = std::vector<SFieldAttribute*>;
+			using NativeGCInvoke = std::function<void(SObject* _Obj)>;
+			using NativeGCCollection = std::function<void(SObject*, NativeGCInvoke&)>;
+
+			std::wstring FieldName;
+			FieldAttributeCollection Attributes;
+			uint8 bIsConst : 1;
+			uint8 bIsStatic : 1;
+
+			SetterFunc Setter;
+			GetterFunc Getter;
+			SType* FieldType;
+			NativeGCCollection Collection;
+
+			template<class TMemberType, class TOwningClass, class... TAttributeCollection>
+			FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+
+			template<class TMemberType, class... TAttributeCollection>
+			FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+
+			template<class TMemberType, class TOwningClass, class... TAttributeCollection>
+			FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+
+			template<class TMemberType, class... TAttributeCollection>
+			FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+
+		private:
+			template<class TMemberType>
+			void SupportNativeObjectCollection(InheritSelector<2>&&) requires
+				IEnumerable<TMemberType, SObject*>;
+
+			template<class TMemberType>
+			void SupportNativeObjectCollection(InheritSelector<2>&&) requires
+				IDictionary<TMemberType, SObject*, SObject*>;
+
+			template<class TMemberType>
+			void SupportNativeObjectCollection(InheritSelector<1>&&) requires
+				IDictionary<TMemberType, DictionaryKey_t<TMemberType>, SObject*>;
+
+			template<class TMemberType>
+			void SupportNativeObjectCollection(InheritSelector<1>&&) requires
+				IDictionary<TMemberType, SObject*, DictionaryValue_t<TMemberType>>;
+
+			template<class TMemberType>
+			void SupportNativeObjectCollection(InheritSelector<1>&&) requires
+				IGenericTuple<TMemberType>;
+
+			template<class TMemberType>
+			void SupportNativeObjectCollection(InheritSelector<0>&&);
+
+		private:
+			template<class TMemberType, size_t... Idx>
+			void SupportNativeObjectCollectionTupleImpl(std::index_sequence<Idx...>&&);
+
+			template<class T>
+			SObject* MakeObjectPointerOrNull(T& value);
+
+			template<class... TAttributeCollection, size_t... Idx>
+			static std::vector<SFieldAttribute*> MakeVectorCollection(std::tuple<TAttributeCollection...>& attributes, std::index_sequence<Idx...>&&)
+			{
+				return std::vector<SFieldAttribute*>{ (&std::get<Idx>(attributes))... };
+			}
+		};
+	}
 }

@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::Core::Reflection
+namespace libty::inline Core::Reflection
 {
 	class GCNewBinder
 	{

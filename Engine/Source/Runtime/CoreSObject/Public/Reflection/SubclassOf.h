@@ -4,85 +4,88 @@
 
 #include "Type.h"
 
-template<class T>
-class SubclassOf
+namespace libty::inline Core
 {
-	template<class>
-	friend class SubclassOf;
-
-private:
-	SType* MyType = nullptr;
-
-public:
-	inline SubclassOf() = default;
-
-	inline SubclassOf(const SubclassOf& Rhs) : MyType(Rhs.MyType)
+	template<class T>
+	class SubclassOf
 	{
-	}
+		template<class>
+		friend class SubclassOf;
 
-	inline SubclassOf(SubclassOf&& Rhs) : MyType(Rhs.MyType)
-	{
-		Rhs.MyType = nullptr;
-	}
+	private:
+		SType* MyType = nullptr;
 
-	template<std::derived_from<T> U>
-	inline SubclassOf(const SubclassOf<U>& Rhs) : MyType(Rhs.MyType)
-	{
-	}
+	public:
+		inline SubclassOf() = default;
 
-	template<std::derived_from<T> U>
-	inline SubclassOf(SubclassOf<U>&& Rhs) : MyType(Rhs.MyType)
-	{
-		Rhs.MyType = nullptr;
-	}
+		inline SubclassOf(const SubclassOf& Rhs) : MyType(Rhs.MyType)
+		{
+		}
 
-	inline SubclassOf(SType* NewType) : MyType(NewType)
-	{
-		checkf(NewType == nullptr || NewType->IsDerivedFrom(typeof(T)), L"Couldn't convert super class.");
-	}
+		inline SubclassOf(SubclassOf&& Rhs) : MyType(Rhs.MyType)
+		{
+			Rhs.MyType = nullptr;
+		}
 
-	inline bool IsValid() const
-	{
-		return MyType != nullptr;
-	}
+		template<std::derived_from<T> U>
+		inline SubclassOf(const SubclassOf<U>& Rhs) : MyType(Rhs.MyType)
+		{
+		}
 
-	inline SType* Get()
-	{
-		return MyType;
-	}
+		template<std::derived_from<T> U>
+		inline SubclassOf(SubclassOf<U>&& Rhs) : MyType(Rhs.MyType)
+		{
+			Rhs.MyType = nullptr;
+		}
 
-	inline SubclassOf& operator =(const SubclassOf& Rhs)
-	{
-		MyType = Rhs.MyType;
-		return *this;
-	}
+		inline SubclassOf(SType* NewType) : MyType(NewType)
+		{
+			checkf(NewType == nullptr || NewType->IsDerivedFrom(typeof(T)), L"Couldn't convert super class.");
+		}
 
-	inline SubclassOf& operator =(SubclassOf&& Rhs)
-	{
-		MyType = Rhs.MyType;
-		Rhs.MyType = nullptr;
-		return *this;
-	}
+		inline bool IsValid() const
+		{
+			return MyType != nullptr;
+		}
 
-	template<std::derived_from<T> U>
-	inline SubclassOf& operator =(const SubclassOf<U>& Rhs)
-	{
-		MyType = Rhs.MyType;
-		return *this;
-	}
+		inline SType* Get()
+		{
+			return MyType;
+		}
 
-	template<std::derived_from<T> U>
-	inline SubclassOf& operator =(SubclassOf<U>&& Rhs)
-	{
-		MyType = Rhs.MyType;
-		Rhs.MyType = nullptr;
-		return *this;
-	}
+		inline SubclassOf& operator =(const SubclassOf& Rhs)
+		{
+			MyType = Rhs.MyType;
+			return *this;
+		}
 
-	inline auto operator ->() const { return MyType; }
-	inline auto operator *() const { return MyType; }
-	inline auto operator <=>(const SubclassOf& Rhs) const = default;
+		inline SubclassOf& operator =(SubclassOf&& Rhs)
+		{
+			MyType = Rhs.MyType;
+			Rhs.MyType = nullptr;
+			return *this;
+		}
 
-	inline operator bool() const { return IsValid(); }
-	inline operator SType* () const { return MyType; }
-};
+		template<std::derived_from<T> U>
+		inline SubclassOf& operator =(const SubclassOf<U>& Rhs)
+		{
+			MyType = Rhs.MyType;
+			return *this;
+		}
+
+		template<std::derived_from<T> U>
+		inline SubclassOf& operator =(SubclassOf<U>&& Rhs)
+		{
+			MyType = Rhs.MyType;
+			Rhs.MyType = nullptr;
+			return *this;
+		}
+
+		inline auto operator ->() const { return MyType; }
+		inline auto operator *() const { return MyType; }
+		inline auto operator <=>(const SubclassOf& Rhs) const = default;
+
+		inline operator bool() const { return IsValid(); }
+		inline operator SType* () const { return MyType; }
+	};
+}

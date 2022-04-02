@@ -12,25 +12,33 @@
 #include <string_view>
 #include <source_location>
 
-class LogCategory;
-
-/// <summary>
-/// Provide logging functions.
-/// </summary>
-class CORE_API LogSystem
+namespace libty::inline Core::inline Diagnostics
 {
-	using This = LogSystem;
+	class LogCategory;
 
-public:
-	template<class... TArgs>
-	static void Log(const std::source_location& Location, LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
+	/// <summary>
+	/// Provide logging functions.
+	/// </summary>
+	class CORE_API LogSystem
 	{
-		std::wstring Message = String::Format(Format, std::forward<TArgs>(Args)...);
-		InternalLog(Category, LogVerbosity, Message, Location);
-	}
+		using This = LogSystem;
 
-private:
-	static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message, const std::source_location& Location = std::source_location::current());
-};
+	public:
+		template<class... TArgs>
+		static void Log(const std::source_location& Location, LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
+		{
+			std::wstring Message = String::Format(Format, std::forward<TArgs>(Args)...);
+			InternalLog(Category, LogVerbosity, Message, Location);
+		}
 
-#define SE_LOG(Category, Verbosity, Format, ...) LogSystem::Log(std::source_location::current(), Category, ELogVerbosity::Verbosity, Format __VA_OPT__(,) __VA_ARGS__)
+	private:
+		static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message, const std::source_location& Location = std::source_location::current());
+	};
+}
+
+#define SE_LOG(Category, Verbosity, Format, ...) ::libty::LogSystem::Log( \
+	std::source_location::current(), \
+	::libty::Generated::LogCategories::Category, \
+	::libty::ELogVerbosity::Verbosity, \
+	Format __VA_OPT__(,) __VA_ARGS__ \
+)
