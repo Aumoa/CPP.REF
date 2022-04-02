@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ActionResult.h"
-#include "HttpStatusCode.h"
+#include "Web/HttpStatusCode.h"
 
 namespace libty::Asp::inline RestApi
 {

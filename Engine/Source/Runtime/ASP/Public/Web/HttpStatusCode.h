@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-namespace libty::Asp::inline RestApi
+namespace libty::Asp::inline Web
 {
     SENUM(EHttpStatusCode, int32,
         Continue, 100,

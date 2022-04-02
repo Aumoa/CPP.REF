@@ -2,8 +2,6 @@
 
 #include "RestApi/MethodAttributeProducesResponseType.h"
 
-GENERATE_BODY(libty::Asp::RestApi::SMethodAttributeProducesResponseType);
-
 using namespace libty::Asp;
 
 SMethodAttributeProducesResponseType::SMethodAttributeProducesResponseType(EHttpStatusCode statusCode)

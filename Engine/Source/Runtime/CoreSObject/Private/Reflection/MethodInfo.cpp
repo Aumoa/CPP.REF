@@ -2,10 +2,7 @@
 
 #include "Reflection/MethodInfo.h"
 #include "Reflection/MethodInfoMetadataGenerator.Impl.h"
-#include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 #include "Attributes/MethodAttribute.h"
-
-GENERATE_BODY(SMethodInfo);
 
 SMethodInfo::SMethodInfo(MetadataGenerator&& generator)
 	: Super()

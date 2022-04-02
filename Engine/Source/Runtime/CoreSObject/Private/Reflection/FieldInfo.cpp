@@ -1,11 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Reflection/FieldInfo.h"
+#include "Reflection/FieldInfoMetadataGenerator.Impl.h"
 #include "Reflection/Type.h"
-#include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 #include "Attributes/FieldAttribute.h"
-
-GENERATE_BODY(SFieldInfo);
 
 SFieldInfo::SFieldInfo(MetadataGenerator&& generator)
 	: Super()

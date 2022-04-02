@@ -3,12 +3,9 @@
 #include "DependencyInjection/ServiceCollectionExtensions.h"
 #include "DependencyInjection/IServiceCollection.h"
 #include "Controllers/ControllerBase.h"
-
 #include "RestApi/MethodAttributeHttpGet.h"
 #include "RestApi/MethodAttributeProducesResponseType.h"
 #include "Controllers/ClassAttributeRoute.h"
-
-GENERATE_BODY(libty::Asp::DependencyInjection::SServiceCollectionExtensions);
 
 using namespace libty::Asp;
 
@@ -40,19 +37,15 @@ IServiceCollection* SServiceCollectionExtensions::AddControllers(IServiceCollect
 
 			for (auto& method : controllerClass->GetMethods())
 			{
-				SE_LOG(LogTemp, Verbose, L"==");
-
 				for (auto& attr : method->GetAttributes())
 				{
 					if (attr->GetType()->IsA<SMethodAttributeHttpGet>())
 					{
 						auto* ptr = Cast<SMethodAttributeHttpGet>(attr);
-						SE_LOG(LogTemp, Verbose, L"Find API route: {0}", concatPath(baseRoute, ptr->GetRoute()));
 					}
 					else if (attr->GetType()->IsA<SMethodAttributeProducesResponseType>())
 					{
 						auto* ptr = Cast<SMethodAttributeProducesResponseType>(attr);
-						SE_LOG(LogTemp, Verbose, L"Is can response with {}", ptr->GetProducesCode().ToString());
 					}
 				}
 			}

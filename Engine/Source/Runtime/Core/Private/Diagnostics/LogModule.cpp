@@ -106,7 +106,7 @@ void LogModule::Worker()
 	while (bRunning)
 	{
 		std::unique_lock Lock(Impl->Lock);
-		Impl->Cond.wait(Lock);
+		Impl->Cond.wait(Lock, [this]() { return Impl->Works.size() > 0; });
 
 		std::queue<std::wstring> Works;
 		std::swap(Works, Impl->Works);

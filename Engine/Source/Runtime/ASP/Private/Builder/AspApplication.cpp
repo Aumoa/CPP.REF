@@ -5,9 +5,7 @@
 #include "DependencyInjection/ServiceCollection.h"
 #include "Controllers/ControllerBase.h"
 
-GENERATE_BODY(libty::Asp::Builder::SAspApplication);
-
-using namespace libty::Asp::Builder;
+using namespace libty::Asp;
 
 SAspApplication::SAspApplication()
 	: Super()
@@ -24,10 +22,11 @@ void SAspApplication::ApplyControllers(SServiceCollection* collection)
 
 int32 SAspApplication::Run()
 {
+	
+
 	while (true)
 	{
-		SE_LOG(LogTemp, Verbose, L"Heartbeat...");
-		std::this_thread::sleep_for(10s);
+		std::this_thread::sleep_for(10ms);
 	}
 
 	return 0;

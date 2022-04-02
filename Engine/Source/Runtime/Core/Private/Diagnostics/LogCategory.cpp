@@ -9,6 +9,7 @@
 #include "Threading/Thread.h"
 #include <chrono>
 #include <fstream>
+#include <filesystem>
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -46,7 +47,9 @@ void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message, cons
 		DateTime::Now().ToString<libty::DateTimeFormat::Json>(),
 		Thread::GetCurrentThread()->GetFriendlyName(),
 		Composed,
-		String::AsUnicode(Src.function_name()), String::AsUnicode(Src.file_name()), Src.line()
+		String::AsUnicode(Src.function_name()),
+		std::filesystem::path(Src.file_name()).filename().wstring(),
+		Src.line()
 	);
 
 #if PLATFORM_WINDOWS

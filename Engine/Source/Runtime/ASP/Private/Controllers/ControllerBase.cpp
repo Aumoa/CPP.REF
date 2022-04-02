@@ -3,8 +3,6 @@
 #include "Controllers/ControllerBase.h"
 #include "RestApi/OkObjectResult.h"
 
-GENERATE_BODY(libty::Asp::Controllers::SControllerBase);
-
 using namespace libty::Asp;
 
 SControllerBase::SControllerBase()

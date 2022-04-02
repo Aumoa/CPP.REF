@@ -2,9 +2,7 @@
 
 #include "RestApi/ObjectResult.h"
 
-GENERATE_BODY(libty::Asp::RestApi::SObjectResult);
-
-using namespace libty::Asp::RestApi;
+using namespace libty::Asp;
 
 SObjectResult::SObjectResult(SObject* object, EHttpStatusCode statusCode)
 	: Super()

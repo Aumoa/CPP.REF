@@ -4,6 +4,7 @@
 
 #include "Misc/RecursiveMacroHelper.h"
 #include <tuple>
+#include <iostream>
 
 class SType;
 class SObject;

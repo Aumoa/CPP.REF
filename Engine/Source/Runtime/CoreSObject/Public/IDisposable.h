@@ -4,16 +4,15 @@
 
 #include "CoreMinimal.h"
 
-struct IDisposable : virtual public SObject
+struct CORESOBJECT_API IDisposable : virtual public SObject
 {
 	GENERATED_BODY(IDisposable);
 
-	// Special constructor for IDisposable.
-	IDisposable()
-	{
-		this->SObject::bHasFinalizer = true;
-	}
-
+public:
 	virtual void Dispose() = 0;
 	virtual bool IsDisposed() = 0;
+
+protected:
+	// Special Interface Constructor.
+	IDisposable();
 };

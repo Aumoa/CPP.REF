@@ -49,6 +49,7 @@ namespace libty::Core::Reflection
 		gen.bIsEnum = !IsObject && IsEnum;
 		gen.CollectFields<TOwningClass, 0>();
 		gen.CollectMethods<TOwningClass, 0>();
+		gen.GenerateConstructor<TOwningClass>();
 
 		if constexpr (IsEnum)
 		{
@@ -118,7 +119,7 @@ namespace libty::Core::Reflection
 		template<class T>
 		concept IInterfaceCollection = requires
 		{
-			{ std::declval<typename T::InterfaceCollection>() };
+			{ std::declval<typename T::InterfaceCollection*>() };
 		};
 
 		template<class TTuple>

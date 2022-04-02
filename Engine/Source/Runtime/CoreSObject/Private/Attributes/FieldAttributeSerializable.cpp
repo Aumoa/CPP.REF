@@ -2,8 +2,6 @@
 
 #include "Attributes/FieldAttributeSerializable.h"
 
-GENERATE_BODY(SFieldAttributeSerializable);
-
 SFieldAttributeSerializable::SFieldAttributeSerializable()
 	: Super()
 {

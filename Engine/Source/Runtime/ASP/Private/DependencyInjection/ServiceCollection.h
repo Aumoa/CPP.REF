@@ -15,7 +15,7 @@ namespace libty::Asp::inline DependencyInjection
 	class SServiceCollection : virtual public SObject, implements(IServiceCollection)
 	{
 		GENERATED_BODY(SServiceCollection);
-		friend class SAspApplication;
+		friend class libty::Asp::Builder::SAspApplication;
 
 	private:
 		SPROPERTY(_controllers)

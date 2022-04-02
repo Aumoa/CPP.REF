@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HttpStatusCode.h"
+#include "Web/HttpStatusCode.h"
 
 namespace libty::Asp::inline RestApi
 {

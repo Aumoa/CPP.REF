@@ -2,8 +2,6 @@
 
 #include "RestApi/MethodAttributeHttpGet.h"
 
-GENERATE_BODY(libty::Asp::RestApi::SMethodAttributeHttpGet);
-
 using namespace libty::Asp::RestApi;
 
 SMethodAttributeHttpGet::SMethodAttributeHttpGet(std::wstring_view route)

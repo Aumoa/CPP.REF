@@ -1,9 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Reflection/Enum.h"
-#include "CoreMinimal.h"
-
-GENERATE_BODY(SEnum);
+#include "Reflection/Type.h"
 
 bool SEnum::TryParse(SType* type, std::wstring_view format, SObject*& result)
 {

@@ -4,10 +4,7 @@
 #include "DependencyInjection/ServiceCollection.h"
 #include "Builder/AspApplication.h"
 
-GENERATE_BODY(libty::Asp::Builder::SAspApplicationBuilder);
-
-using namespace libty::Asp::Builder;
-using namespace libty::Asp::DependencyInjection;
+using namespace libty::Asp;
 
 SAspApplicationBuilder::SAspApplicationBuilder()
 	: Super()

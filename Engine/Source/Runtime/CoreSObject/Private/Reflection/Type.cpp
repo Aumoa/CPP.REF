@@ -7,8 +7,6 @@
 #include "Reflection/Assembly.h"
 #include "Attributes/ClassAttribute.h"
 
-GENERATE_BODY(SType);
-
 SType::StaticCollection* SType::_staticCollection;
 
 SType::SType(MetadataGenerator&& generator)

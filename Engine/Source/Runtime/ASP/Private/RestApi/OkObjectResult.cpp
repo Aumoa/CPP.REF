@@ -2,8 +2,6 @@
 
 #include "RestApi/OkObjectResult.h"
 
-GENERATE_BODY(libty::Asp::RestApi::SOkObjectResult);
-
 using namespace libty::Asp::RestApi;
 
 SOkObjectResult::SOkObjectResult(SObject* value)

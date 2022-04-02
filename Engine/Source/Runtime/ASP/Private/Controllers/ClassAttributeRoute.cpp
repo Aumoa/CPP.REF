@@ -2,8 +2,6 @@
 
 #include "Controllers/ClassAttributeRoute.h"
 
-GENERATE_BODY(libty::Asp::Controllers::SClassAttributeRoute);
-
 using namespace libty::Asp::Controllers;
 
 SClassAttributeRoute::SClassAttributeRoute(std::wstring_view route)
