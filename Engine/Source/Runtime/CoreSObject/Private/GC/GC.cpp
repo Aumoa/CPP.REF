@@ -112,13 +112,13 @@ void GarbageCollector::Collect(bool bFullPurge)
 		bool timedOut = false;
 		for (auto& Ready : SuspendReady)
 		{
-			//std::future_status status = Ready.wait_until(timeout);
-			//if (status == std::future_status::timeout)
-			//{
-			//	timedOut = true;
-			//	break;
-			//}
-			Ready.wait();
+			std::future_status status = Ready.wait_until(timeout);
+			if (status == std::future_status::timeout)
+			{
+				timedOut = true;
+				break;
+			}
+			//Ready.wait();
 		}
 
 		if (timedOut)
