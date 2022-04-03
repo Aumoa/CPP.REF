@@ -79,6 +79,8 @@ SSocket::SSocket(EAddressFamily Family, ESocketType SocketType, EProtocolType Pr
 	{
 		Impl->AbortWithError();
 	}
+
+	Impl->SetNonblock();
 }
 
 SSocket::~SSocket()
@@ -117,7 +119,7 @@ void SSocket::Listen(int32 backlog)
 	}
 }
 
-SSocket* SSocket::Accept()
+Task<SSocket*> SSocket::Accept()
 {
 	sockaddr addr;
 	socklen_t szAddr = sizeof(addr);
@@ -132,15 +134,24 @@ SSocket* SSocket::Accept()
 	client->Impl = std::make_unique<SocketImpl>();
 	client->Impl->Socket = sock;
 
-	return client;
+	co_return client;
 }
 
-Task<size_t> SSocket::Recv(void* buf, size_t len, ESocketFlags flags)
+size_t SSocket::Recv(void* buf, size_t len, ESocketFlags flags, std::stop_token cancellationToken)
 {
 	size_t total = 0;
-
 	while (len > 0)
 	{
+		if (!IsReadyToRead(10ms))
+		{
+			return total;
+		}
+
+		if (cancellationToken.stop_requested())
+		{
+			return total;
+		}
+
 		u_long available = 0;
 		if (ioctlsocket(Impl->Socket, FIONREAD, &available) == SOCKET_ERROR)
 		{
@@ -164,5 +175,47 @@ Task<size_t> SSocket::Recv(void* buf, size_t len, ESocketFlags flags)
 		total += sz;
 	}
 
-	co_return total;
+	return total;
+}
+
+bool SSocket::IsReadyToRead(std::chrono::microseconds Timeout)
+{
+	using namespace std::chrono;
+
+	fd_set ReadSet;
+	FD_ZERO(&ReadSet);
+
+	FD_SET(Impl->Socket, &ReadSet);
+
+	timeval Timeval = MakeTimeval(Timeout);
+	int32 SocketAvailable = select(0, &ReadSet, nullptr, nullptr, &Timeval);
+
+	if (SocketAvailable != 0)
+	{
+		//AbortWithError(errno, L"IsReadyToRead()");
+		return true;
+	}
+
+	return SocketAvailable > 0 && FD_ISSET(Impl->Socket, &ReadSet) != 0;
+}
+
+bool SSocket::IsReadyToWrite(std::chrono::microseconds Timeout)
+{
+	using namespace std::chrono;
+
+	fd_set WriteSet;
+	FD_ZERO(&WriteSet);
+
+	FD_SET(Impl->Socket, &WriteSet);
+
+	timeval Timeval = MakeTimeval(Timeout);
+	int32 SocketAvailable = select(0, nullptr, &WriteSet, nullptr, &Timeval);
+
+	if (SocketAvailable < 0)
+	{
+		//AbortWithError(errno, L"IsReadyToWrite()");
+		return true;
+	}
+
+	return SocketAvailable > 0 && FD_ISSET(Impl->Socket, &WriteSet) != 0;
 }

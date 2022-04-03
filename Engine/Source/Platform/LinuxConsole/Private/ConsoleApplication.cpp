@@ -38,7 +38,14 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		Thread* MainThread = Thread::GetCurrentThread();
 
 		MainThread->SetFriendlyName(L"[Main Thread]");
-		ReturnCode = ConsoleModule->Main(CommandArgs);
+		if constexpr (std::integral<decltype(ConsoleModule->Main(CommandArgs))>)
+		{
+			ReturnCode = ConsoleModule->Main(CommandArgs);
+		}
+		else
+		{
+			ReturnCode = ConsoleModule->Main(CommandArgs).GetResult();
+		}
 		SE_LOG(LogLinuxCommon, Verbose, L"Application will shutting down with return code: {}.", ReturnCode);
 	}
 

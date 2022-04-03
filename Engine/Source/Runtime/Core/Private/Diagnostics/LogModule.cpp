@@ -2,8 +2,10 @@
 
 #include "CoreAssert.h"
 #include "Diagnostics/LogModule.h"
+#include "Diagnostics/LogEntry.h"
 #include "Misc/DateTime.h"
 #include "Misc/String.h"
+#include "Misc/PlatformMacros.h"
 #include "Threading/Thread.h"
 #include <filesystem>
 #include <chrono>
@@ -14,6 +16,10 @@
 #include <iostream>
 #include <syncstream>
 
+#if PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
 using namespace libty;
 
 static LogModule* gModule;
@@ -21,7 +27,7 @@ static LogModule* gModule;
 struct LogModule::Storage
 {
 	std::mutex Lock;
-	std::queue<std::wstring> Works;
+	std::queue<LogEntry> Works;
 	std::condition_variable Cond;
 };
 
@@ -63,7 +69,7 @@ void LogModule::RunTask()
 	WorkerThread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this));
 }
 
-void LogModule::Shutdown()
+void LogModule::Shutdown() noexcept
 {
 	if (bRunning)
 	{
@@ -81,10 +87,10 @@ void LogModule::Shutdown()
 	}
 }
 
-void LogModule::EnqueueLogMessage(std::wstring_view Message)
+void LogModule::EnqueueLogMessage(LogEntry&& entry)
 {
 	std::unique_lock Lock(Impl->Lock);
-	Impl->Works.emplace(std::wstring(Message));
+	Impl->Works.emplace(std::move(entry).Generate());
 	Impl->Cond.notify_one();
 }
 
@@ -110,7 +116,7 @@ void LogModule::Worker()
 		std::unique_lock Lock(Impl->Lock);
 		Impl->Cond.wait(Lock, [this]() { return Impl->Works.size() > 0; });
 
-		std::queue<std::wstring> Works;
+		std::queue<LogEntry> Works;
 		std::swap(Works, Impl->Works);
 
 		Lock.unlock();
@@ -118,10 +124,21 @@ void LogModule::Worker()
 		// Write messages.
 		while (!Works.empty())
 		{
-			auto& Wstr = Works.front();
-			LogFile << String::AsMultibyte(Wstr) << std::endl;
-			Logged.Broadcast(Wstr);
-			std::wosyncstream(std::wcout) << Wstr << std::endl;
+			auto& Entry = Works.front();
+			LogFile << String::AsMultibyte(Entry.ToString(true)) << std::endl;
+			Logged.Broadcast(Entry);
+			if (Entry.Category->GetArguments().bLogToConsole)
+			{
+				std::wosyncstream(std::wcout) << Entry.ToString() << std::endl;
+			}
+
+			if (Entry.Category->GetArguments().bLogToDebugger)
+			{
+#if PLATFORM_WINDOWS
+				// Log to Visual Studio Output Console.
+				OutputDebugStringW((std::wstring(Entry.ToString(true)) + L"\n"s).c_str());
+#endif
+			}
 			Works.pop();
 		}
 

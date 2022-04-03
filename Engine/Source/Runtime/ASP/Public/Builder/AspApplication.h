@@ -47,5 +47,8 @@ namespace libty::Asp::inline Builder
 
 	public:
 		static SAspApplicationBuilder* CreateBuilder(const CommandLine& args);
+
+	private:
+		Task<> HandleClient(Sockets::SSocket* client);
 	};
 }

@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "Delegates/MulticastEvent.h"
 #include <atomic>
 #include <fstream>
 #include <future>
-#include "Delegates/MulticastEvent.h"
 
 namespace libty::inline Core::inline Threading
 {
@@ -14,6 +14,8 @@ namespace libty::inline Core::inline Threading
 
 namespace libty::inline Core::inline Diagnostics
 {
+	struct LogEntry;
+
 	class CORE_API LogModule
 	{
 		using This = LogModule;
@@ -29,17 +31,17 @@ namespace libty::inline Core::inline Diagnostics
 
 	public:
 		LogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);
-		~LogModule();
+		~LogModule() noexcept;
 
 		void RunTask();
-		void Shutdown();
-		void EnqueueLogMessage(std::wstring_view Message);
+		void Shutdown() noexcept;
+		void EnqueueLogMessage(LogEntry&& entry);
 		bool IsRunning();
 
 		static LogModule* Get();
 
 	public:
-		DECLARE_MULTICAST_EVENT(LoggedEvent, std::wstring_view);
+		DECLARE_MULTICAST_EVENT(LoggedEvent, const LogEntry&);
 		LoggedEvent Logged;
 
 	private:

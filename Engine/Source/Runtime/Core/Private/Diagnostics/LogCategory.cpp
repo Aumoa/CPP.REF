@@ -6,19 +6,17 @@
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogModule.h"
+#include "Diagnostics/LogEntry.h"
 #include "Threading/Thread.h"
 #include <chrono>
 #include <fstream>
 #include <filesystem>
 
-#if PLATFORM_WINDOWS
-#include <Windows.h>
-#endif
-
 using namespace libty;
 
-LogCategory::LogCategory(std::wstring_view CategoryName)
+LogCategory::LogCategory(std::wstring_view CategoryName, Arguments&& InArgs)
 	: CategoryName(CategoryName)
+	, Args(std::move(InArgs))
 {
 }
 
@@ -39,28 +37,25 @@ std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
 	}
 }
 
+auto LogCategory::GetArguments() -> Arguments
+{
+	return Args;
+}
+
 void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src)
 {
-	using namespace std;
-	using namespace std::chrono;
-
-	wstring Composed = String::Format(L"{}: {}: {}", CategoryName, VerbosityToString(Verbosity), Message);
-	wstring DetailComposed = String::Format(L"{}: {}: {}\n  at {} in {}:{}",
-		DateTime::Now().ToString<libty::DateTimeFormat::Json>(),
-		Thread::GetCurrentThread()->GetFriendlyName(),
-		Composed,
-		String::AsUnicode(Src.function_name()),
-		std::filesystem::path(Src.file_name()).filename().wstring(),
-		Src.line()
-	);
-
-#if PLATFORM_WINDOWS
-	// Log to Visual Studio Output Console.
-	OutputDebugStringW((DetailComposed + L"\n").c_str());
-#endif
+	auto thr = Thread::GetCurrentThread();
+	LogEntry entry;
+	entry.ThreadId = thr->GetThreadId();
+	entry.ThreadName = thr->GetFriendlyName();
+	entry.LoggedTime = DateTime::Now();
+	entry.Category = this;
+	entry.Verbosity = Verbosity;
+	entry.Message = Message;
+	entry.Source = Src;
 
 	if (LogModule* Module = LogModule::Get(); Module && Module->IsRunning())
 	{
-		Module->EnqueueLogMessage(DetailComposed);
+		Module->EnqueueLogMessage(std::move(entry));
 	}
 }

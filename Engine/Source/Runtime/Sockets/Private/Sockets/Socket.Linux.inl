@@ -20,6 +20,14 @@ struct SSocket::SocketImpl
 	int Socket = -1;
 	bool bClosed = false;
 
+	void SetNonblock()
+	{
+		if (fcntl(Socket, F_SETFL, O_NONBLOCK) == SOCKET_ERROR)
+		{
+			AbortWithError();
+		}
+	}
+
 	void Close()
 	{
 		if (!bClosed)

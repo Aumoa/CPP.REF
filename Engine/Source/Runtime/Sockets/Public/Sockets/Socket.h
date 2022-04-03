@@ -35,7 +35,12 @@ namespace libty::Sockets
 		void Bind(const IPEndPoint& endpoint);
 		void Close();
 		void Listen(int32 backlog = 256);
-		SSocket* Accept();
-		Task<size_t> Recv(void* buf, size_t len, ESocketFlags flags = ESocketFlags::None);
+		Task<SSocket*> Accept();
+
+		size_t Recv(void* buf, size_t len, ESocketFlags flags = ESocketFlags::None, std::stop_token cancellationToken = {});
+
+	private:
+		bool IsReadyToRead(std::chrono::microseconds Timeout = 2048576ms);
+		bool IsReadyToWrite(std::chrono::microseconds Timeout = 2048576ms);
 	};
 }

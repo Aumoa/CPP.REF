@@ -8,6 +8,7 @@
 #include "Net/IPEndPoint.h"
 #include "Diagnostics/CycleCounter.h"
 
+using namespace ::libty;
 using namespace ::libty::Asp;
 using namespace ::libty::Sockets;
 
@@ -31,8 +32,6 @@ void SAspApplication::ApplyControllers(SServiceCollection* collection)
 
 int32 SAspApplication::Run()
 {
-	GC.SetFlushInterval(1.0f);
-
 	size_t prev = 0;
 	GC.PreGarbageCollect += [&prev]()
 	{
@@ -51,17 +50,17 @@ int32 SAspApplication::Run()
 	_socket->Listen();
 	while (SSocket* client = _socket->Accept())
 	{
-		SE_LOG(LogTemp, Verbose, L"Client accepted.");
+		HandleClient(client);
 
 		Task<>::Run([client]()
 		{
 			std::vector<char> buf(1024);
 			size_t read = client->Recv(buf.data(), 1024).GetResult();
 
-			SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
+			//SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
 			client->Close();
 
-			SE_LOG(LogTemp, Verbose, L"Session closed.");
+			//SE_LOG(LogTemp, Verbose, L"Session closed.");
 		});
 
 		GC.Hint();
@@ -73,4 +72,16 @@ int32 SAspApplication::Run()
 SAspApplicationBuilder* SAspApplication::CreateBuilder(const CommandLine& args)
 {
 	return gcnew SAspApplicationBuilder();
+}
+
+Task<> SAspApplication::HandleClient(SSocket* client)
+{
+	//SharedPtr lock = client;
+
+	//while (true)
+	//{
+	//	std::array<char, 1024> buf = {};
+	//	size_t read = co_await client->Recv(buf.data(), buf.size());
+	//}
+	co_return;
 }
