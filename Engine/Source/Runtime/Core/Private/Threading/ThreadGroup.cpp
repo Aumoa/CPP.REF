@@ -7,7 +7,12 @@
 #include "Misc/Exceptions.h"
 #include "Misc/TickCalc.h"
 #include "Misc/String.h"
+#include "Diagnostics/LogSystem.h"
+#include "Diagnostics/LogCategory.h"
+#include "Diagnostics/LogVerbosity.h"
 #include <future>
+
+DEFINE_LOG_CATEGORY(LogThreadGroup);
 
 using namespace libty;
 
@@ -38,6 +43,20 @@ public:
 		}
 
 		_threadsIdx = 0;
+
+		for (size_t i = 0; i < _source->_threads.size();)
+		{
+			auto& thr = _source->_threads[i];
+			if (!thr.joinable())
+			{
+				SE_LOG(LogThreadGroup, Error, L"Thread {} is not joinable.", _threadsIdx.load());
+				_source->_threads.erase(_source->_threads.begin() + i);
+				continue;
+			}
+
+			++i;
+		}
+
 		_promise.emplace();
 		_source->_immQueue.cv.notify_all();
 
@@ -46,17 +65,18 @@ public:
 
 	virtual void Resume() override
 	{
-		for (auto& SuspendThread : _threads)
-		{
-			SuspendThread->ResumeThread();
-		}
-
 		_promise.reset();
+
+		for (size_t idx = 0; idx < _threadsIdx; ++idx)
+		{
+			auto& thread = _threads[idx];
+			thread->ResumeThread();
+		}
 	}
 
 	void Join(Thread* MyThread)
 	{
-		if (_promise.has_value())
+		if (IsJoinRequested())
 		{
 			size_t Myidx = _threadsIdx++;
 			_threads[Myidx] = MyThread;
@@ -68,6 +88,11 @@ public:
 
 			MyThread->SuspendThread();
 		}
+	}
+
+	bool IsJoinRequested()
+	{
+		return _promise.has_value();
 	}
 };
 
@@ -126,7 +151,6 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 	// Blocking the thread for all times.
 	while (!cancellationToken.stop_requested())
 	{
-		auto now = clock::now();
 		_suspendToken->Join(mythread);
 
 		std::unique_lock lock(_immQueue.lock);
@@ -141,7 +165,11 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 			lock.lock();
 		}
 
-		_immQueue.cv.wait(lock);
+		_immQueue.cv.wait(lock, [this, mythread]
+		{
+			return _immQueue.queue.size() > 0
+				|| _suspendToken->IsJoinRequested();
+		});
 	}
 }
 

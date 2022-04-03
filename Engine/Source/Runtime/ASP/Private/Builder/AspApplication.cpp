@@ -42,7 +42,7 @@ int32 SAspApplication::Run()
 	GC.PostGarbageCollect += [&prev]()
 	{
 		size_t now = GC.NumObjects();
-		//SE_LOG(LogTemp, Verbose, L"GC Stat: Objects {} -> {} ({})\n{}", prev, now, (int32)now - (int32)prev, CycleCounter::Get().GetNamespace(L"GC")->Trace());
+		SE_LOG(LogTemp, Verbose, L"GC Stat: Objects {} -> {} ({})", prev, now, (int32)now - (int32)prev);
 	};
 
 	_socket = gcnew SSocket(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::TCP);
@@ -58,8 +58,10 @@ int32 SAspApplication::Run()
 			std::vector<char> buf(1024);
 			size_t read = client->Recv(buf.data(), 1024).GetResult();
 
-			SE_LOG(LogTemp, Verbose, L"Received: {}", String::AsUnicode(std::string_view(buf.data(), read)));
+			SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
 			client->Close();
+
+			SE_LOG(LogTemp, Verbose, L"Session closed.");
 		});
 
 		GC.Hint();
