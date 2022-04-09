@@ -4,7 +4,7 @@
 
 #include "MulticastDelegate.h"
 
-namespace libty::inline Core::inline Delegates
+namespace libty::inline Core
 {
 	/// <summary>
 	/// Represents a multicast event that is, a event that can have more than one element in its invocation list.

@@ -8,7 +8,7 @@
 #include <vector>
 #include <mutex>
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	class CycleCounterUnit;
 

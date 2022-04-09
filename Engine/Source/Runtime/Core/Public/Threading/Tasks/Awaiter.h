@@ -10,7 +10,7 @@
 #include <future>
 #include <queue>
 
-namespace libty::inline Core::inline Threading::inline Tasks
+namespace libty::inline Core
 {
 	template<class T>
 	class Awaiter : public IAwaiter

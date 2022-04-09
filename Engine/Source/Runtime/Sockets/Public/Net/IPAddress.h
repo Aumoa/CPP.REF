@@ -4,7 +4,7 @@
 
 #include "NetUtility.h"
 
-namespace libty::Sockets::inline Net
+namespace libty::inline Sockets
 {
 	struct IPAddress
 	{

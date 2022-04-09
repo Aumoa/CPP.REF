@@ -4,9 +4,9 @@
 
 #include "IActionResult.h"
 
-namespace libty::Asp::inline RestApi
+namespace libty::inline Asp
 {
-	class SActionResult : virtual public SObject, implements(IActionResult)
+	class SActionResult : extends(SObject), implements(IActionResult)
 	{
 		GENERATED_BODY(SActionResult);
 

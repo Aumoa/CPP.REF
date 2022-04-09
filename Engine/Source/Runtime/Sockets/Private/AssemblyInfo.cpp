@@ -6,9 +6,9 @@ DEFINE_ASSEMBLY_INFO;
 #include "Net/ProtocolType.h"
 #include "Net/NetUtility.h"
 
-GENERATE_BODY(libty::Sockets::Net::EAddressFamily);
-GENERATE_BODY(libty::Sockets::Net::EProtocolType);
-GENERATE_BODY(libty::Sockets::Net::SNetUtility);
+GENERATE_BODY(libty::Sockets::EAddressFamily);
+GENERATE_BODY(libty::Sockets::EProtocolType);
+GENERATE_BODY(libty::Sockets::SNetUtility);
 
 #include "Sockets/SocketType.h"
 #include "Sockets/SocketFlags.h"
@@ -20,4 +20,4 @@ GENERATE_BODY(libty::Sockets::SSocket);
 
 #include "Web/HttpStatusCode.h"
 
-GENERATE_BODY(libty::Sockets::Web::EHttpStatusCode);
+GENERATE_BODY(libty::Sockets::EHttpStatusCode);

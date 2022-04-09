@@ -6,7 +6,7 @@
 #include <string>
 #include <numbers>
 
-namespace libty::inline CoreNumerics::inline Mathematics
+namespace libty::inline CoreNumerics
 {
 	struct Degrees;
 

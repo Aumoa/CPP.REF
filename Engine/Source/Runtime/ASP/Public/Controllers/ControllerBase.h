@@ -2,14 +2,11 @@
 
 #pragma once
 
-namespace libty::Asp::inline RestApi
+namespace libty::inline Asp
 {
 	class SOkObjectResult;
-}
 
-namespace libty::Asp::inline Controllers
-{
-	class ASP_API SControllerBase : virtual public SObject
+	class ASP_API SControllerBase : extends(SObject)
 	{
 		GENERATED_BODY(SControllerBase);
 

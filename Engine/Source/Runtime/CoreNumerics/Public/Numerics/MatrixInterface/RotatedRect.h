@@ -6,7 +6,7 @@
 #include "Numerics/VectorInterface/Rect.h"
 #include "Numerics/TransformConcepts.h"
 
-namespace libty::inline CoreNumerics::inline MatrixInterface
+namespace libty::inline CoreNumerics
 {
 	struct RotatedRect
 	{

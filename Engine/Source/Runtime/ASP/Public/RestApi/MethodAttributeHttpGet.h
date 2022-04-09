@@ -4,7 +4,7 @@
 
 namespace Attributes::inline libty::inline Asp
 {
-	class ASP_API SMethodAttributeHttpGet : public ::libty::SMethodAttribute
+	class ASP_API SMethodAttributeHttpGet : extends(::libty::SMethodAttribute)
 	{
 		GENERATED_BODY(SMethodAttributeHttpGet);
 

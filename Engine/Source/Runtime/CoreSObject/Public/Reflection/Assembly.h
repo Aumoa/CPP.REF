@@ -7,7 +7,7 @@
 
 namespace libty::inline Core::Reflection
 {
-	class CORESOBJECT_API SAssembly : virtual public SObject
+	class CORESOBJECT_API SAssembly : extends(SObject)
 	{
 		GENERATED_BODY(SAssembly);
 		friend class libty::Core::SType;

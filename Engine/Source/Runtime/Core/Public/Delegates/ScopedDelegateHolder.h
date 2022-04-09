@@ -6,7 +6,7 @@
 #include "IMulticastDelegate.h"
 #include <memory>
 
-namespace libty::inline Core::inline Delegates
+namespace libty::inline Core
 {
 	class DelegateHandle;
 	template<class>

@@ -9,7 +9,7 @@
 #include "LogVerbosity.h"
 #include "Misc/RecursiveMacroHelper.h"
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	class CORE_API LogCategory
 	{
@@ -43,7 +43,7 @@ namespace libty::inline Core::inline Diagnostics
 #define DECLARE_LOG_CATEGORY(API, CategoryName) \
 namespace libty::inline Generated::LogCategories \
 { \
-	extern API ::libty::Core::Diagnostics::LogCategory CategoryName; \
+	extern API ::libty::Core::LogCategory CategoryName; \
 } \
 
 #define LOG_CATEGORY_ARGUMENT_FOR_EACH_ITEM(X, Value) .X = Value,
@@ -51,8 +51,8 @@ namespace libty::inline Generated::LogCategories \
 #define DEFINE_LOG_CATEGORY(CategoryName, ...) \
 namespace libty::inline Generated::LogCategories \
 { \
-	::libty::Core::Diagnostics::LogCategory CategoryName(L ## #CategoryName, \
-		::libty::Core::Diagnostics::LogCategory::Arguments { \
+	::libty::Core::LogCategory CategoryName(L ## #CategoryName, \
+		::libty::Core::LogCategory::Arguments { \
 			__VA_OPT__(MACRO_RECURSIVE_FOR_EACH(LOG_CATEGORY_ARGUMENT_FOR_EACH_ITEM, __VA_ARGS__)) \
 		} \
 	); \

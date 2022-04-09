@@ -6,7 +6,7 @@
 #include "Task.h"
 #include <source_location>
 
-namespace libty::inline Core::inline Threading::inline Tasks
+namespace libty::inline Core
 {
 	template<class T = void>
 	class TaskCompletionSource

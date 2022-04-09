@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline Core::inline Threading::inline Tasks
+namespace libty::inline Core
 {
 	enum class ETaskStatus
 	{

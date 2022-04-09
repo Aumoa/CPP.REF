@@ -4,7 +4,7 @@
 
 #include "IConfiguration.h"
 
-namespace libty::Asp::inline Configuration
+namespace libty::inline Asp
 {
 	struct IConfigurationSection : implements(IConfiguration)
 	{

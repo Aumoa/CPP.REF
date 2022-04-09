@@ -4,7 +4,7 @@
 
 #include "DateTime.h"
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	class UnixTime
 	{

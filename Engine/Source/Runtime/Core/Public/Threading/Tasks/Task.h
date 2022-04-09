@@ -9,12 +9,12 @@
 #include <chrono>
 #include <array>
 
-namespace libty::inline Core::inline Threading
+namespace libty::inline Core
 {
 	class ThreadGroup;
 }
 
-namespace libty::inline Core::inline Threading::inline Tasks
+namespace libty::inline Core
 {
 	template<class T>
 	class Task;
@@ -140,11 +140,11 @@ namespace libty::inline Core::inline Threading::inline Tasks
 		friend class Task;
 
 	public:
-		using promise_type = libty::Threading::Tasks::Impl::promise_type<T>;
+		using promise_type = libty::Impl::promise_type<T>;
 
 	protected:
 		using MyAwaiter = Awaiter<T>;
-		using SourceAwaiter = typename libty::Threading::Tasks::Impl::SourceAwaiter<T>::type;
+		using SourceAwaiter = typename libty::Impl::SourceAwaiter<T>::type;
 		using CoroutineHandle = std::coroutine_handle<promise_type>;
 
 	private:

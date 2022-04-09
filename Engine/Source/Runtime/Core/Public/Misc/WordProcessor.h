@@ -6,7 +6,7 @@
 #include <span>
 #include <functional>
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	class WordProcessor
 	{

@@ -11,7 +11,7 @@
 #include "Scale3D.h"
 #include "Quaternion.h"
 
-namespace libty::inline CoreNumerics::inline TransformInterface
+namespace libty::inline CoreNumerics
 {
     struct Transform
     {

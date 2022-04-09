@@ -11,7 +11,7 @@
 #include <queue>
 #include <condition_variable>
 
-namespace libty::inline Core::inline Threading
+namespace libty::inline Core
 {
 	class CORE_API ThreadGroup
 	{

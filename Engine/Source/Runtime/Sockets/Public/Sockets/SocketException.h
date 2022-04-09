@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::Sockets
+namespace libty::inline Sockets
 {
 	class SOCKETS_API SocketException : public FatalException
 	{

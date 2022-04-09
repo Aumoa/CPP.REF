@@ -4,7 +4,7 @@
 #include "Builder/AspApplication.h"
 #include "DependencyInjection/ServiceCollection.h"
 
-using namespace libty::Asp;
+using namespace ::libty;
 
 SAspApplicationBuilder::SAspApplicationBuilder()
 	: Super()

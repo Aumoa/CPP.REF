@@ -2,24 +2,20 @@
 
 #pragma once
 
-namespace libty::Asp::inline DependencyInjection
-{
-	struct IServiceCollection;
-	class SServiceCollection;
-}
-
-namespace libty::Asp::inline Builder
+namespace libty::inline Asp
 {
 	class SAspApplication;
+	struct IServiceCollection;
+	class SServiceCollection;
 
-	class ASP_API SAspApplicationBuilder : virtual public SObject
+	class ASP_API SAspApplicationBuilder : extends(SObject)
 	{
 		GENERATED_BODY(SAspApplicationBuilder);
 		friend class SAspApplication;
 
 	private:
 		SPROPERTY(_services)
-		DependencyInjection::SServiceCollection* _services = nullptr;
+		SServiceCollection* _services = nullptr;
 
 	private:
 		SAspApplicationBuilder();

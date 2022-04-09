@@ -5,7 +5,7 @@
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/MatrixInterface/Matrix2x2.h"
 
-namespace libty::inline CoreNumerics::inline TransformInterface
+namespace libty::inline CoreNumerics
 {
 	struct Shear2D
 	{

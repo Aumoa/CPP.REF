@@ -5,7 +5,7 @@
 #include "CoreAssert.h"
 #include <chrono>
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	template<class T, class Clock = std::chrono::steady_clock>
 	class ScopedTimer

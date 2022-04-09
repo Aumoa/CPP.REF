@@ -4,7 +4,7 @@
 
 #include "FatalException.h"
 
-namespace libty::inline Core::inline Exceptions
+namespace libty::inline Core
 {
 	class CORE_API InvalidOperationException : public FatalException
 	{

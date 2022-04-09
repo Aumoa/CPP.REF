@@ -11,7 +11,7 @@
 #include <mutex>
 #include <memory>
 
-namespace libty::inline Core::inline Delegates
+namespace libty::inline Core
 {
 	template<class>
 	class MulticastDelegate

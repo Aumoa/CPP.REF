@@ -6,7 +6,7 @@
 
 namespace libty::inline Core
 {
-	struct CORESOBJECT_API IDisposable : virtual public SObject
+	struct CORESOBJECT_API IDisposable : implements(SObject)
 	{
 		GENERATED_BODY(IDisposable);
 

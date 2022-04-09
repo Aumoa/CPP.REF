@@ -5,7 +5,7 @@
 #include "IPAddress.h"
 #include "NetUtility.h"
 
-namespace libty::Sockets::inline Net
+namespace libty::inline Sockets
 {
 	struct SOCKETS_API IPEndPoint
 	{

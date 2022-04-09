@@ -2,7 +2,7 @@
 
 #include "DependencyInjection/ServiceCollection.h"
 
-using namespace ::libty::Asp::DependencyInjection;
+using namespace ::libty;
 
 SServiceCollection::SServiceCollection()
 	: Super()

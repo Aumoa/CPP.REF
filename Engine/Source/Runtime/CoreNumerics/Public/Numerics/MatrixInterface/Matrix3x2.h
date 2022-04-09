@@ -8,7 +8,7 @@
 #include "Mathematics/Radians.h"
 #include "Numerics/VectorInterface/Vector.h"
 
-namespace libty::inline CoreNumerics::inline MatrixInterface
+namespace libty::inline CoreNumerics
 {
 	struct Matrix3x2
 	{

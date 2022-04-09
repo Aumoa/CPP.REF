@@ -8,7 +8,7 @@
 #include "Scale2D.h"
 #include "Complex.h"
 
-namespace libty::inline CoreNumerics::inline TransformInterface
+namespace libty::inline CoreNumerics
 {
     struct Transform2D
     {

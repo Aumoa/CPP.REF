@@ -6,7 +6,7 @@
 
 namespace Attributes::inline libty::inline Asp
 {
-	class ASP_API SMethodAttributeProducesResponseType : public ::libty::SMethodAttribute
+	class ASP_API SMethodAttributeProducesResponseType : extends(::libty::SMethodAttribute)
 	{
 		GENERATED_BODY(SMethodAttributeProducesResponseType);
 

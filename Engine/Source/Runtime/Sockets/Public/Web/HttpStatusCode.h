@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::Sockets::inline Web
+namespace libty::inline Sockets
 {
     SENUM(SOCKETS_API, EHttpStatusCode, int32,
         Continue, 100,

@@ -5,9 +5,9 @@
 #include "ActionResult.h"
 #include "Web/HttpStatusCode.h"
 
-namespace libty::Asp::inline RestApi
+namespace libty::inline Asp
 {
-	class ASP_API SObjectResult : public SActionResult
+	class ASP_API SObjectResult : extends(SActionResult)
 	{
 		GENERATED_BODY(SObjectResult);
 

@@ -2,19 +2,12 @@
 
 #pragma once
 
-namespace libty::Asp::inline Configuration
+namespace libty::inline Asp
 {
 	struct IConfiguration;
-}
-
-namespace libty::Asp::inline Controllers
-{
 	class SControllerBase;
-}
 
-namespace libty::Asp::inline DependencyInjection
-{
-	struct ASP_API IServiceCollection : virtual public SObject
+	struct ASP_API IServiceCollection : implements(SObject)
 	{
 		GENERATED_BODY(IServiceCollection);
 

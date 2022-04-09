@@ -2,7 +2,7 @@
 
 #include "RestApi/ActionResult.h"
 
-using namespace ::libty::Asp::RestApi;
+using namespace ::libty;
 
 SActionResult::SActionResult()
 {

@@ -4,7 +4,7 @@
 
 #include "FatalException.h"
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	class CORE_API TaskCanceledException : public FatalException
 	{

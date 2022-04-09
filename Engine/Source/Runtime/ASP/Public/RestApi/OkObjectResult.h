@@ -4,9 +4,9 @@
 
 #include "ObjectResult.h"
 
-namespace libty::Asp::inline RestApi
+namespace libty::inline Asp
 {
-	class ASP_API SOkObjectResult : public SObjectResult
+	class ASP_API SOkObjectResult : extends(SObjectResult)
 	{
 		GENERATED_BODY(SOkObjectResult);
 

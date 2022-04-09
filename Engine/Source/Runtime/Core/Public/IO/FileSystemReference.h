@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <source_location>
 
-namespace libty::inline Core::inline IO
+namespace libty::inline Core
 {
 	class DirectoryReference;
 

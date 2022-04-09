@@ -6,7 +6,7 @@
 
 namespace Attributes::inline libty::inline Asp
 {
-	class ASP_API SClassAttributeRoute : public ::libty::SClassAttribute
+	class ASP_API SClassAttributeRoute : extends(::libty::SClassAttribute)
 	{
 		GENERATED_BODY(SClassAttributeRoute);
 

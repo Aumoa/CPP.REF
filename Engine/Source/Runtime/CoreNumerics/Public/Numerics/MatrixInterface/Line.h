@@ -4,7 +4,7 @@
 
 #include "Numerics/VectorInterface/Vector.h"
 
-namespace libty::inline CoreNumerics::inline MatrixInterface
+namespace libty::inline CoreNumerics
 {
 	template<size_t N = 0>
 	struct Line

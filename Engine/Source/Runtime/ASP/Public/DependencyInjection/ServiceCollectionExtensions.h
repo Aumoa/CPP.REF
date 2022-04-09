@@ -2,11 +2,11 @@
 
 #pragma once
 
-namespace libty::Asp::inline DependencyInjection
+namespace libty::inline Asp
 {
 	struct IServiceCollection;
 
-	class ASP_API SServiceCollectionExtensions : virtual public SObject
+	class ASP_API SServiceCollectionExtensions : extends(SObject)
 	{
 		GENERATED_BODY(SServiceCollectionExtensions);
 

@@ -9,7 +9,7 @@
 
 namespace libty::inline Core
 {
-	class SValueType : virtual public SObject
+	class SValueType : extends(SObject)
 	{
 	private:
 		std::any _value;

@@ -5,7 +5,7 @@
 #include "Radians.h"
 #include "MathEx.h"
 
-namespace libty::inline CoreNumerics::inline Mathematics
+namespace libty::inline CoreNumerics
 {
 	/// <summary>
 	/// Represents the degrees value.

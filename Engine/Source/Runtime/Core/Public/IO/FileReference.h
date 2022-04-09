@@ -8,7 +8,7 @@
 #include <fstream>
 #include <filesystem>
 
-namespace libty::inline Core::inline IO
+namespace libty::inline Core
 {
 	class CORE_API FileReference : public FileSystemReference
 	{

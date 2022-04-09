@@ -7,7 +7,7 @@
 #include <string>
 #include <atomic>
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	class CycleCounterNamespace;
 

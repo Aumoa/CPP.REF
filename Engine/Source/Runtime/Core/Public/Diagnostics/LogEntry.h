@@ -12,7 +12,7 @@
 #include <filesystem>
 #include <thread>
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	struct LogEntry
 	{

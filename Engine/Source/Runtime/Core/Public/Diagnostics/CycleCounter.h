@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	class CycleCounterNamespace;
 

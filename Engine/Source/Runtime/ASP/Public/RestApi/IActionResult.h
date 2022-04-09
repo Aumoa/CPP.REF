@@ -2,9 +2,9 @@
 
 #pragma once
 
-namespace libty::Asp::inline RestApi
+namespace libty::inline Asp
 {
-	struct ASP_API IActionResult : virtual public SObject
+	struct ASP_API IActionResult : implements(SObject)
 	{
 		GENERATED_BODY(IActionResult);
 	};

@@ -15,7 +15,7 @@
 #include <format>
 #endif
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	class CORE_API String
 	{
@@ -504,25 +504,25 @@ namespace libty::inline Core::inline Misc
 #if PLATFORM_WINDOWS
 
 template<class TValue> requires
-	requires { libty::Core::Misc::Details::ToString<wchar_t>(std::declval<TValue>()); }
+	requires { libty::Core::Details::ToString<wchar_t>(std::declval<TValue>()); }
 struct std::formatter<TValue, wchar_t> : public std::formatter<std::wstring_view, wchar_t>
 {
 	template<class UValue, class TFormatContext>
 	auto format(UValue&& value, TFormatContext& ctx)
 	{
-		auto str = libty::Core::Misc::Details::ToString<wchar_t>(std::forward<UValue>(value));
+		auto str = libty::Core::Details::ToString<wchar_t>(std::forward<UValue>(value));
 		return std::formatter<std::wstring_view, wchar_t>::format(std::move(str), ctx);
 	}
 };
 
 template<class TValue> requires
-	requires { libty::Core::Misc::Details::ToString<char>(std::declval<TValue>()); }
+	requires { libty::Core::Details::ToString<char>(std::declval<TValue>()); }
 struct std::formatter<TValue, wchar_t> : public std::formatter<std::string_view, char>
 {
 	template<class UValue, class TFormatContext>
 	auto format(UValue&& value, TFormatContext& ctx)
 	{
-		auto str = libty::Core::Misc::Details::ToString<char>(std::forward<UValue>(value));
+		auto str = libty::Core::Details::ToString<char>(std::forward<UValue>(value));
 		return std::formatter<std::string_view, char>::format(std::move(str), ctx);
 	}
 };

@@ -11,7 +11,7 @@
 #include "Numerics/TransformInterface/Quaternion.h"
 #include "Mathematics/Radians.h"
 
-namespace libty::inline CoreNumerics::inline MatrixInterface
+namespace libty::inline CoreNumerics
 {
 	struct Matrix4x4
 	{

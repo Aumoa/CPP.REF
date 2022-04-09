@@ -6,7 +6,7 @@
 #include <utility>
 #include <tuple>
 
-namespace libty::inline CoreNumerics::inline VectorInterface
+namespace libty::inline CoreNumerics
 {
 #define VECTOR_SCALARS_CONSTEXPR_CTORS \
 	constexpr VectorScalarsImpl(const T& S = 0) : Scalars{} \

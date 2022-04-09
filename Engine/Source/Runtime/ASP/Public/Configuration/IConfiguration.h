@@ -2,11 +2,11 @@
 
 #pragma once
 
-namespace libty::Asp::inline Configuration
+namespace libty::inline Asp
 {
 	struct IConfigurationSection;
 
-	struct ASP_API IConfiguration : virtual public SObject
+	struct ASP_API IConfiguration : implements(SObject)
 	{
 		GENERATED_BODY(IConfiguration);
 

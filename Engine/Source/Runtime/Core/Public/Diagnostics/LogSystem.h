@@ -12,7 +12,7 @@
 #include <string_view>
 #include <source_location>
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	class LogCategory;
 

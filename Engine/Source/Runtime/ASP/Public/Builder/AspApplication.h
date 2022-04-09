@@ -2,21 +2,13 @@
 
 #pragma once
 
-namespace libty::Asp::inline DependencyInjection
-{
-	class SServiceCollection;
-}
-
-namespace libty::Asp::inline Controllers
-{
-	class SControllerBase;
-}
-
-namespace libty::Asp::inline Builder
+namespace libty::inline Asp
 {
 	class SAspApplicationBuilder;
+	class SControllerBase;
+	class SServiceCollection;
 
-	class ASP_API SAspApplication : virtual public SObject
+	class ASP_API SAspApplication : extends(SObject)
 	{
 		GENERATED_BODY(SAspApplication);
 		friend class SAspApplicationBuilder;

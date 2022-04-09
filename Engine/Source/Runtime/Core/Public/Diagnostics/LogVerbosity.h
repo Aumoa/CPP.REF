@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	enum class ELogVerbosity
 	{

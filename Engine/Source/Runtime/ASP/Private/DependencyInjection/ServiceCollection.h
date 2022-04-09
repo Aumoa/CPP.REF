@@ -4,17 +4,14 @@
 
 #include "DependencyInjection/IServiceCollection.h"
 
-namespace libty::Asp::inline Builder
+namespace libty::inline Asp
 {
 	class SAspApplication;
-}
 
-namespace libty::Asp::inline DependencyInjection
-{
-	class SServiceCollection : virtual public SObject, implements(IServiceCollection)
+	class SServiceCollection : extends(SObject), implements(IServiceCollection)
 	{
 		GENERATED_BODY(SServiceCollection);
-		friend class ::libty::Asp::Builder::SAspApplication;
+		friend class ::libty::Asp::SAspApplication;
 
 	private:
 		SPROPERTY(_controllers)

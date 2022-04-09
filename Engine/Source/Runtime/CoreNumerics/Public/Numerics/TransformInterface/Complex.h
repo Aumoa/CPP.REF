@@ -6,7 +6,7 @@
 #include "Numerics/MatrixInterface/Matrix3x2.h"
 #include "Numerics/MatrixInterface/Matrix2x2.h"
 
-namespace libty::inline CoreNumerics::inline TransformInterface
+namespace libty::inline CoreNumerics
 {
 	struct Complex
 	{

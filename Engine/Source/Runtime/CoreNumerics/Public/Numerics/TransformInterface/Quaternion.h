@@ -6,7 +6,7 @@
 #include "Mathematics/MathEx.h"
 #include "Mathematics/Degrees.h"
 
-namespace libty::inline CoreNumerics::inline TransformInterface
+namespace libty::inline CoreNumerics
 {
 	struct Quaternion
 	{

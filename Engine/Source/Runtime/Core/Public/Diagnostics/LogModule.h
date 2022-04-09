@@ -7,12 +7,12 @@
 #include <fstream>
 #include <future>
 
-namespace libty::inline Core::inline Threading
+namespace libty::inline Core
 {
 	class Thread;
 }
 
-namespace libty::inline Core::inline Diagnostics
+namespace libty::inline Core
 {
 	struct LogEntry;
 

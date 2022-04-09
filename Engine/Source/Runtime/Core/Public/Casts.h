@@ -5,7 +5,7 @@
 #include "Misc/String.h"
 #include <utility>
 
-namespace libty::inline Core::inline Casts
+namespace libty::inline Core
 {
 	namespace Impl
 	{
@@ -31,9 +31,9 @@ namespace libty::inline Core::inline Casts
 	template<class TTo, class TFrom>
 	inline auto Cast(TFrom&& from) requires requires
 	{
-		{ libty::Core::Casts::Impl::DoCast<TTo, TFrom>(std::declval<int>(), std::declval<TFrom>()) };
+		{ libty::Core::Impl::DoCast<TTo, TFrom>(std::declval<int>(), std::declval<TFrom>()) };
 	}
 	{
-		return libty::Core::Casts::Impl::DoCast<TTo, TFrom>(0, std::forward<TFrom>(from));
+		return libty::Core::Impl::DoCast<TTo, TFrom>(0, std::forward<TFrom>(from));
 	}
 }

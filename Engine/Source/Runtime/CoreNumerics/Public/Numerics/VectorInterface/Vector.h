@@ -10,7 +10,7 @@
 #include <array>
 #include <span>
 
-namespace libty::inline CoreNumerics::inline VectorInterface
+namespace libty::inline CoreNumerics
 {
 	template<class T = void, size_t N = 0>
 	struct Vector : public VectorScalarsImpl<T, N>
@@ -687,16 +687,5 @@ namespace libty::inline CoreNumerics::inline VectorInterface
 	constexpr bool Vector<T, N>::NearlyEquals(const IVector& V, const T& Epsilon) const
 	{
 		return Vector<>::NearlyEquals(*this, V, Epsilon);
-	}
-
-
-	// Supports for Casts.h
-	template<class TTo, class TFrom>
-	inline auto Cast(TFrom&& From) requires requires
-	{
-		{ Vector<>::Cast<TTo>(std::declval<TFrom>()) };
-	}
-	{
-		return Vector<>::Cast<TTo>(From);
 	}
 }

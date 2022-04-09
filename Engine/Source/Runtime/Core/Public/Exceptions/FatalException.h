@@ -7,7 +7,7 @@
 #include <string_view>
 #include <source_location>
 
-namespace libty::inline Core::inline Exceptions
+namespace libty::inline Core
 {
 	class CORE_API FatalException : public std::exception
 	{

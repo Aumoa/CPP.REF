@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::Sockets
+namespace libty::inline Sockets
 {
 	SENUM(SOCKETS_API, ESocketFlags, int32,
 		None				, 0,

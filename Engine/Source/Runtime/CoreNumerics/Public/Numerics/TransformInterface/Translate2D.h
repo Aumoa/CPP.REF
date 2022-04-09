@@ -4,7 +4,7 @@
 
 #include "Numerics/VectorInterface/Vector.h"
 
-namespace libty::inline CoreNumerics::inline TransformInterface
+namespace libty::inline CoreNumerics
 {
 	struct Translate2D
 	{

@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline CoreNumerics::inline Mathematics
+namespace libty::inline CoreNumerics
 {
 	enum class EEaseFunction
 	{

@@ -9,7 +9,6 @@ public class Core : ModuleRule
     public Core()
     {
         TargetType = TargetType.Engine;
-        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");

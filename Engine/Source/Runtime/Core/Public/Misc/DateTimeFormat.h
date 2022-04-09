@@ -12,7 +12,7 @@
 #include <iomanip>
 #endif
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	// @see https://en.cppreference.com/w/cpp/chrono/parse to check format strings.
 	namespace DateTimeFormat

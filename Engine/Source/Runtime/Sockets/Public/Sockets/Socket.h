@@ -7,14 +7,11 @@
 #include "Net/ProtocolType.h"
 #include "SocketFlags.h"
 
-namespace libty::Sockets
+namespace libty::inline Sockets
 {
-	inline namespace Net
-	{
-		struct IPEndPoint;
-	}
+	struct IPEndPoint;
 
-	class SOCKETS_API SSocket : virtual public SObject
+	class SOCKETS_API SSocket : extends(SObject)
 	{
 		GENERATED_BODY(SSocket);
 

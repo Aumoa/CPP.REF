@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
     enum class EKey
     {

@@ -7,7 +7,7 @@
 #include <list>
 #include <optional>
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	template<class Clock = std::chrono::steady_clock>
 	class TickCalc

@@ -6,7 +6,7 @@
 #include "Vector.h"
 #include "Mathematics/MathEx.h"
 
-namespace libty::inline CoreNumerics::inline VectorInterface
+namespace libty::inline CoreNumerics
 {
 	struct Color
 	{

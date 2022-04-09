@@ -7,7 +7,7 @@
 #include <future>
 #include <thread>
 
-namespace libty::inline Core::inline Threading::inline Tasks
+namespace libty::inline Core
 {
 	class Parallel
 	{

@@ -4,7 +4,7 @@
 
 #include "PrimitiveTypes.h"
 
-namespace libty::inline Core::inline Delegates
+namespace libty::inline Core
 {
 	class DelegateHandle;
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::Sockets::inline Net
+namespace libty::inline Sockets
 {
 	SENUM(SOCKETS_API, EAddressFamily, int32,
 		InterNetwork,

@@ -6,7 +6,7 @@
 #include "Numerics/TransformConcepts.h"
 #include "Mathematics/Radians.h"
 
-namespace libty::inline CoreNumerics::inline MatrixInterface
+namespace libty::inline CoreNumerics
 {
 	struct Matrix2x2
 	{

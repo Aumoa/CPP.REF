@@ -4,7 +4,7 @@
 
 #include "Numerics/VectorInterface/Plane.h"
 
-namespace libty::inline CoreNumerics::inline MatrixInterface
+namespace libty::inline CoreNumerics
 {
 	struct Frustum
 	{

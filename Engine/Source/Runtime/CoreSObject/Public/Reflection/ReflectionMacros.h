@@ -194,3 +194,4 @@ namespace libty::inline Generated::Class													\
 	}
 
 #define implements(...) public ::libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>
+#define extends(Class) virtual public Class

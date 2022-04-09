@@ -6,7 +6,7 @@
 #include <numbers>
 #include "EaseFunction.h"
 
-namespace libty::inline CoreNumerics::inline Mathematics
+namespace libty::inline CoreNumerics
 {
 	struct Radians;
 

@@ -4,7 +4,7 @@
 
 #include "Vector.h"
 
-namespace libty::inline CoreNumerics::inline VectorInterface
+namespace libty::inline CoreNumerics
 {
 	template<size_t N = 0>
 	struct Sphere

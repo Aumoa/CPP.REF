@@ -5,7 +5,7 @@
 #include <set>
 #include <mutex>
 
-namespace libty::inline Core::inline Threading
+namespace libty::inline Core
 {
 	class ISuspendToken;
 

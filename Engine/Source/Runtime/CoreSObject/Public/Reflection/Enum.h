@@ -163,7 +163,7 @@ public:																								\
 		}																							\
 		else																						\
 		{																							\
-			return ::libty::Core::Misc::String::Format(L"(" L ## #Name L"){}", this->Value);		\
+			return ::libty::Core::String::Format(L"(" L ## #Name L"){}", this->Value);				\
 		}																							\
 	}																								\
 																									\
@@ -211,7 +211,7 @@ struct std::is_enum<TEnum> : public bool_constant<true>
 
 namespace libty::inline Core::Reflection
 {
-	class CORESOBJECT_API SEnum : virtual public SObject
+	class CORESOBJECT_API SEnum : extends(SObject)
 	{
 		GENERATED_BODY(SEnum);
 		SEnum() = delete;

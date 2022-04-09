@@ -4,9 +4,9 @@
 
 #include <bit>
 
-namespace libty::Sockets::inline Net
+namespace libty::inline Sockets
 {
-	class SOCKETS_API SNetUtility : virtual public SObject
+	class SOCKETS_API SNetUtility : extends(SObject)
 	{
 		GENERATED_BODY(SNetUtility);
 		SNetUtility() = delete;

@@ -8,7 +8,7 @@
 #include <optional>
 #include <version>
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	class DateTime
 	{

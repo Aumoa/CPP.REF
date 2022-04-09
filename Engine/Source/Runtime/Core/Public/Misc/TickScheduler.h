@@ -6,7 +6,7 @@
 #include <functional>
 #include <map>
 
-namespace libty::inline Core::inline Misc
+namespace libty::inline Core
 {
 	class CORE_API TickScheduler
 	{

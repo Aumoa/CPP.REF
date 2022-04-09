@@ -24,13 +24,13 @@ namespace libty::inline Core
 #define check(x) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::Misc::AssertException(#x); \
+	throw ::libty::Core::AssertException(#x); \
 }
 
 #define checkf(x, fmt, ...) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::Misc::AssertException(#x, ::libty::Core::Misc::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+	throw ::libty::Core::AssertException(#x, ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
 }
 
 #define ensure(x) \
@@ -54,7 +54,7 @@ if (const bool b = (bool)(x); !b) \
 {\
 	if (!b)\
 	{\
-		::libty::Core::CoreAssert::Ensure(#x, ::libty::Core::Misc::String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
+		::libty::Core::CoreAssert::Ensure(#x, ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
