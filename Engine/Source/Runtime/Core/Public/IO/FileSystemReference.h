@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <filesystem>
+#include <source_location>
 
 namespace libty::inline Core::inline IO
 {
@@ -33,6 +34,6 @@ namespace libty::inline Core::inline IO
 		bool operator ==(const FileSystemReference&) const = default;
 
 	private:
-		static void Xassert(bool expression, std::string_view message);
+		static void Xassert(bool expression, std::string_view message, std::source_location src = std::source_location::current());
 	};
 }

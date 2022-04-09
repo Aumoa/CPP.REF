@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Threading/Thread.h"
-#include "Misc/Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
 #include "Misc/String.h"
 
 using namespace libty;
@@ -15,7 +15,7 @@ std::future<void> Thread::ThreadSuspendToken::Suspend()
 {
 	if (SuspendPromise.has_value())
 	{
-		throw invalid_operation("Thread already wait for suspend.");
+		throw InvalidOperationException("Thread already wait for suspend.");
 	}
 	return SuspendPromise.emplace().get_future();
 }

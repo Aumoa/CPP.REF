@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Object.h"
-#include "PrimitiveTypes.h"
 #include <set>
 
 namespace libty::inline Core::Reflection

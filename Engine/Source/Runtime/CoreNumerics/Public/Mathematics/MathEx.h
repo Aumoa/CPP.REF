@@ -4,7 +4,6 @@
 
 #include <concepts>
 #include <numbers>
-#include "PrimitiveTypes.h"
 #include "EaseFunction.h"
 
 namespace libty::inline CoreNumerics::inline Mathematics

@@ -6,7 +6,6 @@
 #include "typeof.h"
 #include "ReflectionTypeTraits.h"
 #include "ValueType.h"
-#include "Misc/String.h"
 
 namespace libty::inline Core::Reflection
 {

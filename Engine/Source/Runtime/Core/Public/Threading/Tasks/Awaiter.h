@@ -3,7 +3,8 @@
 #pragma once
 
 #include "IAwaiter.h"
-#include "Misc/Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
+#include "Exceptions/TaskCanceledException.h"
 #include <coroutine>
 #include <mutex>
 #include <future>
@@ -89,17 +90,17 @@ namespace libty::inline Core::inline Threading::inline Tasks
 			}
 		}
 
-		virtual void Cancel(const std::source_location& source = std::source_location::current()) override
+		virtual void Cancel(std::source_location source = std::source_location::current()) override
 		{
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
 			{
-				throw invalid_operation("Task is freezed.");
+				throw InvalidOperationException("Task is freezed.", nullptr, source);
 			}
 			if (!IsCompleted())
 			{
 				_status = ETaskStatus::Canceled;
-				_exception = std::make_exception_ptr(task_canceled());
+				_exception = std::make_exception_ptr(TaskCanceledException(nullptr, source));
 				_promise.set_exception(_exception);
 				_source = source;
 
@@ -108,16 +109,16 @@ namespace libty::inline Core::inline Threading::inline Tasks
 			}
 			else
 			{
-				throw invalid_operation("Task already completed.");
+				throw InvalidOperationException("Task already completed.", nullptr, source);
 			}
 		}
 
-		virtual void SetException(std::exception_ptr ptr, const std::source_location& source = std::source_location::current()) override
+		virtual void SetException(std::exception_ptr ptr, std::source_location source = std::source_location::current()) override
 		{
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
 			{
-				throw invalid_operation("Task is freezed.");
+				throw InvalidOperationException("Task is freezed.", nullptr, source);
 			}
 			if (!IsCompleted())
 			{
@@ -131,7 +132,7 @@ namespace libty::inline Core::inline Threading::inline Tasks
 			}
 			else
 			{
-				throw invalid_operation("Task already completed.");
+				throw InvalidOperationException("Task already completed.", nullptr, source);
 			}
 		}
 
@@ -141,14 +142,14 @@ namespace libty::inline Core::inline Threading::inline Tasks
 			return _exception;
 		}
 
-		void SetResult(const std::source_location& source = std::source_location::current()) requires
+		void SetResult(std::source_location source = std::source_location::current()) requires
 			std::same_as<T, void>
 		{
 			SetResultImpl(source);
 		}
 
 		template<class U>
-		void SetResult(U&& result, const std::source_location& source = std::source_location::current()) requires
+		void SetResult(U&& result, std::source_location source = std::source_location::current()) requires
 			(!std::same_as<T, void>) &&
 			(!std::same_as<std::remove_const_t<std::remove_reference_t<U>>, void>)
 		{
@@ -178,12 +179,12 @@ namespace libty::inline Core::inline Threading::inline Tasks
 
 	private:
 		template<class... U>
-		void SetResultImpl(const std::source_location& source, U&&... result)
+		void SetResultImpl(std::source_location source, U&&... result)
 		{
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
 			{
-				throw invalid_operation("Task is freezed.");
+				throw InvalidOperationException("Task is freezed.", nullptr, source);
 			}
 			if (!IsCompleted())
 			{
@@ -196,7 +197,7 @@ namespace libty::inline Core::inline Threading::inline Tasks
 			}
 			else
 			{
-				throw invalid_operation("Task already completed.");
+				throw InvalidOperationException("Task already completed.", nullptr, source);
 			}
 		}
 

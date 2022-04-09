@@ -4,8 +4,8 @@
 
 #if PLATFORM_WINDOWS
 
-#include <Windows.h>
 #include "Misc/String.h"
+#include <Windows.h>
 
 using namespace libty;
 

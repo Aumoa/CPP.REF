@@ -3,7 +3,6 @@
 #pragma once
 
 #include "TypeInfoMetadataGenerator.h"
-#include "Misc/String.h"
 #include "typeof.h"
 #include "Enum.h"
 #include "Attributes/ClassAttribute.h"

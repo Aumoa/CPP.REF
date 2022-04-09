@@ -33,12 +33,12 @@ void SFieldInfo::SetValue(SObject* obj, SObject* value)
 {
 	if (IsReadOnly())
 	{
-		throw invalid_operation("The specified field is readonly.");
+		throw InvalidOperationException("The specified field is readonly.");
 	}
 
 	if (!IsStatic() and obj == nullptr)
 	{
-		throw invalid_operation("Field is non-static member but this pointer is not specified.");
+		throw InvalidOperationException("Field is non-static member but this pointer is not specified.");
 	}
 
 	_meta.Setter(obj, value);
@@ -48,7 +48,7 @@ SObject* SFieldInfo::GetValue(SObject* obj)
 {
 	if (!IsStatic() and obj == nullptr)
 	{
-		throw invalid_operation("Field is non-static member but this pointer is not specified.");
+		throw InvalidOperationException("Field is non-static member but this pointer is not specified.");
 	}
 
 	return _meta.Getter(obj);

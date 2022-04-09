@@ -2,7 +2,6 @@
 
 #include "GC/ObjectHashTable.h"
 #include "Object.h"
-#include "CoreAssert.h"
 
 using namespace libty;
 

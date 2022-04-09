@@ -5,7 +5,7 @@
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/TransformInterface/Quaternion.h"
 
-inline namespace libty::CoreNumerics
+namespace libty::inline CoreNumerics
 {
 	struct ObjectOrientedCube
 	{

@@ -245,7 +245,7 @@ namespace libty::inline Core::inline Threading::inline Tasks
 		{
 			if (!IsValid())
 			{
-				throw invalid_operation("Task is null.");
+				throw InvalidOperationException("Task is null.");
 			}
 		}
 

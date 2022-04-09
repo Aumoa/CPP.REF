@@ -5,7 +5,7 @@
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
 #include "Misc/String.h"
-#include "Misc/Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
 #include <string_view>
 #include <span>
 #include <map>
@@ -120,7 +120,7 @@ namespace libty::inline Core::inline Misc
 					auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
 					if (!emplaced.second)
 					{
-						throw invalid_operation(String::Format(L"Duplicated command line key({}).", currKey));
+						throw InvalidOperationException(String::Format("Duplicated command line key({}).", currKey));
 					}
 				}
 				else
@@ -129,7 +129,7 @@ namespace libty::inline Core::inline Misc
 					auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
 					if (!emplaced.second)
 					{
-						throw invalid_operation(String::Format(L"Duplicated command line key({}).", wCurrKey));
+						throw InvalidOperationException(String::Format("Duplicated command line key({}).", wCurrKey));
 					}
 				}
 			};

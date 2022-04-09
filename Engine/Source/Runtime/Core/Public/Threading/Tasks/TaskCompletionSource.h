@@ -78,7 +78,7 @@ namespace libty::inline Core::inline Threading::inline Tasks
 		{
 			if (!x)
 			{
-				throw invalid_operation(message);
+				throw InvalidOperationException(message);
 			}
 		}
 	};

@@ -296,7 +296,7 @@ namespace libty::inline Core::inline Misc
 			}
 			else
 			{
-				static_assert(false);
+				static_assert(sizeof(size_t) == 4 || sizeof(size_t) == 8);
 			}
 		}
 

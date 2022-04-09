@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Object.h"
 
 namespace libty::inline Core
 {

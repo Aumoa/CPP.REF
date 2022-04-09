@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreConcepts.h"
-
 namespace libty::inline CoreNumerics
 {
 	template<class T>

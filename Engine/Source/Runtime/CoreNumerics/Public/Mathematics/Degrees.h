@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Radians.h"
-#include "Misc/String.h"
 #include "MathEx.h"
 
 namespace libty::inline CoreNumerics::inline Mathematics

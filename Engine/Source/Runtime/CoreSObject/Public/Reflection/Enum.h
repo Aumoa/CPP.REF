@@ -2,13 +2,9 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
-#include "CoreConcepts.h"
 #include "Object.h"
 #include "ReflectionMacros.h"
 #include "ReflectionTypeTraits.h"
-#include "Misc/RecursiveMacroHelper.h"
-#include "Misc/String.h"
 #include <map>
 
 namespace libty::inline Core::Reflection
@@ -105,8 +101,8 @@ namespace libty::inline Core::Reflection
 #define SENUM_DECLARE_DICTIONARY_PAIR_PARSE(Name, ...) { L ## #Name, __Type__(Name) },
 #define SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING(Name, ...) { Name.Value, L ## #Name },
 
-#define SENUM_BEGIN(Name, Type, ...)																\
-struct Name : public ::libty::Core::Reflection::EEnumBase<Name, Type>								\
+#define SENUM_BEGIN(API, Name, Type, ...)															\
+struct API Name : public ::libty::Core::Reflection::EEnumBase<Name, Type>							\
 {																									\
 	using __Type__ = Name;																			\
 																									\
@@ -167,7 +163,7 @@ public:																								\
 		}																							\
 		else																						\
 		{																							\
-			return String::Format(L"(" L ## #Name L"){}", this->Value);								\
+			return ::libty::Core::Misc::String::Format(L"(" L ## #Name L"){}", this->Value);		\
 		}																							\
 	}																								\
 																									\
@@ -198,8 +194,8 @@ public:																								\
 #define SENUM_END() \
 };
 
-#define SENUM(Name, Type, ...) \
-SENUM_BEGIN(Name, Type __VA_OPT__(, __VA_ARGS__)) \
+#define SENUM(API, Name, Type, ...) \
+SENUM_BEGIN(API, Name, Type __VA_OPT__(, __VA_ARGS__)) \
 SENUM_END();
 
 template<::libty::Core::Reflection::IEnum TEnum>

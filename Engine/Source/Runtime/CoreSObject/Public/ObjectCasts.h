@@ -3,8 +3,6 @@
 #pragma once
 
 #include "gcnew.h"
-#include "CoreConcepts.h"
-#include "Misc/Exceptions.h"
 #include <optional>
 
 namespace libty::inline Core
@@ -36,13 +34,13 @@ namespace libty::inline Core
 			auto ValueTypePtr = Cast<SValueType>(InValue);
 			if (ValueTypePtr == nullptr)
 			{
-				throw fatal_exception(L"Object is not boxing class.");
+				throw FatalException("Object is not boxing class.");
 			}
 
 			TTo OutValue;
 			if (!ValueTypePtr->Unboxing(&OutValue))
 			{
-				throw fatal_exception(L"The type of value contained at boxing object is not match with desired type.");
+				throw FatalException("The type of value contained at boxing object is not match with desired type.");
 			}
 
 			return OutValue;

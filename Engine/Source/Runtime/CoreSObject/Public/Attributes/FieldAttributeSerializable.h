@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "FieldAttribute.h"
+#include "Reflection/TypeInfoMetadataGenerator.h"
+#include "Reflection/TypeInfoMetadataGenerator.Impl.h"
 
 namespace Attributes::inline Core
 {

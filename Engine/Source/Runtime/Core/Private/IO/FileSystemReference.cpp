@@ -2,7 +2,7 @@
 
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
-#include "Misc/Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
 
 using namespace libty;
 
@@ -34,10 +34,10 @@ bool FileSystemReference::IsSet() const
 	return _path.has_value();
 }
 
-void FileSystemReference::Xassert(bool expression, std::string_view message)
+void FileSystemReference::Xassert(bool expression, std::string_view message, std::source_location src)
 {
 	if (!expression)
 	{
-		throw invalid_operation(message);
+		throw InvalidOperationException(message, nullptr, src);
 	}
 }

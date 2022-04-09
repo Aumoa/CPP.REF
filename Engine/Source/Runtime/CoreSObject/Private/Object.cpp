@@ -1,11 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Object.h"
-#include "LogCore.h"
-#include "Diagnostics/LogVerbosity.h"
-#include "Diagnostics/LogSystem.h"
-#include "Misc/TickCalc.h"
-#include "Threading/Tasks/Parallel.h"
 #include "GC/GC.h"
 #include "GC/WeakPtr.h"
 #include "Reflection/Type.h"

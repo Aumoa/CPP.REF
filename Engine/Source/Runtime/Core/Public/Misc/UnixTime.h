@@ -29,7 +29,7 @@ namespace libty::inline Core::inline Misc
 			return _tp.has_value();
 		}
 
-		template<class TDateFormatter = libty::DateTimeFormat::Json>
+		template<class TDateFormatter = libty::Core::Misc::DateTimeFormat::Json>
 		std::wstring ToString() const
 		{
 			Xassert(IsValid(), "Time is not setted.");
@@ -64,7 +64,7 @@ namespace libty::inline Core::inline Misc
 			return UnixTime(clock::now());
 		}
 
-		template<class TDateFormatter = libty::DateTimeFormat::Json>
+		template<class TDateFormatter = libty::Core::Misc::DateTimeFormat::Json>
 		static bool TryParse(std::wstring_view time, UnixTime& outDateTime)
 		{
 			time_point tp;
@@ -83,7 +83,7 @@ namespace libty::inline Core::inline Misc
 		{
 			if (!x)
 			{
-				throw invalid_operation(message, source);
+				throw InvalidOperationException(message, nullptr, source);
 			}
 		}
 	};

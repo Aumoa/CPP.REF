@@ -4,7 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
-#include "Misc/Exceptions.h"
+#include "Exceptions/AssertException.h"
 #include <string_view>
 #include <source_location>
 
@@ -24,13 +24,13 @@ namespace libty::inline Core
 #define check(x) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::Misc::assert_exception(#x); \
+	throw ::libty::Core::Misc::AssertException(#x); \
 }
 
 #define checkf(x, fmt, ...) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::Misc::assert_exception(#x, ::libty::Core::Misc::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+	throw ::libty::Core::Misc::AssertException(#x, ::libty::Core::Misc::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
 }
 
 #define ensure(x) \

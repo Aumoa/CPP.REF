@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreAssert.h"
-
 namespace libty::inline Core
 {
 	template<class T>

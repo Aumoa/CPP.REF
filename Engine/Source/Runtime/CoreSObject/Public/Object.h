@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
-#include "Casts.h"
 #include "gcnew.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/TypeInfoMetadataGenerator.h"

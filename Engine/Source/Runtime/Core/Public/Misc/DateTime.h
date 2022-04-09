@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
 #include "DateTimeFormat.h"
 #include <chrono>
 #include <optional>
@@ -110,7 +110,7 @@ namespace libty::inline Core::inline Misc
 		{
 			if (!x)
 			{
-				throw invalid_operation(message, source);
+				throw InvalidOperationException(message, nullptr, source);
 			}
 		}
 	};

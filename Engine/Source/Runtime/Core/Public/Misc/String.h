@@ -4,7 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
-#include "Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
 #include <vector>
 #include <set>
 #include <array>
@@ -63,7 +63,7 @@ namespace libty::inline Core::inline Misc
 				size_t endp = format_sv.find((Char_t)'}', i + 1);
 				if (endp == format_sv.npos)
 				{
-					throw invalid_operation("Formatter is not closed with '}' token.");
+					throw InvalidOperationException("Formatter is not closed with '}' token.");
 				}
 
 				StringView_t scope = format_sv.substr(startp, endp - startp);

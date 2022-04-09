@@ -1,17 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "GC/GC.h"
-#include "Threading/Tasks/Parallel.h"
-#include "Diagnostics/CycleCounterNamespace.h"
-#include "Diagnostics/CycleCounterUnit.h"
-#include "Diagnostics/CycleCounterMacros.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogVerbosity.h"
-#include "Threading/SuspendTokenCollection.h"
-#include "Threading/ISuspendToken.h"
 #include "Reflection/Type.h"
 #include "Reflection/FieldInfo.h"
-#include "LogCore.h"
 #include "Object.h"
 #include <string>
 #include <future>

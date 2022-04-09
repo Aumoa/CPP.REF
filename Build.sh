@@ -2,8 +2,6 @@ echo
 echo Build CMake projects.
 echo 
 
-pwd_p=`pwd -P`
-
 if [ ! -d Intermediate ];then
   mkdir Intermediate
 fi
@@ -16,5 +14,6 @@ pushd Intermediate
   pushd CMake
     cmake -GNinja ../..
     ninja -j20
+    exit $?
   popd
 popd

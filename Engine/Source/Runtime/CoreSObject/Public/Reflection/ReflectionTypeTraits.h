@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreConcepts.h"
-
 namespace libty::inline Core
 {
 	class SObject;

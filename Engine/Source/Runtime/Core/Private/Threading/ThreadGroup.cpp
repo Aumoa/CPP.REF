@@ -4,7 +4,7 @@
 #include "Threading/Thread.h"
 #include "Threading/ISuspendToken.h"
 #include "Threading/SuspendTokenCollection.h"
-#include "Misc/Exceptions.h"
+#include "Exceptions/InvalidOperationException.h"
 #include "Misc/TickCalc.h"
 #include "Misc/String.h"
 #include "Diagnostics/LogSystem.h"
@@ -39,7 +39,7 @@ public:
 	{
 		if (_promise.has_value())
 		{
-			throw invalid_operation("ThreadGroup already wait for suspend.");
+			throw InvalidOperationException("ThreadGroup already wait for suspend.");
 		}
 
 		_threadsIdx = 0;
