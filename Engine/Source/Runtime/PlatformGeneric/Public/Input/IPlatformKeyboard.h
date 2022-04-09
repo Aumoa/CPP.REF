@@ -2,18 +2,20 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "KeyboardState.h"
 
-struct IPlatformKeyboard : implements SObject
+namespace libty::inline PlatformGeneric::inline Input
 {
-	GENERATED_INTERFACE_BODY(IPlatformKeyboard)
+	struct PLATFORMGENERIC_API IPlatformKeyboard : virtual public SObject
+	{
+		GENERATED_BODY(IPlatformKeyboard);
 
-	virtual KeyboardState GetState() = 0;
-	virtual void Reset() = 0;
-	virtual bool IsConnected() = 0;
+		virtual KeyboardState GetState() = 0;
+		virtual void Reset() = 0;
+		virtual bool IsConnected() = 0;
 
-	DECLARE_MULTICAST_DELEGATE(KeyboardDelegate, EKey);
-	KeyboardDelegate KeyPressed;
-	KeyboardDelegate KeyReleased;
-};
+		DECLARE_MULTICAST_DELEGATE(KeyboardDelegate, EKey);
+		KeyboardDelegate KeyPressed;
+		KeyboardDelegate KeyReleased;
+	};
+}

@@ -2,7 +2,7 @@
 
 #include "Input/MouseStateTracker.h"
 
-GENERATE_BODY(SMouseStateTracker);
+using namespace ::libty;
 
 SMouseStateTracker::SMouseStateTracker() : Super()
 {

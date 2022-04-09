@@ -2,13 +2,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "IMEEvent.h"
 
-struct IPlatformIME : implements SObject
+namespace libty::inline PlatformGeneric::inline Input
 {
-	GENERATED_INTERFACE_BODY(IPlatformIME)
+	struct PLATFORMGENERIC_API IPlatformIME : virtual public SObject
+	{
+		GENERATED_BODY(IPlatformIME);
 
-	DECLARE_MULTICAST_DELEGATE(IMEDelegate, IMEEvent);
-	IMEDelegate IME;
-};
+		DECLARE_MULTICAST_DELEGATE(IMEDelegate, IMEEvent);
+		IMEDelegate IME;
+	};
+}

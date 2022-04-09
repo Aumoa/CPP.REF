@@ -2,55 +2,66 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Reflection/ReflectionMacros.h"
-#include "Numerics/VectorInterface/Vector.h"
-#include "Reflection/Enum.h"
-
-class PlatformModule;
-struct IRHIFactory;
-struct IPlatformKeyboard;
-struct IPlatformMouse;
-struct IPlatformImageLoader;
-struct IPlatformIME;
-
-struct IApplicationInterface : implements SObject
+namespace libty::inline PlatformGeneric
 {
-	GENERATED_INTERFACE_BODY(IApplicationInterface)
+	inline namespace RHI
+	{
+		struct IRHIFactory;
+	}
+	
+	inline namespace Input
+	{
+		struct IPlatformKeyboard;
+		struct IPlatformMouse;
+		struct IPlatformIME;
+	}
 
-	SENUM(ETickMode, int32,
-		Realtime,,
-		Ontime,
-	);
+	inline namespace Multimedia
+	{
+		struct IPlatformImageLoader;
+	}
+}
 
-	virtual void Start() = 0;
-	virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) = 0;
+namespace libty::inline PlatformGeneric
+{
+	struct PLATFORMGENERIC_API IApplicationInterface : virtual public SObject
+	{
+		GENERATED_BODY(IApplicationInterface);
 
-	virtual Vector2N GetViewportSize() = 0;
-	virtual float GetDpi() = 0;
-	virtual void* GetWindowHandle() = 0;
+		SENUM(PLATFORMGENERIC_API, ETickMode, int32,
+			Realtime,,
+			Ontime,
+		);
 
-	virtual void SetTickMode(ETickMode InTickMode) = 0;
-	virtual ETickMode GetTickMode() = 0;
-	virtual void AddRealtimeDemander(SObject* InObject) = 0;
-	virtual void RemoveRealtimeDemander(SObject* InObject) = 0;
+		virtual void Start() = 0;
+		virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) = 0;
 
-	virtual void SetTitle(std::wstring_view InTitle) = 0;
-	virtual std::wstring GetTitle() = 0;
+		virtual Vector2N GetViewportSize() = 0;
+		virtual float GetDpi() = 0;
+		virtual void* GetWindowHandle() = 0;
 
-	virtual IRHIFactory* GetFactory() = 0;
-	virtual IPlatformKeyboard& GetPlatformKeyboard() = 0;
-	virtual IPlatformMouse& GetPlatformMouse() = 0;
-	virtual IPlatformImageLoader& GetPlatformImageLoader() = 0;
-	virtual IPlatformIME& GetPlatformIME() = 0;
+		virtual void SetTickMode(ETickMode InTickMode) = 0;
+		virtual ETickMode GetTickMode() = 0;
+		virtual void AddRealtimeDemander(SObject* InObject) = 0;
+		virtual void RemoveRealtimeDemander(SObject* InObject) = 0;
 
-	DECLARE_MULTICAST_DELEGATE(IdleDelegate, ETickMode);
-	IdleDelegate Idle;
-	DECLARE_MULTICAST_DELEGATE(SizedDelegate, Vector2N);
-	SizedDelegate Sized;
-	DECLARE_MULTICAST_DELEGATE(PreDestroyAppDelegate);
-	PreDestroyAppDelegate PreDestroyApp;
+		virtual void SetTitle(std::wstring_view InTitle) = 0;
+		virtual std::wstring GetTitle() = 0;
 
-	PLATFORMGENERIC_API IApplicationInterface();
-	PLATFORMGENERIC_API static IApplicationInterface& Get();
-};
+		virtual IRHIFactory* GetFactory() = 0;
+		virtual IPlatformKeyboard& GetPlatformKeyboard() = 0;
+		virtual IPlatformMouse& GetPlatformMouse() = 0;
+		virtual IPlatformImageLoader& GetPlatformImageLoader() = 0;
+		virtual IPlatformIME& GetPlatformIME() = 0;
+
+		DECLARE_MULTICAST_DELEGATE(IdleDelegate, ETickMode);
+		IdleDelegate Idle;
+		DECLARE_MULTICAST_DELEGATE(SizedDelegate, Vector2N);
+		SizedDelegate Sized;
+		DECLARE_MULTICAST_DELEGATE(PreDestroyAppDelegate);
+		PreDestroyAppDelegate PreDestroyApp;
+
+		IApplicationInterface();
+		static IApplicationInterface& Get();
+	};
+}

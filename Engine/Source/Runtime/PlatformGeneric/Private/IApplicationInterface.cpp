@@ -2,6 +2,8 @@
 
 #include "IApplicationInterface.h"
 
+using namespace ::libty;
+
 static IApplicationInterface* gApp;
 
 IApplicationInterface::IApplicationInterface()

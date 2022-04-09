@@ -2,7 +2,7 @@
 
 #include "Input/KeyboardTracker.h"
 
-GENERATE_BODY(SKeyboardTracker);
+using namespace ::libty;
 
 SKeyboardTracker::SKeyboardTracker() : Super()
 {

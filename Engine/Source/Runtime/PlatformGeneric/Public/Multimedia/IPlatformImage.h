@@ -2,14 +2,16 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "RHI/RHIEnums.h"
 
-struct IPlatformImage : implements SObject
+namespace libty::inline PlatformGeneric::inline Multimedia
 {
-	GENERATED_INTERFACE_BODY(IPlatformImage)
+	struct PLATFORMGENERIC_API IPlatformImage : implements(IDisposable)
+	{
+		GENERATED_BODY(IPlatformImage);
 
-	virtual void CopyPixels(const RectN* CopyRect, int32 Stride, int32 BufferSize, void* OutBuffer) = 0;
-	virtual Vector2N GetPixelSize() = 0;
-	virtual ERHIPixelFormat GetPixelFormat() = 0;
-};
+		virtual void CopyPixels(const RectN* CopyRect, int32 Stride, int32 BufferSize, void* OutBuffer) = 0;
+		virtual Vector2N GetPixelSize() = 0;
+		virtual ERHIPixelFormat GetPixelFormat() = 0;
+	};
+}

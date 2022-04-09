@@ -2,23 +2,23 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
-#include "Reflection/Enum.h"
-
-SENUM(EMousePositionMode, int32,
-    Absolute,,
-    Relative,
-);
-
-struct MouseState
+namespace libty::inline PlatformGeneric::inline Input
 {
-    uint8 bLeftButton : 1;
-    uint8 bMiddleButton : 1;
-    uint8 bRightButton : 1;
-    uint8 bXButton1 : 1;
-    uint8 bXButton2 : 1;
-    int32 X;
-    int32 Y;
-    int32 ScrollWheelValue;
-    EMousePositionMode Mode;
-};
+    SENUM(PLATFORMGENERIC_API, EMousePositionMode, int32,
+        Absolute,,
+        Relative,
+    );
+
+    struct MouseState
+    {
+        uint8 bLeftButton : 1;
+        uint8 bMiddleButton : 1;
+        uint8 bRightButton : 1;
+        uint8 bXButton1 : 1;
+        uint8 bXButton2 : 1;
+        int32 X;
+        int32 Y;
+        int32 ScrollWheelValue;
+        EMousePositionMode Mode;
+    };
+}

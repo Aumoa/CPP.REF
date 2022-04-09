@@ -2,28 +2,29 @@
 
 #pragma once
 
-#include "Object.h"
 #include "BitfieldInputChangeTracker.h"
 #include "KeyboardState.h"
 #include "MouseState.h"
-#include "Misc/InputEnums.h"
 
-class PLATFORMGENERIC_API SKeyboardTracker : implements SObject
+namespace libty::inline PlatformGeneric::inline Input
 {
-	GENERATED_BODY(SKeyboardTracker)
+	class PLATFORMGENERIC_API SKeyboardTracker : virtual public SObject
+	{
+		GENERATED_BODY(SKeyboardTracker);
 
-private:
-	BitfieldInputChangeTracker<KeyboardState> Tracker;
+	private:
+		BitfieldInputChangeTracker<KeyboardState> Tracker;
 
-public:
-	SKeyboardTracker();
+	public:
+		SKeyboardTracker();
 
-	void Update(const KeyboardState& InNewState);
-	void Reset();
-	const KeyboardState& GetLast();
-	bool IsKeyPressed(EKey Key);
-	int32 GetPressedBitsByIndex(int32 BitIndex);
-	bool IsKeyReleased(EKey Key);
-	int32 GetReleasedBitsByIndex(int32 BitIndex);
-	int32 GetNumBits();
-};
+		void Update(const KeyboardState& InNewState);
+		void Reset();
+		const KeyboardState& GetLast();
+		bool IsKeyPressed(EKey Key);
+		int32 GetPressedBitsByIndex(int32 BitIndex);
+		bool IsKeyReleased(EKey Key);
+		int32 GetReleasedBitsByIndex(int32 BitIndex);
+		int32 GetNumBits();
+	};
+}

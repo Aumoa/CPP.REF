@@ -2,16 +2,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "RHI/RHIEnums.h"
 #include <filesystem>
 
-struct IPlatformImage;
-
-struct IPlatformImageLoader : implements SObject
+namespace libty::inline PlatformGeneric::inline Multimedia
 {
-	GENERATED_INTERFACE_BODY(IPlatformImageLoader)
+	struct IPlatformImage;
 
-	virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) = 0;
-	virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) = 0;
-};
+	struct PLATFORMGENERIC_API IPlatformImageLoader : virtual public SObject
+	{
+		GENERATED_BODY(IPlatformImageLoader);
+
+		virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) = 0;
+		virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) = 0;
+	};
+}

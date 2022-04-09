@@ -2,43 +2,44 @@
 
 #pragma once
 
-#include "Reflection/Enum.h"
-
-SENUM(EIMEEvent, int32,
-	Char,,
-	StartComposition,,
-	EndComposition,,
-	Composition,
-);
-
-struct IMEEvent
+namespace libty::inline PlatformGeneric::inline Input
 {
-	EIMEEvent Event;
+	SENUM(PLATFORMGENERIC_API, EIMEEvent, int32,
+		Char,,
+		StartComposition,,
+		EndComposition,,
+		Composition,
+	);
 
-	union
+	struct IMEEvent
 	{
-		struct
-		{
-			wchar_t ComposedChar;
-		} Char;
+		EIMEEvent Event;
 
-		struct
+		union
 		{
-			uint8 __Unused;
-		} StartComposition;
+			struct
+			{
+				wchar_t ComposedChar;
+			} Char;
 
-		struct
-		{
-			uint8 __Unused;
-		} EndComposition;
+			struct
+			{
+				uint8 __Unused;
+			} StartComposition;
 
-		struct
+			struct
+			{
+				uint8 __Unused;
+			} EndComposition;
+
+			struct
+			{
+				wchar_t ComposingChar;
+			} Composition;
+		};
+
+		IMEEvent(EIMEEvent Event) : Event(Event)
 		{
-			wchar_t ComposingChar;
-		} Composition;
+		}
 	};
-
-	IMEEvent(EIMEEvent Event) : Event(Event)
-	{
-	}
-};
+}
