@@ -4,30 +4,17 @@
 
 namespace libty::inline PlatformGeneric
 {
-	inline namespace RHI
-	{
-		struct IRHIFactory;
-	}
-	
-	inline namespace Input
-	{
-		struct IPlatformKeyboard;
-		struct IPlatformMouse;
-		struct IPlatformIME;
-	}
+	struct IRHIFactory;
+	struct IPlatformKeyboard;
+	struct IPlatformMouse;
+	struct IPlatformIME;
+	struct IPlatformImageLoader;
 
-	inline namespace Multimedia
-	{
-		struct IPlatformImageLoader;
-	}
-}
-
-namespace libty::inline PlatformGeneric
-{
 	struct PLATFORMGENERIC_API IApplicationInterface : virtual public SObject
 	{
 		GENERATED_BODY(IApplicationInterface);
 
+	public:
 		SENUM(PLATFORMGENERIC_API, ETickMode, int32,
 			Realtime,,
 			Ontime,

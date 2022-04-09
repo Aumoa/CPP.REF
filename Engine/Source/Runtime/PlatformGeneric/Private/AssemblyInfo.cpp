@@ -4,91 +4,91 @@ DEFINE_ASSEMBLY_INFO;
 
 #include "RHI/RHIEnums.h"
 
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIPrimitiveTopology);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHICommandListType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIResourceStates);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIPixelFormat);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIVertexElementFormat);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIInputClassification);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIShaderParameterType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIResourceFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIDescriptorRangeType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIBufferUsage);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIRTVDimension);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIDSVDimension);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHISRVDimension);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIDSVFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIBufferSRVFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIFontWeight);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIFontStyle);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIFontStretch);
-GENERATE_BODY(libty::PlatformGeneric::RHI::EMaterialBlendMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::EMaterialDomain);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIDrawTextOptions);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHITextAlignment);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIParagraphAlignment);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIInterpolationMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHICompositeMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIAttachmentLoadOp);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIAttachmentStoreOp);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIShaderType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIRootParameterType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIShaderVisibility);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHISamplerFilter);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHITextureAddressMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIComparisonFunc);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIStaticBorderColor);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIRootSignatureFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIBlend);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIBlendOp);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHILogicOp);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIFillMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHICullMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIConservativeRasterizationMode);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIDepthWriteMask);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIStencilOp);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIIndexBufferStripCutValue);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIPrimitiveTopologyType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIPipelineStateFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIColorWriteEnable);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIResourceBarrierType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIResourceBarrierFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIUAVDimension);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIBufferUAVFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIHeapType);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHICPUPageProperty);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIMemoryPool);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIHeapFlags);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHIResourceDimension);
-GENERATE_BODY(libty::PlatformGeneric::RHI::ERHITextureLayout);
+GENERATE_BODY(libty::PlatformGeneric::ERHIPrimitiveTopology);
+GENERATE_BODY(libty::PlatformGeneric::ERHICommandListType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIResourceStates);
+GENERATE_BODY(libty::PlatformGeneric::ERHIPixelFormat);
+GENERATE_BODY(libty::PlatformGeneric::ERHIVertexElementFormat);
+GENERATE_BODY(libty::PlatformGeneric::ERHIInputClassification);
+GENERATE_BODY(libty::PlatformGeneric::ERHIShaderParameterType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIResourceFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIDescriptorRangeType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIBufferUsage);
+GENERATE_BODY(libty::PlatformGeneric::ERHIRTVDimension);
+GENERATE_BODY(libty::PlatformGeneric::ERHIDSVDimension);
+GENERATE_BODY(libty::PlatformGeneric::ERHISRVDimension);
+GENERATE_BODY(libty::PlatformGeneric::ERHIDSVFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIBufferSRVFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIFontWeight);
+GENERATE_BODY(libty::PlatformGeneric::ERHIFontStyle);
+GENERATE_BODY(libty::PlatformGeneric::ERHIFontStretch);
+GENERATE_BODY(libty::PlatformGeneric::EMaterialBlendMode);
+GENERATE_BODY(libty::PlatformGeneric::EMaterialDomain);
+GENERATE_BODY(libty::PlatformGeneric::ERHIDrawTextOptions);
+GENERATE_BODY(libty::PlatformGeneric::ERHITextAlignment);
+GENERATE_BODY(libty::PlatformGeneric::ERHIParagraphAlignment);
+GENERATE_BODY(libty::PlatformGeneric::ERHIInterpolationMode);
+GENERATE_BODY(libty::PlatformGeneric::ERHICompositeMode);
+GENERATE_BODY(libty::PlatformGeneric::ERHIAttachmentLoadOp);
+GENERATE_BODY(libty::PlatformGeneric::ERHIAttachmentStoreOp);
+GENERATE_BODY(libty::PlatformGeneric::ERHIShaderType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIRootParameterType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIShaderVisibility);
+GENERATE_BODY(libty::PlatformGeneric::ERHISamplerFilter);
+GENERATE_BODY(libty::PlatformGeneric::ERHITextureAddressMode);
+GENERATE_BODY(libty::PlatformGeneric::ERHIComparisonFunc);
+GENERATE_BODY(libty::PlatformGeneric::ERHIStaticBorderColor);
+GENERATE_BODY(libty::PlatformGeneric::ERHIRootSignatureFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIBlend);
+GENERATE_BODY(libty::PlatformGeneric::ERHIBlendOp);
+GENERATE_BODY(libty::PlatformGeneric::ERHILogicOp);
+GENERATE_BODY(libty::PlatformGeneric::ERHIFillMode);
+GENERATE_BODY(libty::PlatformGeneric::ERHICullMode);
+GENERATE_BODY(libty::PlatformGeneric::ERHIConservativeRasterizationMode);
+GENERATE_BODY(libty::PlatformGeneric::ERHIDepthWriteMask);
+GENERATE_BODY(libty::PlatformGeneric::ERHIStencilOp);
+GENERATE_BODY(libty::PlatformGeneric::ERHIIndexBufferStripCutValue);
+GENERATE_BODY(libty::PlatformGeneric::ERHIPrimitiveTopologyType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIPipelineStateFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIColorWriteEnable);
+GENERATE_BODY(libty::PlatformGeneric::ERHIResourceBarrierType);
+GENERATE_BODY(libty::PlatformGeneric::ERHIResourceBarrierFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIUAVDimension);
+GENERATE_BODY(libty::PlatformGeneric::ERHIBufferUAVFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIHeapType);
+GENERATE_BODY(libty::PlatformGeneric::ERHICPUPageProperty);
+GENERATE_BODY(libty::PlatformGeneric::ERHIMemoryPool);
+GENERATE_BODY(libty::PlatformGeneric::ERHIHeapFlags);
+GENERATE_BODY(libty::PlatformGeneric::ERHIResourceDimension);
+GENERATE_BODY(libty::PlatformGeneric::ERHITextureLayout);
 
 #include "RHI/RHIInterfaces.h"
 
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIFactoryChild);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIAdapter);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIDeviceChild);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIRootSignature);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIPipelineState);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIResource);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIView);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIRenderTargetView);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIDepthStencilView);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIShaderResourceView);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHICommandAllocator);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIGraphicsCommandList);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIShaderCodeBlob);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIShaderCodeWorkspace);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIFence);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHISwapChain);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHICommandQueue);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIDevice);
-GENERATE_BODY(libty::PlatformGeneric::RHI::IRHIFactory);
+GENERATE_BODY(libty::PlatformGeneric::IRHIFactoryChild);
+GENERATE_BODY(libty::PlatformGeneric::IRHIAdapter);
+GENERATE_BODY(libty::PlatformGeneric::IRHIDeviceChild);
+GENERATE_BODY(libty::PlatformGeneric::IRHIRootSignature);
+GENERATE_BODY(libty::PlatformGeneric::IRHIPipelineState);
+GENERATE_BODY(libty::PlatformGeneric::IRHIResource);
+GENERATE_BODY(libty::PlatformGeneric::IRHIView);
+GENERATE_BODY(libty::PlatformGeneric::IRHIRenderTargetView);
+GENERATE_BODY(libty::PlatformGeneric::IRHIDepthStencilView);
+GENERATE_BODY(libty::PlatformGeneric::IRHIShaderResourceView);
+GENERATE_BODY(libty::PlatformGeneric::IRHICommandAllocator);
+GENERATE_BODY(libty::PlatformGeneric::IRHIGraphicsCommandList);
+GENERATE_BODY(libty::PlatformGeneric::IRHIShaderCodeBlob);
+GENERATE_BODY(libty::PlatformGeneric::IRHIShaderCodeWorkspace);
+GENERATE_BODY(libty::PlatformGeneric::IRHIFence);
+GENERATE_BODY(libty::PlatformGeneric::IRHISwapChain);
+GENERATE_BODY(libty::PlatformGeneric::IRHICommandQueue);
+GENERATE_BODY(libty::PlatformGeneric::IRHIDevice);
+GENERATE_BODY(libty::PlatformGeneric::IRHIFactory);
 
 #include "Multimedia/IPlatformImage.h"
 #include "Multimedia/IPlatformImageLoader.h"
 
-GENERATE_BODY(libty::PlatformGeneric::Multimedia::IPlatformImage);
-GENERATE_BODY(libty::PlatformGeneric::Multimedia::IPlatformImageLoader);
+GENERATE_BODY(libty::PlatformGeneric::IPlatformImage);
+GENERATE_BODY(libty::PlatformGeneric::IPlatformImageLoader);
 
 #include "Input/IMEEvent.h"
 #include "Input/IPlatformIME.h"
@@ -98,13 +98,13 @@ GENERATE_BODY(libty::PlatformGeneric::Multimedia::IPlatformImageLoader);
 #include "Input/MouseState.h"
 #include "Input/MouseStateTracker.h"
 
-GENERATE_BODY(libty::PlatformGeneric::Input::EIMEEvent);
-GENERATE_BODY(libty::PlatformGeneric::Input::IPlatformIME);
-GENERATE_BODY(libty::PlatformGeneric::Input::IPlatformKeyboard);
-GENERATE_BODY(libty::PlatformGeneric::Input::IPlatformMouse);
-GENERATE_BODY(libty::PlatformGeneric::Input::SKeyboardTracker);
-GENERATE_BODY(libty::PlatformGeneric::Input::EMousePositionMode);
-GENERATE_BODY(libty::PlatformGeneric::Input::SMouseStateTracker);
+GENERATE_BODY(libty::PlatformGeneric::EIMEEvent);
+GENERATE_BODY(libty::PlatformGeneric::IPlatformIME);
+GENERATE_BODY(libty::PlatformGeneric::IPlatformKeyboard);
+GENERATE_BODY(libty::PlatformGeneric::IPlatformMouse);
+GENERATE_BODY(libty::PlatformGeneric::SKeyboardTracker);
+GENERATE_BODY(libty::PlatformGeneric::EMousePositionMode);
+GENERATE_BODY(libty::PlatformGeneric::SMouseStateTracker);
 
 #include "IApplicationInterface.h"
 

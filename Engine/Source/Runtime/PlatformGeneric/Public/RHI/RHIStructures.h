@@ -4,7 +4,7 @@
 
 #include "RHIEnums.h"
 
-namespace libty::inline PlatformGeneric::inline RHI
+namespace libty::inline PlatformGeneric
 {
 	struct IRHIResource;
 	struct IRHIRenderTargetView;

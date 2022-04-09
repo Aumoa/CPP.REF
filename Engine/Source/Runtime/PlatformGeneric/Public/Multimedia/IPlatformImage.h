@@ -4,7 +4,7 @@
 
 #include "RHI/RHIEnums.h"
 
-namespace libty::inline PlatformGeneric::inline Multimedia
+namespace libty::inline PlatformGeneric
 {
 	struct PLATFORMGENERIC_API IPlatformImage : implements(IDisposable)
 	{

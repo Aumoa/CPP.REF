@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline PlatformGeneric::inline RHI
+namespace libty::inline PlatformGeneric
 {
     SENUM(PLATFORMGENERIC_API, ERHIPrimitiveTopology, int32,
         TriangleList, 4,

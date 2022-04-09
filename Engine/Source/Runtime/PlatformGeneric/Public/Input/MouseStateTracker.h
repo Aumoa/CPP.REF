@@ -5,7 +5,7 @@
 #include "BitfieldInputChangeTracker.h"
 #include "Input/IPlatformMouse.h"
 
-namespace libty::inline PlatformGeneric::inline Input
+namespace libty::inline PlatformGeneric
 {
 	class PLATFORMGENERIC_API SMouseStateTracker : virtual public SObject
 	{

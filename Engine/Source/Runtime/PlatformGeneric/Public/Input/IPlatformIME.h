@@ -4,7 +4,7 @@
 
 #include "IMEEvent.h"
 
-namespace libty::inline PlatformGeneric::inline Input
+namespace libty::inline PlatformGeneric
 {
 	struct PLATFORMGENERIC_API IPlatformIME : virtual public SObject
 	{

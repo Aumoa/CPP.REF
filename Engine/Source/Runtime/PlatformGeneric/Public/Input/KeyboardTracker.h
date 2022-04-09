@@ -6,7 +6,7 @@
 #include "KeyboardState.h"
 #include "MouseState.h"
 
-namespace libty::inline PlatformGeneric::inline Input
+namespace libty::inline PlatformGeneric
 {
 	class PLATFORMGENERIC_API SKeyboardTracker : virtual public SObject
 	{

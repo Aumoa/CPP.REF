@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline PlatformGeneric::inline RHI
+namespace libty::inline PlatformGeneric
 {
 	class PLATFORMGENERIC_API ShaderCompilerException : public FatalException
 	{

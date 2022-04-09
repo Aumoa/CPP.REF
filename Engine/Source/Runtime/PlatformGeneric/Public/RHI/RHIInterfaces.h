@@ -6,7 +6,7 @@
 #include <span>
 #include <optional>
 
-namespace libty::inline PlatformGeneric::inline RHI
+namespace libty::inline PlatformGeneric
 {
 	struct IRHIFactory;
 	struct IRHIDevice;
@@ -15,6 +15,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIFactoryChild);
 
+	public:
 		virtual IRHIFactory* GetFactory() = 0;
 	};
 
@@ -22,6 +23,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIAdapter);
 
+	public:
 		virtual std::wstring GetDeviceName() = 0;
 	};
 
@@ -29,6 +31,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIDeviceChild);
 
+	public:
 		virtual IRHIDevice* GetDevice() = 0;
 	};
 
@@ -46,6 +49,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIResource);
 
+	public:
 		virtual RHIResourceDesc GetDesc() = 0;
 	};
 
@@ -53,6 +57,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIView);
 
+	public:
 		virtual size_t GetViewCount() = 0;
 		virtual IRHIResource* GetResource(size_t indexOf) = 0;
 	};
@@ -61,6 +66,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIRenderTargetView);
 
+	public:
 		virtual void CreateRenderTargetView(size_t index, IRHIResource* pResource, const RHIRenderTargetViewDesc* pDesc) = 0;
 	};
 
@@ -68,6 +74,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIDepthStencilView);
 
+	public:
 		virtual void CreateDepthStencilView(size_t index, IRHIResource* pResource, const RHIDepthStencilViewDesc* pDesc) = 0;
 	};
 
@@ -75,6 +82,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIShaderResourceView);
 
+	public:
 		virtual void CreateShaderResourceView(size_t index, IRHIResource* pResource, const RHIShaderResourceViewDesc* pDesc) = 0;
 		virtual void CreateUnorderedAccessView(size_t index, IRHIResource* pResource, IRHIResource* pCounter, const RHIUnorderedAccessViewDesc* pDesc) = 0;
 	};
@@ -83,6 +91,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHICommandAllocator);
 
+	public:
 		virtual void Reset() = 0;
 	};
 
@@ -90,6 +99,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIGraphicsCommandList);
 
+	public:
 		virtual void Reset(IRHICommandAllocator* pAllocator, IRHIPipelineState* pInitialState) = 0;
 		virtual void Close() = 0;
 		virtual void ResourceBarrier(std::span<const RHIResourceBarrier> barriers) = 0;
@@ -100,6 +110,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIShaderCodeBlob);
 
+	public:
 		virtual const void* GetBufferPointer() = 0;
 		virtual size_t GetBufferSize() = 0;
 		virtual ERHIShaderType GetShaderCodeType() = 0;
@@ -109,6 +120,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIShaderCodeWorkspace);
 
+	public:
 		virtual void AddShaderCode(std::wstring_view name, const RHIShaderCode& code) = 0;
 		virtual void Compile() = 0;
 		virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::string_view entryPointName) = 0;
@@ -118,6 +130,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIFence);
 
+	public:
 		virtual Task<> SetEventOnCompletion(uint64 fenceValue, std::optional<std::chrono::milliseconds> timeout) = 0;
 		virtual uint64 GetCompletedValue() = 0;
 	};
@@ -126,6 +139,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHISwapChain);
 
+	public:
 		virtual void ResizeBuffers(const Vector2N& size) = 0;
 		virtual IRHIResource* GetBuffer(size_t index) = 0;
 		virtual void Present() = 0;
@@ -135,7 +149,8 @@ namespace libty::inline PlatformGeneric::inline RHI
 	struct PLATFORMGENERIC_API IRHICommandQueue : implements(IRHIDeviceChild)
 	{
 		GENERATED_BODY(IRHICommandQueue);
-		
+
+	public:		
 		virtual void ExecuteCommandBuffers(std::span<IRHIGraphicsCommandList* const> commandLists) = 0;
 		virtual void Signal(IRHIFence* pFence, uint64 fenceValue) = 0;
 
@@ -150,6 +165,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIDevice);
 
+	public:
 		virtual IRHICommandQueue* CreateCommandQueue(ERHICommandListType type) = 0;
 		virtual IRHIResource* CreateCommittedResource(const RHIHeapProperties& heapProperties, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* pOptimizedClearValue) = 0;
 		virtual IRHIRenderTargetView* CreateRenderTargetView(size_t count) = 0;
@@ -167,6 +183,7 @@ namespace libty::inline PlatformGeneric::inline RHI
 	{
 		GENERATED_BODY(IRHIFactory);
 
+	public:
 		virtual IRHIAdapter* GetAdapter(size_t index) = 0;
 		virtual IRHIDevice* CreateDevice(IRHIAdapter* pAdapter) = 0;
 		virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* pQueue, size_t numBuffers) = 0;

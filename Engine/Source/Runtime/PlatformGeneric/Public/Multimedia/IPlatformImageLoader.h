@@ -5,7 +5,7 @@
 #include "RHI/RHIEnums.h"
 #include <filesystem>
 
-namespace libty::inline PlatformGeneric::inline Multimedia
+namespace libty::inline PlatformGeneric
 {
 	struct IPlatformImage;
 

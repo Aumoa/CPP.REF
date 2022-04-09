@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace libty::inline PlatformGeneric::inline Input
+namespace libty::inline PlatformGeneric
 {
 	template<class TBitfield>
 	class BitfieldInputChangeTracker

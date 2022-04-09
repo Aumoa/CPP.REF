@@ -4,7 +4,7 @@
 
 #include "MouseState.h"
 
-namespace libty::inline PlatformGeneric::Input
+namespace libty::inline PlatformGeneric
 {
     struct PLATFORMGENERIC_API IPlatformMouse : virtual public SObject
     {
