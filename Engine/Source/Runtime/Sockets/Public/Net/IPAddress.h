@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "NetUtility.h"
-#include <stdexcept>
 
 namespace libty::Sockets::inline Net
 {
@@ -71,7 +69,7 @@ namespace libty::Sockets::inline Net
 			std::vector<std::wstring> splits = String::Split(ipstring, L".", true, true);
 			if (splits.size() != 4)
 			{
-				throw invalid_operation("Source IPString is not valid for parsing IPAddress. There are not 4 components.");
+				throw InvalidOperationException("Source IPString is not valid for parsing IPAddress. There are not 4 components.");
 			}
 
 			IPAddress addr;
@@ -83,7 +81,7 @@ namespace libty::Sockets::inline Net
 					int32 value = std::stoi(splits[i], nullptr, 10);
 					if (value < 0 || value > 255)
 					{
-						throw invalid_operation("Out of range detected while parsing IP component. Value must between 0 ~ 255.");
+						throw InvalidOperationException("Out of range detected while parsing IP component. Value must between 0 ~ 255.");
 					}
 
 					addr._baddr[i] = (uint8)value;
@@ -91,7 +89,7 @@ namespace libty::Sockets::inline Net
 			}
 			catch (const std::out_of_range&)
 			{
-				throw invalid_operation("Out of range detected while parsing IP component. Value must between 0 ~ 255.");
+				throw InvalidOperationException("Out of range detected while parsing IP component. Value must between 0 ~ 255.");
 			}
 
 			return addr;

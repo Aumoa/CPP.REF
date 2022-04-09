@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include <bit>
 
 namespace libty::Sockets::inline Net
 {
-	class SNetUtility : virtual public SObject
+	class SOCKETS_API SNetUtility : virtual public SObject
 	{
 		GENERATED_BODY(SNetUtility);
 		SNetUtility() = delete;

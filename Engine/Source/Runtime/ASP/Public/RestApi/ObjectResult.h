@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ActionResult.h"
 #include "Web/HttpStatusCode.h"
 

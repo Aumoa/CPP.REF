@@ -2,7 +2,7 @@
 
 #include "DependencyInjection/ServiceCollection.h"
 
-using namespace libty::Asp::DependencyInjection;
+using namespace ::libty::Asp::DependencyInjection;
 
 SServiceCollection::SServiceCollection()
 	: Super()
@@ -11,7 +11,7 @@ SServiceCollection::SServiceCollection()
 
 IServiceCollection* SServiceCollection::Configure(SType* optionsGenericType, IConfiguration* configuration)
 {
-	throw not_implemented();
+	throw NotImplementedException();
 }
 
 IServiceCollection* SServiceCollection::AddController(SType* controllerGenericType)

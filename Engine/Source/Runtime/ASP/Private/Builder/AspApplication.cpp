@@ -4,9 +4,6 @@
 #include "Builder/AspApplicationBuilder.h"
 #include "DependencyInjection/ServiceCollection.h"
 #include "Controllers/ControllerBase.h"
-#include "Sockets/Socket.h"
-#include "Net/IPEndPoint.h"
-#include "Diagnostics/CycleCounter.h"
 
 using namespace ::libty;
 using namespace ::libty::Asp;
@@ -48,14 +45,14 @@ int32 SAspApplication::Run()
 	_socket->Bind(IPEndPoint::Parse(L"0.0.0.0:5001"));
 
 	_socket->Listen();
-	while (SSocket* client = _socket->Accept())
+	while (SSocket* client = _socket->Accept().GetResult())
 	{
 		HandleClient(client);
 
 		Task<>::Run([client]()
 		{
 			std::vector<char> buf(1024);
-			size_t read = client->Recv(buf.data(), 1024).GetResult();
+			size_t read = client->Recv(buf.data(), 1024);
 
 			//SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
 			client->Close();

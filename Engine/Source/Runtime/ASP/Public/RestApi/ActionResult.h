@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "IActionResult.h"
 
 namespace libty::Asp::inline RestApi

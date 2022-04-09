@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "DependencyInjection/IServiceCollection.h"
 
 namespace libty::Asp::inline Builder
@@ -15,7 +14,7 @@ namespace libty::Asp::inline DependencyInjection
 	class SServiceCollection : virtual public SObject, implements(IServiceCollection)
 	{
 		GENERATED_BODY(SServiceCollection);
-		friend class libty::Asp::Builder::SAspApplication;
+		friend class ::libty::Asp::Builder::SAspApplication;
 
 	private:
 		SPROPERTY(_controllers)

@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 namespace libty::Sockets
 {
-	SENUM(ESocketFlags, int32,
+	SENUM(SOCKETS_API, ESocketFlags, int32,
 		None				, 0,
 		OutOfBand			, 1,
 		Peek				, OutOfBand << 1,

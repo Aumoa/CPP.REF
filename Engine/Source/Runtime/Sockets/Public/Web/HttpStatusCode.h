@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 namespace libty::Sockets::inline Web
 {
-    SENUM(EHttpStatusCode, int32,
+    SENUM(SOCKETS_API, EHttpStatusCode, int32,
         Continue, 100,
         SwitchingProtocols, 101,
         Processing, 102,

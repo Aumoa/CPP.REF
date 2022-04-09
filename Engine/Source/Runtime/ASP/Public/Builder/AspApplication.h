@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Misc/CommandLine.h"
-
 namespace libty::Asp::inline DependencyInjection
 {
 	class SServiceCollection;
@@ -13,11 +10,6 @@ namespace libty::Asp::inline DependencyInjection
 namespace libty::Asp::inline Controllers
 {
 	class SControllerBase;
-}
-
-namespace libty::Sockets
-{
-	class SSocket;
 }
 
 namespace libty::Asp::inline Builder

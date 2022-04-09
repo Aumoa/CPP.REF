@@ -2,12 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "SocketType.h"
 #include "Net/AddressFamily.h"
 #include "Net/ProtocolType.h"
 #include "SocketFlags.h"
-#include "Threading/Tasks/Task.h"
 
 namespace libty::Sockets
 {

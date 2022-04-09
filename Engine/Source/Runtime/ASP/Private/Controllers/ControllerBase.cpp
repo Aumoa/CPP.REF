@@ -3,7 +3,7 @@
 #include "Controllers/ControllerBase.h"
 #include "RestApi/OkObjectResult.h"
 
-using namespace libty::Asp;
+using namespace ::libty::Asp;
 
 SControllerBase::SControllerBase()
 	: Super()

@@ -36,7 +36,7 @@ public:
 				int32 Result = WSAStartup(MAKEWORD(2, 2), &WSAData);
 				if (Result)
 				{
-					throw socket_exception(std::format("Couldn't initialize WinSock2 with error code: {}", Result));
+					throw SocketException(String::Format("Couldn't initialize WinSock2 with error code: {}", Result));
 				}
 
 				bStaticInit = true;
@@ -89,7 +89,7 @@ public:
 		{
 			if (closesocket(Socket) == SOCKET_ERROR)
 			{
-				throw socket_exception("Failed to close socket handle.");
+				throw SocketException("Failed to close socket handle.");
 			}
 			bClosed = true;
 		}
@@ -99,27 +99,27 @@ public:
 	static void AbortWithError(const std::source_location& src = std::source_location::current())
 	{
 		int32 PlatformErrorCode = WSAGetLastError();
-		wchar_t* Wstr = nullptr;
-		std::wstring Message;
+		char* Astr = nullptr;
+		std::string Message;
 
-		FormatMessageW(
+		FormatMessageA(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr,
 			(DWORD)PlatformErrorCode,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPWSTR)&Wstr,
+			(LPSTR)&Astr,
 			0,
 			nullptr
 		);
 
-		if (Wstr)
+		if (Astr)
 		{
-			Message = Wstr;
-			LocalFree(Wstr);
-			Wstr = nullptr;
+			Message = Astr;
+			LocalFree(Astr);
+			Astr = nullptr;
 		}
 
-		throw socket_exception(std::format(L"Socket operation return error code: {}, message: {}", PlatformErrorCode, Message), src);
+		throw SocketException(String::Format("Socket operation return error code: {}, message: {}", PlatformErrorCode, Message), nullptr, src);
 	}
 
 	inline int32 ClampToInt(size_t Size)

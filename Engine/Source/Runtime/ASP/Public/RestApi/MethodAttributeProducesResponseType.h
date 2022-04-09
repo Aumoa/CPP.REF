@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Web/HttpStatusCode.h"
 
 namespace Attributes::inline libty::inline Asp

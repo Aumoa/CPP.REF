@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Attributes/ClassAttribute.h"
 
 namespace Attributes::inline libty::inline Asp

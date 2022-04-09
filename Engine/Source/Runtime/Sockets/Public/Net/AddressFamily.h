@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 namespace libty::Sockets::inline Net
 {
-	SENUM(EAddressFamily, int32,
+	SENUM(SOCKETS_API, EAddressFamily, int32,
 		InterNetwork,
 	);
 }

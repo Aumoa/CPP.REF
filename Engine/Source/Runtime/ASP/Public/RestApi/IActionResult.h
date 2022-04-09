@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 namespace libty::Asp::inline RestApi
 {
 	struct ASP_API IActionResult : virtual public SObject

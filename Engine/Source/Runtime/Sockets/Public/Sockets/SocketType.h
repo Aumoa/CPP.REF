@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 namespace libty::Sockets
 {
-	SENUM(ESocketType, int32,
+	SENUM(SOCKETS_API, ESocketType, int32,
 		Stream,
 	);
 }

@@ -3,7 +3,6 @@
 #include "Sockets/Socket.h"
 #include "Sockets/SocketException.h"
 #include "Net/IPEndPoint.h"
-#include "CoreAssert.h"
 
 using namespace ::libty;
 using namespace ::libty::Sockets;
@@ -18,7 +17,7 @@ inline int GetRawFamily(EAddressFamily Family)
 	case EAddressFamily::InterNetwork:
 		return AF_INET;
 	default:
-		throw socket_exception(String::Format("Unknown address family type({}).", (int32)Family));
+		throw SocketException(String::Format("Unknown address family type({}).", (int32)Family));
 	}
 }
 
@@ -29,7 +28,7 @@ inline int GetRawSocketType(ESocketType SocketType)
 	case ESocketType::Stream:
 		return SOCK_STREAM;
 	default:
-		throw socket_exception(String::Format("Unknown socket type({}).", (int32)SocketType));
+		throw SocketException(String::Format("Unknown socket type({}).", (int32)SocketType));
 	}
 }
 
@@ -40,7 +39,7 @@ inline int GetRawProtocolType(EProtocolType ProtocolType)
 	case EProtocolType::TCP:
 		return IPPROTO_TCP;
 	default:
-		throw socket_exception(String::Format("Unknown protocol type({}).", (int32)ProtocolType));
+		throw SocketException(String::Format("Unknown protocol type({}).", (int32)ProtocolType));
 	}
 }
 

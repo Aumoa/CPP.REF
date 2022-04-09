@@ -2,35 +2,15 @@
 
 #pragma once
 
-#include "Misc/String.h"
-#include <exception>
-#include <source_location>
-#include <string>
-
 namespace libty::Sockets
 {
-	class socket_exception : public std::exception
+	class SOCKETS_API SocketException : public FatalException
 	{
 		std::string _message;
 		std::source_location _location;
 		std::string _what;
 
 	public:
-		socket_exception(std::string_view message, const std::source_location& location = std::source_location::current())
-			: _message(message)
-			, _location(location)
-		{
-			_what = String::Format("{}: {}\n  at {} in {}:{}", typeid(*this).name(), _message, location.function_name(), location.file_name(), location.line());
-		}
-
-		socket_exception(std::wstring_view message, const std::source_location& location = std::source_location::current())
-			: socket_exception(String::AsMultibyte(message), location)
-		{
-		}
-
-		virtual const char* what() const noexcept override
-		{
-			return _what.c_str();
-		}
+		SocketException(std::string_view message, std::exception_ptr innerException = nullptr, std::source_location location = std::source_location::current());
 	};
 }

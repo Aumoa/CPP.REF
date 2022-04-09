@@ -52,14 +52,14 @@ namespace libty::Sockets::inline Net
 				int32 value = std::stoi(splits[1]);
 				if (value < 0 || value > 65535)
 				{
-					throw invalid_operation("Out of range detected while parsing port component. Value must between 0 ~ 65535.");
+					throw InvalidOperationException("Out of range detected while parsing port component. Value must between 0 ~ 65535.");
 				}
 
 				ep._port = (uint16)value;
 				return ep;
 			}
 
-			throw invalid_operation("Port is not specified.");
+			throw InvalidOperationException("Port is not specified.");
 		}
 	};
 }

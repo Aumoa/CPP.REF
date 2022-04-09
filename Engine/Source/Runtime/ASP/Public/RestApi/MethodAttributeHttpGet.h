@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 namespace Attributes::inline libty::inline Asp
 {
 	class ASP_API SMethodAttributeHttpGet : public ::libty::SMethodAttribute
