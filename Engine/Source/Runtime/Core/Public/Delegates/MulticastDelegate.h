@@ -170,4 +170,4 @@ namespace libty::inline Core::inline Delegates
 
 
 #define DECLARE_MULTICAST_DELEGATE(DelegateName, ...)				\
-	using DelegateName = libty::MulticastDelegate<void(__VA_ARGS__)>;
+	using DelegateName = ::libty::MulticastDelegate<void(__VA_ARGS__)>;

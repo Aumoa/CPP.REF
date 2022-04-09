@@ -21,4 +21,4 @@ namespace libty::inline Core::inline Delegates
 }
 
 #define DECLARE_MULTICAST_EVENT(EventName, ...)					\
-	using EventName = libty::MulticastEvent<This, void(__VA_ARGS__)>;
+	using EventName = ::libty::MulticastEvent<This, void(__VA_ARGS__)>;
