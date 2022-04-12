@@ -5,10 +5,11 @@
 #include "IAwaiter.h"
 #include "Exceptions/InvalidOperationException.h"
 #include "Exceptions/TaskCanceledException.h"
+#include "Misc/VoidableOptional.h"
 #include <coroutine>
 #include <mutex>
-#include <future>
 #include <queue>
+#include <condition_variable>
 
 namespace libty::inline Core
 {
@@ -16,8 +17,8 @@ namespace libty::inline Core
 	class Awaiter : public IAwaiter
 	{
 		std::mutex _lock;
-		std::promise<T> _promise;
-		std::shared_future<T> _future;
+		VoidableOptional<T> _promise;
+		std::condition_variable _future;
 		ETaskStatus _status = ETaskStatus::Created;
 		std::queue<std::function<void(Task<void>)>> _thens;
 		std::exception_ptr _exception;
@@ -27,7 +28,6 @@ namespace libty::inline Core
 	public:
 		Awaiter()
 		{
-			_future = _promise.get_future();
 		}
 
 		Awaiter(const Awaiter&) = delete;
@@ -73,7 +73,8 @@ namespace libty::inline Core
 
 		virtual void Wait() override
 		{
-			_future.wait();
+			auto lock = std::unique_lock(_lock);
+			_future.wait(lock, [this] { return IsCompleted(); });
 		}
 
 		virtual void Then(std::function<void(Task<void>)> proc) override
@@ -101,9 +102,9 @@ namespace libty::inline Core
 			{
 				_status = ETaskStatus::Canceled;
 				_exception = std::make_exception_ptr(TaskCanceledException(nullptr, source));
-				_promise.set_exception(_exception);
 				_source = source;
 
+				_future.notify_all();
 				lock.unlock();
 				InvokeThens();
 			}
@@ -123,10 +124,10 @@ namespace libty::inline Core
 			if (!IsCompleted())
 			{
 				_status = ETaskStatus::Faulted;
-				_promise.set_exception(ptr);
 				_exception = ptr;
 				_source = source;
 
+				_future.notify_all();
 				lock.unlock();
 				InvokeThens();
 			}
@@ -156,9 +157,32 @@ namespace libty::inline Core
 			SetResultImpl(source, std::forward<U>(result));
 		}
 
-		T GetResult() const
+		template<class U = T>
+		void GetResult() requires
+			std::same_as<U, void> &&
+			std::same_as<U, T>
 		{
-			return _future.get();
+			Wait();
+			if (_exception)
+			{
+				std::rethrow_exception(_exception);
+			}
+		}
+
+		template<class U = T>
+		const U& GetResult() requires
+			(!std::same_as<U, void>) &&
+			std::same_as<U, T>
+		{
+			Wait();
+			if (_exception)
+			{
+				std::rethrow_exception(_exception);
+			}
+			else
+			{
+				return _promise.GetValue();
+			}
 		}
 
 		std::source_location GetSourceCode() const
@@ -172,9 +196,9 @@ namespace libty::inline Core
 			_freezed = true;
 		}
 
-		T await_resume()
+		decltype(auto) await_resume()
 		{
-			return _future.get();
+			return GetResult();
 		}
 
 	private:
@@ -189,9 +213,10 @@ namespace libty::inline Core
 			if (!IsCompleted())
 			{
 				_status = ETaskStatus::RanToCompletion;
-				_promise.set_value(std::forward<U>(result)...);
+				_promise.Emplace(std::forward<U>(result)...);
 				_source = source;
 
+				_future.notify_all();
 				lock.unlock();
 				InvokeThens();
 			}

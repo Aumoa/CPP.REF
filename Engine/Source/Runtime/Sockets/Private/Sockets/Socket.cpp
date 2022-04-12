@@ -78,8 +78,6 @@ SSocket::SSocket(EAddressFamily Family, ESocketType SocketType, EProtocolType Pr
 	{
 		Impl->AbortWithError();
 	}
-
-	Impl->SetNonblock();
 }
 
 SSocket::~SSocket()
@@ -118,8 +116,11 @@ void SSocket::Listen(int32 backlog)
 	}
 }
 
-Task<SSocket*> SSocket::Accept()
+SSocket* SSocket::Accept()
 {
+	std::unique_lock lock(_lock);
+	Impl->SetNonblock(false);
+
 	sockaddr addr;
 	socklen_t szAddr = sizeof(addr);
 
@@ -133,11 +134,14 @@ Task<SSocket*> SSocket::Accept()
 	client->Impl = std::make_unique<SocketImpl>();
 	client->Impl->Socket = sock;
 
-	co_return client;
+	return client;
 }
 
 size_t SSocket::Recv(void* buf, size_t len, ESocketFlags flags, std::stop_token cancellationToken)
 {
+	std::unique_lock lock(_lock);
+	//Impl->SetNonblock(true);
+
 	size_t total = 0;
 	while (len > 0)
 	{

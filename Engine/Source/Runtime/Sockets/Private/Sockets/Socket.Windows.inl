@@ -17,9 +17,6 @@ struct SSocket::SocketImpl
 	inline static std::mutex StaticMtx;
 
 	SOCKET Socket = INVALID_SOCKET;
-	HANDLE hSockListenEvent = nullptr;
-	HANDLE hSockSendEvent = nullptr;
-	HANDLE hSockRecvEvent = nullptr;
 	bool bClosed = false;
 
 public:
@@ -44,12 +41,6 @@ public:
 		}
 
 		++ReferenceCount;
-
-		hSockListenEvent = WSACreateEvent();
-		hSockSendEvent = WSACreateEvent();
-		hSockRecvEvent = WSACreateEvent();
-
-		RegisterWaitForSingleObject(&hSockListenEvent, hSockListenEvent, SSocket::SocketImpl::WindowsAccept, this, 0, 0);
 	}
 
 	inline static void CloseHandle(HANDLE& hSockEvent)
@@ -63,10 +54,6 @@ public:
 
 	~SocketImpl() noexcept
 	{
-		CloseHandle(hSockListenEvent);
-		CloseHandle(hSockSendEvent);
-		CloseHandle(hSockRecvEvent);
-
 		if (--ReferenceCount == 0)
 		{
 			std::unique_lock StaticMtx_lock(StaticMtx);
@@ -74,9 +61,9 @@ public:
 		}
 	}
 
-	void SetNonblock()
+	void SetNonblock(bool bNonblock)
 	{
-		u_long nBlock = 1;
+		u_long nBlock = bNonblock ? 1 : 0;
 		if (ioctlsocket(Socket, FIONBIO, &nBlock) == SOCKET_ERROR)
 		{
 			AbortWithError();
@@ -125,12 +112,6 @@ public:
 	inline int32 ClampToInt(size_t Size)
 	{
 		return (int32)(Size > 0x7FFFFFFF ? 0x7FFFFFFF : Size);
-	}
-
-private:
-	static VOID NTAPI WindowsAccept(PVOID ptr, BOOLEAN timerOrWaitFired)
-	{
-		SE_LOG(LogTemp, Verbose, L"WindowsAccept");
 	}
 };
 

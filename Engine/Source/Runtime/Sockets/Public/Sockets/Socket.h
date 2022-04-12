@@ -18,6 +18,7 @@ namespace libty::inline Sockets
 	private:
 		struct SocketImpl;
 		std::shared_ptr<SocketImpl> Impl;
+		std::mutex _lock;
 
 	private:
 		SSocket();
@@ -30,7 +31,7 @@ namespace libty::inline Sockets
 		void Bind(const IPEndPoint& endpoint);
 		void Close();
 		void Listen(int32 backlog = 256);
-		Task<SSocket*> Accept();
+		SSocket* Accept();
 
 		size_t Recv(void* buf, size_t len, ESocketFlags flags = ESocketFlags::None, std::stop_token cancellationToken = {});
 

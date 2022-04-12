@@ -49,7 +49,7 @@ int32 SAspApplication::Run()
 	{
 		try
 		{
-			SSocket* client = _socket->Accept().GetResult();
+			SSocket* client = _socket->Accept();
 			HandleClient(client);
 
 			Task<>::Run([client]()
@@ -57,10 +57,10 @@ int32 SAspApplication::Run()
 				std::vector<char> buf(1024);
 				size_t read = client->Recv(buf.data(), 1024);
 
-				//SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
+				SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
 				client->Close();
 
-				//SE_LOG(LogTemp, Verbose, L"Session closed.");
+				SE_LOG(LogTemp, Verbose, L"Session closed.");
 			});
 		}
 		catch (const std::exception& e)
