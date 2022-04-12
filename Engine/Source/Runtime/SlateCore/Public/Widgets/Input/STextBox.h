@@ -2,38 +2,40 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "STextBlock.h"
+#include "Widgets/Text/STextBlock.h"
 
-class SLATECORE_API STextBox : public STextBlock
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(STextBox)
+	class SLATECORE_API STextBox : extends(STextBlock)
+	{
+		GENERATED_BODY(STextBox);
 
-public:
-	STextBox();
+	public:
+		STextBox();
 
-public:
-	BEGIN_SLATE_ATTRIBUTE
-	END_SLATE_ATTRIBUTE
+	public:
+		BEGIN_SLATE_ATTRIBUTE
+		END_SLATE_ATTRIBUTE
 
-	DECLARE_SLATE_CONSTRUCTOR();
+		DECLARE_SLATE_CONSTRUCTOR();
 
-protected:
-	virtual bool OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
-	virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
+	protected:
+		virtual bool OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event) override;
+		virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
 
-public:
-	DECLARE_MULTICAST_DELEGATE(TextCommittedDelegate, std::wstring_view)
-	TextCommittedDelegate TextCommitted;
+	public:
+		DECLARE_MULTICAST_DELEGATE(TextCommittedDelegate, std::wstring_view)
+		TextCommittedDelegate TextCommitted;
 
-private:
-	void ProcessChar(wchar_t Ch);
-	void Composition(wchar_t Ch);
-	void Backspace();
-	void Enter();
+	private:
+		void ProcessChar(wchar_t Ch);
+		void Composition(wchar_t Ch);
+		void Backspace();
+		void Enter();
 
-private:
-	std::wstring Text;
-	std::optional<wchar_t> ComposingChar;
-	size_t Caret = 0;
-};
+	private:
+		std::wstring Text;
+		std::optional<wchar_t> ComposingChar;
+		size_t Caret = 0;
+	};
+}

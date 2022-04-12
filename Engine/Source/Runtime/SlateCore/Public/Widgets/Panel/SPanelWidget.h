@@ -2,13 +2,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
 
-class SLATECORE_API SPanelWidget : public SCompoundWidget
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SPanelWidget)
+	class SLATECORE_API SPanelWidget : extends(SCompoundWidget)
+	{
+		GENERATED_BODY(SPanelWidget);
 
-public:
-	SPanelWidget();
-};
+	public:
+		SPanelWidget();
+	};
+}

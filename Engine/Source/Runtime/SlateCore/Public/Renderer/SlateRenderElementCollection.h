@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-class SLATECORE_API SSlateRenderElementCollection : implements SObject
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SSlateRenderElementCollection);
+	class SLATECORE_API SSlateRenderElementCollection : extends(SObject)
+	{
+		GENERATED_BODY(SSlateRenderElementCollection);
 
-public:
-	SSlateRenderElementCollection();
-};
+	public:
+		SSlateRenderElementCollection();
+	};
+}

@@ -4,14 +4,17 @@
 
 #include "CommonShaderWorkspace.h"
 
-class RENDERCORE_API SColorShaderWorkspace : public SCommonShaderWorkspace
+namespace libty::inline RenderCore
 {
-	GENERATED_BODY(SColorShaderWorkspace)
+	class RENDERCORE_API SColorShaderWorkspace : public SCommonShaderWorkspace
+	{
+		GENERATED_BODY(SColorShaderWorkspace);
 
-public:
-	SColorShaderWorkspace(IRHIDevice* device);
+	public:
+		SColorShaderWorkspace(IRHIDevice* device);
 
-protected:
-	virtual IRHIRootSignature* CreateRootSignature(IRHIShaderCodeWorkspace* workspace) override;
-	virtual IRHIPipelineState* CreateGraphicsPipelineState(IRHIShaderCodeWorkspace* workspace, IRHIRootSignature* signature) override;
-};
+	protected:
+		virtual IRHIRootSignature* CreateRootSignature(IRHIShaderCodeWorkspace* workspace) override;
+		virtual IRHIPipelineState* CreateGraphicsPipelineState(IRHIShaderCodeWorkspace* workspace, IRHIRootSignature* signature) override;
+	};
+}

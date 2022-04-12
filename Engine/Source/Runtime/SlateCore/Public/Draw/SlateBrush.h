@@ -2,45 +2,46 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "CoreNumerics.h"
 #include "RHI/RHIInterfaces.h"
 
-struct SlateBrush
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SlateBrush);
-
-public:
-	SPROPERTY(ImageSource)
-	IRHIShaderResourceView* ImageSource = nullptr;
-	Vector2 ImageSize = Vector2::Zero();
-
-	SlateBrush(IRHIShaderResourceView* ImageSource, const Vector2& ImageSize)
-		: ImageSource(ImageSource)
-		, ImageSize(ImageSize)
+	struct SlateBrush
 	{
-	}
+		GENERATED_BODY(SlateBrush);
 
-	std::wstring ToString(std::wstring_view InFormatArgs = L"") const
-	{
-		return String::Format(L"DesiredSize: {}", ImageSize.ToString(InFormatArgs));
-	}
+	public:
+		//SPROPERTY(ImageSource)
+		//IRHIShaderResourceView* ImageSource = nullptr;
+		//Vector2 ImageSize = Vector2::Zero();
 
-	auto operator <=>(const SlateBrush& Rhs) const
-	{
-		auto Compare = ImageSource <=> Rhs.ImageSource;
-		if (Compare != 0)
+		SlateBrush(IRHIShaderResourceView* ImageSource, const Vector2& ImageSize)
+			//: ImageSource(ImageSource)
+			//, ImageSize(ImageSize)
 		{
-			return Compare;
 		}
 
-		Compare = ImageSize <=> Rhs.ImageSize;
-		return Compare;
-	}
+		//std::wstring ToString(std::wstring_view InFormatArgs = L"") const
+		//{
+		//	return String::Format(L"DesiredSize: {}", ImageSize.ToString(InFormatArgs));
+		//}
 
-	bool operator ==(const SlateBrush& Rhs) const
-	{
-		return ImageSource == Rhs.ImageSource
-			&& ImageSize == Rhs.ImageSize;
-	}
-};
+		//auto operator <=>(const SlateBrush& Rhs) const
+		//{
+		//	auto Compare = ImageSource <=> Rhs.ImageSource;
+		//	if (Compare != 0)
+		//	{
+		//		return Compare;
+		//	}
+
+		//	Compare = ImageSize <=> Rhs.ImageSize;
+		//	return Compare;
+		//}
+
+		//bool operator ==(const SlateBrush& Rhs) const
+		//{
+		//	return ImageSource == Rhs.ImageSource
+		//		&& ImageSize == Rhs.ImageSize;
+		//}
+	};
+}

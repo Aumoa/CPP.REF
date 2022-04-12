@@ -2,49 +2,50 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-class SWidget;
-
-namespace libty::SlateCore::Details
+namespace libty::inline SlateCore
 {
-	class SLATECORE_API SSlotBase : implements SObject
-	{
-		GENERATED_BODY(SSlotBase)
+	class SWidget;
 
-	private:
-		SPROPERTY(Content)
-		SWidget* Content = nullptr;
+	namespace Details
+	{
+		class SLATECORE_API SSlotBase : extends(SObject)
+		{
+			GENERATED_BODY(SSlotBase)
+
+		private:
+			SPROPERTY(Content)
+			SWidget* Content = nullptr;
+
+		public:
+			SSlotBase();
+
+			SWidget* GetContent();
+			void SetContent(SWidget* Content);
+		};
+	}
+
+	template<class TSlotClass>
+	class TSlotBase : public ::libty::SlateCore::Details::SSlotBase
+	{
+	public:
+		using Super = libty::SlateCore::Details::SSlotBase;
+		using This = TSlotBase<TSlotClass>;
 
 	public:
-		SSlotBase();
+		TSlotBase() : Super()
+		{
+		}
 
-		SWidget* GetContent();
-		void SetContent(SWidget* Content);
+		TSlotClass&& operator [](SWidget* InContent) &&
+		{
+			SetContent(InContent);
+			return static_cast<TSlotClass&&>(std::move(*this));
+		}
+
+		TSlotClass& operator [](SWidget* InContent) &
+		{
+			SetContent(InContent);
+			return static_cast<TSlotClass&>(*this);
+		}
 	};
 }
-
-template<class TSlotClass>
-class TSlotBase : public libty::SlateCore::Details::SSlotBase
-{
-public:
-	using Super = libty::SlateCore::Details::SSlotBase;
-	using This = TSlotBase<TSlotClass>;
-
-public:
-	TSlotBase() : Super()
-	{
-	}
-
-	TSlotClass&& operator [](SWidget* InContent) &&
-	{
-		SetContent(InContent);
-		return static_cast<TSlotClass&&>(std::move(*this));
-	}
-
-	TSlotClass& operator [](SWidget* InContent) &
-	{
-		SetContent(InContent);
-		return static_cast<TSlotClass&>(*this);
-	}
-};

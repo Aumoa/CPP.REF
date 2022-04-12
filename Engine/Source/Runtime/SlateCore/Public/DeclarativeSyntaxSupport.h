@@ -2,53 +2,54 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-template<class T, class TDesiredClass>
-struct DeclarativeInheritanceIfImplements
+namespace libty::inline SlateCore
 {
-private:
-	template<class U> requires requires { typename U::template DeclarativeAttr<>; }
-	static auto Impl(int32) -> decltype(std::declval<typename U::template DeclarativeAttr<TDesiredClass>>());
-
-	struct E
+	template<class T, class TDesiredClass>
+	struct DeclarativeInheritanceIfImplements
 	{
+	private:
+		template<class U> requires requires { typename U::template DeclarativeAttr<>; }
+		static auto Impl(int32) -> decltype(std::declval<typename U::template DeclarativeAttr<TDesiredClass>>());
+
+		struct E
+		{
+		};
+		template<class U> requires (!requires { typename U::template DeclarativeAttr<>; })
+		static auto Impl(int16) -> E;
+
+	public:
+		using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
 	};
-	template<class U> requires (!requires { typename U::template DeclarativeAttr<>; })
-	static auto Impl(int16) -> E;
 
-public:
-	using Type = std::remove_reference_t<decltype(Impl<T>(0))>;
-};
+	template<class TVoid, class TImpl>
+	struct DeclarativeVoidTypeImpl
+	{
+		using Type = TVoid;
+	};
 
-template<class TVoid, class TImpl>
-struct DeclarativeVoidTypeImpl
-{
-	using Type = TVoid;
-};
+	template<class TImpl>
+	struct DeclarativeVoidTypeImpl<void, TImpl>
+	{
+		using Type = TImpl;
+	};
 
-template<class TImpl>
-struct DeclarativeVoidTypeImpl<void, TImpl>
-{
-	using Type = TImpl;
-};
+	template<class U>
+	concept DeclarativeAttrShouldBeCast = requires
+	{
+		{ std::declval<typename U::DeclarativeAttrVoid>() };
+	};
+}
 
-template<class U>
-concept DeclarativeAttrShouldBeCast = requires
-{
-	{ std::declval<typename U::DeclarativeAttrVoid>() };
-};
-
-#define BEGIN_SLATE_ATTRIBUTE																			\
-template<class TThis = void>																			\
-struct DeclarativeAttr : public DeclarativeInheritanceIfImplements<Super, DeclarativeAttr<>>::Type		\
-{																										\
-	using This = typename DeclarativeVoidTypeImpl<TThis, DeclarativeAttr>::Type;						\
-																										\
-	template<DeclarativeAttrShouldBeCast U = Super>														\
-	operator typename U::DeclarativeAttrVoid&& () &														\
-	{																									\
-		return std::move(reinterpret_cast<typename U::DeclarativeAttrVoid&>(*this));					\
+#define BEGIN_SLATE_ATTRIBUTE																				\
+template<class TThis = void>																				\
+struct DeclarativeAttr : public ::libty::DeclarativeInheritanceIfImplements<Super, DeclarativeAttr<>>::Type	\
+{																											\
+	using This = typename ::libty::DeclarativeVoidTypeImpl<TThis, DeclarativeAttr>::Type;					\
+																											\
+	template<::libty::DeclarativeAttrShouldBeCast U = Super>												\
+	operator typename U::DeclarativeAttrVoid&& () &															\
+	{																										\
+		return std::move(reinterpret_cast<typename U::DeclarativeAttrVoid&>(*this));						\
 	}
 
 #define END_SLATE_ATTRIBUTE								\

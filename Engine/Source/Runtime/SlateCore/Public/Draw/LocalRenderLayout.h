@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-struct LocalRenderLayout
+namespace libty::inline SlateCore
 {
-	Vector2 LocalPosition;
-	Vector2 LocalSize;
-};
+	struct LocalRenderLayout
+	{
+		Vector2 LocalPosition;
+		Vector2 LocalSize;
+	};
+}

@@ -1,10 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/LeafWidget.h"
-#include "IApplicationInterface.h"
-#include "Input/IPlatformMouse.h"
+#include "Widgets/SLeafWidget.h"
 
-GENERATE_BODY(SLeafWidget);
+using namespace ::libty;
 
 SLeafWidget::SLeafWidget() : Super()
 {
@@ -30,7 +28,7 @@ bool SLeafWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vector2
 {
     Super::SendMouseMoved(AllottedGeometry, Location);
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    if (GetVisibility().IsHitTestVisible())
     {
         return OnReceiveMouseMoved(AllottedGeometry, Location);
     }
@@ -46,7 +44,7 @@ bool SLeafWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32
     auto State = PlatformMouse.GetState();
     Vector2 CursorPos = Vector2((float)State.X, (float)State.Y);
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+    if (GetVisibility().IsHitTestVisible() &&
         AllottedGeometry.GetRenderBoundingRect().PtInRect(CursorPos))
     {
         return OnReceiveMouseWheelScrolled(AllottedGeometry, ScrollDelta);
@@ -59,7 +57,7 @@ bool SLeafWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vector2
 {
     Super::SendMouseEvent(AllottedGeometry, Location, Button, Event);
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+    if (GetVisibility().IsHitTestVisible() &&
         AllottedGeometry.GetRenderBoundingRect().PtInRect(Vector<>::Cast<float>(Location)))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
@@ -72,7 +70,7 @@ bool SLeafWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, 
 {
     Super::SendKeyboardEvent(AllottedGeometry, Key, Event);
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    if (GetVisibility().IsHitTestVisible())
     {
         return OnReceiveKeyboardEvent(AllottedGeometry, Key, Event);
     }
@@ -84,7 +82,7 @@ bool SLeafWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent&
 {
     Super::SendIMEEvent(AllottedGeometry, EventArgs);
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    if (GetVisibility().IsHitTestVisible())
     {
         return OnReceiveIMEEvent(AllottedGeometry, EventArgs);
     }

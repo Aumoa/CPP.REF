@@ -2,32 +2,34 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Widgets/Layout/SBorder.h"
 
-class SLATECORE_API SButton : public SBorder
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SButton)
+	class SLATECORE_API SButton : extends(SBorder)
+	{
+		GENERATED_BODY(SButton);
 
-public:
-	SButton();
+	public:
+		SButton();
 
-protected:
-	virtual bool OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
+	protected:
+		virtual bool OnReceiveMouseEvent(const Geometry& AllottedGeometry, const Vector2N& Location, EMouseButton Button, EMouseButtonEvent Event) override;
 
-public:
-	DECLARE_MULTICAST_EVENT(ButtonClickedEvent);
-	ButtonClickedEvent ButtonClicked;
+	public:
+		DECLARE_MULTICAST_EVENT(ButtonClickedEvent);
+		ButtonClickedEvent ButtonClicked;
 
-private:
-	EMouseButton InterruptButton;
-	EMouseButtonEvent CaughtEvent;
+	private:
+		EMouseButton InterruptButton;
+		EMouseButtonEvent CaughtEvent;
 
-public:
-	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_ATTRIBUTE(EMouseButton, InterruptButton, EMouseButton::Left)
-		DECLARE_SLATE_ATTRIBUTE(EMouseButtonEvent, CaughtEvent, EMouseButtonEvent::Released)
-	END_SLATE_ATTRIBUTE
+	public:
+		BEGIN_SLATE_ATTRIBUTE
+			DECLARE_SLATE_ATTRIBUTE(EMouseButton, InterruptButton, EMouseButton::Left)
+			DECLARE_SLATE_ATTRIBUTE(EMouseButtonEvent, CaughtEvent, EMouseButtonEvent::Released)
+		END_SLATE_ATTRIBUTE
 
-	DECLARE_SLATE_CONSTRUCTOR();
-};
+		DECLARE_SLATE_CONSTRUCTOR();
+	};
+}

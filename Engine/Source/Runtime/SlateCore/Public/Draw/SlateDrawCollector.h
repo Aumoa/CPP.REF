@@ -2,46 +2,48 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "IRenderSlateElement.h"
 #include "Layout/Layout.h"
 
-struct IRenderSlateElement;
-
-class GAME_API SSlateDrawCollector : implements SObject
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SSlateDrawCollector)
+	struct IRenderSlateElement;
 
-public:
-	SENUM(EElementType, int32,
-		RenderElement,,
-		PushClipLayer,,
-		PopClipLayer,
-	);
-
-	struct RenderElement
+	class SLATECORE_API SSlateDrawCollector : extends(SObject)
 	{
-		GENERATED_STRUCT_BODY(RenderElement)
+		GENERATED_BODY(SSlateDrawCollector);
 
 	public:
-		EElementType ElementType;
+		SENUM(SLATECORE_API, EElementType, int32,
+			RenderElement,,
+			PushClipLayer,,
+			PopClipLayer,
+		);
 
-		SPROPERTY(Element)
-		IRenderSlateElement* Element = nullptr;
-		std::optional<Geometry> AllottedGeometry;
+		struct RenderElement
+		{
+			GENERATED_BODY(RenderElement);
+
+		public:
+			EElementType ElementType;
+
+			//SPROPERTY(Element)
+			//IRenderSlateElement* Element = nullptr;
+			std::optional<Geometry> AllottedGeometry;
+		};
+
+	private:
+		SPROPERTY(Elements)
+		std::vector<RenderElement> Elements;
+
+	public:
+		SSlateDrawCollector();
+
+		void AddRenderElement(IRenderSlateElement* Element);
+		void PushClipLayer(const Geometry& ClipGeometry);
+		void PopClipLayer();
+
+		void SortByLayer();
+		void FlushElements(std::vector<RenderElement>& SwapElements);
 	};
-
-private:
-	SPROPERTY(Elements)
-	std::vector<RenderElement> Elements;
-
-public:
-	SSlateDrawCollector();
-
-	void AddRenderElement(IRenderSlateElement* Element);
-	void PushClipLayer(const Geometry& ClipGeometry);
-	void PopClipLayer();
-
-	void SortByLayer();
-	void FlushElements(std::vector<RenderElement>& SwapElements);
-};
+}

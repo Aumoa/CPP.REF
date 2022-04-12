@@ -10,6 +10,7 @@ namespace libty::inline PlatformGeneric
     {
         GENERATED_BODY(IPlatformMouse);
 
+    public:
         virtual MouseState GetState() = 0;
         virtual void ResetScrollWheelValue() = 0;
         virtual void SetMode(EMousePositionMode InPositionMode) = 0;

@@ -2,22 +2,22 @@
 
 #pragma once
 
-#include "Object.h"
-#include "RHI/RHIInterfaces.h"
-
-class RENDERCORE_API SRenderContext : implements SObject
+namespace libty::inline RenderCore
 {
-	GENERATED_BODY(SRenderContext)
+	class RENDERCORE_API SRenderContext : virtual public SObject
+	{
+		GENERATED_BODY(SRenderContext);
 
-public:
-	SRenderContext();
+	public:
+		SRenderContext();
 
-	SPROPERTY(OwningDevice)
-	IRHIDevice* OwningDevice = nullptr;
-	SPROPERTY(RenderQueue)
-	IRHICommandQueue* RenderQueue = nullptr;
-	SPROPERTY(CommandAllocator)
-	IRHICommandAllocator* CommandAllocator = nullptr;
-	SPROPERTY(CommandList)
-	IRHIGraphicsCommandList* CommandList = nullptr;
-};
+		SPROPERTY(OwningDevice)
+		IRHIDevice* OwningDevice = nullptr;
+		SPROPERTY(RenderQueue)
+		IRHICommandQueue* RenderQueue = nullptr;
+		SPROPERTY(CommandAllocator)
+		IRHICommandAllocator* CommandAllocator = nullptr;
+		SPROPERTY(CommandList)
+		IRHIGraphicsCommandList* CommandList = nullptr;
+	};
+}

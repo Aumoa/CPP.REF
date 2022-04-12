@@ -1,14 +1,13 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Text/TextBlock.h"
+#include "Widgets/Text/STextBlock.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/IRenderSlateElement.h"
 #include "Draw/SlateDrawCollector.h"
-#include "RHI/RHIInterfaces.h"
-#include "IApplicationInterface.h"
-#include "RenderThread.h"
 
-class STextBlock::SRenderElement : implements SObject, implements IRenderSlateElement
+using namespace ::libty;
+
+class STextBlock::SRenderElement : extends(SObject), implements(IRenderSlateElement)
 {
 	GENERATED_BODY(SRenderElement)
 
@@ -53,10 +52,10 @@ public:
 		return CachedGeometry;
 	}
 
-	virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
-	{
-		//CommandBuffer->DrawTextLayout(LocalLayout.LocalPosition, Layout, TintBrush);
-	}
+	//virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
+	//{
+	//	//CommandBuffer->DrawTextLayout(LocalLayout.LocalPosition, Layout, TintBrush);
+	//}
 
 	void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
 	{
@@ -65,7 +64,7 @@ public:
 			CachedGeometry = AllottedGeometry;
 			CachedLayer = Layer;
 
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [this, AllottedGeometry, Layer](auto)
+			::libty::RenderCore::SRenderThread::Get()->EnqueueRenderThreadWork(this, [this, AllottedGeometry, Layer](auto)
 			{
 				RenderGeometry = AllottedGeometry;
 				RenderLayer = Layer;
@@ -79,16 +78,13 @@ public:
 		{
 			CachedLayoutSize = LayoutSize;
 
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [this, LayoutSize](auto)
+			::libty::RenderCore::SRenderThread::Get()->EnqueueRenderThreadWork(this, [this, LayoutSize](auto)
 			{
 				//Layout->SetMaxSize(LayoutSize);
 			});
 		}
 	}
 };
-
-GENERATE_BODY(STextBlock);
-GENERATE_BODY(STextBlock::SRenderElement);
 
 STextBlock::STextBlock() : Super()
 {
@@ -110,11 +106,11 @@ std::wstring STextBlock::GetText()
 
 void STextBlock::SetFont(const SlateFont& Font)
 {
-	if (this->Font != Font)
-	{
-		this->Font = Font;
-		InvalidateLayoutAndVolatility();
-	}
+	//if (this->Font != Font)
+	//{
+	//	this->Font = Font;
+	//	InvalidateLayoutAndVolatility();
+	//}
 }
 
 SlateFont STextBlock::GetFont()

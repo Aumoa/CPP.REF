@@ -2,49 +2,48 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Widgets/SLeafWidget.h"
 #include "Draw/SlateBrush.h"
 
-struct IRHIBitmap;
-struct IRHISolidColorBrush;
-
-class SLATECORE_API SImage : public SLeafWidget
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SImage)
+	class SLATECORE_API SImage : extends(SLeafWidget)
+	{
+		GENERATED_BODY(SImage);
 
-private:
-	class SRenderElement;
+	private:
+		class SRenderElement;
 
-private:
-	//SPROPERTY(ImageSource)
-	//IRHIBitmap* ImageSource = nullptr;
-	//SPROPERTY(TintBrush)
-	//IRHISolidColorBrush* TintBrush = nullptr;
+	private:
+		//SPROPERTY(ImageSource)
+		//IRHIBitmap* ImageSource = nullptr;
+		//SPROPERTY(TintBrush)
+		//IRHISolidColorBrush* TintBrush = nullptr;
 
-	SPROPERTY(CachedRenderElement)
-	SRenderElement* CachedRenderElement = nullptr;
+		SPROPERTY(CachedRenderElement)
+		SRenderElement* CachedRenderElement = nullptr;
 
-	Vector2 ImageSize;
-	Color TintColor;
+		Vector2 ImageSize;
+		Color TintColor;
 
-public:
-	SImage();
+	public:
+		SImage();
 
-	void SetBrush(const SlateBrush& InBrush);
-	SlateBrush GetBrush();
-	void SetTintColor(const Color& InTintColor);
-	Color GetTintColor() const;
+		void SetBrush(const SlateBrush& InBrush);
+		SlateBrush GetBrush();
+		void SetTintColor(const Color& InTintColor);
+		Color GetTintColor() const;
 
-public:
-	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_ATTRIBUTE(SlateBrush, Brush)
-		DECLARE_SLATE_ATTRIBUTE(Color, TintColor, NamedColors::White)
-	END_SLATE_ATTRIBUTE
+	public:
+		BEGIN_SLATE_ATTRIBUTE
+			DECLARE_SLATE_ATTRIBUTE(SlateBrush, Brush)
+			DECLARE_SLATE_ATTRIBUTE(Color, TintColor, NamedColors::White)
+		END_SLATE_ATTRIBUTE
 
-	DECLARE_SLATE_CONSTRUCTOR();
+		DECLARE_SLATE_CONSTRUCTOR();
 
-protected:
-	virtual Vector2 ComputeDesiredSize() override;
-	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
-};
+	protected:
+		virtual Vector2 ComputeDesiredSize() override;
+		virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
+	};
+}

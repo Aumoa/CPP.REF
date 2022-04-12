@@ -1,9 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "SlateCore/SlotBase.h"
-#include "SlateCore/SWidget.h"
+#include "SlotBase.h"
+#include "Widgets/SWidget.h"
 
-GENERATE_BODY(libty::SlateCore::Details::SSlotBase);
+using namespace ::libty;
 
 namespace libty::SlateCore::Details
 {

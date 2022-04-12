@@ -2,7 +2,7 @@
 
 #include "Renderer/SceneRenderer.h"
 
-GENERATE_BODY(SSceneRenderer);
+using namespace ::libty;
 
 SSceneRenderer::SSceneRenderer(IRHIDevice* device)
 	: _device(device)

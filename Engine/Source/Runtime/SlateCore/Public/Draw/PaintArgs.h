@@ -2,24 +2,24 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-struct IRHIDevice;
-class SWidget;
-class SceneRenderTarget;
-
-class GAME_API PaintArgs
+namespace libty::inline SlateCore
 {
-public:
-	IRHIDevice* const Device;
-	SWidget*	const Parent;
-	float		const DeltaTime;
-	float		const RenderOpacity;
+	class SWidget;
+	class SceneRenderTarget;
 
-private:
-	PaintArgs(IRHIDevice* Device, SWidget* InParentWidget, float InDeltaTime, float RenderOpacity = 1.0f);
+	class SLATECORE_API PaintArgs
+	{
+	public:
+		IRHIDevice* const Device;
+		SWidget*	const Parent;
+		float		const DeltaTime;
+		float		const RenderOpacity;
 
-public:
-	static PaintArgs InitPaintArgs(IRHIDevice* Device, float InDeltaTime);
-	PaintArgs WithNewParent(SWidget* InParentWidget) const;
-};
+	private:
+		PaintArgs(IRHIDevice* Device, SWidget* InParentWidget, float InDeltaTime, float RenderOpacity = 1.0f);
+
+	public:
+		static PaintArgs InitPaintArgs(IRHIDevice* Device, float InDeltaTime);
+		PaintArgs WithNewParent(SWidget* InParentWidget) const;
+	};
+}

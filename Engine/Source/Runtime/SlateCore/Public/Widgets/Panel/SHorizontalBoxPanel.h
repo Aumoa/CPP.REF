@@ -2,14 +2,16 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "SBoxPanel.h"
 
-class SLATECORE_API SHorizontalBoxPanel : public SBoxPanel
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SHorizontalBoxPanel)
+	class SLATECORE_API SHorizontalBoxPanel : extends(SBoxPanel)
+	{
+		GENERATED_BODY(SHorizontalBoxPanel);
 
-public:
-	SHorizontalBoxPanel();
-	virtual ~SHorizontalBoxPanel() override;
-};
+	public:
+		SHorizontalBoxPanel();
+		virtual ~SHorizontalBoxPanel() override;
+	};
+}

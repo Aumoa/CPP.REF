@@ -2,18 +2,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "LocalRenderLayout.h"
 #include "Layout/Layout.h"
 
-struct IRHIDeviceContext2D;
-
-struct IRenderSlateElement : implements SObject
+namespace libty::inline SlateCore
 {
-	GENERATED_INTERFACE_BODY(IRenderSlateElement)
-		
-	virtual int32 GetLayer() = 0;
-	virtual Geometry GetCachedGeometry() = 0;
+	struct IRenderSlateElement : implements(SObject)
+	{
+		GENERATED_BODY(IRenderSlateElement);
 
-	virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) = 0;
-};
+		virtual int32 GetLayer() = 0;
+		virtual Geometry GetCachedGeometry() = 0;
+
+		//virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) = 0;
+	};
+}

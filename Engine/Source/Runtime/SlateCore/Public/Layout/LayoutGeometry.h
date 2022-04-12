@@ -2,54 +2,55 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "CoreNumerics.h"
 #include "SlateLayoutTransform.h"
 
-struct LayoutGeometry
+namespace libty::inline SlateCore
 {
-	constexpr LayoutGeometry()
-		: LocalSize(1.0f, 1.0f)
+	struct LayoutGeometry
 	{
-	}
+		constexpr LayoutGeometry()
+			: LocalSize(1.0f, 1.0f)
+		{
+		}
 
-	constexpr LayoutGeometry(const SlateLayoutTransform& LocalToParent, const Vector2& SizeInLocalSpace)
-		: LocalToParent(LocalToParent)
-		, LocalSize(SizeInLocalSpace)
-	{
-	}
+		constexpr LayoutGeometry(const SlateLayoutTransform& LocalToParent, const Vector2& SizeInLocalSpace)
+			: LocalToParent(LocalToParent)
+			, LocalSize(SizeInLocalSpace)
+		{
+		}
 
-	constexpr const SlateLayoutTransform& GetLocalToParentTransform() const
-	{
-		return LocalToParent;
-	}
+		constexpr const SlateLayoutTransform& GetLocalToParentTransform() const
+		{
+			return LocalToParent;
+		}
 
-	constexpr const Vector2& GetSizeInLocalSpace() const
-	{
-		return LocalSize;
-	}
+		constexpr const Vector2& GetSizeInLocalSpace() const
+		{
+			return LocalSize;
+		}
 
-	constexpr Vector2 GetSizeInParentSpace() const
-	{
-		return LocalToParent.TransformVector(LocalSize);
-	}
+		constexpr Vector2 GetSizeInParentSpace() const
+		{
+			return LocalToParent.TransformVector(LocalSize);
+		}
 
-	constexpr Vector2 GetOffsetInParentSpace() const
-	{
-		return LocalToParent.Translation;
-	}
+		constexpr Vector2 GetOffsetInParentSpace() const
+		{
+			return LocalToParent.Translation;
+		}
 
-	constexpr Rect GetRectInLocalSpace() const
-	{
-		return Rect(Vector2::Zero(), LocalSize);
-	}
+		constexpr Rect GetRectInLocalSpace() const
+		{
+			return Rect(Vector2::Zero(), LocalSize);
+		}
 
-	constexpr Rect GetRectInParentSpace() const
-	{
-		return Rect::TransformRect(LocalToParent, GetRectInLocalSpace());
-	}
+		constexpr Rect GetRectInParentSpace() const
+		{
+			return Rect::TransformRect(LocalToParent, GetRectInLocalSpace());
+		}
 
-private:
-	SlateLayoutTransform LocalToParent;
-	Vector2 LocalSize;
-};
+	private:
+		SlateLayoutTransform LocalToParent;
+		Vector2 LocalSize;
+	};
+}

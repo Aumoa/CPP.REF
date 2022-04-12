@@ -2,22 +2,23 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "CoreNumerics.h"
 #include "LayoutEnums.h"
 
-struct SizeParam
+namespace libty::inline SlateCore
 {
-	ESizeRule SizeRule = ESizeRule::Stretch;
-	float Value = 1.0f;
-
-	constexpr SizeParam()
+	struct SizeParam
 	{
-	}
+		ESizeRule SizeRule = ESizeRule::Stretch;
+		float Value = 1.0f;
 
-	constexpr SizeParam(ESizeRule SizeRule, float Value)
-		: SizeRule(SizeRule)
-		, Value(Value)
-	{
-	}
-};
+		constexpr SizeParam()
+		{
+		}
+
+		constexpr SizeParam(ESizeRule SizeRule, float Value)
+			: SizeRule(SizeRule)
+			, Value(Value)
+		{
+		}
+	};
+}

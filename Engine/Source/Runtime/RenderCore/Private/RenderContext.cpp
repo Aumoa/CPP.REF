@@ -2,7 +2,7 @@
 
 #include "RenderContext.h"
 
-GENERATE_BODY(SRenderContext);
+using namespace ::libty;
 
 SRenderContext::SRenderContext()
 	: Super()

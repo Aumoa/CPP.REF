@@ -2,24 +2,25 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "CoreNumerics.h"
 #include "ArrangedWidget.h"
 #include "LayoutEnums.h"
 
-class SLATECORE_API ArrangedChildrens
+namespace libty::inline SlateCore
 {
-private:
-	const ESlateVisibility VisibilityFilter;
-	std::vector<ArrangedWidget> Widgets;
+	class SLATECORE_API ArrangedChildrens
+	{
+	private:
+		const ESlateVisibility VisibilityFilter;
+		std::vector<ArrangedWidget> Widgets;
 
-public:
-	ArrangedChildrens(ESlateVisibility InVisibilityFilter);
+	public:
+		ArrangedChildrens(ESlateVisibility InVisibilityFilter);
 
-	void AddWidget(ESlateVisibility VisibilityOverride, const ArrangedWidget& InArrangedWidget);
-	void InsertWidget(ESlateVisibility VisibilityOverride, const ArrangedWidget& InArrangedWidget, size_t Index);
-	bool Accepts(ESlateVisibility Visibility) const;
+		void AddWidget(ESlateVisibility VisibilityOverride, const ArrangedWidget& InArrangedWidget);
+		void InsertWidget(ESlateVisibility VisibilityOverride, const ArrangedWidget& InArrangedWidget, size_t Index);
+		bool Accepts(ESlateVisibility Visibility) const;
 
-	ESlateVisibility GetVisibilityFilter() const;
-	const std::vector<ArrangedWidget>& GetWidgets() const;
-};
+		ESlateVisibility GetVisibilityFilter() const;
+		const std::vector<ArrangedWidget>& GetWidgets() const;
+	};
+}

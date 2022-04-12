@@ -3,7 +3,7 @@
 #include "ShaderWorkspaces/CommonShaderWorkspace.h"
 #include "CommonHLSL/CommonTypes.hlsli"
 
-GENERATE_BODY(SCommonShaderWorkspace);
+using namespace ::libty;
 
 SCommonShaderWorkspace::SCommonShaderWorkspace(IRHIDevice* device)
 	: Super()
@@ -38,8 +38,6 @@ void SCommonShaderWorkspace::Dispose(bool bDisposing)
 
 		_device = nullptr;
 	}
-
-	Super::Dispose(bDisposing);
 }
 
 void SCommonShaderWorkspace::AddHeader(const std::filesystem::path& sourcePath, std::string_view code)

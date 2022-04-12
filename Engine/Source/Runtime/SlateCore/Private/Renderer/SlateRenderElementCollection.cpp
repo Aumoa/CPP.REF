@@ -2,7 +2,7 @@
 
 #include "Renderer/SlateRenderElementCollection.h"
 
-GENERATE_BODY(SSlateRenderElementCollection);
+using namespace ::libty;
 
 SSlateRenderElementCollection::SSlateRenderElementCollection()
 {

@@ -1,29 +1,26 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "RenderThread.h"
-#include "Threading/Thread.h"
-#include "Threading/ThreadGroup.h"
-#include "Threading/SuspendTokenCollection.h"
-#include <mutex>
-#include <condition_variable>
 
-RenderThread* RenderThread::sInstance;
+using namespace ::libty;
+
+SRenderThread* SRenderThread::sInstance;
 
 DECLARE_STAT_GROUP("RenderThread", STATGROUP_RenderThread);
 DECLARE_CYCLE_STAT("ExecuteWorks", STAT_ExecuteWorks, STATGROUP_RenderThread);
 DECLARE_CYCLE_STAT("  WaitPreviousComplete", STAT_WaitPreviousComplete, STATGROUP_RenderThread);
 DECLARE_CYCLE_STAT("  ExecuteCurrentWorks", STAT_ExecuteCurrentWorks, STATGROUP_RenderThread);
 
-RenderThread::RenderThread()
+SRenderThread::SRenderThread()
 {
 	checkf(sInstance == nullptr, L"Singleton instance duplicated.");
 	sInstance = this;
 
 	_running = true;
-	_rthread = Thread::CreateThread(L"[Render Thread]", std::bind(&RenderThread::Run, this));
+	_thread = Thread::CreateThread(L"[Render Thread]", std::bind(&SRenderThread::Run, this));
 }
 
-RenderThread::~RenderThread()
+SRenderThread::~SRenderThread()
 {
 	std::unique_lock lock(_lock);
 	_running = false;
@@ -31,11 +28,11 @@ RenderThread::~RenderThread()
 	_invoke.notify_all();
 	lock.unlock();
 
-	_rthread->Join();
+	_thread->Join();
 	sInstance = nullptr;
 }
 
-void RenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(IRHIGraphicsCommandList*)> work)
+void SRenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(IRHIGraphicsCommandList*)> work)
 {
 	_queuedWorks.emplace(Work
 	{
@@ -44,7 +41,7 @@ void RenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(I
 	});
 }
 
-Task<> RenderThread::ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std::function<void(IRHIGraphicsCommandList*)> InCompletionWork)
+Task<> SRenderThread::ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std::function<void(IRHIGraphicsCommandList*)> InCompletionWork)
 {
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteWorks);
 
@@ -67,24 +64,24 @@ Task<> RenderThread::ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std:
 	}
 }
 
-bool RenderThread::InRenderThread()
+bool SRenderThread::InRenderThread()
 {
-	return Thread::GetCurrentThread()->GetThreadId() == Get()->_rthread->GetThreadId();
+	return Thread::GetCurrentThread()->GetThreadId() == Get()->_thread->GetThreadId();
 }
 
-void RenderThread::Run()
+void SRenderThread::Run()
 {
 	Thread* CurrentThread = Thread::GetCurrentThread();
 
 	class RenderThreadSuspendToken : public ISuspendToken
 	{
-		RenderThread* Owner;
+		SRenderThread* Owner;
 		Thread* CurrentThread;
 
 		std::optional<std::promise<void>> SuspendPromise;
 
 	public:
-		RenderThreadSuspendToken(RenderThread* Owner, Thread* CurrentThread)
+		RenderThreadSuspendToken(SRenderThread* Owner, Thread* CurrentThread)
 			: Owner(Owner)
 			, CurrentThread(CurrentThread)
 		{

@@ -1,6 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "SlateCore/Layout/ArrangedChildrens.h"
+#include "Layout/ArrangedChildrens.h"
+
+using namespace ::libty;
 
 ArrangedChildrens::ArrangedChildrens(ESlateVisibility InVisibilityFilter)
 	: VisibilityFilter(InVisibilityFilter)

@@ -2,31 +2,33 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Widgets/Panel/SBoxPanel.h"
 
-class SLATECORE_API SScrollBox : public SBoxPanel
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SScrollBox)
+	class SLATECORE_API SScrollBox : extends(SBoxPanel)
+	{
+		GENERATED_BODY(SScrollBox);
 
-private:
-	float ScrollAmount = 0;
+	private:
+		float ScrollAmount = 0;
 
-public:
-	SScrollBox();
+	public:
+		SScrollBox();
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
-	virtual bool OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) override;
+		virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
+		virtual bool OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta) override;
 
-	void ScrollToBottom();
+		void ScrollToBottom();
 
-protected:
-	virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
+	protected:
+		virtual void OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry) override;
 
-public:
-	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_ATTRIBUTE(EOrientation, Orientation, EOrientation::Vertical)
-	END_SLATE_ATTRIBUTE
+	public:
+		BEGIN_SLATE_ATTRIBUTE
+			DECLARE_SLATE_ATTRIBUTE(EOrientation, Orientation, EOrientation::Vertical)
+		END_SLATE_ATTRIBUTE
 
-	DECLARE_SLATE_CONSTRUCTOR();
-};
+		DECLARE_SLATE_CONSTRUCTOR();
+	};
+}

@@ -3,7 +3,7 @@
 #include "Renderer/SlateRenderer.h"
 #include "RenderContext.h"
 
-GENERATE_BODY(SSlateRenderer);
+using namespace ::libty;
 
 SSlateRenderer::SSlateRenderer(IRHIDevice* device)
 	: Super()

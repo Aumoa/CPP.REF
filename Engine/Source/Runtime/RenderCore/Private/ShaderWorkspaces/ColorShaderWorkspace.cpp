@@ -4,7 +4,7 @@
 #include "ShaderWorkspaces/ColorShaderHLSL/VertexShader.hlsl"
 #include "ShaderWorkspaces/ColorShaderHLSL/PixelShader.hlsl"
 
-GENERATE_BODY(SColorShaderWorkspace);
+using namespace ::libty;
 
 SColorShaderWorkspace::SColorShaderWorkspace(IRHIDevice* device)
 	: Super(device)

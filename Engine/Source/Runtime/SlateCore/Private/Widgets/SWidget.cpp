@@ -1,12 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "SlateCore/Widgets/SWidget.h"
+#include "Widgets/SWidget.h"
 #include "Draw/PaintArgs.h"
-#include "IApplicationInterface.h"
-#include "Input/IPlatformMouse.h"
 #include "Draw/SlateDrawCollector.h"
 
-GENERATE_BODY(SWidget);
+using namespace ::libty;
 
 SWidget::SWidget() : Super()
 {
@@ -14,7 +12,7 @@ SWidget::SWidget() : Super()
 
 std::wstring SWidget::ToString()
 {
-	return String::Format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullName(), GetDesiredSize().ToString(), Visibility.ToString());
+	return String::Format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullQualifiedName(), GetDesiredSize().ToString(), Visibility.ToString());
 }
 
 void SWidget::Dispose()
@@ -56,7 +54,7 @@ void SWidget::InvalidateLayoutAndVolatility()
 
 void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+    if (GetVisibility().IsHitTestVisible() &&
         AllottedGeometry.GetRenderBoundingRect().PtInRect(CachedMouseLocation))
     {
         const bool bHover = AllottedGeometry.IsUnderLocation(CachedMouseLocation);
@@ -129,7 +127,7 @@ bool SWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& Eve
 void SWidget::PostConstruction()
 {
     Super::PostConstruction();
-    Name = GetType()->GenerateUniqueName();
+    Name = GetType()->GetFullQualifiedName();
 }
 
 Vector2 SWidget::ComputeDesiredSize()

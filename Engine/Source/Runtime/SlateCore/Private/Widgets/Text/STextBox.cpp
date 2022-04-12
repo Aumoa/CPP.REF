@@ -1,8 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Text/TextBox.h"
+#include "Widgets/Text/STextBox.h"
 
-GENERATE_BODY(STextBox);
+using namespace ::libty;
 
 STextBox::STextBox() : Super()
 {

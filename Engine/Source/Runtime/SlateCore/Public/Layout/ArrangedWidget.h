@@ -2,25 +2,29 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "CoreNumerics.h"
 #include "Geometry.h"
 
-class SWidget;
-
-class SLATECORE_API ArrangedWidget
+namespace libty::inline SlateCore
 {
-	WeakPtr<SWidget> Widget = nullptr;
-	Geometry MyGeometry;
+	class SWidget;
+}
 
-public:
-	ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry);
+namespace libty::inline SlateCore
+{
+	class SLATECORE_API ArrangedWidget
+	{
+		WeakPtr<SWidget> Widget = nullptr;
+		Geometry MyGeometry;
 
-	std::wstring ToString() const;
+	public:
+		ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry);
 
-	SWidget* GetWidget() const { return Widget.Get(); }
-	const Geometry& GetGeometry() const { return MyGeometry; }
+		std::wstring ToString() const;
 
-	bool operator ==(const ArrangedWidget& Rhs) const;
-	bool operator !=(const ArrangedWidget& Rhs) const;
-};
+		SWidget* GetWidget() const { return Widget.Get(); }
+		const Geometry& GetGeometry() const { return MyGeometry; }
+
+		bool operator ==(const ArrangedWidget& Rhs) const;
+		bool operator !=(const ArrangedWidget& Rhs) const;
+	};
+}

@@ -2,20 +2,17 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "RHI/RHIInterfaces.h"
-
-class SRenderContext;
-class SViewport;
-
-class SLATECORE_API SSlateRenderer : implements SObject
+namespace libty::inline SlateCore
 {
-	GENERATED_BODY(SSlateRenderer)
+	class SLATECORE_API SSlateRenderer : extends(SObject)
+	{
+		GENERATED_BODY(SSlateRenderer);
 
-public:
-	SSlateRenderer(IRHIDevice* device);
+	public:
+		SSlateRenderer(IRHIDevice* device);
 
-	virtual void BeginFrame(SRenderContext* renderContext);
-	virtual void RenderViewport(SViewport* viewport);
-	virtual void EndFrame();
-};
+		virtual void BeginFrame(SRenderContext* renderContext);
+		//virtual void RenderViewport(SViewport* viewport);
+		virtual void EndFrame();
+	};
+}

@@ -1,12 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/CompoundWidget.h"
+#include "Widgets/SCompoundWidget.h"
 #include "Draw/PaintArgs.h"
 #include "Layout/ArrangedChildrens.h"
-#include "IApplicationInterface.h"
-#include "Input/IPlatformMouse.h"
 
-GENERATE_BODY(SCompoundWidget);
+using namespace ::libty;
 
 SCompoundWidget::SCompoundWidget() : Super()
 {
@@ -51,7 +49,7 @@ bool SCompoundWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vec
 {
     Super::SendMouseMoved(AllottedGeometry, Location);
 
-    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    if (GetVisibility().AreChildrenHitTestVisible())
     {
         ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
         ArrangeChildren(ArrangedChildren, AllottedGeometry);
@@ -65,7 +63,7 @@ bool SCompoundWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Vec
         }
     }
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    if (GetVisibility().IsHitTestVisible())
     {
         return OnReceiveMouseMoved(AllottedGeometry, Location);
     }
@@ -81,7 +79,7 @@ bool SCompoundWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, i
     auto State = PlatformMouse.GetState();
     Vector2 CursorPos = Vector2((float)State.X, (float)State.Y);
 
-    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    if (GetVisibility().AreChildrenHitTestVisible())
     {
         ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
         ArrangeChildren(ArrangedChildren, AllottedGeometry);
@@ -95,7 +93,7 @@ bool SCompoundWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, i
         }
     }
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+    if (GetVisibility().IsHitTestVisible() &&
         AllottedGeometry.GetRenderBoundingRect().PtInRect(CursorPos))
     {
         return OnReceiveMouseWheelScrolled(AllottedGeometry, ScrollDelta);
@@ -108,7 +106,7 @@ bool SCompoundWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vec
 {
     Super::SendMouseEvent(AllottedGeometry, Location, Button, Event);
 
-    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    if (GetVisibility().AreChildrenHitTestVisible())
     {
         ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
         ArrangeChildren(ArrangedChildren, AllottedGeometry);
@@ -122,7 +120,7 @@ bool SCompoundWidget::SendMouseEvent(const Geometry& AllottedGeometry, const Vec
         }
     }
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()) &&
+    if (GetVisibility().IsHitTestVisible() &&
         AllottedGeometry.GetRenderBoundingRect().PtInRect(Cast<Vector2>(Location)))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Location, Button, Event);
@@ -135,7 +133,7 @@ bool SCompoundWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey K
 {
     Super::SendKeyboardEvent(AllottedGeometry, Key, Event);
 
-    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    if (GetVisibility().AreChildrenHitTestVisible())
     {
         ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
         ArrangeChildren(ArrangedChildren, AllottedGeometry);
@@ -149,7 +147,7 @@ bool SCompoundWidget::SendKeyboardEvent(const Geometry& AllottedGeometry, EKey K
         }
     }
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    if (GetVisibility().IsHitTestVisible())
     {
         return OnReceiveKeyboardEvent(AllottedGeometry, Key, Event);
     }
@@ -161,7 +159,7 @@ bool SCompoundWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEv
 {
     Super::SendIMEEvent(AllottedGeometry, EventArgs);
 
-    if (SlateVisibilityExtensions::AreChildrenHitTestVisible(GetVisibility()))
+    if (GetVisibility().AreChildrenHitTestVisible())
     {
         ArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
         ArrangeChildren(ArrangedChildren, AllottedGeometry);
@@ -175,7 +173,7 @@ bool SCompoundWidget::SendIMEEvent(const Geometry& AllottedGeometry, const IMEEv
         }
     }
 
-    if (SlateVisibilityExtensions::IsHitTestVisible(GetVisibility()))
+    if (GetVisibility().IsHitTestVisible())
     {
         return OnReceiveIMEEvent(AllottedGeometry, EventArgs);
     }
