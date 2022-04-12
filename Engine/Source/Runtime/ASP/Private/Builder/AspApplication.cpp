@@ -45,20 +45,28 @@ int32 SAspApplication::Run()
 	_socket->Bind(IPEndPoint::Parse(L"0.0.0.0:5001"));
 
 	_socket->Listen();
-	while (SSocket* client = _socket->Accept().GetResult())
+	while (true)
 	{
-		HandleClient(client);
-
-		Task<>::Run([client]()
+		try
 		{
-			std::vector<char> buf(1024);
-			size_t read = client->Recv(buf.data(), 1024);
+			SSocket* client = _socket->Accept().GetResult();
+			HandleClient(client);
 
-			//SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
-			client->Close();
+			Task<>::Run([client]()
+			{
+				std::vector<char> buf(1024);
+				size_t read = client->Recv(buf.data(), 1024);
 
-			//SE_LOG(LogTemp, Verbose, L"Session closed.");
-		});
+				//SE_LOG(LogTemp, Verbose, L"Received: {} bytes", read);
+				client->Close();
+
+				//SE_LOG(LogTemp, Verbose, L"Session closed.");
+			});
+		}
+		catch (const std::exception& e)
+		{
+			SE_LOG(LogTemp, Error, L"Exception caught: {0}", String::AsUnicode(e.what()));
+		}
 
 		GC.Hint();
 	}

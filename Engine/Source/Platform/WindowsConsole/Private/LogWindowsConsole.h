@@ -2,6 +2,4 @@
 
 #pragma once
 
-#include "Diagnostics/LogCategory.h"
-
 DECLARE_LOG_CATEGORY(, LogWindowsConsole);

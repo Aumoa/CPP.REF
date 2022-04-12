@@ -6,7 +6,7 @@
 
 namespace libty::inline Asp
 {
-	struct IConfigurationSection : implements(IConfiguration)
+	struct ASP_API IConfigurationSection : implements(IConfiguration)
 	{
 		GENERATED_BODY(IConfigurationSection);
 

@@ -6,7 +6,7 @@
 
 namespace libty::inline Asp
 {
-	class SActionResult : extends(SObject), implements(IActionResult)
+	class ASP_API SActionResult : extends(SObject), implements(IActionResult)
 	{
 		GENERATED_BODY(SActionResult);
 

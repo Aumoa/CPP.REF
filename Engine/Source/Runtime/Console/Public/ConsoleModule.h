@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Misc/CommandLine.h"
-
-namespace libty::Console
+namespace libty::inline Console
 {
 	class SConsoleModuleSubsystem;
 

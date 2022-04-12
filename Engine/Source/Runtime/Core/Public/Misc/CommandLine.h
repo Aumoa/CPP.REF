@@ -89,7 +89,7 @@ namespace libty::inline Core
 		template<class TChar>
 		void DoParse(std::span<const std::basic_string_view<TChar>> args)
 		{
-			using TNakedChar = std::remove_const_t<TChar>;
+			using TNakedChar = std::remove_reference_t<std::remove_const_t<TChar>>;
 
 			static constexpr bool bWstr = std::same_as<TNakedChar, wchar_t>;
 			using StringView_t = std::basic_string_view<TNakedChar>;
@@ -120,7 +120,7 @@ namespace libty::inline Core
 					auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
 					if (!emplaced.second)
 					{
-						throw InvalidOperationException(String::Format("Duplicated command line key({}).", currKey));
+						throw InvalidOperationException(String::Format("Duplicated command line key({}).", String::AsMultibyte(currKey)));
 					}
 				}
 				else
@@ -129,7 +129,7 @@ namespace libty::inline Core
 					auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
 					if (!emplaced.second)
 					{
-						throw InvalidOperationException(String::Format("Duplicated command line key({}).", wCurrKey));
+						throw InvalidOperationException(String::Format("Duplicated command line key({}).", currKey));
 					}
 				}
 			};

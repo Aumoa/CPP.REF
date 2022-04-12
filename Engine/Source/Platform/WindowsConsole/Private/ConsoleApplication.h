@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "Object.h"
-#include "Misc/CommandLine.h"
-
 namespace libty::inline Windows
 {
-	class SConsoleApplication : virtual public SObject
+	class SConsoleApplication : extends(SObject)
 	{
 		GENERATED_BODY(SConsoleApplication)
 

@@ -2,13 +2,6 @@
 
 #include "ConsoleApplication.h"
 #include "LogWindowsConsole.h"
-#include "ConsoleModule.h"
-#include "Misc/PlatformModule.h"
-#include "Misc/CommandLine.h"
-#include "Diagnostics/LogModule.h"
-#include "Diagnostics/LogSystem.h"
-#include "Threading/Thread.h"
-#include "GC/SharedPtr.h"
 #include <chrono>
 
 using namespace ::libty;
@@ -38,14 +31,14 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 		auto Loader = Module->GetFunctionPointer<SConsoleModule* ()>("LoadConsoleModule");
 		if (!Loader)
 		{
-			throw fatal_exception(std::format(L"Cannot found 'LoadConsoleModule' function from Module: {}.", ModuleName));
+			throw FatalException(std::format("Cannot found 'LoadConsoleModule' function from Module: {}.", String::AsMultibyte(ModuleName)));
 		}
 
 		{
 			SharedPtr ConsoleModule = Loader();
 			if (!ConsoleModule.IsValid())
 			{
-				throw fatal_exception(L"LoadConsoleModule function return nullptr.");
+				throw FatalException("LoadConsoleModule function return nullptr.");
 			}
 
 			Thread* MainThread = Thread::GetCurrentThread();

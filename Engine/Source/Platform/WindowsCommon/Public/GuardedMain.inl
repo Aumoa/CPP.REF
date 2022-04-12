@@ -4,16 +4,14 @@
 
 #include "WindowsMinimal.h"
 #include "WindowsStackTrace.h"
-#include "Misc/CommandLine.h"
-#include "Diagnostics/LogModule.h"
 #include <iostream>
-
-using namespace libty;
 
 static int32 GReturn = 0;
 
 DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException)
 {
+	using namespace ::libty;
+
 	WindowsStackTrace StackTrace(lpException);
 	GReturn = (int32)ExceptionCode;
 
@@ -35,7 +33,7 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 
 	for (auto& Callstack : StackTrace.GetCallstacks())
 	{
-		std::wstring Callstack_line = std::format(L"{:>2}  {}!{} [{}]", Callstack.FrameNumber, Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
+		std::wstring Callstack_line = String::Format(L"{:>2}  {}!{} [{}]", Callstack.FrameNumber, Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
 		SE_LOG(LogWindowsCommon, Error, Callstack_line);
 		std::wcerr << Callstack_line << std::endl;
 	}
@@ -61,7 +59,10 @@ int32 GuardedMain(std::span<std::wstring> Argv)
 	}
 	__except (ReportCrash(GetExceptionCode(), GetExceptionInformation()))
 	{
-		LogModule::Get()->Shutdown();
+		if (auto* Module = ::libty::LogModule::Get())
+		{
+			Module->Shutdown();;
+		}
 	}
 #endif
 
@@ -83,6 +84,6 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 
 int wWinMain(HINSTANCE, HINSTANCE, wchar_t* argv, int)
 {
-	std::vector<std::wstring> Argv = String::Split((std::wstring)argv, L" ", true, true);
+	std::vector<std::wstring> Argv = ::libty::String::Split((std::wstring)argv, L" ", true, true);
 	return GuardedMain(Argv);
 }

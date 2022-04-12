@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-namespace libty::Console
+namespace libty::inline Console
 {
 	class CONSOLE_API SConsoleModuleSubsystem : virtual public SObject
 	{
