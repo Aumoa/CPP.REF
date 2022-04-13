@@ -4,6 +4,7 @@
 
 #include <tuple>
 #include <iostream>
+#include "Misc/RecursiveMacroHelper.h"
 
 namespace libty::inline Core
 {
@@ -29,7 +30,7 @@ namespace libty::inline Core
 		};
 
 		template<class... TInterfaces>
-		class InterfaceCollector : virtual public TInterfaces...
+		class InterfaceCollector
 		{
 		public:
 			template<class T>
@@ -43,11 +44,6 @@ namespace libty::inline Core
 
 				using Type = decltype(Declare<T>(0));
 			};
-
-			virtual SType* GetType() const override
-			{
-				return (TInterfaces::SObject::TypeId, ...);
-			}
 
 		public:
 			using InterfaceCollection = decltype(std::tuple_cat(std::declval<std::tuple<TInterfaces...>>(), std::declval<typename InterfaceCollection_t<TInterfaces>::Type>()...));
@@ -193,5 +189,7 @@ namespace libty::inline Generated::Class													\
 		return &FieldInfo;																	\
 	}
 
-#define implements(...) public ::libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>
+#define SVIRTUAL_IMPLEMENTS_NODE(X) virtual public X
+
+#define implements(...) public ::libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>, MACRO_RECURSIVE_FOR_EACH_DOT(SVIRTUAL_IMPLEMENTS_NODE, __VA_ARGS__)
 #define extends(Class) virtual public Class

@@ -141,6 +141,7 @@ namespace libty::inline Core
 
 	public:
 		using promise_type = libty::Impl::promise_type<T>;
+		using TGenericVoid = void;
 
 	protected:
 		using MyAwaiter = Awaiter<T>;

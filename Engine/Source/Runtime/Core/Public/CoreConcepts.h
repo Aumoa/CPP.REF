@@ -152,4 +152,12 @@ namespace libty::inline Core
 		{ std::tuple_size<T>::value } -> std::convertible_to<size_t>;
 		{ std::declval<std::tuple_element_t<0, T>>() };
 	};
+
+	template<template<class...> class TGenericClass, class... TArguments>
+	concept IGenericClass = requires
+	{
+		{ std::declval<typename TGenericClass<TArguments...>::TGenericVoid>() };
+		{ TGenericClass<typename TGenericClass<TArguments...>::TGenericVoid>(std::declval<TGenericClass<TArguments...>>()) };
+		{ TGenericClass<TArguments...>(std::declval<TGenericClass<typename TGenericClass<TArguments...>::TGenericVoid>>()) };
+	};
 }

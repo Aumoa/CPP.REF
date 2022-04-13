@@ -4,10 +4,10 @@
 #include "Builder/AspApplicationBuilder.h"
 #include "DependencyInjection/ServiceCollection.h"
 #include "Controllers/ControllerBase.h"
+#include "RestApi/OkObjectResult.h"
 
 using namespace ::libty;
-using namespace ::libty::Asp;
-using namespace ::libty::Sockets;
+using namespace ::libty::Reflection;
 
 SAspApplication::SAspApplication()
 	: Super()
@@ -43,6 +43,19 @@ int32 SAspApplication::Run()
 
 	_socket = gcnew SSocket(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::TCP);
 	_socket->Bind(IPEndPoint::Parse(L"0.0.0.0:5001"));
+
+	SMethodInfo* method = _controllers[0]->GetType()->GetMethod(L"GetAsync");
+	SObject* returnObj = method->Invoke(_controllers[0], {});
+	SOkObjectResult* returnValue = nullptr;
+	if (method->GetReturnType()->IsA<Task<>>())
+	{
+		Task<IActionResult*> returnTask = Cast<Task<IActionResult*>>(returnObj);
+		returnValue = Cast<SOkObjectResult>(returnTask.GetResult());
+	}
+	else
+	{
+		returnValue = Cast<SOkObjectResult>(returnObj);
+	}
 
 	_socket->Listen();
 	while (true)

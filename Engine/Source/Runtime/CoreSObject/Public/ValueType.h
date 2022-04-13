@@ -15,13 +15,25 @@ namespace libty::inline Core
 		std::any _value;
 		std::wstring _toString;
 		SType* _type = nullptr;
+		bool _isGeneric = false;
 
 	public:
 		template<class T>
-		SValueType(const T& value) : SObject()
+		SValueType(const T& value)
+			: SObject()
 			, _value(value)
 		{
 			_type = typeof(T);
+			_toString = Internal_ToString(0, value);
+		}
+
+		template<template<class...> class TGenericClass, class... TArguments>
+		SValueType(const TGenericClass<TArguments...>& value) requires
+			IGenericClass<TGenericClass, TArguments...>
+			: SObject()
+			, _value(TGenericClass<void>(value))
+		{
+			_type = typeof(TGenericClass<>);
 			_toString = Internal_ToString(0, value);
 		}
 
@@ -48,6 +60,33 @@ namespace libty::inline Core
 				return true;
 			}
 			return false;
+		}
+
+		template<template<class...> class TGenericClass, class... TArguments>
+		bool Unboxing(TGenericClass<TArguments...>* outValue) const requires
+			IGenericClass<TGenericClass, TArguments...>
+		{
+			using T = TGenericClass<TArguments...>;
+
+			if (_isGeneric)
+			{
+				if (const T* p = std::any_cast<T>(&_value); p)
+				{
+					*outValue = *p;
+					return true;
+				}
+				return false;
+			}
+			else
+			{
+				TGenericClass<void> transp;
+				if (const TGenericClass<void>* p = std::any_cast<TGenericClass<void>>(&_value); p)
+				{
+					*outValue = TGenericClass<TArguments...>(*p);
+					return true;
+				}
+				return false;
+			}
 		}
 
 	private:

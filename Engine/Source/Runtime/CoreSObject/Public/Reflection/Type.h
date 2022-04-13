@@ -180,26 +180,47 @@ namespace libty::inline Core
 		/// <param name="baseType"> The base type of results. </param>
 		static std::set<SType*> GetDerivedTypes(SType* baseType);
 
+	private:
+		template<class T>
+		struct TypeOfImpl
+		{
+			static SType* Generate() requires
+				(!requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }) &&
+				(!std::same_as<T, void>)
+			{
+				static SType StaticClass = SType(MetadataGenerator::GenerateNative<T>());
+				return &StaticClass;
+			}
+
+			static SType* Generate() requires
+				requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }
+			{
+				return T::TypeId;
+			}
+
+			static SType* Generate() requires std::same_as<T, void>
+			{
+				return nullptr;
+			}
+		};
+
+		template<template<class...> class TGenericClass, class... TArguments> requires
+			IGenericClass<TGenericClass, TArguments...>
+		struct TypeOfImpl<TGenericClass<TArguments...>>
+		{
+			static SType* Generate()
+			{
+				static SType StaticClass = SType(MetadataGenerator::GenerateNative<TGenericClass<>>());
+				return &StaticClass;
+			}
+		};
+
+	public:
 		template<class T>
 		static SType* TypeOf() requires
-			(!requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }) &&
-			(!std::same_as<T, void>)
+			requires { std::declval<TypeOfImpl<T>>(); }
 		{
-			static SType StaticClass = SType(MetadataGenerator::GenerateNative<T>());
-			return &StaticClass;
-		}
-
-		template<class T>
-		static SType* TypeOf() requires
-			requires { { std::declval<T>().GetType() } -> std::same_as<SType*>; }
-		{
-			return T::TypeId;
-		}
-
-		template<class T>
-		static SType* TypeOf() requires std::same_as<T, void>
-		{
-			return nullptr;
+			return TypeOfImpl<T>::Generate();
 		}
 	};
 }

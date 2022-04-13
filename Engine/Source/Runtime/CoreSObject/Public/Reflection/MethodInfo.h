@@ -51,6 +51,11 @@ namespace libty::inline Core::Reflection
 		}
 
 		/// <summary>
+		/// Gets the return type of this method.
+		/// </summary>
+		virtual SType* GetReturnType();
+
+		/// <summary>
 		/// Invokes the method represented by the current instance, using the specified parameters.
 		/// </summary>
 		/// <param name="self"> The object on which to invoke the method. If a method is static, this argument is ignored. </param>
