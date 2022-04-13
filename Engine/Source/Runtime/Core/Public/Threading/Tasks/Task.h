@@ -315,9 +315,9 @@ namespace libty::inline Core
 		}
 
 		template<class U> requires (!std::same_as<U, void>)
-		static Task<> CompletedTask(U value, const std::source_location& source = std::source_location::current())
+		static Task<> FromResult(U value, const std::source_location& source = std::source_location::current())
 		{
-			static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask<U> instead.");
+			static_assert(std::same_as<T, void>, "Use Task<>::FromResult<U> instead.");
 			throw;
 		}
 
@@ -463,7 +463,7 @@ namespace libty::inline Core
 
 	template<>
 	template<class U> requires (!std::same_as<U, void>)
-	inline Task<> Task<>::CompletedTask(U value, const std::source_location& source)
+	inline Task<> Task<>::FromResult(U value, const std::source_location& source)
 	{
 		auto ptr = std::make_shared<Awaiter<U>>();
 		ptr->SetResult(std::move(value), source);
