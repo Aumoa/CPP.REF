@@ -251,7 +251,7 @@ namespace libty::inline Core
 
 	public:
 		template<class TBody>
-		auto Then(TBody&& body, const std::source_location& source = std::source_location::current()) -> Task<FunctionReturn_t<TBody, Task>>
+		auto ContinueWith(TBody&& body, const std::source_location& source = std::source_location::current()) -> Task<FunctionReturn_t<TBody, Task>>
 		{
 			using U = FunctionReturn_t<TBody, Task>;
 
@@ -367,7 +367,7 @@ namespace libty::inline Core
 			std::shared_ptr awaiter = std::make_shared<WhenAnyAwaiter>();
 			for (auto& task : tasks)
 			{
-				task.Then([awaiter](Task<> result) mutable
+				task.ContinueWith([awaiter](Task<> result) mutable
 				{
 					awaiter->Join(std::move(result));
 				});
