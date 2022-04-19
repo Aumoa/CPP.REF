@@ -1,7 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Draw/PaintArgs.h"
-#include "Widgets/Widget.h"
+#include "Widgets/SWidget.h"
+
+using namespace ::libty;
 
 PaintArgs::PaintArgs(IRHIDevice* Device, SWidget* InParentWidget, float InDeltaTime, float RenderOpacity)
 	: Device(Device)

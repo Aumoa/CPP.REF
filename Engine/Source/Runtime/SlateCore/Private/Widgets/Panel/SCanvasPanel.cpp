@@ -1,11 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Panel/CanvasPanel.h"
+#include "Widgets/Panel/SCanvasPanel.h"
 #include "Layout/ArrangedChildrens.h"
 #include "Draw/PaintArgs.h"
 
-GENERATE_BODY(SCanvasPanel);
-GENERATE_BODY(SCanvasPanel::SSlot);
+using namespace ::libty;
 
 SCanvasPanel::SCanvasPanel() : Super()
 {

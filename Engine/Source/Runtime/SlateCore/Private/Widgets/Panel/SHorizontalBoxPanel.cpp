@@ -1,8 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Panel/HorizontalBoxPanel.h"
+#include "Widgets/Panel/SHorizontalBoxPanel.h"
 
-GENERATE_BODY(SHorizontalBoxPanel);
+using namespace ::libty;
 
 SHorizontalBoxPanel::SHorizontalBoxPanel() : Super(EOrientation::Horizontal)
 {

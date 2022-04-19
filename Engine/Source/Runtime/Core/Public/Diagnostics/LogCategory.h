@@ -41,7 +41,7 @@ namespace libty::inline Core
 }
 
 #define DECLARE_LOG_CATEGORY(API, CategoryName) \
-namespace libty::inline Generated::LogCategories \
+namespace libty::Generated::LogCategories \
 { \
 	extern API ::libty::Core::LogCategory CategoryName; \
 } \
@@ -49,7 +49,7 @@ namespace libty::inline Generated::LogCategories \
 #define LOG_CATEGORY_ARGUMENT_FOR_EACH_ITEM(X, Value) .X = Value,
 
 #define DEFINE_LOG_CATEGORY(CategoryName, ...) \
-namespace libty::inline Generated::LogCategories \
+namespace libty::Generated::LogCategories \
 { \
 	::libty::Core::LogCategory CategoryName(L ## #CategoryName, \
 		::libty::Core::LogCategory::Arguments { \

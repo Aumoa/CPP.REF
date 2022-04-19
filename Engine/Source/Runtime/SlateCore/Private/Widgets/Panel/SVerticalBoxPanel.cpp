@@ -1,13 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Panel/VerticalBoxPanel.h"
+#include "Widgets/Panel/SVerticalBoxPanel.h"
 
-GENERATE_BODY(SVerticalBoxPanel);
+using namespace ::libty;
 
 SVerticalBoxPanel::SVerticalBoxPanel() : Super(EOrientation::Vertical)
-{
-}
-
-SVerticalBoxPanel::~SVerticalBoxPanel()
 {
 }

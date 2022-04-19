@@ -7,7 +7,7 @@ namespace libty::inline Core
 	class LogCategory;
 }
 
-namespace libty::inline Generated::LogCategories
+namespace libty::Generated::LogCategories
 {
 	extern CORE_API ::libty::Core::LogCategory LogCore;
 	extern CORE_API ::libty::Core::LogCategory LogAssert;

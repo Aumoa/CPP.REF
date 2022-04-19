@@ -117,18 +117,18 @@ private:																					\
 private:
 
 #define GENERATE_BODY(Class, ...)															\
-namespace libty::inline Generated::Assemblies												\
+namespace libty::Generated::Assemblies														\
 {																							\
 	extern ::libty::Core::Reflection::SAssembly SE_ASSEMBLY_INFO;							\
 }																							\
 																							\
-namespace libty::inline Generated::Class													\
+namespace libty::Generated::Class															\
 {																							\
 	inline constexpr bool __pred__															\
 		= ::libty::Core::Reflection::IInternalAccessModifierIsPublic<::Class>;				\
 }																							\
 																							\
-::libty::Core::SType Class::StaticClass =													\
+::libty::Core::SType __VA_ARGS__ (::Class::StaticClass) =									\
 	::libty::Core::SType(::libty::Core::Reflection											\
 	::TypeInfoMetadataGenerator::GenerateManaged<(char)FriendlyName[0], ::Class>(			\
 		FriendlyName,																		\
@@ -136,7 +136,7 @@ namespace libty::inline Generated::Class													\
 		&::libty::Generated::Assemblies::SE_ASSEMBLY_INFO,									\
 		AttributeCollection																	\
 	)																						\
-);																							\
+);
 
 #define SFUNCTION(FunctionName, ...)														\
 	template<size_t _Line> requires (_Line == __LINE__)										\

@@ -1,15 +1,17 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Image/Image.h"
+#include "Widgets/Image/SImage.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/IRenderSlateElement.h"
 #include "Draw/SlateDrawCollector.h"
 #include "RHI/RHIInterfaces.h"
 #include "RenderThread.h"
 
-class SImage::SRenderElement : implements SObject, implements IRenderSlateElement
+using namespace ::libty;
+
+class SImage::SRenderElement : extends(SObject), implements(IRenderSlateElement)
 {
-	GENERATED_BODY(SRenderElement)
+	GENERATED_BODY(SRenderElement);
 
 public:
 	const PaintArgs Args;
@@ -52,44 +54,43 @@ public:
 		return RenderGeometry;
 	}
 
-	virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
-	{
-		Vector2 RB = LocalLayout.LocalPosition + LocalLayout.LocalSize;
+	//virtual void RenderElement(IRHIDeviceContext2D* CommandBuffer, const LocalRenderLayout& LocalLayout) override
+	//{
+	//	Vector2 RB = LocalLayout.LocalPosition + LocalLayout.LocalSize;
 
-		Rect DrawRect;
-		DrawRect.Left = LocalLayout.LocalPosition.X;
-		DrawRect.Top = LocalLayout.LocalPosition.Y;
-		DrawRect.Right = RB.X;
-		DrawRect.Bottom = RB.Y;
+	//	Rect DrawRect;
+	//	DrawRect.Left = LocalLayout.LocalPosition.X;
+	//	DrawRect.Top = LocalLayout.LocalPosition.Y;
+	//	DrawRect.Right = RB.X;
+	//	DrawRect.Bottom = RB.Y;
 
-		//if (ImageSource)
-		//{
-		//	CommandBuffer->DrawBitmap(ImageSource, &DrawRect, Args.RenderOpacity, ERHIInterpolationMode::Anisotropic);
-		//}
-		//else
-		//{
-		//	CommandBuffer->FillRectangle(TintBrush, DrawRect);
-		//}
-	}
+	//	//if (ImageSource)
+	//	//{
+	//	//	CommandBuffer->DrawBitmap(ImageSource, &DrawRect, Args.RenderOpacity, ERHIInterpolationMode::Anisotropic);
+	//	//}
+	//	//else
+	//	//{
+	//	//	CommandBuffer->FillRectangle(TintBrush, DrawRect);
+	//	//}
+	//}
 
-	void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
-	{
-		if (CachedGeometry != AllottedGeometry || CachedLayer != Layer)
-		{
-			CachedGeometry = AllottedGeometry;
-			CachedLayer = Layer;
+	//void SetGeometry_GameThread(int32 Layer, Geometry AllottedGeometry)
+	//{
+	//	if (CachedGeometry != AllottedGeometry || CachedLayer != Layer)
+	//	{
+	//		CachedGeometry = AllottedGeometry;
+	//		CachedLayer = Layer;
 
-			RenderThread::Get()->EnqueueRenderThreadWork(this, [this, Layer, AllottedGeometry](auto)
-			{
-				RenderGeometry = AllottedGeometry;
-				RenderLayer = Layer;
-			});
-		}
-	}
+	//		RenderThread::Get()->EnqueueRenderThreadWork(this, [this, Layer, AllottedGeometry](auto)
+	//		{
+	//			RenderGeometry = AllottedGeometry;
+	//			RenderLayer = Layer;
+	//		});
+	//	}
+	//}
 };
 
-GENERATE_BODY(SImage);
-GENERATE_BODY(SImage::SRenderElement);
+GENERATE_BODY(libty::SlateCore::SImage::SRenderElement);
 
 SImage::SImage() : Super()
 {
@@ -104,11 +105,11 @@ void SImage::SetBrush(const SlateBrush& InBrush)
 	//	CachedRenderElement = nullptr;
 	//}
 
-	if (ImageSize != InBrush.ImageSize)
-	{
-		ImageSize = InBrush.ImageSize;
-		InvalidateLayoutAndVolatility();
-	}
+	//if (ImageSize != InBrush.ImageSize)
+	//{
+	//	ImageSize = InBrush.ImageSize;
+	//	InvalidateLayoutAndVolatility();
+	//}
 }
 
 SlateBrush SImage::GetBrush()
@@ -163,7 +164,7 @@ int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, c
 	}
 	else
 	{
-		CachedRenderElement->SetGeometry_GameThread(InLayer, AllottedGeometry);
+		//CachedRenderElement->SetGeometry_GameThread(InLayer, AllottedGeometry);
 	}
 
 	if (CachedRenderElement)

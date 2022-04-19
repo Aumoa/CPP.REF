@@ -12,6 +12,5 @@ namespace libty::inline SlateCore
 
 	public:
 		SVerticalBoxPanel();
-		virtual ~SVerticalBoxPanel() override;
 	};
 }

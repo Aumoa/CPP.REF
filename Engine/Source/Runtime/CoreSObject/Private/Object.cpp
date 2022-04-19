@@ -12,14 +12,14 @@ using namespace libty;
 using namespace libty::Reflection;
 
 static std::tuple<> EmptyAttributes = std::make_tuple();
-namespace libty::inline Generated::Assemblies
+namespace libty::Generated::Assemblies
 {
 	extern SAssembly CoreSObject_AssemblyInfo;
 }
 
 SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator
 	::GenerateManaged<"SObject"[0], SObject>(
-		FriendlyName, L"SObject", &libty::Assemblies::CoreSObject_AssemblyInfo, EmptyAttributes
+		FriendlyName, L"SObject", &libty::Generated::Assemblies::CoreSObject_AssemblyInfo, EmptyAttributes
 	)
 );
 

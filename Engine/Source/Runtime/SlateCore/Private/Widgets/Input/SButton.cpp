@@ -1,9 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Input/Button.h"
+#include "Widgets/Input/SButton.h"
 #include "Layout/ArrangedChildrens.h"
 
-GENERATE_BODY(SButton);
+using namespace ::libty;
 
 SButton::SButton() : Super()
 {

@@ -16,4 +16,4 @@ namespace libty::inline Core::Reflection
 	};
 }
 
-#define gcnew libty::Core::Reflection::GCNewBinder() << new
+#define gcnew ::libty::Core::Reflection::GCNewBinder() << new

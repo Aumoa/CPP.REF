@@ -11,7 +11,7 @@ namespace libty::inline SlateCore
 	{
 		GENERATED_BODY(SImage);
 
-	private:
+	public:
 		class SRenderElement;
 
 	private:

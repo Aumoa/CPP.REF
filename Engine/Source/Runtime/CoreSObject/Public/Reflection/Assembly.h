@@ -35,7 +35,7 @@ namespace libty::inline Core::Reflection
 	};
 
 	#define DEFINE_ASSEMBLY_INFO \
-namespace libty::inline Generated::Assemblies \
+namespace libty::Generated::Assemblies \
 { \
 	::libty::Core::Reflection::SAssembly SE_ASSEMBLY_INFO(SE_ASSEMBLY_NAME); \
 }

@@ -1,10 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Panel/BoxPanel.h"
+#include "Widgets/Panel/SBoxPanel.h"
 #include <ranges>
 
-GENERATE_BODY(SBoxPanel);
-GENERATE_BODY(SBoxPanel::SSlot);
+using namespace ::libty;
 
 SBoxPanel::SBoxPanel(EOrientation Orientation) : Super()
 	, Orientation(Orientation)

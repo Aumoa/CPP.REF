@@ -1,8 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Widgets/Layout/Border.h"
+#include "Widgets/Layout/SBorder.h"
 
-GENERATE_BODY(SBorder);
+using namespace ::libty;
 
 SBorder::SBorder() : Super()
 {

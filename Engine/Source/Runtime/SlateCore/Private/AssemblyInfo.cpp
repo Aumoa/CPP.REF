@@ -22,7 +22,9 @@ GENERATE_BODY(libty::SlateCore::SCompoundWidget);
 
 GENERATE_BODY(libty::SlateCore::SPanelWidget);
 GENERATE_BODY(libty::SlateCore::SBoxPanel);
+GENERATE_BODY(libty::SlateCore::SBoxPanel::SSlot);
 GENERATE_BODY(libty::SlateCore::SCanvasPanel);
+GENERATE_BODY(libty::SlateCore::SCanvasPanel::SSlot);
 GENERATE_BODY(libty::SlateCore::SHorizontalBoxPanel);
 GENERATE_BODY(libty::SlateCore::SVerticalBoxPanel);
 

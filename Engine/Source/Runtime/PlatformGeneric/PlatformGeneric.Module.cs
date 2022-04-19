@@ -7,7 +7,6 @@ public class PlatformGeneric : ModuleRule
     public PlatformGeneric()
     {
         TargetType = TargetType.Engine;
-        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");
