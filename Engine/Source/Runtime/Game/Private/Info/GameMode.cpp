@@ -6,10 +6,10 @@
 #include "Level/Level.h"
 #include "Level/World.h"
 
-GENERATE_BODY(AGameMode);
+using namespace ::libty;
 
 AGameMode::AGameMode() : Super()
-	, PlayerControllerClass(APlayerController::StaticClass())
+	, PlayerControllerClass(APlayerController::TypeId)
 {
 }
 

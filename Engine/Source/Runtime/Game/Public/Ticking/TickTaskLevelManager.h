@@ -2,45 +2,47 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "TickingGroup.h"
 
 DECLARE_LOG_CATEGORY(GAME_API, LogLevelTick);
 
-class SWorld;
-class TickFunction;
-
-class GAME_API STickTaskLevelManager : public SObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(STickTaskLevelManager)
+	class SWorld;
+	class TickFunction;
 
-private:
-	struct TickGroupHeader
+	class GAME_API STickTaskLevelManager : extends(SObject)
 	{
-		ETickingGroup TickGroup;
-		std::set<TickFunction*> Functions;
+		GENERATED_BODY(STickTaskLevelManager);
+
+	private:
+		struct TickGroupHeader
+		{
+			ETickingGroup TickGroup;
+			std::set<TickFunction*> Functions;
+
+			void AddTickFunction(TickFunction* InFunction);
+			void RemoveTickFunction(TickFunction* InFunction);
+		};
+
+		SPROPERTY(World)
+		SWorld* World = nullptr;
+		std::array<TickGroupHeader, (int32)ETickingGroup::NumGroups> TickGroups;
+
+	public:
+		STickTaskLevelManager(SWorld* InWorld);
+
+		SWorld* GetWorld();
 
 		void AddTickFunction(TickFunction* InFunction);
 		void RemoveTickFunction(TickFunction* InFunction);
+
+	private:
+		TickFunction* FrameHead = nullptr;
+
+	public:
+		void BeginFrame();
+		void IncrementalDispatchTick(ETickingGroup InTickGroup, float InDeltaTime);
+		void EndFrame();
 	};
-
-	SPROPERTY(World)
-	SWorld* World = nullptr;
-	std::array<TickGroupHeader, (int32)ETickingGroup::NumGroups> TickGroups;
-
-public:
-	STickTaskLevelManager(SWorld* InWorld);
-
-	SWorld* GetWorld();
-
-	void AddTickFunction(TickFunction* InFunction);
-	void RemoveTickFunction(TickFunction* InFunction);
-
-private:
-	TickFunction* FrameHead = nullptr;
-
-public:
-	void BeginFrame();
-	void IncrementalDispatchTick(ETickingGroup InTickGroup, float InDeltaTime);
-	void EndFrame();
-};
+}

@@ -2,29 +2,24 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Player.h"
 
-class APlayerController;
-class SViewport;
-class SSlateApplication;
-
-class GAME_API SLocalPlayer : public SPlayer
+namespace libty::inline Game
 {
-	GENERATED_BODY(SLocalPlayer)
+	class APlayerController;
 
-private:
-	SPROPERTY(SlateApp)
-	SSlateApplication* SlateApp = nullptr;
-	SPROPERTY(PlayerController)
-	APlayerController* PlayerController = nullptr;
+	class GAME_API SLocalPlayer : extends(SPlayer)
+	{
+		GENERATED_BODY(SLocalPlayer);
 
-public:
-	SLocalPlayer(SSlateApplication* SlateApp);
+	private:
+		SPROPERTY(PlayerController)
+		APlayerController* PlayerController = nullptr;
 
-	void SetPlayerController(APlayerController* InController);
-	APlayerController* GetPlayerController();
+	public:
+		SLocalPlayer();
 
-	SSlateApplication* GetSlateApplication();
-	SViewport* GetGameViewport();
-};
+		void SetPlayerController(APlayerController* InController);
+		APlayerController* GetPlayerController();
+	};
+}

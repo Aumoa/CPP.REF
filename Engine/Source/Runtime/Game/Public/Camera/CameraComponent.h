@@ -2,16 +2,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "MinimalViewInfo.h"
 
-class GAME_API SCameraComponent : public SSceneComponent
+namespace libty::inline Game
 {
-	GENERATED_BODY(SCameraComponent)
+	class GAME_API SCameraComponent : extends(SSceneComponent)
+	{
+		GENERATED_BODY(SCameraComponent);
 
-public:
-	SCameraComponent();
+	public:
+		SCameraComponent();
 
-	MinimalViewInfo GetViewInfo(float elapsedTime);
-};
+		MinimalViewInfo GetViewInfo(float elapsedTime);
+	};
+}

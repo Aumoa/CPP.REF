@@ -4,7 +4,6 @@
 #include "GameFramework/Pawn.h"
 #include "GameInstance.h"
 #include "GameEngine.h"
-#include "IApplicationInterface.h"
 #include "LogGame.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/CameraComponent.h"
@@ -12,10 +11,10 @@
 #include "GameFramework/LocalPlayer.h"
 #include "Components/SceneComponent.h"
 
-GENERATE_BODY(APlayerController);
+using namespace ::libty;
 
 APlayerController::APlayerController() : Super()
-	, PlayerCameraManagerClass(APlayerCameraManager::StaticClass())
+	, PlayerCameraManagerClass(APlayerCameraManager::TypeId)
 {
 }
 
@@ -41,7 +40,7 @@ void APlayerController::UpdateCameraManager(float elapsedTime)
 
 Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 {
-	throw fatal_exception("NOT IMPLEMENTED");
+	throw FatalException("NOT IMPLEMENTED");
 	//if (!ensureMsgf(_PlayerCameraManager != nullptr, L"PlayerCameraManager does not registered."))
 	//{
 	//	return {};

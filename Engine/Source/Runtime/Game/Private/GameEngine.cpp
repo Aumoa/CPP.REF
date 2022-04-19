@@ -7,14 +7,10 @@
 #include "RenderThread.h"
 #include "Threading/Thread.h"
 #include "Level/World.h"
-#include "Application/SlateApplication.h"
 #include "EngineSubsystems/GameEngineSubsystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
-#include "EngineSubsystems/GameRenderSystem.h"
 #include "Misc/AutoConsoleVariable.h"
-
-GENERATE_BODY(SGameEngine)
 
 DECLARE_STAT_GROUP("Engine", STATGROUP_Engine);
 DECLARE_CYCLE_STAT("Tick", STAT_Tick, STATGROUP_Engine);
@@ -22,7 +18,9 @@ DECLARE_CYCLE_STAT("  SystemTick", STAT_SystemTick, STATGROUP_Engine);
 DECLARE_CYCLE_STAT("  GameTick", STAT_GameTick, STATGROUP_Engine);
 DECLARE_CYCLE_STAT("  ExecuteRenderThread", STAT_ExecuteRenderThread, STATGROUP_Engine);
 
-SGameEngine* GEngine = nullptr;
+using namespace ::libty;
+
+SGameEngine* ::libty::Game::GEngine = nullptr;
 
 SGameEngine::SGameEngine() : Super()
 {
@@ -33,8 +31,8 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	GEngine = this;
 	Thread::GetCurrentThread()->SetFriendlyName(L"[Game Thread]");
 
-	SlateApplication = CreateSlateApplication();
-	SlateApplication->Init(InApplication);
+	//SlateApplication = CreateSlateApplication();
+	//SlateApplication->Init(InApplication);
 
 	InitializeSubsystems();
 	CoreDelegates::PostEngineInit.Broadcast();
@@ -48,19 +46,19 @@ bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 	ModuleSystem->LoadGameModule(InModuleName);
 	if (GameInstance = ModuleSystem->LoadGameInstance(); GameInstance == nullptr)
 	{
-		throw fatal_exception(String::Format(L"LoadGameInstance function from {} module return nullptr.", InModuleName));
+		throw FatalException(String::Format("LoadGameInstance function from {} module return nullptr.", String::AsMultibyte(InModuleName)));
 	}
 
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 	GameInstance->SetOuter(GameWorld);
 	if (!GameInstance->StartupLevel.IsValid())
 	{
-		throw fatal_exception("SGameInstance::StartupLevel is not specified.");
+		throw FatalException("SGameInstance::StartupLevel is not specified.");
 	}
 
 	if (!GetEngineSubsystem<SGameLevelSystem>()->OpenLevel(GameInstance->StartupLevel))
 	{
-		throw fatal_exception("Could not startup level.");
+		throw FatalException("Could not startup level.");
 	}
 
 	return true;
@@ -74,7 +72,7 @@ void SGameEngine::Shutdown()
 	}
 
 	GC.SuppressFinalize(GameInstance);
-	GC.SuppressFinalize(SlateApplication);
+	//GC.SuppressFinalize(SlateApplication);
 	GC.Collect(true);
 
 	Subsystems.clear();
@@ -103,7 +101,7 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstrin
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine(InApplication))
 	{
-		throw fatal_exception("Could not initialize engine.");
+		throw FatalException("Could not initialize engine.");
 	}
 
 	// Load game module.
@@ -127,21 +125,21 @@ SGameInstance* SGameEngine::GetGameInstance()
 	return GameInstance;
 }
 
-SSlateApplication* SGameEngine::GetSlateApplication()
-{
-	return SlateApplication;
-}
+//SSlateApplication* SGameEngine::GetSlateApplication()
+//{
+//	return SlateApplication;
+//}
 
-SSlateApplication* SGameEngine::CreateSlateApplication()
-{
-	return gcnew SSlateApplication();
-}
+//SSlateApplication* SGameEngine::CreateSlateApplication()
+//{
+//	return gcnew SSlateApplication();
+//}
 
 void SGameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
 
-	std::span Subclasses = Type::FindAllSubclass<SGameEngineSubsystem>();
+	auto Subclasses = SType::GetDerivedTypes(typeof(SGameEngineSubsystem));
 	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size() - 1);
 
 	for (auto& Subclass : Subclasses)
@@ -155,7 +153,7 @@ void SGameEngine::InitializeSubsystems()
 		Instance->Init();
 		Subsystems.emplace_back(Instance);
 
-		Type* Class = Instance->GetType();
+		SType* Class = Instance->GetType();
 		while (Class)
 		{
 			auto [It, bStatus] = SubsystemView.emplace(Class->GetHashCode(), Instance);
@@ -164,7 +162,7 @@ void SGameEngine::InitializeSubsystems()
 				break;
 			}
 
-			Class = Class->GetSuper();
+			Class = Class->GetSuperType();
 		}
 	}
 
@@ -220,5 +218,5 @@ void SGameEngine::RenderTick(std::chrono::duration<float> InDeltaTime)
 {
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteRenderThread);
 
-	GetEngineSubsystem<SGameRenderSystem>()->ExecuteRenderThread(InDeltaTime.count(), SlateApplication);
+	//GetEngineSubsystem<SGameRenderSystem>()->ExecuteRenderThread(InDeltaTime.count(), SlateApplication);
 }

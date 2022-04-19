@@ -5,7 +5,8 @@
 #include "Level/World.h"
 #include "Components/PrimitiveComponent.h"
 
-GENERATE_BODY(AActor);
+using namespace ::libty;
+
 DEFINE_LOG_CATEGORY(LogActor);
 
 AActor::ActorTickFunction::ActorTickFunction(AActor* InTarget)

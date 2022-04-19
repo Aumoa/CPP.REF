@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 DECLARE_LOG_CATEGORY(GAME_API, LogEngine);
 DECLARE_LOG_CATEGORY(GAME_API, LogTicking);
 DECLARE_LOG_CATEGORY(GAME_API, LogPawn);

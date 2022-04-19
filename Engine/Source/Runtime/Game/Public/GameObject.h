@@ -2,53 +2,53 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include <filesystem>
-
-class SLevel;
-class SWorld;
-
-/// <summary>
-/// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
-/// </summary>
-class GAME_API SGameObject : implements SObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameObject)
+	class SLevel;
+	class SWorld;
 
-private:
-	SPROPERTY(Outer)
-	SGameObject* Outer = nullptr;
-	std::wstring Name;
-
-public:
-	SGameObject();
-
-	virtual std::wstring ToString() override;
-
-	SGameObject* GetOuter() const;
-	void SetOuter(SGameObject* Value);
-	std::wstring_view GetName() const;
-	void SetName(std::wstring_view Value);
-
-	virtual SLevel* GetLevel();
-	virtual SWorld* GetWorld();
-
-public:
-	static SObject* LoadObject(const std::filesystem::path& assetPath);
-
-public:
-	template<std::derived_from<SObject> T>
-	static T* LoadObject(const std::filesystem::path& assetPath)
+	/// <summary>
+	/// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
+	/// </summary>
+	class GAME_API SGameObject : extends(SObject)
 	{
-		return Cast<T>(LoadObject(assetPath));
-	}
+		GENERATED_BODY(SGameObject);
 
-	template<std::derived_from<SGameObject> T>
-	T* GetOuter()
-	{
-		return Cast<T>(GetOuter());
-	}
+	private:
+		SPROPERTY(Outer)
+		SGameObject* Outer = nullptr;
+		std::wstring Name;
 
-private:
-	mutable SWorld* _WorldPrivate = nullptr;
-};
+	public:
+		SGameObject();
+
+		virtual std::wstring ToString() override;
+
+		SGameObject* GetOuter() const;
+		void SetOuter(SGameObject* Value);
+		std::wstring_view GetName() const;
+		void SetName(std::wstring_view Value);
+
+		virtual SLevel* GetLevel();
+		virtual SWorld* GetWorld();
+
+	public:
+		static SObject* LoadObject(const std::filesystem::path& assetPath);
+
+	public:
+		template<std::derived_from<SObject> T>
+		static T* LoadObject(const std::filesystem::path& assetPath)
+		{
+			return Cast<T>(LoadObject(assetPath));
+		}
+
+		template<std::derived_from<SGameObject> T>
+		T* GetOuter()
+		{
+			return Cast<T>(GetOuter());
+		}
+
+	private:
+		mutable SWorld* _WorldPrivate = nullptr;
+	};
+}

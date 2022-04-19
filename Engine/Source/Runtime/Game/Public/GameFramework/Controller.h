@@ -2,29 +2,31 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Actor.h"
 
-class APawn;
-
-class GAME_API AController : public AActor
+namespace libty::inline Game
 {
-	GENERATED_BODY(AController)
+	class APawn;
 
-private:
-	SPROPERTY(PossessedPawn)
-	APawn* PossessedPawn = nullptr;
+	class GAME_API AController : extends(AActor)
+	{
+		GENERATED_BODY(AController);
 
-public:
-	AController();
+	private:
+		SPROPERTY(PossessedPawn)
+		APawn* PossessedPawn = nullptr;
 
-	void Possess(APawn* InNewPawn);
-	void UnPossess();
+	public:
+		AController();
 
-	APawn* GetPawn() const;
-	template<std::derived_from<APawn> T> T* GetPawn() const { return Cast<T>(GetPawn()); }
+		void Possess(APawn* InNewPawn);
+		void UnPossess();
 
-protected:
-	virtual void OnPossess(APawn* pawn) {}
-	virtual void OnUnPossess() {}
-};
+		APawn* GetPawn() const;
+		template<std::derived_from<APawn> T> T* GetPawn() const { return Cast<T>(GetPawn()); }
+
+	protected:
+		virtual void OnPossess(APawn* pawn) {}
+		virtual void OnUnPossess() {}
+	};
+}

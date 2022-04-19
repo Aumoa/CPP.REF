@@ -2,9 +2,8 @@
 
 #include "Components/PrimitiveComponent.h"
 #include "Level/World.h"
-#include "Scene/PrimitiveSceneProxy.h"
 
-GENERATE_BODY(SPrimitiveComponent);
+using namespace ::libty;
 
 SPrimitiveComponent::SPrimitiveComponent() : Super()
 {
@@ -14,8 +13,8 @@ SPrimitiveComponent::~SPrimitiveComponent()
 {
 	if (!ensure(SceneProxy == nullptr))
 	{
-		delete SceneProxy;
-		SceneProxy = nullptr;
+		//delete SceneProxy;
+		//SceneProxy = nullptr;
 	}
 }
 
@@ -27,7 +26,7 @@ void SPrimitiveComponent::SetHiddenInGame(bool bHidden)
 
 		if (SceneProxy != nullptr)
 		{
-			SceneProxy->SetHiddenInGame_GameThread(bHidden);
+			//SceneProxy->SetHiddenInGame_GameThread(bHidden);
 		}
 	}
 }

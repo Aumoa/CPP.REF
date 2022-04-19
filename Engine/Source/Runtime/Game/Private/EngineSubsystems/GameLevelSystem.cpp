@@ -5,7 +5,8 @@
 #include "Level/Level.h"
 #include "Level/ActorIterator.h"
 
-GENERATE_BODY(SGameLevelSystem);
+using namespace ::libty;
+
 DEFINE_LOG_CATEGORY(LogLevel);
 
 SGameLevelSystem::SGameLevelSystem() : Super()
@@ -40,7 +41,7 @@ SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 	{
 		if (_GameWorld)
 		{
-			throw fatal_exception("GameWorld cannot be multiple instantiated.");
+			throw FatalException("GameWorld cannot be multiple instantiated.");
 			return nullptr;
 		}
 
@@ -50,7 +51,7 @@ SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 	}
 	else
 	{
-		throw fatal_exception("NOT IMPLEMENTED.");
+		throw FatalException("NOT IMPLEMENTED.");
 		return nullptr;
 	}
 }

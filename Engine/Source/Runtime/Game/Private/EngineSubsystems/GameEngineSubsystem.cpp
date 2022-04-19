@@ -2,7 +2,7 @@
 
 #include "EngineSubsystems/GameEngineSubsystem.h"
 
-GENERATE_BODY(SGameEngineSubsystem);
+using namespace ::libty;
 
 SGameEngineSubsystem::SGameEngineSubsystem() : Super()
 {

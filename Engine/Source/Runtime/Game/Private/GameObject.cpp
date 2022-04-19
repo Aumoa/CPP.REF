@@ -2,10 +2,9 @@
 
 #include "GameObject.h"
 #include "GameEngine.h"
-#include "EngineSubsystems/GameAssetSystem.h"
 #include "Level/Level.h"
 
-GENERATE_BODY(SGameObject);
+using namespace ::libty;
 
 SGameObject::SGameObject() : Super()
 {
@@ -52,13 +51,13 @@ SWorld* SGameObject::GetWorld()
 
 SObject* SGameObject::LoadObject(const std::filesystem::path& assetPath)
 {
-	SObject* LoadedObject = GEngine->GetEngineSubsystem<SGameAssetSystem>()->LoadObject(assetPath);
-	if (LoadedObject)
-	{
-		return LoadedObject;
-	}
-	else
-	{
+	//SObject* LoadedObject = GEngine->GetEngineSubsystem<SGameAssetSystem>()->LoadObject(assetPath);
+	//if (LoadedObject)
+	//{
+	//	return LoadedObject;
+	//}
+	//else
+	//{
 		return nullptr;
-	}
+	//}
 }

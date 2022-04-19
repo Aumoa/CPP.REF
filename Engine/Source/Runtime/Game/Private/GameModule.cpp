@@ -4,7 +4,7 @@
 #include "GameInstance.h"
 #include "GameEngine.h"
 
-GENERATE_BODY(SGameModule);
+using namespace ::libty;
 
 SGameModule::SGameModule() : Super()
 {

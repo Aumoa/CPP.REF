@@ -2,22 +2,23 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-class SGameInstance;
-class SGameEngine;
-
-class GAME_API SGameModule : implements SObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameModule)
+	class SGameInstance;
+	class SGameEngine;
 
-public:
-	SGameModule();
-	virtual ~SGameModule() override;
+	class GAME_API SGameModule : extends(SObject)
+	{
+		GENERATED_BODY(SGameModule);
 
-	virtual SGameInstance* CreateGameInstance();
-	virtual SGameEngine* CreateGameEngine();
-};
+	public:
+		SGameModule();
+		virtual ~SGameModule() override;
+
+		virtual SGameInstance* CreateGameInstance();
+		virtual SGameEngine* CreateGameEngine();
+	};
+}
 
 #if PLATFORM_DYNAMIC_LIBRARY
 

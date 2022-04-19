@@ -2,20 +2,22 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Info.h"
 
-class APlayerController;
-
-class GAME_API AGameMode : public AInfo
+namespace libty::inline Game
 {
-	GENERATED_BODY(AGameMode)
+	class APlayerController;
 
-public:
-	SubclassOf<APlayerController> PlayerControllerClass;
+	class GAME_API AGameMode : extends(AInfo)
+	{
+		GENERATED_BODY(AGameMode);
 
-public:
-	AGameMode();
+	public:
+		SubclassOf<APlayerController> PlayerControllerClass;
 
-	APlayerController* SpawnPlayerController();
-};
+	public:
+		AGameMode();
+
+		APlayerController* SpawnPlayerController();
+	};
+}

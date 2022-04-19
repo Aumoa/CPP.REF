@@ -7,10 +7,10 @@
 #include "Info/GameMode.h"
 #include "Ticking/TickTaskLevelManager.h"
 
-GENERATE_BODY(SLevel);
+using namespace ::libty;
 
 SLevel::SLevel() : Super()
-	, GameModeClass(AGameMode::StaticClass())
+	, GameModeClass(AGameMode::TypeId)
 {
 }
 

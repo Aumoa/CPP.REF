@@ -4,16 +4,19 @@
 
 #include "Controller.h"
 
-/// <summary>
-/// Represents controller that possess to pawn, process AI, etc...
-/// </summary>
-class GAME_API AAIController : public AController
+namespace libty::inline Game
 {
-	GENERATED_BODY(AAIController)
-
-public:
 	/// <summary>
-	/// Initialize new <see cref="AAIController"/> instance.
+	/// Represents controller that possess to pawn, process AI, etc...
 	/// </summary>
-	AAIController();
-};
+	class GAME_API AAIController : extends(AController)
+	{
+		GENERATED_BODY(AAIController);
+
+	public:
+		/// <summary>
+		/// Initialize new <see cref="AAIController"/> instance.
+		/// </summary>
+		AAIController();
+	};
+}

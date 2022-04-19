@@ -2,16 +2,17 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-class CoreDelegates
+namespace libty::inline Game
 {
-	CoreDelegates() = delete;
+	class GAME_API CoreDelegates
+	{
+		CoreDelegates() = delete;
 
-public:
-	DECLARE_MULTICAST_DELEGATE(BeginMainInvokedDelegate);
-	static BeginMainInvokedDelegate BeginMainInvoked;
+	public:
+		DECLARE_MULTICAST_DELEGATE(BeginMainInvokedDelegate);
+		static BeginMainInvokedDelegate BeginMainInvoked;
 
-	DECLARE_MULTICAST_DELEGATE(PostEngineInitDelegate);
-	static PostEngineInitDelegate PostEngineInit;
-};
+		DECLARE_MULTICAST_DELEGATE(PostEngineInitDelegate);
+		static PostEngineInitDelegate PostEngineInit;
+	};
+}

@@ -1,11 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameInputSystem.h"
-#include "Input/IPlatformKeyboard.h"
-#include "Input/IPlatformMouse.h"
-#include "IApplicationInterface.h"
 
-GENERATE_BODY(SGameInputSystem);
+using namespace ::libty;
 
 SGameInputSystem::SGameInputSystem() : Super()
 {

@@ -4,6 +4,8 @@
 #include "Level/World.h"
 #include "Level/Level.h"
 
+using namespace ::libty;
+
 ActorIterator::ActorIterator(SWorld* InWorld)
 	: MyWorld(InWorld)
 	, CurrentLevel(InWorld->Level)

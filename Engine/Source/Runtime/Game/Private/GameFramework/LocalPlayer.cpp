@@ -3,13 +3,11 @@
 #include "GameFramework/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "Level/World.h"
-#include "Application/SlateApplication.h"
-#include "Application/Window.h"
 
-GENERATE_BODY(SLocalPlayer);
+using namespace ::libty;
 
-SLocalPlayer::SLocalPlayer(SSlateApplication* SlateApp) : Super()
-	, SlateApp(SlateApp)
+SLocalPlayer::SLocalPlayer()
+	: Super()
 {
 }
 
@@ -21,16 +19,4 @@ void SLocalPlayer::SetPlayerController(APlayerController* InController)
 APlayerController* SLocalPlayer::GetPlayerController()
 {
 	return PlayerController;
-}
-
-SSlateApplication* SLocalPlayer::GetSlateApplication()
-{
-	return SlateApp;
-}
-
-SViewport* SLocalPlayer::GetGameViewport()
-{
-	SSlateApplication* App = GetSlateApplication();
-	SWindow* Window = App->GetCoreWindow();
-	return Window->GetGameViewport();
 }

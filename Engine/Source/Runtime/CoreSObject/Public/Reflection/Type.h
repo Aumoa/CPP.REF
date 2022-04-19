@@ -157,6 +157,16 @@ namespace libty::inline Core
 		virtual bool IsDerivedFrom(SType* baseType);
 
 		/// <summary>
+		/// Gets a value indicating whether the Type derived from specified type.
+		/// </summary>
+		/// <typeparam name="T"> The type what to compare. </typeparam>
+		template<class T>
+		bool IsDerivedFrom()
+		{
+			return IsDerivedFrom(TypeOf<T>());
+		}
+
+		/// <summary>
 		/// Gets a value indicating whether the Type derived from specified type or implements interface.
 		/// </summary>
 		/// <param name="baseTypeOrInterface"> The type what to check. </param>

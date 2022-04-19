@@ -5,13 +5,13 @@
 #include "Level/Level.h"
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GameInstanceSubsystem.h"
-#include "Application/SlateApplication.h"
 
-GENERATE_BODY(SGameInstance);
 DEFINE_LOG_CATEGORY(LogGameInstance);
 
+using namespace ::libty;
+
 SGameInstance::SGameInstance() : Super()
-	, StartupLevel(SLevel::StaticClass())
+	, StartupLevel(SLevel::TypeId)
 {
 }
 
@@ -24,7 +24,7 @@ SLocalPlayer* SGameInstance::GetLocalPlayer()
 {
 	if (GEngine)
 	{
-		return GEngine->GetSlateApplication()->GetLocalPlayer();
+		//return GEngine->GetSlateApplication()->GetLocalPlayer();
 	}
 
 	return nullptr;
@@ -35,7 +35,7 @@ SWorld* SGameInstance::GetWorld()
 	return GEngine->GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 }
 
-SGameInstanceSubsystem* SGameInstance::GetSubsystem(Type* SubsystemClass, bool bAllowDerivedClass)
+SGameInstanceSubsystem* SGameInstance::GetSubsystem(SType* SubsystemClass, bool bAllowDerivedClass)
 {
 	for (auto& Subsystem : Subsystems)
 	{
@@ -55,13 +55,13 @@ SGameInstanceSubsystem* SGameInstance::GetSubsystem(Type* SubsystemClass, bool b
 		}
 	}
 
-	SE_LOG(LogGameInstance, Error, L"Subsystem typed as '{}' is not found.", SubsystemClass->GetFriendlyName());
+	SE_LOG(LogGameInstance, Error, L"Subsystem typed as '{}' is not found.", SubsystemClass->GetName());
 	return nullptr;
 }
 
 void SGameInstance::InitSubsystemCollection()
 {
-	std::span<Type*> SubsystemClasses = Type::FindAllSubclass<SGameInstanceSubsystem>();
+	auto SubsystemClasses = SType::GetDerivedTypes(typeof(SGameInstanceSubsystem));
 	SE_LOG(LogGameInstance, Verbose, L"{} subsystems found.", SubsystemClasses.size() - 1);
 
 	for (auto& Class : SubsystemClasses)

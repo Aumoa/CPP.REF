@@ -7,7 +7,7 @@
 #include "Level/Level.h"
 #include "Ticking/TickTaskLevelManager.h"
 
-GENERATE_BODY(SActorComponent);
+using namespace ::libty;
 
 SActorComponent::SComponentTickFunction::SComponentTickFunction(SActorComponent* InTarget)
 	: ComponentTarget(InTarget)

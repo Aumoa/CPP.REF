@@ -9,7 +9,6 @@ public class RenderCore : ModuleRule
     public RenderCore()
     {
         TargetType = TargetType.Engine;
-        NonUnityBuild = true;
         RelativePath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");

@@ -5,14 +5,9 @@
 #include "GameEngine.h"
 #include "Components/PrimitiveComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "SceneRendering/Scene.h"
-#include "Scene/PrimitiveSceneProxy.h"
 #include "Camera/PlayerCameraManager.h"
-#include "EngineSubsystems/GameRenderSystem.h"
 #include "Ticking/TickTaskLevelManager.h"
-#include "Application/SlateApplication.h"
 
-GENERATE_BODY(SWorld);
 DEFINE_LOG_CATEGORY(LogWorld);
 
 DECLARE_STAT_GROUP("World", STATGROUP_World);
@@ -23,6 +18,8 @@ DECLARE_CYCLE_STAT("  DuringPhysics", STAT_DuringPhysics, STATGROUP_World);
 DECLARE_CYCLE_STAT("  PostPhysics", STAT_PostPhysics, STATGROUP_World);
 DECLARE_CYCLE_STAT("  PostUpdateWork", STAT_PostUpdateWork, STATGROUP_World);
 
+using namespace ::libty;
+
 SWorld::SWorld(EWorldType InWorldType) : Super()
 	, WorldType(InWorldType)
 {
@@ -30,16 +27,10 @@ SWorld::SWorld(EWorldType InWorldType) : Super()
 
 void SWorld::InitWorld()
 {
-	Scene = gcnew SScene(GEngine->GetEngineSubsystem<SGameRenderSystem>()->GetRHIDevice());
 }
 
 void SWorld::DestroyWorld()
 {
-	if (Scene)
-	{
-		Scene->Dispose();
-		Scene = nullptr;
-	}
 }
 
 SWorld* SWorld::GetWorld()
@@ -52,14 +43,9 @@ EWorldType SWorld::GetWorldType()
 	return WorldType;
 }
 
-SScene* SWorld::GetScene()
-{
-	return Scene;
-}
-
 SLocalPlayer* SWorld::GetLocalPlayer()
 {
-	return GEngine->GetSlateApplication()->GetLocalPlayer();
+	return nullptr;
 }
 
 SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
@@ -78,7 +64,7 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 	Level = Cast<SLevel>(InLevelToOpen->Instantiate());
 	if (!Level->LoadLevel(this))
 	{
-		throw fatal_exception("Could not load level.");
+		throw FatalException("Could not load level.");
 	}
 
 	return Level;

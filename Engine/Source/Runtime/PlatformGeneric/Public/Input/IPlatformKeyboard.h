@@ -10,6 +10,7 @@ namespace libty::inline PlatformGeneric
 	{
 		GENERATED_BODY(IPlatformKeyboard);
 
+	public:
 		virtual KeyboardState GetState() = 0;
 		virtual void Reset() = 0;
 		virtual bool IsConnected() = 0;

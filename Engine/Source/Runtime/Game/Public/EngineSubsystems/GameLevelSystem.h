@@ -2,29 +2,31 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 #include "Level/WorldType.h"
 
-class SLevel;
-class SWorld;
-
-class GAME_API SGameLevelSystem : public SGameEngineSubsystem
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameLevelSystem)
+	class SLevel;
+	class SWorld;
 
-private:
-	SWorld* _GameWorld = nullptr;
+	class GAME_API SGameLevelSystem : extends(SGameEngineSubsystem)
+	{
+		GENERATED_BODY(SGameLevelSystem);
 
-public:
-	SGameLevelSystem();
-	virtual ~SGameLevelSystem() override;
+	private:
+		SWorld* _GameWorld = nullptr;
 
-	virtual void PostInit() override;
-	virtual void Deinit() override;
+	public:
+		SGameLevelSystem();
+		virtual ~SGameLevelSystem() override;
 
-	SWorld* SpawnWorld(EWorldType InWorldType);
+		virtual void PostInit() override;
+		virtual void Deinit() override;
 
-	SWorld* GetGameWorld() const;
-	bool OpenLevel(SubclassOf<SLevel> InLevelToOpen);
-};
+		SWorld* SpawnWorld(EWorldType InWorldType);
+
+		SWorld* GetGameWorld() const;
+		bool OpenLevel(SubclassOf<SLevel> InLevelToOpen);
+	};
+}

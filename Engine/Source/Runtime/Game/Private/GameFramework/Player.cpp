@@ -2,7 +2,7 @@
 
 #include "GameFramework/Player.h"
 
-GENERATE_BODY(SPlayer);
+using namespace ::libty;
 
 SPlayer::SPlayer() : Super()
 {

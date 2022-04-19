@@ -4,6 +4,8 @@
 #include "Misc/Bezier.h"
 #include <numbers>
 
+using namespace ::libty;
+
 namespace GeometryGeneratorInternal
 {
     constexpr float SQRT2 = 1.41421356237309504880f;

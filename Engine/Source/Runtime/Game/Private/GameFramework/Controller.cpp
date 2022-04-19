@@ -4,7 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "LogGame.h"
 
-GENERATE_BODY(AController);
+using namespace ::libty;
 
 AController::AController() : Super()
 {

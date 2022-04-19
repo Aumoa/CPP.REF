@@ -2,39 +2,41 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameObject.h"
 
-class SLevel;
-class SLocalPlayer;
-class SGameInstanceSubsystem;
-
-class GAME_API SGameInstance : public SGameObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameInstance)
+	class SLevel;
+	class SLocalPlayer;
+	class SGameInstanceSubsystem;
 
-public:
-	SubclassOf<SLevel> StartupLevel;
-
-private:
-	SPROPERTY(Subsystems)
-	std::vector<SGameInstanceSubsystem*> Subsystems;
-
-public:
-	SGameInstance();
-
-	virtual void Init();
-
-	SLocalPlayer* GetLocalPlayer();
-	virtual SWorld* GetWorld() override;
-
-	SGameInstanceSubsystem* GetSubsystem(Type* SubsystemClass, bool bAllowDerivedClass = true);
-	template<std::derived_from<SGameInstanceSubsystem> T>
-	T* GetSubsystem(bool bAllowDerivedClass = true)
+	class GAME_API SGameInstance : extends(SGameObject)
 	{
-		return Cast<T>(GetSubsystem(T::StaticClass()));
-	}
+		GENERATED_BODY(SGameInstance);
 
-private:
-	void InitSubsystemCollection();
-};
+	public:
+		SubclassOf<SLevel> StartupLevel;
+
+	private:
+		SPROPERTY(Subsystems)
+		std::vector<SGameInstanceSubsystem*> Subsystems;
+
+	public:
+		SGameInstance();
+
+		virtual void Init();
+
+		SLocalPlayer* GetLocalPlayer();
+		virtual SWorld* GetWorld() override;
+
+		SGameInstanceSubsystem* GetSubsystem(SType* SubsystemClass, bool bAllowDerivedClass = true);
+		template<std::derived_from<SGameInstanceSubsystem> T>
+		T* GetSubsystem(bool bAllowDerivedClass = true)
+		{
+			return Cast<T>(GetSubsystem(T::StaticClass()));
+		}
+
+	private:
+		void InitSubsystemCollection();
+	};
+}

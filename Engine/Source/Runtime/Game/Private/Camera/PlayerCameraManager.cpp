@@ -5,7 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
-GENERATE_BODY(APlayerCameraManager);
+using namespace ::libty;
 
 APlayerCameraManager::APlayerCameraManager()
 {

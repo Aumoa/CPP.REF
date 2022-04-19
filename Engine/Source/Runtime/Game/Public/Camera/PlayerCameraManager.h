@@ -2,30 +2,32 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MinimalViewInfo.h"
 
-class SCameraComponent;
-class APlayerController;
-
-class GAME_API APlayerCameraManager : public AActor
+namespace libty::inline Game
 {
-	GENERATED_BODY(APlayerCameraManager)
+	class SCameraComponent;
+	class APlayerController;
 
-private:
-	APlayerController* _InitializedController = nullptr;
-	SCameraComponent* _cachedBindCamera = nullptr;
-	MinimalViewInfo _CachedView;
+	class GAME_API APlayerCameraManager : extends(AActor)
+	{
+		GENERATED_BODY(APlayerCameraManager)
 
-public:
-	APlayerCameraManager();
+	private:
+		APlayerController* _InitializedController = nullptr;
+		SCameraComponent* _cachedBindCamera = nullptr;
+		MinimalViewInfo _CachedView;
 
-	virtual void UpdateCamera(float elapsedTime);
+	public:
+		APlayerCameraManager();
 
-	void InitializeFor(APlayerController* InController);
-	APlayerController* GetController();
+		virtual void UpdateCamera(float elapsedTime);
 
-	void CachePlayerCamera(APlayerController* controller);
-	MinimalViewInfo GetCachedCameraView();
-};
+		void InitializeFor(APlayerController* InController);
+		APlayerController* GetController();
+
+		void CachePlayerCamera(APlayerController* controller);
+		MinimalViewInfo GetCachedCameraView();
+	};
+}

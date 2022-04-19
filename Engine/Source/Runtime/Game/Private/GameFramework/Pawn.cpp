@@ -4,7 +4,7 @@
 #include "GameFramework/Controller.h"
 #include "LogGame.h"
 
-GENERATE_BODY(APawn);
+using namespace ::libty;
 
 APawn::APawn() : Super()
 {

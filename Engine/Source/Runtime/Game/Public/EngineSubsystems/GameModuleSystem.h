@@ -2,28 +2,29 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameEngineSubsystem.h"
 
-class PlatformModule;
-class SGameInstance;
-class SGameModule;
-
-class GAME_API SGameModuleSystem : public SGameEngineSubsystem
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameModuleSystem)
+	class SGameInstance;
+	class SGameModule;
 
-private:
-	SPROPERTY(GameModule)
-	SGameModule* GameModule = nullptr;
+	class GAME_API SGameModuleSystem : extends(SGameEngineSubsystem)
+	{
+		GENERATED_BODY(SGameModuleSystem)
 
-public:
-	SGameModuleSystem();
-	virtual ~SGameModuleSystem() override;
+	private:
+		SPROPERTY(GameModule)
+		SGameModule* GameModule = nullptr;
 
-	virtual void Init() override;
-	virtual void Deinit() override;
-	
-	void LoadGameModule(std::wstring_view GameModuleName);
-	SGameInstance* LoadGameInstance();
-};
+	public:
+		SGameModuleSystem();
+		virtual ~SGameModuleSystem() override;
+
+		virtual void Init() override;
+		virtual void Deinit() override;
+
+		void LoadGameModule(std::wstring_view GameModuleName);
+		SGameInstance* LoadGameInstance();
+	};
+}

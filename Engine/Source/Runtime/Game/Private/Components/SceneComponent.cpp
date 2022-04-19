@@ -2,8 +2,9 @@
 
 #include "Components/SceneComponent.h"
 
-GENERATE_BODY(SSceneComponent);
 DEFINE_LOG_CATEGORY(LogSceneComponent);
+
+using namespace ::libty;
 
 SSceneComponent::SSceneComponent() : Super()
 {

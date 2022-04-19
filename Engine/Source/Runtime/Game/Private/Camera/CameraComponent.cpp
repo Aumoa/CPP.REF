@@ -2,7 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 
-GENERATE_BODY(SCameraComponent);
+using namespace ::libty;
 
 SCameraComponent::SCameraComponent()
 {

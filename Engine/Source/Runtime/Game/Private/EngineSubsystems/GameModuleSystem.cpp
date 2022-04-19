@@ -1,11 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "EngineSubsystems/GameModuleSystem.h"
-#include "Misc/PlatformModule.h"
 #include "LogGame.h"
 #include "GameModule.h"
 
-GENERATE_BODY(SGameModuleSystem);
+using namespace ::libty;
 
 SGameModuleSystem::SGameModuleSystem() : Super()
 {
@@ -39,19 +38,19 @@ void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
 	std::unique_ptr Module = std::make_unique<PlatformModule>(GameModulePath);
 	if (!Module->IsValid())
 	{
-		throw fatal_exception(String::Format(L"Could not initialize game module({}).", GameModuleName));
+		throw FatalException(String::Format("Could not initialize game module({}).", String::AsMultibyte(GameModuleName)));
 	}
 
 	auto ModuleLoader = Module->GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
 	if (!ModuleLoader)
 	{
-		throw fatal_exception(String::Format("The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.", GameModulePath.string()));
+		throw FatalException(String::Format("The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.", GameModulePath.string()));
 	}
 
 	GameModule = ModuleLoader(this);
 	if (!GameModule)
 	{
-		throw fatal_exception(String::Format(L"The game module loader({}.dll@LoadGameModule()) returns nullptr.", GameModuleName));
+		throw FatalException(String::Format("The game module loader({}.dll@LoadGameModule()) returns nullptr.", String::AsMultibyte(GameModuleName)));
 	}
 
 	// Keep module object while application is running.

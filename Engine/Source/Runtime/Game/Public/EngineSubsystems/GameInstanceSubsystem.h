@@ -2,23 +2,24 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-class SGameInstance;
-
-class GAME_API SGameInstanceSubsystem : implements SObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameInstanceSubsystem)
+	class SGameInstance;
 
-private:
-	SPROPERTY(GameInstance)
-	SGameInstance* GameInstance = nullptr;
+	class GAME_API SGameInstanceSubsystem : extends(SObject)
+	{
+		GENERATED_BODY(SGameInstanceSubsystem);
 
-public:
-	SGameInstanceSubsystem();
-	
-	virtual void Init(SGameInstance* GameInstance);
-	virtual void Deinit() {}
+	private:
+		SPROPERTY(GameInstance)
+		SGameInstance* GameInstance = nullptr;
 
-	SGameInstance* GetGameInstance();
-};
+	public:
+		SGameInstanceSubsystem();
+
+		virtual void Init(SGameInstance* GameInstance);
+		virtual void Deinit() {}
+
+		SGameInstance* GetGameInstance();
+	};
+}

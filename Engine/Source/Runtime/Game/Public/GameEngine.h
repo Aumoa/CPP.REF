@@ -2,68 +2,66 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Misc/TickScheduler.h"
-#include "Misc/TickCalc.h"
-#include "IApplicationInterface.h"
-
-class SGameInstance;
-class SGameEngineSubsystem;
-class SSlateApplication;
-
-class GAME_API SGameEngine : implements SObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameEngine)
+	class SGameInstance;
+	class SGameEngineSubsystem;
+	//class SSlateApplication;
 
-private:
-	SPROPERTY(GameInstance)
-	SGameInstance* GameInstance = nullptr;
-	SPROPERTY(SlateApplication)
-	SSlateApplication* SlateApplication = nullptr;
-
-public:
-	SGameEngine();
-
-	virtual bool InitEngine(IApplicationInterface* InApplication);
-	virtual bool LoadGameModule(std::wstring_view InModuleName);
-	virtual void Shutdown();
-
-	int32 GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule);
-	SGameInstance* GetGameInstance();
-	SSlateApplication* GetSlateApplication();
-
-protected:
-	virtual SSlateApplication* CreateSlateApplication();
-
-private:
-	SPROPERTY(Subsystems)
-	std::vector<SGameEngineSubsystem*> Subsystems;
-	mutable std::map<size_t, SGameEngineSubsystem*> SubsystemView;
-
-	void InitializeSubsystems();
-
-public:
-	template<class T>
-	T* GetEngineSubsystem()
+	class GAME_API SGameEngine : extends(SObject)
 	{
-		auto It = SubsystemView.find(T::StaticClass()->GetHashCode());
-		if (It == SubsystemView.end())
+		GENERATED_BODY(SGameEngine);
+
+	private:
+		SPROPERTY(GameInstance)
+		SGameInstance* GameInstance = nullptr;
+		//SPROPERTY(SlateApplication)
+		//SSlateApplication* SlateApplication = nullptr;
+
+	public:
+		SGameEngine();
+
+		virtual bool InitEngine(IApplicationInterface* InApplication);
+		virtual bool LoadGameModule(std::wstring_view InModuleName);
+		virtual void Shutdown();
+
+		int32 GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule);
+		SGameInstance* GetGameInstance();
+		//SSlateApplication* GetSlateApplication();
+
+	protected:
+		//virtual SSlateApplication* CreateSlateApplication();
+
+	private:
+		SPROPERTY(Subsystems)
+		std::vector<SGameEngineSubsystem*> Subsystems;
+		std::map<size_t, SGameEngineSubsystem*> SubsystemView;
+
+		void InitializeSubsystems();
+
+	public:
+		template<class T>
+		T* GetEngineSubsystem()
 		{
-			return nullptr;
+			auto It = SubsystemView.find(T::TypeId->GetHashCode());
+			if (It == SubsystemView.end())
+			{
+				return nullptr;
+			}
+			return Cast<T>(It->second);
 		}
-		return Cast<T>(It->second);
-	}
 
-private:
-	IApplicationInterface::ETickMode AppTickMode = IApplicationInterface::ETickMode::Realtime;
-	::TickCalc<> TickCalc;
+	private:
+		IApplicationInterface::ETickMode AppTickMode = IApplicationInterface::ETickMode::Realtime;
+		::libty::TickCalc<> TickCalc;
 
-	void TickEngine(IApplicationInterface::ETickMode ActualTickMode);
+		void TickEngine(IApplicationInterface::ETickMode ActualTickMode);
 
-private:
-	void SystemsTick(std::chrono::duration<float> InDeltaTime);
-	void GameTick(std::chrono::duration<float> InDeltaTime);
-	void RenderTick(std::chrono::duration<float> InDeltaTime);
-};
+	private:
+		void SystemsTick(std::chrono::duration<float> InDeltaTime);
+		void GameTick(std::chrono::duration<float> InDeltaTime);
+		void RenderTick(std::chrono::duration<float> InDeltaTime);
+	};
 
-extern GAME_API SGameEngine* GEngine;
+	extern GAME_API SGameEngine* GEngine;
+}

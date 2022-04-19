@@ -2,7 +2,7 @@
 
 #include "Info/Info.h"
 
-GENERATE_BODY(AInfo);
+using namespace ::libty;
 
 AInfo::AInfo() : Super()
 {

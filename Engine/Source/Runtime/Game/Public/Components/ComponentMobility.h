@@ -4,7 +4,8 @@
 
 namespace libty::inline Game
 {
-	SENUM(GAME_API, EWorldType, int32,
-		GameWorld,
+	SENUM(GAME_API, EComponentMobility, int32,
+		Static, 0,
+		Movable, 2
 	);
 }

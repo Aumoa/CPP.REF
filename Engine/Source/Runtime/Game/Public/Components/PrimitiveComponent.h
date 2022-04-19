@@ -2,27 +2,29 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "SceneComponent.h"
 
-class PrimitiveSceneProxy;
-
-class GAME_API SPrimitiveComponent : public SSceneComponent
+namespace libty::inline Game
 {
-	GENERATED_BODY(SPrimitiveComponent)
+	class PrimitiveSceneProxy;
 
-private:
-	uint8 _bHiddenInGame : 1 = false;
+	class GAME_API SPrimitiveComponent : extends(SSceneComponent)
+	{
+		GENERATED_BODY(SPrimitiveComponent);
 
-public:
-	SPrimitiveComponent();
-	~SPrimitiveComponent() override;
+	private:
+		uint8 _bHiddenInGame : 1 = false;
 
-	virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
-	PrimitiveSceneProxy* SceneProxy = nullptr;
+	public:
+		SPrimitiveComponent();
+		~SPrimitiveComponent() override;
 
-	void SetHiddenInGame(bool bHidden);
-	inline bool IsHiddenInGame() { return _bHiddenInGame; }
+		virtual PrimitiveSceneProxy* CreateSceneProxy() { return nullptr; }
+		PrimitiveSceneProxy* SceneProxy = nullptr;
 
-	virtual void MarkRenderStateDirty() override;
-};
+		void SetHiddenInGame(bool bHidden);
+		inline bool IsHiddenInGame() { return _bHiddenInGame; }
+
+		virtual void MarkRenderStateDirty() override;
+	};
+}

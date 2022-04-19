@@ -2,16 +2,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
-/// <summary>
-/// Represent game information placed to world.
-/// </summary>
-class GAME_API AInfo : public AActor
+namespace libty::inline Game
 {
-	GENERATED_BODY(AInfo)
+	/// <summary>
+	/// Represent game information placed to world.
+	/// </summary>
+	class GAME_API AInfo : extends(AActor)
+	{
+		GENERATED_BODY(AInfo);
 
-public:
-	AInfo();
-};
+	public:
+		AInfo();
+	};
+}

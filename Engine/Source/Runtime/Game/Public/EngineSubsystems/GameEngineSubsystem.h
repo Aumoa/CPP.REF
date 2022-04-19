@@ -2,32 +2,32 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameEngine.h"
 
-class SGameEngine;
-
-class GAME_API SGameEngineSubsystem : implements SObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SGameEngineSubsystem)
-
-public:
-	SGameEngineSubsystem();
-	virtual ~SGameEngineSubsystem() override;
-
-	virtual void Init() {}
-	virtual void PostInit() {}
-	virtual void Deinit();
-	virtual void Tick(float InDeltaTime) {}
-
-public:
-	template<std::derived_from<SGameEngineSubsystem> T>
-	static T* Get()
+	class GAME_API SGameEngineSubsystem : extends(SObject)
 	{
-		if (GEngine)
+		GENERATED_BODY(SGameEngineSubsystem);
+
+	public:
+		SGameEngineSubsystem();
+		virtual ~SGameEngineSubsystem() override;
+
+		virtual void Init() {}
+		virtual void PostInit() {}
+		virtual void Deinit();
+		virtual void Tick(float InDeltaTime) {}
+
+	public:
+		template<std::derived_from<SGameEngineSubsystem> T>
+		static T* Get()
 		{
-			return GEngine->GetEngineSubsystem<T>();
+			if (GEngine)
+			{
+				return GEngine->GetEngineSubsystem<T>();
+			}
+			return nullptr;
 		}
-		return nullptr;
-	}
-};
+	};
+}

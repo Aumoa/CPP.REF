@@ -2,25 +2,26 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-class SWorld;
-class SLevel;
-class AActor;
-
-class ActorIterator
+namespace libty::inline Game
 {
-	SWorld* MyWorld;
-	SLevel* CurrentLevel;
-	int32 CurrentIdx;
+	class SWorld;
+	class SLevel;
+	class AActor;
 
-public:
-	ActorIterator(SWorld* InWorld);
+	class ActorIterator
+	{
+		SWorld* MyWorld;
+		SLevel* CurrentLevel;
+		int32 CurrentIdx;
 
-	AActor* operator *();
-	ActorIterator& operator ++();
-	bool operator !=(const ActorIterator&) const;
+	public:
+		ActorIterator(SWorld* InWorld);
 
-	ActorIterator& begin() { return *this; }
-	ActorIterator& end() { return *this; }
-};
+		AActor* operator *();
+		ActorIterator& operator ++();
+		bool operator !=(const ActorIterator&) const;
+
+		ActorIterator& begin() { return *this; }
+		ActorIterator& end() { return *this; }
+	};
+}

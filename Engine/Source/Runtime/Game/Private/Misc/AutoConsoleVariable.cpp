@@ -4,7 +4,7 @@
 
 DEFINE_LOG_CATEGORY(LogConsoleVar);
 
-namespace Details
+namespace libty::inline Game::Details
 {
 	static std::map<std::wstring, AutoConsoleVariableBase*>* StaticVars;
 

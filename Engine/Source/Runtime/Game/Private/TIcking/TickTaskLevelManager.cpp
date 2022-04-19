@@ -3,8 +3,9 @@
 #include "Ticking/TickTaskLevelManager.h"
 #include "Level/World.h"
 
-GENERATE_BODY(STickTaskLevelManager);
 DEFINE_LOG_CATEGORY(LogLevelTick);
+
+using namespace ::libty;
 
 void STickTaskLevelManager::TickGroupHeader::AddTickFunction(TickFunction* InFunction)
 {

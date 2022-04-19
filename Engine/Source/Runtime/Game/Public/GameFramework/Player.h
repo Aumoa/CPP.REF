@@ -2,13 +2,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameObject.h"
 
-class GAME_API SPlayer : public SGameObject
+namespace libty::inline Game
 {
-	GENERATED_BODY(SPlayer)
+	class GAME_API SPlayer : extends(SGameObject)
+	{
+		GENERATED_BODY(SPlayer);
 
-public:
-	SPlayer();
-};
+	public:
+		SPlayer();
+	};
+}

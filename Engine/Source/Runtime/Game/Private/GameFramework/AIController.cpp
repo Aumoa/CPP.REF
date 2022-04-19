@@ -2,7 +2,7 @@
 
 #include "GameFramework/AIController.h"
 
-GENERATE_BODY(AAIController);
+using namespace ::libty;
 
 AAIController::AAIController() : Super()
 {

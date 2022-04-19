@@ -2,43 +2,44 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Controller.h"
 
-class APlayerCameraManager;
-class InputComponent;
-class SCameraComponent;
-class SLocalPlayer;
-
-/// <summary>
-/// Represents controller that possess to pawn, process player input, etc...
-/// </summary>
-class GAME_API APlayerController : public AController
+namespace libty::inline Game
 {
-	GENERATED_BODY(APlayerController)
+	class APlayerCameraManager;
+	class SCameraComponent;
+	class SLocalPlayer;
 
-private:
-	APlayerCameraManager* _PlayerCameraManager = nullptr;
-	SLocalPlayer* _LocalPlayer = nullptr;
-
-protected:
-	SubclassOf<APlayerCameraManager> PlayerCameraManagerClass;
-
-public:
 	/// <summary>
-	/// Initialize new <see cref="APlayerController"/> instance.
+	/// Represents controller that possess to pawn, process player input, etc...
 	/// </summary>
-	APlayerController();
+	class GAME_API APlayerController : extends(AController)
+	{
+		GENERATED_BODY(APlayerController);
 
-	SCameraComponent* FindPlayerCameraComponent();
-	void UpdateCameraManager(float elapsedTime);
-	Ray<3> ScreenPointToRay(int32 screenX, int32 screenY);
-	SLocalPlayer* GetLocalPlayer();
-	APlayerCameraManager* GetPlayerCameraManager();
+	private:
+		APlayerCameraManager* _PlayerCameraManager = nullptr;
+		SLocalPlayer* _LocalPlayer = nullptr;
 
-public:
-	virtual void PostInitializedComponents() override;
+	protected:
+		SubclassOf<APlayerCameraManager> PlayerCameraManagerClass;
 
-private:
-	void SpawnPlayerCameraManager();
-};
+	public:
+		/// <summary>
+		/// Initialize new <see cref="APlayerController"/> instance.
+		/// </summary>
+		APlayerController();
+
+		SCameraComponent* FindPlayerCameraComponent();
+		void UpdateCameraManager(float elapsedTime);
+		Ray<3> ScreenPointToRay(int32 screenX, int32 screenY);
+		SLocalPlayer* GetLocalPlayer();
+		APlayerCameraManager* GetPlayerCameraManager();
+
+	public:
+		virtual void PostInitializedComponents() override;
+
+	private:
+		void SpawnPlayerCameraManager();
+	};
+}
