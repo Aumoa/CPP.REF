@@ -4,7 +4,7 @@
 
 namespace libty::inline RenderCore
 {
-	class RENDERCORE_API SRenderThread : extends(SObject)
+	class RENDERCORE_API SRenderThread : implements(SObject)
 	{
 		GENERATED_BODY(SRenderThread);
 

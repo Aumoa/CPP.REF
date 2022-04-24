@@ -4,7 +4,7 @@
 
 namespace libty::inline Windows
 {
-	class SConsoleApplication : extends(SObject)
+	class SConsoleApplication : implements(SObject)
 	{
 		GENERATED_BODY(SConsoleApplication)
 

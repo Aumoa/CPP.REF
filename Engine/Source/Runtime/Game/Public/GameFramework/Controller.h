@@ -8,7 +8,7 @@ namespace libty::inline Game
 {
 	class APawn;
 
-	class GAME_API AController : extends(AActor)
+	class GAME_API AController : public AActor
 	{
 		GENERATED_BODY(AController);
 

@@ -14,5 +14,5 @@ SGameEngineSubsystem::~SGameEngineSubsystem()
 
 void SGameEngineSubsystem::Deinit()
 {
-	GC.SuppressFinalize(this);
+	GC->SuppressFinalize(this);
 }

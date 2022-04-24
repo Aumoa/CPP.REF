@@ -4,7 +4,7 @@
 #include "DirectXDevice.h"
 #include "DirectXResource.h"
 
-GENERATE_BODY(SDirectXDepthStencilView);
+using namespace ::libty;
 
 SDirectXDepthStencilView::SDirectXDepthStencilView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> pDescriptorHeap, size_t NumViews)
 	: Super(Owner, std::move(pDescriptorHeap), NumViews)

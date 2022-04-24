@@ -4,15 +4,18 @@
 
 #include "DirectXDeviceChild.h"
 
-class DIRECTX_API SDirectXPipelineState : public SDirectXDeviceChild, implements IRHIPipelineState
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXPipelineState)
+	class DIRECTX_API SDirectXPipelineState : public SDirectXDeviceChild, implements(IRHIPipelineState)
+	{
+		GENERATED_BODY(SDirectXPipelineState);
 
-public:
-	ComPtr<ID3D12PipelineState> pPipelineState;
+	public:
+		ComPtr<ID3D12PipelineState> pPipelineState;
 
-public:
-	SDirectXPipelineState(IRHIDevice* Owner, ComPtr<ID3D12PipelineState> pPipelineState);
+	public:
+		SDirectXPipelineState(IRHIDevice* Owner, ComPtr<ID3D12PipelineState> pPipelineState);
 
-	using Super::Dispose;
-};
+		using Super::Dispose;
+	};
+}

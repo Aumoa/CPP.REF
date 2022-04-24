@@ -8,7 +8,7 @@ namespace libty::inline Game
 {
 	class APlayerController;
 
-	class GAME_API AGameMode : extends(AInfo)
+	class GAME_API AGameMode : public AInfo
 	{
 		GENERATED_BODY(AGameMode);
 

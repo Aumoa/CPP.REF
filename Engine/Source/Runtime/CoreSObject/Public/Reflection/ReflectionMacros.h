@@ -116,6 +116,28 @@ private:																					\
 																							\
 private:
 
+#define GENERATED_INTERFACE_BODY(Class, ...)												\
+	friend struct ::libty::Core::Reflection::TypeInfoMetadataGenerator;						\
+	friend struct ::libty::Core::Reflection::MethodInfoMetadataGenerator;					\
+	static consteval ::libty::int32 __INTERNAL_AccessModifierChecker();						\
+																							\
+public:																						\
+	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
+																							\
+private:																					\
+	static ::libty::Core::SType StaticClass;												\
+	static inline std::tuple AttributeCollection = std::make_tuple(__VA_OPT__(				\
+		MACRO_RECURSIVE_FOR_EACH_DOT(REFLECTION_FOREACH_CLASS_ATTRIBUTE_NAME, __VA_ARGS__)	\
+	));																						\
+																							\
+public:																						\
+	static inline ::libty::Core::SType* TypeId = &StaticClass;								\
+																							\
+private:																					\
+	GENERATED_BODY_DECLARE_REFLECTION_CHAINS()												\
+																							\
+private:
+
 #define GENERATE_BODY(Class, ...)															\
 namespace libty::Generated::Assemblies														\
 {																							\
@@ -192,4 +214,3 @@ namespace libty::Generated::Class															\
 #define SVIRTUAL_IMPLEMENTS_NODE(X) virtual public X
 
 #define implements(...) public ::libty::Core::Reflection::InterfaceCollector<__VA_ARGS__>, MACRO_RECURSIVE_FOR_EACH_DOT(SVIRTUAL_IMPLEMENTS_NODE, __VA_ARGS__)
-#define extends(Class) virtual public Class

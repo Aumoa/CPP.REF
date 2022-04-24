@@ -2,7 +2,7 @@
 
 #include "DirectXAdapter.h"
 
-GENERATE_BODY(SDirectXAdapter);
+using namespace ::libty;
 
 SDirectXAdapter::SDirectXAdapter(SDirectXFactory* Owner, ComPtr<IDXGIAdapter1> pAdapter)
 	: Super(Owner)

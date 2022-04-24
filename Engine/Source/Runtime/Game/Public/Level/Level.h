@@ -12,7 +12,7 @@ namespace libty::inline Game
 	class APlayerController;
 	class AActor;
 
-	class GAME_API SLevel : extends(SGameObject)
+	class GAME_API SLevel : public SGameObject
 	{
 		GENERATED_BODY(SLevel);
 
@@ -63,7 +63,7 @@ namespace libty::inline Game
 		template<std::derived_from<AActor> T>
 		T* SpawnActor()
 		{
-			return SpawnActor<T>(T::StaticClass());
+			return SpawnActor<T>(T::TypeId);
 		}
 
 		template<std::derived_from<AActor> T>

@@ -6,7 +6,7 @@
 
 namespace libty::inline Sockets
 {
-	class SOCKETS_API SNetUtility : extends(SObject)
+	class SOCKETS_API SNetUtility : implements(SObject)
 	{
 		GENERATED_BODY(SNetUtility);
 		SNetUtility() = delete;

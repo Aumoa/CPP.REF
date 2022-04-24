@@ -2,37 +2,38 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Input/IPlatformKeyboard.h"
 #include "WindowsIncludes.h"
 
-class SWindowsPlatformKeyboard : implements SObject, implements IPlatformKeyboard
+namespace libty::inline Windows
 {
-    GENERATED_BODY(SWindowsPlatformKeyboard)
+    class SWindowsPlatformKeyboard : implements(SObject, IPlatformKeyboard)
+    {
+        GENERATED_BODY(SWindowsPlatformKeyboard)
 
-private:
-    static SWindowsPlatformKeyboard* sInstance;
+    private:
+        static SWindowsPlatformKeyboard* sInstance;
 
-public:
-    SWindowsPlatformKeyboard();
-    ~SWindowsPlatformKeyboard();
+    public:
+        SWindowsPlatformKeyboard();
+        ~SWindowsPlatformKeyboard();
 
-    // Retrieve the current state of the keyboard
-    virtual KeyboardState GetState() override;
+        // Retrieve the current state of the keyboard
+        virtual KeyboardState GetState() override;
 
-    // Reset the keyboard state
-    virtual void Reset() override;
+        // Reset the keyboard state
+        virtual void Reset() override;
 
-    // Feature detection
-    virtual bool IsConnected() override;
+        // Feature detection
+        virtual bool IsConnected() override;
 
-    static void ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+        static void ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    // Singleton
-    static SWindowsPlatformKeyboard& Get();
+        // Singleton
+        static SWindowsPlatformKeyboard& Get();
 
-private:
-    // Private implementation.
-    class Impl;
-    std::unique_ptr<Impl> pImpl;
-};
+    private:
+        // Private implementation.
+        class Impl;
+        std::unique_ptr<Impl> pImpl;
+    };
+}

@@ -8,7 +8,7 @@ namespace libty::inline Game
 {
 	class PrimitiveSceneProxy;
 
-	class GAME_API SPrimitiveComponent : extends(SSceneComponent)
+	class GAME_API SPrimitiveComponent : public SSceneComponent
 	{
 		GENERATED_BODY(SPrimitiveComponent);
 

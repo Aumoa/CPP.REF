@@ -211,7 +211,7 @@ struct std::is_enum<TEnum> : public bool_constant<true>
 
 namespace libty::inline Core::Reflection
 {
-	class CORESOBJECT_API SEnum : extends(SObject)
+	class CORESOBJECT_API SEnum : implements(SObject)
 	{
 		GENERATED_BODY(SEnum);
 		SEnum() = delete;

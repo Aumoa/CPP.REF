@@ -2,18 +2,20 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXDeviceChild.h"
 
-class DIRECTX_API SDirectXRootSignature : public SDirectXDeviceChild, implements IRHIRootSignature
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXRootSignature)
+	class DIRECTX_API SDirectXRootSignature : public SDirectXDeviceChild, implements(IRHIRootSignature)
+	{
+		GENERATED_BODY(SDirectXRootSignature);
 
-public:
-	ComPtr<ID3D12RootSignature> pRootSignature;
+	public:
+		ComPtr<ID3D12RootSignature> pRootSignature;
 
-public:
-	SDirectXRootSignature(IRHIDevice* Owner, ComPtr<ID3D12RootSignature> pRootSignature);
+	public:
+		SDirectXRootSignature(IRHIDevice* Owner, ComPtr<ID3D12RootSignature> pRootSignature);
 
-	using Super::Dispose;
-};
+		using Super::Dispose;
+	};
+}

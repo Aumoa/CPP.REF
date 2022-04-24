@@ -2,7 +2,7 @@
 
 #include "WindowsIMEController.h"
 
-GENERATE_BODY(SWindowsIMEController);
+using namespace ::libty;
 
 SWindowsIMEController* SWindowsIMEController::sInstance;
 

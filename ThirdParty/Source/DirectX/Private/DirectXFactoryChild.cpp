@@ -3,7 +3,7 @@
 #include "DirectXFactoryChild.h"
 #include "DirectXFactory.h"
 
-GENERATE_BODY(SDirectXFactoryChild);
+using namespace ::libty;
 
 SDirectXFactoryChild::SDirectXFactoryChild(IRHIFactory* Owner)
 	: Super()

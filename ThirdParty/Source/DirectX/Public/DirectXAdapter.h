@@ -2,23 +2,25 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXFactoryChild.h"
 
-class SDirectXAdapter : public SDirectXFactoryChild, implements IRHIAdapter
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXAdapter)
+	class SDirectXAdapter : public SDirectXFactoryChild, implements(IRHIAdapter)
+	{
+		GENERATED_BODY(SDirectXAdapter)
 
-public:
-	ComPtr<IDXGIAdapter1> pAdapter;
+	public:
+		ComPtr<IDXGIAdapter1> pAdapter;
 
-public:
-	SDirectXAdapter(SDirectXFactory* Owner, ComPtr<IDXGIAdapter1> pAdapter);
+	public:
+		SDirectXAdapter(SDirectXFactory* Owner, ComPtr<IDXGIAdapter1> pAdapter);
 
-	using Super::Dispose;
+		using Super::Dispose;
 
-	virtual std::wstring GetDeviceName() override;
+		virtual std::wstring GetDeviceName() override;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

@@ -10,7 +10,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// Represents all classes in the smart component game framework hierarchy and provides low-level services to derived class.
 	/// </summary>
-	class GAME_API SGameObject : extends(SObject)
+	class GAME_API SGameObject : implements(SObject)
 	{
 		GENERATED_BODY(SGameObject);
 

@@ -4,7 +4,7 @@
 #include "DirectXDevice.h"
 #include "DirectXResource.h"
 
-GENERATE_BODY(SDirectXRenderTargetView);
+using namespace ::libty;
 
 SDirectXRenderTargetView::SDirectXRenderTargetView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> pDescriptorHeap, size_t NumViews)
 	: Super(Owner, std::move(pDescriptorHeap), NumViews)

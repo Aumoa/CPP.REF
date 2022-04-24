@@ -6,7 +6,7 @@
 
 namespace libty::inline Game
 {
-	class GAME_API SGameEngineSubsystem : extends(SObject)
+	class GAME_API SGameEngineSubsystem : implements(SObject)
 	{
 		GENERATED_BODY(SGameEngineSubsystem);
 

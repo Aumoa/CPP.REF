@@ -9,7 +9,7 @@ namespace libty::inline SlateCore
 {
 	struct IRenderSlateElement;
 
-	class SLATECORE_API SSlateDrawCollector : extends(SObject)
+	class SLATECORE_API SSlateDrawCollector : implements(SObject)
 	{
 		GENERATED_BODY(SSlateDrawCollector);
 

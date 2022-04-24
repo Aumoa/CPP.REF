@@ -8,7 +8,7 @@ namespace libty::inline Game
 {
 	class APlayerController;
 
-	class GAME_API SLocalPlayer : extends(SPlayer)
+	class GAME_API SLocalPlayer : public SPlayer
 	{
 		GENERATED_BODY(SLocalPlayer);
 

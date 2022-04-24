@@ -6,7 +6,7 @@
 #include "DirectXCommandAllocator.h"
 #include "DirectXPipelineState.h"
 
-GENERATE_BODY(SDirectXCommandList);
+using namespace ::libty;
 
 SDirectXCommandList::SDirectXCommandList(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator, ComPtr<ID3D12GraphicsCommandList4> pCommandList)
 	: Super(Owner)

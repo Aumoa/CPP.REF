@@ -2,7 +2,7 @@
 
 #include "DirectXFence.h"
 
-GENERATE_BODY(SDirectXFence);
+using namespace ::libty;
 
 SDirectXFence::SDirectXFence(IRHIDevice* Owner, ComPtr<ID3D12Fence> pFence)
 	: Super(Owner)
@@ -47,7 +47,7 @@ Task<> SDirectXFence::SetEventOnCompletion(uint64 fenceValue, std::optional<std:
 			WT_EXECUTEONLYONCE);
 		if (!bResult)
 		{
-			pContext->TCS.SetException(std::make_exception_ptr(invalid_operation("Failed to create callback procedure for waiting event.")));
+			pContext->TCS.SetException(std::make_exception_ptr(InvalidOperationException("Failed to create callback procedure for waiting event.")));
 			pContext->bReady = true;
 		}
 
@@ -89,7 +89,7 @@ VOID CALLBACK SDirectXFence::OnConnect(PVOID lpParameter, BOOLEAN TimerOrWaitFir
 	WaitContext* pContext = reinterpret_cast<WaitContext*>(lpParameter);
 	if (TimerOrWaitFired)
 	{
-		pContext->TCS.SetException(std::make_exception_ptr(task_canceled()));
+		pContext->TCS.SetException(std::make_exception_ptr(TaskCanceledException()));
 	}
 	else
 	{

@@ -2,12 +2,17 @@
 
 #include "WindowsImage.h"
 
-GENERATE_BODY(SWindowsImage);
+using namespace ::libty;
 
 SWindowsImage::SWindowsImage(IWICBitmapSource* ImageSource, ERHIPixelFormat Format) : Super()
 	, ImageSource(ImageSource)
 	, Format(Format)
 {
+}
+
+void SWindowsImage::Dispose()
+{
+	this->Dispose(true);
 }
 
 void SWindowsImage::CopyPixels(const RectN* CopyRect, int32 Stride, int32 BufferSize, void* OutBuffer)
@@ -34,4 +39,10 @@ Vector2N SWindowsImage::GetPixelSize()
 ERHIPixelFormat SWindowsImage::GetPixelFormat()
 {
 	return Format;
+}
+
+void SWindowsImage::Dispose(bool bDisposing)
+{
+	ImageSource.Reset();
+	Super::Dispose(bDisposing);
 }

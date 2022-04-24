@@ -10,7 +10,7 @@ namespace libty::inline Game
 	class SCameraComponent;
 	class APlayerController;
 
-	class GAME_API APlayerCameraManager : extends(AActor)
+	class GAME_API APlayerCameraManager : public AActor
 	{
 		GENERATED_BODY(APlayerCameraManager)
 

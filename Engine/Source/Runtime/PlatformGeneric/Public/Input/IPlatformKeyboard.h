@@ -8,7 +8,7 @@ namespace libty::inline PlatformGeneric
 {
 	struct PLATFORMGENERIC_API IPlatformKeyboard : virtual public SObject
 	{
-		GENERATED_BODY(IPlatformKeyboard);
+		GENERATED_INTERFACE_BODY(IPlatformKeyboard);
 
 	public:
 		virtual KeyboardState GetState() = 0;

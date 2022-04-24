@@ -27,17 +27,17 @@ void SAspApplication::ApplyControllers(SServiceCollection* collection)
 	}
 }
 
-int32 SAspApplication::Run()
+int32 SAspApplication::Run(std::stop_token cancellationToken)
 {
 	size_t prev = 0;
-	GC.PreGarbageCollect += [&prev]()
+	GC->PreGarbageCollect += [&prev]()
 	{
-		prev = GC.NumObjects();
+		prev = GC->NumObjects();
 	};
 
-	GC.PostGarbageCollect += [&prev]()
+	GC->PostGarbageCollect += [&prev]()
 	{
-		size_t now = GC.NumObjects();
+		size_t now = GC->NumObjects();
 		SE_LOG(LogTemp, Verbose, L"GC Stat: Objects {} -> {} ({})", prev, now, (int32)now - (int32)prev);
 	};
 
@@ -58,7 +58,7 @@ int32 SAspApplication::Run()
 	}
 
 	_socket->Listen();
-	while (true)
+	while (!cancellationToken.stop_possible() || !cancellationToken.stop_requested())
 	{
 		try
 		{
@@ -81,7 +81,7 @@ int32 SAspApplication::Run()
 			SE_LOG(LogTemp, Error, L"Exception caught: {0}", String::AsUnicode(e.what()));
 		}
 
-		GC.Hint();
+		GC->Hint();
 	}
 
 	return 0;

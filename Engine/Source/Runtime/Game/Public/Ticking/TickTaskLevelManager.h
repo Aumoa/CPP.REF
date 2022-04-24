@@ -11,7 +11,7 @@ namespace libty::inline Game
 	class SWorld;
 	class TickFunction;
 
-	class GAME_API STickTaskLevelManager : extends(SObject)
+	class GAME_API STickTaskLevelManager : implements(SObject)
 	{
 		GENERATED_BODY(STickTaskLevelManager);
 

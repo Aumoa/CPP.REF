@@ -11,7 +11,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// Represents pawn that controller can be possessed.
 	/// </summary>
-	class GAME_API APawn : extends(AActor)
+	class GAME_API APawn : public AActor
 	{
 		GENERATED_BODY(APawn);
 

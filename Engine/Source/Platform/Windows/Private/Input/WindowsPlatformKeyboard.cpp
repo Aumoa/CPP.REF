@@ -10,7 +10,7 @@
 
 #include "Input/WindowsPlatformKeyboard.h"
 
-GENERATE_BODY(SWindowsPlatformKeyboard);
+using namespace ::libty;
 
 static_assert(sizeof(KeyboardState) == (256 / 8), "Size mismatch for State");
 
@@ -79,7 +79,7 @@ public:
     {
         if (s_keyboard)
         {
-            throw fatal_exception("PlatformWindowsKeyboard is a singleton.");
+            throw FatalException("PlatformWindowsKeyboard is a singleton.");
         }
 
         s_keyboard = this;

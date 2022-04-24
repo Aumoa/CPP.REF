@@ -5,7 +5,7 @@
 #include "DirectXFence.h"
 #include "DirectXCommandList.h"
 
-GENERATE_BODY(SDirectXCommandQueue);
+using namespace ::libty;
 
 SDirectXCommandQueue::SDirectXCommandQueue(IRHIDevice* Owner, ComPtr<ID3D12CommandQueue> pQueue)
 	: Super(Owner)

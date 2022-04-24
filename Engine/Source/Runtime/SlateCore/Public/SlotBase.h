@@ -8,7 +8,7 @@ namespace libty::inline SlateCore
 
 	namespace Details
 	{
-		class SLATECORE_API SSlotBase : extends(SObject)
+		class SLATECORE_API SSlotBase : implements(SObject)
 		{
 			GENERATED_BODY(SSlotBase)
 

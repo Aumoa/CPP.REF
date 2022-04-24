@@ -2,28 +2,29 @@
 
 #pragma once
 
-#include "Object.h"
-#include "RHI/RHIInterfaces.h"
 #include "DirectXCommon.h"
 
-class SDirectXFactory;
-
-class SDirectXFactoryChild : implements SObject, implements IRHIFactoryChild
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXFactoryChild)
+	class SDirectXFactory;
 
-private:
-	SPROPERTY(Owner)
-	IRHIFactory* Owner = nullptr;
+	class SDirectXFactoryChild : implements(SObject, IRHIFactoryChild)
+	{
+		GENERATED_BODY(SDirectXFactoryChild)
 
-public:
-	SDirectXFactoryChild(IRHIFactory* Owner);
-	SDirectXFactoryChild(SDirectXFactory* Owner);
+	private:
+		SPROPERTY(Owner)
+		IRHIFactory* Owner = nullptr;
 
-	virtual void Dispose() override;
+	public:
+		SDirectXFactoryChild(IRHIFactory* Owner);
+		SDirectXFactoryChild(SDirectXFactory* Owner);
 
-	virtual IRHIFactory* GetFactory() override;
+		virtual void Dispose() override;
 
-protected:
-	virtual void Dispose(bool bDisposing);
-};
+		virtual IRHIFactory* GetFactory() override;
+
+	protected:
+		virtual void Dispose(bool bDisposing);
+	};
+}

@@ -48,12 +48,12 @@ SObject::~SObject()
 
 void SObject::AddToRoot()
 {
-	GC.Roots.emplace(this);
+	GC->Roots.emplace(this);
 }
 
 void SObject::RemoveFromRoot()
 {
-	GC.Roots.erase(this);
+	GC->Roots.erase(this);
 }
 
 std::function<bool()> SObject::GetHolder()
@@ -71,7 +71,7 @@ std::wstring SObject::ToString()
 
 void SObject::PostConstruction()
 {
-	GC.RegisterObject(this);
+	GC->RegisterObject(this);
 
 #if !SHIPPING
 	CachedTypeName = GetType()->GetFullQualifiedName();

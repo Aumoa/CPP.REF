@@ -2,39 +2,41 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Input/IPlatformMouse.h"
 #include "WindowsIncludes.h"
 
-class SWindowsApplication;
-
-class SWindowsPlatformMouse : implements SObject, implements IPlatformMouse
+namespace libty::inline Windows
 {
-    GENERATED_BODY(SWindowsPlatformMouse)
+    class SWindowsApplication;
 
-private:
-    static SWindowsPlatformMouse* sInstance;
+    class SWindowsPlatformMouse : implements(SObject, IPlatformMouse)
+    {
+        GENERATED_BODY(SWindowsPlatformMouse)
 
-public:
-    SWindowsPlatformMouse();
-    ~SWindowsPlatformMouse();
+    private:
+        static SWindowsPlatformMouse* sInstance;
 
-    virtual MouseState GetState() override;
-    virtual void ResetScrollWheelValue() override;
-    virtual void SetMode(EMousePositionMode InPositionMode);
-    virtual bool IsConnected() override;
-    virtual bool IsVisible() override;
-    virtual void SetVisible(bool bNewVisibility) override;
+    public:
+        SWindowsPlatformMouse();
+        ~SWindowsPlatformMouse();
 
-    void SetWindow(SWindowsApplication* Application);
-    static void ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+        virtual MouseState GetState() override;
+        virtual void ResetScrollWheelValue() override;
+        virtual void SetMode(EMousePositionMode InPositionMode);
+        virtual bool IsConnected() override;
+        virtual bool IsVisible() override;
+        virtual void SetVisible(bool bNewVisibility) override;
 
-    // Singleton
-    static SWindowsPlatformMouse& Get();
+        void SetWindow(SWindowsApplication* Application);
+        static void ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-private:
-    // Private implementation.
-    class Impl;
+        // Singleton
+        static SWindowsPlatformMouse& Get();
 
-    std::unique_ptr<Impl> pImpl;
-};
+    private:
+        // Private implementation.
+        class Impl;
+
+        std::unique_ptr<Impl> pImpl;
+    };
+}

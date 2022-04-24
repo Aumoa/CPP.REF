@@ -2,7 +2,7 @@
 
 #include "DirectXShaderCodeBlob.h"
 
-GENERATE_BODY(SDirectXShaderCodeBlob);
+using namespace ::libty;
 
 SDirectXShaderCodeBlob::SDirectXShaderCodeBlob(SDirectXDevice* Owner, ComPtr<ID3DBlob> pBlob, ERHIShaderType ShaderType)
 	: Super(Owner)

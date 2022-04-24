@@ -8,7 +8,7 @@ namespace libty::inline Game
 	class SGameEngineSubsystem;
 	//class SSlateApplication;
 
-	class GAME_API SGameEngine : extends(SObject)
+	class GAME_API SGameEngine : implements(SObject)
 	{
 		GENERATED_BODY(SGameEngine);
 

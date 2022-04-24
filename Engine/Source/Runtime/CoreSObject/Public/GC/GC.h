@@ -28,6 +28,7 @@ namespace libty::inline Core
 		friend class libty::Core::Reflection::SFieldInfo;
 
 	private:
+		static std::optional<GarbageCollector> sInstance;
 		std::mutex GCMtx;
 
 		ObjectHashTable Objects;
@@ -53,16 +54,15 @@ namespace libty::inline Core
 		std::atomic<bool> bGCTrigger = false;
 
 	private:
-		GarbageCollector() = default;
-		~GarbageCollector();
-
-	private:
 		void RegisterObject(SObject* Object);
 		void UnregisterObject(SObject* Object);
 
 	public:
+		GarbageCollector() = default;
+		~GarbageCollector() noexcept;
+
 		void Init();
-		void Shutdown(bool bNormal);
+		void Shutdown(bool bNormal) noexcept;
 		bool IsTearingDown();
 
 	public:
@@ -78,9 +78,6 @@ namespace libty::inline Core
 		float GetFlushInterval();
 
 	public:
-		static GarbageCollector& Get();
-
-	public:
 		DECLARE_MULTICAST_EVENT(GCEvent);
 		GCEvent PreGarbageCollect;
 		GCEvent PostGarbageCollect;
@@ -89,5 +86,5 @@ namespace libty::inline Core
 		int32 MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth);
 	};
 
-	CORESOBJECT_API extern GarbageCollector& GC;
+	CORESOBJECT_API extern GarbageCollector* GC;
 }

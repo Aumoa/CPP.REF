@@ -6,7 +6,7 @@ namespace libty::inline Asp
 {
 	class SOkObjectResult;
 
-	class ASP_API SControllerBase : extends(SObject)
+	class ASP_API SControllerBase : implements(SObject)
 	{
 		GENERATED_BODY(SControllerBase);
 

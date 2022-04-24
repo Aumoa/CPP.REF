@@ -16,7 +16,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// Represents game world that contains spawned actor, physically state and environment.
 	/// </summary>
-	class GAME_API SWorld : extends(SGameObject)
+	class GAME_API SWorld : public SGameObject
 	{
 		GENERATED_BODY(SWorld);
 

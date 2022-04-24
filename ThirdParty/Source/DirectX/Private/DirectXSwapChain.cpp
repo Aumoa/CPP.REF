@@ -1,11 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "DirectXSwapChain.h"
-#include "DirectXFence.h"
 #include "DirectXDevice.h"
 #include "DirectXResource.h"
 
-GENERATE_BODY(SDirectXSwapChain);
+using namespace ::libty;
 
 SDirectXSwapChain::SDirectXSwapChain(SDirectXDevice* Owner, ComPtr<IDXGISwapChain4> pSwapChain, size_t BufferCount)
 	: Super(Owner)

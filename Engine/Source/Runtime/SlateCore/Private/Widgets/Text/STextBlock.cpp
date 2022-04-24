@@ -7,7 +7,7 @@
 
 using namespace ::libty;
 
-class STextBlock::SRenderElement : extends(SObject), implements(IRenderSlateElement)
+class STextBlock::SRenderElement : implements(SObject), implements(IRenderSlateElement)
 {
 	GENERATED_BODY(SRenderElement)
 

@@ -9,7 +9,7 @@ namespace libty::inline Core::Reflection
 	/// <summary>
 	/// Obtains information about the attributes of a member and provides access to member metadata.
 	/// </summary>
-	class CORESOBJECT_API SMemberInfo : extends(SObject)
+	class CORESOBJECT_API SMemberInfo : implements(SObject)
 	{
 		GENERATED_BODY(SMemberInfo);
 

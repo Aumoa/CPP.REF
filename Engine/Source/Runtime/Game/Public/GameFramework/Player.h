@@ -6,7 +6,7 @@
 
 namespace libty::inline Game
 {
-	class GAME_API SPlayer : extends(SGameObject)
+	class GAME_API SPlayer : public SGameObject
 	{
 		GENERATED_BODY(SPlayer);
 

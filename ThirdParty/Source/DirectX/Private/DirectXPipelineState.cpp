@@ -2,7 +2,7 @@
 
 #include "DirectXPipelineState.h"
 
-GENERATE_BODY(SDirectXPipelineState);
+using namespace ::libty;
 
 SDirectXPipelineState::SDirectXPipelineState(IRHIDevice* Owner, ComPtr<ID3D12PipelineState> pPipelineState)
 	: Super(Owner)

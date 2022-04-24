@@ -10,7 +10,7 @@ namespace libty::inline Game
 	class SLocalPlayer;
 	class SGameInstanceSubsystem;
 
-	class GAME_API SGameInstance : extends(SGameObject)
+	class GAME_API SGameInstance : public SGameObject
 	{
 		GENERATED_BODY(SGameInstance);
 

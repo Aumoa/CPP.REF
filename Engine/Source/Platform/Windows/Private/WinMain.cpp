@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "CoreMinimal.h"
 #include "WindowsApplication.h"
 
-using TApplicationClass = SWindowsApplication;
+using TApplicationClass = ::libty::Windows::SWindowsApplication;
 #include "GuardedMain.inl"

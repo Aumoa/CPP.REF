@@ -2,15 +2,17 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXView.h"
 
-class DIRECTX_API SDirectXDepthStencilView : public SDirectXView, implements IRHIDepthStencilView
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXDepthStencilView)
+	class DIRECTX_API SDirectXDepthStencilView : public SDirectXView, implements(IRHIDepthStencilView)
+	{
+		GENERATED_BODY(SDirectXDepthStencilView);
 
-public:
-	SDirectXDepthStencilView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> pDescriptorHeap, size_t NumViews);
+	public:
+		SDirectXDepthStencilView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> pDescriptorHeap, size_t NumViews);
 
-	virtual void CreateDepthStencilView(size_t index, IRHIResource* pResource, const RHIDepthStencilViewDesc* pDesc) override;
-};
+		virtual void CreateDepthStencilView(size_t index, IRHIResource* pResource, const RHIDepthStencilViewDesc* pDesc) override;
+	};
+}

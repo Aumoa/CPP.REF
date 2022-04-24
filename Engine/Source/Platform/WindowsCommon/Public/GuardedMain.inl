@@ -35,7 +35,6 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 	{
 		std::wstring Callstack_line = String::Format(L"{:>2}  {}!{} [{}]", Callstack.FrameNumber, Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
 		SE_LOG(LogWindowsCommon, Error, Callstack_line);
-		std::wcerr << Callstack_line << std::endl;
 	}
 
 #if DO_CHECK

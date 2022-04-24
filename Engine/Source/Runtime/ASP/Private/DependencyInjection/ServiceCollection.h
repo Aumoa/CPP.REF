@@ -8,7 +8,7 @@ namespace libty::inline Asp
 {
 	class SAspApplication;
 
-	class SServiceCollection : extends(SObject), implements(IServiceCollection)
+	class SServiceCollection : implements(SObject), implements(IServiceCollection)
 	{
 		GENERATED_BODY(SServiceCollection);
 		friend class ::libty::Asp::SAspApplication;

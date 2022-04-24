@@ -19,7 +19,7 @@ namespace libty::inline Game
 	class SActorComponent;
 	class SSceneComponent;
 
-	class GAME_API AActor : extends(SGameObject)
+	class GAME_API AActor : public SGameObject
 	{
 		GENERATED_BODY(AActor);
 

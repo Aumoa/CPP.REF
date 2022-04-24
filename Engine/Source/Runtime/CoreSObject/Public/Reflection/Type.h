@@ -19,7 +19,7 @@ namespace libty::inline Core
 	/// <summary>
 	/// Represents type declarations: class types, interface types, value types, and enumeration types.
 	/// </summary>
-	class CORESOBJECT_API SType : extends(SObject)
+	class CORESOBJECT_API SType : implements(SObject)
 	{
 		GENERATED_BODY(SType);
 		friend class ::libty::Core::GarbageCollector;

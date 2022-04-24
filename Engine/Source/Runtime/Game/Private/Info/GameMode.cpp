@@ -21,6 +21,6 @@ APlayerController* AGameMode::SpawnPlayerController()
 	SWorld* World = GetWorld();
 	SLocalPlayer* LocalPlayer = World->GetLocalPlayer();
 
-	LocalPlayer->SetPlayerController(PlayerController);
+	//LocalPlayer->SetPlayerController(PlayerController);
 	return PlayerController;
 }

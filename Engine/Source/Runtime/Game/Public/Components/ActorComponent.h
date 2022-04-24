@@ -10,7 +10,7 @@ namespace libty::inline Game
 	class AActor;
 	class SLevel;
 
-	class GAME_API SActorComponent : extends(SGameObject)
+	class GAME_API SActorComponent : public SGameObject
 	{
 		GENERATED_BODY(SActorComponent);
 

@@ -9,7 +9,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// Represent game information placed to world.
 	/// </summary>
-	class GAME_API AInfo : extends(AActor)
+	class GAME_API AInfo : public AActor
 	{
 		GENERATED_BODY(AInfo);
 

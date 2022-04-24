@@ -11,7 +11,7 @@
 #include "Input/WindowsPlatformMouse.h"
 #include "WindowsApplication.h"
 
-GENERATE_BODY(SWindowsPlatformMouse);
+using namespace ::libty;
 
 namespace WindowsPlatformMouseInternal
 {
@@ -70,7 +70,7 @@ public:
     {
         if (s_mouse)
         {
-            throw fatal_exception("WindowsPlatformMouse is a singleton");
+            throw FatalException("WindowsPlatformMouse is a singleton");
         }
 
         s_mouse = this;

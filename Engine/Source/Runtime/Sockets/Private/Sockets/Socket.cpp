@@ -82,7 +82,7 @@ SSocket::SSocket(EAddressFamily Family, ESocketType SocketType, EProtocolType Pr
 
 SSocket::~SSocket()
 {
-	if (!GC.IsTearingDown() && IsValid() && !ensure(Impl->bClosed))
+	if (!GC->IsTearingDown() && IsValid() && !ensure(Impl->bClosed))
 	{
 		Close();
 	}

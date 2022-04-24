@@ -2,7 +2,7 @@
 
 #include "DirectXResource.h"
 
-GENERATE_BODY(SDirectXResource);
+using namespace ::libty;
 
 SDirectXResource::SDirectXResource(IRHIDevice* Owner, ComPtr<ID3D12Resource> pResource)
 	: Super(Owner)

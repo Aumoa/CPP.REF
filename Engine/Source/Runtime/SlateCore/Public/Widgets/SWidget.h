@@ -13,7 +13,7 @@ namespace libty::inline SlateCore
 	class ArrangedChildrens;
 	class ArrangedWidget;
 
-	class SLATECORE_API SWidget : extends(SObject), implements(IDisposable)
+	class SLATECORE_API SWidget : implements(SObject), implements(IDisposable)
 	{
 		GENERATED_BODY(SWidget);
 

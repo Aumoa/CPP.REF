@@ -2,28 +2,30 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXDeviceChild.h"
 
-class SDirectXRenderPass;
-
-class DIRECTX_API SDirectXCommandList : public SDirectXDeviceChild, implements IRHIGraphicsCommandList
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXCommandList)
+	class SDirectXRenderPass;
 
-public:
-	ComPtr<ID3D12GraphicsCommandList4> pCommandList;
+	class DIRECTX_API SDirectXCommandList : public SDirectXDeviceChild, implements(IRHIGraphicsCommandList)
+	{
+		GENERATED_BODY(SDirectXCommandList);
 
-public:
-	SDirectXCommandList(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator, ComPtr<ID3D12GraphicsCommandList4> pCommandList);
+	public:
+		ComPtr<ID3D12GraphicsCommandList4> pCommandList;
 
-	using Super::Dispose;
+	public:
+		SDirectXCommandList(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator, ComPtr<ID3D12GraphicsCommandList4> pCommandList);
 
-	virtual void Reset(IRHICommandAllocator* pAllocator, IRHIPipelineState* pInitialState) override;
-	virtual void Close() override;
-	virtual void ResourceBarrier(std::span<const RHIResourceBarrier> barriers) override;
-	virtual void ClearRenderTargetView(IRHIRenderTargetView* pRTV, size_t indexOf, const Color& color, std::span<const RectN> rects) override;
+		using Super::Dispose;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+		virtual void Reset(IRHICommandAllocator* pAllocator, IRHIPipelineState* pInitialState) override;
+		virtual void Close() override;
+		virtual void ResourceBarrier(std::span<const RHIResourceBarrier> barriers) override;
+		virtual void ClearRenderTargetView(IRHIRenderTargetView* pRTV, size_t indexOf, const Color& color, std::span<const RectN> rects) override;
+
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

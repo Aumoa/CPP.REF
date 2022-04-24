@@ -8,7 +8,7 @@ namespace libty::inline Asp
 	struct IServiceCollection;
 	class SServiceCollection;
 
-	class ASP_API SAspApplicationBuilder : extends(SObject)
+	class ASP_API SAspApplicationBuilder : implements(SObject)
 	{
 		GENERATED_BODY(SAspApplicationBuilder);
 		friend class SAspApplication;

@@ -4,9 +4,9 @@
 #include "DirectXResource.h"
 #include "DirectXCommandList.h"
 
-DEFINE_LOG_CATEGORY(LogDirectX);
+using namespace ::libty;
 
-void ReplaceNativePointer(std::vector<D3D12_RESOURCE_BARRIER>& dst, std::span<const RHIResourceBarrier> src)
+void ::libty::DirectX::ReplaceNativePointer(std::vector<D3D12_RESOURCE_BARRIER>& dst, std::span<const RHIResourceBarrier> src)
 {
 	dst.resize(src.size());
 
@@ -29,7 +29,7 @@ void ReplaceNativePointer(std::vector<D3D12_RESOURCE_BARRIER>& dst, std::span<co
 	}
 }
 
-void ReplaceNativePointer(std::vector<ID3D12CommandList*>& dst, std::span<IRHIGraphicsCommandList* const> src)
+void ::libty::DirectX::ReplaceNativePointer(std::vector<ID3D12CommandList*>& dst, std::span<IRHIGraphicsCommandList* const> src)
 {
 	dst.resize(src.size());
 

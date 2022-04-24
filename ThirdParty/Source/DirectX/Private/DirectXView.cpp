@@ -3,7 +3,7 @@
 #include "DirectXView.h"
 #include "DirectXDevice.h"
 
-GENERATE_BODY(SDirectXView);
+using namespace ::libty;
 
 SDirectXView::SDirectXView(SDirectXDevice* Owner, ComPtr<ID3D12DescriptorHeap> pDescriptorHeap, size_t NumViews)
 	: Super(Owner)

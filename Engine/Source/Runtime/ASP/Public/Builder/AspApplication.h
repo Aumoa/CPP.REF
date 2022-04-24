@@ -8,7 +8,7 @@ namespace libty::inline Asp
 	class SControllerBase;
 	class SServiceCollection;
 
-	class ASP_API SAspApplication : extends(SObject)
+	class ASP_API SAspApplication : implements(SObject)
 	{
 		GENERATED_BODY(SAspApplication);
 		friend class SAspApplicationBuilder;
@@ -27,7 +27,7 @@ namespace libty::inline Asp
 		void ApplyControllers(SServiceCollection* collection);
 
 	public:
-		virtual int32 Run();
+		virtual int32 Run(std::stop_token cancellationToken);
 
 	public:
 		static SAspApplicationBuilder* CreateBuilder(const CommandLine& args);

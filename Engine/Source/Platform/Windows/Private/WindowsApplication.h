@@ -2,80 +2,79 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "IApplicationInterface.h"
 #include "WindowsIncludes.h"
 #include "Multimedia/IPlatformImageLoader.h"
 
-class SWindowsPlatformKeyboard;
-class SWindowsPlatformMouse;
-class SWindowsIMEController;
-class PlatformModule;
-interface IRHIFactory;
-
-class SWindowsApplication : implements SObject, implements IApplicationInterface, implements IPlatformImageLoader
+namespace libty::inline Windows
 {
-	GENERATED_BODY(SWindowsApplication)
+	class SWindowsPlatformKeyboard;
+	class SWindowsPlatformMouse;
+	class SWindowsIMEController;
 
-private:
-	inline static SWindowsApplication* gApp;
+	class SWindowsApplication : implements(SObject, IApplicationInterface, IPlatformImageLoader)
+	{
+		GENERATED_BODY(SWindowsApplication)
 
-	HINSTANCE hInstance = nullptr;
-	HWND hWnd = nullptr;
-	ETickMode TickMode = ETickMode::Realtime;
-	ETickMode ActualTickMode = ETickMode::Realtime;
-	std::vector<WeakPtr<SObject>> RealtimeDemanders;
+	private:
+		inline static SWindowsApplication* gApp;
 
-	SPROPERTY(PlatformKeyboard)
-	SWindowsPlatformKeyboard* PlatformKeyboard = nullptr;
-	SPROPERTY(PlatformMouse)
-	SWindowsPlatformMouse* PlatformMouse = nullptr;
-	SPROPERTY(PlatformIME)
-	SWindowsIMEController* PlatformIME = nullptr;
-	SPROPERTY(Factory)
-	IRHIFactory* Factory = nullptr;
-	ComPtr<IWICImagingFactory> ImagingFactory;
+		HINSTANCE hInstance = nullptr;
+		HWND hWnd = nullptr;
+		ETickMode TickMode = ETickMode::Realtime;
+		ETickMode ActualTickMode = ETickMode::Realtime;
+		std::vector<WeakPtr<SObject>> RealtimeDemanders;
 
-	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
+		SPROPERTY(PlatformKeyboard)
+		SWindowsPlatformKeyboard* PlatformKeyboard = nullptr;
+		SPROPERTY(PlatformMouse)
+		SWindowsPlatformMouse* PlatformMouse = nullptr;
+		SPROPERTY(PlatformIME)
+		SWindowsIMEController* PlatformIME = nullptr;
+		SPROPERTY(Factory)
+		IRHIFactory* Factory = nullptr;
+		ComPtr<IWICImagingFactory> ImagingFactory;
 
-public:
-	SWindowsApplication(HINSTANCE hInstance);
+		std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
 
-	static int32 GuardedMain(std::span<const std::wstring> Argv);
+	public:
+		SWindowsApplication(HINSTANCE hInstance);
 
-	// IApplicationInterface
-	virtual void Start() override;
-	virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) override;
+		static int32 GuardedMain(std::span<const std::wstring> Argv);
 
-	virtual Vector2N GetViewportSize() override;
-	virtual float GetDpi() override;
-	virtual void* GetWindowHandle() override;
+		// IApplicationInterface
+		virtual void Start() override;
+		virtual void ConsumeModule(std::unique_ptr<PlatformModule> ModulePtr) override;
 
-	virtual void SetTickMode(ETickMode InTickMode) override;
-	virtual ETickMode GetTickMode() override;
-	virtual void AddRealtimeDemander(SObject* InObject) override;
-	virtual void RemoveRealtimeDemander(SObject* InObject) override;
+		virtual Vector2N GetViewportSize() override;
+		virtual float GetDpi() override;
+		virtual void* GetWindowHandle() override;
 
-	virtual void SetTitle(std::wstring_view InTitle) override;
-	virtual std::wstring GetTitle() override;
+		virtual void SetTickMode(ETickMode InTickMode) override;
+		virtual ETickMode GetTickMode() override;
+		virtual void AddRealtimeDemander(SObject* InObject) override;
+		virtual void RemoveRealtimeDemander(SObject* InObject) override;
 
-	virtual IRHIFactory* GetFactory() override;
-	virtual IPlatformKeyboard& GetPlatformKeyboard() override;
-	virtual IPlatformMouse& GetPlatformMouse() override;
-	virtual IPlatformImageLoader& GetPlatformImageLoader() override;
-	virtual IPlatformIME& GetPlatformIME() override;
-	// ~IApplicationInterface
+		virtual void SetTitle(std::wstring_view InTitle) override;
+		virtual std::wstring GetTitle() override;
 
-	// IPlatformImageLoader
-	virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
-	virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
-	// ~IPlatformImageLoader
+		virtual IRHIFactory* GetFactory() override;
+		virtual IPlatformKeyboard& GetPlatformKeyboard() override;
+		virtual IPlatformMouse& GetPlatformMouse() override;
+		virtual IPlatformImageLoader& GetPlatformImageLoader() override;
+		virtual IPlatformIME& GetPlatformIME() override;
+		// ~IApplicationInterface
 
-private:
-	void ShrinkRealtimeDemanders();
-	void UpdateRealtimeDemanders();
-	ComPtr<IWICFormatConverter> DecodeImage(IWICBitmapDecoder* Decoder, int32 FrameIndex, ERHIPixelFormat PixelFormat);
+		// IPlatformImageLoader
+		virtual IPlatformImage* CreateImageFromFile(const std::filesystem::path& InAssetPath, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
+		virtual IPlatformImage* CreateImageFromBinary(std::span<const uint8> AssetsBin, int32 FrameIndex, ERHIPixelFormat PixelFormat) override;
+		// ~IPlatformImageLoader
 
-private:
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-};
+	private:
+		void ShrinkRealtimeDemanders();
+		void UpdateRealtimeDemanders();
+		ComPtr<IWICFormatConverter> DecodeImage(IWICBitmapDecoder* Decoder, int32 FrameIndex, ERHIPixelFormat PixelFormat);
+
+	private:
+		static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	};
+}

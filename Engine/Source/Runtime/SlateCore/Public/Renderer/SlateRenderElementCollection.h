@@ -4,7 +4,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SSlateRenderElementCollection : extends(SObject)
+	class SLATECORE_API SSlateRenderElementCollection : implements(SObject)
 	{
 		GENERATED_BODY(SSlateRenderElementCollection);
 

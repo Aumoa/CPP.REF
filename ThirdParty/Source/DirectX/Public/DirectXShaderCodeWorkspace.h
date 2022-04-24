@@ -2,32 +2,34 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXDeviceChild.h"
 
-class SDirectXShaderCodeBlob;
-
-class DIRECTX_API SDirectXShaderCodeWorkspace : public SDirectXDeviceChild, implements IRHIShaderCodeWorkspace, implements ID3DInclude
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXShaderCodeWorkspace)
+	class SDirectXShaderCodeBlob;
 
-private:
-	std::map<std::wstring, RHIShaderCode, std::less<>> ShaderCodes;
-	SPROPERTY(CompiledShaderBlobs)
-	std::map<std::string_view, SDirectXShaderCodeBlob*, std::less<>> CompiledShaderBlobs;
+	class DIRECTX_API SDirectXShaderCodeWorkspace : public SDirectXDeviceChild, implements(IRHIShaderCodeWorkspace, ID3DInclude)
+	{
+		GENERATED_BODY(SDirectXShaderCodeWorkspace);
 
-public:
-	SDirectXShaderCodeWorkspace(SDirectXDevice* Owner);
+	private:
+		std::map<std::wstring, RHIShaderCode, std::less<>> ShaderCodes;
+		SPROPERTY(CompiledShaderBlobs)
+		std::map<std::string_view, SDirectXShaderCodeBlob*, std::less<>> CompiledShaderBlobs;
 
-	using Super::Dispose;
+	public:
+		SDirectXShaderCodeWorkspace(SDirectXDevice* Owner);
 
-	virtual void AddShaderCode(std::wstring_view Name, const RHIShaderCode& Code) override;
-	virtual void Compile() override;
-	virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::string_view EntryPointName) override;
+		using Super::Dispose;
 
-	virtual HRESULT CALLBACK Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
-	virtual HRESULT CALLBACK Close(LPCVOID pData) override;
+		virtual void AddShaderCode(std::wstring_view Name, const RHIShaderCode& Code) override;
+		virtual void Compile() override;
+		virtual IRHIShaderCodeBlob* GetCompiledShaderCodeBlob(std::string_view EntryPointName) override;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+		virtual HRESULT CALLBACK Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
+		virtual HRESULT CALLBACK Close(LPCVOID pData) override;
+
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

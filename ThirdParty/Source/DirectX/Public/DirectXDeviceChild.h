@@ -2,27 +2,29 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXFactoryChild.h"
 
-class SDirectXDevice;
-
-class DIRECTX_API SDirectXDeviceChild : public SDirectXFactoryChild, implements IRHIDeviceChild
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXDeviceChild)
+	class SDirectXDevice;
 
-private:
-	SPROPERTY(Owner)
-	IRHIDevice* Owner = nullptr;
+	class DIRECTX_API SDirectXDeviceChild : public SDirectXFactoryChild, implements(IRHIDeviceChild)
+	{
+		GENERATED_BODY(SDirectXDeviceChild);
 
-public:
-	SDirectXDeviceChild(IRHIDevice* Owner);
-	SDirectXDeviceChild(SDirectXDevice* Owner);
+	private:
+		SPROPERTY(Owner)
+		IRHIDevice* Owner = nullptr;
 
-	using Super::Dispose;
+	public:
+		SDirectXDeviceChild(IRHIDevice* Owner);
+		SDirectXDeviceChild(SDirectXDevice* Owner);
 
-	virtual IRHIDevice* GetDevice() override;
+		using Super::Dispose;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+		virtual IRHIDevice* GetDevice() override;
+
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

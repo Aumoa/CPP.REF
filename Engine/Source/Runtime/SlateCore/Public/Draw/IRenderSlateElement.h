@@ -9,7 +9,7 @@ namespace libty::inline SlateCore
 {
 	struct IRenderSlateElement : implements(SObject)
 	{
-		GENERATED_BODY(IRenderSlateElement);
+		GENERATED_INTERFACE_BODY(IRenderSlateElement);
 
 		virtual int32 GetLayer() = 0;
 		virtual Geometry GetCachedGeometry() = 0;

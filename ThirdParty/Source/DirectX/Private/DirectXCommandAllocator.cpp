@@ -2,7 +2,7 @@
 
 #include "DirectXCommandAllocator.h"
 
-GENERATE_BODY(SDirectXCommandAllocator);
+using namespace ::libty;
 
 SDirectXCommandAllocator::SDirectXCommandAllocator(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator)
 	: Super(Owner)

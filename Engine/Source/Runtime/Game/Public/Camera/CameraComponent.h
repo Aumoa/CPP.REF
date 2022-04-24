@@ -7,7 +7,7 @@
 
 namespace libty::inline Game
 {
-	class GAME_API SCameraComponent : extends(SSceneComponent)
+	class GAME_API SCameraComponent : public SSceneComponent
 	{
 		GENERATED_BODY(SCameraComponent);
 

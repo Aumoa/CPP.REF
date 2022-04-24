@@ -26,7 +26,6 @@ namespace libty::inline Core
 
 	public:
 		using This = SObject;
-		using Super = void;
 		using IsClass = SObject;
 
 		inline static constexpr std::wstring_view FriendlyName = L"SObject";

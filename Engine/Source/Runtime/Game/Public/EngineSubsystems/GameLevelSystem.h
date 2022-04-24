@@ -10,7 +10,7 @@ namespace libty::inline Game
 	class SLevel;
 	class SWorld;
 
-	class GAME_API SGameLevelSystem : extends(SGameEngineSubsystem)
+	class GAME_API SGameLevelSystem : public SGameEngineSubsystem
 	{
 		GENERATED_BODY(SGameLevelSystem);
 

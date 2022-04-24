@@ -8,8 +8,9 @@ namespace libty::inline PlatformGeneric
 {
 	struct PLATFORMGENERIC_API IPlatformIME : virtual public SObject
 	{
-		GENERATED_BODY(IPlatformIME);
+		GENERATED_INTERFACE_BODY(IPlatformIME);
 
+	public:
 		DECLARE_MULTICAST_DELEGATE(IMEDelegate, IMEEvent);
 		IMEDelegate IME;
 	};

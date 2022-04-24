@@ -9,7 +9,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// Represents controller that possess to pawn, process AI, etc...
 	/// </summary>
-	class GAME_API AAIController : extends(AController)
+	class GAME_API AAIController : public AController
 	{
 		GENERATED_BODY(AAIController);
 

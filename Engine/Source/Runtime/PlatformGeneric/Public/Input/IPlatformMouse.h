@@ -8,7 +8,7 @@ namespace libty::inline PlatformGeneric
 {
     struct PLATFORMGENERIC_API IPlatformMouse : virtual public SObject
     {
-        GENERATED_BODY(IPlatformMouse);
+        GENERATED_INTERFACE_BODY(IPlatformMouse);
 
     public:
         virtual MouseState GetState() = 0;

@@ -6,7 +6,7 @@ namespace libty::inline Asp
 {
 	struct IServiceCollection;
 
-	class ASP_API SServiceCollectionExtensions : extends(SObject)
+	class ASP_API SServiceCollectionExtensions : implements(SObject)
 	{
 		GENERATED_BODY(SServiceCollectionExtensions);
 

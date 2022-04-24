@@ -13,7 +13,7 @@
 #include "DirectXPipelineState.h"
 #include "DirectXResource.h"
 
-GENERATE_BODY(SDirectXDevice);
+using namespace ::libty;
 
 SDirectXDevice::SDirectXDevice(SDirectXFactory* Owner, ComPtr<ID3D12Device> pDevice)
 	: Super(Owner)
@@ -131,7 +131,7 @@ IRHIRootSignature* SDirectXDevice::CreateRootSignature(const RHIRootSignatureDes
 		if (pError)
 		{
 			std::string_view Msg((const char*)pError->GetBufferPointer(), pError->GetBufferSize());
-			throw fatal_exception(String::Format("Failed to create root signature: {}", Msg));
+			throw FatalException(String::Format("Failed to create root signature: {}", Msg));
 		}
 		else
 		{

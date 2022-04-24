@@ -12,7 +12,7 @@ namespace libty::inline PlatformGeneric
 
 	struct PLATFORMGENERIC_API IApplicationInterface : virtual public SObject
 	{
-		GENERATED_BODY(IApplicationInterface);
+		GENERATED_INTERFACE_BODY(IApplicationInterface);
 
 	public:
 		SENUM(PLATFORMGENERIC_API, ETickMode, int32,

@@ -2,23 +2,25 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXDeviceChild.h"
 
-class DIRECTX_API SDirectXCommandAllocator : public SDirectXDeviceChild, implements IRHICommandAllocator
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXCommandAllocator)
+	class DIRECTX_API SDirectXCommandAllocator : public SDirectXDeviceChild, implements(IRHICommandAllocator)
+	{
+		GENERATED_BODY(SDirectXCommandAllocator);
 
-public:
-	ComPtr<ID3D12CommandAllocator> pAllocator;
+	public:
+		ComPtr<ID3D12CommandAllocator> pAllocator;
 
-public:
-	SDirectXCommandAllocator(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator);
+	public:
+		SDirectXCommandAllocator(SDirectXDevice* Owner, ComPtr<ID3D12CommandAllocator> pAllocator);
 
-	using Super::Dispose;
+		using Super::Dispose;
 
-	virtual void Reset() override;
+		virtual void Reset() override;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

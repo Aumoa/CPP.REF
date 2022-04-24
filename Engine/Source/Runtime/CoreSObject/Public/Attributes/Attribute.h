@@ -6,7 +6,7 @@
 
 namespace libty::inline Core::inline Attributes
 {
-	class CORESOBJECT_API SAttribute : extends(SObject)
+	class CORESOBJECT_API SAttribute : implements(SObject)
 	{
 		GENERATED_BODY(SAttribute);
 

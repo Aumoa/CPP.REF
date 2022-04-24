@@ -5,9 +5,8 @@
 #include "DirectXCommandQueue.h"
 #include "DirectXSwapChain.h"
 #include "DirectXDevice.h"
-#include "IApplicationInterface.h"
 
-GENERATE_BODY(SDirectXFactory);
+using namespace ::libty;
 
 SDirectXFactory::SDirectXFactory(bool bEnableDebugLayer)
 	: Super()

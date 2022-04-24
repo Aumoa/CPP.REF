@@ -5,30 +5,31 @@
 #include "Object.h"
 #include "DirectXDeviceChild.h"
 
-class SDirectXDevice;
-class SDirectXFence;
-class SDirectXResource;
-class SEventHandle;
-
-class DIRECTX_API SDirectXSwapChain : public SDirectXDeviceChild, implements IRHISwapChain
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXSwapChain)
+	class SDirectXDevice;
+	class SDirectXResource;
 
-public:
-	ComPtr<IDXGISwapChain4> pSwapChain;
-	SPROPERTY(Buffers)
-	std::vector<SDirectXResource*> Buffers;
+	class DIRECTX_API SDirectXSwapChain : public SDirectXDeviceChild, implements(IRHISwapChain)
+	{
+		GENERATED_BODY(SDirectXSwapChain);
 
-public:
-	SDirectXSwapChain(SDirectXDevice* Owner, ComPtr<IDXGISwapChain4> pSwapChain, size_t BufferCount);
+	public:
+		ComPtr<IDXGISwapChain4> pSwapChain;
+		SPROPERTY(Buffers)
+		std::vector<SDirectXResource*> Buffers;
 
-	using Super::Dispose;
+	public:
+		SDirectXSwapChain(SDirectXDevice* Owner, ComPtr<IDXGISwapChain4> pSwapChain, size_t BufferCount);
 
-	virtual void ResizeBuffers(const Vector2N& size) override;
-	virtual IRHIResource* GetBuffer(size_t index) override;
-	virtual void Present() override;
-	virtual size_t GetCurrentBackBufferIndex() override;
+		using Super::Dispose;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+		virtual void ResizeBuffers(const Vector2N& size) override;
+		virtual IRHIResource* GetBuffer(size_t index) override;
+		virtual void Present() override;
+		virtual size_t GetCurrentBackBufferIndex() override;
+
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

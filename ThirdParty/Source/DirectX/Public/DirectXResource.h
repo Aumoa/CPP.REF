@@ -2,23 +2,25 @@
 
 #pragma once
 
-#include "Object.h"
 #include "DirectXDeviceChild.h"
 
-class DIRECTX_API SDirectXResource : public SDirectXDeviceChild, implements IRHIResource
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXResource)
+	class DIRECTX_API SDirectXResource : public SDirectXDeviceChild, implements(IRHIResource)
+	{
+		GENERATED_BODY(SDirectXResource);
 
-public:
-	ComPtr<ID3D12Resource> pResource;
+	public:
+		ComPtr<ID3D12Resource> pResource;
 
-public:
-	SDirectXResource(IRHIDevice* Owner, ComPtr<ID3D12Resource> pResource);
+	public:
+		SDirectXResource(IRHIDevice* Owner, ComPtr<ID3D12Resource> pResource);
 
-	using Super::Dispose;
+		using Super::Dispose;
 
-	virtual RHIResourceDesc GetDesc() override;
+		virtual RHIResourceDesc GetDesc() override;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

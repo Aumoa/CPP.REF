@@ -24,12 +24,8 @@ DECLARE_CYCLE_STAT("  ResumeToken", STAT_ResumeToken, STATGROUP_GC);
 
 using namespace libty;
 
-GarbageCollector& libty::Core::GC = GarbageCollector::Get();
-
-GarbageCollector::~GarbageCollector()
-{
-	Shutdown(false);
-}
+std::optional<GarbageCollector> GarbageCollector::sInstance;
+GarbageCollector* libty::Core::GC;
 
 void GarbageCollector::RegisterObject(SObject* Object)
 {
@@ -43,12 +39,23 @@ void GarbageCollector::UnregisterObject(SObject* Object)
 	Objects.Remove(Object);
 }
 
-void GarbageCollector::Init()
+GarbageCollector::~GarbageCollector()
 {
+	Shutdown(false);
 }
 
-void GarbageCollector::Shutdown(bool bNormal)
+void GarbageCollector::Init()
 {
+	GC = &sInstance.emplace();
+}
+
+void GarbageCollector::Shutdown(bool bNormal) noexcept
+{
+	if (bTearingDown)
+	{
+		return;
+	}
+
 	std::unique_lock GCMtx_lock(GCMtx);
 	bTearingDown = true;
 
@@ -70,6 +77,10 @@ void GarbageCollector::Shutdown(bool bNormal)
 
 	Objects.Clear();
 	Roots.clear();
+
+	GC = nullptr;
+	GCMtx_lock.unlock();
+	sInstance.reset();
 }
 
 bool GarbageCollector::IsTearingDown()
@@ -103,13 +114,19 @@ void GarbageCollector::Collect(bool bFullPurge)
 		bool timedOut = false;
 		for (auto& Ready : SuspendReady)
 		{
-			std::future_status status = Ready.wait_until(timeout);
-			if (status == std::future_status::timeout)
+			if (bFullPurge)
 			{
-				timedOut = true;
-				break;
+				Ready.wait();
 			}
-			//Ready.wait();
+			else
+			{
+				std::future_status status = Ready.wait_until(timeout);
+				if (status == std::future_status::timeout)
+				{
+					timedOut = true;
+					break;
+				}
+			}
 		}
 
 		if (timedOut)
@@ -338,12 +355,6 @@ void GarbageCollector::SetFlushInterval(float InSeconds)
 float GarbageCollector::GetFlushInterval()
 {
 	return FlushInterval;
-}
-
-GarbageCollector& GarbageCollector::Get()
-{
-	static GarbageCollector Singleton;
-	return Singleton;
 }
 
 int32 GarbageCollector::MarkGC(SObject* Object, size_t ThreadIdx, int32 MarkDepth)

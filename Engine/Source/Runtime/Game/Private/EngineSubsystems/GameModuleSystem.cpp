@@ -22,7 +22,7 @@ void SGameModuleSystem::Deinit()
 {
 	if (GameModule)
 	{
-		GC.SuppressFinalize(GameModule);
+		GC->SuppressFinalize(GameModule);
 	}
 }
 

@@ -11,7 +11,7 @@ namespace libty::inline Sockets
 {
 	struct IPEndPoint;
 
-	class SOCKETS_API SSocket : extends(SObject)
+	class SOCKETS_API SSocket : implements(SObject)
 	{
 		GENERATED_BODY(SSocket);
 

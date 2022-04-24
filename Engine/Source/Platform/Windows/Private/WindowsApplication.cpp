@@ -1,8 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "WindowsApplication.h"
-#include "GameModule.h"
-#include "GameEngine.h"
 #include "Input/WindowsPlatformKeyboard.h"
 #include "Input/WindowsPlatformMouse.h"
 #include "Input/WindowsIMEController.h"
@@ -14,7 +12,7 @@
 //#include "VkFactory.h"
 #include "DirectXFactory.h"
 
-GENERATE_BODY(SWindowsApplication);
+using namespace ::libty;
 
 #define WM_UPDATETICKMODE		WM_APP + 1
 #define WM_PRESENT				WM_UPDATETICKMODE + 1
@@ -59,7 +57,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
 
 	{
-		GC.Init();
+		GC->Init();
 
 		auto CommandArgs = CommandLine(Argv);
 		std::wstring ModuleName;
@@ -84,19 +82,19 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		auto Loader = EngineModule->GetFunctionPointer<SGameModule*()>("LoadGameModule");
 		if (!Loader)
 		{
-			throw fatal_exception(String::Format(L"GameEngine does not initialized. {} is corrupted.", EngineName));
+			throw FatalException(String::Format("GameEngine does not initialized. {} is corrupted.", String::AsMultibyte(EngineName)));
 		}
 
 		SharedPtr<SGameModule> GameModule = Loader();
 		if (GameModule == nullptr)
 		{
-			throw fatal_exception(L"LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
+			throw FatalException("LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
 		}
 
 		SharedPtr<SGameEngine> GameEngine = GameModule->CreateGameEngine();
 		if (GameEngine == nullptr)
 		{
-			throw fatal_exception(L"Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
+			throw FatalException("Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
 		}
 
 		SharedPtr WinApp = gcnew SWindowsApplication(GetModuleHandleW(nullptr));
@@ -111,8 +109,8 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		PlatformModules.emplace_back(std::move(EngineModule));
 	}
 
-	GC.Collect(true);
-	GC.Shutdown(true);
+	GC->Collect(true);
+	GC->Shutdown(true);
 
 	Logger->Shutdown();
 	return ErrorCode;
@@ -350,7 +348,7 @@ ComPtr<IWICFormatConverter> SWindowsApplication::DecodeImage(IWICBitmapDecoder* 
 		FormatGUID = GUID_WICPixelFormat32bppPRGBA;
 		break;
 	default:
-		throw fatal_exception(L"Not supported pixel format.");
+		throw FatalException("Not supported pixel format.");
 	}
 
 	ComPtr<IWICFormatConverter> Converter;

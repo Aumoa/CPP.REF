@@ -13,7 +13,6 @@ public class DirectX : ModuleRule
             TargetType = TargetType.Engine;
             ModuleType = ModuleType.GameModule;
             RelativePath = "ThirdParty";
-            NonUnityBuild = true;
 
             PublicIncludePaths.Add("Public");
             PrivateIncludePaths.Add("Private");

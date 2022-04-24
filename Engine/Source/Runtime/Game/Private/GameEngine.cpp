@@ -71,9 +71,9 @@ void SGameEngine::Shutdown()
 		System->Deinit();
 	}
 
-	GC.SuppressFinalize(GameInstance);
+	GC->SuppressFinalize(GameInstance);
 	//GC.SuppressFinalize(SlateApplication);
-	GC.Collect(true);
+	GC->Collect(true);
 
 	Subsystems.clear();
 	SubsystemView.clear();
@@ -90,12 +90,31 @@ namespace AutoConsoleVars
 int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Broadcast();
-	GC.Collect();
+	GC->Collect();
 
-	GC.SetFlushInterval(AutoConsoleVars::GC::CollectInterval.GetValue());
+	SpinlockConditionVariable cv;
+	Spinlock lock;
+	std::unique_lock ul(lock, std::defer_lock);
+
+	int32 value = 0;
+	Task<>::Run([&lock, &cv, &value]()
+	{
+		std::unique_lock ul(lock);
+		cv.Wait(ul);
+		value = 100;
+	});
+
+	std::this_thread::sleep_for(20ms);
+
+	ul.lock();
+	value = 200;
+	ul.unlock();
+	cv.NotifyOne();
+
+	GC->SetFlushInterval(AutoConsoleVars::GC::CollectInterval.GetValue());
 	AutoConsoleVars::GC::CollectInterval.VariableCommitted.AddRaw([](AutoConsoleVariable<float>& V)
 	{
-		GC.SetFlushInterval(V.GetValue());
+		GC->SetFlushInterval(V.GetValue());
 	});
 
 	// Create GameEngine instance and initialize it.
@@ -185,7 +204,7 @@ void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
 		AppTickMode = ActualTickMode;
 	}
 
-	GC.Hint();
+	GC->Hint();
 
 	SystemsTick(Tick);
 	GameTick(Tick);

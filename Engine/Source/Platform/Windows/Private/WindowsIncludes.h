@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "LogWindows.h"
 #include "WindowsMinimal.h"
 #include <wrl/client.h>
@@ -15,4 +14,7 @@
 #include <dwrite_3.h>
 #include <wincodec.h>
 
-using Microsoft::WRL::ComPtr;
+namespace libty::inline Windows
+{
+	using Microsoft::WRL::ComPtr;
+}

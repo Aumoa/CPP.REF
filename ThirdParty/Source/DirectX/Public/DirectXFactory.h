@@ -2,26 +2,27 @@
 
 #pragma once
 
-#include "Object.h"
-#include "RHI/RHIInterfaces.h"
 #include "DirectXCommon.h"
 
-class DIRECTX_API SDirectXFactory : implements SObject, implements IRHIFactory
+namespace libty::inline DirectX
 {
-	GENERATED_BODY(SDirectXFactory)
+	class DIRECTX_API SDirectXFactory : implements(IRHIFactory)
+	{
+		GENERATED_BODY(SDirectXFactory);
 
-public:
-	ComPtr<IDXGIFactory4> pFactory;
+	public:
+		ComPtr<IDXGIFactory4> pFactory;
 
-public:
-	SDirectXFactory(bool bEnableDebugLayer = false);
+	public:
+		SDirectXFactory(bool bEnableDebugLayer = false);
 
-	virtual void Dispose() override;
+		virtual void Dispose() override;
 
-	virtual IRHIAdapter* GetAdapter(size_t index) override;
-	virtual IRHIDevice* CreateDevice(IRHIAdapter* pAdapter) override;
-	virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* pQueue, size_t numBuffers) override;
+		virtual IRHIAdapter* GetAdapter(size_t index) override;
+		virtual IRHIDevice* CreateDevice(IRHIAdapter* pAdapter) override;
+		virtual IRHISwapChain* CreateSwapChain(IRHICommandQueue* pQueue, size_t numBuffers) override;
 
-protected:
-	virtual void Dispose(bool bDisposing) override;
-};
+	protected:
+		virtual void Dispose(bool bDisposing) override;
+	};
+}

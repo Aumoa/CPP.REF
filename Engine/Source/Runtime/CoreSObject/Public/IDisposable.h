@@ -8,11 +8,10 @@ namespace libty::inline Core
 {
 	struct CORESOBJECT_API IDisposable : implements(SObject)
 	{
-		GENERATED_BODY(IDisposable);
+		GENERATED_INTERFACE_BODY(IDisposable);
 
 	public:
 		virtual void Dispose() = 0;
-		virtual bool IsDisposed() = 0;
 
 	protected:
 		// Special Interface Constructor.

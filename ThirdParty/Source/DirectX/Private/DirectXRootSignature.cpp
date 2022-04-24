@@ -2,7 +2,7 @@
 
 #include "DirectXRootSignature.h"
 
-GENERATE_BODY(SDirectXRootSignature);
+using namespace ::libty;
 
 SDirectXRootSignature::SDirectXRootSignature(IRHIDevice* Owner, ComPtr<ID3D12RootSignature> pRootSignature)
 	: Super(Owner)

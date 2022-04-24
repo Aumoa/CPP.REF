@@ -3,7 +3,7 @@
 #include "DirectXDeviceChild.h"
 #include "DirectXDevice.h"
 
-GENERATE_BODY(SDirectXDeviceChild);
+using namespace ::libty;
 
 SDirectXDeviceChild::SDirectXDeviceChild(IRHIDevice* Owner)
 	: Super(Owner->GetFactory())

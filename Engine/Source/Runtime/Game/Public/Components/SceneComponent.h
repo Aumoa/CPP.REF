@@ -13,7 +13,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// A SceneComponent has a transform and supports attachment, but has no rendering or collision capabilities.
 	/// </summary>
-	class GAME_API SSceneComponent : extends(SActorComponent)
+	class GAME_API SSceneComponent : public SActorComponent
 	{
 		GENERATED_BODY(SSceneComponent);
 

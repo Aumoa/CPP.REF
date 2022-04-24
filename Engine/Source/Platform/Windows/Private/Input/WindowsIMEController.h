@@ -2,19 +2,20 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "WindowsIncludes.h"
-#include "Input/IPlatformIME.h"
 
-class SWindowsIMEController : implements SObject, implements IPlatformIME
+namespace libty::inline Windows
 {
-	GENERATED_BODY(SWindowsIMEController)
+	class SWindowsIMEController : implements(SObject, IPlatformIME)
+	{
+		GENERATED_BODY(SWindowsIMEController)
 
-private:
-	static SWindowsIMEController* sInstance;
+	private:
+		static SWindowsIMEController* sInstance;
 
-public:
-	SWindowsIMEController();
+	public:
+		SWindowsIMEController();
 
-	static void ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-};
+		static void ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	};
+}

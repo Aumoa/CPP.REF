@@ -9,7 +9,7 @@
 
 using namespace ::libty;
 
-class SImage::SRenderElement : extends(SObject), implements(IRenderSlateElement)
+class SImage::SRenderElement : implements(SObject, IRenderSlateElement)
 {
 	GENERATED_BODY(SRenderElement);
 

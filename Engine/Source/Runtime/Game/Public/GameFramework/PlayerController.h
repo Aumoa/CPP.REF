@@ -13,7 +13,7 @@ namespace libty::inline Game
 	/// <summary>
 	/// Represents controller that possess to pawn, process player input, etc...
 	/// </summary>
-	class GAME_API APlayerController : extends(AController)
+	class GAME_API APlayerController : public AController
 	{
 		GENERATED_BODY(APlayerController);
 

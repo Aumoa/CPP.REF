@@ -3,10 +3,9 @@
 #include "DirectXShaderCodeWorkspace.h"
 #include "DirectXShaderCodeBlob.h"
 #include "DirectXDevice.h"
-#include "RHI/RHIExceptions.h"
 #include <filesystem>
 
-GENERATE_BODY(SDirectXShaderCodeWorkspace);
+using namespace ::libty;
 
 SDirectXShaderCodeWorkspace::SDirectXShaderCodeWorkspace(SDirectXDevice* Owner)
 	: Super(Owner)
@@ -18,7 +17,7 @@ void SDirectXShaderCodeWorkspace::AddShaderCode(std::wstring_view Name, const RH
 	auto Emplace_it = ShaderCodes.emplace(Name, Code);
 	if (!Emplace_it.second)
 	{
-		throw shader_compiler_exception("DirectX", "ShaderCodeName duplicated.");
+		throw ShaderCompilerException("DirectX", "ShaderCodeName duplicated.");
 	}
 }
 
@@ -38,7 +37,7 @@ void SDirectXShaderCodeWorkspace::Compile()
 			{
 				if (pError)
 				{
-					throw shader_compiler_exception("DirectX", std::format("Compile error occurred while compile '{}' shader code. ErrorTrace: \n{}", AId, std::string_view((const char*)pError->GetBufferPointer())));
+					throw ShaderCompilerException("DirectX", std::format("Compile error occurred while compile '{}' shader code. ErrorTrace: \n{}", AId, std::string_view((const char*)pError->GetBufferPointer())));
 				}
 				else
 				{

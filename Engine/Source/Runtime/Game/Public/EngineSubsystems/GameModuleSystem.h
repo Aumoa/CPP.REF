@@ -9,7 +9,7 @@ namespace libty::inline Game
 	class SGameInstance;
 	class SGameModule;
 
-	class GAME_API SGameModuleSystem : extends(SGameEngineSubsystem)
+	class GAME_API SGameModuleSystem : public SGameEngineSubsystem
 	{
 		GENERATED_BODY(SGameModuleSystem)
 
