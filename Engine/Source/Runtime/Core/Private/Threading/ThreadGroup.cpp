@@ -58,7 +58,7 @@ public:
 		}
 
 		_promise.emplace();
-		_source->_immQueue.cv.notify_all();
+		_source->_immQueue.cv.NotifyAll();
 
 		return _promise->get_future();
 	}
@@ -165,7 +165,7 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 			lock.lock();
 		}
 
-		_immQueue.cv.wait(lock, [this, mythread]
+		_immQueue.cv.Wait(lock, [this, mythread]
 		{
 			return _immQueue.queue.size() > 0
 				|| _suspendToken->IsJoinRequested();
@@ -218,11 +218,11 @@ void ThreadGroup::Timer(std::stop_token cancellationToken)
 
 		if (wait.has_value())
 		{
-			_delQueue.cv.wait_until(lock, *wait);
+			_delQueue.cv.WaitUntil(lock, *wait);
 		}
 		else
 		{
-			_delQueue.cv.wait(lock);
+			_delQueue.cv.Wait(lock);
 		}
 	}
 }

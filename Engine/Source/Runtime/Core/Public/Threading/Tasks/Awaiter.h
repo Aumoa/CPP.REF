@@ -6,19 +6,19 @@
 #include "Exceptions/InvalidOperationException.h"
 #include "Exceptions/TaskCanceledException.h"
 #include "Misc/VoidableOptional.h"
+#include "Threading/Spinlock.h"
+#include "Threading/SpinlockConditionVariable.h"
 #include <coroutine>
-#include <mutex>
 #include <queue>
-#include <condition_variable>
 
 namespace libty::inline Core
 {
 	template<class T>
 	class Awaiter : public IAwaiter
 	{
-		std::mutex _lock;
+		Spinlock _lock;
 		VoidableOptional<T> _promise;
-		std::condition_variable _future;
+		SpinlockConditionVariable _future;
 		ETaskStatus _status = ETaskStatus::Created;
 		std::queue<std::function<void(Task<void>)>> _thens;
 		std::exception_ptr _exception;
@@ -73,8 +73,8 @@ namespace libty::inline Core
 
 		virtual void Wait() override
 		{
-			auto lock = std::unique_lock(_lock);
-			_future.wait(lock, [this] { return IsCompleted(); });
+			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+			_future.Wait(lock, [this] { return IsCompleted(); });
 		}
 
 		virtual void Then(std::function<void(Task<void>)> proc) override
@@ -104,7 +104,7 @@ namespace libty::inline Core
 				_exception = std::make_exception_ptr(TaskCanceledException(nullptr, source));
 				_source = source;
 
-				_future.notify_all();
+				_future.NotifyAll();
 				lock.unlock();
 				InvokeThens();
 			}
@@ -127,7 +127,7 @@ namespace libty::inline Core
 				_exception = ptr;
 				_source = source;
 
-				_future.notify_all();
+				_future.NotifyAll();
 				lock.unlock();
 				InvokeThens();
 			}
@@ -139,7 +139,7 @@ namespace libty::inline Core
 
 		virtual std::exception_ptr GetException()
 		{
-			auto lock = std::unique_lock(_lock);
+			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
 			return _exception;
 		}
 
@@ -216,7 +216,7 @@ namespace libty::inline Core
 				_promise.Emplace(std::forward<U>(result)...);
 				_source = source;
 
-				_future.notify_all();
+				_future.NotifyAll();
 				lock.unlock();
 				InvokeThens();
 			}

@@ -68,6 +68,7 @@ if (const bool b = (bool)(x); !b) \
 
 #else
 
+#define check(x)
 #define checkf(x, format, ...)
 #define ensure(x) (x)
 #define ensureMsgf(x, format, ...) (x)

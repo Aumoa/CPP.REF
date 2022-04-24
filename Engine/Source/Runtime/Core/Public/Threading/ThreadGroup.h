@@ -2,19 +2,23 @@
 
 #pragma once
 
+#include "Threading/Spinlock.h"
+#include "Threading/SpinlockConditionVariable.h"
 #include <chrono>
 #include <thread>
 #include <functional>
 #include <string_view>
 #include <stop_token>
-#include <mutex>
 #include <queue>
-#include <condition_variable>
 
 namespace libty::inline Core
 {
 	class CORE_API ThreadGroup
 	{
+		ThreadGroup(const ThreadGroup&) = delete;
+		ThreadGroup& operator =(const ThreadGroup&) = delete;
+
+	private:
 		class ThreadGroupSuspendToken;
 		using clock = std::chrono::steady_clock;
 
@@ -32,14 +36,14 @@ namespace libty::inline Core
 		template<class TWork>
 		struct WorkQueue
 		{
-			std::mutex lock;
+			Spinlock lock;
 			std::queue<TWork> queue;
-			std::condition_variable cv;
+			SpinlockConditionVariable cv;
 
 			void enqueue(TWork&& work)
 			{
 				queue.emplace(std::move(work));
-				cv.notify_one();
+				cv.NotifyOne();
 			}
 
 			TWork dequeue()
