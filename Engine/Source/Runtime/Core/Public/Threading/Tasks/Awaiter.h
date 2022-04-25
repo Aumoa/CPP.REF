@@ -104,9 +104,10 @@ namespace libty::inline Core
 				_exception = std::make_exception_ptr(TaskCanceledException(nullptr, source));
 				_source = source;
 
+				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
 				_future.NotifyAll();
 				lock.unlock();
-				InvokeThens();
+				InvokeThens(std::move(thens));
 			}
 			else
 			{
@@ -127,9 +128,10 @@ namespace libty::inline Core
 				_exception = ptr;
 				_source = source;
 
+				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
 				_future.NotifyAll();
 				lock.unlock();
-				InvokeThens();
+				InvokeThens(std::move(thens));
 			}
 			else
 			{
@@ -216,9 +218,10 @@ namespace libty::inline Core
 				_promise.Emplace(std::forward<U>(result)...);
 				_source = source;
 
+				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
 				_future.NotifyAll();
 				lock.unlock();
-				InvokeThens();
+				InvokeThens(std::move(thens));
 			}
 			else
 			{
@@ -226,11 +229,11 @@ namespace libty::inline Core
 			}
 		}
 
-		void InvokeThens()
+		void InvokeThens(std::queue<std::function<void(Task<void>)>> thens)
 		{
-			for (; !_thens.empty(); _thens.pop())
+			for (; !thens.empty(); thens.pop())
 			{
-				Invoke(_thens.front());
+				Invoke(thens.front());
 			}
 		}
 

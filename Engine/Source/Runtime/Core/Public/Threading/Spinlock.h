@@ -144,18 +144,21 @@ public:
 		{
 			_lck->Lock();
 		}
+
+		_owns = true;
 	}
 
 	bool try_lock()
 	{
 		if (_readonly)
 		{
-			return _lck->TryLockReadonly();
+			_owns = _lck->TryLockReadonly();
 		}
 		else
 		{
-			return _lck->TryLock();
+			_owns = _lck->TryLock();
 		}
+		return _owns;
 	}
 
 	void unlock()
@@ -168,6 +171,8 @@ public:
 		{
 			_lck->Unlock();
 		}
+
+		_owns = false;
 	}
 
 	unique_lock& operator =(unique_lock&& rhs) noexcept
