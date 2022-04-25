@@ -3,48 +3,49 @@
 #pragma once
 
 #include "Delegates/MulticastEvent.h"
-#include <atomic>
+#include "Threading/Spinlock.h"
+#include "Threading/SpinlockConditionVariable.h"
+#include "Threading/Tasks/Task.h"
+#include "Threading/Tasks/TaskCompletionSource.h"
+#include "Diagnostics/LogEntry.h"
+#include "Misc/SingletonSupports.h"
 #include <fstream>
-#include <future>
+#include <queue>
+#include <atomic>
 
 namespace libty::inline Core
 {
 	class Thread;
-}
 
-namespace libty::inline Core
-{
-	struct LogEntry;
-
-	class CORE_API LogModule
+	class CORE_API LogModule : public SingletonSupports<LogModule>
 	{
 		using This = LogModule;
 
 	private:
-		std::wstring ModuleName;
-		Thread* WorkerThread = nullptr;
-		std::atomic<bool> bRunning;
-		std::ofstream LogFile;
+		std::wstring _name;
+		Thread* _thread = nullptr;
+		std::stop_source _stopSource;
+		std::ofstream _logFile;
 
-		struct Storage;
-		Storage* Impl = nullptr;
+		Spinlock _mutex;
+		SpinlockConditionVariable _cv;
+		std::vector<LogEntry> _entries;
 
 	public:
-		LogModule(std::wstring_view ModuleName, size_t QueueSize = 1024);
+		LogModule(std::wstring_view moduleName);
 		~LogModule() noexcept;
 
-		void RunTask();
-		void Shutdown() noexcept;
+		Task<> StartAsync(std::stop_token cancellationToken = {});
+		Task<> StopAsync(std::stop_token cancellationToken = {});
+
 		void EnqueueLogMessage(LogEntry&& entry);
 		bool IsRunning();
-
-		static LogModule* Get();
 
 	public:
 		DECLARE_MULTICAST_EVENT(LoggedEvent, const LogEntry&);
 		LoggedEvent Logged;
 
 	private:
-		void Worker();
+		void Worker(TaskCompletionSource<>* init, std::stop_token cancellationToken);
 	};
 }

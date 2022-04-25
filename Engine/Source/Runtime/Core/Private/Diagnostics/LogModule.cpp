@@ -5,143 +5,100 @@
 #include "Diagnostics/LogEntry.h"
 #include "Misc/DateTime.h"
 #include "Misc/String.h"
-#include "Misc/PlatformMacros.h"
 #include "Threading/Thread.h"
 #include <filesystem>
-#include <chrono>
-#include <atomic>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
 #include <iostream>
-#include <syncstream>
-
-#if PLATFORM_WINDOWS
-#include <Windows.h>
-#endif
 
 using namespace libty;
 
-static LogModule* gModule;
-
-struct LogModule::Storage
+LogModule::LogModule(std::wstring_view moduleName)
+	: SingletonSupports(this)
+	, _name(moduleName)
 {
-	std::mutex Lock;
-	std::queue<LogEntry> Works;
-	std::condition_variable Cond;
-};
-
-LogModule::LogModule(std::wstring_view ModuleName, size_t QueueSize)
-	: ModuleName(ModuleName)
-{
-	checkf(gModule == nullptr, L"Module is already initialized.");
-	gModule = this;
-	Impl = new Storage();
 }
 
 LogModule::~LogModule()
 {
-	Shutdown();
 }
 
-void LogModule::RunTask()
+Task<> LogModule::StartAsync(std::stop_token cancellationToken)
 {
-	using namespace std::filesystem;
+	using namespace ::std::filesystem;
 
-	path Directory = L"Saved/Logs";
-	path LogPath = String::Format(L"{}.log", ModuleName);
+	path directory = L"Saved/Logs";
+	path logPath = directory / path(String::Format(L"{}.log", _name));
 
-	if (!exists(Directory))
+	if (exists(logPath))
 	{
-		create_directories(Directory);
+		path newPath = path(logPath)
+			.replace_filename(String::Format(L"{}_{}.log", _name, DateTime::Now().ToString<DateTimeFormat::File>()));
+		rename(logPath, newPath);
 	}
-	else if (exists(Directory / LogPath))
+	else if (!exists(directory))
 	{
-		auto BackupTime = DateTime::Now().ToString<libty::DateTimeFormat::File>();
-		path BackupPath = String::ReplaceAll(String::Format(L"{}_{}.log", ModuleName, BackupTime), L":", L"-");
-		rename(Directory / LogPath, Directory / BackupPath);
+		create_directory(directory);
 	}
 
-	LogFile.open(Directory / LogPath, std::ios::trunc | std::ios::out);
-	checkf(LogFile.is_open(), L"Couldn't open log file.");
+	_logFile.open(logPath, std::ios::trunc | std::ios::out);
+	if (!_logFile.is_open())
+	{
+		throw InvalidOperationException("Cannot open file.");
+	}
 
-	bRunning = true;
-	WorkerThread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this));
+	auto tsc = TaskCompletionSource<>::Create();
+	_thread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this, &tsc, _stopSource.get_token()));
+
+	co_await tsc.GetTask();
 }
 
-void LogModule::Shutdown() noexcept
+Task<> LogModule::StopAsync(std::stop_token cancellationToken)
 {
-	if (bRunning)
-	{
-		Logged.Clear();
-
-		gModule = nullptr;
-		bRunning = false;
-
-		Impl->Cond.notify_all();
-		WorkerThread->Join();
-		LogFile.close();
-
-		delete Impl;
-		Impl = nullptr;
-	}
+	_stopSource.request_stop();
+	_cv.NotifyOne();
+	return _thread->JoinAsync();
 }
 
 void LogModule::EnqueueLogMessage(LogEntry&& entry)
 {
-	std::unique_lock Lock(Impl->Lock);
-	Impl->Works.emplace(std::move(entry).Generate());
-	Impl->Cond.notify_one();
+	std::unique_lock lock(_mutex);
+	_entries.emplace_back(std::move(entry).Generate());
+	_cv.NotifyOne();
 }
 
 bool LogModule::IsRunning()
 {
-	return bRunning;
+	return _stopSource.stop_requested();
 }
 
-LogModule* LogModule::Get()
-{
-	return gModule;
-}
-
-void LogModule::Worker()
+void LogModule::Worker(TaskCompletionSource<>* init, std::stop_token cancellationToken)
 {
 	using namespace std::literals;
 	using namespace std::chrono;
 
 	steady_clock::time_point Curr = steady_clock::now();
+	std::vector<LogEntry> entries;
+	init->SetResult();
 
-	while (bRunning)
+	while (!cancellationToken.stop_requested())
 	{
-		std::unique_lock Lock(Impl->Lock);
-		Impl->Cond.wait(Lock, [this]() { return Impl->Works.size() > 0; });
+		std::unique_lock lock(_mutex);
+		_cv.Wait(lock, [this, &cancellationToken]() { return _entries.size() > 0 || cancellationToken.stop_requested(); });
 
-		std::queue<LogEntry> Works;
-		std::swap(Works, Impl->Works);
-
-		Lock.unlock();
+		std::swap(entries, _entries);
+		lock.unlock();
 
 		// Write messages.
-		while (!Works.empty())
+		for (auto& entry : entries)
 		{
-			auto& Entry = Works.front();
-			LogFile << String::AsMultibyte(Entry.ToString(true)) << std::endl;
-			Logged.Broadcast(Entry);
-			if (Entry.Category->GetArguments().bLogToConsole)
+			_logFile << String::AsMultibyte(entry.ToString(true)) << std::endl;
+			Logged.Broadcast(entry);
+			if (entry.Category->GetArguments().bLogToConsole)
 			{
-				std::wosyncstream(std::wcout) << Entry.ToString() << std::endl;
+				std::wcout << entry.ToString() << std::endl;
 			}
-
-			if (Entry.Category->GetArguments().bLogToDebugger)
-			{
-#if PLATFORM_WINDOWS
-				// Log to Visual Studio Output Console.
-				OutputDebugStringW((std::wstring(Entry.ToString(true)) + L"\n"s).c_str());
-#endif
-			}
-			Works.pop();
 		}
 
-		LogFile.flush();
+		entries.clear();
+		_logFile.flush();
 	}
 }

@@ -52,7 +52,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	int32 ErrorCode;
 
 	auto Logger = std::make_unique<LogModule>(String::AsUnicode(SE_APPLICATION));
-	Logger->RunTask();
+	Logger->StartAsync().Wait();
 
 	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
 
@@ -112,7 +112,7 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 	GC->Collect(true);
 	GC->Shutdown(true);
 
-	Logger->Shutdown();
+	Logger->StopAsync().Wait();
 	return ErrorCode;
 }
 

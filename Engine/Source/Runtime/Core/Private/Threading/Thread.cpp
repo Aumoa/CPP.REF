@@ -36,7 +36,7 @@ Thread::Thread()
 #endif
 
 	SToken = new ThreadSuspendToken(this);
-	JoinFuture = JoinPromise.get_future();
+	JoinSource = TaskCompletionSource<>::Create();
 }
 
 Thread::~Thread()
@@ -74,7 +74,12 @@ void Thread::ResumeThread()
 
 void Thread::Join()
 {
-	JoinFuture.get();
+	JoinSource.GetTask().Wait();
+}
+
+Task<> Thread::JoinAsync()
+{
+	return JoinSource.GetTask();
 }
 
 std::wstring Thread::GetFriendlyName() const
@@ -109,8 +114,17 @@ Thread* Thread::CreateThread(std::wstring_view FriendlyName, std::function<void(
 		MyThread->bIsManaged = true;
 
 		ThreadPtr.set_value(MyThread);
-		ThreadEntry();
-		MyThread->JoinPromise.set_value();
+		try
+		{
+			ThreadEntry();
+		}
+		catch (...)
+		{
+			MyThread->JoinSource.SetException(std::current_exception());
+			return;
+		}
+
+		MyThread->JoinSource.SetResult();
 	}).detach();
 
 	return ThreadPtrFuture.get();

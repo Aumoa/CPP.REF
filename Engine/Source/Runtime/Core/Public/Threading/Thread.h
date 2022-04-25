@@ -6,6 +6,8 @@
 #include "ISuspendToken.h"
 #include "Misc/NonCopyable.h"
 #include "Misc/PlatformMacros.h"
+#include "Threading/Tasks/Task.h"
+#include "Threading/Tasks/TaskCompletionSource.h"
 #include <string>
 #include <future>
 #include <functional>
@@ -46,8 +48,7 @@ namespace libty::inline Core
 		bool bIsManaged = false;
 		ThreadSuspendToken* SToken = nullptr;
 
-		std::promise<void> JoinPromise;
-		std::future<void> JoinFuture;
+		TaskCompletionSource<> JoinSource;
 		std::mutex SuspendMtx;
 		std::condition_variable SuspendCv;
 
@@ -61,6 +62,7 @@ namespace libty::inline Core
 		void SuspendThread();
 		void ResumeThread();
 		void Join();
+		Task<> JoinAsync();
 
 		std::wstring GetFriendlyName() const;
 		std::thread::id GetThreadId() const;
