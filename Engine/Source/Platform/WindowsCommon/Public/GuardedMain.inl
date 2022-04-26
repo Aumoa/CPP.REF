@@ -40,6 +40,12 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 #if DO_CHECK
 	return EXCEPTION_CONTINUE_SEARCH;
 #else
+
+	if (auto* Module = ::libty::LogModule::Get())
+	{
+		Module->StopAsync().Wait();
+	}
+
 	return EXCEPTION_EXECUTE_HANDLER;
 #endif
 }
@@ -58,10 +64,6 @@ int32 GuardedMain(std::span<std::wstring> Argv)
 	}
 	__except (ReportCrash(GetExceptionCode(), GetExceptionInformation()))
 	{
-		if (auto* Module = ::libty::LogModule::Get())
-		{
-			Module->Shutdown();;
-		}
 	}
 #endif
 
