@@ -34,6 +34,7 @@ namespace libty::inline Core
 
 		virtual void SetException(std::exception_ptr ptr, std::source_location source = std::source_location::current()) = 0;
 		virtual std::exception_ptr GetException() = 0;
+		virtual std::source_location GetCompletionSource() = 0;
 
 		bool await_ready()
 		{
@@ -45,8 +46,9 @@ namespace libty::inline Core
 		{
 			Then([this, coroutine, awaiter = coroutine.promise().GetAwaiter()](auto)
 			{
-				if (IsCanceled())
+				if (IsCanceled() || awaiter->_Invoke_cancel_requested())
 				{
+					awaiter->Cancel();
 					coroutine.destroy();
 				}
 				else
@@ -54,6 +56,15 @@ namespace libty::inline Core
 					coroutine.resume();
 				}
 			});
+		}
+
+	protected:
+		virtual bool _Cancel_requested() = 0;
+
+	private:
+		inline bool _Invoke_cancel_requested()
+		{
+			return this->_Cancel_requested();
 		}
 	};
 }

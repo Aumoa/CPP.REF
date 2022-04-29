@@ -90,7 +90,7 @@ public:
 	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, ::libty::Core::Spinlock::Readonly_t isReadonly) noexcept
 		: _lck(&lck)
 		, _readonly(true)
-		, _owns(false)
+		, _owns(true)
 	{
 		_lck->LockReadonly();
 	}

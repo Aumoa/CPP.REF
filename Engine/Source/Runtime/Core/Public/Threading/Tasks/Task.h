@@ -102,6 +102,14 @@ namespace libty::inline Core
 				auto awaiter = task.GetAwaiter();
 				return WrapSharedAwaiter(std::move(awaiter));
 			}
+
+			template<class T> requires
+				requires { std::declval<Awaiter<T>>()._Co_push_impl(std::declval<co_push<T>&&>()); }
+			auto yield_value(co_push<T>&& push)
+			{
+				_awaiter->_Co_push_impl(std::move(push));
+				return std::suspend_never();
+			}
 		};
 
 		template<class T>
