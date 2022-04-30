@@ -15,6 +15,7 @@ namespace libty::inline Game
 		GENERATED_BODY(SGameLevelSystem);
 
 	private:
+		SPROPERTY(_GameWorld);
 		SWorld* _GameWorld = nullptr;
 
 	public:
