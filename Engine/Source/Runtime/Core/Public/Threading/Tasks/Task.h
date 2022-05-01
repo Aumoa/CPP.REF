@@ -269,15 +269,36 @@ namespace libty::inline Core
 
 			_awaiter->Then([body = std::forward<TBody>(body), uAwaiter, source](Task<> result) mutable
 			{
-				if constexpr (std::same_as<U, void>)
+				try
 				{
-					body((Task<T>)result);
-					uAwaiter->SetResult(source);
+					if constexpr (std::same_as<U, void>)
+					{
+						if (result.IsCanceled())
+						{
+							uAwaiter->Cancel(source);
+						}
+						else
+						{
+							body((Task<T>)result);
+							uAwaiter->SetResult(source);
+						}
+					}
+					else
+					{
+						if (result.IsCanceled())
+						{
+							uAwaiter->Cancel(source);
+						}
+						else
+						{
+							auto r = body((Task<T>)result);
+							uAwaiter->SetResult(std::move(r), source);
+						}
+					}
 				}
-				else
+				catch (const std::exception&)
 				{
-					auto r = body((Task<T>)result);
-					uAwaiter->SetResult(std::move(r), source);
+					uAwaiter->SetException(std::current_exception(), source);
 				}
 			});
 
@@ -404,7 +425,7 @@ namespace libty::inline Core
 				});
 			}
 
-			return awaiter;
+			return Task<>(awaiter);
 		}
 
 		template<class... TTasks>

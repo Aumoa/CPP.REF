@@ -13,6 +13,7 @@ public class Core : ModuleRule
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
+        NonUnityBuild = true;
 
         PublicDisableWarnings.AddRange(new[]
         {

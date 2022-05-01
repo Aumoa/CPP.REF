@@ -34,7 +34,7 @@ if (const bool b = (bool)(x); !b) \
 }
 
 #define ensure(x) \
-[b = (bool)(x)](const std::source_location& location = std::source_location::current())\
+[&, b = (bool)(x)](const std::source_location& location = std::source_location::current())\
 {\
 	if (!b)\
 	{\
@@ -50,7 +50,7 @@ if (const bool b = (bool)(x); !b) \
 	return b;\
 }()
 #define ensureMsgf(x, fmt, ...) \
-[b = (bool)(x)](const std::source_location& location = std::source_location::current())\
+[&, b = (bool)(x)](const std::source_location& location = std::source_location::current())\
 {\
 	if (!b)\
 	{\
