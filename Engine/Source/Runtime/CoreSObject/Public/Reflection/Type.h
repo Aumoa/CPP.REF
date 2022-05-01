@@ -173,6 +173,11 @@ namespace libty::inline Core
 		virtual bool IsImplemented(SType* baseTypeOrInterface);
 
 		/// <summary>
+		/// Gets a value indicating whether the Type is constructible without any parameters.
+		/// </summary>
+		virtual bool IsConstructible();
+
+		/// <summary>
 		/// Instantiate specified type with default constructor.
 		/// </summary>
 		virtual SObject* Instantiate();

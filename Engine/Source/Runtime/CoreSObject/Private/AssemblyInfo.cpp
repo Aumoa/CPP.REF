@@ -15,6 +15,16 @@
 #include "Reflection/MethodInfo.h"
 #include "Reflection/Type.h"
 
+#include "DependencyInjection/ObjectFactory.h"
+#include "DependencyInjection/ObjectFactoryBuilder.h"
+#include "DependencyInjection/ServiceType.h"
+#include "DependencyInjection/IServiceProvider.h"
+#include "DependencyInjection/InjectionErrorCode.h"
+#include "DependencyInjection/IServiceCollection.h"
+#include "DependencyInjection/IHostedService.h"
+
+#include "Reflection/FieldInfoMetadataGenerator.Impl.h"
+
 DEFINE_ASSEMBLY_INFO;
 
 GENERATE_BODY(libty::Core::IDisposable);
@@ -31,3 +41,12 @@ GENERATE_BODY(libty::Core::Reflection::SEnum);
 GENERATE_BODY(libty::Core::Reflection::SFieldInfo);
 GENERATE_BODY(libty::Core::Reflection::SMemberInfo);
 GENERATE_BODY(libty::Core::Reflection::SMethodInfo);
+
+GENERATE_BODY(libty::Core::SObjectFactory);
+GENERATE_BODY(libty::Core::SObjectFactory::InjectionInfo);
+GENERATE_BODY(libty::Core::SObjectFactoryBuilder);
+GENERATE_BODY(libty::Core::EServiceType);
+GENERATE_BODY(libty::Core::IServiceProvider);
+GENERATE_BODY(libty::Core::EInjectionErrorCode);
+GENERATE_BODY(libty::Core::IServiceCollection);
+GENERATE_BODY(libty::Core::IHostedService);

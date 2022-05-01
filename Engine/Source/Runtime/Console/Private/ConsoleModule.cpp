@@ -5,6 +5,8 @@
 
 using namespace ::libty;
 
+DEFINE_LOG_CATEGORY(LogConsole);
+
 SConsoleModule::SConsoleModule() : Super()
 {
 }
@@ -13,43 +15,21 @@ SConsoleModule::~SConsoleModule() noexcept
 {
 }
 
-int32 SConsoleModule::Main(const CommandLine& CommandArgs)
+int32 SConsoleModule::Main(const CommandLine& commandLine)
 {
-	for (auto& SubsystemClass : SType::GetDerivedTypes(typeof(SConsoleModuleSubsystem)))
+	SharedPtr builder = SObjectFactory::CreateBuilder();
+	Configure(builder.Get());
+	try
 	{
-		if (!SubsystemClass->IsA(typeof(SConsoleModuleSubsystem)))
-		{
-			auto* Subsystem = *Subsystems.emplace(Cast<SConsoleModuleSubsystem>(SubsystemClass->Instantiate())).first;
-			Subsystem->Init();
-		}
+		_sp = Cast<SObjectFactory>(builder->Build());
+		_sp->StartAsync().GetResult();
+		_sp->GetServiceTask().GetResult();
+	}
+	catch (const std::exception& e)
+	{
+		SE_LOG(LogConsole, Error, L"Unhandled exception detected. Exception: {0}", String::AsUnicode(e.what()));
+		std::rethrow_exception(std::current_exception());
 	}
 
-	int32 ReturnCode = Run(CommandArgs);
-
-	// Cleanup subsystems.
-	for (auto& Subsystem : Subsystems)
-	{
-		Subsystem->Deinit();
-	}
-
-	Subsystems.clear();
-
-	return ReturnCode;
-}
-
-SConsoleModuleSubsystem* SConsoleModule::GetSubsystem(SType* SubsystemClass)
-{
-	auto It = CachedSubsystemView.find(SubsystemClass->GetHashCode());
-	if (It == CachedSubsystemView.end())
-	{
-		for (auto& Subsystem : Subsystems)
-		{
-			if (Subsystem->GetType()->IsDerivedFrom(SubsystemClass))
-			{
-				CachedSubsystemView.emplace(SubsystemClass->GetHashCode(), Subsystem);
-				return Subsystem;
-			}
-		}
-	}
-	return It->second;
+	return 0;
 }

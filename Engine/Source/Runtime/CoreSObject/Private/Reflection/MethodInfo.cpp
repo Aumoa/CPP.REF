@@ -48,6 +48,11 @@ SType* SMethodInfo::GetReturnType()
 	return _meta.ReturnType;
 }
 
+std::span<SType*> SMethodInfo::GetParameters()
+{
+	return _meta.ParameterTypes;
+}
+
 SObject* SMethodInfo::Invoke(SObject* self, std::span<SObject* const> args)
 {
 	return _meta.Invoker(self, args);

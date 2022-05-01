@@ -39,6 +39,7 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 	{
 		SharedPtr cModule = loader();
+
 		if (!cModule.IsValid())
 		{
 			throw FatalException("'LoadConsoleModule' function return nullptr.'");

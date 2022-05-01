@@ -214,6 +214,11 @@ bool SType::IsImplemented(SType* baseTypeOrInterface)
 	}
 }
 
+bool SType::IsConstructible()
+{
+	return (bool)_meta.Constructor;
+}
+
 SObject* SType::Instantiate()
 {
 	if (_meta.Constructor)

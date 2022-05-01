@@ -11,25 +11,15 @@ namespace libty::inline Console
 		GENERATED_BODY(SConsoleModule);
 
 	private:
-		SPROPERTY(Subsystems)
-		std::set<SConsoleModuleSubsystem*> Subsystems;
+		SPROPERTY(_sp)
+		SObjectFactory* _sp = nullptr;
 
 	public:
 		SConsoleModule();
 		virtual ~SConsoleModule() noexcept override;
 
-		int32 Main(const CommandLine& CommandArgs);
-		virtual int32 Run(const CommandLine& CommandArgs) = 0;
-
-		SConsoleModuleSubsystem* GetSubsystem(SType* SubsystemClass);
-		template<class T>
-		T* GetSubsystem()
-		{
-			return Cast<T>(GetSubsystem(T::StaticClass()));
-		}
-
-	private:
-		std::map<size_t, SConsoleModuleSubsystem*> CachedSubsystemView;
+		int32 Main(const CommandLine& commandLine);
+		virtual void Configure(IServiceCollection* collection) = 0;
 	};
 }
 
