@@ -56,6 +56,11 @@ namespace libty::inline Core::Reflection
 		virtual SType* GetReturnType();
 
 		/// <summary>
+		/// Get all parameters type of this method.
+		/// </summary>
+		virtual std::span<SType*> GetParameters();
+
+		/// <summary>
 		/// Invokes the method represented by the current instance, using the specified parameters.
 		/// </summary>
 		/// <param name="self"> The object on which to invoke the method. If a method is static, this argument is ignored. </param>

@@ -21,19 +21,40 @@ namespace libty::inline Core::Reflection
 		{
 			auto This = Cast<TOwningClass>(_This);
 			auto Value = Cast<TReflectType>(_Value);
-			(This->*field) = Value;
+			if constexpr (std::is_pointer_v<decltype(This)>)
+			{
+				(This->*field) = Value;
+			}
+			else
+			{
+				(This.*field) = Value;
+			}
 		};
 
 		Getter = [field](SObject* _This)
 		{
 			auto This = Cast<TOwningClass>(_This);
-			return Cast<SObject>(This->*field);
+			if constexpr (std::is_pointer_v<decltype(This)>)
+			{
+				return Cast<SObject>(This->*field);
+			}
+			else
+			{
+				return Cast<SObject>(This.*field);
+			}
 		};
 
 		GetterAny = [field](SObject* _This)
 		{
 			auto This = Cast<TOwningClass>(_This);
-			return This->*field;
+			if constexpr (std::is_pointer_v<decltype(This)>)
+			{
+				return This->*field;
+			}
+			else
+			{
+				return This.*field;
+			}
 		};
 
 		FieldType = typeof(TReflectType);
