@@ -28,11 +28,6 @@ Thread::Thread()
 	{
 		FriendlyName = pwThreadDesc;
 	}
-
-	if (String::Trim(FriendlyName).empty())
-	{
-		FriendlyName = std::to_wstring(tid);
-	}
 #endif
 
 	SToken = new ThreadSuspendToken(this);

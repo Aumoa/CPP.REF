@@ -5,7 +5,9 @@ DEFINE_ASSEMBLY_INFO;
 #include "ConsoleModule.h"
 #include "ConsoleModuleSubsystem.h"
 #include "ConsoleApplication.h"
+#include "ConsoleColor.h"
 
 GENERATE_BODY(libty::Console::SConsoleModule);
 GENERATE_BODY(libty::Console::SConsoleModuleSubsystem);
 GENERATE_BODY(libty::Console::SConsoleApplication);
+GENERATE_BODY(libty::Console::EConsoleColor);

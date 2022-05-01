@@ -8,18 +8,21 @@
 #include "Threading/Tasks/Task.h"
 #include "Threading/Tasks/TaskCompletionSource.h"
 #include "Diagnostics/LogEntry.h"
-#include "Misc/SingletonSupports.h"
 #include <fstream>
-#include <queue>
 #include <atomic>
+#include <variant>
 
 namespace libty::inline Core
 {
 	class Thread;
 
-	class CORE_API LogModule : public SingletonSupports<LogModule>
+	class CORE_API LogModule
 	{
 		using This = LogModule;
+		using Variant_t = std::variant<LogEntry, std::function<void()>>;
+
+	private:
+		static LogModule* sInstance;
 
 	private:
 		std::wstring _name;
@@ -29,7 +32,7 @@ namespace libty::inline Core
 
 		Spinlock _mutex;
 		SpinlockConditionVariable _cv;
-		std::vector<LogEntry> _entries;
+		std::vector<Variant_t> _entries;
 
 	public:
 		LogModule(std::wstring_view moduleName);
@@ -39,13 +42,17 @@ namespace libty::inline Core
 		Task<> StopAsync(std::stop_token cancellationToken = {});
 
 		void EnqueueLogMessage(LogEntry&& entry);
+		void EnqueueLogAction(std::function<void()> action);
 		bool IsRunning();
+
+	public:
+		static inline LogModule* Get() noexcept { return sInstance; }
 
 	public:
 		DECLARE_MULTICAST_EVENT(LoggedEvent, const LogEntry&);
 		LoggedEvent Logged;
 
 	private:
-		void Worker(TaskCompletionSource<>* init, std::stop_token cancellationToken);
+		void Worker(std::stop_token cancellationToken);
 	};
 }

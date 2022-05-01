@@ -18,5 +18,6 @@ namespace libty::inline Console
 
 	private:
 		static void _Handle_sigint(int);
+		static void _Console_logged(const LogEntry& entry);
 	};
 }

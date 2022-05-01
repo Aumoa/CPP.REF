@@ -4,11 +4,11 @@
 
 #include "IMulticastDelegate.h"
 #include "DelegateHandle.h"
+#include "Threading/Spinlock.h"
 #include <functional>
 #include <map>
 #include <atomic>
 #include <concepts>
-#include <mutex>
 #include <memory>
 
 namespace libty::inline Core
@@ -55,7 +55,7 @@ namespace libty::inline Core
 			}
 		};
 
-		std::mutex _lock;
+		Spinlock _lock;
 		std::map<int64, DelegateInstance> _payload;
 		int64 _id = 0;
 
@@ -69,7 +69,7 @@ namespace libty::inline Core
 			std::vector<DelegateInstance> invokes;
 
 			{
-				std::unique_lock lock(_lock);
+				auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
 				invokes.reserve(_payload.size());
 				for (auto& instance : _payload)
 				{

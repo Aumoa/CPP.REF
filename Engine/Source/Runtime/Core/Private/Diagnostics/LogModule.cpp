@@ -11,14 +11,18 @@
 
 using namespace libty;
 
+LogModule* LogModule::sInstance;
+
 LogModule::LogModule(std::wstring_view moduleName)
-	: SingletonSupports(this)
-	, _name(moduleName)
+	: _name(moduleName)
 {
+	check(sInstance == nullptr);
+	sInstance = this;
 }
 
 LogModule::~LogModule()
 {
+	sInstance = nullptr;
 }
 
 Task<> LogModule::StartAsync(std::stop_token cancellationToken)
@@ -45,10 +49,8 @@ Task<> LogModule::StartAsync(std::stop_token cancellationToken)
 		throw InvalidOperationException("Cannot open file.");
 	}
 
-	auto tsc = TaskCompletionSource<>::Create();
-	_thread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this, &tsc, _stopSource.get_token()));
-
-	co_await tsc.GetTask();
+	_thread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this, _stopSource.get_token()));
+	return Task<>::CompletedTask();
 }
 
 Task<> LogModule::StopAsync(std::stop_token cancellationToken)
@@ -65,19 +67,24 @@ void LogModule::EnqueueLogMessage(LogEntry&& entry)
 	_cv.NotifyOne();
 }
 
-bool LogModule::IsRunning()
+void LogModule::EnqueueLogAction(std::function<void()> action)
 {
-	return _stopSource.stop_requested();
+	std::unique_lock lock(_mutex);
+	_entries.emplace_back(std::move(action));
+	_cv.NotifyOne();
 }
 
-void LogModule::Worker(TaskCompletionSource<>* init, std::stop_token cancellationToken)
+bool LogModule::IsRunning()
+{
+	return !_stopSource.stop_requested();
+}
+
+void LogModule::Worker(std::stop_token cancellationToken)
 {
 	using namespace std::literals;
 	using namespace std::chrono;
 
-	steady_clock::time_point Curr = steady_clock::now();
-	std::vector<LogEntry> entries;
-	init->SetResult();
+	std::vector<Variant_t> entries;
 
 	while (!cancellationToken.stop_requested())
 	{
@@ -87,14 +94,16 @@ void LogModule::Worker(TaskCompletionSource<>* init, std::stop_token cancellatio
 		std::swap(entries, _entries);
 		lock.unlock();
 
-		// Write messages.
 		for (auto& entry : entries)
 		{
-			_logFile << String::AsMultibyte(entry.ToString(true)) << std::endl;
-			Logged.Broadcast(entry);
-			if (entry.Category->GetArguments().bLogToConsole)
+			switch (entry.index())
 			{
-				std::wcout << entry.ToString() << std::endl;
+			case 0:  // LogEntry
+				Logged.Broadcast(std::get<0>(entry));
+				break;
+			case 1:
+				std::get<1>(entry)();
+				break;
 			}
 		}
 
