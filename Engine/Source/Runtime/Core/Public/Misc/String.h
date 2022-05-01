@@ -460,6 +460,36 @@ namespace libty::inline Core
 			return Str;
 		}
 
+		template<class StringL, class StringR>
+		static bool Equals(StringL&& sl, StringR&& sr, bool ignoreCase = false) requires
+			IString<StringL, StringChar_t<StringL>> &&
+			IString<StringR, StringChar_t<StringR>> &&
+			std::same_as<StringChar_t<StringL>, StringChar_t<StringR>>
+		{
+			using Char_t = StringChar_t<StringL>;
+			std::basic_string_view<Char_t> sls(std::forward<StringL>(sl));
+			std::basic_string_view<Char_t> srs(std::forward<StringR>(sr));
+
+			if (sls.length() != srs.length())
+			{
+				return false;
+			}
+
+			for (size_t i = 0; i < sls.length(); ++i)
+			{
+				if (ignoreCase && std::tolower(sls[i]) != std::tolower(srs[i]))
+				{
+					return false;
+				}
+				else if (sls[i] != srs[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		// String.{Platform}.cpp
 		static std::wstring AsUnicode(std::string_view source, uint32 codepage = 0);
 		static std::string AsMultibyte(std::wstring_view source, uint32 codepage = 0);
