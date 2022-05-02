@@ -28,6 +28,11 @@ public class Core : ModuleRule
                 "NOMINMAX",
                 "WIN32_LEAN_AND_MEAN"
             });
+
+            PrivateDisableWarnings.AddRange(new[]
+            {
+                5105
+            });
         }
     }
 }
