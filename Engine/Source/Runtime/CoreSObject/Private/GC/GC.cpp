@@ -41,7 +41,7 @@ void GarbageCollector::UnregisterObject(SObject* Object)
 
 GarbageCollector::~GarbageCollector()
 {
-	Shutdown(false);
+	//Shutdown(false);
 }
 
 void GarbageCollector::Init()

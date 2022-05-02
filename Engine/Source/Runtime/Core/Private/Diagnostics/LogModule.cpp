@@ -6,6 +6,8 @@
 #include "Misc/DateTime.h"
 #include "Misc/String.h"
 #include "Threading/Thread.h"
+#include "IO/Directory.h"
+#include "IO/File.h"
 #include <filesystem>
 #include <iostream>
 
@@ -32,15 +34,15 @@ Task<> LogModule::StartAsync(std::stop_token cancellationToken)
 	path directory = L"Saved/Logs";
 	path logPath = directory / path(String::Format(L"{}.log", _name));
 
-	if (exists(logPath))
+	if (File::Exists(logPath))
 	{
 		path newPath = path(logPath)
 			.replace_filename(String::Format(L"{}_{}.log", _name, DateTime::Now().ToString<DateTimeFormat::File>()));
 		rename(logPath, newPath);
 	}
-	else if (!exists(directory))
+	else if (!Directory::Exists(directory))
 	{
-		create_directory(directory);
+		Directory::TryCreateDirectory(directory);
 	}
 
 	_logFile.open(logPath, std::ios::trunc | std::ios::out);
