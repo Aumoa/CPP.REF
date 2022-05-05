@@ -239,37 +239,12 @@ struct Stacktrace::_Stacktrace_impl
 		}
 	};
 
-	HANDLE _hThread;
-	CONTEXT _threadCtx;
 	std::vector<Stackframe> _stackframes;
 
-	inline void CaptureCurrent() noexcept
+	inline void Capture(HANDLE hThread, CONTEXT* context) noexcept
 	{
 		PIMAGE_NT_HEADERS image = this->_Impl_symbol_load();
-
-		_hThread = GetCurrentThread();
-		RtlCaptureContext(&_threadCtx);
-		this->_Impl_stacktrace(image);
-	}
-
-	inline void Capture(HANDLE hThread) noexcept
-	{
-		PIMAGE_NT_HEADERS image = this->_Impl_symbol_load();
-
-		SuspendThread(hThread);
-		_hThread = hThread;
-		GetThreadContext(hThread, &_threadCtx);
-		this->_Impl_stacktrace(image);
-		ResumeThread(hThread);
-	}
-
-	inline void CaptureException(LPEXCEPTION_POINTERS lpExceptionPointers) noexcept
-	{
-		PIMAGE_NT_HEADERS image = this->_Impl_symbol_load();
-
-		_hThread = GetCurrentThread();
-		_threadCtx = *lpExceptionPointers->ContextRecord;
-		this->_Impl_stacktrace(image);
+		this->_Impl_stacktrace(image, hThread, context);
 	}
 
 private:
@@ -283,7 +258,7 @@ private:
 		return _Symbol_inst->ReloadSymbols();
 	}
 
-	inline void _Impl_stacktrace(PIMAGE_NT_HEADERS image) noexcept
+	inline void _Impl_stacktrace(PIMAGE_NT_HEADERS image, HANDLE hThread, CONTEXT* context) noexcept
 	{
 		if (image == nullptr)
 		{
@@ -291,17 +266,17 @@ private:
 		}
 
 		STACKFRAME64 S = {};
-		S.AddrPC.Offset = _threadCtx.Rip;
+		S.AddrPC.Offset = context->Rip;
 		S.AddrPC.Mode = AddrModeFlat;
-		S.AddrStack.Offset = _threadCtx.Rsp;
+		S.AddrStack.Offset = context->Rsp;
 		S.AddrStack.Mode = AddrModeFlat;
-		S.AddrFrame.Offset = _threadCtx.Rbp;
+		S.AddrFrame.Offset = context->Rbp;
 		S.AddrFrame.Mode = AddrModeFlat;
 		DWORD imageType = image->FileHeader.Machine;
 		HANDLE hProcess = _Symbol_inst->GetHandle();
 
 		_stackframes.reserve(128);
-		while (StackWalk64(imageType, hProcess, _hThread, &S, &_threadCtx, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)
+		while (StackWalk64(imageType, hProcess, hThread, &S, context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)
 			&& S.AddrReturn.Offset != 0)
 		{
 			_Symbol_info si(S.AddrPC.Offset);
@@ -340,22 +315,39 @@ std::span<const Stackframe> Stacktrace::GetStackframes() const noexcept
 
 Stacktrace Stacktrace::CaptureCurrent() noexcept
 {
+	HANDLE hThread = GetCurrentThread();
+
+	CONTEXT context;
+	RtlCaptureContext(&context);
+
 	Stacktrace s;
-	s._impl->CaptureCurrent();
+	s._impl->Capture(hThread, &context);
+
 	return s;
 }
 
 Stacktrace Stacktrace::Capture(Thread* thread) noexcept
 {
+	HANDLE hThread = (HANDLE)thread->GetNativeHandle();
+	SuspendThread(hThread);
+
+	CONTEXT context;
+	GetThreadContext(hThread, &context);
+
 	Stacktrace s;
-	s._impl->Capture((HANDLE)thread->GetNativeHandle());
+	s._impl->Capture(hThread, &context);
+
+	ResumeThread(hThread);
 	return s;
 }
 
 Stacktrace Stacktrace::CaptureException(void* exception_pointer) noexcept
 {
+	HANDLE hThread = GetCurrentThread();
+
 	Stacktrace s;
-	s._impl->CaptureException((LPEXCEPTION_POINTERS)exception_pointer);
+	s._impl->Capture(hThread, ((LPEXCEPTION_POINTERS)exception_pointer)->ContextRecord);
+
 	return s;
 }
 

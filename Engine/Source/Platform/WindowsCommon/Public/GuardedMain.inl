@@ -7,10 +7,11 @@
 
 static int32 GReturn = 0;
 
-DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException)
+LONG CALLBACK ReportCrash(LPEXCEPTION_POINTERS lpException)
 {
 	using namespace ::libty;
 
+	DWORD ExceptionCode = lpException->ExceptionRecord->ExceptionCode;
 	Stacktrace StackTrace = Stacktrace::CaptureException(lpException);
 	GReturn = (int32)ExceptionCode;
 
@@ -43,8 +44,7 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 
 	if (auto* logModule = LogModule::Get())
 	{
-		Task<> task = logModule->StopAsync();
-		task.Wait();
+		logModule->FlushAsync().Wait();
 	}
 
 #if DO_CHECK
@@ -54,19 +54,28 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 #endif
 }
 
+inline void ShutdownLogger()
+{
+	using namespace ::libty;
+	if (auto* logModule = LogModule::Get())
+	{
+		Task<> task = logModule->StopAsync();
+		task.Wait();
+	}
+}
+
 int32 GuardedMain(std::span<std::wstring> Argv)
 {
-	// std::chrono::zoned_time is causes memory leak logs.
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
+	SetUnhandledExceptionFilter(ReportCrash);
 	__try
 	{
 		GReturn = TApplicationClass::GuardedMain(Argv);
 	}
-	__except (ReportCrash(GetExceptionCode(), GetExceptionInformation()))
+	__except (ReportCrash(GetExceptionInformation()))
 	{
 	}
 
+	ShutdownLogger();
 	return GReturn;
 }
 

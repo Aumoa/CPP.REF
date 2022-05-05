@@ -41,8 +41,24 @@ namespace libty::inline Core
 		Task<> StartAsync(std::stop_token cancellationToken = {});
 		Task<> StopAsync(std::stop_token cancellationToken = {});
 
-		void EnqueueLogMessage(LogEntry&& entry);
-		void EnqueueLogAction(std::function<void()> action);
+		inline void EnqueueLogMessage(LogEntry&& entry)
+		{
+			this->EnqueueEntry(std::move(entry).Generate());
+		}
+
+		inline void EnqueueLogAction(std::function<void()> action)
+		{
+			this->EnqueueEntry(std::move(action));
+		}
+
+		inline Task<> FlushAsync()
+		{
+			auto tcs = TaskCompletionSource<>::Create();
+			std::function<void()> waitingAction = [tcs]() mutable { tcs.SetResult(); };
+			this->EnqueueEntry(std::move(waitingAction));
+			return tcs.GetTask();
+		}
+
 		bool IsRunning();
 
 	public:
@@ -53,6 +69,7 @@ namespace libty::inline Core
 		LoggedEvent Logged;
 
 	private:
+		void EnqueueEntry(Variant_t&& entry);
 		void Worker(std::stop_token cancellationToken);
 	};
 }

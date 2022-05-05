@@ -63,23 +63,16 @@ Task<> LogModule::StopAsync(std::stop_token cancellationToken)
 	return joinTask;
 }
 
-void LogModule::EnqueueLogMessage(LogEntry&& entry)
-{
-	std::unique_lock lock(_mutex);
-	_entries.emplace_back(std::move(entry).Generate());
-	_cv.NotifyOne();
-}
-
-void LogModule::EnqueueLogAction(std::function<void()> action)
-{
-	std::unique_lock lock(_mutex);
-	_entries.emplace_back(std::move(action));
-	_cv.NotifyOne();
-}
-
 bool LogModule::IsRunning()
 {
 	return !_stopSource.stop_requested();
+}
+
+void LogModule::EnqueueEntry(Variant_t&& entry)
+{
+	std::unique_lock lock(_mutex);
+	_entries.emplace_back(std::move(entry));
+	_cv.NotifyOne();
 }
 
 void LogModule::Worker(std::stop_token cancellationToken)
