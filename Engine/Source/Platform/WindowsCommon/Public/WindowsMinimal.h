@@ -7,14 +7,14 @@
 #undef interface
 #define NOMINMAX
 
+#pragma push_macro("TEXT")
+#undef TEXT
+
 #include <Windows.h>
 #include <winnt.h>
 #include <comdef.h>
-#include <Psapi.h>
 
-#pragma pack(push, before_imagehlp, 8)
-#include <imagehlp.h>
-#pragma pack(pop, before_imagehlp)
+#pragma pop_macro("TEXT")
 
 #undef GetCommandLine
 

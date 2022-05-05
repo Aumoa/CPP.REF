@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ScopedTimer.h"
+#include "Misc/StringView.h"
 #include <array>
 #include <string>
 #include <atomic>
@@ -14,7 +15,7 @@ namespace libty::inline Core
 	class CORE_API CycleCounterUnit
 	{
 		CycleCounterNamespace* Namespace;
-		std::wstring Name;
+		String Name;
 		std::array<float, 1024> Stats;
 		std::atomic<size_t> NumStats = 0;
 
@@ -45,10 +46,10 @@ namespace libty::inline Core
 		};
 
 	public:
-		CycleCounterUnit(CycleCounterNamespace* NamespacePtr, std::wstring_view Name);
+		CycleCounterUnit(CycleCounterNamespace* NamespacePtr, StringView Name);
 
 		Instance GetScopedTimer();
-		std::wstring GetName();
+		StringView GetName();
 		float GetAverageTime();
 	};
 }

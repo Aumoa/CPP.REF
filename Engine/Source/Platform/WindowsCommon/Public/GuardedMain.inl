@@ -3,7 +3,6 @@
 #pragma once
 
 #include "WindowsMinimal.h"
-#include "WindowsStackTrace.h"
 #include <iostream>
 
 static int32 GReturn = 0;
@@ -12,7 +11,7 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 {
 	using namespace ::libty;
 
-	WindowsStackTrace StackTrace(lpException);
+	Stacktrace StackTrace = Stacktrace::CaptureException(lpException);
 	GReturn = (int32)ExceptionCode;
 
 	WCHAR* Buf = nullptr;
@@ -25,27 +24,32 @@ DWORD CALLBACK ReportCrash(DWORD ExceptionCode, LPEXCEPTION_POINTERS lpException
 	}
 	else
 	{
-		ScopedBuf = L"<Unknown>";
+		ScopedBuf = TEXT("<Unknown>");
 	}
 
-	SE_LOG(LogWindowsCommon, Error, L"Unhandled exception caught!");
-	SE_LOG(LogWindowsCommon, Error, L"Code 0x{:0>8X} - {}", ExceptionCode, ScopedBuf);
-
-	for (auto& Callstack : StackTrace.GetCallstacks())
+	std::vector<String> frames;
+	for (auto& Callstack : StackTrace.GetStackframes())
 	{
-		std::wstring Callstack_line = String::Format(L"{:>2}  {}!{} [{}]", Callstack.FrameNumber, Callstack.ModuleName, Callstack.FunctionName, Callstack.SourceLocation);
-		SE_LOG(LogWindowsCommon, Error, Callstack_line);
+		frames.emplace_back(String::Format(TEXT("   at {}!{} in {}{}"),
+			Callstack.ModuleName,
+			Callstack.GetCleanedFunctionName(),
+			Callstack.GetCleanedFileName(),
+			Callstack.FileName.empty() ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
+		));
+	}
+
+	String callstack = String::Join(TEXT("\n"), frames);
+	SE_LOG(LogWindowsCommon, Error, L"Unhandled exception caught! Code 0x{:0>8X} - {}\n===== BEGIN OF STACKTRACE =====\n{}\n===== END OF STACKTRACE =====", ExceptionCode, ScopedBuf, callstack);
+
+	if (auto* logModule = LogModule::Get())
+	{
+		Task<> task = logModule->StopAsync();
+		task.Wait();
 	}
 
 #if DO_CHECK
 	return EXCEPTION_CONTINUE_SEARCH;
 #else
-
-	if (auto* Module = ::libty::LogModule::Get())
-	{
-		Module->StopAsync().Wait();
-	}
-
 	return EXCEPTION_EXECUTE_HANDLER;
 #endif
 }
@@ -55,17 +59,13 @@ int32 GuardedMain(std::span<std::wstring> Argv)
 	// std::chrono::zoned_time is causes memory leak logs.
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-#if !DO_CHECK
 	__try
 	{
-#endif
 		GReturn = TApplicationClass::GuardedMain(Argv);
-#if !DO_CHECK
 	}
 	__except (ReportCrash(GetExceptionCode(), GetExceptionInformation()))
 	{
 	}
-#endif
 
 	return GReturn;
 }

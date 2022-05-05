@@ -29,6 +29,12 @@ public class Core : ModuleRule
                 "WIN32_LEAN_AND_MEAN"
             });
 
+            PrivateAdditionalLibraries.AddRange(new[]
+            {
+                "psapi.lib",
+                "dbghelp.lib"
+            });
+            
             PrivateDisableWarnings.AddRange(new[]
             {
                 5105

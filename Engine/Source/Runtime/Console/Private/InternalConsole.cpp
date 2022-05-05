@@ -101,10 +101,10 @@ namespace libty::inline Console
 				std::wcout << message.substr(prev, len);
 			}
 
-			if (message.length() < pos + 1 && message[pos + 1] == L'<')
+			if (message.length() > pos + 1 && message[pos + 1] == L'<')
 			{
 				std::wcout << L'<';
-				++pos;
+				pos += 2;
 				prev = pos;
 				continue;
 			}

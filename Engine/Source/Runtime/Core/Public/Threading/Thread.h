@@ -68,6 +68,7 @@ namespace libty::inline Core
 		std::thread::id GetThreadId() const;
 		bool IsManaged() const;
 		ThreadSuspendToken* GetSuspendToken() const;
+		void* GetNativeHandle() const noexcept;
 
 		static Thread* CreateThread(std::wstring_view FriendlyName, std::function<void()> ThreadEntry);
 

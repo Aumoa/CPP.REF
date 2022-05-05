@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Exceptions/InvalidOperationException.h"
+#include "CoreAssert.h"
 #include "DateTimeFormat.h"
 #include <chrono>
 #include <optional>
@@ -39,7 +40,7 @@ namespace libty::inline Core
 		template<class TDateFormatter = libty::DateTimeFormat::Json>
 		std::wstring ToString() const
 		{
-			Xassert(IsValid(), "Time is not setted.");
+			checkf(IsValid(), TEXT("Time is not setted."));
 	#if PLATFORM_WINDOWS
 			return TDateFormatter::ToString(std::chrono::zoned_time(_zone, *_tp));
 	#else
@@ -49,7 +50,7 @@ namespace libty::inline Core
 
 		auto GetTimePoint() const
 		{
-			Xassert(IsValid(), "Time is not setted.");
+			checkf(IsValid(), TEXT("Time is not setted."));
 			return *_tp;
 		}
 
@@ -103,15 +104,6 @@ namespace libty::inline Core
 			auto days = std::chrono::floor<std::chrono::days>(*_tp);
 			auto hms = std::chrono::hh_mm_ss(*_tp - days);
 			return hms;
-		}
-
-	private:
-		static void Xassert(bool x, std::string_view message, const std::source_location& source = std::source_location::current())
-		{
-			if (!x)
-			{
-				throw InvalidOperationException(message, nullptr, source);
-			}
 		}
 	};
 }

@@ -3,38 +3,35 @@
 #include "CoreAssert.h"
 #include "LogCore.h"
 #include "Misc/PlatformMacros.h"
+#include "Misc/StringView.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogCategory.h"
 
 using namespace libty;
 
-void CoreAssert::Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location)
+void CoreAssert::Ensure(StringView exp, StringView msg, const std::source_location& location)
 {
+	using namespace ::Generated::LogCategories;
+
 	if (msg.empty())
 	{
-		LogSystem::Log(location, Generated::LogCategories::LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})",
-			String::AsUnicode(exp)
-		);
+		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, TEXT("Ensure failed: !({})"), exp);
 	}
 	else
 	{
-		LogSystem::Log(location, Generated::LogCategories::LogAssert, ELogVerbosity::Error, L"Ensure failed: !({})\n{}",
-			String::AsUnicode(exp),
-			msg
-		);
+		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, TEXT("Ensure failed: !({})\n{}"), exp, msg);
 	}
-}
-
-void CoreAssert::Ensure(std::string_view exp, std::string_view msg, const std::source_location& location)
-{
-	Ensure(exp, String::AsUnicode(msg), location);
 }
 
 void CoreAssert::DebugBreak()
 {
-#if !SHIPPING && PLATFORM_WINDOWS
+#if !SHIPPING
+#if PLATFORM_WINDOWS
+
 	// Call built-in function.
 	__debugbreak();
+
+#endif
 #endif
 }

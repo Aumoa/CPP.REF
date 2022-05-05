@@ -7,13 +7,13 @@
 
 using namespace libty;
 
-CycleCounterNamespace::CycleCounterNamespace(std::wstring_view Name, std::wstring_view GroupName)
+CycleCounterNamespace::CycleCounterNamespace(StringView Name, StringView GroupName)
 	: Name(Name)
 	, GroupName(GroupName)
 {
 }
 
-std::wstring_view CycleCounterNamespace::GetName() const
+StringView CycleCounterNamespace::GetName() const
 {
 	return Name;
 }
@@ -28,17 +28,17 @@ void CycleCounterNamespace::Register(CycleCounterUnit* Unit)
 	Units.emplace_back(Unit);
 }
 
-std::wstring CycleCounterNamespace::Trace()
+String CycleCounterNamespace::Trace()
 {
 	std::unique_lock Mtx_lock(Mtx);
 
-	std::vector<std::wstring> Traces;
+	std::vector<String> Traces;
 	Traces.reserve(Units.size());
-	Traces.emplace_back(String::Format(L"{} ({})", Name, GroupName));
+	Traces.emplace_back(String::Format(TEXT("{} ({})"), Name, GroupName));
 
 	for (auto& Unit : Units)
 	{
-		Traces.emplace_back(String::Format(L"  {:<30}: {:.4f} ms", Unit->GetName(), Unit->GetAverageTime() * 1000.0f));
+		Traces.emplace_back(String::Format(TEXT("  {:<30}: {:.4f} ms"), Unit->GetName(), Unit->GetAverageTime() * 1000.0f));
 	}
 
 	return String::Join(L"\n", Traces);

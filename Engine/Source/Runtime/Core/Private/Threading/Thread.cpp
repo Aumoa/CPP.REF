@@ -7,8 +7,15 @@
 using namespace libty;
 
 #if PLATFORM_WINDOWS
+
+#pragma push_macro("TEXT")
+#undef TEXT
+
 #include <Windows.h>
 #undef GetObject
+
+#pragma pop_macro("TEXT")
+
 #endif
 
 Thread::Thread()
@@ -17,17 +24,8 @@ Thread::Thread()
 	ThreadId = std::this_thread::get_id();
 
 #if PLATFORM_WINDOWS
-	HANDLE CurrentThread = ::GetCurrentThread();
-	int64 tid = ::GetThreadId(CurrentThread);
-	ThreadHandle = ::OpenThread(GENERIC_ALL, TRUE, (DWORD)tid);
-
-	PWSTR pwThreadDesc = nullptr;
-	::GetThreadDescription(CurrentThread, &pwThreadDesc);
-
-	if (pwThreadDesc)
-	{
-		FriendlyName = pwThreadDesc;
-	}
+	HANDLE hProcess = GetCurrentProcess();
+	DuplicateHandle(hProcess, GetCurrentThread(), hProcess, (HANDLE*)&ThreadHandle, NULL, FALSE, DUPLICATE_SAME_ACCESS);
 #endif
 
 	SToken = new ThreadSuspendToken(this);
@@ -36,14 +34,6 @@ Thread::Thread()
 
 Thread::~Thread()
 {
-#if PLATFORM_WINDOWS
-	if (ThreadHandle)
-	{
-		::CloseHandle(ThreadHandle);
-		ThreadHandle = nullptr;
-	}
-#endif
-
 	delete SToken;
 }
 
@@ -95,6 +85,15 @@ bool Thread::IsManaged() const
 auto Thread::GetSuspendToken() const -> ThreadSuspendToken*
 {
 	return SToken;
+}
+
+void* Thread::GetNativeHandle() const noexcept
+{
+#if PLATFORM_WINDOWS
+	return ThreadHandle;
+#else
+	return nullptr;
+#endif
 }
 
 Thread* Thread::CreateThread(std::wstring_view FriendlyName, std::function<void()> ThreadEntry)

@@ -3,6 +3,7 @@
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
 #include "Exceptions/InvalidOperationException.h"
+#include "CoreAssert.h"
 
 using namespace libty;
 
@@ -13,31 +14,23 @@ FileSystemReference::FileSystemReference(const std::filesystem::path& filepath)
 
 bool FileSystemReference::IsExists() const
 {
-	Xassert(IsSet(), "Path is not setted.");
+	checkf(IsSet(), TEXT("Path is not setted."));
 	return std::filesystem::exists(_path.value_or(L"\\"));
 }
 
 std::filesystem::path FileSystemReference::GetPath() const
 {
-	Xassert(IsSet(), "Path is not setted.");
+	checkf(IsSet(), TEXT("Path is not setted."));
 	return _path.value_or(L"\\");
 }
 
 DirectoryReference FileSystemReference::GetParent() const
 {
-	Xassert(IsSet(), "Path is not setted.");
+	checkf(IsSet(), TEXT("Path is not setted."));
 	return _path.value_or(L"\\").parent_path();
 }
 
 bool FileSystemReference::IsSet() const
 {
 	return _path.has_value();
-}
-
-void FileSystemReference::Xassert(bool expression, std::string_view message, std::source_location src)
-{
-	if (!expression)
-	{
-		throw InvalidOperationException(message, nullptr, src);
-	}
 }

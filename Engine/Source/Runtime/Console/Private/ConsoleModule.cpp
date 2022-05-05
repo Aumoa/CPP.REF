@@ -19,17 +19,10 @@ int32 SConsoleModule::Main(const CommandLine& commandLine)
 {
 	SharedPtr builder = SObjectFactory::CreateBuilder();
 	Configure(builder.Get());
-	try
-	{
-		_sp = Cast<SObjectFactory>(builder->Build());
-		_sp->StartAsync().GetResult();
-		_sp->GetServiceTask().GetResult();
-	}
-	catch (const std::exception& e)
-	{
-		SE_LOG(LogConsole, Error, L"Unhandled exception detected. Exception: {0}", String::AsUnicode(e.what()));
-		std::rethrow_exception(std::current_exception());
-	}
+
+	_sp = Cast<SObjectFactory>(builder->Build());
+	_sp->StartAsync().GetResult();
+	_sp->GetServiceTask().GetResult();
 
 	return 0;
 }

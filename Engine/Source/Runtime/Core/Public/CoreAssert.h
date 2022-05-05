@@ -3,7 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "Misc/String.h"
+#include "Misc/StringView.h"
 #include "Exceptions/AssertException.h"
 #include <string_view>
 #include <source_location>
@@ -13,8 +13,7 @@ namespace libty::inline Core
 	class CORE_API CoreAssert
 	{
 	public:
-		static void Ensure(std::string_view exp, std::wstring_view msg, const std::source_location& location = std::source_location::current());
-		static void Ensure(std::string_view exp, std::string_view msg, const std::source_location& location = std::source_location::current());
+		static void Ensure(StringView exp, StringView msg, const std::source_location& location = std::source_location::current());
 		static void DebugBreak();
 	};
 }
@@ -38,7 +37,7 @@ if (const bool b = (bool)(x); !b) \
 {\
 	if (!b)\
 	{\
-		::libty::Core::CoreAssert::Ensure(#x, "", location);\
+		::libty::Core::CoreAssert::Ensure(#x, TEXT(""), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\

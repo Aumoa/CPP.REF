@@ -11,7 +11,12 @@ using namespace libty;
 
 #if PLATFORM_WINDOWS
 
+#pragma push_macro("TEXT")
+#undef TEXT
+
 #include <Windows.h>
+
+#pragma pop_macro("TEXT")
 
 PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 {
@@ -20,7 +25,7 @@ PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 
 	if (NativeHandle == nullptr)
 	{
-		throw InvalidOperationException(String::Format("Could not load library from path: {}", InModulePath.string()));
+		throw InvalidOperationException(String::Format(TEXT("Could not load library from path: {}"), InModulePath.wstring()));
 	}
 }
 
@@ -33,7 +38,7 @@ PlatformModule::~PlatformModule() noexcept
 	}
 }
 
-std::wstring PlatformModule::ToString()
+String PlatformModule::ToString()
 {
 	return ModuleName;
 }
@@ -43,14 +48,15 @@ bool PlatformModule::IsValid() const
 	return NativeHandle;
 }
 
-auto PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) const -> FunctionPointer<void>
+auto PlatformModule::InternalGetFunctionPointer(StringView FunctionName) const -> FunctionPointer<void>
 {
 	if (!IsValid())
 	{
-		throw InvalidOperationException("Module not be initialized.");
+		throw InvalidOperationException(TEXT("Module not be initialized."));
 	}
 
-	return reinterpret_cast<FunctionPointer<void>>(::GetProcAddress((HMODULE)NativeHandle, FunctionName.data()));
+	std::string Astr = String::AsMultibyte(FunctionName);
+	return reinterpret_cast<FunctionPointer<void>>(::GetProcAddress((HMODULE)NativeHandle, Astr.data()));
 }
 
 #endif
@@ -59,26 +65,26 @@ auto PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) c
 
 PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
 {
-	throw InvalidOperationException("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }
 
 PlatformModule::~PlatformModule() noexcept
 {
 }
 
-std::wstring PlatformModule::ToString()
+String PlatformModule::ToString()
 {
-	throw InvalidOperationException("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }
 
 bool PlatformModule::IsValid() const
 {
-	throw InvalidOperationException("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }
 
-auto PlatformModule::InternalGetFunctionPointer(std::string_view FunctionName) const -> FunctionPointer<void>
+auto PlatformModule::InternalGetFunctionPointer(StringView FunctionName) const -> FunctionPointer<void>
 {
-	throw InvalidOperationException("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY.");
+	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }
 
 #endif

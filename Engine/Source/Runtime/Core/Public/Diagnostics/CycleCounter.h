@@ -3,6 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
+#include "Misc/StringView.h"
 #include <map>
 #include <string>
 
@@ -16,11 +17,11 @@ namespace libty::inline Core
 		~CycleCounter() = default;
 
 	private:
-		std::map<std::wstring, CycleCounterNamespace*, std::less<>> Namespaces;
+		std::map<String, CycleCounterNamespace*, std::less<>> Namespaces;
 
 	public:
 		void Register(CycleCounterNamespace* Namespace);
-		CycleCounterNamespace* GetNamespace(std::wstring_view Name) const;
+		CycleCounterNamespace* GetNamespace(StringView Name) const;
 
 	public:
 		static CycleCounter& Get();

@@ -32,7 +32,7 @@ namespace libty::inline Core
 		template<class TDateFormatter = libty::Core::Misc::DateTimeFormat::Json>
 		std::wstring ToString() const
 		{
-			Xassert(IsValid(), "Time is not setted.");
+			checkf(IsValid(), TEXT("Time is not setted."));
 			return TDateFormatter::ToString(*_tp);
 		}
 
@@ -44,7 +44,7 @@ namespace libty::inline Core
 
 		time_point GetTimePoint() const
 		{
-			Xassert(IsValid(), "Time is not setted.");
+			checkf(IsValid(), TEXT("Time is not setted."));
 			return *_tp;
 		}
 
@@ -76,15 +76,6 @@ namespace libty::inline Core
 
 			outDateTime = UnixTime(tp);
 			return true;
-		}
-
-	private:
-		static void Xassert(bool x, std::string_view message, const std::source_location& source = std::source_location::current())
-		{
-			if (!x)
-			{
-				throw InvalidOperationException(message, nullptr, source);
-			}
 		}
 	};
 }

@@ -25,7 +25,7 @@ namespace libty::inline Core
 		static LogModule* sInstance;
 
 	private:
-		std::wstring _name;
+		String _name;
 		Thread* _thread = nullptr;
 		std::stop_source _stopSource;
 		std::ofstream _logFile;
@@ -35,7 +35,7 @@ namespace libty::inline Core
 		std::vector<Variant_t> _entries;
 
 	public:
-		LogModule(std::wstring_view moduleName);
+		LogModule(StringView moduleName);
 		~LogModule() noexcept;
 
 		Task<> StartAsync(std::stop_token cancellationToken = {});

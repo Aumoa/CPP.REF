@@ -4,22 +4,110 @@
 
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
-#include "Exceptions/InvalidOperationException.h"
 #include <vector>
 #include <set>
 #include <array>
 #include <optional>
 #include <string_view>
-
-#if PLATFORM_WINDOWS
 #include <format>
-#endif
 
 namespace libty::inline Core
 {
-	class CORE_API String
+	class CORE_API String : public std::wstring
 	{
-		String() = delete;
+	public:
+		inline String()
+		{
+		}
+
+		template<class... TArgs> requires
+			std::constructible_from<std::wstring, TArgs...>
+		inline String(TArgs&&... args) noexcept(noexcept(std::wstring(std::declval<TArgs>()...)))
+			: std::wstring(std::forward<TArgs>(args)...)
+		{
+		}
+
+		inline String(const String& rhs) noexcept(noexcept(std::wstring(std::declval<const String&>())))
+			: std::wstring(rhs)
+		{
+		}
+
+		inline String(String&& rhs) noexcept(noexcept(std::wstring(std::declval<String&&>())))
+			: std::wstring(std::move(rhs))
+		{
+		}
+
+		inline String(std::string_view sv)
+			: std::wstring(AsUnicode(sv))
+		{
+		}
+
+		template<class... TArgs> requires
+			std::constructible_from<std::string_view, TArgs...>
+		inline String(TArgs&&... args)
+			: String(std::string_view(std::forward<TArgs>(args)...))
+		{
+		}
+
+	public:
+		template<class T> requires
+			requires { std::declval<std::wstring>() = std::declval<T>(); }
+		inline String& operator =(T&& rhs) noexcept(noexcept(std::wstring::operator =(std::declval<T>())))
+		{
+			this->std::wstring::operator =(std::forward<T>(rhs));
+			return *this;
+		}
+
+		template<class T> requires
+			std::constructible_from<std::string_view, T>
+		inline String& operator =(T&& rhs) noexcept(
+			noexcept(std::string_view(std::declval<T>())) &&
+			noexcept(AsUnicode(std::declval<std::string_view>())) &&
+			noexcept(std::wstring::operator =(std::declval<std::wstring>()))
+			)
+		{
+			this->std::wstring::operator =(AsUnicode(std::string_view(std::forward<T>(rhs))));
+			return *this;
+		}
+
+		inline String& operator =(const String& rhs) noexcept(noexcept(std::wstring::operator =(std::declval<const String&>())))
+		{
+			this->std::wstring::operator =(rhs);
+			return *this;
+		}
+
+		inline String& operator =(String&& rhs) noexcept(noexcept(std::wstring::operator =(std::declval<String&&>())))
+		{
+			this->std::wstring::operator =(std::move(rhs));
+			return *this;
+		}
+
+		template<class T> requires
+			requires { std::declval<std::wstring>() += std::declval<T>(); }
+		inline String& operator +=(T&& rhs) noexcept(noexcept(std::wstring::operator +=(std::declval<T>())))
+		{
+			this->std::wstring::operator +=(std::forward<T>(rhs));
+			return *this;
+		}
+
+		template<class T> requires
+			std::constructible_from<std::string_view, T>
+		inline String& operator +=(T&& rhs) noexcept(
+			noexcept(std::string_view(std::declval<T>())) &&
+			noexcept(AsUnicode(std::declval<std::string_view>())) &&
+			noexcept(std::wstring::operator +=(std::declval<T>()))
+			)
+		{
+			this->std::wstring::operator +=(AsUnicode(std::string_view(std::forward<T>(rhs))));
+			return *this;
+		}
+
+		template<class T> requires
+			std::convertible_to<std::wstring, T>
+		inline operator T() const noexcept(noexcept((T)std::declval<std::wstring>()))
+		{
+			return (T)(const std::wstring&)*this;
+		}
 
 	private:
 		template<class Char_t, class T>
@@ -35,57 +123,7 @@ namespace libty::inline Core
 		static auto Format(TFormat&& format, TArgs&&... args) requires
 			IString<TFormat, StringChar_t<TFormat>>
 		{
-	#if PLATFORM_WINDOWS
-			return std::format(std::forward<TFormat>(format), std::forward<TArgs>(args)...);
-	#else
-			using Char_t = StringChar_t<TFormat>;
-			using String_t = std::basic_string<Char_t>;
-			using StringView_t = std::basic_string_view<Char_t>;
-
-			StringView_t format_sv = format;
-			std::basic_stringstream<Char_t> ss;
-			std::vector<String_t> args_v = { GetTupleStringImpl<Char_t>(std::forward<TArgs>(args))... };
-
-			size_t last = 0;
-			size_t param = 0;
-			for (size_t i = format_sv.find((Char_t)'{'); i != format_sv.npos; i = format_sv.find((Char_t)'{', i))
-			{
-				ss << format_sv.substr(last, i - last);
-
-				if (format_sv.length() > i && format_sv[i + 1] == (Char_t)'{')
-				{
-					ss << (Char_t)'{';
-					last = i + 1;
-					continue;
-				}
-
-				size_t startp = i + 1;
-				size_t endp = format_sv.find((Char_t)'}', i + 1);
-				if (endp == format_sv.npos)
-				{
-					throw InvalidOperationException("Formatter is not closed with '}' token.");
-				}
-
-				StringView_t scope = format_sv.substr(startp, endp - startp);
-				Char_t sep[2] = { (Char_t)':', 0 };
-				std::vector splits = Split(scope, sep, false, true);
-
-				size_t local = 0;
-				if (!(splits.size() == 0 || splits[0].empty()))
-				{
-					param = std::stoi(splits[0]);
-				}
-
-				local = param++;
-
-				ss << args_v[local];
-				i = endp + 1;
-				last = i;
-			}
-
-			ss << format_sv.substr(last);
-			return ss.str();
-	#endif
+			return std::format(std::basic_string_view<StringChar_t<TFormat>>(std::forward<TFormat>(format)), std::forward<TArgs>(args)...);
 		}
 
 		template<class StringT, class SpanT, class CharT = StringChar_t<StringT>> requires
@@ -531,7 +569,15 @@ namespace libty::inline Core
 	}
 }
 
-#if PLATFORM_WINDOWS
+inline ::libty::String operator "" _s(const char* mstr, size_t len)
+{
+	return ::libty::String(std::string_view(mstr, len));
+}
+
+inline ::libty::String operator "" _s(const wchar_t* wstr, size_t len)
+{
+	return ::libty::String(std::wstring_view(wstr, len));
+}
 
 template<class TValue> requires
 	requires { libty::Core::Details::ToString<wchar_t>(std::declval<TValue>()); }
@@ -556,5 +602,3 @@ struct std::formatter<TValue, wchar_t> : public std::formatter<std::string_view,
 		return std::formatter<std::string_view, char>::format(std::move(str), ctx);
 	}
 };
-
-#endif

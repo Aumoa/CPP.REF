@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Misc/StringView.h"
 #include <exception>
 #include <string>
 #include <string_view>
@@ -11,18 +12,20 @@ namespace libty::inline Core
 {
 	class CORE_API FatalException : public std::exception
 	{
-		std::string _message;
+		String _message;
 		std::source_location _src;
-		std::string _what;
+		String _what;
 		std::exception_ptr _innerException;
 
+		std::string _what_mb;
+
 	public:
-		FatalException(std::string_view message, std::exception_ptr innerException = {}, const std::source_location & src = std::source_location::current());
+		FatalException(StringView message, std::exception_ptr innerException = {}, const std::source_location & src = std::source_location::current());
 
 		virtual const char* what() const noexcept override;
 
 		virtual const std::source_location& GetSource() const noexcept;
-		virtual std::string_view GetMessage() const noexcept;
+		virtual StringView GetMessage() const noexcept;
 		virtual std::exception_ptr GetInnerException() const noexcept;
 	};
 }

@@ -5,7 +5,7 @@
 
 using namespace libty;
 
-CycleCounterUnit::CycleCounterUnit(CycleCounterNamespace* Namespace, std::wstring_view Name)
+CycleCounterUnit::CycleCounterUnit(CycleCounterNamespace* Namespace, StringView Name)
 	: Namespace(Namespace)
 	, Name(Name)
 	, Stats({})
@@ -25,7 +25,7 @@ auto CycleCounterUnit::GetScopedTimer() -> Instance
 	return Instance(this, Index);
 }
 
-std::wstring CycleCounterUnit::GetName()
+StringView CycleCounterUnit::GetName()
 {
 	return Name;
 }

@@ -15,7 +15,7 @@ using namespace libty;
 
 LogModule* LogModule::sInstance;
 
-LogModule::LogModule(std::wstring_view moduleName)
+LogModule::LogModule(StringView moduleName)
 	: _name(moduleName)
 {
 	check(sInstance == nullptr);
@@ -31,13 +31,13 @@ Task<> LogModule::StartAsync(std::stop_token cancellationToken)
 {
 	using namespace ::std::filesystem;
 
-	path directory = L"Saved/Logs";
-	path logPath = directory / path(String::Format(L"{}.log", _name));
+	path directory = TEXT("Saved/Logs");
+	path logPath = directory / path(String::Format(TEXT("{}.log"), _name));
 
 	if (File::Exists(logPath))
 	{
 		path newPath = path(logPath)
-			.replace_filename(String::Format(L"{}_{}.log", _name, DateTime::Now().ToString<DateTimeFormat::File>()));
+			.replace_filename(String::Format(TEXT("{}_{}.log"), _name, DateTime::Now().ToString<DateTimeFormat::File>()));
 		rename(logPath, newPath);
 	}
 	else if (!Directory::Exists(directory))
@@ -48,18 +48,19 @@ Task<> LogModule::StartAsync(std::stop_token cancellationToken)
 	_logFile.open(logPath, std::ios::trunc | std::ios::out);
 	if (!_logFile.is_open())
 	{
-		throw InvalidOperationException("Cannot open file.");
+		throw InvalidOperationException(TEXT("Cannot open file."));
 	}
 
-	_thread = Thread::CreateThread(L"[Log Module]", std::bind(&LogModule::Worker, this, _stopSource.get_token()));
+	_thread = Thread::CreateThread(TEXT("[Log Module]"), std::bind(&LogModule::Worker, this, _stopSource.get_token()));
 	return Task<>::CompletedTask();
 }
 
 Task<> LogModule::StopAsync(std::stop_token cancellationToken)
 {
+	Task<> joinTask = _thread->JoinAsync();
 	_stopSource.request_stop();
 	_cv.NotifyOne();
-	return _thread->JoinAsync();
+	return joinTask;
 }
 
 void LogModule::EnqueueLogMessage(LogEntry&& entry)
@@ -88,7 +89,7 @@ void LogModule::Worker(std::stop_token cancellationToken)
 
 	std::vector<Variant_t> entries;
 
-	while (!cancellationToken.stop_requested())
+	while (!cancellationToken.stop_requested() || !_entries.empty())
 	{
 		std::unique_lock lock(_mutex);
 		_cv.Wait(lock, [this, &cancellationToken]() { return _entries.size() > 0 || cancellationToken.stop_requested(); });

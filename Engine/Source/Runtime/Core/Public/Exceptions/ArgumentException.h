@@ -9,6 +9,6 @@ namespace libty::inline Core
 	class CORE_API ArgumentException : public FatalException
 	{
 	public:
-		ArgumentException(std::string_view argName, std::source_location src = std::source_location::current());
+		ArgumentException(StringView argName, std::source_location src = std::source_location::current());
 	};
 }

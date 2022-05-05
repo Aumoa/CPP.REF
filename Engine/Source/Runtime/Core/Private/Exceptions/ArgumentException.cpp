@@ -5,7 +5,7 @@
 
 using namespace libty;
 
-ArgumentException::ArgumentException(std::string_view argName, std::source_location src)
-	: FatalException(String::Format("Invalid argument '{}' detected.", argName), nullptr, src)
+ArgumentException::ArgumentException(StringView argName, std::source_location src)
+	: FatalException(String::Format(TEXT("Invalid argument '{}' detected."), argName), nullptr, src)
 {
 }

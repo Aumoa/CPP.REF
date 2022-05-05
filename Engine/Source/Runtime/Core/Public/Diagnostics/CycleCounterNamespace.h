@@ -3,6 +3,8 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
+#include "Misc/StringView.h"
+#include "Threading/Spinlock.h"
 #include <string>
 #include <string_view>
 #include <vector>
@@ -14,17 +16,17 @@ namespace libty::inline Core
 
 	class CORE_API CycleCounterNamespace
 	{
-		std::wstring Name;
-		std::wstring GroupName;
-		std::mutex Mtx;
+		String Name;
+		String GroupName;
+		Spinlock Mtx;
 		std::vector<CycleCounterUnit*> Units;
 
 	public:
-		CycleCounterNamespace(std::wstring_view Name, std::wstring_view GroupName);
+		CycleCounterNamespace(StringView Name, StringView GroupName);
 
-		std::wstring_view GetName() const;
+		StringView GetName() const;
 
 		void Register(CycleCounterUnit* Unit);
-		std::wstring Trace();
+		String Trace();
 	};
 }

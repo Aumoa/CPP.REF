@@ -14,26 +14,26 @@
 
 using namespace libty;
 
-LogCategory::LogCategory(std::wstring_view CategoryName, Arguments&& InArgs)
+LogCategory::LogCategory(StringView CategoryName, Arguments&& InArgs)
 	: CategoryName(CategoryName)
 	, Args(std::move(InArgs))
 {
 }
 
-std::wstring_view LogCategory::GetName() const
+StringView LogCategory::GetName() const
 {
 	return CategoryName;
 }
 
-std::wstring_view LogCategory::VerbosityToString(ELogVerbosity verbosity)
+StringView LogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
 	switch (verbosity)
 	{
-	case ELogVerbosity::Error: return L"Error";
-	case ELogVerbosity::Warning: return L"Warning";
-	case ELogVerbosity::Info: return L"Info";
-	case ELogVerbosity::Verbose: return L"Verbose";
-	default: return L"";
+	case ELogVerbosity::Error: return TEXT("Error");
+	case ELogVerbosity::Warning: return TEXT("Warning");
+	case ELogVerbosity::Info: return TEXT("Info");
+	case ELogVerbosity::Verbose: return TEXT("Verbose");
+	default: return TEXT("");
 	}
 }
 
@@ -42,7 +42,7 @@ auto LogCategory::GetArguments() -> Arguments
 	return Args;
 }
 
-void LogCategory::OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src)
+void LogCategory::OnLog(ELogVerbosity Verbosity, StringView Message, const std::source_location& Src)
 {
 	auto thr = Thread::GetCurrentThread();
 	LogEntry entry;

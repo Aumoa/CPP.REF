@@ -3,6 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
+#include "Misc/StringView.h"
 #include <array>
 
 namespace libty::inline Core
@@ -43,7 +44,7 @@ namespace libty::inline Core
 		{
 		}
 
-		std::wstring ToString() const;
+		String ToString() const;
 
 		static bool TryParse(std::wstring_view formattedString, Guid& outResult);
 		static Guid NewGuid();

@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "LogVerbosity.h"
+#include "Misc/RecursiveMacroHelper.h"
+#include "Misc/StringView.h"
 #include <optional>
 #include <string>
 #include <string_view>
 #include <source_location>
-#include "LogVerbosity.h"
-#include "Misc/RecursiveMacroHelper.h"
 
 namespace libty::inline Core
 {
@@ -27,16 +28,16 @@ namespace libty::inline Core
 		Arguments Args;
 
 	public:
-		LogCategory(std::wstring_view CategoryName, Arguments&& InArgs);
+		LogCategory(StringView CategoryName, Arguments&& InArgs);
 
-		std::wstring_view GetName() const;
-		static std::wstring_view VerbosityToString(ELogVerbosity Verbosity);
+		StringView GetName() const;
+		static StringView VerbosityToString(ELogVerbosity Verbosity);
 
 	public:
 		Arguments GetArguments();
 
 	protected:
-		virtual void OnLog(ELogVerbosity Verbosity, std::wstring_view Message, const std::source_location& Src = std::source_location::current());
+		virtual void OnLog(ELogVerbosity Verbosity, StringView Message, const std::source_location& Src = std::source_location::current());
 	};
 }
 

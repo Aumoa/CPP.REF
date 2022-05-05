@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/PlatformMacros.h"
+#include "Exceptions/InvalidOperationException.h"
 
 #if PLATFORM_LINUX
 
@@ -10,29 +11,6 @@
 #include <string>
 
 using namespace libty;
-
-class string_conversion_error : public std::exception
-{
-	std::string _message;
-
-public:
-	template<IString<char> StringT>
-	string_conversion_error(StringT&& message)
-		: _message(std::forward<StringT>(message))
-	{
-	}
-
-	template<IString<wchar_t> StringT>
-	string_conversion_error(StringT&& message)
-		: string_conversion_error(String::AsMultibyte(std::forward<StringT>(message)))
-	{
-	}
-
-	virtual const char* what() const noexcept override
-	{
-		return _message.c_str();
-	}
-};
 
 std::wstring String::AsUnicode(std::string_view multibyte, uint32 codePage)
 {

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Misc/StringView.h"
 #include <filesystem>
 
 namespace libty::inline Core
@@ -14,28 +15,28 @@ namespace libty::inline Core
 
 	private:
 		void* NativeHandle = nullptr;
-		std::wstring ModuleName;
+		String ModuleName;
 
 	public:
 		PlatformModule(const std::filesystem::path& InModulePath);
 		~PlatformModule() noexcept;
 
-		std::wstring ToString();
+		String ToString();
 		bool IsValid() const;
 
 		template<class TFunction>
-		TFunction* GetFunctionPointer(std::string_view FunctionName) const
+		TFunction* GetFunctionPointer(StringView FunctionName) const
 		{
 			return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(FunctionName));
 		}
 
 		template<class TRet, class... TArgs>
-		FunctionPointer<TRet, TArgs...> GetFunctionPointer(std::string_view FunctionName) const
+		FunctionPointer<TRet, TArgs...> GetFunctionPointer(StringView FunctionName) const
 		{
 			return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
 		}
 
 	private:
-		FunctionPointer<void> InternalGetFunctionPointer(std::string_view FunctionName) const;
+		FunctionPointer<void> InternalGetFunctionPointer(StringView FunctionName) const;
 	};
 }

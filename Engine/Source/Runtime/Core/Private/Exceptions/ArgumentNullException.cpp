@@ -5,7 +5,7 @@
 
 using namespace libty;
 
-ArgumentNullException::ArgumentNullException(std::string_view argName, std::source_location src)
-	: FatalException(String::Format("Argument '{}' cannot be nullptr.", argName), nullptr, src)
+ArgumentNullException::ArgumentNullException(StringView argName, std::source_location src)
+	: FatalException(String::Format(TEXT("Argument '{}' cannot be nullptr."), argName), nullptr, src)
 {
 }

@@ -1,28 +1,34 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/PlatformMacros.h"
+#include "Exceptions/InvalidOperationException.h"
 
 #if PLATFORM_WINDOWS
+
+#pragma push_macro("TEXT")
+#undef TEXT
 
 #include "Misc/String.h"
 #include <Windows.h>
 
+#pragma pop_macro("TEXT")
+
 using namespace libty;
 
-class string_conversion_error : public std::exception
+class StringConversionException : public InvalidOperationException
 {
 	std::string _message;
 
 public:
 	template<IString<char> StringT>
-	string_conversion_error(StringT&& message)
+	StringConversionException(StringT&& message)
 		: _message(std::forward<StringT>(message))
 	{
 	}
 
 	template<IString<wchar_t> StringT>
-	string_conversion_error(StringT&& message)
-		: string_conversion_error(String::AsMultibyte(std::forward<StringT>(message)))
+	StringConversionException(StringT&& message)
+		: StringConversionException(String::AsMultibyte(std::forward<StringT>(message)))
 	{
 	}
 
@@ -42,7 +48,7 @@ std::wstring String::AsUnicode(std::string_view multibyte, uint32 codePage)
 	int32 length = MultiByteToWideChar(codePage, 0, multibyte.data(), (int32)multibyte.length(), nullptr, 0);
 	if (length == 0)
 	{
-		throw string_conversion_error(std::format(L"Couldn't convert to unicode string from multibyte source with CodePage '{}'", codePage));
+		throw StringConversionException(std::format(L"Couldn't convert to unicode string from multibyte source with CodePage '{}'", codePage));
 	}
 
 	std::wstring unicode;
@@ -62,7 +68,7 @@ std::string String::AsMultibyte(std::wstring_view unicode, uint32 codePage)
 	int32 length = WideCharToMultiByte(codePage, 0, unicode.data(), (int32)unicode.length(), nullptr, 0, nullptr, nullptr);
 	if (length == 0)
 	{
-		throw string_conversion_error(std::format(L"Couldn't convert to multibyte string from unicode source with CodePage '{}'", codePage));
+		throw StringConversionException(std::format(L"Couldn't convert to multibyte string from unicode source with CodePage '{}'", codePage));
 	}
 
 	std::string multibyte;

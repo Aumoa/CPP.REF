@@ -98,5 +98,5 @@ void SConsoleApplication::_Console_logged(const LogEntry& entry)
 	}
 
 	InternalConsole::Write(ConsolePin::Null(), String::Format(L"{0}{1}</color>: {2}: {0}{3}</color>\n", ccode, verb, std::move(woss).str(), entry.Category->GetName()));
-	InternalConsole::Write(ConsolePin::Null(), String::Format(L"      {0}\n", entry.Message));
+	InternalConsole::Write(ConsolePin::Null(), String::Format(L"      {0}\n", String::ReplaceAll(entry.Message, TEXT("<"), TEXT("<<"))));
 }

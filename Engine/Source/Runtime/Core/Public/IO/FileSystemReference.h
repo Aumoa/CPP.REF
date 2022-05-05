@@ -32,8 +32,5 @@ namespace libty::inline Core
 
 		auto operator <=>(const FileSystemReference&) const = default;
 		bool operator ==(const FileSystemReference&) const = default;
-
-	private:
-		static void Xassert(bool expression, std::string_view message, std::source_location src = std::source_location::current());
 	};
 }
