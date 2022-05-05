@@ -15,32 +15,27 @@ LONG CALLBACK ReportCrash(LPEXCEPTION_POINTERS lpException)
 	Stacktrace StackTrace = Stacktrace::CaptureException(lpException);
 	GReturn = (int32)ExceptionCode;
 
-	WCHAR* Buf = nullptr;
-	std::wstring ScopedBuf;
-	FormatMessageW(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER, GetModuleHandleW(L"ntdll.dll"), ExceptionCode, 0, (WCHAR*)&Buf, 0, nullptr);
-	if (Buf)
+	if (FatalException* fe; ExceptionCode == 0xE06D7363 && (fe = FatalException::AvailableException()))
 	{
-		ScopedBuf = Buf;
-		LocalFree(Buf);
+		SE_LOG(LogWindowsCommon, Error, L"Unhandled C++ exception caught!\n===== BEGIN OF EXCEPTION TRACE =====\n      {}\n===== END OF EXCEPTION TRACE =====", fe->ToString());
 	}
 	else
 	{
-		ScopedBuf = TEXT("<Unknown>");
-	}
+		WCHAR* Buf = nullptr;
+		std::wstring ScopedBuf;
+		FormatMessageW(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER, GetModuleHandleW(L"ntdll.dll"), ExceptionCode, 0, (WCHAR*)&Buf, 0, nullptr);
+		if (Buf)
+		{
+			ScopedBuf = Buf;
+			LocalFree(Buf);
+		}
+		else
+		{
+			ScopedBuf = TEXT("<Unknown>");
+		}
 
-	std::vector<String> frames;
-	for (auto& Callstack : StackTrace.GetStackframes())
-	{
-		frames.emplace_back(String::Format(TEXT("   at {}!{} in {}{}"),
-			Callstack.ModuleName,
-			Callstack.GetCleanedFunctionName(),
-			Callstack.GetCleanedFileName(),
-			Callstack.FileName.empty() ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
-		));
+		SE_LOG(LogWindowsCommon, Error, L"Unhandled SEH exception caught! Code 0x{:0>8X} - {}\n===== BEGIN OF STACKTRACE =====\n{}\n===== END OF STACKTRACE =====", ExceptionCode, ScopedBuf, StackTrace.Trace());
 	}
-
-	String callstack = String::Join(TEXT("\n"), frames);
-	SE_LOG(LogWindowsCommon, Error, L"Unhandled exception caught! Code 0x{:0>8X} - {}\n===== BEGIN OF STACKTRACE =====\n{}\n===== END OF STACKTRACE =====", ExceptionCode, ScopedBuf, callstack);
 
 	if (auto* logModule = LogModule::Get())
 	{

@@ -9,6 +9,6 @@ namespace libty::inline Core
 	class CORE_API NotImplementedException : public FatalException
 	{
 	public:
-		NotImplementedException(const std::source_location& src = std::source_location::current());
+		NotImplementedException();
 	};
 }

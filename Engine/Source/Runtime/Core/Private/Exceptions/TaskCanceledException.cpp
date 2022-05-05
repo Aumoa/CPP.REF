@@ -4,7 +4,7 @@
 
 using namespace libty;
 
-TaskCanceledException::TaskCanceledException(std::exception_ptr innerException, std::source_location src)
-	: FatalException("Task was aborted.", innerException, src)
+TaskCanceledException::TaskCanceledException(std::exception_ptr innerException)
+	: FatalException("Task was aborted.", innerException)
 {
 }

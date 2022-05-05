@@ -12,14 +12,14 @@ namespace libty::inline Core
 		std::error_code _ec;
 
 	public:
-		IOException(StringView message, const std::error_code& ec, std::exception_ptr innerException = nullptr, std::source_location src = std::source_location::current()) noexcept
-			: FatalException(message, innerException, src)
+		IOException(StringView message, const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
+			: FatalException(message, innerException)
 			, _ec(ec)
 		{
 		}
 
-		IOException(const std::error_code& ec, std::exception_ptr innerException = nullptr, std::source_location src = std::source_location::current()) noexcept
-			: FatalException(TEXT("Invalid file operation."), innerException, src)
+		IOException(const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
+			: FatalException(TEXT("Invalid file operation."), innerException)
 			, _ec(ec)
 		{
 		}

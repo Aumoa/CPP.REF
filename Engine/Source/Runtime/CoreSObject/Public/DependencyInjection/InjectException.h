@@ -9,7 +9,7 @@ namespace libty::inline Core
 	class CORESOBJECT_API InjectException : public FatalException
 	{
 	public:
-		InjectException(EInjectionErrorCode code, std::exception_ptr innerException = nullptr, std::source_location src = std::source_location::current());
+		InjectException(EInjectionErrorCode code, std::exception_ptr innerException = nullptr);
 
 	private:
 		static std::string FormatMessage(EInjectionErrorCode code);

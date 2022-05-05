@@ -4,7 +4,6 @@
 
 #include "PrimitiveTypes.h"
 #include "Stackframe.h"
-#include "Linq/Generator.h"
 #include "Misc/StringView.h"
 #include <span>
 
@@ -17,14 +16,33 @@ namespace libty::inline Core
 		struct _Stacktrace_impl;
 		std::shared_ptr<_Stacktrace_impl> _impl;
 
-	private:
-		Stacktrace() noexcept;
-
 	public:
+		Stacktrace() noexcept;
 		Stacktrace(const Stacktrace&) noexcept = default;
 		Stacktrace(Stacktrace&&) noexcept = default;
 
 		std::span<const Stackframe> GetStackframes() const noexcept;
+
+		[[nodiscard]] inline bool IsValid() const noexcept
+		{
+			return (bool)_impl;
+		}
+
+		inline String Trace() const noexcept
+		{
+			std::vector<String> frames;
+			for (auto& Callstack : GetStackframes())
+			{
+				frames.emplace_back(String::Format(TEXT("   at {}!{} in {}{}"),
+					Callstack.ModuleName,
+					Callstack.GetCleanedFunctionName(),
+					Callstack.GetCleanedFileName(),
+					Callstack.FileName.empty() ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
+				));
+			}
+
+			return String::Join(TEXT("\n"), frames);
+		}
 
 	public:
 		static Stacktrace CaptureCurrent() noexcept;

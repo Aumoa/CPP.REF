@@ -100,12 +100,12 @@ namespace libty::inline Core
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
 			{
-				throw InvalidOperationException("Task is freezed.", nullptr, source);
+				throw InvalidOperationException(TEXT("Task is freezed."));
 			}
 			if (!IsCompleted())
 			{
 				_status = ETaskStatus::Canceled;
-				_exception = std::make_exception_ptr(TaskCanceledException(nullptr, source));
+				_exception = std::make_exception_ptr(TaskCanceledException());
 				_source = source;
 
 				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
@@ -115,7 +115,7 @@ namespace libty::inline Core
 			}
 			else
 			{
-				throw InvalidOperationException("Task already completed.", nullptr, source);
+				throw InvalidOperationException(TEXT("Task already completed."));
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace libty::inline Core
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
 			{
-				throw InvalidOperationException("Task is freezed.", nullptr, source);
+				throw InvalidOperationException(TEXT("Task is freezed."));
 			}
 			if (!IsCompleted())
 			{
@@ -148,7 +148,7 @@ namespace libty::inline Core
 			}
 			else
 			{
-				throw InvalidOperationException("Task already completed.", nullptr, source);
+				throw InvalidOperationException(TEXT("Task already completed."));
 			}
 		}
 
@@ -186,7 +186,7 @@ namespace libty::inline Core
 			Wait();
 			if (_exception)
 			{
-				std::rethrow_exception(_exception);
+				throw InvalidOperationException(TEXT("Task aborted with exception."), _exception);
 			}
 		}
 
@@ -198,7 +198,7 @@ namespace libty::inline Core
 			Wait();
 			if (_exception)
 			{
-				std::rethrow_exception(_exception);
+				throw InvalidOperationException(TEXT("Task aborted with exception."), _exception);
 			}
 			else
 			{
@@ -281,7 +281,7 @@ namespace libty::inline Core
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
 			{
-				throw InvalidOperationException("Task is freezed.", nullptr, source);
+				throw InvalidOperationException(TEXT("Task is freezed."));
 			}
 			if (!IsCompleted())
 			{
@@ -296,7 +296,7 @@ namespace libty::inline Core
 			}
 			else
 			{
-				throw InvalidOperationException("Task already completed.", nullptr, source);
+				throw InvalidOperationException(TEXT("Task already completed."));
 			}
 		}
 

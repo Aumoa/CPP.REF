@@ -4,8 +4,8 @@
 
 using namespace ::libty;
 
-InjectException::InjectException(EInjectionErrorCode code, std::exception_ptr innerException, std::source_location src)
-	: FatalException(FormatMessage(code), innerException, src)
+InjectException::InjectException(EInjectionErrorCode code, std::exception_ptr innerException)
+	: FatalException(FormatMessage(code), innerException)
 {
 }
 

@@ -4,7 +4,7 @@
 
 using namespace libty;
 
-NotImplementedException::NotImplementedException(const std::source_location& src)
-	: FatalException("The function to call does not implemented.", nullptr, src)
+NotImplementedException::NotImplementedException()
+	: FatalException("The function to call does not implemented.")
 {
 }

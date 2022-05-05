@@ -9,6 +9,6 @@ namespace libty::inline Core
 	class CORE_API TaskCanceledException : public FatalException
 	{
 	public:
-		TaskCanceledException(std::exception_ptr innerException = nullptr, std::source_location src = std::source_location::current());
+		TaskCanceledException(std::exception_ptr innerException = nullptr);
 	};
 }
