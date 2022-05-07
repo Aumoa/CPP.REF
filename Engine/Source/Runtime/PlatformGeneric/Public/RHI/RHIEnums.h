@@ -40,6 +40,7 @@ namespace libty::inline PlatformGeneric
         GenericRead, VertexAndConstantBuffer | IndexBuffer | NonPixelShaderResource | PixelShaderResource | IndirectArgument | CopySource,
         Present, 0
     );
+    SENUM_MAKE_FLAGS(ERHIResourceStates);
 
     SENUM(PLATFORMGENERIC_API, ERHIPixelFormat, int32,
         Unknown, 0,

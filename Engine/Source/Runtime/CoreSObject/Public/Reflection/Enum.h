@@ -249,3 +249,41 @@ namespace libty::inline Core::Reflection
 		static bool TryParse(SType* type, StringView format, int64& result);
 	};
 }
+
+#define SENUM_MAKE_FLAGS(EnumClass)															\
+template<class TEnumClassL, class TEnumClassR>												\
+constexpr EnumClass operator |(const TEnumClassL& lhs, const TEnumClassR& rhs) requires		\
+	std::same_as<typename TEnumClassL::__Tag__, EnumClass::__Tag__> ||						\
+	std::same_as<typename TEnumClassR::__Tag__, EnumClass::__Tag__>							\
+{																							\
+	return (EnumClass)((int32)lhs | (int32)rhs);											\
+}																							\
+																							\
+template<class TEnumClassL, class TEnumClassR>												\
+constexpr EnumClass operator &(const TEnumClassL& lhs, const TEnumClassR& rhs) requires		\
+	std::same_as<typename TEnumClassL::__Tag__, EnumClass::__Tag__> ||						\
+	std::same_as<typename TEnumClassR::__Tag__, EnumClass::__Tag__>							\
+{																							\
+	return (EnumClass)((int32)lhs & (int32)rhs);											\
+}																							\
+																							\
+template<class TEnumClass>																	\
+constexpr EnumClass& operator |=(EnumClass& lhs, const TEnumClass& rhs) requires			\
+	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>							\
+{																							\
+	return lhs = (EnumClass)((int32)lhs | (int32)rhs);										\
+}																							\
+																							\
+template<class TEnumClass>																	\
+constexpr EnumClass& operator &=(EnumClass& lhs, const TEnumClass& rhs) requires			\
+	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>							\
+{																							\
+	return lhs = (EnumClass)((int32)lhs & (int32)rhs);										\
+}																							\
+																							\
+template<class TEnumClass>																	\
+constexpr EnumClass operator ~(TEnumClass lhs) requires										\
+	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>							\
+{																							\
+	return (EnumClass)~(int32)lhs;															\
+}

@@ -11,47 +11,5 @@ namespace libty::inline Console
 		Control, 0x4
 	);
 
-	template<class TConsoleModifiersL, class TConsoleModifiersR>
-	constexpr EConsoleModifiers operator |(const TConsoleModifiersL& lhs, const TConsoleModifiersR& rhs) requires
-		std::same_as<TConsoleModifiersL, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiersL, EConsoleModifiers::__Tag__> ||
-		std::same_as<TConsoleModifiersR, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiersR, EConsoleModifiers::__Tag__>
-	{
-		return (EConsoleModifiers)((int32)lhs | (int32)rhs);
-	}
-
-	template<class TConsoleModifiersL, class TConsoleModifiersR>
-	constexpr EConsoleModifiers operator &(const TConsoleModifiersL& lhs, const TConsoleModifiersR& rhs) requires
-		std::same_as<TConsoleModifiersL, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiersL, EConsoleModifiers::__Tag__> ||
-		std::same_as<TConsoleModifiersR, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiersR, EConsoleModifiers::__Tag__>
-	{
-		return (EConsoleModifiers)((int32)lhs & (int32)rhs);
-	}
-
-	template<class TConsoleModifiers>
-	constexpr EConsoleModifiers& operator |=(EConsoleModifiers& lhs, const TConsoleModifiers& rhs) requires
-		std::same_as<TConsoleModifiers, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiers, EConsoleModifiers::__Tag__>
-	{
-		return lhs = (EConsoleModifiers)((int32)lhs | (int32)rhs);
-	}
-
-	template<class TConsoleModifiers>
-	constexpr EConsoleModifiers& operator &=(EConsoleModifiers& lhs, const TConsoleModifiers& rhs) requires
-		std::same_as<TConsoleModifiers, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiers, EConsoleModifiers::__Tag__>
-	{
-		return lhs = (EConsoleModifiers)((int32)lhs & (int32)rhs);
-	}
-
-	template<class TConsoleModifiers>
-	constexpr EConsoleModifiers operator ~(TConsoleModifiers lhs) requires
-		std::same_as<TConsoleModifiers, EConsoleModifiers> ||
-		std::same_as<TConsoleModifiers, EConsoleModifiers::__Tag__>
-	{
-		return (EConsoleModifiers)~(int32)lhs;
-	}
+	SENUM_MAKE_FLAGS(EConsoleModifiers);
 }
