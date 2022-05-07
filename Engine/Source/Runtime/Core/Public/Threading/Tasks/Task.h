@@ -260,14 +260,14 @@ namespace libty::inline Core
 
 	public:
 		template<class TBody>
-		auto ContinueWith(TBody&& body, std::source_location source = std::source_location::current()) -> Task<FunctionReturn_t<TBody, Task>>
+		auto ContinueWith(TBody&& body) -> Task<FunctionReturn_t<TBody, Task>>
 		{
 			using U = FunctionReturn_t<TBody, Task>;
 
 			ThrowInvalid();
 			std::shared_ptr uAwaiter = std::make_shared<Awaiter<U>>();
 
-			_awaiter->Then([body = std::forward<TBody>(body), uAwaiter, source](Task<> result) mutable
+			_awaiter->Then([body = std::forward<TBody>(body), uAwaiter](Task<> result) mutable
 			{
 				try
 				{
@@ -275,30 +275,30 @@ namespace libty::inline Core
 					{
 						if (result.IsCanceled())
 						{
-							uAwaiter->Cancel(source);
+							uAwaiter->Cancel();
 						}
 						else
 						{
 							body((Task<T>)result);
-							uAwaiter->SetResult(source);
+							uAwaiter->SetResult();
 						}
 					}
 					else
 					{
 						if (result.IsCanceled())
 						{
-							uAwaiter->Cancel(source);
+							uAwaiter->Cancel();
 						}
 						else
 						{
 							auto r = body((Task<T>)result);
-							uAwaiter->SetResult(std::move(r), source);
+							uAwaiter->SetResult(std::move(r));
 						}
 					}
 				}
 				catch (const std::exception&)
 				{
-					uAwaiter->SetException(std::current_exception(), source);
+					uAwaiter->SetException(std::current_exception());
 				}
 			});
 
@@ -320,19 +320,19 @@ namespace libty::inline Core
 
 	public:
 		template<class TBody>
-		static auto Run(TBody&& body, std::stop_token cancellationToken = {}, std::source_location source = std::source_location::current()) -> Task<FunctionReturn_t<TBody>>
+		static auto Run(TBody&& body, std::stop_token cancellationToken = {}) -> Task<FunctionReturn_t<TBody>>
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
 			throw;
 		}
 
-		static auto Yield(std::source_location source = std::source_location::current())
+		static auto Yield()
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
 			throw;
 		}
 
-		static Task<> Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken = {}, std::source_location source = std::source_location::current())
+		static Task<> Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken = {})
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 			throw;
@@ -345,7 +345,7 @@ namespace libty::inline Core
 		}
 
 		template<class U> requires (!std::same_as<U, void>)
-		static Task<> FromResult(U value, std::source_location source = std::source_location::current())
+		static Task<> FromResult(U value)
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::FromResult<U> instead.");
 			throw;
@@ -488,13 +488,13 @@ namespace libty::inline Core
 
 	template<>
 	template<class TBody>
-	inline auto Task<>::Run(TBody&& body, std::stop_token cancellationToken, std::source_location source) -> Task<FunctionReturn_t<TBody>>
+	inline auto Task<>::Run(TBody&& body, std::stop_token cancellationToken) -> Task<FunctionReturn_t<TBody>>
 	{
 		using U = FunctionReturn_t<TBody>;
 		std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
 		awaiter->WaitingToRun();
 
-		RunImpl([awaiter, body = std::forward<TBody>(body), cancellationToken, source]() mutable
+		RunImpl([awaiter, body = std::forward<TBody>(body), cancellationToken]() mutable
 		{
 			if (cancellationToken.stop_possible() && cancellationToken.stop_requested())
 			{
@@ -509,17 +509,17 @@ namespace libty::inline Core
 				if constexpr (std::same_as<U, void>)
 				{
 					body();
-					awaiter->SetResult((const std::source_location&)source);
+					awaiter->SetResult();
 				}
 				else
 				{
 					U result = body();
-					awaiter->SetResult(result, source);
+					awaiter->SetResult(result);
 				}
 			}
 			catch (...)
 			{
-				awaiter->SetException(std::current_exception(), source);
+				awaiter->SetException(std::current_exception());
 			}
 		});
 
@@ -527,18 +527,18 @@ namespace libty::inline Core
 	}
 
 	template<>
-	inline auto Task<>::Yield(std::source_location source)
+	inline auto Task<>::Yield()
 	{
-		return Run([] {}, {}, source);
+		return Run([] {}, {});
 	}
 
 	template<>
-	inline Task<> Task<>::Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken, std::source_location source)
+	inline Task<> Task<>::Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken)
 	{
 		std::shared_ptr awaiter = std::make_shared<Awaiter<void>>();
 		awaiter->WaitingToRun();
 
-		DelayImpl(delay, [awaiter, cancellationToken, source]() mutable
+		DelayImpl(delay, [awaiter, cancellationToken]() mutable
 		{
 			if (cancellationToken.stop_possible() && cancellationToken.stop_requested())
 			{
@@ -547,7 +547,7 @@ namespace libty::inline Core
 			}
 
 			awaiter->Running();
-			awaiter->SetResult((const std::source_location&)source);
+			awaiter->SetResult();
 		});
 
 		return Task<>(std::move(awaiter));
@@ -569,10 +569,10 @@ namespace libty::inline Core
 
 	template<>
 	template<class U> requires (!std::same_as<U, void>)
-	inline Task<> Task<>::FromResult(U value, std::source_location source)
+	inline Task<> Task<>::FromResult(U value)
 	{
 		auto ptr = std::make_shared<Awaiter<U>>();
-		ptr->SetResult(std::move(value), source);
+		ptr->SetResult(std::move(value));
 		return ptr;
 	}
 }

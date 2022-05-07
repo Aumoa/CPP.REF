@@ -29,27 +29,27 @@ namespace libty::inline Core
 			return (bool)_awaiter;
 		}
 
-		void SetResult(const std::source_location& source = std::source_location::current())
+		void SetResult()
 		{
-			SetResultImpl(source);
+			SetResultImpl();
 		}
 
 		template<class U>
-		void SetResult(U&& result, const std::source_location& source = std::source_location::current())
+		void SetResult(U&& result)
 		{
-			SetResultImpl(source, std::forward<U>(result));
+			SetResultImpl(std::forward<U>(result));
 		}
 
-		void SetException(std::exception_ptr ptr, const std::source_location& source = std::source_location::current())
+		void SetException(std::exception_ptr ptr)
 		{
 			Xassert(IsValid(), "Awaiter is null.");
-			_awaiter->SetException(std::move(ptr), source);
+			_awaiter->SetException(std::move(ptr));
 		}
 
-		void SetCanceled(const std::source_location& source = std::source_location::current())
+		void SetCanceled()
 		{
 			Xassert(IsValid(), "Awaiter is null.");
-			_awaiter->Cancel(source);
+			_awaiter->Cancel();
 		}
 
 		Task<T> GetTask()
@@ -68,7 +68,7 @@ namespace libty::inline Core
 
 	private:
 		template<class... U>
-		void SetResultImpl(const std::source_location& source, U&&... result)
+		void SetResultImpl(U&&... result)
 		{
 			Xassert(IsValid(), "Awaiter is null.");
 			_awaiter->SetResult(std::forward<U>(result)...);

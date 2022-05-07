@@ -5,6 +5,7 @@
 #include "IAwaiter.h"
 #include "Exceptions/InvalidOperationException.h"
 #include "Exceptions/TaskCanceledException.h"
+#include "Exceptions/TaskAbortedException.h"
 #include "Misc/VoidableOptional.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
@@ -24,7 +25,6 @@ namespace libty::inline Core
 		std::queue<std::function<void(Task<void>)>> _thens;
 		std::exception_ptr _exception;
 		bool _freezed = false;
-		std::source_location _source;
 
 		std::vector<std::stop_token> _stop_tokens;
 		std::vector<Validator> _validators;
@@ -95,7 +95,7 @@ namespace libty::inline Core
 			}
 		}
 
-		virtual void Cancel(std::source_location source = std::source_location::current()) override
+		virtual void Cancel() override
 		{
 			auto lock = std::unique_lock(_lock);
 			if (_freezed)
@@ -106,7 +106,6 @@ namespace libty::inline Core
 			{
 				_status = ETaskStatus::Canceled;
 				_exception = std::make_exception_ptr(TaskCanceledException());
-				_source = source;
 
 				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
 				_future.NotifyAll();
@@ -119,13 +118,13 @@ namespace libty::inline Core
 			}
 		}
 
-		virtual void SetException(std::exception_ptr ptr, std::source_location source = std::source_location::current()) override
+		virtual void SetException(std::exception_ptr ptr) override
 		{
 			if (this->_Cancel_requested())
 			{
 				if (this->_status != ETaskStatus::Canceled)
 				{
-					this->Cancel(source);
+					this->Cancel();
 				}
 				return;
 			}
@@ -139,7 +138,6 @@ namespace libty::inline Core
 			{
 				_status = ETaskStatus::Faulted;
 				_exception = ptr;
-				_source = source;
 
 				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
 				_future.NotifyAll();
@@ -158,24 +156,18 @@ namespace libty::inline Core
 			return _exception;
 		}
 
-		virtual std::source_location GetCompletionSource() override
-		{
-			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
-			return _source;
-		}
-
-		void SetResult(std::source_location source = std::source_location::current()) requires
+		void SetResult() requires
 			std::same_as<T, void>
 		{
-			SetResultImpl(source);
+			SetResultImpl();
 		}
 
 		template<class U>
-		void SetResult(U&& result, std::source_location source = std::source_location::current()) requires
+		void SetResult(U&& result) requires
 			(!std::same_as<T, void>) &&
 			(!std::same_as<std::remove_const_t<std::remove_reference_t<U>>, void>)
 		{
-			SetResultImpl(source, std::forward<U>(result));
+			SetResultImpl(std::forward<U>(result));
 		}
 
 		template<class U = T>
@@ -186,7 +178,7 @@ namespace libty::inline Core
 			Wait();
 			if (_exception)
 			{
-				throw InvalidOperationException(TEXT("Task aborted with exception."), _exception);
+				throw TaskAbortedException(_exception);
 			}
 		}
 
@@ -198,7 +190,7 @@ namespace libty::inline Core
 			Wait();
 			if (_exception)
 			{
-				throw InvalidOperationException(TEXT("Task aborted with exception."), _exception);
+				throw TaskAbortedException(_exception);
 			}
 			else
 			{
@@ -270,11 +262,11 @@ namespace libty::inline Core
 
 	private:
 		template<class... U>
-		void SetResultImpl(std::source_location source, U&&... result)
+		void SetResultImpl(U&&... result)
 		{
 			if (this->_Cancel_requested())
 			{
-				this->Cancel(source);
+				this->Cancel();
 				return;
 			}
 
@@ -287,7 +279,6 @@ namespace libty::inline Core
 			{
 				_status = ETaskStatus::RanToCompletion;
 				_promise.Emplace(std::forward<U>(result)...);
-				_source = source;
 
 				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
 				_future.NotifyAll();

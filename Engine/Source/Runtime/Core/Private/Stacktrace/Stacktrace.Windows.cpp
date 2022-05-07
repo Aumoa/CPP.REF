@@ -288,7 +288,7 @@ private:
 			_Symbol_info si(S.AddrPC.Offset);
 			const _Module_info* mi = _Symbol_inst->FindModule(si.GetSymbolBaseAddr());
 
-			Stackframe& frame = _stackframes.emplace_back();
+			Stackframe frame;
 			if (mi)
 			{
 				frame.ModuleName = mi->ModuleName;
@@ -302,9 +302,16 @@ private:
 			{
 				frame.FileName = line.FileName;
 				frame.Line = line.LineNumber;
+
+				if (line.LineNumber > 1'000'000)
+				{
+					// Compiler-generated frame.
+					continue;
+				}
 			}
 
 			frame.AddressOf = S.AddrPC.Offset;
+			_stackframes.emplace_back(frame);
 		}
 	}
 };

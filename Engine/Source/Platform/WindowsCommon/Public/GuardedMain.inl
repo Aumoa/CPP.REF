@@ -42,11 +42,7 @@ LONG CALLBACK ReportCrash(LPEXCEPTION_POINTERS lpException)
 		logModule->FlushAsync().Wait();
 	}
 
-#if DO_CHECK
-	return EXCEPTION_CONTINUE_SEARCH;
-#else
 	return EXCEPTION_EXECUTE_HANDLER;
-#endif
 }
 
 inline void ShutdownLogger()

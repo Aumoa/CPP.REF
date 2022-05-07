@@ -24,8 +24,17 @@ Thread::Thread()
 	ThreadId = std::this_thread::get_id();
 
 #if PLATFORM_WINDOWS
-	HANDLE hProcess = GetCurrentProcess();
-	DuplicateHandle(hProcess, GetCurrentThread(), hProcess, (HANDLE*)&ThreadHandle, NULL, FALSE, DUPLICATE_SAME_ACCESS);
+	HANDLE CurrentThread = ::GetCurrentThread();
+	int64 tid = ::GetThreadId(CurrentThread);
+	ThreadHandle = ::OpenThread(GENERIC_ALL, TRUE, (DWORD)tid);
+
+	PWSTR pwThreadDesc = nullptr;
+	::GetThreadDescription(CurrentThread, &pwThreadDesc);
+
+	if (pwThreadDesc)
+	{
+		FriendlyName = pwThreadDesc;
+	}
 #endif
 
 	SToken = new ThreadSuspendToken(this);
@@ -34,6 +43,14 @@ Thread::Thread()
 
 Thread::~Thread()
 {
+#if PLATFORM_WINDOWS
+	if (ThreadHandle)
+	{
+		::CloseHandle(ThreadHandle);
+		ThreadHandle = nullptr;
+	}
+#endif
+
 	delete SToken;
 }
 

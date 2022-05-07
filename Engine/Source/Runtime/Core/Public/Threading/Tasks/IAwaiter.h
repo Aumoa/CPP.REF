@@ -30,11 +30,10 @@ namespace libty::inline Core
 		virtual void Running() = 0;
 		virtual void Wait() = 0;
 		virtual void Then(std::function<void(Task<void>)> proc) = 0;
-		virtual void Cancel(std::source_location source = std::source_location::current()) = 0;
+		virtual void Cancel() = 0;
 
-		virtual void SetException(std::exception_ptr ptr, std::source_location source = std::source_location::current()) = 0;
+		virtual void SetException(std::exception_ptr ptr) = 0;
 		virtual std::exception_ptr GetException() = 0;
-		virtual std::source_location GetCompletionSource() = 0;
 
 		bool await_ready()
 		{
