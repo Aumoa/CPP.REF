@@ -11,6 +11,8 @@ using namespace ::libty::Reflection;
 
 DEFINE_LOG_CATEGORY(LogDependencyInjection);
 
+SObjectFactory* SObjectFactory::_primaryService;
+
 SObjectFactory::SObjectFactory()
 	: _tcs(TaskCompletionSource<>::Create())
 {
@@ -86,6 +88,11 @@ SObject* SObjectFactory::InternalGetService(SType* type, bool nolock)
 	}
 }
 
+void SObjectFactory::SetAsPrimary()
+{
+	_primaryService = this;
+}
+
 Task<> SObjectFactory::StartAsync(std::stop_token cancellationToken)
 {
 	std::unique_lock lock(_lock);
@@ -140,6 +147,19 @@ Task<> SObjectFactory::GetServiceTask()
 SObject* SObjectFactory::GetService(SType* type)
 {
 	return InternalGetService(type);
+}
+
+SObject* SObjectFactory::Create(SType* type, std::function<SObject*(IServiceProvider*)> factory)
+{
+	InjectionInfo info;
+	info.Class = type;
+	info.Factory = factory;
+	return CreateInstance(info);
+}
+
+SObjectFactory* SObjectFactory::GetPrimaryService()
+{
+	return _primaryService;
 }
 
 SObjectFactoryBuilder* SObjectFactory::CreateBuilder()

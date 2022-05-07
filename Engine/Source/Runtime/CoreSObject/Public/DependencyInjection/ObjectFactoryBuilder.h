@@ -25,6 +25,7 @@ namespace libty::inline Core
 
 	public:
 		virtual IServiceCollection* AddService(EServiceType type, SType* objectClass, std::function<SObject*(IServiceProvider*)> factory = nullptr) override;
+		virtual void SetAsPrimary();
 		virtual IServiceProvider* Build() override;
 	};
 }

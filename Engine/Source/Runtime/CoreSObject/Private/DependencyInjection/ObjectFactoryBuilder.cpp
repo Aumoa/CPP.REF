@@ -31,6 +31,11 @@ IServiceCollection* SObjectFactoryBuilder::AddService(EServiceType type, SType* 
 	return this;
 }
 
+void SObjectFactoryBuilder::SetAsPrimary()
+{
+	_factory->SetAsPrimary();
+}
+
 IServiceProvider* SObjectFactoryBuilder::Build()
 {
 	SObjectFactory* builded = _factory;

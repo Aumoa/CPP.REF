@@ -13,6 +13,7 @@ namespace libty::inline Core
 
 	public:
 		virtual SObject* GetService(SType* type) = 0;
+		virtual SObject* Create(SType * type, std::function<SObject*(IServiceProvider*)> factory = nullptr) = 0;
 
 		inline SObject* GetRequiredService(SType* type)
 		{

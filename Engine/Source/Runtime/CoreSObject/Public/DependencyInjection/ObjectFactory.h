@@ -30,6 +30,8 @@ namespace libty::inline Core
 		};
 
 	private:
+		SPROPERTY(_primaryService);
+		static SObjectFactory* _primaryService;
 		std::map<size_t, InjectionInfo> _injections;
 		std::vector<IHostedService*> _hostedServices;
 
@@ -40,6 +42,7 @@ namespace libty::inline Core
 		SObjectFactory();
 		SObject* CreateInstance(const InjectionInfo& info);
 		SObject* InternalGetService(SType* type, bool nolock = false);
+		void SetAsPrimary();
 
 	public:
 		Task<> StartAsync(std::stop_token cancellationToken = {});
@@ -47,6 +50,9 @@ namespace libty::inline Core
 		Task<> GetServiceTask();
 
 		virtual SObject* GetService(SType* type) override;
+		virtual SObject* Create(SType* type, std::function<SObject*(IServiceProvider*)> factory = nullptr) override;
+
+		static SObjectFactory* GetPrimaryService();
 
 	public:
 		static SObjectFactoryBuilder* CreateBuilder();
