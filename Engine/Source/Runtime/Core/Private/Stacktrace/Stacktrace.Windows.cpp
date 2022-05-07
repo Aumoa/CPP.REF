@@ -276,9 +276,15 @@ private:
 		HANDLE hProcess = _Symbol_inst->GetHandle();
 
 		_stackframes.reserve(128);
+		int32 skip = 1;
 		while (StackWalk64(imageType, hProcess, hThread, &S, context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)
 			&& S.AddrReturn.Offset != 0)
 		{
+			if (skip-- > 0)
+			{
+				continue;
+			}
+
 			_Symbol_info si(S.AddrPC.Offset);
 			const _Module_info* mi = _Symbol_inst->FindModule(si.GetSymbolBaseAddr());
 

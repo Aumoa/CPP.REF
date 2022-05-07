@@ -28,7 +28,7 @@ namespace libty::inline Core
 		std::shared_ptr<_Impl_buf> _impl_buf;
 
 	public:
-		FatalException(StringView message, std::exception_ptr innerException = {}) noexcept;
+		FatalException(StringView message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
 		FatalException(const FatalException& rhs) noexcept;
 		FatalException(FatalException&& rhs) noexcept;
 		virtual ~FatalException() noexcept;
