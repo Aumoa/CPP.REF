@@ -9,6 +9,6 @@ namespace libty::inline PlatformGeneric
 		std::string _api;
 
 	public:
-		ShaderCompilerException(std::string_view API, std::string_view message, std::source_location location = std::source_location::current());
+		ShaderCompilerException(std::string_view API, std::string_view message);
 	};
 }

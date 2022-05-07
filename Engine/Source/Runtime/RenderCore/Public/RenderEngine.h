@@ -11,10 +11,10 @@ namespace libty::inline RenderCore
 		GENERATED_BODY(SRenderEngine);
 
 	private:
-		SPROPERTY(_device)
-		IRHIDevice* _device = nullptr;
-		SPROPERTY(_commandQueue)
-		IRHICommandQueue* _commandQueue = nullptr;
+		SPROPERTY(RHIDevice)
+		IRHIDevice* RHIDevice = nullptr;
+		SPROPERTY(RHIQueue)
+		IRHICommandQueue* RHIQueue = nullptr;
 
 	public:
 		SRenderEngine();

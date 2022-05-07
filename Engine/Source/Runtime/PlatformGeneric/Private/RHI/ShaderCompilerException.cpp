@@ -4,8 +4,8 @@
 
 using namespace ::libty;
 
-ShaderCompilerException::ShaderCompilerException(std::string_view API, std::string_view message, std::source_location location)
-	: FatalException(message, nullptr, location)
+ShaderCompilerException::ShaderCompilerException(std::string_view API, std::string_view message)
+	: FatalException(message)
 	, _api(API)
 {
 }

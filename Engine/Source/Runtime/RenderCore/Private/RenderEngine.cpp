@@ -8,19 +8,19 @@ using namespace ::libty;
 SRenderEngine::SRenderEngine()
 	: Super()
 {
-	IRHIFactory* factory = IApplicationInterface::Get().GetFactory();
-	IRHIAdapter* adapter = factory->GetAdapter(0);
+	IRHIFactory* Factory = IApplicationInterface::Get().GetFactory();
+	IRHIAdapter* Adapter = Factory->GetAdapter(0);
 
-	_device = factory->CreateDevice(adapter);
-	_commandQueue = _device->CreateCommandQueue(ERHICommandListType::Direct);
+	RHIDevice = Factory->CreateDevice(Adapter);
+	RHIQueue = RHIDevice->CreateCommandQueue(ERHICommandListType::Direct);
 }
 
 SRenderContext* SRenderEngine::CreateRenderContext()
 {
 	auto* context = gcnew SRenderContext();
-	context->OwningDevice = _device;
-	context->RenderQueue = _commandQueue;
-	context->CommandAllocator = _device->CreateCommandAllocator(ERHICommandListType::Direct);
-	context->CommandList = _device->CreateCommandList(context->CommandAllocator, ERHICommandListType::Direct, nullptr);
+	context->OwningDevice = RHIDevice;
+	context->RenderQueue = RHIQueue;
+	context->CommandAllocator = RHIDevice->CreateCommandAllocator(ERHICommandListType::Direct);
+	context->CommandList = RHIDevice->CreateCommandList(context->CommandAllocator, ERHICommandListType::Direct, nullptr);
 	return context;
 }
