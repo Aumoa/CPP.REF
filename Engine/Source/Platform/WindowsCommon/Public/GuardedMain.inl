@@ -57,13 +57,17 @@ inline void ShutdownLogger()
 
 int32 GuardedMain(std::span<std::wstring> Argv)
 {
+#if !DO_CHECK
 	__try
 	{
+#endif
 		GReturn = TApplicationClass::GuardedMain(Argv);
+#if !DO_CHECK
 	}
 	__except (ReportCrash(GetExceptionInformation()))
 	{
 	}
+#endif
 
 	ShutdownLogger();
 	return GReturn;

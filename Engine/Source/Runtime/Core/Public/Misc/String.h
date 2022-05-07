@@ -603,3 +603,26 @@ struct std::formatter<TValue, wchar_t> : public std::formatter<std::string_view,
 		return std::formatter<std::string_view, char>::format(std::move(str), ctx);
 	}
 };
+
+template<class TException> requires
+	std::derived_from<TException, std::exception>
+struct std::formatter<TException, wchar_t> : public std::formatter<std::wstring_view, wchar_t>
+{
+	template<class UValue, class TFormatContext>
+	auto format(UValue&& value, TFormatContext& ctx)
+	{
+		auto str = ::libty::String::AsUnicode(value.what());
+		return std::formatter<std::wstring_view, wchar_t>::format(str, ctx);
+	}
+};
+
+template<class TException> requires
+	std::derived_from<TException, std::exception>
+struct std::formatter<TException, char> : public std::formatter<std::wstring_view, char>
+{
+	template<class UValue, class TFormatContext>
+	auto format(UValue&& value, TFormatContext& ctx)
+	{
+		return std::formatter<std::wstring_view, char>::format(value.what(), ctx);
+	}
+};
