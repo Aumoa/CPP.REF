@@ -25,7 +25,7 @@ SRenderThread::~SRenderThread()
 	std::unique_lock lock(_lock);
 	_running = false;
 	_taskCompletionSource = TaskCompletionSource<>::Create();
-	_invoke.notify_all();
+	_invoke.NotifyAll();
 	lock.unlock();
 
 	_thread->Join();
@@ -56,7 +56,7 @@ Task<> SRenderThread::ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std
 		_completion = InCompletionWork;
 	}
 
-	_invoke.notify_one();
+	_invoke.NotifyOne();
 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ExecuteCurrentWorks);
@@ -93,7 +93,7 @@ void SRenderThread::Run()
 			SuspendPromise.emplace();
 
 			Owner->_taskCompletionSource.GetTask().Wait();
-			Owner->_invoke.notify_one();
+			Owner->_invoke.NotifyOne();
 
 			return SuspendPromise->get_future();
 		}
@@ -128,7 +128,7 @@ void SRenderThread::Run()
 
 		// Waiting for event 'Run'.
 		std::unique_lock lock(_lock);
-		_invoke.wait(lock);
+		_invoke.Wait(lock);
 
 		std::queue<Work> works;
 		std::swap(works, _queuedWorks);

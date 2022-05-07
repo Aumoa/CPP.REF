@@ -21,9 +21,9 @@ namespace libty::inline RenderCore
 		Thread* _thread = nullptr;
 		bool _running = false;
 
-		std::mutex _lock;
+		Spinlock _lock;
+		SpinlockConditionVariable _invoke;
 		std::queue<Work> _queuedWorks;
-		std::condition_variable _invoke;
 		IRHIGraphicsCommandList* _deviceContext = nullptr;
 		std::function<void(IRHIGraphicsCommandList*)> _completion;
 		TaskCompletionSource<> _taskCompletionSource;
