@@ -61,7 +61,6 @@ inline void ShutdownLogger()
 
 int32 GuardedMain(std::span<std::wstring> Argv)
 {
-	SetUnhandledExceptionFilter(ReportCrash);
 	__try
 	{
 		GReturn = TApplicationClass::GuardedMain(Argv);
