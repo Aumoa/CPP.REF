@@ -239,6 +239,7 @@ namespace libty::inline Core
 
 			std::basic_stringstream<Char_t> ss;
 			ss << StringView_t(*it);
+			std::advance(it, 1);
 			auto sepView = StringView_t(separator);
 
 			for (; it != end; ++it)
