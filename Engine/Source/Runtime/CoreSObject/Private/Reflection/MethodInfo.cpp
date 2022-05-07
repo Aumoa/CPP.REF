@@ -13,7 +13,7 @@ SMethodInfo::SMethodInfo(MetadataGenerator&& generator)
 {
 }
 
-std::wstring SMethodInfo::GetName()
+String SMethodInfo::GetName()
 {
 	return _meta.MethodName;
 }

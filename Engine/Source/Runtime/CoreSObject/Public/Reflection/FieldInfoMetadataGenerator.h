@@ -28,7 +28,7 @@ namespace libty::inline Core
 			using NativeGCInvoke = std::function<void(SObject* _Obj)>;
 			using NativeGCCollection = std::function<void(FieldInfoMetadataGenerator*, SObject*, NativeGCInvoke&)>;
 
-			std::wstring FieldName;
+			String FieldName;
 			FieldAttributeCollection Attributes;
 			uint8 bIsConst : 1;
 			uint8 bIsStatic : 1;
@@ -40,16 +40,16 @@ namespace libty::inline Core
 			NativeGCCollection Collection;
 
 			template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 			template<class TMemberType, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(TMemberType* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 			template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 			template<class TMemberType, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(const TMemberType* field, std::string_view fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(const TMemberType* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 		private:
 			template<class TMemberType>

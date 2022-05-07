@@ -29,7 +29,7 @@ namespace libty::inline Core::Reflection
 		/// <summary>
 		/// Gets the name of current field.
 		/// </summary>
-		virtual std::wstring GetName() override;
+		virtual String GetName() override;
 
 		/// <summary>
 		/// Gets a value indicating whether the field is readonly.

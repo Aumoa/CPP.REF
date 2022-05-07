@@ -13,7 +13,7 @@ namespace libty::inline Core
 	{
 	private:
 		std::any _value;
-		std::wstring _toString;
+		String _toString;
 		SType* _type = nullptr;
 		bool _isGeneric = false;
 
@@ -46,7 +46,7 @@ namespace libty::inline Core
 			return _type;
 		}
 
-		virtual std::wstring ToString() override
+		virtual String ToString() override
 		{
 			return _toString;
 		}
@@ -91,14 +91,14 @@ namespace libty::inline Core
 
 	private:
 		template<class T>
-		inline static std::wstring Internal_ToString(int, const T& value) requires
+		inline static String Internal_ToString(int, const T& value) requires
 			requires { std::declval<T>().ToString(); }
 		{
 			return value.ToString();
 		}
 
 		template<class T>
-		inline static std::wstring Internal_ToString(short, const T& value)
+		inline static String Internal_ToString(short, const T& value)
 		{
 			return String::AsUnicode(typeid(T).name());
 		}

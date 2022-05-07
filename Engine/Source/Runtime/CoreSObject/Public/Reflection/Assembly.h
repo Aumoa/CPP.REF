@@ -13,17 +13,17 @@ namespace libty::inline Core::Reflection
 		friend class libty::Core::SType;
 
 	private:
-		std::wstring _assemblyName;
+		String _assemblyName;
 		std::set<SType*>* volatile _types;
 
 	public:
-		SAssembly(std::string_view assemblyName);
+		SAssembly(StringView assemblyName);
 		virtual ~SAssembly() noexcept override;
 
 		/// <summary>
 		/// Gets assembly name.
 		/// </summary>
-		virtual std::wstring GetName();
+		virtual String GetName();
 
 		/// <summary>
 		/// Gets all types declared in current assembly.

@@ -55,8 +55,8 @@ namespace libty::inline Core::Reflection
 		using InterfaceCollection = std::vector<SType*>;
 
 		// ** Common metadata **
-		std::wstring ClassName;
-		std::wstring FullQualifiedClassName;
+		String ClassName;
+		String FullQualifiedClassName;
 		SAssembly* Assembly;
 		ClassAttributeCollection Attributes;
 		InterfaceCollection Interfaces;
@@ -73,16 +73,16 @@ namespace libty::inline Core::Reflection
 		ClassMethodsCollection Methods;
 
 		// ** Enum Specialization **
-		using EnumTryParseObjFunc = bool(*)(std::wstring_view, SObject*&);
+		using EnumTryParseObjFunc = bool(*)(StringView, SObject*&);
 		EnumTryParseObjFunc EnumTryParseObj;
-		using EnumTryParseFunc = bool(*)(std::wstring_view, int64&);
+		using EnumTryParseFunc = bool(*)(StringView, int64&);
 		EnumTryParseFunc EnumTryParse;
 
 		template<char ClassType, class TOwningClass, class... TAttributeCollection>
 		static TypeInfoMetadataGenerator GenerateManaged
 		(
-			std::wstring_view className,
-			std::wstring_view fullQualifiedClassName,
+			StringView className,
+			StringView fullQualifiedClassName,
 			SAssembly* assembly,
 			std::tuple<TAttributeCollection...>& attributes
 		);

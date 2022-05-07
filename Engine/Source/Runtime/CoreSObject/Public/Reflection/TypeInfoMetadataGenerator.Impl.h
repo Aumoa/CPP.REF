@@ -13,8 +13,8 @@ namespace libty::inline Core::Reflection
 	template<char ClassType, class TOwningClass, class... TAttributeCollection>
 	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateManaged
 	(
-		std::wstring_view className,
-		std::wstring_view fullQualifiedClassName,
+		StringView className,
+		StringView fullQualifiedClassName,
 		SAssembly* assembly,
 		std::tuple<TAttributeCollection...>& attributes
 	)
@@ -52,7 +52,7 @@ namespace libty::inline Core::Reflection
 
 		if constexpr (IsEnum)
 		{
-			gen.EnumTryParseObj = +[](std::wstring_view format, SObject*& value) -> bool
+			gen.EnumTryParseObj = +[](StringView format, SObject*& value) -> bool
 			{
 				TOwningClass ov;
 				bool result = TOwningClass::TryParse(format, ov);
@@ -66,7 +66,7 @@ namespace libty::inline Core::Reflection
 				return true;
 			};
 
-			gen.EnumTryParse = +[](std::wstring_view format, int64& value) -> bool
+			gen.EnumTryParse = +[](StringView format, int64& value) -> bool
 			{
 				TOwningClass ov;
 				bool result = TOwningClass::TryParse(format, ov);

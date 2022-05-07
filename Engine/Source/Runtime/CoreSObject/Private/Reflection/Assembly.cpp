@@ -5,7 +5,7 @@
 using namespace libty;
 using namespace libty::Reflection;
 
-SAssembly::SAssembly(std::string_view assemblyName)
+SAssembly::SAssembly(StringView assemblyName)
 	: _assemblyName(String::AsUnicode(assemblyName))
 {
 }
@@ -18,7 +18,7 @@ SAssembly::~SAssembly()
 	}
 }
 
-std::wstring SAssembly::GetName()
+String SAssembly::GetName()
 {
 	return _assemblyName;
 }

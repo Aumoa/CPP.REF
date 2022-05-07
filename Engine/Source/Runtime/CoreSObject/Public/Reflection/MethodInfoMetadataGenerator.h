@@ -24,7 +24,7 @@ namespace libty::inline Core
 			using ParameterTypeCollection = std::vector<SType*>;
 			using Invoke = std::function<SObject*(SObject* _This, std::span<SObject* const> _Args)>;
 
-			std::wstring MethodName;
+			String MethodName;
 			MethodAttributeCollection Attributes;
 
 			uint8 bIsStatic : 1;
@@ -38,7 +38,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(TOwningClass::* method)(TArgs...),
-				std::string_view methodName,
+				StringView methodName,
 				std::tuple<TAttributeCollection...>& attributes
 			)
 			{
@@ -49,7 +49,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(TOwningClass::* method)(TArgs...),
-				std::string_view methodName,
+				StringView methodName,
 				std::tuple<TAttributeCollection...>& attributes,
 				std::index_sequence<Idx...>&&
 			);
@@ -58,7 +58,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(*method)(TArgs...),
-				std::string_view methodName,
+				StringView methodName,
 				std::tuple<TAttributeCollection...>& attributes
 			)
 			{
@@ -69,7 +69,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(*method)(TArgs...),
-				std::string_view methodName,
+				StringView methodName,
 				std::tuple<TAttributeCollection...>& attributes,
 				std::index_sequence<Idx...>&&
 			);

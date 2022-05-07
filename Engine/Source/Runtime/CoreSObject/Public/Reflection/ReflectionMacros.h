@@ -96,7 +96,7 @@ public:																						\
 	using Super = typename ::libty::Core::Reflection::SuperClassTypeDeclare<Class>::Type;	\
 	using This = Class;																		\
 																							\
-	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
+	inline static constexpr ::libty::StringView FriendlyName = TEXT(#Class);				\
 																							\
 private:																					\
 	static ::libty::Core::SType StaticClass;												\
@@ -122,7 +122,7 @@ private:
 	static consteval ::libty::int32 __INTERNAL_AccessModifierChecker();						\
 																							\
 public:																						\
-	inline static constexpr std::wstring_view FriendlyName = L ## #Class;					\
+	inline static constexpr ::libty::StringView FriendlyName = TEXT(#Class);				\
 																							\
 private:																					\
 	static ::libty::Core::SType StaticClass;												\

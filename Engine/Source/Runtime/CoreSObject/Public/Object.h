@@ -8,8 +8,6 @@
 #include "Reflection/FieldInfoMetadataGenerator.h"
 #include "Reflection/MethodInfoMetadataGenerator.h"
 #include "GC/Referencer.h"
-#include <string>
-#include <string_view>
 #include <atomic>
 #include <functional>
 
@@ -28,7 +26,7 @@ namespace libty::inline Core
 		using This = SObject;
 		using IsClass = SObject;
 
-		inline static constexpr std::wstring_view FriendlyName = L"SObject";
+		inline static constexpr StringView FriendlyName = TEXT("SObject");
 
 	private:
 		static SType StaticClass;
@@ -89,7 +87,7 @@ namespace libty::inline Core
 		Referencer* ReferencePtr = nullptr;
 
 	#if !SHIPPING
-		std::wstring CachedTypeName;
+		String CachedTypeName;
 		SObject* GC_ContainsOwner = nullptr;
 	#endif
 
@@ -109,7 +107,7 @@ namespace libty::inline Core
 
 	public:
 		SFUNCTION(ToString)
-		virtual std::wstring ToString();
+		virtual String ToString();
 
 	protected:
 		virtual void PostConstruction();

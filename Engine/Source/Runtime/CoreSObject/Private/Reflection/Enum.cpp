@@ -5,7 +5,7 @@
 
 using namespace libty::Reflection;
 
-bool SEnum::TryParse(SType* type, std::wstring_view format, SObject*& result)
+bool SEnum::TryParse(SType* type, StringView format, SObject*& result)
 {
 	if (!type->IsEnum())
 	{
@@ -16,7 +16,7 @@ bool SEnum::TryParse(SType* type, std::wstring_view format, SObject*& result)
 	return type->_meta.EnumTryParseObj(format, result);
 }
 
-bool SEnum::TryParse(SType* type, std::wstring_view format, int64& result)
+bool SEnum::TryParse(SType* type, StringView format, int64& result)
 {
 	if (!type->IsEnum())
 	{

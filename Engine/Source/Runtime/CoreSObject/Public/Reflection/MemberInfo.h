@@ -20,6 +20,6 @@ namespace libty::inline Core::Reflection
 		/// <summary>
 		/// Gets the name of current member.
 		/// </summary>
-		virtual std::wstring GetName() = 0;
+		virtual String GetName() = 0;
 	};
 }

@@ -44,7 +44,7 @@ SType::SType(MetadataGenerator&& generator)
 	}
 }
 
-std::wstring_view SType::GetName()
+StringView SType::GetName()
 {
 	return _meta.ClassName;
 }
@@ -54,7 +54,7 @@ SType* SType::GetSuperType()
 	return _meta.SuperClass;
 }
 
-std::wstring_view SType::GetFullQualifiedName()
+StringView SType::GetFullQualifiedName()
 {
 	return _meta.FullQualifiedClassName;
 }
@@ -71,7 +71,7 @@ std::span<SFieldInfo* const> SType::GetFields(bool bRecursive)
 	}
 }
 
-SFieldInfo* SType::GetField(std::wstring_view fieldName, bool bRecursive)
+SFieldInfo* SType::GetField(StringView fieldName, bool bRecursive)
 {
 	auto& collection = bRecursive ? _meta.Fields : _recursiveFields;
 	auto it = std::find_if(collection.begin(), collection.end(), [&fieldName](SFieldInfo* field)
@@ -99,7 +99,7 @@ std::span<SMethodInfo* const> SType::GetMethods(bool bRecursive)
 	}
 }
 
-SMethodInfo* SType::GetMethod(std::wstring_view methodName, bool bRecursive)
+SMethodInfo* SType::GetMethod(StringView methodName, bool bRecursive)
 {
 	auto& collection = bRecursive ? _meta.Methods : _recursiveMethods;
 	auto it = std::find_if(collection.begin(), collection.end(), [&methodName](SMethodInfo* method)
@@ -231,7 +231,7 @@ SObject* SType::Instantiate()
 	}
 }
 
-SType* SType::GetType(std::wstring_view fullQualifiedName)
+SType* SType::GetType(StringView fullQualifiedName)
 {
 	auto it = _staticCollection->FullQualifiedNameView.find(fullQualifiedName);
 	if (it == _staticCollection->FullQualifiedNameView.end())

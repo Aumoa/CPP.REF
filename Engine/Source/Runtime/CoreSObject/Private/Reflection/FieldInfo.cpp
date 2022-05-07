@@ -14,7 +14,7 @@ SFieldInfo::SFieldInfo(MetadataGenerator&& generator)
 {
 }
 
-std::wstring SFieldInfo::GetName()
+String SFieldInfo::GetName()
 {
 	return _meta.FieldName;
 }

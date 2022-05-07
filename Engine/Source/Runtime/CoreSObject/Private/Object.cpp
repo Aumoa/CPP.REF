@@ -19,7 +19,7 @@ namespace libty::Generated::Assemblies
 
 SType SObject::StaticClass(libty::Core::Reflection::TypeInfoMetadataGenerator
 	::GenerateManaged<"SObject"[0], SObject>(
-		FriendlyName, L"SObject", &libty::Generated::Assemblies::CoreSObject_AssemblyInfo, EmptyAttributes
+		FriendlyName, TEXT("SObject"), &libty::Generated::Assemblies::CoreSObject_AssemblyInfo, EmptyAttributes
 	)
 );
 
@@ -64,9 +64,9 @@ std::function<bool()> SObject::GetHolder()
 	};
 }
 
-std::wstring SObject::ToString()
+String SObject::ToString()
 {
-	return std::wstring(GetType()->GetFullQualifiedName());
+	return String(GetType()->GetFullQualifiedName());
 }
 
 void SObject::PostConstruction()

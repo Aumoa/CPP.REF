@@ -32,9 +32,9 @@ namespace libty::inline Core::Reflection
 		{
 		}
 
-		static constexpr std::string_view ToString()
+		static constexpr StringView ToString()
 		{
-			return std::string_view(ConstString.Str);
+			return StringView(ConstString.Str);
 		}
 
 		template<std::integral U>
@@ -132,9 +132,9 @@ public:																								\
 	{																								\
 	}																								\
 																									\
-	static bool TryParse(std::wstring_view EnumName, Name& OutValue)								\
+	static bool TryParse(StringView EnumName, Name& OutValue)								\
 	{																								\
-		static std::map<std::wstring_view, Name, std::less<>> Dictionary =							\
+		static std::map<StringView, Name, std::less<>> Dictionary =							\
 		{																							\
 			MACRO_RECURSIVE_FOR_EACH_2(SENUM_DECLARE_DICTIONARY_PAIR_PARSE, __VA_ARGS__)			\
 		};																							\
@@ -150,9 +150,9 @@ public:																								\
 		}																							\
 	}																								\
 																									\
-	std::wstring ToString() const																	\
+	String ToString() const																	\
 	{																								\
-		static std::map<Type, std::wstring> Dictionary =											\
+		static std::map<Type, String> Dictionary =											\
 		{																							\
 			MACRO_RECURSIVE_FOR_EACH_2(SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING, __VA_ARGS__)			\
 		};																							\
@@ -224,7 +224,7 @@ namespace libty::inline Core::Reflection
 		/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
 		/// <param name="result"> When this method returns true, contains an enumeration constant that represents the parsed value. </param>
 		/// <returns> true if the conversion succeeded; false otherwise. </returns>
-		static bool TryParse(SType* type, std::wstring_view format, SObject*& result);
+		static bool TryParse(SType* type, StringView format, SObject*& result);
 
 		/// <summary>
 		/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object. The return value indicates whether the conversion succeeded.
@@ -234,7 +234,7 @@ namespace libty::inline Core::Reflection
 		/// <param name="result"> When this method returns, contains an object of type TEnum whose value is represented by value if the parse operation succeeds. If the parse operation fails, contains the default value of the underlying type of TEnum. This value need not be a member of the TEnum enumeration. This parameter is passed uninitialized. </param>
 		/// <returns> true if the conversion succeeded; false otherwise. </returns>
 		template<::libty::Core::Reflection::IEnum TEnum>
-		static bool TryParse(std::wstring_view format, TEnum& result)
+		static bool TryParse(StringView format, TEnum& result)
 		{
 			int64 uvalue;
 			if (TryParse(TEnum::TypeId, format, uvalue))
@@ -246,6 +246,6 @@ namespace libty::inline Core::Reflection
 		}
 
 	private:
-		static bool TryParse(SType* type, std::wstring_view format, int64& result);
+		static bool TryParse(SType* type, StringView format, int64& result);
 	};
 }
