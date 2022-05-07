@@ -6,7 +6,7 @@
 
 namespace libty::inline Game
 {
-	class GAME_API SGameEngineSubsystem : implements(SObject)
+	class GAME_API SGameEngineSubsystem : implements(SObject, IHostedService)
 	{
 		GENERATED_BODY(SGameEngineSubsystem);
 
@@ -14,10 +14,9 @@ namespace libty::inline Game
 		SGameEngineSubsystem();
 		virtual ~SGameEngineSubsystem() override;
 
-		virtual void Init() {}
-		virtual void PostInit() {}
-		virtual void Deinit();
-		virtual void Tick(float InDeltaTime) {}
+		virtual Task<> StartAsync(std::stop_token CancellationToken) override;
+		virtual Task<> StopAsync(std::stop_token CancellationToken) override;
+		virtual void Tick(float InDeltaTime);
 
 	public:
 		template<std::derived_from<SGameEngineSubsystem> T>

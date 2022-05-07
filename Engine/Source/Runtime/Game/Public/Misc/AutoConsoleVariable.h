@@ -11,18 +11,18 @@ namespace libty::inline Game
 		class GAME_API AutoConsoleVariableBase
 		{
 		private:
-			std::wstring Name;
+			String Name;
 
 		public:
-			AutoConsoleVariableBase(std::wstring_view Key);
+			AutoConsoleVariableBase(StringView Key);
 
-			std::wstring_view GetName() const;
+			StringView GetName() const;
 
 		public:
-			static bool TryProcessConsoleVar(std::wstring_view Key, std::wstring_view Argument);
+			static bool TryProcessConsoleVar(StringView Key, StringView Argument);
 
 		protected:
-			virtual void ProcessConsoleVar(std::wstring_view Argument) = 0;
+			virtual void ProcessConsoleVar(StringView Argument) = 0;
 		};
 
 		template<class U, class T>
@@ -32,75 +32,75 @@ namespace libty::inline Game
 			static constexpr const T Maximum = (T)std::numeric_limits<U>::max();
 			if (Value < Minimum || Value > Maximum)
 			{
-				throw std::out_of_range("Value is out of range.");
+				throw ArgumentException(TEXT("Value is out of range."));
 			}
 			return (U)Value;
 		}
 
-		inline void Parse(std::wstring_view Source, wchar_t* Out)
+		inline void Parse(StringView Source, wchar_t* Out)
 		{
 			if (Source.length() > 1)
 			{
-				throw std::out_of_range("String length is out of range.");
+				throw ArgumentException(TEXT("String length is out of range."));
 			}
 
 			*Out = Source[0];
 		}
 
-		inline void Parse(std::wstring_view Source, char* Out)
+		inline void Parse(StringView Source, char* Out)
 		{
 			if (Source.length() > 1)
 			{
-				throw std::out_of_range("String length is out of range.");
+				throw ArgumentException(TEXT("String length is out of range."));
 			}
 
 			*Out = (char)Source[0];
 		}
 
-		inline void Parse(std::wstring_view Source, uint16* Out)
+		inline void Parse(StringView Source, uint16* Out)
 		{
 			int32 Value = std::stoi(std::wstring(Source), nullptr, 10);
 			*Out = CheckOutOfRange<uint16>(Value);
 		}
 
-		inline void Parse(std::wstring_view Source, int16* Out)
+		inline void Parse(StringView Source, int16* Out)
 		{
 			int32 Value = std::stoi(std::wstring(Source), nullptr, 10);
 			*Out = CheckOutOfRange<int16>(Value);
 		}
 
-		inline void Parse(std::wstring_view Source, uint32* Out)
+		inline void Parse(StringView Source, uint32* Out)
 		{
 			*Out = std::stoul(std::wstring(Source), nullptr, 10);
 		}
 
-		inline void Parse(std::wstring_view Source, int32* Out)
+		inline void Parse(StringView Source, int32* Out)
 		{
 			*Out = std::stoi(std::wstring(Source), nullptr, 10);
 		}
 
-		inline void Parse(std::wstring_view Source, uint64* Out)
+		inline void Parse(StringView Source, uint64* Out)
 		{
 			*Out = std::stoull(std::wstring(Source), nullptr, 10);
 		}
 
-		inline void Parse(std::wstring_view Source, int64* Out)
+		inline void Parse(StringView Source, int64* Out)
 		{
 			*Out = std::stoll(std::wstring(Source), nullptr, 10);
 		}
 
-		inline void Parse(std::wstring_view Source, float* Out)
+		inline void Parse(StringView Source, float* Out)
 		{
 			*Out = std::stof(std::wstring(Source), nullptr);
 		}
 
-		inline void Parse(std::wstring_view Source, double* Out)
+		inline void Parse(StringView Source, double* Out)
 		{
 			*Out = std::stod(std::wstring(Source), nullptr);
 		}
 
 		template<class T>
-		inline bool TryParse(std::wstring_view Source, T* Out) requires requires
+		inline bool TryParse(StringView Source, T* Out) requires requires
 		{
 			{ Parse(Source, Out) };
 		}
@@ -112,18 +112,18 @@ namespace libty::inline Game
 			}
 			catch (const std::invalid_argument& E)
 			{
-				SE_LOG(LogConsoleVar, Warning, L"Invalid argument detected while parsing console variable: {}", String::AsUnicode(E.what()));
+				SE_LOG(LogConsoleVar, Warning, TEXT("Invalid argument detected while parsing console variable: {}"), String::AsUnicode(E.what()));
 				return false;
 			}
 			catch (const std::out_of_range& E)
 			{
-				SE_LOG(LogConsoleVar, Warning, L"Out of range detected while parsing console variable: {}", String::AsUnicode(E.what()));
+				SE_LOG(LogConsoleVar, Warning, TEXT("Out of range detected while parsing console variable: {}"), String::AsUnicode(E.what()));
 				return false;
 			}
 		}
 
 		template<class T>
-		inline bool TryParse(std::wstring_view Source, T* Out) requires requires
+		inline bool TryParse(StringView Source, T* Out) requires requires
 		{
 			{ T::TryParse(Source, Out) } -> std::same_as<bool>;
 		}
@@ -142,17 +142,17 @@ namespace libty::inline Game
 
 	public:
 		template<class U>
-		AutoConsoleVariable(std::wstring_view Key, U&& InitialValue)
+		AutoConsoleVariable(StringView Key, U&& InitialValue)
 			: AutoConsoleVariableBase(Key)
 			, Value(std::forward<U>(InitialValue))
 		{
 		}
 
-		void ProcessConsoleVar(std::wstring_view Argument)
+		void ProcessConsoleVar(StringView Argument)
 		{
 			if (Argument.empty())
 			{
-				SE_LOG(LogConsoleVar, Verbose, L"{}: {}", GetName(), Value);
+				SE_LOG(LogConsoleVar, Verbose, TEXT("{}: {}"), GetName(), Value);
 			}
 			else
 			{
@@ -160,7 +160,7 @@ namespace libty::inline Game
 				{
 					VariableCommitted.Broadcast(*this);
 				}
-				SE_LOG(LogConsoleVar, Verbose, L"{} = {}", GetName(), Value);
+				SE_LOG(LogConsoleVar, Verbose, TEXT("{} = {}"), GetName(), Value);
 			}
 		}
 

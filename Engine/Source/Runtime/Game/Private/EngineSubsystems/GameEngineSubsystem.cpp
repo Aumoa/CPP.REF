@@ -12,7 +12,16 @@ SGameEngineSubsystem::~SGameEngineSubsystem()
 {
 }
 
-void SGameEngineSubsystem::Deinit()
+Task<> SGameEngineSubsystem::StartAsync(std::stop_token CancellationToken)
 {
-	GC->SuppressFinalize(this);
+	return Task<>::CompletedTask();
+}
+
+Task<> SGameEngineSubsystem::StopAsync(std::stop_token CancellationToken)
+{
+	return Task<>::CompletedTask();
+}
+
+void SGameEngineSubsystem::Tick(float InDeltaTime)
+{
 }

@@ -10,6 +10,7 @@
 #include "EngineSubsystems/GameEngineSubsystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 #include "Misc/AutoConsoleVariable.h"
 
 DECLARE_STAT_GROUP("Engine", STATGROUP_Engine);
@@ -29,10 +30,7 @@ SGameEngine::SGameEngine() : Super()
 bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 {
 	GEngine = this;
-	Thread::GetCurrentThread()->SetFriendlyName(L"[Game Thread]");
-
-	//SlateApplication = CreateSlateApplication();
-	//SlateApplication->Init(InApplication);
+	Thread::GetCurrentThread()->SetFriendlyName(TEXT("[Game Thread]"));
 
 	InitializeSubsystems();
 	CoreDelegates::PostEngineInit.Broadcast();
@@ -46,19 +44,19 @@ bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 	ModuleSystem->LoadGameModule(InModuleName);
 	if (GameInstance = ModuleSystem->LoadGameInstance(); GameInstance == nullptr)
 	{
-		throw FatalException(String::Format("LoadGameInstance function from {} module return nullptr.", String::AsMultibyte(InModuleName)));
+		throw FatalException(String::Format(TEXT("LoadGameInstance function from {} module return nullptr."), InModuleName));
 	}
 
 	SWorld* GameWorld = GetEngineSubsystem<SGameLevelSystem>()->GetGameWorld();
 	GameInstance->SetOuter(GameWorld);
 	if (!GameInstance->StartupLevel.IsValid())
 	{
-		throw FatalException("SGameInstance::StartupLevel is not specified.");
+		throw FatalException(TEXT("SGameInstance::StartupLevel is not specified."));
 	}
 
 	if (!GetEngineSubsystem<SGameLevelSystem>()->OpenLevel(GameInstance->StartupLevel))
 	{
-		throw FatalException("Could not startup level.");
+		throw FatalException(TEXT("Could not startup level."));
 	}
 
 	return true;
@@ -66,13 +64,9 @@ bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
 
 void SGameEngine::Shutdown()
 {
-	for (auto& System : Subsystems)
-	{
-		System->Deinit();
-	}
+	SubsystemCollection->StopAsync().GetResult();
 
 	GC->SuppressFinalize(GameInstance);
-	//GC.SuppressFinalize(SlateApplication);
 	GC->Collect(true);
 
 	Subsystems.clear();
@@ -83,7 +77,7 @@ namespace AutoConsoleVars
 {
 	namespace GC
 	{
-		AutoConsoleVariable<float> CollectInterval(L"GC.CollectInterval", 60.0f);
+		AutoConsoleVariable<float> CollectInterval(TEXT("GC.CollectInterval"), 60.0f);
 	}
 }
 
@@ -91,25 +85,6 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstrin
 {
 	CoreDelegates::BeginMainInvoked.Broadcast();
 	GC->Collect();
-
-	SpinlockConditionVariable cv;
-	Spinlock lock;
-	std::unique_lock ul(lock, std::defer_lock);
-
-	int32 value = 0;
-	Task<>::Run([&lock, &cv, &value]()
-	{
-		std::unique_lock ul(lock);
-		cv.Wait(ul);
-		value = 100;
-	});
-
-	std::this_thread::sleep_for(20ms);
-
-	ul.lock();
-	value = 200;
-	ul.unlock();
-	cv.NotifyOne();
 
 	GC->SetFlushInterval(AutoConsoleVars::GC::CollectInterval.GetValue());
 	AutoConsoleVars::GC::CollectInterval.VariableCommitted.AddRaw([](AutoConsoleVariable<float>& V)
@@ -144,19 +119,14 @@ SGameInstance* SGameEngine::GetGameInstance()
 	return GameInstance;
 }
 
-//SSlateApplication* SGameEngine::GetSlateApplication()
-//{
-//	return SlateApplication;
-//}
-
-//SSlateApplication* SGameEngine::CreateSlateApplication()
-//{
-//	return gcnew SSlateApplication();
-//}
-
 void SGameEngine::InitializeSubsystems()
 {
 	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
+
+	SObjectFactoryBuilder* Builder = SObjectFactory::CreateBuilder();
+
+	Builder->AddSingleton<SRenderEngine>();
+	Builder->AddSingleton<SSlateCollection>();
 
 	auto Subclasses = SType::GetDerivedTypes(typeof(SGameEngineSubsystem));
 	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size() - 1);
@@ -168,27 +138,11 @@ void SGameEngine::InitializeSubsystems()
 			continue;
 		}
 
-		auto Instance = Cast<SGameEngineSubsystem>(Subclass->Instantiate());
-		Instance->Init();
-		Subsystems.emplace_back(Instance);
-
-		SType* Class = Instance->GetType();
-		while (Class)
-		{
-			auto [It, bStatus] = SubsystemView.emplace(Class->GetHashCode(), Instance);
-			if (bStatus)
-			{
-				break;
-			}
-
-			Class = Class->GetSuperType();
-		}
+		Builder->AddHostedService(Subclass);
 	}
 
-	for (auto& Subsystem : Subsystems)
-	{
-		Subsystem->PostInit();
-	}
+	SubsystemCollection = Cast<SObjectFactory>(Builder->Build());
+	SubsystemCollection->StartAsync().GetResult();
 }
 
 void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
@@ -237,5 +191,5 @@ void SGameEngine::RenderTick(std::chrono::duration<float> InDeltaTime)
 {
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteRenderThread);
 
-	//GetEngineSubsystem<SGameRenderSystem>()->ExecuteRenderThread(InDeltaTime.count(), SlateApplication);
+	GetEngineSubsystem<SGameRenderSystem>()->RenderFrame(InDeltaTime);
 }

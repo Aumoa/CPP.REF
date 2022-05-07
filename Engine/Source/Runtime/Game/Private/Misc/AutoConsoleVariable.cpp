@@ -8,7 +8,7 @@ namespace libty::inline Game::Details
 {
 	static std::map<std::wstring, AutoConsoleVariableBase*>* StaticVars;
 
-	AutoConsoleVariableBase::AutoConsoleVariableBase(std::wstring_view Key)
+	AutoConsoleVariableBase::AutoConsoleVariableBase(StringView Key)
 	{
 		static std::map<std::wstring, AutoConsoleVariableBase*> StaticVars_Impl;
 		StaticVars = &StaticVars_Impl;
@@ -17,17 +17,17 @@ namespace libty::inline Game::Details
 		std::wstring Key_v = String::ToLower(Name);
 
 		auto [It, bResult] = StaticVars_Impl.emplace(Key_v, this);
-		checkf(bResult, L"Duplicated AutoConsoleVariable detected. Key: '{}'", Key);
+		checkf(bResult, TEXT("Duplicated AutoConsoleVariable detected. Key: '{}'"), Key);
 	}
 
-	std::wstring_view AutoConsoleVariableBase::GetName() const
+	StringView AutoConsoleVariableBase::GetName() const
 	{
 		return Name;
 	}
 
-	bool AutoConsoleVariableBase::TryProcessConsoleVar(std::wstring_view Key, std::wstring_view Arguments)
+	bool AutoConsoleVariableBase::TryProcessConsoleVar(StringView Key, StringView Arguments)
 	{
-		std::wstring Key_v = String::ToLower(std::wstring(Key));
+		String Key_v = String::ToLower(Key);
 
 		auto It = StaticVars->find(Key_v);
 		if (It == StaticVars->end())

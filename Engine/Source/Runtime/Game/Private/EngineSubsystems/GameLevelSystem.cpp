@@ -17,12 +17,13 @@ SGameLevelSystem::~SGameLevelSystem()
 {
 }
 
-void SGameLevelSystem::PostInit()
+Task<> SGameLevelSystem::StartAsync(std::stop_token CancellationToken)
 {
 	SpawnWorld(EWorldType::GameWorld);
+	return Super::StartAsync(CancellationToken);
 }
 
-void SGameLevelSystem::Deinit()
+Task<> SGameLevelSystem::StopAsync(std::stop_token CancellationToken)
 {
 	for (auto Actor : ActorIterator(_GameWorld))
 	{
@@ -32,7 +33,7 @@ void SGameLevelSystem::Deinit()
 	_GameWorld->DestroyWorld();
 	GC->SuppressFinalize(_GameWorld);
 
-	Super::Deinit();
+	return Super::StopAsync(CancellationToken);
 }
 
 SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)

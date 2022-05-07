@@ -14,16 +14,19 @@ SGameModuleSystem::~SGameModuleSystem()
 {
 }
 
-void SGameModuleSystem::Init()
+Task<> SGameModuleSystem::StartAsync(std::stop_token CancellationToken)
 {
+	return Super::StartAsync(CancellationToken);
 }
 
-void SGameModuleSystem::Deinit()
+Task<> SGameModuleSystem::StopAsync(std::stop_token CancellationToken)
 {
 	if (GameModule)
 	{
 		GC->SuppressFinalize(GameModule);
 	}
+
+	return Super::StopAsync(CancellationToken);
 }
 
 void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)

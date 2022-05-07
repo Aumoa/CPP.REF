@@ -15,8 +15,8 @@ namespace libty::inline Game
 	private:
 		SPROPERTY(GameInstance)
 		SGameInstance* GameInstance = nullptr;
-		//SPROPERTY(SlateApplication)
-		//SSlateApplication* SlateApplication = nullptr;
+		SPROPERTY(SubsystemCollection)
+		SObjectFactory* SubsystemCollection = nullptr;
 
 	public:
 		SGameEngine();
@@ -27,10 +27,6 @@ namespace libty::inline Game
 
 		int32 GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule);
 		SGameInstance* GetGameInstance();
-		//SSlateApplication* GetSlateApplication();
-
-	protected:
-		//virtual SSlateApplication* CreateSlateApplication();
 
 	private:
 		SPROPERTY(Subsystems)
@@ -41,14 +37,10 @@ namespace libty::inline Game
 
 	public:
 		template<class T>
-		T* GetEngineSubsystem()
+		T* GetEngineSubsystem() requires
+			std::derived_from<T, SGameEngineSubsystem>
 		{
-			auto It = SubsystemView.find(T::TypeId->GetHashCode());
-			if (It == SubsystemView.end())
-			{
-				return nullptr;
-			}
-			return Cast<T>(It->second);
+			return SubsystemCollection->GetRequiredService<T>();
 		}
 
 	private:

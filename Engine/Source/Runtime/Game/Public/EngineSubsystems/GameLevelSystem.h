@@ -22,8 +22,8 @@ namespace libty::inline Game
 		SGameLevelSystem();
 		virtual ~SGameLevelSystem() override;
 
-		virtual void PostInit() override;
-		virtual void Deinit() override;
+		virtual Task<> StartAsync(std::stop_token CancellationToken) override;
+		virtual Task<> StopAsync(std::stop_token CancellationToken) override;
 
 		SWorld* SpawnWorld(EWorldType InWorldType);
 

@@ -20,7 +20,8 @@ public class Game : ModuleRule
             "CoreSObject",
             "CoreNumerics",
             "PlatformGeneric",
-            "RenderCore"
+            "RenderCore",
+            "SlateCore"
         });
     }
 }

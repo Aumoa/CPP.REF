@@ -21,8 +21,8 @@ namespace libty::inline Game
 		SGameModuleSystem();
 		virtual ~SGameModuleSystem() override;
 
-		virtual void Init() override;
-		virtual void Deinit() override;
+		virtual Task<> StartAsync(std::stop_token CancellationToken) override;
+		virtual Task<> StopAsync(std::stop_token CancellationToken) override;
 
 		void LoadGameModule(std::wstring_view GameModuleName);
 		SGameInstance* LoadGameInstance();

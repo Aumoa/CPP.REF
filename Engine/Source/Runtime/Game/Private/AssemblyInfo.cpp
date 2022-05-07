@@ -21,6 +21,7 @@ DEFINE_ASSEMBLY_INFO;
 #include "EngineSubsystems/GameInstanceSubsystem.h"
 #include "EngineSubsystems/GameLevelSystem.h"
 #include "EngineSubsystems/GameModuleSystem.h"
+#include "EngineSubsystems/GameRenderSystem.h"
 
 #include "GameFramework/Actor.h"
 #include "GameFramework/AIController.h"
@@ -59,6 +60,7 @@ GENERATE_BODY(libty::Game::SGameInputSystem);
 GENERATE_BODY(libty::Game::SGameInstanceSubsystem);
 GENERATE_BODY(libty::Game::SGameLevelSystem);
 GENERATE_BODY(libty::Game::SGameModuleSystem);
+GENERATE_BODY(libty::Game::SGameRenderSystem);
 
 GENERATE_BODY(libty::Game::AActor);
 GENERATE_BODY(libty::Game::AAIController);
