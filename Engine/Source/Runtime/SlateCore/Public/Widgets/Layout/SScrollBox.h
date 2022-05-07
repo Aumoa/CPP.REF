@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SScrollBox : extends(SBoxPanel)
+	class SLATECORE_API SScrollBox : public SBoxPanel
 	{
 		GENERATED_BODY(SScrollBox);
 

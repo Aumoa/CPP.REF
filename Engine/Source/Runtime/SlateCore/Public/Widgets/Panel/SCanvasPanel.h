@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SCanvasPanel : extends(SPanelWidget)
+	class SLATECORE_API SCanvasPanel : public SPanelWidget
 	{
 		GENERATED_BODY(SCanvasPanel);
 

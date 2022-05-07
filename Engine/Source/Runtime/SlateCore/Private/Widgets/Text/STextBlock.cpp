@@ -7,7 +7,7 @@
 
 using namespace ::libty;
 
-class STextBlock::SRenderElement : implements(SObject), implements(IRenderSlateElement)
+class STextBlock::SRenderElement : implements(SObject, IRenderSlateElement)
 {
 	GENERATED_BODY(SRenderElement)
 
@@ -90,7 +90,7 @@ STextBlock::STextBlock() : Super()
 {
 }
 
-void STextBlock::SetText(std::wstring_view Text)
+void STextBlock::SetText(StringView Text)
 {
 	if (this->Text != Text)
 	{
@@ -99,7 +99,7 @@ void STextBlock::SetText(std::wstring_view Text)
 	}
 }
 
-std::wstring STextBlock::GetText()
+String STextBlock::GetText()
 {
 	return Text;
 }

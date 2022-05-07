@@ -6,7 +6,7 @@ namespace libty::inline SlateCore
 {
 	struct SlateFont
 	{
-		std::wstring FamilyName;
+		String FamilyName;
 		//IRHIFontCollection* Collection = nullptr;
 		float Size = 11.0f;
 
@@ -14,14 +14,14 @@ namespace libty::inline SlateCore
 		{
 		}
 
-		//SlateFont(std::wstring InFamilyName, float InSize, IRHIFontCollection* InCollection = nullptr)
+		//SlateFont(String InFamilyName, float InSize, IRHIFontCollection* InCollection = nullptr)
 		//	: FamilyName(InFamilyName)
 		//	, Collection(InCollection)
 		//	, Size(InSize)
 		//{
 		//}
 
-		std::wstring ToString(std::wstring_view InFormatArgs = L"") const
+		String ToString(StringView InFormatArgs = L"") const
 		{
 			return String::Format(L"FamilyName={} Size={}", FamilyName, Size);
 		}

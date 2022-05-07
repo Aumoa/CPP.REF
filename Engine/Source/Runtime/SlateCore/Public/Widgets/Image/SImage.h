@@ -7,7 +7,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SImage : extends(SLeafWidget)
+	class SLATECORE_API SImage : public SLeafWidget
 	{
 		GENERATED_BODY(SImage);
 

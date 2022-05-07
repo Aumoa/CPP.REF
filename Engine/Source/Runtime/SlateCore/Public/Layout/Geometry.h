@@ -222,9 +222,9 @@ namespace libty::inline SlateCore
 			return AccumulatedRenderTransform;
 		}
 
-		std::wstring ToString(std::wstring_view InFormatArgs = L"") const
+		String ToString(StringView InFormatArgs = L"") const
 		{
-			std::wstring scaleText = String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
+			String scaleText = String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
 			return String::Format(L"[Abs={}, Scale={}, Size={}]", AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
 		}
 

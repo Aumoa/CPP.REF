@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SHorizontalBoxPanel : extends(SBoxPanel)
+	class SLATECORE_API SHorizontalBoxPanel : public SBoxPanel
 	{
 		GENERATED_BODY(SHorizontalBoxPanel);
 

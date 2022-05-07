@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SLeafWidget : extends(SWidget)
+	class SLATECORE_API SLeafWidget : public SWidget
 	{
 		GENERATED_BODY(SLeafWidget);
 

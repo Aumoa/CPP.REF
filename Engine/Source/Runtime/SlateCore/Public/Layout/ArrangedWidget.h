@@ -19,7 +19,7 @@ namespace libty::inline SlateCore
 	public:
 		ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry);
 
-		std::wstring ToString() const;
+		String ToString() const;
 
 		SWidget* GetWidget() const { return Widget.Get(); }
 		const Geometry& GetGeometry() const { return MyGeometry; }

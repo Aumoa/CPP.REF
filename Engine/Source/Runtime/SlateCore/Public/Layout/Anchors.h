@@ -97,7 +97,7 @@ namespace libty::inline SlateCore
 		}
 
 	public:
-		inline std::wstring ToString(std::wstring_view FormatArgs) const
+		inline String ToString(StringView FormatArgs) const
 		{
 			return String::Format(L"{{{Minimum={}, Maximum={}}}", Minimum.ToString(FormatArgs), Maximum.ToString(FormatArgs));
 		}

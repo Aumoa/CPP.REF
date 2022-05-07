@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SCompoundWidget : extends(SWidget)
+	class SLATECORE_API SCompoundWidget : public SWidget
 	{
 		GENERATED_BODY(SCompoundWidget);
 

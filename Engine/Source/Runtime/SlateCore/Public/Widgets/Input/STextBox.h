@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API STextBox : extends(STextBlock)
+	class SLATECORE_API STextBox : public STextBlock
 	{
 		GENERATED_BODY(STextBox);
 
@@ -24,7 +24,7 @@ namespace libty::inline SlateCore
 		virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
 
 	public:
-		DECLARE_MULTICAST_DELEGATE(TextCommittedDelegate, std::wstring_view)
+		DECLARE_MULTICAST_DELEGATE(TextCommittedDelegate, StringView)
 		TextCommittedDelegate TextCommitted;
 
 	private:
@@ -34,7 +34,7 @@ namespace libty::inline SlateCore
 		void Enter();
 
 	private:
-		std::wstring Text;
+		String Text;
 		std::optional<wchar_t> ComposingChar;
 		size_t Caret = 0;
 	};

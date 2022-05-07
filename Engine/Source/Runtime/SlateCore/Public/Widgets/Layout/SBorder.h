@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SBorder : extends(SCompoundWidget)
+	class SLATECORE_API SBorder : public SCompoundWidget
 	{
 		GENERATED_BODY(SBorder);
 

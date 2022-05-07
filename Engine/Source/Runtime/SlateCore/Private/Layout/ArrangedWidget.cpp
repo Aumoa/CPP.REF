@@ -11,7 +11,7 @@ ArrangedWidget::ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry)
 {
 }
 
-std::wstring ArrangedWidget::ToString() const
+String ArrangedWidget::ToString() const
 {
 	return String::Format(L"{} @ {}", Widget->ToString(), MyGeometry.ToString());
 }

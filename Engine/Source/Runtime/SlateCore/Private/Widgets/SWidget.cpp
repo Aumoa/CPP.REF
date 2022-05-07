@@ -10,17 +10,17 @@ SWidget::SWidget() : Super()
 {
 }
 
-std::wstring SWidget::ToString()
+String SWidget::ToString()
 {
-	return String::Format(L"{}({}): [{}] ({})", GetName(), GetType()->GetFullQualifiedName(), GetDesiredSize().ToString(), Visibility.ToString());
+	return String::Format(TEXT("{}({}): [{}] ({})"), GetName(), GetType()->GetFullQualifiedName(), GetDesiredSize().ToString(), Visibility.ToString());
 }
 
 void SWidget::Dispose()
 {
-    GC.SuppressFinalize(this);
+    GC->SuppressFinalize(this);
 }
 
-std::wstring SWidget::GetName()
+String SWidget::GetName()
 {
     return Name;
 }

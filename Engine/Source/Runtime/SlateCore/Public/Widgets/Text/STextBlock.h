@@ -8,7 +8,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API STextBlock : extends(SLeafWidget)
+	class SLATECORE_API STextBlock : public SLeafWidget
 	{
 		GENERATED_BODY(STextBlock);
 
@@ -26,7 +26,7 @@ namespace libty::inline SlateCore
 		SPROPERTY(CachedRenderElement)
 		SRenderElement* CachedRenderElement = nullptr;
 
-		std::wstring Text;
+		String Text;
 		SlateFont Font;
 		Color TintColor = NamedColors::Black;
 		ERHITextAlignment TextAlignment = ERHITextAlignment::Leading;
@@ -38,8 +38,8 @@ namespace libty::inline SlateCore
 	public:
 		STextBlock();
 
-		void SetText(std::wstring_view Text);
-		std::wstring GetText();
+		void SetText(StringView Text);
+		String GetText();
 		void SetFont(const SlateFont& Font);
 		SlateFont GetFont();
 		void SetTintColor(const Color& TintColor);
@@ -62,7 +62,7 @@ namespace libty::inline SlateCore
 
 	public:
 		BEGIN_SLATE_ATTRIBUTE
-			DECLARE_SLATE_ATTRIBUTE(std::wstring, Text)
+			DECLARE_SLATE_ATTRIBUTE(String, Text)
 			DECLARE_SLATE_ATTRIBUTE(SlateFont, Font)
 			DECLARE_SLATE_ATTRIBUTE(Color, TintColor, NamedColors::Black)
 			DECLARE_SLATE_ATTRIBUTE(ERHITextAlignment, TextAlignment, ERHITextAlignment::Leading)

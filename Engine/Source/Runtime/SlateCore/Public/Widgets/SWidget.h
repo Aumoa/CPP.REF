@@ -13,12 +13,12 @@ namespace libty::inline SlateCore
 	class ArrangedChildrens;
 	class ArrangedWidget;
 
-	class SLATECORE_API SWidget : implements(SObject), implements(IDisposable)
+	class SLATECORE_API SWidget : implements(SObject, IDisposable)
 	{
 		GENERATED_BODY(SWidget);
 
 	private:
-		std::wstring Name;
+		String Name;
 
 		ESlateVisibility Visibility = ESlateVisibility::Visible;
 		EFlowDirection FlowDirection = EFlowDirection::LeftToRight;
@@ -38,9 +38,9 @@ namespace libty::inline SlateCore
 	public:
 		SWidget();
 
-		virtual std::wstring ToString() override;
+		virtual String ToString() override;
 		virtual void Dispose() override;
-		std::wstring GetName();
+		String GetName();
 
 		int32 Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled);
 		void ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry);

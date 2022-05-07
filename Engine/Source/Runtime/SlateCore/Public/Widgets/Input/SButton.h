@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SButton : extends(SBorder)
+	class SLATECORE_API SButton : public SBorder
 	{
 		GENERATED_BODY(SButton);
 

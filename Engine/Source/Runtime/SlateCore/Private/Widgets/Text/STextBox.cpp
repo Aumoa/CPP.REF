@@ -97,8 +97,8 @@ void STextBox::Composition(wchar_t Ch)
 	else
 	{
 		ComposingChar = Ch;
-		std::wstring Left = Text.substr(0, Caret);
-		std::wstring Right = Text.substr(Caret);
+		String Left = Text.substr(0, Caret);
+		String Right = Text.substr(Caret);
 		SetText(Left + Ch + Right);
 	}
 }

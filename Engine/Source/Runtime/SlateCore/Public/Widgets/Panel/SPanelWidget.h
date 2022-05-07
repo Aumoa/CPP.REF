@@ -6,7 +6,7 @@
 
 namespace libty::inline SlateCore
 {
-	class SLATECORE_API SPanelWidget : extends(SCompoundWidget)
+	class SLATECORE_API SPanelWidget : public SCompoundWidget
 	{
 		GENERATED_BODY(SPanelWidget);
 

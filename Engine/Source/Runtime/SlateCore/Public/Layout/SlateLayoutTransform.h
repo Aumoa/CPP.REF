@@ -25,7 +25,7 @@ namespace libty::inline SlateCore
 		{
 		}
 
-		std::wstring ToString(std::wstring_view InFormatArgs = L"") const
+		String ToString(StringView InFormatArgs = L"") const
 		{
 			return String::Format(L"Translation: {}, Scale: {}", Translation.ToString(InFormatArgs), String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs)));
 		}
