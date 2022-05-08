@@ -53,6 +53,7 @@ namespace libty::inline Core::Reflection
 		using ClassFieldsCollection = std::vector<SFieldInfo*>;
 		using ClassMethodsCollection = std::vector<SMethodInfo*>;
 		using InterfaceCollection = std::vector<SType*>;
+		using TypeGetter = std::function<SType* ()>;
 
 		// ** Common metadata **
 		String ClassName;
@@ -60,7 +61,7 @@ namespace libty::inline Core::Reflection
 		SAssembly* Assembly;
 		ClassAttributeCollection Attributes;
 		InterfaceCollection Interfaces;
-		SType* SuperClass;
+		TypeGetter SuperClass;
 		size_t TypeHash;
 		std::function<SObject* ()> Constructor;
 		uint8 bIsNative : 1;
@@ -98,12 +99,12 @@ namespace libty::inline Core::Reflection
 		static std::vector<SType*> MakeInterfaceCollection();
 
 		template<class TOwningClass>
-		static SType* GetSuperClass() requires
+		static TypeGetter GetSuperClass() requires
 			requires { std::declval<typename TOwningClass::Super>(); } &&
-			(not std::same_as<typename TOwningClass::Super, void>);
+		(not std::same_as<typename TOwningClass::Super, void>);
 
 		template<class TOwningClass>
-		static SType* GetSuperClass();
+		static TypeGetter GetSuperClass();
 
 		template<class TOwningClass, size_t N>
 		void CollectFields()

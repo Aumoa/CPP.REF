@@ -19,20 +19,17 @@ namespace libty::inline Core
 	public:
 		struct InjectionInfo
 		{
-			GENERATED_BODY(InjectionInfo);
-
-		public:
 			EServiceType ServiceType;
 			SType* Class = nullptr;
 			std::function<SObject* (IServiceProvider*)> Factory;
-			SPROPERTY(Instanced)
 			SObject* Instanced = nullptr;
 		};
 
 	private:
 		SPROPERTY(_primaryService);
 		static SObjectFactory* _primaryService;
-		SPROPERTY(_injections);
+		SPROPERTY(_instanced);
+		std::set<SObject*> _instanced;
 		std::map<size_t, InjectionInfo> _injections;
 		std::vector<IHostedService*> _hostedServices;
 

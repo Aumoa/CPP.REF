@@ -83,6 +83,7 @@ SObject* SObjectFactory::InternalGetService(SType* type, bool nolock)
 		if (it->second.Instanced == nullptr)
 		{
 			it->second.Instanced = CreateInstance(it->second);
+			_instanced.emplace(it->second.Instanced);
 		}
 		return it->second.Instanced;
 	}
@@ -112,6 +113,7 @@ Task<> SObjectFactory::StartAsync(std::stop_token cancellationToken)
 				throw InjectException(EInjectionErrorCode::NotSupportedType);
 			}
 			info.Instanced = instanced;
+			_instanced.emplace(info.Instanced);
 
 			tasks.emplace_back(_hostedServices.emplace_back(Cast<IHostedService>(instanced))->StartAsync(cancellationToken));
 		}

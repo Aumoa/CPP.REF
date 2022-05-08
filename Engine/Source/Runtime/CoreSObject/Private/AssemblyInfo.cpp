@@ -45,7 +45,6 @@ GENERATE_BODY(libty::Core::Reflection::SMemberInfo);
 GENERATE_BODY(libty::Core::Reflection::SMethodInfo);
 
 GENERATE_BODY(libty::Core::SObjectFactory);
-GENERATE_BODY(libty::Core::SObjectFactory::InjectionInfo);
 GENERATE_BODY(libty::Core::SObjectFactoryBuilder);
 GENERATE_BODY(libty::Core::EServiceType);
 GENERATE_BODY(libty::Core::IServiceProvider);

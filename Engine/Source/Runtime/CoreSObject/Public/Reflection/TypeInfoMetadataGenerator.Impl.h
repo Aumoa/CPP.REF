@@ -154,15 +154,15 @@ namespace libty::inline Core::Reflection
 	}
 
 	template<class TOwningClass>
-	SType* TypeInfoMetadataGenerator::GetSuperClass() requires
+	auto TypeInfoMetadataGenerator::GetSuperClass() ->TypeGetter requires
 		requires { std::declval<typename TOwningClass::Super>(); } &&
-		(not std::same_as<typename TOwningClass::Super, void>)
+	(not std::same_as<typename TOwningClass::Super, void>)
 	{
-		return typeof(typename TOwningClass::Super);
+		return [] { return typeof(typename TOwningClass::Super); };
 	}
 
 	template<class TOwningClass>
-	SType* TypeInfoMetadataGenerator::GetSuperClass()
+	auto TypeInfoMetadataGenerator::GetSuperClass() -> TypeGetter
 	{
 		return nullptr;
 	}
