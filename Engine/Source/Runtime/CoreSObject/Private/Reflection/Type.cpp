@@ -27,17 +27,17 @@ SType::SType(MetadataGenerator&& generator)
 	for (SType* curr = this; curr != nullptr; curr = curr->_meta.SuperClass)
 	{
 		_staticCollection->HierarchyView[curr].emplace(this);
-		
-		auto fields = GetFields(false);
+
+		auto fields = curr->GetFields(false);
 		_recursiveFields.insert(_recursiveFields.end(), fields.begin(), fields.end());
 
-		auto methods = GetMethods(false);
+		auto methods = curr->GetMethods(false);
 		_recursiveMethods.insert(_recursiveMethods.end(), methods.begin(), methods.end());
 
-		auto attributes = GetCustomAttributes(false);
+		auto attributes = curr->GetCustomAttributes(false);
 		_recursiveAttributes.insert(_recursiveAttributes.end(), attributes.begin(), attributes.end());
 	}
-
+	
 	if (_meta.Assembly)
 	{
 		_meta.Assembly->AddType(this);
@@ -63,17 +63,17 @@ std::span<SFieldInfo* const> SType::GetFields(bool bRecursive)
 {
 	if (bRecursive)
 	{
-		return _meta.Fields;
+		return _recursiveFields;
 	}
 	else
 	{
-		return _recursiveFields;
+		return _meta.Fields;
 	}
 }
 
 SFieldInfo* SType::GetField(StringView fieldName, bool bRecursive)
 {
-	auto& collection = bRecursive ? _meta.Fields : _recursiveFields;
+	auto& collection = bRecursive ? _recursiveFields : _meta.Fields;
 	auto it = std::find_if(collection.begin(), collection.end(), [&fieldName](SFieldInfo* field)
 	{
 		return field->GetName() == fieldName;
@@ -91,17 +91,17 @@ std::span<SMethodInfo* const> SType::GetMethods(bool bRecursive)
 {
 	if (bRecursive)
 	{
-		return _meta.Methods;
+		return _recursiveMethods;
 	}
 	else
 	{
-		return _recursiveMethods;
+		return _meta.Methods;
 	}
 }
 
 SMethodInfo* SType::GetMethod(StringView methodName, bool bRecursive)
 {
-	auto& collection = bRecursive ? _meta.Methods : _recursiveMethods;
+	auto& collection = bRecursive ?_recursiveMethods : _meta.Methods;
 	auto it = std::find_if(collection.begin(), collection.end(), [&methodName](SMethodInfo* method)
 	{
 		return method->GetName() == methodName;
@@ -119,17 +119,17 @@ std::span<SClassAttribute* const> SType::GetCustomAttributes(bool bRecursive)
 {
 	if (bRecursive)
 	{
-		return _meta.Attributes;
+		return _recursiveAttributes;
 	}
 	else
 	{
-		return _recursiveAttributes;
+		return _meta.Attributes;
 	}
 }
 
 SClassAttribute* SType::GetCustomAttribute(SType* attributeType, bool bRecursive)
 {
-	auto& collection = bRecursive ? _meta.Attributes : _recursiveAttributes;
+	auto& collection = bRecursive ? _recursiveAttributes : _meta.Attributes;
 	auto it = std::find_if(collection.begin(), collection.end(), [&attributeType](SClassAttribute* attr)
 	{
 		return attr->GetType()->IsA(attributeType);

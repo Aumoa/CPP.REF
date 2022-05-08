@@ -18,6 +18,7 @@ namespace libty::inline Core
 	public:
 		virtual IServiceCollection* AddService(EServiceType type, SType* cls, std::function<SObject*(IServiceProvider*)> factory) = 0;
 		virtual IServiceProvider* Build() = 0;
+		IServiceCollection* AddAutoServices();
 
 		inline IServiceCollection* AddHostedService(SType* cls)
 		{
