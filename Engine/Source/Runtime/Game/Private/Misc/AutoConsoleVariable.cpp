@@ -6,15 +6,15 @@ DEFINE_LOG_CATEGORY(LogConsoleVar);
 
 namespace libty::inline Game::Details
 {
-	static std::map<std::wstring, AutoConsoleVariableBase*>* StaticVars;
+	static std::map<String, AutoConsoleVariableBase*>* StaticVars;
 
 	AutoConsoleVariableBase::AutoConsoleVariableBase(StringView Key)
 	{
-		static std::map<std::wstring, AutoConsoleVariableBase*> StaticVars_Impl;
+		static std::map<String, AutoConsoleVariableBase*> StaticVars_Impl;
 		StaticVars = &StaticVars_Impl;
 
-		Name = std::wstring(Key);
-		std::wstring Key_v = String::ToLower(Name);
+		Name = String(Key);
+		String Key_v = String::ToLower(Name);
 
 		auto [It, bResult] = StaticVars_Impl.emplace(Key_v, this);
 		checkf(bResult, TEXT("Duplicated AutoConsoleVariable detected. Key: '{}'"), Key);

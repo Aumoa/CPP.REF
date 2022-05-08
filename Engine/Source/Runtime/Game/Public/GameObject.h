@@ -17,17 +17,17 @@ namespace libty::inline Game
 	private:
 		SPROPERTY(Outer)
 		SGameObject* Outer = nullptr;
-		std::wstring Name;
+		String Name;
 
 	public:
 		SGameObject();
 
-		virtual std::wstring ToString() override;
+		virtual String ToString() override;
 
 		SGameObject* GetOuter() const;
 		void SetOuter(SGameObject* Value);
-		std::wstring_view GetName() const;
-		void SetName(std::wstring_view Value);
+		StringView GetName() const;
+		void SetName(StringView Value);
 
 		virtual SLevel* GetLevel();
 		virtual SWorld* GetWorld();

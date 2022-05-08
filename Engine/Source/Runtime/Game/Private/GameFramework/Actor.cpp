@@ -182,7 +182,7 @@ SActorComponent* AActor::GetComponentByClass(SubclassOf<SActorComponent> InCompo
 void AActor::SetRootComponent(SSceneComponent* InRootComponent)
 {
 	SSceneComponent* AttachParent = nullptr;
-	std::wstring SocketName;
+	String SocketName;
 
 	if (RootComponent)
 	{

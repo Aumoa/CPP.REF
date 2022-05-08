@@ -38,7 +38,7 @@ void SSceneComponent::UpdateComponentToWorld()
 	UpdateWorldTransform();
 }
 
-Transform SSceneComponent::GetSocketTransform(std::wstring_view InSocketName, EComponentTransformSpace InSpace) const
+Transform SSceneComponent::GetSocketTransform(StringView InSocketName, EComponentTransformSpace InSpace) const
 {
 	SE_LOG(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
 
@@ -95,7 +95,7 @@ void SSceneComponent::AttachToComponent(SSceneComponent* AttachTo)
 	AttachToSocket(AttachTo, L"");
 }
 
-void SSceneComponent::AttachToSocket(SSceneComponent* AttachTo, const std::wstring& socketName)
+void SSceneComponent::AttachToSocket(SSceneComponent* AttachTo, const String& socketName)
 {
 	if (AttachTo == nullptr)
 	{

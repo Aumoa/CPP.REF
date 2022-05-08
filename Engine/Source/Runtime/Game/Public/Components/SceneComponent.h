@@ -21,7 +21,7 @@ namespace libty::inline Game
 		struct SceneAttachment
 		{
 			SSceneComponent* AttachmentRoot = nullptr;
-			std::wstring SocketName;
+			String SocketName;
 
 			inline void Clear()
 			{
@@ -44,15 +44,15 @@ namespace libty::inline Game
 
 		virtual void UpdateChildTransforms();
 		virtual void UpdateComponentToWorld();
-		virtual Transform GetSocketTransform(std::wstring_view InSocketName, EComponentTransformSpace InSpace = EComponentTransformSpace::World) const;
+		virtual Transform GetSocketTransform(StringView InSocketName, EComponentTransformSpace InSpace = EComponentTransformSpace::World) const;
 		virtual bool MoveComponent(const Vector3& InMoveDelta, const Quaternion& InNewRotation, EComponentTransformSpace InSpace = EComponentTransformSpace::World);
 
 		void AttachToComponent(SSceneComponent* AttachTo);
-		void AttachToSocket(SSceneComponent* AttachTo, const std::wstring& socketName);
+		void AttachToSocket(SSceneComponent* AttachTo, const String& socketName);
 		void DetachFromComponent();
 
 		inline SSceneComponent* GetAttachParent() { return _Attachment.AttachmentRoot; }
-		inline std::wstring GetAttachSocketName() { return _Attachment.SocketName; }
+		inline String GetAttachSocketName() { return _Attachment.SocketName; }
 		inline const std::vector<SSceneComponent*>& GetChildComponents() { return _Childs; }
 		Transform GetRelativeTransform() const;
 		void SetRelativeTransform(const Transform& value);

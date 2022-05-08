@@ -59,44 +59,44 @@ namespace libty::inline Game
 
 		inline void Parse(StringView Source, uint16* Out)
 		{
-			int32 Value = std::stoi(std::wstring(Source), nullptr, 10);
+			int32 Value = std::stoi(String(Source), nullptr, 10);
 			*Out = CheckOutOfRange<uint16>(Value);
 		}
 
 		inline void Parse(StringView Source, int16* Out)
 		{
-			int32 Value = std::stoi(std::wstring(Source), nullptr, 10);
+			int32 Value = std::stoi(String(Source), nullptr, 10);
 			*Out = CheckOutOfRange<int16>(Value);
 		}
 
 		inline void Parse(StringView Source, uint32* Out)
 		{
-			*Out = std::stoul(std::wstring(Source), nullptr, 10);
+			*Out = std::stoul(String(Source), nullptr, 10);
 		}
 
 		inline void Parse(StringView Source, int32* Out)
 		{
-			*Out = std::stoi(std::wstring(Source), nullptr, 10);
+			*Out = std::stoi(String(Source), nullptr, 10);
 		}
 
 		inline void Parse(StringView Source, uint64* Out)
 		{
-			*Out = std::stoull(std::wstring(Source), nullptr, 10);
+			*Out = std::stoull(String(Source), nullptr, 10);
 		}
 
 		inline void Parse(StringView Source, int64* Out)
 		{
-			*Out = std::stoll(std::wstring(Source), nullptr, 10);
+			*Out = std::stoll(String(Source), nullptr, 10);
 		}
 
 		inline void Parse(StringView Source, float* Out)
 		{
-			*Out = std::stof(std::wstring(Source), nullptr);
+			*Out = std::stof(String(Source), nullptr);
 		}
 
 		inline void Parse(StringView Source, double* Out)
 		{
-			*Out = std::stod(std::wstring(Source), nullptr);
+			*Out = std::stod(String(Source), nullptr);
 		}
 
 		template<class T>

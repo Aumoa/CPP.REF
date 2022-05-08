@@ -38,7 +38,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	return true;
 }
 
-bool SGameEngine::LoadGameModule(std::wstring_view InModuleName)
+bool SGameEngine::LoadGameModule(StringView InModuleName)
 {
 	SGameModuleSystem* ModuleSystem = GetEngineSubsystem<SGameModuleSystem>();
 	ModuleSystem->LoadGameModule(InModuleName);
@@ -81,7 +81,7 @@ namespace AutoConsoleVars
 	}
 }
 
-int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, std::wstring_view gameModule)
+int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, StringView gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Broadcast();
 	GC->Collect();

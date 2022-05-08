@@ -10,7 +10,7 @@ SGameObject::SGameObject() : Super()
 {
 }
 
-std::wstring SGameObject::ToString()
+String SGameObject::ToString()
 {
 	return Name;
 }
@@ -25,12 +25,12 @@ void SGameObject::SetOuter(SGameObject* Value)
 	Outer = Value;
 }
 
-std::wstring_view SGameObject::GetName() const
+StringView SGameObject::GetName() const
 {
 	return Name;
 }
 
-void SGameObject::SetName(std::wstring_view Value)
+void SGameObject::SetName(StringView Value)
 {
 	Name = Value;
 }

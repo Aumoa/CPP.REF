@@ -29,7 +29,7 @@ Task<> SGameModuleSystem::StopAsync(std::stop_token CancellationToken)
 	return Super::StopAsync(CancellationToken);
 }
 
-void SGameModuleSystem::LoadGameModule(std::wstring_view GameModuleName)
+void SGameModuleSystem::LoadGameModule(StringView GameModuleName)
 {
 	std::filesystem::path GameModulePath = GameModuleName;
 	if (!GameModulePath.has_extension())
