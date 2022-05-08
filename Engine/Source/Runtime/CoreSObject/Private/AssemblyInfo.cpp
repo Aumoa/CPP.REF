@@ -4,6 +4,7 @@
 
 #include "Attributes/Attribute.h"
 #include "Attributes/ClassAttribute.h"
+#include "Attributes/ClassAttributeAutoRegistration.h"
 #include "Attributes/FieldATtribute.h"
 #include "Attributes/FieldAttributeSerializable.h"
 #include "Attributes/MethodAttribute.h"
@@ -32,6 +33,7 @@ GENERATE_BODY(libty::Core::SType);
 
 GENERATE_BODY(libty::Core::Attributes::SAttribute);
 GENERATE_BODY(libty::Core::Attributes::SClassAttribute);
+GENERATE_BODY(Attributes::Core::SClassAttributeAutoRegistration);
 GENERATE_BODY(libty::Core::Attributes::SFieldAttribute);
 GENERATE_BODY(Attributes::Core::SFieldAttributeSerializable);
 GENERATE_BODY(libty::Core::Attributes::SMethodAttribute);

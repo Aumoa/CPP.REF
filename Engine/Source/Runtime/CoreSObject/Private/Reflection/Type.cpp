@@ -20,23 +20,8 @@ SType::SType(MetadataGenerator&& generator)
 	_staticCollection = &__STATIC_COLLECTION__;
 
 	// Add to dictionary for search by name.
+	_staticCollection->AllTypes.emplace(this);
 	_staticCollection->FullQualifiedNameView.emplace(_meta.FullQualifiedClassName, this);
-	
-	// Add to dictionary for search by hierarchy.
-	// and make full recursive fields and attributes collection.
-	for (SType* curr = this; curr != nullptr; curr = curr->_meta.SuperClass)
-	{
-		_staticCollection->HierarchyView[curr].emplace(this);
-
-		auto fields = curr->GetFields(false);
-		_recursiveFields.insert(_recursiveFields.end(), fields.begin(), fields.end());
-
-		auto methods = curr->GetMethods(false);
-		_recursiveMethods.insert(_recursiveMethods.end(), methods.begin(), methods.end());
-
-		auto attributes = curr->GetCustomAttributes(false);
-		_recursiveAttributes.insert(_recursiveAttributes.end(), attributes.begin(), attributes.end());
-	}
 	
 	if (_meta.Assembly)
 	{
@@ -51,7 +36,8 @@ StringView SType::GetName()
 
 SType* SType::GetSuperType()
 {
-	return _meta.SuperClass;
+	this->_Cache_private();
+	return _baseType;
 }
 
 StringView SType::GetFullQualifiedName()
@@ -63,6 +49,7 @@ std::span<SFieldInfo* const> SType::GetFields(bool bRecursive)
 {
 	if (bRecursive)
 	{
+		this->_Cache_private();
 		return _recursiveFields;
 	}
 	else
@@ -73,24 +60,44 @@ std::span<SFieldInfo* const> SType::GetFields(bool bRecursive)
 
 SFieldInfo* SType::GetField(StringView fieldName, bool bRecursive)
 {
-	auto& collection = bRecursive ? _recursiveFields : _meta.Fields;
-	auto it = std::find_if(collection.begin(), collection.end(), [&fieldName](SFieldInfo* field)
+	if (bRecursive)
 	{
-		return field->GetName() == fieldName;
-	});
+		this->_Cache_private();
+		auto& collection = _recursiveFields;
+		auto it = std::find_if(collection.begin(), collection.end(), [&fieldName](SFieldInfo* field)
+		{
+			return field->GetName() == fieldName;
+		});
 
-	if (it == collection.end())
-	{
-		return nullptr;
+		if (it == collection.end())
+		{
+			return nullptr;
+		}
+
+		return *it;
 	}
+	else
+	{
+		auto& collection = _meta.Fields;
+		auto it = std::find_if(collection.begin(), collection.end(), [&fieldName](SFieldInfo* field)
+		{
+			return field->GetName() == fieldName;
+		});
 
-	return *it;
+		if (it == collection.end())
+		{
+			return nullptr;
+		}
+
+		return *it;
+	}
 }
 
 std::span<SMethodInfo* const> SType::GetMethods(bool bRecursive)
 {
 	if (bRecursive)
 	{
+		this->_Cache_private();
 		return _recursiveMethods;
 	}
 	else
@@ -101,24 +108,44 @@ std::span<SMethodInfo* const> SType::GetMethods(bool bRecursive)
 
 SMethodInfo* SType::GetMethod(StringView methodName, bool bRecursive)
 {
-	auto& collection = bRecursive ?_recursiveMethods : _meta.Methods;
-	auto it = std::find_if(collection.begin(), collection.end(), [&methodName](SMethodInfo* method)
+	if (bRecursive)
 	{
-		return method->GetName() == methodName;
-	});
+		this->_Cache_private();
+		auto& collection = _recursiveMethods;
+		auto it = std::find_if(collection.begin(), collection.end(), [&methodName](SMethodInfo* method)
+		{
+			return method->GetName() == methodName;
+		});
 
-	if (it == collection.end())
-	{
-		return nullptr;
+		if (it == collection.end())
+		{
+			return nullptr;
+		}
+
+		return *it;
 	}
+	else
+	{
+		auto& collection = _meta.Methods;
+		auto it = std::find_if(collection.begin(), collection.end(), [&methodName](SMethodInfo* method)
+		{
+			return method->GetName() == methodName;
+		});
 
-	return *it;
+		if (it == collection.end())
+		{
+			return nullptr;
+		}
+
+		return *it;
+	}
 }
 
 std::span<SClassAttribute* const> SType::GetCustomAttributes(bool bRecursive)
 {
 	if (bRecursive)
 	{
+		this->_Cache_private();
 		return _recursiveAttributes;
 	}
 	else
@@ -129,18 +156,37 @@ std::span<SClassAttribute* const> SType::GetCustomAttributes(bool bRecursive)
 
 SClassAttribute* SType::GetCustomAttribute(SType* attributeType, bool bRecursive)
 {
-	auto& collection = bRecursive ? _recursiveAttributes : _meta.Attributes;
-	auto it = std::find_if(collection.begin(), collection.end(), [&attributeType](SClassAttribute* attr)
+	if (bRecursive)
 	{
-		return attr->GetType()->IsA(attributeType);
-	});
+		this->_Cache_private();
+		auto& collection = _recursiveAttributes;
+		auto it = std::find_if(collection.begin(), collection.end(), [&attributeType](SClassAttribute* attr)
+		{
+			return attr->GetType()->IsA(attributeType);
+		});
 
-	if (it == collection.end())
-	{
-		return nullptr;
+		if (it == collection.end())
+		{
+			return nullptr;
+		}
+
+		return *it;
 	}
+	else
+	{
+		auto& collection = _meta.Attributes;
+		auto it = std::find_if(collection.begin(), collection.end(), [&attributeType](SClassAttribute* attr)
+		{
+			return attr->GetType()->IsA(attributeType);
+		});
 
-	return *it;
+		if (it == collection.end())
+		{
+			return nullptr;
+		}
+
+		return *it;
+	}
 }
 
 std::span<SType* const> SType::GetInterfaces()
@@ -185,7 +231,7 @@ bool SType::IsA(SType* compareType)
 
 bool SType::IsDerivedFrom(SType* compareType)
 {
-	for (SType* curr = this; curr != nullptr; curr = curr->_meta.SuperClass)
+	for (SType* curr = this; curr != nullptr; curr = GetSuperType())
 	{
 		if (curr->_meta.TypeHash == compareType->_meta.TypeHash)
 		{
@@ -241,12 +287,55 @@ SType* SType::GetType(StringView fullQualifiedName)
 	return it->second;
 }
 
-std::set<SType*> SType::GetDerivedTypes(SType* baseType)
+const std::set<SType*>& SType::GetAllTypes()
+{
+	return _staticCollection->AllTypes;
+}
+
+const std::set<SType*>& SType::GetDerivedTypes(SType* baseType)
 {
 	auto it = _staticCollection->HierarchyView.find(baseType);
 	if (it == _staticCollection->HierarchyView.end())
 	{
-		return {};
+		static std::set<SType*> empty;
+		return empty;
 	}
 	return it->second;
+}
+
+void SType::_Cache_private()
+{
+	if (_cached_private)
+	{
+		return;
+	}
+
+	std::unique_lock lock(_lock);
+	if (_cached_private)
+	{
+		return;
+	}
+
+	// Add to dictionary for search by hierarchy.
+	// and make full recursive fields and attributes collection.
+	for (SType* curr = this; curr != nullptr; curr = (curr->_meta.SuperClass ? curr->_meta.SuperClass() : nullptr))
+	{
+		_staticCollection->HierarchyView[curr].emplace(this);
+
+		auto fields = curr->GetFields(false);
+		_recursiveFields.insert(_recursiveFields.end(), fields.begin(), fields.end());
+
+		auto methods = curr->GetMethods(false);
+		_recursiveMethods.insert(_recursiveMethods.end(), methods.begin(), methods.end());
+
+		auto attributes = curr->GetCustomAttributes(false);
+		_recursiveAttributes.insert(_recursiveAttributes.end(), attributes.begin(), attributes.end());
+	}
+
+	if (_meta.SuperClass)
+	{
+		_baseType = _meta.SuperClass();
+	}
+
+	_cached_private = true;
 }

@@ -31,6 +31,7 @@ namespace libty::inline Core
 	private:
 		struct StaticCollection
 		{
+			std::set<SType*> AllTypes;
 			std::map<String, SType*, std::less<>> FullQualifiedNameView;
 			std::map<SType*, std::set<SType*>> HierarchyView;
 		};
@@ -38,6 +39,10 @@ namespace libty::inline Core
 		static StaticCollection* _staticCollection;
 
 		MetadataGenerator _meta;
+
+		Spinlock _lock;
+		bool _cached_private = false;
+		SType* _baseType = nullptr;
 		std::vector<Reflection::SFieldInfo*> _recursiveFields;
 		std::vector<Reflection::SMethodInfo*> _recursiveMethods;
 		std::vector<SClassAttribute*> _recursiveAttributes;
@@ -190,10 +195,15 @@ namespace libty::inline Core
 		static SType* GetType(StringView fullQualifiedName);
 
 		/// <summary>
+		/// Get all types.
+		/// </summary>
+		static const std::set<SType*>& GetAllTypes();
+
+		/// <summary>
 		/// Get all derived types from specified base type.
 		/// </summary>
 		/// <param name="baseType"> The base type of results. </param>
-		static std::set<SType*> GetDerivedTypes(SType* baseType);
+		static const std::set<SType*>& GetDerivedTypes(SType* baseType);
 
 	private:
 		template<class T>
@@ -237,5 +247,8 @@ namespace libty::inline Core
 		{
 			return TypeOfImpl<T>::Generate();
 		}
+
+	private:
+		void _Cache_private();
 	};
 }

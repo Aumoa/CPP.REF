@@ -32,6 +32,7 @@ namespace libty::inline Core
 	private:
 		SPROPERTY(_primaryService);
 		static SObjectFactory* _primaryService;
+		SPROPERTY(_injections);
 		std::map<size_t, InjectionInfo> _injections;
 		std::vector<IHostedService*> _hostedServices;
 
