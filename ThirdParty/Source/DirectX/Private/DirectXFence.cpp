@@ -96,7 +96,7 @@ VOID CALLBACK SDirectXFence::OnConnect(PVOID lpParameter, BOOLEAN TimerOrWaitFir
 		pContext->TCS.SetResult();
 	}
 
-	CloseHandle(pContext->hWait);
+	//CloseHandle(pContext->hWait);
 	pContext->hWait = nullptr;
 	pContext->bReady = true;
 }
