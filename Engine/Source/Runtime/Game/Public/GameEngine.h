@@ -6,7 +6,6 @@ namespace libty::inline Game
 {
 	class SGameInstance;
 	class SGameEngineSubsystem;
-	//class SSlateApplication;
 
 	class GAME_API SGameEngine : implements(SObject)
 	{
@@ -17,6 +16,8 @@ namespace libty::inline Game
 		SGameInstance* GameInstance = nullptr;
 		SPROPERTY(SubsystemCollection)
 		SObjectFactory* SubsystemCollection = nullptr;
+		SPROPERTY(SlateApplication)
+		SSlateApplication* SlateApplication = nullptr;
 
 	public:
 		SGameEngine();

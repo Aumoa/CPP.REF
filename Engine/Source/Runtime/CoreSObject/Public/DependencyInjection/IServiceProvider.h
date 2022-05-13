@@ -36,5 +36,21 @@ namespace libty::inline Core
 		{
 			return Cast<T>(GetRequiredService(typeof(T)));
 		}
+
+		template<std::derived_from<SObject> T>
+		inline T* Create()
+		{
+			return Cast<T>(Create(typeof(T)));
+		}
+
+		template<std::invocable<IServiceProvider*> TFactory>
+		inline std::invoke_result_t<TFactory> Create(TFactory&& factory)
+		{
+			using T = std::remove_pointer_t<std::invoke_result_t<TFactory>>;
+			return Cast<T>(Create(typeof(T), [factory = std::forward<TFactory>(factory)](IServiceProvider* provider) mutable -> SObject*
+			{
+				return factory(provider);
+			}));
+		}
 	};
 }

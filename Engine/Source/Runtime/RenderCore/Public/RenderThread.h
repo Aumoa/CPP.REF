@@ -4,15 +4,20 @@
 
 namespace libty::inline RenderCore
 {
+	class SRenderContext;
+
 	class RENDERCORE_API SRenderThread : implements(SObject)
 	{
-		GENERATED_BODY(SRenderThread);
+		GENERATED_BODY(SRenderThread, AutoRegistration());
+
+	public:
+		using RenderThreadWork = std::function<void(SRenderContext*)>;
 
 	private:
 		struct Work
 		{
 			WeakPtr<SObject> Holder;
-			std::function<void(IRHIGraphicsCommandList*)> Body;
+			RenderThreadWork Body;
 		};
 
 	private:
@@ -23,19 +28,19 @@ namespace libty::inline RenderCore
 
 		Spinlock _lock;
 		SpinlockConditionVariable _invoke;
-		std::queue<Work> _queuedWorks;
-		IRHIGraphicsCommandList* _deviceContext = nullptr;
-		std::function<void(IRHIGraphicsCommandList*)> _completion;
-		TaskCompletionSource<> _taskCompletionSource;
+		SpinlockConditionVariable _dequeued;
+		std::exception_ptr _exception;
 
-	private:
-		SRenderThread();
+		std::vector<Work> _queuedWorks;
+		SRenderContext* _rcontext;
 
 	public:
+		SRenderThread();
 		virtual ~SRenderThread() noexcept override;
 
-		void EnqueueRenderThreadWork(SObject* object, std::function<void(IRHIGraphicsCommandList*)> work);
-		Task<> ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std::function<void(IRHIGraphicsCommandList*)> InCompletionWork);
+		void EnqueueRenderThreadWork(SObject* object, RenderThreadWork work);
+		void ExecuteWorks(SRenderContext* InRenderContext, RenderThreadWork InCompletionWork);
+		void Shutdown();
 		static bool InRenderThread();
 
 	public:

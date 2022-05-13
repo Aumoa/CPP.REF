@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "RenderThread.h"
+#include "RenderContext.h"
 
 using namespace ::libty;
 
@@ -22,45 +23,53 @@ SRenderThread::SRenderThread()
 
 SRenderThread::~SRenderThread()
 {
-	std::unique_lock lock(_lock);
-	_running = false;
-	_taskCompletionSource = TaskCompletionSource<>::Create();
-	_invoke.NotifyAll();
-	lock.unlock();
-
-	_thread->Join();
-	sInstance = nullptr;
+	if (_running)
+	{
+		Shutdown();
+	}
 }
 
-void SRenderThread::EnqueueRenderThreadWork(SObject* object, std::function<void(IRHIGraphicsCommandList*)> work)
+void SRenderThread::EnqueueRenderThreadWork(SObject* object, RenderThreadWork work)
 {
-	_queuedWorks.emplace(Work
+	_queuedWorks.emplace_back(Work
 	{
 		.Holder = object,
 		.Body = work
 	});
 }
 
-Task<> SRenderThread::ExecuteWorks(IRHIGraphicsCommandList* InDeviceContext, std::function<void(IRHIGraphicsCommandList*)> InCompletionWork)
+void SRenderThread::ExecuteWorks(SRenderContext* InRenderContext, RenderThreadWork InCompletionWork)
 {
+	check(InRenderContext);
 	SCOPE_CYCLE_COUNTER(STAT_ExecuteWorks);
 
-	if (_taskCompletionSource.IsValid())
+	std::unique_lock lock(_lock);
+	_dequeued.Wait(lock, [this]() { return _rcontext == nullptr; });
+
+	if (_exception)
 	{
-		_taskCompletionSource.GetTask().Wait();
+		std::rethrow_exception(_exception);
 	}
 
-	{
-		std::unique_lock lock(_lock);
-		_taskCompletionSource = TaskCompletionSource<>::Create();
-		_completion = InCompletionWork;
-	}
+	_queuedWorks.emplace_back(Work{ .Holder = this, .Body = std::move(InCompletionWork) });
+	_rcontext = InRenderContext;
 
 	_invoke.NotifyOne();
+}
 
+void SRenderThread::Shutdown()
+{
+	if (_running)
 	{
-		SCOPE_CYCLE_COUNTER(STAT_ExecuteCurrentWorks);
-		co_await _taskCompletionSource.GetTask();
+		Task<> jtask = _thread->JoinAsync();
+
+		std::unique_lock lock(_lock);
+		_running = false;
+		_invoke.NotifyAll();
+		lock.unlock();
+
+		jtask.GetResult();
+		sInstance = nullptr;
 	}
 }
 
@@ -71,92 +80,48 @@ bool SRenderThread::InRenderThread()
 
 void SRenderThread::Run()
 {
-	Thread* CurrentThread = Thread::GetCurrentThread();
+	std::vector<Work> queuedWorks;
+	SRenderContext* rcontext = nullptr;
 
-	class RenderThreadSuspendToken : public ISuspendToken
+	while (true)
 	{
-		SRenderThread* Owner;
-		Thread* CurrentThread;
-
-		std::optional<std::promise<void>> SuspendPromise;
-
-	public:
-		RenderThreadSuspendToken(SRenderThread* Owner, Thread* CurrentThread)
-			: Owner(Owner)
-			, CurrentThread(CurrentThread)
-		{
-		}
-
-		virtual std::future<void> Suspend() override
-		{
-			checkf(!SuspendPromise.has_value(), L"Thread already wait for suspend.");
-			SuspendPromise.emplace();
-
-			Owner->_taskCompletionSource.GetTask().Wait();
-			Owner->_invoke.NotifyOne();
-
-			return SuspendPromise->get_future();
-		}
-
-		virtual void Resume() override
-		{
-			if (SuspendPromise.has_value())
-			{
-				SuspendPromise.reset();
-				CurrentThread->ResumeThread();
-			}
-		}
-
-		void Join()
-		{
-			if (!SuspendPromise.has_value())
-			{
-				return;
-			}
-
-			SuspendPromise->set_value();
-			CurrentThread->SuspendThread();
-		}
-	};
-
-	std::unique_ptr Token = std::make_unique<RenderThreadSuspendToken>(this, CurrentThread);
-	SuspendTokenCollection::Add(Token.get());
-
-	while (_running)
-	{
-		Token->Join();
-
 		// Waiting for event 'Run'.
 		std::unique_lock lock(_lock);
-		_invoke.Wait(lock);
+		_invoke.Wait(lock, [this]() { return _rcontext != nullptr || !_running; });
 
-		std::queue<Work> works;
-		std::swap(works, _queuedWorks);
+		if (!_running)
+		{
+			break;
+		}
 
-		TaskCompletionSource<> completionSrc = _taskCompletionSource;
-		IRHIGraphicsCommandList* deviceContext = _deviceContext;
-		std::function<void(IRHIGraphicsCommandList*)> completion = std::move(_completion);
+		std::swap(queuedWorks, _queuedWorks);
+		std::swap(rcontext, _rcontext);
 
+		_dequeued.NotifyOne();
 		lock.unlock();
 
-		while (!works.empty())
+		try
 		{
-			Work& work = works.front();
-			if (work.Holder.IsValid())
+			for (auto& work : queuedWorks)
 			{
-				work.Body(deviceContext);
+				if (work.Holder.IsValid())
+				{
+					work.Body(rcontext);
+				}
 			}
-			works.pop();
 		}
-
-		if (completion)
+		catch (const Exception&)
 		{
-			completion(deviceContext);
+			lock.lock();
+			_exception = std::current_exception();
 		}
 
-		lock.lock();
-		completionSrc.SetResult();
-	}
+		if (!lock.owns_lock())
+		{
+			lock.lock();
+		}
 
-	SuspendTokenCollection::Remove(Token.get());
+		queuedWorks.clear();
+		rcontext = nullptr;
+	}
 }

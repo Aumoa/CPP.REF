@@ -8,7 +8,7 @@
 
 namespace libty::inline SlateCore
 {
-	class PaintArgs;
+	struct PaintArgs;
 	class SSlateDrawCollector;
 	class ArrangedChildrens;
 	class ArrangedWidget;

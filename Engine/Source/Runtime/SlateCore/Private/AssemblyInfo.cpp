@@ -3,8 +3,10 @@
 DEFINE_ASSEMBLY_INFO;
 
 #include "SlotBase.h"
+#include "SlateApplication.h"
 
 GENERATE_BODY(libty::SlateCore::Details::SSlotBase);
+GENERATE_BODY(libty::SlateCore::SSlateApplication);
 
 #include "Widgets/SWidget.h"
 #include "Widgets/SLeafWidget.h"
@@ -48,6 +50,12 @@ GENERATE_BODY(libty::SlateCore::STextBox);
 
 GENERATE_BODY(libty::SlateCore::SImage);
 
+#include "Widgets/Viewports/SViewport.h"
+#include "Widgets/Viewports/SWindow.h"
+
+GENERATE_BODY(libty::SlateCore::SViewport);
+GENERATE_BODY(libty::SlateCore::SWindow);
+
 #include "Renderer/SlateRenderer.h"
 #include "Renderer/SlateRenderElementCollection.h"
 
@@ -66,10 +74,6 @@ GENERATE_BODY(libty::SlateCore::ESlateVisibility);
 
 #include "Draw/IRenderSlateElement.h"
 #include "Draw/SlateBrush.h"
-#include "Draw/SlateDrawCollector.h"
 
 GENERATE_BODY(libty::SlateCore::IRenderSlateElement);
 GENERATE_BODY(libty::SlateCore::SlateBrush);
-GENERATE_BODY(libty::SlateCore::SSlateDrawCollector);
-GENERATE_BODY(libty::SlateCore::SSlateDrawCollector::EElementType);
-GENERATE_BODY(libty::SlateCore::SSlateDrawCollector::RenderElement);

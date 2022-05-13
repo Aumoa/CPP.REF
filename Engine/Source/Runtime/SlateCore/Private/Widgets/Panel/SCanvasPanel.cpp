@@ -122,8 +122,6 @@ int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeome
 	int32 MaxLayerId = InLayer;
 	int32 ChildLayerId = InLayer;
 
-	const PaintArgs NewArgs = Args.WithNewParent(this);
-
 	const std::vector<ArrangedWidget>& ArrangedWidgets = ArrangedChildren.GetWidgets();
 	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)
 	{
@@ -137,7 +135,7 @@ int32 SCanvasPanel::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeome
 				ChildLayerId = MaxLayerId + 1;
 			}
 
-			const int32 CurWidgetsMaxLayerId = CurWidget.GetWidget()->Paint(NewArgs, CurWidget.GetGeometry(), CullingRect, DrawCollector, ChildLayerId, bForwardedEnabled);
+			const int32 CurWidgetsMaxLayerId = CurWidget.GetWidget()->Paint(Args, CurWidget.GetGeometry(), CullingRect, DrawCollector, ChildLayerId, bForwardedEnabled);
 
 			MaxLayerId = MathEx::Max(MaxLayerId, CurWidgetsMaxLayerId);
 		}

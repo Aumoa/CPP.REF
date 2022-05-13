@@ -2,7 +2,7 @@
 
 #include "Widgets/SWidget.h"
 #include "Draw/PaintArgs.h"
-#include "Draw/SlateDrawCollector.h"
+//#include "Draw/SlateDrawCollector.h"
 
 using namespace ::libty;
 
@@ -29,14 +29,15 @@ int32 SWidget::Paint(const PaintArgs& Args, const Geometry& AllottedGeometry, co
 {
     if (Clipping == EWidgetClipping::ClipToBounds)
     {
-        DrawCollector->PushClipLayer(AllottedGeometry);
+        //DrawCollector->PushClipLayer(AllottedGeometry);
     }
 
-	int32 Layer = OnPaint(Args, AllottedGeometry, CullingRect, DrawCollector, InLayer, bParentEnabled);
+    PaintArgs NewArgs = Args.WithNewParent(this);
+	int32 Layer = OnPaint(NewArgs, AllottedGeometry, CullingRect, DrawCollector, InLayer, bParentEnabled);
 
     if (Clipping == EWidgetClipping::ClipToBounds)
     {
-        DrawCollector->PopClipLayer();
+        //DrawCollector->PopClipLayer();
     }
 
     return Layer;

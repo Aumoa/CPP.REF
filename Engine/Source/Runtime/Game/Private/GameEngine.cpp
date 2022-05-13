@@ -77,7 +77,7 @@ namespace AutoConsoleVars
 {
 	namespace GC
 	{
-		AutoConsoleVariable<float> CollectInterval(TEXT("GC.CollectInterval"), 60.0f);
+		AutoConsoleVariable<float> CollectInterval(TEXT("GC.CollectInterval"), 1.0f);
 	}
 }
 
@@ -125,8 +125,8 @@ void SGameEngine::InitializeSubsystems()
 
 	SObjectFactoryBuilder* Builder = SObjectFactory::CreateBuilder();
 
-	Builder->AddSingleton<SRenderEngine>();
-	Builder->AddSingleton<SSlateCollection>();
+	Builder->AddAutoServices();
+	Builder->SetAsPrimary();
 
 	auto Subclasses = SType::GetDerivedTypes(typeof(SGameEngineSubsystem));
 	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size() - 1);
@@ -143,6 +143,8 @@ void SGameEngine::InitializeSubsystems()
 
 	SubsystemCollection = Cast<SObjectFactory>(Builder->Build());
 	SubsystemCollection->StartAsync().GetResult();
+
+	SlateApplication = SubsystemCollection->GetRequiredService<SSlateApplication>();
 }
 
 void SGameEngine::TickEngine(IApplicationInterface::ETickMode ActualTickMode)
@@ -184,7 +186,7 @@ void SGameEngine::GameTick(std::chrono::duration<float> InDeltaTime)
 	GameWorld->LevelTick(InDeltaTime.count());
 
 	// Tick and paint.
-	//SlateApplication->TickAndPaint(InDeltaTime.count());
+	SlateApplication->TickAndPaint(InDeltaTime.count());
 }
 
 void SGameEngine::RenderTick(std::chrono::duration<float> InDeltaTime)

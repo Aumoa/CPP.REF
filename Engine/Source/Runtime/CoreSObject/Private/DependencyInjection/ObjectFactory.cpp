@@ -58,6 +58,7 @@ SObject* SObjectFactory::CreateInstance(const InjectionInfo& info)
 	else
 	{
 		instanced = info.Class->Instantiate();
+		checkf(instanced, TEXT("Cannot instantiate object class: {0}. May not declared default constructor, or it is a abstract class."), info.Class->GetFullQualifiedName());
 	}
 
 	SE_LOG(LogDependencyInjection, Info, L"Instance of {0} type generated.", info.Class->GetFullQualifiedName());
@@ -159,7 +160,7 @@ SObject* SObjectFactory::Create(SType* type, std::function<SObject*(IServiceProv
 	return CreateInstance(info);
 }
 
-SObjectFactory* SObjectFactory::GetPrimaryService()
+IServiceProvider* SObjectFactory::GetPrimaryService()
 {
 	return _primaryService;
 }

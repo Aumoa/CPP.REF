@@ -3,7 +3,6 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/IRenderSlateElement.h"
-#include "Draw/SlateDrawCollector.h"
 
 using namespace ::libty;
 
@@ -184,7 +183,7 @@ int32 STextBlock::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometr
 
 	if (CachedRenderElement)
 	{
-		DrawCollector->AddRenderElement(CachedRenderElement);
+		//DrawCollector->AddRenderElement(CachedRenderElement);
 	}
 
 	return InLayer;

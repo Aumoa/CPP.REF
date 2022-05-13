@@ -3,7 +3,7 @@
 #include "Widgets/Image/SImage.h"
 #include "Draw/PaintArgs.h"
 #include "Draw/IRenderSlateElement.h"
-#include "Draw/SlateDrawCollector.h"
+//#include "Draw/SlateDrawCollector.h"
 #include "RHI/RHIInterfaces.h"
 #include "RenderThread.h"
 
@@ -157,7 +157,7 @@ int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, c
 	if (CachedRenderElement == nullptr)
 	{
 		CachedRenderElement = gcnew SRenderElement(this,
-			Args.WithNewParent(this),
+			Args,
 			InLayer,
 			AllottedGeometry
 		);
@@ -169,7 +169,7 @@ int32 SImage::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, c
 
 	if (CachedRenderElement)
 	{
-		DrawCollector->AddRenderElement(CachedRenderElement);
+		//DrawCollector->AddRenderElement(CachedRenderElement);
 	}
 	return InLayer;
 }

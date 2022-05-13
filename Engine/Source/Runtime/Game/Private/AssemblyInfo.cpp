@@ -3,9 +3,9 @@
 DEFINE_ASSEMBLY_INFO;
 
 #include "GameEngine.h"
+#include "GameObject.h"
 #include "GameInstance.h"
 #include "GameModule.h"
-#include "GameObject.h"
 
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
@@ -42,9 +42,9 @@ DEFINE_ASSEMBLY_INFO;
 #include "Ticking/TickTaskLevelManager.h"
 
 GENERATE_BODY(libty::Game::SGameEngine);
+GENERATE_BODY(libty::Game::SGameObject);
 GENERATE_BODY(libty::Game::SGameInstance);
 GENERATE_BODY(libty::Game::SGameModule);
-GENERATE_BODY(libty::Game::SGameObject);
 
 GENERATE_BODY(libty::Game::SCameraComponent);
 GENERATE_BODY(libty::Game::APlayerCameraManager);

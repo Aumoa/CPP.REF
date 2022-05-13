@@ -26,9 +26,9 @@ namespace libty::inline Core
 		};
 
 	private:
-		SPROPERTY(_primaryService);
+		SPROPERTY(_primaryService)
 		static SObjectFactory* _primaryService;
-		SPROPERTY(_instanced);
+		SPROPERTY(_instanced)
 		std::set<SObject*> _instanced;
 		std::map<size_t, InjectionInfo> _injections;
 		std::vector<IHostedService*> _hostedServices;
@@ -50,9 +50,11 @@ namespace libty::inline Core
 		virtual SObject* GetService(SType* type) override;
 		virtual SObject* Create(SType* type, std::function<SObject*(IServiceProvider*)> factory = nullptr) override;
 
-		static SObjectFactory* GetPrimaryService();
+		using IServiceProvider::GetService;
+		using IServiceProvider::Create;
 
 	public:
+		static IServiceProvider* GetPrimaryService();
 		static SObjectFactoryBuilder* CreateBuilder();
 	};
 }

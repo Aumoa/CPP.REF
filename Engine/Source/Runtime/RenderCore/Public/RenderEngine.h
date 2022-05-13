@@ -6,9 +6,9 @@ namespace libty::inline RenderCore
 {
 	class SRenderContext;
 
-	class RENDERCORE_API SRenderEngine : virtual public SObject
+	class RENDERCORE_API SRenderEngine : implements(SObject)
 	{
-		GENERATED_BODY(SRenderEngine);
+		GENERATED_BODY(SRenderEngine, AutoRegistration());
 
 	private:
 		SPROPERTY(RHIDevice)
