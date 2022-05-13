@@ -5,7 +5,7 @@
 using namespace ::libty;
 
 InjectException::InjectException(EInjectionErrorCode code, std::exception_ptr innerException)
-	: FatalException(FormatMessage(code), innerException)
+	: Exception(FormatMessage(code), innerException)
 {
 }
 

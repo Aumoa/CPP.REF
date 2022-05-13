@@ -79,7 +79,7 @@ public:
     {
         if (s_keyboard)
         {
-            throw FatalException("PlatformWindowsKeyboard is a singleton.");
+            throw Exception("PlatformWindowsKeyboard is a singleton.");
         }
 
         s_keyboard = this;

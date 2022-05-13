@@ -6,6 +6,6 @@
 using namespace libty;
 
 ArgumentException::ArgumentException(StringView argName)
-	: FatalException(String::Format(TEXT("Invalid argument '{}' detected."), argName))
+	: Exception(String::Format(TEXT("Invalid argument '{}' detected."), argName))
 {
 }

@@ -115,7 +115,7 @@ namespace libty::inline SlateCore
 			case ESlateVisibility::SelfHitTestInvisible: return VIS_SelfHitTestInvisible;
 			case ESlateVisibility::All: return VIS_All;
 			default:
-				throw FatalException(String::Format("Invalid argument: Visibility({})", (int32)Visibility));
+				throw Exception(String::Format("Invalid argument: Visibility({})", (int32)Visibility));
 			};
 		}
 

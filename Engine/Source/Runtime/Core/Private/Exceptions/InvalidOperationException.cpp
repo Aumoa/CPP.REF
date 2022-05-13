@@ -5,11 +5,11 @@
 using namespace libty;
 
 InvalidOperationException::InvalidOperationException(StringView message, std::exception_ptr innerException)
-	: FatalException(message, innerException)
+	: Exception(message, innerException)
 {
 }
 
 InvalidOperationException::InvalidOperationException(std::exception_ptr innerException)
-	: FatalException(TEXT("Invalid operation detected"), innerException)
+	: Exception(TEXT("Invalid operation detected"), innerException)
 {
 }

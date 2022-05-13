@@ -11,7 +11,7 @@
 
 namespace libty::inline Core
 {
-	class CORE_API FatalException : public std::exception
+	class CORE_API Exception : public std::exception
 	{
 		struct _Impl_buf
 		{
@@ -28,10 +28,10 @@ namespace libty::inline Core
 		std::shared_ptr<_Impl_buf> _impl_buf;
 
 	public:
-		FatalException(StringView message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
-		FatalException(const FatalException& rhs) noexcept;
-		FatalException(FatalException&& rhs) noexcept;
-		virtual ~FatalException() noexcept;
+		Exception(StringView message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
+		Exception(const Exception& rhs) noexcept;
+		Exception(Exception&& rhs) noexcept;
+		virtual ~Exception() noexcept;
 
 		virtual const char* what() const noexcept override;
 		virtual StringView ToString() const noexcept;
@@ -40,7 +40,7 @@ namespace libty::inline Core
 		virtual StringView GetMessage() const noexcept;
 		virtual std::exception_ptr GetInnerException() const noexcept;
 
-		static FatalException* AvailableException() noexcept;
+		static Exception* AvailableException() noexcept;
 
 	private:
 		void _Cache_strings() const noexcept;

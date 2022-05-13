@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "FatalException.h"
+#include "Exception.h"
 
 namespace libty::inline Core
 {
-	class CORE_API InvalidOperationException : public FatalException
+	class CORE_API InvalidOperationException : public Exception
 	{
 	public:
 		InvalidOperationException(StringView message, std::exception_ptr innerException = nullptr);

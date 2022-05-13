@@ -4,7 +4,7 @@
 
 namespace libty::inline PlatformGeneric
 {
-	class PLATFORMGENERIC_API ShaderCompilerException : public FatalException
+	class PLATFORMGENERIC_API ShaderCompilerException : public Exception
 	{
 		std::string _api;
 

@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "FatalException.h"
+#include "Exception.h"
 
 namespace libty::inline Core
 {
-	class CORE_API ArgumentException : public FatalException
+	class CORE_API ArgumentException : public Exception
 	{
 	public:
 		ArgumentException(StringView argName);

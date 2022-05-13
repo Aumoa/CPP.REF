@@ -70,7 +70,7 @@ public:
     {
         if (s_mouse)
         {
-            throw FatalException("WindowsPlatformMouse is a singleton");
+            throw Exception("WindowsPlatformMouse is a singleton");
         }
 
         s_mouse = this;

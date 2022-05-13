@@ -6,7 +6,7 @@
 
 namespace libty::inline Core
 {
-	class CORESOBJECT_API InjectException : public FatalException
+	class CORESOBJECT_API InjectException : public Exception
 	{
 	public:
 		InjectException(EInjectionErrorCode code, std::exception_ptr innerException = nullptr);

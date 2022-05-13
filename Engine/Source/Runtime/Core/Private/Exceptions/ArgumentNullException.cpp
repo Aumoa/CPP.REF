@@ -6,6 +6,6 @@
 using namespace libty;
 
 ArgumentNullException::ArgumentNullException(StringView argName)
-	: FatalException(String::Format(TEXT("Argument '{}' cannot be nullptr."), argName))
+	: Exception(String::Format(TEXT("Argument '{}' cannot be nullptr."), argName))
 {
 }

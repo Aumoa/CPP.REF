@@ -15,9 +15,9 @@ LONG CALLBACK ReportCrash(LPEXCEPTION_POINTERS lpException)
 	Stacktrace StackTrace = Stacktrace::CaptureException(lpException);
 	GReturn = (int32)ExceptionCode;
 
-	if (FatalException* fe; ExceptionCode == 0xE06D7363 && (fe = FatalException::AvailableException()))
+	if (Exception* e; ExceptionCode == 0xE06D7363 && (e = Exception::AvailableException()))
 	{
-		SE_LOG(LogWindowsCommon, Error, L"Unhandled C++ exception caught!\n===== BEGIN OF EXCEPTION TRACE =====\n      {}\n===== END OF EXCEPTION TRACE =====", fe->ToString());
+		SE_LOG(LogWindowsCommon, Error, L"Unhandled C++ exception caught!\n===== BEGIN OF EXCEPTION TRACE =====\n      {}\n===== END OF EXCEPTION TRACE =====", e->ToString());
 	}
 	else
 	{

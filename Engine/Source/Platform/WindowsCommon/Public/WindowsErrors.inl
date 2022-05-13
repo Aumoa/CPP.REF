@@ -21,7 +21,7 @@ inline void ReportWindowsError(std::wstring_view InMessage = L"", int32 Error = 
 		ScopedBuf = L"<Unknown>";
 	}
 
-	throw FatalException(String::Format("An error occurred from Windows: {}\nErrorCode: {}, FormattedMessage: {}", String::AsMultibyte(InMessage), Error, String::AsMultibyte(ScopedBuf)));
+	throw Exception(String::Format("An error occurred from Windows: {}\nErrorCode: {}, FormattedMessage: {}", String::AsMultibyte(InMessage), Error, String::AsMultibyte(ScopedBuf)));
 }
 
 [[noreturn]]
@@ -30,7 +30,7 @@ inline void ReportCOMError(std::wstring_view InMessage, HRESULT Error)
 	using namespace ::libty;
 
 	_com_error ComError(Error);
-	throw FatalException(String::Format("An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", String::AsMultibyte(InMessage), (uint32)Error, String::AsMultibyte(ComError.ErrorMessage())));
+	throw Exception(String::Format("An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", String::AsMultibyte(InMessage), (uint32)Error, String::AsMultibyte(ComError.ErrorMessage())));
 }
 
 #define HR(x) \

@@ -6,11 +6,11 @@
 using namespace libty;
 
 AssertException::AssertException(StringView exp)
-	: FatalException(String::Format(TEXT("Assertion failed: !({})"), exp))
+	: Exception(String::Format(TEXT("Assertion failed: !({})"), exp))
 {
 }
 
 AssertException::AssertException(StringView exp, StringView msg)
-	: FatalException(String::Format(TEXT("Assertion failed: !({})\n{}"), exp, msg))
+	: Exception(String::Format(TEXT("Assertion failed: !({})\n{}"), exp, msg))
 {
 }

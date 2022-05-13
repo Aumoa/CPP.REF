@@ -5,7 +5,7 @@
 using namespace ::libty;
 
 ShaderCompilerException::ShaderCompilerException(std::string_view API, std::string_view message)
-	: FatalException(message)
+	: Exception(message)
 	, _api(API)
 {
 }

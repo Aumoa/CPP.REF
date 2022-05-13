@@ -2,24 +2,24 @@
 
 #pragma once
 
-#include "Exceptions/FatalException.h"
+#include "Exceptions/Exception.h"
 #include <system_error>
 
 namespace libty::inline Core
 {
-	class IOException : public FatalException
+	class IOException : public Exception
 	{
 		std::error_code _ec;
 
 	public:
 		IOException(StringView message, const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
-			: FatalException(message, innerException)
+			: Exception(message, innerException)
 			, _ec(ec)
 		{
 		}
 
 		IOException(const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
-			: FatalException(TEXT("Invalid file operation."), innerException)
+			: Exception(TEXT("Invalid file operation."), innerException)
 			, _ec(ec)
 		{
 		}

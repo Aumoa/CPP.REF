@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "FatalException.h"
+#include "Exception.h"
 
 namespace libty::inline Core
 {
-	class CORE_API NotImplementedException : public FatalException
+	class CORE_API NotImplementedException : public Exception
 	{
 	public:
 		NotImplementedException();

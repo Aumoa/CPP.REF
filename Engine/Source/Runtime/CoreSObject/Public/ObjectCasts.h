@@ -34,13 +34,13 @@ namespace libty::inline Core
 			auto ValueTypePtr = Cast<SValueType>(InValue);
 			if (ValueTypePtr == nullptr)
 			{
-				throw FatalException("Object is not boxing class.");
+				throw Exception("Object is not boxing class.");
 			}
 
 			TTo OutValue;
 			if (!ValueTypePtr->Unboxing(&OutValue))
 			{
-				throw FatalException("The type of value contained at boxing object is not match with desired type.");
+				throw Exception("The type of value contained at boxing object is not match with desired type.");
 			}
 
 			return OutValue;

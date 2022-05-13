@@ -64,7 +64,7 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 	Level = Cast<SLevel>(InLevelToOpen->Instantiate());
 	if (!Level->LoadLevel(this))
 	{
-		throw FatalException("Could not load level.");
+		throw Exception("Could not load level.");
 	}
 
 	return Level;
