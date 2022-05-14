@@ -79,7 +79,7 @@ public:
     {
         if (s_keyboard)
         {
-            throw Exception("PlatformWindowsKeyboard is a singleton.");
+            throw Exception(TEXT("PlatformWindowsKeyboard is a singleton."));
         }
 
         s_keyboard = this;
@@ -191,7 +191,7 @@ SWindowsPlatformKeyboard* SWindowsPlatformKeyboard::sInstance;
 SWindowsPlatformKeyboard::SWindowsPlatformKeyboard()
     : pImpl(std::make_unique<Impl>(this))
 {
-    checkf(sInstance == nullptr, L"Singleton instance duplicated.");
+    checkf(sInstance == nullptr, TEXT("Singleton instance duplicated."));
     sInstance = this;
 }
 

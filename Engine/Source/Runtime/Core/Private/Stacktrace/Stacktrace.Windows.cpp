@@ -147,8 +147,8 @@ struct Stacktrace::_Stacktrace_impl
 
 			_loadedModules.emplace(hModule, _Module_info
 			{
-				.ImageName = filenameBuf,
-				.ModuleName = basenameBuf,
+				.ImageName = String(filenameBuf),
+				.ModuleName = String(basenameBuf),
 				.BaseAddress = info.lpBaseOfDll,
 				.LoadSize = (size_t)info.SizeOfImage
 			});
@@ -196,7 +196,7 @@ struct Stacktrace::_Stacktrace_impl
 			}
 			else
 			{
-				return (LPSTR)this->_Get_ref().Name;
+				return String((LPSTR)this->_Get_ref().Name);
 			}
 		}
 
@@ -215,7 +215,7 @@ struct Stacktrace::_Stacktrace_impl
 			DWORD len = UnDecorateSymbolName(this->_Get_ref().Name, sUndeco.data(), (DWORD)_Max_name_len, UNDNAME_COMPLETE);
 			if (len == 0)
 			{
-				return this->_Get_ref().Name;
+				return String(this->_Get_ref().Name);
 			}
 
 			return String(sUndeco.data(), (size_t)len);
@@ -300,7 +300,7 @@ private:
 			IMAGEHLP_LINE64 line;
 			if (SymGetLineFromAddr64(hProcess, S.AddrPC.Offset, &disp, &line))
 			{
-				frame.FileName = line.FileName;
+				frame.FileName = String(line.FileName);
 				frame.Line = line.LineNumber;
 
 				if (line.LineNumber > 1'000'000)

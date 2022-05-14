@@ -4,7 +4,7 @@
 
 #include "LogVerbosity.h"
 #include "Misc/RecursiveMacroHelper.h"
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include <optional>
 #include <string>
 #include <string_view>
@@ -24,20 +24,20 @@ namespace libty::inline Core
 		};
 
 	private:
-		std::wstring CategoryName;
+		String CategoryName;
 		Arguments Args;
 
 	public:
-		LogCategory(StringView CategoryName, Arguments&& InArgs);
+		LogCategory(String CategoryName, Arguments&& InArgs);
 
-		StringView GetName() const;
-		static StringView VerbosityToString(ELogVerbosity Verbosity);
+		String GetName() const;
+		static String VerbosityToString(ELogVerbosity Verbosity);
 
 	public:
 		Arguments GetArguments();
 
 	protected:
-		virtual void OnLog(ELogVerbosity Verbosity, StringView Message, const std::source_location& Src = std::source_location::current());
+		virtual void OnLog(ELogVerbosity Verbosity, String Message, const std::source_location& Src = std::source_location::current());
 	};
 }
 
@@ -52,7 +52,7 @@ namespace libty::Generated::LogCategories \
 #define DEFINE_LOG_CATEGORY(CategoryName, ...) \
 namespace libty::Generated::LogCategories \
 { \
-	::libty::Core::LogCategory CategoryName(L ## #CategoryName, \
+	::libty::Core::LogCategory CategoryName(::libty::String::FromLiteral(L ## #CategoryName), \
 		::libty::Core::LogCategory::Arguments { \
 			__VA_OPT__(MACRO_RECURSIVE_FOR_EACH(LOG_CATEGORY_ARGUMENT_FOR_EACH_ITEM, __VA_ARGS__)) \
 		} \

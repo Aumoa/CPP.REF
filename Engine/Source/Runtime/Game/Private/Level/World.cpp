@@ -52,7 +52,7 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 {
 	if (!InLevelToOpen.IsValid())
 	{
-		SE_LOG(LogWorld, Error, L"Class of level to open is not specified. Abort.");
+		SE_LOG(LogWorld, Error, TEXT("Class of level to open is not specified. Abort."));
 		return nullptr;
 	}
 
@@ -64,7 +64,7 @@ SLevel* SWorld::OpenLevel(SubclassOf<SLevel> InLevelToOpen)
 	Level = Cast<SLevel>(InLevelToOpen->Instantiate());
 	if (!Level->LoadLevel(this))
 	{
-		throw Exception("Could not load level.");
+		throw Exception(TEXT("Could not load level."));
 	}
 
 	return Level;

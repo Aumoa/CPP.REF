@@ -3,19 +3,20 @@
 #include "CoreAssert.h"
 #include "LogCore.h"
 #include "Misc/PlatformMacros.h"
-#include "Misc/StringView.h"
 #include "Diagnostics/LogSystem.h"
 #include "Diagnostics/LogVerbosity.h"
 #include "Diagnostics/LogCategory.h"
 
 using namespace libty;
 
-void CoreAssert::Ensure(StringView exp, StringView msg, const std::source_location& location)
+void CoreAssert::Ensure(String exp, String msg, const std::source_location& location)
 {
 	using namespace ::Generated::LogCategories;
 
-	if (msg.empty())
+	if (!msg)
 	{
+		constexpr String s = TEXT("s");
+
 		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, TEXT("Ensure failed: !({})"), exp);
 	}
 	else

@@ -130,8 +130,8 @@ IRHIRootSignature* SDirectXDevice::CreateRootSignature(const RHIRootSignatureDes
 	{
 		if (pError)
 		{
-			std::string_view Msg((const char*)pError->GetBufferPointer(), pError->GetBufferSize());
-			throw Exception(String::Format("Failed to create root signature: {}", Msg));
+			String Msg(std::string_view((const char*)pError->GetBufferPointer(), pError->GetBufferSize()));
+			throw Exception(String::Format(TEXT("Failed to create root signature: {}"), Msg));
 		}
 		else
 		{

@@ -44,7 +44,7 @@ namespace libty::inline Core
 	#endif
 
 		std::thread::id ThreadId;
-		std::wstring FriendlyName;
+		String FriendlyName;
 		bool bIsManaged = false;
 		ThreadSuspendToken* SToken = nullptr;
 
@@ -58,19 +58,19 @@ namespace libty::inline Core
 	public:
 		~Thread();
 
-		void SetFriendlyName(std::wstring_view InFriendlyName);
+		void SetFriendlyName(String InFriendlyName);
 		void SuspendThread();
 		void ResumeThread();
 		void Join();
 		Task<> JoinAsync();
 
-		std::wstring GetFriendlyName() const;
+		String GetFriendlyName() const;
 		std::thread::id GetThreadId() const;
 		bool IsManaged() const;
 		ThreadSuspendToken* GetSuspendToken() const;
 		void* GetNativeHandle() const noexcept;
 
-		static Thread* CreateThread(std::wstring_view FriendlyName, std::function<void()> ThreadEntry);
+		static Thread* CreateThread(String FriendlyName, std::function<void()> ThreadEntry);
 
 	public:
 		static Thread* GetCurrentThread();

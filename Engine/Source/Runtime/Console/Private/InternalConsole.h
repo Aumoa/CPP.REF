@@ -22,7 +22,7 @@ namespace libty::inline Console
 		static void Clear() noexcept;
 
 	public:
-		static void Write(ConsolePin pin, std::wstring message) noexcept;
+		static void Write(ConsolePin pin, String message) noexcept;
 		static void Clear(ConsolePin pin, bool restore) noexcept;
 	};
 }

@@ -5,6 +5,6 @@
 using namespace libty;
 
 NotImplementedException::NotImplementedException()
-	: Exception("The function to call does not implemented.")
+	: Exception(TEXT("The function to call does not implemented."))
 {
 }

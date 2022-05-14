@@ -18,7 +18,7 @@ public class Core : ModuleRule
         PublicDisableWarnings.AddRange(new[]
         {
             4251,
-            4275
+            4275,
         });
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -37,7 +37,9 @@ public class Core : ModuleRule
             
             PrivateDisableWarnings.AddRange(new[]
             {
-                5105
+                5105,
+                4005,
+                5106,
             });
         }
     }

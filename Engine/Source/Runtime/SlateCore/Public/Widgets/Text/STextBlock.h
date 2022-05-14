@@ -38,7 +38,7 @@ namespace libty::inline SlateCore
 	public:
 		STextBlock();
 
-		void SetText(StringView Text);
+		void SetText(String Text);
 		String GetText();
 		void SetFont(const SlateFont& Font);
 		SlateFont GetFont();

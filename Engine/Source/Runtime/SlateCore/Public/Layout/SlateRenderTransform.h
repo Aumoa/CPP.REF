@@ -114,9 +114,9 @@ namespace libty::inline SlateCore
 		}
 
 	public:
-		String ToString(StringView InFormatArgs = L"") const
+		String ToString(String InFormatArgs = TEXT("")) const
 		{
-			return String::Format(L"M: {}, Translation: {}", M.ToString(InFormatArgs), Translation.ToString(InFormatArgs));
+			return String::Format(TEXT("M: {}, Translation: {}"), M.ToString(InFormatArgs), Translation.ToString(InFormatArgs));
 		}
 
 		static constexpr bool IsIdentity(const SlateRenderTransform& T, float Epsilon = 0)

@@ -26,7 +26,7 @@ namespace libty::inline Game
 			inline void Clear()
 			{
 				AttachmentRoot = nullptr;
-				SocketName = L"";
+				SocketName = TEXT("");
 			}
 		};
 
@@ -44,7 +44,7 @@ namespace libty::inline Game
 
 		virtual void UpdateChildTransforms();
 		virtual void UpdateComponentToWorld();
-		virtual Transform GetSocketTransform(StringView InSocketName, EComponentTransformSpace InSpace = EComponentTransformSpace::World) const;
+		virtual Transform GetSocketTransform(String InSocketName, EComponentTransformSpace InSpace = EComponentTransformSpace::World) const;
 		virtual bool MoveComponent(const Vector3& InMoveDelta, const Quaternion& InNewRotation, EComponentTransformSpace InSpace = EComponentTransformSpace::World);
 
 		void AttachToComponent(SSceneComponent* AttachTo);

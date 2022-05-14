@@ -14,7 +14,7 @@ void APawn::PossessedBy(AController* controller)
 {
 	if (_controller != nullptr)
 	{
-		SE_LOG(LogPawn, Error, L"The pawn already possessed by controller[{}]. Abort.", controller->GetName());
+		SE_LOG(LogPawn, Error, TEXT("The pawn already possessed by controller[{}]. Abort."), controller->GetName());
 		return;
 	}
 

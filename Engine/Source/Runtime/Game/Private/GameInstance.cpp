@@ -55,14 +55,14 @@ SGameInstanceSubsystem* SGameInstance::GetSubsystem(SType* SubsystemClass, bool 
 		}
 	}
 
-	SE_LOG(LogGameInstance, Error, L"Subsystem typed as '{}' is not found.", SubsystemClass->GetName());
+	SE_LOG(LogGameInstance, Error, TEXT("Subsystem typed as '{}' is not found."), SubsystemClass->GetName());
 	return nullptr;
 }
 
 void SGameInstance::InitSubsystemCollection()
 {
 	auto SubsystemClasses = SType::GetDerivedTypes(typeof(SGameInstanceSubsystem));
-	SE_LOG(LogGameInstance, Verbose, L"{} subsystems found.", SubsystemClasses.size() - 1);
+	SE_LOG(LogGameInstance, Verbose, TEXT("{} subsystems found."), SubsystemClasses.size() - 1);
 
 	for (auto& Class : SubsystemClasses)
 	{

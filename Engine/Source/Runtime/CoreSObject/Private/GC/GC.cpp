@@ -91,7 +91,7 @@ bool GarbageCollector::IsTearingDown()
 void GarbageCollector::Collect(bool bFullPurge)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GC);
-	SE_LOG(LogGC, Verbose, L"GC.Collect() triggered.");
+	SE_LOG(LogGC, Verbose, TEXT("GC.Collect() triggered."));
 
 	{
 		SCOPE_CYCLE_COUNTER(STAT_PreCollect);
@@ -131,7 +131,7 @@ void GarbageCollector::Collect(bool bFullPurge)
 
 		if (timedOut)
 		{
-			SE_LOG(LogGC, Verbose, L"Timed out detected for waiting that all threads are suspend.");
+			SE_LOG(LogGC, Verbose, TEXT("Timed out detected for waiting that all threads are suspend."));
 
 			{
 				SCOPE_CYCLE_COUNTER(STAT_ResumeToken);

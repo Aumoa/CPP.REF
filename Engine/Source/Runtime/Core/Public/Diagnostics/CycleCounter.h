@@ -3,7 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include <map>
 #include <string>
 
@@ -21,7 +21,7 @@ namespace libty::inline Core
 
 	public:
 		void Register(CycleCounterNamespace* Namespace);
-		CycleCounterNamespace* GetNamespace(StringView Name) const;
+		CycleCounterNamespace* GetNamespace(String Name) const;
 
 	public:
 		static CycleCounter& Get();

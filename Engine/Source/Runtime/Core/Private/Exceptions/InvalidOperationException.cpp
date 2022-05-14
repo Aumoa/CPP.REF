@@ -4,7 +4,7 @@
 
 using namespace libty;
 
-InvalidOperationException::InvalidOperationException(StringView message, std::exception_ptr innerException)
+InvalidOperationException::InvalidOperationException(String message, std::exception_ptr innerException)
 	: Exception(message, innerException)
 {
 }

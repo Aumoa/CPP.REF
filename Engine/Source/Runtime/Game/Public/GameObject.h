@@ -26,8 +26,8 @@ namespace libty::inline Game
 
 		SGameObject* GetOuter() const;
 		void SetOuter(SGameObject* Value);
-		StringView GetName() const;
-		void SetName(StringView Value);
+		String GetName() const;
+		void SetName(String Value);
 
 		virtual SLevel* GetLevel();
 		virtual SWorld* GetWorld();

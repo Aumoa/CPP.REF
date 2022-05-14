@@ -47,7 +47,7 @@ Task<> SDirectXFence::SetEventOnCompletion(uint64 fenceValue, std::optional<std:
 			WT_EXECUTEONLYONCE);
 		if (!bResult)
 		{
-			pContext->TCS.SetException(std::make_exception_ptr(InvalidOperationException("Failed to create callback procedure for waiting event.")));
+			pContext->TCS.SetException(std::make_exception_ptr(InvalidOperationException(TEXT("Failed to create callback procedure for waiting event."))));
 			pContext->bReady = true;
 		}
 

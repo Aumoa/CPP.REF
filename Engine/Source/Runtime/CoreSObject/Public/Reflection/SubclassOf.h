@@ -40,7 +40,7 @@ namespace libty::inline Core
 
 		inline SubclassOf(SType* NewType) : MyType(NewType)
 		{
-			checkf(NewType == nullptr || NewType->IsDerivedFrom(typeof(T)), L"Couldn't convert super class.");
+			checkf(NewType == nullptr || NewType->IsDerivedFrom(typeof(T)), TEXT("Couldn't convert super class."));
 		}
 
 		inline bool IsValid() const

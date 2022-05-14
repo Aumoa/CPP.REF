@@ -13,13 +13,13 @@ namespace libty::inline Core::Reflection
 	MethodInfoMetadataGenerator MethodInfoMetadataGenerator::Generate
 	(
 		TReturnType(TOwningClass::* method)(TArgs...),
-		StringView methodName,
+		String methodName,
 		std::tuple<TAttributeCollection...>& attributes,
 		std::index_sequence<Idx...>&&
 	)
 	{
 		MethodInfoMetadataGenerator gen;
-		gen.MethodName = String::AsUnicode(methodName);
+		gen.MethodName = methodName;
 		gen.Attributes = MakeAttributeCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 		gen.bIsStatic = false;
 		gen.OwningType = typeof(TOwningClass);
@@ -46,13 +46,13 @@ namespace libty::inline Core::Reflection
 	MethodInfoMetadataGenerator MethodInfoMetadataGenerator::Generate
 	(
 		TReturnType(* method)(TArgs...),
-		StringView methodName,
+		String methodName,
 		std::tuple<TAttributeCollection...>& attributes,
 		std::index_sequence<Idx...>&&
 	)
 	{
 		MethodInfoMetadataGenerator gen;
-		gen.MethodName = String::AsUnicode(methodName);
+		gen.MethodName = methodName;
 		gen.Attributes = MakeAttributeCollection(attributes, std::make_index_sequence<sizeof...(TAttributeCollection)>{});
 		gen.bIsStatic = true;
 		gen.OwningType = typeof(TOwningClass);

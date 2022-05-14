@@ -9,7 +9,7 @@ namespace libty::inline Core
 	class CORE_API AssertException : public Exception
 	{
 	public:
-		AssertException(StringView exp);
-		AssertException(StringView exp, StringView msg);
+		AssertException(String exp);
+		AssertException(String exp, String msg);
 	};
 }

@@ -107,9 +107,9 @@ namespace libty::inline CoreNumerics
 		}
 
 	public:
-		inline std::wstring ToString(std::wstring_view FormatArgs) const
+		inline String ToString(String formatArgs) const
 		{
-			return Matrix<>::ToString(*this, FormatArgs);
+			return Matrix<>::ToString(*this, formatArgs);
 		}
 
 		template<TIsMatrix<float, 3, 2> IMatrix>

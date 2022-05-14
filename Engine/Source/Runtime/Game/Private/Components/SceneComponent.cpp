@@ -26,7 +26,7 @@ void SSceneComponent::UpdateComponentToWorld()
 		return;
 	}
 
-	if (GetAttachSocketName() != L"")
+	if (GetAttachSocketName() != TEXT(""))
 	{
 		_RelativeTransform = GetAttachParent()->GetSocketTransform(GetAttachSocketName());
 	}
@@ -38,9 +38,9 @@ void SSceneComponent::UpdateComponentToWorld()
 	UpdateWorldTransform();
 }
 
-Transform SSceneComponent::GetSocketTransform(StringView InSocketName, EComponentTransformSpace InSpace) const
+Transform SSceneComponent::GetSocketTransform(String InSocketName, EComponentTransformSpace InSpace) const
 {
-	SE_LOG(LogSceneComponent, Error, L"SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform.");
+	SE_LOG(LogSceneComponent, Error, TEXT("SceneComponent::GetSocketName() called. SceneComponent have not any sockets. Use override this function and provide correct socket transform."));
 
 	switch (InSpace)
 	{
@@ -92,20 +92,20 @@ bool SSceneComponent::MoveComponent(const Vector3& InMoveDelta, const Quaternion
 
 void SSceneComponent::AttachToComponent(SSceneComponent* AttachTo)
 {
-	AttachToSocket(AttachTo, L"");
+	AttachToSocket(AttachTo, TEXT(""));
 }
 
 void SSceneComponent::AttachToSocket(SSceneComponent* AttachTo, const String& socketName)
 {
 	if (AttachTo == nullptr)
 	{
-		SE_LOG(LogSceneComponent, Warning, L"AttachTo is nullptr. First argument of AttachToComponent function must not be nullptr. Abort.");
+		SE_LOG(LogSceneComponent, Warning, TEXT("AttachTo is nullptr. First argument of AttachToComponent function must not be nullptr. Abort."));
 		return;
 	}
 
 	if (_Attachment.AttachmentRoot == AttachTo && _Attachment.SocketName == socketName)
 	{
-		SE_LOG(LogSceneComponent, Verbose, L"Component is already attach to desired target. Abort.");
+		SE_LOG(LogSceneComponent, Verbose, TEXT("Component is already attach to desired target. Abort."));
 		return;
 	}
 
@@ -126,14 +126,14 @@ void SSceneComponent::DetachFromComponent()
 {
 	if (_Attachment.AttachmentRoot == nullptr)
 	{
-		SE_LOG(LogSceneComponent, Verbose, L"Component is already detached from any components. Abort.");
+		SE_LOG(LogSceneComponent, Verbose, TEXT("Component is already detached from any components. Abort."));
 		return;
 	}
 
 	auto It = find(_Childs.begin(), _Childs.end(), this);
 	if (It == _Childs.end())
 	{
-		SE_LOG(LogSceneComponent, Error, L"Cannot found this component from child component list of parent component.");
+		SE_LOG(LogSceneComponent, Error, TEXT("Cannot found this component from child component list of parent component."));
 	}
 	else
 	{
@@ -141,7 +141,7 @@ void SSceneComponent::DetachFromComponent()
 	}
 
 	_Attachment.AttachmentRoot = nullptr;
-	_Attachment.SocketName = L"";
+	_Attachment.SocketName = TEXT("");
 
 	UpdateComponentToWorld();
 	OnAttachmentChanged();
@@ -208,7 +208,7 @@ void SSceneComponent::UpdateWorldTransform()
 {
 	if (HasBegunPlay() && Mobility != EComponentMobility::Movable)
 	{
-		SE_LOG(LogSceneComponent, Error, L"SceneComponent has been try move but it is not movable mobility.");
+		SE_LOG(LogSceneComponent, Error, TEXT("SceneComponent has been try move but it is not movable mobility."));
 		return;
 	}
 

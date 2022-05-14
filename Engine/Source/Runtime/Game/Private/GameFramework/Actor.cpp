@@ -75,7 +75,7 @@ void AActor::SetActive(bool bActive)
 void AActor::DestroyActor()
 {
 	SWorld* const World = GetWorld();
-	if (ensureMsgf(World != nullptr, L"Actor does not spawned at world."))
+	if (ensureMsgf(World != nullptr, TEXT("Actor does not spawned at world.")))
 	{
 		World->DestroyActor(this);
 	}
@@ -125,7 +125,7 @@ void AActor::AddOwnedComponent(SActorComponent* InComponent)
 {
 	if (InComponent->GetType()->IsDerivedFrom<SSceneComponent>())
 	{
-		SE_LOG(LogActor, Error, L"SceneComponent could not add to inline components array. Attach to root component of this actor for your desired do.");
+		SE_LOG(LogActor, Error, TEXT("SceneComponent could not add to inline components array. Attach to root component of this actor for your desired do."));
 		return;
 	}
 
@@ -204,7 +204,7 @@ void AActor::SetRootComponent(SSceneComponent* InRootComponent)
 
 	if (AttachParent)
 	{
-		if (SocketName.length() == 0)
+		if ((size_t)SocketName == 0)
 		{
 			RootComponent->AttachToComponent(AttachParent);
 		}

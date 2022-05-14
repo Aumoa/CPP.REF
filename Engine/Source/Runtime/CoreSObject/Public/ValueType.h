@@ -100,7 +100,7 @@ namespace libty::inline Core
 		template<class T>
 		inline static String Internal_ToString(short, const T& value)
 		{
-			return String::AsUnicode(typeid(T).name());
+			return String::FromLiteral(typeid(T).name());
 		}
 	};
 }

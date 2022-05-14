@@ -14,11 +14,11 @@ DECLARE_CYCLE_STAT("  ExecuteCurrentWorks", STAT_ExecuteCurrentWorks, STATGROUP_
 
 SRenderThread::SRenderThread()
 {
-	checkf(sInstance == nullptr, L"Singleton instance duplicated.");
+	checkf(sInstance == nullptr, TEXT("Singleton instance duplicated."));
 	sInstance = this;
 
 	_running = true;
-	_thread = Thread::CreateThread(L"[Render Thread]", std::bind(&SRenderThread::Run, this));
+	_thread = Thread::CreateThread(TEXT("[Render Thread]"), std::bind(&SRenderThread::Run, this));
 }
 
 SRenderThread::~SRenderThread()

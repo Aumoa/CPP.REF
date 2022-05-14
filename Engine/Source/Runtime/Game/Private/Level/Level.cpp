@@ -16,7 +16,7 @@ SLevel::SLevel() : Super()
 
 bool SLevel::LoadLevel(SWorld* InWorld, STickTaskLevelManager* InParentLevelTick)
 {
-	checkf(GameModeClass.IsValid(), L"GameModeClass does not specified.");
+	checkf(GameModeClass.IsValid(), TEXT("GameModeClass does not specified."));
 
 	World = InWorld;
 
@@ -49,14 +49,14 @@ AActor* SLevel::SpawnActor(SubclassOf<AActor> InActorClass, bool bSpawnIncrement
 {
 	if (!InActorClass.IsValid())
 	{
-		SE_LOG(LogWorld, Error, L"Actor class does not specified. Abort.");
+		SE_LOG(LogWorld, Error, TEXT("Actor class does not specified. Abort."));
 		return nullptr;
 	}
 
 	AActor* Actor = Cast<AActor>(InActorClass->Instantiate());
 	if (Actor == nullptr)
 	{
-		SE_LOG(LogWorld, Error, L"Actor class does not support instantiate without any constructor arguments.");
+		SE_LOG(LogWorld, Error, TEXT("Actor class does not support instantiate without any constructor arguments."));
 		return nullptr;
 	}
 

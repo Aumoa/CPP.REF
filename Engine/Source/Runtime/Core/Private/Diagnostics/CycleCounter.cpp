@@ -10,7 +10,7 @@ void CycleCounter::Register(CycleCounterNamespace* Namespace)
 	Namespaces.emplace(Namespace->GetName(), Namespace);
 }
 
-CycleCounterNamespace* CycleCounter::GetNamespace(StringView Name) const
+CycleCounterNamespace* CycleCounter::GetNamespace(String Name) const
 {
 	if (auto It = Namespaces.find(Name); It != Namespaces.end())
 	{

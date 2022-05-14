@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include "Stacktrace/Stacktrace.h"
 #include <exception>
 #include <string>
@@ -11,7 +11,7 @@
 
 namespace libty::inline Core
 {
-	class CORE_API Exception : public std::exception
+	class CORE_API Exception
 	{
 		struct _Impl_buf
 		{
@@ -19,7 +19,6 @@ namespace libty::inline Core
 			String _description;
 			String _stacktrace;
 			String _fulltrace;
-			std::string _what;
 		};
 
 		Stacktrace _stacktrace;
@@ -28,16 +27,15 @@ namespace libty::inline Core
 		std::shared_ptr<_Impl_buf> _impl_buf;
 
 	public:
-		Exception(StringView message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
+		Exception(String message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
 		Exception(const Exception& rhs) noexcept;
 		Exception(Exception&& rhs) noexcept;
 		virtual ~Exception() noexcept;
 
-		virtual const char* what() const noexcept override;
-		virtual StringView ToString() const noexcept;
+		virtual String ToString() const noexcept;
 
 		virtual const Stacktrace& GetStacktrace() const noexcept;
-		virtual StringView GetMessage() const noexcept;
+		virtual String GetMessage() const noexcept;
 		virtual std::exception_ptr GetInnerException() const noexcept;
 
 		static Exception* AvailableException() noexcept;

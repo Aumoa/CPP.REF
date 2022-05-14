@@ -15,7 +15,7 @@ using namespace libty;
 
 LogModule* LogModule::sInstance;
 
-LogModule::LogModule(StringView moduleName)
+LogModule::LogModule(String moduleName)
 	: _name(moduleName)
 {
 	check(sInstance == nullptr);
@@ -31,13 +31,13 @@ Task<> LogModule::StartAsync(std::stop_token cancellationToken)
 {
 	using namespace ::std::filesystem;
 
-	path directory = TEXT("Saved/Logs");
-	path logPath = directory / path(String::Format(TEXT("{}.log"), _name));
+	path directory = (std::wstring)TEXT("Saved/Logs");
+	path logPath = directory / path((std::wstring)String::Format(TEXT("{}.log"), _name));
 
 	if (File::Exists(logPath))
 	{
 		path newPath = path(logPath)
-			.replace_filename(String::Format(TEXT("{}_{}.log"), _name, DateTime::Now().ToString<DateTimeFormat::File>()));
+			.replace_filename((std::wstring)String::Format(TEXT("{}_{}.log"), _name, DateTime::Now().ToString<DateTimeFormat::File>()));
 		rename(logPath, newPath);
 	}
 	else if (!Directory::Exists(directory))

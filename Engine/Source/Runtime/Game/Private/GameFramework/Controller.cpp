@@ -15,7 +15,7 @@ void AController::Possess(APawn* InNewPawn)
 {
 	if (PossessedPawn != nullptr)
 	{
-		SE_LOG(LogController, Error, L"The controller already possessed to InNewPawn[{}]. Abort.", PossessedPawn->GetName());
+		SE_LOG(LogController, Error, TEXT("The controller already possessed to InNewPawn[{}]. Abort."), PossessedPawn->GetName());
 		return;
 	}
 
@@ -28,7 +28,7 @@ void AController::UnPossess()
 {
 	if (PossessedPawn == nullptr)
 	{
-		SE_LOG(LogController, Verbose, L"The controller already detached any pawn. Abort.");
+		SE_LOG(LogController, Verbose, TEXT("The controller already detached any pawn. Abort."));
 		return;
 	}
 

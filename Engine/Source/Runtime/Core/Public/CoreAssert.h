@@ -3,7 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include "Exceptions/AssertException.h"
 #include <string_view>
 #include <source_location>
@@ -13,7 +13,7 @@ namespace libty::inline Core
 	class CORE_API CoreAssert
 	{
 	public:
-		static void Ensure(StringView exp, StringView msg, const std::source_location& location = std::source_location::current());
+		static void Ensure(String exp, String msg, const std::source_location& location = std::source_location::current());
 		static void DebugBreak();
 	};
 }
@@ -23,13 +23,13 @@ namespace libty::inline Core
 #define check(x) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::AssertException(#x); \
+	throw ::libty::Core::AssertException(TEXT(#x)); \
 }
 
 #define checkf(x, fmt, ...) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::AssertException(#x, ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+	throw ::libty::Core::AssertException(TEXT(#x), ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
 }
 
 #define ensure(x) \
@@ -37,7 +37,7 @@ if (const bool b = (bool)(x); !b) \
 {\
 	if (!b)\
 	{\
-		::libty::Core::CoreAssert::Ensure(#x, TEXT(""), location);\
+		::libty::Core::CoreAssert::Ensure(TEXT(#x), TEXT(""), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
@@ -53,7 +53,7 @@ if (const bool b = (bool)(x); !b) \
 {\
 	if (!b)\
 	{\
-		::libty::Core::CoreAssert::Ensure(#x, ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
+		::libty::Core::CoreAssert::Ensure(TEXT(#x), ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\

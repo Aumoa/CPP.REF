@@ -5,7 +5,7 @@
 
 using namespace libty;
 
-CycleCounterUnit::CycleCounterUnit(CycleCounterNamespace* Namespace, StringView Name)
+CycleCounterUnit::CycleCounterUnit(CycleCounterNamespace* Namespace, String Name)
 	: Namespace(Namespace)
 	, Name(Name)
 	, Stats({})
@@ -25,7 +25,7 @@ auto CycleCounterUnit::GetScopedTimer() -> Instance
 	return Instance(this, Index);
 }
 
-StringView CycleCounterUnit::GetName()
+String CycleCounterUnit::GetName()
 {
 	return Name;
 }

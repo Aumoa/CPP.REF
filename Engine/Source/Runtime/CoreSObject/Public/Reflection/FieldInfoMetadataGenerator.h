@@ -40,16 +40,16 @@ namespace libty::inline Core
 			NativeGCCollection Collection;
 
 			template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, String fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 			template<class TMemberType, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(TMemberType* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(TMemberType* field, String fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 			template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, String fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 			template<class TMemberType, class... TAttributeCollection>
-			FieldInfoMetadataGenerator(const TMemberType* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes);
+			FieldInfoMetadataGenerator(const TMemberType* field, String fieldName, std::tuple<TAttributeCollection...>& attributes);
 
 		private:
 			template<class TMemberType>

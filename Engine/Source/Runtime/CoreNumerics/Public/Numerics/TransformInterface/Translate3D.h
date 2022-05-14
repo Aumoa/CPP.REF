@@ -141,9 +141,9 @@ namespace libty::inline CoreNumerics
 		}
 
 	public:
-		std::wstring ToString(std::wstring_view FormatArgs) const
+		String ToString(String formatArgs) const
 		{
-			return Vector<>::ToString(*this, FormatArgs);
+			return Vector<>::ToString(*this, formatArgs);
 		}
 
 		constexpr bool NearlyEquals(const Translate3D& T, float Epsilon) const

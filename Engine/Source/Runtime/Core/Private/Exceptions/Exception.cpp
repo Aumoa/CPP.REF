@@ -11,7 +11,7 @@ using namespace libty;
 
 thread_local std::vector<Exception*> sTLExceptions;
 
-Exception::Exception(StringView message, std::exception_ptr innerException) noexcept
+Exception::Exception(String message, std::exception_ptr innerException) noexcept
 	: _stacktrace(Stacktrace::CaptureCurrent())
 	, _message(message)
 	, _innerException(innerException)
@@ -45,13 +45,7 @@ Exception::~Exception() noexcept
 	}
 }
 
-const char* Exception::what() const noexcept
-{
-	this->_Cache_strings();
-	return _impl_buf->_what.c_str();
-}
-
-StringView Exception::ToString() const noexcept
+String Exception::ToString() const noexcept
 {
 	this->_Cache_strings();
 	return _impl_buf->_fulltrace;
@@ -62,7 +56,7 @@ const Stacktrace& Exception::GetStacktrace() const noexcept
 	return _stacktrace;
 }
 
-StringView Exception::GetMessage() const noexcept
+String Exception::GetMessage() const noexcept
 {
 	return _message;
 }
@@ -104,20 +98,19 @@ void Exception::_Cache_strings() const noexcept
 			}
 		}
 
-		if (!_impl_buf->_description.empty())
+		if (_impl_buf->_description)
 		{
 			_impl_buf->_description += TEXT("\n ---> ");
 		}
-		if (!_impl_buf->_stacktrace.empty())
+		if (_impl_buf->_stacktrace)
 		{
 			_impl_buf->_stacktrace += TEXT("\n   --- End of inner exception stack trace ---\n");
 		}
 
-		_impl_buf->_description += String::Format(TEXT("{}: {}"), StringView(typeid(*this).name()), _message);
+		_impl_buf->_description += String::Format(TEXT("{}: {}"), String(typeid(*this).name()), _message);
 		_impl_buf->_stacktrace += _stacktrace.Trace();
 
 		_impl_buf->_fulltrace = String::Format(TEXT("{}\n{}"), _impl_buf->_description, _impl_buf->_stacktrace);
-		_impl_buf->_what = String::AsMultibyte(_impl_buf->_fulltrace);
 		_impl_buf->_cached = true;
 	}
 }

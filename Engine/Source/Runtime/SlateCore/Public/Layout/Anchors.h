@@ -97,9 +97,9 @@ namespace libty::inline SlateCore
 		}
 
 	public:
-		inline String ToString(StringView FormatArgs) const
+		inline String ToString(String FormatArgs) const
 		{
-			return String::Format(L"{{{Minimum={}, Maximum={}}}", Minimum.ToString(FormatArgs), Maximum.ToString(FormatArgs));
+			return String::Format(TEXT("{{{Minimum={}, Maximum={}}}"), Minimum.ToString(FormatArgs), Maximum.ToString(FormatArgs));
 		}
 
 		template<TIsMatrix<float, 2, 2> IMatrix>

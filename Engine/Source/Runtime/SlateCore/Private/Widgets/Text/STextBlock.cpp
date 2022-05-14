@@ -89,7 +89,7 @@ STextBlock::STextBlock() : Super()
 {
 }
 
-void STextBlock::SetText(StringView Text)
+void STextBlock::SetText(String Text)
 {
 	if (this->Text != Text)
 	{
@@ -195,7 +195,7 @@ void STextBlock::ReallocLayout()
 	//Format = nullptr;
 	CachedRenderElement = nullptr;
 
-	if (!Text.empty() && !Font.FamilyName.empty() && Font.Size > 0.1f)
+	if (Text && Font.FamilyName && Font.Size > 0.1f)
 	{
 		IRHIFactory* Factory = IApplicationInterface::Get().GetFactory();
 		//Format = Factory->CreateTextFormat(Font.FamilyName, Font.Collection, ERHIFontWeight::Normal, ERHIFontStyle::Normal, ERHIFontStretch::Normal, Font.Size, L"ko-KR");

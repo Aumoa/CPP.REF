@@ -9,21 +9,21 @@ InjectException::InjectException(EInjectionErrorCode code, std::exception_ptr in
 {
 }
 
-std::string InjectException::FormatMessage(EInjectionErrorCode code)
+String InjectException::FormatMessage(EInjectionErrorCode code)
 {
 	switch (code)
 	{
 	case EInjectionErrorCode::InjectFunctionNotFound:
-		return "'Inject' function does not found in desired type.";
+		return TEXT("'Inject' function does not found in desired type.");
 	case EInjectionErrorCode::InjectInnerException:
-		return "Exception detected in 'Inject' function. See inner exception.";
+		return TEXT("Exception detected in 'Inject' function. See inner exception.");
 	case EInjectionErrorCode::NotSupportedType:
-		return "Object type is not allowed for desired service type.";
+		return TEXT("Object type is not allowed for desired service type.");
 	case EInjectionErrorCode::ServiceNotFound:
-		return "Service does not found in this provider.";
+		return TEXT("Service does not found in this provider.");
 	case EInjectionErrorCode::ServiceNotConstructible:
-		return "Service does not constructible without any parameters.";
+		return TEXT("Service does not constructible without any parameters.");
 	default:
-		return String::AsMultibyte(code.ToString());
+		return code.ToString();
 	}
 }

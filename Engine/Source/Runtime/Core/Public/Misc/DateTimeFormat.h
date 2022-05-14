@@ -27,9 +27,9 @@ namespace libty::inline Core
 			}
 
 			template<class time_point>
-			static bool TryParse(std::wstring_view text, time_point& tp)
+			static bool TryParse(String text, time_point& tp)
 			{
-				std::wistringstream wiss(text);
+				std::wistringstream wiss((std::wstring)text);
 				return std::chrono::from_stream(wiss, TEXT("%Y-%m-%dT%H:%M:%S%z"), tp);
 			}
 		};
@@ -38,15 +38,15 @@ namespace libty::inline Core
 		{
 		public:
 			template<class time_point>
-			static std::wstring ToString(time_point tp)
+			static String ToString(time_point tp)
 			{
 				return String::Format(TEXT("{:%Y-%m-%d-%H-%M-%S}"), tp);
 			}
 
 			template<class time_point>
-			static bool TryParse(std::wstring_view text, time_point& tp)
+			static bool TryParse(String text, time_point& tp)
 			{
-				std::wistringstream wiss(text);
+				std::wistringstream wiss((std::wstring)text);
 				return std::chrono::from_stream(wiss, TEXT("%Y-%m-%d-%H-%M-%S"), tp);
 			}
 		};

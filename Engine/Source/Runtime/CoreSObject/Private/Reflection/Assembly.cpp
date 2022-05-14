@@ -5,8 +5,8 @@
 using namespace libty;
 using namespace libty::Reflection;
 
-SAssembly::SAssembly(StringView assemblyName)
-	: _assemblyName(String::AsUnicode(assemblyName))
+SAssembly::SAssembly(String assemblyName)
+	: _assemblyName(assemblyName)
 {
 }
 

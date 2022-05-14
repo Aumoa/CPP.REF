@@ -42,7 +42,7 @@ SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 	{
 		if (_GameWorld)
 		{
-			throw Exception("GameWorld cannot be multiple instantiated.");
+			throw Exception(TEXT("GameWorld cannot be multiple instantiated."));
 			return nullptr;
 		}
 
@@ -52,7 +52,7 @@ SWorld* SGameLevelSystem::SpawnWorld(EWorldType InWorldType)
 	}
 	else
 	{
-		throw Exception("NOT IMPLEMENTED.");
+		throw Exception(TEXT("NOT IMPLEMENTED."));
 		return nullptr;
 	}
 }

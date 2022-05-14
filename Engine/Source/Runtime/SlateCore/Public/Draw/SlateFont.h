@@ -21,9 +21,9 @@ namespace libty::inline SlateCore
 		//{
 		//}
 
-		String ToString(StringView InFormatArgs = L"") const
+		String ToString(String InFormatArgs = TEXT("")) const
 		{
-			return String::Format(L"FamilyName={} Size={}", FamilyName, Size);
+			return String::Format(TEXT("FamilyName={} Size={}"), FamilyName, Size);
 		}
 
 		//bool operator ==(const SlateFont& Rhs) const

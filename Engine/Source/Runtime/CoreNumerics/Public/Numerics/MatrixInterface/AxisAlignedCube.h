@@ -94,7 +94,7 @@ namespace libty::inline CoreNumerics
 	struct AxisAlignedCube<0>
 	{
 		template<TIsAxisAlignedCube IMatrix>
-		static std::wstring ToString(const IMatrix& M, std::wstring_view FormatArgs = L"")
+		static String ToString(const IMatrix& M, String FormatArgs = TEXT(""))
 		{
 			return String::Format(L"Min: {}, Max: {}", Vector<>::ToString(M[0], FormatArgs), Vector<>::ToString(M[1], FormatArgs));
 		}

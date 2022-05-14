@@ -15,7 +15,7 @@ std::future<void> Thread::ThreadSuspendToken::Suspend()
 {
 	if (SuspendPromise.has_value())
 	{
-		throw InvalidOperationException("Thread already wait for suspend.");
+		throw InvalidOperationException(TEXT("Thread already wait for suspend."));
 	}
 	return SuspendPromise.emplace().get_future();
 }

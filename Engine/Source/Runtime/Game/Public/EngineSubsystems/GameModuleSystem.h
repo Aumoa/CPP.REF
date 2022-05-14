@@ -24,7 +24,7 @@ namespace libty::inline Game
 		virtual Task<> StartAsync(std::stop_token CancellationToken) override;
 		virtual Task<> StopAsync(std::stop_token CancellationToken) override;
 
-		void LoadGameModule(StringView GameModuleName);
+		void LoadGameModule(String GameModuleName);
 		SGameInstance* LoadGameInstance();
 	};
 }

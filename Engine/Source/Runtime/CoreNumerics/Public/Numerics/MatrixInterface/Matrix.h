@@ -170,7 +170,7 @@ namespace libty::inline CoreNumerics
 	public:
 		template<TIsMatrix<T, NRow, NCol> IMatrix>
 		constexpr bool NearlyEquals(const IMatrix& M, const T& Epsilon) const;
-		inline std::wstring ToString(std::wstring_view FormatArgs) const;
+		inline String ToString(String formatArgs) const;
 	};
 
 
@@ -350,15 +350,15 @@ namespace libty::inline CoreNumerics
 		}
 
 		template<TIsMatrixBase IMatrix>
-		static std::wstring ToString(const IMatrix& M, std::wstring_view FormatArgs = L"")
+		static String ToString(const IMatrix& M, String FormatArgs = TEXT(""))
 		{
-			std::array<std::wstring, IMatrix::Row()> Composed;
+			std::array<String, IMatrix::Row()> Composed;
 			for (size_t i = 0; i < IMatrix::Row(); ++i)
 			{
 				Composed[i] = M[i].ToString(FormatArgs);
 			}
 
-			return String::Format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
+			return String::Format(TEXT("{{{}}}"), String::Join(TEXT(", "), std::span<String const>(Composed)));
 		}
 
 		template<TIsMatrixBase IMatrix>
@@ -608,8 +608,8 @@ namespace libty::inline CoreNumerics
 	}
 
 	template<class T, size_t NRow, size_t NCol>
-	inline std::wstring Matrix<T, NRow, NCol>::ToString(std::wstring_view FormatArgs) const
+	inline String Matrix<T, NRow, NCol>::ToString(String formatArgs) const
 	{
-		return Matrix<>::ToString(*this, FormatArgs);
+		return Matrix<>::ToString(*this, formatArgs);
 	}
 }

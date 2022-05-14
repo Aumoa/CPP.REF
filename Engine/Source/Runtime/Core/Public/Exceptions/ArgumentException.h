@@ -9,6 +9,6 @@ namespace libty::inline Core
 	class CORE_API ArgumentException : public Exception
 	{
 	public:
-		ArgumentException(StringView argName);
+		ArgumentException(String argName);
 	};
 }

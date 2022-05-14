@@ -29,31 +29,31 @@ Task<> SGameModuleSystem::StopAsync(std::stop_token CancellationToken)
 	return Super::StopAsync(CancellationToken);
 }
 
-void SGameModuleSystem::LoadGameModule(StringView GameModuleName)
+void SGameModuleSystem::LoadGameModule(String GameModuleName)
 {
-	std::filesystem::path GameModulePath = GameModuleName;
-	if (!GameModulePath.has_extension())
+	String GameModulePath = GameModuleName;
+	if (!Path::HasExtension(GameModulePath))
 	{
 		// Add .dll extension.
-		GameModulePath.replace_extension(L".dll");
+		GameModulePath = Path::ChangeExtension(GameModulePath, TEXT(".dll"));
 	}
 
 	std::unique_ptr Module = std::make_unique<PlatformModule>(GameModulePath);
 	if (!Module->IsValid())
 	{
-		throw Exception(String::Format("Could not initialize game module({}).", String::AsMultibyte(GameModuleName)));
+		throw Exception(String::Format(TEXT("Could not initialize game module({})."), GameModuleName));
 	}
 
-	auto ModuleLoader = Module->GetFunctionPointer<SGameModule*(SObject*)>("LoadGameModule");
+	auto ModuleLoader = Module->GetFunctionPointer<SGameModule*(SObject*)>(TEXT("LoadGameModule"));
 	if (!ModuleLoader)
 	{
-		throw Exception(String::Format("The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application.", GameModulePath.string()));
+		throw Exception(String::Format(TEXT("The game module({}) have not LoadGameInstance function. Please add DEFINE_GAME_MODULE(YourGameInstanceClass) to your code and restart application."), GameModulePath));
 	}
 
 	GameModule = ModuleLoader(this);
 	if (!GameModule)
 	{
-		throw Exception(String::Format("The game module loader({}.dll@LoadGameModule()) returns nullptr.", String::AsMultibyte(GameModuleName)));
+		throw Exception(String::Format(TEXT("The game module loader({}.dll@LoadGameModule()) returns nullptr."), GameModuleName));
 	}
 
 	// Keep module object while application is running.

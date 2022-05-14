@@ -38,7 +38,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(TOwningClass::* method)(TArgs...),
-				StringView methodName,
+				String methodName,
 				std::tuple<TAttributeCollection...>& attributes
 			)
 			{
@@ -49,7 +49,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(TOwningClass::* method)(TArgs...),
-				StringView methodName,
+				String methodName,
 				std::tuple<TAttributeCollection...>& attributes,
 				std::index_sequence<Idx...>&&
 			);
@@ -58,7 +58,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(*method)(TArgs...),
-				StringView methodName,
+				String methodName,
 				std::tuple<TAttributeCollection...>& attributes
 			)
 			{
@@ -69,7 +69,7 @@ namespace libty::inline Core
 			static MethodInfoMetadataGenerator Generate
 			(
 				TReturnType(*method)(TArgs...),
-				StringView methodName,
+				String methodName,
 				std::tuple<TAttributeCollection...>& attributes,
 				std::index_sequence<Idx...>&&
 			);

@@ -39,7 +39,7 @@ namespace libty::inline Windows
 	public:
 		SWindowsApplication(HINSTANCE hInstance);
 
-		static int32 GuardedMain(std::span<const std::wstring> Argv);
+		static int32 GuardedMain(std::span<const String> Argv);
 
 		// IApplicationInterface
 		virtual void Start() override;

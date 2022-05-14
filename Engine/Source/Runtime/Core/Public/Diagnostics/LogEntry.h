@@ -17,27 +17,27 @@ namespace libty::inline Core
 	struct LogEntry
 	{
 		std::thread::id ThreadId;
-		std::wstring ThreadName;
+		String ThreadName;
 		DateTime LoggedTime;
 		LogCategory* Category;
 		ELogVerbosity Verbosity;
 
-		std::wstring Message;
+		String Message;
 		std::source_location Source;
 
 		LogEntry&& Generate() &&
 		{
-			_log = String::Format(L"{}: {}: {}",
+			_log = String::Format(TEXT("{}: {}: {}"),
 				Category->GetName(),
 				Category->VerbosityToString(Verbosity),
 				Message
 			);
 
-			_details = String::Format(L"{}: {}: {}\n  at {} in {}:{}",
+			_details = String::Format(TEXT("{}: {}: {}\n  at {} in {}:{}"),
 				LoggedTime.ToString<libty::DateTimeFormat::Json>(),
 				ThreadName,
 				_log,
-				String::AsUnicode(Source.function_name()),
+				String::FromLiteral(Source.function_name()),
 				std::filesystem::path(Source.file_name()).filename().wstring(),
 				Source.line()
 			);
@@ -46,11 +46,11 @@ namespace libty::inline Core
 		}
 
 	private:
-		std::wstring _log;
-		std::wstring _details;
+		String _log;
+		String _details;
 
 	public:
-		std::wstring_view ToString(bool details = false)
+		String ToString(bool details = false)
 		{
 			return details ? _details : _log;
 		}

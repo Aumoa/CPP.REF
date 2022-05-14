@@ -35,7 +35,7 @@ namespace libty::inline Core
 		std::vector<Variant_t> _entries;
 
 	public:
-		LogModule(StringView moduleName);
+		LogModule(String moduleName);
 		~LogModule() noexcept;
 
 		Task<> StartAsync(std::stop_token cancellationToken = {});

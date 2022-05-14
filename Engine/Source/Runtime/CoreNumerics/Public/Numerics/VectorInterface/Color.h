@@ -113,9 +113,9 @@ namespace libty::inline CoreNumerics
 			};
 		}
 
-		inline std::wstring ToString() const
+		inline String ToString() const
 		{
-			return String::Format(L"#{:0>8X}", ToUInt());
+			return String::Format(TEXT("#{:0>8X}"), ToUInt());
 		}
 
 		template<TIsVector<float, 4> IVectorL, TIsVector<float, 4> IVectorR>
@@ -153,7 +153,7 @@ namespace libty::inline CoreNumerics
 			return Color((float)R * Inv255, (float)G * Inv255, (float)B * Inv255, (float)A * Inv255);
 		}
 
-		CORENUMERICS_API static Color FromHtml(std::wstring_view HtmlCode);
+		CORENUMERICS_API static Color FromHtml(String HtmlCode);
 	};
 
 	namespace NamedColors

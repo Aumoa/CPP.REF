@@ -25,14 +25,14 @@ namespace libty::inline Core
 
 	public:
 		template<class... TArgs>
-		static void Log(const std::source_location& Location, LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring_view Format, TArgs&&... Args)
+		static void Log(const std::source_location& Location, LogCategory& Category, ELogVerbosity LogVerbosity, String Format, TArgs&&... Args)
 		{
-			std::wstring Message = String::Format(Format, std::forward<TArgs>(Args)...);
+			String Message = String::Format(Format, std::forward<TArgs>(Args)...);
 			InternalLog(Category, LogVerbosity, Message, Location);
 		}
 
 	private:
-		static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, std::wstring& Message, const std::source_location& Location = std::source_location::current());
+		static void InternalLog(LogCategory& Category, ELogVerbosity LogVerbosity, String Message, const std::source_location& Location = std::source_location::current());
 	};
 }
 

@@ -70,7 +70,7 @@ public:
     {
         if (s_mouse)
         {
-            throw Exception("WindowsPlatformMouse is a singleton");
+            throw Exception(TEXT("WindowsPlatformMouse is a singleton"));
         }
 
         s_mouse = this;
@@ -144,7 +144,7 @@ public:
 
         SetEvent((mode == EMousePositionMode::Absolute) ? mAbsoluteMode.get() : mRelativeMode.get());
 
-        checkf(mWindow, L"Internal logic error.");
+        checkf(mWindow, TEXT("Internal logic error."));
 
         TRACKMOUSEEVENT tme;
         tme.cbSize = sizeof(tme);
@@ -197,7 +197,7 @@ public:
         if (mWindow == window)
             return;
 
-        checkf(window != nullptr, L"Internal logic error.");
+        checkf(window != nullptr, TEXT("Internal logic error."));
 
         RAWINPUTDEVICE Rid;
         Rid.usUsagePage = 0x1 /* HID_USAGE_PAGE_GENERIC */;
@@ -238,7 +238,7 @@ private:
 
     void ClipToWindow()
     {
-        checkf(mWindow != nullptr, L"internal logic error.");
+        checkf(mWindow != nullptr, TEXT("internal logic error."));
 
         RECT rect;
         GetClientRect(mWindow, &rect);
@@ -503,7 +503,7 @@ void SWindowsPlatformMouse::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 SWindowsPlatformMouse::SWindowsPlatformMouse()
     : pImpl(std::make_unique<Impl>(this))
 {
-    checkf(sInstance == nullptr, L"Internal logic error.");
+    checkf(sInstance == nullptr, TEXT("Internal logic error."));
     sInstance = this;
 }
 

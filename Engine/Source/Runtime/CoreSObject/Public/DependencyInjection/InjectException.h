@@ -12,6 +12,6 @@ namespace libty::inline Core
 		InjectException(EInjectionErrorCode code, std::exception_ptr innerException = nullptr);
 
 	private:
-		static std::string FormatMessage(EInjectionErrorCode code);
+		static String FormatMessage(EInjectionErrorCode code);
 	};
 }

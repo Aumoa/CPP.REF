@@ -3,9 +3,10 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "CoreConcepts.h"
 #include "Misc/String.h"
-#include "Exceptions/InvalidOperationException.h"
+#include "Concepts/IArray.h"
+#include "Exceptions/ArgumentException.h"
+#include "Linq/IsValidIndex.h"
 #include <string_view>
 #include <span>
 #include <map>
@@ -15,190 +16,73 @@ namespace libty::inline Core
 	class CommandLine
 	{
 	private:
-		std::wstring _source;
-		std::map<std::wstring, std::vector<std::wstring>, std::less<>> _keyValuePairs;
+		std::map<String, std::vector<String>> _values;
 
 	public:
-		template<class TChar>
-		CommandLine(size_t argc, TChar* const* argv)
+		template<IArray<String> TArray>
+		inline CommandLine(const TArray& args)
 		{
-			std::vector<std::basic_string_view<TChar>> args(argc);
-			for (size_t i = 0; i < args.size(); ++i)
-			{
-				args[i] = argv[i];
-			}
-
-			DoParse<TChar>(args);
+			this->_Impl_parse_all(args);
 		}
 
-		template<class TList>
-		CommandLine(const TList& args) requires
-			IString<EnumerableItem_t<TList>, StringChar_t<EnumerableItem_t<TList>>>
+		inline bool ContainsKey(String key) const noexcept
 		{
-			using String_t = EnumerableItem_t<TList>;
-			using Char_t = StringChar_t<String_t>;
-
-			if constexpr (std::same_as<EnumerableItem_t<TList>, std::basic_string_view<Char_t>>)
-			{
-				// Is span convertible. Just pass.
-				DoParse<Char_t>(args);
-			}
-			else
-			{
-				std::vector<std::basic_string_view<Char_t>> args_sv(args.size());
-				for (size_t i = 0; i < args.size(); ++i)
-				{
-					args_sv[i] = std::basic_string_view<Char_t>(args[i]);
-				}
-				DoParse<Char_t>(args_sv);
-			}
+			return _values.contains(key);
 		}
 
-		bool ContainsKey(std::wstring_view key) const
+		inline bool TryGetValue(String key, size_t idx, String& oValue) const noexcept
 		{
-			return _keyValuePairs.contains(key);
-		}
-
-		bool TryGetValue(std::wstring_view key, std::span<const std::wstring>& outValues) const
-		{
-			if (auto it = _keyValuePairs.find(key); it != _keyValuePairs.end())
-			{
-				outValues = it->second;
-				return true;
-			}
-			else
+			auto it = _values.find(key);
+			if (it == _values.end())
 			{
 				return false;
 			}
-		}
 
-		bool TryGetValue(std::wstring_view key, std::wstring& outValues) const
-		{
-			if (std::span<const std::wstring> values; TryGetValue(key, values) && values.size() > 0)
-			{
-				outValues = values[0];
-				return true;
-			}
-			else
+			if (!Linq::IsValidIndex(it->second, idx))
 			{
 				return false;
 			}
+
+			oValue = it->second[idx];
+			return true;
+		}
+
+		inline bool TryGetValues(String key, std::vector<String>& oValues) const noexcept
+		{
+			auto it = _values.find(key);
+			if (it == _values.end())
+			{
+				return false;
+			}
+
+			oValues = it->second;
+			return true;
 		}
 
 	private:
-		template<class TChar>
-		void DoParse(std::span<const std::basic_string_view<TChar>> args)
+		template<IArray<String> TArray>
+		inline void _Impl_parse_all(const TArray& args)
 		{
-			using TNakedChar = std::remove_reference_t<std::remove_const_t<TChar>>;
+			std::vector<String>* curr = nullptr;
 
-			static constexpr bool bWstr = std::same_as<TNakedChar, wchar_t>;
-			using StringView_t = std::basic_string_view<TNakedChar>;
-
-			StringView_t currKey;
-			std::vector<std::wstring> values;
-
-			char stringCtxKey = 0;
-			std::wstring stringCtxAppend;
-
-			StringView_t doublehyphen;
-			if constexpr (bWstr)
+			for (const String& str : args)
 			{
-				doublehyphen = L"--";
-			}
-			else
-			{
-				doublehyphen = "--";
-			}
-
-			auto flushAll = [&]()
-			{
-				std::vector<std::wstring> clone;
-				std::swap(clone, values);
-
-				if constexpr (bWstr)
+				if (str.StartsWith(TEXT("--")))
 				{
-					auto emplaced = _keyValuePairs.emplace(currKey, std::move(clone));
-					if (!emplaced.second)
-					{
-						throw InvalidOperationException(String::Format("Duplicated command line key({}).", String::AsMultibyte(currKey)));
-					}
+					String key = str.Substring(2);
+					curr = &_values[key];
 				}
 				else
 				{
-					auto wCurrKey = String::AsUnicode(currKey);
-					auto emplaced = _keyValuePairs.emplace(wCurrKey, std::move(clone));
-					if (!emplaced.second)
+					if (curr == nullptr)
 					{
-						throw InvalidOperationException(String::Format("Duplicated command line key({}).", currKey));
-					}
-				}
-			};
-
-			for (size_t i = 1; i < args.size(); ++i)
-			{
-				auto sView = StringView_t(args[i]);
-
-				if (stringCtxKey == 0 && sView.starts_with(doublehyphen))
-				{
-					if (!currKey.empty())
-					{
-						flushAll();
+						throw ArgumentException(TEXT("The parameter name does not specified."));
 					}
 
-					currKey = sView.substr(2);
-					stringCtxAppend = L"";
-				}
-				else
-				{
-					if (stringCtxKey == 0)
-					{
-						if (sView.length() > 0 && (sView[0] == '\"' || sView[0] == '\'' || sView[0] == '`'))
-						{
-							stringCtxKey = (char)sView[0];
-							sView = sView.substr(1);
-						}
-						else
-						{
-							if constexpr (bWstr)
-							{
-								values.emplace_back(sView);
-							}
-							else
-							{
-								values.emplace_back(ANSI_TO_WCHAR(sView));
-							}
-						}
-					}
-
-					if (stringCtxKey != 0)
-					{
-						size_t last = sView.length() - 1;
-						if (last != -1 && (sView[last] == stringCtxKey))
-						{
-							stringCtxKey = 0;
-							sView = sView.substr(0, sView.length() - 1);
-						}
-
-						if constexpr (bWstr)
-						{
-							stringCtxAppend += sView;
-						}
-						else
-						{
-							stringCtxAppend += Cast<std::wstring>(sView);
-						}
-
-						if (stringCtxKey == 0)
-						{
-							std::wstring clone;
-							std::swap(clone, stringCtxAppend);
-							values.emplace_back(std::move(clone));
-						}
-					}
+					curr->emplace_back(str);
+					curr = nullptr;
 				}
 			}
-
-			flushAll();
 		}
 	};
 }

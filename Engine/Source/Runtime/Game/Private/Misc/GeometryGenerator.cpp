@@ -274,7 +274,7 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
 
     for (size_t iSubdivision = 0; iSubdivision < tessellation; ++iSubdivision)
     {
-        checkf(indices.size() % 3 == 0, L"Internal logic error."); // sanity
+        checkf(indices.size() % 3 == 0, TEXT("Internal logic error.")); // sanity
 
         // We use this to keep track of which edges have already been subdivided.
         EdgeSubdivisionMap subdividedEdges;
@@ -429,8 +429,8 @@ void GeometryGenerator::ComputeGeoSphere(VertexCollection& vertices, IndexCollec
                 }
 
                 // If we got to this point then triIndex0 is the pointer to the index to the vertex we're looking at
-                checkf(*triIndex0 == i, L"Internal logic error.");
-                checkf(*triIndex1 != i && *triIndex2 != i, L"assume no degenerate triangles");
+                checkf(*triIndex0 == i, TEXT("Internal logic error."));
+                checkf(*triIndex1 != i && *triIndex2 != i, TEXT("assume no degenerate triangles"));
 
                 const RHIVertex& v0 = vertices[*triIndex0];
                 const RHIVertex& v1 = vertices[*triIndex1];
@@ -597,7 +597,7 @@ void GeometryGenerator::ComputeCylinder(VertexCollection& vertices, IndexCollect
     vertices.clear();
     indices.clear();
 
-    checkf(tessellation >= 3, L"tesselation parameter out of range");
+    checkf(tessellation >= 3, TEXT("tesselation parameter out of range"));
 
     height /= 2;
 
@@ -804,8 +804,8 @@ void GeometryGenerator::ComputeTetrahedron(VertexCollection& vertices, IndexColl
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    checkf(vertices.size() == 4 * 3, L"Internal logic error!");
-    checkf(indices.size() == 4 * 3, L"Internal logic error!");
+    checkf(vertices.size() == 4 * 3, TEXT("Internal logic error!"));
+    checkf(indices.size() == 4 * 3, TEXT("Internal logic error!"));
 }
 
 
@@ -870,8 +870,8 @@ void GeometryGenerator::ComputeOctahedron(VertexCollection& vertices, IndexColle
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    checkf(vertices.size() == 8 * 3, L"Internal logic error.");
-    checkf(indices.size() == 8 * 3, L"Internal logic error.");
+    checkf(vertices.size() == 8 * 3, TEXT("Internal logic error."));
+    checkf(indices.size() == 8 * 3, TEXT("Internal logic error."));
 }
 
 
@@ -1001,8 +1001,8 @@ void GeometryGenerator::ComputeDodecahedron(VertexCollection& vertices, IndexCol
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    checkf(vertices.size() == 12 * 5, L"Internal logic error.");
-    checkf(indices.size() == 12 * 3 * 3, L"Internal logic error.");
+    checkf(vertices.size() == 12 * 5, TEXT("Internal logic error."));
+    checkf(indices.size() == 12 * 3 * 3, TEXT("Internal logic error."));
 }
 
 
@@ -1088,8 +1088,8 @@ void GeometryGenerator::ComputeIcosahedron(VertexCollection& vertices, IndexColl
     if (rhcoords)
         ReverseWinding(indices, vertices);
 
-    checkf(vertices.size() == 20 * 3, L"Internal logic error.");
-    checkf(indices.size() == 20 * 3, L"Internal logic error.");
+    checkf(vertices.size() == 20 * 3, TEXT("Internal logic error."));
+    checkf(indices.size() == 20 * 3, TEXT("Internal logic error."));
 }
 
 
@@ -1141,7 +1141,9 @@ void GeometryGenerator::ComputeTeapot(VertexCollection& vertices, IndexCollectio
     indices.clear();
 
     if (tessellation < 1)
-        throw std::out_of_range("tesselation parameter out of range");
+    {
+        throw ArgumentException(TEXT("tesselation parameter out of range"));
+    }
 
     Vector3 scaleVector = size;
 

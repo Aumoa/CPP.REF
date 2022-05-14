@@ -13,7 +13,7 @@ ArrangedWidget::ArrangedWidget(SWidget* InWidget, const Geometry& InGeometry)
 
 String ArrangedWidget::ToString() const
 {
-	return String::Format(L"{} @ {}", Widget->ToString(), MyGeometry.ToString());
+	return String::Format(TEXT("{} @ {}"), Widget->ToString(), MyGeometry.ToString());
 }
 
 bool ArrangedWidget::operator ==(const ArrangedWidget& Rhs) const

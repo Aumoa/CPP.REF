@@ -55,31 +55,6 @@ namespace libty::inline Core
 		{ std::declval<TUnaryOp>()(std::declval<TChar>()) } -> std::convertible_to<TChar>;
 	};
 
-	template<class T, class U>
-	concept IEnumerable = requires
-	{
-		{ *std::begin(std::declval<T>()) } -> std::convertible_to<U>;
-		{ std::begin(std::declval<T>()) != std::end(std::declval<T>()) } -> std::convertible_to<bool>;
-		{ std::advance(std::declval<std::remove_reference_t<decltype(std::begin(std::declval<T>()))>&>(), 1) };
-	};
-
-	template<class T, class U>
-	concept IList = IEnumerable<T, U> && requires
-	{
-		{ std::size(std::declval<T>()) } -> std::convertible_to<size_t>;
-		{ std::declval<T>().emplace_back(std::declval<U>()) };
-	};
-
-	template<class T, class U>
-	concept IVector = IList<T, U> && requires
-	{
-		{ std::declval<T>()[std::declval<size_t>()] } -> std::convertible_to<U>;
-		{ std::declval<T>().reserve(std::declval<size_t>()) };
-	};
-
-	template<class TEnumerable>
-	using EnumerableItem_t = std::remove_const_t<std::remove_reference_t<decltype(*std::begin(std::declval<TEnumerable>()))>>;
-
 	template<class TBody, class... TArgs>
 	using FunctionReturn_t = decltype(std::declval<TBody>()(std::declval<TArgs>()...));
 

@@ -40,7 +40,7 @@ void APlayerController::UpdateCameraManager(float elapsedTime)
 
 Ray<3> APlayerController::ScreenPointToRay(int32 screenX, int32 screenY)
 {
-	throw Exception("NOT IMPLEMENTED");
+	throw Exception(TEXT("NOT IMPLEMENTED"));
 	//if (!ensureMsgf(_PlayerCameraManager != nullptr, L"PlayerCameraManager does not registered."))
 	//{
 	//	return {};
@@ -112,7 +112,7 @@ void APlayerController::PostInitializedComponents()
 void APlayerController::SpawnPlayerCameraManager()
 {
 	SWorld* const World = GetWorld();
-	checkf(World, L"There is no valid world context.");
+	checkf(World, TEXT("There is no valid world context."));
 
 	if (_PlayerCameraManager)
 	{

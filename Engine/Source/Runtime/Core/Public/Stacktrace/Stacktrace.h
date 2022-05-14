@@ -4,7 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "Stackframe.h"
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include <span>
 
 namespace libty::inline Core
@@ -30,6 +30,7 @@ namespace libty::inline Core
 
 		inline String Trace() const noexcept
 		{
+			constexpr auto f = L""_s;
 			std::vector<String> frames;
 			for (auto& Callstack : GetStackframes())
 			{
@@ -37,7 +38,7 @@ namespace libty::inline Core
 					Callstack.ModuleName,
 					Callstack.GetCleanedFunctionName(),
 					Callstack.GetCleanedFileName(),
-					Callstack.FileName.empty() ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
+					!Callstack.FileName ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
 				));
 			}
 

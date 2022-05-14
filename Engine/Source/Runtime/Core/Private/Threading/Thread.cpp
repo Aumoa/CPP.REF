@@ -33,7 +33,7 @@ Thread::Thread()
 
 	if (pwThreadDesc)
 	{
-		FriendlyName = pwThreadDesc;
+		FriendlyName = String(pwThreadDesc);
 	}
 #endif
 
@@ -54,10 +54,10 @@ Thread::~Thread()
 	delete SToken;
 }
 
-void Thread::SetFriendlyName(std::wstring_view InFriendlyName)
+void Thread::SetFriendlyName(String InFriendlyName)
 {
 #if PLATFORM_WINDOWS
-	SetThreadDescription(ThreadHandle, InFriendlyName.data());
+	SetThreadDescription(ThreadHandle, (const wchar_t*)InFriendlyName);
 #endif
 	FriendlyName = InFriendlyName;
 }
@@ -84,7 +84,7 @@ Task<> Thread::JoinAsync()
 	return JoinSource.GetTask();
 }
 
-std::wstring Thread::GetFriendlyName() const
+String Thread::GetFriendlyName() const
 {
 	return FriendlyName;
 }
@@ -113,12 +113,12 @@ void* Thread::GetNativeHandle() const noexcept
 #endif
 }
 
-Thread* Thread::CreateThread(std::wstring_view FriendlyName, std::function<void()> ThreadEntry)
+Thread* Thread::CreateThread(String FriendlyName, std::function<void()> ThreadEntry)
 {
 	std::promise<Thread*> ThreadPtr;
 	std::future<Thread*> ThreadPtrFuture = ThreadPtr.get_future();
 
-	std::thread([ThreadEntry, FriendlyName = std::wstring(FriendlyName), &ThreadPtr]()
+	std::thread([ThreadEntry, FriendlyName, &ThreadPtr]()
 	{
 		Thread* MyThread = GetCurrentThread();
 		MyThread->SetFriendlyName(FriendlyName);

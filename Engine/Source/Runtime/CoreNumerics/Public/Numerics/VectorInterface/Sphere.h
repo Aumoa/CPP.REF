@@ -75,16 +75,16 @@ namespace libty::inline CoreNumerics
 		}
 
 	public:
-		std::wstring ToString(std::wstring_view FormatArgs) const;
+		String ToString(String formatArgs) const;
 	};
 
 	template<>
 	struct Sphere<0>
 	{
 		template<TIsVectorTyped<float> IVector>
-		static std::wstring ToString(const IVector& S, std::wstring_view FormatArgs = L"")
+		static String ToString(const IVector& S, String FormatArgs = TEXT(""))
 		{
-			std::wstring PH = String::GetPlaceholder(FormatArgs);
+			String PH = String::GetPlaceholder(FormatArgs);
 			auto Center = Vector<>::Minor(S, S.Size() - 1);
 			auto Radius = S[S.Size() - 1];
 			return String::Format(L"Center: {}, Radius: {}", Vector<>::ToString(Center, FormatArgs), String::Format(PH, Radius));
@@ -92,8 +92,8 @@ namespace libty::inline CoreNumerics
 	};
 
 	template<size_t N>
-	std::wstring Sphere<N>::ToString(std::wstring_view FormatArgs) const
+	String Sphere<N>::ToString(String formatArgs) const
 	{
-		return Sphere<>::ToString(*this, FormatArgs);
+		return Sphere<>::ToString(*this, formatArgs);
 	}
 }

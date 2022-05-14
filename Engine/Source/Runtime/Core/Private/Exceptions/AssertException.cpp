@@ -5,12 +5,12 @@
 
 using namespace libty;
 
-AssertException::AssertException(StringView exp)
+AssertException::AssertException(String exp)
 	: Exception(String::Format(TEXT("Assertion failed: !({})"), exp))
 {
 }
 
-AssertException::AssertException(StringView exp, StringView msg)
+AssertException::AssertException(String exp, String msg)
 	: Exception(String::Format(TEXT("Assertion failed: !({})\n{}"), exp, msg))
 {
 }

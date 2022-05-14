@@ -56,6 +56,11 @@ void SObject::RemoveFromRoot()
 	GC->Roots.erase(this);
 }
 
+bool SObject::Equals(SObject* rhs)
+{
+	return this == rhs;
+}
+
 std::function<bool()> SObject::GetHolder()
 {
 	return [ptr = WeakPtr(this)]()

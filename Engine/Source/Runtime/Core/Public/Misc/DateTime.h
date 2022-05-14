@@ -38,7 +38,7 @@ namespace libty::inline Core
 		}
 
 		template<class TDateFormatter = libty::DateTimeFormat::Json>
-		std::wstring ToString() const
+		String ToString() const
 		{
 			checkf(IsValid(), TEXT("Time is not setted."));
 	#if PLATFORM_WINDOWS

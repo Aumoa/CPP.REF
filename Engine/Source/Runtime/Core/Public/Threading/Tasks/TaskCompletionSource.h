@@ -4,6 +4,7 @@
 
 #include "Awaiter.h"
 #include "Task.h"
+#include "Misc/String.h"
 #include <source_location>
 
 namespace libty::inline Core
@@ -42,13 +43,13 @@ namespace libty::inline Core
 
 		void SetException(std::exception_ptr ptr)
 		{
-			Xassert(IsValid(), "Awaiter is null.");
+			Xassert(IsValid(), TEXT("Awaiter is null."));
 			_awaiter->SetException(std::move(ptr));
 		}
 
 		void SetCanceled()
 		{
-			Xassert(IsValid(), "Awaiter is null.");
+			Xassert(IsValid(), TEXT("Awaiter is null."));
 			_awaiter->Cancel();
 		}
 
@@ -70,11 +71,11 @@ namespace libty::inline Core
 		template<class... U>
 		void SetResultImpl(U&&... result)
 		{
-			Xassert(IsValid(), "Awaiter is null.");
+			Xassert(IsValid(), TEXT("Awaiter is null."));
 			_awaiter->SetResult(std::forward<U>(result)...);
 		}
 
-		void Xassert(bool x, std::string_view message)
+		void Xassert(bool x, String message)
 		{
 			if (!x)
 			{

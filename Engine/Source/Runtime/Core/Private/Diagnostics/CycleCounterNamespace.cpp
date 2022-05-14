@@ -7,13 +7,13 @@
 
 using namespace libty;
 
-CycleCounterNamespace::CycleCounterNamespace(StringView Name, StringView GroupName)
+CycleCounterNamespace::CycleCounterNamespace(String Name, String GroupName)
 	: Name(Name)
 	, GroupName(GroupName)
 {
 }
 
-StringView CycleCounterNamespace::GetName() const
+String CycleCounterNamespace::GetName() const
 {
 	return Name;
 }
@@ -41,5 +41,5 @@ String CycleCounterNamespace::Trace()
 		Traces.emplace_back(String::Format(TEXT("  {:<30}: {:.4f} ms"), Unit->GetName(), Unit->GetAverageTime() * 1000.0f));
 	}
 
-	return String::Join(L"\n", Traces);
+	return String::Join(TEXT("\n"), Traces);
 }

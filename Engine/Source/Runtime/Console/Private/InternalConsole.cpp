@@ -81,7 +81,7 @@ namespace libty::inline Console
 		}
 	};
 
-	void InternalConsole::Write(ConsolePin pin, std::wstring message) noexcept
+	void InternalConsole::Write(ConsolePin pin, String message) noexcept
 	{
 		InternalConsole::Coord restore;
 		if (pin.IsValid())
@@ -93,12 +93,12 @@ namespace libty::inline Console
 		ScriptStack ss = ScriptStack::Current();
 		size_t pos = 0;
 		size_t prev = 0;
-		while ((pos = message.find(L'<', pos)) != message.npos)
+		while ((pos = message.IndexOf(TEXT('<'), pos)) != -1)
 		{
 			if (pos != prev)
 			{
 				size_t len = pos - prev;
-				std::wcout << message.substr(prev, len);
+				std::wcout << message.SubstringView(prev, len);
 			}
 
 			if (message.length() > pos + 1 && message[pos + 1] == L'<')

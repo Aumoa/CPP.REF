@@ -74,16 +74,16 @@ namespace libty::inline Core::Reflection
 		ClassMethodsCollection Methods;
 
 		// ** Enum Specialization **
-		using EnumTryParseObjFunc = bool(*)(StringView, SObject*&);
+		using EnumTryParseObjFunc = bool(*)(String, SObject*&);
 		EnumTryParseObjFunc EnumTryParseObj;
-		using EnumTryParseFunc = bool(*)(StringView, int64&);
+		using EnumTryParseFunc = bool(*)(String, int64&);
 		EnumTryParseFunc EnumTryParse;
 
 		template<char ClassType, class TOwningClass, class... TAttributeCollection>
 		static TypeInfoMetadataGenerator GenerateManaged
 		(
-			StringView className,
-			StringView fullQualifiedClassName,
+			String className,
+			String fullQualifiedClassName,
 			SAssembly* assembly,
 			std::tuple<TAttributeCollection...>& attributes
 		);

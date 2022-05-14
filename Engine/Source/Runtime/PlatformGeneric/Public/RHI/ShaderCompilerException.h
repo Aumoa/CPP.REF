@@ -6,9 +6,9 @@ namespace libty::inline PlatformGeneric
 {
 	class PLATFORMGENERIC_API ShaderCompilerException : public Exception
 	{
-		std::string _api;
+		String _api;
 
 	public:
-		ShaderCompilerException(std::string_view API, std::string_view message);
+		ShaderCompilerException(String API, String message);
 	};
 }

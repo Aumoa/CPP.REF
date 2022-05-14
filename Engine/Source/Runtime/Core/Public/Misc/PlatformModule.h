@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include <filesystem>
 
 namespace libty::inline Core
@@ -18,25 +18,25 @@ namespace libty::inline Core
 		String ModuleName;
 
 	public:
-		PlatformModule(const std::filesystem::path& InModulePath);
+		PlatformModule(String InModulePath);
 		~PlatformModule() noexcept;
 
 		String ToString();
 		bool IsValid() const;
 
 		template<class TFunction>
-		TFunction* GetFunctionPointer(StringView FunctionName) const
+		TFunction* GetFunctionPointer(String FunctionName) const
 		{
 			return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(FunctionName));
 		}
 
 		template<class TRet, class... TArgs>
-		FunctionPointer<TRet, TArgs...> GetFunctionPointer(StringView FunctionName) const
+		FunctionPointer<TRet, TArgs...> GetFunctionPointer(String FunctionName) const
 		{
 			return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
 		}
 
 	private:
-		FunctionPointer<void> InternalGetFunctionPointer(StringView FunctionName) const;
+		FunctionPointer<void> InternalGetFunctionPointer(String FunctionName) const;
 	};
 }

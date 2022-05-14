@@ -12,29 +12,29 @@ static std::stop_source sCancellationTokenSource;
 
 SConsoleApplication::SigintEvent SConsoleApplication::Sigint;
 
-int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
+int32 SConsoleApplication::GuardedMain(std::span<const String> Argv)
 {
 	signal(SIGINT, _Handle_sigint);
 
 	int32 exitCode = 0;
-	auto logger = std::make_unique<LogModule>(String::AsUnicode(SE_APPLICATION));
+	auto logger = std::make_unique<LogModule>(SE_APPLICATION);
 	logger->Logged.AddRaw(&_Console_logged);
 	logger->StartAsync(sCancellationTokenSource.get_token()).Wait();
 
 	GC->Init();
 	auto commandLine = CommandLine(Argv);
 
-	std::wstring moduleName;
-	if (!commandLine.TryGetValue(L"ConsoleDll", moduleName))
+	String moduleName;
+	if (!commandLine.TryGetValue(TEXT("ConsoleDll"), moduleName))
 	{
-		moduleName = String::AsUnicode(SE_APPLICATION_TARGET);
+		moduleName = SE_APPLICATION_TARGET;
 	}
 
 	auto module = std::make_unique<PlatformModule>(moduleName);
-	auto loader = module->GetFunctionPointer<SConsoleModule*()>("LoadConsoleModule");
+	auto loader = module->GetFunctionPointer<SConsoleModule*()>(TEXT("LoadConsoleModule"));
 	if (loader == nullptr)
 	{
-		throw FatalException(String::Format("Cannot found 'LoadConsoleModule' function from '{0}' module. See 'DEFINE_CONSOLE_MODULE' macros in 'ConsoleModule.h', and declare your module in your code.", String::AsMultibyte(moduleName)));
+		throw Exception(String::Format(TEXT("Cannot found 'LoadConsoleModule' function from '{0}' module. See 'DEFINE_CONSOLE_MODULE' macros in 'ConsoleModule.h', and declare your module in your code."), moduleName));
 	}
 
 	{
@@ -42,10 +42,10 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 
 		if (!cModule.IsValid())
 		{
-			throw FatalException("'LoadConsoleModule' function return nullptr.'");
+			throw Exception(TEXT("'LoadConsoleModule' function return nullptr.'"));
 		}
 
-		Thread::GetCurrentThread()->SetFriendlyName(L"[Main Thread]");
+		Thread::GetCurrentThread()->SetFriendlyName(TEXT("[Main Thread]"));
 		exitCode = cModule->Main(commandLine);
 	}
 
@@ -56,6 +56,17 @@ int32 SConsoleApplication::GuardedMain(std::span<const std::wstring> Argv)
 	return exitCode;
 }
 
+void SConsoleApplication::AllocConsole()
+{
+#if PLATFORM_WINDOWS
+
+#endif
+}
+
+void SConsoleApplication::FreeConsole()
+{
+}
+
 void SConsoleApplication::_Handle_sigint(int)
 {
 	sCancellationTokenSource.request_stop();
@@ -64,39 +75,45 @@ void SConsoleApplication::_Handle_sigint(int)
 
 void SConsoleApplication::_Console_logged(const LogEntry& entry)
 {
-	std::wstring ccode;
-	std::wstring verb;
+	String ccode;
+	String verb;
 
 	switch (entry.Verbosity)
 	{
 	case ELogVerbosity::Error:
-		verb = L"erro";
-		ccode = L"<color=Red>";
+		verb = TEXT("erro");
+		ccode = TEXT("<color=Red>");
 		break;
 	case ELogVerbosity::Warning:
-		verb = L"warn";
-		ccode = L"<color=Yellow>";
+		verb = TEXT("warn");
+		ccode = TEXT("<color=Yellow>");
 		break;
 	case ELogVerbosity::Info:
-		verb = L"info";
-		ccode = L"<color=Green>";
+		verb = TEXT("info");
+		ccode = TEXT("<color=Green>");
 		break;
 	case ELogVerbosity::Verbose:
-		verb = L"verb";
-		ccode = L"<color=White>";
+		verb = TEXT("verb");
+		ccode = TEXT("<color=White>");
 		break;
 	}
 
-	std::wostringstream woss;
-	if (entry.ThreadName.empty())
+	String trd;
+	
+	if (entry.ThreadName)
 	{
-		woss << L"[ThreadId " << entry.ThreadId << L']';
+		trd = String::Format(TEXT("[ThreadId {}]"), entry.ThreadId);
 	}
 	else
 	{
-		woss << entry.ThreadName;
+		trd = entry.ThreadName;
 	}
 
-	InternalConsole::Write(ConsolePin::Null(), String::Format(L"{0}{1}</color>: {2}: {0}{3}</color>\n", ccode, verb, std::move(woss).str(), entry.Category->GetName()));
+	InternalConsole::Write(ConsolePin::Null(), String::Format(TEXT("{0}{1}</color>: {2}: {0}{3}</color>\n"),
+		ccode,
+		verb,
+		trd,
+		entry.Category->GetName()
+	));
 	InternalConsole::Write(ConsolePin::Null(), String::Format(L"      {0}\n", String::ReplaceAll(entry.Message, TEXT("<"), TEXT("<<"))));
 }

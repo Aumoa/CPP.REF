@@ -9,19 +9,19 @@ inline void ReportWindowsError(std::wstring_view InMessage = L"", int32 Error = 
 	using namespace ::libty;
 
 	WCHAR* Buf = nullptr;
-	std::wstring ScopedBuf;
+	String ScopedBuf;
 	FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, 0, (DWORD)Error, 0, (WCHAR*)&Buf, 0, nullptr);
 	if (Buf)
 	{
-		ScopedBuf = Buf;
+		ScopedBuf = String(Buf);
 		LocalFree(Buf);
 	}
 	else
 	{
-		ScopedBuf = L"<Unknown>";
+		ScopedBuf = TEXT("<Unknown>");
 	}
 
-	throw Exception(String::Format("An error occurred from Windows: {}\nErrorCode: {}, FormattedMessage: {}", String::AsMultibyte(InMessage), Error, String::AsMultibyte(ScopedBuf)));
+	throw Exception(String::Format(TEXT("An error occurred from Windows: {}\nErrorCode: {}, FormattedMessage: {}"), InMessage, Error, ScopedBuf));
 }
 
 [[noreturn]]
@@ -30,7 +30,7 @@ inline void ReportCOMError(std::wstring_view InMessage, HRESULT Error)
 	using namespace ::libty;
 
 	_com_error ComError(Error);
-	throw Exception(String::Format("An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}", String::AsMultibyte(InMessage), (uint32)Error, String::AsMultibyte(ComError.ErrorMessage())));
+	throw Exception(String::Format(TEXT("An error occurred from COM: {}\nErrorCode: 0x{:08X}, FormattedMessage: {}"), InMessage, (uint32)Error, String::FromLiteral(ComError.ErrorMessage())));
 }
 
 #define HR(x) \

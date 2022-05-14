@@ -14,11 +14,10 @@ String Guid::ToString() const
 	return String::Format(TEXT("{:0>8X}-{:0>4X}-{:0>4X}-{:0>4X}-{:0>12X}"), _data1, _data2, _data3, iPad._data4, iPad._data5);
 }
 
-bool Guid::TryParse(std::wstring_view formattedString, Guid& outResult)
+bool Guid::TryParse(String formattedString, Guid& outResult)
 {
-	std::wstring trimmedString = String::Trim(formattedString, std::array<wchar_t, 5>{ TEXT('{'), TEXT('}'), TEXT(' '), TEXT('\t'), TEXT('\n') });
-	static_assert(IString<wchar_t[10], wchar_t>, "!IString");
-	std::vector<std::wstring> splits = String::Split(trimmedString, TEXT("-"), true, true);
+	String trimmedString = formattedString.Trim(std::array<wchar_t, 5>{ TEXT('{'), TEXT('}'), TEXT(' '), TEXT('\t'), TEXT('\n') });
+	std::vector<String> splits = trimmedString.Split(TEXT("-"), EStringSplitOptions::RemoveEmptyEntries | EStringSplitOptions::TrimEntries);
 	if (splits.size() != 5)
 	{
 		return false;
@@ -26,14 +25,14 @@ bool Guid::TryParse(std::wstring_view formattedString, Guid& outResult)
 
 	try
 	{
-		uint32 data1 = std::stoul(splits[0], nullptr, 16);
-		uint16 data2 = (uint16)std::stoul(splits[1], nullptr, 16);
-		uint16 data3 = (uint16)std::stoul(splits[2], nullptr, 16);
+		uint32 data1 = std::stoul((std::wstring)splits[0], nullptr, 16);
+		uint16 data2 = (uint16)std::stoul((std::wstring)splits[1], nullptr, 16);
+		uint16 data3 = (uint16)std::stoul((std::wstring)splits[2], nullptr, 16);
 
 		_InternalPad iPad
 		{
-			._data4 = (uint16)std::stoul(splits[3], nullptr, 16),
-			._data5 = (uint64)std::stoull(splits[4], nullptr, 16)
+			._data4 = (uint16)std::stoul((std::wstring)splits[3], nullptr, 16),
+			._data5 = (uint64)std::stoull((std::wstring)splits[4], nullptr, 16)
 		};
 
 		outResult._data1 = data1;

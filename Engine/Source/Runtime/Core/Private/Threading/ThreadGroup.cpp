@@ -39,7 +39,7 @@ public:
 	{
 		if (_promise.has_value())
 		{
-			throw InvalidOperationException("ThreadGroup already wait for suspend.");
+			throw InvalidOperationException(TEXT("ThreadGroup already wait for suspend."));
 		}
 
 		_threadsIdx = 0;
@@ -49,7 +49,7 @@ public:
 			auto& thr = _source->_threads[i];
 			if (!thr.joinable())
 			{
-				SE_LOG(LogThreadGroup, Error, L"Thread {} is not joinable.", _threadsIdx.load());
+				SE_LOG(LogThreadGroup, Error, TEXT("Thread {} is not joinable."), _threadsIdx.load());
 				_source->_threads.erase(_source->_threads.begin() + i);
 				continue;
 			}
@@ -144,7 +144,7 @@ void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()>
 void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 {
 	Thread* mythread = Thread::GetCurrentThread();
-	mythread->SetFriendlyName(String::Format(L"[{} #{}]", _groupName, index));
+	mythread->SetFriendlyName(String::Format(TEXT("[{} #{}]"), _groupName, index));
 
 	TickCalc<> timer;
 
@@ -176,7 +176,7 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 void ThreadGroup::Timer(std::stop_token cancellationToken)
 {
 	Thread* mythread = Thread::GetCurrentThread();
-	mythread->SetFriendlyName(String::Format(L"[{} #Timer]", _groupName));
+	mythread->SetFriendlyName(String::Format(TEXT("[{} #Timer]"), _groupName));
 
 	TickCalc<> timer;
 

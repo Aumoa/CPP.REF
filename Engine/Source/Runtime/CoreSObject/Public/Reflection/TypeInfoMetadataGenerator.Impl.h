@@ -13,8 +13,8 @@ namespace libty::inline Core::Reflection
 	template<char ClassType, class TOwningClass, class... TAttributeCollection>
 	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateManaged
 	(
-		StringView className,
-		StringView fullQualifiedClassName,
+		String className,
+		String fullQualifiedClassName,
 		SAssembly* assembly,
 		std::tuple<TAttributeCollection...>& attributes
 	)
@@ -52,7 +52,7 @@ namespace libty::inline Core::Reflection
 
 		if constexpr (IsEnum)
 		{
-			gen.EnumTryParseObj = +[](StringView format, SObject*& value) -> bool
+			gen.EnumTryParseObj = +[](String format, SObject*& value) -> bool
 			{
 				TOwningClass ov;
 				bool result = TOwningClass::TryParse(format, ov);
@@ -66,7 +66,7 @@ namespace libty::inline Core::Reflection
 				return true;
 			};
 
-			gen.EnumTryParse = +[](StringView format, int64& value) -> bool
+			gen.EnumTryParse = +[](String format, int64& value) -> bool
 			{
 				TOwningClass ov;
 				bool result = TOwningClass::TryParse(format, ov);
@@ -87,7 +87,7 @@ namespace libty::inline Core::Reflection
 	TypeInfoMetadataGenerator TypeInfoMetadataGenerator::GenerateNative()
 	{
 		TypeInfoMetadataGenerator gen;
-		gen.ClassName = String::AsUnicode(typeid(TNativeClass).name());
+		gen.ClassName = String::FromLiteral(typeid(TNativeClass).name());
 		gen.FullQualifiedClassName = gen.ClassName;
 		gen.Assembly = nullptr;
 		gen.Attributes = {};

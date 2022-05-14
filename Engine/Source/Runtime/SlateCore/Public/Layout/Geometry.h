@@ -222,10 +222,10 @@ namespace libty::inline SlateCore
 			return AccumulatedRenderTransform;
 		}
 
-		String ToString(StringView InFormatArgs = L"") const
+		String ToString(String InFormatArgs = TEXT("")) const
 		{
 			String scaleText = String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs));
-			return String::Format(L"[Abs={}, Scale={}, Size={}]", AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
+			return String::Format(TEXT("[Abs={}, Scale={}, Size={}]"), AbsolutePosition.ToString(InFormatArgs), scaleText, Size.ToString(InFormatArgs));
 		}
 
 		constexpr const Vector2& GetLocalSize() const

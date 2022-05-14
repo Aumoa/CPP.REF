@@ -17,7 +17,7 @@ void SDirectXShaderCodeWorkspace::AddShaderCode(std::wstring_view Name, const RH
 	auto Emplace_it = ShaderCodes.emplace(Name, Code);
 	if (!Emplace_it.second)
 	{
-		throw ShaderCompilerException("DirectX", "ShaderCodeName duplicated.");
+		throw ShaderCompilerException(TEXT("DirectX"), TEXT("ShaderCodeName duplicated."));
 	}
 }
 
@@ -27,7 +27,7 @@ void SDirectXShaderCodeWorkspace::Compile()
 	{
 		if (!Code.EntryPoint.empty())
 		{
-			std::string AId = String::AsMultibyte(Id);
+			std::string AId = (std::string)Id;
 			std::string_view ATarget = ShaderTypeToTarget(Code.ShaderType);
 
 			ComPtr<ID3DBlob> pBlob;
@@ -37,7 +37,7 @@ void SDirectXShaderCodeWorkspace::Compile()
 			{
 				if (pError)
 				{
-					throw ShaderCompilerException("DirectX", std::format("Compile error occurred while compile '{}' shader code. ErrorTrace: \n{}", AId, std::string_view((const char*)pError->GetBufferPointer())));
+					throw ShaderCompilerException(TEXT("DirectX"), String::Format(TEXT("Compile error occurred while compile '{}' shader code. ErrorTrace: \n{}"), String(AId), String((const char*)pError->GetBufferPointer())));
 				}
 				else
 				{
@@ -63,7 +63,7 @@ IRHIShaderCodeBlob* SDirectXShaderCodeWorkspace::GetCompiledShaderCodeBlob(std::
 
 HRESULT CALLBACK SDirectXShaderCodeWorkspace::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
 {
-	auto It = ShaderCodes.find(String::AsUnicode(pFileName));
+	auto It = ShaderCodes.find(String(pFileName));
 	if (It == ShaderCodes.end())
 	{
 		return E_FAIL;

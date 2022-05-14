@@ -7,7 +7,7 @@ using namespace libty;
 
 SObject*& ObjectHashTable::Emplace(SObject* InObject)
 {
-	checkf(InObject->InternalIndex == -1, L"Internal object hash value is not valid.");
+	checkf(InObject->InternalIndex == -1, TEXT("Internal object hash value is not valid."));
 
 	if (IndexPoolSize)
 	{

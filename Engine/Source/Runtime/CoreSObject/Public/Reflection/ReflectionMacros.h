@@ -96,7 +96,7 @@ public:																						\
 	using Super = typename ::libty::Core::Reflection::SuperClassTypeDeclare<Class>::Type;	\
 	using This = Class;																		\
 																							\
-	inline static constexpr ::libty::StringView FriendlyName = TEXT(#Class);				\
+	inline static constexpr ::libty::String FriendlyName = TEXT(#Class);					\
 																							\
 private:																					\
 	static ::libty::Core::SType StaticClass;												\
@@ -122,7 +122,7 @@ private:
 	static consteval ::libty::int32 __INTERNAL_AccessModifierChecker();						\
 																							\
 public:																						\
-	inline static constexpr ::libty::StringView FriendlyName = TEXT(#Class);				\
+	inline static constexpr ::libty::String FriendlyName = TEXT(#Class);					\
 																							\
 private:																					\
 	static ::libty::Core::SType StaticClass;												\
@@ -154,7 +154,7 @@ namespace libty::Generated::Class															\
 	::libty::Core::SType(::libty::Core::Reflection											\
 	::TypeInfoMetadataGenerator::GenerateManaged<(char)FriendlyName[0], ::Class>(			\
 		FriendlyName,																		\
-		L ## #Class,																		\
+		TEXT(#Class),																		\
 		&::libty::Generated::Assemblies::SE_ASSEMBLY_INFO,									\
 		AttributeCollection																	\
 	)																						\
@@ -179,7 +179,7 @@ namespace libty::Generated::Class															\
 		static ::libty::Core::Reflection::SMethodInfo MethodInfo = ::libty::Core::Reflection\
 			::MethodInfoMetadataGenerator::Generate(										\
 				&This::FunctionName,														\
-				#FunctionName,																\
+				TEXT(#FunctionName),														\
 				AttributeCollection															\
 			);																				\
 		return &MethodInfo;																	\
@@ -205,7 +205,7 @@ namespace libty::Generated::Class															\
 			::FieldInfoMetadataGenerator													\
 			(																				\
 				&This::PropertyName,														\
-				#PropertyName,																\
+				TEXT(#PropertyName),														\
 				AttributeCollection															\
 			);																				\
 		return &FieldInfo;																	\

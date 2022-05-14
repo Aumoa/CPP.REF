@@ -34,9 +34,9 @@ namespace libty::inline CoreNumerics
 		/// </summary>
 		/// <param name="formatArgs"> The formatting args that use to String::Format. </param>
 		/// <returns> The simple string value. </returns>
-		inline std::wstring ToString(std::wstring_view formatArgs = L"") const
+		inline String ToString(String FormatArgs = TEXT("")) const
 		{
-			std::wstring placeholder = String::GetPlaceholder(formatArgs) + L"°";
+			String placeholder = String::GetPlaceholder(FormatArgs) + TEXT("°");
 			return String::Format(placeholder, Value);
 		}
 

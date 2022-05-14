@@ -14,18 +14,18 @@
 
 using namespace libty;
 
-LogCategory::LogCategory(StringView CategoryName, Arguments&& InArgs)
+LogCategory::LogCategory(String CategoryName, Arguments&& InArgs)
 	: CategoryName(CategoryName)
 	, Args(std::move(InArgs))
 {
 }
 
-StringView LogCategory::GetName() const
+String LogCategory::GetName() const
 {
 	return CategoryName;
 }
 
-StringView LogCategory::VerbosityToString(ELogVerbosity verbosity)
+String LogCategory::VerbosityToString(ELogVerbosity verbosity)
 {
 	switch (verbosity)
 	{
@@ -42,7 +42,7 @@ auto LogCategory::GetArguments() -> Arguments
 	return Args;
 }
 
-void LogCategory::OnLog(ELogVerbosity Verbosity, StringView Message, const std::source_location& Src)
+void LogCategory::OnLog(ELogVerbosity Verbosity, String Message, const std::source_location& Src)
 {
 	auto thr = Thread::GetCurrentThread();
 	LogEntry entry;

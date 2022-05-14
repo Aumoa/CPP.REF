@@ -96,10 +96,10 @@ namespace libty::inline CoreNumerics
 		}
 
 	public:
-		std::wstring ToString(std::wstring_view FormatArgs = L"") const
+		String ToString(String FormatArgs = TEXT("")) const
 		{
-			std::wstring placeholder = String::GetPlaceholder(FormatArgs);
-			return String::Format(L"Normal: {}, Distance: {}", Vector<>::ToString(Normal, FormatArgs), String::Format(placeholder, Distance));
+			String placeholder = String::GetPlaceholder(FormatArgs);
+			return String::Format(TEXT("Normal: {}, Distance: {}"), Vector<>::ToString(Normal, FormatArgs), String::Format(placeholder, Distance));
 		}
 
 		Plane GetNormal() const

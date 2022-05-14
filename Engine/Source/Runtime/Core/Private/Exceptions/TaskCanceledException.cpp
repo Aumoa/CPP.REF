@@ -5,6 +5,6 @@
 using namespace libty;
 
 TaskCanceledException::TaskCanceledException(std::exception_ptr innerException)
-	: Exception("Task was aborted.", innerException)
+	: Exception(TEXT("Task was aborted."), innerException)
 {
 }

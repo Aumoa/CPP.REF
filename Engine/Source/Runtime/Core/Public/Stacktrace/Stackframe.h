@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include <filesystem>
 
 namespace libty::inline Core
@@ -17,13 +17,13 @@ namespace libty::inline Core
 
         String GetCleanedFileName(size_t allowedNestedLevel = 2) const noexcept
         {
-            if (FileName.empty())
+            if (!FileName)
             {
                 return String::Format(TEXT("0x{:0>16X}"), AddressOf);
             }
 
             auto p = std::filesystem::path((const std::wstring&)FileName);
-            String cleaned = p.filename();
+            String cleaned = String(p.filename().wstring());
 
             for (size_t i = 0; i < allowedNestedLevel && p.has_parent_path(); ++i)
             {
@@ -51,7 +51,7 @@ namespace libty::inline Core
             std::vector<ShrinkScope> scopes;
             std::optional<ShrinkScope> scope;
 
-            for (size_t i = 0; i < FunctionName.length(); ++i)
+            for (size_t i = 0; i < (size_t)FunctionName; ++i)
             {
                 if (FunctionName[i] == TEXT('<'))
                 {
@@ -79,14 +79,14 @@ namespace libty::inline Core
             {
                 auto& scope = *it;
                 size_t len = scope.endOf - scope.startOf;
-                bool isLambda = StringView(cleaned).substr(scope.startOf, len).find(TEXT("lambda")) != StringView::npos;
+                bool isLambda = String(cleaned).Contains(TEXT("lambda"), scope.startOf, len);
                 if (isLambda)
                 {
-                    cleaned.replace(scope.startOf, len, TEXT("lambda"));
+                    cleaned = cleaned.ReplaceAt(scope.startOf, len, TEXT("lambda"));
                 }
                 else
                 {
-                    cleaned.replace(scope.startOf, len, TEXT("..."));
+                    cleaned = cleaned.ReplaceAt(scope.startOf, len, TEXT("..."));
                 }
             }
 
@@ -94,14 +94,14 @@ namespace libty::inline Core
 		}
 
     private:
-        static inline String _Cleanup_nested_namespaces(StringView nested) noexcept
+        static inline String _Cleanup_nested_namespaces(String nested) noexcept
         {
             std::vector<size_t> scopes;
             String result(nested);
 
             size_t lpos = 0;
             size_t tstack = 0;
-            for (size_t i = 0; i < result.length(); ++i)
+            for (size_t i = 0; i < (size_t)result; ++i)
             {
                 auto ch = result[i];
                 if (ch == TEXT('<'))
@@ -116,9 +116,9 @@ namespace libty::inline Core
                     if (--tstack == 0)
                     {
                         size_t len = i - lpos;
-                        String tscope = _Cleanup_nested_namespaces(result.substr(lpos, len));
-                        result.replace(lpos, len, tscope);
-                        lpos += tscope.length();
+                        String tscope = _Cleanup_nested_namespaces(result.Substring(lpos, len));
+                        result = result.ReplaceAt(lpos, len, tscope);
+                        lpos += (size_t)tscope;
                         i = lpos;
                     }
                 }
@@ -132,9 +132,9 @@ namespace libty::inline Core
                     else if (ch == TEXT(','))
                     {
                         size_t startOf = i + 1;
-                        size_t len = result.length() - startOf;
-                        String commaSep = _Cleanup_nested_namespaces(result.substr(startOf));
-                        result.replace(startOf, len, commaSep);
+                        size_t len = (size_t)result - startOf;
+                        String commaSep = _Cleanup_nested_namespaces(result.Substring(startOf));
+                        result = result.ReplaceAt(startOf, len, commaSep);
                         break;
                     }
                 }
@@ -147,9 +147,9 @@ namespace libty::inline Core
                 size_t back = scopes.back();
 
                 return String::Format(TEXT("{}::...::{}::{}"),
-                    result.substr(0, front),
-                    result.substr(mid, back - mid),
-                    result.substr(back + 2)
+                    result.Substring(0, front),
+                    result.Substring(mid, back - mid),
+                    result.Substring(back + 2)
                 );
             }
 

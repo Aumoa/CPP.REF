@@ -3,25 +3,46 @@
 #pragma once
 
 #include "FileSystemReference.h"
-#include <filesystem>
 
 namespace libty::inline Core
 {
-	class CORE_API DirectoryReference : public FileSystemReference
+	class DirectoryReference : public FileSystemReference
 	{
 	public:
-		DirectoryReference() = default;
-		DirectoryReference(const DirectoryReference& rhs) = default;
-		DirectoryReference(DirectoryReference&& rhs) = default;
-		DirectoryReference(const std::filesystem::path& filepath);
+		inline constexpr DirectoryReference() noexcept
+		{
+		}
 
-		std::filesystem::path GetName() const;
-		void CreateIfNotExists(bool bRecursive = false) const;
+		inline constexpr DirectoryReference(const DirectoryReference& rhs) noexcept
+			: FileSystemReference(rhs)
+		{
+		}
 
-		DirectoryReference& operator =(const DirectoryReference& rhs) = default;
-		DirectoryReference& operator =(DirectoryReference&& rhs) = default;
+		inline constexpr DirectoryReference(DirectoryReference&& rhs) noexcept
+			: FileSystemReference(std::move(rhs))
+		{
+		}
 
-		auto operator <=>(const DirectoryReference&) const = default;
-		bool operator ==(const DirectoryReference&) const = default;
+		inline constexpr DirectoryReference(String path) noexcept
+			: FileSystemReference(path)
+		{
+		}
+
+		inline bool CreateIfNotExists(bool bRecursive = false) const noexcept
+		{
+			if (!IsExists())
+			{
+				if (bRecursive)
+				{
+					std::error_code ec;
+					return std::filesystem::create_directories(this->_Get_path(), ec);
+				}
+				else
+				{
+					std::error_code ec;
+					return std::filesystem::create_directory(this->_Get_path(), ec);
+				}
+			}
+		}
 	};
 }

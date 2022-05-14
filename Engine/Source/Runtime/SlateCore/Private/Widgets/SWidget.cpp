@@ -95,7 +95,7 @@ Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
 
 SlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 {
-	checkf(bHasRenderTransform, L"Widget have not render transform.");
+	checkf(bHasRenderTransform, TEXT("Widget have not render transform."));
 	return RenderTransform;
 }
 
@@ -225,7 +225,7 @@ void SWidget::SetRenderTransform(const SlateRenderTransform& InRenderTransform)
 
 SlateRenderTransform SWidget::GetRenderTransform()
 {
-    checkf(bHasRenderTransform, L"Widget have not render transform.");
+    checkf(bHasRenderTransform, TEXT("Widget have not render transform."));
     return RenderTransform;
 }
 

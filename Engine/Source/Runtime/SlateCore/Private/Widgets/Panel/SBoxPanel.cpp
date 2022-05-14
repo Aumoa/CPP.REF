@@ -232,7 +232,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 			}
 			default:
 			{
-				checkf(false, L"The parameter \"InLayoutFlow\"({}) does not valid.", (int32)InLayoutFlow);
+				checkf(false, TEXT("The parameter \"InLayoutFlow\"({}) does not valid."), (int32)InLayoutFlow);
 				break;
 			}
 		}

@@ -46,15 +46,15 @@ namespace libty::inline CoreNumerics
             return NearlyEquals(*this, T, Epsilon);
         }
 
-        static std::wstring ToString(const Transform2D& T, std::wstring_view FormatArgs = L"")
+        static String ToString(const Transform2D& T, String FormatArgs = TEXT(""))
         {
-            return String::Format(L"{{T: {}, S: {}, R: {}}}",
+            return String::Format(TEXT("{{T: {}, S: {}, R: {}}}"),
                 T.Translation.ToString(FormatArgs),
                 T.Scale.ToString(FormatArgs),
                 T.Rotation.ToString(FormatArgs));
         }
 
-        std::wstring ToString(std::wstring_view FormatArgs = L"")
+        String ToString(String FormatArgs = TEXT(""))
         {
             return ToString(*this, FormatArgs);
         }

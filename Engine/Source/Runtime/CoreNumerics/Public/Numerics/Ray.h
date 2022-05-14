@@ -57,7 +57,7 @@ namespace libty::inline CoreNumerics
 		}
 
 		template<size_t N>
-		static std::wstring ToString(const Ray<N>& R, std::wstring_view FormatArgs = L"")
+		static String ToString(const Ray<N>& R, String FormatArgs = TEXT(""))
 		{
 			return String::Format(L"Origin: {}, Direction: {}", R.Origin.ToString(FormatArgs), R.Direction.ToString(FormatArgs));
 		}

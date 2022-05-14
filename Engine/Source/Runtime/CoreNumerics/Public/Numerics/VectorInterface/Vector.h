@@ -135,7 +135,7 @@ namespace libty::inline CoreNumerics
 		}
 
 	public:
-		std::wstring ToString(std::wstring_view FormatArgs = L"") const;
+		String ToString(String FormatArgs = TEXT("")) const;
 		template<TIsVector<T, N> IVector>
 		constexpr bool NearlyEquals(const IVector& V, const T& Epsilon) const;
 
@@ -257,18 +257,18 @@ namespace libty::inline CoreNumerics
 		}
 
 		template<TIsVectorBase IVector>
-		static inline std::wstring ToString(const IVector& V, std::wstring_view FormatArgs = L"")
+		static inline String ToString(const IVector& V, String FormatArgs = TEXT(""))
 		{
 			constexpr size_t N = IVector::Size();
-			std::wstring Placeholder = String::GetPlaceholder(FormatArgs);
+			String Placeholder = String::GetPlaceholder(FormatArgs);
 
-			std::array<std::wstring, N> Composed;
+			std::array<String, N> Composed;
 			for (size_t i = 0; i < N; ++i)
 			{
 				Composed[i] = String::Format(Placeholder, V[i]);
 			}
 
-			return String::Format(L"{{{}}}", String::Join(L", ", std::span<std::wstring const>(Composed)));
+			return String::Format(TEXT("{{{}}}"), String::Join(TEXT(", "), std::span<String const>(Composed)));
 		}
 
 		template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
@@ -677,9 +677,9 @@ namespace libty::inline CoreNumerics
 	using Vector4N = Vector<int32, 4>;
 
 	template<class T, size_t N>
-	std::wstring Vector<T, N>::ToString(std::wstring_view FormatArgs) const
+	String Vector<T, N>::ToString(String formatArgs) const
 	{
-		return Vector<>::ToString(*this, FormatArgs);
+		return Vector<>::ToString(*this, formatArgs);
 	}
 
 	template<class T, size_t N>

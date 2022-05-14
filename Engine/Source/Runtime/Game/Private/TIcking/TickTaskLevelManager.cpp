@@ -149,7 +149,7 @@ void STickTaskLevelManager::BeginFrame()
 
 			if (InternalHead->ActualTickGroup != InternalMax->ActualTickGroup)
 			{
-				SE_LOG(LogLevelTick, Warning, L"Actual tick group is different to your desired. It is not an error, but not working as your desired.");
+				SE_LOG(LogLevelTick, Warning, TEXT("Actual tick group is different to your desired. It is not an error, but not working as your desired."));
 				InternalHead->ActualTickGroup = InternalMax->ActualTickGroup;
 			}
 

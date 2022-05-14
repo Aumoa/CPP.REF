@@ -4,8 +4,8 @@
 
 #include "PrimitiveTypes.h"
 #include "CoreConcepts.h"
-#include "Exceptions/InvalidOperationException.h"
 #include <coroutine>
+#include <exception>
 
 namespace libty::inline Core::Linq
 {
@@ -96,7 +96,7 @@ namespace libty::inline Core::Linq
 		{
 			if (this->_Prom()->_exception)
 			{
-				throw InvalidOperationException(TEXT("Coroutine aborted with exception."), this->_Prom()->_exception);
+				std::rethrow_exception(this->_Prom()->_exception);
 			}
 		}
 

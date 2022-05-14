@@ -102,7 +102,7 @@ namespace libty::inline CoreNumerics
 		}
 
 	public:
-		std::wstring ToString(std::wstring_view FormatArgs) const;
+		String ToString(String formatArgs) const;
 	};
 
 	struct Rect : public RectT<float>
@@ -160,7 +160,7 @@ namespace libty::inline CoreNumerics
 		}
 
 		template<TIsVectorSized<4> IRect>
-		static std::wstring ToString(const IRect& R, std::wstring_view FormatArgs = L"")
+		static String ToString(const IRect& R, String FormatArgs = TEXT(""))
 		{
 			auto LT = LeftTop(R);
 			auto RB = RightBottom(R);
@@ -277,8 +277,8 @@ namespace libty::inline CoreNumerics
 	using RectN = RectT<int32>;
 
 	template<class T>
-	std::wstring RectT<T>::ToString(std::wstring_view FormatArgs) const
+	String RectT<T>::ToString(String formatArgs) const
 	{
-		return Rect::ToString(*this, FormatArgs);
+		return Rect::ToString(*this, formatArgs);
 	}
 }

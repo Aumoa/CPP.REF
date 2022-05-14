@@ -29,7 +29,7 @@ SType::SType(MetadataGenerator&& generator)
 	}
 }
 
-StringView SType::GetName()
+String SType::GetName()
 {
 	return _meta.ClassName;
 }
@@ -40,7 +40,7 @@ SType* SType::GetSuperType()
 	return _baseType;
 }
 
-StringView SType::GetFullQualifiedName()
+String SType::GetFullQualifiedName()
 {
 	return _meta.FullQualifiedClassName;
 }
@@ -58,7 +58,7 @@ std::span<SFieldInfo* const> SType::GetFields(bool bRecursive)
 	}
 }
 
-SFieldInfo* SType::GetField(StringView fieldName, bool bRecursive)
+SFieldInfo* SType::GetField(String fieldName, bool bRecursive)
 {
 	if (bRecursive)
 	{
@@ -106,7 +106,7 @@ std::span<SMethodInfo* const> SType::GetMethods(bool bRecursive)
 	}
 }
 
-SMethodInfo* SType::GetMethod(StringView methodName, bool bRecursive)
+SMethodInfo* SType::GetMethod(String methodName, bool bRecursive)
 {
 	if (bRecursive)
 	{
@@ -277,7 +277,7 @@ SObject* SType::Instantiate()
 	}
 }
 
-SType* SType::GetType(StringView fullQualifiedName)
+SType* SType::GetType(String fullQualifiedName)
 {
 	auto it = _staticCollection->FullQualifiedNameView.find(fullQualifiedName);
 	if (it == _staticCollection->FullQualifiedNameView.end())

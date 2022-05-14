@@ -12,7 +12,7 @@ DEFINE_SLATE_CONSTRUCTOR(STextBox, Attr)
 {
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
 	Text = GetText();
-	Caret = Text.length();
+	Caret = (size_t)Text;
 }
 
 bool STextBox::OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key, EKeyboardEvent Event)
@@ -28,7 +28,7 @@ bool STextBox::OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key
 			}
 			return true;
 		case EKey::Right:
-			if (Caret < Text.length())
+			if (Caret < (size_t)Text)
 			{
 				Caret += 1;
 			}
@@ -40,7 +40,7 @@ bool STextBox::OnReceiveKeyboardEvent(const Geometry& AllottedGeometry, EKey Key
 			}
 			return true;
 		case EKey::End:
-			if (size_t Len = Text.length(); Caret != Len)
+			if (size_t Len = (size_t)Text; Caret != Len)
 			{
 				Caret = Len;
 			}
@@ -80,7 +80,7 @@ void STextBox::ProcessChar(wchar_t Ch)
 		Enter();
 		break;
 	default:
-		Text.insert(Text.begin() + Caret, Ch);
+		Text = Text.Insert(Caret, Ch);
 		SetText(Text);
 		Caret += 1;
 		break;
@@ -97,9 +97,7 @@ void STextBox::Composition(wchar_t Ch)
 	else
 	{
 		ComposingChar = Ch;
-		String Left = Text.substr(0, Caret);
-		String Right = Text.substr(Caret);
-		SetText(Left + Ch + Right);
+		SetText(Text.Insert(Caret, Ch));
 	}
 }
 
@@ -107,7 +105,7 @@ void STextBox::Backspace()
 {
 	if (Caret > 0)
 	{
-		Text.erase(Text.begin() + Caret - 1);
+		Text = Text.Remove(Caret - 1, 1);
 		Caret -= 1;
 		SetText(Text);
 	}
@@ -116,7 +114,7 @@ void STextBox::Backspace()
 void STextBox::Enter()
 {
 	TextCommitted.Broadcast(GetText());
-	SetText(L"");
-	Text = L"";
+	SetText(TEXT(""));
+	Text = TEXT("");
 	Caret = 0;
 }

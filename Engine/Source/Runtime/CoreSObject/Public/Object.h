@@ -26,7 +26,7 @@ namespace libty::inline Core
 		using This = SObject;
 		using IsClass = SObject;
 
-		inline static constexpr StringView FriendlyName = TEXT("SObject");
+		inline static constexpr String FriendlyName = TEXT("SObject");
 
 	private:
 		static SType StaticClass;
@@ -100,12 +100,13 @@ namespace libty::inline Core
 		void AddToRoot();
 		SFUNCTION(RemoveFromRoot)
 		void RemoveFromRoot();
-		std::function<bool()> GetHolder();
 
 	private:
 		SObject(const SObject&) = delete;
 
 	public:
+		bool Equals(SObject* rhs);
+		std::function<bool()> GetHolder();
 		SFUNCTION(ToString)
 		virtual String ToString();
 

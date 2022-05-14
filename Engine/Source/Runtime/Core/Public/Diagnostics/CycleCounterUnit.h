@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ScopedTimer.h"
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include <array>
 #include <string>
 #include <atomic>
@@ -46,10 +46,10 @@ namespace libty::inline Core
 		};
 
 	public:
-		CycleCounterUnit(CycleCounterNamespace* NamespacePtr, StringView Name);
+		CycleCounterUnit(CycleCounterNamespace* NamespacePtr, String Name);
 
 		Instance GetScopedTimer();
-		StringView GetName();
+		String GetName();
 		float GetAverageTime();
 	};
 }

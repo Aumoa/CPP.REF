@@ -24,7 +24,7 @@ namespace libty::inline SlateCore
 		virtual bool OnReceiveIMEEvent(const Geometry& AllottedGeometry, const IMEEvent& EventArgs) override;
 
 	public:
-		DECLARE_MULTICAST_DELEGATE(TextCommittedDelegate, StringView)
+		DECLARE_MULTICAST_DELEGATE(TextCommittedDelegate, String);
 		TextCommittedDelegate TextCommitted;
 
 	private:

@@ -23,10 +23,10 @@ namespace libty::inline Game
 		SGameEngine();
 
 		virtual bool InitEngine(IApplicationInterface* InApplication);
-		virtual bool LoadGameModule(StringView InModuleName);
+		virtual bool LoadGameModule(String InModuleName);
 		virtual void Shutdown();
 
-		int32 GuardedMain(IApplicationInterface* InApplication, StringView gameModule);
+		int32 GuardedMain(IApplicationInterface* InApplication, String gameModule);
 		SGameInstance* GetGameInstance();
 
 	private:

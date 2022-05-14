@@ -13,7 +13,7 @@ namespace libty::inline DirectX
 		GENERATED_BODY(SDirectXShaderCodeWorkspace);
 
 	private:
-		std::map<std::wstring, RHIShaderCode, std::less<>> ShaderCodes;
+		std::map<String, RHIShaderCode, std::less<>> ShaderCodes;
 		SPROPERTY(CompiledShaderBlobs)
 		std::map<std::string_view, SDirectXShaderCodeBlob*, std::less<>> CompiledShaderBlobs;
 

@@ -8,7 +8,7 @@ SWindowsIMEController* SWindowsIMEController::sInstance;
 
 SWindowsIMEController::SWindowsIMEController() : Super()
 {
-	checkf(sInstance == nullptr, L"Internal logic error.");
+	checkf(sInstance == nullptr, TEXT("Internal logic error."));
 	sInstance = this;
 }
 

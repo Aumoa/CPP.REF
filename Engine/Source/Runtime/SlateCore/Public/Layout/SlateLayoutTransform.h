@@ -25,9 +25,9 @@ namespace libty::inline SlateCore
 		{
 		}
 
-		String ToString(StringView InFormatArgs = L"") const
+		String ToString(String InFormatArgs = TEXT("")) const
 		{
-			return String::Format(L"Translation: {}, Scale: {}", Translation.ToString(InFormatArgs), String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs)));
+			return String::Format(TEXT("Translation: {}, Scale: {}"), Translation.ToString(InFormatArgs), String::Format(String::GetPlaceholder(InFormatArgs), Scale.ToString(InFormatArgs)));
 		}
 
 		constexpr auto operator <=>(const SlateLayoutTransform& Rhs) const = default;

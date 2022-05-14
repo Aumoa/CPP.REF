@@ -25,7 +25,7 @@ SObject* SObjectFactory::CreateInstance(const InjectionInfo& info)
 	{
 		instanced = info.Factory(this);
 	}
-	else if (SMethodInfo* inject = info.Class->GetMethod(L"Inject"); inject != nullptr)
+	else if (SMethodInfo* inject = info.Class->GetMethod(TEXT("Inject")); inject != nullptr)
 	{
 		std::span params = inject->GetParameters();
 		std::vector<SObject*> args;
@@ -51,7 +51,7 @@ SObject* SObjectFactory::CreateInstance(const InjectionInfo& info)
 		}
 		catch (const std::exception& e)
 		{
-			SE_LOG(LogDependencyInjection, Error, L"Exception detected while running 'Inject' function for create dependency injection object.\nInnerException: {0}", String::AsUnicode(e.what()));
+			SE_LOG(LogDependencyInjection, Error, TEXT("Exception detected while running 'Inject' function for create dependency injection object.\nInnerException: {0}"), String(e.what()));
 			throw InjectException(EInjectionErrorCode::InjectInnerException, std::current_exception());
 		}
 	}
@@ -61,7 +61,7 @@ SObject* SObjectFactory::CreateInstance(const InjectionInfo& info)
 		checkf(instanced, TEXT("Cannot instantiate object class: {0}. May not declared default constructor, or it is a abstract class."), info.Class->GetFullQualifiedName());
 	}
 
-	SE_LOG(LogDependencyInjection, Info, L"Instance of {0} type generated.", info.Class->GetFullQualifiedName());
+	SE_LOG(LogDependencyInjection, Info, TEXT("Instance of {0} type generated."), info.Class->GetFullQualifiedName());
 	return instanced;
 }
 
@@ -123,7 +123,7 @@ Task<> SObjectFactory::StartAsync(std::stop_token cancellationToken)
 	lock.unlock();
 
 	co_await Task<>::WhenAll(std::move(tasks), cancellationToken);
-	SE_LOG(LogDependencyInjection, Info, L"ObjectFactory service started.");
+	SE_LOG(LogDependencyInjection, Info, TEXT("ObjectFactory service started."));
 }
 
 Task<> SObjectFactory::StopAsync(std::stop_token cancellationToken)
@@ -138,7 +138,7 @@ Task<> SObjectFactory::StopAsync(std::stop_token cancellationToken)
 	lock.unlock();
 
 	co_await Task<>::WhenAll(std::move(tasks), cancellationToken);
-	SE_LOG(LogDependencyInjection, Info, L"ObjectFactory service stopped.");
+	SE_LOG(LogDependencyInjection, Info, TEXT("ObjectFactory service stopped."));
 	_tcs.SetResult();
 }
 

@@ -39,7 +39,7 @@ namespace libty::inline SlateCore
 
 		PaintGeometry& AppendTransform(const SlateLayoutTransform& LayoutTransform)
 		{
-			checkf(bHasRenderTransform, L"Geometry haven't render transform.");
+			checkf(bHasRenderTransform, TEXT("Geometry haven't render transform."));
 			AccumulatedRenderTransform = Transform::Concatenate(AccumulatedRenderTransform, LayoutTransform);
 			return *this;
 		}

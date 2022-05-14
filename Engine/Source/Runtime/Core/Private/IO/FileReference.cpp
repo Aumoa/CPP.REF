@@ -4,44 +4,9 @@
 #include "IO/DirectoryReference.h"
 #include "Misc/String.h"
 #include <bit>
-#include <cstring>
+#include <fstream>
 
 using namespace libty;
-
-FileReference::FileReference(const std::filesystem::path& filepath)
-	: FileSystemReference(filepath)
-{
-}
-
-std::filesystem::path FileReference::GetFilename() const
-{
-	return GetPath().filename();
-}
-
-std::filesystem::path FileReference::GetName() const
-{
-	return GetPath().stem();
-}
-
-std::filesystem::path FileReference::GetExtension() const
-{
-	return GetPath().extension();
-}
-
-std::wfstream FileReference::OpenStream(std::ios_base::openmode mode, bool bCreateIfNotExists, bool bCreateDirectoryRecursive) const
-{
-	if (bCreateIfNotExists && !IsExists())
-	{
-		if (bCreateDirectoryRecursive)
-		{
-			GetParent().CreateIfNotExists(bCreateDirectoryRecursive);
-		}
-
-		mode = std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
-	}
-
-	return std::wfstream(GetPath(), mode);
-}
 
 template<class TChar, class... TChars>
 inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
@@ -59,9 +24,9 @@ inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
 	return false;
 }
 
-std::wstring FileReference::ReadAllText()
+String FileReference::ReadAllText() const
 {
-	std::ifstream File(GetPath());
+	std::ifstream File(this->_Get_path());
 	if (File.is_open())
 	{
 		std::string Buf;
@@ -71,7 +36,7 @@ std::wstring FileReference::ReadAllText()
 		if (File.read(Buf.data(), Buf.size()).bad())
 		{
 			File.close();
-			return L"";
+			return TEXT("");
 		}
 
 		auto Rit = Buf.rbegin();
@@ -116,7 +81,7 @@ std::wstring FileReference::ReadAllText()
 		if (BOMcheck(Buf.data(), 0xEF, 0xBB, 0xBF))
 		{
 			// UTF-8
-			Encoded = String::AsUnicode(Buf.substr(3), 65001);
+			Encoded = String::FromCodepage(Buf.substr(3), 65001);
 		}
 		else if (BOMcheck(Buf.data(), 0xFE, 0xFF))
 		{
@@ -131,23 +96,23 @@ std::wstring FileReference::ReadAllText()
 		else if (BOMcheck(Buf.data(), 0x2B, 0x2F, 0x76))
 		{
 			// UTF-7
-			Encoded = String::AsUnicode(Buf.substr(3), 65000);
+			Encoded = String::FromCodepage(Buf.substr(3), 65000);
 		}
 		else
 		{
 			// Without BOM.
-			Encoded = String::AsUnicode(Buf);
+			Encoded = String(Buf);
 		}
 
-		return Encoded;
+		return String(Encoded);
 	}
-	return L"";
+	return TEXT("");
 }
 
-bool FileReference::WriteAllText(std::wstring_view Text, uint32 Encoding)
+bool FileReference::WriteAllText(String Text, uint32 Encoding) const
 {
-	std::string EncodedText = String::AsMultibyte(Text, Encoding);
-	std::ofstream File(GetPath(), std::ios::trunc);
+	std::string EncodedText = Text.AsCodepage(Encoding);
+	std::ofstream File(this->_Get_path(), std::ios::trunc);
 	if (File.is_open())
 	{
 		File << EncodedText;

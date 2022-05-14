@@ -32,9 +32,9 @@ namespace libty::inline Core::Reflection
 		{
 		}
 
-		static constexpr StringView ToString()
+		static constexpr String ToString()
 		{
-			return StringView(ConstString.Str);
+			return String::FromLiteral(ConstString.Str, ConstString.Size);
 		}
 
 		template<std::integral U>
@@ -98,8 +98,8 @@ namespace libty::inline Core::Reflection
 
 #define SENUM_DECLARE_ENUM_ELEMENT(Name, ...) Name __VA_OPT__(= __VA_ARGS__),
 #define SENUM_DECLARE_CONSTEXPR_ELEMENT(Name, ...) static constexpr MyKeyValuePair<__Tag__, #Name> Name = (Type)__Tag__::Name;
-#define SENUM_DECLARE_DICTIONARY_PAIR_PARSE(Name, ...) { L ## #Name, __Type__(Name) },
-#define SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING(Name, ...) { Name.Value, L ## #Name },
+#define SENUM_DECLARE_DICTIONARY_PAIR_PARSE(Name, ...) { TEXT(#Name), __Type__(Name) },
+#define SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING(Name, ...) { Name.Value, TEXT(#Name) },
 
 #define SENUM_BEGIN(API, Name, Type, ...)															\
 struct API Name : public ::libty::Core::Reflection::EEnumBase<Name, Type>							\
@@ -132,9 +132,9 @@ public:																								\
 	{																								\
 	}																								\
 																									\
-	static bool TryParse(StringView EnumName, Name& OutValue)								\
+	static bool TryParse(::libty::String EnumName, Name& OutValue)									\
 	{																								\
-		static std::map<StringView, Name, std::less<>> Dictionary =							\
+		static std::map<::libty::String, Name, std::less<>> Dictionary =							\
 		{																							\
 			MACRO_RECURSIVE_FOR_EACH_2(SENUM_DECLARE_DICTIONARY_PAIR_PARSE, __VA_ARGS__)			\
 		};																							\
@@ -150,9 +150,9 @@ public:																								\
 		}																							\
 	}																								\
 																									\
-	String ToString() const																	\
+	::libty::String ToString() const																\
 	{																								\
-		static std::map<Type, String> Dictionary =											\
+		static std::map<Type, ::libty::String> Dictionary =											\
 		{																							\
 			MACRO_RECURSIVE_FOR_EACH_2(SENUM_DECLARE_DICTIONARY_PAIR_TOSTRING, __VA_ARGS__)			\
 		};																							\
@@ -163,7 +163,7 @@ public:																								\
 		}																							\
 		else																						\
 		{																							\
-			return ::libty::Core::String::Format(L"(" L ## #Name L"){}", this->Value);				\
+			return ::libty::String::Format(TEXT("(") TEXT(#Name) TEXT("){}"), this->Value);			\
 		}																							\
 	}																								\
 																									\
@@ -224,7 +224,7 @@ namespace libty::inline Core::Reflection
 		/// <param name="format"> The string representation of the name or numeric value of enumerated constants. </param>
 		/// <param name="result"> When this method returns true, contains an enumeration constant that represents the parsed value. </param>
 		/// <returns> true if the conversion succeeded; false otherwise. </returns>
-		static bool TryParse(SType* type, StringView format, SObject*& result);
+		static bool TryParse(SType* type, String format, SObject*& result);
 
 		/// <summary>
 		/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object. The return value indicates whether the conversion succeeded.
@@ -234,7 +234,7 @@ namespace libty::inline Core::Reflection
 		/// <param name="result"> When this method returns, contains an object of type TEnum whose value is represented by value if the parse operation succeeds. If the parse operation fails, contains the default value of the underlying type of TEnum. This value need not be a member of the TEnum enumeration. This parameter is passed uninitialized. </param>
 		/// <returns> true if the conversion succeeded; false otherwise. </returns>
 		template<::libty::Core::Reflection::IEnum TEnum>
-		static bool TryParse(StringView format, TEnum& result)
+		static bool TryParse(String format, TEnum& result)
 		{
 			int64 uvalue;
 			if (TryParse(TEnum::TypeId, format, uvalue))
@@ -246,7 +246,7 @@ namespace libty::inline Core::Reflection
 		}
 
 	private:
-		static bool TryParse(SType* type, StringView format, int64& result);
+		static bool TryParse(SType* type, String format, int64& result);
 	};
 }
 

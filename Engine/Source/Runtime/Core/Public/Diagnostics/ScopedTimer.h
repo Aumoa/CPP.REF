@@ -24,7 +24,7 @@ namespace libty::inline Core
 			, StartTime(Clock::now())
 			, Reporter(InReporter)
 		{
-			checkf(Instance, "Instance is nullptr.");
+			checkf(Instance, TEXT("Instance is nullptr."));
 		}
 
 		inline ~ScopedTimer()
@@ -34,7 +34,7 @@ namespace libty::inline Core
 
 		inline void Stop()
 		{
-			checkf(Instance, "Timer already stopped.");
+			checkf(Instance, TEXT("Timer already stopped."));
 			InternalStop();
 		}
 

@@ -4,6 +4,7 @@
 
 #include "Awaiter.h"
 #include "CoreConcepts.h"
+#include "Concepts/IList.h"
 #include <coroutine>
 #include <memory>
 #include <chrono>
@@ -254,7 +255,7 @@ namespace libty::inline Core
 		{
 			if (!IsValid())
 			{
-				throw InvalidOperationException("Task is null.");
+				throw InvalidOperationException(TEXT("Task is null."));
 			}
 		}
 
@@ -382,7 +383,7 @@ namespace libty::inline Core
 						bool expected = false;
 						if (_stored.compare_exchange_strong(expected, true))
 						{
-							Awaiter<void>::SetException(result.GetException());
+							this->SetException(result.GetException());
 						}
 					}
 					else
@@ -393,7 +394,7 @@ namespace libty::inline Core
 							bool expected = false;
 							if (_stored.compare_exchange_strong(expected, true))
 							{
-								Awaiter<void>::SetResult();
+								this->SetResult();
 								return true;
 							}
 						}
@@ -407,7 +408,7 @@ namespace libty::inline Core
 					bool expected = false;
 					if (_stored.compare_exchange_strong(expected, true))
 					{
-						Awaiter<void>::Cancel();
+						this->Cancel();
 					}
 				}
 			};

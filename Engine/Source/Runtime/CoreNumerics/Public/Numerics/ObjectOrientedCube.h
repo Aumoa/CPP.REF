@@ -31,10 +31,10 @@ namespace libty::inline CoreNumerics
 				&& Vector<>::NearlyEquals(OOL.Rotation, OOR.Rotation, Epsilon);
 		}
 
-		static std::wstring ToString(const ObjectOrientedCube& OO, std::wstring_view FormatArgs = L"")
+		static String ToString(const ObjectOrientedCube& OO, String FormatArgs = TEXT(""))
 		{
 			return String::Format(
-				L"Center: {}, Extent: {}, Rotation{}",
+				TEXT("Center: {}, Extent: {}, Rotation{}"),
 				OO.Center.ToString(FormatArgs),
 				OO.Extent.ToString(FormatArgs),
 				OO.Rotation.ToString(FormatArgs)

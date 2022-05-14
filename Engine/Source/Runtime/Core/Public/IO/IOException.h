@@ -12,7 +12,7 @@ namespace libty::inline Core
 		std::error_code _ec;
 
 	public:
-		IOException(StringView message, const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
+		IOException(String message, const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
 			: Exception(message, innerException)
 			, _ec(ec)
 		{

@@ -65,7 +65,7 @@ namespace libty::inline SlateCore
 			case EOrientation::Horizontal: return Left + Right;
 			case EOrientation::Vertical: return Top + Bottom;
 			default:
-				throw Exception(String::Format("Invalid argument: Orientation({})", (int32)Orientation));
+				throw Exception(String::Format(TEXT("Invalid argument: Orientation({})"), (int32)Orientation));
 			}
 		}
 

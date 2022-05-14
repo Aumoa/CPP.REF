@@ -10,8 +10,8 @@
 namespace libty::inline Core::Reflection
 {
 	template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes)
-		: FieldName(String::AsUnicode(fieldName))
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType TOwningClass::* field, String fieldName, std::tuple<TAttributeCollection...>& attributes)
+		: FieldName(fieldName)
 		, bIsConst(false)
 		, bIsStatic(false)
 	{
@@ -63,8 +63,8 @@ namespace libty::inline Core::Reflection
 	}
 
 	template<class TMemberType, class... TAttributeCollection>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes)
-		: FieldName(String::AsUnicode(fieldName))
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(TMemberType* field, String fieldName, std::tuple<TAttributeCollection...>& attributes)
+		: FieldName(fieldName)
 		, bIsConst(false)
 		, bIsStatic(true)
 	{
@@ -92,7 +92,7 @@ namespace libty::inline Core::Reflection
 	}
 
 	template<class TMemberType, class TOwningClass, class... TAttributeCollection>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes)
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType TOwningClass::* field, String fieldName, std::tuple<TAttributeCollection...>& attributes)
 		: FieldName(String::AsUnicode(fieldName))
 		, bIsConst(true)
 		, bIsStatic(false)
@@ -119,7 +119,7 @@ namespace libty::inline Core::Reflection
 	}
 
 	template<class TMemberType, class... TAttributeCollection>
-	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType* field, StringView fieldName, std::tuple<TAttributeCollection...>& attributes)
+	FieldInfoMetadataGenerator::FieldInfoMetadataGenerator(const TMemberType* field, String fieldName, std::tuple<TAttributeCollection...>& attributes)
 		: FieldName(String::AsUnicode(fieldName))
 		, bIsConst(true)
 		, bIsStatic(true)

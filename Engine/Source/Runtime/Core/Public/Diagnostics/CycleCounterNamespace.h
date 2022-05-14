@@ -3,7 +3,7 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "Misc/StringView.h"
+#include "Misc/String.h"
 #include "Threading/Spinlock.h"
 #include <string>
 #include <string_view>
@@ -22,9 +22,9 @@ namespace libty::inline Core
 		std::vector<CycleCounterUnit*> Units;
 
 	public:
-		CycleCounterNamespace(StringView Name, StringView GroupName);
+		CycleCounterNamespace(String Name, String GroupName);
 
-		StringView GetName() const;
+		String GetName() const;
 
 		void Register(CycleCounterUnit* Unit);
 		String Trace();

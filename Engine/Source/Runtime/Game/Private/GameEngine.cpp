@@ -38,7 +38,7 @@ bool SGameEngine::InitEngine(IApplicationInterface* InApplication)
 	return true;
 }
 
-bool SGameEngine::LoadGameModule(StringView InModuleName)
+bool SGameEngine::LoadGameModule(String InModuleName)
 {
 	SGameModuleSystem* ModuleSystem = GetEngineSubsystem<SGameModuleSystem>();
 	ModuleSystem->LoadGameModule(InModuleName);
@@ -81,7 +81,7 @@ namespace AutoConsoleVars
 	}
 }
 
-int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, StringView gameModule)
+int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, String gameModule)
 {
 	CoreDelegates::BeginMainInvoked.Broadcast();
 	GC->Collect();
@@ -95,7 +95,7 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, StringView 
 	// Create GameEngine instance and initialize it.
 	if (!InitEngine(InApplication))
 	{
-		throw Exception("Could not initialize engine.");
+		throw Exception(TEXT("Could not initialize engine."));
 	}
 
 	// Load game module.
@@ -103,7 +103,7 @@ int32 SGameEngine::GuardedMain(IApplicationInterface* InApplication, StringView 
 	{
 		return -1;
 	}
-	InApplication->SetTitle(String::AsUnicode(SE_APPLICATION));
+	InApplication->SetTitle(SE_APPLICATION);
 
 	// Start application now!
 	InApplication->Idle.AddObject(this, &SGameEngine::TickEngine);
@@ -121,7 +121,7 @@ SGameInstance* SGameEngine::GetGameInstance()
 
 void SGameEngine::InitializeSubsystems()
 {
-	SE_LOG(LogEngine, Verbose, L"Initialize subsystems.");
+	SE_LOG(LogEngine, Verbose, TEXT("Initialize subsystems."));
 
 	SObjectFactoryBuilder* Builder = SObjectFactory::CreateBuilder();
 
@@ -129,7 +129,7 @@ void SGameEngine::InitializeSubsystems()
 	Builder->SetAsPrimary();
 
 	auto Subclasses = SType::GetDerivedTypes(typeof(SGameEngineSubsystem));
-	SE_LOG(LogEngine, Verbose, L"{} subsystems found.", Subclasses.size() - 1);
+	SE_LOG(LogEngine, Verbose, TEXT("{} subsystems found."), Subclasses.size() - 1);
 
 	for (auto& Subclass : Subclasses)
 	{

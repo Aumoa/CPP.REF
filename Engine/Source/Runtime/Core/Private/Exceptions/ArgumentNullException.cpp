@@ -5,7 +5,7 @@
 
 using namespace libty;
 
-ArgumentNullException::ArgumentNullException(StringView argName)
+ArgumentNullException::ArgumentNullException(String argName)
 	: Exception(String::Format(TEXT("Argument '{}' cannot be nullptr."), argName))
 {
 }

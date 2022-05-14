@@ -53,7 +53,7 @@ namespace libty::inline Core
 		/// <summary>
 		/// Gets the simply name of the type.
 		/// </summary>
-		virtual StringView GetName();
+		virtual String GetName();
 
 		/// <summary>
 		/// Gets the type from which the current Type directly inherits.
@@ -63,7 +63,7 @@ namespace libty::inline Core
 		/// <summary>
 		/// Gets the fully qualified name of the type, including its namespace but not its assembly.
 		/// </summary>
-		virtual StringView GetFullQualifiedName();
+		virtual String GetFullQualifiedName();
 
 		/// <summary>
 		/// Returns all the fields of the current Type.
@@ -73,7 +73,7 @@ namespace libty::inline Core
 		/// <summary>
 		/// Returns specified field of the current Type.
 		/// </summary>
-		virtual Reflection::SFieldInfo* GetField(StringView fieldName, bool bRecursive = true);
+		virtual Reflection::SFieldInfo* GetField(String fieldName, bool bRecursive = true);
 
 		/// <summary>
 		/// Returns all the methods of the current Type.
@@ -83,7 +83,7 @@ namespace libty::inline Core
 		/// <summary>
 		/// Returns specified method of the current Type.
 		/// </summary>
-		virtual Reflection::SMethodInfo* GetMethod(StringView methodName, bool bRecursive = true);
+		virtual Reflection::SMethodInfo* GetMethod(String methodName, bool bRecursive = true);
 
 		/// <summary>
 		/// Return custom attributes applied to this Type.
@@ -192,7 +192,7 @@ namespace libty::inline Core
 		/// </summary>
 		/// <param name="fullQualifiedName"> The full qualified name of the type to get. </param>
 		/// <returns> The type with the specified name, if found; otherwise, null. </returns>
-		static SType* GetType(StringView fullQualifiedName);
+		static SType* GetType(String fullQualifiedName);
 
 		/// <summary>
 		/// Get all types.

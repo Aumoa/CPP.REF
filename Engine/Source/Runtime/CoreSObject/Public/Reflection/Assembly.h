@@ -17,7 +17,7 @@ namespace libty::inline Core::Reflection
 		std::set<SType*>* volatile _types;
 
 	public:
-		SAssembly(StringView assemblyName);
+		SAssembly(String assemblyName);
 		virtual ~SAssembly() noexcept override;
 
 		/// <summary>

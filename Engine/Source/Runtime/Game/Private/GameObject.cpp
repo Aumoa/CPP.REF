@@ -25,12 +25,12 @@ void SGameObject::SetOuter(SGameObject* Value)
 	Outer = Value;
 }
 
-StringView SGameObject::GetName() const
+String SGameObject::GetName() const
 {
 	return Name;
 }
 
-void SGameObject::SetName(StringView Value)
+void SGameObject::SetName(String Value)
 {
 	Name = Value;
 }

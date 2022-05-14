@@ -17,7 +17,7 @@ LONG CALLBACK ReportCrash(LPEXCEPTION_POINTERS lpException)
 
 	if (Exception* e; ExceptionCode == 0xE06D7363 && (e = Exception::AvailableException()))
 	{
-		SE_LOG(LogWindowsCommon, Error, L"Unhandled C++ exception caught!\n===== BEGIN OF EXCEPTION TRACE =====\n      {}\n===== END OF EXCEPTION TRACE =====", e->ToString());
+		SE_LOG(LogWindowsCommon, Error, TEXT("Unhandled C++ exception caught!\n===== BEGIN OF EXCEPTION TRACE =====\n      {}\n===== END OF EXCEPTION TRACE ====="), e->ToString());
 	}
 	else
 	{
@@ -34,7 +34,7 @@ LONG CALLBACK ReportCrash(LPEXCEPTION_POINTERS lpException)
 			ScopedBuf = TEXT("<Unknown>");
 		}
 
-		SE_LOG(LogWindowsCommon, Error, L"Unhandled SEH exception caught! Code 0x{:0>8X} - {}\n===== BEGIN OF STACKTRACE =====\n{}\n===== END OF STACKTRACE =====", ExceptionCode, ScopedBuf, StackTrace.Trace());
+		SE_LOG(LogWindowsCommon, Error, TEXT("Unhandled SEH exception caught! Code 0x{:0>8X} - {}\n===== BEGIN OF STACKTRACE =====\n{}\n===== END OF STACKTRACE ====="), ExceptionCode, ScopedBuf, StackTrace.Trace());
 	}
 
 	if (auto* logModule = LogModule::Get())
@@ -55,7 +55,7 @@ inline void ShutdownLogger()
 	}
 }
 
-int32 GuardedMain(std::span<std::wstring> Argv)
+int32 GuardedMain(std::span<::libty::String> Argv)
 {
 #if !DO_CHECK
 	__try
@@ -75,12 +75,14 @@ int32 GuardedMain(std::span<std::wstring> Argv)
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
+	using namespace ::libty;
+
 	setlocale(LC_ALL, "");
 
-	std::vector<std::wstring> Argv(argc);
+	std::vector<String> Argv(argc);
 	for (size_t i = 0; i < Argv.size(); ++i)
 	{
-		Argv[i] = argv[i];
+		Argv[i] = String::FromLiteral(argv[i]);
 	}
 
 	return GuardedMain(Argv);
@@ -88,6 +90,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 
 int wWinMain(HINSTANCE, HINSTANCE, wchar_t* argv, int)
 {
-	std::vector<std::wstring> Argv = ::libty::String::Split((std::wstring)argv, L" ", true, true);
+	using namespace ::libty;
+
+	std::vector<String> Argv = ::libty::String(argv).Split(TEXT(" "), ::libty::EStringSplitOptions::RemoveEmptyEntries | ::libty::EStringSplitOptions::TrimEntries);
 	return GuardedMain(Argv);
 }

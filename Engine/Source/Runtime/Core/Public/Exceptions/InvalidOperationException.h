@@ -9,7 +9,7 @@ namespace libty::inline Core
 	class CORE_API InvalidOperationException : public Exception
 	{
 	public:
-		InvalidOperationException(StringView message, std::exception_ptr innerException = nullptr);
+		InvalidOperationException(String message, std::exception_ptr innerException = nullptr);
 		InvalidOperationException(std::exception_ptr innerException = nullptr);
 	};
 }

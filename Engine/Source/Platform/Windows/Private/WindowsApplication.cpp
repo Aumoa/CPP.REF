@@ -20,7 +20,7 @@ using namespace ::libty;
 SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 	, hInstance(hInstance)
 {
-	checkf(gApp == nullptr, L"Singleton instance duplicated.");
+	checkf(gApp == nullptr, TEXT("Singleton instance duplicated."));
 	gApp = this;
 
 	WNDCLASSEXW Wcex = {};
@@ -47,11 +47,11 @@ SWindowsApplication::SWindowsApplication(HINSTANCE hInstance) : Super()
 	PlatformIME = gcnew SWindowsIMEController();
 }
 
-int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
+int32 SWindowsApplication::GuardedMain(std::span<const String> Argv)
 {
 	int32 ErrorCode;
 
-	auto Logger = std::make_unique<LogModule>(String::AsUnicode(SE_APPLICATION));
+	auto Logger = std::make_unique<LogModule>(SE_APPLICATION);
 	Logger->StartAsync().Wait();
 
 	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
@@ -60,48 +60,48 @@ int32 SWindowsApplication::GuardedMain(std::span<const std::wstring> Argv)
 		GC->Init();
 
 		auto CommandArgs = CommandLine(Argv);
-		std::wstring ModuleName;
+		String ModuleName;
 
-		if (!CommandArgs.TryGetValue(L"GameDll", ModuleName))
+		if (!CommandArgs.TryGetValue(TEXT("GameDll"), 0, ModuleName))
 		{
-			ModuleName = String::AsUnicode(SE_APPLICATION_TARGET);
+			ModuleName = SE_APPLICATION_TARGET;
 		}
 
-		std::wstring EngineName;
-		if (!CommandArgs.TryGetValue(L"EngineDll", EngineName))
+		String EngineName;
+		if (!CommandArgs.TryGetValue(TEXT("EngineDll"), 0, EngineName))
 		{
 //#if !SHIPPING
-//			constexpr const wchar_t* GameEngineModuleName = L"Editor.dll";
+//			constexpr String GameEngineModuleName = TEXT("Editor.dll");
 //#else
-			constexpr const wchar_t* GameEngineModuleName = L"Game.dll";
+			constexpr String GameEngineModuleName = TEXT("Game.dll");
 //#endif
 			EngineName = GameEngineModuleName;
 		}
 
 		std::unique_ptr EngineModule = std::make_unique<PlatformModule>(EngineName);
-		auto Loader = EngineModule->GetFunctionPointer<SGameModule*()>("LoadGameModule");
+		auto Loader = EngineModule->GetFunctionPointer<SGameModule*()>(TEXT("LoadGameModule"));
 		if (!Loader)
 		{
-			throw Exception(String::Format("GameEngine does not initialized. {} is corrupted.", String::AsMultibyte(EngineName)));
+			throw Exception(String::Format(TEXT("GameEngine does not initialized. {} is corrupted."), EngineName));
 		}
 
 		SharedPtr<SGameModule> GameModule = Loader();
 		if (GameModule == nullptr)
 		{
-			throw Exception("LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader.");
+			throw Exception(TEXT("LoadGameModule function does not defined. Please DEFINE_GAME_MODULE to any code file in module project to provide loader."));
 		}
 
 		SharedPtr<SGameEngine> GameEngine = GameModule->CreateGameEngine();
 		if (GameEngine == nullptr)
 		{
-			throw Exception("Could not create GameEngine. CreateGameEngine function on GameModule return nullptr.");
+			throw Exception(TEXT("Could not create GameEngine. CreateGameEngine function on GameModule return nullptr."));
 		}
 
 		SharedPtr WinApp = gcnew SWindowsApplication(GetModuleHandleW(nullptr));
 		ErrorCode = GameEngine->GuardedMain(WinApp.Get(), ModuleName);
 		if (ErrorCode != 0)
 		{
-			SE_LOG(LogWindows, Error, L"Application has one more error({}).", ErrorCode);
+			SE_LOG(LogWindows, Error, TEXT("Application has one more error({})."), ErrorCode);
 		}
 
 		// Save platform modules for finish to dispose.
@@ -348,7 +348,7 @@ ComPtr<IWICFormatConverter> SWindowsApplication::DecodeImage(IWICBitmapDecoder* 
 		FormatGUID = GUID_WICPixelFormat32bppPRGBA;
 		break;
 	default:
-		throw Exception("Not supported pixel format.");
+		throw Exception(TEXT("Not supported pixel format."));
 	}
 
 	ComPtr<IWICFormatConverter> Converter;

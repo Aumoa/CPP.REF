@@ -10,7 +10,9 @@ namespace libty::inline Console
 		SConsoleApplication() = delete;
 
 	public:
-		static int32 GuardedMain(std::span<const std::wstring> Argv);
+		static int32 GuardedMain(std::span<const String> Argv);
+		static void AllocConsole();
+		static void FreeConsole();
 
 	public:
 		DECLARE_MULTICAST_EVENT(SigintEvent);
