@@ -12,36 +12,30 @@ namespace libty::inline Console
 	class CONSOLE_API ConsoleEx
 	{
 	public:
-		static void Write(ConsolePin pin, std::wstring message);
+		static void Write(ConsolePin pin, String message);
 		static void Clear(ConsolePin pin = ConsolePin::Null());
 
-		static inline void Write(ConsolePin pin, std::string message)
-		{
-			Write(pin, String::AsUnicode(message));
-		}
-
-		template<class TString, class... TArgs>
-		static inline void Write(ConsolePin pin, TString&& format, TArgs&&... args) requires
-			IString<TString, StringChar_t<TString>>
+		template<class... TArgs>
+		static inline void Write(ConsolePin pin, String format, TArgs&&... args)
 		{
 			Write(pin, String::Format(format, std::forward<TArgs>(args)...));
 		}
 
-		template<class TString, class... TArgs>
-		static inline void Write(TString&& format, TArgs&&... args) requires
-			IString<TString, StringChar_t<TString>>
+		template<class... TArgs>
+		static inline void Write(String format, TArgs&&... args)
 		{
 			Write(ConsolePin::Null(), String::Format(format, std::forward<TArgs>(args)...));
 		}
 
-		template<class TString, class... TArgs>
-		static inline void WriteLine(TString&& format, TArgs&&... args) requires
-			IString<TString, StringChar_t<TString>>
+		template<class... TArgs>
+		static inline void WriteLine(String format, TArgs&&... args)
 		{
-			using Char_t = StringChar_t<TString>;
-			static Char_t nl[2] = { (Char_t)'\n', 0};
-			static std::basic_string<Char_t> nls(nl);
-			Write(std::forward<TString>(format) + nls, std::forward<TArgs>(args)...);
+			Write(String::Format(format + TEXT("\n"), std::forward<TArgs>(args)...));
 		}
+
+		static void EnableLogToConsole(bool enabled);
+
+	private:
+		static void _Console_logged(const LogEntry& entry);
 	};
 }

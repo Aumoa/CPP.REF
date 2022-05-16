@@ -27,7 +27,7 @@ namespace libty::inline Core
 		std::shared_ptr<_Impl_buf> _impl_buf;
 
 	public:
-		Exception(String message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
+		Exception(const String& message = TEXT("An exception was thrown."), std::exception_ptr innerException = {}) noexcept;
 		Exception(const Exception& rhs) noexcept;
 		Exception(Exception&& rhs) noexcept;
 		virtual ~Exception() noexcept;

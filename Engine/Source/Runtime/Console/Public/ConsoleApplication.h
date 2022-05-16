@@ -11,8 +11,6 @@ namespace libty::inline Console
 
 	public:
 		static int32 GuardedMain(std::span<const String> Argv);
-		static void AllocConsole();
-		static void FreeConsole();
 
 	public:
 		DECLARE_MULTICAST_EVENT(SigintEvent);
@@ -20,6 +18,5 @@ namespace libty::inline Console
 
 	private:
 		static void _Handle_sigint(int);
-		static void _Console_logged(const LogEntry& entry);
 	};
 }

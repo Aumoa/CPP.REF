@@ -408,10 +408,9 @@ namespace libty::inline Core
 
 		[[nodiscard]] constexpr size_t IndexOf(wchar_t ch, size_t indexOf, size_t length, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 		{
-			size_t max_len = _len - indexOf;
-			if (length > max_len || length == -1)
+			if (length > _len || length == -1)
 			{
-				length = max_len;
+				length = _len;
 			}
 
 			if (length == 0)
@@ -443,7 +442,7 @@ namespace libty::inline Core
 				}
 			}
 
-			return false;
+			return -1;
 		}
 
 		[[nodiscard]] inline constexpr size_t IndexOf(const String& compare, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
@@ -458,7 +457,7 @@ namespace libty::inline Core
 
 		[[nodiscard]] constexpr size_t IndexOf(const String& compare, size_t indexOf, size_t length, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 		{
-			size_t max_len = length - indexOf;
+			size_t max_len = _len - indexOf;
 			if (length > max_len || length == -1)
 			{
 				length = max_len;
@@ -741,7 +740,7 @@ namespace libty::inline Core
 				return String();
 			}
 
-			length = std::max(length, _len - start);
+			length = std::min(length, _len - start);
 			return String(std::wstring_view(this->_Get_raw() + start, length));
 		}
 
@@ -752,7 +751,12 @@ namespace libty::inline Core
 				return std::wstring_view();
 			}
 
-			length = std::max(length, _len - start);
+			if (length > _len - start)
+			{
+				length = _len - start;
+			}
+
+			length = std::min(length, _len - start);
 			return std::wstring_view(this->_Get_raw() + start, length);
 		}
 
@@ -773,7 +777,7 @@ namespace libty::inline Core
 			for (size_t i = 0; i < _len;)
 			{
 				std::optional<String> view;
-				size_t seekp = IndexOfAny(separators);
+				size_t seekp = IndexOfAny(separators, i);
 
 				if (seekp == -1)
 				{
@@ -795,7 +799,7 @@ namespace libty::inline Core
 				{
 					if (trim)
 					{
-						view = Trim(view.value());
+						view = view->Trim();
 						if (removeEmpty && view->_len == 0)
 						{
 							continue;

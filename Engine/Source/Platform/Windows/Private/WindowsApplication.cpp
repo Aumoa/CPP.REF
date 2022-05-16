@@ -53,6 +53,9 @@ int32 SWindowsApplication::GuardedMain(std::span<const String> Argv)
 
 	auto Logger = std::make_unique<LogModule>(SE_APPLICATION);
 	Logger->StartAsync().Wait();
+#if !SHIPPING
+	ConsoleEx::EnableLogToConsole(true);
+#endif
 
 	std::vector<std::unique_ptr<PlatformModule>> PlatformModules;
 
@@ -109,6 +112,9 @@ int32 SWindowsApplication::GuardedMain(std::span<const String> Argv)
 		PlatformModules.emplace_back(std::move(EngineModule));
 	}
 
+#if !SHIPPING
+	ConsoleEx::EnableLogToConsole(false);
+#endif
 	GC->Collect(true);
 	GC->Shutdown(true);
 

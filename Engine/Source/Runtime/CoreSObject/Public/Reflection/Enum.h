@@ -250,40 +250,65 @@ namespace libty::inline Core::Reflection
 	};
 }
 
-#define SENUM_MAKE_FLAGS(EnumClass)															\
-template<class TEnumClassL, class TEnumClassR>												\
-constexpr EnumClass operator |(const TEnumClassL& lhs, const TEnumClassR& rhs) requires		\
-	std::same_as<typename TEnumClassL::__Tag__, EnumClass::__Tag__> ||						\
-	std::same_as<typename TEnumClassR::__Tag__, EnumClass::__Tag__>							\
-{																							\
-	return (EnumClass)((int32)lhs | (int32)rhs);											\
-}																							\
-																							\
-template<class TEnumClassL, class TEnumClassR>												\
-constexpr EnumClass operator &(const TEnumClassL& lhs, const TEnumClassR& rhs) requires		\
-	std::same_as<typename TEnumClassL::__Tag__, EnumClass::__Tag__> ||						\
-	std::same_as<typename TEnumClassR::__Tag__, EnumClass::__Tag__>							\
-{																							\
-	return (EnumClass)((int32)lhs & (int32)rhs);											\
-}																							\
-																							\
-template<class TEnumClass>																	\
-constexpr EnumClass& operator |=(EnumClass& lhs, const TEnumClass& rhs) requires			\
-	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>							\
-{																							\
-	return lhs = (EnumClass)((int32)lhs | (int32)rhs);										\
-}																							\
-																							\
-template<class TEnumClass>																	\
-constexpr EnumClass& operator &=(EnumClass& lhs, const TEnumClass& rhs) requires			\
-	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>							\
-{																							\
-	return lhs = (EnumClass)((int32)lhs & (int32)rhs);										\
-}																							\
-																							\
-template<class TEnumClass>																	\
-constexpr EnumClass operator ~(TEnumClass lhs) requires										\
-	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>							\
-{																							\
-	return (EnumClass)~(int32)lhs;															\
+#define SENUM_MAKE_FLAGS(EnumClass)																	\
+template<class TEnumClassL, class TEnumClassR>														\
+constexpr EnumClass operator |(const TEnumClassL& lhs, const TEnumClassR& rhs) noexcept requires	\
+	std::same_as<typename TEnumClassL::__Tag__, EnumClass::__Tag__> &&								\
+	std::same_as<typename TEnumClassR::__Tag__, EnumClass::__Tag__>									\
+{																									\
+	return (EnumClass)((int32)lhs | (int32)rhs);													\
+}																									\
+																									\
+constexpr EnumClass operator |(EnumClass::__Tag__ lhs, EnumClass::__Tag__ rhs) noexcept				\
+{																									\
+	return (EnumClass)((int32)lhs | (int32)rhs);													\
+}																									\
+																									\
+template<class TEnumClassL, class TEnumClassR>														\
+constexpr EnumClass operator &(const TEnumClassL& lhs, const TEnumClassR& rhs) noexcept requires	\
+	std::same_as<typename TEnumClassL::__Tag__, EnumClass::__Tag__> &&								\
+	std::same_as<typename TEnumClassR::__Tag__, EnumClass::__Tag__>									\
+{																									\
+	return (EnumClass)((int32)lhs & (int32)rhs);													\
+}																									\
+																									\
+constexpr EnumClass operator &(EnumClass::__Tag__ lhs, EnumClass::__Tag__ rhs) noexcept				\
+{																									\
+	return (EnumClass)((int32)lhs & (int32)rhs);													\
+}																									\
+																									\
+template<class TEnumClass>																			\
+constexpr EnumClass& operator |=(EnumClass& lhs, const TEnumClass& rhs) noexcept requires			\
+	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>									\
+{																									\
+	return lhs = (EnumClass)((int32)lhs | (int32)rhs);												\
+}																									\
+																									\
+constexpr EnumClass& operator |=(EnumClass& lhs, EnumClass::__Tag__ rhs) noexcept					\
+{																									\
+	return lhs = (EnumClass)((int32)lhs | (int32)rhs);												\
+}																									\
+																									\
+template<class TEnumClass>																			\
+constexpr EnumClass& operator &=(EnumClass& lhs, const TEnumClass& rhs) noexcept requires			\
+	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>									\
+{																									\
+	return lhs = (EnumClass)((int32)lhs & (int32)rhs);												\
+}																									\
+																									\
+constexpr EnumClass& operator &=(EnumClass& lhs, EnumClass::__Tag__ rhs) noexcept					\
+{																									\
+	return lhs = (EnumClass)((int32)lhs & (int32)rhs);												\
+}																									\
+																									\
+template<class TEnumClass>																			\
+constexpr EnumClass operator ~(TEnumClass lhs) noexcept requires									\
+	std::same_as<typename TEnumClass::__Tag__, EnumClass::__Tag__>									\
+{																									\
+	return (EnumClass)~(int32)lhs;																	\
+}																									\
+																									\
+constexpr EnumClass operator ~(EnumClass::__Tag__ lhs) noexcept										\
+{																									\
+	return (EnumClass)~(int32)lhs;																	\
 }

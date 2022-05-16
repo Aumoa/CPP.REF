@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="libty::Core::String">
+		<DisplayString Condition="_buf._Which==0">{_buf._Head,na}</DisplayString>
+		<DisplayString Condition="_buf._Which==1">[{_buf._Tail._Head._Rep->_Uses} strong ref] {_buf._Tail._Head._Ptr,na}</DisplayString>
+	</Type>
+</AutoVisualizer>

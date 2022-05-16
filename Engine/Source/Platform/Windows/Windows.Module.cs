@@ -21,6 +21,7 @@ public class Windows : ModuleRule
             "Core",
             "PlatformGeneric",
             "Game",
+            "Console"
         });
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)

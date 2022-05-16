@@ -9,7 +9,7 @@ ConsolePin ConsolePin::Reserve(int32 height)
 {
 	if (height < 1)
 	{
-		throw ArgumentException("height");
+		throw ArgumentException(nameof(height));
 	}
 
 	ConsolePin pin;

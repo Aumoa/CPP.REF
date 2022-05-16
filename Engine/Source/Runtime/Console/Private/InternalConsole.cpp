@@ -5,41 +5,44 @@
 
 #if PLATFORM_WINDOWS
 
+#pragma push_macro("TEXT")
+#undef TEXT
+
 #include <Windows.h>
 #undef Yield
 
+#pragma pop_macro("TEXT")
+
 namespace libty::inline Console
 {
-	static HANDLE sCachedStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-
 	void InternalConsole::SetColor(BackForeColor color) noexcept
 	{
-		SetConsoleTextAttribute(sCachedStdout, ((WORD)color.first << 8) | (BYTE)color.second);
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), ((WORD)color.first << 8) | (BYTE)color.second);
 	}
 
 	auto InternalConsole::GetColor() noexcept -> BackForeColor
 	{
 		CONSOLE_SCREEN_BUFFER_INFO screen;
-		GetConsoleScreenBufferInfo(sCachedStdout, &screen);
-		return { (EConsoleColor)((screen.wAttributes >> 8) & 0xFF), (EConsoleColor)(screen.wAttributes & 0xFF) };
+		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen);
+		return { (EConsoleColor)((screen.wAttributes >> 4) & 0xF), (EConsoleColor)(screen.wAttributes & 0xF) };
 	}
 
 	void InternalConsole::SetCursorPos(Coord coord) noexcept
 	{
-		SetConsoleCursorPosition(sCachedStdout, { (short)coord.first, (short)coord.second });
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)coord.first, (short)coord.second });
 	}
 
 	std::pair<int32, int32> InternalConsole::GetCursorPos() noexcept
 	{
 		CONSOLE_SCREEN_BUFFER_INFO screen;
-		GetConsoleScreenBufferInfo(sCachedStdout, &screen);
+		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen);
 		return { (int32)screen.dwCursorPosition.X, (int32)screen.dwCursorPosition.Y };
 	}
 
 	int32 InternalConsole::GetBufferWidth() noexcept
 	{
 		CONSOLE_SCREEN_BUFFER_INFO screen;
-		GetConsoleScreenBufferInfo(sCachedStdout, &screen);
+		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen);
 		return (int32)screen.dwSize.X;
 	}
 
@@ -74,7 +77,7 @@ namespace libty::inline Console
 				Backgrounds.pop();
 			}
 
-			while (!ensureMsgf(Foregrounds.size() <= 1, L"<color=...> script is not released with {0} stacks.", Foregrounds.size()))
+			while (!ensureMsgf(Foregrounds.size() <= 1, TEXT("<color=...> script is not released with {0} stacks."), Foregrounds.size()))
 			{
 				Foregrounds.pop();
 			}
@@ -95,23 +98,32 @@ namespace libty::inline Console
 		size_t prev = 0;
 		while ((pos = message.IndexOf(TEXT('<'), pos)) != -1)
 		{
+			static constexpr EStringSplitOptions SplitOpt = EStringSplitOptions::RemoveEmptyEntries | EStringSplitOptions::TrimEntries;
+
 			if (pos != prev)
 			{
 				size_t len = pos - prev;
 				std::wcout << message.SubstringView(prev, len);
 			}
 
-			if (message.length() > pos + 1 && message[pos + 1] == L'<')
+			if ((size_t)message > pos + 1 && message[pos + 1] == TEXT('<'))
 			{
-				std::wcout << L'<';
+				std::wcout << TEXT('<');
 				pos += 2;
 				prev = pos;
 				continue;
 			}
 
-			size_t endof = message.find(L'>', pos);
-			std::vector<std::wstring> code = String::Split(message.substr(pos + 1, endof - (pos + 1)), L"=", true, true);
-			if (String::Equals(code[0], L"color", true) && code.size() == 2)
+			size_t endof = message.IndexOf(TEXT('>'), pos);
+			if (endof == -1)
+			{
+				size_t len = pos - prev;
+				std::wcout << message.SubstringView(prev, len);
+				break;
+			}
+
+			std::vector<String> code = message.Substring(pos + 1, endof - (pos + 1)).Split(TEXT('='), SplitOpt);
+			if (code[0].Equals(TEXT("color"), EStringComparison::CurrentCultureIgnoreCase) && code.size() == 2)
 			{
 				EConsoleColor foreground;
 				if (!Reflection::SEnum::TryParse<EConsoleColor>(code[1], foreground))
@@ -123,7 +135,7 @@ namespace libty::inline Console
 				ss.Foregrounds.emplace(foreground);
 				InternalConsole::SetColor({ background, foreground });
 			}
-			else if (String::Equals(code[0], L"/color", true) && ss.Foregrounds.size() > 1)
+			else if (code[0].Equals(TEXT("/color"), EStringComparison::CurrentCultureIgnoreCase) && ss.Foregrounds.size() > 1)
 			{
 				ss.Foregrounds.pop();
 				EConsoleColor foreground = ss.Foregrounds.top();
@@ -138,16 +150,16 @@ namespace libty::inline Console
 		ss.Release();
 		InternalConsole::SetColor({ ss.Backgrounds.top(), ss.Foregrounds.top() });
 
-		pos = message.length();
+		pos = (size_t)message;
 		if (prev < pos)
 		{
 			if (prev == 0)
 			{
-				std::wcout << message;
+				std::wcout << (const wchar_t*)message;
 			}
 			else
 			{
-				std::wcout << message.substr(prev, pos - prev);
+				std::wcout << message.SubstringView(prev, pos - prev);
 			}
 		}
 

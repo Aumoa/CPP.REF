@@ -79,10 +79,10 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 
 	setlocale(LC_ALL, "");
 
-	std::vector<String> Argv(argc);
-	for (size_t i = 0; i < Argv.size(); ++i)
+	std::vector<String> Argv(argc - 1);
+	for (size_t i = 1; i < Argv.size(); ++i)
 	{
-		Argv[i] = String::FromLiteral(argv[i]);
+		Argv[i - 1] = String::FromLiteral(argv[i]);
 	}
 
 	return GuardedMain(Argv);
@@ -91,6 +91,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 int wWinMain(HINSTANCE, HINSTANCE, wchar_t* argv, int)
 {
 	using namespace ::libty;
+
+	setlocale(LC_ALL, "");
 
 	std::vector<String> Argv = ::libty::String(argv).Split(TEXT(" "), ::libty::EStringSplitOptions::RemoveEmptyEntries | ::libty::EStringSplitOptions::TrimEntries);
 	return GuardedMain(Argv);

@@ -11,7 +11,7 @@ using namespace libty;
 
 thread_local std::vector<Exception*> sTLExceptions;
 
-Exception::Exception(String message, std::exception_ptr innerException) noexcept
+Exception::Exception(const String& message, std::exception_ptr innerException) noexcept
 	: _stacktrace(Stacktrace::CaptureCurrent())
 	, _message(message)
 	, _innerException(innerException)

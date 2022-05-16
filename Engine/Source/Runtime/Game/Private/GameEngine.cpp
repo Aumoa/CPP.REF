@@ -77,7 +77,7 @@ namespace AutoConsoleVars
 {
 	namespace GC
 	{
-		AutoConsoleVariable<float> CollectInterval(TEXT("GC.CollectInterval"), 1.0f);
+		AutoConsoleVariable<float> CollectInterval(TEXT("GC.CollectInterval"), 60.0f);
 	}
 }
 
