@@ -50,6 +50,11 @@ namespace libty::inline Core
 			}
 		}
 
+		~VoidableOptional()
+		{
+			Reset();
+		}
+
 		VoidableOptional& Reset()
 		{
 			if (_HasValue)
@@ -114,6 +119,29 @@ namespace libty::inline Core
 		T& operator *()
 		{
 			return GetValue();
+		}
+
+		VoidableOptional& operator =(const VoidableOptional& rhs)
+		{
+			Reset();
+			_HasValue = rhs._HasValue;
+			if (rhs._HasValue)
+			{
+				new(_Buf) T(rhs.GetValue());
+			}
+			return *this;
+		}
+
+		VoidableOptional& operator =(VoidableOptional&& rhs) noexcept
+		{
+			Reset();
+			_HasValue = rhs._HasValue;
+			if (rhs._HasValue)
+			{
+				new(_Buf) T(std::move(rhs._Buf));
+				rhs._HasValue = false;
+			}
+			return *this;
 		}
 
 		const T& operator *() const
