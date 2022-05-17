@@ -9,9 +9,10 @@ SViewport::SViewport()
 {
 }
 
-void SViewport::Inject(SRenderEngine* REngine)
+void SViewport::Inject(SRenderEngine* REngine, SRenderThread* RThread)
 {
 	RContext = REngine->CreateRenderContext();
+	this->RThread = RThread;
 }
 
 void SViewport::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
@@ -44,7 +45,29 @@ void SViewport::ReallocateSurface(const Vector2& SurfaceVector)
 			.Flags = ERHIResourceFlags::AllowRenderTarget
 		};
 
-		constexpr bool b = std::same_as<decltype(ERHIResourceStates::PixelShaderResource)::__Tag__, ERHIResourceStates::__Tag__>;
+		struct Graveyard
+		{
+			SharedPtr<IRHIResource> Surface;
+
+			Graveyard(IRHIResource* Surface)
+				: Surface(Surface)
+			{
+			}
+
+			void Dispose()
+			{
+				if (Surface)
+				{
+					Surface->Dispose();
+				}
+			}
+		};
+
+		// Capture resource while rendring previous frame.
+		RThread->EnqueueRenderThreadWork(this, [lock = Graveyard(Surface)](SRenderContext*) mutable
+		{
+			lock.Dispose();
+		});
 
 		Surface = RContext->OwningDevice->CreateCommittedResource(HeapProp, ERHIHeapFlags::None, Resource, ERHIResourceStates::PixelShaderResource | ERHIResourceStates::CopySource, nullptr);
 		SurfaceSize = Size;

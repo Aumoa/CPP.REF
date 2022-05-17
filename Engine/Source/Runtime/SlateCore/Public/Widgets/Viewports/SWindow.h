@@ -15,10 +15,13 @@ namespace libty::inline SlateCore
 	private:
 		SPROPERTY(RContext)
 		SRenderContext* RContext = nullptr;
+		SPROPERTY(RThread)
+		SRenderThread* RThread = nullptr;
 
 		SPROPERTY(SwapChain)
 		IRHISwapChain* SwapChain = nullptr;
 		int32 BufferCount;
+		Vector2N SwapChainSize;
 
 		SPROPERTY(Viewports)
 		std::vector<SViewport*> Viewports;
@@ -27,7 +30,9 @@ namespace libty::inline SlateCore
 		SWindow();
 
 		SFUNCTION(Inject)
-		void Inject(SRenderEngine* REngine);
+		void Inject(SRenderEngine* REngine, SRenderThread* RThread);
+
+		virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
 
 		void RenderWindow(SRenderContext* RContext);
 
@@ -43,5 +48,8 @@ namespace libty::inline SlateCore
 		END_SLATE_ATTRIBUTE;
 
 		DECLARE_SLATE_CONSTRUCTOR();
+
+	private:
+		void TryResizeSwapChain(const Geometry& AllottedGeometry);
 	};
 }

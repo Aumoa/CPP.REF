@@ -17,12 +17,14 @@ namespace libty::inline SlateCore
 		SRenderContext* RContext = nullptr;
 		SPROPERTY(Surface)
 		IRHIResource* Surface = nullptr;
+		SPROPERTY(RThread);
+		SRenderThread* RThread = nullptr;
 
 	public:
 		SViewport();
 
 		SFUNCTION(Inject)
-		void Inject(SRenderEngine* REngine);
+		void Inject(SRenderEngine* REngine, SRenderThread* RThread);
 
 		virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
 		virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;

@@ -10,9 +10,16 @@ SWindow::SWindow()
 {
 }
 
-void SWindow::Inject(SRenderEngine* REngine)
+void SWindow::Inject(SRenderEngine* REngine, SRenderThread* RThread)
 {
 	RContext = REngine->CreateRenderContext();
+	this->RThread = RThread;
+}
+
+void SWindow::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+{
+	TryResizeSwapChain(AllottedGeometry);
+	Super::Tick(AllottedGeometry, InDeltaTime);
 }
 
 void SWindow::RenderWindow(SRenderContext* RContext)
@@ -52,4 +59,17 @@ DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 	Viewports.emplace_back(SNew(SViewport));
 
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
+}
+
+void SWindow::TryResizeSwapChain(const Geometry& AllottedGeometry)
+{
+	Vector2N Size = Vector<>::Cast<int32>(AllottedGeometry.GetLocalSize());
+	if (Size != SwapChainSize)
+	{
+		RThread->EnqueueRenderThreadWork(this, [this, DesiredSize = Size](SRenderContext*)
+		{
+			SwapChain->ResizeBuffers(DesiredSize);
+		});
+		SwapChainSize = Size;
+	}
 }
