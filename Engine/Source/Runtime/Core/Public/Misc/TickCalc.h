@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "PrimitiveTypes.h"
 #include <chrono>
 #include <numeric>
 #include <list>

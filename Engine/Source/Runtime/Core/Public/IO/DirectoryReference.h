@@ -43,6 +43,8 @@ namespace libty::inline Core
 					return std::filesystem::create_directory(this->_Get_path(), ec);
 				}
 			}
+
+			return true;
 		}
 	};
 }

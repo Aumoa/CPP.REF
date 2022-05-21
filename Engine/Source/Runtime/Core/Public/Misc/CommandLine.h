@@ -4,7 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
-#include "Concepts/IArray.h"
+#include "Generic/IArray.h"
 #include "Exceptions/ArgumentException.h"
 #include "Linq/IsValidIndex.h"
 #include <string_view>

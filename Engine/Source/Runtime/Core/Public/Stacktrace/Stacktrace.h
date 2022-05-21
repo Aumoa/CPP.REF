@@ -30,7 +30,6 @@ namespace libty::inline Core
 
 		inline String Trace() const noexcept
 		{
-			constexpr auto f = L""_s;
 			std::vector<String> frames;
 			for (auto& Callstack : GetStackframes())
 			{

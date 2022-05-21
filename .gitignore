@@ -9,3 +9,5 @@ CMakeLists.txt
 Build/
 Intermediate/
 Saved/
+Program/*/obj
+Program/*/properties

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreConcepts.h"
+#include "Generic/IEnumerable.h"
 #include <vector>
 #include <future>
 #include <thread>
@@ -83,6 +84,7 @@ namespace libty::inline Core
 			// Waiting all threads.
 			for (size_t i = 0; i < threads; ++i)
 			{
+				using namespace std;
 				while (futures[i].wait_for(1ms) != std::future_status::ready);
 			}
 		}

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Concepts/IEnumerable.h"
+#include "Generic/IEnumerable.h"
 #include <vector>
 
 namespace libty::inline Core::Linq

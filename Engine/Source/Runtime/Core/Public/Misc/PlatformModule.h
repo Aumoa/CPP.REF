@@ -18,25 +18,25 @@ namespace libty::inline Core
 		String ModuleName;
 
 	public:
-		PlatformModule(String InModulePath);
+		PlatformModule(const String& InModulePath);
 		~PlatformModule() noexcept;
 
 		String ToString();
 		bool IsValid() const;
 
 		template<class TFunction>
-		TFunction* GetFunctionPointer(String FunctionName) const
+		TFunction* GetFunctionPointer(const String& FunctionName) const
 		{
 			return reinterpret_cast<TFunction*>(InternalGetFunctionPointer(FunctionName));
 		}
 
 		template<class TRet, class... TArgs>
-		FunctionPointer<TRet, TArgs...> GetFunctionPointer(String FunctionName) const
+		FunctionPointer<TRet, TArgs...> GetFunctionPointer(const String& FunctionName) const
 		{
 			return reinterpret_cast<TRet(*)(TArgs...)>(InternalGetFunctionPointer(FunctionName));
 		}
 
 	private:
-		FunctionPointer<void> InternalGetFunctionPointer(String FunctionName) const;
+		FunctionPointer<void> InternalGetFunctionPointer(const String& FunctionName) const;
 	};
 }

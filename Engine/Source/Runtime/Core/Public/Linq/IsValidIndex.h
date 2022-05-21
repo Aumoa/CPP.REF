@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Concepts/IArray.h"
+#include "Generic/IArray.h"
 
 namespace libty::inline Core::Linq
 {

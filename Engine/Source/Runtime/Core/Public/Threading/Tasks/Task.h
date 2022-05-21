@@ -4,7 +4,7 @@
 
 #include "Awaiter.h"
 #include "CoreConcepts.h"
-#include "Concepts/IList.h"
+#include "Generic/IList.h"
 #include <coroutine>
 #include <memory>
 #include <chrono>
@@ -307,11 +307,7 @@ namespace libty::inline Core
 		}
 
 	private:
-		static void RunImpl(std::function<void()> body)
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
-			throw;
-		}
+		static void RunImpl(std::function<void()> body);
 
 		static void DelayImpl(std::chrono::milliseconds delay, std::function<void()> body)
 		{
@@ -323,8 +319,40 @@ namespace libty::inline Core
 		template<class TBody>
 		static auto Run(TBody&& body, std::stop_token cancellationToken = {}) -> Task<FunctionReturn_t<TBody>>
 		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
-			throw;
+			using U = FunctionReturn_t<TBody>;
+			std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
+			awaiter->WaitingToRun();
+
+			RunImpl([awaiter, body = std::forward<TBody>(body), cancellationToken]() mutable
+			{
+				if (cancellationToken.stop_possible() && cancellationToken.stop_requested())
+				{
+					awaiter->Cancel();
+					return;
+				}
+
+				awaiter->Running();
+
+				try
+				{
+					if constexpr (std::same_as<U, void>)
+					{
+						body();
+						awaiter->SetResult();
+					}
+					else
+					{
+						U result = body();
+						awaiter->SetResult(result);
+					}
+				}
+				catch (...)
+				{
+					awaiter->SetException(std::current_exception());
+				}
+			});
+
+			return Task<U>(std::move(awaiter));
 		}
 
 		static auto Yield()

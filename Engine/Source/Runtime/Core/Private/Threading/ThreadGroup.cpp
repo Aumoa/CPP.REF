@@ -104,8 +104,8 @@ ThreadGroup::ThreadGroup(std::wstring_view groupName, size_t numThreads)
 		numThreads = (size_t)std::thread::hardware_concurrency();
 	}
 
-	_suspendToken = new ThreadGroupSuspendToken(this, numThreads);
-	SuspendTokenCollection::Add(_suspendToken);
+	//_suspendToken = new ThreadGroupSuspendToken(this, numThreads);
+	//SuspendTokenCollection::Add(_suspendToken);
 
 	for (size_t i = 0; i < numThreads; ++i)
 	{
@@ -117,7 +117,7 @@ ThreadGroup::ThreadGroup(std::wstring_view groupName, size_t numThreads)
 
 ThreadGroup::~ThreadGroup() noexcept
 {
-	SuspendTokenCollection::Remove(_suspendToken);
+	//SuspendTokenCollection::Remove(_suspendToken);
 
 	for (auto& Thread : _threads)
 	{
@@ -151,7 +151,7 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 	// Blocking the thread for all times.
 	while (!cancellationToken.stop_requested())
 	{
-		_suspendToken->Join(mythread);
+		//_suspendToken->Join(mythread);
 
 		std::unique_lock lock(_immQueue.lock);
 		size_t nonExpired = 0;
@@ -167,8 +167,7 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 
 		_immQueue.cv.Wait(lock, [this, mythread]
 		{
-			return _immQueue.queue.size() > 0
-				|| _suspendToken->IsJoinRequested();
+			return _immQueue.queue.size();
 		});
 	}
 }

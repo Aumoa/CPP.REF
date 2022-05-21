@@ -19,7 +19,7 @@ using namespace libty;
 
 #pragma pop_macro("TEXT")
 
-PlatformModule::PlatformModule(String InModulePath)
+PlatformModule::PlatformModule(const String& InModulePath)
 {
 	NativeHandle = LoadLibraryW((const wchar_t*)InModulePath);
 	ModuleName = String(Path::GetFileNameWithoutExtension(InModulePath));
@@ -49,7 +49,7 @@ bool PlatformModule::IsValid() const
 	return NativeHandle;
 }
 
-auto PlatformModule::InternalGetFunctionPointer(String FunctionName) const -> FunctionPointer<void>
+auto PlatformModule::InternalGetFunctionPointer(const String& FunctionName) const -> FunctionPointer<void>
 {
 	if (!IsValid())
 	{
@@ -64,7 +64,7 @@ auto PlatformModule::InternalGetFunctionPointer(String FunctionName) const -> Fu
 
 #else
 
-PlatformModule::PlatformModule(const std::filesystem::path& InModulePath)
+PlatformModule::PlatformModule(const String& InModulePath)
 {
 	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }
@@ -83,7 +83,7 @@ bool PlatformModule::IsValid() const
 	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }
 
-auto PlatformModule::InternalGetFunctionPointer(String FunctionName) const -> FunctionPointer<void>
+auto PlatformModule::InternalGetFunctionPointer(const String& FunctionName) const -> FunctionPointer<void>
 {
 	throw InvalidOperationException(TEXT("PlatformModule must be with PLATFORM_DYNAMIC_LIBRARY."));
 }

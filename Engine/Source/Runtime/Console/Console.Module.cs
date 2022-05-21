@@ -1,24 +1,38 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-using CodeProjectConfiguration;
-
 using System;
+using BuildTool;
 
-public class Console : ModuleRule
+public class ConsoleRule : ModuleRule
 {
-    public Console()
+    public ConsoleRule()
     {
-        TargetType = TargetType.Engine;
-        NonUnityBuild = true;
-        RelativePath = "Engine.Runtime";
+        Category = ModuleCategory.Engine;
+        FilterPath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
 
-        PublicDependencyModuleNames.AddRange(new[]
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            "Core",
-            "CoreSObject"
-        });
+            PrivateAdditionalMacros.AddRange(new[]
+            {
+                "NOMINMAX",
+                "WIN32_LEAN_AND_MEAN"
+            });
+
+            PublicAdditionalLibraries.AddRange(new[]
+            {
+                "psapi.lib",
+                "dbghelp.lib"
+            });
+
+            PrivateDisableWarnings.AddRange(new[]
+            {
+                5105,
+                4005,
+                5106,
+            });
+        }
     }
 }
