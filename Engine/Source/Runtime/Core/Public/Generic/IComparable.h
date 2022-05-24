@@ -6,11 +6,8 @@
 #include <compare>
 #include <concepts>
 
-namespace libty::inline Core
+template<class T, class U>
+concept IComparable = requires
 {
-	template<class T, class U>
-	concept IComparable = requires
-	{
-		{ std::declval<T>().CompareTo(std::declval<U>()) } -> std::convertible_to<std::strong_ordering>;
-	};
-}
+	{ std::declval<T>().CompareTo(std::declval<U>()) } -> std::convertible_to<std::strong_ordering>;
+};

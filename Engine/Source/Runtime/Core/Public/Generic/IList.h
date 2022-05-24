@@ -4,12 +4,9 @@
 
 #include "IEnumerable.h"
 
-namespace libty::inline Core
+template<class T, class U>
+concept IList = IEnumerable<T, U> && requires
 {
-	template<class T, class U>
-	concept IList = IEnumerable<T, U> && requires
-	{
-		{ std::size(std::declval<T>()) } -> std::convertible_to<size_t>;
-		{ std::declval<T>().emplace_back(std::declval<U>()) };
-	};
-}
+	{ std::size(std::declval<T>()) } -> std::convertible_to<size_t>;
+	{ std::declval<T>().emplace_back(std::declval<U>()) };
+};

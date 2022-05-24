@@ -4,12 +4,9 @@
 
 #include "IList.h"
 
-namespace libty::inline Core
+template<class T, class U>
+concept IVector = IList<T, U> && requires
 {
-	template<class T, class U>
-	concept IVector = IList<T, U> && requires
-	{
-		{ std::declval<T>()[std::declval<size_t>()] } -> std::convertible_to<U>;
-		{ std::declval<T>().reserve(std::declval<size_t>()) };
-	};
-}
+	{ std::declval<T>()[std::declval<size_t>()] } -> std::convertible_to<U>;
+	{ std::declval<T>().reserve(std::declval<size_t>()) };
+};

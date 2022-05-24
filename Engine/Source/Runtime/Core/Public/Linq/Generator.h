@@ -3,56 +3,124 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "CoreConcepts.h"
 #include <coroutine>
 #include <exception>
 
-namespace libty::inline Core::Linq
+namespace Linq
 {
 	template<class T>
 	class Generator
 	{
+		Generator(const Generator&) = delete;
+		class Enumerator;
+		template<class U>
+		friend class Generator;
+
 	public:
-		struct promise_type
+		class promise_type
 		{
+			friend Enumerator;
+
 			std::optional<T> _value;
 			std::exception_ptr _exception;
 
-			Generator<T> get_return_object() noexcept
+		public:
+			inline promise_type() noexcept
+			{
+			}
+
+			inline Generator<T> get_return_object() noexcept
 			{
 				return Generator<T>(*this);
 			}
-			
+
 			template<class U>
-			auto yield_value(U&& value) noexcept(noexcept(_value = std::forward<U>(value)))
+			inline auto yield_value(U&& value) noexcept(noexcept(_Emplace_value(std::forward<U>(value))))
+			{
+				return this->_Emplace_value(std::forward<U>(value));
+			}
+
+			inline auto yield_value(const T& value) noexcept(noexcept(_Emplace_value(value)))
+			{
+				return this->_Emplace_value(value);
+			}
+
+			inline void unhandled_exception() noexcept
+			{
+				_exception = std::current_exception();
+			}
+
+			inline auto initial_suspend() const noexcept
+			{
+				return std::suspend_never();
+			}
+
+			inline auto final_suspend() const noexcept
+			{
+				return std::suspend_always();
+			}
+
+			inline void return_void() noexcept
+			{
+			}
+
+		private:
+			template<class U>
+			auto _Emplace_value(U&& value) noexcept(noexcept(_value = std::forward<U>(value)))
 			{
 				_value = std::forward<U>(value);
 				return std::suspend_always();
 			}
 
-			auto yield_value(const T& value) noexcept(noexcept(_value = value))
+			const T& _Get_current() const
 			{
-				_value = value;
-				return std::suspend_always();
+				if (!_value.has_value())
+				{
+					Generator<void>::_Xthrow_value_null();
+				}
+				return *_value;
+			}
+		};
+
+	public:
+		class Enumerator
+		{
+			Enumerator(const Enumerator&) = delete;
+
+		private:
+			std::coroutine_handle<promise_type> _coro;
+
+		public:
+			inline Enumerator(std::coroutine_handle<promise_type> coro) noexcept
+				: _coro(std::move(coro))
+			{
 			}
 
-			void unhandled_exception() noexcept
+			inline const T& operator *() const noexcept
 			{
-				_exception = std::current_exception();
+				return _coro.promise()._Get_current();
 			}
 
-			auto initial_suspend() const noexcept
+			inline Enumerator& operator ++()
 			{
-				return std::suspend_always();
+				if (_coro.done())
+				{
+					Generator<void>::_Xthrow_coro_done();
+				}
+
+				_coro.resume();
+				return *this;
 			}
 
-			auto final_suspend() const noexcept
+			inline bool IsDone() const noexcept
 			{
-				return std::suspend_always();
+				return _coro.done();
 			}
 
-			void return_void() noexcept
+		public:
+			inline bool operator !=(std::nullptr_t) const noexcept
 			{
+				return !IsDone();
 			}
 		};
 
@@ -60,16 +128,21 @@ namespace libty::inline Core::Linq
 		std::coroutine_handle<promise_type> _coro;
 
 	public:
-		Generator() noexcept
+		inline Generator() noexcept
 		{
 		}
 
-		Generator(promise_type& prom) noexcept
-			: _coro(std::coroutine_handle<promise_type>::from_promise(prom))
+		inline Generator(promise_type& promise) noexcept
+			: _coro(decltype(_coro)::from_promise(promise))
 		{
 		}
 
-		~Generator() noexcept
+		inline Generator(Generator&& rhs) noexcept
+			: _coro(std::move(rhs._coro))
+		{
+		}
+
+		inline ~Generator() noexcept
 		{
 			if (_coro)
 			{
@@ -77,32 +150,43 @@ namespace libty::inline Core::Linq
 			}
 		}
 
-		bool MoveNext()
+		Enumerator begin() noexcept
 		{
-			this->_Throw_if();
+			if (!_coro)
+			{
+				Generator<void>::_Xthrow_already_start();
+			}
 
-			_coro.resume();
-			return !_coro.done();
+			return Enumerator(std::move(_coro));
 		}
-		
-		const T& Current() const
+
+		std::nullptr_t end() noexcept
 		{
-			this->_Throw_if();
-			return this->_Prom()->_value.value();
+			return nullptr;
+		}
+
+		inline bool IsDone() const noexcept
+		{
+			return _coro.done();
+		}
+
+	public:
+		Generator& operator =(Generator&& rhs) noexcept
+		{
+			_coro = std::move(rhs._coro);
+			return *this;
 		}
 
 	private:
-		inline void _Throw_if() const
-		{
-			if (this->_Prom()->_exception)
-			{
-				std::rethrow_exception(this->_Prom()->_exception);
-			}
-		}
-
-		inline promise_type* _Prom() const noexcept
-		{
-			return &_coro.promise();
-		}
+		[[noreturn]] static void _Xthrow_already_start();
+		[[noreturn]] static void _Xthrow_value_null();
+		[[noreturn]] static void _Xthrow_coro_done();
 	};
+
+	template<>
+	[[noreturn]] static void Generator<void>::_Xthrow_already_start();
+	template<>
+	[[noreturn]] static void Generator<void>::_Xthrow_value_null();
+	template<>
+	[[noreturn]] static void Generator<void>::_Xthrow_coro_done();
 }

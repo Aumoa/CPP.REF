@@ -5,11 +5,8 @@
 #include <utility>
 #include <concepts>
 
-namespace libty::inline Core
+template<class T, class U>
+concept IEquatable = requires
 {
-	template<class T, class U>
-	concept IEquatable = requires
-	{
-		{ std::declval<T>().Equals(std::declval<U>()) } -> std::convertible_to<bool>;
-	};
-}
+	{ std::declval<T>().Equals(std::declval<U>()) } -> std::convertible_to<bool>;
+};
