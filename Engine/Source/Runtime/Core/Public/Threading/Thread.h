@@ -3,76 +3,44 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include "ISuspendToken.h"
-#include "Misc/NonCopyable.h"
-#include "Misc/PlatformMacros.h"
+#include "TimeSpan.h"
+#include "Misc/String.h"
 #include "Threading/Tasks/Task.h"
 #include "Threading/Tasks/TaskCompletionSource.h"
-#include <string>
-#include <future>
 #include <functional>
-#include <optional>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 
-namespace libty::inline Core
+class CORE_API Thread
 {
-	class CORE_API Thread : public NonCopyable
-	{
-	public:
-		class CORE_API ThreadSuspendToken : public ISuspendToken
-		{
-			friend class Thread;
-			Thread* CurrentThread;
+public:
+	struct _Impl;
+	
+private:
+	std::shared_ptr<_Impl> _impl;
 
-			std::optional<std::promise<void>> SuspendPromise;
+private:
+	Thread(std::shared_ptr<_Impl> impl) noexcept;
 
-		private:
-			ThreadSuspendToken(Thread* CurrentThread);
+public:
+	Thread() noexcept;
+	~Thread() noexcept;
 
-		public:
-			virtual ~ThreadSuspendToken() noexcept override = default;
+	void SetFriendlyName(const String& friendlyName) noexcept;
+	String GetFriendlyName() const noexcept;
 
-			virtual std::future<void> Suspend() override;
-			virtual void Resume() override;
+	void SuspendThread(const TimeSpan& waitFor = 0s) const noexcept;
+	void ResumeThread() const noexcept;
 
-			void Join();
-		};
+	Task<> JoinAsync() const noexcept;
 
-	#if PLATFORM_WINDOWS
-		void* ThreadHandle = nullptr;
-	#endif
+	int32 GetThreadId() const noexcept;
+	bool IsManaged() const noexcept;
+	void* GetNativeHandle() const noexcept;
 
-		std::thread::id ThreadId;
-		String FriendlyName;
-		bool bIsManaged = false;
-		ThreadSuspendToken* SToken = nullptr;
+	static Thread CreateThread(const String& friendlyName, std::function<void()> entry);
 
-		TaskCompletionSource<> JoinSource;
-		std::mutex SuspendMtx;
-		std::condition_variable SuspendCv;
-
-	private:
-		Thread();
-
-	public:
-		~Thread();
-
-		void SetFriendlyName(String InFriendlyName);
-		void SuspendThread();
-		void ResumeThread();
-		void Join();
-		Task<> JoinAsync();
-
-		String GetFriendlyName() const;
-		std::thread::id GetThreadId() const;
-		bool IsManaged() const;
-		ThreadSuspendToken* GetSuspendToken() const;
-		void* GetNativeHandle() const noexcept;
-
-		static Thread* CreateThread(String FriendlyName, std::function<void()> ThreadEntry);
-
-	public:
-		static Thread* GetCurrentThread();
-	};
-}
+public:
+	static Thread GetCurrentThread();
+};

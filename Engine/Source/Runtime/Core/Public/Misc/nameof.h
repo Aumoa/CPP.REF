@@ -4,10 +4,13 @@
 
 #include "Misc/String.h"
 
-template<class>
-::libty::String __nameof_helper(::libty::String s)
+namespace libty::Syntax
 {
-	return s;
+	template<class>
+	String __nameof_helper(const String& s)
+	{
+		return s;
+	}
 }
 
 #define nameof(x) __nameof_helper<decltype(x)>(TEXT(#x))

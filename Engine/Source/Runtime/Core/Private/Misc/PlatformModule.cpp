@@ -1,12 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Misc/PlatformMacros.h"
 #include "Misc/PlatformModule.h"
 #include "Misc/String.h"
-#include "Misc/Path.h"
+#include "IO/Path.h"
 #include "Exceptions/InvalidOperationException.h"
-
-using namespace libty;
 
 #if PLATFORM_DYNAMIC_LIBRARY
 

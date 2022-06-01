@@ -2,27 +2,13 @@
 
 #include "CoreAssert.h"
 #include "LogCore.h"
-#include "Misc/PlatformMacros.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogVerbosity.h"
-#include "Diagnostics/LogCategory.h"
+#include "Logging/Log.h"
+#include "Stacktrace/Stacktrace.h"
 
-using namespace libty;
-
-void CoreAssert::Ensure(String exp, String msg, const std::source_location& location)
+void CoreAssert::Assert(const String& exp, const String& msg)
 {
-	using namespace ::Generated::LogCategories;
-
-	if (!msg)
-	{
-		constexpr String s = TEXT("s");
-
-		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, TEXT("Ensure failed: !({})"), exp);
-	}
-	else
-	{
-		LogSystem::Log(location, LogAssert, ELogVerbosity::Error, TEXT("Ensure failed: !({})\n{}"), exp, msg);
-	}
+	Log::Fatal(LogAssert, TEXT("{} (in expression: {})\n{}"), msg, exp, Stacktrace::CaptureCurrent().Trace());
+	DebugBreak();
 }
 
 void CoreAssert::DebugBreak()

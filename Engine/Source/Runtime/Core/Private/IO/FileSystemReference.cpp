@@ -3,8 +3,6 @@
 #include "IO/FileSystemReference.h"
 #include "IO/DirectoryReference.h"
 
-using namespace libty;
-
 std::optional<DirectoryReference> FileSystemReference::GetParent() const
 {
 	auto p = this->_Get_path();

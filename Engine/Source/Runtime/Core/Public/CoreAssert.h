@@ -4,44 +4,41 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
+#include "Misc/noop.h"
 #include "Exceptions/AssertException.h"
-#include <string_view>
 #include <source_location>
 
-namespace libty::inline Core
+class CORE_API CoreAssert
 {
-	class CORE_API CoreAssert
-	{
-	public:
-		static void Ensure(String exp, String msg, const std::source_location& location = std::source_location::current());
-		static void DebugBreak();
-	};
-}
+public:
+	static void Assert(const String& exp, const String& msg);
+	static void DebugBreak();
+};
 
 #if DO_CHECK
 
 #define check(x) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::AssertException(TEXT(#x)); \
+	CoreAssert::Assert(TEXT(#x), TEXT("Assertion failure.")); \
 }
 
 #define checkf(x, fmt, ...) \
 if (const bool b = (bool)(x); !b) \
 { \
-	throw ::libty::Core::AssertException(TEXT(#x), ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__)); \
+	CoreAssert::Assert(TEXT(#x), String::Format(fmt __VA_OPT__(, __VA_ARGS__)); \
 }
 
 #define ensure(x) \
-[&, b = (bool)(x)](const std::source_location& location = std::source_location::current())\
+[&, b = (bool)(x)]()\
 {\
 	if (!b)\
 	{\
-		::libty::Core::CoreAssert::Ensure(TEXT(#x), TEXT(""), location);\
+		CoreAssert::Assert(TEXT(#x), TEXT("Ensure failure."));\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
-			::libty::Core::CoreAssert::DebugBreak();\
+			CoreAssert::DebugBreak();\
 			bSwitchLocal = false;\
 		}\
 	}\
@@ -49,15 +46,15 @@ if (const bool b = (bool)(x); !b) \
 	return b;\
 }()
 #define ensureMsgf(x, fmt, ...) \
-[&, b = (bool)(x)](const std::source_location& location = std::source_location::current())\
+[&, b = (bool)(x)]()\
 {\
 	if (!b)\
 	{\
-		::libty::Core::CoreAssert::Ensure(TEXT(#x), ::libty::Core::String::Format(fmt __VA_OPT__(,) __VA_ARGS__), location);\
+		CoreAssert::Assert(TEXT(#x), String::Format(fmt __VA_OPT__(,) __VA_ARGS__));\
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
-			::libty::Core::CoreAssert::DebugBreak();\
+			CoreAssert::DebugBreak();\
 			bSwitchLocal = false;\
 		}\
 	}\
@@ -69,7 +66,7 @@ if (const bool b = (bool)(x); !b) \
 
 #define check(x)
 #define checkf(x, format, ...)
-#define ensure(x) (x)
-#define ensureMsgf(x, format, ...) (x)
+#define ensure(x) noop(x)
+#define ensureMsgf(x, format, ...) noop(x)
 
 #endif

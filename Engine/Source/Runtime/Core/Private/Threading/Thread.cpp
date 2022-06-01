@@ -1,10 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Threading/Thread.h"
-#include "Misc/PlatformMacros.h"
-#include "Misc/String.h"
-
-using namespace libty;
+#include <future>
 
 #if PLATFORM_WINDOWS
 
@@ -16,133 +13,152 @@ using namespace libty;
 
 #pragma pop_macro("TEXT")
 
-#endif
-
-Thread::Thread()
-	: ThreadId(std::this_thread::get_id())
+struct Thread::_Impl
 {
-	ThreadId = std::this_thread::get_id();
+	HANDLE _localHandle = nullptr;
+	HANDLE _threadHandle = nullptr;
+	DWORD _threadId = 0;
 
-#if PLATFORM_WINDOWS
-	HANDLE CurrentThread = ::GetCurrentThread();
-	int64 tid = ::GetThreadId(CurrentThread);
-	ThreadHandle = ::OpenThread(GENERIC_ALL, TRUE, (DWORD)tid);
+	TaskCompletionSource<> _joinSrc;
+	std::mutex _suspendLock;
+	std::condition_variable _suspendVar;
 
-	PWSTR pwThreadDesc = nullptr;
-	::GetThreadDescription(CurrentThread, &pwThreadDesc);
+	bool _isManaged = false;
 
-	if (pwThreadDesc)
+	_Impl()
 	{
-		FriendlyName = String(pwThreadDesc);
+		_localHandle = ::GetCurrentThread();
+		_threadId = ::GetThreadId(_localHandle);
+		_threadHandle = ::OpenThread(GENERIC_ALL, TRUE, _threadId);
 	}
-#endif
 
-	SToken = new ThreadSuspendToken(this);
-	JoinSource = TaskCompletionSource<>::Create();
-}
-
-Thread::~Thread()
-{
-#if PLATFORM_WINDOWS
-	if (ThreadHandle)
+	~_Impl() noexcept
 	{
-		::CloseHandle(ThreadHandle);
-		ThreadHandle = nullptr;
+		if (_threadHandle)
+		{
+			::CloseHandle(_threadHandle);
+			_threadHandle = nullptr;
+		}
 	}
+
+	String _Impl_get_thread_name() const noexcept
+	{
+		PWSTR pwsz = nullptr;
+		if (::GetThreadDescription(_threadHandle, &pwsz) == S_OK)
+		{
+			return String::FromLiteral(pwsz);
+		}
+		else
+		{
+			return TEXT("");
+		}
+	}
+
+	bool _Impl_set_thread_name(const String& threadName) noexcept
+	{
+		return ::SetThreadDescription(_threadHandle, (const wchar_t*)threadName) == S_OK;
+	}
+
+	void* _Get_native_handle() const noexcept
+	{
+		return _threadHandle;
+	}
+};
+
 #endif
 
-	delete SToken;
+Thread::Thread(std::shared_ptr<_Impl> impl) noexcept
+	: _impl(std::move(impl))
+{
 }
 
-void Thread::SetFriendlyName(String InFriendlyName)
+Thread::Thread() noexcept
 {
-#if PLATFORM_WINDOWS
-	SetThreadDescription(ThreadHandle, (const wchar_t*)InFriendlyName);
-#endif
-	FriendlyName = InFriendlyName;
 }
 
-void Thread::SuspendThread()
+Thread::~Thread() noexcept
 {
-	std::unique_lock lock(SuspendMtx);
-	SuspendCv.wait(lock);
 }
 
-void Thread::ResumeThread()
+void Thread::SetFriendlyName(const String& friendlyName) noexcept
 {
-	std::unique_lock lock(SuspendMtx);
-	SuspendCv.notify_all();
+	_impl->_Impl_set_thread_name(friendlyName);
 }
 
-void Thread::Join()
+String Thread::GetFriendlyName() const noexcept
 {
-	JoinSource.GetTask().Wait();
+	return _impl->_Impl_get_thread_name();
 }
 
-Task<> Thread::JoinAsync()
+void Thread::SuspendThread(const TimeSpan& waitFor) const noexcept
 {
-	return JoinSource.GetTask();
+	std::unique_lock lock(_impl->_suspendLock);
+	if (waitFor > 0s)
+	{
+		_impl->_suspendVar.wait_for(lock, (std::chrono::milliseconds)waitFor);
+	}
+	else
+	{
+		_impl->_suspendVar.wait(lock);
+	}
 }
 
-String Thread::GetFriendlyName() const
+void Thread::ResumeThread() const noexcept
 {
-	return FriendlyName;
+	std::unique_lock lock(_impl->_suspendLock);
+	_impl->_suspendVar.notify_all();
 }
 
-std::thread::id Thread::GetThreadId() const
+Task<> Thread::JoinAsync() const noexcept
 {
-	return ThreadId;
+	return _impl->_joinSrc.GetTask();
 }
 
-bool Thread::IsManaged() const
+int32 Thread::GetThreadId() const noexcept
 {
-	return bIsManaged;
+	return _impl->_threadId;
 }
 
-auto Thread::GetSuspendToken() const -> ThreadSuspendToken*
+bool Thread::IsManaged() const noexcept
 {
-	return SToken;
+	return _impl->_isManaged;
 }
 
 void* Thread::GetNativeHandle() const noexcept
 {
-#if PLATFORM_WINDOWS
-	return ThreadHandle;
-#else
-	return nullptr;
-#endif
+	return _impl->_Get_native_handle();
 }
 
-Thread* Thread::CreateThread(String FriendlyName, std::function<void()> ThreadEntry)
+Thread Thread::CreateThread(const String& friendlyName, std::function<void()> entry)
 {
-	std::promise<Thread*> ThreadPtr;
-	std::future<Thread*> ThreadPtrFuture = ThreadPtr.get_future();
+	std::promise<Thread> promise;
+	std::future<Thread> future = promise.get_future();
 
-	std::thread([ThreadEntry, FriendlyName, &ThreadPtr]()
+	std::thread([&]()
 	{
-		Thread* MyThread = GetCurrentThread();
-		MyThread->SetFriendlyName(FriendlyName);
-		MyThread->bIsManaged = true;
+		Thread thread = GetCurrentThread();
+		thread.SetFriendlyName(friendlyName);
+		thread._impl->_isManaged = true;
 
-		ThreadPtr.set_value(MyThread);
+		promise.set_value(thread);
 		try
 		{
-			ThreadEntry();
+			entry();
 		}
 		catch (...)
 		{
-			MyThread->JoinSource.SetException(std::current_exception());
+			thread._impl->_joinSrc.SetException(std::current_exception());
 			return;
 		}
 
-		MyThread->JoinSource.SetResult();
+		thread._impl->_joinSrc.SetResult();
 	}).detach();
 
-	return ThreadPtrFuture.get();
+	return future.get();
 }
 
-Thread* Thread::GetCurrentThread()
+Thread Thread::GetCurrentThread()
 {
-	static thread_local Thread MyThread;
-	return &MyThread;
+	static thread_local std::shared_ptr<_Impl> impl = std::make_shared<Thread::_Impl>();
+	return Thread(impl);
 }

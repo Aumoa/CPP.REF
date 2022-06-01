@@ -4,12 +4,9 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class CORE_API InvalidOperationException : public Exception
 {
-	class CORE_API InvalidOperationException : public Exception
-	{
-	public:
-		InvalidOperationException(String message, std::exception_ptr innerException = nullptr);
-		InvalidOperationException(std::exception_ptr innerException = nullptr);
-	};
-}
+public:
+	InvalidOperationException(const String& message, std::exception_ptr innerException = nullptr);
+	InvalidOperationException(std::exception_ptr innerException = nullptr);
+};

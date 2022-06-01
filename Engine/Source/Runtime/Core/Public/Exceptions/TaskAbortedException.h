@@ -4,11 +4,8 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class CORE_API TaskAbortedException : public Exception
 {
-	class CORE_API TaskAbortedException : public Exception
-	{
-	public:
-		TaskAbortedException(std::exception_ptr innerException = nullptr);
-	};
-}
+public:
+	TaskAbortedException(std::exception_ptr innerException = nullptr);
+};

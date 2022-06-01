@@ -4,74 +4,64 @@
 
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
+#include "Misc/String.h"
 #include <chrono>
 #include <thread>
 #include <functional>
 #include <string_view>
 #include <stop_token>
-#include <queue>
+#include <map>
 
-namespace libty::inline Core
+class CORE_API ThreadGroup
 {
-	class CORE_API ThreadGroup
+	ThreadGroup(const ThreadGroup&) = delete;
+	ThreadGroup& operator =(const ThreadGroup&) = delete;
+
+private:
+	using clock = std::chrono::steady_clock;
+
+	template<class TPriority, class TWork>
+	struct WorkPriorityQueue
 	{
-		ThreadGroup(const ThreadGroup&) = delete;
-		ThreadGroup& operator =(const ThreadGroup&) = delete;
+		Spinlock lock;
+		std::multimap<TPriority, TWork> queue;
+		SpinlockConditionVariable cv;
 
-	private:
-		class ThreadGroupSuspendToken;
-		using clock = std::chrono::steady_clock;
-
-		struct ImmediateWork
+		inline void enqueue(TPriority&& priority, TWork&& work) noexcept
 		{
-			std::function<void()> Body;
-		};
+			queue.emplace(std::move(priority), std::move(work));
+			cv.NotifyOne();
+		}
 
-		struct DelayedWork
+		inline const TPriority& priority() const noexcept
 		{
-			clock::time_point StartsWith;
-			std::function<void()> Body;
-		};
+			return queue.begin()->first;
+		}
 
-		template<class TWork>
-		struct WorkQueue
+		TWork dequeue()
 		{
-			Spinlock lock;
-			std::queue<TWork> queue;
-			SpinlockConditionVariable cv;
-
-			void enqueue(TWork&& work)
-			{
-				queue.emplace(std::move(work));
-				cv.NotifyOne();
-			}
-
-			TWork dequeue()
-			{
-				auto work = std::move(queue.front());
-				queue.pop();
-				return std::move(work);
-			}
-		};
-
-	private:
-		std::vector<std::jthread> _threads;
-
-		WorkQueue<ImmediateWork> _immQueue;
-		WorkQueue<DelayedWork> _delQueue;
-
-		ThreadGroupSuspendToken* _suspendToken = nullptr;
-		std::wstring _groupName;
-
-	public:
-		ThreadGroup(std::wstring_view groupName, size_t numThreads = 0);
-		virtual ~ThreadGroup() noexcept;
-
-		void Run(std::function<void()> body);
-		void Delay(std::chrono::milliseconds timeout, std::function<void()> body);
-
-	private:
-		void Worker(size_t index, std::stop_token cancellationToken);
-		void Timer(std::stop_token cancellationToken);
+			auto it = queue.begin();
+			TWork work = std::move(it->second);
+			queue.erase(it);
+			return std::move(work);
+		}
 	};
-}
+
+private:
+	String _groupName;
+	std::vector<std::jthread> _threads;
+
+	WorkPriorityQueue<int64, std::function<void()>> _immQueue;
+	WorkPriorityQueue<clock::time_point, std::function<void()>> _delQueue;
+
+public:
+	ThreadGroup(const String& groupName, size_t numThreads = 0);
+	virtual ~ThreadGroup() noexcept;
+
+	void Run(std::function<void()> body);
+	void Delay(std::chrono::milliseconds timeout, std::function<void()> body);
+
+private:
+	void Worker(size_t index, std::stop_token cancellationToken);
+	void Timer(std::stop_token cancellationToken);
+};

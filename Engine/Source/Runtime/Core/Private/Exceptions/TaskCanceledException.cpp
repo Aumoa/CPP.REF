@@ -2,8 +2,6 @@
 
 #include "Exceptions/TaskCanceledException.h"
 
-using namespace libty;
-
 TaskCanceledException::TaskCanceledException(std::exception_ptr innerException)
 	: Exception(TEXT("Task was aborted."), innerException)
 {

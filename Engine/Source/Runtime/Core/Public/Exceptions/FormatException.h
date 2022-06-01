@@ -4,14 +4,11 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class FormatException : public Exception
 {
-	class FormatException : public Exception
+public:
+	FormatException(const String& message)
+		: Exception(message)
 	{
-	public:
-		FormatException(const String& message)
-			: Exception(message)
-		{
-		}
-	};
-}
+	}
+};

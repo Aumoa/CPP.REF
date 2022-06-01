@@ -2,19 +2,33 @@
 
 #include "Threading/Tasks/Task.h"
 #include "Threading/ThreadGroup.h"
+#include <optional>
 
-using namespace libty;
-
-static ThreadGroup group(L"TaskWorker");
-
-template<>
-void Task<>::RunImpl(std::function<void()> body)
+namespace Threading::Tasks
 {
-	group.Run(std::move(body));
+	static std::optional<ThreadGroup> sTaskWorker;
 }
 
 template<>
-void Task<>::DelayImpl(std::chrono::milliseconds delay, std::function<void()> body)
+void Task<>::_Initialize()
 {
-	group.Delay(delay, body);
+	Threading::Tasks::sTaskWorker.emplace(TEXT("TaskWorker"));
+}
+
+template<>
+void Task<>::_Shutdown()
+{
+	Threading::Tasks::sTaskWorker.reset();
+}
+
+template<>
+void Task<>::_Run_thread(std::function<void()> body)
+{
+	Threading::Tasks::sTaskWorker->Run(std::move(body));
+}
+
+template<>
+void Task<>::_Delay_thread(std::chrono::milliseconds delay, std::function<void()> body)
+{
+	Threading::Tasks::sTaskWorker->Delay(delay, std::move(body));
 }

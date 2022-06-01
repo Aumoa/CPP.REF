@@ -2,11 +2,8 @@
 
 #pragma once
 
-namespace libty::inline Core
+enum class EStringComparison
 {
-	enum class EStringComparison
-	{
-		CurrentCulture = 0,
-		CurrentCultureIgnoreCase = 1,
-	};
-}
+	CurrentCulture = 0,
+	CurrentCultureIgnoreCase = 1,
+};

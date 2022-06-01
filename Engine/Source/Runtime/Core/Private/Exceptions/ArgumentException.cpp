@@ -3,9 +3,7 @@
 #include "Exceptions/ArgumentException.h"
 #include "Misc/String.h"
 
-using namespace libty;
-
-ArgumentException::ArgumentException(String argName)
+ArgumentException::ArgumentException(const String& argName)
 	: Exception(String::Format(TEXT("Invalid argument '{}' detected."), argName))
 {
 }

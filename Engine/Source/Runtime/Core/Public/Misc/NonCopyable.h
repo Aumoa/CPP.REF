@@ -2,16 +2,13 @@
 
 #pragma once
 
-namespace libty::inline Core
+class NonCopyable
 {
-	class NonCopyable
-	{
-		NonCopyable(const NonCopyable&) = delete;
-		NonCopyable& operator =(const NonCopyable&) = delete;
+	NonCopyable(const NonCopyable&) = delete;
+	NonCopyable& operator =(const NonCopyable&) = delete;
 
-	public:
-		NonCopyable()
-		{
-		}
-	};
-}
+public:
+	NonCopyable()
+	{
+	}
+};

@@ -4,12 +4,9 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class CORE_API AssertException : public Exception
 {
-	class CORE_API AssertException : public Exception
-	{
-	public:
-		AssertException(String exp);
-		AssertException(String exp, String msg);
-	};
-}
+public:
+	AssertException(const String& exp);
+	AssertException(const String& exp, const String& msg);
+};

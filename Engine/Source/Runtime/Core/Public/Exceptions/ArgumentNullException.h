@@ -4,11 +4,8 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class CORE_API ArgumentNullException : public Exception
 {
-	class CORE_API ArgumentNullException : public Exception
-	{
-	public:
-		ArgumentNullException(String argName);
-	};
-}
+public:
+	ArgumentNullException(const String& argName);
+};

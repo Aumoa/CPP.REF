@@ -1,6 +1,5 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Misc/PlatformMacros.h"
 #include "Misc/String.h"
 
 #if PLATFORM_WINDOWS
@@ -12,11 +11,9 @@
 
 #else
 
-#include <codecvt>
+#error Not supported platform.
 
 #endif
-
-using namespace ::libty;
 
 String& String::_Allocate_assign(const wchar_t* buf, size_t len)
 {
@@ -67,24 +64,6 @@ std::string String::_As_multibyte(std::wstring_view s, int32 codepage)
 	WideCharToMultiByte(codepage, 0, s.data(), (int32)s.length(), multibyte.data(), length, nullptr, nullptr);
 
 	return multibyte;
-}
-
-#else
-
-std::wstring String::_As_unicode(std::string_view multibyte, int32 codePage)
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-	return converterX.from_bytes(std::string(multibyte));
-}
-
-std::string String::_As_multibyte(std::wstring_view unicode, int32 codePage)
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-	return converterX.to_bytes(std::wstring(unicode));
 }
 
 #endif

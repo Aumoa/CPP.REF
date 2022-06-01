@@ -7,11 +7,11 @@
 #include <concepts>
 
 template<class T, class U>
-concept IEnumerable = requires
+concept IEnumerable = requires (const T& val)
 {
-	{ *std::begin(std::declval<T>()) } -> std::convertible_to<U>;
-	{ std::begin(std::declval<T>()) != std::end(std::declval<T>()) } -> std::convertible_to<bool>;
-	{ std::advance(std::declval<std::remove_reference_t<decltype(std::begin(std::declval<T>()))>&>(), 1) };
+	{ *std::begin(val) } -> std::convertible_to<U>;
+	{ std::begin(val) != std::end(val) } -> std::convertible_to<bool>;
+	{ std::advance(std::declval<std::remove_reference_t<decltype(std::begin(val))>&>(), 1) };
 };
 
 template<class TEnumerable>

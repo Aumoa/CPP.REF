@@ -2,15 +2,11 @@
 
 #pragma once
 
-namespace libty::inline Core
+enum class ETaskStatus
 {
-	enum class ETaskStatus
-	{
-		Created,
-		WaitingToRun,
-		Running,
-		RanToCompletion,
-		Faulted,
-		Canceled,
-	};
-}
+	Created,
+	Running,
+	RanToCompletion,
+	Faulted,
+	Canceled,
+};

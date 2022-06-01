@@ -2,110 +2,16 @@
 
 #include "Threading/ThreadGroup.h"
 #include "Threading/Thread.h"
-#include "Threading/ISuspendToken.h"
-#include "Threading/SuspendTokenCollection.h"
 #include "Exceptions/InvalidOperationException.h"
-#include "Misc/TickCalc.h"
 #include "Misc/String.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogCategory.h"
-#include "Diagnostics/LogVerbosity.h"
-#include <future>
 
-DEFINE_LOG_CATEGORY(LogThreadGroup);
-
-using namespace libty;
-
-class ThreadGroup::ThreadGroupSuspendToken : public ISuspendToken
-{
-	ThreadGroup* _source;
-	std::optional<std::promise<void>> _promise;
-
-	std::vector<Thread*> _threads;
-	std::atomic<size_t> _threadsIdx;
-
-public:
-	ThreadGroupSuspendToken(ThreadGroup* source, size_t NumThreads)
-		: _source(source)
-		, _threads(NumThreads)
-	{
-	}
-
-	virtual ~ThreadGroupSuspendToken() noexcept override
-	{
-	}
-
-	virtual std::future<void> Suspend() override
-	{
-		if (_promise.has_value())
-		{
-			throw InvalidOperationException(TEXT("ThreadGroup already wait for suspend."));
-		}
-
-		_threadsIdx = 0;
-
-		for (size_t i = 0; i < _source->_threads.size();)
-		{
-			auto& thr = _source->_threads[i];
-			if (!thr.joinable())
-			{
-				SE_LOG(LogThreadGroup, Error, TEXT("Thread {} is not joinable."), _threadsIdx.load());
-				_source->_threads.erase(_source->_threads.begin() + i);
-				continue;
-			}
-
-			++i;
-		}
-
-		_promise.emplace();
-		_source->_immQueue.cv.NotifyAll();
-
-		return _promise->get_future();
-	}
-
-	virtual void Resume() override
-	{
-		_promise.reset();
-
-		for (size_t idx = 0; idx < _threadsIdx; ++idx)
-		{
-			auto& thread = _threads[idx];
-			thread->ResumeThread();
-		}
-	}
-
-	void Join(Thread* MyThread)
-	{
-		if (IsJoinRequested())
-		{
-			size_t Myidx = _threadsIdx++;
-			_threads[Myidx] = MyThread;
-
-			if (Myidx == _threads.size() - 1)
-			{
-				_promise->set_value();
-			}
-
-			MyThread->SuspendThread();
-		}
-	}
-
-	bool IsJoinRequested()
-	{
-		return _promise.has_value();
-	}
-};
-
-ThreadGroup::ThreadGroup(std::wstring_view groupName, size_t numThreads)
+ThreadGroup::ThreadGroup(const String& groupName, size_t numThreads)
 	: _groupName(groupName)
 {
 	if (numThreads == 0)
 	{
 		numThreads = (size_t)std::thread::hardware_concurrency();
 	}
-
-	//_suspendToken = new ThreadGroupSuspendToken(this, numThreads);
-	//SuspendTokenCollection::Add(_suspendToken);
 
 	for (size_t i = 0; i < numThreads; ++i)
 	{
@@ -117,14 +23,25 @@ ThreadGroup::ThreadGroup(std::wstring_view groupName, size_t numThreads)
 
 ThreadGroup::~ThreadGroup() noexcept
 {
-	//SuspendTokenCollection::Remove(_suspendToken);
+	std::unique_lock lock1(_immQueue.lock);
+	std::unique_lock lock2(_delQueue.lock);
 
-	for (auto& Thread : _threads)
+	for (auto& thread : _threads)
 	{
-		if (Thread.joinable())
+		if (thread.joinable())
 		{
-			Thread.request_stop();
-			Thread.join();
+			thread.request_stop();
+		}
+	}
+
+	lock1.unlock();
+	lock2.unlock();
+
+	for (auto& thread : _threads)
+	{
+		if (thread.joinable())
+		{
+			thread.join();
 		}
 	}
 }
@@ -132,27 +49,24 @@ ThreadGroup::~ThreadGroup() noexcept
 void ThreadGroup::Run(std::function<void()> body)
 {
 	std::unique_lock lock(_immQueue.lock);
-	_immQueue.enqueue(ImmediateWork{ .Body = body });
+	_immQueue.enqueue(0, std::move(body));
 }
 
 void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()> body)
 {
+	auto startsWith = clock::now() + timeout;
 	std::unique_lock lock(_delQueue.lock);
-	_delQueue.enqueue(DelayedWork{ .StartsWith = clock::now() + timeout, .Body = body });
+	_delQueue.enqueue(std::move(startsWith), std::move(body));
 }
 
 void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 {
-	Thread* mythread = Thread::GetCurrentThread();
-	mythread->SetFriendlyName(String::Format(TEXT("[{} #{}]"), _groupName, index));
-
-	TickCalc<> timer;
+	Thread mythread = Thread::GetCurrentThread();
+	mythread.SetFriendlyName(String::Format(TEXT("[{} #{}]"), _groupName, index));
 
 	// Blocking the thread for all times.
 	while (!cancellationToken.stop_requested())
 	{
-		//_suspendToken->Join(mythread);
-
 		std::unique_lock lock(_immQueue.lock);
 		size_t nonExpired = 0;
 
@@ -160,8 +74,7 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 		{
 			auto front = _immQueue.dequeue();
 			lock.unlock();
-			front.Body();
-			_suspendToken->Join(mythread);
+			front();
 			lock.lock();
 		}
 
@@ -174,10 +87,8 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 
 void ThreadGroup::Timer(std::stop_token cancellationToken)
 {
-	Thread* mythread = Thread::GetCurrentThread();
-	mythread->SetFriendlyName(String::Format(TEXT("[{} #Timer]"), _groupName));
-
-	TickCalc<> timer;
+	Thread mythread = Thread::GetCurrentThread();
+	mythread.SetFriendlyName(String::Format(TEXT("[{} #Timer]"), _groupName));
 
 	// Blocking the thread for all times.
 	while (!cancellationToken.stop_requested())
@@ -190,38 +101,42 @@ void ThreadGroup::Timer(std::stop_token cancellationToken)
 		{
 			auto now = clock::now();
 
-			auto front = _delQueue.dequeue();
-			if (front.StartsWith <= now)
+			auto& priority = _delQueue.priority();
+			if (priority <= now)
 			{
-				lock.unlock();
-				front.Body();
-				lock.lock();
-				continue;
-			}
+				Run(_delQueue.dequeue());
 
-			if (wait.has_value())
-			{
-				if (*wait > now)
+				if (wait.has_value())
+				{
+					if (*wait > now)
+					{
+						wait = now;
+					}
+				}
+				else
 				{
 					wait = now;
 				}
 			}
 			else
 			{
-				wait = now;
+				break;
 			}
-
-			_delQueue.enqueue(std::move(front));
-			++nonExpired;
 		}
+
+		size_t remain = _delQueue.queue.size();
+		auto pred = [this, &remain]()
+		{
+			return _delQueue.queue.size() > remain;
+		};
 
 		if (wait.has_value())
 		{
-			_delQueue.cv.WaitUntil(lock, *wait);
+			_delQueue.cv.WaitUntil(lock, *wait, pred);
 		}
 		else
 		{
-			_delQueue.cv.Wait(lock);
+			_delQueue.cv.Wait(lock, pred);
 		}
 	}
 }

@@ -5,49 +5,46 @@
 #include "PrimitiveTypes.h"
 #include "ScopedDelegateHolder.h"
 
-namespace libty::inline Core
+class DelegateHandle
 {
-	class DelegateHandle
+	template<class>
+	friend class MulticastDelegate;
+
+private:
+	ScopedDelegateHolder _delegate;
+
+public:
+	DelegateHandle() = default;
+	DelegateHandle(const DelegateHandle&) = default;
+	DelegateHandle(DelegateHandle&&) = default;
+
+	DelegateHandle(const ScopedDelegateHolder& delegate)
+		: _delegate(delegate)
 	{
-		template<class>
-		friend class MulticastDelegate;
+	}
 
-	private:
-		ScopedDelegateHolder _delegate;
+	DelegateHandle(ScopedDelegateHolder&& delegate)
+		: _delegate(std::move(delegate))
+	{
+	}
 
-	public:
-		DelegateHandle() = default;
-		DelegateHandle(const DelegateHandle&) = default;
-		DelegateHandle(DelegateHandle&&) = default;
+	bool IsValid() const
+	{
+		return _delegate.IsValid();
+	}
 
-		DelegateHandle(const ScopedDelegateHolder& delegate)
-			: _delegate(delegate)
+	void Reset()
+	{
+		if (IsValid())
 		{
+			_delegate->Remove(*this);
+			_delegate.Reset();
 		}
+	}
 
-		DelegateHandle(ScopedDelegateHolder&& delegate)
-			: _delegate(std::move(delegate))
-		{
-		}
+	auto operator <=>(const DelegateHandle& rhs) const { return _delegate <=> rhs._delegate; }
+	bool operator ==(const DelegateHandle& rhs) const { return _delegate == rhs._delegate; }
 
-		bool IsValid() const
-		{
-			return _delegate.IsValid();
-		}
-
-		void Reset()
-		{
-			if (IsValid())
-			{
-				_delegate->Remove(*this);
-				_delegate.Reset();
-			}
-		}
-
-		auto operator <=>(const DelegateHandle& rhs) const { return _delegate <=> rhs._delegate; }
-		bool operator ==(const DelegateHandle& rhs) const { return _delegate == rhs._delegate; }
-
-		DelegateHandle& operator =(const DelegateHandle&) = default;
-		DelegateHandle& operator =(DelegateHandle&&) = default;
-	};
-}
+	DelegateHandle& operator =(const DelegateHandle&) = default;
+	DelegateHandle& operator =(DelegateHandle&&) = default;
+};

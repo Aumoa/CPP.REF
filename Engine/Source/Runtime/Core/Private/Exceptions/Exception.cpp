@@ -2,12 +2,6 @@
 
 #include "Exceptions/Exception.h"
 #include "Misc/String.h"
-#include "Diagnostics/LogSystem.h"
-#include "Diagnostics/LogCategory.h"
-
-DEFINE_LOG_CATEGORY(LogException);
-
-using namespace libty;
 
 thread_local std::vector<Exception*> sTLExceptions;
 

@@ -2,8 +2,6 @@
 
 #include "Exceptions/NotImplementedException.h"
 
-using namespace libty;
-
 NotImplementedException::NotImplementedException()
 	: Exception(TEXT("The function to call does not implemented."))
 {

@@ -2,9 +2,7 @@
 
 #include "Exceptions/InvalidOperationException.h"
 
-using namespace libty;
-
-InvalidOperationException::InvalidOperationException(String message, std::exception_ptr innerException)
+InvalidOperationException::InvalidOperationException(const String& message, std::exception_ptr innerException)
 	: Exception(message, innerException)
 {
 }

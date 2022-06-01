@@ -3,9 +3,7 @@
 #include "Exceptions/ArgumentNullException.h"
 #include "Misc/String.h"
 
-using namespace libty;
-
-ArgumentNullException::ArgumentNullException(String argName)
+ArgumentNullException::ArgumentNullException(const String& argName)
 	: Exception(String::Format(TEXT("Argument '{}' cannot be nullptr."), argName))
 {
 }

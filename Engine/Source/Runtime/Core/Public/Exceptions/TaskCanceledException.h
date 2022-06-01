@@ -4,11 +4,8 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class CORE_API TaskCanceledException : public Exception
 {
-	class CORE_API TaskCanceledException : public Exception
-	{
-	public:
-		TaskCanceledException(std::exception_ptr innerException = nullptr);
-	};
-}
+public:
+	TaskCanceledException(std::exception_ptr innerException = nullptr);
+};

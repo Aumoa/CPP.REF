@@ -1,9 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Stacktrace/Stacktrace.h"
-#include "Misc/PlatformMacros.h"
-
-using namespace ::libty;
 
 #if PLATFORM_WINDOWS
 

@@ -6,8 +6,6 @@
 #include <bit>
 #include <fstream>
 
-using namespace libty;
-
 template<class TChar, class... TChars>
 inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
 {

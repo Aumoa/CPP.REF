@@ -4,14 +4,11 @@
 
 #include "PrimitiveTypes.h"
 
-namespace libty::inline Core
-{
-	class DelegateHandle;
+class DelegateHandle;
 
-	class IMulticastDelegate
-	{
-	public:
-		virtual ~IMulticastDelegate() noexcept = default;
-		virtual void Remove(DelegateHandle&) = 0;
-	};
-}
+class IMulticastDelegate
+{
+public:
+	virtual ~IMulticastDelegate() noexcept = default;
+	virtual void Remove(DelegateHandle&) = 0;
+};

@@ -2,8 +2,6 @@
 
 #include "Threading/Spinlock.h"
 
-using namespace ::libty;
-
 #if PLATFORM_WINDOWS
 
 #include <Windows.h>

@@ -4,11 +4,8 @@
 
 #include "Exception.h"
 
-namespace libty::inline Core
+class CORE_API NotImplementedException : public Exception
 {
-	class CORE_API NotImplementedException : public Exception
-	{
-	public:
-		NotImplementedException();
-	};
-}
+public:
+	NotImplementedException();
+};

@@ -3,67 +3,36 @@
 #pragma once
 
 #include "TaskStatus.h"
-#include <memory>
+#include <concepts>
+#include <coroutine>
+#include <exception>
 #include <functional>
-#include <source_location>
+#include <memory>
+#include <stop_token>
 
-namespace libty::inline Core
+class AwaiterBase;
+
+template<class TAwaiter>
+concept IAwaiter = requires (TAwaiter& val, const TAwaiter& cval)
 {
-	template<class T>
-	class Task;
+	// C++ coroutine interface.
+	{ val.await_ready() } -> std::convertible_to<bool>;
+	{ val.await_suspend(std::declval<std::coroutine_handle<>>()) };
+	{ val.await_resume() };
 
-	class IAwaiter : public std::enable_shared_from_this<IAwaiter>
-	{
-	protected:
-		IAwaiter() = default;
+	// IAwaiter results interface.
+	{ cval.GetStatus() } -> std::convertible_to<ETaskStatus>;
+	{ val.ContinueWith(std::declval<std::function<void(std::shared_ptr<AwaiterBase>)>>()) };
+	{ val.GetException() } -> std::convertible_to<std::exception_ptr>;
+	{ val.GetResult() };
+	{ val.Wait() };
 
-	public:
-		virtual ~IAwaiter() noexcept = default;
+	// IAwaiter continutation interface.
+	{ val.Cancel() };
+	{ val.SetException(std::declval<std::exception_ptr>()) } -> std::convertible_to<bool>;
 
-		virtual ETaskStatus GetStatus() const = 0;
-		virtual bool IsCompleted() const = 0;
-		virtual bool IsCompletedSuccessfully() const = 0;
-		virtual bool IsCanceled() const = 0;
-		virtual bool IsFaulted() const = 0;
-
-		virtual void WaitingToRun() = 0;
-		virtual void Running() = 0;
-		virtual void Wait() = 0;
-		virtual void Then(std::function<void(Task<void>)> proc) = 0;
-		virtual void Cancel() = 0;
-
-		virtual void SetException(std::exception_ptr ptr) = 0;
-		virtual std::exception_ptr GetException() = 0;
-
-		bool await_ready()
-		{
-			return IsCompleted();
-		}
-
-		template<class TCoroutineHandle>
-		void await_suspend(TCoroutineHandle&& coroutine)
-		{
-			Then([this, coroutine, awaiter = coroutine.promise().GetAwaiter()](auto)
-			{
-				if (IsCanceled() || awaiter->_Invoke_cancel_requested())
-				{
-					awaiter->Cancel();
-					coroutine.destroy();
-				}
-				else
-				{
-					coroutine.resume();
-				}
-			});
-		}
-
-	protected:
-		virtual bool _Cancel_requested() = 0;
-
-	private:
-		inline bool _Invoke_cancel_requested()
-		{
-			return this->_Cancel_requested();
-		}
-	};
-}
+	// IAwaiter misc interface.
+	{ val.AddCancellationToken(std::declval<std::stop_token>()) };
+	{ val.AddConditionVariable(std::declval<std::function<bool()>>()) };
+	{ cval.IsCancellationRequested() } -> std::convertible_to<bool>;
+};

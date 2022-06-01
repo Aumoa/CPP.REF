@@ -3,27 +3,25 @@
 #include "Misc/StringBuilder.h"
 #include "Exceptions/ArgumentException.h"
 
-using namespace ::libty;
-
-StringBuilder::StringBuilder()
+StringBuilder::StringBuilder() noexcept
 	: _length(0)
 {
 }
 
-void StringBuilder::Append(String str)
+void StringBuilder::Append(const String& str)
 {
 	_sources.emplace_back(str);
 	_length += (size_t)str;
 }
 
-void StringBuilder::AppendLine(String str)
+void StringBuilder::AppendLine(const String& str)
 {
 	_sources.emplace_back(str);
 	_sources.emplace_back(TEXT("\n"));
 	_length += (size_t)str + 1;
 }
 
-void StringBuilder::Insert(size_t idx, String str)
+void StringBuilder::Insert(size_t idx, const String& str)
 {
 	if (idx > _length)
 	{

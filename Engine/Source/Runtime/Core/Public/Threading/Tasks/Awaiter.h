@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IAwaiter.h"
+#include "AwaiterBase.h"
 #include "Exceptions/InvalidOperationException.h"
 #include "Exceptions/TaskCanceledException.h"
 #include "Exceptions/TaskAbortedException.h"
@@ -12,296 +12,275 @@
 #include "co_push.h"
 #include <coroutine>
 #include <queue>
+#include <stop_token>
+#include <memory>
 
-namespace libty::inline Core
+template<class T>
+class Awaiter : public AwaiterBase
 {
-	template<class T>
-	class Awaiter : public IAwaiter
+	template<class U>
+	friend class Awaiter;
+
+	Spinlock _lock;
+	SpinlockConditionVariable _future;
+
+	VoidableOptional<T> _promise;
+	ETaskStatus _status;
+	std::exception_ptr _exception;
+
+	std::vector<std::function<void(std::shared_ptr<AwaiterBase>)>> _thens;
+	std::vector<std::unique_ptr<std::stop_callback<std::function<void()>>>> _stop_tokens;
+	std::vector<std::function<bool()>> _validators;
+
+public:
+	Awaiter(std::stop_token sToken, ETaskStatus initialStatus = ETaskStatus::Running)
+		: _status(initialStatus)
 	{
-		Spinlock _lock;
-		VoidableOptional<T> _promise;
-		SpinlockConditionVariable _future;
-		ETaskStatus _status = ETaskStatus::Created;
-		std::queue<std::function<void(Task<void>)>> _thens;
-		std::exception_ptr _exception;
-		bool _freezed = false;
-
-		std::vector<std::stop_token> _stop_tokens;
-		std::vector<Validator> _validators;
-
-	public:
-		Awaiter()
+		if (sToken.stop_possible())
 		{
+			this->_Add_cancellation_token(nullptr, sToken);
+		}
+	}
+
+	Awaiter(const Awaiter&) = delete;
+
+	decltype(auto) await_resume()
+	{
+		return GetResult();
+	}
+
+	virtual ETaskStatus GetStatus() const noexcept override
+	{
+		return _status;
+	}
+
+	virtual void ContinueWith(std::function<void(std::shared_ptr<AwaiterBase>)> proc) override
+	{
+		auto lock = std::unique_lock(_lock);
+		if (IsCompleted())
+		{
+			lock.unlock();
+			proc(shared_from_this());
+		}
+		else
+		{
+			_thens.emplace_back(std::move(proc));
+		}
+	}
+
+	virtual std::exception_ptr GetException() override
+	{
+		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+		return _exception;
+	}
+
+	T GetResult()
+	{
+		Wait();
+		if (_exception)
+		{
+			std::rethrow_exception(_exception);
+		}
+		return _promise.GetValue();
+	}
+
+	virtual void Wait() override
+	{
+		if (IsCompleted())
+		{
+			return;
 		}
 
-		Awaiter(const Awaiter&) = delete;
+		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+		_future.Wait(lock, [this] { return IsCompleted(); });
+	}
 
-		virtual ETaskStatus GetStatus() const override
+	virtual void Cancel() override
+	{
+		auto lock = std::unique_lock(_lock);
+		if (!IsCompleted())
 		{
-			return _status;
+			_status = ETaskStatus::Canceled;
+			_exception = std::make_exception_ptr(TaskCanceledException());
+
+			auto thens = std::move(_thens);
+			_future.NotifyAll();
+			lock.unlock();
+			this->_Invoke_thens(std::move(thens));
 		}
+	}
 
-		virtual bool IsCompleted() const override
+	virtual bool SetException(std::exception_ptr ptr) override
+	{
+		auto lock = std::unique_lock(_lock);
+		if (this->IsCancellationRequested())
 		{
-			return _status == ETaskStatus::RanToCompletion
-				|| _status == ETaskStatus::Faulted
-				|| _status == ETaskStatus::Canceled;
-		}
-
-		virtual bool IsCompletedSuccessfully() const override
-		{
-			return _status == ETaskStatus::RanToCompletion;
-		}
-
-		virtual bool IsCanceled() const override
-		{
-			return _status == ETaskStatus::Canceled;
-		}
-
-		virtual bool IsFaulted() const override
-		{
-			return _status == ETaskStatus::Faulted;
-		}
-
-		virtual void WaitingToRun() override
-		{
-			auto lock = std::unique_lock(_lock);
-			_status = ETaskStatus::WaitingToRun;
-		}
-
-		virtual void Running() override
-		{
-			auto lock = std::unique_lock(_lock);
-			_status = ETaskStatus::Running;
-		}
-
-		virtual void Wait() override
-		{
-			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
-			_future.Wait(lock, [this] { return IsCompleted(); });
-		}
-
-		virtual void Then(std::function<void(Task<void>)> proc) override
-		{
-			auto lock = std::unique_lock(_lock);
-			if (IsCompleted())
-			{
-				lock.unlock();
-				proc(Task<void>(shared_from_this()));
-			}
-			else
-			{
-				_thens.emplace(std::move(proc));
-			}
-		}
-
-		virtual void Cancel() override
-		{
-			auto lock = std::unique_lock(_lock);
-			if (_freezed)
-			{
-				throw InvalidOperationException(TEXT("Task is freezed."));
-			}
-			if (!IsCompleted())
-			{
-				_status = ETaskStatus::Canceled;
-				_exception = std::make_exception_ptr(TaskCanceledException());
-
-				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
-				_future.NotifyAll();
-				lock.unlock();
-				InvokeThens(std::move(thens));
-			}
-			else
-			{
-				throw InvalidOperationException(TEXT("Task already completed."));
-			}
-		}
-
-		virtual void SetException(std::exception_ptr ptr) override
-		{
-			if (this->_Cancel_requested())
-			{
-				if (this->_status != ETaskStatus::Canceled)
-				{
-					this->Cancel();
-				}
-				return;
-			}
-
-			auto lock = std::unique_lock(_lock);
-			if (_freezed)
-			{
-				throw InvalidOperationException(TEXT("Task is freezed."));
-			}
-			if (!IsCompleted())
-			{
-				_status = ETaskStatus::Faulted;
-				_exception = ptr;
-
-				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
-				_future.NotifyAll();
-				lock.unlock();
-				InvokeThens(std::move(thens));
-			}
-			else
-			{
-				throw InvalidOperationException(TEXT("Task already completed."));
-			}
-		}
-
-		virtual std::exception_ptr GetException() override
-		{
-			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
-			return _exception;
-		}
-
-		void SetResult() requires
-			std::same_as<T, void>
-		{
-			SetResultImpl();
-		}
-
-		template<class U>
-		void SetResult(U&& result) requires
-			(!std::same_as<T, void>) &&
-			(!std::same_as<std::remove_const_t<std::remove_reference_t<U>>, void>)
-		{
-			SetResultImpl(std::forward<U>(result));
-		}
-
-		template<class U = T>
-		void GetResult() requires
-			std::same_as<U, void> &&
-			std::same_as<U, T>
-		{
-			Wait();
-			if (_exception)
-			{
-				throw TaskAbortedException(_exception);
-			}
-		}
-
-		template<class U = T>
-		const U& GetResult() requires
-			(!std::same_as<U, void>) &&
-			std::same_as<U, T>
-		{
-			Wait();
-			if (_exception)
-			{
-				throw TaskAbortedException(_exception);
-			}
-			else
-			{
-				return _promise.GetValue();
-			}
-		}
-
-		void Freeze()
-		{
-			auto lock = std::unique_lock(_lock);
-			_freezed = true;
-		}
-
-		decltype(auto) await_resume()
-		{
-			return GetResult();
-		}
-
-		void _Co_push_impl(co_push<Validator>&& push)
-		{
-			auto lock = std::unique_lock(_lock);
-			_validators.emplace_back(std::move(push)._Consume());
-			if (this->_Cancel_requested_impl())
-			{
-				lock.unlock();
-				this->Cancel();
-				throw TaskCanceledException();
-			}
-		}
-
-		void _Co_push_impl(co_push<std::stop_token>&& push)
-		{
-			auto lock = std::unique_lock(_lock);
-			_stop_tokens.emplace_back(std::move(push)._Consume());
-			if (this->_Cancel_requested_impl())
-			{
-				lock.unlock();
-				this->Cancel();
-				throw TaskCanceledException();
-			}
-		}
-
-	protected:
-		virtual bool _Cancel_requested() override
-		{
-			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
-			return this->_Cancel_requested_impl();
-		}
-
-	private:
-		inline bool _Cancel_requested_impl()
-		{
-			for (auto& s_token : _stop_tokens)
-			{
-				if (s_token.stop_requested())
-				{
-					return true;
-				}
-			}
-			for (auto& validator : _validators)
-			{
-				if (!validator.IsValid())
-				{
-					return true;
-				}
-			}
+			lock.unlock();
+			Cancel();
 			return false;
 		}
 
-	private:
-		template<class... U>
-		void SetResultImpl(U&&... result)
+		if (!IsCompleted())
 		{
-			if (this->_Cancel_requested())
-			{
-				this->Cancel();
-				return;
-			}
+			_status = ETaskStatus::Faulted;
+			_exception = ptr;
 
-			auto lock = std::unique_lock(_lock);
-			if (_freezed)
-			{
-				throw InvalidOperationException(TEXT("Task is freezed."));
-			}
-			if (!IsCompleted())
-			{
-				_status = ETaskStatus::RanToCompletion;
-				_promise.Emplace(std::forward<U>(result)...);
+			auto thens = std::move(_thens);
+			_future.NotifyAll();
+			lock.unlock();
+			this->_Invoke_thens(std::move(thens));
+			return true;
+		}
+		else
+		{
+			throw InvalidOperationException(TEXT("Task already completed."));
+		}
+	}
 
-				std::queue<std::function<void(Task<void>)>> thens = std::move(_thens);
-				_future.NotifyAll();
-				lock.unlock();
-				InvokeThens(std::move(thens));
-			}
-			else
+	virtual void AddCancellationToken(std::stop_token sToken) override
+	{
+		if (!sToken.stop_possible())
+		{
+			return;
+		}
+
+		auto lock = std::unique_lock(_lock);
+		if (this->IsCancellationRequested())
+		{
+			return;
+		}
+
+		if (IsCompleted())
+		{
+			return;
+		}
+
+		this->_Add_cancellation_token(std::move(lock), std::move(sToken));
+	}
+
+	virtual void AddConditionVariable(std::function<bool()> condition) override
+	{
+		if (condition == nullptr)
+		{
+			return;
+		}
+
+		if (!condition())
+		{
+			Cancel();
+			return;
+		}
+		
+		auto lock = std::unique_lock(_lock);
+		if (this->IsCancellationRequested())
+		{
+			return;
+		}
+
+		if (IsCompleted())
+		{
+			return;
+		}
+
+		_validators.emplace_back(condition);
+	}
+
+	virtual bool IsCancellationRequested() const noexcept override
+	{
+		if (IsCanceled())
+		{
+			return true;
+		}
+
+		for (auto& val : _validators)
+		{
+			if (!val())
 			{
-				throw InvalidOperationException(TEXT("Task already completed."));
+				return true;
 			}
 		}
 
-		void InvokeThens(std::queue<std::function<void(Task<void>)>> thens)
+		return false;
+	}
+
+	inline bool IsCompleted() const noexcept
+	{
+		ETaskStatus status = GetStatus();
+		return status == ETaskStatus::RanToCompletion
+			|| status == ETaskStatus::Faulted
+			|| status == ETaskStatus::Canceled;
+	}
+
+	inline bool IsCompletedSuccessfully() const noexcept
+	{
+		return _status == ETaskStatus::RanToCompletion;
+	}
+
+	inline bool IsCanceled() const noexcept
+	{
+		return _status == ETaskStatus::Canceled;
+	}
+
+	inline bool IsFaulted() const noexcept
+	{
+		return _status == ETaskStatus::Faulted;
+	}
+
+	template<class... U>
+	void SetResult(U&&... result) requires
+		(std::same_as<T, void> && sizeof...(U) == 0) ||
+		(!std::same_as<T, void> && std::constructible_from<T, U...>)
+	{
+		if (this->IsCancellationRequested())
 		{
-			for (; !thens.empty(); thens.pop())
-			{
-				Invoke(thens.front());
-			}
+			this->Cancel();
+			return;
 		}
 
-		void Invoke(std::function<void(Task<void>)>& body)
+		auto lock = std::unique_lock(_lock);
+		if (!IsCompleted())
 		{
-			body(Task<void>(shared_from_this()));
+			_status = ETaskStatus::RanToCompletion;
+			_promise.Emplace(std::forward<U>(result)...);
+
+			std::vector thens = std::move(_thens);
+			_future.NotifyAll();
+			lock.unlock();
+			this->_Invoke_thens(std::move(thens));
 		}
-	};
-}
+		else
+		{
+			throw InvalidOperationException(TEXT("Task already completed."));
+		}
+	}
+
+private:
+	template<class _Unilock>
+	inline void _Add_cancellation_token(_Unilock&& lock, std::stop_token sToken)
+	{
+		auto& ptr = _stop_tokens.emplace_back();
+
+		if constexpr (!std::same_as<_Unilock, void>)
+		{
+			lock.unlock();
+		}
+
+		ptr = std::make_unique<std::stop_callback<std::function<void()>>>(
+			sToken,
+			[this] { this->Cancel(); }
+		);
+	}
+
+	void _Invoke_thens(std::vector<std::function<void(std::shared_ptr<AwaiterBase>)>> thens)
+	{
+		for (auto& invoke : thens)
+		{
+			this->_Invoke(invoke);
+		}
+	}
+
+	void _Invoke(std::function<void(std::shared_ptr<AwaiterBase>)>& body)
+	{
+		body(shared_from_this());
+	}
+};

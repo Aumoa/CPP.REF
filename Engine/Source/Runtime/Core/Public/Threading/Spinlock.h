@@ -6,47 +6,44 @@
 #include <mutex>
 #include <utility>
 
-namespace libty::inline Core
+class CORE_API Spinlock
 {
-	class CORE_API Spinlock
+	struct Impl;
+	Spinlock(const Spinlock&) = delete;
+
+private:
+	Impl* _impl = nullptr;
+
+public:
+	Spinlock();
+	~Spinlock() noexcept;
+
+	void Lock() noexcept;
+	void Unlock() noexcept;
+	bool TryLock() noexcept;
+
+	void LockReadonly() noexcept;
+	void UnlockReadonly() noexcept;
+	bool TryLockReadonly() noexcept;
+
+	void* NativeHandle() const noexcept;
+
+public:
+	class Readonly_t
 	{
-		struct Impl;
-		Spinlock(const Spinlock&) = delete;
-
-	private:
-		Impl* _impl = nullptr;
-
 	public:
-		Spinlock();
-		~Spinlock() noexcept;
-
-		void Lock() noexcept;
-		void Unlock() noexcept;
-		bool TryLock() noexcept;
-
-		void LockReadonly() noexcept;
-		void UnlockReadonly() noexcept;
-		bool TryLockReadonly() noexcept;
-
-		void* NativeHandle() const noexcept;
-
-	public:
-		class Readonly_t
-		{
-		public:
-			Readonly_t() = default;
-		};
-
-		inline static Readonly_t Readonly;
+		Readonly_t() = default;
 	};
-}
+
+	inline static Readonly_t Readonly;
+};
 
 template<>
-class std::unique_lock<::libty::Core::Spinlock>
+class std::unique_lock<Spinlock>
 {
 	unique_lock(const unique_lock&) = delete;
 
-	::libty::Core::Spinlock* _lck;
+	Spinlock* _lck;
 	uint8 _readonly : 1;
 	uint8 _owns : 1;
 
@@ -58,7 +55,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck) noexcept
 		: _lck(&lck)
 		, _readonly(false)
 		, _owns(true)
@@ -66,28 +63,28 @@ public:
 		_lck->Lock();
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, std::adopt_lock_t) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, std::adopt_lock_t) noexcept
 		: _lck(&lck)
 		, _readonly(false)
 		, _owns(true)
 	{
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, std::try_to_lock_t) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, std::try_to_lock_t) noexcept
 		: _lck(&lck)
 		, _readonly(false)
 		, _owns(lck.TryLock())
 	{
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, std::defer_lock_t) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, std::defer_lock_t) noexcept
 		: _lck(&lck)
 		, _readonly(false)
 		, _owns(false)
 	{
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, ::libty::Core::Spinlock::Readonly_t isReadonly) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly) noexcept
 		: _lck(&lck)
 		, _readonly(true)
 		, _owns(true)
@@ -95,21 +92,21 @@ public:
 		_lck->LockReadonly();
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, ::libty::Core::Spinlock::Readonly_t isReadonly, std::adopt_lock_t) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly, std::adopt_lock_t) noexcept
 		: _lck(&lck)
 		, _readonly(true)
 		, _owns(true)
 	{
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, ::libty::Core::Spinlock::Readonly_t isReadonly, std::try_to_lock_t) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly, std::try_to_lock_t) noexcept
 		: _lck(&lck)
 		, _readonly(true)
 		, _owns(lck.TryLockReadonly())
 	{
 	}
 
-	[[nodiscard]] explicit unique_lock(::libty::Core::Spinlock& lck, ::libty::Core::Spinlock::Readonly_t isReadonly, std::defer_lock_t) noexcept
+	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly, std::defer_lock_t) noexcept
 		: _lck(&lck)
 		, _readonly(true)
 		, _owns(false)
@@ -186,9 +183,9 @@ public:
 		return *this;
 	}
 
-	::libty::Core::Spinlock* release() noexcept
+	Spinlock* release() noexcept
 	{
-		::libty::Core::Spinlock* lck = _lck;
+		Spinlock* lck = _lck;
 		_lck = nullptr;
 		_readonly = false;
 		_owns = false;
@@ -210,8 +207,23 @@ public:
 		return _owns;
 	}
 
-	[[nodiscard]] ::libty::Core::Spinlock* mutex() const noexcept
+	[[nodiscard]] Spinlock* mutex() const noexcept
 	{
 		return _lck;
 	}
 };
+
+namespace std
+{
+	template<class T>
+	std::unique_lock(T&, Spinlock::Readonly_t) -> std::unique_lock<Spinlock>;
+
+	template<class T>
+	std::unique_lock(T&, Spinlock::Readonly_t, std::adopt_lock_t) -> std::unique_lock<Spinlock>;
+
+	template<class T>
+	std::unique_lock(T&, Spinlock::Readonly_t, std::try_to_lock_t) -> std::unique_lock<Spinlock>;
+
+	template<class T>
+	std::unique_lock(T&, Spinlock::Readonly_t, std::defer_lock_t) -> std::unique_lock<Spinlock>;
+}

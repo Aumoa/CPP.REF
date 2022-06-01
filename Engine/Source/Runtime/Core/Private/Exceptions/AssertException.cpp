@@ -3,14 +3,12 @@
 #include "Exceptions/AssertException.h"
 #include "Misc/String.h"
 
-using namespace libty;
-
-AssertException::AssertException(String exp)
+AssertException::AssertException(const String& exp)
 	: Exception(String::Format(TEXT("Assertion failed: !({})"), exp))
 {
 }
 
-AssertException::AssertException(String exp, String msg)
+AssertException::AssertException(const String& exp, const String& msg)
 	: Exception(String::Format(TEXT("Assertion failed: !({})\n{}"), exp, msg))
 {
 }

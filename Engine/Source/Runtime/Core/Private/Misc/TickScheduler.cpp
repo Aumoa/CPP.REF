@@ -2,8 +2,6 @@
 
 #include "Misc/TickScheduler.h"
 
-using namespace libty;
-
 TickScheduler::TickScheduler()
 {
 }

@@ -430,7 +430,7 @@ public partial class VSGenerator : ISolutionGenerator
                         ClCompile.NewElement("IntrinsicFunctions", Config.bIntrinsicFunctions.ToString());
                         ClCompile.NewElement("SDLCheck", "true");
                         ClCompile.NewElement("ConformanceMode", "true");
-                        ClCompile.NewElement("LanguageStandard", "stdcpp20");
+                        ClCompile.NewElement("LanguageStandard", "stdcpplatest");
                         ClCompile.NewElement("MultiProcessorCompilation", "true");
                         ClCompile.NewElement("AdditionalIncludeDirectories", string.Join(";", project.IncludePaths));
 

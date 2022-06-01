@@ -7,46 +7,43 @@
 #include "Misc/String.h"
 #include <span>
 
-namespace libty::inline Core
+class Thread;
+
+class CORE_API Stacktrace
 {
-	class Thread;
+	struct _Stacktrace_impl;
+	std::shared_ptr<_Stacktrace_impl> _impl;
 
-	class CORE_API Stacktrace
+public:
+	Stacktrace() noexcept;
+	Stacktrace(const Stacktrace&) noexcept = default;
+	Stacktrace(Stacktrace&&) noexcept = default;
+
+	std::span<const Stackframe> GetStackframes() const noexcept;
+
+	[[nodiscard]] inline bool IsValid() const noexcept
 	{
-		struct _Stacktrace_impl;
-		std::shared_ptr<_Stacktrace_impl> _impl;
+		return (bool)_impl;
+	}
 
-	public:
-		Stacktrace() noexcept;
-		Stacktrace(const Stacktrace&) noexcept = default;
-		Stacktrace(Stacktrace&&) noexcept = default;
-
-		std::span<const Stackframe> GetStackframes() const noexcept;
-
-		[[nodiscard]] inline bool IsValid() const noexcept
+	inline String Trace() const noexcept
+	{
+		std::vector<String> frames;
+		for (auto& Callstack : GetStackframes())
 		{
-			return (bool)_impl;
+			frames.emplace_back(String::Format(TEXT("   at {}!{} in {}{}"),
+				Callstack.ModuleName,
+				Callstack.GetCleanedFunctionName(),
+				Callstack.GetCleanedFileName(),
+				!Callstack.FileName ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
+			));
 		}
 
-		inline String Trace() const noexcept
-		{
-			std::vector<String> frames;
-			for (auto& Callstack : GetStackframes())
-			{
-				frames.emplace_back(String::Format(TEXT("   at {}!{} in {}{}"),
-					Callstack.ModuleName,
-					Callstack.GetCleanedFunctionName(),
-					Callstack.GetCleanedFileName(),
-					!Callstack.FileName ? TEXT("") : String::Format(TEXT("({})"), Callstack.Line)
-				));
-			}
+		return String::Join(TEXT("\n"), frames);
+	}
 
-			return String::Join(TEXT("\n"), frames);
-		}
-
-	public:
-		static Stacktrace CaptureCurrent() noexcept;
-		static Stacktrace Capture(Thread* thread) noexcept;
-		static Stacktrace CaptureException(void* exception_pointer) noexcept;
-	};
-}
+public:
+	static Stacktrace CaptureCurrent() noexcept;
+	static Stacktrace Capture(Thread* thread) noexcept;
+	static Stacktrace CaptureException(void* exception_pointer) noexcept;
+};

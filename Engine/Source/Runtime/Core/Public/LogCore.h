@@ -2,15 +2,9 @@
 
 #pragma once
 
-namespace libty::inline Core
-{
-	class LogCategory;
-}
+#include "Logging/LogCategory.h"
 
-namespace libty::Generated::LogCategories
-{
-	extern CORE_API ::libty::Core::LogCategory LogCore;
-	extern CORE_API ::libty::Core::LogCategory LogAssert;
-	extern CORE_API ::libty::Core::LogCategory LogCasts;
-	extern CORE_API ::libty::Core::LogCategory LogTemp;
-}
+inline constexpr LogCategory LogCore = LogCategory(TEXT("LogCore"));
+inline constexpr LogCategory LogAssert = LogCategory(TEXT("LogAssert"));
+inline constexpr LogCategory LogCasts = LogCategory(TEXT("LogCasts"));
+inline constexpr LogCategory LogTemp = LogCategory(TEXT("LogTemp"));

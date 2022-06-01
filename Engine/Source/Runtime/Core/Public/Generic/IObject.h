@@ -12,27 +12,3 @@ concept IObject = requires
 {
 	{ std::declval<std::remove_pointer_t<T>>().ToString() } -> std::convertible_to<String>;
 };
-
-template<IObject T>
-T& to_ref(T& ref)
-{
-	return ref;
-}
-
-template<IObject T>
-const T& to_ref(const T& ref)
-{
-	return ref;
-}
-
-template<IObject T>
-T& to_ref(T* ref)
-{
-	return *ref;
-}
-
-template<IObject T>
-const T& to_ref(const T* ref)
-{
-	return *ref;
-}

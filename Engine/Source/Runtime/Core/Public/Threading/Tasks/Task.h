@@ -3,605 +3,446 @@
 #pragma once
 
 #include "Awaiter.h"
-#include "CoreConcepts.h"
+#include "promise_type.h"
 #include "Generic/IList.h"
+#include "Concepts/CompatibleVariadic.h"
+#include "Concepts/GetVariadic.h"
 #include <coroutine>
 #include <memory>
 #include <chrono>
 #include <array>
 
-namespace libty::inline Core
+template<class T = void>
+class Task
 {
-	class ThreadGroup;
-}
+	template<class U>
+	friend class Task;
+	friend class Core;
 
-namespace libty::inline Core
-{
-	template<class T>
-	class Task;
+public:
+	using promise_type = ::promise_type<T, Task<T>>;
+	using Awaiter = ::Awaiter<T>;
+	using ValueType = T;
 
-	namespace Impl
+private:
+	std::shared_ptr<AwaiterBase> _awaiter;
+
+public:
+	Task() = default;
+	Task(const Task&) = default;
+	Task(Task&&) = default;
+
+	Task(std::shared_ptr<Awaiter> awaiter)
+		: _awaiter(std::move(awaiter))
 	{
-		template<class T>
-		struct SourceAwaiter
-		{
-			using type = Awaiter<T>;
-		};
-
-		template<>
-		struct SourceAwaiter<void>
-		{
-			using type = IAwaiter;
-		};
-
-		template<class T>
-		class WrapSharedAwaiter
-		{
-			T _awaiter;
-
-		public:
-			WrapSharedAwaiter(T awaiter) : _awaiter(std::move(awaiter))
-			{
-			}
-
-			auto await_ready()
-			{
-				return _awaiter->await_ready();
-			}
-
-			template<class TCoroutine>
-			auto await_suspend(TCoroutine&& coroutine)
-			{
-				return _awaiter->await_suspend(std::forward<TCoroutine>(coroutine));
-			}
-
-			auto await_resume()
-			{
-				return _awaiter->await_resume();
-			}
-		};
-
-		template<class T>
-		class promise_type_base
-		{
-		protected:
-			std::shared_ptr<Awaiter<T>> _awaiter = std::make_shared<Awaiter<T>>();
-			promise_type_base() = default;
-
-		public:
-			std::shared_ptr<Awaiter<T>> GetAwaiter() const
-			{
-				return _awaiter;
-			}
-
-			Task<T> get_return_object()
-			{
-				return Task<T>(_awaiter);
-			}
-
-			void unhandled_exception()
-			{
-				_awaiter->SetException(std::current_exception());
-			}
-
-			auto initial_suspend() noexcept
-			{
-				return std::suspend_never();
-			}
-
-			auto final_suspend() noexcept
-			{
-				return std::suspend_never();
-			}
-
-			template<class AwaitableTask>
-			auto await_transform(AwaitableTask&& task) requires requires
-			{
-				{ task.GetAwaiter() };
-			}
-			{
-				auto awaiter = task.GetAwaiter();
-				return WrapSharedAwaiter(std::move(awaiter));
-			}
-
-			template<class T> requires
-				requires { std::declval<Awaiter<T>>()._Co_push_impl(std::declval<co_push<T>&&>()); }
-			auto yield_value(co_push<T>&& push)
-			{
-				_awaiter->_Co_push_impl(std::move(push));
-				return std::suspend_never();
-			}
-		};
-
-		template<class T>
-		class promise_type : public promise_type_base<T>
-		{
-		public:
-			promise_type() = default;
-
-			template<class U>
-			void return_value(U&& value) requires requires
-			{
-				{ std::declval<Awaiter<T>>().SetResult(std::declval<U>()) };
-			}
-			{
-				this->_awaiter->SetResult(std::forward<U>(value));
-			}
-		};
-
-		template<>
-		class promise_type<void> : public promise_type_base<void>
-		{
-		public:
-			promise_type() = default;
-
-			void return_void()
-			{
-				this->_awaiter->SetResult();
-			}
-		};
 	}
 
-	template<class T = void>
-	class Task
+	explicit Task(std::shared_ptr<AwaiterBase> awaiter)
+		: _awaiter(std::dynamic_pointer_cast<Awaiter>(awaiter))
 	{
-		template<class U>
-		friend class Task;
+	}
 
-	public:
-		using promise_type = libty::Impl::promise_type<T>;
-		using TGenericVoid = void;
+	explicit Task(const Task<>& task) requires !std::same_as<T, void>
+		: Task(task.GetAwaiter())
+	{
+	}
 
-	protected:
-		using MyAwaiter = Awaiter<T>;
-		using SourceAwaiter = typename libty::Impl::SourceAwaiter<T>::type;
-		using CoroutineHandle = std::coroutine_handle<promise_type>;
+	inline bool IsValid() const noexcept
+	{
+		return (bool)_awaiter;
+	}
 
-	private:
-		std::shared_ptr<SourceAwaiter> _awaiter;
+	inline std::shared_ptr<Awaiter> GetAwaiter() const noexcept
+	{
+		return std::static_pointer_cast<Awaiter>(_awaiter);
+	}
 
-	public:
-		Task() = default;
-		Task(const Task&) = default;
-		Task(Task&&) = default;
+	inline ETaskStatus GetStatus() const noexcept
+	{
+		return _awaiter->GetStatus();
+	}
 
-		Task(std::shared_ptr<SourceAwaiter> awaiter)
-			: _awaiter(std::move(awaiter))
-		{
-		}
-
-		template<class U>
-		Task(std::shared_ptr<Awaiter<U>> awaiter) requires std::derived_from<Awaiter<U>, SourceAwaiter>
-			: _awaiter(std::move(awaiter))
-		{
-		}
-
-		bool IsValid() const
-		{
-			return (bool)_awaiter;
-		}
-
-		std::shared_ptr<Awaiter<T>> GetAwaiter() const
-		{
-			if constexpr (std::convertible_to<SourceAwaiter, Awaiter<T>>)
-			{
-				return _awaiter;
-			}
-			else
-			{
-				return static_pointer_cast<Awaiter<T>>(_awaiter);
-			}
-		}
-
-		void Wait()
-		{
-			ThrowInvalid();
-			_awaiter->Wait();
-		}
-
-		T GetResult()
-		{
-			ThrowInvalid();
-			return ((Awaiter<T>*)_awaiter.get())->GetResult();
-		}
-
-		std::exception_ptr GetException()
-		{
-			return _awaiter->GetException();
-		}
-
-		ETaskStatus GetStatus() const
-		{
-			return _awaiter->GetStatus();
-		}
-
-		bool IsCompleted() const
-		{
-			return _awaiter->IsCompleted();
-		}
-
-		bool IsCompletedSuccessfully() const
-		{
-			return _awaiter->IsCompletedSuccessfully();
-		}
-
-		bool IsCanceled() const
-		{
-			return _awaiter->IsCanceled();
-		}
-
-		Task& operator =(const Task&) = default;
-		Task& operator =(Task&&) = default;
-
-		template<class U>
-		explicit operator Task<U>() const
-		{
-			return Task<U>(std::dynamic_pointer_cast<Awaiter<U>>(_awaiter));
-		}
-
-		template<class U>
-		operator Task<U>() const requires
-			std::same_as<U, void> &&
-			(!std::same_as<T, void>)
-		{
-			return Task<U>(_awaiter);
-		}
-
-		auto operator <=>(const Task&) const = default;
-		bool operator ==(const Task&) const = default;
-
-	private:
-		void ThrowInvalid()
-		{
-			if (!IsValid())
-			{
-				throw InvalidOperationException(TEXT("Task is null."));
-			}
-		}
-
-	public:
-		template<class TBody>
-		auto ContinueWith(TBody&& body) -> Task<FunctionReturn_t<TBody, Task>>
-		{
-			using U = FunctionReturn_t<TBody, Task>;
-
-			ThrowInvalid();
-			std::shared_ptr uAwaiter = std::make_shared<Awaiter<U>>();
-
-			_awaiter->Then([body = std::forward<TBody>(body), uAwaiter](Task<> result) mutable
-			{
-				try
-				{
-					if constexpr (std::same_as<U, void>)
-					{
-						if (result.IsCanceled())
-						{
-							uAwaiter->Cancel();
-						}
-						else
-						{
-							body((Task<T>)result);
-							uAwaiter->SetResult();
-						}
-					}
-					else
-					{
-						if (result.IsCanceled())
-						{
-							uAwaiter->Cancel();
-						}
-						else
-						{
-							auto r = body((Task<T>)result);
-							uAwaiter->SetResult(std::move(r));
-						}
-					}
-				}
-				catch (const std::exception&)
-				{
-					uAwaiter->SetException(std::current_exception());
-				}
-			});
-
-			return Task<U>(std::move(uAwaiter));
-		}
-
-	private:
-		static void RunImpl(std::function<void()> body);
-
-		static void DelayImpl(std::chrono::milliseconds delay, std::function<void()> body)
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
-			throw;
-		}
-
-	public:
-		template<class TBody>
-		static auto Run(TBody&& body, std::stop_token cancellationToken = {}) -> Task<FunctionReturn_t<TBody>>
-		{
-			using U = FunctionReturn_t<TBody>;
-			std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
-			awaiter->WaitingToRun();
-
-			RunImpl([awaiter, body = std::forward<TBody>(body), cancellationToken]() mutable
-			{
-				if (cancellationToken.stop_possible() && cancellationToken.stop_requested())
-				{
-					awaiter->Cancel();
-					return;
-				}
-
-				awaiter->Running();
-
-				try
-				{
-					if constexpr (std::same_as<U, void>)
-					{
-						body();
-						awaiter->SetResult();
-					}
-					else
-					{
-						U result = body();
-						awaiter->SetResult(result);
-					}
-				}
-				catch (...)
-				{
-					awaiter->SetException(std::current_exception());
-				}
-			});
-
-			return Task<U>(std::move(awaiter));
-		}
-
-		static auto Yield()
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
-			throw;
-		}
-
-		static Task<> Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken = {})
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
-			throw;
-		}
-
-		static Task<> CompletedTask()
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask instead.");
-			throw;
-		}
-
-		template<class U> requires (!std::same_as<U, void>)
-		static Task<> FromResult(U value)
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::FromResult<U> instead.");
-			throw;
-		}
-
-	public:
-		template<class TTasks>
-		static Task<> WhenAll(TTasks tasks, std::stop_token cancellationToken = {}) requires
-			IList<TTasks, EnumerableItem_t<TTasks>> &&
-			std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
-			class WhenAllAwaiter : public Awaiter<void>
-			{
-				size_t _desired;
-				std::atomic<size_t> _counter;
-				std::atomic<bool> _stored;
-
-			public:
-				WhenAllAwaiter(size_t desired)
-					: _desired(desired)
-				{
-				}
-
-				bool Join(Task<> result)
-				{
-					if (_stored.load())
-					{
-						return false;
-					}
-
-					if (result.GetStatus() == ETaskStatus::Faulted)
-					{
-						bool expected = false;
-						if (_stored.compare_exchange_strong(expected, true))
-						{
-							this->SetException(result.GetException());
-						}
-					}
-					else
-					{
-						size_t counter = ++_counter;
-						if (counter == _desired)
-						{
-							bool expected = false;
-							if (_stored.compare_exchange_strong(expected, true))
-							{
-								this->SetResult();
-								return true;
-							}
-						}
-					}
-
-					return false;
-				}
-
-				void Cancel()
-				{
-					bool expected = false;
-					if (_stored.compare_exchange_strong(expected, true))
-					{
-						this->Cancel();
-					}
-				}
-			};
-
-			std::shared_ptr awaiter = std::make_shared<WhenAllAwaiter>(std::size(tasks));
-			for (auto& task : tasks)
-			{
-				task.ContinueWith([awaiter, cancellationToken](Task<> result) mutable
-				{
-					bool completed = awaiter->Join(result);
-					if (!completed && cancellationToken.stop_possible() && cancellationToken.stop_requested())
-					{
-						awaiter->Cancel();
-					}
-				});
-			}
-
-			return Task<>(awaiter);
-		}
-
-		template<class... TTasks>
-		static Task<> WhenAll(TTasks... tasks) requires
-			(std::constructible_from<Task<>, TTasks> && ...)
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
-			std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
-			return WhenAll(tasksArray);
-		}
-
-		template<class TTasks>
-		static Task<Task<>> WhenAny(TTasks tasks) requires
-			IEnumerable<TTasks, EnumerableItem_t<TTasks>>&&
-			std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
-			class WhenAnyAwaiter : public Awaiter<Task<>>
-			{
-				std::atomic<bool> _alreadyBound;
-
-			public:
-				void Join(Task<> result)
-				{
-					bool expected = false;
-					if (_alreadyBound.compare_exchange_strong(expected, true))
-					{
-						SetResult(std::move(result));
-					}
-				}
-			};
-
-			std::shared_ptr awaiter = std::make_shared<WhenAnyAwaiter>();
-			for (auto& task : tasks)
-			{
-				task.ContinueWith([awaiter](Task<> result) mutable
-				{
-					awaiter->Join(std::move(result));
-				});
-			}
-
-			return Task<Task<>>(awaiter);
-		}
-
-		template<class... TTasks>
-		static Task<Task<>> WhenAny(TTasks... tasks) requires
-			(std::constructible_from<Task<>, TTasks> && ...)
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
-			std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
-			return WhenAny(tasksArray);
-		}
-	};
-
-	template<>
-	void CORE_API Task<>::RunImpl(std::function<void()> body);
-
-	template<>
-	void CORE_API Task<>::DelayImpl(std::chrono::milliseconds delay, std::function<void()> body);
-
-	template<>
+	inline std::exception_ptr GetException() const noexcept
+	{
+		return _awaiter->GetException();
+	}
+	
 	template<class TBody>
-	inline auto Task<>::Run(TBody&& body, std::stop_token cancellationToken) -> Task<FunctionReturn_t<TBody>>
+	auto ContinueWith(TBody&& body, std::stop_token sToken) const noexcept -> Task<std::invoke_result_t<TBody, Task>>
 	{
-		using U = FunctionReturn_t<TBody>;
-		std::shared_ptr awaiter = std::make_shared<Awaiter<U>>();
-		awaiter->WaitingToRun();
-
-		RunImpl([awaiter, body = std::forward<TBody>(body), cancellationToken]() mutable
+		using U = std::invoke_result_t<TBody, Task>;
+		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<U>>(sToken);
+		_awaiter->ContinueWith([body = std::forward<TBody>(body), uAwaiter](std::shared_ptr<AwaiterBase> result) mutable
 		{
-			if (cancellationToken.stop_possible() && cancellationToken.stop_requested())
+			try
 			{
-				awaiter->Cancel();
-				return;
+				if constexpr (std::same_as<U, void>)
+				{
+					body(Task(result));
+					uAwaiter->SetResult();
+				}
+				else
+				{
+					auto r = body(Task(result));
+					uAwaiter->SetResult(std::move(r));
+				}
 			}
+			catch (const std::exception&)
+			{
+				uAwaiter->SetException(std::current_exception());
+			}
+		});
 
-			awaiter->Running();
+		return Task<U>(std::move(uAwaiter));
+	}
 
+	inline void Wait() const noexcept
+	{
+		_awaiter->Wait();
+	}
+
+	inline T GetResult() const noexcept
+	{
+		return static_cast<Awaiter*>(_awaiter.get())->GetResult();
+	}
+
+	inline bool IsCompleted() const noexcept
+	{
+		return _awaiter->IsCompleted();
+	}
+
+	inline bool IsCompletedSuccessfully() const noexcept
+	{
+		return _awaiter->IsCompletedSuccessfully();
+	}
+
+	inline bool IsCanceled() const noexcept
+	{
+		return _awaiter->IsCanceled();
+	}
+
+	inline bool IsFaulted() const noexcept
+	{
+		return _awaiter->IsFaulted();
+	}
+
+	Task& operator =(const Task&) = default;
+	Task& operator =(Task&&) = default;
+
+	template<class U>
+	explicit operator Task<U>() const requires
+		std::same_as<T, void>
+	{
+		return Task<U>(_awaiter);
+	}
+
+	template<class U>
+	operator Task<U>() const requires
+		std::same_as<U, void> &&
+		(!std::same_as<T, void>)
+	{
+		return Task<U>(_awaiter);
+	}
+
+	auto operator <=>(const Task&) const = default;
+	bool operator ==(const Task&) const = default;
+
+private:
+	static void _Initialize();
+	static void _Shutdown();
+
+	static void _Run_thread(std::function<void()> body);
+	static void _Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);
+
+public:
+	template<class TBody>
+	static auto Run(TBody&& body, std::stop_token sToken = {}) -> Task<std::invoke_result_t<TBody>>
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
+
+		using U = std::invoke_result_t<TBody>;
+		std::shared_ptr uAwaiter = std::make_shared<Awaiter<U>>(sToken);
+		uAwaiter->WaitingToRun();
+
+		_Run_thread([uAwaiter, body = std::forward<TBody>(body)]() mutable
+		{
 			try
 			{
 				if constexpr (std::same_as<U, void>)
 				{
 					body();
-					awaiter->SetResult();
+					uAwaiter->SetResult();
 				}
 				else
 				{
 					U result = body();
-					awaiter->SetResult(result);
+					uAwaiter->SetResult(result);
 				}
 			}
 			catch (...)
 			{
-				awaiter->SetException(std::current_exception());
+				uAwaiter->SetException(std::current_exception());
 			}
 		});
 
-		return Task<U>(std::move(awaiter));
+		return Task<U>(std::move(uAwaiter));
 	}
 
-	template<>
-	inline auto Task<>::Yield()
+	static auto Yield()
 	{
-		return Run([] {}, {});
-	}
+		static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
 
-	template<>
-	inline Task<> Task<>::Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken)
-	{
-		std::shared_ptr awaiter = std::make_shared<Awaiter<void>>();
-		awaiter->WaitingToRun();
-
-		DelayImpl(delay, [awaiter, cancellationToken]() mutable
+		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<void>>();
+		_Run_thread([uAwaiter]
 		{
-			if (cancellationToken.stop_possible() && cancellationToken.stop_requested())
-			{
-				awaiter->Cancel();
-				return;
-			}
-
-			awaiter->Running();
-			awaiter->SetResult();
+			uAwaiter->SetResult();
 		});
-
-		return Task<>(std::move(awaiter));
+		
+		return Task<>(std::move(uAwaiter));
 	}
 
-	template<>
-	inline Task<> Task<>::CompletedTask()
+	static Task<> Delay(std::chrono::milliseconds delay, std::stop_token sToken = {})
 	{
+		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
+
+		std::shared_ptr uAwaiter = std::make_shared<Awaiter<void>>(sToken);
+		DelayImpl(delay, [uAwaiter]() mutable
+			{
+				uAwaiter->SetResult();
+			});
+
+		return Task<>(std::move(uAwaiter));
+	}
+
+	static Task<> CompletedTask()
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask instead.");
+
 		static thread_local std::shared_ptr awaiter = []
 		{
-			auto ptr = std::make_shared<Awaiter<void>>();
+			auto ptr = std::make_shared<::Awaiter<void>>();
 			ptr->SetResult();
-			ptr->Freeze();
 			return ptr;
 		}();
 
 		return Task<>(awaiter);
 	}
 
-	template<>
 	template<class U> requires (!std::same_as<U, void>)
-	inline Task<> Task<>::FromResult(U value)
+	static Task<> FromResult(U value)
 	{
-		auto ptr = std::make_shared<Awaiter<U>>();
+		static_assert(std::same_as<T, void>, "Use Task<>::FromResult<U> instead.");
+		 
+		auto ptr = std::make_shared<::Awaiter<U>>();
 		ptr->SetResult(std::move(value));
 		return ptr;
 	}
-}
+
+public:
+	template<IList<Task<>> TTasks>
+	static Task<> WhenAll(TTasks tasks, std::stop_token sToken = {}) requires
+		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+
+		class WhenAllAwaiter : public ::Awaiter<void>
+		{
+			std::vector<Task<>> _tasks;
+			std::atomic<size_t> _counter;
+			std::atomic<bool> _bool;
+
+		public:
+			WhenAllAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+				: ::Awaiter<void>(sToken)
+				, _tasks(std::move(tasks))
+			{
+				for (auto& task : tasks)
+				{
+					task.ContinueWith([self = std::static_pointer_cast<::Awaiter<void>>(this->shared_from_this())](Task<> t)
+					{
+						if (t.IsCanceled())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->Cancel();
+							}
+						}
+						else if (auto e = t.GetException())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->SetException(e);
+							}
+						}
+						else if (auto number = self->_counter; number == self->_tasks.size())
+						{
+							self->SetResult();
+						}
+					}, sToken);
+				}
+			}
+		};
+
+		return Task<>(Linq::ToVector(&tasks));
+	}
+	
+	template<class TTasks>
+	static auto WhenAll(TTasks tasks, std::stop_token sToken = {})
+		-> Task<std::vector<typename EnumerableItem_t<TTasks>::ValueType>> requires
+		IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
+		std::constructible_from<Task<>, EnumerableItem_t<TTasks>> &&
+		(!std::same_as<typename EnumerableItem_t<TTasks>::ValueType, void>)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+		using ValueType = typename EnumerableItem_t<ValueType>::ValueType;
+
+		class WhenAllAwaiter : public ::Awaiter<std::vector<ValueType>>
+		{
+			std::vector<Task<>> _tasks;
+			std::atomic<size_t> _counter;
+			std::atomic<bool> _bool;
+			std::unique_ptr<char[]> _values;
+
+		public:
+			WhenAllAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+				: ::Awaiter<void>(sToken)
+				, _tasks(std::move(tasks))
+			{
+				_values = std::make_unique<char[]>(sizeof(ValueType) * _tasks.size());
+				ValueType* values = reinterpret_cast<ValueType*>(_values.get());
+
+				for (size_t i = 0; i < _tasks.size(); ++i)
+				{
+					_tasks[i].ContinueWith([self = std::static_pointer_cast<::Awaiter<void>>(this->shared_from_this()), values, i](Task<> t)
+					{
+						if (t.IsCanceled())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->Cancel();
+							}
+						}
+						else if (auto e = t.GetException())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->SetException(e);
+							}
+						}
+						else if (auto number = self->_counter; number == self->_tasks.size())
+						{
+							new(values + i) ValueType(t.GetResult());
+							if (number == self->_tasks.size())
+							{
+								self->SetResult(std::vector(values, values + self->_tasks.size()));
+							}
+						}
+					}, sToken);
+				}
+			}
+		};
+
+		return Task<>(Linq::ToVector(&tasks));
+	}
+
+	template<class... TTasks>
+	static auto WhenAll(TTasks... tasks) requires
+		(std::constructible_from<Task<>, TTasks> && ...)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+
+		using BaseVariadic = GetVariadic_t<0, TTasks...>;
+		if constexpr (CompatibleVariadic<BaseVariadic, TTasks...>)
+		{
+			std::array<BaseVariadic, sizeof...(TTasks)> tasksArray{ BaseVariadic(std::move(tasks))... };
+			return WhenAll(tasksArray);
+		}
+		else
+		{
+			std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
+			return WhenAll(tasksArray);
+		}
+	}
+
+	template<class TTasks>
+	static Task<EnumerableItem_t<TTasks>> WhenAny(TTasks tasks) requires
+		IEnumerable<TTasks, EnumerableItem_t<TTasks>>&&
+		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+
+		using TTask = EnumerableItem_t<TTasks>;
+		class WhenAllAwaiter : public ::Awaiter<TTask>
+		{
+			std::vector<Task<>> _tasks;
+			std::atomic<bool> _bool;
+
+		public:
+			WhenAllAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+				: ::Awaiter<void>(sToken)
+				, _tasks(std::move(tasks))
+			{
+				for (auto& task : tasks)
+				{
+					task.ContinueWith([self = std::static_pointer_cast<::Awaiter<void>>(this->shared_from_this())](Task<> t)
+					{
+						if (t.IsCanceled())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->Cancel();
+							}
+						}
+						else if (auto e = t.GetException())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->SetException(e);
+							}
+						}
+						else if (auto number = self->_counter; number == self->_tasks.size())
+						{
+							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
+							{
+								self->SetResult(t);
+							}
+						}
+					}, sToken);
+				}
+			}
+		};
+
+		return Task<>(Linq::ToVector(&tasks));
+	}
+
+	template<class... TTasks>
+	static auto WhenAny(TTasks... tasks) requires
+		(std::constructible_from<Task<>, TTasks> && ...)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+
+		using BaseVariadic = GetVariadic_t<0, TTasks...>;
+		if constexpr (CompatibleVariadic<BaseVariadic, TTasks...>)
+		{
+			std::array<BaseVariadic, sizeof...(TTasks)> tasksArray{ BaseVariadic(std::move(tasks))... };
+			return WhenAny(tasksArray);
+		}
+		else
+		{
+			std::array<Task<>, sizeof...(TTasks)> tasksArray{ Task<>(std::move(tasks))... };
+			return WhenAny(tasksArray);
+		}
+	}
+};
+
+template<>
+void CORE_API Task<>::_Initialize();
+
+template<>
+void CORE_API Task<>::_Shutdown();
+
+template<>
+void CORE_API Task<>::_Run_thread(std::function<void()> body);
+
+template<>
+void CORE_API Task<>::_Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);

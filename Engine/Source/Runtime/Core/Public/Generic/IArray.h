@@ -5,11 +5,11 @@
 #include "IEnumerable.h"
 
 template<class T, class U>
-concept IArray = IEnumerable<T, U> && requires
+concept IArray = IEnumerable<T, U> && requires (const T& val)
 {
-	{ std::declval<T>()[std::declval<size_t>()] } -> std::convertible_to<U>;
-	{ std::size(std::declval<T>()) } -> std::convertible_to<size_t>;
-	{ std::declval<T>().begin() < std::declval<T>().end() } -> std::convertible_to<bool>;
-	{ std::declval<T>().begin() + std::declval<size_t>() };
-	{ std::declval<T>().end() - std::declval<T>().begin() } -> std::convertible_to<size_t>;
+	{ val[std::declval<size_t>()] } -> std::convertible_to<U>;
+	{ std::size(val) };
+	{ std::begin(val) < std::end(val) } -> std::convertible_to<bool>;
+	{ std::begin(val) + std::declval<size_t>() };
+	{ std::end(val) - std::begin(val) };
 };
