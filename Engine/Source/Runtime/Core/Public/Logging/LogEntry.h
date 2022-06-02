@@ -4,12 +4,14 @@
 
 #include "LogLevel.h"
 #include "Misc/String.h"
+#include "Threading/Thread.h"
 
 class LogCategory;
 
 struct LogEntry
 {
 	const LogCategory* Category;
+	Thread LogThread;
 	ELogLevel Level;
 	String Message;
 };

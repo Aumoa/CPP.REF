@@ -4,7 +4,9 @@
 
 #include "FileSystemReference.h"
 
-class DirectoryReference : public FileSystemReference
+class FileReference;
+
+class CORE_API DirectoryReference : public FileSystemReference
 {
 public:
 	inline constexpr DirectoryReference() noexcept
@@ -26,22 +28,6 @@ public:
 	{
 	}
 
-	inline bool CreateIfNotExists(bool bRecursive = false) const noexcept
-	{
-		if (!IsExists())
-		{
-			if (bRecursive)
-			{
-				std::error_code ec;
-				return std::filesystem::create_directories(this->_Get_path(), ec);
-			}
-			else
-			{
-				std::error_code ec;
-				return std::filesystem::create_directory(this->_Get_path(), ec);
-			}
-		}
-
-		return true;
-	}
+	bool CreateIfNotExists(bool bRecursive = false) const noexcept;
+	std::vector<FileReference> GetAllFiles(bool recursive = false) const noexcept;
 };

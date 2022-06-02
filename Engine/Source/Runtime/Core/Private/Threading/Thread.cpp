@@ -76,6 +76,16 @@ Thread::Thread() noexcept
 {
 }
 
+Thread::Thread(const Thread& rhs) noexcept
+	: _impl(rhs._impl)
+{
+}
+
+Thread::Thread(Thread&& rhs) noexcept
+	: _impl(std::move(rhs._impl))
+{
+}
+
 Thread::~Thread() noexcept
 {
 }
@@ -127,6 +137,18 @@ bool Thread::IsManaged() const noexcept
 void* Thread::GetNativeHandle() const noexcept
 {
 	return _impl->_Get_native_handle();
+}
+
+Thread& Thread::operator =(const Thread& rhs) noexcept
+{
+	_impl = rhs._impl;
+	return *this;
+}
+
+Thread& Thread::operator =(Thread&& rhs) noexcept
+{
+	_impl = std::move(rhs._impl);
+	return *this;
 }
 
 Thread Thread::CreateThread(const String& friendlyName, std::function<void()> entry)

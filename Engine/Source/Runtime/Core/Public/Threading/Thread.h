@@ -25,6 +25,8 @@ private:
 
 public:
 	Thread() noexcept;
+	Thread(const Thread& rhs) noexcept;
+	Thread(Thread&& rhs) noexcept;
 	~Thread() noexcept;
 
 	void SetFriendlyName(const String& friendlyName) noexcept;
@@ -39,8 +41,11 @@ public:
 	bool IsManaged() const noexcept;
 	void* GetNativeHandle() const noexcept;
 
-	static Thread CreateThread(const String& friendlyName, std::function<void()> entry);
+public:
+	Thread& operator =(const Thread& rhs) noexcept;
+	Thread& operator =(Thread&& rhs) noexcept;
 
 public:
+	static Thread CreateThread(const String& friendlyName, std::function<void()> entry);
 	static Thread GetCurrentThread();
 };

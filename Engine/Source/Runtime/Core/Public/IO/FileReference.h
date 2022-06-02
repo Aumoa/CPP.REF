@@ -38,4 +38,7 @@ public:
 
 	CORE_API String ReadAllText() const;
 	CORE_API bool WriteAllText(String Text, uint32 Encoding = 0) const;
+
+	inline constexpr FileReference& operator =(const FileReference&) = default;
+	inline constexpr FileReference& operator =(FileReference&&) = default;
 };

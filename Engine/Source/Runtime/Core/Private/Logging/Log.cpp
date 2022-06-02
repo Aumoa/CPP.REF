@@ -38,6 +38,7 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 	sEntries.emplace_back() =
 	{
 		.Category = &logCategory,
+		.LogThread = Thread::GetCurrentThread(),
 		.Level = logLevel,
 		.Message = message
 	};
@@ -47,6 +48,22 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 void Log::_Worker()
 {
 	std::vector<LogEntry> entries;
+	static auto levelToString = [](ELogLevel level) -> String
+	{
+		switch (level)
+		{
+		case ELogLevel::Debug:
+			return TEXT("dbug");
+		case ELogLevel::Info:
+			return TEXT("info");
+		case ELogLevel::Warning:
+			return TEXT("warn");
+		case ELogLevel::Error:
+			return TEXT("erro");
+		default:
+			return TEXT("ftal");
+		}
+	};
 
 	while (sRunning)
 	{
@@ -56,7 +73,8 @@ void Log::_Worker()
 
 		for (auto& entry : entries)
 		{
-			std::wcout << (std::wstring_view)entry.Message << std::endl;
+			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}"), levelToString(entry.Level), entry.LogThread.GetThreadId(), entry.Message);
+			std::wcout << (std::wstring_view)formatted << std::endl;
 		}
 
 		entries.clear();
