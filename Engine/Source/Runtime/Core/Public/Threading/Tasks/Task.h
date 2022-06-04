@@ -32,12 +32,19 @@ public:
 	Task(const Task&) = default;
 	Task(Task&&) = default;
 
-	Task(std::shared_ptr<Awaiter> awaiter)
+	template<class T>
+	explicit Task(std::shared_ptr<T> awaiter) requires
+		std::constructible_from<Task, std::shared_ptr<T>, int>
+		: Task(awaiter, 0)
+	{
+	}
+
+	Task(std::shared_ptr<Awaiter> awaiter, int)
 		: _awaiter(std::move(awaiter))
 	{
 	}
 
-	explicit Task(std::shared_ptr<AwaiterBase> awaiter)
+	explicit Task(std::shared_ptr<AwaiterBase> awaiter, short)
 		: _awaiter(std::dynamic_pointer_cast<Awaiter>(awaiter))
 	{
 	}
@@ -265,9 +272,22 @@ public:
 				: ::Awaiter<void>(sToken)
 				, _tasks(std::move(tasks))
 			{
+				if (_tasks.empty())
+				{
+					if (sToken.stop_requested())
+					{
+						this->Cancel();
+					}
+					else
+					{
+						this->SetResult();
+					}
+					return;
+				}
+
 				for (auto& task : tasks)
 				{
-					task.ContinueWith([self = std::static_pointer_cast<::Awaiter<void>>(this->shared_from_this())](Task<> t)
+					task.ContinueWith([self = std::static_pointer_cast<WhenAllAwaiter>(this->shared_from_this())](Task<> t)
 					{
 						if (t.IsCanceled())
 						{
@@ -283,7 +303,7 @@ public:
 								self->SetException(e);
 							}
 						}
-						else if (auto number = self->_counter; number == self->_tasks.size())
+						else if (size_t number = self->_counter; number == self->_tasks.size())
 						{
 							self->SetResult();
 						}
@@ -292,7 +312,7 @@ public:
 			}
 		};
 
-		return Task<>(Linq::ToVector(&tasks));
+		return Task<>(std::make_shared<WhenAllAwaiter>(Linq::ToVector(&tasks), sToken));
 	}
 	
 	template<class TTasks>
@@ -317,12 +337,25 @@ public:
 				: ::Awaiter<void>(sToken)
 				, _tasks(std::move(tasks))
 			{
+				if (_tasks.empty())
+				{
+					if (sToken.stop_requested())
+					{
+						this->Cancel();
+					}
+					else
+					{
+						this->SetResult();
+					}
+					return;
+				}
+
 				_values = std::make_unique<char[]>(sizeof(ValueType) * _tasks.size());
 				ValueType* values = reinterpret_cast<ValueType*>(_values.get());
 
 				for (size_t i = 0; i < _tasks.size(); ++i)
 				{
-					_tasks[i].ContinueWith([self = std::static_pointer_cast<::Awaiter<void>>(this->shared_from_this()), values, i](Task<> t)
+					_tasks[i].ContinueWith([self = std::static_pointer_cast<WhenAllAwaiter>(this->shared_from_this()), values, i](Task<> t)
 					{
 						if (t.IsCanceled())
 						{
@@ -338,7 +371,7 @@ public:
 								self->SetException(e);
 							}
 						}
-						else if (auto number = self->_counter; number == self->_tasks.size())
+						else if (size_t number = self->_counter; number == self->_tasks.size())
 						{
 							new(values + i) ValueType(t.GetResult());
 							if (number == self->_tasks.size())
@@ -351,7 +384,7 @@ public:
 			}
 		};
 
-		return Task<>(Linq::ToVector(&tasks));
+		return Task<>(std::make_shared<WhenAllAwaiter>(Linq::ToVector(&tasks), sToken));
 	}
 
 	template<class... TTasks>
@@ -374,26 +407,39 @@ public:
 	}
 
 	template<class TTasks>
-	static Task<EnumerableItem_t<TTasks>> WhenAny(TTasks tasks) requires
+	static Task<EnumerableItem_t<TTasks>> WhenAny(TTasks tasks, std::stop_token sToken = {}) requires
 		IEnumerable<TTasks, EnumerableItem_t<TTasks>>&&
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
 
 		using TTask = EnumerableItem_t<TTasks>;
-		class WhenAllAwaiter : public ::Awaiter<TTask>
+		class WhenAnyAwaiter : public ::Awaiter<TTask>
 		{
 			std::vector<Task<>> _tasks;
 			std::atomic<bool> _bool;
 
 		public:
-			WhenAllAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+			WhenAnyAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
 				: ::Awaiter<void>(sToken)
 				, _tasks(std::move(tasks))
 			{
+				if (_tasks.empty())
+				{
+					if (sToken.stop_requested())
+					{
+						this->Cancel();
+					}
+					else
+					{
+						this->SetResult();
+					}
+					return;
+				}
+
 				for (auto& task : tasks)
 				{
-					task.ContinueWith([self = std::static_pointer_cast<::Awaiter<void>>(this->shared_from_this())](Task<> t)
+					task.ContinueWith([self = std::static_pointer_cast<WhenAnyAwaiter>(this->shared_from_this())](Task<> t)
 					{
 						if (t.IsCanceled())
 						{
@@ -409,7 +455,7 @@ public:
 								self->SetException(e);
 							}
 						}
-						else if (auto number = self->_counter; number == self->_tasks.size())
+						else if (size_t number = self->_counter; number == self->_tasks.size())
 						{
 							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
 							{
@@ -421,7 +467,7 @@ public:
 			}
 		};
 
-		return Task<>(Linq::ToVector(&tasks));
+		return Task<>(std::make_shared<WhenAnyAwaiter>(Linq::ToVector(&tasks), sToken));
 	}
 
 	template<class... TTasks>
