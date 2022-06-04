@@ -34,6 +34,9 @@ ThreadGroup::~ThreadGroup() noexcept
 		}
 	}
 
+	_immQueue.cv.NotifyAll();
+	_delQueue.cv.NotifyAll();
+
 	lock1.unlock();
 	lock2.unlock();
 
@@ -78,9 +81,9 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 			lock.lock();
 		}
 
-		_immQueue.cv.Wait(lock, [this, mythread]
+		_immQueue.cv.Wait(lock, [&]
 		{
-			return _immQueue.queue.size();
+			return _immQueue.queue.size() || cancellationToken.stop_requested();
 		});
 	}
 }
@@ -94,10 +97,9 @@ void ThreadGroup::Timer(std::stop_token cancellationToken)
 	while (!cancellationToken.stop_requested())
 	{
 		std::unique_lock lock(_delQueue.lock);
-		size_t nonExpired = 0;
 		std::optional<clock::time_point> wait;
 
-		while (_delQueue.queue.size() > nonExpired)
+		while (_delQueue.queue.size() > 0)
 		{
 			auto now = clock::now();
 
@@ -105,38 +107,21 @@ void ThreadGroup::Timer(std::stop_token cancellationToken)
 			if (priority <= now)
 			{
 				Run(_delQueue.dequeue());
-
-				if (wait.has_value())
-				{
-					if (*wait > now)
-					{
-						wait = now;
-					}
-				}
-				else
-				{
-					wait = now;
-				}
 			}
 			else
 			{
+				wait = priority;
 				break;
 			}
 		}
 
-		size_t remain = _delQueue.queue.size();
-		auto pred = [this, &remain]()
-		{
-			return _delQueue.queue.size() > remain;
-		};
-
 		if (wait.has_value())
 		{
-			_delQueue.cv.WaitUntil(lock, *wait, pred);
+			_delQueue.cv.WaitUntil(lock, *wait);
 		}
 		else
 		{
-			_delQueue.cv.Wait(lock, pred);
+			_delQueue.cv.Wait(lock);
 		}
 	}
 }

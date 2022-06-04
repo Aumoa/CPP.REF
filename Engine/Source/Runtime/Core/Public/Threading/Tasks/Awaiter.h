@@ -33,7 +33,7 @@ class Awaiter : public AwaiterBase
 	std::vector<std::function<bool()>> _validators;
 
 public:
-	Awaiter(std::stop_token sToken, ETaskStatus initialStatus = ETaskStatus::Running)
+	Awaiter(std::stop_token sToken = {}, ETaskStatus initialStatus = ETaskStatus::Running)
 		: _status(initialStatus)
 	{
 		if (sToken.stop_possible())
@@ -137,52 +137,60 @@ public:
 		}
 	}
 
-	virtual void AddCancellationToken(std::stop_token sToken) override
+	virtual suspend_and_destroy_if AddCancellationToken(std::stop_token sToken) override
 	{
 		if (!sToken.stop_possible())
 		{
-			return;
+			return IsCancellationRequested();
+		}
+
+		if (sToken.stop_requested())
+		{
+			Cancel();
+			return true;
 		}
 
 		auto lock = std::unique_lock(_lock);
 		if (this->IsCancellationRequested())
 		{
-			return;
+			return true;
 		}
 
 		if (IsCompleted())
 		{
-			return;
+			return false;
 		}
 
 		this->_Add_cancellation_token(std::move(lock), std::move(sToken));
+		return IsCancellationRequested();
 	}
 
-	virtual void AddConditionVariable(std::function<bool()> condition) override
+	virtual suspend_and_destroy_if AddConditionVariable(std::function<bool()> condition) override
 	{
 		if (condition == nullptr)
 		{
-			return;
+			return IsCancellationRequested();
 		}
 
 		if (!condition())
 		{
 			Cancel();
-			return;
+			return true;
 		}
 		
 		auto lock = std::unique_lock(_lock);
 		if (this->IsCancellationRequested())
 		{
-			return;
+			return true;
 		}
 
 		if (IsCompleted())
 		{
-			return;
+			return false;
 		}
 
 		_validators.emplace_back(condition);
+		return IsCancellationRequested();
 	}
 
 	virtual bool IsCancellationRequested() const noexcept override
@@ -260,7 +268,7 @@ private:
 	{
 		auto& ptr = _stop_tokens.emplace_back();
 
-		if constexpr (!std::same_as<_Unilock, void>)
+		if constexpr (!std::same_as<_Unilock, std::nullptr_t>)
 		{
 			lock.unlock();
 		}

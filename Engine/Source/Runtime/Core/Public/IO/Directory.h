@@ -2,24 +2,11 @@
 
 #pragma once
 
-#include <filesystem>
-#include <stack>
+class String;
 
-namespace libty::inline Core
+class CORE_API Directory
 {
-	class Directory
-	{
-	public:
-		static inline bool TryCreateDirectory(const std::filesystem::path& path)
-		{
-			std::error_code ec;
-			return std::filesystem::create_directories(path, ec);
-		}
-
-		static inline bool Exists(std::filesystem::path path)
-		{
-			std::error_code ec;
-			return std::filesystem::is_directory(path, ec);
-		}
-	};
-}
+public:
+	static bool TryCreateDirectory(const String& path);
+	static bool Exists(const String& path);
+};

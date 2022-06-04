@@ -20,7 +20,7 @@ struct Stackframe
             return String::Format(TEXT("0x{:0>16X}"), AddressOf);
         }
 
-        auto p = std::filesystem::path((const std::wstring&)FileName);
+        auto p = std::filesystem::path((std::wstring_view)FileName);
         String cleaned = String(p.filename().wstring());
 
         for (size_t i = 0; i < allowedNestedLevel && p.has_parent_path(); ++i)

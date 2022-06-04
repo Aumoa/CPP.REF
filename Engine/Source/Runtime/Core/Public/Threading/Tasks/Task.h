@@ -68,7 +68,7 @@ public:
 	}
 	
 	template<class TBody>
-	auto ContinueWith(TBody&& body, std::stop_token sToken) const noexcept -> Task<std::invoke_result_t<TBody, Task>>
+	auto ContinueWith(TBody&& body, std::stop_token sToken = {}) const -> Task<std::invoke_result_t<TBody, Task>>
 	{
 		using U = std::invoke_result_t<TBody, Task>;
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<U>>(sToken);
@@ -87,7 +87,7 @@ public:
 					uAwaiter->SetResult(std::move(r));
 				}
 			}
-			catch (const std::exception&)
+			catch (...)
 			{
 				uAwaiter->SetException(std::current_exception());
 			}
@@ -101,29 +101,29 @@ public:
 		_awaiter->Wait();
 	}
 
-	inline T GetResult() const noexcept
+	inline T GetResult() const
 	{
 		return static_cast<Awaiter*>(_awaiter.get())->GetResult();
 	}
 
 	inline bool IsCompleted() const noexcept
 	{
-		return _awaiter->IsCompleted();
+		return static_cast<Awaiter*>(_awaiter.get())->IsCompleted();
 	}
 
 	inline bool IsCompletedSuccessfully() const noexcept
 	{
-		return _awaiter->IsCompletedSuccessfully();
+		return static_cast<Awaiter*>(_awaiter.get())->IsCompletedSuccessfully();
 	}
 
 	inline bool IsCanceled() const noexcept
 	{
-		return _awaiter->IsCanceled();
+		return static_cast<Awaiter*>(_awaiter.get())->IsCanceled();
 	}
 
 	inline bool IsFaulted() const noexcept
 	{
-		return _awaiter->IsFaulted();
+		return static_cast<Awaiter*>(_awaiter.get())->IsFaulted();
 	}
 
 	Task& operator =(const Task&) = default;
@@ -161,8 +161,7 @@ public:
 		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
 
 		using U = std::invoke_result_t<TBody>;
-		std::shared_ptr uAwaiter = std::make_shared<Awaiter<U>>(sToken);
-		uAwaiter->WaitingToRun();
+		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<U>>(sToken);
 
 		_Run_thread([uAwaiter, body = std::forward<TBody>(body)]() mutable
 		{
@@ -205,11 +204,11 @@ public:
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 
-		std::shared_ptr uAwaiter = std::make_shared<Awaiter<void>>(sToken);
-		DelayImpl(delay, [uAwaiter]() mutable
-			{
-				uAwaiter->SetResult();
-			});
+		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<void>>(sToken);
+		_Delay_thread(delay, [uAwaiter]() mutable
+		{
+			uAwaiter->SetResult();
+		});
 
 		return Task<>(std::move(uAwaiter));
 	}
@@ -236,6 +235,16 @@ public:
 		auto ptr = std::make_shared<::Awaiter<U>>();
 		ptr->SetResult(std::move(value));
 		return ptr;
+	}
+
+	static void CancelAfter(std::stop_source ss, std::chrono::milliseconds delay)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::CancelAfter instead.");
+
+		Delay(delay, ss.get_token()).ContinueWith([ss = std::move(ss)](auto) mutable
+		{
+			ss.request_stop();
+		});
 	}
 
 public:

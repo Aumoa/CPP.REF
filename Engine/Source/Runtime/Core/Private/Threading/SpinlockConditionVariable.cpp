@@ -66,5 +66,6 @@ bool SpinlockConditionVariable::WaitFor(std::unique_lock<Spinlock>& lck, std::ch
 
 bool SpinlockConditionVariable::WaitUntil(std::unique_lock<Spinlock>& lck, _Clock::time_point tp) noexcept
 {
-	return _impl->Wait(lck.mutex()->NativeHandle(), (uint32)std::chrono::duration_cast<std::chrono::milliseconds>(_Clock::now() - tp).count(), lck.readonly());
+	auto milli = (uint32)std::chrono::duration_cast<std::chrono::milliseconds>(tp - _Clock::now()).count();
+	return _impl->Wait(lck.mutex()->NativeHandle(), milli, lck.readonly());
 }

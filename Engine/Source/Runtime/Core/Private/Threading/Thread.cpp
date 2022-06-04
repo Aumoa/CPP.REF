@@ -19,7 +19,7 @@ struct Thread::_Impl
 	HANDLE _threadHandle = nullptr;
 	DWORD _threadId = 0;
 
-	TaskCompletionSource<> _joinSrc;
+	TaskCompletionSource<> _joinSrc = TaskCompletionSource<>::Create();
 	std::mutex _suspendLock;
 	std::condition_variable _suspendVar;
 
@@ -44,7 +44,7 @@ struct Thread::_Impl
 	String _Impl_get_thread_name() const noexcept
 	{
 		PWSTR pwsz = nullptr;
-		if (::GetThreadDescription(_threadHandle, &pwsz) == S_OK)
+		if (SUCCEEDED(::GetThreadDescription(_threadHandle, &pwsz)))
 		{
 			return String::FromLiteral(pwsz);
 		}
@@ -56,7 +56,7 @@ struct Thread::_Impl
 
 	bool _Impl_set_thread_name(const String& threadName) noexcept
 	{
-		return ::SetThreadDescription(_threadHandle, (const wchar_t*)threadName) == S_OK;
+		return SUCCEEDED(::SetThreadDescription(_threadHandle, (const wchar_t*)threadName));
 	}
 
 	void* _Get_native_handle() const noexcept

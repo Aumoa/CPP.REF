@@ -5,6 +5,8 @@
 #include "IAwaiter.h"
 #include "ITask.h"
 #include "Concepts/ContainsRef.h"
+#include "co_push.h"
+#include "co_cancel.h"
 #include <stop_token>
 #include <memory>
 #include <coroutine>
@@ -21,6 +23,49 @@ namespace libty::Details
 	struct AwaiterTrait<void>
 	{
 		using Type = void;
+	};
+
+	template<class T>
+	class WrapSharedAwaiter
+	{
+		std::shared_ptr<T> _awaiter;
+
+	public:
+		inline WrapSharedAwaiter(std::shared_ptr<T> awaiter) noexcept
+			: _awaiter(std::move(awaiter))
+		{
+		}
+
+		inline operator std::shared_ptr<T>() const & noexcept
+		{
+			return _awaiter;
+		}
+
+		inline operator std::shared_ptr<T>() const && noexcept
+		{
+			return std::move(_awaiter);
+		}
+
+		inline bool await_ready() const noexcept(noexcept(_awaiter->await_ready()))
+		{
+			return _awaiter->await_ready();
+		}
+
+		template<class TCoroutineHandle>
+		inline void await_suspend(TCoroutineHandle&& coroutine) const noexcept(noexcept(_awaiter->await_suspend(std::forward<TCoroutineHandle>(coroutine))))
+		{
+			_awaiter->await_suspend(std::forward<TCoroutineHandle>(coroutine));
+		}
+
+		inline decltype(auto) await_resume() const noexcept(noexcept(_awaiter->await_resume()))
+		{
+			return _awaiter->await_resume();
+		}
+
+		inline T* operator ->() const noexcept
+		{
+			return _awaiter.get();
+		}
 	};
 
 	template<class T, class TTask>
@@ -44,22 +89,22 @@ namespace libty::Details
 		}
 
 	public:
-		template<class TSelf>
-		auto GetAwaiter() const noexcept
+		Awaiter_t* GetAwaiter() const noexcept requires
+			!std::same_as<Awaiter_t, void>
 		{
-			return std::ref(_awaiter);
+			return _awaiter.get();
 		}
 
 		constexpr TTask get_return_object() noexcept requires !std::same_as<TTask, void>
 		{
-			return TTask(*this);
+			return TTask(_awaiter);
 		}
 
 		constexpr void get_return_object() noexcept requires std::same_as<TTask, void>
 		{
 		}
 
-		constexpr void unhandled_exception() noexcept
+		constexpr void unhandled_exception()
 		{
 			if constexpr (std::same_as<Awaiter_t, void>)
 			{
@@ -88,7 +133,30 @@ namespace libty::Details
 		constexpr decltype(auto) await_transform(TAwaitableTask&& task) requires
 			ITask<TAwaitableTask>
 		{
-			return task.GetAwaiter();
+			return WrapSharedAwaiter(task.GetAwaiter());
+		}
+
+		template<class TSelf, class TOp>
+		auto yield_value(this TSelf& self, co_push<TOp>&& push)
+		{
+			if constexpr (std::same_as<TOp, std::stop_token>)
+			{
+				return self.GetAwaiter()->AddCancellationToken(std::move(push)._Consume());
+			}
+			else if constexpr (std::same_as<TOp, std::function<bool()>>)
+			{
+				return self.GetAwaiter()->AddConditionVariable(std::move(push)._Consume());
+			}
+			else
+			{
+				return std::suspend_never();
+			}
+		}
+
+		template<class TSelf>
+		suspend_and_destroy_if yield_value(TSelf& self, co_cancel_t&&)
+		{
+			return true;
 		}
 	};
 }
@@ -135,13 +203,93 @@ public:
 
 class async_void_promise_type : public libty::Details::promise_type_base<void, void>
 {
+	bool _cancellationRequested = false;
+	std::vector<std::unique_ptr<std::stop_callback<std::function<void()>>>> _stop_tokens;
+	std::vector<std::function<bool()>> _validators;
+
 public:
-	async_void_promise_type()
+	inline async_void_promise_type() noexcept
 	{
 	}
 
-	void return_void()
+	inline void return_void() noexcept
 	{
+	}
+
+	inline async_void_promise_type* GetAwaiter() noexcept
+	{
+		return this;
+	}
+
+	inline void Cancel() noexcept
+	{
+		_cancellationRequested = true;
+	}
+
+	inline bool IsCancellationRequested() const
+	{
+		if (_cancellationRequested)
+		{
+			return true;
+		}
+
+		for (auto& val : _validators)
+		{
+			if (!val())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	suspend_and_destroy_if AddCancellationToken(std::stop_token sToken)
+	{
+		if (!sToken.stop_possible())
+		{
+			return IsCancellationRequested();
+		}
+
+		if (sToken.stop_requested())
+		{
+			Cancel();
+			return true;
+		}
+
+		if (this->IsCancellationRequested())
+		{
+			return true;
+		}
+
+		_stop_tokens.emplace_back(std::make_unique<std::stop_callback<std::function<void()>>>(
+			sToken,
+			[this] { this->Cancel(); }
+		));
+
+		return IsCancellationRequested();
+	}
+
+	suspend_and_destroy_if AddConditionVariable(std::function<bool()> condition)
+	{
+		if (condition == nullptr)
+		{
+			return IsCancellationRequested();
+		}
+
+		if (!condition())
+		{
+			Cancel();
+			return true;
+		}
+
+		if (this->IsCancellationRequested())
+		{
+			return true;
+		}
+
+		_validators.emplace_back(condition);
+		return IsCancellationRequested();
 	}
 };
 

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreConcepts.h"
 #include <stop_token>
 #include <functional>
 
@@ -35,4 +34,4 @@ co_push(TArgs&&...) -> co_push<std::stop_token>;
 
 template<class... TArgs> requires
 	std::constructible_from<std::function<bool()>, TArgs...>
-co_push(TArgs&&...) -> co_push<std::stop_token>;
+co_push(TArgs&&...) -> co_push<std::function<bool()>>;

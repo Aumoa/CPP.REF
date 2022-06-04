@@ -9,16 +9,22 @@ class CORE_API Type : virtual public Object
 	friend class Object;
 
 private:
-	Type();
+	String _name;
+	String _fullname;
+
+private:
+	Type() noexcept;
 
 	template<class T>
-	static Type* Generate()
+	static Type* Generate() noexcept
 	{
 		return nullptr;
 	}
 
 public:
 	virtual ~Type() noexcept override;
+
+	virtual String ToString() const noexcept override;
 
 	String GetName() const noexcept;
 };

@@ -8,10 +8,10 @@ std::optional<DirectoryReference> FileSystemReference::GetParent() const
 	auto p = this->_Get_path();
 	if (p.has_parent_path())
 	{
-		return std::nullopt;
+		return DirectoryReference(String(p.parent_path().wstring()));
 	}
 	else
 	{
-		return DirectoryReference(String(p.parent_path().wstring()));
+		return std::nullopt;
 	}
 }

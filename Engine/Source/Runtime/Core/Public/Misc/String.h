@@ -1100,7 +1100,7 @@ struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 	template<class U, class TFormatContext>
 	auto format(U&& obj, TFormatContext& ctx)
 	{
-		return std::formatter<String, TChar>(Misc::ToRef(std::forward<U>(obj)).ToString(), ctx);
+		return std::formatter<String, TChar>::format(Misc::ToRef(std::forward<U>(obj)).ToString(), ctx);
 	}
 };
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IAwaiter.h"
+#include "suspend_and_destroy_if.h"
 #include <memory>
 
 class AwaiterBase : public std::enable_shared_from_this<AwaiterBase>
@@ -25,9 +26,9 @@ public:
 	template<class TCoroutineHandle>
 	void await_suspend(TCoroutineHandle&& coroutine)
 	{
-		Then([this, coroutine, awaiter = coroutine.promise().GetAwaiter()](auto)
+		ContinueWith([this, coroutine, awaiter = coroutine.promise().GetAwaiter()](auto)
 		{
-			if (GetStatus() == ETaskStatus::Canceled || awaiter->IsCancellationRequested())
+			if (awaiter->IsCancellationRequested())
 			{
 				awaiter->Cancel();
 				coroutine.destroy();
@@ -47,8 +48,8 @@ public:
 	virtual void Cancel() = 0;
 	virtual bool SetException(std::exception_ptr ptr) = 0;
 
-	virtual void AddCancellationToken(std::stop_token sToken) = 0;
-	virtual void AddConditionVariable(std::function<bool()> condition) = 0;
+	virtual suspend_and_destroy_if AddCancellationToken(std::stop_token sToken) = 0;
+	virtual suspend_and_destroy_if AddConditionVariable(std::function<bool()> condition) = 0;
 	virtual bool IsCancellationRequested() const noexcept = 0;
 
 	inline bool IsCompleted() const noexcept

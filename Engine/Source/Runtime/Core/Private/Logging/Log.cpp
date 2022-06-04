@@ -27,6 +27,7 @@ void Log::_Shutdown()
 {
 	auto lock = std::unique_lock(sLock);
 	sRunning = false;
+	sCondVar.NotifyOne();
 	lock.unlock();
 
 	sWorker.JoinAsync().Wait();
@@ -65,7 +66,7 @@ void Log::_Worker()
 		}
 	};
 
-	while (sRunning)
+	while (sRunning || !sEntries.empty())
 	{
 		std::unique_lock lock(sLock);
 		std::swap(entries, sEntries);
@@ -73,7 +74,13 @@ void Log::_Worker()
 
 		for (auto& entry : entries)
 		{
-			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}"), levelToString(entry.Level), entry.LogThread.GetThreadId(), entry.Message);
+			String threadName = entry.LogThread.GetFriendlyName();
+			if (!threadName)
+			{
+				threadName = String::Format(TEXT("[Thread {}]"), entry.LogThread.GetThreadId());
+			}
+
+			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}"), levelToString(entry.Level), threadName, entry.Category->GetCategoryName(), entry.Message);
 			std::wcout << (std::wstring_view)formatted << std::endl;
 		}
 

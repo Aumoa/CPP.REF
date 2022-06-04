@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Misc/String.h"
-#include <memory>
 #include <reflexpr.h>
 
 class Type;

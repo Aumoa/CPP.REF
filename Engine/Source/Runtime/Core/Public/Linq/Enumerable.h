@@ -25,7 +25,7 @@ public:
 	}
 
 	template<class UEnumerable>
-	constexpr Enumerable(const UEnumerable* enumerable) noexcept requires
+	constexpr Enumerable(UEnumerable* enumerable) noexcept requires
 		IEnumerable<UEnumerable, EnumerableItem_t<UEnumerable>>
 		: Enumerable(enumerable->begin(), enumerable->end())
 	{
@@ -39,6 +39,11 @@ public:
 	constexpr decltype(auto) end() const noexcept
 	{
 		return _end;
+	}
+
+	constexpr bool Any() const noexcept
+	{
+		return _begin < _end;
 	}
 
 	template<class U>
@@ -57,9 +62,9 @@ public:
 	}
 
 	template<class UPred>
-	constexpr bool Contains(UPred pred) const noexcept(noexcept(pred(std::declval<ValueType>()))) requires
-		std::invocable<UPred, ValueType> &&
-		std::convertible_to<std::invoke_result_t<UPred, ValueType>, bool>
+	constexpr bool Contains(UPred pred) const noexcept(noexcept(pred(std::declval<ValueType&>()))) requires
+		std::invocable<UPred, ValueType&> &&
+		std::convertible_to<std::invoke_result_t<UPred, ValueType&>, bool>
 	{
 		for (auto it = _begin; it != _end; ++it)
 		{
@@ -72,10 +77,48 @@ public:
 		return false;
 	}
 
+	constexpr ValueType Min() const requires
+		std::three_way_comparable<ValueType>
+	{
+		auto it = _begin;
+		auto minimal = *it++;
+		for (; it != _end; ++it)
+		{
+			auto& value = *it;
+			if (minimal > value)
+			{
+				minimal = value;
+			}
+		}
+
+		return minimal;
+	}
+
+	template<class TCompare>
+	constexpr ValueType Min(TCompare compare) const requires
+		std::invocable<TCompare, ValueType&, ValueType&> &&
+		std::convertible_to<std::invoke_result_t<TCompare, ValueType&, ValueType&>, bool>
+	{
+		auto it = _begin;
+		auto minimal = *it++;
+		for (; it != _end; ++it)
+		{
+			if (compare(minimal, *it))
+			{
+				minimal = *it;
+			}
+		}
+
+		return minimal;
+	}
+
 private:
 	template<class TIterator, class TSelector>
 	class SelectIterator
 	{
+		template<class UIterator, class USelector>
+		friend class SelectIterator;
+
 		TIterator _it;
 		TSelector _selector;
 
@@ -102,13 +145,19 @@ private:
 		{
 			return _it != rhs._it;
 		}
+
+		template<class UIterator, class USelector>
+		constexpr bool operator <(const SelectIterator<UIterator, USelector>& rhs) const noexcept
+		{
+			return _it < rhs._it;
+		}
 	};
 
 public:
 	template<class TSelector>
-	constexpr auto Select(TSelector selector) const noexcept(noexcept(selector(std::declval<ValueType>()))) requires
-		std::invocable<TSelector, ValueType> &&
-		(!std::same_as<std::invoke_result_t<TSelector, ValueType>, void>)
+	constexpr auto Select(TSelector selector) const noexcept(noexcept(selector(std::declval<ValueType&>()))) requires
+		std::invocable<TSelector, ValueType&> &&
+		(!std::same_as<std::invoke_result_t<TSelector, ValueType&>, void>)
 	{
 		using UBeginIt = SelectIterator<TBeginIt, TSelector>;
 		using UEndIt = SelectIterator<TEndIt, TSelector>;
@@ -145,15 +194,93 @@ public:
 		}
 		return values;
 	}
+
+private:
+	template<class TIterator, class TIteratorEnd, class TSelector>
+	class WhereIterator
+	{
+		template<class UIterator, class UIteratorEnd, class USelector>
+		friend class WhereIterator;
+
+		TIterator _it;
+		TIteratorEnd _end;
+		TSelector _selector;
+
+	public:
+		constexpr WhereIterator(TIterator it, TIteratorEnd end, TSelector selector) noexcept
+			: _it(std::move(it))
+			, _end(std::move(end))
+			, _selector(std::move(selector))
+		{
+			while (_it < _end && !_selector(*_it)) {
+				++_it;
+			}
+		}
+
+		constexpr decltype(auto) operator *() const noexcept
+		{
+			return *_it;
+		}
+
+		constexpr WhereIterator& operator ++() noexcept
+		{
+			while (++_it < _end && !_selector(*_it));
+			return *this;
+		}
+
+		template<class UIterator, class UEndIt, class USelector>
+		constexpr bool operator !=(const WhereIterator<UIterator, UEndIt, USelector>& rhs) const noexcept
+		{
+			return _it != rhs._it;
+		}
+
+		template<class UIterator, class UEndIt, class USelector>
+		constexpr bool operator <(const WhereIterator<UIterator, UEndIt, USelector>& rhs) const noexcept
+		{
+			return _it < rhs._it;
+		}
+	};
+
+public:
+	template<class TSelector>
+	constexpr auto Where(TSelector selector) const noexcept(noexcept(selector(std::declval<ValueType&>()))) requires
+		std::invocable<TSelector, ValueType&> &&
+		std::convertible_to<std::invoke_result_t<TSelector, ValueType&>, bool>
+	{
+		using UBeginIt = WhereIterator<TBeginIt, TEndIt, TSelector>;
+		using UEndIt = WhereIterator<TEndIt, TEndIt, TSelector>;
+		return Enumerable<UBeginIt, UEndIt>(UBeginIt(_begin, _end, selector), UEndIt(_end, _end, selector));
+	}
+
 };
 
 template<class UEnumerable> requires IEnumerable<UEnumerable, EnumerableItem_t<UEnumerable>>
-Enumerable(const UEnumerable*) -> Enumerable<decltype(std::declval<const UEnumerable>().begin()), decltype(std::declval<const UEnumerable>().end())>;
+Enumerable(UEnumerable*) -> Enumerable<decltype(std::declval<UEnumerable>().begin()), decltype(std::declval<UEnumerable>().end())>;
 
 namespace Linq
 {
+	template<class TEnumerable>
+	constexpr auto Any(TEnumerable* enumerable) requires
+		requires
+		{
+			{ Enumerable(enumerable).Any() };
+		}
+	{
+		return Enumerable(enumerable).Any();
+	}
+
 	template<class TEnumerable, class... TArgs>
-	constexpr auto Contains(const TEnumerable* enumerable, TArgs&&... args) requires
+	constexpr auto Min(TEnumerable* enumerable, TArgs&&... args) requires
+		requires
+		{
+			{ Enumerable(enumerable).Min(std::declval<TArgs>()...) };
+		}
+	{
+		return Enumerable(enumerable).Min(std::forward<TArgs>(args)...);
+	}
+
+	template<class TEnumerable, class... TArgs>
+	constexpr auto Contains(TEnumerable* enumerable, TArgs&&... args) requires
 		requires
 		{
 			{ Enumerable(enumerable).Contains(std::declval<TArgs>()...) };
@@ -163,7 +290,7 @@ namespace Linq
 	}
 
 	template<class TEnumerable, class... TArgs>
-	constexpr auto Select(const TEnumerable* enumerable, TArgs&&... args) requires
+	constexpr auto Select(TEnumerable* enumerable, TArgs&&... args) requires
 		requires
 		{
 			{ Enumerable(enumerable).Select(std::declval<TArgs>()...) };
@@ -173,12 +300,22 @@ namespace Linq
 	}
 
 	template<class TEnumerable, class U = EnumerableItem_t<TEnumerable>, class... TArgs>
-	constexpr auto ToVector(const TEnumerable* enumerable, TArgs&&... args) requires
+	constexpr auto ToVector(TEnumerable* enumerable, TArgs&&... args) requires
 		requires
 		{
-			{ Enumerable(enumerable).ToVector<U>(std::declval<TArgs>()...) };
+			{ Enumerable(enumerable).template ToVector<U>(std::declval<TArgs>()...) };
 		}
 	{
-		return Enumerable(enumerable).ToVector<U>(std::forward<TArgs>(args)...);
+		return Enumerable(enumerable).template ToVector<U>(std::forward<TArgs>(args)...);
+	}
+
+	template<class TEnumerable, class... TArgs>
+	constexpr auto Where(TEnumerable* enumerable, TArgs&&... args) requires
+		requires
+		{
+			{ Enumerable(enumerable).Where(std::declval<TArgs>()...) };
+		}
+	{
+		return Enumerable(enumerable).Where(std::forward<TArgs>(args)...);
 	}
 }

@@ -2,10 +2,8 @@
 
 #pragma once
 
-class VirtualDtor
+class co_cancel_t
 {
-public:
-	virtual ~VirtualDtor() noexcept
-	{
-	}
 };
+
+inline constexpr co_cancel_t co_cancel;

@@ -24,7 +24,7 @@ public:
 	}
 
 	template<class UArray>
-	constexpr Array(const UArray* enumerable) noexcept requires
+	constexpr Array(UArray* enumerable) noexcept requires
 		IArray<UArray, EnumerableItem_t<UArray>>
 		: Array(enumerable->begin(), enumerable->end())
 	{
@@ -60,12 +60,12 @@ public:
 };
 
 template<class UArray> requires IArray<UArray, EnumerableItem_t<UArray>>
-Array(const UArray*) -> Array<decltype(std::declval<const UArray>().begin()), decltype(std::declval<const UArray>().end())>;
+Array(UArray*) -> Array<decltype(std::declval<UArray>().begin()), decltype(std::declval<UArray>().end())>;
 
 namespace Linq
 {
 	template<class TArray, class... TArgs>
-	constexpr auto IndexOf(const TArray* enumerable, TArgs&&... args) requires
+	constexpr auto IndexOf(TArray* enumerable, TArgs&&... args) requires
 		requires
 	{
 		{ Array(enumerable).IndexOf(std::declval<TArgs>()...) };
@@ -75,7 +75,7 @@ namespace Linq
 	}
 	
 	template<class TArray, class... TArgs>
-	constexpr auto IsValidIndex(const TArray* enumerable, TArgs&&... args) requires
+	constexpr auto IsValidIndex(TArray* enumerable, TArgs&&... args) requires
 		requires
 	{
 		{ Array(enumerable).IsValidIndex(std::declval<TArgs>()...) };

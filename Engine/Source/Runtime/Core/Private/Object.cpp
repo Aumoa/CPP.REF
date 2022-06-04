@@ -5,10 +5,6 @@
 
 Object::Object() noexcept
 {
-	using ref = reflexpr(Object);
-	using ctors = get_constructors_t<ref>;
-	using ctor = get_constructor_t<ctors, 0>;
-	invoke_constructor<ctor>(nullptr);
 }
 
 Object::~Object() noexcept
