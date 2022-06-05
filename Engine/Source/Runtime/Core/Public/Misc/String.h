@@ -18,7 +18,7 @@
 #include <format>
 #include <vector>
 
-class CORE_API String
+class CORE_API String : public ArrayExtensions<wchar_t>
 {
 	std::variant<const wchar_t*, std::shared_ptr<wchar_t[]>> _buf;
 	size_t _len;
@@ -455,7 +455,7 @@ public:
 		size_t max_len = _len - indexOf;
 		if (length > max_len || length == -1)
 		{
-			length = max_len;
+			length = max_len - indexOf;
 		}
 
 		if (length == 0)
@@ -475,7 +475,7 @@ public:
 
 		if (indexOf >= length - compare._len)
 		{
-			return false;
+			return -1;
 		}
 
 		const wchar_t* const buf1 = this->_Get_raw();
