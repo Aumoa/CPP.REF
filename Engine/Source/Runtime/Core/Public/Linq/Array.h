@@ -51,7 +51,7 @@ public:
 	constexpr bool IsValidIndex(const TIndex& index) const noexcept requires
 		requires
 		{
-			{ std::declval<Super::IteratorType>() + std::declval<TIndex>() };
+			{ std::declval<typename Super::IteratorType>() + std::declval<TIndex>() };
 		}
 	{
 		auto indexIt = this->begin() + index;
@@ -61,6 +61,31 @@ public:
 
 template<class UArray> requires IArray<UArray, EnumerableItem_t<UArray>>
 Array(UArray*) -> Array<decltype(std::declval<UArray>().begin()), decltype(std::declval<UArray>().end())>;
+
+template<class T>
+class ArrayExtensions
+{
+public:
+	template<class TSelf, class... TArgs>
+	constexpr auto IndexOf(this TSelf& self, TArgs&&... args) requires
+		requires
+	{
+		{ Array(&self).IndexOf(std::declval<TArgs>()...) };
+	}
+	{
+		return Array(&self).IndexOf(std::forward<TArgs>(args)...);
+	}
+	
+	template<class TSelf, class... TArgs>
+	constexpr auto IsValidIndex(this TSelf& self, TArgs&&... args) requires
+		requires
+	{
+		{ Array(&self).IsValidIndex(std::declval<TArgs>()...) };
+	}
+	{
+		return Array(&self).IsValidIndex(std::forward<TArgs>(args)...);
+	}
+};
 
 namespace Linq
 {
