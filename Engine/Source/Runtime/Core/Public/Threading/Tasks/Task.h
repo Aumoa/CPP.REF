@@ -268,26 +268,24 @@ public:
 			std::atomic<bool> _bool;
 
 		public:
-			WhenAllAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+			WhenAllAwaiter(std::stop_token sToken)
 				: ::Awaiter<void>(sToken)
-				, _tasks(std::move(tasks))
 			{
+			}
+
+			void Start(std::shared_ptr<WhenAllAwaiter> self, std::vector<Task<>> tasks)
+			{
+				_tasks = std::move(tasks);
+
 				if (_tasks.empty())
 				{
-					if (sToken.stop_requested())
-					{
-						this->Cancel();
-					}
-					else
-					{
-						this->SetResult();
-					}
+					this->SetResult();
 					return;
 				}
 
-				for (auto& task : tasks)
+				for (auto& task : _tasks)
 				{
-					task.ContinueWith([self = std::static_pointer_cast<WhenAllAwaiter>(this->shared_from_this())](Task<> t)
+					task.ContinueWith([self](Task<> t)
 					{
 						if (t.IsCanceled())
 						{
@@ -303,16 +301,18 @@ public:
 								self->SetException(e);
 							}
 						}
-						else if (size_t number = self->_counter; number == self->_tasks.size())
+						else if (size_t number = ++self->_counter; number == self->_tasks.size())
 						{
 							self->SetResult();
 						}
-					}, sToken);
+					});
 				}
 			}
 		};
 
-		return Task<>(std::make_shared<WhenAllAwaiter>(Linq::ToVector(&tasks), sToken));
+		auto ptr = std::make_shared<WhenAllAwaiter>(sToken);
+		ptr->Start(ptr, Linq::ToVector(&tasks));
+		return Task<>(std::move(ptr));
 	}
 	
 	template<class TTasks>
@@ -333,20 +333,18 @@ public:
 			std::unique_ptr<char[]> _values;
 
 		public:
-			WhenAllAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+			WhenAllAwaiter(std::stop_token sToken)
 				: ::Awaiter<void>(sToken)
-				, _tasks(std::move(tasks))
 			{
+			}
+
+			void Start(std::shared_ptr<WhenAllAwaiter> self, std::vector<Task<>> tasks)
+			{
+				_tasks = std::move(tasks);
+
 				if (_tasks.empty())
 				{
-					if (sToken.stop_requested())
-					{
-						this->Cancel();
-					}
-					else
-					{
-						this->SetResult();
-					}
+					this->SetResult();
 					return;
 				}
 
@@ -355,7 +353,7 @@ public:
 
 				for (size_t i = 0; i < _tasks.size(); ++i)
 				{
-					_tasks[i].ContinueWith([self = std::static_pointer_cast<WhenAllAwaiter>(this->shared_from_this()), values, i](Task<> t)
+					_tasks[i].ContinueWith([self, values, i](Task<> t)
 					{
 						if (t.IsCanceled())
 						{
@@ -371,7 +369,7 @@ public:
 								self->SetException(e);
 							}
 						}
-						else if (size_t number = self->_counter; number == self->_tasks.size())
+						else if (size_t number = ++self->_counter; number == self->_tasks.size())
 						{
 							new(values + i) ValueType(t.GetResult());
 							if (number == self->_tasks.size())
@@ -379,12 +377,14 @@ public:
 								self->SetResult(std::vector(values, values + self->_tasks.size()));
 							}
 						}
-					}, sToken);
+					});
 				}
 			}
 		};
 
-		return Task<>(std::make_shared<WhenAllAwaiter>(Linq::ToVector(&tasks), sToken));
+		auto ptr = std::make_shared<WhenAllAwaiter>(sToken);
+		ptr->Start(ptr, Linq::ToVector(&tasks));
+		return Task<>(std::move(ptr));
 	}
 
 	template<class... TTasks>
@@ -420,26 +420,24 @@ public:
 			std::atomic<bool> _bool;
 
 		public:
-			WhenAnyAwaiter(std::vector<Task<>> tasks, std::stop_token sToken)
+			WhenAnyAwaiter(std::stop_token sToken)
 				: ::Awaiter<void>(sToken)
-				, _tasks(std::move(tasks))
 			{
+			}
+
+			void Start(std::shared_ptr<WhenAnyAwaiter> self, std::vector<Task<>> tasks)
+			{
+				_tasks = std::move(tasks);
+
 				if (_tasks.empty())
 				{
-					if (sToken.stop_requested())
-					{
-						this->Cancel();
-					}
-					else
-					{
-						this->SetResult();
-					}
+					this->SetResult();
 					return;
 				}
 
-				for (auto& task : tasks)
+				for (auto& task : _tasks)
 				{
-					task.ContinueWith([self = std::static_pointer_cast<WhenAnyAwaiter>(this->shared_from_this())](Task<> t)
+					task.ContinueWith([self](Task<> t)
 					{
 						if (t.IsCanceled())
 						{
@@ -462,12 +460,14 @@ public:
 								self->SetResult(t);
 							}
 						}
-					}, sToken);
+					});
 				}
 			}
 		};
 
-		return Task<>(std::make_shared<WhenAnyAwaiter>(Linq::ToVector(&tasks), sToken));
+		auto ptr = std::make_shared<WhenAnyAwaiter>(sToken);
+		ptr->Start(ptr, Linq::ToVector(&tasks));
+		return Task<>(std::move(ptr));
 	}
 
 	template<class... TTasks>
