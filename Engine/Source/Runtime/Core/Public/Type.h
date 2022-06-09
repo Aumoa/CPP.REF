@@ -4,8 +4,10 @@
 
 #include "Object.h"
 
+SCLASS()
 class CORE_API Type : virtual public Object
 {
+	GENERATED_BODY()
 	friend class Object;
 
 private:
@@ -30,7 +32,7 @@ public:
 };
 
 template<class TSelf>
-Type* Object::GetType(this const TSelf&)
+Type* Object::GetType(this TSelf&&) noexcept
 {
 	return Type::Generate<TSelf>();
 }

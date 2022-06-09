@@ -1,79 +1,73 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "ConsoleApplication.h"
-#include "ConsoleModule.h"
-#include "InternalConsole.h"
-#include "ConsoleEx.h"
-#include <csignal>
+#include "Core.h"
+#include "Misc/CommandLineBuilder.h"
+#include "Logging/LogCategory.h"
+#include "Logging/Log.h"
 
 #if PLATFORM_WINDOWS
 
 #pragma push_macro("TEXT")
 #undef TEXT
-
-#define NOMINMAX
-
 #include <Windows.h>
-
 #pragma pop_macro("TEXT")
 
 #endif
 
-using namespace ::libty;
+constexpr LogCategory LogConsoleApplication(TEXT("LogConsoleApplication"));
 
-static SConsoleApplication* sApp;
-static std::stop_source sCancellationTokenSource;
-
-SConsoleApplication::SigintEvent SConsoleApplication::Sigint;
-
-int32 SConsoleApplication::GuardedMain(std::span<const String> Argv)
+ConsoleApplication::ConsoleApplication()
 {
-	signal(SIGINT, _Handle_sigint);
-
-	int32 exitCode = 0;
-	auto logger = std::make_unique<LogModule>(SE_APPLICATION);
-	ConsoleEx::EnableLogToConsole(true);
-	logger->StartAsync(sCancellationTokenSource.get_token()).Wait();
-
-	GC->Init();
-	auto commandLine = CommandLine(Argv);
-
-	String moduleName;
-	if (!commandLine.TryGetValue(TEXT("ConsoleDll"), 0, moduleName))
-	{
-		moduleName = SE_APPLICATION_TARGET;
-	}
-
-	auto module = std::make_unique<PlatformModule>(moduleName);
-	auto loader = module->GetFunctionPointer<SConsoleModule*()>(TEXT("LoadConsoleModule"));
-	if (loader == nullptr)
-	{
-		throw Exception(String::Format(TEXT("Cannot found 'LoadConsoleModule' function from '{0}' module. See 'DEFINE_CONSOLE_MODULE' macros in 'ConsoleModule.h', and declare your module in your code."), moduleName));
-	}
-
-	{
-		SharedPtr cModule = loader();
-
-		if (!cModule.IsValid())
-		{
-			throw Exception(TEXT("'LoadConsoleModule' function return nullptr.'"));
-		}
-
-		Thread::GetCurrentThread()->SetFriendlyName(TEXT("[Main Thread]"));
-		exitCode = cModule->Main(commandLine);
-	}
-
-	GC->Collect(true);
-	GC->Shutdown(true);
-
-	ConsoleEx::EnableLogToConsole(false);
-	logger->StopAsync(sCancellationTokenSource.get_token()).Wait();
-
-	return exitCode;
 }
 
-void SConsoleApplication::_Handle_sigint(int)
+ConsoleApplication::~ConsoleApplication() noexcept
 {
-	sCancellationTokenSource.request_stop();
-	Sigint.Broadcast();
+}
+
+#if PLATFORM_WINDOWS
+
+INT __stdcall HandleSEHException(LPEXCEPTION_POINTERS lpExceptionPtr)
+{
+	Log::Fatal(LogConsoleApplication, TEXT("Unhandled SEH exception caught.\n{}"), Stacktrace::CaptureException(lpExceptionPtr).Trace());
+	Log::FlushAll();
+	return SHIPPING ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH;
+}
+
+#endif
+
+int32 ConsoleApplication::GuardedMain(int32 argc, char** argv, ApplicationFactory_t factory, InvokeMain_t invokeMain)
+{
+	Core::Initialize();
+
+	int32 returnCode = 0;
+	ConsoleApplication* ptr = nullptr;
+
+#if PLATFORM_WINDOWS
+
+	__try
+	{
+		returnCode = InvokeMain(argc, argv, factory, invokeMain);
+	}
+	__except (HandleSEHException(GetExceptionInformation()))
+	{
+	}
+
+#endif
+
+	Core::Shutdown();
+	return returnCode;
+}
+
+int32 ConsoleApplication::InvokeMain(int32 argc, char** argv, ApplicationFactory_t factory, InvokeMain_t invokeMain)
+{
+	try
+	{
+		return invokeMain(factory(), CommandLineBuilder(argc, argv));
+	}
+	catch (const Exception& e)
+	{
+		Log::Fatal(LogConsoleApplication, TEXT("Unhandled exception caught. {}"), e);
+		throw;
+	}
 }

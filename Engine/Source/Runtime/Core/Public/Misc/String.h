@@ -25,7 +25,7 @@ class CORE_API String : public ArrayExtensions<wchar_t>
 
 private:
 	static inline constexpr const wchar_t _Null_char = 0;
-	static inline constexpr const std::array<wchar_t, 3> _Whitespace_chars = { L' ', L'\t', L'\n' };
+	static inline constexpr const std::array _Whitespace_chars = { L' ', L'\t', L'\r', L'\n', L'\b' };
 
 private:
 	inline constexpr String(decltype(_buf) buf, size_t len)
@@ -207,6 +207,14 @@ public:
 		rhs._len = 0;
 	}
 
+	template<class T>
+	explicit inline constexpr String(const T& ch) noexcept requires
+		std::same_as<T, char> ||
+		std::same_as<T, wchar_t>
+		: String(&ch, 1)
+	{
+	}
+
 	explicit inline String(std::string_view s)
 		: String(_As_unicode(s, 0))
 	{
@@ -366,9 +374,19 @@ public:
 		return this->_Compare_to(rhs._Get_raw(), rhs._len, comparison) == 0;
 	}
 
-	[[nodiscard]] inline constexpr String ToString() const
+	[[nodiscard]] inline constexpr String ToString() const noexcept
 	{
 		return *this;
+	}
+
+	[[nodiscard]] inline constexpr size_t length() const noexcept
+	{
+		return (size_t)*this;
+	}
+
+	[[nodiscard]] inline constexpr const wchar_t* c_str() const noexcept
+	{
+		return (const wchar_t*)*this;
 	}
 
 	[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& rhs, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept

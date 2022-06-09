@@ -2,21 +2,60 @@
 
 #pragma once
 
-namespace libty::inline Console
+#include "Object.h"
+#include "Threading/Tasks/Task.h"
+#include <functional>
+
+class CommandLineBuilder;
+
+class CONSOLE_API ConsoleApplication : virtual public Object
 {
-	class CONSOLE_API SConsoleApplication : implements(SObject)
+	using ApplicationFactory_t = ConsoleApplication*(*)();
+	using InvokeMain_t = int32(*)(ConsoleApplication*, const CommandLineBuilder&);
+
+public:
+	ConsoleApplication();
+	virtual ~ConsoleApplication() noexcept override;
+
+	template<class TApplication>
+	static inline int32 GuardedMain(int32 argc, char** argv)
 	{
-		GENERATED_BODY(SConsoleApplication);
-		SConsoleApplication() = delete;
+		static_assert(std::same_as<TApplication, void>, "TApplication does not have any supported Run method.");
+	}
 
-	public:
-		static int32 GuardedMain(std::span<const String> Argv);
+	template<class TApplication>
+	static inline int32 GuardedMain(int32 argc, char** argv) requires
+		requires
+		{
+			{ std::declval<TApplication>().Run() } -> std::convertible_to<int32>;
+		}
+	{
+		static auto _InstanceFactory = +[]() -> ConsoleApplication* { return new TApplication(); };
+		static auto _InvokeMain = +[](ConsoleApplication* app, const CommandLineBuilder&)
+		{
+			return static_cast<TApplication*>(app)->Run();
+		};
 
-	public:
-		DECLARE_MULTICAST_EVENT(SigintEvent);
-		static SigintEvent Sigint;
+		return GuardedMain(argc, argv, _InstanceFactory, _InvokeMain);
+	}
 
-	private:
-		static void _Handle_sigint(int);
-	};
-}
+	template<class TApplication>
+	static inline int32 GuardedMain(int32 argc, char** argv) requires
+		requires
+	{
+		{ std::declval<TApplication>().Run() } -> std::convertible_to<Task<int32>>;
+	}
+	{
+		static auto _InstanceFactory = +[]() -> ConsoleApplication* { return new TApplication(); };
+		static auto _InvokeMain = +[](ConsoleApplication* app, const CommandLineBuilder&)
+		{
+			return static_cast<TApplication*>(app)->Run().GetResult();
+		};
+
+		return GuardedMain(argc, argv, _InstanceFactory, _InvokeMain);
+	}
+
+private:
+	static int32 GuardedMain(int32 argc, char** argv, ApplicationFactory_t factory, InvokeMain_t invokeMain);
+	static int32 InvokeMain(int32 argc, char** argv, ApplicationFactory_t factory, InvokeMain_t invokeMain);
+};

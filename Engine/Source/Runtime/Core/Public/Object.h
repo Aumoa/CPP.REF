@@ -3,17 +3,21 @@
 #pragma once
 
 #include "Misc/String.h"
-#include <reflexpr.h>
+#include "Reflection/ObjectMacros.h"
 
 class Type;
 
+SCLASS()
 class CORE_API Object
 {
+	GENERATED_BODY()
+
 public:
 	Object() noexcept;
 	virtual ~Object() noexcept;
 
 	template<class TSelf>
-	Type* GetType(this const TSelf&);  // in Type.h
+	Type* GetType(this TSelf&&) noexcept;
+
 	virtual String ToString() const noexcept;
 };

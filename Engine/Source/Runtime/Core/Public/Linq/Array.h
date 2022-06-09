@@ -63,7 +63,7 @@ template<class UArray> requires IArray<UArray, EnumerableItem_t<UArray>>
 Array(UArray*) -> Array<decltype(std::declval<UArray>().begin()), decltype(std::declval<UArray>().end())>;
 
 template<class T>
-class ArrayExtensions
+class ArrayExtensions : public EnumerableExtensions<T>
 {
 public:
 	template<class TSelf, class... TArgs>

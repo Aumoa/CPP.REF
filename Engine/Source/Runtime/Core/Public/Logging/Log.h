@@ -18,6 +18,7 @@ private:
 
 public:
 	static void Print(const LogCategory& logCategory, ELogLevel logLevel, const String& message);
+	static void FlushAll();
 
 public:
 	template<class... TFormatArgs>

@@ -7,6 +7,7 @@
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include <iostream>
+#include <future>
 
 namespace
 {
@@ -15,6 +16,7 @@ namespace
 	static Spinlock sLock;
 	static SpinlockConditionVariable sCondVar;
 	static std::vector<LogEntry> sEntries;
+	static std::vector<std::function<void()>> sActions;
 }
 
 void Log::_Initialize()
@@ -46,9 +48,27 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 	sCondVar.NotifyOne();
 }
 
+void Log::FlushAll()
+{
+	std::promise<void> promise;
+	std::future<void> future = promise.get_future();
+
+	std::unique_lock lock(sLock);
+	sActions.emplace_back([&]()
+	{
+		promise.set_value();
+	});
+	sCondVar.NotifyOne();
+
+	lock.unlock();
+	future.wait();
+}
+
 void Log::_Worker()
 {
 	std::vector<LogEntry> entries;
+	std::vector<std::function<void()>> actions;
+
 	static auto levelToString = [](ELogLevel level) -> String
 	{
 		switch (level)
@@ -66,10 +86,11 @@ void Log::_Worker()
 		}
 	};
 
-	while (sRunning || !sEntries.empty())
+	while (sRunning || !sEntries.empty() || !sActions.empty())
 	{
 		std::unique_lock lock(sLock);
 		std::swap(entries, sEntries);
+		std::swap(actions, sActions);
 		lock.unlock();
 
 		for (auto& entry : entries)
@@ -84,11 +105,17 @@ void Log::_Worker()
 			std::wcout << (std::wstring_view)formatted << std::endl;
 		}
 
+		for (auto& action : actions)
+		{
+			action();
+		}
+
 		entries.clear();
+		actions.clear();
 		lock.lock();
 		sCondVar.Wait(lock, []()
 		{
-			return !sEntries.empty() || !sRunning;
+			return !sEntries.empty() || !sRunning || !sActions.empty();
 		});
 	}
 }
