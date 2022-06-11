@@ -470,10 +470,15 @@ public:
 
 	[[nodiscard]] constexpr size_t IndexOf(const String& compare, size_t indexOf, size_t length, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
+		if (indexOf > _len)
+		{
+			return -1;
+		}
+
 		size_t max_len = _len - indexOf;
 		if (length > max_len || length == -1)
 		{
-			length = max_len - indexOf;
+			length = max_len;
 		}
 
 		if (length == 0)
@@ -902,7 +907,7 @@ public:
 		return Transform((int(*)(int))std::toupper);
 	}
 
-	[[nodiscard]] String Replace(String oldValue, String newValue, EStringComparison comparison = EStringComparison::CurrentCulture) const
+	[[nodiscard]] String Replace(const String& oldValue, const String& newValue, EStringComparison comparison = EStringComparison::CurrentCulture) const
 	{
 		const wchar_t* const buf = this->_Get_raw();
 

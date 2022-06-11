@@ -18,6 +18,11 @@ public:
 	void Insert(size_t idx, const String& str);
 	void Clear() noexcept;
 
+	inline void AppendLine()
+	{
+		AppendLine(TEXT(""));
+	}
+
 	template<class... TArgs>
 	inline void AppendFormat(const String& format, TArgs&&... args)
 	{
