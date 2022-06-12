@@ -2,7 +2,9 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="String">
 		<DisplayString Condition="_buf._Which==0">{_buf._Head,na}</DisplayString>
-		<DisplayString Condition="_buf._Which==1">[{_buf._Tail._Head._Rep->_Uses} strong ref] {_buf._Tail._Head._Ptr,na}</DisplayString>
+		<DisplayString Condition="_buf._Which==1">{_buf._Tail._Head._Ptr,na}</DisplayString>
+		<StringView Condition="_buf._Which==0">_buf._Head,na</StringView>
+		<StringView Condition="_buf._Which==1">_buf._Tail._Head._Ptr,na</StringView>
 		<Expand>
 			<Item Condition="_buf._Which==0" Name="[Text]">_buf._Head,na</Item>
 			<Item Condition="_buf._Which==1" Name="[Text]">_buf._Tail._Head._Ptr,na</Item>
