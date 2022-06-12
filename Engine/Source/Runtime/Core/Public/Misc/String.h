@@ -508,7 +508,7 @@ public:
 
 		size_t compares = 0;
 		size_t i;
-		for (i = indexOf; i < length; ++i)
+		for (i = indexOf; i < length;)
 		{
 			wchar_t lc = _Safe_get(buf1, length, i, lowerCase);
 			wchar_t rc = _Safe_get(buf2, compare._len, compares, lowerCase);
@@ -524,12 +524,19 @@ public:
 			}
 			else
 			{
-				compares = 0;
 				if (i > last)
 				{
 					break;
 				}
+
+				if (compares > 0)
+				{
+					compares = 0;
+					continue;
+				}
 			}
+
+			++i;
 		}
 
 		if (compares == compare._len)
