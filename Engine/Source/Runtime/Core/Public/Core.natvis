@@ -3,5 +3,13 @@
 	<Type Name="String">
 		<DisplayString Condition="_buf._Which==0">{_buf._Head,na}</DisplayString>
 		<DisplayString Condition="_buf._Which==1">[{_buf._Tail._Head._Rep->_Uses} strong ref] {_buf._Tail._Head._Ptr,na}</DisplayString>
+		<Expand>
+			<Item Condition="_buf._Which==0" Name="[Text]">_buf._Head,na</Item>
+			<Item Condition="_buf._Which==1" Name="[Text]">_buf._Tail._Head._Ptr,na</Item>
+			<Item Condition="_buf._Which==1" Name="[Refs]">_buf._Tail._Head._Rep->_Uses</Item>
+		</Expand>
+	</Type>
+	<Type Name="FileSystemReference">
+		<DisplayString>{_path}</DisplayString>
 	</Type>
 </AutoVisualizer>

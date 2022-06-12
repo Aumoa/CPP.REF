@@ -23,6 +23,11 @@ public:
 		AppendLine(TEXT(""));
 	}
 
+	inline void AppendLineFormat()
+	{
+		AppendLine(TEXT(""));
+	}
+
 	template<class... TArgs>
 	inline void AppendFormat(const String& format, TArgs&&... args)
 	{
