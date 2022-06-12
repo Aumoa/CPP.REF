@@ -109,10 +109,14 @@ public class Project
         foreach (var depend in dependencyModules)
         {
             includePaths.AddRange(ProcessIncludePaths(depend, depend.Rule.PublicIncludePaths));
+            includePaths.Add(depend.IntermediateIncludePath);
             additionalMacros.AddRange(depend.Rule.PublicAdditionalMacros);
             disableWarnings.AddRange(depend.Rule.PublicDisableWarnings);
             additionalLibraries.AddRange(depend.Rule.PublicAdditionalLibraries);
         }
+
+        IntermediateIncludePath = SolutionDirectory.Intermediate.Move("Include").Move(Rule.ProjectName).FullPath;
+        includePaths.Add(IntermediateIncludePath);
 
         includePaths.AddRange(ProcessIncludePaths(this, Rule.PublicIncludePaths));
         includePaths.AddRange(ProcessIncludePaths(this, Rule.PrivateIncludePaths));
@@ -160,6 +164,11 @@ public class Project
     /// 이 프로젝트가 추가로 포함해야 하는 라이브러리 목록을 가져옵니다.
     /// </summary>
     public string[] AdditionalLibraries { get; private set; } = null!;
+
+    /// <summary>
+    /// 이 프로젝트의 임시 포함 파일 위치를 가져옵니다.
+    /// </summary>
+    public string IntermediateIncludePath { get; private set; } = null!;
 
     /// <summary>
     /// API 매크로 목록을 생성합니다.

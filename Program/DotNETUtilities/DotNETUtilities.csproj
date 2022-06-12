@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPublishable>False</IsPublishable>
-    <BaseOutputPath>$(SolutionDir)Build\$(Platform)\$(Configuration)\</BaseOutputPath>
+    <BaseOutputPath>$(SolutionDir)Build\$(Platform)\$(AssemblyName)\</BaseOutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
