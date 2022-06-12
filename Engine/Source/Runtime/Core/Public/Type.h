@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Type.generated.h"
 
 SCLASS()
 class CORE_API Type : virtual public Object
@@ -12,7 +13,6 @@ class CORE_API Type : virtual public Object
 
 private:
 	String _name;
-	String _fullname;
 
 private:
 	Type() noexcept;
@@ -20,7 +20,8 @@ private:
 	template<class T>
 	static Type* Generate() noexcept
 	{
-		return nullptr;
+		static Type sType;
+		return &sType;
 	}
 
 public:

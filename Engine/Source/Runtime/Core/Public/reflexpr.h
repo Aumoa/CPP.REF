@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Misc/String.h"
 #include "Concepts/Variadic.h"
 #include "Concepts/GetVariadic.h"
 #include <concepts>
@@ -15,6 +16,11 @@ namespace libty::reflect
 }
 
 #define reflexpr(x) libty::reflect::reflexpr_t<x>
+
+
+
+template<class T>
+inline constexpr String get_friendly_name_v = T::friendly_name;
 
 
 

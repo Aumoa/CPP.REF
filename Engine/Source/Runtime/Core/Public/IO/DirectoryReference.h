@@ -30,4 +30,5 @@ public:
 
 	bool CreateIfNotExists(bool bRecursive = false) const noexcept;
 	std::vector<FileReference> GetAllFiles(bool recursive = false) const noexcept;
+	FileReference GetFile(const String& filename) const noexcept;
 };

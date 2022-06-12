@@ -15,10 +15,17 @@ NativeReflector::NativeReflector()
 
 int32 NativeReflector::Run()
 {
-	Log::Info(LogNativeReflector, TEXT("Application start."));
+	BuildGraph graph1(TEXT("Core"), TEXT(R"(F:\CPP.REF\Engine\Intermediate\Include\Core)"));
+	graph1.AddProject(TEXT(R"(F:\CPP.REF\Engine\Source\Runtime\Core)"));
+	graph1.Compile().GetResult();
 
-	BuildGraph graph(TEXT(R"(F:\CPP.REF\Engine\Intermediate\ReflectionCode)"));
-	graph.AddProject(TEXT(R"(F:\CPP.REF\Engine\Source\Runtime\Core)"));
+	BuildGraph graph2(TEXT("Console"), TEXT(R"(F:\CPP.REF\Engine\Intermediate\Include\Console)"));
+	graph2.AddProject(TEXT(R"(F:\CPP.REF\Engine\Source\Runtime\Console)"));
+	graph2.Compile().GetResult();
+
+	BuildGraph graph3(TEXT("NativeReflector"), TEXT(R"(F:\CPP.REF\Engine\Intermediate\Include\NativeReflector)"));
+	graph3.AddProject(TEXT(R"(F:\CPP.REF\Engine\Source\NativeApps\NativeReflector)"));
+	graph3.Compile().GetResult();
 
 	return 0;
 }

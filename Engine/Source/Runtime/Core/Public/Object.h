@@ -2,8 +2,10 @@
 
 #pragma once
 
+#include "reflexpr.h"
 #include "Misc/String.h"
 #include "Reflection/ObjectMacros.h"
+#include "Object.generated.h"
 
 class Type;
 
@@ -18,6 +20,5 @@ public:
 
 	template<class TSelf>
 	Type* GetType(this TSelf&&) noexcept;
-
 	virtual String ToString() const noexcept;
 };

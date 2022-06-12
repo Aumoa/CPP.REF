@@ -12,7 +12,7 @@ Type::~Type() noexcept
 
 String Type::ToString() const noexcept
 {
-	return _fullname;
+	return _name;
 }
 
 String Type::GetName() const noexcept

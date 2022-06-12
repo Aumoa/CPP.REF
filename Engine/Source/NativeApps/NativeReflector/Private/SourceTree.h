@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Object.h"
+#include "CompiledSCLASS.h"
 #include "IO/DirectoryReference.h"
 #include "Threading/Tasks/Task.h"
 #include <memory>
@@ -11,20 +12,22 @@
 
 class SourceTree : virtual public Object
 {
+	String _projectName;
 	DirectoryReference _projectDir;
+	DirectoryReference _intermediateDir;
 
 	std::vector<std::shared_ptr<SourceTree>> _dependencies;
 	std::map<String, void*> _sourceTree;
 
 public:
-	SourceTree(const DirectoryReference& projectDir);
+	SourceTree(const String& projectName, const DirectoryReference& projectDir, const DirectoryReference& intermediateDir);
 
 	void AddDependencySourceTree(std::shared_ptr<SourceTree> sourceTree);
 	Task<> CompileAsync(std::stop_token sToken = {});
 
 private:
-	Task<> CompileWorker(FileReference fr, std::stop_token sToken);
+	void CompileWorker(const FileReference& fr, std::stop_token sToken);
 
 private:
-	void Interpreter_SCLASS(const String& sourceCode, size_t& indexOf, size_t& line);
+	std::unique_ptr<CompiledSCLASS> Interpreter_SCLASS(const String& sourceCode, size_t& indexOf, size_t& line);
 };

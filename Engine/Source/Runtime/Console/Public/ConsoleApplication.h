@@ -5,11 +5,16 @@
 #include "Object.h"
 #include "Threading/Tasks/Task.h"
 #include <functional>
+#include "ConsoleApplication.generated.h"
 
 class CommandLineBuilder;
 
+SCLASS()
 class CONSOLE_API ConsoleApplication : virtual public Object
 {
+	GENERATED_BODY()
+
+private:
 	using ApplicationFactory_t = ConsoleApplication*(*)();
 	using InvokeMain_t = int32(*)(ConsoleApplication*, const CommandLineBuilder&);
 

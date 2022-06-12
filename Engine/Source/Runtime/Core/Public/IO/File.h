@@ -7,33 +7,33 @@
 class File
 {
 public:
-	static inline bool Exists(const std::filesystem::path& path) noexcept
+	static inline bool Exists(const String& path) noexcept
 	{
 		std::error_code ec;
-		return std::filesystem::is_regular_file(path, ec);
+		return std::filesystem::is_regular_file((std::wstring)path, ec);
 	}
 
-	static inline bool TryMove(const std::filesystem::path& src, const std::filesystem::path& dst, bool overwrite = false) noexcept
+	static inline bool TryMove(const String& src, const String& dst, bool overwrite = false) noexcept
 	{
 		if (overwrite && Exists(dst))
 		{
-			if (!TryDelete(dst))
+			if (!TryDelete(dst)
 			{
 				return false;
 			}
 		}
 
 		std::error_code ec;
-		std::filesystem::rename(src, dst, ec);
+		std::filesystem::rename((std::wstring)src, (std::wstring)dst, ec);
 		return (bool)ec;
 	}
 
-	static inline bool TryDelete(const std::filesystem::path& src) noexcept
+	static inline bool TryDelete(const String& src) noexcept
 	{
 		if (Exists(src))
 		{
 			std::error_code ec;
-			return std::filesystem::remove(src, ec);
+			return std::filesystem::remove((std::wstring)src, ec);
 		}
 		return false;
 	}

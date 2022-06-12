@@ -184,9 +184,9 @@ namespace Linq
 	};
 
 	template<>
-	[[noreturn]] static void Generator<void>::_Xthrow_already_start();
+	[[noreturn]] CORE_API static void Generator<void>::_Xthrow_already_start();
 	template<>
-	[[noreturn]] static void Generator<void>::_Xthrow_value_null();
+	[[noreturn]] CORE_API static void Generator<void>::_Xthrow_value_null();
 	template<>
-	[[noreturn]] static void Generator<void>::_Xthrow_coro_done();
+	[[noreturn]] CORE_API static void Generator<void>::_Xthrow_coro_done();
 }

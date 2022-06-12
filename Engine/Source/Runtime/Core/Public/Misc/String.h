@@ -235,6 +235,20 @@ public:
 	{
 	}
 
+	inline String(wchar_t ch, size_t len)
+	{
+		auto& ptr = _buf.emplace<1>(std::make_shared<wchar_t[]>(len + 1));
+		auto* rptr = ptr.get();
+
+		for (size_t i = 0; i < len; ++i)
+		{
+			rptr[i] = ch;
+		}
+
+		rptr[len] = 0;
+		_len = len;
+	}
+
 public:
 	inline constexpr String& operator =(const String& rhs) noexcept
 	{
@@ -1135,3 +1149,4 @@ struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 };
 
 #define TEXT(x) L ## x ## _s
+#define TEXTF(x, ...) String::Format(TEXT(x) __VA_OPT__(, __VA_ARGS__))
