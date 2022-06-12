@@ -35,16 +35,27 @@ std::vector<FileReference> DirectoryReference::GetAllFiles(bool recursive) const
 	{
 		for (auto& file : std::filesystem::recursive_directory_iterator(this->_Get_path()))
 		{
-			frs.emplace_back(FileReference(String(file.path().wstring())));
+			if (!file.is_directory())
+			{
+				frs.emplace_back(FileReference(String(file.path().wstring())));
+			}
 		}
 	}
 	else
 	{
 		for (auto& file : std::filesystem::directory_iterator(this->_Get_path()))
 		{
-			frs.emplace_back(FileReference(String(file.path().wstring())));
+			if (!file.is_directory())
+			{
+				frs.emplace_back(FileReference(String(file.path().wstring())));
+			}
 		}
 	}
 
 	return frs;
+}
+
+FileReference DirectoryReference::GetFile(const String& filename) const noexcept
+{
+	return FileReference(String::Concat(GetPath(), TEXT("/"), filename));
 }
