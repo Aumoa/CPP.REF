@@ -112,9 +112,33 @@ public class FileReference : FileSystemReference
     /// </summary>
     /// <param name="text"> 텍스트 데이터를 전달합니다. </param>
     /// <param name="encoding"> 인코딩 정보를 전달합니다. </param>
-    public void WriteAllText(string text, Encoding encoding)
+    public void WriteAllText(string text, Encoding? encoding = null)
     {
-        File.WriteAllText(FullPath, text, encoding);
+        if (encoding != null)
+        {
+            File.WriteAllText(FullPath, text, encoding);
+        }
+        else
+        {
+            File.WriteAllText(FullPath, text);
+        }
+    }
+
+    /// <summary>
+    /// 해당 레퍼런스에 해당하는 파일에 모든 텍스트 데이터를 씁니다. 파일이 변경되었을 때에만 쓰기 작업을 실행합니다.
+    /// </summary>
+    /// <param name="text"> 텍스트 데이터를 전달합니다. </param>
+    /// <param name="encoding"> 인코딩 정보를 전달합니다. </param>
+    /// <returns> 쓰기 작업이 실행되었으면 <see langword="true"/>가, 그 이외의 경우 <see langword="false"/>가 반환됩니다. </returns>
+    public bool WriteAllTextIfChanged(string text, Encoding? encoding = null)
+    {
+        if (IsExist && ReadAllText() == text)
+        {
+            return false;
+        }
+
+        WriteAllText(text, encoding);
+        return true;
     }
 
     /// <summary>
@@ -136,5 +160,15 @@ public class FileReference : FileSystemReference
     public static FileReference GetTemp()
     {
         return new FileReference(Guid.NewGuid().ToString());
+    }
+
+    /// <summary>
+    /// 파일의 확장자 명을 변경하고 대상으로 새 참조를 생성합니다.
+    /// </summary>
+    /// <param name="newExtensions"> 변경할 확장명을 전달합니다. </param>
+    /// <returns> 생성된 개체가 반환됩니다. </returns>
+    public FileReference ChangeExtensions(string newExtensions)
+    {
+        return new FileReference(Path.ChangeExtension(FullPath, newExtensions));
     }
 }

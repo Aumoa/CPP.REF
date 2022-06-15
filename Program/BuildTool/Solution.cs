@@ -69,6 +69,11 @@ public class Solution
             return Enumerable.Empty<Project>();
         }
 
+        if (!from.IsExist || !from.Source.IsExist)
+        {
+            return Enumerable.Empty<Project>();
+        }
+
         List<FileReference> submodules = new();
         foreach (var file in from.Source.GetAllFiles())
         {

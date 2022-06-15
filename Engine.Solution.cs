@@ -1,13 +1,11 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
-using CodeProjectConfiguration;
+using BuildTool;
 
-public class Engine : SolutionRule
+public class EngineRule : SolutionRule
 {
-    public Engine()
+    public EngineRule()
     {
-        EngineRoot = "./Engine";
-        ThirdPartyRoot = "./ThirdParty";
-        PrimaryModule = "Game";
+        GenerateEngine(".");
     }
 }

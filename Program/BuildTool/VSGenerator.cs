@@ -76,10 +76,9 @@ public partial class VSGenerator : ISolutionGenerator
         const string SolutionDirectoryGuid = "2150E333-8FDC-42A3-9474-1A3956D46DE8";
         const string CSharpProjectGuid = "9A19103F-16F7-4668-BE54-9A1E7A4F7556";
 
-        Builder.AppendLine();
         Builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 12.00");
-        Builder.AppendLine("# Visual Studio Version 16");
-        Builder.AppendLine("VisualStduioVersion = 16.0.31321.278");
+        Builder.AppendLine("# Visual Studio Version 17");
+        Builder.AppendLine("VisualStudioVersion = 17.2.32602.215");
         Builder.AppendLine("MinimumVisualStudioVersion = 10.0.40219.1");
 
         Dictionary<Project, string> CachedSlicedSolutionDirectory = new();
@@ -124,7 +123,7 @@ public partial class VSGenerator : ISolutionGenerator
 
         foreach (var (Key, Value) in SolutionDirectories)
         {
-            Builder.AppendLine(string.Format("Project(\"{{{0}}}\") = \"{1}\", \"{1}\", \"{{{2}}}\"", SolutionDirectoryGuid, Key, Value.Guid));
+            Builder.AppendLine(string.Format("Project(\"{{{0}}}\") = \"{1}\", \"{1}\", \"{{{2}}}\"", SolutionDirectoryGuid, Key, Value.Guid.ToString().ToUpper()));
             Builder.AppendLine("EndProject");
         }
 
@@ -132,17 +131,18 @@ public partial class VSGenerator : ISolutionGenerator
         List<string> ProjectsSort = new();
         foreach (var (Key, Value) in _generatedProjects)
         {
-            string ProjectDeclare = string.Format("Project(\"{{{0}}}\") = \"{1}\", \"{2}\", \"{{{3}}}\"\nEndProject", CppProjectGuid, Key, Value.File.FullPath, Value.ProjectGuid);
+            string ProjectDeclare = string.Format("Project(\"{{{0}}}\") = \"{1}\", \"{2}\", \"{{{3}}}\"\nEndProject", CppProjectGuid, Key, Value.File.FullPath, Value.ProjectGuid.ToString().ToUpper());
             ProjectsSort.Add(ProjectDeclare);
         }
 
         List<Guid> ProgramsGuid = new();
 
+        // Generate C# projects.
         foreach (FileReference CSProj in Programs)
         {
             string ProjectName = CSProj.Name;
             Guid ProjectGuid = GenerateProjectGuid(ProjectName);
-            string ProjectDeclare = string.Format("Project(\"{{{0}}}\") = \"{1}\", \"{2}\", \"{{{3}}}\"\nEndProject", CSharpProjectGuid, ProjectName, CSProj.FullPath, ProjectGuid);
+            string ProjectDeclare = string.Format("Project(\"{{{0}}}\") = \"{1}\", \"{2}\", \"{{{3}}}\"\nEndProject", CSharpProjectGuid, ProjectName, CSProj.FullPath, ProjectGuid.ToString().ToUpper());
             ProjectsSort.Add(ProjectDeclare);
             ProgramsGuid.Add(ProjectGuid);
         }
@@ -166,24 +166,30 @@ public partial class VSGenerator : ISolutionGenerator
             Builder.AppendLine("\tEndGlobalSection");
 
             // ProjectConfigurationPlatforms
-            string[] ManagedConfigs = new[] { "Debug", "Release" };
+            Dictionary<string, string> ManagedConfigs = new()
+            {
+                ["Debug"] = "Debug",
+                ["DebugGame"] = "Debug",
+                ["Development"] = "Release",
+                ["Shipping"] = "Release"
+            };
             Builder.AppendLine("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution");
             {
                 foreach (var (Key, Project) in _generatedProjects)
                 {
                     foreach (var Config in Configurations)
                     {
-                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|x64.ActiveCfg = {1}|x64", Project.ProjectGuid, Config));
-                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|x64.Build.0 = {1}|x64", Project.ProjectGuid, Config));
+                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|x64.ActiveCfg = {1}|x64", Project.ProjectGuid.ToString().ToUpper(), Config));
+                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|x64.Build.0 = {1}|x64", Project.ProjectGuid.ToString().ToUpper(), Config));
                     }
                 }
 
                 foreach (var ProjectGuid in ProgramsGuid)
                 {
-                    foreach (var Config in ManagedConfigs)
+                    foreach (var Config in Configurations)
                     {
-                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|Any CPU.ActiveCfg = {1}|Any CPU", ProjectGuid, Config));
-                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|Any CPU.Build.0 = {1}|Any CPU", ProjectGuid, Config));
+                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|x64.ActiveCfg = {2}|Any CPU", ProjectGuid.ToString().ToUpper(), Config, ManagedConfigs[Config]));
+                        Builder.AppendLine(string.Format("\t\t{{{0}}}.{1}|x64.Build.0 = {2}|Any CPU", ProjectGuid.ToString().ToUpper(), Config, ManagedConfigs[Config]));
                     }
                 }
             }
@@ -206,20 +212,20 @@ public partial class VSGenerator : ISolutionGenerator
                     {
                         string LastParent = Splits[^2];
                         SolutionDirectoryPair LastParentInfo = SolutionDirectories[LastParent];
-                        Builder.AppendLine(string.Format("\t\t{{{0}}} = {{{1}}}", Value.Guid, LastParentInfo.Guid));
+                        Builder.AppendLine(string.Format("\t\t{{{0}}} = {{{1}}}", Value.Guid.ToString().ToUpper(), LastParentInfo.Guid.ToString().ToUpper()));
                     }
                 }
 
                 foreach (var (Key, Project) in _generatedProjects)
                 {
                     SolutionDirectoryPair ParentInfo = SolutionDirectories[CachedSlicedSolutionDirectory[Key]];
-                    Builder.AppendLine(string.Format("\t\t{{{0}}} = {{{1}}}", Project.ProjectGuid, ParentInfo.Guid));
+                    Builder.AppendLine(string.Format("\t\t{{{0}}} = {{{1}}}", Project.ProjectGuid.ToString().ToUpper(), ParentInfo.Guid.ToString().ToUpper()));
                 }
 
                 foreach (var ProjectGuid in ProgramsGuid)
                 {
                     SolutionDirectoryPair ParentInfo = SolutionDirectories["Program"];
-                    Builder.AppendLine(string.Format("\t\t{{{0}}} = {{{1}}}", ProjectGuid, ParentInfo.Guid));
+                    Builder.AppendLine(string.Format("\t\t{{{0}}} = {{{1}}}", ProjectGuid.ToString().ToUpper(), ParentInfo.Guid.ToString().ToUpper()));
                 }
             }
             Builder.AppendLine("\tEndGlobalSection");
@@ -237,17 +243,13 @@ public partial class VSGenerator : ISolutionGenerator
         foreach (var (_, generatedProject) in _generatedProjects)
         {
             generatedProject.File.GetParent().CreateIfNotExists();
-            generatedProject.ProjectXml.Save(generatedProject.File.FullPath);
-
-            string filterPath = Path.ChangeExtension(generatedProject.File.FullPath, ".vcxproj.filters");
-            generatedProject.FilterXml.Save(filterPath);
-
-            string userPath = Path.ChangeExtension(generatedProject.File.FullPath, ".vcxproj.user");
-            generatedProject.UserXml.Save(userPath);
+            generatedProject.ProjectXml.SaveIfChanged(generatedProject.File);
+            generatedProject.FilterXml.SaveIfChanged(generatedProject.File.ChangeExtensions(".vcxproj.filters"));
+            generatedProject.UserXml.SaveIfChanged(generatedProject.File.ChangeExtensions(".vcxproj.user"));
         }
 
         FileReference SolutionFile = _solution.Directory.GetFile(_solution.Rule.SolutionName + ".sln");
-        File.WriteAllText(SolutionFile.FullPath, Builder.ToString());
+        SolutionFile.WriteAllTextIfChanged(Builder.ToString());
     }
 
     /// <inheritdoc/>
@@ -539,7 +541,7 @@ public partial class VSGenerator : ISolutionGenerator
             File = GetProjectFileIntermediateDirectory(project).GetFile(project.Rule.ProjectName + ".vcxproj"),
             ProjectXml = Doc,
             FilterXml = GenerateFilter(project),
-            UserXml = GenerateUser(project, Configurations),
+            UserXml = GenerateUser(Configurations),
             ProjectGuid = projectGuid
         });
     }
@@ -616,10 +618,8 @@ public partial class VSGenerator : ISolutionGenerator
         return Doc;
     }
 
-    private XmlDocument GenerateUser(Project project, IEnumerable<BuildConfiguration> Configurations)
+    private XmlDocument GenerateUser(IEnumerable<BuildConfiguration> Configurations)
     {
-        var Rule = project.Rule;
-
         XmlDocument Doc = new();
         Doc.NewDeclaration();
 
