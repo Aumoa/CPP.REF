@@ -18,6 +18,7 @@
 constexpr LogCategory LogConsoleApplication(TEXT("LogConsoleApplication"));
 
 ConsoleApplication::ConsoleApplication()
+	: Super()
 {
 }
 

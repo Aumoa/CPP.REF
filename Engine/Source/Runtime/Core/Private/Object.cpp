@@ -15,3 +15,8 @@ String Object::ToString() const noexcept
 {
 	return GetType()->GetName();
 }
+
+Object Object::MemberwiseClone() const
+{
+	throw;
+}

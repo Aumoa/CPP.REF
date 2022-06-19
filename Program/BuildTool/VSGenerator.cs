@@ -467,6 +467,12 @@ public partial class VSGenerator : ISolutionGenerator
                         Link.NewElement("EnableUAC", "false");
                         Link.NewElement("AdditionalDependencies", string.Join(";", project.AdditionalLibraries) + ";$(AdditionalDependencies)");
                     }
+
+                    XmlElement PreBuildEvent = ItemDefinitionGroup.NewElement("PreBuildEvent");
+                    {
+                        FileReference ReflectionHeaderTool = _solution.Directory.Move("Binaries\\ReflectionHeaderTool").GetFile("ReflectionHeaderTool.dll");
+                        PreBuildEvent.NewElement("Command", $"dotnet \"{ReflectionHeaderTool}\" -s \"{project.Directory}\" -o \"{project.IntermediateIncludePath}\"");
+                    }
                 }
             }
 

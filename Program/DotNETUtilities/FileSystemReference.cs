@@ -28,7 +28,7 @@ public abstract class FileSystemReference
     /// <returns> 상대적 경로가 반환됩니다. </returns>
     public string GetRelativePath(FileSystemReference InReference)
     {
-        return Path.GetRelativePath(FullPath, InReference.FullPath);
+        return Path.GetRelativePath(InReference.FullPath, FullPath);
     }
 
     /// <summary>
