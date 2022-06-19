@@ -34,11 +34,12 @@ internal class Startup
         Console.WriteLine("Reflection Header Tool for {0} project.", sourceDir.Name);
         Stopwatch timer = Stopwatch.StartNew();
 
-        //headerFiles = new[]
-        //{
-        //    new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Core\Public\Object.h"),
-        //    new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Core\Public\Type.h")
-        //};
+#if PRINT_SYNTAX
+        headerFiles = new[]
+        {
+            new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Core\Public\Object.h")
+        };
+#endif
 
         List<Task> tasks = new();
         foreach (var headerFile in headerFiles)

@@ -4,14 +4,22 @@ namespace ReflectionHeaderTool;
 
 internal static class SyntaxEnumeratorExtensions
 {
-    public static List<SyntaxCore>? EnumerateNext(this IEnumerator<SyntaxCore> enumerator, Func<SyntaxCore, bool>? predic)
+    public static List<SyntaxCore>? EnumerateNext(this IEnumerator<SyntaxCore> enumerator, Func<SyntaxCore, bool>? predic, bool ignoreComment = false)
     {
         List<SyntaxCore> results = new();
+
+        static bool IsComment(SyntaxCore value)
+        {
+            return value.Type == SyntaxType.Comment || value.Type == SyntaxType.CommentDoc;
+        }
 
         for (; ; )
         {
             SyntaxCore sCore = enumerator.Current;
-            results.Add(sCore);
+            if (!ignoreComment || !IsComment(sCore))
+            {
+                results.Add(sCore);
+            }
 
             if (predic?.Invoke(sCore) == true)
             {

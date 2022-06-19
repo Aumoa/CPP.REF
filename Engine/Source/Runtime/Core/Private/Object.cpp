@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "Type.h"
+#include <list>
 
 Object::Object() noexcept
 {
@@ -19,4 +20,13 @@ String Object::ToString() const noexcept
 Object Object::MemberwiseClone() const
 {
 	throw;
+}
+
+Type* Object::GenerateClassType(const libty::reflect::ClassTypeMetadata& meta)
+{
+	static thread_local std::list<std::unique_ptr<Type>> sTypes;
+	std::unique_ptr<Type>& ptr = sTypes.emplace_back() = std::unique_ptr<Type>(new Type());
+	ptr->_name = meta.FriendlyName;
+	ptr->_constructors = meta.Constructors;
+	return ptr.get();
 }

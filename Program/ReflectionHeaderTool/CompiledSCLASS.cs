@@ -13,6 +13,7 @@ internal class CompiledSCLASS : IHeaderGenerator
     private string? _inherit;
     private readonly List<string> _interfaces = new();
     private int _generatedBody;
+    private List<SyntaxConstructor> _constructors = new();
 
     public CompiledSCLASS()
     {
@@ -23,16 +24,10 @@ internal class CompiledSCLASS : IHeaderGenerator
         _line = syntaxes.Last().Line;
 
         // Reading SCLASS attributes.
-        var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")");
-        if (span == null)
-        {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Cannot find parentheses in SCLASS.", _line);
-        }
-
-        ParseAttributes(span);
+        ParseAttributes(generator);
 
         // Reading class key.
-        span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Keyword);
+        var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Keyword, true);
         if (span == null)
         {
             throw new CompilationException(CompilationException.ErrorCode.InvalidClassKey, "Cannot find class key for SCLASS.", _line);
@@ -43,7 +38,7 @@ internal class CompiledSCLASS : IHeaderGenerator
             throw new CompilationException(CompilationException.ErrorCode.InvalidClassKey, "Class key is not \"class\".", _line);
         }
 
-        span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Scope);
+        span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Scope, true);
         if (span == null)
         {
             throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Class name does not specified.", _line);
@@ -84,6 +79,16 @@ internal class CompiledSCLASS : IHeaderGenerator
 
     public virtual void GenerateHeader(string fileKey, StringBuilder sb)
     {
+        static string ComposeMacroArray(string type, List<string> strs)
+        {
+            if (strs.Count == 0)
+            {
+                return $"(std::array<{type}, 0>())";
+            }
+
+            return $"(std::array<{type}, {strs.Count}>{{{string.Join(", ", strs)}}})";
+        }
+
         // Summary
         sb.AppendLine($"// SCLASS for {_name}");
         sb.AppendLine();
@@ -93,7 +98,13 @@ internal class CompiledSCLASS : IHeaderGenerator
         sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()\\");
         sb.AppendLine($"\\");
 
-        sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name})\\");
+        List<string> ctors = new();
+        foreach (var ctor in _constructors)
+        {
+            sb.AppendLine($"__SCLASS_DECLARE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName})\\");
+            ctors.Add($"(constructor_t)&Invoke_constructor__{_name}__{ctor.SafeName}__");
+        }
+        sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)})\\");
 
         sb.AppendLine($"\\");
         sb.AppendLine($"__SCLASS_END_NAMESPACE()");
@@ -119,6 +130,111 @@ internal class CompiledSCLASS : IHeaderGenerator
         }
 
         _generatedBody = value.Line;
+        ParseAttributes(syntaxes);
+
+        int scopeLevel = 0;
+        for (; ; )
+        {
+            value = syntaxes.Current;
+
+            if (value.Type == SyntaxType.Scope)
+            {
+                if (value.Name == "}")
+                {
+                    --scopeLevel;
+                }
+                else
+                {
+                    ++scopeLevel;
+                }
+            }
+
+            if (scopeLevel == 0)
+            {
+                if (value.Type == SyntaxType.Identifier)
+                {
+                    if (value.Name == "SCONSTRUCTOR")
+                    {
+                        ParseConstructor(syntaxes);
+                    }
+                }
+            }
+
+            if (!syntaxes.MoveNext())
+            {
+                break;
+            }
+        }
+    }
+
+    private void ParseConstructor(IEnumerator<SyntaxCore> syntaxes)
+    {
+        int line = syntaxes.Current.Line;
+
+        syntaxes.MoveNext();
+        ParseAttributes(syntaxes);
+
+        List<SyntaxCore>? prefix = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Identifier && sCore.Name == _name, true);
+        if (prefix == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.RuleError, "Cannot find allowed constructor function for SCONSTRUCTOR().", line);
+        }
+
+        _constructors.Add(new()
+        {
+            Arguments = ParseArguments(syntaxes, line)
+        });
+    }
+
+    private static List<string> ParseArguments(IEnumerator<SyntaxCore> syntaxes, int line)
+    {
+        List<SyntaxCore>? arguments = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")", true);
+        if (arguments == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Cannot find arguments list of constructor function.", line);
+        }
+
+        if (arguments[0].Type != SyntaxType.Operator || arguments[0].Name != "(")
+        {
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before '('.", line);
+        }
+
+        arguments.RemoveAt(0);
+        arguments.RemoveAt(arguments.Count - 1);
+
+        List<string> strArgs = new();
+        string? composed = null;
+        foreach (var syntax in arguments)
+        {
+            if (syntax.Type == SyntaxType.Operator && syntax.Name == ",")
+            {
+                if (string.IsNullOrEmpty(composed))
+                {
+                    throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before ','.", line);
+                }
+
+                strArgs.Add(composed);
+                composed = null;
+            }
+            else
+            {
+                if (composed == null)
+                {
+                    composed = syntax.Name;
+                }
+                else
+                {
+                    composed += ' ' + syntax.Name;
+                }
+            }
+        }
+
+        if (!string.IsNullOrEmpty(composed))
+        {
+            strArgs.Add(composed);
+        }
+
+        return strArgs;
     }
 
     private void ParseClassDeclaration(IEnumerator<SyntaxCore> syntaxes)
@@ -235,11 +351,19 @@ internal class CompiledSCLASS : IHeaderGenerator
         }
     }
 
-    private void ParseAttributes(List<SyntaxCore> arguments)
+    private List<string> ParseAttributes(IEnumerator<SyntaxCore> generator)
     {
-        if (arguments.Count < 2)
+        var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")", true);
+        if (span == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Cannot find parentheses in SCLASS.", _line);
+        }
+
+        if (span.Count < 2)
         {
             throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Parentheses does not opened.", _line);
         }
+
+        return new List<string>();
     }
 }

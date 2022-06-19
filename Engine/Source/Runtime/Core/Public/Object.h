@@ -5,6 +5,7 @@
 #include "reflexpr.h"
 #include "Misc/String.h"
 #include "Reflection/ObjectMacros.h"
+#include "Reflection/ClassTypeMetadata.h"
 #include "Object.generated.h"
 
 class Type;
@@ -23,21 +24,25 @@ public:
 	/// <summary>
 	/// Initializes a new instance of the Object class.
 	/// </summary>
+	SCONSTRUCTOR()
 	Object() noexcept;
 	virtual ~Object() noexcept;
 
 	/// <summary>
 	/// Gets the Type of the current instance.
 	/// </summary>
-	/// <typeparam name="TSelf"> Type of this class. </typeparam>
 	/// <returns> The exact runtime type of the current instance. </returns>
-	template<class TSelf>
-	Type* GetType(this TSelf&&) noexcept;
+	SFUNCTION()
+	Type* GetType() const noexcept
+	{
+		return Impl_GetType();
+	}
 
 	/// <summary>
 	/// Returns a string that represents the current object.
 	/// </summary>
 	/// <returns> A string that represents the current object. </returns>
+	SFUNCTION()
 	virtual String ToString() const noexcept;
 
 protected:
@@ -45,5 +50,9 @@ protected:
 	/// Creates a shallow copy of the current Object.
 	/// </summary>
 	/// <returns> A shallow copy of the current Object. </returns>
+	SFUNCTION()
 	Object MemberwiseClone() const;
+
+protected:
+	static Type* GenerateClassType(const libty::reflect::ClassTypeMetadata& meta);
 };

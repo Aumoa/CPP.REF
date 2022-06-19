@@ -2,6 +2,12 @@
 
 #pragma once
 
+#include "Misc/String.h"
+#include <array>
+#include <vector>
+
+class Object;
+
 #define __COMBINE_THREE_MACROS(X, Y, Z) __ ## X ## __ ## Y ## __ ## Z ## __
 
 #define __SCLASS0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SCLASS, FileID, Line)
@@ -13,11 +19,14 @@
 #define __SCLASS_BEGIN_NAMESPACE() namespace libty::reflect {
 #define __SCLASS_END_NAMESPACE() }
 
-#define __SCLASS_DECLARE_REFLEXPR(Class) \
-template<class T> requires std::same_as<T, Class> \
-struct reflexpr_t<T> \
+#define __SCLASS_DECLARE_REFLEXPR(Class, Ctors) \
+struct reflexpr_ ## Class \
 { \
+	using is_class_t = int; \
 	static constexpr String friendly_name = TEXT(#Class); \
+\
+	using constructor_t = Object*(*)(std::vector<Object*>); \
+	static constexpr auto constructors = Ctors; \
 };
 
 #define __SCLASS_DECLARE_GENERATED_BODY(Class, Base) \
@@ -26,9 +35,24 @@ private: \
 	using Super = Base; \
 \
 public: \
-	virtual class Type* GetType() \
+	virtual class Type* Impl_GetType() const \
 	{ \
-		return nullptr; \
+		static const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Class)>(); \
+		static Type* GeneratedClass = GenerateClassType(sToken); \
+		return GeneratedClass; \
 	} \
 \
 private:
+
+#define __SCLASS_DEFINE_GENERATED_BODY(Class, Base)
+
+#define SCONSTRUCTOR(...)
+
+#define __SCLASS_DECLARE_CONSTRUCTOR_INFO(Class, Arguments) \
+inline Object* Invoke_constructor__ ## Class ## __ ## Arguments ## __(std::vector<Object*> args) \
+{ \
+	return nullptr; \
+}
+
+#define SPROPERTY(...)
+#define SFUNCTION(...)

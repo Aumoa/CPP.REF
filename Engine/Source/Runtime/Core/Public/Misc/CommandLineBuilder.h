@@ -3,9 +3,14 @@
 #pragma once
 
 #include "Object.h"
+#include "CommandLineBuilder.generated.h"
 
+SCLASS()
 class CORE_API CommandLineBuilder : virtual public Object
 {
+	GENERATED_BODY()
+
+private:
 	std::vector<String> _args;
 
 public:

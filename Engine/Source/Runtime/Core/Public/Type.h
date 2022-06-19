@@ -5,6 +5,9 @@
 #include "Object.h"
 #include "Type.generated.h"
 
+/// <summary>
+/// Represents type declarations: SCLASS types, SINTERFACE types, SSTRUCT types, and SENUM types.
+/// </summary>
 SCLASS()
 class CORE_API Type : virtual public Object
 {
@@ -12,28 +15,25 @@ class CORE_API Type : virtual public Object
 	friend class Object;
 
 private:
+	using Constructor_t = Object*(*)(std::vector<Object*>);
+
+	SPROPERTY()
 	String _name;
+	SPROPERTY()
+	std::vector<Constructor_t> _constructors;
 
 private:
 	Type() noexcept;
 
-	template<class T>
-	static Type* Generate() noexcept
-	{
-		static Type sType;
-		return &sType;
-	}
-
 public:
 	virtual ~Type() noexcept override;
 
+	SFUNCTION()
 	virtual String ToString() const noexcept override;
 
+	/// <summary>
+	/// Gets the name of the current type.
+	/// </summary>
+	SFUNCTION()
 	String GetName() const noexcept;
 };
-
-template<class TSelf>
-Type* Object::GetType(this TSelf&&) noexcept
-{
-	return Type::Generate<TSelf>();
-}
