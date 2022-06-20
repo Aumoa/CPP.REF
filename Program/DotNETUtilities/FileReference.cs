@@ -132,6 +132,8 @@ public class FileReference : FileSystemReference
     /// <returns> 쓰기 작업이 실행되었으면 <see langword="true"/>가, 그 이외의 경우 <see langword="false"/>가 반환됩니다. </returns>
     public bool WriteAllTextIfChanged(string text, Encoding? encoding = null)
     {
+        GetParent().CreateIfNotExists();
+
         if (IsExist && ReadAllText() == text)
         {
             return false;

@@ -98,12 +98,7 @@ public class Project
 
         IEnumerable<string> ProcessIncludePaths(Project project, IEnumerable<string> paths)
         {
-            return paths.Select(p =>
-            {
-                string includePath = Path.Combine(project.Directory.FullPath, p);
-                string relativePath = Path.GetRelativePath(solution.Directory.FullPath, includePath);
-                return "$(SolutionDir)" + relativePath;
-            });
+            return paths.Select(p => project.Directory.Move(p).FullPath);
         }
 
         foreach (var depend in dependencyModules)

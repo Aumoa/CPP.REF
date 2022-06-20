@@ -6,6 +6,7 @@ public class EngineRule : SolutionRule
 {
     public EngineRule()
     {
+        GameRoot = "Game";
         GenerateEngine(".");
     }
 }

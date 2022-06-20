@@ -17,7 +17,11 @@ public class SolutionRule
         {
             SolutionName = SolutionName[..^4];
         }
-        GameRoot = ".";
+
+        GameRoot = "Game";
+        EngineRoot = "Engine";
+        ProgramsRoot = "Program";
+        ThirdpartyRoot = "ThirdParty";
     }
 
     /// <summary>
@@ -38,17 +42,17 @@ public class SolutionRule
     /// <summary>
     /// 엔진 루트 디렉토리를 지정합니다.
     /// </summary>
-    public string? EngineRoot { get; protected set; }
+    public string EngineRoot { get; protected set; }
 
     /// <summary>
     /// 서드파티 루트 디렉토리를 지정합니다.
     /// </summary>
-    public string? ThirdpartyRoot { get; protected set; }
+    public string ThirdpartyRoot { get; protected set; }
 
     /// <summary>
     /// 도구 프로그램의 루트 디렉토리를 지정합니다.
     /// </summary>
-    public string? ProgramsRoot { get; protected set; }
+    public string ProgramsRoot { get; protected set; }
 
     /// <summary>
     /// 표준 엔진 경로를 사용해 <see cref="EngineRoot"/>, <see cref="ThirdpartyRoot"/> 및 <see cref="ProgramsRoot"/> 프로퍼티를 채웁니다.

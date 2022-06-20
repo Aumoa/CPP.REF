@@ -19,39 +19,32 @@ public class Solution
     /// <param name="rule"> Solution.cs 파일의 레퍼런스를 전달합니다. </param>
     public Solution(FileReference rule)
     {
-        SolutionDirectoryReference? GenerateDirectory(string? path)
+        SolutionDirectoryReference GenerateDirectory(string path)
         {
-            if (!string.IsNullOrEmpty(path))
+            if (Path.IsPathFullyQualified(path))
             {
-                if (Path.IsPathFullyQualified(path))
-                {
-                    return new SolutionDirectoryReference(path);
-                }
-                else
-                {
-                    return new SolutionDirectoryReference(rule.GetParent().Move(path));
-                }
-            }
-
-            return null;
-        }
-
-        Rule = CompileSolutionRule(rule, out _assembly);
-
-        Directory = GenerateDirectory(Rule.GameRoot)!;
-        EngineDirectory = GenerateDirectory(Rule.EngineRoot);
-        ThirdpartyDirectory = GenerateDirectory(Rule.ThirdpartyRoot);
-
-        if (!string.IsNullOrEmpty(Rule.ProgramsRoot))
-        {
-            if (Path.IsPathFullyQualified(Rule.ProgramsRoot))
-            {
-                ProgramsDirectory = new DirectoryReference(Rule.ProgramsRoot);
+                return new SolutionDirectoryReference(path);
             }
             else
             {
-                ProgramsDirectory = rule.GetParent().Move(Rule.ProgramsRoot);
+                return new SolutionDirectoryReference(rule.GetParent().Move(path));
             }
+        }
+
+        Rule = CompileSolutionRule(rule, out _assembly);
+        RuleDirectory = rule.GetParent();
+
+        Directory = GenerateDirectory(Rule.GameRoot);
+        EngineDirectory = GenerateDirectory(Rule.EngineRoot);
+        ThirdpartyDirectory = GenerateDirectory(Rule.ThirdpartyRoot);
+
+        if (Path.IsPathFullyQualified(Rule.ProgramsRoot))
+        {
+            ProgramsDirectory = new DirectoryReference(Rule.ProgramsRoot);
+        }
+        else
+        {
+            ProgramsDirectory = rule.GetParent().Move(Rule.ProgramsRoot);
         }
 
         Projects = SearchAndCompileProjects(Directory)
@@ -62,13 +55,8 @@ public class Solution
         BuildReferences();
     }
 
-    private static IEnumerable<Project> SearchAndCompileProjects(SolutionDirectoryReference? from)
+    private static IEnumerable<Project> SearchAndCompileProjects(SolutionDirectoryReference from)
     {
-        if (from is null)
-        {
-            return Enumerable.Empty<Project>();
-        }
-
         if (!from.IsExist || !from.Source.IsExist)
         {
             return Enumerable.Empty<Project>();
@@ -139,6 +127,11 @@ public class Solution
     public SolutionRule Rule { get; }
 
     /// <summary>
+    /// 솔루션 규칙 파일이 위치한 디렉토리를 가져옵니다.
+    /// </summary>
+    public DirectoryReference RuleDirectory { get; }
+
+    /// <summary>
     /// 솔루션 코드가 위치한 디렉토리를 가져옵니다.
     /// </summary>
     public SolutionDirectoryReference Directory { get; }
@@ -146,17 +139,17 @@ public class Solution
     /// <summary>
     /// 엔진 코드가 위치한 디렉토리를 가져옵니다.
     /// </summary>
-    public SolutionDirectoryReference? EngineDirectory { get; }
+    public SolutionDirectoryReference EngineDirectory { get; }
 
     /// <summary>
     /// 서드파티 코드가 위치한 디렉토리를 가져옵니다.
     /// </summary>
-    public SolutionDirectoryReference? ThirdpartyDirectory { get; }
+    public SolutionDirectoryReference ThirdpartyDirectory { get; }
 
     /// <summary>
     /// 도구 프로그램의 루트 디렉토리를 가져옵니다.
     /// </summary>
-    public DirectoryReference? ProgramsDirectory { get; }
+    public DirectoryReference ProgramsDirectory { get; }
 
     /// <summary>
     /// 이 솔루션에 포함되는 프로젝트 목록을 가져옵니다.

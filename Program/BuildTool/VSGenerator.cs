@@ -248,7 +248,7 @@ public partial class VSGenerator : ISolutionGenerator
             generatedProject.UserXml.SaveIfChanged(generatedProject.File.ChangeExtensions(".vcxproj.user"));
         }
 
-        FileReference SolutionFile = _solution.Directory.GetFile(_solution.Rule.SolutionName + ".sln");
+        FileReference SolutionFile = _solution.RuleDirectory.GetFile(_solution.Rule.SolutionName + ".sln");
         SolutionFile.WriteAllTextIfChanged(Builder.ToString());
     }
 
@@ -470,7 +470,7 @@ public partial class VSGenerator : ISolutionGenerator
 
                     XmlElement PreBuildEvent = ItemDefinitionGroup.NewElement("PreBuildEvent");
                     {
-                        FileReference ReflectionHeaderTool = _solution.Directory.Move("Binaries\\ReflectionHeaderTool").GetFile("ReflectionHeaderTool.dll");
+                        FileReference ReflectionHeaderTool = _solution.ProgramsDirectory.GetParent().Move("Binaries\\ReflectionHeaderTool").GetFile("ReflectionHeaderTool.dll");
                         PreBuildEvent.NewElement("Command", $"dotnet \"{ReflectionHeaderTool}\" -s \"{project.Directory}\" -o \"{project.IntermediateIncludePath}\"");
                     }
                 }
@@ -524,8 +524,6 @@ public partial class VSGenerator : ISolutionGenerator
                         string ProjectName = It.Rule.ProjectName + ".vcxproj";
 
                         string ProjectPath = Path.Combine(ProjectFileDir.FullPath, ProjectName);
-                        ProjectPath = "$(SolutionDir)" + Path.GetRelativePath(_solution.Directory.FullPath, ProjectPath);
-
                         XmlElement ProjectReference = ItemGroup.NewElementItemInclude("ProjectReference", ProjectPath);
                         {
                             ProjectReference.NewElement("Project", string.Format("{{{0}}}", _generatedProjects[It].ProjectGuid));
