@@ -3,6 +3,7 @@
 #include "Object.h"
 #include "Type.h"
 #include <list>
+#include "Object.gen.cpp"
 
 Object::Object() noexcept
 {
@@ -10,6 +11,11 @@ Object::Object() noexcept
 
 Object::~Object() noexcept
 {
+}
+
+Type* Object::GetType() const noexcept
+{
+	return nullptr;
 }
 
 String Object::ToString() const noexcept

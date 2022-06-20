@@ -10,6 +10,7 @@ internal class CompiledSCLASS : IHeaderGenerator
 {
     private int _line;
     private string _name = null!;
+    private string _apikey = null!;
     private string? _inherit;
     private readonly List<string> _interfaces = new();
     private int _generatedBody;
@@ -101,7 +102,7 @@ internal class CompiledSCLASS : IHeaderGenerator
         List<string> ctors = new();
         foreach (var ctor in _constructors)
         {
-            sb.AppendLine($"__SCLASS_DECLARE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName})\\");
+            sb.AppendLine($"__SCLASS_DECLARE_CONSTRUCTOR_INFO({_apikey}, {_name}, {ctor.SafeName})\\");
             ctors.Add($"(constructor_t)&Invoke_constructor__{_name}__{ctor.SafeName}__");
         }
         sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)})\\");
@@ -113,6 +114,31 @@ internal class CompiledSCLASS : IHeaderGenerator
         // Supports GENERATED_BODY()
         sb.AppendLine($"#define __LIBTY_GENERATED_BODY__{fileKey}__{_generatedBody}__ \\");
         sb.AppendLine($"__SCLASS_DECLARE_GENERATED_BODY({_name}, {_inherit ?? "void"})");
+        sb.AppendLine();
+    }
+
+    public virtual void GenerateSource(string fileKey, StringBuilder sb)
+    {
+        // Summary.
+        sb.AppendLine($"// SCLASS for {_name}");
+        sb.AppendLine();
+
+        // Impl_GetType()
+        sb.AppendLine($"Type* {_name}::Impl_GetType() const");
+        sb.AppendLine($"{{");
+        sb.AppendLine($"\tstatic const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr({_name})>();");
+        sb.AppendLine($"\tstatic Type* GeneratedClass = GenerateClassType(sToken);");
+        sb.AppendLine($"\treturn GeneratedClass;");
+        sb.AppendLine($"}}");
+        sb.AppendLine();
+
+        // Constructors.
+        sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()");
+        foreach (var ctor in _constructors)
+        {
+            sb.AppendLine($"__SCLASS_DEFINE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName});");
+        }
+        sb.AppendLine($"__SCLASS_END_NAMESPACE()");
         sb.AppendLine();
     }
 
@@ -259,6 +285,10 @@ internal class CompiledSCLASS : IHeaderGenerator
                 throw new CompilationException(CompilationException.ErrorCode.SyntaxError, $"Unexpected syntax: {value.Name}", value.Line);
             }
 
+            if (_name != null)
+            {
+                _apikey = _name;
+            }
             _name = value.Name;
         }
 

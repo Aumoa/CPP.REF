@@ -10,7 +10,7 @@
 class CommandLineBuilder;
 
 SCLASS()
-class CONSOLE_API ConsoleApplication : virtual public Object
+class CONSOLEEX_API ConsoleApplication : virtual public Object
 {
 	GENERATED_BODY()
 

@@ -641,10 +641,10 @@ public partial class VSGenerator : ISolutionGenerator
                     PropertyGroup.NewElement("LocalDebuggerWorkingDirectory", "$(SolutionDir)");
                     PropertyGroup.NewElement("DebuggerFlavor", "WindowsLocalDebugger");
 
-                    string Paths = "%PATH%;";
+                    string Paths = ";%PATH%";
                     if (_solution.EngineDirectory != null)
                     {
-                        Paths = Path.Combine(_solution.EngineDirectory.Build.FullPath, "$(Platform)", "$(Configuration)") + Paths;
+                        Paths = Path.Combine(_solution.EngineDirectory.Build.FullPath, "Win64", "$(Configuration)") + Paths;
                     }
                     PropertyGroup.NewElement("LocalDebuggerEnvironment", $"Path={Paths}");
                 }

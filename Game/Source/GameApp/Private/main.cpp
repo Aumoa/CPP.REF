@@ -1,8 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "CoreMinimal.h"
+#include "GameApp.h"
 
-int32 main()
+int main(int argc, char** argv)
 {
-	return 0;
+	return ConsoleApplication::GuardedMain<GameApp>(argc, argv);
 }

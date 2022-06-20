@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Misc/CommandLineBuilder.h"
+#include "CommandLineBuilder.gen.cpp"
 
 CommandLineBuilder::CommandLineBuilder(int32 argc, char** argv)
 {

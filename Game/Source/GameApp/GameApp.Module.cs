@@ -16,7 +16,8 @@ public class GameAppRule : ModuleRule
         
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
+            "ConsoleEx",
         });
     }
 }

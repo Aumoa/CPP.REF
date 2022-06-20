@@ -33,10 +33,7 @@ public:
 	/// </summary>
 	/// <returns> The exact runtime type of the current instance. </returns>
 	SFUNCTION()
-	Type* GetType() const noexcept
-	{
-		return Impl_GetType();
-	}
+	Type* GetType() const noexcept;
 
 	/// <summary>
 	/// Returns a string that represents the current object.

@@ -54,17 +54,24 @@ internal class Startup
                 SyntaxTree sTree = new(file);
                 sTree.Parse();
 
-                StringBuilder sb = new();
+                StringBuilder sbHeader = new();
+                StringBuilder sbSource = new();
                 var compile = new CppCompilation(sTree, fileKey);
-                if (!compile.Emit(sb))
+                if (!compile.Emit(sbHeader, sbSource))
                 {
                     return;
                 }
 
-                FileReference generated = outDir.GetFile(headerFile.ChangeExtensions(".generated.h").FileName);
-                if (generated.WriteAllTextIfChanged(sb.ToString(), Encoding.UTF8))
+                FileReference generatedHeader = outDir.GetFile(headerFile.ChangeExtensions(".generated.h").FileName);
+                if (generatedHeader.WriteAllTextIfChanged(sbHeader.ToString(), Encoding.UTF8))
                 {
-                    Console.WriteLine("{0}", generated);
+                    Console.WriteLine("{0}", generatedHeader);
+                }
+
+                FileReference generatedSource = outDir.GetFile(headerFile.ChangeExtensions(".gen.cpp").FileName);
+                if (generatedSource.WriteAllTextIfChanged(sbSource.ToString(), Encoding.UTF8))
+                {
+                    Console.WriteLine("{0}", generatedSource);
                 }
             }));
         }

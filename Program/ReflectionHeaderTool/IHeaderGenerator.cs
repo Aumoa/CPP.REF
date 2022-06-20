@@ -7,4 +7,5 @@ namespace ReflectionHeaderTool;
 internal interface IHeaderGenerator
 {
     void GenerateHeader(string fileKey, StringBuilder sb);
+    void GenerateSource(string fileKey, StringBuilder sb);
 }

@@ -35,12 +35,7 @@ private: \
 	using Super = Base; \
 \
 public: \
-	virtual class Type* Impl_GetType() const \
-	{ \
-		static const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Class)>(); \
-		static Type* GeneratedClass = GenerateClassType(sToken); \
-		return GeneratedClass; \
-	} \
+	virtual class Type* Impl_GetType() const; \
 \
 private:
 
@@ -48,8 +43,11 @@ private:
 
 #define SCONSTRUCTOR(...)
 
-#define __SCLASS_DECLARE_CONSTRUCTOR_INFO(Class, Arguments) \
-inline Object* Invoke_constructor__ ## Class ## __ ## Arguments ## __(std::vector<Object*> args) \
+#define __SCLASS_DECLARE_CONSTRUCTOR_INFO(API, Class, Arguments) \
+API Object* Invoke_constructor__ ## Class ## __ ## Arguments ## __(std::vector<Object*> args);
+
+#define __SCLASS_DEFINE_CONSTRUCTOR_INFO(Class, Arguments) \
+Object* Invoke_constructor__ ## Class ## __ ## Arguments ## __(std::vector<Object*> args) \
 { \
 	return nullptr; \
 }

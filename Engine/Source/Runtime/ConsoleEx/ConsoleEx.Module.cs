@@ -3,9 +3,9 @@
 using System;
 using BuildTool;
 
-public class ConsoleRule : ModuleRule
+public class ConsoleExRule : ModuleRule
 {
-    public ConsoleRule()
+    public ConsoleExRule()
     {
         Category = ModuleCategory.Engine;
         FilterPath = "Engine.Runtime";
@@ -17,14 +17,5 @@ public class ConsoleRule : ModuleRule
         {
             "Core",
         });
-
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-        {
-            PrivateAdditionalMacros.AddRange(new[]
-            {
-                "NOMINMAX",
-                "WIN32_LEAN_AND_MEAN"
-            });
-        }
     }
 }

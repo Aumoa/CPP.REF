@@ -5,6 +5,7 @@
 #include "Misc/CommandLineBuilder.h"
 #include "Logging/LogCategory.h"
 #include "Logging/Log.h"
+#include "ConsoleApplication.gen.cpp"
 
 #if PLATFORM_WINDOWS
 
