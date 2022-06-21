@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "ConsoleApplication.h"
 #include "GameApp.generated.h"
 

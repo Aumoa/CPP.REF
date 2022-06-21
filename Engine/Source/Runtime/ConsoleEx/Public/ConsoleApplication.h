@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "CoreMinimal.h"
 #include "Threading/Tasks/Task.h"
 #include <functional>
 #include "ConsoleApplication.generated.h"

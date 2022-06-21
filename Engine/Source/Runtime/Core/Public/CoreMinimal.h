@@ -4,3 +4,5 @@
 
 #include "Core.h"
 #include "Object.h"
+#include "Type.h"
+#include "Casts.h"

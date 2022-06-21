@@ -26,6 +26,16 @@ public:
 	/// </summary>
 	SCONSTRUCTOR()
 	Object() noexcept;
+
+	SCONSTRUCTOR()
+	Object(int32 number) noexcept;
+	
+	SCONSTRUCTOR()
+	Object(Object* object) noexcept;
+	
+	SCONSTRUCTOR()
+	Object(const String& str) noexcept;
+
 	virtual ~Object() noexcept;
 
 	/// <summary>

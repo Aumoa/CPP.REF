@@ -4,15 +4,14 @@
 
 #include "reflexpr.h"
 #include "Misc/String.h"
+#include "Reflection/ReflectionTraits.h"
 
 namespace libty::reflect
 {
 	struct ClassTypeMetadata
 	{
-		using Constructor_t = Object*(*)(std::vector<Object*>);
-
 		String FriendlyName;
-		std::vector<Constructor_t> Constructors;
+		std::vector<constructor_t> Constructors;
 
 		template<class T>
 		static ClassTypeMetadata Generate()

@@ -3,7 +3,10 @@
 #pragma once
 
 #include "Object.h"
+#include "Reflection/ReflectionTraits.h"
 #include "Type.generated.h"
+
+class ConstructorInfo;
 
 /// <summary>
 /// Represents type declarations: SCLASS types, SINTERFACE types, SSTRUCT types, and SENUM types.
@@ -15,12 +18,10 @@ class CORE_API Type : virtual public Object
 	friend class Object;
 
 private:
-	using Constructor_t = Object*(*)(std::vector<Object*>);
-
 	SPROPERTY()
 	String _name;
 	SPROPERTY()
-	std::vector<Constructor_t> _constructors;
+	std::vector<libty::reflect::constructor_t> _constructors;
 
 private:
 	Type() noexcept;
@@ -36,4 +37,7 @@ public:
 	/// </summary>
 	SFUNCTION()
 	String GetName() const noexcept;
+
+	SFUNCTION()
+	std::vector<ConstructorInfo*> GetConstructors() const noexcept;
 };

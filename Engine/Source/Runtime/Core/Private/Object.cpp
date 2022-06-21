@@ -9,13 +9,28 @@ Object::Object() noexcept
 {
 }
 
+Object::Object(int32 number) noexcept
+{
+	static int32 value = number;
+}
+
+Object::Object(Object* object) noexcept
+{
+	static Object* value = object;
+}
+
+Object::Object(const String& str) noexcept
+{
+	static const String& value = str;
+}
+
 Object::~Object() noexcept
 {
 }
 
 Type* Object::GetType() const noexcept
 {
-	return nullptr;
+	return Impl_GetType();
 }
 
 String Object::ToString() const noexcept

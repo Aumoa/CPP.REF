@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 namespace ReflectionHeaderTool;
@@ -80,16 +81,6 @@ internal class CompiledSCLASS : IHeaderGenerator
 
     public virtual void GenerateHeader(string fileKey, StringBuilder sb)
     {
-        static string ComposeMacroArray(string type, List<string> strs)
-        {
-            if (strs.Count == 0)
-            {
-                return $"(std::array<{type}, 0>())";
-            }
-
-            return $"(std::array<{type}, {strs.Count}>{{{string.Join(", ", strs)}}})";
-        }
-
         // Summary
         sb.AppendLine($"// SCLASS for {_name}");
         sb.AppendLine();
@@ -99,13 +90,13 @@ internal class CompiledSCLASS : IHeaderGenerator
         sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()\\");
         sb.AppendLine($"\\");
 
-        List<string> ctors = new();
         foreach (var ctor in _constructors)
         {
             sb.AppendLine($"__SCLASS_DECLARE_CONSTRUCTOR_INFO({_apikey}, {_name}, {ctor.SafeName})\\");
-            ctors.Add($"(constructor_t)&Invoke_constructor__{_name}__{ctor.SafeName}__");
         }
-        sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)})\\");
+
+        sb.AppendLine($"\\");
+        sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name})\\");
 
         sb.AppendLine($"\\");
         sb.AppendLine($"__SCLASS_END_NAMESPACE()");
@@ -119,25 +110,39 @@ internal class CompiledSCLASS : IHeaderGenerator
 
     public virtual void GenerateSource(string fileKey, StringBuilder sb)
     {
+        static string ComposeMacroArray(string type, List<string> strs)
+        {
+            if (strs.Count == 0)
+            {
+                return $"(std::vector<{type}>())";
+            }
+
+            return $"(std::vector<{type}>\r\n{{\r\n\t{string.Join(",\r\n\t", strs)}\r\n}})";
+        }
+
         // Summary.
         sb.AppendLine($"// SCLASS for {_name}");
         sb.AppendLine();
 
         // Impl_GetType()
-        sb.AppendLine($"Type* {_name}::Impl_GetType() const");
-        sb.AppendLine($"{{");
-        sb.AppendLine($"\tstatic const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr({_name})>();");
-        sb.AppendLine($"\tstatic Type* GeneratedClass = GenerateClassType(sToken);");
-        sb.AppendLine($"\treturn GeneratedClass;");
-        sb.AppendLine($"}}");
+        sb.AppendLine($"__SCLASS_DEFINE_GENERATED_BODY({_name}, {_inherit});");
         sb.AppendLine();
 
         // Constructors.
+        List<string> ctors = new();
         sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()");
+        sb.AppendLine();
+
         foreach (var ctor in _constructors)
         {
-            sb.AppendLine($"__SCLASS_DEFINE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName});");
+            sb.AppendLine($"__SCLASS_DEFINE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName}, ({ctor.ComposeInvokeArgs()}));");
+            ctors.Add($"constructor_t(&Invoke_constructor__{_name}__{ctor.SafeName}__, {ctor.ComposeTypeHash()})");
         }
+
+        sb.AppendLine();
+        sb.AppendLine($"__SCLASS_DEFINE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)});");
+
+        sb.AppendLine();
         sb.AppendLine($"__SCLASS_END_NAMESPACE()");
         sb.AppendLine();
     }
@@ -212,7 +217,7 @@ internal class CompiledSCLASS : IHeaderGenerator
         });
     }
 
-    private static List<string> ParseArguments(IEnumerator<SyntaxCore> syntaxes, int line)
+    private static List<SyntaxVariable> ParseArguments(IEnumerator<SyntaxCore> syntaxes, int line)
     {
         List<SyntaxCore>? arguments = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")", true);
         if (arguments == null)
@@ -228,39 +233,32 @@ internal class CompiledSCLASS : IHeaderGenerator
         arguments.RemoveAt(0);
         arguments.RemoveAt(arguments.Count - 1);
 
-        List<string> strArgs = new();
-        string? composed = null;
+        List<SyntaxVariable> sVars = new();
+        List<SyntaxCore> composed = new();
         foreach (var syntax in arguments)
         {
             if (syntax.Type == SyntaxType.Operator && syntax.Name == ",")
             {
-                if (string.IsNullOrEmpty(composed))
+                if (composed.Count == 0)
                 {
                     throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before ','.", line);
                 }
 
-                strArgs.Add(composed);
-                composed = null;
+                sVars.Add(SyntaxVariable.CreateFromSyntaxes(composed));
+                composed.Clear();
             }
             else
             {
-                if (composed == null)
-                {
-                    composed = syntax.Name;
-                }
-                else
-                {
-                    composed += ' ' + syntax.Name;
-                }
+                composed.Add(syntax);
             }
         }
 
-        if (!string.IsNullOrEmpty(composed))
+        if (composed.Count != 0)
         {
-            strArgs.Add(composed);
+            sVars.Add(SyntaxVariable.CreateFromSyntaxes(composed));
         }
 
-        return strArgs;
+        return sVars;
     }
 
     private void ParseClassDeclaration(IEnumerator<SyntaxCore> syntaxes)
