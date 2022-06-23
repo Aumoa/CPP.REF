@@ -65,7 +65,9 @@ int32 ConsoleApplication::InvokeMain(int32 argc, char** argv, ApplicationFactory
 {
 	try
 	{
-		return invokeMain(factory(), CommandLineBuilder(argc, argv));
+		ConsoleApplication* cApp = factory();
+		cApp->AddToRoot();
+		return invokeMain(cApp, CommandLineBuilder(argc, argv));
 	}
 	catch (const Exception& e)
 	{

@@ -11,8 +11,5 @@ GameApp::GameApp()
 
 int32 GameApp::Run()
 {
-	Type* t = GetType();
-	auto ctors = t->GetConstructors();
-	auto ptr1 = Cast<GameApp>((Object*)ctors[0]->Invoke());
-	return ptr1->Run();
+	return 0;
 }

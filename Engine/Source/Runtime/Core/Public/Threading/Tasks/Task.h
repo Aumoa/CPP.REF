@@ -155,11 +155,11 @@ public:
 	bool operator ==(const Task&) const = default;
 
 private:
-	static void _Initialize();
-	static void _Shutdown();
+	static void Initialize();
+	static void Shutdown();
 
-	static void _Run_thread(std::function<void()> body);
-	static void _Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);
+	static void Run_thread(std::function<void()> body);
+	static void Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);
 
 public:
 	template<class TBody>
@@ -170,7 +170,7 @@ public:
 		using U = std::invoke_result_t<TBody>;
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<U>>(sToken);
 
-		_Run_thread([uAwaiter, body = std::forward<TBody>(body)]() mutable
+		Run_thread([uAwaiter, body = std::forward<TBody>(body)]() mutable
 		{
 			try
 			{
@@ -199,7 +199,7 @@ public:
 		static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
 
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<void>>();
-		_Run_thread([uAwaiter]
+		Run_thread([uAwaiter]
 		{
 			uAwaiter->SetResult();
 		});
@@ -212,7 +212,7 @@ public:
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<void>>(sToken);
-		_Delay_thread(delay, [uAwaiter]() mutable
+		Delay_thread(delay, [uAwaiter]() mutable
 		{
 			uAwaiter->SetResult();
 		});
@@ -491,13 +491,13 @@ public:
 };
 
 template<>
-void CORE_API Task<>::_Initialize();
+void CORE_API Task<>::Initialize();
 
 template<>
-void CORE_API Task<>::_Shutdown();
+void CORE_API Task<>::Shutdown();
 
 template<>
-void CORE_API Task<>::_Run_thread(std::function<void()> body);
+void CORE_API Task<>::Run_thread(std::function<void()> body);
 
 template<>
-void CORE_API Task<>::_Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);
+void CORE_API Task<>::Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);

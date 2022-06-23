@@ -2,19 +2,24 @@
 
 #pragma once
 
+#include "Object.h"
 #include "LogLevel.h"
 #include "Misc/String.h"
+#include "Log.generated.h"
 
 class LogCategory;
 
-class CORE_API Log
+SCLASS()
+class CORE_API Log : virtual public Object
 {
+	GENERATED_BODY()
+
 	friend class Core;
 	Log() = delete;
 
 private:
-	static void _Initialize();
-	static void _Shutdown();
+	static void Initialize();
+	static void Shutdown();
 
 public:
 	static void Print(const LogCategory& logCategory, ELogLevel logLevel, const String& message);

@@ -1,7 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 
 namespace ReflectionHeaderTool;
@@ -16,6 +15,7 @@ internal class CompiledSCLASS : IHeaderGenerator
     private readonly List<string> _interfaces = new();
     private int _generatedBody;
     private List<SyntaxConstructor> _constructors = new();
+    private List<SyntaxProperty> _properties = new();
 
     public CompiledSCLASS()
     {
@@ -96,6 +96,13 @@ internal class CompiledSCLASS : IHeaderGenerator
         }
 
         sb.AppendLine($"\\");
+
+        foreach (var prop in _properties)
+        {
+            sb.AppendLine($"__SCLASS_DECLARE_PROPERTY_INFO({_name}, {prop.Variable.Name}, {prop.Variable.DefaultValue}, {prop.AccessModifier})\\");
+        }
+
+        sb.AppendLine($"\\");
         sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name})\\");
 
         sb.AppendLine($"\\");
@@ -147,6 +154,8 @@ internal class CompiledSCLASS : IHeaderGenerator
         sb.AppendLine();
     }
 
+    private AccessModifier _currentAccessModifier = AccessModifier.Private;
+
     private void ParseClassBody(IEnumerator<SyntaxCore> syntaxes)
     {
         if (!syntaxes.MoveNext())
@@ -180,6 +189,22 @@ internal class CompiledSCLASS : IHeaderGenerator
                 }
             }
 
+            if (value.Type == SyntaxType.Keyword && scopeLevel == 0)
+            {
+                if (value.Name == "public")
+                {
+                    _currentAccessModifier = AccessModifier.Public;
+                }
+                else if (value.Name == "protected")
+                {
+                    _currentAccessModifier = AccessModifier.Protected;
+                }
+                else if (value.Name == "private")
+                {
+                    _currentAccessModifier = AccessModifier.Private;
+                }
+            }
+
             if (scopeLevel == 0)
             {
                 if (value.Type == SyntaxType.Identifier)
@@ -187,6 +212,11 @@ internal class CompiledSCLASS : IHeaderGenerator
                     if (value.Name == "SCONSTRUCTOR")
                     {
                         ParseConstructor(syntaxes);
+                    }
+                    else if (value.Name == "SPROPERTY")
+                    {
+                        ParseProperty(syntaxes);
+                        continue;
                     }
                 }
             }
@@ -214,6 +244,28 @@ internal class CompiledSCLASS : IHeaderGenerator
         _constructors.Add(new()
         {
             Arguments = ParseArguments(syntaxes, line)
+        });
+    }
+
+    private void ParseProperty(IEnumerator<SyntaxCore> syntaxes)
+    {
+        int line = syntaxes.Current.Line;
+
+        syntaxes.MoveNext();
+        ParseAttributes(syntaxes);
+
+        List<SyntaxCore>? syntaxesVar = syntaxes.EnumerateNext(p => p.Type == SyntaxType.Semicolon);
+        if (syntaxesVar == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Cannot find semicolon(;) after variable declaration.", line);
+        }
+
+        syntaxesVar.RemoveAt(syntaxesVar.Count - 1);
+        SyntaxVariable sVar = SyntaxVariable.CreateFromSyntaxes(syntaxesVar);
+        _properties.Add(new SyntaxProperty()
+        {
+            AccessModifier = _currentAccessModifier,
+            Variable = sVar
         });
     }
 

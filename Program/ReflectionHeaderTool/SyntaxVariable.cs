@@ -8,6 +8,8 @@ internal record SyntaxVariable
 
     public string Name { get; set; } = null!;
 
+    public string? DefaultValue { get; set; }
+
     public string GetComposedName()
     {
         return Type + (Name is null ? "" : ' ' + Name);
@@ -21,16 +23,33 @@ internal record SyntaxVariable
         bool typeHit = false;
         foreach (var syntax in syntaxes)
         {
-            if (syntax.Type == SyntaxType.Identifier)
+            if (sVar.Name == null)
             {
-                if (typeHit == false)
+                if (syntax.Type == SyntaxType.Identifier)
                 {
-                    typeHit = true;
+                    if (typeHit == false)
+                    {
+                        typeHit = true;
+                    }
+                    else
+                    {
+                        sVar.Type = composed.Trim();
+                        composed = "";
+                    }
                 }
-                else
+                else if (syntax.Type == SyntaxType.Operator)
                 {
-                    sVar.Type = composed;
-                    composed = "";
+                    if (syntax.Name == "=")
+                    {
+                        if (sVar.Type == null)
+                        {
+                            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Variable identifier does not exists before '='.", syntax.Line);
+                        }
+
+                        sVar.Name = composed.Trim();
+                        composed = "";
+                        continue;
+                    }
                 }
             }
 
@@ -39,11 +58,15 @@ internal record SyntaxVariable
 
         if (sVar.Type == null)
         {
-            sVar.Type = composed;
+            sVar.Type = composed.Trim();
+        }
+        else if (sVar.Name == null)
+        {
+            sVar.Name = composed.Trim();
         }
         else
         {
-            sVar.Name = composed;
+            sVar.DefaultValue = composed.Trim();
         }
 
         return sVar;

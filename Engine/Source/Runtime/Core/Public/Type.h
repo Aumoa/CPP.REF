@@ -21,23 +21,30 @@ private:
 	SPROPERTY()
 	String _name;
 	SPROPERTY()
-	std::vector<libty::reflect::constructor_t> _constructors;
+	std::vector<std::unique_ptr<ConstructorInfo>> _constructors;
 
 private:
 	Type() noexcept;
+	void GenerateClass(const libty::reflect::ClassTypeMetadata& meta);
 
 public:
 	virtual ~Type() noexcept override;
-
+	
+	/// <summary>
+	/// Gets the name of the current type.
+	/// </summary>
 	SFUNCTION()
-	virtual String ToString() const noexcept override;
+	virtual String ToString() noexcept override;
 
 	/// <summary>
 	/// Gets the name of the current type.
 	/// </summary>
 	SFUNCTION()
-	String GetName() const noexcept;
+	String GetName() noexcept;
 
+	/// <summary>
+	/// Returns all the public constructors defined for the current System.Type.
+	/// </summary>
 	SFUNCTION()
-	std::vector<ConstructorInfo*> GetConstructors() const noexcept;
+	std::vector<ConstructorInfo*> GetConstructors() noexcept;
 };

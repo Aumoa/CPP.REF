@@ -8,6 +8,7 @@
 #include "Threading/SpinlockConditionVariable.h"
 #include <iostream>
 #include <future>
+#include "Log.gen.cpp"
 
 namespace
 {
@@ -19,13 +20,13 @@ namespace
 	static std::vector<std::function<void()>> sActions;
 }
 
-void Log::_Initialize()
+void Log::Initialize()
 {
 	sRunning = true;
 	sWorker = Thread::CreateThread(TEXT("[Log Worker]"), &_Worker);
 }
 
-void Log::_Shutdown()
+void Log::Shutdown()
 {
 	auto lock = std::unique_lock(sLock);
 	sRunning = false;

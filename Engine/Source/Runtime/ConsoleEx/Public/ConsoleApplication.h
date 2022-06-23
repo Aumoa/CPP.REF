@@ -35,7 +35,7 @@ public:
 			{ std::declval<TApplication>().Run() } -> std::convertible_to<int32>;
 		}
 	{
-		static auto _InstanceFactory = +[]() -> ConsoleApplication* { return new TApplication(); };
+		static auto _InstanceFactory = +[]() -> ConsoleApplication* { return gcnew TApplication(); };
 		static auto _InvokeMain = +[](ConsoleApplication* app, const CommandLineBuilder&)
 		{
 			return static_cast<TApplication*>(app)->Run();
@@ -51,7 +51,7 @@ public:
 		{ std::declval<TApplication>().Run() } -> std::convertible_to<Task<int32>>;
 	}
 	{
-		static auto _InstanceFactory = +[]() -> ConsoleApplication* { return new TApplication(); };
+		static auto _InstanceFactory = +[]() -> ConsoleApplication* { return gcnew TApplication(); };
 		static auto _InvokeMain = +[](ConsoleApplication* app, const CommandLineBuilder&)
 		{
 			return static_cast<TApplication*>(app)->Run().GetResult();

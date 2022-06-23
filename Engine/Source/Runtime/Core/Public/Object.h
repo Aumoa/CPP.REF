@@ -9,6 +9,7 @@
 #include "Object.generated.h"
 
 class Type;
+class GC;
 
 /// <summary>
 /// Supports all classes in the CPP.REF class hierarchy and provides low-level services
@@ -19,6 +20,17 @@ SCLASS()
 class CORE_API Object
 {
 	GENERATED_BODY()
+	friend class GC;
+
+private:
+	Object(const Object&) = delete;
+	Object& operator =(const Object&) = delete;
+
+private:
+	SPROPERTY()
+	int64 InternalIndex = -1;
+	SPROPERTY()
+	bool bRoot = false;
 
 public:
 	/// <summary>
@@ -26,16 +38,6 @@ public:
 	/// </summary>
 	SCONSTRUCTOR()
 	Object() noexcept;
-
-	SCONSTRUCTOR()
-	Object(int32 number) noexcept;
-	
-	SCONSTRUCTOR()
-	Object(Object* object) noexcept;
-	
-	SCONSTRUCTOR()
-	Object(const String& str) noexcept;
-
 	virtual ~Object() noexcept;
 
 	/// <summary>
@@ -43,14 +45,33 @@ public:
 	/// </summary>
 	/// <returns> The exact runtime type of the current instance. </returns>
 	SFUNCTION()
-	Type* GetType() const noexcept;
+	Type* GetType() noexcept;
 
 	/// <summary>
 	/// Returns a string that represents the current object.
 	/// </summary>
 	/// <returns> A string that represents the current object. </returns>
 	SFUNCTION()
-	virtual String ToString() const noexcept;
+	virtual String ToString() noexcept;
+
+	/// <summary>
+	/// Add an object to the root set.
+	/// This prevents the object and all its descendants from being deleted during garbage collection.
+	/// </summary>
+	SFUNCTION()
+	void AddToRoot();
+
+	/// <summary>
+	/// Remove an object from the root set.
+	/// </summary>
+	SFUNCTION()
+	void RemoveFromRoot();
+
+	/// <summary>
+	/// Checks to see if the object appears to be valid.
+	/// </summary>
+	SFUNCTION()
+	bool IsValidLowLevel();
 
 protected:
 	/// <summary>
@@ -58,7 +79,7 @@ protected:
 	/// </summary>
 	/// <returns> A shallow copy of the current Object. </returns>
 	SFUNCTION()
-	Object MemberwiseClone() const;
+	Object MemberwiseClone();
 
 protected:
 	static Type* GenerateClassType(const libty::reflect::ClassTypeMetadata& meta);

@@ -108,6 +108,12 @@ internal class SyntaxTree : IEnumerable<SyntaxCore>
                     syntax = ParseIdentifier(ref i, ref line, sourceCode);
                 }
 
+                // Number
+                if (syntax == null && char.IsNumber(sourceCode[i]))
+                {
+                    syntax = ParseNumber(ref i, ref line, sourceCode);
+                }
+
                 // Semicolon
                 if (syntax == null && sourceCode[i] == ';')
                 {
@@ -174,6 +180,47 @@ internal class SyntaxTree : IEnumerable<SyntaxCore>
         return new SyntaxCore(SyntaxType.Identifier, sourceCode[start..(i + (isEof ? 0 : 1))], line);
     }
 
+    public static SyntaxCore? ParseNumber(ref int i, ref int line, string sourceCode)
+    {
+        string composed = "";
+        bool containsDot = false;
+
+        if (char.IsNumber(sourceCode[i]) || sourceCode[i] == '.')
+        {
+            for (; ; ++i)
+            {
+                if ((sourceCode[i] >= 'a' && sourceCode[i] <= 'z') || (sourceCode[i] >= 'A' && sourceCode[i] <= 'Z'))
+                {
+                    composed += sourceCode[i];
+                    break;
+                }
+                else if (sourceCode[i] == '.')
+                {
+                    if (containsDot)
+                    {
+                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Duplicated dot on number.", line);
+                    }
+                    else
+                    {
+                        composed += '.';
+                        containsDot = true;
+                    }
+                }
+                else if (char.IsNumber(sourceCode[i]))
+                {
+                    composed += sourceCode[i];
+                }
+                else
+                {
+                    --i;
+                    break;
+                }
+            }
+        }
+
+        return new SyntaxCore(SyntaxType.Number, composed, line);
+    }
+
     private static SyntaxCore? ParsePreprocessor(ref int i, ref int line, string sourceCode)
     {
         int start = i;
@@ -218,7 +265,7 @@ internal class SyntaxTree : IEnumerable<SyntaxCore>
         "&", "*", "->",
         "co_return", "co_await", "co_yield",
         "?", ":", ",",
-        "+", "-", "/", "?", "^", "|",
+        "+", "-", "/", "?", "^", "|", "=",
     };
 
     private static readonly HashSet<char> OperatorsIndex = Operators.Select(p => p[0]).ToHashSet();

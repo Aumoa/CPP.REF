@@ -10,25 +10,25 @@ namespace Threading::Tasks
 }
 
 template<>
-void Task<>::_Initialize()
+void Task<>::Initialize()
 {
 	Threading::Tasks::sTaskWorker.emplace(TEXT("TaskWorker"));
 }
 
 template<>
-void Task<>::_Shutdown()
+void Task<>::Shutdown()
 {
 	Threading::Tasks::sTaskWorker.reset();
 }
 
 template<>
-void Task<>::_Run_thread(std::function<void()> body)
+void Task<>::Run_thread(std::function<void()> body)
 {
 	Threading::Tasks::sTaskWorker->Run(std::move(body));
 }
 
 template<>
-void Task<>::_Delay_thread(std::chrono::milliseconds delay, std::function<void()> body)
+void Task<>::Delay_thread(std::chrono::milliseconds delay, std::function<void()> body)
 {
 	Threading::Tasks::sTaskWorker->Delay(delay, std::move(body));
 }

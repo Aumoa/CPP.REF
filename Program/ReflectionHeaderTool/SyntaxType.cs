@@ -13,4 +13,5 @@ internal enum SyntaxType
     Semicolon,
     Operator,
     Scope,
+    Number,
 }

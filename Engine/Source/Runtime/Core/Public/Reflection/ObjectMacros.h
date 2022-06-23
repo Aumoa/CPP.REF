@@ -110,5 +110,12 @@ void* Invoke_constructor__ ## Class ## __ ## Arguments ## __(std::vector<void*> 
 
 // --------------------------------------------------
 
+// ------------------- SPROPERTY --------------------
+
 #define SPROPERTY(...)
+
+#define __SCLASS_DECLARE_PROPERTY_INFO(Class, Name, DefaultValue, Access)
+
+// --------------------------------------------------
+
 #define SFUNCTION(...)

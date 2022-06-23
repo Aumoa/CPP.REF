@@ -6,3 +6,5 @@
 #include "Object.h"
 #include "Type.h"
 #include "Casts.h"
+#include "CoreAssert.h"
+#include "GC.h"
