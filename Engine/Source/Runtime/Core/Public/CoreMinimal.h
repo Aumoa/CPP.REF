@@ -8,3 +8,7 @@
 #include "Casts.h"
 #include "CoreAssert.h"
 #include "GC.h"
+#include "DateTime.h"
+#include "TimeSpan.h"
+#include "Misc/StringBuilder.h"
+#include "Logging/Log.h"

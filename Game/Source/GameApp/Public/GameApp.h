@@ -11,6 +11,12 @@ class GameApp : public ConsoleApplication
 {
 	GENERATED_BODY()
 
+private:
+	SPROPERTY()
+	Object* _objValue = nullptr;
+	SPROPERTY()
+	int32 _intValue = 0;
+
 public:
 	SCONSTRUCTOR()
 	GameApp();

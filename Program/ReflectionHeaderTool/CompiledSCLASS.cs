@@ -8,6 +8,7 @@ namespace ReflectionHeaderTool;
 [DebuggerDisplay("SCLASS {_name}({_line})")]
 internal class CompiledSCLASS : IHeaderGenerator
 {
+    private string _source;
     private int _line;
     private string _name = null!;
     private string _apikey = null!;
@@ -16,9 +17,11 @@ internal class CompiledSCLASS : IHeaderGenerator
     private int _generatedBody;
     private List<SyntaxConstructor> _constructors = new();
     private List<SyntaxProperty> _properties = new();
+    private List<SyntaxFunction> _functions = new();
 
-    public CompiledSCLASS()
+    public CompiledSCLASS(string source)
     {
+        _source = source;
     }
 
     public void Compile(IEnumerator<SyntaxCore> generator, List<SyntaxCore> syntaxes)
@@ -32,18 +35,18 @@ internal class CompiledSCLASS : IHeaderGenerator
         var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Keyword, true);
         if (span == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidClassKey, "Cannot find class key for SCLASS.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.InvalidClassKey, "Cannot find class key for SCLASS.", _source, _line);
         }
 
         if (span[0].Name != "class")
         {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidClassKey, "Class key is not \"class\".", _line);
+            throw new CompilationException(CompilationException.ErrorCode.InvalidClassKey, "Class key is not \"class\".", _source, _line);
         }
 
         span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Scope, true);
         if (span == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Class name does not specified.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Class name does not specified.", _source, _line);
         }
 
         ParseClassDeclaration(span.GetEnumerator());
@@ -90,20 +93,8 @@ internal class CompiledSCLASS : IHeaderGenerator
         sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()\\");
         sb.AppendLine($"\\");
 
-        foreach (var ctor in _constructors)
-        {
-            sb.AppendLine($"__SCLASS_DECLARE_CONSTRUCTOR_INFO({_apikey}, {_name}, {ctor.SafeName})\\");
-        }
-
         sb.AppendLine($"\\");
-
-        foreach (var prop in _properties)
-        {
-            sb.AppendLine($"__SCLASS_DECLARE_PROPERTY_INFO({_name}, {prop.Variable.Name}, {prop.Variable.DefaultValue}, {prop.AccessModifier})\\");
-        }
-
-        sb.AppendLine($"\\");
-        sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_name})\\");
+        sb.AppendLine($"__SCLASS_DECLARE_REFLEXPR({_apikey}, {_name}, {_inherit ?? "void"})\\");
 
         sb.AppendLine($"\\");
         sb.AppendLine($"__SCLASS_END_NAMESPACE()");
@@ -111,7 +102,28 @@ internal class CompiledSCLASS : IHeaderGenerator
 
         // Supports GENERATED_BODY()
         sb.AppendLine($"#define __LIBTY_GENERATED_BODY__{fileKey}__{_generatedBody}__ \\");
-        sb.AppendLine($"__SCLASS_DECLARE_GENERATED_BODY({_name}, {_inherit ?? "void"})");
+        sb.AppendLine($"__SCLASS_DECLARE_GENERATED_BODY({_name}, {_inherit ?? "void"})\\");
+        sb.AppendLine($"\\");
+
+        foreach (var ctor in _constructors)
+        {
+            sb.AppendLine($"__SCLASS_DECLARE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName})\\");
+        }
+
+        sb.AppendLine($"\\");
+
+        foreach (var prop in _properties)
+        {
+            sb.AppendLine($"__SCLASS_DECLARE_PROPERTY_INFO({prop.Variable.Name}, {prop.Variable.DefaultValue}, {prop.AccessModifier})\\");
+        }
+
+        sb.AppendLine($"\\");
+
+        foreach (var func in _functions)
+        {
+            sb.AppendLine($"__SCLASS_DECLARE_FUNCTION_INFO({func.Name}, {func.SafeName})\\");
+        }
+
         sb.AppendLine();
     }
 
@@ -135,19 +147,29 @@ internal class CompiledSCLASS : IHeaderGenerator
         sb.AppendLine($"__SCLASS_DEFINE_GENERATED_BODY({_name}, {_inherit});");
         sb.AppendLine();
 
-        // Constructors.
         List<string> ctors = new();
-        sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()");
-        sb.AppendLine();
-
         foreach (var ctor in _constructors)
         {
             sb.AppendLine($"__SCLASS_DEFINE_CONSTRUCTOR_INFO({_name}, {ctor.SafeName}, ({ctor.ComposeInvokeArgs()}));");
-            ctors.Add($"constructor_t(&Invoke_constructor__{_name}__{ctor.SafeName}__, {ctor.ComposeTypeHash()})");
+            ctors.Add($"constructor_t(&{_name}::Invoke_constructor__{ctor.SafeName}__, {ctor.ComposeTypeHash()}, true)");
         }
 
         sb.AppendLine();
-        sb.AppendLine($"__SCLASS_DEFINE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)});");
+
+        List<string> props = new();
+        foreach (var prop in _properties)
+        {
+            sb.AppendLine($"__SCLASS_DEFINE_PROPERTY_INFO({_name}, {prop.Variable.Name})\\");
+            props.Add($"property_info_t::generate<{prop.Variable.Type}>(&{_name}::Invoke_getter__{prop.Variable.Name}__, &{_name}::Invoke_setter__{prop.Variable.Name}__, EAccessModifier::{prop.AccessModifier})");
+        }
+
+        sb.AppendLine();
+
+        // Constructors.
+        sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()");
+
+        sb.AppendLine();
+        sb.AppendLine($"__SCLASS_DEFINE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)}, {ComposeMacroArray("property_info_t", props)});");
 
         sb.AppendLine();
         sb.AppendLine($"__SCLASS_END_NAMESPACE()");
@@ -160,13 +182,13 @@ internal class CompiledSCLASS : IHeaderGenerator
     {
         if (!syntaxes.MoveNext())
         {
-            throw new CompilationException(CompilationException.ErrorCode.RuleError, "SCLASS must be contains GENERATED_BODY in first line.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.RuleError, "SCLASS must be contains GENERATED_BODY in first line.", _source, _line);
         }
 
         var value = syntaxes.Current;
         if (value.Type != SyntaxType.Identifier && value.Name != "GENERATED_BODY")
         {
-            throw new CompilationException(CompilationException.ErrorCode.RuleError, "SCLASS must be contains GENERATED_BODY in first line.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.RuleError, "SCLASS must be contains GENERATED_BODY in first line.", _source, _line);
         }
 
         _generatedBody = value.Line;
@@ -218,6 +240,11 @@ internal class CompiledSCLASS : IHeaderGenerator
                         ParseProperty(syntaxes);
                         continue;
                     }
+                    else if (value.Name == "SFUNCTION")
+                    {
+                        ParseFunction(syntaxes);
+                        continue;
+                    }
                 }
             }
 
@@ -235,16 +262,46 @@ internal class CompiledSCLASS : IHeaderGenerator
         syntaxes.MoveNext();
         ParseAttributes(syntaxes);
 
+        bool isInline = false;
+        bool isConstexpr = false;
+
+        while (true)
+        {
+            var curr = syntaxes.Current;
+            if (curr.Type == SyntaxType.Keyword)
+            {
+                if (curr.Name == "inline")
+                {
+                    isInline = true;
+                    syntaxes.MoveNext();
+                    continue;
+                }
+                else if (curr.Name == "constexpr")
+                {
+                    isConstexpr = true;
+                    syntaxes.MoveNext();
+                    continue;
+                }
+            }
+
+            break;
+        }
+
         List<SyntaxCore>? prefix = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Identifier && sCore.Name == _name, true);
         if (prefix == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.RuleError, "Cannot find allowed constructor function for SCONSTRUCTOR().", line);
+            throw new CompilationException(CompilationException.ErrorCode.RuleError, "Cannot find allowed constructor function for SCONSTRUCTOR().", _source, line);
         }
 
         _constructors.Add(new()
         {
-            Arguments = ParseArguments(syntaxes, line)
+            Arguments = ParseArguments(syntaxes, line),
+            AccessModifier = _currentAccessModifier,
+            IsInline = isInline,
+            IsConstexpr = isConstexpr
         });
+
+        ParseFunctionBody(syntaxes);
     }
 
     private void ParseProperty(IEnumerator<SyntaxCore> syntaxes)
@@ -257,11 +314,11 @@ internal class CompiledSCLASS : IHeaderGenerator
         List<SyntaxCore>? syntaxesVar = syntaxes.EnumerateNext(p => p.Type == SyntaxType.Semicolon);
         if (syntaxesVar == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Cannot find semicolon(;) after variable declaration.", line);
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Cannot find semicolon(;) after variable declaration.", _source, line);
         }
 
         syntaxesVar.RemoveAt(syntaxesVar.Count - 1);
-        SyntaxVariable sVar = SyntaxVariable.CreateFromSyntaxes(syntaxesVar);
+        SyntaxVariable sVar = SyntaxVariable.CreateFromSyntaxes(syntaxesVar, _source);
         _properties.Add(new SyntaxProperty()
         {
             AccessModifier = _currentAccessModifier,
@@ -269,17 +326,96 @@ internal class CompiledSCLASS : IHeaderGenerator
         });
     }
 
-    private static List<SyntaxVariable> ParseArguments(IEnumerator<SyntaxCore> syntaxes, int line)
+    private void ParseFunction(IEnumerator<SyntaxCore> syntaxes)
+    {
+        int line = syntaxes.Current.Line;
+
+        syntaxes.MoveNext();
+        ParseAttributes(syntaxes);
+
+        bool isVirtual = false;
+        bool isInline = false;
+        bool isConstexpr = false;
+        bool isStatic = false;
+
+        while (true)
+        {
+            var curr = syntaxes.Current;
+            if (curr.Type == SyntaxType.Keyword)
+            {
+                if (curr.Name == "virtual")
+                {
+                    isVirtual = true;
+                    syntaxes.MoveNext();
+                    continue;
+                }
+                else if (curr.Name == "inline")
+                {
+                    isInline = true;
+                    syntaxes.MoveNext();
+                    continue;
+                }
+                else if (curr.Name == "constexpr")
+                {
+                    isConstexpr = true;
+                    syntaxes.MoveNext();
+                    continue;
+                }
+                else if (curr.Name == "static")
+                {
+                    isStatic = true;
+                    syntaxes.MoveNext();
+                    continue;
+                }
+            }
+
+            break;
+        }
+
+        List<SyntaxCore>? prefix = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Identifier, true);
+        if (prefix == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.RuleError, "Unexpected EOF detected before finding return type.", _source, line);
+        }
+
+        string? returnType = syntaxes.GetIdentifier(prefix.Last()!.Name);
+        if (returnType == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Return type must be specified.", _source, line);
+        }
+
+        prefix = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Identifier, true);
+        if (prefix == null)
+        {
+            throw new CompilationException(CompilationException.ErrorCode.RuleError, "Unexpected EOF detected before finding function name identifier.", _source, line);
+        }
+
+        string functionName = prefix.Last().Name;
+        _functions.Add(new()
+        {
+            ReturnType = returnType,
+            Name = functionName,
+            IsVirtual = isVirtual,
+            IsInline = isInline,
+            IsConstexpr = isConstexpr,
+            IsStatic = isStatic,
+            Arguments = ParseArguments(syntaxes, line)
+        });
+
+        ParseFunctionBody(syntaxes);
+    }
+
+    private List<SyntaxVariable> ParseArguments(IEnumerator<SyntaxCore> syntaxes, int line)
     {
         List<SyntaxCore>? arguments = syntaxes.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")", true);
         if (arguments == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Cannot find arguments list of constructor function.", line);
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Cannot find arguments list of constructor function.", _source, line);
         }
 
         if (arguments[0].Type != SyntaxType.Operator || arguments[0].Name != "(")
         {
-            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before '('.", line);
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before '('.", _source, line);
         }
 
         arguments.RemoveAt(0);
@@ -293,10 +429,10 @@ internal class CompiledSCLASS : IHeaderGenerator
             {
                 if (composed.Count == 0)
                 {
-                    throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before ','.", line);
+                    throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before ','.", _source, line);
                 }
 
-                sVars.Add(SyntaxVariable.CreateFromSyntaxes(composed));
+                sVars.Add(SyntaxVariable.CreateFromSyntaxes(composed, _source));
                 composed.Clear();
             }
             else
@@ -307,10 +443,37 @@ internal class CompiledSCLASS : IHeaderGenerator
 
         if (composed.Count != 0)
         {
-            sVars.Add(SyntaxVariable.CreateFromSyntaxes(composed));
+            sVars.Add(SyntaxVariable.CreateFromSyntaxes(composed, _source));
         }
 
         return sVars;
+    }
+
+    private static void ParseFunctionBody(IEnumerator<SyntaxCore> syntaxes)
+    {
+        var before = syntaxes.EnumerateNext(p => p.Type == SyntaxType.Semicolon || (p.Type == SyntaxType.Scope && p.Name == "{"));
+        if (before?.Last().Name == "{")
+        {
+            int level = 0;
+            while (true)
+            {
+                var syntax = syntaxes.Current;
+                if (syntax.Type == SyntaxType.Scope)
+                {
+                    if (syntax.Name == "{")
+                    {
+                        ++level;
+                    }
+                    else if (syntax.Name == "}")
+                    {
+                        if (--level < 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void ParseClassDeclaration(IEnumerator<SyntaxCore> syntaxes)
@@ -332,7 +495,7 @@ internal class CompiledSCLASS : IHeaderGenerator
 
             if (value.Type != SyntaxType.Identifier)
             {
-                throw new CompilationException(CompilationException.ErrorCode.SyntaxError, $"Unexpected syntax: {value.Name}", value.Line);
+                throw new CompilationException(CompilationException.ErrorCode.SyntaxError, $"Unexpected syntax: {value.Name}", _source, value.Line);
             }
 
             if (_name != null)
@@ -344,7 +507,7 @@ internal class CompiledSCLASS : IHeaderGenerator
 
         if (_name == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Class name does not specified.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Class name does not specified.", _source, _line);
         }
     }
 
@@ -357,14 +520,14 @@ internal class CompiledSCLASS : IHeaderGenerator
         {
             if (name == null)
             {
-                throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before ','.", value.Line);
+                throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected syntax before ','.", _source, value.Line);
             }
 
             if (name == "Object")
             {
                 if (!isVirtual)
                 {
-                    throw new CompilationException(CompilationException.ErrorCode.RuleError, "Object must be have virtual modifier.", value.Line);
+                    throw new CompilationException(CompilationException.ErrorCode.RuleError, "Object must be have virtual modifier.", _source, value.Line);
                 }
 
                 _inherit = name;
@@ -377,7 +540,7 @@ internal class CompiledSCLASS : IHeaderGenerator
             {
                 if (_inherit != null)
                 {
-                    throw new CompilationException(CompilationException.ErrorCode.RuleError, "Inheritance the class is allowed only one.", value.Line);
+                    throw new CompilationException(CompilationException.ErrorCode.RuleError, "Inheritance the class is allowed only one.", _source, value.Line);
                 }
 
                 _inherit = name;
@@ -402,13 +565,13 @@ internal class CompiledSCLASS : IHeaderGenerator
                     }
                     else
                     {
-                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, $"Unexpected operator {value.Name}", value.Line);
+                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, $"Unexpected operator {value.Name}", _source, value.Line);
                     }
                     break;
                 case SyntaxType.Identifier:
                     if (name != null)
                     {
-                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected identifier before ','.", value.Line);
+                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected identifier before ','.", _source, value.Line);
                     }
                     name = value.Name;
                     break;
@@ -419,7 +582,7 @@ internal class CompiledSCLASS : IHeaderGenerator
                     }
                     else if (value.Name == "protected" || value.Name == "private")
                     {
-                        throw new CompilationException(CompilationException.ErrorCode.RuleError, "Class or interface inheritance must be public access.", value.Line);
+                        throw new CompilationException(CompilationException.ErrorCode.RuleError, "Class or interface inheritance must be public access.", _source, value.Line);
                     }
                     break;
             }
@@ -436,12 +599,12 @@ internal class CompiledSCLASS : IHeaderGenerator
         var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")", true);
         if (span == null)
         {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Cannot find parentheses in SCLASS.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Cannot find parentheses in SCLASS.", _source, _line);
         }
 
         if (span.Count < 2)
         {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Parentheses does not opened.", _line);
+            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Parentheses does not opened.", _source, _line);
         }
 
         return new List<string>();

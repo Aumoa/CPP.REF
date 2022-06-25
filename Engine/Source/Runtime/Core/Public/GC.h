@@ -6,19 +6,23 @@
 #include "GC.generated.h"
 
 class Core;
+class ConstructorInfo;
 
 SCLASS()
 class CORE_API GC : virtual public Object
 {
 	GENERATED_BODY()
 	friend class Core;
+	friend class ConstructorInfo;
 
 private:
 	struct InternalCollection;
+	struct MarkingCollection;
 
 private:
 	static int32 sGCThreadId;
 	static InternalCollection sCollection;
+	static MarkingCollection sMarkingCol;
 
 private:
 	GC() = delete;
@@ -37,12 +41,13 @@ public:
 	};
 
 public:
+	SFUNCTION()
 	static bool IsValidLowLevel(Object* internalObject);
+	SFUNCTION()
 	static void Collect();
 
 private:
 	static void RegisterObject(Object* internalObject);
-	static void UnregisterObject(Object* internalObject);
 };
 
 #define gcnew GC::gcnew_binder() << new 

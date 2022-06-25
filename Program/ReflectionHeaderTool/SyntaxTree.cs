@@ -180,7 +180,7 @@ internal class SyntaxTree : IEnumerable<SyntaxCore>
         return new SyntaxCore(SyntaxType.Identifier, sourceCode[start..(i + (isEof ? 0 : 1))], line);
     }
 
-    public static SyntaxCore? ParseNumber(ref int i, ref int line, string sourceCode)
+    public SyntaxCore? ParseNumber(ref int i, ref int line, string sourceCode)
     {
         string composed = "";
         bool containsDot = false;
@@ -198,7 +198,7 @@ internal class SyntaxTree : IEnumerable<SyntaxCore>
                 {
                     if (containsDot)
                     {
-                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Duplicated dot on number.", line);
+                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Duplicated dot on number.", _fr.FileName, line);
                     }
                     else
                     {

@@ -13,13 +13,13 @@ internal class CompilationException : Exception
         RuleError = 4,
     }
 
-    public CompilationException(ErrorCode errorCode, string message, int line)
-        : base(FormatMessage(errorCode, message, line))
+    public CompilationException(ErrorCode errorCode, string message, string source, int line)
+        : base(FormatMessage(errorCode, message, source, line))
     {
     }
 
-    private static string FormatMessage(ErrorCode errorCode, string message, int line)
+    private static string FormatMessage(ErrorCode errorCode, string message, string source, int line)
     {
-        return string.Format("{0}: \"{1}\" in line {2}", errorCode, message, line);
+        return string.Format("{0}: \"{1}\" in {2} at line {3}", errorCode, message, source, line);
     }
 }

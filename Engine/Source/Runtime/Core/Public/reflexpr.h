@@ -5,6 +5,7 @@
 #include "Misc/String.h"
 #include "Concepts/Variadic.h"
 #include "Concepts/GetVariadic.h"
+#include "Reflection/ReflectionTraits.h"
 #include <concepts>
 
 #define reflexpr(Class) libty::reflect::reflexpr_ ## Class
@@ -13,9 +14,16 @@
 
 namespace libty::reflect
 {
+	struct reflexpr_void
+	{
+		using super_t = void;
+		static constexpr String friendly_name = TEXT("void");
+		static inline std::vector<constructor_t> constructors;
+		static inline std::vector<property_info_t> properties;
+	};
+
 	template<class T>
 	inline constexpr String get_friendly_name_v = T::friendly_name;
-
 
 
 

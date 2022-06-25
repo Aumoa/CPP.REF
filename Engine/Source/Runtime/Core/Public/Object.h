@@ -10,6 +10,7 @@
 
 class Type;
 class GC;
+class PropertyInfo;
 
 /// <summary>
 /// Supports all classes in the CPP.REF class hierarchy and provides low-level services
@@ -21,6 +22,7 @@ class CORE_API Object
 {
 	GENERATED_BODY()
 	friend class GC;
+	friend class Type;
 
 private:
 	Object(const Object&) = delete;
@@ -29,8 +31,8 @@ private:
 private:
 	SPROPERTY()
 	int64 InternalIndex = -1;
-	SPROPERTY()
-	bool bRoot = false;
+	uint8 bRoot : 1 = false;
+	uint8 bMarking : 1 = false;
 
 public:
 	/// <summary>
@@ -79,8 +81,11 @@ protected:
 	/// </summary>
 	/// <returns> A shallow copy of the current Object. </returns>
 	SFUNCTION()
-	Object MemberwiseClone();
+	Object* MemberwiseClone();
 
 protected:
 	static Type* GenerateClassType(const libty::reflect::ClassTypeMetadata& meta);
+	static Type* FindClass(const String& friendlyName);
 };
+
+#include "Type.h"

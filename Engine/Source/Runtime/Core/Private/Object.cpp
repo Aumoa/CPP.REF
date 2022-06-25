@@ -4,7 +4,9 @@
 #include "Type.h"
 #include "CoreAssert.h"
 #include "GC.h"
-#include <list>
+#include "Reflection/PropertyInfo.h"
+#include "Reflection/ConstructorInfo.h"
+#include <map>
 #include "Object.gen.cpp"
 
 Object::Object() noexcept
@@ -42,15 +44,52 @@ bool Object::IsValidLowLevel()
 	return GC::IsValidLowLevel(this);
 }
 
-Object Object::MemberwiseClone()
+Object* Object::MemberwiseClone()
 {
-	throw;
+	for (auto& ctor : GetType()->GetConstructors())
+	{
+		Object* obj = reinterpret_cast<Object*>(ctor->Invoke());
+		
+		std::vector<PropertyInfo*> props;
+		for (Type* t = GetType(); t; t = t->GetBaseType())
+		{
+			auto innerProps = t->GetProperties();
+			props.insert(props.begin(), innerProps.begin(), innerProps.end());
+		}
+
+		for (auto& p : props)
+		{
+			void* value = p->GetValue(this);
+			p->SetValue(obj, value);
+		}
+
+		return obj;
+	}
+
+	return nullptr;
 }
+
+static thread_local std::map<String, std::unique_ptr<Type>> sTypes;
 
 Type* Object::GenerateClassType(const libty::reflect::ClassTypeMetadata& meta)
 {
-	static thread_local std::list<std::unique_ptr<Type>> sTypes;
-	std::unique_ptr<Type>& ptr = sTypes.emplace_back() = std::unique_ptr<Type>(new Type());
-	ptr->GenerateClass(meta);
-	return ptr.get();
+	auto it = sTypes.find(meta.FriendlyName);
+	if (it == sTypes.end())
+	{
+		it = sTypes.emplace(meta.FriendlyName, std::unique_ptr<Type>(new Type())).first;
+		it->second->GenerateClass(meta);
+	}
+	return it->second.get();
+}
+
+Type* Object::FindClass(const String& friendlyName)
+{
+	if (auto it = sTypes.find(friendlyName); it != sTypes.end())
+	{
+		return it->second.get();
+	}
+	else
+	{
+		return nullptr;
+	}
 }

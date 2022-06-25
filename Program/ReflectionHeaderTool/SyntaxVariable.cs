@@ -15,7 +15,7 @@ internal record SyntaxVariable
         return Type + (Name is null ? "" : ' ' + Name);
     }
 
-    public static SyntaxVariable CreateFromSyntaxes(List<SyntaxCore> syntaxes)
+    public static SyntaxVariable CreateFromSyntaxes(List<SyntaxCore> syntaxes, string source)
     {
         SyntaxVariable sVar = new();
 
@@ -43,7 +43,7 @@ internal record SyntaxVariable
                     {
                         if (sVar.Type == null)
                         {
-                            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Variable identifier does not exists before '='.", syntax.Line);
+                            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Variable identifier does not exists before '='.", source, syntax.Line);
                         }
 
                         sVar.Name = composed.Trim();

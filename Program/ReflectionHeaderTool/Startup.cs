@@ -37,7 +37,7 @@ internal class Startup
 #if PRINT_SYNTAX
         headerFiles = new[]
         {
-            new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Core\Public\Object.h")
+            new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Core\Public\Type.h")
         };
 #endif
 
@@ -56,7 +56,7 @@ internal class Startup
 
                 StringBuilder sbHeader = new();
                 StringBuilder sbSource = new();
-                var compile = new CppCompilation(sTree, fileKey);
+                var compile = new CppCompilation(headerFile.FileName, sTree, fileKey);
                 if (!compile.Emit(sbHeader, sbSource))
                 {
                     return;

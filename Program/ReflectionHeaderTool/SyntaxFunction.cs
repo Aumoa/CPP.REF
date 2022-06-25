@@ -2,12 +2,15 @@
 
 namespace ReflectionHeaderTool;
 
-internal record SyntaxConstructor
+internal class SyntaxFunction
 {
-    public List<SyntaxVariable> Arguments { get; set; } = null!;
-    public AccessModifier AccessModifier { get; set; }
+    public string ReturnType { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public bool IsVirtual { get; set; }
     public bool IsInline { get; set; }
     public bool IsConstexpr { get; set; }
+    public bool IsStatic { get; set; }
+    public List<SyntaxVariable> Arguments { get; set; } = null!;
 
     public string SafeName => string
         .Concat(Arguments.Select(p => p.GetComposedName()))
