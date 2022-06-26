@@ -33,10 +33,14 @@ public class CoreRule : ModuleRule
                 "dbghelp.lib"
             });
 
+            PublicDisableWarnings.AddRange(new[]
+            {
+                4005,
+            });
+
             PrivateDisableWarnings.AddRange(new[]
             {
                 5105,
-                4005,
                 5106,
             });
         }

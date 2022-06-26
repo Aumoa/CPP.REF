@@ -8,6 +8,7 @@
 #include <vector>
 
 class Object;
+#define interface struct
 
 // --------------- Supports Functions ---------------
 template<class T>
@@ -118,8 +119,8 @@ public:
 
 #define __COMBINE_THREE_MACROS(X, Y, Z) __ ## X ## __ ## Y ## __ ## Z ## __
 
-#define __SCLASS_BEGIN_NAMESPACE() namespace libty::reflect {
-#define __SCLASS_END_NAMESPACE() }
+#define __STYPE_BEGIN_NAMESPACE() namespace libty::reflect {
+#define __STYPE_END_NAMESPACE() }
 
 // --------------------------------------------------
 
@@ -179,16 +180,30 @@ Type* Class::StaticClass() \
 	return GeneratedClass; \
 }
 
+#define __SINTERFACE_DECLARE_GENERATED_BODY(Interface, Base) \
+	friend struct libty::reflect::reflexpr_ ## Interface; \
+\
+public: \
+	static Type* StaticClass(); \
+\
+public:
+
+#define __SINTERFACE_DEFINE_GENERATED_BODY(Interface, Base) \
+Type* Interface::StaticClass() \
+{ \
+	return nullptr; \
+}
+
 // --------------------------------------------------
 
 // ------------------- SCONSTRUCTOR -----------------
 
 #define SCONSTRUCTOR(...)
 
-#define __SCLASS_DECLARE_CONSTRUCTOR_INFO(Class, Arguments) \
+#define __STYPE_DECLARE_CONSTRUCTOR_INFO(Class, Arguments) \
 static void* Invoke_constructor__ ## Arguments ## __(std::vector<void*> args);
 
-#define __SCLASS_DEFINE_CONSTRUCTOR_INFO(Class, Arguments, ...) \
+#define __STYPE_DEFINE_CONSTRUCTOR_INFO(Class, Arguments, ...) \
 void* Class::Invoke_constructor__ ## Arguments ## __(std::vector<void*> args) \
 { \
 	Object* ptr = new Class __VA_ARGS__ ; \
@@ -201,11 +216,11 @@ void* Class::Invoke_constructor__ ## Arguments ## __(std::vector<void*> args) \
 
 #define SPROPERTY(...)
 
-#define __SCLASS_DECLARE_PROPERTY_INFO(Name, DefaultValue, Access) \
+#define __STYPE_DECLARE_PROPERTY_INFO(Name, DefaultValue, Access) \
 static void* Invoke_getter__ ## Name ## __(void* ptr); \
 static void Invoke_setter__ ## Name ## __(void* ptr, void* value);
 
-#define __SCLASS_DEFINE_PROPERTY_INFO(Class, Name, ...) \
+#define __STYPE_DEFINE_PROPERTY_INFO(Class, Name, ...) \
 void* Class::Invoke_getter__ ## Name ## __(void* ptr) \
 { \
 	auto self = dynamic_cast<Class*>(reinterpret_cast<Object*>(ptr)); \
@@ -218,16 +233,41 @@ void Class::Invoke_setter__ ## Name ## __(void* ptr, void* value) \
 	__SCLASS_SetRef(self->Name, value); \
 }
 
-// --------------------------------------------------
+// ------------------- SFUNCTION --------------------
 
 #define SFUNCTION(...)
 
-#define __SCLASS_DECLARE_FUNCTION_INFO(Name, Arguments) \
+#define __STYPE_DECLARE_FUNCTION_INFO(Name, Arguments) \
 static void* Invoke_function__ ## Name ## __ ## Arguments ## __(void* self, std::vector<void*> args);
 
-#define __SCLASS_DEFINE_FUNCTION_INFO(Class, Name, SafeName, Arguments, ReturnType, ...) \
+#define __STYPE_DEFINE_FUNCTION_INFO(Class, Name, SafeName, Arguments, ReturnType, ...) \
 void* Class::Invoke_function__ ## Name ## __ ## SafeName ## __(void* self, std::vector<void*> args) \
 { \
 	auto* oself = dynamic_cast<Class*>(reinterpret_cast<Object*>(self)); \
 	return __SCLASS_Invoke_template_function(oself, (ReturnType(Class::*) Arguments )&Class::Name) __VA_ARGS__ ; \
 }
+
+// --------------------------------------------------
+
+// ------------------- SINTERFACE -------------------
+
+#define __SINTERFACE0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SINTERFACE, FileID, Line)
+#define SINTERFACE(...) __SINTERFACE0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
+
+#define __SINTERFACE_DECLARE_REFLEXPR(API, Interface, Base) \
+struct API reflexpr_ ## Interface \
+{ \
+	using is_interface_t = int; \
+	using super_t = reflexpr_ ## Base; \
+	static constexpr String friendly_name = TEXT(#Interface); \
+	static std::vector<constructor_t> constructors; \
+	static std::vector<property_info_t> properties; \
+	static std::vector<function_info_t> functions; \
+};
+
+#define __SINTERFACE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs) \
+std::vector<constructor_t> reflexpr_ ## Interface::constructors = Ctors; \
+std::vector<property_info_t> reflexpr_ ## Interface::properties = Props; \
+std::vector<function_info_t> reflexpr_ ## Interface::functions = Funcs;
+
+// --------------------------------------------------

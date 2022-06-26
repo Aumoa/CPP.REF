@@ -24,18 +24,37 @@ internal class CppCompilation
             return sCore.Type == SyntaxType.Identifier && sCore.Name == "SCLASS";
         }
 
+        static bool IsSINTERFACE(SyntaxCore sCore)
+        {
+            return sCore.Type == SyntaxType.Identifier && sCore.Name == "SINTERFACE";
+        }
+
         List<IHeaderGenerator> generators = new();
+        List<SyntaxCore> syntaxes = new();
         for (var enumerator = _syntaxTree.GetEnumerator(); enumerator.MoveNext();)
         {
-            var syntaxes = enumerator.EnumerateNext(IsSCLASS);
-            if (syntaxes == null)
+            if (IsSCLASS(enumerator.Current))
             {
-                break;
+                syntaxes.Add(enumerator.Current);
+                enumerator.MoveNext();
+                var instance = new CompiledSCLASS(_source);
+                instance.Compile(enumerator, syntaxes);
+                generators.Add(instance);
+                syntaxes.Clear();
             }
-
-            var instance = new CompiledSCLASS(_source);
-            instance.Compile(enumerator, syntaxes);
-            generators.Add(instance);
+            else if (IsSINTERFACE(enumerator.Current))
+            {
+                syntaxes.Add(enumerator.Current);
+                enumerator.MoveNext();
+                var instance = new CompiledSINTERFACE(_source);
+                instance.Compile(enumerator, syntaxes);
+                generators.Add(instance);
+                syntaxes.Clear();
+            }
+            else
+            {
+                syntaxes.Add(enumerator.Current);
+            }
         }
 
         if (generators.Count == 0)

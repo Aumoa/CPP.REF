@@ -37,7 +37,7 @@ internal class Startup
 #if PRINT_SYNTAX
         headerFiles = new[]
         {
-            new FileReference(@"F:\CPP.REF\Game\Source\GameApp\Public\GameApp.h")
+            new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Core\Public\IDisposable.h")
         };
 #endif
 
