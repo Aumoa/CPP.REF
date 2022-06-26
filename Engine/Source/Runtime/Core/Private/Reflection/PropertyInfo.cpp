@@ -8,6 +8,11 @@ PropertyInfo::PropertyInfo(libty::reflect::property_info_t prop)
 {
 }
 
+String PropertyInfo::GetName() noexcept
+{
+	return _prop.name;
+}
+
 void* PropertyInfo::GetValue(void* self)
 {
 	return _prop.getter(self);

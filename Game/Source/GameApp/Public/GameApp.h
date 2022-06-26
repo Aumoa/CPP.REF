@@ -23,4 +23,7 @@ public:
 
 	SFUNCTION()
 	int32 Run();
+
+	SFUNCTION()
+	bool IsValid();
 };

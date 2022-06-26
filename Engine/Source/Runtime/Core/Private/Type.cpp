@@ -3,6 +3,7 @@
 #include "Type.h"
 #include "Reflection/ConstructorInfo.h"
 #include "Reflection/PropertyInfo.h"
+#include "Reflection/MethodInfo.h"
 #include "Type.gen.cpp"
 
 Type::Type() noexcept
@@ -14,8 +15,7 @@ void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 	_name = meta.FriendlyName;
 	if (meta.Super)
 	{
-		_base = std::unique_ptr<Type>(new Type());
-		_base->GenerateClass(*meta.Super);
+		_base = Object::GenerateClassType(*meta.Super);
 	}
 	for (auto& ctor : meta.Constructors)
 	{
@@ -24,6 +24,10 @@ void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 	for (auto& prop : meta.Properties)
 	{
 		_properties.emplace_back(std::unique_ptr<PropertyInfo>(new PropertyInfo(prop)));
+	}
+	for (auto& func : meta.Functions)
+	{
+		_methods.emplace_back(std::unique_ptr<MethodInfo>(new MethodInfo(func)));
 	}
 	for (Type* t = this; t; t = t->GetBaseType())
 	{
@@ -59,7 +63,7 @@ bool Type::IsClass() noexcept
 
 Type* Type::GetBaseType() noexcept
 {
-	return _base.get();
+	return _base;
 }
 
 std::vector<ConstructorInfo*> Type::GetConstructors() noexcept
@@ -86,4 +90,17 @@ std::vector<PropertyInfo*> Type::GetProperties() noexcept
 	}
 
 	return props;
+}
+
+std::vector<MethodInfo*> Type::GetMethods() noexcept
+{
+	std::vector<MethodInfo*> methods;
+	methods.reserve(_methods.size());
+
+	for (auto& method : _methods)
+	{
+		methods.emplace_back(method.get());
+	}
+
+	return methods;
 }

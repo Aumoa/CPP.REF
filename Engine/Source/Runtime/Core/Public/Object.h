@@ -29,7 +29,6 @@ private:
 	Object& operator =(const Object&) = delete;
 
 private:
-	SPROPERTY()
 	int64 InternalIndex = -1;
 	uint8 bRoot : 1 = false;
 	uint8 bMarking : 1 = false;

@@ -41,9 +41,7 @@ public:
 	};
 
 public:
-	SFUNCTION()
 	static bool IsValidLowLevel(Object* internalObject);
-	SFUNCTION()
 	static void Collect();
 
 private:

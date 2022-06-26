@@ -19,6 +19,7 @@ private:
 	using InvokeMain_t = int32(*)(ConsoleApplication*, const CommandLineBuilder&);
 
 public:
+	SCONSTRUCTOR()
 	ConsoleApplication();
 	virtual ~ConsoleApplication() noexcept override;
 

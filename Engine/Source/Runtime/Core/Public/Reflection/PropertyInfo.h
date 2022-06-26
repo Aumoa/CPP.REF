@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Concepts/IDerivedFrom.h"
 #include "PropertyInfo.generated.h"
 
 class Type;
@@ -19,17 +20,12 @@ private:
 public:
 	PropertyInfo(libty::reflect::property_info_t prop);
 
-	SFUNCTION()
+	String GetName() noexcept;
 	void* GetValue(void* self);
-	SFUNCTION()
 	void SetValue(void* self, void* value);
-	SFUNCTION()
 	Type* GetPropertyType() noexcept;
-	SFUNCTION()
 	bool IsPublic() noexcept;
-	SFUNCTION()
 	bool IsProtected() noexcept;
-	SFUNCTION()
 	bool IsPrivate() noexcept;
 
 	inline void* GetValue(Object* self)
@@ -42,13 +38,13 @@ public:
 		SetValue(reinterpret_cast<void*>(self), value);
 	}
 
-	template<std::derived_from<Object> T, class TSelf>
+	template<IDerivedFrom<Object> T, class TSelf>
 	T* GetValue(TSelf&& self)
 	{
 		using TSelfNonRef = std::remove_reference_t<TSelf>;
 
 		void* vself;
-		if constexpr (std::is_pointer_v<TSelfNonRef> && std::derived_from<std::remove_pointer_t<TSelfNonRef>, Object>)
+		if constexpr (std::is_pointer_v<TSelfNonRef> && IDerivedFrom<std::remove_pointer_t<TSelfNonRef>, Object>)
 		{
 			vself = reinterpret_cast<void*>(dynamic_cast<Object*>(self));
 		}
@@ -61,13 +57,13 @@ public:
 		return dynamic_cast<T*>(reinterpret_cast<Object*>(result));
 	}
 
-	template<std::derived_from<Object> T, class TSelf>
+	template<IDerivedFrom<Object> T, class TSelf>
 	void SetValue(TSelf&& self, T* value)
 	{
 		using TSelfNonRef = std::remove_reference_t<TSelf>;
 
 		void* vself;
-		if constexpr (std::is_pointer_v<TSelfNonRef> && std::derived_from<std::remove_pointer_t<TSelfNonRef>, Object>)
+		if constexpr (std::is_pointer_v<TSelfNonRef> && IDerivedFrom<std::remove_pointer_t<TSelfNonRef>, Object>)
 		{
 			vself = reinterpret_cast<void*>(dynamic_cast<Object*>(self));
 		}
@@ -85,7 +81,7 @@ public:
 		using TSelfNonRef = std::remove_reference_t<TSelf>;
 
 		void* vself;
-		if constexpr (std::is_pointer_v<TSelfNonRef> && std::derived_from<std::remove_pointer_t<TSelfNonRef>, Object>)
+		if constexpr (std::is_pointer_v<TSelfNonRef> && IDerivedFrom<std::remove_pointer_t<TSelfNonRef>, Object>)
 		{
 			vself = reinterpret_cast<void*>(dynamic_cast<Object*>(self));
 		}
@@ -104,7 +100,7 @@ public:
 		using TSelfNonRef = std::remove_reference_t<TSelf>;
 
 		void* vself;
-		if constexpr (std::is_pointer_v<TSelfNonRef> && std::derived_from<std::remove_pointer_t<TSelfNonRef>, Object>)
+		if constexpr (std::is_pointer_v<TSelfNonRef> && IDerivedFrom<std::remove_pointer_t<TSelfNonRef>, Object>)
 		{
 			vself = reinterpret_cast<void*>(dynamic_cast<Object*>(self));
 		}

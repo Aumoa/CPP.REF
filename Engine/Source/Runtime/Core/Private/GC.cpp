@@ -18,7 +18,7 @@ struct GC::InternalCollection
 		if (IndexQueue.size() > 0)
 		{
 			size_t index = IndexQueue.back();
-			IndexQueue.erase(IndexQueue.rbegin().base());
+			IndexQueue.erase(IndexQueue.end() - 1);
 			ObjectArray[index] = internalObject;
 			internalObject->InternalIndex = (int64)index;
 		}

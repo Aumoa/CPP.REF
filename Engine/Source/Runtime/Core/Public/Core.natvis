@@ -14,4 +14,17 @@
 	<Type Name="FileSystemReference">
 		<DisplayString>{_path}</DisplayString>
 	</Type>
+	<Type Name="Object">
+		<DisplayString></DisplayString>
+	</Type>
+	<Type Name="PropertyInfo">
+		<DisplayString>{_prop.name}</DisplayString>
+		<Expand>
+			<Item Name="[Name]">_prop.name</Item>
+			<Item Name="[Type]">_prop.reflect_type</Item>
+			<Item Name="[Access]">_prop.access_modifier</Item>
+			<Item Name="[Getter]">_prop.getter</Item>
+			<Item Name="[Setter]">_prop.setter</Item>
+		</Expand>
+	</Type>
 </AutoVisualizer>

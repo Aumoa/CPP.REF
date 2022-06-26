@@ -10,6 +10,20 @@ class Type;
 
 namespace libty::reflect
 {
+	template<class T>
+	inline Type* get_class() requires
+		std::is_pointer_v<T>&&
+		std::derived_from<std::remove_pointer_t<T>, Object>
+	{
+		return std::remove_pointer_t<T>::StaticClass();
+	}
+
+	template<class T>
+	inline Type* get_class()
+	{
+		return nullptr;
+	}
+
 	struct constructor_t
 	{
 		using function_t = void*(*)(std::vector<void*>);
@@ -36,50 +50,45 @@ namespace libty::reflect
 		using getter_t = void*(*)(void*);
 		using setter_t = void(*)(void*, void*);
 
+		String name;
 		getter_t getter;
 		setter_t setter;
 		Type* reflect_type;
 		EAccessModifier access_modifier;
 
 		template<class T>
-		static inline property_info_t generate(getter_t getter, setter_t setter, EAccessModifier access_modifier)
+		static inline property_info_t generate(const String& name, getter_t getter, setter_t setter, EAccessModifier access_modifier)
 		{
 			property_info_t p;
+			p.name = name;
 			p.getter = getter;
 			p.setter = setter;
 			p.reflect_type = get_class<T>();
 			p.access_modifier = access_modifier;
 			return p;
 		}
-
-		template<class T>
-		static inline Type* get_class() requires
-			std::is_pointer_v<T> &&
-			std::derived_from<std::remove_pointer_t<T>, Object>
-		{
-			return std::remove_pointer_t<T>::StaticClass();
-		}
-
-		template<class T>
-		static inline Type* get_class()
-		{
-			return nullptr;
-		}
 	};
 
 	struct function_info_t
 	{
-		using function_t = void*(*)(std::vector<void*>);
+		using function_t = void*(*)(void*, std::vector<void*>);
 
-		function_t fnc;
 		String name;
+		function_t fnc;
 		size_t hash;
+		Type* return_type;
+		std::vector<Type*> argument_types;
 
-		inline function_info_t(function_t fnc, const String& name, size_t hash)
-			: fnc(fnc)
-			, name(name)
-			, hash(hash)
+		template<class T, class TReturnType, class... TArgs>
+		static inline function_info_t generate(const String& name, function_t fnc, size_t hash)
 		{
+			function_info_t p;
+			p.name = name;
+			p.fnc = fnc;
+			p.hash = hash;
+			p.return_type = get_class<TReturnType>();
+			p.argument_types = std::vector<Type*>{ get_class<TArgs>()... };
+			return p;
 		}
 
 		inline operator function_t() const

@@ -3,24 +3,41 @@
 #pragma once
 
 #include "Object.h"
-#include <concepts>
+#include "Concepts/IDerivedFrom.h"
 
 // ------------- Object to Object casts. -------------
 
 template<class TTo, class TFrom>
 inline TTo* Cast(TFrom* from) requires
-	std::derived_from<TTo, Object> &&
-	std::derived_from<TFrom, Object>
+	IDerivedFrom<TTo, Object> &&
+	IDerivedFrom<TFrom, Object>
 {
 	return dynamic_cast<TTo*>(from);
 }
 
 template<class TTo, class TFrom>
 inline const TTo* Cast(const TFrom* from) requires
-	std::derived_from<TTo, Object> &&
-	std::derived_from<TFrom, Object>
+	IDerivedFrom<TTo, Object> &&
+	IDerivedFrom<TFrom, Object>
 {
 	return dynamic_cast<const TTo*>(from);
 }
 
 // ---------------------------------------------------
+
+// --------------- Void to Object casts. -------------
+
+template<class TTo>
+inline TTo* Cast(void* from) requires
+	IDerivedFrom<TTo, Object>
+{
+	return Cast<TTo>(reinterpret_cast<Object*>(from));
+}
+
+template<class TTo, class TFrom>
+inline TTo Cast(TFrom* from) requires
+	std::same_as<TTo, void*> &&
+	IDerivedFrom<TFrom, Object>
+{
+	return reinterpret_cast<void*>(Cast<Object>(from));
+}

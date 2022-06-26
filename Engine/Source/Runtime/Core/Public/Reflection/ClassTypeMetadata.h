@@ -14,6 +14,7 @@ namespace libty::reflect
 		String FriendlyName;
 		std::vector<constructor_t> Constructors;
 		std::vector<property_info_t> Properties;
+		std::vector<function_info_t> Functions;
 		std::unique_ptr<ClassTypeMetadata> Super;
 
 		template<class T>
@@ -23,6 +24,7 @@ namespace libty::reflect
 			M.FriendlyName = get_friendly_name_v<T>;
 			M.Constructors = T::constructors;
 			M.Properties = T::properties;
+			M.Functions = T::functions;
 			if constexpr (libty::reflect::is_class<typename T::super_t>)
 			{
 				M.Super = std::make_unique<ClassTypeMetadata>(Generate<typename T::super_t>());

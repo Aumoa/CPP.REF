@@ -18,6 +18,21 @@ internal class SyntaxFunction
         .Replace("&", "_3_")
         .Replace("*", "_4_");
 
+    public string ComposeArguments(string? prefix = null)
+    {
+        List<string> types = new();
+        foreach (var argument in Arguments)
+        {
+            types.Add(argument.Type);
+        }
+        string result = string.Join(", ", types);
+        if (!string.IsNullOrEmpty(result))
+        {
+            result = prefix + result;
+        }
+        return result;
+    }
+
     public string ComposeInvokeArgs()
     {
         List<string> casts = new();

@@ -160,7 +160,16 @@ internal class CompiledSCLASS : IHeaderGenerator
         foreach (var prop in _properties)
         {
             sb.AppendLine($"__SCLASS_DEFINE_PROPERTY_INFO({_name}, {prop.Variable.Name})\\");
-            props.Add($"property_info_t::generate<{prop.Variable.Type}>(&{_name}::Invoke_getter__{prop.Variable.Name}__, &{_name}::Invoke_setter__{prop.Variable.Name}__, EAccessModifier::{prop.AccessModifier})");
+            props.Add($"property_info_t::generate<{prop.Variable.Type}>(TEXT(\"{prop.Variable.Name}\"), &{_name}::Invoke_getter__{prop.Variable.Name}__, &{_name}::Invoke_setter__{prop.Variable.Name}__, EAccessModifier::{prop.AccessModifier})");
+        }
+
+        sb.AppendLine();
+
+        List<string> funcs = new();
+        foreach (var func in _functions)
+        {
+            sb.AppendLine($"__SCLASS_DEFINE_FUNCTION_INFO({_name}, {func.Name}, {func.SafeName}, ({func.ComposeArguments()}), {func.ReturnType}, ({func.ComposeInvokeArgs()}));");
+            funcs.Add($"function_info_t::generate<{_name}, {func.ReturnType}{func.ComposeArguments(", ")}>(TEXT(\"{func.Name}\"), &{_name}::Invoke_function__{func.Name}__{func.SafeName}__, {func.ComposeTypeHash()})");
         }
 
         sb.AppendLine();
@@ -169,7 +178,7 @@ internal class CompiledSCLASS : IHeaderGenerator
         sb.AppendLine($"__SCLASS_BEGIN_NAMESPACE()");
 
         sb.AppendLine();
-        sb.AppendLine($"__SCLASS_DEFINE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)}, {ComposeMacroArray("property_info_t", props)});");
+        sb.AppendLine($"__SCLASS_DEFINE_REFLEXPR({_name}, {ComposeMacroArray("constructor_t", ctors)}, {ComposeMacroArray("property_info_t", props)}, {ComposeMacroArray("function_info_t", funcs)});");
 
         sb.AppendLine();
         sb.AppendLine($"__SCLASS_END_NAMESPACE()");
@@ -234,6 +243,7 @@ internal class CompiledSCLASS : IHeaderGenerator
                     if (value.Name == "SCONSTRUCTOR")
                     {
                         ParseConstructor(syntaxes);
+                        continue;
                     }
                     else if (value.Name == "SPROPERTY")
                     {

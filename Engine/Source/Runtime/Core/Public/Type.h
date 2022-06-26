@@ -8,6 +8,7 @@
 
 class ConstructorInfo;
 class PropertyInfo;
+class MethodInfo;
 class GC;
 
 /// <summary>
@@ -31,13 +32,13 @@ private:
 	};
 
 private:
-	SPROPERTY()
 	String _name;
-	std::unique_ptr<Type> _base;
+	Type* _base = nullptr;
 	std::vector<std::unique_ptr<ConstructorInfo>> _constructors;
 	std::vector<std::unique_ptr<PropertyInfo>> _properties;
+	std::vector<std::unique_ptr<MethodInfo>> _methods;
 	std::vector<PropertyInfo*> _gcproperties;
-	EClassType _class_type;
+	EClassType _class_type = EClassType::Class;
 
 private:
 	Type() noexcept;
@@ -49,7 +50,6 @@ public:
 	/// <summary>
 	/// Gets the name of the current type.
 	/// </summary>
-	SFUNCTION()
 	virtual String ToString() noexcept override;
 
 	/// <summary>
@@ -61,6 +61,7 @@ public:
 	/// <summary>
 	/// Gets a value indicating whether the Type is a class.
 	/// </summary>
+	SFUNCTION()
 	bool IsClass() noexcept;
 
 	/// <summary>
@@ -80,6 +81,12 @@ public:
 	/// </summary>
 	SFUNCTION()
 	std::vector<PropertyInfo*> GetProperties() noexcept;
+
+	/// <summary>
+	/// Gets the methods of the current Type.
+	/// </summary>
+	SFUNCTION()
+	std::vector<MethodInfo*> GetMethods() noexcept;
 
 public:
 	template<class T>

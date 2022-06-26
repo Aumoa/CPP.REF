@@ -4,6 +4,7 @@
 
 #include "Misc/String.h"
 #include "Exceptions/TargetInvocationException.h"
+#include "Concepts/IDerivedFrom.h"
 #include <vector>
 
 class Object;
@@ -12,7 +13,7 @@ class Object;
 template<class T>
 inline T __SCLASS_Cast(void* rptr) requires
 	std::is_pointer_v<T> &&
-	std::derived_from<std::remove_const_t<std::remove_pointer_t<T>>, Object>
+	IDerivedFrom<std::remove_const_t<std::remove_pointer_t<T>>, Object>
 {
 	auto* sptr = (Object*)rptr;
 	return dynamic_cast<std::remove_const_t<T>>(sptr);
@@ -42,12 +43,25 @@ inline const T& __SCLASS_Cast(const void* rptr)
 }
 
 template<class T>
+inline void* __SCLASS_Cast(const T& value)
+{
+	return &value;
+}
+
+template<IDerivedFrom<Object> T>
+inline void* __SCLASS_Cast(T* value)
+{
+	auto* ovalue = dynamic_cast<Object*>(value);
+	return reinterpret_cast<void*>(ovalue);
+}
+
+template<class T>
 inline T* __SCLASS_GetRef(T& value)
 {
 	return &value;
 }
 
-template<std::derived_from<Object> T>
+template<IDerivedFrom<Object> T>
 inline Object* __SCLASS_GetRef(T* value)
 {
 	return value;
@@ -59,11 +73,44 @@ inline void __SCLASS_SetRef(T& left, void* right)
 	left = *reinterpret_cast<const T*>(right);
 }
 
-template<std::derived_from<Object> T>
-inline void __SCLASS_SetRef(T* left, void* right)
+template<IDerivedFrom<Object> T>
+inline void __SCLASS_SetRef(T*& left, void* right)
 {
 	left = dynamic_cast<T*>(reinterpret_cast<Object*>(right));
 }
+
+template<class TReturnType, class T, class... TArgs>
+class __SCLASS_Invoke_template_function
+{
+	using function_t = TReturnType(T::*)(TArgs...);
+	using static_function_t = TReturnType(*)(TArgs...);
+
+	T* _self;
+	function_t _fnc;
+
+public:
+	__SCLASS_Invoke_template_function(T* self, function_t fnc)
+		: _self(self)
+		, _fnc(fnc)
+	{
+	}
+
+	template<class... TInvokes>
+	void* operator ()(TInvokes&&... invokes)
+	{
+		if constexpr (std::same_as<TReturnType, void>)
+		{
+			(_self->*_fnc)(std::forward<TInvokes>(invokes)...);
+			return nullptr;
+		}
+		else
+		{
+			static thread_local TReturnType ret;
+			ret = (_self->*_fnc)(std::forward<TInvokes>(invokes)...);
+			return __SCLASS_GetRef(ret);
+		}
+	}
+};
 
 // --------------------------------------------------
 
@@ -89,11 +136,13 @@ struct API reflexpr_ ## Class \
 	static constexpr String friendly_name = TEXT(#Class); \
 	static std::vector<constructor_t> constructors; \
 	static std::vector<property_info_t> properties; \
+	static std::vector<function_info_t> functions; \
 };
 
-#define __SCLASS_DEFINE_REFLEXPR(Class, Ctors, Props) \
+#define __SCLASS_DEFINE_REFLEXPR(Class, Ctors, Props, Funcs) \
 std::vector<constructor_t> reflexpr_ ## Class::constructors = Ctors; \
-std::vector<property_info_t> reflexpr_ ## Class::properties = Props;
+std::vector<property_info_t> reflexpr_ ## Class::properties = Props; \
+std::vector<function_info_t> reflexpr_ ## Class::functions = Funcs;
 
 // --------------------------------------------------
 
@@ -173,5 +222,12 @@ void Class::Invoke_setter__ ## Name ## __(void* ptr, void* value) \
 
 #define SFUNCTION(...)
 
-#define __SCLASS_DECLARE_FUNCTION_INFO(Name, Arguments)
-//static void* Invoke_function__ ## Arguments ## __(std::vector<void*> args);
+#define __SCLASS_DECLARE_FUNCTION_INFO(Name, Arguments) \
+static void* Invoke_function__ ## Name ## __ ## Arguments ## __(void* self, std::vector<void*> args);
+
+#define __SCLASS_DEFINE_FUNCTION_INFO(Class, Name, SafeName, Arguments, ReturnType, ...) \
+void* Class::Invoke_function__ ## Name ## __ ## SafeName ## __(void* self, std::vector<void*> args) \
+{ \
+	auto* oself = dynamic_cast<Class*>(reinterpret_cast<Object*>(self)); \
+	return __SCLASS_Invoke_template_function(oself, (ReturnType(Class::*) Arguments )&Class::Name) __VA_ARGS__ ; \
+}
