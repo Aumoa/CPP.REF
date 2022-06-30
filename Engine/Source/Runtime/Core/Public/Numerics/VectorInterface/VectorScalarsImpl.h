@@ -6,8 +6,6 @@
 #include <utility>
 #include <tuple>
 
-namespace libty::inline CoreNumerics
-{
 #define VECTOR_SCALARS_CONSTEXPR_CTORS \
 	constexpr VectorScalarsImpl(const T& S = 0) : Scalars{} \
 	{ \
@@ -81,10 +79,9 @@ struct VectorScalarsImpl<T, ScalarsCount>					\
 	VECTOR_SCALARS_CONSTEXPR_CTORS;							\
 }
 
-	DECLARE_VECTOR_SCALARS_IMPL(1, T X;);
-	DECLARE_VECTOR_SCALARS_IMPL(2, T X; T Y;);
-	DECLARE_VECTOR_SCALARS_IMPL(3, T X; T Y; T Z;);
+DECLARE_VECTOR_SCALARS_IMPL(1, T X;);
+DECLARE_VECTOR_SCALARS_IMPL(2, T X; T Y;);
+DECLARE_VECTOR_SCALARS_IMPL(3, T X; T Y; T Z;);
 
 #undef DECLARE_VECTOR_SCALARS_IMPL
 #undef VECTOR_SCALARS_CONSTEXPR_CTORS
-}

@@ -3,8 +3,6 @@
 #include "Mathematics/MathEx.h"
 #include "Mathematics/Radians.h"
 
-using namespace libty;
-
 float MathEx::Sin(const Radians& v)
 {
 	return sin(v.Value);

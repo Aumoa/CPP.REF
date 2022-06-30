@@ -1085,7 +1085,7 @@ public:
 		}
 	}
 
-	[[nodiscard]] static String GetPlaceholder(String formatArgs)
+	[[nodiscard]] static String GetPlaceholder(const String& formatArgs)
 	{
 		if (!formatArgs)
 		{
