@@ -15,7 +15,11 @@ void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 	_name = meta.FriendlyName;
 	if (meta.Super)
 	{
-		_base = Object::GenerateClassType(*meta.Super);
+		_base = meta.Super;
+	}
+	for (auto& i : meta.Interfaces)
+	{
+		_interfaces.emplace_back(i);
 	}
 	for (auto& ctor : meta.Constructors)
 	{
@@ -64,6 +68,11 @@ bool Type::IsClass() noexcept
 Type* Type::GetBaseType() noexcept
 {
 	return _base;
+}
+
+std::vector<Type*> Type::GetInterfaces() noexcept
+{
+	return _interfaces;
 }
 
 std::vector<ConstructorInfo*> Type::GetConstructors() noexcept

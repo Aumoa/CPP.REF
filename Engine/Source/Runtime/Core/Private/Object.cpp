@@ -4,6 +4,8 @@
 #include "Type.h"
 #include "CoreAssert.h"
 #include "GC.h"
+#include "Casts.h"
+#include "IDisposable.h"
 #include "Reflection/PropertyInfo.h"
 #include "Reflection/ConstructorInfo.h"
 #include <map>

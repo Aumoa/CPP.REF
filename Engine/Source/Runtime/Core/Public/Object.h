@@ -11,6 +11,7 @@
 class Type;
 class GC;
 class PropertyInfo;
+interface IDisposable;
 
 /// <summary>
 /// Supports all classes in the CPP.REF class hierarchy and provides low-level services
@@ -23,6 +24,7 @@ class CORE_API Object
 	GENERATED_BODY()
 	friend class GC;
 	friend class Type;
+	friend interface IDisposable;
 
 private:
 	Object(const Object&) = delete;

@@ -10,5 +10,7 @@
 #include "GC.h"
 #include "DateTime.h"
 #include "TimeSpan.h"
+#include "IDisposable.h"
+#include "LogCore.h"
 #include "Misc/StringBuilder.h"
 #include "Logging/Log.h"

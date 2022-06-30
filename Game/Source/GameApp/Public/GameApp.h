@@ -7,7 +7,7 @@
 #include "GameApp.generated.h"
 
 SCLASS()
-class GameApp : public ConsoleApplication
+class GameApp : public ConsoleApplication, virtual public IDisposable
 {
 	GENERATED_BODY()
 
@@ -21,9 +21,14 @@ public:
 	SCONSTRUCTOR()
 	GameApp();
 
+	virtual void Dispose() override;
+
 	SFUNCTION()
 	int32 Run();
 
 	SFUNCTION()
 	bool IsValid();
+
+protected:
+	void Dispose(bool bDisposing);
 };

@@ -89,17 +89,25 @@ internal class CompiledSTYPE : IHeaderGenerator
 
     public virtual void GenerateHeader(string fileKey, StringBuilder sb)
     {
+        string GenerateInterfaces()
+        {
+            return string.Join(", ", _interfaces.Select(p => $"std::declval<{p}>()"));
+        }
+
         // Summary
         sb.AppendLine($"// {_classMacro} for {_name}");
         sb.AppendLine();
 
         // Supports SCLASS()
         sb.AppendLine($"#define __LIBTY_{_classMacro}__{fileKey}__{_line}__ \\");
+        sb.AppendLine($"\\");
+        sb.AppendLine($"{_classKey} {_name};\\");
+        sb.AppendLine($"\\");
         sb.AppendLine($"__STYPE_BEGIN_NAMESPACE()\\");
         sb.AppendLine($"\\");
 
         sb.AppendLine($"\\");
-        sb.AppendLine($"__{_classMacro}_DECLARE_REFLEXPR({_apikey}, {_name}, {_inherit ?? "void"})\\");
+        sb.AppendLine($"__{_classMacro}_DECLARE_REFLEXPR({_apikey}, {_name}, {_inherit ?? "void"}, ({GenerateInterfaces()}))\\");
 
         sb.AppendLine($"\\");
         sb.AppendLine($"__STYPE_END_NAMESPACE()");

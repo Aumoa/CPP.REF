@@ -129,11 +129,13 @@ public:
 #define __SCLASS0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SCLASS, FileID, Line)
 #define SCLASS(...) __SCLASS0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
 
-#define __SCLASS_DECLARE_REFLEXPR(API, Class, Base) \
+#define __SCLASS_DECLARE_REFLEXPR(API, Class, Base, Interfaces) \
 struct API reflexpr_ ## Class \
 { \
+	using type_t = Class; \
 	using is_class_t = int; \
 	using super_t = reflexpr_ ## Base; \
+	using interfaces_t = std::remove_reference_t<decltype(std::make_tuple Interfaces)>; \
 	static constexpr String friendly_name = TEXT(#Class); \
 	static std::vector<constructor_t> constructors; \
 	static std::vector<property_info_t> properties; \
@@ -191,7 +193,9 @@ public:
 #define __SINTERFACE_DEFINE_GENERATED_BODY(Interface, Base) \
 Type* Interface::StaticClass() \
 { \
-	return nullptr; \
+	static const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Interface)>(); \
+	static Type* GeneratedClass = GenerateClassType(sToken); \
+	return GeneratedClass; \
 }
 
 // --------------------------------------------------
@@ -254,11 +258,13 @@ void* Class::Invoke_function__ ## Name ## __ ## SafeName ## __(void* self, std::
 #define __SINTERFACE0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SINTERFACE, FileID, Line)
 #define SINTERFACE(...) __SINTERFACE0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
 
-#define __SINTERFACE_DECLARE_REFLEXPR(API, Interface, Base) \
+#define __SINTERFACE_DECLARE_REFLEXPR(API, Interface, Base, Interfaces) \
 struct API reflexpr_ ## Interface \
 { \
+	using type_t = Interface; \
 	using is_interface_t = int; \
 	using super_t = reflexpr_ ## Base; \
+	using interfaces_t = std::remove_reference_t<decltype(std::make_tuple Interfaces)>; \
 	static constexpr String friendly_name = TEXT(#Interface); \
 	static std::vector<constructor_t> constructors; \
 	static std::vector<property_info_t> properties; \

@@ -11,30 +11,30 @@ GameApp::GameApp()
 {
 }
 
+void GameApp::Dispose()
+{
+	throw;
+}
+
 int32 GameApp::Run()
 {
-	_objValue = gcnew Object();
-	_intValue = 10;
-
-	using r = std::invoke_result_t<decltype(&GameApp::Run), GameApp*>;
-
-	auto props = GetType()->GetProperties();
-
-	Object* ptr = gcnew Object();
-	GC::Collect();
-	Object* objValue = props[0]->GetValue<Object>(this);
-	int32 intValue = props[1]->GetValue<int32>(this);
-
-	auto* gameApp = Cast<GameApp>(MemberwiseClone());
-	const bool b = gameApp->_objValue == _objValue;
-
-	for (auto& method : GetType()->GetMethods())
+	for (auto* p = GetType(); p; p = p->GetBaseType())
 	{
-		if (method->GetName() == TEXT("Run"))
+		std::vector<String> interfaces;
+		for (auto& i : p->GetInterfaces())
 		{
-			method->Invoke(this);
+			interfaces.emplace_back(String::Format(TEXT("          interface {}"), i->GetName()));
 		}
+
+		std::vector<String> values;
+		values.emplace_back(p->GetName());
+		if (interfaces.size())
+		{
+			values.emplace_back(String::Join(TEXT("\n"), interfaces));
+		}
+		Log::Info(LogTemp, TEXT("class {}"), String::Join(TEXT("\n"), values));
 	}
+
 	return 0;
 }
 

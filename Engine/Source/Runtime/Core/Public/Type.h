@@ -34,6 +34,7 @@ private:
 private:
 	String _name;
 	Type* _base = nullptr;
+	std::vector<Type*> _interfaces;
 	std::vector<std::unique_ptr<ConstructorInfo>> _constructors;
 	std::vector<std::unique_ptr<PropertyInfo>> _properties;
 	std::vector<std::unique_ptr<MethodInfo>> _methods;
@@ -69,6 +70,12 @@ public:
 	/// </summary>
 	SFUNCTION()
 	Type* GetBaseType() noexcept;
+
+	/// <summary>
+	/// When overridden in a derived class, gets all the interfaces implemented or inherited by the current Type.
+	/// </summary>
+	SFUNCTION()
+	std::vector<Type*> GetInterfaces() noexcept;
 
 	/// <summary>
 	/// Returns all the public constructors defined for the current System.Type.

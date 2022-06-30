@@ -9,4 +9,7 @@ SINTERFACE()
 interface CORE_API IDisposable : virtual public Object
 {
 	GENERATED_BODY()
+
+	SFUNCTION()
+	virtual void Dispose() = 0;
 };
