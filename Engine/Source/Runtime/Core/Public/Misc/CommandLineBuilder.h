@@ -2,19 +2,17 @@
 
 #pragma once
 
-#include "Object.h"
-#include "CommandLineBuilder.generated.h"
+#include "Misc/String.h"
+#include <vector>
 
-SCLASS()
-class CORE_API CommandLineBuilder : virtual public Object
+class CORE_API CommandLineBuilder
 {
-	GENERATED_BODY()
-
 private:
 	std::vector<String> _args;
 
 public:
 	CommandLineBuilder(int32 argc, char** argv);
+	CommandLineBuilder(char* args);
 
 	inline size_t NumArguments() const noexcept { return _args.size(); }
 	inline String GetArgument(size_t index) const noexcept { return _args[index]; }

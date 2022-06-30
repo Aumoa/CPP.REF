@@ -3,32 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ConsoleApplication.h"
+#include "GameAppCore.h"
 #include "GameApp.generated.h"
 
 SCLASS()
-class GameApp : public ConsoleApplication, virtual public IDisposable
+class GameApp : public GameAppCore
 {
 	GENERATED_BODY()
-
-private:
-	SPROPERTY()
-	Object* _objValue = nullptr;
-	SPROPERTY()
-	int32 _intValue = 0;
 
 public:
 	SCONSTRUCTOR()
 	GameApp();
-
-	virtual void Dispose() override;
-
-	SFUNCTION()
-	int32 Run();
-
-	SFUNCTION()
-	bool IsValid();
-
-protected:
-	void Dispose(bool bDisposing);
 };

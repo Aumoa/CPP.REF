@@ -3,21 +3,19 @@
 using System;
 using BuildTool;
 
-public class GameAppRule : ModuleRule
+public class GameRule : ModuleRule
 {
-    public GameAppRule()
+    public GameRule()
     {
-        Category = ModuleCategory.Game;
-        FilterPath = "Test";
-        ModuleType = ModuleType.Application;
+        Category = ModuleCategory.Engine;
+        FilterPath = "Engine.Runtime";
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
-        
+
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core",
-            "Game",
+            "Core"
         });
     }
 }

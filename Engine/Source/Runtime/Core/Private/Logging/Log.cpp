@@ -10,6 +10,13 @@
 #include <future>
 #include "Log.gen.cpp"
 
+#if PLATFORM_WINDOWS
+#pragma push_macro("TEXT")
+#undef TEXT
+#include <Windows.h>
+#pragma pop_macro("TEXT")
+#endif
+
 namespace
 {
 	static Thread sWorker;
@@ -102,8 +109,12 @@ void Log::_Worker()
 				threadName = String::Format(TEXT("[Thread {}]"), entry.LogThread.GetThreadId());
 			}
 
-			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}"), levelToString(entry.Level), threadName, entry.Category->GetCategoryName(), entry.Message);
-			std::wcout << (std::wstring_view)formatted << std::endl;
+			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}\n"), levelToString(entry.Level), threadName, entry.Category->GetCategoryName(), entry.Message);
+			std::wcout << (std::wstring_view)formatted;
+
+#if PLATFORM_WINDOWS
+			OutputDebugStringW(formatted.c_str());
+#endif
 		}
 
 		for (auto& action : actions)

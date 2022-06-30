@@ -12,5 +12,8 @@
 #include "TimeSpan.h"
 #include "IDisposable.h"
 #include "LogCore.h"
+#include "SubclassOf.h"
+#include "Delegates/MulticastDelegate.h"
+#include "Delegates/MulticastEvent.h"
 #include "Misc/StringBuilder.h"
 #include "Logging/Log.h"

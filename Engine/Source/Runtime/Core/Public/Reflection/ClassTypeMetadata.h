@@ -32,6 +32,8 @@ namespace libty::reflect
 
 	struct ClassTypeMetadata
 	{
+		int32 ClassType;
+		size_t HashCode;
 		String FriendlyName;
 		std::vector<constructor_t> Constructors;
 		std::vector<property_info_t> Properties;
@@ -43,6 +45,15 @@ namespace libty::reflect
 		static ClassTypeMetadata Generate()
 		{
 			ClassTypeMetadata M;
+			if constexpr (libty::reflect::is_class<T>)
+			{
+				M.ClassType = 0;
+			}
+			else if constexpr (libty::reflect::is_interface<T>)
+			{
+				M.ClassType = 2;
+			}
+			M.HashCode = typeid(typename T::type_t).hash_code();
 			M.FriendlyName = get_friendly_name_v<T>;
 			M.Constructors = T::constructors;
 			M.Properties = T::properties;

@@ -33,6 +33,7 @@ private:
 
 private:
 	String _name;
+	size_t _hash_code;
 	Type* _base = nullptr;
 	std::vector<Type*> _interfaces;
 	std::vector<std::unique_ptr<ConstructorInfo>> _constructors;
@@ -66,6 +67,29 @@ public:
 	bool IsClass() noexcept;
 
 	/// <summary>
+	/// Gets a value indicating whether the Type is a interface.
+	/// </summary>
+	SFUNCTION()
+	bool IsInterface() noexcept;
+
+	/// <summary>
+	/// Gets a value indicating whether the Type is derived from target Type.
+	/// </summary>
+	SFUNCTION()
+	bool IsDerivedFrom(Type* t) noexcept;
+
+	/// <summary>
+	/// Gets a value indicating whether the Type is implements the target interface Type.
+	/// </summary>
+	SFUNCTION()
+	bool IsImplements(Type* t) noexcept;
+
+	/// <summary>
+	/// Gets the hash code indicating this type.
+	/// </summary>
+	size_t GetHashCode() noexcept;
+
+	/// <summary>
 	/// Gets the type from which the current Type directly inherits.
 	/// </summary>
 	SFUNCTION()
@@ -97,11 +121,11 @@ public:
 
 public:
 	template<class T>
-	Type* TypeOf() requires
+	static Type* TypeOf() requires
 		requires { { T::StaticClass() } -> std::same_as<Type*>; }
 	{
 		return T::StaticClass();
 	}
 };
 
-#define typeof(x) Type::TypeOf<x>();
+#define typeof(x) Type::TypeOf<x>()

@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Type.h"
+#include "CoreAssert.h"
 #include "Reflection/ConstructorInfo.h"
 #include "Reflection/PropertyInfo.h"
 #include "Reflection/MethodInfo.h"
@@ -13,6 +14,7 @@ Type::Type() noexcept
 void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 {
 	_name = meta.FriendlyName;
+	_hash_code = meta.HashCode;
 	if (meta.Super)
 	{
 		_base = meta.Super;
@@ -43,7 +45,7 @@ void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 			}
 		}
 	}
-	_class_type = EClassType::Class;
+	_class_type = (EClassType)meta.ClassType;
 }
 
 Type::~Type() noexcept
@@ -63,6 +65,45 @@ String Type::GetName() noexcept
 bool Type::IsClass() noexcept
 {
 	return _class_type == EClassType::Class;
+}
+
+bool Type::IsInterface() noexcept
+{
+	return _class_type == EClassType::Interface;
+}
+
+bool Type::IsDerivedFrom(Type* t) noexcept
+{
+	check(t && t->IsClass());
+	for (Type* p = this; p; p = p->GetBaseType())
+	{
+		if (p->GetHashCode() == t->GetHashCode())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Type::IsImplements(Type* t) noexcept
+{
+	check(t && t->IsInterface());
+	for (Type* p = this; p; p = p->GetBaseType())
+	{
+		for (auto& i : p->GetInterfaces())
+		{
+			if (i->GetHashCode() == t->GetHashCode())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+size_t Type::GetHashCode() noexcept
+{
+	return _hash_code;
 }
 
 Type* Type::GetBaseType() noexcept

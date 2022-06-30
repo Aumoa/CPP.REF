@@ -2,7 +2,5 @@
 
 #include "CoreDelegates.h"
 
-using namespace ::libty;
-
 CoreDelegates::BeginMainInvokedDelegate CoreDelegates::BeginMainInvoked;
 CoreDelegates::PostEngineInitDelegate CoreDelegates::PostEngineInit;
