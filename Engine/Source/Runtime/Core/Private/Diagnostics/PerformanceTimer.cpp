@@ -53,7 +53,14 @@ bool PerformanceTimer::IsRunning() const noexcept
 
 TimeSpan PerformanceTimer::GetElapsed() const noexcept
 {
-	return _elapsed;
+	if (_startTime.has_value())
+	{
+		return DateTime::Now() - *_startTime;
+	}
+	else
+	{
+		return _elapsed;
+	}
 }
 
 PerformanceTimer PerformanceTimer::StartNew() noexcept

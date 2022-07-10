@@ -15,7 +15,7 @@ namespace libty::reflect
 		std::is_pointer_v<T>&&
 		std::derived_from<std::remove_pointer_t<T>, Object>
 	{
-		return std::remove_pointer_t<T>::StaticClass();
+		return std::remove_pointer_t<T>::InstantiatedClass();
 	}
 
 	template<class T>

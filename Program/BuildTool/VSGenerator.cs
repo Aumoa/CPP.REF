@@ -281,6 +281,7 @@ public partial class VSGenerator : ISolutionGenerator
         return project.Rule.ModuleType switch
         {
             ModuleType.ConsoleApplication => "Application",
+            ModuleType.Application => "Application",
             ModuleType.Library => _solution.Rule.StaticLibraries ? "StaticLibrary" : "DynamicLibrary",
             _ => "Utility"
         };

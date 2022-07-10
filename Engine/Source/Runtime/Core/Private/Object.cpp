@@ -13,10 +13,14 @@
 
 Object::Object() noexcept
 {
+	Reference = new ObjectReference();
+	Reference->IncrWeak();
 }
 
 Object::~Object() noexcept
 {
+	Reference->DecrWeak();
+	Reference = nullptr;
 }
 
 Type* Object::GetType() noexcept
@@ -32,13 +36,18 @@ String Object::ToString() noexcept
 void Object::AddToRoot()
 {
 	check(InternalIndex != -1);
-	bRoot = true;
+	Reference->IncrRef();
 }
 
 void Object::RemoveFromRoot()
 {
 	check(InternalIndex != -1);
-	bRoot = false;
+	Reference->DecrRef();
+}
+
+bool Object::IsRoot()
+{
+	return Reference->Shared > 0;
 }
 
 bool Object::IsValidLowLevel()
@@ -71,22 +80,43 @@ Object* Object::MemberwiseClone()
 	return nullptr;
 }
 
-static thread_local std::map<String, std::unique_ptr<Type>> sTypes;
+std::map<String, std::unique_ptr<Type>>* sTypesPtr;
 
-Type* Object::GenerateClassType(const libty::reflect::ClassTypeMetadata& meta)
+Type* Object::InstantiateClass(const String& friendlyName)
 {
-	auto it = sTypes.find(meta.FriendlyName);
-	if (it == sTypes.end())
+	static std::map<String, std::unique_ptr<Type>> sTypes;
+	sTypesPtr = &sTypes;
+
+	auto it = sTypesPtr->find(friendlyName);
+	if (it == sTypesPtr->end())
 	{
-		it = sTypes.emplace(meta.FriendlyName, std::unique_ptr<Type>(new Type())).first;
-		it->second->GenerateClass(meta);
+		// Reserve type pointer.
+		it = sTypesPtr->emplace(friendlyName, std::unique_ptr<Type>(new Type())).first;
 	}
+
 	return it->second.get();
+}
+
+Type* Object::GenerateClassType(libty::reflect::ClassTypeMetadata& meta)
+{
+	if (!meta.bGen)
+	{
+		meta.bGen = true;
+
+		Type* type = InstantiateClass(meta.FriendlyName);
+		// Make class metadata.
+		type->GenerateClass(meta);
+		return type;
+	}
+	else
+	{
+		return FindClass(meta.FriendlyName);
+	}
 }
 
 Type* Object::FindClass(const String& friendlyName)
 {
-	if (auto it = sTypes.find(friendlyName); it != sTypes.end())
+	if (auto it = sTypesPtr->find(friendlyName); it != sTypesPtr->end())
 	{
 		return it->second.get();
 	}

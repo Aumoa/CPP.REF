@@ -30,7 +30,8 @@ public class CoreRule : ModuleRule
             PublicAdditionalLibraries.AddRange(new[]
             {
                 "psapi.lib",
-                "dbghelp.lib"
+                "dbghelp.lib",
+                "User32.lib"
             });
 
             PublicDisableWarnings.AddRange(new[]

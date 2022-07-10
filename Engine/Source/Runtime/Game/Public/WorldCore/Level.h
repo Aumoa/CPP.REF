@@ -3,15 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameAppCore.h"
-#include "GameApp.generated.h"
+#include "Level.generated.h"
 
 SCLASS()
-class GameApp : public GameAppCore
+class GAME_API Level : virtual public Object
 {
 	GENERATED_BODY()
 
 public:
-	SCONSTRUCTOR()
-	GameApp();
+	Level();
 };

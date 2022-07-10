@@ -126,6 +126,10 @@ public:
 	{
 		return T::StaticClass();
 	}
+
+private:
+	bool _cached = false;
+	const std::vector<PropertyInfo*>& GetGCProperties();
 };
 
 #define typeof(x) Type::TypeOf<x>()

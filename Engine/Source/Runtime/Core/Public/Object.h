@@ -6,6 +6,7 @@
 #include "Misc/String.h"
 #include "Reflection/ObjectMacros.h"
 #include "Reflection/ClassTypeMetadata.h"
+#include "CoreObject/ObjectReference.h"
 #include "Object.generated.h"
 
 class Type;
@@ -22,17 +23,18 @@ SCLASS()
 class CORE_API Object
 {
 	GENERATED_BODY()
-	friend class GC;
-	friend class Type;
-	friend interface IDisposable;
+	friend GC;
+	friend Type;
+	friend IDisposable;
+	template<class> friend class WeakPtr;
 
 private:
 	Object(const Object&) = delete;
 	Object& operator =(const Object&) = delete;
 
 private:
+	ObjectReference* Reference = nullptr;
 	int64 InternalIndex = -1;
-	uint8 bRoot : 1 = false;
 	uint8 bMarking : 1 = false;
 
 public:
@@ -71,6 +73,12 @@ public:
 	void RemoveFromRoot();
 
 	/// <summary>
+	/// Check the object is root set.
+	/// </summary>
+	SFUNCTION()
+	bool IsRoot();
+
+	/// <summary>
 	/// Checks to see if the object appears to be valid.
 	/// </summary>
 	SFUNCTION()
@@ -85,8 +93,10 @@ protected:
 	Object* MemberwiseClone();
 
 protected:
-	static Type* GenerateClassType(const libty::reflect::ClassTypeMetadata& meta);
+	static Type* InstantiateClass(const String& friendlyName);
+	static Type* GenerateClassType(libty::reflect::ClassTypeMetadata& meta);
 	static Type* FindClass(const String& friendlyName);
 };
 
+#include "GC.h"
 #include "Type.h"

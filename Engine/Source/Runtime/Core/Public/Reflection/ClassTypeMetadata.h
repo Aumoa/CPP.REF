@@ -32,6 +32,7 @@ namespace libty::reflect
 
 	struct ClassTypeMetadata
 	{
+		bool bGen = false;
 		int32 ClassType;
 		size_t HashCode;
 		String FriendlyName;
@@ -54,15 +55,15 @@ namespace libty::reflect
 				M.ClassType = 2;
 			}
 			M.HashCode = typeid(typename T::type_t).hash_code();
-			M.FriendlyName = get_friendly_name_v<T>;
-			M.Constructors = T::constructors;
-			M.Properties = T::properties;
-			M.Functions = T::functions;
+			M.FriendlyName = T::friendly_name();
+			M.Constructors = T::constructors();
+			M.Properties = T::properties();
+			M.Functions = T::functions();
 			if constexpr (libty::reflect::is_class<typename T::super_t>)
 			{
 				using super_t = typename T::super_t;
 				using type_t = typename super_t::type_t;
-				M.Super = type_t::StaticClass();
+				M.Super = type_t::InstantiatedClass();
 			}
 			libty::reflect::GenerateInterfaces<typename T::interfaces_t>::Generate(M);
 			return M;

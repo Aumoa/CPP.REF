@@ -36,6 +36,7 @@ struct GC::InternalCollection
 		ObjectArray[index] = nullptr;
 		IndexQueue.emplace_back(index);
 		PendingRemoves.emplace_back(internalObject);
+		internalObject->Reference->bDisposed = true;
 	}
 };
 
@@ -80,6 +81,7 @@ void GC::Shutdown()
 	if (sGCThreadId != 0)
 	{
 		Collect();
+		WaitPendingRemoves();
 		sGCThreadId = 0;
 	}
 }
@@ -90,7 +92,7 @@ void GC::Collect()
 	sMarkingCol.Clear(sCollection.ObjectArray.size());
 	for (size_t i = 0; i < sCollection.ObjectArray.size(); ++i)
 	{
-		if (Object*& ptr = sCollection.ObjectArray[i]; ptr && ptr->bRoot)
+		if (Object*& ptr = sCollection.ObjectArray[i]; ptr && ptr->IsRoot())
 		{
 			sMarkingCol.Add(ptr);
 			ptr->bMarking = true;
@@ -105,7 +107,7 @@ void GC::Collect()
 			if (Object*& ptr = sMarkingCol.MarkingObjects[i]; ptr)
 			{
 				Type* t = ptr->GetType();
-				for (auto& prop : t->_gcproperties)
+				for (auto& prop : t->GetGCProperties())
 				{
 					if (Object* value = prop->GetValue<Object>(ptr); value && !value->bMarking)
 					{
@@ -125,10 +127,7 @@ void GC::Collect()
 	}
 
 	// Collecting objects.
-	while (sCollection.PendingRemoves.size())
-	{
-		std::this_thread::yield();
-	}
+	WaitPendingRemoves();
 
 	for (size_t i = 0; i < sCollection.ObjectArray.size(); ++i)
 	{
@@ -172,4 +171,12 @@ void GC::RegisterObject(Object* internalObject)
 	check(internalObject->InternalIndex == -1);
 	check(Thread::GetCurrentThread().GetThreadId() == sGCThreadId);
 	sCollection.AddObject(internalObject);
+}
+
+void GC::WaitPendingRemoves()
+{
+	while (sCollection.PendingRemoves.size())
+	{
+		std::this_thread::yield();
+	}
 }

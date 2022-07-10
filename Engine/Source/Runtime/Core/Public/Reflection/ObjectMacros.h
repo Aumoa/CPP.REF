@@ -122,12 +122,29 @@ public:
 #define __STYPE_BEGIN_NAMESPACE() namespace libty::reflect {
 #define __STYPE_END_NAMESPACE() }
 
+#define __STYPE_DEFINE_REFLEXPR(Class, Ctors, Props, Funcs) \
+std::vector<constructor_t> reflexpr_ ## Class::constructors() \
+{ \
+	static auto ctors = Ctors; \
+	return ctors; \
+} \
+std::vector<property_info_t> reflexpr_ ## Class::properties() \
+{ \
+	static auto props = Props; \
+	return props; \
+} \
+std::vector<function_info_t> reflexpr_ ## Class::functions() \
+{ \
+	static auto funcs = Funcs; \
+	return funcs; \
+}
+
 // --------------------------------------------------
 
 // -------------------- SCLASS ----------------------
 
 #define __SCLASS0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SCLASS, FileID, Line)
-#define SCLASS(...) __SCLASS0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
+#define SCLASS(...) __SCLASS0(__LIBTY_GENERATED_FILE_ID__, __LINE__);
 
 #define __SCLASS_DECLARE_REFLEXPR(API, Class, Base, Interfaces) \
 struct API reflexpr_ ## Class \
@@ -136,23 +153,21 @@ struct API reflexpr_ ## Class \
 	using is_class_t = int; \
 	using super_t = reflexpr_ ## Base; \
 	using interfaces_t = std::remove_reference_t<decltype(std::make_tuple Interfaces)>; \
-	static constexpr String friendly_name = TEXT(#Class); \
-	static std::vector<constructor_t> constructors; \
-	static std::vector<property_info_t> properties; \
-	static std::vector<function_info_t> functions; \
+	static constexpr String friendly_name() { return TEXT(#Class); } \
+	static std::vector<constructor_t> constructors(); \
+	static std::vector<property_info_t> properties(); \
+	static std::vector<function_info_t> functions(); \
 };
 
 #define __SCLASS_DEFINE_REFLEXPR(Class, Ctors, Props, Funcs) \
-std::vector<constructor_t> reflexpr_ ## Class::constructors = Ctors; \
-std::vector<property_info_t> reflexpr_ ## Class::properties = Props; \
-std::vector<function_info_t> reflexpr_ ## Class::functions = Funcs;
+__STYPE_DEFINE_REFLEXPR(Class, Ctors, Props, Funcs)
 
 // --------------------------------------------------
 
 // ----------------- GENERATED_BODY -----------------
 
 #define __GENERATED_BODY0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_GENERATED_BODY, FileID, Line)
-#define GENERATED_BODY(...) __GENERATED_BODY0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
+#define GENERATED_BODY(...) __GENERATED_BODY0(__LIBTY_GENERATED_FILE_ID__, __LINE__);
 
 #define __SCLASS_DECLARE_GENERATED_BODY(Class, Base) \
 	friend struct libty::reflect::reflexpr_ ## Class; \
@@ -160,16 +175,24 @@ std::vector<function_info_t> reflexpr_ ## Class::functions = Funcs;
 public: \
 	using This = Class; \
 	using Super = Base; \
+	static constexpr String FriendlyName = TEXT(#Class); \
 \
 protected: \
 	virtual Type* Impl_GetType(); \
 \
 public: \
 	static Type* StaticClass(); \
+	static Type* InstantiatedClass(); \
 \
 private:
 
 #define __SCLASS_DEFINE_GENERATED_BODY(Class, Base) \
+static auto& s ## Class ## Token() \
+{ \
+	static auto sGen = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Class)>(); \
+	return sGen; \
+} \
+\
 Type* Class::Impl_GetType() \
 { \
 	return StaticClass(); \
@@ -177,10 +200,17 @@ Type* Class::Impl_GetType() \
 \
 Type* Class::StaticClass() \
 { \
-	static const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Class)>(); \
-	static Type* GeneratedClass = GenerateClassType(sToken); \
-	return GeneratedClass; \
-}
+	static Type* sType = InstantiatedClass(); \
+	static Type* sDummy = GenerateClassType(s ## Class ## Token()); \
+	return sType; \
+} \
+\
+Type* Class::InstantiatedClass() \
+{ \
+	return InstantiateClass(TEXT(#Class)); \
+} \
+\
+static Type* s ## Static ## Class = Class::StaticClass();
 
 #define __SINTERFACE_DECLARE_GENERATED_BODY(Interface, Base) \
 	friend struct libty::reflect::reflexpr_ ## Interface; \
@@ -193,9 +223,9 @@ public:
 #define __SINTERFACE_DEFINE_GENERATED_BODY(Interface, Base) \
 Type* Interface::StaticClass() \
 { \
-	static const auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Interface)>(); \
-	static Type* GeneratedClass = GenerateClassType(sToken); \
-	return GeneratedClass; \
+	static auto sToken = libty::reflect::ClassTypeMetadata::Generate<reflexpr(Interface)>(); \
+	static Type* sType = GenerateClassType(sToken); \
+	return sType; \
 }
 
 // --------------------------------------------------
@@ -256,7 +286,7 @@ void* Class::Invoke_function__ ## Name ## __ ## SafeName ## __(void* self, std::
 // ------------------- SINTERFACE -------------------
 
 #define __SINTERFACE0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SINTERFACE, FileID, Line)
-#define SINTERFACE(...) __SINTERFACE0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
+#define SINTERFACE(...) __SINTERFACE0(__LIBTY_GENERATED_FILE_ID__, __LINE__);
 
 #define __SINTERFACE_DECLARE_REFLEXPR(API, Interface, Base, Interfaces) \
 struct API reflexpr_ ## Interface \
@@ -265,15 +295,13 @@ struct API reflexpr_ ## Interface \
 	using is_interface_t = int; \
 	using super_t = reflexpr_ ## Base; \
 	using interfaces_t = std::remove_reference_t<decltype(std::make_tuple Interfaces)>; \
-	static constexpr String friendly_name = TEXT(#Interface); \
-	static std::vector<constructor_t> constructors; \
-	static std::vector<property_info_t> properties; \
-	static std::vector<function_info_t> functions; \
+	static constexpr String friendly_name() { return TEXT(#Interface); } \
+	static std::vector<constructor_t> constructors(); \
+	static std::vector<property_info_t> properties(); \
+	static std::vector<function_info_t> functions(); \
 };
 
 #define __SINTERFACE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs) \
-std::vector<constructor_t> reflexpr_ ## Interface::constructors = Ctors; \
-std::vector<property_info_t> reflexpr_ ## Interface::properties = Props; \
-std::vector<function_info_t> reflexpr_ ## Interface::functions = Funcs;
+__STYPE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs)
 
 // --------------------------------------------------

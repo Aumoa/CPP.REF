@@ -15,7 +15,7 @@
 		<DisplayString>{_path}</DisplayString>
 	</Type>
 	<Type Name="Object">
-		<DisplayString></DisplayString>
+		<DisplayString>{FriendlyName}</DisplayString>
 	</Type>
 	<Type Name="PropertyInfo">
 		<DisplayString>{_prop.name}</DisplayString>
@@ -26,5 +26,9 @@
 			<Item Name="[Getter]">_prop.getter</Item>
 			<Item Name="[Setter]">_prop.setter</Item>
 		</Expand>
+	</Type>
+	<Type Name="Type">
+		<DisplayString Condition="_class_type==Type::EClassType::Class">class {_name}</DisplayString>
+		<DisplayString Condition="_class_type==Type::EClassType::Interface">interface {_name}</DisplayString>
 	</Type>
 </AutoVisualizer>

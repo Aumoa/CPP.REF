@@ -3,12 +3,12 @@
 #if PLATFORM_WINDOWS
 
 #include "CoreMinimal.h"
-#include "GameApp.h"
+#include "GameApplication.h"
 #include <Windows.h>
 
 INT APIENTRY WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ char* args, _In_ INT)
 {
-	return GameAppCore::GuardedMain(typeof(GameApp), CommandLineBuilder(args));
+	return GameApplication::GuardedMain(typeof(GameApplication), CommandLineBuilder(args));
 }
 
 #endif

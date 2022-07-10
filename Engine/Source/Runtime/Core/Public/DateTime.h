@@ -6,7 +6,6 @@
 #include "TimeSpan.h"
 #include <chrono>
 #include <optional>
-#include <version>
 
 class DateTime
 {

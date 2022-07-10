@@ -23,7 +23,7 @@ namespace libty::reflect
 	};
 
 	template<class T>
-	inline constexpr String get_friendly_name_v = T::friendly_name;
+	inline constexpr String get_friendly_name_v = T::friendly_name();
 
 
 

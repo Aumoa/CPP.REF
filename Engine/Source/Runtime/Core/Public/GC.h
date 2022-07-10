@@ -46,6 +46,7 @@ public:
 
 private:
 	static void RegisterObject(Object* internalObject);
+	static void WaitPendingRemoves();
 };
 
 #define gcnew GC::gcnew_binder() << new 

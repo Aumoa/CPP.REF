@@ -5,6 +5,7 @@
 #include "IMulticastDelegate.h"
 #include "DelegateHandle.h"
 #include "Threading/Spinlock.h"
+#include "CoreObject/WeakPtr.h"
 #include <functional>
 #include <map>
 #include <atomic>
@@ -61,7 +62,8 @@ public:
 	MulticastDelegate() = default;
 
 	template<class... TInvokeArgs>
-	void Broadcast(TInvokeArgs&&... args)
+	void Broadcast(TInvokeArgs&&... args) requires
+		std::invocable<TPayload, TInvokeArgs>
 	{
 		std::vector<int64> compacts;
 		std::vector<DelegateInstance> invokes;
@@ -100,35 +102,71 @@ public:
 		_id = 0;
 	}
 
-	template<class TFunctionBody>
-	ScopedDelegateHolder AddRaw(TFunctionBody&& body) requires requires
-	{
-		{ TPayload(std::declval<TFunctionBody>()) };
-	}
-	{
-		std::unique_lock lock(_lock);
-		int64 myid = _id++;
+private:
 
-		DelegateInstance instance(myid, std::move(body));
-		ScopedDelegateHolder handle(this, instance.Id);
-		_payload.emplace(myid, std::move(instance));
-		return handle;
+public:
+	template<class T>
+	static inline DelegateInstance CreateLambda(T&& body) requires
+		std::invocable<T, TArgs...>
+	{
+		return DelegateInstance(0, std::forward<T>(body));
 	}
 
-	template<class U>
-	ScopedDelegateHolder AddObject(U* object, void(U::* body)(TArgs...))
+	template<class T>
+	static inline DelegateInstance CreateWeakLambda(Object* self, T&& body) requires
+		std::invocable<T, TArgs...>
+	{
+		return DelegateInstance(0, std::forward<T>(body), ImplGetHolder(self));
+	}
+
+	template<class TSelf, class T>
+	static inline DelegateInstance CreateWeakLambda(const std::shared_ptr<TSelf>& self, T&& body) requires
+		std::invocable<T, TArgs...>
+	{
+		return DelegateInstance(0, std::forward<T>(body), ImplGetHolder(self));
+	}
+
+	template<class TSelf, class... TInvokeArgs>
+	static inline DelegateInstance CreateObject(TSelf* self, void (TSelf::*func)(TInvokeArgs...)) requires
+		std::derived_from<TSelf, Object>
+	{
+		return CreateWeakLambda(self, [self, func](TArgs... args) { (self->*func)(args...); });
+	}
+
+	template<class T>
+	inline ScopedDelegateHolder AddLambda(T&& body) requires
+		std::invocable<T, TArgs...>
+	{
+		return Add(CreateLambda(std::forward<T>(body)));
+	}
+
+	template<class T>
+	inline ScopedDelegateHolder AddWeakLambda(Object* self, T&& body) requires
+		std::invocable<T, TArgs...>
+	{
+		return Add(CreateWeakLambda(self, std::forward<T>(body)));
+	}
+
+	template<class TSelf, class T>
+	inline ScopedDelegateHolder AddWeakLambda(const std::shared_ptr<TSelf>& self, T&& body) requires
+		std::invocable<T, TArgs...>
+	{
+		return Add(CreateWeakLambda(self, std::forward<T>(body)));
+	}
+
+	template<class TSelf, class... TInvokeArgs>
+	inline ScopedDelegateHolder AddObject(TSelf* self, void (TSelf::*func)(TInvokeArgs...)) requires
+		std::derived_from<TSelf, Object>
+	{
+		return Add(CreateObject(self, func));
+	}
+
+	inline ScopedDelegateHolder Add(DelegateInstance&& instance)
 	{
 		std::unique_lock lock(_lock);
-		int64 myid = _id++;
-
-		auto invoke = [object, body](TArgs&&... args)
-		{
-			(object->*body)(std::forward<TArgs>(args)...);
-		};
-
-		DelegateInstance instance(myid, invoke, GetHolderImpl(object));
+		*instance.Id = _id++;
 		ScopedDelegateHolder handle(this, instance.Id);
-		_payload.emplace(myid, std::move(instance));
+		_payload.emplace(*instance.Id, std::move(instance));
 		return handle;
 	}
 
@@ -142,24 +180,45 @@ public:
 		}
 	}
 
-	template<class TFunctionBody>
-	auto operator +=(TFunctionBody&& body)
+	template<class T>
+	inline auto operator +=(T&& body) requires
+		std::invocable<T, TArgs...>
 	{
-		return AddRaw(std::forward<TFunctionBody>(body));
+		return AddLambda(std::forward<T>(body));
+	}
+
+	inline auto operator +=(DelegateInstance&& instance)
+	{
+		return Add(std::move(instance));
+	}
+
+	inline auto operator -=(DelegateHandle& handle)
+	{
+		return Remove(handle);
 	}
 
 private:
 	template<class U>
-	static auto GetHolderImpl(U* object) requires requires
+	static auto ImplGetHolder(U* object) requires
+		std::derived_from<U, Object>
 	{
-		{ std::declval<U>().GetHolder()() } -> std::convertible_to<bool>;
-	}
-	{
-		return object->GetHolder();
+		return [self = WeakPtr(object)]
+		{
+			return self.IsValid();
+		};
 	}
 
 	template<class U>
-	static auto GetHolderImpl(U* object)
+	static auto ImplGetHolder(const std::shared_ptr<U>& object)
+	{
+		return [self = std::weak_ptr(object)]
+		{
+			return !self.expired();
+		};
+	}
+
+	template<class U>
+	static auto ImplGetHolder(U* object)
 	{
 		return nullptr;
 	}

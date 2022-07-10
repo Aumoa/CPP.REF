@@ -35,16 +35,6 @@ void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 	{
 		_methods.emplace_back(std::unique_ptr<MethodInfo>(new MethodInfo(func)));
 	}
-	for (Type* t = this; t; t = t->GetBaseType())
-	{
-		for (auto& prop : t->_properties)
-		{
-			if (Type* pt = prop->GetPropertyType(); pt && pt->IsClass())
-			{
-				_gcproperties.emplace_back(prop.get());
-			}
-		}
-	}
 	_class_type = (EClassType)meta.ClassType;
 }
 
@@ -153,4 +143,25 @@ std::vector<MethodInfo*> Type::GetMethods() noexcept
 	}
 
 	return methods;
+}
+
+const std::vector<PropertyInfo*>& Type::GetGCProperties()
+{
+	if (!_cached)
+	{
+		for (Type* t = this; t; t = t->GetBaseType())
+		{
+			for (auto& prop : t->_properties)
+			{
+				if (Type* pt = prop->GetPropertyType(); pt && (pt->IsClass() || pt->IsInterface()))
+				{
+					_gcproperties.emplace_back(prop.get());
+				}
+			}
+		}
+
+		_cached = true;
+	};
+
+	return _gcproperties;
 }

@@ -26,7 +26,7 @@ if (const bool b = (bool)(x); !b) \
 #define checkf(x, fmt, ...) \
 if (const bool b = (bool)(x); !b) \
 { \
-	CoreAssert::Assert(TEXT(#x), String::Format(fmt __VA_OPT__(, __VA_ARGS__)); \
+	CoreAssert::Assert(TEXT(#x), String::Format(fmt __VA_OPT__(, __VA_ARGS__))); \
 }
 
 #define ensure(x) \

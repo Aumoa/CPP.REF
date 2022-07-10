@@ -3,9 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CoreDelegates.generated.h"
 
-class GAME_API CoreDelegates
+SCLASS()
+class GAME_API CoreDelegates : virtual public Object
 {
+	GENERATED_BODY()
+
+private:
 	CoreDelegates() = delete;
 
 public:
