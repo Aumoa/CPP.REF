@@ -60,6 +60,24 @@ void WindowsWindow::Destroy()
 	}
 }
 
+void* WindowsWindow::GetPointer()
+{
+	return _hWnd;
+}
+
+Vector2N WindowsWindow::GetDrawingSize()
+{
+	RECT rc;
+	if (!GetClientRect(_hWnd, &rc))
+	{
+		return Vector2N::Zero();
+	}
+	else
+	{
+		return Vector2N(rc.right - rc.left, rc.bottom - rc.top);
+	}
+}
+
 LRESULT CALLBACK WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_NCCREATE)

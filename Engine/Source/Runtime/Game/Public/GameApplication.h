@@ -24,7 +24,11 @@ public:
 	GameApplication();
 
 	virtual int32 Startup(const CommandLineBuilder& builder) override;
+	virtual void RequestExit(int32 exitCode) override;
 	virtual void Tick() override;
+
+protected:
+	virtual Type* GetEngineType();
 
 private:
 	void OnMainWindowDestroyed();

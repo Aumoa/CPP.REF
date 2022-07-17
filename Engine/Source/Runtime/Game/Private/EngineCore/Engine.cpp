@@ -2,6 +2,7 @@
 
 #include "EngineCore/Engine.h"
 #include "WorldCore/World.h"
+#include "EngineCore/GameRenderSubsystem.h"
 #include "Engine.gen.cpp"
 
 Engine::Engine() : Super()
@@ -11,6 +12,15 @@ Engine::Engine() : Super()
 void Engine::Init()
 {
 	_world = SpawnGameWorld();
+
+	_renderSystem = gcnew GameRenderSubsystem();
+	_renderSystem->Init();
+}
+
+void Engine::Deinit()
+{
+	_renderSystem->Deinit();
+	_renderSystem = nullptr;
 }
 
 void Engine::ExecuteEngineLoop()

@@ -17,5 +17,20 @@ public class GameRule : ModuleRule
         {
             "Core"
         });
+
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            PrivateAdditionalMacros.AddRange(new[]
+            {
+                "NOMINMAX",
+                "WIN32_LEAN_AND_MEAN"
+            });
+
+            PublicAdditionalLibraries.AddRange(new[]
+            {
+                "DXGI.lib",
+                "D3D12.lib"
+            });
+        }
     }
 }

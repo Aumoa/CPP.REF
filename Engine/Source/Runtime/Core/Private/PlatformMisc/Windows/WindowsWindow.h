@@ -34,6 +34,8 @@ public:
 
 	virtual void Show(bool bShow) override;
 	virtual void Destroy() override;
+	virtual void* GetPointer() override;
+	virtual Vector2N GetDrawingSize() override;
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

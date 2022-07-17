@@ -4,6 +4,7 @@
 
 #include "Object.h"
 #include "Delegates/MulticastDelegate.h"
+#include "Numerics/VectorInterface/Vector.h"
 #include "IPlatformWindow.generated.h"
 
 SINTERFACE()
@@ -13,6 +14,8 @@ interface CORE_API IPlatformWindow : virtual public Object
 
 	virtual void Show(bool bShow) = 0;
 	virtual void Destroy() = 0;
+	virtual void* GetPointer() = 0;
+	virtual Vector2N GetDrawingSize() = 0;
 
 	DECLARE_MULTICAST_DELEGATE(WindowDestroyedDelegate);
 	WindowDestroyedDelegate WindowDestroyed;

@@ -26,7 +26,7 @@ public:
 	virtual int32 Startup(const CommandLineBuilder& builder) = 0;
 
 	void StartApplicationLoop();
-	void RequestExit(int32 exitCode);
+	virtual void RequestExit(int32 exitCode);
 	virtual void Tick();
 
 	int32 GetPlatformExitCode();

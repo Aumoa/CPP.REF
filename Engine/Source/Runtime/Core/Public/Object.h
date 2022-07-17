@@ -23,6 +23,8 @@ SCLASS()
 class CORE_API Object
 {
 	GENERATED_BODY()
+
+private:
 	friend GC;
 	friend Type;
 	friend IDisposable;

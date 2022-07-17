@@ -3,6 +3,7 @@
 #include "GameApplication.h"
 #include "PlatformMisc/IPlatformWindow.h"
 #include "EngineCore/GameEngine.h"
+#include "Reflection/ConstructorInfo.h"
 #include "GameApplication.gen.cpp"
 
 constexpr LogCategory LogGameApp(TEXT("LogGameApp"));
@@ -18,7 +19,9 @@ int32 GameApplication::Startup(const CommandLineBuilder& args)
 	_window->WindowDestroyed.AddObject(this, &GameApplication::OnMainWindowDestroyed);
 
 	Log::Info(LogGameApp, TEXT("Initialize engine."));
-	_engine = gcnew GameEngine();
+	Type* engineType = GetEngineType();
+	checkf(engineType, TEXT("GetEngineType() return nullptr."));
+	_engine = Cast<Engine>(engineType->GetConstructors()[0]->Invoke());
 	_engine->Init();
 
 	Log::Info(LogGameApp, TEXT("Starting main loop."));
@@ -29,10 +32,21 @@ int32 GameApplication::Startup(const CommandLineBuilder& args)
 	return GetPlatformExitCode();
 }
 
+void GameApplication::RequestExit(int32 exitCode)
+{
+	_engine->Deinit();
+	Super::RequestExit(exitCode);
+}
+
 void GameApplication::Tick()
 {
 	Super::Tick();
 	_engine->ExecuteEngineLoop();
+}
+
+Type* GameApplication::GetEngineType()
+{
+	return typeof(GameEngine);
 }
 
 void GameApplication::OnMainWindowDestroyed()

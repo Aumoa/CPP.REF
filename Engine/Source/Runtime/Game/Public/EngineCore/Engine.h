@@ -7,6 +7,7 @@
 #include "Engine.generated.h"
 
 class World;
+class GameRenderSubsystem;
 
 SCLASS()
 class GAME_API Engine : virtual public Object
@@ -20,11 +21,15 @@ private:
 	SPROPERTY()
 	World* _world = nullptr;
 
+	SPROPERTY()
+	GameRenderSubsystem* _renderSystem = nullptr;
+
 protected:
 	Engine();
 
 public:
 	virtual void Init();
+	virtual void Deinit();
 
 	void ExecuteEngineLoop();
 
