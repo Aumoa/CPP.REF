@@ -5,8 +5,6 @@
 #if PLATFORM_WINDOWS
 #include "DirectXInlineHelper.h"
 
-using namespace libty;
-
 Quaternion Quaternion::FromAxisAngle(const Vector3& Axis, Degrees Angle)
 {
 	Radians Rad = Angle.ToRadians();

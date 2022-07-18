@@ -17,3 +17,7 @@
 #include "Delegates/MulticastEvent.h"
 #include "Misc/StringBuilder.h"
 #include "Logging/Log.h"
+#include "Numerics/VectorInterface/Vector.h"
+#include "Numerics/MatrixInterface/Matrix.h"
+#include "Numerics/TransformInterface/Transform.h"
+#include "Numerics/TransformInterface/Transform2D.h"

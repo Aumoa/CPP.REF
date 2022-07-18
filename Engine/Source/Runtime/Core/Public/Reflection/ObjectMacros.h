@@ -172,9 +172,11 @@ __STYPE_DEFINE_REFLEXPR(Class, Ctors, Props, Funcs)
 #define __SCLASS_DECLARE_GENERATED_BODY(Class, Base) \
 	friend struct libty::reflect::reflexpr_ ## Class; \
 \
-public: \
+private: \
 	using This = Class; \
 	using Super = Base; \
+\
+public: \
 	static constexpr String FriendlyName = TEXT(#Class); \
 \
 protected: \
@@ -303,5 +305,12 @@ struct API reflexpr_ ## Interface \
 
 #define __SINTERFACE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs) \
 __STYPE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs)
+
+// --------------------------------------------------
+
+// --------------------- SENUM ----------------------
+
+#define __SENUM0(FileID, Line)
+#define SENUM(...)
 
 // --------------------------------------------------
