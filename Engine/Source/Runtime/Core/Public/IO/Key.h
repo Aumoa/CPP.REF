@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include "Reflection/ObjectMacros.h"
+
+SENUM()
 enum class EKey
 {
     None                = 0,

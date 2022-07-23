@@ -314,3 +314,10 @@ __STYPE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs)
 #define SENUM(...)
 
 // --------------------------------------------------
+
+// -------------------- SSTRUCT ---------------------
+
+#define __SSTRUCT0(FileID, Line)
+#define SSTRUCT(...)
+
+// --------------------------------------------------
