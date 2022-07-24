@@ -100,8 +100,8 @@ public:
 		auto lock = std::unique_lock(_lock);
 		if (!IsCompleted())
 		{
-			_status = ETaskStatus::Canceled;
 			_exception = std::make_exception_ptr(TaskCanceledException());
+			_status = ETaskStatus::Canceled;
 
 			auto thens = std::move(_thens);
 			_future.NotifyAll();
@@ -122,8 +122,8 @@ public:
 
 		if (!IsCompleted())
 		{
-			_status = ETaskStatus::Faulted;
 			_exception = ptr;
+			_status = ETaskStatus::Faulted;
 
 			auto thens = std::move(_thens);
 			_future.NotifyAll();
@@ -248,8 +248,8 @@ public:
 		auto lock = std::unique_lock(_lock);
 		if (!IsCompleted())
 		{
-			_status = ETaskStatus::RanToCompletion;
 			_promise.Emplace(std::forward<U>(result)...);
+			_status = ETaskStatus::RanToCompletion;
 
 			std::vector thens = std::move(_thens);
 			_future.NotifyAll();

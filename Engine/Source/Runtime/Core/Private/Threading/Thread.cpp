@@ -156,7 +156,7 @@ Thread Thread::CreateThread(const String& friendlyName, std::function<void()> en
 	std::promise<Thread> promise;
 	std::future<Thread> future = promise.get_future();
 
-	std::thread([&]()
+	std::thread([&, entryPoint = entry]()
 	{
 		Thread thread = GetCurrentThread();
 		thread.SetFriendlyName(friendlyName);
@@ -165,7 +165,7 @@ Thread Thread::CreateThread(const String& friendlyName, std::function<void()> en
 		promise.set_value(thread);
 		try
 		{
-			entry();
+			entryPoint();
 		}
 		catch (...)
 		{

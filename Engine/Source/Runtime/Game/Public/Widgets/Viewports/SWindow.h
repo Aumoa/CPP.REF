@@ -5,6 +5,11 @@
 #include "Widgets/SCompoundWidget.h"
 
 class SViewport;
+class RHISwapChain;
+class RHIDevice;
+class RHICommandQueue;
+class GameRenderSubsystem;
+interface IPlatformWindow;
 
 class GAME_API SWindow : public SCompoundWidget
 {
@@ -12,28 +17,18 @@ class GAME_API SWindow : public SCompoundWidget
 	using Super = SCompoundWidget;
 
 private:
-	//SPROPERTY(RContext)
-	//SRenderContext* RContext = nullptr;
-	//SPROPERTY(RThread)
-	//SRenderThread* RThread = nullptr;
+	std::shared_ptr<RHIDevice> _device;
+	std::shared_ptr<RHICommandQueue> _commandQueue;
+	WeakPtr<IPlatformWindow> _platformWindow;
 
-	//SPROPERTY(SwapChain)
-	//IRHISwapChain* SwapChain = nullptr;
-	//int32 BufferCount;
-	//Vector2N SwapChainSize;
-
-	SPROPERTY(Viewports)
-	std::vector<SViewport*> Viewports;
+	std::shared_ptr<RHISwapChain> _swapChain;
+	std::vector<std::shared_ptr<SViewport>> _viewports;
 
 public:
 	SWindow();
 
-	//SFUNCTION(Inject)
-	//void Inject(SRenderEngine* REngine, SRenderThread* RThread);
-
 	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
-
-	//void RenderWindow(SRenderContext* RContext);
+	void PresentWindow();
 
 	virtual size_t NumChildrens() override;
 	virtual SWidget* GetChildrenAt(size_t IndexOf) override;
@@ -43,11 +38,12 @@ protected:
 
 public:
 	BEGIN_SLATE_ATTRIBUTE
-		DECLARE_SLATE_ATTRIBUTE(int32, BufferCount, 3)
+		DECLARE_SLATE_ATTRIBUTE(GameRenderSubsystem*, RenderSystem)
+		DECLARE_SLATE_ATTRIBUTE(IPlatformWindow*, TargetWindow)
 	END_SLATE_ATTRIBUTE;
 
 	DECLARE_SLATE_CONSTRUCTOR();
 
 private:
-	void TryResizeSwapChain(const Geometry& AllottedGeometry);
+	void TryResizeSwapChain(const Geometry& allottedGeometry);
 };

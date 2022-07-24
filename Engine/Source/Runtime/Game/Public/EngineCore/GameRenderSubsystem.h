@@ -22,10 +22,17 @@ private:
 	std::shared_ptr<RHIDevice> _device;
 	std::shared_ptr<RHICommandQueue> _commandQueue;
 
+	Task<> _previousRenderTick;
+
 public:
 	GameRenderSubsystem();
 	virtual ~GameRenderSubsystem() noexcept override;
 
 	virtual void Init();
 	virtual void Deinit();
+
+	void ExecuteRenderTicks();
+
+	inline const std::shared_ptr<RHIDevice>& GetDevice() { return _device; }
+	inline const std::shared_ptr<RHICommandQueue>& GetCommandQueue() { return _commandQueue; }
 };

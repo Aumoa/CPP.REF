@@ -18,10 +18,21 @@ private:
 	SpinlockConditionVariable _cv;
 	bool _running = false;
 
+	Spinlock _lockWorks;
+	std::vector<std::function<void()>> _pendingWorks;
+	std::vector<std::function<void()>> _readyWorks;
+
+#if !SHIPPING
+	bool _ensureWorks = false;
+#endif
+
 public:
 	RHIRenderThread();
 
 	void StopThread();
+
+	void EnqueueWork(std::function<void()> work);
+	Task<> ExecuteWorks(std::function<void()> work);
 
 private:
 	void Worker();

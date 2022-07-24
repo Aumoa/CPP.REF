@@ -16,4 +16,6 @@ private:
 
 public:
 	virtual ~NullRHISwapChain() noexcept override;
+
+	virtual void Present() override;
 };

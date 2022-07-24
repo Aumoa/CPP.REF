@@ -8,45 +8,36 @@
 template<class T>
 class WeakPtr
 {
-	T* _ptr;
-	ObjectReference* _reference;
+	T* _ptr = nullptr;
+	ObjectReference* _reference = nullptr;
 
 public:
+	inline WeakPtr() noexcept
+	{
+	}
+
+	inline WeakPtr(std::nullptr_t) noexcept
+	{
+	}
+
 	inline WeakPtr(T* ptr) noexcept
 	{
-		_ptr = ptr;
-		if (ptr)
-		{
-			_reference = ptr->Reference;
-			_reference->IncrWeak();
-		}
+		Reset(ptr);
 	}
 
 	inline WeakPtr(const WeakPtr& ptr) noexcept
 	{
-		_ptr = ptr._ptr;
-		if (_ptr)
-		{
-			_reference = _ptr->Reference;
-			_reference->IncrWeak();
-		}
+		Reset(ptr.Get());
 	}
 
 	inline WeakPtr(WeakPtr&& ptr) noexcept
 	{
-		_ptr = ptr._ptr;
-		_reference = ptr._reference;
-		ptr._ptr = nullptr;
-		ptr._reference = nullptr;
+		Swap(ptr);
 	}
 
 	inline ~WeakPtr() noexcept
 	{
-		if (_reference)
-		{
-			_reference->DecrWeak();
-			_reference = nullptr;
-		}
+		Reset();
 	}
 
 	inline bool IsValid() const noexcept
@@ -69,6 +60,39 @@ public:
 		return nullptr;
 	}
 
+	inline WeakPtr& Reset(T* rhs = nullptr) noexcept
+	{
+		// Same pointer.
+		if (_ptr == rhs)
+		{
+			return *this;
+		}
+
+		// Unreference pointer.
+		if (_reference)
+		{
+			_reference->DecrWeak();
+			_reference = nullptr;
+			_ptr = nullptr;
+		}
+
+		if (rhs != nullptr)
+		{
+			_reference = rhs->Reference;
+			_reference->IncrWeak();
+			_ptr = rhs;
+		}
+
+		return *this;
+	}
+
+	inline WeakPtr& Swap(WeakPtr& rhs) noexcept
+	{
+		std::swap(_ptr, rhs._ptr);
+		std::swap(_reference, rhs._reference);
+		return *this;
+	}
+
 	inline operator bool() const noexcept
 	{
 		return IsValid();
@@ -79,6 +103,17 @@ public:
 		auto* p = Get();
 		check(p);
 		return p;
+	}
+
+	inline WeakPtr& operator =(const WeakPtr& rhs) noexcept
+	{
+		return Reset(rhs.Get());
+	}
+
+	inline WeakPtr& operator =(WeakPtr&& rhs) noexcept
+	{
+		Reset();
+		return Swap(rhs);
 	}
 };
 

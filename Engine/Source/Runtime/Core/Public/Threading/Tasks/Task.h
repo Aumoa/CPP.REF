@@ -421,7 +421,7 @@ public:
 
 		public:
 			WhenAnyAwaiter(std::stop_token sToken)
-				: ::Awaiter<void>(sToken)
+				: ::Awaiter<TTask>(sToken)
 			{
 			}
 
@@ -453,7 +453,7 @@ public:
 								self->SetException(e);
 							}
 						}
-						else if (size_t number = self->_counter; number == self->_tasks.size())
+						else if (t.IsCompletedSuccessfully())
 						{
 							if (bool expected = false; self->_bool.compare_exchange_strong(expected, true))
 							{
@@ -467,7 +467,7 @@ public:
 
 		auto ptr = std::make_shared<WhenAnyAwaiter>(sToken);
 		ptr->Start(ptr, Linq::ToVector(&tasks));
-		return Task<>(std::move(ptr));
+		return Task<TTask>(std::move(ptr));
 	}
 
 	template<class... TTasks>

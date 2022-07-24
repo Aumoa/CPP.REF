@@ -12,4 +12,6 @@ protected:
 
 public:
 	virtual ~RHISwapChain() noexcept override;
+
+	virtual void Present() = 0;
 };

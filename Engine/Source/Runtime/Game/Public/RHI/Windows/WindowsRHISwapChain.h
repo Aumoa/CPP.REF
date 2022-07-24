@@ -25,6 +25,8 @@ private:
 
 public:
 	virtual ~WindowsRHISwapChain() noexcept override;
+
+	virtual void Present() override;
 };
 
 #endif

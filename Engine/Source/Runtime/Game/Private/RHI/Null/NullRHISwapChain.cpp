@@ -10,3 +10,7 @@ NullRHISwapChain::NullRHISwapChain(std::shared_ptr<RHIDevice> device)
 NullRHISwapChain::~NullRHISwapChain() noexcept
 {
 }
+
+void NullRHISwapChain::Present()
+{
+}

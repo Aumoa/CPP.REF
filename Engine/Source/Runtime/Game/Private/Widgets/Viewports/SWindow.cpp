@@ -2,32 +2,30 @@
 
 #include "Widgets/Viewports/SWindow.h"
 #include "Widgets/Viewports/SViewport.h"
+#include "RHI/RHISwapChain.h"
+#include "RHI/RHIDevice.h"
+#include "EngineCore/GameRenderSubsystem.h"
+#include "PlatformMisc/IPlatformWindow.h"
 
 SWindow::SWindow()
 	: Super()
 {
 }
 
-//void SWindow::Inject(SRenderEngine* REngine, SRenderThread* RThread)
-//{
-//	RContext = REngine->CreateRenderContext();
-//	this->RThread = RThread;
-//}
-
 void SWindow::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
 {
-	TryResizeSwapChain(AllottedGeometry);
 	Super::Tick(AllottedGeometry, InDeltaTime);
+	TryResizeSwapChain(AllottedGeometry);
 }
 
-//void SWindow::RenderWindow(SRenderContext* RContext)
-//{
-//	SwapChain->Present();
-//}
+void SWindow::PresentWindow()
+{
+	_swapChain->Present();
+}
 
 size_t SWindow::NumChildrens()
 {
-	return Viewports.size();
+	return _viewports.size();
 }
 
 SWidget* SWindow::GetChildrenAt(size_t IndexOf)
@@ -50,25 +48,16 @@ void SWindow::OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const
 
 DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 {
-	//BufferCount = Attr._BufferCount;
-
-	//IRHIFactory* Factory = RContext->OwningDevice->GetFactory();
-	//SwapChain = Factory->CreateSwapChain(RContext->RenderQueue, BufferCount);
-
-	//Viewports.emplace_back(SNew(SViewport));
-
 	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
+
+	_device = Attr._RenderSystem->GetDevice();
+	_commandQueue = Attr._RenderSystem->GetCommandQueue();
+	_platformWindow = Attr._TargetWindow;
+
+	_swapChain = _device->CreateSwapChain(_commandQueue, _platformWindow.Get());
 }
 
 void SWindow::TryResizeSwapChain(const Geometry& AllottedGeometry)
 {
 	Vector2N Size = Vector<>::Cast<int32>(AllottedGeometry.GetLocalSize());
-	//if (Size != SwapChainSize)
-	//{
-	//	RThread->EnqueueRenderThreadWork(this, [this, DesiredSize = Size](SRenderContext*)
-	//	{
-	//		SwapChain->ResizeBuffers(DesiredSize);
-	//	});
-	//	SwapChainSize = Size;
-	//}
 }

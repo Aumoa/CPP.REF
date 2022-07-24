@@ -23,7 +23,7 @@ using Microsoft::WRL::ComPtr;
 #define HR(x) \
 { \
 	HRESULT hr = (x); \
-	checkf(SUCCEEDED(hr), TEXT("DirectX RHI assertion failure. HRESULT: {0:X}, Message: {1}"), (int32)hr, (const wchar_t*)_com_error(hr).Description()); \
+	ensureMsgf(SUCCEEDED(hr), TEXT("DirectX RHI assertion failure. HRESULT: {0:X}, Message: {1}"), (int32)hr, (const wchar_t*)_com_error(hr).Description()); \
 }
 
 #else

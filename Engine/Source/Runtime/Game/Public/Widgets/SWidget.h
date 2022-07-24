@@ -30,10 +30,10 @@ private:
 
 	SlateRenderTransform RenderTransform = SlateRenderTransform::Identity();
 	Vector2 RenderTransformPivot = Vector2(0.5f, 0.5f);
-	uint8 bEnabled : 1 = true;
-	uint8 bHasRenderTransform : 1 = false;
-	uint8 bMouseHover : 1 = false;
-	uint8 bInvalidateLayout : 1 = true;
+	bool bEnabled : 1 = true;
+	bool bHasRenderTransform : 1 = false;
+	bool bMouseHover : 1 = false;
+	bool bInvalidateLayout : 1 = true;
 
 	float RenderOpacity = 1.0f;
 	Vector2 CachedMouseLocation;
@@ -107,9 +107,10 @@ public:
 	float GetRenderOpacity();
 };
 
-template<std::derived_from<SWidget> TSlateClass, class TDeclarativeAttr>
-inline TSlateClass* operator <<(TSlateClass* SlateInstance, TDeclarativeAttr&& Attribute)
+template<class T, class TDeclarativeAttr>
+std::shared_ptr<T> operator <<(const std::shared_ptr<T>& ptr, TDeclarativeAttr&& attr) requires
+std::derived_from<T, SWidget>
 {
-	SlateInstance->Construct(std::move(Attribute));
-	return SlateInstance;
+	ptr->Construct(std::forward<TDeclarativeAttr>(attr));
+	return ptr;
 }

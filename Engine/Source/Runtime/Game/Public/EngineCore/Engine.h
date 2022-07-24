@@ -33,6 +33,12 @@ public:
 
 	void ExecuteEngineLoop();
 
+	template<class T>
+	GameRenderSubsystem* GetEngineSubsystem() requires std::same_as<T, GameRenderSubsystem>
+	{
+		return _renderSystem;
+	}
+
 protected:
 	virtual void DispatchEngineTick(float elapsedSeconds);
 

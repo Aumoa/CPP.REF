@@ -42,16 +42,16 @@ namespace SlateCore
 	};
 }
 
-#define BEGIN_SLATE_ATTRIBUTE																				\
-template<class TThis = void>																				\
+#define BEGIN_SLATE_ATTRIBUTE																					\
+template<class TThis = void>																					\
 struct DeclarativeAttr : public ::SlateCore::DeclarativeInheritanceIfImplements<Super, DeclarativeAttr<>>::Type	\
-{																											\
+{																												\
 	using This = typename ::SlateCore::DeclarativeVoidTypeImpl<TThis, DeclarativeAttr>::Type;					\
-																											\
+																												\
 	template<::SlateCore::DeclarativeAttrShouldBeCast U = Super>												\
-	operator typename U::DeclarativeAttrVoid&& () &															\
-	{																										\
-		return std::move(reinterpret_cast<typename U::DeclarativeAttrVoid&>(*this));						\
+	operator typename U::DeclarativeAttrVoid&& () &																\
+	{																											\
+		return std::move(reinterpret_cast<typename U::DeclarativeAttrVoid&>(*this));							\
 	}
 
 #define END_SLATE_ATTRIBUTE													\
@@ -104,5 +104,5 @@ This&& operator +(SlotClass&& instanceSlot) &&								\
 	return std::move(*static_cast<This*>(this));							\
 }
 
-#define SNew(SlateClass) (::SlateCore::SObjectFactory::GetPrimaryService()->Create<SlateClass>()) << SlateClass::DeclarativeAttr<>()
-#define SAssignNew(Var, SlateClass) (Var = gcnew SlateClass()) << SlateClass::DeclarativeAttr<>()
+#define SNew(SlateClass) (std::make_shared<SlateClass>()) << SlateClass::DeclarativeAttr<>()
+#define SAssignNew(Var, SlateClass) (Var = std::make_shared<SlateClass>()) << SlateClass::DeclarativeAttr<>()

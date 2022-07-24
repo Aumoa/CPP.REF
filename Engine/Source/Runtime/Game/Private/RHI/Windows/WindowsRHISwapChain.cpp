@@ -41,4 +41,9 @@ WindowsRHISwapChain::~WindowsRHISwapChain() noexcept
 {
 }
 
+void WindowsRHISwapChain::Present()
+{
+	HR(_swapChain->Present(0, 0));
+}
+
 #endif

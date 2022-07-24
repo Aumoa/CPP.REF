@@ -7,6 +7,7 @@
 #include "GameApplication.generated.h"
 
 class Engine;
+class SWindow;
 
 SCLASS()
 class GAME_API GameApplication : public PlatformApplication
@@ -27,8 +28,12 @@ public:
 	virtual void RequestExit(int32 exitCode) override;
 	virtual void Tick() override;
 
+private:
+	std::vector<std::shared_ptr<SWindow>> _sWindows;
+
 protected:
 	virtual Type* GetEngineType();
+	virtual void InitializeSlateApplication(IPlatformWindow* initialWindow);
 
 private:
 	void OnMainWindowDestroyed();
