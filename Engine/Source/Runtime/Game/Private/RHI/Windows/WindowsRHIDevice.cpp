@@ -7,6 +7,7 @@
 #include "RHI/Windows/WindowsRHIFactory.h"
 #include "RHI/Windows/WindowsRHICommandQueue.h"
 #include "RHI/Windows/WindowsRHISwapChain.h"
+#include "RHI/Windows/WindowsRHIFence.h"
 
 WindowsRHIDevice::WindowsRHIDevice(std::shared_ptr<WindowsRHIFactory> factory)
 	: RHIDevice(factory)
@@ -30,12 +31,17 @@ WindowsRHIDevice::~WindowsRHIDevice() noexcept
 
 std::shared_ptr<RHICommandQueue> WindowsRHIDevice::CreateCommandQueue()
 {
-	return std::shared_ptr<RHICommandQueue>(new WindowsRHICommandQueue(std::static_pointer_cast<WindowsRHIDevice>(shared_from_this())));
+	return std::shared_ptr<RHICommandQueue>(new WindowsRHICommandQueue(SharedFromThis()));
 }
 
 std::shared_ptr<RHISwapChain> WindowsRHIDevice::CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow)
 {
 	return std::shared_ptr<RHISwapChain>(new WindowsRHISwapChain(std::static_pointer_cast<WindowsRHICommandQueue>(queue), drawingWindow));
+}
+
+std::shared_ptr<RHIFence> WindowsRHIDevice::CreateFence()
+{
+	return std::shared_ptr<RHIFence>(new WindowsRHIFence(SharedFromThis()));
 }
 
 #endif

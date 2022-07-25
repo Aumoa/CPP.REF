@@ -9,6 +9,7 @@
 class RHIRenderThread;
 class RHIDevice;
 class RHICommandQueue;
+class RHIFence;
 
 SCLASS()
 class GAME_API GameRenderSubsystem : public EngineSubsystem
@@ -21,6 +22,8 @@ private:
 
 	std::shared_ptr<RHIDevice> _device;
 	std::shared_ptr<RHICommandQueue> _commandQueue;
+	std::shared_ptr<RHIFence> _fence;
+	uint64 _fenceValue = 0;
 
 	Task<> _previousRenderTick;
 
@@ -31,7 +34,7 @@ public:
 	virtual void Init();
 	virtual void Deinit();
 
-	void ExecuteRenderTicks();
+	void ExecuteRenderTicks(std::function<void()> presentWorks);
 
 	inline const std::shared_ptr<RHIDevice>& GetDevice() { return _device; }
 	inline const std::shared_ptr<RHICommandQueue>& GetCommandQueue() { return _commandQueue; }

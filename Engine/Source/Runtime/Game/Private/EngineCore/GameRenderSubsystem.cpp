@@ -5,6 +5,7 @@
 #include "RHI/RHIFactory.h"
 #include "RHI/RHIDevice.h"
 #include "RHI/RHICommandQueue.h"
+#include "RHI/RHIFence.h"
 #include "Diagnostics/PerformanceTimer.h"
 #include "GameRenderSubsystem.gen.cpp"
 
@@ -22,6 +23,7 @@ void GameRenderSubsystem::Init()
 	auto factory = RHIFactory::CreateFactory();
 	_device = factory->CreateDevice();
 	_commandQueue = _device->CreateCommandQueue();
+	_fence = _device->CreateFence();
 }
 
 void GameRenderSubsystem::Deinit()
@@ -33,7 +35,7 @@ void GameRenderSubsystem::Deinit()
 	_renderThread = nullptr;
 }
 
-void GameRenderSubsystem::ExecuteRenderTicks()
+void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> presentWorks)
 {
 	if (_previousRenderTick.IsValid())
 	{
@@ -45,7 +47,14 @@ void GameRenderSubsystem::ExecuteRenderTicks()
 		_previousRenderTick.GetResult();
 	}
 
-	_previousRenderTick = _renderThread->ExecuteWorks([]()
+	_previousRenderTick = _renderThread->ExecuteWorks([this, presentWorks]()
 	{
+		if (presentWorks)
+		{
+			presentWorks();
+		}
+
+		_commandQueue->Signal(_fence, ++_fenceValue);
+		_fence->Wait(_fenceValue);
 	});
 }

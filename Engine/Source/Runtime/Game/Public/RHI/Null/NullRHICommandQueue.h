@@ -16,4 +16,6 @@ private:
 
 public:
 	virtual ~NullRHICommandQueue() noexcept override;
+
+	virtual void Signal(std::shared_ptr<RHIFence> fence, uint64 fenceValue) override;
 };

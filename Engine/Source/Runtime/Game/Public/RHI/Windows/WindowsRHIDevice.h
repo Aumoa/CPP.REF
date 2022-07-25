@@ -25,10 +25,17 @@ private:
 public:
 	virtual ~WindowsRHIDevice() noexcept override;
 
-	inline ID3D12Device* GetDevice() const { return _device.Get(); }
+	inline ID3D12Device* GetDevice() const noexcept { return _device.Get(); }
 
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) override;
+	virtual std::shared_ptr<RHIFence> CreateFence() override;
+
+private:
+	inline std::shared_ptr<WindowsRHIDevice> SharedFromThis() noexcept
+	{
+		return std::static_pointer_cast<WindowsRHIDevice>(shared_from_this());
+	}
 };
 
 #endif

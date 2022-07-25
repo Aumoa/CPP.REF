@@ -4,6 +4,7 @@
 #include "RHI/Null/NullRHIFactory.h"
 #include "RHI/Null/NullRHICommandQueue.h"
 #include "RHI/Null/NullRHISwapChain.h"
+#include "RHI/Null/NullRHIFence.h"
 
 NullRHIDevice::NullRHIDevice(std::shared_ptr<RHIFactory> factory)
 	: RHIDevice(factory)
@@ -22,4 +23,9 @@ std::shared_ptr<RHICommandQueue> NullRHIDevice::CreateCommandQueue()
 std::shared_ptr<RHISwapChain> NullRHIDevice::CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow)
 {
 	return std::shared_ptr<RHISwapChain>(new NullRHISwapChain(shared_from_this()));
+}
+
+std::shared_ptr<RHIFence> NullRHIDevice::CreateFence()
+{
+	return std::shared_ptr<RHIFence>(new NullRHIFence(shared_from_this()));
 }

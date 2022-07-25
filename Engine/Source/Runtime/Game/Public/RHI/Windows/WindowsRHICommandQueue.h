@@ -24,7 +24,9 @@ private:
 public:
 	virtual ~WindowsRHICommandQueue() noexcept override;
 
-	inline ID3D12CommandQueue* GetQueue() const { return _queue.Get(); }
+	virtual void Signal(std::shared_ptr<RHIFence> fence, uint64 fenceValue) override;
+
+	inline ID3D12CommandQueue* GetQueue() const noexcept { return _queue.Get(); }
 };
 
 #endif

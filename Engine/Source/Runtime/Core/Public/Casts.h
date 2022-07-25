@@ -41,3 +41,11 @@ inline TTo Cast(TFrom* from) requires
 {
 	return reinterpret_cast<void*>(Cast<Object>(from));
 }
+
+// ---------------- shared_ptr casts. ----------------
+
+template<class TTo, class TFrom>
+inline TTo* Cast(std::shared_ptr<TFrom> from)
+{
+	return std::dynamic_pointer_cast<TTo>(from);
+}

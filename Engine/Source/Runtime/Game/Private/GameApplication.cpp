@@ -59,13 +59,14 @@ void GameApplication::Tick()
 	_engine->ExecuteEngineLoop();
 
 	// Render ticks.
-	_engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks();
-
-	// Flushing.
-	for (auto& sWindow : _sWindows)
+	_engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks([this]()
 	{
-		//sWindow->PresentWindow();
-	}
+		// Present.
+		for (auto& sWindow : _sWindows)
+		{
+			sWindow->PresentWindow();
+		}
+	});
 }
 
 Type* GameApplication::GetEngineType()

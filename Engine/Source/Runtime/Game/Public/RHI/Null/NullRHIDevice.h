@@ -19,4 +19,5 @@ public:
 
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) override;
+	virtual std::shared_ptr<RHIFence> CreateFence() override;
 };

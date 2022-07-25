@@ -7,6 +7,7 @@
 class RHIFactory;
 class RHICommandQueue;
 class RHISwapChain;
+class RHIFence;
 interface IPlatformWindow;
 
 class GAME_API RHIDevice : public std::enable_shared_from_this<RHIDevice>
@@ -23,4 +24,5 @@ public:
 
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() = 0;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) = 0;
+	virtual std::shared_ptr<RHIFence> CreateFence() = 0;
 };

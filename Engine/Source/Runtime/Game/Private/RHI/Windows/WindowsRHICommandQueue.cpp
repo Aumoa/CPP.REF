@@ -5,6 +5,7 @@
 #if PLATFORM_WINDOWS
 
 #include "RHI/Windows/WindowsRHIDevice.h"
+#include "RHI/Windows/WindowsRHIFence.h"
 
 WindowsRHICommandQueue::WindowsRHICommandQueue(std::shared_ptr<WindowsRHIDevice> device)
 	: RHICommandQueue(device)
@@ -22,6 +23,14 @@ WindowsRHICommandQueue::WindowsRHICommandQueue(std::shared_ptr<WindowsRHIDevice>
 
 WindowsRHICommandQueue::~WindowsRHICommandQueue() noexcept
 {
+}
+
+void WindowsRHICommandQueue::Signal(std::shared_ptr<RHIFence> fence, uint64 fenceValue)
+{
+	auto wFence = std::static_pointer_cast<WindowsRHIFence>(fence);
+	auto pFence = wFence->GetFence();
+
+	HR(_queue->Signal(pFence, fenceValue));
 }
 
 #endif
