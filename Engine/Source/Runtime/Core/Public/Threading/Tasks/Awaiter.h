@@ -84,7 +84,7 @@ public:
 		return _promise.GetValue();
 	}
 
-	virtual void Wait() override
+	virtual void Wait() noexcept override
 	{
 		if (IsCompleted())
 		{
@@ -93,6 +93,22 @@ public:
 
 		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
 		_future.Wait(lock, [this] { return IsCompleted(); });
+	}
+
+	virtual bool WaitFor(const TimeSpan& timeout) noexcept override
+	{
+		if (IsCompleted())
+		{
+			return true;
+		}
+
+		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+		return _future.WaitFor(lock, timeout, [this] { return IsCompleted(); });
+	}
+
+	virtual bool WaitUntil(const DateTime& timeout) noexcept override
+	{
+		return WaitFor(timeout - DateTime::Now());
 	}
 
 	virtual void Cancel() override

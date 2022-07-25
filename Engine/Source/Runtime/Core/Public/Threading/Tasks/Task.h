@@ -108,6 +108,11 @@ public:
 		_awaiter->Wait();
 	}
 
+	inline bool WaitFor(const TimeSpan& timeout) const noexcept
+	{
+		return _awaiter->WaitFor(timeout);
+	}
+
 	inline T GetResult() const
 	{
 		return static_cast<Awaiter*>(_awaiter.get())->GetResult();
@@ -275,6 +280,7 @@ public:
 
 			void Start(std::shared_ptr<WhenAllAwaiter> self, std::vector<Task<>> tasks)
 			{
+				check(tasks.empty() == false);
 				_tasks = std::move(tasks);
 
 				if (_tasks.empty())
@@ -340,6 +346,7 @@ public:
 
 			void Start(std::shared_ptr<WhenAllAwaiter> self, std::vector<Task<>> tasks)
 			{
+				check(tasks.empty() == false);
 				_tasks = std::move(tasks);
 
 				if (_tasks.empty())

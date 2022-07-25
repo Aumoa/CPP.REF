@@ -3,6 +3,8 @@
 #pragma once
 
 #include "TaskStatus.h"
+#include "DateTime.h"
+#include "TimeSpan.h"
 #include <concepts>
 #include <coroutine>
 #include <exception>
@@ -26,6 +28,8 @@ concept IAwaiter = requires (TAwaiter& val, const TAwaiter& cval)
 	{ val.GetException() } -> std::convertible_to<std::exception_ptr>;
 	{ val.GetResult() };
 	{ val.Wait() };
+	{ val.WaitFor(std::declval<TimeSpan>()) } -> std::same_as<bool>;
+	{ val.WaitUntil(std::declval<DateTime>()) } -> std::same_as<bool>;
 
 	// IAwaiter continutation interface.
 	{ val.Cancel() };

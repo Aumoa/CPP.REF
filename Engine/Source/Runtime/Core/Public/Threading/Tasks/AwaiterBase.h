@@ -4,6 +4,8 @@
 
 #include "IAwaiter.h"
 #include "suspend_and_destroy_if.h"
+#include "TimeSpan.h"
+#include "DateTime.h"
 #include <memory>
 
 class AwaiterBase : public std::enable_shared_from_this<AwaiterBase>
@@ -43,7 +45,9 @@ public:
 	virtual ETaskStatus GetStatus() const noexcept = 0;
 	virtual void ContinueWith(std::function<void(std::shared_ptr<AwaiterBase>)> awaiter) = 0;
 	virtual std::exception_ptr GetException() = 0;
-	virtual void Wait() = 0;
+	virtual void Wait() noexcept = 0;
+	virtual bool WaitFor(const TimeSpan& timeout) noexcept = 0;
+	virtual bool WaitUntil(const DateTime& timeout) noexcept = 0;
 
 	virtual void Cancel() = 0;
 	virtual bool SetException(std::exception_ptr ptr) = 0;

@@ -39,11 +39,10 @@ void GameRenderSubsystem::ExecuteRenderTicks()
 	{
 		// Waiting previous render tick.
 #if DO_CHECK
-		Task<> timeoutResult = Task<>::WhenAny(_previousRenderTick, Task<>::Delay(1000ms)).GetResult();
-		checkf(timeoutResult == _previousRenderTick, TEXT("RenderThread Deadlock Detected."));
-#else
-		_previousRenderTick.GetResult();
+		checkf(_previousRenderTick.WaitFor(1s), TEXT("Timeout detected on render thread."));
 #endif
+
+		_previousRenderTick.GetResult();
 	}
 
 	_previousRenderTick = _renderThread->ExecuteWorks([]()

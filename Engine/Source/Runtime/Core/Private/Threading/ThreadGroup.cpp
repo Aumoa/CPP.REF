@@ -23,8 +23,9 @@ ThreadGroup::ThreadGroup(const String& groupName, size_t numThreads)
 
 ThreadGroup::~ThreadGroup() noexcept
 {
-	std::unique_lock lock1(_immQueue.lock);
+	// Unlock delay queue first! When timer working, call Run() function to queue works to work thread.
 	std::unique_lock lock2(_delQueue.lock);
+	std::unique_lock lock1(_immQueue.lock);
 
 	for (auto& thread : _threads)
 	{
@@ -34,8 +35,8 @@ ThreadGroup::~ThreadGroup() noexcept
 		}
 	}
 
-	_immQueue.cv.NotifyAll();
 	_delQueue.cv.NotifyAll();
+	_immQueue.cv.NotifyAll();
 
 	lock1.unlock();
 	lock2.unlock();

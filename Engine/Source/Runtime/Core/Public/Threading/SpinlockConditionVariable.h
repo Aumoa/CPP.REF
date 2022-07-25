@@ -45,7 +45,7 @@ public:
 	template<class TPredicate>
 	bool WaitUntil(std::unique_lock<Spinlock>& lck, _Clock::time_point tp, TPredicate pred) noexcept
 	{
-		while (true)
+		while (!pred())
 		{
 			auto now = _Clock::now();
 			if (tp <= now)
@@ -58,5 +58,7 @@ public:
 				return true;
 			}
 		}
+
+		return true;
 	}
 };
