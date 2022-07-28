@@ -44,7 +44,7 @@ void SWidget::InvalidateLayoutAndVolatility()
     bInvalidateLayout = true;
 }
 
-void SWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+void SWidget::Tick(const Geometry& AllottedGeometry, const TimeSpan& InDeltaTime)
 {
     if (ESlateVisibility::IsHitTestVisible(GetVisibility()) &&
         AllottedGeometry.GetRenderBoundingRect().PtInRect(CachedMouseLocation))

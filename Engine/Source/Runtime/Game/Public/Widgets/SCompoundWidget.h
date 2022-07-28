@@ -14,7 +14,7 @@ private:
 public:
 	SCompoundWidget();
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
+	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime);
 	virtual bool PrepassLayout();
 
 	virtual bool SendMouseMoved(const Geometry& AllottedGeometry, const MouseState& State) override;

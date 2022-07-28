@@ -169,18 +169,18 @@ void LevelTick::BeginFrame()
 	}
 }
 
-void LevelTick::IncrementalDispatchTick(ETickingGroup tickGroup, float elapsedSeconds)
+void LevelTick::IncrementalDispatchTick(ETickingGroup tickGroup, const TimeSpan& deltaTime)
 {
 	for (; _frameHead && _frameHead->InternalData->ActualTickGroup == tickGroup; _frameHead = _frameHead->InternalData->NextPtr)
 	{
 		if (_frameHead->IsTickFunctionEnabled())
 		{
 			auto* internalData = _frameHead->InternalData.get();
-			internalData->Interval -= elapsedSeconds;
+			internalData->Interval -= deltaTime;
 
-			if (internalData->Interval <= 0.0f)
+			if (internalData->Interval <= 0s)
 			{
-				_frameHead->ExecuteTick(elapsedSeconds);
+				_frameHead->ExecuteTick(deltaTime);
 				internalData->bTickExecuted = true;
 				internalData->Interval += _frameHead->TickInterval;
 			}

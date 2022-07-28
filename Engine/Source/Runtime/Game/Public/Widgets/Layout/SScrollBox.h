@@ -15,7 +15,7 @@ private:
 public:
 	SScrollBox();
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
+	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime);
 	virtual bool OnReceiveMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta, const MouseState& State) override;
 
 	void ScrollToBottom();

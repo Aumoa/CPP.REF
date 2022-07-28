@@ -8,9 +8,9 @@ SScrollBox::SScrollBox() : Super()
 {
 }
 
-void SScrollBox::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+void SScrollBox::Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime)
 {
-	Super::Tick(AllottedGeometry, InDeltaTime);
+	Super::Tick(AllottedGeometry, deltaTime);
 
 	float DesiredSize = GetDesiredSize().Y;
 	float Minimum = 0.0f;

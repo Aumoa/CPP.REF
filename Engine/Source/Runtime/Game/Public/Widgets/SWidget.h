@@ -49,7 +49,7 @@ public:
 	void ArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry);
 	void InvalidateLayoutAndVolatility();
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime);
+	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& InDeltaTime);
 	virtual bool PrepassLayout();
 	Vector2 GetDesiredSize() const;
 

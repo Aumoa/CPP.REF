@@ -15,9 +15,6 @@ class GAME_API Engine : virtual public Object
 	GENERATED_BODY()
 
 private:
-	PerformanceTimer _timer;
-
-private:
 	SPROPERTY()
 	World* _world = nullptr;
 
@@ -31,7 +28,7 @@ public:
 	virtual void Init();
 	virtual void Deinit();
 
-	void ExecuteEngineLoop();
+	void ExecuteEngineLoop(const TimeSpan& deltaTime);
 
 	template<class T>
 	GameRenderSubsystem* GetEngineSubsystem() requires std::same_as<T, GameRenderSubsystem>
@@ -40,7 +37,7 @@ public:
 	}
 
 protected:
-	virtual void DispatchEngineTick(float elapsedSeconds);
+	virtual void DispatchEngineTick(const TimeSpan& deltaTime);
 
 protected:
 	World* SpawnGameWorld();

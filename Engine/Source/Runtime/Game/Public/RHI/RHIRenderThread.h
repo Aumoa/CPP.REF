@@ -29,7 +29,7 @@ private:
 public:
 	RHIRenderThread();
 
-	void StopThread();
+	void StopThread(bool join = true);
 
 	void EnqueueWork(std::function<void()> work);
 	Task<> ExecuteWorks(std::function<void()> work);

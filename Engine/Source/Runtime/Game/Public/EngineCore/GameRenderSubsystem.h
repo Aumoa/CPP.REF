@@ -35,6 +35,7 @@ public:
 	virtual void Deinit();
 
 	void ExecuteRenderTicks(std::function<void()> presentWorks);
+	void JoinRenderThread();
 
 	inline const std::shared_ptr<RHIDevice>& GetDevice() { return _device; }
 	inline const std::shared_ptr<RHICommandQueue>& GetCommandQueue() { return _commandQueue; }

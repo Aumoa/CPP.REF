@@ -27,7 +27,8 @@ private:
 public:
 	SWindow();
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
+	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime) override;
+	void DispatchSlateTick(const TimeSpan& deltaTime);
 	void PresentWindow();
 
 	virtual size_t NumChildrens() override;

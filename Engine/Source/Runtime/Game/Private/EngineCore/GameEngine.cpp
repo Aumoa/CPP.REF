@@ -11,8 +11,3 @@ void GameEngine::Init()
 {
 	Super::Init();
 }
-
-void GameEngine::DispatchEngineTick(float elapsedSeconds)
-{
-	Super::DispatchEngineTick(elapsedSeconds);
-}

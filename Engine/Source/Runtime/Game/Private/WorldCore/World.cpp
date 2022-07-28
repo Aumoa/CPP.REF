@@ -16,12 +16,12 @@ Engine* World::GetOuter()
 	return _engine;
 }
 
-void World::DispatchWorldTick(float elapsedSeconds)
+void World::DispatchWorldTick(const TimeSpan& deltaTime)
 {
 	_levelTick->BeginFrame();
-	_levelTick->IncrementalDispatchTick(ETickingGroup::PrePhysics, elapsedSeconds);
-	_levelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, elapsedSeconds);
-	_levelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, elapsedSeconds);
-	_levelTick->IncrementalDispatchTick(ETickingGroup::PostUpdateWork, elapsedSeconds);
+	_levelTick->IncrementalDispatchTick(ETickingGroup::PrePhysics, deltaTime);
+	_levelTick->IncrementalDispatchTick(ETickingGroup::DuringPhysics, deltaTime);
+	_levelTick->IncrementalDispatchTick(ETickingGroup::PostPhysics, deltaTime);
+	_levelTick->IncrementalDispatchTick(ETickingGroup::PostUpdateWork, deltaTime);
 	_levelTick->EndFrame();
 }

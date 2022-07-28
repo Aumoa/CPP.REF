@@ -11,8 +11,3 @@ void EditorEngine::Init()
 {
 	Super::Init();
 }
-
-void EditorEngine::DispatchEngineTick(float elapsedSeconds)
-{
-	Super::DispatchEngineTick(elapsedSeconds);
-}

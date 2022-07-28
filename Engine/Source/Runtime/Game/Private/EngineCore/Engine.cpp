@@ -23,24 +23,14 @@ void Engine::Deinit()
 	_renderSystem = nullptr;
 }
 
-void Engine::ExecuteEngineLoop()
+void Engine::ExecuteEngineLoop(const TimeSpan& deltaTime)
 {
-	if (_timer.IsRunning())
-	{
-		// Start tick timer when first executing.
-		_timer.Start();
-	}
-
-	_timer.Stop();
-	float elapsedSeconds = _timer.GetElapsed().GetTotalSeconds<float>();
-	_timer.Restart();
-
-	DispatchEngineTick(elapsedSeconds);
+	DispatchEngineTick(deltaTime);
 }
 
-void Engine::DispatchEngineTick(float elapsedSeconds)
+void Engine::DispatchEngineTick(const TimeSpan& deltaTime)
 {
-	_world->DispatchWorldTick(elapsedSeconds);
+	_world->DispatchWorldTick(deltaTime);
 }
 
 World* Engine::SpawnGameWorld()

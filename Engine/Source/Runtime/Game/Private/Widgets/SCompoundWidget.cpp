@@ -7,16 +7,16 @@ SCompoundWidget::SCompoundWidget() : Super()
 {
 }
 
-void SCompoundWidget::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+void SCompoundWidget::Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime)
 {
-    Super::Tick(AllottedGeometry, InDeltaTime);
+    Super::Tick(AllottedGeometry, deltaTime);
 
     ArrangedChildrens ArrangedChildren(ESlateVisibility::All);
     ArrangeChildren(ArrangedChildren, AllottedGeometry);
 
     for (auto& Arranged : ArrangedChildren.GetWidgets())
     {
-        Arranged.GetWidget()->Tick(Arranged.GetGeometry(), InDeltaTime);
+        Arranged.GetWidget()->Tick(Arranged.GetGeometry(), deltaTime);
     }
 }
 

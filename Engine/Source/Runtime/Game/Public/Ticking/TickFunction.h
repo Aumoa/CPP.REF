@@ -22,7 +22,7 @@ public:
 		ETickingGroup ActualTickGroup;
 		double TickPriority;
 
-		float Interval;
+		TimeSpan Interval;
 		bool bTickExecuted;
 	};
 
@@ -34,7 +34,7 @@ public:
 	uint8 bStartWithTickEnabled : 1 = true;
 
 	ETickingGroup TickGroup = ETickingGroup::PrePhysics;
-	float TickInterval = 0.0f;
+	TimeSpan TickInterval = 0s;
 	std::vector<TickFunction*> Prerequisites;
 
 protected:
@@ -43,7 +43,7 @@ protected:
 	}
 
 public:
-	virtual void ExecuteTick(float InDeltaTime) = 0;
+	virtual void ExecuteTick(const TimeSpan& InDeltaTime) = 0;
 
 	void SetTickFunctionEnable(bool bEnabled)
 	{

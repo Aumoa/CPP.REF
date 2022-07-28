@@ -29,6 +29,7 @@ public:
 	virtual void Tick() override;
 
 private:
+	PerformanceTimer _frameTimer;
 	std::vector<std::shared_ptr<SWindow>> _sWindows;
 
 protected:

@@ -25,7 +25,7 @@ public:
 	//SFUNCTION(Inject)
 	//void Inject(SRenderEngine* REngine, SRenderThread* RThread);
 
-	virtual void Tick(const Geometry& AllottedGeometry, float InDeltaTime) override;
+	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime) override;
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
 
 private:

@@ -43,6 +43,6 @@ private:
 
 public:
 	void BeginFrame();
-	void IncrementalDispatchTick(ETickingGroup tickGroup, float elapsedSeconds);
+	void IncrementalDispatchTick(ETickingGroup tickGroup, const TimeSpan& deltaTime);
 	void EndFrame();
 };

@@ -24,5 +24,5 @@ public:
 
 	SFUNCTION()
 	Engine* GetOuter();
-	void DispatchWorldTick(float elapsedSeconds);
+	void DispatchWorldTick(const TimeSpan& deltaTime);
 };

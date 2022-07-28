@@ -16,7 +16,4 @@ public:
 	GameEngine();
 
 	virtual void Init() override;
-
-protected:
-	virtual void DispatchEngineTick(float elapsedSeconds) override;
 };

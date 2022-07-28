@@ -12,10 +12,18 @@ SWindow::SWindow()
 {
 }
 
-void SWindow::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+void SWindow::Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime)
 {
-	Super::Tick(AllottedGeometry, InDeltaTime);
+	Super::Tick(AllottedGeometry, deltaTime);
 	TryResizeSwapChain(AllottedGeometry);
+}
+
+void SWindow::DispatchSlateTick(const TimeSpan& deltaTime)
+{
+	Vector2N drawingSize = _platformWindow->GetDrawingSize();
+	auto allottedGeometry = Geometry::MakeRoot(Vector<>::Cast<Vector2>(drawingSize), SlateLayoutTransform::Identity());
+
+	Tick(allottedGeometry, deltaTime);
 }
 
 void SWindow::PresentWindow()

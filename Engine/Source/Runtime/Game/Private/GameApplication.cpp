@@ -40,7 +40,6 @@ int32 GameApplication::Startup(const CommandLineBuilder& args)
 
 void GameApplication::RequestExit(int32 exitCode)
 {
-	_engine->Deinit();
 	Super::RequestExit(exitCode);
 }
 
@@ -55,8 +54,18 @@ void GameApplication::Tick()
 
 	Super::Tick();
 
+	_frameTimer.Stop();
+	TimeSpan frameTime = _frameTimer.GetElapsed();
+	_frameTimer.Restart();
+
 	// Game ticks.
-	_engine->ExecuteEngineLoop();
+	_engine->ExecuteEngineLoop(frameTime);
+
+	// Widget ticks.
+	for (auto& sWindow : _sWindows)
+	{
+		sWindow->DispatchSlateTick(frameTime);
+	}
 
 	// Render ticks.
 	_engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks([this]()

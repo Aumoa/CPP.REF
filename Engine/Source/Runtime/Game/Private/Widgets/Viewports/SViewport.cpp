@@ -13,11 +13,11 @@ SViewport::SViewport()
 //	this->RThread = RThread;
 //}
 
-void SViewport::Tick(const Geometry& AllottedGeometry, float InDeltaTime)
+void SViewport::Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime)
 {
 	ReallocateSurface(AllottedGeometry.GetLocalSize());
 
-	Super::Tick(AllottedGeometry, InDeltaTime);
+	Super::Tick(AllottedGeometry, deltaTime);
 }
 
 int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled)
