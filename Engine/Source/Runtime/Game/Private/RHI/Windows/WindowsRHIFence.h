@@ -13,7 +13,7 @@
 
 class WindowsRHIDevice;
 
-class GAME_API WindowsRHIFence : public RHIFence
+class WindowsRHIFence : public RHIFence
 {
 	friend WindowsRHIDevice;
 

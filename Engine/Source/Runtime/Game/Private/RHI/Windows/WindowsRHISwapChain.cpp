@@ -9,6 +9,11 @@
 #include "RHI/Windows/WindowsRHIFactory.h"
 #include "PlatformMisc/IPlatformWindow.h"
 
+std::shared_ptr<RHISwapChain> WindowsRHIDevice::CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow)
+{
+	return std::shared_ptr<RHISwapChain>(new WindowsRHISwapChain(std::static_pointer_cast<WindowsRHICommandQueue>(queue), drawingWindow));
+}
+
 WindowsRHISwapChain::WindowsRHISwapChain(std::shared_ptr<WindowsRHICommandQueue> queue, IPlatformWindow* drawingWindow)
 	: RHISwapChain(queue->GetDevice())
 {

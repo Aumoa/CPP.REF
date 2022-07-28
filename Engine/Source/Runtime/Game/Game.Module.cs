@@ -29,7 +29,8 @@ public class GameRule : ModuleRule
             PublicAdditionalLibraries.AddRange(new[]
             {
                 "DXGI.lib",
-                "D3D12.lib"
+                "D3D12.lib",
+                "D3DCompiler.lib"
             });
         }
     }

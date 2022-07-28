@@ -11,7 +11,7 @@
 
 class WindowsRHIFactory;
 
-class GAME_API WindowsRHIDevice : public RHIDevice
+class WindowsRHIDevice : public RHIDevice
 {
 	friend WindowsRHIFactory;
 
@@ -30,6 +30,8 @@ public:
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) override;
 	virtual std::shared_ptr<RHIFence> CreateFence() override;
+	virtual std::shared_ptr<RHIShaderBytecode> CreateShaderBytecode(const void* pShaderBytecode, size_t bytecodeLength) override;
+	virtual std::shared_ptr<RHIRootSignature> CreateRootSignature(const RHIRootSignatureDesc& desc) override;
 
 private:
 	inline std::shared_ptr<WindowsRHIDevice> SharedFromThis() noexcept

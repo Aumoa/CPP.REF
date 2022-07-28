@@ -7,7 +7,7 @@
 
 class NullRHIFactory;
 
-class GAME_API NullRHIDevice : public RHIDevice
+class NullRHIDevice : public RHIDevice
 {
 	friend NullRHIFactory;
 
@@ -20,4 +20,6 @@ public:
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) override;
 	virtual std::shared_ptr<RHIFence> CreateFence() override;
+	virtual std::shared_ptr<RHIShaderBytecode> CreateShaderBytecode(const void* pShaderBytecode, size_t bytecodeLength) override;
+	virtual std::shared_ptr<RHIRootSignature> CreateRootSignature(const RHIRootSignatureDesc& desc) override;
 };

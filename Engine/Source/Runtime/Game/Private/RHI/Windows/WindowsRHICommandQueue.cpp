@@ -7,6 +7,11 @@
 #include "RHI/Windows/WindowsRHIDevice.h"
 #include "RHI/Windows/WindowsRHIFence.h"
 
+std::shared_ptr<RHICommandQueue> WindowsRHIDevice::CreateCommandQueue()
+{
+	return std::shared_ptr<RHICommandQueue>(new WindowsRHICommandQueue(SharedFromThis()));
+}
+
 WindowsRHICommandQueue::WindowsRHICommandQueue(std::shared_ptr<WindowsRHIDevice> device)
 	: RHICommandQueue(device)
 {

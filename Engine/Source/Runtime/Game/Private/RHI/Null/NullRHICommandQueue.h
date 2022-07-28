@@ -7,7 +7,7 @@
 
 class NullRHIDevice;
 
-class GAME_API NullRHICommandQueue : public RHICommandQueue
+class NullRHICommandQueue : public RHICommandQueue
 {
 	friend NullRHIDevice;
 

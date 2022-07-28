@@ -25,6 +25,9 @@ private:
 	Vector2N _lastSwapChainSize = Vector2N::Zero();
 	std::shared_ptr<SViewport> _gameViewport;
 
+	Vector2N _cachedDrawingSize;
+	TimeSpan _cachedDeltaTime;
+
 public:
 	SWindow();
 	virtual ~SWindow() noexcept override;

@@ -9,7 +9,7 @@
 
 #include "WindowsRHICommon.h"
 
-class GAME_API WindowsRHIFactory : public RHIFactory
+class WindowsRHIFactory : public RHIFactory
 {
 	friend RHIFactory;
 

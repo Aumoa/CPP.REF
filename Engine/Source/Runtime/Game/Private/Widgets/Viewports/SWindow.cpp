@@ -2,6 +2,7 @@
 
 #include "Widgets/Viewports/SWindow.h"
 #include "Widgets/Viewports/SViewport.h"
+#include "Widgets/Drawing/PaintArgs.h"
 #include "RHI/RHISwapChain.h"
 #include "RHI/RHIDevice.h"
 #include "RHI/RHIRenderThread.h"
@@ -28,13 +29,28 @@ void SWindow::Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime)
 void SWindow::DispatchSlateTick(const TimeSpan& deltaTime)
 {
 	Vector2N drawingSize = _platformWindow->GetDrawingSize();
-	auto allottedGeometry = Geometry::MakeRoot(Vector<>::Cast<Vector2>(drawingSize), SlateLayoutTransform::Identity());
-
+	auto allottedGeometry = Geometry::MakeRoot(
+		Vector<>::Cast<Vector2>(drawingSize),
+		SlateLayoutTransform::Identity()
+	);
 	Tick(allottedGeometry, deltaTime);
+
+	_cachedDrawingSize = drawingSize;
+	_cachedDeltaTime = deltaTime;
 }
 
 void SWindow::PresentWindow()
 {
+	auto allottedGeometry = Geometry::MakeRoot(
+		Vector<>::Cast<Vector2>(_cachedDrawingSize),
+		SlateLayoutTransform::Identity(),
+		SlateRenderTransform::Identity()
+	);
+
+	// Starting paint.
+	PaintArgs args = PaintArgs::NewArgs(SharedFromThis(), _cachedDeltaTime);
+	Paint(args, allottedGeometry, Rect(0.0f, 0.0f, (float)_cachedDrawingSize.X, (float)_cachedDrawingSize.Y), nullptr, 0, true);
+	
 	_swapChain->Present();
 }
 

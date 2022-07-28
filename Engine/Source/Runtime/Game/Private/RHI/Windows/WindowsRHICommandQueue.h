@@ -11,7 +11,7 @@
 
 class WindowsRHIDevice;
 
-class GAME_API WindowsRHICommandQueue : public RHICommandQueue
+class WindowsRHICommandQueue : public RHICommandQueue
 {
 	friend WindowsRHIDevice;
 

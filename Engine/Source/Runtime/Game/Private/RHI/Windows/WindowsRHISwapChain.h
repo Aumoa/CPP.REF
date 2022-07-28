@@ -13,7 +13,7 @@ class WindowsRHIDevice;
 class WindowsRHICommandQueue;
 interface IPlatformWindow;
 
-class GAME_API WindowsRHISwapChain : public RHISwapChain
+class WindowsRHISwapChain : public RHISwapChain
 {
 	friend WindowsRHIDevice;
 

@@ -9,7 +9,7 @@
 class NullRHIDevice;
 class NullRHICommandQueue;
 
-class GAME_API NullRHIFence : public RHIFence
+class NullRHIFence : public RHIFence
 {
 	friend NullRHIDevice;
 	friend NullRHICommandQueue;

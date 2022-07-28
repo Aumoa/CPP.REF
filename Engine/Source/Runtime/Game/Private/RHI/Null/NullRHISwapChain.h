@@ -7,7 +7,7 @@
 
 class NullRHIDevice;
 
-class GAME_API NullRHISwapChain : public RHISwapChain
+class NullRHISwapChain : public RHISwapChain
 {
 	friend NullRHIDevice;
 

@@ -6,6 +6,11 @@
 
 #include "RHI/Windows/WindowsRHIDevice.h"
 
+std::shared_ptr<RHIFence> WindowsRHIDevice::CreateFence()
+{
+	return std::shared_ptr<RHIFence>(new WindowsRHIFence(SharedFromThis()));
+}
+
 WindowsRHIFence::WindowsRHIFence(std::shared_ptr<WindowsRHIDevice> device)
 	: RHIFence(device)
 {
@@ -45,6 +50,8 @@ void WindowsRHIFence::Wait(uint64 fenceValue)
 		hEvent = _eventsPool.back();
 		_eventsPool.pop_back();
 	}
+
+	check(hEvent);
 
 	if (GetCompletedValue() < fenceValue)
 	{

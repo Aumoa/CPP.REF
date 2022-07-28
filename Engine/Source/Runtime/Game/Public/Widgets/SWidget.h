@@ -14,10 +14,10 @@
 #include "IO/KeyboardState.h"
 #include "Misc/EnableSharedFromThis.h"
 
-struct PaintArgs;
 class SSlateDrawCollector;
 class ArrangedChildrens;
 class ArrangedWidget;
+struct PaintArgs;
 
 class GAME_API SWidget : public EnableSharedFromThis<SWidget>
 {
