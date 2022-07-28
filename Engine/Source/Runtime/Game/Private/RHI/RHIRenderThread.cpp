@@ -10,11 +10,23 @@ RHIRenderThread::RHIRenderThread()
 	_thread = Thread::CreateThread(TEXT("[RHI]"), std::bind(&RHIRenderThread::Worker, this));
 }
 
-void RHIRenderThread::StopThread()
+void RHIRenderThread::StopThread(bool join)
 {
 	std::unique_lock lock(_mutex);
+	if (_running == false)
+	{
+		// Already stopped.
+		return;
+	}
+
 	_running = false;
 	_cv.NotifyOne();
+
+	if (join)
+	{
+		lock.unlock();
+		_thread.JoinAsync().Wait();
+	}
 }
 
 void RHIRenderThread::EnqueueWork(std::function<void()> work)

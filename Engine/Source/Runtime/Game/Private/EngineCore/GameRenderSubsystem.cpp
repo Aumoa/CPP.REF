@@ -28,6 +28,7 @@ void GameRenderSubsystem::Init()
 
 void GameRenderSubsystem::Deinit()
 {
+	_fence.reset();
 	_commandQueue.reset();
 	_device.reset();
 
@@ -57,4 +58,9 @@ void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> presentWorks)
 		_commandQueue->Signal(_fence, ++_fenceValue);
 		_fence->Wait(_fenceValue);
 	});
+}
+
+void GameRenderSubsystem::JoinRenderThread()
+{
+	_renderThread->StopThread();
 }

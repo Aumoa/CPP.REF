@@ -87,6 +87,11 @@ IPlatformWindow* PlatformApplication::CreateWindow(const String& title)
 	return gcnew WindowsWindow(title);
 }
 
+void PlatformApplication::OnApplicationShutdown() noexcept
+{
+	RemoveFromRoot();
+}
+
 int32 InvokeWindowsStartup(const CommandLineBuilder& builder)
 {
 	int32 __except_code = 0;
@@ -111,8 +116,9 @@ int32 PlatformApplication::GuardedMain(SubclassOf<PlatformApplication> classOf, 
 	sPreviousHandler = SetUnhandledExceptionFilter(WindowsUnhandledExceptionFilter);
 	int32 returnCode = InvokeWindowsStartup(builder);
 
-	sApp->RemoveFromRoot();
+	sApp->OnApplicationShutdown();
 	Core::Shutdown();
+
 	return returnCode;
 }
 

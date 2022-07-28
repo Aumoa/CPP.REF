@@ -33,6 +33,8 @@ private:
 	std::vector<std::shared_ptr<SWindow>> _sWindows;
 
 protected:
+	virtual void OnApplicationShutdown() noexcept override;
+
 	virtual Type* GetEngineType();
 	virtual void InitializeSlateApplication(IPlatformWindow* initialWindow);
 

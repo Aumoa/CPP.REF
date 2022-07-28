@@ -78,6 +78,16 @@ void GameApplication::Tick()
 	});
 }
 
+void GameApplication::OnApplicationShutdown() noexcept
+{
+	_engine->GetEngineSubsystem<GameRenderSubsystem>()->JoinRenderThread();
+
+	_sWindows.clear();
+
+	_engine->Deinit();
+	_engine = nullptr;
+}
+
 Type* GameApplication::GetEngineType()
 {
 	return typeof(GameEngine);

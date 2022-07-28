@@ -33,6 +33,9 @@ public:
 
 	virtual IPlatformWindow* CreateWindow(const String& title);
 
+protected:
+	virtual void OnApplicationShutdown() noexcept;
+
 public:
 	static int32 GuardedMain(SubclassOf<PlatformApplication> classOf, const CommandLineBuilder& builder);
 };
