@@ -137,6 +137,13 @@ public:
 		return CreateWeakLambda(self, [self, func](TArgs... args) { (self->*func)(args...); });
 	}
 
+	template<class TSelf, class... TInvokeArgs>
+	static inline DelegateInstance CreateShared(TSelf* self, void (TSelf::*func)(TInvokeArgs...)) requires
+		requires { { self->shared_from_this() }; }
+	{
+		return CreateWeakLambda(self->shared_from_this(), [self, func](TArgs... args) { (self->*func)(args...); });
+	}
+
 	template<class T>
 	inline ScopedDelegateHolder AddLambda(T&& body) requires
 		std::invocable<T, TArgs...>
@@ -163,6 +170,13 @@ public:
 		std::derived_from<TSelf, Object>
 	{
 		return Add(CreateObject(self, func));
+	}
+
+	template<class TSelf, class... TInvokeArgs>
+	inline ScopedDelegateHolder AddShared(TSelf* self, void (TSelf::*func)(TInvokeArgs...)) requires
+		requires { { self->shared_from_this() }; }
+	{
+		return Add(CreateShared(self, func));
 	}
 
 	inline ScopedDelegateHolder Add(DelegateInstance&& instance)
