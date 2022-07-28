@@ -27,6 +27,7 @@ public:
 	virtual ~WindowsRHISwapChain() noexcept override;
 
 	virtual void Present() override;
+	virtual void ResizeBuffers(const Vector2N& size) override;
 };
 
 #endif

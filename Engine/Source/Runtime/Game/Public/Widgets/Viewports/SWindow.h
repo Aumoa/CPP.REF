@@ -22,10 +22,12 @@ private:
 	WeakPtr<IPlatformWindow> _platformWindow;
 
 	std::shared_ptr<RHISwapChain> _swapChain;
-	std::vector<std::shared_ptr<SViewport>> _viewports;
+	Vector2N _lastSwapChainSize = Vector2N::Zero();
+	std::shared_ptr<SViewport> _gameViewport;
 
 public:
 	SWindow();
+	virtual ~SWindow() noexcept override;
 
 	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime) override;
 	void DispatchSlateTick(const TimeSpan& deltaTime);
@@ -44,6 +46,10 @@ public:
 	END_SLATE_ATTRIBUTE;
 
 	DECLARE_SLATE_CONSTRUCTOR();
+
+public:
+	DECLARE_MULTICAST_EVENT(SwapChainResizedEvent, Vector2N);
+	SwapChainResizedEvent SwapChainResized;
 
 private:
 	void TryResizeSwapChain(const Geometry& allottedGeometry);

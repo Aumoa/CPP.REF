@@ -14,3 +14,8 @@ NullRHISwapChain::~NullRHISwapChain() noexcept
 void NullRHISwapChain::Present()
 {
 }
+
+void NullRHISwapChain::ResizeBuffers(const Vector2N& size)
+{
+	check(size.X != 0 && size.Y != 0);
+}

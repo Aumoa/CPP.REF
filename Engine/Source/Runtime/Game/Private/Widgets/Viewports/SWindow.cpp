@@ -4,11 +4,18 @@
 #include "Widgets/Viewports/SViewport.h"
 #include "RHI/RHISwapChain.h"
 #include "RHI/RHIDevice.h"
+#include "RHI/RHIRenderThread.h"
 #include "EngineCore/GameRenderSubsystem.h"
 #include "PlatformMisc/IPlatformWindow.h"
 
+constexpr LogCategory LogSlateWindow = TEXT("LogSlateWindow");
+
 SWindow::SWindow()
 	: Super()
+{
+}
+
+SWindow::~SWindow() noexcept
 {
 }
 
@@ -33,7 +40,7 @@ void SWindow::PresentWindow()
 
 size_t SWindow::NumChildrens()
 {
-	return _viewports.size();
+	return 1;
 }
 
 SWidget* SWindow::GetChildrenAt(size_t IndexOf)
@@ -44,14 +51,11 @@ SWidget* SWindow::GetChildrenAt(size_t IndexOf)
 
 void SWindow::OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry)
 {
-	//for (auto& Vp : Viewports)
-	//{
-	//	InoutArrangedChildrens.AddWidget(Vp->GetVisibility(), AllottedGeometry.MakeChild(
-	//		Vp,
-	//		Vector2::Zero(),
-	//		AllottedGeometry.GetLocalSize()
-	//	));
-	//}
+	InoutArrangedChildrens.AddWidget(_gameViewport->GetVisibility(), AllottedGeometry.MakeChild(
+		_gameViewport,
+		Vector2::Zero(),
+		AllottedGeometry.GetLocalSize()
+	));
 }
 
 DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
@@ -63,9 +67,23 @@ DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 	_platformWindow = Attr._TargetWindow;
 
 	_swapChain = _device->CreateSwapChain(_commandQueue, _platformWindow.Get());
+	_gameViewport = SNew(SViewport)
+		.Window(this);
 }
 
-void SWindow::TryResizeSwapChain(const Geometry& AllottedGeometry)
+void SWindow::TryResizeSwapChain(const Geometry& allottedGeometry)
 {
-	Vector2N Size = Vector<>::Cast<int32>(AllottedGeometry.GetLocalSize());
+	Vector2N size = Vector<>::Cast<int32>(allottedGeometry.GetLocalSize());
+	if (_lastSwapChainSize != size)
+	{
+		EnqueueRenderThreadWork([self = SharedFromThis<SWindow>(), previous = _lastSwapChainSize, size]() mutable
+		{
+			self->_swapChain->ResizeBuffers(size);
+			self->SwapChainResized.Broadcast(size);
+
+			Log::Info(LogSlateWindow, TEXT("SwapChain resized from [{0}] to [{1}]."), previous, size);
+		});
+
+		_lastSwapChainSize = size;
+	}
 }

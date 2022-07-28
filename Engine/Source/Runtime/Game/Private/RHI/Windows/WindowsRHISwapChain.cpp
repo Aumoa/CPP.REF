@@ -46,4 +46,9 @@ void WindowsRHISwapChain::Present()
 	HR(_swapChain->Present(0, 0));
 }
 
+void WindowsRHISwapChain::ResizeBuffers(const Vector2N& size)
+{
+	HR(_swapChain->ResizeBuffers(0, (UINT)size.X, (UINT)size.Y, DXGI_FORMAT_UNKNOWN, 0));
+}
+
 #endif

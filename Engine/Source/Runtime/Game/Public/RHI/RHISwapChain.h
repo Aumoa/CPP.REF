@@ -14,4 +14,5 @@ public:
 	virtual ~RHISwapChain() noexcept override;
 
 	virtual void Present() = 0;
+	virtual void ResizeBuffers(const Vector2N& size) = 0;
 };

@@ -28,6 +28,7 @@ private:
 
 public:
 	RHIRenderThread();
+	virtual ~RHIRenderThread() noexcept override;
 
 	void StopThread(bool join = true);
 
@@ -35,5 +36,18 @@ public:
 	Task<> ExecuteWorks(std::function<void()> work);
 
 private:
+	static RHIRenderThread* sInstance;
+
+public:
+	static RHIRenderThread* Get();
+
+private:
 	void Worker();
 };
+
+inline void EnqueueRenderThreadWork(std::function<void()> work)
+{
+	auto* instance = RHIRenderThread::Get();
+	check(instance);
+	instance->EnqueueWork(std::move(work));
+}

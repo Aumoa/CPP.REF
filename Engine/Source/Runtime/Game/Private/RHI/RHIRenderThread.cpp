@@ -4,10 +4,21 @@
 #include "Threading/GameThreads.h"
 #include "RHIRenderThread.gen.cpp"
 
+RHIRenderThread* RHIRenderThread::sInstance;
+
 RHIRenderThread::RHIRenderThread()
 {
+	check(sInstance == nullptr);
+	sInstance = this;
+
 	_running = true;
 	_thread = Thread::CreateThread(TEXT("[RHI]"), std::bind(&RHIRenderThread::Worker, this));
+}
+
+RHIRenderThread::~RHIRenderThread() noexcept
+{
+	check(sInstance == this);
+	sInstance = nullptr;
 }
 
 void RHIRenderThread::StopThread(bool join)
@@ -73,6 +84,11 @@ Task<> RHIRenderThread::ExecuteWorks(std::function<void()> work)
 	_cv.NotifyOne();
 
 	return tcs.GetTask();
+}
+
+RHIRenderThread* RHIRenderThread::Get()
+{
+	return sInstance;
 }
 
 void RHIRenderThread::Worker()

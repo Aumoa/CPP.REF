@@ -12,16 +12,21 @@
 #include "IO/IMEEvent.h"
 #include "IO/MouseState.h"
 #include "IO/KeyboardState.h"
+#include "Misc/EnableSharedFromThis.h"
 
 struct PaintArgs;
 class SSlateDrawCollector;
 class ArrangedChildrens;
 class ArrangedWidget;
 
-class GAME_API SWidget : public std::enable_shared_from_this<SWidget>
+class GAME_API SWidget : public EnableSharedFromThis<SWidget>
 {
 	using This = SWidget;
 	using Super = void;
+
+private:
+	SWidget(const SWidget&) = delete;
+	SWidget& operator =(const SWidget&) = delete;
 
 private:
 	ESlateVisibility::Enum Visibility = ESlateVisibility::Visible;
