@@ -8,19 +8,20 @@ namespace ReflectionHeaderTool;
 [DebuggerDisplay("{_classMacro} {_name}({_line})")]
 internal class CompiledSTYPE : IHeaderGenerator
 {
-    private string _source;
-    private string _classMacro;
-    private string _classKey;
+    protected readonly string _source;
+    protected readonly string _classMacro;
+    protected readonly string _classKey;
 
-    private int _line;
-    private string _name = null!;
-    private string _apikey = null!;
-    private string? _inherit;
-    private readonly List<string> _interfaces = new();
-    private int _generatedBody;
-    private List<SyntaxConstructor> _constructors = new();
-    private List<SyntaxProperty> _properties = new();
-    private List<SyntaxFunction> _functions = new();
+    protected int _line;
+    protected string _name = null!;
+    protected string _apikey = null!;
+    protected string? _inherit;
+    protected readonly List<string> _interfaces = new();
+    protected int _generatedBody;
+    protected List<string> _typeAttributes = new();
+    protected List<SyntaxConstructor> _constructors = new();
+    protected List<SyntaxProperty> _properties = new();
+    protected List<SyntaxFunction> _functions = new();
 
     public CompiledSTYPE(string source, string classMacro, string classKey)
     {
@@ -29,12 +30,12 @@ internal class CompiledSTYPE : IHeaderGenerator
         _classKey = classKey;
     }
 
-    public void Compile(IEnumerator<SyntaxCore> generator, List<SyntaxCore> syntaxes)
+    public virtual void Compile(IEnumerator<SyntaxCore> generator, List<SyntaxCore> syntaxes)
     {
         _line = syntaxes.Last().Line;
 
         // Reading SCLASS attributes.
-        ParseAttributes(generator);
+        _typeAttributes = ParseAttributes(generator);
 
         // Reading class key.
         var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Keyword, true);
@@ -200,7 +201,7 @@ internal class CompiledSTYPE : IHeaderGenerator
 
     private AccessModifier _currentAccessModifier = AccessModifier.Private;
 
-    private void ParseClassBody(IEnumerator<SyntaxCore> syntaxes)
+    protected virtual void ParseClassBody(IEnumerator<SyntaxCore> syntaxes)
     {
         if (!syntaxes.MoveNext())
         {
@@ -499,7 +500,7 @@ internal class CompiledSTYPE : IHeaderGenerator
         }
     }
 
-    private void ParseClassDeclaration(IEnumerator<SyntaxCore> syntaxes)
+    protected virtual void ParseClassDeclaration(IEnumerator<SyntaxCore> syntaxes)
     {
         for (; syntaxes.MoveNext();)
         {
@@ -619,18 +620,64 @@ internal class CompiledSTYPE : IHeaderGenerator
 
     private List<string> ParseAttributes(IEnumerator<SyntaxCore> generator)
     {
-        var span = generator.EnumerateNext(sCore => sCore.Type == SyntaxType.Operator && sCore.Name == ")", true);
-        if (span == null)
+        int level = 0;
+
+        List<string> attributes = new();
+        string composed = "";
+
+        void Push()
         {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Cannot find parentheses in SCLASS.", _source, _line);
+            if (string.IsNullOrEmpty(composed))
+            {
+                return;
+            }
+
+            attributes.Add(composed);
+            composed = "";
         }
 
-        if (span.Count < 2)
+        void Compose(string name)
         {
-            throw new CompilationException(CompilationException.ErrorCode.InvalidSCLASS, "Parentheses does not opened.", _source, _line);
+            composed += name;
         }
 
-        return new List<string>();
+        do
+        {
+            var value = generator.Current;
+            if (value.Type == SyntaxType.Operator)
+            {
+                if (value.Name == "(")
+                {
+                    if (++level > 1)
+                    {
+                        Compose("(");
+                    }
+                }
+                else if (value.Name == ")")
+                {
+                    if (level-- > 1)
+                    {
+                        Compose(")");
+                    }
+                }
+                else if (value.Name == "," && level == 1)
+                {
+                    Push();
+                }
+                else
+                {
+                    Compose(value.Name);
+                }
+            }
+            else
+            {
+                Compose(value.Name);
+            }
+        }
+        while (generator.MoveNext() && level != 0);
+
+        Push();
+        return attributes;
     }
 }
 

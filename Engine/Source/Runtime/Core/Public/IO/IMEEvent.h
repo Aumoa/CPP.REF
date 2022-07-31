@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Reflection/ObjectMacros.h"
+#include "IMEEvent.generated.h"
 
 SENUM()
 enum class EIMEEvent

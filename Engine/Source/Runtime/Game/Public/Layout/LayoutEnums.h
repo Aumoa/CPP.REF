@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LayoutEnums.generated.h"
 
 SENUM()
 enum class EFlowDirection
@@ -50,7 +51,6 @@ enum class ESizeRule
 	Stretch,
 };
 
-SENUM()
 namespace ESlateVisibility
 {
 	enum Enum

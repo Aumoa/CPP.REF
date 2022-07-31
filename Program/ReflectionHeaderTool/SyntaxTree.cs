@@ -293,7 +293,7 @@ internal class SyntaxTree : IEnumerable<SyntaxCore>
 
     private static readonly string[] Keywords = new[]
     {
-        "class", "struct", "interface",
+        "class", "struct", "interface", "enum",
         "public", "protected", "private",
         "virtual", "noexcept",
         "inline", "constexpr", "const", "static",

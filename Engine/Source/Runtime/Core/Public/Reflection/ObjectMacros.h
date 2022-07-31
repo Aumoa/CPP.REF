@@ -139,6 +139,53 @@ std::vector<function_info_t> reflexpr_ ## Class::functions() \
 	return funcs; \
 }
 
+#define __SENUM_DEFINE_FLAGS_OPERATORS(Name) \
+template<class TEnum>\
+inline constexpr TEnum operator |(const TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	using T = std::underlying_type_t<TEnum>;\
+	return (TEnum)((T)lhs | (T)rhs);\
+}\
+\
+template<class TEnum>\
+inline constexpr TEnum operator &(const TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	using T = std::underlying_type_t<TEnum>;\
+	return (TEnum)((T)lhs & (T)rhs);\
+}\
+\
+template<class TEnum>\
+inline constexpr TEnum operator ^(const TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	using T = std::underlying_type_t<TEnum>;\
+	return (TEnum)((T)lhs ^ (T)rhs);\
+}\
+\
+template<class TEnum>\
+inline constexpr TEnum& operator |=(TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	return lhs = lhs | rhs;\
+}\
+\
+template<class TEnum>\
+inline constexpr TEnum& operator &=(TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	return lhs = lhs &= rhs;\
+}\
+\
+template<class TEnum>\
+inline constexpr TEnum& operator ^=(TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	return lhs = lhs ^= rhs;\
+}\
+\
+template<class TEnum>\
+inline constexpr TEnum operator ~(const TEnum& lhs) noexcept requires std::same_as<TEnum, Name>\
+{\
+	using T = std::underlying_type_t<TEnum>;\
+	return (TEnum)(~(T)lhs);\
+}
+
 // --------------------------------------------------
 
 // -------------------- SCLASS ----------------------
@@ -310,8 +357,8 @@ __STYPE_DEFINE_REFLEXPR(Interface, Ctors, Props, Funcs)
 
 // --------------------- SENUM ----------------------
 
-#define __SENUM0(FileID, Line)
-#define SENUM(...)
+#define __SENUM0(FileID, Line) __COMBINE_THREE_MACROS(LIBTY_SENUM, FileID, Line)
+#define SENUM(...) __SENUM0(__LIBTY_GENERATED_FILE_ID__, __LINE__)
 
 // --------------------------------------------------
 

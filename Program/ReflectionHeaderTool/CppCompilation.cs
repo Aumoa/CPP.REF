@@ -29,6 +29,11 @@ internal class CppCompilation
             return sCore.Type == SyntaxType.Identifier && sCore.Name == "SINTERFACE";
         }
 
+        static bool IsSENUM(SyntaxCore sCore)
+        {
+            return sCore.Type == SyntaxType.Identifier && sCore.Name == "SENUM";
+        }
+
         List<IHeaderGenerator> generators = new();
         List<SyntaxCore> syntaxes = new();
         for (var enumerator = _syntaxTree.GetEnumerator(); enumerator.MoveNext();)
@@ -47,6 +52,15 @@ internal class CppCompilation
                 syntaxes.Add(enumerator.Current);
                 enumerator.MoveNext();
                 var instance = new CompiledSINTERFACE(_source);
+                instance.Compile(enumerator, syntaxes);
+                generators.Add(instance);
+                syntaxes.Clear();
+            }
+            else if (IsSENUM(enumerator.Current))
+            {
+                syntaxes.Add(enumerator.Current);
+                enumerator.MoveNext();
+                var instance = new CompiledSENUM(_source);
                 instance.Compile(enumerator, syntaxes);
                 generators.Add(instance);
                 syntaxes.Clear();
