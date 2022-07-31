@@ -426,6 +426,8 @@ public partial class VSGenerator : ISolutionGenerator
 
                 XmlElement ItemDefinitionGroup = Project.NewElementItemDefinitionGroup(Condition);
                 {
+                    string AdditionalIncludeDirectories = string.Join(";", project.IncludePaths);
+
                     XmlElement ClCompile = ItemDefinitionGroup.NewElement("ClCompile");
                     {
                         ClCompile.NewElement("WarningLevel", "Level3");
@@ -435,7 +437,7 @@ public partial class VSGenerator : ISolutionGenerator
                         ClCompile.NewElement("ConformanceMode", "true");
                         ClCompile.NewElement("LanguageStandard", "stdcpplatest");
                         ClCompile.NewElement("MultiProcessorCompilation", "true");
-                        ClCompile.NewElement("AdditionalIncludeDirectories", string.Join(";", project.IncludePaths));
+                        ClCompile.NewElement("AdditionalIncludeDirectories", AdditionalIncludeDirectories);
 
                         List<string> Macros = new() { Config.Macros };
                         Macros.AddRange(Enumerable.Concat(ApplicationMacros, project.AdditionalMacros));
@@ -474,6 +476,14 @@ public partial class VSGenerator : ISolutionGenerator
                         FileReference ReflectionHeaderTool = _solution.ProgramsDirectory.GetParent().Move("Binaries\\ReflectionHeaderTool").GetFile("ReflectionHeaderTool.dll");
                         PreBuildEvent.NewElement("Command", $"dotnet \"{ReflectionHeaderTool}\" -s \"{project.Directory}\" -o \"{project.IntermediateIncludePath}\"");
                     }
+
+                    XmlElement FxCompile = ItemDefinitionGroup.NewElement("FxCompile");
+                    {
+                        FxCompile.NewElement("VariableName", "HLSL_%(Filename)");
+                        FxCompile.NewElement("HeaderFileOutput", "%(Filename).generated.h");
+                        FxCompile.NewElement("ShaderModel", "5.1");
+                        FxCompile.NewElement("AdditionalIncludeDirectories", AdditionalIncludeDirectories);
+                    }
                 }
             }
 
@@ -503,13 +513,35 @@ public partial class VSGenerator : ISolutionGenerator
                     {
                         ItemGroup.NewElementItemInclude("ClInclude", IncludePath);
                     }
+                    else if (project.Rule.NonBuildExtensions.Contains(Extension))
+                    {
+                        ItemGroup.NewElementItemInclude("None", IncludePath);
+                    }
+
+                    // VisualStudio Specialization.
                     else if (IncludeItem.CompareExtension(".natvis"))
                     {
                         ItemGroup.NewElementItemInclude("Natvis", IncludePath);
                     }
-                    else if (project.Rule.NonBuildExtensions.Contains(Extension))
+                    else if (Extension == ".hlsli")
                     {
                         ItemGroup.NewElementItemInclude("None", IncludePath);
+                    }
+                    else if (Extension == ".hlsl")
+                    {
+                        XmlElement FxCompile = ItemGroup.NewElementItemInclude("FxCompile", IncludePath);
+
+                        var Filename = Path.GetFileNameWithoutExtension(IncludePath);
+                        if (Filename.EndsWith("VertexShader"))
+                        {
+                            FxCompile.NewElement("ShaderType", "Vertex");
+                            FxCompile.NewElement("EntryPointName", "VSMain");
+                        }
+                        else if (Filename.EndsWith("PixelShader"))
+                        {
+                            FxCompile.NewElement("ShaderType", "Pixel");
+                            FxCompile.NewElement("EntryPointName", "PSMain");
+                        }
                     }
                 }
             }
@@ -571,24 +603,33 @@ public partial class VSGenerator : ISolutionGenerator
                 foreach (var IncludeItem in AbsolutePath.GetAllFiles())
                 {
                     XmlElement? InnerItem = null;
-                    if (IncludeItem.CompareExtension(".cpp") || IncludeItem.CompareExtension(".ixx") || IncludeItem.CompareExtension(".c"))
+                    string Extension = IncludeItem.Extension ?? "";
+
+                    if (project.Rule.SourceCodeExtensions.Contains(Extension))
                     {
                         InnerItem = ItemGroup.NewElementItemInclude("ClCompile", IncludeItem.FullPath);
                     }
-                    else if (IncludeItem.CompareExtension(".h")
-                          || IncludeItem.CompareExtension(".inl")
-                          || IncludeItem.CompareExtension(".hlsli")
-                          || IncludeItem.CompareExtension(".hlsl"))
+                    else if (project.Rule.HeaderExtensions.Contains(Extension))
                     {
                         InnerItem = ItemGroup.NewElementItemInclude("ClInclude", IncludeItem.FullPath);
                     }
+                    else if (project.Rule.NonBuildExtensions.Contains(Extension))
+                    {
+                        InnerItem = ItemGroup.NewElementItemInclude("None", IncludeItem.FullPath);
+                    }
+
+                    // VisualStudio Specialization.
                     else if (IncludeItem.CompareExtension(".natvis"))
                     {
                         InnerItem = ItemGroup.NewElementItemInclude("Natvis", IncludeItem.FullPath);
                     }
-                    else if (IncludeItem.CompareExtension(".cs"))
+                    else if (IncludeItem.CompareExtension(".hlsli"))
                     {
                         InnerItem = ItemGroup.NewElementItemInclude("None", IncludeItem.FullPath);
+                    }
+                    else if (IncludeItem.CompareExtension(".hlsl"))
+                    {
+                        InnerItem = ItemGroup.NewElementItemInclude("FxCompile", IncludeItem.FullPath);
                     }
 
                     if (InnerItem != null)
@@ -603,7 +644,7 @@ public partial class VSGenerator : ISolutionGenerator
                             Filters.Add(FilterPath);
 
                             int LastIndex;
-                            while ((LastIndex = FilterPath.IndexOf('\\')) != -1)
+                            while ((LastIndex = FilterPath.LastIndexOf(Path.DirectorySeparatorChar)) != -1)
                             {
                                 FilterPath = FilterPath[..LastIndex];
                                 Filters.Add(FilterPath);

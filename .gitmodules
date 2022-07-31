@@ -7,6 +7,3 @@
 [submodule "ThirdParty/Source/Vcpkg"]
 	path = ThirdParty/Source/Vcpkg
 	url = https://github.com/microsoft/vcpkg
-[submodule "ThirdParty/BuildTool"]
-	path = ThirdParty/BuildTool
-	url = git@github.com:Aumoa/BuildTool
