@@ -11,6 +11,7 @@ class RHISwapChain;
 class RHIFence;
 class RHIShaderBytecode;
 class RHIRootSignature;
+class RHICommandList;
 interface IPlatformWindow;
 struct RHIRootSignatureDesc;
 
@@ -31,4 +32,5 @@ public:
 	virtual std::shared_ptr<RHIFence> CreateFence() = 0;
 	virtual std::shared_ptr<RHIShaderBytecode> CreateShaderBytecode(const void* pShaderBytecode, size_t bytecodeLength) = 0;
 	virtual std::shared_ptr<RHIRootSignature> CreateRootSignature(const RHIRootSignatureDesc& desc) = 0;
+	virtual std::shared_ptr<RHICommandList> CreateCommandList() = 0;
 };

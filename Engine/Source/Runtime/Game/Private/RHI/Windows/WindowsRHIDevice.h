@@ -32,11 +32,18 @@ public:
 	virtual std::shared_ptr<RHIFence> CreateFence() override;
 	virtual std::shared_ptr<RHIShaderBytecode> CreateShaderBytecode(const void* pShaderBytecode, size_t bytecodeLength) override;
 	virtual std::shared_ptr<RHIRootSignature> CreateRootSignature(const RHIRootSignatureDesc& desc) override;
+	virtual std::shared_ptr<RHICommandList> CreateCommandList() override;
 
 private:
 	inline std::shared_ptr<WindowsRHIDevice> SharedFromThis() noexcept
 	{
 		return std::static_pointer_cast<WindowsRHIDevice>(shared_from_this());
+	}
+
+	template<class T, class... TArgs>
+	inline std::shared_ptr<T> MakeShared(TArgs&&... args)
+	{
+		return std::shared_ptr<T>(new T(std::forward<TArgs>(args)...));
 	}
 };
 

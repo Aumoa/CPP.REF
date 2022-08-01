@@ -10,6 +10,7 @@ class RHIRenderThread;
 class RHIDevice;
 class RHICommandQueue;
 class RHIFence;
+class RHICommandList;
 
 SCLASS()
 class GAME_API GameRenderSubsystem : public EngineSubsystem
@@ -23,6 +24,7 @@ private:
 	std::shared_ptr<RHIDevice> _device;
 	std::shared_ptr<RHICommandQueue> _commandQueue;
 	std::shared_ptr<RHIFence> _fence;
+	std::shared_ptr<RHICommandList> _commandList;
 	uint64 _fenceValue = 0;
 
 	Task<> _previousRenderTick;
