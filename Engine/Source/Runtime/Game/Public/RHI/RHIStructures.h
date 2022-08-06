@@ -657,3 +657,17 @@ struct RHIResourceDesc
 	ERHITextureLayout Layout;
 	ERHIResourceFlags Flags;
 };
+
+struct RHIShaderLibraryExport
+{
+	struct Expose
+	{
+		String Expose;
+		std::optional<String> Rename;
+		RHIRootSignature* pLocalRS;
+	};
+
+	RHIShaderBytecode* pShaderBytecode;
+	RHIRootSignature* pGlobalRS;
+	std::vector<Expose> Exposes;
+};

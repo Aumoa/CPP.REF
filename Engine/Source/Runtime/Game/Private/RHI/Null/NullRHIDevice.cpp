@@ -8,6 +8,8 @@
 #include "RHI/Null/NullRHIShaderBytecode.h"
 #include "RHI/Null/NullRHIRootSignature.h"
 #include "RHI/Null/NullRHICommandList.h"
+#include "RHI/Null/NullRHIResource.h"
+#include "RHI/Null/NullRHIRaytracingPipelineState.h"
 
 NullRHIDevice::NullRHIDevice(std::shared_ptr<RHIFactory> factory)
 	: RHIDevice(factory)
@@ -46,4 +48,14 @@ std::shared_ptr<RHIRootSignature> NullRHIDevice::CreateRootSignature(const RHIRo
 std::shared_ptr<RHICommandList> NullRHIDevice::CreateCommandList()
 {
 	return MakeShared<NullRHICommandList>(shared_from_this());
+}
+
+std::shared_ptr<RHIResource> NullRHIDevice::CreateCommittedResource(const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue)
+{
+	return MakeShared<NullRHIResource>(shared_from_this());
+}
+
+std::shared_ptr<RHIRaytracingPipelineState> NullRHIDevice::CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport)
+{
+	return MakeShared<NullRHIRaytracingPipelineState>(shared_from_this());
 }

@@ -17,7 +17,7 @@ class WindowsRHIDevice : public RHIDevice
 
 private:
 	ComPtr<IDXGIAdapter1> _physicalDevice;
-	ComPtr<ID3D12Device> _device;
+	ComPtr<ID3D12Device5> _device;
 
 private:
 	WindowsRHIDevice(std::shared_ptr<WindowsRHIFactory> factory);
@@ -25,7 +25,7 @@ private:
 public:
 	virtual ~WindowsRHIDevice() noexcept override;
 
-	inline ID3D12Device* GetDevice() const noexcept { return _device.Get(); }
+	inline ID3D12Device5* GetDevice() const noexcept { return _device.Get(); }
 
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) override;
@@ -33,6 +33,8 @@ public:
 	virtual std::shared_ptr<RHIShaderBytecode> CreateShaderBytecode(const void* pShaderBytecode, size_t bytecodeLength) override;
 	virtual std::shared_ptr<RHIRootSignature> CreateRootSignature(const RHIRootSignatureDesc& desc) override;
 	virtual std::shared_ptr<RHICommandList> CreateCommandList() override;
+	virtual std::shared_ptr<RHIResource> CreateCommittedResource(const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue) override;
+	virtual std::shared_ptr<RHIRaytracingPipelineState> CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport) override;
 
 private:
 	inline std::shared_ptr<WindowsRHIDevice> SharedFromThis() noexcept

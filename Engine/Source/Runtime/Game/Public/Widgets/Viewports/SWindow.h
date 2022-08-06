@@ -39,6 +39,8 @@ public:
 	virtual size_t NumChildrens() override;
 	virtual SWidget* GetChildrenAt(size_t IndexOf) override;
 
+	std::shared_ptr<RHIDevice> GetDevice() const;
+
 protected:
 	virtual void OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry) override;
 

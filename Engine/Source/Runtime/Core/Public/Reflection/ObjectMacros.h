@@ -117,6 +117,8 @@ public:
 
 // --------------- Supports Macros ------------------
 
+#define SE_ARRAYSIZE(x) (sizeof(x) / sizeof(x[0]))
+
 #define __COMBINE_THREE_MACROS(X, Y, Z) __ ## X ## __ ## Y ## __ ## Z ## __
 
 #define __STYPE_BEGIN_NAMESPACE() namespace libty::reflect {

@@ -480,7 +480,7 @@ public partial class VSGenerator : ISolutionGenerator
                     XmlElement FxCompile = ItemDefinitionGroup.NewElement("FxCompile");
                     {
                         FxCompile.NewElement("VariableName", "HLSL_%(Filename)");
-                        FxCompile.NewElement("HeaderFileOutput", "%(Filename).generated.h");
+                        FxCompile.NewElement("HeaderFileOutput", $"{project.IntermediateIncludePath}\\%(Filename).generated.h");
                         FxCompile.NewElement("ShaderModel", "5.1");
                         FxCompile.NewElement("AdditionalIncludeDirectories", AdditionalIncludeDirectories);
                     }
@@ -541,6 +541,12 @@ public partial class VSGenerator : ISolutionGenerator
                         {
                             FxCompile.NewElement("ShaderType", "Pixel");
                             FxCompile.NewElement("EntryPointName", "PSMain");
+                        }
+                        else if (Filename.EndsWith("ShaderLibrary"))
+                        {
+                            FxCompile.NewElement("ShaderType", "Library");
+                            FxCompile.NewElement("ShaderModel", "6.3");
+                            FxCompile.NewElement("EntryPointName", "");
                         }
                     }
                 }

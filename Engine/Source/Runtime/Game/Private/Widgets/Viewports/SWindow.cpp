@@ -65,6 +65,11 @@ SWidget* SWindow::GetChildrenAt(size_t IndexOf)
 	return nullptr;
 }
 
+std::shared_ptr<RHIDevice> SWindow::GetDevice() const
+{
+	return _device;
+}
+
 void SWindow::OnArrangeChildren(ArrangedChildrens& InoutArrangedChildrens, const Geometry& AllottedGeometry)
 {
 	InoutArrangedChildrens.AddWidget(_gameViewport->GetVisibility(), AllottedGeometry.MakeChild(

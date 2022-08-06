@@ -3,13 +3,19 @@
 #pragma once
 
 #include "Widgets/SLeafWidget.h"
+#include "RHI/RHIRaytracingRenderTarget.h"
 
 class SWindow;
+class RHIResource;
 
 class GAME_API SViewport : public SLeafWidget
 {
 	using This = SViewport;
 	using Super = SLeafWidget;
+
+private:
+	std::shared_ptr<RHIDevice> _device;
+	RHIRaytracingRenderTarget _renderTarget;
 
 public:
 	SViewport();
@@ -25,5 +31,5 @@ public:
 	DECLARE_SLATE_CONSTRUCTOR();
 
 private:
-	void OnSwapChainResized_RenderThread(Vector2N size);
+	void TryResizeViewport(const Geometry& allottedGeometry);
 };

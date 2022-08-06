@@ -50,6 +50,51 @@ inline D3D12_ROOT_SIGNATURE_FLAGS Convert(ERHIRootSignatureFlags flags) noexcept
 	return (D3D12_ROOT_SIGNATURE_FLAGS)flags;
 }
 
+inline D3D12_RESOURCE_DIMENSION Convert(ERHIResourceDimension dimension) noexcept
+{
+	return (D3D12_RESOURCE_DIMENSION)dimension;
+}
+
+inline DXGI_FORMAT Convert(ERHIPixelFormat format) noexcept
+{
+	return (DXGI_FORMAT)format;
+}
+
+inline D3D12_TEXTURE_LAYOUT Convert(ERHITextureLayout layout) noexcept
+{
+	return (D3D12_TEXTURE_LAYOUT)layout;
+}
+
+inline D3D12_RESOURCE_FLAGS Convert(ERHIResourceFlags flags) noexcept
+{
+	return (D3D12_RESOURCE_FLAGS)flags;
+}
+
+inline D3D12_HEAP_TYPE Convert(ERHIHeapType type) noexcept
+{
+	return (D3D12_HEAP_TYPE)type;
+}
+
+inline D3D12_CPU_PAGE_PROPERTY Convert(ERHICPUPageProperty prop) noexcept
+{
+	return (D3D12_CPU_PAGE_PROPERTY)prop;
+}
+
+inline D3D12_MEMORY_POOL Convert(ERHIMemoryPool pool) noexcept
+{
+	return (D3D12_MEMORY_POOL)pool;
+}
+
+inline D3D12_HEAP_FLAGS Convert(ERHIHeapFlags flags) noexcept
+{
+	return (D3D12_HEAP_FLAGS)flags;
+}
+
+inline D3D12_RESOURCE_STATES Convert(ERHIResourceStates state) noexcept
+{
+	return (D3D12_RESOURCE_STATES)state;
+}
+
 struct WindowsConvertMemoryHeap
 {
 private:
@@ -183,6 +228,49 @@ inline D3D12_ROOT_SIGNATURE_DESC Convert(const RHIRootSignatureDesc& desc, Windo
 	output.NumStaticSamplers = desc.NumStaticSamplers;
 	output.pStaticSamplers = heap.Alloc(desc.NumStaticSamplers, desc.pStaticSamplers);
 	output.Flags = Convert(desc.Flags);
+	return output;
+}
+
+inline DXGI_SAMPLE_DESC Convert(const RHISampleDesc& desc) noexcept
+{
+	DXGI_SAMPLE_DESC output;
+	output.Count = desc.Count;
+	output.Quality = desc.Quality;
+	return output;
+}
+
+inline D3D12_RESOURCE_DESC Convert(const RHIResourceDesc& desc) noexcept
+{
+	D3D12_RESOURCE_DESC output;
+	output.Dimension = Convert(desc.Dimension);
+	output.Alignment = desc.Alignment;
+	output.Width = desc.Width;
+	output.Height = desc.Height;
+	output.DepthOrArraySize = desc.DepthOrArraySize;
+	output.MipLevels = desc.MipLevels;
+	output.Format = Convert(desc.Format);
+	output.SampleDesc = Convert(desc.SampleDesc);
+	output.Layout = Convert(desc.Layout);
+	output.Flags = Convert(desc.Flags);
+	return output;
+}
+
+inline D3D12_HEAP_PROPERTIES Convert(const RHIHeapProperties& prop) noexcept
+{
+	D3D12_HEAP_PROPERTIES output;
+	output.Type = Convert(prop.Type);
+	output.CPUPageProperty = Convert(prop.CPUPageProperty);
+	output.MemoryPoolPreference = Convert(prop.MemoryPoolPreference);
+	output.CreationNodeMask = prop.CreationNodeMask;
+	output.VisibleNodeMask = prop.VisibleNodeMask;
+	return output;
+}
+
+inline D3D12_CLEAR_VALUE Convert(const RHIClearValue& clear) noexcept
+{
+	D3D12_CLEAR_VALUE output;
+	output.Format = Convert(clear.Format);
+	memcpy(output.Color, clear.Color, sizeof(float) * 4);
 	return output;
 }
 

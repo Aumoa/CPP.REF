@@ -24,6 +24,8 @@ protected:
 
 public:
 	virtual ~WindowsRHIRootSignature() noexcept override;
+
+	inline ID3D12RootSignature* GetSignature() const noexcept { return _signature.Get(); }
 };
 
 #endif
