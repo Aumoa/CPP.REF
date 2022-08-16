@@ -662,7 +662,7 @@ struct RHIShaderLibraryExport
 {
 	struct Expose
 	{
-		String Expose;
+		String Name;
 		std::optional<String> Rename;
 		RHIRootSignature* pLocalRS;
 	};
@@ -670,4 +670,34 @@ struct RHIShaderLibraryExport
 	RHIShaderBytecode* pShaderBytecode;
 	RHIRootSignature* pGlobalRS;
 	std::vector<Expose> Exposes;
+};
+
+struct RHIGPUVirtualAddressRange
+{
+	uint64 StartAddress;
+	uint64 SizeInBytes;
+};
+
+struct RHIGPUVirtualAddressAndStride
+{
+	uint64 StartAddress;
+	uint64 StrideInBytes;
+};
+
+struct RHIGPUVirtualAddressRangeAndStride
+{
+	uint64 StartAddress;
+	uint64 SizeInBytes;
+	uint64 StrideInBytes;
+};
+
+struct RHIDispatchRaysDesc
+{
+	RHIGPUVirtualAddressRange RayGenerationShaderRecord;
+	RHIGPUVirtualAddressRangeAndStride MissShaderTable;
+	RHIGPUVirtualAddressRangeAndStride HitGroupTable;
+	RHIGPUVirtualAddressRangeAndStride CallableShaderTable;
+	uint32 Width;
+	uint32 Height;
+	uint32 Depth;
 };

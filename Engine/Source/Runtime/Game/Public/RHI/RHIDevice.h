@@ -14,6 +14,7 @@ class RHIRootSignature;
 class RHICommandList;
 class RHIResource;
 class RHIRaytracingPipelineState;
+class RHIShaderResourceViewTable;
 interface IPlatformWindow;
 struct RHIRootSignatureDesc;
 struct RHIResourceDesc;
@@ -22,6 +23,7 @@ struct RHIHeapProperties;
 struct RHIShaderLibraryExport;
 enum class ERHIHeapFlags;
 enum class ERHIResourceStates;
+enum class ERHIShaderResourceViewType;
 
 class GAME_API RHIDevice : public EnableSharedFromThis<RHIDevice>
 {
@@ -43,4 +45,5 @@ public:
 	virtual std::shared_ptr<RHICommandList> CreateCommandList() = 0;
 	virtual std::shared_ptr<RHIResource> CreateCommittedResource(const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue) = 0;
 	virtual std::shared_ptr<RHIRaytracingPipelineState> CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport) = 0;
+	virtual std::shared_ptr<RHIShaderResourceViewTable> CreateShaderResourceViewTable(ERHIShaderResourceViewType type, size_t numViews) = 0;
 };

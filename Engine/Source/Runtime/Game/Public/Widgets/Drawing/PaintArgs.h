@@ -10,14 +10,16 @@ struct PaintArgs
 	std::shared_ptr<SWidget> OwningWidget;
 	const TimeSpan DeltaTime;
 	const float RenderOpacity;
+	RHICommandList* const CommandList;
 
-	static PaintArgs NewArgs(std::shared_ptr<SWidget> owningWidget, const TimeSpan& deltaTime)
+	static PaintArgs NewArgs(std::shared_ptr<SWidget> owningWidget, const TimeSpan& deltaTime, RHICommandList* commandList)
 	{
 		return PaintArgs
 		{
 			.OwningWidget = owningWidget,
 			.DeltaTime = deltaTime,
-			.RenderOpacity = owningWidget->GetRenderOpacity()
+			.RenderOpacity = owningWidget->GetRenderOpacity(),
+			.CommandList = commandList
 		};
 	}
 
@@ -27,7 +29,8 @@ struct PaintArgs
 		{
 			.OwningWidget = owningWidget,
 			.DeltaTime = DeltaTime,
-			.RenderOpacity = RenderOpacity * owningWidget->GetRenderOpacity()
+			.RenderOpacity = RenderOpacity * owningWidget->GetRenderOpacity(),
+			.CommandList = CommandList
 		};
 	}
 };

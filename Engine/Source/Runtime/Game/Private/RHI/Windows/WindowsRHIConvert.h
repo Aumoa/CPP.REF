@@ -95,6 +95,11 @@ inline D3D12_RESOURCE_STATES Convert(ERHIResourceStates state) noexcept
 	return (D3D12_RESOURCE_STATES)state;
 }
 
+inline D3D12_DESCRIPTOR_HEAP_TYPE Convert(ERHIShaderResourceViewType type) noexcept
+{
+	return (D3D12_DESCRIPTOR_HEAP_TYPE)type;
+}
+
 struct WindowsConvertMemoryHeap
 {
 private:
@@ -271,6 +276,44 @@ inline D3D12_CLEAR_VALUE Convert(const RHIClearValue& clear) noexcept
 	D3D12_CLEAR_VALUE output;
 	output.Format = Convert(clear.Format);
 	memcpy(output.Color, clear.Color, sizeof(float) * 4);
+	return output;
+}
+
+inline D3D12_GPU_VIRTUAL_ADDRESS_RANGE Convert(const RHIGPUVirtualAddressRange& vaRange)
+{
+	D3D12_GPU_VIRTUAL_ADDRESS_RANGE output;
+	output.StartAddress = vaRange.StartAddress;
+	output.SizeInBytes = vaRange.SizeInBytes;
+	return output;
+}
+
+inline D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE Convert(const RHIGPUVirtualAddressAndStride& vaStride)
+{
+	D3D12_GPU_VIRTUAL_ADDRESS_AND_STRIDE output;
+	output.StartAddress = vaStride.StartAddress;
+	output.StrideInBytes = vaStride.StrideInBytes;
+	return output;
+}
+
+inline D3D12_GPU_VIRTUAL_ADDRESS_RANGE_AND_STRIDE Convert(const RHIGPUVirtualAddressRangeAndStride& vaStride)
+{
+	D3D12_GPU_VIRTUAL_ADDRESS_RANGE_AND_STRIDE output;
+	output.StartAddress = vaStride.StartAddress;
+	output.SizeInBytes = vaStride.SizeInBytes;
+	output.StrideInBytes = vaStride.StrideInBytes;
+	return output;
+}
+
+inline D3D12_DISPATCH_RAYS_DESC Convert(const RHIDispatchRaysDesc& dispatch) noexcept
+{
+	D3D12_DISPATCH_RAYS_DESC output;
+	output.RayGenerationShaderRecord = Convert(dispatch.RayGenerationShaderRecord);
+	output.MissShaderTable = Convert(dispatch.MissShaderTable);
+	output.HitGroupTable = Convert(dispatch.HitGroupTable);
+	output.CallableShaderTable = Convert(dispatch.CallableShaderTable);
+	output.Width = dispatch.Width;
+	output.Height = dispatch.Height;
+	output.Depth = dispatch.Depth;
 	return output;
 }
 

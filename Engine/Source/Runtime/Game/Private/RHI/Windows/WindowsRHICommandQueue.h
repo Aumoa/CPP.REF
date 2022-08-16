@@ -25,6 +25,7 @@ public:
 	virtual ~WindowsRHICommandQueue() noexcept override;
 
 	virtual void Signal(std::shared_ptr<RHIFence> fence, uint64 fenceValue) override;
+	virtual void ExecuteCommandLists(std::span<std::shared_ptr<RHICommandList>> cmdLists) override;
 
 	inline ID3D12CommandQueue* GetQueue() const noexcept { return _queue.Get(); }
 };

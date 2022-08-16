@@ -14,7 +14,7 @@ std::shared_ptr<RHIFence> WindowsRHIDevice::CreateFence()
 WindowsRHIFence::WindowsRHIFence(std::shared_ptr<WindowsRHIDevice> device)
 	: RHIFence(device)
 {
-	ID3D12Device* dev = device->GetDevice();
+	ID3D12Device* dev = WinGetr(device);
 	HR(dev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence)));
 }
 

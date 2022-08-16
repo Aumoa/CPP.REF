@@ -22,4 +22,8 @@ public:
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
+
+	virtual void SetComputeRootSignature(RHIRootSignature* rootSignature) override;
+	virtual void SetPipelineState(RHIRaytracingPipelineState* pipelineState) override;
+	virtual void DispatchRays(const RHIDispatchRaysDesc& dispatchRays) override;
 };

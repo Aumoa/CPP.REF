@@ -13,13 +13,13 @@ std::shared_ptr<RHIRaytracingPipelineState> WindowsRHIDevice::CreateRaytracingPi
 	return MakeShared<WindowsRHIRaytracingPipelineState>(SharedFromThis(), shaderExport);
 }
 
-WindowsRHIRaytracingPipelineState::WindowsRHIRaytracingPipelineState(std::shared_ptr<WindowsRHIDevice> device, const RHIShaderLibraryExport& exposes)
+WindowsRHIRaytracingPipelineState::WindowsRHIRaytracingPipelineState(std::shared_ptr<WindowsRHIDevice> device, const RHIShaderLibraryExport& shaderExport)
 	: RHIRaytracingPipelineState(device)
 {
-	auto* d3ddev = device->GetDevice();
+	auto* d3ddev = WinGetr(device);
 
 	std::vector<D3D12_EXPORT_DESC> exports;
-	exports.reserve(exposes.Exposes.size());
+	exports.reserve(shaderExport.Exposes.size());
 
 	struct RootSignatureMapInfo
 	{
@@ -29,13 +29,13 @@ WindowsRHIRaytracingPipelineState::WindowsRHIRaytracingPipelineState(std::shared
 	};
 	std::map<RHIRootSignature*, RootSignatureMapInfo> localRSMaps;
 
-	for (size_t i = 0; i < exposes.Exposes.size(); ++i)
+	for (size_t i = 0; i < shaderExport.Exposes.size(); ++i)
 	{
-		auto& expose = exposes.Exposes[i];
+		auto& expose = shaderExport.Exposes[i];
 
 		exports.emplace_back() =
 		{
-			.Name = expose.Expose.c_str(),
+			.Name = expose.Name.c_str(),
 			.ExportToRename = expose.Rename.has_value() ? expose.Rename->c_str() : nullptr,
 			.Flags = D3D12_EXPORT_FLAG_NONE
 		};
@@ -43,7 +43,7 @@ WindowsRHIRaytracingPipelineState::WindowsRHIRaytracingPipelineState(std::shared
 		if (expose.pLocalRS)
 		{
 			auto& localMap = localRSMaps[expose.pLocalRS];
-			String exposeName = expose.Rename.has_value() ? *expose.Rename : expose.Expose;
+			String exposeName = expose.Rename.has_value() ? *expose.Rename : expose.Name;
 			localMap.Exposes.emplace_back(exposeName);
 			localMap.lpszExports.emplace_back(exposeName.c_str());
 		}
@@ -79,9 +79,13 @@ WindowsRHIRaytracingPipelineState::WindowsRHIRaytracingPipelineState(std::shared
 	};
 
 	D3D12_GLOBAL_ROOT_SIGNATURE globalRS;
-	if (exposes.pGlobalRS)
+	if (shaderExport.pGlobalRS)
 	{
-		globalRS = { .pGlobalRootSignature = static_cast<WindowsRHIRootSignature*>(exposes.pGlobalRS)->GetSignature() };
+		globalRS =
+		{
+			.pGlobalRootSignature = static_cast<WindowsRHIRootSignature*>(shaderExport.pGlobalRS)->GetSignature().Get()
+		};
+
 		states.emplace_back() =
 		{
 			D3D12_STATE_SUBOBJECT_TYPE_GLOBAL_ROOT_SIGNATURE,
@@ -96,7 +100,11 @@ WindowsRHIRaytracingPipelineState::WindowsRHIRaytracingPipelineState(std::shared
 	d3dLocalRS.reserve(localRSMaps.size());
 	for (auto& [pRS, map] : localRSMaps)
 	{
-		auto& lv = d3dLocalRS.emplace_back() = { .pLocalRootSignature = static_cast<WindowsRHIRootSignature*>(pRS)->GetSignature() };
+		auto& lv = d3dLocalRS.emplace_back() =
+		{
+			.pLocalRootSignature = static_cast<WindowsRHIRootSignature*>(pRS)->GetSignature().Get()
+		};
+
 		map.Index = states.size();
 
 		states.emplace_back() =

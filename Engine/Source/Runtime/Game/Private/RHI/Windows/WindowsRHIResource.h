@@ -23,6 +23,22 @@ private:
 
 public:
 	virtual ~WindowsRHIResource() noexcept override;
+
+public:
+	DECLGET(Resource, _resource);
 };
+
+template<class T>
+inline ID3D12Resource* WinGetr(const std::shared_ptr<T>& resource) requires std::derived_from<T, RHIResource>
+{
+	if (resource)
+	{
+		return CastChecked<WindowsRHIResource>(resource)->GetResource().Get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
 
 #endif

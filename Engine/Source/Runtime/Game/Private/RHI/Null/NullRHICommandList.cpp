@@ -22,3 +22,20 @@ void NullRHICommandList::EndFrame()
 	check(_begun);
 	_begun = false;
 }
+
+void NullRHICommandList::SetComputeRootSignature(RHIRootSignature* rootSignature)
+{
+	check(_begun);
+	check(rootSignature);
+}
+
+void NullRHICommandList::SetPipelineState(RHIRaytracingPipelineState* pipelineState)
+{
+	check(_begun);
+	check(pipelineState);
+}
+
+void NullRHICommandList::DispatchRays(const RHIDispatchRaysDesc& dispatchRays)
+{
+	check(_begun);
+}

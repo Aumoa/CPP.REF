@@ -262,6 +262,15 @@ enum class ERHIDescriptorRangeType
 };
 
 SENUM()
+enum class ERHIShaderResourceViewType
+{
+    CBV_SRV_UAV,
+    Sampler,
+    RTV,
+    DSV
+};
+
+SENUM()
 enum class ERHIBufferUsage
 {
     Default,
@@ -566,7 +575,7 @@ enum class ERHIStaticBorderColor
     OpaqueWhite = OpaqueBlack + 1
 };
 
-SENUM()
+SENUM(Flags)
 enum class ERHIRootSignatureFlags
 {
     None = 0,
@@ -581,7 +590,16 @@ enum class ERHIRootSignatureFlags
     DenyAmplificationShaderRootAccess = 0x100,
     DenyMeshShaderRootAccess = 0x200,
     CbvSrvUavHeapDirectlyIndexed = 0x400,
-    SamplerHeapDirectlyIndexed = 0x800
+    SamplerHeapDirectlyIndexed = 0x800,
+
+    DenyAllShaderRootAccess =
+        DenyVertexShaderRootAccess |
+        DenyHullShaderRootAccess |
+        DenyDomainShaderRootAccess |
+        DenyGeometryShaderRootAccess |
+        DenyPixelShaderRootAccess |
+        DenyAmplificationShaderRootAccess |
+        DenyMeshShaderRootAccess
 };
 
 SENUM()

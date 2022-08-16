@@ -25,8 +25,6 @@ private:
 public:
 	virtual ~WindowsRHIDevice() noexcept override;
 
-	inline ID3D12Device5* GetDevice() const noexcept { return _device.Get(); }
-
 	virtual std::shared_ptr<RHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<RHISwapChain> CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow) override;
 	virtual std::shared_ptr<RHIFence> CreateFence() override;
@@ -35,6 +33,10 @@ public:
 	virtual std::shared_ptr<RHICommandList> CreateCommandList() override;
 	virtual std::shared_ptr<RHIResource> CreateCommittedResource(const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue) override;
 	virtual std::shared_ptr<RHIRaytracingPipelineState> CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport) override;
+	virtual std::shared_ptr<RHIShaderResourceViewTable> CreateShaderResourceViewTable(ERHIShaderResourceViewType type, size_t numViews) override;
+
+public:
+	DECLGET(Device, _device);
 
 private:
 	inline std::shared_ptr<WindowsRHIDevice> SharedFromThis() noexcept
@@ -48,5 +50,18 @@ private:
 		return std::shared_ptr<T>(new T(std::forward<TArgs>(args)...));
 	}
 };
+
+template<class T>
+inline ID3D12Device5* WinGetr(const std::shared_ptr<T>& dev) requires std::derived_from<T, RHIDevice>
+{
+	if (dev)
+	{
+		return CastChecked<WindowsRHIDevice>(dev)->GetDevice().Get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
 
 #endif

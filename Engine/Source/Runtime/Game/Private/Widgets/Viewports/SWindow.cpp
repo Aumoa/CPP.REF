@@ -6,6 +6,8 @@
 #include "RHI/RHISwapChain.h"
 #include "RHI/RHIDevice.h"
 #include "RHI/RHIRenderThread.h"
+#include "RHI/RHICommandList.h"
+#include "RHI/RHICommandQueue.h"
 #include "EngineCore/GameRenderSubsystem.h"
 #include "PlatformMisc/IPlatformWindow.h"
 
@@ -48,9 +50,15 @@ void SWindow::PresentWindow()
 	);
 
 	// Starting paint.
-	PaintArgs args = PaintArgs::NewArgs(SharedFromThis(), _cachedDeltaTime);
+	PaintArgs args = PaintArgs::NewArgs(SharedFromThis(), _cachedDeltaTime, _windowCmdList.get());
 	Paint(args, allottedGeometry, Rect(0.0f, 0.0f, (float)_cachedDrawingSize.X, (float)_cachedDrawingSize.Y), nullptr, 0, true);
 	
+	_windowCmdList->BeginFrame();
+	_gameViewport->PresentViewport(_windowCmdList.get());
+	_windowCmdList->EndFrame();
+
+	auto cmds = std::vector{ _windowCmdList };
+	_commandQueue->ExecuteCommandLists(cmds);
 	_swapChain->Present();
 }
 
@@ -90,6 +98,8 @@ DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 	_swapChain = _device->CreateSwapChain(_commandQueue, _platformWindow.Get());
 	_gameViewport = SNew(SViewport)
 		.Window(this);
+
+	_windowCmdList = _device->CreateCommandList();
 }
 
 void SWindow::TryResizeSwapChain(const Geometry& allottedGeometry)

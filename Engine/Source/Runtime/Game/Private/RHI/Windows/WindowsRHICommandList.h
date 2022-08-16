@@ -17,7 +17,7 @@ class WindowsRHICommandList : public RHICommandList
 
 private:
 	ComPtr<ID3D12CommandAllocator> _allocator;
-	ComPtr<ID3D12GraphicsCommandList> _commandList;
+	ComPtr<ID3D12GraphicsCommandList4> _commandList;
 	bool _begun = false;
 
 private:
@@ -28,6 +28,13 @@ public:
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
+
+	virtual void SetComputeRootSignature(RHIRootSignature* rootSignature) override;
+	virtual void SetPipelineState(RHIRaytracingPipelineState* pipelineState) override;
+	virtual void DispatchRays(const RHIDispatchRaysDesc& dispatchRays) override;
+
+public:
+	DECLGET(CommandList, _commandList);
 };
 
 #endif

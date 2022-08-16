@@ -4,6 +4,7 @@
 
 #include "Object.h"
 #include "Concepts/IDerivedFrom.h"
+#include "CoreAssert.h"
 
 // ------------- Object to Object casts. -------------
 
@@ -45,7 +46,14 @@ inline TTo Cast(TFrom* from) requires
 // ---------------- shared_ptr casts. ----------------
 
 template<class TTo, class TFrom>
-inline TTo* Cast(std::shared_ptr<TFrom> from)
+inline std::shared_ptr<TTo> Cast(std::shared_ptr<TFrom> from)
 {
 	return std::dynamic_pointer_cast<TTo>(from);
+}
+
+template<class TTo, class TFrom>
+inline std::shared_ptr<TTo> CastChecked(std::shared_ptr<TFrom> from)
+{
+	check(from.get() == nullptr || dynamic_cast<TTo*>(from.get()));
+	return std::static_pointer_cast<TTo>(from);
 }

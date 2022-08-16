@@ -14,7 +14,7 @@ std::shared_ptr<RHIResource> WindowsRHIDevice::CreateCommittedResource(const RHI
 WindowsRHIResource::WindowsRHIResource(std::shared_ptr<WindowsRHIDevice> device, const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue)
 	: RHIResource(device)
 {
-	auto* d3ddev = device->GetDevice();
+	auto* d3ddev = WinGetr(device);
 	
 	auto d3dHeapFlags = Convert(heapProps);
 	auto d3ddesc = Convert(desc);

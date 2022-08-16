@@ -10,6 +10,7 @@
 #include "RHI/Null/NullRHICommandList.h"
 #include "RHI/Null/NullRHIResource.h"
 #include "RHI/Null/NullRHIRaytracingPipelineState.h"
+#include "RHI/Null/NullRHIShaderResourceViewTable.h"
 
 NullRHIDevice::NullRHIDevice(std::shared_ptr<RHIFactory> factory)
 	: RHIDevice(factory)
@@ -58,4 +59,9 @@ std::shared_ptr<RHIResource> NullRHIDevice::CreateCommittedResource(const RHIHea
 std::shared_ptr<RHIRaytracingPipelineState> NullRHIDevice::CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport)
 {
 	return MakeShared<NullRHIRaytracingPipelineState>(shared_from_this());
+}
+
+std::shared_ptr<RHIShaderResourceViewTable> NullRHIDevice::CreateShaderResourceViewTable(ERHIShaderResourceViewType type, size_t numViews)
+{
+	return MakeShared<NullRHIShaderResourceViewTable>(shared_from_this(), type, numViews);
 }

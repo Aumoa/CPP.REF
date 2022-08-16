@@ -7,7 +7,9 @@
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHIFence.h"
 #include "RHI/RHICommandList.h"
-#include "Diagnostics/PerformanceTimer.h"
+#include "RHI/RHIRaytracingPipelineState.h"
+#include "RHI/RHIStructures.h"
+#include "RHI/RHIResource.h"
 #include "GameRenderSubsystem.gen.cpp"
 
 GameRenderSubsystem::GameRenderSubsystem()
@@ -25,7 +27,6 @@ void GameRenderSubsystem::Init()
 	_device = factory->CreateDevice();
 	_commandQueue = _device->CreateCommandQueue();
 	_fence = _device->CreateFence();
-	_commandList = _device->CreateCommandList();
 }
 
 void GameRenderSubsystem::Deinit()
@@ -52,9 +53,6 @@ void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> presentWorks)
 
 	_previousRenderTick = _renderThread->ExecuteWorks([this, presentWorks]()
 	{
-		_commandList->BeginFrame();
-		_commandList->EndFrame();
-
 		if (presentWorks)
 		{
 			presentWorks();

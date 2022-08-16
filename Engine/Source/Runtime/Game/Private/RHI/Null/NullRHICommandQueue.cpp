@@ -17,3 +17,8 @@ void NullRHICommandQueue::Signal(std::shared_ptr<RHIFence> fence, uint64 fenceVa
 	auto nFence = std::static_pointer_cast<NullRHIFence>(fence);
 	nFence->SetFenceValue(fenceValue);
 }
+
+void NullRHICommandQueue::ExecuteCommandLists(std::span<std::shared_ptr<RHICommandList>> cmdLists)
+{
+	check(cmdLists.size() > 0);
+}

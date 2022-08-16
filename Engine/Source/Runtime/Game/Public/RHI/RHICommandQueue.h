@@ -6,6 +6,7 @@
 #include "RHI/RHIDeviceResource.h"
 
 class RHIFence;
+class RHICommandList;
 
 class GAME_API RHICommandQueue : public RHIDeviceResource
 {
@@ -16,4 +17,5 @@ public:
 	virtual ~RHICommandQueue() noexcept override;
 
 	virtual void Signal(std::shared_ptr<RHIFence> fence, uint64 fenceValue) = 0;
+	virtual void ExecuteCommandLists(std::span<std::shared_ptr<RHICommandList>> cmdLists) = 0;
 };

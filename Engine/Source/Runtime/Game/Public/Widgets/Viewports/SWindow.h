@@ -8,6 +8,7 @@ class SViewport;
 class RHISwapChain;
 class RHIDevice;
 class RHICommandQueue;
+class RHICommandList;
 class GameRenderSubsystem;
 interface IPlatformWindow;
 
@@ -27,6 +28,8 @@ private:
 
 	Vector2N _cachedDrawingSize;
 	TimeSpan _cachedDeltaTime;
+
+	std::shared_ptr<RHICommandList> _windowCmdList;
 
 public:
 	SWindow();

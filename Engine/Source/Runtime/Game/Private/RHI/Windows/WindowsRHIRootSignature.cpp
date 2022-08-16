@@ -18,7 +18,7 @@ WindowsRHIRootSignature::WindowsRHIRootSignature(std::shared_ptr<WindowsRHIDevic
 	WindowsConvertMemoryHeap convertHeap;
 	D3D12_ROOT_SIGNATURE_DESC d3ddesc = Convert(desc, convertHeap);
 
-	auto* d3ddev = device->GetDevice();
+	auto* d3ddev = WinGetr(device);
 
 	ComPtr<ID3DBlob> blob, error;
 	HRESULT hCode = D3D12SerializeRootSignature(&d3ddesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &blob, &error);

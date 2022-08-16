@@ -6,6 +6,7 @@
 
 #include "RHI/Windows/WindowsRHIDevice.h"
 #include "RHI/Windows/WindowsRHIFence.h"
+#include "RHI/Windows/WindowsRHICommandList.h"
 
 std::shared_ptr<RHICommandQueue> WindowsRHIDevice::CreateCommandQueue()
 {
@@ -15,7 +16,7 @@ std::shared_ptr<RHICommandQueue> WindowsRHIDevice::CreateCommandQueue()
 WindowsRHICommandQueue::WindowsRHICommandQueue(std::shared_ptr<WindowsRHIDevice> device)
 	: RHICommandQueue(device)
 {
-	ID3D12Device* d3ddev = device->GetDevice();
+	ID3D12Device* d3ddev = WinGetr(device);
 	D3D12_COMMAND_QUEUE_DESC queueDesc =
 	{
 		.Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -36,6 +37,19 @@ void WindowsRHICommandQueue::Signal(std::shared_ptr<RHIFence> fence, uint64 fenc
 	auto pFence = wFence->GetFence();
 
 	HR(_queue->Signal(pFence, fenceValue));
+}
+
+void WindowsRHICommandQueue::ExecuteCommandLists(std::span<std::shared_ptr<RHICommandList>> cmdLists)
+{
+	static thread_local std::vector<ID3D12CommandList*> raws;
+	raws.reserve(cmdLists.size());
+
+	for (auto& ptr : cmdLists)
+	{
+		raws.emplace_back(CastChecked<WindowsRHICommandList>(ptr)->GetCommandList().Get());
+	}
+
+	_queue->ExecuteCommandLists((UINT)raws.size(), raws.data());
 }
 
 #endif

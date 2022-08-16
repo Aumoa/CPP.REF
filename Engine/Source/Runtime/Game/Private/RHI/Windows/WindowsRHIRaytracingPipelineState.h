@@ -21,13 +21,15 @@ private:
 	ComPtr<ID3D12StateObject> _pipeline;
 	ComPtr<ID3D12StateObjectProperties> _properties;
 
-	std::shared_ptr<RHIRootSignature> _globalRS;
-
 private:
-	WindowsRHIRaytracingPipelineState(std::shared_ptr<WindowsRHIDevice> device, const RHIShaderLibraryExport& exposes);
+	WindowsRHIRaytracingPipelineState(std::shared_ptr<WindowsRHIDevice> device, const RHIShaderLibraryExport& shaderExport);
 
 public:
 	virtual ~WindowsRHIRaytracingPipelineState() noexcept override;
+
+public:
+	DECLGET(StateObject, _pipeline);
+	DECLGET(Properties, _properties);
 };
 
 #endif
