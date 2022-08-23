@@ -8,6 +8,7 @@
 #include "RHI/RHIRenderThread.h"
 #include "RHI/RHICommandList.h"
 #include "RHI/RHICommandQueue.h"
+#include "RHI/RHIStructures.h"
 #include "EngineCore/GameRenderSubsystem.h"
 #include "PlatformMisc/IPlatformWindow.h"
 
@@ -54,7 +55,31 @@ void SWindow::PresentWindow()
 	Paint(args, allottedGeometry, Rect(0.0f, 0.0f, (float)_cachedDrawingSize.X, (float)_cachedDrawingSize.Y), nullptr, 0, true);
 	
 	_windowCmdList->BeginFrame();
-	_gameViewport->PresentViewport(_windowCmdList.get());
+
+	std::shared_ptr<RHIResource> colorSurface = _gameViewport->PresentViewport(_windowCmdList.get());
+
+	size_t index = _swapChain->GetCurrentBackBufferIndex();
+	auto surface = _swapChain->GetBuffer(index);
+
+	RHIResourceBarrier barrier =
+	{
+		.Type = ERHIResourceBarrierType::Transition,
+		.Flags = ERHIResourceBarrierFlags::None,
+		.Transition =
+		{
+			.pResource = surface.get(),
+			.Subresource = 0,
+			.StateBefore = ERHIResourceStates::Present,
+			.StateAfter = ERHIResourceStates::CopyDest
+		}
+	};
+
+	_windowCmdList->ResourceBarrier({ &barrier, 1 });
+	_windowCmdList->CopyResource(surface.get(), colorSurface.get());
+
+	std::swap(barrier.Transition.StateBefore, barrier.Transition.StateAfter);
+	_windowCmdList->ResourceBarrier({ &barrier, 1 });
+
 	_windowCmdList->EndFrame();
 
 	auto cmds = std::vector{ _windowCmdList };
@@ -69,8 +94,8 @@ size_t SWindow::NumChildrens()
 
 SWidget* SWindow::GetChildrenAt(size_t IndexOf)
 {
-	//return Viewports[IndexOf];
-	return nullptr;
+	check(IndexOf == 0);
+	return _gameViewport.get();
 }
 
 std::shared_ptr<RHIDevice> SWindow::GetDevice() const

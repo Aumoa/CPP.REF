@@ -13,6 +13,7 @@ public partial class VSGenerator
         public string Macros;
         public string DebugInformationFormat;
         public string RuntimeLibrary;
+        public string ExceptionHandling;
         public bool bUseDebugLibrary;
         public bool bWholeProgramOptimization;
         public bool bLinkIncremental;
@@ -56,6 +57,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0",
                 DebugInformationFormat = "EditAndContinue",
                 RuntimeLibrary = "MultiThreadedDebug",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = true,
                 bWholeProgramOptimization = false,
                 bLinkIncremental = true,
@@ -73,6 +75,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0",
                 DebugInformationFormat = "EditAndContinue",
                 RuntimeLibrary = "MultiThreadedDebug",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = true,
                 bWholeProgramOptimization = false,
                 bLinkIncremental = true,
@@ -90,6 +93,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=0;SHIPPING=0",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = true,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -111,6 +115,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0",
                 DebugInformationFormat = "EditAndContinue",
                 RuntimeLibrary = "MultiThreadedDebug",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = true,
                 bWholeProgramOptimization = false,
                 bLinkIncremental = true,
@@ -128,6 +133,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreadedDebug",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = true,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -145,6 +151,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=0;SHIPPING=0",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreadedDebug",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = true,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -166,6 +173,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = false,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -183,6 +191,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0;_DEBUG",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = false,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -200,6 +209,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=1;SHIPPING=0;_DEBUG",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Async",
                 bUseDebugLibrary = false,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -221,6 +231,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=0;SHIPPING=1",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Sync",
                 bUseDebugLibrary = false,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -238,6 +249,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=0;SHIPPING=1",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Sync",
                 bUseDebugLibrary = false,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,
@@ -255,6 +267,7 @@ public partial class VSGenerator
                 Macros = "DO_CHECK=0;SHIPPING=1",
                 DebugInformationFormat = "ProgramDatabase",
                 RuntimeLibrary = "MultiThreaded",
+                ExceptionHandling = "Sync",
                 bUseDebugLibrary = false,
                 bWholeProgramOptimization = true,
                 bLinkIncremental = false,

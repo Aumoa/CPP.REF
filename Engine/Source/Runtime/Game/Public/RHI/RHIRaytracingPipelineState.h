@@ -12,4 +12,6 @@ protected:
 
 public:
 	virtual ~RHIRaytracingPipelineState() noexcept override;
+
+	virtual const void* GetShaderIdentifier(const String& functionName) const = 0;
 };

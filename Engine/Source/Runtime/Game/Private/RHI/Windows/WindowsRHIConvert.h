@@ -100,6 +100,11 @@ inline D3D12_DESCRIPTOR_HEAP_TYPE Convert(ERHIShaderResourceViewType type) noexc
 	return (D3D12_DESCRIPTOR_HEAP_TYPE)type;
 }
 
+inline D3D12_RESOURCE_BARRIER_FLAGS Convert(ERHIResourceBarrierFlags flags) noexcept
+{
+	return (D3D12_RESOURCE_BARRIER_FLAGS)flags;
+}
+
 struct WindowsConvertMemoryHeap
 {
 private:

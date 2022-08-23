@@ -15,6 +15,8 @@ class RHICommandList;
 class RHIResource;
 class RHIRaytracingPipelineState;
 class RHIShaderResourceViewTable;
+class RHIShaderBindingTable;
+class RHIDescriptorTable;
 interface IPlatformWindow;
 struct RHIRootSignatureDesc;
 struct RHIResourceDesc;
@@ -24,6 +26,8 @@ struct RHIShaderLibraryExport;
 enum class ERHIHeapFlags;
 enum class ERHIResourceStates;
 enum class ERHIShaderResourceViewType;
+enum class ERHIHeapType;
+enum class ERHIResourceFlags;
 
 class GAME_API RHIDevice : public EnableSharedFromThis<RHIDevice>
 {
@@ -46,4 +50,8 @@ public:
 	virtual std::shared_ptr<RHIResource> CreateCommittedResource(const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue) = 0;
 	virtual std::shared_ptr<RHIRaytracingPipelineState> CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport) = 0;
 	virtual std::shared_ptr<RHIShaderResourceViewTable> CreateShaderResourceViewTable(ERHIShaderResourceViewType type, size_t numViews) = 0;
+	virtual std::shared_ptr<RHIShaderBindingTable> CreateShaderBindingTable() = 0;
+	virtual std::shared_ptr<RHIDescriptorTable> CreateDescriptorTable(size_t descriptors) = 0;
+
+	std::shared_ptr<RHIResource> CreateCommittedBuffer(ERHIHeapType heapType, uint64 bufferSize, ERHIResourceStates initialState, ERHIResourceFlags flags);
 };

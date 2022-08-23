@@ -11,6 +11,8 @@
 #include "RHI/Null/NullRHIResource.h"
 #include "RHI/Null/NullRHIRaytracingPipelineState.h"
 #include "RHI/Null/NullRHIShaderResourceViewTable.h"
+#include "RHI/Null/NullRHIShaderBindingTable.h"
+#include "RHI/Null/NullRHIDescriptorTable.h"
 
 NullRHIDevice::NullRHIDevice(std::shared_ptr<RHIFactory> factory)
 	: RHIDevice(factory)
@@ -64,4 +66,14 @@ std::shared_ptr<RHIRaytracingPipelineState> NullRHIDevice::CreateRaytracingPipel
 std::shared_ptr<RHIShaderResourceViewTable> NullRHIDevice::CreateShaderResourceViewTable(ERHIShaderResourceViewType type, size_t numViews)
 {
 	return MakeShared<NullRHIShaderResourceViewTable>(shared_from_this(), type, numViews);
+}
+
+std::shared_ptr<RHIShaderBindingTable> NullRHIDevice::CreateShaderBindingTable()
+{
+	return MakeShared<NullRHIShaderBindingTable>(shared_from_this());
+}
+
+std::shared_ptr<RHIDescriptorTable> NullRHIDevice::CreateDescriptorTable(size_t descriptors)
+{
+	return MakeShared<NullRHIDescriptorTable>(shared_from_this(), descriptors);
 }

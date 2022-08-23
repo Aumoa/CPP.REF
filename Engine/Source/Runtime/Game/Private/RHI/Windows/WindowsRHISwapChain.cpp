@@ -7,6 +7,7 @@
 #include "RHI/Windows/WindowsRHICommandQueue.h"
 #include "RHI/Windows/WindowsRHIDevice.h"
 #include "RHI/Windows/WindowsRHIFactory.h"
+#include "RHI/Windows/WindowsRHIResource.h"
 #include "PlatformMisc/IPlatformWindow.h"
 
 std::shared_ptr<RHISwapChain> WindowsRHIDevice::CreateSwapChain(std::shared_ptr<RHICommandQueue> queue, IPlatformWindow* drawingWindow)
@@ -29,7 +30,7 @@ WindowsRHISwapChain::WindowsRHISwapChain(std::shared_ptr<WindowsRHICommandQueue>
 		.Height = (UINT)drawingSize.Y,
 		.Format = DXGI_FORMAT_B8G8R8A8_UNORM,
 		.SampleDesc = { 1, 0 },
-		.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
+		.BufferUsage = DXGI_USAGE_BACK_BUFFER,
 		.BufferCount = 3,
 		.Scaling = DXGI_SCALING_STRETCH,
 		.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
@@ -40,6 +41,8 @@ WindowsRHISwapChain::WindowsRHISwapChain(std::shared_ptr<WindowsRHICommandQueue>
 	ComPtr<IDXGISwapChain1> swapChain1;
 	HR(dxgiFactory->CreateSwapChainForHwnd(queue->GetQueue(), (HWND)drawingWindow->GetPointer(), &swapChainDesc, nullptr, nullptr, &swapChain1));
 	HR(swapChain1.As(&_swapChain));
+
+	AssignBuffers();
 }
 
 WindowsRHISwapChain::~WindowsRHISwapChain() noexcept
@@ -53,7 +56,30 @@ void WindowsRHISwapChain::Present()
 
 void WindowsRHISwapChain::ResizeBuffers(const Vector2N& size)
 {
+	_buffers.clear();
 	HR(_swapChain->ResizeBuffers(0, (UINT)size.X, (UINT)size.Y, DXGI_FORMAT_UNKNOWN, 0));
+	AssignBuffers();
+}
+
+size_t WindowsRHISwapChain::GetCurrentBackBufferIndex() const
+{
+	return (size_t)_swapChain->GetCurrentBackBufferIndex();
+}
+
+std::shared_ptr<RHIResource> WindowsRHISwapChain::GetBuffer(size_t index)
+{
+	return _buffers[index];
+}
+
+void WindowsRHISwapChain::AssignBuffers()
+{
+	for (size_t i = 0; i < 3; ++i)
+	{
+		ComPtr<ID3D12Resource> pResource;
+		HR(_swapChain->GetBuffer((UINT)i, IID_PPV_ARGS(&pResource)));
+		auto& ptr = _buffers.emplace_back(new WindowsRHIResource(GetDevice()));
+		ptr->_resource = std::move(pResource);
+	}
 }
 
 #endif

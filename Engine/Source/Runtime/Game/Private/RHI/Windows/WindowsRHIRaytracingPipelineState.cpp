@@ -150,4 +150,9 @@ WindowsRHIRaytracingPipelineState::~WindowsRHIRaytracingPipelineState() noexcept
 {
 }
 
+const void* WindowsRHIRaytracingPipelineState::GetShaderIdentifier(const String& functionName) const
+{
+	return _properties->GetShaderIdentifier(functionName.c_str());
+}
+
 #endif

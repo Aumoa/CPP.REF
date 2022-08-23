@@ -37,7 +37,10 @@ std::shared_ptr<RHIFactory> RHIFactory::CreateFactory()
 	}
 	else
 	{
-		bool bEnableDebugLayer = level == ERHIFactoryLevel::EnableDebugLayer;
+		bool bEnableDebugLayer = false;
+#if !SHIPPING
+		bEnableDebugLayer = level == ERHIFactoryLevel::EnableDebugLayer;;
+#endif
 
 #if PLATFORM_WINDOWS
 		return std::shared_ptr<WindowsRHIFactory>(new WindowsRHIFactory(bEnableDebugLayer));

@@ -39,3 +39,23 @@ void NullRHICommandList::DispatchRays(const RHIDispatchRaysDesc& dispatchRays)
 {
 	check(_begun);
 }
+
+void NullRHICommandList::ResourceBarrier(std::span<RHIResourceBarrier> barriers)
+{
+	check(_begun);
+}
+
+void NullRHICommandList::SetDescriptorTables(std::span<RHIDescriptorTable*> descriptorTables)
+{
+	check(_begun);
+}
+
+void NullRHICommandList::SetComputeRootDescriptorTable(size_t parameterIndex, uint64 heapPtr)
+{
+	check(_begun);
+}
+
+void NullRHICommandList::CopyResource(RHIResource* dstResource, RHIResource* srcResource)
+{
+	check(_begun);
+}

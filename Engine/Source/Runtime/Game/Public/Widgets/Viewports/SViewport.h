@@ -9,6 +9,7 @@ class SWindow;
 class RHIResource;
 class RHIRootSignature;
 class RHIRaytracingPipelineState;
+class RHIShaderBindingTable;
 
 class GAME_API SViewport : public SLeafWidget
 {
@@ -21,13 +22,16 @@ private:
 
 	std::shared_ptr<RHIRootSignature> _rootSignature;
 	std::shared_ptr<RHIRaytracingPipelineState> _pipelineState;
+	std::shared_ptr<RHIShaderBindingTable> _bindingTable;
+	std::shared_ptr<RHIDescriptorTable> _descriptorTable;
 
 public:
 	SViewport();
 
 	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime) override;
 	virtual int32 OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry, const Rect& CullingRect, SSlateDrawCollector* DrawCollector, int32 InLayer, bool bParentEnabled) override;
-	void PresentViewport(RHICommandList* commandList);
+
+	std::shared_ptr<RHIResource> PresentViewport(RHICommandList* commandList);
 
 public:
 	BEGIN_SLATE_ATTRIBUTE

@@ -11,6 +11,11 @@ std::shared_ptr<RHIResource> WindowsRHIDevice::CreateCommittedResource(const RHI
 	return MakeShared<WindowsRHIResource>(SharedFromThis(), heapProps, heapFlags, desc, initialState, clearValue);
 }
 
+WindowsRHIResource::WindowsRHIResource(std::shared_ptr<RHIDevice> device)
+	: RHIResource(std::move(device))
+{
+}
+
 WindowsRHIResource::WindowsRHIResource(std::shared_ptr<WindowsRHIDevice> device, const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue)
 	: RHIResource(device)
 {

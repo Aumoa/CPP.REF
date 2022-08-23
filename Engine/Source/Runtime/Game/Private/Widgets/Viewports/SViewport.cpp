@@ -6,6 +6,9 @@
 #include "RHI/RHICommandList.h"
 #include "RHI/RHIRenderThread.h"
 #include "RHI/RHIStructures.h"
+#include "RHI/RHIShaderBindingTable.h"
+#include "RHI/RHIDescriptorTable.h"
+#include "RHI/RHIRaytracingPipelineState.h"
 #include "RTShaderLibrary.generated.h"
 
 constexpr LogCategory LogViewport = LogCategory(TEXT("LogViewport"));
@@ -27,10 +30,48 @@ int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry
 	return InLayer;
 }
 
-void SViewport::PresentViewport(RHICommandList* commandList)
+std::shared_ptr<RHIResource> SViewport::PresentViewport(RHICommandList* commandList)
 {
+	RHIResourceBarrier barrier =
+	{
+		.Type = ERHIResourceBarrierType::Transition,
+		.Flags = ERHIResourceBarrierFlags::None,
+		.Transition =
+		{
+			.pResource = _renderTarget.ColorTarget.get(),
+			.Subresource = 0,
+			.StateBefore = ERHIResourceStates::CopySource,
+			.StateAfter = ERHIResourceStates::UnorderedAccess
+		}
+	};
+
+	commandList->ResourceBarrier({ &barrier, 1 });
+
 	commandList->SetComputeRootSignature(_rootSignature.get());
 	commandList->SetPipelineState(_pipelineState.get());
+
+	std::vector heaps = { _descriptorTable.get() };
+	commandList->SetDescriptorTables(heaps);
+
+	RHIDispatchRaysDesc dispatchRays =
+	{
+		.RayGenerationShaderRecord = _bindingTable->GetRayGenerationShaderRecord(_pipelineState->GetShaderIdentifier(TEXT("RayGeneration"))),
+		.MissShaderTable = _bindingTable->GetMissShaderTable(),
+		.HitGroupTable = _bindingTable->GetHitGroupTable(),
+		.CallableShaderTable = _bindingTable->GetCallableShaderTable(),
+		.Width = (uint32)_renderTarget.Size.X,
+		.Height = (uint32)_renderTarget.Size.Y,
+		.Depth = 1
+	};
+
+	uint64 heapPtr = _descriptorTable->CopyFrom(0, _renderTarget.UAV.get(), 0, 1);
+	commandList->SetComputeRootDescriptorTable(0, heapPtr);
+	commandList->DispatchRays(dispatchRays);
+
+	std::swap(barrier.Transition.StateBefore, barrier.Transition.StateAfter);
+	commandList->ResourceBarrier({ &barrier, 1 });
+
+	return _renderTarget.ColorTarget;
 }
 
 DEFINE_SLATE_CONSTRUCTOR(SViewport, attr)
@@ -102,5 +143,15 @@ void SViewport::ComposeRaytracingShaders()
 		};
 
 		_pipelineState = _device->CreateRaytracingPipelineState(shaderExport);
+	}
+
+	if (!_bindingTable)
+	{
+		_bindingTable = _device->CreateShaderBindingTable();
+	}
+	
+	if (!_descriptorTable)
+	{
+		_descriptorTable = _device->CreateDescriptorTable(1);
 	}
 }

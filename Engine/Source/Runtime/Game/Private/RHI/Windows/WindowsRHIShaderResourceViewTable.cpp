@@ -39,7 +39,7 @@ void WindowsRHIShaderResourceViewTable::CreateUnorderedAccessView(size_t viewInd
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	handle.ptr += _incrementSize * viewIndex;
 
-	d3ddev->CreateUnorderedAccessView(WinGetr(pResource), WinGetr(pCounter), reinterpret_cast<const D3D12_UNORDERED_ACCESS_VIEW_DESC*>(&desc), handle);
+	d3ddev->CreateUnorderedAccessView(WinGetr(pResource.get()), WinGetr(pCounter.get()), reinterpret_cast<const D3D12_UNORDERED_ACCESS_VIEW_DESC*>(&desc), handle);
 }
 
 #endif

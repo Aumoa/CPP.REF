@@ -6,5 +6,5 @@ RWTexture2D<float4> gColorOutput : register(u0);
 void RayGeneration()
 {
 	uint2 launchIndex = (uint2)DispatchRaysIndex();
-	gColorOutput[launchIndex] = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	gColorOutput[launchIndex] = float4(1.0f, 0.0f, 0.0f, 1.0f);
 }

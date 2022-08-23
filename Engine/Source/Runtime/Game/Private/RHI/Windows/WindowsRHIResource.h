@@ -10,15 +10,19 @@
 #include "WindowsRHICommon.h"
 
 class WindowsRHIDevice;
+class WindowsRHISwapChain;
 
 class WindowsRHIResource : public RHIResource
 {
 	friend WindowsRHIDevice;
+	friend WindowsRHISwapChain;
 
 private:
 	ComPtr<ID3D12Resource> _resource;
 
 private:
+	// for swap chain buffer.
+	WindowsRHIResource(std::shared_ptr<RHIDevice> device);
 	WindowsRHIResource(std::shared_ptr<WindowsRHIDevice> device, const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue);
 
 public:
@@ -28,12 +32,11 @@ public:
 	DECLGET(Resource, _resource);
 };
 
-template<class T>
-inline ID3D12Resource* WinGetr(const std::shared_ptr<T>& resource) requires std::derived_from<T, RHIResource>
+inline ID3D12Resource* WinGetr(RHIResource* resource)
 {
 	if (resource)
 	{
-		return CastChecked<WindowsRHIResource>(resource)->GetResource().Get();
+		return static_cast<WindowsRHIResource*>(resource)->GetResource().Get();
 	}
 	else
 	{

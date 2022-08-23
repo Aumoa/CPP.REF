@@ -10,3 +10,8 @@ NullRHIRaytracingPipelineState::NullRHIRaytracingPipelineState(std::shared_ptr<R
 NullRHIRaytracingPipelineState::~NullRHIRaytracingPipelineState() noexcept
 {
 }
+
+const void* NullRHIRaytracingPipelineState::GetShaderIdentifier(const String& functionName) const
+{
+	return nullptr;
+}

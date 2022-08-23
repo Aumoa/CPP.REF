@@ -459,6 +459,7 @@ public partial class VSGenerator : ISolutionGenerator
                         }
                         ClCompile.NewElement("AdditionalOptions", "/bigobj %(AdditionalOptions)");
                         ClCompile.NewElement("RuntimeLibrary", Config.RuntimeLibrary + (_solution.Rule.StaticLibraries ? "" : "DLL"));
+                        ClCompile.NewElement("ExceptionHandling", Config.ExceptionHandling);
                     }
 
                     XmlElement Link = ItemDefinitionGroup.NewElement("Link");

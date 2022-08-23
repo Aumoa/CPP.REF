@@ -26,6 +26,8 @@ public:
 	virtual std::shared_ptr<RHIResource> CreateCommittedResource(const RHIHeapProperties& heapProps, ERHIHeapFlags heapFlags, const RHIResourceDesc& desc, ERHIResourceStates initialState, const RHIClearValue* clearValue) override;
 	virtual std::shared_ptr<RHIRaytracingPipelineState> CreateRaytracingPipelineState(const RHIShaderLibraryExport& shaderExport) override;
 	virtual std::shared_ptr<RHIShaderResourceViewTable> CreateShaderResourceViewTable(ERHIShaderResourceViewType type, size_t numViews) override;
+	virtual std::shared_ptr<RHIShaderBindingTable> CreateShaderBindingTable() override;
+	virtual std::shared_ptr<RHIDescriptorTable> CreateDescriptorTable(size_t descriptors) override;
 
 private:
 	template<class T, class... TArgs>

@@ -28,4 +28,16 @@ public:
 	DECLGET(Signature, _signature);
 };
 
+inline ID3D12RootSignature* WinGetr(RHIRootSignature* sig)
+{
+	if (sig)
+	{
+		return static_cast<WindowsRHIRootSignature*>(sig)->GetSignature().Get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 #endif

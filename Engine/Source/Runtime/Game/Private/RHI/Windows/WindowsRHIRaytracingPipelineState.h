@@ -27,9 +27,23 @@ private:
 public:
 	virtual ~WindowsRHIRaytracingPipelineState() noexcept override;
 
+	virtual const void* GetShaderIdentifier(const String& functionName) const override;
+
 public:
 	DECLGET(StateObject, _pipeline);
 	DECLGET(Properties, _properties);
 };
+
+inline ID3D12StateObject* WinGetr(RHIRaytracingPipelineState* pip)
+{
+	if (pip)
+	{
+		return static_cast<WindowsRHIRaytracingPipelineState*>(pip)->GetStateObject().Get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
 
 #endif

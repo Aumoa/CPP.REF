@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "RHI/RHIDeviceResource.h"
 
+class RHIResource;
+
 class GAME_API RHISwapChain : public RHIDeviceResource
 {
 protected:
@@ -15,4 +17,6 @@ public:
 
 	virtual void Present() = 0;
 	virtual void ResizeBuffers(const Vector2N& size) = 0;
+	virtual size_t GetCurrentBackBufferIndex() const = 0;
+	virtual std::shared_ptr<RHIResource> GetBuffer(size_t index) = 0;
 };

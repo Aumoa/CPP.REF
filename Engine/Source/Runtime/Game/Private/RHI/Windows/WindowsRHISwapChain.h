@@ -11,6 +11,7 @@
 
 class WindowsRHIDevice;
 class WindowsRHICommandQueue;
+class WindowsRHIResource;
 interface IPlatformWindow;
 
 class WindowsRHISwapChain : public RHISwapChain
@@ -19,6 +20,7 @@ class WindowsRHISwapChain : public RHISwapChain
 
 private:
 	ComPtr<IDXGISwapChain3> _swapChain;
+	std::vector<std::shared_ptr<WindowsRHIResource>> _buffers;
 
 private:
 	WindowsRHISwapChain(std::shared_ptr<WindowsRHICommandQueue> queue, IPlatformWindow* drawingWindow);
@@ -28,6 +30,11 @@ public:
 
 	virtual void Present() override;
 	virtual void ResizeBuffers(const Vector2N& size) override;
+	virtual size_t GetCurrentBackBufferIndex() const override;
+	virtual std::shared_ptr<RHIResource> GetBuffer(size_t index) override;
+
+private:
+	void AssignBuffers();
 };
 
 #endif

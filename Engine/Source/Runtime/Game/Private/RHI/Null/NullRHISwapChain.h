@@ -12,6 +12,10 @@ class NullRHISwapChain : public RHISwapChain
 	friend NullRHIDevice;
 
 private:
+	std::atomic<size_t> _index;
+	std::vector<std::shared_ptr<RHIResource>> _buffers;
+
+private:
 	NullRHISwapChain(std::shared_ptr<RHIDevice> device);
 
 public:
@@ -19,4 +23,6 @@ public:
 
 	virtual void Present() override;
 	virtual void ResizeBuffers(const Vector2N& size) override;
+	virtual size_t GetCurrentBackBufferIndex() const override;
+	virtual std::shared_ptr<RHIResource> GetBuffer(size_t index) override;
 };

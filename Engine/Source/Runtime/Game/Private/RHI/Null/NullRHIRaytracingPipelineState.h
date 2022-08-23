@@ -16,4 +16,6 @@ private:
 
 public:
 	virtual ~NullRHIRaytracingPipelineState() noexcept override;
+
+	virtual const void* GetShaderIdentifier(const String& functionName) const override;
 };

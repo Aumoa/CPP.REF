@@ -43,6 +43,7 @@ void WindowsRHICommandQueue::ExecuteCommandLists(std::span<std::shared_ptr<RHICo
 {
 	static thread_local std::vector<ID3D12CommandList*> raws;
 	raws.reserve(cmdLists.size());
+	raws.clear();
 
 	for (auto& ptr : cmdLists)
 	{
