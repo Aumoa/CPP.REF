@@ -3,12 +3,12 @@
 using System;
 using BuildTool;
 
-public class GameAppRule : ModuleRule
+public class AylaRule : ModuleRule
 {
-    public GameAppRule()
+    public AylaRule()
     {
         Category = ModuleCategory.Game;
-        FilterPath = "Test";
+        FilterPath = "Games";
         ModuleType = ModuleType.Application;
 
         PublicIncludePaths.Add("Public");

@@ -8,6 +8,7 @@
 
 class Engine;
 class SWindow;
+class GameInstance;
 
 SCLASS()
 class GAME_API GameApplication : public PlatformApplication
@@ -19,6 +20,11 @@ private:
 	IPlatformWindow* _window = nullptr;
 	SPROPERTY()
 	Engine* _engine = nullptr;
+	SPROPERTY()
+	GameInstance* _gameInstance = nullptr;
+
+protected:
+	SubclassOf<GameInstance> GameInstanceClass;
 
 public:
 	SCONSTRUCTOR()
@@ -37,6 +43,8 @@ protected:
 
 	virtual Type* GetEngineType();
 	virtual void InitializeSlateApplication(IPlatformWindow* initialWindow);
+	virtual void InitializeGameFramework();
+	virtual void FinalizeGameFramework();
 
 private:
 	void OnMainWindowDestroyed();

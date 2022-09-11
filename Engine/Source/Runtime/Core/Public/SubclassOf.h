@@ -32,6 +32,11 @@ public:
 		return _t;
 	}
 
+	inline bool IsValid() const noexcept
+	{
+		return _t != nullptr;
+	}
+
 	inline Type* operator ->() const noexcept
 	{
 		return Get();
@@ -42,5 +47,10 @@ public:
 		_t = rhs._t;
 		check(_t == nullptr || _t->IsDerivedFrom(typeof(T)));
 		return *this;
+	}
+
+	inline operator bool() const noexcept
+	{
+		return IsValid();
 	}
 };

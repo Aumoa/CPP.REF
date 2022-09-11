@@ -7,12 +7,14 @@
 #include "Widgets/Viewports/SWindow.h"
 #include "EngineCore/GameRenderSubsystem.h"
 #include "Threading/GameThreads.h"
+#include "GameFramework/GameInstance.h"
 #include "GameApplication.gen.cpp"
 
 constexpr LogCategory LogGameApp(TEXT("LogGameApp"));
 
 GameApplication::GameApplication() : Super()
 {
+	GameInstanceClass = typeof(GameInstance);
 }
 
 int32 GameApplication::Startup(const CommandLineBuilder& args)
@@ -29,6 +31,7 @@ int32 GameApplication::Startup(const CommandLineBuilder& args)
 
 	Log::Info(LogGameApp, TEXT("Initialize slate application."));
 	InitializeSlateApplication(_window);
+	InitializeGameFramework();
 
 	Log::Info(LogGameApp, TEXT("Starting main loop."));
 	_window->Show(true);
@@ -80,6 +83,8 @@ void GameApplication::Tick()
 
 void GameApplication::OnApplicationShutdown() noexcept
 {
+	FinalizeGameFramework();
+
 	_engine->GetEngineSubsystem<GameRenderSubsystem>()->JoinRenderThread();
 
 	_sWindows.clear();
@@ -102,6 +107,18 @@ void GameApplication::InitializeSlateApplication(IPlatformWindow* initialWindow)
 		.TargetWindow(initialWindow);
 
 	_sWindows.emplace_back(std::move(sInitialWindow));
+}
+
+void GameApplication::InitializeGameFramework()
+{
+	check(GameInstanceClass);
+	_gameInstance = Cast<GameInstance>(GameInstanceClass->GetConstructors()[0]->Invoke());
+	_gameInstance->Init();
+}
+
+void GameApplication::FinalizeGameFramework()
+{
+	_gameInstance->Deinit();
 }
 
 void GameApplication::OnMainWindowDestroyed()
