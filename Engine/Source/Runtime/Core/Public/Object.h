@@ -43,7 +43,6 @@ public:
 	/// <summary>
 	/// Initializes a new instance of the Object class.
 	/// </summary>
-	SCONSTRUCTOR()
 	Object() noexcept;
 	virtual ~Object() noexcept;
 

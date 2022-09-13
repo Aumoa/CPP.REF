@@ -220,6 +220,7 @@ __STYPE_DEFINE_REFLEXPR(Class, Ctors, Props, Funcs)
 
 #define __SCLASS_DECLARE_GENERATED_BODY(Class, Base) \
 	friend struct libty::reflect::reflexpr_ ## Class; \
+	friend struct libty::reflect::ClassTypeMetadata; \
 \
 private: \
 	using This = Class; \

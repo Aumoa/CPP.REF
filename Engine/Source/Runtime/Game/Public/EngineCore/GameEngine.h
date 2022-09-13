@@ -12,7 +12,6 @@ class GAME_API GameEngine : public Engine
 	GENERATED_BODY()
 
 public:
-	SCONSTRUCTOR()
 	GameEngine();
 
 	virtual void Init() override;

@@ -13,7 +13,6 @@ class GAME_API GameInstance : virtual public Object
 	friend class GameApplication;
 
 public:
-	SCONSTRUCTOR()
 	GameInstance();
 
 protected:

@@ -8,6 +8,7 @@
 #include <memory>
 
 class Type;
+class Object;
 
 namespace libty::reflect
 {
@@ -46,19 +47,31 @@ namespace libty::reflect
 		static ClassTypeMetadata Generate()
 		{
 			ClassTypeMetadata M;
+			bool bIsGC = false;
 			if constexpr (libty::reflect::is_class<T>)
 			{
 				M.ClassType = 0;
+				bIsGC = true;
 			}
 			else if constexpr (libty::reflect::is_interface<T>)
 			{
 				M.ClassType = 2;
+				bIsGC = true;
 			}
 			M.HashCode = typeid(typename T::type_t).hash_code();
 			M.FriendlyName = T::friendly_name();
 			M.Constructors = T::constructors();
 			M.Properties = T::properties();
 			M.Functions = T::functions();
+			if constexpr (std::constructible_from<typename T::type_t>)
+			{
+				// Supports default constructor.
+				M.Constructors.emplace(M.Constructors.begin(), constructor_t([](std::vector<void*>) -> void*
+				{
+					using InstanceType = typename T::type_t;
+					return dynamic_cast<Object*>(new InstanceType());
+				}, 0, bIsGC));
+			}
 			if constexpr (libty::reflect::is_class<typename T::super_t>)
 			{
 				using super_t = typename T::super_t;

@@ -27,7 +27,6 @@ protected:
 	SubclassOf<GameInstance> GameInstanceClass;
 
 public:
-	SCONSTRUCTOR()
 	GameApplication();
 
 	virtual int32 Startup(const CommandLineBuilder& builder) override;
