@@ -36,12 +36,12 @@ public class CoreRule : ModuleRule
 
             PublicDisableWarnings.AddRange(new[]
             {
+                5105,
                 4005,
             });
 
             PrivateDisableWarnings.AddRange(new[]
             {
-                5105,
                 5106,
             });
         }
