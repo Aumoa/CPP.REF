@@ -17,14 +17,14 @@ class GAME_API GameApplication : public PlatformApplication
 
 private:
 	SPROPERTY()
-	IPlatformWindow* _window = nullptr;
+	IPlatformWindow* Window = nullptr;
 	SPROPERTY()
-	Engine* _engine = nullptr;
+	Engine* Engine = nullptr;
 	SPROPERTY()
-	GameInstance* _gameInstance = nullptr;
+	GameInstance* GameInstance = nullptr;
 
 protected:
-	SubclassOf<GameInstance> GameInstanceClass;
+	SubclassOf<::GameInstance> GameInstanceClass;
 
 public:
 	GameApplication();
@@ -34,8 +34,8 @@ public:
 	virtual void Tick() override;
 
 private:
-	PerformanceTimer _frameTimer;
-	std::vector<std::shared_ptr<SWindow>> _sWindows;
+	PerformanceTimer FrameTimer;
+	std::vector<std::shared_ptr<SWindow>> sWindows;
 
 protected:
 	virtual void OnApplicationShutdown() noexcept override;

@@ -17,172 +17,171 @@ void LevelTick::TickGroupHeader::RemoveTickFunction(TickFunction* function)
 	Functions.erase(function);
 }
 
-LevelTick::LevelTick(World* world) : Super()
-	, _world(world)
+LevelTick::LevelTick() : Super()
 {
 	// Initialize tick group headers.
-	for (size_t i = 0; i < _tickGroups.size(); ++i)
+	for (size_t i = 0; i < TickGroups.size(); ++i)
 	{
-		_tickGroups[i].TickGroup = (ETickingGroup)(int32)i;
+		TickGroups[i].TickGroup = (ETickingGroup)(int32)i;
 	}
 }
 
-World* LevelTick::GetWorld()
+World* LevelTick::GetWorld() noexcept
 {
-	return _world;
+	return Cast<World>(GetOuter());
 }
 
-void LevelTick::AddTickFunction(TickFunction* function)
+void LevelTick::AddTickFunction(TickFunction* InFunction)
 {
-	if (function->bCanEverTick)
+	if (InFunction->bCanEverTick)
 	{
-		bool bEnabled = function->bStartWithTickEnabled || function->IsTickFunctionEnabled();
-		function->SetTickFunctionEnable(bEnabled);
+		bool bEnabled = InFunction->bStartWithTickEnabled || InFunction->IsTickFunctionEnabled();
+		InFunction->SetTickFunctionEnable(bEnabled);
 
 		// Initialize internal data.
-		auto* internalData = (function->InternalData = std::make_unique<TickFunction::InternalLevelData>()).get();
-		internalData->Level = this;
+		auto* InternalData = (InFunction->InternalData = std::make_unique<TickFunction::InternalLevelData>()).get();
+		InternalData->Level = this;
 
-		internalData->PrevPtr = nullptr;
-		internalData->NextPtr = nullptr;
-		internalData->ActualTickGroup = function->TickGroup;
-		internalData->TickPriority = 0;
+		InternalData->PrevPtr = nullptr;
+		InternalData->NextPtr = nullptr;
+		InternalData->ActualTickGroup = InFunction->TickGroup;
+		InternalData->TickPriority = 0;
 
-		internalData->Interval = function->TickInterval;
-		internalData->bTickExecuted = false;
+		InternalData->Interval = InFunction->TickInterval;
+		InternalData->bTickExecuted = false;
 
-		TickGroupHeader& header = _tickGroups[(int32)function->TickGroup];
-		header.AddTickFunction(function);
+		TickGroupHeader& Header = TickGroups[(int32)InFunction->TickGroup];
+		Header.AddTickFunction(InFunction);
 	}
 }
 
-void LevelTick::RemoveTickFunction(TickFunction* function)
+void LevelTick::RemoveTickFunction(TickFunction* InFunction)
 {
-	TickGroupHeader& header = _tickGroups[(int32)function->TickGroup];
-	header.RemoveTickFunction(function);
+	TickGroupHeader& header = TickGroups[(int32)InFunction->TickGroup];
+	header.RemoveTickFunction(InFunction);
 }
 
 void LevelTick::BeginFrame()
 {
 	// Initialize frame.
-	_frameHead = nullptr;
+	FrameHead = nullptr;
 
 	// Sort by tick ordering.
-	TickFunction* tail = nullptr;
-	double priorityCounter = 0;
-	for (auto& group : _tickGroups)
+	TickFunction* Tail = nullptr;
+	double PriorityCounter = 0;
+	for (auto& Group : TickGroups)
 	{
-		for (auto& Function : group.Functions)
+		for (auto& Function : Group.Functions)
 		{
 			if (Function->IsTickFunctionEnabled())
 			{
-				if (_frameHead == nullptr)
+				if (FrameHead == nullptr)
 				{
-					_frameHead = Function;
+					FrameHead = Function;
 				}
 
-				TickFunction::InternalLevelData* internalData = Function->InternalData.get();
+				TickFunction::InternalLevelData* InternalData = Function->InternalData.get();
 
-				if (tail)
+				if (Tail)
 				{
-					tail->InternalData->NextPtr = Function;
-					internalData->PrevPtr = tail;
-					internalData->NextPtr = nullptr;
-					tail = Function;
+					Tail->InternalData->NextPtr = Function;
+					InternalData->PrevPtr = Tail;
+					InternalData->NextPtr = nullptr;
+					Tail = Function;
 				}
 				else
 				{
-					tail = _frameHead;
-					tail->InternalData->PrevPtr = nullptr;
-					tail->InternalData->NextPtr = nullptr;
+					Tail = FrameHead;
+					Tail->InternalData->PrevPtr = nullptr;
+					Tail->InternalData->NextPtr = nullptr;
 				}
 
-				internalData->TickPriority = priorityCounter;
-				internalData->bTickExecuted = false;
+				InternalData->TickPriority = PriorityCounter;
+				InternalData->bTickExecuted = false;
 
-				priorityCounter += 1.0;
+				PriorityCounter += 1.0;
 			}
 		}
 	}
 
 	// Make dependencies.
-	for (auto head = _frameHead; head != nullptr;)
+	for (auto Head = FrameHead; Head != nullptr;)
 	{
-		double maximumPriority = head->InternalData->TickPriority;
-		TickFunction* maximumDependency = nullptr;
-		for (auto& dependency : head->Prerequisites)
+		double MaximumPriority = Head->InternalData->TickPriority;
+		TickFunction* MaximumDependency = nullptr;
+		for (auto& Dependency : Head->Prerequisites)
 		{
-			if (dependency->IsTickFunctionRegistered() && dependency->IsTickFunctionEnabled())
+			if (Dependency->IsTickFunctionRegistered() && Dependency->IsTickFunctionEnabled())
 			{
-				double priority = dependency->InternalData->TickPriority;
-				if (priority > maximumPriority)
+				double Priority = Dependency->InternalData->TickPriority;
+				if (Priority > MaximumPriority)
 				{
-					maximumDependency = dependency;
-					maximumPriority = priority;
+					MaximumDependency = Dependency;
+					MaximumPriority = Priority;
 				}
 			}
 		}
 
-		auto nextHead = head->InternalData->NextPtr;
-		if (maximumPriority > head->InternalData->TickPriority)
+		auto NextHead = Head->InternalData->NextPtr;
+		if (MaximumPriority > Head->InternalData->TickPriority)
 		{
 			// Unlink left and right from head.
-			auto internalHead = head->InternalData.get();
-			if (internalHead->PrevPtr)
+			auto InternalHead = Head->InternalData.get();
+			if (InternalHead->PrevPtr)
 			{
-				internalHead->PrevPtr->InternalData->NextPtr = internalHead->NextPtr;
+				InternalHead->PrevPtr->InternalData->NextPtr = InternalHead->NextPtr;
 			}
-			if (internalHead->NextPtr)
+			if (InternalHead->NextPtr)
 			{
-				internalHead->NextPtr->InternalData->PrevPtr = internalHead->PrevPtr;
-			}
-
-			auto internalMax = maximumDependency->InternalData.get();
-			internalHead->NextPtr = internalMax->NextPtr;
-			internalHead->PrevPtr = maximumDependency;
-			internalMax->NextPtr = head;
-
-			if (head == _frameHead)
-			{
-				_frameHead = maximumDependency;
+				InternalHead->NextPtr->InternalData->PrevPtr = InternalHead->PrevPtr;
 			}
 
-			if (internalHead->ActualTickGroup != internalMax->ActualTickGroup)
+			auto internalMax = MaximumDependency->InternalData.get();
+			InternalHead->NextPtr = internalMax->NextPtr;
+			InternalHead->PrevPtr = MaximumDependency;
+			internalMax->NextPtr = Head;
+
+			if (Head == FrameHead)
+			{
+				FrameHead = MaximumDependency;
+			}
+
+			if (InternalHead->ActualTickGroup != internalMax->ActualTickGroup)
 			{
 				Log::Warning(LogLevelTick, TEXT("Actual tick group is different to your desired. It is not an error, but not working as your desired."));
-				internalHead->ActualTickGroup = internalMax->ActualTickGroup;
+				InternalHead->ActualTickGroup = internalMax->ActualTickGroup;
 			}
 
-			internalHead->TickPriority = internalHead->PrevPtr->InternalData->TickPriority;
-			if (internalHead->NextPtr)
+			InternalHead->TickPriority = InternalHead->PrevPtr->InternalData->TickPriority;
+			if (InternalHead->NextPtr)
 			{
-				internalHead->TickPriority += internalHead->NextPtr->InternalData->TickPriority;
-				internalHead->TickPriority *= 0.5f;
+				InternalHead->TickPriority += InternalHead->NextPtr->InternalData->TickPriority;
+				InternalHead->TickPriority *= 0.5f;
 			}
 			else
 			{
-				internalHead->TickPriority += 1.0f;
+				InternalHead->TickPriority += 1.0f;
 			}
 		}
 
-		head = nextHead;
+		Head = NextHead;
 	}
 }
 
-void LevelTick::IncrementalDispatchTick(ETickingGroup tickGroup, const TimeSpan& deltaTime)
+void LevelTick::IncrementalDispatchTick(ETickingGroup TickGroup, const TimeSpan& DeltaTime)
 {
-	for (; _frameHead && _frameHead->InternalData->ActualTickGroup == tickGroup; _frameHead = _frameHead->InternalData->NextPtr)
+	for (; FrameHead && FrameHead->InternalData->ActualTickGroup == TickGroup; FrameHead = FrameHead->InternalData->NextPtr)
 	{
-		if (_frameHead->IsTickFunctionEnabled())
+		if (FrameHead->IsTickFunctionEnabled())
 		{
-			auto* internalData = _frameHead->InternalData.get();
-			internalData->Interval -= deltaTime;
+			auto* InternalData = FrameHead->InternalData.get();
+			InternalData->Interval -= DeltaTime;
 
-			if (internalData->Interval <= 0s)
+			if (InternalData->Interval <= 0s)
 			{
-				_frameHead->ExecuteTick(deltaTime);
-				internalData->bTickExecuted = true;
-				internalData->Interval += _frameHead->TickInterval;
+				FrameHead->ExecuteTick(DeltaTime);
+				InternalData->bTickExecuted = true;
+				InternalData->Interval += FrameHead->TickInterval;
 			}
 		}
 	}

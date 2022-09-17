@@ -14,27 +14,27 @@ constexpr LogCategory LogGameApp(TEXT("LogGameApp"));
 
 GameApplication::GameApplication() : Super()
 {
-	GameInstanceClass = typeof(GameInstance);
+	GameInstanceClass = ::GameInstance::StaticClass();
 }
 
 int32 GameApplication::Startup(const CommandLineBuilder& args)
 {
 	Log::Info(LogGameApp, TEXT("Create main window."));
-	_window = CreateWindow(TEXT("GameApp"));
-	_window->WindowDestroyed.AddObject(this, &GameApplication::OnMainWindowDestroyed);
+	Window = CreateWindow(TEXT("GameApp"));
+	Window->WindowDestroyed.AddObject(this, &GameApplication::OnMainWindowDestroyed);
 
 	Log::Info(LogGameApp, TEXT("Initialize engine."));
 	Type* engineType = GetEngineType();
 	checkf(engineType, TEXT("GetEngineType() return nullptr."));
-	_engine = Cast<Engine>(engineType->GetConstructors()[0]->Invoke());
-	_engine->Init();
+	Engine = Cast<::Engine>(engineType->GetConstructors()[0]->Invoke());
+	Engine->Init();
 
 	Log::Info(LogGameApp, TEXT("Initialize slate application."));
-	InitializeSlateApplication(_window);
+	InitializeSlateApplication(Window);
 	InitializeGameFramework();
 
 	Log::Info(LogGameApp, TEXT("Starting main loop."));
-	_window->Show(true);
+	Window->Show(true);
 	StartApplicationLoop();
 
 	Log::Info(LogGameApp, TEXT("Game Application Shutdown."));
@@ -57,24 +57,24 @@ void GameApplication::Tick()
 
 	Super::Tick();
 
-	_frameTimer.Stop();
-	TimeSpan frameTime = _frameTimer.GetElapsed();
-	_frameTimer.Restart();
+	FrameTimer.Stop();
+	TimeSpan frameTime = FrameTimer.GetElapsed();
+	FrameTimer.Restart();
 
 	// Game ticks.
-	_engine->ExecuteEngineLoop(frameTime);
+	Engine->ExecuteEngineLoop(frameTime);
 
 	// Widget ticks.
-	for (auto& sWindow : _sWindows)
+	for (auto& sWindow : sWindows)
 	{
 		sWindow->DispatchSlateTick(frameTime);
 	}
 
 	// Render ticks.
-	_engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks([this]()
+	Engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks([this]()
 	{
 		// Present.
-		for (auto& sWindow : _sWindows)
+		for (auto& sWindow : sWindows)
 		{
 			sWindow->PresentWindow();
 		}
@@ -85,40 +85,42 @@ void GameApplication::OnApplicationShutdown() noexcept
 {
 	FinalizeGameFramework();
 
-	_engine->GetEngineSubsystem<GameRenderSubsystem>()->JoinRenderThread();
+	Engine->GetEngineSubsystem<GameRenderSubsystem>()->JoinRenderThread();
 
-	_sWindows.clear();
+	sWindows.clear();
 
-	_engine->Deinit();
-	_engine = nullptr;
+	Engine->Deinit();
+	Engine = nullptr;
 }
 
 Type* GameApplication::GetEngineType()
 {
-	return typeof(GameEngine);
+	return GameEngine::StaticClass();
 }
 
 void GameApplication::InitializeSlateApplication(IPlatformWindow* initialWindow)
 {
-	checkf(_sWindows.empty(), TEXT("SlateWindows already initialized before execute InitializeSlateApplication()."));
+	checkf(sWindows.empty(), TEXT("SlateWindows already initialized before execute InitializeSlateApplication()."));
 
 	std::shared_ptr<SWindow> sInitialWindow = SNew(SWindow)
-		.RenderSystem(_engine->GetEngineSubsystem<GameRenderSubsystem>())
+		.RenderSystem(Engine->GetEngineSubsystem<GameRenderSubsystem>())
 		.TargetWindow(initialWindow);
 
-	_sWindows.emplace_back(std::move(sInitialWindow));
+	sWindows.emplace_back(std::move(sInitialWindow));
 }
 
 void GameApplication::InitializeGameFramework()
 {
 	check(GameInstanceClass);
-	_gameInstance = Cast<GameInstance>(GameInstanceClass->GetConstructors()[0]->Invoke());
-	_gameInstance->Init();
+	GameInstance = Cast<::GameInstance>(GameInstanceClass->GetConstructors()[0]->Invoke());
+	GameInstance->Rename(Engine, TEXT("GameInstance"));
+	GameInstance->Init();
+	Engine->Start(GameInstance);
 }
 
 void GameApplication::FinalizeGameFramework()
 {
-	_gameInstance->Deinit();
+	GameInstance->Deinit();
 }
 
 void GameApplication::OnMainWindowDestroyed()

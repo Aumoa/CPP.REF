@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameObject.h"
 #include "TickingGroup.h"
 #include <set>
 #include <array>
@@ -12,7 +13,7 @@ class World;
 class TickFunction;
 
 SCLASS()
-class GAME_API LevelTick : virtual public Object
+class GAME_API LevelTick : public GameObject
 {
 	GENERATED_BODY();
 
@@ -26,23 +27,21 @@ private:
 		void RemoveTickFunction(TickFunction* function);
 	};
 
-	SPROPERTY()
-	World* _world = nullptr;
-	std::array<TickGroupHeader, (int32)ETickingGroup::NumGroups> _tickGroups;
+	std::array<TickGroupHeader, (int32)ETickingGroup::NumGroups> TickGroups;
 
 public:
-	LevelTick(World* world);
+	LevelTick();
 
-	World* GetWorld();
+	World* GetWorld() noexcept;
 
-	void AddTickFunction(TickFunction* function);
-	void RemoveTickFunction(TickFunction* function);
+	void AddTickFunction(TickFunction* InFunction);
+	void RemoveTickFunction(TickFunction* InFunction);
 
 private:
-	TickFunction* _frameHead = nullptr;
+	TickFunction* FrameHead = nullptr;
 
 public:
 	void BeginFrame();
-	void IncrementalDispatchTick(ETickingGroup tickGroup, const TimeSpan& deltaTime);
+	void IncrementalDispatchTick(ETickingGroup TickGroup, const TimeSpan& DeltaTime);
 	void EndFrame();
 };

@@ -8,6 +8,10 @@
 template<class T>
 class SubclassOf
 {
+	template<class>
+	friend class SubclassOf;
+
+private:
 	Type* _t;
 
 public:
@@ -25,6 +29,12 @@ public:
 		: _t(t)
 	{
 		check(t == nullptr || t->IsDerivedFrom(typeof(T)));
+	}
+
+	template<std::derived_from<T> U>
+	inline SubclassOf(const SubclassOf<U>& derivedSubclass)
+		: _t(derivedSubclass._t)
+	{
 	}
 
 	inline Type* Get() const noexcept

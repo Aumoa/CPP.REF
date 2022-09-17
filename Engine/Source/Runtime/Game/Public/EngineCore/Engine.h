@@ -6,8 +6,8 @@
 #include "Diagnostics/PerformanceTimer.h"
 #include "Engine.generated.h"
 
-class World;
 class GameRenderSubsystem;
+class GameInstance;
 
 SCLASS()
 class GAME_API Engine : virtual public Object
@@ -16,10 +16,7 @@ class GAME_API Engine : virtual public Object
 
 private:
 	SPROPERTY()
-	World* _world = nullptr;
-
-	SPROPERTY()
-	GameRenderSubsystem* _renderSystem = nullptr;
+	GameRenderSubsystem* RenderSystem = nullptr;
 
 protected:
 	Engine();
@@ -27,18 +24,13 @@ protected:
 public:
 	virtual void Init();
 	virtual void Deinit();
+	virtual void Start(GameInstance* Instance);
 
 	void ExecuteEngineLoop(const TimeSpan& deltaTime);
 
-	template<class T>
-	GameRenderSubsystem* GetEngineSubsystem() requires std::same_as<T, GameRenderSubsystem>
-	{
-		return _renderSystem;
-	}
+	template<std::same_as<GameRenderSubsystem> T>
+	GameRenderSubsystem* GetEngineSubsystem() { return RenderSystem; }
 
 protected:
 	virtual void DispatchEngineTick(const TimeSpan& deltaTime);
-
-protected:
-	World* SpawnGameWorld();
 };

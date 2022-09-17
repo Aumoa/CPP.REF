@@ -3,17 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameObject.h"
 #include "GameInstance.generated.h"
 
+class GameEngine;
+class Level;
+class World;
+
 SCLASS()
-class GAME_API GameInstance : virtual public Object
+class GAME_API GameInstance : public GameObject
 {
 	GENERATED_BODY()
 
 	friend class GameApplication;
 
+protected:
+	SubclassOf<Level> StartupLevel;
+
 public:
 	GameInstance();
+
+	void Start(World* Browser);
+	GameEngine* GetEngine() noexcept;
 
 protected:
 	virtual void Init();
