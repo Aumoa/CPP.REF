@@ -10,6 +10,7 @@ class LevelTick;
 class GameEngine;
 class Level;
 class AActor;
+class RenderScene;
 
 SCLASS()
 class GAME_API World : public GameObject
@@ -22,13 +23,19 @@ private:
 
 	SPROPERTY()
 	Level* PersistentLevel = nullptr;
+	std::vector<RefPtr<AActor>> Actors;
+
+	std::unique_ptr<RenderScene> ScenePrivate;
 
 public:
 	World();
+	virtual ~World() noexcept override;
 
 	void DispatchWorldTick(const TimeSpan& InDeltaTime);
 
 	void BrowseLevel(SubclassOf<Level> InLevelClass);
+
+	inline RenderScene* GetScene() noexcept { return ScenePrivate.get(); }
 
 	AActor* SpawnActor(SubclassOf<AActor> InActorClass, const String& ActorName = TEXT(""));
 
@@ -45,4 +52,5 @@ public:
 	}
 
 	GameEngine* GetEngine() noexcept;
+	::LevelTick* GetLevelTick() noexcept;
 };

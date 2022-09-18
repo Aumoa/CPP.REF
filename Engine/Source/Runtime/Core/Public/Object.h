@@ -29,6 +29,7 @@ private:
 	friend Type;
 	friend IDisposable;
 	template<class> friend class WeakPtr;
+	template<class> friend class RefPtr;
 
 private:
 	Object(const Object&) = delete;

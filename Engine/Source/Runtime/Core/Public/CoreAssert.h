@@ -11,6 +11,7 @@
 class CORE_API CoreAssert
 {
 public:
+	[[noreturn]]
 	static void Assert(const String& exp, const String& msg);
 	static void DebugBreak();
 };

@@ -10,60 +10,85 @@
 #include "RHI/RHIRaytracingPipelineState.h"
 #include "RHI/RHIStructures.h"
 #include "RHI/RHIResource.h"
+#include "Rendering/RaytracingSceneRenderer.h"
 #include "GameRenderSubsystem.gen.cpp"
+
+GameRenderSubsystem* GameRenderSubsystem::sInstance = nullptr;
 
 GameRenderSubsystem::GameRenderSubsystem()
 {
+	check(sInstance == nullptr);
+	sInstance = this;
 }
 
 GameRenderSubsystem::~GameRenderSubsystem() noexcept
 {
+	check(sInstance == this);
+	sInstance = nullptr;
 }
 
 void GameRenderSubsystem::Init()
 {
-	_renderThread = gcnew RHIRenderThread();
-	auto factory = RHIFactory::CreateFactory();
-	_device = factory->CreateDevice();
-	_commandQueue = _device->CreateCommandQueue();
-	_fence = _device->CreateFence();
+	RenderThread = gcnew RHIRenderThread();
+
+	auto Factory = RHIFactory::CreateFactory();
+	Device = Factory->CreateDevice();
+	CommandQueue = Device->CreateCommandQueue();
+	Fence = Device->CreateFence();
 }
 
 void GameRenderSubsystem::Deinit()
 {
-	_fence.reset();
-	_commandQueue.reset();
-	_device.reset();
+	Fence.reset();
+	CommandQueue.reset();
+	Device.reset();
 
-	_renderThread->StopThread();
-	_renderThread = nullptr;
+	RenderThread->StopThread();
+	RenderThread = nullptr;
 }
 
-void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> presentWorks)
+void GameRenderSubsystem::RegisterSceneView(SceneView* Scene)
 {
-	if (_previousRenderTick.IsValid())
+	check(std::find(Scenes.begin(), Scenes.end(), Scene) == Scenes.end());
+	Scenes.emplace_back(Scene);
+}
+
+void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> DisplayWorks)
+{
+	if (PreviousRenderTask.IsValid())
 	{
 		// Waiting previous render tick.
 #if DO_CHECK
-		checkf(_previousRenderTick.WaitFor(1s), TEXT("Timeout detected on render thread."));
+		checkf(PreviousRenderTask.WaitFor(1s), TEXT("Timeout detected on render thread."));
 #endif
 
-		_previousRenderTick.GetResult();
+		PreviousRenderTask.GetResult();
 	}
 
-	_previousRenderTick = _renderThread->ExecuteWorks([this, presentWorks]()
+	PreviousRenderTask = RenderThread->ExecuteWorks([this, DisplayWorks, Renderer = RaytracingSceneRenderer()]() mutable
 	{
-		if (presentWorks)
+		for (auto& Scene : Scenes)
 		{
-			presentWorks();
+			Renderer.Render(Scene);
 		}
 
-		_commandQueue->Signal(_fence, ++_fenceValue);
-		_fence->Wait(_fenceValue);
+		if (DisplayWorks)
+		{
+			DisplayWorks();
+		}
+
+		CommandQueue->Signal(Fence, ++FenceValue);
+		Fence->Wait(FenceValue);
 	});
 }
 
 void GameRenderSubsystem::JoinRenderThread()
 {
-	_renderThread->StopThread();
+	RenderThread->StopThread();
+}
+
+bool GameRenderSubsystem::IsInRenderThread() noexcept
+{
+	check(sInstance);
+	return sInstance->RenderThread->IsInRenderThread();
 }

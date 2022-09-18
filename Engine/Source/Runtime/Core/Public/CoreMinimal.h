@@ -22,3 +22,5 @@
 #include "Numerics/TransformInterface/Transform.h"
 #include "Numerics/TransformInterface/Transform2D.h"
 #include "Threading/Tasks/Task.h"
+#include "CoreObject/WeakPtr.h"
+#include "CoreObject/RefPtr.h"

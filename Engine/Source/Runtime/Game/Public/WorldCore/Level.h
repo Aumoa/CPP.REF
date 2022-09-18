@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
+#include "SerializedLevelSpawn.h"
 #include "Level.generated.h"
 
 class AGameMode;
@@ -16,6 +17,7 @@ class GAME_API Level : public GameObject
 
 protected:
 	SubclassOf<AGameMode> GameModeClass;
+	std::vector<SerializedLevelSpawn> SerializedSpawns;
 
 public:
 	Level();
@@ -24,4 +26,5 @@ public:
 
 	void SpawnGameMode() { SpawnGameModeAt(GetWorld()); }
 	AGameMode* SpawnGameModeAt(World* InWorld);
+	void SpawnLevelActors(World* InWorld);
 };

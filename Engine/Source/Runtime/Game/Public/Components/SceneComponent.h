@@ -53,22 +53,22 @@ public:
 	inline String GetAttachSocketName() { return Attachment.SocketName; }
 	inline const std::vector<SceneComponent*>& GetChildComponents() { return Childs; }
 	Transform GetRelativeTransform() const;
-	void SetRelativeTransform(const Transform& value);
+	void SetRelativeTransform(const Transform& InValue);
 	Transform GetComponentTransform() const;
 
 	Vector3 GetLocation();
-	void SetLocation(const Vector3& value);
+	void SetLocation(const Vector3& InValue);
 	Vector3 GetScale();
-	void SetScale(const Vector3& value);
+	void SetScale(const Vector3& InValue);
 	Quaternion GetRotation();
-	void SetRotation(const Quaternion& value);
+	void SetRotation(const Quaternion& InValue);
 
 	inline Vector3 GetComponentLocation() { return WorldTransform.Translation; }
 	inline Vector3 GetComponentScale() { return WorldTransform.Scale; }
 	inline Quaternion GetComponentRotation() { return WorldTransform.Rotation; }
 
-	EComponentMobility GetMobility();
-	void SetMobility(EComponentMobility value);
+	EComponentMobility GetMobility() noexcept;
+	void SetMobility(EComponentMobility InValue);
 
 protected:
 	virtual void OnAttachmentChanged();

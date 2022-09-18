@@ -7,6 +7,7 @@
 #include "GameEngine.generated.h"
 
 class World;
+class SceneView;
 
 SCLASS()
 class GAME_API GameEngine : public Engine
@@ -16,12 +17,17 @@ class GAME_API GameEngine : public Engine
 private:
 	SPROPERTY()
 	World* GameWorld = nullptr;
+	std::unique_ptr<SceneView> GameViewport;
 
 public:
 	GameEngine();
+	virtual ~GameEngine() noexcept override;
 
 	virtual void Init() override;
 	virtual void Start(GameInstance* Instance) override;
+
+protected:
+	virtual void DispatchEngineTick(const TimeSpan& InDeltaTime);
 
 private:
 	World* SpawnGameWorld();

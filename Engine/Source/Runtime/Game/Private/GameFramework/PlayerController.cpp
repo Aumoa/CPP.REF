@@ -5,4 +5,5 @@
 
 APlayerController::APlayerController()
 {
+	PrimaryActorTick.bCanEverTick = true;
 }

@@ -31,6 +31,7 @@ public:
 	virtual ~RHIRenderThread() noexcept override;
 
 	void StopThread(bool join = true);
+	bool IsInRenderThread() noexcept;
 
 	void EnqueueWork(std::function<void()> work);
 	Task<> ExecuteWorks(std::function<void()> work);

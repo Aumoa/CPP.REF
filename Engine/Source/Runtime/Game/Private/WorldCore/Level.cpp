@@ -19,3 +19,11 @@ AGameMode* Level::SpawnGameModeAt(World* InWorld)
 {
 	return InWorld->SpawnActor(GameModeClass);
 }
+
+void Level::SpawnLevelActors(World* InWorld)
+{
+	for (auto& SpawnInfo : SerializedSpawns)
+	{
+		InWorld->SpawnActor(SpawnInfo.ActorClass);
+	}
+}

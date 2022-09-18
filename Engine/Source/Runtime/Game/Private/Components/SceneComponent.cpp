@@ -151,9 +151,9 @@ Transform SceneComponent::GetRelativeTransform() const
 	return RelativeTransform;
 }
 
-void SceneComponent::SetRelativeTransform(const Transform& value)
+void SceneComponent::SetRelativeTransform(const Transform& InValue)
 {
-	RelativeTransform = value;
+	RelativeTransform = InValue;
 	UpdateWorldTransform();
 }
 
@@ -167,9 +167,9 @@ Vector3 SceneComponent::GetLocation()
 	return RelativeTransform.Translation;
 }
 
-void SceneComponent::SetLocation(const Vector3& value)
+void SceneComponent::SetLocation(const Vector3& InValue)
 {
-	RelativeTransform.Translation = value;
+	RelativeTransform.Translation = InValue;
 	UpdateWorldTransform();
 }
 
@@ -178,9 +178,9 @@ Vector3 SceneComponent::GetScale()
 	return RelativeTransform.Scale;
 }
 
-void SceneComponent::SetScale(const Vector3& value)
+void SceneComponent::SetScale(const Vector3& InValue)
 {
-	RelativeTransform.Scale = value;
+	RelativeTransform.Scale = InValue;
 	UpdateWorldTransform();
 }
 
@@ -189,10 +189,20 @@ Quaternion SceneComponent::GetRotation()
 	return RelativeTransform.Rotation;
 }
 
-void SceneComponent::SetRotation(const Quaternion& value)
+void SceneComponent::SetRotation(const Quaternion& InValue)
 {
-	RelativeTransform.Rotation = value;
+	RelativeTransform.Rotation = InValue;
 	UpdateWorldTransform();
+}
+
+EComponentMobility SceneComponent::GetMobility() noexcept
+{
+	return Mobility;
+}
+
+void SceneComponent::SetMobility(EComponentMobility InValue)
+{
+	Mobility = InValue;
 }
 
 void SceneComponent::OnAttachmentChanged()

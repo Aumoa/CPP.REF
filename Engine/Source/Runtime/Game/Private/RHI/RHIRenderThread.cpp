@@ -40,6 +40,12 @@ void RHIRenderThread::StopThread(bool join)
 	}
 }
 
+bool RHIRenderThread::IsInRenderThread() noexcept
+{
+	static thread_local Thread CurrentThread = Thread::GetCurrentThread();
+	return CurrentThread.GetThreadId() == _thread.GetThreadId();
+}
+
 void RHIRenderThread::EnqueueWork(std::function<void()> work)
 {
 	check(GameThreads::IsInGameThread());

@@ -10,6 +10,7 @@ class RHIRenderThread;
 class RHIDevice;
 class RHICommandQueue;
 class RHIFence;
+class SceneView;
 
 SCLASS()
 class GAME_API GameRenderSubsystem : public EngineSubsystem
@@ -17,15 +18,19 @@ class GAME_API GameRenderSubsystem : public EngineSubsystem
 	GENERATED_BODY()
 
 private:
+	static GameRenderSubsystem* sInstance;
+
+private:
 	SPROPERTY()
-	RHIRenderThread* _renderThread = nullptr;
+	RHIRenderThread* RenderThread = nullptr;
 
-	std::shared_ptr<RHIDevice> _device;
-	std::shared_ptr<RHICommandQueue> _commandQueue;
-	std::shared_ptr<RHIFence> _fence;
-	uint64 _fenceValue = 0;
+	std::shared_ptr<RHIDevice> Device;
+	std::shared_ptr<RHICommandQueue> CommandQueue;
+	std::shared_ptr<RHIFence> Fence;
+	uint64 FenceValue = 0;
 
-	Task<> _previousRenderTick;
+	Task<> PreviousRenderTask;
+	std::vector<SceneView*> Scenes;
 
 public:
 	GameRenderSubsystem();
@@ -34,9 +39,13 @@ public:
 	virtual void Init();
 	virtual void Deinit();
 
-	void ExecuteRenderTicks(std::function<void()> presentWorks);
+	void RegisterSceneView(SceneView* Scene);
+	void ExecuteRenderTicks(std::function<void()> DisplayWorks);
 	void JoinRenderThread();
 
-	inline const std::shared_ptr<RHIDevice>& GetDevice() { return _device; }
-	inline const std::shared_ptr<RHICommandQueue>& GetCommandQueue() { return _commandQueue; }
+	inline const std::shared_ptr<RHIDevice>& GetDevice() { return Device; }
+	inline const std::shared_ptr<RHICommandQueue>& GetCommandQueue() { return CommandQueue; }
+
+public:
+	static bool IsInRenderThread() noexcept;
 };
