@@ -6,11 +6,20 @@
 #include "Actors/Actor.h"
 #include "Controller.generated.h"
 
+class APawn;
+
 SCLASS()
 class GAME_API AController : public AActor
 {
 	GENERATED_BODY()
 
+private:
+	SPROPERTY()
+	APawn* PossessedPawn = nullptr;
+
 public:
 	AController();
+
+	void Possess(APawn* InPawn);
+	void UnPossess();
 };

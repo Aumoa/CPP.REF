@@ -49,6 +49,7 @@ public:
 
 	inline bool IsActive() noexcept { return bActive; }
 	inline bool HasBegunPlay() noexcept { return bHasBegunPlay; }
+	World* GetWorld() noexcept;
 
 	void SetRootComponent(SceneComponent* InRootComponent);
 	SceneComponent* GetRootComponent() noexcept;

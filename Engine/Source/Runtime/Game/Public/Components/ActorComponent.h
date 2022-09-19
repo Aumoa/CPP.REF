@@ -8,6 +8,7 @@
 #include "ActorComponent.generated.h"
 
 class AActor;
+class World;
 
 SCLASS()
 class GAME_API ActorComponent : public GameObject
@@ -47,7 +48,11 @@ public:
 	inline bool IsActive() noexcept { return bActive; }
 	inline bool HasBegunPlay() noexcept { return bHasBegunPlay; }
 
-	AActor* GetOwner();
+	AActor* GetOwner() noexcept;
+	World* GetWorld() noexcept;
+
+	virtual void RegisterComponent();
+	virtual void UnregisterComponent();
 
 protected:
 	virtual void Tick(const TimeSpan& InDeltaTime);

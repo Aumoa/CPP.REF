@@ -114,7 +114,7 @@ LRESULT WindowsWindow::DispatchWindowsMessage(HWND hWnd, UINT uMsg, WPARAM wPara
 		}
 	}
 
-	return DefWindowProcW((HWND)_hWnd, (UINT)uMsg, (WPARAM)wParam, (LPARAM)lParam);
+	return DefWindowProcW(hWnd, (UINT)uMsg, (WPARAM)wParam, (LPARAM)lParam);
 }
 
 #endif

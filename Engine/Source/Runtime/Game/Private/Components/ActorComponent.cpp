@@ -30,9 +30,22 @@ void ActorComponent::TickComponent(const TimeSpan& InDeltaTime, ComponentTickFun
 	}
 }
 
-AActor* ActorComponent::GetOwner()
+AActor* ActorComponent::GetOwner() noexcept
 {
 	return Cast<AActor>(GetOuter());
+}
+
+World* ActorComponent::GetWorld() noexcept
+{
+	return GetOwner()->GetWorld();
+}
+
+void ActorComponent::RegisterComponent()
+{
+}
+
+void ActorComponent::UnregisterComponent()
+{
 }
 
 void ActorComponent::Tick(const TimeSpan& InDeltaTime)

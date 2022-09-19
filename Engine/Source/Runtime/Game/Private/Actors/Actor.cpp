@@ -48,6 +48,11 @@ void AActor::TickComponent(const TimeSpan& InDeltaTime, ActorTickFunction* InTic
 	}
 }
 
+World* AActor::GetWorld() noexcept
+{
+	return Cast<World>(GetOuter());
+}
+
 void AActor::SetRootComponent(SceneComponent* InRootComponent)
 {
 	RootComponent = InRootComponent;
