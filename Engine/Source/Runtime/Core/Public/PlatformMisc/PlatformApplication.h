@@ -6,9 +6,11 @@
 #include "SubclassOf.h"
 #include "Diagnostics/PerformanceTimer.h"
 #include "Misc/CommandLineBuilder.h"
-#include "PlatformApplication.generated.h"
+#include "PlatformApplication.gen.h"
 
 interface IPlatformWindow;
+interface IPlatformKeyboard;
+interface IPlatformMouse;
 
 SCLASS()
 class CORE_API PlatformApplication : virtual public Object
@@ -18,6 +20,11 @@ class CORE_API PlatformApplication : virtual public Object
 private:
 	PerformanceTimer _gcTimer;
 	int32 _platformExitCode = -1;
+
+	SPROPERTY()
+	IPlatformKeyboard* Keyboard = nullptr;
+	SPROPERTY()
+	IPlatformMouse* Mouse = nullptr;
 
 protected:
 	PlatformApplication();

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MaterialInterface.generated.h"
+#include "MaterialInterface.gen.h"
 
 SCLASS()
 class GAME_API MaterialInterface : virtual public Object

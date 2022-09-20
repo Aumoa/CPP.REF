@@ -4,7 +4,7 @@
 
 #include "Object.h"
 #include "Reflection/ReflectionTraits.h"
-#include "Type.generated.h"
+#include "Type.gen.h"
 
 class ConstructorInfo;
 class PropertyInfo;

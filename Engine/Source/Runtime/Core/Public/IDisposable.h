@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "IDisposable.generated.h"
+#include "IDisposable.gen.h"
 
 SINTERFACE()
 interface CORE_API IDisposable : virtual public Object

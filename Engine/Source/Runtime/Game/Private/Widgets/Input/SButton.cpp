@@ -11,7 +11,7 @@ SButton::SButton() : Super()
 
 bool SButton::OnReceiveMouseEvent(const Geometry& AllottedGeometry, EMouseButton Button, EMouseButtonEvent Event, const MouseState& State)
 {
-	if (AllottedGeometry.IsUnderLocation(Vector<>::Cast<Vector2>(State.CursorLocation)))
+	if (AllottedGeometry.IsUnderLocation(Vector<>::Cast<Vector2>(State.GetCursorLocation())))
 	{
 		if (Button == InterruptButton && Event == CaughtEvent)
 		{

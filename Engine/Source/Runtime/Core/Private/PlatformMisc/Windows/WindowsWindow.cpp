@@ -6,6 +6,8 @@
 #include "CoreAssert.h"
 #include "PlatformMisc/Windows/WindowsWindow.h"
 #include "Threading/Spinlock.h"
+#include "PlatformMisc/Windows/WindowsMouse.h"
+#include "PlatformMisc/Windows/WindowsKeyboard.h"
 #include "WindowsWindow.gen.cpp"
 
 #define GWLP_SELF GWLP_USERDATA
@@ -99,6 +101,8 @@ LRESULT CALLBACK WindowsWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 LRESULT WindowsWindow::DispatchWindowsMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	check(hWnd);
+
 	if (uMsg == WM_NCCREATE)
 	{
 		_hWnd = hWnd;
@@ -108,6 +112,28 @@ LRESULT WindowsWindow::DispatchWindowsMessage(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
+		case WM_ACTIVATEAPP:
+			WindowsKeyboard::ProcessMessage(uMsg, wParam, lParam);
+		case WM_INPUT:
+		case WM_MOUSEMOVE:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_MOUSEWHEEL:
+		case WM_XBUTTONDOWN:
+		case WM_XBUTTONUP:
+		case WM_MOUSEHOVER:
+			WindowsMouse::ProcessMessage(uMsg, wParam, lParam);
+			break;
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+			WindowsKeyboard::ProcessMessage(uMsg, wParam, lParam);
+			break;
 		case WM_DESTROY:
 			WindowDestroyed.Broadcast();
 			break;

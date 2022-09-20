@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MeshComponent.h"
-#include "StaticMeshComponent.generated.h"
+#include "StaticMeshComponent.gen.h"
 
 SCLASS()
 class GAME_API StaticMeshComponent : public MeshComponent

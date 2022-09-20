@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Reflection/ObjectMacros.h"
-#include "MouseButton.generated.h"
+#include "MouseButton.gen.h"
 
 SENUM()
 enum class EMouseButton

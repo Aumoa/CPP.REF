@@ -5,12 +5,8 @@
 #if PLATFORM_WINDOWS
 
 #include "PlatformMisc/IPlatformWindow.h"
-#include "WindowsWindow.generated.h"
-
-#pragma push_macro("TEXT")
-#undef TEXT
-#include <Windows.h>
-#pragma pop_macro("TEXT")
+#include "PlatformMisc/Windows/WindowsMinimal.h"
+#include "WindowsWindow.gen.h"
 
 SCLASS()
 class WindowsWindow : virtual public Object, virtual public IPlatformWindow
@@ -36,6 +32,8 @@ public:
 	virtual void Destroy() override;
 	virtual void* GetPointer() override;
 	virtual Vector2N GetDrawingSize() override;
+
+	HWND GetWindowHandle() noexcept { return _hWnd; }
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EngineSubsystem.generated.h"
+#include "EngineSubsystem.gen.h"
 
 SCLASS()
 class GAME_API EngineSubsystem : virtual public Object

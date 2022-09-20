@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include "Object.h"
-#include "Delegates/MulticastDelegate.h"
-#include "Numerics/VectorInterface/Vector.h"
-#include "IPlatformWindow.generated.h"
+#include "CoreMinimal.h"
+#include "IPlatformWindow.gen.h"
 
 SINTERFACE()
 interface CORE_API IPlatformWindow : virtual public Object

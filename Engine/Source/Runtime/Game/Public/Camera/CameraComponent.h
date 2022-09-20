@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "CameraComponent.generated.h"
+#include "CameraComponent.gen.h"
 
 struct MinimalViewInfo;
 

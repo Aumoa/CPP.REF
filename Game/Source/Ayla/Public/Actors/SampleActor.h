@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Actor.h"
-#include "SampleActor.generated.h"
+#include "SampleActor.gen.h"
 
 SCLASS()
 class AYLA_API ASampleActor : public AActor

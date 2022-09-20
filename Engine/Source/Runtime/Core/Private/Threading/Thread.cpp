@@ -5,13 +5,7 @@
 
 #if PLATFORM_WINDOWS
 
-#pragma push_macro("TEXT")
-#undef TEXT
-
-#include <Windows.h>
-#undef GetObject
-
-#pragma pop_macro("TEXT")
+#include "PlatformMisc/Windows/WindowsMinimal.h"
 
 struct Thread::_Impl
 {

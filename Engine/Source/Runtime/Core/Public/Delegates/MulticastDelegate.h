@@ -62,12 +62,7 @@ public:
 	MulticastDelegate() = default;
 
 	template<class... TInvokeArgs>
-	void Broadcast(TInvokeArgs&&... args) requires
-#if __INTELLISENSE__
-		true
-#else
-		std::invocable<TPayload, TInvokeArgs>
-#endif
+	void Broadcast(TInvokeArgs&&... args)
 	{
 		std::vector<int64> compacts;
 		std::vector<DelegateInstance> invokes;

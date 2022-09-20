@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "AylaPlayerController.generated.h"
+#include "AylaPlayerController.gen.h"
 
 SCLASS()
 class AYLA_API AAylaPlayerController : public APlayerController

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameInstance.h"
-#include "AylaGameInstance.generated.h"
+#include "AylaGameInstance.gen.h"
 
 SCLASS()
 class AYLA_API AylaGameInstance : public GameInstance

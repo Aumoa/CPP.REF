@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
-#include "GameInstance.generated.h"
+#include "GameInstance.gen.h"
 
 class GameEngine;
 class Level;

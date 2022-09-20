@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ITickableComponent.generated.h"
+#include "ITickableComponent.gen.h"
 
 class World;
 

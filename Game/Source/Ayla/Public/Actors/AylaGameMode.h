@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/GameMode.h"
-#include "AylaGameMode.generated.h"
+#include "AylaGameMode.gen.h"
 
 SCLASS()
 class AYLA_API AAylaGameMode : public AGameMode

@@ -6,7 +6,7 @@
 #include "GameObject.h"
 #include "Ticking/TickFunction.h"
 #include "Ticking/ITickableComponent.h"
-#include "Actor.generated.h"
+#include "Actor.gen.h"
 
 class SceneComponent;
 

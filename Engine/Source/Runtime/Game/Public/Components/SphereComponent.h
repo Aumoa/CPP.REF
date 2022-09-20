@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ShapeComponent.h"
-#include "SphereComponent.generated.h"
+#include "SphereComponent.gen.h"
 
 SCLASS()
 class GAME_API SphereComponent : public ShapeComponent

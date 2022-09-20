@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameObject.h"
 #include "SerializedLevelSpawn.h"
-#include "Level.generated.h"
+#include "Level.gen.h"
 
 class AGameMode;
 class World;

@@ -7,7 +7,7 @@
 #include "Reflection/ObjectMacros.h"
 #include "Reflection/ClassTypeMetadata.h"
 #include "CoreObject/ObjectReference.h"
-#include "Object.generated.h"
+#include "Object.gen.h"
 
 class Type;
 class GC;

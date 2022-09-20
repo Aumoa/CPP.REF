@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "GC.generated.h"
+#include "GC.gen.h"
 
 class Core;
 class ConstructorInfo;

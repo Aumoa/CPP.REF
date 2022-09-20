@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameObject.generated.h"
+#include "GameObject.gen.h"
 
 SCLASS()
 class GAME_API GameObject : virtual public Object

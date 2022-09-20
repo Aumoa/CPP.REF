@@ -36,7 +36,7 @@ bool SLeafWidget::SendMouseMoved(const Geometry& AllottedGeometry, const MouseSt
 
 bool SLeafWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta, const MouseState& State)
 {
-    Vector2 CursorPos = State.CursorLocation;
+    Vector2 CursorPos = State.GetCursorLocation();
 
     if (ESlateVisibility::IsHitTestVisible(GetVisibility()) && AllottedGeometry.GetRenderBoundingRect().PtInRect(CursorPos))
     {
@@ -49,7 +49,7 @@ bool SLeafWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32
 bool SLeafWidget::SendMouseEvent(const Geometry& AllottedGeometry, EMouseButton Button, EMouseButtonEvent Event, const MouseState& State)
 {
     if (ESlateVisibility::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(Vector<>::Cast<float>(State.CursorLocation)))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Vector<>::Cast<float>(State.GetCursorLocation())))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Button, Event, State);
     }

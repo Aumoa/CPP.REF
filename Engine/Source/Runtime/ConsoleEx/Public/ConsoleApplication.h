@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Threading/Tasks/Task.h"
 #include <functional>
-#include "ConsoleApplication.generated.h"
+#include "ConsoleApplication.gen.h"
 
 class CommandLineBuilder;
 

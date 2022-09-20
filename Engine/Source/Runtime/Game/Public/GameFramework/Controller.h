@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Actor.h"
-#include "Controller.generated.h"
+#include "Controller.gen.h"
 
 class APawn;
 

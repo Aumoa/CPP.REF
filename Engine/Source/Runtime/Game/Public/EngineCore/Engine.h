@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Diagnostics/PerformanceTimer.h"
-#include "Engine.generated.h"
+#include "Engine.gen.h"
 
 class GameRenderSubsystem;
 class GameInstance;

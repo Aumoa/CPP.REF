@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ComponentMobility.generated.h"
+#include "ComponentMobility.gen.h"
 
 SENUM()
 enum class EComponentMobility

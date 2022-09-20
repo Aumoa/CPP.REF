@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine.h"
-#include "GameEngine.generated.h"
+#include "GameEngine.gen.h"
 
 class World;
 class SceneView;

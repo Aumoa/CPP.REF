@@ -4,8 +4,7 @@
 
 #if PLATFORM_WINDOWS
 
-#include <Windows.h>
-#undef GetMessage
+#include "PlatformMisc/Windows/WindowsMinimal.h"
 
 struct Spinlock::Impl
 {

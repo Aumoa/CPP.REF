@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CoreDelegates.generated.h"
+#include "CoreDelegates.gen.h"
 
 SCLASS()
 class GAME_API CoreDelegates : virtual public Object

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameObject.h"
-#include "World.generated.h"
+#include "World.gen.h"
 
 class LevelTick;
 class GameEngine;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PrimitiveComponent.h"
-#include "ShapeComponent.generated.h"
+#include "ShapeComponent.gen.h"
 
 SCLASS()
 class GAME_API ShapeComponent : public PrimitiveComponent

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameObject.h"
 #include "Ticking/TickFunction.h"
-#include "ActorComponent.generated.h"
+#include "ActorComponent.gen.h"
 
 class AActor;
 class World;

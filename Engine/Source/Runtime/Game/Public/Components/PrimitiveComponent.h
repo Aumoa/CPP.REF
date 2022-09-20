@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SceneComponent.h"
-#include "PrimitiveComponent.generated.h"
+#include "PrimitiveComponent.gen.h"
 
 SCLASS()
 class GAME_API PrimitiveComponent : public SceneComponent

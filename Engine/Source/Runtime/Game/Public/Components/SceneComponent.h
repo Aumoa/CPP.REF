@@ -6,7 +6,7 @@
 #include "ActorComponent.h"
 #include "ComponentTransformSpace.h"
 #include "ComponentMobility.h"
-#include "SceneComponent.generated.h"
+#include "SceneComponent.gen.h"
 
 SCLASS()
 class GAME_API SceneComponent : public ActorComponent

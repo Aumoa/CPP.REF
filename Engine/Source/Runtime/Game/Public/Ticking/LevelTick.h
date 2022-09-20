@@ -7,7 +7,7 @@
 #include "TickingGroup.h"
 #include <set>
 #include <array>
-#include "LevelTick.generated.h"
+#include "LevelTick.gen.h"
 
 class World;
 class TickFunction;

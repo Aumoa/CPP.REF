@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PrimitiveComponent.h"
-#include "MeshComponent.generated.h"
+#include "MeshComponent.gen.h"
 
 SCLASS()
 class GAME_API MeshComponent : public PrimitiveComponent

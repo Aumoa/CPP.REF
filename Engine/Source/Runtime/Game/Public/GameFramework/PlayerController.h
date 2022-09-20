@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Controller.h"
-#include "PlayerController.generated.h"
+#include "PlayerController.gen.h"
 
 SCLASS()
 class GAME_API APlayerController : public AController

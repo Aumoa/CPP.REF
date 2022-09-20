@@ -62,7 +62,7 @@ internal class Startup
                     return;
                 }
 
-                FileReference generatedHeader = outDir.GetFile(headerFile.ChangeExtensions(".generated.h").FileName);
+                FileReference generatedHeader = outDir.GetFile(headerFile.ChangeExtensions(".gen.h").FileName);
                 if (generatedHeader.WriteAllTextIfChanged(sbHeader.ToString(), Encoding.UTF8))
                 {
                     Console.WriteLine("{0}", generatedHeader);

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Actor.h"
-#include "Pawn.generated.h"
+#include "Pawn.gen.h"
 
 class AController;
 

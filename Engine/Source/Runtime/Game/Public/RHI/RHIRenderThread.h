@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Threading/Thread.h"
-#include "RHIRenderThread.generated.h"
+#include "RHIRenderThread.gen.h"
 
 SCLASS()
 class GAME_API RHIRenderThread : virtual public Object

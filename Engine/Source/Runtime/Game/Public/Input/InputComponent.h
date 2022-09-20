@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "InputComponent.generated.h"
+#include "InputComponent.gen.h"
 
 SCLASS()
 class GAME_API InputComponent : public ActorComponent

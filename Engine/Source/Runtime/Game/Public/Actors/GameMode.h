@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actor.h"
-#include "GameMode.generated.h"
+#include "GameMode.gen.h"
 
 class APlayerController;
 class World;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EngineSubsystem.h"
-#include "GameRenderSubsystem.generated.h"
+#include "GameRenderSubsystem.gen.h"
 
 class RHIRenderThread;
 class RHIDevice;

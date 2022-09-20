@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "WorldCore/Level.h"
-#include "GameStarterLevel.generated.h"
+#include "GameStarterLevel.gen.h"
 
 SCLASS()
 class AYLA_API GameStarterLevel : public Level

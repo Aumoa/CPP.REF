@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameApplication.h"
-#include "AylaGameApplication.generated.h"
+#include "AylaGameApplication.gen.h"
 
 SCLASS()
 class AYLA_API AylaGameApplication : public GameApplication

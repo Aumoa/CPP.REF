@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "ConstructorInfo.generated.h"
+#include "ConstructorInfo.gen.h"
 
 class Type;
 

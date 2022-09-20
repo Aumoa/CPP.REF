@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlatformMisc/PlatformApplication.h"
-#include "GameApplication.generated.h"
+#include "GameApplication.gen.h"
 
 class Engine;
 class SWindow;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Pawn.h"
-#include "SpectatorPawn.generated.h"
+#include "SpectatorPawn.gen.h"
 
 SCLASS()
 class GAME_API ASpectatorPawn : public APawn

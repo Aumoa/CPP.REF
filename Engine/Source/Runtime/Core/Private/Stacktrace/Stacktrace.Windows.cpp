@@ -6,18 +6,8 @@
 
 #include "Threading/Spinlock.h"
 #include "Threading/Thread.h"
+#include "PlatformMisc/Windows/WindowsMinimal.h"
 #include <map>
-
-#pragma push_macro("TEXT")
-#undef TEXT
-
-#pragma pack(push, 8)
-#include <Windows.h>
-#include <Psapi.h>
-#include <imagehlp.h>
-#pragma pack(pop)
-
-#pragma pop_macro("TEXT")
 
 struct Stacktrace::_Stacktrace_impl
 {

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine.h"
-#include "EditorEngine.generated.h"
+#include "EditorEngine.gen.h"
 
 SCLASS()
 class GAME_API EditorEngine : public Engine

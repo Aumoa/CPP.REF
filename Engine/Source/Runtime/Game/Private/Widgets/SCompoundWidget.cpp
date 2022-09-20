@@ -68,7 +68,7 @@ bool SCompoundWidget::SendMouseMoved(const Geometry& AllottedGeometry, const Mou
 
 bool SCompoundWidget::SendMouseWheelScrolled(const Geometry& AllottedGeometry, int32 ScrollDelta, const MouseState& State)
 {
-    Vector2 CursorPos = State.CursorLocation;
+    Vector2 CursorPos = State.GetCursorLocation();
 
     if (ESlateVisibility::AreChildrenHitTestVisible(GetVisibility()))
     {
@@ -110,7 +110,7 @@ bool SCompoundWidget::SendMouseEvent(const Geometry& AllottedGeometry, EMouseBut
     }
 
     if (ESlateVisibility::IsHitTestVisible(GetVisibility()) &&
-        AllottedGeometry.GetRenderBoundingRect().PtInRect(Vector<>::Cast<Vector2>(State.CursorLocation)))
+        AllottedGeometry.GetRenderBoundingRect().PtInRect(Vector<>::Cast<Vector2>(State.GetCursorLocation())))
     {
         return OnReceiveMouseEvent(AllottedGeometry, Button, Event, State);
     }

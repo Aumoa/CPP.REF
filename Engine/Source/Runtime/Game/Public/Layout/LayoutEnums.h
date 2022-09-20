@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LayoutEnums.generated.h"
+#include "LayoutEnums.gen.h"
 
 SENUM()
 enum class EFlowDirection

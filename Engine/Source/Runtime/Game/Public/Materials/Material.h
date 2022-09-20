@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MaterialInterface.h"
-#include "Material.generated.h"
+#include "Material.gen.h"
 
 SCLASS()
 class GAME_API Material : public MaterialInterface

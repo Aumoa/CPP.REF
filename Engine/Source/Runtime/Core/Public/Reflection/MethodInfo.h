@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "MethodInfo.generated.h"
+#include "MethodInfo.gen.h"
 
 class Type;
 

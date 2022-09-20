@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "LogLevel.h"
 #include "Misc/String.h"
-#include "Log.generated.h"
+#include "Log.gen.h"
 
 class LogCategory;
 
@@ -57,6 +57,7 @@ public:
 	}
 
 	template<class... TFormatArgs>
+	[[noreturn]]
 	static inline void Fatal(const LogCategory& logCategory, const String& format, TFormatArgs&&... args)
 	{
 		Print(logCategory, ELogLevel::Fatal, String::Format(format, std::forward<TFormatArgs>(args)...));

@@ -4,7 +4,7 @@
 
 #include "Object.h"
 #include "Concepts/IDerivedFrom.h"
-#include "PropertyInfo.generated.h"
+#include "PropertyInfo.gen.h"
 
 class Type;
 

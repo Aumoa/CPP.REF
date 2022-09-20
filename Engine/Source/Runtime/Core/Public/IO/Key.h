@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Reflection/ObjectMacros.h"
-#include "Key.generated.h"
+#include "Key.gen.h"
 
 SENUM()
 enum class EKey

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHIEnums.generated.h"
+#include "RHIEnums.gen.h"
 
 SENUM()
 enum class ERHIPrimitiveTopology

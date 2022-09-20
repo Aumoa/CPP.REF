@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ComponentTransformSpace.generated.h"
+#include "ComponentTransformSpace.gen.h"
 
 SENUM()
 enum class EComponentTransformSpace
