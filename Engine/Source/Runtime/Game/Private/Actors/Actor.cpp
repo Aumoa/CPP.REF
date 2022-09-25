@@ -2,7 +2,9 @@
 
 #include "Actors/Actor.h"
 #include "WorldCore/World.h"
+#include "WorldCore/Level.h"
 #include "Ticking/LevelTick.h"
+#include "Components/SceneComponent.h"
 #include "Actor.gen.cpp"
 
 AActor::ActorTickFunction::ActorTickFunction(AActor* InTarget)
@@ -26,6 +28,7 @@ void AActor::ActorTickFunction::ExecuteTick(const TimeSpan& InDeltaTime)
 AActor::AActor()
 	: PrimaryActorTick(this)
 {
+	MarkObjectFlags(EObjectFlags::Active);
 }
 
 void AActor::RegisterAllTickFunctions(World* InWorld)
@@ -48,9 +51,21 @@ void AActor::TickComponent(const TimeSpan& InDeltaTime, ActorTickFunction* InTic
 	}
 }
 
+Level* AActor::GetLevel() noexcept
+{
+	return Cast<Level>(GetOuter());
+}
+
 World* AActor::GetWorld() noexcept
 {
-	return Cast<World>(GetOuter());
+	if (Level* Level = GetLevel())
+	{
+		return Level->GetWorld();
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 void AActor::SetRootComponent(SceneComponent* InRootComponent)
@@ -63,16 +78,41 @@ SceneComponent* AActor::GetRootComponent() noexcept
 	return RootComponent;
 }
 
-void AActor::DispatchBeginPlay(World* InWorld)
+void AActor::GetComponents(std::list<ActorComponent*>& OutComponents, SubclassOf<ActorComponent> InComponentClass)
 {
-	check(bHasBegunPlay == false);
-	bHasBegunPlay = true;
+	if (RootComponent && RootComponent->GetType()->IsDerivedFrom(InComponentClass.Get()))
+	{
+		OutComponents.emplace_back(RootComponent);
+	}
 }
 
-void AActor::DispatchEndPlay(World* InWorld)
+void AActor::RegisterActor()
 {
-	check(bHasBegunPlay);
-	bHasBegunPlay = false;
+	MarkObjectFlags(EObjectFlags::Registered | EObjectFlags::BegunPlay);
+
+	RegisterAllTickFunctions(GetWorld());
+	BeginPlay();
+}
+
+void AActor::UnregisterActor()
+{
+	EndPlay();
+	UnregisterAllTickFunctions(GetWorld());
+
+	UnmarkObjectFlags(EObjectFlags::Registered | EObjectFlags::BegunPlay);
+}
+
+void AActor::Destroy()
+{
+	GetWorld()->DestroyActor(this);
+}
+
+void AActor::BeginPlay()
+{
+}
+
+void AActor::EndPlay()
+{
 }
 
 void AActor::Tick(const TimeSpan& InDeltaTime)

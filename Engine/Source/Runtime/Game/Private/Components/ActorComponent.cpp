@@ -20,6 +20,7 @@ void ActorComponent::ComponentTickFunction::ExecuteTick(const TimeSpan& InDeltaT
 ActorComponent::ActorComponent()
 	: PrimaryComponentTick(this)
 {
+	MarkObjectFlags(EObjectFlags::Active);
 }
 
 void ActorComponent::TickComponent(const TimeSpan& InDeltaTime, ComponentTickFunction* InTickFunction)

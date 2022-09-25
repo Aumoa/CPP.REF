@@ -115,6 +115,16 @@ public:
 		Reset();
 		return Swap(rhs);
 	}
+
+	inline auto operator <=>(const RefPtr& rhs) const noexcept
+	{
+		return Get() <=> rhs.Get();
+	}
+
+	inline auto operator ==(const RefPtr& rhs) const noexcept
+	{
+		return Get() == rhs.Get();
+	}
 };
 
 template<class T>

@@ -172,13 +172,13 @@ inline constexpr TEnum& operator |=(TEnum& lhs, const TEnum& rhs) noexcept requi
 template<class TEnum>\
 inline constexpr TEnum& operator &=(TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
 {\
-	return lhs = lhs &= rhs;\
+	return lhs = lhs & rhs;\
 }\
 \
 template<class TEnum>\
 inline constexpr TEnum& operator ^=(TEnum& lhs, const TEnum& rhs) noexcept requires std::same_as<TEnum, Name>\
 {\
-	return lhs = lhs ^= rhs;\
+	return lhs = lhs ^ rhs;\
 }\
 \
 template<class TEnum>\

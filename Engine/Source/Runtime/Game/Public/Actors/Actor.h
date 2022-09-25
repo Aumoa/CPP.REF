@@ -8,6 +8,8 @@
 #include "Ticking/ITickableComponent.h"
 #include "Actor.gen.h"
 
+class Level;
+class ActorComponent;
 class SceneComponent;
 
 SCLASS()
@@ -31,10 +33,6 @@ private:
 private:
 	SPROPERTY()
 	SceneComponent* RootComponent = nullptr;
-	SPROPERTY()
-	bool bActive = true;
-	SPROPERTY()
-	bool bHasBegunPlay = false;
 
 protected:
 	ActorTickFunction PrimaryActorTick;
@@ -47,17 +45,25 @@ public:
 
 	virtual void TickComponent(const TimeSpan& InDeltaTime, ActorTickFunction* InTickFunction);
 
-	inline bool IsActive() noexcept { return bActive; }
-	inline bool HasBegunPlay() noexcept { return bHasBegunPlay; }
+	inline bool IsActive() noexcept { return HasObjectFlags(EObjectFlags::Active); }
+	inline bool HasBegunPlay() noexcept { return HasObjectFlags(EObjectFlags::BegunPlay); }
+	inline bool IsRegistered() noexcept { return HasObjectFlags(EObjectFlags::Registered); }
+	inline bool IsPendingKill() noexcept { return HasObjectFlags(EObjectFlags::PendingKill); }
+	
+	Level* GetLevel() noexcept;
 	World* GetWorld() noexcept;
 
 	void SetRootComponent(SceneComponent* InRootComponent);
 	SceneComponent* GetRootComponent() noexcept;
 
-	void DispatchBeginPlay(World* InWorld);
-	void DispatchEndPlay(World* InWorld);
+	void GetComponents(std::list<ActorComponent*>& OutComponents, SubclassOf<ActorComponent> InComponentClass);
+
+	void RegisterActor();
+	void UnregisterActor();
+	void Destroy();
 
 protected:
+	virtual void BeginPlay();
+	virtual void EndPlay();
 	virtual void Tick(const TimeSpan& InDeltaTime);
-
 };

@@ -17,13 +17,13 @@ World* Level::GetWorld() noexcept
 
 AGameMode* Level::SpawnGameModeAt(World* InWorld)
 {
-	return InWorld->SpawnActor(GameModeClass);
+	return InWorld->SpawnActorAt(this, GameModeClass);
 }
 
 void Level::SpawnLevelActors(World* InWorld)
 {
 	for (auto& SpawnInfo : SerializedSpawns)
 	{
-		InWorld->SpawnActor(SpawnInfo.ActorClass);
+		InWorld->SpawnActorAt(this, SpawnInfo.ActorClass);
 	}
 }

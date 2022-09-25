@@ -6,5 +6,11 @@
 
 ASampleActor::ASampleActor()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	SetRootComponent(NewObject<StaticMeshComponent>());
+}
+
+void ASampleActor::Tick(const TimeSpan& InDeltaTime)
+{
+	Super::Tick(InDeltaTime);
 }

@@ -10,4 +10,7 @@ SCLASS()
 class GAME_API StaticMeshComponent : public MeshComponent
 {
 	GENERATED_BODY()
+
+protected:
+	virtual PrimitiveSceneProxy* CreateSceneProxy() override;
 };

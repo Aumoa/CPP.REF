@@ -29,14 +29,6 @@ private:
 		inline ActorComponent* GetTarget() const noexcept { return ComponentTarget.Get(); }
 	};
 
-private:
-	SPROPERTY()
-	bool bActive = true;
-	SPROPERTY()
-	bool bHasBegunPlay = false;
-	SPROPERTY()
-	bool bRegistered = false;
-
 protected:
 	ComponentTickFunction PrimaryComponentTick;
 
@@ -45,8 +37,10 @@ public:
 
 	virtual void TickComponent(const TimeSpan& InDeltaTime, ComponentTickFunction* InTickFunction);
 
-	inline bool IsActive() noexcept { return bActive; }
-	inline bool HasBegunPlay() noexcept { return bHasBegunPlay; }
+	inline bool IsActive() noexcept { return HasObjectFlags(EObjectFlags::Active); }
+	inline bool HasBegunPlay() noexcept { return HasObjectFlags(EObjectFlags::BegunPlay); }
+	inline bool IsRegistered() noexcept { return HasObjectFlags(EObjectFlags::Registered); }
+	inline bool IsPendingKill() noexcept { return HasObjectFlags(EObjectFlags::PendingKill); }
 
 	AActor* GetOwner() noexcept;
 	World* GetWorld() noexcept;

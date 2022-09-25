@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ObjectFlags.h"
 #include "GameObject.gen.h"
 
 SCLASS()
@@ -15,6 +16,8 @@ private:
 	String Name;
 	SPROPERTY()
 	Object* Outer = nullptr;
+	SPROPERTY()
+	EObjectFlags ObjectFlags = EObjectFlags::None;
 
 public:
 	GameObject();
@@ -22,6 +25,12 @@ public:
 	void Rename(Object* InOuter, const String& InName);
 	String GetName() noexcept { return Name; }
 	Object* GetOuter() noexcept { return Outer; }
+
+	void MarkObjectFlags(EObjectFlags InFlags) noexcept;
+	void UnmarkObjectFlags(EObjectFlags InFlags) noexcept;
+	void SetObjectFlags(EObjectFlags InFlags) noexcept;
+	bool HasObjectFlags(EObjectFlags InFlags, bool bAny = false) noexcept;
+	EObjectFlags GetObjectFlags() noexcept { return ObjectFlags; }
 
 	GameObject* NewObject(SubclassOf<GameObject> InType, const String& InName = TEXT(""));
 

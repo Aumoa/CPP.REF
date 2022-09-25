@@ -14,6 +14,34 @@ void GameObject::Rename(Object* InOuter, const String& InName)
 	Name = InName;
 }
 
+void GameObject::MarkObjectFlags(EObjectFlags InFlags) noexcept
+{
+	ObjectFlags |= InFlags;
+}
+
+void GameObject::UnmarkObjectFlags(EObjectFlags InFlags) noexcept
+{
+	ObjectFlags &= ~InFlags;
+}
+
+void GameObject::SetObjectFlags(EObjectFlags InFlags) noexcept
+{
+	ObjectFlags = InFlags;
+}
+
+bool GameObject::HasObjectFlags(EObjectFlags InFlags, bool bAny) noexcept
+{
+	if (bAny)
+	{
+		using T = std::underlying_type_t<EObjectFlags>;
+		return (T)(ObjectFlags & InFlags) > 0;
+	}
+	else
+	{
+		return (ObjectFlags & InFlags) == InFlags;
+	}
+}
+
 GameObject* GameObject::NewObject(SubclassOf<GameObject> InType, const String& InName)
 {
 	check(InType.IsValid());

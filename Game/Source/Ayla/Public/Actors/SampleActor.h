@@ -13,4 +13,7 @@ class AYLA_API ASampleActor : public AActor
 
 public:
 	ASampleActor();
+
+protected:
+	virtual void Tick(const TimeSpan& InDeltaTime) override;
 };
