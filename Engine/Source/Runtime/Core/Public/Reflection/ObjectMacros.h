@@ -9,6 +9,7 @@
 
 class Object;
 #define interface struct
+#define implements virtual public
 
 // --------------- Supports Functions ---------------
 template<class T>

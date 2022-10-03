@@ -8,7 +8,7 @@
 class World;
 
 SINTERFACE()
-interface GAME_API ITickableComponent : virtual public Object
+interface GAME_API ITickableComponent : implements Object
 {
 	GENERATED_BODY()
 

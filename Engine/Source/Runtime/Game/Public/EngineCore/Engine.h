@@ -6,17 +6,19 @@
 #include "Diagnostics/PerformanceTimer.h"
 #include "Engine.gen.h"
 
+class EngineSubsystem;
 class GameRenderSubsystem;
 class GameInstance;
 
 SCLASS()
-class GAME_API Engine : virtual public Object
+class GAME_API Engine : implements Object
 {
 	GENERATED_BODY()
 
 private:
 	SPROPERTY()
-	GameRenderSubsystem* RenderSystem = nullptr;
+	std::vector<EngineSubsystem*> Subsystems;
+	std::map<Type*, EngineSubsystem*> CachedSubsystemMap;
 
 protected:
 	Engine();
@@ -28,8 +30,9 @@ public:
 
 	void ExecuteEngineLoop(const TimeSpan& deltaTime);
 
-	template<std::same_as<GameRenderSubsystem> T>
-	GameRenderSubsystem* GetEngineSubsystem() { return RenderSystem; }
+	template<std::derived_from<EngineSubsystem> T>
+	T* GetEngineSubsystem() { return Cast<T>(GetEngineSubsystem(typeof(T))); }
+	EngineSubsystem* GetEngineSubsystem(Type* SubsystemType);
 
 protected:
 	virtual void DispatchEngineTick(const TimeSpan& deltaTime);

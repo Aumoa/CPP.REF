@@ -6,7 +6,7 @@
 #include "EngineSubsystem.gen.h"
 
 SCLASS()
-class GAME_API EngineSubsystem : virtual public Object
+class GAME_API EngineSubsystem : implements Object
 {
 	GENERATED_BODY()
 

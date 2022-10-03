@@ -13,7 +13,7 @@ class ActorComponent;
 class SceneComponent;
 
 SCLASS()
-class GAME_API AActor : public GameObject, virtual public ITickableComponent
+class GAME_API AActor : public GameObject, implements ITickableComponent
 {
 	GENERATED_BODY()
 

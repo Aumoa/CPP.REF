@@ -42,6 +42,7 @@ namespace libty::reflect
 		std::vector<function_info_t> Functions;
 		Type* Super = nullptr;
 		std::vector<Type*> Interfaces;
+		Object* (*ToObject)(void*) = nullptr;
 
 		template<class T>
 		static ClassTypeMetadata Generate()
@@ -52,6 +53,12 @@ namespace libty::reflect
 			{
 				M.ClassType = 0;
 				bIsGC = true;
+
+				M.ToObject = +[](void* ptr)
+				{
+					using ClassType = typename T::type_t;
+					return dynamic_cast<Object*>(reinterpret_cast<ClassType*>(ptr));
+				};
 			}
 			else if constexpr (libty::reflect::is_interface<T>)
 			{

@@ -7,7 +7,7 @@
 #include "RHIRenderThread.gen.h"
 
 SCLASS()
-class GAME_API RHIRenderThread : virtual public Object
+class GAME_API RHIRenderThread : implements Object
 {
 	GENERATED_BODY()
 

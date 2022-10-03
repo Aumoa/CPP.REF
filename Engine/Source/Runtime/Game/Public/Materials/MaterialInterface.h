@@ -6,7 +6,7 @@
 #include "MaterialInterface.gen.h"
 
 SCLASS()
-class GAME_API MaterialInterface : virtual public Object
+class GAME_API MaterialInterface : implements Object
 {
 	GENERATED_BODY()
 

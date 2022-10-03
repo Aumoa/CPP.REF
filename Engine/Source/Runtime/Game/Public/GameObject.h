@@ -7,7 +7,7 @@
 #include "GameObject.gen.h"
 
 SCLASS()
-class GAME_API GameObject : virtual public Object
+class GAME_API GameObject : implements Object
 {
 	GENERATED_BODY()
 

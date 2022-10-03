@@ -6,7 +6,7 @@
 #include "CoreDelegates.gen.h"
 
 SCLASS()
-class GAME_API CoreDelegates : virtual public Object
+class GAME_API CoreDelegates : implements Object
 {
 	GENERATED_BODY()
 

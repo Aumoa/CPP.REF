@@ -8,6 +8,7 @@
 #include "Type.gen.cpp"
 
 Type::Type() noexcept
+	: _hash_code(0)
 {
 }
 
@@ -35,6 +36,10 @@ void Type::GenerateClass(const libty::reflect::ClassTypeMetadata& meta)
 	{
 		_methods.emplace_back(std::unique_ptr<MethodInfo>(new MethodInfo(func)));
 	}
+	if (meta.ToObject)
+	{
+		_converter = meta.ToObject;
+	}
 	_class_type = (EClassType)meta.ClassType;
 }
 
@@ -45,6 +50,11 @@ Type::~Type() noexcept
 String Type::ToString() noexcept
 {
 	return _name;
+}
+
+bool Type::Equals(Type* type) noexcept
+{
+	return _hash_code == type->_hash_code;
 }
 
 String Type::GetName() noexcept
@@ -129,6 +139,12 @@ std::vector<PropertyInfo*> Type::GetProperties() noexcept
 		props.emplace_back(prop.get());
 	}
 
+	if (_base)
+	{
+		auto inherit = _base->GetProperties();
+		props.insert(props.end(), inherit.begin(), inherit.end());
+	}
+
 	return props;
 }
 
@@ -145,15 +161,59 @@ std::vector<MethodInfo*> Type::GetMethods() noexcept
 	return methods;
 }
 
+bool Type::IsGenericType() noexcept
+{
+	return _isGeneric;
+}
+
+std::vector<Type*> Type::GetGenericArguments() noexcept
+{
+	return _genericArgs;
+}
+
+Type* Type::GetGenericTypeDefinition() noexcept
+{
+	return _genericSource;
+}
+
+Object* Type::GetObject(void* ptr) noexcept
+{
+	return _converter(ptr);
+}
+
 const std::vector<PropertyInfo*>& Type::GetGCProperties()
 {
+	static auto isGenericSource = [](Type* type)
+	{
+		// Is generic?
+		if (type->IsGenericType() == false)
+		{
+			return false;
+		}
+		
+		// Is vector?
+		if (typeof(std::vector)->Equals(type->GetGenericTypeDefinition()) == false)
+		{
+			return false;
+		}
+
+		// Generic type is GC object?
+		Type* genericArgument = type->GetGenericArguments()[0];
+		if (genericArgument == nullptr || genericArgument->IsClass() == false)
+		{
+			return false;
+		}
+
+		return true;
+	};
+
 	if (!_cached)
 	{
 		for (Type* t = this; t; t = t->GetBaseType())
 		{
 			for (auto& prop : t->_properties)
 			{
-				if (Type* pt = prop->GetPropertyType(); pt && (pt->IsClass() || pt->IsInterface()))
+				if (Type* pt = prop->GetPropertyType(); pt && (pt->IsClass() || pt->IsInterface() || isGenericSource(pt)))
 				{
 					_gcproperties.emplace_back(prop.get());
 				}

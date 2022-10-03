@@ -37,7 +37,7 @@ internal class Startup
 #if PRINT_SYNTAX
         headerFiles = new[]
         {
-            new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Game\Public\RHI\RHIResourceStates.h")
+            new FileReference(@"F:\CPP.REF\Engine\Source\Runtime\Game\Public\EngineCore\Engine.h")
         };
 #endif
 

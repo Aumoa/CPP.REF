@@ -604,6 +604,10 @@ internal class CompiledSTYPE : IHeaderGenerator
                     {
                         isVirtual = true;
                     }
+                    else if (value.Name == "implements")
+                    {
+                        isVirtual = true;
+                    }
                     else if (value.Name == "protected" || value.Name == "private")
                     {
                         throw new CompilationException(CompilationException.ErrorCode.RuleError, "Class or interface inheritance must be public access.", _source, value.Line);

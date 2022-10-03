@@ -19,10 +19,7 @@ namespace libty::reflect
 	}
 
 	template<class T>
-	inline Type* get_class()
-	{
-		return nullptr;
-	}
+	inline Type* get_class();
 
 	struct constructor_t
 	{

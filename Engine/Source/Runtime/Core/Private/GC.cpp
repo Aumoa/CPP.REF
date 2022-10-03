@@ -88,6 +88,30 @@ void GC::Shutdown()
 
 void GC::Collect()
 {
+	static auto isGenericSource = [](Type* type)
+	{
+		// Is generic?
+		if (type->IsGenericType() == false)
+		{
+			return false;
+		}
+
+		// Is vector?
+		if (typeof(std::vector)->Equals(type->GetGenericTypeDefinition()) == false)
+		{
+			return false;
+		}
+
+		// Generic type is GC object?
+		Type* genericArgument = type->GetGenericArguments()[0];
+		if (genericArgument == nullptr || genericArgument->IsClass() == false)
+		{
+			return false;
+		}
+
+		return true;
+	};
+
 	// Fill initial objects.
 	sMarkingCol.Clear(sCollection.ObjectArray.size());
 	for (size_t i = 0; i < sCollection.ObjectArray.size(); ++i)
@@ -109,7 +133,20 @@ void GC::Collect()
 				Type* t = ptr->GetType();
 				for (auto& prop : t->GetGCProperties())
 				{
-					if (Object* value = prop->GetValue<Object>(ptr); value && !value->bMarking)
+					if (Type* propertyType = prop->GetPropertyType(); isGenericSource(propertyType))
+					{
+						Type* genericType = propertyType->GetGenericArguments()[0];
+						std::vector<void*> objects = prop->GetValue<std::vector<void*>>(ptr);
+						for (auto& ptr : objects)
+						{
+							if (Object* obj = genericType->GetObject(ptr); obj && !obj->bMarking)
+							{
+								obj->bMarking = true;
+								sMarkingCol.PendingObjects.emplace_back(obj);
+							}
+						}
+					}
+					else if (Object* value = prop->GetValue<Object>(ptr); value && !value->bMarking)
 					{
 						value->bMarking = true;
 						sMarkingCol.PendingObjects.emplace_back(value);

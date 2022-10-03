@@ -21,11 +21,15 @@ internal record SyntaxVariable
 
         string composed = "";
         bool typeHit = false;
+        int templateLevel = 0;
+        bool inNamespace = false;
+        SyntaxType? previous = null;
+
         foreach (var syntax in syntaxes)
         {
             if (sVar.Name == null)
             {
-                if (syntax.Type == SyntaxType.Identifier)
+                if (syntax.Type == SyntaxType.Identifier && inNamespace == false && templateLevel == 0)
                 {
                     if (typeHit == false)
                     {
@@ -50,10 +54,31 @@ internal record SyntaxVariable
                         composed = "";
                         continue;
                     }
+                    else if (syntax.Name == ":")
+                    {
+                        inNamespace = true;
+                    }
+                    else if (syntax.Name == ">")
+                    {
+                        templateLevel++;
+                    }
+                    else if (syntax.Name == "<")
+                    {
+                        templateLevel--;
+                    }
+                }
+                else
+                {
+                    inNamespace = false;
                 }
             }
 
-            composed += ' ' + syntax.Name;
+            if (previous == syntax.Type && syntax.Type != SyntaxType.Operator)
+            {
+                composed += ' ';
+            }
+            composed += syntax.Name;
+            previous = syntax.Type;
         }
 
         if (sVar.Type == null)
