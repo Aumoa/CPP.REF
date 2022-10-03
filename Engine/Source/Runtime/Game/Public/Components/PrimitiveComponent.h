@@ -6,6 +6,7 @@
 #include "SceneComponent.h"
 #include "PrimitiveComponent.gen.h"
 
+class PrimitiveSceneInfo;
 class PrimitiveSceneProxy;
 
 SCLASS()
@@ -13,9 +14,12 @@ class GAME_API PrimitiveComponent : public SceneComponent
 {
 	GENERATED_BODY()
 
+private:
+	PrimitiveSceneInfo* SceneInfo = nullptr;
+
 protected:
-	PrimitiveSceneProxy* SceneProxy = nullptr;
 	bool bMarkRenderStateDirty = false;
+	PrimitiveSceneProxy* SceneProxy = nullptr;
 
 public:
 	PrimitiveComponent();

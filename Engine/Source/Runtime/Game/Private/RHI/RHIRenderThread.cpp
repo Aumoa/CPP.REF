@@ -50,6 +50,7 @@ void RHIRenderThread::EnqueueWork(std::function<void()> work)
 {
 	check(GameThreads::IsInGameThread());
 	check(work);
+
 	_pendingWorks.emplace_back(std::move(work));
 }
 
@@ -101,7 +102,7 @@ void RHIRenderThread::Worker()
 {
 	std::vector<std::function<void()>> executeWorks;
 
-	while (_running)
+	while (_running || _readyWorks.size())
 	{
 		{
 			std::unique_lock lock(_mutex);

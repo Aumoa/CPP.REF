@@ -35,6 +35,7 @@ public:
 	World();
 	virtual ~World() noexcept override;
 
+	void DestroyWorld();
 	void DispatchWorldTick(const TimeSpan& InDeltaTime);
 
 	void BrowseLevel(SubclassOf<Level> InLevelClass);

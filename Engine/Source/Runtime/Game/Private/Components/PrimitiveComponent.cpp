@@ -2,6 +2,9 @@
 
 #include "Components/PrimitiveComponent.h"
 #include "Rendering/PrimitiveSceneProxy.h"
+#include "Rendering/PrimitiveSceneInfo.h"
+#include "Rendering/RenderScene.h"
+#include "WorldCore/World.h"
 #include "PrimitiveComponent.gen.cpp"
 
 PrimitiveComponent::PrimitiveComponent()
@@ -16,20 +19,30 @@ PrimitiveComponent::~PrimitiveComponent() noexcept
 void PrimitiveComponent::RegisterComponent()
 {
 	Super::RegisterComponent();
-	SceneProxy = CreateSceneProxy();
+
+	SceneInfo = new PrimitiveSceneInfo();
+	SceneInfo->SceneProxy = CreateSceneProxy();
+	SceneProxy = SceneInfo->SceneProxy;
+	GetWorld()->GetScene()->AddPrimitive(SceneInfo);
 }
 
 void PrimitiveComponent::UnregisterComponent()
 {
+	if (World* GameWorld = GetWorld(); GameWorld && SceneInfo)
+	{
+		GameWorld->GetScene()->RemovePrimitive(SceneInfo->GetPrimitiveId());
+		SceneInfo = nullptr;
+	}
+
 	Super::UnregisterComponent();
-	SceneProxy = nullptr;
 }
 
 void PrimitiveComponent::ResolveRenderState()
 {
-	if (bMarkRenderStateDirty)
+	if (World* GameWorld = GetWorld(); GameWorld && SceneInfo && bMarkRenderStateDirty)
 	{
 		SceneProxy = CreateSceneProxy();
+		GameWorld->GetScene()->UpdatePrimitive(SceneInfo->GetPrimitiveId(), SceneProxy);
 	}
 
 	bMarkRenderStateDirty = false;

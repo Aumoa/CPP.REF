@@ -26,6 +26,8 @@ public:
 	virtual void Init() override;
 	virtual void Start(GameInstance* Instance) override;
 
+	void DestroyGameWorld();
+
 protected:
 	virtual void DispatchEngineTick(const TimeSpan& InDeltaTime);
 

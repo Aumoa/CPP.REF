@@ -27,6 +27,15 @@ void GameEngine::Start(GameInstance* Instance)
 	Instance->Start(GameWorld);
 }
 
+void GameEngine::DestroyGameWorld()
+{
+	if (GameWorld)
+	{
+		GameWorld->DestroyWorld();
+		GameWorld = nullptr;
+	}
+}
+
 void GameEngine::DispatchEngineTick(const TimeSpan& InDeltaTime)
 {
 	Super::DispatchEngineTick(InDeltaTime);

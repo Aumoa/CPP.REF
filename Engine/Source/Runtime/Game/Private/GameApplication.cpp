@@ -120,6 +120,11 @@ void GameApplication::InitializeGameFramework()
 
 void GameApplication::FinalizeGameFramework()
 {
+	if (auto* GEngine = Cast<GameEngine>(Engine))
+	{
+		GEngine->DestroyGameWorld();
+	}
+
 	GameInstance->Deinit();
 }
 

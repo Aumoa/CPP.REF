@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class PrimitiveSceneProxy;
+
 class GAME_API PrimitiveSceneInfo
 {
 	friend class RenderScene;
@@ -16,4 +18,6 @@ public:
 
 	inline bool IsRegistered() const noexcept { return PrimitiveId != -1; }
 	inline size_t GetPrimitiveId() const noexcept { return PrimitiveId; }
+
+	PrimitiveSceneProxy* SceneProxy = nullptr;
 };

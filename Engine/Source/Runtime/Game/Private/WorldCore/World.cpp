@@ -19,6 +19,11 @@ World::~World() noexcept
 {
 }
 
+void World::DestroyWorld()
+{
+	ScenePrivate->DestroyScene(std::move(ScenePrivate));
+}
+
 void World::DispatchWorldTick(const TimeSpan& InDeltaTime)
 {
 	IncrementalRegisterComponents();

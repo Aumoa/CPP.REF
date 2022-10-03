@@ -84,6 +84,7 @@ void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> DisplayWorks)
 
 void GameRenderSubsystem::JoinRenderThread()
 {
+	RenderThread->ExecuteWorks(nullptr);
 	RenderThread->StopThread();
 }
 
