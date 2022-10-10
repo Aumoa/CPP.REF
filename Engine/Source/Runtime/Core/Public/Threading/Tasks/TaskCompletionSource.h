@@ -10,7 +10,11 @@
 template<class T = void>
 class TaskCompletionSource
 {
+	template<class>
+	friend class TaskCompletionSource;
+
 	std::shared_ptr<Awaiter<T>> _awaiter;
+	std::source_location _set = std::source_location::current();
 
 private:
 	TaskCompletionSource(std::shared_ptr<Awaiter<T>> awaiter)
@@ -28,15 +32,17 @@ public:
 		return (bool)_awaiter;
 	}
 
-	void SetResult()
+	void SetResult(std::source_location src = std::source_location::current())
 	{
 		SetResultImpl();
+		_set = src;
 	}
 
 	template<class U>
-	void SetResult(U&& result)
+	void SetResult(U&& result, std::source_location src = std::source_location::current())
 	{
 		SetResultImpl(std::forward<U>(result));
+		_set = src;
 	}
 
 	void SetException(std::exception_ptr ptr)
@@ -60,9 +66,9 @@ public:
 	TaskCompletionSource& operator =(TaskCompletionSource&&) = default;
 
 	template<class U = T>
-	static TaskCompletionSource<U> Create()
+	static TaskCompletionSource<U> Create(std::stop_token cancellationToken = {})
 	{
-		return TaskCompletionSource<U>(std::make_shared<Awaiter<U>>());
+		return TaskCompletionSource<U>(std::make_shared<Awaiter<U>>(cancellationToken));
 	}
 
 private:

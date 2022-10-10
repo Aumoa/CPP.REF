@@ -54,12 +54,18 @@ private:
 	WorkPriorityQueue<int64, std::function<void()>> _immQueue;
 	WorkPriorityQueue<clock::time_point, std::function<void()>> _delQueue;
 
+protected:
+	using Worker_t = std::function<void(size_t index, std::stop_token)>;
+
 public:
-	ThreadGroup(const String& groupName, size_t numThreads = 0);
+	ThreadGroup(const String& groupName, size_t numThreads = 0, bool timer = true, Worker_t worker = nullptr);
 	virtual ~ThreadGroup() noexcept;
 
 	void Run(std::function<void()> body);
 	void Delay(std::chrono::milliseconds timeout, std::function<void()> body);
+
+protected:
+	void ReadyWorkerThread(size_t index);
 
 private:
 	void Worker(size_t index, std::stop_token cancellationToken);

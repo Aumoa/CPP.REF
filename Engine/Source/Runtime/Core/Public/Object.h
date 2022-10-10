@@ -7,6 +7,7 @@
 #include "Reflection/ObjectMacros.h"
 #include "Reflection/ClassTypeMetadata.h"
 #include "CoreObject/ObjectReference.h"
+#include "CoreObject/AsyncValidator.h"
 #include "Object.gen.h"
 
 class Type;
@@ -85,6 +86,11 @@ public:
 	/// </summary>
 	SFUNCTION()
 	bool IsValidLowLevel();
+
+	/// <summary>
+	/// Get validator for checking lifestate of current object.
+	/// </summary>
+	AsyncValidator GetValidator();
 
 protected:
 	/// <summary>

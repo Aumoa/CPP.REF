@@ -240,13 +240,13 @@ public:
 	}
 
 	template<class U> requires (!std::same_as<U, void>)
-	static Task<> FromResult(U value)
+	static Task<U> FromResult(U value)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::FromResult<U> instead.");
 		 
 		auto ptr = std::make_shared<::Awaiter<U>>();
 		ptr->SetResult(std::move(value));
-		return ptr;
+		return Task<U>(ptr);
 	}
 
 	static void CancelAfter(std::stop_source ss, std::chrono::milliseconds delay)

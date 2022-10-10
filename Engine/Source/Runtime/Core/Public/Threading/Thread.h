@@ -40,6 +40,7 @@ public:
 	int32 GetThreadId() const noexcept;
 	bool IsManaged() const noexcept;
 	void* GetNativeHandle() const noexcept;
+	bool IsValid() const noexcept;
 
 public:
 	Thread& operator =(const Thread& rhs) noexcept;

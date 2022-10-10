@@ -133,6 +133,11 @@ void* Thread::GetNativeHandle() const noexcept
 	return _impl->_Get_native_handle();
 }
 
+bool Thread::IsValid() const noexcept
+{
+	return (bool)_impl;
+}
+
 Thread& Thread::operator =(const Thread& rhs) noexcept
 {
 	_impl = rhs._impl;

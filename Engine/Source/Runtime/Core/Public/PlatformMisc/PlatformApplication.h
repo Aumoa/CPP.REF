@@ -16,10 +16,12 @@ SCLASS()
 class CORE_API PlatformApplication : virtual public Object
 {
 	GENERATED_BODY()
+	friend void Invoke_crash_handler(const Stacktrace& stacktrace, void* exceptionPointer);
+	friend void Invoke_sigint(int);
 
 private:
 	PerformanceTimer _gcTimer;
-	int32 _platformExitCode = -1;
+	std::optional<int32> _platformExitCode;
 
 	SPROPERTY()
 	IPlatformKeyboard* Keyboard = nullptr;
@@ -42,7 +44,10 @@ public:
 
 protected:
 	virtual void OnApplicationShutdown() noexcept;
+	virtual void OnApplicationCrashed(const Stacktrace& stacktrace, void* exceptionPointer) noexcept;
+	virtual void OnApplicationSignalExit() noexcept;
 
 public:
 	static int32 GuardedMain(SubclassOf<PlatformApplication> classOf, const CommandLineBuilder& builder);
+	static PlatformApplication* GetApp();
 };

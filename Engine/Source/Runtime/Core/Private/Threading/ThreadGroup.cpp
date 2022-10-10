@@ -4,8 +4,12 @@
 #include "Threading/Thread.h"
 #include "Exceptions/InvalidOperationException.h"
 #include "Misc/String.h"
+#include "Logging/LogCategory.h"
+#include "Logging/Log.h"
 
-ThreadGroup::ThreadGroup(const String& groupName, size_t numThreads)
+constexpr LogCategory LogThreadGroup(TEXT("LogThreadGroup"));
+
+ThreadGroup::ThreadGroup(const String& groupName, size_t numThreads, bool timer, Worker_t worker)
 	: _groupName(groupName)
 {
 	if (numThreads == 0)
@@ -15,10 +19,23 @@ ThreadGroup::ThreadGroup(const String& groupName, size_t numThreads)
 
 	for (size_t i = 0; i < numThreads; ++i)
 	{
-		_threads.emplace_back(std::jthread(std::bind(&ThreadGroup::Worker, this, i, std::placeholders::_1)));
+		if (worker == nullptr)
+		{
+			_threads.emplace_back(std::jthread([this, i](std::stop_token cancellationToken)
+			{
+				this->Worker(i, cancellationToken);
+			}));
+		}
+		else
+		{
+			_threads.emplace_back(std::jthread(std::bind(worker, i, std::placeholders::_1)));
+		}
 	}
 
-	_threads.emplace_back(std::jthread(std::bind(&ThreadGroup::Timer, this, std::placeholders::_1)));
+	if (timer)
+	{
+		_threads.emplace_back(std::jthread(std::bind(&ThreadGroup::Timer, this, std::placeholders::_1)));
+	}
 }
 
 ThreadGroup::~ThreadGroup() noexcept
@@ -63,10 +80,15 @@ void ThreadGroup::Delay(std::chrono::milliseconds timeout, std::function<void()>
 	_delQueue.enqueue(std::move(startsWith), std::move(body));
 }
 
-void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
+void ThreadGroup::ReadyWorkerThread(size_t index)
 {
 	Thread mythread = Thread::GetCurrentThread();
 	mythread.SetFriendlyName(String::Format(TEXT("[{} #{}]"), _groupName, index));
+}
+
+void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
+{
+	ReadyWorkerThread(index);
 
 	// Blocking the thread for all times.
 	while (!cancellationToken.stop_requested())
@@ -74,18 +96,29 @@ void ThreadGroup::Worker(size_t index, std::stop_token cancellationToken)
 		std::unique_lock lock(_immQueue.lock);
 		size_t nonExpired = 0;
 
-		while (_immQueue.queue.size() > nonExpired)
+#if !SHIPPING
+		try
 		{
-			auto front = _immQueue.dequeue();
-			lock.unlock();
-			front();
-			lock.lock();
-		}
+#endif
+			while (_immQueue.queue.size() > nonExpired)
+			{
+				auto front = _immQueue.dequeue();
+				lock.unlock();
+				front();
+				lock.lock();
+			}
 
-		_immQueue.cv.Wait(lock, [&]
+			_immQueue.cv.Wait(lock, [&]
+			{
+				return _immQueue.queue.size() || cancellationToken.stop_requested();
+			});
+#if !SHIPPING
+		}
+		catch (...)
 		{
-			return _immQueue.queue.size() || cancellationToken.stop_requested();
-		});
+			Log::Error(LogThreadGroup, TEXT("An exception occurred while processing Task's worker thread."));
+		}
+#endif
 	}
 }
 

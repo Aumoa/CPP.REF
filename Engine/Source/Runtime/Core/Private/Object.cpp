@@ -19,6 +19,8 @@ Object::Object() noexcept
 
 Object::~Object() noexcept
 {
+	// Mark disposed forcely.
+	Reference->bDisposed = true;
 	Reference->DecrWeak();
 	Reference = nullptr;
 }
@@ -53,6 +55,11 @@ bool Object::IsRoot()
 bool Object::IsValidLowLevel()
 {
 	return GC::IsValidLowLevel(this);
+}
+
+AsyncValidator Object::GetValidator()
+{
+	return AsyncValidator(Reference);
 }
 
 Object* Object::MemberwiseClone()

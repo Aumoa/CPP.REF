@@ -177,7 +177,7 @@ public:
 	inline ScopedDelegateHolder Add(DelegateInstance&& instance)
 	{
 		std::unique_lock lock(_lock);
-		*instance.Id = _id++;
+		*instance.Id = ++_id;
 		ScopedDelegateHolder handle(this, instance.Id);
 		_payload.emplace(*instance.Id, std::move(instance));
 		return handle;
