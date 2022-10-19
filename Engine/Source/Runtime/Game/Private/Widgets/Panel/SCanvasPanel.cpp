@@ -3,6 +3,7 @@
 #include "Widgets/Panel/SCanvasPanel.h"
 #include "Layout/ArrangedChildrens.h"
 //#include "Draw/PaintArgs.h"
+#include "SCanvasPanel.gen.cpp"
 
 SCanvasPanel::SCanvasPanel() : Super()
 {

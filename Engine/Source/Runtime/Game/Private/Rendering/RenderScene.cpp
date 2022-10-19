@@ -4,6 +4,7 @@
 #include "Rendering/PrimitiveSceneInfo.h"
 #include "Rendering/PrimitiveSceneProxy.h"
 #include "RHI/RHIRenderThread.h"
+#include "RenderScene.gen.cpp"
 
 RenderScene::RenderScene(World* OwnedWorld)
 {

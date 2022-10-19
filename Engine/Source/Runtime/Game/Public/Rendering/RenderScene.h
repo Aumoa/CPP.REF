@@ -5,13 +5,17 @@
 #include "CoreMinimal.h"
 #include <set>
 #include <queue>
+#include "RenderScene.gen.h"
 
 class World;
 class PrimitiveSceneInfo;
 class PrimitiveSceneProxy;
 
-class GAME_API RenderScene
+SCLASS()
+class GAME_API RenderScene : implements Object
 {
+	GENERATED_BODY()
+
 private:
 	std::vector<PrimitiveSceneInfo*> Primitives;
 	std::vector<size_t> PendingPrimitiveIds;

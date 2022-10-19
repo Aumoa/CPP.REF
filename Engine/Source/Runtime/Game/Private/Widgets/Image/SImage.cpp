@@ -2,6 +2,7 @@
 
 #include "Widgets/Image/SImage.h"
 //#include "Draw/SlateDrawCollector.h"
+#include "SImage.gen.cpp"
 
 SImage::SImage() : Super()
 {

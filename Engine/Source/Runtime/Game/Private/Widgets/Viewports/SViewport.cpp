@@ -6,10 +6,10 @@
 #include "RHI/RHICommandList.h"
 #include "RHI/RHIRenderThread.h"
 #include "RHI/RHIStructures.h"
-#include "RHI/RHIShaderBindingTable.h"
 #include "RHI/RHIDescriptorTable.h"
-#include "RHI/RHIRaytracingPipelineState.h"
-#include "RTShaderLibrary.generated.h"
+#include "Rendering/SceneRenderer.h"
+#include "Rendering/SceneRenderContext.h"
+#include "SViewport.gen.cpp"
 
 constexpr LogCategory LogViewport = LogCategory(TEXT("LogViewport"));
 
@@ -18,9 +18,9 @@ SViewport::SViewport()
 {
 }
 
-void SViewport::Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime)
+void SViewport::Tick(const Geometry& AllottedGeometry, const TimeSpan& DeltaTime)
 {
-	Super::Tick(AllottedGeometry, deltaTime);
+	Super::Tick(AllottedGeometry, DeltaTime);
 	TryResizeViewport(AllottedGeometry);
 	ComposeRaytracingShaders();
 }
@@ -30,128 +30,62 @@ int32 SViewport::OnPaint(const PaintArgs& Args, const Geometry& AllottedGeometry
 	return InLayer;
 }
 
-std::shared_ptr<RHIResource> SViewport::PresentViewport(RHICommandList* commandList)
+std::shared_ptr<RHIResource> SViewport::PresentViewport(SceneRenderContext& Context, RHICommandList* CmdList)
 {
-	RHIResourceBarrier barrier =
+	RHIResourceBarrier Barrier =
 	{
 		.Type = ERHIResourceBarrierType::Transition,
 		.Flags = ERHIResourceBarrierFlags::None,
 		.Transition =
 		{
-			.pResource = _renderTarget.ColorTarget.get(),
+			.pResource = RenderTarget.ColorTarget.get(),
 			.Subresource = 0,
 			.StateBefore = ERHIResourceStates::CopySource,
 			.StateAfter = ERHIResourceStates::UnorderedAccess
 		}
 	};
 
-	commandList->ResourceBarrier({ &barrier, 1 });
+	CmdList->ResourceBarrier({ &Barrier, 1 });
 
-	commandList->SetComputeRootSignature(_rootSignature.get());
-	commandList->SetPipelineState(_pipelineState.get());
+	std::vector Heaps = { DescriptorTable.get() };
+	CmdList->SetDescriptorTables(Heaps);
 
-	std::vector heaps = { _descriptorTable.get() };
-	commandList->SetDescriptorTables(heaps);
-
-	RHIDispatchRaysDesc dispatchRays =
+	for (auto& Scene : Context.SceneViews)
 	{
-		.RayGenerationShaderRecord = _bindingTable->GetRayGenerationShaderRecord(_pipelineState->GetShaderIdentifier(TEXT("RayGeneration"))),
-		.MissShaderTable = _bindingTable->GetMissShaderTable(),
-		.HitGroupTable = _bindingTable->GetHitGroupTable(),
-		.CallableShaderTable = _bindingTable->GetCallableShaderTable(),
-		.Width = (uint32)_renderTarget.Size.X,
-		.Height = (uint32)_renderTarget.Size.Y,
-		.Depth = 1
-	};
+		Context.Renderer->Render(Scene, CmdList);
+	}
 
-	uint64 heapPtr = _descriptorTable->CopyFrom(0, _renderTarget.UAV.get(), 0, 1);
-	commandList->SetComputeRootDescriptorTable(0, heapPtr);
-	commandList->DispatchRays(dispatchRays);
+	std::swap(Barrier.Transition.StateBefore, Barrier.Transition.StateAfter);
+	CmdList->ResourceBarrier({ &Barrier, 1 });
 
-	std::swap(barrier.Transition.StateBefore, barrier.Transition.StateAfter);
-	commandList->ResourceBarrier({ &barrier, 1 });
-
-	return _renderTarget.ColorTarget;
+	return RenderTarget.ColorTarget;
 }
 
-DEFINE_SLATE_CONSTRUCTOR(SViewport, attr)
+DEFINE_SLATE_CONSTRUCTOR(SViewport, Attr)
 {
-	INVOKE_SLATE_CONSTRUCTOR_SUPER(attr);
+	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
 
-	_device = attr._Window->GetDevice();
+	Device = Attr._Window->GetDevice();
 }
 
-void SViewport::TryResizeViewport(const Geometry& allottedGeometry)
+void SViewport::TryResizeViewport(const Geometry& AllottedGeometry)
 {
-	Vector2N size = Vector<>::Cast<int32>(allottedGeometry.GetLocalSize());
-	if (_renderTarget.Size != size)
+	Vector2N Size = Vector<>::Cast<int32>(AllottedGeometry.GetLocalSize());
+	if (RenderTarget.Size != Size)
 	{
-		EnqueueRenderThreadWork([ref = std::move(_renderTarget), size]() mutable
-		{
-			Log::Info(LogViewport, TEXT("Viewport resized from [{0}] to [{1}]."), ref.Size, size);
-		});
+		EnqueueRenderThreadWork([ref = std::move(RenderTarget), Size]() mutable
+			{
+				Log::Info(LogViewport, TEXT("Viewport resized from [{0}] to [{1}]."), ref.Size, Size);
+			});
 
-		_renderTarget = RHIRaytracingRenderTarget::Create(_device, size);
+		RenderTarget = RHIRaytracingRenderTarget::Create(Device, Size);
 	}
 }
 
 void SViewport::ComposeRaytracingShaders()
-{
-	if (!_rootSignature)
+{	
+	if (!DescriptorTable)
 	{
-		RHIDescriptorRange range =
-		{
-			.RangeType = ERHIDescriptorRangeType::UnorderedAccessView,
-			.NumDescriptors = 1,
-			.BaseShaderRegister = 0,
-			.RegisterSpace = 0,
-			.OffsetInDescriptorsFromTableStart = RHIDescriptorRange::DescriptorRangeOffsetAppend
-		};
-
-		RHIRootDescriptorTable descriptor =
-		{
-			.NumDescriptorRanges = 1,
-			.pDescriptorRanges = &range
-		};
-
-		RHIRootParameter parameter =
-		{
-			.ParameterType = ERHIRootParameterType::DescriptorTable,
-			.DescriptorTable = descriptor,
-			.ShaderVisibility = ERHIShaderVisibility::All
-		};
-
-		RHIRootSignatureDesc rsdesc =
-		{
-			.NumParameters = 1,
-			.pParameters = &parameter,
-			.Flags = ERHIRootSignatureFlags::DenyAllShaderRootAccess
-		};
-
-		_rootSignature = _device->CreateRootSignature(rsdesc);
-	}
-
-	if (!_pipelineState)
-	{
-		std::shared_ptr shaderBytecode = _device->CreateShaderBytecode(HLSL_RTShaderLibrary, SE_ARRAYSIZE(HLSL_RTShaderLibrary));
-
-		RHIShaderLibraryExport shaderExport =
-		{
-			.pShaderBytecode = shaderBytecode.get(),
-			.pGlobalRS = _rootSignature.get(),
-			.Exposes = { { .Name = TEXT("RayGeneration") } }
-		};
-
-		_pipelineState = _device->CreateRaytracingPipelineState(shaderExport);
-	}
-
-	if (!_bindingTable)
-	{
-		_bindingTable = _device->CreateShaderBindingTable();
-	}
-	
-	if (!_descriptorTable)
-	{
-		_descriptorTable = _device->CreateDescriptorTable(1);
+		DescriptorTable = Device->CreateDescriptorTable(1);
 	}
 }

@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "SWidget.h"
+#include "SLeafWidget.gen.h"
 
+SCLASS()
 class GAME_API SLeafWidget : public SWidget
 {
-	using This = SLeafWidget;
-	using Super = SWidget;
+	GENERATED_BODY()
 
 public:
 	SLeafWidget();

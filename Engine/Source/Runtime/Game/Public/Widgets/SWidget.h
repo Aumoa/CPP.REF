@@ -13,16 +13,17 @@
 #include "IO/MouseState.h"
 #include "IO/KeyboardState.h"
 #include "Misc/EnableSharedFromThis.h"
+#include "SWidget.gen.h"
 
 class SSlateDrawCollector;
 class ArrangedChildrens;
 class ArrangedWidget;
 struct PaintArgs;
 
-class GAME_API SWidget : public EnableSharedFromThis<SWidget>
+SCLASS()
+class GAME_API SWidget : implements Object, public EnableSharedFromThis<SWidget>
 {
-	using This = SWidget;
-	using Super = void;
+	GENERATED_BODY()
 
 private:
 	SWidget(const SWidget&) = delete;

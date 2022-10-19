@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/Text/STextBlock.h"
+#include "STextBox.gen.h"
 
+SCLASS()
 class GAME_API STextBox : public STextBlock
 {
-	using This = STextBox;
-	using Super = STextBlock;
+	GENERATED_BODY()
 
 public:
 	STextBox();

@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Layout/SBorder.h"
+#include "SBorder.gen.cpp"
 
 SBorder::SBorder() : Super()
 {

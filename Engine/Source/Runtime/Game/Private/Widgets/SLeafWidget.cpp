@@ -1,8 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/SLeafWidget.h"
-
-using namespace ::libty;
+#include "SLeafWidget.gen.cpp"
 
 SLeafWidget::SLeafWidget() : Super()
 {

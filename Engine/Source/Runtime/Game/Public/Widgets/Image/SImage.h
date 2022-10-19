@@ -2,13 +2,15 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/SLeafWidget.h"
 #include "Numerics/VectorInterface/Color.h"
+#include "SImage.gen.h"
 
+SCLASS()
 class GAME_API SImage : public SLeafWidget
 {
-	using This = SImage;
-	using Super = SLeafWidget;
+	GENERATED_BODY()
 
 public:
 	class SRenderElement;

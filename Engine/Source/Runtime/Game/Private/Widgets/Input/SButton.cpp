@@ -2,8 +2,7 @@
 
 #include "Widgets/Input/SButton.h"
 #include "Layout/ArrangedChildrens.h"
-
-using namespace ::libty;
+#include "SButton.gen.cpp"
 
 SButton::SButton() : Super()
 {

@@ -11,6 +11,7 @@ class RHIDevice;
 class RHICommandQueue;
 class RHIFence;
 class SceneView;
+struct SceneRenderContext;
 
 SCLASS()
 class GAME_API GameRenderSubsystem : public EngineSubsystem
@@ -40,11 +41,12 @@ public:
 	virtual void Deinit();
 
 	void RegisterSceneView(SceneView* Scene);
-	void ExecuteRenderTicks(std::function<void()> DisplayWorks);
+	void ExecuteRenderTicks(std::function<void(SceneRenderContext&)> DisplayWorks);
 	void JoinRenderThread();
 
 	inline const std::shared_ptr<RHIDevice>& GetDevice() { return Device; }
 	inline const std::shared_ptr<RHICommandQueue>& GetCommandQueue() { return CommandQueue; }
+	inline std::span<SceneView* const> GetSceneViews() { return Scenes; }
 
 public:
 	static bool IsInRenderThread() noexcept;

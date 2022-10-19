@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "SPanelWidget.h"
+#include "SCanvasPanel.gen.h"
 
+SCLASS()
 class GAME_API SCanvasPanel : public SPanelWidget
 {
-	using This = SCanvasPanel;
-	using Super = SPanelWidget;
+	GENERATED_BODY()
 
 public:
 	//class SLATECORE_API SSlot : public TSlotBase<SSlot>

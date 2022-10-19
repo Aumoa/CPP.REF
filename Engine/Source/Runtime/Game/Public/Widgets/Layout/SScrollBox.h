@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/Panel/SBoxPanel.h"
+#include "SScrollBox.gen.h"
 
+SCLASS()
 class GAME_API SScrollBox : public SBoxPanel
 {
-	using This = SScrollBox;
-	using Super = SBoxPanel;
+	GENERATED_BODY()
 
 private:
 	float ScrollAmount = 0;

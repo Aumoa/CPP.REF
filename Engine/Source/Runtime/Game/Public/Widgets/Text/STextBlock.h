@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/SLeafWidget.h"
+#include "STextBlock.gen.h"
 
+SCLASS()
 class GAME_API STextBlock : public SLeafWidget
 {
-	using This = STextBlock;
-	using Super = SLeafWidget;
+	GENERATED_BODY()
 
 public:
 	STextBlock();

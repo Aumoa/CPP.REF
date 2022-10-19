@@ -2,6 +2,7 @@
 
 #include "Widgets/SCompoundWidget.h"
 #include "Layout/ArrangedChildrens.h"
+#include "SCompoundWidget.gen.cpp"
 
 SCompoundWidget::SCompoundWidget() : Super()
 {

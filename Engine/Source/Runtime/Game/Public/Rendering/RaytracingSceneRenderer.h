@@ -4,11 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "SceneRenderer.h"
+#include "RaytracingSceneRenderer.gen.h"
 
+class RHIDevice;
+class RHIRootSignature;
+class RHIRaytracingPipelineState;
+
+SCLASS()
 class GAME_API RaytracingSceneRenderer : public SceneRenderer
 {
-public:
-	RaytracingSceneRenderer();
+	GENERATED_BODY()
 
-	virtual void Render(SceneView* Scene) override;
+private:
+	std::shared_ptr<RHIRootSignature> RootSignature;
+	std::shared_ptr<RHIRaytracingPipelineState> PipelineState;
+	std::shared_ptr<RHIShaderBindingTable> BindingTable;
+
+public:
+	RaytracingSceneRenderer(RHIDevice* InDevice);
+	virtual ~RaytracingSceneRenderer() noexcept override;
+
+	virtual void Render(SceneView* Scene, RHICommandList* CmdList) override;
+
+private:
+	void InitShaderPipeline(RHIDevice* InDevice);
 };

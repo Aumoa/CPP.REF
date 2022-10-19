@@ -2,6 +2,7 @@
 
 #include "Widgets/Panel/SBoxPanel.h"
 #include <ranges>
+#include "SBoxPanel.gen.cpp"
 
 SBoxPanel::SBoxPanel(EOrientation Orientation) : Super()
 	, Orientation(Orientation)

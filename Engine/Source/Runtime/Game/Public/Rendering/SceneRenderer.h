@@ -3,15 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SceneRenderer.gen.h"
 
 class SceneView;
+class RHICommandList;
 
-class GAME_API SceneRenderer
+SCLASS()
+class GAME_API SceneRenderer : implements Object
 {
+	GENERATED_BODY()
+
 protected:
 	SceneRenderer();
 	virtual ~SceneRenderer() noexcept;
 
 public:
-	virtual void Render(SceneView* Scene) = 0;
+	virtual void Render(SceneView* Scene, RHICommandList* CmdList) = 0;
 };

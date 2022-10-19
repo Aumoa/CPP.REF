@@ -562,12 +562,11 @@ internal class CompiledSTYPE : IHeaderGenerator
             }
             else
             {
-                if (_inherit != null)
+                if (_inherit == null)
                 {
-                    throw new CompilationException(CompilationException.ErrorCode.RuleError, "Inheritance the class is allowed only one.", _source, value.Line);
+                    // Only allows first inheritance.
+                    _inherit = name;
                 }
-
-                _inherit = name;
             }
 
             name = null;
@@ -575,6 +574,7 @@ internal class CompiledSTYPE : IHeaderGenerator
         }
 
         SyntaxCore value = default;
+        string? templateCode = null;
 
         for (; syntaxes.MoveNext();)
         {
@@ -587,6 +587,16 @@ internal class CompiledSTYPE : IHeaderGenerator
                     {
                         FlushInh(value);
                     }
+                    else if (value.Name == "<")
+                    {
+                        templateCode = value.Name;
+                        break;
+                    }
+                    else if (value.Name == ">")
+                    {
+                        name += ">";
+                        break;
+                    }
                     else
                     {
                         throw new CompilationException(CompilationException.ErrorCode.SyntaxError, $"Unexpected operator {value.Name}", _source, value.Line);
@@ -595,7 +605,15 @@ internal class CompiledSTYPE : IHeaderGenerator
                 case SyntaxType.Identifier:
                     if (name != null)
                     {
-                        throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected identifier before ','.", _source, value.Line);
+                        if (templateCode != null)
+                        {
+                            name += templateCode + value.Name;
+                            break;
+                        }
+                        else
+                        {
+                            throw new CompilationException(CompilationException.ErrorCode.SyntaxError, "Unexpected identifier before ','.", _source, value.Line);
+                        }
                     }
                     name = value.Name;
                     break;

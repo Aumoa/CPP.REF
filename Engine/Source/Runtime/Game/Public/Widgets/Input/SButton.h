@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/Layout/SBorder.h"
+#include "SButton.gen.h"
 
+SCLASS()
 class GAME_API SButton : public SBorder
 {
-	using This = SButton;
-	using Super = SBorder;
+	GENERATED_BODY()
 
 public:
 	SButton();

@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
+#include "SPanelWidget.gen.h"
 
+SCLASS()
 class GAME_API SPanelWidget : public SCompoundWidget
 {
-	using This = SPanelWidget;
-	using Super = SCompoundWidget;
+	GENERATED_BODY()
 
 public:
 	SPanelWidget();

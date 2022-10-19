@@ -11,6 +11,7 @@
 #include "RHI/RHIStructures.h"
 #include "RHI/RHIResource.h"
 #include "Rendering/RaytracingSceneRenderer.h"
+#include "Rendering/SceneRenderContext.h"
 #include "GameRenderSubsystem.gen.cpp"
 
 GameRenderSubsystem* GameRenderSubsystem::sInstance = nullptr;
@@ -53,7 +54,7 @@ void GameRenderSubsystem::RegisterSceneView(SceneView* Scene)
 	Scenes.emplace_back(Scene);
 }
 
-void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> DisplayWorks)
+void GameRenderSubsystem::ExecuteRenderTicks(std::function<void(SceneRenderContext&)> DisplayWorks)
 {
 	if (PreviousRenderTask.IsValid())
 	{
@@ -65,16 +66,18 @@ void GameRenderSubsystem::ExecuteRenderTicks(std::function<void()> DisplayWorks)
 		PreviousRenderTask.GetResult();
 	}
 
-	PreviousRenderTask = RenderThread->ExecuteWorks([this, DisplayWorks, Renderer = RaytracingSceneRenderer()]() mutable
+	// For testing.
+	static RaytracingSceneRenderer Renderer;
+
+	PreviousRenderTask = RenderThread->ExecuteWorks([this, DisplayWorks]() mutable
 	{
-		for (auto& Scene : Scenes)
-		{
-			Renderer.Render(Scene);
-		}
+		SceneRenderContext Context;
+		Context.SceneViews = Scenes;
+		Context.Renderer = &Renderer;
 
 		if (DisplayWorks)
 		{
-			DisplayWorks();
+			DisplayWorks(Context);
 		}
 
 		CommandQueue->Signal(Fence, ++FenceValue);

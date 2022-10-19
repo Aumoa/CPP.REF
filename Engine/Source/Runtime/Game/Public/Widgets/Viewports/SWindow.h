@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
+#include "SWindow.gen.h"
 
 class SViewport;
 class RHISwapChain;
@@ -10,26 +12,27 @@ class RHIDevice;
 class RHICommandQueue;
 class RHICommandList;
 class GameRenderSubsystem;
+struct SceneRenderContext;
 interface IPlatformWindow;
 
+SCLASS()
 class GAME_API SWindow : public SCompoundWidget
 {
-	using This = SWindow;
-	using Super = SCompoundWidget;
+	GENERATED_BODY()
 
 private:
-	std::shared_ptr<RHIDevice> _device;
-	std::shared_ptr<RHICommandQueue> _commandQueue;
-	WeakPtr<IPlatformWindow> _platformWindow;
+	std::shared_ptr<RHIDevice> Device;
+	std::shared_ptr<RHICommandQueue> CommandQueue;
+	WeakPtr<IPlatformWindow> PlatformWindow;
 
-	std::shared_ptr<RHISwapChain> _swapChain;
-	Vector2N _lastSwapChainSize = Vector2N::Zero();
-	std::shared_ptr<SViewport> _gameViewport;
+	std::shared_ptr<RHISwapChain> SwapChain;
+	Vector2N LastSwapChainSize = Vector2N::Zero();
+	std::shared_ptr<SViewport> GameViewport;
 
-	Vector2N _cachedDrawingSize;
-	TimeSpan _cachedDeltaTime;
+	Vector2N CachedDrawingSize;
+	TimeSpan CachedDeltaTime;
 
-	std::shared_ptr<RHICommandList> _windowCmdList;
+	std::shared_ptr<RHICommandList> WindowCmdList;
 
 public:
 	SWindow();
@@ -37,7 +40,7 @@ public:
 
 	virtual void Tick(const Geometry& AllottedGeometry, const TimeSpan& deltaTime) override;
 	void DispatchSlateTick(const TimeSpan& deltaTime);
-	void PresentWindow();
+	void PresentWindow(SceneRenderContext& Context);
 
 	virtual size_t NumChildrens() override;
 	virtual SWidget* GetChildrenAt(size_t IndexOf) override;

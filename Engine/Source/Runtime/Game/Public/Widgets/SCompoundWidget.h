@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "SWidget.h"
+#include "SCompoundWidget.gen.h"
 
+SCLASS()
 class GAME_API SCompoundWidget : public SWidget
 {
-private:
-	using Super = SWidget;
-	using This = SCompoundWidget;
+	GENERATED_BODY()
 
 public:
 	SCompoundWidget();

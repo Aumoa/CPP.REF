@@ -1,8 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/Layout/SScrollBox.h"
-
-using namespace ::libty;
+#include "SScrollBox.gen.cpp"
 
 SScrollBox::SScrollBox() : Super()
 {

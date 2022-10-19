@@ -71,12 +71,12 @@ void GameApplication::Tick()
 	}
 
 	// Render ticks.
-	Engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks([this]()
+	Engine->GetEngineSubsystem<GameRenderSubsystem>()->ExecuteRenderTicks([this](SceneRenderContext& Context)
 	{
 		// Present.
 		for (auto& sWindow : sWindows)
 		{
-			sWindow->PresentWindow();
+			sWindow->PresentWindow(Context);
 		}
 	});
 }

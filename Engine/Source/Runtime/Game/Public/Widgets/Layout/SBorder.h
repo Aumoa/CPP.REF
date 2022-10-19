@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
+#include "SBorder.gen.h"
 
+SCLASS()
 class GAME_API SBorder : public SCompoundWidget
 {
-	using This = SBorder;
-	using Super = SCompoundWidget;
+	GENERATED_BODY()
 
 private:
 	Margin Padding;
