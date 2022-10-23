@@ -16,4 +16,6 @@ using uint16 = unsigned short;
 using uint32 = unsigned long;
 using uint64 = unsigned long long;
 
+using ssize_t = ptrdiff_t;
+
 using namespace std::literals;

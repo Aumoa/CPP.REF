@@ -11,3 +11,7 @@ Intermediate/
 Saved/
 Program/*/obj
 Program/*/properties
+
+# Vcpkg
+ThirdParty/Source/vcpkg/vcpkg_installed/
+vcpkg_installed/

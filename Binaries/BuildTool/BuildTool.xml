@@ -350,6 +350,11 @@
             솔루션 규칙 클래스를 가져옵니다.
             </summary>
         </member>
+        <member name="P:BuildTool.Solution.RuleDirectory">
+            <summary>
+            솔루션 규칙 파일이 위치한 디렉토리를 가져옵니다.
+            </summary>
+        </member>
         <member name="P:BuildTool.Solution.Directory">
             <summary>
             솔루션 코드가 위치한 디렉토리를 가져옵니다.

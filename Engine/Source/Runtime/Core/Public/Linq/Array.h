@@ -6,13 +6,16 @@
 #include "Enumerable.h"
 #include <array>
 
-template<class TBeginIt, class TEndIt> requires
+template<class TBeginIt = void, class TEndIt = void> requires (
 	requires
 	{
 		{ std::declval<TEndIt>() - std::declval<TBeginIt>() } -> std::convertible_to<size_t>;
 		{ std::declval<TBeginIt>() + std::declval<size_t>() };
 		{ std::declval<TBeginIt>() < std::declval<TEndIt>() } -> std::convertible_to<bool>;
-	}
+	}) || (
+		std::same_as<TBeginIt, void> &&
+		std::same_as<TEndIt, void>
+	)
 class Array : public Enumerable<TBeginIt, TEndIt>
 {
 	using Super = Enumerable<TBeginIt, TEndIt>;
@@ -61,6 +64,39 @@ public:
 
 template<class UArray> requires IArray<UArray, EnumerableItem_t<UArray>>
 Array(UArray*) -> Array<decltype(std::declval<UArray>().begin()), decltype(std::declval<UArray>().end())>;
+
+template<>
+class Array<void, void>
+{
+private:
+	template<class T>
+	static constexpr ptrdiff_t length(const T& val) requires requires { { val.length() }; }
+	{
+		return (ptrdiff_t)val.length();
+	}
+
+	template<class T>
+	static constexpr ptrdiff_t length(const T& val)
+	{
+		return std::ssize(val);
+	}
+
+public:
+	template<class TArray, class TIntegral>
+	static constexpr auto At(const TArray& arr, TIntegral index) -> decltype(auto) requires
+		std::integral<TIntegral>
+	{
+		size_t off = (size_t)index;
+
+		if constexpr (std::signed_integral<TIntegral>)
+		{
+			ptrdiff_t len = length(arr);
+			off = len + (ptrdiff_t)index;
+		}
+
+		return arr[off];
+	}
+};
 
 template<class T>
 class ArrayExtensions : public EnumerableExtensions<T>

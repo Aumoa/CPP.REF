@@ -13,6 +13,7 @@
 #include "IDisposable.h"
 #include "LogCore.h"
 #include "SubclassOf.h"
+#include "Generic/IString.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"
 #include "Misc/StringBuilder.h"

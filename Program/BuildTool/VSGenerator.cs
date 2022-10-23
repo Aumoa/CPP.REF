@@ -3,6 +3,8 @@
 using DotNETUtilities;
 
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Xml;
 
 namespace BuildTool;
@@ -246,6 +248,10 @@ public partial class VSGenerator : ISolutionGenerator
             generatedProject.ProjectXml.SaveIfChanged(generatedProject.File);
             generatedProject.FilterXml.SaveIfChanged(generatedProject.File.ChangeExtensions(".vcxproj.filters"));
             generatedProject.UserXml.SaveIfChanged(generatedProject.File.ChangeExtensions(".vcxproj.user"));
+            if (generatedProject.VcpkgModule != null)
+            {
+                generatedProject.File.GetParent().GetFile("vcpkg.json").WriteAllTextIfChanged(generatedProject.VcpkgModule);
+            }
         }
 
         FileReference SolutionFile = _solution.RuleDirectory.GetFile(_solution.Rule.SolutionName + ".sln");
@@ -364,6 +370,7 @@ public partial class VSGenerator : ISolutionGenerator
 
                     PropertyGroup.NewElement("VcpkgEnabled", "true");
                     PropertyGroup.NewElement("VcpkgTriplet", $"x64-windows{Trip}");
+                    PropertyGroup.NewElement("VcpkgEnableManifest", "true");
                 }
             }
 
@@ -586,8 +593,40 @@ public partial class VSGenerator : ISolutionGenerator
             ProjectXml = Doc,
             FilterXml = GenerateFilter(project),
             UserXml = GenerateUser(Configurations),
+            VcpkgModule = project.Rule.SupportsVcpkg ? GenerateVcpkg(project) : null,
             ProjectGuid = projectGuid
         });
+    }
+
+    private record JsonPackages
+    {
+        [JsonPropertyName("$schema")]
+        public string Schema { get; set; } = "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json";
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = null!;
+
+        [JsonPropertyName("version")]
+        public string Version { get; set; } = "0.0.1";
+
+        [JsonPropertyName("dependencies")]
+        public List<string> Dependencies { get; set; } = new();
+    }
+
+    private static string GenerateVcpkg(Project project)
+    {
+        JsonPackages jpkg = new()
+        {
+            Name = project.Rule.ProjectName.ToLower(),
+            Version = "0.0.1"
+        };
+
+        foreach (var vcpkg in project.VcpkgModules)
+        {
+            jpkg.Dependencies.Add(vcpkg);
+        }
+
+        return JsonSerializer.Serialize(jpkg);
     }
 
     private XmlDocument GenerateFilter(Project project)
@@ -714,6 +753,8 @@ public partial class VSGenerator : ISolutionGenerator
         public XmlDocument ProjectXml { get; set; } = null!;
         public XmlDocument FilterXml { get; set; } = null!;
         public XmlDocument UserXml { get; set; } = null!;
+        public string? VcpkgModule { get; set; } = null!;
+
         public Guid ProjectGuid { get; set; }
     }
 

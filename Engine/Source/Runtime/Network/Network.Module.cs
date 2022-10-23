@@ -18,6 +18,11 @@ public class NetworkRule : ModuleRule
             "Core"
         });
 
+        PublicVcpkgModules.AddRange(new[]
+        {
+            "openssl"
+        });
+
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
             PrivateAdditionalMacros.AddRange(new[]

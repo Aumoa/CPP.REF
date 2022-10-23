@@ -1096,6 +1096,27 @@ public:
 			return Format(FromLiteral(L"{{:{}}}"), formatArgs);
 		}
 	}
+
+	template<class T = int32, IArray<wchar_t> IString>
+	static constexpr T Stoi(const IString& str) requires std::integral<T>
+	{
+		T number = 0;
+
+		for (size_t i = 0; i < str.length(); ++i)
+		{
+			wchar_t ch = Array<>::At(str, i);
+			if (ch < '0' || ch > '9')
+			{
+				throw std::format_error("Invalid number format.");
+			}
+
+			size_t index = ch - (size_t)'0';
+			number *= 10;
+			number += (T)index;
+		}
+
+		return number;
+	}
 };
 
 inline constexpr auto operator "" _s(const wchar_t* lit, size_t len)

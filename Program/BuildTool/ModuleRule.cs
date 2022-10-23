@@ -128,4 +128,14 @@ public class ModuleRule
     /// 개인 추가 라이브러리 목록을 지정합니다. 이 프로젝트에만 적용됩니다.
     /// </summary>
     public List<string> PrivateAdditionalLibraries { get; protected set; } = new();
+
+    /// <summary>
+    /// 공용 Vcpkg 패키지 목록을 지정합니다. 이 모듈을 의존하는 모든 프로젝트에 적용됩니다.
+    /// </summary>
+    public List<string> PublicVcpkgModules { get; protected set; } = new();
+
+    /// <summary>
+    /// 개인 Vcpkg 패키지 목록을 지정합니다. 이 프로젝트에만 적용됩니다.
+    /// </summary>
+    public List<string> PrivateVcpkgModules { get; protected set; } = new();
 }

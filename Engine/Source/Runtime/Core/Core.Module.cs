@@ -19,6 +19,8 @@ public class CoreRule : ModuleRule
             4275,
         });
 
+        SupportsVcpkg = false;
+
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
             PrivateAdditionalMacros.AddRange(new[]

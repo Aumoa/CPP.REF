@@ -23,14 +23,14 @@ private:
 public:
 	Socket();
 	Socket(EAddressFamily addressFamily, ESocketType socketType, EProtocolType protocolType);
-	~Socket() noexcept;
+	virtual ~Socket() noexcept;
 
 	void Bind(const EndPoint& ep);
 	void Listen();
 	void Listen(int32 backlog);
-	std::unique_ptr<Socket> Accept();
-	Task<size_t> ReceiveAsync(void* bufferToRecv, size_t len, std::stop_token cancellationToken = {});
-	Task<size_t> SendAsync(const void* bufferToSend, size_t len, std::stop_token cancellationToken = {});
+	virtual std::unique_ptr<Socket> Accept();
+	virtual Task<size_t> ReceiveAsync(void* bufferToRecv, size_t len, std::stop_token cancellationToken = {});
+	virtual Task<size_t> SendAsync(const void* bufferToSend, size_t len, std::stop_token cancellationToken = {});
 
 public:
 	template<class T>
