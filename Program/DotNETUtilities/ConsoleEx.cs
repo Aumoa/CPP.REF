@@ -45,4 +45,69 @@ public static class ConsoleEx
 
         ConsoleCursorPin.RestoreCursor(restoreContext!.Value);
     }
+
+    internal static int SafeCursorLeft
+    {
+        get
+        {
+            try
+            {
+                return Console.CursorLeft;
+            }
+            catch (IOException)
+            {
+                return 0;
+            }
+        }
+        set
+        {
+            try
+            {
+                Console.CursorLeft = value;
+            }
+            catch (IOException)
+            {
+            }
+        }
+    }
+
+    internal static int SafeCursorTop
+    {
+        get
+        {
+            try
+            {
+                return Console.CursorTop;
+            }
+            catch (IOException)
+            {
+                return 0;
+            }
+        }
+        set
+        {
+            try
+            {
+                Console.CursorTop = value;
+            }
+            catch (IOException)
+            {
+            }
+        }
+    }
+
+    internal static int SafeBufferWidth
+    {
+        get
+        {
+            try
+            {
+                return Console.BufferWidth;
+            }
+            catch (IOException)
+            {
+                return 80;
+            }
+        }
+    }
 }

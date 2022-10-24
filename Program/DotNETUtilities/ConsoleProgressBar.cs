@@ -77,7 +77,7 @@ public class ConsoleProgressBar
 
     private static void RenderBar(ConsoleCursorPin pin, string name, string text, double progress)
     {
-        int width = Console.BufferWidth - (name.Length + 1) - "[](100.00%)".Length;
+        int width = ConsoleEx.SafeBufferWidth - (name.Length + 1) - "[](100.00%)".Length;
         int filled = Math.Max((int)(width * progress), 1) - 1;
 
         StringBuilder sb = new();

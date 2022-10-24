@@ -28,7 +28,7 @@ public class ConsoleCursorPin
 
         Log.Action(() =>
         {
-            pin._top = SafeCursorTop;
+            pin._top = ConsoleEx.SafeCursorTop;
             Console.Write(new string('\n', height));
         });
 
@@ -37,66 +37,16 @@ public class ConsoleCursorPin
 
     internal (int, int) InternalMoveCursor()
     {
-        (int, int) restoreContext = (SafeCursorLeft, SafeCursorTop);
-        SafeCursorLeft = 0;
-        SafeCursorTop = _top!.Value;
+        (int, int) restoreContext = (ConsoleEx.SafeCursorLeft, ConsoleEx.SafeCursorTop);
+        ConsoleEx.SafeCursorLeft = 0;
+        ConsoleEx.SafeCursorTop = _top!.Value;
         return restoreContext;
     }
 
     internal static void RestoreCursor((int, int) restoreContext)
     {
-        SafeCursorLeft = restoreContext.Item1;
-        SafeCursorTop = restoreContext.Item2;
-    }
-
-    internal static int SafeCursorLeft
-    {
-        get
-        {
-            try
-            {
-                return Console.CursorLeft;
-            }
-            catch (IOException)
-            {
-                return 0;
-            }
-        }
-        set
-        {
-            try
-            {
-                Console.CursorLeft = value;
-            }
-            catch (IOException)
-            {
-            }
-        }
-    }
-
-    internal static int SafeCursorTop
-    {
-        get
-        {
-            try
-            {
-                return Console.CursorTop;
-            }
-            catch (IOException)
-            {
-                return 0;
-            }
-        }
-        set
-        {
-            try
-            {
-                Console.CursorTop = value;
-            }
-            catch (IOException)
-            {
-            }
-        }
+        ConsoleEx.SafeCursorLeft = restoreContext.Item1;
+        ConsoleEx.SafeCursorTop = restoreContext.Item2;
     }
 
     internal (int, int) InternalClear()
