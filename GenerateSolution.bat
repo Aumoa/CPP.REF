@@ -18,7 +18,7 @@ IF NOT EXIST "%VCPKG_DIR%\vcpkg.exe" (
     )
 
     PUSHD "%VCPKG_DIR%"
-      git clone git@github.com:microsoft/vcpkg.git .
+      git clone https://github.com/microsoft/vcpkg.git .
       IF NOT "%errorlevel%" == "0" (
         EXIT \b %errorlevel%
       )
