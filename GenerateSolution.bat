@@ -18,14 +18,19 @@ IF NOT EXIST "%VCPKG_DIR%\vcpkg.exe" (
     )
 
     PUSHD "%VCPKG_DIR%"
-      git clone git@github.com:microsoft\vcpkg.git .
+      git clone git@github.com:microsoft/vcpkg.git .
+      IF NOT "%errorlevel%" == "0" (
+        EXIT \b %errorlevel%
+      )
     POPD
   )
-
-  CALL .\bootstrap-vcpkg.bat
-  IF NOT "%errorlevel%" == "0" (
-    EXIT \b %errorlevel%
-  )
+  
+  PUSHD "%VCPKG_DIR%"
+    CALL .\bootstrap-vcpkg.bat
+    IF NOT "%errorlevel%" == "0" (
+      EXIT \b %errorlevel%
+    )
+  POPD
 )
 
 PUSHD %ENGINE_ROOT%  
