@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Threading/Thread.h"
+#include "Net/Socket.h"
 #include "ServiceSession.gen.h"
 
 class Socket;
@@ -14,8 +15,8 @@ class NETWORK_API ServiceSession : implements Object
 	GENERATED_BODY()
 
 private:
-	std::unique_ptr<Socket> _sock;
-	Thread _acceptor;
+	Socket _sock;
+	Task<> _acceptor;
 	std::stop_source _ss;
 
 public:
@@ -25,9 +26,9 @@ public:
 	void Start();
 	void CloseSession() noexcept;
 
-	DECLARE_MULTICAST_EVENT(SocketConnectedEvent, Socket*);
+	DECLARE_MULTICAST_EVENT(SocketConnectedEvent, Socket);
 	SocketConnectedEvent SocketConnected;
 
 private:
-	void StartSocketAcceptor(std::stop_token cancellationToken);
+	Task<> StartSocketAcceptor(std::stop_token cancellationToken);
 };

@@ -14,7 +14,7 @@ Uri::Uri(const String& uri)
 	if (uri.StartsWith(TEXT("http")))
 	{
 		const bool secured = uri.length() > 4 && uri[4] == 's';
-		_protocol = secured ? EHttpProtocol::Secured : EHttpProtocol::None;
+		_protocol = secured ? EHttpProtocol::Secured : EHttpProtocol::Default;
 		indexOf += (size_t)4 + (secured ? 1 : 0);
 	}
 
@@ -30,7 +30,7 @@ Uri::Uri(const String& uri)
 	}
 
 	// end of HTTP, separator of port, path separator.
-	size_t hostEnd = uri.IndexOfAny(std::array{ ':', '/' }, indexOf);
+	size_t hostEnd = uri.IndexOfAny(std::array{ ':', '/' }, indexOf + 1);
 	if (hostEnd == -1)
 	{
 		_host = uri.Substring(indexOf);
@@ -61,7 +61,6 @@ Uri::Uri(const String& uri)
 		return;
 	}
 
-	indexOf++;
 	_path = uri.Substring(indexOf);
 }
 

@@ -40,7 +40,7 @@ void ServerApplication::Update(const TimeSpan& deltaTime)
 			id = (int64)_sessions.size();
 		}
 
-		auto& session = _sessions.emplace(id, std::make_unique<ClientSession>(sock.release(), id)).first->second;
+		auto& session = _sessions.emplace(id, std::make_unique<ClientSession>(sock, id)).first->second;
 		SessionConnected.Broadcast(session.get());
 
 		session->Start();
@@ -58,8 +58,8 @@ void ServerApplication::OnApplicationShutdown() noexcept
 	}
 }
 
-void ServerApplication::OnSocketConnected(Socket* sock)
+void ServerApplication::OnSocketConnected(Socket sock)
 {
 	std::unique_lock lock(_lock);
-	_pendingSockets.emplace_back(std::unique_ptr<Socket>(sock));
+	_pendingSockets.emplace_back(sock);
 }

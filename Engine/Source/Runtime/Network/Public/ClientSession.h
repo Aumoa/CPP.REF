@@ -15,13 +15,13 @@ class NETWORK_API ClientSession : implements Object
 	GENERATED_BODY()
 
 private:
-	std::unique_ptr<Socket> _sock;
+	Socket _sock;
 	int64 _sessionId;
 	std::stop_source _ss;
 	std::any _pdata;
 
 public:
-	ClientSession(Socket* sock, int64 sessionId);
+	ClientSession(Socket sock, int64 sessionId);
 	virtual ~ClientSession() noexcept override;
 
 	void Start();

@@ -45,8 +45,9 @@ public:
 	}
 
 	explicit Task(std::shared_ptr<AwaiterBase> awaiter, short)
-		: _awaiter(std::dynamic_pointer_cast<Awaiter>(awaiter))
+		: _awaiter(awaiter)
 	{
+		check(awaiter == nullptr || _awaiter);
 	}
 
 	explicit Task(const Task<>& task) requires !std::same_as<T, void>

@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "IPAddress.h"
 
-struct EndPoint
+enum class EIOCPAsyncOp
 {
-	IPAddress Address;
-	uint16 Port;
+	Connect,
+	Accept,
+	Receive,
+	Send,
+	Count
 };

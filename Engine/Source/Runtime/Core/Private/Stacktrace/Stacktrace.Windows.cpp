@@ -313,8 +313,12 @@ std::span<const Stackframe> Stacktrace::GetStackframes() const noexcept
 	return _impl->_stackframes;
 }
 
+static Spinlock sLock;
+
 Stacktrace Stacktrace::CaptureCurrent() noexcept
 {
+	auto lock = std::unique_lock(sLock);
+
 	HANDLE hThread = GetCurrentThread();
 
 	CONTEXT context;
@@ -328,6 +332,8 @@ Stacktrace Stacktrace::CaptureCurrent() noexcept
 
 Stacktrace Stacktrace::Capture(Thread* thread) noexcept
 {
+	auto lock = std::unique_lock(sLock);
+
 	HANDLE hThread = (HANDLE)thread->GetNativeHandle();
 	SuspendThread(hThread);
 
@@ -343,6 +349,8 @@ Stacktrace Stacktrace::Capture(Thread* thread) noexcept
 
 Stacktrace Stacktrace::CaptureException(void* exception_pointer) noexcept
 {
+	auto lock = std::unique_lock(sLock);
+
 	HANDLE hThread = GetCurrentThread();
 
 	Stacktrace s;

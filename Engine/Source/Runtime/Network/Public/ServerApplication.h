@@ -21,8 +21,8 @@ private:
 	std::vector<int64> _sessionIdPool;
 
 	Spinlock _lock;
-	std::vector<std::unique_ptr<Socket>> _pendingSockets;
-	std::vector<std::unique_ptr<Socket>> _pendingSockets_buf;
+	std::vector<Socket> _pendingSockets;
+	std::vector<Socket> _pendingSockets_buf;
 
 public:
 	ServerApplication();
@@ -37,5 +37,5 @@ protected:
 	virtual void OnApplicationShutdown() noexcept override;
 
 private:
-	void OnSocketConnected(Socket* sock);
+	void OnSocketConnected(Socket sock);
 };

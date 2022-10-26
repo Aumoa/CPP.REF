@@ -11,7 +11,7 @@ constexpr static LogCategory LogServer(TEXT("LogServer"));
 
 ServiceSession::ServiceSession()
 {
-	_sock = std::make_unique<Socket>(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::Tcp);
+	_sock = Socket::CreateTCP();
 }
 
 ServiceSession::~ServiceSession() noexcept
@@ -21,23 +21,25 @@ ServiceSession::~ServiceSession() noexcept
 
 void ServiceSession::Start()
 {
-	_sock->Bind(EndPoint{ .Address = IPAddress::Any(), .Port = 11000 });
-	_sock->Listen();
+	_sock.Bind(IPEndPoint{ .Address = IPAddress::Any(), .Port = 11000 });
+	_sock.Listen();
 
-	_acceptor = Thread::CreateThread(TEXT("[ServerAcceptor]"), std::bind(&ServiceSession::StartSocketAcceptor, this, _ss.get_token()));
+	_acceptor = StartSocketAcceptor(_ss.get_token());
 }
 
 void ServiceSession::CloseSession() noexcept
 {
 	_ss.request_stop();
-	_sock.reset();
+	_sock.Close();
 }
 
-void ServiceSession::StartSocketAcceptor(std::stop_token cancellationToken)
+Task<> ServiceSession::StartSocketAcceptor(std::stop_token cancellationToken)
 {
+	co_yield co_push(cancellationToken);
+
 	while (!cancellationToken.stop_requested())
 	{
-		std::unique_ptr<Socket> sock = _sock->Accept();
-		SocketConnected.Broadcast(sock.release());
+		Socket sock = co_await _sock.AcceptAsync();
+		SocketConnected.Broadcast(sock);
 	}
 }

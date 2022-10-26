@@ -6,31 +6,32 @@
 #include "AddressFamily.h"
 #include "SocketType.h"
 #include "ProtocolType.h"
-#include "EndPoint.h"
-#include "Socket.gen.h"
+#include "Net/IPEndPoint.h"
 
-SCLASS()
-class NETWORK_API Socket : implements Object
+class ImplSocket;
+
+class NETWORK_API Socket
 {
-	GENERATED_BODY()
-
-public:
-	struct Impl;
+	friend class IOCompletionPort;
 
 private:
-	std::shared_ptr<Impl> _impl;
+	std::shared_ptr<ImplSocket> _impl;
 
 public:
 	Socket();
-	Socket(EAddressFamily addressFamily, ESocketType socketType, EProtocolType protocolType);
+	Socket(const Socket& rhs);
 	virtual ~Socket() noexcept;
 
-	void Bind(const EndPoint& ep);
+	void Bind(const IPEndPoint& ep);
+	Task<> ConnectAsync(const IPEndPoint& ep);
 	void Listen();
-	void Listen(int32 backlog);
-	virtual std::unique_ptr<Socket> Accept();
-	virtual Task<size_t> ReceiveAsync(void* bufferToRecv, size_t len, std::stop_token cancellationToken = {});
-	virtual Task<size_t> SendAsync(const void* bufferToSend, size_t len, std::stop_token cancellationToken = {});
+	Task<Socket> AcceptAsync();
+	Task<size_t> ReceiveAsync(void* bufferToRecv, size_t len, std::stop_token cancellationToken = {});
+	Task<size_t> SendAsync(const void* bufferToSend, size_t len, std::stop_token cancellationToken = {});
+	void Close();
+
+public:
+	static Socket CreateTCP();
 
 public:
 	template<class T>

@@ -863,7 +863,7 @@ public:
 		for (size_t i = 0; i < _len;)
 		{
 			std::optional<String> view;
-			size_t seekp = IndexOf(separator);
+			size_t seekp = IndexOf(separator, i);
 
 			if (seekp == -1)
 			{

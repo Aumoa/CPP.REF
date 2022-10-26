@@ -23,27 +23,29 @@ struct IPAddress
 		return IPAddress(127, 0, 0, 1);
 	}
 
-	constexpr IPAddress(uint8 b1, uint8 b2, uint8 b3, uint8 b4)
-		: Address{ b1, b2, b3, b3 }
+	constexpr IPAddress(uint8 b1 = 0, uint8 b2 = 0, uint8 b3 = 0, uint8 b4 = 0)
+		: Address{ b1, b2, b3, b4 }
 	{
 	}
 
-	static IPAddress Parse(const String& ipv4Addr)
+	static bool TryParse(const String& ipv4Addr, IPAddress& value)
 	{
 		if (ipv4Addr == TEXT("localhost"))
 		{
-			return IPAddress::Loopback();
+			value = IPAddress::Loopback();
+			return true;
 		}
 		else if (ipv4Addr == TEXT("*"))
 		{
-			return IPAddress::Any();
+			value = IPAddress::Any();
+			return true;
 		}
 		else
 		{
 			std::vector<String> bytes = ipv4Addr.Split(L'.', EStringSplitOptions::TrimEntries | EStringSplitOptions::RemoveEmptyEntries);
 			if (bytes.size() != 4)
 			{
-				throw ArgumentException(TEXT("Invalid ipv4 address string."));
+				return false;
 			}
 
 			std::wstringstream wss((std::wstring)String::Join(TEXT(" "), bytes));
@@ -54,10 +56,11 @@ struct IPAddress
 			int32 max = std::max({ b1, b2, b3, b4 });
 			if (min < 0 || max > 255)
 			{
-				throw ArgumentException(TEXT("Invalid pv4 address string."));
+				return false;
 			}
 
-			return IPAddress((uint8)b1, (uint8)b2, (uint8)b3, (uint8)b4);
+			value = IPAddress((uint8)b1, (uint8)b2, (uint8)b3, (uint8)b4);
+			return true;
 		}
 	}
 };

@@ -5,7 +5,7 @@
 #include "Net/Packet.h"
 #include "ClientSession.gen.cpp"
 
-ClientSession::ClientSession(Socket* sock, int64 sessionId)
+ClientSession::ClientSession(Socket sock, int64 sessionId)
 	: _sock(sock)
 	, _sessionId(sessionId)
 {
@@ -27,7 +27,7 @@ void ClientSession::CloseSession() noexcept
 
 void ClientSession::SendPacket(std::shared_ptr<Packet> p)
 {
-	co_await _sock->SendAsync(p->GetBuffer());
+	co_await _sock.SendAsync(p->GetBuffer());
 }
 
 void ClientSession::SetPrivateData(std::any data)
@@ -48,7 +48,7 @@ void ClientSession::StartReceiver()
 
 	while (!_ss.stop_requested())
 	{
-		size_t bytesToRead = co_await _sock->ReceiveAsync(buffer, _ss.get_token());
+		size_t bytesToRead = co_await _sock.ReceiveAsync(buffer, _ss.get_token());
 		while (bytesToRead > reads)
 		{
 			reads += builder.Append(std::span(buffer.data(), buffer.data() + bytesToRead));
