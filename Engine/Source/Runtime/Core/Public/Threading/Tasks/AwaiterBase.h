@@ -6,6 +6,7 @@
 #include "suspend_and_destroy_if.h"
 #include "TimeSpan.h"
 #include "DateTime.h"
+#include "Exceptions/InvalidOperationException.h"
 #include <memory>
 
 class AwaiterBase : public std::enable_shared_from_this<AwaiterBase>
@@ -42,6 +43,15 @@ public:
 		});
 	}
 
+	void await_resume()
+	{
+		Wait();
+		if (auto exception = GetException())
+		{
+			std::rethrow_exception(exception);
+		}
+	}
+
 	virtual ETaskStatus GetStatus() const noexcept = 0;
 	virtual void ContinueWith(std::function<void(std::shared_ptr<AwaiterBase>)> awaiter) = 0;
 	virtual std::exception_ptr GetException() = 0;
@@ -50,6 +60,7 @@ public:
 	virtual bool WaitUntil(const DateTime& timeout) noexcept = 0;
 
 	virtual void Cancel() = 0;
+	virtual void SetResult() { throw InvalidOperationException(TEXT("A typed task cannot setting result without value.")); }
 	virtual bool SetException(std::exception_ptr ptr) = 0;
 
 	virtual suspend_and_destroy_if AddCancellationToken(std::stop_token sToken) = 0;

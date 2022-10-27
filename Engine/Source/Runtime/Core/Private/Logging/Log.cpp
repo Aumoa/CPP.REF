@@ -51,6 +51,12 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 		.Message = message
 	};
 	sCondVar.NotifyOne();
+
+	if (logLevel == ELogLevel::Fatal)
+	{
+		lock.unlock();
+		FlushAll();
+	}
 }
 
 void Log::FlushAll()

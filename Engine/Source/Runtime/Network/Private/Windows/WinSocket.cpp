@@ -137,10 +137,6 @@ Task<std::shared_ptr<ImplSocket>> WinSocket::AcceptAsync()
 
 		co_await block->Signal.GetTask();
 	}
-	else
-	{
-		block->Release();
-	}
 
 	IOCompletionPort::Get()->ChainSocket(sAccept.get());
 	co_return sAccept;
@@ -167,7 +163,6 @@ Task<size_t> WinSocket::ReceiveAsync(void* bufferToRecv, size_t len, std::stop_t
 		return block->Signal.GetTask();
 	}
 
-	block->Release();
 	return Task<>::FromResult((size_t)len_r);
 }
 
@@ -191,7 +186,6 @@ Task<size_t> WinSocket::SendAsync(const void* bufferToSend, size_t len, std::sto
 		return block->Signal.GetTask();
 	}
 
-	block->Release();
 	return Task<>::FromResult((size_t)len_r);
 }
 

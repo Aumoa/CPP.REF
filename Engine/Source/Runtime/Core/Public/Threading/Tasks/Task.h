@@ -7,6 +7,7 @@
 #include "Generic/IList.h"
 #include "Concepts/CompatibleVariadic.h"
 #include "Concepts/GetVariadic.h"
+#include "Exceptions/InvalidCastException.h"
 #include <coroutine>
 #include <memory>
 #include <chrono>
@@ -47,7 +48,6 @@ public:
 	explicit Task(std::shared_ptr<AwaiterBase> awaiter, short)
 		: _awaiter(awaiter)
 	{
-		check(awaiter == nullptr || _awaiter);
 	}
 
 	explicit Task(const Task<>& task) requires !std::same_as<T, void>
@@ -60,9 +60,16 @@ public:
 		return (bool)_awaiter;
 	}
 
-	inline std::shared_ptr<Awaiter> GetAwaiter() const noexcept
+	inline auto GetAwaiter() const noexcept(!std::same_as<T, void>)
 	{
-		return std::static_pointer_cast<Awaiter>(_awaiter);
+		if constexpr (std::same_as<T, void>)
+		{
+			return _awaiter;
+		}
+		else
+		{
+			return std::static_pointer_cast<Awaiter>(_awaiter);
+		}
 	}
 
 	inline ETaskStatus GetStatus() const noexcept

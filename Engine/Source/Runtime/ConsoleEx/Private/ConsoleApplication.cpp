@@ -29,11 +29,11 @@ ConsoleApplication::~ConsoleApplication() noexcept
 
 #if PLATFORM_WINDOWS
 
-INT __stdcall HandleSEHException(LPEXCEPTION_POINTERS lpExceptionPtr)
+LONG NTAPI HandleSEHException(LPEXCEPTION_POINTERS lpExceptionPtr)
 {
 	Log::Fatal(LogConsoleApplication, TEXT("Unhandled SEH exception caught.\n{}"), Stacktrace::CaptureException(lpExceptionPtr).Trace());
 	Log::FlushAll();
-	return SHIPPING ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH;
+	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 #endif
@@ -42,20 +42,11 @@ int32 ConsoleApplication::GuardedMain(int32 argc, char** argv, ApplicationFactor
 {
 	Core::Initialize();
 
-	int32 returnCode = 0;
-	ConsoleApplication* ptr = nullptr;
-
 #if PLATFORM_WINDOWS
-
-	__try
-	{
-		returnCode = InvokeMain(argc, argv, factory, invokeMain);
-	}
-	__except (HandleSEHException(GetExceptionInformation()))
-	{
-	}
-
+	SetUnhandledExceptionFilter(HandleSEHException);
 #endif
+
+	int32 returnCode = InvokeMain(argc, argv, factory, invokeMain);
 
 	Core::Shutdown();
 	return returnCode;
@@ -63,15 +54,7 @@ int32 ConsoleApplication::GuardedMain(int32 argc, char** argv, ApplicationFactor
 
 int32 ConsoleApplication::InvokeMain(int32 argc, char** argv, ApplicationFactory_t factory, InvokeMain_t invokeMain)
 {
-	try
-	{
-		ConsoleApplication* cApp = factory();
-		cApp->AddToRoot();
-		return invokeMain(cApp, CommandLineBuilder(argc, argv));
-	}
-	catch (const Exception& e)
-	{
-		Log::Fatal(LogConsoleApplication, TEXT("Unhandled exception caught. {}"), e);
-		throw;
-	}
+	ConsoleApplication* cApp = factory();
+	cApp->AddToRoot();
+	return invokeMain(cApp, CommandLineBuilder(argc, argv));
 }
