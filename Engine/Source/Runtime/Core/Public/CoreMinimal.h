@@ -25,3 +25,5 @@
 #include "Threading/Tasks/Task.h"
 #include "CoreObject/WeakPtr.h"
 #include "CoreObject/RefPtr.h"
+#include "Exceptions/FormatException.h"
+#include "Exceptions/ArgumentException.h"

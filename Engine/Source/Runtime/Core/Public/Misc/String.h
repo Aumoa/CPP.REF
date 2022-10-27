@@ -18,13 +18,13 @@
 #include <format>
 #include <vector>
 
-class CORE_API String : public ArrayExtensions<wchar_t>
+class CORE_API String : public ArrayExtensions<char_t>
 {
-	std::variant<const wchar_t*, std::shared_ptr<wchar_t[]>> _buf;
+	std::variant<const char_t*, std::shared_ptr<char_t[]>> _buf;
 	size_t _len;
 
 private:
-	static inline constexpr const wchar_t _Null_char = 0;
+	static inline constexpr const char_t _Null_char = 0;
 	static inline constexpr const std::array _Whitespace_chars = { L' ', L'\t', L'\r', L'\n', L'\b' };
 
 private:
@@ -34,9 +34,9 @@ private:
 	{
 	}
 
-	inline constexpr const wchar_t* _Get_raw() const noexcept
+	inline constexpr const char_t* _Get_raw() const noexcept
 	{
-		const wchar_t* buf = nullptr;
+		const char_t* buf = nullptr;
 		switch (_buf.index())
 		{
 		case 0:
@@ -50,7 +50,7 @@ private:
 		return buf ? buf : &_Null_char;
 	}
 
-	static inline constexpr wchar_t _Safe_get(const wchar_t* buf, size_t len, size_t idx, bool lowerCase = false) noexcept
+	static inline constexpr char_t _Safe_get(const char_t* buf, size_t len, size_t idx, bool lowerCase = false) noexcept
 	{
 		if (idx >= len || buf == nullptr)
 		{
@@ -62,10 +62,10 @@ private:
 		}
 	}
 
-	inline constexpr std::strong_ordering _Compare_to(const wchar_t* buf, size_t len, EStringComparison comparison) const noexcept
+	inline constexpr std::strong_ordering _Compare_to(const char_t* buf, size_t len, EStringComparison comparison) const noexcept
 	{
 		size_t length = std::min(_len, len) + 1;
-		const wchar_t* mybuf = this->_Get_raw();
+		const char_t* mybuf = this->_Get_raw();
 
 		bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 
@@ -106,7 +106,7 @@ private:
 		}
 	}
 
-	String& _Allocate_assign(const wchar_t* buf, size_t len);
+	String& _Allocate_assign(const char_t* buf, size_t len);
 	static std::wstring _As_unicode(std::string_view s, int32 codepage);
 	static std::string _As_multibyte(std::wstring_view s, int32 codepage);
 
@@ -116,7 +116,7 @@ private:
 		Tail = 0x2,
 	};
 
-	template<IArray<wchar_t> TArray>
+	template<IArray<char_t> TArray>
 	constexpr String _Trim_all(ETrimType tt, const TArray& chars) const
 	{
 		if (_len == 0)
@@ -124,14 +124,14 @@ private:
 			return String();
 		}
 
-		const wchar_t* const buf = _Get_raw();
+		const char_t* const buf = _Get_raw();
 
 		size_t head = 0;
 		if (((int32)tt & (int32)ETrimType::Head) > 0)
 		{
 			for (; head < _len; ++head)
 			{
-				wchar_t wc = _Safe_get(buf, _len, head);
+				char_t wc = _Safe_get(buf, _len, head);
 				if (!Linq::Contains(&chars, wc))
 				{
 					break;
@@ -149,7 +149,7 @@ private:
 		{
 			for (; tail > head; --tail)
 			{
-				wchar_t wc = _Safe_get(buf, _len, tail - 1);
+				char_t wc = _Safe_get(buf, _len, tail - 1);
 				if (!Linq::Contains(&chars, wc))
 				{
 					break;
@@ -176,11 +176,11 @@ private:
 		}
 
 		decltype(_buf) nbuf;
-		auto& ptr = nbuf.emplace<1>(std::make_shared<wchar_t[]>(length + 1));
+		auto& ptr = nbuf.emplace<1>(std::make_shared<char_t[]>(length + 1));
 		size_t appendIdx = 0;
 		for (const std::wstring_view& item : concat)
 		{
-			memcpy(ptr.get() + appendIdx, item.data(), sizeof(wchar_t) * item.length());
+			memcpy(ptr.get() + appendIdx, item.data(), sizeof(char_t) * item.length());
 			appendIdx += item.length();
 		}
 
@@ -210,7 +210,7 @@ public:
 	template<class T>
 	explicit inline constexpr String(const T& ch) noexcept requires
 		std::same_as<T, char> ||
-		std::same_as<T, wchar_t>
+		std::same_as<T, char_t>
 		: String(&ch, 1)
 	{
 	}
@@ -230,14 +230,14 @@ public:
 		this->_Allocate_assign(s.data(), s.length());
 	}
 
-	inline String(const wchar_t* buf, size_t len)
+	inline String(const char_t* buf, size_t len)
 		: String(std::wstring_view(buf, len))
 	{
 	}
 
-	inline String(wchar_t ch, size_t len)
+	inline String(char_t ch, size_t len)
 	{
-		auto& ptr = _buf.emplace<1>(std::make_shared<wchar_t[]>(len + 1));
+		auto& ptr = _buf.emplace<1>(std::make_shared<char_t[]>(len + 1));
 		auto* rptr = ptr.get();
 
 		for (size_t i = 0; i < len; ++i)
@@ -265,9 +265,9 @@ public:
 		return *this;
 	}
 
-	inline constexpr const wchar_t& operator [](size_t idx) const noexcept
+	inline constexpr const char_t& operator [](size_t idx) const noexcept
 	{
-		const wchar_t* buf = this->_Get_raw();
+		const char_t* buf = this->_Get_raw();
 		if (buf != nullptr)
 		{
 			return buf[idx];
@@ -315,7 +315,7 @@ public:
 		return std::wstring_view(this->_Get_raw(), _len);
 	}
 
-	inline constexpr explicit operator const wchar_t* () const noexcept
+	inline constexpr explicit operator const char_t* () const noexcept
 	{
 		return this->_Get_raw();
 	}
@@ -331,8 +331,8 @@ public:
 	}
 
 public:
-#pragma region IEnumerable<wchar_t>
-	inline constexpr const wchar_t* begin() const noexcept
+#pragma region IEnumerable<char_t>
+	inline constexpr const char_t* begin() const noexcept
 	{
 		if (_len == 0)
 		{
@@ -344,7 +344,7 @@ public:
 		}
 	}
 
-	inline constexpr const wchar_t* end() const noexcept
+	inline constexpr const char_t* end() const noexcept
 	{
 		if (_len == 0)
 		{
@@ -398,9 +398,9 @@ public:
 		return (size_t)*this;
 	}
 
-	[[nodiscard]] inline constexpr const wchar_t* c_str() const noexcept
+	[[nodiscard]] inline constexpr const char_t* c_str() const noexcept
 	{
-		return (const wchar_t*)*this;
+		return (const char_t*)*this;
 	}
 
 	[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& rhs, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
@@ -423,17 +423,17 @@ public:
 		return IndexOf(compare, indexOf, length, comparison) != -1;
 	}
 
-	[[nodiscard]] inline constexpr size_t IndexOf(wchar_t ch, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
+	[[nodiscard]] inline constexpr size_t IndexOf(char_t ch, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
 		return IndexOf(ch, 0, -1, comparison);
 	}
 
-	[[nodiscard]] inline constexpr size_t IndexOf(wchar_t ch, size_t indexOf, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
+	[[nodiscard]] inline constexpr size_t IndexOf(char_t ch, size_t indexOf, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
 		return IndexOf(ch, indexOf, -1, comparison);
 	}
 
-	[[nodiscard]] constexpr size_t IndexOf(wchar_t ch, size_t indexOf, size_t length, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
+	[[nodiscard]] constexpr size_t IndexOf(char_t ch, size_t indexOf, size_t length, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
 		if (length > _len || length == -1)
 		{
@@ -450,7 +450,7 @@ public:
 			return -1;
 		}
 
-		const wchar_t* const buf1 = this->_Get_raw();
+		const char_t* const buf1 = this->_Get_raw();
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 
 		if (lowerCase)
@@ -460,8 +460,8 @@ public:
 
 		for (size_t i = indexOf; i < length; ++i)
 		{
-			wchar_t lc = _Safe_get(buf1, length, i, lowerCase);
-			wchar_t rc = ch;
+			char_t lc = _Safe_get(buf1, length, i, lowerCase);
+			char_t rc = ch;
 
 			if (lc == rc)
 			{
@@ -515,8 +515,8 @@ public:
 			return -1;
 		}
 
-		const wchar_t* const buf1 = this->_Get_raw();
-		const wchar_t* const buf2 = compare._Get_raw();
+		const char_t* const buf1 = this->_Get_raw();
+		const char_t* const buf2 = compare._Get_raw();
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 		const size_t last = length - compare._len;
 
@@ -524,8 +524,8 @@ public:
 		size_t i;
 		for (i = indexOf; i < length;)
 		{
-			wchar_t lc = _Safe_get(buf1, length, i, lowerCase);
-			wchar_t rc = _Safe_get(buf2, compare._len, compares, lowerCase);
+			char_t lc = _Safe_get(buf1, length, i, lowerCase);
+			char_t rc = _Safe_get(buf2, compare._len, compares, lowerCase);
 
 			if (lc == rc)
 			{
@@ -580,15 +580,15 @@ public:
 			return false;
 		}
 
-		const wchar_t* const buf1 = this->_Get_raw();
-		const wchar_t* const buf2 = compare._Get_raw();
+		const char_t* const buf1 = this->_Get_raw();
+		const char_t* const buf2 = compare._Get_raw();
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 
 		size_t compares = 0;
 		for (size_t i = 0; i < compare._len; ++i)
 		{
-			wchar_t lc = _Safe_get(buf1, _len, i, lowerCase);
-			wchar_t rc = _Safe_get(buf2, compare._len, compares, lowerCase);
+			char_t lc = _Safe_get(buf1, _len, i, lowerCase);
+			char_t rc = _Safe_get(buf2, compare._len, compares, lowerCase);
 
 			if (lc == rc)
 			{
@@ -624,16 +624,16 @@ public:
 			return false;
 		}
 
-		const wchar_t* const buf1 = this->_Get_raw();
-		const wchar_t* const buf2 = compare._Get_raw();
+		const char_t* const buf1 = this->_Get_raw();
+		const char_t* const buf2 = compare._Get_raw();
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 		const size_t end = _len - compare._len;
 
 		size_t compares = 0;
 		for (size_t i = _len - 1; i >= end && i != -1; --i)
 		{
-			wchar_t lc = _Safe_get(buf1, _len, i, lowerCase);
-			wchar_t rc = _Safe_get(buf2, compare._len, compare._len - (compares + 1), lowerCase);
+			char_t lc = _Safe_get(buf1, _len, i, lowerCase);
+			char_t rc = _Safe_get(buf2, compare._len, compare._len - (compares + 1), lowerCase);
 
 			if (lc == rc)
 			{
@@ -652,13 +652,13 @@ public:
 		return false;
 	}
 
-	template<IArray<wchar_t> TArray>
+	template<IArray<char_t> TArray>
 	[[nodiscard]] inline constexpr size_t IndexOfAny(const TArray& chars, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
 		return IndexOfAny(chars, 0, comparison);
 	}
 
-	template<IArray<wchar_t> TArray>
+	template<IArray<char_t> TArray>
 	[[nodiscard]] constexpr size_t IndexOfAny(const TArray& chars, size_t indexOf, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
 		if (_len == 0)
@@ -671,19 +671,19 @@ public:
 			return -1;
 		}
 
-		const wchar_t* const buf = this->_Get_raw();
+		const char_t* const buf = this->_Get_raw();
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 
 		for (size_t i = indexOf; i < _len; ++i)
 		{
-			wchar_t c = _Safe_get(buf, _len, i, lowerCase);
+			char_t c = _Safe_get(buf, _len, i, lowerCase);
 
 			bool found = false;
 			if (lowerCase)
 			{
-				found = Linq::Contains(&chars, [&c](wchar_t wc)
+				found = Linq::Contains(&chars, [&c](char_t wc)
 				{
-					return c == (wchar_t)std::tolower(wc);
+					return c == (char_t)std::tolower(wc);
 				});
 			}
 			else
@@ -714,7 +714,7 @@ public:
 		}
 
 		std::vector<String> strs = Linq::ToVector(strings);
-		std::vector<wchar_t> firsts = Linq::Select(std::ref(strs), [](const auto& str) { return str[0]; });
+		std::vector<char_t> firsts = Linq::Select(std::ref(strs), [](const auto& str) { return str[0]; });
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
 
 		for (size_t i = IndexOfAny(firsts, indexOf, comparison); i != -1; i = IndexOfAny(firsts, ++i, comparison))
@@ -746,7 +746,7 @@ public:
 
 	template<class TArray>
 	[[nodiscard]] inline String Trim(const TArray& chars) const requires
-		IArray<TArray, wchar_t>
+		IArray<TArray, char_t>
 	{
 		return this->_Trim_all((ETrimType)((int32)ETrimType::Head | (int32)ETrimType::Tail), chars);
 	}
@@ -756,7 +756,7 @@ public:
 		return TrimStart(_Whitespace_chars);
 	}
 
-	template<IArray<wchar_t> TArray>
+	template<IArray<char_t> TArray>
 	[[nodiscard]] inline String TrimStart(const TArray& chars) const
 	{
 		return this->_Trim_all(ETrimType::Head, chars);
@@ -767,7 +767,7 @@ public:
 		return TrimEnd(_Whitespace_chars);
 	}
 
-	template<IArray<wchar_t> TArray>
+	template<IArray<char_t> TArray>
 	[[nodiscard]] inline String TrimEnd(const TArray& chars) const
 	{
 		return this->_Trim_all(ETrimType::Head, chars);
@@ -800,13 +800,13 @@ public:
 		return std::wstring_view(this->_Get_raw() + start, length);
 	}
 
-	[[nodiscard]] inline std::vector<String> Split(wchar_t separator, EStringSplitOptions options = EStringSplitOptions::None) const
+	[[nodiscard]] inline std::vector<String> Split(char_t separator, EStringSplitOptions options = EStringSplitOptions::None) const
 	{
-		std::array<wchar_t, 1> seps{ separator };
+		std::array<char_t, 1> seps{ separator };
 		return Split(seps, options);
 	}
 
-	template<IArray<wchar_t> TArray>
+	template<IArray<char_t> TArray>
 	[[nodiscard]] std::vector<String> Split(const TArray& separators, EStringSplitOptions options = EStringSplitOptions::None) const
 	{
 		std::vector<String> results;
@@ -901,11 +901,11 @@ public:
 
 	template<class TOp>
 	[[nodiscard]] String Transform(TOp&& op) const requires
-		std::convertible_to<std::invoke_result_t<TOp, wchar_t>, wchar_t>
+		std::convertible_to<std::invoke_result_t<TOp, char_t>, char_t>
 	{
 		decltype(_buf) nbuf;
-		auto& ptr = nbuf.emplace<1>(std::make_shared<wchar_t[]>(_len + 1));
-		const wchar_t* const buf = this->_Get_raw();
+		auto& ptr = nbuf.emplace<1>(std::make_shared<char_t[]>(_len + 1));
+		const char_t* const buf = this->_Get_raw();
 
 		for (size_t i = 0; i < _len; ++i)
 		{
@@ -930,7 +930,7 @@ public:
 
 	[[nodiscard]] String Replace(const String& oldValue, const String& newValue, EStringComparison comparison = EStringComparison::CurrentCulture) const
 	{
-		const wchar_t* const buf = this->_Get_raw();
+		const char_t* const buf = this->_Get_raw();
 
 		std::vector<std::wstring_view> concat;
 
@@ -982,9 +982,9 @@ public:
 		return ReplaceAt(indexOf, 0, newValue);
 	}
 
-	[[nodiscard]] inline String Insert(size_t indexOf, wchar_t ch) const
+	[[nodiscard]] inline String Insert(size_t indexOf, char_t ch) const
 	{
-		wchar_t buf[2] = { ch, 0 };
+		char_t buf[2] = { ch, 0 };
 		return Insert(indexOf, String::FromLiteral(buf));
 	}
 
@@ -1097,17 +1097,22 @@ public:
 		}
 	}
 
-	template<class T = int32, IArray<wchar_t> IString>
+	[[noreturn]]
+	static constexpr void ThrowFormatError(bool);
+	[[noreturn]]
+	static constexpr void ThrowArgumentError(bool);
+
+	template<class T = int32, IArray<char_t> IString>
 	static constexpr T Stoi(const IString& str) requires std::integral<T>
 	{
 		T number = 0;
 
 		for (size_t i = 0; i < str.length(); ++i)
 		{
-			wchar_t ch = Array<>::At(str, i);
+			char_t ch = Array<>::At(str, i);
 			if (ch < '0' || ch > '9')
 			{
-				throw std::format_error("Invalid number format.");
+				ThrowFormatError(true);
 			}
 
 			size_t index = ch - (size_t)'0';
@@ -1117,9 +1122,65 @@ public:
 
 		return number;
 	}
+
+	template<class TChar = char_t>
+	static constexpr TChar HexChar(unsigned char number, bool bUpper = true)
+	{
+		if (number < 10)
+		{
+			return (TChar)('0' + number);
+		}
+		else if (number < 16)
+		{
+			return (TChar)((bUpper ? 'A' : 'a') + (number - 10));
+		}
+		else
+		{
+			ThrowArgumentError(true);
+		}
+	}
+
+	template<class TChar>
+	static constexpr unsigned char CharHex(TChar ch)
+	{
+		if (ch >= '0' && ch <= '9')
+		{
+			return (unsigned char)(ch - '0');
+		}
+		else if (ch >= 'a' && ch <= 'z')
+		{
+			return (unsigned char)(ch - 'a') + 10;
+		}
+		else if (ch >= 'A' && ch <= 'Z')
+		{
+			return (unsigned char)(ch - 'A') + 10;
+		}
+		else
+		{
+			ThrowArgumentError(true);
+		}
+	}
+
+	template<class T, class TChar>
+	static void Hex(T number, TChar* dest) noexcept
+	{
+		for (size_t i = 0; i < sizeof(T); ++i)
+		{
+			unsigned char slot = (unsigned char)number;
+			number >>= 8;
+			dest[i * 2 + 0] = HexChar<TChar>(slot / 16);
+			dest[i * 2 + 1] = HexChar<TChar>(slot % 16);
+		}
+	}
+
+	template<class TChar>
+	static constexpr bool IsHex(TChar ch) noexcept
+	{
+		return (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
+	}
 };
 
-inline constexpr auto operator "" _s(const wchar_t* lit, size_t len)
+inline constexpr auto operator "" _s(const char_t* lit, size_t len)
 {
 	return String::FromLiteral(std::wstring_view(lit, len));
 }
@@ -1129,23 +1190,23 @@ inline String operator "" _s(const char* lit, size_t len)
 	return String::FromLiteral(std::string_view(lit, len));
 }
 
-inline constexpr wchar_t operator "" _s(wchar_t wc)
+inline constexpr char_t operator "" _s(char_t wc)
 {
 	return wc;
 }
 
 inline constexpr char operator "" _s(char c)
 {
-	return (wchar_t)c;
+	return (char_t)c;
 }
 
 template<>
-struct std::formatter<String, wchar_t> : public std::formatter<std::wstring_view, wchar_t>
+struct std::formatter<String, char_t> : public std::formatter<std::wstring_view, char_t>
 {
 	template<class TFormatContext>
 	auto format(const String& str, TFormatContext& ctx)
 	{
-		return std::formatter<std::wstring_view, wchar_t>::format((std::wstring_view)str, ctx);
+		return std::formatter<std::wstring_view, char_t>::format((std::wstring_view)str, ctx);
 	}
 };
 

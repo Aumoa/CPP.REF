@@ -12,3 +12,12 @@ public:
 	{
 	}
 };
+
+[[noreturn]]
+constexpr void String::ThrowFormatError(bool b)
+{
+	if (b)
+	{
+		throw FormatException(TEXT("Invalid number format."));
+	}
+}

@@ -9,3 +9,12 @@ class CORE_API ArgumentException : public Exception
 public:
 	ArgumentException(const String& argName);
 };
+
+[[noreturn]]
+constexpr void String::ThrowArgumentError(bool b)
+{
+	if (b)
+	{
+		throw ArgumentException(TEXT("Invalid number argument."));
+	}
+}
