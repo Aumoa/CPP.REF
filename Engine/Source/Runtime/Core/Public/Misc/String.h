@@ -290,7 +290,7 @@ public:
 		return this->_Compare_to(rhs._Get_raw(), rhs._len, EStringComparison::CurrentCulture);
 	}
 
-	inline String operator +(const String& rhs)
+	inline String operator +(const String& rhs) const
 	{
 		return Concat(*this, rhs);
 	}

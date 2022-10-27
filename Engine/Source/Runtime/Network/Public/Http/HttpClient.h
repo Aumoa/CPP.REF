@@ -15,5 +15,5 @@ public:
 	HttpClient();
 	virtual ~HttpClient() noexcept override;
 
-	Task<String> PostAsync(const Uri& uri, const String& body, std::stop_token cancellationToken = {});
+	Task<String> GetAsync(const Uri& uri, std::stop_token cancellationToken = {});
 };
