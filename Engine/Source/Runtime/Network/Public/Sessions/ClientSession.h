@@ -18,7 +18,6 @@ private:
 	Socket _sock;
 	int64 _sessionId;
 	std::stop_source _ss;
-	std::any _pdata;
 
 public:
 	ClientSession(Socket sock, int64 sessionId);
@@ -30,14 +29,11 @@ public:
 
 	inline int64 GetSessionId() noexcept { return _sessionId; }
 
-	void SetPrivateData(std::any data);
-	std::any GetPrivateData();
-	template<class T>
-	T GetPrivateData() { return std::any_cast<T>(_pdata); }
-
 public:
 	DECLARE_MULTICAST_EVENT(MessageReceivedEvent, ClientSession*, std::shared_ptr<Packet>);
 	MessageReceivedEvent MessageReceived;
+	DECLARE_MULTICAST_EVENT(SessionEvent, ClientSession*);
+	SessionEvent SessionDisconnected;
 
 private:
 	void StartReceiver();

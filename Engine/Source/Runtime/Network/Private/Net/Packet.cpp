@@ -102,6 +102,11 @@ int32 Packet::GetCorrelationId() const noexcept
 	return *reinterpret_cast<const int32*>(_buf.data() + 6);
 }
 
+std::span<uint8 const> Packet::GetBuffer() const noexcept
+{
+	return { _buf.data(), HEADER_SIZE + GetLength() };
+}
+
 std::shared_ptr<Packet> Packet::AllocACK(uint16 messageId)
 {
 	return std::make_shared<Packet>(messageId, GetCorrelationId());

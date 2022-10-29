@@ -17,7 +17,6 @@ class WinSocket : public ImplSocket
 {
 private:
 	SOCKET _socket;
-	std::atomic<bool> _iocpBound = false;
 	WinOverlappedContainer* _overlaps = nullptr;
 
 	LPFN_CONNECTEX WSAConnectEx = nullptr;

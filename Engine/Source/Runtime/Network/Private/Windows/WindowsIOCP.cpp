@@ -63,10 +63,12 @@ void WindowsIOCP::HandleChainSocket(ImplSocket* impl)
 
 void WindowsIOCP::IOCPThreadStart()
 {
+#if !SHIPPING
 	while (true)
 	{
 		try
 		{
+#endif
 			while (true)
 			{
 				DWORD dwTransferred = 0;
@@ -80,8 +82,13 @@ void WindowsIOCP::IOCPThreadStart()
 				auto* pWinOverlapped = static_cast<WinOverlapped*>(lpOverlapped);
 				auto signal = pWinOverlapped->Signal;
 				pWinOverlapped->Release();
-				signal.SetResult((size_t)dwTransferred);
+
+				Task<>::Run([signal, dwTransferred]() mutable
+				{
+					signal.SetResult((size_t)dwTransferred);
+				});
 			}
+#if !SHIPPING
 		}
 		catch (...)
 		{
@@ -89,6 +96,7 @@ void WindowsIOCP::IOCPThreadStart()
 			check(false);
 		}
 	}
+#endif
 }
 
 #endif

@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "ClientSession.h"
+#include "Sessions/ClientSession.h"
 #include "Net/Socket.h"
 #include "Net/Packet.h"
 #include "ClientSession.gen.cpp"
@@ -30,16 +30,6 @@ void ClientSession::SendPacket(std::shared_ptr<Packet> p)
 	co_await _sock.SendAsync(p->GetBuffer());
 }
 
-void ClientSession::SetPrivateData(std::any data)
-{
-	_pdata = std::move(data);
-}
-
-std::any ClientSession::GetPrivateData()
-{
-	return _pdata;
-}
-
 void ClientSession::StartReceiver()
 {
 	std::vector<uint8> buffer(1024);
@@ -49,6 +39,13 @@ void ClientSession::StartReceiver()
 	while (!_ss.stop_requested())
 	{
 		size_t bytesToRead = co_await _sock.ReceiveAsync(buffer, _ss.get_token());
+		if (bytesToRead == 0)
+		{
+			SessionDisconnected.Broadcast(this);
+			_sock.Close();
+			co_return;
+		}
+
 		while (bytesToRead > reads)
 		{
 			reads += builder.Append(std::span(buffer.data(), buffer.data() + bytesToRead));

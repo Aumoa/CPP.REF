@@ -1,8 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "ServerApplication.h"
-#include "ServiceSession.h"
-#include "ClientSession.h"
+#include "Sessions/ServiceSession.h"
+#include "Sessions/ClientSession.h"
 #include "Net/Socket.h"
 #include "ServerApplication.gen.cpp"
 
@@ -41,6 +41,7 @@ void ServerApplication::Update(const TimeSpan& deltaTime)
 		}
 
 		auto& session = _sessions.emplace(id, std::make_unique<ClientSession>(sock, id)).first->second;
+		session->SessionDisconnected.AddObject(this, &ServerApplication::OnSessionDisconnected);
 		SessionConnected.Broadcast(session.get());
 
 		session->Start();
@@ -62,4 +63,9 @@ void ServerApplication::OnSocketConnected(Socket sock)
 {
 	std::unique_lock lock(_lock);
 	_pendingSockets.emplace_back(sock);
+}
+
+void ServerApplication::OnSessionDisconnected(ClientSession* session)
+{
+	SessionDisconnected.Broadcast(session);
 }

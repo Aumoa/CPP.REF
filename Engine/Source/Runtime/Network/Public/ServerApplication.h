@@ -28,8 +28,9 @@ public:
 	ServerApplication();
 	virtual ~ServerApplication() noexcept override;
 
-	DECLARE_MULTICAST_EVENT(SessionConnectedEvent, ClientSession*);
-	SessionConnectedEvent SessionConnected;
+	DECLARE_MULTICAST_EVENT(SessionEvent, ClientSession*);
+	SessionEvent SessionConnected;
+	SessionEvent SessionDisconnected;
 
 protected:
 	virtual void Start() override;
@@ -38,4 +39,5 @@ protected:
 
 private:
 	void OnSocketConnected(Socket sock);
+	void OnSessionDisconnected(ClientSession* session);
 };

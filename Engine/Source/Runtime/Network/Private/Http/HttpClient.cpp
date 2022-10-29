@@ -13,30 +13,71 @@ HttpClient::~HttpClient() noexcept
 {
 }
 
-Task<String> HttpClient::GetAsync(const Uri& uri, std::stop_token cancellationToken)
+Task<HttpResponse> HttpClient::SendAsync(HttpRequest request, std::stop_token cancellationToken)
 {
+	Uri uri = request.GetUri();
 	String host = uri.GetHost();
 
 	IPAddress ip;
-	IPAddress::TryParse(host, ip);
-
-	auto sock = Socket::CreateTCP();
-	co_await sock.ConnectAsync(IPEndPoint{ .Address = ip, .Port = (uint16)uri.GetPort() });
-
-	std::string buf = HttpRequest()
-		.SetUrl(uri)
-		.SetVerbs(EHttpVerbs::GET)
-		.Compose()
-		.AsCodepage(65001);
-	size_t send = 0;
-	while (send < buf.length())
+	if (IPAddress::TryParse(host, ip) == false)
 	{
-		send += co_await sock.SendAsync(buf, cancellationToken);
+		throw ArgumentException(TEXT("Cannot resolve hostname."));
 	}
 
-	std::vector<char> response;
-	response.resize(16384);
-	size_t recv = co_await sock.ReceiveAsync(response, cancellationToken);
+	Socket sock = Socket::CreateTCP();
+	IPEndPoint ep = { .Address = ip, .Port = (uint16)uri.GetPort() };
 
-	co_return String::FromCodepage(std::string_view(response.data(), recv), 65001);
+	// Connect to endpoint.
+	co_await sock.ConnectAsync(ep);
+
+	// Sending request.
+	{
+		std::string buf = request.Compose();
+		size_t send = 0;
+		while (send < buf.length())
+		{
+			std::span<const char> subspan = std::span<char const>(buf.c_str() + send, buf.length() - send);
+			send += co_await sock.SendAsync(subspan, cancellationToken);
+		}
+	}
+
+	HttpResponse response;
+	std::vector<char> buf(1024);
+	String bufstr;
+	auto handle = response.AppendBuffer(&bufstr);
+	auto it = handle.begin();
+
+	while (it.IsDone() == false)
+	{
+		size_t recv = co_await sock.ReceiveAsync(buf, cancellationToken);
+		if (recv == 0)
+		{
+			co_return response;
+		}
+
+		bufstr += String::FromCodepage(std::string_view(buf.data(), recv), 65001);
+		if (*(++it))
+		{
+			break;
+		}
+	}
+
+	sock.Close();
+	co_return response;
+}
+
+Task<HttpResponse> HttpClient::GetAsync(const Uri& uri, std::stop_token cancellationToken)
+{
+	return SendAsync(HttpRequest().SetUri(uri).SetVerbs(EHttpVerbs::GET), cancellationToken);
+}
+
+Task<HttpResponse> HttpClient::PostAsync(const Uri& uri, const String& body, std::stop_token cancellationToken)
+{
+	return SendAsync(HttpRequest().SetUri(uri).SetVerbs(EHttpVerbs::POST).SetBody(body), cancellationToken);
+}
+
+HttpClient& HttpClient::GetSingleton()
+{
+	static HttpClient sClient;
+	return sClient;
 }

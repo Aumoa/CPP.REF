@@ -53,7 +53,7 @@ public:
 	uint16 GetMessageId() const noexcept;
 	int32 GetLength() const noexcept;
 	int32 GetCorrelationId() const noexcept;
-	inline std::span<uint8 const> GetBuffer() const noexcept { return _buf; }
+	std::span<uint8 const> GetBuffer() const noexcept;
 
 	std::shared_ptr<Packet> AllocACK(uint16 messageId);
 

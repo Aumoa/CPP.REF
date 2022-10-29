@@ -74,6 +74,7 @@ Task<> WinSocket::ConnectAsync(const IPEndPoint& ep)
 
 	WinOverlapped* block = _overlaps->GetRef(EIOCPAsyncOp::Connect);
 	DWORD bytesSent = 0;
+//	std::cerr << std::format("Connect, Socket: {}\n", (int)_socket);
 	if (WSAConnectEx(_socket, (const sockaddr*)&addr, sizeof(addr), nullptr, 0, &bytesSent, block) == FALSE)
 	{
 		int errorCode = WSAGetLastError();

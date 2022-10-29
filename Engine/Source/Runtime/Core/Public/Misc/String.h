@@ -1003,6 +1003,15 @@ public:
 		return _Concat(concat);
 	}
 
+	[[nodiscard]] inline String Quotes(char_t c = '"') const
+	{
+		std::array<std::wstring_view, 3> concat;
+		concat[0] = std::wstring_view(&c, 1);
+		concat[1] = std::wstring_view(this->_Get_raw(), _len);
+		concat[2] = std::wstring_view(&c, 1);
+		return _Concat(concat);
+	}
+
 public:
 	[[nodiscard]] static inline constexpr String FromLiteral(std::wstring_view str)
 	{
@@ -1103,21 +1112,33 @@ public:
 	static constexpr void ThrowArgumentError(bool);
 
 	template<class T = int32, IArray<char_t> IString>
-	static constexpr T Stoi(const IString& str) requires std::integral<T>
+	static constexpr T Stoi(const IString& str, bool hex = false) requires std::integral<T>
 	{
 		T number = 0;
 
 		for (size_t i = 0; i < str.length(); ++i)
 		{
 			char_t ch = Array<>::At(str, i);
-			if (ch < '0' || ch > '9')
+			T value = 0;
+			if (ch >= '0' && ch <= '9')
+			{
+				value = (T)(ch - '0');
+			}
+			else if (ch >= 'A' && ch <= 'F' && hex)
+			{
+				value = (T)10 + (T)(ch - 'A');
+			}
+			else if (ch >= 'a' && ch <= 'f' && hex)
+			{
+				value = (T)10 + (T)(ch - 'a');
+			}
+			else
 			{
 				ThrowFormatError(true);
 			}
 
-			size_t index = ch - (size_t)'0';
-			number *= 10;
-			number += (T)index;
+			number *= hex ? (T)16 : (T)10;
+			number += value;
 		}
 
 		return number;
