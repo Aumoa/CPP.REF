@@ -34,7 +34,6 @@ void ClientSession::StartReceiver()
 {
 	std::vector<uint8> buffer(1024);
 	auto builder = Packet::CreateBuilder();
-	size_t reads = 0;
 
 	while (!_ss.stop_requested())
 	{
@@ -46,9 +45,10 @@ void ClientSession::StartReceiver()
 			co_return;
 		}
 
+		size_t reads = 0;
 		while (bytesToRead > reads)
 		{
-			reads += builder.Append(std::span(buffer.data(), buffer.data() + bytesToRead));
+			reads += builder.Append(std::span(buffer.data() + reads, buffer.data() + bytesToRead));
 			if (builder.IsCompleted())
 			{
 				auto p = builder.Build();
