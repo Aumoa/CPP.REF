@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Net/Socket.h"
-#include <any>
 #include "ClientSession.gen.h"
 
 class Packet;
+class SocketException;
 
 SCLASS()
 class NETWORK_API ClientSession : implements Object
@@ -34,6 +34,8 @@ public:
 	MessageReceivedEvent MessageReceived;
 	DECLARE_MULTICAST_EVENT(SessionEvent, ClientSession*);
 	SessionEvent SessionDisconnected;
+	DECLARE_MULTICAST_EVENT(SocketErrorEvent, ClientSession*, const SocketException&, bool&);
+	SocketErrorEvent SocketError;
 
 private:
 	void StartReceiver();

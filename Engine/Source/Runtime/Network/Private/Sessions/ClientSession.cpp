@@ -3,6 +3,7 @@
 #include "Sessions/ClientSession.h"
 #include "Net/Socket.h"
 #include "Net/Packet.h"
+#include "Net/SocketException.h"
 #include "ClientSession.gen.cpp"
 
 ClientSession::ClientSession(Socket sock, int64 sessionId)
@@ -35,26 +36,41 @@ void ClientSession::StartReceiver()
 	std::vector<uint8> buffer(1024);
 	auto builder = Packet::CreateBuilder();
 
-	while (!_ss.stop_requested())
+	try
 	{
-		size_t bytesToRead = co_await _sock.ReceiveAsync(buffer, _ss.get_token());
-		if (bytesToRead == 0)
+		while (!_ss.stop_requested())
 		{
-			SessionDisconnected.Broadcast(this);
-			_sock.Close();
-			co_return;
-		}
-
-		size_t reads = 0;
-		while (bytesToRead > reads)
-		{
-			reads += builder.Append(std::span(buffer.data() + reads, buffer.data() + bytesToRead));
-			if (builder.IsCompleted())
+			size_t bytesToRead = co_await _sock.ReceiveAsync(buffer, _ss.get_token());
+			if (bytesToRead == 0)
 			{
-				auto p = builder.Build();
-				builder = Packet::CreateBuilder();
-				MessageReceived.Broadcast(this, std::move(p));
+				SessionDisconnected.Broadcast(this);
+				_sock.Close();
+				co_return;
+			}
+
+			size_t reads = 0;
+			while (bytesToRead > reads)
+			{
+				reads += builder.Append(std::span(buffer.data() + reads, buffer.data() + bytesToRead));
+				if (builder.IsCompleted())
+				{
+					auto p = builder.Build();
+					builder = Packet::CreateBuilder();
+					MessageReceived.Broadcast(this, std::move(p));
+				}
 			}
 		}
+	}
+	catch (const SocketException& se)
+	{
+		bool bDisconnect = true;
+		SocketError.Broadcast(this, std::ref(se), std::ref(bDisconnect));
+		if (bDisconnect == false)
+		{
+			// Start new.
+			StartReceiver();
+			co_return;
+		}
+		SessionDisconnected.Broadcast(this);
 	}
 }

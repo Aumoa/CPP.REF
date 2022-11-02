@@ -74,19 +74,45 @@ void WindowsIOCP::IOCPThreadStart()
 				DWORD dwTransferred = 0;
 				ULONG_PTR lpKey = 0;
 				OVERLAPPED* lpOverlapped = nullptr;
-				if (GetQueuedCompletionStatus(_hComp, &dwTransferred, &lpKey, &lpOverlapped, 1000) == FALSE)
+				BOOL bOk = GetQueuedCompletionStatus(_hComp, &dwTransferred, &lpKey, &lpOverlapped, 1000);
+				DWORD dwError = 0;
+
+				if (bOk == false)
+				{
+					dwError = GetLastError();
+				}
+
+				if (dwError == WAIT_TIMEOUT)
 				{
 					continue;
 				}
 
-				auto* pWinOverlapped = static_cast<WinOverlapped*>(lpOverlapped);
-				auto signal = pWinOverlapped->Signal;
-				pWinOverlapped->Release();
-
-				Task<>::Run([signal, dwTransferred]() mutable
+				if (lpOverlapped)
 				{
-					signal.SetResult((size_t)dwTransferred);
-				});
+					auto* pWinOverlapped = static_cast<WinOverlapped*>(lpOverlapped);
+					TaskCompletionSource signal = pWinOverlapped->Signal;
+					pWinOverlapped->Release();
+
+					if (dwError != 0)
+					{
+						try
+						{
+							throw SocketException(FormatLastError(dwError));
+						}
+						catch (...)
+						{
+							signal.SetException(std::current_exception());
+						}
+					}
+					else
+					{
+						signal.SetResult((size_t)dwTransferred);
+					}
+				}
+				else if (bOk == false)
+				{
+					checkf(bOk, TEXT("GetQueuedCompletionStatus return FALSE, and last error: {}"), dwError);
+				}
 			}
 #if !SHIPPING
 		}
