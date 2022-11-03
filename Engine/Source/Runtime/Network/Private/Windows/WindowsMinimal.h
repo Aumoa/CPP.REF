@@ -27,9 +27,8 @@
 #undef GetMessage
 #undef GetObject
 
-inline String FormatLastError()
+inline String FormatLastError(DWORD errorCode = GetLastError())
 {
-	DWORD errorCode = GetLastError();
 	static thread_local WCHAR buf[1024] = {};
 	DWORD len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buf, 1024, NULL);
 	if (len == 0)

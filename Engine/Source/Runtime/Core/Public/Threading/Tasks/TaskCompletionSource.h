@@ -45,6 +45,12 @@ public:
 		_set = src;
 	}
 
+	template<class TException>
+	void SetException(const TException& e)
+	{
+		SetException(std::make_exception_ptr(e));
+	}
+
 	void SetException(std::exception_ptr ptr)
 	{
 		Xassert(IsValid(), TEXT("Awaiter is null."));

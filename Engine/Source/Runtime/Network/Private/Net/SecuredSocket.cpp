@@ -2,7 +2,6 @@
 
 #include "Net/SecuredSocket.h"
 #include "Exceptions/NotImplementedException.h"
-#include <openssl/pem.h>
 
 //std::unique_ptr<Socket> SecuredSocket::Accept()
 //{

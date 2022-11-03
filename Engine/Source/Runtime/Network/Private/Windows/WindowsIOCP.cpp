@@ -95,14 +95,7 @@ void WindowsIOCP::IOCPThreadStart()
 
 					if (dwError != 0)
 					{
-						try
-						{
-							throw SocketException(FormatLastError(dwError));
-						}
-						catch (...)
-						{
-							signal.SetException(std::current_exception());
-						}
+						signal.SetException(SocketException(FormatLastError(dwError)));
 					}
 					else
 					{
