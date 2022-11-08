@@ -18,7 +18,7 @@ public class NetworkRule : ModuleRule
             "Core"
         });
 
-        PublicVcpkgModules.AddRange(new[]
+        PrivateVcpkgModules.AddRange(new[]
         {
             "openssl"
         });
@@ -31,7 +31,7 @@ public class NetworkRule : ModuleRule
                 "WIN32_LEAN_AND_MEAN"
             });
 
-            PrivateAdditionalLibraries.AddRange(new[]
+            PublicAdditionalLibraries.AddRange(new[]
             {
                 "ws2_32.lib"
             });
