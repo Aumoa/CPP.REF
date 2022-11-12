@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "Reflection/ObjectMacros.h"
-#include "Key.gen.h"
+#include "PrimitiveTypes.h"
 
-SENUM()
-enum class EKey
+enum class EKey : uint8
 {
     None                = 0,
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-class CORE_API Misc
+class Misc
 {
 public:
 	template<class T>

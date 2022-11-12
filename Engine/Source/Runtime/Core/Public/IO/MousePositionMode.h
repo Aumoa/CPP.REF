@@ -2,10 +2,6 @@
 
 #pragma once
 
-#include "Reflection/ObjectMacros.h"
-#include "MousePositionMode.gen.h"
-
-SENUM()
 enum class EMousePositionMode
 {
     Absolute,

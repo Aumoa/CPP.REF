@@ -12,83 +12,26 @@ class CORE_API FileSystemReference
 {
 private:
 	String _path;
-	mutable std::optional<std::filesystem::path> _fpath;
+	std::filesystem::path _filepath;
 
 public:
-	inline constexpr FileSystemReference() noexcept
-		: _path(TEXT("."))
-	{
-	}
+	FileSystemReference();
+	FileSystemReference(const FileSystemReference& rhs) = default;
+	FileSystemReference(FileSystemReference && rhs) noexcept = default;
+	FileSystemReference(String path);
 
-	inline constexpr FileSystemReference(const FileSystemReference& rhs) noexcept
-		: _path(rhs._path)
-	{
-	}
-
-	inline constexpr FileSystemReference(FileSystemReference&& rhs) noexcept
-		: _path(std::move(rhs._path))
-	{
-	}
-
-	inline constexpr FileSystemReference(String path) noexcept
-		: _path(path)
-	{
-	}
-
-	inline bool IsExists() const
-	{
-		std::error_code ec;
-		return std::filesystem::exists(this->_Get_path(), ec);
-	}
-
-	inline constexpr String GetPath() const noexcept
-	{
-		return _path;
-	}
-
+	bool IsExists() const noexcept;
+	String GetPath() const noexcept;
 	std::optional<DirectoryReference> GetParent() const;
-		
-	inline bool HasParent() const
-	{
-		return this->_Get_path().has_parent_path();
-	}
+	bool HasParent() const noexcept;
+	String GetName() const;
 
-	inline String GetName() const
-	{
-		return String(this->_Get_path().stem().wstring());
-	}
+	FileSystemReference& operator =(const FileSystemReference& r);
+	FileSystemReference& operator =(FileSystemReference&& rr) noexcept;
 
-	inline constexpr FileSystemReference& operator =(const FileSystemReference& rhs) noexcept
-	{
-		_path = rhs._path;
-		_fpath = rhs._fpath;
-		return *this;
-	}
-
-	inline constexpr FileSystemReference& operator =(FileSystemReference&& rhs) noexcept
-	{
-		_path = std::move(rhs._path);
-		_fpath = std::move(rhs._fpath);
-		return *this;
-	}
-
-	inline constexpr auto operator <=>(const FileSystemReference& rhs) const noexcept
-	{
-		return _path <=> rhs._path;
-	}
-
-	inline constexpr bool operator ==(const FileSystemReference& rhs) const noexcept
-	{
-		return _path == rhs._path;
-	}
+	inline auto operator <=>(const FileSystemReference& rhs) const noexcept { return _path <=> rhs._path; }
+	inline bool operator ==(const FileSystemReference& rhs) const noexcept { return _path == rhs._path; }
 
 protected:
-	inline const std::filesystem::path& _Get_path() const noexcept
-	{
-		if (!_fpath.has_value())
-		{
-			_fpath.emplace((const wchar_t*)_path);
-		}
-		return *_fpath;
-	}
+	inline const std::filesystem::path& _get_path() const noexcept { return _filepath; }
 };

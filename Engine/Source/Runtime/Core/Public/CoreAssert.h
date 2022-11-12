@@ -4,7 +4,6 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
-#include "Misc/noop.h"
 #include "Exceptions/AssertException.h"
 #include <source_location>
 
@@ -67,7 +66,7 @@ if (const bool b = (bool)(x); !b) \
 
 #define check(x)
 #define checkf(x, format, ...)
-#define ensure(x) noop(x)
-#define ensureMsgf(x, format, ...) noop(x)
+#define ensure(x) (x)
+#define ensureMsgf(x, format, ...) (x)
 
 #endif

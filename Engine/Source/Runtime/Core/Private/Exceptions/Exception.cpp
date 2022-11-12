@@ -3,22 +3,19 @@
 #include "Exceptions/Exception.h"
 #include "Misc/String.h"
 
-thread_local std::vector<Exception*> sTLExceptions;
-
 Exception::Exception(const String& message, std::exception_ptr innerException) noexcept
-	: _stacktrace(Stacktrace::CaptureCurrent())
+	: _stacktrace(std::stacktrace::current(1))
 	, _message(message)
 	, _innerException(innerException)
-	, _impl_buf(std::make_unique<_Impl_buf>())
+	, _impl(std::make_unique<_impl_buf>())
 {
-	sTLExceptions.emplace_back(this);
 }
 
 Exception::Exception(const Exception& rhs) noexcept
 	: _stacktrace(rhs._stacktrace)
 	, _message(rhs._message)
 	, _innerException(rhs._innerException)
-	, _impl_buf(rhs._impl_buf)
+	, _impl(rhs._impl)
 {
 }
 
@@ -26,26 +23,21 @@ Exception::Exception(Exception&& rhs) noexcept
 	: _stacktrace(std::move(rhs._stacktrace))
 	, _message(std::move(rhs._message))
 	, _innerException(std::move(rhs._innerException))
-	, _impl_buf(std::move(rhs._impl_buf))
+	, _impl(std::move(rhs._impl))
 {
 }
 
 Exception::~Exception() noexcept
 {
-	auto it = std::find(sTLExceptions.begin(), sTLExceptions.end(), this);
-	if (it != sTLExceptions.end())
-	{
-		sTLExceptions.erase(it);
-	}
 }
 
 String Exception::ToString() const noexcept
 {
-	this->_Cache_strings();
-	return _impl_buf->_fulltrace;
+	this->_cache_string();
+	return _impl->_fulltrace;
 }
 
-const Stacktrace& Exception::GetStacktrace() const noexcept
+const std::stacktrace& Exception::GetStacktrace() const noexcept
 {
 	return _stacktrace;
 }
@@ -60,19 +52,9 @@ std::exception_ptr Exception::GetInnerException() const noexcept
 	return _innerException;
 }
 
-Exception* Exception::AvailableException() noexcept
+void Exception::_cache_string() const noexcept
 {
-	if (sTLExceptions.empty())
-	{
-		return nullptr;
-	}
-
-	return sTLExceptions.back();
-}
-
-void Exception::_Cache_strings() const noexcept
-{
-	if (!_impl_buf->_cached)
+	if (!_impl->_cached)
 	{
 		// Unwinding descriptions.
 		if (_innerException)
@@ -83,28 +65,33 @@ void Exception::_Cache_strings() const noexcept
 			}
 			catch (const Exception& fe)
 			{
-				fe._Cache_strings();
-				_impl_buf->_description = fe._impl_buf->_description;
-				_impl_buf->_stacktrace = fe._impl_buf->_stacktrace;
+				fe._cache_string();
+				_impl->_description = fe._impl->_description;
+				_impl->_stacktrace = fe._impl->_stacktrace;
 			}
 			catch (...)
 			{
 			}
 		}
 
-		if (_impl_buf->_description)
+		if (_impl->_description)
 		{
-			_impl_buf->_description += TEXT("\n ---> ");
+			_impl->_description += TEXT("\n ---> ");
 		}
-		if (_impl_buf->_stacktrace)
+		if (_impl->_stacktrace)
 		{
-			_impl_buf->_stacktrace += TEXT("\n   --- End of inner exception stack trace ---\n");
+			_impl->_stacktrace += TEXT("\n   --- End of inner exception stack trace ---\n");
 		}
 
-		_impl_buf->_description += String::Format(TEXT("{}: {}"), String(typeid(*this).name()), _message);
-		_impl_buf->_stacktrace += _stacktrace.Trace();
+		_impl->_description += String::Format(TEXT("{}: {}"), String(typeid(*this).name()), _message);
+		_impl->_stacktrace += _stacktrace_to_string(_stacktrace);
 
-		_impl_buf->_fulltrace = String::Format(TEXT("{}\n{}"), _impl_buf->_description, _impl_buf->_stacktrace);
-		_impl_buf->_cached = true;
+		_impl->_fulltrace = String::Format(TEXT("{}\n{}"), _impl->_description, _impl->_stacktrace);
+		_impl->_cached = true;
 	}
+}
+
+String Exception::_stacktrace_to_string(const std::stacktrace& st) noexcept
+{
+	return String::FromCodepage(std::to_string(st), 0);
 }

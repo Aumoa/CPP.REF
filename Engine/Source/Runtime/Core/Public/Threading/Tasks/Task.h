@@ -5,9 +5,10 @@
 #include "Awaiter.h"
 #include "promise_type.h"
 #include "Generic/IList.h"
-#include "Concepts/CompatibleVariadic.h"
-#include "Concepts/GetVariadic.h"
+#include "Misc/CompatibleVariadic.h"
+#include "Misc/GetVariadic.h"
 #include "Exceptions/InvalidCastException.h"
+#include "Threading/ThreadPool.h"
 #include <coroutine>
 #include <memory>
 #include <chrono>
@@ -167,13 +168,6 @@ public:
 	auto operator <=>(const Task&) const = default;
 	bool operator ==(const Task&) const = default;
 
-private:
-	static void Initialize();
-	static void Shutdown();
-
-	static void Run_thread(std::function<void()> body);
-	static void Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);
-
 public:
 	template<class TBody>
 	static auto Run(TBody&& body, std::stop_token sToken = {}) -> Task<std::invoke_result_t<TBody>>
@@ -183,7 +177,7 @@ public:
 		using U = std::invoke_result_t<TBody>;
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<U>>(sToken);
 
-		Run_thread([uAwaiter, body = std::forward<TBody>(body)]() mutable
+		ThreadPool::QueueUserWorkItem([uAwaiter, body = std::forward<TBody>(body)]() mutable
 		{
 			try
 			{
@@ -212,7 +206,7 @@ public:
 		static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
 
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<void>>();
-		Run_thread([uAwaiter]
+		ThreadPool::QueueUserWorkItem([uAwaiter]
 		{
 			uAwaiter->SetResult();
 		});
@@ -225,7 +219,7 @@ public:
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<void>>(sToken);
-		Delay_thread(delay, [uAwaiter]() mutable
+		ThreadPool::QueueDelayedUserWorkItem(delay, [uAwaiter]() mutable
 		{
 			uAwaiter->SetResult();
 		});
@@ -504,15 +498,3 @@ public:
 		}
 	}
 };
-
-template<>
-void CORE_API Task<>::Initialize();
-
-template<>
-void CORE_API Task<>::Shutdown();
-
-template<>
-void CORE_API Task<>::Run_thread(std::function<void()> body);
-
-template<>
-void CORE_API Task<>::Delay_thread(std::chrono::milliseconds delay, std::function<void()> body);

@@ -3,22 +3,13 @@
 #include "CoreAssert.h"
 #include "LogCore.h"
 #include "Logging/Log.h"
-#include "Stacktrace/Stacktrace.h"
+#include "Misc/PlatformMisc.h"
+#include <stacktrace>
 
 void CoreAssert::Assert(const String& exp, const String& msg)
 {
-	Log::Fatal(LogAssert, TEXT("{} (in expression: {})\n{}"), msg, exp, Stacktrace::CaptureCurrent().Trace());
-	DebugBreak();
-}
-
-void CoreAssert::DebugBreak()
-{
+	Log::Fatal(LogAssert, TEXT("{} (in expression: {})\n{}"), msg, exp, String::FromCodepage(std::to_string(std::stacktrace::current())));
 #if !SHIPPING
-#if PLATFORM_WINDOWS
-
-	// Call built-in function.
-	__debugbreak();
-
-#endif
+	PlatformMisc::Debugbreak();
 #endif
 }

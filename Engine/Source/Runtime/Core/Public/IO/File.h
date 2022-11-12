@@ -2,22 +2,23 @@
 
 #pragma once
 
+#include "Misc/String.h"
 #include <filesystem>
 
 class File
 {
 public:
-	static inline bool Exists(const String& path) noexcept
+	static inline bool Exists(String path) noexcept
 	{
 		std::error_code ec;
 		return std::filesystem::is_regular_file((std::wstring)path, ec);
 	}
 
-	static inline bool TryMove(const String& src, const String& dst, bool overwrite = false) noexcept
+	static inline bool TryMove(String src, String dst, bool overwrite = false) noexcept
 	{
 		if (overwrite && Exists(dst))
 		{
-			if (!TryDelete(dst)
+			if (!TryDelete(dst))
 			{
 				return false;
 			}
@@ -28,7 +29,7 @@ public:
 		return (bool)ec;
 	}
 
-	static inline bool TryDelete(const String& src) noexcept
+	static inline bool TryDelete(String src) noexcept
 	{
 		if (Exists(src))
 		{

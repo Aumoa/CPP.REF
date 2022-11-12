@@ -17,7 +17,7 @@ public:
 	}
 
 	IOException(const std::error_code& ec, std::exception_ptr innerException = nullptr) noexcept
-		: Exception(TEXT("Invalid file operation."), innerException)
+		: Exception(String::FromCodepage(ec.message()), innerException)
 		, _ec(ec)
 	{
 	}

@@ -20,4 +20,13 @@ public:
 			|| ch == '\t'
 			|| ch == '\b';
 	}
+
+	template<class T>
+	inline constexpr static bool IsHexChar(const T& ch) noexcept requires
+		std::same_as<T, char> ||
+		std::same_as<T, wchar_t>
+	{
+		return ch >= 'a' && ch <= 'f'
+			|| ch >= 'A' && ch <= 'F';
+	}
 };

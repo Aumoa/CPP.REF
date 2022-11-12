@@ -3,20 +3,15 @@
 #include "Logging/Log.h"
 #include "Logging/LogCategory.h"
 #include "Logging/LogEntry.h"
-#include "Threading/Thread.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
-#include <iostream>
+#include "Misc/PlatformMisc.h"
+#include "Console.h"
 #include <future>
-#include "Log.gen.cpp"
-
-#if PLATFORM_WINDOWS
-#include "PlatformMisc/Windows/WindowsMinimal.h"
-#endif
 
 namespace
 {
-	static Thread sWorker;
+	static std::jthread sWorker;
 	static bool sRunning;
 	static Spinlock sLock;
 	static SpinlockConditionVariable sCondVar;
@@ -27,26 +22,18 @@ namespace
 void Log::Initialize()
 {
 	sRunning = true;
-	sWorker = Thread::CreateThread(TEXT("[Log Worker]"), &_Worker);
-}
-
-void Log::Shutdown()
-{
-	auto lock = std::unique_lock(sLock);
-	sRunning = false;
-	sCondVar.NotifyOne();
-	lock.unlock();
-
-	sWorker.JoinAsync().Wait();
+	sWorker = std::jthread(_worker);
 }
 
 void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String& message)
 {
+	static int trap = (_trap_init(), 0);
+
 	std::unique_lock lock(sLock);
 	sEntries.emplace_back() =
 	{
 		.Category = &logCategory,
-		.LogThread = Thread::GetCurrentThread(),
+		.LogThread = _get_threadid_or_name(),
 		.Level = logLevel,
 		.Message = message
 	};
@@ -59,8 +46,19 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 	}
 }
 
+void Log::Post(std::function<void()> work)
+{
+	static int trap = (_trap_init(), 0);
+
+	std::unique_lock lock(sLock);
+	sActions.emplace_back(work);
+	sCondVar.NotifyOne();
+}
+
 void Log::FlushAll()
 {
+	static int trap = (_trap_init(), 0);
+
 	std::promise<void> promise;
 	std::future<void> future = promise.get_future();
 
@@ -75,7 +73,46 @@ void Log::FlushAll()
 	future.wait();
 }
 
-void Log::_Worker()
+void Log::Cleanup()
+{
+	static int trap = (_trap_init(), 0);
+
+	auto lock = std::unique_lock(sLock);
+	sRunning = false;
+	sCondVar.NotifyOne();
+	lock.unlock();
+
+	sWorker.join();
+}
+
+String Log::_get_threadid_or_name() noexcept
+{
+	static thread_local String name = []()
+	{
+		String name = PlatformMisc::GetThreadName();
+		if (name.length() == 0)
+		{
+			name = String::Format(TEXT("Thread {}"), PlatformMisc::GetCurrentThreadId());
+		}
+		return name;
+	}();
+	return name;
+}
+
+void Log::_trap_init()
+{
+	struct _cleanup
+	{
+		~_cleanup()
+		{
+			Log::Cleanup();
+		}
+	};
+
+	static auto _s = (Initialize(), _cleanup());
+}
+
+void Log::_worker()
 {
 	std::vector<LogEntry> entries;
 	std::vector<std::function<void()>> actions;
@@ -106,17 +143,11 @@ void Log::_Worker()
 
 		for (auto& entry : entries)
 		{
-			String threadName = entry.LogThread.GetFriendlyName();
-			if (!threadName)
-			{
-				threadName = String::Format(TEXT("[Thread {}]"), entry.LogThread.GetThreadId());
-			}
+			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}\n"), levelToString(entry.Level), entry.LogThread, entry.Category->GetCategoryName(), entry.Message);
+			Console::Write(formatted);
 
-			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}\n"), levelToString(entry.Level), threadName, entry.Category->GetCategoryName(), entry.Message);
-			std::wcout << (std::wstring_view)formatted;
-
-#if PLATFORM_WINDOWS
-			OutputDebugStringW(formatted.c_str());
+#if !SHIPPING
+			PlatformMisc::OutputDebugString(formatted);
 #endif
 		}
 

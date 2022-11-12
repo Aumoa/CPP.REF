@@ -4,7 +4,7 @@
 
 #include "Misc/String.h"
 
-namespace libty::Syntax
+namespace lib::details
 {
 	template<class>
 	String __nameof_helper(const String& s)
@@ -13,4 +13,4 @@ namespace libty::Syntax
 	}
 }
 
-#define nameof(x) __nameof_helper<decltype(x)>(TEXT(#x))
+#define nameof(x) lib::details::__nameof_helper<decltype(x)>(TEXT(#x))

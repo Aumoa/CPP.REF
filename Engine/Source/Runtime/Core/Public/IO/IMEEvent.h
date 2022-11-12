@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include "Reflection/ObjectMacros.h"
-#include "IMEEvent.gen.h"
+#include "PrimitiveTypes.h"
 
-SENUM()
 enum class EIMEEvent
 {
 	Char,
@@ -22,26 +20,28 @@ struct IMEEvent
 	{
 		struct
 		{
-			wchar_t ComposedChar;
+			char_t ComposedChar;
 		} Char;
 
 		struct
 		{
-			uint8 __Unused;
+			uint8 _unused;
 		} StartComposition;
 
 		struct
 		{
-			uint8 __Unused;
+			uint8 _unused;
 		} EndComposition;
 
 		struct
 		{
-			wchar_t ComposingChar;
+			char_t ComposingChar;
 		} Composition;
 	};
 
-	IMEEvent(EIMEEvent Event) : Event(Event)
+	IMEEvent(EIMEEvent Event)
+		: Event(Event)
+		, Char{ 0 }
 	{
 	}
 };

@@ -6,6 +6,21 @@
 #include <bit>
 #include <fstream>
 
+FileReference::FileReference(String path) noexcept
+	: FileSystemReference(path)
+{
+}
+
+String FileReference::GetFilename() const noexcept
+{
+	return String(this->_get_path().filename().wstring());
+}
+
+String FileReference::GetExtension() const noexcept
+{
+	return String(this->_get_path().extension().wstring());
+}
+
 template<class TChar, class... TChars>
 inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
 {
@@ -24,7 +39,7 @@ inline bool BOMcheck(const char* Orign, TChar&& Char, TChars&&... Chars)
 
 String FileReference::ReadAllText() const
 {
-	std::ifstream File(this->_Get_path());
+	std::ifstream File(this->_get_path());
 	if (File.is_open())
 	{
 		std::string Buf;
@@ -110,7 +125,7 @@ String FileReference::ReadAllText() const
 bool FileReference::WriteAllText(String Text, uint32 Encoding) const
 {
 	std::string EncodedText = Text.AsCodepage(Encoding);
-	std::ofstream File(this->_Get_path(), std::ios::trunc);
+	std::ofstream File(this->_get_path(), std::ios::trunc);
 	if (File.is_open())
 	{
 		File << EncodedText;

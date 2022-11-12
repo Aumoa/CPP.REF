@@ -2,10 +2,6 @@
 
 #pragma once
 
-#include "Reflection/ObjectMacros.h"
-#include "MouseButton.gen.h"
-
-SENUM()
 enum class EMouseButton
 {
     Left = 0,

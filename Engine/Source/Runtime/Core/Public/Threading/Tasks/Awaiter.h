@@ -70,7 +70,7 @@ public:
 
 	virtual std::exception_ptr GetException() override
 	{
-		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+		auto lock = std::unique_lock(_lock.AsReadonly());
 		return _exception;
 	}
 
@@ -91,7 +91,7 @@ public:
 			return;
 		}
 
-		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+		auto lock = std::unique_lock(_lock.AsReadonly());
 		_future.Wait(lock, [this] { return IsCompleted(); });
 	}
 
@@ -102,7 +102,7 @@ public:
 			return true;
 		}
 
-		auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+		auto lock = std::unique_lock(_lock.AsReadonly());
 		return _future.WaitFor(lock, timeout, [this] { return IsCompleted(); });
 	}
 

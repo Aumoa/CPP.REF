@@ -3,227 +3,118 @@
 #pragma once
 
 #include "PrimitiveTypes.h"
-#include <mutex>
-#include <utility>
+#include "Misc/PlatformMisc.h"
 
-class CORE_API Spinlock
+class Spinlock
 {
 	struct Impl;
 	Spinlock(const Spinlock&) = delete;
 
-private:
-	Impl* _impl = nullptr;
-
-public:
-	Spinlock();
-	~Spinlock() noexcept;
-
-	void Lock() noexcept;
-	void Unlock() noexcept;
-	bool TryLock() noexcept;
-
-	void LockReadonly() noexcept;
-	void UnlockReadonly() noexcept;
-	bool TryLockReadonly() noexcept;
-
-	void* NativeHandle() const noexcept;
-
 public:
 	class Readonly_t
 	{
+		Spinlock* _src;
+
 	public:
-		Readonly_t() = default;
+		Readonly_t(Spinlock* src)
+			: _src(src)
+		{
+		}
+
+		inline void lock() noexcept(noexcept(_src->Lock(true)))
+		{
+			_src->Lock(true);
+		}
+
+		inline void unlock() noexcept(noexcept(_src->Unlock(true)))
+		{
+			_src->Unlock(true);
+		}
+
+		inline size_t& NativeHandle() noexcept(noexcept(_src->NativeHandle()))
+		{
+			return _src->NativeHandle();
+		}
 	};
 
-	inline static Readonly_t Readonly;
-};
-
-template<>
-class std::unique_lock<Spinlock>
-{
-	unique_lock(const unique_lock&) = delete;
-
-	Spinlock* _lck;
-	uint8 _readonly : 1;
-	uint8 _owns : 1;
+private:
+	size_t _lock = 0;
+	Readonly_t _readonly;
 
 public:
-	unique_lock() noexcept
-		: _lck(nullptr)
-		, _readonly(false)
-		, _owns(false)
+	inline Spinlock() noexcept
+		: _readonly(this)
 	{
+		PlatformMisc::InitializeSpinlock(_lock);
 	}
 
-	[[nodiscard]] explicit unique_lock(Spinlock& lck) noexcept
-		: _lck(&lck)
-		, _readonly(false)
-		, _owns(true)
+	inline Spinlock(Spinlock&& r) noexcept
+		: _readonly(this)
 	{
-		_lck->Lock();
+		std::swap(_lock, r._lock);
 	}
 
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, std::adopt_lock_t) noexcept
-		: _lck(&lck)
-		, _readonly(false)
-		, _owns(true)
+	inline ~Spinlock() noexcept
 	{
-	}
-
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, std::try_to_lock_t) noexcept
-		: _lck(&lck)
-		, _readonly(false)
-		, _owns(lck.TryLock())
-	{
-	}
-
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, std::defer_lock_t) noexcept
-		: _lck(&lck)
-		, _readonly(false)
-		, _owns(false)
-	{
-	}
-
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly) noexcept
-		: _lck(&lck)
-		, _readonly(true)
-		, _owns(true)
-	{
-		_lck->LockReadonly();
-	}
-
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly, std::adopt_lock_t) noexcept
-		: _lck(&lck)
-		, _readonly(true)
-		, _owns(true)
-	{
-	}
-
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly, std::try_to_lock_t) noexcept
-		: _lck(&lck)
-		, _readonly(true)
-		, _owns(lck.TryLockReadonly())
-	{
-	}
-
-	[[nodiscard]] explicit unique_lock(Spinlock& lck, Spinlock::Readonly_t isReadonly, std::defer_lock_t) noexcept
-		: _lck(&lck)
-		, _readonly(true)
-		, _owns(false)
-	{
-	}
-
-	[[nodiscard]] explicit unique_lock(unique_lock&& rhs) noexcept
-		: _lck(rhs._lck)
-		, _readonly(rhs._readonly)
-		, _owns(rhs._owns)
-	{
-		rhs._lck = nullptr;
-		rhs._readonly = false;
-		rhs._owns = false;
-	}
-
-	~unique_lock() noexcept
-	{
-		if (_owns)
+		if (_lock != 0)
 		{
-			this->unlock();
+			PlatformMisc::DestroySpinlock(_lock);
+			_lock = 0;
 		}
 	}
 
-	void lock()
+	inline void Lock(bool shared = false) noexcept
 	{
-		if (_readonly)
+		if (shared)
 		{
-			_lck->LockReadonly();
+			PlatformMisc::AcquireSpinlockShared(_lock);
 		}
 		else
 		{
-			_lck->Lock();
+			PlatformMisc::AcquireSpinlockExclusive(_lock);
 		}
-
-		_owns = true;
 	}
 
-	bool try_lock()
+	inline void Unlock(bool shared = false) noexcept
 	{
-		if (_readonly)
+		if (shared)
 		{
-			_owns = _lck->TryLockReadonly();
+			PlatformMisc::ReleaseSpinlockShared(_lock);
 		}
 		else
 		{
-			_owns = _lck->TryLock();
+			PlatformMisc::ReleaseSpinlockExclusive(_lock);
 		}
-		return _owns;
 	}
 
-	void unlock()
+	inline bool TryLock(bool shared = false) noexcept
 	{
-		if (_readonly)
+		if (shared)
 		{
-			_lck->UnlockReadonly();
+			return PlatformMisc::TryAcquireSpinlockShared(_lock);
 		}
 		else
 		{
-			_lck->Unlock();
+			return PlatformMisc::TryAcquireSpinlockExclusive(_lock);
 		}
-
-		_owns = false;
 	}
 
-	unique_lock& operator =(unique_lock&& rhs) noexcept
+	inline Spinlock& operator =(Spinlock&& r) noexcept
 	{
-		_lck = rhs._lck;
-		_readonly = rhs._readonly;
-		_owns = rhs._owns;
-		rhs._lck = nullptr;
-		rhs._readonly = false;
-		rhs._owns = false;
+		std::swap(_lock, r._lock);
 		return *this;
 	}
 
-	Spinlock* release() noexcept
+	inline size_t& NativeHandle() noexcept
 	{
-		Spinlock* lck = _lck;
-		_lck = nullptr;
-		_readonly = false;
-		_owns = false;
-		return _lck;
+		return _lock;
 	}
 
-	[[nodiscard]] bool owns_lock() const noexcept
-	{
-		return _owns;
-	}
-
-	[[nodiscard]] bool readonly() const noexcept
+	inline Readonly_t& AsReadonly() noexcept
 	{
 		return _readonly;
 	}
 
-	explicit operator bool() const noexcept
-	{
-		return _owns;
-	}
-
-	[[nodiscard]] Spinlock* mutex() const noexcept
-	{
-		return _lck;
-	}
+	inline void lock() noexcept { Lock(); }
+	inline void unlock() noexcept { Unlock(); }
 };
-
-namespace std
-{
-	template<class T>
-	std::unique_lock(T&, Spinlock::Readonly_t) -> std::unique_lock<Spinlock>;
-
-	template<class T>
-	std::unique_lock(T&, Spinlock::Readonly_t, std::adopt_lock_t) -> std::unique_lock<Spinlock>;
-
-	template<class T>
-	std::unique_lock(T&, Spinlock::Readonly_t, std::try_to_lock_t) -> std::unique_lock<Spinlock>;
-
-	template<class T>
-	std::unique_lock(T&, Spinlock::Readonly_t, std::defer_lock_t) -> std::unique_lock<Spinlock>;
-}

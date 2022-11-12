@@ -2,28 +2,25 @@
 
 #pragma once
 
-#include "Object.h"
 #include "LogLevel.h"
 #include "Misc/String.h"
-#include "Log.gen.h"
+#include <functional>
 
 class LogCategory;
 
-SCLASS()
-class CORE_API Log : virtual public Object
+class Log
 {
-	GENERATED_BODY()
-
 	friend class Core;
 	Log() = delete;
 
 private:
 	static void Initialize();
-	static void Shutdown();
 
 public:
 	static void Print(const LogCategory& logCategory, ELogLevel logLevel, const String& message);
+	static void Post(std::function<void()> work);
 	static void FlushAll();
+	static void Cleanup();
 
 public:
 	template<class... TFormatArgs>
@@ -64,5 +61,7 @@ public:
 	}
 
 private:
-	static void _Worker();
+	static String _get_threadid_or_name() noexcept;
+	static void _trap_init();
+	static void _worker();
 };

@@ -9,26 +9,12 @@ class FileReference;
 class CORE_API DirectoryReference : public FileSystemReference
 {
 public:
-	inline constexpr DirectoryReference() noexcept
-	{
-	}
+	DirectoryReference() = default;
+	DirectoryReference(const DirectoryReference& rhs) = default;
+	DirectoryReference(DirectoryReference&& rhs) noexcept = default;
+	DirectoryReference(String path);
 
-	inline constexpr DirectoryReference(const DirectoryReference& rhs) noexcept
-		: FileSystemReference(rhs)
-	{
-	}
-
-	inline constexpr DirectoryReference(DirectoryReference&& rhs) noexcept
-		: FileSystemReference(std::move(rhs))
-	{
-	}
-
-	inline constexpr DirectoryReference(String path) noexcept
-		: FileSystemReference(path)
-	{
-	}
-
-	bool CreateIfNotExists(bool bRecursive = false) const noexcept;
-	std::vector<FileReference> GetAllFiles(bool recursive = false) const noexcept;
-	FileReference GetFile(const String& filename) const noexcept;
+	bool CreateIfNotExists(bool bRecursive = false) const;
+	std::vector<FileReference> GetAllFiles(bool recursive = false) const;
+	FileReference GetFile(const String& filename) const;
 };

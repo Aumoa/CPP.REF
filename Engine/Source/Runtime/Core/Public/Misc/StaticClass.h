@@ -2,7 +2,7 @@
 
 #pragma once
 
-struct MouseEventReply
+class StaticClass
 {
-	bool bHandled : 1;
+	StaticClass() = delete;
 };

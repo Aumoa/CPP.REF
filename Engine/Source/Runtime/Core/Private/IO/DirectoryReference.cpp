@@ -3,26 +3,31 @@
 #include "IO/DirectoryReference.h"
 #include "IO/FileReference.h"
 
-bool DirectoryReference::CreateIfNotExists(bool bRecursive) const noexcept
+DirectoryReference::DirectoryReference(String path)
+	: FileSystemReference(path)
+{
+}
+
+bool DirectoryReference::CreateIfNotExists(bool bRecursive) const
 {
 	if (!IsExists())
 	{
 		if (bRecursive)
 		{
 			std::error_code ec;
-			return std::filesystem::create_directories(this->_Get_path(), ec);
+			return std::filesystem::create_directories(this->_get_path(), ec);
 		}
 		else
 		{
 			std::error_code ec;
-			return std::filesystem::create_directory(this->_Get_path(), ec);
+			return std::filesystem::create_directory(this->_get_path(), ec);
 		}
 	}
 
 	return true;
 }
 
-std::vector<FileReference> DirectoryReference::GetAllFiles(bool recursive) const noexcept
+std::vector<FileReference> DirectoryReference::GetAllFiles(bool recursive) const
 {
 	if (!IsExists())
 	{
@@ -33,7 +38,7 @@ std::vector<FileReference> DirectoryReference::GetAllFiles(bool recursive) const
 
 	if (recursive)
 	{
-		for (auto& file : std::filesystem::recursive_directory_iterator(this->_Get_path()))
+		for (auto& file : std::filesystem::recursive_directory_iterator(this->_get_path()))
 		{
 			if (!file.is_directory())
 			{
@@ -43,7 +48,7 @@ std::vector<FileReference> DirectoryReference::GetAllFiles(bool recursive) const
 	}
 	else
 	{
-		for (auto& file : std::filesystem::directory_iterator(this->_Get_path()))
+		for (auto& file : std::filesystem::directory_iterator(this->_get_path()))
 		{
 			if (!file.is_directory())
 			{
@@ -55,7 +60,7 @@ std::vector<FileReference> DirectoryReference::GetAllFiles(bool recursive) const
 	return frs;
 }
 
-FileReference DirectoryReference::GetFile(const String& filename) const noexcept
+FileReference DirectoryReference::GetFile(const String& filename) const
 {
 	return FileReference(String::Concat(GetPath(), TEXT("/"), filename));
 }

@@ -5,7 +5,6 @@
 #include "IMulticastDelegate.h"
 #include "DelegateHandle.h"
 #include "Threading/Spinlock.h"
-#include "CoreObject/WeakPtr.h"
 #include <functional>
 #include <map>
 #include <atomic>
@@ -111,25 +110,11 @@ public:
 		return DelegateInstance(0, std::forward<T>(body));
 	}
 
-	template<class T>
-	static inline DelegateInstance CreateWeakLambda(Object* self, T&& body) requires
-		std::invocable<T, TArgs...>
-	{
-		return DelegateInstance(0, std::forward<T>(body), ImplGetHolder(self));
-	}
-
 	template<class TSelf, class T>
 	static inline DelegateInstance CreateWeakLambda(const std::shared_ptr<TSelf>& self, T&& body) requires
 		std::invocable<T, TArgs...>
 	{
 		return DelegateInstance(0, std::forward<T>(body), ImplGetHolder(self));
-	}
-
-	template<class TSelf, class... TInvokeArgs>
-	static inline DelegateInstance CreateObject(TSelf* self, void (TSelf::*func)(TInvokeArgs...)) requires
-		std::derived_from<TSelf, Object>
-	{
-		return CreateWeakLambda(self, [self, func](TArgs... args) { (self->*func)(args...); });
 	}
 
 	template<class TSelf, class... TInvokeArgs>
@@ -146,25 +131,11 @@ public:
 		return Add(CreateLambda(std::forward<T>(body)));
 	}
 
-	template<class T>
-	inline ScopedDelegateHolder AddWeakLambda(Object* self, T&& body) requires
-		std::invocable<T, TArgs...>
-	{
-		return Add(CreateWeakLambda(self, std::forward<T>(body)));
-	}
-
 	template<class TSelf, class T>
 	inline ScopedDelegateHolder AddWeakLambda(const std::shared_ptr<TSelf>& self, T&& body) requires
 		std::invocable<T, TArgs...>
 	{
 		return Add(CreateWeakLambda(self, std::forward<T>(body)));
-	}
-
-	template<class TSelf, class... TInvokeArgs>
-	inline ScopedDelegateHolder AddObject(TSelf* self, void (TSelf::*func)(TInvokeArgs...)) requires
-		std::derived_from<TSelf, Object>
-	{
-		return Add(CreateObject(self, func));
 	}
 
 	template<class TSelf, class... TInvokeArgs>
@@ -211,16 +182,6 @@ public:
 	}
 
 private:
-	template<class U>
-	static auto ImplGetHolder(U* object) requires
-		std::derived_from<U, Object>
-	{
-		return [self = WeakPtr(object)]
-		{
-			return self.IsValid();
-		};
-	}
-
 	template<class U>
 	static auto ImplGetHolder(const std::shared_ptr<U>& object)
 	{
