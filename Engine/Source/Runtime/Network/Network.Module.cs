@@ -18,9 +18,9 @@ public class NetworkRule : ModuleRule
             "Core"
         });
 
-        PrivateVcpkgModules.AddRange(new[]
+        PublicVcpkgModules.AddRange(new[]
         {
-            "openssl"
+            "nlohmann-json"
         });
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
