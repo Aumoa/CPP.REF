@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Net/Packet.h"
-#include "Packet.gen.cpp"
 
 Packet::Builder::Builder(std::shared_ptr<Packet> p)
 	: _p(std::move(p))

@@ -6,6 +6,7 @@
 #include "DateTime.h"
 #include "TimeSpan.h"
 #include "LogCore.h"
+#include "Environment.h"
 #include "Generic/IString.h"
 #include "Delegates/MulticastDelegate.h"
 #include "Delegates/MulticastEvent.h"

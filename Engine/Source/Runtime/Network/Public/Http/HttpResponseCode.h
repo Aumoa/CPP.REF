@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HttpResponseCode.gen.h"
 
-SENUM()
 enum class EHttpResponseCode
 {
 	Unknown = 0,

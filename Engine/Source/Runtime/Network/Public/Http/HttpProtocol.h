@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HttpProtocol.gen.h"
 
-SENUM()
 enum class EHttpProtocol
 {
 	None,

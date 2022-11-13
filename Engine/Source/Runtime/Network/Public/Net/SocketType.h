@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SocketType.gen.h"
 
-SENUM()
 enum class ESocketType
 {
     Unknown = -1,

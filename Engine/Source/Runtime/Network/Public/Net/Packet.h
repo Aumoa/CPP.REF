@@ -3,13 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Packet.gen.h"
 
-SCLASS()
-class NETWORK_API Packet : implements Object
+class NETWORK_API Packet
 {
-	GENERATED_BODY()
-
 private:
 	static constexpr size_t HEADER_SIZE = 10;
 

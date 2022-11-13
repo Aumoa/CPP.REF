@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ProtocolType.gen.h"
 
-SENUM()
 enum class EProtocolType
 {
     Unspecified = 0,

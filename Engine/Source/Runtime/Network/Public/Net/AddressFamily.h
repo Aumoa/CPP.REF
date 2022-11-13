@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AddressFamily.gen.h"
 
-SENUM()
 enum class EAddressFamily
 {
     Unspecified = 0,

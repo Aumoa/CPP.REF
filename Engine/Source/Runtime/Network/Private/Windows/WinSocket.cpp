@@ -8,8 +8,8 @@
 
 WinSocket::WinSocket()
 	: _overlaps(new WinOverlappedContainer())
-{
-	static auto sIOCP = std::make_unique<WindowsIOCP>();
+{/*
+	static auto sIOCP = std::make_unique<WindowsIOCP>();*/
 	_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_OVERLAPPED);
 	if (_socket == INVALID_SOCKET)
 	{
@@ -50,7 +50,7 @@ void WinSocket::Bind(const IPEndPoint& ep)
 		throw SocketException(FormatWSAError());
 	}
 
-	IOCompletionPort::Get()->ChainSocket(this);
+	//IOCompletionPort::Get()->ChainSocket(this);
 }
 
 Task<> WinSocket::ConnectAsync(const IPEndPoint& ep)
@@ -139,7 +139,7 @@ Task<std::shared_ptr<ImplSocket>> WinSocket::AcceptAsync()
 		co_await block->Signal.GetTask();
 	}
 
-	IOCompletionPort::Get()->ChainSocket(sAccept.get());
+	//IOCompletionPort::Get()->ChainSocket(sAccept.get());
 	co_return sAccept;
 }
 

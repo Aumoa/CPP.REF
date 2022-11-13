@@ -23,7 +23,7 @@ public class CoreRule : ModuleRule
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            PrivateAdditionalMacros.AddRange(new[]
+            PublicAdditionalMacros.AddRange(new[]
             {
                 "NOMINMAX",
                 "WIN32_LEAN_AND_MEAN"

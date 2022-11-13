@@ -2,6 +2,7 @@
 
 using DotNETUtilities;
 
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -424,6 +425,7 @@ public partial class VSGenerator : ISolutionGenerator
                         InnerPropGroup.NewElement("VcpkgUseStatic", _solution.Rule.StaticLibraries.ToString());
                         InnerPropGroup.NewElement("VcpkgConfiguration", Config.bUseDebugLibrary ? "Debug" : "Release");
                     }
+                    InnerPropGroup.NewElement("CustomBuildBeforeTargets", "ClCompile");
                 }
             }
 
@@ -464,6 +466,16 @@ public partial class VSGenerator : ISolutionGenerator
                             ClCompile.NewElement("PrecompiledHeader", "Use");
                             ClCompile.NewElement("PrecompiledHeaderFile", PCHHeader);
                         }
+                        else if (!(Config.Name == "DebugGame" && project.Rule.Category == ModuleCategory.Game))
+                        {
+                            string Path = _solution.EngineDirectory.Intermediate.FullPath;
+
+                            ClCompile.NewElement("ForcedIncludeFiles", "CoreMinimal.h");
+                            ClCompile.NewElement("PrecompiledHeader", "Use");
+                            ClCompile.NewElement("PrecompiledHeaderFile", "CoreMinimal.h");
+                            ClCompile.NewElement("PrecompiledHeaderOutputFile", Path + @"\$(Configuration)\Core\CoreMinimal.PCH");
+                            ClCompile.NewElement("ProgramDataBaseFileName", "$(IntDir)$(TargetName).pdb");
+                        }
                         ClCompile.NewElement("AdditionalOptions", "/bigobj %(AdditionalOptions)");
                         ClCompile.NewElement("RuntimeLibrary", Config.RuntimeLibrary + (_solution.Rule.StaticLibraries ? "" : "DLL"));
                         ClCompile.NewElement("ExceptionHandling", Config.ExceptionHandling);
@@ -492,6 +504,22 @@ public partial class VSGenerator : ISolutionGenerator
                         FxCompile.NewElement("ShaderModel", "5.1");
                         FxCompile.NewElement("AdditionalIncludeDirectories", AdditionalIncludeDirectories);
                     }
+
+                    if (string.IsNullOrEmpty(project.Rule.PrivatePCHHeader) && project.Rule.ProjectName != "Core" &&
+                        !(Config.Name == "DebugGame" && project.Rule.Category == ModuleCategory.Game))
+                    {
+                        string Path = _solution.EngineDirectory.Intermediate.FullPath;
+                        XmlElement CustomBuildStep = ItemDefinitionGroup.NewElement("CustomBuildStep");
+
+                        string SourceBase = Path + @"\$(Configuration)\Core\Core";
+                        string TargetBase = "$(IntDir)$(TargetName)";
+
+                        CustomBuildStep.NewElement("Command", 
+                            $"echo F | xcopy /Y /F \"{SourceBase}.pdb\" \"{TargetBase}.pdb\"\n\n" +
+                            $"IF EXIST \"{SourceBase}.idb\" echo F | xcopy /Y /F \"{SourceBase}.idb\" \"{TargetBase}.idb\"");
+                        CustomBuildStep.NewElement("Inputs", $"{SourceBase}.pdb");
+                        CustomBuildStep.NewElement("Outputs", $"{TargetBase}.pdb");
+                    }
                 }
             }
 
@@ -515,6 +543,11 @@ public partial class VSGenerator : ISolutionGenerator
                             {
                                 ClCompile.NewElement("PrecompiledHeader", "Create");
                             }
+                        }
+                        else if (IncludeItem.FileName == "CoreMinimal.cpp")
+                        {
+                            string Path = _solution.EngineDirectory.Intermediate.FullPath;
+                            ClCompile.NewElement("PrecompiledHeader", "Create");
                         }
                     }
                     else if (project.Rule.HeaderExtensions.Contains(Extension))
