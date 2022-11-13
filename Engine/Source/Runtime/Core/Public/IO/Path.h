@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include "Misc/StaticClass.h"
+
 class String;
 
-class CORE_API Path
+class CORE_API Path : public StaticClass
 {
 public:
 	static String GetFileNameWithoutExtension(const String& path);

@@ -3,39 +3,12 @@
 #pragma once
 
 #include "Misc/String.h"
-#include <filesystem>
+#include "Threading/Tasks/Task.h"
 
 class File
 {
 public:
-	static inline bool Exists(String path) noexcept
-	{
-		std::error_code ec;
-		return std::filesystem::is_regular_file((std::wstring)path, ec);
-	}
-
-	static inline bool TryMove(String src, String dst, bool overwrite = false) noexcept
-	{
-		if (overwrite && Exists(dst))
-		{
-			if (!TryDelete(dst))
-			{
-				return false;
-			}
-		}
-
-		std::error_code ec;
-		std::filesystem::rename((std::wstring)src, (std::wstring)dst, ec);
-		return (bool)ec;
-	}
-
-	static inline bool TryDelete(String src) noexcept
-	{
-		if (Exists(src))
-		{
-			std::error_code ec;
-			return std::filesystem::remove((std::wstring)src, ec);
-		}
-		return false;
-	}
+	static bool Exists(String path) noexcept;
+	static inline bool TryMove(String src, String dst, bool overwrite = false) noexcept;
+	static inline bool TryDelete(String src) noexcept;
 };

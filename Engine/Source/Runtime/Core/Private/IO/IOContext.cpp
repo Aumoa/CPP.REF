@@ -32,9 +32,10 @@ size_t IOContext::PollOne()
 		return 0;
 	}
 
-	if (IOCompletionOverlapped* overlap = PlatformMisc::GetQueuedCompletionStatus(_iocp, 0))
+	size_t transf = 0;
+	if (IOCompletionOverlapped* overlap = PlatformMisc::GetQueuedCompletionStatus(_iocp, 0, &transf))
 	{
-		if (overlap->Complete())
+		if (overlap->Complete(transf))
 		{
 			delete overlap;
 		}
@@ -56,10 +57,11 @@ size_t IOContext::Run()
 
 	while (_running)
 	{
-		IOCompletionOverlapped* overlap = PlatformMisc::GetQueuedCompletionStatus(_iocp, 0xFFFFFFFF);
+		size_t transf = 0;
+		IOCompletionOverlapped* overlap = PlatformMisc::GetQueuedCompletionStatus(_iocp, 0xFFFFFFFF, &transf);
 		if (overlap)
 		{
-			if (overlap->Complete())
+			if (overlap->Complete(transf))
 			{
 				delete overlap;
 			}
@@ -78,7 +80,7 @@ void IOContext::Stop()
 	size_t workers = _workers;
 	for (size_t i = 0; i < workers; ++i)
 	{
-		PlatformMisc::PostQueuedCompletionStatus(_iocp, new IOSignalOverlapped(0));
+		PlatformMisc::PostQueuedCompletionStatus(_iocp, new IOSignalOverlapped(0), 0);
 	}
 
 	while (_workers)
@@ -104,5 +106,5 @@ bool IOContext::Post(std::function<void()> work)
 		return false;
 	}
 
-	return PlatformMisc::PostQueuedCompletionStatus(_iocp, new IOActionOverlapped(std::move(work)));
+	return PlatformMisc::PostQueuedCompletionStatus(_iocp, new IOActionOverlapped(std::move(work)), 0);
 }

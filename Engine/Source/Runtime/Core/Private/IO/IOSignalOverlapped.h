@@ -15,5 +15,6 @@ public:
 	}
 
 	int32 GetSignal() const noexcept { return _signal; }
-	virtual bool Complete() override { return true; }
+	virtual bool Complete(size_t) override { return true; }
+	virtual bool Failed(std::exception_ptr) override { return true; }
 };

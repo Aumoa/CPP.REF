@@ -5,6 +5,7 @@
 #include "PrimitiveTypes.h"
 #include "Misc/PlatformMisc.h"
 #include <vector>
+#include <exception>
 
 class CORE_API IOCompletionOverlapped
 {
@@ -15,7 +16,8 @@ public:
 	IOCompletionOverlapped();
 	virtual ~IOCompletionOverlapped() noexcept;
 
-	virtual bool Complete() = 0;
+	virtual bool Complete(size_t resolved) = 0;
+	virtual bool Failed(std::exception_ptr ptr) = 0;
 
 public:
 	void* ToOverlapped() const noexcept;

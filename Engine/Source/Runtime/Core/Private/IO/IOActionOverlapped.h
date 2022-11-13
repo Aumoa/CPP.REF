@@ -15,9 +15,14 @@ public:
 	{
 	}
 
-	virtual bool Complete() override
+	virtual bool Complete(size_t) override
 	{
 		_work();
+		return true;
+	}
+
+	virtual bool Failed(std::exception_ptr) override
+	{
 		return true;
 	}
 };

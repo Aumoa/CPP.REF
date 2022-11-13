@@ -19,6 +19,8 @@ public:
 	String ReadAllText() const;
 	bool WriteAllText(String Text, uint32 Encoding = 0) const;
 
+	Task<String> ReadAllTextAsync(std::stop_token cancellationToken = {}) const;
+
 	inline constexpr FileReference& operator =(const FileReference&) = default;
 	inline constexpr FileReference& operator =(FileReference&&) = default;
 };

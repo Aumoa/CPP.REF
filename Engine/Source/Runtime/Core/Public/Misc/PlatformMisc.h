@@ -4,8 +4,11 @@
 
 #include "PrimitiveTypes.h"
 #include "StaticClass.h"
+#include "IO/FileAccessMode.h"
+#include "IO/FileSharedMode.h"
 #include <expected>
 #include <functional>
+#include <span>
 
 class String;
 class IOCompletionOverlapped;
@@ -54,6 +57,13 @@ public:
 	static void InitializeIOCompletionPort(size_t* iocp);
 	static void BindIOCompletionPort(size_t* iocp, void* nativeHandle);
 	static void DestroyIOCompletionPort(size_t& iocp) noexcept;
-	static IOCompletionOverlapped* GetQueuedCompletionStatus(size_t& iocp, uint32 timeout) noexcept;
-	static bool PostQueuedCompletionStatus(size_t& iocp, IOCompletionOverlapped* overlapped) noexcept;
+	static IOCompletionOverlapped* GetQueuedCompletionStatus(size_t& iocp, uint32 timeout, size_t* transferred) noexcept;
+	static bool PostQueuedCompletionStatus(size_t& iocp, IOCompletionOverlapped* overlapped, size_t resolved) noexcept;
+
+public:
+	static void CreateAsyncFile(size_t* handle, String filename, EFileAccessMode accessMode, EFileSharedMode sharedMode);
+	static void CloseAsyncFile(size_t handle) noexcept;
+	static void WriteAsyncFile(size_t handle, std::span<const uint8> buf, IOCompletionOverlapped* overlapped);
+	static void ReadAsyncFile(size_t handle, std::span<uint8> buf, IOCompletionOverlapped* overlapped);
+	static size_t GetAsyncFileSize(size_t handle);
 };

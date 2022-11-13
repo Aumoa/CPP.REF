@@ -14,5 +14,5 @@ SystemException::SystemException(int32 systemCode, String message) noexcept
 
 String SystemException::FormatMessage(int32 systemCode, String message) noexcept
 {
-	return String::Format(TEXT("{}({}: {})"), message, systemCode, PlatformMisc::FormatSystemCode(systemCode));
+	return String::Format(TEXT("{}({}: {})"), message, systemCode, PlatformMisc::FormatSystemCode(systemCode).Trim());
 }

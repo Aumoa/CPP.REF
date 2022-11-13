@@ -131,7 +131,7 @@ namespace libty::Details
 
 		template<class TAwaitableTask>
 		constexpr decltype(auto) await_transform(TAwaitableTask&& task) requires
-			ITask<TAwaitableTask>
+			ITask<std::remove_const_t<std::remove_reference_t<TAwaitableTask>>>
 		{
 			return WrapSharedAwaiter(task.GetAwaiter());
 		}

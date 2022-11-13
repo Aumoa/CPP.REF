@@ -269,13 +269,18 @@ void PlatformMisc::DestroyIOCompletionPort(size_t& iocp) noexcept
 {
 }
 
-IOCompletionOverlapped* PlatformMisc::GetQueuedCompletionStatus(size_t& iocp, uint32 timeout) noexcept
+IOCompletionOverlapped* PlatformMisc::GetQueuedCompletionStatus(size_t& iocp, uint32 timeout, size_t* pTransferred) noexcept
 {
 	HANDLE hIOCP = reinterpret_cast<HANDLE>(iocp);
 	DWORD transferred = 0;
 	ULONG_PTR key = 0;
 	OVERLAPPED* lpOverlapped = NULL;
 	BOOL status = ::GetQueuedCompletionStatus(hIOCP, &transferred, &key, &lpOverlapped, timeout);
+
+	if (pTransferred)
+	{
+		*pTransferred = (size_t)transferred;
+	}
 
 	if (lpOverlapped)
 	{
@@ -286,10 +291,80 @@ IOCompletionOverlapped* PlatformMisc::GetQueuedCompletionStatus(size_t& iocp, ui
 	return nullptr;
 }
 
-bool PlatformMisc::PostQueuedCompletionStatus(size_t& iocp, IOCompletionOverlapped* overlapped) noexcept
+bool PlatformMisc::PostQueuedCompletionStatus(size_t& iocp, IOCompletionOverlapped* overlapped, size_t resolved) noexcept
 {
 	HANDLE hIOCP = reinterpret_cast<HANDLE>(iocp);
-	return ::PostQueuedCompletionStatus(hIOCP, 0, (ULONG_PTR)overlapped, reinterpret_cast<LPOVERLAPPED>(overlapped->ToOverlapped())) == TRUE;
+	return ::PostQueuedCompletionStatus(hIOCP, (DWORD)resolved, (ULONG_PTR)overlapped, reinterpret_cast<LPOVERLAPPED>(overlapped->ToOverlapped())) == TRUE;
+}
+
+
+
+void PlatformMisc::CreateAsyncFile(size_t* handle, String filename, EFileAccessMode accessMode, EFileSharedMode sharedMode)
+{
+	HANDLE hFile = CreateFileW(filename.c_str(), (DWORD)accessMode, (DWORD)sharedMode, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		throw SystemException(GetLastError());
+	}
+
+	*handle = reinterpret_cast<size_t>(hFile);
+}
+
+void PlatformMisc::CloseAsyncFile(size_t handle) noexcept
+{
+	CloseHandle(reinterpret_cast<HANDLE>(handle));
+}
+
+void PlatformMisc::WriteAsyncFile(size_t handle, std::span<const uint8> buf, IOCompletionOverlapped* overlapped)
+{
+	HANDLE hFile = reinterpret_cast<HANDLE>(handle);
+	if (::WriteFile(hFile, buf.data(), (DWORD)buf.size_bytes(), NULL, reinterpret_cast<LPOVERLAPPED>(overlapped->ToOverlapped())) == FALSE)
+	{
+		DWORD err = GetLastError();
+		if (err != ERROR_IO_PENDING)
+		{
+			auto ptr = std::make_exception_ptr(SystemException(err));
+			if (overlapped->Failed(ptr))
+			{
+				delete overlapped;
+			}
+
+			std::rethrow_exception(ptr);
+		}
+	}
+}
+
+void PlatformMisc::ReadAsyncFile(size_t handle, std::span<uint8> buf, IOCompletionOverlapped* overlapped)
+{
+	HANDLE hFile = reinterpret_cast<HANDLE>(handle);
+	if (::ReadFile(hFile, buf.data(), (DWORD)buf.size_bytes(), NULL, reinterpret_cast<LPOVERLAPPED>(overlapped->ToOverlapped())) == FALSE)
+	{
+		DWORD err = GetLastError();
+		if (err != ERROR_IO_PENDING)
+		{
+			auto ptr = std::make_exception_ptr(SystemException(err));
+			if (overlapped->Failed(ptr))
+			{
+				delete overlapped;
+			}
+
+			std::rethrow_exception(ptr);
+		}
+	}
+}
+
+size_t PlatformMisc::GetAsyncFileSize(size_t handle)
+{
+	HANDLE hFile = reinterpret_cast<HANDLE>(handle);
+	DWORD dwSizeHigh = 0;
+	DWORD dwSize = ::GetFileSize(hFile, &dwSizeHigh);
+
+	if (dwSize == 0xFFFFFFFF)
+	{
+		throw SystemException(GetLastError());
+	}
+
+	return ((size_t)dwSizeHigh << 32) | (size_t)dwSize;
 }
 
 #endif

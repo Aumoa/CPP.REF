@@ -11,4 +11,7 @@ class CORE_API Console : public StaticClass
 public:
 	static void Write(String message);
 	static void WriteLine(String message);
+
+private:
+	static void _trap_init();
 };

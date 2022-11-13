@@ -4,7 +4,6 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
-#include "Exceptions/AssertException.h"
 #include <source_location>
 
 class CORE_API CoreAssert
