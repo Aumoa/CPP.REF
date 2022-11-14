@@ -466,7 +466,7 @@ public partial class VSGenerator : ISolutionGenerator
                             ClCompile.NewElement("PrecompiledHeader", "Use");
                             ClCompile.NewElement("PrecompiledHeaderFile", PCHHeader);
                         }
-                        else if (!(Config.Name == "DebugGame" && project.Rule.Category == ModuleCategory.Game))
+                        else if (!(Config.Name == "DebugGame" && project.Rule.Category == ModuleCategory.Game) && project.Rule.ProjectName != "Core")
                         {
                             string Path = _solution.EngineDirectory.Intermediate.FullPath;
 
@@ -474,8 +474,8 @@ public partial class VSGenerator : ISolutionGenerator
                             ClCompile.NewElement("PrecompiledHeader", "Use");
                             ClCompile.NewElement("PrecompiledHeaderFile", "CoreMinimal.h");
                             ClCompile.NewElement("PrecompiledHeaderOutputFile", Path + @"\$(Configuration)\Core\CoreMinimal.PCH");
-                            ClCompile.NewElement("ProgramDataBaseFileName", "$(IntDir)$(TargetName).pdb");
                         }
+                        ClCompile.NewElement("ProgramDataBaseFileName", "$(IntDir)$(TargetName).pdb");
                         ClCompile.NewElement("AdditionalOptions", "/bigobj %(AdditionalOptions)");
                         ClCompile.NewElement("RuntimeLibrary", Config.RuntimeLibrary + (_solution.Rule.StaticLibraries ? "" : "DLL"));
                         ClCompile.NewElement("ExceptionHandling", Config.ExceptionHandling);
@@ -511,7 +511,7 @@ public partial class VSGenerator : ISolutionGenerator
                         string Path = _solution.EngineDirectory.Intermediate.FullPath;
                         XmlElement CustomBuildStep = ItemDefinitionGroup.NewElement("CustomBuildStep");
 
-                        string SourceBase = Path + @"\$(Configuration)\Core\Core";
+                        string SourceBase = Path + @"\$(Configuration)\Core\CoreMinimal";
                         string TargetBase = "$(IntDir)$(TargetName)";
 
                         CustomBuildStep.NewElement("Command", 
@@ -548,6 +548,9 @@ public partial class VSGenerator : ISolutionGenerator
                         {
                             string Path = _solution.EngineDirectory.Intermediate.FullPath;
                             ClCompile.NewElement("PrecompiledHeader", "Create");
+                            ClCompile.NewElement("PrecompiledHeaderFile", "CoreMinimal.h");
+                            ClCompile.NewElement("PrecompiledHeaderOutputFile", Path + @"\$(Configuration)\Core\CoreMinimal.PCH");
+                            ClCompile.NewElement("ProgramDataBaseFileName", "$(IntDir)CoreMinimal.pdb");
                         }
                     }
                     else if (project.Rule.HeaderExtensions.Contains(Extension))
