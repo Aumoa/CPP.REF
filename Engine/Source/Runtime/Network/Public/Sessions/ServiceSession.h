@@ -3,32 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Threading/Thread.h"
-//#include "Net/Socket.h"
-//#include "ServiceSession.gen.h"
-//
-//class Socket;
-//
-//SCLASS()
-//class NETWORK_API ServiceSession : implements Object
-//{
-//	GENERATED_BODY()
-//
-//private:
-//	Socket _sock;
-//	Task<> _acceptor;
-//	std::stop_source _ss;
-//
-//public:
-//	ServiceSession();
-//	virtual ~ServiceSession() noexcept override;
-//
-//	void Start();
-//	void CloseSession() noexcept;
-//
-//	DECLARE_MULTICAST_EVENT(SocketConnectedEvent, Socket);
-//	SocketConnectedEvent SocketConnected;
-//
-//private:
-//	Task<> StartSocketAcceptor(std::stop_token cancellationToken);
-//};
+#include "Services/IHostedService.h"
+#include "Json/JsonUtility.h"
+
+class IServiceProvider;
+
+class ServiceSession : IHostedService
+{
+public:
+	struct Configuration
+	{
+		int32 ServicePort;
+		GENERATE_JSON_BODY(Configuration, ServicePort);
+	};
+
+public:
+	ServiceSession(IServiceProvider* sp);
+
+	virtual Task<> StartAsync(std::stop_token cancellationToken);
+	virtual Task<> StopAsync(std::stop_token cancellationToken);
+};

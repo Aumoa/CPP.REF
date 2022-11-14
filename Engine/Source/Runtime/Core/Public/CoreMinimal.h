@@ -135,3 +135,7 @@
 #include "Threading/Tasks/Task.h"
 #include "Threading/Tasks/TaskCompletionSource.h"
 #include "Threading/Tasks/TaskStatus.h"
+#include "Net/Socket.h"
+#include "Net/EndPoint.h"
+#include "Net/IPAddress.h"
+#include "Net/IPEndPoint.h"

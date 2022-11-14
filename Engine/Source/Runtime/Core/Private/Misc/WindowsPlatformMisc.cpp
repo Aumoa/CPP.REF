@@ -1,27 +1,14 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "WindowsPlatformMisc.h"
+
+#if PLATFORM_WINDOWS
+
 #include "Misc/PlatformMisc.h"
 #include "Misc/String.h"
 #include "Exceptions/SystemException.h"
 #include "Exceptions/ArgumentNullException.h"
 #include "IO/IOCompletionOverlapped.h"
-
-#if PLATFORM_WINDOWS
-
-#pragma push_macro("TEXT")
-#undef TEXT
-
-#pragma pack(push, 8)
-
-#include <Windows.h>
-#include <rpc.h>
-
-#undef YieldProcessor
-#undef OutputDebugString
-
-#pragma pack(pop)
-
-#pragma pop_macro("TEXT")
 
 void PlatformMisc::InitializeSpinlock(size_t& lock) noexcept
 {

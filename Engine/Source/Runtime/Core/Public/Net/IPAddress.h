@@ -2,11 +2,15 @@
 
 #pragma once
 
-#include <vector>
+#include "PrimitiveTypes.h"
+#include "Misc/String.h"
+#include <array>
+#include <span>
 
-class IPAddress
+class CORE_API IPAddress
 {
-	std::vector<uint8> _value;
+	std::array<uint8, 16> _value = {};
+	bool _v6 = false;
 
 public:
 	IPAddress() = default;
@@ -15,14 +19,14 @@ public:
 
 	IPAddress(uint8 v1, uint8 v2, uint8 v3, uint8 v4);
 	IPAddress(uint16 v1, uint16 v2, uint16 v3, uint16 v4, uint16 v5, uint16 v6, uint16 v7, uint16 v8);
+	IPAddress(String str);
 
 	String ToString() const;
-	bool IsV4() const;
+	bool IsV4() const noexcept;
+	std::span<const uint8> GetBytes() const noexcept;
 
 	static IPAddress Any(bool ipv6 = false);
 	static IPAddress Loopback(bool ipv6 = false);
 
-private:
-	String _ipv4_to_string() const;
-	String _ipv6_to_string() const;
+	static bool TryParse(String str, IPAddress* result) noexcept;
 };

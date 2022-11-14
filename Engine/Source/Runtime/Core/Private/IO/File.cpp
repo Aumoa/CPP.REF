@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/File.h"
+#include <filesystem>
 
 bool File::Exists(String path) noexcept
 {

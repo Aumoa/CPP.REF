@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IO/IOCompletionOverlapped.h"
+#include "Threading/Tasks/TaskCompletionSource.h"
 
 class IOFileOverlapped : public IOCompletionOverlapped
 {
