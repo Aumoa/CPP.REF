@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "Misc/NonCopyable.h"
 #include "Threading/Tasks/Task.h"
 
-class CORE_API Stream
+class CORE_API Stream : public NonCopyable
 {
 public:
 	Stream();

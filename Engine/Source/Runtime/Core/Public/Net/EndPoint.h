@@ -16,4 +16,5 @@ public:
 public:
 	virtual String ToString() const = 0;
 	virtual void ApplyTo(sockaddr_buf& buf) const = 0;
+	virtual size_t Size() const = 0;
 };

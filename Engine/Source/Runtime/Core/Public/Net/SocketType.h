@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-
 enum class ESocketType
 {
     Unknown = -1,

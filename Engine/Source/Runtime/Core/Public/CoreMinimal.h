@@ -142,3 +142,6 @@
 #include "Net/EndPoint.h"
 #include "Net/IPAddress.h"
 #include "Net/IPEndPoint.h"
+#include "Net/AddressFamily.h"
+#include "Net/ProtocolType.h"
+#include "Net/SocketType.h"

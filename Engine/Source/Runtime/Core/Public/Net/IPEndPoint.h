@@ -19,4 +19,5 @@ public:
 
 	virtual String ToString() const override;
 	virtual void ApplyTo(sockaddr_buf& buf) const override;
+	virtual size_t Size() const override;
 };

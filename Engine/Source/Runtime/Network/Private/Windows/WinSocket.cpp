@@ -4,7 +4,6 @@
 
 #include "WinSocket.h"
 #include "WindowsIOCP.h"
-#include "Net/SocketException.h"
 
 //WinSocket::WinSocket()
 //	: _overlaps(new WinOverlappedContainer())

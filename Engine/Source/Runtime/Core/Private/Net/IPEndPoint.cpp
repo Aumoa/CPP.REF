@@ -44,3 +44,8 @@ void IPEndPoint::ApplyTo(sockaddr_buf& buf) const
 		sin.sin6_scope_id = 0;
 	}
 }
+
+size_t IPEndPoint::Size() const
+{
+	return _addr.IsV4() ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
+}
