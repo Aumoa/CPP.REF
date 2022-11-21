@@ -40,7 +40,9 @@ public:
 
 public:
 	static void Debugbreak() noexcept;
-	static void YieldProcessor() noexcept;
+#if PLATFORM_WINDOWS
+	inline static void YieldProcessor() noexcept { _mm_pause(); }
+#endif
 	static void OutputDebugString(String message) noexcept;
 
 public:
@@ -51,19 +53,4 @@ public:
 public:
 	static std::wstring FromCodepage(std::string_view s, int32 codepage = 0) noexcept;
 	static std::string AsCodepage(std::wstring_view s, int32 codepage = 0) noexcept;
-
-public:
-	static consteval size_t IOOverlappedDefaultSize() noexcept { return 64; }
-	static void InitializeIOCompletionPort(size_t* iocp);
-	static void BindIOCompletionPort(size_t* iocp, void* nativeHandle);
-	static void DestroyIOCompletionPort(size_t& iocp) noexcept;
-	static IOCompletionOverlapped* GetQueuedCompletionStatus(size_t& iocp, uint32 timeout, size_t* transferred) noexcept;
-	static bool PostQueuedCompletionStatus(size_t& iocp, IOCompletionOverlapped* overlapped, size_t resolved) noexcept;
-
-public:
-	static void CreateAsyncFile(size_t* handle, String filename, EFileAccessMode accessMode, EFileSharedMode sharedMode);
-	static void CloseAsyncFile(size_t handle) noexcept;
-	static void WriteAsyncFile(size_t handle, std::span<const uint8> buf, IOCompletionOverlapped* overlapped);
-	static void ReadAsyncFile(size_t handle, std::span<uint8> buf, IOCompletionOverlapped* overlapped);
-	static size_t GetAsyncFileSize(size_t handle);
 };

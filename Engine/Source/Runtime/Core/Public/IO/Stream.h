@@ -17,4 +17,5 @@ public:
 	virtual Task<> WriteAsync(std::span<const uint8> bytes, std::stop_token cancellationToken = {}) = 0;
 	virtual size_t Read(std::span<uint8> bytes) = 0;
 	virtual Task<size_t> ReadAsync(std::span<uint8> bytes, std::stop_token cancellationToken = {}) = 0;
+	virtual size_t GetLength() = 0;
 };

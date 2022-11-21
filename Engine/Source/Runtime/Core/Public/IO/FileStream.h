@@ -22,4 +22,5 @@ public:
 	virtual Task<> WriteAsync(std::span<const uint8> bytes, std::stop_token cancellationToken = {}) override;
 	virtual size_t Read(std::span<uint8> bytes) override;
 	virtual Task<size_t> ReadAsync(std::span<uint8> bytes, std::stop_token cancellationToken = {}) override;
+	virtual size_t GetLength() override;
 };

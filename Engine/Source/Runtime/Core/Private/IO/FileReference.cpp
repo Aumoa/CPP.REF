@@ -2,7 +2,7 @@
 
 #include "IO/FileReference.h"
 #include "IO/DirectoryReference.h"
-#include "IO/IOFileOverlapped.h"
+#include "IO/FileStream.h"
 #include "Misc/String.h"
 #include <bit>
 #include <fstream>
@@ -138,18 +138,12 @@ bool FileReference::WriteAllText(String Text, uint32 Encoding) const
 
 Task<String> FileReference::ReadAllTextAsync(std::stop_token cancellationToken) const
 {
-	size_t file = 0;
-	PlatformMisc::CreateAsyncFile(&file, GetPath(), EFileAccessMode::Read, EFileSharedMode::None);
-	ThreadPool::BindHandle(reinterpret_cast<void*>(file));
+	FileStream fs(GetPath(), EFileAccessMode::Read, EFileSharedMode::None, EFileMode::Open);
+	size_t length = fs.GetLength();
 
-	auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
-	Task<size_t> task = tcs.GetTask();
-
-	auto* ovp = new IOFileOverlapped(std::move(tcs));
-	std::vector<uint8> buf(PlatformMisc::GetAsyncFileSize(file));
-
-	PlatformMisc::ReadAsyncFile(file, buf, ovp);
-	size_t reads = co_await task;
+	std::vector<uint8> buf;
+	size_t reads = co_await fs.ReadAsync(buf, cancellationToken);
+	check(length == reads);
 
 	co_return String::FromCodepage(std::string_view(reinterpret_cast<const char*>(buf.data()), reads));
 }

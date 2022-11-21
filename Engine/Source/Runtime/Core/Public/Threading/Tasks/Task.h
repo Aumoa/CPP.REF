@@ -82,6 +82,11 @@ public:
 	{
 		return _awaiter->GetException();
 	}
+
+	inline void AddStopCallback(std::stop_token cancellationToken, std::function<void()> callback)
+	{
+		_awaiter->AddStopCallback(std::move(cancellationToken), std::move(callback));
+	}
 	
 	template<class TBody>
 	auto ContinueWith(TBody&& body, std::stop_token sToken = {}) const -> Task<std::invoke_result_t<TBody, Task>>

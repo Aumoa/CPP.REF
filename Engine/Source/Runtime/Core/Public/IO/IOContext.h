@@ -11,8 +11,9 @@ class CORE_API IOContext
 	IOContext(const IOContext&) = delete;
 
 private:
-	size_t _iocp = 0;
-	std::atomic<bool> _running = true;
+	class _iocp_impl;
+
+	std::unique_ptr<_iocp_impl> _impl;
 	std::atomic<size_t> _workers = 0;
 
 public:
@@ -26,5 +27,5 @@ public:
 	void Stop();
 
 	void BindHandle(void* nativeHandle);
-	bool Post(std::function<void()> work);
+	bool Post(std::function<void(size_t, int32)> work);
 };

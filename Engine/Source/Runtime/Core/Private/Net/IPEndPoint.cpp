@@ -49,3 +49,32 @@ size_t IPEndPoint::Size() const
 {
 	return _addr.IsV4() ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
 }
+
+std::unique_ptr<EndPoint> IPEndPoint::Clone() const
+{
+	return std::make_unique<IPEndPoint>(*this);
+}
+
+std::unique_ptr<EndPoint> IPEndPoint::Accept(const EndPoint::sockaddr_buf& ep) const
+{
+	auto ptr = std::make_unique<IPEndPoint>();
+	ptr->Accept(ep);
+	return ptr;
+}
+
+void IPEndPoint::Accept(const EndPoint::sockaddr_buf& ep)
+{
+	_addr._v6 = reinterpret_cast<const sockaddr_in&>(ep).sin_family == AF_INET6;
+	if (_addr._v6 == false)
+	{
+		auto& sin = reinterpret_cast<const sockaddr_in&>(ep);
+		memcpy(_addr._value.data(), &sin.sin_addr, sizeof(uint8) * 4);
+		_port = sin.sin_port;
+	}
+	else
+	{
+		auto& sin = reinterpret_cast<const sockaddr_in6&>(ep);
+		memcpy(_addr._value.data(), &sin.sin6_addr, sizeof(uint16) * 8);
+		_port = sin.sin6_port;
+	}
+}

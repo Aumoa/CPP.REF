@@ -7,7 +7,8 @@
 #include "Net/AddressFamily.h"
 #include "Net/SocketType.h"
 #include "Net/ProtocolType.h"
-#include "Net/EndPoint.h"
+#include "Net/IPEndPoint.h"
+#include "Threading/Tasks/Task.h"
 
 class CORE_API Socket : public NonCopyable
 {
@@ -15,7 +16,8 @@ class CORE_API Socket : public NonCopyable
 	static constexpr int32 SOCKET_ERROR = -1;
 
 	size_t _socket = INVALID_SOCKET;
-	std::optional<EndPoint::sockaddr_buf> _ep;
+	IPEndPoint _local;
+	IPEndPoint _remote;
 
 public:
 	Socket(EAddressFamily af, ESocketType st, EProtocolType pt);
@@ -24,6 +26,12 @@ public:
 	void Close() noexcept;
 	void Listen(int32 backlog = 0);
 	void Bind(const EndPoint& ep);
+	Task<> AcceptAsync(Socket& sock, std::stop_token cancellationToken = {});
+	Task<> ConnectAsync(const EndPoint& ep, std::stop_token cancellationToken = {});
+	Task<size_t> ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_token cancellationToken = {});
+
+	inline const IPEndPoint& GetLocalEndPoint() const { return _local; }
+	inline const IPEndPoint& GetRemoteEndPoint() const { return _remote; }
 
 private:
 	static void _trap_init();

@@ -3,6 +3,8 @@
 #include "Net/Socket.h"
 #include "Exceptions/SocketException.h"
 #include "Threading/ThreadPool.h"
+#include "Threading/Tasks/TaskCompletionSource.h"
+#include "IO/IOCompletionOverlapped.h"
 
 #if PLATFORM_WINDOWS
 #include "Misc/WindowsPlatformMisc.h"
@@ -50,13 +52,186 @@ void Socket::Listen(int32 backlog)
 
 void Socket::Bind(const EndPoint& ep)
 {
-	auto& buf = _ep.emplace();
+	EndPoint::sockaddr_buf buf;
 	ep.ApplyTo(buf);
+	_local.Accept(buf);
+	_remote.Accept(buf);
 
 	if (bind(_socket, (const sockaddr*)&buf, (int)ep.Size()) == SOCKET_ERROR)
 	{
 		_throw_error();
 	}
+}
+
+Task<> Socket::AcceptAsync(Socket& sock, std::stop_token cancellationToken)
+{
+#if PLATFORM_WINDOWS
+	static LPFN_ACCEPTEX WSAAcceptEx = [this]()
+	{
+		GUID id = WSAID_ACCEPTEX;
+		DWORD bytesReturned = 0;
+		LPFN_ACCEPTEX fn = nullptr;
+		if (WSAIoctl(_socket, SIO_GET_EXTENSION_FUNCTION_POINTER, &id, sizeof(id), &fn, sizeof(fn), &bytesReturned, nullptr, nullptr) == SOCKET_ERROR)
+		{
+			throw SocketException(WSAGetLastError());
+		}
+
+		return fn;
+	}();
+
+	static LPFN_GETACCEPTEXSOCKADDRS WSAGetAcceptExSockaddrs = [this]()
+	{
+		GUID id = WSAID_GETACCEPTEXSOCKADDRS;
+		DWORD bytesReturned = 0;
+		LPFN_GETACCEPTEXSOCKADDRS fn = nullptr;
+		if (WSAIoctl(_socket, SIO_GET_EXTENSION_FUNCTION_POINTER, &id, sizeof(id), &fn, sizeof(fn), &bytesReturned, nullptr, nullptr) == SOCKET_ERROR)
+		{
+			throw SocketException(WSAGetLastError());
+		}
+
+		return fn;
+	}();
+
+	struct buf
+	{
+		EndPoint::sockaddr_buf sLocalBuf;
+		EndPoint::sockaddr_buf sRemoteBuf;
+	};
+
+	auto tcs = TaskCompletionSource<>::Create();
+	auto* ptr = new IOCompletionOverlapped([tcs](size_t, int32 error) mutable
+	{
+		if (error)
+		{
+			tcs.SetException(SocketException(error));
+		}
+		else
+		{
+			tcs.SetResult();
+		}
+	});
+
+	auto* overlapped = (LPOVERLAPPED)ptr->ToOverlapped();
+	buf b = {};
+
+	DWORD recv;
+	if (WSAAcceptEx(_socket, sock._socket, &b, 0, sizeof(b.sLocalBuf), sizeof(b.sRemoteBuf), &recv, overlapped) == FALSE)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			ptr->Failed(err);
+			delete ptr;
+		}
+
+		co_await tcs.GetTask();
+	}
+
+	sockaddr* localEp, *remoteEp;
+	INT localEpSz, remoteEpSz;
+	WSAGetAcceptExSockaddrs(&b, 0, sizeof(b.sLocalBuf), sizeof(b.sRemoteBuf), &localEp, &localEpSz, &remoteEp, &remoteEpSz);
+
+	sock._local.Accept(b.sLocalBuf);
+	sock._remote.Accept(b.sRemoteBuf);
+#endif
+}
+
+Task<> Socket::ConnectAsync(const EndPoint& ep, std::stop_token cancellationToken)
+{
+	ThreadPool::BindHandle((void*)_socket);
+
+	EndPoint::sockaddr_buf sBuf;
+	ep.ApplyTo(sBuf);
+
+#if PLATFORM_WINDOWS
+	static LPFN_CONNECTEX WSAConnectEx = [this]()
+	{
+		GUID id = WSAID_CONNECTEX;
+		DWORD bytesReturned = 0;
+		LPFN_CONNECTEX fn = nullptr;
+		if (WSAIoctl(_socket, SIO_GET_EXTENSION_FUNCTION_POINTER, &id, sizeof(id), &fn, sizeof(fn), &bytesReturned, nullptr, nullptr) == SOCKET_ERROR)
+		{
+			throw SocketException(WSAGetLastError());
+		}
+
+		return fn;
+	}();
+
+	auto tcs = TaskCompletionSource<>::Create();
+	auto* ptr = new IOCompletionOverlapped([tcs](size_t, int32 error) mutable
+	{
+		if (error)
+		{
+			tcs.SetException(SocketException(error));
+		}
+		else
+		{
+			tcs.SetResult();
+		}
+	});
+
+	if (WSAConnectEx(_socket, reinterpret_cast<const sockaddr*>(&sBuf), (int)ep.Size(), NULL, 0, NULL, reinterpret_cast<LPOVERLAPPED>(ptr->ToOverlapped())) == FALSE)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			ptr->Failed(err);
+			delete ptr;
+		}
+
+		co_await tcs.GetTask();
+	}
+#endif
+
+	_remote.Accept(sBuf);
+}
+
+Task<size_t> Socket::ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_token cancellationToken)
+{
+#if PLATFORM_WINDOWS
+	size_t reads = 0;
+	while (bytesToReceive.size() - reads > 0)
+	{
+		DWORD cur;
+		DWORD flags = 0;
+		auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
+		auto* ptr = new IOCompletionOverlapped([tcs](size_t resolved, int32 error) mutable
+		{
+			if (error)
+			{
+				tcs.SetException(SocketException(error));
+			}
+			else
+			{
+				tcs.SetResult(resolved);
+			}
+		});
+
+		WSABUF wbuf;
+		wbuf.buf = reinterpret_cast<CHAR*>(bytesToReceive.data() + reads);
+		wbuf.len = static_cast<DWORD>(bytesToReceive.size_bytes() - reads);
+		int r = WSARecv(_socket, &wbuf, 1, &cur, &flags, reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
+		if (r == -1)
+		{
+			if (int err = WSAGetLastError(); err != WSA_IO_PENDING)
+			{
+				ptr->Failed(err);
+				delete ptr;
+			}
+
+			r = (int)co_await tcs.GetTask();
+		}
+
+		if (r == 0)
+		{
+			break;
+		}
+
+		reads += (size_t)r;
+	}
+
+	co_return reads;
+#endif
 }
 
 void Socket::_trap_init()
@@ -76,6 +251,16 @@ void Socket::_trap_init()
 
 		return 0;
 	}();
+
+	static struct _trap_shutdown
+	{
+		~_trap_shutdown() noexcept
+		{
+#if PLATFORM_WINDOWS
+			WSACleanup();
+#endif
+		}
+	} _ts;
 }
 
 [[noreturn]] void Socket::_throw_error()

@@ -9,6 +9,8 @@
 
 class CORE_API IPAddress
 {
+	friend class IPEndPoint;
+
 	std::array<uint8, 16> _value = {};
 	bool _v6 = false;
 

@@ -3,24 +3,16 @@
 #include "IO/IOCompletionOverlapped.h"
 #include "Misc/PlatformMisc.h"
 
-IOCompletionOverlapped::IOCompletionOverlapped()
+IOCompletionOverlapped::IOCompletionOverlapped(std::function<void(size_t, int32)> work)
 	: _pad{}
 	, _ptr(this)
+	, _work(std::move(work))
 {
-}
-
-IOCompletionOverlapped::~IOCompletionOverlapped() noexcept
-{
-}
-
-void* IOCompletionOverlapped::ToOverlapped() const noexcept
-{
-	return const_cast<uint8*>(_pad + 0);
 }
 
 IOCompletionOverlapped* IOCompletionOverlapped::FromOverlapped(void* overlapped) noexcept
 {
 	uint8* pad = reinterpret_cast<uint8*>(overlapped);
-	auto* block = reinterpret_cast<IOCompletionOverlapped**>(pad + PlatformMisc::IOOverlappedDefaultSize());
+	auto* block = reinterpret_cast<IOCompletionOverlapped**>(pad + OverlapDefaultPaddingSize);
 	return *block;
 }

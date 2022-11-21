@@ -13,6 +13,7 @@
 #include <rpc.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <MSWSock.h>
 
 #undef YieldProcessor
 #undef OutputDebugString

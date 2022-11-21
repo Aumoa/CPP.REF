@@ -21,13 +21,13 @@ void ThreadPool::BindHandle(void* nativeHandle)
 void ThreadPool::QueueUserWorkItem(Work_t work)
 {
 	static int trap = (_trap_init(), 0);
-	sContext.Post(std::move(work));
+	sContext.Post([work](size_t, int32) { work(); });
 }
 
 void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds dur, Work_t work)
 {
 	static int trap = (_trap_init(), 0);
-	sScheduledContext.Post(dur, std::move(work));
+	sScheduledContext.Post(dur, [work](size_t, int32) { work(); });
 }
 
 void ThreadPool::_trap_init()

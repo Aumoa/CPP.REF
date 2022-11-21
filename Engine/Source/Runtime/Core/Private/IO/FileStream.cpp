@@ -1,9 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/FileStream.h"
-#include "IO/IOFileOverlapped.h"
+#include "IO/IOCompletionOverlapped.h"
 #include "Exceptions/SystemException.h"
 #include "Threading/ThreadPool.h"
+#include "Threading/Tasks/TaskCompletionSource.h"
 
 #if PLATFORM_WINDOWS
 #include "Misc/WindowsPlatformMisc.h"
@@ -63,19 +64,27 @@ Task<> FileStream::WriteAsync(std::span<const uint8> bytes, std::stop_token canc
 {
 #if PLATFORM_WINDOWS
 	auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
-	auto* ptr = new IOFileOverlapped(tcs);
+	auto* ptr = new IOCompletionOverlapped([tcs](size_t written, int32 error) mutable
+	{
+		if (error)
+		{
+			tcs.SetException(SystemException(error));
+		}
+		else
+		{
+			tcs.SetResult(written);
+		}
+	});
+
 	if (::WriteFile(_handle, bytes.data(), (DWORD)bytes.size_bytes(), NULL, (LPOVERLAPPED)ptr->ToOverlapped()) == FALSE)
 	{
 		if (DWORD err = GetLastError(); err != ERROR_IO_PENDING)
 		{
-			auto e = std::make_exception_ptr(SystemException(err));
-			if (ptr->Failed(e))
-			{
-				delete ptr;
-			}
-			std::rethrow_exception(e);
+			ptr->Failed(err);
+			delete ptr;
 		}
 	}
+
 	return tcs.GetTask();
 #endif
 }
@@ -89,19 +98,36 @@ Task<size_t> FileStream::ReadAsync(std::span<uint8> bytes, std::stop_token cance
 {
 #if PLATFORM_WINDOWS
 	auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
-	auto* ptr = new IOFileOverlapped(tcs);
+	auto* ptr = new IOCompletionOverlapped([tcs](size_t read, int32 error) mutable
+		{
+		if (error)
+		{
+			tcs.SetException(SystemException(error));
+		}
+		else
+		{
+			tcs.SetResult(read);
+		}
+	});
+
 	if (::ReadFile(_handle, bytes.data(), (DWORD)bytes.size_bytes(), NULL, (LPOVERLAPPED)ptr->ToOverlapped()) == FALSE)
 	{
 		if (DWORD err = GetLastError(); err != ERROR_IO_PENDING)
 		{
-			auto e = std::make_exception_ptr(SystemException(err));
-			if (ptr->Failed(e))
-			{
-				delete ptr;
-			}
-			std::rethrow_exception(e);
+			ptr->Failed(err);
+			delete ptr;
 		}
 	}
+
 	return tcs.GetTask();
+#endif
+}
+
+size_t FileStream::GetLength()
+{
+#if PLATFORM_WINDOWS
+	DWORD high = 0;
+	DWORD low = GetFileSize(_handle, &high);
+	return (size_t)low | (size_t)high << 32;
 #endif
 }

@@ -20,6 +20,7 @@ class Awaiter : public AwaiterBase
 {
 	template<class U>
 	friend class Awaiter;
+	using TCallback = std::stop_callback<std::function<void()>>;
 
 	Spinlock _lock;
 	SpinlockConditionVariable _future;
@@ -29,7 +30,7 @@ class Awaiter : public AwaiterBase
 	std::exception_ptr _exception;
 
 	std::vector<std::function<void(std::shared_ptr<AwaiterBase>)>> _thens;
-	std::vector<std::unique_ptr<std::stop_callback<std::function<void()>>>> _stop_tokens;
+	std::vector<std::unique_ptr<TCallback>> _stop_tokens;
 	std::vector<std::function<bool()>> _validators;
 
 public:
@@ -209,6 +210,12 @@ public:
 		return IsCancellationRequested();
 	}
 
+	virtual void AddStopCallback(std::stop_token cancellationToken, std::function<void()> callback) override
+	{
+		auto lock = std::unique_lock(_lock);
+		_stop_tokens.emplace_back(std::make_unique<TCallback>(std::move(cancellationToken), std::move(callback)));
+	}
+
 	virtual bool IsCancellationRequested() const noexcept override
 	{
 		if (IsCanceled())
@@ -289,7 +296,7 @@ private:
 			lock.unlock();
 		}
 
-		ptr = std::make_unique<std::stop_callback<std::function<void()>>>(
+		ptr = std::make_unique<TCallback>(
 			sToken,
 			[this] { this->Cancel(); }
 		);

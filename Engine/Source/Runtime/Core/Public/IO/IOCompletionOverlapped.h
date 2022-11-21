@@ -9,17 +9,20 @@
 
 class CORE_API IOCompletionOverlapped
 {
-	uint8 _pad[PlatformMisc::IOOverlappedDefaultSize()];
+	static constexpr size_t OverlapDefaultPaddingSize = 64;
+
+	uint8 _pad[OverlapDefaultPaddingSize];
 	IOCompletionOverlapped* _ptr;
+	std::function<void(size_t, int32)> _work;
 
 public:
-	IOCompletionOverlapped();
-	virtual ~IOCompletionOverlapped() noexcept;
+	IOCompletionOverlapped(std::function<void(size_t, int32)> work);
+	~IOCompletionOverlapped() noexcept = default;
 
-	virtual bool Complete(size_t resolved) = 0;
-	virtual bool Failed(std::exception_ptr ptr) = 0;
+	inline void Complete(size_t resolved) { _work(resolved, 0); }
+	inline void Failed(int32 systemCode) { _work(0, systemCode); }
 
 public:
-	void* ToOverlapped() const noexcept;
+	inline void* ToOverlapped() const noexcept { return const_cast<uint8*>(_pad + 0); }
 	static IOCompletionOverlapped* FromOverlapped(void* overlapped) noexcept;
 };

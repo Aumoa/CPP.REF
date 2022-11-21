@@ -78,7 +78,7 @@ void ScheduledIOContext::Stop(IOContext& io)
 	_works.clear();
 }
 
-bool ScheduledIOContext::Post(std::chrono::nanoseconds dur, std::function<void()> work)
+bool ScheduledIOContext::Post(std::chrono::nanoseconds dur, _work_t work)
 {
 	if (_running == false)
 	{

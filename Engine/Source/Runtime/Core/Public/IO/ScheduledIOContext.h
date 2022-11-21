@@ -18,7 +18,7 @@ class CORE_API ScheduledIOContext
 
 private:
 	using _clock = std::chrono::steady_clock;
-	using _work_t = std::function<void()>;
+	using _work_t = std::function<void(size_t, int32)>;
 
 	Spinlock _lock;
 	SpinlockConditionVariable _cv;
@@ -32,5 +32,5 @@ public:
 	size_t Run(IOContext& io);
 	void Stop(IOContext& io);
 
-	bool Post(std::chrono::nanoseconds dur, std::function<void()> work);
+	bool Post(std::chrono::nanoseconds dur, _work_t work);
 };

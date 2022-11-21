@@ -28,6 +28,7 @@
 #include "Exceptions/TargetInvocationException.h"
 #include "Exceptions/TaskAbortedException.h"
 #include "Exceptions/TaskCanceledException.h"
+#include "Exceptions/SocketException.h"
 #include "Generic/IArray.h"
 #include "Generic/IComparable.h"
 #include "Generic/IDictionary.h"

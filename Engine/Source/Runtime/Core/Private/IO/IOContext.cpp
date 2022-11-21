@@ -1,18 +1,18 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/IOContext.h"
-#include "IO/IOSignalOverlapped.h"
-#include "IO/IOActionOverlapped.h"
+#include "IO/IOCompletionOverlapped.h"
 #include "Misc/PlatformMisc.h"
+#include "Exceptions/SystemException.h"
+#include "_win_iocp_impl.h"
 
 IOContext::IOContext()
+	: _impl(std::make_unique<_iocp_impl>())
 {
-	PlatformMisc::InitializeIOCompletionPort(&_iocp);
 }
 
 IOContext::~IOContext() noexcept
 {
-	PlatformMisc::DestroyIOCompletionPort(_iocp);
 }
 
 size_t IOContext::Poll()
@@ -27,27 +27,19 @@ size_t IOContext::Poll()
 
 size_t IOContext::PollOne()
 {
-	if (_running == false)
+	if (_impl)
+	{
+		return _impl->poll_one() ? 1 : 0;
+	}
+	else
 	{
 		return 0;
 	}
-
-	size_t transf = 0;
-	if (IOCompletionOverlapped* overlap = PlatformMisc::GetQueuedCompletionStatus(_iocp, 0, &transf))
-	{
-		if (overlap->Complete(transf))
-		{
-			delete overlap;
-		}
-		
-		return 1;
-	}
-	return 0;
 }
 
 size_t IOContext::Run()
 {
-	if (_running == false)
+	if (_impl == nullptr)
 	{
 		return 0;
 	}
@@ -55,19 +47,9 @@ size_t IOContext::Run()
 	size_t cnt = 0;
 	++_workers;
 
-	while (_running)
+	while (_impl)
 	{
-		size_t transf = 0;
-		IOCompletionOverlapped* overlap = PlatformMisc::GetQueuedCompletionStatus(_iocp, 0xFFFFFFFF, &transf);
-		if (overlap)
-		{
-			if (overlap->Complete(transf))
-			{
-				delete overlap;
-			}
-
-			++cnt;
-		}
+		cnt += _impl->poll_one();
 	}
 
 	--_workers;
@@ -76,11 +58,10 @@ size_t IOContext::Run()
 
 void IOContext::Stop()
 {
-	_running = false;
 	size_t workers = _workers;
 	for (size_t i = 0; i < workers; ++i)
 	{
-		PlatformMisc::PostQueuedCompletionStatus(_iocp, new IOSignalOverlapped(0), 0);
+		_impl->post([this](size_t, int32) { --_workers; });
 	}
 
 	while (_workers)
@@ -92,19 +73,20 @@ void IOContext::Stop()
 	}
 
 	Poll();
+	_impl.reset();
 }
 
 void IOContext::BindHandle(void* nativeHandle)
 {
-	PlatformMisc::BindIOCompletionPort(&_iocp, nativeHandle);
+	_impl->bind_handle(nativeHandle);
 }
 
-bool IOContext::Post(std::function<void()> work)
+bool IOContext::Post(std::function<void(size_t, int32)> work)
 {
-	if (_running == false)
+	if (_impl)
 	{
-		return false;
+		_impl->post(std::move(work));
+		return true;
 	}
-
-	return PlatformMisc::PostQueuedCompletionStatus(_iocp, new IOActionOverlapped(std::move(work)), 0);
+	return false;
 }

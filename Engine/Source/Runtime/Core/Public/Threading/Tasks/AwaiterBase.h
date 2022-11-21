@@ -8,6 +8,7 @@
 #include "DateTime.h"
 #include "Exceptions/InvalidOperationException.h"
 #include <memory>
+#include <any>
 
 class AwaiterBase : public std::enable_shared_from_this<AwaiterBase>
 {
@@ -65,6 +66,7 @@ public:
 
 	virtual suspend_and_destroy_if AddCancellationToken(std::stop_token sToken) = 0;
 	virtual suspend_and_destroy_if AddConditionVariable(std::function<bool()> condition) = 0;
+	virtual void AddStopCallback(std::stop_token cancellationToken, std::function<void()> callback) = 0;
 	virtual bool IsCancellationRequested() const noexcept = 0;
 
 	inline bool IsCompleted() const noexcept
