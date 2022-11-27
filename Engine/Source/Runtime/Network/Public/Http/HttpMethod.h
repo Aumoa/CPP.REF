@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HttpMethod.gen.h"
 
-SENUM()
 enum class EHttpMethod
 {
 	Get,

@@ -4,14 +4,15 @@ using System;
 
 using BuildTool;
 
-public class amqpcppRule : ModuleRule
+public class jsonRule : ModuleRule
 {
-    public amqpcppRule()
+    public jsonRule()
     {
         Category = ModuleCategory.ThirdParty;
         FilterPath = "ThirdParty";
         ModuleType = ModuleType.None;
 
         PublicIncludePaths.Add("include");
+        PrivateIncludePaths.Add("src");
     }
 }

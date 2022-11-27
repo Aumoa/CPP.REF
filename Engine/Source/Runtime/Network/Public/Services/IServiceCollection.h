@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IHostedService.h"
+#include "IConfiguration.h"
 #include <any>
 
 class IServiceProvider;
@@ -24,6 +25,12 @@ public:
 	void Configure(const T& value)
 	{
 		Configure(typeid(T), value);
+	}
+
+	template<class T>
+	void Configure(const std::shared_ptr<IConfiguration>& configuration)
+	{
+		Configure<T>(configuration->GetValue());
 	}
 
 	template<class T, class U = T>

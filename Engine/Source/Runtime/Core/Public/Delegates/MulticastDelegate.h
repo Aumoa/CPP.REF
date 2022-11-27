@@ -67,7 +67,7 @@ public:
 		std::vector<DelegateInstance> invokes;
 
 		{
-			auto lock = std::unique_lock<Spinlock>(_lock, Spinlock::Readonly);
+			auto lock = std::unique_lock(_lock.AsReadonly());
 			invokes.reserve(_payload.size());
 			for (auto& instance : _payload)
 			{

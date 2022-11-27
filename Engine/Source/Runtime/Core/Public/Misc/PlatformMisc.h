@@ -47,8 +47,9 @@ public:
 
 public:
 	static void UuidCreate(void* block128) noexcept;
-	static String FormatSystemCode(int32 systemCode) noexcept;
+	static String FormatSystemCode(int32 systemCode);
 	static int32 GetLastError() noexcept;
+	static String GetSystemPath();
 
 public:
 	static std::wstring FromCodepage(std::string_view s, int32 codepage = 0) noexcept;

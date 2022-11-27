@@ -32,7 +32,6 @@ private:
 public:
 	Task() = default;
 	Task(const Task&) = default;
-	Task(Task&&) = default;
 
 	template<class T>
 	explicit Task(std::shared_ptr<T> awaiter) requires
@@ -53,6 +52,11 @@ public:
 
 	explicit Task(const Task<>& task) requires !std::same_as<T, void>
 		: Task(task.GetAwaiter())
+	{
+	}
+
+	Task(Task&& task)
+		: _awaiter(std::move(task._awaiter))
 	{
 	}
 

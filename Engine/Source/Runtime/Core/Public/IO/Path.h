@@ -9,6 +9,7 @@ class String;
 class CORE_API Path : public StaticClass
 {
 public:
+	static String GetFileName(const String& path);
 	static String GetFileNameWithoutExtension(const String& path);
 	static bool HasExtension(const String& path);
 	static String ChangeExtension(const String& path, const String& extension);

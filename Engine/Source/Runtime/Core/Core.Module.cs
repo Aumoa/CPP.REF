@@ -12,6 +12,7 @@ public class CoreRule : ModuleRule
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
+        SupportsVcpkg = false;
 
         PublicDisableWarnings.AddRange(new[]
         {
@@ -34,7 +35,8 @@ public class CoreRule : ModuleRule
                 "psapi.lib",
                 "dbghelp.lib",
                 "User32.lib",
-                "Rpcrt4.lib"
+                "Rpcrt4.lib",
+                "ws2_32.lib"
             });
 
             PublicDisableWarnings.AddRange(new[]

@@ -12,29 +12,16 @@ public class NetworkRule : ModuleRule
 
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
+        SupportsVcpkg = false;
 
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core"
         });
 
-        PublicVcpkgModules.AddRange(new[]
+        PrivateDependencyModuleNames.AddRange(new[]
         {
-            "nlohmann-json"
+            "json"
         });
-
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-        {
-            PrivateAdditionalMacros.AddRange(new[]
-            {
-                "NOMINMAX",
-                "WIN32_LEAN_AND_MEAN"
-            });
-
-            PublicAdditionalLibraries.AddRange(new[]
-            {
-                "ws2_32.lib"
-            });
-        }
     }
 }

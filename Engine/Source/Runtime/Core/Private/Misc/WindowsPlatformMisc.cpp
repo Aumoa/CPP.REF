@@ -152,7 +152,7 @@ void PlatformMisc::UuidCreate(void* block128) noexcept
 	}
 }
 
-String PlatformMisc::FormatSystemCode(int32 systemCode) noexcept
+String PlatformMisc::FormatSystemCode(int32 systemCode)
 {
 	static thread_local WCHAR buf[1024] = {};
 	DWORD len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)systemCode, 0, buf, 1024, NULL);
@@ -167,6 +167,13 @@ String PlatformMisc::FormatSystemCode(int32 systemCode) noexcept
 int32 PlatformMisc::GetLastError() noexcept
 {
 	return (int32)::GetLastError();
+}
+
+String PlatformMisc::GetSystemPath()
+{
+	static thread_local WCHAR buf[1024] = {};
+	::GetSystemDirectoryW(buf, 1024);
+	return String(buf);
 }
 
 

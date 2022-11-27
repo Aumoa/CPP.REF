@@ -24,4 +24,6 @@ public:
 	virtual std::unique_ptr<EndPoint> Accept(const EndPoint::sockaddr_buf& ep) const override;
 
 	void Accept(const EndPoint::sockaddr_buf& ep);
+
+	static IPEndPoint Any();
 };

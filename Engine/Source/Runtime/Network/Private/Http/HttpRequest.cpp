@@ -83,7 +83,6 @@ std::string HttpRequest::Compose()
 }
 
 Task<HttpResponse> HttpRequest::SendAsync()
-{/*
-	return HttpClient::GetSingleton().SendAsync(*this);*/
-	throw;
+{
+	return HttpClient::GetSingleton().SendAsync(*this);
 }

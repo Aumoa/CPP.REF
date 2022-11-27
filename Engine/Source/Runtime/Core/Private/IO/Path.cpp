@@ -4,6 +4,11 @@
 #include "Misc/String.h"
 #include <filesystem>
 
+String Path::GetFileName(const String& path)
+{
+	return String(std::filesystem::path((std::wstring_view)path).filename().wstring());
+}
+
 String Path::GetFileNameWithoutExtension(const String& path)
 {
 	return String(std::filesystem::path((std::wstring_view)path).stem().wstring());

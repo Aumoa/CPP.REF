@@ -31,4 +31,9 @@ public:
 	static IPAddress Loopback(bool ipv6 = false);
 
 	static bool TryParse(String str, IPAddress* result) noexcept;
+
+	inline bool operator ==(const IPAddress&) const noexcept = default;
+	inline auto operator <=>(const IPAddress&) const noexcept = default;
+
+	inline IPAddress& operator =(const IPAddress&) = default;
 };

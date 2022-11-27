@@ -78,3 +78,8 @@ void IPEndPoint::Accept(const EndPoint::sockaddr_buf& ep)
 		_port = sin.sin6_port;
 	}
 }
+
+IPEndPoint IPEndPoint::Any()
+{
+	return IPEndPoint(IPAddress::Any(), 0);
+}

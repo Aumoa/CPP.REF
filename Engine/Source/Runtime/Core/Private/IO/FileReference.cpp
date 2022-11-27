@@ -4,6 +4,7 @@
 #include "IO/DirectoryReference.h"
 #include "IO/FileStream.h"
 #include "Misc/String.h"
+#include "Exceptions/SystemException.h"
 #include <bit>
 #include <fstream>
 
@@ -141,9 +142,12 @@ Task<String> FileReference::ReadAllTextAsync(std::stop_token cancellationToken) 
 	FileStream fs(GetPath(), EFileAccessMode::Read, EFileSharedMode::None, EFileMode::Open);
 	size_t length = fs.GetLength();
 
-	std::vector<uint8> buf;
+	std::vector<uint8> buf(length);
 	size_t reads = co_await fs.ReadAsync(buf, cancellationToken);
-	check(length == reads);
+	if (length != reads)
+	{
+		throw SystemException(PlatformMisc::GetLastError());
+	}
 
 	co_return String::FromCodepage(std::string_view(reinterpret_cast<const char*>(buf.data()), reads));
 }

@@ -9,4 +9,9 @@ class CORE_API Environment : public StaticClass
 {
 public:
 	static String GetCurrentDirectory();
+
+public:
+#if PLATFORM_WINDOWS
+	static constexpr String NewLine = TEXT("\r\n");
+#endif
 };

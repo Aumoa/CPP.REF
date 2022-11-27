@@ -99,7 +99,7 @@ Task<size_t> FileStream::ReadAsync(std::span<uint8> bytes, std::stop_token cance
 #if PLATFORM_WINDOWS
 	auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
 	auto* ptr = new IOCompletionOverlapped([tcs](size_t read, int32 error) mutable
-		{
+	{
 		if (error)
 		{
 			tcs.SetException(SystemException(error));
@@ -110,6 +110,7 @@ Task<size_t> FileStream::ReadAsync(std::span<uint8> bytes, std::stop_token cance
 		}
 	});
 
+	DWORD reads = 0;
 	if (::ReadFile(_handle, bytes.data(), (DWORD)bytes.size_bytes(), NULL, (LPOVERLAPPED)ptr->ToOverlapped()) == FALSE)
 	{
 		if (DWORD err = GetLastError(); err != ERROR_IO_PENDING)
