@@ -32,9 +32,21 @@ public:
 		return TDateFormatter::ToString(std::chrono::zoned_time(std::chrono::current_zone(), _tp));
 	}
 
+	inline String ToString(String format) const
+	{
+		format = String::Format(TEXT("{{:{}}}"), format);
+		return String::Format(format, GetTimePoint());
+	}
+
 	inline constexpr const time_point& GetTimePoint() const noexcept
 	{
 		return _tp;
+	}
+
+	template<class T>
+	constexpr DateTime GetFloor() const noexcept
+	{
+		return DateTime(std::chrono::floor<T>(GetTimePoint()));
 	}
 
 	static DateTime Now() noexcept

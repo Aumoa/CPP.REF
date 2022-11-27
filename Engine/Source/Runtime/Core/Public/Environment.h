@@ -9,6 +9,7 @@ class CORE_API Environment : public StaticClass
 {
 public:
 	static String GetCurrentDirectory();
+	static String GetExecutingApp();
 
 public:
 #if PLATFORM_WINDOWS

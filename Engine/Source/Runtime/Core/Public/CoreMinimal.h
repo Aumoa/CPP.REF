@@ -71,6 +71,7 @@
 #include "Logging/LogCategory.h"
 #include "Logging/LogEntry.h"
 #include "Logging/LogLevel.h"
+#include "Logging/ILoggingExtension.h"
 #include "Mathematics/Degrees.h"
 #include "Mathematics/EaseFunction.h"
 #include "Mathematics/MathEx.h"

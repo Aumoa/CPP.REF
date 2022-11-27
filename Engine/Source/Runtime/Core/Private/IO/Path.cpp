@@ -33,3 +33,13 @@ String Path::GetRelativePath(const String& relativeTo, const String& path)
 
 	return String(std::filesystem::relative(relativeTo_p, path_p).wstring());
 }
+
+String Path::Combine(std::span<const String> paths)
+{
+	std::filesystem::path r;
+	for (auto& path : paths)
+	{
+		r /= path.c_str();
+	}
+	return String(std::move(r).wstring());
+}

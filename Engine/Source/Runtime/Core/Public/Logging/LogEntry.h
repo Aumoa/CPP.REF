@@ -3,12 +3,14 @@
 #pragma once
 
 #include "LogLevel.h"
+#include "DateTime.h"
 #include "Misc/String.h"
 
 class LogCategory;
 
 struct LogEntry
 {
+	DateTime LogDate;
 	const LogCategory* Category = nullptr;
 	String LogThread;
 	ELogLevel Level;

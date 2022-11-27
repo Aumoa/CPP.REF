@@ -7,6 +7,7 @@
 #include <functional>
 
 class LogCategory;
+class ILoggingExtension;
 
 class Log
 {
@@ -20,6 +21,7 @@ public:
 	static void Print(const LogCategory& logCategory, ELogLevel logLevel, const String& message);
 	static void Post(std::function<void()> work);
 	static void FlushAll();
+	static void InstallExtension(std::unique_ptr<ILoggingExtension> extension);
 	static void Cleanup();
 
 public:

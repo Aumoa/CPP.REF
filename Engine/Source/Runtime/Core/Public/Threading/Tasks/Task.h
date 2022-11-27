@@ -65,7 +65,13 @@ public:
 		return (bool)_awaiter;
 	}
 
-	inline auto GetAwaiter() const noexcept(!std::same_as<T, void>)
+	inline
+#if __INTELLISENSE__
+		std::shared_ptr<Awaiter>
+#else
+		auto
+#endif
+		GetAwaiter() const noexcept(!std::same_as<T, void>)
 	{
 		if constexpr (std::same_as<T, void>)
 		{
@@ -133,27 +139,38 @@ public:
 
 	inline T GetResult() const
 	{
-		return static_cast<Awaiter*>(_awaiter.get())->GetResult();
+		if constexpr (std::same_as<T, void>)
+		{
+			_awaiter.get()->Wait();
+			if (_awaiter->GetException())
+			{
+				std::rethrow_exception(_awaiter->GetException());
+			}
+		}
+		else
+		{
+			return static_cast<Awaiter*>(_awaiter.get())->GetResult();
+		}
 	}
 
 	inline bool IsCompleted() const noexcept
 	{
-		return static_cast<Awaiter*>(_awaiter.get())->IsCompleted();
+		return _awaiter->IsCompleted();
 	}
 
 	inline bool IsCompletedSuccessfully() const noexcept
 	{
-		return static_cast<Awaiter*>(_awaiter.get())->IsCompletedSuccessfully();
+		return _awaiter->GetStatus() == ETaskStatus::RanToCompletion;
 	}
 
 	inline bool IsCanceled() const noexcept
 	{
-		return static_cast<Awaiter*>(_awaiter.get())->IsCanceled();
+		return _awaiter->GetStatus() == ETaskStatus::Canceled;
 	}
 
 	inline bool IsFaulted() const noexcept
 	{
-		return static_cast<Awaiter*>(_awaiter.get())->IsFaulted();
+		return _awaiter->GetStatus() == ETaskStatus::Faulted;
 	}
 
 	Task& operator =(const Task&) = default;

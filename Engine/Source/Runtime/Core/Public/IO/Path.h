@@ -3,6 +3,9 @@
 #pragma once
 
 #include "Misc/StaticClass.h"
+#include <span>
+#include <initializer_list>
+#include <vector>
 
 class String;
 
@@ -14,4 +17,13 @@ public:
 	static bool HasExtension(const String& path);
 	static String ChangeExtension(const String& path, const String& extension);
 	static String GetRelativePath(const String& relativeTo, const String& path);
+	static String Combine(std::span<const String> paths);
+
+public:
+	template<class... T>
+	static String Combine(T&&... paths) requires requires { { std::initializer_list<String>{ paths... } }; }
+	{
+		std::vector<String> v{ std::forward<T>(paths)... };
+		return Combine(v);
+	}
 };

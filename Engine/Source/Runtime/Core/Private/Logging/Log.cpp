@@ -3,6 +3,7 @@
 #include "Logging/Log.h"
 #include "Logging/LogCategory.h"
 #include "Logging/LogEntry.h"
+#include "Logging/ILoggingExtension.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include "Misc/PlatformMisc.h"
@@ -17,6 +18,7 @@ namespace
 	static SpinlockConditionVariable sCondVar;
 	static std::vector<LogEntry> sEntries;
 	static std::vector<std::function<void()>> sActions;
+	static std::vector<std::unique_ptr<ILoggingExtension>> sExtensions;
 }
 
 void Log::Initialize()
@@ -32,6 +34,7 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 	std::unique_lock lock(sLock);
 	sEntries.emplace_back() =
 	{
+		.LogDate = DateTime::Now(),
 		.Category = &logCategory,
 		.LogThread = _get_threadid_or_name(),
 		.Level = logLevel,
@@ -73,6 +76,14 @@ void Log::FlushAll()
 	future.wait();
 }
 
+void Log::InstallExtension(std::unique_ptr<ILoggingExtension> extension)
+{
+	extension->Installed();
+
+	auto lock = std::unique_lock(sLock);
+	sExtensions.emplace_back(std::move(extension));
+}
+
 void Log::Cleanup()
 {
 	static int trap = (_trap_init(), 0);
@@ -83,6 +94,13 @@ void Log::Cleanup()
 	lock.unlock();
 
 	sWorker.join();
+
+	for (auto& extension : sExtensions)
+	{
+		extension->Uninstalled();
+	}
+
+	sExtensions.clear();
 }
 
 String Log::_get_threadid_or_name() noexcept
@@ -141,14 +159,23 @@ void Log::_worker()
 		std::swap(actions, sActions);
 		lock.unlock();
 
+		String formatted;
 		for (auto& entry : entries)
 		{
-			String formatted = String::Format(TEXT("{0}: {1}: {2}\n      {3}\n"), levelToString(entry.Level), entry.LogThread, entry.Category->GetCategoryName(), entry.Message);
-			Console::Write(formatted);
+			formatted += String::Format(TEXT("{0}: {1}: {2}\n      {3}\n"), levelToString(entry.Level), entry.LogThread, entry.Category->GetCategoryName(), entry.Message);
+			for (auto& extension : sExtensions)
+			{
+				extension->TraceOne(entry);
+			}
+		}
 
+		Console::Write(formatted);
 #if !SHIPPING
-			PlatformMisc::OutputDebugString(formatted);
+		PlatformMisc::OutputDebugString(formatted);
 #endif
+		for (auto& extension : sExtensions)
+		{
+			extension->Flush();
 		}
 
 		for (auto& action : actions)

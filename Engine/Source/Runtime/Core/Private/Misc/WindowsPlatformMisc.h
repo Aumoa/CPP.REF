@@ -18,6 +18,7 @@
 #undef YieldProcessor
 #undef OutputDebugString
 #undef GetMessage
+#undef GetCurrentDirectory
 
 #pragma pack(pop)
 
