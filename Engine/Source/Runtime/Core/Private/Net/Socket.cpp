@@ -98,7 +98,7 @@ Task<> Socket::AcceptAsync(Socket& sock, std::stop_token cancellationToken)
 		EndPoint::sockaddr_buf sRemoteBuf;
 	};
 
-	auto tcs = TaskCompletionSource<>::Create();
+	auto tcs = TaskCompletionSource<>::Create(cancellationToken);
 	auto* ptr = new IOCompletionOverlapped([tcs](size_t, int32 error) mutable
 	{
 		if (error)
@@ -157,7 +157,7 @@ Task<> Socket::ConnectAsync(const EndPoint& ep, std::stop_token cancellationToke
 		return fn;
 	}();
 
-	auto tcs = TaskCompletionSource<>::Create();
+	auto tcs = TaskCompletionSource<>::Create(cancellationToken);
 	auto* ptr = new IOCompletionOverlapped([tcs](size_t, int32 error) mutable
 	{
 		if (error)

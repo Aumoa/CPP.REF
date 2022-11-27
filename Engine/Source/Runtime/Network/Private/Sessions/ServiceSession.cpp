@@ -29,8 +29,14 @@ Task<> ServiceSession::StartAsync(std::stop_token cancellationToken)
 
 Task<> ServiceSession::StopAsync(std::stop_token cancellationToken)
 {
-	_ss.request_stop();
-	co_await _acceptor;
+	try
+	{
+		_ss.request_stop();
+		co_await _acceptor;
+	}
+	catch (const TaskCanceledException&)
+	{
+	}
 
 	_sock->Close();
 }
@@ -45,7 +51,7 @@ Task<> ServiceSession::StartSocketAcceptor(std::stop_token cancellationToken, Ta
 		auto client = std::make_unique<Socket>(EAddressFamily::InterNetwork, ESocketType::Stream, EProtocolType::Tcp);
 		co_await _sock->AcceptAsync(*client, cancellationToken);
 
-		Log::Info(LogServer, TEXT("TEST: Client {} connected."), _sock->GetRemoteEndPoint());
+		Log::Info(LogServer, TEXT("Client {} connected."), _sock->GetRemoteEndPoint());
 		client->Close();
 	}
 }
