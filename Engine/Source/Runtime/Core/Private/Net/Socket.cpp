@@ -138,8 +138,15 @@ Task<> Socket::AcceptAsync(Socket& sock, std::stop_token cancellationToken)
 
 Task<> Socket::ConnectAsync(const EndPoint& ep, std::stop_token cancellationToken)
 {
-	ThreadPool::BindHandle((void*)_socket);
+	std::error_code ec = co_await TryConnectAsync(ep, cancellationToken);
+	if (ec)
+	{
+		throw SocketException(ec.value());
+	}
+}
 
+Task<std::error_code> Socket::TryConnectAsync(const EndPoint& ep, std::stop_token cancellationToken)
+{
 	EndPoint::sockaddr_buf sBuf;
 	ep.ApplyTo(sBuf);
 
@@ -157,19 +164,20 @@ Task<> Socket::ConnectAsync(const EndPoint& ep, std::stop_token cancellationToke
 		return fn;
 	}();
 
-	auto tcs = TaskCompletionSource<>::Create(cancellationToken);
+	auto tcs = TaskCompletionSource<>::Create<std::error_code>(cancellationToken);
 	auto* ptr = new IOCompletionOverlapped([tcs](size_t, int32 error) mutable
 	{
 		if (error)
 		{
-			tcs.SetException(SocketException(error));
+			tcs.SetResult(std::error_code(error, std::system_category()));
 		}
 		else
 		{
-			tcs.SetResult();
+			tcs.SetResult(std::error_code());
 		}
 	});
 
+	std::error_code ec;
 	if (WSAConnectEx(_socket, reinterpret_cast<const sockaddr*>(&sBuf), (int)ep.Size(), NULL, 0, NULL, reinterpret_cast<LPOVERLAPPED>(ptr->ToOverlapped())) == FALSE)
 	{
 		int err = WSAGetLastError();
@@ -179,11 +187,12 @@ Task<> Socket::ConnectAsync(const EndPoint& ep, std::stop_token cancellationToke
 			delete ptr;
 		}
 
-		co_await tcs.GetTask();
+		ec = co_await tcs.GetTask();
 	}
 #endif
 
 	_remote.Accept(sBuf);
+	co_return ec;
 }
 
 Task<size_t> Socket::SendAsync(std::span<const uint8> bytesToSend, std::stop_token cancellationToken)
@@ -215,10 +224,10 @@ Task<size_t> Socket::SendAsync(std::span<const uint8> bytesToSend, std::stop_tok
 			delete ptr;
 		}
 
-		r = (int)co_await tcs.GetTask();
+		cur = (DWORD)co_await tcs.GetTask();
 	}
 
-	co_return (size_t)r;
+	co_return (size_t)cur;
 #endif
 }
 
@@ -290,10 +299,10 @@ Task<size_t> Socket::ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_tok
 			delete ptr;
 		}
 
-		r = (int)co_await tcs.GetTask();
+		cur = (DWORD)co_await tcs.GetTask();
 	}
 
-	co_return (size_t)r;
+	co_return (size_t)cur;
 #endif
 }
 

@@ -28,6 +28,7 @@ public:
 	void Bind(const EndPoint& ep);
 	Task<> AcceptAsync(Socket& sock, std::stop_token cancellationToken = {});
 	Task<> ConnectAsync(const EndPoint& ep, std::stop_token cancellationToken = {});
+	Task<std::error_code> TryConnectAsync(const EndPoint& ep, std::stop_token cancellationToken = {});
 	Task<size_t> SendAsync(std::span<const uint8> bytesToSend, std::stop_token cancellationToken = {});
 	Task<> SendToAsync(const EndPoint& ep, std::span<const uint8> bytesToSend, std::stop_token cancellationToken = {});
 	Task<size_t> ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_token cancellationToken = {});
