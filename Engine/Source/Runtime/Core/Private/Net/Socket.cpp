@@ -21,6 +21,8 @@ Socket::Socket(EAddressFamily af, ESocketType st, EProtocolType pt)
 	{
 		_throw_error();
 	}
+
+	ThreadPool::BindHandle((void*)_socket);
 }
 
 Socket::~Socket() noexcept
@@ -50,8 +52,6 @@ void Socket::Listen(int32 backlog)
 
 void Socket::Bind(const EndPoint& ep)
 {
-	ThreadPool::BindHandle((void*)_socket);
-
 	EndPoint::sockaddr_buf buf;
 	ep.ApplyTo(buf);
 	_local.Accept(buf);
