@@ -34,7 +34,7 @@ public:
 	HttpRequest& SetBody(const String& body) & noexcept;
 	inline HttpRequest&& SetBody(const String& body) && noexcept { return (HttpRequest&&)SetBody(body); }
 
-	std::string Compose();
+	SocketBuffer Compose();
 
 	// Helper on HttpClient
 	Task<HttpResponse> SendAsync();

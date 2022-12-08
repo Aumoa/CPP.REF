@@ -8,6 +8,7 @@
 #include "Net/SocketType.h"
 #include "Net/ProtocolType.h"
 #include "Net/IPEndPoint.h"
+#include "Net/SocketBuffer.h"
 #include "Threading/Tasks/Task.h"
 
 class CORE_API Socket : public NonCopyable
@@ -29,26 +30,13 @@ public:
 	Task<> AcceptAsync(Socket& sock, std::stop_token cancellationToken = {});
 	Task<> ConnectAsync(const EndPoint& ep, std::stop_token cancellationToken = {});
 	Task<std::error_code> TryConnectAsync(const EndPoint& ep, std::stop_token cancellationToken = {});
-	Task<size_t> SendAsync(std::span<const uint8> bytesToSend, std::stop_token cancellationToken = {});
-	Task<> SendToAsync(const EndPoint& ep, std::span<const uint8> bytesToSend, std::stop_token cancellationToken = {});
-	Task<size_t> ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_token cancellationToken = {});
-	Task<> ReceiveFromAsync(EndPoint& ep, std::span<uint8> bytesToRecv, std::stop_token cancellationToken = {});
+	Task<size_t> SendAsync(SocketBuffer buf, std::stop_token cancellationToken = {});
+	Task<> SendToAsync(const EndPoint& ep, SocketBuffer buf, std::stop_token cancellationToken = {});
+	Task<size_t> ReceiveAsync(SocketBuffer buf, std::stop_token cancellationToken = {});
+	Task<> ReceiveFromAsync(EndPoint& ep, SocketBuffer buf, std::stop_token cancellationToken = {});
 
 	inline const IPEndPoint& GetLocalEndPoint() const { return _local; }
 	inline const IPEndPoint& GetRemoteEndPoint() const { return _remote; }
-
-public:
-	template<class T>
-	Task<size_t> SendAsync(std::span<const T> bytesToSend, std::stop_token cancellationToken = {})
-	{
-		return SendAsync(std::span<const uint8>((const uint8*)bytesToSend.data(), bytesToSend.size_bytes()), cancellationToken);
-	}
-
-	template<class T>
-	Task<size_t> ReceiveAsync(std::span<T> bytesToReceive, std::stop_token cancellationToken = {})
-	{
-		return ReceiveAsync(std::span<uint8>((uint8*)bytesToReceive.data(), bytesToReceive.size_bytes()), cancellationToken);
-	}
 
 private:
 	static void _trap_init();

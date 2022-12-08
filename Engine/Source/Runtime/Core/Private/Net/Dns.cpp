@@ -11,12 +11,26 @@
 
 Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop_token cancellationToken)
 {
+	if (hostname == TEXT("localhost"))
+	{
+		auto entry = IPHostEntry(std::vector{ IPAddress::Loopback(), IPAddress::Loopback(true) }, std::vector<String>{});
+		co_return std::vector{ entry };
+	}
+
+	if (IPAddress addr; IPAddress::TryParse(hostname, &addr))
+	{
+		auto entry = IPHostEntry(std::vector{ addr }, std::vector<String>{});
+		co_return std::vector{ entry };
+	}
+
 	hostname = hostname.ToLower();
 	std::map<IPAddress, std::vector<String>> ipMap;
 
 #if PLATFORM_WINDOWS
-	// Windows: Reading hosts.
-	FileReference fr(PlatformMisc::GetSystemPath() + TEXT("\\drivers\\etc\\hosts"));
+	String hostpath = PlatformMisc::GetSystemPath() + TEXT("\\drivers\\etc\\hosts");
+#endif
+
+	FileReference fr(hostpath);
 	String hosts = co_await fr.ReadAllTextAsync(cancellationToken);
 
 	std::vector<String> lines = hosts.Split('\n', EStringSplitOptions::RemoveEmptyEntries | EStringSplitOptions::TrimEntries);
@@ -28,7 +42,8 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 			continue;
 		}
 
-		std::vector<String> pair = line.Split({ ' ', '\t' }, EStringSplitOptions::RemoveEmptyEntries | EStringSplitOptions::TrimEntries);
+		std::array<char_t, 2> separators = { ' ', '\t' };
+		std::vector<String> pair = line.Split(separators, EStringSplitOptions::RemoveEmptyEntries | EStringSplitOptions::TrimEntries);
 		if (pair.size() < 2)
 		{
 			continue;
@@ -72,7 +87,6 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 
 		co_return{ IPHostEntry(addresses, aliases_v) };
 	}
-#endif
 
 	std::string host = hostname.AsCodepage(65001);
 
@@ -86,8 +100,8 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 
 	int pid = _getpid();
 
-	static thread_local uint8 buf[2048];
-	uint8* ptr = buf;
+	SocketBuffer buf = SocketBuffer::Alloc(2048);
+	uint8* ptr = reinterpret_cast<uint8*>(buf.GetBuffer());
 
 	//Set the DNS structure to standard queries
 	DNS_HEADER* dns = (DNS_HEADER*)ptr;
@@ -119,12 +133,12 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 	qinfo->qtype = htons(T_A); //type of the query , A , MX , CNAME , NS etc
 	qinfo->qclass = htons(1); //its internet (lol)
 
-	co_await s.SendToAsync(DNSServers[0], std::span(buf, ptr), cancellationToken);
+	co_await s.SendToAsync(DNSServers[0], buf, cancellationToken);
 
 	static thread_local IPEndPoint sDummyEP;
-	co_await s.ReceiveFromAsync(sDummyEP, std::span(buf), cancellationToken);
+	co_await s.ReceiveFromAsync(sDummyEP, buf, cancellationToken);
 
-	ptr = buf;
+	ptr = reinterpret_cast<uint8*>(buf.GetBuffer());
 	ptr += sizeof(DNS_HEADER);
 	ptr += strlen((const char*)qname) + 1;
 	ptr += sizeof(QUESTION);
@@ -187,7 +201,7 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 	for (size_t i = 0; i < ans_count; ++i)
 	{
 		RES_RECORD ans;
-		ans.name = _read_dns_query_name(reader, buf, &reader);
+		ans.name = _read_dns_query_name(reader, reinterpret_cast<uint8*>(buf.GetBuffer()), &reader);
 		ans.resource = (R_DATA*)reader;
 		reader += sizeof(R_DATA);
 
@@ -208,7 +222,7 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 		}
 		else
 		{
-			ans.rdata = _read_dns_query_name(reader, buf, &reader);
+			ans.rdata = _read_dns_query_name(reader, reinterpret_cast<uint8*>(buf.GetBuffer()), &reader);
 			aliases.emplace_back(String(ans.rdata));
 		}
 	}

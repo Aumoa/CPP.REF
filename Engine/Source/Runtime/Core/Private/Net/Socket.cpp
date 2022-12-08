@@ -195,12 +195,12 @@ Task<std::error_code> Socket::TryConnectAsync(const EndPoint& ep, std::stop_toke
 	co_return ec;
 }
 
-Task<size_t> Socket::SendAsync(std::span<const uint8> bytesToSend, std::stop_token cancellationToken)
+Task<size_t> Socket::SendAsync(SocketBuffer buf, std::stop_token cancellationToken)
 {
 #if PLATFORM_WINDOWS
 	DWORD cur;
 	auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
-	auto* ptr = new IOCompletionOverlapped([tcs](size_t resolved, int32 error) mutable
+	auto* ptr = new IOCompletionOverlapped([tcs, buf](size_t resolved, int32 error) mutable
 	{
 		if (error)
 		{
@@ -213,8 +213,8 @@ Task<size_t> Socket::SendAsync(std::span<const uint8> bytesToSend, std::stop_tok
 	});
 
 	WSABUF wbuf;
-	wbuf.buf = reinterpret_cast<CHAR*>(const_cast<uint8*>(bytesToSend.data()));
-	wbuf.len = static_cast<DWORD>(bytesToSend.size_bytes());
+	wbuf.buf = reinterpret_cast<CHAR*>(const_cast<void*>(buf.GetReadonlyBuffer()));
+	wbuf.len = static_cast<DWORD>(buf.GetBufferSize());
 	int r = WSASend(_socket, &wbuf, 1, &cur, 0, reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
 	if (r == -1)
 	{
@@ -231,13 +231,13 @@ Task<size_t> Socket::SendAsync(std::span<const uint8> bytesToSend, std::stop_tok
 #endif
 }
 
-Task<> Socket::SendToAsync(const EndPoint& ep, std::span<const uint8> bytesToSend, std::stop_token cancellationToken)
+Task<> Socket::SendToAsync(const EndPoint& ep, SocketBuffer buf, std::stop_token cancellationToken)
 {
 #if PLATFORM_WINDOWS
 	DWORD cur;
 	DWORD flags = 0;
 	auto tcs = TaskCompletionSource<>::Create<size_t>(cancellationToken);
-	auto* ptr = new IOCompletionOverlapped([tcs](size_t resolved, int32 error) mutable
+	auto* ptr = new IOCompletionOverlapped([tcs, buf](size_t resolved, int32 error) mutable
 	{
 		if (error)
 		{
@@ -249,13 +249,13 @@ Task<> Socket::SendToAsync(const EndPoint& ep, std::span<const uint8> bytesToSen
 		}
 	});
 
-	EndPoint::sockaddr_buf buf;
-	ep.ApplyTo(buf);
+	EndPoint::sockaddr_buf sockaddr_buf;
+	ep.ApplyTo(sockaddr_buf);
 
 	WSABUF wbuf;
-	wbuf.buf = reinterpret_cast<CHAR*>(const_cast<uint8*>(bytesToSend.data()));
-	wbuf.len = static_cast<DWORD>(bytesToSend.size_bytes());
-	int s = WSASendTo(_socket, &wbuf, 1, &cur, flags, reinterpret_cast<const sockaddr*>(&buf), (int)ep.Size(), reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
+	wbuf.buf = reinterpret_cast<CHAR*>(const_cast<void*>(buf.GetReadonlyBuffer()));
+	wbuf.len = static_cast<DWORD>(buf.GetBufferSize());
+	int s = WSASendTo(_socket, &wbuf, 1, &cur, flags, reinterpret_cast<const sockaddr*>(&sockaddr_buf), (int)ep.Size(), reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
 	if (s == -1)
 	{
 		if (int err = WSAGetLastError(); err != WSA_IO_PENDING)
@@ -269,7 +269,7 @@ Task<> Socket::SendToAsync(const EndPoint& ep, std::span<const uint8> bytesToSen
 #endif
 }
 
-Task<size_t> Socket::ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_token cancellationToken)
+Task<size_t> Socket::ReceiveAsync(SocketBuffer buf, std::stop_token cancellationToken)
 {
 #if PLATFORM_WINDOWS
 	DWORD cur;
@@ -288,8 +288,8 @@ Task<size_t> Socket::ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_tok
 	});
 
 	WSABUF wbuf;
-	wbuf.buf = reinterpret_cast<CHAR*>(bytesToReceive.data());
-	wbuf.len = static_cast<DWORD>(bytesToReceive.size_bytes());
+	wbuf.buf = reinterpret_cast<CHAR*>(buf.GetBuffer());
+	wbuf.len = static_cast<DWORD>(buf.GetBufferSize());
 	int r = WSARecv(_socket, &wbuf, 1, &cur, &flags, reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
 	if (r == -1)
 	{
@@ -306,7 +306,7 @@ Task<size_t> Socket::ReceiveAsync(std::span<uint8> bytesToReceive, std::stop_tok
 #endif
 }
 
-Task<> Socket::ReceiveFromAsync(EndPoint& ep, std::span<uint8> bytesToReceive, std::stop_token cancellationToken)
+Task<> Socket::ReceiveFromAsync(EndPoint& ep, SocketBuffer buf, std::stop_token cancellationToken)
 {
 #if PLATFORM_WINDOWS
 	DWORD cur;
@@ -325,12 +325,12 @@ Task<> Socket::ReceiveFromAsync(EndPoint& ep, std::span<uint8> bytesToReceive, s
 	});
 
 	WSABUF wbuf;
-	wbuf.buf = reinterpret_cast<CHAR*>(bytesToReceive.data());
-	wbuf.len = static_cast<DWORD>(bytesToReceive.size_bytes());
+	wbuf.buf = reinterpret_cast<CHAR*>(buf.GetBuffer());
+	wbuf.len = static_cast<DWORD>(buf.GetBufferSize());
 
-	EndPoint::sockaddr_buf buf;
-	INT sz = sizeof(buf);
-	int r = WSARecvFrom(_socket, &wbuf, 1, &cur, &flags, reinterpret_cast<sockaddr*>(&buf), &sz, reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
+	EndPoint::sockaddr_buf sockaddr_buf;
+	INT sz = sizeof(sockaddr_buf);
+	int r = WSARecvFrom(_socket, &wbuf, 1, &cur, &flags, reinterpret_cast<sockaddr*>(&sockaddr_buf), &sz, reinterpret_cast<LPWSAOVERLAPPED>(ptr->ToOverlapped()), NULL);
 	if (r == -1)
 	{
 		if (int err = WSAGetLastError(); err != WSA_IO_PENDING)
@@ -342,7 +342,7 @@ Task<> Socket::ReceiveFromAsync(EndPoint& ep, std::span<uint8> bytesToReceive, s
 		r = (int)co_await tcs.GetTask();
 	}
 
-	ep.Accept(buf);
+	ep.Accept(sockaddr_buf);
 #endif
 }
 

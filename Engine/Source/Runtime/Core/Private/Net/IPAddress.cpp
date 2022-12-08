@@ -45,7 +45,8 @@ bool IPAddress::IsV4() const noexcept
 
 std::span<const uint8> IPAddress::GetBytes() const noexcept
 {
-	return _value;
+	size_t length = _v6 ? 16 : 4;
+	return std::span(_value.begin(), _value.begin() + length);
 }
 
 IPAddress IPAddress::Any(bool ipv6)

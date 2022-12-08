@@ -27,6 +27,7 @@ class DefaultServiceCollection : public IServiceCollection, public IServiceProvi
 private:
 	Spinlock _lock;
 	std::map<size_t, ServiceEntry> _entries;
+	std::map<size_t, ServiceEntry> _hosts;
 
 public:
 	DefaultServiceCollection();

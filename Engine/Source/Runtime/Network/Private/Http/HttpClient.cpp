@@ -12,10 +12,20 @@ HttpClient::~HttpClient() noexcept
 {
 }
 
+void HttpClient::SetRequestTimeout(const TimeSpan& timeout)
+{
+	_timeout = timeout;
+}
+
 Task<HttpResponse> HttpClient::SendAsync(HttpRequest request, std::stop_token cancellationToken)
 {
 	Uri uri = request.GetUri();
 	String host = uri.GetHost();
+
+	// Setting timeout.
+	std::stop_source ss;
+	Task<>::CancelAfter(ss, _timeout);
+	co_yield co_push(ss.get_token());
 
 	std::vector<IPAddress> addresses(1);
 	if (IPAddress::TryParse(host, &addresses[0]) == false)
@@ -58,30 +68,30 @@ Task<HttpResponse> HttpClient::SendAsync(HttpRequest request, std::stop_token ca
 
 	// Sending request.
 	{
-		std::string buf = request.Compose();
-		size_t send = 0;
-		while (send < buf.length())
+		SocketBuffer buf = request.Compose();
+		size_t sent = 0;
+		while (sent < buf.GetBufferSize())
 		{
-			std::span<const char> subspan = std::span<char const>(buf.c_str() + send, buf.length() - send);
-			send += co_await sock.SendAsync(subspan, cancellationToken);
+			sent += co_await sock.SendAsync(buf.Subbuffer(sent), cancellationToken);
 		}
 	}
 
 	HttpResponse response;
-	std::vector<char> buf(1024);
+	SocketBuffer buf = SocketBuffer::Alloc(1024);
+
 	String bufstr;
 	auto handle = response.AppendBuffer(&bufstr);
 	auto it = handle.begin();
 
 	while (it.IsDone() == false)
 	{
-		size_t recv = co_await sock.ReceiveAsync(std::span(buf), cancellationToken);
+		size_t recv = co_await sock.ReceiveAsync(buf, cancellationToken);
 		if (recv == 0)
 		{
 			co_return response;
 		}
 
-		bufstr += String::FromCodepage(std::string_view(buf.data(), recv), 65001);
+		bufstr += String::FromCodepage(std::string_view(reinterpret_cast<const char*>(buf.GetBuffer()), recv), 65001);
 		if (*(++it))
 		{
 			break;

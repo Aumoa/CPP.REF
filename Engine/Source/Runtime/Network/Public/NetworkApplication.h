@@ -25,8 +25,9 @@ public:
 
 	int32 Run();
 
-	std::shared_ptr<IConfiguration> GetConfiguration();
+	IConfiguration* GetConfiguration();
 	IServiceCollection* GetServiceCollection();
+	IServiceProvider* GetServiceProvider();
 
 protected:
 	virtual Task<> StartAsync(std::stop_token cancellationToken);

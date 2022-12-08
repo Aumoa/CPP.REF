@@ -4,6 +4,7 @@
 
 #include "PrimitiveTypes.h"
 #include "Misc/String.h"
+#include "Misc/PlatformMisc.h"
 #include <source_location>
 
 class CORE_API CoreAssert
@@ -11,7 +12,6 @@ class CORE_API CoreAssert
 public:
 	[[noreturn]]
 	static void Assert(const String& exp, const String& msg);
-	static void DebugBreak();
 };
 
 #if DO_CHECK
@@ -37,7 +37,7 @@ if (const bool b = (bool)(x); !b) \
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
-			CoreAssert::DebugBreak();\
+			PlatformMisc::Debugbreak();\
 			bSwitchLocal = false;\
 		}\
 	}\
@@ -53,7 +53,7 @@ if (const bool b = (bool)(x); !b) \
 		static bool bSwitchLocal = true;\
 		if (bSwitchLocal)\
 		{\
-			CoreAssert::DebugBreak();\
+			PlatformMisc::Debugbreak();\
 			bSwitchLocal = false;\
 		}\
 	}\

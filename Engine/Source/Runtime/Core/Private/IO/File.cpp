@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/File.h"
+#include "IO/FileReference.h"
 #include <filesystem>
 
 bool File::Exists(String path) noexcept
@@ -32,4 +33,10 @@ bool File::TryDelete(String src) noexcept
 		return std::filesystem::remove((std::wstring)src, ec);
 	}
 	return false;
+}
+
+Task<String> File::ReadAllTextAsync(String filename, std::stop_token cancellationToken)
+{
+	FileReference fr(filename);
+	co_return co_await fr.ReadAllTextAsync(cancellationToken);
 }

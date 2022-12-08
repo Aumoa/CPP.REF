@@ -10,7 +10,7 @@ class IConfiguration
 public:
 	virtual ~IConfiguration() noexcept = default;
 
-	virtual std::shared_ptr<IConfiguration> GetSection(String sectionName) = 0;
+	virtual IConfiguration* GetSection(String sectionName) = 0;
 	virtual nlohmann::json GetValue() = 0;
 
 public:

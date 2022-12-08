@@ -8,10 +8,18 @@ ClientSession::ClientSession(std::unique_ptr<Socket> sock, int64 sessionId)
 	: _sock(std::move(sock))
 	, _sessionId(sessionId)
 {
+	SessionDisconnected.AddLambda([](ClientSession* session)
+	{
+		session->CloseSession();
+	});
 }
 
 ClientSession::~ClientSession() noexcept
 {
+	if (ensure(_sock == nullptr) == false)
+	{
+		CloseSession();
+	}
 }
 
 void ClientSession::Start()
@@ -22,40 +30,46 @@ void ClientSession::Start()
 void ClientSession::CloseSession() noexcept
 {
 	_ss.request_stop();
+
+	if (_sock)
+	{
+		_sock->Close();
+		_sock.reset();
+	}
 }
 
 Task<> ClientSession::SendPacket(std::shared_ptr<Packet> p, std::stop_token cancellationToken)
 {
-	auto buffer = p->GetBuffer();
+	SocketBuffer buffer = SocketBuffer::CopyReadonly(p->GetBuffer());
 	size_t sent = 0;
 
-	while (sent >= buffer.size_bytes())
+	while (sent < buffer.GetBufferSize())
 	{
-		sent += co_await _sock->SendAsync(buffer.subspan(sent), cancellationToken);
+		sent += co_await _sock->SendAsync(buffer.Subbuffer(sent), cancellationToken);
 	}
 }
 
 void ClientSession::StartReceiver()
 {
-	std::vector<uint8> buffer(1024);
+	SocketBuffer buf = SocketBuffer::Alloc(1024);
 	auto builder = Packet::CreateBuilder();
 
 	try
 	{
 		while (!_ss.stop_requested())
 		{
-			size_t bytesToRead = co_await _sock->ReceiveAsync(std::span(buffer), _ss.get_token());
+			size_t bytesToRead = co_await _sock->ReceiveAsync(buf, _ss.get_token());
 			if (bytesToRead == 0)
 			{
+				CloseSession();
 				SessionDisconnected.Broadcast(this);
-				_sock->Close();
 				co_return;
 			}
 
 			size_t reads = 0;
 			while (bytesToRead > reads)
 			{
-				reads += builder.Append(std::span(buffer.data() + reads, buffer.data() + bytesToRead));
+				reads += builder.Append(buf.AsReadonlySpan(reads, bytesToRead - reads));
 				if (builder.IsCompleted())
 				{
 					auto p = builder.Build();
@@ -75,6 +89,10 @@ void ClientSession::StartReceiver()
 			StartReceiver();
 			co_return;
 		}
+		SessionDisconnected.Broadcast(this);
+	}
+	catch (const TaskCanceledException&)
+	{
 		SessionDisconnected.Broadcast(this);
 	}
 }

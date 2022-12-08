@@ -115,14 +115,18 @@ int _internal_guarded_main(std::function<int()>* body)
 {
 	uint32 exceptionCode = 0;
 
+#if SHIPPING
 	__try
 	{
+#endif
 		return (*body)();
+#if SHIPPING
 	}
 	__except ((exceptionCode = GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER))
 	{
 		throw WindowsSEHException(exceptionCode);
 	}
+#endif
 }
 
 int PlatformMisc::GuardedMain(std::function<int()> body)

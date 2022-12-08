@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <bit>
 
 class NETWORK_API Packet
 {
@@ -54,17 +55,15 @@ public:
 	std::shared_ptr<Packet> AllocACK(uint16 messageId);
 
 	template<class T>
-	std::vector<uint8> Read() requires std::same_as<T, std::vector<uint8>> { return _Read_bytes(); }
-	template<class T>
 	String Read() requires std::same_as<T, String> { return _Read_string(); }
+	void Write(String value) { _Write_string(value); }
 
 #define DECLARE_GENERIC_READ(type) \
 	template<class T> \
-	int32 Read() requires std::same_as<T, type> { return _Generic_read<T>(); }
+	T Read() requires std::same_as<T, type> { return _Generic_read<T>(); }
 
 #define DECLARE_GENERIC_WRITE(type) \
-	template<class T> \
-	void Write(const T& value) requires std::same_as<T, type> { _Generic_write(value); }
+	void Write(const type& value) { _Generic_write(value); }
 
 #define DECLARE_GENERIC_READ_WRITE(type) \
 	DECLARE_GENERIC_READ(type); \
@@ -81,10 +80,62 @@ public:
 	DECLARE_GENERIC_READ_WRITE(int32);
 	DECLARE_GENERIC_READ_WRITE(uint64);
 	DECLARE_GENERIC_READ_WRITE(int64);
+	DECLARE_GENERIC_READ_WRITE(char_t);
 
 #undef DECLARE_GENERIC_READ
 #undef DECLARE_GENERIC_WRITE
 #undef DECLARE_GENERIC_READ_WRITE
+
+	template<class TVector>
+	TVector Read() requires
+		std::same_as<TVector, std::vector<typename TVector::value_type>> &&
+		requires { std::declval<Packet>().template Read<typename TVector::value_type>(); }
+	{
+		using element_t = typename TVector::value_type;
+		int32 length = Read<int32>();
+		std::vector<element_t> values;
+		values.reserve(length);
+		for (int32 i = 0; i < length; ++i)
+		{
+			values.emplace_back(Read<element_t>());
+		}
+		return values;
+	}
+
+	template<class T>
+	void Write(const T& values) requires
+		requires { std::span(values); } &&
+		requires { std::declval<Packet>().Write(std::span(values)); }
+	{
+		Write(std::span(values));
+	}
+
+	template<class T>
+	void Write(std::span<T> values) requires
+		requires { std::declval<Packet>().Write(std::declval<T>()); }
+	{
+		Write((int32)values.size());
+		for (auto& v : values)
+		{
+			Write(v);
+		}
+	}
+
+	template<class TSerializable>
+	TSerializable Read() requires
+		requires { TSerializable::Deserialize(std::declval<TSerializable&>(), std::declval<Packet&>()); }
+	{
+		TSerializable value;
+		TSerializable::Deserialize(value, *this);
+		return value;
+	}
+
+	template<class TSerializable>
+	void Write(const TSerializable& value) requires
+		requires { TSerializable::Serialize(std::declval<const TSerializable&>(), std::declval<Packet&>()); }
+	{
+		TSerializable::Serialize(value, *this);
+	}
 
 public:
 	static Builder CreateBuilder();
@@ -98,21 +149,43 @@ private:
 	size_t _Extend(size_t length) noexcept;
 
 	std::vector<uint8> _Read_bytes();
+	void _Write_bytes(std::span<const uint8> values);
 	String _Read_string();
+	void _Write_string(String value);
 
 	template<class T>
 	T _Generic_read()
 	{
+		static_assert(sizeof(T) == 1 || sizeof(T) % 2 == 0);
 		size_t off = _Acquire(sizeof(T));
 		T value;
 		memcpy(&value, _buf.data() + off, sizeof(T));
+		if constexpr (std::endian::native != std::endian::little && sizeof(T) > 1)
+		{
+			size_t sp = sizeof(T) / 2;
+			uint8* p = reinterpret_cast<uint8*>(&value);
+			for (size_t i = 0; i < sp; ++i)
+			{
+				std::swap(p[i], p[sizeof(T) - (i + 1)]);
+			}
+		}
 		return value;
 	}
 
 	template<class T>
-	void _Generic_write(const T& value)
+	void _Generic_write(T value)
 	{
+		static_assert(sizeof(T) == 1 || sizeof(T) % 2 == 0);
 		size_t off = _Extend(sizeof(T));
+		if constexpr (std::endian::native != std::endian::little && sizeof(T) > 1)
+		{
+			size_t sp = sizeof(T) / 2;
+			uint8* p = reinterpret_cast<uint8*>(&value);
+			for (size_t i = 0; i < sp; ++i)
+			{
+				std::swap(p[i], p[sizeof(T) - (i + 1)]);
+			}
+		}
 		memcpy(_buf.data() + off, &value, sizeof(T));
 	}
 };

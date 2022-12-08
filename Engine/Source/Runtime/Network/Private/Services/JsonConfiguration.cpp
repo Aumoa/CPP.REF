@@ -22,14 +22,14 @@ JsonConfiguration::JsonConfiguration(nlohmann::json json)
 	}
 }
 
-std::shared_ptr<IConfiguration> JsonConfiguration::GetSection(String sectionName)
+IConfiguration* JsonConfiguration::GetSection(String sectionName)
 {
 	auto it = _sections.find(sectionName);
 	if (it == _sections.end())
 	{
 		return nullptr;
 	}
-	return it->second;
+	return it->second.get();
 }
 
 nlohmann::json JsonConfiguration::GetValue()

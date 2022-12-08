@@ -29,6 +29,7 @@
 #include "Exceptions/TaskAbortedException.h"
 #include "Exceptions/TaskCanceledException.h"
 #include "Exceptions/SocketException.h"
+#include "Exceptions/FileNotFoundException.h"
 #include "Generic/IArray.h"
 #include "Generic/IComparable.h"
 #include "Generic/IDictionary.h"
@@ -151,3 +152,4 @@
 #include "Net/SocketType.h"
 #include "Net/IPHostEntry.h"
 #include "Net/Dns.h"
+#include "Net/SocketBuffer.h"

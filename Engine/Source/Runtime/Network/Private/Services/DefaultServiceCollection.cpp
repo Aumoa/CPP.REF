@@ -38,7 +38,7 @@ void DefaultServiceCollection::AddScoped(const std::type_info& serviceType, std:
 
 void DefaultServiceCollection::AddHostedService(const std::type_info& serviceType, std::function<std::any(IServiceProvider*)> factory)
 {
-	_entries[serviceType.hash_code()] =
+	_hosts[serviceType.hash_code()] =
 	{
 		.Type = EServiceType::Hosted,
 		.Instanced = std::nullopt,
@@ -91,13 +91,10 @@ std::optional<std::any> DefaultServiceCollection::GetService(const std::type_inf
 Task<> DefaultServiceCollection::InitializeHostedServices(std::stop_token cancellationToken)
 {
 	std::vector<Task<>> tasks;
-	for (auto& [_, entry] : _entries)
+	for (auto& [_, entry] : _hosts)
 	{
-		if (entry.Type == EServiceType::Hosted)
-		{
-			auto ptr = std::any_cast<std::shared_ptr<IHostedService>>((entry.Instanced = entry.Factory(this)).value());
-			tasks.emplace_back(ptr->StartAsync(cancellationToken));
-		}
+		auto ptr = std::any_cast<std::shared_ptr<IHostedService>>((entry.Instanced = entry.Factory(this)).value());
+		tasks.emplace_back(ptr->StartAsync(cancellationToken));
 	}
 
 	if (tasks.size() > 0)
@@ -109,13 +106,10 @@ Task<> DefaultServiceCollection::InitializeHostedServices(std::stop_token cancel
 Task<> DefaultServiceCollection::FinalizeHostedServices(std::stop_token cancellationToken)
 {
 	std::vector<Task<>> tasks;
-	for (auto& [_, entry] : _entries)
+	for (auto& [_, entry] : _hosts)
 	{
-		if (entry.Type == EServiceType::Hosted)
-		{
-			auto ptr = std::any_cast<std::shared_ptr<IHostedService>>(entry.Instanced.value());
-			tasks.emplace_back(ptr->StopAsync(cancellationToken));
-		}
+		auto ptr = std::any_cast<std::shared_ptr<IHostedService>>(entry.Instanced.value());
+		tasks.emplace_back(ptr->StopAsync(cancellationToken));
 	}
 
 	if (tasks.size() > 0)

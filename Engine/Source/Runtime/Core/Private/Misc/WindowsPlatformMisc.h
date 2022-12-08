@@ -19,6 +19,7 @@
 #undef OutputDebugString
 #undef GetMessage
 #undef GetCurrentDirectory
+#undef SetCurrentDirectory
 
 #pragma pack(pop)
 

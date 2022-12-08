@@ -161,8 +161,30 @@ std::vector<uint8> Packet::_Read_bytes()
 	return bytes;
 }
 
+void Packet::_Write_bytes(std::span<const uint8> values)
+{
+	Write((int32)values.size());
+	size_t off = _Extend(values.size_bytes());
+	memcpy(_buf.data() + off, values.data(), values.size_bytes());
+}
+
 String Packet::_Read_string()
 {
-	std::vector<uint8> bytes = _Read_bytes();
-	return String(std::string_view((const char*)bytes.data(), bytes.size()));
+	int32 length = Read<int32>();
+	std::vector<char_t> data;
+	data.reserve(length);
+	for (int32 i = 0; i < length; ++i)
+	{
+		data.emplace_back((char_t)Read<int16>());
+	}
+	return String(std::wstring_view(data.data(), data.size()));
+}
+
+void Packet::_Write_string(String value)
+{
+	Write((int32)value.length());
+	for (size_t i = 0; i < value.length(); ++i)
+	{
+		Write((int16)value[i]);
+	}
 }

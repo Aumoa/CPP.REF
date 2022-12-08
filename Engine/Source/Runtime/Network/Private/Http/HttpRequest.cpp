@@ -37,7 +37,7 @@ HttpRequest& HttpRequest::SetBody(const String& body) & noexcept
 	return *this;
 }
 
-std::string HttpRequest::Compose()
+SocketBuffer HttpRequest::Compose()
 {
 	if (auto it = _headers.find(TEXT("Accept")); it == _headers.end())
 	{
@@ -79,7 +79,9 @@ std::string HttpRequest::Compose()
 		/*Headers*/			String::Join(TEXT("\r\n"), headers)
 	).AsCodepage(65001);
 
-	return head + body;
+	std::string result = head + body;
+	const uint8* ptr = reinterpret_cast<const uint8*>(result.c_str());
+	return SocketBuffer::CopyReadonly(std::span(ptr, ptr + result.length()));
 }
 
 Task<HttpResponse> HttpRequest::SendAsync()

@@ -25,7 +25,8 @@ public:
 	void CloseSession() noexcept;
 	Task<> SendPacket(std::shared_ptr<Packet> p, std::stop_token cancellationToken = {});
 
-	inline int64 GetSessionId() noexcept { return _sessionId; }
+	inline int64 GetSessionId() const noexcept { return _sessionId; }
+	inline const IPEndPoint& GetRemoteEndPoint() const noexcept { return _sock->GetRemoteEndPoint(); }
 
 public:
 	DECLARE_MULTICAST_EVENT(MessageReceivedEvent, ClientSession*, std::shared_ptr<Packet>);

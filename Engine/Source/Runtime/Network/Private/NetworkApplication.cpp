@@ -12,10 +12,11 @@ NetworkApplication::NetworkApplication(String contentPath)
 {
 	_sApp = this;
 
+	Environment::SetCurrentDirectory(Path::Combine(Environment::GetCurrentDirectory(), contentPath));
 	Log::Info(LogNet, TEXT("Content Directory: {}"), Environment::GetCurrentDirectory());
 
 	DirectoryReference dir(Environment::GetCurrentDirectory());
-	FileReference appsettings = dir.GetFile(TEXTF("{}/appsettings.json", contentPath));
+	FileReference appsettings = dir.GetFile(TEXT("appsettings.json"));
 	if (appsettings.IsExists())
 	{
 		String json = appsettings.ReadAllText();
@@ -43,12 +44,17 @@ int32 NetworkApplication::Run()
 	});
 }
 
-std::shared_ptr<IConfiguration> NetworkApplication::GetConfiguration()
+IConfiguration* NetworkApplication::GetConfiguration()
 {
-	return _configuration;
+	return _configuration.get();
 }
 
 IServiceCollection* NetworkApplication::GetServiceCollection()
+{
+	return _provider.get();
+}
+
+IServiceProvider* NetworkApplication::GetServiceProvider()
 {
 	return _provider.get();
 }

@@ -14,6 +14,6 @@ private:
 public:
 	JsonConfiguration(nlohmann::json json);
 
-	virtual std::shared_ptr<IConfiguration> GetSection(String sectionName) override;
+	virtual IConfiguration* GetSection(String sectionName) override;
 	virtual nlohmann::json GetValue() override;
 };

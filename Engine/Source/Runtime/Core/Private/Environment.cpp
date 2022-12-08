@@ -18,3 +18,8 @@ String Environment::GetExecutingApp()
 	return String(sBuf);
 #endif
 }
+
+void Environment::SetCurrentDirectory(String directory)
+{
+	std::filesystem::current_path((std::wstring)directory);
+}

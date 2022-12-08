@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include <nlohmann/json.hpp>
 
+// Declare custom formats.
+
 inline void from_json(const nlohmann::json& json, String& p)
 {
 	p = String::FromCodepage((std::string)json, 65001);
@@ -14,6 +16,24 @@ inline void to_json(nlohmann::json& json, const String& p)
 {
 	json = p.AsCodepage(65001);
 }
+
+inline void from_json(const nlohmann::json& json, IPAddress& p)
+{
+	String str;
+	from_json(json, str);
+	bool status = IPAddress::TryParse(str, &p);
+	if (status == false)
+	{
+		throw InvalidCastException(TEXTF("String {} is not a valid IPAddress format.", str));
+	}
+}
+
+inline void to_json(nlohmann::json& json, const IPAddress& p)
+{
+	to_json(json, p.ToString());
+}
+
+
 
 template<class T>
 void from_json(const nlohmann::json& json, T& p) requires
