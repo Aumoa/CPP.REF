@@ -56,7 +56,7 @@ SocketBuffer SocketBuffer::Subbuffer(size_t pos, size_t length) const
 	SocketBuffer sb;
 	sb._block = _block;
 	sb._begin = _begin + pos;
-	sb._end = std::max(sb._begin + length, _end);
+	sb._end = std::min(sb._begin + length, _end);
 	return sb;
 }
 
@@ -93,7 +93,7 @@ SocketBuffer SocketBuffer::CopyReadonly(std::vector<uint8> buffer)
 	ptr->_readonly = true;
 	ptr->_buf = std::move(buffer);
 	sb._begin = 0;
-	sb._end = buffer.size();
+	sb._end = ptr->_length;
 	return sb;
 }
 
@@ -111,7 +111,7 @@ SocketBuffer SocketBuffer::WrapReadonly(std::span<const uint8> buffer)
 	ptr->_length = buffer.size_bytes();
 	ptr->_readonly = true;
 	sb._begin = 0;
-	sb._end = buffer.size();
+	sb._end = ptr->_length;
 	return sb;
 }
 
@@ -124,6 +124,6 @@ SocketBuffer SocketBuffer::Alloc(size_t length)
 	ptr->_length = ptr->_buf.size();
 	ptr->_readonly = false;
 	sb._begin = 0;
-	sb._end = length;
+	sb._end = ptr->_length;
 	return sb;
 }
