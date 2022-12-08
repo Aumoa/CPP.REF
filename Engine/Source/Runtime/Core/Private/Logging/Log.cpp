@@ -162,7 +162,11 @@ void Log::_worker()
 		String formatted;
 		for (auto& entry : entries)
 		{
-			formatted += String::Format(TEXT("{0}: {1}: {2}\n      {3}\n"), levelToString(entry.Level), entry.LogThread, entry.Category->GetCategoryName(), entry.Message);
+			formatted += String::Format(TEXT("{0}: {1}: {2}\n"), levelToString(entry.Level), entry.LogThread, entry.Category->GetCategoryName());
+			for (auto& line : entry.Message.Split('\n'))
+			{
+				formatted += String::Format(TEXT("      {}\n"), line.TrimStart());
+			}
 			for (auto& extension : sExtensions)
 			{
 				extension->TraceOne(entry);

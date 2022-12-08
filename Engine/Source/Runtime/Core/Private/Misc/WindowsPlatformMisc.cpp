@@ -9,6 +9,10 @@
 #include "Exceptions/SystemException.h"
 #include "Exceptions/ArgumentNullException.h"
 #include "IO/IOCompletionOverlapped.h"
+#include "Logging/Log.h"
+#include "Logging/LogCategory.h"
+
+static constexpr LogCategory LogWindows(TEXT("LogWindows"));
 
 void PlatformMisc::InitializeSpinlock(size_t& lock) noexcept
 {
@@ -111,22 +115,43 @@ public:
 	}
 };
 
+static constexpr DWORD CxxExceptionCode = 0xE06D7363;
+static std::mutex sLock;
+static String sStacktrace;
+
+LONG CALLBACK UnhandledExceptionHandler(LPEXCEPTION_POINTERS lpExceptionPointers)
+{
+	Log::Fatal(LogWindows, TEXT("{}"), std::stacktrace::current());
+
+	if (lpExceptionPointers->ExceptionRecord->ExceptionCode == CxxExceptionCode)
+	{
+		Log::Fatal(LogWindows, TEXT("=== From original CXX exception ==="));
+		std::unique_lock lock(sLock);
+		Log::Fatal(LogWindows, sStacktrace);
+	}
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+LONG CALLBACK CxxStandardExceptionFilter(LPEXCEPTION_POINTERS lpExceptionPointers)
+{
+	if (lpExceptionPointers->ExceptionRecord->ExceptionCode == CxxExceptionCode)
+	{
+		std::unique_lock lock(sLock);
+		sStacktrace = String::Format(TEXT("{}"), std::stacktrace::current());
+	}
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
 int _internal_guarded_main(std::function<int()>* body)
 {
 	uint32 exceptionCode = 0;
 
-#if SHIPPING
-	__try
-	{
-#endif
-		return (*body)();
-#if SHIPPING
-	}
-	__except ((exceptionCode = GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER))
-	{
-		throw WindowsSEHException(exceptionCode);
-	}
-#endif
+	SetUnhandledExceptionFilter(UnhandledExceptionHandler);
+	AddVectoredExceptionHandler(1, CxxStandardExceptionFilter);
+
+	return (*body)();
 }
 
 int PlatformMisc::GuardedMain(std::function<int()> body)
