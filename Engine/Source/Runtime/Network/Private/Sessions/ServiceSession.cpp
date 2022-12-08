@@ -58,7 +58,7 @@ Task<> ServiceSession::StartSocketAcceptor(std::stop_token cancellationToken, Ta
 		co_await _sock->AcceptAsync(*client, cancellationToken);
 
 		Log::Info(LogServer, TEXT("Client {} connected."), client->GetRemoteEndPoint());
-		auto session = std::make_unique<ClientSession>(std::move(client), ++sessionId);
+		auto session = std::make_shared<ClientSession>(std::move(client), ++sessionId);
 		OnSessionConnected(std::move(session));
 	}
 }

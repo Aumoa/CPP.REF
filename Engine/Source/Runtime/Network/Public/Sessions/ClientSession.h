@@ -8,7 +8,7 @@
 class Packet;
 class SocketException;
 
-class NETWORK_API ClientSession
+class NETWORK_API ClientSession : public EnableSharedFromThis<ClientSession>
 {
 	using This = ClientSession;
 
@@ -16,6 +16,7 @@ private:
 	std::unique_ptr<Socket> _sock;
 	int64 _sessionId;
 	std::stop_source _ss;
+	TaskCompletionSource<> _close;
 
 public:
 	ClientSession(std::unique_ptr<Socket> sock, int64 sessionId);

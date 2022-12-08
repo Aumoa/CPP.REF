@@ -16,14 +16,11 @@ ClientSession::ClientSession(std::unique_ptr<Socket> sock, int64 sessionId)
 
 ClientSession::~ClientSession() noexcept
 {
-	if (ensure(_sock == nullptr) == false)
-	{
-		CloseSession();
-	}
 }
 
 void ClientSession::Start()
 {
+	_close = TaskCompletionSource<>::Create();
 	StartReceiver();
 }
 
@@ -35,6 +32,12 @@ void ClientSession::CloseSession() noexcept
 	{
 		_sock->Close();
 		_sock.reset();
+	}
+
+	if (_close.IsValid())
+	{
+		co_await _close.GetTask();
+		_close = {};
 	}
 }
 
@@ -53,6 +56,7 @@ void ClientSession::StartReceiver()
 {
 	SocketBuffer buf = SocketBuffer::Alloc(1024);
 	auto builder = Packet::CreateBuilder();
+	auto lock = SharedFromThis();
 
 	try
 	{

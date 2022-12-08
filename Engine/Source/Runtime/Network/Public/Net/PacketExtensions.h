@@ -35,7 +35,8 @@ inline Packet& operator <<(Packet& is, const IPAddress& p)
 	bool isV4 = p.IsV4();
 	if (isV4)
 	{
-		is << isV4 << p.GetBytes();
+		auto bytes = p.GetBytes();
+		is << isV4 << bytes[0] << bytes[1] << bytes[2] << bytes[3];
 	}
 	else
 	{

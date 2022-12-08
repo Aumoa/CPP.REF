@@ -26,7 +26,7 @@ public:
 	Task<> StartService(int32 servicePort);
 
 protected:
-	virtual void OnSessionConnected(std::unique_ptr<ClientSession> session) = 0;
+	virtual void OnSessionConnected(std::shared_ptr<ClientSession> session) = 0;
 
 private:
 	Task<> StartSocketAcceptor(std::stop_token cancellationToken, TaskCompletionSource<> init);
