@@ -1277,22 +1277,5 @@ struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 	}
 };
 
-template<>
-struct std::formatter<std::stacktrace, char_t> : public std::formatter<std::wstring_view, char_t>
-{
-	template<class TFormatContext>
-	auto format(const std::stacktrace& s, TFormatContext& ctx)
-	{
-		std::string ss;
-		for (auto& frame : s)
-		{
-			ss += std::format("  at {} in {}({})\n", frame.description(), frame.source_file(), frame.source_line());
-		}
-
-		std::wstring ws = PlatformMisc::FromCodepage(ss);
-		return std::formatter<std::wstring_view, char_t>::format(ws, ctx);
-	}
-};
-
 #define TEXT(x) L ## x ## _s
 #define TEXTF(x, ...) String::Format(TEXT(x) __VA_OPT__(, __VA_ARGS__))

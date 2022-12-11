@@ -8,6 +8,9 @@
 #include "Misc/String.h"
 #include "Exceptions/SystemException.h"
 #include "Exceptions/ArgumentNullException.h"
+#include "Exceptions/AccessViolationException.h"
+#include "Exceptions/StackOverflowException.h"
+#include "Exceptions/CxxException.h"
 #include "IO/IOCompletionOverlapped.h"
 #include "Logging/Log.h"
 #include "Logging/LogCategory.h"
@@ -116,40 +119,65 @@ public:
 };
 
 static constexpr DWORD CxxExceptionCode = 0xE06D7363;
-static std::mutex sLock;
-static String sStacktrace;
 
 LONG CALLBACK UnhandledExceptionHandler(LPEXCEPTION_POINTERS lpExceptionPointers)
 {
-	Log::Fatal(LogWindows, TEXT("{}"), std::stacktrace::current());
-
 	if (lpExceptionPointers->ExceptionRecord->ExceptionCode == CxxExceptionCode)
 	{
-		Log::Fatal(LogWindows, TEXT("=== From original CXX exception ==="));
-		std::unique_lock lock(sLock);
-		Log::Fatal(LogWindows, sStacktrace);
+		auto* ptr = Exception::EnsureException((Exception*)lpExceptionPointers->ExceptionRecord->ExceptionInformation[1]);
+		if (ptr)
+		{
+			Log::Fatal(LogWindows, TEXT("{}"), *ptr);
+		}
+	}
+	else
+	{
+		Log::Fatal(LogWindows, TEXT("{}"), Stacktrace::FromException(lpExceptionPointers));
 	}
 
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
-LONG CALLBACK CxxStandardExceptionFilter(LPEXCEPTION_POINTERS lpExceptionPointers)
+LONG CALLBACK MarkExceptionStacktrace(LPEXCEPTION_POINTERS lpExceptionPointers)
 {
 	if (lpExceptionPointers->ExceptionRecord->ExceptionCode == CxxExceptionCode)
 	{
-		std::unique_lock lock(sLock);
-		sStacktrace = String::Format(TEXT("{}"), std::stacktrace::current());
+		auto* ptr = Exception::EnsureException((Exception*)lpExceptionPointers->ExceptionRecord->ExceptionInformation[1]);
+		if (ptr)
+		{
+			ptr->InternalMarkStacktrace(lpExceptionPointers);
+		}
+		else if (_is_exception_typeof(typeid(std::exception), lpExceptionPointers))
+		{
+			auto inner = std::make_exception_ptr((std::exception*)lpExceptionPointers->ExceptionRecord->ExceptionInformation[1]);
+			throw CxxException(inner);
+		}
 	}
 
 	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+void CALLBACK SEHExceptionTranslator(unsigned int lExceptionCode, LPEXCEPTION_POINTERS lpExceptionPointers)
+{
+	LPEXCEPTION_RECORD lpExceptionRecord = lpExceptionPointers->ExceptionRecord;
+	DWORD exceptionCode = lpExceptionRecord->ExceptionCode;
+	switch (exceptionCode)
+	{
+	case EXCEPTION_ACCESS_VIOLATION:
+		throw AccessViolationException((AccessViolationException::EAccessMode)lpExceptionRecord->ExceptionInformation[0], (int64)lpExceptionRecord->ExceptionInformation[1]);
+	case EXCEPTION_STACK_OVERFLOW:
+		throw StackOverflowException();
+	}
 }
 
 int _internal_guarded_main(std::function<int()>* body)
 {
 	uint32 exceptionCode = 0;
 
+	_set_se_translator(SEHExceptionTranslator);
+
 	SetUnhandledExceptionFilter(UnhandledExceptionHandler);
-	AddVectoredExceptionHandler(1, CxxStandardExceptionFilter);
+	AddVectoredExceptionHandler(1, MarkExceptionStacktrace);
 
 	return (*body)();
 }

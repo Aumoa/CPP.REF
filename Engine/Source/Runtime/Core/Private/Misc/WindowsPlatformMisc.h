@@ -14,6 +14,8 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
+#include <Psapi.h>
+#include <imagehlp.h>
 
 #undef YieldProcessor
 #undef OutputDebugString

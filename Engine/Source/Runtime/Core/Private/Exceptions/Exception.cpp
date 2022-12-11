@@ -4,40 +4,64 @@
 #include "Misc/String.h"
 
 Exception::Exception(const String& message, std::exception_ptr innerException) noexcept
-	: _stacktrace(std::stacktrace::current(1))
-	, _message(message)
+	: _message(message)
 	, _innerException(innerException)
-	, _impl(std::make_unique<_impl_buf>())
 {
+	MarkExceptionPointer(this);
 }
 
 Exception::Exception(const Exception& rhs) noexcept
-	: _stacktrace(rhs._stacktrace)
-	, _message(rhs._message)
+	: _message(rhs._message)
 	, _innerException(rhs._innerException)
-	, _impl(rhs._impl)
+	, _stacktrace(rhs._stacktrace)
 {
+	MarkExceptionPointer(this);
 }
 
 Exception::Exception(Exception&& rhs) noexcept
-	: _stacktrace(std::move(rhs._stacktrace))
-	, _message(std::move(rhs._message))
+	: _message(std::move(rhs._message))
 	, _innerException(std::move(rhs._innerException))
-	, _impl(std::move(rhs._impl))
+	, _stacktrace(std::move(rhs._stacktrace))
 {
+	MarkExceptionPointer(this);
 }
 
 Exception::~Exception() noexcept
 {
+	UnmarkExceptionPointer(this);
 }
 
 String Exception::ToString() const noexcept
 {
-	this->_cache_string();
-	return _impl->_fulltrace;
+	if (_innerException)
+	{
+		String ss = String::Format(TEXT("{}: {}\n"), String(typeid(*this).name()), _message);
+		try
+		{
+			std::rethrow_exception(_innerException);
+		}
+		catch (const Exception& e)
+		{
+			ss += String::Format(TEXT("---> {}\n"), e);
+		}
+		catch (const std::exception& e)
+		{
+			ss += String::Format(TEXT("---> {}: {}\n"), String(typeid(e).name()), String(e.what()));
+		}
+		catch (...)
+		{
+			ss += String::Format(TEXT("---> Unknown exception.\n"));
+		}
+		ss += String::Format(TEXT("--- End of inner exception stack trace ---\n{}"), _stacktrace);
+		return ss;
+	}
+	else
+	{
+		return String::Format(TEXT("{}: {}\n{}"), String(typeid(*this).name()), _message, _stacktrace);
+	}
 }
 
-const std::stacktrace& Exception::GetStacktrace() const noexcept
+const Stacktrace& Exception::GetStacktrace() const noexcept
 {
 	return _stacktrace;
 }
@@ -52,46 +76,33 @@ std::exception_ptr Exception::GetInnerException() const noexcept
 	return _innerException;
 }
 
-void Exception::_cache_string() const noexcept
+void Exception::InternalMarkStacktrace(void* lpExceptionPointers) noexcept
 {
-	if (!_impl->_cached)
-	{
-		// Unwinding descriptions.
-		if (_innerException)
-		{
-			try
-			{
-				std::rethrow_exception(_innerException);
-			}
-			catch (const Exception& fe)
-			{
-				fe._cache_string();
-				_impl->_description = fe._impl->_description;
-				_impl->_stacktrace = fe._impl->_stacktrace;
-			}
-			catch (...)
-			{
-			}
-		}
-
-		if (_impl->_description)
-		{
-			_impl->_description += TEXT("\n ---> ");
-		}
-		if (_impl->_stacktrace)
-		{
-			_impl->_stacktrace += TEXT("\n   --- End of inner exception stack trace ---\n");
-		}
-
-		_impl->_description += String::Format(TEXT("{}: {}"), String(typeid(*this).name()), _message);
-		_impl->_stacktrace += _stacktrace_to_string(_stacktrace);
-
-		_impl->_fulltrace = String::Format(TEXT("{}\n{}"), _impl->_description, _impl->_stacktrace);
-		_impl->_cached = true;
-	}
+	_stacktrace = Stacktrace::FromException(lpExceptionPointers);
 }
 
-String Exception::_stacktrace_to_string(const std::stacktrace& st) noexcept
+Spinlock Exception::sLock;
+std::set<Exception*> Exception::sMarks;
+
+void Exception::MarkExceptionPointer(Exception* ptr) noexcept
 {
-	return String::FromCodepage(std::to_string(st), 0);
+	std::unique_lock lock(sLock);
+	sMarks.emplace(ptr);
+}
+
+void Exception::UnmarkExceptionPointer(Exception* ptr) noexcept
+{
+	std::unique_lock lock(sLock);
+	sMarks.erase(ptr);
+}
+
+Exception* Exception::EnsureException(Exception* ptr) noexcept
+{
+	std::unique_lock lock(sLock);
+	auto it = sMarks.find(ptr);
+	if (it == sMarks.end())
+	{
+		return nullptr;
+	}
+	return *it;
 }

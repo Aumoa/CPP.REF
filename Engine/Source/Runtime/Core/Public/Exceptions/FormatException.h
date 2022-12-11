@@ -7,8 +7,8 @@
 class FormatException : public Exception
 {
 public:
-	FormatException(const String& message)
-		: Exception(message)
+	FormatException(const String& message, std::exception_ptr innerException = {})
+		: Exception(message, innerException)
 	{
 	}
 };
