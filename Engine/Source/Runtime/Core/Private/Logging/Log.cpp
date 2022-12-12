@@ -152,6 +152,25 @@ void Log::_worker()
 		}
 	};
 
+	static auto levelToColor = [](ELogLevel level) -> EConsoleColor
+	{
+		switch (level)
+		{
+		case ELogLevel::Debug:
+			return EConsoleColor::White;
+		case ELogLevel::Info:
+			return EConsoleColor::DarkGreen;
+		case ELogLevel::Warning:
+			return EConsoleColor::DarkYellow;
+		case ELogLevel::Error:
+			return EConsoleColor::DarkRed;
+		default:
+			return EConsoleColor::Red;
+		}
+	};
+
+	static auto previousColor = Console::GetForegroundColor();
+
 	while (sRunning || !sEntries.empty() || !sActions.empty())
 	{
 		std::unique_lock lock(sLock);
@@ -159,10 +178,17 @@ void Log::_worker()
 		std::swap(actions, sActions);
 		lock.unlock();
 
-		String formatted;
 		for (auto& entry : entries)
 		{
-			formatted += String::Format(TEXT("{0}: {1}: {2}\n"), levelToString(entry.Level), entry.LogThread, entry.Category->GetCategoryName());
+			Console::SetForegroundColor(levelToColor(entry.Level));
+			Console::Write(levelToString(entry.Level));
+#if !SHIPPING
+			PlatformMisc::OutputDebugString(levelToString(entry.Level));
+#endif
+			Console::SetForegroundColor(previousColor);
+
+			String formatted;
+			formatted += String::Format(TEXT(": {}[{}]\n"), entry.Category->GetCategoryName(), entry.LogThread);
 			for (auto& line : entry.Message.Split('\n'))
 			{
 				formatted += String::Format(TEXT("      {}\n"), line.TrimStart());
@@ -171,12 +197,12 @@ void Log::_worker()
 			{
 				extension->TraceOne(entry);
 			}
-		}
 
-		Console::Write(formatted);
+			Console::Write(formatted);
 #if !SHIPPING
-		PlatformMisc::OutputDebugString(formatted);
+			PlatformMisc::OutputDebugString(formatted);
 #endif
+		}
 		for (auto& extension : sExtensions)
 		{
 			extension->Flush();
