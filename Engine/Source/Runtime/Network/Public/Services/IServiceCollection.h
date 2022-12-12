@@ -47,7 +47,7 @@ public:
 	{
 		AddSingleton(typeid(T), [factory](IServiceProvider* sp) -> std::any
 		{
-			return factory(sp);
+			return (std::shared_ptr<T>)factory(sp);
 		});
 	}
 
