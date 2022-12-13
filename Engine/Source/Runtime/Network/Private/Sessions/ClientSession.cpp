@@ -26,18 +26,21 @@ void ClientSession::Start()
 
 void ClientSession::CloseSession() noexcept
 {
-	_ss.request_stop();
-
-	if (_sock)
+	if (_ss.stop_requested() == false)
 	{
-		_sock->Close();
-		_sock.reset();
-	}
+		_ss.request_stop();
 
-	if (_close.IsValid())
-	{
-		co_await _close.GetTask();
-		_close = {};
+		if (_sock)
+		{
+			_sock->Close();
+			_sock.reset();
+		}
+
+		if (_close.IsValid())
+		{
+			co_await _close.GetTask();
+			_close = {};
+		}
 	}
 }
 

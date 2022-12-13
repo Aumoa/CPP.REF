@@ -46,6 +46,7 @@ bool IOContext::_iocp_impl::poll_one()
 		block->Failed(GetLastError());
 	}
 
+	delete block;
 	return true;
 }
 
