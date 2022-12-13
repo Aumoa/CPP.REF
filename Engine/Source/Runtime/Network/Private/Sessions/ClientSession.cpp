@@ -16,11 +16,11 @@ ClientSession::ClientSession(std::unique_ptr<Socket> sock, int64 sessionId)
 
 ClientSession::~ClientSession() noexcept
 {
+	CloseSession();
 }
 
 void ClientSession::Start()
 {
-	_close = TaskCompletionSource<>::Create();
 	StartReceiver();
 }
 
@@ -29,18 +29,7 @@ void ClientSession::CloseSession() noexcept
 	if (_ss.stop_requested() == false)
 	{
 		_ss.request_stop();
-
-		if (_sock)
-		{
-			_sock->Close();
-			_sock.reset();
-		}
-
-		if (_close.IsValid())
-		{
-			co_await _close.GetTask();
-			_close = {};
-		}
+		_sock->Close();
 	}
 }
 
