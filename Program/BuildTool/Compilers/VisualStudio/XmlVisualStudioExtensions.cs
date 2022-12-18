@@ -2,7 +2,7 @@
 
 using System.Xml;
 
-namespace BuildTool;
+namespace BuildTool.Compilers.VisualStudio;
 
 internal static class XmlVisualStudioExtensions
 {
@@ -44,7 +44,7 @@ internal static class XmlVisualStudioExtensions
         return ProjectConfiguration;
     }
 
-    public static XmlElement NewElementPropertyGroup(this XmlNode Node, string Condition, string Label = "")
+    public static XmlElement NewElementPropertyGroup(this XmlNode Node, string? Condition = null, string Label = "")
     {
         XmlElement Elem = Node.NewElement("PropertyGroup");
         if (!string.IsNullOrEmpty(Condition))

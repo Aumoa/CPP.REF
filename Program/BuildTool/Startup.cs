@@ -1,7 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using BuildTool;
-
+using BuildTool.Compilers.VisualStudio;
 using DotNETUtilities;
 
 if (!args.IsValidIndex(0))
@@ -15,7 +15,7 @@ Solution solution = new(solutionCodeFile);
 
 ISolutionGenerator[] generators = new[]
 {
-    new VSGenerator(solution, VisualStudioVersion.VS2022)
+    new VSGenerator(solution, VSVersion.VS2022)
 };
 
 foreach (var generator in generators)

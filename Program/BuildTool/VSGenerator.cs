@@ -1,8 +1,8 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using BuildTool.Compilers.VisualStudio;
 using DotNETUtilities;
 
-using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -23,7 +23,7 @@ public partial class VSGenerator : ISolutionGenerator
 
     private readonly CRC32 _hashGenerator = new();
     private readonly Solution _solution;
-    private readonly VisualStudioVersion _version;
+    private readonly VSVersion _version;
 
     private readonly string[] ApplicationMacros;
 
@@ -32,7 +32,7 @@ public partial class VSGenerator : ISolutionGenerator
     /// </summary>
     /// <param name="solution"> 생성할 솔루션 개체를 전달합니다. </param>
     /// <param name="version"> 생성할 버전을 전달합니다. </param>
-    public VSGenerator(Solution solution, VisualStudioVersion version)
+    public VSGenerator(Solution solution, VSVersion version)
     {
         _solution = solution;
         _version = version;
@@ -307,8 +307,8 @@ public partial class VSGenerator : ISolutionGenerator
 
     private string PlatformToolset => _version switch
     {
-        VisualStudioVersion.VS2019 => "v142",
-        VisualStudioVersion.VS2022 => "v143",
+        VSVersion.VS2019 => "v142",
+        VSVersion.VS2022 => "v143",
         _ => "v143"
     };
 

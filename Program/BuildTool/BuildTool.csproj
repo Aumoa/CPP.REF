@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <IsPublishable>False</IsPublishable>
     <BaseOutputPath>$(SolutionDir)Build\$(Platform)\$(AssemblyName)\</BaseOutputPath>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
