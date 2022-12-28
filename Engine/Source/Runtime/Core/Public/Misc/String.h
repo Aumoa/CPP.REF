@@ -18,7 +18,6 @@
 #include <format>
 #include <vector>
 #include <unordered_map>
-#include <stacktrace>
 
 namespace lib::details
 {
@@ -29,7 +28,7 @@ namespace lib::details
 	};
 }
 
-class CORE_API String : public ArrayExtensions<char_t>
+class CORE_API String// : public ArrayExtensions<char_t>
 {
 	std::variant<const char_t*, std::shared_ptr<char_t[]>> _buf;
 	size_t _len;

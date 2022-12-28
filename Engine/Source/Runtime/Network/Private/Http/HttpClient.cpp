@@ -33,7 +33,8 @@ Task<HttpResponse> HttpClient::SendAsync(HttpRequest request, std::stop_token ca
 		addresses.resize(0);
 		for (auto& entry : co_await Dns::GetHostEntryAsync(host, cancellationToken))
 		{
-			addresses.insert_range(addresses.end(), entry.GetAddresses());
+			auto range = entry.GetAddresses();
+			addresses.insert(addresses.end(), range.begin(), range.end());
 		}
 
 		if (addresses.size() == 0)

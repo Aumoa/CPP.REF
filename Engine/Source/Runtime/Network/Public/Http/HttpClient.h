@@ -8,7 +8,6 @@
 #include "Http/HttpRequest.h"
 #include "Http/HttpResponse.h"
 #include "Net/Socket.h"
-#include "HttpClient.gen.h"
 
 class NETWORK_API HttpClient
 {

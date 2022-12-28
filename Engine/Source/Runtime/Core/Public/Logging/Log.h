@@ -9,7 +9,7 @@
 class LogCategory;
 class ILoggingExtension;
 
-class Log
+class CORE_API Log
 {
 	friend class Core;
 	Log() = delete;

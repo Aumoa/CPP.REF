@@ -257,70 +257,70 @@ public:
 template<class UEnumerable> requires IEnumerable<UEnumerable, EnumerableItem_t<UEnumerable>>
 Enumerable(UEnumerable*) -> Enumerable<decltype(std::declval<UEnumerable>().begin()), decltype(std::declval<UEnumerable>().end())>;
 
-template<class T>
-class EnumerableExtensions
-{
-public:
-	template<class TSelf>
-	constexpr auto Any(this TSelf& self) requires
-		requires
-		{
-			{ Enumerable(&self).Any() };
-		}
-	{
-		return Enumerable(&self).Any();
-	}
-
-	template<class TSelf, class... TArgs>
-	constexpr auto Min(this TSelf& self, TArgs&&... args) requires
-		requires
-		{
-			{ Enumerable(&self).Min(std::declval<TArgs>()...) };
-		}
-	{
-		return Enumerable(&self).Min(std::forward<TArgs>(args)...);
-	}
-	
-	template<class TSelf, class... TArgs>
-	constexpr auto Contains(this TSelf& self, TArgs&&... args) requires
-		requires
-		{
-			{ Enumerable(&self).Contains(std::declval<TArgs>()...) };
-		}
-	{
-		return Enumerable(&self).Contains(std::forward<TArgs>(args)...);
-	}
-
-	template<class TSelf, class... TArgs>
-	constexpr auto Select(this TSelf& self, TArgs&&... args) requires
-		requires
-		{
-			{ Enumerable(&self).Select(std::declval<TArgs>()...) };
-		}
-	{
-		return Enumerable(&self).Select(std::forward<TArgs>(args)...);
-	}
-
-	template<class TSelf, class U = EnumerableItem_t<TSelf>, class... TArgs>
-	constexpr auto ToVector(this TSelf& self, TArgs&&... args) requires
-		requires
-		{
-			{ Enumerable(&self).template ToVector<U>(std::declval<TArgs>()...) };
-		}
-	{
-		return Enumerable(&self).template ToVector<U>(std::forward<TArgs>(args)...);
-	}
-
-	template<class TSelf, class... TArgs>
-	constexpr auto Where(this TSelf& self, TArgs&&... args) requires
-		requires
-		{
-			{ Enumerable(&self).Where(std::declval<TArgs>()...) };
-		}
-	{
-		return Enumerable(&self).Where(std::forward<TArgs>(args)...);
-	}
-};
+//template<class T>
+//class EnumerableExtensions
+//{
+//public:
+//	template<class TSelf>
+//	constexpr auto Any(this TSelf& self) requires
+//		requires
+//		{
+//			{ Enumerable(&self).Any() };
+//		}
+//	{
+//		return Enumerable(&self).Any();
+//	}
+//
+//	template<class TSelf, class... TArgs>
+//	constexpr auto Min(this TSelf& self, TArgs&&... args) requires
+//		requires
+//		{
+//			{ Enumerable(&self).Min(std::declval<TArgs>()...) };
+//		}
+//	{
+//		return Enumerable(&self).Min(std::forward<TArgs>(args)...);
+//	}
+//	
+//	template<class TSelf, class... TArgs>
+//	constexpr auto Contains(this TSelf& self, TArgs&&... args) requires
+//		requires
+//		{
+//			{ Enumerable(&self).Contains(std::declval<TArgs>()...) };
+//		}
+//	{
+//		return Enumerable(&self).Contains(std::forward<TArgs>(args)...);
+//	}
+//
+//	template<class TSelf, class... TArgs>
+//	constexpr auto Select(this TSelf& self, TArgs&&... args) requires
+//		requires
+//		{
+//			{ Enumerable(&self).Select(std::declval<TArgs>()...) };
+//		}
+//	{
+//		return Enumerable(&self).Select(std::forward<TArgs>(args)...);
+//	}
+//
+//	template<class TSelf, class U = EnumerableItem_t<TSelf>, class... TArgs>
+//	constexpr auto ToVector(this TSelf& self, TArgs&&... args) requires
+//		requires
+//		{
+//			{ Enumerable(&self).template ToVector<U>(std::declval<TArgs>()...) };
+//		}
+//	{
+//		return Enumerable(&self).template ToVector<U>(std::forward<TArgs>(args)...);
+//	}
+//
+//	template<class TSelf, class... TArgs>
+//	constexpr auto Where(this TSelf& self, TArgs&&... args) requires
+//		requires
+//		{
+//			{ Enumerable(&self).Where(std::declval<TArgs>()...) };
+//		}
+//	{
+//		return Enumerable(&self).Where(std::forward<TArgs>(args)...);
+//	}
+//};
 
 namespace Linq
 {

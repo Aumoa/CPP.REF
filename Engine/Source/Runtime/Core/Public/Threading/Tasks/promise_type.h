@@ -136,16 +136,16 @@ namespace libty::Details
 			return WrapSharedAwaiter(task.GetAwaiter());
 		}
 
-		template<class TSelf, class TOp>
-		auto yield_value(this TSelf& self, co_push<TOp>&& push)
+		template<class TOp>
+		auto yield_value(co_push<TOp>&& push)
 		{
 			if constexpr (std::same_as<TOp, std::stop_token>)
 			{
-				return self.GetAwaiter()->AddCancellationToken(std::move(push)._Consume());
+				return GetAwaiter()->AddCancellationToken(std::move(push)._Consume());
 			}
 			else if constexpr (std::same_as<TOp, std::function<bool()>>)
 			{
-				return self.GetAwaiter()->AddConditionVariable(std::move(push)._Consume());
+				return GetAwaiter()->AddConditionVariable(std::move(push)._Consume());
 			}
 			else
 			{
@@ -153,8 +153,7 @@ namespace libty::Details
 			}
 		}
 
-		template<class TSelf>
-		suspend_and_destroy_if yield_value(TSelf& self, co_cancel_t&&)
+		suspend_and_destroy_if yield_value(co_cancel_t&&)
 		{
 			return true;
 		}

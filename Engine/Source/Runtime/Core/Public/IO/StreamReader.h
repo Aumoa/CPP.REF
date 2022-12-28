@@ -19,12 +19,12 @@ public:
 	StreamReader(PolPtr<Stream> stream);
 	virtual ~StreamReader() noexcept override;
 
-	virtual String ReadLine() override;
-	virtual Task<String> ReadLineAsync(std::stop_token cancellationToken) override;
-	virtual bool IsEOF() override;
-
-private:
-	Task<bool> _cache_buf_async();
-	bool _eof();
-	String _to_string(size_t length, bool incr);
+//	virtual String ReadLine() override;
+//	virtual Task<String> ReadLineAsync(std::stop_token cancellationToken) override;
+//	virtual bool IsEOF() override;
+//
+//private:
+//	Task<bool> _cache_buf_async();
+//	bool _eof();
+//	String _to_string(size_t length, bool incr);
 };

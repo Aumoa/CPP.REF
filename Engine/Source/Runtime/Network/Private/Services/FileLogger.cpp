@@ -20,6 +20,11 @@ void FileLogger::FileWriterImpl::Uninstalled()
 {
 }
 
+[[noreturn]] inline void unreachable()
+{
+	throw;
+}
+
 void FileLogger::FileWriterImpl::TraceOne(LogEntry& entry)
 {
 	static auto l2s = [](ELogLevel l)
@@ -37,7 +42,7 @@ void FileLogger::FileWriterImpl::TraceOne(LogEntry& entry)
 		case ELogLevel::Fatal:
 			return TEXT("ftal");
 		default:
-			std::unreachable();
+			unreachable();
 		}
 	};
 
