@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BuildTool": {
+      "commandName": "Project",
+      "commandLineArgs": "ProjectFiles -projectfile \"F:\\ayla_workspace\\Ayla\\Ayla.aproject\""
+    }
+  }
+}
