@@ -75,7 +75,7 @@ Task<std::vector<IPHostEntry>> Dns::GetHostEntryAsync(String hostname, std::stop
 		for (auto& pair : ipMap)
 		{
 			addresses.emplace_back(pair.first);
-			aliases.insert_range(pair.second);
+			aliases.insert(pair.second.begin(), pair.second.end());
 		}
 
 		std::vector<String> aliases_v;

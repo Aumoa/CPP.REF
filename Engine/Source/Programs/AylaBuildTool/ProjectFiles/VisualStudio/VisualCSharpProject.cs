@@ -1,8 +1,9 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.Misc;
+using AE.Projects;
 
-namespace AE.Projects.VisualStudio;
+namespace AE.ProjectFiles.VisualStudio;
 
 public class VisualCSharpProject : IProject
 {

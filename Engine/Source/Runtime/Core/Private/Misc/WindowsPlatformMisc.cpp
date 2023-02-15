@@ -113,7 +113,7 @@ class WindowsSEHException : public Exception
 {
 public:
 	WindowsSEHException(uint32 exceptionCode)
-		: Exception(TEXTF("An SEH exception occurred with exception code: {}", exceptionCode))
+		: Exception(String::Format(TEXT("An SEH exception occurred with exception code: {}"), exceptionCode))
 	{
 	}
 };

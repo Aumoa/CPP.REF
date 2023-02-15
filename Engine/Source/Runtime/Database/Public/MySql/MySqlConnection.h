@@ -3,20 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "IDbConnection.h"
 
-class DATABASE_API MySqlConnection : public IDbConnection
+class MySqlCommand;
+struct mysql_connection;
+
+class DATABASE_API MySqlConnection
 {
-	struct connection;
-	std::unique_ptr<connection> _conn;
+	friend MySqlCommand;
+	std::shared_ptr<mysql_connection> _conn;
 
 public:
 	MySqlConnection(String connectionString);
-	virtual ~MySqlConnection() noexcept override;
+	~MySqlConnection() noexcept;
 
-	virtual void Open() override;
-	virtual void Close() noexcept override;
-	virtual std::shared_ptr<IDbCommand> CreateCommand() override;
+	void Open();
+	void Close() noexcept;
+	MySqlCommand CreateCommand();
 
 private:
 	static void ParseConnectionStringInto(String connectionString, void* outOptions);

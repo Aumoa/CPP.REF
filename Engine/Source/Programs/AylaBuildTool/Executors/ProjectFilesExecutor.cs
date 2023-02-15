@@ -2,6 +2,7 @@
 
 using AE.CLI;
 using AE.Diagnostics;
+using AE.ProjectFiles.VisualStudio;
 using AE.Projects;
 
 using System.Reflection;
@@ -36,6 +37,7 @@ public class ProjectFilesExecutor : IExecutor
         await Workspace.GenerateDirectoriesAsync(CToken);
         await Workspace.GenerateProjectFilesAsync(CToken);
 
+        await VisualStudioGenerator.GenerateSolutionAsync(Workspace, CToken);
         return 0;
     }
 }

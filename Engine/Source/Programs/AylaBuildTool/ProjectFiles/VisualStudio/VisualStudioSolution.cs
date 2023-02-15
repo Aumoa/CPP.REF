@@ -3,13 +3,14 @@
 using AE.BuildSettings;
 using AE.Diagnostics;
 using AE.Misc;
+using AE.Projects;
 using AE.Source;
 
 using System;
 using System.Text;
 using System.Xml;
 
-namespace AE.Projects.VisualStudio;
+namespace AE.ProjectFiles.VisualStudio;
 
 public class VisualStudioSolution : ISolution
 {
@@ -21,7 +22,7 @@ public class VisualStudioSolution : ISolution
     public VisualStudioSolution(Workspace InWorkspace)
     {
         TargetWorkspace = InWorkspace;
-        SolutionGuid = CRC32.GenerateGuid("Solution_" +InWorkspace.TargetName);
+        SolutionGuid = CRC32.GenerateGuid("Solution_" + InWorkspace.TargetName);
     }
 
     public void AddProject(IProject Project)
@@ -49,12 +50,29 @@ public class VisualStudioSolution : ISolution
             string VcxprojName = Path.ChangeExtension(Project.Name, ".vcxproj");
             string VcxprojFiltersName = Path.ChangeExtension(Project.Name, ".vcxproj.filters");
             Project.GenerateXmlDocument(out XmlDocument Vcxproj, out XmlDocument VcxprojFilters);
-            await File.WriteAllTextAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojName), Vcxproj.Serialize(true), CToken);
-            await File.WriteAllTextAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojFiltersName), VcxprojFilters.Serialize(true), CToken);
+            await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojName), Vcxproj.Serialize(true), CToken);
+            await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojFiltersName), VcxprojFilters.Serialize(true), CToken);
         }
 
         string SolutionFilename = Path.ChangeExtension(TargetWorkspace.TargetName, ".sln");
-        await File.WriteAllTextAsync(Path.Combine(TargetDirectory.RootDirectory, SolutionFilename), GenerateSolution(), CToken);
+        await CompareAndWriteAsync(Path.Combine(TargetDirectory.RootDirectory, SolutionFilename), GenerateSolution(), CToken);
+    }
+
+    private static async Task CompareAndWriteAsync(string Filename, string Text, CancellationToken CToken)
+    {
+        if (File.Exists(Filename) == false)
+        {
+            await File.WriteAllTextAsync(Filename, Text, CToken);
+            return;
+        }
+
+        string PreviousText = await File.ReadAllTextAsync(Filename, CToken);
+        if (PreviousText.Trim() == Text.Trim())
+        {
+            return;
+        }
+
+        await File.WriteAllTextAsync(Filename, Text, CToken);
     }
 
     private string GenerateSolution()
@@ -89,7 +107,7 @@ public class VisualStudioSolution : ISolution
         {
             string Filename = Path.ChangeExtension(Project.Name, ".vcxproj");
             Filename = Path.Combine(TargetWorkspace.TargetDirectory.ProjectFilesDirectory, Filename);
-            Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.Name}\", \"{Filename}\", \"{{{Project.ProjectGuid.ToString().ToUpper()}}}\"");
+            Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.Name}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
             Builder.AppendLine("EndProject");
         }
 
@@ -114,8 +132,8 @@ public class VisualStudioSolution : ISolution
         {
             BuildConfiguration.ForEach((Configuration, Platform) =>
             {
-                Builder.AppendLine($"\t\t{{{Project.ProjectGuid.ToString().ToUpper()}}}.{Configuration}|{Platform}.ActiveCfg = {Configuration}|{Platform}");
-                Builder.AppendLine($"\t\t{{{Project.ProjectGuid.ToString().ToUpper()}}}.{Configuration}|{Platform}.Build.0 = {Configuration}|{Platform}");
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}|{Platform}.ActiveCfg = {Configuration}|{Platform}");
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}|{Platform}.Build.0 = {Configuration}|{Platform}");
             });
         }
         foreach (var Project in CSProjects)
@@ -138,7 +156,7 @@ public class VisualStudioSolution : ISolution
         {
             if (Filters.TryGetValue(Project.FilterPath, out string? FilterGuid))
             {
-                Builder.AppendLine($"\t\t{{{Project.ProjectGuid.ToString().ToUpper()}}} = {{{FilterGuid}}}");
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}} = {{{FilterGuid}}}");
             }
         }
         foreach (var Project in CSProjects)

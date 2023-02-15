@@ -2,23 +2,16 @@
 
 #include "MySql/MySqlConnection.h"
 #include "MySql/MySqlCommand.h"
-#include "mysql.h"
-
-struct MySqlConnection::connection
-{
-	sql::ConnectOptionsMap options;
-	sql::Connection* connection = nullptr;
-};
+#include "MySql/mysql_connection.h"
 
 MySqlConnection::MySqlConnection(String connectionString)
 {
-	_conn = std::make_unique<connection>();
+	_conn = std::make_shared<mysql_connection>();
 	ParseConnectionStringInto(connectionString, &_conn->options);
 }
 
 MySqlConnection::~MySqlConnection() noexcept
 {
-	Close();
 }
 
 void MySqlConnection::Open()
@@ -34,17 +27,12 @@ void MySqlConnection::Open()
 
 void MySqlConnection::Close() noexcept
 {
-	if (_conn->connection)
-	{
-		_conn->connection->close();
-		delete _conn->connection;
-		_conn->connection = nullptr;
-	}
+	_conn->close();
 }
 
-std::shared_ptr<IDbCommand> MySqlConnection::CreateCommand()
+MySqlCommand MySqlConnection::CreateCommand()
 {
-	return std::make_shared<MySqlCommand>();
+	return MySqlCommand(this);
 }
 
 void MySqlConnection::ParseConnectionStringInto(String connectionString, void* outOptions)

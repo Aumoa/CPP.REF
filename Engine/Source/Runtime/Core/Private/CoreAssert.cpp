@@ -4,11 +4,11 @@
 #include "LogCore.h"
 #include "Logging/Log.h"
 #include "Misc/PlatformMisc.h"
-#include <stacktrace>
+#include "Diagnostics/Stacktrace.h"
 
 void CoreAssert::Assert(const String& exp, const String& msg)
 {
-	Log::Fatal(LogAssert, TEXT("{} (in expression: {})\n{}"), msg, exp, String::FromCodepage(std::to_string(std::stacktrace::current())));
+	Log::Fatal(LogAssert, TEXT("{} (in expression: {})\n{}"), msg, exp, Stacktrace::Current());
 #if !SHIPPING
 	PlatformMisc::Debugbreak();
 #endif

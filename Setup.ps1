@@ -13,7 +13,7 @@ Push-Location Registry::HKEY_CLASSES_ROOT
 			Set-Item -Path "BuildTool" -Value "Generate CPP.REF Solution..."
 			Push-Location "BuildTool"
 				New-Item -Path "command" > $null
-				Set-Item -Path "command" -Value "$PSScriptRoot\Binaries\BuildTool\BuildTool.exe %1"
+				Set-Item -Path "command" -Value "$PSScriptRoot\Binaries\BuildTool\BuildTool.exe $PSScriptRoot %1"
 			Pop-Location
 		Pop-Location
 	Pop-Location

@@ -98,30 +98,30 @@ public:
 	}
 };
 
-template<class T>
-class ArrayExtensions : public EnumerableExtensions<T>
-{
-public:
-	template<class TSelf, class... TArgs>
-	constexpr auto IndexOf(this TSelf& self, TArgs&&... args) requires
-		requires
-	{
-		{ Array(&self).IndexOf(std::declval<TArgs>()...) };
-	}
-	{
-		return Array(&self).IndexOf(std::forward<TArgs>(args)...);
-	}
-	
-	template<class TSelf, class... TArgs>
-	constexpr auto IsValidIndex(this TSelf& self, TArgs&&... args) requires
-		requires
-	{
-		{ Array(&self).IsValidIndex(std::declval<TArgs>()...) };
-	}
-	{
-		return Array(&self).IsValidIndex(std::forward<TArgs>(args)...);
-	}
-};
+//template<class T>
+//class ArrayExtensions : public EnumerableExtensions<T>
+//{
+//public:
+//	template<class TSelf, class... TArgs>
+//	constexpr auto IndexOf(this TSelf& self, TArgs&&... args) requires
+//		requires
+//	{
+//		{ Array(&self).IndexOf(std::declval<TArgs>()...) };
+//	}
+//	{
+//		return Array(&self).IndexOf(std::forward<TArgs>(args)...);
+//	}
+//	
+//	template<class TSelf, class... TArgs>
+//	constexpr auto IsValidIndex(this TSelf& self, TArgs&&... args) requires
+//		requires
+//	{
+//		{ Array(&self).IsValidIndex(std::declval<TArgs>()...) };
+//	}
+//	{
+//		return Array(&self).IsValidIndex(std::forward<TArgs>(args)...);
+//	}
+//};
 
 namespace Linq
 {

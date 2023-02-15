@@ -62,7 +62,7 @@ public static class CSCompiler
             {
                 typeof(object).Assembly.Location,
                 Assembly.Load("System.Runtime").Location,
-                Assembly.Load("System.Collectiosn").Location
+                Assembly.Load("System.Collections").Location
             });
         }
 

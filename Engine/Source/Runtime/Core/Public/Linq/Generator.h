@@ -5,6 +5,7 @@
 #include "PrimitiveTypes.h"
 #include <coroutine>
 #include <exception>
+#include <optional>
 
 namespace Linq
 {

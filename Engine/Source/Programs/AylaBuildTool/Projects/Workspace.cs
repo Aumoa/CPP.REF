@@ -1,7 +1,11 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using AE.Projects.VisualStudio;
+using AE.Compilation;
+using AE.ProjectFiles.VisualStudio;
+using AE.Rules;
 using AE.Source;
+
+using System.Reflection;
 
 namespace AE.Projects;
 
@@ -12,6 +16,10 @@ public class Workspace
     public string TargetName { get; private set; }
 
     public SourceCodeDirectory TargetDirectory => EngineDirectory;
+
+    public List<CXXProject> CXXProjects { get; private set; } = new();
+
+    public List<CSProject> CSProjects { get; private set; } = new();
 
     public Workspace(string EnginePath)
     {
@@ -26,12 +34,28 @@ public class Workspace
 
     public async Task GenerateProjectFilesAsync(CancellationToken CToken = default)
     {
-        VisualStudioSolution Solution = new(this);
-        Solution.AddProject(new VisualCXXProject("AE", "Engine", EngineDirectory));
+        var TargetInfo = new TargetInfo()
+        {
+            Name = TargetName
+        };
+
+        foreach (var TargetRule in Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories))
+        {
+            Type RuleClass = await CSCompiler.LoadClassAsync<TargetRules>(TargetRule, CToken);
+            ConstructorInfo? Ctor = RuleClass.GetConstructor(new[] { typeof(TargetInfo) });
+            if (Ctor == null)
+            {
+                throw new InvalidOperationException($"Cannot load TargetRules class from {TargetRule} source code. Constructor not found.");
+            }
+
+            TargetRules Rules = (TargetRules)Ctor.Invoke(new object[] { TargetInfo });
+            CXXProject Project = new(TargetRule, Rules);
+            CXXProjects.Add(Project);
+        }
+
         foreach (var ProjectFile in Directory.GetFiles(EngineDirectory.ProgramsDirectory, "*.csproj", SearchOption.AllDirectories))
         {
-            Solution.AddProject(new VisualCSharpProject(ProjectFile, "Programs"));
+            CSProjects.Add(new CSProject(ProjectFile));
         }
-        await Solution.GenerateProjectFilesAsync(CToken);
     }
 }

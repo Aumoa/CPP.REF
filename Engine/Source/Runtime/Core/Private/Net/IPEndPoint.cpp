@@ -17,11 +17,11 @@ String IPEndPoint::ToString() const
 {
 	if (_addr.IsV4())
 	{
-		return TEXTF("{}:{}", _addr.ToString(), ntohs(_port));
+		return String::Format(TEXT("{}:{}"), _addr.ToString(), ntohs(_port));
 	}
 	else
 	{
-		return TEXTF("[{}]:{}", _addr.ToString(), ntohs(_port));
+		return String::Format(TEXT("[{}]:{}"), _addr.ToString(), ntohs(_port));
 	}
 }
 

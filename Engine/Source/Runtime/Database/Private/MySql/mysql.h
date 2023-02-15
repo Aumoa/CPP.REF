@@ -9,5 +9,6 @@
 
 #include <jdbc/mysql_connection.h>
 #include <jdbc/cppconn/driver.h>
+#include <jdbc/cppconn/prepared_statement.h>
 
 #pragma pop_macro("check")

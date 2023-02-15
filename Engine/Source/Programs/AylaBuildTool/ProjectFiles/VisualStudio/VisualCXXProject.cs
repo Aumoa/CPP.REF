@@ -2,30 +2,42 @@
 
 using AE.BuildSettings;
 using AE.Misc;
-using AE.Source;
+using AE.Projects;
+using AE.Rules;
 
 using System.Xml;
 
-namespace AE.Projects.VisualStudio;
+namespace AE.ProjectFiles.VisualStudio;
 
 public class VisualCXXProject : IProject
 {
     private readonly string ProjectName;
-    private readonly SourceCodeDirectory Directory;
+    private readonly CXXProject CXXProject;
 
-    public VisualCXXProject(string ProjectName, string FilterPath, SourceCodeDirectory Directory)
+    private static string GetFilterName(TargetClass Class)
     {
-        this.ProjectName = ProjectName;
-        this.FilterPath = FilterPath;
-        this.Directory = Directory;
-        ProjectGuid = CRC32.GenerateGuid(Path.Combine(FilterPath, ProjectName));
+        return Class switch
+        {
+            TargetClass.Engine => "Engine",
+            TargetClass.Game => "Games",
+            TargetClass.Program => "Programs",
+            _ => throw new ArgumentException("Invalid enum.", nameof(Class))
+        };
+    }
+
+    public VisualCXXProject(CXXProject CXXProject)
+    {
+        ProjectName = CXXProject.Rules.Name;
+        FilterPath = GetFilterName(CXXProject.Rules.Class);
+        this.CXXProject = CXXProject;
+        ProjectGuid = CRC32.GenerateGuid(Path.Combine(FilterPath, ProjectName)).ToString().ToUpper();
     }
 
     public string Name => ProjectName;
 
     public string FilterPath { get; init; }
 
-    public Guid ProjectGuid { get; init; }
+    public string ProjectGuid { get; init; }
 
     public void GenerateXmlDocument(out XmlDocument Vcxproj, out XmlDocument VcxprojFilters)
     {
@@ -88,7 +100,7 @@ public class VisualCXXProject : IProject
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
-            foreach (var Filename in System.IO.Directory.EnumerateFiles(Directory.SourceDirectory, "*", SearchOption.AllDirectories))
+            foreach (var Filename in CXXProject.GetAllModuleSourceFiles())
             {
                 string Extension = Path.GetExtension(Filename).ToLower();
                 if (IsSourceFile(Extension))
@@ -124,12 +136,13 @@ public class VisualCXXProject : IProject
             var ItemGroup = Project.AddElement("ItemGroup");
 
             HashSet<string> Filters = new();
-            foreach (var Filename in System.IO.Directory.EnumerateFiles(Directory.SourceDirectory, "*", SearchOption.AllDirectories))
+            foreach (var Filename in CXXProject.GetAllModuleSourceFiles())
             {
-                string? FilterPath = Path.GetRelativePath(Directory.SourceDirectory, Filename);
+                string? FilterPath = Path.GetRelativePath(CXXProject.SourceCodeDirectory, Filename);
                 FilterPath = Path.GetDirectoryName(FilterPath);
                 if (string.IsNullOrEmpty(FilterPath) == false)
                 {
+                    FilterPath = Path.Combine("Source", FilterPath);
                     string[] Splices = FilterPath.Split(Path.DirectorySeparatorChar);
                     string Composed = string.Empty;
                     foreach (var Splice in Splices)

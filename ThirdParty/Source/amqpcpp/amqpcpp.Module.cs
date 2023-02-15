@@ -2,15 +2,14 @@
 
 using System;
 
-using BuildTool;
+using BuildTool.Rule;
 
-public class amqpcppRule : ModuleRule
+public class amqpcpp : ModuleRule
 {
-    public amqpcppRule()
+    public amqpcpp(IReadonlyTargetRules targets) : base(targets)
     {
         Category = ModuleCategory.ThirdParty;
-        FilterPath = "ThirdParty";
-        ModuleType = ModuleType.None;
+        Type = ModuleType.Misc;
 
         PublicIncludePaths.Add("include");
     }

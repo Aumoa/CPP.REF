@@ -2,16 +2,19 @@
 
 using System;
 
-using BuildTool;
+using BuildTool.Rule;
 
-public class mysqlRule : ModuleRule
+public class mysql : ModuleRule
 {
-    public mysqlRule()
+    public mysql(IReadonlyTargetRules targets) : base(targets)
     {
         Category = ModuleCategory.ThirdParty;
-        FilterPath = "ThirdParty";
-        ModuleType = ModuleType.None;
+        Type = ModuleType.Misc;
 
         PublicIncludePaths.Add("include");
+        PublicAdditionalLibraries.AddRange(new[]
+        {
+            "lib/vs14/mysqlcppconn.lib"
+        });
     }
 }
