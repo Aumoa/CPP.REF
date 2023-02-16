@@ -16,4 +16,6 @@ public class TargetRules
     public string TargetName { get; protected set; }
 
     public TargetClass Class { get; protected set; }
+
+    public List<string> ExtraModuleNames { get; protected set; } = new();
 }

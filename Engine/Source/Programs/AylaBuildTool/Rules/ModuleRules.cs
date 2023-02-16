@@ -10,4 +10,31 @@ public class ModuleRules
     {
         this.TargetRule = TargetRule;
     }
+
+    public string GenerateSafeAPIName()
+    {
+        return Name.ToUpper() + "_API";
+    }
+
+    public string Name => GetType().Name;
+
+    public List<string> PublicDependencyModuleNames { get; protected set; } = new();
+
+    public List<string> PrivateDependencyModuleNames { get; protected set; } = new();
+
+    public List<string> PublicIncludePaths { get; protected set; } = new();
+
+    public List<string> PrivateIncludePaths { get; protected set; } = new();
+
+    public List<string> PublicAdditionalMacros { get; protected set; } = new();
+
+    public List<string> PrivateAdditionalMacros { get; protected set; } = new();
+
+    public List<string> PublicAdditionalLibraries { get; protected set; } = new();
+
+    public List<string> PrivateAdditionalLibraries { get; protected set; } = new();
+
+    public List<int> PublicDisableWarnings { get; protected set; } = new();
+
+    public List<int> PrivateDisableWarnings { get; protected set; } = new();
 }

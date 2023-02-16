@@ -89,36 +89,73 @@ public class VisualCXXProject : IProject
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.props");
 
+            // Common
+            var PropertyGroup = Project.AddElement("PropertyGroup");
+            PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = "PLATFORM_WINDOWS=1";
+            PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
+
             BuildConfiguration.ForEach((Configuration, Platform) =>
             {
+                // Foreach Configurations
                 var PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
 
                 PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = "echo NMakeBuildCommandLine";
                 PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = "echo NMakeReBuildCommandLine";
-                PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = "PLATFORM_WINDOWS=1";
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
-            foreach (var Filename in CXXProject.GetAllModuleSourceFiles())
+            HashSet<string> Checker = new();
+
+            XmlElement? AddSourceFile(string Filename)
             {
+                if (Checker.Add(Filename) == false)
+                {
+                    return null;
+                }
+
                 string Extension = Path.GetExtension(Filename).ToLower();
                 if (IsSourceFile(Extension))
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", Filename);
+                    return ClCompile;
                 }
                 else if (IsHeaderFile(Extension))
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
                     ClInclude.SetAttribute("Include", Filename);
+                    return null;
                 }
                 else if (IsNoneFile(Extension))
                 {
                     var None = ItemGroup.AddElement("None");
                     None.SetAttribute("Include", Filename);
+                    return null;
+                }
+
+                return null;
+            }
+
+            foreach (var ModuleName in CXXProject.GetModules())
+            {
+                var Resolved = CXXProject.GetModuleRule(ModuleName);
+
+                foreach (var Filename in Resolved.SourceFiles)
+                {
+                    XmlElement? Elem = AddSourceFile(Filename);
+                    if (Elem != null)
+                    {
+                        var PreprocessorDefinitions = Elem.AddElement("PreprocessorDefinitions");
+                        PreprocessorDefinitions.InnerText = $"{string.Join(';', Resolved.AdditionalMacros)};%(PreprocessorDefinitions)";
+
+                        var AdditionalIncludeDirectories = Elem.AddElement("AdditionalIncludeDirectories");
+                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Resolved.IncludePaths)};%(AdditionalIncludeDirectories)";
+                    }
                 }
             }
+
+            AddSourceFile(CXXProject.TargetFile);
 
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.targets");

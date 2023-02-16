@@ -1,7 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.CLI;
-using AE.Diagnostics;
 using AE.ProjectFiles.VisualStudio;
 using AE.Projects;
 

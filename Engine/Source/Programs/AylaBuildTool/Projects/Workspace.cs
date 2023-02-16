@@ -50,6 +50,7 @@ public class Workspace
 
             TargetRules Rules = (TargetRules)Ctor.Invoke(new object[] { TargetInfo });
             CXXProject Project = new(TargetRule, Rules);
+            await Project.CompileModulesAsync(CToken);
             CXXProjects.Add(Project);
         }
 

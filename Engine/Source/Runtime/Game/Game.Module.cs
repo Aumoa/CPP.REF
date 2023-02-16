@@ -3,11 +3,16 @@
 using System;
 using AE.Rules;
 
-public class Core : ModuleRules
+public class Game : ModuleRules
 {
-    public Core(TargetRules TargetRule) : base(TargetRule)
+    public Game(TargetRules TargetRule) : base(TargetRule)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
+
+        PublicDependencyModuleNames.AddRange(new[]
+        {
+            "Core"
+        });
     }
 }
