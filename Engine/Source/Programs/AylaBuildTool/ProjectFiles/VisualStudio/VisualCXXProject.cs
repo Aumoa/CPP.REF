@@ -39,7 +39,7 @@ public class VisualCXXProject : IProject
 
     public string ProjectGuid { get; init; }
 
-    public void GenerateXmlDocument(out XmlDocument Vcxproj, out XmlDocument VcxprojFilters)
+    public void GenerateXmlDocument(Workspace InWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters)
     {
         XmlDocument Doc = new();
         Doc.AddXmlDeclaration("1.0", "utf-8");
@@ -100,8 +100,10 @@ public class VisualCXXProject : IProject
                 var PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = "echo NMakeBuildCommandLine";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = "echo NMakeReBuildCommandLine";
+                string BuildToolPath = InWorkspace.BuildTool;
+
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"dotnet {BuildToolPath} Build";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"dotnet {BuildToolPath} Rebuild";
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
@@ -177,16 +179,14 @@ public class VisualCXXProject : IProject
             {
                 string? FilterPath = Path.GetRelativePath(CXXProject.SourceCodeDirectory, Filename);
                 FilterPath = Path.GetDirectoryName(FilterPath);
-                if (string.IsNullOrEmpty(FilterPath) == false)
+                FilterPath = Path.Combine("Source", FilterPath ?? "/");
+
+                string[] Splices = FilterPath.Split(Path.DirectorySeparatorChar);
+                string Composed = string.Empty;
+                foreach (var Splice in Splices)
                 {
-                    FilterPath = Path.Combine("Source", FilterPath);
-                    string[] Splices = FilterPath.Split(Path.DirectorySeparatorChar);
-                    string Composed = string.Empty;
-                    foreach (var Splice in Splices)
-                    {
-                        Composed = Path.Combine(Composed, Splice);
-                        Filters.Add(Composed);
-                    }
+                    Composed = Path.Combine(Composed, Splice);
+                    Filters.Add(Composed);
                 }
 
                 string Extension = Path.GetExtension(Filename);

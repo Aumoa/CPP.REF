@@ -8,9 +8,6 @@ public class AETarget : TargetRules
     public AETarget(TargetInfo Info) : base(Info)
     {
         Class = TargetClass.Engine;
-        ExtraModuleNames.AddRange(new[]
-        {
-            "Game"
-        });
+        ExtraModuleNames.Add("Game");
     }
 }

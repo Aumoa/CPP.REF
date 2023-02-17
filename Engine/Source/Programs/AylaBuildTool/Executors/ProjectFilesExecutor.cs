@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace AE.Executors;
 
-public class ProjectFilesExecutor : IExecutor
+public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
 {
     private record Arguments
     {
@@ -18,21 +18,14 @@ public class ProjectFilesExecutor : IExecutor
 
     private readonly Arguments GeneratorArgs = new();
 
-    public ProjectFilesExecutor(CommandLineParser Args)
+    public ProjectFilesExecutor(CommandLineParser Args) : base(Args)
     {
         Args.ApplyTo(GeneratorArgs);
     }
 
     public async Task<int> RunAsync(CancellationToken CToken = default)
     {
-        if (File.Exists(GeneratorArgs.ProjectFile) == false)
-        {
-            throw new FileNotFoundException($"Project file is not exists. Location: {GeneratorArgs.ProjectFile}");
-        }
-
-        string AssemblyLocation = Assembly.GetEntryAssembly()!.Location;
-        string EngineLocation = Path.GetFullPath(Path.Combine(AssemblyLocation, "../../../"));
-        Workspace Workspace = new(EngineLocation);
+        Workspace Workspace = GenerateEngineWorkspace();
         await Workspace.GenerateDirectoriesAsync(CToken);
         await Workspace.GenerateProjectFilesAsync(CToken);
 

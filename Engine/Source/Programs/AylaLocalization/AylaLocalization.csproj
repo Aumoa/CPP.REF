@@ -6,14 +6,8 @@
     <Nullable>enable</Nullable>
     <IsPublishable>False</IsPublishable>
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
-    <OutputType>Exe</OutputType>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<RootNamespace>AE</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AylaLocalization\AylaLocalization.csproj" />
-    <ProjectReference Include="..\DotNETUtilities\DotNETUtilities.csproj" />
-  </ItemGroup>
 
 </Project>

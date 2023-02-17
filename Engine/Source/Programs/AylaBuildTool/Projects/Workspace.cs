@@ -11,20 +11,24 @@ namespace AE.Projects;
 
 public class Workspace
 {
-    private readonly SourceCodeDirectory EngineDirectory;
-
     public string TargetName { get; private set; }
 
-    public SourceCodeDirectory TargetDirectory => EngineDirectory;
+    public SourceCodeDirectory TargetDirectory { get; }
+
+    public SourceCodeDirectory EngineDirectory { get; }
 
     public List<CXXProject> CXXProjects { get; private set; } = new();
 
     public List<CSProject> CSProjects { get; private set; } = new();
 
-    public Workspace(string EnginePath)
+    public string BuildTool { get; }
+
+    public Workspace(string EnginePath, string BuildToolPath)
     {
         EngineDirectory = new SourceCodeDirectory(EnginePath);
+        TargetDirectory = EngineDirectory;
         TargetName = "Engine";
+        BuildTool = BuildToolPath;
     }
 
     public async Task GenerateDirectoriesAsync(CancellationToken CToken = default)
@@ -45,7 +49,7 @@ public class Workspace
             ConstructorInfo? Ctor = RuleClass.GetConstructor(new[] { typeof(TargetInfo) });
             if (Ctor == null)
             {
-                throw new InvalidOperationException($"Cannot load TargetRules class from {TargetRule} source code. Constructor not found.");
+                throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
             }
 
             TargetRules Rules = (TargetRules)Ctor.Invoke(new object[] { TargetInfo });

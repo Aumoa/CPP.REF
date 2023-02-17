@@ -62,10 +62,10 @@ public class CXXProject
             var Ctor = Task.Result.GetConstructor(new[] { typeof(TargetRules) });
             if (Ctor == null)
             {
-                throw new InvalidOperationException($"Failed to find valid constructor for module `{ModuleName}`.");
+                throw new InvalidOperationException(string.Format(CoreStrings.Errors.ModuleRuleConstructorNotFound, Task.Result.Name));
             }
 
-            var Rule = (ModuleRules)Ctor!.Invoke(new object[] { Rules });
+            var Rule = (ModuleRules)Ctor.Invoke(new object[] { Rules });
 
             HashSet<string> SourceFiles = new();
             string ModuleDirectory = Path.GetDirectoryName(ModuleName)!;
@@ -117,7 +117,7 @@ public class CXXProject
         {
             if (Projects.TryGetValue(Depend, out var DependProject) == false)
             {
-                throw new KeyNotFoundException($"Cannot find dependency module name `{Depend}` from `{Rule.Rules.Name}` module.");
+                throw new KeyNotFoundException(string.Format(CoreStrings.Errors.DependencyModuleNotFound, Rule.Rules.Name, Depend));
             }
             if (!IncludeSet.Contains(DependProject))
             {
@@ -224,7 +224,7 @@ public class CXXProject
             {
                 if (ModuleFile != null)
                 {
-                    throw new InvalidOperationException("Two or more .Module.cs file detected.");
+                    throw new InvalidOperationException(CoreStrings.Errors.DuplicatedModuleDefinitions);
                 }
 
                 ModuleFile = Path;

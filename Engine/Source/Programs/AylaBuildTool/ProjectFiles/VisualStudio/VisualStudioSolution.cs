@@ -49,7 +49,7 @@ public class VisualStudioSolution : ISolution
         {
             string VcxprojName = Path.ChangeExtension(Project.Name, ".vcxproj");
             string VcxprojFiltersName = Path.ChangeExtension(Project.Name, ".vcxproj.filters");
-            Project.GenerateXmlDocument(out XmlDocument Vcxproj, out XmlDocument VcxprojFilters);
+            Project.GenerateXmlDocument(TargetWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters);
             await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojName), Vcxproj.Serialize(true), CToken);
             await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojFiltersName), VcxprojFilters.Serialize(true), CToken);
         }
