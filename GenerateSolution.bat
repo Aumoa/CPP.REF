@@ -4,20 +4,6 @@ ECHO.
 ECHO Generate Solution and Project Files...
 ECHO.
 
-SET PROJECT_PATH=%cd%
-SET PROJECT_NAME=%1
-
-CD /d %~dp0
-SET ENGINE_ROOT=%cd%
-
-IF "%PROJECT_NAME%"=="" (
-  SET PROJECT_NAME=Engine
-  SET PROJECT_PATH=%ENGINE_ROOT%
-)
-
-ECHO ENGINE_ROOT = %ENGINE_ROOT%
-ECHO PROJECT_PATH = %PROJECT_PATH%
-
-PUSHD "%ENGINE_ROOT%"
-  dotnet "%ENGINE_ROOT%\Binaries\BuildTool\BuildTool.dll" "%PROJECT_PATH%\%PROJECT_NAME%.Solution.cs"
+PUSHD "%~dp0"
+  dotnet "Engine\Binaries\DotNET\AylaBuildTool.dll" ProjectFiles
 POPD

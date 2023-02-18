@@ -1,2 +1,3 @@
-**/obj/**
-*.sln
+# C# project intermediate file
+
+**/obj/

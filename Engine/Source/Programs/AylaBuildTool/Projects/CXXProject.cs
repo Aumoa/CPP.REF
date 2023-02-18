@@ -2,6 +2,7 @@
 
 using AE.Compilation;
 using AE.Rules;
+using AE.Source;
 
 using System.Data;
 using System.Diagnostics;
@@ -20,6 +21,8 @@ public class CXXProject
 
     public string SourceCodeDirectory => Path.GetDirectoryName(TargetFile)!;
 
+    public SourceCodeDirectory Workspace { get; }
+
     public record ResolvedModule
     {
         public string Path { get; set; } = null!;
@@ -37,16 +40,17 @@ public class CXXProject
         public string[] AdditionalLibraries { get; set; } = null!;
     }
 
-    public CXXProject(string TargetFile, TargetRules Rules)
+    public CXXProject(string TargetFile, TargetRules Rules, SourceCodeDirectory InWorkspace)
     {
         this.TargetFile = TargetFile;
         this.Rules = Rules;
+        this.Workspace = InWorkspace;
 
         string SourceDirectory = Path.GetDirectoryName(TargetFile)!;
         SearchModulesRecursive(SourceDirectory, true);
     }
 
-    public async Task CompileModulesAsync(CancellationToken CToken = default)
+    public async Task CompileModulesAsync(Dictionary<string, ResolvedModule> Projects, CancellationToken CToken = default)
     {
         Dictionary<string, Task<Type>> Tasks = new();
         foreach (var ModuleName in Modules)
@@ -56,7 +60,6 @@ public class CXXProject
 
         await Task.WhenAll(Tasks.Values);
 
-        Dictionary<string, ResolvedModule> Projects = new();
         foreach (var (ModuleName, Task) in Tasks)
         {
             var Ctor = Task.Result.GetConstructor(new[] { typeof(TargetRules) });
@@ -84,7 +87,10 @@ public class CXXProject
             CompiledRules.Add(ModuleName, Resolved);
             Projects.Add(Resolved.Rules.Name, Resolved);
         }
+    }
 
+    public void ResolveDependency(Dictionary<string, ResolvedModule> Projects)
+    {
         HashSet<ResolvedModule> IncludeSet = new();
         List<ResolvedModule> PriorityList = new();
         Dictionary<ResolvedModule, ResolvedModule[]> DependenciesMap = new();

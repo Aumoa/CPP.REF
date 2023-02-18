@@ -15,4 +15,10 @@ public interface IErrors
     string DependencyModuleNotFound { get; }
 
     string DuplicatedModuleDefinitions { get; }
+
+    string InvalidProjectFormat { get; }
+
+    string StartCMakeError { get; }
+
+    string CMakeReturnCodeError { get; }
 }

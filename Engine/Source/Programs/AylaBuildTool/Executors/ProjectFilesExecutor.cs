@@ -4,8 +4,6 @@ using AE.CLI;
 using AE.ProjectFiles.VisualStudio;
 using AE.Projects;
 
-using System.Reflection;
-
 namespace AE.Executors;
 
 public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
@@ -29,7 +27,7 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
         await Workspace.GenerateDirectoriesAsync(CToken);
         await Workspace.GenerateProjectFilesAsync(CToken);
 
-        await VisualStudioGenerator.GenerateSolutionAsync(Workspace, CToken);
+        await VisualStudioGenerator.GenerateSolutionAsync(Workspace, null, CToken);
         return 0;
     }
 }

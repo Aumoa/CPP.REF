@@ -18,6 +18,10 @@ public record SourceCodeDirectory
 
     public string ProgramsDirectory { get; init; }
 
+    public string BinariesDirectory { get; init; }
+
+    public string BuildDirectory { get; init; }
+
     public SourceCodeDirectory(string InPath)
     {
         RootDirectory = Path.GetFullPath(InPath);
@@ -27,6 +31,8 @@ public record SourceCodeDirectory
         GeneratedDirectory = Path.Combine(IntermediateDirectory, "Includes");
         ContentDirectory = Path.Combine(RootDirectory, "Content");
         ProgramsDirectory = Path.Combine(SourceDirectory, "Programs");
+        BinariesDirectory = Path.Combine(RootDirectory, "Binaries");
+        BuildDirectory = Path.Combine(RootDirectory, "Build");
     }
 
     public Task GenerateDirectoriesAsync(CancellationToken CToken = default)

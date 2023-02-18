@@ -24,7 +24,7 @@ public:
 	virtual bool IsEOF() override;
 
 private:
-	Task<bool> _cache_buf_async();
-	bool _eof();
-	String _to_string(size_t length, bool incr);
+	Task<bool> _cache_buf_async() { throw; }
+	bool _eof() { throw; }
+	String _to_string(size_t length, bool incr) { throw; }
 };

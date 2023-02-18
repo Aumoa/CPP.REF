@@ -53,3 +53,13 @@ String StreamReader::ReadLine()
 
 	return _to_string(_cached.size() - _seekpos, true);
 }
+
+Task<String> StreamReader::ReadLineAsync(std::stop_token cancellationToken)
+{
+	throw;
+}
+
+bool StreamReader::IsEOF()
+{
+	throw;
+}

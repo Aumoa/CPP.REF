@@ -1,7 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.Compilation;
-using AE.ProjectFiles.VisualStudio;
+using AE.ProjectFiles.CMake;
 using AE.Rules;
 using AE.Source;
 
@@ -21,6 +21,8 @@ public class Workspace
 
     public List<CSProject> CSProjects { get; private set; } = new();
 
+    public string ProjectPath { get; private set; } = null!;
+
     public string BuildTool { get; }
 
     public Workspace(string EnginePath, string BuildToolPath)
@@ -28,6 +30,7 @@ public class Workspace
         EngineDirectory = new SourceCodeDirectory(EnginePath);
         TargetDirectory = EngineDirectory;
         TargetName = "Engine";
+        ProjectPath = Path.Combine(EnginePath, "../");
         BuildTool = BuildToolPath;
     }
 
@@ -43,6 +46,8 @@ public class Workspace
             Name = TargetName
         };
 
+        Dictionary<string, CXXProject.ResolvedModule> Projects = new();
+
         foreach (var TargetRule in Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories))
         {
             Type RuleClass = await CSCompiler.LoadClassAsync<TargetRules>(TargetRule, CToken);
@@ -53,14 +58,19 @@ public class Workspace
             }
 
             TargetRules Rules = (TargetRules)Ctor.Invoke(new object[] { TargetInfo });
-            CXXProject Project = new(TargetRule, Rules);
-            await Project.CompileModulesAsync(CToken);
+            CXXProject Project = new(TargetRule, Rules, EngineDirectory);
+            await Project.CompileModulesAsync(Projects, CToken);
             CXXProjects.Add(Project);
         }
 
         foreach (var ProjectFile in Directory.GetFiles(EngineDirectory.ProgramsDirectory, "*.csproj", SearchOption.AllDirectories))
         {
             CSProjects.Add(new CSProject(ProjectFile));
+        }
+
+        foreach (var Project in CXXProjects)
+        {
+            Project.ResolveDependency(Projects);
         }
     }
 }

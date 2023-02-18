@@ -37,11 +37,11 @@ public class VisualStudioSolution : ISolution
         }
         else
         {
-            throw new InvalidOperationException("VisualStudioSolution only can accept VisualStudioProject type.");
+            throw new InvalidOperationException(CoreStrings.Errors.InvalidProjectFormat);
         }
     }
 
-    public async Task GenerateProjectFilesAsync(CancellationToken CToken = default)
+    public async Task GenerateProjectFilesAsync(string ProjectPath, CancellationToken CToken = default)
     {
         SourceCodeDirectory TargetDirectory = TargetWorkspace.TargetDirectory;
 
@@ -55,7 +55,7 @@ public class VisualStudioSolution : ISolution
         }
 
         string SolutionFilename = Path.ChangeExtension(TargetWorkspace.TargetName, ".sln");
-        await CompareAndWriteAsync(Path.Combine(TargetDirectory.RootDirectory, SolutionFilename), GenerateSolution(), CToken);
+        await CompareAndWriteAsync(Path.Combine(ProjectPath, SolutionFilename), GenerateSolution(), CToken);
     }
 
     private static async Task CompareAndWriteAsync(string Filename, string Text, CancellationToken CToken)

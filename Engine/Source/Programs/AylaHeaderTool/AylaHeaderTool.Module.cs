@@ -7,5 +7,11 @@ public class AylaHeaderTool : ModuleRules
 {
     public AylaHeaderTool(TargetRules TargetRule) : base(TargetRule)
     {
+        PublicDependencyModuleNames.AddRange(new[]
+        {
+            "Core"
+        });
+
+        PrivateIncludePaths.Add("Private");
     }
 }

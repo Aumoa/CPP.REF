@@ -17,5 +17,7 @@ public class TargetRules
 
     public TargetClass Class { get; protected set; }
 
+    public TargetType Type { get; protected set; }
+
     public List<string> ExtraModuleNames { get; protected set; } = new();
 }

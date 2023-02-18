@@ -6,7 +6,7 @@ namespace AE.ProjectFiles.VisualStudio;
 
 public static class VisualStudioGenerator
 {
-    public static async Task GenerateSolutionAsync(Workspace InWorkspace, CancellationToken CToken = default)
+    public static async Task GenerateSolutionAsync(Workspace InWorkspace, string? ProjectDir = null, CancellationToken CToken = default)
     {
         VisualStudioSolution Solution = new(InWorkspace);
 
@@ -20,6 +20,6 @@ public static class VisualStudioGenerator
             Solution.AddProject(new VisualCSharpProject(Project.ProjectFile, "Programs"));
         }
 
-        await Solution.GenerateProjectFilesAsync(CToken);
+        await Solution.GenerateProjectFilesAsync(ProjectDir ?? InWorkspace.ProjectPath, CToken);
     }
 }
