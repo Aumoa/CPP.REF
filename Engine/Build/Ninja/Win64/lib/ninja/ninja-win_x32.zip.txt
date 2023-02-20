@@ -1,0 +1,2 @@
+﻿C:\ProgramData\chocolatey\lib\ninja\tools\ninja.exe
+
