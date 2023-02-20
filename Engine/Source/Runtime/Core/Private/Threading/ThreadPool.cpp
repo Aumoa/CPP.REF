@@ -38,7 +38,7 @@ void ThreadPool::_trap_init()
 		{
 			std::thread([index = i]
 			{
-				PlatformMisc::SetThreadName(TEXTF("IOCP #{}", index));
+				PlatformMisc::SetThreadName(String::Format(TEXT("IOCP #{}"), index));
 				sContext.Run();
 			}).detach();
 		}

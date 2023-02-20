@@ -16,23 +16,23 @@ public:
 	PolPtr(const PolPtr&) = delete;
 	PolPtr(PolPtr&&) noexcept = default;
 
-	PolPtr(T* ptr) noexcept
+	inline PolPtr(T* ptr) noexcept
 		: _ptr(ptr)
 	{
 	}
 
-	PolPtr(std::unique_ptr<T> ptr) noexcept
+	inline PolPtr(std::unique_ptr<T> ptr) noexcept
 		: _ptr(std::move(ptr))
 	{
 	}
 
-	PolPtr(std::shared_ptr<T> ptr) noexcept
+	inline PolPtr(std::shared_ptr<T> ptr) noexcept
 		: _ptr(std::move(ptr))
 	{
 	}
 
-	const T* get() const noexcept { return const_cast<PolPtr*>(this)->get(); }
-	T* get() noexcept
+	inline const T* get() const noexcept { return const_cast<PolPtr*>(this)->get(); }
+	inline T* get() noexcept
 	{
 		switch (_ptr.index())
 		{
@@ -47,10 +47,33 @@ public:
 		}
 	}
 
-	const T* operator ->() const noexcept { auto p = get(); check(p); return p; }
-	T* operator ->() noexcept { auto p = get(); check(p); return p; }
-	operator bool() const noexcept { return get() != nullptr; }
+	inline bool IsCloneable() const noexcept
+	{
+		size_t idx = _ptr.index();
+		return idx == 0 || idx == 2;
+	}
+
+	inline PolPtr<T> Clone() const noexcept
+	{
+		check(IsCloneable());
+		switch (_ptr.index())
+		{
+		case 0:
+			return PolPtr<T>(std::get<0>(_ptr));
+		case 2:
+			return PolPtr<T>(std::get<2>(_ptr));
+		default:
+			_unreachable();
+		}
+	}
+
+	inline const T* operator ->() const noexcept { auto p = get(); check(p); return p; }
+	inline T* operator ->() noexcept { auto p = get(); check(p); return p; }
+	inline operator bool() const noexcept { return get() != nullptr; }
 
 	PolPtr& operator =(const PolPtr&) = delete;
 	PolPtr& operator =(PolPtr&&) noexcept = default;
+
+private:
+	[[noreturn]] void _unreachable() { throw; }
 };

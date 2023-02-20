@@ -2,15 +2,14 @@
 
 using System;
 
-using BuildTool;
+using BuildTool.Rule;
 
-public class jsonRule : ModuleRule
+public class json : ModuleRule
 {
-    public jsonRule()
+    public json(IReadonlyTargetRules targets) : base(targets)
     {
         Category = ModuleCategory.ThirdParty;
-        FilterPath = "ThirdParty";
-        ModuleType = ModuleType.None;
+        Type = ModuleType.Misc;
 
         PublicIncludePaths.Add("include");
         PrivateIncludePaths.Add("src");
