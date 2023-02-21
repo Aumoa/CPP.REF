@@ -21,4 +21,6 @@ public interface IErrors
     string StartCMakeError { get; }
 
     string CMakeReturnCodeError { get; }
+
+    string NotSupportedBuildHostPlatform { get; }
 }

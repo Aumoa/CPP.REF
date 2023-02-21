@@ -1,9 +1,9 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.Compilation;
-using AE.ProjectFiles.CMake;
 using AE.Rules;
 using AE.Source;
+using AE.System;
 
 using System.Reflection;
 
@@ -43,7 +43,8 @@ public class Workspace
     {
         var TargetInfo = new TargetInfo()
         {
-            Name = TargetName
+            Name = TargetName,
+            Configuration = BuildHostPlatform.Current.Configuration
         };
 
         Dictionary<string, CXXProject.ResolvedModule> Projects = new();
