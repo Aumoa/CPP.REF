@@ -1,6 +1,8 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
 using AE.Projects;
+using AE.Rules;
 
 namespace AE.ProjectFiles.CMake;
 
@@ -22,6 +24,7 @@ public class CMakeCXXProject : IProject
     public async Task GenerateCMakeProject(Workspace _, CancellationToken CToken = default)
     {
         var TargetDirectory = CXXProject.Workspace;
+        var TargetRule = CXXProject.Rules;
 
         string OutputDir = Directory.GetParent(MakefilePath)!.FullName;
         Directory.CreateDirectory(OutputDir);
@@ -40,7 +43,7 @@ public class CMakeCXXProject : IProject
             static string AsLibrary(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
 
             string SubCMakeLists = $@"
-CMAKE_MINIMUM_REQUIRED(VERSION 3.26)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
 PROJECT({Name})
 
@@ -71,22 +74,23 @@ TARGET_LINK_LIBRARIES({Name}
             return Value ? '1' : '0';
         }
 
-        Definitions.Add($"PLATFORM_WINDOWS={Int(Environment.OSVersion.Platform == PlatformID.Win32NT)}");
-        Definitions.Add($"PLATFORM_LINUX={Int(Environment.OSVersion.Platform == PlatformID.Unix)}");
+        PlatformGroup.ForEach(p =>
+        {
+            bool bOn = TargetRule.Platform.Group == p;
+            Definitions.Add($"{p.ToDefinition()}={Int(bOn)}");
+        });
+
         Definitions.Add($"SHIPPING={1}");
         Definitions.Add($"DO_CHECK={0}");
 
         string CMakeLists = $@"
-CMAKE_MINIMUM_REQUIRED(VERSION 3.26)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
 PROJECT({CXXProject.Rules.Name})
 
 ADD_COMPILE_DEFINITIONS(
     {string.Join(Environment.NewLine + '\t', Definitions)}
 )
-
-SET(CMAKE_DLL_EXPORT ""__declspec(dllexport)"")
-SET(CMAKE_DLL_IMPORT ""__declspec(dllimport)"")
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")

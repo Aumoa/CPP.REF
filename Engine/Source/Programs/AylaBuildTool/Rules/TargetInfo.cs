@@ -8,5 +8,5 @@ public record TargetInfo
 {
     public string Name { get; set; } = null!;
 
-    public BuildConfiguration Configuration { get; set; }
+    public BuildConfiguration BuildConfiguration { get; set; }
 }

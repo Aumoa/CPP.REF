@@ -39,15 +39,10 @@ public class Workspace
         await EngineDirectory.GenerateDirectoriesAsync(CToken);
     }
 
-    public async Task GenerateProjectFilesAsync(CancellationToken CToken = default)
+    public async Task GenerateProjectFilesAsync(TargetInfo InTargetInfo, CancellationToken CToken = default)
     {
-        var TargetInfo = new TargetInfo()
-        {
-            Name = TargetName,
-            Configuration = BuildHostPlatform.Current.Configuration
-        };
-
         Dictionary<string, CXXProject.ResolvedModule> Projects = new();
+        InTargetInfo.Name = TargetName;
 
         foreach (var TargetRule in Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories))
         {
@@ -58,7 +53,7 @@ public class Workspace
                 throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
             }
 
-            TargetRules Rules = (TargetRules)Ctor.Invoke(new object[] { TargetInfo });
+            TargetRules Rules = (TargetRules)Ctor.Invoke(new object[] { InTargetInfo });
             CXXProject Project = new(TargetRule, Rules, EngineDirectory);
             await Project.CompileModulesAsync(Projects, CToken);
             CXXProjects.Add(Project);

@@ -2,6 +2,8 @@
 
 using AE.BuildSettings;
 
+using System.Runtime.InteropServices;
+
 namespace AE.System;
 
 public abstract class BuildHostPlatform
@@ -10,7 +12,7 @@ public abstract class BuildHostPlatform
     {
     }
 
-    public abstract BuildConfiguration Configuration { get; }
+    public abstract TargetPlatform Platform { get; }
 
     class WindowsBuildHostPlatform : BuildHostPlatform
     {
@@ -18,19 +20,46 @@ public abstract class BuildHostPlatform
         {
         }
 
-        public override BuildConfiguration Configuration => new()
-        {
-            Configuration = BuildSettings.Configuration.Development,
-            Platform = TargetPlatform.Win64
-        };
+        public override TargetPlatform Platform => TargetPlatform.Win64;
     }
 
     public static readonly BuildHostPlatform WindowsPlatform = new WindowsBuildHostPlatform();
 
-    public static BuildHostPlatform Current =>
-        Environment.OSVersion.Platform switch
+    class LinuxBuildHostPlatform : BuildHostPlatform
+    {
+        public LinuxBuildHostPlatform()
         {
-            PlatformID.Win32NT => WindowsPlatform,
-            _ => throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
-        };
+        }
+
+        public override TargetPlatform Platform => TargetPlatform.Linux;
+    }
+
+    public static readonly BuildHostPlatform LinuxPlatform = new LinuxBuildHostPlatform();
+
+    public static BuildHostPlatform Current
+    {
+        get
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return RuntimeInformation.OSArchitecture switch
+                {
+                    Architecture.X64 => WindowsPlatform,
+                    _ => throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
+                };
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return RuntimeInformation.OSArchitecture switch
+                {
+                    Architecture.X64 => LinuxPlatform,
+                    _ => throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
+                };
+            }
+            else
+            {
+                throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform);
+            }
+        }
+    }
 }

@@ -101,9 +101,10 @@ public class VisualCXXProject : IProject
                 PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
 
                 string BuildToolPath = InWorkspace.BuildTool;
+                BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"dotnet {BuildToolPath} Build";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"dotnet {BuildToolPath} Rebuild";
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean";
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");

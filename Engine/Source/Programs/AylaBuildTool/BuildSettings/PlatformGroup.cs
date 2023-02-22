@@ -13,7 +13,19 @@ public record PlatformGroup
 
     public override string ToString() => GroupName;
 
+    public string ToDefinition() => "PLATFORM_" + GroupName.ToUpper();
+
     public static readonly PlatformGroup Windows = new("Windows")
     {
     };
+
+    public static readonly PlatformGroup Linux = new("Linux")
+    {
+    };
+
+    public static void ForEach(Action<PlatformGroup> Body)
+    {
+        Body(Windows);
+        Body(Linux);
+    }
 }
