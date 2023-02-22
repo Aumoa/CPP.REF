@@ -4,6 +4,8 @@ using AE.BuildSettings;
 using AE.Projects;
 using AE.Rules;
 
+using Microsoft.CodeAnalysis;
+
 namespace AE.ProjectFiles.CMake;
 
 public class CMakeCXXProject : IProject
@@ -29,8 +31,15 @@ public class CMakeCXXProject : IProject
         string OutputDir = Directory.GetParent(MakefilePath)!.FullName;
         Directory.CreateDirectory(OutputDir);
 
+        bool bExecutable = CXXProject.Rules.Type == Rules.TargetType.ConsoleApplication;
+        var Modules = CXXProject.GetModules();
+        if (bExecutable && Modules.Length != 1)
+        {
+            throw new InvalidOperationException(CoreStrings.Errors.MultipleModuleNotSuportedError);
+        }
+
         List<string> Subdirectories = new();
-        foreach (var ModuleName in CXXProject.GetModules())
+        foreach (var ModuleName in Modules)
         {
             var Resolved = CXXProject.GetModuleRule(ModuleName);
             string Name = Resolved.Rules.Name;
@@ -41,6 +50,12 @@ public class CMakeCXXProject : IProject
             static string AsDefinition(string p) => $"\"-D{p}\"";
             static string AsIncludeDirectory(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
             static string AsLibrary(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
+
+            string LinkType = bExecutable ? "ADD_EXECUTABLE" : "ADD_LIBRARY";
+            string ShareType = bExecutable ? "" : "SHARED";
+
+            IEnumerable<string> Links = Resolved.DependencyModules;
+            Links = Links.Concat(Resolved.AdditionalLibraries.Select(AsLibrary));
 
             string SubCMakeLists = $@"
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
@@ -57,10 +72,10 @@ INCLUDE_DIRECTORIES(
 
 FILE(GLOB_RECURSE SRC_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cpp"")
 
-ADD_LIBRARY({Name} SHARED ${{SRC_FILES}})
+{LinkType}({Name} {ShareType} ${{SRC_FILES}})
 
 TARGET_LINK_LIBRARIES({Name}
-    {string.Join(Environment.NewLine + '\t', Resolved.AdditionalLibraries.Select(AsLibrary))}
+    {string.Join(Environment.NewLine + '\t', Links)}
 )
 ";
 
@@ -96,11 +111,13 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
 
+LINK_DIRECTORIES(""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
+
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_CXX_FLAGS ""/EHsc"")
 
-{string.Join(Environment.NewLine + '\t', Subdirectories)}
+{string.Join(Environment.NewLine, Subdirectories)}
 ";
 
         await File.WriteAllTextAsync(MakefilePath, CMakeLists, CToken);

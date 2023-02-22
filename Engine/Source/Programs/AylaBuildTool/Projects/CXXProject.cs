@@ -29,6 +29,8 @@ public class CXXProject
 
         public ModuleRules Rules { get; set; } = null!;
 
+        public string[] DependencyModules { get; set; } = null!;
+
         public string[] SourceFiles { get; set; } = null!;
 
         public string[] IncludePaths { get; set; } = null!;
@@ -186,6 +188,8 @@ public class CXXProject
         AdditionalLibraries.AddRange(Project.Rules.PublicAdditionalLibraries);
         AdditionalLibraries.AddRange(Project.Rules.PrivateAdditionalLibraries);
         Project.AdditionalLibraries = AdditionalLibraries.Distinct().ToArray();
+
+        Project.DependencyModules = Dependencies.Select(p => p.Rules.Name).ToArray();
     }
 
     public string[] GetAllModuleSourceFiles()
