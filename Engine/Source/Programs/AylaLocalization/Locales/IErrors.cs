@@ -22,6 +22,8 @@ public interface IErrors
 
     string CMakeReturnCodeError { get; }
 
+    string MultipleModuleNotSuportedError { get; }
+    
     string NotSupportedBuildHostPlatform { get; }
 
     string CompilerNotSupported { get; }
