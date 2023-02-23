@@ -23,4 +23,6 @@ internal class Errors : IErrors
     public string CMakeReturnCodeError => "cmake.exe에서 성공이 아닌 코드({0})를 반환했습니다.";
 
     public string NotSupportedBuildHostPlatform => "지원하지 않는 빌드 호스트 플랫폼입니다.";
+
+    public string CompilerNotSupported => "지원되지 않는 컴파일러 버전입니다.";
 }

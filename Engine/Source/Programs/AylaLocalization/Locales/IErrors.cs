@@ -23,4 +23,6 @@ public interface IErrors
     string CMakeReturnCodeError { get; }
 
     string NotSupportedBuildHostPlatform { get; }
+
+    string CompilerNotSupported { get; }
 }
