@@ -234,7 +234,7 @@ public class VisualCXXProject : IProject
 
     private static bool IsSourceFile(string Extensions)
     {
-        return Extensions == ".cpp";
+        return Extensions == ".cpp" || Extensions == ".cc";
     }
 
     private static bool IsNoneFile(string Extensions)

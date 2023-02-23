@@ -70,9 +70,10 @@ INCLUDE_DIRECTORIES(
     {string.Join(Environment.NewLine + '\t', Resolved.IncludePaths.Select(AsIncludeDirectory))}
 )
 
-FILE(GLOB_RECURSE SRC_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cpp"")
+FILE(GLOB_RECURSE CXX_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cpp"")
+FILE(GLOB_RECURSE CC_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cc"")
 
-{LinkType}({Name} {ShareType} ${{SRC_FILES}})
+{LinkType}({Name} {ShareType} ${{CXX_FILES}} ${{CC_FILES}})
 
 TARGET_LINK_LIBRARIES({Name}
     {string.Join(Environment.NewLine + '\t', Links)}
