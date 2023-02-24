@@ -5,6 +5,8 @@
 #include "PrimitiveTypes.h"
 #include <functional>
 #include <atomic>
+#include <mutex>
+#include <memory>
 
 class CORE_API IOContext
 {

@@ -21,6 +21,6 @@ public:
 
 	Task<String> ReadAllTextAsync(std::stop_token cancellationToken = {}) const;
 
-	inline constexpr FileReference& operator =(const FileReference&) = default;
-	inline constexpr FileReference& operator =(FileReference&&) = default;
+	FileReference& operator =(const FileReference&) = default;
+	FileReference& operator =(FileReference&&) = default;
 };

@@ -5,6 +5,8 @@
 #include "PrimitiveTypes.h"
 #include <any>
 #include <span>
+#include <vector>
+#include <memory>
 
 class CORE_API SocketBuffer
 {

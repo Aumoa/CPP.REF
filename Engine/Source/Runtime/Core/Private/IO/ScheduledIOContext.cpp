@@ -3,6 +3,7 @@
 #include "IO/ScheduledIOContext.h"
 #include "IO/IOContext.h"
 #include <optional>
+#include <mutex>
 
 ScheduledIOContext::ScheduledIOContext() noexcept
 {

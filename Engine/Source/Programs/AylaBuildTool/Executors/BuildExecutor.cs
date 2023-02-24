@@ -2,6 +2,7 @@
 
 using AE.BuildSettings;
 using AE.CLI;
+using AE.Platform.Windows;
 using AE.ProjectFiles.CMake;
 using AE.Projects;
 using AE.Rules;
@@ -55,21 +56,42 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         string PlatformId = TargetInfo.BuildConfiguration.Platform.ToString();
 
         string CMakeExecutable = Path.Combine(Workspace.EngineDirectory.BuildDirectory, "CMake", PlatformId, "bin", "cmake");
-        string NinjaExecutable = Path.Combine(Workspace.EngineDirectory.BuildDirectory, "Ninja", PlatformId, "bin", "ninja");
-        string CCompiler = "";
-        string CXXCompiler = "";
+        List<string> PathEnvironments = new();
+        Dictionary<string, string> CMakeDefinitions = new();
+
+        // Add current path environments.
+        string CurrentPaths = Environment.GetEnvironmentVariable("PATH") ?? "";
+        foreach (var Path in CurrentPaths.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            PathEnvironments.Add(Path);
+        }
+
+        // Add ninja executable path to environments.
+        PathEnvironments.Add(Path.Combine(Workspace.EngineDirectory.BuildDirectory, "Ninja", PlatformId, "bin"));
 
         if (TargetInfo.BuildConfiguration.Platform.Group == PlatformGroup.Windows)
         {
             CMakeExecutable = Path.ChangeExtension(CMakeExecutable, ".exe");
-            NinjaExecutable = Path.ChangeExtension(NinjaExecutable, ".exe");
-            CCompiler = "cl.exe";
-            CXXCompiler = "cl.exe";
+
+            var Installations = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022);
+            string CompilerPath = Installations.First().FindCCompilerPath(Platform.Architecture.x64);
+
+            PathEnvironments.Add(Path.GetDirectoryName(CompilerPath)!);
+            PathEnvironments.Add("C:/Program Files (x86)/Windows Kits/10\\bin\\10.0.19041.0\\x64");
+
+            CMakeDefinitions.Add("CMAKE_CXX_FLAGS", "/EHsc /MP");
+
+            CMakeDefinitions.Add("CMAKE_SHARED_LIBRARY_EXPORT", "__declspec(dllexport)");
+            CMakeDefinitions.Add("CMAKE_SHARED_LIBRARY_IMPORT", "__declspec(dllimport)");
         }
         else if (TargetInfo.BuildConfiguration.Platform.Group == PlatformGroup.Linux)
         {
-            CCompiler = "gcc";
-            CXXCompiler = "g++";
+            CMakeDefinitions.Add("CMAKE_CXX_FLAGS", "");
+            CMakeDefinitions.Add("CMAKE_C_COMPILER", "gcc");
+            CMakeDefinitions.Add("CMAKE_CXX_COMPILER", "g++");
+
+            CMakeDefinitions.Add("CMAKE_SHARED_LIBRARY_EXPORT", "__attribute__((visibility(\\\"default\\\")))");
+            CMakeDefinitions.Add("CMAKE_SHARED_LIBRARY_IMPORT", "");
         }
 
         Console.WriteLine("Start building with CMake...");
@@ -77,24 +99,26 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         {
             string ProjectFilesDir = Directory.GetParent(CXXProject.MakefilePath)!.FullName;
             string ProjectName = CXXProject.Name;
-            string IntermediatePath = Path.GetFullPath(Path.Combine(ProjectFilesDir, "../../.."));
-            IntermediatePath = Path.Combine(IntermediatePath, "Shipping", ProjectName);
+            string IntermediatePath = Workspace.TargetDirectory.IntermediateDirectory;
+            IntermediatePath = Path.Combine(IntermediatePath, "Build", "Shipping", ProjectName);
             if (BuildArgs.bClean && Directory.Exists(IntermediatePath))
             {
                 Directory.Delete(IntermediatePath, true);
             }
             Directory.CreateDirectory(IntermediatePath);
 
-            ProcessStartInfo CmdStart = new(CMakeExecutable)
+            ProcessStartInfo CMakeStart = new(CMakeExecutable)
             {
-                Arguments = $"-G Ninja -DCMAKE_MAKE_PROGRAM=\"{NinjaExecutable}\" -DCMAKE_C_COMPILER=\"{CCompiler}\" -DCMAKE_CXX_COMPILER=\"{CXXCompiler}\" \"{CXXProject.MakefilePath}\"",
+                Arguments = $"-GNinja {string.Join(' ', CMakeDefinitions.Select(p => $"-D{p.Key}=\"{p.Value}\""))} \"{CXXProject.MakefilePath}\"",
                 WorkingDirectory = IntermediatePath,
 #if !DEBUG
                 RedirectStandardOutput = true,
 #endif
             };
 
-            Process? CMakeApp = Process.Start(CmdStart);
+            CMakeStart.Environment["PATH"] = string.Join(';', PathEnvironments);
+
+            Process? CMakeApp = Process.Start(CMakeStart);
             if (CMakeApp == null)
             {
                 Console.Error.WriteLine(CoreStrings.Errors.StartCMakeError);
@@ -108,13 +132,13 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                 return CMakeApp.ExitCode;
             }
 
-            CmdStart = new(CMakeExecutable)
+            CMakeStart = new(CMakeExecutable)
             {
                 Arguments = $"--build .",
                 WorkingDirectory = IntermediatePath
             };
 
-            CMakeApp = Process.Start(CmdStart);
+            CMakeApp = Process.Start(CMakeStart);
             if (CMakeApp == null)
             {
                 Console.Error.WriteLine(CoreStrings.Errors.StartCMakeError);

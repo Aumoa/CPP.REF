@@ -25,4 +25,6 @@ internal class Errors : IErrors
     public string NotSupportedBuildHostPlatform => "지원하지 않는 빌드 호스트 플랫폼입니다.";
 
     public string CompilerNotSupported => "지원되지 않는 컴파일러 버전입니다.";
+
+    public string InvalidToolChainInstallation => "올바르지 않은 ToolChain 설치입니다.";
 }

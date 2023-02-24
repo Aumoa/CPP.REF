@@ -14,6 +14,7 @@
 #include <queue>
 #include <stop_token>
 #include <memory>
+#include <mutex>
 
 template<class T>
 class Awaiter : public AwaiterBase

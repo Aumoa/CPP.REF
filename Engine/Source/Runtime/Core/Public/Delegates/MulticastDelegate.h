@@ -10,6 +10,7 @@
 #include <atomic>
 #include <concepts>
 #include <memory>
+#include <mutex>
 
 template<class>
 class MulticastDelegate

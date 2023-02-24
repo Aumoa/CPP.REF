@@ -9,6 +9,7 @@
 #include "Misc/PlatformMisc.h"
 #include "Console.h"
 #include <future>
+#include <thread>
 
 namespace
 {

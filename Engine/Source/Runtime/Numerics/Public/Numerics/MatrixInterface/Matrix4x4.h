@@ -111,23 +111,23 @@ public:
 	}
 
 public:
-	CORE_API static float Determinant(const Matrix4x4& M);
-	CORE_API static Matrix4x4 Inverse(const Matrix4x4& M);
-	CORE_API static bool Decompose(const Matrix4x4& M, Translate3D& OutT, Scale3D& OutS, struct Quaternion& OutQ);
+	NUMERICS_API static float Determinant(const Matrix4x4& M);
+	NUMERICS_API static Matrix4x4 Inverse(const Matrix4x4& M);
+	NUMERICS_API static bool Decompose(const Matrix4x4& M, Translate3D& OutT, Scale3D& OutS, struct Quaternion& OutQ);
 
-	CORE_API static Vector3 TransformPoint(const Matrix4x4& M, const Vector3& P);
-	CORE_API static Vector3 TransformVector(const Matrix4x4& M, const Vector3& V);
-	CORE_API static Matrix4x4 Multiply(const Matrix4x4& ML, const Matrix4x4& MR);
+	NUMERICS_API static Vector3 TransformPoint(const Matrix4x4& M, const Vector3& P);
+	NUMERICS_API static Vector3 TransformVector(const Matrix4x4& M, const Vector3& V);
+	NUMERICS_API static Matrix4x4 Multiply(const Matrix4x4& ML, const Matrix4x4& MR);
 
-	CORE_API static Matrix4x4 LookToLH(const Vector3& Location, const Vector3& Dir, const Vector3& Up);
-	CORE_API static Matrix4x4 PerspectiveFovLH(Radians Fov, float AspectRatio, float Near, float Far);
-	CORE_API static Matrix4x4 AffineTransformation(const Translate3D& T, const Scale3D& S, const struct Quaternion& Q);
-	CORE_API static Matrix4x4 Translation(const Vector3& T);
-	CORE_API static Matrix4x4 Scale(const Scale3D& S);
-	CORE_API static Matrix4x4 Rotation(const Vector3& Axis, Radians Angle);
-	CORE_API static Matrix4x4 RotationX(Radians Angle);
-	CORE_API static Matrix4x4 RotationY(Radians Angle);
-	CORE_API static Matrix4x4 RotationZ(Radians Angle);
+	NUMERICS_API static Matrix4x4 LookToLH(const Vector3& Location, const Vector3& Dir, const Vector3& Up);
+	NUMERICS_API static Matrix4x4 PerspectiveFovLH(Radians Fov, float AspectRatio, float Near, float Far);
+	NUMERICS_API static Matrix4x4 AffineTransformation(const Translate3D& T, const Scale3D& S, const struct Quaternion& Q);
+	NUMERICS_API static Matrix4x4 Translation(const Vector3& T);
+	NUMERICS_API static Matrix4x4 Scale(const Scale3D& S);
+	NUMERICS_API static Matrix4x4 Rotation(const Vector3& Axis, Radians Angle);
+	NUMERICS_API static Matrix4x4 RotationX(Radians Angle);
+	NUMERICS_API static Matrix4x4 RotationY(Radians Angle);
+	NUMERICS_API static Matrix4x4 RotationZ(Radians Angle);
 
 	template<TIsMatrix<float, 4, 4> IMatrix>
 	static auto Determinant(const IMatrix& M)

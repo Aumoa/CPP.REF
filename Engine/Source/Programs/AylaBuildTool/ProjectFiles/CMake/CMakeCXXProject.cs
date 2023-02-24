@@ -2,7 +2,6 @@
 
 using AE.BuildSettings;
 using AE.Projects;
-using AE.Rules;
 
 using Microsoft.CodeAnalysis;
 
@@ -35,7 +34,8 @@ public class CMakeCXXProject : IProject
         var Modules = CXXProject.GetModules();
         if (bExecutable && Modules.Length != 1)
         {
-            throw new InvalidOperationException(CoreStrings.Errors.MultipleModuleNotSuportedError);
+            //throw new InvalidOperationException(CoreStrings.Errors.MultipleModuleNotSuportedError);
+            throw new Exception();
         }
 
         List<string> Subdirectories = new();
@@ -62,12 +62,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
 PROJECT({Name})
 
-ADD_DEFINITIONS(
-    {string.Join(Environment.NewLine + '\t', Resolved.AdditionalMacros.Select(AsDefinition))}
-)
-
 INCLUDE_DIRECTORIES(
-    {string.Join(Environment.NewLine + '\t', Resolved.IncludePaths.Select(AsIncludeDirectory))}
+    {string.Join("\n\t", Resolved.IncludePaths.Select(AsIncludeDirectory))}
 )
 
 FILE(GLOB_RECURSE CXX_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cpp"")
@@ -76,7 +72,11 @@ FILE(GLOB_RECURSE CC_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorCha
 {LinkType}({Name} {ShareType} ${{CXX_FILES}} ${{CC_FILES}})
 
 TARGET_LINK_LIBRARIES({Name}
-    {string.Join(Environment.NewLine + '\t', Links)}
+    {string.Join("\t\n", Links)}
+)
+
+TARGET_COMPILE_DEFINITIONS({Name} PRIVATE
+    {string.Join("\n\t", Resolved.AdditionalMacros.Select(AsDefinition))}
 )
 ";
 
@@ -105,7 +105,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 PROJECT({CXXProject.Rules.Name})
 
 ADD_COMPILE_DEFINITIONS(
-    {string.Join(Environment.NewLine + '\t', Definitions)}
+    {string.Join("\n\t", Definitions)}
 )
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
@@ -116,9 +116,8 @@ LINK_DIRECTORIES(""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySepa
 
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_STANDARD 20)
-SET(CMAKE_CXX_FLAGS ""/EHsc"")
 
-{string.Join(Environment.NewLine, Subdirectories)}
+{string.Join('\n', Subdirectories)}
 ";
 
         await File.WriteAllTextAsync(MakefilePath, CMakeLists, CToken);

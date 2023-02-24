@@ -60,6 +60,7 @@ public:
 	static inline void Fatal(const LogCategory& logCategory, const String& format, TFormatArgs&&... args)
 	{
 		Print(logCategory, ELogLevel::Fatal, String::Format(format, std::forward<TFormatArgs>(args)...));
+		throw;
 	}
 
 private:

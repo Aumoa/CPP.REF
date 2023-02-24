@@ -148,8 +148,8 @@ public:
 	}
 
 public:
-	CORE_API static Quaternion FromAxisAngle(const Vector3& Axis, Degrees Angle);
-	CORE_API static Quaternion LookTo(const Vector3& Forward, const Vector3& Up);
+	NUMERICS_API static Quaternion FromAxisAngle(const Vector3& Axis, Degrees Angle);
+	NUMERICS_API static Quaternion LookTo(const Vector3& Forward, const Vector3& Up);
 
 	template<TIsVector<float, 3> IAxis>
 	static Quaternion FromAxisAngle(const IAxis& Axis, Degrees Angle)

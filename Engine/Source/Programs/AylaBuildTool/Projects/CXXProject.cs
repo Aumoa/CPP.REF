@@ -159,7 +159,7 @@ public class CXXProject
 
         List<string> APIDefinitions = new()
         {
-            $"{Project.Rules.GenerateSafeAPIName()}=__declspec(dllexport)"
+            $"{Project.Rules.GenerateSafeAPIName()}=${{CMAKE_SHARED_LIBRARY_EXPORT}}"
         };
 
         foreach (var Depend in Dependencies)
@@ -169,7 +169,7 @@ public class CXXProject
             DisableWarnings.AddRange(Depend.Rules.PublicDisableWarnings);
             AdditionalLibraries.AddRange(Depend.Rules.PublicAdditionalLibraries);
 
-            APIDefinitions.Add($"{Depend.Rules.GenerateSafeAPIName()}=__declspec(dllimport)");
+            APIDefinitions.Add($"{Depend.Rules.GenerateSafeAPIName()}=${{CMAKE_SHARED_LIBRARY_IMPORT}}");
         }
 
         IncludePaths.AddRange(ProcessIncludes(Project, Project.Rules.PublicIncludePaths));

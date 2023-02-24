@@ -3,20 +3,17 @@
 #include "Linq/Generator.h"
 #include "Exceptions/Exception.h"
 
-template<>
-void Linq::Generator<void>::_Xthrow_already_start()
+void Linq::GeneratorHelper::_Xthrow_already_start()
 {
 	throw Exception(TEXT("Already started."));
 }
 
-template<>
-void Linq::Generator<void>::_Xthrow_value_null()
+void Linq::GeneratorHelper::_Xthrow_value_null()
 {
 	throw Exception(TEXT("Value is null."));
 }
 
-template<>
-void Linq::Generator<void>::_Xthrow_coro_done()
+void Linq::GeneratorHelper::_Xthrow_coro_done()
 {
 	throw Exception(TEXT("Coroutine is done."));
 }

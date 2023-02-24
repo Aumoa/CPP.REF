@@ -90,12 +90,12 @@ namespace libty::Details
 
 	public:
 		Awaiter_t* GetAwaiter() const noexcept requires
-			!std::same_as<Awaiter_t, void>
+			(!std::same_as<Awaiter_t, void>)
 		{
 			return _awaiter.get();
 		}
 
-		constexpr TTask get_return_object() noexcept requires !std::same_as<TTask, void>
+		constexpr TTask get_return_object() noexcept requires (!std::same_as<TTask, void>)
 		{
 			return TTask(_awaiter);
 		}

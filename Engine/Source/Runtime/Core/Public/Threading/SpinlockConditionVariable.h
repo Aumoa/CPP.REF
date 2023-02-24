@@ -7,6 +7,7 @@
 #include "TimeSpan.h"
 #include "Misc/PlatformMisc.h"
 #include <chrono>
+#include <mutex>
 
 class CORE_API SpinlockConditionVariable
 {

@@ -33,9 +33,9 @@ public:
 	Task() = default;
 	Task(const Task&) = default;
 
-	template<class T>
-	explicit Task(std::shared_ptr<T> awaiter) requires
-		std::constructible_from<Task, std::shared_ptr<T>, int>
+	template<class U>
+	explicit Task(std::shared_ptr<U> awaiter) requires
+		std::constructible_from<Task, std::shared_ptr<U>, int>
 		: Task(awaiter, 0)
 	{
 	}
@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	explicit Task(const Task<>& task) requires !std::same_as<T, void>
+	explicit Task(const Task<>& task) requires (!std::same_as<T, void>)
 		: Task(task.GetAwaiter())
 	{
 	}

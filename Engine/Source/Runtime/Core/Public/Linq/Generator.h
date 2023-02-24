@@ -9,13 +9,23 @@
 
 namespace Linq
 {
+	class CORE_API GeneratorHelper
+	{
+	public:
+		[[noreturn]] static void _Xthrow_already_start();
+		[[noreturn]] static void _Xthrow_value_null();
+		[[noreturn]] static void _Xthrow_coro_done();
+	};
+
 	template<class T>
 	class Generator
 	{
 		Generator(const Generator&) = delete;
-		class Enumerator;
 		template<class U>
 		friend class Generator;
+
+	public:
+		class Enumerator;
 
 	public:
 		class promise_type
@@ -77,7 +87,7 @@ namespace Linq
 			{
 				if (!_value.has_value())
 				{
-					Generator<void>::_Xthrow_value_null();
+					GeneratorHelper::_Xthrow_value_null();
 				}
 				return *_value;
 			}
@@ -106,7 +116,7 @@ namespace Linq
 			{
 				if (_coro.done())
 				{
-					Generator<void>::_Xthrow_coro_done();
+					GeneratorHelper::_Xthrow_coro_done();
 				}
 
 				_coro.resume();
@@ -155,7 +165,7 @@ namespace Linq
 		{
 			if (!_coro)
 			{
-				Generator<void>::_Xthrow_already_start();
+				GeneratorHelper::_Xthrow_already_start();
 			}
 
 			return Enumerator(std::move(_coro));
@@ -177,17 +187,5 @@ namespace Linq
 			_coro = std::move(rhs._coro);
 			return *this;
 		}
-
-	private:
-		[[noreturn]] static void _Xthrow_already_start();
-		[[noreturn]] static void _Xthrow_value_null();
-		[[noreturn]] static void _Xthrow_coro_done();
 	};
-
-	template<>
-	[[noreturn]] CORE_API static void Generator<void>::_Xthrow_already_start();
-	template<>
-	[[noreturn]] CORE_API static void Generator<void>::_Xthrow_value_null();
-	template<>
-	[[noreturn]] CORE_API static void Generator<void>::_Xthrow_coro_done();
 }

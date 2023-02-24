@@ -2,6 +2,7 @@
 
 #include "Exceptions/Exception.h"
 #include "Misc/String.h"
+#include <mutex>
 
 Exception::Exception(const String& message, std::exception_ptr innerException) noexcept
 	: _message(message)

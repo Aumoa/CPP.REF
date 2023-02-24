@@ -2,6 +2,7 @@
 
 using System;
 using AE.Rules;
+using AE.BuildSettings;
 
 public class Core : ModuleRules
 {
@@ -23,19 +24,22 @@ public class Core : ModuleRules
             5106,
         });
 
-        PublicAdditionalMacros.AddRange(new[]
+        if (TargetRule.Platform.Group == PlatformGroup.Windows)
         {
-            "NOMINMAX",
-            "WIN32_LEAN_AND_MEAN"
-        });
+            PublicAdditionalMacros.AddRange(new[]
+            {
+                "NOMINMAX",
+                "WIN32_LEAN_AND_MEAN"
+            });
 
-        PublicAdditionalLibraries.AddRange(new[]
-        {
-            "psapi.lib",
-            "dbghelp.lib",
-            "User32.lib",
-            "Rpcrt4.lib",
-            "ws2_32.lib"
-        });
+            PublicAdditionalLibraries.AddRange(new[]
+            {
+                "psapi.lib",
+                "dbghelp.lib",
+                "User32.lib",
+                "Rpcrt4.lib",
+                "ws2_32.lib"
+            });
+        }
     }
 }

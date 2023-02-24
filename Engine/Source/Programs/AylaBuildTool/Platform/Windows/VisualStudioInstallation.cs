@@ -71,11 +71,49 @@ public class VisualStudioInstallation : ToolChainInstallation
             }
             catch
             {
+                Console.Error.WriteLine("An exception occurred while search Visual Studio Compiler for {0}.", InCompiler);
             }
 
             CachedVisualStudioInstallations.Add(InCompiler, Installations);
         }
 
         return Installations.ToArray();
+    }
+
+    private Dictionary<Architecture, string> CompilerPaths = new();
+
+    public override string FindCCompilerPath(Architecture TargetArchitecture)
+    {
+        if (CompilerPaths.TryGetValue(TargetArchitecture, out string? CompilerPath) == false)
+        {
+            string MSVCToolsetsPath = Path.Combine(BaseDirectory, "VC", "Tools", "MSVC");
+            if (Directory.Exists(MSVCToolsetsPath) == false)
+            {
+                throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
+            }
+
+            List<Version> CompilerVersions = new();
+            foreach (var VersionDir in Directory.GetDirectories(MSVCToolsetsPath))
+            {
+                CompilerVersions.Add(Version.Parse(Path.GetFileName(VersionDir)!));
+            }
+
+            string HostArchitecture = BuildHostPlatform.Current.Platform.Architecture switch
+            {
+                Architecture.x64 => "Hostx64",
+                _ => throw new NotSupportedException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
+            };
+
+            Version LatestVersion = CompilerVersions.OrderByDescending(p => p).First();
+            CompilerPath = Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "bin", HostArchitecture, TargetArchitecture.ToString(), "cl.exe");
+            if (File.Exists(CompilerPath) == false)
+            {
+                throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
+            }
+
+            CompilerPaths.Add(TargetArchitecture, CompilerPath);
+        }
+
+        return CompilerPath;
     }
 }

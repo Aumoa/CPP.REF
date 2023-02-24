@@ -3,11 +3,10 @@
 #pragma once
 
 #include "Misc/StaticClass.h"
+#include "Misc/String.h"
 #include <span>
 #include <initializer_list>
 #include <vector>
-
-class String;
 
 class CORE_API Path : public StaticClass
 {

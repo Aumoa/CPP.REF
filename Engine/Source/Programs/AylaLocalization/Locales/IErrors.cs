@@ -25,4 +25,6 @@ public interface IErrors
     string NotSupportedBuildHostPlatform { get; }
 
     string CompilerNotSupported { get; }
+
+    string InvalidToolChainInstallation { get; }
 }

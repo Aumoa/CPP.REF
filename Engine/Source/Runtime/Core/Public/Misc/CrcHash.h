@@ -209,14 +209,15 @@ class CrcHash
 	template<size_t _Idx>
 	static consteval uint32 _Crc32(const char* str)
 	{
-		uint32 _Next = _Crc32<_Idx - 1>(str);
-		return (_Next >> 8) ^ CrcTable32[(_Next ^ str[_Idx]) & 0xFF];
-	}
-
-	template<>
-	static consteval uint32 _Crc32<size_t(-1)>(const char* str)
-	{
-		return 0xFFFFFFFF;
+		if constexpr (_Idx == -1)
+		{
+			return 0xFFFFFFFF;
+		}
+		else
+		{
+			uint32 _Next = _Crc32<_Idx - 1>(str);
+			return (_Next >> 8) ^ CrcTable32[(_Next ^ str[_Idx]) & 0xFF];
+		}
 	}
 
 	static constexpr uint32 _Crc32(const char* str, size_t _Idx)
@@ -235,14 +236,15 @@ class CrcHash
 	template<size_t _Idx>
 	static consteval uint64 _Crc64(const char* str)
 	{
-		uint64 _Next = _Crc64<_Idx - 1>(str);
-		return (_Next >> 8) ^ CrcTable64[(_Next ^ str[_Idx]) & 0xFF];
-	}
-
-	template<>
-	static consteval uint64 _Crc64<size_t(-1)>(const char* str)
-	{
-		return 0xFFFFFFFFFFFFFFFF;
+		if constexpr (_Idx == -1)
+		{
+			return 0xFFFFFFFFFFFFFFFF;
+		}
+		else
+		{
+			uint64 _Next = _Crc64<_Idx - 1>(str);
+			return (_Next >> 8) ^ CrcTable64[(_Next ^ str[_Idx]) & 0xFF];
+		}
 	}
 
 	static constexpr uint64 _Crc64(const char* str, size_t _Idx)

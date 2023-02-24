@@ -151,7 +151,7 @@ public:
 		return Color((float)R * Inv255, (float)G * Inv255, (float)B * Inv255, (float)A * Inv255);
 	}
 
-	CORE_API static Color FromHtml(String HtmlCode);
+	NUMERICS_API static Color FromHtml(String HtmlCode);
 };
 
 namespace NamedColors
