@@ -1,5 +1,0 @@
-*                         text=auto
-
-*.cs                      text diff=csharp
-
-*.sh                      text eol=lf
