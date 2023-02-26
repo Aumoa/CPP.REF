@@ -3,9 +3,9 @@
 using System;
 using AE.Rules;
 
-public class Launch : ModuleRules
+public class SlateCore : ModuleRules
 {
-    public Launch(TargetRules TargetRule) : base(TargetRule)
+    public SlateCore(TargetRules TargetRule) : base(TargetRule)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

@@ -32,7 +32,8 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
             {
                 Configuration = Configuration.Development,
                 Platform = BuildHostPlatform.Current.Platform
-            }
+            },
+            bEditor = true
         };
 
         Workspace Workspace = GenerateEngineWorkspace();

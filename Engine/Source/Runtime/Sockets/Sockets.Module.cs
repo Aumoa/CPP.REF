@@ -4,20 +4,12 @@ using System;
 using AE.Rules;
 using AE.BuildSettings;
 
-public class Core : ModuleRules
+public class Sockets : ModuleRules
 {
-    public Core(TargetRules TargetRule) : base(TargetRule)
+    public Sockets(TargetRules TargetRule) : base(TargetRule)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
-
-        PublicDisableWarnings.AddRange(new[]
-        {
-            4251,
-            4275,
-            5105,
-            4005,
-        });
 
         PrivateDisableWarnings.AddRange(new[]
         {
@@ -34,10 +26,7 @@ public class Core : ModuleRules
 
             PublicAdditionalLibraries.AddRange(new[]
             {
-                "psapi.lib",
-                "dbghelp.lib",
-                "User32.lib",
-                "Rpcrt4.lib"
+                "ws2_32.lib"
             });
         }
     }

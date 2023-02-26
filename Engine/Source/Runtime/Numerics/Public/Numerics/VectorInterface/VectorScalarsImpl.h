@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreMinimal.h"
 #include <initializer_list>
 #include <utility>
 #include <tuple>

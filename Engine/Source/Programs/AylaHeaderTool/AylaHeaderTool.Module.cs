@@ -9,7 +9,8 @@ public class AylaHeaderTool : ModuleRules
     {
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
+            "Launch"
         });
 
         PrivateIncludePaths.Add("Private");

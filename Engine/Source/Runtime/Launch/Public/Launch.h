@@ -16,5 +16,16 @@ public:
 	virtual ~NLaunch() noexcept;
 
 public:
-	int32 GuardedMain();
+	int32 GuardedMain(std::function<int32()> Main);
+
+	static std::unique_ptr<NLaunch> GeneratePlatformLaunch(String CmdArgs);
+	static std::unique_ptr<NLaunch> GeneratePlatformLaunch(int Argc, char** Argv)
+	{
+		std::vector<String> Args;
+		for (int i = 0; i < Argc; ++i)
+		{
+			Args.emplace_back(String::FromLiteral(Argv[i]));
+		}
+		return GeneratePlatformLaunch(String::Join(TEXT(" "), Args));
+	}
 };

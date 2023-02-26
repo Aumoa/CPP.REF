@@ -14,7 +14,7 @@ using uint32 = unsigned long;
 using int64 = signed long long;
 using uint64 = unsigned long long;
 
-class CORE_API NIntegralTypes : public StaticClass
+class CORE_API IntegralTypes : public StaticClass
 {
 public:
 	template<class T>
@@ -34,7 +34,7 @@ public:
 template<class T>
 struct TIntegralType
 {
-	static_assert(NIntegralTypes::IsIntegral<T>);
+	static_assert(IntegralTypes::IsIntegral<T>);
 	T Value;
 
 	inline TIntegralType() noexcept

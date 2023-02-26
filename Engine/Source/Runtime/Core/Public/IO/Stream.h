@@ -7,8 +7,10 @@
 
 class CORE_API Stream : public NonCopyable
 {
-public:
+protected:
 	Stream();
+
+public:
 	virtual ~Stream() noexcept;
 
 	virtual void Flush() = 0;

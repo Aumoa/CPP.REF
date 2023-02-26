@@ -5,7 +5,7 @@
 #include <concepts>
 #include "Misc/StaticClass.h"
 
-class CORE_API NRealTypes : public StaticClass
+class CORE_API RealTypes : public StaticClass
 {
 public:
 	template<class T>
@@ -19,7 +19,7 @@ public:
 template<class T>
 struct TRealType
 {
-	static_assert(NRealTypes::IsReal<T>);
+	static_assert(RealTypes::IsReal<T>);
 	T Value;
 
 	inline TRealType() noexcept

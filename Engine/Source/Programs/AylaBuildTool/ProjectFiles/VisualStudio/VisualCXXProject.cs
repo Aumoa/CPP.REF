@@ -267,17 +267,21 @@ public class VisualCXXProject : IProject
         Project = Doc.AddElement("Project", "http://schemas.microsoft.com/developer/msbuild/2003");
         Project.SetAttribute("ToolsVersion", "Current");
         {
-            var PropertyGroup = Project.AddElement("PropertyGroup");
+            foreach (var Platform in BuildConfiguration.Platforms)
+            {
+                var PropertyGroup = Project.AddElement("PropertyGroup");
+                PropertyGroup.SetAttribute("Condition", $"'$(Platform)'=='{Platform}'");
 
-            string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, CXXProject.Rules.TargetModuleName);
-            Executable = Path.ChangeExtension(Executable, ".exe");
-            PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
+                string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, Platform.ToString(), CXXProject.Rules.TargetModuleName);
+                Executable = Path.ChangeExtension(Executable, ".exe");
+                PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
 
-            string WorkingDirectory = Path.GetDirectoryName(Executable)!;
-            PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = WorkingDirectory;
+                string WorkingDirectory = Path.GetDirectoryName(Executable)!;
+                PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = WorkingDirectory;
 
-            PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
-            PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
+                PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
+                PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
+            }
         }
         VcxprojUser = Doc;
     }

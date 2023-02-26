@@ -23,8 +23,13 @@ public:
 
 INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE _, LPWSTR lpCmdLine, INT nShow)
 {
-	auto WindowsLaunch = std::make_unique<NWindowsLaunch>(String::FromLiteral(lpCmdLine));
-	return WindowsLaunch->GuardedMain();
+	auto WindowsLaunch = NLaunch::GeneratePlatformLaunch(String::FromLiteral(lpCmdLine));
+	return WindowsLaunch->GuardedMain([]() { return 0; });
+}
+
+std::unique_ptr<NLaunch> NLaunch::GeneratePlatformLaunch(String CmdArgs)
+{
+	return std::make_unique<NWindowsLaunch>(CmdArgs);
 }
 
 #endif
