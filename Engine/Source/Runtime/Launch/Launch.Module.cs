@@ -13,7 +13,7 @@ public class Launch : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "Numerics"
+            "SlateCore"
         });
     }
 }
