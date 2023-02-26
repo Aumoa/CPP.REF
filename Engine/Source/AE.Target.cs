@@ -8,6 +8,6 @@ public class AETarget : TargetRules
     public AETarget(TargetInfo Info) : base(Info)
     {
         Class = TargetClass.Engine;
-        ExtraModuleNames.Add("Game");
+        ExtraModuleNames.Add("Core");
     }
 }

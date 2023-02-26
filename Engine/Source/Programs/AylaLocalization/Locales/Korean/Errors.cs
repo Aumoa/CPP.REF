@@ -29,4 +29,8 @@ internal class Errors : IErrors
     public string CompilerNotSupported => "지원되지 않는 컴파일러 버전입니다.";
 
     public string InvalidToolChainInstallation => "올바르지 않은 ToolChain 설치입니다.";
+
+    public string TargetNotFoundException => "지정한 빌드 타깃({0})을 찾을 수 없습니다.";
+
+    public string NotSupportedArchitecture => "지원되지 않는 아키텍처 버전({0})입니다.";
 }

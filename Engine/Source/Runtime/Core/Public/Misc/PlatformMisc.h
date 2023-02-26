@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 #include "StaticClass.h"
 #include "IO/FileAccessMode.h"
 #include "IO/FileSharedMode.h"
 #include <functional>
 #include <span>
+#include <string>
 
 class String;
 class IOCompletionOverlapped;

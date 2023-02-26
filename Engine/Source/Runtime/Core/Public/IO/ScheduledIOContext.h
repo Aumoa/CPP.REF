@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include <chrono>

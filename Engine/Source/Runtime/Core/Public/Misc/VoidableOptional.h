@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 #include "CoreAssert.h"
 
 template<class T>

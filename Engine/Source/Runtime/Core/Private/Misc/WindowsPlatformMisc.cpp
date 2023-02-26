@@ -5,7 +5,7 @@
 #if PLATFORM_WINDOWS
 
 #include "Misc/PlatformMisc.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include "Exceptions/SystemException.h"
 #include "Exceptions/ArgumentNullException.h"
 #include "Exceptions/AccessViolationException.h"

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
-#include "Misc/String.h"
+#include "CoreTypes/IntegralTypes.h"
+#include "CoreTypes/String.h"
 
 class CORE_API EndPoint
 {

@@ -4,7 +4,7 @@
 
 #include "LogLevel.h"
 #include "DateTime.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 
 class LogCategory;
 

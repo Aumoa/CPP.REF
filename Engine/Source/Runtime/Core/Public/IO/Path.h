@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Misc/StaticClass.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <span>
 #include <initializer_list>
 #include <vector>

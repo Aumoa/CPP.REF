@@ -2,7 +2,7 @@
 
 #include "Threading/ThreadGroup.h"
 #include "Exceptions/InvalidOperationException.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include "Misc/PlatformMisc.h"
 
 ThreadGroup::ThreadGroup(const String& groupName)

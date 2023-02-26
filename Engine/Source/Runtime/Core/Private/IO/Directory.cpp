@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/Directory.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include "Exceptions/SystemException.h"
 #include <filesystem>
 

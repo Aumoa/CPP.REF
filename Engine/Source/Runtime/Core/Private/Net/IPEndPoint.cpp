@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Net/IPEndPoint.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 
 #if PLATFORM_WINDOWS
 #include "Misc/WindowsPlatformMisc.h"

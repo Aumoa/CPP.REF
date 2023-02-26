@@ -29,4 +29,8 @@ public interface IErrors
     string CompilerNotSupported { get; }
 
     string InvalidToolChainInstallation { get; }
+
+    string TargetNotFoundException { get; }
+
+    string NotSupportedArchitecture { get; }
 }

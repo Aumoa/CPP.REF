@@ -20,7 +20,7 @@ public class VisualStudioInstallation : ToolChainInstallation
 
     public bool bIsPreview { get; init; }
 
-    private static Dictionary<Compiler, List<VisualStudioInstallation>> CachedVisualStudioInstallations = new();
+    private static readonly Dictionary<Compiler, List<VisualStudioInstallation>> CachedVisualStudioInstallations = new();
 
     public static VisualStudioInstallation[] FindVisualStudioInstallations(Compiler InCompiler)
     {
@@ -80,22 +80,38 @@ public class VisualStudioInstallation : ToolChainInstallation
         return Installations.ToArray();
     }
 
-    private Dictionary<Architecture, string> CompilerPaths = new();
-
-    public override string FindCCompilerPath(Architecture TargetArchitecture)
+    private struct CompilerAndLibraryPath
     {
-        if (CompilerPaths.TryGetValue(TargetArchitecture, out string? CompilerPath) == false)
+        public string CompilerPath { get; set; }
+
+        public string[] LibraryPath { get; set; }
+
+        public string[] IncludePath { get; set; }
+    }
+
+    private readonly Dictionary<Architecture, CompilerAndLibraryPath> CompilerPaths = new();
+
+    private CompilerAndLibraryPath CacheVisualStudioPath(Architecture TargetArchitecture)
+    {
+        if (CompilerPaths.TryGetValue(TargetArchitecture, out CompilerAndLibraryPath PathSet) == false)
         {
+            string ArchPath = TargetArchitecture switch
+            {
+                Architecture.x64 => "x64",
+                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture, TargetArchitecture))
+            };
+
+            string CompilerPath;
             string MSVCToolsetsPath = Path.Combine(BaseDirectory, "VC", "Tools", "MSVC");
             if (Directory.Exists(MSVCToolsetsPath) == false)
             {
                 throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
             }
 
-            List<Version> CompilerVersions = new();
+            List<string> CompilerVersions = new();
             foreach (var VersionDir in Directory.GetDirectories(MSVCToolsetsPath))
             {
-                CompilerVersions.Add(Version.Parse(Path.GetFileName(VersionDir)!));
+                CompilerVersions.Add(Path.GetFileName(VersionDir)!);
             }
 
             string HostArchitecture = BuildHostPlatform.Current.Platform.Architecture switch
@@ -104,16 +120,108 @@ public class VisualStudioInstallation : ToolChainInstallation
                 _ => throw new NotSupportedException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
             };
 
-            Version LatestVersion = CompilerVersions.OrderByDescending(p => p).First();
-            CompilerPath = Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "bin", HostArchitecture, TargetArchitecture.ToString(), "cl.exe");
-            if (File.Exists(CompilerPath) == false)
+            string LatestVersion = CompilerVersions.OrderByDescending(Version.Parse).First();
+            CompilerPath = Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "bin", HostArchitecture, ArchPath);
+            if (File.Exists(Path.Combine(CompilerPath, "cl.exe")) == false)
             {
                 throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
             }
 
-            CompilerPaths.Add(TargetArchitecture, CompilerPath);
+            PathSet.CompilerPath = CompilerPath;
+            PathSet.LibraryPath = new[] { Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "lib", ArchPath) };
+            PathSet.IncludePath = new[] { Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "include") };
+            CompilerPaths.Add(TargetArchitecture, PathSet);
         }
 
-        return CompilerPath;
+        return PathSet;
+    }
+
+    private readonly Dictionary<Architecture, CompilerAndLibraryPath> CachedWindowsKitVersion = new();
+
+    private CompilerAndLibraryPath CacheWindowsKitVersion(Architecture InArchitecture)
+    {
+        if (CachedWindowsKitVersion.TryGetValue(InArchitecture, out CompilerAndLibraryPath CachedVersion) == false)
+        {
+            string ArchPath = InArchitecture switch
+            {
+                Architecture.x64 => "x64",
+                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture, InArchitecture))
+            };
+
+            List<string> CandidateVersions = new();
+
+            const string BaseLibraryDirectory = "C:\\Program Files (x86)\\Windows Kits\\10\\Lib";
+            foreach (var VersionDirectory in Directory.GetDirectories(BaseLibraryDirectory))
+            {
+                string Location = Path.Combine(VersionDirectory, "ucrt", ArchPath, "ucrt.lib");
+                if (File.Exists(Location) == false)
+                {
+                    continue;
+                }
+
+                CandidateVersions.Add(Path.GetFileName(VersionDirectory));
+            }
+
+            const string BaseCompilerDirectory = "C:\\Program Files (x86)\\Windows Kits\\10\\bin";
+            string[] VersionDirectories = CandidateVersions.ToArray();
+            CandidateVersions.Clear();
+            foreach (var VersionDirectory in VersionDirectories)
+            {
+                string Location = Path.Combine(BaseCompilerDirectory, VersionDirectory, ArchPath, "rc.exe");
+                if (File.Exists(Location) == false)
+                {
+                    continue;
+                }
+
+                CandidateVersions.Add(VersionDirectory);
+            }
+
+            if (CandidateVersions.Count == 0)
+            {
+                throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
+            }
+
+            const string BaseIncludeDirectory = "C:\\Program Files (x86)\\Windows Kits\\10\\Include";
+
+            string CurrentVersion = CandidateVersions.OrderByDescending(Version.Parse).First();
+            CachedVersion.CompilerPath = Path.Combine(BaseCompilerDirectory, CurrentVersion, ArchPath);
+            CachedVersion.LibraryPath = new[]
+            {
+                Path.Combine(BaseLibraryDirectory, CurrentVersion, "um", ArchPath),
+                Path.Combine(BaseLibraryDirectory, CurrentVersion, "ucrt", ArchPath)
+            };
+            CachedVersion.IncludePath = new[]
+            {
+                Path.Combine(BaseIncludeDirectory, CurrentVersion, "ucrt"),
+                Path.Combine(BaseIncludeDirectory, CurrentVersion, "um"),
+                Path.Combine(BaseIncludeDirectory, CurrentVersion, "shared")
+            };
+
+            CachedWindowsKitVersion.Add(InArchitecture, CachedVersion);
+        }
+
+        return CachedVersion;
+    }
+
+    public override string[] GetRequiredExecutablePaths(Architecture TargetArchitecture)
+    {
+        CompilerAndLibraryPath VSSet = CacheVisualStudioPath(TargetArchitecture);
+        CompilerAndLibraryPath WindowsSet = CacheWindowsKitVersion(TargetArchitecture);
+
+        return new[] { VSSet.CompilerPath, WindowsSet.CompilerPath };
+    }
+
+    public override string[] GetRequiredLibraryPaths(Architecture TargetArchitecture)
+    {
+        CompilerAndLibraryPath VSSet = CacheVisualStudioPath(TargetArchitecture);
+        CompilerAndLibraryPath WindowsSet = CacheWindowsKitVersion(TargetArchitecture);
+        return VSSet.LibraryPath.Concat(WindowsSet.LibraryPath).ToArray();
+    }
+
+    public override string[] GetRequiredIncludePaths(Architecture TargetArchitecture)
+    {
+        CompilerAndLibraryPath VSSet = CacheVisualStudioPath(TargetArchitecture);
+        CompilerAndLibraryPath WindowsSet = CacheWindowsKitVersion(TargetArchitecture);
+        return VSSet.IncludePath.Concat(WindowsSet.IncludePath).ToArray();
     }
 }

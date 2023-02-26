@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 
 namespace lib::details
 {

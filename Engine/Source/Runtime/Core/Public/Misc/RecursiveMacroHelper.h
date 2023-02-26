@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 
 #define MACRO_RECURSIVE_HELPER_PARENTHESES ()
 

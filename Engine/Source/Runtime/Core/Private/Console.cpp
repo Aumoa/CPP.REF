@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Console.h"
+#include <mutex>
 
 #if PLATFORM_WINDOWS
 #include "Misc/WindowsPlatformMisc.h"

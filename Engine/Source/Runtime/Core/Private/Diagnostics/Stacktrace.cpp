@@ -6,6 +6,7 @@
 #include "Misc/WindowsPlatformMisc.h"
 #include "Threading/Spinlock.h"
 #include <map>
+#include <mutex>
 
 struct Stacktrace::_stacktrace_impl
 {

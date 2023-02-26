@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 #include "Spinlock.h"
 #include "TimeSpan.h"
 #include "Misc/PlatformMisc.h"

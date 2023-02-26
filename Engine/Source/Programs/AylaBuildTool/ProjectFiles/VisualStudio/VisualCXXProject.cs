@@ -2,6 +2,7 @@
 
 using AE.BuildSettings;
 using AE.Misc;
+using AE.Platform.Windows;
 using AE.Projects;
 using AE.Rules;
 
@@ -94,6 +95,8 @@ public class VisualCXXProject : IProject
             PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = "PLATFORM_WINDOWS=1";
             PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
 
+            var Installation = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022).First();
+
             BuildConfiguration.ForEach((Configuration, Platform) =>
             {
                 // Foreach Configurations
@@ -103,8 +106,11 @@ public class VisualCXXProject : IProject
                 string BuildToolPath = InWorkspace.BuildTool;
                 BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean";
+                var IncludePaths = Installation.GetRequiredIncludePaths(Platform.Architecture);
+
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name}";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name}";
+                PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
@@ -143,14 +149,22 @@ public class VisualCXXProject : IProject
             foreach (var ModuleName in CXXProject.GetModules())
             {
                 var Resolved = CXXProject.GetModuleRule(ModuleName);
+                if (Resolved == null)
+                {
+                    continue;
+                }
 
                 foreach (var Filename in Resolved.SourceFiles)
                 {
                     XmlElement? Elem = AddSourceFile(Filename);
                     if (Elem != null)
                     {
+                        string FilterSharedLibrary(string p)
+                            => p.Replace("${CMAKE_SHARED_LIBRARY_EXPORT}", "__declspec(dllexport)")
+                                .Replace("${CMAKE_SHARED_LIBRARY_IMPORT}", "__declspec(dllimport)");
+
                         var PreprocessorDefinitions = Elem.AddElement("PreprocessorDefinitions");
-                        PreprocessorDefinitions.InnerText = $"{string.Join(';', Resolved.AdditionalMacros)};%(PreprocessorDefinitions)";
+                        PreprocessorDefinitions.InnerText = $"{string.Join(';', Resolved.AdditionalMacros.Select(FilterSharedLibrary))};%(PreprocessorDefinitions)";
 
                         var AdditionalIncludeDirectories = Elem.AddElement("AdditionalIncludeDirectories");
                         AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Resolved.IncludePaths)};%(AdditionalIncludeDirectories)";

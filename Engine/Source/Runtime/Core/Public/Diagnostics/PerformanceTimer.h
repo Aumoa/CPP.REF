@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
 #include "DateTime.h"
 #include "TimeSpan.h"
 #include <optional>

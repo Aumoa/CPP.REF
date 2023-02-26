@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Exceptions/Exception.h"
+#include <system_error>
 
 class CORE_API SystemException : public Exception
 {

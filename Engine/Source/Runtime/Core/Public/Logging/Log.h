@@ -3,7 +3,7 @@
 #pragma once
 
 #include "LogLevel.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <functional>
 
 class LogCategory;

@@ -2,6 +2,8 @@
 
 using AE.BuildSettings;
 
+using System.Diagnostics;
+
 namespace AE.Rules;
 
 public class TargetRules
@@ -9,6 +11,7 @@ public class TargetRules
     public TargetRules(TargetInfo Info)
     {
         Name = GetType().Name.Replace("Target", "");
+        Debug.Assert(Info.Name != null);
         TargetName = Info.Name;
         Class = TargetClass.Game;
         Platform = Info.BuildConfiguration.Platform;
@@ -25,4 +28,6 @@ public class TargetRules
     public TargetPlatform Platform { get; protected set; }
 
     public List<string> ExtraModuleNames { get; protected set; } = new();
+
+    public bool bBuildAllModules { get; set; }
 }

@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
-#include <any>
+#include "CoreTypes/IntegralTypes.h"
 #include <span>
 #include <vector>
 #include <memory>

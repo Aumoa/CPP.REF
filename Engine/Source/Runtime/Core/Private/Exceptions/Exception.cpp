@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Exceptions/Exception.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <mutex>
 
 Exception::Exception(const String& message, std::exception_ptr innerException) noexcept

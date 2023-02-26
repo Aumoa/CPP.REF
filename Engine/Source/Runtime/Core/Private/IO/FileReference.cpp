@@ -3,7 +3,7 @@
 #include "IO/FileReference.h"
 #include "IO/DirectoryReference.h"
 #include "IO/FileStream.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include "Exceptions/SystemException.h"
 #include <bit>
 #include <fstream>

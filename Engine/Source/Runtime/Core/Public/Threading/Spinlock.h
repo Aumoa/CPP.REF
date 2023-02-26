@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
 #include "Misc/PlatformMisc.h"
 
 class Spinlock

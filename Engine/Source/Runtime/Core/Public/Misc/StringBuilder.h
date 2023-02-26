@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "String.h"
+#include "CoreTypes/String.h"
 #include <vector>
 
 class CORE_API StringBuilder

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "MathEx.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <string>
 #include <numbers>
 

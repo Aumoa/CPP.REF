@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
 #include "ConsoleColor.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include "Misc/StaticClass.h"
 
 class CORE_API Console : public StaticClass

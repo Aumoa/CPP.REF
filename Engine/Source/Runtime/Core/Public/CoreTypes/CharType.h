@@ -4,11 +4,30 @@
 
 #include <concepts>
 
-class Char
-{
-	Char() = delete;
+using char_t = wchar_t;
 
-public:
+struct CORE_API Char
+{
+	char_t Value;
+
+	inline Char() noexcept
+		: Value(0)
+	{
+	}
+
+	template<class T>
+	constexpr Char(const T& Val) noexcept requires
+		std::same_as<T, char> ||
+		std::same_as<T, wchar_t>
+		: Value(static_cast<char_t>(Val))
+	{
+	}
+	
+	constexpr Char(const Char& Val) noexcept
+		: Value(Val.Value)
+	{
+	}
+
 	template<class T>
 	inline constexpr static bool IsWhiteSpace(const T& ch) noexcept requires
 		std::same_as<T, char> ||

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include "Misc/StaticClass.h"
 
 class CORE_API Environment : public StaticClass

@@ -4,7 +4,7 @@
 
 #include "Awaiter.h"
 #include "Task.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <source_location>
 
 template<class T = void>

@@ -3,7 +3,7 @@
 #include "Threading/ThreadPool.h"
 #include "IO/IOContext.h"
 #include "IO/ScheduledIOContext.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <thread>
 
 namespace

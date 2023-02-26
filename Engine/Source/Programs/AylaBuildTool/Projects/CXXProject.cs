@@ -4,18 +4,20 @@ using AE.Compilation;
 using AE.Rules;
 using AE.Source;
 
+using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
-using System.Reflection;
-
 namespace AE.Projects;
 
+[DebuggerDisplay("Name = {Name}")]
 public class CXXProject
 {
     private readonly List<string> Modules = new();
-    private readonly Dictionary<string, ResolvedModule> CompiledRules = new();
+    private readonly ConcurrentDictionary<string, ResolvedModule> CompiledRules = new();
 
     public string TargetFile { get; }
+
+    public string Name => Path.GetFileNameWithoutExtension(TargetFile).Replace(".Target", string.Empty);
 
     public TargetRules Rules { get; }
 
@@ -52,43 +54,53 @@ public class CXXProject
         SearchModulesRecursive(SourceDirectory, true);
     }
 
+    public async Task<ModuleRules> CompileModuleAsync(Dictionary<string, ResolvedModule> Projects, string TargetModule, CancellationToken CToken = default)
+    {
+        if (Modules.Contains(TargetModule) == false)
+        {
+            throw new InvalidOperationException(CoreStrings.Errors.DependencyModuleNotFound);
+        }
+
+        Type ModuleType = await CSCompiler.LoadClassAsync<ModuleRules>(TargetModule, CToken);
+
+        var Ctor = ModuleType.GetConstructor(new[] { typeof(TargetRules) });
+        if (Ctor == null)
+        {
+            throw new InvalidOperationException(string.Format(CoreStrings.Errors.ModuleRuleConstructorNotFound, ModuleType.Name));
+        }
+
+        var Rule = (ModuleRules)Ctor.Invoke(new object[] { Rules });
+
+        HashSet<string> SourceFiles = new();
+        string ModuleDirectory = Path.GetDirectoryName(TargetModule)!;
+        foreach (var SourceFile in Directory.GetFiles(ModuleDirectory, "*.*", SearchOption.AllDirectories))
+        {
+            SourceFiles.Add(SourceFile);
+        }
+
+        var Resolved = new ResolvedModule
+        {
+            Path = ModuleDirectory,
+            Rules = Rule,
+            SourceFiles = SourceFiles.ToArray()
+        };
+
+        bool bStatus = CompiledRules.TryAdd(TargetModule, Resolved);
+        Debug.Assert(bStatus);
+        Projects.Add(Resolved.Rules.Name, Resolved);
+
+        return Rule;
+    }
+
     public async Task CompileModulesAsync(Dictionary<string, ResolvedModule> Projects, CancellationToken CToken = default)
     {
-        Dictionary<string, Task<Type>> Tasks = new();
+        List<Task> Tasks = new();
         foreach (var ModuleName in Modules)
         {
-            Tasks.Add(ModuleName, CSCompiler.LoadClassAsync<ModuleRules>(ModuleName, CToken));
+            Tasks.Add(CompileModuleAsync(Projects, ModuleName, CToken));
         }
 
-        await Task.WhenAll(Tasks.Values);
-
-        foreach (var (ModuleName, Task) in Tasks)
-        {
-            var Ctor = Task.Result.GetConstructor(new[] { typeof(TargetRules) });
-            if (Ctor == null)
-            {
-                throw new InvalidOperationException(string.Format(CoreStrings.Errors.ModuleRuleConstructorNotFound, Task.Result.Name));
-            }
-
-            var Rule = (ModuleRules)Ctor.Invoke(new object[] { Rules });
-
-            HashSet<string> SourceFiles = new();
-            string ModuleDirectory = Path.GetDirectoryName(ModuleName)!;
-            foreach (var SourceFile in Directory.GetFiles(ModuleDirectory, "*.*", SearchOption.AllDirectories))
-            {
-                SourceFiles.Add(SourceFile);
-            }
-
-            var Resolved = new ResolvedModule
-            {
-                Path = ModuleDirectory,
-                Rules = Rule,
-                SourceFiles = SourceFiles.ToArray()
-            };
-
-            CompiledRules.Add(ModuleName, Resolved);
-            Projects.Add(Resolved.Rules.Name, Resolved);
-        }
+        await Task.WhenAll(Tasks);
     }
 
     public void ResolveDependency(Dictionary<string, ResolvedModule> Projects)
@@ -145,7 +157,7 @@ public class CXXProject
         PriorityList.Add(Rule);
     }
 
-    private void BuildDependencies(ResolvedModule Project, ResolvedModule[] Dependencies)
+    private static void BuildDependencies(ResolvedModule Project, ResolvedModule[] Dependencies)
     {
         List<string> IncludePaths = new();
         List<string> AdditionalMacros = new();
@@ -214,9 +226,16 @@ public class CXXProject
         return Modules.ToArray();
     }
 
-    public ResolvedModule GetModuleRule(string ModuleName)
+    public ResolvedModule? GetModuleRule(string ModuleName)
     {
-        return CompiledRules[ModuleName];
+        if (CompiledRules.TryGetValue(ModuleName, out ResolvedModule? Value))
+        {
+            return Value;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     private void SearchModulesRecursive(string SourceDirectory, bool bFirst)
@@ -251,5 +270,12 @@ public class CXXProject
         {
             SearchModulesRecursive(Subdirectory, false);
         }
+    }
+
+    public CXXProject[] DependencyProjects { get; private set; } = Array.Empty<CXXProject>();
+
+    public void AddDependencyProjects(IEnumerable<CXXProject> Projects)
+    {
+        DependencyProjects = Enumerable.Concat(DependencyProjects, Projects).ToArray();
     }
 }

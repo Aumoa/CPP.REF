@@ -2,7 +2,7 @@
   "profiles": {
     "BuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "ProjectFiles"
+      "commandLineArgs": "Build -Clean -Target AylaHeaderTool"
     }
   }
 }

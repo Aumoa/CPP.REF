@@ -1,8 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using AE.BuildSettings;
 using AE.Platform;
-using AE.Platform.Windows;
 
 namespace AE.System;
 
@@ -17,5 +15,9 @@ public abstract class ToolChainInstallation
         return $"{InstallVersion} in {BaseDirectory}";
     }
 
-    public abstract string FindCCompilerPath(Architecture TargetArchitecture);
+    public abstract string[] GetRequiredExecutablePaths(Architecture TargetArchitecture);
+
+    public abstract string[] GetRequiredLibraryPaths(Architecture TargetArchitecture);
+
+    public abstract string[] GetRequiredIncludePaths(Architecture TargetArchitecture);
 }

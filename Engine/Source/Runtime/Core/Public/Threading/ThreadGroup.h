@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <thread>
 #include <functional>
 #include <stop_token>

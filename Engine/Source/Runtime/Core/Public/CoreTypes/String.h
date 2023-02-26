@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
-#include "StringComparison.h"
-#include "StringSplitOptions.h"
+#include "CharType.h"
+#include "Misc/StringComparison.h"
+#include "Misc/StringSplitOptions.h"
 #include "Linq/Array.h"
 #include "Misc/Misc.h"
 #include "Misc/CompatibleVariadic.h"
@@ -15,7 +15,8 @@
 #include <string_view>
 #include <utility>
 #include <compare>
-#include <format>
+#include <cstring>
+//#include <format>
 #include <vector>
 #include <unordered_map>
 
@@ -118,11 +119,12 @@ private:
 
 	String& _allocate_assign(const char_t* buf, size_t len)
 	{
-		auto& ptr = _buf.emplace<1>(std::make_shared<wchar_t[]>(len + 1));
-		memcpy(ptr.get(), buf, sizeof(wchar_t) * len);
-		ptr[len] = 0;
-		_len = len;
-		return *this;
+		//auto& ptr = _buf.emplace<1>(std::make_shared<wchar_t[]>(len + 1));
+		//memcpy(ptr.get(), buf, sizeof(wchar_t) * len);
+		//ptr[len] = 0;
+		//_len = len;
+		//return *this;
+		throw;
 	}
 
 	enum class ETrimType
@@ -184,23 +186,24 @@ private:
 	template<IArray<std::wstring_view> TArray>
 	static String _concat(const TArray& concat)
 	{
-		size_t length = 0;
-		for (const std::wstring_view& item : concat)
-		{
-			length += item.length();
-		}
+		//size_t length = 0;
+		//for (const std::wstring_view& item : concat)
+		//{
+		//	length += item.length();
+		//}
 
-		decltype(_buf) nbuf;
-		auto& ptr = nbuf.emplace<1>(std::make_shared<char_t[]>(length + 1));
-		size_t appendIdx = 0;
-		for (const std::wstring_view& item : concat)
-		{
-			memcpy(ptr.get() + appendIdx, item.data(), sizeof(char_t) * item.length());
-			appendIdx += item.length();
-		}
+		//decltype(_buf) nbuf;
+		//auto& ptr = nbuf.emplace<1>(std::make_shared<char_t[]>(length + 1));
+		//size_t appendIdx = 0;
+		//for (const std::wstring_view& item : concat)
+		//{
+		//	memcpy(ptr.get() + appendIdx, item.data(), sizeof(char_t) * item.length());
+		//	appendIdx += item.length();
+		//}
 
-		ptr[length] = 0;
-		return String(std::move(nbuf), length);
+		//ptr[length] = 0;
+		//return String(std::move(nbuf), length);
+		throw;
 	}
 
 public:
@@ -252,16 +255,16 @@ public:
 
 	inline String(char_t ch, size_t len)
 	{
-		auto& ptr = _buf.emplace<1>(std::make_shared<char_t[]>(len + 1));
-		auto* rptr = ptr.get();
+		//auto& ptr = _buf.emplace<1>(std::make_shared<char_t[]>(len + 1));
+		//auto* rptr = ptr.get();
 
-		for (size_t i = 0; i < len; ++i)
-		{
-			rptr[i] = ch;
-		}
+		//for (size_t i = 0; i < len; ++i)
+		//{
+		//	rptr[i] = ch;
+		//}
 
-		rptr[len] = 0;
-		_len = len;
+		//rptr[len] = 0;
+		//_len = len;
 	}
 
 public:
@@ -918,19 +921,20 @@ public:
 	[[nodiscard]] String Transform(TOp&& op) const requires
 		std::convertible_to<std::invoke_result_t<TOp, char_t>, char_t>
 	{
-		decltype(_buf) nbuf;
-		auto& ptr = nbuf.emplace<1>(std::make_shared<char_t[]>(_len + 1));
-		const char_t* const buf = this->_get_raw();
+		//decltype(_buf) nbuf;
+		//auto& ptr = nbuf.emplace<1>(std::make_shared<char_t[]>(_len + 1));
+		//const char_t* const buf = this->_get_raw();
 
-		for (size_t i = 0; i < _len; ++i)
-		{
-			ptr[i] = op(buf[i]);
-		}
+		//for (size_t i = 0; i < _len; ++i)
+		//{
+		//	ptr[i] = op(buf[i]);
+		//}
 
-		String s;
-		s._buf = std::move(nbuf);
-		s._len = _len;
-		return s;
+		//String s;
+		//s._buf = std::move(nbuf);
+		//s._len = _len;
+		//return s;
+		throw;
 	}
 
 	[[nodiscard]] inline String ToLower() const
@@ -1063,7 +1067,8 @@ public:
 	template<class... TArgs>
 	[[nodiscard]] static String Format(String formatStr, TArgs&&... args)
 	{
-		return String(std::vformat((std::wstring_view)formatStr, std::make_wformat_args(std::forward<TArgs>(args)...)));
+		throw;
+		//return String(std::vformat((std::wstring_view)formatStr, std::make_wformat_args(std::forward<TArgs>(args)...)));
 	}
 
 	template<IEnumerable<String> TEnumerable>
@@ -1246,35 +1251,35 @@ inline constexpr char operator "" _s(char c)
 	return (char_t)c;
 }
 
-template<>
-struct std::formatter<String, char_t> : public std::formatter<std::wstring_view, char_t>
-{
-	template<class TFormatContext>
-	auto format(const String& str, TFormatContext& ctx)
-	{
-		return std::formatter<std::wstring_view, char_t>::format((std::wstring_view)str, ctx);
-	}
-};
-
-template<>
-struct std::formatter<String, char> : public std::formatter<std::string_view, char>
-{
-	template<class TFormatContext>
-	auto format(const String& str, TFormatContext& ctx)
-	{
-		return std::formatter<std::string_view, char>::format((std::string)str, ctx);
-	}
-};
-
-template<lib::details::_to_string T, class TChar>
-struct std::formatter<T, TChar> : public std::formatter<String, TChar>
-{
-	template<class U, class TFormatContext>
-	auto format(U&& obj, TFormatContext& ctx)
-	{
-		return std::formatter<String, TChar>::format(Misc::ToRef(std::forward<U>(obj)).ToString(), ctx);
-	}
-};
+//template<>
+//struct std::formatter<String, char_t> : public std::formatter<std::wstring_view, char_t>
+//{
+//	template<class TFormatContext>
+//	auto format(const String& str, TFormatContext& ctx)
+//	{
+//		return std::formatter<std::wstring_view, char_t>::format((std::wstring_view)str, ctx);
+//	}
+//};
+//
+//template<>
+//struct std::formatter<String, char> : public std::formatter<std::string_view, char>
+//{
+//	template<class TFormatContext>
+//	auto format(const String& str, TFormatContext& ctx)
+//	{
+//		return std::formatter<std::string_view, char>::format((std::string)str, ctx);
+//	}
+//};
+//
+//template<lib::details::_to_string T, class TChar>
+//struct std::formatter<T, TChar> : public std::formatter<String, TChar>
+//{
+//	template<class U, class TFormatContext>
+//	auto format(U&& obj, TFormatContext& ctx)
+//	{
+//		return std::formatter<String, TChar>::format(Misc::ToRef(std::forward<U>(obj)).ToString(), ctx);
+//	}
+//};
 
 #define TEXT(x) L ## x ## _s
 #define TEXTF(x, ...) String::Format(TEXT(x) __VA_OPT__(, __VA_ARGS__))

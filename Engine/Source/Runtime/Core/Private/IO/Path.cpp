@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "IO/Path.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <filesystem>
 
 String Path::GetFileName(const String& path)

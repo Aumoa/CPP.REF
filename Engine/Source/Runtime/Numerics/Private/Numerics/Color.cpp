@@ -2,6 +2,7 @@
 
 #include "Numerics/VectorInterface/Color.h"
 #include <map>
+#include <sstream>
 
 static std::map<String, Color> gConvertTable =
 {

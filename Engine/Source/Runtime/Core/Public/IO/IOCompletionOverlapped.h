@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 #include "Misc/PlatformMisc.h"
 #include <vector>
 #include <exception>

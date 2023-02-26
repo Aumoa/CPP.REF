@@ -6,7 +6,7 @@ namespace AE.Rules;
 
 public record TargetInfo
 {
-    public string Name { get; set; } = null!;
-
+    public string? Name { get; set; }
+    
     public BuildConfiguration BuildConfiguration { get; set; }
 }

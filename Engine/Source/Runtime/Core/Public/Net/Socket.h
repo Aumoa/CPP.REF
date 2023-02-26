@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
+#include "CoreTypes/IntegralTypes.h"
 #include "Misc/NonCopyable.h"
 #include "Net/AddressFamily.h"
 #include "Net/SocketType.h"

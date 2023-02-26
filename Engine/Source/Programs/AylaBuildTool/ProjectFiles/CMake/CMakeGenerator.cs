@@ -1,6 +1,5 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using AE.ProjectFiles.VisualStudio;
 using AE.Projects;
 
 namespace AE.ProjectFiles.CMake;

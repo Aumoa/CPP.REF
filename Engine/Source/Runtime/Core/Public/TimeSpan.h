@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "PrimitiveTypes.h"
 #include <chrono>
 #include <compare>
+
+using namespace std::chrono_literals;
 
 class TimeSpan
 {

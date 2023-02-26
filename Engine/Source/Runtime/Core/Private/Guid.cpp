@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Guid.h"
-#include "Misc/String.h"
+#include "CoreTypes/String.h"
 #include <vector>
 #include <random>
 #include <string>
