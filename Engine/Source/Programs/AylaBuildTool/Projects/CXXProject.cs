@@ -54,7 +54,7 @@ public class CXXProject
         SearchModulesRecursive(SourceDirectory, true);
     }
 
-    public async Task<ModuleRules> CompileModuleAsync(Dictionary<string, ResolvedModule> Projects, string TargetModule, CancellationToken CToken = default)
+    public async Task<ModuleRules> CompileModuleAsync(IDictionary<string, ResolvedModule> Projects, string TargetModule, CancellationToken CToken = default)
     {
         if (Modules.Contains(TargetModule) == false)
         {
@@ -92,7 +92,7 @@ public class CXXProject
         return Rule;
     }
 
-    public async Task CompileModulesAsync(Dictionary<string, ResolvedModule> Projects, CancellationToken CToken = default)
+    public async Task CompileModulesAsync(IDictionary<string, ResolvedModule> Projects, CancellationToken CToken = default)
     {
         List<Task> Tasks = new();
         foreach (var ModuleName in Modules)
@@ -103,7 +103,7 @@ public class CXXProject
         await Task.WhenAll(Tasks);
     }
 
-    public void ResolveDependency(Dictionary<string, ResolvedModule> Projects)
+    public void ResolveDependency(IDictionary<string, ResolvedModule> Projects)
     {
         HashSet<ResolvedModule> IncludeSet = new();
         List<ResolvedModule> PriorityList = new();
@@ -120,7 +120,7 @@ public class CXXProject
         }
     }
 
-    private void ComputeDependencyRecursive(Dictionary<string, ResolvedModule> Projects, ResolvedModule Rule, HashSet<ResolvedModule> IncludeSet, List<ResolvedModule> PriorityList, Dictionary<ResolvedModule, ResolvedModule[]> DependenciesMap)
+    private void ComputeDependencyRecursive(IDictionary<string, ResolvedModule> Projects, ResolvedModule Rule, HashSet<ResolvedModule> IncludeSet, List<ResolvedModule> PriorityList, Dictionary<ResolvedModule, ResolvedModule[]> DependenciesMap)
     {
         if (IncludeSet.Contains(Rule))
         {
@@ -270,12 +270,5 @@ public class CXXProject
         {
             SearchModulesRecursive(Subdirectory, false);
         }
-    }
-
-    public CXXProject[] DependencyProjects { get; private set; } = Array.Empty<CXXProject>();
-
-    public void AddDependencyProjects(IEnumerable<CXXProject> Projects)
-    {
-        DependencyProjects = Enumerable.Concat(DependencyProjects, Projects).ToArray();
     }
 }

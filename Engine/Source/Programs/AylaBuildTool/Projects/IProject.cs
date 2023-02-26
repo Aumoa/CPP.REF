@@ -4,5 +4,5 @@ namespace AE.Projects;
 
 public interface IProject
 {
-    string Name { get; }
+    string TargetName { get; }
 }

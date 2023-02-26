@@ -47,11 +47,13 @@ public class VisualStudioSolution : ISolution
 
         foreach (var Project in CXXProjects)
         {
-            string VcxprojName = Path.ChangeExtension(Project.Name, ".vcxproj");
-            string VcxprojFiltersName = Path.ChangeExtension(Project.Name, ".vcxproj.filters");
-            Project.GenerateXmlDocument(TargetWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters);
+            string VcxprojName = Path.ChangeExtension(Project.TargetName, ".vcxproj");
+            string VcxprojFiltersName = Path.ChangeExtension(Project.TargetName, ".vcxproj.filters");
+            string VcxprojUserName = Path.ChangeExtension(Project.TargetName, ".vcxproj.user");
+            Project.GenerateXmlDocument(TargetWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters, out XmlDocument VcxprojUser);
             await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojName), Vcxproj.Serialize(true), CToken);
             await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojFiltersName), VcxprojFilters.Serialize(true), CToken);
+            await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojUserName), VcxprojUser.Serialize(true), CToken);
         }
 
         string SolutionFilename = Path.ChangeExtension(TargetWorkspace.TargetName, ".sln");
@@ -105,16 +107,16 @@ public class VisualStudioSolution : ISolution
 
         foreach (var Project in CXXProjects)
         {
-            string Filename = Path.ChangeExtension(Project.Name, ".vcxproj");
+            string Filename = Path.ChangeExtension(Project.TargetName, ".vcxproj");
             Filename = Path.Combine(TargetWorkspace.TargetDirectory.ProjectFilesDirectory, Filename);
-            Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.Name}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
+            Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
             Builder.AppendLine("EndProject");
         }
 
         foreach (var Project in CSProjects)
         {
             string Filename = Project.ProjectFile;
-            Builder.AppendLine($"Project(\"{{{VisualCSharpGUID}}}\") = \"{Project.Name}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
+            Builder.AppendLine($"Project(\"{{{VisualCSharpGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
             Builder.AppendLine("EndProject");
         }
 
@@ -124,6 +126,7 @@ public class VisualStudioSolution : ISolution
         BuildConfiguration.ForEach((Configuration, Platform) =>
         {
             Builder.AppendLine($"\t\t{Configuration}|{Platform} = {Configuration}|{Platform}");
+            Builder.AppendLine($"\t\t{Configuration} Editor|{Platform} = {Configuration} Editor|{Platform}");
         });
         Builder.AppendLine("\tEndGlobalSection");
 
@@ -134,6 +137,9 @@ public class VisualStudioSolution : ISolution
             {
                 Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}|{Platform}.ActiveCfg = {Configuration}|{Platform}");
                 Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}|{Platform}.Build.0 = {Configuration}|{Platform}");
+
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration} Editor|{Platform}.ActiveCfg = {Configuration}_Editor|{Platform}");
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration} Editor|{Platform}.Build.0 = {Configuration}_Editor|{Platform}");
             });
         }
         foreach (var Project in CSProjects)
@@ -143,6 +149,9 @@ public class VisualStudioSolution : ISolution
                 string ActualConf = Configuration == Configuration.Debug ? "Debug" : "Release";
                 Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}|{Platform}.ActiveCfg = {ActualConf}|Any CPU");
                 Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}|{Platform}.Build.0 = {ActualConf}|Any CPU");
+
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration} Editor|{Platform}.ActiveCfg = {ActualConf}|Any CPU");
+                Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration} Editor|{Platform}.Build.0 = {ActualConf}|Any CPU");
             });
         }
         Builder.AppendLine("\tEndGlobalSection");

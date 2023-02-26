@@ -9,6 +9,5 @@ public class AylaHeaderToolTarget : TargetRules
     {
         Class = TargetClass.Program;
         Type = TargetType.ConsoleApplication;
-        ExtraModuleNames.Add("AylaHeaderTool");
     }
 }

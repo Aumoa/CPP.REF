@@ -11,7 +11,7 @@ public class VisualCSharpProject : IProject
 
     public string FilterPath { get; init; }
 
-    public string Name => Path.GetFileNameWithoutExtension(ProjectFile);
+    public string TargetName => Path.GetFileNameWithoutExtension(ProjectFile);
 
     public string ProjectGuid { get; init; }
 

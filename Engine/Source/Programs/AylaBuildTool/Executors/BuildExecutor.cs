@@ -28,6 +28,9 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         [CommandLineApply(CategoryName = "Target", IsRequired = true)]
         public string Target { get; set; } = null!;
+
+        [CommandLineApply(CategoryName = "Editor")]
+        public bool bEditor { get; set; }
     }
 
     private readonly Arguments BuildArgs = new();
@@ -47,7 +50,8 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             {
                 Configuration = Enum.Parse<Configuration>(BuildArgs.Config!, true),
                 Platform = BuildHostPlatform.Current.Platform
-            }
+            },
+            bEditor = BuildArgs.bEditor
         };
 
         await Task.Yield();
@@ -104,6 +108,12 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         Console.WriteLine("Start building with CMake...");
         foreach (var CXXProject in Solution.CXXProjects)
         {
+            if (CXXProject.bEmptyProject)
+            {
+                // Skip project.
+                continue;
+            }
+
             string ProjectFilesDir = Directory.GetParent(CXXProject.MakefilePath)!.FullName;
             string ProjectName = CXXProject.Name;
             string IntermediatePath = Workspace.TargetDirectory.IntermediateDirectory;

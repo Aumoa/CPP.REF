@@ -2,6 +2,7 @@
 
 using AE.BuildSettings;
 using AE.Projects;
+using AE.Rules;
 
 using Microsoft.CodeAnalysis;
 
@@ -21,9 +22,13 @@ public class CMakeCXXProject : IProject
         CXXProject = TargetProject;
     }
 
-    public string Name => ProjectName;
+    public string TargetName => ProjectName;
 
-    public string MakefilePath => Path.Combine(CXXProject.Workspace.ProjectFilesDirectory, CXXProject.Rules.Name, "CMakeLists.txt");
+    public string Name => CXXProject.Name;
+
+    public string MakefilePath => Path.Combine(CXXProject.Workspace.ProjectFilesDirectory, CXXProject.Name, "CMakeLists.txt");
+
+    public bool bEmptyProject { get; private set; }
 
     public async Task GenerateCMakeProject(Workspace _, CancellationToken CToken = default)
     {
@@ -33,20 +38,18 @@ public class CMakeCXXProject : IProject
         string OutputDir = Directory.GetParent(MakefilePath)!.FullName;
         Directory.CreateDirectory(OutputDir);
 
-        bool bExecutable = CXXProject.Rules.Type == Rules.TargetType.ConsoleApplication;
         var Modules = CXXProject.GetModules();
 
         List<string> Subdirectories = new();
-        foreach (var DependProject in CXXProject.DependencyProjects)
-        {
-            foreach (var ModuleName in DependProject.GetModules())
-            {
-                await GenerateModuleMakefile(DependProject, Subdirectories, ModuleName, OutputDir, false, CToken);
-            }
-        }
         foreach (var ModuleName in Modules)
         {
-            await GenerateModuleMakefile(CXXProject, Subdirectories, ModuleName, OutputDir, bExecutable, CToken);
+            await GenerateModuleMakefile(CXXProject, Subdirectories, ModuleName, OutputDir, CXXProject.Rules.Type, CToken);
+        }
+
+        if (Subdirectories.Count == 0)
+        {
+            bEmptyProject = true;
+            return;
         }
 
         List<string> Definitions = new();
@@ -88,7 +91,7 @@ SET(CMAKE_CXX_STANDARD 20)
         await File.WriteAllTextAsync(MakefilePath, CMakeLists, CToken);
     }
 
-    private static async Task GenerateModuleMakefile(CXXProject Project, List<string> Subdirectories, string ModuleName, string OutputDir, bool bExecutable, CancellationToken CToken)
+    private static async Task GenerateModuleMakefile(CXXProject Project, List<string> Subdirectories, string ModuleName, string OutputDir, TargetType Type, CancellationToken CToken)
     {
         var Resolved = Project.GetModuleRule(ModuleName);
         if (Resolved == null)
@@ -105,8 +108,17 @@ SET(CMAKE_CXX_STANDARD 20)
         static string AsIncludeDirectory(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
         static string AsLibrary(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
 
-        string LinkType = bExecutable ? "ADD_EXECUTABLE" : "ADD_LIBRARY";
-        string ShareType = bExecutable ? "" : "SHARED";
+        if (Project.Rules.TargetModuleName != Resolved.Rules.Name)
+        {
+            Type = TargetType.Module;
+        }
+
+        string ExecutablePrefix = Type switch
+        {
+            TargetType.ConsoleApplication => $"ADD_EXECUTABLE({Name}",
+            TargetType.SlateApplication => $"ADD_EXECUTABLE({Name} WIN32",
+            _ => $"ADD_LIBRARY({Name} SHARED",
+        };
 
         IEnumerable<string> Links = Resolved.DependencyModules;
         Links = Links.Concat(Resolved.AdditionalLibraries.Select(AsLibrary));
@@ -123,7 +135,7 @@ INCLUDE_DIRECTORIES(
 FILE(GLOB_RECURSE CXX_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cpp"")
 FILE(GLOB_RECURSE CC_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cc"")
 
-{LinkType}({Name} {ShareType} ${{CXX_FILES}} ${{CC_FILES}})
+{ExecutablePrefix} ${{CXX_FILES}} ${{CC_FILES}})
 
 TARGET_LINK_LIBRARIES({Name}
     {string.Join("\n\t", Links)}

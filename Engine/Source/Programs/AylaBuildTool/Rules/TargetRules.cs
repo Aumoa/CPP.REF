@@ -15,6 +15,7 @@ public class TargetRules
         TargetName = Info.Name;
         Class = TargetClass.Game;
         Platform = Info.BuildConfiguration.Platform;
+        TargetModuleName = Name;
     }
 
     public string Name { get; protected set; }
@@ -27,7 +28,7 @@ public class TargetRules
 
     public TargetPlatform Platform { get; protected set; }
 
-    public List<string> ExtraModuleNames { get; protected set; } = new();
+    public string TargetModuleName { get; protected set; }
 
     public bool bBuildAllModules { get; set; }
 }

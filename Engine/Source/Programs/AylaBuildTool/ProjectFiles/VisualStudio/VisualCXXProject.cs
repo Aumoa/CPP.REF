@@ -34,13 +34,13 @@ public class VisualCXXProject : IProject
         ProjectGuid = CRC32.GenerateGuid(Path.Combine(FilterPath, ProjectName)).ToString().ToUpper();
     }
 
-    public string Name => ProjectName;
+    public string TargetName => ProjectName;
 
     public string FilterPath { get; init; }
 
     public string ProjectGuid { get; init; }
 
-    public void GenerateXmlDocument(Workspace InWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters)
+    public void GenerateXmlDocument(Workspace InWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters, out XmlDocument VcxprojUser)
     {
         XmlDocument Doc = new();
         Doc.AddXmlDeclaration("1.0", "utf-8");
@@ -57,6 +57,12 @@ public class VisualCXXProject : IProject
                     ProjectConfiguration.SetAttribute("Include", $"{Configuration}|{Platform}");
 
                     ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString();
+                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString();
+
+                    ProjectConfiguration = ProjectConfigurations.AddElement("ProjectConfiguration");
+                    ProjectConfiguration.SetAttribute("Include", $"{Configuration}_Editor|{Platform}");
+
+                    ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString() + "_Editor";
                     ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString();
                 });
             }
@@ -80,6 +86,14 @@ public class VisualCXXProject : IProject
             {
                 var PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
+                PropertyGroup.SetAttribute("Label", "Configuration");
+
+                PropertyGroup.AddElement("ConfigurationType").InnerText = "Makefile";
+                PropertyGroup.AddElement("PlatformToolset").InnerText = "v143";
+                PropertyGroup.AddElement("CharacterSet").InnerText = "Unicode";
+
+                PropertyGroup = Project.AddElement("PropertyGroup");
+                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}_Editor|{Platform}'");
                 PropertyGroup.SetAttribute("Label", "Configuration");
 
                 PropertyGroup.AddElement("ConfigurationType").InnerText = "Makefile";
@@ -110,6 +124,14 @@ public class VisualCXXProject : IProject
 
                 PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name}";
                 PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name}";
+                PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
+
+                // Foreach Configurations
+                PropertyGroup = Project.AddElement("PropertyGroup");
+                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}_Editor|{Platform}'");
+
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name} -Editor";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name} -Editor";
                 PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
             });
 
@@ -239,6 +261,25 @@ public class VisualCXXProject : IProject
             }
         }
         VcxprojFilters = Doc;
+
+        Doc = new();
+        Doc.AddXmlDeclaration("1.0", "utf-8");
+        Project = Doc.AddElement("Project", "http://schemas.microsoft.com/developer/msbuild/2003");
+        Project.SetAttribute("ToolsVersion", "Current");
+        {
+            var PropertyGroup = Project.AddElement("PropertyGroup");
+
+            string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, CXXProject.Rules.TargetModuleName);
+            Executable = Path.ChangeExtension(Executable, ".exe");
+            PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
+
+            string WorkingDirectory = Path.GetDirectoryName(Executable)!;
+            PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = WorkingDirectory;
+
+            PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
+            PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
+        }
+        VcxprojUser = Doc;
     }
 
     private static bool IsHeaderFile(string Extensions)

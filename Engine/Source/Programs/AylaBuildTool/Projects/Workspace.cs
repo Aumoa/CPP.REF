@@ -1,10 +1,10 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.Compilation;
-using AE.Misc;
 using AE.Rules;
 using AE.Source;
 
+using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace AE.Projects;
@@ -41,7 +41,7 @@ public class Workspace
 
     public async Task GenerateProjectFilesAsync(TargetInfo InTargetInfo, CancellationToken CToken = default)
     {
-        Dictionary<string, CXXProject.ResolvedModule> Projects = new();
+        ConcurrentDictionary<string, CXXProject.ResolvedModule> Projects = new();
 
         TargetRules? Rules = null;
         foreach (var TargetRule in Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories))
@@ -93,23 +93,13 @@ public class Workspace
         else
         {
             Dictionary<string, (string Filename, CXXProject Project)> ModuleProjects = new();
-            CXXProject? TargetProject = null;
-            List<CXXProject> DependProjects = new();
 
             // Search all modules.
             string[] TargetRuleList = Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories);
             foreach (var TargetRule in TargetRuleList)
             {
                 CXXProject Project = new(TargetRule, Rules, EngineDirectory);
-                if (Project.Name == InTargetInfo.Name)
-                {
-                    CXXProjects.Add(Project);
-                    TargetProject = Project;
-                }
-                else
-                {
-                    DependProjects.Add(Project);
-                }
+                CXXProjects.Add(Project);
 
                 foreach (var Module in Project.GetModules())
                 {
@@ -119,17 +109,12 @@ public class Workspace
                 }
             }
 
-            if (TargetProject == null)
-            {
-                throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetNotFoundException, InTargetInfo.Name));
-            }
-
             List<string> LoadModules = new(ModuleProjects.Count);
             List<string> LoadModulesSwap = new();
             HashSet<string> LoadedModules = new();
 
             Dictionary<CXXProject, HashSet<string>> CompileTargets = new(ModuleProjects.Count);
-            LoadModules.AddRange(Rules.ExtraModuleNames);
+            LoadModules.Add(Rules.TargetModuleName);
 
             // Search dependencies modules for current target.
             while (LoadModules.Count != 0)
@@ -169,8 +154,6 @@ public class Workspace
                     }
                 }
             }
-
-            TargetProject.AddDependencyProjects(DependProjects);
         }
 
         foreach (var ProjectFile in Directory.GetFiles(EngineDirectory.ProgramsDirectory, "*.csproj", SearchOption.AllDirectories))

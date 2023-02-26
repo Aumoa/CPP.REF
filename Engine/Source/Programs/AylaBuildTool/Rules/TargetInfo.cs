@@ -9,4 +9,6 @@ public record TargetInfo
     public string? Name { get; set; }
     
     public BuildConfiguration BuildConfiguration { get; set; }
+
+    public bool bEditor { get; set; }
 }

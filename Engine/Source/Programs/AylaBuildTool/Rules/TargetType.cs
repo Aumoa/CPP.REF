@@ -5,5 +5,6 @@ namespace AE.Rules;
 public enum TargetType
 {
     Module,
-    ConsoleApplication
+    ConsoleApplication,
+    SlateApplication
 }

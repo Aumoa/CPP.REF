@@ -8,6 +8,14 @@ public class AETarget : TargetRules
     public AETarget(TargetInfo Info) : base(Info)
     {
         Class = TargetClass.Engine;
-        ExtraModuleNames.Add("Core");
+        if (Info.bEditor)
+        {
+            TargetModuleName = "Launch";
+            Type = TargetType.SlateApplication;
+        }
+        else
+        {
+            TargetModuleName = "Core";
+        }
     }
 }
