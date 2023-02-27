@@ -14,6 +14,8 @@ using uint32 = unsigned long;
 using int64 = signed long long;
 using uint64 = unsigned long long;
 
+class String;
+
 class CORE_API IntegralTypes : public StaticClass
 {
 public:
@@ -34,7 +36,7 @@ public:
 template<class T>
 struct TIntegralType
 {
-	static_assert(IntegralTypes::IsIntegral<T>);
+	static_assert(IntegralTypes::IsIntegral<T>());
 	T Value;
 
 	inline TIntegralType() noexcept
@@ -51,6 +53,8 @@ struct TIntegralType
 		: Value(Val.Value)
 	{
 	}
+
+    String ToString() const;
 };
 
 using Int8 = TIntegralType<int8>;

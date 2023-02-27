@@ -164,6 +164,12 @@ public class VisualCXXProject : IProject
                     None.SetAttribute("Include", Filename);
                     return null;
                 }
+                else if (IsNatvisFile(Extension))
+                {
+                    var None = ItemGroup.AddElement("Natvis");
+                    None.SetAttribute("Include", Filename);
+                    return null;
+                }
 
                 return null;
             }
@@ -246,6 +252,12 @@ public class VisualCXXProject : IProject
                     None.SetAttribute("Include", Filename);
                     InnerElement = None;
                 }
+                else if (IsNatvisFile(Extension))
+                {
+                    var None = ItemGroup.AddElement("Natvis");
+                    None.SetAttribute("Include", Filename);
+                    InnerElement = None;
+                }
 
                 if (InnerElement != null && string.IsNullOrEmpty(FilterPath) == false)
                 {
@@ -299,5 +311,10 @@ public class VisualCXXProject : IProject
     private static bool IsNoneFile(string Extensions)
     {
         return Extensions == ".cs";
+    }
+
+    private static bool IsNatvisFile(string Extensions)
+    {
+        return Extensions == ".natvis";
     }
 }

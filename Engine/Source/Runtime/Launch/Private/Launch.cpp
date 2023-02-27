@@ -2,19 +2,25 @@
 
 #include "Launch.h"
 #include "Logging/Log.h"
+#include "EngineLoop.h"
 
 NLaunch::NLaunch(String CmdArgs)
 	: CmdArgs(CmdArgs)
 {
+    Loop = std::make_unique<NEngineLoop>();
 }
 
 NLaunch::~NLaunch() noexcept
 {
 }
 
-int32 NLaunch::GuardedMain(std::function<int32()> Main)
+int32 NLaunch::GuardedMain()
 {
-	int32 ReturnValue = Main();
+    // Ready subresources for initialize engine.
+    auto InitContext = Loop->PreInit();
+
+    // Shutting down.
 	Log::FlushAll();
-	return ReturnValue;
+
+    return Loop->GetExitCode();
 }

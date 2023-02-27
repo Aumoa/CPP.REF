@@ -47,6 +47,7 @@ void Log::Print(const LogCategory& logCategory, ELogLevel logLevel, const String
 	{
 		lock.unlock();
 		FlushAll();
+        throw;
 	}
 }
 

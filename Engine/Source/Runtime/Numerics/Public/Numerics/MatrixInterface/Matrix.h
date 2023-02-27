@@ -18,8 +18,7 @@ public:
 	template<class... TArgs>
 	constexpr Matrix(TArgs&&... Args) requires
 		(sizeof...(TArgs) > 1 && sizeof...(TArgs) <= NRow * NCol) &&
-		std::constructible_from<Matrix, int, TArgs...> &&
-		(!SameAsVariadic<Private, 0, TArgs...>)
+		std::constructible_from<Matrix, int, TArgs...>
 		: Matrix(Private{}, 0, std::forward<TArgs>(Args)...)
 	{
 	}

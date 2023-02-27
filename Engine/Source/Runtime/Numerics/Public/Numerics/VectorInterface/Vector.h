@@ -33,7 +33,6 @@ public:
 	template<class... TArgs>
 	constexpr Vector(TArgs&&... Args) requires
 		(sizeof...(TArgs) > 0) &&
-		(!SameAsVariadic<Private, 0, std::remove_reference_t<TArgs>...>) &&
 		(!std::constructible_from<Super, TArgs...>)
 		: Vector(Private{}, std::tuple_cat(MakeScalarsImpl(std::forward<TArgs>(Args))...))
 	{

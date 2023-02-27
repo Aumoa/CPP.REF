@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Vector.h"
+#include "Numerics/TransformConcepts.h"
 
 template<class T>
 struct RectT

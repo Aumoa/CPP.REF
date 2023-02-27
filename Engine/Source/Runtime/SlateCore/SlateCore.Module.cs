@@ -13,7 +13,8 @@ public class SlateCore : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "Numerics"
+            "Numerics",
+            "ApplicationCore"
         });
     }
 }
