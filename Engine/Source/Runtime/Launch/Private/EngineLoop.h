@@ -16,7 +16,6 @@ private:
 public:
     struct NInitializeContext
     {
-        std::unique_ptr<NGenericWindow> SplashWindow;
     };
 
 public:

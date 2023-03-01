@@ -5,7 +5,7 @@
 #include "CoreTypes/String.h"
 #include "Threading/Tasks/Task.h"
 
-class File
+class CORE_API File
 {
 public:
 	static bool Exists(String path) noexcept;

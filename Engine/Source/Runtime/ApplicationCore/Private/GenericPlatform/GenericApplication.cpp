@@ -15,3 +15,8 @@ NGenericApplication::~NGenericApplication() noexcept
     check(sApp);
     sApp = nullptr;
 }
+
+String NGenericApplication::GetApplicationName()
+{
+    return TEXT("");
+}

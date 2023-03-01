@@ -4,6 +4,8 @@
 #include "CoreTypes/String.h"
 #include <filesystem>
 
+String Path::EngineDirectory;
+
 String Path::GetFileName(const String& path)
 {
 	return String(std::filesystem::path((std::wstring_view)path).filename().wstring());
@@ -42,4 +44,29 @@ String Path::Combine(std::span<const String> paths)
 		r /= path.c_str();
 	}
 	return String(std::move(r).wstring());
+}
+
+String Path::GetFullPath(String InPath)
+{
+	return String(std::filesystem::absolute(InPath.c_str()).wstring());
+}
+
+String Path::GetDirectoryName(String InPath)
+{
+	return String(std::filesystem::path(InPath.c_str()).parent_path().wstring());
+}
+
+void Path::SetEngineDirectory(String InDir)
+{
+	EngineDirectory = InDir;
+}
+
+String Path::GetEngineDirectory()
+{
+	return EngineDirectory;
+}
+
+String Path::GetEngineContentDirectory()
+{
+	return Path::Combine(EngineDirectory, TEXT("Content"));
 }

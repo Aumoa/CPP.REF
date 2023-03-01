@@ -52,20 +52,7 @@ public class CMakeCXXProject : IProject
             return;
         }
 
-        List<string> Definitions = new();
-        static char Int(bool Value)
-        {
-            return Value ? '1' : '0';
-        }
-
-        PlatformGroup.ForEach(p =>
-        {
-            bool bOn = TargetRule.Platform.Group == p;
-            Definitions.Add($"{p.ToDefinition()}={Int(bOn)}");
-        });
-
-        Definitions.Add($"SHIPPING={1}");
-        Definitions.Add($"DO_CHECK={0}");
+        string[] Definitions = CXXProject.GetProjectDefinitions();
 
         string CMakeLists = $@"
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)

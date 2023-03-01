@@ -10,6 +10,25 @@ constexpr LogCategory LogWindowsApplication(TEXT("LogWindowsApplication"));
 NWindowsApplication::NWindowsApplication(HINSTANCE hInstance)
     : hInstance(hInstance)
 {
+    // Setting engine directory using ApplicationCore.dll location.
+    HMODULE hModule = GetModuleHandle(TEXT("ApplicationCore.dll").c_str());
+    check(hModule);
+
+    WCHAR Buf[1024];
+    DWORD Len = GetModuleFileName(hModule, Buf, 1024);
+    check(Len == 0);
+
+    // Engine/Binaries/Win64/ApplicationCore.dll
+    String WorkingDirectory(Buf, (size_t)Len);
+    // Engine/Binaries/Win64
+    WorkingDirectory = Path::GetDirectoryName(WorkingDirectory);
+
+    // Engine/
+    WorkingDirectory = Path::Combine(WorkingDirectory, TEXT(".."), TEXT(".."));
+    WorkingDirectory = Path::GetFullPath(WorkingDirectory);
+
+    Path::SetEngineDirectory(WorkingDirectory);
+    Log::Info(LogWindowsApplication, TEXT("Engine directory is setted to {}."), WorkingDirectory);
 }
 
 std::unique_ptr<NGenericWindow> NWindowsApplication::MakeWindow(const NGenericWindowDefinition& InDefinition)

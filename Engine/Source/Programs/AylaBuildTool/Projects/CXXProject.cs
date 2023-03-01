@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
 using AE.Compilation;
 using AE.Rules;
 using AE.Source;
@@ -63,12 +64,8 @@ public class CXXProject
 
         Type ModuleType = await CSCompiler.LoadClassAsync<ModuleRules>(TargetModule, CToken);
 
-        var Ctor = ModuleType.GetConstructor(new[] { typeof(TargetRules) });
-        if (Ctor == null)
-        {
-            throw new InvalidOperationException(string.Format(CoreStrings.Errors.ModuleRuleConstructorNotFound, ModuleType.Name));
-        }
-
+        var Ctor = ModuleType.GetConstructor(new[] { typeof(TargetRules) })
+            ?? throw new InvalidOperationException(string.Format(CoreStrings.Errors.ModuleRuleConstructorNotFound, ModuleType.Name));
         var Rule = (ModuleRules)Ctor.Invoke(new object[] { Rules });
 
         HashSet<string> SourceFiles = new();
@@ -224,6 +221,25 @@ public class CXXProject
     public string[] GetModules()
     {
         return Modules.ToArray();
+    }
+
+    public string[] GetProjectDefinitions()
+    {
+        static char Int(bool Value) => Value ? '1' : '0';
+        List<string> Definitions = new();
+        PlatformGroup.ForEach(p =>
+        {
+            bool b = Rules.Platform.Group == p;
+            Definitions.Add($"{p.ToDefinition()}={Int(b)}");
+        });
+        Definitions.AddRange(new[]
+        {
+            "PLATFORM_WINDOWS=1",
+            "UNICODE=1",
+            "SHIPPING=1",
+            "DO_CHECK=0"
+        });
+        return Definitions.ToArray();
     }
 
     public ResolvedModule? GetModuleRule(string ModuleName)

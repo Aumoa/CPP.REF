@@ -10,6 +10,9 @@
 
 class CORE_API Path : public StaticClass
 {
+private:
+	static String EngineDirectory;
+
 public:
 	static String GetFileName(const String& path);
 	static String GetFileNameWithoutExtension(const String& path);
@@ -17,6 +20,12 @@ public:
 	static String ChangeExtension(const String& path, const String& extension);
 	static String GetRelativePath(const String& relativeTo, const String& path);
 	static String Combine(std::span<const String> paths);
+	static String GetFullPath(String InPath);
+	static String GetDirectoryName(String InPath);
+
+	static void SetEngineDirectory(String InDir);
+	static String GetEngineDirectory();
+	static String GetEngineContentDirectory();
 
 public:
 	template<class... T>

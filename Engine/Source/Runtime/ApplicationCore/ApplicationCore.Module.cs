@@ -27,6 +27,11 @@ public class ApplicationCore : ModuleRules
                     "_WIN64"
                 });
             }
+
+            PrivateAdditionalLibraries.AddRange(new[]
+            {
+                "gdiplus.lib"
+            });
         }
     }
 }

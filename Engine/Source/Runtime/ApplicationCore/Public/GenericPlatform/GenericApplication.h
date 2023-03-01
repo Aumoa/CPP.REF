@@ -20,6 +20,7 @@ public:
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) = 0;
     virtual Vector2N GetScreenResolution() = 0;
+    virtual String GetApplicationName();
 
 public:
     static std::unique_ptr<NGenericApplication> CreateApplication();

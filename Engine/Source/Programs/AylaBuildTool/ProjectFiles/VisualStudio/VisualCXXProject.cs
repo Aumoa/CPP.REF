@@ -106,7 +106,7 @@ public class VisualCXXProject : IProject
 
             // Common
             var PropertyGroup = Project.AddElement("PropertyGroup");
-            PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = "PLATFORM_WINDOWS=1";
+            PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', CXXProject.GetProjectDefinitions());
             PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
 
             var Installation = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022).First();
