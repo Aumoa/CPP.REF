@@ -1,7 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.Projects;
-using AE.Source;
 
 namespace AE.ProjectFiles.CMake;
 

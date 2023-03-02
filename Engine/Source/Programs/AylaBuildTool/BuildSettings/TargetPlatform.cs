@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.Misc;
 using AE.Platform;
 
 namespace AE.BuildSettings;
@@ -30,4 +31,20 @@ public record TargetPlatform
         Group = PlatformGroup.Linux,
         Architecture = Architecture.x64
     };
+
+    public void Serialize(BinaryWriter Writer)
+    {
+        Writer.Write(TargetName);
+        Group.Serialize(Writer);
+        Writer.Write((int)Architecture);
+    }
+
+    public static TargetPlatform Deserialize(BinaryReader Reader)
+    {
+        return new(Reader.ReadString())
+        {
+            Group = PlatformGroup.Deserialize(Reader),
+            Architecture = (Architecture)Reader.ReadInt32()
+        };
+    }
 }

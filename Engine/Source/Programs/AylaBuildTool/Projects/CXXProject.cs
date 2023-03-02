@@ -45,13 +45,13 @@ public class CXXProject
         public string[] AdditionalLibraries { get; set; } = null!;
     }
 
-    public CXXProject(string TargetFile, TargetRules Rules, SourceCodeDirectory InWorkspace)
+    public CXXProject(string InTargetFile, TargetRules InRules, SourceCodeDirectory InWorkspace)
     {
-        this.TargetFile = TargetFile;
-        this.Rules = Rules;
-        this.Workspace = InWorkspace;
+        TargetFile = InTargetFile;
+        Rules = InRules;
+        Workspace = InWorkspace;
 
-        string SourceDirectory = Path.GetDirectoryName(TargetFile)!;
+        string SourceDirectory = Path.GetDirectoryName(InTargetFile)!;
         SearchModulesRecursive(SourceDirectory, true);
     }
 

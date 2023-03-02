@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.Misc;
+
 namespace AE.BuildSettings;
 
 public record PlatformGroup
@@ -27,5 +29,15 @@ public record PlatformGroup
     {
         Body(Windows);
         Body(Linux);
+    }
+
+    public void Serialize(BinaryWriter Writer)
+    {
+        Writer.Write(GroupName);
+    }
+
+    public static PlatformGroup Deserialize(BinaryReader Reader)
+    {
+        return new(Reader.ReadString());
     }
 }
