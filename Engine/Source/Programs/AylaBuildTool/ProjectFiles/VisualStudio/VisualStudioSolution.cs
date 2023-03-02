@@ -7,6 +7,7 @@ using AE.Projects;
 using AE.Source;
 
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Xml;
 
@@ -85,6 +86,8 @@ public class VisualStudioSolution : ISolution
         Builder.AppendLine("VisualStudioVersion = 17.2.32602.215");
         Builder.AppendLine("MinimumVisualStudioVersion = 10.0.40219.1");
 
+        VisualCSharpProject? SpecialTarget = null;
+
         Dictionary<string, string> Filters = new();
         foreach (var Project in CXXProjects)
         {
@@ -93,6 +96,13 @@ public class VisualStudioSolution : ISolution
         foreach (var Project in CSProjects)
         {
             Filters.TryAdd(Project.FilterPath, CRC32.GenerateGuid(Project.FilterPath).ToString().ToUpper());
+
+            // Special target.
+            if (Project.TargetName == "AylaBuildTool")
+            {
+                Debug.Assert(SpecialTarget == null);
+                SpecialTarget = Project;
+            }
         }
 
         const string FilterGUID = "2150E333-8FDC-42A3-9474-1A3956D46DE8";
@@ -110,6 +120,12 @@ public class VisualStudioSolution : ISolution
             string Filename = Path.ChangeExtension(Project.TargetName, ".vcxproj");
             Filename = Path.Combine(TargetWorkspace.TargetDirectory.ProjectFilesDirectory, Filename);
             Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
+            if (SpecialTarget != null)
+            {
+                Builder.AppendLine($"\tProjectSection(ProjectDependencies) = postProject");
+                Builder.AppendLine($"\t\t{{{SpecialTarget.ProjectGuid}}} = {{{SpecialTarget.ProjectGuid}}}");
+                Builder.AppendLine($"\tEndProjectSection");
+            }
             Builder.AppendLine("EndProject");
         }
 
