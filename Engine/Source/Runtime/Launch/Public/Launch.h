@@ -9,6 +9,8 @@ class NEngineLoop;
 class LAUNCH_API NLaunch
 {
 private:
+	static NLaunch* CurrentLaunch;
+
 	String CmdArgs;
     std::unique_ptr<NEngineLoop> Loop;
 
@@ -21,6 +23,9 @@ public:
 public:
 	int32 GuardedMain();
 
+	virtual void* GetApplicationPointer() = 0;
+
+	static NLaunch& Get() noexcept;
 	static std::unique_ptr<NLaunch> GeneratePlatformLaunch(String CmdArgs);
 	static std::unique_ptr<NLaunch> GeneratePlatformLaunch(int Argc, char** Argv)
 	{

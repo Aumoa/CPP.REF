@@ -6,14 +6,20 @@
 #include "Bootstrap/BootstrapTask.h"
 #include "EngineLoop.h"
 
+NLaunch* NLaunch::CurrentLaunch;
+
 NLaunch::NLaunch(String CmdArgs)
 	: CmdArgs(CmdArgs)
 {
+    check(CurrentLaunch == nullptr);
+    CurrentLaunch = this;
     Loop = std::make_unique<NEngineLoop>();
 }
 
 NLaunch::~NLaunch() noexcept
 {
+    check(CurrentLaunch);
+    CurrentLaunch = nullptr;
 }
 
 int32 NLaunch::GuardedMain()
@@ -35,4 +41,9 @@ int32 NLaunch::GuardedMain()
 	Log::FlushAll();
 
     return Loop->GetExitCode();
+}
+
+NLaunch& NLaunch::Get() noexcept
+{
+    return *CurrentLaunch;
 }

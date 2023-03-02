@@ -7,8 +7,7 @@
 
 constexpr LogCategory LogWindowsApplication(TEXT("LogWindowsApplication"));
 
-NWindowsApplication::NWindowsApplication(HINSTANCE hInstance)
-    : hInstance(hInstance)
+NWindowsApplication::NWindowsApplication()
 {
     // Setting engine directory using ApplicationCore.dll location.
     HMODULE hModule = GetModuleHandle(TEXT("ApplicationCore.dll").c_str());
@@ -33,7 +32,7 @@ NWindowsApplication::NWindowsApplication(HINSTANCE hInstance)
 
 std::unique_ptr<NGenericWindow> NWindowsApplication::MakeWindow(const NGenericWindowDefinition& InDefinition)
 {
-    return std::make_unique<NWindowsWindow>(hInstance, InDefinition);
+    return std::make_unique<NWindowsWindow>((HINSTANCE)GetApplicationPointer(), InDefinition);
 }
 
 Vector2N NWindowsApplication::GetScreenResolution()
@@ -83,7 +82,7 @@ LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
 // specialize for each platforms.
 std::unique_ptr<NGenericApplication> NGenericApplication::CreateApplication()
 {
-    return std::make_unique<NWindowsApplication>((HINSTANCE)GetModuleHandleW(NULL));
+    return std::make_unique<NWindowsApplication>();
 }
 
 #endif

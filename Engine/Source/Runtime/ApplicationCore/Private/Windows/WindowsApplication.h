@@ -16,10 +16,8 @@
 
 class NWindowsApplication : public NGenericApplication
 {
-    HINSTANCE hInstance = NULL;
-
 public:
-    NWindowsApplication(HINSTANCE hInstance);
+    NWindowsApplication();
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
     virtual Vector2N GetScreenResolution() override;

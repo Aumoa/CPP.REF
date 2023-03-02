@@ -15,16 +15,26 @@ class NWindowsLaunch : public NLaunch
 {
 	using Super = NLaunch;
 
+public: /* Internal only. */
+	void* ApplicationPointer = nullptr;
+
 public:
 	NWindowsLaunch(String CmdArgs) : Super(CmdArgs)
 	{
+	}
+
+	virtual void* GetApplicationPointer() override
+	{
+		return ApplicationPointer;
 	}
 };
 
 INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE _, LPWSTR lpCmdLine, INT nShow)
 {
-	auto WindowsLaunch = NLaunch::GeneratePlatformLaunch(String::FromLiteral(lpCmdLine));
-	return WindowsLaunch->GuardedMain();
+	auto Launch = NLaunch::GeneratePlatformLaunch(String::FromLiteral(lpCmdLine));
+	auto* WindowsLaunch = static_cast<NWindowsLaunch*>(Launch.get());
+	WindowsLaunch->ApplicationPointer = hInstance;
+	return Launch->GuardedMain();
 }
 
 std::unique_ptr<NLaunch> NLaunch::GeneratePlatformLaunch(String CmdArgs)

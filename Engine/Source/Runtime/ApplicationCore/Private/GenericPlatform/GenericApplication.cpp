@@ -20,3 +20,24 @@ String NGenericApplication::GetApplicationName()
 {
     return TEXT("");
 }
+
+void NGenericApplication::SetApplicationPointer(void* InAppPointer)
+{
+    check(!bFreezed);
+    ApplicationPointer = InAppPointer;
+}
+
+void* NGenericApplication::GetApplicationPointer()
+{
+    return ApplicationPointer;
+}
+
+void NGenericApplication::Freeze()
+{
+    bFreezed = true;
+}
+
+bool NGenericApplication::IsFreezed() noexcept
+{
+    return bFreezed;
+}

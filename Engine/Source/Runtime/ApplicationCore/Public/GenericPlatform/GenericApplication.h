@@ -11,6 +11,8 @@ class APPLICATIONCORE_API NGenericApplication
 {
 private:
     static NGenericApplication* sApp;
+    void* ApplicationPointer = nullptr;
+    bool bFreezed = false;
 
 protected:
     NGenericApplication();
@@ -20,7 +22,14 @@ public:
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) = 0;
     virtual Vector2N GetScreenResolution() = 0;
+
     virtual String GetApplicationName();
+
+    virtual void SetApplicationPointer(void* InAppPointer);
+    virtual void* GetApplicationPointer();
+
+    virtual void Freeze();
+    bool IsFreezed() noexcept;
 
 public:
     static std::unique_ptr<NGenericApplication> CreateApplication();
