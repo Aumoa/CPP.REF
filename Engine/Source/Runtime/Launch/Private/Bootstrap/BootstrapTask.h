@@ -5,40 +5,27 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericSplash.h"
 
-class NBootstrapTask
+class NBootstrapTask : public NonCopyable
 {
-	const String ContextName;
-	const float TotalAmount;
-	float CurrentAmount = 0;
+	struct NContext
+	{
+		String Name;
+		float TotalAmount;
+		float CurrentAmount = 0;
+	};
+
+	static Spinlock sLock;
+	static std::vector<std::unique_ptr<NContext>> sTasks;
+	NContext* Context;
 
 public:
-	NBootstrapTask(String InName, float Amount)
-		: ContextName(InName)
-		, TotalAmount(Amount)
-	{
-		UpdateSplashWindow();
-	}
+	NBootstrapTask(String InName, float Amount);
+	~NBootstrapTask() noexcept;
 
-	void Step(float InAmount)
-	{
-		float Previous = CurrentAmount;
-		CurrentAmount += InAmount;
-		if (CurrentAmount > TotalAmount)
-		{
-			CurrentAmount = TotalAmount;
-		}
+	void Step(float InAmount);
 
-		if ((int32)Previous == (int32)CurrentAmount)
-		{
-			return;
-		}
-
-		UpdateSplashWindow();
-	}
+	static void Clear();
 
 private:
-	void UpdateSplashWindow()
-	{
-		NGenericSplash::SetSplashText(String::Format(TEXT("Initializing... - {} ({}%)"), ContextName, (int32)CurrentAmount));
-	}
+	void UpdateContext();
 };

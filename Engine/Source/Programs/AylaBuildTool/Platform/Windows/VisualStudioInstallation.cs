@@ -194,7 +194,8 @@ public class VisualStudioInstallation : ToolChainInstallation
             {
                 Path.Combine(BaseIncludeDirectory, CurrentVersion, "ucrt"),
                 Path.Combine(BaseIncludeDirectory, CurrentVersion, "um"),
-                Path.Combine(BaseIncludeDirectory, CurrentVersion, "shared")
+                Path.Combine(BaseIncludeDirectory, CurrentVersion, "shared"),
+                Path.Combine(BaseIncludeDirectory, CurrentVersion, "winrt")
             };
 
             CachedWindowsKitVersion.Add(InArchitecture, CachedVersion);

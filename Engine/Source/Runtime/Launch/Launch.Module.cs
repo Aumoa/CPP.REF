@@ -12,7 +12,8 @@ public class Launch : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
+            "RHI"
         });
 
         if (TargetRule.Type == TargetType.SlateApplication)

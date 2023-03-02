@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Bootstrap/BootstrapTask.h"
 
 class IEngineLoop
 {
@@ -13,4 +14,5 @@ public:
     virtual ~IEngineLoop() noexcept = default;
 
     virtual int32 GetExitCode() const = 0;
+    virtual void Init() = 0;
 };

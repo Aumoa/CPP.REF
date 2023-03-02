@@ -32,11 +32,9 @@ public class Core : ModuleRules
                 "WIN32_LEAN_AND_MEAN"
             });
 
-            PublicAdditionalLibraries.AddRange(new[]
+            PrivateAdditionalLibraries.AddRange(new[]
             {
-                "psapi.lib",
                 "dbghelp.lib",
-                "User32.lib",
                 "Rpcrt4.lib"
             });
         }
