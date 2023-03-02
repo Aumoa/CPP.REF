@@ -1228,26 +1228,6 @@ public:
 	}
 };
 
-inline constexpr auto operator "" _s(const char_t* lit, size_t len)
-{
-	return String::FromLiteral(std::wstring_view(lit, len));
-}
-
-inline String operator "" _s(const char* lit, size_t len)
-{
-	return String::FromLiteral(std::string_view(lit, len));
-}
-
-inline constexpr char_t operator "" _s(char_t wc)
-{
-	return wc;
-}
-
-inline constexpr char operator "" _s(char c)
-{
-	return (char_t)c;
-}
-
 template<>
 struct std::formatter<String, char_t> : public std::formatter<std::wstring_view, char_t>
 {
@@ -1278,4 +1258,4 @@ struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 	}
 };
 
-#define TEXT(x) L ## x ## _s
+#define TEXT(x) String::FromLiteral(L ## x)

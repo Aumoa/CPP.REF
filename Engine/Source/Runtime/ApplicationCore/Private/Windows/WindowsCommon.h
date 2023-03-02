@@ -5,13 +5,17 @@
 #if PLATFORM_WINDOWS
 
 #pragma push_macro("TEXT")
+#pragma push_macro("NOMINMAX")
+
 #undef TEXT
+#undef NOMINMAX
 
 #include <Windows.h>
 #include <comdef.h>
 #include <gdiplus.h>
 
 #pragma pop_macro("TEXT")
+#pragma pop_macro("NOMINMAX")
 
 namespace WindowsTools
 {

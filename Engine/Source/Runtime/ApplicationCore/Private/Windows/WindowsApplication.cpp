@@ -14,7 +14,7 @@ NWindowsApplication::NWindowsApplication(HINSTANCE hInstance)
     HMODULE hModule = GetModuleHandle(TEXT("ApplicationCore.dll").c_str());
     check(hModule);
 
-    WCHAR Buf[1024];
+    TCHAR Buf[1024];
     DWORD Len = GetModuleFileName(hModule, Buf, 1024);
     check(Len == 0);
 

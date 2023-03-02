@@ -14,7 +14,7 @@ String Guid::ToString() const
 
 bool Guid::TryParse(String formattedString, Guid& outResult)
 {
-	String trimmedString = formattedString.Trim(std::array<wchar_t, 5>{ TEXT('{'), TEXT('}'), TEXT(' '), TEXT('\t'), TEXT('\n') });
+	String trimmedString = formattedString.Trim(std::array<wchar_t, 5>{ '{', '}', ' ', '\t', '\n' });
 	std::vector<String> splits = trimmedString.Split(TEXT("-"), EStringSplitOptions::RemoveEmptyEntries | EStringSplitOptions::TrimEntries);
 	if (splits.size() != 5)
 	{
