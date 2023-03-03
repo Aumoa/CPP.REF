@@ -3,3 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RHI/RHIDeviceChild.h"
+
+class RHI_API NRHICommandQueue : public NRHIDeviceChild
+{
+protected:
+	NRHICommandQueue();
+
+public:
+	virtual ~NRHICommandQueue() noexcept override;
+};

@@ -6,6 +6,7 @@
 #include "GenericPlatform/GenericSplash.h"
 #include "Bootstrap/BootstrapTask.h"
 #include "RHI/RHIGraphics.h"
+#include "RHI/RHICommandQueue.h"
 
 constexpr LogCategory LogEngineLoop(TEXT("LogEngineLoop"));
 
@@ -42,5 +43,9 @@ void NEngineLoop::Init()
     Context->GraphicsTask->Step(0.0f);
     auto RHI = NRHIGraphics::GenerateGraphics(TEXT("D3D12"));
     RHI->Init();
+
+    Context->GraphicsTask->Step(90.0f);
+    auto CommandQueue = RHI->CreateCommandQueue();
+
     Context->GraphicsTask->Step(100.0f);
 }

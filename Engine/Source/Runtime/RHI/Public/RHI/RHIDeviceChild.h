@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class NRHIGraphics;
+
 class RHI_API NRHIDeviceChild : public NonCopyable
 {
 protected:
@@ -11,4 +13,6 @@ protected:
 
 public:
 	virtual ~NRHIDeviceChild() noexcept;
+
+	virtual NRHIGraphics* GetDevice() const = 0;
 };

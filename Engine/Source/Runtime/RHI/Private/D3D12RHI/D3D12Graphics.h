@@ -19,6 +19,9 @@ public:
 	virtual ~ND3D12Graphics() noexcept override;
 
 	virtual void Init() override;
+	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() override;
+
+	ID3D12Device* GetDevice() const;
 
 public:
 	static std::unique_ptr<NRHIGraphics> GenerateGraphics();

@@ -1,8 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "D3D12RHI/D3D12Graphics.h"
-
 #if PLATFORM_WINDOWS
+
+#include "D3D12RHI/D3D12Graphics.h"
+#include "D3D12RHI/D3D12CommandQueue.h"
 
 ND3D12Graphics::ND3D12Graphics()
 {
@@ -48,6 +49,16 @@ void ND3D12Graphics::Init()
 		CurrentAdapter = std::move(Adapter);
 		break;
 	}
+}
+
+std::shared_ptr<NRHICommandQueue> ND3D12Graphics::CreateCommandQueue()
+{
+	return std::make_shared<ND3D12CommandQueue>(this);
+}
+
+ID3D12Device* ND3D12Graphics::GetDevice() const
+{
+	return Device.Get();
 }
 
 std::unique_ptr<NRHIGraphics> ND3D12Graphics::GenerateGraphics()
