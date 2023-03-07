@@ -5,3 +5,13 @@
 SWindow::SWindow()
 {
 }
+
+SWindow::~SWindow() noexcept
+{
+}
+
+void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
+{
+	check(!NativeWindow);
+	NativeWindow = InNativeWindow;
+}

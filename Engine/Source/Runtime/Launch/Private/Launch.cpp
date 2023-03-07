@@ -1,9 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Launch.h"
+#include "EditorEngineLoop.h"
 #include "Logging/Log.h"
 #include "GenericPlatform/GenericSplash.h"
-#include "EngineLoop.h"
+#include "GenericPlatform/GenericApplication.h"
 
 NLaunch* NLaunch::CurrentLaunch;
 
@@ -12,7 +13,9 @@ NLaunch::NLaunch(String CmdArgs)
 {
     check(CurrentLaunch == nullptr);
     CurrentLaunch = this;
-    Loop = std::make_unique<NEngineLoop>();
+
+    GenericApp = NGenericApplication::CreateApplication();
+    Loop = std::make_unique<NEditorEngineLoop>();
 }
 
 NLaunch::~NLaunch() noexcept
@@ -23,20 +26,27 @@ NLaunch::~NLaunch() noexcept
 
 int32 NLaunch::GuardedMain()
 {
+    GenericApp->SetApplicationPointer(GetApplicationPointer());
+
     // Ready subresources for initialize engine.
     auto InitContext = Loop->PreInit();
 
     // Initialize engine. 
-    Loop->Init();
+    Loop->Init(InitContext.get());
 
     // Finished the initialization.
-    NGenericSplash::Hide();
-    NBootstrapTask::Clear();
+    Loop->PostInit(std::move(InitContext));
+
+    while (!GenericApp->IsQuitRequested())
+    {
+        GenericApp->PumpMessages();
+        Loop->Tick();
+    }
 
     // Shutting down.
 	Log::FlushAll();
 
-    return Loop->GetExitCode();
+    return GenericApp->GetExitCode();
 }
 
 NLaunch& NLaunch::Get() noexcept

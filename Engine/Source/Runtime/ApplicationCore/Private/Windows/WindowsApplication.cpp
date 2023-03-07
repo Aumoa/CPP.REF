@@ -42,6 +42,24 @@ Vector2N NWindowsApplication::GetScreenResolution()
     return Vector2N(X, Y);
 }
 
+void NWindowsApplication::PumpMessages()
+{
+    static thread_local MSG M;
+    while (PeekMessage(&M, NULL, 0, 0, PM_REMOVE))
+    {
+        if (M.message == WM_QUIT)
+        {
+            QuitApplication((int32)M.wParam);
+            break;
+        }
+        else
+        {
+            TranslateMessage(&M);
+            DispatchMessage(&M);
+        }
+    }
+}
+
 LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_NCCREATE)

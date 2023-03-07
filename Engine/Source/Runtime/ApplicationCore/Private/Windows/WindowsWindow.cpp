@@ -43,6 +43,23 @@ NWindowsWindow::NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefiniti
     {
         WndStyle |= WS_POPUPWINDOW;
     }
+    if (InDefinition.bSystemMenu)
+    {
+        WndStyle |= WS_SYSMENU;
+    }
+    if (InDefinition.bThickframe)
+    {
+        WndStyle |= WS_THICKFRAME;
+    }
+    if (InDefinition.bSizebox)
+    {
+        WndStyle |= WS_MINIMIZEBOX;
+        WndStyle |= WS_MAXIMIZEBOX;
+    }
+    if (InDefinition.bCaption)
+    {
+        WndStyle |= WS_CAPTION;
+    }
 
     UINT WndStyleEx = 0;
 
@@ -70,6 +87,7 @@ NWindowsWindow::NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefiniti
         nHeight = CW_USEDEFAULT;
     }
 
+    CachedDefinition = InDefinition;
     hWnd = CreateWindowExW(WndStyleEx, It->second.c_str(), NULL, WndStyle, nX, nY, nWidth, nHeight, NULL, NULL, hInstance, this);
 }
 

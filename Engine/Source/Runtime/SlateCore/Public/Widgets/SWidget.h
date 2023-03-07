@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "Misc/NonCopyable.h"
+#include "CoreMinimal.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
 
 class SLATECORE_API SWidget : public NonCopyable
 {

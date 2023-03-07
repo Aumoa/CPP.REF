@@ -13,6 +13,7 @@ private:
     static NGenericApplication* sApp;
     void* ApplicationPointer = nullptr;
     bool bFreezed = false;
+    std::optional<int32> ExitCode;
 
 protected:
     NGenericApplication();
@@ -22,6 +23,7 @@ public:
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) = 0;
     virtual Vector2N GetScreenResolution() = 0;
+    virtual void PumpMessages() = 0;
 
     virtual String GetApplicationName();
 
@@ -31,7 +33,11 @@ public:
     virtual void Freeze();
     bool IsFreezed() noexcept;
 
+    void QuitApplication(int32 InCode);
+    bool IsQuitRequested();
+    int32 GetExitCode();
+
 public:
     static std::unique_ptr<NGenericApplication> CreateApplication();
-    static NGenericApplication* GetApplication() noexcept { return sApp; }
+    static NGenericApplication* Get() noexcept { return sApp; }
 };

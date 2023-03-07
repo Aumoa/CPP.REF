@@ -8,26 +8,17 @@
 #include "Bootstrap/BootstrapTask.h"
 
 class NGenericApplication;
+class NSlateApplication;
 
-class NEngineLoop : public IEngineLoop
+class NEngineLoop : public IEngineLoop, public NonCopyable
 {
 private:
-    std::unique_ptr<NGenericApplication> GenericApp;
-
-public:
-    struct NInitializeContext
-    {
-        std::optional<NBootstrapTask> GraphicsTask;
-    };
-
-    std::unique_ptr<NInitializeContext> Context;
+    std::unique_ptr<NSlateApplication> SlateApp;
 
 public:
     NEngineLoop();
     virtual ~NEngineLoop() noexcept override;
 
-    NInitializeContext* PreInit();
-
-    virtual int32 GetExitCode() const override;
-    virtual void Init() override;
+    virtual void Init(NInitializeContext* InContext) override;
+    virtual void Tick() override;
 };

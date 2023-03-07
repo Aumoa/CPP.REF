@@ -7,8 +7,8 @@
 
 class SLATECORE_API NSlateApplication
 {
-    std::shared_ptr<NGenericApplication> CurrentApp;
+    NGenericApplication* CurrentApp;
 
 public:
-    NSlateApplication(std::shared_ptr<NGenericApplication> InApplication);
+    NSlateApplication(NGenericApplication* InApplication);
 };

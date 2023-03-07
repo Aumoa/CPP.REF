@@ -24,4 +24,9 @@ ND3D12CommandQueue::~ND3D12CommandQueue() noexcept
 {
 }
 
+NRHIGraphics* ND3D12CommandQueue::GetDevice() const
+{
+	return Graphics;
+}
+
 #endif

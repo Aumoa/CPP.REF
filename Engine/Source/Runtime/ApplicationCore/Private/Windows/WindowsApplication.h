@@ -21,6 +21,7 @@ public:
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
     virtual Vector2N GetScreenResolution() override;
+    virtual void PumpMessages() override;
 
 public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -41,3 +41,20 @@ bool NGenericApplication::IsFreezed() noexcept
 {
     return bFreezed;
 }
+
+void NGenericApplication::QuitApplication(int32 InCode)
+{
+    check(!ExitCode);
+    ExitCode = InCode;
+}
+
+int32 NGenericApplication::GetExitCode()
+{
+    check(ExitCode);
+    return ExitCode.value();
+}
+
+bool NGenericApplication::IsQuitRequested()
+{
+    return (bool)ExitCode;
+}

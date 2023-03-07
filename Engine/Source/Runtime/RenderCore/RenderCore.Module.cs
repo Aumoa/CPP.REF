@@ -3,9 +3,9 @@
 using System;
 using AE.Rules;
 
-public class Launch : ModuleRules
+public class RenderCore : ModuleRules
 {
-    public Launch(TargetRules TargetRule) : base(TargetRule)
+    public RenderCore(TargetRules TargetRule) : base(TargetRule)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -13,13 +13,7 @@ public class Launch : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "RHI",
-            "SlateCore"
+            "RHI"
         });
-
-        if (TargetRule.Type == TargetType.SlateApplication)
-        {
-            PublicDependencyModuleNames.Add("SlateCore");
-        }
     }
 }

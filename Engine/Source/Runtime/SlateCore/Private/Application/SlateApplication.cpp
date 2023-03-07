@@ -2,8 +2,8 @@
 
 #include "Application/SlateApplication.h"
 
-NSlateApplication::NSlateApplication(std::shared_ptr<NGenericApplication> InApplication)
-    : CurrentApp(std::move(InApplication))
+NSlateApplication::NSlateApplication(NGenericApplication* InApplication)
+    : CurrentApp(InApplication)
 {
     check(CurrentApp);
 }

@@ -11,8 +11,14 @@ protected:
     IEngineLoop() = default;
 
 public:
+    struct NInitializeContext
+    {
+        std::optional<NBootstrapTask> GraphicsTask;
+    };
+
+public:
     virtual ~IEngineLoop() noexcept = default;
 
-    virtual int32 GetExitCode() const = 0;
-    virtual void Init() = 0;
+    virtual void Init(NInitializeContext* InContext) = 0;
+    virtual void Tick() = 0;
 };

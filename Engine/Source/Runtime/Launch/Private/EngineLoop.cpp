@@ -7,6 +7,8 @@
 #include "Bootstrap/BootstrapTask.h"
 #include "RHI/RHIGraphics.h"
 #include "RHI/RHICommandQueue.h"
+#include "Application/SlateApplication.h"
+#include "Widgets/SWindow.h"
 
 constexpr LogCategory LogEngineLoop(TEXT("LogEngineLoop"));
 
@@ -18,34 +20,20 @@ NEngineLoop::~NEngineLoop() noexcept
 {
 }
 
-NEngineLoop::NInitializeContext* NEngineLoop::PreInit()
+void NEngineLoop::Init(NInitializeContext* InContext)
 {
-    Log::Info(LogEngineLoop, TEXT("Start pre-initialize engine."));
-    GenericApp = NGenericApplication::CreateApplication();
-    GenericApp->SetApplicationPointer(NLaunch::Get().GetApplicationPointer());
-
-    // Show splash window.
-    NGenericSplash::Show();
-
-    // Create initialization context.
-    Context = std::make_unique<NInitializeContext>();
-    Context->GraphicsTask.emplace(TEXT("Graphics"), 100.0f);
-    return Context.get();
-}
-
-int32 NEngineLoop::GetExitCode() const
-{
-    return 0;
-}
-
-void NEngineLoop::Init()
-{
-    Context->GraphicsTask->Step(0.0f);
+    if (InContext) InContext->GraphicsTask->Step(0.0f);
     auto RHI = NRHIGraphics::GenerateGraphics(TEXT("D3D12"));
     RHI->Init();
 
-    Context->GraphicsTask->Step(90.0f);
+    if (InContext) InContext->GraphicsTask->Step(90.0f);
     auto CommandQueue = RHI->CreateCommandQueue();
 
-    Context->GraphicsTask->Step(100.0f);
+    SlateApp = std::make_unique<NSlateApplication>(NGenericApplication::Get());
+
+    if (InContext) InContext->GraphicsTask->Step(100.0f);
+}
+
+void NEngineLoop::Tick()
+{
 }
