@@ -14,7 +14,8 @@ public class Launch : ModuleRules
         {
             "Core",
             "RHI",
-            "SlateCore"
+            "SlateCore",
+            "CoreAObject"
         });
 
         if (TargetRule.Type == TargetType.SlateApplication)
