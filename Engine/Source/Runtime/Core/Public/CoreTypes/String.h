@@ -1133,6 +1133,8 @@ public:
 		}
 	}
 
+	[[nodiscard]] static inline constexpr String GetEmpty();
+
 	[[noreturn]]
 	static constexpr void ThrowFormatError(bool);
 	[[noreturn]]
@@ -1227,6 +1229,29 @@ public:
 		return (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
 	}
 };
+
+namespace StringInternal
+{
+	constexpr inline String EmptyStr;
+}
+
+[[nodiscard]]
+inline constexpr String String::GetEmpty()
+{
+	return StringInternal::EmptyStr;
+}
+
+[[nodiscard]]
+inline constexpr char_t operator ""_c(char Val)
+{
+	return (char_t)Val;
+}
+
+[[nodiscard]]
+inline constexpr char_t operator ""_c(wchar_t Val)
+{
+	return (char_t)Val;
+}
 
 template<>
 struct std::formatter<String, char_t> : public std::formatter<std::wstring_view, char_t>

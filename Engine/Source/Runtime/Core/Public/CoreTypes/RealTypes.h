@@ -5,6 +5,8 @@
 #include <concepts>
 #include "Misc/StaticClass.h"
 
+class String;
+
 class CORE_API RealTypes : public StaticClass
 {
 public:
@@ -19,7 +21,7 @@ public:
 template<class T>
 struct TRealType
 {
-	static_assert(RealTypes::IsReal<T>);
+	static_assert(RealTypes::IsReal<T>());
 	T Value;
 
 	inline TRealType() noexcept
@@ -27,15 +29,17 @@ struct TRealType
 	{
 	}
 
-	constexpr TRealType(const T& Val) noexcept
+	inline constexpr TRealType(const T& Val) noexcept
 		: Value(Val)
 	{
 	}
 
-	constexpr TRealType(const TRealType& Val) noexcept
+	inline constexpr TRealType(const TRealType& Val) noexcept
 		: Value(Val.Value)
 	{
 	}
+
+	String ToString() const;
 };
 
 using Single = TRealType<float>;

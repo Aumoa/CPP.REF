@@ -44,12 +44,12 @@ struct TIntegralType
 	{
 	}
 
-	constexpr TIntegralType(const T& Val) noexcept
+	inline constexpr TIntegralType(const T& Val) noexcept
 		: Value(Val)
 	{
 	}
 
-	constexpr TIntegralType(const TIntegralType& Val) noexcept
+	inline constexpr TIntegralType(const TIntegralType& Val) noexcept
 		: Value(Val.Value)
 	{
 	}
