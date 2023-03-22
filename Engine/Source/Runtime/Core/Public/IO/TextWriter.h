@@ -2,7 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "CoreTypes/CharType.h"
+#include "CoreTypes/IntegralTypes.h"
+#include "CoreTypes/RealTypes.h"
+#include "CoreTypes/String.h"
 
 class CORE_API TextWriter
 {

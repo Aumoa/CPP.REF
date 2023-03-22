@@ -4,7 +4,7 @@
 
 std::vector<String> CommandLine::Args;
 
-void CommandLine::Set(int Argc, const char* Argv[])
+void CommandLine::Set(int Argc, const char* const Argv[])
 {
 	for (int i = 0; i < Argc; ++i)
 	{

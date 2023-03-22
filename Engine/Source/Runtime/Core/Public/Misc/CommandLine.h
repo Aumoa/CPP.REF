@@ -12,6 +12,6 @@ private:
 	static std::vector<String> Args;
 
 public:
-	static void Set(int Argc, const char* Argv[]);
+	static void Set(int Argc, const char* const Argv[]);
 	static bool TryGetValue(String InName, String& OutValue);
 };

@@ -5,14 +5,19 @@
 #include "ConsoleColor.h"
 #include "CoreTypes/String.h"
 #include "Misc/StaticClass.h"
+#include "IO/TextWriter.h"
 
 class CORE_API Console : public StaticClass
 {
 public:
-	static void Write(String message);
-	static void WriteLine(String message);
+	static void Write(String Str);
+	static void WriteLine(String Str);
 	static void SetForegroundColor(EConsoleColor color);
 	static EConsoleColor GetForegroundColor();
+
+public:
+	static TextWriter& Out;
+	static TextWriter& Error;
 
 private:
 	static void _trap_init();
