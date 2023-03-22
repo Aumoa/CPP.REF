@@ -54,56 +54,61 @@ void TextWriter::Write(double Val)
 	Write(Double(Val).ToString());
 }
 
+void TextWriter::WriteLine()
+{
+	Write(CoreNewLine);
+}
+
 void TextWriter::WriteLine(char_t Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(String Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(bool bVal)
 {
 	Write(bVal);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(int32 Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(uint32 Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(int64 Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(uint64 Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(float Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }
 
 void TextWriter::WriteLine(double Val)
 {
 	Write(Val);
-	Write(CoreNewLine);
+	WriteLine();
 }

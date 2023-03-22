@@ -14,4 +14,10 @@ private:
 public:
 	static void Set(int Argc, const char* const Argv[]);
 	static bool TryGetValue(String InName, String& OutValue);
+
+	static bool TryGetValue(String InName)
+	{
+		String _;
+		return TryGetValue(InName, _);
+	}
 };

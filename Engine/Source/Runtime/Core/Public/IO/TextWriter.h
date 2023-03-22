@@ -25,6 +25,13 @@ public:
 	virtual void Write(float Val);
 	virtual void Write(double Val);
 
+	template<class... TArgs>
+	void Write(String Format, TArgs&&... InArgs)
+	{
+		Write(String::Format(Format, std::forward<TArgs>(InArgs)...));
+	}
+
+	virtual void WriteLine();
 	virtual void WriteLine(char_t Val);
 	virtual void WriteLine(String Val);
 	virtual void WriteLine(bool bVal);
@@ -34,6 +41,12 @@ public:
 	virtual void WriteLine(uint64 Val);
 	virtual void WriteLine(float Val);
 	virtual void WriteLine(double Val);
+
+	template<class... TArgs>
+	void WriteLine(String Format, TArgs&&... InArgs)
+	{
+		WriteLine(String::Format(Format, std::forward<TArgs>(InArgs)...));
+	}
 
 protected:
 	char_t CoreNewLine;

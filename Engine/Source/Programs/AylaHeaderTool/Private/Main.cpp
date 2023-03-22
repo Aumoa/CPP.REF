@@ -1,15 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "CoreMinimal.h"
-#include "Launch.h"
+#include "Misc/CommandLine.h"
+#include "AylaHeaderTool.h"
 
 int main(int Argc, char** Argv)
 {
-	auto PlatformLaunch = NLaunch::GeneratePlatformLaunch(Argc, Argv);
-	return PlatformLaunch->GuardedMain([Argv]()
-	{
-		Console::WriteLine(String::Format(TEXT("AylaHeaderTool {}"), String::FromLiteral(Argv[0])));
-		__debugbreak();
-		return 0;
-	});
+	CommandLine::Set(Argc, Argv);
+	AylaHeaderTool App;
+	return (int)App.Run();
 }
