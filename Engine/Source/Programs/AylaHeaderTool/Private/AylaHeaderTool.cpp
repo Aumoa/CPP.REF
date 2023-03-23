@@ -54,5 +54,5 @@ void AylaHeaderTool::PrintUsage(TextWriter& Writer)
 
 	Writer.WriteLine(TEXT("Usage: "));
 	Writer.WriteLine(TEXT("  {}"), ExecutableName);
-	Writer.WriteLine(TEXT("    -Usage         [?]          Print usage."));
+	Writer.WriteLine(TEXT("    -Usage         []          Print usage."));
 }

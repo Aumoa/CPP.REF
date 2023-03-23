@@ -41,6 +41,7 @@
 #include "Exceptions/CxxException.h"
 #include "Exceptions/NullReferenceException.h"
 #include "Exceptions/IndexOutOfRangeException.h"
+#include "Exceptions/NotSupportedException.h"
 #include "Generic/IArray.h"
 #include "Generic/IComparable.h"
 #include "Generic/IDictionary.h"

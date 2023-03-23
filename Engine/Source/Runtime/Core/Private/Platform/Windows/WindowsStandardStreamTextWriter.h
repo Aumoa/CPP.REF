@@ -17,6 +17,8 @@ public:
 
 	virtual void Write(char_t Val) override;
 	virtual void Write(String Val) override;
+
+	HANDLE GetNativeHandle() const { return hStd; }
 };
 
 #endif

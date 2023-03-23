@@ -77,6 +77,23 @@ std::exception_ptr Exception::GetInnerException() const noexcept
 	return _innerException;
 }
 
+bool Exception::TryGetExceptionFromPointer(std::exception_ptr Pointer, std::function<void(const Exception&)> Catch)
+{
+	try
+	{
+		std::rethrow_exception(Pointer);
+	}
+	catch (const Exception& E)
+	{
+		Catch(E);
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
 void Exception::InternalMarkStacktrace(void* lpExceptionPointers) noexcept
 {
 	_stacktrace = Stacktrace::FromException(lpExceptionPointers);

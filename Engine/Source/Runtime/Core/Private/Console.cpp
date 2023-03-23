@@ -1,18 +1,14 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Console.h"
-#include <mutex>
 
 #if PLATFORM_WINDOWS
 #include "Misc/WindowsPlatformMisc.h"
-#include "Threading/Spinlock.h"
 #include "Platform/Windows/WindowsStandardStreamTextWriter.h"
+#include "Exceptions/NotSupportedException.h"
 
 inline namespace
 {
-	CONSOLE_SCREEN_BUFFER_INFO sScreenInfo;
-	HANDLE sStdout;
-
 	WindowsStandardStreamTextWriter sOut(STD_OUTPUT_HANDLE);
 	WindowsStandardStreamTextWriter sError(STD_ERROR_HANDLE);
 }
@@ -23,8 +19,6 @@ TextWriter& Console::Error = sError;
 
 void Console::Write(String Str)
 {
-	static int _trap = (_trap_init(), 0);
-
 #if PLATFORM_WINDOWS
 	Out.Write(Str);
 #endif
@@ -32,40 +26,35 @@ void Console::Write(String Str)
 
 void Console::WriteLine(String Str)
 {
-	static int _trap = (_trap_init(), 0);
-
 #if PLATFORM_WINDOWS
 	Out.WriteLine(Str);
 #endif
 }
 
-void Console::SetForegroundColor(EConsoleColor color)
+void Console::SetForegroundColor(EConsoleColor InColor)
 {
-	static int _trp = (_trap_init(), 0);
-
 #if PLATFORM_WINDOWS
-	sScreenInfo.wAttributes = (sScreenInfo.wAttributes & 0xFF00) | (WORD)color;
-	SetConsoleTextAttribute(sStdout, sScreenInfo.wAttributes);
+	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
+	{
+		throw NotSupportedException();
+	}
+	BufferInfo.wAttributes = (BufferInfo.wAttributes & 0xFF00) | (WORD)InColor;
+	if (SetConsoleTextAttribute(sOut.GetNativeHandle(), BufferInfo.wAttributes) == FALSE)
+	{
+		throw NotSupportedException();
+	}
 #endif
 }
 
 EConsoleColor Console::GetForegroundColor()
 {
-	static int _trp = (_trap_init(), 0);
-
 #if PLATFORM_WINDOWS
-	return (EConsoleColor)(sScreenInfo.wAttributes & 0x00FF);
-#endif
-}
-
-void Console::_trap_init()
-{
-#if PLATFORM_WINDOWS
-	static int _trap = []()
+	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
 	{
-		sStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-		GetConsoleScreenBufferInfo(sStdout, &sScreenInfo);
-		return 0;
-	}();
+		throw NotSupportedException();
+	}
+	return (EConsoleColor)(BufferInfo.wAttributes & 0x00FF);
 #endif
 }

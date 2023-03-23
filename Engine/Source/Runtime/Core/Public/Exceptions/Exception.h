@@ -28,6 +28,8 @@ public:
 	virtual String GetMessage() const noexcept;
 	virtual std::exception_ptr GetInnerException() const noexcept;
 
+	static bool TryGetExceptionFromPointer(std::exception_ptr Pointer, std::function<void(const Exception&)> Catch);
+
 public:
 	void InternalMarkStacktrace(void*) noexcept;
 
