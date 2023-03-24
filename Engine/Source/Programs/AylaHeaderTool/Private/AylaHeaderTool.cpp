@@ -29,6 +29,21 @@ int32 AylaHeaderTool::Run()
 			throw TerminateException(String::Format(TEXT("SourceLocation({}) is not valid directory path."), SourceLocation));
 		}
 
+		if (CommandLine::TryGetValue(TEXT("Intermediate"), Intermediate) == false)
+		{
+			throw UsageException(TEXT("Intermediate"));
+		}
+
+		if (Directory::Exists(Intermediate) == false)
+		{
+			throw TerminateException(String::Format(TEXT("Intermediate({}) is not valid directory path."), Intermediate));
+		}
+
+		for (auto& File : Directory::GetFiles(SourceLocation, EDirectorySearchOptions::AllDirectories))
+		{
+			Console::WriteLine(TEXT("Search file: {}"), File);
+		}
+
 		return 0;
 	}
 	catch (const TerminateException& TE)
@@ -54,5 +69,7 @@ void AylaHeaderTool::PrintUsage(TextWriter& Writer)
 
 	Writer.WriteLine(TEXT("Usage: "));
 	Writer.WriteLine(TEXT("  {}"), ExecutableName);
-	Writer.WriteLine(TEXT("    -Usage         []          Print usage."));
+	Writer.WriteLine(TEXT("    -Usage            []          Print usage."));
+	Writer.WriteLine(TEXT("    -SourceLocation   [String]    Specify source code location to parse."));
+	Writer.WriteLine(TEXT("    -Intermediate     [String]    Specify intermediate location to save reflection code generated."));
 }

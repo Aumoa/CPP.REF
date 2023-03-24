@@ -3,13 +3,16 @@
 #pragma once
 
 #include <system_error>
+#include <vector>
+#include "IO/DirectorySearchOptions.h"
 
 class String;
 
 class CORE_API Directory
 {
 public:
-	static bool TryCreateDirectory(const String& path, std::error_code* ec);
-	static void CreateDirectory(const String& path);
-	static bool Exists(const String& path);
+	static bool TryCreateDirectory(String InPath, std::error_code* OutErrorCode);
+	static void CreateDirectory(String InPath);
+	static bool Exists(String InPath);
+	static std::vector<String> GetFiles(String InPath, EDirectorySearchOptions Options);
 };

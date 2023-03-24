@@ -5,35 +5,69 @@
 #include "Exceptions/SystemException.h"
 #include <filesystem>
 
-bool Directory::TryCreateDirectory(const String& path, std::error_code* ec)
+bool Directory::TryCreateDirectory(String InPath, std::error_code* OutErrorCode)
 {
 	std::error_code ec_;
-	bool success = std::filesystem::create_directories((std::wstring)path, ec_);
-	if (ec)
+	bool success = std::filesystem::create_directories((std::wstring)InPath, ec_);
+	if (OutErrorCode)
 	{
 		if (success)
 		{
-			ec->clear();
+			OutErrorCode->clear();
 		}
 		else
 		{
-			*ec = ec_;
+			*OutErrorCode = ec_;
 		}
 	}
 	return success;
 }
 
-void Directory::CreateDirectory(const String& path)
+void Directory::CreateDirectory(String InPath)
 {
 	std::error_code ec_;
-	if (std::filesystem::create_directories((std::wstring)path, ec_) == false)
+	if (std::filesystem::create_directories((std::wstring)InPath, ec_) == false)
 	{
 		throw SystemException(ec_);
 	}
 }
 
-bool Directory::Exists(const String& path)
+bool Directory::Exists(String InPath)
 {
 	std::error_code ec;
-	return std::filesystem::is_directory((std::wstring)path, ec);
+	return std::filesystem::is_directory((std::wstring)InPath, ec);
+}
+
+std::vector<String> Directory::GetFiles(String InPath, EDirectorySearchOptions Options)
+{
+	namespace fs = std::filesystem;
+
+	std::vector<String> Entries;
+	auto AddEntry = [&Entries](const std::filesystem::path& p)
+	{
+		Entries.emplace_back(String(p.c_str()));
+	};
+
+	if (Options == EDirectorySearchOptions::TopDirectoryOnly)
+	{
+		for (auto& Entry : fs::directory_iterator(InPath.c_str()))
+		{
+			if (Entry.is_regular_file())
+			{
+				AddEntry(Entry.path());
+			}
+		}
+	}
+	else
+	{
+		for (auto& Entry : fs::recursive_directory_iterator(InPath.c_str()))
+		{
+			if (Entry.is_regular_file())
+			{
+				AddEntry(Entry.path());
+			}
+		}
+	}
+
+	return Entries;
 }
