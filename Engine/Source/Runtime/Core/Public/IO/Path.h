@@ -22,6 +22,7 @@ public:
 	static String Combine(std::span<const String> paths);
 	static String GetFullPath(String InPath);
 	static String GetDirectoryName(String InPath);
+	static String GetExtension(String InPath);
 
 	static void SetEngineDirectory(String InDir);
 	static String GetEngineDirectory();

@@ -12,4 +12,5 @@ public:
 	static inline bool TryMove(String src, String dst, bool overwrite = false) noexcept;
 	static inline bool TryDelete(String src) noexcept;
 	static Task<String> ReadAllTextAsync(String filename, std::stop_token cancellationToken = {});
+	static Task<> WriteAllTextAsync(String InFilename, String Text, uint32 Encoding = 0, std::stop_token SToken = {});
 };

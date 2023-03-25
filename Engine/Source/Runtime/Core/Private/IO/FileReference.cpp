@@ -151,3 +151,11 @@ Task<String> FileReference::ReadAllTextAsync(std::stop_token cancellationToken) 
 
 	co_return String::FromCodepage(std::string_view(reinterpret_cast<const char*>(buf.data()), reads));
 }
+
+Task<> FileReference::WriteAllTextAsync(String Text, uint32 Encoding, std::stop_token SToken) const
+{
+	std::string Encoded = Text.AsCodepage(Encoding);
+	FileStream Stream(GetPath(), EFileAccessMode::Write, EFileSharedMode::None, EFileMode::Create);
+	co_await Stream.WriteAsync(std::span((const uint8*)Encoded.c_str(), Encoded.length()), SToken);
+	Stream.Close();
+}

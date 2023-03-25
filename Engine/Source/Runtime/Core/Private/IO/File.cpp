@@ -40,3 +40,9 @@ Task<String> File::ReadAllTextAsync(String filename, std::stop_token cancellatio
 	FileReference fr(filename);
 	co_return co_await fr.ReadAllTextAsync(cancellationToken);
 }
+
+Task<> File::WriteAllTextAsync(String InFilename, String Text, uint32 Encoding, std::stop_token SToken)
+{
+	FileReference Ref(InFilename);
+	co_return co_await Ref.WriteAllTextAsync(Text, Encoding, SToken);
+}

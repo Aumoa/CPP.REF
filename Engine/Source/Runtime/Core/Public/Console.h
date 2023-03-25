@@ -12,6 +12,9 @@ class CORE_API Console : public StaticClass
 public:
 	static void Write(String Str);
 	static void WriteLine(String Str);
+
+	static String ReadLine();
+
 	static void SetForegroundColor(EConsoleColor InColor);
 	static EConsoleColor GetForegroundColor();
 

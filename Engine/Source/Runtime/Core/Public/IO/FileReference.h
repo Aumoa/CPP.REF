@@ -20,6 +20,7 @@ public:
 	bool WriteAllText(String Text, uint32 Encoding = 0) const;
 
 	Task<String> ReadAllTextAsync(std::stop_token cancellationToken = {}) const;
+	Task<> WriteAllTextAsync(String Text, uint32 Encoding = 0, std::stop_token SToken = {}) const;
 
 	FileReference& operator =(const FileReference&) = default;
 	FileReference& operator =(FileReference&&) = default;
