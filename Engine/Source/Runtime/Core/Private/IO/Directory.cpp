@@ -26,9 +26,12 @@ bool Directory::TryCreateDirectory(String InPath, std::error_code* OutErrorCode)
 void Directory::CreateDirectory(String InPath)
 {
 	std::error_code ec_;
-	if (std::filesystem::create_directories((std::wstring)InPath, ec_) == false)
+	if (Exists(InPath) == false)
 	{
-		throw SystemException(ec_);
+		if (std::filesystem::create_directories((std::wstring)InPath, ec_) == false)
+		{
+			throw SystemException(ec_);
+		}
 	}
 }
 

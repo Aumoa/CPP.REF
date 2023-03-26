@@ -3,10 +3,21 @@
 #include "CoreMinimal.h"
 #include "Misc/CommandLine.h"
 #include "AylaHeaderTool.h"
+#include <csignal>
+
+std::stop_source Sigint;
+
+void signal_sigint(int)
+{
+	Sigint.request_stop();
+}
 
 int main(int Argc, char** Argv)
 {
 	CommandLine::Set(Argc, Argv);
+
 	AylaHeaderTool App;
-	return (int)App.Run();
+	signal(SIGINT, signal_sigint);
+
+	return (int)App.Run(Sigint.get_token()).GetResult();
 }

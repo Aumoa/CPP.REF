@@ -4,19 +4,20 @@
 #include "Misc/CommandLine.h"
 #include "Exceptions/TerminateException.h"
 #include "Exceptions/UsageException.h"
+#include "Reflection/AAssembly.h"
 
 AylaHeaderTool::AylaHeaderTool()
 {
 }
 
-int32 AylaHeaderTool::Run()
+Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 {
 	try
 	{
 		if (CommandLine::TryGetValue(TEXT("Usage")))
 		{
 			PrintUsage(Console::Out);
-			return 0;
+			co_return 0;
 		}
 
 		if (CommandLine::TryGetValue(TEXT("SourceLocation"), SourceLocation) == false)
@@ -29,33 +30,63 @@ int32 AylaHeaderTool::Run()
 			throw TerminateException(String::Format(TEXT("SourceLocation({}) is not valid directory path."), SourceLocation));
 		}
 
-		if (CommandLine::TryGetValue(TEXT("Intermediate"), Intermediate) == false)
+		if (CommandLine::TryGetValue(TEXT("Build"), Build) == false)
 		{
-			throw UsageException(TEXT("Intermediate"));
+			throw UsageException(TEXT("Build"));
 		}
 
-		if (Directory::Exists(Intermediate) == false)
+		if (CommandLine::TryGetValue(TEXT("Output"), Output) == false)
 		{
-			throw TerminateException(String::Format(TEXT("Intermediate({}) is not valid directory path."), Intermediate));
+			throw UsageException(TEXT("Output"));
 		}
 
+		Directory::CreateDirectory(Build);
+
+		String AssemblyName = Path::GetFileNameWithoutExtension(SourceLocation);
+		AAssembly Assembly(String::Format(TEXT("{}_API"), AssemblyName));
+
+		std::vector<Task<>> Tasks;
+		Spinlock Lock;
 		for (auto& File : Directory::GetFiles(SourceLocation, EDirectorySearchOptions::AllDirectories))
 		{
-			Console::WriteLine(TEXT("Search file: {}"), File);
+			if (Path::GetExtension(File).Equals(TEXT(".h"), EStringComparison::CurrentCultureIgnoreCase))
+			{
+				Tasks.emplace_back(File::ReadAllTextAsync(File, SToken).ContinueWith([this, &Lock, File, &Assembly](auto p)
+				{
+					if (p.IsCompletedSuccessfully())
+					{
+						HeaderFile CurrentHeader(File, p.GetResult());
+						if (CurrentHeader.Parse(Assembly))
+						{
+							std::unique_lock ScopedLock(Lock);
+							HeaderFiles.emplace_back(File, p.GetResult());
+						}
+					}
+					else
+					{
+						throw TerminateException(String::Format(TEXT("Failed to read header file '{}'."), File));
+					}
+				}, SToken));
+			}
 		}
 
-		return 0;
+		co_await Task<>::WhenAll(Tasks);
+
+		CSProject.emplace(Build, AssemblyName);
+		co_await CSProject->GenerateProjectFileAsync(Output, SToken);
+
+		co_return 0;
 	}
 	catch (const TerminateException& TE)
 	{
 		Console::Error.WriteLine(TEXT("Application terminated. {}"), TE.GetMessage());
-		return 2;
+		co_return 2;
 	}
 	catch (const UsageException& UE)
 	{
 		Console::Error.WriteLine(TEXT("Required parameter {} is not provided."), UE.GetParameterName());
 		PrintUsage(Console::Error);
-		return 1;
+		co_return 1;
 	}
 }
 
@@ -71,5 +102,6 @@ void AylaHeaderTool::PrintUsage(TextWriter& Writer)
 	Writer.WriteLine(TEXT("  {}"), ExecutableName);
 	Writer.WriteLine(TEXT("    -Usage            []          Print usage."));
 	Writer.WriteLine(TEXT("    -SourceLocation   [String]    Specify source code location to parse."));
-	Writer.WriteLine(TEXT("    -Intermediate     [String]    Specify intermediate location to save reflection code generated."));
+	Writer.WriteLine(TEXT("    -Build            [String]    Specify build location to save reflection code generated."));
+	Writer.WriteLine(TEXT("    -Output           [String]    Specify build output location to desire C# project output."));
 }

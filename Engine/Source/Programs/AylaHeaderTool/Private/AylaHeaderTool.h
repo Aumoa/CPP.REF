@@ -3,20 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Projects/HeaderFile.h"
+#include "Projects/CSProjectFile.h"
 
 class AylaHeaderTool
 {
 private:
 	String SourceLocation;
-	String Intermediate;
+	String Build;
+	String Output;
+
+	std::vector<HeaderFile> HeaderFiles;
+	std::optional<CSProjectFile> CSProject;
 
 public:
 	AylaHeaderTool();
 
-	int32 Run();
+	Task<int32> Run(std::stop_token SToken = {});
 
 	inline String GetSourceLocation() const { return SourceLocation; }
-	inline String GetIntermediateLocation() const { return Intermediate; }
+	inline String GetBuildLocation() const { return Build; }
 
 private:
 	void PrintUsage(TextWriter& Writer);

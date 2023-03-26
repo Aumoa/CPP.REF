@@ -410,6 +410,11 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]] inline String Clone() const
+	{
+		return String(this->_get_raw(), this->_len);
+	}
+
 	[[nodiscard]] inline constexpr size_t length() const noexcept
 	{
 		return (size_t)*this;
@@ -669,6 +674,11 @@ public:
 		return false;
 	}
 
+	[[nodiscard]] inline constexpr bool IsStringView() const noexcept
+	{
+		return _buf.index() == 0;
+	}
+
 	template<IArray<char_t> TArray>
 	[[nodiscard]] inline constexpr size_t IndexOfAny(const TArray& chars, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
 	{
@@ -709,40 +719,6 @@ public:
 			}
 
 			if (found)
-			{
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	template<IArray<String> TArray>
-	[[nodiscard]] constexpr size_t IndexOfAny(const TArray& strings, size_t indexOf, EStringComparison comparison = EStringComparison::CurrentCulture) const noexcept
-	{
-		if (_len == 0)
-		{
-			return -1;
-		}
-
-		if (std::size(strings) == 0)
-		{
-			return -1;
-		}
-
-		std::vector<String> strs = Linq::ToVector(strings);
-		std::vector<char_t> firsts = Linq::Select(std::ref(strs), [](const auto& str) { return str[0]; });
-		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
-
-		for (size_t i = IndexOfAny(firsts, indexOf, comparison); i != -1; i = IndexOfAny(firsts, ++i, comparison))
-		{
-			String& candidate = strs[IndexOf(firsts, this->operator [](i))];
-
-			std::wstring_view lhs(candidate._get_raw(), candidate._len);
-			size_t sublen = _len - i;
-			std::wstring_view rhs(this->_get_raw() + i, std::min(sublen, candidate._len));
-
-			if (_compare_string_view(lhs, rhs, lowerCase))
 			{
 				return i;
 			}
@@ -801,11 +777,11 @@ public:
 		return String(std::wstring_view(this->_get_raw() + start, length));
 	}
 
-	[[nodiscard]] constexpr std::wstring_view SubstringView(size_t start, size_t length = -1) const noexcept
+	[[nodiscard]] constexpr String SubstringView(size_t start, size_t length = -1) const noexcept
 	{
 		if (start >= _len)
 		{
-			return std::wstring_view();
+			return String::GetEmpty();
 		}
 
 		if (length > _len - start)
@@ -814,7 +790,7 @@ public:
 		}
 
 		length = std::min(length, _len - start);
-		return std::wstring_view(this->_get_raw() + start, length);
+		return String::FromLiteral(std::wstring_view(this->_get_raw() + start, length));
 	}
 
 	[[nodiscard]] inline std::vector<String> Split(char_t separator, EStringSplitOptions options = EStringSplitOptions::None) const
