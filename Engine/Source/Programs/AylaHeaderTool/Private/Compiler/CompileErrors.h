@@ -12,4 +12,5 @@ public:
 	static String InvalidClassKey(String InClassKey, String InRequired);
 	static String IllegalScope(bool bOpen);
 	static String GeneratedBody();
+	static String Colon();
 };

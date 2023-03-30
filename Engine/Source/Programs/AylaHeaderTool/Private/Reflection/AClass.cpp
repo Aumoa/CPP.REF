@@ -3,7 +3,6 @@
 #include "Reflection/AClass.h"
 #include "Reflection/AAssembly.h"
 #include "Compiler/CompileErrors.h"
-#include "Compiler/CppSyntaxTree.h"
 #include "Exceptions/TerminateException.h"
 
 AClass::AClass(const AAssembly& InAssembly, SourceCodeLocator& Locator) : AType(InAssembly, Locator)

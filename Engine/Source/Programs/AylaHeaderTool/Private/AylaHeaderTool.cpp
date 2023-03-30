@@ -43,7 +43,7 @@ Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 		Directory::CreateDirectory(Build);
 
 		String AssemblyName = Path::GetFileNameWithoutExtension(SourceLocation);
-		AAssembly Assembly(String::Format(TEXT("{}_API"), AssemblyName));
+		AAssembly Assembly(String::Format(TEXT("{}_API"), AssemblyName.ToUpper()));
 
 		std::vector<Task<>> Tasks;
 		Spinlock Lock;

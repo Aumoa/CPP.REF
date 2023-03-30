@@ -4,6 +4,7 @@
 #include "Compiler/CompileErrors.h"
 #include "Compiler/SourceCodeLocator.h"
 #include "Exceptions/TerminateException.h"
+#include "Reflection/AccessSpecifier.h"
 
 CppClassSyntaxTree::CppClassSyntaxTree()
 {
@@ -38,11 +39,48 @@ void CppClassSyntaxTree::ParseClassBody(SourceCodeLocator& Locator)
 		throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::GeneratedBody()));
 	}
 
+	EAccessSpecifier CurrentAccess = EAccessSpecifier::Private;
+
 	while (true)
 	{
 		Next = Locator.GetWord(true);
 		if (Next == TEXT("public"))
 		{
+			CurrentAccess = EAccessSpecifier::Public;
+			if (Locator.GetWord(true) != TEXT(":"))
+			{
+				throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::Colon()));
+			}
+		}
+		else if (Next == TEXT("protected"))
+		{
+			CurrentAccess = EAccessSpecifier::Protected;
+			if (Locator.GetWord(true) != TEXT(":"))
+			{
+				throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::Colon()));
+			}
+		}
+		else if (Next == TEXT("private"))
+		{
+			CurrentAccess = EAccessSpecifier::Private;
+			if (Locator.GetWord(true) != TEXT(":"))
+			{
+				throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::Colon()));
+			}
+		}
+		else if (Next == TEXT("internal"))
+		{
+			CurrentAccess = EAccessSpecifier::Internal;
+			if (Locator.GetWord(true) != TEXT(":"))
+			{
+				throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::Colon()));
+			}
+		}
+
+		// escape.
+		else if (Next == TEXT("}"))
+		{
+			break;
 		}
 	}
 }

@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Reflection/AType.h"
-#include "Compiler/CppSyntaxTree.h"
+#include "Compiler/CppClassSyntaxTree.h"
 
 class AAssembly;
 
 class AClass : public AType
 {
 	String TypeName;
-	CppSyntaxTree SyntaxTree;
+	CppClassSyntaxTree SyntaxTree;
 
 public:
 	AClass(const AAssembly& InAssembly, SourceCodeLocator& Locator);

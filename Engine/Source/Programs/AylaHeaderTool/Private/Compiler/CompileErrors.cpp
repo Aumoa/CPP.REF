@@ -16,3 +16,8 @@ String CompileErrors::GeneratedBody()
 {
 	return TEXT("error A003: GENERATED_BODY() not found in first of class declaration.");
 }
+
+String CompileErrors::Colon()
+{
+	return TEXT("error A004: Expected: colon.");
+}
