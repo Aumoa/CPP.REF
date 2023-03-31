@@ -4,8 +4,8 @@
 
 #include "IAwaiter.h"
 #include "suspend_and_destroy_if.h"
-#include "TimeSpan.h"
-#include "DateTime.h"
+#include "CoreTypes/TimeSpan.h"
+#include "CoreTypes/DateTime.h"
 #include "Exceptions/InvalidOperationException.h"
 #include <memory>
 #include <any>

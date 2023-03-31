@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DateTime.h"
-#include "TimeSpan.h"
+#include "CoreTypes/DateTime.h"
+#include "CoreTypes/TimeSpan.h"
 #include <optional>
 
 class CORE_API PerformanceTimer

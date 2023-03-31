@@ -4,7 +4,7 @@
 
 #include "CoreTypes/IntegralTypes.h"
 #include "Spinlock.h"
-#include "TimeSpan.h"
+#include "CoreTypes/TimeSpan.h"
 #include "Misc/PlatformMisc.h"
 #include <chrono>
 #include <mutex>

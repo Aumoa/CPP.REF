@@ -3,8 +3,8 @@
 #pragma once
 
 #include "TaskStatus.h"
-#include "DateTime.h"
-#include "TimeSpan.h"
+#include "CoreTypes/DateTime.h"
+#include "CoreTypes/TimeSpan.h"
 #include <concepts>
 #include <coroutine>
 #include <exception>

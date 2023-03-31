@@ -40,126 +40,131 @@ public:
 	}
 
 public:
-	inline constexpr int64 GetYears() const
+	inline constexpr int64 GetYears() const noexcept
 	{
 		return std::chrono::floor<std::chrono::years>(_val).count();
 	}
 
-	inline constexpr int64 GetMonths() const
+	inline constexpr int64 GetMonths() const noexcept
 	{
 		auto years = std::chrono::floor<std::chrono::years>(_val);
 		return std::chrono::floor<std::chrono::months>(_val - years).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalMonths() const requires
+	inline constexpr T GetTotalMonths() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::months::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetDays() const
+	inline constexpr int64 GetDays() const noexcept
 	{
 		auto months = std::chrono::floor<std::chrono::months>(_val);
 		return std::chrono::floor<std::chrono::days>(_val - months).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalDays() const requires
+	inline constexpr T GetTotalDays() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::days::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetHours() const
+	inline constexpr int64 GetHours() const noexcept
 	{
 		auto days = std::chrono::floor<std::chrono::days>(_val);
 		return std::chrono::floor<std::chrono::hours>(_val - days).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalHours() const requires
+	inline constexpr T GetTotalHours() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::hours::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetMinutes() const
+	inline constexpr int64 GetMinutes() const noexcept
 	{
 		auto hours = std::chrono::floor<std::chrono::hours>(_val);
 		return std::chrono::floor<std::chrono::minutes>(_val - hours).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalMinutes() const requires
+	inline constexpr T GetTotalMinutes() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::minutes::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetSeconds() const
+	inline constexpr int64 GetSeconds() const noexcept
 	{
 		auto minutes = std::chrono::floor<std::chrono::minutes>(_val);
 		return std::chrono::floor<std::chrono::seconds>(_val - minutes).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalSeconds() const requires
+	inline constexpr T GetTotalSeconds() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::seconds::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetMilliseconds() const
+	inline constexpr int64 GetMilliseconds() const noexcept
 	{
 		auto seconds = std::chrono::floor<std::chrono::seconds>(_val);
 		return std::chrono::floor<std::chrono::milliseconds>(_val - seconds).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalMilliseconds() const requires
+	inline constexpr T GetTotalMilliseconds() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::milliseconds::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetMicroseconds() const
+	inline constexpr int64 GetMicroseconds() const noexcept
 	{
 		auto milliseconds = std::chrono::floor<std::chrono::milliseconds>(_val);
 		return std::chrono::floor<std::chrono::microseconds>(_val - milliseconds).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalMicroseconds() const requires
+	inline constexpr T GetTotalMicroseconds() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::microseconds::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetNanoseconds() const
+	inline constexpr int64 GetNanoseconds() const noexcept
 	{
 		auto microseconds = std::chrono::floor<std::chrono::microseconds>(_val);
 		return std::chrono::floor<std::chrono::nanoseconds>(_val - microseconds).count();
 	}
 
 	template<class T = int64>
-	inline constexpr T GetTotalNanoseconds() const requires
+	inline constexpr T GetTotalNanoseconds() const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::nanoseconds::period>>(_val).count();
 	}
 
-	inline constexpr int64 GetTicks() const
+	inline constexpr int64 GetTicks() const noexcept
 	{
 		return _val.count();
+	}
+
+	inline constexpr std::chrono::microseconds GetSpan() const noexcept
+	{
+		return std::chrono::duration_cast<std::chrono::microseconds>(_val);
 	}
 
 public:

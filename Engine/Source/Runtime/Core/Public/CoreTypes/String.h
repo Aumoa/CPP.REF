@@ -33,6 +33,7 @@ class CORE_API String
 {
 	std::variant<const char_t*, std::shared_ptr<char_t[]>> _buf;
 	size_t _len;
+	bool _null_z;
 
 private:
 	static inline constexpr const char_t _null_char = 0;
@@ -42,6 +43,7 @@ private:
 	inline constexpr String(decltype(_buf) buf, size_t len)
 		: _buf(std::move(buf))
 		, _len(len)
+		, _null_z(true)
 	{
 	}
 
@@ -123,8 +125,8 @@ private:
 		memcpy(ptr.get(), buf, sizeof(wchar_t) * len);
 		ptr[len] = 0;
 		_len = len;
+		_null_z = true;
 		return *this;
-		throw;
 	}
 
 	enum class ETrimType
@@ -207,21 +209,27 @@ private:
 
 public:
 	inline constexpr String() noexcept
-		: _len(0)
+		: _buf(&_null_char)
+		, _len(0)
+		, _null_z(true)
 	{
 	}
 
 	inline constexpr String(const String& rhs) noexcept
 		: _buf(rhs._buf)
 		, _len(rhs._len)
+		, _null_z(rhs._null_z)
 	{
 	}
 
 	inline constexpr String(String&& rhs) noexcept
 		: _buf(std::move(rhs._buf))
 		, _len(rhs._len)
+		, _null_z(rhs._null_z)
 	{
+		rhs._buf = &_null_char;
 		rhs._len = 0;
+		rhs._null_z = true;
 	}
 
 	template<class T>
@@ -264,6 +272,7 @@ public:
 
 		rptr[len] = 0;
 		_len = len;
+		_null_z = true;
 	}
 
 public:
@@ -271,6 +280,7 @@ public:
 	{
 		_buf = rhs._buf;
 		_len = rhs._len;
+		_null_z = rhs._null_z;
 		return *this;
 	}
 
@@ -278,7 +288,10 @@ public:
 	{
 		_buf = std::move(rhs._buf);
 		_len = rhs._len;
+		_null_z = rhs._null_z;
+		rhs._buf = &_null_char;
 		rhs._len = 0;
+		rhs._null_z = true;
 		return *this;
 	}
 
@@ -677,6 +690,11 @@ public:
 	[[nodiscard]] inline constexpr bool IsStringView() const noexcept
 	{
 		return _buf.index() == 0;
+	}
+
+	[[nodiscard]] inline constexpr bool IsNullTerminate() const noexcept
+	{
+		return _null_z;
 	}
 
 	template<IArray<char_t> TArray>
