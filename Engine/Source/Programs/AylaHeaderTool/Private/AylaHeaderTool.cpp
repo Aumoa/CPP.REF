@@ -40,10 +40,19 @@ Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 			throw UsageException(TEXT("Output"));
 		}
 
+		if (CommandLine::TryGetValue(TEXT("Includes"), Includes) == false)
+		{
+			throw UsageException(TEXT("Includes"));
+		}
+
 		Directory::CreateDirectory(Build);
 
 		String AssemblyName = Path::GetFileNameWithoutExtension(SourceLocation);
-		AAssembly Assembly(String::Format(TEXT("{}_API"), AssemblyName.ToUpper()));
+		AAssembly Assembly(AssemblyName);
+
+		// Create intermediate default directories.
+		String GeneratedIntermediatePath = Path::Combine(Includes, AssemblyName);
+		Directory::CreateDirectory(GeneratedIntermediatePath);
 
 		std::vector<Task<>> Tasks;
 		Spinlock Lock;
@@ -51,15 +60,15 @@ Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 		{
 			if (Path::GetExtension(File).Equals(TEXT(".h"), EStringComparison::CurrentCultureIgnoreCase))
 			{
-				Tasks.emplace_back(File::ReadAllTextAsync(File, SToken).ContinueWith([this, &Lock, File, &Assembly](auto p)
+				Tasks.emplace_back(File::ReadAllTextAsync(File, SToken).ContinueWith([this, &Lock, File, &Assembly, &GeneratedIntermediatePath](auto p)
 				{
 					if (p.IsCompletedSuccessfully())
 					{
-						HeaderFile CurrentHeader(File, p.GetResult());
+						HeaderFile CurrentHeader(File, p.GetResult(), GeneratedIntermediatePath);
 						if (CurrentHeader.Parse(Assembly))
 						{
 							std::unique_lock ScopedLock(Lock);
-							HeaderFiles.emplace_back(File, p.GetResult());
+							HeaderFiles.emplace_back(std::move(CurrentHeader));
 						}
 					}
 					else
@@ -73,6 +82,14 @@ Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 		co_await Task<>::WhenAll(Tasks);
 
 		CSProject.emplace(Build, AssemblyName);
+
+		Tasks.clear();
+		for (auto& File : HeaderFiles)
+		{
+			Tasks.emplace_back(File.SaveAsync(SToken));
+		}
+
+		co_await Task<>::WhenAll(Tasks);
 		co_await CSProject->GenerateProjectFileAsync(Output, SToken);
 
 		co_return 0;

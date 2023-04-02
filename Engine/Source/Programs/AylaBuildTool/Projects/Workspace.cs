@@ -81,7 +81,8 @@ public class Workspace
                     throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
                 }
 
-                InTargetInfo.Name = RuleClass.Name;
+                string ProjectName = Directory.GetParent(TargetRule)!.Name;
+
                 TargetRules CurrentRules = (TargetRules)Ctor.Invoke(new object[] { InTargetInfo });
                 CurrentRules.bBuildAllModules = true;
                 Project = new(TargetRule, CurrentRules, EngineDirectory);

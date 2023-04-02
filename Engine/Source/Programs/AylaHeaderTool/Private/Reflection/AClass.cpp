@@ -21,7 +21,7 @@ AClass::AClass(const AAssembly& InAssembly, SourceCodeLocator& Locator) : AType(
 	TypeName = Next;
 	check(TypeName.IsEmpty() == false);
 
-	SyntaxTree.Parse(Locator);
+	SyntaxTree.Parse(TypeName, Locator);
 }
 
 AClass::~AClass() noexcept
@@ -31,4 +31,9 @@ AClass::~AClass() noexcept
 String AClass::GetTypeName() const
 {
 	return TypeName;
+}
+
+int32 AClass::GetGeneratedBodyLineNumber() const
+{
+	return SyntaxTree.GetGeneratedBodyLineNumber();
 }

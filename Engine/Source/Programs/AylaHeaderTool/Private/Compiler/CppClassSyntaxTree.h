@@ -10,13 +10,17 @@ class SourceCodeLocator;
 class CppClassSyntaxTree
 {
 	std::vector<CppSyntax> Syntaxes;
+	int32 LineOfGeneratedBody = 0;
 
 public:
 	CppClassSyntaxTree();
+	~CppClassSyntaxTree() noexcept;
 
-	void Parse(SourceCodeLocator& Locator);
-	
+	void Parse(String TypeName, SourceCodeLocator& Locator);
+
+	int32 GetGeneratedBodyLineNumber() const;
+
 private:
 	void ParseInheritances(SourceCodeLocator& Locator);
-	void ParseClassBody(SourceCodeLocator& Locator);
+	void ParseClassBody(String TypeName, SourceCodeLocator& Locator);
 };

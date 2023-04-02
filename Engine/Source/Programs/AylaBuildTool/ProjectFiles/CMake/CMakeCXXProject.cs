@@ -89,6 +89,7 @@ SET(CMAKE_CXX_STANDARD 20)
         string Name = Resolved.Rules.Name;
         string InnerDir = Path.Combine(OutputDir, Name);
         string SourceDirectory = Directory.GetParent(ModuleName)!.FullName;
+        string GenDirectory = Path.Combine(Project.Workspace.GeneratedDirectory, Name);
         Directory.CreateDirectory(InnerDir);
 
         static string AsDefinition(string p) => $"\"-D{p}\"";
@@ -121,8 +122,9 @@ INCLUDE_DIRECTORIES(
 
 FILE(GLOB_RECURSE CXX_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cpp"")
 FILE(GLOB_RECURSE CC_FILES ""{SourceDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.cc"")
+FILE(GLOB_RECURSE GEN_FILES ""{GenDirectory.Replace(Path.DirectorySeparatorChar, '/')}/*.gen.cpp"")
 
-{ExecutablePrefix} ${{CXX_FILES}} ${{CC_FILES}})
+{ExecutablePrefix} ${{CXX_FILES}} ${{CC_FILES}} ${{GEN_FILES}})
 
 TARGET_LINK_LIBRARIES({Name}
     {string.Join("\n\t", Links)}

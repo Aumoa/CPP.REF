@@ -154,7 +154,7 @@ public class CXXProject
         PriorityList.Add(Rule);
     }
 
-    private static void BuildDependencies(ResolvedModule Project, ResolvedModule[] Dependencies)
+    private void BuildDependencies(ResolvedModule Project, ResolvedModule[] Dependencies)
     {
         List<string> IncludePaths = new();
         List<string> AdditionalMacros = new();
@@ -183,6 +183,10 @@ public class CXXProject
 
         IncludePaths.AddRange(ProcessIncludes(Project, Project.Rules.PublicIncludePaths));
         IncludePaths.AddRange(ProcessIncludes(Project, Project.Rules.PrivateIncludePaths));
+
+        // Add generated.h include path.
+        IncludePaths.Add(Path.Combine(Workspace.GeneratedDirectory, Project.Rules.Name));
+
         Project.IncludePaths = IncludePaths.Distinct().ToArray();
 
         AdditionalMacros.AddRange(Project.Rules.PublicAdditionalMacros);

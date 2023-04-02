@@ -7,10 +7,12 @@
 class AAssembly
 {
 private:
+	String Name;
 	String APIName;
 
 public:
-	AAssembly(String InAPIName);
+	AAssembly(String InAssemblyName);
 
+	String GetName() const;
 	String GetAPIName() const;
 };

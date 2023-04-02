@@ -10,7 +10,11 @@ CppClassSyntaxTree::CppClassSyntaxTree()
 {
 }
 
-void CppClassSyntaxTree::Parse(SourceCodeLocator& Locator)
+CppClassSyntaxTree::~CppClassSyntaxTree() noexcept
+{
+}
+
+void CppClassSyntaxTree::Parse(String TypeName, SourceCodeLocator& Locator)
 {
 	String Next = Locator.GetWord(true);
 	if (Next == TEXT(":"))
@@ -23,7 +27,12 @@ void CppClassSyntaxTree::Parse(SourceCodeLocator& Locator)
 		throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::IllegalScope(true)));
 	}
 
-	ParseClassBody(Locator);
+	ParseClassBody(TypeName, Locator);
+}
+
+int32 CppClassSyntaxTree::GetGeneratedBodyLineNumber() const
+{
+	return LineOfGeneratedBody;
 }
 
 void CppClassSyntaxTree::ParseInheritances(SourceCodeLocator& Locator)
@@ -31,8 +40,9 @@ void CppClassSyntaxTree::ParseInheritances(SourceCodeLocator& Locator)
 	throw NotImplementedException();
 }
 
-void CppClassSyntaxTree::ParseClassBody(SourceCodeLocator& Locator)
+void CppClassSyntaxTree::ParseClassBody(String TypeName, SourceCodeLocator& Locator)
 {
+	LineOfGeneratedBody = Locator.GetPosition().LinePos;
 	String Next = Locator.GetWord(true);
 	if (Next != TEXT("GENERATED_BODY") || Locator.GetWord(true) != TEXT("(") || Locator.GetWord(true) != TEXT(")"))
 	{

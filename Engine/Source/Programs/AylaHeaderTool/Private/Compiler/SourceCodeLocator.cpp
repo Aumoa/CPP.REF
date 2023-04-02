@@ -109,7 +109,7 @@ String SourceCodeLocator::GetWord(bool bStringView, bool bPeek)
 {
 	check(IsEOF() == false);
 
-	constexpr std::array CodeSplits = { ' ', '{', '}', ':', '<', '>', '(', ')' };
+	constexpr std::array CodeSplits = { ' ', '{', '}', ':', '<', '>', '(', ')', '\r', '\n' };
 	String View = GetCurrentView();
 	size_t IndexOf = View.IndexOfAny(CodeSplits);
 	if (IndexOf != -1)

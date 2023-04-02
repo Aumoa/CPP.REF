@@ -2,9 +2,15 @@
 
 #include "Reflection/AAssembly.h"
 
-AAssembly::AAssembly(String InAPIName)
-	: APIName(InAPIName)
+AAssembly::AAssembly(String InAssemblyName)
+	: Name(InAssemblyName)
+	, APIName(String::Format(TEXT("{}_API"), InAssemblyName.ToUpper()))
 {
+}
+
+String AAssembly::GetName() const
+{
+	return Name;
 }
 
 String AAssembly::GetAPIName() const

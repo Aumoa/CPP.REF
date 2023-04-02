@@ -18,4 +18,6 @@ public:
 	virtual ~AClass() noexcept override;
 
 	virtual String GetTypeName() const override;
+
+	int32 GetGeneratedBodyLineNumber() const;
 };

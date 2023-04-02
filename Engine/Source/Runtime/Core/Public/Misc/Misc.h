@@ -28,4 +28,14 @@ public:
 	{
 		return *inRef;
 	}
+
+	[[noreturn]]
+	static constexpr inline void Unreachable()
+	{
+#if PLATFORM_WINDOWS
+		__assume(false);
+#else
+		__builtin_unreachable();
+#endif
+	}
 };

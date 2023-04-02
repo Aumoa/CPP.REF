@@ -12,6 +12,7 @@ private:
 	String SourceLocation;
 	String Build;
 	String Output;
+	String Includes;
 
 	std::vector<HeaderFile> HeaderFiles;
 	std::optional<CSProjectFile> CSProject;
