@@ -545,7 +545,7 @@ public:
 			return -1;
 		}
 
-		if (indexOf >= length - compare._len)
+		if (indexOf >= _len - compare._len)
 		{
 			return -1;
 		}
@@ -553,13 +553,13 @@ public:
 		const char_t* const buf1 = this->_get_raw();
 		const char_t* const buf2 = compare._get_raw();
 		const bool lowerCase = comparison == EStringComparison::CurrentCultureIgnoreCase;
-		const size_t last = length - compare._len;
+		const size_t last = _len - compare._len;
 
 		size_t compares = 0;
 		size_t i;
-		for (i = indexOf; i < length;)
+		for (i = indexOf; i < _len;)
 		{
-			char_t lc = _safe_get(buf1, length, i, lowerCase);
+			char_t lc = _safe_get(buf1, _len, i, lowerCase);
 			char_t rc = _safe_get(buf2, compare._len, compares, lowerCase);
 
 			if (lc == rc)
