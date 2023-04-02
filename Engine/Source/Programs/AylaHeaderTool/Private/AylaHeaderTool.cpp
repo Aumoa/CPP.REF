@@ -49,6 +49,8 @@ Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 
 		String AssemblyName = Path::GetFileNameWithoutExtension(SourceLocation);
 		AAssembly Assembly(AssemblyName);
+		Console::WriteLine(TEXT("AylaHeaderTool running on {} module."), AssemblyName);
+		auto Timer = PerformanceTimer::StartNew();
 
 		// Create intermediate default directories.
 		String GeneratedIntermediatePath = Path::Combine(Includes, AssemblyName);
@@ -92,6 +94,7 @@ Task<int32> AylaHeaderTool::Run(std::stop_token SToken)
 		co_await Task<>::WhenAll(Tasks);
 		co_await CSProject->GenerateProjectFileAsync(Output, SToken);
 
+		Console::WriteLine(TEXT("Reflection code generated on {} seconds."), Timer.GetElapsed().GetTotalSeconds<double>());
 		co_return 0;
 	}
 	catch (const TerminateException& TE)

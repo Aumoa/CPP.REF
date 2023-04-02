@@ -87,12 +87,12 @@ void Console::SetForegroundColor(EConsoleColor InColor)
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
 	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
 	{
-		throw NotSupportedException();
+		return;
 	}
 	BufferInfo.wAttributes = (BufferInfo.wAttributes & 0xFF00) | (WORD)InColor;
 	if (SetConsoleTextAttribute(sOut.GetNativeHandle(), BufferInfo.wAttributes) == FALSE)
 	{
-		throw NotSupportedException();
+		return;
 	}
 #endif
 }
@@ -103,7 +103,7 @@ EConsoleColor Console::GetForegroundColor()
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
 	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
 	{
-		throw NotSupportedException();
+		return (EConsoleColor)-1;
 	}
 	return (EConsoleColor)(BufferInfo.wAttributes & 0x00FF);
 #endif

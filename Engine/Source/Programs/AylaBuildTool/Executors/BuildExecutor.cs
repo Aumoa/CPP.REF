@@ -72,6 +72,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         // Add ninja executable path to environments.
         PathEnvironments.Add(Path.Combine(Workspace.EngineDirectory.BuildDirectory, "Ninja", PlatformId, "bin"));
+        PathEnvironments.Add(Environment.SystemDirectory);
 
         ToolChainInstallation? ToolChain = null;
         const Architecture CurrentArchitecture = Architecture.x64;
@@ -96,6 +97,11 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             CMakeDefinitions.Add("CMAKE_CXX_COMPILER", "g++");
             CMakeDefinitions.Add("CMAKE_SHARED_LIBRARY_EXPORT", "__attribute__((visibility(\\\"default\\\")))");
             CMakeDefinitions.Add("CMAKE_SHARED_LIBRARY_IMPORT", "");
+        }
+        else
+        {
+            Console.Error.WriteLine("Not supported platform.");
+            return 1;
         }
 
         if (ToolChain != null)
@@ -156,6 +162,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                 WorkingDirectory = IntermediatePath
             };
 
+            CMakeStart.Environment["PATH"] = string.Join(';', PathEnvironments);
             CMakeStart.Environment["LIB"] = string.Join(';', LibraryEnvironments);
             CMakeStart.Environment["INCLUDE"] = string.Join(';', IncludeEnvironments);
 
