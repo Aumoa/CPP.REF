@@ -18,4 +18,7 @@ public:
 	String GetSourcePath() const;
 	String GetSource() const;
 	virtual Task<> SaveAsync(std::stop_token SToken = {});
+
+protected:
+	static Task<> CompareAndSaveAsync(String InPath, String Text, uint32 Encoding, std::stop_token SToken = {});
 };

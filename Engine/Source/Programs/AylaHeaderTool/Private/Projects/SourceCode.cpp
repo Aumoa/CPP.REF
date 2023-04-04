@@ -27,3 +27,17 @@ Task<> SourceCode::SaveAsync(std::stop_token SToken)
 {
 	co_await File::WriteAllTextAsync(GetSourcePath(), GetSource(), 0, SToken);
 }
+
+Task<> SourceCode::CompareAndSaveAsync(String InPath, String InText, uint32 Encoding, std::stop_token SToken)
+{
+	String Previous;
+	if (File::Exists(InPath))
+	{
+		Previous = co_await File::ReadAllTextAsync(InPath, SToken);
+	}
+
+	if (Previous != InText)
+	{
+		co_await File::WriteAllTextAsync(InPath, InText, Encoding, SToken);
+	}
+}

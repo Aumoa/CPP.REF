@@ -15,8 +15,8 @@ Task<> HeaderFile::SaveAsync(std::stop_token SToken)
 	String Filename = Path::GetFileNameWithoutExtension(GetSourcePath());
 
 	std::vector<Task<>> Tasks;
-	Tasks.emplace_back(File::WriteAllTextAsync(Path::Combine(IntermediatePath, Path::ChangeExtension(Filename, TEXT(".generated.h"))), GeneratedHeader(), 0, SToken));
-	Tasks.emplace_back(File::WriteAllTextAsync(Path::Combine(IntermediatePath, Path::ChangeExtension(Filename, TEXT(".gen.cpp"))), GeneratedSource(), 0, SToken));
+	Tasks.emplace_back(CompareAndSaveAsync(Path::Combine(IntermediatePath, Path::ChangeExtension(Filename, TEXT(".generated.h"))), GeneratedHeader(), 0, SToken));
+	Tasks.emplace_back(CompareAndSaveAsync(Path::Combine(IntermediatePath, Path::ChangeExtension(Filename, TEXT(".gen.cpp"))), GeneratedSource(), 0, SToken));
 
 	return Task<>::WhenAll(Tasks);
 }
