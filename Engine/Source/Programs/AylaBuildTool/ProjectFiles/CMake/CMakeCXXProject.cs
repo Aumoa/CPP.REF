@@ -112,6 +112,22 @@ SET(CMAKE_CXX_STANDARD 20)
         IEnumerable<string> Links = Resolved.DependencyModules;
         Links = Links.Concat(Resolved.AdditionalLibraries.Select(AsLibrary));
 
+        string? GEN_Include = null;
+        string? GEN_CustomTarget = null;
+        string? GEN_Dependencies = null;
+
+        if (Resolved.DependencyModules.Contains("CoreAObject"))
+        {
+            GEN_Include = $"FILE(GLOB_RECURSE GEN_FILES \"{GenDirectory}/*.gen.cpp\")";
+            GEN_CustomTarget = $@"
+ADD_CUSTOM_TARGET({Name}_GEN
+    COMMAND ${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}/AylaHeaderTool.exe -SourceLocation ""{SourceDirectory}"" -Build ""{BuildDirectory}"" -Includes ""{Project.Workspace.GeneratedDirectory.Replace(Path.DirectorySeparatorChar, '/')}"" -Output ""${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}""
+    USES_TERMINAL
+    VERBATIM
+)";
+            GEN_Dependencies = $"ADD_DEPENDENCIES({Name} {Name}_GEN)";
+        }
+
         string SubCMakeLists = $@"
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
@@ -123,17 +139,13 @@ INCLUDE_DIRECTORIES(
 
 FILE(GLOB_RECURSE CXX_FILES ""{SourceDirectory}/*.cpp"")
 FILE(GLOB_RECURSE CC_FILES ""{SourceDirectory}/*.cc"")
-FILE(GLOB_RECURSE GEN_FILES ""{GenDirectory}/*.gen.cpp"")
+{GEN_Include}
 
-ADD_CUSTOM_TARGET({Name}_GEN
-    COMMAND ${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}/AylaHeaderTool.exe -SourceLocation ""{SourceDirectory}"" -Build ""{BuildDirectory}"" -Includes ""{Project.Workspace.GeneratedDirectory.Replace(Path.DirectorySeparatorChar, '/')}"" -Output ""${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}""
-    USES_TERMINAL
-    VERBATIM
-)
+{GEN_CustomTarget}
 
 {ExecutablePrefix} ${{CXX_FILES}} ${{CC_FILES}} ${{GEN_FILES}})
 
-ADD_DEPENDENCIES({Name} {Name}_GEN)
+{GEN_Dependencies}
 
 TARGET_LINK_LIBRARIES({Name}
     {string.Join("\n\t", Links)}

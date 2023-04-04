@@ -80,38 +80,91 @@ public class VisualStudioSolution : ISolution
 
     private string GenerateSolution()
     {
+        const string FilterGUID = "2150E333-8FDC-42A3-9474-1A3956D46DE8";
+        const string VisualCPPGUID = "8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
+        const string VisualCSharpGUID = "9A19103F-16F7-4668-BE54-9A1E7A4F7556";
+
         StringBuilder Builder = new();
         Builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 12.00");
         Builder.AppendLine("# Visual Studio Version 17");
         Builder.AppendLine("VisualStudioVersion = 17.2.32602.215");
         Builder.AppendLine("MinimumVisualStudioVersion = 10.0.40219.1");
 
-        VisualCSharpProject? SpecialTarget = null;
+        List<string> SpecialTargetGUIDs = new();
+        HashSet<string> SpecialTargetNames = new() { "AylaHeaderTool", "AylaBuildTool" };
 
+        // Resolve filters.
         Dictionary<string, string> Filters = new();
         foreach (var Project in CXXProjects)
         {
             Filters.TryAdd(Project.FilterPath, CRC32.GenerateGuid(Project.FilterPath).ToString().ToUpper());
         }
+
         foreach (var Project in CSProjects)
         {
             Filters.TryAdd(Project.FilterPath, CRC32.GenerateGuid(Project.FilterPath).ToString().ToUpper());
-
-            // Special target.
-            if (Project.TargetName == "AylaBuildTool")
-            {
-                Debug.Assert(SpecialTarget == null);
-                SpecialTarget = Project;
-            }
         }
-
-        const string FilterGUID = "2150E333-8FDC-42A3-9474-1A3956D46DE8";
-        const string VisualCPPGUID = "8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
-        const string VisualCSharpGUID = "9A19103F-16F7-4668-BE54-9A1E7A4F7556";
 
         foreach (var (Path, GUID) in Filters)
         {
             Builder.AppendLine($"Project(\"{{{FilterGUID}}}\") = \"{Path}\", \"{Path}\", \"{{{GUID}}}\"");
+            Builder.AppendLine("EndProject");
+        }
+
+        // Resolve pre-dependencies.
+        foreach (var Project in CSProjects)
+        {
+            if (SpecialTargetNames.Contains(Project.TargetName))
+            {
+                SpecialTargetGUIDs.Add(Project.ProjectGuid);
+            }
+        }
+
+        foreach (var Project in CXXProjects)
+        {
+            if (SpecialTargetNames.Contains(Project.TargetName))
+            {
+                SpecialTargetGUIDs.Add(Project.ProjectGuid);
+            }
+        }
+
+        // Add projects.
+        void ResolveDependencies(IProject InProject)
+        {
+            int Cnt = SpecialTargetNames.Count;
+            bool Contains = SpecialTargetNames.Contains(InProject.TargetName);
+
+            if (Contains)
+            {
+                --Cnt;
+            }
+
+            if (Cnt > 0)
+            {
+                if (SpecialTargetGUIDs.Any())
+                {
+                    Builder.AppendLine($"\tProjectSection(ProjectDependencies) = postProject");
+                }
+
+                foreach (var SpecialTarget in SpecialTargetGUIDs)
+                {
+                    if (SpecialTarget != InProject.TargetName)
+                    {
+                        Builder.AppendLine($"\t\t{{{SpecialTarget}}} = {{{SpecialTarget}}}");
+                    }
+                }
+
+                if (SpecialTargetGUIDs.Any())
+                {
+                    Builder.AppendLine($"\tEndProjectSection");
+                }
+            }
+        }
+
+        foreach (var Project in CSProjects)
+        {
+            string Filename = Project.ProjectFile;
+            Builder.AppendLine($"Project(\"{{{VisualCSharpGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
             Builder.AppendLine("EndProject");
         }
 
@@ -120,19 +173,7 @@ public class VisualStudioSolution : ISolution
             string Filename = Path.ChangeExtension(Project.TargetName, ".vcxproj");
             Filename = Path.Combine(TargetWorkspace.TargetDirectory.ProjectFilesDirectory, Filename);
             Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
-            if (SpecialTarget != null)
-            {
-                Builder.AppendLine($"\tProjectSection(ProjectDependencies) = postProject");
-                Builder.AppendLine($"\t\t{{{SpecialTarget.ProjectGuid}}} = {{{SpecialTarget.ProjectGuid}}}");
-                Builder.AppendLine($"\tEndProjectSection");
-            }
-            Builder.AppendLine("EndProject");
-        }
-
-        foreach (var Project in CSProjects)
-        {
-            string Filename = Project.ProjectFile;
-            Builder.AppendLine($"Project(\"{{{VisualCSharpGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
+            ResolveDependencies(Project);
             Builder.AppendLine("EndProject");
         }
 
