@@ -21,3 +21,18 @@ String CompileErrors::Colon()
 {
 	return TEXT("error A004: Expected: colon.");
 }
+
+String CompileErrors::IllegalKeyword(String InKeyword)
+{
+	return String::Format(TEXT("error A005: Unexpected keyword '{}'."), InKeyword);
+}
+
+String CompileErrors::MultipleInheritance()
+{
+	return TEXT("error A006: Multiple inheritance is not allowed.");
+}
+
+String CompileErrors::IllegalAccess()
+{
+	return TEXT("error A007: Unexpected access modifier.");
+}

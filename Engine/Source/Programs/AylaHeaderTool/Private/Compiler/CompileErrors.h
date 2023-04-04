@@ -13,4 +13,7 @@ public:
 	static String IllegalScope(bool bOpen);
 	static String GeneratedBody();
 	static String Colon();
+	static String IllegalKeyword(String InKeyword);
+	static String MultipleInheritance();
+	static String IllegalAccess();
 };

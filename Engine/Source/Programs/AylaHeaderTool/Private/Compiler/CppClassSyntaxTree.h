@@ -12,6 +12,8 @@ class CppClassSyntaxTree
 	std::vector<CppSyntax> Syntaxes;
 	int32 LineOfGeneratedBody = 0;
 
+	String SuperClass;
+
 public:
 	CppClassSyntaxTree();
 	~CppClassSyntaxTree() noexcept;
@@ -23,4 +25,7 @@ public:
 private:
 	void ParseInheritances(SourceCodeLocator& Locator);
 	void ParseClassBody(String TypeName, SourceCodeLocator& Locator);
+
+private:
+	static bool IsKeyword(String InWord);
 };

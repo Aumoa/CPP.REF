@@ -37,7 +37,47 @@ int32 CppClassSyntaxTree::GetGeneratedBodyLineNumber() const
 
 void CppClassSyntaxTree::ParseInheritances(SourceCodeLocator& Locator)
 {
-	throw NotImplementedException();
+	String Next;
+
+	auto AddInheritance = [&]()
+	{
+		Next = Locator.GetWord(true);
+		if (IsKeyword(Next))
+		{
+			throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::IllegalKeyword(Next)));
+		}
+
+		if (SuperClass.IsEmpty() == false)
+		{
+			throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::MultipleInheritance()));
+		}
+
+		SuperClass = Next;
+	};
+
+	while (true)
+	{
+		Next = Locator.GetWord(true);
+		if (Next == TEXT("public"))
+		{
+			AddInheritance();
+		}
+		else if (Next == TEXT("protected") || Next == TEXT("private"))
+		{
+			throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::IllegalAccess()));
+		}
+		else
+		{
+			if (Next == TEXT("{"))
+			{
+				break;
+			}
+			else
+			{
+				AddInheritance();
+			}
+		}
+	}
 }
 
 void CppClassSyntaxTree::ParseClassBody(String TypeName, SourceCodeLocator& Locator)
@@ -93,4 +133,14 @@ void CppClassSyntaxTree::ParseClassBody(String TypeName, SourceCodeLocator& Loca
 			break;
 		}
 	}
+}
+
+bool CppClassSyntaxTree::IsKeyword(String InWord)
+{
+	static std::set<String> Keywords =
+	{
+		TEXT("public"), TEXT("protected"), TEXT("private"), TEXT("internal")
+	};
+
+	return Keywords.contains(InWord);
 }
