@@ -23,7 +23,7 @@ SourceCodeLocator::SourceCodeLocator(String InFilenameHint, String InSourceCode)
 
 String SourceCodeLocator::ToString() const
 {
-	return GetCurrentView().ToString();
+	return GetPosition().ToString();
 }
 
 void SourceCodeLocator::SetEOF()

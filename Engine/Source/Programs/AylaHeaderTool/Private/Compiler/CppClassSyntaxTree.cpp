@@ -21,8 +21,7 @@ void CppClassSyntaxTree::Parse(String TypeName, SourceCodeLocator& Locator)
 	{
 		ParseInheritances(Locator);
 	}
-
-	if (Next != TEXT("{"))
+	else if (Next != TEXT("{"))
 	{
 		throw TerminateException(String::Format(TEXT("{}: {}"), Locator.ToString(), CompileErrors::IllegalScope(true)));
 	}

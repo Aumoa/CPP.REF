@@ -116,7 +116,7 @@ SET(CMAKE_CXX_STANDARD 20)
         string? GEN_CustomTarget = null;
         string? GEN_Dependencies = null;
 
-        if (Resolved.DependencyModules.Contains("CoreAObject"))
+        if (Resolved.DependencyModules.Contains("CoreAObject") || Resolved.Rules.Name == "CoreAObject")
         {
             GEN_Include = $"FILE(GLOB_RECURSE GEN_FILES \"{GenDirectory}/*.gen.cpp\")";
             GEN_CustomTarget = $@"
