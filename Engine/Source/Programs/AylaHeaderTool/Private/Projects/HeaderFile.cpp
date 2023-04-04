@@ -86,10 +86,14 @@ String HeaderFile::GeneratedTypeHeader(AType* InType) const
 
 		String BodySource = TEXT(R"AA(
 #define FILE_ID {0}
-#define __GENERATED_BODY__{0}__{1}__
+#define __GENERATED_BODY__{0}__{1}__ \
+	{2}
+
 )AA");
+
+		String Super = TEXT("");
 		
-		return String::Format(BodySource, FileId, Class->GetGeneratedBodyLineNumber());
+		return String::Format(BodySource, FileId, Class->GetGeneratedBodyLineNumber(), Super);
 	}
 	else
 	{

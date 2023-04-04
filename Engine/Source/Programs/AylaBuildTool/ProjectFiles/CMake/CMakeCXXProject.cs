@@ -125,7 +125,15 @@ FILE(GLOB_RECURSE CXX_FILES ""{SourceDirectory}/*.cpp"")
 FILE(GLOB_RECURSE CC_FILES ""{SourceDirectory}/*.cc"")
 FILE(GLOB_RECURSE GEN_FILES ""{GenDirectory}/*.gen.cpp"")
 
+ADD_CUSTOM_TARGET({Name}_GEN
+    COMMAND ${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}/AylaHeaderTool.exe -SourceLocation ""{SourceDirectory}"" -Build ""{BuildDirectory}"" -Includes ""{Project.Workspace.GeneratedDirectory.Replace(Path.DirectorySeparatorChar, '/')}"" -Output ""${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}""
+    USES_TERMINAL
+    VERBATIM
+)
+
 {ExecutablePrefix} ${{CXX_FILES}} ${{CC_FILES}} ${{GEN_FILES}})
+
+ADD_DEPENDENCIES({Name} {Name}_GEN)
 
 TARGET_LINK_LIBRARIES({Name}
     {string.Join("\n\t", Links)}
@@ -133,12 +141,6 @@ TARGET_LINK_LIBRARIES({Name}
 
 TARGET_COMPILE_DEFINITIONS({Name} PRIVATE
     {string.Join("\n\t", Resolved.AdditionalMacros.Select(AsDefinition))}
-)
-
-ADD_CUSTOM_COMMAND(TARGET {Name}
-    PRE_BUILD
-    COMMAND ${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}/AylaHeaderTool.exe -SourceLocation ""{SourceDirectory}"" -Build ""{BuildDirectory}"" -Includes ""{Project.Workspace.GeneratedDirectory.Replace(Path.DirectorySeparatorChar, '/')}"" -Output ""${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}""
-    VERBATIM
 )
 ";
 

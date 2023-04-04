@@ -13,8 +13,7 @@ public class TargetRules
     public TargetRules(TargetInfo Info)
     {
         Name = GetType().Name.Replace("Target", "");
-        Debug.Assert(Info.Name != null);
-        TargetName = Info.Name;
+        TargetName = Info.Name ?? "";
         Class = TargetClass.Game;
         Platform = Info.BuildConfiguration.Platform;
         TargetModuleName = Name;
