@@ -28,7 +28,7 @@ public class VisualCXXProject : IProject
 
     public VisualCXXProject(CXXProject CXXProject)
     {
-        ProjectName = CXXProject.Rules.Name;
+        //ProjectName = CXXProject.Rules.Name;
         FilterPath = GetFilterName(CXXProject.Rules.Class);
         this.CXXProject = CXXProject;
         ProjectGuid = CRC32.GenerateGuid(Path.Combine(FilterPath, ProjectName)).ToString().ToUpper();
@@ -57,13 +57,13 @@ public class VisualCXXProject : IProject
                     ProjectConfiguration.SetAttribute("Include", $"{Configuration}|{Platform}");
 
                     ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString();
-                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString();
+                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString()!;
 
                     ProjectConfiguration = ProjectConfigurations.AddElement("ProjectConfiguration");
                     ProjectConfiguration.SetAttribute("Include", $"{Configuration}_Editor|{Platform}");
 
                     ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString() + "_Editor";
-                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString();
+                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString()!;
                 });
             }
 
@@ -122,16 +122,16 @@ public class VisualCXXProject : IProject
 
                 var IncludePaths = Installation.GetRequiredIncludePaths(Platform.Architecture);
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name}";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name}";
+                //PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name}";
+                //PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name}";
                 PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
 
                 // Foreach Configurations
                 PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}_Editor|{Platform}'");
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name} -Editor";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name} -Editor";
+                //PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name} -Editor";
+                //PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name} -Editor";
                 PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
             });
 
@@ -284,7 +284,8 @@ public class VisualCXXProject : IProject
                 var PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Platform)'=='{Platform}'");
 
-                string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, Platform.ToString(), CXXProject.Rules.TargetModuleName);
+                //string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, Platform.ToString(), CXXProject.Rules.TargetModuleName);
+                string Executable = "";
                 Executable = Path.ChangeExtension(Executable, ".exe");
                 PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
 

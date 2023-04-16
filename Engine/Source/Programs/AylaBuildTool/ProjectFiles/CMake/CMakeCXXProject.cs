@@ -18,7 +18,7 @@ public class CMakeCXXProject : IProject
 
     public CMakeCXXProject(CXXProject TargetProject)
     {
-        ProjectName = TargetProject.Rules.Name;
+        //ProjectName = TargetProject.Rules.Name;
         CXXProject = TargetProject;
     }
 
@@ -26,7 +26,8 @@ public class CMakeCXXProject : IProject
 
     public string Name => CXXProject.Name;
 
-    public string MakefilePath => Path.Combine(CXXProject.Workspace.ProjectFilesDirectory, CXXProject.Name, "CMakeLists.txt");
+    public string MakefilePath => throw new Exception();
+    //public string MakefilePath => Path.Combine(CXXProject.Workspace.ProjectFilesDirectory, CXXProject.Name, "CMakeLists.txt");
 
     public bool bEmptyProject { get; private set; }
 
@@ -57,17 +58,17 @@ public class CMakeCXXProject : IProject
         string CMakeLists = $@"
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
-PROJECT({CXXProject.Rules.Name})
+PROJECT({/*CXXProject.Rules.Name*/""})
 
 ADD_COMPILE_DEFINITIONS(
     {string.Join("\n\t", Definitions)}
 )
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ""{/*TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')*/""}/Win64"")
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ""{/*TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')*/""}/Win64"")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ""{/*TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')*/""}/Win64"")
 
-LINK_DIRECTORIES(""{TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')}/Win64"")
+LINK_DIRECTORIES(""{/*TargetDirectory.BinariesDirectory.Replace(Path.DirectorySeparatorChar, '/')*/""}/Win64"")
 
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_STANDARD 20)
@@ -89,18 +90,20 @@ SET(CMAKE_CXX_STANDARD 20)
         string Name = Resolved.Rules.Name;
         string InnerDir = Path.Combine(OutputDir, Name);
         string SourceDirectory = Directory.GetParent(ModuleName)!.FullName.Replace(Path.DirectorySeparatorChar, '/');
-        string GenDirectory = Path.Combine(Project.Workspace.GeneratedDirectory, Name).Replace(Path.DirectorySeparatorChar, '/');
-        string BuildDirectory = Path.Combine(Project.Workspace.IntermediateDirectory, "Build").Replace(Path.DirectorySeparatorChar, '/');
+        //string GenDirectory = Path.Combine(Project.Workspace.GeneratedDirectory, Name).Replace(Path.DirectorySeparatorChar, '/');
+        //string BuildDirectory = Path.Combine(Project.Workspace.IntermediateDirectory, "Build").Replace(Path.DirectorySeparatorChar, '/');
+        string GenDirectory = "";
+        string BuildDirectory = "";
         Directory.CreateDirectory(InnerDir);
 
         static string AsDefinition(string p) => $"\"-D{p}\"";
         static string AsIncludeDirectory(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
         static string AsLibrary(string p) => $"\"{p.Replace(Path.DirectorySeparatorChar, '/')}\"";
 
-        if (Project.Rules.TargetModuleName != Resolved.Rules.Name)
-        {
-            Type = TargetType.Module;
-        }
+        //if (Project.Rules.TargetModuleName != Resolved.Rules.Name)
+        //{
+        //    Type = TargetType.Module;
+        //}
 
         string ExecutablePrefix = Type switch
         {
@@ -121,7 +124,7 @@ SET(CMAKE_CXX_STANDARD 20)
             GEN_Include = $"FILE(GLOB_RECURSE GEN_FILES \"{GenDirectory}/*.gen.cpp\")";
             GEN_CustomTarget = $@"
 ADD_CUSTOM_TARGET({Name}_GEN
-    COMMAND ${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}/AylaHeaderTool.exe -SourceLocation ""{SourceDirectory}"" -Build ""{BuildDirectory}"" -Includes ""{Project.Workspace.GeneratedDirectory.Replace(Path.DirectorySeparatorChar, '/')}"" -Output ""${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}""
+    COMMAND ${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}/AylaHeaderTool.exe -SourceLocation ""{SourceDirectory}"" -Build ""{BuildDirectory}"" -Includes ""{/*Project.Workspace.GeneratedDirectory.Replace(Path.DirectorySeparatorChar, '/')*/""}"" -Output ""${{CMAKE_RUNTIME_OUTPUT_DIRECTORY}}""
     USES_TERMINAL
     VERBATIM
 )";

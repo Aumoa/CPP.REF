@@ -2,49 +2,29 @@
 
 using AE.Misc;
 using AE.Platform;
+using AE.Rules;
 
 namespace AE.BuildSettings;
 
-public record TargetPlatform
+public class TargetPlatform : SerializableRule
 {
-    private readonly string TargetName;
+    public string TargetName { get; set; } = string.Empty;
 
-    public PlatformGroup Group { get; init; } = null!;
+    public PlatformGroup Group { get; set; } = new();
 
-    public Architecture Architecture { get; init; }
+    public Architecture Architecture { get; set; }
 
-    private TargetPlatform(string TargetName)
+    public static readonly TargetPlatform Win64 = new()
     {
-        this.TargetName = TargetName;
-    }
-
-    public override string ToString() => TargetName;
-
-    public static readonly TargetPlatform Win64 = new("Win64")
-    {
+        TargetName = "Win64",
         Group = PlatformGroup.Windows,
         Architecture = Architecture.x64
     };
 
-    public static readonly TargetPlatform Linux = new("Linux")
+    public static readonly TargetPlatform Linux = new()
     {
+        TargetName = "Linux",
         Group = PlatformGroup.Linux,
         Architecture = Architecture.x64
     };
-
-    public void Serialize(BinaryWriter Writer)
-    {
-        Writer.Write(TargetName);
-        Group.Serialize(Writer);
-        Writer.Write((int)Architecture);
-    }
-
-    public static TargetPlatform Deserialize(BinaryReader Reader)
-    {
-        return new(Reader.ReadString())
-        {
-            Group = PlatformGroup.Deserialize(Reader),
-            Architecture = (Architecture)Reader.ReadInt32()
-        };
-    }
 }

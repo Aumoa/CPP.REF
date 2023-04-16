@@ -2,13 +2,14 @@
 
 namespace AE.Rules;
 
-public class ModuleRules
+public class ModuleRules : SerializableRule
 {
     public TargetRules TargetRule { get; }
 
     public ModuleRules(TargetRules TargetRule)
     {
         this.TargetRule = TargetRule;
+        this.Name = GetType().Name;
     }
 
     public string GenerateSafeAPIName()
@@ -16,7 +17,7 @@ public class ModuleRules
         return Name.ToUpper() + "_API";
     }
 
-    public string Name => GetType().Name;
+    public required string Name { get; init; }
 
     public List<string> PublicDependencyModuleNames { get; protected set; } = new();
 

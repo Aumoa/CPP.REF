@@ -45,7 +45,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
     {
         var TargetInfo = new TargetInfo()
         {
-            Name = BuildArgs.Target,
+            //Name = BuildArgs.Target,
             BuildConfiguration = new BuildConfiguration()
             {
                 Configuration = Enum.Parse<Configuration>(BuildArgs.Config!, true),
@@ -62,16 +62,17 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         Console.WriteLine("Generate CMake projects.");
         CMakeSolution Solution = await CMakeGenerator.GenerateSolutionAsync(Workspace, null, CToken);
 
-        string PlatformId = TargetInfo.BuildConfiguration.Platform.ToString();
+        string PlatformId = TargetInfo.BuildConfiguration.Platform.ToString()!;
 
-        string CMakeExecutable = Path.Combine(Workspace.EngineDirectory.BuildDirectory, "CMake", PlatformId, "bin", "cmake");
+        //string CMakeExecutable = Path.Combine(Workspace.EngineDirectory.BuildDirectory, "CMake", PlatformId, "bin", "cmake");
+        string CMakeExecutable = "";
         List<string> PathEnvironments = new();
         List<string> LibraryEnvironments = new();
         List<string> IncludeEnvironments = new();
         Dictionary<string, string> CMakeDefinitions = new();
 
         // Add ninja executable path to environments.
-        PathEnvironments.Add(Path.Combine(Workspace.EngineDirectory.BuildDirectory, "Ninja", PlatformId, "bin"));
+        //PathEnvironments.Add(Path.Combine(Workspace.EngineDirectory.BuildDirectory, "Ninja", PlatformId, "bin"));
         PathEnvironments.Add(Environment.SystemDirectory);
 
         ToolChainInstallation? ToolChain = null;
@@ -122,7 +123,8 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
             string ProjectFilesDir = Directory.GetParent(CXXProject.MakefilePath)!.FullName;
             string ProjectName = CXXProject.Name;
-            string IntermediatePath = Workspace.TargetDirectory.IntermediateDirectory;
+            //string IntermediatePath = Workspace.TargetDirectory.IntermediateDirectory;
+            string IntermediatePath = "";
             IntermediatePath = Path.Combine(IntermediatePath, "Build", "Shipping", ProjectName);
             if (BuildArgs.bClean && Directory.Exists(IntermediatePath))
             {

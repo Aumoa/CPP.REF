@@ -23,7 +23,7 @@ public interface IErrors
     string CMakeReturnCodeError { get; }
 
     string MultipleModuleNotSuportedError { get; }
-    
+
     string NotSupportedBuildHostPlatform { get; }
 
     string CompilerNotSupported { get; }
@@ -33,4 +33,18 @@ public interface IErrors
     string TargetNotFoundException { get; }
 
     string NotSupportedArchitecture { get; }
+
+    string NullReferenceInRule { get; }
+
+    string NotSupportedType { get; }
+
+    string ModuleRuleDuplicated { get; }
+
+    string ModuleRuleNotFound { get; }
+
+    string TargetRuleNotFound { get; }
+
+    string RuleClassDefinitions { get; }
+
+    string TargetRuleDuplicated { get; }
 }

@@ -13,9 +13,9 @@ public class Workspace
 {
     public string TargetName { get; private set; }
 
-    public SourceCodeDirectory TargetDirectory { get; }
+    public ProjectDirectory TargetDirectory { get; }
 
-    public SourceCodeDirectory EngineDirectory { get; }
+    public ProjectDirectory EngineDirectory { get; }
 
     public List<CXXProject> CXXProjects { get; private set; } = new();
 
@@ -27,7 +27,7 @@ public class Workspace
 
     public Workspace(string EnginePath, string BuildToolPath)
     {
-        EngineDirectory = new SourceCodeDirectory(EnginePath);
+        EngineDirectory = new ProjectDirectory() { Root = EnginePath };
         TargetDirectory = EngineDirectory;
         TargetName = "Engine";
         ProjectPath = Path.Combine(EnginePath, "../");
@@ -36,7 +36,9 @@ public class Workspace
 
     public async Task GenerateDirectoriesAsync(CancellationToken CToken = default)
     {
-        await EngineDirectory.GenerateDirectoriesAsync(CToken);
+        await Task.Yield();
+        throw new Exception();
+        //await EngineDirectory.GenerateDirectoriesRecursiveAsync(CToken);
     }
 
     public async Task GenerateProjectFilesAsync(TargetInfo InTargetInfo, CancellationToken CToken = default)
@@ -44,78 +46,78 @@ public class Workspace
         ConcurrentDictionary<string, CXXProject.ResolvedModule> Projects = new();
 
         TargetRules? Rules = null;
-        foreach (var TargetRule in Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories))
-        {
-            string Filename = Path.GetFileNameWithoutExtension(TargetRule);
-            Filename = Filename.Replace(".Target", "");
-            if (InTargetInfo.Name != null && Filename == InTargetInfo.Name)
-            {
-                Type RuleClass = await CSCompiler.LoadClassAsync<TargetRules>(TargetRule, CToken);
-                ConstructorInfo? Ctor = RuleClass.GetConstructor(new[] { typeof(TargetInfo) });
-                if (Ctor == null)
-                {
-                    throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
-                }
+        //foreach (var TargetRule in Directory.GetFiles(EngineDirectory.Source, "*.Target.cs", SearchOption.AllDirectories))
+        //{
+        //    string Filename = Path.GetFileNameWithoutExtension(TargetRule);
+        //    Filename = Filename.Replace(".Target", "");
+        //    if (InTargetInfo.Name != null && Filename == InTargetInfo.Name)
+        //    {
+        //        Type RuleClass = await CSCompiler.LoadClassAsync<TargetRules>(TargetRule, CToken);
+        //        ConstructorInfo? Ctor = RuleClass.GetConstructor(new[] { typeof(TargetInfo) });
+        //        if (Ctor == null)
+        //        {
+        //            throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
+        //        }
 
-                Rules = (TargetRules)Ctor.Invoke(new object[] { InTargetInfo });
-                break;
-            }
-        }
+        //        Rules = (TargetRules)Ctor.Invoke(new object[] { InTargetInfo });
+        //        break;
+        //    }
+        //}
 
-        if (InTargetInfo.Name != null && Rules == null)
-        {
-            throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetNotFoundException, InTargetInfo.Name));
-        }
+        //if (InTargetInfo.Name != null && Rules == null)
+        //{
+        //    throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetNotFoundException, InTargetInfo.Name));
+        //}
 
         if (Rules == null)
         {
             // Search all modules.
-            foreach (var TargetRule in Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories))
-            {
-                CXXProject Project;
+            //foreach (var TargetRule in Directory.GetFiles(EngineDirectory.Source, "*.Target.cs", SearchOption.AllDirectories))
+            //{
+            //    CXXProject Project;
 
-                Type RuleClass = await CSCompiler.LoadClassAsync<TargetRules>(TargetRule, CToken);
-                ConstructorInfo? Ctor = RuleClass.GetConstructor(new[] { typeof(TargetInfo) });
-                if (Ctor == null)
-                {
-                    throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
-                }
+            //    Type RuleClass = await CSCompiler.LoadClassAsync<TargetRules>(TargetRule, CToken);
+            //    ConstructorInfo? Ctor = RuleClass.GetConstructor(new[] { typeof(TargetInfo) });
+            //    if (Ctor == null)
+            //    {
+            //        throw new InvalidOperationException(string.Format(CoreStrings.Errors.TargetRuleConstructorNotFound, RuleClass.Name));
+            //    }
 
-                string ProjectName = Directory.GetParent(TargetRule)!.Name;
+            //    string ProjectName = Directory.GetParent(TargetRule)!.Name;
 
-                TargetRules CurrentRules = (TargetRules)Ctor.Invoke(new object[] { InTargetInfo });
-                CurrentRules.bBuildAllModules = true;
-                Project = new(TargetRule, CurrentRules, EngineDirectory);
+            //    TargetRules CurrentRules = (TargetRules)Ctor.Invoke(new object[] { InTargetInfo });
+            //    CurrentRules.bBuildAllModules = true;
+            //    Project = new(TargetRule, CurrentRules, EngineDirectory);
 
-                await Project.CompileModulesAsync(Projects, CToken);
-                CXXProjects.Add(Project);
-            }
+            //    await Project.CompileModulesAsync(Projects, CToken);
+            //    CXXProjects.Add(Project);
+            //}
         }
         else
         {
             Dictionary<string, (string Filename, CXXProject Project)> ModuleProjects = new();
 
             // Search all modules.
-            string[] TargetRuleList = Directory.GetFiles(EngineDirectory.SourceDirectory, "*.Target.cs", SearchOption.AllDirectories);
-            foreach (var TargetRule in TargetRuleList)
-            {
-                CXXProject Project = new(TargetRule, Rules, EngineDirectory);
-                CXXProjects.Add(Project);
+            //string[] TargetRuleList = Directory.GetFiles(EngineDirectory.Source, "*.Target.cs", SearchOption.AllDirectories);
+            //foreach (var TargetRule in TargetRuleList)
+            //{
+            //    CXXProject Project = new(TargetRule, Rules, EngineDirectory);
+            //    CXXProjects.Add(Project);
 
-                foreach (var Module in Project.GetModules())
-                {
-                    string ModuleName = Path.GetFileNameWithoutExtension(Module);
-                    ModuleName = ModuleName.Replace(".Module", "");
-                    ModuleProjects.Add(ModuleName, (Module, Project));
-                }
-            }
+            //    foreach (var Module in Project.GetModules())
+            //    {
+            //        string ModuleName = Path.GetFileNameWithoutExtension(Module);
+            //        ModuleName = ModuleName.Replace(".Module", "");
+            //        ModuleProjects.Add(ModuleName, (Module, Project));
+            //    }
+            //}
 
             List<string> LoadModules = new(ModuleProjects.Count);
             List<string> LoadModulesSwap = new();
             HashSet<string> LoadedModules = new();
 
             Dictionary<CXXProject, HashSet<string>> CompileTargets = new(ModuleProjects.Count);
-            LoadModules.Add(Rules.TargetModuleName);
+            //LoadModules.Add(Rules.TargetModuleName);
 
             // Search dependencies modules for current target.
             while (LoadModules.Count != 0)
@@ -157,10 +159,10 @@ public class Workspace
             }
         }
 
-        foreach (var ProjectFile in Directory.GetFiles(EngineDirectory.ProgramsDirectory, "*.csproj", SearchOption.AllDirectories))
-        {
-            CSProjects.Add(new CSProject(ProjectFile));
-        }
+        //foreach (var ProjectFile in Directory.GetFiles(EngineDirectory.ProgramsDirectory, "*.csproj", SearchOption.AllDirectories))
+        //{
+        //    CSProjects.Add(new CSProject(ProjectFile));
+        //}
 
         foreach (var Project in CXXProjects)
         {

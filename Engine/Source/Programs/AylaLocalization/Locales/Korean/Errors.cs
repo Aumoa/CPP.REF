@@ -33,4 +33,18 @@ internal class Errors : IErrors
     public string TargetNotFoundException => "지정한 빌드 타깃({0})을 찾을 수 없습니다.";
 
     public string NotSupportedArchitecture => "지원되지 않는 아키텍처 버전({0})입니다.";
+
+    public string NullReferenceInRule => "규칙 파일을 로드하는 중 null 레퍼런스를 발견했습니다. 프로퍼티 이름: {0}, 소유 형식: {1}";
+
+    public string NotSupportedType => "규칙 파일에 지원하지 않는 프로퍼티가 포함되어 있습니다. 프로퍼티 이름: {0}, 소유 형식: {1}";
+
+    public string ModuleRuleDuplicated => "디렉토리 {0}에 모듈 규칙 파일(*.Module.cs)이 디렉토리에 두 개 이상 포함되어 있습니다.";
+
+    public string ModuleRuleNotFound => "디렉토리 {0}에서 필요한 모듈 규칙 파일(*.Module.cs)을 찾을 수 없습니다.";
+
+    public string TargetRuleNotFound => "디렉토리 {0}에서 필요한 타깃 규칙 파일({1})을 찾을 수 없습니다.";
+
+    public string RuleClassDefinitions => "{0} 규칙 정의에 호환 가능한 클래스가 없거나 두 개 이상의 호환 가능한 클래스가 있습니다.";
+
+    public string TargetRuleDuplicated => "일치하는 이름의 타깃 규칙 파일(*.Target.cs)이 두 개 이상 포함되어 있습니다.";
 }

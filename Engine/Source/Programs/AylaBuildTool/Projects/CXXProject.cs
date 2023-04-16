@@ -24,7 +24,7 @@ public class CXXProject
 
     public string SourceCodeDirectory => Path.GetDirectoryName(TargetFile)!;
 
-    public SourceCodeDirectory Workspace { get; }
+    public ProjectDirectory Workspace { get; }
 
     public record ResolvedModule
     {
@@ -45,7 +45,7 @@ public class CXXProject
         public string[] AdditionalLibraries { get; set; } = null!;
     }
 
-    public CXXProject(string InTargetFile, TargetRules InRules, SourceCodeDirectory InWorkspace)
+    public CXXProject(string InTargetFile, TargetRules InRules, ProjectDirectory InWorkspace)
     {
         TargetFile = InTargetFile;
         Rules = InRules;
@@ -185,7 +185,7 @@ public class CXXProject
         IncludePaths.AddRange(ProcessIncludes(Project, Project.Rules.PrivateIncludePaths));
 
         // Add generated.h include path.
-        IncludePaths.Add(Path.Combine(Workspace.GeneratedDirectory, Project.Rules.Name));
+        //IncludePaths.Add(Path.Combine(Workspace.GeneratedDirectory, Project.Rules.Name));
 
         Project.IncludePaths = IncludePaths.Distinct().ToArray();
 

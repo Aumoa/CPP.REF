@@ -11,19 +11,19 @@ namespace AE.Compilation;
 
 public static class CSCompiler
 {
-    public static async Task<Assembly> CompileAsync(string AssemblyName, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken CToken = default)
+    public static async Task<MemoryStream> InternalCompileAsync(string AssemblyName, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken SToken = default)
     {
-        CSharpParseOptions ParseOptions = new(LanguageVersion.CSharp10);
+        CSharpParseOptions ParseOptions = new(LanguageVersion.CSharp11);
         List<SyntaxTree> SyntaxTrees = new();
         List<Diagnostic> CompileErrors = new();
 
         foreach (var SourceFile in SourceFiles)
         {
-            var Source = SourceText.From(await File.ReadAllTextAsync(SourceFile, CToken));
-            var Syntax = await Task.Run(() => CSharpSyntaxTree.ParseText(Source, ParseOptions, SourceFile, CToken));
+            var Source = SourceText.From(await File.ReadAllTextAsync(SourceFile, SToken));
+            var Syntax = await Task.Run(() => CSharpSyntaxTree.ParseText(Source, ParseOptions, SourceFile, SToken));
 
             // Check syntax error.
-            IEnumerable<Diagnostic> Diagnostics = Syntax.GetDiagnostics(CToken);
+            IEnumerable<Diagnostic> Diagnostics = Syntax.GetDiagnostics(SToken);
             if (Diagnostics.Any())
             {
                 CompileErrors.AddRange(Diagnostics);
@@ -43,15 +43,27 @@ public static class CSCompiler
         var CompilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, true, optimizationLevel: OptimizationLevel.Release);
         var Compilation = CSharpCompilation.Create(AssemblyName, SyntaxTrees, MetadataReferences, CompilerOptions);
 
-        using MemoryStream CompiledBinary = new();
+        MemoryStream CompiledBinary = new();
         var EmitOptions = new EmitOptions(includePrivateMembers: true);
-        var EmitResult = await Task.Run(() => Compilation.Emit(CompiledBinary, options: EmitOptions, cancellationToken: CToken));
+        var EmitResult = await Task.Run(() => Compilation.Emit(CompiledBinary, options: EmitOptions, cancellationToken: SToken));
         if (EmitResult.Success == false)
         {
             throw new CSCompilerError(EmitResult.Diagnostics);
         }
 
+        return CompiledBinary;
+    }
+
+    public static async Task<Assembly> CompileAsync(string AssemblyName, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken SToken = default)
+    {
+        using MemoryStream CompiledBinary = await InternalCompileAsync(AssemblyName, SourceFiles, ReferencedAssemblies, SToken);
         return Assembly.Load(CompiledBinary.GetBuffer());
+    }
+
+    public static async Task CompileToAsync(string AssemblyName, string SaveTo, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken SToken = default)
+    {
+        using MemoryStream CompiledBinary = await InternalCompileAsync(AssemblyName, SourceFiles, ReferencedAssemblies, SToken);
+        await File.WriteAllBytesAsync(SaveTo, CompiledBinary.GetBuffer(), SToken);
     }
 
     public static async Task<Assembly> CompileAsync(string AssemblyName, string SourceFile, IEnumerable<string> ReferencedAssemblies, bool bIncludeBaseAssemblies = true, CancellationToken CToken = default)

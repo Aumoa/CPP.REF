@@ -4,34 +4,26 @@ using AE.BuildSettings;
 using AE.Misc;
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace AE.Rules;
 
-public class TargetRules
+public class TargetRules : SerializableRule
 {
+    [SetsRequiredMembers]
     public TargetRules(TargetInfo Info)
     {
+        Target = Info;
         Name = GetType().Name.Replace("Target", "");
-        TargetName = Info.Name ?? "";
         Class = TargetClass.Game;
         Platform = Info.BuildConfiguration.Platform;
-        TargetModuleName = Name;
+        TargetModuleName = GetType().Name.Replace("Target", "");
     }
 
-    private TargetRules()
-    {
-        Name = null!;
-        TargetName = null!;
-        Platform = null!;
-        TargetModuleName = null!;
-    }
+    public required TargetInfo Target { get; init; }
 
-    public string Name { get; private set; }
-
-    public string TargetName { get; protected set; }
-
-    public string SourceCode { get; set; } = null!;
+    public required string Name { get; init; }
 
     public TargetClass Class { get; protected set; }
 
@@ -40,32 +32,4 @@ public class TargetRules
     public TargetPlatform Platform { get; protected set; }
 
     public string TargetModuleName { get; protected set; }
-
-    public bool bBuildAllModules { get; set; }
-
-    public void Serialize(BinaryWriter Writer)
-    {
-        Writer.Write(Name);
-        Writer.Write(TargetName);
-        Writer.Write(SourceCode);
-        Writer.Write((int)Class);
-        Writer.Write((int)Type);
-        Platform.Serialize(Writer);
-        Writer.Write(TargetModuleName);
-        Writer.Write(bBuildAllModules);
-    }
-
-    public static TargetRules Deserialize(BinaryReader Reader)
-    {
-        TargetRules Rules = new();
-        Rules.Name = Reader.ReadString();
-        Rules.TargetName = Reader.ReadString();
-        Rules.SourceCode = Reader.ReadString();
-        Rules.Class = (TargetClass)Reader.ReadInt32();
-        Rules.Type = (TargetType)Reader.ReadInt32();
-        Rules.Platform = TargetPlatform.Deserialize(Reader);
-        Rules.TargetModuleName = Reader.ReadString();
-        Rules.bBuildAllModules = Reader.ReadBoolean();
-        return Rules;
-    }
 }

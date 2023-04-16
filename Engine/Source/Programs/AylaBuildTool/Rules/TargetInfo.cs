@@ -4,11 +4,9 @@ using AE.BuildSettings;
 
 namespace AE.Rules;
 
-public record TargetInfo
+public class TargetInfo : SerializableRule
 {
-    public string? Name { get; set; }
-    
-    public BuildConfiguration BuildConfiguration { get; set; }
+    public BuildConfiguration BuildConfiguration { get; set; } = new();
 
     public bool bEditor { get; set; }
 }

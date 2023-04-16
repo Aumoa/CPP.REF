@@ -44,7 +44,7 @@ public class VisualStudioSolution : ISolution
 
     public async Task GenerateProjectFilesAsync(string ProjectPath, CancellationToken CToken = default)
     {
-        SourceCodeDirectory TargetDirectory = TargetWorkspace.TargetDirectory;
+        ProjectDirectory TargetDirectory = TargetWorkspace.TargetDirectory;
 
         foreach (var Project in CXXProjects)
         {
@@ -52,9 +52,9 @@ public class VisualStudioSolution : ISolution
             string VcxprojFiltersName = Path.ChangeExtension(Project.TargetName, ".vcxproj.filters");
             string VcxprojUserName = Path.ChangeExtension(Project.TargetName, ".vcxproj.user");
             Project.GenerateXmlDocument(TargetWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters, out XmlDocument VcxprojUser);
-            await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojName), Vcxproj.Serialize(true), CToken);
-            await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojFiltersName), VcxprojFilters.Serialize(true), CToken);
-            await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojUserName), VcxprojUser.Serialize(true), CToken);
+            //await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojName), Vcxproj.Serialize(true), CToken);
+            //await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojFiltersName), VcxprojFilters.Serialize(true), CToken);
+            //await CompareAndWriteAsync(Path.Combine(TargetDirectory.ProjectFilesDirectory, VcxprojUserName), VcxprojUser.Serialize(true), CToken);
         }
 
         string SolutionFilename = Path.ChangeExtension(TargetWorkspace.TargetName, ".sln");
@@ -171,7 +171,7 @@ public class VisualStudioSolution : ISolution
         foreach (var Project in CXXProjects)
         {
             string Filename = Path.ChangeExtension(Project.TargetName, ".vcxproj");
-            Filename = Path.Combine(TargetWorkspace.TargetDirectory.ProjectFilesDirectory, Filename);
+            //Filename = Path.Combine(TargetWorkspace.TargetDirectory.ProjectFilesDirectory, Filename);
             Builder.AppendLine($"Project(\"{{{VisualCPPGUID}}}\") = \"{Project.TargetName}\", \"{Filename}\", \"{{{Project.ProjectGuid}}}\"");
             ResolveDependencies(Project);
             Builder.AppendLine("EndProject");
