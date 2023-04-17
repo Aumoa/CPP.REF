@@ -1,47 +1,70 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Xml;
+
 using AE.BuildSettings;
 using AE.Misc;
 using AE.Platform.Windows;
 using AE.Projects;
-using AE.Rules;
-
-using System.Xml;
+using AE.Source;
 
 namespace AE.ProjectFiles.VisualStudio;
 
-public class VisualCXXProject : IProject
+public class VisualCXXProject : IVisualStudioProject
 {
-    private readonly string ProjectName;
-    private readonly CXXProject CXXProject;
+    public required string TargetName { get; init; }
 
-    private static string GetFilterName(TargetClass Class)
+    public required string ProjectGuid { get; init; }
+
+    public required string FilterPath { get; init; }
+
+    public required string ProjectFile { get; init; }
+
+    private ProjectDirectory ProjectDirectory { get; init; }
+
+    private string SourceDirectory { get; init; }
+
+    [SetsRequiredMembers]
+    public VisualCXXProject(Workspace InWorkspace, ProjectDirectory ProjectDirectory, string ProjectName, string SourceDirectory, string FilterPath)
     {
-        return Class switch
+        this.TargetName = ProjectName;
+        this.ProjectGuid = CRC32.GenerateGuid(FilterPath + '/' + ProjectName).ToString().ToUpper();
+        this.FilterPath = FilterPath;
+        this.ProjectFile = Path.Combine(InWorkspace.CurrentTarget.Intermediate.ProjectFiles, Path.ChangeExtension(ProjectName, ".vcxproj"));
+        this.ProjectDirectory = ProjectDirectory;
+        this.SourceDirectory = SourceDirectory;
+    }
+
+    public (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform)
+    {
+        return (Configuration.ToString() + (bEditor ? "_Editor" : string.Empty), Platform.ToString());
+    }
+
+    public async Task GenerateProjectFilesAsync(CancellationToken SToken = default)
+    {
+        GenerateXmlDocument(out var Vcxproj, out var VcxprojFilter, out var VcxprojUser);
+        await Task.WhenAll(new[]
         {
-            TargetClass.Engine => "Engine",
-            TargetClass.Game => "Games",
-            TargetClass.Program => "Programs",
-            _ => throw new ArgumentException("Invalid enum.", nameof(Class))
-        };
+            WriteXml(Vcxproj, ProjectFile, ".vcxproj", SToken),
+            WriteXml(VcxprojFilter, ProjectFile, ".vcxproj.filters", SToken),
+            WriteXml(VcxprojUser, ProjectFile, ".vcxproj.user", SToken)
+        });
     }
 
-    public VisualCXXProject(CXXProject CXXProject)
+    private static async Task WriteXml(XmlDocument Doc, string SaveToBase, string SaveToExt, CancellationToken SToken = default)
     {
-        //ProjectName = CXXProject.Rules.Name;
-        FilterPath = GetFilterName(CXXProject.Rules.Class);
-        this.CXXProject = CXXProject;
-        ProjectGuid = CRC32.GenerateGuid(Path.Combine(FilterPath, ProjectName)).ToString().ToUpper();
+        StringWriter Writer = new();
+        XmlTextWriter XmlWriter = new(Writer);
+        XmlWriter.Formatting = Formatting.Indented;
+        Doc.WriteTo(XmlWriter);
+        await Global.CompareAndWriteAsync(Path.ChangeExtension(SaveToBase, SaveToExt), Writer.ToString(), SToken);
     }
 
-    public string TargetName => ProjectName;
-
-    public string FilterPath { get; init; }
-
-    public string ProjectGuid { get; init; }
-
-    public void GenerateXmlDocument(Workspace InWorkspace, out XmlDocument Vcxproj, out XmlDocument VcxprojFilters, out XmlDocument VcxprojUser)
+    public void GenerateXmlDocument(out XmlDocument Vcxproj, out XmlDocument VcxprojFilters, out XmlDocument VcxprojUser)
     {
+        HashSet<string> SourceFiles = new();
+
         XmlDocument Doc = new();
         Doc.AddXmlDeclaration("1.0", "utf-8");
         XmlElement Project = Doc.AddElement("Project", "http://schemas.microsoft.com/developer/msbuild/2003");
@@ -51,19 +74,15 @@ public class VisualCXXProject : IProject
             {
                 ProjectConfigurations.SetAttribute("Label", "ProjectConfigurations");
 
-                BuildConfiguration.ForEach((Configuration, Platform) =>
+                BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
                 {
+                    string App = bEditor ? "_Editor" : string.Empty;
+
                     var ProjectConfiguration = ProjectConfigurations.AddElement("ProjectConfiguration");
-                    ProjectConfiguration.SetAttribute("Include", $"{Configuration}|{Platform}");
+                    ProjectConfiguration.SetAttribute("Include", $"{Configuration}{App}|{Platform}");
 
-                    ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString();
-                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString()!;
-
-                    ProjectConfiguration = ProjectConfigurations.AddElement("ProjectConfiguration");
-                    ProjectConfiguration.SetAttribute("Include", $"{Configuration}_Editor|{Platform}");
-
-                    ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString() + "_Editor";
-                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString()!;
+                    ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString() + App;
+                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString();
                 });
             }
 
@@ -82,18 +101,11 @@ public class VisualCXXProject : IProject
                 Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.Default.props");
             }
 
-            BuildConfiguration.ForEach((Configuration, Platform) =>
+            BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
             {
+                string App = bEditor ? "_Editor" : string.Empty;
                 var PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
-                PropertyGroup.SetAttribute("Label", "Configuration");
-
-                PropertyGroup.AddElement("ConfigurationType").InnerText = "Makefile";
-                PropertyGroup.AddElement("PlatformToolset").InnerText = "v143";
-                PropertyGroup.AddElement("CharacterSet").InnerText = "Unicode";
-
-                PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}_Editor|{Platform}'");
+                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}{App}|{Platform}'");
                 PropertyGroup.SetAttribute("Label", "Configuration");
 
                 PropertyGroup.AddElement("ConfigurationType").InnerText = "Makefile";
@@ -106,25 +118,25 @@ public class VisualCXXProject : IProject
 
             // Common
             var PropertyGroup = Project.AddElement("PropertyGroup");
-            PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', CXXProject.GetProjectDefinitions());
+            //PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', CXXProject.GetProjectDefinitions());
             PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
 
             var Installation = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022).First();
 
-            BuildConfiguration.ForEach((Configuration, Platform) =>
+            BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
             {
                 // Foreach Configurations
                 var PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
 
-                string BuildToolPath = InWorkspace.BuildTool;
-                BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
+                //string BuildToolPath = InWorkspace.BuildTool;
+                //BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
 
                 var IncludePaths = Installation.GetRequiredIncludePaths(Platform.Architecture);
 
                 //PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name}";
                 //PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name}";
-                PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
+                //PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
 
                 // Foreach Configurations
                 PropertyGroup = Project.AddElement("PropertyGroup");
@@ -132,15 +144,14 @@ public class VisualCXXProject : IProject
 
                 //PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name} -Editor";
                 //PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name} -Editor";
-                PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
+                //PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
-            HashSet<string> Checker = new();
 
             XmlElement? AddSourceFile(string Filename)
             {
-                if (Checker.Add(Filename) == false)
+                if (SourceFiles.Add(Filename) == false)
                 {
                     return null;
                 }
@@ -174,33 +185,43 @@ public class VisualCXXProject : IProject
                 return null;
             }
 
-            foreach (var ModuleName in CXXProject.GetModules())
+            foreach (var SourceFile in Directory.GetFiles(SourceDirectory, "*", SearchOption.AllDirectories))
             {
-                var Resolved = CXXProject.GetModuleRule(ModuleName);
-                if (Resolved == null)
+                if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false && SourceFile.StartsWith(ProjectDirectory.Source.Programs))
                 {
                     continue;
                 }
 
-                foreach (var Filename in Resolved.SourceFiles)
-                {
-                    XmlElement? Elem = AddSourceFile(Filename);
-                    if (Elem != null)
-                    {
-                        string FilterSharedLibrary(string p)
-                            => p.Replace("${CMAKE_SHARED_LIBRARY_EXPORT}", "__declspec(dllexport)")
-                                .Replace("${CMAKE_SHARED_LIBRARY_IMPORT}", "__declspec(dllimport)");
-
-                        var PreprocessorDefinitions = Elem.AddElement("PreprocessorDefinitions");
-                        PreprocessorDefinitions.InnerText = $"{string.Join(';', Resolved.AdditionalMacros.Select(FilterSharedLibrary))};%(PreprocessorDefinitions)";
-
-                        var AdditionalIncludeDirectories = Elem.AddElement("AdditionalIncludeDirectories");
-                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Resolved.IncludePaths)};%(AdditionalIncludeDirectories)";
-                    }
-                }
+                AddSourceFile(SourceFile);
             }
 
-            AddSourceFile(CXXProject.TargetFile);
+            //foreach (var ModuleName in CXXProject.GetModules())
+            //{
+            //    var Resolved = CXXProject.GetModuleRule(ModuleName);
+            //    if (Resolved == null)
+            //    {
+            //        continue;
+            //    }
+
+            //    foreach (var Filename in Resolved.SourceFiles)
+            //    {
+            //        XmlElement? Elem = AddSourceFile(Filename);
+            //        if (Elem != null)
+            //        {
+            //            string FilterSharedLibrary(string p)
+            //                => p.Replace("${CMAKE_SHARED_LIBRARY_EXPORT}", "__declspec(dllexport)")
+            //                    .Replace("${CMAKE_SHARED_LIBRARY_IMPORT}", "__declspec(dllimport)");
+
+            //            var PreprocessorDefinitions = Elem.AddElement("PreprocessorDefinitions");
+            //            PreprocessorDefinitions.InnerText = $"{string.Join(';', Resolved.AdditionalMacros.Select(FilterSharedLibrary))};%(PreprocessorDefinitions)";
+
+            //            var AdditionalIncludeDirectories = Elem.AddElement("AdditionalIncludeDirectories");
+            //            AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Resolved.IncludePaths)};%(AdditionalIncludeDirectories)";
+            //        }
+            //    }
+            //}
+
+            //AddSourceFile(CXXProject.TargetFile);
 
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.targets");
@@ -218,11 +239,14 @@ public class VisualCXXProject : IProject
             var ItemGroup = Project.AddElement("ItemGroup");
 
             HashSet<string> Filters = new();
-            foreach (var Filename in CXXProject.GetAllModuleSourceFiles())
+            foreach (var Filename in SourceFiles)
             {
-                string? FilterPath = Path.GetRelativePath(CXXProject.SourceCodeDirectory, Filename);
-                FilterPath = Path.GetDirectoryName(FilterPath);
-                FilterPath = Path.Combine("Source", FilterPath ?? "/");
+                string? FilterPath = Path.GetRelativePath(SourceDirectory, Filename);
+                FilterPath = Path.GetDirectoryName(FilterPath)!;
+                if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false)
+                {
+                    FilterPath = Path.Combine("Source", FilterPath ?? "/");
+                }
 
                 string[] Splices = FilterPath.Split(Path.DirectorySeparatorChar);
                 string Composed = string.Empty;
@@ -267,9 +291,12 @@ public class VisualCXXProject : IProject
 
             foreach (var FilterPath in Filters)
             {
-                var Filter = ItemGroup.AddElement("Filter");
-                Filter.SetAttribute("Include", FilterPath);
-                Filter.AddElement("UniqueIdentifier").InnerText = $"{{{CRC32.GenerateGuid(FilterPath).ToString().ToUpper()}}}";
+                if (string.IsNullOrEmpty(FilterPath) == false)
+                {
+                    var Filter = ItemGroup.AddElement("Filter");
+                    Filter.SetAttribute("Include", FilterPath);
+                    Filter.AddElement("UniqueIdentifier").InnerText = $"{{{CRC32.GenerateGuid(FilterPath).ToString().ToUpper()}}}";
+                }
             }
         }
         VcxprojFilters = Doc;
@@ -285,15 +312,14 @@ public class VisualCXXProject : IProject
                 PropertyGroup.SetAttribute("Condition", $"'$(Platform)'=='{Platform}'");
 
                 //string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, Platform.ToString(), CXXProject.Rules.TargetModuleName);
-                string Executable = "";
-                Executable = Path.ChangeExtension(Executable, ".exe");
-                PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
+                //Executable = Path.ChangeExtension(Executable, ".exe");
+                //PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
 
-                string WorkingDirectory = Path.GetDirectoryName(Executable)!;
-                PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = WorkingDirectory;
+                //string WorkingDirectory = Path.GetDirectoryName(Executable)!;
+                //PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = WorkingDirectory;
 
-                PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
-                PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
+                //PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
+                //PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
             }
         }
         VcxprojUser = Doc;
@@ -306,7 +332,7 @@ public class VisualCXXProject : IProject
 
     private static bool IsSourceFile(string Extensions)
     {
-        return Extensions == ".cpp" || Extensions == ".cc";
+        return Extensions == ".cpp" || Extensions == ".cc" || Extensions == ".ixx";
     }
 
     private static bool IsNoneFile(string Extensions)

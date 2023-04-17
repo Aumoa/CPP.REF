@@ -2,7 +2,7 @@
 
 namespace AE.Projects;
 
-public interface IProject
+public interface IAModule
 {
-    string TargetName { get; }
+    public string SourcePath { get; }
 }

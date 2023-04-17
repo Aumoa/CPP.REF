@@ -12,6 +12,7 @@ public readonly struct ProjectDirectory
         init
         {
             _Root = value;
+            Name = Path.GetFileNameWithoutExtension(value);
             Source = new() { Root = Path.Combine(Root, "Source") };
             Intermediate = new() { Root = Path.Combine(Root, "Intermediate") };
             Content = new() { Root = Path.Combine(Root, "Content") };
@@ -19,6 +20,8 @@ public readonly struct ProjectDirectory
             Build = new() { Root = Path.Combine(Root, "Build") };
         }
     }
+
+    public string Name { get; private init; }
 
     public SourceDirectory Source { get; private init; }
 

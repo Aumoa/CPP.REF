@@ -12,7 +12,7 @@ public class TerminateException : Exception
         ConstructorNotFound = 4,
         TargetDuplicate = 5,
         TargetNotFound = 6,
-        DependencyModuleNotFound = 7
+        DependencyModuleNotFound = 7,
     }
 
     public TerminateException(int ErrorCode, string ErrorStringFormat, params object?[] Args)

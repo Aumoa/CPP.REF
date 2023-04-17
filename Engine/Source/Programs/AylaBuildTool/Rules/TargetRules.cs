@@ -16,7 +16,6 @@ public class TargetRules : SerializableRule
     {
         Target = Info;
         Name = GetType().Name.Replace("Target", "");
-        Class = TargetClass.Game;
         Platform = Info.BuildConfiguration.Platform;
         TargetModuleName = GetType().Name.Replace("Target", "");
     }
@@ -24,8 +23,6 @@ public class TargetRules : SerializableRule
     public required TargetInfo Target { get; init; }
 
     public required string Name { get; init; }
-
-    public TargetClass Class { get; protected set; }
 
     public TargetType Type { get; protected set; }
 

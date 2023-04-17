@@ -2,7 +2,8 @@
   "profiles": {
     "BuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "Build -Target AE -Editor"
+      "commandLineArgs": "ProjectFiles",
+      "workingDirectory": "F:\\SampleGame\\"
     }
   }
 }

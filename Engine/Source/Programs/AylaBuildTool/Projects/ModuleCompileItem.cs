@@ -8,7 +8,7 @@ namespace AE.Projects;
 
 public class ModuleCompileItem : CompileItem
 {
-    public required AModule SourceModule { get; init; }
+    public required ACXXModule SourceModule { get; init; }
 
     public required CompilerOptions Options { get; init; }
 
@@ -31,7 +31,7 @@ public class ModuleCompileItem : CompileItem
     }
 
     [SetsRequiredMembers]
-    public ModuleCompileItem(AModule SourceModule, CompilerOptions Options, string SourceCode, CompileTree Tree, JsonNode? Node) : base(SourceCode)
+    public ModuleCompileItem(ACXXModule SourceModule, CompilerOptions Options, string SourceCode, CompileTree Tree, JsonNode? Node) : base(SourceCode)
     {
         this.SourceModule = SourceModule;
         this.Options = Options;

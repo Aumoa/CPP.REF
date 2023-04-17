@@ -2,14 +2,16 @@
 
 using AE.BuildSettings;
 using AE.CLI;
+using AE.Exceptions;
 using AE.ProjectFiles.VisualStudio;
 using AE.Projects;
 using AE.Rules;
+using AE.Source;
 using AE.System;
 
 namespace AE.Executors;
 
-public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
+public class ProjectFilesExecutor : IExecutor
 {
     private record Arguments
     {
@@ -19,12 +21,12 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
 
     private readonly Arguments GeneratorArgs = new();
 
-    public ProjectFilesExecutor(CommandLineParser Args) : base(Args)
+    public ProjectFilesExecutor(CommandLineParser Args)
     {
         Args.ApplyTo(GeneratorArgs);
     }
 
-    public async Task<int> RunAsync(CancellationToken CToken = default)
+    public async Task<int> RunAsync(CancellationToken SToken = default)
     {
         var TargetInfo = new TargetInfo()
         {
@@ -36,11 +38,27 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
             bEditor = true
         };
 
-        Workspace Workspace = GenerateEngineWorkspace();
-        await Workspace.GenerateDirectoriesAsync(CToken);
-        await Workspace.GenerateProjectFilesAsync(TargetInfo, CToken);
+        Workspace Workspace = new();
+        await Workspace.ConfigureWorkspaceAsync(Global.EngineDirectory, true, SToken);
+        if (GeneratorArgs.ProjectFile != null)
+        {
+            if (Path.IsPathFullyQualified(GeneratorArgs.ProjectFile) == false)
+            {
+                GeneratorArgs.ProjectFile = Path.Combine(Environment.CurrentDirectory, GeneratorArgs.ProjectFile);
+            }
 
-        await VisualStudioGenerator.GenerateSolutionAsync(Workspace, null, CToken);
+            if (File.Exists(GeneratorArgs.ProjectFile) == false)
+            {
+                throw new TerminateException(6, CoreStrings.Errors.InvalidProjectFormat);
+            }
+
+            string ProjectFileDir = Path.GetFullPath(Path.GetDirectoryName(GeneratorArgs.ProjectFile)!);
+            ProjectDirectory GameProject = new() { Root = ProjectFileDir };
+            await Workspace.ConfigureWorkspaceAsync(GameProject, false, SToken);
+        }
+
+        VisualStudioSolution Solution = new(Workspace, GeneratorArgs.ProjectFile);
+        await Solution.GenerateProjectFilesAsync(SToken);
         return 0;
     }
 }

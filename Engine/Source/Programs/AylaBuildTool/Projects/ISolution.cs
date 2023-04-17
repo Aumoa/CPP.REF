@@ -4,7 +4,5 @@ namespace AE.Projects;
 
 public interface ISolution
 {
-    void AddProject(IProject Project);
-
-    Task GenerateProjectFilesAsync(string ProjectPath, CancellationToken CToken = default);
+    Task GenerateProjectFilesAsync(CancellationToken SToken = default);
 }

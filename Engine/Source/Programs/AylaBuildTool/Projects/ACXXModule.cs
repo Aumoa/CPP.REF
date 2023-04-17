@@ -1,5 +1,10 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Text.Json.Nodes;
+
 using AE.Compilation;
 using AE.Exceptions;
 using AE.Misc;
@@ -7,23 +12,18 @@ using AE.Platform;
 using AE.Rules;
 using AE.Source;
 
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Text.Json.Nodes;
-
 namespace AE.Projects;
 
-public class AModule
+public class ACXXModule : IAModule
 {
     [SetsRequiredMembers]
-    public AModule(ProjectDirectory ProjectDirectory, string SourceRelativePath)
+    public ACXXModule(ProjectDirectory ProjectDirectory, string SourceRelativePath)
     {
         string SourcePath = Path.Combine(ProjectDirectory.Source.Root, SourceRelativePath);
         this.ModuleName = Path.GetFileNameWithoutExtension(SourcePath);
         this.RuleName = this.ModuleName;
         this.ProjectDirectory = ProjectDirectory;
-        this.ModuleSourceDirectory = SourcePath;
+        this.SourcePath = SourcePath;
     }
 
     public required string ModuleName { get; init; }
@@ -32,7 +32,7 @@ public class AModule
     
     public required ProjectDirectory ProjectDirectory { get; init; }
 
-    public required string ModuleSourceDirectory { get; init; }
+    public required string SourcePath { get; init; }
 
     private readonly AsyncLock CachedAssemblyLock = new();
     private Assembly? CachedAssembly;
@@ -40,6 +40,11 @@ public class AModule
     public override string ToString()
     {
         return RuleName;
+    }
+
+    public bool IsInProgramsDirectory()
+    {
+        return SourcePath.StartsWith(ProjectDirectory.Source.Programs);
     }
 
     public async Task ConfigureAsync(CancellationToken SToken = default)
@@ -50,13 +55,13 @@ public class AModule
             {
                 string? ModuleCodePath = null;
 
-                foreach (var Filename in Directory.GetFiles(ModuleSourceDirectory))
+                foreach (var Filename in Directory.GetFiles(SourcePath))
                 {
                     if (Filename.EndsWith(".Module.cs"))
                     {
                         if (ModuleCodePath != null)
                         {
-                            throw new TerminateException(2, CoreStrings.Errors.ModuleRuleDuplicated, ModuleSourceDirectory);
+                            throw new TerminateException(2, CoreStrings.Errors.ModuleRuleDuplicated, SourcePath);
                         }
 
                         ModuleCodePath = Filename;
@@ -65,7 +70,7 @@ public class AModule
 
                 if (ModuleCodePath == null)
                 {
-                    throw new TerminateException(3, CoreStrings.Errors.ModuleRuleNotFound, ModuleSourceDirectory);
+                    throw new TerminateException(3, CoreStrings.Errors.ModuleRuleNotFound, SourcePath);
                 }
 
                 string AssemblyCacheDirectory = Path.Combine(ProjectDirectory.Intermediate.Makefiles, ModuleName);
@@ -228,7 +233,7 @@ public class AModule
 
         string CompilerOptions = $"/nologo /scanDependencies- /std:c++20 /c /EHsc {Includes} {Defines}";
 
-        foreach (var SourceCode in Directory.GetFiles(ModuleSourceDirectory, "*.ixx", SearchOption.AllDirectories))
+        foreach (var SourceCode in Directory.GetFiles(SourcePath, "*.ixx", SearchOption.AllDirectories))
         {
             Tasks.Add(CompileAction(SourceCode));
         }

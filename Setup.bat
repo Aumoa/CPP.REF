@@ -3,4 +3,4 @@
 ECHO Setup
 
 cd "%~dp0"
-dotnet build -c Release Engine\Source\Programs\AylaBuildTool
+dotnet build -c Shipping Engine\Source\Programs\AylaBuildTool

@@ -14,6 +14,11 @@ public class TargetPlatform : SerializableRule
 
     public Architecture Architecture { get; set; }
 
+    public override string ToString()
+    {
+        return TargetName;
+    }
+
     public static readonly TargetPlatform Win64 = new()
     {
         TargetName = "Win64",

@@ -24,13 +24,18 @@ public class BuildConfiguration : SerializableRule
         TargetPlatform.Linux
     };
 
-    public static void ForEach(Action<Configuration, TargetPlatform> InAction)
+    public static void ForEach(Action<Configuration, bool, TargetPlatform> InAction)
     {
         foreach (var Platform in Platforms)
         {
             foreach (var Configuration in Configurations)
             {
-                InAction(Configuration, Platform);
+                InAction(Configuration, false, Platform);
+                if (Configuration != Configuration.Shipping)
+                {
+                    // Contains editor build.
+                    InAction(Configuration, true, Platform);
+                }
             }
         }
     }

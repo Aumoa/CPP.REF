@@ -22,8 +22,8 @@ public class ModuleDependenciesResolver
         this.Projects = Projects;
     }
 
-    private readonly Dictionary<ProjectDirectory, List<AModule>> DirectoryModuleMap = new();
-    private readonly Dictionary<string, AModule> ModuleMap = new();
+    private readonly Dictionary<ProjectDirectory, List<ACXXModule>> DirectoryModuleMap = new();
+    private readonly Dictionary<string, ACXXModule> ModuleMap = new();
     private readonly Dictionary<string, ProjectDirectory> DirectoryMap = new();
 
     public async Task<TargetRules> ResolveAsync(string TargetName, TargetInfo TargetInfo, CancellationToken SToken = default)
@@ -59,8 +59,8 @@ public class ModuleDependenciesResolver
         await Target.ConfigureAsync(SToken);
         TargetRules Rule = Target.GenerateTargetRule(TargetInfo);
 
-        Dictionary<string, AModule> Modules = await LoadModulesAsync(SToken);
-        if (Modules.TryGetValue(Rule.TargetModuleName, out AModule? PrimaryModule) == false)
+        Dictionary<string, ACXXModule> Modules = await LoadModulesAsync(SToken);
+        if (Modules.TryGetValue(Rule.TargetModuleName, out ACXXModule? PrimaryModule) == false)
         {
             throw new TerminateException(7, CoreStrings.Errors.DependencyModuleNotFound, Target.TargetName, Rule.TargetModuleName);
         }
@@ -69,9 +69,9 @@ public class ModuleDependenciesResolver
         return Rule;
     }
 
-    public Dictionary<string, AModule> RequiredModules = new();
+    public Dictionary<string, ACXXModule> RequiredModules = new();
 
-    private void ResolveDependenciesAsync(Dictionary<string, AModule> Sources, AModule CurrentModule, TargetRules Rule)
+    private void ResolveDependenciesAsync(Dictionary<string, ACXXModule> Sources, ACXXModule CurrentModule, TargetRules Rule)
     {
         Debug.Assert(RequiredModules != null);
 
@@ -83,7 +83,7 @@ public class ModuleDependenciesResolver
         var ModuleRule = CurrentModule.GenerateModuleRule(Rule);
         void Resolve(string? Depend)
         {
-            if (string.IsNullOrEmpty(Depend) || Sources.TryGetValue(Depend, out AModule? Module) == false)
+            if (string.IsNullOrEmpty(Depend) || Sources.TryGetValue(Depend, out ACXXModule? Module) == false)
             {
                 throw new TerminateException(7, CoreStrings.Errors.DependencyModuleNotFound, Rule.Name, Depend);
             }
@@ -101,14 +101,14 @@ public class ModuleDependenciesResolver
         }
     }
 
-    public ProjectDirectory GetModuleDirectory(AModule Module)
+    public ProjectDirectory GetModuleDirectory(ACXXModule Module)
     {
         return DirectoryMap[Module.ModuleName];
     }
 
-    private async Task<Dictionary<string, AModule>> LoadModulesAsync(CancellationToken SToken = default)
+    private async Task<Dictionary<string, ACXXModule>> LoadModulesAsync(CancellationToken SToken = default)
     {
-        Dictionary<string, AModule> Modules = new();
+        Dictionary<string, ACXXModule> Modules = new();
         void AddModules(ProjectDirectory Dir)
         {
             foreach (var SourceCode in Directory.GetFiles(Dir.Source.Root, "*.Module.cs", SearchOption.AllDirectories))
@@ -119,7 +119,7 @@ public class ModuleDependenciesResolver
                     continue;
                 }
 
-                var Module = new AModule(Dir, DirectoryName);
+                var Module = new ACXXModule(Dir, DirectoryName);
                 Modules.Add(Module.ModuleName, Module);
 
                 if (this.DirectoryModuleMap.TryGetValue(Dir, out var List) == false)
@@ -164,7 +164,7 @@ public class ModuleDependenciesResolver
             Includes.AddRange(ResolveIncludeDirectories(Required.GenerateModuleRule(Rule.TargetRule), false));
         }
 
-        string SourceDirectory = ModuleMap[Rule.Name].ModuleSourceDirectory;
+        string SourceDirectory = ModuleMap[Rule.Name].SourcePath;
         foreach (var Include in Rule.PublicIncludePaths)
         {
             string IncludePath = Path.Combine(SourceDirectory, Include);
