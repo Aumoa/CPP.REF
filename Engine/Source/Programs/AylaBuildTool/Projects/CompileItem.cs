@@ -6,13 +6,46 @@ namespace AE.Projects;
 
 public abstract class CompileItem
 {
-    [SetsRequiredMembers]
-    public CompileItem(string SourceCode)
+    public CompileItem()
     {
-        this.SourceCode = SourceCode;
+    }
+
+    public abstract class DependencyItem
+    {
+        public required string LogicalName { get; init; }
+    }
+
+    public class HeaderDependencyItem : DependencyItem
+    {
+        [SetsRequiredMembers]
+        public HeaderDependencyItem(string SourceCode, HeaderCompileItem.LookupMethod LookupMethod, string LogicalName)
+        {
+            this.LogicalName = LogicalName;
+            this.LookupMethod = LookupMethod;
+            this.SourceCode = SourceCode;
+        }
+
+        public required HeaderCompileItem.LookupMethod LookupMethod { get; init; }
+
+        public required string SourceCode { get; init; }
+    }
+
+    public class ModuleDependencyItem : DependencyItem
+    {
+        [SetsRequiredMembers]
+        public ModuleDependencyItem(string LogicalName)
+        {
+            this.LogicalName = LogicalName;
+        }
     }
 
     public required string SourceCode { get; init; }
 
-    public string? Output { get; protected set; }
+    public required string? Output { get; init; }
+
+    public required string LogicalName { get; init; }
+
+    public required string? InterfaceOutput { get; init; }
+
+    public required DependencyItem[] Dependencies { get; init; }
 }

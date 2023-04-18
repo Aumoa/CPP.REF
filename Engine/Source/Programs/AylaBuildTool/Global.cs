@@ -20,6 +20,7 @@ public static class Global
     {
         if (File.Exists(Filename) == false)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(Filename)!);
             await File.WriteAllTextAsync(Filename, Text, SToken);
             return;
         }
@@ -31,5 +32,37 @@ public static class Global
         }
 
         await File.WriteAllTextAsync(Filename, Text, SToken);
+    }
+
+    public static bool IsSourceCode(string Name)
+    {
+        string Ext = Path.GetExtension(Name).ToLower();
+        return Ext == ".ixx";
+    }
+
+    public static bool IsHeaderFile(string Name)
+    {
+        string Ext = Path.GetExtension(Name).ToLower();
+        return Ext == ".h" || Ext == ".inl";
+    }
+
+    public static bool IsRuleFile(string Name)
+    {
+        string Ext = Path.GetExtension(Name).ToLower();
+        return Ext == ".cs";
+    }
+
+    public static bool IsNatvisFile(string Name)
+    {
+        string Ext = Path.GetExtension(Name).ToLower();
+        return Ext == ".natvis";
+    }
+
+    public static bool IsSourceFile(string Name)
+    {
+        return IsSourceCode(Name)
+            || IsHeaderFile(Name)
+            || IsRuleFile(Name)
+            || IsNatvisFile(Name);
     }
 }

@@ -13,6 +13,9 @@ public class TerminateException : Exception
         TargetDuplicate = 5,
         TargetNotFound = 6,
         DependencyModuleNotFound = 7,
+        ModuleNotFound = 8,
+        CompileError = 9,
+        InvalidModule = 10
     }
 
     public TerminateException(int ErrorCode, string ErrorStringFormat, params object?[] Args)

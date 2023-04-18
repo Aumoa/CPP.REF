@@ -1,238 +1,103 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
 using AE.BuildSettings;
 using AE.Exceptions;
 using AE.Rules;
 using AE.Source;
+using AE.System;
 
 using Microsoft.CodeAnalysis;
-
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace AE.Projects;
 
 public class ModuleDependenciesResolver
 {
-    private ProjectDirectory[] Projects { get; }
+    public required TargetRules Rule { get; init; }
+
+    public required Dictionary<string, (ModuleRules Rule, ProjectDirectory ProjectDir, string SourceDir)> Modules { get; init; } = new();
+
+    public required ToolChainInstallation ToolChain { get; init; }
 
     [SetsRequiredMembers]
-    public ModuleDependenciesResolver(params ProjectDirectory[] Projects)
+    public ModuleDependenciesResolver(TargetRules Rule, Dictionary<string, (ModuleRules, ProjectDirectory, string)> Modules, ToolChainInstallation ToolChain)
     {
-        this.Projects = Projects;
+        this.Rule = Rule;
+        this.Modules = Modules;
+        this.ToolChain = ToolChain;
     }
 
-    private readonly Dictionary<ProjectDirectory, List<ACXXModule>> DirectoryModuleMap = new();
-    private readonly Dictionary<string, ACXXModule> ModuleMap = new();
-    private readonly Dictionary<string, ProjectDirectory> DirectoryMap = new();
-
-    public async Task<TargetRules> ResolveAsync(string TargetName, TargetInfo TargetInfo, CancellationToken SToken = default)
+    public record ModuleDependencyCache
     {
-        string TargetFilename = TargetName + ".Target.cs";
+        public required string Name { get; init; }
 
-        ProjectDirectory TargetDirectory = new();
-        string? TargetPath = null;
+        public required ProjectDirectory ProjectDir { get; init; }
 
-        foreach (var Workspace in Projects)
-        {
-            foreach (var File in Directory.GetFiles(Workspace.Source.Root, "*.Target.cs"))
-            {
-                if (Path.GetFileName(File).Equals(TargetName + ".Target.cs", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (TargetPath != null)
-                    {
-                        throw new TerminateException(5, CoreStrings.Errors.TargetRuleDuplicated);
-                    }
+        public required string[] IncludePaths { get; init; }
 
-                    TargetPath = File;
-                    TargetDirectory = Workspace;
-                }
-            }
-        }
+        public required string[] AdditionalMacros { get; init; }
 
-        if (TargetPath == null)
-        {
-            throw new TerminateException(6, CoreStrings.Errors.TargetNotFoundException, TargetFilename);
-        }
+        public required string[] SourceFiles { get; init; }
 
-        var Target = new ATarget(TargetDirectory, TargetName);
-        await Target.ConfigureAsync(SToken);
-        TargetRules Rule = Target.GenerateTargetRule(TargetInfo);
-
-        Dictionary<string, ACXXModule> Modules = await LoadModulesAsync(SToken);
-        if (Modules.TryGetValue(Rule.TargetModuleName, out ACXXModule? PrimaryModule) == false)
-        {
-            throw new TerminateException(7, CoreStrings.Errors.DependencyModuleNotFound, Target.TargetName, Rule.TargetModuleName);
-        }
-
-        ResolveDependenciesAsync(Modules, PrimaryModule, Rule);
-        return Rule;
+        public required string[] ApiDescriptions { get; init; }
     }
 
-    public Dictionary<string, ACXXModule> RequiredModules = new();
+    private readonly Dictionary<string, ModuleDependencyCache> DependencyCaches = new();
 
-    private void ResolveDependenciesAsync(Dictionary<string, ACXXModule> Sources, ACXXModule CurrentModule, TargetRules Rule)
+    public void Resolve()
     {
-        Debug.Assert(RequiredModules != null);
+        Debug.Assert(DependencyCaches.Count == 0);
+        SearchDependencyRecursive(Rule.TargetModuleName);
+    }
 
-        if (RequiredModules.TryAdd(CurrentModule.ModuleName, CurrentModule) == false)
+    private void SearchDependencyRecursive(string Current)
+    {
+        if (DependencyCaches.TryGetValue(Current, out ModuleDependencyCache? DependencyCache) == false)
         {
-            return;
-        }
+            var (ModuleRule, ProjectDir, SourcePath) = Modules[Current];
 
-        var ModuleRule = CurrentModule.GenerateModuleRule(Rule);
-        void Resolve(string? Depend)
-        {
-            if (string.IsNullOrEmpty(Depend) || Sources.TryGetValue(Depend, out ACXXModule? Module) == false)
+            string AsFullPath(string CurrentPath)
             {
-                throw new TerminateException(7, CoreStrings.Errors.DependencyModuleNotFound, Rule.Name, Depend);
+                return Path.Combine(SourcePath, CurrentPath);
             }
 
-            ResolveDependenciesAsync(Sources, Module, Rule);
-        }
+            List<string> IncludePaths = new();
+            List<string> AdditionalMacros = new();
+            List<string> ApiDescriptions = new();
 
-        foreach (var Depend in ModuleRule.PublicDependencyModuleNames)
-        {
-            Resolve(Depend);
-        }
-        foreach (var Depend in ModuleRule.PrivateDependencyModuleNames)
-        {
-            Resolve(Depend);
+            foreach (var Depend in ModuleRule.PublicDependencyModuleNames.Concat(ModuleRule.PrivateDependencyModuleNames))
+            {
+                SearchDependencyRecursive(Depend);
+                ModuleDependencyCache? DependCache = DependencyCaches[Depend];
+                IncludePaths.AddRange(DependCache.IncludePaths);
+                AdditionalMacros.AddRange(DependCache.AdditionalMacros);
+                ApiDescriptions.AddRange(DependCache.ApiDescriptions);
+                ApiDescriptions.Add($"{Depend.ToUpper()}_API");
+            }
+
+            IncludePaths.AddRange(ModuleRule.PublicIncludePaths.Select(AsFullPath));
+            IncludePaths.AddRange(ModuleRule.PrivateIncludePaths.Select(AsFullPath));
+            AdditionalMacros.AddRange(ModuleRule.PublicAdditionalMacros);
+            AdditionalMacros.AddRange(ModuleRule.PrivateAdditionalMacros);
+
+            DependencyCaches[Current] = new()
+            {
+                Name = Current,
+                ProjectDir = ProjectDir,
+                IncludePaths = IncludePaths.Distinct().ToArray(),
+                AdditionalMacros = AdditionalMacros.Distinct().ToArray(),
+                SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories).Where(Global.IsSourceFile).ToArray(),
+                ApiDescriptions = ApiDescriptions.Distinct().ToArray(),
+            };
         }
     }
 
-    public ProjectDirectory GetModuleDirectory(ACXXModule Module)
+    public ModuleDependencyCache GetDependencyCache(string Module)
     {
-        return DirectoryMap[Module.ModuleName];
+        return DependencyCaches[Module];
     }
 
-    private async Task<Dictionary<string, ACXXModule>> LoadModulesAsync(CancellationToken SToken = default)
-    {
-        Dictionary<string, ACXXModule> Modules = new();
-        void AddModules(ProjectDirectory Dir)
-        {
-            foreach (var SourceCode in Directory.GetFiles(Dir.Source.Root, "*.Module.cs", SearchOption.AllDirectories))
-            {
-                string? DirectoryName = Path.GetDirectoryName(SourceCode);
-                if (DirectoryName == null)
-                {
-                    continue;
-                }
-
-                var Module = new ACXXModule(Dir, DirectoryName);
-                Modules.Add(Module.ModuleName, Module);
-
-                if (this.DirectoryModuleMap.TryGetValue(Dir, out var List) == false)
-                {
-                    List = new();
-                    this.DirectoryModuleMap.Add(Dir, List);
-                }
-
-                List.Add(Module);
-                ModuleMap.Add(Module.ModuleName, Module);
-                DirectoryMap.Add(Module.ModuleName, Dir);
-            }
-        }
-
-        foreach (var Workspace in Projects)
-        {
-            AddModules(Workspace);
-        }
-
-        List<Task> Tasks = new();
-        foreach (var Module in Modules.Values)
-        {
-            Tasks.Add(Module.ConfigureAsync(SToken));
-        }
-
-        await Task.WhenAll(Tasks);
-        return Modules;
-    }
-
-    public string[] ResolveIncludeDirectories(ModuleRules Rule, bool bCurrentModule)
-    {
-        Debug.Assert(RequiredModules != null);
-        List<string> Includes = new();
-
-        foreach (var Depend in Rule.PublicDependencyModuleNames)
-        {
-            if (RequiredModules.TryGetValue(Depend, out var Required) == false)
-            {
-                throw new TerminateException(7, CoreStrings.Errors.DependencyModuleNotFound, Rule.Name, Depend);
-            }
-
-            Includes.AddRange(ResolveIncludeDirectories(Required.GenerateModuleRule(Rule.TargetRule), false));
-        }
-
-        string SourceDirectory = ModuleMap[Rule.Name].SourcePath;
-        foreach (var Include in Rule.PublicIncludePaths)
-        {
-            string IncludePath = Path.Combine(SourceDirectory, Include);
-            Includes.Add(IncludePath);
-        }
-
-        if (bCurrentModule)
-        {
-            foreach (var Include in Rule.PrivateIncludePaths)
-            {
-                string IncludePath = Path.Combine(SourceDirectory, Include);
-                Includes.Add(IncludePath);
-            }
-        }
-
-        return Includes.Distinct().ToArray();
-    }
-
-    public string[] ResolveDefines(ModuleRules Rule, bool bCurrentModule)
-    {
-        Debug.Assert(RequiredModules != null);
-        List<string> Macros = new();
-
-        foreach (var Depend in Rule.PublicDependencyModuleNames)
-        {
-            if (RequiredModules.TryGetValue(Depend, out var Required) == false)
-            {
-                throw new TerminateException(7, CoreStrings.Errors.DependencyModuleNotFound, Rule.Name, Depend);
-            }
-
-            Macros.AddRange(ResolveDefines(Required.GenerateModuleRule(Rule.TargetRule), false));
-        }
-
-        foreach (var Macro in Rule.PublicAdditionalMacros)
-        {
-            Macros.Add(Macro);
-        }
-
-        if (bCurrentModule)
-        {
-            foreach (var Macro in Rule.PrivateAdditionalMacros)
-            {
-                Macros.Add(Macro);
-            }
-
-            Macros.Add($"{Rule.GenerateSafeAPIName()}=__declspec(dllexport)");
-        }
-        else
-        {
-            Macros.Add($"{Rule.GenerateSafeAPIName()}=__declspec(dllimport)");
-        }
-
-        Dictionary<string, bool> PlatformDefines = new()
-        {
-            ["PLATFORM_WINDOWS"] = false,
-            ["PLATFORM_LINUX"] = false
-        };
-
-        if (Rule.TargetRule.Platform.Group == PlatformGroup.Windows)
-        {
-            PlatformDefines["PLATFORM_WINDOWS"] = true;
-        }
-
-        foreach (var (Macro, bEnabled) in PlatformDefines)
-        {
-            Macros.Add($"{Macro}={(bEnabled ? 1 : 0)}");
-        }
-
-        return Macros.Distinct().ToArray();
-    }
+    public IEnumerable<ModuleRules> GetModules() => Modules.Values.Select(p => p.Rule);
 }

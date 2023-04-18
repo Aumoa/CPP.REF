@@ -8,9 +8,9 @@ using System.Text.Json.Nodes;
 using AE.Compilation;
 using AE.Exceptions;
 using AE.Misc;
-using AE.Platform;
 using AE.Rules;
 using AE.Source;
+using AE.System;
 
 namespace AE.Projects;
 
@@ -164,80 +164,5 @@ public class ACXXModule : IAModule
 
             return ModuleRule;
         }
-    }
-
-    public Task ScanDependenciesAsync(TargetRules Rule, ModuleCompiler Compiler, CompileTree Tree, ModuleDependenciesResolver Resolver, CancellationToken SToken = default)
-    {
-        ModuleRules ModuleRule = GenerateModuleRule(Rule);
-        string Includes = string.Join(" ", Resolver.ResolveIncludeDirectories(ModuleRule, true).Select(p => $"/I\"{p}\""));
-        string Defines = string.Join(" ", Resolver.ResolveDefines(ModuleRule, true).Select(p => $"/D \"{p}\""));
-
-        ProjectDirectory ProjectDir = Resolver.GetModuleDirectory(this);
-
-        string Configuration = Rule.Target.BuildConfiguration.Configuration.ToString();
-        string OutBase = Path.Combine(ProjectDir.Intermediate.Build, Configuration, ModuleName);
-        Directory.CreateDirectory(OutBase);
-
-        string CompilerOptions = $"/nologo /scanDependencies- /std:c++20 /c /EHsc {Includes} {Defines}";
-
-        return ExecuteCompilerAsync(Rule, Compiler, async (SourceCode) =>
-        {
-            string Filename = Path.Combine(OutBase, Path.GetFileNameWithoutExtension(SourceCode));
-            string OutFilename = Path.ChangeExtension(Filename, ".obj");
-            string CacheFilename = Path.ChangeExtension(Filename, ".abin");
-
-            JsonNode? TreeNode = JsonNode.Parse(await Compiler.RunCompilerAsync(SourceCode, $"{SourceCode} {CompilerOptions} /Fo\"{Filename}\"", SToken));
-            var CompileItem = new ModuleCompileItem(this, new() { Defines = Defines, Includes = Includes }, SourceCode, Tree, TreeNode);
-            Tree.AddCompileItem(CompileItem);
-        }, Resolver, SToken);
-    }
-
-    public Task CompileAsync(TargetRules Rule, ModuleCompiler Compiler, CompileTree Tree, ModuleDependenciesResolver Resolver, CancellationToken SToken = default)
-    {
-        ModuleRules ModuleRule = GenerateModuleRule(Rule);
-        string Includes = string.Join(" ", Resolver.ResolveIncludeDirectories(ModuleRule, true).Select(p => $"/I\"{p}\""));
-        string Defines = string.Join(" ", Resolver.ResolveDefines(ModuleRule, true).Select(p => $"/D \"{p}\""));
-
-        ProjectDirectory ProjectDir = Resolver.GetModuleDirectory(this);
-
-        string Configuration = Rule.Target.BuildConfiguration.Configuration.ToString();
-        string OutBase = Path.Combine(ProjectDir.Intermediate.Build, Configuration, ModuleName);
-        Directory.CreateDirectory(OutBase);
-
-        string CompilerOptions = $"/nologo /std:c++20 /c /EHsc {Includes} {Defines}";
-
-        return ExecuteCompilerAsync(Rule, Compiler, async (SourceCode) =>
-        {
-            string Filename = Path.Combine(OutBase, Path.GetFileNameWithoutExtension(SourceCode));
-            string OutFilename = Path.ChangeExtension(Filename, ".obj");
-            string CacheFilename = Path.ChangeExtension(Filename, ".abin");
-
-            string Output = await Compiler.RunCompilerAsync(SourceCode, $"{SourceCode} {CompilerOptions} /Fo\"{Filename}\"", SToken);
-            Console.Write(Output);
-        }, Resolver, SToken);
-    }
-
-    private async Task ExecuteCompilerAsync(TargetRules Rule, ModuleCompiler Compiler, Func<string, Task> CompileAction, ModuleDependenciesResolver Resolver, CancellationToken SToken)
-    {
-        List<Task> Tasks = new();
-
-        ModuleRules ModuleRule = GenerateModuleRule(Rule);
-        string Includes = string.Join(" ", Resolver.ResolveIncludeDirectories(ModuleRule, true).Select(p => $"/I\"{p}\""));
-        string Defines = string.Join(" ", Resolver.ResolveDefines(ModuleRule, true).Select(p => $"/D \"{p}\""));
-
-        ProjectDirectory ProjectDir = Resolver.GetModuleDirectory(this);
-
-        string Configuration = Rule.Target.BuildConfiguration.Configuration.ToString();
-        string OutBase = Path.Combine(ProjectDir.Intermediate.Build, Configuration, ModuleName);
-        Directory.CreateDirectory(OutBase);
-
-        string CompilerOptions = $"/nologo /scanDependencies- /std:c++20 /c /EHsc {Includes} {Defines}";
-
-        foreach (var SourceCode in Directory.GetFiles(SourcePath, "*.ixx", SearchOption.AllDirectories))
-        {
-            Tasks.Add(CompileAction(SourceCode));
-        }
-
-        await Task.WhenAll(Tasks);
     }
 }

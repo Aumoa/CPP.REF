@@ -7,6 +7,4 @@ namespace AE.Rules;
 public class TargetInfo : SerializableRule
 {
     public BuildConfiguration BuildConfiguration { get; set; } = new();
-
-    public bool bEditor { get; set; }
 }

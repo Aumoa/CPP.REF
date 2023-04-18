@@ -2,8 +2,8 @@
   "profiles": {
     "BuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "ProjectFiles",
-      "workingDirectory": "F:\\SampleGame\\"
+      "commandLineArgs": "Build -ProjectFile SampleGame.aproject -Target SampleGame",
+      "workingDirectory": "F:\\SampleGame"
     }
   }
 }

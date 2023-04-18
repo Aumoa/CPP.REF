@@ -47,4 +47,6 @@ public interface IErrors
     string RuleClassDefinitions { get; }
 
     string TargetRuleDuplicated { get; }
+
+    string InvalidModuleFormat { get; }
 }

@@ -11,7 +11,6 @@ namespace AE.Rules;
 
 public class TargetRules : SerializableRule
 {
-    [SetsRequiredMembers]
     public TargetRules(TargetInfo Info)
     {
         Target = Info;
@@ -20,13 +19,15 @@ public class TargetRules : SerializableRule
         TargetModuleName = GetType().Name.Replace("Target", "");
     }
 
-    public required TargetInfo Target { get; init; }
+    public TargetInfo Target { get; }
 
-    public required string Name { get; init; }
+    public string Name { get; }
 
     public TargetType Type { get; protected set; }
 
     public TargetPlatform Platform { get; protected set; }
 
     public string TargetModuleName { get; protected set; }
+
+    public bool bEditor { get; protected set; } = false;
 }

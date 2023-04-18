@@ -3,54 +3,50 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
+
+using AE.Exceptions;
+
+using static AE.Projects.HeaderCompileItem;
 
 namespace AE.Projects;
 
 public class ModuleCompileItem : CompileItem
 {
-    public required ACXXModule SourceModule { get; init; }
-
-    public required CompilerOptions Options { get; init; }
-
-    private JsonNode? DependencyNode { get; init; }
-
-    public struct CompilerOptions
-    {
-        public string Includes { get; set; }
-
-        public string Defines { get; set; }
-    }
-
-    public record RequiredModule
-    {
-        public required string Name { get; init; }
-
-        public required string SourcePath { get; init; }
-    
-        public required string LookupMethod { get; init; }
-    }
-
     [SetsRequiredMembers]
-    public ModuleCompileItem(ACXXModule SourceModule, CompilerOptions Options, string SourceCode, CompileTree Tree, JsonNode? Node) : base(SourceCode)
+    public ModuleCompileItem(string SourceCode, JsonNode? Node, ModuleDependenciesResolver.ModuleDependencyCache DependencyCache)
     {
-        this.SourceModule = SourceModule;
-        this.Options = Options;
-
-        Debug.Assert(Node != null);
-        DependencyNode = Node;
         this.SourceCode = SourceCode;
+        this.DependencyCache = DependencyCache;
 
-        JsonArray? Rules = Node["rules"] as JsonArray;
-        Debug.Assert(Rules != null);
-        JsonNode? Rule = Rules[0] as JsonNode;
-        Debug.Assert(Rule != null);
+        if (Node == null)
+        {
+            throw new TerminateException(10, CoreStrings.Errors.InvalidModuleFormat, SourceCode);
+        }
+
+        if (Node["rules"] is not JsonArray Rules)
+        {
+            throw new TerminateException(10, CoreStrings.Errors.InvalidModuleFormat, SourceCode);
+        }
+
         Debug.Assert(Rules.Count == 1);
+        if (Rules[0] is not JsonNode Rule)
+        {
+            throw new TerminateException(10, CoreStrings.Errors.InvalidModuleFormat, SourceCode);
+        }
 
-        Output = (string)Rule["primary-output"]!;
-        Debug.Assert(Output != null);
+        Output = (string?)Rule["primary-output"];
+        if (Output == null)
+        {
+            throw new TerminateException(10, CoreStrings.Errors.InvalidModuleFormat, SourceCode);
+        }
 
-        JsonArray? Outputs = Rule["outputs"] as JsonArray;
-        Debug.Assert(Outputs != null);
+        if (Rule["outputs"] is not JsonArray Outputs)
+        {
+            throw new TerminateException(10, CoreStrings.Errors.InvalidModuleFormat, SourceCode);
+        }
+
+        this.InterfaceOutput = null;
         foreach (var Output in Outputs)
         {
             string? OutputStr = (string?)Output;
@@ -61,11 +57,10 @@ public class ModuleCompileItem : CompileItem
             }
 
             Debug.Assert(InterfaceOutput == null);
-            InterfaceOutput = Path.Combine(Path.GetDirectoryName(this.Output)!, OutputStr);
+            this.InterfaceOutput = Path.Combine(Path.GetDirectoryName(this.Output)!, OutputStr);
         }
 
-        JsonArray? Provides = Rule["provides"] as JsonArray;
-        if (Provides != null)
+        if (Rule["provides"] is JsonArray Provides)
         {
             foreach (var Provide in Provides)
             {
@@ -75,31 +70,44 @@ public class ModuleCompileItem : CompileItem
                     continue;
                 }
 
-                InterfaceName = LogicalName;
+                this.LogicalName = LogicalName;
                 Debug.Assert((bool?)Provide!["is-interface"] == true);
             }
+        }
+        
+        if (string.IsNullOrEmpty(LogicalName))
+        {
+            LogicalName = "private-" + Path.GetFileNameWithoutExtension(SourceCode);
         }
 
         JsonArray? Requires = Rule["requires"] as JsonArray;
         Debug.Assert(Requires != null);
 
-        List<RequiredModule> RequiredModules = new();
+        List<DependencyItem> Dependencies = new();
         foreach (var Require in Requires)
         {
             Debug.Assert(Require != null);
-            RequiredModules.Add(new RequiredModule()
+            string LogicalName = (string)Require["logical-name"]!;
+            string? SourcePath = (string?)Require["source-path"];
+            string? LookupMethodStr = (string?)Require["lookup-method"];
+
+            if (SourcePath != null && LookupMethodStr != null)
             {
-                Name = (string)Require["logical-name"]!,
-                SourcePath = (string?)Require["source-path"] ?? string.Empty,
-                LookupMethod = (string?)Require["lookup-method"] ?? string.Empty
-            });
+                LookupMethod Method = LookupMethodStr switch
+                {
+                    "include-angle" => LookupMethod.Angle,
+                    "include-quote" => LookupMethod.Quote,
+                    _ => throw new InvalidOperationException("Internal error.")
+                };
+                Dependencies.Add(new HeaderDependencyItem(SourcePath, Method, LogicalName));
+            }
+            else
+            {
+                Dependencies.Add(new ModuleDependencyItem(LogicalName));
+            }
         }
-        this.RequiredModules = RequiredModules.ToArray();
+        this.Dependencies = Dependencies.ToArray();
     }
 
-    public required string? InterfaceOutput { get; init; }
-
-    public required string? InterfaceName { get; init; }
-
-    public required RequiredModule[] RequiredModules { get; init; }
+    public required ModuleDependenciesResolver.ModuleDependencyCache DependencyCache { get; init; }
 }

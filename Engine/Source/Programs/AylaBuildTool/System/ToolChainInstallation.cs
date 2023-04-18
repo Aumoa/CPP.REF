@@ -20,4 +20,10 @@ public abstract class ToolChainInstallation
     public abstract string[] GetRequiredLibraryPaths(Architecture TargetArchitecture);
 
     public abstract string[] GetRequiredIncludePaths(Architecture TargetArchitecture);
+
+    public abstract string GetSharedSymbol(bool bExport);
+
+    public abstract string GetPrimaryCompilerName();
+
+    public abstract string GetCompilerOptions(CompilerOptions Options, params object?[] Args);
 }

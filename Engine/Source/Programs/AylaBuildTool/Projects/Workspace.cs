@@ -6,7 +6,8 @@ namespace AE.Projects;
 
 public class Workspace
 {
-    private readonly List<ACXXModule> CXXModules = new();
+    private readonly Dictionary<string, ATarget> Targets = new();
+    private readonly Dictionary<string, ACXXModule> CXXModules = new();
     private readonly List<ACSModule> CSModules = new();
 
     public Workspace()
@@ -34,7 +35,7 @@ public class Workspace
         {
             var CXXModule = new ACXXModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
             await CXXModule.ConfigureAsync(SToken);
-            CXXModules.Add(CXXModule);
+            CXXModules.Add(CXXModule.ModuleName, CXXModule);
             return;
         }
 
@@ -45,6 +46,13 @@ public class Workspace
             return;
         }
 
+        ModulePath = Directory.GetFiles(InSubdirectory, "*.Target.cs");
+        foreach (var TargetPath in ModulePath)
+        {
+            var Instance = new ATarget(Target, Path.GetFileName(TargetPath).Replace(".Target.cs", ""));
+            Targets.Add(Instance.TargetName, Instance);
+        }
+
         foreach (var Subdirectory in Directory.GetDirectories(InSubdirectory, "*", SearchOption.TopDirectoryOnly))
         {
             await CollectModuleInSubdirectoryRecursiveAsync(Target, Subdirectory, SToken);
@@ -53,5 +61,17 @@ public class Workspace
 
     public IEnumerable<ACSModule> GetCSModules() => CSModules;
 
-    public IEnumerable<ACXXModule> GetCXXModules() => CXXModules;
+    public IEnumerable<ACXXModule> GetCXXModules() => CXXModules.Values;
+
+    public ATarget? SearchTargetByName(string InTargetName)
+    {
+        Targets.TryGetValue(InTargetName, out ATarget? SearchInstance);
+        return SearchInstance;
+    }
+
+    public ACXXModule? SearchCXXModuleByName(string InModuleName)
+    {
+        CXXModules.TryGetValue(InModuleName, out ACXXModule? SearchInstance);
+        return SearchInstance;
+    }
 }

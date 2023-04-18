@@ -1,16 +1,20 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.Exceptions;
+using AE.Platform;
 using AE.Platform.Windows;
 
 using System.Diagnostics;
 
-namespace AE.Platform;
+namespace AE.System;
 
 public class ModuleCompiler
 {
+    public readonly ToolChainInstallation ToolChain;
+    public readonly string Executable;
     public readonly int MaxParallelCompilers;
 
-    public ModuleCompiler(int MaxParallelCompilers = 0)
+    public ModuleCompiler(ToolChainInstallation ToolChain, string Executable, int MaxParallelCompilers = 0)
     {
         Debug.Assert(MaxParallelCompilers >= 0);
         if (MaxParallelCompilers == 0)
@@ -18,6 +22,8 @@ public class ModuleCompiler
             MaxParallelCompilers = Process.GetCurrentProcess().Threads.Count;
         }
 
+        this.ToolChain = ToolChain;
+        this.Executable = SearchExecutable(Executable);
         this.MaxParallelCompilers = MaxParallelCompilers;
     }
 
@@ -26,10 +32,7 @@ public class ModuleCompiler
 
     private string SearchExecutable(string Executable)
     {
-        VisualStudioInstallation[] Installations = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022);
-        VisualStudioInstallation Installation = Installations[0];
-
-        foreach (var ExecutablePath in Installation.GetRequiredExecutablePaths(Architecture.x64))
+        foreach (var ExecutablePath in ToolChain.GetRequiredExecutablePaths(Architecture.x64))
         {
             string Cur = Path.Combine(ExecutablePath, Executable);
             if (File.Exists(Cur))
@@ -44,11 +47,7 @@ public class ModuleCompiler
 
     public async Task<string> RunCompilerAsync(string SourceCode, string Commands, CancellationToken SToken = default)
     {
-        string Executable = "cl.exe";
         string Stdout = string.Empty;
-
-        VisualStudioInstallation[] Installations = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022);
-        VisualStudioInstallation Installation = Installations[0];
 
         TaskCompletionSource<string>? SourceCodeCompletion = null;
         Task<string>? SourceCodeTask = null!;
@@ -77,10 +76,8 @@ public class ModuleCompiler
 
             try
             {
-                Executable = SearchExecutable(Executable);
-
-                string Paths = string.Join(';', Installation.GetRequiredExecutablePaths(Architecture.x64));
-                string Includes = string.Join(';', Installation.GetRequiredIncludePaths(Architecture.x64));
+                string Paths = string.Join(';', ToolChain.GetRequiredExecutablePaths(Architecture.x64));
+                string Includes = string.Join(';', ToolChain.GetRequiredIncludePaths(Architecture.x64));
 
                 ProcessStartInfo PSI = new(Executable);
                 PSI.Environment["PATH"] = Paths;
@@ -95,10 +92,15 @@ public class ModuleCompiler
                 }
 
                 Stdout = await P.StandardOutput.ReadToEndAsync();
-                _ = await P.StandardError.ReadToEndAsync();
+                string Stderr = await P.StandardError.ReadToEndAsync();
                 await P.WaitForExitAsync(SToken);
                 Stdout += await P.StandardOutput.ReadToEndAsync();
-                _ = await P.StandardError.ReadToEndAsync();
+                Stderr += await P.StandardError.ReadToEndAsync();
+
+                if (P.ExitCode != 0)
+                {
+                    throw new TerminateException(9, Stdout + Stderr);
+                }
 
                 return Stdout;
             }

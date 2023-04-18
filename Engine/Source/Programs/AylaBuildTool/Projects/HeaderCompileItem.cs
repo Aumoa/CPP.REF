@@ -15,26 +15,17 @@ public class HeaderCompileItem : CompileItem
     }
 
     [SetsRequiredMembers]
-    public HeaderCompileItem(ProjectDirectory StdDir, string Name, string SourceCode, string LookupMethod) : base(SourceCode)
+    public HeaderCompileItem(string Name, string SourceCode, LookupMethod Method)
     {
-        this.Name = Name;
-        if (LookupMethod == "include-angle")
-        {
-            Method = HeaderCompileItem.LookupMethod.Angle;
-        }
-        else
-        {
-            Method = HeaderCompileItem.LookupMethod.Quote;
-        }
+        this.SourceCode = SourceCode;
+        this.LogicalName = Name;
+        this.Dependencies = Array.Empty<DependencyItem>();
+        this.Method = Method;
 
-        string StdOutPath = StdDir.Intermediate.StdBuild;
-        InterfaceOutput = Path.Combine(StdOutPath, Path.ChangeExtension(Name, ".ifc"));
-        Output = Path.Combine(StdOutPath, Path.ChangeExtension(Name, ".obj"));
+        string StdOutPath = Global.EngineDirectory.Intermediate.StdBuild;
+        this.InterfaceOutput = Path.Combine(StdOutPath, Path.ChangeExtension(Name, ".ifc"));
+        this.Output = Path.Combine(StdOutPath, Path.ChangeExtension(Name, ".obj"));
     }
 
-    public required string Name { get; init; }
-
     public required LookupMethod Method { get; init; }
-
-    public required string InterfaceOutput { get; init; }
 }

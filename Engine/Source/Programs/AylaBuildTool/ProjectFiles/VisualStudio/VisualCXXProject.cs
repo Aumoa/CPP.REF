@@ -157,25 +157,25 @@ public class VisualCXXProject : IVisualStudioProject
                 }
 
                 string Extension = Path.GetExtension(Filename).ToLower();
-                if (IsSourceFile(Extension))
+                if (Global.IsSourceCode(Extension))
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", Filename);
                     return ClCompile;
                 }
-                else if (IsHeaderFile(Extension))
+                else if (Global.IsHeaderFile(Extension))
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
                     ClInclude.SetAttribute("Include", Filename);
                     return null;
                 }
-                else if (IsNoneFile(Extension))
+                else if (Global.IsRuleFile(Extension))
                 {
                     var None = ItemGroup.AddElement("None");
                     None.SetAttribute("Include", Filename);
                     return null;
                 }
-                else if (IsNatvisFile(Extension))
+                else if (Global.IsNatvisFile(Extension))
                 {
                     var None = ItemGroup.AddElement("Natvis");
                     None.SetAttribute("Include", Filename);
@@ -258,25 +258,25 @@ public class VisualCXXProject : IVisualStudioProject
 
                 string Extension = Path.GetExtension(Filename);
                 XmlElement? InnerElement = null;
-                if (IsSourceFile(Extension))
+                if (Global.IsSourceCode(Extension))
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", Filename);
                     InnerElement = ClCompile;
                 }
-                else if (IsHeaderFile(Extension))
+                else if (Global.IsHeaderFile(Extension))
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
                     ClInclude.SetAttribute("Include", Filename);
                     InnerElement = ClInclude;
                 }
-                else if (IsNoneFile(Extension))
+                else if (Global.IsRuleFile(Extension))
                 {
                     var None = ItemGroup.AddElement("None");
                     None.SetAttribute("Include", Filename);
                     InnerElement = None;
                 }
-                else if (IsNatvisFile(Extension))
+                else if (Global.IsNatvisFile(Extension))
                 {
                     var None = ItemGroup.AddElement("Natvis");
                     None.SetAttribute("Include", Filename);
@@ -323,25 +323,5 @@ public class VisualCXXProject : IVisualStudioProject
             }
         }
         VcxprojUser = Doc;
-    }
-
-    private static bool IsHeaderFile(string Extensions)
-    {
-        return Extensions == ".h";
-    }
-
-    private static bool IsSourceFile(string Extensions)
-    {
-        return Extensions == ".cpp" || Extensions == ".cc" || Extensions == ".ixx";
-    }
-
-    private static bool IsNoneFile(string Extensions)
-    {
-        return Extensions == ".cs";
-    }
-
-    private static bool IsNatvisFile(string Extensions)
-    {
-        return Extensions == ".natvis";
     }
 }

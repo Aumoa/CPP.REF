@@ -47,4 +47,6 @@ internal class Errors : IErrors
     public string RuleClassDefinitions => "{0} 규칙 정의에 호환 가능한 클래스가 없거나 두 개 이상의 호환 가능한 클래스가 있습니다.";
 
     public string TargetRuleDuplicated => "일치하는 이름의 타깃 규칙 파일(*.Target.cs)이 두 개 이상 포함되어 있습니다.";
+
+    public string InvalidModuleFormat => "{0} 파일의 의존 관계를 구성하는 중 오류가 발생했습니다. 올바르지 않은 모듈 소스 코드 형식입니다.";
 }
