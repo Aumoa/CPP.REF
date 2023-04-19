@@ -2,7 +2,7 @@
 
 namespace AE.Rules;
 
-public class ModuleRules : SerializableRule
+public class ModuleRules
 {
     public TargetRules TargetRule { get; }
 

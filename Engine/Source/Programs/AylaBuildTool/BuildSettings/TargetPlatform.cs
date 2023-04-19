@@ -6,7 +6,7 @@ using AE.Rules;
 
 namespace AE.BuildSettings;
 
-public class TargetPlatform : SerializableRule
+public class TargetPlatform
 {
     public string TargetName { get; set; } = string.Empty;
 

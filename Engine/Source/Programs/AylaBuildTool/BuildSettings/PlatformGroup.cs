@@ -5,7 +5,7 @@ using AE.Rules;
 
 namespace AE.BuildSettings;
 
-public class PlatformGroup : SerializableRule
+public class PlatformGroup
 {
     public string GroupName { get; set; } = string.Empty;
 

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace AE.Rules;
 
-public class TargetRules : SerializableRule
+public class TargetRules
 {
     public TargetRules(TargetInfo Info)
     {

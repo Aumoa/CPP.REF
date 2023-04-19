@@ -4,7 +4,7 @@ using AE.BuildSettings;
 
 namespace AE.Rules;
 
-public class TargetInfo : SerializableRule
+public class TargetInfo
 {
     public BuildConfiguration BuildConfiguration { get; set; } = new();
 }
