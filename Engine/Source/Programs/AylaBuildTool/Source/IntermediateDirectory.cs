@@ -17,6 +17,7 @@ public struct IntermediateDirectory
             Build = Path.Combine(_Root, "Build");
             StdBuild = Path.Combine(Build, "Std");
             Makefiles = Path.Combine(_Root, "Makefiles");
+            Unused = Path.Combine(_Root, "Unused");
         }
     }
 
@@ -29,6 +30,8 @@ public struct IntermediateDirectory
     public string StdBuild { get; private init; }
 
     public string Makefiles { get; private init; }
+
+    public string Unused { get; private init; }
 
     public void GenerateDirectoriesRecursive()
     {
@@ -60,6 +63,11 @@ public struct IntermediateDirectory
         if (Directory.Exists(Makefiles) == false)
         {
             Directory.CreateDirectory(Makefiles);
+        }
+
+        if (Directory.Exists(Unused) == false)
+        {
+            Directory.CreateDirectory(Unused);
         }
     }
 

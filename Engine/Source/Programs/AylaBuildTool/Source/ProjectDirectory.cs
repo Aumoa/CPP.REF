@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.Misc;
+
 namespace AE.Source;
 
 public readonly struct ProjectDirectory
@@ -45,6 +47,15 @@ public readonly struct ProjectDirectory
         Content.GenerateDirectoriesRecursive();
         Binaries.GenerateDirectoriesRecursive();
         Build.GenerateDirectoriesRecursive();
+    }
+
+    public void Cleanup()
+    {
+        DirectoryExtensions.Cleanup(Intermediate.Build);
+        DirectoryExtensions.Cleanup(Intermediate.StdBuild);
+        DirectoryExtensions.Cleanup(Intermediate.Includes);
+        DirectoryExtensions.Cleanup(Intermediate.Makefiles);
+        DirectoryExtensions.Cleanup(Binaries.Win64);
     }
 
     public override string ToString()

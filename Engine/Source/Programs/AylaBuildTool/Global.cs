@@ -16,6 +16,8 @@ public static class Global
 
     public static ProjectDirectory EngineDirectory { get; }
 
+    public static string BuildToolPath => Path.Combine(EngineDirectory.Binaries.DotNET, "AylaBuildTool");
+
     public static async Task CompareAndWriteAsync(string Filename, string Text, CancellationToken SToken)
     {
         if (File.Exists(Filename) == false)

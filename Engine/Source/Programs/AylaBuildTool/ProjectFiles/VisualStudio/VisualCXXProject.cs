@@ -116,35 +116,27 @@ public class VisualCXXProject : IVisualStudioProject
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.props");
 
-            // Common
-            var PropertyGroup = Project.AddElement("PropertyGroup");
-            //PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', CXXProject.GetProjectDefinitions());
-            PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
-
             var Installation = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022).First();
 
             BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
             {
+                string App = bEditor ? "_Editor" : "";
+                string TargetApp = bEditor ? "Editor" : "";
+
                 // Foreach Configurations
                 var PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}|{Platform}'");
+                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}{App}|{Platform}'");
 
-                //string BuildToolPath = InWorkspace.BuildTool;
-                //BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
+                string BuildToolPath = Global.BuildToolPath;
+                BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
 
                 var IncludePaths = Installation.GetRequiredIncludePaths(Platform.Architecture);
 
-                //PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name}";
-                //PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name}";
-                //PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
-
-                // Foreach Configurations
-                PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}_Editor|{Platform}'");
-
-                //PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {CXXProject.Rules.Name} -Editor";
-                //PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {CXXProject.Rules.Name} -Editor";
-                //PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = $"{string.Join(';', IncludePaths)};%(NMakeIncludeSearchPath)";
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp}";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp}";
+                PropertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{BuildToolPath} Clean";
+                PropertyGroup.AddElement("OutDir").InnerText = ProjectDirectory.Binaries.Win64;
+                PropertyGroup.AddElement("IntDir").InnerText = ProjectDirectory.Intermediate.Unused;
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");

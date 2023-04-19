@@ -46,5 +46,29 @@ public abstract class ProjectBasedExecutor
         return Workspace;
     }
 
+    protected ProjectDirectory[] GetProjectDirectories()
+    {
+        if (ProjectBasedArgs.ProjectFile != null)
+        {
+            if (Path.IsPathFullyQualified(ProjectBasedArgs.ProjectFile) == false)
+            {
+                ProjectBasedArgs.ProjectFile = Path.Combine(Environment.CurrentDirectory, ProjectBasedArgs.ProjectFile);
+            }
+
+            if (File.Exists(ProjectBasedArgs.ProjectFile) == false)
+            {
+                throw new TerminateException(6, CoreStrings.Errors.InvalidProjectFormat);
+            }
+
+            string ProjectFileDir = Path.GetFullPath(Path.GetDirectoryName(ProjectBasedArgs.ProjectFile)!);
+            ProjectDirectory GameProject = new() { Root = ProjectFileDir };
+            return new[] { Global.EngineDirectory, GameProject };
+        }
+        else
+        {
+            return new[] { Global.EngineDirectory };
+        }
+    }
+
     public string? ProjectFile => ProjectBasedArgs.ProjectFile;
 }

@@ -17,6 +17,9 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
     {
         [CommandLineApply(CategoryName = "Target", IsRequired = true)]
         public string Target { get; set; } = null!;
+
+        [CommandLineApply(CategoryName = "Clean")]
+        public bool? bClean { get; set; }
     }
 
     private readonly Arguments BuildArgs = new();
@@ -29,6 +32,14 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
     public async Task<int> RunAsync(CancellationToken SToken = default)
     {
         Workspace Workspace = await ConfigureWorkspaceAsync(SToken);
+        if (BuildArgs.bClean == true)
+        {
+            foreach (var Dir in GetProjectDirectories())
+            {
+                Dir.Cleanup();
+            }
+        }
+
         ATarget? CurrentTarget = Workspace.SearchTargetByName(BuildArgs.Target);
         if (CurrentTarget == null)
         {
