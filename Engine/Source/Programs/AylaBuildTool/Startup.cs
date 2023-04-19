@@ -1,10 +1,12 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Reflection;
+using System.Text;
 
 using AE.BuildSettings;
 using AE.CLI;
 using AE.Diagnostics;
+using AE.Exceptions;
 using AE.Executors;
 using AE.Misc;
 using AE.Platform;
@@ -45,5 +47,53 @@ Console.CancelKeyPress += (Sender, EventArgs) =>
     CTS.Cancel();
 };
 
-var Executor = (IExecutor)Constructor.Invoke(new object[] { CommandLineParser.Parse(args[1..]) });
-return await Executor.RunAsync(CTS.Token);
+try
+{
+    var Executor = (IExecutor)Constructor.Invoke(new object[] { CommandLineParser.Parse(args[1..]) });
+    return await Executor.RunAsync(CTS.Token);
+}
+catch (TerminateException TE)
+{
+    Console.Error.WriteLine(TE.Message);
+    return TE.ErrorCode;
+}
+catch (AggregateException AE)
+{
+    if (AE.InnerExceptions.Any())
+    {
+        List<string> CompilerMessages = new();
+        List<Exception> NewExceptionList = new();
+        foreach (var Exception in AE.InnerExceptions)
+        {
+            if (Exception is TerminateException TE)
+            {
+                if (TE.ErrorCode == (int)TerminateException.KnownErrorCode.CompileError)
+                {
+                    CompilerMessages.Add(Exception.Message);
+                }
+                else
+                {
+                    NewExceptionList.Add(Exception);
+                }
+            }
+            else
+            {
+                NewExceptionList.Add(Exception);
+            }
+        }
+
+        if (CompilerMessages.Any())
+        {
+            Console.Error.Write(string.Join('\n', CompilerMessages));
+        }
+        if (NewExceptionList.Any())
+        {
+            throw;
+        }
+        else
+        {
+            return (int)TerminateException.KnownErrorCode.CompileError;
+        }
+    }
+    throw;
+}

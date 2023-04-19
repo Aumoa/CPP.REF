@@ -77,6 +77,7 @@ public class CompileTree
             string OutputDirectory = Path.Combine(IntermediateBuild, BuildConfiguration.ToString(), Rule.Name);
 
             string CompilerArgs = GenerateBaseCompilerOptions(DependencyCache, OutputDirectory, CompilerOptions.ScanDependencies);
+            HashSet<Exception> Exceptions = new();
 
             foreach (var SourceFile in DependencyCache.SourceFiles.Where(Global.IsSourceCode))
             {
@@ -84,14 +85,29 @@ public class CompileTree
                 string AdditionalArgs = $" {ToolChain.GetCompilerOptions(CompilerOptions.Output, OutputFilename)} {SourceFile}";
                 Tasks.Add(Compiler.RunCompilerAsync(SourceFile, CompilerArgs + AdditionalArgs, SToken).ContinueWith(p =>
                 {
-                    JsonNode? DependenciesTree = JsonNode.Parse(p.Result);
-                    var CompileItem = new ModuleCompileItem(SourceFile, DependenciesTree, Resolver.GetDependencyCache(Rule.Name));
-
-                    lock (InterfaceTree)
+                    if (p.IsFaulted)
                     {
-                        InterfaceTree.Add(CompileItem.LogicalName, CompileItem);
+                        lock (Exceptions)
+                        {
+                            Exceptions.Add(p.Exception!);
+                        }
+                    }
+                    else
+                    {
+                        JsonNode? DependenciesTree = JsonNode.Parse(p.Result);
+                        var CompileItem = new ModuleCompileItem(SourceFile, DependenciesTree, Resolver.GetDependencyCache(Rule.Name));
+
+                        lock (InterfaceTree)
+                        {
+                            InterfaceTree.Add(CompileItem.LogicalName, CompileItem);
+                        }
                     }
                 }));
+            }
+
+            if (Exceptions.Any())
+            {
+                throw new AggregateException(Exceptions.ToArray());
             }
         }
 
@@ -147,16 +163,34 @@ public class CompileTree
         int ParallelNumber = 0;
         Dictionary<string, Task> SourceCodeCompileTasks = new();
 
+        HashSet<Exception> Exceptions = new();
         foreach (var (LogicalName, Item) in InterfaceTree)
         {
             Tasks.Add(CompileFileAsync(Compiler, SourceCodeCompileTasks, Item, Output =>
             {
                 int Current = Interlocked.Increment(ref ParallelNumber);
                 Console.Write("[{0}/{1}] {2}", Current, InterfaceTree.Count, Output);
+            }, SToken).ContinueWith(p =>
+            {
+                if (p.IsFaulted)
+                {
+                    if (p.Exception!.InnerExceptions.Count > 1)
+                    {
+                        Exceptions.Add(p.Exception);
+                    }
+                    else
+                    {
+                        Exceptions.Add(p.Exception.InnerException ?? p.Exception.InnerExceptions.First());
+                    }
+                }
             }, SToken));
         }
 
         await Task.WhenAll(Tasks);
+        if (Exceptions.Any())
+        {
+            throw new AggregateException(Exceptions.ToArray());
+        }
     }
 
     private struct InterfaceRef
