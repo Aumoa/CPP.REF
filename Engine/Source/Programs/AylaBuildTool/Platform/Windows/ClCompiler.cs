@@ -101,6 +101,7 @@ public class ClCompiler : Compiler
                 continue;
             }
 
+            Location = Location.Trim();
             Tasks.Add(SourceCodeHash.GenerateHashAsync(Location, SToken).ContinueWith(p =>
             {
                 lock (SourceCodeHashes)

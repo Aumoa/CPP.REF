@@ -9,6 +9,7 @@ using AE.Platform.Windows;
 using AE.Projects;
 using AE.Rules;
 using AE.Source;
+using AE.SourceTree;
 using AE.System;
 
 namespace AE.Executors;
@@ -74,27 +75,28 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         var Makefile = await Resolver.GenerateMakefileAsync(TargetRule, SToken);
         await Makefile.ResolveMakefileCacheAsync(ToolChain, TargetRule, SToken);
-        var Tasks = new CompileTasks(ToolChain);
+        var CompileTasks = new CompileTasks(ToolChain);
 
         int ReturnCode = 0;
+        Dictionary<string, List<Task<bool>>> LinkDepends = new();
         if (Makefile.CompileItems.Any())
         {
-            var DeferredTasks = new List<Task>();
             int TaskNumber = 0;
-            Console.WriteLine("Dispatch {0} tasks with {1} processors.", Makefile.CompileItems.Count, Tasks.MaxParallel);
+            Console.WriteLine("Dispatch {0} tasks with {1} processors.", Makefile.CompileItems.Count, CompileTasks.MaxParallel);
             int Left = 0, Top = 0;
             if (ConsoleExtensions.IsConsoleHandleSupports)
             {
                 (Left, Top) = Console.GetCursorPosition();
             }
+
             foreach (var CompileItem in Makefile.CompileItems)
             {
-                DeferredTasks.Add(Tasks.CompileAsync(CompileItem, TargetRule, SToken).ContinueWith(p =>
+                Task<bool> CurrentTask = CompileTasks.CompileAsync(CompileItem, TargetRule, SToken).ContinueWith(p =>
                 {
                     if (p.IsCompletedSuccessfully)
                     {
                         int Number = Interlocked.Increment(ref TaskNumber);
-                        lock (DeferredTasks)
+                        lock (TargetRule)
                         {
                             string Fm = string.Format("[{0}/{1}] {2}", TaskNumber, Makefile.CompileItems.Count, p.Result);
                             if (ConsoleExtensions.IsConsoleHandleSupports)
@@ -104,12 +106,14 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                             }
                             Console.WriteLine(Fm);
                         }
+
+                        return true;
                     }
                     else
                     {
                         if (p.Exception!.InnerException is TerminateException TE)
                         {
-                            lock (DeferredTasks)
+                            lock (TargetRule)
                             {
                                 Console.Error.WriteLine(TE.Message.Trim());
                                 if (ConsoleExtensions.IsConsoleHandleSupports)
@@ -119,22 +123,91 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                             }
                             ReturnCode = TE.ErrorCode;
                         }
-                        else
-                        {
-                            var _ = p.Result;
-                        }
+
+                        // Rethrowing.
+                        _ = p.Result;
+                        return false;
                     }
-                }));
+                });
+
+                if (LinkDepends.TryGetValue(CompileItem.ModuleName, out List<Task<bool>>? LinkTasks) == false)
+                {
+                    LinkTasks = new();
+                    LinkDepends.Add(CompileItem.ModuleName, LinkTasks);
+                }
+                LinkTasks.Add(CurrentTask);
+            }
+        }
+
+        Dictionary<string, Task<bool>> Linkers = new();
+        foreach (var (ModuleName, _) in Resolver.Modules)
+        {
+            async Task<bool> StartLinkerAsync(string ModuleName, CancellationToken SToken = default)
+            {
+                Task<bool>? PreviousTask = null;
+                TaskCompletionSource<bool>? TCS = null;
+                lock (Linkers)
+                {
+                    if (Linkers.TryGetValue(ModuleName, out PreviousTask) == false)
+                    {
+                        TCS = new();
+                        PreviousTask = TCS.Task;
+                        Linkers.Add(ModuleName, PreviousTask);
+                    }
+                }
+
+                if (TCS == null)
+                {
+                    return await PreviousTask;
+                }
+
+                var DependencyCache = Resolver.GetDependencyCache(ModuleName);
+
+                IEnumerable<Task<bool>> CompileTasks = Enumerable.Empty<Task<bool>>();
+                if (LinkDepends.TryGetValue(ModuleName, out var TasksList))
+                {
+                    CompileTasks = TasksList;
+                }
+
+                bool[] bResults = await Task.WhenAll(CompileTasks.Distinct());
+                if (bResults.Contains(false))
+                {
+                    return false;
+                }
+
+                foreach (var Depend in DependencyCache.DependModules)
+                {
+                    if (await StartLinkerAsync(Depend, SToken) == false)
+                    {
+                        return false;
+                    }
+                }
+
+                try
+                {
+                    var Config = TargetInfo.BuildConfiguration;
+
+                    var Linker = ToolChain.SpawnLinker();
+                    string Output = await Linker.LinkAsync(TargetRule, DependencyCache, SToken);
+                    Console.Write(Output);
+
+                    TCS.SetResult(true);
+                    return true;
+                }
+                catch (TerminateException? TE)
+                {
+                    Console.Error.WriteLine(TE.Message);
+                    ReturnCode = TE.ErrorCode;
+                    TCS.SetResult(false);
+                    return false;
+                }
             }
 
-            await Task.WhenAll(DeferredTasks);
-            await Makefile.SaveMakefileCacheAsync(TargetRule, SToken);
-        }
-        else
-        {
-            Console.WriteLine("No compile items.");
+            _ = StartLinkerAsync(ModuleName, SToken);
         }
 
+        await Task.WhenAll(Linkers.Values);
+        await Makefile.SaveMakefileCacheAsync(TargetRule, SToken);
         return ReturnCode;
     }
 

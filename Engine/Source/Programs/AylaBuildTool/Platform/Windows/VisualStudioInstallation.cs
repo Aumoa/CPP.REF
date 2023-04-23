@@ -226,48 +226,14 @@ public class VisualStudioInstallation : ToolChainInstallation
         return VSSet.IncludePath.Concat(WindowsSet.IncludePath).ToArray();
     }
 
-    public override string GetSharedSymbol(bool bExport)
-    {
-        return $"__declspec({(bExport ? "dllexport" : "dllimport")})";
-    }
-
-    public override string GetPrimaryCompilerName()
-    {
-        return "cl.exe";
-    }
-
-    public override string GetCompilerOptions(CompilerOptions Options, params object?[]? Args)
-    {
-        if (Args == null)
-        {
-            Args = Array.Empty<object>();
-        }
-
-        return Options switch
-        {
-            CompilerOptions.NoLogo => "/nologo",
-            CompilerOptions.CppStandard => "/std:c++20",
-            CompilerOptions.ScanDependencies => "/scanDependencies-",
-            CompilerOptions.Compile => "/c",
-            CompilerOptions.EnableExceptions => "/EHsc",
-            CompilerOptions.Includes => string.Join(' ', Args.Select(p => $"/I\"{p}\"")),
-            CompilerOptions.Defines => string.Join(' ', Args.Select(p => $"/D\"{p}\"")),
-            CompilerOptions.Output => string.Join(' ', Args.Select(p => $"/Fo\"{p}\"")),
-            CompilerOptions.InterfaceOutput => string.Join(' ', Args.Select(p => $"/ifcOutput\"{p}\"")),
-            CompilerOptions.InterfaceOutputDirectory => string.Join(' ', Args.Select(p => $"/ifcOutput\"{p}\\\\\"")),
-            CompilerOptions.ForceInclude => string.Join(' ', Args.Select(p => $"/FI\"{p}\"")),
-            CompilerOptions.InterfaceSearchDir => string.Join(' ', Args.Select(p => $"/ifcSearchDir \"{p}\"")),
-            CompilerOptions.HeaderUnit => $"/headerUnit:{Args[0]!.ToString()!.ToLower()} \"{Args[1]}\"=\"{Args[2]}\"",
-            CompilerOptions.ExportHeader => "/exportHeader",
-            CompilerOptions.HeaderReference => $"/headerName:{Args[0]!.ToString()!.ToLower()} \"{Args[1]}\"",
-            CompilerOptions.ShowIncludes => $"/sourceDependencies-",
-            _ => string.Empty
-        };
-    }
-
     public override Compiler SpawnCompiler()
     {
-        return new ClCompiler(GetPrimaryCompilerName(), this);
+        return new ClCompiler("cl.exe", this);
+    }
+
+    public override Linker SpawnLinker()
+    {
+        return new VSLinker("link.exe", this);
     }
 
     public override string GetOutputExtension()

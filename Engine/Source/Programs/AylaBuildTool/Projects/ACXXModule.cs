@@ -131,7 +131,6 @@ public class ACXXModule : IAModule
                     await File.WriteAllTextAsync(TextCache, await File.ReadAllTextAsync(ModuleCodePath), SToken);
 
                     CachedAssembly = Assembly.LoadFile(RuleAssemblyCache);
-                    Console.WriteLine("TextCache({0}), AssemblyCache({1}) is generated.", TextCache, RuleAssemblyCache);
                 }
             }
         }

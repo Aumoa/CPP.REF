@@ -43,6 +43,8 @@ public class ModuleDependenciesResolver
         public required string[] SourceFiles { get; init; }
 
         public required string[] DependModules { get; init; }
+
+        public required string[] AdditionalLibraries { get; init; }
     }
 
     private readonly Dictionary<string, ModuleDependencyCache> DependencyCaches = new();
@@ -67,6 +69,7 @@ public class ModuleDependenciesResolver
             List<string> IncludePaths = new();
             List<string> AdditionalMacros = new();
             List<string> ApiDescriptions = new();
+            List<string> AdditionalLibraries = new();
 
             foreach (var Depend in ModuleRule.PublicDependencyModuleNames.Concat(ModuleRule.PrivateDependencyModuleNames))
             {
@@ -76,12 +79,15 @@ public class ModuleDependenciesResolver
                 AdditionalMacros.AddRange(DependCache.AdditionalMacros);
                 ApiDescriptions.AddRange(DependCache.DependModules);
                 ApiDescriptions.Add(Depend);
+                AdditionalLibraries.AddRange(DependCache.AdditionalLibraries);
             }
 
             IncludePaths.AddRange(ModuleRule.PublicIncludePaths.Select(AsFullPath));
             IncludePaths.AddRange(ModuleRule.PrivateIncludePaths.Select(AsFullPath));
             AdditionalMacros.AddRange(ModuleRule.PublicAdditionalMacros);
             AdditionalMacros.AddRange(ModuleRule.PrivateAdditionalMacros);
+            AdditionalLibraries.AddRange(ModuleRule.PublicAdditionalLibraries);
+            AdditionalLibraries.AddRange(ModuleRule.PrivateAdditionalLibraries);
 
             DependencyCaches[Current] = new()
             {
@@ -91,6 +97,7 @@ public class ModuleDependenciesResolver
                 AdditionalMacros = AdditionalMacros.Distinct().ToArray(),
                 SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories).Where(Global.IsSourceFile).ToArray(),
                 DependModules = ApiDescriptions.Distinct().ToArray(),
+                AdditionalLibraries = AdditionalLibraries.Distinct().ToArray(),
             };
         }
     }
