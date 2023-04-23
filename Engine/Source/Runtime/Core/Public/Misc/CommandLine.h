@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "CoreTypes/String.h"
 
 class CORE_API CommandLine
 {

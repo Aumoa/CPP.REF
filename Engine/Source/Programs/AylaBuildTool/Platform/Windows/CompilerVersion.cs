@@ -2,7 +2,7 @@
 
 namespace AE.Platform.Windows;
 
-public enum Compiler
+public enum CompilerVersion
 {
     VisualStudio2022
 }

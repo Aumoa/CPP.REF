@@ -116,7 +116,7 @@ public class VisualCXXProject : IVisualStudioProject
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.props");
 
-            var Installation = VisualStudioInstallation.FindVisualStudioInstallations(Compiler.VisualStudio2022).First();
+            var Installation = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022).First();
 
             BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
             {

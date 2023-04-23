@@ -1,9 +1,8 @@
 {
   "profiles": {
-    "BuildTool": {
+    "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "Build -ProjectFile SampleGame.aproject -Target SampleGame",
-      "workingDirectory": "F:\\SampleGame"
+      "commandLineArgs": "Build -Target AEEditor"
     }
   }
 }

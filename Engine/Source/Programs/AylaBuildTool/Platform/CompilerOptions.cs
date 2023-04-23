@@ -19,4 +19,5 @@ public enum CompilerOptions
     HeaderUnit,
     ExportHeader,
     HeaderReference,
+    ShowIncludes,
 }

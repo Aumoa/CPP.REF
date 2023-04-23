@@ -15,7 +15,6 @@ public struct IntermediateDirectory
             Includes = Path.Combine(_Root, "Includes");
             ProjectFiles = Path.Combine(_Root, "ProjectFiles");
             Build = Path.Combine(_Root, "Build");
-            StdBuild = Path.Combine(Build, "Std");
             Makefiles = Path.Combine(_Root, "Makefiles");
             Unused = Path.Combine(_Root, "Unused");
         }
@@ -26,8 +25,6 @@ public struct IntermediateDirectory
     public string ProjectFiles { get; private init; }
 
     public string Build { get; private init; }
-
-    public string StdBuild { get; private init; }
 
     public string Makefiles { get; private init; }
 
@@ -53,11 +50,6 @@ public struct IntermediateDirectory
         if (Directory.Exists(Build) == false)
         {
             Directory.CreateDirectory(Build);
-        }
-
-        if (Directory.Exists(StdBuild) == false)
-        {
-            Directory.CreateDirectory(StdBuild);
         }
 
         if (Directory.Exists(Makefiles) == false)

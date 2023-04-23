@@ -20,9 +20,9 @@ public class VisualStudioInstallation : ToolChainInstallation
 
     public bool bIsPreview { get; init; }
 
-    private static readonly Dictionary<Compiler, List<VisualStudioInstallation>> CachedVisualStudioInstallations = new();
+    private static readonly Dictionary<CompilerVersion, List<VisualStudioInstallation>> CachedVisualStudioInstallations = new();
 
-    public static VisualStudioInstallation[] FindVisualStudioInstallations(Compiler InCompiler)
+    public static VisualStudioInstallation[] FindVisualStudioInstallations(CompilerVersion InCompiler)
     {
         if (CachedVisualStudioInstallations.TryGetValue(InCompiler, out var Installations) == false)
         {
@@ -51,7 +51,7 @@ public class VisualStudioInstallation : ToolChainInstallation
                     var InstallVersion = Version.Parse(Instance.GetInstallationVersion());
                     Version CurrentVersion = InCompiler switch
                     {
-                        Compiler.VisualStudio2022 => new Version(17, 0),
+                        CompilerVersion.VisualStudio2022 => new Version(17, 0),
                         _ => throw new ArgumentException(CoreStrings.Errors.CompilerNotSupported, nameof(InCompiler))
                     };
 
@@ -260,7 +260,18 @@ public class VisualStudioInstallation : ToolChainInstallation
             CompilerOptions.HeaderUnit => $"/headerUnit:{Args[0]!.ToString()!.ToLower()} \"{Args[1]}\"=\"{Args[2]}\"",
             CompilerOptions.ExportHeader => "/exportHeader",
             CompilerOptions.HeaderReference => $"/headerName:{Args[0]!.ToString()!.ToLower()} \"{Args[1]}\"",
+            CompilerOptions.ShowIncludes => $"/sourceDependencies-",
             _ => string.Empty
         };
+    }
+
+    public override Compiler SpawnCompiler()
+    {
+        return new ClCompiler(GetPrimaryCompilerName(), this);
+    }
+
+    public override string GetOutputExtension()
+    {
+        return ".obj";
     }
 }

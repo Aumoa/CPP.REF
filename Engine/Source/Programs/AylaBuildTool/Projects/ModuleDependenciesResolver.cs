@@ -7,6 +7,7 @@ using AE.BuildSettings;
 using AE.Exceptions;
 using AE.Rules;
 using AE.Source;
+using AE.SourceTree;
 using AE.System;
 
 using Microsoft.CodeAnalysis;
@@ -41,7 +42,7 @@ public class ModuleDependenciesResolver
 
         public required string[] SourceFiles { get; init; }
 
-        public required string[] ApiDescriptions { get; init; }
+        public required string[] DependModules { get; init; }
     }
 
     private readonly Dictionary<string, ModuleDependencyCache> DependencyCaches = new();
@@ -73,8 +74,8 @@ public class ModuleDependenciesResolver
                 ModuleDependencyCache? DependCache = DependencyCaches[Depend];
                 IncludePaths.AddRange(DependCache.IncludePaths);
                 AdditionalMacros.AddRange(DependCache.AdditionalMacros);
-                ApiDescriptions.AddRange(DependCache.ApiDescriptions);
-                ApiDescriptions.Add($"{Depend.ToUpper()}_API");
+                ApiDescriptions.AddRange(DependCache.DependModules);
+                ApiDescriptions.Add(Depend);
             }
 
             IncludePaths.AddRange(ModuleRule.PublicIncludePaths.Select(AsFullPath));
@@ -89,7 +90,7 @@ public class ModuleDependenciesResolver
                 IncludePaths = IncludePaths.Distinct().ToArray(),
                 AdditionalMacros = AdditionalMacros.Distinct().ToArray(),
                 SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories).Where(Global.IsSourceFile).ToArray(),
-                ApiDescriptions = ApiDescriptions.Distinct().ToArray(),
+                DependModules = ApiDescriptions.Distinct().ToArray(),
             };
         }
     }
@@ -100,4 +101,47 @@ public class ModuleDependenciesResolver
     }
 
     public IEnumerable<ModuleRules> GetModules() => Modules.Values.Select(p => p.Rule);
+
+    public async Task<Makefile> GenerateMakefileAsync(TargetRules Rule, CancellationToken SToken = default)
+    {
+        var Config = Rule.Target.BuildConfiguration;
+        var Makefile = new Makefile() { Items = new() };
+        List<Task> Tasks = new();
+
+        foreach (var (Name, Cache) in DependencyCaches)
+        {
+            foreach (var SourceFile in Cache.SourceFiles)
+            {
+                if (Global.IsSourceCode(SourceFile))
+                {
+                    Tasks.Add(SourceCodeHash.GenerateHashAsync(SourceFile).ContinueWith(p =>
+                    {
+                        string Intermediate = Cache.ProjectDir.Intermediate.Root;
+                        string Output = Path.Combine(Cache.ProjectDir.Intermediate.Build, Config.Platform.TargetName, Config.Configuration.ToString(), Name);
+
+                        var Item = new MakefileCompile
+                        {
+                            SourceCode = SourceFile,
+                            Hash = p.Result,
+                            ModuleName = Name,
+                            Intermediate = Intermediate,
+                            DependModules = Cache.DependModules,
+                            IncludePaths = Cache.IncludePaths,
+                            AdditionalMacros = Cache.AdditionalMacros,
+                            Output = Output,
+                            IncludeHashes = new()
+                        };
+
+                        lock (Makefile)
+                        {
+                            Makefile.Items.Add(Item);
+                        }
+                    }));
+                }
+            }
+        }
+
+        await Task.WhenAll(Tasks);
+        return Makefile;
+    }
 }

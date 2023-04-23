@@ -52,7 +52,6 @@ public readonly struct ProjectDirectory
     public void Cleanup()
     {
         DirectoryExtensions.Cleanup(Intermediate.Build);
-        DirectoryExtensions.Cleanup(Intermediate.StdBuild);
         DirectoryExtensions.Cleanup(Intermediate.Includes);
         DirectoryExtensions.Cleanup(Intermediate.Makefiles);
         DirectoryExtensions.Cleanup(Binaries.Win64);

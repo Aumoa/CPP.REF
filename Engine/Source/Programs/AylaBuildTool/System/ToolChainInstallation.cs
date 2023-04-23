@@ -26,4 +26,8 @@ public abstract class ToolChainInstallation
     public abstract string GetPrimaryCompilerName();
 
     public abstract string GetCompilerOptions(CompilerOptions Options, params object?[] Args);
+
+    public abstract Compiler SpawnCompiler();
+
+    public abstract string GetOutputExtension();
 }

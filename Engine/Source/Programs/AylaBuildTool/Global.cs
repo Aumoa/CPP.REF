@@ -39,7 +39,7 @@ public static class Global
     public static bool IsSourceCode(string Name)
     {
         string Ext = Path.GetExtension(Name).ToLower();
-        return Ext == ".ixx";
+        return Ext == ".cpp";
     }
 
     public static bool IsHeaderFile(string Name)
