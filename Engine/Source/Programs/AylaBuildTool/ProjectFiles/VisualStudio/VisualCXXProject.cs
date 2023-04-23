@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
@@ -7,12 +8,15 @@ using AE.BuildSettings;
 using AE.Misc;
 using AE.Platform.Windows;
 using AE.Projects;
+using AE.Rules;
 using AE.Source;
 
 namespace AE.ProjectFiles.VisualStudio;
 
 public class VisualCXXProject : IVisualStudioProject
 {
+    public required Workspace Workspace { get; init; }
+
     public required string TargetName { get; init; }
 
     public required string ProjectGuid { get; init; }
@@ -28,6 +32,7 @@ public class VisualCXXProject : IVisualStudioProject
     [SetsRequiredMembers]
     public VisualCXXProject(Workspace InWorkspace, ProjectDirectory ProjectDirectory, string ProjectName, string SourceDirectory, string FilterPath)
     {
+        this.Workspace = InWorkspace;
         this.TargetName = ProjectName;
         this.ProjectGuid = CRC32.GenerateGuid(FilterPath + '/' + ProjectName).ToString().ToUpper();
         this.FilterPath = FilterPath;
@@ -43,7 +48,7 @@ public class VisualCXXProject : IVisualStudioProject
 
     public async Task GenerateProjectFilesAsync(CancellationToken SToken = default)
     {
-        GenerateXmlDocument(out var Vcxproj, out var VcxprojFilter, out var VcxprojUser);
+        var (Vcxproj, VcxprojFilter, VcxprojUser) = GenerateXmlDocument();
         await Task.WhenAll(new[]
         {
             WriteXml(Vcxproj, ProjectFile, ".vcxproj", SToken),
@@ -61,7 +66,7 @@ public class VisualCXXProject : IVisualStudioProject
         await Global.CompareAndWriteAsync(Path.ChangeExtension(SaveToBase, SaveToExt), Writer.ToString(), SToken);
     }
 
-    public void GenerateXmlDocument(out XmlDocument Vcxproj, out XmlDocument VcxprojFilters, out XmlDocument VcxprojUser)
+    public (XmlDocument, XmlDocument, XmlDocument) GenerateXmlDocument()
     {
         HashSet<string> SourceFiles = new();
 
@@ -116,7 +121,7 @@ public class VisualCXXProject : IVisualStudioProject
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.props");
 
-            var Installation = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022).First();
+            var ToolChain = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022).First();
 
             BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
             {
@@ -130,18 +135,47 @@ public class VisualCXXProject : IVisualStudioProject
                 string BuildToolPath = Global.BuildToolPath;
                 BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
 
-                var IncludePaths = Installation.GetRequiredIncludePaths(Platform.Architecture);
+                var IncludePaths = ToolChain.GetRequiredIncludePaths(Platform.Architecture);
 
                 PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp}";
                 PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp}";
                 PropertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{BuildToolPath} Clean";
                 PropertyGroup.AddElement("OutDir").InnerText = ProjectDirectory.Binaries.Win64;
                 PropertyGroup.AddElement("IntDir").InnerText = ProjectDirectory.Intermediate.Unused;
+
+                List<string> Macros = new();
+                PlatformGroup.ForEach(p =>
+                {
+                    if (p == PlatformGroup.Windows)
+                    {
+                        Macros.Add($"{p.ToDefinition()}=1");
+                    }
+                    else
+                    {
+                        Macros.Add($"{p.ToDefinition()}=0");
+                    }
+                });
+
+                if (bEditor)
+                {
+                    Macros.Add("WITH_EDITOR=1");
+                }
+                else
+                {
+                    Macros.Add("WITH_EDITOR=0");
+                }
+
+                Macros.Add("UNICODE");
+                Macros.Add("_UNICODE");
+
+                PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = string.Join(';', IncludePaths);
+                PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
+                PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', Macros);
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
 
-            XmlElement? AddSourceFile(string Filename)
+            XmlElement? AddSourceFile(ModuleDependenciesResolver.ModuleDependencyCache? Module, string Filename)
             {
                 if (SourceFiles.Add(Filename) == false)
                 {
@@ -153,6 +187,22 @@ public class VisualCXXProject : IVisualStudioProject
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", Filename);
+
+                    if (Module != null)
+                    {
+                        IEnumerable<string> Macros = Module.AdditionalMacros;
+                        Macros = Macros.Concat(Module.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"));
+                        Macros = Macros.Append($"{Module.Name.ToUpper()}_API=__declspec(dllexport)");
+
+                        var PreprocessorDefinitions = ClCompile.AddElement("PreprocessorDefinitions");
+                        PreprocessorDefinitions.InnerText = $"{string.Join(';', Macros)};%(PreprocessorDefinitions)";
+
+                        string GeneratedInclude = Path.Combine(Module.ProjectDir.Intermediate.Includes, Module.Name);
+
+                        var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
+                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.IncludePaths.Append(GeneratedInclude))};%(AdditionalIncludeDirectories)";
+                    }
+
                     return ClCompile;
                 }
                 else if (Global.IsHeaderFile(Extension))
@@ -177,43 +227,45 @@ public class VisualCXXProject : IVisualStudioProject
                 return null;
             }
 
-            foreach (var SourceFile in Directory.GetFiles(SourceDirectory, "*", SearchOption.AllDirectories))
+            void SearchDirectory(ModuleDependenciesResolver.ModuleDependencyCache? Module, string CurrentDirectory)
             {
-                if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false && SourceFile.StartsWith(ProjectDirectory.Source.Programs))
+                if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false && CurrentDirectory.StartsWith(ProjectDirectory.Source.Programs))
                 {
-                    continue;
+                    return;
                 }
 
-                AddSourceFile(SourceFile);
+                string[] ModuleFile = Directory.GetFiles(CurrentDirectory, "*.Module.cs", SearchOption.TopDirectoryOnly);
+                if (ModuleFile.Any())
+                {
+                    string ModuleName = Path.GetFileName(ModuleFile[0]).Replace(".Module.cs", "");
+                    Dictionary<string, SearchedModule> SearchedModules = new();
+                    var TargetRule = new TargetRules(new TargetInfo
+                    {
+                        BuildConfiguration = new()
+                        {
+                            Configuration = Configuration.Development,
+                            Platform = TargetPlatform.Win64
+                        }
+                    }, ModuleName);
+                    Global.SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
+
+                    var Resolver = new ModuleDependenciesResolver(TargetRule, SearchedModules, ToolChain);
+                    Resolver.Resolve();
+                    Module = Resolver.GetDependencyCache(ModuleName);
+                }
+
+                foreach (var SourceFile in Directory.GetFiles(CurrentDirectory, "*", SearchOption.TopDirectoryOnly))
+                {
+                    AddSourceFile(Module, SourceFile);
+                }
+
+                foreach (var Subdirectory in Directory.GetDirectories(CurrentDirectory, "*", SearchOption.TopDirectoryOnly))
+                {
+                    SearchDirectory(Module, Subdirectory);
+                }
             }
 
-            //foreach (var ModuleName in CXXProject.GetModules())
-            //{
-            //    var Resolved = CXXProject.GetModuleRule(ModuleName);
-            //    if (Resolved == null)
-            //    {
-            //        continue;
-            //    }
-
-            //    foreach (var Filename in Resolved.SourceFiles)
-            //    {
-            //        XmlElement? Elem = AddSourceFile(Filename);
-            //        if (Elem != null)
-            //        {
-            //            string FilterSharedLibrary(string p)
-            //                => p.Replace("${CMAKE_SHARED_LIBRARY_EXPORT}", "__declspec(dllexport)")
-            //                    .Replace("${CMAKE_SHARED_LIBRARY_IMPORT}", "__declspec(dllimport)");
-
-            //            var PreprocessorDefinitions = Elem.AddElement("PreprocessorDefinitions");
-            //            PreprocessorDefinitions.InnerText = $"{string.Join(';', Resolved.AdditionalMacros.Select(FilterSharedLibrary))};%(PreprocessorDefinitions)";
-
-            //            var AdditionalIncludeDirectories = Elem.AddElement("AdditionalIncludeDirectories");
-            //            AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Resolved.IncludePaths)};%(AdditionalIncludeDirectories)";
-            //        }
-            //    }
-            //}
-
-            //AddSourceFile(CXXProject.TargetFile);
+            SearchDirectory(null, SourceDirectory);
 
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.targets");
@@ -221,7 +273,7 @@ public class VisualCXXProject : IVisualStudioProject
             var ImportGroup = Project.AddElement("ImportGroup");
             ImportGroup.SetAttribute("Label", "ExtensionTargets");
         }
-        Vcxproj = Doc;
+        var Vcxproj = Doc;
 
         Doc = new();
         Doc.AddXmlDeclaration("1.0", "utf-8");
@@ -291,7 +343,7 @@ public class VisualCXXProject : IVisualStudioProject
                 }
             }
         }
-        VcxprojFilters = Doc;
+        var VcxprojFilters = Doc;
 
         Doc = new();
         Doc.AddXmlDeclaration("1.0", "utf-8");
@@ -303,17 +355,35 @@ public class VisualCXXProject : IVisualStudioProject
                 var PropertyGroup = Project.AddElement("PropertyGroup");
                 PropertyGroup.SetAttribute("Condition", $"'$(Platform)'=='{Platform}'");
 
-                //string Executable = Path.Combine(CXXProject.Workspace.BinariesDirectory, Platform.ToString(), CXXProject.Rules.TargetModuleName);
-                //Executable = Path.ChangeExtension(Executable, ".exe");
-                //PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
+                bool bIsProgram = SourceDirectory != ProjectDirectory.Source.Root;
+                string Executable;
+                string? LaunchDLL = null;
+                if (bIsProgram)
+                {
+                    Executable = Path.GetFileNameWithoutExtension(SourceDirectory);
+                }
+                else
+                {
+                    Executable = "Launch";
+                    if (ProjectDirectory.Root != Global.EngineDirectory.Root)
+                    {
+                        LaunchDLL = Path.ChangeExtension(ProjectDirectory.Name, ".dll");
+                    }
+                }
 
-                //string WorkingDirectory = Path.GetDirectoryName(Executable)!;
-                //PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = WorkingDirectory;
+                Executable = Path.ChangeExtension(Executable, ".exe");
+                PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
+                PropertyGroup.AddElement("LocalDebuggerCommandArguments").InnerText = LaunchDLL ?? "";
 
-                //PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
-                //PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
+                string WorkingDirectory = Path.GetDirectoryName(Executable)!;
+                PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = "$(OutDir)";
+
+                PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
+                PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
             }
         }
-        VcxprojUser = Doc;
+        var VcxprojUser = Doc;
+
+        return (Vcxproj, VcxprojFilters, VcxprojUser);
     }
 }

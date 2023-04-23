@@ -124,4 +124,5 @@ void AylaHeaderTool::PrintUsage(TextWriter& Writer)
 	Writer.WriteLine(TEXT("    -SourceLocation   [String]    Specify source code location to parse."));
 	Writer.WriteLine(TEXT("    -Build            [String]    Specify build location to save reflection code generated."));
 	Writer.WriteLine(TEXT("    -Output           [String]    Specify build output location to desire C# project output."));
+	Writer.WriteLine(TEXT("    -Includes         [String]    Specify include location to save reflection code generated."));
 }

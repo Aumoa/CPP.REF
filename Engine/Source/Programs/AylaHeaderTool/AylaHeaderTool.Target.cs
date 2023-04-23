@@ -7,7 +7,6 @@ public class AylaHeaderToolTarget : TargetRules
 {
     public AylaHeaderToolTarget(TargetInfo Info) : base(Info)
     {
-        Class = TargetClass.Program;
         Type = TargetType.ConsoleApplication;
     }
 }

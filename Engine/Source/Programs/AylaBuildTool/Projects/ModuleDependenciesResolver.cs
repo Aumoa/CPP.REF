@@ -18,12 +18,12 @@ public class ModuleDependenciesResolver
 {
     public required TargetRules Rule { get; init; }
 
-    public required Dictionary<string, (ModuleRules Rule, ProjectDirectory ProjectDir, string SourceDir)> Modules { get; init; } = new();
+    public required Dictionary<string, SearchedModule> Modules { get; init; } = new();
 
     public required ToolChainInstallation ToolChain { get; init; }
 
     [SetsRequiredMembers]
-    public ModuleDependenciesResolver(TargetRules Rule, Dictionary<string, (ModuleRules, ProjectDirectory, string)> Modules, ToolChainInstallation ToolChain)
+    public ModuleDependenciesResolver(TargetRules Rule, Dictionary<string, SearchedModule> Modules, ToolChainInstallation ToolChain)
     {
         this.Rule = Rule;
         this.Modules = Modules;
@@ -36,6 +36,8 @@ public class ModuleDependenciesResolver
 
         public required ProjectDirectory ProjectDir { get; init; }
 
+        public required TargetType TargetType { get; init; }
+
         public required string[] IncludePaths { get; init; }
 
         public required string[] AdditionalMacros { get; init; }
@@ -45,6 +47,8 @@ public class ModuleDependenciesResolver
         public required string[] DependModules { get; init; }
 
         public required string[] AdditionalLibraries { get; init; }
+
+        public required int[] DisableWarnings { get; init; }
     }
 
     private readonly Dictionary<string, ModuleDependencyCache> DependencyCaches = new();
@@ -52,14 +56,17 @@ public class ModuleDependenciesResolver
     public void Resolve()
     {
         Debug.Assert(DependencyCaches.Count == 0);
-        SearchDependencyRecursive(Rule.TargetModuleName);
+        SearchDependencyRecursive(Rule.TargetModuleName, true);
     }
 
-    private void SearchDependencyRecursive(string Current)
+    private void SearchDependencyRecursive(string Current, bool bPrimary)
     {
         if (DependencyCaches.TryGetValue(Current, out ModuleDependencyCache? DependencyCache) == false)
         {
-            var (ModuleRule, ProjectDir, SourcePath) = Modules[Current];
+            var CurrentSearchedModule = Modules[Current];
+            string SourcePath = CurrentSearchedModule.Location;
+            var ModuleRule = CurrentSearchedModule.Rule;
+            var ProjectDir = CurrentSearchedModule.ProjectDir;
 
             string AsFullPath(string CurrentPath)
             {
@@ -70,16 +77,18 @@ public class ModuleDependenciesResolver
             List<string> AdditionalMacros = new();
             List<string> ApiDescriptions = new();
             List<string> AdditionalLibraries = new();
+            List<int> DisableWarnings = new();
 
             foreach (var Depend in ModuleRule.PublicDependencyModuleNames.Concat(ModuleRule.PrivateDependencyModuleNames))
             {
-                SearchDependencyRecursive(Depend);
+                SearchDependencyRecursive(Depend, false);
                 ModuleDependencyCache? DependCache = DependencyCaches[Depend];
                 IncludePaths.AddRange(DependCache.IncludePaths);
                 AdditionalMacros.AddRange(DependCache.AdditionalMacros);
                 ApiDescriptions.AddRange(DependCache.DependModules);
                 ApiDescriptions.Add(Depend);
                 AdditionalLibraries.AddRange(DependCache.AdditionalLibraries);
+                DisableWarnings.AddRange(DependCache.DisableWarnings);
             }
 
             IncludePaths.AddRange(ModuleRule.PublicIncludePaths.Select(AsFullPath));
@@ -88,16 +97,20 @@ public class ModuleDependenciesResolver
             AdditionalMacros.AddRange(ModuleRule.PrivateAdditionalMacros);
             AdditionalLibraries.AddRange(ModuleRule.PublicAdditionalLibraries);
             AdditionalLibraries.AddRange(ModuleRule.PrivateAdditionalLibraries);
+            DisableWarnings.AddRange(ModuleRule.PublicDisableWarnings);
+            DisableWarnings.AddRange(ModuleRule.PrivateDisableWarnings);
 
             DependencyCaches[Current] = new()
             {
                 Name = Current,
+                TargetType = bPrimary ? Rule.Type : TargetType.Module,
                 ProjectDir = ProjectDir,
                 IncludePaths = IncludePaths.Distinct().ToArray(),
                 AdditionalMacros = AdditionalMacros.Distinct().ToArray(),
                 SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories).Where(Global.IsSourceFile).ToArray(),
                 DependModules = ApiDescriptions.Distinct().ToArray(),
                 AdditionalLibraries = AdditionalLibraries.Distinct().ToArray(),
+                DisableWarnings = DisableWarnings.Distinct().ToArray(),
             };
         }
     }
@@ -135,6 +148,7 @@ public class ModuleDependenciesResolver
                             DependModules = Cache.DependModules,
                             IncludePaths = Cache.IncludePaths,
                             AdditionalMacros = Cache.AdditionalMacros,
+                            DisableWarnings = Cache.DisableWarnings,
                             Output = Output,
                             IncludeHashes = new()
                         };

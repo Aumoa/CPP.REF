@@ -69,7 +69,10 @@ public record Makefile
 
                     foreach (var Compile in Compiles2)
                     {
-                        Compiles[Compile.SourceCode] = Compile;
+                        lock (Compiles)
+                        {
+                            Compiles[Compile.SourceCode] = Compile;
+                        }
                     }
                 }));
             }

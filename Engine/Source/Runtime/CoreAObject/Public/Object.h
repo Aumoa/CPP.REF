@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "ObjectMacros.h"
-#include "Object.generated.h"
+//#include "Object.generated.h"
 
 ACLASS()
 class COREAOBJECT_API AObject
 {
-	GENERATED_BODY()
+	//GENERATED_BODY()
 
 public:
 	AObject();

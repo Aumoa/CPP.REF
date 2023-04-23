@@ -2,6 +2,9 @@
 
 using System.Reflection;
 
+using AE.Exceptions;
+using AE.Projects;
+using AE.Rules;
 using AE.Source;
 
 namespace AE;
@@ -66,5 +69,30 @@ public static class Global
             || IsHeaderFile(Name)
             || IsRuleFile(Name)
             || IsNatvisFile(Name);
+    }
+
+    public static void SearchCXXModulesRecursive(Workspace InWorkspace, TargetRules Rule, Dictionary<string, SearchedModule> SearchedModules, string FromModule, string CurrentModule)
+    {
+        if (SearchedModules.TryGetValue(CurrentModule, out var ModuleRule) == false)
+        {
+            ACXXModule? Module = InWorkspace.SearchCXXModuleByName(CurrentModule);
+            if (Module == null)
+            {
+                throw new TerminateException(8, CoreStrings.Errors.DependencyModuleNotFound, FromModule, CurrentModule);
+            }
+
+            ModuleRule = new()
+            {
+                Rule = Module.GenerateModuleRule(Rule),
+                ProjectDir = Module.ProjectDirectory,
+                Location = Module.SourcePath
+            };
+            SearchedModules.Add(CurrentModule, ModuleRule);
+
+            foreach (var NextModule in ModuleRule.Rule.PublicDependencyModuleNames.Concat(ModuleRule.Rule.PrivateDependencyModuleNames))
+            {
+                SearchCXXModulesRecursive(InWorkspace, Rule, SearchedModules, CurrentModule, NextModule);
+            }
+        }
     }
 }

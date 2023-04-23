@@ -47,6 +47,10 @@ Console.CancelKeyPress += (Sender, EventArgs) =>
     CTS.Cancel();
 };
 
+Console.WriteLine(Console.OutputEncoding);
+Console.OutputEncoding = KnownEncodings.EUCKR;
+Console.WriteLine(Console.OutputEncoding);
+
 try
 {
     var Executor = (IExecutor)Constructor.Invoke(new object[] { CommandLineParser.Parse(args[1..]) });

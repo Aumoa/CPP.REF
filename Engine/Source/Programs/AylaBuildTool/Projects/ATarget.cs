@@ -15,14 +15,17 @@ namespace AE.Projects;
 public class ATarget
 {
     [SetsRequiredMembers]
-    public ATarget(ProjectDirectory ProjectDirectory, string TargetName)
+    public ATarget(ProjectDirectory ProjectDirectory, string SourceCode)
     {
-        this.TargetName = TargetName;
-        this.RuleName = $"{TargetName}Target";
+        this.TargetName = Path.GetFileNameWithoutExtension(SourceCode.Replace(".Target.cs", ""));
+        this.SourceCode = SourceCode;
+        this.RuleName = TargetName;
         this.ProjectDirectory = ProjectDirectory;
     }
 
     public required string TargetName { get; init; }
+
+    public required string SourceCode { get; init; }
 
     public required string RuleName { get; init; }
 
@@ -42,7 +45,7 @@ public class ATarget
         {
             if (CachedAssembly == null)
             {
-                string Filename = Path.ChangeExtension(TargetName, ".Target.cs");
+                string Filename = SourceCode;
                 string TargetCodePath = Path.Combine(ProjectDirectory.Source.Root, Filename);
                 if (TargetCodePath == null)
                 {

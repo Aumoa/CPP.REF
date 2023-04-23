@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 using AE.BuildSettings;
@@ -44,25 +45,33 @@ public class ClCompiler : Compiler
         PSI.RedirectStandardOutput = true;
         PSI.RedirectStandardError = true;
         PSI.StandardOutputEncoding = KnownEncodings.EUCKR;
+        PSI.StandardErrorEncoding = KnownEncodings.EUCKR;
 
         string Output = Item.Output;
+        string Pdb = Path.Combine(Output, Path.ChangeExtension(Path.GetFileName(Item.SourceCode), ".pdb"));
         if (Directory.Exists(Output) == false)
         {
             Directory.CreateDirectory(Output);
         }
-        PSI.Arguments = $"/nologo /c /Fo\"{Output}\\\\\" /std:c++20 /EHsc /showIncludes";
+        PSI.Arguments = $"/nologo /c /Fo\"{Output}\\\\\" /Fd\"{Pdb}\" /std:c++20 /EHsc /showIncludes /Zc:wchar_t /GS /GL /W3 /Gy /Zi /O2 /sdl";
 
         // Appending additional arguments.
-        string IncludePaths = string.Join(' ', Item.IncludePaths.Select(p => $"/I\"{p}\""));
+        string GeneratedInclude = Path.Combine(Item.Intermediate, "Includes", Item.ModuleName);
+        string IncludePaths = string.Join(' ', Item.IncludePaths.Append(GeneratedInclude).Select(p => $"/I\"{p}\""));
         PSI.Arguments += $" {IncludePaths}";
         List<string> Macros = new();
         Macros.AddRange(GenerateBuildMacros(Rule).Select(p => $"/D\"{p.Item1}\"=\"{p.Item2}\""));
         Macros.AddRange(Item.AdditionalMacros.Select(p => $"/D\"{p}\""));
         Macros.AddRange(Item.DependModules.Select(p => $"/D\"{p.ToUpper()}_API\"=\"__declspec(dllimport)\""));
         Macros.Add($"/D\"{Item.ModuleName.ToUpper()}_API\"=\"__declspec(dllexport)\"");
+        Macros.Add("/DUNICODE");
+        Macros.Add("/D_UNICODE");
 
         string AdditionalMacros = string.Join(' ', Macros);
         PSI.Arguments += $" {AdditionalMacros}";
+
+        string DisableWarnings = string.Join(' ', Item.DisableWarnings.Select(p => $"/wd{p}"));
+        PSI.Arguments += $" {DisableWarnings}";
 
         // Include source.
         PSI.Arguments += $" {Item.SourceCode}";

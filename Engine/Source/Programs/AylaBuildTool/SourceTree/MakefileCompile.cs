@@ -22,6 +22,8 @@ public sealed record MakefileCompile : IEquatable<MakefileCompile>
 
     public required string[] AdditionalMacros { get; init; }
 
+    public required int[] DisableWarnings { get; init; }
+
     public required Dictionary<string, SourceCodeHash> IncludeHashes { get; set; }
 
     public void Serialize(BinaryWriter Writer)
@@ -34,6 +36,7 @@ public sealed record MakefileCompile : IEquatable<MakefileCompile>
         Writer.Write(DependModules);
         Writer.Write(IncludePaths);
         Writer.Write(AdditionalMacros);
+        Writer.Write(DisableWarnings);
         Writer.Write(IncludeHashes.Count);
         foreach (var (Filename, Hash) in IncludeHashes)
         {
@@ -52,6 +55,7 @@ public sealed record MakefileCompile : IEquatable<MakefileCompile>
         string[] DependModules = Reader.ReadStringArray();
         string[] IncludePaths = Reader.ReadStringArray();
         string[] AdditionalMacros = Reader.ReadStringArray();
+        int[] IgnoreWarnings = Reader.ReadInt32Array();
         int IncludeHashes_Length = Reader.ReadInt32();
         Dictionary<string, SourceCodeHash> IncludeHashes = new();
         for (int i = 0; i < IncludeHashes_Length; ++i)
@@ -69,6 +73,7 @@ public sealed record MakefileCompile : IEquatable<MakefileCompile>
             DependModules = DependModules,
             IncludePaths = IncludePaths,
             AdditionalMacros = AdditionalMacros,
+            DisableWarnings = IgnoreWarnings,
             Output = Output,
             IncludeHashes = IncludeHashes,
         };

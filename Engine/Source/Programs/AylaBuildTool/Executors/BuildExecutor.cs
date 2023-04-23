@@ -8,7 +8,6 @@ using AE.Platform;
 using AE.Platform.Windows;
 using AE.Projects;
 using AE.Rules;
-using AE.Source;
 using AE.SourceTree;
 using AE.System;
 
@@ -60,8 +59,8 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             }
         };
         TargetRules TargetRule = CurrentTarget.GenerateTargetRule(TargetInfo);
-        Dictionary<string, (ModuleRules, ProjectDirectory, string)> SearchedModules = new();
-        SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
+        Dictionary<string, SearchedModule> SearchedModules = new();
+        Global.SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
 
         var Installations = VisualStudioInstallation.FindVisualStudioInstallations(Platform.Windows.CompilerVersion.VisualStudio2022);
         if (Installations.Any() == false)
@@ -125,7 +124,6 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                         }
 
                         // Rethrowing.
-                        _ = p.Result;
                         return false;
                     }
                 });
@@ -161,30 +159,30 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                     return await PreviousTask;
                 }
 
-                var DependencyCache = Resolver.GetDependencyCache(ModuleName);
-
-                IEnumerable<Task<bool>> CompileTasks = Enumerable.Empty<Task<bool>>();
-                if (LinkDepends.TryGetValue(ModuleName, out var TasksList))
+                try
                 {
-                    CompileTasks = TasksList;
-                }
+                    var DependencyCache = Resolver.GetDependencyCache(ModuleName);
 
-                bool[] bResults = await Task.WhenAll(CompileTasks.Distinct());
-                if (bResults.Contains(false))
-                {
-                    return false;
-                }
+                    IEnumerable<Task<bool>> CompileTasks = Enumerable.Empty<Task<bool>>();
+                    if (LinkDepends.TryGetValue(ModuleName, out var TasksList))
+                    {
+                        CompileTasks = TasksList;
+                    }
 
-                foreach (var Depend in DependencyCache.DependModules)
-                {
-                    if (await StartLinkerAsync(Depend, SToken) == false)
+                    bool[] bResults = await Task.WhenAll(CompileTasks.Distinct());
+                    if (bResults.Contains(false))
                     {
                         return false;
                     }
-                }
 
-                try
-                {
+                    foreach (var Depend in DependencyCache.DependModules)
+                    {
+                        if (await StartLinkerAsync(Depend, SToken) == false)
+                        {
+                            return false;
+                        }
+                    }
+
                     var Config = TargetInfo.BuildConfiguration;
 
                     var Linker = ToolChain.SpawnLinker();
@@ -192,14 +190,23 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
                     Console.Write(Output);
 
                     TCS.SetResult(true);
+                    TCS = null;
                     return true;
                 }
-                catch (TerminateException? TE)
+                catch (TerminateException TE)
                 {
                     Console.Error.WriteLine(TE.Message);
                     ReturnCode = TE.ErrorCode;
-                    TCS.SetResult(false);
                     return false;
+                }
+                catch (Exception E)
+                {
+                    Console.Error.WriteLine(E);
+                    return false;
+                }
+                finally
+                {
+                    TCS?.SetResult(false);
                 }
             }
 
@@ -209,27 +216,5 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         await Task.WhenAll(Linkers.Values);
         await Makefile.SaveMakefileCacheAsync(TargetRule, SToken);
         return ReturnCode;
-    }
-
-    private static void SearchCXXModulesRecursive(Workspace InWorkspace, TargetRules Rule, Dictionary<string, (ModuleRules, ProjectDirectory, string)> SearchedModules, string FromModule, string CurrentModule)
-    {
-        if (SearchedModules.TryGetValue(CurrentModule, out var ModuleRule) == false)
-        {
-            ACXXModule? Module = InWorkspace.SearchCXXModuleByName(CurrentModule);
-            if (Module == null)
-            {
-                throw new TerminateException(8, CoreStrings.Errors.DependencyModuleNotFound, FromModule, CurrentModule);
-            }
-
-            ModuleRule.Item1 = Module.GenerateModuleRule(Rule);
-            ModuleRule.Item2 = Module.ProjectDirectory;
-            ModuleRule.Item3 = Module.SourcePath;
-            SearchedModules.Add(CurrentModule, ModuleRule);
-
-            foreach (var NextModule in ModuleRule.Item1.PublicDependencyModuleNames.Concat(ModuleRule.Item1.PrivateDependencyModuleNames))
-            {
-                SearchCXXModulesRecursive(InWorkspace, Rule, SearchedModules, CurrentModule, NextModule);
-            }
-        }
     }
 }

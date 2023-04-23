@@ -30,26 +30,26 @@ public class Workspace
 
     private async Task CollectModuleInSubdirectoryRecursiveAsync(ProjectDirectory Target, string InSubdirectory, CancellationToken SToken = default)
     {
-        string[] ModulePath = Directory.GetFiles(InSubdirectory, "*.Module.cs");
-        if (ModulePath.Any())
-        {
-            var CXXModule = new ACXXModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
-            await CXXModule.ConfigureAsync(SToken);
-            CXXModules.Add(CXXModule.ModuleName, CXXModule);
-            return;
-        }
-
-        ModulePath = Directory.GetFiles(InSubdirectory, "*.csproj");
+        string[] ModulePath = Directory.GetFiles(InSubdirectory, "*.csproj");
         if (ModulePath.Any())
         {
             CSModules.Add(new ACSModule(Target, InSubdirectory));
             return;
         }
 
+        ModulePath = Directory.GetFiles(InSubdirectory, "*.Module.cs");
+        if (ModulePath.Any())
+        {
+            var CXXModule = new ACXXModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
+            await CXXModule.ConfigureAsync(SToken);
+            CXXModules.Add(CXXModule.ModuleName, CXXModule);
+        }
+
         ModulePath = Directory.GetFiles(InSubdirectory, "*.Target.cs");
         foreach (var TargetPath in ModulePath)
         {
-            var Instance = new ATarget(Target, Path.GetFileName(TargetPath).Replace(".Target.cs", ""));
+            var RelativePath = Path.GetRelativePath(Target.Source.Root, TargetPath);
+            var Instance = new ATarget(Target, RelativePath);
             Targets.Add(Instance.TargetName, Instance);
         }
 

@@ -20,6 +20,7 @@ bool Directory::TryCreateDirectory(String InPath, std::error_code* OutErrorCode)
 			*OutErrorCode = ec_;
 		}
 	}
+
 	return success;
 }
 

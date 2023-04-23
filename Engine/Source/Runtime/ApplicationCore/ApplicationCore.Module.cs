@@ -30,6 +30,7 @@ public class ApplicationCore : ModuleRules
 
             PrivateAdditionalLibraries.AddRange(new[]
             {
+                "Gdi32.lib",
                 "gdiplus.lib"
             });
         }

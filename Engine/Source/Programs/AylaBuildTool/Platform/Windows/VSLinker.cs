@@ -62,11 +62,30 @@ public class VSLinker : Linker
         PSI.RedirectStandardError = true;
         PSI.StandardOutputEncoding = KnownEncodings.EUCKR;
 
-        BinaryOut = Path.ChangeExtension(BinaryOut, ".dll");
-        IEnumerable<string> DynamicBases = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
-        DynamicBases = DynamicBases.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));
-        string DynamicBase = string.Join(' ', DynamicBases);
-        PSI.Arguments = $"/nologo /DLL /DEBUG /DYNAMICBASE {DynamicBase} /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.obj\"";
+        IEnumerable<string> LinkLibraries = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
+        LinkLibraries = LinkLibraries.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));
+        string LinkLibrary = string.Join(' ', LinkLibraries);
+        LinkLibrary = $"/DYNAMICBASE {LinkLibrary}";
+
+        string Subsystem = string.Empty;
+
+        if (Module.TargetType == TargetType.Module)
+        {
+            BinaryOut = Path.ChangeExtension(BinaryOut, ".dll");
+            Subsystem = "/DLL";
+        }
+        else if (Module.TargetType == TargetType.ConsoleApplication)
+        {
+            BinaryOut = Path.ChangeExtension(BinaryOut, ".exe");
+            Subsystem = "/SUBSYSTEM:CONSOLE";
+        }
+        else if (Module.TargetType == TargetType.SlateApplication)
+        {
+            BinaryOut = Path.ChangeExtension(BinaryOut, ".exe");
+            Subsystem = "/SUBSYSTEM:WINDOWS";
+        }
+
+        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" /LTCG \"{BuildDir}\\*.obj\"";
 
         Process? P = Process.Start(PSI);
         if (P == null)

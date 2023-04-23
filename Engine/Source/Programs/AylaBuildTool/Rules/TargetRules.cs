@@ -16,7 +16,15 @@ public class TargetRules
         Target = Info;
         Name = GetType().Name.Replace("Target", "");
         Platform = Info.BuildConfiguration.Platform;
-        TargetModuleName = GetType().Name.Replace("Target", "");
+        TargetModuleName = Name;
+    }
+
+    internal TargetRules(TargetInfo Info, string Name)
+    {
+        Target = Info;
+        this.Name = Name;
+        Platform = Info.BuildConfiguration.Platform;
+        TargetModuleName = Name;
     }
 
     public TargetInfo Target { get; }
