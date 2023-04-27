@@ -98,7 +98,7 @@ public class VisualStudioInstallation : ToolChainInstallation
             string ArchPath = TargetArchitecture switch
             {
                 Architecture.x64 => "x64",
-                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture, TargetArchitecture))
+                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture(TargetArchitecture.ToString())))
             };
 
             string CompilerPath;
@@ -145,7 +145,7 @@ public class VisualStudioInstallation : ToolChainInstallation
             string ArchPath = InArchitecture switch
             {
                 Architecture.x64 => "x64",
-                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture, InArchitecture))
+                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture(InArchitecture.ToString())))
             };
 
             List<string> CandidateVersions = new();

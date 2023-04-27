@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 using AE.BuildSettings;
+using AE.Compile;
 using AE.Exceptions;
+using AE.Misc;
 using AE.Rules;
 using AE.Source;
 using AE.SourceTree;
@@ -122,47 +124,116 @@ public class ModuleDependenciesResolver
 
     public IEnumerable<ModuleRules> GetModules() => Modules.Values.Select(p => p.Rule);
 
-    public async Task<Makefile> GenerateMakefileAsync(TargetRules Rule, CancellationToken SToken = default)
+    public async Task<Dictionary<ModuleDependencyCache, Makefile>> GenerateMakefilesAsync(TargetRules Rule, CancellationToken SToken = default)
     {
         var Config = Rule.Target.BuildConfiguration;
-        var Makefile = new Makefile() { Items = new() };
-        List<Task> Tasks = new();
+        List<Task<(ModuleDependencyCache, Makefile)>> Tasks = new();
 
         foreach (var (Name, Cache) in DependencyCaches)
         {
-            foreach (var SourceFile in Cache.SourceFiles)
+            string MakefileDir = Path.Combine(Cache.ProjectDir.Intermediate.Build, Config.Platform.TargetName, Config.Configuration.ToString(), Name);
+            Tasks.Add(Makefile.LoadMakefileCacheAsync(MakefileDir).ContinueWith(p =>
             {
-                if (Global.IsSourceCode(SourceFile))
+                Makefile Makefile = p.Result;
+
+                Dictionary<string, MakefileCache> MakefileCaches = Makefile.Caches.ToDictionary(p => p.SourceCodePath, p => p);
+                Dictionary<string, MakefileCache?> SourceCodeChecks = new();
+                Queue<string> SourceCodes = new();
+
+                void SourceCodeAction(string InSourceCode)
                 {
-                    Tasks.Add(SourceCodeHash.GenerateHashAsync(SourceFile).ContinueWith(p =>
+                    if (Global.IsSourceCode(InSourceCode) == false && Global.IsHeaderFile(InSourceCode) == false)
                     {
-                        string Intermediate = Cache.ProjectDir.Intermediate.Root;
-                        string Output = Path.Combine(Cache.ProjectDir.Intermediate.Build, Config.Platform.TargetName, Config.Configuration.ToString(), Name);
+                        return;
+                    }
 
-                        var Item = new MakefileCompile
-                        {
-                            SourceCode = SourceFile,
-                            Hash = p.Result,
-                            ModuleName = Name,
-                            Intermediate = Intermediate,
-                            DependModules = Cache.DependModules,
-                            IncludePaths = Cache.IncludePaths,
-                            AdditionalMacros = Cache.AdditionalMacros,
-                            DisableWarnings = Cache.DisableWarnings,
-                            Output = Output,
-                            IncludeHashes = new()
-                        };
+                    if (SourceCodeChecks.ContainsKey(InSourceCode))
+                    {
+                        return;
+                    }
 
-                        lock (Makefile)
+                    if (MakefileCaches.TryGetValue(InSourceCode, out var MakefileCache))
+                    {
+                        ulong NewSourceCodeHash;
+                        if (MakefileCache.IsNewer(InSourceCode, out NewSourceCodeHash) == false)
                         {
-                            Makefile.Items.Add(Item);
+                            SourceCodeChecks.Add(InSourceCode, null);
+                            foreach (var Depend in MakefileCache.Dependencies)
+                            {
+                                SourceCodes.Enqueue(Depend);
+                            }
+                            foreach (var Include in MakefileCache.Includes)
+                            {
+                                SourceCodes.Enqueue(Include);
+                            }
                         }
-                    }));
+                        else
+                        {
+                            var NewCache = new MakefileCache()
+                            {
+                                SourceCodePath = InSourceCode,
+                                SourceCodeHash = NewSourceCodeHash,
+                                LastWriteTimeInUtc = File.GetLastWriteTimeUtc(InSourceCode),
+                                Dependencies = Array.Empty<string>(),
+                                Includes = Array.Empty<string>(),
+                                IntermediateOutput = Cache.ProjectDir.GenerateIntermediateOutput(Rule.Target.BuildConfiguration, Cache.Name),
+                                ObjectOutput = string.Empty,
+                                InterfaceOutput = string.Empty
+                            };
+                            SourceCodeChecks.Add(InSourceCode, NewCache);
+                        }
+                    }
+                    else
+                    {
+                        var NewCache = new MakefileCache()
+                        {
+                            SourceCodePath = InSourceCode,
+                            SourceCodeHash = Global.GenerateSourceCodeHash(InSourceCode),
+                            LastWriteTimeInUtc = File.GetLastWriteTimeUtc(InSourceCode),
+                            Dependencies = Array.Empty<string>(),
+                            Includes = Array.Empty<string>(),
+                            IntermediateOutput = Cache.ProjectDir.GenerateIntermediateOutput(Rule.Target.BuildConfiguration, Cache.Name),
+                            ObjectOutput = string.Empty,
+                            InterfaceOutput = string.Empty
+                        };
+                        SourceCodeChecks.Add(InSourceCode, NewCache);
+                    }
                 }
-            }
+
+                foreach (var SourceCode in Cache.SourceFiles)
+                {
+                    SourceCodeAction(SourceCode);
+                }
+
+                // TODO: Generate re-compile targets with scan dependencies.
+                while (SourceCodes.Count > 0)
+                {
+                    SourceCodeAction(SourceCodes.Dequeue());
+                }
+
+                List<MakefileCompile> Compiles = new();
+                foreach (var SourceCode in SourceCodeChecks.Where(p => p.Value != null))
+                {
+                    Compiles.Add(new MakefileCompile()
+                    {
+                        SourceCode = SourceCode.Key,
+                        Cache = SourceCode.Value!,
+                        Provide = null,
+                        Requires = Array.Empty<CppModuleDescriptor>(),
+                        ModuleName = Cache.Name,
+                        DependModules = Cache.DependModules,
+                        IncludePaths = Cache.IncludePaths,
+                        AdditionalMacros = Cache.AdditionalMacros,
+                        DisableWarnings = Cache.DisableWarnings,
+                    });
+                }
+
+                Makefile.CompileItems = Compiles.ToArray();
+                return (Cache, Makefile);
+            }));
         }
 
-        await Task.WhenAll(Tasks);
-        return Makefile;
+        var MakefileList = await Task.WhenAll(Tasks);
+        return MakefileList.ToDictionary(p => p.Item1, p => p.Item2);
     }
 }

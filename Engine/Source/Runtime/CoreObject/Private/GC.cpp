@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "GC.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 #include "Type.h"
 #include "Threading/Thread.h"
 #include "Reflection/PropertyInfo.h"

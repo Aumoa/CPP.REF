@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Geometry.h"
-#include <memory>
+//#include <memory>
 
 class SWidget;
 

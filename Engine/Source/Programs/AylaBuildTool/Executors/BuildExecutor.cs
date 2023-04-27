@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics;
+
 using AE.BuildSettings;
 using AE.CLI;
 using AE.Exceptions;
@@ -43,178 +45,193 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         Workspace Workspace = await ConfigureWorkspaceAsync(SToken);
 
-        ATarget? CurrentTarget = Workspace.SearchTargetByName(BuildArgs.Target);
-        if (CurrentTarget == null)
-        {
-            throw new TerminateException(6, CoreStrings.Errors.TargetNotFoundException, BuildArgs.Target);
-        }
-        await CurrentTarget.ConfigureAsync(SToken);
-
-        var TargetInfo = new TargetInfo()
+        var HeaderToolCompiler = await AylaProjectCompiler.CreateCompilerAsync(Workspace, "AylaHeaderTool", new TargetInfo
         {
             BuildConfiguration = new()
             {
                 Configuration = Configuration.Shipping,
                 Platform = TargetPlatform.Win64
             }
-        };
-        TargetRules TargetRule = CurrentTarget.GenerateTargetRule(TargetInfo);
-        Dictionary<string, SearchedModule> SearchedModules = new();
-        Global.SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
+        }, SToken);
 
-        var Installations = VisualStudioInstallation.FindVisualStudioInstallations(Platform.Windows.CompilerVersion.VisualStudio2022);
-        if (Installations.Any() == false)
-        {
-            throw new InvalidOperationException("Internal error.");
-        }
+        return await HeaderToolCompiler.CompileAsync(SToken);
 
-        ToolChainInstallation ToolChain = Installations[0];
-        var Resolver = new ModuleDependenciesResolver(TargetRule, SearchedModules, ToolChain);
-        Resolver.Resolve();
+        //ATarget? CurrentTarget = Workspace.SearchTargetByName(BuildArgs.Target);
+        //if (CurrentTarget == null)
+        //{
+        //    throw new TerminateException(6, CoreStrings.Errors.TargetNotFoundException, BuildArgs.Target);
+        //}
+        //await CurrentTarget.ConfigureAsync(SToken);
 
-        var Makefile = await Resolver.GenerateMakefileAsync(TargetRule, SToken);
-        await Makefile.ResolveMakefileCacheAsync(ToolChain, TargetRule, SToken);
-        var CompileTasks = new CompileTasks(ToolChain);
+        //var TargetInfo = new TargetInfo()
+        //{
+        //    BuildConfiguration = new()
+        //    {
+        //        Configuration = Configuration.Shipping,
+        //        Platform = TargetPlatform.Win64
+        //    }
+        //};
+        //TargetRules TargetRule = CurrentTarget.GenerateTargetRule(TargetInfo);
+        //Dictionary<string, SearchedModule> SearchedModules = new();
+        //Global.SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
 
-        int ReturnCode = 0;
-        Dictionary<string, List<Task<bool>>> LinkDepends = new();
-        if (Makefile.CompileItems.Any())
-        {
-            int TaskNumber = 0;
-            Console.WriteLine("Dispatch {0} tasks with {1} processors.", Makefile.CompileItems.Count, CompileTasks.MaxParallel);
-            int Left = 0, Top = 0;
-            if (ConsoleExtensions.IsConsoleHandleSupports)
-            {
-                (Left, Top) = Console.GetCursorPosition();
-            }
+        //var Installations = VisualStudioInstallation.FindVisualStudioInstallations(Platform.Windows.CompilerVersion.VisualStudio2022);
+        //if (Installations.Any() == false)
+        //{
+        //    throw new InvalidOperationException("Internal error.");
+        //}
 
-            foreach (var CompileItem in Makefile.CompileItems)
-            {
-                Task<bool> CurrentTask = CompileTasks.CompileAsync(CompileItem, TargetRule, SToken).ContinueWith(p =>
-                {
-                    if (p.IsCompletedSuccessfully)
-                    {
-                        int Number = Interlocked.Increment(ref TaskNumber);
-                        lock (TargetRule)
-                        {
-                            string Fm = string.Format("[{0}/{1}] {2}", TaskNumber, Makefile.CompileItems.Count, p.Result);
-                            if (ConsoleExtensions.IsConsoleHandleSupports)
-                            {
-                                Console.SetCursorPosition(Left, Top);
-                                Fm = Fm.PadRight(Console.BufferWidth, ' ');
-                            }
-                            Console.WriteLine(Fm);
-                        }
+        //ToolChainInstallation ToolChain = Installations[0];
+        //var Resolver = new ModuleDependenciesResolver(TargetRule, SearchedModules, ToolChain);
+        //Resolver.Resolve();
 
-                        return true;
-                    }
-                    else
-                    {
-                        if (p.Exception!.InnerException is TerminateException TE)
-                        {
-                            lock (TargetRule)
-                            {
-                                Console.Error.WriteLine(TE.Message.Trim());
-                                if (ConsoleExtensions.IsConsoleHandleSupports)
-                                {
-                                    (Left, Top) = Console.GetCursorPosition();
-                                }
-                            }
-                            ReturnCode = TE.ErrorCode;
-                        }
+        //var Timer = Stopwatch.StartNew();
+        //Console.Write("Generate Makefiles...");
+        //var Makefiles = await Resolver.GenerateMakefilesAsync(TargetRule, SToken);
+        //Console.WriteLine(" {0} seconds elapsed.", Timer.Elapsed.Seconds);
 
-                        // Rethrowing.
-                        return false;
-                    }
-                });
+        ////await Makefiles.ResolveMakefileCacheAsync(ToolChain, TargetRule, SToken);
+        //var CompileTasks = new CompileTasks(ToolChain);
 
-                if (LinkDepends.TryGetValue(CompileItem.ModuleName, out List<Task<bool>>? LinkTasks) == false)
-                {
-                    LinkTasks = new();
-                    LinkDepends.Add(CompileItem.ModuleName, LinkTasks);
-                }
-                LinkTasks.Add(CurrentTask);
-            }
-        }
+        //int ReturnCode = 0;
+        //Dictionary<string, List<Task<bool>>> LinkDepends = new();
+        //if (Makefiles.CompileItems.Any())
+        //{
+        //    int TaskNumber = 0;
+        //    Console.WriteLine("Dispatch {0} tasks with {1} processors.", Makefiles.CompileItems.Count, CompileTasks.MaxParallel);
+        //    int Left = 0, Top = 0;
+        //    if (ConsoleExtensions.IsConsoleHandleSupports)
+        //    {
+        //        (Left, Top) = Console.GetCursorPosition();
+        //    }
 
-        Dictionary<string, Task<bool>> Linkers = new();
-        foreach (var (ModuleName, _) in Resolver.Modules)
-        {
-            async Task<bool> StartLinkerAsync(string ModuleName, CancellationToken SToken = default)
-            {
-                Task<bool>? PreviousTask = null;
-                TaskCompletionSource<bool>? TCS = null;
-                lock (Linkers)
-                {
-                    if (Linkers.TryGetValue(ModuleName, out PreviousTask) == false)
-                    {
-                        TCS = new();
-                        PreviousTask = TCS.Task;
-                        Linkers.Add(ModuleName, PreviousTask);
-                    }
-                }
+        //    foreach (var CompileItem in Makefiles.CompileItems)
+        //    {
+        //        Task<bool> CurrentTask = CompileTasks.CompileAsync(CompileItem, TargetRule, SToken).ContinueWith(p =>
+        //        {
+        //            if (p.IsCompletedSuccessfully)
+        //            {
+        //                int Number = Interlocked.Increment(ref TaskNumber);
+        //                lock (TargetRule)
+        //                {
+        //                    string Fm = string.Format("[{0}/{1}] {2}", TaskNumber, Makefiles.CompileItems.Count, p.Result);
+        //                    if (ConsoleExtensions.IsConsoleHandleSupports)
+        //                    {
+        //                        Console.SetCursorPosition(Left, Top);
+        //                        Fm = Fm.PadRight(Console.BufferWidth, ' ');
+        //                    }
+        //                    Console.WriteLine(Fm);
+        //                }
 
-                if (TCS == null)
-                {
-                    return await PreviousTask;
-                }
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (p.Exception!.InnerException is TerminateException TE)
+        //                {
+        //                    lock (TargetRule)
+        //                    {
+        //                        Console.Error.WriteLine(TE.Message.Trim());
+        //                        if (ConsoleExtensions.IsConsoleHandleSupports)
+        //                        {
+        //                            (Left, Top) = Console.GetCursorPosition();
+        //                        }
+        //                    }
+        //                    ReturnCode = TE.ErrorCode;
+        //                }
 
-                try
-                {
-                    var DependencyCache = Resolver.GetDependencyCache(ModuleName);
+        //                // Rethrowing.
+        //                return false;
+        //            }
+        //        });
 
-                    IEnumerable<Task<bool>> CompileTasks = Enumerable.Empty<Task<bool>>();
-                    if (LinkDepends.TryGetValue(ModuleName, out var TasksList))
-                    {
-                        CompileTasks = TasksList;
-                    }
+        //        if (LinkDepends.TryGetValue(CompileItem.ModuleName, out List<Task<bool>>? LinkTasks) == false)
+        //        {
+        //            LinkTasks = new();
+        //            LinkDepends.Add(CompileItem.ModuleName, LinkTasks);
+        //        }
+        //        LinkTasks.Add(CurrentTask);
+        //    }
+        //}
 
-                    bool[] bResults = await Task.WhenAll(CompileTasks.Distinct());
-                    if (bResults.Contains(false))
-                    {
-                        return false;
-                    }
+        //Dictionary<string, Task<bool>> Linkers = new();
+        //foreach (var (ModuleName, _) in Resolver.Modules)
+        //{
+        //    async Task<bool> StartLinkerAsync(string ModuleName, CancellationToken SToken = default)
+        //    {
+        //        Task<bool>? PreviousTask = null;
+        //        TaskCompletionSource<bool>? TCS = null;
+        //        lock (Linkers)
+        //        {
+        //            if (Linkers.TryGetValue(ModuleName, out PreviousTask) == false)
+        //            {
+        //                TCS = new();
+        //                PreviousTask = TCS.Task;
+        //                Linkers.Add(ModuleName, PreviousTask);
+        //            }
+        //        }
 
-                    foreach (var Depend in DependencyCache.DependModules)
-                    {
-                        if (await StartLinkerAsync(Depend, SToken) == false)
-                        {
-                            return false;
-                        }
-                    }
+        //        if (TCS == null)
+        //        {
+        //            return await PreviousTask;
+        //        }
 
-                    var Config = TargetInfo.BuildConfiguration;
+        //        try
+        //        {
+        //            var DependencyCache = Resolver.GetDependencyCache(ModuleName);
 
-                    var Linker = ToolChain.SpawnLinker();
-                    string Output = await Linker.LinkAsync(TargetRule, DependencyCache, SToken);
-                    Console.Write(Output);
+        //            IEnumerable<Task<bool>> CompileTasks = Enumerable.Empty<Task<bool>>();
+        //            if (LinkDepends.TryGetValue(ModuleName, out var TasksList))
+        //            {
+        //                CompileTasks = TasksList;
+        //            }
 
-                    TCS.SetResult(true);
-                    TCS = null;
-                    return true;
-                }
-                catch (TerminateException TE)
-                {
-                    Console.Error.WriteLine(TE.Message);
-                    ReturnCode = TE.ErrorCode;
-                    return false;
-                }
-                catch (Exception E)
-                {
-                    Console.Error.WriteLine(E);
-                    return false;
-                }
-                finally
-                {
-                    TCS?.SetResult(false);
-                }
-            }
+        //            bool[] bResults = await Task.WhenAll(CompileTasks.Distinct());
+        //            if (bResults.Contains(false))
+        //            {
+        //                return false;
+        //            }
 
-            _ = StartLinkerAsync(ModuleName, SToken);
-        }
+        //            foreach (var Depend in DependencyCache.DependModules)
+        //            {
+        //                if (await StartLinkerAsync(Depend, SToken) == false)
+        //                {
+        //                    return false;
+        //                }
+        //            }
 
-        await Task.WhenAll(Linkers.Values);
-        await Makefile.SaveMakefileCacheAsync(TargetRule, SToken);
-        return ReturnCode;
+        //            var Config = TargetInfo.BuildConfiguration;
+
+        //            var Linker = ToolChain.SpawnLinker();
+        //            string Output = await Linker.LinkAsync(TargetRule, DependencyCache, SToken);
+        //            Console.Write(Output);
+
+        //            TCS.SetResult(true);
+        //            TCS = null;
+        //            return true;
+        //        }
+        //        catch (TerminateException TE)
+        //        {
+        //            Console.Error.WriteLine(TE.Message);
+        //            ReturnCode = TE.ErrorCode;
+        //            return false;
+        //        }
+        //        catch (Exception E)
+        //        {
+        //            Console.Error.WriteLine(E);
+        //            return false;
+        //        }
+        //        finally
+        //        {
+        //            TCS?.SetResult(false);
+        //        }
+        //    }
+
+        //    _ = StartLinkerAsync(ModuleName, SToken);
+        //}
+
+        //await Task.WhenAll(Linkers.Values);
+        //await Makefiles.SaveMakefileCacheAsync(TargetRule, SToken);
+        //return ReturnCode;
     }
 }

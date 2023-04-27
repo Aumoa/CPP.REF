@@ -3,6 +3,7 @@
 using System.Reflection;
 
 using AE.Exceptions;
+using AE.Misc;
 using AE.Projects;
 using AE.Rules;
 using AE.Source;
@@ -16,6 +17,8 @@ public static class Global
         string Location = Assembly.GetEntryAssembly()!.Location;
         EngineDirectory = new ProjectDirectory() { Root = Path.GetFullPath(Path.Combine(Location, "..", "..", "..")) };
     }
+
+    public static int MakefileVersion = 1;
 
     public static ProjectDirectory EngineDirectory { get; }
 
@@ -42,7 +45,7 @@ public static class Global
     public static bool IsSourceCode(string Name)
     {
         string Ext = Path.GetExtension(Name).ToLower();
-        return Ext == ".cpp";
+        return Ext == ".cpp" || Ext == ".ixx";
     }
 
     public static bool IsHeaderFile(string Name)
@@ -78,7 +81,7 @@ public static class Global
             ACXXModule? Module = InWorkspace.SearchCXXModuleByName(CurrentModule);
             if (Module == null)
             {
-                throw new TerminateException(8, CoreStrings.Errors.DependencyModuleNotFound, FromModule, CurrentModule);
+                throw new TerminateException(KnownErrorCode.ModuleNotFound, CoreStrings.Errors.DependencyModuleNotFound(FromModule, CurrentModule));
             }
 
             ModuleRule = new()
@@ -94,5 +97,10 @@ public static class Global
                 SearchCXXModulesRecursive(InWorkspace, Rule, SearchedModules, CurrentModule, NextModule);
             }
         }
+    }
+
+    public static ulong GenerateSourceCodeHash(string InSourceCodePath)
+    {
+        return CRC64.Generate64(File.ReadAllText(InSourceCodePath));
     }
 }

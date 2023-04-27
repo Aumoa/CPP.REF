@@ -102,7 +102,7 @@ public class VSLinker : Linker
         if (P.ExitCode != 0)
         {
             string Report = Stdout + Stderr;
-            throw new TerminateException(9, Report.Replace("{", "{{").Replace("}", "}}"));
+            throw new TerminateException(KnownErrorCode.CompileError, Report);
         }
 
         return Stdout;

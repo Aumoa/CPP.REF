@@ -25,13 +25,27 @@ public class CompileTasks : Compiler
 
     public int MaxParallel { get; private init; }
 
-    public override async Task<string> CompileAsync(MakefileCompile Item, TargetRules Rule, CancellationToken SToken = default)
+    public override async Task<MakefileCompile> ScanDependenciesAsync(MakefileCompile Item, TargetRules Rule, CancellationToken SToken = default)
     {
         await Access.WaitAsync();
         try
         {
             var Compiler = ToolChain.SpawnCompiler();
-            return await Compiler.CompileAsync(Item, Rule, SToken);
+            return await Compiler.ScanDependenciesAsync(Item, Rule, SToken);
+        }
+        finally
+        {
+            Access.Release();
+        }
+    }
+
+    public override async Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default)
+    {
+        await Access.WaitAsync();
+        try
+        {
+            var Compiler = ToolChain.SpawnCompiler();
+            return await Compiler.CompileAsync(Node, Rule, SToken);
         }
         finally
         {

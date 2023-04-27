@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 #include "CoreObject/ObjectReference.h"
 
 class AsyncValidator

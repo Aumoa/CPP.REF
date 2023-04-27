@@ -61,7 +61,7 @@ public class ACXXModule : IAModule
                     {
                         if (ModuleCodePath != null)
                         {
-                            throw new TerminateException(2, CoreStrings.Errors.ModuleRuleDuplicated, SourcePath);
+                            throw new TerminateException(KnownErrorCode.ModuleDuplicate, CoreStrings.Errors.ModuleRuleDuplicated(SourcePath));
                         }
 
                         ModuleCodePath = Filename;
@@ -70,7 +70,7 @@ public class ACXXModule : IAModule
 
                 if (ModuleCodePath == null)
                 {
-                    throw new TerminateException(3, CoreStrings.Errors.ModuleRuleNotFound, SourcePath);
+                    throw new TerminateException(KnownErrorCode.ModuleNotFound, CoreStrings.Errors.ModuleRuleNotFound(SourcePath));
                 }
 
                 string AssemblyCacheDirectory = Path.Combine(ProjectDirectory.Intermediate.Makefiles, ModuleName);
@@ -149,13 +149,13 @@ public class ACXXModule : IAModule
                 Type? RuleType = CachedAssembly.GetType(ModuleName);
                 if (RuleType == null)
                 {
-                    throw new TerminateException(3, CoreStrings.Errors.RuleClassDefinitions, ModuleName);
+                    throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.RuleClassDefinitions(ModuleName));
                 }
 
                 ConstructorInfo? Ctor = RuleType.GetConstructor(new[] { typeof(TargetRules) });
                 if (Ctor == null)
                 {
-                    throw new TerminateException(4, CoreStrings.Errors.ModuleRuleConstructorNotFound, RuleType.Name);
+                    throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.ModuleRuleConstructorNotFound(RuleType.Name));
                 }
 
                 ModuleRule = (ModuleRules)Ctor.Invoke(new object?[] { Rule });

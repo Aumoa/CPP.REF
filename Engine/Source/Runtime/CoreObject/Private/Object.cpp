@@ -2,7 +2,7 @@
 
 #include "Object.h"
 #include "Type.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 #include "GC.h"
 #include "Casts.h"
 #include "IDisposable.h"

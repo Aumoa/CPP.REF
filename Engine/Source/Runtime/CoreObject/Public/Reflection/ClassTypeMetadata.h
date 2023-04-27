@@ -5,7 +5,7 @@
 #include "reflexpr.h"
 #include "Misc/String.h"
 #include "Reflection/ReflectionTraits.h"
-#include <memory>
+//#include <memory>
 
 class Type;
 class Object;

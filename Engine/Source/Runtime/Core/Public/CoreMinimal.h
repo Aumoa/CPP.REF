@@ -1,128 +1,87 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+// for String.h
+#define TEXT(X) String::FromLiteral(L ## X)
 
-#include "CoreTypes/IntegralTypes.h"
-#include "CoreTypes/RealTypes.h"
-#include "CoreTypes/CharType.h"
-#include "CoreTypes/String.h"
-#include "CoreTypes/DateTime.h"
-#include "CoreTypes/TimeSpan.h"
-#include "CoreAssert.h"
-#include "LogCore.h"
-#include "Environment.h"
-#include "Console.h"
-#include "Guid.h"
-#include "Delegates/DelegateHandle.h"
-#include "Delegates/IMulticastDelegate.h"
-#include "Delegates/MulticastDelegate.h"
-#include "Delegates/MulticastEvent.h"
-#include "Delegates/ScopedDelegateHolder.h"
-#include "Diagnostics/PerformanceTimer.h"
-#include "Diagnostics/Stackframe.h"
-#include "Diagnostics/Stacktrace.h"
-#include "Exceptions/Exception.h"
-#include "Exceptions/ArgumentException.h"
-#include "Exceptions/ArgumentNullException.h"
-#include "Exceptions/ArgumentOutOfRangeException.h"
-#include "Exceptions/FormatException.h"
-#include "Exceptions/InvalidCastException.h"
-#include "Exceptions/InvalidOperationException.h"
-#include "Exceptions/NotImplementedException.h"
-#include "Exceptions/SystemException.h"
-#include "Exceptions/TargetInvocationException.h"
-#include "Exceptions/TaskAbortedException.h"
-#include "Exceptions/TaskCanceledException.h"
-#include "Exceptions/SocketException.h"
-#include "Exceptions/FileNotFoundException.h"
-#include "Exceptions/AccessViolationException.h"
-#include "Exceptions/StackOverflowException.h"
-#include "Exceptions/CxxException.h"
-#include "Exceptions/NullReferenceException.h"
-#include "Exceptions/IndexOutOfRangeException.h"
-#include "Exceptions/NotSupportedException.h"
-#include "Generic/IArray.h"
-#include "Generic/IComparable.h"
-#include "Generic/IDictionary.h"
-#include "Generic/IEnumerable.h"
-#include "Generic/IEquatable.h"
-#include "Generic/IList.h"
-#include "Generic/IString.h"
-#include "Generic/ITuple.h"
-#include "Generic/IVector.h"
-#include "IO/Directory.h"
-#include "IO/DirectoryReference.h"
-#include "IO/File.h"
-#include "IO/FileReference.h"
-#include "IO/FileSystemReference.h"
-#include "IO/IMEEvent.h"
-#include "IO/IOCompletionOverlapped.h"
-#include "IO/IOContext.h"
-#include "IO/IOException.h"
-#include "IO/Key.h"
-#include "IO/KeyboardEvent.h"
-#include "IO/KeyboardState.h"
-#include "IO/MouseButton.h"
-#include "IO/MouseButtonEvent.h"
-#include "IO/MouseEventReply.h"
-#include "IO/MousePositionMode.h"
-#include "IO/MouseState.h"
-#include "IO/Path.h"
-#include "IO/ScheduledIOContext.h"
-#include "IO/FileAccessMode.h"
-#include "IO/FileSharedMode.h"
-#include "IO/FileMode.h"
-#include "IO/Stream.h"
-#include "IO/FileStream.h"
-#include "IO/TextReader.h"
-#include "IO/StreamReader.h"
-#include "Linq/Array.h"
-#include "Linq/Generator.h"
-#include "Linq/Enumerable.h"
-#include "Logging/Log.h"
-#include "Logging/LogCategory.h"
-#include "Logging/LogEntry.h"
-#include "Logging/LogLevel.h"
-#include "Logging/ILoggingExtension.h"
-#include "Mathematics/Degrees.h"
-#include "Mathematics/EaseFunction.h"
-#include "Mathematics/MathEx.h"
-#include "Mathematics/Radians.h"
-#include "Misc/CompatibleVariadic.h"
-#include "Misc/ContainsRef.h"
-#include "Misc/CrcHash.h"
-#include "Misc/EnableSharedFromThis.h"
-#include "Misc/GetVariadic.h"
-#include "Misc/IDerivedFrom.h"
-#include "Misc/Misc.h"
-#include "Misc/nameof.h"
-#include "Misc/NonCopyable.h"
-#include "Misc/PlatformMisc.h"
-#include "Misc/RecursiveMacroHelper.h"
-#include "Misc/StaticClass.h"
-#include "Misc/DateTimeFormat.h"
-#include "CoreTypes/String.h"
-#include "Misc/StringBuilder.h"
-#include "Misc/StringComparison.h"
-#include "Misc/StringSplitOptions.h"
-#include "Misc/TickScheduler.h"
-#include "Misc/Variadic.h"
-#include "Misc/VirtualDtor.h"
-#include "Misc/VoidableOptional.h"
-#include "Misc/EnumFlags.h"
-#include "Threading/Spinlock.h"
-#include "Threading/SpinlockConditionVariable.h"
-#include "Threading/ThreadGroup.h"
-#include "Threading/ThreadPool.h"
-#include "Threading/Tasks/Awaiter.h"
-#include "Threading/Tasks/AwaiterBase.h"
-#include "Threading/Tasks/co_cancel.h"
-#include "Threading/Tasks/co_push.h"
-#include "Threading/Tasks/IAwaiter.h"
-#include "Threading/Tasks/ITask.h"
-#include "Threading/Tasks/Parallel.h"
-#include "Threading/Tasks/promise_type.h"
-#include "Threading/Tasks/suspend_and_destroy_if.h"
-#include "Threading/Tasks/Task.h"
-#include "Threading/Tasks/TaskCompletionSource.h"
-#include "Threading/Tasks/TaskStatus.h"
+// for CoreAssert.h
+#define check(X)
+#define ensure(X)
+#define checkf(X, Format, ...)
+#define ensureMsgf(X, Format, ...)
+
+// for nameof.h
+#define nameof(x) lib::details::__nameof_helper<decltype(x)>(TEXT(#x))
+
+// for RecursiveMacroHelper.h
+#define MACRO_RECURSIVE_HELPER_PARENTHESES ()
+
+#define MACRO_RECURSIVE_HELPER_EXPAND_0(...) \
+ MACRO_RECURSIVE_HELPER_EXPAND_1( \
+  MACRO_RECURSIVE_HELPER_EXPAND_1( \
+   MACRO_RECURSIVE_HELPER_EXPAND_1( \
+    MACRO_RECURSIVE_HELPER_EXPAND_1(__VA_ARGS__) \
+   ) \
+  ) \
+ )
+
+#define MACRO_RECURSIVE_HELPER_EXPAND_1(...) \
+ MACRO_RECURSIVE_HELPER_EXPAND_2( \
+  MACRO_RECURSIVE_HELPER_EXPAND_2( \
+   MACRO_RECURSIVE_HELPER_EXPAND_2( \
+    MACRO_RECURSIVE_HELPER_EXPAND_2(__VA_ARGS__) \
+   ) \
+  ) \
+ )
+
+#define MACRO_RECURSIVE_HELPER_EXPAND_2(...) \
+ MACRO_RECURSIVE_HELPER_EXPAND_3( \
+  MACRO_RECURSIVE_HELPER_EXPAND_3( \
+   MACRO_RECURSIVE_HELPER_EXPAND_3( \
+    MACRO_RECURSIVE_HELPER_EXPAND_3(__VA_ARGS__) \
+   ) \
+  ) \
+ )
+
+#define MACRO_RECURSIVE_HELPER_EXPAND_3(...) \
+ MACRO_RECURSIVE_HELPER_EXPAND_4( \
+  MACRO_RECURSIVE_HELPER_EXPAND_4( \
+   MACRO_RECURSIVE_HELPER_EXPAND_4( \
+    MACRO_RECURSIVE_HELPER_EXPAND_4(__VA_ARGS__) \
+   ) \
+  ) \
+ )
+
+#define MACRO_RECURSIVE_HELPER_EXPAND_4(...) __VA_ARGS__
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH(Body, ...) \
+ __VA_OPT__(MACRO_RECURSIVE_HELPER_EXPAND_0(MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER(Body, __VA_ARGS__)))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER(Body, Arg1, ...) \
+ Body(Arg1) \
+ __VA_OPT__(MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY MACRO_RECURSIVE_HELPER_PARENTHESES (Body, __VA_ARGS__))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY() MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER
+
+#define MACRO_RECURSIVE_FOR_EACH(Body, ...) MACRO_RECURSIVE_HELPER_FOR_EACH(Body __VA_OPT__(, __VA_ARGS__))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_2(Body, ...) \
+ __VA_OPT__(MACRO_RECURSIVE_HELPER_EXPAND_0(MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_2(Body, __VA_ARGS__)))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_2(Body, Arg1, Arg2, ...) \
+ Body(Arg1, Arg2) \
+ __VA_OPT__(MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY_2 MACRO_RECURSIVE_HELPER_PARENTHESES (Body, __VA_ARGS__))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY_2() MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_2
+
+#define MACRO_RECURSIVE_FOR_EACH_2(Body, ...) MACRO_RECURSIVE_HELPER_FOR_EACH_2(Body __VA_OPT__(, __VA_ARGS__))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_DOT(Body, ...) \
+ __VA_OPT__(MACRO_RECURSIVE_HELPER_EXPAND_0(MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_DOT(Body, __VA_ARGS__)))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_DOT(Body, Arg1, ...) \
+ Body(Arg1) \
+ __VA_OPT__(, MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY_DOT MACRO_RECURSIVE_HELPER_PARENTHESES (Body, __VA_ARGS__))
+
+#define MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY_DOT() MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_DOT
+
+#define MACRO_RECURSIVE_FOR_EACH_DOT(Body, ...) MACRO_RECURSIVE_HELPER_FOR_EACH_DOT(Body __VA_OPT__(, __VA_ARGS__))

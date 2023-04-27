@@ -8,7 +8,9 @@ namespace AE.Platform;
 
 public abstract class Compiler
 {
-    public abstract Task<string> CompileAsync(MakefileCompile Item, TargetRules Rule, CancellationToken SToken = default);
+    public abstract Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default);
+
+    public abstract Task<MakefileCompile> ScanDependenciesAsync(MakefileCompile Item, TargetRules Rule, CancellationToken SToken = default);
 
     protected static (string, string)[] GenerateBuildMacros(TargetRules Rule)
     {

@@ -35,7 +35,8 @@ public class Core : ModuleRules
             PrivateAdditionalLibraries.AddRange(new[]
             {
                 "dbghelp.lib",
-                "Rpcrt4.lib"
+                "Rpcrt4.lib",
+                "Kernel32.lib"
             });
         }
     }

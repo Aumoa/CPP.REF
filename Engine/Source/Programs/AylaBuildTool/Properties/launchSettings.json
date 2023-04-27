@@ -2,7 +2,7 @@
   "profiles": {
     "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "Build -Target AEEditor"
+      "commandLineArgs": "Build -Target AylaHeaderTool"
     }
   }
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Net/IPEndPoint.h"
-#include <vector>
+//#include <vector>
 #include <span>
 
 class CORE_API IPHostEntry

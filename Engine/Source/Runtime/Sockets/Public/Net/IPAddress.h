@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "CoreTypes/IntegralTypes.h"
+//#include "CoreTypes/IntegralTypes.h"
 #include "CoreTypes/String.h"
-#include <array>
+//#include <array>
 #include <span>
 
 class CORE_API IPAddress

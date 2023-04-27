@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Object.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 
 template<class T>
 class RefPtr

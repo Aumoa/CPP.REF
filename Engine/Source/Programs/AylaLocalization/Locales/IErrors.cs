@@ -8,11 +8,11 @@ public interface IErrors
 
     string InvalidEngineDirectory { get; }
 
-    string TargetRuleConstructorNotFound { get; }
+    string TargetRuleConstructorNotFound(string RuleClassName);
 
-    string ModuleRuleConstructorNotFound { get; }
+    string ModuleRuleConstructorNotFound(string ClassName);
 
-    string DependencyModuleNotFound { get; }
+    string DependencyModuleNotFound(string ModuleName, string RequiredModule);
 
     string DuplicatedModuleDefinitions { get; }
 
@@ -20,7 +20,7 @@ public interface IErrors
 
     string StartCMakeError { get; }
 
-    string CMakeReturnCodeError { get; }
+    string CMakeReturnCodeError(int ReturnCode);
 
     string MultipleModuleNotSuportedError { get; }
 
@@ -30,23 +30,27 @@ public interface IErrors
 
     string InvalidToolChainInstallation { get; }
 
-    string TargetNotFoundException { get; }
+    string TargetNotFoundException(string TargetName);
 
-    string NotSupportedArchitecture { get; }
+    string NotSupportedArchitecture(string ArchitectureName);
 
-    string NullReferenceInRule { get; }
+    string NullReferenceInRule(string PropertyName, string OwnedType);
 
-    string NotSupportedType { get; }
+    string NotSupportedType(string PropertyName, string OwnedType);
 
-    string ModuleRuleDuplicated { get; }
+    string ModuleRuleDuplicated(string DirectoryName);
 
-    string ModuleRuleNotFound { get; }
+    string ModuleRuleNotFound(string DirectoryName);
 
-    string TargetRuleNotFound { get; }
+    string TargetRuleNotFound(string DirectoryName, string RuleName);
 
-    string RuleClassDefinitions { get; }
+    string RuleClassDefinitions(string RuleName);
 
     string TargetRuleDuplicated { get; }
 
-    string InvalidModuleFormat { get; }
+    string InvalidModuleFormat(string FileName);
+
+    string PlatformCompilerNotFound(string PlatformName);
+
+    string NotSupportedCompiler { get; }
 }

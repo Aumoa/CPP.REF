@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Type.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 
 template<class T>
 class SubclassOf

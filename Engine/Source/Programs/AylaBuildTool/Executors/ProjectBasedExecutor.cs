@@ -35,7 +35,7 @@ public abstract class ProjectBasedExecutor
 
             if (File.Exists(ProjectBasedArgs.ProjectFile) == false)
             {
-                throw new TerminateException(6, CoreStrings.Errors.InvalidProjectFormat);
+                throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.InvalidProjectFormat);
             }
 
             string ProjectFileDir = Path.GetFullPath(Path.GetDirectoryName(ProjectBasedArgs.ProjectFile)!);
@@ -57,7 +57,7 @@ public abstract class ProjectBasedExecutor
 
             if (File.Exists(ProjectBasedArgs.ProjectFile) == false)
             {
-                throw new TerminateException(6, CoreStrings.Errors.InvalidProjectFormat);
+                throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.InvalidProjectFormat);
             }
 
             string ProjectFileDir = Path.GetFullPath(Path.GetDirectoryName(ProjectBasedArgs.ProjectFile)!);

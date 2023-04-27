@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Type.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 #include "Reflection/ConstructorInfo.h"
 #include "Reflection/PropertyInfo.h"
 #include "Reflection/MethodInfo.h"

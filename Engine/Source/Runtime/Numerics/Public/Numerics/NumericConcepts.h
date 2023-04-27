@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <concepts>
-#include <utility>
-#include <compare>
+//#include <concepts>
+//////#include <utility>
+////#include <compare>
 
 template<class TVector>
 concept TIsVectorBase = requires

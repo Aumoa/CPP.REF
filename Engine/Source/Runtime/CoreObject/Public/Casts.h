@@ -4,7 +4,7 @@
 
 #include "Object.h"
 #include "Concepts/IDerivedFrom.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 
 // ------------- Object to Object casts. -------------
 

@@ -4,7 +4,7 @@
 
 #include "Object.h"
 #include "Reflection/ReflectionTraits.h"
-#include <functional>
+//#include <functional>
 #include "Type.gen.h"
 
 class ConstructorInfo;

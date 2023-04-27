@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
 using AE.Misc;
 
 namespace AE.Source;
@@ -60,5 +61,10 @@ public readonly struct ProjectDirectory
     public override string ToString()
     {
         return Root;
+    }
+
+    public string GenerateIntermediateOutput(BuildConfiguration Config, string ModuleName)
+    {
+        return Path.Combine(Intermediate.Build, Config.Platform.ToString(), Config.Configuration.ToString(), ModuleName);
     }
 }

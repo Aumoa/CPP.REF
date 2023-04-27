@@ -3,7 +3,7 @@
 #if PLATFORM_WINDOWS
 
 #include "Casts.h"
-#include "CoreAssert.h"
+//#include "CoreAssert.h"
 #include "PlatformMisc/Windows/WindowsWindow.h"
 #include "Threading/Spinlock.h"
 #include "PlatformMisc/Windows/WindowsMouse.h"

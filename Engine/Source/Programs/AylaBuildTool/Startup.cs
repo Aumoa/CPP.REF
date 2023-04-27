@@ -16,7 +16,7 @@ using AE.Source;
 
 if (args.IsValidIndex(0) == false)
 {
-    Log.Error("Argument error. First argument must be specify executor.");
+    Console.Error.WriteLine("Argument error. First argument must be specify executor.");
     return -1;
 }
 
@@ -24,20 +24,20 @@ string ExecutorName = args[0];
 Type? ExecutorType = typeof(IExecutor).Assembly.GetType("AE.Executors." + ExecutorName + "Executor");
 if (ExecutorType == null)
 {
-    Log.Error("Executor {0} is not valid. Cannot find class.", ExecutorName);
+    Console.Error.WriteLine("Executor {0} is not valid. Cannot find class.", ExecutorName);
     return -1;
 }
 
 if (ExecutorType.IsAssignableTo(typeof(IExecutor)) == false)
 {
-    Log.Error("Executor {0} is not valid. Is not implements IExecutor interface.", ExecutorName);
+    Console.Error.WriteLine("Executor {0} is not valid. Is not implements IExecutor interface.", ExecutorName);
     return -1;
 }
 
 ConstructorInfo? Constructor = ExecutorType.GetConstructor(new[] { typeof(CommandLineParser) });
 if (Constructor == null)
 {
-    Log.Error("Executor {0} is not valid. Cannot find default constructor.", ExecutorName);
+    Console.Error.WriteLine("Executor {0} is not valid. Cannot find default constructor.", ExecutorName);
     return -1;
 }
 
@@ -55,7 +55,7 @@ try
 catch (TerminateException TE)
 {
     Console.Error.WriteLine(TE.Message);
-    return TE.ErrorCode;
+    return (int)TE.ErrorCode;
 }
 catch (AggregateException AE)
 {
@@ -67,7 +67,7 @@ catch (AggregateException AE)
         {
             if (Exception is TerminateException TE)
             {
-                if (TE.ErrorCode == (int)TerminateException.KnownErrorCode.CompileError)
+                if (TE.ErrorCode == KnownErrorCode.CompileError)
                 {
                     CompilerMessages.Add(Exception.Message);
                 }
@@ -92,7 +92,7 @@ catch (AggregateException AE)
         }
         else
         {
-            return (int)TerminateException.KnownErrorCode.CompileError;
+            return (int)KnownErrorCode.CompileError;
         }
     }
     throw;

@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "CoreTypes/IntegralTypes.h"
+//#include "CoreTypes/IntegralTypes.h"
 #include <span>
-#include <vector>
-#include <memory>
+//#include <vector>
+//#include <memory>
 
 class CORE_API SocketBuffer
 {

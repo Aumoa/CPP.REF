@@ -5,7 +5,7 @@
 #include "Misc/String.h"
 #include "Exceptions/TargetInvocationException.h"
 #include "Concepts/IDerivedFrom.h"
-#include <vector>
+//#include <vector>
 
 class Object;
 #define interface struct

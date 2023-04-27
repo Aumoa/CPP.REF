@@ -49,7 +49,7 @@ public class ATarget
                 string TargetCodePath = Path.Combine(ProjectDirectory.Source.Root, Filename);
                 if (TargetCodePath == null)
                 {
-                    throw new TerminateException(3, CoreStrings.Errors.TargetRuleNotFound, ProjectDirectory.Source.Root, Filename);
+                    throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.TargetRuleNotFound(ProjectDirectory.Source.Root, Filename));
                 }
 
                 string AssemblyCacheDirectory = ProjectDirectory.Intermediate.Makefiles;
@@ -127,7 +127,7 @@ public class ATarget
             {
                 if (RuleType != null)
                 {
-                    throw new TerminateException(3, CoreStrings.Errors.RuleClassDefinitions, TargetName);
+                    throw new TerminateException(KnownErrorCode.MultipleClassDefinitions, CoreStrings.Errors.RuleClassDefinitions(TargetName));
                 }
 
                 RuleType = ContainedType;
@@ -136,13 +136,13 @@ public class ATarget
 
         if (RuleType == null)
         {
-            throw new TerminateException(3, CoreStrings.Errors.RuleClassDefinitions, TargetName);
+            throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.RuleClassDefinitions(TargetName));
         }
 
         ConstructorInfo? Ctor = RuleType.GetConstructor(new[] { typeof(TargetInfo) });
         if (Ctor == null)
         {
-            throw new TerminateException(4, CoreStrings.Errors.TargetRuleConstructorNotFound, RuleType.Name);
+            throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.TargetRuleConstructorNotFound(RuleType.Name));
         }
 
         return (TargetRules)Ctor.Invoke(new object?[] { Info });

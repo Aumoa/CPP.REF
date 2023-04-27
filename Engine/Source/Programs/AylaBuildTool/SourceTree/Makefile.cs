@@ -1,175 +1,72 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 using AE.Rules;
 using AE.System;
 
 namespace AE.SourceTree;
 
-public record Makefile
+public sealed class Makefile
 {
-    public required List<MakefileCompile> Items { get; set; } = new();
-
-    public List<MakefileCompile> CompileItems { get; private set; } = new();
-
-    public Task SaveMakefileCacheAsync(TargetRules Rule, CancellationToken SToken = default)
+    [SetsRequiredMembers]
+    private Makefile()
     {
-        Dictionary<string, string> MakefilePath = new();
-        Dictionary<string, BinaryWriter> MakefileBuilder = new();
-        var Config = Rule.Target.BuildConfiguration;
-
-        foreach (var Item in Items)
-        {
-            if (MakefilePath.TryGetValue(Item.Output, out string? P) == false)
-            {
-                P = Path.Combine(Item.Output, "Makefile.abin");
-                MakefilePath.Add(Item.Output, P);
-                MakefileBuilder.Add(P, new(File.Create(P)));
-            }
-
-            BinaryWriter Builder = MakefileBuilder[P];
-            Item.Serialize(Builder);
-        }
-
-        List<Task> Tasks = new();
-        foreach (var (_, Builder) in MakefileBuilder)
-        {
-            var FS = (FileStream)Builder.BaseStream;
-            FS.Flush();
-        }
-
-        return Task.WhenAll(Tasks);
+        Caches = Array.Empty<MakefileCache>();
     }
 
-    public async Task ResolveMakefileCacheAsync(ToolChainInstallation ToolChain, TargetRules Rule, CancellationToken SToken = default)
+    public required MakefileCache[] Caches { get; init; }
+
+    public static async Task<Makefile> LoadMakefileCacheAsync(string InPath, CancellationToken SToken = default)
     {
-        var Config = Rule.Target.BuildConfiguration;
-        HashSet<string> Makefiles = new();
-        foreach (var Item in Items)
+        string Filename = Path.Combine(InPath, "Makefile.abin");
+        if (File.Exists(Filename) == false)
         {
-            Makefiles.Add(Path.Combine(Item.Output, "Makefile.abin"));
+            return new();
         }
 
-        List<Task> Tasks = new();
-        Dictionary<string, MakefileCompile> Compiles = new();
-        foreach (var MakefileName in Makefiles)
-        {
-            if (File.Exists(MakefileName))
-            {
-                Tasks.Add(File.ReadAllBytesAsync(MakefileName, SToken).ContinueWith(p =>
-                {
-                    var S = new MemoryStream(p.Result);
-                    var R = new BinaryReader(S);
-
-                    long Len = S.Length;
-                    List<MakefileCompile> Compiles2 = new();
-                    while (S.Position < Len)
-                    {
-                        Compiles2.Add(MakefileCompile.Deserialize(R));
-                    }
-
-                    foreach (var Compile in Compiles2)
-                    {
-                        lock (Compiles)
-                        {
-                            Compiles[Compile.SourceCode] = Compile;
-                        }
-                    }
-                }));
-            }
-        }
-
-        await Task.WhenAll(Tasks);
-
-        Tasks.Clear();
+        using var Stream = new MemoryStream(await File.ReadAllBytesAsync(Filename, SToken));
+        var Reader = new BinaryReader(Stream);
         try
         {
-            foreach (var Item in Items)
+            int MakefileVersion = Reader.ReadInt32();
+            if (MakefileVersion != Global.MakefileVersion)
             {
-                string Output = Item.Output;
-                Output = Path.Combine(Output, Path.ChangeExtension(Path.GetFileName(Item.SourceCode), ToolChain.GetOutputExtension()));
-
-                if (string.IsNullOrEmpty(Item.Output))
-                {
-                    lock (CompileItems)
-                    {
-                        CompileItems.Add(Item);
-                    }
-                    continue;
-                }
-
-                if (File.Exists(Output) == false)
-                {
-                    lock (CompileItems)
-                    {
-                        CompileItems.Add(Item);
-                    }
-                    continue;
-                }
-
-                if (Compiles.TryGetValue(Item.SourceCode, out MakefileCompile? Cache) == false)
-                {
-                    lock (CompileItems)
-                    {
-                        CompileItems.Add(Item);
-                    }
-                    continue;
-                }
-
-                if (Cache.SourceCode != Item.SourceCode)
-                {
-                    lock (CompileItems)
-                    {
-                        CompileItems.Add(Item);
-                    }
-                    continue;
-                }
-
-                async Task Compare()
-                {
-                    if (await Cache.Hash.IsNewer(Item.SourceCode, SToken))
-                    {
-                        lock (CompileItems)
-                        {
-                            CompileItems.Add(Item);
-                            return;
-                        }
-                    }
-
-                    foreach (var (Source, Hash) in Cache.IncludeHashes)
-                    {
-                        if (await Hash.IsNewer(Source, SToken))
-                        {
-                            lock (CompileItems)
-                            {
-                                CompileItems.Add(Item);
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                Tasks.Add(Compare());
+                return new();
             }
 
-            await Task.WhenAll(Tasks);
+            int Count = Reader.ReadInt32();
+            var Caches = new MakefileCache[Count];
+            for (int i = 0; i < Count; ++i)
+            {
+                Caches[i] = MakefileCache.LoadCacheFromBinary(Reader);
+            }
+
+            return new()
+            {
+                Caches = Caches
+            };
         }
-        finally
+        catch
         {
-            var Dict = CompileItems.ToDictionary(p => p.SourceCode, p => p);
-            List<MakefileCompile> NewItems = new();
-            foreach (var Item in Items)
-            {
-                if (Dict.TryGetValue(Item.SourceCode, out var Newer))
-                {
-                    NewItems.Add(Newer);
-                }
-                else
-                {
-                    NewItems.Add(Item);
-                }
-            }
-
-            Items = NewItems;
+            return new();
         }
     }
+
+    public async Task SaveMakefileCacheAsync(string InPath, CancellationToken SToken = default)
+    {
+        string Filename = Path.Combine(InPath, "Makefile.abin");
+
+        using var Stream = new MemoryStream();
+        var Writer = new BinaryWriter(Stream);
+        Writer.Write(Global.MakefileVersion);
+        foreach (var Cache in Caches)
+        {
+            Cache.SaveCacheToBinary(Writer);
+        }
+
+        await File.WriteAllBytesAsync(Filename, Stream.ToArray(), SToken);
+    }
+
+    public MakefileCompile[] CompileItems { get; set; } = Array.Empty<MakefileCompile>();
 }

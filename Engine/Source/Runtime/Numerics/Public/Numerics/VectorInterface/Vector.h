@@ -8,7 +8,7 @@
 #include "Mathematics/MathEx.h"
 #include <string_view>
 #include <string>
-#include <array>
+//#include <array>
 #include <span>
 
 template<class T = void, size_t N = 0>
