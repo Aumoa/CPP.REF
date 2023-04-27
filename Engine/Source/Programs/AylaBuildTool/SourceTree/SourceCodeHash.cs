@@ -96,6 +96,11 @@ public struct SourceCodeHash
             return false;
         }
 
+        if (File.Exists(SourceCode) == false)
+        {
+            return true;
+        }
+
         ulong H = CRC64.Generate64(await File.ReadAllTextAsync(SourceCode, SToken));
         return HashCode != H;
     }
