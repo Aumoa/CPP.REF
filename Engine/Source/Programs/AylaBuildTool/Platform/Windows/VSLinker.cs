@@ -2,6 +2,7 @@
 
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 
 using AE.BuildSettings;
 using AE.Exceptions;
@@ -60,7 +61,6 @@ public class VSLinker : Linker
         PSI.Environment["LIB"] = string.Join(';', Libs);
         PSI.RedirectStandardOutput = true;
         PSI.RedirectStandardError = true;
-        PSI.StandardOutputEncoding = KnownEncodings.EUCKR;
 
         IEnumerable<string> LinkLibraries = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
         LinkLibraries = LinkLibraries.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));

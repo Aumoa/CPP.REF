@@ -44,8 +44,6 @@ public class ClCompiler : Compiler
         PSI.Environment["INCLUDE"] = string.Join(';', Includes);
         PSI.RedirectStandardOutput = true;
         PSI.RedirectStandardError = true;
-        PSI.StandardOutputEncoding = KnownEncodings.EUCKR;
-        PSI.StandardErrorEncoding = KnownEncodings.EUCKR;
 
         string Output = Item.Output;
         string Pdb = Path.Combine(Output, Path.ChangeExtension(Path.GetFileName(Item.SourceCode), ".pdb"));
