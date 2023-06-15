@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-export module Core:FileMode;
+export module Core.IO:FileMode;
 
 export enum class EFileMode
 {

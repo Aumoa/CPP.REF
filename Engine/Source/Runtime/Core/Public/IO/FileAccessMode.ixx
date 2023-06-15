@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-export module Core.Filesystem:FileAccessMode;
+export module Core.IO:FileAccessMode;
 
 export import Core.System;
 
