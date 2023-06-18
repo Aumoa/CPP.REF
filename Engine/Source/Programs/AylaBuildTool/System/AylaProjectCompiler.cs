@@ -66,7 +66,7 @@ public class AylaProjectCompiler
                         MakefileCompile Item = p.Result;
                         if (Item.Provide != null)
                         {
-                            return (ModuleCache, Item.Provide.InterfaceName, new CompileTreeNode
+                            return (ModuleCache, Item.Provide.InterfaceName, new CompileNode
                             {
                                 Compile = Item,
                                 CompileTask = new(),
@@ -79,7 +79,13 @@ public class AylaProjectCompiler
                         {
                             if (!Global.IsHeaderFile(p.Result.SourceCode))
                             {
-                                return (ModuleCache, Item.SourceCode, new CompileNode() { Compile = Item, IfcSearchDirs = new(), HeaderImports = new(), Parents = new() });
+                                return (ModuleCache, Item.SourceCode, new CompileNode()
+                                {
+                                    Compile = Item, IfcSearchDirs = new(),
+                                    CompileTask = new(),
+                                    HeaderImports = new(),
+                                    Parents = new()
+                                });
                             }
                             else
                             {
@@ -109,10 +115,7 @@ public class AylaProjectCompiler
                 List<Task> CompilerTasks = new();
                 foreach (var Node in p.Value)
                 {
-                    if (Node is CompileTreeNode TreeNode)
-                    {
-                        CompilerTasks.Add(TreeNode.CompileTask.Task);
-                    }
+                    CompilerTasks.Add(Node.CompileTask.Task);
                 }
 
                 Task CurrentTask = Task.WhenAll(CompilerTasks);
@@ -159,7 +162,7 @@ public class AylaProjectCompiler
                 {
                     if (Depend.SourcePath != null)
                     {
-                        SubNode = new CompileTreeNode()
+                        SubNode = new CompileNode()
                         {
                             Compile = Node.Compile with
                             {
@@ -225,20 +228,18 @@ public class AylaProjectCompiler
             {
                 async Task<string?> CompileNodeAsync(CancellationToken SToken)
                 {
-                    CompileTreeNode? TreeNode = Node as CompileTreeNode;
-
                     try
                     {
                         foreach (var SubNode in Node.Parents)
                         {
-                            if (SubNode is CompileTreeNode SubTreeNode)
+                            if (SubNode is CompileNode SubTreeNode)
                             {
                                 await SubTreeNode.CompileTask.Task;
                             }
                         }
 
                         string Result = await CompileTasks.CompileAsync(Node, Rule, SToken);
-                        TreeNode?.CompileTask.SetResult();
+                        Node.CompileTask.SetResult();
                         Console.WriteLine(Result);
                         return Result;
                     }
@@ -246,7 +247,7 @@ public class AylaProjectCompiler
                     {
                         if (E is TaskCanceledException)
                         {
-                            TreeNode?.CompileTask.SetCanceled();
+                            Node.CompileTask.SetCanceled();
                         }
                         else if (E is TerminateException TE)
                         {
@@ -254,7 +255,7 @@ public class AylaProjectCompiler
                         }
                         else
                         {
-                            TreeNode?.CompileTask.SetException(E);
+                            Node.CompileTask.SetException(E);
                         }
                         return null;
                     }
@@ -263,10 +264,12 @@ public class AylaProjectCompiler
                 Tasks.Add(CompileNodeAsync(SToken));
             }
 
+            int ReturnCode = 0;
             foreach (var (ModuleCache, (CompileTask, LinkerTCS)) in LinkerTree)
             {
                 async Task Link()
                 {
+                    bool bIsMyError = false;
                     try
                     {
                         await CompileTask;
@@ -282,10 +285,21 @@ public class AylaProjectCompiler
                         }
                         await Task.WhenAll(DependTasks);
 
+                        bIsMyError = true;
                         Linker Linker = ToolChain.SpawnLinker();
-                        await Linker.LinkAsync(Rule, ModuleCache);
+                        string Result = await Linker.LinkAsync(Rule, ModuleCache);
+                        Console.WriteLine(Result);
 
                         LinkerTCS.SetResult();
+                    }
+                    catch (TerminateException TE)
+                    {
+                        if (bIsMyError)
+                        {
+                            Console.Error.WriteLine(TE.Message);
+                        }
+                        LinkerTCS.SetException(TE);
+                        ReturnCode = (int)TE.ErrorCode;
                     }
                     catch (Exception E)
                     {
@@ -296,9 +310,9 @@ public class AylaProjectCompiler
             }
 
             await Task.WhenAll(Tasks);
-        }
 
-        return 0;
+            return ReturnCode;
+        }
     }
 
     public static async Task<AylaProjectCompiler> CreateCompilerAsync(Workspace InWorkspace, string InTargetName, TargetInfo InTargetInfo, CancellationToken SToken = default)

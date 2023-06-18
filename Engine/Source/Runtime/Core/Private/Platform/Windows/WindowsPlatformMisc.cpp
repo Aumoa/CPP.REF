@@ -201,17 +201,17 @@ bool PlatformMisc::SleepConditionVariable(size_t& Cv, size_t& Lock, uint32 Delay
 //	}
 //}
 //
-//String PlatformMisc::FormatSystemCode(int32 systemCode)
-//{
-//	static thread_local WCHAR buf[1024] = {};
-//	DWORD len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)systemCode, 0, buf, 1024, NULL);
-//	if (len == 0)
-//	{
-//		return TEXT("Unknown error.");
-//	}
-//
-//	return String(buf, len);
-//}
+String PlatformMisc::FormatSystemCode(int32 systemCode)
+{
+	static thread_local WCHAR buf[1024] = {};
+	DWORD len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)systemCode, 0, buf, 1024, NULL);
+	if (len == 0)
+	{
+		return TEXT("Unknown error.");
+	}
+
+	return String(buf, len);
+}
 //
 //int32 PlatformMisc::GetLastError() noexcept
 //{

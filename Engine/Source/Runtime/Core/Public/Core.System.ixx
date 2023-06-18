@@ -30,3 +30,7 @@ export import :Degrees;
 export import :EaseFunction;
 export import :MulticastDelegate;
 export import :Guid;
+export import :ConsoleColor;
+export import :Console;
+export import :Exception;
+export import :SystemException;

@@ -1,34 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="String">
-		<DisplayString Condition="_buf._Which==0">{_buf._Head,[_len]}</DisplayString>
-		<DisplayString Condition="_buf._Which==1">{_buf._Tail._Head._Ptr,[_len]}</DisplayString>
-		<StringView Condition="_buf._Which==0">_buf._Head,[_len]</StringView>
-		<StringView Condition="_buf._Which==1">_buf._Tail._Head._Ptr,[_len]</StringView>
+		<DisplayString Condition="Buf._Which==0">{Buf._Head,[Len]}</DisplayString>
+		<DisplayString Condition="Buf._Which==1">{Buf._Tail._Head._Ptr,[Len]}</DisplayString>
+		<StringView Condition="Buf._Which==0">Buf._Head,[Len]</StringView>
+		<StringView Condition="Buf._Which==1">Buf._Tail._Head._Ptr,[Len]</StringView>
 		<Expand>
-			<Item Condition="_buf._Which==0" Name="[Text]">_buf._Head,[_len]</Item>
-			<Item Condition="_buf._Which==1" Name="[Text]">_buf._Tail._Head._Ptr,[_len]</Item>
-			<Item Condition="_buf._Which==1" Name="[Refs]">_buf._Tail._Head._Rep->_Uses</Item>
+			<Item Condition="Buf._Which==0" Name="[Text]">Buf._Head,[Len]</Item>
+			<Item Condition="Buf._Which==1" Name="[Text]">Buf._Tail._Head._Ptr,[Len]</Item>
+			<Item Condition="Buf._Which==1" Name="[Refs]">Buf._Tail._Head._Rep->_Uses</Item>
 		</Expand>
-	</Type>
-	<Type Name="FileSystemReference">
-		<DisplayString>{_path}</DisplayString>
-	</Type>
-	<Type Name="Object">
-		<DisplayString>{FriendlyName}</DisplayString>
-	</Type>
-	<Type Name="PropertyInfo">
-		<DisplayString>{_prop.name}</DisplayString>
-		<Expand>
-			<Item Name="[Name]">_prop.name</Item>
-			<Item Name="[Type]">_prop.reflect_type</Item>
-			<Item Name="[Access]">_prop.access_modifier</Item>
-			<Item Name="[Getter]">_prop.getter</Item>
-			<Item Name="[Setter]">_prop.setter</Item>
-		</Expand>
-	</Type>
-	<Type Name="Type">
-		<DisplayString Condition="_class_type==Type::EClassType::Class">class {_name}</DisplayString>
-		<DisplayString Condition="_class_type==Type::EClassType::Interface">interface {_name}</DisplayString>
 	</Type>
 </AutoVisualizer>

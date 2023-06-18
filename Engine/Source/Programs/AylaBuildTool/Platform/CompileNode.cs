@@ -13,4 +13,6 @@ public record CompileNode
     public required HashSet<string> HeaderImports { get; init; }
 
     public required HashSet<CompileNode> Parents { get; init; }
+
+    public required TaskCompletionSource CompileTask { get; init; }
 }

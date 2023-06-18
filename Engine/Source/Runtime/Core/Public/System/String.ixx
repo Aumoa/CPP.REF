@@ -1018,7 +1018,7 @@ public:
 			Buffers.emplace_back(std::wstring_view(Item.GetRaw(), Item.Len));
 		}
 
-		return Concat(Buffers);
+		return InternalConcat(Buffers);
 	}
 
 	template<class... TStrings>

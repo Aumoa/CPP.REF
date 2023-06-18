@@ -5,5 +5,6 @@ import Core;
 int main()
 {
 	String Str = TEXT("MyText");
+	Console::WriteLine(Str);
 	return 0;
 }

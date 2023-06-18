@@ -4,3 +4,5 @@ export module Core.Diagnostics;
 
 export import :Debug;
 export import :PerformanceTimer;
+export import :StackFrame;
+export import :StackTrace;

@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-export module Core:ConsoleColor;
+export module Core.System:ConsoleColor;
 
 export enum class EConsoleColor
 {

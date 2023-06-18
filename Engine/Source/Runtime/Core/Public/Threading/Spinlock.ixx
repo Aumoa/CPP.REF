@@ -62,9 +62,9 @@ public:
 		}
 	}
 
-	inline void Lock(bool shared = false) noexcept
+	inline void Lock(bool bShared = false) noexcept
 	{
-		if (shared)
+		if (bShared)
 		{
 			PlatformMisc::AcquireSpinlockShared(LockVal);
 		}
@@ -74,9 +74,9 @@ public:
 		}
 	}
 
-	inline void Unlock(bool shared = false) noexcept
+	inline void Unlock(bool bShared = false) noexcept
 	{
-		if (shared)
+		if (bShared)
 		{
 			PlatformMisc::ReleaseSpinlockShared(LockVal);
 		}
@@ -86,9 +86,9 @@ public:
 		}
 	}
 
-	inline bool TryLock(bool shared = false) noexcept
+	inline bool TryLock(bool bShared = false) noexcept
 	{
-		if (shared)
+		if (bShared)
 		{
 			return PlatformMisc::TryAcquireSpinlockShared(LockVal);
 		}
@@ -98,9 +98,9 @@ public:
 		}
 	}
 
-	inline Spinlock& operator =(Spinlock&& r) noexcept
+	inline Spinlock& operator =(Spinlock&& Rhs) noexcept
 	{
-		std::swap(LockVal, r.LockVal);
+		std::swap(LockVal, Rhs.LockVal);
 		return *this;
 	}
 

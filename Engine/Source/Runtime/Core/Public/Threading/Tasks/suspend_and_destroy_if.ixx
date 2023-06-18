@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-export module Core:suspend_and_destroy_if;
+export module Core.Threading:suspend_and_destroy_if;
 
 export import <coroutine>;
 
@@ -19,11 +19,11 @@ public:
 		return !bSuspendAndDestroy;
 	}
 
-	void await_suspend(std::coroutine_handle<> coro) const noexcept
+	void await_suspend(std::coroutine_handle<> Coro) const noexcept
 	{
 		if (bSuspendAndDestroy)
 		{
-			coro.destroy();
+			Coro.destroy();
 		}
 	}
 

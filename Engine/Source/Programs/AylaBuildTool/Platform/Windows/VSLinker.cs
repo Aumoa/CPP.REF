@@ -85,7 +85,7 @@ public class VSLinker : Linker
             Subsystem = "/SUBSYSTEM:WINDOWS";
         }
 
-        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" /LTCG \"{BuildDir}\\*.obj\"";
+        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.obj\"";
 
         Process? P = Process.Start(PSI);
         if (P == null)
@@ -105,6 +105,6 @@ public class VSLinker : Linker
             throw new TerminateException(KnownErrorCode.CompileError, Report);
         }
 
-        return Stdout;
+        return Stdout.Trim() + $"\n{BinaryOut}";
     }
 }
