@@ -2,10 +2,9 @@
 
 export module Core.System:Math;
 
+export import Core.Std;
 export import :IntegralTypes;
 export import :EaseFunction;
-export import <concepts>;
-export import <numbers>;
 
 export struct Radians;
 

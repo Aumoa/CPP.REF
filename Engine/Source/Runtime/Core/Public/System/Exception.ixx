@@ -2,8 +2,7 @@
 
 export module Core.System:Exception;
 
-export import <exception>;
-export import <source_location>;
+export import Core.Std;
 export import :String;
 
 export class CORE_API Exception

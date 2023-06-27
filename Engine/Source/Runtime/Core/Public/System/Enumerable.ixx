@@ -2,9 +2,8 @@
 
 export module Core.System:Enumerable;
 
+export import Core.Std;
 export import :IEnumerable;
-export import <vector>;
-export import <span>;
 
 export template<class TBeginIt, class TEndIt>
 class Enumerable

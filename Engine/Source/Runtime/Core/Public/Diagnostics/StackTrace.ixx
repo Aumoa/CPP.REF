@@ -2,10 +2,8 @@
 
 export module Core.Diagnostics:StackTrace;
 
+export import Core.Std;
 export import :StackFrame;
-export import <thread>;
-export import <map>;
-export import <mutex>;
 
 export class CORE_API StackTrace
 {

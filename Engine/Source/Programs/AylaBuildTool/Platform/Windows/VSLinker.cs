@@ -40,11 +40,13 @@ public class VSLinker : Linker
         string OutputDir;
         string BuildDir;
         string LibraryPath;
+        string StdDir;
         if (Config.Platform == TargetPlatform.Win64)
         {
             OutputDir = Module.ProjectDir.Binaries.Win64;
             BuildDir = Path.Combine(Module.ProjectDir.Intermediate.Build, "Win64");
             LibraryPath = Global.EngineDirectory.Binaries.Win64;
+            StdDir = Path.Combine(Global.EngineDirectory.Intermediate.Build, "Win64");
         }
         else
         {
@@ -53,6 +55,7 @@ public class VSLinker : Linker
 
         string BinaryOut = Path.Combine(OutputDir, Module.Name);
         BuildDir = Path.Combine(BuildDir, Config.Configuration.ToString(), Module.Name);
+        StdDir = Path.Combine(StdDir, Config.Configuration.ToString(), "Core");
 
         ProcessStartInfo PSI = new(LinkExe);
         string[] Paths = ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture);
@@ -85,7 +88,7 @@ public class VSLinker : Linker
             Subsystem = "/SUBSYSTEM:WINDOWS";
         }
 
-        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.obj\"";
+        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.cpp.obj\" \"{BuildDir}\\*.ixx.obj\" \"{StdDir}\\*.std.obj\"";
 
         Process? P = Process.Start(PSI);
         if (P == null)

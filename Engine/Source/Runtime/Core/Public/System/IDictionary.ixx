@@ -2,8 +2,8 @@
 
 export module Core.System:IDictionary;
 
+export import Core.Std;
 export import :IEnumerable;
-export import <map>;
 
 export template<class T, class TKey, class TValue>
 concept IDictionary = IEnumerable<T, std::pair<TKey, TValue>> && requires

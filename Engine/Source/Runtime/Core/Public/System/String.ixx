@@ -2,23 +2,18 @@
 
 export module Core.System:String;
 
+export import Core.Std;
 export import :CharType;
 export import :IntegralTypes;
 export import :StringComparison;
 export import :StringSplitOptions;
 export import :AEConcepts;
 export import :Array;
-export import <variant>;
-export import <array>;
-export import <memory>;
-export import <string_view>;
-export import <utility>;
-export import <compare>;
-export import <cstring>;
-export import <format>;
-export import <vector>;
-export import <unordered_map>;
-export import <optional>;
+
+namespace details
+{
+	export inline constexpr const char_t NullChar = 0;
+}
 
 export class CORE_API String
 {
@@ -27,7 +22,6 @@ export class CORE_API String
 	bool bNullTerminate;
 
 private:
-	static inline constexpr const char_t NullChar = 0;
 	static inline constexpr const std::array WhitespaceChars = { L' ', L'\t', L'\r', L'\n', L'\b' };
 
 private:
@@ -51,7 +45,7 @@ private:
 			break;
 		}
 
-		return Ptr ? Ptr : &NullChar;
+		return Ptr ? Ptr : &details::NullChar;
 	}
 
 	static inline constexpr char_t SafeGet(const char_t* InBuf, size_t InLen, size_t Idx, bool bLowerCase = false) noexcept
@@ -167,7 +161,7 @@ private:
 
 public:
 	inline constexpr String() noexcept
-		: Buf(&NullChar)
+		: Buf(&details::NullChar)
 		, Len(0)
 		, bNullTerminate(true)
 	{
@@ -185,7 +179,7 @@ public:
 		, Len(Rhs.Len)
 		, bNullTerminate(Rhs.bNullTerminate)
 	{
-		Rhs.Buf = &NullChar;
+		Rhs.Buf = &details::NullChar;
 		Rhs.Len = 0;
 		Rhs.bNullTerminate = true;
 	}
@@ -240,7 +234,7 @@ public:
 		Buf = std::move(Rhs.Buf);
 		Len = Rhs.Len;
 		bNullTerminate = Rhs.bNullTerminate;
-		Rhs.Buf = &NullChar;
+		Rhs.Buf = &details::NullChar;
 		Rhs.Len = 0;
 		Rhs.bNullTerminate = true;
 		return *this;
@@ -253,7 +247,7 @@ public:
 		{
 			return MyBuf[Idx];
 		}
-		return NullChar;
+		return details::NullChar;
 	}
 
 	inline constexpr bool operator ==(const String& Rhs) const noexcept
@@ -314,7 +308,7 @@ public:
 	{
 		if (Len == 0)
 		{
-			return &NullChar;
+			return &details::NullChar;
 		}
 		else
 		{
@@ -326,7 +320,7 @@ public:
 	{
 		if (Len == 0)
 		{
-			return &NullChar;
+			return &details::NullChar;
 		}
 		else
 		{

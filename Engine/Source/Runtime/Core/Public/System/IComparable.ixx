@@ -2,9 +2,7 @@
 
 export module Core.System:IComparable;
 
-export import <utility>;
-export import <compare>;
-export import <concepts>;
+export import Core.Std;
 
 export template<class T, class U>
 concept IComparable = requires

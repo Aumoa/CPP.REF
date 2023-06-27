@@ -2,9 +2,9 @@
 
 export module Core.System:ScopedDelegateHolder;
 
+export import Core.Std;
 export import :IntegralTypes;
 export import :IMulticastDelegate;
-export import <memory>;
 
 export class DelegateHandle;
 export template<class> class MulticastDelegate;

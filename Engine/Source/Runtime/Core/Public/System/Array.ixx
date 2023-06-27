@@ -2,9 +2,9 @@
 
 export module Core.System:Array;
 
+export import Core.Std;
 export import :IArray;
 export import :Enumerable;
-export import <array>;
 
 export template<class TBeginIt = void, class TEndIt = void> requires (
 	requires

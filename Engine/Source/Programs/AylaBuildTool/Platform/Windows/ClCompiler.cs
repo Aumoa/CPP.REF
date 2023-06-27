@@ -94,7 +94,9 @@ public class ClCompiler : Compiler
                     // Disable optimization.
                     "/Od " +
                     // Enable fast runtime checks.
-                    "/RTC1 "
+                    "/RTC1 " +
+                    // Multithreaded DLL
+                    "/MDd "
                     ;
                 break;
             case Configuration.Development:
@@ -107,7 +109,9 @@ public class ClCompiler : Compiler
                     // Generates complete debugging information.
                     "/Zi " +
                     // Creates fast code.
-                    "/O2 "
+                    "/O2 " +
+                    // Multithreaded DLL
+                    "/MD "
                     ;
                 break;
         }
@@ -140,6 +144,10 @@ public class ClCompiler : Compiler
     {
         string SourceCodeName = Path.GetFileName(Item.SourceCode);
         string Output = Path.Combine(Item.Cache.IntermediateOutput, SourceCodeName + ".obj");
+        if (Path.HasExtension(SourceCodeName) == false)
+        {
+            Output = Path.ChangeExtension(Output, ".std.obj");
+        }
         string Pdb = Path.Combine(Item.Cache.IntermediateOutput, SourceCodeName + ".pdb");
         string IfcOutput = Item.Cache.IntermediateOutput;
 

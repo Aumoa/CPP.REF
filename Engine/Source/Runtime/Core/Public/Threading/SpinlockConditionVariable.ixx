@@ -2,10 +2,9 @@
 
 export module Core.Threading:SpinlockConditionVariable;
 
+export import Core.Std;
 export import Core.System;
 export import Core.Platform;
-export import <chrono>;
-export import <mutex>;
 
 export class CORE_API SpinlockConditionVariable
 {

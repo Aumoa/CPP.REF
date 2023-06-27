@@ -2,6 +2,7 @@
 
 export module Core;
 
+export import Core.Std;
 export import Core.System;
 export import Core.IO;
 export import Core.Platform;

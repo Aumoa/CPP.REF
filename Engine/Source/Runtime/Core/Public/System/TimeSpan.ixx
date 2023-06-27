@@ -2,8 +2,7 @@
 
 export module Core.System:TimeSpan;
 
-export import <chrono>;
-export import <compare>;
+export import Core.Std;
 export import :IntegralTypes;
 
 using namespace std::chrono_literals;

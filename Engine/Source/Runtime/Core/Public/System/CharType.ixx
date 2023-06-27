@@ -2,7 +2,7 @@
 
 export module Core.System:CharType;
 
-export import <concepts>;
+export import Core.Std;
 
 export using char_t = wchar_t;
 

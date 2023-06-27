@@ -2,8 +2,7 @@
 
 export module Core.System:IEquatable;
 
-export import <utility>;
-export import <concepts>;
+export import Core.Std;
 
 export template<class T, class U>
 concept IEquatable = requires

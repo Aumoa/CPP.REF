@@ -2,7 +2,7 @@
 
 export module Core.System:IntegralTypes;
 
-export import <concepts>;
+export import Core.Std;
 export import :StaticClass;
 
 export using int8 = signed char;

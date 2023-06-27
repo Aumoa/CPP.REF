@@ -2,8 +2,8 @@
 
 export module Core.System:Guid;
 
+export import Core.Std;
 export import :IntegralTypes;
-export import <array>;
 
 export class String;
 

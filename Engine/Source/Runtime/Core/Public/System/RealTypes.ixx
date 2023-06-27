@@ -2,7 +2,7 @@
 
 export module Core.System:RealTypes;
 
-export import <concepts>;
+export import Core.Std;
 export import :StaticClass;
 
 export class String;

@@ -2,10 +2,8 @@
 
 export module Core.Platform:PlatformMisc;
 
+export import Core.Std;
 export import Core.System;
-export import <functional>;
-export import <span>;
-export import <string>;
 
 export class String;
 export class IOCompletionOverlapped;

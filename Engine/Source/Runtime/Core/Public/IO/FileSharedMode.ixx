@@ -2,7 +2,7 @@
 
 export module Core.IO:FileSharedMode;
 
-export import <utility>;
+export import Core.Std;
 
 export enum class EFileSharedMode
 {

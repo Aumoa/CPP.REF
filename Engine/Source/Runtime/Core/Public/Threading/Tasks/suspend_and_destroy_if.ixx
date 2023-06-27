@@ -2,7 +2,7 @@
 
 export module Core.Threading:suspend_and_destroy_if;
 
-export import <coroutine>;
+export import Core.Std;
 
 export class suspend_and_destroy_if
 {

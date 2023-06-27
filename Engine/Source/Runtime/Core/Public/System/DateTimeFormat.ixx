@@ -2,9 +2,8 @@
 
 export module Core.System:DateTimeFormat;
 
+export import Core.Std;
 export import :String;
-export import <chrono>;
-export import <sstream>;
 
 export class DateTime;
 

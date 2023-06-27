@@ -2,9 +2,7 @@
 
 export module Core.System:IEnumerable;
 
-export import <utility>;
-export import <algorithm>;
-export import <concepts>;
+export import Core.Std;
 
 export template<class T, class U>
 concept IEnumerable = requires (const T& Val)

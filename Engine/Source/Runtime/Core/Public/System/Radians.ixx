@@ -2,10 +2,9 @@
 
 export module Core.System:Radians;
 
+export import Core.Std;
 export import :Math;
 export import :String;
-export import <string>;
-export import <numbers>;
 
 export struct Degrees;
 

@@ -2,7 +2,7 @@
 
 export module Core.System:StringSplitOptions;
 
-export import <utility>;
+export import Core.Std;
 
 export enum class EStringSplitOptions
 {

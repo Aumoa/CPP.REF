@@ -2,8 +2,7 @@
 
 export module Core.System:AEConcepts;
 
-export import <concepts>;
-export import <ranges>;
+export import Core.Std;
 
 export template<class TBase, class... TArgs>
 concept CompatibleVariadic = requires (TArgs&&... Vals)

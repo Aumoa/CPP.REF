@@ -2,14 +2,9 @@
 
 export module Core.System:MulticastDelegate;
 
+export import Core.Std;
 export import :IMulticastDelegate;
 export import :DelegateHandle;
-export import <functional>;
-export import <map>;
-export import <atomic>;
-export import <concepts>;
-export import <memory>;
-export import <mutex>;
 
 export template<class>
 class MulticastDelegate
