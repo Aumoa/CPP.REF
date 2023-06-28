@@ -3,3 +3,4 @@
 export module Core.Platform.Windows;
 
 export import :WindowsStandardStreamTextWriter;
+export import :WindowsIOCPImplementation;

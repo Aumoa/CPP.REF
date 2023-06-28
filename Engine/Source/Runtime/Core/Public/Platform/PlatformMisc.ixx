@@ -31,13 +31,17 @@ public:
 	static bool SetThreadName(String name) noexcept;
 	static String GetThreadName() noexcept;
 	static size_t GetCurrentThreadId() noexcept;
-	static int GuardedMain(std::function<int()> body);
 
 public:
 	static void Debugbreak() noexcept;
+	inline static void YieldProcessor() noexcept
+	{
 #if PLATFORM_WINDOWS
-	inline static void YieldProcessor() noexcept { _mm_pause(); }
+		_mm_pause();
+#else
+		std::this_thread::yield();
 #endif
+	}
 	static void OutputDebugString(String message) noexcept;
 
 public:

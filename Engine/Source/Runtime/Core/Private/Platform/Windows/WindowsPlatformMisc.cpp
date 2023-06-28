@@ -78,152 +78,74 @@ bool PlatformMisc::SleepConditionVariable(size_t& Cv, size_t& Lock, uint32 Delay
 
 
 
-//bool PlatformMisc::SetThreadName(String name) noexcept
-//{
-//	return SetThreadDescription(GetCurrentThread(), name.c_str()) == S_OK;
-//}
-//
-//String PlatformMisc::GetThreadName() noexcept
-//{
-//	WCHAR* buf;
-//	if (FAILED(GetThreadDescription(GetCurrentThread(), &buf)))
-//	{
-//		return TEXT("");
-//	}
-//
-//	auto str = String(buf);
-//	LocalFree(buf);
-//	return str;
-//}
-//
-//size_t PlatformMisc::GetCurrentThreadId() noexcept
-//{
-//	return (size_t)GetThreadId(GetCurrentThread());
-//}
+bool PlatformMisc::SetThreadName(String name) noexcept
+{
+	return SetThreadDescription(GetCurrentThread(), name.c_str()) == S_OK;
+}
 
-//class WindowsSEHException : public Exception
-//{
-//public:
-//	WindowsSEHException(uint32 exceptionCode)
-//		: Exception(String::Format(TEXT("An SEH exception occurred with exception code: {}"), exceptionCode))
-//	{
-//	}
-//};
-//
-//static constexpr DWORD CxxExceptionCode = 0xE06D7363;
-//
-//LONG CALLBACK UnhandledExceptionHandler(LPEXCEPTION_POINTERS lpExceptionPointers)
-//{
-//	if (lpExceptionPointers->ExceptionRecord->ExceptionCode == CxxExceptionCode)
-//	{
-//		auto* ptr = Exception::EnsureException((Exception*)lpExceptionPointers->ExceptionRecord->ExceptionInformation[1]);
-//		if (ptr)
-//		{
-//			Log::Fatal(LogWindows, TEXT("{}"), *ptr);
-//		}
-//	}
-//	else
-//	{
-//		Log::Fatal(LogWindows, TEXT("{}"), Stacktrace::FromException(lpExceptionPointers));
-//	}
-//
-//	return EXCEPTION_CONTINUE_SEARCH;
-//}
-//
-//LONG CALLBACK MarkExceptionStacktrace(LPEXCEPTION_POINTERS lpExceptionPointers)
-//{
-//	if (lpExceptionPointers->ExceptionRecord->ExceptionCode == CxxExceptionCode)
-//	{
-//		auto* ptr = Exception::EnsureException((Exception*)lpExceptionPointers->ExceptionRecord->ExceptionInformation[1]);
-//		if (ptr)
-//		{
-//			ptr->InternalMarkStacktrace(lpExceptionPointers);
-//		}
-//		else if (_is_exception_typeof(typeid(std::exception), lpExceptionPointers))
-//		{
-//			auto inner = std::make_exception_ptr((std::exception*)lpExceptionPointers->ExceptionRecord->ExceptionInformation[1]);
-//			throw CxxException(inner);
-//		}
-//	}
-//
-//	return EXCEPTION_CONTINUE_SEARCH;
-//}
-//
-//void CALLBACK SEHExceptionTranslator(unsigned int lExceptionCode, LPEXCEPTION_POINTERS lpExceptionPointers)
-//{
-//	LPEXCEPTION_RECORD lpExceptionRecord = lpExceptionPointers->ExceptionRecord;
-//	DWORD exceptionCode = lpExceptionRecord->ExceptionCode;
-//	switch (exceptionCode)
-//	{
-//	case EXCEPTION_ACCESS_VIOLATION:
-//		throw AccessViolationException((AccessViolationException::EAccessMode)lpExceptionRecord->ExceptionInformation[0], (int64)lpExceptionRecord->ExceptionInformation[1]);
-//	case EXCEPTION_STACK_OVERFLOW:
-//		throw StackOverflowException();
-//	}
-//}
-//
-//int _internal_guarded_main(std::function<int()>* body)
-//{
-//	uint32 exceptionCode = 0;
-//
-//	_set_se_translator(SEHExceptionTranslator);
-//
-//	SetUnhandledExceptionFilter(UnhandledExceptionHandler);
-//	AddVectoredExceptionHandler(1, MarkExceptionStacktrace);
-//
-//	return (*body)();
-//}
-//
-//int PlatformMisc::GuardedMain(std::function<int()> body)
-//{
-//	return _internal_guarded_main(&body);
-//}
-//
-//
-//
-//void PlatformMisc::Debugbreak() noexcept
-//{
-//	__debugbreak();
-//}
-//
-//void PlatformMisc::OutputDebugString(String message) noexcept
-//{
-//	OutputDebugStringW(message.c_str());
-//}
-//
-//
-//
-//void PlatformMisc::UuidCreate(void* block128) noexcept
-//{
-//	if (::UuidCreate((UUID*)block128) != RPC_S_OK)
-//	{
-//		__noop;
-//	}
-//}
-//
+String PlatformMisc::GetThreadName() noexcept
+{
+	WCHAR* Buf;
+	if (FAILED(GetThreadDescription(GetCurrentThread(), &Buf)))
+	{
+		return TEXT("");
+	}
+
+	auto Str = String(Buf);
+	LocalFree(Buf);
+	return Str;
+}
+
+size_t PlatformMisc::GetCurrentThreadId() noexcept
+{
+	return (size_t)GetThreadId(GetCurrentThread());
+}
+
+
+
+void PlatformMisc::Debugbreak() noexcept
+{
+	__debugbreak();
+}
+
+void PlatformMisc::OutputDebugString(String InMessage) noexcept
+{
+	OutputDebugStringW(InMessage.c_str());
+}
+
+
+
+void PlatformMisc::UuidCreate(void* block128) noexcept
+{
+	if (::UuidCreate((UUID*)block128) != RPC_S_OK)
+	{
+		__noop;
+	}
+}
+
 String PlatformMisc::FormatSystemCode(int32 systemCode)
 {
-	static thread_local WCHAR buf[1024] = {};
-	DWORD len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)systemCode, 0, buf, 1024, NULL);
-	if (len == 0)
+	static thread_local WCHAR Buf[1024] = {};
+	DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)systemCode, 0, Buf, 1024, NULL);
+	if (Len == 0)
 	{
 		return TEXT("Unknown error.");
 	}
 
-	return String(buf, len);
+	return String(Buf, Len);
 }
-//
-//int32 PlatformMisc::GetLastError() noexcept
-//{
-//	return (int32)::GetLastError();
-//}
-//
-//String PlatformMisc::GetSystemPath()
-//{
-//	static thread_local WCHAR buf[1024] = {};
-//	::GetSystemDirectoryW(buf, 1024);
-//	return String(buf);
-//}
+
+int32 PlatformMisc::GetLastError() noexcept
+{
+	return (int32)::GetLastError();
+}
+
+String PlatformMisc::GetSystemPath()
+{
+	static thread_local WCHAR Buf[1024] = {};
+	::GetSystemDirectoryW(Buf, 1024);
+	return String(Buf);
+}
 
 
 

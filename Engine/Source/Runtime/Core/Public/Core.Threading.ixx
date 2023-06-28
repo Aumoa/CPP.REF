@@ -6,3 +6,4 @@ export import :Spinlock;
 export import :SpinlockConditionVariable;
 export import :suspend_and_destroy_if;
 export import :TaskStatus;
+export import :ThreadPool;

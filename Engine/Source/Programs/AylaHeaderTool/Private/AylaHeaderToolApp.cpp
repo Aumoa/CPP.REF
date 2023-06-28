@@ -20,7 +20,7 @@ int32 AylaHeaderToolApp::Run()
 	}
 	catch (const TerminateException& TE)
 	{
-		Console::WriteLine(TE.GetMessage());
+		Console::WriteLine(TE.ToString());
 		if (TE.ErrorCode == TerminateException::EKnownErrorCodes::Usage)
 		{
 			PrintUsage(Console::GetError());
