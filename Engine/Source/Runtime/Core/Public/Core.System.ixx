@@ -36,3 +36,5 @@ export import :Exception;
 export import :SystemException;
 export import :CommandLine;
 export import :Path;
+export import :VoidableOptional;
+export import :InvalidOperationException;
