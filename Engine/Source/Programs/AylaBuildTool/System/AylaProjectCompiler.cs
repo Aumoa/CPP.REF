@@ -54,6 +54,8 @@ public class AylaProjectCompiler
         Dictionary<string, CompileNode> CompileTree;
         Dictionary<ModuleDependencyCache, (Task, TaskCompletionSource)> LinkerTree = new();
 
+        Console.Write("Scan dependencies for {0}...", Target.TargetName);
+        using (var Timer = new ScopedTimer("Scan Dependencies"))
         {
             List<Task<(ModuleDependencyCache, string, CompileNode)?>> Tasks = new();
 
@@ -81,7 +83,8 @@ public class AylaProjectCompiler
                             {
                                 return (ModuleCache, Item.SourceCode, new CompileNode()
                                 {
-                                    Compile = Item, IfcSearchDirs = new(),
+                                    Compile = Item,
+                                    IfcSearchDirs = new(),
                                     CompileTask = new(),
                                     HeaderImports = new(),
                                     Parents = new()
@@ -147,6 +150,7 @@ public class AylaProjectCompiler
                 _ = ResolveDependencyLinkTree(ModuleCache);
             }
         }
+        Console.WriteLine(" {0} seconds elapsed.", ScopedTimer.GetElapsed("Scan Dependencies"));
 
         HashSet<CompileNode> Resolved = new();
         void ResolveCompileTreeNode(CompileNode Node)

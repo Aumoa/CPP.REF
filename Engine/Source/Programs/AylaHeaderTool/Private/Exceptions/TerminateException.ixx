@@ -10,10 +10,13 @@ public:
 	enum class EKnownErrorCodes
 	{
 		Success = 0,
+		Usage = 1,
 	};
 
 public:
 	TerminateException(EKnownErrorCodes ErrorCode);
+
+	EKnownErrorCodes ErrorCode;
 
 private:
 	static String FormatMessage(EKnownErrorCodes ErrorCode);

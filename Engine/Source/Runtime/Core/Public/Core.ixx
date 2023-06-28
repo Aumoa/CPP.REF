@@ -8,3 +8,4 @@ export import Core.IO;
 export import Core.Platform;
 export import Core.Diagnostics;
 export import Core.Threading;
+export import Core.Linq;

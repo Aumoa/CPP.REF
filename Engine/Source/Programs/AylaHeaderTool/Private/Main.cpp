@@ -3,8 +3,9 @@
 import Core;
 import AylaHeaderTool;
 
-int main()
+int main(int Argc, char* Argv[])
 {
+	CommandLine::Init(Argc, Argv);
 	AylaHeaderToolApp App;
 	return App.Run();
 }

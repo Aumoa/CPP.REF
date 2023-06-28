@@ -13,21 +13,28 @@ inline namespace
 	HANDLE hIn(GetStdHandle(STD_INPUT_HANDLE));
 }
 
-TextWriter& Console::Out = sOut;
-TextWriter& Console::Error = sError;
+TextWriter& Console::GetOut()
+{
+	return sOut;
+}
+
+TextWriter& Console::GetError()
+{
+	return sError;
+}
 #endif
 
 void Console::Write(String Str)
 {
 #if PLATFORM_WINDOWS
-	Out.Write(Str);
+	sOut.Write(Str);
 #endif
 }
 
 void Console::WriteLine(String Str)
 {
 #if PLATFORM_WINDOWS
-	Out.WriteLine(Str);
+	sOut.WriteLine(Str);
 #endif
 }
 

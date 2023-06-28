@@ -2,20 +2,29 @@
 
 import Core;
 import AylaHeaderTool;
-import <format>;
 
 TerminateException::TerminateException(EKnownErrorCodes ErrorCode)
 	: Exception(FormatMessage(ErrorCode))
+	, ErrorCode(ErrorCode)
 {
 }
 
 String TerminateException::FormatMessage(EKnownErrorCodes ErrorCode)
 {
+	String Message;
+
 	switch (ErrorCode)
 	{
 	case EKnownErrorCodes::Success:
-		return TEXT("A0000: Working success.");
+		Message = TEXT("Working success.");
+		break;
+	case EKnownErrorCodes::Usage:
+		Message = TEXT("Usage error.");
+		break;
 	default:
-		return String::Format(TEXT("A{:0>4}: Unknown error code."), (int32)ErrorCode);
+		Message = TEXT("Internal compiler error.");
+		break;
 	}
+
+	return String::Format(TEXT("A{:0>4}: {}"), (int32)ErrorCode, Message);
 }

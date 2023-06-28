@@ -22,3 +22,18 @@ String& String::AllocateAssign(const char_t* InBuf, size_t InLen)
 	bNullTerminate = true;
 	return *this;
 }
+
+String String::FromLiteral(std::string_view InStr)
+{
+	static thread_local std::unordered_map<const char*, String> Views;
+	if (auto It = Views.find(InStr.data()); It != Views.end())
+	{
+		return It->second;
+	}
+	else
+	{
+		String Cv = String(InStr);
+		Views.emplace(InStr.data(), Cv);
+		return Cv;
+	}
+}

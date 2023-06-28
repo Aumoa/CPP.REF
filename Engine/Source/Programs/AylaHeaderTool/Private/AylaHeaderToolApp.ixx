@@ -10,4 +10,7 @@ public:
 	AylaHeaderToolApp();
 
 	int32 Run();
+
+private:
+	static void PrintUsage(TextWriter& Output);
 };

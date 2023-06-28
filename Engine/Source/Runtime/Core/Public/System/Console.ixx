@@ -10,6 +10,10 @@ export import :ConsoleColor;
 export class CORE_API Console
 {
 public:
+	static class TextWriter& GetOut();
+	static class TextWriter& GetError();
+
+public:
 	static void Write(String Str);
 	static void WriteLine(String Str);
 
@@ -30,8 +34,4 @@ public:
 	{
 		WriteLine(String::Format(Format, std::forward<TArgs>(InArgs)...));
 	}
-
-public:
-	static class TextWriter& Out;
-	static class TextWriter& Error;
 };

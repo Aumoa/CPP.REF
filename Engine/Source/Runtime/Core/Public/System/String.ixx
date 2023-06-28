@@ -971,20 +971,7 @@ public:
 		return String(decltype(Buf)(InStr.data()), InStr.length());
 	}
 
-	[[nodiscard]] static inline String FromLiteral(std::string_view InStr)
-	{
-		static thread_local std::unordered_map<const char*, String> Views;
-		if (auto It = Views.find(InStr.data()); It != Views.end())
-		{
-			return It->second;
-		}
-		else
-		{
-			String Cv = String(InStr);
-			Views.emplace(InStr.data(), Cv);
-			return Cv;
-		}
-	}
+	[[nodiscard]] static String FromLiteral(std::string_view InStr);
 
 public:
 	[[nodiscard]] static String FromCodepage(std::string_view Str, int32 Codepage = 0);
