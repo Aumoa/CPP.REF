@@ -11,9 +11,7 @@ public sealed record MakefileCompile
 
     public required MakefileCache Cache { get; init; }
 
-    public required CppModuleDescriptor? Provide { get; init; }
-
-    public required CppModuleDescriptor[] Requires { get; init; }
+    public required bool bSourceCodeNew { get; init; }
 
     public required string ModuleName { get; init; }
 

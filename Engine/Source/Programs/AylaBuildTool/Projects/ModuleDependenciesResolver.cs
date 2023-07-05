@@ -137,8 +137,23 @@ public class ModuleDependenciesResolver
                 Makefile Makefile = p.Result;
 
                 Dictionary<string, MakefileCache> MakefileCaches = Makefile.Caches.ToDictionary(p => p.SourceCodePath, p => p);
-                Dictionary<string, MakefileCache?> SourceCodeChecks = new();
+                Dictionary<string, MakefileCompile> SourceCodeChecks = new();
                 Queue<string> SourceCodes = new();
+
+                MakefileCompile GenerateMakefileCompile(MakefileCache InCache, bool bSourceCodeNew)
+                {
+                    return new MakefileCompile()
+                    {
+                        SourceCode = InCache.SourceCodePath,
+                        Cache = InCache,
+                        bSourceCodeNew = bSourceCodeNew,
+                        ModuleName = Cache.Name,
+                        DependModules = Cache.DependModules,
+                        IncludePaths = Cache.IncludePaths,
+                        AdditionalMacros = Cache.AdditionalMacros,
+                        DisableWarnings = Cache.DisableWarnings,
+                    };
+                }
 
                 void SourceCodeAction(string InSourceCode)
                 {
@@ -157,7 +172,7 @@ public class ModuleDependenciesResolver
                         ulong NewSourceCodeHash;
                         if (MakefileCache.IsNewer(InSourceCode, out NewSourceCodeHash) == false)
                         {
-                            SourceCodeChecks.Add(InSourceCode, null);
+                            SourceCodeChecks.Add(InSourceCode, GenerateMakefileCompile(MakefileCache, false));
                             foreach (var Depend in MakefileCache.Dependencies)
                             {
                                 SourceCodes.Enqueue(Depend);
@@ -177,10 +192,11 @@ public class ModuleDependenciesResolver
                                 Dependencies = Array.Empty<string>(),
                                 Includes = Array.Empty<string>(),
                                 IntermediateOutput = Cache.ProjectDir.GenerateIntermediateOutput(Rule.Target.BuildConfiguration, Cache.Name),
+                                bScanDependenciesCache = false,
                                 ObjectOutput = string.Empty,
                                 InterfaceOutput = string.Empty
                             };
-                            SourceCodeChecks.Add(InSourceCode, NewCache);
+                            SourceCodeChecks.Add(InSourceCode, GenerateMakefileCompile(NewCache, true));
                         }
                     }
                     else
@@ -193,10 +209,11 @@ public class ModuleDependenciesResolver
                             Dependencies = Array.Empty<string>(),
                             Includes = Array.Empty<string>(),
                             IntermediateOutput = Cache.ProjectDir.GenerateIntermediateOutput(Rule.Target.BuildConfiguration, Cache.Name),
+                            bScanDependenciesCache = false,
                             ObjectOutput = string.Empty,
                             InterfaceOutput = string.Empty
                         };
-                        SourceCodeChecks.Add(InSourceCode, NewCache);
+                        SourceCodeChecks.Add(InSourceCode, GenerateMakefileCompile(NewCache, true));
                     }
                 }
 
@@ -211,24 +228,7 @@ public class ModuleDependenciesResolver
                     SourceCodeAction(SourceCodes.Dequeue());
                 }
 
-                List<MakefileCompile> Compiles = new();
-                foreach (var SourceCode in SourceCodeChecks.Where(p => p.Value != null))
-                {
-                    Compiles.Add(new MakefileCompile()
-                    {
-                        SourceCode = SourceCode.Key,
-                        Cache = SourceCode.Value!,
-                        Provide = null,
-                        Requires = Array.Empty<CppModuleDescriptor>(),
-                        ModuleName = Cache.Name,
-                        DependModules = Cache.DependModules,
-                        IncludePaths = Cache.IncludePaths,
-                        AdditionalMacros = Cache.AdditionalMacros,
-                        DisableWarnings = Cache.DisableWarnings,
-                    });
-                }
-
-                Makefile.CompileItems = Compiles.ToArray();
+                Makefile.CompileItems = SourceCodeChecks.Values.ToArray();
                 return (Cache, Makefile);
             }));
         }

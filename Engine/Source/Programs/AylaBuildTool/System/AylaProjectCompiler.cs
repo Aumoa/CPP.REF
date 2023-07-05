@@ -54,268 +54,276 @@ public class AylaProjectCompiler
         Dictionary<string, CompileNode> CompileTree;
         Dictionary<ModuleDependencyCache, (Task, TaskCompletionSource)> LinkerTree = new();
 
-        Console.Write("Scan dependencies for {0}...", Target.TargetName);
-        using (var Timer = new ScopedTimer("Scan Dependencies"))
+        try
         {
-            List<Task<(ModuleDependencyCache, string, CompileNode)?>> Tasks = new();
-
-            foreach (var (ModuleCache, Makefile) in Makefiles)
+            Console.Write("Scan dependencies for {0}...", Target.TargetName);
+            using (var Timer = new ScopedTimer("Scan Dependencies"))
             {
-                foreach (var CompileItem in Makefile.CompileItems)
+                List<Task<(ModuleDependencyCache, string, CompileNode)?>> Tasks = new();
+
+                foreach (var (ModuleCache, Makefile) in Makefiles)
                 {
-                    Tasks.Add(CompileTasks.ScanDependenciesAsync(CompileItem, Rule, SToken).ContinueWith(p =>
+                    foreach (var CompileItem in Makefile.CompileItems)
                     {
-                        MakefileCompile Item = p.Result;
-                        if (Item.Provide != null)
+                        (ModuleDependencyCache, string, CompileNode)? MakeReturnValue(MakefileCompile Item)
                         {
-                            return (ModuleCache, Item.Provide.InterfaceName, new CompileNode
+                            if (Item.Cache.Provide != null || Global.IsHeaderFile(Item.SourceCode) == false)
                             {
-                                Compile = Item,
-                                CompileTask = new(),
-                                Parents = new(),
-                                IfcSearchDirs = new() { Item.Cache.IntermediateOutput },
-                                HeaderImports = new()
-                            });
-                        }
-                        else
-                        {
-                            if (!Global.IsHeaderFile(p.Result.SourceCode))
-                            {
-                                return (ModuleCache, Item.SourceCode, new CompileNode()
+                                return (ModuleCache, Item.Cache.Provide?.InterfaceName ?? Item.SourceCode, new CompileNode
                                 {
                                     Compile = Item,
-                                    IfcSearchDirs = new(),
                                     CompileTask = new(),
-                                    HeaderImports = new(),
-                                    Parents = new()
+                                    Parents = new(),
+                                    IfcSearchDirs = new() { Item.Cache.IntermediateOutput },
+                                    HeaderImports = new()
                                 });
                             }
                             else
                             {
-                                return ((ModuleDependencyCache, string, CompileNode)?)null;
+                                return null;
                             }
                         }
-                    }));
-                }
-            }
 
-            var CompileList = (await Task.WhenAll(Tasks)).Where(p => p != null).Select(p => p!.Value);
-            CompileTree = CompileList.ToDictionary(p => p.Item2, p => p.Item3);
+                        if (CompileItem.Cache.bScanDependenciesCache && CompileItem.bSourceCodeNew == false)
+                        {
+                            Tasks.Add(Task.FromResult(MakeReturnValue(CompileItem)));
+                            continue;
+                        }
 
-            Dictionary<ModuleDependencyCache, List<CompileNode>> LinkCompiles = new();
-            foreach (var (ModuleCache, _, CompileItem) in CompileList)
-            {
-                if (LinkCompiles.TryGetValue(ModuleCache, out List<CompileNode>? CompileNodes) == false)
-                {
-                    CompileNodes = new();
-                    LinkCompiles.Add(ModuleCache, CompileNodes);
-                }
-                CompileNodes.Add(CompileItem);
-            }
-
-            var CurrentLinkerTask = LinkCompiles.Select(p =>
-            {
-                List<Task> CompilerTasks = new();
-                foreach (var Node in p.Value)
-                {
-                    CompilerTasks.Add(Node.CompileTask.Task);
+                        Tasks.Add(CompileTasks.ScanDependenciesAsync(CompileItem, Rule, SToken).ContinueWith(p =>
+                        {
+                            MakefileCompile Item = p.Result;
+                            return MakeReturnValue(Item);
+                        }));
+                    }
                 }
 
-                Task CurrentTask = Task.WhenAll(CompilerTasks);
-                return (p.Key, CurrentTask);
-            }).ToDictionary(p => p.Key, p => p.CurrentTask);
+                var CompileList = (await Task.WhenAll(Tasks)).Where(p => p != null).Select(p => p!.Value);
+                CompileTree = CompileList.ToDictionary(p => p.Item2, p => p.Item3);
 
-            (Task, TaskCompletionSource) ResolveDependencyLinkTree(ModuleDependencyCache ModuleCache)
-            {
-                if (LinkerTree.TryGetValue(ModuleCache, out var FullTask))
+                Dictionary<ModuleDependencyCache, List<CompileNode>> LinkCompiles = new();
+                foreach (var (ModuleCache, _, CompileItem) in CompileList)
                 {
+                    if (LinkCompiles.TryGetValue(ModuleCache, out List<CompileNode>? CompileNodes) == false)
+                    {
+                        CompileNodes = new();
+                        LinkCompiles.Add(ModuleCache, CompileNodes);
+                    }
+                    CompileNodes.Add(CompileItem);
+                }
+
+                var CurrentLinkerTask = LinkCompiles.Select(p =>
+                {
+                    List<Task> CompilerTasks = new();
+                    foreach (var Node in p.Value)
+                    {
+                        CompilerTasks.Add(Node.CompileTask.Task);
+                    }
+
+                    Task CurrentTask = Task.WhenAll(CompilerTasks);
+                    return (p.Key, CurrentTask);
+                }).ToDictionary(p => p.Key, p => p.CurrentTask);
+
+                (Task, TaskCompletionSource) ResolveDependencyLinkTree(ModuleDependencyCache ModuleCache)
+                {
+                    if (LinkerTree.TryGetValue(ModuleCache, out var FullTask))
+                    {
+                        return FullTask;
+                    }
+
+                    List<Task> DependTasks = new();
+                    foreach (var Depend in ModuleCache.DependModules)
+                    {
+                        ModuleDependencyCache DependModuleCache = Resolver.GetDependencyCache(Depend);
+                        DependTasks.Add(ResolveDependencyLinkTree(DependModuleCache).Item1);
+                    }
+
+                    FullTask.Item1 = Task.WhenAll(DependTasks.Append(CurrentLinkerTask[ModuleCache]));
+                    FullTask.Item2 = new TaskCompletionSource();
+                    LinkerTree.Add(ModuleCache, FullTask);
                     return FullTask;
                 }
 
-                List<Task> DependTasks = new();
-                foreach (var Depend in ModuleCache.DependModules)
+                foreach (var (ModuleCache, _) in CurrentLinkerTask)
                 {
-                    ModuleDependencyCache DependModuleCache = Resolver.GetDependencyCache(Depend);
-                    DependTasks.Add(ResolveDependencyLinkTree(DependModuleCache).Item1);
+                    _ = ResolveDependencyLinkTree(ModuleCache);
+                }
+            }
+            Console.WriteLine(" {0} seconds elapsed.", ScopedTimer.GetElapsed("Scan Dependencies"));
+
+            HashSet<CompileNode> Resolved = new();
+            void ResolveCompileTreeNode(CompileNode Node)
+            {
+                if (Resolved.Add(Node) == false)
+                {
+                    return;
                 }
 
-                FullTask.Item1 = Task.WhenAll(DependTasks.Append(CurrentLinkerTask[ModuleCache]));
-                FullTask.Item2 = new TaskCompletionSource();
-                LinkerTree.Add(ModuleCache, FullTask);
-                return FullTask;
-            }
-
-            foreach (var (ModuleCache, _) in CurrentLinkerTask)
-            {
-                _ = ResolveDependencyLinkTree(ModuleCache);
-            }
-        }
-        Console.WriteLine(" {0} seconds elapsed.", ScopedTimer.GetElapsed("Scan Dependencies"));
-
-        HashSet<CompileNode> Resolved = new();
-        void ResolveCompileTreeNode(CompileNode Node)
-        {
-            if (Resolved.Add(Node) == false)
-            {
-                return;
-            }
-
-            foreach (var Depend in Node.Compile.Requires)
-            {
-                if (CompileTree.TryGetValue(Depend.InterfaceName, out CompileNode? SubNode) == false)
+                foreach (var Depend in Node.Compile.Cache.Requires)
                 {
-                    if (Depend.SourcePath != null)
+                    if (CompileTree.TryGetValue(Depend.InterfaceName, out CompileNode? SubNode) == false)
                     {
-                        SubNode = new CompileNode()
+                        if (Depend.SourcePath != null)
                         {
-                            Compile = Node.Compile with
+                            SubNode = new CompileNode()
                             {
-                                SourceCode = Depend.SourcePath,
-                                Cache = new MakefileCache()
+                                Compile = Node.Compile with
                                 {
-                                    SourceCodePath = Depend.SourcePath,
-                                    SourceCodeHash = Global.GenerateSourceCodeHash(Depend.SourcePath),
-                                    LastWriteTimeInUtc = File.GetLastWriteTimeUtc(Depend.SourcePath),
-                                    Dependencies = Array.Empty<string>(),
-                                    Includes = Array.Empty<string>(),
-                                    IntermediateOutput = Node.Compile.Cache.IntermediateOutput,
-                                    ObjectOutput = string.Empty,
-                                    InterfaceOutput = string.Empty
+                                    SourceCode = Depend.SourcePath,
+                                    Cache = new MakefileCache()
+                                    {
+                                        SourceCodePath = Depend.SourcePath,
+                                        SourceCodeHash = Global.GenerateSourceCodeHash(Depend.SourcePath),
+                                        LastWriteTimeInUtc = File.GetLastWriteTimeUtc(Depend.SourcePath),
+                                        Dependencies = Array.Empty<string>(),
+                                        Includes = Array.Empty<string>(),
+                                        IntermediateOutput = Node.Compile.Cache.IntermediateOutput,
+                                        ObjectOutput = string.Empty,
+                                        InterfaceOutput = string.Empty,
+                                        Provide = Depend,
+                                        Requires = Array.Empty<CppModuleDescriptor>()
+                                    },
                                 },
-                                Provide = Depend,
-                                Requires = Array.Empty<CppModuleDescriptor>(),
-                            },
-                            CompileTask = new(),
-                            Parents = new(),
-                            IfcSearchDirs = new(),
-                            HeaderImports = new()
-                        };
+                                CompileTask = new(),
+                                Parents = new(),
+                                IfcSearchDirs = new(),
+                                HeaderImports = new()
+                            };
 
-                        CompileTree.Add(Depend.InterfaceName, SubNode);
+                            CompileTree.Add(Depend.InterfaceName, SubNode);
+                        }
                     }
-                }
 
-                if (SubNode == null)
-                {
-                    continue;
-                }
+                    if (SubNode == null)
+                    {
+                        continue;
+                    }
 
-                // Resolve sub tree node recursive.
-                ResolveCompileTreeNode(SubNode);
+                    // Resolve sub tree node recursive.
+                    ResolveCompileTreeNode(SubNode);
 
-                Node.Parents.Add(SubNode);
+                    Node.Parents.Add(SubNode);
 
-                foreach (var IfcSearchDir in SubNode.IfcSearchDirs)
-                {
-                    Node.IfcSearchDirs.Add(IfcSearchDir);
-                }
-                foreach (var HeaderImport in SubNode.HeaderImports)
-                {
-                    Node.HeaderImports.Add(HeaderImport);
-                }
-                if (Depend.LookupMethod.HasValue)
-                {
-                    Node.HeaderImports.Add(Depend.InterfaceName);
+                    foreach (var IfcSearchDir in SubNode.IfcSearchDirs)
+                    {
+                        Node.IfcSearchDirs.Add(IfcSearchDir);
+                    }
+                    foreach (var HeaderImport in SubNode.HeaderImports)
+                    {
+                        Node.HeaderImports.Add(HeaderImport);
+                    }
+                    if (Depend.LookupMethod.HasValue)
+                    {
+                        Node.HeaderImports.Add(Depend.InterfaceName);
+                    }
                 }
             }
-        }
 
-        foreach (var Node in CompileTree.Values.ToArray())
-        {
-            ResolveCompileTreeNode(Node);
-        }
-
-        // Compile module sources.
-        {
-            List<Task> Tasks = new();
-            foreach (var (_, Node) in CompileTree)
+            foreach (var Node in CompileTree.Values.ToArray())
             {
-                async Task<string?> CompileNodeAsync(CancellationToken SToken)
-                {
-                    try
-                    {
-                        foreach (var SubNode in Node.Parents)
-                        {
-                            if (SubNode is CompileNode SubTreeNode)
-                            {
-                                await SubTreeNode.CompileTask.Task;
-                            }
-                        }
+                ResolveCompileTreeNode(Node);
+            }
 
-                        string Result = await CompileTasks.CompileAsync(Node, Rule, SToken);
-                        Node.CompileTask.SetResult();
-                        Console.WriteLine(Result);
-                        return Result;
-                    }
-                    catch (Exception E)
+            // Compile module sources.
+            {
+                List<Task> Tasks = new();
+                foreach (var (_, Node) in CompileTree)
+                {
+                    async Task CompileNodeAsync(CancellationToken SToken)
                     {
-                        if (E is TaskCanceledException)
+                        try
                         {
-                            Node.CompileTask.SetCanceled();
+                            bool bHasRecompile = Node.Compile.bSourceCodeNew;
+                            foreach (var SubNode in Node.Parents)
+                            {
+                                if (SubNode is CompileNode SubTreeNode)
+                                {
+                                    bHasRecompile = await SubTreeNode.CompileTask.Task || bHasRecompile;
+                                }
+                            }
+
+                            if (bHasRecompile)
+                            {
+                                string Result = await CompileTasks.CompileAsync(Node, Rule, SToken);
+                                Console.WriteLine(Result);
+                            }
+                            Node.CompileTask.SetResult(bHasRecompile);
                         }
-                        else if (E is TerminateException TE)
+                        catch (Exception E)
                         {
-                            Console.Error.WriteLine(TE.Message);
-                        }
-                        else
-                        {
+                            if (E is TaskCanceledException)
+                            {
+                                Node.CompileTask.SetCanceled();
+                            }
+                            else if (E is TerminateException TE)
+                            {
+                                Console.Error.WriteLine(TE.Message);
+                            }
                             Node.CompileTask.SetException(E);
                         }
-                        return null;
                     }
+
+                    Tasks.Add(CompileNodeAsync(SToken));
                 }
 
-                Tasks.Add(CompileNodeAsync(SToken));
-            }
-
-            int ReturnCode = 0;
-            foreach (var (ModuleCache, (CompileTask, LinkerTCS)) in LinkerTree)
-            {
-                async Task Link()
+                int ReturnCode = 0;
+                foreach (var (ModuleCache, (CompileTask, LinkerTCS)) in LinkerTree)
                 {
-                    bool bIsMyError = false;
-                    try
+                    async Task Link()
                     {
-                        await CompileTask;
-
-                        List<Task> DependTasks = new();
-                        foreach (string Depend in ModuleCache.DependModules)
+                        bool bIsMyError = false;
+                        try
                         {
-                            ModuleDependencyCache DependCache = Resolver.GetDependencyCache(Depend);
-                            if (LinkerTree.TryGetValue(DependCache, out var OutputTasks))
+                            await CompileTask;
+
+                            List<Task> DependTasks = new();
+                            foreach (string Depend in ModuleCache.DependModules)
                             {
-                                DependTasks.Add(OutputTasks.Item2.Task);
+                                ModuleDependencyCache DependCache = Resolver.GetDependencyCache(Depend);
+                                if (LinkerTree.TryGetValue(DependCache, out var OutputTasks))
+                                {
+                                    DependTasks.Add(OutputTasks.Item2.Task);
+                                }
                             }
+                            await Task.WhenAll(DependTasks);
+
+                            bIsMyError = true;
+                            Linker Linker = ToolChain.SpawnLinker();
+                            string Result = await Linker.LinkAsync(Rule, ModuleCache);
+                            Console.WriteLine(Result);
+
+                            LinkerTCS.SetResult();
                         }
-                        await Task.WhenAll(DependTasks);
-
-                        bIsMyError = true;
-                        Linker Linker = ToolChain.SpawnLinker();
-                        string Result = await Linker.LinkAsync(Rule, ModuleCache);
-                        Console.WriteLine(Result);
-
-                        LinkerTCS.SetResult();
-                    }
-                    catch (TerminateException TE)
-                    {
-                        if (bIsMyError)
+                        catch (TerminateException TE)
                         {
-                            Console.Error.WriteLine(TE.Message);
+                            if (bIsMyError)
+                            {
+                                Console.Error.WriteLine(TE.Message);
+                            }
+                            LinkerTCS.SetException(TE);
+                            ReturnCode = (int)TE.ErrorCode;
                         }
-                        LinkerTCS.SetException(TE);
-                        ReturnCode = (int)TE.ErrorCode;
+                        catch (Exception E)
+                        {
+                            LinkerTCS.SetException(E);
+                        }
                     }
-                    catch (Exception E)
-                    {
-                        LinkerTCS.SetException(E);
-                    }
+                    Tasks.Add(Link());
                 }
-                Tasks.Add(Link());
+
+                await Task.WhenAll(Tasks);
+
+                return ReturnCode;
             }
-
+        }
+        finally
+        {
+            List<Task> Tasks = new();
+            foreach (var (_, Makefile) in Makefiles)
+            {
+                Tasks.Add(Makefile.SaveMakefileCacheAsync());
+            }
             await Task.WhenAll(Tasks);
-
-            return ReturnCode;
         }
     }
 

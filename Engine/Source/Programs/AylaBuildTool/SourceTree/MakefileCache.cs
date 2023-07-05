@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 
+using AE.Compile;
 using AE.Misc;
 
 namespace AE.SourceTree;
@@ -24,6 +25,12 @@ public record MakefileCache
 
     public required string InterfaceOutput;
 
+    public bool bScanDependenciesCache = false;
+
+    public CppModuleDescriptor? Provide;
+
+    public CppModuleDescriptor[] Requires = null!;
+
     public static MakefileCache LoadCacheFromBinary(BinaryReader Reader)
     {
         MakefileCache Instance = new()
@@ -37,6 +44,22 @@ public record MakefileCache
             ObjectOutput = Reader.ReadString(),
             InterfaceOutput = Reader.ReadString(),
         };
+
+        Instance.bScanDependenciesCache = Reader.ReadBoolean();
+        if (Instance.bScanDependenciesCache)
+        {
+            if (Reader.ReadBoolean())
+            {
+                Instance.Provide = CppModuleDescriptor.LoadCacheFromBinary(Reader);
+            }
+            int Length = Reader.ReadInt32();
+            Instance.Requires = new CppModuleDescriptor[Length];
+            for (int i = 0; i < Length; ++i)
+            {
+                Instance.Requires[i] = CppModuleDescriptor.LoadCacheFromBinary(Reader);
+            }
+        }
+
         return Instance;
     }
 
@@ -50,6 +73,22 @@ public record MakefileCache
         Writer.Write(IntermediateOutput);
         Writer.Write(ObjectOutput);
         Writer.Write(InterfaceOutput);
+
+        Writer.Write(bScanDependenciesCache);
+        if (bScanDependenciesCache)
+        {
+            bool bHasProvide = Provide != null;
+            Writer.Write(bHasProvide);
+            if (bHasProvide)
+            {
+                Provide!.SaveCacheToBinary(Writer);
+            }
+            Writer.Write(Requires.Length);
+            foreach (var Require in Requires)
+            {
+                Require.SaveCacheToBinary(Writer);
+            }
+        }
     }
 
     public bool CompareTo(string InSourceCodePath, out ulong OutSourceCodeHash)

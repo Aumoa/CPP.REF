@@ -170,11 +170,11 @@ public class ClCompiler : Compiler
         SetModuleParameters(PSI, Item, Rule);
         SetSourceCodeParameters(PSI, Item);
 
-        if (Item.Provide != null)
+        if (Item.Cache.Provide != null)
         {
-            if (Item.Provide.IsInterface == false)
+            if (Item.Cache.Provide.IsInterface == false)
             {
-                PSI.Arguments += $"/exportHeader /headerName:{Item.Provide.LookupMethod!.Value.ToString().ToLower()} ";
+                PSI.Arguments += $"/exportHeader /headerName:{Item.Cache.Provide.LookupMethod!.Value.ToString().ToLower()} ";
             }
         }
 
@@ -297,11 +297,10 @@ public class ClCompiler : Compiler
         CppModuleDescriptor[] Provides = ((JsonArray?)ModuleRule["provides"] ?? new()).Select(p => Parse(p!)).ToArray();
         CppModuleDescriptor[] Requires = ((JsonArray?)ModuleRule["requires"] ?? new()).Select(p => Parse(p!)).ToArray();
 
-        return Item with
-        {
-            Provide = Provides.FirstOrDefault(),
-            Requires = Requires
-        };
+        Item.Cache.bScanDependenciesCache = true;
+        Item.Cache.Provide = Provides.FirstOrDefault();
+        Item.Cache.Requires = Requires;
+        return Item;
     }
 
     private static async Task<(string, string)> GetProcessOutputsAsync(string DebugString, Process P, CancellationToken SToken = default)

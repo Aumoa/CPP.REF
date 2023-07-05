@@ -10,10 +10,13 @@ namespace AE.SourceTree;
 public sealed class Makefile
 {
     [SetsRequiredMembers]
-    private Makefile()
+    private Makefile(string InMakefilePath)
     {
+        MakefilePath = InMakefilePath;
         Caches = Array.Empty<MakefileCache>();
     }
+
+    public required string MakefilePath { get; init; }
 
     public required MakefileCache[] Caches { get; init; }
 
@@ -22,7 +25,7 @@ public sealed class Makefile
         string Filename = Path.Combine(InPath, "Makefile.abin");
         if (File.Exists(Filename) == false)
         {
-            return new();
+            return new(Filename);
         }
 
         using var Stream = new MemoryStream(await File.ReadAllBytesAsync(Filename, SToken));
@@ -32,7 +35,7 @@ public sealed class Makefile
             int MakefileVersion = Reader.ReadInt32();
             if (MakefileVersion != Global.MakefileVersion)
             {
-                return new();
+                return new(Filename);
             }
 
             int Count = Reader.ReadInt32();
@@ -42,30 +45,31 @@ public sealed class Makefile
                 Caches[i] = MakefileCache.LoadCacheFromBinary(Reader);
             }
 
-            return new()
+            return new(Filename)
             {
                 Caches = Caches
             };
         }
         catch
         {
-            return new();
+            return new(Filename);
         }
     }
 
-    public async Task SaveMakefileCacheAsync(string InPath, CancellationToken SToken = default)
+    public async Task SaveMakefileCacheAsync(CancellationToken SToken = default)
     {
-        string Filename = Path.Combine(InPath, "Makefile.abin");
-
         using var Stream = new MemoryStream();
         var Writer = new BinaryWriter(Stream);
         Writer.Write(Global.MakefileVersion);
-        foreach (var Cache in Caches)
+
+        MakefileCache[] AllCaches = CompileItems.Select(p => p.Cache).ToArray();
+        Writer.Write(AllCaches.Length);
+        foreach (var Cache in AllCaches)
         {
             Cache.SaveCacheToBinary(Writer);
         }
 
-        await File.WriteAllBytesAsync(Filename, Stream.ToArray(), SToken);
+        await File.WriteAllBytesAsync(MakefilePath, Stream.ToArray(), SToken);
     }
 
     public MakefileCompile[] CompileItems { get; set; } = Array.Empty<MakefileCompile>();

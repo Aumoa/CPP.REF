@@ -14,5 +14,5 @@ public record CompileNode
 
     public required HashSet<CompileNode> Parents { get; init; }
 
-    public required TaskCompletionSource CompileTask { get; init; }
+    public required TaskCompletionSource<bool> CompileTask { get; init; }
 }
