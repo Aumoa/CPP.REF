@@ -1,8 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:TransformConcepts;
 
-template<class T>
+export import Core;
+
+export template<class T>
 concept TIsTransformBase = requires
 {
 	{ T::Inverse(std::declval<T>()) };
@@ -12,7 +14,7 @@ concept TIsTransformBase = requires
 	{ T::Identity() };
 };
 
-template<class T, class U>
+export template<class T, class U>
 concept TIsTransform = TIsTransformBase<T> && requires
 {
 	{ T::TransformPoint(std::declval<T>(), std::declval<U>()) };

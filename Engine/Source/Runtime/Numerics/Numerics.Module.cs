@@ -14,5 +14,10 @@ public class Numerics : ModuleRules
         {
             "Core"
         });
+
+        PrivateDisableWarnings.AddRange(new[]
+        {
+            4201
+        });
     }
 }

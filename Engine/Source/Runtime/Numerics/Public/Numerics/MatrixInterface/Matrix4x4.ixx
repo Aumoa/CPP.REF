@@ -1,17 +1,17 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Matrix4x4;
 
-#include "Matrix.h"
-#include "Numerics/TransformConcepts.h"
-#include "Numerics/NumericConcepts.h"
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/TransformInterface/Translate3D.h"
-#include "Numerics/TransformInterface/Scale3D.h"
-#include "Numerics/TransformInterface/Quaternion.h"
-#include "Mathematics/Radians.h"
+export import Core;
+export import :Matrix;
+export import :TransformConcepts;
+export import :NumericConcepts;
+export import :Vector;
+export import :Translate3D;
+export import :Scale3D;
+export import :Quaternion;
 
-struct Matrix4x4
+export struct Matrix4x4
 {
 	union
 	{
@@ -209,9 +209,9 @@ public:
 
 
 
-	inline String ToString(String formatArgs) const
+	inline String ToString() const
 	{
-		return Matrix<>::ToString(*this, formatArgs);
+		return Matrix<>::ToString(*this);
 	}
 
 	template<TIsMatrix<float, 4, 4> IMatrix>

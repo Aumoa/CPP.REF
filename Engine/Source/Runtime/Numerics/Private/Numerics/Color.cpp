@@ -1,8 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Numerics/VectorInterface/Color.h"
-#include <map>
-#include <sstream>
+import Core;
+import Numerics;
 
 static std::map<String, Color> gConvertTable =
 {

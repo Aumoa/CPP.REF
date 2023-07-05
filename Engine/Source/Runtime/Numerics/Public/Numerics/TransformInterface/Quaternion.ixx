@@ -1,12 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Quaternion;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include "Mathematics/MathEx.h"
-#include "Mathematics/Degrees.h"
+export import Core;
+export import :Vector;
 
-struct Quaternion
+export struct Quaternion
 {
 	Vector<float, 3> V;
 	float W;
@@ -242,7 +241,7 @@ public:
 			Dot = -Dot;
 		}
 
-		float Theta_0 = MathEx::Acos(Dot);
+		float Theta_0 = Math::Acos(Dot);
 		float Theta = Theta_0 * T;
 		if (Theta > Theta_0) return QR;
 
@@ -251,10 +250,10 @@ public:
 			return Vector<>::Normalize(Lerp(V0, V1, T));
 		}
 
-		float SinTheta = MathEx::Sin(Theta);
-		float SinTheta0Inv = 1.0f / MathEx::Sin(Theta_0);
+		float SinTheta = Math::Sin(Theta);
+		float SinTheta0Inv = 1.0f / Math::Sin(Theta_0);
 
-		float S0 = MathEx::Cos(Theta) - Dot * SinTheta * SinTheta0Inv;
+		float S0 = Math::Cos(Theta) - Dot * SinTheta * SinTheta0Inv;
 		float S1 = SinTheta * SinTheta0Inv;
 
 		return V0 * S0 + V1 * S1;
@@ -310,7 +309,7 @@ public:
 
 		if (T > 0.0f)
 		{
-			const float S = MathEx::Sqrt(1 + T) * 2.0f;
+			const float S = Math::Sqrt(1 + T) * 2.0f;
 			Q[0] = (C2 - B3) / S;
 			Q[1] = (A3 - C1) / S;
 			Q[2] = (B1 - A2) / S;
@@ -318,7 +317,7 @@ public:
 		}
 		else if (A1 > B2 && A1 > C3)
 		{
-			const float S = MathEx::Sqrt(1.0f + A1 - B2 - C3) * 2.0f;
+			const float S = Math::Sqrt(1.0f + A1 - B2 - C3) * 2.0f;
 			Q[0] = 0.25f * S;
 			Q[1] = (B1 + A2) / S;
 			Q[2] = (A3 + C1) / S;
@@ -326,7 +325,7 @@ public:
 		}
 		else if (B2 > C3)
 		{
-			const float S = MathEx::Sqrt(1.0f + B2 - A1 - C3) * 2.0f;
+			const float S = Math::Sqrt(1.0f + B2 - A1 - C3) * 2.0f;
 			Q[0] = (B1 + A2) / S;
 			Q[1] = 0.25f * S;
 			Q[2] = (C2 + B3) / S;
@@ -334,7 +333,7 @@ public:
 		}
 		else
 		{
-			const float S = MathEx::Sqrt(1.0f + C3 - A1 - B2) * 2.0f;
+			const float S = Math::Sqrt(1.0f + C3 - A1 - B2) * 2.0f;
 			Q[0] = (A3 + C1) / S;
 			Q[1] = (C2 + B3) / S;
 			Q[2] = 0.25f * S;
@@ -345,9 +344,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Quaternion& Q, float Epsilon) const

@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Translate2D;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Vector;
 
-struct Translate2D
+export struct Translate2D
 {
 	float X;
 	float Y;
@@ -118,9 +119,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Translate2D& T, float Epsilon) const
@@ -130,6 +131,6 @@ public:
 
 	constexpr Translate2D Round() const
 	{
-		return { MathEx::Round(X), MathEx::Round(Y) };
+		return { Math::Round(X), Math::Round(Y) };
 	}
 };

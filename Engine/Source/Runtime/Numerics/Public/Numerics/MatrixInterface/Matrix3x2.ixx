@@ -1,14 +1,13 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Matrix3x2;
 
-#include "Matrix.h"
-#include "Numerics/MatrixInterface/Matrix2x2.h"
-#include "Numerics/TransformConcepts.h"
-#include "Mathematics/Radians.h"
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Matrix2x2;
+export import :TransformConcepts;
+export import :Vector;
 
-struct Matrix3x2
+export struct Matrix3x2
 {
 	union
 	{
@@ -105,9 +104,9 @@ public:
 	}
 
 public:
-	inline String ToString(String formatArgs) const
+	inline String ToString() const
 	{
-		return Matrix<>::ToString(*this, formatArgs);
+		return Matrix<>::ToString(*this);
 	}
 
 	template<TIsMatrix<float, 3, 2> IMatrix>
@@ -138,7 +137,7 @@ public:
 	static IMatrix Rotation(const Radians& Rad)
 	{
 		float S, C;
-		MathEx::SinCos(Rad.Value, S, C);
+		Math::SinCos(Rad.Value, S, C);
 
 		IMatrix R = IMatrix::Identity();
 		R[0][0] = C;
@@ -194,7 +193,7 @@ public:
 
 		// Extract scale.
 		OutS = Vector2(Vector<>::Length(M[0]), Vector<>::Length(M[1]));
-		if (MathEx::Abs(OutS[0]) < 0.001f || MathEx::Abs(OutS[1]) < 0.001f)
+		if (Math::Abs(OutS[0]) < 0.001f || Math::Abs(OutS[1]) < 0.001f)
 		{
 			return false;
 		}

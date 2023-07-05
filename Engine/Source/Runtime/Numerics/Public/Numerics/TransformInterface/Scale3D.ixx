@@ -1,10 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Scale3D;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import :Vector;
 
-struct Scale3D
+export struct Scale3D
 {
 	using IsScale = int;
 
@@ -141,9 +141,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Scale3D& S, float Epsilon) const

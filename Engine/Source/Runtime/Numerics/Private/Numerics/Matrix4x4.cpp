@@ -1,9 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "Numerics/MatrixInterface/Matrix4x4.h"
-
 #if PLATFORM_WINDOWS
 #include "DirectXInlineHelper.h"
+
+import Core;
+import Numerics;
 
 float Matrix4x4::Determinant(const Matrix4x4& M)
 {

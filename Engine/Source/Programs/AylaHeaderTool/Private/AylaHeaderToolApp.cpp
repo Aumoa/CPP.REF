@@ -8,6 +8,15 @@ AylaHeaderToolApp::AylaHeaderToolApp()
 
 int32 AylaHeaderToolApp::Run()
 {
+	std::vector<Task<>> Tasks;
+	for (int32 i = 0; i < 32; ++i)
+	{
+		Tasks.emplace_back(Task<>::Run([]()
+		{
+			Console::WriteLine(TEXT("[{}] In worker thread."), PlatformMisc::GetThreadName());
+		}));
+	}
+
 	try
 	{
 		if (CommandLine::Contains(TEXT("help")))
@@ -29,6 +38,7 @@ int32 AylaHeaderToolApp::Run()
 		return (int32)TE.ErrorCode;
 	}
 
+	Task<>::WhenAll(Tasks).GetResult();
 	return 0;
 }
 

@@ -24,9 +24,15 @@ TextWriter& Console::GetError()
 }
 #endif
 
+inline namespace
+{
+	Spinlock Lock;
+}
+
 void Console::Write(String Str)
 {
 #if PLATFORM_WINDOWS
+	std::unique_lock ScopedLock(Lock);
 	sOut.Write(Str);
 #endif
 }
@@ -34,6 +40,7 @@ void Console::Write(String Str)
 void Console::WriteLine(String Str)
 {
 #if PLATFORM_WINDOWS
+	std::unique_lock ScopedLock(Lock);
 	sOut.WriteLine(Str);
 #endif
 }

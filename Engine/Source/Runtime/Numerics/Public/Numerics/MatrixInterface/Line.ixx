@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Line;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Vector;
 
-template<size_t N = 0>
+export template<size_t N = 0>
 struct Line
 {
 	Vector<float, N> Start;
@@ -87,10 +88,10 @@ public:
 	}
 };
 
-template<class TLine>
+export template<class TLine>
 concept TIsLine = TIsMatrixTyped<TLine, float> && (TLine::Row() >= 2);
 
-template<>
+export template<>
 struct Line<0>
 {
 	template<TIsLine IMatrix>

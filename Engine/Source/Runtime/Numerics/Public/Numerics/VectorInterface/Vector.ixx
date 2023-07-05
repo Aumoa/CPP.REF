@@ -1,17 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Vector;
 
-#include "VectorScalarsImpl.h"
-#include "CoreTypes/String.h"
-#include "Numerics/NumericConcepts.h"
-#include "Mathematics/MathEx.h"
-#include <string_view>
-#include <string>
-//#include <array>
-#include <span>
+export import Core;
+export import :VectorScalarsImpl;
+export import :NumericConcepts;
 
-template<class T = void, size_t N = 0>
+export template<class T = void, size_t N = 0>
 struct Vector : public VectorScalarsImpl<T, N>
 {
 	using Super = VectorScalarsImpl<T, N>;
@@ -133,7 +128,7 @@ public:
 	}
 
 public:
-	String ToString(String FormatArgs = TEXT("")) const;
+	String ToString() const;
 	template<TIsVector<T, N> IVector>
 	constexpr bool NearlyEquals(const IVector& V, const T& Epsilon) const;
 
@@ -143,7 +138,7 @@ public:
 	}
 };
 
-template<>
+export template<>
 struct Vector<void, 0>
 {
 	template<TIsVectorBase IVector>
@@ -161,7 +156,7 @@ struct Vector<void, 0>
 	template<TIsVectorBase IVector>
 	static inline float Length(const IVector& V)
 	{
-		return MathEx::Sqrt(LengthSq(V));
+		return Math::Sqrt(LengthSq(V));
 	}
 
 	template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
@@ -181,7 +176,7 @@ struct Vector<void, 0>
 	{
 		for (size_t i = 0; i < VL.Size(); ++i)
 		{
-			if (MathEx::Abs(VL[i] - VR[i]) > Epsilon)
+			if (Math::Abs(VL[i] - VR[i]) > Epsilon)
 			{
 				return false;
 			}
@@ -193,7 +188,7 @@ struct Vector<void, 0>
 	template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
 	static inline IVectorResult Normalize(const IVector& V) requires TIsCompatibleVector<IVector, IVectorResult>
 	{
-		float InvSqrt = MathEx::InvSqrt(LengthSq(V));
+		float InvSqrt = Math::InvSqrt(LengthSq(V));
 		IVectorResult R;
 		for (size_t i = 0; i < V.Size(); ++i)
 		{
@@ -210,7 +205,7 @@ struct Vector<void, 0>
 		IVectorResult R;
 		for (size_t i = 0; i < VL.Size(); ++i)
 		{
-			R[i] = MathEx::Max(VL[i], VR[i]);
+			R[i] = Math::Max(VL[i], VR[i]);
 		}
 		return R;
 	}
@@ -223,7 +218,7 @@ struct Vector<void, 0>
 		IVectorResult R;
 		for (size_t i = 0; i < VL.Size(); ++i)
 		{
-			R[i] = MathEx::Min(VL[i], VR[i]);
+			R[i] = Math::Min(VL[i], VR[i]);
 		}
 		return R;
 	}
@@ -235,7 +230,7 @@ struct Vector<void, 0>
 		IVectorResult R;
 		for (size_t i = 0; i < VL.Size(); ++i)
 		{
-			R[i] = MathEx::Clamp(VL[i], Minimum, Maximum);
+			R[i] = Math::Clamp(VL[i], Minimum, Maximum);
 		}
 		return R;
 	}
@@ -249,21 +244,19 @@ struct Vector<void, 0>
 		IVectorResult R;
 		for (size_t i = 0; i < VL.Size(); ++i)
 		{
-			R[i] = MathEx::Clamp(VL[i], Minimum[i], Maximum[i]);
+			R[i] = Math::Clamp(VL[i], Minimum[i], Maximum[i]);
 		}
 		return R;
 	}
 
 	template<TIsVectorBase IVector>
-	static inline String ToString(const IVector& V, String FormatArgs = TEXT(""))
+	static inline String ToString(const IVector& V)
 	{
 		constexpr size_t N = IVector::Size();
-		String Placeholder = String::GetPlaceholder(FormatArgs);
-
 		std::array<String, N> Composed;
 		for (size_t i = 0; i < N; ++i)
 		{
-			Composed[i] = String::Format(Placeholder, V[i]);
+			Composed[i] = String::Format(TEXT("{}"), V[i]);
 		}
 
 		return String::Format(TEXT("{{{}}}"), String::Join(TEXT(", "), std::span<String const>(Composed)));
@@ -279,7 +272,7 @@ struct Vector<void, 0>
 		IVectorResult R;
 		for (size_t i = 0; i < N; ++i)
 		{
-			R[i] = MathEx::Round(V[i]);
+			R[i] = Math::Round(V[i]);
 		}
 		return R;
 	}
@@ -323,7 +316,7 @@ struct Vector<void, 0>
 	static inline constexpr IVectorResult Cast(const IVector& V)
 	{
 		IVectorResult R;
-		size_t Size = MathEx::Min(V.Size(), IVectorResult::Size());
+		size_t Size = Math::Min(V.Size(), IVectorResult::Size());
 		for (size_t i = 0; i < Size; ++i)
 		{
 			R[i] = static_cast<typename IVectorResult::Type>(V[i]);
@@ -403,7 +396,7 @@ struct Vector<void, 0>
 };
 
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr IVectorL operator +(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	IVectorL R;
@@ -414,7 +407,7 @@ constexpr IVectorL operator +(const IVectorL& VL, const IVectorR& VR) requires T
 	return R;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr IVectorL operator -(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	IVectorL R;
@@ -425,7 +418,7 @@ constexpr IVectorL operator -(const IVectorL& VL, const IVectorR& VR) requires T
 	return R;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr IVectorL operator *(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	IVectorL R;
@@ -436,7 +429,7 @@ constexpr IVectorL operator *(const IVectorL& VL, const IVectorR& VR) requires T
 	return R;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr IVectorL operator /(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	IVectorL R;
@@ -447,17 +440,17 @@ constexpr IVectorL operator /(const IVectorL& VL, const IVectorR& VR) requires T
 	return R;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr IVectorL operator %(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	IVectorL R;
 	for (size_t i = 0; i < VL.Size(); ++i)
 	{
-		R[i] = MathEx::Mod(VL[i], VR[i]);
+		R[i] = Math::Mod(VL[i], VR[i]);
 	}
 	return R;
 }
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 constexpr IVector operator *(const IVector& VL, const typename IVector::Type& S)
 {
 	IVector R;
@@ -468,7 +461,7 @@ constexpr IVector operator *(const IVector& VL, const typename IVector::Type& S)
 	return R;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 constexpr IVector operator /(const IVector& VL, const typename IVector::Type& S)
 {
 	IVector R;
@@ -479,36 +472,36 @@ constexpr IVector operator /(const IVector& VL, const typename IVector::Type& S)
 	return R;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 constexpr IVector operator %(const IVector& VL, const typename IVector::Type& S)
 {
 	IVector R;
 	for (size_t i = 0; i < VL.Size(); ++i)
 	{
-		R[i] = MathEx::Mod(VL[i], S);
+		R[i] = Math::Mod(VL[i], S);
 	}
 	return R;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 constexpr auto operator *(const typename IVector::Type& S, const IVector& V)
 {
 	return IVector(S) * V;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 constexpr auto operator /(const typename IVector::Type& S, const IVector& V)
 {
 	return IVector(S) / V;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 constexpr auto operator %(const typename IVector::Type& S, const IVector& V)
 {
 	return IVector(S) % V;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr auto operator ^(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& requires
 {
 	{ Vector<>::Cross(VL, VR) };
@@ -517,63 +510,63 @@ constexpr auto operator ^(const IVectorL& VL, const IVectorR& VR) requires TIsCo
 	return Vector<>::Cross(VL, VR);
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr auto operator |(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return Vector<>::Dot(VL, VR);
 }
 
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 decltype(auto) operator +=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
 {
 	return V = V + VR;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 decltype(auto) operator -=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
 {
 	return V = V - VR;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 decltype(auto) operator *=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
 {
 	return V = V * VR;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 decltype(auto) operator /=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
 {
 	return V = V / VR;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 decltype(auto) operator %=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
 {
 	return V = V % VR;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 decltype(auto) operator *=(IVector& V, const typename IVector::Type& S) requires std::assignable_from<IVector, IVector>
 {
 	return V = V * S;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 decltype(auto) operator /=(IVector& V, const typename IVector::Type& S) requires std::assignable_from<IVector, IVector>
 {
 	return V = V / S;
 }
 
-template<TIsVectorBase IVector>
+export template<TIsVectorBase IVector>
 decltype(auto) operator %=(IVector& V, const typename IVector::Type& S) requires std::assignable_from<IVector, IVector>
 {
 	return V = V % S;
 }
 
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr std::strong_ordering operator <=>(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	for (size_t i = 0; i < VL.Size(); ++i)
@@ -593,94 +586,94 @@ constexpr std::strong_ordering operator <=>(const IVectorL& VL, const IVectorR& 
 	return std::strong_ordering::equal;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr bool operator < (const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return operator <=>(VL, VR) < 0;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr bool operator <=(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return operator <=>(VL, VR) <= 0;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr bool operator > (const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return operator <=>(VL, VR) > 0;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr bool operator >=(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return operator <=>(VL, VR) >= 0;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr bool operator ==(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return operator <=>(VL, VR) == 0;
 }
 
-template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
+export template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
 constexpr bool operator !=(const IVectorL& VL, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return operator <=>(VL, VR) != 0;
 }
 
 
-//namespace std
-//{
-//	template<TIsVectorBase IVector>
-//	struct tuple_size<IVector> : public integral_constant<size_t, IVector::Size()>
-//	{
-//	};
-//
-//	template<TIsVectorBase IVector>
-//	struct tuple_size<const IVector> : public tuple_size<IVector>
-//	{
-//	};
-//
-//	template<size_t Idx, TIsVectorBase IVector>
-//	struct tuple_element<Idx, IVector>
-//	{
-//		using type = typename IVector::Type;
-//	};
-//
-//	template<size_t Idx, TIsVectorBase IVector>
-//	struct tuple_element<Idx, const IVector> : public tuple_element<Idx, IVector>
-//	{
-//	};
-//
-//	template<size_t Idx, TIsVectorBase IVector>
-//	inline tuple_element_t<Idx, IVector>& get(IVector& V)
-//	{
-//		return V[Idx];
-//	}
-//
-//	template<size_t Idx, TIsVectorBase IVector>
-//	inline const tuple_element_t<Idx, IVector>& get(const IVector& V)
-//	{
-//		return V[Idx];
-//	}
-//}
-
-using Vector2 = Vector<float, 2>;
-using Vector3 = Vector<float, 3>;
-using Vector4 = Vector<float, 4>;
-
-using Vector2N = Vector<int32, 2>;
-using Vector3N = Vector<int32, 3>;
-using Vector4N = Vector<int32, 4>;
-
-template<class T, size_t N>
-String Vector<T, N>::ToString(String formatArgs) const
+export namespace std
 {
-	return Vector<>::ToString(*this, formatArgs);
+	template<TIsVectorBase IVector>
+	struct tuple_size<IVector> : public integral_constant<size_t, IVector::Size()>
+	{
+	};
+
+	template<TIsVectorBase IVector>
+	struct tuple_size<const IVector> : public tuple_size<IVector>
+	{
+	};
+
+	template<size_t Idx, TIsVectorBase IVector>
+	struct tuple_element<Idx, IVector>
+	{
+		using type = typename IVector::Type;
+	};
+
+	template<size_t Idx, TIsVectorBase IVector>
+	struct tuple_element<Idx, const IVector> : public tuple_element<Idx, IVector>
+	{
+	};
+
+	template<size_t Idx, TIsVectorBase IVector>
+	inline tuple_element_t<Idx, IVector>& get(IVector& V)
+	{
+		return V[Idx];
+	}
+
+	template<size_t Idx, TIsVectorBase IVector>
+	inline const tuple_element_t<Idx, IVector>& get(const IVector& V)
+	{
+		return V[Idx];
+	}
 }
 
-template<class T, size_t N>
+export using Vector2 = Vector<float, 2>;
+export using Vector3 = Vector<float, 3>;
+export using Vector4 = Vector<float, 4>;
+
+export using Vector2N = Vector<int32, 2>;
+export using Vector3N = Vector<int32, 3>;
+export using Vector4N = Vector<int32, 4>;
+
+export template<class T, size_t N>
+String Vector<T, N>::ToString() const
+{
+	return Vector<>::ToString(*this);
+}
+
+export template<class T, size_t N>
 template<TIsVector<T, N> IVector>
 constexpr bool Vector<T, N>::NearlyEquals(const IVector& V, const T& Epsilon) const
 {

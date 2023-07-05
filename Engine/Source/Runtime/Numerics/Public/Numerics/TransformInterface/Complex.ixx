@@ -1,12 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Complex;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/MatrixInterface/Matrix3x2.h"
-#include "Numerics/MatrixInterface/Matrix2x2.h"
+export import :Vector;
+export import :Matrix3x2;
+export import :Matrix2x2;
 
-struct Complex
+export struct Complex
 {
 	float X;
 	float Y;
@@ -144,9 +144,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Complex& C, float Epsilon) const
@@ -191,8 +191,8 @@ public:
 	{
 		return Complex
 		{
-			MathEx::Cos(R),
-			MathEx::Sin(R)
+			Math::Cos(R),
+			Math::Sin(R)
 		};
 	}
 };

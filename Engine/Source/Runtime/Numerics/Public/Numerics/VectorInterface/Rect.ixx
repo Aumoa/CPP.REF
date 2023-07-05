@@ -1,11 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Rect;
 
-#include "Vector.h"
-#include "Numerics/TransformConcepts.h"
+export import Core;
+export import :Vector;
+export import :TransformConcepts;
 
-template<class T>
+export template<class T>
 struct RectT
 {
 	T Left;
@@ -104,7 +105,7 @@ public:
 	String ToString(String formatArgs) const;
 };
 
-struct Rect : public RectT<float>
+export struct Rect : public RectT<float>
 {
 	template<class... TArgs>
 	constexpr Rect(TArgs&&... Args) requires std::constructible_from<RectT<float>, TArgs...>
@@ -121,13 +122,13 @@ struct Rect : public RectT<float>
 	template<TIsVectorSized<4> IRect>
 	static constexpr auto Width(const IRect& R)
 	{
-		return MathEx::Abs(R[2] - R[0]);
+		return Math::Abs(R[2] - R[0]);
 	}
 
 	template<TIsVectorSized<4> IRect>
 	static constexpr auto Height(const IRect& R)
 	{
-		return MathEx::Abs(R[3] - R[1]);
+		return Math::Abs(R[3] - R[1]);
 	}
 
 	template<TIsVectorSized<4> IRect>
@@ -185,10 +186,10 @@ struct Rect : public RectT<float>
 	template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IRectR>
 	static constexpr bool IsIntersect(const IRectL& RL, const IRectR& RR) requires std::same_as<typename IRectL::Type, typename IRectR::Type>
 	{
-		const float L = MathEx::Max(RL[0], RR[0]);
-		const float T = MathEx::Max(RL[1], RR[1]);
-		const float R = MathEx::Min(RL[2], RR[2]);
-		const float B = MathEx::Min(RL[3], RR[3]);
+		const float L = Math::Max(RL[0], RR[0]);
+		const float T = Math::Max(RL[1], RR[1]);
+		const float R = Math::Min(RL[2], RR[2]);
+		const float B = Math::Min(RL[3], RR[3]);
 
 		if (R >= L && B >= T)
 		{
@@ -203,10 +204,10 @@ struct Rect : public RectT<float>
 	template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IRectR>
 	static constexpr std::optional<IRectL> Intersect(const IRectL& RL, const IRectR& RR) requires std::same_as<typename IRectL::Type, typename IRectR::Type>
 	{
-		const float L = MathEx::Max(RL[0], RR[0]);
-		const float T = MathEx::Max(RL[1], RR[1]);
-		const float R = MathEx::Min(RL[2], RR[2]);
-		const float B = MathEx::Min(RL[3], RR[3]);
+		const float L = Math::Max(RL[0], RR[0]);
+		const float T = Math::Max(RL[1], RR[1]);
+		const float R = Math::Min(RL[2], RR[2]);
+		const float B = Math::Min(RL[3], RR[3]);
 
 		if (R >= L && B >= T)
 		{
@@ -265,18 +266,18 @@ struct Rect : public RectT<float>
 		const auto RB = Transform.TransformPoint(Rect::RightBottom(InRect));
 
 		IRectResult R;
-		R[0] = MathEx::Min(TL.X, RB.X);
-		R[1] = MathEx::Min(TL.Y, RB.Y);
-		R[2] = MathEx::Max(TL.X, RB.X);
-		R[3] = MathEx::Max(TL.Y, RB.Y);
+		R[0] = Math::Min(TL.X, RB.X);
+		R[1] = Math::Min(TL.Y, RB.Y);
+		R[2] = Math::Max(TL.X, RB.X);
+		R[3] = Math::Max(TL.Y, RB.Y);
 		return R;
 	}
 };
 
-using RectN = RectT<int32>;
+export using RectN = RectT<int32>;
 
-template<class T>
-String RectT<T>::ToString(String formatArgs) const
+export template<class T>
+String RectT<T>::ToString(String InFormatArgs) const
 {
-	return Rect::ToString(*this, formatArgs);
+	return Rect::ToString(*this, InFormatArgs);
 }

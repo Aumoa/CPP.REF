@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Scale2D;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Vector;
 
-struct Scale2D
+export struct Scale2D
 {
 	float X;
 	float Y;
@@ -118,9 +119,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Scale2D& S, float Epsilon) const

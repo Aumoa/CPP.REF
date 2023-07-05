@@ -1,11 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:ObjectOrientedCube;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/TransformInterface/Quaternion.h"
+export import Core;
+export import :Vector;
+export import :Quaternion;
 
-struct ObjectOrientedCube
+export struct ObjectOrientedCube
 {
 	Vector3 Center;
 	Vector3 Extent;
@@ -29,13 +30,13 @@ struct ObjectOrientedCube
 			&& Vector<>::NearlyEquals(OOL.Rotation, OOR.Rotation, Epsilon);
 	}
 
-	static String ToString(const ObjectOrientedCube& OO, String FormatArgs = TEXT(""))
+	static String ToString(const ObjectOrientedCube& OO)
 	{
 		return String::Format(
 			TEXT("Center: {}, Extent: {}, Rotation{}"),
-			OO.Center.ToString(FormatArgs),
-			OO.Extent.ToString(FormatArgs),
-			OO.Rotation.ToString(FormatArgs)
+			OO.Center.ToString(),
+			OO.Extent.ToString(),
+			OO.Rotation.ToString()
 		);
 	}
 

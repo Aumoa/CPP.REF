@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Frustum;
 
-#include "Numerics/VectorInterface/Plane.h"
+export import Core;
+export import :Plane;
 
-struct Frustum
+export struct Frustum
 {
 	Plane Planes[6];
 

@@ -1,12 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:NumericConcepts;
 
-//#include <concepts>
-//////#include <utility>
-////#include <compare>
+export import Core;
 
-template<class TVector>
+export template<class TVector>
 concept TIsVectorBase = requires
 {
 	{ std::declval<typename TVector::Type>() };
@@ -15,19 +13,19 @@ concept TIsVectorBase = requires
 	{ std::declval<TVector>()[std::declval<size_t>()] };
 };
 
-template<class TVector, class T>
+export template<class TVector, class T>
 concept TIsVectorTyped = TIsVectorBase<TVector> && requires
 {
 	{ TVector(std::declval<T>()) };
 };
 
-template<class TVector, size_t N>
+export template<class TVector, size_t N>
 concept TIsVectorSized = TIsVectorBase<TVector> && (TVector::Size() >= N);
 
-template<class TVector, class T, size_t N>
+export template<class TVector, class T, size_t N>
 concept TIsVector = TIsVectorTyped<TVector, T> && TIsVectorSized<TVector, N>;
 
-template<class VL, class VR>
+export template<class VL, class VR>
 concept TIsCompatibleVector =
 	TIsVectorBase<VL> &&
 	TIsVectorBase<VR> &&
@@ -35,7 +33,7 @@ concept TIsCompatibleVector =
 	(VL::Size() <= VR::Size());
 
 
-template<class TMatrix>
+export template<class TMatrix>
 concept TIsMatrixBase = TIsVectorBase<typename TMatrix::VectorType> && requires
 {
 	{ std::declval<typename TMatrix::Type>() };
@@ -46,19 +44,19 @@ concept TIsMatrixBase = TIsVectorBase<typename TMatrix::VectorType> && requires
 	{ TMatrix::Identity() };
 };
 
-template<class TMatrix, class T>
+export template<class TMatrix, class T>
 concept TIsMatrixTyped = TIsMatrixBase<TMatrix> && requires
 {
 	{ TMatrix(std::declval<T>()) };
 };
 
-template<class TMatrix, size_t NRow, size_t NCol>
+export template<class TMatrix, size_t NRow, size_t NCol>
 concept TIsMatrixSized = TIsMatrixBase<TMatrix> && (TMatrix::Row() >= NRow) && (TMatrix::Column() >= NCol);
 
-template<class TMatrix, class T, size_t NRow, size_t NCol>
+export template<class TMatrix, class T, size_t NRow, size_t NCol>
 concept TIsMatrix = TIsMatrixTyped<TMatrix, T> && TIsMatrixSized<TMatrix, NRow, NCol>;
 
-template<class ML, class MR>
+export template<class ML, class MR>
 concept TIsCompatibleMatrix =
 	TIsMatrixBase<ML> &&
 	TIsMatrixBase<MR> &&

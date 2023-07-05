@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Translate3D;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Vector;
 
-struct Translate3D
+export struct Translate3D
 {
 	float X;
 	float Y;
@@ -139,9 +140,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Translate3D& T, float Epsilon) const

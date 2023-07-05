@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Range;
 
-#include "Vector.h"
+export import Core;
+export import :Vector;
 
-template<class T = void>
+export template<class T = void>
 struct Range
 {
 	T Start;
@@ -86,7 +87,7 @@ public:
 	}
 };
 
-template<>
+export template<>
 struct Range<void>
 {
 	template<TIsVectorSized<2> IRange>

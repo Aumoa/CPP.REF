@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Sphere;
 
-#include "Vector.h"
+export import Core;
+export import :Vector;
 
-template<size_t N = 0>
+export template<size_t N = 0>
 struct Sphere
 {
 	Vector<float, N> Center;
@@ -76,7 +77,7 @@ public:
 	String ToString(String formatArgs) const;
 };
 
-template<>
+export template<>
 struct Sphere<0>
 {
 	template<TIsVectorTyped<float> IVector>
@@ -89,8 +90,8 @@ struct Sphere<0>
 	}
 };
 
-template<size_t N>
-String Sphere<N>::ToString(String formatArgs) const
+export template<size_t N>
+String Sphere<N>::ToString(String InFormatArgs) const
 {
-	return Sphere<>::ToString(*this, formatArgs);
+	return Sphere<>::ToString(*this, InFormatArgs);
 }

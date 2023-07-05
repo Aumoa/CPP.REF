@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Plane;
 
-#include "Vector.h"
+export import Core;
+export import :Vector;
 
-struct Plane
+export struct Plane
 {
 	Vector3 Normal;
 	float Distance;
@@ -96,13 +97,12 @@ public:
 public:
 	String ToString(String FormatArgs = TEXT("")) const
 	{
-		String placeholder = String::GetPlaceholder(FormatArgs);
-		return String::Format(TEXT("Normal: {}, Distance: {}"), Vector<>::ToString(Normal, FormatArgs), String::Format(placeholder, Distance));
+		return String::Format(TEXT("Normal: {}, Distance: {}"), Vector<>::ToString(Normal), Distance);
 	}
 
 	Plane GetNormal() const
 	{
-		float S = MathEx::InvSqrt(Vector<>::LengthSq(Normal));
+		float S = Math::InvSqrt(Vector<>::LengthSq(Normal));
 		return Plane(Normal * S, Distance * S);
 	}
 

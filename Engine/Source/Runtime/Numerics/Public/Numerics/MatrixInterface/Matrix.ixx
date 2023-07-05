@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Matrix;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Vector;
 
-template<class T = void, size_t NRow = 0, size_t NCol = 0>
+export template<class T = void, size_t NRow = 0, size_t NCol = 0>
 struct Matrix
 {
 	Vector<T, NCol> V[NRow];
@@ -171,7 +172,7 @@ public:
 };
 
 
-template<>
+export template<>
 struct Matrix<void, 0, 0>
 {
 	template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
@@ -184,7 +185,7 @@ struct Matrix<void, 0, 0>
 		{
 			for (size_t j = 0; j < Col; ++j)
 			{
-				if (MathEx::Abs(ML[i][j] - MR[i][j]) > Epsilon)
+				if (Math::Abs(ML[i][j] - MR[i][j]) > Epsilon)
 				{
 					return false;
 				}
@@ -214,7 +215,7 @@ struct Matrix<void, 0, 0>
 		{
 			for (size_t j = 0; j < M.Column(); ++j)
 			{
-				if (MathEx::Abs(M[i][j] - (T)(i == j)) > Epsilon)
+				if (Math::Abs(M[i][j] - (T)(i == j)) > Epsilon)
 				{
 					return false;
 				}
@@ -347,12 +348,12 @@ struct Matrix<void, 0, 0>
 	}
 
 	template<TIsMatrixBase IMatrix>
-	static String ToString(const IMatrix& M, String FormatArgs = TEXT(""))
+	static String ToString(const IMatrix& M)
 	{
 		std::array<String, IMatrix::Row()> Composed;
 		for (size_t i = 0; i < IMatrix::Row(); ++i)
 		{
-			Composed[i] = M[i].ToString(FormatArgs);
+			Composed[i] = M[i].ToString();
 		}
 
 		return String::Format(TEXT("{{{}}}"), String::Join(TEXT(", "), std::span<String const>(Composed)));
@@ -373,7 +374,7 @@ struct Matrix<void, 0, 0>
 };
 
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr IMatrixL operator +(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	IMatrixL R;
@@ -384,7 +385,7 @@ constexpr IMatrixL operator +(const IMatrixL& ML, const IMatrixR& MR) requires T
 	return R;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr IMatrixL operator -(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	IMatrixL R;
@@ -395,7 +396,7 @@ constexpr IMatrixL operator -(const IMatrixL& ML, const IMatrixR& MR) requires T
 	return R;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr IMatrixL operator *(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	IMatrixL R;
@@ -406,7 +407,7 @@ constexpr IMatrixL operator *(const IMatrixL& ML, const IMatrixR& MR) requires T
 	return R;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr IMatrixL operator /(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	IMatrixL R;
@@ -417,7 +418,7 @@ constexpr IMatrixL operator /(const IMatrixL& ML, const IMatrixR& MR) requires T
 	return R;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr IMatrixL operator %(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	IMatrixL R;
@@ -427,7 +428,7 @@ constexpr IMatrixL operator %(const IMatrixL& ML, const IMatrixR& MR) requires T
 	}
 	return R;
 }
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 constexpr IMatrix operator *(const IMatrix& ML, const typename IMatrix::Type& S)
 {
 	IMatrix R;
@@ -438,7 +439,7 @@ constexpr IMatrix operator *(const IMatrix& ML, const typename IMatrix::Type& S)
 	return R;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 constexpr IMatrix operator /(const IMatrix& ML, const typename IMatrix::Type& S)
 {
 	IMatrix R;
@@ -449,7 +450,7 @@ constexpr IMatrix operator /(const IMatrix& ML, const typename IMatrix::Type& S)
 	return R;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 constexpr IMatrix operator %(const IMatrix& ML, const typename IMatrix::Type& S)
 {
 	IMatrix R;
@@ -460,25 +461,25 @@ constexpr IMatrix operator %(const IMatrix& ML, const typename IMatrix::Type& S)
 	return R;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 constexpr auto operator *(const typename IMatrix::Type& S, const IMatrix& V)
 {
 	return IMatrix(S) * V;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 constexpr auto operator /(const typename IMatrix::Type& S, const IMatrix& V)
 {
 	return IMatrix(S) / V;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 constexpr auto operator %(const typename IMatrix::Type& S, const IMatrix& V)
 {
 	return IMatrix(S) % V;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr auto operator ^(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>&& requires
 {
 	{ Matrix<>::Multiply(ML, MR) };
@@ -488,56 +489,56 @@ constexpr auto operator ^(const IMatrixL& ML, const IMatrixR& MR) requires TIsCo
 }
 
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 decltype(auto) operator +=(IMatrixL& V, const IMatrixR& VR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>&& std::assignable_from<IMatrixL, IMatrixL>
 {
 	return V = V + VR;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 decltype(auto) operator -=(IMatrixL& V, const IMatrixR& VR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>&& std::assignable_from<IMatrixL, IMatrixL>
 {
 	return V = V - VR;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 decltype(auto) operator *=(IMatrixL& V, const IMatrixR& VR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>&& std::assignable_from<IMatrixL, IMatrixL>
 {
 	return V = V * VR;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 decltype(auto) operator /=(IMatrixL& V, const IMatrixR& VR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>&& std::assignable_from<IMatrixL, IMatrixL>
 {
 	return V = V / VR;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 decltype(auto) operator %=(IMatrixL& V, const IMatrixR& VR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>&& std::assignable_from<IMatrixL, IMatrixL>
 {
 	return V = V % VR;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 decltype(auto) operator *=(IMatrix& V, const typename IMatrix::Type& S) requires std::assignable_from<IMatrix, IMatrix>
 {
 	return V = V * S;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 decltype(auto) operator /=(IMatrix& V, const typename IMatrix::Type& S) requires std::assignable_from<IMatrix, IMatrix>
 {
 	return V = V / S;
 }
 
-template<TIsMatrixBase IMatrix>
+export template<TIsMatrixBase IMatrix>
 decltype(auto) operator %=(IMatrix& V, const typename IMatrix::Type& S) requires std::assignable_from<IMatrix, IMatrix>
 {
 	return V = V % S;
 }
 
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr std::strong_ordering operator <=>(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	for (size_t i = 0; i < IMatrixL::Row(); ++i)
@@ -560,51 +561,51 @@ constexpr std::strong_ordering operator <=>(const IMatrixL& ML, const IMatrixR& 
 	return std::strong_ordering::equal;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr bool operator < (const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	return operator <=>(ML, MR) < 0;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr bool operator <=(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	return operator <=>(ML, MR) <= 0;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr bool operator > (const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	return operator <=>(ML, MR) > 0;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr bool operator >=(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	return operator <=>(ML, MR) >= 0;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr bool operator ==(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	return operator <=>(ML, MR) == 0;
 }
 
-template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
+export template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR>
 constexpr bool operator !=(const IMatrixL& ML, const IMatrixR& MR) requires TIsCompatibleMatrix<IMatrixL, IMatrixR>
 {
 	return operator <=>(ML, MR) != 0;
 }
 
 
-template<class T, size_t NRow, size_t NCol>
+export template<class T, size_t NRow, size_t NCol>
 template<TIsMatrix<T, NRow, NCol> IMatrix>
 constexpr bool Matrix<T, NRow, NCol>::NearlyEquals(const IMatrix& M, const T& Epsilon) const
 {
 	return Matrix<>::NearlyEquals(*this, M, Epsilon);
 }
 
-template<class T, size_t NRow, size_t NCol>
+export template<class T, size_t NRow, size_t NCol>
 inline String Matrix<T, NRow, NCol>::ToString(String formatArgs) const
 {
 	return Matrix<>::ToString(*this, formatArgs);

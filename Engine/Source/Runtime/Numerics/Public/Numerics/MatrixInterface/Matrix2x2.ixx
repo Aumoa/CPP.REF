@@ -1,12 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Matrix2x2;
 
-#include "Matrix.h"
-#include "Numerics/TransformConcepts.h"
-#include "Mathematics/Radians.h"
+export import Core;
+export import :Matrix;
+export import :TransformConcepts;
 
-struct Matrix2x2
+export struct Matrix2x2
 {
 	union
 	{
@@ -100,9 +100,9 @@ public:
 	}
 
 public:
-	inline String ToString(String formatArgs) const
+	inline String ToString() const
 	{
-		return Matrix<>::ToString(*this, formatArgs);
+		return Matrix<>::ToString(*this);
 	}
 
 	template<TIsMatrix<float, 2, 2> IMatrix>
@@ -124,7 +124,7 @@ public:
 	static Matrix2x2 Rotation(const Radians& Rad)
 	{
 		float S, C;
-		MathEx::SinCos(Rad.Value, S, C);
+		Math::SinCos(Rad.Value, S, C);
 
 		return Matrix2x2
 		{

@@ -1,12 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Color;
 
-#include "Vector.h"
-#include "Mathematics/MathEx.h"
-#include <string_view>
+export import Core;
+export import :Vector;
 
-struct Color
+export struct Color
 {
 	float R;
 	float G;
@@ -154,7 +153,7 @@ public:
 	NUMERICS_API static Color FromHtml(String HtmlCode);
 };
 
-namespace NamedColors
+export namespace NamedColors
 {
 	constexpr Color AliceBlue = Color::FromUInt(0xFFF0F8FF);
 	constexpr Color AntiqueWhite = Color::FromUInt(0xFFFAEBD7);

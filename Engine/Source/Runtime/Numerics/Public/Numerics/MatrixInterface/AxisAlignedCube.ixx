@@ -1,10 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:AxisAlignedCube;
 
-#include "Numerics/VectorInterface/Vector.h"
+export import Core;
+export import :Vector;
 
-template<size_t N = 0>
+export template<size_t N = 0>
 struct AxisAlignedCube
 {
 	Vector<float, N> Min;
@@ -85,10 +86,10 @@ public:
 	}
 };
 
-template<class TAxisAlignedCube>
+export template<class TAxisAlignedCube>
 concept TIsAxisAlignedCube = TIsMatrixTyped<TAxisAlignedCube, float> && (TAxisAlignedCube::Row() >= 2);
 
-template<>
+export template<>
 struct AxisAlignedCube<0>
 {
 	template<TIsAxisAlignedCube IMatrix>

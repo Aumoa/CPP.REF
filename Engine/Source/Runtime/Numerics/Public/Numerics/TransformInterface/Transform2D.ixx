@@ -1,14 +1,14 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Transform2D;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/MatrixInterface/Matrix3x2.h"
-#include "Translate2D.h"
-#include "Scale2D.h"
-#include "Complex.h"
+export import :Vector;
+export import :Matrix3x2;
+export import :Translate2D;
+export import :Scale2D;
+export import :Complex;
 
-struct Transform2D
+export struct Transform2D
 {
     Translate2D Translation;
     Scale2D Scale = Scale2D(1.0f);
@@ -44,17 +44,17 @@ struct Transform2D
         return NearlyEquals(*this, T, Epsilon);
     }
 
-    static String ToString(const Transform2D& T, String FormatArgs = TEXT(""))
+    static String ToString(const Transform2D& T)
     {
         return String::Format(TEXT("{{T: {}, S: {}, R: {}}}"),
-            T.Translation.ToString(FormatArgs),
-            T.Scale.ToString(FormatArgs),
-            T.Rotation.ToString(FormatArgs));
+            T.Translation.ToString(),
+            T.Scale.ToString(),
+            T.Rotation.ToString());
     }
 
-    String ToString(String FormatArgs = TEXT(""))
+    String ToString()
     {
-        return ToString(*this, FormatArgs);
+        return ToString(*this);
     }
 
 public:

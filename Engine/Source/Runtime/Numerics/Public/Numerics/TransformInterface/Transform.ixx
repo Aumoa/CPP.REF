@@ -1,17 +1,18 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Transform;
 
-#include "Numerics/NumericConcepts.h"
-#include "Numerics/TransformConcepts.h"
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/VectorInterface/Rect.h"
-#include "Numerics/MatrixInterface/Matrix4x4.h"
-#include "Translate3D.h"
-#include "Scale3D.h"
-#include "Quaternion.h"
+export import Core;
+export import :NumericConcepts;
+export import :TransformConcepts;
+export import :Vector;
+export import :Rect;
+export import :Matrix4x4;
+export import :Translate3D;
+export import :Scale3D;
+export import :Quaternion;
 
-struct Transform
+export struct Transform
 {
     Translate3D Translation;
     Scale3D Scale = Scale3D(1.0f);
@@ -47,17 +48,17 @@ struct Transform
         return NearlyEquals(*this, T, Epsilon);
     }
 
-    static String ToString(const Transform& T, String FormatArgs = TEXT(""))
+    static String ToString(const Transform& T)
     {
         return String::Format(TEXT("{{T: {}, S: {}, R: {}}}"),
-            T.Translation.ToString(FormatArgs),
-            T.Scale.ToString(FormatArgs),
-            T.Rotation.ToString(FormatArgs));
+            T.Translation.ToString(),
+            T.Scale.ToString(),
+            T.Rotation.ToString());
     }
 
-    String ToString(String FormatArgs = TEXT(""))
+    String ToString()
     {
-        return ToString(*this, FormatArgs);
+        return ToString(*this);
     }
 
 public:

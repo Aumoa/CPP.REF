@@ -1,11 +1,11 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Ray;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include <optional>
+export import Core;
+export import :Vector;
 
-template<size_t N = 0>
+export template<size_t N = 0>
 struct Ray
 {
 	using VectorType = Vector<float, N>;
@@ -43,7 +43,7 @@ struct Ray
 	constexpr auto operator <=>(const Ray& R) const = default;
 };
 
-template<>
+export template<>
 struct Ray<0>
 {
 	template<size_t N>
@@ -51,7 +51,7 @@ struct Ray<0>
 	{
 		return RL.Origin.NearlyEquals(RR.Origin, Epsilon)
 			&& RL.Direction.NearlyEquals(RR.Direction, Epsilon)
-			&& MathEx::Abs(RL.Distance.value_or(-1.0f) - RR.Distance.value_or(-1.0f)) <= Epsilon;
+			&& Math::Abs(RL.Distance.value_or(-1.0f) - RR.Distance.value_or(-1.0f)) <= Epsilon;
 	}
 
 	template<size_t N>

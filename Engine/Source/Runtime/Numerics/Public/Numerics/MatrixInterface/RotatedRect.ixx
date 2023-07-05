@@ -1,12 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:RotatedRect;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/VectorInterface/Rect.h"
-#include "Numerics/TransformConcepts.h"
+export import :Vector;
+export import :Rect;
+export import :TransformConcepts;
 
-struct RotatedRect
+export struct RotatedRect
 {
 	Vector2 TopLeft;
 	Vector2 ExtentX;
@@ -135,10 +135,10 @@ public:
 
 		return Rect
 		{
-			MathEx::Min(Points[0].X, Points[1].X, Points[2].X, Points[3].X),
-			MathEx::Min(Points[0].Y, Points[1].Y, Points[2].Y, Points[3].Y),
-			MathEx::Max(Points[0].X, Points[1].X, Points[2].X, Points[3].X),
-			MathEx::Max(Points[0].Y, Points[1].Y, Points[2].Y, Points[3].Y)
+			Math::Min(Points[0].X, Points[1].X, Points[2].X, Points[3].X),
+			Math::Min(Points[0].Y, Points[1].Y, Points[2].Y, Points[3].Y),
+			Math::Max(Points[0].X, Points[1].X, Points[2].X, Points[3].X),
+			Math::Max(Points[0].Y, Points[1].Y, Points[2].Y, Points[3].Y)
 		};
 	}
 
@@ -155,10 +155,10 @@ public:
 		const auto InvDet = (decltype(Det))1.0 / Det;
 
 		const auto S = -Vector<>::Cross(Offset, M[1]) * InvDet;
-		if (MathEx::IsWithinInclusive(S, 0.0f, 1.0f))
+		if (Math::IsWithinInclusive(S, 0.0f, 1.0f))
 		{
 			const auto T = Vector<>::Cross(Offset, M[2]) * InvDet;
-			return MathEx::IsWithinInclusive(T, 0.0f, 1.0f);
+			return Math::IsWithinInclusive(T, 0.0f, 1.0f);
 		}
 		return false;
 	}

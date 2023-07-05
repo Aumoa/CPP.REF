@@ -1,11 +1,12 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Numerics:Shear2D;
 
-#include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/MatrixInterface/Matrix2x2.h"
+export import :Vector;
+export import :Matrix2x2;
+export import :Scale2D;
 
-struct Shear2D
+export struct Shear2D
 {
 	float X;
 	float Y;
@@ -155,9 +156,9 @@ public:
 	}
 
 public:
-	String ToString(String formatArgs) const
+	String ToString() const
 	{
-		return Vector<>::ToString(*this, formatArgs);
+		return Vector<>::ToString(*this);
 	}
 
 	constexpr bool NearlyEquals(const Scale2D& S, float Epsilon) const
