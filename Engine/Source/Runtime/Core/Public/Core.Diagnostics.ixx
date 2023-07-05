@@ -6,3 +6,6 @@ export import :Debug;
 export import :PerformanceTimer;
 export import :StackFrame;
 export import :StackTrace;
+export import :LogLevel;
+export import :Log;
+export import :LogEntry;
