@@ -50,3 +50,4 @@ export import :NotSupportedException;
 export import :NullReferenceException;
 export import :StackOverflowException;
 export import :CoreAssert;
+export import :CommandLine;

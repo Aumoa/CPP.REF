@@ -113,6 +113,16 @@ void PlatformMisc::OutputDebugString(String InMessage) noexcept
 	OutputDebugStringW(InMessage.c_str());
 }
 
+bool PlatformMisc::IsDebuggerPresent() noexcept
+{
+	return ::IsDebuggerPresent() == TRUE;
+}
+
+void PlatformMisc::Abort() noexcept
+{
+	::abort();
+}
+
 
 
 void PlatformMisc::UuidCreate(void* block128) noexcept
@@ -123,10 +133,10 @@ void PlatformMisc::UuidCreate(void* block128) noexcept
 	}
 }
 
-String PlatformMisc::FormatSystemCode(int32 systemCode)
+String PlatformMisc::FormatSystemCode(int32 InSystemCode)
 {
 	static thread_local WCHAR Buf[1024] = {};
-	DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)systemCode, 0, Buf, 1024, NULL);
+	DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)InSystemCode, 0, Buf, 1024, NULL);
 	if (Len == 0)
 	{
 		return TEXT("Unknown error.");

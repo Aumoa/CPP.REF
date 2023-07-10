@@ -13,4 +13,8 @@ public:
 	static void BindHandle(void* NativeHandle);
 	static void QueueUserWorkItem(Work_t InWork);
 	static void QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Work_t InWork);
+	static void NotifyCustom();
+
+	static void GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
+	static void GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
 };

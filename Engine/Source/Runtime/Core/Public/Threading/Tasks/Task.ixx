@@ -5,6 +5,7 @@ export module Core.Threading:Task;
 export import :promise_type;
 export import :Awaiter;
 export import :ThreadPool;
+export import :SynchronizationContext;
 
 export template<class T = void>
 class Task
@@ -19,6 +20,7 @@ public:
 	using ValueType = T;
 
 private:
+	static bool bConfigureDefault;
 	std::shared_ptr<AwaiterBase> Awaiter;
 
 public:
@@ -111,6 +113,38 @@ public:
 		});
 
 		return Task<U>(std::move(uAwaiter));
+	}
+
+	auto ConfigureAwait(bool bContinueOnCapturedContext = bConfigureDefault)
+	{
+		if (bContinueOnCapturedContext == false)
+		{
+			return *this;
+		}
+
+		auto Current = SynchronizationContext::GetCurrent();
+		if (Current == nullptr)
+		{
+			return *this;
+		}
+
+		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<T>>();
+		ContinueWith([Current, uAwaiter](auto Previous)
+		{
+			Current->Enqueue([uAwaiter, Previous]()
+			{
+				if constexpr (std::same_as<T, void>)
+				{
+					uAwaiter->SetResult();
+				}
+				else
+				{
+					uAwaiter->SetResult(Previous.GetResult());
+				}
+			});
+		});
+
+		return Task(std::move(uAwaiter));
 	}
 
 	inline void Wait() const noexcept
@@ -271,6 +305,12 @@ public:
 		{
 			StopSource.request_stop();
 		});
+	}
+
+	static void ConfigureDefault(bool bContinueOnCapturedContext)
+	{
+		static_assert(std::same_as<T, void>, "Use Task<>::ConfigureDefault instead.");
+		bConfigureDefault = bContinueOnCapturedContext;
 	}
 
 public:

@@ -13,7 +13,7 @@ class TaskCompletionSource
 	friend class TaskCompletionSource;
 
 	std::shared_ptr<Awaiter<T>> Awaiter;
-	std::source_location Src = std::source_location::current();
+	mutable std::source_location Src = std::source_location::current();
 
 private:
 	TaskCompletionSource(std::shared_ptr<::Awaiter<T>> InAwaiter)
@@ -31,38 +31,38 @@ public:
 		return (bool)Awaiter;
 	}
 
-	void SetResult(std::source_location InSrc = std::source_location::current())
+	void SetResult(std::source_location InSrc = std::source_location::current()) const
 	{
 		SetResultImpl();
 		Src = InSrc;
 	}
 
 	template<class U>
-	void SetResult(U&& Result, std::source_location InSrc = std::source_location::current())
+	void SetResult(U&& Result, std::source_location InSrc = std::source_location::current()) const
 	{
 		SetResultImpl(std::forward<U>(Result));
 		Src = InSrc;
 	}
 
 	template<class TException>
-	void SetException(const TException& ExceptionObj)
+	void SetException(const TException& ExceptionObj) const
 	{
 		SetException(std::make_exception_ptr(ExceptionObj));
 	}
 
-	void SetException(std::exception_ptr ExceptionPtr)
+	void SetException(std::exception_ptr ExceptionPtr) const
 	{
 		Xassert(IsValid(), TEXT("Awaiter is null."));
 		Awaiter->SetException(std::move(ExceptionPtr));
 	}
 
-	void SetCanceled()
+	void SetCanceled() const
 	{
 		Xassert(IsValid(), TEXT("Awaiter is null."));
 		Awaiter->Cancel();
 	}
 
-	Task<T> GetTask()
+	Task<T> GetTask() const
 	{
 		return Task<T>(Awaiter);
 	}
@@ -78,13 +78,13 @@ public:
 
 private:
 	template<class... U>
-	void SetResultImpl(U&&... Result)
+	void SetResultImpl(U&&... Result) const
 	{
 		Xassert(IsValid(), TEXT("Awaiter is null."));
 		Awaiter->SetResult(std::forward<U>(Result)...);
 	}
 
-	void Xassert(bool bAssert, String InMessage)
+	void Xassert(bool bAssert, String InMessage) const
 	{
 		if (!bAssert)
 		{

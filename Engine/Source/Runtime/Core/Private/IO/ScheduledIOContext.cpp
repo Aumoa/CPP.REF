@@ -6,7 +6,7 @@ ScheduledIOContext::ScheduledIOContext() noexcept
 {
 }
 
-size_t ScheduledIOContext::Run(IOContext& Context)
+size_t ScheduledIOContext::Run()
 {
 	if (bRunning == false)
 	{
@@ -27,7 +27,7 @@ size_t ScheduledIOContext::Run(IOContext& Context)
 			auto It = Works.begin();
 			if (It->first <= Now)
 			{
-				Context.Post(std::move(It->second));
+				ThreadPool::QueueUserWorkItem(std::move(It->second));
 				Works.erase(It);
 				++Count;
 			}
@@ -52,7 +52,7 @@ size_t ScheduledIOContext::Run(IOContext& Context)
 	return Count;
 }
 
-void ScheduledIOContext::Stop(IOContext& Context)
+void ScheduledIOContext::Stop()
 {
 	bRunning = false;
 
@@ -70,7 +70,7 @@ void ScheduledIOContext::Stop(IOContext& Context)
 
 	for (auto& [_, Work] : Works)
 	{
-		Context.Post(std::move(Work));
+		ThreadPool::QueueUserWorkItem(std::move(Work));
 	}
 
 	Works.clear();

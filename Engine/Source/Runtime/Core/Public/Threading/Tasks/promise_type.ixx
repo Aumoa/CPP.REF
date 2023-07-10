@@ -8,7 +8,7 @@ export import :co_cancel;
 export import :ITask;
 export import :suspend_and_destroy_if;
 
-namespace details
+export namespace details
 {
 	template<class TTask>
 	struct AwaiterTrait
@@ -127,8 +127,7 @@ namespace details
 		}
 
 		template<class TAwaitableTask>
-		constexpr decltype(auto) await_transform(TAwaitableTask&& InTask) requires
-			ITask<std::remove_const_t<std::remove_reference_t<TAwaitableTask>>>
+		constexpr decltype(auto) await_transform(TAwaitableTask&& InTask)
 		{
 			return WrapSharedAwaiter(InTask.GetAwaiter());
 		}
@@ -291,6 +290,12 @@ public:
 
 export template<class TOwningClass, class... TArgs>
 struct std::coroutine_traits<void, TOwningClass, TArgs...>
+{
+	using promise_type = ::async_void_promise_type;
+};
+
+export template<class... TArgs>
+struct std::coroutine_traits<void, TArgs...>
 {
 	using promise_type = ::async_void_promise_type;
 };

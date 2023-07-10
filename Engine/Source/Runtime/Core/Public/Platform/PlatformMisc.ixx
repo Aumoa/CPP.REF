@@ -43,6 +43,12 @@ public:
 #endif
 	}
 	static void OutputDebugString(String message) noexcept;
+	static bool IsDebuggerPresent() noexcept;
+	[[noreturn]] static void Abort() noexcept;
+	template<class T>
+	static void UnreferencedParameter(T&&) noexcept
+	{
+	}
 
 public:
 	static void UuidCreate(void* block128) noexcept;

@@ -17,3 +17,4 @@ export import :promise_type;
 export import :Task;
 export import :TaskCompletionSource;
 export import :TaskCanceledException;
+export import :SynchronizationContext;

@@ -8,6 +8,16 @@ void CoreAssert::Assert(String InExpression, String InMessage, bool bDebugbreak)
 {
 	Log::Critical(TEXT("{} (in expression: {})\n{}"), InMessage, InExpression, StackTrace::Current().ToString());
 #if !SHIPPING
-	PlatformMisc::Debugbreak();
+	if (bDebugbreak)
+	{
+		PlatformMisc::Debugbreak();
+	}
+	else
+	{
+		PlatformMisc::Abort();
+	}
+#else
+	PlatformMisc::UnreferencedParameter(bDebugbreak);
+	(void)(bDebugbreak);
 #endif
 }
