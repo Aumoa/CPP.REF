@@ -49,7 +49,7 @@ class MulticastDelegate<void(TArgs...)> : public IMulticastDelegate
 	};
 
 	std::mutex Lock;
-	std::map<int64, DelegateInstance> Payload;
+	std::map<int64, DelegateInstance> Payloads;
 	int64 Id = 0;
 
 public:
@@ -62,9 +62,9 @@ public:
 		std::vector<DelegateInstance> Invokes;
 
 		{
-			auto Lock = std::unique_lock(Lock.AsReadonly());
-			Invokes.reserve(Payload.size());
-			for (auto& Instance : Payload)
+			auto ScopedLock = std::unique_lock(Lock);
+			Invokes.reserve(Payloads.size());
+			for (auto& Instance : Payloads)
 			{
 				Invokes.emplace_back(Instance.second);
 			}
@@ -80,18 +80,18 @@ public:
 
 		if (Compacts.size())
 		{
-			std::unique_lock Scope(Lock);
+			std::unique_lock ScopedLock(Lock);
 			for (auto& Compact : Compacts)
 			{
-				Payload.erase(Compact);
+				Payloads.erase(Compact);
 			}
 		}
 	}
 
 	void Clear()
 	{
-		std::unique_lock lock(Lock);
-		Payload.clear();
+		std::unique_lock ScopedLock(Lock);
+		Payloads.clear();
 		Id = 0;
 	}
 
@@ -143,7 +143,7 @@ public:
 		std::unique_lock Scope(Lock);
 		*Instance.Id = ++Id;
 		ScopedDelegateHolder Handle(this, Instance.Id);
-		Payload.emplace(*Instance.Id, std::move(Instance));
+		Payloads.emplace(*Instance.Id, std::move(Instance));
 		return Handle;
 	}
 
@@ -152,7 +152,7 @@ public:
 		std::unique_lock Scope(Lock);
 		if (Handle.IsValid())
 		{
-			Payload.erase(Handle.Delegate.Id);
+			Payloads.erase(Handle.Delegate.Id);
 			Handle.Delegate.Reset();
 		}
 	}

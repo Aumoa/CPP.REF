@@ -4,3 +4,4 @@
 #include "CoreMinimal/AssertionMacros.h"
 #include "CoreMinimal/nameof.h"
 #include "CoreMinimal/MacroHelpers.h"
+#include "CoreMinimal/DelegateMacros.h"

@@ -32,6 +32,15 @@ int32 AylaHeaderToolApp::Run()
 
 	Task<>::WhenAll(Tasks).GetResult();
 
+	Console::CancelKeyPressed() += []()
+	{
+		Log::Critical(TEXT("Cancel key pressed."));
+		Log::FlushAll();
+		__debugbreak();
+	};
+
+	String Temp = Console::ReadLine();
+
 	try
 	{
 		if (CommandLine::Contains(TEXT("help")))

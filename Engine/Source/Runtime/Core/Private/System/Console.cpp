@@ -5,6 +5,7 @@
 
 import Core.System;
 import Core.Platform.Windows;
+import Core.Threading;
 
 inline namespace
 {
@@ -27,6 +28,23 @@ TextWriter& Console::GetError()
 inline namespace
 {
 	Spinlock Lock;
+
+	void BroadcastSignalInterrupt(int)
+	{
+		Console::CancelKeyPressed().Broadcast();
+	}
+
+	int SignalInit = +[]()
+	{
+		signal(SIGINT, BroadcastSignalInterrupt);
+		return 0;
+	}();
+}
+
+Console::CancelKeyPressedDelegate& Console::CancelKeyPressed()
+{
+	static CancelKeyPressedDelegate Delegate;
+	return Delegate;
 }
 
 void Console::Write(String Str)

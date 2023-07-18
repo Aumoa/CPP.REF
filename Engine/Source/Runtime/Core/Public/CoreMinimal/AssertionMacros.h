@@ -50,7 +50,7 @@ if (const bool b = (bool)(x); !b) \
 }
 #else
 #define check(X)
-#define ensure(X)
+#define ensure(X) ((bool)(X))
 #define checkf(X, Format, ...)
-#define ensureMsgf(X, Format, ...)
+#define ensureMsgf(X, Format, ...) ((bool)(X))
 #endif

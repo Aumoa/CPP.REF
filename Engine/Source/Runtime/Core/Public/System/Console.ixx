@@ -1,11 +1,10 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#pragma once
-
 export module Core.System:Console;
 
 export import :String;
 export import :ConsoleColor;
+export import :MulticastDelegate;
 
 export class CORE_API Console
 {
@@ -25,6 +24,9 @@ public:
 	static EConsoleColor GetBackgroundColor();
 	static void SetColors(EConsoleColor InForegroundColor, EConsoleColor InBackgroundColor);
 	static void GetColors(EConsoleColor* OutForegroundColor, EConsoleColor* OutBackgroundColor);
+
+	DECLARE_MULTICAST_DELEGATE(CancelKeyPressedDelegate);
+	static CancelKeyPressedDelegate& CancelKeyPressed();
 
 public:
 	template<class... TArgs>
