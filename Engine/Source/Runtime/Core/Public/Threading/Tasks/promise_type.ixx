@@ -13,7 +13,7 @@ export namespace details
 	template<class TTask>
 	struct AwaiterTrait
 	{
-		using Type = typename TTask::Awaiter;
+		using Type = typename TTask::Awaiter_t;
 	};
 
 	template<>

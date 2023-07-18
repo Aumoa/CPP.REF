@@ -9,5 +9,6 @@ export enum class ELogLevel
 	Information,
 	Warning,
 	Level,
+	Error,
 	Critical
 };

@@ -12,6 +12,8 @@ export import :LogEntry;
 export class CORE_API Log
 {
 public:
+	static void FlushAll();
+
 	template<class... TArgs>
 	static void Write(ELogLevel InLogLevel, String InFormat, TArgs&&... InArgs)
 	{
@@ -63,7 +65,6 @@ public:
 	static void ClearOutputDevice();
 
 private:
-	static std::thread WorkerThread;
 	static std::vector<TextWriter*> OutputDevices;
 	static Spinlock Lock;
 	static SpinlockConditionVariable Trigger;
