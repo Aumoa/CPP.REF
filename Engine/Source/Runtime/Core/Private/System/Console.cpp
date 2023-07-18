@@ -101,7 +101,7 @@ void Console::SetForegroundColor(EConsoleColor InColor)
 	{
 		return;
 	}
-	BufferInfo.wAttributes = (BufferInfo.wAttributes & 0xFF00) | (WORD)InColor;
+	BufferInfo.wAttributes = (BufferInfo.wAttributes & 0xFFF0) | (WORD)InColor;
 	if (SetConsoleTextAttribute(sOut.GetNativeHandle(), BufferInfo.wAttributes) == FALSE)
 	{
 		return;
@@ -117,6 +117,68 @@ EConsoleColor Console::GetForegroundColor()
 	{
 		return (EConsoleColor)-1;
 	}
-	return (EConsoleColor)(BufferInfo.wAttributes & 0x00FF);
+	return (EConsoleColor)(BufferInfo.wAttributes & 0x000F);
+#endif
+}
+
+void Console::SetBackgroundColor(EConsoleColor InColor)
+{
+#if PLATFORM_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
+	{
+		return;
+	}
+	BufferInfo.wAttributes = (BufferInfo.wAttributes & 0xFF0F) | ((WORD)InColor << 4);
+	if (SetConsoleTextAttribute(sOut.GetNativeHandle(), BufferInfo.wAttributes) == FALSE)
+	{
+		return;
+	}
+#endif
+}
+
+EConsoleColor Console::GetBackgroundColor()
+{
+#if PLATFORM_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
+	{
+		return (EConsoleColor)-1;
+	}
+	return (EConsoleColor)(BufferInfo.wAttributes & 0x00F0);
+#endif
+}
+
+void Console::SetColors(EConsoleColor InForegroundColor, EConsoleColor InBackgroundColor)
+{
+#if PLATFORM_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
+	{
+		return;
+	}
+	BufferInfo.wAttributes = (BufferInfo.wAttributes & 0xFF00) | ((WORD)InBackgroundColor << 4) | (WORD)InForegroundColor;
+	if (SetConsoleTextAttribute(sOut.GetNativeHandle(), BufferInfo.wAttributes) == FALSE)
+	{
+		return;
+	}
+#endif
+}
+
+void Console::GetColors(EConsoleColor* OutForegroundColor, EConsoleColor* OutBackgroundColor)
+{
+	check(OutForegroundColor);
+	check(OutBackgroundColor);
+
+#if PLATFORM_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+	if (GetConsoleScreenBufferInfo(sOut.GetNativeHandle(), &BufferInfo) == FALSE)
+	{
+		*OutForegroundColor = EConsoleColor::Black;
+		*OutBackgroundColor = EConsoleColor::Black;
+		return;
+	}
+	*OutForegroundColor = (EConsoleColor)(BufferInfo.wAttributes & 0x000F);
+	*OutBackgroundColor = (EConsoleColor)(BufferInfo.wAttributes & 0x00F0);
 #endif
 }

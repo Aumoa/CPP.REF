@@ -21,6 +21,10 @@ public:
 
 	static void SetForegroundColor(EConsoleColor InColor);
 	static EConsoleColor GetForegroundColor();
+	static void SetBackgroundColor(EConsoleColor InColor);
+	static EConsoleColor GetBackgroundColor();
+	static void SetColors(EConsoleColor InForegroundColor, EConsoleColor InBackgroundColor);
+	static void GetColors(EConsoleColor* OutForegroundColor, EConsoleColor* OutBackgroundColor);
 
 public:
 	template<class... TArgs>
