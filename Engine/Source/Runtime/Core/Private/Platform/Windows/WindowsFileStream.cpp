@@ -69,6 +69,10 @@ Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, std::stop_token In
 	auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
 	auto* Ptr = new IOCompletionOverlapped([TCS, this](IOCompletionOverlapped* Self, size_t Written, int32 ErrorCode) mutable
 	{
+		auto* Overlap = (OVERLAPPED*)Self->ToOverlapped();
+		(ULONG_PTR&)Overlap->Pointer += Written;
+		memcpy(WriteOverlapPointer, Self->ToOverlapped(), sizeof(OVERLAPPED));
+
 		if (ErrorCode)
 		{
 			TCS.SetException(SystemException(ErrorCode));
@@ -77,8 +81,6 @@ Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, std::stop_token In
 		{
 			TCS.SetResult(Written);
 		}
-
-		memcpy(WriteOverlapPointer, Self->ToOverlapped(), sizeof(OVERLAPPED));
 	});
 
 	memcpy(Ptr->ToOverlapped(), WriteOverlapPointer, sizeof(OVERLAPPED));
@@ -113,7 +115,11 @@ Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, std::stop_token In
 	auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
 	auto* Ptr = new IOCompletionOverlapped([TCS, this](IOCompletionOverlapped* Self, size_t Read, int32 ErrorCode) mutable
 	{
-		if (ErrorCode)
+		auto* Overlap = (OVERLAPPED*)Self->ToOverlapped();
+		(ULONG_PTR&)Overlap->Pointer += Read;
+		memcpy(ReadOverlapPointer, Self->ToOverlapped(), sizeof(OVERLAPPED));
+
+		if (ErrorCode && ErrorCode != ERROR_HANDLE_EOF)
 		{
 			TCS.SetException(SystemException(ErrorCode));
 		}
@@ -121,8 +127,6 @@ Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, std::stop_token In
 		{
 			TCS.SetResult(Read);
 		}
-
-		memcpy(ReadOverlapPointer, Self->ToOverlapped(), sizeof(OVERLAPPED));
 	});
 
 	memcpy(Ptr->ToOverlapped(), ReadOverlapPointer, sizeof(OVERLAPPED));
