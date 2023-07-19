@@ -3,13 +3,14 @@
 using System;
 using AE.Rules;
 
-public class AylaHeaderTool : ModuleRules
+public class BlankApp : ModuleRules
 {
-    public AylaHeaderTool(TargetRules TargetRule) : base(TargetRule)
+    public BlankApp(TargetRules TargetRule) : base(TargetRule)
     {
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
+            "Numerics"
         });
 
         PrivateIncludePaths.Add("Private");
