@@ -22,7 +22,7 @@ public:
 
 	bool poll_one();
 	void bind_handle(void* Handle);
-	void post(std::function<void(size_t, int32)> InWork);
+	void post(std::function<void(IOCompletionOverlapped*, size_t, int32)> InWork);
 };
 
 #endif

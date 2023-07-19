@@ -6,7 +6,6 @@ export import :FileAccessMode;
 export import :FileMode;
 export import :FileSharedMode;
 export import :TextWriter;
-export import :IOContext;
 export import :IOCompletionOverlapped;
 export import :ScheduledIOContext;
 export import :Stream;

@@ -37,17 +37,20 @@ bool WindowsIOCPImplementation::poll_one()
 		return false;
 	}
 
-	auto* pBlock = IOCompletionOverlapped::FromOverlapped(lpOverlapped);
-	if (bSucceeded)
+	ThreadPool::QueueUserWorkItem([lpOverlapped, bSucceeded, dwTransferred, LastError = GetLastError()]()
 	{
-		pBlock->Complete((size_t)dwTransferred);
-	}
-	else
-	{
-		pBlock->Failed(GetLastError());
-	}
+		auto* pBlock = IOCompletionOverlapped::FromOverlapped(lpOverlapped);
+		if (bSucceeded)
+		{
+			pBlock->Complete((size_t)dwTransferred);
+		}
+		else
+		{
+			pBlock->Failed(LastError);
+		}
 
-	delete pBlock;
+		delete pBlock;
+	});
 	return true;
 }
 
@@ -60,7 +63,7 @@ void WindowsIOCPImplementation::bind_handle(void* Handle)
 	}
 }
 
-void WindowsIOCPImplementation::post(std::function<void(size_t, int32)> InWork)
+void WindowsIOCPImplementation::post(std::function<void(IOCompletionOverlapped*, size_t, int32)> InWork)
 {
 	auto* ptr = new IOCompletionOverlapped(std::move(InWork));
 	if (PostQueuedCompletionStatus(hIOCP, 0, (ULONG_PTR)ptr, reinterpret_cast<LPOVERLAPPED>(ptr->ToOverlapped())) == FALSE)

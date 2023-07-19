@@ -34,6 +34,8 @@ export class CORE_API FileStream : public Stream
 {
 private:
 	void* FileHandle = nullptr;
+	void* WriteOverlapPointer = nullptr;
+	void* ReadOverlapPointer = nullptr;
 
 public:
 	FileStream(String InFilename, EFileAccessMode InAccessMode, EFileSharedMode InSharedMode, EFileMode InFileMode);

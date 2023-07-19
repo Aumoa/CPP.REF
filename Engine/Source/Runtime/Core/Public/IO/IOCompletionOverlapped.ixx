@@ -11,14 +11,14 @@ export class CORE_API IOCompletionOverlapped
 
 	uint8 Padding[OverlapDefaultPaddingSize];
 	IOCompletionOverlapped* Pointer;
-	std::function<void(size_t, int32)> Work;
+	std::function<void(IOCompletionOverlapped*, size_t, int32)> Work;
 
 public:
-	IOCompletionOverlapped(std::function<void(size_t, int32)> InWork);
+	IOCompletionOverlapped(std::function<void(IOCompletionOverlapped*, size_t, int32)> InWork);
 	~IOCompletionOverlapped() noexcept = default;
 
-	inline void Complete(size_t Resolved) { Work(Resolved, 0); }
-	inline void Failed(int32 SystemCode) { Work(0, SystemCode); }
+	inline void Complete(size_t Resolved) { Work(this, Resolved, 0); }
+	inline void Failed(int32 SystemCode) { Work(this, 0, SystemCode); }
 
 public:
 	inline void* ToOverlapped() const noexcept { return const_cast<uint8*>(Padding + 0); }

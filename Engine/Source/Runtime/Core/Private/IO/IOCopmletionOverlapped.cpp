@@ -2,7 +2,7 @@
 
 import Core;
 
-IOCompletionOverlapped::IOCompletionOverlapped(std::function<void(size_t, int32)> InWork)
+IOCompletionOverlapped::IOCompletionOverlapped(std::function<void(IOCompletionOverlapped*, size_t, int32)> InWork)
 	: Padding{}
 	, Pointer(this)
 	, Work(std::move(InWork))

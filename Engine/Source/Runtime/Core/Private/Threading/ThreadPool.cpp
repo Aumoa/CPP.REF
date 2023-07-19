@@ -11,7 +11,6 @@ namespace
 {
 	static size_t NumWorkerThreads;
 	static size_t NumCompletionPortThreads;
-	static IOContext sContext;
 	static ScheduledIOContext sScheduledContext;
 
 	static Spinlock Lock;
@@ -55,6 +54,18 @@ namespace
 		SynchronizationContext::Uninstall(std::move(Context));
 	}
 
+#if PLATFORM_WINDOWS
+	WindowsIOCPImplementation Implementation;
+
+	void Worker_WindowsIOCP()
+	{
+		while (true)
+		{
+			Implementation.poll_one();
+		}
+	}
+#endif
+
 	void TrapInitialize()
 	{
 		static int TrapView = []()
@@ -67,7 +78,7 @@ namespace
 				std::thread([Index = i]
 				{
 					PlatformMisc::SetThreadName(String::Format(TEXT("IOCP #{}"), Index));
-					sContext.Run();
+					Worker_WindowsIOCP();
 				}).detach();
 			}
 
@@ -94,7 +105,9 @@ namespace
 void ThreadPool::BindHandle(void* NativeHandle)
 {
 	static int Trap_view = (TrapInitialize(), 0);
-	sContext.BindHandle(NativeHandle);
+#if PLATFORM_WINDOWS
+	Implementation.bind_handle(NativeHandle);
+#endif
 }
 
 void ThreadPool::QueueUserWorkItem(Work_t InWork)
