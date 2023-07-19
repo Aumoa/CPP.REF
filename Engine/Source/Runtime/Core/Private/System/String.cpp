@@ -37,3 +37,13 @@ String String::FromLiteral(std::string_view InStr)
 		return Cv;
 	}
 }
+
+[[nodiscard]] String String::FromCodepage(std::string_view Str, int32 Codepage)
+{
+	return String(PlatformMisc::FromCodepage(Str, Codepage));
+}
+
+[[nodiscard]] std::string String::AsCodepage(int32 Codepage) const
+{
+	return PlatformMisc::AsCodepage((std::wstring_view)*this, Codepage);
+}
