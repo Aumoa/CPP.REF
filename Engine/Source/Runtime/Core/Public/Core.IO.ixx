@@ -9,3 +9,4 @@ export import :TextWriter;
 export import :IOContext;
 export import :IOCompletionOverlapped;
 export import :ScheduledIOContext;
+export import :Stream;
