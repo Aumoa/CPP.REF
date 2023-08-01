@@ -3,3 +3,4 @@
 export module Core.Platform;
 
 export import :PlatformMisc;
+export import :PlatformAtomics;
