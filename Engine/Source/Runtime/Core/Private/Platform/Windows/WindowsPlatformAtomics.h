@@ -19,5 +19,5 @@ FORCEINLINE int32 PlatformAtomics::InterlockedIncrement(volatile int32* Value)
 
 FORCEINLINE int64 PlatformAtomics::InterlockedIncrement(volatile int64* Value)
 {
-	return (int64)_InlineInterlockedIncrement64((volatile long long*)Value);
+	return (int64)_InterlockedIncrement64((volatile long long*)Value);
 }

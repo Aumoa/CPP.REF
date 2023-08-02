@@ -11,3 +11,5 @@ export import :ScheduledIOContext;
 export import :Stream;
 export import :TextReader;
 export import :StreamReader;
+export import :Directory;
+export import :SearchOption;
