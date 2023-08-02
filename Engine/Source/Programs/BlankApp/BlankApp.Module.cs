@@ -10,7 +10,8 @@ public class BlankApp : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "Numerics"
+            "Numerics",
+            "CoreAObject",
         });
 
         PrivateIncludePaths.Add("Private");

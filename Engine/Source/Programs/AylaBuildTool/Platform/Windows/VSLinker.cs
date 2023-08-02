@@ -43,10 +43,15 @@ public class VSLinker : Linker
         string StdDir;
         if (Config.Platform == TargetPlatform.Win64)
         {
-            OutputDir = Module.ProjectDir.Binaries.Win64;
+            OutputDir = Path.Combine(Module.ProjectDir.Binaries.Win64, Config.Configuration.ToString());
             BuildDir = Path.Combine(Module.ProjectDir.Intermediate.Build, "Win64");
-            LibraryPath = Global.EngineDirectory.Binaries.Win64;
+            LibraryPath = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.Configuration.ToString());
             StdDir = Path.Combine(Global.EngineDirectory.Intermediate.Build, "Win64");
+
+            if (Directory.Exists(OutputDir) == false)
+            {
+                Directory.CreateDirectory(OutputDir);
+            }
         }
         else
         {

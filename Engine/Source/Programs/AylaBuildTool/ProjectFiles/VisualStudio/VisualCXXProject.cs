@@ -137,10 +137,10 @@ public class VisualCXXProject : IVisualStudioProject
 
                 var IncludePaths = ToolChain.GetRequiredIncludePaths(Platform.Architecture);
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp}";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp}";
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp} -Config {Configuration}";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp} -Config {Configuration}";
                 PropertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{BuildToolPath} Clean";
-                PropertyGroup.AddElement("OutDir").InnerText = ProjectDirectory.Binaries.Win64;
+                PropertyGroup.AddElement("OutDir").InnerText = Path.Combine(ProjectDirectory.Binaries.Win64, Configuration.ToString());
                 PropertyGroup.AddElement("IntDir").InnerText = ProjectDirectory.Intermediate.Unused;
 
                 List<string> Macros = new();

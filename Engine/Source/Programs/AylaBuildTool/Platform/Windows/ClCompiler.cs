@@ -93,6 +93,8 @@ public class ClCompiler : Compiler
                     "/Oi- " +
                     // Disable optimization.
                     "/Od " +
+                    // Generates complete debugging information.
+                    "/Zi " +
                     // Enable fast runtime checks.
                     "/RTC1 " +
                     // Multithreaded DLL

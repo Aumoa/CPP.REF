@@ -6,6 +6,9 @@ export import Core;
 
 export class AylaHeaderToolApp
 {
+	String SourcePath;
+	String IncludesPath;
+
 public:
 	AylaHeaderToolApp();
 
@@ -13,4 +16,6 @@ public:
 
 private:
 	static void PrintUsage(TextWriter& Output);
+
+	void ParseCommandLines();
 };

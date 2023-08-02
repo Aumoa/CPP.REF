@@ -7,6 +7,10 @@ int main()
 	Log::Information(TEXT("Log system initialized."));
 	Log::FlushAll();
 
+	int64 Interlocked = 0;
+	PlatformAtomics::InterlockedIncrement(&Interlocked);
+	PlatformAtomics::InterlockedIncrement(&Interlocked);
+
 	{
 		FileStream FS(TEXT("Sample.txt"), EFileAccessMode::Write, EFileSharedMode::None, EFileMode::Create);
 		std::string SampleText = TEXT("SampleText").AsCodepage();

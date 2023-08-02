@@ -24,13 +24,19 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         [CommandLineApply(CategoryName = "Clean")]
         public bool bClean { get; set; }
+
+        [CommandLineApply(CategoryName = "Config")]
+        public string Config { get; set; } = null!;
     }
 
     private readonly Arguments BuildArgs = new();
+    private readonly Configuration ProjectConfig;
 
     public BuildExecutor(CommandLineParser Args) : base(Args)
     {
         Args.ApplyTo(BuildArgs);
+        BuildArgs.Config ??= "Debug";
+        ProjectConfig = Enum.Parse<Configuration>(BuildArgs.Config);
     }
 
     public async Task<int> RunAsync(CancellationToken SToken = default)
@@ -64,7 +70,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         {
             BuildConfiguration = new()
             {
-                Configuration = Configuration.Shipping,
+                Configuration = ProjectConfig,
                 Platform = TargetPlatform.Win64
             }
         });

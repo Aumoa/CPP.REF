@@ -6,41 +6,8 @@ AylaHeaderToolApp::AylaHeaderToolApp()
 {
 }
 
-Task<> ConfigureAwaitTestAsync(size_t Number)
-{
-	co_await Task<>::Yield();
-
-	auto Id = std::this_thread::get_id();
-	Log::Information(TEXT("[{}] = [{}] In worker thread."), Number, PlatformMisc::GetThreadName());
-
-	co_await Task<>::Yield().ConfigureAwait(true);
-	Log::Information(TEXT("[{}] = [{}] In worker thread."), Number, PlatformMisc::GetThreadName());
-	check(Id == std::this_thread::get_id());
-
-	co_await Task<>::Yield().ConfigureAwait(true);
-	Log::Information(TEXT("[{}] = [{}] In worker thread."), Number, PlatformMisc::GetThreadName());
-	check(Id == std::this_thread::get_id());
-}
-
 int32 AylaHeaderToolApp::Run()
 {
-	std::vector<Task<>> Tasks;
-	for (int32 i = 0; i < 32; ++i)
-	{
-		Tasks.emplace_back(ConfigureAwaitTestAsync(i));
-	}
-
-	Task<>::WhenAll(Tasks).GetResult();
-
-	Console::CancelKeyPressed() += []()
-	{
-		Log::Critical(TEXT("Cancel key pressed."));
-		Log::FlushAll();
-		__debugbreak();
-	};
-
-	String Temp = Console::ReadLine();
-
 	try
 	{
 		if (CommandLine::Contains(TEXT("help")))
@@ -49,7 +16,12 @@ int32 AylaHeaderToolApp::Run()
 			return 0;
 		}
 
-		throw TerminateException(TerminateException::EKnownErrorCodes::Usage);
+		ParseCommandLines();
+
+		for (auto& Path : Directory::GetFiles(SourcePath, ESearchOption::AllDirectories))
+		{
+			Console::WriteLine(Path);
+		}
 	}
 	catch (const TerminateException& TE)
 	{
@@ -70,4 +42,19 @@ int32 AylaHeaderToolApp::Run()
 void AylaHeaderToolApp::PrintUsage(TextWriter& Output)
 {
 	Output.WriteLine(TEXT("Usage: "));
+	Output.WriteLine(TEXT("  -Source [String] The source code path."));
+	Output.WriteLine(TEXT("  -Includes [String] The include path to save generated header files."));
+}
+
+void AylaHeaderToolApp::ParseCommandLines()
+{
+	if (CommandLine::TryGetValue(TEXT("source"), SourcePath) == false || SourcePath.IsEmpty())
+	{
+		throw TerminateException(TerminateException::EKnownErrorCodes::Usage);
+	}
+
+	if (CommandLine::TryGetValue(TEXT("includes"), IncludesPath) == false || IncludesPath.IsEmpty())
+	{
+		throw TerminateException(TerminateException::EKnownErrorCodes::Usage);
+	}
 }
