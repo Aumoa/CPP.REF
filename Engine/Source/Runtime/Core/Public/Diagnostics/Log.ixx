@@ -69,6 +69,7 @@ private:
 	static Spinlock Lock;
 	static SpinlockConditionVariable Trigger;
 	static std::vector<LogEntry> LogQueue;
+	static bool bWriting;
 
 private:
 	static void InitThread();

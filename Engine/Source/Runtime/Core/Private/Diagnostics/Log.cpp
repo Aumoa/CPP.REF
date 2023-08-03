@@ -6,21 +6,14 @@ std::vector<TextWriter*> Log::OutputDevices;
 Spinlock Log::Lock;
 SpinlockConditionVariable Log::Trigger;
 std::vector<LogEntry> Log::LogQueue;
+bool Log::bWriting = false;
 
 SpinlockConditionVariable FlushConditionVar;
 
 void Log::FlushAll()
 {
-	while (true)
-	{
-		std::unique_lock ScopedLock(Lock);
-		if (LogQueue.empty())
-		{
-			break;
-		}
-
-		FlushConditionVar.Wait(ScopedLock, []() { return LogQueue.empty(); });
-	}
+	std::unique_lock ScopedLock(Lock);
+	FlushConditionVar.Wait(ScopedLock, []() { return LogQueue.empty() && bWriting == false; });
 }
 
 void Log::InternalLog(ELogLevel InLogLevel, String InFormattedStr)
@@ -60,6 +53,7 @@ void Log::Worker()
 		{
 			std::unique_lock ScopedLock(Lock);
 			std::swap(SwapQueue, LogQueue);
+			bWriting = !SwapQueue.empty();
 		}
 
 		if (SwapQueue.size() == 0)
@@ -67,6 +61,7 @@ void Log::Worker()
 			std::unique_lock ScopedLock(Lock);
 			Trigger.Wait(ScopedLock, []() { return LogQueue.size() > 0; });
 			std::swap(SwapQueue, LogQueue);
+			bWriting = !SwapQueue.empty();
 		}
 
 		EConsoleColor ForegroundColor, BackgroundColor;
@@ -116,6 +111,7 @@ void Log::Worker()
 
 		{
 			std::unique_lock ScopedLock(Lock);
+			bWriting = false;
 			FlushConditionVar.NotifyAll();
 		}
 	}
