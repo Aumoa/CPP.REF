@@ -315,7 +315,14 @@ public:
 
 public:
 	template<IList<Task<>> TTasks>
-	static Task<> WhenAll(TTasks InTasks, std::stop_token sToken = {}) requires
+	static auto WhenAll(const TTasks& InTasks, std::stop_token sToken = {})
+	{
+		return WhenAll(InTasks, std::move(sToken), 0);
+	}
+
+private:
+	template<IList<Task<>> TTasks>
+	static Task<> WhenAll(const TTasks& InTasks, std::stop_token sToken, short) requires
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
@@ -345,23 +352,23 @@ public:
 
 				for (auto& Task : Tasks)
 				{
-					std::ignore = Task.ContinueWith([Self](::Task<> t)
+					std::ignore = Task.ContinueWith([Self](::Task<> p)
 					{
-						if (t.IsCanceled())
+						if (p.IsCanceled())
 						{
-							if (bool expected = false; Self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
 							{
 								Self->Cancel();
 							}
 						}
-						else if (auto e = t.GetException())
+						else if (auto E = p.GetException())
 						{
-							if (bool expected = false; Self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
 							{
-								Self->SetException(e);
+								Self->SetException(E);
 							}
 						}
-						else if (size_t number = ++Self->Counter; number == Self->Tasks.size())
+						else if (size_t Number = ++Self->Counter; Number == Self->Tasks.size())
 						{
 							Self->SetResult();
 						}
@@ -381,32 +388,33 @@ public:
 	}
 	
 	template<class TTasks>
-	static auto WhenAll(TTasks InTasks, std::stop_token sToken = {})
+	static auto WhenAll(const TTasks& InTasks, std::stop_token sToken, int)
 		-> Task<std::vector<typename EnumerableItem_t<TTasks>::ValueType>> requires
 		IEnumerable<TTasks, EnumerableItem_t<TTasks>> &&
 		std::constructible_from<Task<>, EnumerableItem_t<TTasks>> &&
 		(!std::same_as<typename EnumerableItem_t<TTasks>::ValueType, void>)
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
-		using ValueType = typename EnumerableItem_t<ValueType>::ValueType;
+		using ElementType = typename EnumerableItem_t<TTasks>::ValueType;
 
-		class WhenAllAwaiter : public ::Awaiter<std::vector<ValueType>>
+		class WhenAllAwaiter : public ::Awaiter<std::vector<ElementType>>
 		{
-			std::vector<Task<>> Tasks;
+			std::vector<Task<ElementType>> Tasks;
 			std::atomic<size_t> Counter;
+			std::atomic<size_t> Assigned;
 			std::atomic<bool> bComplete;
 			std::unique_ptr<char[]> Values;
 
 		public:
 			WhenAllAwaiter(std::stop_token sToken)
-				: ::Awaiter<void>(sToken)
+				: ::Awaiter<std::vector<ElementType>>(sToken)
 			{
 			}
 
-			void Start(std::shared_ptr<WhenAllAwaiter> self, std::vector<Task<>> tasks)
+			void Start(std::shared_ptr<WhenAllAwaiter> Self, std::vector<Task<ElementType>> InTasks)
 			{
-				check(tasks.empty() == false);
-				Tasks = std::move(tasks);
+				check(InTasks.empty() == false);
+				Tasks = std::move(InTasks);
 
 				if (Tasks.empty())
 				{
@@ -414,33 +422,34 @@ public:
 					return;
 				}
 
-				Values = std::make_unique<char[]>(sizeof(ValueType) * Tasks.size());
-				ValueType* values = reinterpret_cast<ValueType*>(Values.get());
+				Values = std::make_unique<char[]>(sizeof(ElementType) * Tasks.size());
+				ElementType* ValuesPtr = reinterpret_cast<ElementType*>(Values.get());
 
 				for (size_t i = 0; i < Tasks.size(); ++i)
 				{
-					Tasks[i].ContinueWith([self, values, i](Task<> t)
+					std::ignore = Tasks[i].ContinueWith([Self, ValuesPtr, i](Task<ElementType> p)
 					{
-						if (t.IsCanceled())
+						if (p.IsCanceled())
 						{
-							if (bool expected = false; self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
 							{
-								self->Cancel();
+								Self->Cancel();
 							}
 						}
-						else if (auto e = t.GetException())
+						else if (auto E = p.GetException())
 						{
-							if (bool expected = false; self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
 							{
-								self->SetException(e);
+								Self->SetException(E);
 							}
 						}
-						else if (size_t number = ++self->Counter; number == self->Tasks.size())
+						else if (size_t Number = ++Self->Counter; Number <= Self->Tasks.size())
 						{
-							new(values + i) ValueType(t.GetResult());
-							if (number == self->Tasks.size())
+							new(ValuesPtr + i) ElementType(p.GetResult());
+							size_t Assigned = ++Self->Assigned;
+							if (Assigned == Self->Tasks.size())
 							{
-								self->SetResult(std::vector(values, values + self->Tasks.size()));
+								Self->SetResult(std::vector(ValuesPtr, ValuesPtr + Self->Tasks.size()));
 							}
 						}
 					});
@@ -448,11 +457,18 @@ public:
 			}
 		};
 
+		std::vector<Task<ElementType>> ConvTasks;
+		for (auto& InTask : InTasks)
+		{
+			ConvTasks.emplace_back((Task<ElementType>)InTask);
+		}
+
 		auto Ptr = std::make_shared<WhenAllAwaiter>(sToken);
-		Ptr->Start(Ptr, Linq::ToVector(&InTasks));
-		return Task<>(std::move(Ptr));
+		Ptr->Start(Ptr, std::move(ConvTasks));
+		return Task<std::vector<ElementType>>(std::move(Ptr));
 	}
 
+public:
 	template<class... TTasks>
 	static auto WhenAll(TTasks... InTasks) requires
 		(std::constructible_from<Task<>, TTasks> && ...)
@@ -507,21 +523,21 @@ public:
 					{
 						if (t.IsCanceled())
 						{
-							if (bool expected = false; self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; self->bComplete.compare_exchange_strong(bExpected, true))
 							{
 								self->Cancel();
 							}
 						}
 						else if (auto e = t.GetException())
 						{
-							if (bool expected = false; self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; self->bComplete.compare_exchange_strong(bExpected, true))
 							{
 								self->SetException(e);
 							}
 						}
 						else if (t.IsCompletedSuccessfully())
 						{
-							if (bool expected = false; self->bComplete.compare_exchange_strong(expected, true))
+							if (bool bExpected = false; self->bComplete.compare_exchange_strong(bExpected, true))
 							{
 								self->SetResult(t);
 							}

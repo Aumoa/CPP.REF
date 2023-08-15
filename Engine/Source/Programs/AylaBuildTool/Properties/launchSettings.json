@@ -2,7 +2,7 @@
   "profiles": {
     "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "Build -Target AylaHeaderTool"
+      "commandLineArgs": "Build -Target AylaHeaderTool -Config Debug"
     }
   }
 }

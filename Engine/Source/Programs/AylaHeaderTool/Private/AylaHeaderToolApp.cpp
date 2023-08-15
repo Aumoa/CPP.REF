@@ -18,7 +18,7 @@ Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationTok
 
 		ParseCommandLines();
 
-		std::vector<Task<>> Tasks;
+		std::vector<Task<bool>> Tasks;
 		for (auto& Path : Directory::GetFiles(SourcePath, ESearchOption::AllDirectories))
 		{
 			if (Path::GetExtension(Path) == TEXT(".ixx"))
@@ -28,7 +28,15 @@ Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationTok
 			}
 		}
 
-		co_await Task<>::WhenAll(Tasks);
+		std::vector<bool> Results = co_await Task<>::WhenAll(Tasks);
+		for (bool Result : Results)
+		{
+			if (Result == false)
+			{
+				Console::GetError().WriteLine(TEXT("Compile error."));
+				co_return 1;
+			}
+		}
 	}
 	catch (const TerminateException& TE)
 	{

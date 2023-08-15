@@ -203,7 +203,7 @@ public class ClCompiler : Compiler
         if (P.ExitCode != 0)
         {
             string Report = string.Empty;
-            if (P.ExitCode == 1 || P.ExitCode == 2)
+            if (P.ExitCode != 0)
             {
                 Report += Stdout;
             }
