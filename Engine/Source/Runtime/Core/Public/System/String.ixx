@@ -22,9 +22,6 @@ export class CORE_API String
 	bool bNullTerminate;
 
 private:
-	static inline constexpr const std::array WhitespaceChars = { L' ', L'\t', L'\r', L'\n', L'\b' };
-
-private:
 	inline constexpr String(decltype(Buf) Buf, size_t Len)
 		: Buf(std::move(Buf))
 		, Len(Len)
@@ -696,7 +693,7 @@ public:
 
 	[[nodiscard]] inline String Trim() const
 	{
-		return Trim(WhitespaceChars);
+		return Trim(Char::GetWhiteSpaceChars());
 	}
 
 	template<class TArray>
@@ -708,7 +705,7 @@ public:
 
 	[[nodiscard]] inline String TrimStart() const
 	{
-		return TrimStart(WhitespaceChars);
+		return TrimStart(Char::GetWhiteSpaceChars());
 	}
 
 	template<IArray<char_t> TArray>
@@ -719,13 +716,13 @@ public:
 
 	[[nodiscard]] inline String TrimEnd() const
 	{
-		return TrimEnd(WhitespaceChars);
+		return TrimEnd(Char::GetWhiteSpaceChars());
 	}
 
 	template<IArray<char_t> TArray>
 	[[nodiscard]] inline String TrimEnd(const TArray& Chars) const
 	{
-		return this->TrimAll(ETrimType::Head, Chars);
+		return this->TrimAll(ETrimType::Tail, Chars);
 	}
 
 	[[nodiscard]] String Substring(size_t StartIndex, size_t InLength = -1) const

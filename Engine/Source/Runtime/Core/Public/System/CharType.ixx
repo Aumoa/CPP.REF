@@ -48,4 +48,9 @@ export struct CORE_API Char
 		return ch >= 'a' && ch <= 'f'
 			|| ch >= 'A' && ch <= 'F';
 	}
+
+	static constexpr auto GetWhiteSpaceChars() noexcept
+	{
+		return std::array{ (char_t)' ', (char_t)'\n', (char_t)'\r', (char_t)'\t', (char_t)'\b' };
+	}
 };

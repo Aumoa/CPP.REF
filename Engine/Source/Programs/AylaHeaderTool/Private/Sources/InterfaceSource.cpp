@@ -10,6 +10,12 @@ InterfaceSource::InterfaceSource(String InPath)
 Task<bool> InterfaceSource::TryParseAsync(std::stop_token InCancellationToken)
 {
 	String Content = co_await File::ReadAllTextAsync(GetSourcePath(), InCancellationToken);
+	std::unique_ptr<SyntaxTree> SyntaxTree = AylaCxxSyntaxTree::ParseText(Content, GetSourcePath(), InCancellationToken);
+	std::vector<CodeDiagnostic> Diagnostics = SyntaxTree->GetDiagnostics();
+	if (Diagnostics.size() > 0)
+	{
+		co_return false;
+	}
 	co_return true;
 }
 
