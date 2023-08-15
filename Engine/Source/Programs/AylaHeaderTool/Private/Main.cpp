@@ -6,6 +6,13 @@ import AylaHeaderTool;
 int main(int Argc, char* Argv[])
 {
 	CommandLine::Init(Argc, Argv);
+
+	std::stop_source CancellationTokenSource;
+	Console::CancelKeyPressed().AddLambda([&CancellationTokenSource]()
+	{
+		CancellationTokenSource.request_stop();
+	});
+
 	AylaHeaderToolApp App;
-	return App.Run();
+	return (int)App.RunConsoleAsync(CancellationTokenSource.get_token()).GetResult();
 }

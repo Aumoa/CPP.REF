@@ -6,22 +6,29 @@ AylaHeaderToolApp::AylaHeaderToolApp()
 {
 }
 
-int32 AylaHeaderToolApp::Run()
+Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationToken)
 {
 	try
 	{
 		if (CommandLine::Contains(TEXT("help")))
 		{
 			PrintUsage(Console::GetOut());
-			return 0;
+			co_return 0;
 		}
 
 		ParseCommandLines();
 
+		std::vector<Task<>> Tasks;
 		for (auto& Path : Directory::GetFiles(SourcePath, ESearchOption::AllDirectories))
 		{
-			Console::WriteLine(Path);
+			if (Path::GetExtension(Path) == TEXT(".ixx"))
+			{
+				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<InterfaceSource>(Path));
+				Tasks.emplace_back(Source->TryParseAsync(InCancellationToken));
+			}
 		}
+
+		co_await Task<>::WhenAll(Tasks);
 	}
 	catch (const TerminateException& TE)
 	{
@@ -33,10 +40,10 @@ int32 AylaHeaderToolApp::Run()
 			PrintUsage(Console::GetError());
 		}
 
-		return (int32)TE.ErrorCode;
+		co_return (int32)TE.ErrorCode;
 	}
 
-	return 0;
+	co_return 0;
 }
 
 void AylaHeaderToolApp::PrintUsage(TextWriter& Output)

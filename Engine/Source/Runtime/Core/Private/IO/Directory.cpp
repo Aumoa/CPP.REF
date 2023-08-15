@@ -10,18 +10,23 @@ std::vector<String> Directory::GetFiles(String InPath, ESearchOption InSearchOpt
 
 	if (InSearchOption == ESearchOption::TopDirectoryOnly)
 	{
-		for (auto It : std::filesystem::directory_iterator(InPath.c_str()))
+		for (auto It : std::filesystem::directory_iterator(InPath.path()))
 		{
 			Files.emplace_back(It.path().wstring());
 		}
 	}
 	else
 	{
-		for (auto It : std::filesystem::recursive_directory_iterator(InPath.c_str()))
+		for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
 		{
 			Files.emplace_back(It.path().wstring());
 		}
 	}
 
 	return Files;
+}
+
+bool Directory::Exists(String InPath)
+{
+	return std::filesystem::is_directory(InPath.path());
 }

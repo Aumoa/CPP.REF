@@ -5,7 +5,13 @@ import Core.System;
 import Core.IO;
 
 StreamReader::StreamReader(std::shared_ptr<Stream> InStream)
-	: CurrentStream(InStream)
+	: CurrentStream_Capture(std::move(InStream))
+	, CurrentStream(CurrentStream_Capture.get())
+{
+}
+
+StreamReader::StreamReader(Stream* InStreamRaw)
+	: CurrentStream(InStreamRaw)
 {
 }
 

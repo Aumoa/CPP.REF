@@ -13,3 +13,5 @@ export import :TextReader;
 export import :StreamReader;
 export import :Directory;
 export import :SearchOption;
+export import :FileStream;
+export import :File;

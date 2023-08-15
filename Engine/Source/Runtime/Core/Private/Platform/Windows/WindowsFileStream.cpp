@@ -6,7 +6,7 @@
 
 import Core.IO;
 
-FileStream::FileStream(String InFilename, EFileAccessMode InAccessMode, EFileSharedMode InSharedMode, EFileMode InFileMode)
+FileStream::FileStream(String InFilename, EFileMode InFileMode, EFileAccessMode InAccessMode, EFileSharedMode InSharedMode)
 {
 	FileHandle = CreateFileW(InFilename.c_str(), (DWORD)InAccessMode, (DWORD)InSharedMode, NULL, (DWORD)InFileMode, FILE_FLAG_OVERLAPPED, NULL);
 	if (FileHandle == nullptr)

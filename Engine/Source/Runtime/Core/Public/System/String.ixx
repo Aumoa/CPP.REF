@@ -275,12 +275,14 @@ public:
 		return this->operator =(*this + Rhs);
 	}
 
-	inline explicit operator std::string() const noexcept;
+	inline explicit operator std::string() const { return AsCodepage(); }
+	inline std::string string() const { return (std::string)*this; }
 
-	inline explicit operator std::wstring() const noexcept
-	{
-		return std::wstring(this->GetRaw(), Len);
-	}
+	inline explicit operator std::wstring() const { return std::wstring(this->GetRaw(), Len); }
+	inline std::wstring wstring() const { return (std::wstring)*this; }
+
+	inline explicit operator std::filesystem::path() const { return std::filesystem::path(this->GetRaw(), this->GetRaw() + Len); }
+	inline std::filesystem::path path() const { return (std::filesystem::path)*this; }
 
 	inline constexpr operator std::wstring_view() const noexcept
 	{

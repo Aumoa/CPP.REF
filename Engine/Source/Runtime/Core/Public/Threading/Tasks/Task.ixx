@@ -8,7 +8,7 @@ export import :ThreadPool;
 export import :SynchronizationContext;
 
 export template<class T = void>
-class Task
+class [[nodiscard]] Task
 {
 	template<class U>
 	friend class Task;
@@ -345,7 +345,7 @@ public:
 
 				for (auto& Task : Tasks)
 				{
-					Task.ContinueWith([Self](::Task<> t)
+					std::ignore = Task.ContinueWith([Self](::Task<> t)
 					{
 						if (t.IsCanceled())
 						{

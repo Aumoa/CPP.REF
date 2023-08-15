@@ -11,13 +11,15 @@ export class CORE_API StreamReader : public TextReader
 {
 	static constexpr size_t InitialBufferSize = 1024;
 
-	std::shared_ptr<Stream> CurrentStream;
+	std::shared_ptr<Stream> CurrentStream_Capture;
+	Stream* CurrentStream = nullptr;
 	std::vector<uint8> Buffer;
 	size_t BufferPos = 0;
 	bool bEOF = false;
 
 public:
 	StreamReader(std::shared_ptr<Stream> InStream);
+	StreamReader(Stream* InStreamRaw);
 
 	virtual String ReadLine() override;
 	virtual Task<String> ReadLineAsync(std::stop_token InCancellationToken = {}) override;

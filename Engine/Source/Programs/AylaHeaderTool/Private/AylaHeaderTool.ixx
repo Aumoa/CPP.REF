@@ -5,3 +5,6 @@ export module AylaHeaderTool;
 export import :AylaHeaderToolApp;
 
 export import :TerminateException;
+
+export import :SourceFile;
+export import :InterfaceSource;
