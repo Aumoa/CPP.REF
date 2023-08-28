@@ -2,10 +2,8 @@
 
 #if PLATFORM_WINDOWS
 
-#include "Platform/Windows/WindowsCore.h"
-
-import Core;
-import Core.Platform.Windows;
+#include "WindowsStandardStreamTextWriter.h"
+#include "System/AssertionMacros.h"
 
 WindowsStandardStreamTextWriter::WindowsStandardStreamTextWriter(DWORD StdHandleId)
 	: hStd(GetStdHandle(StdHandleId))

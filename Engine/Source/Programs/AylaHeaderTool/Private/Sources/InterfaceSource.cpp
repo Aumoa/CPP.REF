@@ -1,6 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import AylaHeaderTool;
+#include "Sources/InterfaceSource.h"
+#include "CodeAnalysis/SyntaxTree.h"
+#include "CodeAnalysis/AylaCxx/AylaCxxSyntaxTree.h"
 
 InterfaceSource::InterfaceSource(String InPath)
 	: Super(InPath)

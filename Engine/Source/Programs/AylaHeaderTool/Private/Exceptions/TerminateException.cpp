@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core;
-import AylaHeaderTool;
+#include "Exceptions/TerminateException.h"
 
 TerminateException::TerminateException(EKnownErrorCodes ErrorCode)
 	: Exception(FormatMessage(ErrorCode))

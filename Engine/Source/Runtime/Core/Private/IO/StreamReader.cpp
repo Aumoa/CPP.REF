@@ -1,8 +1,6 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import Core.Std;
-import Core.System;
-import Core.IO;
+#include "IO/StreamReader.h"
 
 StreamReader::StreamReader(std::shared_ptr<Stream> InStream)
 	: CurrentStream_Capture(std::move(InStream))

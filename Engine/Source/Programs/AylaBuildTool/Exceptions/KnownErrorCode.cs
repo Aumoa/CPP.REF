@@ -16,4 +16,5 @@ public enum KnownErrorCode
     InvalidModule = 10,
     PlatformCompilerNotFound = 11,
     NotSupportedCompiler = 12,
+    NotSupportedBuildHostPlatform = 13
 }

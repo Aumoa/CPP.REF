@@ -2,7 +2,6 @@
 
 using System;
 using AE.Rules;
-using AE.BuildSettings;
 
 public class CoreAObject : ModuleRules
 {

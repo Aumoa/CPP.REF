@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core.System;
-import Core.Platform;
+#include "System/SystemException.h"
+#include "Platform/PlatformMisc.h"
 
 SystemException::SystemException(int32 SystemCode) noexcept
 	: Exception(FormatMessage(SystemCode))

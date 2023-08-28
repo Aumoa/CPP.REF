@@ -1,7 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core.System;
-import Core.Diagnostics;
+#include "System/Exception.h"
+#include "Diagnostics/StackTrace.h"
 
 Exception::Exception(const String& InMessage, std::exception_ptr InInnerException, std::source_location Src) noexcept
 	: Message(InMessage)

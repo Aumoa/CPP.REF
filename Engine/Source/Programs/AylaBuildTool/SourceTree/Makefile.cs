@@ -2,9 +2,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-using AE.Rules;
-using AE.System;
-
 namespace AE.SourceTree;
 
 public sealed class Makefile
@@ -13,12 +10,12 @@ public sealed class Makefile
     private Makefile(string InMakefilePath)
     {
         MakefilePath = InMakefilePath;
-        Caches = Array.Empty<MakefileCache>();
+        Caches = Array.Empty<MakefileSourceCache>();
     }
 
     public required string MakefilePath { get; init; }
 
-    public required MakefileCache[] Caches { get; init; }
+    public required MakefileSourceCache[] Caches { get; init; }
 
     public static async Task<Makefile> LoadMakefileCacheAsync(string InPath, CancellationToken SToken = default)
     {
@@ -39,10 +36,10 @@ public sealed class Makefile
             }
 
             int Count = Reader.ReadInt32();
-            var Caches = new MakefileCache[Count];
+            var Caches = new MakefileSourceCache[Count];
             for (int i = 0; i < Count; ++i)
             {
-                Caches[i] = MakefileCache.LoadCacheFromBinary(Reader);
+                Caches[i] = MakefileSourceCache.LoadCacheFromBinary(Reader);
             }
 
             return new(Filename)
@@ -50,8 +47,9 @@ public sealed class Makefile
                 Caches = Caches
             };
         }
-        catch
+        catch (Exception E)
         {
+            Console.WriteLine("Makefile is not compatible with current version: {0}: {1}", E.GetType().Name, E.Message);
             return new(Filename);
         }
     }
@@ -62,11 +60,17 @@ public sealed class Makefile
         var Writer = new BinaryWriter(Stream);
         Writer.Write(Global.MakefileVersion);
 
-        MakefileCache[] AllCaches = CompileItems.Select(p => p.Cache).ToArray();
+        MakefileSourceCache[] AllCaches = CompileItems.Select(p => p.Cache!).Where(p => p != null).ToArray();
         Writer.Write(AllCaches.Length);
         foreach (var Cache in AllCaches)
         {
             Cache.SaveCacheToBinary(Writer);
+        }
+
+        string DirectoryName = Path.GetDirectoryName(MakefilePath)!;
+        if (Directory.Exists(DirectoryName) == false)
+        {
+            Directory.CreateDirectory(DirectoryName);
         }
 
         await File.WriteAllBytesAsync(MakefilePath, Stream.ToArray(), SToken);

@@ -8,7 +8,7 @@ public class BuildConfiguration
 {
     public Configuration Configuration { get; set; } = Configuration.Debug;
 
-    public TargetPlatform Platform { get; set; } = new();
+    public required TargetPlatform Platform { get; set; }
 
     public static readonly Configuration[] Configurations = new[]
     {

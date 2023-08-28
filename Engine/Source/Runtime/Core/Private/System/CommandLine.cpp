@@ -1,6 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import Core;
+#include "System/CommandLine.h"
+#include "System/AssertionMacros.h"
+#include "Platform/PlatformLocalization.h"
 
 std::vector<String> CommandLine::Args;
 

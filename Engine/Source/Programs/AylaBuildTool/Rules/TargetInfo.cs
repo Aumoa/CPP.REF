@@ -6,5 +6,5 @@ namespace AE.Rules;
 
 public class TargetInfo
 {
-    public BuildConfiguration BuildConfiguration { get; set; } = new();
+    public required BuildConfiguration BuildConfiguration { get; set; }
 }

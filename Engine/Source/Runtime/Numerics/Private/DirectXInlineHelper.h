@@ -4,9 +4,8 @@
 
 #if PLATFORM_WINDOWS
 
+#include "Numerics/MatrixInterface/Matrix4x4.h"
 #include <DirectXMath.h>
-
-import Numerics;
 
 inline DirectX::XMVECTOR XMLoadQuaternion(const void* ptr)
 {

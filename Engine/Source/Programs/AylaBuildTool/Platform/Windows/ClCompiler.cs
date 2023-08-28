@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Text.Json.Nodes;
 
 using AE.BuildSettings;
-using AE.Compile;
 using AE.Exceptions;
 using AE.Rules;
 using AE.SourceTree;
@@ -77,8 +76,8 @@ public class ClCompiler : Compiler
             "/FC " +
             // Diagnostics format: prints column information.
             "/diagnostics:column " +
-            // Force include CoreMinimal.h
-            $"/FICoreMinimal.h "
+            // Use standard preprocessor.
+            "/Zc:preprocessor "
             ;
     }
 
@@ -123,13 +122,13 @@ public class ClCompiler : Compiler
     {
         // Appending additional arguments.
         //string GeneratedInclude = Path.Combine(Item.Intermediate, "Includes", Item.ModuleName);
-        string IncludePaths = string.Join(' ', Item.IncludePaths.Select(p => $"/I\"{p}\""));
+        string IncludePaths = string.Join(' ', Item.ModuleInfo.IncludePaths.Select(p => $"/I\"{p}\""));
 
         List<string> Macros = new();
         Macros.AddRange(GenerateBuildMacros(Rule).Select(p => $"/D\"{p.Item1}\"=\"{p.Item2}\""));
-        Macros.AddRange(Item.AdditionalMacros.Select(p => $"/D\"{p}\""));
-        Macros.AddRange(Item.DependModules.Select(p => $"/D\"{p.ToUpper()}_API\"=\"__declspec(dllimport)\""));
-        Macros.Add($"/D\"{Item.ModuleName.ToUpper()}_API\"=\"__declspec(dllexport)\"");
+        Macros.AddRange(Item.ModuleInfo.AdditionalMacros.Select(p => $"/D\"{p}\""));
+        Macros.AddRange(Item.ModuleInfo.DependModules.Select(p => $"/D\"{p.ToUpper()}_API\"=\"__declspec(dllimport)\""));
+        Macros.Add($"/D\"{Item.ModuleInfo.Name.ToUpper()}_API\"=\"__declspec(dllexport)\"");
         Macros.Add("/DUNICODE");
         Macros.Add("/D_UNICODE");
 
@@ -138,23 +137,22 @@ public class ClCompiler : Compiler
         string AdditionalMacros = string.Join(' ', Macros);
         PSI.Arguments += $"{AdditionalMacros} ";
 
-        string DisableWarnings = string.Join(' ', Item.DisableWarnings.Select(p => $"/wd{p}"));
+        string DisableWarnings = string.Join(' ', Item.ModuleInfo.DisableWarnings.Select(p => $"/wd{p}"));
         PSI.Arguments += $"{DisableWarnings} ";
     }
 
-    private void SetSourceCodeParameters(ProcessStartInfo PSI, MakefileCompile Item)
+    private void SetSourceCodeParameters(ProcessStartInfo PSI, TargetRules Rule, MakefileCompile Item, out string OutputPath, out string DependenciesJson)
     {
-        string SourceCodeName = Path.GetFileName(Item.SourceCode);
-        string Output = Path.Combine(Item.Cache.IntermediateOutput, SourceCodeName + ".obj");
-        if (Path.HasExtension(SourceCodeName) == false)
-        {
-            Output = Path.ChangeExtension(Output, ".std.obj");
-        }
-        string Pdb = Path.Combine(Item.Cache.IntermediateOutput, SourceCodeName + ".pdb");
-        string IfcOutput = Item.Cache.IntermediateOutput;
+        string SourceCodeName = Path.GetFileName(Item.Path);
+        string Output = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".obj");
+        string Deps = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".deps.json");
+        string IntermediateOutputPath = Item.GetIntermediateOutputPath(Rule);
+        string Pdb = Path.Combine(IntermediateOutputPath, SourceCodeName + ".pdb");
 
-        Item.Cache.ObjectOutput = Output;
-        PSI.Arguments += $"/Fo\"{Output}\" /Fd\"{Pdb}\" /ifcOutput\"{IfcOutput}\" ";
+        PSI.Arguments += $"/Fo\"{Output}\" /Fd\"{Pdb}\" /sourceDependencies \"{Deps}\" ";
+
+        OutputPath = Output;
+        DependenciesJson = Deps;
     }
 
     public override async Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default)
@@ -162,7 +160,7 @@ public class ClCompiler : Compiler
         ProcessStartInfo PSI = MakeBaseProcessStartInfo(Rule);
         MakefileCompile Item = Node.Compile;
 
-        string Output = Item.Cache.IntermediateOutput;
+        string Output = Item.GetIntermediateOutputPath(Rule);
         if (Directory.Exists(Output) == false)
         {
             Directory.CreateDirectory(Output);
@@ -170,36 +168,25 @@ public class ClCompiler : Compiler
         SetBaseCompilerParameters(PSI);
         SetConfigCompilerParameters(PSI, Rule);
         SetModuleParameters(PSI, Item, Rule);
-        SetSourceCodeParameters(PSI, Item);
+        SetSourceCodeParameters(PSI, Rule, Item, out string OutputPath, out string DependenciesJson);
 
-        if (Item.Cache.Provide != null)
+        if (Item.ModuleInfo.DependModules.Contains("Core"))
         {
-            if (Item.Cache.Provide.IsInterface == false)
-            {
-                PSI.Arguments += $"/exportHeader /headerName:{Item.Cache.Provide.LookupMethod!.Value.ToString().ToLower()} ";
-            }
-        }
-
-        // ifc references.
-        foreach (var IfcSearchDir in Node.IfcSearchDirs)
-        {
-            PSI.Arguments += $"/ifcSearchDir \"{IfcSearchDir}\" ";
-        }
-        foreach (var HeaderImport in Node.HeaderImports)
-        {
-            PSI.Arguments += $"/headerUnit:angle \"{HeaderImport}\"=\"{Path.ChangeExtension(HeaderImport, ".ifc")}\" ";
+            // Force include CoreMinimal.h
+            PSI.Arguments += $"/FICoreMinimal.h ";
         }
 
         // Include source.
-        PSI.Arguments += $"\"{Item.SourceCode}\"";
+        PSI.Arguments += $"\"{Item.Path}\"";
 
+        DateTime StartTime = DateTime.Now;
         Process? P = Process.Start(PSI);
         if (P == null)
         {
             throw new InvalidOperationException("Internal error.");
         }
 
-        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.SourceCode, P, SToken);
+        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.Path, P, SToken);
         if (P.ExitCode != 0)
         {
             string Report = string.Empty;
@@ -210,99 +197,9 @@ public class ClCompiler : Compiler
             throw new TerminateException(KnownErrorCode.CompileError, Report);
         }
 
-        return Stdout.Trim();
-    }
-
-    public override async Task<MakefileCompile> ScanDependenciesAsync(MakefileCompile Item, TargetRules Rule, CancellationToken SToken = default)
-    {
-        ProcessStartInfo PSI = MakeBaseProcessStartInfo(Rule);
-
-        string Output = Item.Cache.IntermediateOutput;
-        string Pdb = Path.Combine(Output, Path.GetFileName(Item.SourceCode) + ".pdb");
-        if (Directory.Exists(Output) == false)
-        {
-            Directory.CreateDirectory(Output);
-        }
-
-        SetBaseCompilerParameters(PSI);
-        SetConfigCompilerParameters(PSI, Rule);
-        SetModuleParameters(PSI, Item, Rule);
-        SetSourceCodeParameters(PSI, Item);
-
-        // Include source.
-        PSI.Arguments += $"/scanDependencies- /showIncludes /interface /TP {Item.SourceCode}";
-
-        Process? P = Process.Start(PSI);
-        if (P == null)
-        {
-            throw new InvalidOperationException("Internal error.");
-        }
-
-        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.SourceCode, P, SToken);
-        if (P.ExitCode != 0)
-        {
-            Console.Error.WriteLine(Stdout + Stderr);
-            return Item;
-        }
-
-        JsonNode? Root = JsonNode.Parse(Stdout);
-        if (Root == null)
-        {
-            throw new TerminateException(KnownErrorCode.NotSupportedCompiler, CoreStrings.Errors.CompilerNotSupported);
-        }
-
-        int? Version = (int?)Root["version"];
-        if (Version == null || Version.Value != 1)
-        {
-            throw new TerminateException(KnownErrorCode.NotSupportedCompiler, CoreStrings.Errors.CompilerNotSupported);
-        }
-
-        int? Revision = (int?)Root["revision"];
-        if (Revision == null || Revision.Value != 0)
-        {
-            throw new TerminateException(KnownErrorCode.NotSupportedCompiler, CoreStrings.Errors.CompilerNotSupported);
-        }
-
-        JsonArray? Rules = Root["rules"] as JsonArray;
-        if (Rules == null)
-        {
-            throw new TerminateException(KnownErrorCode.NotSupportedCompiler, CoreStrings.Errors.CompilerNotSupported);
-        }
-
-        if (Rules.Any() == false)
-        {
-            // There is no rules.
-            return Item;
-        }
-
-        JsonNode ModuleRule = Rules.First()!;
-
-        CppModuleDescriptor Parse(JsonNode Element)
-        {
-            bool bIsInterface = (bool?)Element["is-interface"] ?? false;
-            string? LookupMethod = (string?)Element["lookup-method"];
-
-            return new CppModuleDescriptor()
-            {
-                InterfaceName = (string)Element["logical-name"]!,
-                SourcePath = (string?)Element["source-path"],
-                IsInterface = bIsInterface,
-                LookupMethod = LookupMethod switch
-                {
-                    "include-angle" => ModuleLookupMethod.Angle,
-                    "include-quote" => ModuleLookupMethod.Quote,
-                    _ => null
-                }
-            };
-        }
-
-        CppModuleDescriptor[] Provides = ((JsonArray?)ModuleRule["provides"] ?? new()).Select(p => Parse(p!)).ToArray();
-        CppModuleDescriptor[] Requires = ((JsonArray?)ModuleRule["requires"] ?? new()).Select(p => Parse(p!)).ToArray();
-
-        Item.Cache.bScanDependenciesCache = true;
-        Item.Cache.Provide = Provides.FirstOrDefault();
-        Item.Cache.Requires = Requires;
-        return Item;
+        await GenerateSourceCodeCache(Item, Rule, OutputPath, DependenciesJson);
+        var Elapsed = DateTime.Now - StartTime;
+        return $"{Stdout.Trim()} ({Elapsed.TotalSeconds:0.00}s)";
     }
 
     private static async Task<(string, string)> GetProcessOutputsAsync(string DebugString, Process P, CancellationToken SToken = default)
@@ -339,5 +236,45 @@ public class ClCompiler : Compiler
         CTS.Cancel();
         await Task.WhenAll(StdoutReader, StderrReader);
         return (StdoutReader.Result, StderrReader.Result);
+    }
+
+    private async Task GenerateSourceCodeCache(MakefileCompile Item, TargetRules Rule, string ObjectOutput, string Deps)
+    {
+        MakefileSourceCache NewCache = new()
+        {
+            SourceCache = SourceCodeCache.Generate(Item.Path),
+            Includes = await ReadDependenciesAsync(Item, Rule, Deps),
+            ObjectOutputFile = ObjectOutput,
+        };
+
+        Item.Cache = NewCache;
+    }
+
+    private async Task<SourceCodeCache[]> ReadDependenciesAsync(MakefileCompile Item, TargetRules Rule, string Deps)
+    {
+        string JsonStr = await File.ReadAllTextAsync(Deps);
+        JsonNode? Node = JsonNode.Parse(JsonStr);
+        JsonArray? IncludesArr = Node?["Data"]?["Includes"]?.AsArray();
+        if (IncludesArr == null)
+        {
+            return Array.Empty<SourceCodeCache>();
+        }
+
+        string[] BuiltInPaths = ToolChain.GetRequiredIncludePaths(Rule.Target.BuildConfiguration.Platform.Architecture);
+        bool IsBuiltIn(string InPath)
+        {
+            foreach (var BuiltInPath in BuiltInPaths)
+            {
+                if (InPath.StartsWith(BuiltInPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        string[] Includes = IncludesArr.Select(p => p!.ToString()).ToArray();
+        return Includes.Where(p => !IsBuiltIn(p)).Select(p => SourceCodeCache.Generate(p)).ToArray();
     }
 }

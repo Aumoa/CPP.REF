@@ -120,7 +120,7 @@ public class VisualStudioInstallation : ToolChainInstallation
                 _ => throw new NotSupportedException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
             };
 
-            string LatestVersion = CompilerVersions.OrderByDescending(Version.Parse).First();
+            Version LatestVersion = SelectVersion(CompilerVersions);
             CompilerPath = Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "bin", HostArchitecture, ArchPath);
             if (File.Exists(Path.Combine(CompilerPath, "cl.exe")) == false)
             {
@@ -183,7 +183,7 @@ public class VisualStudioInstallation : ToolChainInstallation
 
             const string BaseIncludeDirectory = "C:\\Program Files (x86)\\Windows Kits\\10\\Include";
 
-            string CurrentVersion = CandidateVersions.OrderByDescending(Version.Parse).First();
+            string CurrentVersion = SelectVersion(CandidateVersions).ToString();
             CachedVersion.CompilerPath = Path.Combine(BaseCompilerDirectory, CurrentVersion, ArchPath);
             CachedVersion.LibraryPath = new[]
             {
@@ -239,5 +239,15 @@ public class VisualStudioInstallation : ToolChainInstallation
     public override string GetOutputExtension()
     {
         return ".obj";
+    }
+
+    private Version SelectVersion(IEnumerable<string> Versions, Func<Version, bool> Predicate)
+    {
+        return Versions.Select(Version.Parse).Where(Predicate).OrderByDescending(p => p).First();
+    }
+
+    private Version SelectVersion(IEnumerable<string> Versions)
+    {
+        return SelectVersion(Versions, p => true);
     }
 }

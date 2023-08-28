@@ -8,7 +8,7 @@ namespace AE.BuildSettings;
 
 public class TargetPlatform
 {
-    public string TargetName { get; set; } = string.Empty;
+    public readonly string TargetName;
 
     public PlatformGroup Group { get; set; } = new();
 
@@ -19,17 +19,28 @@ public class TargetPlatform
         return TargetName;
     }
 
-    public static readonly TargetPlatform Win64 = new()
+    private static readonly Dictionary<string, TargetPlatform> Platforms = new();
+
+    public TargetPlatform(string InTargetName)
     {
-        TargetName = "Win64",
+        TargetName = InTargetName;
+        Platforms.Add(TargetName, this);
+    }
+
+    public static readonly TargetPlatform Win64 = new("Win64")
+    {
         Group = PlatformGroup.Windows,
         Architecture = Architecture.x64
     };
 
-    public static readonly TargetPlatform Linux = new()
+    public static readonly TargetPlatform Linux = new("Linux")
     {
-        TargetName = "Linux",
         Group = PlatformGroup.Linux,
         Architecture = Architecture.x64
     };
+
+    public static TargetPlatform FromTargetName(string InTargetName)
+    {
+        return Platforms[InTargetName];
+    }
 }

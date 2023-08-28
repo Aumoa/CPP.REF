@@ -27,6 +27,9 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         [CommandLineApply(CategoryName = "Config")]
         public string Config { get; set; } = null!;
+
+        [CommandLineApply(CategoryName = "Platform")]
+        public string? Platform { get; set; } = null!;
     }
 
     private readonly Arguments BuildArgs = new();
@@ -51,12 +54,19 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         Workspace Workspace = await ConfigureWorkspaceAsync(SToken);
 
+        TargetPlatform HostPlatform = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Win32NT => TargetPlatform.Win64,
+            PlatformID.Unix => TargetPlatform.Linux,
+            _ => throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform)
+        };
+
         var HeaderToolCompiler = await AylaProjectCompiler.CreateCompilerAsync(Workspace, "AylaHeaderTool", new TargetInfo
         {
             BuildConfiguration = new()
             {
                 Configuration = Configuration.Shipping,
-                Platform = TargetPlatform.Win64
+                Platform = HostPlatform
             }
         }, SToken);
 
@@ -71,7 +81,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             BuildConfiguration = new()
             {
                 Configuration = ProjectConfig,
-                Platform = TargetPlatform.Win64
+                Platform = BuildArgs.Platform != null ? TargetPlatform.FromTargetName(BuildArgs.Platform) : HostPlatform
             }
         });
 

@@ -6,6 +6,7 @@ using System.Xml;
 
 using AE.BuildSettings;
 using AE.Misc;
+using AE.Platform;
 using AE.Platform.Windows;
 using AE.Projects;
 using AE.Rules;
@@ -43,7 +44,7 @@ public class VisualCXXProject : IVisualStudioProject
 
     public (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform)
     {
-        return (Configuration.ToString() + (bEditor ? "_Editor" : string.Empty), Platform.ToString());
+        return (Configuration.ToString() + (bEditor ? "_Editor" : string.Empty), Platform.Architecture == Architecture.x64 ? "x64" : "Win32");
     }
 
     public async Task GenerateProjectFilesAsync(CancellationToken SToken = default)
@@ -82,12 +83,13 @@ public class VisualCXXProject : IVisualStudioProject
                 BuildConfiguration.ForEach((Configuration, bEditor, Platform) =>
                 {
                     string App = bEditor ? "_Editor" : string.Empty;
+                    var (Name, VSTarget) = MapConfiguration(Configuration, bEditor, Platform);
 
                     var ProjectConfiguration = ProjectConfigurations.AddElement("ProjectConfiguration");
-                    ProjectConfiguration.SetAttribute("Include", $"{Configuration}{App}|{Platform}");
+                    ProjectConfiguration.SetAttribute("Include", $"{Name}|{VSTarget}");
 
                     ProjectConfiguration.AddElement("Configuration").InnerText = Configuration.ToString() + App;
-                    ProjectConfiguration.AddElement("Platform").InnerText = Platform.ToString();
+                    ProjectConfiguration.AddElement("Platform").InnerText = VSTarget;
                 });
             }
 
@@ -110,7 +112,8 @@ public class VisualCXXProject : IVisualStudioProject
             {
                 string App = bEditor ? "_Editor" : string.Empty;
                 var PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}{App}|{Platform}'");
+                var (Name, VSTarget) = MapConfiguration(Configuration, bEditor, Platform);
+                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Name}|{VSTarget}'");
                 PropertyGroup.SetAttribute("Label", "Configuration");
 
                 PropertyGroup.AddElement("ConfigurationType").InnerText = "Makefile";
@@ -130,7 +133,8 @@ public class VisualCXXProject : IVisualStudioProject
 
                 // Foreach Configurations
                 var PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Configuration}{App}|{Platform}'");
+                var (Name, VSTarget) = MapConfiguration(Configuration, bEditor, Platform);
+                PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{Name}|{VSTarget}'");
 
                 string BuildToolPath = Global.BuildToolPath;
                 BuildToolPath = Path.ChangeExtension(BuildToolPath, ".exe");
@@ -165,17 +169,26 @@ public class VisualCXXProject : IVisualStudioProject
                     Macros.Add("WITH_EDITOR=0");
                 }
 
-                Macros.Add("UNICODE");
-                Macros.Add("_UNICODE");
+                Macros.AddRange(new[]
+                {
+                    "UNICODE",
+                    "_UNICODE"
+                });
 
                 PropertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = string.Join(';', IncludePaths);
-                PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20";
+                PropertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20 /Zc:preprocessor";
                 PropertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', Macros);
+                PropertyGroup.AddElement("UseStandardPreprocessor").InnerText = "true";
+                if (Platform.Architecture == Architecture.x64)
+                {
+                    PropertyGroup.AddElement("ExecutablePath").InnerText = "$(VC_ExecutablePath_x64);$(CommonExecutablePath)";
+                }
+                
             });
 
             var ItemGroup = Project.AddElement("ItemGroup");
 
-            XmlElement? AddSourceFile(ModuleDependenciesResolver.ModuleDependencyCache? Module, string Filename)
+            XmlElement? AddSourceFile(ModuleInformation? Module, string Filename)
             {
                 if (SourceFiles.Add(Filename) == false)
                 {
@@ -201,6 +214,12 @@ public class VisualCXXProject : IVisualStudioProject
 
                         var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
                         AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.IncludePaths.Append(GeneratedInclude))};%(AdditionalIncludeDirectories)";
+
+                        if (Module.DependModules.Contains("Core"))
+                        {
+                            var ForcedIncludeFiles = ClCompile.AddElement("ForcedIncludeFiles");
+                            ForcedIncludeFiles.InnerText = "CoreMinimal.h";
+                        }
                     }
 
                     return ClCompile;
@@ -227,7 +246,7 @@ public class VisualCXXProject : IVisualStudioProject
                 return null;
             }
 
-            void SearchDirectory(ModuleDependenciesResolver.ModuleDependencyCache? Module, string CurrentDirectory)
+            void SearchDirectory(ModuleInformation? Module, string CurrentDirectory)
             {
                 if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false && CurrentDirectory.StartsWith(ProjectDirectory.Source.Programs))
                 {

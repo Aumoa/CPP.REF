@@ -1,27 +1,22 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import Core;
+#include "CoreMinimal.h"
+#include "NumericsCore.h"
+#include "Numerics/MatrixInterface/AxisAlignedCube.h"
+#include "Numerics/MatrixInterface/Line.h"
+#include "Numerics/MatrixInterface/RotatedRect.h"
+#include "Numerics/TransformInterface/Complex.h"
+#include "Numerics/TransformInterface/Translate3D.h"
+#include "Numerics/VectorInterface/Plane.h"
+#include "Numerics/VectorInterface/Sphere.h"
+#include "Numerics/VectorInterface/Range.h"
+#include "Numerics/ObjectOrientedCube.h"
+#include "Numerics/Ray.h"
 
 int main()
 {
-	Log::Information(TEXT("Log system initialized."));
-	Log::FlushAll();
-
-	int64 Interlocked = 0;
-	PlatformAtomics::InterlockedIncrement(&Interlocked);
-	PlatformAtomics::InterlockedIncrement(&Interlocked);
-
-	{
-		FileStream FS(TEXT("Sample.txt"), EFileAccessMode::Write, EFileSharedMode::None, EFileMode::Create);
-		std::string SampleText = TEXT("SampleText").AsCodepage();
-		FS.Write(std::span(reinterpret_cast<const uint8*>(SampleText.c_str()), SampleText.length()));
-		FS.Close();
-	}
-	{
-		auto Stream = std::make_shared<FileStream>(TEXT("Sample.txt"), EFileAccessMode::Read, EFileSharedMode::None, EFileMode::Open);
-		StreamReader Reader(Stream);
-		String ReadStr = Reader.ReadToEndAsync().GetResult();
-		Stream->Close();
-	}
+	PlatformProcess::SetupStacktraceSignals();
+	Console::WriteLine(TEXT("BlankApp"));
+	Vector3 V3;
 	return 0;
 }

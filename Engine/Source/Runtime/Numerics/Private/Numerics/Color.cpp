@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core;
-import Numerics;
+#include "Numerics/VectorInterface/Color.h"
 
 static std::map<String, Color> gConvertTable =
 {
@@ -177,10 +176,10 @@ Color Color::FromHtml(String HtmlCode)
 	}
 
 	// In table color.
-	auto it = gConvertTable.find(HtmlCode);
-	if (it != gConvertTable.end())
+	auto It = gConvertTable.find(HtmlCode);
+	if (It != gConvertTable.end())
 	{
-		return it->second;
+		return It->second;
 	}
 
 	return NamedColors::Transparent;

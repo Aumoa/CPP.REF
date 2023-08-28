@@ -1,15 +1,18 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core.System;
+#include "System/RealTypes.h"
+#include "System/String.h"
+#include "Platform/PlatformLocalization.h"
+#include <cstdlib>
 
 template<>
-String TRealType<float_t>::ToString() const
+String TRealType<float>::ToString() const
 {
-	return String(std::to_wstring(Value));
+	return String::Format(TEXT("{}"), Value);
 }
 
 template<>
-String TRealType<double_t>::ToString() const
+String TRealType<double>::ToString() const
 {
-	return String(std::to_wstring(Value));
+	return String::Format(TEXT("{}"), Value);
 }

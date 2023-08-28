@@ -23,7 +23,7 @@ public class VSLinker : Linker
         this.ToolChain = ToolChain;
     }
 
-    public override async Task<string> LinkAsync(TargetRules Rule, ModuleDependenciesResolver.ModuleDependencyCache Module, CancellationToken SToken = default)
+    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
     {
         string LinkExe = this.LinkExe;
         var Config = Rule.Target.BuildConfiguration;
@@ -70,11 +70,6 @@ public class VSLinker : Linker
         PSI.RedirectStandardOutput = true;
         PSI.RedirectStandardError = true;
 
-        IEnumerable<string> LinkLibraries = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
-        LinkLibraries = LinkLibraries.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));
-        string LinkLibrary = string.Join(' ', LinkLibraries);
-        LinkLibrary = $"/DYNAMICBASE {LinkLibrary}";
-
         string Subsystem = string.Empty;
 
         if (Module.TargetType == TargetType.Module)
@@ -92,6 +87,16 @@ public class VSLinker : Linker
             BinaryOut = Path.ChangeExtension(BinaryOut, ".exe");
             Subsystem = "/SUBSYSTEM:WINDOWS";
         }
+
+        if (string.IsNullOrEmpty(Subsystem))
+        {
+            return Path.GetFileNameWithoutExtension(BinaryOut);
+        }
+
+        IEnumerable<string> LinkLibraries = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
+        LinkLibraries = LinkLibraries.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));
+        string LinkLibrary = string.Join(' ', LinkLibraries);
+        LinkLibrary = $"/DYNAMICBASE {LinkLibrary}";
 
         PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.cpp.obj\" \"{BuildDir}\\*.ixx.obj\" \"{StdDir}\\*.std.obj\"";
 

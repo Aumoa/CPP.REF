@@ -1,15 +1,16 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core.System;
-import Core.Platform;
+#include "System/String.h"
+#include "Platform/PlatformLocalization.h"
+#include <unordered_map>
 
 String::String(std::string_view Str)
-	: String(PlatformMisc::FromCodepage(Str))
+	: String(PlatformLocalization::FromCodepage(Str))
 {
 }
 
 String::String(const char* Buf, size_t Len)
-	: String(PlatformMisc::FromCodepage(std::string_view(Buf, Len)))
+	: String(PlatformLocalization::FromCodepage(std::string_view(Buf, Len)))
 {
 }
 
@@ -40,10 +41,10 @@ String String::FromLiteral(std::string_view InStr)
 
 [[nodiscard]] String String::FromCodepage(std::string_view Str, int32 Codepage)
 {
-	return String(PlatformMisc::FromCodepage(Str, Codepage));
+	return String(PlatformLocalization::FromCodepage(Str, Codepage));
 }
 
 [[nodiscard]] std::string String::AsCodepage(int32 Codepage) const
 {
-	return PlatformMisc::AsCodepage((std::wstring_view)*this, Codepage);
+	return PlatformLocalization::ToCodepage((std::wstring_view)*this, Codepage);
 }

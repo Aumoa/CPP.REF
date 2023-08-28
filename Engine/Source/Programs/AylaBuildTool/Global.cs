@@ -18,7 +18,7 @@ public static class Global
         EngineDirectory = new ProjectDirectory() { Root = Path.GetFullPath(Path.Combine(Location, "..", "..", "..")) };
     }
 
-    public static int MakefileVersion = 5;
+    public static int MakefileVersion = 6;
 
     public static ProjectDirectory EngineDirectory { get; }
 
@@ -97,10 +97,5 @@ public static class Global
                 SearchCXXModulesRecursive(InWorkspace, Rule, SearchedModules, CurrentModule, NextModule);
             }
         }
-    }
-
-    public static ulong GenerateSourceCodeHash(string InSourceCodePath)
-    {
-        return CRC64.Generate64(File.ReadAllText(InSourceCodePath));
     }
 }

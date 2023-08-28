@@ -1,6 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import Core;
+#include "IO/File.h"
+#include "IO/FileStream.h"
+#include "IO/StreamReader.h"
 
 Task<String> File::ReadAllTextAsync(String InPath, std::stop_token InCancellationToken)
 {

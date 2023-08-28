@@ -1,25 +1,21 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using AE.Compile;
-using AE.Misc;
+using AE.BuildSettings;
+using AE.Projects;
+using AE.Rules;
 
 namespace AE.SourceTree;
 
 public sealed record MakefileCompile
 {
-    public required string SourceCode { get; init; }
+    public required string Path { get; init; }
 
-    public required MakefileCache Cache { get; init; }
+    public required MakefileSourceCache? Cache { get; set; }
 
-    public required bool bSourceCodeNew { get; init; }
+    public required ModuleInformation ModuleInfo { get; init; }
 
-    public required string ModuleName { get; init; }
-
-    public required string[] DependModules { get; init; }
-
-    public required string[] IncludePaths { get; init; }
-
-    public required string[] AdditionalMacros { get; init; }
-
-    public required int[] DisableWarnings { get; init; }
+    public string GetIntermediateOutputPath(TargetRules Rule)
+    {
+        return ModuleInfo.ProjectDir.GenerateIntermediateOutput(Rule.Target.BuildConfiguration, ModuleInfo.Name);
+    }
 }

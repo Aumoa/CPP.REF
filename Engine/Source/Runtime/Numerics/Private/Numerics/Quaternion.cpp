@@ -1,10 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "Numerics/TransformInterface/Quaternion.h"
+
 #if PLATFORM_WINDOWS
 #include "DirectXInlineHelper.h"
-
-import Core;
-import Numerics;
 
 Quaternion Quaternion::FromAxisAngle(const Vector3& Axis, Degrees Angle)
 {

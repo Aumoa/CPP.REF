@@ -1,6 +1,6 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import AylaHeaderTool;
+#include "Sources/SourceFile.h"
 
 SourceFile::SourceFile(String InPath)
 	: SourcePath(InPath)

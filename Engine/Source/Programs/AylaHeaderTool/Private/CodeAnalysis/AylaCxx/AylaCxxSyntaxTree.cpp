@@ -1,6 +1,7 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import AylaHeaderTool;
+#include "CodeAnalysis/AylaCxx/AylaCxxSyntaxTree.h"
+#include "CodeAnalysis/AylaCxx/AylaCxxSyntaxNode.h"
 
 std::vector<CodeDiagnostic> AylaCxxSyntaxTree::GetDiagnostics() const
 {

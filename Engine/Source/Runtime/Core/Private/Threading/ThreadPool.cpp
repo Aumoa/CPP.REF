@@ -1,143 +1,171 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#if PLATFORM_WINDOWS
+#include "Threading/ThreadPool.h"
+#include "Platform/PlatformIO.h"
 
-import Core;
-import Core.Platform.Windows;
+size_t ThreadPool::NumWorkerThreads;
+size_t ThreadPool::NumCompletionPortThreads;
 
-#endif
+Spinlock ThreadPool::Lck;
+SpinlockConditionVariable ThreadPool::Cv;
+std::queue<Action<>> ThreadPool::Works;
 
-namespace
-{
-	static size_t NumWorkerThreads;
-	static size_t NumCompletionPortThreads;
-	static ScheduledIOContext sScheduledContext;
+Spinlock ThreadPool::DelayedLck;
+SpinlockConditionVariable ThreadPool::DelayedCv;
+std::multimap<std::chrono::steady_clock::time_point, Action<>> ThreadPool::DelayedWorks;
 
-	static Spinlock Lock;
-	static SpinlockConditionVariable ConditionVar;
-	static std::queue<std::function<void()>> Works;
-
-	void WorkerThreadRun(size_t Index)
-	{
-		PlatformMisc::UnreferencedParameter(Index);
-
-		std::shared_ptr Context = SynchronizationContext::Install();
-
-		while (true)
-		{
-			std::unique_lock ScopedLock(Lock);
-			ConditionVar.Wait(ScopedLock, [&Context]()
-			{
-				return Works.empty() == false || Context->IsQueued();
-			});
-
-			std::function<void()> Work;
-			if (Works.empty())
-			{
-				// Context is thread-local storage.
-				Work = Context->Dequeue();
-			}
-			else
-			{
-				Work = std::move(Works.front());
-				Works.pop();
-			}
-
-			ScopedLock.unlock();
-
-			if (Work)
-			{
-				Work();
-			}
-		}
-
-		SynchronizationContext::Uninstall(std::move(Context));
-	}
-
-#if PLATFORM_WINDOWS
-	WindowsIOCPImplementation Implementation;
-
-	void Worker_WindowsIOCP()
-	{
-		while (true)
-		{
-			Implementation.poll_one();
-		}
-	}
-#endif
-
-	void TrapInitialize()
-	{
-		static int TrapView = []()
-		{
-			NumWorkerThreads = std::thread::hardware_concurrency();
-			NumCompletionPortThreads = std::thread::hardware_concurrency();
-
-			for (size_t i = 0; i < NumCompletionPortThreads; ++i)
-			{
-				std::thread([Index = i]
-				{
-					PlatformMisc::SetThreadName(String::Format(TEXT("IOCP #{}"), Index));
-					Worker_WindowsIOCP();
-				}).detach();
-			}
-
-			for (size_t i = 0; i < NumWorkerThreads; ++i)
-			{
-				std::thread([Index = i]
-				{
-					PlatformMisc::SetThreadName(String::Format(TEXT("Worker #{}"), Index));
-					WorkerThreadRun(Index);
-				}).detach();
-			}
-
-			std::thread([]
-			{
-				PlatformMisc::SetThreadName(TEXT("Timer #0"));
-				sScheduledContext.Run();
-			}).detach();
-
-			return 0;
-		}();
-	}
-}
+void* ThreadPool::IO;
+size_t ThreadPool::Workers;
+size_t ThreadPool::IOCPWorkers;
 
 void ThreadPool::BindHandle(void* NativeHandle)
 {
-	static int Trap_view = (TrapInitialize(), 0);
-#if PLATFORM_WINDOWS
-	Implementation.bind_handle(NativeHandle);
-#endif
+	Initialize();
+	PlatformIO::BindIOHandle(IO, NativeHandle);
 }
 
-void ThreadPool::QueueUserWorkItem(Work_t InWork)
+void ThreadPool::UnbindHandle(void* NativeHandle)
 {
-	static int Trap_view = (TrapInitialize(), 0);
+	Initialize();
+	PlatformIO::UnbindIOHandle(IO, NativeHandle);
+}
 
-	std::unique_lock ScopedLock(Lock);
+void ThreadPool::QueueUserWorkItem(Action<> InWork)
+{
+	Initialize();
+	std::unique_lock ScopedLock(Lck);
 	Works.emplace(std::move(InWork));
-	ConditionVar.NotifyOne();
+	Cv.NotifyOne();
 }
 
-void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Work_t InWork)
+void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork)
 {
-	static int Trap_view = (TrapInitialize(), 0);
-	sScheduledContext.Post(InDur, std::move(InWork));
-}
-
-void ThreadPool::NotifyCustom()
-{
-	ConditionVar.NotifyAll();
+	Initialize();
+	auto Tp = std::chrono::steady_clock::now() + InDur;
+	std::unique_lock ScopedLock(DelayedLck);
+	DelayedWorks.emplace(Tp, std::move(InWork));
+	DelayedCv.NotifyOne();
 }
 
 void ThreadPool::GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 {
+	Initialize();
 	OutWorkerThreads = NumWorkerThreads;
 	OutCompletionPortThreads = NumCompletionPortThreads;
 }
 
 void ThreadPool::GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 {
+	Initialize();
 	OutWorkerThreads = NumWorkerThreads;
 	OutCompletionPortThreads = NumCompletionPortThreads;
+}
+
+void ThreadPool::Initialize()
+{
+	static int Init = ([]()
+	{
+		PlatformIO::InitializeIOCPHandle(IO);
+
+		NumWorkerThreads = std::thread::hardware_concurrency();
+		NumCompletionPortThreads = std::thread::hardware_concurrency();
+
+		UpdateWorkers();
+		UpdateIOCPWorkers();
+		std::thread(DelayedWorker).detach();
+	}(), 0);
+}
+
+void ThreadPool::UpdateWorkers()
+{
+	std::unique_lock ScopedLock(Lck);
+
+	while (Workers < NumWorkerThreads)
+	{
+		std::thread(std::bind(Worker, Workers++)).detach();
+	}
+}
+
+void ThreadPool::UpdateIOCPWorkers()
+{
+	std::unique_lock ScopedLock(Lck);
+
+	while (IOCPWorkers < NumCompletionPortThreads)
+	{
+		std::thread(std::bind(IOCPWorker, IOCPWorkers++)).detach();
+	}
+}
+
+void ThreadPool::Worker(size_t Index)
+{
+	PLATFORM_UNREFERENCED_PARAMETER(Index);
+
+	while (true)
+	{
+		std::unique_lock ScopedLock(Lck);
+		Cv.Wait(ScopedLock, []() { return !Works.empty(); });
+
+		Action<> MyAction = std::move(Works.front());
+		Works.pop();
+
+		ScopedLock.unlock();
+		MyAction();
+	}
+}
+
+void ThreadPool::IOCPWorker(size_t Index)
+{
+	PLATFORM_UNREFERENCED_PARAMETER(Index);
+
+	while (true)
+	{
+		PlatformIO::DispatchQueuedCompletionStatus(IO);
+	}
+}
+
+void ThreadPool::DelayedWorker()
+{
+	std::vector<Action<>> Actions;
+
+	while (true)
+	{
+		// calculate timer works.
+		{
+			std::unique_lock ScopedLock(DelayedLck);
+			Cv.Wait(ScopedLock, []() { return !DelayedWorks.empty(); });
+
+			auto It = DelayedWorks.begin();
+			std::chrono::steady_clock::time_point Until = It->first;
+			if (It->first > std::chrono::steady_clock::now())
+			{
+				Cv.WaitUntil(ScopedLock, Until);
+			}
+
+			Actions.clear();
+			while (DelayedWorks.size() > 0)
+			{
+				It = DelayedWorks.begin();
+				if (It->first > std::chrono::steady_clock::now())
+				{
+					// Not yet.
+					break;
+				}
+
+				Actions.emplace_back(std::move(It->second));
+				DelayedWorks.erase(It);
+			}
+
+			ScopedLock.unlock();
+		}
+
+		// enqueue to user work item.
+		{
+			std::unique_lock ScopedLock(Lck);
+			for (auto& Action : Actions)
+			{
+				Works.emplace(std::move(Action));
+			}
+			Cv.NotifyOne();
+		}
+	}
 }

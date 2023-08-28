@@ -142,6 +142,7 @@ public class VisualStudioSolution : ISolution
                 {
                     string App = bEditor ? " Editor" : string.Empty;
                     var Mapped = Project.MapConfiguration(Configuration, bEditor, Platform);
+
                     Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}{App}|{Platform}.ActiveCfg = {Mapped.Item1}|{Mapped.Item2}");
                     Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}{App}|{Platform}.Build.0 = {Mapped.Item1}|{Mapped.Item2}");
                 });

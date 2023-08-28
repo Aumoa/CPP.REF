@@ -13,11 +13,14 @@ public readonly struct BinariesDirectory
         {
             _Root = value;
             Win64 = Path.Combine(_Root, "Win64");
+            Linux = Path.Combine(_Root, "Linux");
             DotNET = Path.Combine(_Root, "DotNET");
         }
     }
 
     public string Win64 { get; private init; }
+
+    public string Linux { get; private init; }
 
     public string DotNET { get; private init; }
 
@@ -33,6 +36,11 @@ public readonly struct BinariesDirectory
             Directory.CreateDirectory(Win64);
         }
 
+        if (Directory.Exists(Linux) == false)
+        {
+            Directory.CreateDirectory(Linux);
+        }
+
         if (Directory.Exists(DotNET) == false)
         {
             Directory.CreateDirectory(DotNET);
@@ -43,7 +51,8 @@ public readonly struct BinariesDirectory
     {
         string[] Targets = new string[]
         {
-            Win64
+            Win64,
+            Linux,
         };
 
         foreach (var Target in Targets)

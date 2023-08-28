@@ -1,6 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-import Core.System;
+#include "System/Math.h"
+#include "System/Radians.h"
+#include "System/Degrees.h"
+#include <cmath>
 
 float Math::Sin(const Radians& v)
 {
