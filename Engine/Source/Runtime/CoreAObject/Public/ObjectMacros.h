@@ -4,20 +4,6 @@
 
 #include "CodeGen/TypeGen.h"
 
-#if __INTELLISENSE__
-
-#define ACLASS(...)
-#define GENERATED_BODY(...)
-#define AFUNCTION(...)
-
-#else
-
-#define ACLSSS(...)
-#define GENERATED_BODY(...)
-#define AFUNCTION(...)
-
-#endif
-
 #define REGISTER_INTRINSIC_CLASS(Class, PackageName) \
 	static NTypeGen::NCompiledInDefer Z__CompiledInDefer__ ## Class(Class::StaticClass(), PackageName);
 
@@ -42,3 +28,5 @@
 		static AType* StaticClass();									\
 																		\
 	private:
+
+#define AFUNCTION(...)

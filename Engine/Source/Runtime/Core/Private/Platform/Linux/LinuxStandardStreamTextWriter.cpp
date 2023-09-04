@@ -11,19 +11,6 @@ LinuxStandardStreamTextWriter::LinuxStandardStreamTextWriter(int32 IO)
 {
 }
 
-void LinuxStandardStreamTextWriter::Write(char_t Val)
-{
-	switch (IO)
-	{
-	case 0:
-		std::wcout << Val;
-		break;
-	case 1:
-		std::wcerr << Val;
-		break;
-	}
-}
-
 void LinuxStandardStreamTextWriter::Write(String Val)
 {
 	switch (IO)

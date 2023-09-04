@@ -13,6 +13,7 @@
 #include "Numerics/ObjectOrientedCube.h"
 #include "Numerics/Ray.h"
 #include "SampleClass.h"
+#include "Type.h"
 
 int main()
 {
@@ -23,5 +24,6 @@ int main()
 	AType* Type = Instance->GetType();
 	ASampleClass2* Instance2 = NewObject<ASampleClass2>();
 	Type = Instance2->GetType();
+	Console::WriteLine(Type->GetClassName());
 	return 0;
 }

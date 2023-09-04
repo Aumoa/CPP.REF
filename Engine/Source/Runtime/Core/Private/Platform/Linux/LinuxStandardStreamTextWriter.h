@@ -16,7 +16,6 @@ private:
 public:
 	LinuxStandardStreamTextWriter(int32 IO);
 
-	virtual void Write(char_t Val) override;
 	virtual void Write(String Val) override;
 };
 

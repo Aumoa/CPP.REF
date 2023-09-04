@@ -119,23 +119,24 @@ public class ModuleDependenciesResolver
 
         if (HeaderToolPaths.Any())
         {
-            string Executable;
+            var PSI = new ProcessStartInfo();
+
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                Executable = Global.EngineDirectory.Binaries.Linux;
-                Executable = Path.Combine(Executable, "Shipping", "AylaHeaderTool");
+                string BaseDir = Path.Combine(Global.EngineDirectory.Binaries.Linux, "Shipping");
+                PSI.Environment["LD_LIBRARY_PATH"] = BaseDir;
+                PSI.FileName = Path.Combine(BaseDir, "AylaHeaderTool");
             }
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
-                Executable = Global.EngineDirectory.Binaries.Win64;
-                Executable = Path.Combine(Executable, "Shipping", "AylaHeaderTool.exe");
+                PSI.FileName = Global.EngineDirectory.Binaries.Win64;
+                PSI.FileName = Path.Combine(PSI.FileName, "Shipping", "AylaHeaderTool.exe");
             }
             else
             {
                 throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform);
             }
 
-            var PSI = new ProcessStartInfo(Executable);
             PSI.WorkingDirectory = Global.EngineDirectory.Root;
             PSI.RedirectStandardOutput = true;
             PSI.RedirectStandardError = true;
