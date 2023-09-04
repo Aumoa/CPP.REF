@@ -14,6 +14,8 @@
 #include <comdef.h>
 #include <gdiplus.h>
 
+#undef OutputDebugString
+
 #pragma pop_macro("TEXT")
 #pragma pop_macro("NOMINMAX")
 

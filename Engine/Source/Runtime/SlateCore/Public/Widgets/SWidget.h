@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
-class SLATECORE_API SWidget : public NonCopyable
+class SLATECORE_API SWidget
 {
+	SWidget(const SWidget&) = delete;
+	SWidget(SWidget&&) = delete;
+
 public:
 	SWidget();
 	virtual ~SWidget() noexcept;

@@ -24,5 +24,6 @@ std::unique_ptr<NRHIGraphics> NRHIGraphics::GenerateGraphics(String InRHIModuleN
 	}
 #endif
 
-	Log::Fatal(LogRHI, TEXT("Cannot initialize graphics. Cannot found RHI module `{}`."), InRHIModuleName);
+	checkf(InRHIModuleName == TEXT("NullRHI"), TEXT("Cannot initialize graphics. Cannot found RHI module `{}`."), InRHIModuleName);
+	return nullptr;
 }

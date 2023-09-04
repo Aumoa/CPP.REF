@@ -64,6 +64,8 @@
 #include "System/SystemException.h"
 #include "System/VoidableVector.h"
 #include "System/Console.h"
+#include "System/Environment.h"
+#include "System/CrcHash.h"
 
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"

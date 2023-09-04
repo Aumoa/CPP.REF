@@ -10,8 +10,6 @@
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 
-constexpr LogCategory LogEngineLoop(TEXT("LogEngineLoop"));
-
 NEngineLoop::NEngineLoop()
 {
 }

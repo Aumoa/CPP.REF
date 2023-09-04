@@ -2,7 +2,6 @@
 
 #include "Launch.h"
 #include "EditorEngineLoop.h"
-#include "Logging/Log.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "GenericPlatform/GenericApplication.h"
 
@@ -42,9 +41,6 @@ int32 NLaunch::GuardedMain()
         GenericApp->PumpMessages();
         Loop->Tick();
     }
-
-    // Shutting down.
-	Log::FlushAll();
 
     return GenericApp->GetExitCode();
 }

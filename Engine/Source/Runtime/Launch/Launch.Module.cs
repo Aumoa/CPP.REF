@@ -15,7 +15,6 @@ public class Launch : ModuleRules
             "Core",
             "RHI",
             "SlateCore",
-            "CoreAObject"
         });
 
         if (TargetRule.Type == TargetType.SlateApplication)

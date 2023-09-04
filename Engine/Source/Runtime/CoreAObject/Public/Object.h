@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "ObjectMacros.h"
 
-ACLASS()
+class AType;
+
 class COREAOBJECT_API AObject
 {
-	GENERATED_BODY()
-
 private:
 	struct Referencer
 	{
@@ -46,6 +45,6 @@ public:
 	AObject();
 	virtual ~AObject() noexcept;
 
-	AFUNCTION()
 	virtual String ToString();
+	virtual AType* GetType();
 };

@@ -5,8 +5,6 @@
 #include "Windows/WindowsWindow.h"
 #include "Windows/WindowsApplication.h"
 
-constexpr LogCategory LogWindowsWindow(TEXT("LogWindowsWindow"));
-
 std::map<uint64, String> NWindowsWindow::RegisteredClasses;
 
 NWindowsWindow::NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefinition& InDefinition)
@@ -30,10 +28,8 @@ NWindowsWindow::NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefiniti
         WndClass.hInstance = hInstance;
         WndClass.lpszClassName = ClassName.c_str();
 
-        if (RegisterClassExW(&WndClass) == 0)
-        {
-            Log::Fatal(LogWindowsWindow, TEXT("Failed to register new window class. ErrorCode: {}"), GetLastError());
-        }
+        ATOM Reg = RegisterClassExW(&WndClass);
+        checkf(Reg, TEXT("Failed to register new window class. ErrorCode: {}"), GetLastError());
 
         It = RegisteredClasses.emplace(HashVal, ClassName).first;
     }

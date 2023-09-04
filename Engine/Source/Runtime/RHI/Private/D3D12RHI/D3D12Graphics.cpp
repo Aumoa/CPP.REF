@@ -20,14 +20,11 @@ void ND3D12Graphics::Init()
 	for (UINT AdapterIndex = 0; ; ++AdapterIndex)
 	{
 		ComPtr<IDXGIAdapter1> Adapter;
-		HRESULT Result = DXGIFactory->EnumAdapters1(AdapterIndex, &Adapter);
-		if (Result == DXGI_ERROR_NOT_FOUND)
+		HRESULT HR = DXGIFactory->EnumAdapters1(AdapterIndex, &Adapter);
+		checkf(HR != DXGI_ERROR_NOT_FOUND, TEXT("Failed to find suitable adapter."));
+		if (FAILED(HR))
 		{
-			Log::Fatal(LogD3D12, TEXT("Failed to find suitable adapter."));
-		}
-		else if (FAILED(Result))
-		{
-			ReportHResult(Result);
+			ReportHResult(HR);
 		}
 
 		DXGI_ADAPTER_DESC1 Desc1;
@@ -39,8 +36,8 @@ void ND3D12Graphics::Init()
 			continue;
 		}
 
-		Result = D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&Device));
-		if (FAILED(Result))
+		HR = D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&Device));
+		if (FAILED(HR))
 		{
 			// Cannot create device.
 			continue;

@@ -6,8 +6,11 @@
 
 class NRHIGraphics;
 
-class RHI_API NRHIDeviceChild : public NonCopyable
+class RHI_API NRHIDeviceChild
 {
+	NRHIDeviceChild(const NRHIDeviceChild&) = delete;
+	NRHIDeviceChild(NRHIDeviceChild&&) = delete;
+
 protected:
 	NRHIDeviceChild();
 

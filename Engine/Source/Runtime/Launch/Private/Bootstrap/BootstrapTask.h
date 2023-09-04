@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericSplash.h"
 
-class NBootstrapTask : public NonCopyable
+class NBootstrapTask
 {
+	NBootstrapTask(const NBootstrapTask&) = delete;
+	NBootstrapTask(NBootstrapTask&&) = delete;
+
 	struct NContext
 	{
 		String Name;

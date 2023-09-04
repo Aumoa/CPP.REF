@@ -8,8 +8,6 @@
 #include "Windows/WindowsCommon.h"
 #include <optional>
 
-constexpr LogCategory LogSplash(TEXT("LogSplash"));
-
 namespace  /* Internal Storage */
 {
 	HWND hWnd;
@@ -81,12 +79,12 @@ namespace  /* Internal Storage */
 		Context.DrawString(Text.c_str(), (INT)Text.length(), &Font, Position, &Drawing->TextBrush);
 	}
 
-	void DoPaint(HWND hWnd)
+	void DoPaint(HWND InHWnd)
 	{
 		using namespace Gdiplus;
 
 		PAINTSTRUCT PS;
-		HDC hDC = BeginPaint(hWnd, &PS);
+		HDC hDC = BeginPaint(InHWnd, &PS);
 
 		Graphics BufferCtx(&Drawing->Buffer.value());
 		BufferCtx.Clear(Gdiplus::Color::Gray);
@@ -99,6 +97,7 @@ namespace  /* Internal Storage */
 				
 		UINT Width = Drawing->Buffer->GetWidth();
 		UINT Height = Drawing->Buffer->GetHeight();
+		PLATFORM_UNREFERENCED_PARAMETER(Width);
 
 		PointF Position = PointF(10.0f, (float)Height - 50.0f - Drawing->Font.GetSize());
 		DrawSimplyShadowText(BufferCtx, Drawing->AppText, Drawing->Font, Position);
@@ -113,12 +112,12 @@ namespace  /* Internal Storage */
 		Context.DrawImage(&Drawing->Buffer.value(), 0, 0);
 	}
 
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK WndProc(HWND InHWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (uMsg)
 		{
 		case WM_PAINT:
-			DoPaint(hWnd);
+			DoPaint(InHWnd);
 			break;
 		case WM_DESTROY:
 			Drawing.reset();
@@ -129,7 +128,7 @@ namespace  /* Internal Storage */
 			break;
 		}
 
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		return DefWindowProc(InHWnd, uMsg, wParam, lParam);
 	}
 
 	void InitializeWindow()
@@ -147,10 +146,8 @@ namespace  /* Internal Storage */
 		WndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 		WndClass.hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH);
 		WndClass.lpszClassName = TEXT("WindowsSplash").c_str();
-		if (RegisterClassExW(&WndClass) == 0)
-		{
-			Log::Fatal(LogSplash, TEXT("Failed to initialize window class for create splash window. Error: {}"), WindowsTools::GetErrorText());
-		}
+		ATOM Ret = RegisterClassExW(&WndClass);
+		checkf(Ret, TEXT("Failed to initialize window class for create splash window. Error: {}"), WindowsTools::GetErrorText());
 
 		// Initial default screen size.
 		int nWidth = 600;
@@ -160,7 +157,7 @@ namespace  /* Internal Storage */
 		Drawing = std::make_unique<DrawingContext>();
 
 		// Load splash image.
-		String SplashImageLoc = Path::Combine(Path::GetEngineContentDirectory(), TEXT("Splash"), TEXT("SplashImage.png"));
+		String SplashImageLoc = Path::Combine(Environment::GetEngineDirectory(), TEXT("Splash"), TEXT("SplashImage.png"));
 		if (File::Exists(SplashImageLoc))
 		{
 			Drawing->Splash.emplace(SplashImageLoc.c_str());
@@ -186,10 +183,7 @@ namespace  /* Internal Storage */
 		std::thread([&CS, &WndClass, &WndStyleEx, &nX, &nY, &nWidth, &nHeight]()
 		{
 			hWnd = CreateWindowEx(WndStyleEx, WndClass.lpszClassName, NULL, WS_POPUP, nX, nY, nWidth, nHeight, NULL, NULL, WndClass.hInstance, NULL);
-			if (hWnd == NULL)
-			{
-				Log::Fatal(LogSplash, TEXT("Failed to create splash window. Error: {}"), WindowsTools::GetErrorText());
-			}
+			checkf(hWnd, TEXT("Failed to create splash window. Error: {}"), WindowsTools::GetErrorText());
 
 			// Set window to fully transparent to start out.
 			SetLayeredWindowAttributes(hWnd, 0, 0, LWA_ALPHA);

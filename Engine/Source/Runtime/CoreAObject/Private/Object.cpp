@@ -17,3 +17,8 @@ String AObject::ToString()
 {
 	return String::FromLiteral(typeid(*this).name());
 }
+
+AType* AObject::GetType()
+{
+	return nullptr;
+}

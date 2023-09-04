@@ -5,8 +5,6 @@
 #include "Windows/WindowsApplication.h"
 #include "Windows/WindowsWindow.h"
 
-constexpr LogCategory LogWindowsApplication(TEXT("LogWindowsApplication"));
-
 NWindowsApplication::NWindowsApplication()
 {
     // Setting engine directory using ApplicationCore.dll location.
@@ -15,7 +13,7 @@ NWindowsApplication::NWindowsApplication()
 
     TCHAR Buf[1024];
     DWORD Len = GetModuleFileName(hModule, Buf, 1024);
-    check(Len == 0);
+    check(Len);
 
     // Engine/Binaries/Win64/ApplicationCore.dll
     String WorkingDirectory(Buf, (size_t)Len);
@@ -23,11 +21,10 @@ NWindowsApplication::NWindowsApplication()
     WorkingDirectory = Path::GetDirectoryName(WorkingDirectory);
 
     // Engine/
-    WorkingDirectory = Path::Combine(WorkingDirectory, TEXT(".."), TEXT(".."));
+    WorkingDirectory = Path::Combine(WorkingDirectory, TEXT(".."), TEXT(".."), TEXT(".."));
     WorkingDirectory = Path::GetFullPath(WorkingDirectory);
 
-    Path::SetEngineDirectory(WorkingDirectory);
-    Log::Info(LogWindowsApplication, TEXT("Engine directory is setted to {}."), WorkingDirectory);
+    Environment::SetEngineDirectory(WorkingDirectory);
 }
 
 std::unique_ptr<NGenericWindow> NWindowsApplication::MakeWindow(const NGenericWindowDefinition& InDefinition)
@@ -73,10 +70,7 @@ LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
                 // Retry with ensure error.
                 SetLastError(0);
                 lPtr = SetWindowLongPtrW(hWnd, 0, (LONG_PTR)lpCreate->lpCreateParams);
-                if (lPtr == 0 && GetLastError() != 0)
-                {
-                    Log::Fatal(LogWindowsApplication, TEXT("Failed to set window pointer to extra space. Error: {}"), GetLastError());
-                }
+                check(lPtr);
             }
         }
     }

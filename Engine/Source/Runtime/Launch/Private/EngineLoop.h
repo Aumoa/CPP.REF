@@ -10,8 +10,11 @@
 class NGenericApplication;
 class NSlateApplication;
 
-class NEngineLoop : public IEngineLoop, public NonCopyable
+class NEngineLoop : public IEngineLoop
 {
+    NEngineLoop(const NEngineLoop&) = delete;
+    NEngineLoop(NEngineLoop&&) = delete;
+
 private:
     std::unique_ptr<NSlateApplication> SlateApp;
 

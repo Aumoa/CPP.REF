@@ -33,6 +33,12 @@ public class ApplicationCore : ModuleRules
                 "Gdi32.lib",
                 "gdiplus.lib"
             });
+
+            PrivateDisableWarnings.AddRange(new[]
+            {
+                4245,
+                4458,
+            });
         }
     }
 }

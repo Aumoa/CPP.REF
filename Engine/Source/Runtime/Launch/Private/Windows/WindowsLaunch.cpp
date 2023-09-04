@@ -29,7 +29,7 @@ public:
 	}
 };
 
-INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE _, LPWSTR lpCmdLine, INT nShow)
+INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE, LPWSTR lpCmdLine, INT nShow)
 {
 	auto Launch = NLaunch::GeneratePlatformLaunch(String::FromLiteral(lpCmdLine));
 	auto* WindowsLaunch = static_cast<NWindowsLaunch*>(Launch.get());

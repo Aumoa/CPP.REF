@@ -15,17 +15,17 @@
 #include <d3d12.h>
 #include <wrl/client.h>
 
+#undef OutputDebugString
+
 #pragma pop_macro("TEXT")
 #pragma pop_macro("NOMINMAX")
 
 using Microsoft::WRL::ComPtr;
 
-constexpr LogCategory LogD3D12(TEXT("LogD3D12"));
-
 [[noreturn]]
 inline void ReportHResult(HRESULT Result)
 {
-	Log::Fatal(LogD3D12, TEXT("Failed to execute D3D12 operation."));
+	checkf(SUCCEEDED(Result), TEXT("Failed to execute D3D12 operation. Error: 0x{:08X}"), Result);
 }
 
 #define HR(X) if (HRESULT Result = (X); FAILED(Result)) { ReportHResult(Result); }

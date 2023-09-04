@@ -4,8 +4,6 @@
 #include "GenericPlatform/GenericApplication.h"
 #include "Widgets/SWindow.h"
 
-constexpr LogCategory LogEditorLoop(TEXT("LogEditorLoop"));
-
 NEditorEngineLoop::NEditorEngineLoop()
 {
 }
@@ -16,8 +14,6 @@ NEditorEngineLoop::~NEditorEngineLoop() noexcept
 
 std::unique_ptr<NEngineLoop::NInitializeContext> NEditorEngineLoop::PreInit()
 {
-    Log::Info(LogEditorLoop, TEXT("Start pre-initialize engine."));
-
     // Show splash window.
     NGenericSplash::Show();
 

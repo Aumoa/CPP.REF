@@ -55,11 +55,13 @@ void NBootstrapTask::UpdateContext()
 		float CompletedScore = 0;
 		for (auto& Task : sTasks)
 		{
+			PLATFORM_UNREFERENCED_PARAMETER(Task);
+
 			TotalScore += Context->TotalAmount;
 			CompletedScore += Context->CurrentAmount;
 
 			float Value = Context->CurrentAmount / Context->TotalAmount;
-			if (Value >= MathEx::SmallNumber && Value <= 1.0f - MathEx::SmallNumber && Name.IsEmpty())
+			if (Value >= Math::SmallNumber && Value <= 1.0f - Math::SmallNumber && Name.IsEmpty())
 			{
 				Name = Context->Name;
 			}
