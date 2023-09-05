@@ -294,7 +294,7 @@ public:
 			}
 		}
 		
-		class WhenAllAwaiter : public ::Awaiter<std::vector<RValueType>>
+		class WhenAllAwaiter : public ::Awaiter<VoidableVector<RValueType>>
 		{
 			std::vector<Task<RValueType>> Tasks;
 
@@ -304,13 +304,10 @@ public:
 
 		public:
 			WhenAllAwaiter(std::vector<Task<RValueType>> Tasks)
-				: ::Awaiter<std::vector<RValueType>>()
+				: ::Awaiter<VoidableVector<RValueType>>()
 				, Tasks(std::move(Tasks))
 			{
-				if constexpr (std::is_void_v<RValueType> == false)
-				{
-					Values.resize(this->Tasks.size());
-				}
+				Values.resize(this->Tasks.size());
 			}
 
 			~WhenAllAwaiter() noexcept
@@ -340,7 +337,11 @@ public:
 						}
 						else
 						{
-							Self->Values[MyIndex] = p.GetResult();
+							if constexpr (std::is_void_v<RValueType> == false)
+							{
+								Self->Values[MyIndex] = p.GetResult();
+							}
+
 							if (++Self->Counter == Self->Values.size())
 							{
 								if constexpr (std::is_void_v<RValueType>)
@@ -366,7 +367,18 @@ public:
 		}
 		else
 		{
-			return Task<std::vector<RValueType>>(std::move(Ptr));
+			return Task<VoidableVector<RValueType>>(std::move(Ptr)).ContinueWith([](Task<VoidableVector<RValueType>> p)
+			{
+				if constexpr (std::is_void_v<RValueType>)
+				{
+					// Task<>
+					return;
+				}
+				else
+				{
+					return (std::vector<RValueType>)p.GetResult();
+				}
+			});
 		}
 	}
 

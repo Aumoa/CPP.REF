@@ -37,7 +37,7 @@ namespace Linq
 			inline constexpr auto operator ()(const R& InRange) const noexcept
 				requires requires { { std::declval<const std::ranges::range_value_t<R>&>() == std::declval<const T&>() }; }
 			{
-				for (auto& V : InRange)
+				for (const auto& V : InRange)
 				{
 					if (V == Comparand)
 					{

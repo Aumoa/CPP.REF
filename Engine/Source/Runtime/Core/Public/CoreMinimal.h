@@ -9,6 +9,7 @@
 #include "Linq/Linq.Any.h"
 #include "Linq/Linq.Select.h"
 #include "Linq/Linq.Where.h"
+#include "Linq/Linq.Join.h"
 
 #include "Platform/PlatformMacros.h"
 #include "Platform/PlatformTypes.h"

@@ -30,6 +30,8 @@ public:
 template<>
 class VoidableVector<void>
 {
+	size_t Size = 0;
+
 public:
 	constexpr VoidableVector() noexcept = default;
 	constexpr VoidableVector(size_t) noexcept {}
@@ -38,4 +40,7 @@ public:
 
 	constexpr VoidableVector& operator =(const VoidableVector&) noexcept = default;
 	constexpr VoidableVector& operator =(VoidableVector&&) noexcept = default;
+
+	constexpr void resize(size_t NewSize) noexcept { Size = NewSize; }
+	constexpr size_t size() const noexcept { return Size; }
 };

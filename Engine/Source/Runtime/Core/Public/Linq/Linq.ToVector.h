@@ -13,7 +13,7 @@ namespace Linq
 		struct to_vector_adaptor_closure
 		{
 			template<std::ranges::input_range R>
-			inline constexpr auto operator ()(R&& InRange) const noexcept(noexcept(std::is_rvalue_reference_v<R>))
+			inline constexpr auto operator ()(const R& InRange) const
 			{
 				using T = std::ranges::range_value_t<R>;
 
@@ -23,16 +23,9 @@ namespace Linq
 					size_t RangeSize = std::ranges::size(InRange);
 					Output.reserve(RangeSize);
 				}
-				for (auto& Elem : InRange)
+				for (const auto& Elem : InRange)
 				{
-					if constexpr (std::is_rvalue_reference_v<R>)
-					{
-						Output.emplace_back(std::move(Elem));
-					}
-					else
-					{
-						Output.emplace_back(Elem);
-					}
+					Output.emplace_back(Elem);
 				}
 				return Output;
 			}
@@ -46,16 +39,16 @@ namespace Linq
 			}
 
 			template<std::ranges::input_range R>
-			inline constexpr auto operator ()(R&& InRange) const noexcept(noexcept(operator ()(std::forward<R>(InRange))))
+			inline constexpr auto operator ()(const R& InRange) const
 			{
-				return operator ()()(std::forward<R>(InRange));
+				return operator ()()(InRange);
 			}
 		};
 
 		template<std::ranges::input_range R>
-		inline constexpr auto operator |(R&& InRange, const to_vector_adaptor_closure& Adaptor) noexcept(std::is_rvalue_reference_v<R>)
+		inline constexpr auto operator |(const R& InRange, const to_vector_adaptor_closure& Adaptor)
 		{
-			return Adaptor(std::forward<R>(InRange));
+			return Adaptor(InRange);
 		}
 	}
 
