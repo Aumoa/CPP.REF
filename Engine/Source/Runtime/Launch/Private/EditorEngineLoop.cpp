@@ -19,6 +19,7 @@ std::unique_ptr<NEngineLoop::NInitializeContext> NEditorEngineLoop::PreInit()
 
     // Create initialization context.
     auto Context = std::make_unique<NInitializeContext>();
+    Context->ScriptsTask.emplace(TEXT("Scripts"), 100.0f);
     Context->GraphicsTask.emplace(TEXT("Graphics"), 100.0f);
     return Context;
 }

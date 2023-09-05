@@ -13,6 +13,7 @@ protected:
 public:
     struct NInitializeContext
     {
+        std::optional<NBootstrapTask> ScriptsTask;
         std::optional<NBootstrapTask> GraphicsTask;
     };
 

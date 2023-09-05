@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 
-class GC
+struct COREAOBJECT_API NGC : public StaticClass
 {
-public:
 	static void Init();
 };

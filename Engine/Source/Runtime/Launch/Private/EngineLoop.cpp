@@ -9,6 +9,7 @@
 #include "RHI/RHICommandQueue.h"
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
+#include "GC.h"
 
 NEngineLoop::NEngineLoop()
 {
@@ -20,6 +21,10 @@ NEngineLoop::~NEngineLoop() noexcept
 
 void NEngineLoop::Init(NInitializeContext* InContext)
 {
+    if (InContext) InContext->ScriptsTask->Step(0.0f);
+    NGC::Init();
+    if (InContext) InContext->ScriptsTask->Step(100.0f);
+
     if (InContext) InContext->GraphicsTask->Step(0.0f);
     auto RHI = NRHIGraphics::GenerateGraphics(TEXT("D3D12"));
     RHI->Init();

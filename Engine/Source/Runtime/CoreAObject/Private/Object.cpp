@@ -1,8 +1,16 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Object.h"
+#include "Type.h"
+#include "CodeGen/TypeGen.h"
+#include "CoreAObject/ObjectInitializer.h"
 
-AObject::AObject()
+AObject::AObject() : AObject(NObjectInitializer::Get())
+{
+}
+
+AObject::AObject(NObjectInitializer& Initializer)
+	: ClassType(Initializer.ConsumeConstructType())
 {
 	Refs = new Referencer();
 	Refs->IncrRef();
@@ -10,15 +18,39 @@ AObject::AObject()
 
 AObject::~AObject() noexcept
 {
-	Refs->DecrRef();
+	if (Refs)
+	{
+		Refs->DecrRef();
+	}
 }
 
 String AObject::ToString()
 {
-	return String::FromLiteral(typeid(*this).name());
+	return GetType()->ClassName;
 }
 
 AType* AObject::GetType()
 {
-	return nullptr;
+	return ClassType;
 }
+
+AType* AObject::StaticClass()
+{
+	static AType* TypePtr = nullptr;
+	if (TypePtr == nullptr)
+	{
+		GENERATE_INTRINSIC_CLASS_METADATA(Object, EClassMetadata::Abstract);
+		NTypeGen::GenerateClassType(TypePtr, Metadata);
+	}
+	return TypePtr;
+}
+
+AObject* AObject::NewObject(AType* InClassType)
+{
+	check(InClassType);
+	check((InClassType->ClassMeta & EClassMetadata::Abstract) == 0);
+	NObjectInitializer::Get().MarkInit(InClassType);
+	return InClassType->Constructor();
+}
+
+REGISTER_INTRINSIC_CLASS(AObject, TEXT("/Script/CoreAObject"));
