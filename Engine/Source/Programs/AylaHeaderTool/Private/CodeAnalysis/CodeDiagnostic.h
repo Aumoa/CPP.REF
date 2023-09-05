@@ -6,11 +6,11 @@
 
 class CodeDiagnostic
 {
-	const String Path;
-	const int32 Line;
-	const int32 Column;
-	const int32 Code;
-	const String Message;
+	String Path;
+	int32 Line;
+	int32 Column;
+	int32 Code;
+	String Message;
 
 public:
 	CodeDiagnostic(String InPath, int32 InLine, int32 InColumn, int32 InCode, String InMessage)
@@ -20,5 +20,10 @@ public:
 		, Code(InCode)
 		, Message(InMessage)
 	{
+	}
+
+	inline String ToString() const
+	{
+		return String::Format(TEXT("{}({},{}): error A{:0>3}: {}"), Path, Line, Column, Code, Message);
 	}
 };

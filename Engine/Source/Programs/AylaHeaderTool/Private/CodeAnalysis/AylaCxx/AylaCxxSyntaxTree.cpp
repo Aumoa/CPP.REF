@@ -3,9 +3,28 @@
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxTree.h"
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxNode.h"
 
+AylaCxxSyntaxTree::AylaCxxSyntaxTree()
+{
+}
+
+AylaCxxSyntaxTree::~AylaCxxSyntaxTree() noexcept
+{
+}
+
 std::vector<CodeDiagnostic> AylaCxxSyntaxTree::GetDiagnostics() const
 {
-	return {};
+	std::vector<CodeDiagnostic> Diags;
+	for (auto& Node : Nodes)
+	{
+		auto SubDiags = Node->GetDiagnostics();
+		Diags.insert(Diags.end(), SubDiags.begin(), SubDiags.end());
+	}
+	return Diags;
+}
+
+std::span<const std::unique_ptr<SyntaxNode>> AylaCxxSyntaxTree::GetNodes() const
+{
+	return Nodes;
 }
 
 std::unique_ptr<SyntaxTree> AylaCxxSyntaxTree::ParseText(String Code, std::optional<String> InPath, std::stop_token InCancellationToken)

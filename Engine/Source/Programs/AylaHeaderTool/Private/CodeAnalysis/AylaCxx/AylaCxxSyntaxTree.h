@@ -12,10 +12,13 @@ private:
 	std::vector<std::unique_ptr<SyntaxNode>> Nodes;
 
 private:
-	AylaCxxSyntaxTree() = default;
+	AylaCxxSyntaxTree();
 
 public:
+	virtual ~AylaCxxSyntaxTree() noexcept override;
+
 	virtual std::vector<CodeDiagnostic> GetDiagnostics() const override;
+	virtual std::span<const std::unique_ptr<SyntaxNode>> GetNodes() const override;
 
 public:
 	static std::unique_ptr<SyntaxTree> ParseText(String Code, std::optional<String> InPath, std::stop_token InCancellationToken = {});

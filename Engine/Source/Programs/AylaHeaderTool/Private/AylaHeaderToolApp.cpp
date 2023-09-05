@@ -3,7 +3,7 @@
 #include "AylaHeaderToolApp.h"
 #include "Exceptions/TerminateException.h"
 #include "Sources/SourceFile.h"
-#include "Sources/InterfaceSource.h"
+#include "Sources/HeaderSource.h"
 
 AylaHeaderToolApp::AylaHeaderToolApp()
 {
@@ -26,20 +26,39 @@ Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationTok
 		{
 			if (Path::GetExtension(Path) == TEXT(".h"))
 			{
-				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<InterfaceSource>(Path));
+				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<HeaderSource>(Path));
 				Tasks.emplace_back(Source->TryParseAsync(InCancellationToken));
 			}
 		}
 
 		std::vector<bool> Results = co_await Task<>::WhenAll(Tasks);
-		for (bool Result : Results)
+		if (Results | Linq::Contains(false))
 		{
-			if (Result == false)
-			{
-				Console::Error.WriteLine(TEXT("Compile error."));
-				co_return 1;
-			}
+			Console::Error.WriteLine(TEXT("Parsing error!"));
+			co_return 1;
 		}
+
+		Tasks.clear();
+		for (auto& Source : Sources)
+		{
+			Tasks.emplace_back(Source->CompileAsync(InCancellationToken));
+		}
+
+		Results = co_await Task<>::WhenAll(Tasks);
+		if (Results | Linq::Contains(false))
+		{
+			Console::Error.WriteLine(TEXT("Compile error!"));
+			co_return 1;
+		}
+
+		std::vector<Task<>> Waits;
+		Waits.reserve(Sources.size());
+		for (auto& Source : Sources)
+		{
+			Waits.emplace_back(Source->GenerateAsync(InCancellationToken));
+		}
+
+		co_await Task<>::WhenAll(Waits);
 	}
 	catch (const TerminateException& TE)
 	{

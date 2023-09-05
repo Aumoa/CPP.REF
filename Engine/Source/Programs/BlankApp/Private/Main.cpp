@@ -12,11 +12,14 @@
 #include "Numerics/VectorInterface/Range.h"
 #include "Numerics/ObjectOrientedCube.h"
 #include "Numerics/Ray.h"
+#include "SampleClass.h"
 
 int main()
 {
 	PlatformProcess::SetupStacktraceSignals();
 	Console::WriteLine(TEXT("BlankApp"));
 	Vector3 V3;
+	ASampleClass* Instance = NewObject<ASampleClass>();
+	AType* Type = Instance->GetType();
 	return 0;
 }

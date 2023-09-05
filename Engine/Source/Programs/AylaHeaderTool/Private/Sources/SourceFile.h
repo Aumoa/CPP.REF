@@ -6,6 +6,9 @@
 
 class SourceFile
 {
+	SourceFile(const SourceFile&) = delete;
+	SourceFile(SourceFile&&) = delete;
+
 private:
 	String SourcePath;
 
@@ -15,6 +18,8 @@ public:
 
 	virtual Task<bool> TryParseAsync(std::stop_token InCancellationToken = {}) = 0;
 	virtual std::vector<String> GetErrors() const = 0;
+	virtual Task<bool> CompileAsync(std::stop_token InCancellationToken = {}) = 0;
+	virtual Task<> GenerateAsync(std::stop_token InCancellationToken = {}) = 0;
 
 	String GetSourcePath() const;
 };

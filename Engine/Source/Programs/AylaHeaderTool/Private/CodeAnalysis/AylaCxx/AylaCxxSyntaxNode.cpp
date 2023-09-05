@@ -2,13 +2,19 @@
 
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxNode.h"
 
-AylaCxxSyntaxNode::AylaCxxSyntaxNode()
+AylaCxxSyntaxNode::AylaCxxSyntaxNode(ESyntaxType InSyntaxType)
+	: SyntaxType(InSyntaxType)
 {
+}
+
+AylaCxxSyntaxNode::ESyntaxType AylaCxxSyntaxNode::GetSyntaxType() const
+{
+	return SyntaxType;
 }
 
 std::vector<CodeDiagnostic> AylaCxxSyntaxNode::GetDiagnostics() const
 {
-	return {};
+	return Diagnostics;
 }
 
 std::unique_ptr<SyntaxNode> AylaCxxSyntaxNode::ParseText(CodeParsingContext& Context)
@@ -23,39 +29,54 @@ std::unique_ptr<SyntaxNode> AylaCxxSyntaxNode::ParseText(CodeParsingContext& Con
 	{
 		return ParseText_Comment(Context);
 	}
+	else if (Context.Equals(TEXT("#")))
+	{
+		return ParseText_Preprocessor(Context);
+	}
+	else if (Context.OperatorChars | Linq::Contains(Context.GetChar()))
+	{
+		return ParseText_Operator(Context);
+	}
 	else
 	{
-		Context.Index = Context.Code.length();
-		auto Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode());
-		Node->Diagnostics.emplace_back(CodeDiagnostic(Context.CodePath, Context.Line, Context.Column, ErrorCode_UnknownSyntaxExpression, Message_UnknownSyntaxExpression));
-		return Node;
+		return ParseText_Identifier(Context);
 	}
 }
 
 std::unique_ptr<SyntaxNode> AylaCxxSyntaxNode::ParseText_Comment(CodeParsingContext& Context)
 {
-	size_t StartIndex = Context.Index;
-	String Comment;
+	auto Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode(ESyntaxType::Comment));
+	Node->Code = Context.ReadLine();
+	return Node;
+}
 
-	while (Context.IsEOF() == false)
+std::unique_ptr<SyntaxNode> AylaCxxSyntaxNode::ParseText_Preprocessor(CodeParsingContext& Context)
+{
+	auto Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode(ESyntaxType::Preprocessor));
+	Node->Code = Context.ReadLine();
+	return Node;
+}
+
+std::unique_ptr<SyntaxNode> AylaCxxSyntaxNode::ParseText_Identifier(CodeParsingContext& Context)
+{
+	String Identifier = Context.ReadIdentifier();
+	std::unique_ptr<AylaCxxSyntaxNode> Node;
+	if (Context.Keywords | Linq::Contains(Identifier))
 	{
-		const char_t C = Context.Code[Context.Index];
-		Context.Increment();
-		if (C == '\n')
-		{
-			Comment = Context.Code.Substring(StartIndex, Context.Index - StartIndex).TrimEnd();
-			Context.Increment();
-			break;
-		}
+		Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode(ESyntaxType::Keyword));
 	}
-
-	if (Comment.IsEmpty())
+	else
 	{
-		Comment = Context.Code.Substring(StartIndex, Context.Index - StartIndex);
+		Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode(ESyntaxType::Identifier));
 	}
+	Node->Code = Identifier;
+	return Node;
+}
 
-	auto Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode());
-	Node->Code = Comment;
+std::unique_ptr<SyntaxNode> AylaCxxSyntaxNode::ParseText_Operator(CodeParsingContext& Context)
+{
+	auto Node = std::unique_ptr<AylaCxxSyntaxNode>(new AylaCxxSyntaxNode(ESyntaxType::Operator));
+	Node->Code = Context.ConsumeString(1);
 	return Node;
 }
 
