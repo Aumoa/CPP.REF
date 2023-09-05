@@ -118,24 +118,32 @@ public class ClCompiler : Compiler
         }
     }
 
+    private static string AsCompilerInclude(string InPath)
+    {
+        return $"/I\"{InPath}\"";
+    }
+
+    private static string AsCompilerMacro((string, string?) InPair)
+    {
+        if (InPair.Item2 == null)
+        {
+            return $"/D\"{InPair.Item1}\"";
+        }
+        else
+        {
+            return $"/D\"{InPair.Item1}\"=\"{InPair.Item2}\"";
+        }
+    }
+
     private void SetModuleParameters(ProcessStartInfo PSI, MakefileCompile Item, TargetRules Rule)
     {
-        // Appending additional arguments.
-        //string GeneratedInclude = Path.Combine(Item.Intermediate, "Includes", Item.ModuleName);
-        string IncludePaths = string.Join(' ', Item.ModuleInfo.IncludePaths.Select(p => $"/I\"{p}\""));
+        var Includes = Item.CollectCompilerIncludePaths().Select(AsCompilerInclude);
+        var Macros = Item.CollectCompilerMacros(Rule).Select(AsCompilerMacro);
 
-        List<string> Macros = new();
-        Macros.AddRange(GenerateBuildMacros(Rule).Select(p => $"/D\"{p.Item1}\"=\"{p.Item2}\""));
-        Macros.AddRange(Item.ModuleInfo.AdditionalMacros.Select(p => $"/D\"{p}\""));
-        Macros.AddRange(Item.ModuleInfo.DependModules.Select(p => $"/D\"{p.ToUpper()}_API\"=\"__declspec(dllimport)\""));
-        Macros.Add($"/D\"{Item.ModuleInfo.Name.ToUpper()}_API\"=\"__declspec(dllexport)\"");
-        Macros.Add("/DUNICODE");
-        Macros.Add("/D_UNICODE");
+        string IncludeStr = string.Join(' ', Includes);
+        string MacroStr = string.Join(' ', Macros);
 
-        PSI.Arguments += $"{IncludePaths} ";
-
-        string AdditionalMacros = string.Join(' ', Macros);
-        PSI.Arguments += $"{AdditionalMacros} ";
+        PSI.Arguments += $"{IncludeStr} {MacroStr} ";
 
         string DisableWarnings = string.Join(' ', Item.ModuleInfo.DisableWarnings.Select(p => $"/wd{p}"));
         PSI.Arguments += $"{DisableWarnings} ";
@@ -143,7 +151,7 @@ public class ClCompiler : Compiler
 
     private void SetSourceCodeParameters(ProcessStartInfo PSI, TargetRules Rule, MakefileCompile Item, out string OutputPath, out string DependenciesJson)
     {
-        string SourceCodeName = Path.GetFileName(Item.Path);
+        string SourceCodeName = Path.GetFileName(Item.FilePath);
         string Output = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".obj");
         string Deps = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".deps.json");
         string IntermediateOutputPath = Item.GetIntermediateOutputPath(Rule);
@@ -177,7 +185,7 @@ public class ClCompiler : Compiler
         }
 
         // Include source.
-        PSI.Arguments += $"\"{Item.Path}\"";
+        PSI.Arguments += $"\"{Item.FilePath}\"";
 
         DateTime StartTime = DateTime.Now;
         Process? P = Process.Start(PSI);
@@ -186,7 +194,7 @@ public class ClCompiler : Compiler
             throw new InvalidOperationException("Internal error.");
         }
 
-        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.Path, P, SToken);
+        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.FilePath, P, SToken);
         if (P.ExitCode != 0)
         {
             string Report = string.Empty;
@@ -242,7 +250,7 @@ public class ClCompiler : Compiler
     {
         MakefileSourceCache NewCache = new()
         {
-            SourceCache = SourceCodeCache.Generate(Item.Path),
+            SourceCache = SourceCodeCache.Generate(Item.FilePath),
             Includes = await ReadDependenciesAsync(Item, Rule, Deps),
             ObjectOutputFile = ObjectOutput,
         };

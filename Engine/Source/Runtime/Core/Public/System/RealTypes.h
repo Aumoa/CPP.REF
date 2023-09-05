@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Platform/PlatformMacros.h"
 #include "System/StaticClass.h"
 #include <concepts>
 

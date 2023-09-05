@@ -24,3 +24,11 @@
 #ifndef PLATFORM_UNREFERENCED_PARAMETER
 #error PLATFORM_UNREFERENCED_PARAMETER is not defined.
 #endif
+
+#ifndef PLATFORM_SHARED_EXPORT
+#error PLATFORM_SHARED_EXPORT is not defined.
+#endif
+
+#ifndef PLATFORM_SHARED_IMPORT
+#error PLATFORM_SHARED_IMPORT is not defined.
+#endif

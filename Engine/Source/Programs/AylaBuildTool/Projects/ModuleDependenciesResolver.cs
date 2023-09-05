@@ -127,7 +127,7 @@ public class ModuleDependenciesResolver
                         {
                             Compile = new()
                             {
-                                Path = SourceFile,
+                                FilePath = SourceFile,
                                 Cache = SourceCache,
                                 ModuleInfo = Cache
                             };
@@ -139,7 +139,7 @@ public class ModuleDependenciesResolver
                     {
                         Compile = new()
                         {
-                            Path = SourceFile,
+                            FilePath = SourceFile,
                             Cache = null,
                             ModuleInfo = Cache
                         };

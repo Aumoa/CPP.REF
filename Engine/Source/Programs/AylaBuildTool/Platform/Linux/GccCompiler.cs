@@ -1,7 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
-using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 using AE.BuildSettings;
 using AE.Exceptions;
@@ -62,41 +62,41 @@ public class GccCompiler : Compiler
         }
     }
 
+    private static string AsCompilerInclude(string InPath)
+    {
+        return $"-I\"{InPath}\"";
+    }
+
+    private static string AsCompilerMacro((string, string?) InPair)
+    {
+        if (InPair.Item2 == null)
+        {
+            return $"-D\"{InPair.Item1}\"";
+        }
+        else
+        {
+            return $"-D\"{InPair.Item1}\"=\"{InPair.Item2}\"";
+        }
+    }
+
     private void SetModuleParameters(ProcessStartInfo PSI, MakefileCompile Item, TargetRules Rule)
     {
-        string IncludePaths = string.Join(' ', Item.ModuleInfo.IncludePaths.Select(p => $"-I\"{p}\""));
+        var Includes = Item.CollectCompilerIncludePaths().Select(AsCompilerInclude);
+        var Macros = Item.CollectCompilerMacros(Rule).Select(AsCompilerMacro);
 
-        List<string> Macros = new();
-        Macros.AddRange(GenerateBuildMacros(Rule).Select(AsMacroDef));
-        Macros.AddRange(Item.ModuleInfo.AdditionalMacros.Select(AsMacroDef));
-        Macros.AddRange(Item.ModuleInfo.DependModules.Select(p => ($"{p.ToUpper()}_API", string.Empty)).Select(AsMacroDef));
-        Macros.Add(AsMacroDef(($"{Item.ModuleInfo.Name.ToUpper()}_API", "__attribute__((visibility(\\\"default\\\")))")));
-        Macros.Add("-DUNICODE");
-        Macros.Add("-D_UNICODE");
+        string IncludeStr = string.Join(' ', Includes);
+        string MacroStr = string.Join(' ', Macros);
 
-        PSI.Arguments += $"{IncludePaths} ";
-
-        string AdditionalMacros = string.Join(' ', Macros);
-        PSI.Arguments += $"{AdditionalMacros} ";
+        PSI.Arguments += $"{IncludeStr} {MacroStr} ";
     }
 
     private string SetSourceCodeParameters(ProcessStartInfo PSI, TargetRules Rule, MakefileCompile Item, out string OutputPath)
     {
-        string SourceCodeName = Path.GetFileName(Item.Path);
+        string SourceCodeName = Path.GetFileName(Item.FilePath);
         string Output = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".o");
 
         OutputPath = Output;
         return $"-o\"{Output}\" ";
-    }
-
-    private static string AsMacroDef(string Name)
-    {
-        return $"-D\"{Name}\"";
-    }
-
-    private static string AsMacroDef((string, string) NameValuePair)
-    {
-        return $"-D\"{NameValuePair.Item1}\"=\"{NameValuePair.Item2}\"";
     }
 
     public override async Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default)
@@ -121,7 +121,7 @@ public class GccCompiler : Compiler
         }
 
         // Include source.
-        PSI.Arguments += $"\"{Item.Path}\" ";
+        PSI.Arguments += $"\"{Item.FilePath}\" ";
 
         string BaseArguments = PSI.Arguments;
         PSI.Arguments += AppendStr;
@@ -133,7 +133,7 @@ public class GccCompiler : Compiler
             throw new InvalidOperationException("Internal error.");
         }
 
-        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.Path, P, SToken);
+        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.FilePath, P, SToken);
         if (P.ExitCode != 0)
         {
             string Report = string.Empty;
@@ -151,7 +151,7 @@ public class GccCompiler : Compiler
         {
             throw new InvalidOperationException("Internal error.");
         }
-        (Stdout, Stderr) = await GetProcessOutputsAsync(Item.Path, P, SToken);
+        (Stdout, Stderr) = await GetProcessOutputsAsync(Item.FilePath, P, SToken);
 
         if (P.ExitCode == 0)
         {
@@ -159,14 +159,14 @@ public class GccCompiler : Compiler
         }
 
         var Elapsed = DateTime.Now - StartTime;
-        return $"{Path.GetFileName(Item.Path)} ({Elapsed.TotalSeconds:0.00}s)";
+        return $"{Path.GetFileName(Item.FilePath)} ({Elapsed.TotalSeconds:0.00}s)";
     }
 
     private async Task GenerateSourceCodeCache(MakefileCompile Item, TargetRules Rule, string ObjectOutput, string Deps)
     {
         MakefileSourceCache NewCache = new()
         {
-            SourceCache = SourceCodeCache.Generate(Item.Path),
+            SourceCache = SourceCodeCache.Generate(Item.FilePath),
             Includes = await ReadDependenciesAsync(Item, Rule, Deps),
             ObjectOutputFile = ObjectOutput,
         };
