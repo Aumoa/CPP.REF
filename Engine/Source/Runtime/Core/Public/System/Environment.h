@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Platform/PlatformMacros.h"
 #include "System/StaticClass.h"
 #include "System/String.h"
 #include "System/AssertionMacros.h"
@@ -24,10 +25,9 @@ struct CORE_API Environment : public StaticClass
 		return EngineDirectory;
 	}
 
-	static void SetEngineDirectory(String InPath)
-	{
-		EngineDirectory = InPath;
-	}
+	static void SetEngineDirectory(String InPath);
+
+	static constexpr String NewLine = PLATFORM_NEWLINE;
 
 private:
 	static String EngineDirectory;

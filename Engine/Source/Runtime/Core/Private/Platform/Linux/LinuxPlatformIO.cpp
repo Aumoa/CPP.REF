@@ -143,14 +143,25 @@ int64 LinuxPlatformIO::GetFileSize(void* Handle) noexcept
 
 Action<IOCompletionOverlapped*, size_t, int32> LinuxPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
 {
-	check(false);
-	return nullptr;
+	return [TCS, WriteIO](IOCompletionOverlapped* Self, size_t Written, int32 ErrorCode)
+	{
+		auto ScopedPtr = std::unique_ptr<IOCompletionOverlapped>(Self);
+		if (ErrorCode)
+		{
+			TCS.SetException(std::make_exception_ptr(SystemException(ErrorCode)));
+		}
+		else
+		{
+			TCS.SetResult(Written);
+		}
+	};
 }
 
 bool LinuxPlatformIO::WriteFile(void* Handle, std::span<const uint8> InBytes, IOCompletionOverlapped* Overlap) noexcept
 {
-	check(false);
-	return false;
+	ssize_t Written = write(GetFD(Handle), InBytes.data(), InBytes.size_bytes());
+	Overlap->Complete(static_cast<size_t>(Written));
+	return true;
 }
 
 Action<IOCompletionOverlapped*, size_t, int32> LinuxPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept

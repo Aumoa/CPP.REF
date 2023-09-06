@@ -9,6 +9,7 @@
 #include "Platform/PlatformTypes.h"
 
 using char_t = PlatformTypes::char_t;
+class String;
 
 struct CORE_API Char
 {
@@ -47,6 +48,12 @@ struct CORE_API Char
 			|| Ch >= 'A' && Ch <= 'F';
 	}
 
+	static constexpr FORCEINLINE bool IsAlpha(char_t Ch) noexcept
+	{
+		return Ch >= 'a' && Ch <= 'z'
+			|| Ch >= 'A' && Ch <= 'Z';
+	}
+
 	static constexpr FORCEINLINE bool IsDigit(char_t Ch) noexcept
 	{
 		return Ch >= '0' && Ch <= '9';
@@ -66,6 +73,10 @@ struct CORE_API Char
 	{
 		return (Ch >= 'a' && Ch <= 'z') ? Ch - 'a' + 'A' : Ch;
 	}
+
+	// Defined in String.h
+	static constexpr FORCEINLINE String ToStringView(const char_t& Ch) noexcept;
+	static FORCEINLINE String ToString(char_t Ch);
 
 	static constexpr char_t NullChar = 0;
 	static constexpr std::array<char_t, 5> WhiteSpaceChars = { (char_t)' ', (char_t)'\n', (char_t)'\r', (char_t)'\t', (char_t)'\b' };

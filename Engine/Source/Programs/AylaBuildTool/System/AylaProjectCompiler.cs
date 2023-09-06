@@ -40,6 +40,13 @@ public class AylaProjectCompiler
         var Resolver = new ModuleDependenciesResolver(Rule, SearchedModules, ToolChain);
         Resolver.Resolve();
 
+        Console.WriteLine("Parsing headers for {0}", Target.TargetName);
+        using (var Timer = new ScopedTimer("Parsing Headers"))
+        {
+            await Resolver.GenerateReflectionCodesAsync(InCancellationToken);
+        }
+        Console.WriteLine("Reflection code generated in {0} seconds.", ScopedTimer.GetElapsed("Parsing Headers"));
+
         Console.Write("Generate makefiles for {0}...", Target.TargetName);
         Dictionary<ModuleInformation, Makefile> Makefiles;
         using (var Timer = new ScopedTimer("Generate Makefiles"))

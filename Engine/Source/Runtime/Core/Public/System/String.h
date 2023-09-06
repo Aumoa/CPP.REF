@@ -1114,4 +1114,15 @@ struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 	}
 };
 
+// Declared in CharType.h
+constexpr FORCEINLINE String Char::ToStringView(const char_t& Ch) noexcept
+{
+	return String::FromLiteral(std::wstring_view(&Ch, 1));
+}
+
+FORCEINLINE String Char::ToString(char_t Ch)
+{
+	return ToStringView(Ch).Clone();
+}
+
 #define TEXT(X) (String::FromLiteral(L ## X))

@@ -2,6 +2,7 @@
 
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxTree.h"
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxNode.h"
+#include "CodeAnalysis/AylaCxx/CxxCodeParsingContext.h"
 
 AylaCxxSyntaxTree::AylaCxxSyntaxTree()
 {
@@ -31,14 +32,8 @@ std::unique_ptr<SyntaxTree> AylaCxxSyntaxTree::ParseText(String Code, std::optio
 {
 	auto Tree = std::unique_ptr<AylaCxxSyntaxTree>(new AylaCxxSyntaxTree());
 
-	AylaCxxSyntaxNode::CodeParsingContext Context =
-	{
-		.CodePath = InPath.value_or(TEXT("<temp>")),
-		.Code = Code,
-		.Line = 1,
-		.Column = 0,
-		.Index = 0
-	};
+	CxxCodeParsingContext Context;
+	Context.Init(InPath.value_or(TEXT("<temp>")), Code);
 
 	while (Context.IsEOF() == false)
 	{

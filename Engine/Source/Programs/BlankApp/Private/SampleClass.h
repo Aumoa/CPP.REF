@@ -14,3 +14,12 @@ class BLANKAPP_API ASampleClass : public AObject
 public:
 	ASampleClass();
 };
+
+ACLASS()
+class BLANKAPP_API ASampleClass2 : public ASampleClass
+{
+	GENERATED_BODY()
+
+public:
+	ASampleClass2();
+};

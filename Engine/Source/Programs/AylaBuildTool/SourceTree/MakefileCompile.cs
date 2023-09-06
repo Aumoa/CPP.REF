@@ -21,9 +21,7 @@ public sealed record MakefileCompile
 
     public IEnumerable<string> CollectCompilerIncludePaths()
     {
-        string IntermediateIncludeDir = ModuleInfo.ProjectDir.Intermediate.Includes;
-        string GeneratedInclude = Path.Combine(IntermediateIncludeDir, ModuleInfo.Name);
-        return ModuleInfo.IncludePaths.Append(GeneratedInclude);
+        return ModuleInfo.IncludePaths.Append(ModuleInfo.GeneratedIncludePath);
     }
 
     public IEnumerable<(string, string?)> CollectCompilerMacros(TargetRules Rule)

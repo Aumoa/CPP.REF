@@ -55,7 +55,7 @@ Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationTok
 		Waits.reserve(Sources.size());
 		for (auto& Source : Sources)
 		{
-			Waits.emplace_back(Source->GenerateAsync(InCancellationToken));
+			Waits.emplace_back(Source->GenerateAsync(IncludesPath, InCancellationToken));
 		}
 
 		co_await Task<>::WhenAll(Waits);

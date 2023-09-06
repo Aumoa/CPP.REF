@@ -3,6 +3,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+using AE.BuildSettings;
+using AE.Exceptions;
 using AE.Rules;
 using AE.SourceTree;
 using AE.System;
@@ -43,6 +45,7 @@ public class ModuleDependenciesResolver
             string SourcePath = CurrentSearchedModule.Location;
             var ModuleRule = CurrentSearchedModule.Rule;
             var ProjectDir = CurrentSearchedModule.ProjectDir;
+            string IncludePath = Path.Combine(ProjectDir.Intermediate.Includes, ModuleRule.Name);
 
             string AsFullPath(string CurrentPath)
             {
@@ -76,6 +79,9 @@ public class ModuleDependenciesResolver
             DisableWarnings.AddRange(ModuleRule.PublicDisableWarnings);
             DisableWarnings.AddRange(ModuleRule.PrivateDisableWarnings);
 
+            IEnumerable<string> SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories);
+            SourceFiles = SourceFiles.Where(Global.IsSourceCode);
+
             DependencyCaches[Current] = new()
             {
                 Name = Current,
@@ -83,7 +89,9 @@ public class ModuleDependenciesResolver
                 ProjectDir = ProjectDir,
                 IncludePaths = IncludePaths.Distinct().ToArray(),
                 AdditionalMacros = AdditionalMacros.Distinct().ToArray(),
-                SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories).Where(Global.IsSourceFile).ToArray(),
+                SourceFiles = SourceFiles.ToArray(),
+                SourcePath = SourcePath,
+                GeneratedIncludePath = IncludePath,
                 DependModules = ApiDescriptions.Distinct().ToArray(),
                 AdditionalLibraries = AdditionalLibraries.Distinct().ToArray(),
                 DisableWarnings = DisableWarnings.Distinct().ToArray(),
@@ -97,6 +105,70 @@ public class ModuleDependenciesResolver
     }
 
     public IEnumerable<ModuleRules> GetModules() => Modules.Values.Select(p => p.Rule);
+
+    public async Task<int> GenerateReflectionCodesAsync(CancellationToken InCancellationToken = default)
+    {
+        List<ModuleInformation> HeaderToolPaths = new();
+        foreach (var (Name, Cache) in DependencyCaches)
+        {
+            if (Cache.DependModules.Contains("CoreAObject"))
+            {
+                HeaderToolPaths.Add(Cache);
+            }
+        }
+
+        if (HeaderToolPaths.Any())
+        {
+            string Executable;
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                Executable = Global.EngineDirectory.Binaries.Linux;
+                Executable = Path.Combine(Executable, "Shipping", "AylaHeaderTool");
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                Executable = Global.EngineDirectory.Binaries.Win64;
+                Executable = Path.Combine(Executable, "Shipping", "AylaHeaderTool.exe");
+            }
+            else
+            {
+                throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform);
+            }
+
+            var PSI = new ProcessStartInfo(Executable);
+            PSI.WorkingDirectory = Global.EngineDirectory.Root;
+            PSI.RedirectStandardOutput = true;
+            PSI.RedirectStandardError = true;
+
+            foreach (var Cache in HeaderToolPaths)
+            {
+                PSI.Arguments = $"""
+                -Source "{Cache.SourcePath}" -Includes "{Cache.GeneratedIncludePath}"
+                """;
+
+                if (Directory.Exists(Cache.GeneratedIncludePath) == false)
+                {
+                    Directory.CreateDirectory(Cache.GeneratedIncludePath);
+                }
+
+                Console.WriteLine("  Running AylaHeaderTool \"{0}\"", Cache.SourcePath);
+                Process? P = Process.Start(PSI);
+                Debug.Assert(P != null);
+                await P.WaitForExitAsync(InCancellationToken);
+
+                Console.Write(P.StandardOutput.ReadToEnd());
+                Console.Write(P.StandardError.ReadToEnd());
+                if (P.ExitCode != 0)
+                {
+                    return P.ExitCode;
+                }
+
+                Cache.SourceFiles = Cache.SourceFiles.Concat(Directory.GetFiles(Cache.GeneratedIncludePath, "*.cpp", SearchOption.TopDirectoryOnly)).ToArray();
+            }
+        }
+
+        return 0;
+    }
 
     public async Task<Dictionary<ModuleInformation, Makefile>> GenerateMakefilesAsync(TargetRules Rule, CancellationToken SToken = default)
     {

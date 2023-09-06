@@ -21,5 +21,7 @@ int main()
 	Vector3 V3;
 	ASampleClass* Instance = NewObject<ASampleClass>();
 	AType* Type = Instance->GetType();
+	ASampleClass2* Instance2 = NewObject<ASampleClass2>();
+	Type = Instance2->GetType();
 	return 0;
 }

@@ -6,13 +6,6 @@ ASampleClass::ASampleClass()
 {
 }
 
-AType* ASampleClass::StaticClass()
+ASampleClass2::ASampleClass2()
 {
-	static AType* TypePtr = nullptr;
-	if (TypePtr == nullptr)
-	{
-		GENERATE_INTRINSIC_CLASS_METADATA(SampleClass, EClassMetadata::None);
-		NTypeGen::GenerateClassType(TypePtr, Metadata);
-	}
-	return TypePtr;
 }

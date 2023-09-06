@@ -210,7 +210,7 @@ public class VisualCXXProject : IVisualStudioProject
                         var PreprocessorDefinitions = ClCompile.AddElement("PreprocessorDefinitions");
                         PreprocessorDefinitions.InnerText = $"{string.Join(';', Macros)};%(PreprocessorDefinitions)";
 
-                        string GeneratedInclude = Path.Combine(Module.ProjectDir.Intermediate.Includes, Module.Name);
+                        string GeneratedInclude = Path.Combine(Module.GeneratedIncludePath, Module.Name);
 
                         var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
                         AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.IncludePaths.Append(GeneratedInclude))};%(AdditionalIncludeDirectories)";

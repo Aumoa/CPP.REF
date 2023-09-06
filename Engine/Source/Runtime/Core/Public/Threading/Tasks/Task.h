@@ -60,7 +60,12 @@ public:
 		return (bool)Awaiter;
 	}
 
-	inline std::shared_ptr<Awaiter_t> GetAwaiter() const
+	inline std::shared_ptr<AwaiterBase> GetAwaiter() const requires std::is_void_v<T>
+	{
+		return Awaiter;
+	}
+
+	inline std::shared_ptr<Awaiter_t> GetAwaiter() const requires (!std::is_void_v<T>)
 	{
 		return std::static_pointer_cast<Awaiter_t>(Awaiter);
 	}

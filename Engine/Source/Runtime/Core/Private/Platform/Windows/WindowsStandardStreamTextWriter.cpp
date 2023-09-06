@@ -10,15 +10,6 @@ WindowsStandardStreamTextWriter::WindowsStandardStreamTextWriter(DWORD StdHandle
 {
 }
 
-void WindowsStandardStreamTextWriter::Write(char_t Val)
-{
-	if (hStd)
-	{
-		DWORD Written = 0;
-		WriteConsoleW(hStd, &Val, 1, &Written, NULL);
-	}
-}
-
 void WindowsStandardStreamTextWriter::Write(String Val)
 {
 	if (hStd)

@@ -17,7 +17,11 @@ public record ModuleInformation
 
     public required string[] AdditionalMacros { get; init; }
 
-    public required string[] SourceFiles { get; init; }
+    public required string[] SourceFiles { get; set; }
+
+    public required string SourcePath { get; init; }
+
+    public required string GeneratedIncludePath { get; init; }
 
     public required string[] DependModules { get; init; }
 

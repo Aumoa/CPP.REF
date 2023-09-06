@@ -102,3 +102,4 @@
 #include "IO/StreamReader.h"
 #include "IO/IOCompletionOverlapped.h"
 #include "IO/FileStream.h"
+#include "IO/StreamWriter.h"

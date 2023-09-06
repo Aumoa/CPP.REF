@@ -8,48 +8,48 @@
 
 struct Path : public StaticClass
 {
-	static FORCEINLINE String GetFileName(String InPath)
+	static inline String GetFileName(String InPath)
 	{
 		return String(InPath.path().filename().wstring());
 	}
 
-	static FORCEINLINE String GetFileNameWithoutExtension(String InPath)
+	static inline String GetFileNameWithoutExtension(String InPath)
 	{
 		return String(InPath.path().stem().wstring());
 	}
 
-	static FORCEINLINE bool HasExtension(String InPath)
+	static inline bool HasExtension(String InPath)
 	{
 		return InPath.path().has_extension();
 	}
 
-	static FORCEINLINE String ChangeExtension(String InPath, String InExtension)
+	static inline String ChangeExtension(String InPath, String InExtension)
 	{
 		return String(InPath.path().replace_extension(InExtension.path()).wstring());
 	}
 
-	static FORCEINLINE String GetRelativePath(String RelativeTo, String InPath)
+	static inline String GetRelativePath(String RelativeTo, String InPath)
 	{
-		return String(std::filesystem::relative(RelativeTo.path(), InPath.path()).wstring());
+		return String(std::filesystem::relative(InPath.path(), RelativeTo.path()).wstring());
 	}
 
-	static FORCEINLINE String GetFullPath(String InPath)
+	static inline String GetFullPath(String InPath)
 	{
 		return String(std::filesystem::absolute(InPath.path()).wstring());
 	}
 
-	static FORCEINLINE String GetDirectoryName(String InPath)
+	static inline String GetDirectoryName(String InPath)
 	{
 		return String(InPath.path().parent_path().wstring());
 	}
 
-	static FORCEINLINE String GetExtension(String InPath)
+	static inline String GetExtension(String InPath)
 	{
 		return String(InPath.path().extension().wstring());
 	}
 
 	template<std::ranges::input_range R> requires std::convertible_to<std::ranges::range_value_t<R>, String>
-	static FORCEINLINE String Combine(const R& InRange)
+	static inline String Combine(const R& InRange)
 	{
 		std::optional<std::filesystem::path> Result;
 		for (auto& PathStr : InRange)
@@ -67,8 +67,14 @@ struct Path : public StaticClass
 	}
 
 	template<std::convertible_to<String>... Seq>
-	static FORCEINLINE String Combine(const Seq&... InSeq)
+	static inline String Combine(const Seq&... InSeq)
 	{
 		return Combine(std::array{ (String)InSeq... });
 	}
+
+	// Platform specified separator char.
+	static constexpr char_t DirectorySeparatorChar = std::filesystem::path::preferred_separator;
+
+	// Universal separator char.
+	static constexpr char_t AltDirectorySeparatorChar = '/';
 };

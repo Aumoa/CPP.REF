@@ -32,3 +32,7 @@
 #ifndef PLATFORM_SHARED_IMPORT
 #error PLATFORM_SHARED_IMPORT is not defined.
 #endif
+
+#ifndef PLATFORM_NEWLINE
+#error PLATFORM_NEWLINE is not defined.
+#endif

@@ -19,5 +19,6 @@
 #define PLATFORM_UNREFERENCED_PARAMETER(X) ((void)(X))
 #define PLATFORM_SHARED_EXPORT __attribute__ ((visibility("default")))
 #define PLATFORM_SHARED_IMPORT
+#define PLATFORM_NEWLINE TEXT("\n")
 
 #endif
