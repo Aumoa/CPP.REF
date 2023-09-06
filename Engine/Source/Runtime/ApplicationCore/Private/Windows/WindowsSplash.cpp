@@ -157,7 +157,7 @@ namespace  /* Internal Storage */
 		Drawing = std::make_unique<DrawingContext>();
 
 		// Load splash image.
-		String SplashImageLoc = Path::Combine(Environment::GetEngineDirectory(), TEXT("Splash"), TEXT("SplashImage.png"));
+		String SplashImageLoc = Path::Combine(Environment::GetEngineDirectory(), TEXT("Content"), TEXT("Splash"), TEXT("SplashImage.png"));
 		if (File::Exists(SplashImageLoc))
 		{
 			Drawing->Splash.emplace(SplashImageLoc.c_str());

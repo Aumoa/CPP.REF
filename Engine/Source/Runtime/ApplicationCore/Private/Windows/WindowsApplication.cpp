@@ -21,7 +21,7 @@ NWindowsApplication::NWindowsApplication()
     WorkingDirectory = Path::GetDirectoryName(WorkingDirectory);
 
     // Engine/
-    WorkingDirectory = Path::Combine(WorkingDirectory, TEXT(".."), TEXT(".."), TEXT(".."), TEXT("Content"));
+    WorkingDirectory = Path::Combine(WorkingDirectory, TEXT(".."), TEXT(".."), TEXT(".."));
     WorkingDirectory = Path::GetFullPath(WorkingDirectory);
 
     Environment::SetEngineDirectory(WorkingDirectory);
