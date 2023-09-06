@@ -13,14 +13,13 @@ class ND3D12Graphics;
 
 class ND3D12CommandQueue : public NRHICommandQueue
 {
-	ND3D12Graphics* Graphics;
 	ComPtr<ID3D12CommandQueue> Queue;
 
 public:
 	ND3D12CommandQueue(ND3D12Graphics* InGraphics);
 	virtual ~ND3D12CommandQueue() noexcept override;
-
-	virtual NRHIGraphics* GetDevice() const override;
+	
+	ID3D12CommandQueue* GetQueue() const { return Queue.Get(); }
 };
 
 #endif

@@ -13,7 +13,8 @@ public class RHI : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
+            "ApplicationCore"
         });
 
         if (TargetRule.Platform.Group == PlatformGroup.Windows)
@@ -21,7 +22,8 @@ public class RHI : ModuleRules
             PrivateAdditionalLibraries.AddRange(new[]
             {
                 "dxgi.lib",
-                "d3d12.lib"
+                "d3d12.lib",
+                "User32.lib"
             });
         }
     }

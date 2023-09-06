@@ -5,11 +5,13 @@
 #include "Widgets/SCompoundWidget.h"
 
 class NGenericWindow;
+class NRHIViewport;
 
 class SLATECORE_API SWindow : public SCompoundWidget
 {
 private:
 	std::shared_ptr<NGenericWindow> NativeWindow;
+	std::shared_ptr<NRHIViewport> Viewport;
 
 public:
 	SWindow();

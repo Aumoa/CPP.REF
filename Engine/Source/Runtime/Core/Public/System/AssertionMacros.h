@@ -24,7 +24,7 @@ namespace AssertionMacros::details
 #define AE_CHECK_IMPL(Capture, Expr, Msg) \
 	(LIKELY(!!(Expr)) || (AssertionMacros::details::DispatchCheckVerify<bool>([Capture]() FORCEINLINE_LAMBDA \
 	{ \
-		PlatformProcess::OutputDebugString(Msg); \
+		PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
 		return true; \
 	}) && ([] () { PLATFORM_BREAK(); } (), false)))
 
@@ -35,7 +35,7 @@ namespace AssertionMacros::details
 	(LIKELY(!!(Expr)) || (AssertionMacros::details::DispatchCheckVerify<bool>([Capture]() FORCEINLINE_LAMBDA \
 	{ \
 		static bool bExecuted = false; \
-		PlatformProcess::OutputDebugString(Msg); \
+		PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
 		if (UNLIKELY(!bExecuted)) \
 		{ \
 			bExecuted = true; \

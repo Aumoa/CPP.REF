@@ -7,8 +7,6 @@
 class CORE_API NotSupportedException : public Exception
 {
 public:
-	NotSupportedException(std::exception_ptr InInnerException = nullptr)
-		: Exception(TEXT("The specified function or operation is not supported."), InInnerException)
-	{
-	}
+	NotSupportedException(std::exception_ptr InInnerException = nullptr);
+	virtual ~NotSupportedException() noexcept override;
 };

@@ -6,9 +6,8 @@
 #include "D3D12RHI/D3D12Graphics.h"
 
 ND3D12CommandQueue::ND3D12CommandQueue(ND3D12Graphics* InGraphics)
-	: Graphics(InGraphics)
 {
-	ID3D12Device* Dev = Graphics->GetDevice();
+	ID3D12Device* Dev = InGraphics->GetDevice();
 
 	D3D12_COMMAND_QUEUE_DESC QueueDesc =
 	{
@@ -22,11 +21,6 @@ ND3D12CommandQueue::ND3D12CommandQueue(ND3D12Graphics* InGraphics)
 
 ND3D12CommandQueue::~ND3D12CommandQueue() noexcept
 {
-}
-
-NRHIGraphics* ND3D12CommandQueue::GetDevice() const
-{
-	return Graphics;
 }
 
 #endif

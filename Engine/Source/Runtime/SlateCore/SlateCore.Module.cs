@@ -14,7 +14,8 @@ public class SlateCore : ModuleRules
         {
             "Core",
             "Numerics",
-            "ApplicationCore"
+            "ApplicationCore",
+            "RHI"
         });
     }
 }

@@ -5,8 +5,8 @@
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "Bootstrap/BootstrapTask.h"
+#include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
-#include "RHI/RHICommandQueue.h"
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 #include "GC.h"
@@ -21,22 +21,29 @@ NEngineLoop::~NEngineLoop() noexcept
 
 void NEngineLoop::Init(NInitializeContext* InContext)
 {
-    if (InContext) InContext->ScriptsTask->Step(0.0f);
-    NGC::Init();
-    if (InContext) InContext->ScriptsTask->Step(100.0f);
-
-    if (InContext) InContext->GraphicsTask->Step(0.0f);
-    auto RHI = NRHIGraphics::GenerateGraphics(TEXT("D3D12"));
-    RHI->Init();
-
-    if (InContext) InContext->GraphicsTask->Step(90.0f);
-    auto CommandQueue = RHI->CreateCommandQueue();
-
-    SlateApp = std::make_unique<NSlateApplication>(NGenericApplication::Get());
-
-    if (InContext) InContext->GraphicsTask->Step(100.0f);
+    InitScripts(InContext);
+    InitRHIs(InContext);
 }
 
 void NEngineLoop::Tick()
 {
+    auto* DynamicRHI = NRHIGlobal::GetDynamicRHI();
+    DynamicRHI->BeginFrame();
+    DynamicRHI->EndFrame();
+}
+
+void NEngineLoop::InitScripts(NInitializeContext* InContext)
+{
+    if (InContext) InContext->ScriptsTask->Step(0.0f);
+    NGC::Init();
+    if (InContext) InContext->ScriptsTask->Step(100.0f);
+}
+
+void NEngineLoop::InitRHIs(NInitializeContext* InContext)
+{
+    if (InContext) InContext->GraphicsTask->Step(0.0f);
+    NRHIGlobal::InitDynamicRHI();
+    if (InContext) InContext->GraphicsTask->Step(90.0f);
+    SlateApp = std::make_unique<NSlateApplication>(NGenericApplication::Get());
+    if (InContext) InContext->GraphicsTask->Step(100.0f);
 }

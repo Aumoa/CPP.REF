@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericWindowDefinition.h"
 
+class NRHIGraphics;
+class NRHICommandQueue;
+
 class APPLICATIONCORE_API NGenericWindow
 {
 protected:

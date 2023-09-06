@@ -12,7 +12,12 @@ class ND3D12Graphics : public NRHIGraphics
 {
 	ComPtr<IDXGIFactory7> DXGIFactory;
 	ComPtr<IDXGIAdapter1> CurrentAdapter;
-	ComPtr<ID3D12Device> Device;
+	ComPtr<ID3D12Device1> Device;
+
+	// FrameResources
+	ComPtr<ID3D12Fence> Fence;
+	HANDLE hFenceEvent = nullptr;
+	uint64 FenceValue = 0;
 
 public:
 	ND3D12Graphics();
@@ -20,8 +25,12 @@ public:
 
 	virtual void Init() override;
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() override;
+	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue* InCommandQueue, NGenericWindow* InWindow) override;
 
-	ID3D12Device* GetDevice() const;
+	virtual void BeginFrame() override;
+	virtual void EndFrame() override;
+
+	ID3D12Device1* GetDevice() const;
 
 public:
 	static std::unique_ptr<NRHIGraphics> GenerateGraphics();

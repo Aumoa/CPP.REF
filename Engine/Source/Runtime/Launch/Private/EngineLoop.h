@@ -24,4 +24,8 @@ public:
 
     virtual void Init(NInitializeContext* InContext) override;
     virtual void Tick() override;
+
+private:
+    void InitScripts(NInitializeContext* InContext);
+    void InitRHIs(NInitializeContext* InContext);
 };

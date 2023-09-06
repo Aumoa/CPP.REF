@@ -16,6 +16,4 @@ protected:
 
 public:
 	virtual ~NRHIDeviceChild() noexcept;
-
-	virtual NRHIGraphics* GetDevice() const = 0;
 };
