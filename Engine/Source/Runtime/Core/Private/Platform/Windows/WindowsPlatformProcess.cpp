@@ -67,4 +67,22 @@ void WindowsPlatformProcess::SetupStacktraceSignals() noexcept
 	SetUnhandledExceptionFilter(UnhandledExceptionTrace);
 }
 
+void* WindowsPlatformProcess::AllocateCurrentThreadHandle() noexcept
+{
+	HANDLE hCurrentProcess = GetCurrentProcess();
+	HANDLE hCurrentThread = GetCurrentThread();
+	DuplicateHandle(hCurrentProcess, hCurrentThread, hCurrentProcess, &hCurrentThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
+	return hCurrentThread;
+}
+
+void WindowsPlatformProcess::DestroyCurrentThreadHandle(void* InHandle) noexcept
+{
+	CloseHandle((HANDLE)InHandle);
+}
+
+void WindowsPlatformProcess::SetThreadDescription(void* InHandle, String InDescription) noexcept
+{
+	::SetThreadDescription((HANDLE)InHandle, (LPCWSTR)InDescription.c_str());
+}
+
 #endif

@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Threading/ThreadPool.h"
+#include "Threading/Thread.h"
 #include "Platform/PlatformIO.h"
 
 size_t ThreadPool::NumWorkerThreads;
@@ -68,7 +69,7 @@ void ThreadPool::Initialize()
 		PlatformIO::InitializeIOCPHandle(IO);
 
 		NumWorkerThreads = std::thread::hardware_concurrency();
-		NumCompletionPortThreads = std::thread::hardware_concurrency();
+		NumCompletionPortThreads = 4;
 
 		UpdateWorkers();
 		UpdateIOCPWorkers();
@@ -100,6 +101,8 @@ void ThreadPool::Worker(size_t Index)
 {
 	PLATFORM_UNREFERENCED_PARAMETER(Index);
 
+	Thread::GetCurrentThread().SetDescription(String::Format(TEXT("Worker #{}"), Index));
+
 	while (true)
 	{
 		std::unique_lock ScopedLock(Lck);
@@ -116,6 +119,8 @@ void ThreadPool::Worker(size_t Index)
 void ThreadPool::IOCPWorker(size_t Index)
 {
 	PLATFORM_UNREFERENCED_PARAMETER(Index);
+
+	Thread::GetCurrentThread().SetDescription(String::Format(TEXT("IOCP #{}"), Index));
 
 	while (true)
 	{

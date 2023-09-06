@@ -47,6 +47,11 @@ struct CORE_API WindowsPlatformAtomics : public GenericPlatformAtomics
 		return (int64)::_InterlockedIncrement64((volatile long long*)Value);
 	}
 
+	static FORCEINLINE uint64 InterlockedIncrement(volatile uint64* Value) noexcept
+	{
+		return (uint64)::_InterlockedIncrement64((volatile long long*)Value);
+	}
+
 	static FORCEINLINE int8 InterlockedDecrement(volatile int8* Value) noexcept
 	{
 		return (int8)::_InterlockedExchangeAdd8((volatile char*)Value, -1) - 1;
