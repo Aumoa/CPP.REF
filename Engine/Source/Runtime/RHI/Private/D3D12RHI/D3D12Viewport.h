@@ -16,6 +16,8 @@ class ND3D12Viewport : public NRHIViewport
 public:
 	ND3D12Viewport(IDXGIFactory7* InFactory, ID3D12CommandQueue* InQueue, HWND hWnd);
 	virtual ~ND3D12Viewport() noexcept override;
+
+	virtual void Present() override;
 };
 
 #endif

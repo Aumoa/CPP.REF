@@ -18,6 +18,7 @@ public:
 	virtual ~SWindow() noexcept override;
 
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
+	void Present();
 
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;

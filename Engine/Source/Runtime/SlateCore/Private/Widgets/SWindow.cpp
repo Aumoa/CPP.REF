@@ -26,6 +26,14 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 	UpdateWindowVisibility();
 }
 
+void SWindow::Present()
+{
+	if (Viewport)
+	{
+		Viewport->Present();
+	}
+}
+
 Vector2 SWindow::ComputeDesiredSize() const
 {
 	return Vector<>::Cast<Vector2>(NativeWindow->GetSize());

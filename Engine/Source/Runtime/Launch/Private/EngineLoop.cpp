@@ -8,6 +8,7 @@
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "Application/SlateApplication.h"
+#include "SlateRHIRenderer.h"
 #include "Widgets/SWindow.h"
 #include "GC.h"
 
@@ -28,10 +29,6 @@ void NEngineLoop::Init(NInitializeContext* InContext)
 void NEngineLoop::Tick()
 {
     NSlateApplication::Get().Tick();
-
-    auto* DynamicRHI = NRHIGlobal::GetDynamicRHI();
-    DynamicRHI->BeginFrame();
-    DynamicRHI->EndFrame();
 }
 
 void NEngineLoop::InitScripts(NInitializeContext* InContext)
@@ -46,6 +43,7 @@ void NEngineLoop::InitRHIs(NInitializeContext* InContext)
     if (InContext) InContext->GraphicsTask->Step(0.0f);
     NRHIGlobal::InitDynamicRHI();
     if (InContext) InContext->GraphicsTask->Step(90.0f);
-    NSlateApplication::Create();
+    NSlateApplication& SlateApp = NSlateApplication::Create();
+    SlateApp.SetupSlateRenderer(std::make_shared<NSlateRHIRenderer>());
     if (InContext) InContext->GraphicsTask->Step(100.0f);
 }

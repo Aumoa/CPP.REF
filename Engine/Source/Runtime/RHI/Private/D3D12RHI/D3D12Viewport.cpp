@@ -33,4 +33,9 @@ ND3D12Viewport::~ND3D12Viewport() noexcept
 {
 }
 
+void ND3D12Viewport::Present()
+{
+	HR(SwapChain4->Present(0, 0));
+}
+
 #endif

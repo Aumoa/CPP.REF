@@ -3,6 +3,7 @@
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 #include "GenericPlatform/GenericWindow.h"
+#include "Rendering/SlateRenderer.h"
 
 std::shared_ptr<NSlateApplication> NSlateApplication::SlateApp;
 
@@ -16,12 +17,24 @@ NSlateApplication::~NSlateApplication() noexcept
 
 void NSlateApplication::Tick()
 {
+    Renderer->BeginFrame();
+    Renderer->EndFrame();
+}
+
+void NSlateApplication::PresentAllWindows()
+{
+    CoreWindow->Present();
 }
 
 void NSlateApplication::SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow)
 {
     CoreWindow = std::move(InCoreWindow);
     CreatePlatformWindow(CoreWindow.get());
+}
+
+void NSlateApplication::SetupSlateRenderer(std::shared_ptr<NSlateRenderer> InRenderer)
+{
+    Renderer = std::move(InRenderer);
 }
 
 void NSlateApplication::CreatePlatformWindow(SWindow* InSlateWindow)
@@ -36,11 +49,10 @@ void NSlateApplication::CreatePlatformWindow(SWindow* InSlateWindow)
     InSlateWindow->AttachWindow(std::move(GenericWindow));
 }
 
-std::shared_ptr<NSlateApplication> NSlateApplication::Create()
+NSlateApplication& NSlateApplication::Create()
 {
-    auto Ptr = std::shared_ptr<NSlateApplication>(new NSlateApplication());
-    SlateApp = Ptr;
-    return Ptr;
+    SlateApp = std::shared_ptr<NSlateApplication>(new NSlateApplication());
+    return Get();
 }
 
 void NSlateApplication::Destroy()

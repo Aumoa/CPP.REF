@@ -9,4 +9,7 @@ class RHI_API NRHIViewport : public NRHIDeviceChild
 {
 protected:
 	NRHIViewport() = default;
+
+public:
+	virtual void Present() = 0;
 };

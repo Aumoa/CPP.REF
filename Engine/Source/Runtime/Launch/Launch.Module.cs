@@ -16,11 +16,7 @@ public class Launch : ModuleRules
             "RHI",
             "SlateCore",
             "CoreAObject",
+            "SlateRHIRenderer"
         });
-
-        if (TargetRule.Type == TargetType.SlateApplication)
-        {
-            PublicDependencyModuleNames.Add("SlateCore");
-        }
     }
 }
