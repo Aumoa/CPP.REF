@@ -26,3 +26,8 @@ bool File::Exists(String InPath)
 {
 	return std::filesystem::is_regular_file(InPath.path());
 }
+
+void File::Delete(String InPath)
+{
+	std::filesystem::remove(InPath.path());
+}

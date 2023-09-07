@@ -11,4 +11,5 @@ public:
 	static Task<String> ReadAllTextAsync(String InPath, std::stop_token InCancellationToken = {});
 	static Task<> WriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken = {});
 	static bool Exists(String InPath);
+	static void Delete(String InPath);
 };
