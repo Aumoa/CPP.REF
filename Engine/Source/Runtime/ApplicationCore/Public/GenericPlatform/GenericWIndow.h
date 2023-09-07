@@ -20,4 +20,5 @@ public:
     virtual void* GetOSWindowHandle() const = 0;
     virtual void Show() = 0;
     virtual void Hide() = 0;
+    virtual Vector2N GetSize() const = 0;
 };

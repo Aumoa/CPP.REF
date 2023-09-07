@@ -5,10 +5,33 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericApplication.h"
 
+class SWindow;
+
 class SLATECORE_API NSlateApplication
 {
-    NGenericApplication* CurrentApp;
+    NSlateApplication(const NSlateApplication&) = delete;
+    NSlateApplication(NSlateApplication&&) = delete;
+    static std::shared_ptr<NSlateApplication> SlateApp;
+
+private:
+    std::shared_ptr<SWindow> CoreWindow;
+
+private:
+    NSlateApplication();
 
 public:
-    NSlateApplication(NGenericApplication* InApplication);
+    virtual ~NSlateApplication() noexcept;
+
+    void Tick();
+
+    void SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow);
+    void SetupSlateRenderer();
+
+private:
+    void CreatePlatformWindow(SWindow* InSlateWindow);
+    
+public:
+    static std::shared_ptr<NSlateApplication> Create();
+    static void Destroy();
+    static NSlateApplication& Get();
 };

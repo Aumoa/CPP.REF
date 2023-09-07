@@ -18,4 +18,12 @@ public:
 	virtual ~SWindow() noexcept override;
 
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
+
+protected:
+	virtual Vector2 ComputeDesiredSize() const override;
+
+	virtual void OnVisibilityChanged(ESlateVisibility::Enum Prev, ESlateVisibility::Enum New);
+
+private:
+	void UpdateWindowVisibility();
 };

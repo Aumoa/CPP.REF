@@ -39,5 +39,5 @@ public:
 
 public:
     static std::unique_ptr<NGenericApplication> CreateApplication();
-    static NGenericApplication* Get() noexcept { return sApp; }
+    static NGenericApplication& Get() noexcept { return *sApp; }
 };

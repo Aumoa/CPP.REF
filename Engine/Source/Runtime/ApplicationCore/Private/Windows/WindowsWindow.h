@@ -25,6 +25,7 @@ public:
     virtual void* GetOSWindowHandle() const override;
     virtual void Show() override;
     virtual void Hide() override;
+    virtual Vector2N GetSize() const override;
 };
 
 #endif

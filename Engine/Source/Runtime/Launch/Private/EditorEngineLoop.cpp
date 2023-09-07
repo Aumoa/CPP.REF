@@ -2,6 +2,7 @@
 
 #include "EditorEngineLoop.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 
 NEditorEngineLoop::NEditorEngineLoop()
@@ -29,16 +30,6 @@ void NEditorEngineLoop::PostInit(std::unique_ptr<NInitializeContext> InitContext
     NGenericSplash::Hide();
     NBootstrapTask::Clear();
 
-    auto* App = NGenericApplication::Get();
-    NGenericWindowDefinition Def;
-    Def.bPrimaryWindow = true;
-    Def.bSystemMenu = true;
-    Def.bThickframe = true;
-    Def.bSizebox = true;
-    Def.bCaption = true;
-    std::shared_ptr NativeWindow = App->MakeWindow(Def);
     EditorWindow = SNew(SWindow);
-    EditorWindow->AttachWindow(NativeWindow);
-
-    NativeWindow->Show();
+    NSlateApplication::Get().SetupCoreWindow(EditorWindow);
 }

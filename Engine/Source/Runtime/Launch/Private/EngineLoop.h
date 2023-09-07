@@ -15,9 +15,6 @@ class NEngineLoop : public IEngineLoop
     NEngineLoop(const NEngineLoop&) = delete;
     NEngineLoop(NEngineLoop&&) = delete;
 
-private:
-    std::unique_ptr<NSlateApplication> SlateApp;
-
 public:
     NEngineLoop();
     virtual ~NEngineLoop() noexcept override;

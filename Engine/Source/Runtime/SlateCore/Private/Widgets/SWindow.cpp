@@ -4,6 +4,7 @@
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "RHI/RHIViewport.h"
+#include "GenericPlatform/GenericWindow.h"
 
 SWindow::SWindow()
 {
@@ -21,4 +22,31 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 	auto* DynamicRHI = NRHIGlobal::GetDynamicRHI();
 	NativeWindow = std::move(InNativeWindow);
 	Viewport = DynamicRHI->CreateViewport(NRHIGlobal::GetPrimaryCommandQueue(), NativeWindow.get());
+
+	UpdateWindowVisibility();
+}
+
+Vector2 SWindow::ComputeDesiredSize() const
+{
+	return Vector<>::Cast<Vector2>(NativeWindow->GetSize());
+}
+
+void SWindow::OnVisibilityChanged(ESlateVisibility::Enum, ESlateVisibility::Enum)
+{
+	if (NativeWindow)
+	{
+		UpdateWindowVisibility();
+	}
+}
+
+void SWindow::UpdateWindowVisibility()
+{
+	if (ESlateVisibility::IsVisible(GetVisibility()))
+	{
+		NativeWindow->Show();
+	}
+	else
+	{
+		NativeWindow->Hide();
+	}
 }

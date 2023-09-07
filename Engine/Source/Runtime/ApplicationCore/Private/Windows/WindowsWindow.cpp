@@ -117,4 +117,11 @@ void NWindowsWindow::Hide()
     ShowWindow(hWnd, SW_HIDE);
 }
 
+Vector2N NWindowsWindow::GetSize() const
+{
+    RECT Rc;
+    ::GetClientRect(hWnd, &Rc);
+    return Vector2N(Rc.right - Rc.left, Rc.bottom - Rc.top);
+}
+
 #endif

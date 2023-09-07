@@ -22,11 +22,11 @@ namespace AssertionMacros::details
 }
 
 #define AE_CHECK_IMPL(Capture, Expr, Msg) \
-	(LIKELY(!!(Expr)) || (AssertionMacros::details::DispatchCheckVerify<bool>([Capture]() FORCEINLINE_LAMBDA \
+	if (UNLIKELY(!(Expr))) \
 	{ \
 		PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
-		return true; \
-	}) && ([] () { PLATFORM_BREAK(); } (), false)))
+		PLATFORM_BREAK(); \
+	}
 
 #define check(Expr)						AE_CHECK_IMPL( , Expr, TEXT(#Expr))
 #define checkf(Expr, Msgf, ...)			AE_CHECK_IMPL(&, Expr, String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))

@@ -27,6 +27,8 @@ void NEngineLoop::Init(NInitializeContext* InContext)
 
 void NEngineLoop::Tick()
 {
+    NSlateApplication::Get().Tick();
+
     auto* DynamicRHI = NRHIGlobal::GetDynamicRHI();
     DynamicRHI->BeginFrame();
     DynamicRHI->EndFrame();
@@ -44,6 +46,6 @@ void NEngineLoop::InitRHIs(NInitializeContext* InContext)
     if (InContext) InContext->GraphicsTask->Step(0.0f);
     NRHIGlobal::InitDynamicRHI();
     if (InContext) InContext->GraphicsTask->Step(90.0f);
-    SlateApp = std::make_unique<NSlateApplication>(NGenericApplication::Get());
+    NSlateApplication::Create();
     if (InContext) InContext->GraphicsTask->Step(100.0f);
 }

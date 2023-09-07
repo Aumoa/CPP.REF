@@ -260,7 +260,7 @@ void NGenericSplash::Show()
 	{
 		InitializeWindow();
 	}
-
+	check(hWnd);
 	ShowWindow(hWnd, SW_SHOW);
 	UpdateWindow(hWnd);
 }
