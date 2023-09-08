@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+class SWindow;
+
 class SLATECORE_API NSlateRenderer
 {
 protected:
@@ -15,4 +17,6 @@ public:
 	virtual void BeginFrame() {}
 	virtual void EndFrame() {}
 	virtual void FlushCommands() {}
+
+	virtual void CreateViewport(SWindow& InWindow) = 0;
 };

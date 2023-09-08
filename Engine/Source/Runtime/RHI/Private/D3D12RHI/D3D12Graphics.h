@@ -25,7 +25,7 @@ public:
 
 	virtual void Init() override;
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() override;
-	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue* InCommandQueue, NGenericWindow* InWindow) override;
+	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) override;
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;

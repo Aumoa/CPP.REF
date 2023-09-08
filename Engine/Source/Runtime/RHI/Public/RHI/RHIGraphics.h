@@ -18,7 +18,7 @@ public:
 
 	virtual void Init() = 0;
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() = 0;
-	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue* InCommandQueue, NGenericWindow* InWindow) = 0;
+	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) = 0;
 
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;

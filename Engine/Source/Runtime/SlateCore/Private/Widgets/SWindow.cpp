@@ -19,9 +19,9 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 	check(!NativeWindow);
 	check(!Viewport);
 
-	auto* DynamicRHI = NRHIGlobal::GetDynamicRHI();
+	auto& DynamicRHI = NRHIGlobal::GetDynamicRHI();
 	NativeWindow = std::move(InNativeWindow);
-	Viewport = DynamicRHI->CreateViewport(NRHIGlobal::GetPrimaryCommandQueue(), NativeWindow.get());
+	Viewport = DynamicRHI.CreateViewport(NRHIGlobal::GetPrimaryCommandQueue(), *NativeWindow);
 
 	UpdateWindowVisibility();
 }

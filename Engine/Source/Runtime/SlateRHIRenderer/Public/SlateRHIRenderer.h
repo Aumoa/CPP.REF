@@ -13,4 +13,6 @@ public:
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
 	virtual void FlushCommands() override;
+
+	virtual void CreateViewport(SWindow& InWindow) override;
 };

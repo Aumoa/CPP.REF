@@ -11,6 +11,7 @@
 #include "SlateRHIRenderer.h"
 #include "Widgets/SWindow.h"
 #include "GC.h"
+#include "SlateRHIRenderer.h"
 
 NEngineLoop::NEngineLoop()
 {
@@ -29,6 +30,7 @@ void NEngineLoop::Init(NInitializeContext* InContext)
 void NEngineLoop::Tick()
 {
     NSlateApplication::Get().Tick();
+    NSlateApplication::Get().DispatchQueuedRenderingWorks();
 }
 
 void NEngineLoop::InitScripts(NInitializeContext* InContext)
@@ -43,7 +45,7 @@ void NEngineLoop::InitRHIs(NInitializeContext* InContext)
     if (InContext) InContext->GraphicsTask->Step(0.0f);
     NRHIGlobal::InitDynamicRHI();
     if (InContext) InContext->GraphicsTask->Step(90.0f);
-    NSlateApplication& SlateApp = NSlateApplication::Create();
-    SlateApp.SetupSlateRenderer(std::make_shared<NSlateRHIRenderer>());
+    auto Renderer = std::make_shared<NSlateRHIRenderer>();
+    NSlateApplication::Create().SetupSlateRenderer(std::move(Renderer));
     if (InContext) InContext->GraphicsTask->Step(100.0f);
 }

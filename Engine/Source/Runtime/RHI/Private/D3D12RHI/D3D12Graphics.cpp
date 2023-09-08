@@ -5,7 +5,7 @@
 #include "D3D12RHI/D3D12Graphics.h"
 #include "D3D12RHI/D3D12CommandQueue.h"
 #include "D3D12RHI/D3D12Viewport.h"
-#include "RHI/RHIGlobal.h"
+#include "D3D12RHI/D3D12Global.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -59,10 +59,10 @@ std::shared_ptr<NRHICommandQueue> ND3D12Graphics::CreateCommandQueue()
 	return std::make_shared<ND3D12CommandQueue>(this);
 }
 
-std::shared_ptr<NRHIViewport> ND3D12Graphics::CreateViewport(NRHICommandQueue* InCommandQueue, NGenericWindow* InWindow)
+std::shared_ptr<NRHIViewport> ND3D12Graphics::CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow)
 {
-	auto* Queue = static_cast<ND3D12CommandQueue*>(InCommandQueue)->GetQueue();
-	HWND hWnd = reinterpret_cast<HWND>(InWindow->GetOSWindowHandle());
+	auto* Queue = static_cast<ND3D12CommandQueue&>(InCommandQueue).GetQueue();
+	HWND hWnd = reinterpret_cast<HWND>(InWindow.GetOSWindowHandle());
 	return std::make_shared<ND3D12Viewport>(DXGIFactory.Get(), Queue, hWnd);
 }
 
@@ -88,7 +88,7 @@ void ND3D12Graphics::BeginFrame()
 
 void ND3D12Graphics::EndFrame()
 {
-	ID3D12CommandQueue* Queue = static_cast<ND3D12CommandQueue*>(NRHIGlobal::GetPrimaryCommandQueue())->GetQueue();
+	ID3D12CommandQueue* Queue = ND3D12Global::GetPrimaryCommandQueue().GetQueue();
 	HR(Queue->Signal(Fence.Get(), ++FenceValue));
 }
 

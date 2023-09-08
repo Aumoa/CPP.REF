@@ -11,15 +11,8 @@ struct RHI_API NRHIGlobal : public StaticClass
 {
 	static void InitDynamicRHI();
 
-	static NRHIGraphics* GetDynamicRHI()
-	{
-		return DynamicRHI.get();
-	}
-
-	static NRHICommandQueue* GetPrimaryCommandQueue()
-	{
-		return PrimaryCommandQueue.get();
-	}
+	static NRHIGraphics& GetDynamicRHI() { return *DynamicRHI.get(); }
+	static NRHICommandQueue& GetPrimaryCommandQueue() { return *PrimaryCommandQueue.get(); }
 
 private:
 	static std::shared_ptr<NRHIGraphics> DynamicRHI;
