@@ -14,6 +14,7 @@ private:
 
 public:
 	static void Init(int Argc, const char* const Argv[]);
+	static void Init(String CmdArgs);
 	static bool TryGetValue(String InName, String& OutValue);
 	static bool Contains(String InName);
 };

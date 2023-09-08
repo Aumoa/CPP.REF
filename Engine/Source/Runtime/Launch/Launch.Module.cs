@@ -16,7 +16,17 @@ public class Launch : ModuleRules
             "RHI",
             "SlateCore",
             "CoreAObject",
-            "SlateRHIRenderer"
+            "SlateRHIRenderer",
+            "Engine"
         });
+
+        if (TargetRule.bEditor)
+        {
+            PublicDependencyModuleNames.AddRange(new[]
+            {
+                "CoreEd",
+                "MainFrame",
+            });
+        }
     }
 }

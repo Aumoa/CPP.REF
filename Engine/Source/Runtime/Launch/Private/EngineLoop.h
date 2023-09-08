@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "IEngineLoop.h"
 #include "GenericPlatform/GenericWindow.h"
-#include "Bootstrap/BootstrapTask.h"
 
 class NGenericApplication;
 class NSlateApplication;
@@ -19,10 +18,13 @@ public:
     NEngineLoop();
     virtual ~NEngineLoop() noexcept override;
 
-    virtual void Init(NInitializeContext* InContext) override;
+    virtual void Init() override;
     virtual void Tick() override;
 
+    void PreInit(String CmdArgs);
+    void PostInit();
+
 private:
-    void InitScripts(NInitializeContext* InContext);
-    void InitRHIs(NInitializeContext* InContext);
+    void PreInitPreStartupScreen(String CmdArgs);
+    void PreInitPostStartupScreen();
 };

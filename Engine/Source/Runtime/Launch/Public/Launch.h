@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-class NEditorEngineLoop;
+class NEngineLoop;
 class NGenericApplication;
 
 class LAUNCH_API NLaunch
@@ -14,7 +14,7 @@ private:
 
 	String CmdArgs;
 	std::unique_ptr<NGenericApplication> GenericApp;
-    std::unique_ptr<NEditorEngineLoop> Loop;
+    std::unique_ptr<NEngineLoop> Loop;
 
 protected:
 	NLaunch(String CmdArgs);

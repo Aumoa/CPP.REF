@@ -15,6 +15,48 @@ void CommandLine::Init(int Argc, const char* const Argv[])
 	}
 }
 
+void CommandLine::Init(String CmdArgs)
+{
+	check(Args.empty());
+	bool bQuoted = false;
+
+	if (CmdArgs.IsEmpty())
+	{
+		return;
+	}
+
+	auto FlushCommand = [&](size_t Start, size_t End)
+	{
+		check(Start < End);
+		size_t Length = End - Start;
+		if (Length == 1 && Char::IsWhiteSpace(CmdArgs[Start]))
+		{
+			return End;
+		}
+
+		Args.emplace_back(CmdArgs.Substring(Start, Length));
+		return End;
+	};
+
+	size_t StartIndex = 0;
+	for (size_t i = 0; i < CmdArgs.length(); ++i)
+	{
+		if (bQuoted)
+		{
+			if (CmdArgs[i] == '"' && CmdArgs[i - 1] != '\\')
+			{
+				bQuoted = false;
+			}
+		}
+
+		if (Char::IsWhiteSpace(CmdArgs[i]))
+		{
+			StartIndex = FlushCommand(StartIndex, i);
+		}
+	}
+	FlushCommand(StartIndex, CmdArgs.length());
+}
+
 bool CommandLine::TryGetValue(String InName, String& OutValue)
 {
 	bool bCatchResult = false;

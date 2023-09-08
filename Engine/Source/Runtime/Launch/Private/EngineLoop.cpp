@@ -4,7 +4,6 @@
 #include "Launch.h"
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericSplash.h"
-#include "Bootstrap/BootstrapTask.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "Application/SlateApplication.h"
@@ -12,6 +11,7 @@
 #include "Widgets/SWindow.h"
 #include "GC.h"
 #include "SlateRHIRenderer.h"
+#include "Widgets/SWindow.h"
 
 NEngineLoop::NEngineLoop()
 {
@@ -21,31 +21,49 @@ NEngineLoop::~NEngineLoop() noexcept
 {
 }
 
-void NEngineLoop::Init(NInitializeContext* InContext)
+void NEngineLoop::Init()
 {
-    InitScripts(InContext);
-    InitRHIs(InContext);
 }
 
 void NEngineLoop::Tick()
 {
-    NSlateApplication::Get().Tick();
-    NSlateApplication::Get().DispatchQueuedRenderingWorks();
+    NSlateApplication& SlateApp = NSlateApplication::Get();
+    SlateApp.Tick();
+    SlateApp.DispatchQueuedRenderingWorks();
 }
 
-void NEngineLoop::InitScripts(NInitializeContext* InContext)
+void NEngineLoop::PreInit(String CmdArgs)
 {
-    if (InContext) InContext->ScriptsTask->Step(0.0f);
+    PreInitPreStartupScreen(CmdArgs);
+
+    // Show splash window.
+    NGenericSplash::Show();
+
+    PreInitPostStartupScreen();
+}
+
+void NEngineLoop::PostInit()
+{
+    NGenericSplash::Hide();
+    NSlateApplication::Get().SetupCoreWindow(SNew(SWindow));
+}
+
+void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
+{
+    // Setup command line arguments.
+    CommandLine::Init(CmdArgs);
+
+    // Initialize GC engine.
     NGC::Init();
-    if (InContext) InContext->ScriptsTask->Step(100.0f);
-}
 
-void NEngineLoop::InitRHIs(NInitializeContext* InContext)
-{
-    if (InContext) InContext->GraphicsTask->Step(0.0f);
+    // Initialize RHI engine.
     NRHIGlobal::InitDynamicRHI();
-    if (InContext) InContext->GraphicsTask->Step(90.0f);
+
+    // Initialize slate application.
     auto Renderer = std::make_shared<NSlateRHIRenderer>();
     NSlateApplication::Create().SetupSlateRenderer(std::move(Renderer));
-    if (InContext) InContext->GraphicsTask->Step(100.0f);
+}
+
+void NEngineLoop::PreInitPostStartupScreen()
+{
 }

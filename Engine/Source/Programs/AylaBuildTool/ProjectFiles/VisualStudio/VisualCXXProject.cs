@@ -265,7 +265,10 @@ public class VisualCXXProject : IVisualStudioProject
                             Configuration = Configuration.Development,
                             Platform = TargetPlatform.Win64
                         }
-                    }, ModuleName);
+                    }, ModuleName)
+                    {
+                        bEditor = true
+                    };
                     Global.SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
 
                     var Resolver = new ModuleDependenciesResolver(TargetRule, SearchedModules, ToolChain);

@@ -31,11 +31,11 @@ public class TargetRules
 
     public string Name { get; }
 
-    public TargetType Type { get; protected set; }
+    public TargetType Type { get; set; }
 
-    public TargetPlatform Platform { get; protected set; }
+    public TargetPlatform Platform { get; set; }
 
-    public string TargetModuleName { get; protected set; }
+    public string TargetModuleName { get; set; }
 
-    public bool bEditor { get; protected set; } = false;
+    public bool bEditor { get; set; } = false;
 }
