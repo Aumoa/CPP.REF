@@ -8,4 +8,6 @@ namespace AE.Platform;
 public abstract class Linker
 {
     public abstract Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default);
+
+    public abstract Task<bool> TryCheckOutputsAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default);
 }

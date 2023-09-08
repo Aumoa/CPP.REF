@@ -2,11 +2,9 @@
 
 using System.Data;
 using System.Diagnostics;
-using System.Text;
 
 using AE.BuildSettings;
 using AE.Exceptions;
-using AE.Misc;
 using AE.Projects;
 using AE.Rules;
 
@@ -23,30 +21,14 @@ public class VSLinker : Linker
         this.ToolChain = ToolChain;
     }
 
-    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    private void GenerateBuildInformation(TargetRules Rule, ModuleInformation Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem)
     {
-        string LinkExe = this.LinkExe;
         var Config = Rule.Target.BuildConfiguration;
-        foreach (var ExecutablePath in ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture))
-        {
-            string Cur = Path.Combine(ExecutablePath, this.LinkExe);
-            if (File.Exists(Cur))
-            {
-                LinkExe = Cur;
-                break;
-            }
-        }
-
-        string OutputDir;
-        string BuildDir;
-        string LibraryPath;
-        string StdDir;
         if (Config.Platform == TargetPlatform.Win64)
         {
             OutputDir = Path.Combine(Module.ProjectDir.Binaries.Win64, Config.Configuration.ToString());
             BuildDir = Path.Combine(Module.ProjectDir.Intermediate.Build, "Win64");
-            LibraryPath = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.Configuration.ToString());
-            StdDir = Path.Combine(Global.EngineDirectory.Intermediate.Build, "Win64");
+            LibraryDir = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.Configuration.ToString());
 
             if (Directory.Exists(OutputDir) == false)
             {
@@ -58,19 +40,9 @@ public class VSLinker : Linker
             throw new InvalidOperationException("Internal error.");
         }
 
-        string BinaryOut = Path.Combine(OutputDir, Module.Name);
+        BinaryOut = Path.Combine(OutputDir, Module.Name);
+        PdbOut = Path.Combine(OutputDir, Module.Name + ".pdb");
         BuildDir = Path.Combine(BuildDir, Config.Configuration.ToString(), Module.Name);
-        StdDir = Path.Combine(StdDir, Config.Configuration.ToString(), "Core");
-
-        ProcessStartInfo PSI = new(LinkExe);
-        string[] Paths = ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture);
-        PSI.Environment["PATH"] = string.Join(';', Paths);
-        string[] Libs = ToolChain.GetRequiredLibraryPaths(Config.Platform.Architecture);
-        PSI.Environment["LIB"] = string.Join(';', Libs);
-        PSI.RedirectStandardOutput = true;
-        PSI.RedirectStandardError = true;
-
-        string Subsystem = string.Empty;
 
         if (Module.TargetType == TargetType.Module)
         {
@@ -87,18 +59,42 @@ public class VSLinker : Linker
             BinaryOut = Path.ChangeExtension(BinaryOut, ".exe");
             Subsystem = "/SUBSYSTEM:WINDOWS";
         }
-
-        if (string.IsNullOrEmpty(Subsystem))
+        else
         {
-            return Path.GetFileNameWithoutExtension(BinaryOut);
+            throw new InvalidOperationException("Internal error.");
         }
+    }
+
+    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    {
+        string LinkExe = this.LinkExe;
+        var Config = Rule.Target.BuildConfiguration;
+        foreach (var ExecutablePath in ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture))
+        {
+            string Cur = Path.Combine(ExecutablePath, this.LinkExe);
+            if (File.Exists(Cur))
+            {
+                LinkExe = Cur;
+                break;
+            }
+        }
+
+        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem);
+
+        ProcessStartInfo PSI = new(LinkExe);
+        string[] Paths = ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture);
+        PSI.Environment["PATH"] = string.Join(';', Paths);
+        string[] Libs = ToolChain.GetRequiredLibraryPaths(Config.Platform.Architecture);
+        PSI.Environment["LIB"] = string.Join(';', Libs);
+        PSI.RedirectStandardOutput = true;
+        PSI.RedirectStandardError = true;
 
         IEnumerable<string> LinkLibraries = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
         LinkLibraries = LinkLibraries.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));
         string LinkLibrary = string.Join(' ', LinkLibraries);
         LinkLibrary = $"/DYNAMICBASE {LinkLibrary}";
 
-        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryPath}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.cpp.obj\" \"{BuildDir}\\*.ixx.obj\" \"{StdDir}\\*.std.obj\"";
+        PSI.Arguments = $"/nologo /DEBUG {LinkLibrary} {Subsystem} /MACHINE:X64 /OUT:\"{BinaryOut}\" /LIBPATH:\"{LibraryDir}\" /LIBPATH:\"{OutputDir}\" \"{BuildDir}\\*.cpp.obj\" \"{BuildDir}\\*.ixx.obj\"";
 
         Process? P = Process.Start(PSI);
         if (P == null)
@@ -118,6 +114,19 @@ public class VSLinker : Linker
             throw new TerminateException(KnownErrorCode.CompileError, Report);
         }
 
-        return Stdout.Trim() + $"\n{BinaryOut}";
+        Stdout = Stdout.Trim();
+        if (Stdout.Length != 0)
+        {
+            Stdout += "\n";
+        }
+        Stdout += $"{BinaryOut}";
+
+        return Stdout;
+    }
+
+    public override Task<bool> TryCheckOutputsAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken)
+    {
+        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem);
+        return Task.FromResult(File.Exists(BinaryOut) && File.Exists(PdbOut));
     }
 }

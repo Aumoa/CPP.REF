@@ -2,6 +2,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+using AE.Projects;
+
 namespace AE.SourceTree;
 
 public sealed class Makefile
@@ -75,6 +77,8 @@ public sealed class Makefile
 
         await File.WriteAllBytesAsync(MakefilePath, Stream.ToArray(), SToken);
     }
+
+    public ModuleInformation ModuleInfo { get; set; } = null!;
 
     public MakefileCompile[] CompileItems { get; set; } = Array.Empty<MakefileCompile>();
 }

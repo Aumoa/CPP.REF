@@ -20,20 +20,14 @@ public class GccLinker : Linker
         this.CompilerPath = CompilerPath;
     }
 
-    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    private void GenerateBuildInformation(TargetRules Rule, ModuleInformation Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem)
     {
         var Config = Rule.Target.BuildConfiguration;
-
-        string OutputDir;
-        string BuildDir;
-        string LibraryPath;
-        string StdDir;
         if (Config.Platform == TargetPlatform.Linux)
         {
             OutputDir = Path.Combine(Module.ProjectDir.Binaries.Linux, Config.Configuration.ToString());
             BuildDir = Path.Combine(Module.ProjectDir.Intermediate.Build, "Linux");
-            LibraryPath = Path.Combine(Global.EngineDirectory.Binaries.Linux, Config.Configuration.ToString());
-            StdDir = Path.Combine(Global.EngineDirectory.Intermediate.Build, "Linux");
+            LibraryDir = Path.Combine(Global.EngineDirectory.Binaries.Linux, Config.Configuration.ToString());
 
             if (Directory.Exists(OutputDir) == false)
             {
@@ -45,14 +39,9 @@ public class GccLinker : Linker
             throw new InvalidOperationException("Internal error.");
         }
 
-        ProcessStartInfo PSI = new(CompilerPath);
-        PSI.RedirectStandardOutput = true;
-        PSI.RedirectStandardError = true;
-        PSI.Environment["LDFLAGS"] = "-Wl,--copy-dt-needed-entries";
-
-        string BinaryOut = Path.Combine(OutputDir, Module.Name);
+        BinaryOut = Path.Combine(OutputDir, Module.Name);
         BuildDir = Path.Combine(BuildDir, Config.Configuration.ToString(), Module.Name);
-        string Subsystem = string.Empty;
+        Subsystem = string.Empty;
 
         if (Module.TargetType == TargetType.Module)
         {
@@ -69,6 +58,16 @@ public class GccLinker : Linker
         {
             throw new TerminateException(KnownErrorCode.NotSupportedType, CoreStrings.Errors.NotSupportedType("TargetType", "SlateApplication"));
         }
+    }
+
+    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    {
+        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem);
+
+        ProcessStartInfo PSI = new(CompilerPath);
+        PSI.RedirectStandardOutput = true;
+        PSI.RedirectStandardError = true;
+        PSI.Environment["LDFLAGS"] = "-Wl,--copy-dt-needed-entries";
 
         IEnumerable<string> Links = Module.AdditionalLibraries.Concat(Module.DependModules);
         IEnumerable<string> LinkLibraries = Links.Select(p => $"-l\"{p}\"");
@@ -79,7 +78,7 @@ public class GccLinker : Linker
 
         PSI.WorkingDirectory = BuildDir;
         PSI.UseShellExecute = false;
-        PSI.Arguments = $"{Subsystem} -o \"{BinaryOut}\" {InputsStr} -lc -lgcc -lstdc++ -lm {LinkLibrary} -L/usr/lib/gcc/x86_64-linux-gnu/13 -L\"{LibraryPath}\"";
+        PSI.Arguments = $"{Subsystem} -o \"{BinaryOut}\" {InputsStr} -lc -lgcc -lstdc++ -lm {LinkLibrary} -L/usr/lib/gcc/x86_64-linux-gnu/13 -L\"{LibraryDir}\"";
         Process? P = Process.Start(PSI);
         if (P == null)
         {
@@ -100,5 +99,11 @@ public class GccLinker : Linker
         }
 
         return $"Linking: {BinaryOut}";
+    }
+
+    public override Task<bool> TryCheckOutputsAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    {
+        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem);
+        return Task.FromResult(File.Exists(BinaryOut));
     }
 }

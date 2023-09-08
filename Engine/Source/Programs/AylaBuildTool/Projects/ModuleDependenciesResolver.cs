@@ -222,6 +222,7 @@ public class ModuleDependenciesResolver
                 }
 
                 Makefile.CompileItems = CompileItems.ToArray();
+                Makefile.ModuleInfo = Cache;
                 return (Cache, Makefile);
             }));
         }

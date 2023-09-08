@@ -2,7 +2,7 @@
   "profiles": {
     "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "Build -Target BlankApp -Config Debug"
+      "commandLineArgs": "Build -Target AEEditor -Config Debug"
     }
   }
 }

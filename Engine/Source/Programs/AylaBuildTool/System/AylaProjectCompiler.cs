@@ -64,6 +64,7 @@ public class AylaProjectCompiler
             
             foreach (var (ModuleInfo, Makefile) in Makefiles)
             {
+                Context.CompileNodes.Add(Makefile, new());
                 foreach (var Item in Makefile.CompileItems)
                 {
                     if (Item.Cache != null)
@@ -71,13 +72,7 @@ public class AylaProjectCompiler
                         continue;
                     }
 
-                    if (Context.CompileNodes.TryGetValue(Makefile, out var List) == false)
-                    {
-                        List = new();
-                        Context.CompileNodes.Add(Makefile, List);
-                    }
-
-                    List.Add(new CompileNode()
+                    Context.CompileNodes[Makefile].Add(new CompileNode()
                     {
                         Compile = Item
                     });
@@ -127,7 +122,7 @@ public class AylaProjectCompiler
     {
         public required ModuleInformation ModuleInfo { get; init; }
 
-        public required Task<bool> Compiles { get; init; }
+        public required List<Task<bool>> Compiles { get; init; }
 
         public TaskCompletionSource<bool> LinkCompleted { get; } = new();
     }
@@ -145,12 +140,11 @@ public class AylaProjectCompiler
         foreach (var (Makefile, Nodes) in Context.CompileNodes)
         {
             List<Task<bool>> ScopedTasks = new();
-            ModuleInformation? ModuleInfo = null;
+            ModuleInformation ModuleInfo = Makefile.ModuleInfo;
 
             foreach (var Node in Nodes)
             {
-                Debug.Assert(ModuleInfo == null || ModuleInfo == Node.Compile.ModuleInfo);
-                ModuleInfo = Node.Compile.ModuleInfo;
+                Debug.Assert(ModuleInfo == Node.Compile.ModuleInfo);
 
                 ScopedTasks.Add(CompileTasks.CompileAsync(Node, Rule, InCancellationToken).ContinueWith(p =>
                 {
@@ -178,11 +172,7 @@ public class AylaProjectCompiler
                 }));
             }
 
-            if (ModuleInfo != null)
-            {
-                Task<bool> ContinuationTask = Task.WhenAll(ScopedTasks).ContinueWith(p => !p.Result.Any(p => !p));
-                LinkModules.Add(ModuleInfo.Name, new() { Compiles = ContinuationTask, ModuleInfo = ModuleInfo });
-            }
+            LinkModules.Add(ModuleInfo.Name, new() { Compiles = ScopedTasks, ModuleInfo = ModuleInfo });
         }
 
         foreach (var (_, LinkContext) in LinkModules)
@@ -198,12 +188,26 @@ public class AylaProjectCompiler
 
             async Task ContinuationAsync()
             {
-                bool bCompileResult = await LinkContext.Compiles;
-                if (bCompileResult == false)
+                Linker Linker = ToolChain.SpawnLinker();
+                if (LinkContext.Compiles.Any())
                 {
-                    // One or more compile tasks are failed.
-                    LinkContext.LinkCompleted.SetResult(false);
-                    return;
+                    bool bCompileResult = await Task.WhenAll(LinkContext.Compiles).ContinueWith(p => !p.Result.Any(p => !p));
+                    if (bCompileResult == false)
+                    {
+                        // One or more compile tasks are failed.
+                        LinkContext.LinkCompleted.SetResult(false);
+                        return;
+                    }
+                }
+                else
+                {
+                    bool bCached = await Linker.TryCheckOutputsAsync(Rule, LinkContext.ModuleInfo, InCancellationToken);
+                    if (bCached)
+                    {
+                        // All compile items and output items is cached.
+                        LinkContext.LinkCompleted.SetResult(true);
+                        return;
+                    }
                 }
 
                 bool[] DependLinkResults = await Task.WhenAll(DependTasks);
@@ -214,7 +218,6 @@ public class AylaProjectCompiler
                     return;
                 }
 
-                Linker Linker = ToolChain.SpawnLinker();
                 try
                 {
                     string Output = await Linker.LinkAsync(Rule, LinkContext.ModuleInfo, InCancellationToken);
