@@ -6,7 +6,7 @@
 
 namespace ESlateVisibility
 {
-	enum Enum
+	enum Enum : uint8
 	{
 		Visible,
 		Collapsed,
@@ -16,21 +16,21 @@ namespace ESlateVisibility
 		All
 	};
 
-	inline constexpr int32 VISPRIVATE_Visible = 0x1 << 0;
-	inline constexpr int32 VISPRIVATE_Collapsed = 0x1 << 1;
-	inline constexpr int32 VISPRIVATE_Hidden = 0x1 << 2;
-	inline constexpr int32 VISPRIVATE_SelfHitTestVisible = 0x1 << 3;
-	inline constexpr int32 VISPRIVATE_ChildrenHitTestVisible = 0x1 << 4;
+	inline constexpr uint8 VISPRIVATE_Visible = 0x1 << 0;
+	inline constexpr uint8 VISPRIVATE_Collapsed = 0x1 << 1;
+	inline constexpr uint8 VISPRIVATE_Hidden = 0x1 << 2;
+	inline constexpr uint8 VISPRIVATE_SelfHitTestVisible = 0x1 << 3;
+	inline constexpr uint8 VISPRIVATE_ChildrenHitTestVisible = 0x1 << 4;
 
-	inline constexpr int32 VIS_Visible = VISPRIVATE_Visible | VISPRIVATE_SelfHitTestVisible | VISPRIVATE_ChildrenHitTestVisible;
-	inline constexpr int32 VIS_Collapsed = VISPRIVATE_Collapsed;
-	inline constexpr int32 VIS_Hidden = VISPRIVATE_Hidden;
-	inline constexpr int32 VIS_HitTestInvisible = VISPRIVATE_Visible;
-	inline constexpr int32 VIS_SelfHitTestInvisible = VISPRIVATE_Visible | VISPRIVATE_ChildrenHitTestVisible;
+	inline constexpr uint8 VIS_Visible = VISPRIVATE_Visible | VISPRIVATE_SelfHitTestVisible | VISPRIVATE_ChildrenHitTestVisible;
+	inline constexpr uint8 VIS_Collapsed = VISPRIVATE_Collapsed;
+	inline constexpr uint8 VIS_Hidden = VISPRIVATE_Hidden;
+	inline constexpr uint8 VIS_HitTestInvisible = VISPRIVATE_Visible;
+	inline constexpr uint8 VIS_SelfHitTestInvisible = VISPRIVATE_Visible | VISPRIVATE_ChildrenHitTestVisible;
 
-	inline constexpr int32 VIS_All = VISPRIVATE_Visible | VISPRIVATE_Hidden | VISPRIVATE_Collapsed | VISPRIVATE_SelfHitTestVisible | VISPRIVATE_ChildrenHitTestVisible;
+	inline constexpr uint8 VIS_All = VISPRIVATE_Visible | VISPRIVATE_Hidden | VISPRIVATE_Collapsed | VISPRIVATE_SelfHitTestVisible | VISPRIVATE_ChildrenHitTestVisible;
 
-	inline int32 GetValue(ESlateVisibility::Enum InVisibility)
+	inline uint8 GetValue(ESlateVisibility::Enum InVisibility)
 	{
 		switch (InVisibility)
 		{
@@ -41,7 +41,7 @@ namespace ESlateVisibility
 		case ESlateVisibility::SelfHitTestInvisible: return VIS_SelfHitTestInvisible;
 		case ESlateVisibility::All: return VIS_All;
 		default:
-			checkf(false, TEXT("Invalid argument: Visibility({})"), (int32)InVisibility);
+			checkf(false, TEXT("Invalid argument: Visibility({})"), (uint8)InVisibility);
 			return VIS_Hidden;
 		};
 	}
@@ -56,7 +56,7 @@ namespace ESlateVisibility
 		case ESlateVisibility::HitTestInvisible: return TEXT("HitTestInvisible");
 		case ESlateVisibility::SelfHitTestInvisible: return TEXT("SelfHitTestInvisible");
 		case ESlateVisibility::All: return TEXT("All");
-		default: return String::Format(TEXT("(ESlateVisibility){}"), (int32)InVisibility);
+		default: return String::Format(TEXT("(ESlateVisibility){}"), (uint8)InVisibility);
 		};
 	}
 

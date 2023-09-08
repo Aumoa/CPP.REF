@@ -7,4 +7,16 @@
 
 class SLATECORE_API SViewport : public SCompoundWidget
 {
+public:
+	SViewport();
+	virtual ~SViewport() noexcept override;
+	
+public:
+	BEGIN_SLATE_ATTRIBUTE(SViewport)
+	END_SLATE_ATTRIBUTE()
+
+	DECLARE_SLATE_CONSTRUCTOR();
+
+protected:
+	virtual Vector2 ComputeDesiredSize() const override;
 };

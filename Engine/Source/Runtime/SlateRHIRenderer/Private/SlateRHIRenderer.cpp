@@ -20,7 +20,6 @@ void NSlateRHIRenderer::BeginFrame()
 void NSlateRHIRenderer::EndFrame()
 {
 	NRHIGlobal::GetDynamicRHI().EndFrame();
-    NSlateApplication::Get().PresentAllWindows();
 }
 
 void NSlateRHIRenderer::FlushCommands()

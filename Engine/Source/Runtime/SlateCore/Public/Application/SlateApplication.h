@@ -25,7 +25,6 @@ public:
     virtual ~NSlateApplication() noexcept;
 
     void Tick();
-    void DispatchQueuedRenderingWorks();
     void PresentAllWindows();
 
     void SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow);

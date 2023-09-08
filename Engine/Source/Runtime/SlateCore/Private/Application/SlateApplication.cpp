@@ -18,10 +18,7 @@ void NSlateApplication::Tick()
 {
     Renderer->BeginFrame();
     Renderer->EndFrame();
-}
-
-void NSlateApplication::DispatchQueuedRenderingWorks()
-{
+    PresentAllWindows();
 }
 
 void NSlateApplication::PresentAllWindows()

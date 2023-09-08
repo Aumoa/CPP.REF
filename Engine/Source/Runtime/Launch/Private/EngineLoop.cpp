@@ -29,7 +29,6 @@ void NEngineLoop::Tick()
 {
     NSlateApplication& SlateApp = NSlateApplication::Get();
     SlateApp.Tick();
-    SlateApp.DispatchQueuedRenderingWorks();
 }
 
 void NEngineLoop::PreInit(String CmdArgs)

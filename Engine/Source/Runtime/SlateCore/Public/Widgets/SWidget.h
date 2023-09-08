@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Layout/SlateVisibility.h"
+#include "Layout/SLateRenderTransform.h"
+#include "Layout/FlowDirection.h"
+#include "Layout/WidgetClipping.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
@@ -26,16 +29,29 @@ class SLATECORE_API SWidget : public SDummyAttributeWidget
 
 private:
 	ESlateVisibility::Enum Visibility = ESlateVisibility::Visible;
+	EFlowDirection FlowDirection = EFlowDirection::LeftToRight;
+	EWidgetClipping Clipping = EWidgetClipping::Inherit;
+
 	Vector2 DesiredSize;
+	NSlateRenderTransform RenderTransform;
+	Vector2 RenderTransformPivot;
+
 	bool bEnabled : 1 = true;
 	bool bInvalidated : 1 = true;
+	bool bHasRenderTransform : 1 = false;
 
 public:
 	SWidget();
 	virtual ~SWidget() noexcept;
 
+	virtual String ToString() const;
+
 	void SetVisibility(ESlateVisibility::Enum InVisibility);
 	ESlateVisibility::Enum GetVisibility() const { return Visibility; }
+
+	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
+	NSlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
+	inline bool HasRenderTransform() { return bHasRenderTransform; }
 
 	void SetEnabled(bool bInEnabled);
 	bool IsEnabled() const { return bEnabled; }

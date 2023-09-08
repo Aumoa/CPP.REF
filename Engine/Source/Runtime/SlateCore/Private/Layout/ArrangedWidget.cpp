@@ -1,0 +1,25 @@
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
+
+#include "Layout/ArrangedWidget.h"
+#include "Widgets/SWidget.h"
+
+NArrangedWidget::NArrangedWidget(SWidget* InWidget, const NGeometry& InGeometry)
+	: Widget(InWidget)
+	, MyGeometry(InGeometry)
+{
+}
+
+String NArrangedWidget::ToString() const
+{
+	return String::Format(TEXT("{} @ {}"), Widget->ToString(), MyGeometry.ToString());
+}
+
+bool NArrangedWidget::operator ==(const NArrangedWidget& Rhs) const
+{
+	return Widget == Rhs.Widget;
+}
+
+bool NArrangedWidget::operator !=(const NArrangedWidget& Rhs) const
+{
+	return Widget != Rhs.Widget;
+}

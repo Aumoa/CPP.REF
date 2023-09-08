@@ -10,6 +10,11 @@ SWidget::~SWidget() noexcept
 {
 }
 
+String SWidget::ToString() const
+{
+	return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
+}
+
 void SWidget::SetVisibility(ESlateVisibility::Enum InVisibility)
 {
 	if (Visibility != InVisibility)
@@ -18,6 +23,17 @@ void SWidget::SetVisibility(ESlateVisibility::Enum InVisibility)
 		OnVisibilityChanged(InVisibility, Visibility);
 		Invalidate();
 	}
+}
+
+Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
+{
+	return RenderTransformPivot;
+}
+
+NSlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
+{
+	checkf(bHasRenderTransform, TEXT("Widget have not render transform."));
+	return RenderTransform;
 }
 
 void SWidget::SetEnabled(bool bInEnabled)
