@@ -8,6 +8,7 @@
 #include "Margin.h"
 #include "PaintGeometry.h"
 #include "Numerics/MatrixInterface/RotatedRect.h"
+#include "Numerics/TransformInterface/Transform.h"
 #include <optional>
 
 class SWidget;

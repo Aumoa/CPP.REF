@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Layout/SlateRenderTransform.h"
 #include "Layout/SlateLayoutTransform.h"
+#include "Numerics/TransformInterface/Transform.h"
 
 struct NPaintGeometry
 {

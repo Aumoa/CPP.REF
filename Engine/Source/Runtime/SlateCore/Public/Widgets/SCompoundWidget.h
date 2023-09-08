@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Widgets/SWidget.h"
+#include "Layout/ArrangedChildrens.h"
 
 class SLATECORE_API SCompoundWidget : public SWidget
 {

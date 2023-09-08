@@ -107,7 +107,7 @@ public:
 	}
 
 	template<TIsVector<float, 2> ITranslate, TIsVector<float, 2> IVector>
-	constexpr static IVector TransformVector(const ITranslate& T, const IVector& V)
+	constexpr static IVector TransformVector([[maybe_unused]] const ITranslate& T, const IVector& V)
 	{
 		return V;
 	}

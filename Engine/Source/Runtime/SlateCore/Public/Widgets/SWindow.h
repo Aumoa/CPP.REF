@@ -29,6 +29,8 @@ public:
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;
 
+	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const override;
+
 	virtual void OnVisibilityChanged(ESlateVisibility::Enum Prev, ESlateVisibility::Enum New);
 
 private:

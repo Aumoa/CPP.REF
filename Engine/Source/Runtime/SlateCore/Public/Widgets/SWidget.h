@@ -7,6 +7,9 @@
 #include "Layout/SLateRenderTransform.h"
 #include "Layout/FlowDirection.h"
 #include "Layout/WidgetClipping.h"
+#include "Layout/Geometry.h"
+#include "Rendering/SlateWindowElementList.h"
+#include "Rendering/PaintArgs.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
@@ -32,9 +35,10 @@ private:
 	EFlowDirection FlowDirection = EFlowDirection::LeftToRight;
 	EWidgetClipping Clipping = EWidgetClipping::Inherit;
 
-	Vector2 DesiredSize;
+	Vector2 CachedDesiredSize;
 	NSlateRenderTransform RenderTransform;
 	Vector2 RenderTransformPivot;
+	float RenderOpacity = 1.0f;
 
 	bool bEnabled : 1 = true;
 	bool bInvalidated : 1 = true;
@@ -45,6 +49,10 @@ public:
 	virtual ~SWidget() noexcept;
 
 	virtual String ToString() const;
+	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
+
+	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const;
+	Vector2 GetDesiredSize() const { return CachedDesiredSize; }
 
 	void SetVisibility(ESlateVisibility::Enum InVisibility);
 	ESlateVisibility::Enum GetVisibility() const { return Visibility; }
@@ -58,11 +66,16 @@ public:
 
 	void Invalidate();
 	bool IsInvalidated() const { return bInvalidated; }
+	void InvalidateLayoutAndVolatility();
+
+	void SetRenderOpacity(float InOpacity);
+	float GetRenderOpacity() const { return RenderOpacity; }
 
 public:
 	BEGIN_SLATE_ATTRIBUTE(SWidget)
-		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility::Enum, Visibility)
-		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility::Enum, Visibility, ESlateVisibility::Visible)
+		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled, true)
+		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
 	END_SLATE_ATTRIBUTE()
 
 	DECLARE_SLATE_CONSTRUCTOR();
@@ -70,6 +83,11 @@ public:
 protected:
 	void CacheDesiredSize();
 	virtual Vector2 ComputeDesiredSize() const = 0;
+
+	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const = 0;
+
+	bool IsChildWidgetCulled(const Rect& CullingRect, const NArrangedWidget& ArrangedChild) const;
+	bool ShouldBeEnabled(bool bParentEnabled) const;
 
 protected:
 	virtual void OnVisibilityChanged([[maybe_unused]] ESlateVisibility::Enum PrevVisibility, [[maybe_unused]] ESlateVisibility::Enum NewVisibility) {}

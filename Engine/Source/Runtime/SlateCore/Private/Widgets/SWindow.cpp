@@ -44,6 +44,11 @@ Vector2 SWindow::ComputeDesiredSize() const
 	return Vector<>::Cast<Vector2>(NativeWindow->GetSize());
 }
 
+int32 SWindow::OnPaint([[maybe_unused]] const NPaintArgs& Args, [[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const Rect& CullingRect, [[maybe_unused]] NSlateWindowElementList& OutDrawElements, int32 InLayer, [[maybe_unused]] bool bParentEnabled) const
+{
+	return InLayer;
+}
+
 void SWindow::OnVisibilityChanged(ESlateVisibility::Enum, ESlateVisibility::Enum)
 {
 	if (NativeWindow)
