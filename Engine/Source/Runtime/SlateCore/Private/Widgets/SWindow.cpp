@@ -34,6 +34,11 @@ void SWindow::Present()
 	}
 }
 
+DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
+{
+	PLATFORM_UNREFERENCED_PARAMETER(Attr);
+}
+
 Vector2 SWindow::ComputeDesiredSize() const
 {
 	return Vector<>::Cast<Vector2>(NativeWindow->GetSize());

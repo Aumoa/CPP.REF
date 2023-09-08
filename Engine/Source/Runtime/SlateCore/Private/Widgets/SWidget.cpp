@@ -41,6 +41,14 @@ void SWidget::Invalidate()
 	bInvalidated = true;
 }
 
+DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
+{
+	Visibility = Attr._Visibility;
+	bEnabled = Attr._bEnabled;
+	
+	Invalidate();
+}
+
 void SWidget::CacheDesiredSize()
 {
 	SetDesiredSize(ComputeDesiredSize());

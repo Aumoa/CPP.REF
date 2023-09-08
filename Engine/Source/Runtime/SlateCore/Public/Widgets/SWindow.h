@@ -20,6 +20,12 @@ public:
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
 	void Present();
 
+public:
+	BEGIN_SLATE_ATTRIBUTE(SWindow)
+	END_SLATE_ATTRIBUTE()
+
+	DECLARE_SLATE_CONSTRUCTOR();
+
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;
 

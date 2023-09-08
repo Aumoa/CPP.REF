@@ -7,7 +7,19 @@
 #include "Numerics/VectorInterface/Vector.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
-class SLATECORE_API SWidget
+class SDummyAttributeWidget
+{
+public:
+	using This = SDummyAttributeWidget;
+	using Super = void;
+
+public:
+	struct NDeclarativeAttr
+	{
+	};
+};
+
+class SLATECORE_API SWidget : public SDummyAttributeWidget
 {
 	SWidget(const SWidget&) = delete;
 	SWidget(SWidget&&) = delete;
@@ -31,6 +43,14 @@ public:
 	void Invalidate();
 	bool IsInvalidated() const { return bInvalidated; }
 
+public:
+	BEGIN_SLATE_ATTRIBUTE(SWidget)
+		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility::Enum, Visibility)
+		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled)
+	END_SLATE_ATTRIBUTE()
+
+	DECLARE_SLATE_CONSTRUCTOR();
+
 protected:
 	void CacheDesiredSize();
 	virtual Vector2 ComputeDesiredSize() const = 0;
@@ -43,3 +63,26 @@ protected:
 private:
 	void SetDesiredSize(const Vector2& InDesiredSize);
 };
+
+namespace DeclarativeSyntaxSupports
+{
+	template<class T, class U>
+	void InvokeConstructorRecursive(T& WidgetInst, U& Args)
+	{
+		static_assert(std::derived_from<T, SWidget>);
+
+		WidgetInst.Construct(static_cast<typename T::NDeclarativeAttr&>(Args));
+		if constexpr (std::same_as<T, SWidget> == false)
+		{
+			InvokeConstructorRecursive(static_cast<T::Super&>(WidgetInst), Args);
+		}
+	}
+}
+
+template<std::derived_from<SWidget> T, class U>
+std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, U&& Args)
+	requires requires { static_cast<typename T::NDeclarativeAttr&>(Args); }
+{
+	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
+	return std::move(WidgetInstPtr);
+}

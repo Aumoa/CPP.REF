@@ -29,6 +29,8 @@ public:
     void PresentAllWindows();
 
     void SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow);
+    SWindow& GetCoreWindow() { return *CoreWindow; }
+
     void SetupSlateRenderer(std::shared_ptr<NSlateRenderer> InRenderer);
 
 private:

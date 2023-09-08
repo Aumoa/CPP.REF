@@ -45,7 +45,7 @@ void NEngineLoop::PreInit(String CmdArgs)
 void NEngineLoop::PostInit()
 {
     NGenericSplash::Hide();
-    NSlateApplication::Get().SetupCoreWindow(SNew(SWindow));
+    NSlateApplication::Get().SetupCoreWindow(SNew(SWindow).Visibility(ESlateVisibility::Visible));
 }
 
 void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
