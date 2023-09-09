@@ -129,3 +129,126 @@ int32 SCanvasPanel::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeo
 
 	return MaxLayerId;
 }
+
+void SCanvasPanel::OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const
+{
+	std::vector<bool> ChildLayers;
+	ArrangeLayeredChildrens(InoutArrangedChildrens, AllottedGeometry, ChildLayers);
+}
+
+void SCanvasPanel::ArrangeLayeredChildrens(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry, std::vector<bool>& ChildLayers) const
+{
+	if (Slots.empty())
+	{
+		return;
+	}
+
+	ChildLayers.reserve(Slots.size());
+
+	// Sort the children based on z-order.
+	std::vector<NChildZOrder> SlotOrder;
+	SlotOrder.reserve(Slots.size());
+
+	for (size_t i = 0; i < Slots.size(); ++i)
+	{
+		auto& CurChild = Slots[i];
+		SlotOrder.emplace_back() =
+		{
+			.ChildIndex = i,
+			.ZOrder = CurChild._ZOrder
+		};
+	}
+
+	static auto SortSlotsByZOrder = [](const NChildZOrder& Lhs, const NChildZOrder& Rhs)
+	{
+		return Lhs.ZOrder == Rhs.ZOrder
+			? std::less<size_t>()(Lhs.ChildIndex, Rhs.ChildIndex)
+			: std::less<int32>()(Lhs.ZOrder, Rhs.ZOrder);
+	};
+
+	std::sort(SlotOrder.begin(), SlotOrder.end(), SortSlotsByZOrder);
+	int32 LastZOrder = std::numeric_limits<int32>::lowest();
+
+	for (size_t ChildIndex = 0; ChildIndex < Slots.size(); ++ChildIndex)
+	{
+		const NChildZOrder& CurSlot = SlotOrder[ChildIndex];
+		const NSlot& CurChild = Slots[CurSlot.ChildIndex];
+		SWidget* CurWidget = CurChild.GetContent();
+
+		ESlateVisibility::Enum ChildVisibility = CurWidget->GetVisibility();
+		if (InoutArrangedChildrens.Accepts(ChildVisibility) == false)
+		{
+			continue;
+		}
+
+		const NMargin& Offset = CurChild.GetOffset();
+		const Vector2& Alignment = CurChild.GetAlignment();
+		const NAnchors& Anchors = CurChild.GetAnchors();
+		const bool bAutoSize = CurChild.IsAutoSize();
+
+		const NMargin AnchorPixels(
+			Anchors.Minimum.X * AllottedGeometry.GetSize().X,
+			Anchors.Minimum.Y * AllottedGeometry.GetSize().Y,
+			Anchors.Maximum.X * AllottedGeometry.GetSize().X,
+			Anchors.Maximum.Y * AllottedGeometry.GetSize().Y
+		);
+
+		const bool bIsHorizontalStretch = Anchors.Minimum.X != Anchors.Maximum.X;
+		const bool bIsVerticalStretch = Anchors.Minimum.Y != Anchors.Maximum.Y;
+
+		const auto SlotSize = Vector2(Offset.Right, Offset.Bottom);
+		const auto Size = bAutoSize ? CurWidget->GetDesiredSize() : SlotSize;
+
+		// Calculate the offset based on the pivot position.
+		const Vector2 AlignmentOffset = Size * Alignment;
+
+		// Calculate the local position based on the anchor and position offset.
+		Vector2 LocalPosition, LocalSize;
+
+		// Calculate the position and size based on the horizontal stretch or non-stretch
+		if (bIsHorizontalStretch)
+		{
+			LocalPosition.X = AnchorPixels.Left + Offset.Left;
+			LocalSize.X = AnchorPixels.Right - LocalPosition.X - Offset.Right;
+		}
+		else
+		{
+			LocalPosition.X = AnchorPixels.Left + Offset.Left - AlignmentOffset.X;
+			LocalSize.X = Size.X;
+		}
+
+		// Calculate the position and size based on the vertical stretch or non-stretch
+		if (bIsVerticalStretch)
+		{
+			LocalPosition.Y = AnchorPixels.Top + Offset.Top;
+			LocalSize.Y = AnchorPixels.Bottom - LocalPosition.Y - Offset.Bottom;
+		}
+		else
+		{
+			LocalPosition.Y = AnchorPixels.Top + Offset.Top - AlignmentOffset.Y;
+			LocalSize.Y = Size.Y;
+		}
+
+		// Add the information about this child to the output list (ArrangedChildren)
+		InoutArrangedChildrens.AddWidget(ChildVisibility, AllottedGeometry.MakeChild(
+			// The child widget being arranged
+			CurWidget,
+			// Child's local position (i.e. position within parent)
+			LocalPosition,
+			// Child's size
+			LocalSize
+		));
+
+		// Split children into discrete layers for the paint method
+		bool bNewLayer = false;
+		if (CurSlot.ZOrder > LastZOrder)
+		{
+			if (ChildLayers.size() > 0)
+			{
+				bNewLayer = true;
+			}
+			LastZOrder = CurSlot.ZOrder;
+		}
+		ChildLayers.emplace_back(bNewLayer);
+	}
+}

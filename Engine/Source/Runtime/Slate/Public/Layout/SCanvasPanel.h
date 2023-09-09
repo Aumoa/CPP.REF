@@ -31,7 +31,7 @@ public:
 private:
 	struct NChildZOrder
 	{
-		int32 ChildIndex = 0;
+		size_t ChildIndex = 0;
 		int32 ZOrder = 0;
 	};
 
@@ -53,7 +53,7 @@ public:
 	{
 		if (Slots.size() < InIndex)
 		{
-			return Slots[InIndex]._Content.get();
+			return Slots[InIndex].GetContent();
 		}
 		else
 		{

@@ -17,7 +17,8 @@ public class Launch : ModuleRules
             "SlateCore",
             "CoreAObject",
             "SlateRHIRenderer",
-            "Engine"
+            "Engine",
+            "Slate"
         });
 
         if (TargetRule.bEditor)
