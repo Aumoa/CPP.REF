@@ -20,7 +20,7 @@ public:																				\
 		}
 
 #define END_SLATE_ATTRIBUTE()														\
-	};
+	}
 
 #define DECLARE_SLATE_ATTRIBUTE(Type, Var, ...)								\
 Type _ ## Var __VA_OPT__(=) __VA_ARGS__;									\

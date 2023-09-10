@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Layout/SizeParam.h"
+#include "Layout/SizeRule.h"
 
 struct NSizeParam
 {

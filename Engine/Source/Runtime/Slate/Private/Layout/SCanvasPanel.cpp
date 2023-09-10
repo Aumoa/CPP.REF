@@ -19,7 +19,7 @@ SCanvasPanel::NSlot& SCanvasPanel::AddSlot()
 
 bool SCanvasPanel::RemoveSlot(size_t Index)
 {
-	if (Slots.size() >= Index)
+	if (Slots.size() <= Index)
 	{
 		return false;
 	}
@@ -29,11 +29,11 @@ bool SCanvasPanel::RemoveSlot(size_t Index)
 	return true;
 }
 
-size_t SCanvasPanel::FindSlot(const SWidget& Content)
+size_t SCanvasPanel::FindSlot(const SWidget& Content) const
 {
 	for (size_t i = 0; i < Slots.size(); ++i)
 	{
-		if (Slots[i]._Content.get() == &Content)
+		if (Slots[i].Content.get() == &Content)
 		{
 			return i;
 		}
@@ -65,7 +65,7 @@ Vector2 SCanvasPanel::ComputeDesiredSize() const
 	for (size_t i = 0; i < Slots.size(); ++i)
 	{
 		const NSlot& CurChild = Slots[i];
-		const SWidget* Widget = CurChild.GetContent();
+		const SWidget* Widget = CurChild.Content.get();
 		if (Widget == nullptr)
 		{
 			continue;
@@ -173,7 +173,7 @@ void SCanvasPanel::ArrangeLayeredChildrens(NArrangedChildrens& InoutArrangedChil
 	{
 		const NChildZOrder& CurSlot = SlotOrder[ChildIndex];
 		const NSlot& CurChild = Slots[CurSlot.ChildIndex];
-		SWidget* CurWidget = CurChild.GetContent();
+		SWidget* CurWidget = CurChild.Content.get();
 
 		ESlateVisibility::Enum ChildVisibility = CurWidget->GetVisibility();
 		if (InoutArrangedChildrens.Accepts(ChildVisibility) == false)

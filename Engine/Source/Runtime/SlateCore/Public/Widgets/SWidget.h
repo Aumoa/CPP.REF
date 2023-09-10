@@ -71,12 +71,16 @@ public:
 	void SetRenderOpacity(float InOpacity);
 	float GetRenderOpacity() const { return RenderOpacity; }
 
+	void SetFlowDirection(EFlowDirection InFlowDirection);
+	EFlowDirection GetFlowDirection() const { return FlowDirection; }
+
 public:
 	BEGIN_SLATE_ATTRIBUTE(SWidget)
 		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility::Enum, Visibility, ESlateVisibility::Visible)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled, true)
 		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
-	END_SLATE_ATTRIBUTE()
+		DECLARE_SLATE_ATTRIBUTE(EFlowDirection, FlowDirection, EFlowDirection::LeftToRight)
+	END_SLATE_ATTRIBUTE();
 
 	DECLARE_SLATE_CONSTRUCTOR();
 

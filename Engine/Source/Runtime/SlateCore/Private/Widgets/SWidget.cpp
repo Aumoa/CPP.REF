@@ -79,7 +79,16 @@ void SWidget::SetRenderOpacity(float InRenderOpacity)
 	if (RenderOpacity != InRenderOpacity)
 	{
 		RenderOpacity = InRenderOpacity;
-		Invalidate();
+		InvalidateLayoutAndVolatility();
+	}
+}
+
+void SWidget::SetFlowDirection(EFlowDirection InFlowDirection)
+{
+	if (FlowDirection != InFlowDirection)
+	{
+		FlowDirection = InFlowDirection;
+		InvalidateLayoutAndVolatility();
 	}
 }
 

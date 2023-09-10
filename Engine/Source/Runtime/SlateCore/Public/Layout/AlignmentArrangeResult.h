@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Layout/Margin.h"
 #include "Layout/FlowDirection.h"
+#include "Layout/Orientation.h"
 
 class SWidget;
 
@@ -19,10 +20,10 @@ struct NAlignmentArrangeResult
 	{
 	}
 
-	template<class TSlot> requires requires { { std::declval<TSlot>().GetContent() } -> std::same_as<SWidget*>; }
-	static NAlignmentArrangeResult AlignChild(EOrientation InOrientation, EFlowDirection InLayoutFlow, float AllottedSize, TSlot& ChildToArrange, Margin SlotPadding, float ContentScale = 1.0f, bool bClampToParent = true)
+	template<class TSlot>
+	static NAlignmentArrangeResult AlignChild(EOrientation InOrientation, EFlowDirection InLayoutFlow, float AllottedSize, TSlot& ChildToArrange, NMargin SlotPadding, float ContentScale = 1.0f, bool bClampToParent = true)
 	{
-		Margin Margin = SlotPadding;
+		NMargin Margin = SlotPadding;
 		float TotalMargin = Margin.GetTotalSpaceAlong(InOrientation);
 		float MarginPre = (InOrientation == EOrientation::Horizontal) ? Margin.Left : Margin.Top;
 		float MarginPost = (InOrientation == EOrientation::Horizontal) ? Margin.Right : Margin.Bottom;
@@ -34,10 +35,10 @@ struct NAlignmentArrangeResult
 		}
 
 		float ChildDesiredSize = (InOrientation == EOrientation::Horizontal)
-			? (ChildToArrange.GetContent()->GetDesiredSize().X * ContentScale)
-			: (ChildToArrange.GetContent()->GetDesiredSize().Y * ContentScale);
+			? (ChildToArrange.Content->GetDesiredSize().X * ContentScale)
+			: (ChildToArrange.Content->GetDesiredSize().Y * ContentScale);
 
-		float ChildSize = bClampToParent ? MathEx::Min(ChildDesiredSize, AllottedSize - TotalMargin) : ChildDesiredSize;
+		float ChildSize = bClampToParent ? Math::Min(ChildDesiredSize, AllottedSize - TotalMargin) : ChildDesiredSize;
 
 		switch (Alignment)
 		{

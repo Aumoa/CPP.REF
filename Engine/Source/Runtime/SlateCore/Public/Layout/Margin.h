@@ -66,6 +66,7 @@ struct NMargin
 		case EOrientation::Vertical: return Top + Bottom;
 		default:
 			checkf(false, TEXT("Invalid argument: Orientation({})"), (int32)Orientation);
+			return 0.0f;
 		}
 	}
 
