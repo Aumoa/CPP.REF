@@ -6,12 +6,14 @@
 
 class NGenericWindow;
 class NRHIViewport;
+class SViewport;
 
 class SLATECORE_API SWindow : public SCompoundWidget
 {
 private:
 	std::shared_ptr<NGenericWindow> NativeWindow;
 	std::shared_ptr<NRHIViewport> Viewport;
+	std::vector<std::shared_ptr<SViewport>> SlateViewports;
 
 public:
 	SWindow();
@@ -19,6 +21,8 @@ public:
 
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
 	void Present();
+
+	void AddViewport(std::shared_ptr<SViewport> InViewport);
 
 public:
 	BEGIN_SLATE_ATTRIBUTE(SWindow)

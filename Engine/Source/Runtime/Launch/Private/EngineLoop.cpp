@@ -35,8 +35,10 @@ void NEngineLoop::PreInit(String CmdArgs)
 {
     PreInitPreStartupScreen(CmdArgs);
 
+#if WITH_EDITOR
     // Show splash window.
     NGenericSplash::Show();
+#endif
 
     PreInitPostStartupScreen();
 }

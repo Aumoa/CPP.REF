@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/SWindow.h"
+#include "Widgets/SViewport.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "RHI/RHIViewport.h"
@@ -32,6 +33,11 @@ void SWindow::Present()
 	{
 		Viewport->Present();
 	}
+}
+
+void SWindow::AddViewport(std::shared_ptr<SViewport> InViewport)
+{
+	SlateViewports.emplace_back(std::move(InViewport));
 }
 
 DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)

@@ -15,6 +15,7 @@ public class CoreEd : ModuleRules
         {
             "Core",
             "SlateCore",
+            "MainFrame",
             "Engine"
         });
     }

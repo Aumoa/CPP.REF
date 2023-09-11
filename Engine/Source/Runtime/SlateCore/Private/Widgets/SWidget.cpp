@@ -16,7 +16,7 @@ String SWidget::ToString() const
 	return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
 }
 
-void SWidget::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)
+void SWidget::Tick([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const TimeSpan& InDeltaTime)
 {
 }
 
