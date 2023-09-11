@@ -16,6 +16,9 @@ NSlateApplication::~NSlateApplication() noexcept
 
 void NSlateApplication::Tick()
 {
+    TimeSpan DeltaTime = Timer.Tick();
+    CoreWindow->ExecuteTick(DeltaTime);
+
     Renderer->BeginFrame();
     Renderer->EndFrame();
     PresentAllWindows();

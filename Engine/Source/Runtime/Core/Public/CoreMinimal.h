@@ -71,6 +71,7 @@
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"
 #include "Diagnostics/PerformanceTimer.h"
+#include "Diagnostics/TickTimer.h"
 
 #include "Threading/Spinlock.h"
 #include "Threading/Thread.h"

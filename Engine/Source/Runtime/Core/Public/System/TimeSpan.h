@@ -9,7 +9,7 @@ using namespace std::chrono_literals;
 
 class TimeSpan
 {
-	std::chrono::nanoseconds _val;
+	std::chrono::nanoseconds Val;
 
 public:
 	static constexpr const int64 TicksPerYear = std::nano::den * std::chrono::years::period::num;
@@ -24,31 +24,31 @@ public:
 
 public:
 	inline constexpr TimeSpan() noexcept
-		: _val(0ns)
+		: Val(0ns)
 	{
 	}
 
-	inline constexpr TimeSpan(const std::chrono::nanoseconds& val) noexcept
-		: _val(val)
+	inline constexpr TimeSpan(const std::chrono::nanoseconds& InVal) noexcept
+		: Val(InVal)
 	{
 	}
 
 	template<class TRep, class TPeriod>
-	inline constexpr TimeSpan(const std::chrono::duration<TRep, TPeriod>& val) noexcept
-		: _val(std::chrono::duration_cast<std::chrono::nanoseconds>(val))
+	inline constexpr TimeSpan(const std::chrono::duration<TRep, TPeriod>& InVal) noexcept
+		: Val(std::chrono::duration_cast<std::chrono::nanoseconds>(InVal))
 	{
 	}
 
 public:
 	inline constexpr int64 GetYears() const noexcept
 	{
-		return std::chrono::floor<std::chrono::years>(_val).count();
+		return std::chrono::floor<std::chrono::years>(Val).count();
 	}
 
 	inline constexpr int64 GetMonths() const noexcept
 	{
-		auto years = std::chrono::floor<std::chrono::years>(_val);
-		return std::chrono::floor<std::chrono::months>(_val - years).count();
+		auto Years = std::chrono::floor<std::chrono::years>(Val);
+		return std::chrono::floor<std::chrono::months>(Val - Years).count();
 	}
 
 	template<class T = int64>
@@ -56,13 +56,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::months::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::months::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetDays() const noexcept
 	{
-		auto months = std::chrono::floor<std::chrono::months>(_val);
-		return std::chrono::floor<std::chrono::days>(_val - months).count();
+		auto Months = std::chrono::floor<std::chrono::months>(Val);
+		return std::chrono::floor<std::chrono::days>(Val - Months).count();
 	}
 
 	template<class T = int64>
@@ -70,13 +70,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::days::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::days::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetHours() const noexcept
 	{
-		auto days = std::chrono::floor<std::chrono::days>(_val);
-		return std::chrono::floor<std::chrono::hours>(_val - days).count();
+		auto Days = std::chrono::floor<std::chrono::days>(Val);
+		return std::chrono::floor<std::chrono::hours>(Val - Days).count();
 	}
 
 	template<class T = int64>
@@ -84,13 +84,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::hours::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::hours::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetMinutes() const noexcept
 	{
-		auto hours = std::chrono::floor<std::chrono::hours>(_val);
-		return std::chrono::floor<std::chrono::minutes>(_val - hours).count();
+		auto Hours = std::chrono::floor<std::chrono::hours>(Val);
+		return std::chrono::floor<std::chrono::minutes>(Val - Hours).count();
 	}
 
 	template<class T = int64>
@@ -98,13 +98,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::minutes::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::minutes::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetSeconds() const noexcept
 	{
-		auto minutes = std::chrono::floor<std::chrono::minutes>(_val);
-		return std::chrono::floor<std::chrono::seconds>(_val - minutes).count();
+		auto Minutes = std::chrono::floor<std::chrono::minutes>(Val);
+		return std::chrono::floor<std::chrono::seconds>(Val - Minutes).count();
 	}
 
 	template<class T = int64>
@@ -112,13 +112,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::seconds::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::seconds::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetMilliseconds() const noexcept
 	{
-		auto seconds = std::chrono::floor<std::chrono::seconds>(_val);
-		return std::chrono::floor<std::chrono::milliseconds>(_val - seconds).count();
+		auto Seconds = std::chrono::floor<std::chrono::seconds>(Val);
+		return std::chrono::floor<std::chrono::milliseconds>(Val - Seconds).count();
 	}
 
 	template<class T = int64>
@@ -126,13 +126,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::milliseconds::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::milliseconds::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetMicroseconds() const noexcept
 	{
-		auto milliseconds = std::chrono::floor<std::chrono::milliseconds>(_val);
-		return std::chrono::floor<std::chrono::microseconds>(_val - milliseconds).count();
+		auto Milliseconds = std::chrono::floor<std::chrono::milliseconds>(Val);
+		return std::chrono::floor<std::chrono::microseconds>(Val - Milliseconds).count();
 	}
 
 	template<class T = int64>
@@ -140,13 +140,13 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::microseconds::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::microseconds::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetNanoseconds() const noexcept
 	{
-		auto microseconds = std::chrono::floor<std::chrono::microseconds>(_val);
-		return std::chrono::floor<std::chrono::nanoseconds>(_val - microseconds).count();
+		auto Microseconds = std::chrono::floor<std::chrono::microseconds>(Val);
+		return std::chrono::floor<std::chrono::nanoseconds>(Val - Microseconds).count();
 	}
 
 	template<class T = int64>
@@ -154,102 +154,102 @@ public:
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::nanoseconds::period>>(_val).count();
+		return std::chrono::duration_cast<std::chrono::duration<T, std::chrono::nanoseconds::period>>(Val).count();
 	}
 
 	inline constexpr int64 GetTicks() const noexcept
 	{
-		return _val.count();
+		return Val.count();
 	}
 
 	inline constexpr std::chrono::microseconds GetSpan() const noexcept
 	{
-		return std::chrono::duration_cast<std::chrono::microseconds>(_val);
+		return std::chrono::duration_cast<std::chrono::microseconds>(Val);
 	}
 
 public:
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromYears(T years) noexcept
+	static inline constexpr TimeSpan FromYears(T Years) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::years::period>(years));
+		return TimeSpan(std::chrono::duration<T, std::chrono::years::period>(Years));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromMonths(T months) noexcept
+	static inline constexpr TimeSpan FromMonths(T Months) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::months::period>(months));
+		return TimeSpan(std::chrono::duration<T, std::chrono::months::period>(Months));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromDays(T days) noexcept
+	static inline constexpr TimeSpan FromDays(T Days) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::days::period>(days));
+		return TimeSpan(std::chrono::duration<T, std::chrono::days::period>(Days));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromHours(T hours) noexcept
+	static inline constexpr TimeSpan FromHours(T Hours) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::hours::period>(hours));
+		return TimeSpan(std::chrono::duration<T, std::chrono::hours::period>(Hours));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromMinutes(T minutes) noexcept
+	static inline constexpr TimeSpan FromMinutes(T Minutes) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::minutes::period>(minutes));
+		return TimeSpan(std::chrono::duration<T, std::chrono::minutes::period>(Minutes));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromSeconds(T seconds) noexcept
+	static inline constexpr TimeSpan FromSeconds(T Seconds) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::seconds::period>(seconds));
+		return TimeSpan(std::chrono::duration<T, std::chrono::seconds::period>(Seconds));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromMilliseconds(T milliseconds) noexcept
+	static inline constexpr TimeSpan FromMilliseconds(T Milliseconds) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::milliseconds::period>(milliseconds));
+		return TimeSpan(std::chrono::duration<T, std::chrono::milliseconds::period>(Milliseconds));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromMicroseconds(T microseconds) noexcept
+	static inline constexpr TimeSpan FromMicroseconds(T Microseconds) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::microseconds::period>(microseconds));
+		return TimeSpan(std::chrono::duration<T, std::chrono::microseconds::period>(Microseconds));
 	}
 
 	template<class T> requires
 		std::integral<T> ||
 		std::floating_point<T>
-	static inline constexpr TimeSpan FromNanoseconds(T nanoseconds) noexcept
+	static inline constexpr TimeSpan FromNanoseconds(T Nanoseconds) noexcept
 	{
-		return TimeSpan(std::chrono::duration<T, std::chrono::nanoseconds::period>(nanoseconds));
+		return TimeSpan(std::chrono::duration<T, std::chrono::nanoseconds::period>(Nanoseconds));
 	}
 
 public:
 	inline constexpr operator const std::chrono::nanoseconds& () const noexcept
 	{
-		return _val;
+		return Val;
 	}
 
 	template<class TRep, class TPeriod>
 	inline constexpr operator std::chrono::duration<TRep, TPeriod>() const noexcept
 	{
-		return std::chrono::duration_cast<std::chrono::duration<TRep, TPeriod>>(_val);
+		return std::chrono::duration_cast<std::chrono::duration<TRep, TPeriod>>(Val);
 	}
 
 	template<class T>
@@ -260,59 +260,59 @@ public:
 		return this->template GetTotalSeconds<T>();
 	}
 
-	inline constexpr TimeSpan& operator =(const TimeSpan& rhs) noexcept
+	inline constexpr TimeSpan& operator =(const TimeSpan& Rhs) noexcept
 	{
-		_val = rhs._val;
+		Val = Rhs.Val;
 		return *this;
 	}
 
-	inline constexpr TimeSpan& operator +=(const TimeSpan& rhs) noexcept
+	inline constexpr TimeSpan& operator +=(const TimeSpan& Rhs) noexcept
 	{
-		_val += rhs._val;
+		Val += Rhs.Val;
 		return *this;
 	}
 
-	inline constexpr TimeSpan& operator -=(const TimeSpan& rhs) noexcept
+	inline constexpr TimeSpan& operator -=(const TimeSpan& Rhs) noexcept
 	{
-		_val -= rhs._val;
+		Val -= Rhs.Val;
 		return *this;
 	}
 
 	template<class T>
-	inline constexpr TimeSpan& operator *=(T rhs) noexcept requires
+	inline constexpr TimeSpan& operator *=(T Rhs) noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		_val *= rhs;
+		Val *= Rhs;
 		return *this;
 	}
 
-	inline constexpr bool operator ==(const TimeSpan& rhs) const noexcept
+	inline constexpr bool operator ==(const TimeSpan& Rhs) const noexcept
 	{
-		return _val == rhs._val;
+		return Val == Rhs.Val;
 	}
 
-	inline constexpr auto operator <=>(const TimeSpan& rhs) const noexcept
+	inline constexpr auto operator <=>(const TimeSpan& Rhs) const noexcept
 	{
-		return _val <=> rhs._val;
+		return Val <=> Rhs.Val;
 	}
 
-	inline constexpr TimeSpan operator +(const TimeSpan& rhs) const noexcept
+	inline constexpr TimeSpan operator +(const TimeSpan& Rhs) const noexcept
 	{
-		return _val + rhs._val;
+		return Val + Rhs.Val;
 	}
 
-	inline constexpr TimeSpan operator -(const TimeSpan& rhs) const noexcept
+	inline constexpr TimeSpan operator -(const TimeSpan& Rhs) const noexcept
 	{
-		return _val + rhs._val;
+		return Val - Rhs.Val;
 	}
 
 	template<class T>
-	inline constexpr TimeSpan operator *(T rhs) const noexcept requires
+	inline constexpr TimeSpan operator *(T Rhs) const noexcept requires
 		std::integral<T> ||
 		std::floating_point<T>
 	{
-		return _val * rhs;
+		return Val * Rhs;
 	}
 
 public:

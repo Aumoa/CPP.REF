@@ -15,6 +15,14 @@ SWindow::~SWindow() noexcept
 {
 }
 
+void SWindow::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)
+{
+	for (auto& Vp : SlateViewports)
+	{
+		Vp->Tick(AllottedGeometry, InDeltaTime);
+	}
+}
+
 void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 {
 	check(!NativeWindow);
@@ -25,6 +33,12 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 	Viewport = DynamicRHI.CreateViewport(NRHIGlobal::GetPrimaryCommandQueue(), *NativeWindow);
 
 	UpdateWindowVisibility();
+}
+
+void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
+{
+	Vector2 AllottedSize = ComputeDesiredSize();
+	Tick(NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity()), InDeltaTime);
 }
 
 void SWindow::Present()

@@ -5,3 +5,7 @@
 SEditorViewport::SEditorViewport()
 {
 }
+
+void SEditorViewport::Tick([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const TimeSpan& InDeltaTime)
+{
+}

@@ -8,10 +8,13 @@
 
 class CORE_API PerformanceTimer
 {
+
 public:
-	PerformanceTimer() noexcept;
+	PerformanceTimer() noexcept {}
+	PerformanceTimer(std::in_place_t) noexcept { Start(); }
 	PerformanceTimer(const PerformanceTimer& Rhs) noexcept;
-	~PerformanceTimer() noexcept;
+	PerformanceTimer(PerformanceTimer&& Rhs) noexcept;
+	~PerformanceTimer() noexcept {}
 
 	void Start() noexcept;
 	void Stop() noexcept;
@@ -26,6 +29,7 @@ public:
 
 public:
 	PerformanceTimer& operator =(const PerformanceTimer& Rhs) noexcept;
+	PerformanceTimer& operator =(PerformanceTimer&& Rhs) noexcept;
 
 private:
 	std::optional<DateTime> StartTime;

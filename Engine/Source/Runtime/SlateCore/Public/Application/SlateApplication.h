@@ -17,6 +17,7 @@ class SLATECORE_API NSlateApplication
 private:
     std::shared_ptr<SWindow> CoreWindow;
     std::shared_ptr<NSlateRenderer> Renderer;
+    TickTimer Timer;
 
 private:
     NSlateApplication();
