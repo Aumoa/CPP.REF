@@ -89,7 +89,7 @@ public class VSLinker : Linker
         PSI.RedirectStandardOutput = true;
         PSI.RedirectStandardError = true;
 
-        IEnumerable<string> LinkLibraries = Module.AdditionalLibraries.Select(p => $"\"{p}\"");
+        IEnumerable<string> LinkLibraries = Module.PrivateAdditionalLibraries.Select(p => $"\"{p}\"");
         LinkLibraries = LinkLibraries.Concat(Module.DependModules.Select(p => $"\"{p}.lib\""));
         string LinkLibrary = string.Join(' ', LinkLibraries);
         LinkLibrary = $"/DYNAMICBASE {LinkLibrary}";

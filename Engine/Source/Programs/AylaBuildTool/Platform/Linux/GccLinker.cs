@@ -69,7 +69,7 @@ public class GccLinker : Linker
         PSI.RedirectStandardError = true;
         PSI.Environment["LDFLAGS"] = "-Wl,--copy-dt-needed-entries";
 
-        IEnumerable<string> Links = Module.AdditionalLibraries.Concat(Module.DependModules);
+        IEnumerable<string> Links = Module.PrivateAdditionalLibraries.Concat(Module.DependModules);
         IEnumerable<string> LinkLibraries = Links.Select(p => $"-l\"{p}\"");
         string LinkLibrary = $"{string.Join(' ', LinkLibraries)} ";
 

@@ -145,7 +145,7 @@ public class ClCompiler : Compiler
 
         PSI.Arguments += $"{IncludeStr} {MacroStr} ";
 
-        string DisableWarnings = string.Join(' ', Item.ModuleInfo.DisableWarnings.Select(p => $"/wd{p}"));
+        string DisableWarnings = string.Join(' ', Item.ModuleInfo.PrivateDisableWarnings.Select(p => $"/wd{p}"));
         PSI.Arguments += $"{DisableWarnings} ";
     }
 

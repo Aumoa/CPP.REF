@@ -55,46 +55,50 @@ public class ModuleDependenciesResolver
             List<string> IncludePaths = new();
             List<string> AdditionalMacros = new();
             List<string> ApiDescriptions = new();
-            List<string> AdditionalLibraries = new();
+            List<string> AdditionalLibs = new();
             List<int> DisableWarnings = new();
 
             foreach (var Depend in ModuleRule.PublicDependencyModuleNames.Concat(ModuleRule.PrivateDependencyModuleNames))
             {
                 SearchDependencyRecursive(Depend, false);
                 ModuleInformation? DependCache = DependencyCaches[Depend];
-                IncludePaths.AddRange(DependCache.IncludePaths);
-                AdditionalMacros.AddRange(DependCache.AdditionalMacros);
+                IncludePaths.AddRange(DependCache.PublicIncludePaths);
+                AdditionalMacros.AddRange(DependCache.PublicAdditionalMacros);
                 ApiDescriptions.AddRange(DependCache.DependModules);
                 ApiDescriptions.Add(Depend);
-                AdditionalLibraries.AddRange(DependCache.AdditionalLibraries);
-                DisableWarnings.AddRange(DependCache.DisableWarnings);
+                AdditionalLibs.AddRange(DependCache.PublicAdditionalLibraries);
+                DisableWarnings.AddRange(DependCache.PublicDisableWarnings);
             }
 
-            IncludePaths.AddRange(ModuleRule.PublicIncludePaths.Select(AsFullPath));
-            IncludePaths.AddRange(ModuleRule.PrivateIncludePaths.Select(AsFullPath));
-            AdditionalMacros.AddRange(ModuleRule.PublicAdditionalMacros);
-            AdditionalMacros.AddRange(ModuleRule.PrivateAdditionalMacros);
-            AdditionalLibraries.AddRange(ModuleRule.PublicAdditionalLibraries);
-            AdditionalLibraries.AddRange(ModuleRule.PrivateAdditionalLibraries);
-            DisableWarnings.AddRange(ModuleRule.PublicDisableWarnings);
-            DisableWarnings.AddRange(ModuleRule.PrivateDisableWarnings);
+            string[] PublicIncludePaths = IncludePaths.Concat(ModuleRule.PublicIncludePaths.Select(AsFullPath)).Distinct().ToArray();
+            string[] PrivateIncludePaths = PublicIncludePaths.Concat(ModuleRule.PrivateIncludePaths.Select(AsFullPath)).Distinct().ToArray();
+            string[] PublicAdditionalMacros = AdditionalMacros.Concat(ModuleRule.PublicAdditionalMacros).Distinct().ToArray();
+            string[] PrivateAdditionalMacros = PublicAdditionalMacros.Concat(ModuleRule.PrivateAdditionalMacros).Distinct().ToArray();
+            string[] PublicAdditionalLibs = AdditionalLibs.Concat(ModuleRule.PublicAdditionalLibraries).Distinct().ToArray();
+            string[] PrivateAdditionalLibs = PublicAdditionalLibs.Concat(ModuleRule.PrivateAdditionalLibraries).Distinct().ToArray();
+            int[] PublicDisableWarnings = DisableWarnings.Concat(ModuleRule.PublicDisableWarnings).Distinct().ToArray();
+            int[] PrivateDisableWarnings = PublicDisableWarnings.Concat(ModuleRule.PrivateDisableWarnings).Distinct().ToArray();
 
             IEnumerable<string> SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories);
             SourceFiles = SourceFiles.Where(Global.IsSourceCode);
 
-            DependencyCaches[Current] = new()
+            DependencyCaches[Current] = new ModuleInformation()
             {
                 Name = Current,
                 TargetType = bPrimary ? Rule.Type : TargetType.Module,
                 ProjectDir = ProjectDir,
-                IncludePaths = IncludePaths.Distinct().ToArray(),
-                AdditionalMacros = AdditionalMacros.Distinct().ToArray(),
                 SourceFiles = SourceFiles.ToArray(),
                 SourcePath = SourcePath,
                 GeneratedIncludePath = IncludePath,
                 DependModules = ApiDescriptions.Distinct().ToArray(),
-                AdditionalLibraries = AdditionalLibraries.Distinct().ToArray(),
-                DisableWarnings = DisableWarnings.Distinct().ToArray(),
+                PublicIncludePaths = PublicIncludePaths,
+                PrivateIncludePaths = PrivateIncludePaths,
+                PublicAdditionalMacros = PublicAdditionalMacros,
+                PrivateAdditionalMacros = PrivateAdditionalMacros, 
+                PublicAdditionalLibraries = PublicAdditionalLibs,
+                PrivateAdditionalLibraries = PrivateAdditionalLibs,
+                PublicDisableWarnings = PublicDisableWarnings,
+                PrivateDisableWarnings = PrivateDisableWarnings,
             };
         }
     }

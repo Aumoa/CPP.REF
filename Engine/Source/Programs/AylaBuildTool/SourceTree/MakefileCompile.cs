@@ -21,7 +21,7 @@ public sealed record MakefileCompile
 
     public IEnumerable<string> CollectCompilerIncludePaths()
     {
-        return ModuleInfo.IncludePaths.Append(ModuleInfo.GeneratedIncludePath);
+        return ModuleInfo.PrivateIncludePaths.Append(ModuleInfo.GeneratedIncludePath);
     }
 
     public IEnumerable<(string, string?)> CollectCompilerMacros(TargetRules Rule)
@@ -42,7 +42,7 @@ public sealed record MakefileCompile
         Macros.Add(("WITH_EDITOR", bEditor ? "1" : "0"));
 
         // User-defined macros.
-        Macros.AddRange(ModuleInfo.AdditionalMacros.Select(p => (p, (string?)null)));
+        Macros.AddRange(ModuleInfo.PrivateAdditionalMacros.Select(p => (p, (string?)null)));
 
         // Library import macros.
         Macros.AddRange(ModuleInfo.DependModules.Select(p =>

@@ -203,7 +203,7 @@ public class VisualCXXProject : IVisualStudioProject
 
                     if (Module != null)
                     {
-                        IEnumerable<string> Macros = Module.AdditionalMacros;
+                        IEnumerable<string> Macros = Module.PrivateAdditionalMacros;
                         Macros = Macros.Concat(Module.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"));
                         Macros = Macros.Append($"{Module.Name.ToUpper()}_API=__declspec(dllexport)");
 
@@ -213,7 +213,7 @@ public class VisualCXXProject : IVisualStudioProject
                         string GeneratedInclude = Path.Combine(Module.GeneratedIncludePath, Module.Name);
 
                         var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
-                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.IncludePaths.Append(GeneratedInclude))};%(AdditionalIncludeDirectories)";
+                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.PrivateIncludePaths.Append(GeneratedInclude))};%(AdditionalIncludeDirectories)";
 
                         if (Module.DependModules.Contains("Core"))
                         {

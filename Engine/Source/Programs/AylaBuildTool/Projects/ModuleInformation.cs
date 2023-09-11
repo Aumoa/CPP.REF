@@ -13,10 +13,6 @@ public record ModuleInformation
 
     public required TargetType TargetType { get; init; }
 
-    public required string[] IncludePaths { get; init; }
-
-    public required string[] AdditionalMacros { get; init; }
-
     public required string[] SourceFiles { get; set; }
 
     public required string SourcePath { get; init; }
@@ -25,7 +21,19 @@ public record ModuleInformation
 
     public required string[] DependModules { get; init; }
 
-    public required string[] AdditionalLibraries { get; init; }
+    public required string[] PublicIncludePaths { get; init; }
 
-    public required int[] DisableWarnings { get; init; }
+    public required string[] PrivateIncludePaths { get; init; }
+
+    public required string[] PublicAdditionalMacros { get; init; }
+
+    public required string[] PrivateAdditionalMacros { get; init; }
+
+    public required string[] PublicAdditionalLibraries { get; init; }
+
+    public required string[] PrivateAdditionalLibraries { get; init; }
+
+    public required int[] PublicDisableWarnings { get; init; }
+
+    public required int[] PrivateDisableWarnings { get; init; }
 }

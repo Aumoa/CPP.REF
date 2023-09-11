@@ -32,6 +32,8 @@ public:
 			|| std::same_as<T, int64>
 			|| std::same_as<T, uint64>;
 	}
+
+	static constexpr size_t Npos = ~size_t(0);
 };
 
 template<class T>

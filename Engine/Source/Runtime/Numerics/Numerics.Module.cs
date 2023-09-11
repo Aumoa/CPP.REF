@@ -15,8 +15,9 @@ public class Numerics : ModuleRules
             "Core"
         });
 
-        PrivateDisableWarnings.AddRange(new[]
+        PublicDisableWarnings.AddRange(new[]
         {
+            // In C11, unnamed union structure is allowed actually.
             4201
         });
     }

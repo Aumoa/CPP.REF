@@ -49,7 +49,7 @@ size_t SBoxPanel::FindSlot(const SWidget& InContent) const
 		}
 	}
 
-	return -1;
+	return IntegralTypes::Npos;
 }
 
 void SBoxPanel::ClearSlots()

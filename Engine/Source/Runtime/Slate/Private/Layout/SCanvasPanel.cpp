@@ -39,7 +39,7 @@ size_t SCanvasPanel::FindSlot(const SWidget& Content) const
 		}
 	}
 
-	return -1;
+	return IntegralTypes::Npos;
 }
 
 void SCanvasPanel::ClearSlots()
