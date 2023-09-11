@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/SWidget.h"
+#include "Widgets/SCompoundWidget.h"
 #include "Layout/ArrangedChildrens.h"
 
 template<class UPanel>
@@ -25,7 +25,7 @@ struct NPanelSlotBase
 	}
 };
 
-class SLATECORE_API SPanel : public SWidget
+class SLATECORE_API SPanel : public SCompoundWidget
 {
 public:
 	SPanel();
@@ -39,7 +39,4 @@ public:
 	END_SLATE_ATTRIBUTE();
 
 	DECLARE_SLATE_CONSTRUCTOR() {}
-
-protected:
-	virtual void OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const = 0;
 };

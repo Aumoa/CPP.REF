@@ -13,13 +13,13 @@ class SLATECORE_API NArrangedWidget
 	NGeometry MyGeometry;
 
 public:
-	NArrangedWidget(SWidget* InWidget, const NGeometry& InGeometry);
+	NArrangedWidget(std::shared_ptr<SWidget> InWidget, const NGeometry& InGeometry);
 
 	String ToString() const;
 
-	SWidget* GetWidget() const { return Widget.get(); }
+	std::shared_ptr<SWidget> GetWidget() const { return Widget; }
 	const NGeometry& GetGeometry() const { return MyGeometry; }
 
-	bool operator ==(const NArrangedWidget& Rhs) const;
-	bool operator !=(const NArrangedWidget& Rhs) const;
+	bool operator ==(const NArrangedWidget& Rhs) const { return Widget != Rhs.Widget; }
+	auto operator <=>(const NArrangedWidget& Rhs) const { return Widget <=> Rhs.Widget; }
 };

@@ -119,9 +119,9 @@ public:
 		return NGeometry(LocalSize, NSlateLayoutTransform(ChildScale, Scale2D(ChildScale).TransformPoint(ChildOffset)), GetAccumulatedLayoutTransform(), GetAccumulatedRenderTransform(), bHasRenderTransform);
 	}
 
-	NArrangedWidget MakeChild(SWidget* ChildWidget, const Vector2& LocalSize, const NSlateLayoutTransform& LayoutTransform) const;
-	NArrangedWidget MakeChild(SWidget* ChildWidget, const NLayoutGeometry& LayoutGeometry) const;
-	NArrangedWidget MakeChild(SWidget* ChildWidget, const Translate2D& ChildOffset, const Vector2& LocalSize, const Scale2D& ChildScale = Scale2D::Identity()) const;
+	NArrangedWidget MakeChild(std::shared_ptr<SWidget> ChildWidget, const Vector2& LocalSize, const NSlateLayoutTransform& LayoutTransform) const;
+	NArrangedWidget MakeChild(std::shared_ptr<SWidget> ChildWidget, const NLayoutGeometry& LayoutGeometry) const;
+	NArrangedWidget MakeChild(std::shared_ptr<SWidget> ChildWidget, const Translate2D& ChildOffset, const Vector2& LocalSize, const Scale2D& ChildScale = Scale2D::Identity()) const;
 
 	constexpr NPaintGeometry ToPaintGeometry() const
 	{

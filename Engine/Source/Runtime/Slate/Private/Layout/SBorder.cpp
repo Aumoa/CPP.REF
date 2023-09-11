@@ -1,14 +1,16 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Widgets/Layout/SBorder.h"
+#include "Layout/SBorder.h"
 
-using namespace ::libty;
-
-SBorder::SBorder() : Super()
+SBorder::SBorder()
 {
 }
 
-void SBorder::SetPadding(const Margin& InPadding)
+SBorder::~SBorder() noexcept
+{
+}
+
+void SBorder::SetPadding(const NMargin& InPadding)
 {
 	if (Padding != InPadding)
 	{
@@ -17,26 +19,16 @@ void SBorder::SetPadding(const Margin& InPadding)
 	}
 }
 
-Margin SBorder::GetPadding()
-{
-	return Padding;
-}
-
-void SBorder::SetContent(SWidget* InContent)
+void SBorder::SetContent(std::shared_ptr<SWidget> InContent)
 {
 	if (Content != InContent)
 	{
-		Content = InContent;
+		Content = std::move(InContent);
 		InvalidateLayoutAndVolatility();
 	}
 }
 
-SWidget* SBorder::GetContent()
-{
-	return Content;
-}
-
-Vector2 SBorder::ComputeDesiredSize()
+Vector2 SBorder::ComputeDesiredSize() const
 {
 	if (Content && Content->GetVisibility() != ESlateVisibility::Collapsed)
 	{
@@ -48,7 +40,7 @@ Vector2 SBorder::ComputeDesiredSize()
 	}
 }
 
-void SBorder::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geometry& AllottedGeometry)
+void SBorder::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const NGeometry& AllottedGeometry) const
 {
 	if (Content && Content->GetVisibility() != ESlateVisibility::Collapsed)
 	{
@@ -64,9 +56,8 @@ void SBorder::OnArrangeChildren(ArrangedChildrens& ArrangedChildrens, const Geom
 	}
 }
 
-DEFINE_SLATE_CONSTRUCTOR(SBorder, Attr)
+DEFINE_SLATE_CONSTRUCTOR(SBorder, Args)
 {
-	INVOKE_SLATE_CONSTRUCTOR_SUPER(Attr);
-	Padding = Attr._Padding;
-	Content = Attr._Content;
+	Padding = Args._Padding;
+	Content = Args._Content;
 }

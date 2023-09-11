@@ -4,7 +4,7 @@
 #include "Layout/ArrangedWidget.h"
 #include "Widgets/SWidget.h"
 
-NArrangedWidget NGeometry::MakeChild(SWidget* ChildWidget, const Vector2& LocalSize, const NSlateLayoutTransform& LayoutTransform) const
+NArrangedWidget NGeometry::MakeChild(std::shared_ptr<SWidget> ChildWidget, const Vector2& LocalSize, const NSlateLayoutTransform& LayoutTransform) const
 {
     if (ChildWidget->HasRenderTransform())
     {
@@ -18,12 +18,12 @@ NArrangedWidget NGeometry::MakeChild(SWidget* ChildWidget, const Vector2& LocalS
     }
 }
 
-NArrangedWidget NGeometry::MakeChild(SWidget* ChildWidget, const NLayoutGeometry& LayoutGeometry) const
+NArrangedWidget NGeometry::MakeChild(std::shared_ptr<SWidget> ChildWidget, const NLayoutGeometry& LayoutGeometry) const
 {
 	return MakeChild(ChildWidget, LayoutGeometry.GetSizeInLocalSpace(), LayoutGeometry.GetLocalToParentTransform());
 }
 
-NArrangedWidget NGeometry::MakeChild(SWidget* ChildWidget, const Translate2D& ChildOffset, const Vector2& LocalSize, const Scale2D& ChildScale) const
+NArrangedWidget NGeometry::MakeChild(std::shared_ptr<SWidget> ChildWidget, const Translate2D& ChildOffset, const Vector2& LocalSize, const Scale2D& ChildScale) const
 {
 	return MakeChild(ChildWidget, LocalSize, NSlateLayoutTransform(ChildScale, ChildScale.TransformPoint(ChildOffset)));
 }

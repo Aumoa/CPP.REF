@@ -10,6 +10,9 @@ class SLATECORE_API SCompoundWidget : public SWidget
 public:
 	SCompoundWidget();
 
+protected:
+	virtual void OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const = 0;
+
 public:
 	BEGIN_SLATE_ATTRIBUTE(SCompoundWidget)
 	END_SLATE_ATTRIBUTE();

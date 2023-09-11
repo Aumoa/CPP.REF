@@ -32,6 +32,7 @@ public:
 
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;
+	virtual void OnArrangeChildren([[maybe_unused]] NArrangedChildrens& ArrangedChildrens, [[maybe_unused]] const NGeometry& AllottedGeometry) const override {}
 
 	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const override;
 

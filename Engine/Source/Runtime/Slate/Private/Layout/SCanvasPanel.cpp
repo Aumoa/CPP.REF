@@ -173,7 +173,7 @@ void SCanvasPanel::ArrangeLayeredChildrens(NArrangedChildrens& InoutArrangedChil
 	{
 		const NChildZOrder& CurSlot = SlotOrder[ChildIndex];
 		const NSlot& CurChild = Slots[CurSlot.ChildIndex];
-		SWidget* CurWidget = CurChild.Content.get();
+		const std::shared_ptr<SWidget>& CurWidget = CurChild.Content;
 
 		ESlateVisibility::Enum ChildVisibility = CurWidget->GetVisibility();
 		if (InoutArrangedChildrens.Accepts(ChildVisibility) == false)

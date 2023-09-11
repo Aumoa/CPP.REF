@@ -3,7 +3,7 @@
 #include "Layout/ArrangedWidget.h"
 #include "Widgets/SWidget.h"
 
-NArrangedWidget::NArrangedWidget(SWidget* InWidget, const NGeometry& InGeometry)
+NArrangedWidget::NArrangedWidget(std::shared_ptr<SWidget> InWidget, const NGeometry& InGeometry)
 	: Widget(InWidget)
 	, MyGeometry(InGeometry)
 {
@@ -12,14 +12,4 @@ NArrangedWidget::NArrangedWidget(SWidget* InWidget, const NGeometry& InGeometry)
 String NArrangedWidget::ToString() const
 {
 	return String::Format(TEXT("{} @ {}"), Widget->ToString(), MyGeometry.ToString());
-}
-
-bool NArrangedWidget::operator ==(const NArrangedWidget& Rhs) const
-{
-	return Widget == Rhs.Widget;
-}
-
-bool NArrangedWidget::operator !=(const NArrangedWidget& Rhs) const
-{
-	return Widget != Rhs.Widget;
 }

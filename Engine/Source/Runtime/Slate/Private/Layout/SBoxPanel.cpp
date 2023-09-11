@@ -194,7 +194,7 @@ void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection 
 			// Add the information about this child to the output list (ArrangedChildren)
 			ArrangedChildrens.AddWidget(ChildVisibility, AllottedGeometry.MakeChild(
 				// The child widget being arranged
-				CurChild.Content.get(),
+				CurChild.Content,
 				// Child's local position (i.e. position within parent)
 				LocalPosition,
 				// Child's size
