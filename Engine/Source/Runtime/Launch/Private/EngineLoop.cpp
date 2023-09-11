@@ -36,7 +36,7 @@ void NEngineLoop::PreInit(String CmdArgs)
     PreInitPreStartupScreen(CmdArgs);
 
 #if WITH_EDITOR
-    // Show splash window.
+    // Show splash window. 
     NGenericSplash::Show();
 #endif
 
@@ -46,7 +46,7 @@ void NEngineLoop::PreInit(String CmdArgs)
 void NEngineLoop::PostInit()
 {
     NGenericSplash::Hide();
-    NSlateApplication::Get().SetupCoreWindow(SNew(SWindow).Visibility(ESlateVisibility::Visible));
+    NSlateApplication::Get().GetCoreWindow().SetVisibility(ESlateVisibility::Visible);
 }
 
 void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
@@ -67,4 +67,8 @@ void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
 
 void NEngineLoop::PreInitPostStartupScreen()
 {
+    NSlateApplication::Get().SetupCoreWindow(
+        SNew(SWindow)
+        .Visibility(ESlateVisibility::Hidden)
+    );
 }

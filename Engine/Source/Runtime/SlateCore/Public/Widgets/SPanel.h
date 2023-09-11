@@ -27,6 +27,8 @@ struct NPanelSlotBase
 
 class SLATECORE_API SPanel : public SCompoundWidget
 {
+	GENERATED_SLATE_BODY(SPanel)
+
 public:
 	SPanel();
 

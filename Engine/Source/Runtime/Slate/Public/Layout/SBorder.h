@@ -8,6 +8,8 @@
 
 class SLATE_API SBorder : public SCompoundWidget
 {
+	GENERATED_SLATE_BODY(SBorder)
+
 private:
 	NMargin Padding;
 	std::shared_ptr<SWidget> Content;

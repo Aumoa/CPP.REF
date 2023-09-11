@@ -10,6 +10,8 @@ class SViewport;
 
 class SLATECORE_API SWindow : public SCompoundWidget
 {
+	GENERATED_SLATE_BODY(SWindow)
+
 private:
 	std::shared_ptr<NGenericWindow> NativeWindow;
 	std::shared_ptr<NRHIViewport> Viewport;

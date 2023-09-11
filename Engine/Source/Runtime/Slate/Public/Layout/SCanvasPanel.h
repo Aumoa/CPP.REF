@@ -9,6 +9,8 @@
 
 class SLATE_API SCanvasPanel : public SPanel
 {
+	GENERATED_SLATE_BODY(SCanvasPanel)
+
 public:
 	struct SLATE_API NSlot : public NPanelSlotBase<NSlot>
 	{

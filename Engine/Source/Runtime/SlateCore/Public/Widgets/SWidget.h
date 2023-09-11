@@ -25,8 +25,10 @@ public:
 	};
 };
 
-class SLATECORE_API SWidget : public SDummyAttributeWidget
+class SLATECORE_API SWidget : public SDummyAttributeWidget, public std::enable_shared_from_this<SWidget>
 {
+	GENERATED_SLATE_BODY(SWidget)
+
 	SWidget(const SWidget&) = delete;
 	SWidget(SWidget&&) = delete;
 

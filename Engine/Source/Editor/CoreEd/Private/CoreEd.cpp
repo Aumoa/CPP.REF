@@ -8,5 +8,7 @@
 void NCoreEd::EditorInit(IEngineLoop& Loop)
 {
 	Loop.Init();
-	//NSlateApplication::Get().GetCoreWindow().AddViewport(SNew(SEditorViewport));
+	NSlateApplication::Get().GetCoreWindow().AddViewport(
+		SNew(SEditorViewport)
+	);
 }

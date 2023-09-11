@@ -7,6 +7,8 @@
 
 class SLATE_API SVerticalBoxPanel : public SBoxPanel
 {
+	GENERATED_SLATE_BODY(SVerticalBoxPanel)
+
 public:
 	SVerticalBoxPanel();
 	virtual ~SVerticalBoxPanel() noexcept override;

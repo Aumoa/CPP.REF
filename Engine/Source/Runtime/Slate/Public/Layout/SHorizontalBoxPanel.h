@@ -7,6 +7,8 @@
 
 class SLATE_API SHorizontalBoxPanel : public SBoxPanel
 {
+	GENERATED_SLATE_BODY(SHorizontalBoxPanel)
+
 public:
 	SHorizontalBoxPanel();
 	virtual ~SHorizontalBoxPanel() noexcept override;

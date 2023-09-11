@@ -13,6 +13,9 @@
 
 class SLATE_API SBoxPanel : public SPanel
 {
+	GENERATED_SLATE_BODY(SBoxPanel)
+
+public:
 	struct SLATE_API NSlot : public NPanelSlotBase<NSlot>
 	{
 		using This = NSlot;

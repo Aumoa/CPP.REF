@@ -4,12 +4,21 @@
 
 #include "CoreMinimal.h"
 
-
-#define BEGIN_SLATE_ATTRIBUTE(WidgetType)											\
+#define GENERATED_SLATE_BODY(WidgetType)											\
 public:																				\
 	using Super = This;																\
 	using This = WidgetType;														\
 																					\
+public:																				\
+	std::shared_ptr<WidgetType> SharedFromThis()									\
+	{																				\
+		return std::static_pointer_cast<WidgetType>(shared_from_this());			\
+	}																				\
+																					\
+private:
+
+#define BEGIN_SLATE_ATTRIBUTE(WidgetType)											\
+public:																				\
 	struct NDeclarativeAttr : public Super::NDeclarativeAttr						\
 	{																				\
 		using This = NDeclarativeAttr;												\

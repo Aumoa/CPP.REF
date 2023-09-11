@@ -7,6 +7,8 @@
 
 class SLATECORE_API SViewport : public SCompoundWidget
 {
+	GENERATED_SLATE_BODY(SViewport)
+
 public:
 	SViewport();
 	virtual ~SViewport() noexcept override;
@@ -19,4 +21,5 @@ public:
 
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;
+	virtual void OnArrangeChildren([[maybe_unused]] NArrangedChildrens& ArrangedChildrens, [[maybe_unused]] const NGeometry& AllottedGeometry) const override {}
 };

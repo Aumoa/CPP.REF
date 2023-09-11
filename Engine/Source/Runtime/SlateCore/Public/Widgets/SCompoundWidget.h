@@ -7,6 +7,8 @@
 
 class SLATECORE_API SCompoundWidget : public SWidget
 {
+	GENERATED_SLATE_BODY(SCompoundWidget)
+
 public:
 	SCompoundWidget();
 
