@@ -6,7 +6,7 @@
 #include "Layout/Margin.h"
 #include "Layout/FlowDirection.h"
 #include "Layout/Orientation.h"
-
+#include "Layout/HorizontalAlignment.h"
 class SWidget;
 
 struct NAlignmentArrangeResult

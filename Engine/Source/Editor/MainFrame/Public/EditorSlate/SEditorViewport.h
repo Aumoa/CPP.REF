@@ -7,6 +7,8 @@
 
 class MAINFRAME_API SEditorViewport : public SViewport
 {
+	GENERATED_SLATE_BODY(SEditorViewport)
+
 public:
 	SEditorViewport();
 
@@ -15,5 +17,9 @@ public:
 protected:
 	virtual Vector2 ComputeDesiredSize() const { return Vector2::Zero(); }
 
-	virtual int32 OnPaint([[maybe_unused]] const NPaintArgs& Args, [[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const Rect& CullingRect, [[maybe_unused]] NSlateWindowElementList& OutDrawElements, int32 InLayer, [[maybe_unused]] bool bParentEnabled) const { return InLayer; }
+public:
+	BEGIN_SLATE_ATTRIBUTE()
+	END_SLATE_ATTRIBUTE();
+
+	DECLARE_SLATE_CONSTRUCTOR();
 };

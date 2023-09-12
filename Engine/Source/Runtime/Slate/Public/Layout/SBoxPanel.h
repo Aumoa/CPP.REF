@@ -16,9 +16,8 @@ class SLATE_API SBoxPanel : public SPanel
 	GENERATED_SLATE_BODY(SBoxPanel)
 
 public:
-	struct SLATE_API NSlot : public NPanelSlotBase<NSlot>
+	struct SLATE_API NSlot : public NSlotBase<NSlot>
 	{
-		using This = NSlot;
 		DECLARE_SLATE_ATTRIBUTE(EHorizontalAlignment, HAlignment, EHorizontalAlignment::Left);
 		DECLARE_SLATE_ATTRIBUTE(EVerticalAlignment, VAlignment, EVerticalAlignment::Top);
 		DECLARE_SLATE_ATTRIBUTE(NSizeParam, SizeParam);
@@ -57,20 +56,8 @@ private:
 	void ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection InLayoutFlow, const NGeometry& AllottedGeometry, NArrangedChildrens& ArrangedChildrens) const;
 	static Vector2 ComputeDesiredSizeForBox(EOrientation InOrientation, const std::vector<NSlot>& Slots);
 
-	static constexpr NMargin LayoutPaddingWithFlow(const NMargin& Padding, EFlowDirection LayoutFlow)
-	{
-		if (LayoutFlow == EFlowDirection::RightToLeft)
-		{
-			return NMargin(Padding.Right, Padding.Top, Padding.Left, Padding.Bottom);
-		}
-		else
-		{
-			return Padding;
-		}
-	}
-
 public:
-	BEGIN_SLATE_ATTRIBUTE(SBoxPanel)
+	BEGIN_SLATE_ATTRIBUTE()
 		DECLARE_SLATE_SLOT_SUPPORTS(NSlot)
 	END_SLATE_ATTRIBUTE();
 

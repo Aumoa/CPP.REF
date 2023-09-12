@@ -12,6 +12,7 @@
 #include "Rendering/PaintArgs.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Layout/ArrangedChildrens.h"
 
 class SDummyAttributeWidget
 {
@@ -20,9 +21,29 @@ public:
 	using Super = void;
 
 public:
+	template<class T = void>
 	struct NDeclarativeAttr
 	{
 	};
+};
+
+template<class UPanel>
+struct NSlotBase
+{
+	using This = UPanel;
+	std::shared_ptr<SWidget> Content;
+
+	UPanel&& operator [](std::shared_ptr<SWidget> InContent)&&
+	{
+		Content = std::move(InContent);
+		return static_cast<UPanel&&>(std::move(*this));
+	}
+
+	UPanel& operator [](std::shared_ptr<SWidget> InContent)&
+	{
+		Content = std::move(InContent);
+		return static_cast<UPanel&>(*this);
+	}
 };
 
 class SLATECORE_API SWidget : public SDummyAttributeWidget, public std::enable_shared_from_this<SWidget>
@@ -43,7 +64,8 @@ private:
 	float RenderOpacity = 1.0f;
 
 	bool bEnabled : 1 = true;
-	bool bInvalidated : 1 = true;
+	bool bLayoutInvalidated : 1 = true;
+	bool bVolatilityInvalidated : 1 = true;
 	bool bHasRenderTransform : 1 = false;
 
 public:
@@ -52,6 +74,7 @@ public:
 
 	virtual String ToString() const;
 	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
+	virtual void PrepassLayout() = 0;
 
 	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const;
 	Vector2 GetDesiredSize() const { return CachedDesiredSize; }
@@ -66,8 +89,8 @@ public:
 	void SetEnabled(bool bInEnabled);
 	bool IsEnabled() const { return bEnabled; }
 
-	void Invalidate();
-	bool IsInvalidated() const { return bInvalidated; }
+	void Validate();
+	bool IsInvalidated() const { return bLayoutInvalidated || bVolatilityInvalidated; }
 	void InvalidateLayoutAndVolatility();
 
 	void SetRenderOpacity(float InOpacity);
@@ -77,7 +100,7 @@ public:
 	EFlowDirection GetFlowDirection() const { return FlowDirection; }
 
 public:
-	BEGIN_SLATE_ATTRIBUTE(SWidget)
+	BEGIN_SLATE_ATTRIBUTE()
 		DECLARE_SLATE_ATTRIBUTE(ESlateVisibility::Enum, Visibility, ESlateVisibility::Visible)
 		DECLARE_SLATE_ATTRIBUTE(bool, bEnabled, true)
 		DECLARE_SLATE_ATTRIBUTE(float, RenderOpacity, 1.0f)
@@ -100,8 +123,23 @@ protected:
 	virtual void OnEnabled() {}
 	virtual void OnDisabled() {}
 
+	virtual void OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const = 0;
+
 private:
 	void SetDesiredSize(const Vector2& InDesiredSize);
+
+protected:
+	static constexpr NMargin LayoutPaddingWithFlow(const NMargin& Padding, EFlowDirection LayoutFlow)
+	{
+		if (LayoutFlow == EFlowDirection::RightToLeft)
+		{
+			return NMargin(Padding.Right, Padding.Top, Padding.Left, Padding.Bottom);
+		}
+		else
+		{
+			return Padding;
+		}
+	}
 };
 
 namespace DeclarativeSyntaxSupports
@@ -111,7 +149,7 @@ namespace DeclarativeSyntaxSupports
 	{
 		static_assert(std::derived_from<T, SWidget>);
 
-		WidgetInst.Construct(static_cast<typename T::NDeclarativeAttr&>(Args));
+		WidgetInst.Construct(reinterpret_cast<typename T::template NDeclarativeAttr<>&>(Args));
 		if constexpr (std::same_as<T, SWidget> == false)
 		{
 			InvokeConstructorRecursive(static_cast<T::Super&>(WidgetInst), Args);
@@ -119,9 +157,15 @@ namespace DeclarativeSyntaxSupports
 	}
 }
 
-template<std::derived_from<SWidget> T, class U>
-std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, U&& Args)
-	requires requires { static_cast<typename T::NDeclarativeAttr&>(Args); }
+template<std::derived_from<SWidget> T>
+std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, typename T::template NDeclarativeAttr<typename T::template NDeclarativeAttr<>>&& Args)
+{
+	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
+	return std::move(WidgetInstPtr);
+}
+
+template<std::derived_from<SWidget> T>
+std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, typename T::template NDeclarativeAttr<void>&& Args)
 {
 	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
 	return std::move(WidgetInstPtr);

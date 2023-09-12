@@ -29,7 +29,7 @@ protected:
 	virtual void OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const NGeometry& AllottedGeometry) const override;
 
 public:
-	BEGIN_SLATE_ATTRIBUTE(SBorder)
+	BEGIN_SLATE_ATTRIBUTE()
 		DECLARE_SLATE_ATTRIBUTE(NMargin, Padding)
 		DECLARE_SLATE_CONTENT(std::shared_ptr<SWidget>)
 	END_SLATE_ATTRIBUTE();

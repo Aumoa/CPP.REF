@@ -31,7 +31,7 @@ void SWidget::SetVisibility(ESlateVisibility::Enum InVisibility)
 	{
 		std::swap(Visibility, InVisibility);
 		OnVisibilityChanged(InVisibility, Visibility);
-		Invalidate();
+		InvalidateLayoutAndVolatility();
 	}
 }
 
@@ -60,18 +60,23 @@ void SWidget::SetEnabled(bool bInEnabled)
 			OnDisabled();
 		}
 
-		Invalidate();
+		InvalidateLayoutAndVolatility();
 	}
 }
 
-void SWidget::Invalidate()
+void SWidget::Validate()
 {
-	bInvalidated = true;
+	if (bLayoutInvalidated)
+	{
+		PrepassLayout();
+		bLayoutInvalidated = true;
+	}
 }
 
 void SWidget::InvalidateLayoutAndVolatility()
 {
-	Invalidate();
+	bLayoutInvalidated = true;
+	bVolatilityInvalidated = true;
 }
 
 void SWidget::SetRenderOpacity(float InRenderOpacity)
@@ -97,7 +102,7 @@ DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
 	Visibility = Attr._Visibility;
 	bEnabled = Attr._bEnabled;
 	
-	Invalidate();
+	InvalidateLayoutAndVolatility();
 }
 
 void SWidget::CacheDesiredSize()

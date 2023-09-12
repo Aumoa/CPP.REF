@@ -17,9 +17,9 @@ SWindow::~SWindow() noexcept
 
 void SWindow::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)
 {
-	for (auto& Vp : SlateViewports)
+	if (SlateViewport)
 	{
-		Vp->Tick(AllottedGeometry, InDeltaTime);
+		SlateViewport->Tick(AllottedGeometry, InDeltaTime);
 	}
 }
 
@@ -37,8 +37,18 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 
 void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 {
+	if (IsInvalidated())
+	{
+		PrepassLayout();
+	}
+
 	Vector2 AllottedSize = ComputeDesiredSize();
-	Tick(NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity()), InDeltaTime);
+	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
+	Tick(AllottedGeometry, InDeltaTime);
+	NPaintArgs Args = NPaintArgs::InitPaintArgs(*this, InDeltaTime);
+	Rect CullingRect = { Vector2::Zero(), AllottedSize };
+	NSlateWindowElementList DrawElements;
+	OnPaint(Args, AllottedGeometry, CullingRect, DrawElements, 0, IsEnabled());
 }
 
 void SWindow::Present()
@@ -49,11 +59,6 @@ void SWindow::Present()
 	}
 }
 
-void SWindow::AddViewport(std::shared_ptr<SViewport> InViewport)
-{
-	SlateViewports.emplace_back(std::move(InViewport));
-}
-
 DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 {
 	PLATFORM_UNREFERENCED_PARAMETER(Attr);
@@ -62,11 +67,6 @@ DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 Vector2 SWindow::ComputeDesiredSize() const
 {
 	return Vector<>::Cast<Vector2>(NativeWindow->GetSize());
-}
-
-int32 SWindow::OnPaint([[maybe_unused]] const NPaintArgs& Args, [[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const Rect& CullingRect, [[maybe_unused]] NSlateWindowElementList& OutDrawElements, int32 InLayer, [[maybe_unused]] bool bParentEnabled) const
-{
-	return InLayer;
 }
 
 void SWindow::OnVisibilityChanged(ESlateVisibility::Enum, ESlateVisibility::Enum)

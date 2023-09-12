@@ -3,7 +3,7 @@
 #include "Rendering/PaintArgs.h"
 #include "Widgets/SWidget.h"
 
-NPaintArgs NPaintArgs::InitPaintArgs(const SWidget& InOwningWidget, float InDeltaTime)
+NPaintArgs NPaintArgs::InitPaintArgs(const SWidget& InOwningWidget, const TimeSpan& InDeltaTime)
 {
 	return NPaintArgs
 	{

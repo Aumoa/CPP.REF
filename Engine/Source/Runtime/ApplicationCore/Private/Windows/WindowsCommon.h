@@ -13,11 +13,15 @@
 #include <Windows.h>
 #include <comdef.h>
 #include <gdiplus.h>
+#include <wrl/client.h>
+#include <wincodec.h>
 
 #undef OutputDebugString
 
 #pragma pop_macro("TEXT")
 #pragma pop_macro("NOMINMAX")
+
+using Microsoft::WRL::ComPtr;
 
 namespace WindowsTools
 {
@@ -37,6 +41,14 @@ namespace WindowsTools
 	{
 		return GetErrorText(::GetLastError());
 	}
+
+	[[noreturn]]
+	inline void ReportHResult(HRESULT Result)
+	{
+		checkf(SUCCEEDED(Result), TEXT("Failed to execute D3D12 operation. Error: 0x{:08X}"), Result);
+	}
 }
+
+#define HR(X) if (HRESULT Result = (X); FAILED(Result)) { WindowsTools::ReportHResult(Result); }
 
 #endif

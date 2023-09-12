@@ -12,7 +12,7 @@ class SLATE_API SCanvasPanel : public SPanel
 	GENERATED_SLATE_BODY(SCanvasPanel)
 
 public:
-	struct SLATE_API NSlot : public NPanelSlotBase<NSlot>
+	struct SLATE_API NSlot : public NSlotBase<NSlot>
 	{
 		DECLARE_SLATE_ATTRIBUTE(NMargin, Offset, NMargin(0, 0, 100.0f, 100.0f));
 		DECLARE_SLATE_ATTRIBUTE(NAnchors, Anchors);
@@ -50,7 +50,7 @@ public:
 	virtual size_t NumChildrens() const override { return Slots.size(); }
 	virtual SWidget* GetChildrenAt(size_t InIndex) const override
 	{
-		if (Slots.size() < InIndex)
+		if (Slots.size() > InIndex)
 		{
 			return Slots[InIndex].Content.get();
 		}
@@ -68,7 +68,7 @@ protected:
 	void ArrangeLayeredChildrens(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry, std::vector<bool>& ChildLayers) const;
 
 protected:
-	BEGIN_SLATE_ATTRIBUTE(SCanvasPanel)
+	BEGIN_SLATE_ATTRIBUTE()
 		DECLARE_SLATE_SLOT_SUPPORTS(NSlot)
 	END_SLATE_ATTRIBUTE();
 

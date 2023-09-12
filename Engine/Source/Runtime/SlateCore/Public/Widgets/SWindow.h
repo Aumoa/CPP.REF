@@ -15,7 +15,7 @@ class SLATECORE_API SWindow : public SCompoundWidget
 private:
 	std::shared_ptr<NGenericWindow> NativeWindow;
 	std::shared_ptr<NRHIViewport> Viewport;
-	std::vector<std::shared_ptr<SViewport>> SlateViewports;
+	std::shared_ptr<SViewport> SlateViewport;
 
 public:
 	SWindow();
@@ -27,19 +27,14 @@ public:
 	void ExecuteTick(const TimeSpan& InDeltaTime);
 	void Present();
 
-	void AddViewport(std::shared_ptr<SViewport> InViewport);
-
 public:
-	BEGIN_SLATE_ATTRIBUTE(SWindow)
+	BEGIN_SLATE_ATTRIBUTE()
 	END_SLATE_ATTRIBUTE();
 
 	DECLARE_SLATE_CONSTRUCTOR();
 
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;
-	virtual void OnArrangeChildren([[maybe_unused]] NArrangedChildrens& ArrangedChildrens, [[maybe_unused]] const NGeometry& AllottedGeometry) const override {}
-
-	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const override;
 
 	virtual void OnVisibilityChanged(ESlateVisibility::Enum Prev, ESlateVisibility::Enum New);
 

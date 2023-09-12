@@ -3,20 +3,40 @@
 #pragma once
 
 #include "Widgets/SWidget.h"
-#include "Layout/ArrangedChildrens.h"
+#include "Layout/HorizontalAlignment.h"
+#include "Layout/VerticalAlignment.h"
 
 class SLATECORE_API SCompoundWidget : public SWidget
 {
 	GENERATED_SLATE_BODY(SCompoundWidget)
 
 public:
-	SCompoundWidget();
+	struct NSlot : public NSlotBase<NSlot>
+	{
+		DECLARE_SLATE_ATTRIBUTE(NMargin, SlotPadding);
+		DECLARE_SLATE_ATTRIBUTE(EHorizontalAlignment, HAlignment, EHorizontalAlignment::Left)
+		DECLARE_SLATE_ATTRIBUTE(EVerticalAlignment, VAlignment, EVerticalAlignment::Top)
+	};
 
-protected:
-	virtual void OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const = 0;
+private:
+	NSlot ChildSlot;
 
 public:
-	BEGIN_SLATE_ATTRIBUTE(SCompoundWidget)
+	SCompoundWidget();
+
+	virtual void PrepassLayout() override;
+
+	void SetContent(std::shared_ptr<SWidget> InContent);
+	std::shared_ptr<SWidget> GetContent() const { return ChildSlot.Content; }
+
+protected:
+	virtual Vector2 ComputeDesiredSize() const override;
+	virtual void OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const override;
+	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const override;
+
+public:
+	BEGIN_SLATE_ATTRIBUTE()
+		DECLARE_SLATE_SINGLE_SLOT_SUPPORTS(NSlot)
 	END_SLATE_ATTRIBUTE();
 
 	DECLARE_SLATE_CONSTRUCTOR() {}

@@ -14,7 +14,8 @@ public class MainFrame : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "SlateCore"
+            "SlateCore",
+            "Slate"
         });
     }
 }
