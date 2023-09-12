@@ -21,8 +21,8 @@ int32 SImage::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry,
 	PLATFORM_UNREFERENCED_PARAMETER(Args);
 	PLATFORM_UNREFERENCED_PARAMETER(AllottedGeometry);
 	PLATFORM_UNREFERENCED_PARAMETER(CullingRect);
-	PLATFORM_UNREFERENCED_PARAMETER(OutDrawElements);
 	PLATFORM_UNREFERENCED_PARAMETER(InLayer);
 	PLATFORM_UNREFERENCED_PARAMETER(bParentEnabled);
+	OutDrawElements.Add();
 	return InLayer;
 }
