@@ -25,6 +25,11 @@ void NEngineLoop::Init()
 {
 }
 
+void NEngineLoop::Shutdown()
+{
+    NRHIGlobal::ShutdownDynamicRHI();
+}
+
 void NEngineLoop::Tick()
 {
     NSlateApplication& SlateApp = NSlateApplication::Get();

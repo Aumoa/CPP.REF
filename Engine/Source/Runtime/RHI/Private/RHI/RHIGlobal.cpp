@@ -22,3 +22,9 @@ void NRHIGlobal::InitDynamicRHI()
 	DynamicRHI->Init();
 	PrimaryCommandQueue = DynamicRHI->CreateCommandQueue();
 }
+
+void NRHIGlobal::ShutdownDynamicRHI()
+{
+	DynamicRHI.reset();
+	PrimaryCommandQueue.reset();
+}

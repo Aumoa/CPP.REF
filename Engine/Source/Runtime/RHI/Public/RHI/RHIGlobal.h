@@ -10,6 +10,7 @@ class NRHICommandQueue;
 struct RHI_API NRHIGlobal : public StaticClass
 {
 	static void InitDynamicRHI();
+	static void ShutdownDynamicRHI();
 
 	static NRHIGraphics& GetDynamicRHI() { return *DynamicRHI.get(); }
 	static NRHICommandQueue& GetPrimaryCommandQueue() { return *PrimaryCommandQueue.get(); }

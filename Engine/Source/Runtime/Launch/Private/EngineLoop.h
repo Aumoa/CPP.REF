@@ -19,6 +19,7 @@ public:
     virtual ~NEngineLoop() noexcept override;
 
     virtual void Init() override;
+    virtual void Shutdown() override;
     virtual void Tick() override;
 
     void PreInit(String CmdArgs);

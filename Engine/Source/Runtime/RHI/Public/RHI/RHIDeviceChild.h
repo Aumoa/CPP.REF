@@ -12,8 +12,8 @@ class RHI_API NRHIDeviceChild
 	NRHIDeviceChild(NRHIDeviceChild&&) = delete;
 
 protected:
-	NRHIDeviceChild();
+	NRHIDeviceChild() = default;
 
 public:
-	virtual ~NRHIDeviceChild() noexcept;
+	virtual ~NRHIDeviceChild() noexcept = default;
 };

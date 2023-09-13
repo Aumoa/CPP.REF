@@ -8,8 +8,8 @@
 class RHI_API NRHICommandQueue : public NRHIDeviceChild
 {
 protected:
-	NRHICommandQueue();
+	NRHICommandQueue() = default;
 
 public:
-	virtual ~NRHICommandQueue() noexcept override;
+	virtual ~NRHICommandQueue() noexcept override = default;
 };

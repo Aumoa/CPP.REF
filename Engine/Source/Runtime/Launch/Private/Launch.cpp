@@ -45,6 +45,7 @@ int32 NLaunch::GuardedMain()
         Loop->Tick();
     }
 
+    Loop->Shutdown();
     return GenericApp->GetExitCode();
 }
 

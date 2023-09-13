@@ -1,8 +1,9 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "D3D12RHI/D3D12CommandQueue.h"
+
 #if PLATFORM_WINDOWS
 
-#include "D3D12RHI/D3D12CommandQueue.h"
 #include "D3D12RHI/D3D12Graphics.h"
 
 ND3D12CommandQueue::ND3D12CommandQueue(ND3D12Graphics* InGraphics)

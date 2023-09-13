@@ -30,4 +30,6 @@ inline void ReportHResult(HRESULT Result)
 
 #define HR(X) if (HRESULT Result = (X); FAILED(Result)) { ReportHResult(Result); }
 
+#include "D3D12ResourceHelpers.h"
+
 #endif
