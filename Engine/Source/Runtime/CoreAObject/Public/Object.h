@@ -56,24 +56,19 @@ public:
 
 public:
 	static AType* StaticClass();
-	static AObject* NewObject(AType* InClassType);
+	static std::shared_ptr<AObject> NewObject(AType* InClassType);
 };
 
 template<std::derived_from<AObject> UObject>
-inline UObject* NewObject(AType* InClassType = nullptr)
+inline std::shared_ptr<UObject> NewObject(AType* InClassType = nullptr)
 {
 	if (InClassType == nullptr)
 	{
 		InClassType = UObject::StaticClass();
 	}
 
-	AObject* Instanced = AObject::NewObject(InClassType);
-	UObject* Casted = dynamic_cast<UObject*>(Instanced);
-	if (Casted == nullptr)
-	{
-		delete Instanced;
-		check(Casted);
-	}
-
+	std::shared_ptr<AObject> Instanced = AObject::NewObject(InClassType);
+	std::shared_ptr<UObject> Casted = std::dynamic_pointer_cast<UObject>(Instanced);
+	check(Casted);
 	return Casted;
 }

@@ -45,12 +45,12 @@ AType* AObject::StaticClass()
 	return TypePtr;
 }
 
-AObject* AObject::NewObject(AType* InClassType)
+std::shared_ptr<AObject> AObject::NewObject(AType* InClassType)
 {
 	check(InClassType);
 	check((InClassType->ClassMeta & EClassMetadata::Abstract) == 0);
 	NObjectInitializer::Get().MarkInit(InClassType);
-	return InClassType->Constructor();
+	return std::shared_ptr<AObject>(InClassType->Constructor());
 }
 
 REGISTER_INTRINSIC_CLASS(AObject, TEXT("/Script/CoreAObject"));

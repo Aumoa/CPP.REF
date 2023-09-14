@@ -9,7 +9,6 @@
 #include "Application/SlateApplication.h"
 #include "SlateRHIRenderer.h"
 #include "Widgets/SWindow.h"
-#include "GC.h"
 #include "SlateRHIRenderer.h"
 #include "Widgets/SWindow.h"
 
@@ -58,9 +57,6 @@ void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
 {
     // Setup command line arguments.
     CommandLine::Init(CmdArgs);
-
-    // Initialize GC engine.
-    NGC::Init();
 
     // Initialize RHI engine.
     NRHIGlobal::InitDynamicRHI();
