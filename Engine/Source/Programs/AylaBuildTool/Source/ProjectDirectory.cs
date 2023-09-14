@@ -17,6 +17,7 @@ public readonly struct ProjectDirectory
             _Root = value;
             Name = Path.GetFileNameWithoutExtension(value);
             Source = new() { Root = Path.Combine(Root, "Source") };
+            Shaders = Path.Combine(_Root, "Shaders");
             Intermediate = new() { Root = Path.Combine(Root, "Intermediate") };
             Content = new() { Root = Path.Combine(Root, "Content") };
             Binaries = new() { Root = Path.Combine(Root, "Binaries") };
@@ -27,6 +28,8 @@ public readonly struct ProjectDirectory
     public string Name { get; private init; }
 
     public SourceDirectory Source { get; private init; }
+
+    public string Shaders { get; private init; }
 
     public IntermediateDirectory Intermediate { get; private init; }
 

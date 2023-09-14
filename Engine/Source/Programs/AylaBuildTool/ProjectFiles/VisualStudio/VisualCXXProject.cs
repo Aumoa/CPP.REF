@@ -242,13 +242,20 @@ public class VisualCXXProject : IVisualStudioProject
                     None.SetAttribute("Include", Filename);
                     return null;
                 }
+                else if (Global.IsShaderFile(Extension))
+                {
+                    var Shader = ItemGroup.AddElement("FxCompile");
+                    Shader.SetAttribute("Include", Filename);
+                    return null;
+                }
 
                 return null;
             }
 
             void SearchDirectory(ModuleInformation? Module, string CurrentDirectory)
             {
-                if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false && CurrentDirectory.StartsWith(ProjectDirectory.Source.Programs))
+                if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false &&
+                    CurrentDirectory.StartsWith(ProjectDirectory.Source.Programs))
                 {
                     return;
                 }
@@ -288,6 +295,10 @@ public class VisualCXXProject : IVisualStudioProject
             }
 
             SearchDirectory(null, SourceDirectory);
+            if (SourceDirectory == ProjectDirectory.Source.Root)
+            {
+                SearchDirectory(null, ProjectDirectory.Shaders);
+            }
 
             Import = Project.AddElement("Import");
             Import.SetAttribute("Project", "$(VCTargetsPath)\\Microsoft.Cpp.targets");
@@ -307,10 +318,27 @@ public class VisualCXXProject : IVisualStudioProject
             HashSet<string> Filters = new();
             foreach (var Filename in SourceFiles)
             {
-                string? FilterPath = Path.GetRelativePath(SourceDirectory, Filename);
-                FilterPath = Path.GetDirectoryName(FilterPath)!;
+                string? FilterPath;
+
                 if (SourceDirectory.StartsWith(ProjectDirectory.Source.Programs) == false)
                 {
+                    if (Filename.StartsWith(ProjectDirectory.Shaders))
+                    {
+                        FilterPath = Path.GetRelativePath(ProjectDirectory.Shaders, Filename);
+                        FilterPath = Path.GetDirectoryName(FilterPath)!;
+                        FilterPath = Path.Combine("Shaders", FilterPath ?? "/");
+                    }
+                    else
+                    {
+                        FilterPath = Path.GetRelativePath(SourceDirectory, Filename);
+                        FilterPath = Path.GetDirectoryName(FilterPath)!;
+                        FilterPath = Path.Combine("Source", FilterPath ?? "/");
+                    }
+                }
+                else
+                {
+                    FilterPath = Path.GetRelativePath(SourceDirectory, Filename);
+                    FilterPath = Path.GetDirectoryName(FilterPath)!;
                     FilterPath = Path.Combine("Source", FilterPath ?? "/");
                 }
 
@@ -347,6 +375,12 @@ public class VisualCXXProject : IVisualStudioProject
                     var None = ItemGroup.AddElement("Natvis");
                     None.SetAttribute("Include", Filename);
                     InnerElement = None;
+                }
+                else if (Global.IsShaderFile(Extension))
+                {
+                    var Shader = ItemGroup.AddElement("FxCompile");
+                    Shader.SetAttribute("Include", Filename);
+                    InnerElement = Shader;
                 }
 
                 if (InnerElement != null && string.IsNullOrEmpty(FilterPath) == false)

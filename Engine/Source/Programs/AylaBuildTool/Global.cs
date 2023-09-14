@@ -45,25 +45,31 @@ public static class Global
     public static bool IsSourceCode(string Name)
     {
         string Ext = Path.GetExtension(Name).ToLower();
-        return Ext == ".cpp" || Ext == ".ixx";
+        return Ext is ".cpp";
     }
 
     public static bool IsHeaderFile(string Name)
     {
         string Ext = Path.GetExtension(Name).ToLower();
-        return Ext == ".h" || Ext == ".inl";
+        return Ext is ".h" or ".inl";
     }
 
     public static bool IsRuleFile(string Name)
     {
         string Ext = Path.GetExtension(Name).ToLower();
-        return Ext == ".cs";
+        return Ext is ".cs";
     }
 
     public static bool IsNatvisFile(string Name)
     {
         string Ext = Path.GetExtension(Name).ToLower();
-        return Ext == ".natvis";
+        return Ext is ".natvis";
+    }
+
+    public static bool IsShaderFile(string Name)
+    {
+        string Ext = Path.GetExtension(Name).ToLower();
+        return Ext is ".hlsl" or ".hlsli";
     }
 
     public static bool IsSourceFile(string Name)
