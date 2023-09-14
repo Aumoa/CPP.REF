@@ -26,6 +26,10 @@ void NEngineLoop::Init()
 
 void NEngineLoop::Shutdown()
 {
+    // shutdown application first.
+    NSlateApplication::Destroy();
+
+    // shutdown graphics engine.
     NRHIGlobal::ShutdownDynamicRHI();
 }
 
