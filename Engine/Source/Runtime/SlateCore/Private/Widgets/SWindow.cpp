@@ -5,6 +5,7 @@
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "RHI/RHIViewport.h"
+#include "Rendering/SlateRenderer.h"
 #include "GenericPlatform/GenericWindow.h"
 
 SWindow::SWindow()
@@ -49,6 +50,15 @@ void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 	Rect CullingRect = { Vector2::Zero(), AllottedSize };
 	NSlateWindowElementList DrawElements;
 	OnPaint(Args, AllottedGeometry, CullingRect, DrawElements, 0, IsEnabled());
+}
+
+void SWindow::Render(NSlateRenderer& Renderer)
+{
+	if (Viewport)
+	{
+		Renderer.BeginRender(*Viewport);
+		Renderer.EndRender(*Viewport);
+	}
 }
 
 void SWindow::Present()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RHI/RHIDeviceChild.h"
+#include "Numerics/VectorInterface/Vector.h"
 
 class RHI_API NRHITexture2D : public NRHIDeviceChild
 {
@@ -12,4 +13,7 @@ protected:
 
 public:
 	virtual ~NRHITexture2D() noexcept override = default;
+
+	virtual Vector2N GetTextureSize() const = 0;
+	virtual bool IsRenderTarget() const = 0;
 };

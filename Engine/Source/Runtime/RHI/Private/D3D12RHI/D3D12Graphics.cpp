@@ -7,6 +7,7 @@
 #include "D3D12RHI/D3D12Viewport.h"
 #include "D3D12RHI/D3D12Global.h"
 #include "D3D12RHI/D3D12Texture2D.h"
+#include "D3D12RHI/D3D12CommandSet.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -113,7 +114,12 @@ Task<std::shared_ptr<NRHITexture2D>> ND3D12Graphics::CreateTexture2DAsync(std::s
 		pCmd->CopyTextureRegion(&LocDst, 0, 0, 0, &LocSrc, nullptr);
 	});
 
-	co_return std::make_shared<ND3D12Texture2D>(std::move(CommittedResource));
+	co_return std::make_shared<ND3D12Texture2D>(std::move(CommittedResource), Texture2DDesc);
+}
+
+std::shared_ptr<NRHICommandSet> ND3D12Graphics::CreateCommandSet()
+{
+	return std::make_shared<ND3D12CommandSet>();
 }
 
 ID3D12Device1* ND3D12Graphics::GetDevice() const

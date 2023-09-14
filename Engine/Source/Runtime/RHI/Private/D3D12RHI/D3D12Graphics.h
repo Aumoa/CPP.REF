@@ -35,6 +35,7 @@ public:
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() override;
 	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) override;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) override;
+	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() override;
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;

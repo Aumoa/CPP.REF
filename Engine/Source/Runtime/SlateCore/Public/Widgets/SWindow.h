@@ -6,6 +6,7 @@
 
 class NGenericWindow;
 class NRHIViewport;
+class NSlateRenderer;
 class SViewport;
 
 class SLATECORE_API SWindow : public SCompoundWidget
@@ -25,6 +26,7 @@ public:
 
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
 	void ExecuteTick(const TimeSpan& InDeltaTime);
+	void Render(NSlateRenderer& Renderer);
 	void Present();
 
 public:

@@ -5,9 +5,14 @@
 #include "CoreMinimal.h"
 
 class SWindow;
+class NRHIViewport;
+struct NSlateRenderProxy;
 
 class SLATECORE_API NSlateRenderer
 {
+	NSlateRenderer(const NSlateRenderer&) = delete;
+	NSlateRenderer(NSlateRenderer&&) = delete;
+
 protected:
 	NSlateRenderer();
 
@@ -19,4 +24,8 @@ public:
 	virtual void FlushCommands() {}
 
 	virtual void CreateViewport(SWindow& InWindow) = 0;
+
+	virtual void BeginRender(const NRHIViewport& InViewport) = 0;
+	virtual void EndRender(const NRHIViewport& InViewport) = 0;
+	virtual void RenderElement(const NSlateRenderProxy& InElement) = 0;
 };

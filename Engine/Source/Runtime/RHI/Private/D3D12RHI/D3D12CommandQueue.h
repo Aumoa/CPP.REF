@@ -18,6 +18,8 @@ class ND3D12CommandQueue : public NRHICommandQueue
 public:
 	ND3D12CommandQueue(ND3D12Graphics* InGraphics);
 	virtual ~ND3D12CommandQueue() noexcept override;
+
+	virtual void ExecuteCommandSets(std::span<NRHICommandSet const* const> InCommandSets) override;
 	
 	ID3D12CommandQueue* GetQueue() const { return Queue.Get(); }
 };

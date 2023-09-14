@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "RHI/RHIDeviceChild.h"
 
+class NRHICommandSet;
+
 class RHI_API NRHICommandQueue : public NRHIDeviceChild
 {
 protected:
@@ -12,4 +14,6 @@ protected:
 
 public:
 	virtual ~NRHICommandQueue() noexcept override = default;
+
+	virtual void ExecuteCommandSets(std::span<NRHICommandSet const* const> InCommandSets) = 0;
 };

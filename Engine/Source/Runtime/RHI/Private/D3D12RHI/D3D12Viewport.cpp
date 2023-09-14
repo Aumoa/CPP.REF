@@ -4,6 +4,8 @@
 
 #if PLATFORM_WINDOWS
 
+#include "D3D12RHI/D3D12Texture2D.h"
+
 ND3D12Viewport::ND3D12Viewport(IDXGIFactory7* InFactory, ID3D12CommandQueue* InQueue, HWND hWnd)
 {
 	RECT ClientRect;
@@ -17,7 +19,7 @@ ND3D12Viewport::ND3D12Viewport(IDXGIFactory7* InFactory, ID3D12CommandQueue* InQ
 		.Stereo = FALSE,
 		.SampleDesc = { .Count = 1, .Quality = 0 },
 		.BufferUsage = DXGI_USAGE_BACK_BUFFER,
-		.BufferCount = 3,
+		.BufferCount = (UINT)NumBuffers,
 		.Scaling = DXGI_SCALING_STRETCH,
 		.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
 		.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED,
@@ -27,6 +29,19 @@ ND3D12Viewport::ND3D12Viewport(IDXGIFactory7* InFactory, ID3D12CommandQueue* InQ
 	ComPtr<IDXGISwapChain1> SwapChain1;
 	HR(InFactory->CreateSwapChainForHwnd(InQueue, hWnd, &Desc, nullptr, nullptr, &SwapChain1));
 	HR(SwapChain1.As(&SwapChain4));
+
+	HR(InQueue->GetDevice(IID_PPV_ARGS(&pDevice)));
+
+	D3D12_DESCRIPTOR_HEAP_DESC HeapDesc =
+	{
+		.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+		.NumDescriptors = (UINT)NumBuffers,
+		.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE
+	};
+
+	HR(pDevice->CreateDescriptorHeap(&HeapDesc, IID_PPV_ARGS(&RTVHeap)));
+	RTVIncrementSize = pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	AllocateBuffersAndCreateDescriptors();
 }
 
 ND3D12Viewport::~ND3D12Viewport() noexcept
@@ -36,6 +51,36 @@ ND3D12Viewport::~ND3D12Viewport() noexcept
 void ND3D12Viewport::Present()
 {
 	HR(SwapChain4->Present(0, 0));
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE ND3D12Viewport::GetRTVHandle(int32 InIndex) const
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE hRTV = RTVHeap->GetCPUDescriptorHandleForHeapStart();
+	hRTV.ptr += (SIZE_T)RTVIncrementSize * InIndex;
+	return hRTV;
+}
+
+void ND3D12Viewport::AllocateBuffersAndCreateDescriptors()
+{
+	Buffers.resize(NumBuffers);
+	D3D12_RENDER_TARGET_VIEW_DESC RTVDesc =
+	{
+		.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+		.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D
+	};
+	D3D12_CPU_DESCRIPTOR_HANDLE hRTV = RTVHeap->GetCPUDescriptorHandleForHeapStart();
+
+	for (size_t i = 0; i < NumBuffers; ++i)
+	{
+		ComPtr<ID3D12Resource> pBuffer;
+		HR(SwapChain4->GetBuffer((UINT)i, IID_PPV_ARGS(&pBuffer)));
+		auto Desc = pBuffer->GetDesc();
+		Buffers[i] = std::make_shared<ND3D12Texture2D>(pBuffer, Desc);
+		pDevice->CreateRenderTargetView(pBuffer.Get(), &RTVDesc, hRTV);
+
+		// increment handle for next buffer.
+		hRTV.ptr += (SIZE_T)RTVIncrementSize;
+	}
 }
 
 #endif

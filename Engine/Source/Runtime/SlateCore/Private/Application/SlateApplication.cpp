@@ -20,6 +20,7 @@ void NSlateApplication::Tick()
     CoreWindow->ExecuteTick(DeltaTime);
 
     Renderer->BeginFrame();
+    CoreWindow->Render(*Renderer);
     Renderer->EndFrame();
     PresentAllWindows();
 }

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "RHI/RHIGlobal.h"
+#include "D3D12RHI/D3D12Graphics.h"
+#include "D3D12RHI/D3D12CommandQueue.h"
 
 struct ND3D12Global : public NRHIGlobal
 {
