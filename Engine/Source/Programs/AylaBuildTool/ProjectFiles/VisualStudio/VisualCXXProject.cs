@@ -408,34 +408,47 @@ public class VisualCXXProject : IVisualStudioProject
         {
             foreach (var Platform in BuildConfiguration.Platforms)
             {
-                var PropertyGroup = Project.AddElement("PropertyGroup");
-                PropertyGroup.SetAttribute("Condition", $"'$(Platform)'=='{Platform}'");
+                foreach (var Config in BuildConfiguration.Configurations)
+                {
+                    var (ConfigStr, PlatformStr) = MapConfiguration(Config, false, Platform);
 
-                bool bIsProgram = SourceDirectory != ProjectDirectory.Source.Root;
-                string Executable;
-                string? LaunchDLL = null;
-                if (bIsProgram)
-                {
-                    Executable = Path.GetFileNameWithoutExtension(SourceDirectory);
-                }
-                else
-                {
-                    Executable = "Launch";
-                    if (ProjectDirectory.Root != Global.EngineDirectory.Root)
+                    var PropertyGroup = Project.AddElement("PropertyGroup");
+                    PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{ConfigStr}|{PlatformStr}'");
+
+                    bool bIsProgram = SourceDirectory != ProjectDirectory.Source.Root;
+                    string Executable;
+                    string? LaunchDLL = null;
+                    if (bIsProgram)
                     {
-                        LaunchDLL = Path.ChangeExtension(ProjectDirectory.Name, ".dll");
+                        string ExecutableName = Path.GetFileNameWithoutExtension(SourceDirectory);
+                        if (SourceDirectory.StartsWith(Global.EngineDirectory.Source.Root))
+                        {
+                            Executable = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.ToString(), ExecutableName);
+                        }
+                        else
+                        {
+                            Executable = Path.Combine(ProjectDirectory.Binaries.Win64, Config.ToString(), ExecutableName);
+                        }
                     }
+                    else
+                    {
+                        Executable = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.ToString(), "Launch");
+                        if (ProjectDirectory.Root != Global.EngineDirectory.Root)
+                        {
+                            LaunchDLL = Path.ChangeExtension(ProjectDirectory.Name, ".dll");
+                        }
+                    }
+
+                    Executable = Path.ChangeExtension(Executable, ".exe");
+                    PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
+                    PropertyGroup.AddElement("LocalDebuggerCommandArguments").InnerText = LaunchDLL ?? "";
+
+                    string WorkingDirectory = Path.GetDirectoryName(Executable)!;
+                    PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = "$(OutDir)";
+
+                    PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
+                    PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
                 }
-
-                Executable = Path.ChangeExtension(Executable, ".exe");
-                PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
-                PropertyGroup.AddElement("LocalDebuggerCommandArguments").InnerText = LaunchDLL ?? "";
-
-                string WorkingDirectory = Path.GetDirectoryName(Executable)!;
-                PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = "$(OutDir)";
-
-                PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
-                PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
             }
         }
         var VcxprojUser = Doc;
