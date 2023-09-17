@@ -7,24 +7,6 @@
 
 NWindowsApplication::NWindowsApplication()
 {
-    // Setting engine directory using ApplicationCore.dll location.
-    HMODULE hModule = GetModuleHandle(TEXT("ApplicationCore.dll").c_str());
-    check(hModule);
-
-    TCHAR Buf[1024];
-    DWORD Len = GetModuleFileName(hModule, Buf, 1024);
-    check(Len);
-
-    // Engine/Binaries/Win64/ApplicationCore.dll
-    String WorkingDirectory(Buf, (size_t)Len);
-    // Engine/Binaries/Win64
-    WorkingDirectory = Path::GetDirectoryName(WorkingDirectory);
-
-    // Engine/
-    WorkingDirectory = Path::Combine(WorkingDirectory, TEXT(".."), TEXT(".."), TEXT(".."));
-    WorkingDirectory = Path::GetFullPath(WorkingDirectory);
-
-    Environment::SetEngineDirectory(WorkingDirectory);
 }
 
 std::unique_ptr<NGenericWindow> NWindowsApplication::MakeWindow(const NGenericWindowDefinition& InDefinition)

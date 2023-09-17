@@ -7,14 +7,16 @@
 
 String Environment::EngineDirectory;
 
-void Environment::SetEngineDirectory(String InPath)
+void Environment::Init()
 {
-	EngineDirectory = InPath;
-	
-	// check directory validation.
-	String BuildToolPath = Path::Combine(EngineDirectory, TEXT("Binaries"), TEXT("DotNET"), TEXT("AylaBuildTool.dll"));
-	if (File::Exists(BuildToolPath) == false)
+	static int Trap_init = (SetupEngineDirectory(), 0);
+}
+
+void Environment::SetupEngineDirectory()
+{
+	String Directory = PlatformProcess::FindEngineDirectory();
+	if (Directory.IsEmpty() == false)
 	{
-		throw InvalidOperationException(String::Format(TEXT("Directory '{}' is not valid. Cannot found 'AylaBuildTool.dll' in directory 'Binaries/DotNET'."), EngineDirectory));
+		EngineDirectory = Directory;
 	}
 }

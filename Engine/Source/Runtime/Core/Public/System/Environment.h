@@ -11,23 +11,28 @@ struct CORE_API Environment : public StaticClass
 {
 	static String GetCurrentDirectory()
 	{
+		Init();
 		return String(std::filesystem::current_path().wstring());
 	}
 
 	static void SetCurrentDirectory(String InPath)
 	{
+		Init();
 		std::filesystem::current_path(InPath.path());
 	}
 
 	static String GetEngineDirectory()
 	{
+		Init();
 		check(EngineDirectory.IsEmpty() == false);
 		return EngineDirectory;
 	}
 
-	static void SetEngineDirectory(String InPath);
-
 	static constexpr String NewLine = PLATFORM_NEWLINE;
+
+private:
+	static void Init();
+	static void SetupEngineDirectory();
 
 private:
 	static String EngineDirectory;

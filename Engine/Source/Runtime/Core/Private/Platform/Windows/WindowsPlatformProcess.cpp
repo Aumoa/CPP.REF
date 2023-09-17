@@ -6,6 +6,7 @@
 
 #include "Platform/Windows/WindowsPlatformProcess.h"
 #include "System/Console.h"
+#include "System/Path.h"
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"
 #include "WindowsCore.h"
@@ -65,6 +66,33 @@ extern "C" LONG CALLBACK UnhandledExceptionTrace(LPEXCEPTION_POINTERS lpExceptio
 void WindowsPlatformProcess::SetupStacktraceSignals() noexcept
 {
 	SetUnhandledExceptionFilter(UnhandledExceptionTrace);
+}
+
+String WindowsPlatformProcess::FindEngineDirectory()
+{
+	// Find 'Core.dll' library.
+	HMODULE hModule = GetModuleHandleW(TEXT("Core.dll").c_str());
+	if (hModule == nullptr)
+	{
+		return String::GetEmpty();
+	}
+
+	TCHAR Buf[1024];
+	DWORD Len = GetModuleFileNameW(hModule, Buf, 1024);
+	if (Len == 0)
+	{
+		return String::GetEmpty();
+	}
+
+	// Get engine directory from relative path of 'Core.dll'.
+	String FileName = String(Buf, Len);
+	// Engine/Binaries/{Platform}/{Configuration}/
+	String BinariesDirectory = Path::GetDirectoryName(FileName);
+	// Engine/
+	String EngineDirectory = Path::Combine(BinariesDirectory, TEXT(".."), TEXT(".."), TEXT(".."));
+	EngineDirectory = Path::GetFullPath(EngineDirectory);
+
+	return EngineDirectory;
 }
 
 void* WindowsPlatformProcess::AllocateCurrentThreadHandle() noexcept

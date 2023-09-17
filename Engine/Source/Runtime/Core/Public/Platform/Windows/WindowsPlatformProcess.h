@@ -22,6 +22,7 @@ struct CORE_API WindowsPlatformProcess : public GenericPlatformProcess
 	static void StacktraceFromException(void* lpExceptionPointer, std::vector<StackFrame>& OutStackframes) noexcept;
 
 	static void SetupStacktraceSignals() noexcept;
+	static String FindEngineDirectory();
 
 	static void* AllocateCurrentThreadHandle() noexcept;
 	static void DestroyCurrentThreadHandle(void* InHandle) noexcept;
