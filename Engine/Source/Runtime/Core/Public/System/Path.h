@@ -48,6 +48,17 @@ struct Path : public StaticClass
 		return String(InPath.path().extension().wstring());
 	}
 
+	static inline bool CompareExtension(String InPath, String Extension)
+	{
+		return GetExtension(InPath).Equals(Extension, EStringComparison::CurrentCultureIgnoreCase);
+	}
+
+	template<std::same_as<String>... TExtensions>
+	static inline bool CompareExtensions(String InPath, TExtensions&&... Extensions)
+	{
+		return (false || ... || CompareExtension(InPath, Extensions));
+	}
+
 	template<std::ranges::input_range R> requires std::convertible_to<std::ranges::range_value_t<R>, String>
 	static inline String Combine(const R& InRange)
 	{

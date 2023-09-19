@@ -13,7 +13,7 @@ namespace Linq
 		struct to_vector_adaptor_closure
 		{
 			template<std::ranges::input_range R>
-			inline constexpr auto operator ()(const R& InRange) const
+			inline constexpr auto operator ()(R&& InRange) const
 			{
 				using T = std::ranges::range_value_t<R>;
 
@@ -39,16 +39,16 @@ namespace Linq
 			}
 
 			template<std::ranges::input_range R>
-			inline constexpr auto operator ()(const R& InRange) const
+			inline constexpr auto operator ()(R&& InRange) const
 			{
-				return operator ()()(InRange);
+				return operator ()()(std::forward<R>(InRange));
 			}
 		};
 
 		template<std::ranges::input_range R>
-		inline constexpr auto operator |(const R& InRange, const to_vector_adaptor_closure& Adaptor)
+		inline constexpr auto operator |(R&& InRange, const to_vector_adaptor_closure& Adaptor)
 		{
-			return Adaptor(InRange);
+			return Adaptor(std::forward<R>(InRange));
 		}
 	}
 
