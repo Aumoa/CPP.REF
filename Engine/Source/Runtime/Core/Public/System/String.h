@@ -1049,7 +1049,7 @@ public:
 
 	template<std::ranges::input_range TStringArray>
 		requires std::convertible_to<std::ranges::range_value_t<TStringArray>, String>
-	[[nodiscard]] static String Join(const String& Separator, const TStringArray& Strings)
+	[[nodiscard]] static String Join(const String& Separator, TStringArray&& Strings)
 	{
 		std::vector<String> Concats;
 
@@ -1058,7 +1058,7 @@ public:
 			Concats.reserve(std::ranges::size(Strings));
 		}
 
-		for (auto& Item : Strings)
+		for (const auto& Item : Strings)
 		{
 			if (Concats.size() > 0)
 			{
