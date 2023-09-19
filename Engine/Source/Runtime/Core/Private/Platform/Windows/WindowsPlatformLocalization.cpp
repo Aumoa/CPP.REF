@@ -4,7 +4,9 @@
 
 #if PLATFORM_WINDOWS
 
-#include "WindowsCore.h"
+#define __ALLOW_PLATFORM_COMMON_H__
+
+#include "Platform/PlatformCommon.h"
 
 std::wstring WindowsPlatformLocalization::FromCodepage(std::string_view Str, int32 Codepage)
 {
@@ -45,5 +47,7 @@ std::string WindowsPlatformLocalization::ToCodepage(std::wstring_view Str, int32
 
 	return Multibyte;
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

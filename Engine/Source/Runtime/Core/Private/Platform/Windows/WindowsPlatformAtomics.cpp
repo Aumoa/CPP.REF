@@ -4,8 +4,10 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "System/Math.h"
-#include "WindowsCore.h"
+#include "Platform/PlatformCommon.h"
 
 inline SRWLOCK* GetSRWLOCK(void*& LockVal)
 {
@@ -141,5 +143,7 @@ void WindowsPlatformAtomics::NotifyAllSpinlockConditionVariable(void*& CondVal) 
 {
 	::WakeAllConditionVariable(GetCONDITION_VARIABLE(CondVal));
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

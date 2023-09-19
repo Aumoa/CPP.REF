@@ -52,6 +52,8 @@ struct GenericPlatformTypes : public StaticClass
 	using int32 = int32_t;
 	using int64 = int64_t;
 
+	using byte = uint8_t;
+
 	using ANSICHAR = char;
 	using WIDECHAR = wchar_t;
 

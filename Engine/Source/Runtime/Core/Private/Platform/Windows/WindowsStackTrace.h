@@ -4,9 +4,11 @@
 
 #if PLATFORM_WINDOWS
 
-#include "WindowsCore.h"
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "System/String.h"
 #include "Threading/Spinlock.h"
+#include "Platform/PlatformCommon.h"
 #include "Platform/PlatformMacros.h"
 #include "Diagnostics/StackFrame.h"
 #include "Platform/PlatformLocalization.h"
@@ -305,5 +307,7 @@ inline std::vector<StackFrame> Capture(HANDLE hThread, CONTEXT* InContext) noexc
 	PIMAGE_NT_HEADERS Image = ImplSymbolLoad();
 	return ImplStacktrace(Image, hThread, InContext);
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

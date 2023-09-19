@@ -11,4 +11,12 @@
 			<Item Condition="Buf._Which==1" Name="[Refs]">Buf._Tail._Head._Rep->_Uses</Item>
 		</Expand>
 	</Type>
+	<Type Name="Version">
+		<DisplayString Condition="Revision != 0">{Major}.{Minor}.{Build}.{Revision}</DisplayString>
+		<DisplayString Condition="Build != 0">{Major}.{Minor}.{Build}</DisplayString>
+		<DisplayString>{Major}.{Minor}</DisplayString>
+	</Type>
+	<Type Name="ToolChainInstallation">
+		<DisplayString Condition="(WindowsToolkitInstallation*)this">WindowsToolkitInstallation {((WindowsToolkitInstallation*)this)->InstallVersion}</DisplayString>
+	</Type>
 </AutoVisualizer>

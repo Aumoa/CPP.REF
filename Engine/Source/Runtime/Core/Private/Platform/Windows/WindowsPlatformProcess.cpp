@@ -4,12 +4,14 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "Platform/Windows/WindowsPlatformProcess.h"
+#include "Platform/PlatformCommon.h"
 #include "System/Console.h"
 #include "System/Path.h"
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"
-#include "WindowsCore.h"
 #include "WindowsStackTrace.h"
 
 bool WindowsPlatformProcess::IsDebuggerPresent() noexcept
@@ -112,5 +114,41 @@ void WindowsPlatformProcess::SetThreadDescription(void* InHandle, String InDescr
 {
 	::SetThreadDescription((HANDLE)InHandle, (LPCWSTR)InDescription.c_str());
 }
+
+void* WindowsPlatformProcess::CreateProcess(const ProcessStartInfo& InStartInfo) noexcept
+{
+	STARTUPINFO StartupInfo = {};
+	PROCESS_INFORMATION ProcessInfo = {};
+
+	BOOL bStatus = ::CreateProcessW(
+		InStartInfo.FileName.c_str(),
+		(LPWSTR)InStartInfo.Arguments.c_str(),
+		NULL,
+		NULL,
+		FALSE,
+		0,
+		NULL,
+		NULL,
+		&StartupInfo,
+		&ProcessInfo
+	);
+	check(bStatus);
+
+	if (bStatus)
+	{
+		CloseHandle(ProcessInfo.hThread);
+		ProcessInfo.hThread = NULL;
+	}
+
+	return ProcessInfo.hProcess;
+}
+
+void WindowsPlatformProcess::CloseProcessHandle(void* InHandle) noexcept
+{
+	BOOL bStatus = CloseHandle((HANDLE)InHandle);
+	check(bStatus);
+}
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

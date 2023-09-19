@@ -1,8 +1,13 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #pragma once
 
+#include "Platform/Generic/GenericPlatformCommon.h"
+
 #if PLATFORM_WINDOWS
+
+#include "System/String.h"
+#include "System/AssertionMacros.h"
 
 #pragma push_macro("TEXT")
 #pragma push_macro("NOMINMAX")
@@ -11,19 +16,39 @@
 #undef NOMINMAX
 
 #include <Windows.h>
+#include <minwindef.h>
+#include <rpc.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <MSWSock.h>
+#include <Psapi.h>
+#include <imagehlp.h>
+#include <signal.h>
 #include <comdef.h>
 #include <gdiplus.h>
 #include <wrl/client.h>
 #include <wincodec.h>
+#include <dxcapi.h>
 
+#undef YieldProcessor
 #undef OutputDebugString
+#undef GetMessage
+#undef GetCurrentDirectory
+#undef SetCurrentDirectory
+#undef Yield
+#undef min
+#undef max
+#undef CreateProcess
+#undef InterlockedIncrement
+#undef InterlockedDecrement
+#undef byte
 
 #pragma pop_macro("TEXT")
 #pragma pop_macro("NOMINMAX")
 
 using Microsoft::WRL::ComPtr;
 
-namespace WindowsTools
+namespace WindowsPlatformCommon
 {
 	inline String GetErrorText(DWORD dwError)
 	{
@@ -49,6 +74,6 @@ namespace WindowsTools
 	}
 }
 
-#define HR(X) if (HRESULT Result = (X); FAILED(Result)) { WindowsTools::ReportHResult(Result); }
+#define HR(X) if (HRESULT Result = (X); FAILED(Result)) { WindowsPlatformCommon::ReportHResult(Result); }
 
 #endif

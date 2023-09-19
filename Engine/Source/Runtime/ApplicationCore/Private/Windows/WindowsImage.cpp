@@ -4,7 +4,7 @@
 
 #if PLATFORM_WINDOWS
 
-#include "WindowsCommon.h"
+#include "Platform/PlatformCommon.h"
 #include "WindowsCo.h"
 
 #define IMPLV (*(IWICFormatConverter*)pImpl)

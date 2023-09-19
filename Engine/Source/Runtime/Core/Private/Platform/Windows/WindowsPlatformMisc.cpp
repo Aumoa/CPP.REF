@@ -4,8 +4,10 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "Platform/PlatformLocalization.h"
-#include "WindowsCore.h"
+#include "Platform/PlatformCommon.h"
 
 int32 PlatformMisc::GetLastError() noexcept
 {
@@ -23,5 +25,7 @@ String PlatformMisc::FormatSystemCode(int32 InSystemCode) noexcept
 
 	return String(Buf, Len);
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

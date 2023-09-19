@@ -4,10 +4,12 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "System/AssertionMacros.h"
 #include "System/SystemException.h"
 #include "Threading/ThreadPool.h"
-#include "WindowsCore.h"
+#include "Platform/PlatformCommon.h"
 #include "WindowsStandardStreamTextWriter.h"
 #include "IO/IOCompletionOverlapped.h"
 
@@ -257,5 +259,7 @@ bool WindowsPlatformIO::ReadFile(void* Handle, std::span<uint8> OutBytes, IOComp
 
 	return true;
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

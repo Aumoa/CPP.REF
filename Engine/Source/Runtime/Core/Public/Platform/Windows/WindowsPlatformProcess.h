@@ -7,6 +7,7 @@
 #if PLATFORM_WINDOWS
 
 #include "Platform/Generic/GenericPlatformProcess.h"
+#include "Platform/ProcessStartInfo.h"
 #include "System/String.h"
 #include <vector>
 
@@ -27,6 +28,9 @@ struct CORE_API WindowsPlatformProcess : public GenericPlatformProcess
 	static void* AllocateCurrentThreadHandle() noexcept;
 	static void DestroyCurrentThreadHandle(void* InHandle) noexcept;
 	static void SetThreadDescription(void* InHandle, String InDescription) noexcept;
+
+	static void* CreateProcess(const ProcessStartInfo& InStartInfo) noexcept;
+	static void CloseProcessHandle(void* InHandle) noexcept;
 };
 
 using PlatformProcess = WindowsPlatformProcess;

@@ -4,7 +4,9 @@
 
 #if PLATFORM_WINDOWS
 
-#include "Platform/Windows/WindowsCore.h"
+#define __ALLOW_PLATFORM_COMMON_H__
+
+#include "Platform/PlatformCommon.h"
 #include "IO/TextWriter.h"
 
 class WindowsStandardStreamTextWriter : public TextWriter
@@ -18,5 +20,7 @@ public:
 
 	HANDLE GetNativeHandle() const { return hStd; }
 };
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

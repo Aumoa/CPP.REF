@@ -17,6 +17,10 @@
 #include "Platform/PlatformLocalization.h"
 #include "Platform/PlatformAtomics.h"
 #include "Platform/PlatformIO.h"
+#include "Platform/ToolChainInstallation.h"
+#include "Platform/WindowsToolkitInstallation.h"
+#include "Platform/ProcessStartInfo.h"
+#include "Platform/Process.h"
 
 #include "System/Action.h"
 #include "System/Func.h"
@@ -67,6 +71,7 @@
 #include "System/Console.h"
 #include "System/Environment.h"
 #include "System/CrcHash.h"
+#include "System/Version.h"
 
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"

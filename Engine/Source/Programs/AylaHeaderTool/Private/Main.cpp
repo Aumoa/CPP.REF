@@ -6,20 +6,10 @@
 int main(int Argc, char* Argv[])
 {
 	PlatformProcess::SetupStacktraceSignals();
-	try
-	{
-		Environment::SetEngineDirectory(Environment::GetCurrentDirectory());
-	}
-	catch (const InvalidOperationException& E)
-	{
-		Console::Error.WriteLine(TEXT("Working directory is not engine directory. E.Message: {}"), E.GetMessage());
-		return 1;
-	}
-
 	CommandLine::Init(Argc, Argv);
 
 	std::stop_source CancellationTokenSource;
-	Console::CancelKeyPressed += [&CancellationTokenSource]()
+	Console::CancelKeyPressed += [&]()
 	{
 		CancellationTokenSource.request_stop();
 	};

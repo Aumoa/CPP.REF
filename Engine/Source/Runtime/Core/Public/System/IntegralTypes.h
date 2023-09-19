@@ -14,6 +14,7 @@ using int32 = PlatformTypes::int32;
 using uint32 = PlatformTypes::uint32;
 using int64 = PlatformTypes::int64;
 using uint64 = PlatformTypes::uint64;
+using byte = PlatformTypes::byte;
 
 class String;
 

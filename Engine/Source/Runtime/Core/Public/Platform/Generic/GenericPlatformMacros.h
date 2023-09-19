@@ -72,3 +72,15 @@
 #	define LIKELY(X) (X)
 #	define UNLIKELY(X) (X)
 #endif
+
+
+namespace GenericPlatformMacros
+{
+	template<class T, size_t N>
+	consteval size_t NativeArraySize(const T(&Val)[N])
+	{
+		return N;
+	}
+}
+
+#define AE_ARRAYSIZE(NativeArray) (GenericPlatformMacros::NativeArraySize(NativeArray))
