@@ -30,6 +30,8 @@ public:
 	Thread& operator =(const Thread& Thr) noexcept;
 	Thread& operator =(Thread&& Thr) noexcept;
 
+	static size_t GetHardwareConcurrency() noexcept;
+
 public:
 	static Thread GetCurrentThread();
 };

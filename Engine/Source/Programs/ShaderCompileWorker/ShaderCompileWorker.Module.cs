@@ -2,6 +2,7 @@
 
 using System;
 using AE.Rules;
+using AE.BuildSettings;
 
 public class ShaderCompileWorker : ModuleRules
 {
@@ -9,9 +10,15 @@ public class ShaderCompileWorker : ModuleRules
     {
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core"
+            "Core",
+            "CoreAObject"
         });
 
         PrivateIncludePaths.Add("Private");
+
+        if (TargetRule.Platform.Group == PlatformGroup.Windows)
+        {
+            PrivateAdditionalLibraries.Add("dxcompiler.lib");
+        }
     }
 }

@@ -1,32 +1,30 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #include "CoreMinimal.h"
+#include "SCWApp.h"
+#include "Exceptions/UsageException.h"
 
 int main(int Argc, char* Argv[])
 {
 	PlatformProcess::SetupStacktraceSignals();
-	try
-	{
-		Environment::SetEngineDirectory(Environment::GetCurrentDirectory());
-	}
-	catch (const InvalidOperationException& E)
-	{
-		Console::Error.WriteLine(TEXT("Working directory is not engine directory. E.Message: {}"), E.GetMessage());
-		return 1;
-	}
-
 	CommandLine::Init(Argc, Argv);
 
 	std::stop_source CancellationTokenSource;
-	Console::CancelKeyPressed += [&CancellationTokenSource]()
+	Console::CancelKeyPressed += [&]()
 	{
 		CancellationTokenSource.request_stop();
 	};
 
+	std::shared_ptr App = NewObject<ASCWApp>();
+
 	try
 	{
-		Console::WriteLine(TEXT("ShaderCompileWorker"));
-		return 0;
+		return App->RunAsync(CancellationTokenSource.get_token()).GetResult();
+	}
+	catch (const UsageException&)
+	{
+		Console::Error.WriteLine(TEXT("Invalid usage."));
+		App->PrintUsage(Console::Error);
 	}
 	catch (const Exception& E)
 	{

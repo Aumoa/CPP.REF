@@ -38,9 +38,11 @@ public:
 };
 
 template<class T>
-struct TIntegralType
+struct CORE_API TIntegralType
 {
+	using UnderlyingType = T;
 	static_assert(IntegralTypes::IsIntegral<T>());
+
 	T Value;
 
 	inline TIntegralType() noexcept
@@ -58,7 +60,7 @@ struct TIntegralType
 	{
 	}
 
-	String ToString() const;
+	static String ToString(const T& InValue);
 	static bool TryParse(String InStr, T& OutValue, int32 Base = 10) noexcept;
 };
 

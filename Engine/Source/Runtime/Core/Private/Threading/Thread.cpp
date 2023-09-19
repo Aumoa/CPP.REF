@@ -4,6 +4,7 @@
 #include "Platform/PlatformProcess.h"
 #include "Platform/PlatformAtomics.h"
 #include "System/AssertionMacros.h"
+#include <thread>
 
 Thread::Thread() noexcept
 {
@@ -67,6 +68,11 @@ Thread& Thread::operator =(Thread&& Thr) noexcept
 	Impl = nullptr;
 	std::swap(Impl, Thr.Impl);
 	return *this;
+}
+
+size_t Thread::GetHardwareConcurrency() noexcept
+{
+	return (size_t)std::thread::hardware_concurrency();
 }
 
 Thread Thread::GetCurrentThread()

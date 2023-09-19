@@ -29,9 +29,9 @@ FORCEINLINE bool VerifyRange(TInput InputValue, int32 Err) noexcept
 }
 
 template<>
-String TIntegralType<int8>::ToString() const
+String TIntegralType<int8>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -51,9 +51,9 @@ bool TIntegralType<int8>::TryParse(String InStr, int8& OutValue, int32 Base) noe
 }
 
 template<>
-String TIntegralType<uint8>::ToString() const
+String TIntegralType<uint8>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -73,9 +73,9 @@ bool TIntegralType<uint8>::TryParse(String InStr, uint8& OutValue, int32 Base) n
 }
 
 template<>
-String TIntegralType<int16>::ToString() const
+String TIntegralType<int16>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -95,9 +95,9 @@ bool TIntegralType<int16>::TryParse(String InStr, int16& OutValue, int32 Base) n
 }
 
 template<>
-String TIntegralType<uint16>::ToString() const
+String TIntegralType<uint16>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -117,9 +117,9 @@ bool TIntegralType<uint16>::TryParse(String InStr, uint16& OutValue, int32 Base)
 }
 
 template<>
-String TIntegralType<int32>::ToString() const
+String TIntegralType<int32>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -139,9 +139,9 @@ bool TIntegralType<int32>::TryParse(String InStr, int32& OutValue, int32 Base) n
 }
 
 template<>
-String TIntegralType<uint32>::ToString() const
+String TIntegralType<uint32>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -161,9 +161,9 @@ bool TIntegralType<uint32>::TryParse(String InStr, uint32& OutValue, int32 Base)
 }
 
 template<>
-String TIntegralType<int64>::ToString() const
+String TIntegralType<int64>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>
@@ -183,9 +183,9 @@ bool TIntegralType<int64>::TryParse(String InStr, int64& OutValue, int32 Base) n
 }
 
 template<>
-String TIntegralType<uint64>::ToString() const
+String TIntegralType<uint64>::ToString(const UnderlyingType& InValue)
 {
-    return String(std::to_wstring(Value));
+    return String(std::to_wstring(InValue));
 }
 
 template<>

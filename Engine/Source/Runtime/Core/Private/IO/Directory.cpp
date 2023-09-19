@@ -62,3 +62,8 @@ bool Directory::Exists(String InPath)
 {
 	return std::filesystem::is_directory(InPath.path());
 }
+
+bool Directory::CreateDirectory(String InPath)
+{
+	return std::filesystem::create_directories(InPath.path());
+}
