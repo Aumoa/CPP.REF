@@ -41,6 +41,9 @@ public sealed record MakefileCompile
         bool bEditor = Rule.bEditor;
         Macros.Add(("WITH_EDITOR", bEditor ? "1" : "0"));
 
+        bool bDoCheck = !bShipping;
+        Macros.Add(("DO_CHECK", bDoCheck ? "1" : "0"));
+
         // User-defined macros.
         Macros.AddRange(ModuleInfo.PrivateAdditionalMacros.Select(p => (p, (string?)null)));
 

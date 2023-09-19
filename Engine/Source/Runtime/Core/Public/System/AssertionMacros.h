@@ -5,12 +5,7 @@
 #include "Platform/PlatformMacros.h"
 #include "Platform/PlatformProcess.h"
 
-#if DO_CHECK
-#define check(Expr)						PLATFORM_UNREFERENCED_PARAMETER(Expr)
-#define checkf(Expr, Msgf, ...)			PLATFORM_UNREFERENCED_PARAMETER(Expr)
-#define ensure(Expr)					(Expr)
-#define ensureMsgf(Expr, Msgf, ...)		(Expr)
-#else
+#if DO_CHECK && !SHIPPING
 
 namespace AssertionMacros::details
 {
@@ -46,4 +41,12 @@ namespace AssertionMacros::details
 
 #define ensure(Expr)					AE_ENSURE_IMPL( , Expr, TEXT(#Expr))
 #define ensureMsgf(Expr, Msgf, ...)		AE_ENSURE_IMPL(&, Expr, String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
+
+#else
+
+#define check(Expr)						PLATFORM_UNREFERENCED_PARAMETER(Expr)
+#define checkf(Expr, Msgf, ...)			PLATFORM_UNREFERENCED_PARAMETER(Expr)
+#define ensure(Expr)					(Expr)
+#define ensureMsgf(Expr, Msgf, ...)		(Expr)
+
 #endif

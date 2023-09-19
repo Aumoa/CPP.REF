@@ -3,6 +3,21 @@
 #include "System/IntegralTypes.h"
 #include "System/String.h"
 
+static inline const wchar_t* GetNumberString(String InStr) noexcept
+{
+    static thread_local wchar_t CachedStrBuf[256];
+    if (InStr[InStr.length()] == '\0')
+    {
+        return InStr.c_str();
+    }
+    else
+    {
+        memcpy(CachedStrBuf, InStr.c_str(), sizeof(wchar_t) * InStr.length());
+        CachedStrBuf[InStr.length()] = 0;
+        return CachedStrBuf;
+    }
+}
+
 template<class TDest, class TInput>
 FORCEINLINE bool VerifyRange(TInput InputValue, int32 Err) noexcept
 {
@@ -23,7 +38,7 @@ template<>
 bool TIntegralType<int8>::TryParse(String InStr, int8& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     int32 Val = wcstol(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<int8>(Val, Err) == false)
@@ -45,7 +60,7 @@ template<>
 bool TIntegralType<uint8>::TryParse(String InStr, uint8& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     uint32 Val = wcstoul(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<uint8>(Val, Err) == false)
@@ -67,7 +82,7 @@ template<>
 bool TIntegralType<int16>::TryParse(String InStr, int16& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     int32 Val = wcstol(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<int16>(Val, Err) == false)
@@ -89,7 +104,7 @@ template<>
 bool TIntegralType<uint16>::TryParse(String InStr, uint16& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     uint32 Val = wcstoul(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<uint16>(Val, Err) == false)
@@ -111,7 +126,7 @@ template<>
 bool TIntegralType<int32>::TryParse(String InStr, int32& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     int32 Val = wcstol(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<int32>(Val, Err) == false)
@@ -133,7 +148,7 @@ template<>
 bool TIntegralType<uint32>::TryParse(String InStr, uint32& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     uint32 Val = wcstoul(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<uint32>(Val, Err) == false)
@@ -155,7 +170,7 @@ template<>
 bool TIntegralType<int64>::TryParse(String InStr, int64& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     int64 Val = wcstoll(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<int64>(Val, Err) == false)
@@ -177,7 +192,7 @@ template<>
 bool TIntegralType<uint64>::TryParse(String InStr, uint64& OutValue, int32 Base) noexcept
 {
     int32& Err = errno = 0;
-    const wchar_t* StartPtr = InStr.c_str();
+    const wchar_t* StartPtr = GetNumberString(InStr);
     wchar_t* EndPtr;
     uint64 Val = wcstoull(StartPtr, &EndPtr, Base);
     if (StartPtr == EndPtr || VerifyRange<uint64>(Val, Err) == false)

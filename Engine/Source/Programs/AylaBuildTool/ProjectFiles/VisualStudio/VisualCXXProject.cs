@@ -160,14 +160,11 @@ public class VisualCXXProject : IVisualStudioProject
                     }
                 });
 
-                if (bEditor)
-                {
-                    Macros.Add("WITH_EDITOR=1");
-                }
-                else
-                {
-                    Macros.Add("WITH_EDITOR=0");
-                }
+                bool bShipping = Configuration == Configuration.Shipping;
+                bool bDoCheck = !bShipping;
+                Macros.Add($"WITH_EDITOR={(bEditor ? "1" : "0")}");
+                Macros.Add($"SHIPPING={(bShipping ? "1" : "0")}");
+                Macros.Add($"DO_CHECK={(bDoCheck ? "1" : "0")}");
 
                 Macros.AddRange(new[]
                 {
