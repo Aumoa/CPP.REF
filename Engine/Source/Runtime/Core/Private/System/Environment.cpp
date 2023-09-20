@@ -4,6 +4,9 @@
 #include "IO/File.h"
 #include "System/Path.h"
 #include "System/InvalidOperationException.h"
+#include "Platform/PlatformProcess.h"
+#include "System/InvalidOperationException.h"
+#include <stdlib.h>
 
 String Environment::EngineDirectory;
 
@@ -19,4 +22,18 @@ void Environment::SetupEngineDirectory()
 	{
 		EngineDirectory = Directory;
 	}
+}
+
+void Environment::SetEnvironmentVariable(String InName, String InValue)
+{
+	if (PlatformProcess::SetEnvironmentVariable(InName, InValue) == false)
+	{
+		throw InvalidOperationException();
+	}
+}
+
+String Environment::GetEnvironmentVariable(String InName)
+{
+	// GetEnvironmentVariable is return literal capture.
+	return PlatformProcess::GetEnvironmentVariable(InName).Clone();
 }

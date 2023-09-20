@@ -14,6 +14,11 @@ Task<String> File::ReadAllTextAsync(String InPath, std::stop_token InCancellatio
 	co_return Content;
 }
 
+String File::ReadAllText(String InPath)
+{
+	return ReadAllTextAsync(InPath).GetResult();
+}
+
 Task<> File::WriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
 {
 	FileStream Stream(InPath, EFileMode::Create, EFileAccessMode::Write);

@@ -31,6 +31,9 @@ struct CORE_API WindowsPlatformProcess : public GenericPlatformProcess
 
 	static void* CreateProcess(const ProcessStartInfo& InStartInfo) noexcept;
 	static void CloseProcessHandle(void* InHandle) noexcept;
+
+	static bool SetEnvironmentVariable(String InName, String InValue) noexcept;
+	static String GetEnvironmentVariable(String InName) noexcept;
 };
 
 using PlatformProcess = WindowsPlatformProcess;

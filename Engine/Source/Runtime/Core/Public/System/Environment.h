@@ -28,6 +28,9 @@ struct CORE_API Environment : public StaticClass
 		return EngineDirectory;
 	}
 
+	static void SetEnvironmentVariable(String InName, String InValue);
+	static String GetEnvironmentVariable(String InName);
+
 	static constexpr String NewLine = PLATFORM_NEWLINE;
 
 private:

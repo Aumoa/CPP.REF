@@ -77,7 +77,7 @@
 namespace GenericPlatformMacros
 {
 	template<class T, size_t N>
-	consteval size_t NativeArraySize(const T(&Val)[N])
+	constexpr size_t NativeArraySize(const T(&)[N])
 	{
 		return N;
 	}

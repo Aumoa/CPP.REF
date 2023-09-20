@@ -149,6 +149,22 @@ void WindowsPlatformProcess::CloseProcessHandle(void* InHandle) noexcept
 	check(bStatus);
 }
 
+bool WindowsPlatformProcess::SetEnvironmentVariable(String InName, String InValue) noexcept
+{
+	return ::SetEnvironmentVariableW(InName.c_str(), InValue.c_str()) == TRUE;
+}
+
+String WindowsPlatformProcess::GetEnvironmentVariable(String InName) noexcept
+{
+	static thread_local WCHAR Buf[32767];
+	DWORD Len = ::GetEnvironmentVariableW(InName.c_str(), Buf, (DWORD)AE_ARRAYSIZE(Buf));
+	if (Len == 0)
+	{
+		return String::GetEmpty();
+	}
+	return String::FromLiteral(std::wstring_view(Buf, (size_t)Len));
+}
+
 #undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

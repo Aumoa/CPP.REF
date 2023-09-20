@@ -42,6 +42,9 @@
 #undef InterlockedIncrement
 #undef InterlockedDecrement
 #undef byte
+#undef FormatMessage
+#undef SetEnvironmentVariable
+#undef GetEnvironmentVariable
 
 #pragma pop_macro("TEXT")
 #pragma pop_macro("NOMINMAX")
