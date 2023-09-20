@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "SCWApp.h"
 #include "Exceptions/UsageException.h"
+#include "Exceptions/TerminateException.h"
 
 int main(int Argc, char* Argv[])
 {
@@ -25,6 +26,12 @@ int main(int Argc, char* Argv[])
 	{
 		Console::Error.WriteLine(TEXT("Invalid usage."));
 		App->PrintUsage(Console::Error);
+		return 1;
+	}
+	catch (const TerminateException& E)
+	{
+		Console::Error.WriteLine(E.GetMessage());
+		return 1;
 	}
 	catch (const Exception& E)
 	{

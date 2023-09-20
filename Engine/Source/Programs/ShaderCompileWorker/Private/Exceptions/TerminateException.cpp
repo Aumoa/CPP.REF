@@ -20,6 +20,9 @@ String TerminateException::FormatMessage(EKnownErrorCodes ErrorCode)
 	case EKnownErrorCodes::NotSupportedShaderType:
 		Message = TEXT("ShaderType is not supported.");
 		break;
+	case EKnownErrorCodes::CompilerError:
+		Message = TEXT("Compile error found.");
+		break;
 	default:
 		Message = TEXT("Internal compiler error.");
 		break;

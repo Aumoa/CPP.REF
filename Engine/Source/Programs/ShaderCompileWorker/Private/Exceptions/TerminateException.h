@@ -11,6 +11,7 @@ public:
 	{
 		Success = 0,
 		NotSupportedShaderType = 1,
+		CompilerError = 2,
 	};
 
 public:
