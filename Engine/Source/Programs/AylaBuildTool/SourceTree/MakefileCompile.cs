@@ -21,7 +21,7 @@ public sealed record MakefileCompile
 
     public IEnumerable<string> CollectCompilerIncludePaths()
     {
-        return ModuleInfo.PrivateIncludePaths.Append(ModuleInfo.GeneratedIncludePath);
+        return ModuleInfo.PrivateIncludePaths.Concat(new[] { ModuleInfo.GeneratedIncludePath, ModuleInfo.GeneratedShaderPath });
     }
 
     public IEnumerable<(string, string?)> CollectCompilerMacros(TargetRules Rule)

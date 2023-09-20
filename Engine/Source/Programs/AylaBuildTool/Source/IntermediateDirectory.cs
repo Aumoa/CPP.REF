@@ -13,6 +13,7 @@ public struct IntermediateDirectory
         {
             _Root = value;
             Includes = Path.Combine(_Root, "Includes");
+            Shaders = Path.Combine(_Root, "Shaders");
             ProjectFiles = Path.Combine(_Root, "ProjectFiles");
             Build = Path.Combine(_Root, "Build");
             Makefiles = Path.Combine(_Root, "Makefiles");
@@ -21,6 +22,8 @@ public struct IntermediateDirectory
     }
 
     public string Includes { get; private init; }
+    
+    public string Shaders { get; private init; }
 
     public string ProjectFiles { get; private init; }
 

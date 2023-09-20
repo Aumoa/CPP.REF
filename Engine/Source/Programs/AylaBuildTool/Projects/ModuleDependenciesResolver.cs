@@ -90,6 +90,7 @@ public class ModuleDependenciesResolver
                 SourceFiles = SourceFiles.ToArray(),
                 SourcePath = SourcePath,
                 GeneratedIncludePath = IncludePath,
+                GeneratedShaderPath = ProjectDir.Intermediate.Shaders,
                 DependModules = ApiDescriptions.Distinct().ToArray(),
                 PublicIncludePaths = PublicIncludePaths,
                 PrivateIncludePaths = PrivateIncludePaths,

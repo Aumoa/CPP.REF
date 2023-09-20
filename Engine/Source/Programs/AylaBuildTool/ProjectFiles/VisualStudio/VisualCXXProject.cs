@@ -210,7 +210,7 @@ public class VisualCXXProject : IVisualStudioProject
                         string GeneratedInclude = Path.Combine(Module.GeneratedIncludePath, Module.Name);
 
                         var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
-                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.PrivateIncludePaths.Append(GeneratedInclude))};%(AdditionalIncludeDirectories)";
+                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.PrivateIncludePaths.Concat(new[] { GeneratedInclude, Module.GeneratedShaderPath }))};%(AdditionalIncludeDirectories)";
 
                         if (Module.DependModules.Contains("Core"))
                         {

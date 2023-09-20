@@ -19,6 +19,8 @@ public record ModuleInformation
 
     public required string GeneratedIncludePath { get; init; }
 
+    public required string GeneratedShaderPath { get; init; }
+
     public required string[] DependModules { get; init; }
 
     public required string[] PublicIncludePaths { get; init; }
