@@ -20,6 +20,9 @@ public:
 
 	virtual Task<std::vector<byte>> CompileVertexShaderAsync(String InShaderFile, std::stop_token InCancellationToken) override;
 	virtual Task<std::vector<byte>> CompilePixelShaderAsync(String InShaderFile, std::stop_token InCancellationToken) override;
+
+private:
+	Task<std::vector<byte>> CompileShaderAsync(String InShaderFile, String InModelName, std::stop_token InCancellationToken);
 };
 
 #endif

@@ -18,7 +18,7 @@ private:
 public:
 	ND3D12CommandSet();
 
-	virtual void BeginFrame() override;
+	virtual void BeginFrame(const NRHIShader* pInitShader) override;
 	virtual void EndFrame() override;
 
 	virtual void BeginRender(const NRHIViewport& InViewport, bool bClear) override;

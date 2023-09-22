@@ -111,6 +111,19 @@ public class ModuleDependenciesResolver
 
     public IEnumerable<ModuleRules> GetModules() => Modules.Values.Select(p => p.Rule);
 
+    public bool HasDependModule(string InDependModuleName)
+    {
+        foreach (var (Name, Cache) in DependencyCaches)
+        {
+            if (Cache.DependModules.Contains(InDependModuleName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public async Task<int> GenerateReflectionCodesAsync(CancellationToken InCancellationToken = default)
     {
         List<ModuleInformation> HeaderToolPaths = new();
@@ -143,8 +156,6 @@ public class ModuleDependenciesResolver
             }
 
             PSI.WorkingDirectory = Global.EngineDirectory.Root;
-            PSI.RedirectStandardOutput = true;
-            PSI.RedirectStandardError = true;
 
             foreach (var Cache in HeaderToolPaths)
             {
@@ -161,9 +172,6 @@ public class ModuleDependenciesResolver
                 Process? P = Process.Start(PSI);
                 Debug.Assert(P != null);
                 await P.WaitForExitAsync(InCancellationToken);
-
-                Console.Write(P.StandardOutput.ReadToEnd());
-                Console.Write(P.StandardError.ReadToEnd());
                 if (P.ExitCode != 0)
                 {
                     return P.ExitCode;

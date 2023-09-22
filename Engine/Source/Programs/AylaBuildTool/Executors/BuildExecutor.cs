@@ -60,17 +60,26 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             PlatformID.Unix => TargetPlatform.Linux,
             _ => throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform)
         };
-
-        var HeaderToolCompiler = await AylaProjectCompiler.CreateCompilerAsync(Workspace, "AylaHeaderTool", new TargetInfo
+        var ToolsTargetInfo = new TargetInfo
         {
             BuildConfiguration = new()
             {
                 Configuration = Configuration.Shipping,
                 Platform = HostPlatform
             }
-        }, SToken);
+        };
+
+        var HeaderToolCompiler = await AylaProjectCompiler.CreateCompilerAsync(Workspace, "AylaHeaderTool", ToolsTargetInfo, SToken);
 
         int ReturnCode = await HeaderToolCompiler.CompileAsync(SToken);
+        if (ReturnCode != 0)
+        {
+            return ReturnCode;
+        }
+
+        var ShaderCompileWorkerCompiler = await AylaProjectCompiler.CreateCompilerAsync(Workspace, "ShaderCompileWorker", ToolsTargetInfo, SToken);
+
+        ReturnCode = await ShaderCompileWorkerCompiler.CompileAsync(SToken);
         if (ReturnCode != 0)
         {
             return ReturnCode;

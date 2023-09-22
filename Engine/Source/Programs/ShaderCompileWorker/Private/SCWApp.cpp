@@ -47,7 +47,6 @@ constexpr byte {}[] =
 )");
 
 		static constexpr size_t BinaryEachLine = 16;
-
 		while (!InCancellationToken.stop_requested())
 		{
 			size_t Index = PlatformAtomics::InterlockedIncrement(&AtomicIndex) - 1;

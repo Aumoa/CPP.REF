@@ -8,24 +8,32 @@
 #include "D3D12RHI/D3D12Graphics.h"
 #include "D3D12RHI/D3D12Viewport.h"
 #include "D3D12RHI/D3D12Texture2D.h"
+#include "D3D12RHI/D3D12Shader.h"
 #include "Numerics/VectorInterface/Color.h"
 
 ND3D12CommandSet::ND3D12CommandSet()
 {
 }
 
-void ND3D12CommandSet::BeginFrame()
+void ND3D12CommandSet::BeginFrame(const NRHIShader* pInitShader)
 {
+	const ND3D12Shader* pShader = static_cast<const ND3D12Shader*>(pInitShader);
+	ID3D12PipelineState* pPipelineState = nullptr;
+	if (pShader)
+	{
+		pPipelineState = pShader->GetPipelineState();
+	}
+
 	if (!Allocator && !CommandList)
 	{
 		ID3D12Device1* pDevice = ND3D12Global::GetDynamicRHI().GetDevice();
 		HR(pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&Allocator)));
-		HR(pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, Allocator.Get(), nullptr, IID_PPV_ARGS(&CommandList)));
+		HR(pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, Allocator.Get(), pPipelineState, IID_PPV_ARGS(&CommandList)));
 	}
 	else
 	{
 		HR(Allocator->Reset());
-		HR(CommandList->Reset(Allocator.Get(), nullptr));
+		HR(CommandList->Reset(Allocator.Get(), pPipelineState));
 	}
 }
 

@@ -40,12 +40,7 @@ public class AylaProjectCompiler
         var Resolver = new ModuleDependenciesResolver(Rule, SearchedModules, ToolChain);
         Resolver.Resolve();
 
-        Console.WriteLine("Parsing headers for {0}", Target.TargetName);
-        using (var Timer = new ScopedTimer("Parsing Headers"))
-        {
-            await Resolver.GenerateReflectionCodesAsync(InCancellationToken);
-        }
-        Console.WriteLine("Reflection code generated in {0} seconds.", ScopedTimer.GetElapsed("Parsing Headers"));
+        await GenerateReflectionCodesAsync(Resolver, InCancellationToken);
 
         Console.Write("Generate makefiles for {0}...", Target.TargetName);
         Dictionary<ModuleInformation, Makefile> Makefiles;
@@ -57,6 +52,12 @@ public class AylaProjectCompiler
 
         try
         {
+            int ReturnCode = await CompileShadersAsync(Resolver, InCancellationToken);
+            if (ReturnCode != 0)
+            {
+                return ReturnCode;
+            }
+
             var Context = new MakefileContext()
             {
                 CompileNodes = new()
@@ -79,7 +80,7 @@ public class AylaProjectCompiler
                 }
             }
 
-            int ReturnCode = await DispatchCompileWorkers(ToolChain, Context, Rule, InCancellationToken);
+            ReturnCode = await DispatchCompileWorkers(ToolChain, Context, Rule, InCancellationToken);
             return ReturnCode;
         }
         finally
@@ -263,5 +264,57 @@ public class AylaProjectCompiler
         }
 
         throw new TerminateException(KnownErrorCode.PlatformCompilerNotFound, CoreStrings.Errors.PlatformCompilerNotFound(TargetInfo.BuildConfiguration.Platform.ToString()));
+    }
+
+    private async Task GenerateReflectionCodesAsync(ModuleDependenciesResolver Resolver, CancellationToken InCancellationToken)
+    {
+        Console.WriteLine("Parsing headers for {0}", Target.TargetName);
+        using (var Timer = new ScopedTimer("Parsing Headers"))
+        {
+            await Resolver.GenerateReflectionCodesAsync(InCancellationToken);
+        }
+        Console.WriteLine("Reflection code generated in {0} seconds.", ScopedTimer.GetElapsed("Parsing Headers"));
+    }
+
+    private async Task<int> CompileShadersAsync(ModuleDependenciesResolver Resolver, CancellationToken InCancellationToken)
+    {
+        if (Resolver.HasDependModule("RHI") == false)
+        {
+            return 0;
+        }
+
+        Process? P;
+        using (var Timer = new ScopedTimer("Compile Shaders"))
+        {
+            var ShaderSourceDirectory = Workspace.CurrentTarget.Shaders;
+            var ShaderOutputDirectory = Workspace.CurrentTarget.Intermediate.Shaders;
+
+            var PSI = new ProcessStartInfo();
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                string BaseDir = Path.Combine(Global.EngineDirectory.Binaries.Linux, "Shipping");
+                PSI.Environment["LD_LIBRARY_PATH"] = BaseDir;
+                PSI.FileName = Path.Combine(BaseDir, "ShaderCompileWorker");
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                PSI.FileName = Global.EngineDirectory.Binaries.Win64;
+                PSI.FileName = Path.Combine(PSI.FileName, "Shipping", "ShaderCompileWorker.exe");
+            }
+            else
+            {
+                throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform);
+            }
+
+            PSI.WorkingDirectory = Path.GetDirectoryName(PSI.FileName);
+            PSI.Arguments = $"-Input \"{ShaderSourceDirectory}\" -Output \"{ShaderOutputDirectory}\"";
+            Console.WriteLine("Running ShaderCompileWorker \"{0}\"", Workspace.CurrentTarget.Name);
+            P = Process.Start(PSI);
+            Debug.Assert(P != null);
+            await P.WaitForExitAsync(InCancellationToken);
+            P.WaitForExit();
+        }
+        Console.WriteLine("Shader code generated in {0} seconds.", ScopedTimer.GetElapsed("Compile Shaders"));
+        return P.ExitCode;
     }
 }

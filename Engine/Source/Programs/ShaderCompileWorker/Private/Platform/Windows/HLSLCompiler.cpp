@@ -15,10 +15,18 @@ NHLSLCompiler::NHLSLCompiler()
 
 Task<std::vector<byte>> NHLSLCompiler::CompileVertexShaderAsync(String InShaderFile, std::stop_token InCancellationToken)
 {
+	return CompileShaderAsync(InShaderFile, TEXT("vs_6_1"), InCancellationToken);
+}
+
+Task<std::vector<byte>> NHLSLCompiler::CompilePixelShaderAsync(String InShaderFile, std::stop_token InCancellationToken)
+{
+	return CompileShaderAsync(InShaderFile, TEXT("ps_6_1"), InCancellationToken);
+}
+
+Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InShaderFile, String InModelName, std::stop_token InCancellationToken)
+{
 	String SrcContent = co_await File::ReadAllTextAsync(InShaderFile, InCancellationToken);
 	std::string SrcContentMultiByte = SrcContent.AsCodepage();
-
-
 
 	ComPtr<IDxcBlobEncoding> pEncoding;
 	HR(pLibrary->CreateBlobWithEncodingFromPinned(SrcContentMultiByte.c_str(), (UINT32)SrcContentMultiByte.length(), 0, &pEncoding));
@@ -29,21 +37,21 @@ Task<std::vector<byte>> NHLSLCompiler::CompileVertexShaderAsync(String InShaderF
 	co_await Task<>::Run([&]()
 	{
 		hCompileResult = pCompiler->Compile(pEncoding.Get(),
-			InShaderFile.c_str(),
-			TEXT("main").c_str(),
-			TEXT("vs_6_1").c_str(),
-			NULL, 0,
-			NULL, 0,
-			pIncludeHandler.Get(),
-			&pResult
-			);
+		InShaderFile.c_str(),
+		TEXT("main").c_str(),
+		InModelName.c_str(),
+		NULL, 0,
+		NULL, 0,
+		pIncludeHandler.Get(),
+		&pResult
+		);
 	});
 
 	HR(hCompileResult);
 	pResult->GetStatus(&hCompileResult);
 
 	ComPtr<IDxcBlobEncoding> pErrorBlob;
-	if (SUCCEEDED(pResult->GetErrorBuffer(&pErrorBlob)) && pErrorBlob)
+	if (SUCCEEDED(pResult->GetErrorBuffer(&pErrorBlob)) && pErrorBlob && pErrorBlob->GetBufferPointer())
 	{
 		std::string_view View = (const char*)pErrorBlob->GetBufferPointer();
 		Console::Error.WriteLine(String(View));
@@ -52,49 +60,6 @@ Task<std::vector<byte>> NHLSLCompiler::CompileVertexShaderAsync(String InShaderF
 	if (FAILED(hCompileResult))
 	{
 		throw TerminateException(TerminateException::EKnownErrorCodes::CompilerError);
-	}
-
-	ComPtr<IDxcBlob> pCode;
-	HR(pResult->GetResult(&pCode));
-
-	std::vector<byte> Bytes(pCode->GetBufferSize());
-	memcpy(Bytes.data(), pCode->GetBufferPointer(), pCode->GetBufferSize());
-
-	co_return Bytes;
-}
-
-Task<std::vector<byte>> NHLSLCompiler::CompilePixelShaderAsync(String InShaderFile, std::stop_token InCancellationToken)
-{
-	String SrcContent = co_await File::ReadAllTextAsync(InShaderFile, InCancellationToken);
-	std::string SrcContentMultiByte = SrcContent.AsCodepage();
-
-	ComPtr<IDxcBlobEncoding> pEncoding;
-	HR(pLibrary->CreateBlobWithEncodingFromPinned(SrcContentMultiByte.c_str(), (UINT32)SrcContentMultiByte.length(), 0, &pEncoding));
-
-	ComPtr<IDxcOperationResult> pResult;
-	HRESULT hCompileResult;
-	co_await Task<>::Run([&]()
-		{
-			hCompileResult = pCompiler->Compile(pEncoding.Get(),
-			InShaderFile.c_str(),
-			TEXT("main").c_str(),
-			TEXT("vs_6_1").c_str(),
-			NULL, 0,
-			NULL, 0,
-			NULL,
-			&pResult
-			);
-		});
-	if (FAILED(hCompileResult))
-	{
-		if (pResult)
-		{
-			ComPtr<IDxcBlobEncoding> pErrorBlob;
-			HR(pResult->GetErrorBuffer(&pErrorBlob));
-			std::string_view View = (const char*)pErrorBlob->GetBufferPointer();
-			Console::Error.WriteLine(String(View));
-		}
-		HR(hCompileResult);
 	}
 
 	ComPtr<IDxcBlob> pCode;

@@ -38,4 +38,9 @@ int main(int Argc, char* Argv[])
 		Console::Error.WriteLine(TEXT("Error: {}"), E.ToString());
 		return 1;
 	}
+	catch (const std::exception& E)
+	{
+		Console::Error.WriteLine(TEXT("Unexpected error: {}"), String::FromLiteral(E.what()));
+		return 1;
+	}
 }

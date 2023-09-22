@@ -6,6 +6,7 @@
 #include "RHI/RHIDeviceChild.h"
 
 class NRHIViewport;
+class NRHIShader;
 
 class RHI_API NRHICommandSet : public NRHIDeviceChild
 {
@@ -15,7 +16,7 @@ protected:
 public:
 	virtual ~NRHICommandSet() noexcept override = default;
 
-	virtual void BeginFrame() = 0;
+	virtual void BeginFrame(const NRHIShader* pInitShader) = 0;
 	virtual void EndFrame() = 0;
 
 	virtual void BeginRender(const NRHIViewport& InViewport, bool bClear) = 0;

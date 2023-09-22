@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "SlateRHIRenderer.h"
+#include "SlateGlobalShaders.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "RHI/RHIViewport.h"
@@ -30,7 +31,7 @@ void NSlateRHIRenderer::BeginFrame()
     }
 
 	Graphics.BeginFrame();
-    CommandSet->BeginFrame();
+    CommandSet->BeginFrame(&NSlateGlobalShaders::GetSlateShader());
 }
 
 void NSlateRHIRenderer::EndFrame()
