@@ -108,14 +108,17 @@ bool WindowsPlatformIO::DispatchQueuedCompletionStatus(void* Handle, const TimeS
 	if (CompletionKey != 0)
 	{
 		auto* Ptr = IOCompletionOverlapped::FromOverlapped(Overlapped);
-		if (bStatus)
+		ThreadPool::QueueUserWorkItem([Ptr, bStatus, NumberOfBytes, ErrorCode = ::WSAGetLastError()]()
 		{
-			Ptr->Complete((size_t)NumberOfBytes);
-		}
-		else
-		{
-			Ptr->Failed(::WSAGetLastError());
-		}
+			if (bStatus)
+			{
+				Ptr->Complete((size_t)NumberOfBytes);
+			}
+			else
+			{
+				Ptr->Failed(ErrorCode);
+			}
+		});
 		return true;
 	}
 	else
