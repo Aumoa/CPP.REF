@@ -7,7 +7,7 @@
 
 Task<String> File::ReadAllTextAsync(String InPath, std::stop_token InCancellationToken)
 {
-	FileStream Stream(InPath, EFileMode::Open, EFileAccessMode::Read);
+	FileStream Stream(InPath, EFileMode::Open, EFileAccessMode::Read, EFileSharedMode::Read);
 	StreamReader Reader(&Stream);
 	String Content = co_await Reader.ReadToEndAsync(InCancellationToken);
 	Stream.Close();

@@ -4,8 +4,9 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
 #include "GenericPlatform/GenericApplication.h"
-#include "Windows/WindowsCommon.h"
 #include <optional>
 
 namespace  /* Internal Storage */
@@ -147,7 +148,7 @@ namespace  /* Internal Storage */
 		WndClass.hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH);
 		WndClass.lpszClassName = TEXT("WindowsSplash").c_str();
 		ATOM Ret = RegisterClassExW(&WndClass);
-		checkf(Ret, TEXT("Failed to initialize window class for create splash window. Error: {}"), WindowsTools::GetErrorText());
+		checkf(Ret, TEXT("Failed to initialize window class for create splash window. Error: {}"), WindowsPlatformCommon::GetErrorText());
 
 		// Initial default screen size.
 		int nWidth = 600;
@@ -183,7 +184,7 @@ namespace  /* Internal Storage */
 		std::thread([&CS, &WndClass, &WndStyleEx, &nX, &nY, &nWidth, &nHeight]()
 		{
 			hWnd = CreateWindowEx(WndStyleEx, WndClass.lpszClassName, NULL, WS_POPUP, nX, nY, nWidth, nHeight, NULL, NULL, WndClass.hInstance, NULL);
-			checkf(hWnd, TEXT("Failed to create splash window. Error: {}"), WindowsTools::GetErrorText());
+			checkf(hWnd, TEXT("Failed to create splash window. Error: {}"), WindowsPlatformCommon::GetErrorText());
 
 			// Set window to fully transparent to start out.
 			SetLayeredWindowAttributes(hWnd, 0, 0, LWA_ALPHA);
@@ -214,7 +215,7 @@ namespace  /* Internal Storage */
 				// Otherwise, waiting next message.
 				else if (bFadingFinished)
 				{
-					if (GetMessage(&M, hWnd, 0, 0))
+					if (GetMessageW(&M, hWnd, 0, 0))
 					{
 						TranslateMessage(&M);
 						DispatchMessage(&M);
@@ -291,5 +292,7 @@ void NGenericSplash::SetSplashText(String InText)
 	InvalidateRect(hWnd, NULL, FALSE);
 	UpdateWindow(hWnd);
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

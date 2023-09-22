@@ -4,6 +4,7 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
 #include "WindowsCo.h"
 
@@ -95,5 +96,6 @@ Task<std::shared_ptr<NGenericImage>> NGenericImage::LoadFromFileAsync(String InF
 }
 
 #undef IMPLV
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

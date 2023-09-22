@@ -6,12 +6,15 @@
 
 #if PLATFORM_WINDOWS
 
-#include "WindowsCommon.h"
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
 
 struct NWindowsCoStatics : public StaticClass
 {
 	static void TryCoInitialize();
 	static ComPtr<IWICImagingFactory2> GetImagingFactory();
 };
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

@@ -4,7 +4,8 @@
 
 #if PLATFORM_WINDOWS
 
-#include "WindowsCommon.h"
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
 
 void NWindowsCoStatics::TryCoInitialize()
 {
@@ -22,5 +23,7 @@ ComPtr<IWICImagingFactory2> NWindowsCoStatics::GetImagingFactory()
 	}();
 	return sInstance;
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

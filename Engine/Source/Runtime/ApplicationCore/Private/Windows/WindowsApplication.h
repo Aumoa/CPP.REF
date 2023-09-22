@@ -7,7 +7,8 @@
 
 #if PLATFORM_WINDOWS
 
-#include "WindowsCommon.h"
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
 
 class NWindowsApplication : public NGenericApplication
 {
@@ -21,5 +22,7 @@ public:
 public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

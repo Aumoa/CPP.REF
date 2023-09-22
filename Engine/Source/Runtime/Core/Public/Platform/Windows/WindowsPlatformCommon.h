@@ -10,10 +10,8 @@
 #include "System/AssertionMacros.h"
 
 #pragma push_macro("TEXT")
-#pragma push_macro("NOMINMAX")
 
 #undef TEXT
-#undef NOMINMAX
 
 #include <Windows.h>
 #include <minwindef.h>
@@ -47,7 +45,6 @@
 #undef GetEnvironmentVariable
 
 #pragma pop_macro("TEXT")
-#pragma pop_macro("NOMINMAX")
 
 using Microsoft::WRL::ComPtr;
 
