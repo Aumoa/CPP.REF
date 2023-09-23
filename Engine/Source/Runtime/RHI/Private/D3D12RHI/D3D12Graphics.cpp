@@ -8,11 +8,10 @@
 #include "D3D12RHI/D3D12Global.h"
 #include "D3D12RHI/D3D12Texture2D.h"
 #include "D3D12RHI/D3D12CommandSet.h"
-#include "D3D12RHI/D3D12Shader.h"
+#include "D3D12RHI/D3D12RootSignature.h"
+#include "D3D12RHI/D3D12GraphicsPipelineState.h"
+#include "D3D12RHI/D3D12ConstantBuffer.h"
 #include "GenericPlatform/GenericWindow.h"
-
-#include "SlateElementVertexShader.fx.h"
-#include "SlateElementPixelShader.fx.h"
 
 ND3D12Graphics::ND3D12Graphics()
 {
@@ -126,122 +125,19 @@ std::shared_ptr<NRHICommandSet> ND3D12Graphics::CreateCommandSet()
 	return std::make_shared<ND3D12CommandSet>();
 }
 
-std::shared_ptr<NRHIShader> ND3D12Graphics::CreateShader()
+std::shared_ptr<NRHIRootSignature> ND3D12Graphics::CreateRootSignature()
 {
-	D3D12_DESCRIPTOR_RANGE RS1Ranges[] =
-	{
-		{
-			.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-			.NumDescriptors = 1,
-			.BaseShaderRegister = 0,
-			.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND,
-		}
-	};
+	return std::make_shared<ND3D12RootSignature>(*Device.Get());
+}
 
-	D3D12_ROOT_PARAMETER RSParameters[] =
-	{
-		{
-			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
-			.Constants =
-			{
-				.Num32BitValues = 4
-			},
-			.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
-		},
-		{
-			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-			.DescriptorTable =
-			{
-				.NumDescriptorRanges = (UINT)AE_ARRAYSIZE(RS1Ranges),
-				.pDescriptorRanges = RS1Ranges
-			},
-			.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
-		}
-	};
+std::shared_ptr<NRHIGraphicsPipelineState> ND3D12Graphics::CreateGraphicsPipelineState(NRHIRootSignature& InRS)
+{
+	return std::make_shared<ND3D12GraphicsPipelineState>(*Device.Get(), *static_cast<ND3D12RootSignature&>(InRS).Get());
+}
 
-	D3D12_STATIC_SAMPLER_DESC RSStaticParameters[] =
-	{
-		{
-			.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR,
-			.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-			.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-			.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-			.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
-			.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
-		}
-	};
-
-	D3D12_ROOT_SIGNATURE_DESC RSDesc =
-	{
-		.NumParameters = (UINT)AE_ARRAYSIZE(RSParameters),
-		.pParameters = RSParameters,
-		.NumStaticSamplers = 1,
-		.pStaticSamplers = RSStaticParameters,
-		.Flags = D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
-	};
-
-	ComPtr<ID3DBlob> pSerializedRSBlob, pError;
-	if (HRESULT Hr = D3D12SerializeRootSignature(&RSDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pSerializedRSBlob, &pError); FAILED(Hr))
-	{
-		if (pError)
-		{
-			PlatformProcess::OutputDebugString(String::Format(TEXT("{}\n"), String::FromLiteral((const char*)pError->GetBufferPointer())));
-		}
-		HR(Hr);
-	}
-
-	ComPtr<ID3D12RootSignature> pRS;
-	Device->CreateRootSignature(0, pSerializedRSBlob->GetBufferPointer(), pSerializedRSBlob->GetBufferSize(), IID_PPV_ARGS(&pRS));
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc =
-	{
-		.pRootSignature = pRS.Get(),
-		.VS = { SlateElementVertexShader, AE_ARRAYSIZE(SlateElementVertexShader) },
-		.PS = { SlateElementPixelShader, AE_ARRAYSIZE(SlateElementPixelShader) },
-		.BlendState =
-		{
-			.AlphaToCoverageEnable = TRUE,
-			.IndependentBlendEnable = FALSE,
-			.RenderTarget =
-			{
-				{
-					.BlendEnable = TRUE,
-					.SrcBlend = D3D12_BLEND_SRC_ALPHA,
-					.DestBlend = D3D12_BLEND_INV_SRC_ALPHA,
-					.BlendOp = D3D12_BLEND_OP_ADD,
-					.SrcBlendAlpha = D3D12_BLEND_ONE,
-					.DestBlendAlpha = D3D12_BLEND_ZERO,
-					.BlendOpAlpha = D3D12_BLEND_OP_ADD,
-					.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
-				}
-			}
-		},
-		.SampleMask = 0xFFFFFFFF,
-		.RasterizerState =
-		{
-			.FillMode = D3D12_FILL_MODE_SOLID,
-			.CullMode = D3D12_CULL_MODE_BACK,
-		},
-		.DepthStencilState =
-		{
-			.DepthEnable = FALSE,
-			.StencilEnable = FALSE
-		},
-		.InputLayout =
-		{
-			.pInputElementDescs = NULL,
-			.NumElements = 0
-		},
-		.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-		.NumRenderTargets = 1,
-		.RTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM },
-		.SampleDesc = { 1, 0 }
-	};
-
-	ComPtr<ID3D12PipelineState> pPS;
-	HR(Device->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
-
-	return std::make_shared<ND3D12Shader>(std::move(pRS), std::move(pPS));
+std::shared_ptr<NRHIConstantBuffer> ND3D12Graphics::CreateConstantBuffer()
+{
+	return std::make_shared<ND3D12ConstantBuffer>(*Device.Get());
 }
 
 ID3D12Device1* ND3D12Graphics::GetDevice() const
@@ -268,11 +164,7 @@ std::unique_ptr<NRHIGraphics> ND3D12Graphics::GenerateGraphics()
 
 void ND3D12Graphics::BeginFrame()
 {
-	if (Fence->GetCompletedValue() < FenceValue)
-	{
-		HR(Fence->SetEventOnCompletion(FenceValue, hFenceEvent));
-		WaitForSingleObject(hFenceEvent, INFINITE);
-	}
+	SyncFrame();
 	check(Fence->GetCompletedValue() >= FenceValue);
 	PulseAsyncCommands();
 }
@@ -281,6 +173,15 @@ void ND3D12Graphics::EndFrame()
 {
 	ID3D12CommandQueue* Queue = ND3D12Global::GetPrimaryCommandQueue().GetQueue();
 	HR(Queue->Signal(Fence.Get(), ++FenceValue));
+}
+
+void ND3D12Graphics::SyncFrame()
+{
+	if (Fence->GetCompletedValue() < FenceValue)
+	{
+		HR(Fence->SetEventOnCompletion(FenceValue, hFenceEvent));
+		WaitForSingleObject(hFenceEvent, INFINITE);
+	}
 }
 
 void ND3D12Graphics::PulseAsyncCommands()

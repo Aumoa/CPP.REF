@@ -42,6 +42,12 @@ public class AylaProjectCompiler
 
         await GenerateReflectionCodesAsync(Resolver, InCancellationToken);
 
+        int ReturnCode = await CompileShadersAsync(Resolver, InCancellationToken);
+        if (ReturnCode != 0)
+        {
+            return ReturnCode;
+        }
+
         Console.Write("Generate makefiles for {0}...", Target.TargetName);
         Dictionary<ModuleInformation, Makefile> Makefiles;
         using (var Timer = new ScopedTimer("Generate Makefiles"))
@@ -52,12 +58,6 @@ public class AylaProjectCompiler
 
         try
         {
-            int ReturnCode = await CompileShadersAsync(Resolver, InCancellationToken);
-            if (ReturnCode != 0)
-            {
-                return ReturnCode;
-            }
-
             var Context = new MakefileContext()
             {
                 CompileNodes = new()

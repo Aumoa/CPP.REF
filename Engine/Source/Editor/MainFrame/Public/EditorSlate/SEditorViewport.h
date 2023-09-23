@@ -12,11 +12,6 @@ class MAINFRAME_API SEditorViewport : public SViewport
 public:
 	SEditorViewport();
 
-	virtual void Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime) override;
-
-protected:
-	virtual Vector2 ComputeDesiredSize() const { return Vector2::Zero(); }
-
 public:
 	BEGIN_SLATE_ATTRIBUTE()
 	END_SLATE_ATTRIBUTE();

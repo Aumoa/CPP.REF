@@ -23,6 +23,8 @@ int32 SImage::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry,
 	PLATFORM_UNREFERENCED_PARAMETER(CullingRect);
 	PLATFORM_UNREFERENCED_PARAMETER(InLayer);
 	PLATFORM_UNREFERENCED_PARAMETER(bParentEnabled);
-	OutDrawElements.Add();
+	NSlateRenderElement& Element = OutDrawElements.Add();
+	Element.AbsolutePosition = AllottedGeometry.GetAbsolutePosition();
+	Element.Layout = AllottedGeometry.ToPaintGeometry();
 	return InLayer;
 }

@@ -83,7 +83,7 @@ struct NPaintGeometry
 	}
 
 private:
-	Vector2 LocalSize;
 	NSlateRenderTransform AccumulatedRenderTransform;
+	Vector2 LocalSize;
 	bool bHasRenderTransform = false;
 };

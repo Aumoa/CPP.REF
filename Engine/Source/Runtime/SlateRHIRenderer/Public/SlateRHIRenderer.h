@@ -6,10 +6,19 @@
 #include "Rendering/SlateRenderer.h"
 
 class NRHICommandSet;
+class NRHIConstantBuffer;
 
 class SLATERHIRENDERER_API NSlateRHIRenderer : public NSlateRenderer
 {
-	std::shared_ptr<NRHICommandSet> CommandSet;
+	struct NViewportCommands
+	{
+		std::shared_ptr<NRHICommandSet> CommandSet;
+		std::shared_ptr<NRHIConstantBuffer> ConstantBuffers;
+		size_t ConstantBufferUsage = 0;
+	};
+
+	std::vector<NViewportCommands> CachedVpCommands;
+	size_t VpIndex = 0;
 
 public:
 	NSlateRHIRenderer();
@@ -23,5 +32,7 @@ public:
 
 	virtual void BeginRender(const NRHIViewport& InViewport) override;
 	virtual void EndRender(const NRHIViewport& InViewport) override;
-	virtual void RenderElement(const NSlateRenderProxy& InElement) override;
+	virtual void RenderElement(const NSlateRenderElement& InElement) override;
+
+	virtual void Populate(const NSlateWindowElementList& InElementList) override;
 };

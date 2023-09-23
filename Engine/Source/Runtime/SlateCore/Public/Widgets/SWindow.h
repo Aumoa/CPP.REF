@@ -22,11 +22,9 @@ public:
 	SWindow();
 	virtual ~SWindow() noexcept override;
 
-	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
-
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
 	void ExecuteTick(const TimeSpan& InDeltaTime);
-	void Render(NSlateRenderer& Renderer);
+	void Render(const TimeSpan& InDeltaTime, NSlateRenderer& Renderer);
 	void Present();
 
 public:

@@ -56,7 +56,16 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, Args)
 
 Vector2 SViewport::ComputeDesiredSize() const
 {
-	return Vector2::Zero();
+	Vector2 MaxDesiredSize;
+
+	for (auto& Slot : Slots)
+	{
+		Vector2 CurrentDesiredSize = Slot.Content->GetDesiredSize();
+		MaxDesiredSize.X = Math::Max(CurrentDesiredSize.X, MaxDesiredSize.X);
+		MaxDesiredSize.Y = Math::Max(CurrentDesiredSize.Y, MaxDesiredSize.Y);
+	}
+
+	return MaxDesiredSize;
 }
 
 int32 SViewport::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const
@@ -107,11 +116,11 @@ void SViewport::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const N
 	}
 
 	static auto SortSlotsByZOrder = [](const NChildZOrder& Lhs, const NChildZOrder& Rhs)
-		{
-			return Lhs.ZOrder == Rhs.ZOrder
-				? std::less<size_t>()(Lhs.ChildIndex, Rhs.ChildIndex)
-				: std::less<int32>()(Lhs.ZOrder, Rhs.ZOrder);
-		};
+	{
+		return Lhs.ZOrder == Rhs.ZOrder
+			? std::less<size_t>()(Lhs.ChildIndex, Rhs.ChildIndex)
+			: std::less<int32>()(Lhs.ZOrder, Rhs.ZOrder);
+	};
 
 	std::sort(SlotOrder.begin(), SlotOrder.end(), SortSlotsByZOrder);
 	Vector2 AllottedSize = AllottedGeometry.GetLocalSize();

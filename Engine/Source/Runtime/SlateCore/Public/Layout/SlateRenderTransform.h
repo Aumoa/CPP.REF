@@ -15,6 +15,12 @@ struct NSlateRenderTransform
 	{
 	}
 
+	constexpr NSlateRenderTransform(const NSlateRenderTransform& Rhs) noexcept
+		: M(Rhs.M)
+		, Translation(Rhs.Translation)
+	{
+	}
+
 	constexpr NSlateRenderTransform(const Translate2D& Translation)
 		: M(Matrix2x2::Identity())
 		, Translation(Translation)
@@ -56,7 +62,9 @@ struct NSlateRenderTransform
 	{
 	}
 
-	constexpr auto operator <=>(const NSlateRenderTransform&) const = default;
+	constexpr auto operator <=>(const NSlateRenderTransform&) const noexcept = default;
+	constexpr bool operator ==(const NSlateRenderTransform&) const noexcept = default;
+	constexpr NSlateRenderTransform& operator =(const NSlateRenderTransform&) noexcept = default;
 
 public:
 	static constexpr NSlateRenderTransform Inverse(const NSlateRenderTransform& T)

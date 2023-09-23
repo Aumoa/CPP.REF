@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RHI/RHIDeviceChild.h"
+#include "Numerics/VectorInterface/Vector.h"
 
 class RHI_API NRHIViewport : public NRHIDeviceChild
 {
@@ -12,4 +13,5 @@ protected:
 
 public:
 	virtual void Present() = 0;
+	virtual Vector2N GetViewportSize() const = 0;
 };

@@ -42,6 +42,8 @@ ND3D12Viewport::ND3D12Viewport(IDXGIFactory7* InFactory, ID3D12CommandQueue* InQ
 	HR(pDevice->CreateDescriptorHeap(&HeapDesc, IID_PPV_ARGS(&RTVHeap)));
 	RTVIncrementSize = pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	AllocateBuffersAndCreateDescriptors();
+
+	VpSize = { (int32)Desc.Width, (int32)Desc.Height };
 }
 
 ND3D12Viewport::~ND3D12Viewport() noexcept
@@ -51,6 +53,11 @@ ND3D12Viewport::~ND3D12Viewport() noexcept
 void ND3D12Viewport::Present()
 {
 	HR(SwapChain4->Present(0, 0));
+}
+
+Vector2N ND3D12Viewport::GetViewportSize() const
+{
+	return VpSize;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE ND3D12Viewport::GetRTVHandle(int32 InIndex) const

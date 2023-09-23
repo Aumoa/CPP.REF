@@ -50,11 +50,7 @@ void SCanvasPanel::ClearSlots()
 
 DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Args)
 {
-	Slots.reserve(Args.Slots.size());
-	for (auto& Slot : Args.Slots)
-	{
-		Slots.emplace_back() = Slot;
-	}
+	Slots = std::move(Args.Slots);
 }
 
 Vector2 SCanvasPanel::ComputeDesiredSize() const

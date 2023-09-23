@@ -20,7 +20,7 @@ void SWidget::Tick([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_u
 {
 }
 
-int32 SWidget::Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const
+int32 SWidget::Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	return OnPaint(Args.WithNewParent(*this), AllottedGeometry, CullingRect, OutDrawElements, InLayer, bParentEnabled);
 }
@@ -35,15 +35,26 @@ void SWidget::SetVisibility(ESlateVisibility::Enum InVisibility)
 	}
 }
 
-Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
+void SWidget::SetRenderTransform(const NSlateRenderTransform& InTransform)
 {
-	return RenderTransformPivot;
+	RenderTransform = InTransform;
+	bHasRenderTransform = true;
 }
 
 NSlateRenderTransform SWidget::GetRenderTransformWithRespectToFlowDirection()
 {
 	checkf(bHasRenderTransform, TEXT("Widget have not render transform."));
 	return RenderTransform;
+}
+
+void SWidget::SetRenderTransformPivot(const Vector2& InPivot)
+{
+	RenderTransformPivot = InPivot;
+}
+
+Vector2 SWidget::GetRenderTransformPivotWithRespectToFlowDirection()
+{
+	return RenderTransformPivot;
 }
 
 void SWidget::SetEnabled(bool bInEnabled)

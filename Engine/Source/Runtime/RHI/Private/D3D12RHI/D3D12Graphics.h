@@ -36,10 +36,13 @@ public:
 	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) override;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) override;
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() override;
-	virtual std::shared_ptr<NRHIShader> CreateShader() override;
+	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() override;
+	virtual std::shared_ptr<NRHIGraphicsPipelineState> CreateGraphicsPipelineState(NRHIRootSignature& InRS) override;
+	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() override;
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
+	virtual void SyncFrame() override;
 
 	ID3D12Device1* GetDevice() const;
 

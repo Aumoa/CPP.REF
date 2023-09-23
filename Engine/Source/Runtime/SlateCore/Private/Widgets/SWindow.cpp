@@ -16,14 +16,6 @@ SWindow::~SWindow() noexcept
 {
 }
 
-void SWindow::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)
-{
-	if (SlateViewport)
-	{
-		SlateViewport->Tick(AllottedGeometry, InDeltaTime);
-	}
-}
-
 void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 {
 	check(!NativeWindow);
@@ -46,17 +38,26 @@ void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 	Vector2 AllottedSize = ComputeDesiredSize();
 	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
 	Tick(AllottedGeometry, InDeltaTime);
+}
+
+void SWindow::Render(const TimeSpan& InDeltaTime, NSlateRenderer& Renderer)
+{
+	Vector2 AllottedSize = ComputeDesiredSize();
 	NPaintArgs Args = NPaintArgs::InitPaintArgs(*this, InDeltaTime);
 	Rect CullingRect = { Vector2::Zero(), AllottedSize };
 	NSlateWindowElementList DrawElements;
+	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
 	OnPaint(Args, AllottedGeometry, CullingRect, DrawElements, 0, IsEnabled());
-}
 
-void SWindow::Render(NSlateRenderer& Renderer)
-{
 	if (Viewport)
 	{
 		Renderer.BeginRender(*Viewport);
+		Renderer.Populate(DrawElements);
+
+		for (auto& Element : DrawElements.UnorderedElements)
+		{
+			Renderer.RenderElement(Element);
+		}
 		Renderer.EndRender(*Viewport);
 	}
 }

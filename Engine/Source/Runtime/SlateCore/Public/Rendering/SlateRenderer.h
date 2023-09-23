@@ -6,7 +6,8 @@
 
 class SWindow;
 class NRHIViewport;
-struct NSlateRenderProxy;
+struct NSlateRenderElement;
+struct NSlateWindowElementList;
 
 class SLATECORE_API NSlateRenderer
 {
@@ -27,5 +28,7 @@ public:
 
 	virtual void BeginRender(const NRHIViewport& InViewport) = 0;
 	virtual void EndRender(const NRHIViewport& InViewport) = 0;
-	virtual void RenderElement(const NSlateRenderProxy& InElement) = 0;
+	virtual void RenderElement(const NSlateRenderElement& InElement) = 0;
+
+	virtual void Populate(const NSlateWindowElementList& InElementList) = 0;
 };

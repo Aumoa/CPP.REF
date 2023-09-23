@@ -3,16 +3,28 @@
 #ifndef __SLATE_ELEMENT_COMMON_HLSLI__
 #define __SLATE_ELEMENT_COMMON_HLSLI__
 
-struct Vertex
-{
-    float2 Position : POSITION;
-    float2 TexCoord : TEXCOORD;
-};
-
-struct Fragment
+struct NFragment
 {
     float4 Position : SV_Position;
     float2 TexCoord : TEXCOORD;
+};
+
+struct NSlatePaintGeometry
+{
+    float4 Transformation;
+    float2 Translation;
+    float2 LocalSize;
+};
+
+struct NSlateRenderParams
+{
+    float4 TintColor;
+    float RenderOpacity;
+};
+
+struct NSlateScreenInformation
+{
+    float2 ScreenResolution;
 };
 
 #endif

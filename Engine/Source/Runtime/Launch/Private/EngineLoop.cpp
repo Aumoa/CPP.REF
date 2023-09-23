@@ -10,6 +10,7 @@
 #include "SlateRHIRenderer.h"
 #include "Widgets/SWindow.h"
 #include "SlateRHIRenderer.h"
+#include "SlateGlobalShaders.h"
 #include "Widgets/SWindow.h"
 
 NEngineLoop::NEngineLoop()
@@ -26,10 +27,14 @@ void NEngineLoop::Init()
 
 void NEngineLoop::Shutdown()
 {
+    // waiting for all graphics commands are completed.
+    NRHIGlobal::GetDynamicRHI().SyncFrame();
+
     // shutdown application first.
     NSlateApplication::Destroy();
 
     // shutdown graphics engine.
+    NSlateGlobalShaders::Shutdown();
     NRHIGlobal::ShutdownDynamicRHI();
 }
 
@@ -64,6 +69,7 @@ void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
 
     // Initialize RHI engine.
     NRHIGlobal::InitDynamicRHI();
+    NSlateGlobalShaders::Initialize();
 
     // Initialize slate application.
     auto Renderer = std::make_shared<NSlateRHIRenderer>();

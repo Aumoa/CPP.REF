@@ -17,6 +17,19 @@ void SCompoundWidget::PrepassLayout()
 	CacheDesiredSize();
 }
 
+void SCompoundWidget::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)
+{
+	NArrangedChildrens ArrangedChildrens(ESlateVisibility::All);
+	OnArrangeChildren(ArrangedChildrens, AllottedGeometry);
+
+	const std::vector<NArrangedWidget>& ArrangedWidgets = ArrangedChildrens.GetWidgets();
+	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)
+	{
+		const NArrangedWidget& CurWidget = ArrangedWidgets[ChildIndex];
+		CurWidget.GetWidget()->Tick(CurWidget.GetGeometry(), InDeltaTime);
+	}
+}
+
 void SCompoundWidget::SetContent(std::shared_ptr<SWidget> InContent)
 {
 	if (ChildSlot.Content != InContent)

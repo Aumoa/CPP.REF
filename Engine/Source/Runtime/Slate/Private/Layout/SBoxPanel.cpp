@@ -81,6 +81,34 @@ void SBoxPanel::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const N
 	ArrangeChildrenAlong(Orientation, GetFlowDirection(), AllottedGeometry, ArrangedChildrens);
 }
 
+int32 SBoxPanel::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const
+{
+	NArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
+	ArrangeChildrenAlong(Orientation, GetFlowDirection(), AllottedGeometry, ArrangedChildren);
+
+	const bool bForwardedEnabled = ShouldBeEnabled(bParentEnabled);
+
+	// Because we paint multiple children, we must track the maximum layer id that they produced in case one of our parents
+	// wants to an overlay for all of its contents.
+	int32 MaxLayerId = InLayer;
+	int32 ChildLayerId = InLayer;
+	NPaintArgs NewArgs = Args.WithNewParent(*this);
+
+	const std::vector<NArrangedWidget>& ArrangedWidgets = ArrangedChildren.GetWidgets();
+	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)
+	{
+		const NArrangedWidget& CurWidget = ArrangedWidgets[ChildIndex];
+
+		if (!IsChildWidgetCulled(CullingRect, CurWidget))
+		{
+			const int32 CurWidgetsMaxLayerId = CurWidget.GetWidget()->Paint(NewArgs, CurWidget.GetGeometry(), CullingRect, OutDrawElements, ChildLayerId, bForwardedEnabled);
+			MaxLayerId = Math::Max(MaxLayerId, CurWidgetsMaxLayerId);
+		}
+	}
+
+	return MaxLayerId;
+}
+
 void SBoxPanel::ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection InLayoutFlow, const NGeometry& AllottedGeometry, NArrangedChildrens& ArrangedChildrens) const
 {
 	// Allotted space will be given to fixed-size children first.
@@ -283,9 +311,5 @@ Vector2 SBoxPanel::ComputeDesiredSizeForBox(EOrientation InOrientation, const st
 
 DEFINE_SLATE_CONSTRUCTOR(SBoxPanel, Attr)
 {
-	Slots.reserve(Attr.Slots.size());
-	for (auto& Slot : Attr.Slots)
-	{
-		Slots.emplace_back(Slot);
-	}
+	Slots = std::move(Attr.Slots);
 }

@@ -25,6 +25,7 @@ public:
 	SCompoundWidget();
 
 	virtual void PrepassLayout() override;
+	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime) override;
 
 	void SetContent(std::shared_ptr<SWidget> InContent);
 	std::shared_ptr<SWidget> GetContent() const { return ChildSlot.Content; }

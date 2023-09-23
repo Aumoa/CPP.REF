@@ -76,15 +76,18 @@ public:
 	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
 	virtual void PrepassLayout() = 0;
 
-	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const;
+	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled);
 	Vector2 GetDesiredSize() const { return CachedDesiredSize; }
 
 	void SetVisibility(ESlateVisibility::Enum InVisibility);
 	ESlateVisibility::Enum GetVisibility() const { return Visibility; }
 
-	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
+	void SetRenderTransform(const NSlateRenderTransform& InTransform);
 	NSlateRenderTransform GetRenderTransformWithRespectToFlowDirection();
 	inline bool HasRenderTransform() { return bHasRenderTransform; }
+
+	void SetRenderTransformPivot(const Vector2& InPivot);
+	Vector2 GetRenderTransformPivotWithRespectToFlowDirection();
 
 	void SetEnabled(bool bInEnabled);
 	bool IsEnabled() const { return bEnabled; }
@@ -144,12 +147,32 @@ protected:
 
 namespace DeclarativeSyntaxSupports
 {
+	template<class T>
+	struct HasConstructFunction
+	{
+		template<class U>
+		consteval static bool DoTest(void(U::*)(U::template NDeclarativeAttr<>&))
+		{
+			return std::same_as<T, U>;
+		}
+
+		consteval static bool DoTest(void*)
+		{
+			return false;
+		}
+
+		static constexpr bool bValue = DoTest(&T::Construct);
+	};
+
 	template<class T, class U>
 	void InvokeConstructorRecursive(T& WidgetInst, U& Args)
 	{
 		static_assert(std::derived_from<T, SWidget>);
 
-		WidgetInst.Construct(reinterpret_cast<typename T::template NDeclarativeAttr<>&>(Args));
+		if constexpr (HasConstructFunction<T>::bValue)
+		{
+			WidgetInst.Construct(reinterpret_cast<typename T::template NDeclarativeAttr<>&>(Args));
+		}
 		if constexpr (std::same_as<T, SWidget> == false)
 		{
 			InvokeConstructorRecursive(static_cast<T::Super&>(WidgetInst), Args);

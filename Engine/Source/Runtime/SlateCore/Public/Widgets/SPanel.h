@@ -13,6 +13,7 @@ public:
 	SPanel();
 
 	virtual void PrepassLayout() override;
+	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime) override;
 
 public:
 	virtual size_t NumChildrens() const = 0;

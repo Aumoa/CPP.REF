@@ -51,6 +51,7 @@ public:
 protected:
 	virtual Vector2 ComputeDesiredSize() const override;
 	virtual void OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const NGeometry& AllottedGeometry) const override;
+	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const override;
 
 private:
 	void ArrangeChildrenAlong(EOrientation InOrientation, EFlowDirection InLayoutFlow, const NGeometry& AllottedGeometry, NArrangedChildrens& ArrangedChildrens) const;
