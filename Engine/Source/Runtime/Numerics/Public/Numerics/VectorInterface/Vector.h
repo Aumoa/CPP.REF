@@ -518,49 +518,49 @@ constexpr auto operator |(const IVectorL& VL, const IVectorR& VR) requires TIsCo
 
 
 template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
-decltype(auto) operator +=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
+decltype(auto) operator +=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return V = V + VR;
 }
 
 template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
-decltype(auto) operator -=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
+decltype(auto) operator -=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return V = V - VR;
 }
 
 template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
-decltype(auto) operator *=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
+decltype(auto) operator *=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return V = V * VR;
 }
 
 template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
-decltype(auto) operator /=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
+decltype(auto) operator /=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return V = V / VR;
 }
 
 template<TIsVectorBase IVectorL, TIsVectorBase IVectorR>
-decltype(auto) operator %=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>&& std::assignable_from<IVectorL, IVectorL>
+decltype(auto) operator %=(IVectorL& V, const IVectorR& VR) requires TIsCompatibleVector<IVectorL, IVectorR>
 {
 	return V = V % VR;
 }
 
 template<TIsVectorBase IVector>
-decltype(auto) operator *=(IVector& V, const typename IVector::Type& S) requires std::assignable_from<IVector, IVector>
+decltype(auto) operator *=(IVector& V, const typename IVector::Type& S)
 {
 	return V = V * S;
 }
 
 template<TIsVectorBase IVector>
-decltype(auto) operator /=(IVector& V, const typename IVector::Type& S) requires std::assignable_from<IVector, IVector>
+decltype(auto) operator /=(IVector& V, const typename IVector::Type& S)
 {
 	return V = V / S;
 }
 
 template<TIsVectorBase IVector>
-decltype(auto) operator %=(IVector& V, const typename IVector::Type& S) requires std::assignable_from<IVector, IVector>
+decltype(auto) operator %=(IVector& V, const typename IVector::Type& S)
 {
 	return V = V % S;
 }
