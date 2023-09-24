@@ -198,7 +198,7 @@ struct Vector<void, 0>
 	}
 
 	template<TIsVectorBase IVectorL, TIsVectorBase IVectorR, TIsVectorBase IVectorResult = IVectorL>
-	static inline constexpr bool Max(const IVectorL& VL, const IVectorR& VR) requires
+	static inline constexpr IVectorResult Max(const IVectorL& VL, const IVectorR& VR) requires
 		TIsCompatibleVector<IVectorL, IVectorR>&&
 		TIsCompatibleVector<IVectorL, IVectorResult>
 	{
@@ -211,7 +211,7 @@ struct Vector<void, 0>
 	}
 
 	template<TIsVectorBase IVectorL, TIsVectorBase IVectorR, TIsVectorBase IVectorResult = IVectorL>
-	static inline constexpr bool Min(const IVectorL& VL, const IVectorR& VR) requires
+	static inline constexpr IVectorResult Min(const IVectorL& VL, const IVectorR& VR) requires
 		TIsCompatibleVector<IVectorL, IVectorR>&&
 		TIsCompatibleVector<IVectorL, IVectorResult>
 	{
@@ -224,7 +224,7 @@ struct Vector<void, 0>
 	}
 
 	template<TIsVectorBase IVectorL, TIsVectorBase IVectorResult = IVectorL>
-	static inline constexpr bool Clamp(const IVectorL& VL, const typename IVectorL::Type& Minimum, const typename IVectorL::Type& Maximum) requires
+	static inline constexpr IVectorResult Clamp(const IVectorL& VL, const typename IVectorL::Type& Minimum, const typename IVectorL::Type& Maximum) requires
 		TIsCompatibleVector<IVectorL, IVectorResult>
 	{
 		IVectorResult R;
@@ -236,7 +236,7 @@ struct Vector<void, 0>
 	}
 
 	template<TIsVectorBase IVectorL, TIsVectorBase IVectorMin, TIsVectorBase IVectorMax, TIsVectorBase IVectorResult = IVectorL>
-	static inline constexpr bool Clamp(const IVectorL& VL, const IVectorMin& Minimum, const IVectorMax& Maximum) requires
+	static inline constexpr IVectorResult Clamp(const IVectorL& VL, const IVectorMin& Minimum, const IVectorMax& Maximum) requires
 		TIsCompatibleVector<IVectorL, IVectorResult>&&
 		TIsCompatibleVector<IVectorL, IVectorMin>&&
 		TIsCompatibleVector<IVectorL, IVectorMax>
