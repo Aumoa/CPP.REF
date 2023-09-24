@@ -20,6 +20,8 @@ public:
 
 private:
 	NSlot ChildSlot;
+	EHorizontalAlignment HAlignment = EHorizontalAlignment::Left;
+	EVerticalAlignment VAlignment = EVerticalAlignment::Top;
 
 public:
 	SCompoundWidget();
@@ -40,5 +42,5 @@ public:
 		DECLARE_SLATE_SINGLE_SLOT_SUPPORTS(NSlot)
 	END_SLATE_ATTRIBUTE();
 
-	DECLARE_SLATE_CONSTRUCTOR() {}
+	DECLARE_SLATE_CONSTRUCTOR();
 };

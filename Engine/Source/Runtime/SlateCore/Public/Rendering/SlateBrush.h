@@ -14,5 +14,5 @@ struct SLATECORE_API NSlateBrush
 	std::shared_ptr<NSlateRenderProxy> RenderProxy;
 
 	NSlateBrush() = default;
-	NSlateBrush(Task<std::shared_ptr<NRHITexture2D>> InTextureTask, Vector2 InDrawSize, Color InTintColor = NamedColors::White);
+	NSlateBrush(Task<std::shared_ptr<NRHITexture2D>> InTextureTask, Vector2 InDrawSize = Vector2(32.0f, 32.0f), Color InTintColor = NamedColors::White);
 };

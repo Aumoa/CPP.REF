@@ -180,15 +180,8 @@ namespace DeclarativeSyntaxSupports
 	}
 }
 
-template<std::derived_from<SWidget> T>
-std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, typename T::template NDeclarativeAttr<typename T::template NDeclarativeAttr<>>&& Args)
-{
-	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
-	return std::move(WidgetInstPtr);
-}
-
-template<std::derived_from<SWidget> T>
-std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, typename T::template NDeclarativeAttr<void>&& Args)
+template<std::derived_from<SWidget> T, class U>
+std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, U&& Args)
 {
 	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
 	return std::move(WidgetInstPtr);

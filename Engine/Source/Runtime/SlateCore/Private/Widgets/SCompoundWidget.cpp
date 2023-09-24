@@ -52,6 +52,11 @@ Vector2 SCompoundWidget::ComputeDesiredSize() const
 
 void SCompoundWidget::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const NGeometry& AllottedGeometry) const
 {
+	if (!ChildSlot.Content)
+	{
+		return;
+	}
+
 	const ESlateVisibility::Enum ChildVisibility = ChildSlot.Content->GetVisibility();
 	if (ArrangedChildrens.Accepts(ChildVisibility))
 	{
@@ -94,4 +99,9 @@ int32 SCompoundWidget::OnPaint([[maybe_unused]] const NPaintArgs& Args, [[maybe_
 	}
 
 	return MaxLayerId;
+}
+
+DEFINE_SLATE_CONSTRUCTOR(SCompoundWidget, Args)
+{
+	ChildSlot = std::move(Args.SingleSlot);
 }
