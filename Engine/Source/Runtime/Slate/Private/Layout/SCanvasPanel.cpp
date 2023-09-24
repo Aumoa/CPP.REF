@@ -48,11 +48,6 @@ void SCanvasPanel::ClearSlots()
 	InvalidateLayoutAndVolatility();
 }
 
-DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Args)
-{
-	Slots = std::move(Args.Slots);
-}
-
 Vector2 SCanvasPanel::ComputeDesiredSize() const
 {
 	Vector2 FinalDesiredSize(0, 0);
@@ -67,24 +62,25 @@ Vector2 SCanvasPanel::ComputeDesiredSize() const
 			continue;
 		}
 
-		ESlateVisibility::Enum ChildVisibility = Widget->GetVisibility();
-
 		// As long as the widgets are not collapsed, they should contribute to the desired size.
-		if (ChildVisibility != ESlateVisibility::Collapsed)
+		ESlateVisibility::Enum ChildVisibility = Widget->GetVisibility();
+		if (ChildVisibility == ESlateVisibility::Collapsed)
 		{
-			const NMargin& Offset = CurChild.GetOffset();
-			const NAnchors& Anchors = CurChild.GetAnchors();
-
-			const Vector2& SlotSize = Vector2(Offset.Right, Offset.Bottom);
-			const bool& bAutoSize = CurChild.IsAutoSize();
-			const Vector2 Size = bAutoSize ? Widget->GetDesiredSize() : SlotSize;
-
-			const bool bIsDockedHorizontally = (Anchors.Minimum.X == Anchors.Maximum.X) && (Anchors.Minimum.X == 0 || Anchors.Minimum.X == 1);
-			const bool bIsDockedVertically = (Anchors.Minimum.Y == Anchors.Maximum.Y) && (Anchors.Minimum.Y == 0 || Anchors.Minimum.Y == 1);
-
-			FinalDesiredSize.X = Math::Max(FinalDesiredSize.X, Size.X + (bIsDockedHorizontally ? Math::Abs(Offset.Left) : 0.0f));
-			FinalDesiredSize.Y = Math::Max(FinalDesiredSize.Y, Size.Y + (bIsDockedVertically ? Math::Abs(Offset.Top) : 0.0f));
+			continue;
 		}
+
+		const NMargin& Offset = CurChild.GetOffset();
+		const NAnchors& Anchors = CurChild.GetAnchors();
+
+		const Vector2& SlotSize = Vector2(Offset.Right, Offset.Bottom);
+		const bool& bAutoSize = CurChild.IsAutoSize();
+		const Vector2 Size = bAutoSize ? Widget->GetDesiredSize() : SlotSize;
+
+		const bool bIsDockedHorizontally = (Anchors.Minimum.X == Anchors.Maximum.X) && (Anchors.Minimum.X == 0 || Anchors.Minimum.X == 1);
+		const bool bIsDockedVertically = (Anchors.Minimum.Y == Anchors.Maximum.Y) && (Anchors.Minimum.Y == 0 || Anchors.Minimum.Y == 1);
+
+		FinalDesiredSize.X = Math::Max(FinalDesiredSize.X, Size.X + (bIsDockedHorizontally ? Math::Abs(Offset.Left) : 0.0f));
+		FinalDesiredSize.Y = Math::Max(FinalDesiredSize.Y, Size.Y + (bIsDockedVertically ? Math::Abs(Offset.Top) : 0.0f));
 	}
 
 	return FinalDesiredSize;
@@ -247,4 +243,9 @@ void SCanvasPanel::ArrangeLayeredChildrens(NArrangedChildrens& InoutArrangedChil
 		}
 		ChildLayers.emplace_back(bNewLayer);
 	}
+}
+
+DEFINE_SLATE_CONSTRUCTOR(SCanvasPanel, Args)
+{
+	Slots = std::move(Args.Slots);
 }

@@ -6,6 +6,7 @@
 #include "Layout/SVerticalBoxPanel.h"
 #include "Layout/SSizeBox.h"
 #include "Layout/SOverlay.h"
+#include "Layout/SDockPanel.h"
 #include "Widgets/Images/SImage.h"
 #include "GenericPlatform/GenericImage.h"
 #include "RHI/RHIGlobal.h"
@@ -21,10 +22,11 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 
 	Args.Slots.emplace_back(SViewport::NSlot()
 		[
-			SNew(SVerticalBoxPanel)
+			SNew(SDockPanel)
 
 			// TOP MENU
-			+SVerticalBoxPanel::NSlot()
+			+SDockPanel::NSlot()
+			.Dock(EDockAttach::Top)
 			.HAlignment(EHorizontalAlignment::Fill)
 			[
 				SNew(SSizeBox)
@@ -85,6 +87,74 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 						]
 					]
 				]
+			]
+			// Inspector
+			+SDockPanel::NSlot()
+			.Dock(EDockAttach::Right)
+			.VAlignment(EVerticalAlignment::Fill)
+			[
+				SNew(SSizeBox)
+				.OverrideWidth(250.0f)
+				+SSizeBox::NSlot()
+				.VAlignment(EVerticalAlignment::Fill)
+				.HAlignment(EHorizontalAlignment::Fill)
+				[
+					SNew(SImage)
+					.Brush(ImageTask)
+				]
+			]
+			// Viewer
+			+SDockPanel::NSlot()
+			.Dock(EDockAttach::Bottom)
+			.HAlignment(EHorizontalAlignment::Fill)
+			[
+				SNew(SSizeBox)
+				.OverrideHeight(300.0f)
+				+SSizeBox::NSlot()
+				.VAlignment(EVerticalAlignment::Fill)
+				.HAlignment(EHorizontalAlignment::Fill)
+				[
+					SNew(SImage)
+					.Brush(ImageTask)
+				]
+			]
+			// Hierarchy
+			+SDockPanel::NSlot()
+			.Dock(EDockAttach::Left)
+			.VAlignment(EVerticalAlignment::Fill)
+			[
+				SNew(SSizeBox)
+				.OverrideWidth(300.0f)
+				+SSizeBox::NSlot()
+				.VAlignment(EVerticalAlignment::Fill)
+				.HAlignment(EHorizontalAlignment::Fill)
+				[
+					SNew(SImage)
+					.Brush(ImageTask)
+				]
+			]
+			// GameMenu
+			+SDockPanel::NSlot()
+			.Dock(EDockAttach::Top)
+			.HAlignment(EHorizontalAlignment::Fill)
+			[
+				SNew(SSizeBox)
+				.OverrideHeight(80.0f)
+				+SSizeBox::NSlot()
+				.VAlignment(EVerticalAlignment::Fill)
+				.HAlignment(EHorizontalAlignment::Fill)
+				[
+					SNew(SImage)
+					.Brush(ImageTask)
+				]
+			]
+			// GameViewport
+			+SDockPanel::NSlot()
+			.VAlignment(EVerticalAlignment::Fill)
+			.HAlignment(EHorizontalAlignment::Fill)
+			[
+				SNew(SImage)
+				.Brush(ImageTask)
 			]
 		]
 	);
