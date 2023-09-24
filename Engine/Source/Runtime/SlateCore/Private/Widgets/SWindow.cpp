@@ -72,7 +72,8 @@ void SWindow::Present()
 
 DEFINE_SLATE_CONSTRUCTOR(SWindow, Attr)
 {
-	PLATFORM_UNREFERENCED_PARAMETER(Attr);
+	Attr.SingleSlot._VAlignment = EVerticalAlignment::Fill;
+	Attr.SingleSlot._HAlignment = EHorizontalAlignment::Fill;
 }
 
 Vector2 SWindow::ComputeDesiredSize() const

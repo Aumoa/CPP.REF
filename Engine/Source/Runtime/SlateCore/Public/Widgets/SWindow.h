@@ -17,7 +17,6 @@ class SLATECORE_API SWindow : public SCompoundWidget
 private:
 	std::shared_ptr<NGenericWindow> NativeWindow;
 	std::shared_ptr<NRHIViewport> Viewport;
-	std::shared_ptr<SViewport> SlateViewport;
 
 public:
 	SWindow();

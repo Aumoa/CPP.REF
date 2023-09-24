@@ -3,6 +3,9 @@
 #include "EditorSlate/SEditorViewport.h"
 #include "Layout/SCanvasPanel.h"
 #include "Layout/SHorizontalBoxPanel.h"
+#include "Layout/SVerticalBoxPanel.h"
+#include "Layout/SSizeBox.h"
+#include "Layout/SOverlay.h"
 #include "Widgets/Images/SImage.h"
 #include "GenericPlatform/GenericImage.h"
 #include "RHI/RHIGlobal.h"
@@ -18,36 +21,69 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 
 	Args.Slots.emplace_back(SViewport::NSlot()
 		[
-			SNew(SCanvasPanel)
-			+SCanvasPanel::NSlot()
-			.bAutoSize(true)
-			.Offset(100.0f, 100.0f, 100.0f, 100.0f)
-			.ZOrder(1)
+			SNew(SVerticalBoxPanel)
+
+			// TOP MENU
+			+SVerticalBoxPanel::NSlot()
+			.HAlignment(EHorizontalAlignment::Fill)
 			[
-				SNew(SImage)
-				.RenderOpacity(0.6f)
-				.Brush(ImageTask, Vector2(571.0f, 200.0f))
-			]
-			+SCanvasPanel::NSlot()
-			.bAutoSize(true)
-			.Offset(100.0f, 220.0f)
-			[
-				SNew(SHorizontalBoxPanel)
-				+SHorizontalBoxPanel::NSlot()
-				.HAlignment(EHorizontalAlignment::Center)
-				.VAlignment(EVerticalAlignment::Center)
-				.SlotPadding(10.0f, 10.0f, 10.0f, 10.0f)
+				SNew(SSizeBox)
+				.OverrideHeight(30.0f)
+				+SSizeBox::NSlot()
+				.VAlignment(EVerticalAlignment::Fill)
+				.HAlignment(EHorizontalAlignment::Fill)
 				[
-					SNew(SImage)
-					.Brush(ImageTask, Vector2(100.0f, 100.0f))
-				]
-				+SHorizontalBoxPanel::NSlot()
-				.HAlignment(EHorizontalAlignment::Center)
-				.VAlignment(EVerticalAlignment::Center)
-				.SlotPadding(10.0f, 10.0f, 10.0f, 10.0f)
-				[
-					SNew(SImage)
-					.Brush(ImageTask, Vector2(50.05, 50.0f))
+					SNew(SOverlay)
+					+SOverlay::NSlot()
+					.HAlignment(EHorizontalAlignment::Fill)
+					[
+						SNew(SImage)
+						.Brush(ImageTask)
+					]
+					+SOverlay::NSlot()
+					[
+						SNew(SHorizontalBoxPanel)
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						[
+							SNew(SImage)
+							.Brush(ImageTask, Vector2(100.0f))
+						]
+					]
 				]
 			]
 		]
