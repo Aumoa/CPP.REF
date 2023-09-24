@@ -16,12 +16,12 @@ ND3D12GraphicsPipelineState::ND3D12GraphicsPipelineState(ID3D12Device& InDevice,
 		.PS = { SlateElementPixelShader, AE_ARRAYSIZE(SlateElementPixelShader) },
 		.BlendState =
 		{
-			.AlphaToCoverageEnable = TRUE,
+			.AlphaToCoverageEnable = FALSE,
 			.IndependentBlendEnable = FALSE,
 			.RenderTarget =
 			{
 				{
-					.BlendEnable = FALSE,
+					.BlendEnable = TRUE,
 					.SrcBlend = D3D12_BLEND_SRC_ALPHA,
 					.DestBlend = D3D12_BLEND_INV_SRC_ALPHA,
 					.BlendOp = D3D12_BLEND_OP_ADD,
@@ -36,7 +36,7 @@ ND3D12GraphicsPipelineState::ND3D12GraphicsPipelineState(ID3D12Device& InDevice,
 		.RasterizerState =
 		{
 			.FillMode = D3D12_FILL_MODE_SOLID,
-			.CullMode = D3D12_CULL_MODE_NONE,
+			.CullMode = D3D12_CULL_MODE_BACK,
 		},
 		.DepthStencilState =
 		{

@@ -8,41 +8,17 @@
 class AType;
 class NObjectInitializer;
 
+template<class T>
+class RefPtr;
+
 class COREAOBJECT_API AObject
 {
-private:
-	struct Referencer
-	{
-		int32 Refs;
-		int32 Weaks;
-
-		void IncrRef() noexcept
-		{
-			PlatformAtomics::InterlockedIncrement(&Weaks);
-			PlatformAtomics::InterlockedIncrement(&Refs);
-		}
-
-		bool DecrRef() noexcept
-		{
-			const bool bDangling = PlatformAtomics::InterlockedDecrement(&Refs) == 0;
-			if (PlatformAtomics::InterlockedDecrement(&Weaks) == 0)
-			{
-				delete this;
-			}
-			return bDangling;
-		}
-	};
-
-	struct GCCollectorMarks
-	{
-		bool bMarkReferenced : 1 = false;
-	};
+	template<class T>
+	friend class RefPtr;
 
 private:
-	Referencer* Refs = nullptr;
-	GCCollectorMarks GCM;
-
 	AType* const ClassType = nullptr;
+	Referencer* Refs = nullptr;
 
 protected:
 	AObject();
@@ -54,21 +30,12 @@ public:
 	virtual String ToString();
 	AType* GetType();
 
+	FORCEINLINE int32 GetLocks() const noexcept { return Refs->GetLocks(); }
+	FORCEINLINE int32 GetWeaks() const noexcept { return Refs->GetWeaks(); }
+
 public:
 	static AType* StaticClass();
-	static std::shared_ptr<AObject> NewObject(AType* InClassType);
+	static RefPtr<AObject> NewObject(AType* InClassType);
 };
 
-template<std::derived_from<AObject> UObject>
-inline std::shared_ptr<UObject> NewObject(AType* InClassType = nullptr)
-{
-	if (InClassType == nullptr)
-	{
-		InClassType = UObject::StaticClass();
-	}
-
-	std::shared_ptr<AObject> Instanced = AObject::NewObject(InClassType);
-	std::shared_ptr<UObject> Casted = std::dynamic_pointer_cast<UObject>(Instanced);
-	check(Casted);
-	return Casted;
-}
+#include "RefPtr.h"

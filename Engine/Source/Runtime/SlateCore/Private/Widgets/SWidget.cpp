@@ -112,6 +112,8 @@ DEFINE_SLATE_CONSTRUCTOR(SWidget, Attr)
 {
 	Visibility = Attr._Visibility;
 	bEnabled = Attr._bEnabled;
+	RenderOpacity = Attr._RenderOpacity;
+	FlowDirection = Attr._FlowDirection;
 	
 	InvalidateLayoutAndVolatility();
 }

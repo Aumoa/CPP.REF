@@ -39,6 +39,8 @@ public:
 	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() override;
 	virtual std::shared_ptr<NRHIGraphicsPipelineState> CreateGraphicsPipelineState(NRHIRootSignature& InRS) override;
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() override;
+	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() override;
+	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) override;
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;

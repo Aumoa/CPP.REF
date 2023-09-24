@@ -13,6 +13,8 @@ class NRHICommandSet;
 class NRHIRootSignature;
 class NRHIGraphicsPipelineState;
 class NRHIConstantBuffer;
+class NRHIDescriptorHeap;
+class NRHIShaderResourceView;
 
 class RHI_API NRHIGraphics
 {
@@ -30,6 +32,8 @@ public:
 	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() = 0;
 	virtual std::shared_ptr<NRHIGraphicsPipelineState> CreateGraphicsPipelineState(NRHIRootSignature& InRS) = 0;
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() = 0;
+	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() = 0;
+	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) = 0;
 
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;

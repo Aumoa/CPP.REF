@@ -10,7 +10,7 @@ NPaintArgs NPaintArgs::InitPaintArgs(const SWidget& InOwningWidget, const TimeSp
 		.OwningWidget = InOwningWidget,
 		.ParentWidget = nullptr,
 		.DeltaTime = InDeltaTime,
-		.ParentRenderOpacity = 1.0f
+		.RenderOpacity = 1.0f
 	};
 }
 
@@ -21,6 +21,6 @@ NPaintArgs NPaintArgs::WithNewParent(const SWidget& InOwningWidget) const
 		.OwningWidget = InOwningWidget,
 		.ParentWidget = &OwningWidget,
 		.DeltaTime = DeltaTime,
-		.ParentRenderOpacity = ParentRenderOpacity * InOwningWidget.GetRenderOpacity()
+		.RenderOpacity = RenderOpacity * InOwningWidget.GetRenderOpacity()
 	};
 }

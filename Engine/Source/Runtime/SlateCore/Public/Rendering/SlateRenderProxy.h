@@ -3,9 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RHI/RHITexture2D.h"
 
-struct NSlateRenderProxy
+class NRHITexture2D;
+class NRHIShaderResourceView;
+
+class NSlateRenderProxy : public std::enable_shared_from_this<NSlateRenderProxy>
 {
-	std::shared_ptr<NRHITexture2D> Texture;
+	NSlateRenderProxy(const NSlateRenderProxy&) = delete;
+	NSlateRenderProxy(NSlateRenderProxy&&) = delete;
+
+protected:
+	NSlateRenderProxy() noexcept = default;
+
+public:
+	virtual ~NSlateRenderProxy() noexcept = default;
+
+	virtual bool TryResolve() = 0;
+	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const = 0;
+	virtual std::shared_ptr<NRHIShaderResourceView> GetSRV() const = 0;
 };

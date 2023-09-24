@@ -11,7 +11,7 @@ struct SLATECORE_API NPaintArgs
 	const SWidget&	OwningWidget;
 	const SWidget*	ParentWidget;
 	const TimeSpan	DeltaTime;
-	const float		ParentRenderOpacity;
+	const float		RenderOpacity;
 
 	static NPaintArgs InitPaintArgs(const SWidget& InOwningWidget, const TimeSpan& InDeltaTime);
 	NPaintArgs WithNewParent(const SWidget& InOwningWidget) const;

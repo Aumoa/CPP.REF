@@ -7,8 +7,5 @@
 class CORE_API ArgumentOutOfRangeException : public Exception
 {
 public:
-	ArgumentOutOfRangeException()
-		: Exception(TEXT("Argument is out of range."))
-	{
-	}
+	ArgumentOutOfRangeException();
 };

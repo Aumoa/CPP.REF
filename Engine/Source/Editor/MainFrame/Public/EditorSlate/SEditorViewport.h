@@ -17,4 +17,7 @@ public:
 	END_SLATE_ATTRIBUTE();
 
 	DECLARE_SLATE_CONSTRUCTOR();
+
+private:
+	Task<std::shared_ptr<NRHITexture2D>> LoadTextureAsync();
 };

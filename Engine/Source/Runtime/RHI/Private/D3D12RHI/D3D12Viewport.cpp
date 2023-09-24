@@ -52,7 +52,7 @@ ND3D12Viewport::~ND3D12Viewport() noexcept
 
 void ND3D12Viewport::Present()
 {
-	HR(SwapChain4->Present(0, 0));
+	HR(SwapChain4->Present(1, 0));
 }
 
 Vector2N ND3D12Viewport::GetViewportSize() const

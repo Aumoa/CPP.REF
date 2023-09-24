@@ -10,6 +10,7 @@
 #include "D3D12RHI/D3D12Texture2D.h"
 #include "D3D12RHI/D3D12GraphicsPipelineState.h"
 #include "D3D12RHI/D3D12RootSignature.h"
+#include "D3D12RHI/D3D12DescriptorHeap.h"
 #include "Numerics/VectorInterface/Color.h"
 
 ND3D12CommandSet::ND3D12CommandSet()
@@ -69,7 +70,7 @@ void ND3D12CommandSet::BeginRender(const NRHIViewport& InViewport, bool bClear)
 
 	if (bClear)
 	{
-		CommandList->ClearRenderTargetView(hRTV, (FLOAT*)&NamedColors::Red, 0, nullptr);
+		CommandList->ClearRenderTargetView(hRTV, (FLOAT*)&NamedColors::Transparent, 0, nullptr);
 	}
 
 	Vector2N VpSize = InViewport.GetViewportSize();
@@ -115,6 +116,24 @@ void ND3D12CommandSet::EndRender(const NRHIViewport& InViewport)
 	CommandList->ResourceBarrier(1, &ResourceBarrier);
 }
 
+void ND3D12CommandSet::SetDescriptorHeaps(std::span<NRHIDescriptorHeap* const> Heaps)
+{
+	static thread_local std::vector<ID3D12DescriptorHeap*> ppHeaps;
+	ppHeaps.clear();
+
+	ppHeaps.reserve(Heaps.size());
+	for (auto& Heap : Heaps)
+	{
+		auto* pHeap = static_cast<ND3D12DescriptorHeap*>(Heap)->Get();
+		if (pHeap)
+		{
+			ppHeaps.emplace_back(pHeap);
+		}
+	}
+
+	CommandList->SetDescriptorHeaps((UINT)ppHeaps.size(), ppHeaps.data());
+}
+
 void ND3D12CommandSet::SetGraphicsRootSignature(NRHIRootSignature& InRS)
 {
 	ID3D12RootSignature* pRS = static_cast<ND3D12RootSignature&>(InRS).Get();
@@ -129,6 +148,12 @@ void ND3D12CommandSet::SetGraphicsRoot32BitConstants(int32 RootParameterIndex, i
 void ND3D12CommandSet::SetGraphicsRootConstantBufferView(int32 RootParameterIndex, int64 BufferLocation)
 {
 	CommandList->SetGraphicsRootConstantBufferView(RootParameterIndex, BufferLocation);
+}
+
+void ND3D12CommandSet::SetGraphicsRootDescriptorTable(int32 RootParameterIndex, int64 VirtualHandleLocation)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE hView{ .ptr = (UINT64)VirtualHandleLocation };
+	CommandList->SetGraphicsRootDescriptorTable(RootParameterIndex, hView);
 }
 
 void ND3D12CommandSet::DrawInstanced(bool bStrip, int32 InVertexCount, int32 InInstanceCount, int32 InVertexStart, int32 InInstanceStart)

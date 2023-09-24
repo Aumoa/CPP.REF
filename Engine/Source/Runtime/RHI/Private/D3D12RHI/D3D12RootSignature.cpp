@@ -38,7 +38,26 @@ ND3D12RootSignature::ND3D12RootSignature(ID3D12Device& InDevice)
 				.ShaderRegister = 1
 			},
 			.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-		}
+		},
+		{
+			// Texture for PS
+			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+			.DescriptorTable =
+			{
+				.NumDescriptorRanges = (UINT)AE_ARRAYSIZE(RS1Ranges),
+				.pDescriptorRanges = RS1Ranges
+			},
+			.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
+		},
+		{
+			// RenderParams for PS
+			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
+			.Descriptor =
+			{
+				.ShaderRegister = 0
+			},
+			.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
+		},
 	};
 
 	D3D12_STATIC_SAMPLER_DESC RSStaticParameters[] =

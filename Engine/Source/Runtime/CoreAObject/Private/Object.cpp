@@ -4,6 +4,7 @@
 #include "Type.h"
 #include "CodeGen/TypeGen.h"
 #include "CoreAObject/ObjectInitializer.h"
+#include "RefPtr.h"
 
 AObject::AObject() : AObject(NObjectInitializer::Get())
 {
@@ -11,8 +12,8 @@ AObject::AObject() : AObject(NObjectInitializer::Get())
 
 AObject::AObject(NObjectInitializer& Initializer)
 	: ClassType(Initializer.ConsumeConstructType())
+	, Refs(new Referencer())
 {
-	Refs = new Referencer();
 	Refs->IncrRef();
 }
 
@@ -45,12 +46,12 @@ AType* AObject::StaticClass()
 	return TypePtr;
 }
 
-std::shared_ptr<AObject> AObject::NewObject(AType* InClassType)
+RefPtr<AObject> AObject::NewObject(AType* InClassType)
 {
 	check(InClassType);
 	check((InClassType->ClassMeta & EClassMetadata::Abstract) == 0);
 	NObjectInitializer::Get().MarkInit(InClassType);
-	return std::shared_ptr<AObject>(InClassType->Constructor());
+	return RefPtr<AObject>(InClassType->Constructor());
 }
 
 REGISTER_INTRINSIC_CLASS(AObject, TEXT("/Script/CoreAObject"));

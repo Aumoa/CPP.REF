@@ -50,8 +50,7 @@ public:
 		return false;
 	}
 
-	FORCEINLINE bool IsLived() const noexcept
-	{
-		return Locks > 0;
-	}
+	FORCEINLINE bool IsLived() const noexcept { return Locks > 0; }
+	FORCEINLINE int32 GetLocks() const noexcept { return Locks; }
+	FORCEINLINE int32 GetWeaks() const noexcept { return Weaks; }
 };

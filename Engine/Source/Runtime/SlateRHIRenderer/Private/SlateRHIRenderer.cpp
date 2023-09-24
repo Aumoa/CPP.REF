@@ -8,11 +8,13 @@
 #include "RHI/RHICommandSet.h"
 #include "RHI/RHICommandQueue.h"
 #include "RHI/RHIConstantBuffer.h"
+#include "RHI/RHIDescriptorHeap.h"
 #include "Application/SlateApplication.h"
 #include "GenericPlatform/GenericWindow.h"
 #include "GenericPlatform/GenericApplication.h"
 #include "Widgets/SWindow.h"
 #include "Rendering/SlateRenderProxy.h"
+#include "Numerics/VectorInterface/Color.h"
 
 NSlateRHIRenderer::NSlateRHIRenderer()
 {
@@ -48,6 +50,7 @@ void NSlateRHIRenderer::EndFrame()
 
 void NSlateRHIRenderer::FlushCommands()
 {
+    NRHIGlobal::GetDynamicRHI().SyncFrame();
 }
 
 void NSlateRHIRenderer::CreateViewport(SWindow& InWindow)
@@ -76,10 +79,10 @@ void NSlateRHIRenderer::BeginRender(const NRHIViewport& InViewport)
         pVpCommands = &CachedVpCommands.emplace_back();
         pVpCommands->CommandSet = Graphics.CreateCommandSet();
         pVpCommands->ConstantBuffers = Graphics.CreateConstantBuffer();
+        pVpCommands->DescriptorHeap = Graphics.CreateDescriptorHeap();
     }
 
-    pVpCommands->ConstantBufferUsage = 0;
-
+    pVpCommands->Restart();
     pVpCommands->CommandSet->BeginFrame(&NSlateGlobalShaders::GetSlatePipelineState());
     pVpCommands->CommandSet->SetGraphicsRootSignature(NSlateGlobalShaders::GetSlateRootSignature());
     pVpCommands->CommandSet->BeginRender(InViewport, true);
@@ -102,36 +105,83 @@ struct alignas(256) NCV_SlatePaintGeometry
     Vector2 LocalSize;
 };
 
+struct alignas(256) NCV_SlateRenderParams
+{
+    Color TintColor;
+    float RenderOpacity;
+};
+
+template<class T>
+inline T* GetConstantBufferPtr(std::shared_ptr<NRHIConstantBuffer>& ConstantBuffer, size_t& Usage, int64& VirtualLocation)
+{
+    auto* Vp = (uint8*)ConstantBuffer->GetBufferPointer();
+    Vp += Usage;
+    VirtualLocation = ConstantBuffer->GetGPUVirtualAddress();
+    VirtualLocation += Usage;
+    Usage += sizeof(T);
+    return (T*)Vp;
+}
+
 void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
 {
     PLATFORM_UNREFERENCED_PARAMETER(InElement);
     NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
 
-    auto* Cvp = (NCV_SlatePaintGeometry*)((uint8*)VpCommands.ConstantBuffers->GetBufferPointer() + VpCommands.ConstantBufferUsage);
+    int64 VL_PaintGeometry;
+    auto* CB_PaintGeometry = GetConstantBufferPtr<NCV_SlatePaintGeometry>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_PaintGeometry);
     if (InElement.Layout.HasRenderTransform())
     {
-        Cvp->Transformation = InElement.Layout.GetAccumulatedRenderTransform().M;
-        Cvp->Translation = InElement.Layout.GetAccumulatedRenderTransform().Translation;
+        CB_PaintGeometry->Transformation = InElement.Layout.GetAccumulatedRenderTransform().M;
+        CB_PaintGeometry->Translation = InElement.Layout.GetAccumulatedRenderTransform().Translation;
     }
     else
     {
-        Cvp->Transformation = Matrix2x2::Identity();
-        Cvp->Translation = InElement.AbsolutePosition;
+        CB_PaintGeometry->Transformation = Matrix2x2::Identity();
+        CB_PaintGeometry->Translation = InElement.AbsolutePosition;
     }
-    Cvp->LocalSize = InElement.Layout.GetLocalSize();
+    CB_PaintGeometry->LocalSize = InElement.Layout.GetLocalSize();
 
-    int64 BufferLocation = VpCommands.ConstantBuffers->GetGPUVirtualAddress();
-    BufferLocation += VpCommands.ConstantBufferUsage;
-    VpCommands.CommandSet->SetGraphicsRootConstantBufferView(1, BufferLocation);
+    int64 VL_RenderParams;
+    auto* CB_RenderParams = GetConstantBufferPtr<NCV_SlateRenderParams>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_RenderParams);
+    CB_RenderParams->TintColor = InElement.TintColor;
+    CB_RenderParams->RenderOpacity = InElement.RenderOpacity;
+
+    if (InElement.Proxy && InElement.Proxy->TryResolve())
+    {
+        VpCommands.DescriptorHeap->ApplyViewSimple(VpCommands.DescriptorUsage, *InElement.Proxy->GetSRV(), 0, 1);
+        int64 VirtualHandleLocation = VpCommands.DescriptorHeap->GetVirtualHandleLocation(VpCommands.DescriptorUsage++);
+        VpCommands.CommandSet->SetGraphicsRootDescriptorTable(2, VirtualHandleLocation);
+    }
+
+    VpCommands.CommandSet->SetGraphicsRootConstantBufferView(1, VL_PaintGeometry);
+    VpCommands.CommandSet->SetGraphicsRootConstantBufferView(3, VL_RenderParams);
     VpCommands.CommandSet->DrawInstanced(true, 4, 1, 0, 0);
-
-    VpCommands.ConstantBufferUsage += sizeof(NCV_SlatePaintGeometry);
 }
 
 void NSlateRHIRenderer::Populate(const NSlateWindowElementList& InElementList)
 {
     NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
     size_t NumElements = InElementList.UnorderedElements.size();
-    size_t ConstantBufferSize = sizeof(NCV_SlatePaintGeometry) * NumElements;
+    size_t ConstantBufferSize
+        = sizeof(NCV_SlatePaintGeometry) * NumElements
+        + sizeof(NCV_SlateRenderParams) * NumElements
+        ;
     VpCommands.ConstantBuffers->Reserve(ConstantBufferSize);
+
+    size_t NumDescriptors = 0;
+    for (auto& Element : InElementList.UnorderedElements)
+    {
+        if (Element.Proxy)
+        {
+            ++NumDescriptors;
+        }
+    }
+
+    if (NumDescriptors)
+    {
+        VpCommands.DescriptorHeap->Reserve(NumDescriptors);
+
+        NRHIDescriptorHeap* Heaps[]{ VpCommands.DescriptorHeap.get() };
+        VpCommands.CommandSet->SetDescriptorHeaps(Heaps);
+    }
 }

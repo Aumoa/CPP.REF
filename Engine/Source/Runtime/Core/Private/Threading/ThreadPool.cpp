@@ -137,13 +137,13 @@ void ThreadPool::DelayedWorker()
 		// calculate timer works.
 		{
 			std::unique_lock ScopedLock(DelayedLck);
-			Cv.Wait(ScopedLock, []() { return !DelayedWorks.empty(); });
+			DelayedCv.Wait(ScopedLock, []() { return !DelayedWorks.empty(); });
 
 			auto It = DelayedWorks.begin();
 			std::chrono::steady_clock::time_point Until = It->first;
 			if (It->first > std::chrono::steady_clock::now())
 			{
-				Cv.WaitUntil(ScopedLock, Until);
+				DelayedCv.WaitUntil(ScopedLock, Until);
 			}
 
 			Actions.clear();

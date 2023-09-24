@@ -7,14 +7,25 @@
 
 class NRHICommandSet;
 class NRHIConstantBuffer;
+class NRHIDescriptorHeap;
 
 class SLATERHIRENDERER_API NSlateRHIRenderer : public NSlateRenderer
 {
 	struct NViewportCommands
 	{
 		std::shared_ptr<NRHICommandSet> CommandSet;
+
 		std::shared_ptr<NRHIConstantBuffer> ConstantBuffers;
 		size_t ConstantBufferUsage = 0;
+
+		std::shared_ptr<NRHIDescriptorHeap> DescriptorHeap;
+		size_t DescriptorUsage = 0;
+
+		void Restart()
+		{
+			ConstantBufferUsage = 0;
+			DescriptorUsage = 0;
+		}
 	};
 
 	std::vector<NViewportCommands> CachedVpCommands;

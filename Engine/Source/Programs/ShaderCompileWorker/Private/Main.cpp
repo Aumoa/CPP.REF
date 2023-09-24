@@ -16,7 +16,7 @@ int main(int Argc, char* Argv[])
 		CancellationTokenSource.request_stop();
 	};
 
-	std::shared_ptr App = NewObject<ASCWApp>();
+	RefPtr App = NewObject<ASCWApp>();
 
 	try
 	{

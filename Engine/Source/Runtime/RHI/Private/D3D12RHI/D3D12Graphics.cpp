@@ -11,6 +11,8 @@
 #include "D3D12RHI/D3D12RootSignature.h"
 #include "D3D12RHI/D3D12GraphicsPipelineState.h"
 #include "D3D12RHI/D3D12ConstantBuffer.h"
+#include "D3D12RHI/D3D12DescriptorHeap.h"
+#include "D3D12RHI/D3D12ShaderResourceView.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -101,7 +103,7 @@ Task<std::shared_ptr<NRHITexture2D>> ND3D12Graphics::CreateTexture2DAsync(std::s
 	void* pBuffer;
 	HR(UploadResource->Map(0, nullptr, &pBuffer));
 
-	co_await ImageSource->CopyPixelsAsync((int32)RowSizeInBytes, (int32)TotalBytes, pBuffer);
+	co_await ImageSource->CopyPixelsAsync((int32)Layouts.Footprint.RowPitch, (int32)TotalBytes, pBuffer);
 	co_await EnqueueGraphicsCommandAsync([&](ID3D12GraphicsCommandList* pCmd)
 	{
 		D3D12_TEXTURE_COPY_LOCATION LocDst;
@@ -138,6 +140,16 @@ std::shared_ptr<NRHIGraphicsPipelineState> ND3D12Graphics::CreateGraphicsPipelin
 std::shared_ptr<NRHIConstantBuffer> ND3D12Graphics::CreateConstantBuffer()
 {
 	return std::make_shared<ND3D12ConstantBuffer>(*Device.Get());
+}
+
+std::shared_ptr<NRHIDescriptorHeap> ND3D12Graphics::CreateDescriptorHeap()
+{
+	return std::make_shared<ND3D12DescriptorHeap>(*Device.Get());
+}
+
+std::shared_ptr<NRHIShaderResourceView> ND3D12Graphics::CreateShaderResourceView(size_t InNumViews)
+{
+	return std::make_shared<ND3D12ShaderResourceView>(*Device.Get(), InNumViews);
 }
 
 ID3D12Device1* ND3D12Graphics::GetDevice() const
