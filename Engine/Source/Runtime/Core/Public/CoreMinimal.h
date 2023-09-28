@@ -10,6 +10,8 @@
 #include "Linq/Linq.Select.h"
 #include "Linq/Linq.Where.h"
 #include "Linq/Linq.Join.h"
+#include "Linq/Linq.Values.h"
+#include "Linq/Linq.ToSet.h"
 
 #include "Platform/PlatformMacros.h"
 #include "Platform/PlatformTypes.h"
@@ -109,3 +111,6 @@
 #include "IO/IOCompletionOverlapped.h"
 #include "IO/FileStream.h"
 #include "IO/StreamWriter.h"
+
+// additional standard libraries.
+#include <set>

@@ -494,4 +494,6 @@ public:
 
 	static inline float Floor(float InValue) noexcept { return std::floor(InValue); }
 	static inline double Floor(double InValue) noexcept { return std::floor(InValue); }
+	static inline float Ceil(float InValue) noexcept { return std::ceil(InValue); }
+	static inline double Ceil(double InValue) noexcept { return std::ceil(InValue); }
 };
