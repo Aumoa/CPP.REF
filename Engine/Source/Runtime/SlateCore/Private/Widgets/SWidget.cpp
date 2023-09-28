@@ -20,6 +20,13 @@ void SWidget::Tick([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_u
 {
 }
 
+void SWidget::PrepassLayout()
+{
+	CacheDesiredSize();
+	bLayoutInvalidated = false;
+	bVolatilityInvalidated = false;
+}
+
 int32 SWidget::Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled)
 {
 	return OnPaint(Args.WithNewParent(*this), AllottedGeometry, CullingRect, OutDrawElements, InLayer, bParentEnabled);
@@ -72,15 +79,6 @@ void SWidget::SetEnabled(bool bInEnabled)
 		}
 
 		InvalidateLayoutAndVolatility();
-	}
-}
-
-void SWidget::Validate()
-{
-	if (bLayoutInvalidated)
-	{
-		PrepassLayout();
-		bLayoutInvalidated = true;
 	}
 }
 

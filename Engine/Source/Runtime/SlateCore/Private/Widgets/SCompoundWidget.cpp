@@ -14,7 +14,7 @@ void SCompoundWidget::PrepassLayout()
 		ChildSlot.Content->PrepassLayout();
 	}
 
-	CacheDesiredSize();
+	Super::PrepassLayout();
 }
 
 void SCompoundWidget::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)

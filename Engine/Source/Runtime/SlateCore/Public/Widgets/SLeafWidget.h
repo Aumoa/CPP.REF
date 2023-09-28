@@ -12,8 +12,6 @@ class SLATECORE_API SLeafWidget : public SWidget
 public:
 	SLeafWidget();
 
-	virtual void PrepassLayout() override;
-
 protected:
 	virtual void OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, const NGeometry& AllottedGeometry) const override;
 

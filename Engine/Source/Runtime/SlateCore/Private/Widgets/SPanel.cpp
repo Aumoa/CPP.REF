@@ -14,7 +14,7 @@ void SPanel::PrepassLayout()
 		GetChildrenAt(i)->PrepassLayout();
 	}
 
-	CacheDesiredSize();
+	Super::PrepassLayout();
 }
 
 void SPanel::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)

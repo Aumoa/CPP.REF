@@ -6,11 +6,6 @@ SLeafWidget::SLeafWidget()
 {
 }
 
-void SLeafWidget::PrepassLayout()
-{
-	CacheDesiredSize();
-}
-
 void SLeafWidget::OnArrangeChildren([[maybe_unused]] NArrangedChildrens& InoutArrangedChildrens, [[maybe_unused]] const NGeometry& AllottedGeometry) const
 {
 }

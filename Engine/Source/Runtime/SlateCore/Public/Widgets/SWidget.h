@@ -74,7 +74,7 @@ public:
 
 	virtual String ToString() const;
 	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
-	virtual void PrepassLayout() = 0;
+	virtual void PrepassLayout();
 
 	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled);
 	Vector2 GetDesiredSize() const { return CachedDesiredSize; }
@@ -92,7 +92,6 @@ public:
 	void SetEnabled(bool bInEnabled);
 	bool IsEnabled() const { return bEnabled; }
 
-	void Validate();
 	bool IsInvalidated() const { return bLayoutInvalidated || bVolatilityInvalidated; }
 	void InvalidateLayoutAndVolatility();
 

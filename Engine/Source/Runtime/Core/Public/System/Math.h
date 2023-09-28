@@ -491,4 +491,7 @@ public:
 		}
 #undef EASE_CASE
 	}
+
+	static inline float Floor(float InValue) noexcept { return std::floor(InValue); }
+	static inline double Floor(double InValue) noexcept { return std::floor(InValue); }
 };
