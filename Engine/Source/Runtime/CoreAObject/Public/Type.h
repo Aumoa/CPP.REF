@@ -28,7 +28,10 @@ private:
 public:
 	virtual ~AType() noexcept override;
 
-	String GetClassName() noexcept;
+	String GetClassName() const noexcept;
+	bool IsDerivedFrom(AType* InType) const noexcept;
+	template<std::derived_from<AObject> U>
+	bool IsDerivedFrom() const noexcept { return IsDerivedFrom(U::StaticClass()); }
 
 public:
 	static AType* StaticClass();

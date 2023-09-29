@@ -16,9 +16,23 @@ AType::~AType() noexcept
 {
 }
 
-String AType::GetClassName() noexcept
+String AType::GetClassName() const noexcept
 {
 	return ClassName;
+}
+
+bool AType::IsDerivedFrom(AType* InType) const noexcept
+{
+	const AType* Current = this;
+	while (Current->SuperClass)
+	{
+		if (Current->SuperClass == InType)
+		{
+			return true;
+		}
+		Current = Current->SuperClass;
+	}
+	return false;
 }
 
 AType* AType::StaticClass()

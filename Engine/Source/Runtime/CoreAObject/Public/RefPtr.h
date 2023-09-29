@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Object.h"
+#include "SubclassOf.h"
 
 template<class T>
 class RefPtr final
@@ -215,4 +216,10 @@ inline RefPtr<UObject> NewObject(AType* InClassType = nullptr)
 	RefPtr<UObject> Casted = Instanced.Cast<UObject>();
 	check(Casted);
 	return Casted;
+}
+
+template<std::derived_from<AObject> UObject>
+inline RefPtr<UObject> NewObject(TSubclassOf<UObject> InClassType)
+{
+	return NewObject(InClassType.GetType());
 }
