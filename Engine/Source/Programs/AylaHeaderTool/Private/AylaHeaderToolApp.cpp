@@ -21,12 +21,17 @@ Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationTok
 
 		ParseCommandLines();
 
+		if (Directory::Exists(IncludesPath) == false)
+		{
+			Directory::CreateDirectory(IncludesPath);
+		}
+
 		std::vector<Task<bool>> Tasks;
 		for (auto& Path : Directory::GetFiles(SourcePath, ESearchOption::AllDirectories))
 		{
 			if (Path::GetExtension(Path) == TEXT(".h"))
 			{
-				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<HeaderSource>(Path));
+				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<HeaderSource>(PackageName, Path));
 				Tasks.emplace_back(Source->TryParseAsync(InCancellationToken));
 			}
 		}
@@ -80,6 +85,7 @@ void AylaHeaderToolApp::PrintUsage(TextWriter& Output)
 	Output.WriteLine(TEXT("Usage: "));
 	Output.WriteLine(TEXT("  -Source [String] The source code path."));
 	Output.WriteLine(TEXT("  -Includes [String] The include path to save generated header files."));
+	Output.WriteLine(TEXT("  -PackageName [String] The package name for scripts."));
 }
 
 void AylaHeaderToolApp::ParseCommandLines()
@@ -90,6 +96,11 @@ void AylaHeaderToolApp::ParseCommandLines()
 	}
 
 	if (CommandLine::TryGetValue(TEXT("includes"), IncludesPath) == false || IncludesPath.IsEmpty())
+	{
+		throw TerminateException(TerminateException::EKnownErrorCodes::Usage);
+	}
+
+	if (CommandLine::TryGetValue(TEXT("packagename"), PackageName) == false || PackageName.IsEmpty())
 	{
 		throw TerminateException(TerminateException::EKnownErrorCodes::Usage);
 	}

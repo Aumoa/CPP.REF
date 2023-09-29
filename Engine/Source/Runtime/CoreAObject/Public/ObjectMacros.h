@@ -4,8 +4,8 @@
 
 #include "CodeGen/TypeGen.h"
 
-#define REGISTER_INTRINSIC_CLASS(Class, PackageName) \
-	static NTypeGen::NCompiledInDefer Z__CompiledInDefer__ ## Class(Class::StaticClass(), PackageName);
+#define REGISTER_INTRINSIC_CLASS(Class, PackageName, ...) \
+	static NTypeGen::NCompiledInDefer Z__CompiledInDefer__ ## Class(Class::StaticClass(), PackageName __VA_OPT__(, __VA_ARGS__));
 
 #define GENERATE_INTRINSIC_CLASS_METADATA(ClassNonPrefix, InClassMeta) \
 	NTypeGen::NClassMetadata Metadata; \
@@ -21,7 +21,7 @@
 #define GENERATED_BODY(...) BODY_MACRO_COMBINE(GENERATED_, CURRENT_FILE_ID, _, __LINE__, _BODY)
 
 #define DECLARE_INTRINSIC_CLASS_BODY_CORE(ThisClass, SuperClass)		\
-	private:															\
+	public:																\
 		using Super = SuperClass;										\
 																		\
 	public:																\

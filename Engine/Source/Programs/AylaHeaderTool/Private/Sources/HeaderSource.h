@@ -17,6 +17,7 @@ private:
 	std::unique_ptr<SyntaxTree> Syntaxes;
 
 private:
+	String PackageName;
 	String FileId;
 
 	struct CompiledACLASS
@@ -30,7 +31,7 @@ private:
 	std::vector<CompiledACLASS> ACLASSes;
 
 public:
-	HeaderSource(String InPath);
+	HeaderSource(String InPackageName, String InPath);
 	virtual ~HeaderSource() noexcept override;
 
 	virtual Task<bool> TryParseAsync(std::stop_token InCancellationToken) override;

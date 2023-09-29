@@ -17,9 +17,9 @@ struct COREAOBJECT_API NTypeGen : public StaticClass
 		EClassMetadata ClassMeta;
 	};
 
-	struct NCompiledInDefer
+	struct COREAOBJECT_API NCompiledInDefer
 	{
-		NCompiledInDefer(AType* ClassType, String PackageName);
+		NCompiledInDefer(AType* ClassType, String PackageName, AType* SuperClassType);
 	};
 
 	static void GenerateClassType(AType*& ConstructTo, const NClassMetadata& Metadata);

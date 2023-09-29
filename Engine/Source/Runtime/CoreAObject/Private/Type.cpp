@@ -32,4 +32,4 @@ AType* AType::StaticClass()
 	return TypePtr;
 }
 
-REGISTER_INTRINSIC_CLASS(AType, TEXT("/Script/CoreAObject"));
+REGISTER_INTRINSIC_CLASS(AType, TEXT("/Script/CoreAObject"), AType::Super::StaticClass());

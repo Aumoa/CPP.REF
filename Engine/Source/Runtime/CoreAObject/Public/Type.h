@@ -11,12 +11,13 @@ class COREAOBJECT_API AType final : public AObject
 	friend struct NTypeGen;
 	friend class AObject;
 
-protected:
+public:
 	using Super = AObject;
 
 private:
 	String ClassName;
 	String PackageName;
+	AType* SuperClass = nullptr;
 	AObject* (*Constructor)() = nullptr;
 	EClassMetadata ClassMeta = {};
 

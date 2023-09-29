@@ -4,9 +4,10 @@
 #include "Type.h"
 #include "CoreAObject/TypeCollection.h"
 
-NTypeGen::NCompiledInDefer::NCompiledInDefer(AType* ClassType, String PackageName)
+NTypeGen::NCompiledInDefer::NCompiledInDefer(AType* ClassType, String PackageName, AType* SuperClassType)
 {
 	ClassType->PackageName = PackageName;
+	ClassType->SuperClass = SuperClassType;
 	NTypeCollection::AddClassTypeToCollection(ClassType);
 }
 

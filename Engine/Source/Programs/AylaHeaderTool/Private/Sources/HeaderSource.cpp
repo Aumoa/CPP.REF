@@ -5,8 +5,9 @@
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxTree.h"
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxNode.h"
 
-HeaderSource::HeaderSource(String InPath)
+HeaderSource::HeaderSource(String InPackageName, String InPath)
 	: Super(InPath)
+	, PackageName(InPackageName)
 {
 }
 
@@ -134,8 +135,10 @@ AType* A{0}::StaticClass()
 	}}
 	return TypePtr;
 }}
+
+REGISTER_INTRINSIC_CLASS(A{0}, TEXT("/Script/{2}"), A{0}::Super::StaticClass());
 )");
-		BodyImplements.emplace_back(String::Format(ImplStr, Body.ClassName.SubstringView(1), TEXT("EClassMetadata::None")));
+		BodyImplements.emplace_back(String::Format(ImplStr, Body.ClassName.SubstringView(1), TEXT("EClassMetadata::None"), PackageName));
 	}
 
 	String IncludePath = GetSourcePath();

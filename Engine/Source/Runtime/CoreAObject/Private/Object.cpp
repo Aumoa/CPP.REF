@@ -54,4 +54,4 @@ RefPtr<AObject> AObject::NewObject(AType* InClassType)
 	return RefPtr<AObject>(InClassType->Constructor());
 }
 
-REGISTER_INTRINSIC_CLASS(AObject, TEXT("/Script/CoreAObject"));
+REGISTER_INTRINSIC_CLASS(AObject, TEXT("/Script/CoreAObject"), nullptr);
