@@ -3,6 +3,8 @@
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 #include "Rendering/SlateRenderer.h"
+#include "RHI/RHIGlobal.h"
+#include "RHI/RHIGraphics.h"
 
 std::shared_ptr<NSlateApplication> NSlateApplication::SlateApp;
 
@@ -20,10 +22,15 @@ void NSlateApplication::Tick()
     NSlateWindowElementList DrawElements;
     CoreWindow->ExecuteTick(DeltaTime);
 
+    NRHIGraphics& Graphics = NRHIGlobal::GetDynamicRHI();
+    Graphics.BeginFrame();
+
     Renderer->BeginFrame();
     CoreWindow->Render(DeltaTime, *Renderer);
     Renderer->EndFrame();
+
     PresentAllWindows();
+    Graphics.EndFrame();
 }
 
 void NSlateApplication::PresentAllWindows()

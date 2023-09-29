@@ -36,6 +36,16 @@ void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 	}
 
 	Vector2 AllottedSize = ComputeDesiredSize();
+	if (Viewport)
+	{
+		Vector2N VpSize = Vector<>::Cast<int32>(AllottedSize);
+		if (Viewport->GetViewportSize() != VpSize)
+		{
+			NRHIGlobal::GetDynamicRHI().SyncFrame();
+			Viewport->Resize(VpSize);
+		}
+	}
+
 	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
 	Tick(AllottedGeometry, InDeltaTime);
 }

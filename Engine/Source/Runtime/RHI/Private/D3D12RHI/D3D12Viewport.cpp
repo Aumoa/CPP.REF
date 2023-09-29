@@ -60,6 +60,17 @@ Vector2N ND3D12Viewport::GetViewportSize() const
 	return VpSize;
 }
 
+void ND3D12Viewport::Resize(const Vector2N& InSize)
+{
+	if (InSize.X > 0 && InSize.Y > 0)
+	{
+		Buffers.clear();
+		HR(SwapChain4->ResizeBuffers((UINT)NumBuffers, (UINT)InSize.X, (UINT)InSize.Y, DXGI_FORMAT_UNKNOWN, 0));
+		AllocateBuffersAndCreateDescriptors();
+	}
+	VpSize = InSize;
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE ND3D12Viewport::GetRTVHandle(int32 InIndex) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE hRTV = RTVHeap->GetCPUDescriptorHandleForHeapStart();

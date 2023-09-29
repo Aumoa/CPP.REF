@@ -26,14 +26,11 @@ NSlateRHIRenderer::~NSlateRHIRenderer() noexcept
 
 void NSlateRHIRenderer::BeginFrame()
 {
-    NRHIGlobal::GetDynamicRHI().BeginFrame();
     VpIndex = 0;
 }
 
 void NSlateRHIRenderer::EndFrame()
 {
-    NRHIGraphics& Graphics = NRHIGlobal::GetDynamicRHI();
-
     size_t NumActualVps = VpIndex;
     std::vector<NRHICommandSet*> Sets;
     Sets.reserve(NumActualVps);
@@ -44,8 +41,6 @@ void NSlateRHIRenderer::EndFrame()
     }
 
     NRHIGlobal::GetPrimaryCommandQueue().ExecuteCommandSets(Sets);
-
-    Graphics.EndFrame();
 }
 
 void NSlateRHIRenderer::FlushCommands()
