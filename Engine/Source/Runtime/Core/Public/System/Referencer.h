@@ -35,6 +35,22 @@ public:
 		return Loc == 0;
 	}
 
+	FORCEINLINE bool TryIncrRef() noexcept
+	{
+		int32 Uses = PlatformAtomics::AtomicRead(&Locks);
+		while (Uses != 0)
+		{
+			const int32 OldValue = PlatformAtomics::InterlockedCompareExchange(&Locks, Uses + 1, Uses);
+			if (OldValue == Uses)
+			{
+				return true;
+			}
+
+			Uses = OldValue;
+		}
+		return false;
+	}
+
 	FORCEINLINE void IncrWeak() noexcept
 	{
 		PlatformAtomics::InterlockedIncrement(&Weaks);

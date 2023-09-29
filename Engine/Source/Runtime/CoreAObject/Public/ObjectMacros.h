@@ -4,14 +4,39 @@
 
 #include "CodeGen/TypeGen.h"
 
+namespace ObjectMacros
+{
+	template<class T>
+	concept IsInstantiatable = requires
+	{
+		{ new T() };
+	};
+
+	template<class T>
+	void STATIC_GENERATE_INTRINSIC_CLASS_METADATA(NTypeGen::NClassMetadata& Output, String NonPrefixName, EClassMetadata InClassMeta)
+	{
+		Output.ClassName = NonPrefixName;
+		Output.Constructor = +[]()
+		{
+			if constexpr (ObjectMacros::IsInstantiatable<T>)
+			{
+				return (AObject*)new T;
+			}
+			else
+			{
+				return (AObject*)nullptr;
+			}
+		};
+		Output.ClassMeta = InClassMeta;
+	}
+}
+
 #define REGISTER_INTRINSIC_CLASS(Class, PackageName, ...) \
 	static NTypeGen::NCompiledInDefer Z__CompiledInDefer__ ## Class(Class::StaticClass(), PackageName __VA_OPT__(, __VA_ARGS__));
 
 #define GENERATE_INTRINSIC_CLASS_METADATA(ClassNonPrefix, InClassMeta) \
 	NTypeGen::NClassMetadata Metadata; \
-	Metadata.ClassName = TEXT(#ClassNonPrefix); \
-	Metadata.Constructor = +[]() { return (AObject*)new A ## ClassNonPrefix(); }; \
-	Metadata.ClassMeta = InClassMeta;
+	ObjectMacros::STATIC_GENERATE_INTRINSIC_CLASS_METADATA<A ## ClassNonPrefix>(Metadata, TEXT(#ClassNonPrefix), InClassMeta);
 
 #define ACLASS(...)
 

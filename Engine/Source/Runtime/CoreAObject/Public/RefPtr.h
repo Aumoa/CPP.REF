@@ -23,7 +23,6 @@ public:
 	constexpr RefPtr(U* Rhs) noexcept
 		: Ptr(Rhs)
 	{
-		SafeAddRef();
 	}
 
 	template<std::derived_from<T> U>
@@ -78,8 +77,11 @@ public:
 
 	template<std::derived_from<T> U>
 	constexpr auto operator <=>(const RefPtr<U>& Rhs) const noexcept { return Ptr <=> Rhs.Ptr; }
+	constexpr auto operator <=>(const T* Rhs) const noexcept { return Ptr <=> Rhs; }
+
 	template<std::derived_from<T> U>
 	constexpr bool operator ==(const RefPtr<U>& Rhs) const noexcept { return Ptr == Rhs.Ptr; }
+	constexpr bool operator ==(const T* Rhs) const noexcept { return Ptr == Rhs; }
 
 	[[nodiscard]] auto operator ->() const noexcept { return Get(); }
 	[[nodiscard]] auto& operator *() const noexcept { return *Get(); }
@@ -203,6 +205,119 @@ private:
 		}
 	}
 };
+
+template<class T>
+class WeakPtr
+{
+	T* Ptr = nullptr;
+	Referencer* Refs = nullptr;
+
+public:
+	inline WeakPtr() noexcept
+	{
+	}
+
+	inline WeakPtr(std::nullptr_t) noexcept
+	{
+	}
+
+	inline WeakPtr(T* InPtr) noexcept
+	{
+		Reset(InPtr);
+	}
+
+	inline WeakPtr(const WeakPtr& InPtr) noexcept
+	{
+		Reset(InPtr.Get());
+	}
+
+	inline WeakPtr(WeakPtr&& InPtr) noexcept
+	{
+		Swap(InPtr);
+	}
+
+	inline ~WeakPtr() noexcept
+	{
+		Reset();
+	}
+
+	inline bool IsValid() const noexcept
+	{
+		if (Refs == nullptr)
+		{
+			return false;
+		}
+
+		return Refs->IsLived();
+	}
+
+	inline RefPtr<T> Lock() const noexcept
+	{
+		if (Refs == nullptr)
+		{
+			return nullptr;
+		}
+
+		if (Refs->TryIncrRef() == false)
+		{
+			return nullptr;
+		}
+
+		return RefPtr<T>(Ptr);
+	}
+
+	inline WeakPtr& Reset(T* Rhs = nullptr) noexcept
+	{
+		// Same pointer.
+		if (Ptr == Rhs)
+		{
+			return *this;
+		}
+
+		// Unreference pointer.
+		if (Refs)
+		{
+			Refs->DecrWeak();
+			Refs = nullptr;
+			Ptr = nullptr;
+		}
+
+		if (Rhs != nullptr)
+		{
+			Refs = Rhs->Refs;
+			Refs->IncrWeak();
+			Ptr = Rhs;
+		}
+
+		return *this;
+	}
+
+	inline WeakPtr& Swap(WeakPtr& Rhs) noexcept
+	{
+		std::swap(Ptr, Rhs.Ptr);
+		std::swap(Refs, Rhs.Refs);
+		return *this;
+	}
+
+	inline operator bool() const noexcept
+	{
+		return IsValid();
+	}
+
+	inline WeakPtr& operator =(const WeakPtr& Rhs) noexcept
+	{
+		return Reset(Rhs.Get());
+	}
+
+	inline WeakPtr& operator =(WeakPtr&& Rhs) noexcept
+	{
+		Reset();
+		return Swap(Rhs);
+	}
+};
+
+template<class T>
+WeakPtr(T*) -> WeakPtr<T>;
 
 template<std::derived_from<AObject> UObject>
 inline RefPtr<UObject> NewObject(AType* InClassType = nullptr)

@@ -10,11 +10,15 @@ class NObjectInitializer;
 
 template<class T>
 class RefPtr;
+template<class T>
+class WeakPtr;
 
 class COREAOBJECT_API AObject
 {
 	template<class T>
 	friend class RefPtr;
+	template<class T>
+	friend class WeakPtr;
 
 private:
 	AType* const ClassType = nullptr;
