@@ -5,6 +5,7 @@
 #include "EditorSlate/SEditorInspectorView.h"
 #include "EditorSlate/SEditorContentView.h"
 #include "EditorSlate/SEditorHierarchyView.h"
+#include "EditorSlate/SEditorPlayMenu.h"
 #include "Layout/SCanvasPanel.h"
 #include "Layout/SHorizontalBoxPanel.h"
 #include "Layout/SVerticalBoxPanel.h"
@@ -24,6 +25,8 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 	auto ImageTask = LoadTextureAsync();
 
 	Args.Slots.emplace_back(SViewport::NSlot()
+		.VAlignment(EVerticalAlignment::Fill)
+		.HAlignment(EHorizontalAlignment::Fill)
 		[
 			SNew(SDockPanel)
 
@@ -60,15 +63,7 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 			.Dock(EDockAttach::Top)
 			.HAlignment(EHorizontalAlignment::Fill)
 			[
-				SNew(SSizeBox)
-				.OverrideHeight(80.0f)
-				+SSizeBox::NSlot()
-				.VAlignment(EVerticalAlignment::Fill)
-				.HAlignment(EHorizontalAlignment::Fill)
-				[
-					SNew(SImage)
-					.Brush(ImageTask)
-				]
+				SNew(SEditorPlayMenu)
 			]
 			// GameViewport
 			+SDockPanel::NSlot()
