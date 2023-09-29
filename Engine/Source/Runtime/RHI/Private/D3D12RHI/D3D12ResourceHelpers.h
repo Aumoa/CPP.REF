@@ -8,7 +8,7 @@
 
 #include "Numerics/VectorInterface/Vector.h"
 
-inline D3D12_RESOURCE_DESC GetTexture2DDesc(const Vector2N& TextureSize, D3D12_RESOURCE_FLAGS Flags)
+inline D3D12_RESOURCE_DESC GetTexture2DDesc(const Vector2N& TextureSize, D3D12_RESOURCE_FLAGS Flags, DXGI_FORMAT InFormat = DXGI_FORMAT_R8G8B8A8_UNORM)
 {
 	return
 	{
@@ -18,7 +18,7 @@ inline D3D12_RESOURCE_DESC GetTexture2DDesc(const Vector2N& TextureSize, D3D12_R
 		.Height = (UINT)TextureSize.Y,
 		.DepthOrArraySize = 1,
 		.MipLevels = 1,
-		.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+		.Format = InFormat,
 		.SampleDesc = { 1, 0 },
 		.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
 		.Flags = Flags

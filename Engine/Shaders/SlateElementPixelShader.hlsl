@@ -8,8 +8,23 @@ ConstantBuffer<NSlateRenderParams> PixelParameters : register(b0);
 
 float4 main(in NFragment InFragment) : SV_TARGET
 {
-    float4 FinalColor = Image.Sample(Sampler, InFragment.TexCoord);
-    FinalColor *= PixelParameters.TintColor;
+    float4 SampleColor = 1.0f;
+    
+    bool bHasTexture = (PixelParameters.RenderStates & RS_HasTexture) > 0;
+    [flatten]
+    if (bHasTexture)
+    {
+        SampleColor = Image.Sample(Sampler, InFragment.TexCoord);
+    }
+    
+    bool bAlphaOnly = (PixelParameters.RenderStates & RS_AlphaOnly) > 0;
+    [flatten]
+    if (bAlphaOnly)
+    {
+        SampleColor.xyz = SampleColor.a;
+    }
+    
+    float4 FinalColor = SampleColor * PixelParameters.TintColor;
     FinalColor.a *= PixelParameters.RenderOpacity;
     return FinalColor;
 }

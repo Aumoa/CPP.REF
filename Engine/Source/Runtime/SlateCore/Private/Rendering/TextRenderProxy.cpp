@@ -44,3 +44,8 @@ Rect NTextRenderProxy::GetTextureCoordinate() const
 	}
 	return Rect(0.0f, 0.0f, 1.0f, 1.0f);
 }
+
+int32 NTextRenderProxy::GetRenderStates() const
+{
+	return RS_HasTexture | RS_AlphaOnly;
+}

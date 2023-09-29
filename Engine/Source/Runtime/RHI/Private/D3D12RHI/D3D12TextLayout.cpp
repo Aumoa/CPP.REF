@@ -51,7 +51,7 @@ void ND3D12TextLayout::TryCacheImage()
 	HR(pTextLayout->GetMetrics(&Metrics));
 	Vector2N TextureSize = { (int32)Math::Ceil(Metrics.width), (int32)Math::Ceil(Metrics.height) };
 
-	D3D12_RESOURCE_DESC Desc = GetTexture2DDesc(TextureSize, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+	D3D12_RESOURCE_DESC Desc = GetTexture2DDesc(TextureSize, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, DXGI_FORMAT_A8_UNORM);
 	HR(Graphics.GetDevice()->CreateCommittedResource(
 		&DefaultHeap,
 		D3D12_HEAP_FLAG_NONE,
@@ -68,7 +68,7 @@ void ND3D12TextLayout::TryCacheImage()
 	{
 		.pixelFormat =
 		{
-			.format = DXGI_FORMAT_R8G8B8A8_UNORM,
+			.format = DXGI_FORMAT_A8_UNORM,
 			.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED
 		},
 		.dpiX = 96.0f,

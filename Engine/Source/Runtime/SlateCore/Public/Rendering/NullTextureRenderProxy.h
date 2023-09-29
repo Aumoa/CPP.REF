@@ -5,15 +5,14 @@
 #include "CoreMinimal.h"
 #include "Rendering/SlateRenderProxy.h"
 
-class NRHITextLayout;
-
-class SLATECORE_API NTextRenderProxy : public NSlateRenderProxy
+class SLATECORE_API NNullTextureRenderProxy : public NSlateRenderProxy
 {
-	std::shared_ptr<NRHITextLayout> Layout;
+private:
+	std::shared_ptr<NRHIShaderResourceView> SRV;
 
 public:
-	NTextRenderProxy(std::shared_ptr<NRHITextLayout> InLayout);
-	virtual ~NTextRenderProxy() noexcept override;
+	NNullTextureRenderProxy();
+	virtual ~NNullTextureRenderProxy() noexcept override;
 
 	virtual bool TryResolve() override;
 	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const override;

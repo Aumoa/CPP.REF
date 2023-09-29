@@ -46,3 +46,8 @@ Rect NTexture2DTaskRenderProxy::GetTextureCoordinate() const
 {
 	return Rect(0.0f, 0.0f, 1.0f, 1.0f);
 }
+
+int32 NTexture2DTaskRenderProxy::GetRenderStates() const
+{
+	return RS_HasTexture;
+}

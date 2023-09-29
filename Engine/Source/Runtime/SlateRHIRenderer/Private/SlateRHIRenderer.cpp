@@ -105,6 +105,7 @@ struct alignas(256) NCV_SlateRenderParams
 {
     Color TintColor;
     float RenderOpacity;
+    int32 RenderStates;
 };
 
 template<class T>
@@ -141,10 +142,12 @@ void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
     auto* CB_RenderParams = GetConstantBufferPtr<NCV_SlateRenderParams>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_RenderParams);
     CB_RenderParams->TintColor = InElement.TintColor;
     CB_RenderParams->RenderOpacity = InElement.RenderOpacity;
+    CB_RenderParams->RenderStates = 0;
 
     if (InElement.Proxy && InElement.Proxy->TryResolve())
     {
         CB_PaintGeometry->TextureCoordinate = InElement.Proxy->GetTextureCoordinate();
+        CB_RenderParams->RenderStates = InElement.Proxy->GetRenderStates();
         VpCommands.DescriptorHeap->ApplyViewSimple(VpCommands.DescriptorUsage, *InElement.Proxy->GetSRV(), 0, 1);
         int64 VirtualHandleLocation = VpCommands.DescriptorHeap->GetVirtualHandleLocation(VpCommands.DescriptorUsage++);
         VpCommands.CommandSet->SetGraphicsRootDescriptorTable(2, VirtualHandleLocation);

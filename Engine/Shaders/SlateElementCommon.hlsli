@@ -21,11 +21,15 @@ struct NSlateRenderParams
 {
     float4 TintColor;
     float RenderOpacity;
+    int RenderStates;
 };
 
 struct NSlateScreenInformation
 {
     float2 ScreenResolution;
 };
+
+#define RS_HasTexture 0x1
+#define RS_AlphaOnly 0x2
 
 #endif

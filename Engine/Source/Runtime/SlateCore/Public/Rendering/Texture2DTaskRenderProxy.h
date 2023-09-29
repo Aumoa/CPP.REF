@@ -20,4 +20,5 @@ public:
 	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const override;
 	virtual std::shared_ptr<NRHIShaderResourceView> GetSRV() const override;
 	virtual Rect GetTextureCoordinate() const override;
+	virtual int32 GetRenderStates() const override;
 };
