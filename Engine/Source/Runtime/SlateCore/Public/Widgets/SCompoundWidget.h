@@ -3,8 +3,6 @@
 #pragma once
 
 #include "Widgets/SWidget.h"
-#include "Layout/HorizontalAlignment.h"
-#include "Layout/VerticalAlignment.h"
 
 class SLATECORE_API SCompoundWidget : public SWidget
 {
@@ -13,9 +11,6 @@ class SLATECORE_API SCompoundWidget : public SWidget
 public:
 	struct NSlot : public NSlotBase<NSlot>
 	{
-		DECLARE_SLATE_ATTRIBUTE(NMargin, SlotPadding);
-		DECLARE_SLATE_ATTRIBUTE(EHorizontalAlignment, HAlignment, EHorizontalAlignment::Left)
-		DECLARE_SLATE_ATTRIBUTE(EVerticalAlignment, VAlignment, EVerticalAlignment::Top)
 	};
 
 private:

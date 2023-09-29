@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/SViewport.h"
+#include "Layout/AlignmentArrangeResult.h"
 
 SViewport::SViewport()
 {
@@ -123,7 +124,6 @@ void SViewport::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const N
 	};
 
 	std::sort(SlotOrder.begin(), SlotOrder.end(), SortSlotsByZOrder);
-	Vector2 AllottedSize = AllottedGeometry.GetLocalSize();
 
 	for (size_t ChildIndex = 0; ChildIndex < Slots.size(); ++ChildIndex)
 	{
@@ -137,10 +137,15 @@ void SViewport::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const N
 			continue;
 		}
 
+		const EFlowDirection MyFlowDirection = GetFlowDirection();
+		const NMargin SlotPadding = LayoutPaddingWithFlow(CurChild._SlotPadding, MyFlowDirection);
+		const auto XResult = NAlignmentArrangeResult::AlignChild(EOrientation::Horizontal, MyFlowDirection, AllottedGeometry.GetLocalSize().X, CurChild, SlotPadding);
+		const auto YResult = NAlignmentArrangeResult::AlignChild(EOrientation::Vertical, MyFlowDirection, AllottedGeometry.GetLocalSize().Y, CurChild, SlotPadding);
+
 		ArrangedChildrens.AddWidget(ChildVisibility, AllottedGeometry.MakeChild(
 			CurWidget,
-			Vector2::Zero(),
-			AllottedSize
+			Vector2(XResult.Offset, YResult.Offset),
+			Vector2(XResult.Size, YResult.Size)
 		));
 	}
 }

@@ -8,11 +8,13 @@
 #include "Layout/FlowDirection.h"
 #include "Layout/WidgetClipping.h"
 #include "Layout/Geometry.h"
+#include "Layout/ArrangedChildrens.h"
+#include "Layout/HorizontalAlignment.h"
+#include "Layout/VerticalAlignment.h"
 #include "Rendering/SlateWindowElementList.h"
 #include "Rendering/PaintArgs.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include "Layout/ArrangedChildrens.h"
 
 class SDummyAttributeWidget
 {
@@ -32,6 +34,10 @@ struct NSlotBase
 {
 	using This = UPanel;
 	std::shared_ptr<SWidget> Content;
+
+	DECLARE_SLATE_ATTRIBUTE(NMargin, SlotPadding);
+	DECLARE_SLATE_ATTRIBUTE(EHorizontalAlignment, HAlignment, EHorizontalAlignment::Left);
+	DECLARE_SLATE_ATTRIBUTE(EVerticalAlignment, VAlignment, EVerticalAlignment::Top);
 
 	UPanel&& operator [](std::shared_ptr<SWidget> InContent)&&
 	{
