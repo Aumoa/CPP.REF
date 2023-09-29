@@ -14,6 +14,7 @@ struct NSlatePaintGeometry
     float4 Transformation;
     float2 Translation;
     float2 LocalSize;
+    float4 TextureCoordinate;
 };
 
 struct NSlateRenderParams

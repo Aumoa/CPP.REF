@@ -38,8 +38,12 @@ NFragment main(uint InVertexId : SV_VertexID)
     V = V / HalfScreen;
     V = V * float2(+1.0f, -1.0f);
     
+    float2 T = RectTexCoords[InVertexId];
+    float2 S = PaintGeometry.TextureCoordinate.zw - PaintGeometry.TextureCoordinate.xy;
+    T = T * S + PaintGeometry.TextureCoordinate.xy;
+    
     NFragment F;
     F.Position = float4(V, 0, 1.0f);
-    F.TexCoord = RectTexCoords[InVertexId];
+    F.TexCoord = T;
     return F;
 }

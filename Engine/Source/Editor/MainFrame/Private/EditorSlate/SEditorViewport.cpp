@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #include "EditorSlate/SEditorViewport.h"
+#include "EditorSlate/SEditorMenu.h"
 #include "Layout/SCanvasPanel.h"
 #include "Layout/SHorizontalBoxPanel.h"
 #include "Layout/SVerticalBoxPanel.h"
@@ -30,74 +31,7 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 			.Dock(EDockAttach::Top)
 			.HAlignment(EHorizontalAlignment::Fill)
 			[
-				SNew(SSizeBox)
-				.OverrideHeight(30.0f)
-				+SSizeBox::NSlot()
-				.VAlignment(EVerticalAlignment::Fill)
-				.HAlignment(EHorizontalAlignment::Fill)
-				[
-					SNew(SOverlay)
-					+SOverlay::NSlot()
-					.HAlignment(EHorizontalAlignment::Fill)
-					[
-						SNew(SImage)
-						.Brush(ImageTask)
-					]
-					+SOverlay::NSlot()
-					[
-						SNew(SHorizontalBoxPanel)
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(STextBlock)
-							.FontFamilyName(TEXT("Arial"))
-							.FontSize(20.0f)
-							.Text(TEXT("MenuItem"))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
-						.SizeParam(ESizeRule::Auto, 1.0f)
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-					]
-				]
+				SNew(SEditorMenu)
 			]
 			// Inspector
 			+SDockPanel::NSlot()

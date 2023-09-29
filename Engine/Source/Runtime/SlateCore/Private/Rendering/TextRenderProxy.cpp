@@ -35,3 +35,12 @@ std::shared_ptr<NRHIShaderResourceView> NTextRenderProxy::GetSRV() const
 	}
 	return nullptr;
 }
+
+Rect NTextRenderProxy::GetTextureCoordinate() const
+{
+	if (Layout)
+	{
+		return Layout->GetTextureCoordinate();
+	}
+	return Rect(0.0f, 0.0f, 1.0f, 1.0f);
+}

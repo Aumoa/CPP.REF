@@ -103,6 +103,7 @@ struct alignas(256) NCV_SlatePaintGeometry
     Matrix2x2 Transformation;
     Vector2 Translation;
     Vector2 LocalSize;
+    Rect TextureCoordinate;
 };
 
 struct alignas(256) NCV_SlateRenderParams
@@ -148,6 +149,7 @@ void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
 
     if (InElement.Proxy && InElement.Proxy->TryResolve())
     {
+        CB_PaintGeometry->TextureCoordinate = InElement.Proxy->GetTextureCoordinate();
         VpCommands.DescriptorHeap->ApplyViewSimple(VpCommands.DescriptorUsage, *InElement.Proxy->GetSRV(), 0, 1);
         int64 VirtualHandleLocation = VpCommands.DescriptorHeap->GetVirtualHandleLocation(VpCommands.DescriptorUsage++);
         VpCommands.CommandSet->SetGraphicsRootDescriptorTable(2, VirtualHandleLocation);

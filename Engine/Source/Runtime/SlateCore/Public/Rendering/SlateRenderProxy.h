@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Numerics/VectorInterface/Rect.h"
 
 class NRHITexture2D;
 class NRHIShaderResourceView;
@@ -21,4 +22,5 @@ public:
 	virtual bool TryResolve() = 0;
 	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const = 0;
 	virtual std::shared_ptr<NRHIShaderResourceView> GetSRV() const = 0;
+	virtual Rect GetTextureCoordinate() const = 0;
 };

@@ -41,3 +41,8 @@ std::shared_ptr<NRHIShaderResourceView> NTexture2DTaskRenderProxy::GetSRV() cons
 {
 	return SRV;
 }
+
+Rect NTexture2DTaskRenderProxy::GetTextureCoordinate() const
+{
+	return Rect(0.0f, 0.0f, 1.0f, 1.0f);
+}

@@ -31,6 +31,7 @@ public:
 
 	virtual String GetText() const override { return CachedText; }
 	virtual Vector2 GetDrawingSize() const override;
+	virtual Rect GetTextureCoordinate() const override;
 	virtual std::shared_ptr<NRHITextFormat> GetTextFormat() const;
 
 	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const override { return TextureResource; }

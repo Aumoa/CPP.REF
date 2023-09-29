@@ -29,6 +29,15 @@ Vector2 ND3D12TextLayout::GetDrawingSize() const
 	return Vector2(Metrics.width, Metrics.height);
 }
 
+Rect ND3D12TextLayout::GetTextureCoordinate() const
+{
+	DWRITE_TEXT_METRICS Metrics;
+	HR(pTextLayout->GetMetrics(&Metrics));
+	double TexX = (double)Metrics.width / Math::Ceil((double)Metrics.width);
+	double TexY = (double)Metrics.height / Math::Ceil((double)Metrics.height);
+	return Rect(0.0f, 0.0f, (float)TexX, (float)TexY);
+}
+
 std::shared_ptr<NRHITextFormat> ND3D12TextLayout::GetTextFormat() const
 {
 	return TextFormat;
@@ -80,6 +89,7 @@ void ND3D12TextLayout::TryCacheImage()
 
 	pDeviceContext->SetTarget(pBitmap.Get());
 	pDeviceContext->BeginDraw();
+	pDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
 	pDeviceContext->DrawTextLayout(D2D1::Point2F(), pTextLayout.Get(), pSolidBrush.Get());
 	HR(pDeviceContext->EndDraw());
 	pDeviceContext->SetTarget(nullptr);
