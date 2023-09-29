@@ -13,6 +13,8 @@
 #include "D3D12RHI/D3D12ConstantBuffer.h"
 #include "D3D12RHI/D3D12DescriptorHeap.h"
 #include "D3D12RHI/D3D12ShaderResourceView.h"
+#include "D3D12RHI/D3D12TextFormat.h"
+#include "D3D12RHI/D3D12TextLayout.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -67,15 +69,59 @@ void ND3D12Graphics::Init()
 	HR(Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&Fence)));
 	hFenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
+	ComPtr<IUnknown> pUnknown;
+	HR(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &pUnknown));
+	HR(pUnknown.As(&WriteFactory));
+
+	D3D12_COMMAND_QUEUE_DESC PrimaryQueueDesc =
+	{
+		.Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
+		.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH,
+	};
+
+	ComPtr<ID3D12CommandQueue> pPrimaryQueue;
+	HR(Device->CreateCommandQueue(&PrimaryQueueDesc, IID_PPV_ARGS(&pPrimaryQueue)));
+	PrimaryQueue = std::make_shared<ND3D12CommandQueue>(pPrimaryQueue);
+
+	UINT DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#if !SHIPPING
+	DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+	HR(D3D11On12CreateDevice(Device.Get(), DeviceFlags, NULL, 0, (IUnknown**)pPrimaryQueue.GetAddressOf(), 1, 0, &Device11, &DeviceContext, nullptr));
+	HR(Device11.As(&Device11On12));
+
+	ComPtr<IDXGIDevice> pDXGIDevice;
+	HR(Device11On12.As(&pDXGIDevice));
+
+	D2D1_DEBUG_LEVEL D2DDebugLevel = D2D1_DEBUG_LEVEL_NONE;
+#if !SHIPPING
+	D2DDebugLevel = D2D1_DEBUG_LEVEL_WARNING;
+#endif
+	D2D1CreateDevice(pDXGIDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_MULTI_THREADED, D2DDebugLevel, D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS), &D2DDevice);
+
 	// Init AsyncCommands requirements.
 	HR(Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&AsyncCommandAllocator)));
-	HR(Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, AsyncCommandAllocator.Get(), nullptr, IID_PPV_ARGS(&AsyncCommandList)));
-	HR(AsyncCommandList->Close());
+}
+
+std::shared_ptr<NRHICommandQueue> ND3D12Graphics::GetPrimaryQueue()
+{
+	return PrimaryQueue;
 }
 
 std::shared_ptr<NRHICommandQueue> ND3D12Graphics::CreateCommandQueue()
 {
-	return std::make_shared<ND3D12CommandQueue>(this);
+	D3D12_COMMAND_QUEUE_DESC QueueDesc =
+	{
+		.Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
+		.Priority = (INT)D3D12_COMMAND_QUEUE_PRIORITY_NORMAL,
+		.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
+		.NodeMask = 0
+	};
+
+	ComPtr<ID3D12CommandQueue> pQueue;
+	HR(Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&pQueue)));
+
+	return std::make_shared<ND3D12CommandQueue>(std::move(pQueue));
 }
 
 std::shared_ptr<NRHIViewport> ND3D12Graphics::CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow)
@@ -117,6 +163,8 @@ Task<std::shared_ptr<NRHITexture2D>> ND3D12Graphics::CreateTexture2DAsync(std::s
 		LocSrc.PlacedFootprint = Layouts;
 
 		pCmd->CopyTextureRegion(&LocDst, 0, 0, 0, &LocSrc, nullptr);
+
+		return false;
 	});
 
 	co_return std::make_shared<ND3D12Texture2D>(std::move(CommittedResource), Texture2DDesc);
@@ -152,12 +200,21 @@ std::shared_ptr<NRHIShaderResourceView> ND3D12Graphics::CreateShaderResourceView
 	return std::make_shared<ND3D12ShaderResourceView>(*Device.Get(), InNumViews);
 }
 
-ID3D12Device1* ND3D12Graphics::GetDevice() const
+std::shared_ptr<NRHITextFormat> ND3D12Graphics::CreateTextFormat(String FontFamilyName, float FontSize, bool bBold, bool bItalic)
 {
-	return Device.Get();
+	return std::make_shared<ND3D12TextFormat>(FontFamilyName, FontSize, bBold, bItalic);
 }
 
-Task<> ND3D12Graphics::EnqueueGraphicsCommandAsync(Action<ID3D12GraphicsCommandList*> InAction)
+std::shared_ptr<NRHITextLayout> ND3D12Graphics::CreateTextLayout(std::shared_ptr<NRHITextFormat> InTextFormat, String InText)
+{
+	IDWriteTextFormat* pTextFormat = static_cast<ND3D12TextFormat*>(InTextFormat.get())->GetTextFormat();
+	ComPtr<IDWriteTextLayout> pTextLayout;
+	HR(WriteFactory->CreateTextLayout(InText.c_str(), (UINT32)InText.length(), pTextFormat, D3D12_FLOAT32_MAX, D3D12_FLOAT32_MAX, &pTextLayout));
+	auto Layout = std::make_shared<ND3D12TextLayout>(std::static_pointer_cast<ND3D12TextFormat>(std::move(InTextFormat)), std::move(pTextLayout), InText);
+	return Layout;
+}
+
+Task<> ND3D12Graphics::EnqueueGraphicsCommandAsync(Func<ID3D12GraphicsCommandList*, bool> InAction)
 {
 	std::unique_lock ScopedLock(AsyncLock);
 	AsyncCommands.emplace_back(std::move(InAction));
@@ -196,6 +253,13 @@ void ND3D12Graphics::SyncFrame()
 	}
 }
 
+ComPtr<ID2D1DeviceContext> ND3D12Graphics::CreateDeviceContext2D() const
+{
+	ComPtr<ID2D1DeviceContext> Context;
+	HR(D2DDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &Context));
+	return Context;
+}
+
 void ND3D12Graphics::PulseAsyncCommands()
 {
 	std::unique_lock ScopedLock(AsyncLock);
@@ -216,18 +280,45 @@ void ND3D12Graphics::PulseAsyncCommands()
 	{
 		return;
 	}
-	HR(AsyncCommandList->Reset(AsyncCommandAllocator.Get(), nullptr));
+
+	ComPtr<ID3D12GraphicsCommandList>* pCurrentCmd = nullptr;
+	size_t CmdIndex = 0;
+	ID3D12CommandQueue* Queue = ND3D12Global::GetPrimaryCommandQueue().GetQueue();
+	Action<> CloseCommandAndNext = [&]()
+	{
+		HR((*pCurrentCmd)->Close());
+		ID3D12CommandList* p = pCurrentCmd->Get();
+		Queue->ExecuteCommandLists(1, &p);
+		pCurrentCmd = nullptr;
+		++CmdIndex;
+	};
 
 	for (auto& Command : Commands)
 	{
-		Command(AsyncCommandList.Get());
+		if (!pCurrentCmd)
+		{
+			if (AsyncCommandLists.size() > CmdIndex)
+			{
+				pCurrentCmd = &AsyncCommandLists[CmdIndex];
+				HR((*pCurrentCmd)->Reset(AsyncCommandAllocator.Get(), nullptr));
+			}
+			else
+			{
+				pCurrentCmd = &AsyncCommandLists.emplace_back();
+				HR(Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, AsyncCommandAllocator.Get(), nullptr, IID_PPV_ARGS(&*pCurrentCmd)));
+			}
+		}
+
+		if (Command(pCurrentCmd->Get()) == true)
+		{
+			CloseCommandAndNext();
+		}
 	}
 
-	HR(AsyncCommandList->Close());
-
-	ID3D12CommandQueue* Queue = ND3D12Global::GetPrimaryCommandQueue().GetQueue();
-	ID3D12CommandList* pCommandList = AsyncCommandList.Get();
-	Queue->ExecuteCommandLists(1, &pCommandList);
+	if (pCurrentCmd)
+	{
+		CloseCommandAndNext();
+	}
 }
 
 #endif

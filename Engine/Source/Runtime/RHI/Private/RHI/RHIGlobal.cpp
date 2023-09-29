@@ -20,7 +20,7 @@ void NRHIGlobal::InitDynamicRHI()
 	}
 
 	DynamicRHI->Init();
-	PrimaryCommandQueue = DynamicRHI->CreateCommandQueue();
+	PrimaryCommandQueue = DynamicRHI->GetPrimaryQueue();
 }
 
 void NRHIGlobal::ShutdownDynamicRHI()

@@ -15,6 +15,8 @@ class NRHIGraphicsPipelineState;
 class NRHIConstantBuffer;
 class NRHIDescriptorHeap;
 class NRHIShaderResourceView;
+class NRHITextFormat;
+class NRHITextLayout;
 
 class RHI_API NRHIGraphics
 {
@@ -25,6 +27,7 @@ public:
 	virtual ~NRHIGraphics() noexcept;
 
 	virtual void Init() = 0;
+	virtual std::shared_ptr<NRHICommandQueue> GetPrimaryQueue() = 0;
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() = 0;
 	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) = 0;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) = 0;
@@ -34,6 +37,8 @@ public:
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() = 0;
 	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() = 0;
 	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) = 0;
+	virtual std::shared_ptr<NRHITextFormat> CreateTextFormat(String FontFamilyName, float FontSize, bool bBold, bool bItalic) = 0;
+	virtual std::shared_ptr<NRHITextLayout> CreateTextLayout(std::shared_ptr<NRHITextFormat> InTextFormat, String InText) = 0;
 
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;

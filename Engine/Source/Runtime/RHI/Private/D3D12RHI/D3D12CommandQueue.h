@@ -16,7 +16,7 @@ class ND3D12CommandQueue : public NRHICommandQueue
 	ComPtr<ID3D12CommandQueue> Queue;
 
 public:
-	ND3D12CommandQueue(ND3D12Graphics* InGraphics);
+	ND3D12CommandQueue(ComPtr<ID3D12CommandQueue> pQueue);
 	virtual ~ND3D12CommandQueue() noexcept override;
 
 	virtual void ExecuteCommandSets(std::span<NRHICommandSet const* const> InCommandSets) override;

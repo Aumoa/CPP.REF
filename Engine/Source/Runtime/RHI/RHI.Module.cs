@@ -23,7 +23,10 @@ public class RHI : ModuleRules
             {
                 "dxgi.lib",
                 "d3d12.lib",
-                "User32.lib"
+                "d3d11.lib",
+                "d2d1.lib",
+                "User32.lib",
+                "dwrite.lib",
             });
         }
     }

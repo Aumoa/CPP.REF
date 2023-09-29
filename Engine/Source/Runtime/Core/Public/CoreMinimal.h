@@ -12,6 +12,7 @@
 #include "Linq/Linq.Join.h"
 #include "Linq/Linq.Values.h"
 #include "Linq/Linq.ToSet.h"
+#include "Linq/Linq.Keys.h"
 
 #include "Platform/PlatformMacros.h"
 #include "Platform/PlatformTypes.h"

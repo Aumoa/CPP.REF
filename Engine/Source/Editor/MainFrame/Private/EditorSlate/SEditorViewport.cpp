@@ -8,6 +8,7 @@
 #include "Layout/SOverlay.h"
 #include "Layout/SDockPanel.h"
 #include "Widgets/Images/SImage.h"
+#include "Widgets/Text/STextBlock.h"
 #include "GenericPlatform/GenericImage.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
@@ -46,41 +47,51 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 					[
 						SNew(SHorizontalBoxPanel)
 						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))
 						]
 						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
+						[
+							SNew(STextBlock)
+							.FontFamilyName(TEXT("Arial"))
+							.FontSize(20.0f)
+							.Text(TEXT("MenuItem"))
+						]
+						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))
 						]
 						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))
 						]
 						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))
 						]
 						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))
 						]
 						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))
 						]
 						+SHorizontalBoxPanel::NSlot()
-						[
-							SNew(SImage)
-							.Brush(ImageTask, Vector2(100.0f))
-						]
-						+SHorizontalBoxPanel::NSlot()
+						.SizeParam(ESizeRule::Auto, 1.0f)
 						[
 							SNew(SImage)
 							.Brush(ImageTask, Vector2(100.0f))

@@ -10,6 +10,9 @@
 #include <dxgi1_6.h>
 #include <d3d12.h>
 #include <wrl/client.h>
+#include <dwrite_3.h>
+#include <d3d11on12.h>
+#include <d2d1_3.h>
 
 using Microsoft::WRL::ComPtr;
 

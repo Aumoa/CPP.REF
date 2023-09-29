@@ -19,4 +19,7 @@
 	<Type Name="ToolChainInstallation">
 		<DisplayString Condition="(WindowsToolkitInstallation*)this">WindowsToolkitInstallation {((WindowsToolkitInstallation*)this)->InstallVersion}</DisplayString>
 	</Type>
+	<Type Name="TaskCompletionSource&lt;T&gt;">
+		<DisplayString>DisplayString</DisplayString>
+	</Type>
 </AutoVisualizer>
