@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Rendering/SlateRenderProxy.h"
+#include "Rendering/StreamableRenderAssetProxy.h"
 
 class NRHITextLayout;
 
-class SLATECORE_API NTextRenderProxy : public NSlateRenderProxy
+class RENDERCORE_API NTextRenderAssetProxy : public NStreamableRenderAssetProxy
 {
 	std::shared_ptr<NRHITextLayout> Layout;
 
 public:
-	NTextRenderProxy(std::shared_ptr<NRHITextLayout> InLayout);
-	virtual ~NTextRenderProxy() noexcept override;
+	NTextRenderAssetProxy(std::shared_ptr<NRHITextLayout> InLayout);
+	virtual ~NTextRenderAssetProxy() noexcept override;
 
 	virtual bool TryResolve() override;
 	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const override;

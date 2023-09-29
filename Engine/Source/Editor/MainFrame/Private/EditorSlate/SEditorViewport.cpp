@@ -15,6 +15,8 @@
 #include "GenericPlatform/GenericImage.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
+#include "Assets/StreamableAssetManager.h"
+#include "Assets/StreamableRenderAsset.h"
 
 SEditorViewport::SEditorViewport()
 {
@@ -22,7 +24,7 @@ SEditorViewport::SEditorViewport()
 
 DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 {
-	auto ImageTask = LoadTextureAsync();
+	auto Image = LoadObject(TEXT("/Engine/Splash/SplashImage"));
 
 	Args.Slots.emplace_back(SViewport::NSlot()
 		.VAlignment(EVerticalAlignment::Fill)
@@ -71,17 +73,8 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 			.HAlignment(EHorizontalAlignment::Fill)
 			[
 				SNew(SImage)
-				.Brush(ImageTask)
+				.Brush(Image->GetRenderProxy())
 			]
 		]
 	);
-}
-
-Task<std::shared_ptr<NRHITexture2D>> SEditorViewport::LoadTextureAsync()
-{
-	auto Holder = SharedFromThis();
-	String ImageName = Path::Combine(Environment::GetEngineDirectory(), TEXT("Content"), TEXT("Splash"), TEXT("SplashImage.png"));
-	auto Image = co_await NGenericImage::LoadFromFileAsync(ImageName);
-	auto Texture = co_await NRHIGlobal::GetDynamicRHI().CreateTexture2DAsync(Image);
-	co_return Texture;
 }

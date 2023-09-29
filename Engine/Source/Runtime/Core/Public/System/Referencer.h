@@ -28,10 +28,7 @@ public:
 	FORCEINLINE bool DecrRef() noexcept
 	{
 		int32 Loc = PlatformAtomics::InterlockedDecrement(&Locks);
-		if (DecrWeak())
-		{
-			delete this;
-		}
+		DecrWeak();
 		return Loc == 0;
 	}
 

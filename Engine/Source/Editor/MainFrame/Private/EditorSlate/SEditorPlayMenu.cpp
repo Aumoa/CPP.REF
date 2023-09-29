@@ -7,9 +7,13 @@
 #include "GenericPlatform/GenericImage.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
+#include "Assets/StreamableAssetManager.h"
+#include "Assets/Texture2D.h"
 
 DEFINE_SLATE_CONSTRUCTOR(SEditorPlayMenu, Args)
 {
+	auto Image = LoadObject(TEXT("/Engine/Editor/MainFrame/PlayButton.png"));
+
 	Args.SingleSlot = SEditorPlayMenu::NSlot()
 	.HAlignment(EHorizontalAlignment::Fill)
 	.VAlignment(EVerticalAlignment::Fill)
@@ -26,17 +30,8 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorPlayMenu, Args)
 			.SlotPadding(5.0f, 5.0f, 5.0f, 0.0f)
 			[
 				SNew(SImage)
-				.Brush(LoadTextureAsync(TEXT("Editor/MainFrame/PlayButton.png")), Vector2(70.0f, 70.0f))
+				.Brush(Image->GetRenderProxy(), Vector2(70.0f, 70.0f))
 			]
 		]
 	];
-}
-
-Task<std::shared_ptr<NRHITexture2D>> SEditorPlayMenu::LoadTextureAsync(String InFilename)
-{
-	auto Holder = SharedFromThis();
-	String ImageName = Path::Combine(Environment::GetEngineDirectory(), TEXT("Content"), InFilename);
-	auto Image = co_await NGenericImage::LoadFromFileAsync(ImageName);
-	auto Texture = co_await NRHIGlobal::GetDynamicRHI().CreateTexture2DAsync(Image);
-	co_return Texture;
 }

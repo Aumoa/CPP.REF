@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Layout/PaintGeometry.h"
-#include "Rendering/SlateRenderProxy.h"
+#include "Rendering/StreamableRenderAssetProxy.h"
 #include "Numerics/VectorInterface/Color.h"
 
 struct SLATECORE_API NSlateRenderElement
@@ -16,5 +16,5 @@ struct SLATECORE_API NSlateRenderElement
 	Color TintColor;
 	float RenderOpacity = 0;
 
-	std::shared_ptr<NSlateRenderProxy> Proxy;
+	std::shared_ptr<NStreamableRenderAssetProxy> Proxy;
 };

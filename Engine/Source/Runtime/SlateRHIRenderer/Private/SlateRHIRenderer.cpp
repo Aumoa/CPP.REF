@@ -13,7 +13,6 @@
 #include "GenericPlatform/GenericWindow.h"
 #include "GenericPlatform/GenericApplication.h"
 #include "Widgets/SWindow.h"
-#include "Rendering/SlateRenderProxy.h"
 #include "Numerics/VectorInterface/Color.h"
 
 NSlateRHIRenderer::NSlateRHIRenderer()

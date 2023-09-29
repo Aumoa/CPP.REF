@@ -1,23 +1,23 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Rendering/Texture2DTaskRenderProxy.h"
+#include "Rendering/Texture2DTaskRenderAssetProxy.h"
 #include "RHI/RHITexture2D.h"
 #include "RHI/RHIShaderResourceView.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 
-NTexture2DTaskRenderProxy::NTexture2DTaskRenderProxy(Task<std::shared_ptr<NRHITexture2D>> InTextureTask)
+NTexture2DTaskRenderAssetProxy::NTexture2DTaskRenderAssetProxy(Task<std::shared_ptr<NRHITexture2D>> InTextureTask)
 	: TextureTask(std::move(InTextureTask))
 {
 	SRV = NRHIGlobal::GetDynamicRHI().CreateShaderResourceView(1);
 	SRV->CreateView(0, nullptr);
 }
 
-NTexture2DTaskRenderProxy::~NTexture2DTaskRenderProxy() noexcept
+NTexture2DTaskRenderAssetProxy::~NTexture2DTaskRenderAssetProxy() noexcept
 {
 }
 
-bool NTexture2DTaskRenderProxy::TryResolve()
+bool NTexture2DTaskRenderAssetProxy::TryResolve()
 {
 	if (TextureTask.IsValid())
 	{
@@ -32,22 +32,22 @@ bool NTexture2DTaskRenderProxy::TryResolve()
 	return true;
 }
 
-std::shared_ptr<NRHITexture2D> NTexture2DTaskRenderProxy::GetTexture2D() const
+std::shared_ptr<NRHITexture2D> NTexture2DTaskRenderAssetProxy::GetTexture2D() const
 {
 	return Texture;
 }
 
-std::shared_ptr<NRHIShaderResourceView> NTexture2DTaskRenderProxy::GetSRV() const
+std::shared_ptr<NRHIShaderResourceView> NTexture2DTaskRenderAssetProxy::GetSRV() const
 {
 	return SRV;
 }
 
-Rect NTexture2DTaskRenderProxy::GetTextureCoordinate() const
+Rect NTexture2DTaskRenderAssetProxy::GetTextureCoordinate() const
 {
 	return Rect(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
-int32 NTexture2DTaskRenderProxy::GetRenderStates() const
+int32 NTexture2DTaskRenderAssetProxy::GetRenderStates() const
 {
 	return RS_HasTexture;
 }

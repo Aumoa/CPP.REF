@@ -16,15 +16,16 @@ namespace ObjectMacros
 	void STATIC_GENERATE_INTRINSIC_CLASS_METADATA(NTypeGen::NClassMetadata& Output, String NonPrefixName, EClassMetadata InClassMeta)
 	{
 		Output.ClassName = NonPrefixName;
-		Output.Constructor = +[]()
+		Output.Constructor = +[]() -> AObject*
 		{
 			if constexpr (ObjectMacros::IsInstantiatable<T>)
 			{
-				return (AObject*)new T;
+				return new T;
 			}
 			else
 			{
-				return (AObject*)nullptr;
+				checkf(false, TEXT("Class {} is not instantiable."), String::FromLiteral(typeid(T).name()));
+				return nullptr;
 			}
 		};
 		Output.ClassMeta = InClassMeta;

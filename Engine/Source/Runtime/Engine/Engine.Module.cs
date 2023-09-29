@@ -13,7 +13,10 @@ public class Engine : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "CoreAObject"
+            "CoreAObject",
+            "Numerics",
+            "ApplicationCore",
+            "RenderCore"
         });
     }
 }

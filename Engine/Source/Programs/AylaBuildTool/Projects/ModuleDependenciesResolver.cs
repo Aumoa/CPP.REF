@@ -70,7 +70,7 @@ public class ModuleDependenciesResolver
                 DisableWarnings.AddRange(DependCache.PublicDisableWarnings);
             }
 
-            string[] PublicIncludePaths = IncludePaths.Concat(ModuleRule.PublicIncludePaths.Select(AsFullPath)).Distinct().ToArray();
+            string[] PublicIncludePaths = IncludePaths.Concat(ModuleRule.PublicIncludePaths.Select(AsFullPath)).Append(IncludePath).Distinct().ToArray();
             string[] PrivateIncludePaths = PublicIncludePaths.Concat(ModuleRule.PrivateIncludePaths.Select(AsFullPath)).Distinct().ToArray();
             string[] PublicAdditionalMacros = AdditionalMacros.Concat(ModuleRule.PublicAdditionalMacros).Distinct().ToArray();
             string[] PrivateAdditionalMacros = PublicAdditionalMacros.Concat(ModuleRule.PrivateAdditionalMacros).Distinct().ToArray();

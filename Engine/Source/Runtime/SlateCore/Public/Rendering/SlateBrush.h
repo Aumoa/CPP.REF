@@ -5,15 +5,26 @@
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/VectorInterface/Color.h"
-#include "Rendering/SlateRenderProxy.h"
+#include "Rendering/StreamableRenderAssetProxy.h"
 
 struct SLATECORE_API NSlateBrush
 {
 	Vector2 DrawSize = Vector2(32.0f, 32.0f);
 	Color TintColor = NamedColors::White;
-	std::shared_ptr<NSlateRenderProxy> RenderProxy;
+	std::shared_ptr<NStreamableRenderAssetProxy> RenderProxy;
 
 	NSlateBrush() = default;
 	NSlateBrush(Vector2 InDrawSize, Color InTintColor = NamedColors::White);
 	NSlateBrush(Task<std::shared_ptr<NRHITexture2D>> InTextureTask, Vector2 InDrawSize = Vector2(32.0f, 32.0f), Color InTintColor = NamedColors::White);
+	NSlateBrush(std::shared_ptr<NStreamableRenderAssetProxy> InRenderProxy, Vector2 InDrawSize = Vector2(32.0f, 32.0f), Color InTintColor = NamedColors::White);
+
+	template<class U>
+	NSlateBrush(const U& InRenderAssetProxy, Vector2 InDrawSize = Vector2(32.0f, 32.0f), Color InTintColor = NamedColors::White) requires
+		requires
+		{
+			{ InRenderAssetProxy.GetRenderProxy() };
+		}
+		: NSlateBrush(InRenderAssetProxy.GetRenderProxy(), InDrawSize, InTintColor)
+	{
+	}
 };

@@ -2,10 +2,11 @@
 
 using System;
 using AE.Rules;
+using AE.BuildSettings;
 
-public class SlateCore : ModuleRules
+public class RenderCore : ModuleRules
 {
-    public SlateCore(TargetRules TargetRule) : base(TargetRule)
+    public RenderCore(TargetRules TargetRule) : base(TargetRule)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -14,8 +15,7 @@ public class SlateCore : ModuleRules
         {
             "Core",
             "Numerics",
-            "ApplicationCore",
-            "RenderCore",
+            "RHI"
         });
     }
 }

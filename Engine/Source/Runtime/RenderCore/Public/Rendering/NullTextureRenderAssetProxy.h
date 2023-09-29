@@ -3,18 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Rendering/SlateRenderProxy.h"
+#include "Rendering/StreamableRenderAssetProxy.h"
 
-class SLATECORE_API NTexture2DTaskRenderProxy : public NSlateRenderProxy
+class RENDERCORE_API NNullTextureRenderAssetProxy : public NStreamableRenderAssetProxy
 {
 private:
-	Task<std::shared_ptr<NRHITexture2D>> TextureTask;
-	std::shared_ptr<NRHITexture2D> Texture;
 	std::shared_ptr<NRHIShaderResourceView> SRV;
 
 public:
-	NTexture2DTaskRenderProxy(Task<std::shared_ptr<NRHITexture2D>> InTextureTask);
-	virtual ~NTexture2DTaskRenderProxy() noexcept override;
+	NNullTextureRenderAssetProxy();
+	virtual ~NNullTextureRenderAssetProxy() noexcept override;
 
 	virtual bool TryResolve() override;
 	virtual std::shared_ptr<NRHITexture2D> GetTexture2D() const override;

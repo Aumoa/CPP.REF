@@ -8,7 +8,7 @@
 
 class NRHITextFormat;
 class NRHITextLayout;
-class NTextRenderProxy;
+class NTextRenderAssetProxy;
 
 class SLATECORE_API STextBlock : public SLeafWidget
 {
@@ -19,7 +19,7 @@ private:
 
 	String CachedText;
 	std::shared_ptr<NRHITextLayout> TextLayout;
-	std::shared_ptr<NTextRenderProxy> RenderProxy;
+	std::shared_ptr<NTextRenderAssetProxy> RenderProxy;
 
 public:
 	STextBlock();

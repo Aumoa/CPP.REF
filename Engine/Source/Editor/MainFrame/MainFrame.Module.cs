@@ -15,7 +15,8 @@ public class MainFrame : ModuleRules
         {
             "Core",
             "SlateCore",
-            "Slate"
+            "Slate",
+            "Engine",
         });
     }
 }

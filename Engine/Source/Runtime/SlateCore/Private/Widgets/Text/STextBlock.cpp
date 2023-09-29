@@ -2,7 +2,7 @@
 
 #include "Widgets/Text/STextBlock.h"
 #include "Rendering/SlateTextFormatCache.h"
-#include "Rendering/TextRenderProxy.h"
+#include "Rendering/TextRenderAssetProxy.h"
 #include "RHI/RHITextLayout.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
@@ -17,7 +17,7 @@ void STextBlock::PrepassLayout()
 	if (LayoutText != CachedText)
 	{
 		TextLayout = NRHIGlobal::GetDynamicRHI().CreateTextLayout(TextFormat, CachedText);
-		RenderProxy = std::make_shared<NTextRenderProxy>(TextLayout);
+		RenderProxy = std::make_shared<NTextRenderAssetProxy>(TextLayout);
 	}
 	Super::PrepassLayout();
 }

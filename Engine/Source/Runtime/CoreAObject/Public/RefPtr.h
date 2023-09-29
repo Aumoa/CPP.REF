@@ -181,7 +181,12 @@ public:
 	template<class U> requires requires { { dynamic_cast<U*>(Ptr) }; }
 	constexpr RefPtr<U> Cast() noexcept
 	{
-		return RefPtr<U>(dynamic_cast<U*>(Ptr));
+		if (auto uPtr = RefPtr<U>(dynamic_cast<U*>(Ptr)))
+		{
+			uPtr.Ptr->Refs->IncrRef();
+			return uPtr;
+		}
+		return nullptr;
 	}
 
 private:
