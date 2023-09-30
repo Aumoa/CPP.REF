@@ -80,7 +80,7 @@ public:
 
 	virtual String ToString() const;
 	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
-	virtual void PrepassLayout();
+	virtual bool PrepassLayout();
 
 	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled);
 	Vector2 GetDesiredSize() const { return CachedDesiredSize; }
@@ -117,7 +117,7 @@ public:
 
 	DECLARE_SLATE_CONSTRUCTOR();
 
-protected:
+public:
 	void CacheDesiredSize();
 	virtual Vector2 ComputeDesiredSize() const = 0;
 
@@ -190,4 +190,11 @@ std::shared_ptr<T> operator <<(std::shared_ptr<T>&& WidgetInstPtr, U&& Args)
 {
 	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
 	return std::move(WidgetInstPtr);
+}
+
+template<std::derived_from<SWidget> T, class U>
+std::shared_ptr<T> operator <<(std::shared_ptr<T>& WidgetInstPtr, U&& Args)
+{
+	DeclarativeSyntaxSupports::InvokeConstructorRecursive(*WidgetInstPtr, Args);
+	return WidgetInstPtr;
 }

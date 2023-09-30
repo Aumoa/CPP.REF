@@ -7,14 +7,17 @@ SCompoundWidget::SCompoundWidget()
 {
 }
 
-void SCompoundWidget::PrepassLayout()
+bool SCompoundWidget::PrepassLayout()
 {
 	if (ChildSlot.Content && ChildSlot.Content->GetVisibility() != ESlateVisibility::Collapsed)
 	{
-		ChildSlot.Content->PrepassLayout();
+		if (ChildSlot.Content->PrepassLayout())
+		{
+			InvalidateLayoutAndVolatility();
+		}
 	}
 
-	Super::PrepassLayout();
+	return Super::PrepassLayout();
 }
 
 void SCompoundWidget::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)

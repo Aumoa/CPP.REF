@@ -24,7 +24,7 @@ private:
 public:
 	STextBlock();
 
-	virtual void PrepassLayout() override;
+	virtual bool PrepassLayout() override;
 
 	void SetText(String InText);
 	String GetText() const { return CachedText; }

@@ -30,10 +30,7 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 
 void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 {
-	if (IsInvalidated())
-	{
-		PrepassLayout();
-	}
+	PrepassLayout();
 
 	Vector2 AllottedSize = ComputeDesiredSize();
 	if (Viewport)

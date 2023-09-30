@@ -49,11 +49,6 @@ void SOverlay::ClearSlots()
 	InvalidateLayoutAndVolatility();
 }
 
-DEFINE_SLATE_CONSTRUCTOR(SOverlay, Args)
-{
-	Slots = std::move(Args.Slots);
-}
-
 Vector2 SOverlay::ComputeDesiredSize() const
 {
 	Vector2 MaxDesiredSize;
@@ -104,8 +99,6 @@ void SOverlay::OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, con
 		return;
 	}
 
-	Vector2 LocalSize = AllottedGeometry.GetLocalSize();
-
 	for (size_t ChildIndex = 0; ChildIndex < Slots.size(); ++ChildIndex)
 	{
 		const NSlot& ChildSlot = Slots[ChildIndex];
@@ -128,4 +121,9 @@ void SOverlay::OnArrangeChildren(NArrangedChildrens& InoutArrangedChildrens, con
 			Vector2(XResult.Size, YResult.Size)
 		));
 	}
+}
+
+DEFINE_SLATE_CONSTRUCTOR(SOverlay, Args)
+{
+	Slots = std::move(Args.Slots);
 }

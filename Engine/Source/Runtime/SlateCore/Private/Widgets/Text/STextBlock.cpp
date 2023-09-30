@@ -11,7 +11,7 @@ STextBlock::STextBlock()
 {
 }
 
-void STextBlock::PrepassLayout()
+bool STextBlock::PrepassLayout()
 {
 	String LayoutText = TextLayout ? TextLayout->GetText() : String::GetEmpty();
 	if (LayoutText != CachedText)
@@ -19,7 +19,7 @@ void STextBlock::PrepassLayout()
 		TextLayout = NRHIGlobal::GetDynamicRHI().CreateTextLayout(TextFormat, CachedText);
 		RenderProxy = std::make_shared<NTextRenderAssetProxy>(TextLayout);
 	}
-	Super::PrepassLayout();
+	return Super::PrepassLayout();
 }
 
 void STextBlock::SetText(String InText)

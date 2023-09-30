@@ -6,15 +6,19 @@ SPanel::SPanel()
 {
 }
 
-void SPanel::PrepassLayout()
+bool SPanel::PrepassLayout()
 {
 	const size_t Num = NumChildrens();
 	for (size_t i = 0; i < Num; ++i)
 	{
-		GetChildrenAt(i)->PrepassLayout();
+		SWidget* CurWidget = GetChildrenAt(i);
+		if (CurWidget->PrepassLayout())
+		{
+			InvalidateLayoutAndVolatility();
+		}
 	}
 
-	Super::PrepassLayout();
+	return Super::PrepassLayout();
 }
 
 void SPanel::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)

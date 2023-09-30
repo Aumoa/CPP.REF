@@ -20,11 +20,17 @@ void SWidget::Tick([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_u
 {
 }
 
-void SWidget::PrepassLayout()
+bool SWidget::PrepassLayout()
 {
-	CacheDesiredSize();
+	bool bValidated = false;
+	if (IsInvalidated())
+	{
+		CacheDesiredSize();
+		bValidated = true;
+	}
 	bLayoutInvalidated = false;
 	bVolatilityInvalidated = false;
+	return bValidated;
 }
 
 int32 SWidget::Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled)

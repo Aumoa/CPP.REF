@@ -12,7 +12,7 @@ class SLATECORE_API SPanel : public SWidget
 public:
 	SPanel();
 
-	virtual void PrepassLayout() override;
+	virtual bool PrepassLayout() override;
 	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime) override;
 
 public:
