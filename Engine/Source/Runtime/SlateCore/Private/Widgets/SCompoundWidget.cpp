@@ -76,7 +76,7 @@ void SCompoundWidget::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, c
 	}
 }
 
-int32 SCompoundWidget::OnPaint([[maybe_unused]] const NPaintArgs& Args, [[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const Rect& CullingRect, [[maybe_unused]] NSlateWindowElementList& OutDrawElements, int32 InLayer, [[maybe_unused]] bool bParentEnabled) const
+int32 SCompoundWidget::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const
 {
 	NArrangedChildrens ArrangedChildren(ESlateVisibility::Visible);
 	OnArrangeChildren(ArrangedChildren, AllottedGeometry);
