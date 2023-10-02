@@ -4,7 +4,6 @@
 #include "Type.h"
 #include "CodeGen/TypeGen.h"
 #include "CoreAObject/ObjectInitializer.h"
-#include "RefPtr.h"
 
 AObject::AObject() : AObject(NObjectInitializer::Get())
 {

@@ -29,7 +29,7 @@ public:
 	{
 	}
 
-	inline TSubclassOf(const AType* InType) noexcept
+	inline TSubclassOf(AType* InType) noexcept
 		: ClassType(InType)
 	{
 		if (ClassType)
@@ -73,3 +73,9 @@ public:
 	inline constexpr bool operator ==(const TSubclassOf& Rhs) const noexcept = default;
 	inline constexpr auto operator <=>(const TSubclassOf& Rhs) const noexcept = default;
 };
+
+template<std::derived_from<AObject> T>
+inline RefPtr<T> NewObject(TSubclassOf<T> InClassType)
+{
+	return NewObject<T>(InClassType.GetType());
+}
