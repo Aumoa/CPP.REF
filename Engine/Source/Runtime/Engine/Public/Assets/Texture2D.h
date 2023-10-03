@@ -6,7 +6,6 @@
 #include "Assets/StreamableRenderAsset.h"
 #include "Texture2D.generated.h"
 
-class NTexture2DTaskRenderAssetProxy;
 class NRHITexture2D;
 
 ACLASS()
@@ -16,7 +15,7 @@ class ENGINE_API ATexture2D : public AStreamableRenderAsset
 
 private:
 	String AbsolutePath;
-	std::shared_ptr<NTexture2DTaskRenderAssetProxy> RenderProxy;
+	std::shared_ptr<NStreamableRenderAssetProxy> RenderProxy;
 
 public:
 	virtual bool IsStreamedIn() const override;
@@ -27,7 +26,4 @@ public:
 
 public:
 	static RefPtr<ATexture2D> LoadAndStreamIn(String InAbsolutePath);
-
-private:
-	static Task<std::shared_ptr<NRHITexture2D>> LoadTextureAsync(String InAbsolutePath);
 };

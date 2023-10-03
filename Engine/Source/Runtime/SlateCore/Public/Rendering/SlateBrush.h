@@ -27,4 +27,14 @@ struct SLATECORE_API NSlateBrush
 		: NSlateBrush(InRenderAssetProxy.GetRenderProxy(), InDrawSize, InTintColor)
 	{
 	}
+
+	template<class U>
+	NSlateBrush(U& Ptr, Vector2 InDrawSize, Color InTintColor = NamedColors::White) requires
+		requires
+		{
+			{ Ptr->GetRenderProxy() };
+		}
+		: NSlateBrush(Ptr ? Ptr->GetRenderProxy() : nullptr, InDrawSize, InTintColor)
+	{
+	}
 };

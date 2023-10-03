@@ -13,15 +13,10 @@ AObject::AObject(NObjectInitializer& Initializer)
 	: ClassType(Initializer.ConsumeConstructType())
 	, Refs(new Referencer())
 {
-	Refs->IncrRef();
 }
 
 AObject::~AObject() noexcept
 {
-	if (Refs)
-	{
-		Refs->DecrRef();
-	}
 }
 
 String AObject::ToString()

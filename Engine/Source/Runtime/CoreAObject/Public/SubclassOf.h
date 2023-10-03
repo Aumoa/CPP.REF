@@ -34,7 +34,8 @@ public:
 	{
 		if (ClassType)
 		{
-			if (ClassType->IsDerivedFrom(T::StaticClass()) == false)
+			AType* Comparand = T::StaticClass();
+			if (ClassType != Comparand && ClassType->IsDerivedFrom(Comparand) == false)
 			{
 				ClassType = nullptr;
 				check(false);

@@ -20,6 +20,9 @@ class COREAOBJECT_API AObject
 	template<class T>
 	friend class WeakPtr;
 
+	AObject(const AObject&) = delete;
+	AObject(AObject&&) = delete;
+
 private:
 	AType* const ClassType = nullptr;
 	Referencer* Refs = nullptr;
@@ -40,6 +43,8 @@ public:
 public:
 	static AType* StaticClass();
 	static RefPtr<AObject> NewObject(AType* InClassType);
+	template<std::derived_from<AObject> UObject>
+	inline RefPtr<UObject> NewObject(AType* InClassType = nullptr);
 };
 
 
@@ -59,9 +64,10 @@ public:
 	constexpr RefPtr(std::nullptr_t) noexcept : Ptr(nullptr) {}
 
 	template<std::derived_from<T> U>
-	constexpr RefPtr(U* Rhs) noexcept
+	constexpr RefPtr(U* Rhs)
 		: Ptr(Rhs)
 	{
+		SafeAddRef();
 	}
 
 	template<std::derived_from<T> U>
@@ -128,8 +134,10 @@ public:
 
 	template<std::derived_from<T> U>
 	constexpr RefPtr& operator =(U* Rhs) noexcept
-		: Ptr(Rhs)
 	{
+		SafeDecrRef();
+		Ptr = Rhs;
+		SafeAddRef();
 	}
 
 	template<std::derived_from<T> U>
@@ -287,6 +295,12 @@ inline RefPtr<UObject> NewObject(AType* InClassType = nullptr)
 	RefPtr<UObject> Casted = Instanced.Cast<UObject>();
 	check(Casted);
 	return Casted;
+}
+
+template<std::derived_from<AObject> UObject>
+inline RefPtr<UObject> AObject::NewObject(AType* InClassType)
+{
+	return ::NewObject<UObject>(InClassType);
 }
 
 #pragma endregion RefPtr

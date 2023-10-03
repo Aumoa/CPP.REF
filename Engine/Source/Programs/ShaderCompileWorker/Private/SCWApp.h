@@ -3,16 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Object.h"
-#include "SCWApp.generated.h"
 
-ACLASS()
-class ASCWApp : public AObject
+class NSCWApp
 {
-	GENERATED_BODY()
-
 public:
-	ASCWApp();
+	NSCWApp();
 
 	Task<int32> RunAsync(std::stop_token InCancellationToken);
 	void PrintUsage(TextWriter& Writer);

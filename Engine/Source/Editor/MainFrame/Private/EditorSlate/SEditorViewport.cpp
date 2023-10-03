@@ -6,17 +6,10 @@
 #include "EditorSlate/SEditorContentView.h"
 #include "EditorSlate/SEditorHierarchyView.h"
 #include "EditorSlate/SEditorPlayMenu.h"
-#include "Layout/SCanvasPanel.h"
-#include "Layout/SHorizontalBoxPanel.h"
-#include "Layout/SVerticalBoxPanel.h"
-#include "Layout/SSizeBox.h"
-#include "Layout/SDockPanel.h"
 #include "Widgets/Images/SImage.h"
-#include "GenericPlatform/GenericImage.h"
-#include "RHI/RHIGlobal.h"
-#include "RHI/RHIGraphics.h"
-#include "Assets/StreamableAssetManager.h"
-#include "Assets/StreamableRenderAsset.h"
+#include "Layout/SDockPanel.h"
+#include "RenderGlobal.h"
+#include "Assets/AssetsPath.h"
 
 SEditorViewport::SEditorViewport()
 {
@@ -24,7 +17,7 @@ SEditorViewport::SEditorViewport()
 
 DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 {
-	auto Image = LoadObject(TEXT("/Engine/Splash/SplashImage"));
+	auto Image = NRenderGlobal::LoadTexture2DAsync(NAssetsPath::GetFileSystemPath(TEXT("/Engine/Splash/SplashImage.png")));
 
 	Args.Slots.emplace_back(SViewport::NSlot()
 		.VAlignment(EVerticalAlignment::Fill)
@@ -73,7 +66,7 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 			.HAlignment(EHorizontalAlignment::Fill)
 			[
 				SNew(SImage)
-				.Brush(Image->GetRenderProxy())
+				.Brush(Image)
 			]
 		]
 	);

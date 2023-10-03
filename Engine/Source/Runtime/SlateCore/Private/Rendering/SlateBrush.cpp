@@ -2,7 +2,7 @@
 
 #include "Rendering/SlateBrush.h"
 #include "Rendering/Texture2DTaskRenderAssetProxy.h"
-#include "Rendering/NullTextureRenderAssetProxy.h"
+#include "RenderGlobal.h"
 
 NSlateBrush::NSlateBrush(Task<std::shared_ptr<NRHITexture2D>> InTextureTask, Vector2 InDrawSize, Color InTintColor)
 	: NSlateBrush(std::make_shared<NTexture2DTaskRenderAssetProxy>(InTextureTask), InDrawSize, InTintColor)
@@ -10,12 +10,12 @@ NSlateBrush::NSlateBrush(Task<std::shared_ptr<NRHITexture2D>> InTextureTask, Vec
 }
 
 NSlateBrush::NSlateBrush(Vector2 InDrawSize, Color InTintColor)
-	: NSlateBrush(std::make_shared<NNullTextureRenderAssetProxy>(), InDrawSize, InTintColor)
+	: NSlateBrush(NRenderGlobal::GetNullRenderProxy(), InDrawSize, InTintColor)
 {
 }
 
 NSlateBrush::NSlateBrush(std::shared_ptr<NStreamableRenderAssetProxy> InRenderProxy, Vector2 InDrawSize, Color InTintColor)
-	: RenderProxy(std::move(InRenderProxy))
+	: RenderProxy(InRenderProxy ? std::move(InRenderProxy) : NRenderGlobal::GetNullRenderProxy())
 	, DrawSize(InDrawSize)
 	, TintColor(InTintColor)
 {

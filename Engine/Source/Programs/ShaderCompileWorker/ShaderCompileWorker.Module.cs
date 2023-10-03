@@ -10,8 +10,7 @@ public class ShaderCompileWorker : ModuleRules
     {
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "Core",
-            "CoreAObject"
+            "Core"
         });
 
         PrivateIncludePaths.Add("Private");

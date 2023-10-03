@@ -16,16 +16,16 @@ int main(int Argc, char* Argv[])
 		CancellationTokenSource.request_stop();
 	};
 
-	RefPtr App = NewObject<ASCWApp>();
+	NSCWApp App;
 
 	try
 	{
-		return App->RunAsync(CancellationTokenSource.get_token()).GetResult();
+		return App.RunAsync(CancellationTokenSource.get_token()).GetResult();
 	}
 	catch (const UsageException&)
 	{
 		Console::Error.WriteLine(TEXT("Invalid usage."));
-		App->PrintUsage(Console::Error);
+		App.PrintUsage(Console::Error);
 		return 1;
 	}
 	catch (const TerminateException& E)

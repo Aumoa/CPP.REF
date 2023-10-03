@@ -5,11 +5,11 @@
 #include "Exceptions/UsageException.h"
 #include "Exceptions/TerminateException.h"
 
-ASCWApp::ASCWApp()
+NSCWApp::NSCWApp()
 {
 }
 
-Task<int32> ASCWApp::RunAsync(std::stop_token InCancellationToken)
+Task<int32> NSCWApp::RunAsync(std::stop_token InCancellationToken)
 {
 	String InputDirectory, OutputDirectory;
 	if (CommandLine::TryGetValue(TEXT("Input"), InputDirectory) == false)
@@ -106,7 +106,7 @@ constexpr byte {}[] =
 	co_return 0;
 }
 
-void ASCWApp::PrintUsage(TextWriter& Writer)
+void NSCWApp::PrintUsage(TextWriter& Writer)
 {
 	String Usage = TEXT(R"(Usage: 
 -Input    : The source shader code directory.
