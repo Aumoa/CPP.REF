@@ -395,7 +395,7 @@ public:
 		return (const char_t*)*this;
 	}
 
-	[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& Rhs, EStringComparison Comparison = EStringComparison::CurrentCulture) const noexcept
+	[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& Rhs, EStringComparison Comparison) const noexcept
 	{
 		return this->CompareTo(Rhs.GetRaw(), Rhs.Len, Comparison);
 	}
