@@ -6,11 +6,15 @@
 
 class AObject;
 class AType;
+class APackage;
+struct NTypeCollection;
 
 class COREAOBJECT_API NObjectInitializer
 {
 	friend AObject;
 	friend AType;
+	friend APackage;
+	friend NTypeCollection;
 
 	AType* ConstructType = nullptr;
 

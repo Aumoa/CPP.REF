@@ -10,8 +10,6 @@ struct COREAOBJECT_API NTypeCollection : public StaticClass
 {
 	friend struct NTypeGen;
 
-	static std::span<AType* const> GetTypeCollection();
-
 private:
 	static void AddClassTypeToCollection(AType* InClassType);
 };

@@ -16,11 +16,6 @@ AType::~AType() noexcept
 {
 }
 
-String AType::GetClassName() const noexcept
-{
-	return ClassName;
-}
-
 bool AType::IsDerivedFrom(AType* InType) const noexcept
 {
 	const AType* Current = this;

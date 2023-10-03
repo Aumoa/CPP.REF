@@ -6,10 +6,13 @@
 #include "Object.h"
 #include "CoreAObject/ClassMetadata.h"
 
+class APackage;
+
 class COREAOBJECT_API AType final : public AObject
 {
 	friend struct NTypeGen;
 	friend class AObject;
+	friend struct NTypeCollection;
 
 public:
 	using Super = AObject;
@@ -20,6 +23,7 @@ private:
 	AType* SuperClass = nullptr;
 	AObject* (*Constructor)() = nullptr;
 	EClassMetadata ClassMeta = {};
+	APackage* Package = nullptr;
 
 private:
 	AType();
@@ -28,7 +32,9 @@ private:
 public:
 	virtual ~AType() noexcept override;
 
-	String GetClassName() const noexcept;
+	String GetClassName() const noexcept { return ClassName; }
+	APackage* GetPackage() const noexcept { return Package; }
+
 	bool IsDerivedFrom(AType* InType) const noexcept;
 	template<std::derived_from<AObject> U>
 	bool IsDerivedFrom() const noexcept { return IsDerivedFrom(U::StaticClass()); }
