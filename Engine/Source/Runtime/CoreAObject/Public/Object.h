@@ -255,7 +255,6 @@ public:
 	{
 		if (auto uPtr = RefPtr<U>(dynamic_cast<U*>(Ptr)))
 		{
-			uPtr.Ptr->Refs->IncrRef();
 			return uPtr;
 		}
 		return nullptr;
