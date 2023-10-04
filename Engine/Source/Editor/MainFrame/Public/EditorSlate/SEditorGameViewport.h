@@ -3,14 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/SViewport.h"
+#include "Widgets/SCompoundWidget.h"
 
-class MAINFRAME_API SEditorViewport : public SCompoundWidget
+class MAINFRAME_API SEditorGameViewport : public SCompoundWidget
 {
-	GENERATED_SLATE_BODY(SEditorViewport)
-
-public:
-	SEditorViewport();
+	GENERATED_SLATE_BODY(SEditorGameViewport)
 
 public:
 	BEGIN_SLATE_ATTRIBUTE()

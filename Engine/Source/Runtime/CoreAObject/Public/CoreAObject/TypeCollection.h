@@ -5,10 +5,13 @@
 #include "CoreMinimal.h"
 
 class AType;
+class APackage;
 
 struct COREAOBJECT_API NTypeCollection : public StaticClass
 {
 	friend struct NTypeGen;
+
+	static std::vector<APackage*> GetPackages();
 
 private:
 	static void AddClassTypeToCollection(AType* InClassType);

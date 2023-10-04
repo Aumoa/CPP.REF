@@ -2,6 +2,8 @@
 
 #include "Widgets/SViewport.h"
 #include "Layout/AlignmentArrangeResult.h"
+#include "RHI/RHIViewport.h"
+#include "RenderGlobal.h"
 
 SViewport::SViewport()
 {
@@ -77,8 +79,16 @@ int32 SViewport::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeomet
 	const bool bForwardedEnabled = ShouldBeEnabled(bParentEnabled);
 
 	// Viewport elements always render with new layer.
-	int32 MaxLayerId = InLayer;
+	int32 MaxLayerId = InLayer + 1;
 	NPaintArgs NewArgs = Args.WithNewParent(*this);
+
+	NSlateRenderElement& Element = OutDrawElements.Add();
+	Element.AbsolutePosition = AllottedGeometry.GetAbsolutePosition();
+	Element.Layout = AllottedGeometry.ToPaintGeometry();
+	Element.Layer = InLayer;
+	Element.RenderOpacity = Args.RenderOpacity;
+	Element.TintColor = NamedColors::Black;
+	Element.Proxy = NRenderGlobal::GetNullRenderProxy();
 
 	const std::vector<NArrangedWidget>& ArrangedWidgets = ArrangedChildrens.GetWidgets();
 	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)

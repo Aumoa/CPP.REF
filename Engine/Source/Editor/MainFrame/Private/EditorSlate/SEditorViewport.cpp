@@ -6,10 +6,8 @@
 #include "EditorSlate/SEditorContentView.h"
 #include "EditorSlate/SEditorHierarchyView.h"
 #include "EditorSlate/SEditorPlayMenu.h"
-#include "Widgets/Images/SImage.h"
+#include "EditorSlate/SEditorGameViewport.h"
 #include "Layout/SDockPanel.h"
-#include "RenderGlobal.h"
-#include "Assets/AssetsPath.h"
 
 SEditorViewport::SEditorViewport()
 {
@@ -17,9 +15,9 @@ SEditorViewport::SEditorViewport()
 
 DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 {
-	auto Image = NRenderGlobal::LoadTexture2DAsync(NAssetsPath::GetFileSystemPath(TEXT("/Engine/Splash/SplashImage.png")));
+	NSlot SingleSlot = std::move(Args.SingleSlot);
 
-	Args.Slots.emplace_back(SViewport::NSlot()
+	Args.SingleSlot = SEditorViewport::NSlot()
 		.VAlignment(EVerticalAlignment::Fill)
 		.HAlignment(EHorizontalAlignment::Fill)
 		[
@@ -65,9 +63,14 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorViewport, Args)
 			.VAlignment(EVerticalAlignment::Fill)
 			.HAlignment(EHorizontalAlignment::Fill)
 			[
-				SNew(SImage)
-				.Brush(Image)
+				SNew(SEditorGameViewport)
+				+SEditorGameViewport::NSlot()
+				.VAlignment(SingleSlot._VAlignment)
+				.HAlignment(SingleSlot._HAlignment)
+				.SlotPadding(SingleSlot._SlotPadding)
+				[
+					SingleSlot.Content
+				]
 			]
-		]
-	);
+		];
 }

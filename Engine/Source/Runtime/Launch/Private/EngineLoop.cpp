@@ -2,6 +2,8 @@
 
 #include "EngineLoop.h"
 #include "Launch.h"
+#include "GameEngine.h"
+#include "RenderGlobal.h"
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "RHI/RHIGlobal.h"
@@ -13,6 +15,7 @@
 #include "SlateGlobalShaders.h"
 #include "Rendering/SlateTextFormatCache.h"
 #include "Widgets/SWindow.h"
+#include "Widgets/SViewport.h"
 
 NEngineLoop::NEngineLoop()
 {
@@ -22,12 +25,18 @@ NEngineLoop::~NEngineLoop() noexcept
 {
 }
 
-void NEngineLoop::Init()
+void NEngineLoop::Init(TSubclassOf<AGameEngine> InEngineClass)
 {
+    EngineInstance = NewObject(InEngineClass);
+    EngineInstance->Initialize();
 }
 
 void NEngineLoop::Shutdown()
 {
+    // shutdown engine instance.
+    EngineInstance->Deinitialize();
+    EngineInstance.Reset();
+
     // waiting for all graphics commands are completed.
     NRHIGlobal::GetDynamicRHI().SyncFrame();
 
@@ -37,6 +46,7 @@ void NEngineLoop::Shutdown()
     // shutdown graphics engine.
     NSlateTextFormatCache::Shutdown();
     NSlateGlobalShaders::Shutdown();
+    NRenderGlobal::Shutdown();
     NRHIGlobal::ShutdownDynamicRHI();
 }
 
@@ -71,6 +81,7 @@ void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
 
     // Initialize RHI engine.
     NRHIGlobal::InitDynamicRHI();
+    NRenderGlobal::Initialize();
     NSlateGlobalShaders::Initialize();
     NSlateTextFormatCache::Initialize();
 
@@ -81,8 +92,14 @@ void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
 
 void NEngineLoop::PreInitPostStartupScreen()
 {
+    std::shared_ptr<SWindow> CoreWindow;
+    std::shared_ptr<SViewport> GameViewport;
+
     NSlateApplication::Get().SetupCoreWindow(
-        SNew(SWindow)
+        SAssignNew(CoreWindow, SWindow)
         .Visibility(ESlateVisibility::Hidden)
     );
+
+    CoreWindow->SetContent(SAssignNew(GameViewport, SViewport));
+    NSlateApplication::Get().SetupGameViewport(GameViewport);
 }

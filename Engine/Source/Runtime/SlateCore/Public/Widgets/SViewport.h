@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Widgets/SPanel.h"
 
+class NRHIViewport;
+
 class SLATECORE_API SViewport : public SPanel
 {
 	GENERATED_SLATE_BODY(SViewport)
@@ -50,6 +52,7 @@ public:
 public:
 	BEGIN_SLATE_ATTRIBUTE()
 		DECLARE_SLATE_SLOT_SUPPORTS(NSlot)
+		DECLARE_SLATE_ATTRIBUTE(bool, bAllocateViewport, false);
 	END_SLATE_ATTRIBUTE();
 
 	DECLARE_SLATE_CONSTRUCTOR();

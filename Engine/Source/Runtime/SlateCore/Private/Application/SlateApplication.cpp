@@ -2,6 +2,7 @@
 
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
+#include "Widgets/SViewport.h"
 #include "Rendering/SlateRenderer.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
@@ -36,6 +37,11 @@ void NSlateApplication::Tick()
 void NSlateApplication::PresentAllWindows()
 {
     CoreWindow->Present();
+}
+
+void NSlateApplication::SetupGameViewport(std::shared_ptr<SViewport> InGameViewport)
+{
+    GameViewport = InGameViewport;
 }
 
 void NSlateApplication::SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow)

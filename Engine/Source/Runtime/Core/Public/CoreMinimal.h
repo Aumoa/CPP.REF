@@ -113,5 +113,7 @@
 #include "IO/FileStream.h"
 #include "IO/StreamWriter.h"
 
+#include "Localizational/Name.h"
+
 // additional standard libraries.
 #include <set>

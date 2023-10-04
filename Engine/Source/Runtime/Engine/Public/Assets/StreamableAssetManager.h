@@ -3,19 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RefPtr.h"
+#include "EngineSubsystem.h"
+#include "GameEngine.h"
+#include "Assets/StreamableRenderAsset.h"
+#include "StreamableAssetManager.generated.h"
 
-class AStreamableRenderAsset;
-
-struct ENGINE_API NStreamableAssetManager : public StaticClass
+ACLASS()
+class ENGINE_API AStreamableAssetManager : public AEngineSubsystem
 {
-	static RefPtr<AStreamableRenderAsset> LoadObject(String InPath);
+	GENERATED_BODY()
 
 private:
-	static std::map<String, WeakPtr<AStreamableRenderAsset>> StreamableAssets;
+	std::map<String, WeakPtr<AStreamableRenderAsset>> StreamableAssets;
+
+public:
+	AStreamableAssetManager();
+	virtual ~AStreamableAssetManager() noexcept override;
+
+public:
+	RefPtr<AStreamableRenderAsset> LoadObject(String InPath);
 };
 
 inline RefPtr<AStreamableRenderAsset> LoadObject(String InPath)
 {
-	return NStreamableAssetManager::LoadObject(InPath);
+	return GEngine->GetEngineSubsystems().GetSubsystem<AStreamableAssetManager>()->LoadObject(InPath);
 }

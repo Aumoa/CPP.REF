@@ -1,13 +1,18 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #include "Assets/StreamableAssetManager.h"
-#include "Assets/StreamableRenderAsset.h"
 #include "Assets/AssetsPath.h"
 #include "Assets/Texture2D.h"
 
-std::map<String, WeakPtr<AStreamableRenderAsset>> NStreamableAssetManager::StreamableAssets;
+AStreamableAssetManager::AStreamableAssetManager()
+{
+}
 
-RefPtr<AStreamableRenderAsset> NStreamableAssetManager::LoadObject(String InPath)
+AStreamableAssetManager::~AStreamableAssetManager() noexcept
+{
+}
+
+RefPtr<AStreamableRenderAsset> AStreamableAssetManager::LoadObject(String InPath)
 {
 	auto It = StreamableAssets.find(InPath);
 	if (It != StreamableAssets.end())

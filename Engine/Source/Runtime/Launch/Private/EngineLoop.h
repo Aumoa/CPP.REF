@@ -14,11 +14,14 @@ class NEngineLoop : public IEngineLoop
     NEngineLoop(const NEngineLoop&) = delete;
     NEngineLoop(NEngineLoop&&) = delete;
 
+private:
+    RefPtr<AGameEngine> EngineInstance;
+
 public:
     NEngineLoop();
     virtual ~NEngineLoop() noexcept override;
 
-    virtual void Init() override;
+    virtual void Init(TSubclassOf<AGameEngine> InEngineClass) override;
     virtual void Shutdown() override;
     virtual void Tick() override;
 

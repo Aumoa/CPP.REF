@@ -2,12 +2,15 @@
 
 #include "Launch.h"
 #include "EngineLoop.h"
+#include "GameEngine.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "GenericPlatform/GenericApplication.h"
 
 #if WITH_EDITOR
 #include "CoreEd.h"
 #endif
+
+#include "Localizational/Name.h"
 
 NLaunch* NLaunch::CurrentLaunch;
 
@@ -35,7 +38,7 @@ int32 NLaunch::GuardedMain()
 #if WITH_EDITOR
     NCoreEd::EditorInit(*Loop);
 #else
-    Loop->Init();
+    Loop->Init(AGameEngine::StaticClass());
 #endif
     Loop->PostInit();
 

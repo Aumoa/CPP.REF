@@ -7,16 +7,6 @@
 
 struct CORE_API GenericPlatformProcess : public StaticClass
 {
-	static FORCEINLINE void Yield()
-	{
-		PLATFORM_YIELD();
-	}
-
-	static FORCEINLINE void DebugBreak()
-	{
-		PLATFORM_BREAK();
-	}
-
 	static FORCEINLINE bool IsDebuggerPresent() noexcept
 	{
 		return false;

@@ -14,6 +14,11 @@ inline namespace TypeCollectionVars
 	}
 }
 
+std::vector<APackage*> NTypeCollection::GetPackages()
+{
+	return Packages() | Linq::Select(LP1R(p, p.second.get())) | Linq::ToVector();
+}
+
 void NTypeCollection::AddClassTypeToCollection(AType* InClassType)
 {
 	auto It = Packages().find(InClassType->PackageName);

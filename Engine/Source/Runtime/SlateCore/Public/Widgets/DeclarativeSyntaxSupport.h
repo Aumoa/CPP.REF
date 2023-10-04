@@ -109,7 +109,7 @@ SlotClass SingleSlot;																							\
 DeclarativeSyntaxSupports::TSingleSlotSupports<This, SlotClass>&& operator +(SlotClass&& InstanceSlot) &&		\
 {																												\
 	SingleSlot = std::move(InstanceSlot);																		\
-	return std::move(static_cast<DeclarativeSyntaxSupports::TSingleSlotSupports<This, SlotClass>&>(*this));		\
+	return std::move(reinterpret_cast<DeclarativeSyntaxSupports::TSingleSlotSupports<This, SlotClass>&>(*this));		\
 }
 
 #define SNew(SlateClass) (std::make_shared<SlateClass>()) << SlateClass::NDeclarativeAttr<SlateClass::NDeclarativeAttr<>>()

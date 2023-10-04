@@ -85,8 +85,7 @@ public class ClCompiler : Compiler
     {
         switch (Rule.Target.BuildConfiguration.Configuration)
         {
-            case Configuration.Debug:
-            case Configuration.DebugGame:
+            case Confi6uration.DebugGame:
                 PSI.Arguments +=
                     // Generates intrinsic functions
                     "/Oi- " +
