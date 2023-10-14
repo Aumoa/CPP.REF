@@ -395,9 +395,9 @@ public:
 		using ValueType1 = typename Task1::ValueType;
 		constexpr bool bIsSameValues = (true && ... && std::same_as<ValueType1, typename Tasks::ValueType>);
 
-		if constexpr (bIsSameValues)
+		if constexpr (bIsSameValues && std::is_void_v<ValueType1> == false)
 		{
-			return WhenAll(std::array<ValueType1, sizeof...(Tasks) + 1>{ InTask1, InTasks... });
+			return WhenAll(std::array<Task<ValueType1>, sizeof...(Tasks) + 1>{ InTask1, InTasks... });
 		}
 		else
 		{

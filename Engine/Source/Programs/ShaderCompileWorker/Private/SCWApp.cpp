@@ -88,7 +88,7 @@ constexpr byte {}[] =
 
 			String Body = String::Join(TEXT(",\n\t"), Lines);
 			Body = String::Format(HeaderFormatBase, FileName, Body);
-			co_await File::WriteAllTextAsync(OutputName, Body, InCancellationToken);
+			co_await File::CompareAndWriteAllTextAsync(OutputName, Body, InCancellationToken);
 
 			Timer.Stop();
 

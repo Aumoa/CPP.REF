@@ -10,8 +10,6 @@ public record SourceCodeCache
 {
     public required string Path;
 
-    public required long SourceCodeHash;
-
     public required DateTime LastWriteTimeInUtc;
 
     public static SourceCodeCache LoadCacheFromBinary(BinaryReader Reader)
@@ -19,7 +17,6 @@ public record SourceCodeCache
         return new SourceCodeCache
         {
             Path = Reader.ReadString(),
-            SourceCodeHash = Reader.ReadInt64(),
             LastWriteTimeInUtc = DateTime.FromBinary(Reader.ReadInt64())
         };
     }
@@ -38,24 +35,15 @@ public record SourceCodeCache
     public void SaveCacheToBinary(BinaryWriter Writer)
     {
         Writer.Write(Path);
-        Writer.Write(SourceCodeHash);
-        Writer.Write(LastWriteTimeInUtc.ToBinary());
+        Writer.Write(File.GetLastWriteTimeUtc(Path).ToBinary());
     }
 
     public bool CompareTo(string InSourceCodePath)
     {
         Debug.Assert(Path.Equals(InSourceCodePath, StringComparison.OrdinalIgnoreCase));
 
-        // first: compare file time.
         DateTime WriteTime = File.GetLastWriteTimeUtc(InSourceCodePath);
         if (WriteTime == this.LastWriteTimeInUtc)
-        {
-            return true;
-        }
-
-        // second: compare source code hash.
-        long Hash = FileHashes.GetHash(InSourceCodePath);
-        if (Hash == SourceCodeHash)
         {
             return true;
         }
@@ -77,7 +65,6 @@ public record SourceCodeCache
         return new SourceCodeCache()
         {
             Path = InPath,
-            SourceCodeHash = FileHashes.GetHash(InPath),
             LastWriteTimeInUtc = File.GetLastWriteTimeUtc(InPath)
         };
     }

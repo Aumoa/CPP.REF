@@ -27,6 +27,21 @@ Task<> File::WriteAllTextAsync(String InPath, String InContent, std::stop_token 
 	Stream.Close();
 }
 
+Task<bool> File::CompareAndWriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
+{
+	if (Exists(InPath))
+	{
+		String PrevContent = co_await ReadAllTextAsync(InPath, InCancellationToken);
+		if (PrevContent == InContent)
+		{
+			co_return false;
+		}
+	}
+
+	co_await WriteAllTextAsync(InPath, InContent, InCancellationToken);
+	co_return true;
+}
+
 bool File::Exists(String InPath)
 {
 	return std::filesystem::is_regular_file(InPath.path());

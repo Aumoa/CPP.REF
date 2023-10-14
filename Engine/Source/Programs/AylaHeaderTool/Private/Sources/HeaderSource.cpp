@@ -147,8 +147,10 @@ REGISTER_INTRINSIC_CLASS(A{0}, TEXT("/Script/{2}"), A{0}::Super::StaticClass());
 		IncludePath = IncludePath.Replace(Char::ToStringView(Path::DirectorySeparatorChar), TEXT("/"));
 	}
 
-	co_await File::WriteAllTextAsync(HeaderFilename, String::Format(HeaderCode, String::Join(TEXT("\n"), GeneratedBodies), FileId));
-	co_await File::WriteAllTextAsync(SourceFilename, String::Format(SourceCode, IncludePath, String::Join(TEXT("\n"), BodyImplements)));
+	co_await Task<>::WhenAll(
+		File::CompareAndWriteAllTextAsync(HeaderFilename, String::Format(HeaderCode, String::Join(TEXT("\n"), GeneratedBodies), FileId), InCancellationToken),
+		File::CompareAndWriteAllTextAsync(SourceFilename, String::Format(SourceCode, IncludePath, String::Join(TEXT("\n"), BodyImplements)), InCancellationToken)
+	);
 }
 
 bool HeaderSource::CompileInACLASS(CompiledACLASS& Body, size_t& Index, std::vector<AylaCxxSyntaxNode*>& Nodes)
