@@ -4,7 +4,7 @@
 #include "Widgets/SViewport.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
-#include "RHI/RHIViewport.h"
+#include "RHI/RHISwapChain.h"
 #include "Rendering/SlateRenderer.h"
 #include "GenericPlatform/GenericWindow.h"
 
@@ -19,11 +19,11 @@ SWindow::~SWindow() noexcept
 void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 {
 	check(!NativeWindow);
-	check(!Viewport);
+	check(!SwapChain);
 
 	auto& DynamicRHI = NRHIGlobal::GetDynamicRHI();
 	NativeWindow = std::move(InNativeWindow);
-	Viewport = DynamicRHI.CreateViewport(NRHIGlobal::GetPrimaryCommandQueue(), *NativeWindow);
+	SwapChain = DynamicRHI.CreateSwapChain(NRHIGlobal::GetPrimaryCommandQueue(), *NativeWindow);
 
 	UpdateWindowVisibility();
 }
@@ -33,13 +33,13 @@ void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 	PrepassLayout();
 
 	Vector2 AllottedSize = ComputeDesiredSize();
-	if (Viewport)
+	if (SwapChain)
 	{
 		Vector2N VpSize = Vector<>::Cast<int32>(AllottedSize);
-		if (Viewport->GetViewportSize() != VpSize)
+		if (SwapChain->GetViewportSize() != VpSize)
 		{
 			NRHIGlobal::GetDynamicRHI().SyncFrame();
-			Viewport->Resize(VpSize);
+			SwapChain->Resize(VpSize);
 		}
 	}
 
@@ -56,24 +56,24 @@ void SWindow::Render(const TimeSpan& InDeltaTime, NSlateRenderer& Renderer)
 	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
 	OnPaint(Args, AllottedGeometry, CullingRect, DrawElements, 0, IsEnabled());
 
-	if (Viewport)
+	if (SwapChain)
 	{
-		Renderer.BeginRender(*Viewport);
+		Renderer.BeginRender(*SwapChain);
 		Renderer.Populate(DrawElements);
 
 		for (auto& Element : DrawElements.UnorderedElements)
 		{
 			Renderer.RenderElement(Element);
 		}
-		Renderer.EndRender(*Viewport);
+		Renderer.EndRender(*SwapChain);
 	}
 }
 
 void SWindow::Present()
 {
-	if (Viewport)
+	if (SwapChain)
 	{
-		Viewport->Present();
+		SwapChain->Present();
 	}
 }
 

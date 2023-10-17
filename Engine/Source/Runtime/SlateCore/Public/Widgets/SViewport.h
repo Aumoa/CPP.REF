@@ -25,6 +25,7 @@ public:
 
 private:
 	std::vector<NSlot> Slots;
+	std::shared_ptr<NRHIViewport> Viewport;
 
 public:
 	SViewport();

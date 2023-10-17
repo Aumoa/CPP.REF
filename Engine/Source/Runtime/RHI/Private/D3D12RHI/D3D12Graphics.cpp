@@ -4,6 +4,7 @@
 
 #include "D3D12RHI/D3D12Graphics.h"
 #include "D3D12RHI/D3D12CommandQueue.h"
+#include "D3D12RHI/D3D12SwapChain.h"
 #include "D3D12RHI/D3D12Viewport.h"
 #include "D3D12RHI/D3D12Global.h"
 #include "D3D12RHI/D3D12Texture2D.h"
@@ -124,11 +125,16 @@ std::shared_ptr<NRHICommandQueue> ND3D12Graphics::CreateCommandQueue()
 	return std::make_shared<ND3D12CommandQueue>(std::move(pQueue));
 }
 
-std::shared_ptr<NRHIViewport> ND3D12Graphics::CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow)
+std::shared_ptr<NRHISwapChain> ND3D12Graphics::CreateSwapChain(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow)
 {
 	auto* Queue = static_cast<ND3D12CommandQueue&>(InCommandQueue).GetQueue();
 	HWND hWnd = reinterpret_cast<HWND>(InWindow.GetOSWindowHandle());
-	return std::make_shared<ND3D12Viewport>(DXGIFactory.Get(), Queue, hWnd);
+	return std::make_shared<ND3D12SwapChain>(DXGIFactory.Get(), Queue, hWnd);
+}
+
+std::shared_ptr<NRHIViewport> ND3D12Graphics::CreateViewport()
+{
+	return std::make_shared<ND3D12Viewport>(Device.Get());
 }
 
 Task<std::shared_ptr<NRHITexture2D>> ND3D12Graphics::CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource)

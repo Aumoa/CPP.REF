@@ -6,11 +6,12 @@
 
 #include "D3D12RHI/D3D12Global.h"
 #include "D3D12RHI/D3D12Graphics.h"
-#include "D3D12RHI/D3D12Viewport.h"
+#include "D3D12RHI/D3D12SwapChain.h"
 #include "D3D12RHI/D3D12Texture2D.h"
 #include "D3D12RHI/D3D12GraphicsPipelineState.h"
 #include "D3D12RHI/D3D12RootSignature.h"
 #include "D3D12RHI/D3D12DescriptorHeap.h"
+#include "D3D12RHI/D3D12Viewport.h"
 #include "Numerics/VectorInterface/Color.h"
 
 ND3D12CommandSet::ND3D12CommandSet()
@@ -46,9 +47,24 @@ void ND3D12CommandSet::EndFrame()
 
 void ND3D12CommandSet::BeginRender(const NRHIViewport& InViewport, bool bClear)
 {
-	auto& dVP = static_cast<const ND3D12Viewport&>(InViewport);
-	int32 Index = dVP.GetCurrentBackBufferIndex();
-	ID3D12Resource* pBufferResource = dVP.GetBackBuffer(Index).GetResource();
+	D3D12_RESOURCE_STATES DesiredState;
+	D3D12_CPU_DESCRIPTOR_HANDLE hRTV;
+	ID3D12Resource* pResource;
+
+	if (auto* pSwapChain = dynamic_cast<const ND3D12SwapChain*>(&InViewport); pSwapChain)
+	{
+		DesiredState = D3D12_RESOURCE_STATE_PRESENT;
+		int32 Index = pSwapChain->GetCurrentBackBufferIndex();
+		pResource = pSwapChain->GetBackBuffer(Index).GetResource();
+		hRTV = pSwapChain->GetRTVHandle(Index);
+	}
+	else
+	{
+		auto& dVP = static_cast<const ND3D12Viewport&>(InViewport);
+		DesiredState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		pResource = dVP.GetResource().Get();
+		hRTV = dVP.GetRTVHandle();
+	}
 
 	D3D12_RESOURCE_BARRIER ResourceBarrier =
 	{
@@ -56,16 +72,14 @@ void ND3D12CommandSet::BeginRender(const NRHIViewport& InViewport, bool bClear)
 		.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 		.Transition =
 		{
-			.pResource = pBufferResource,
+			.pResource = pResource,
 			.Subresource = 0,
-			.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
+			.StateBefore = DesiredState,
 			.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 		}
 	};
 
 	CommandList->ResourceBarrier(1, &ResourceBarrier);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE hRTV = dVP.GetRTVHandle(Index);
 	CommandList->OMSetRenderTargets(1, &hRTV, FALSE, nullptr);
 
 	if (bClear)
@@ -96,9 +110,20 @@ void ND3D12CommandSet::BeginRender(const NRHIViewport& InViewport, bool bClear)
 
 void ND3D12CommandSet::EndRender(const NRHIViewport& InViewport)
 {
-	auto& dVP = static_cast<const ND3D12Viewport&>(InViewport);
-	int32 Index = dVP.GetCurrentBackBufferIndex();
-	ID3D12Resource* pBufferResource = dVP.GetBackBuffer(Index).GetResource();
+	D3D12_RESOURCE_STATES DesiredState;
+	ID3D12Resource* pResource;
+
+	if (auto* pSwapChain = dynamic_cast<const ND3D12SwapChain*>(&InViewport); pSwapChain)
+	{
+		DesiredState = D3D12_RESOURCE_STATE_PRESENT;
+		int32 Index = pSwapChain->GetCurrentBackBufferIndex();
+		pResource = pSwapChain->GetBackBuffer(Index).GetResource();
+	}
+	else
+	{
+		DesiredState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		pResource = static_cast<const ND3D12Viewport&>(InViewport).GetResource().Get();
+	}
 
 	D3D12_RESOURCE_BARRIER ResourceBarrier =
 	{
@@ -106,10 +131,10 @@ void ND3D12CommandSet::EndRender(const NRHIViewport& InViewport)
 		.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 		.Transition =
 		{
-			.pResource = pBufferResource,
+			.pResource = pResource,
 			.Subresource = 0,
 			.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET,
-			.StateAfter = D3D12_RESOURCE_STATE_PRESENT
+			.StateAfter = DesiredState
 		}
 	};
 

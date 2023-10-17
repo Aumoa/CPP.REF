@@ -6,7 +6,7 @@
 #include "Widgets/SCompoundWidget.h"
 
 class NGenericWindow;
-class NRHIViewport;
+class NRHISwapChain;
 class NSlateRenderer;
 class SViewport;
 
@@ -16,7 +16,7 @@ class SLATECORE_API SWindow : public SCompoundWidget
 
 private:
 	std::shared_ptr<NGenericWindow> NativeWindow;
-	std::shared_ptr<NRHIViewport> Viewport;
+	std::shared_ptr<NRHISwapChain> SwapChain;
 
 public:
 	SWindow();

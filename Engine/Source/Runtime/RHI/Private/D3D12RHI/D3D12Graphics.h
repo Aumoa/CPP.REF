@@ -41,7 +41,8 @@ public:
 	virtual void Init() override;
 	virtual std::shared_ptr<NRHICommandQueue> GetPrimaryQueue() override;
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() override;
-	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) override;
+	virtual std::shared_ptr<NRHISwapChain> CreateSwapChain(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) override;
+	virtual std::shared_ptr<NRHIViewport> CreateViewport() override;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) override;
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() override;
 	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() override;

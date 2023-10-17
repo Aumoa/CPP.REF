@@ -12,7 +12,6 @@ protected:
 	NRHIViewport() = default;
 
 public:
-	virtual void Present() = 0;
 	virtual Vector2N GetViewportSize() const = 0;
 	virtual void Resize(const Vector2N& InSize) = 0;
 };

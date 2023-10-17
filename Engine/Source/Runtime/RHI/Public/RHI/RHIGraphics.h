@@ -17,6 +17,7 @@ class NRHIDescriptorHeap;
 class NRHIShaderResourceView;
 class NRHITextFormat;
 class NRHITextLayout;
+class NRHISwapChain;
 
 class RHI_API NRHIGraphics
 {
@@ -29,7 +30,8 @@ public:
 	virtual void Init() = 0;
 	virtual std::shared_ptr<NRHICommandQueue> GetPrimaryQueue() = 0;
 	virtual std::shared_ptr<NRHICommandQueue> CreateCommandQueue() = 0;
-	virtual std::shared_ptr<NRHIViewport> CreateViewport(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) = 0;
+	virtual std::shared_ptr<NRHISwapChain> CreateSwapChain(NRHICommandQueue& InCommandQueue, NGenericWindow& InWindow) = 0;
+	virtual std::shared_ptr<NRHIViewport> CreateViewport() = 0;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) = 0;
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() = 0;
 	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() = 0;

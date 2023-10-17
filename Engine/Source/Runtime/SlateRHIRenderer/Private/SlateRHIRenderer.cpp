@@ -120,7 +120,6 @@ inline T* GetConstantBufferPtr(std::shared_ptr<NRHIConstantBuffer>& ConstantBuff
 
 void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
 {
-    PLATFORM_UNREFERENCED_PARAMETER(InElement);
     NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
 
     int64 VL_PaintGeometry;
