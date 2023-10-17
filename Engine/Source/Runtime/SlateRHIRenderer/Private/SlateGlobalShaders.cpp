@@ -3,21 +3,17 @@
 #include "SlateGlobalShaders.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
-#include "RHI/RHIRootSignature.h"
-#include "RHI/RHIGraphicsPipelineState.h"
+#include "RHI/RHISlateShader.h"
 
-std::shared_ptr<NRHIRootSignature> NSlateGlobalShaders::SlateRS;
-std::shared_ptr<NRHIGraphicsPipelineState> NSlateGlobalShaders::SlatePS;
+std::shared_ptr<NRHISlateShader> NSlateGlobalShaders::SlateDefaultShader;
 
 void NSlateGlobalShaders::Initialize()
 {
 	auto& Graphics = NRHIGlobal::GetDynamicRHI();
-	SlateRS = Graphics.CreateRootSignature();
-	SlatePS = Graphics.CreateGraphicsPipelineState(*SlateRS);
+	SlateDefaultShader = Graphics.CreateSlateShader();
 }
 
 void NSlateGlobalShaders::Shutdown()
 {
-	SlateRS.reset();
-	SlatePS.reset();
+	SlateDefaultShader.reset();
 }

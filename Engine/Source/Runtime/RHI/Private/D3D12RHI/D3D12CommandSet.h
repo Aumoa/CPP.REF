@@ -18,19 +18,19 @@ private:
 public:
 	ND3D12CommandSet();
 
-	virtual void BeginFrame(const NRHIGraphicsPipelineState* pInitialPipeline) override;
+	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
 
 	virtual void BeginRender(const NRHIViewport& InViewport, bool bClear) override;
 	virtual void EndRender(const NRHIViewport& InViewport) override;
-
 	virtual void SetDescriptorHeaps(std::span<NRHIDescriptorHeap* const> Heaps) override;
-	virtual void SetGraphicsRootSignature(NRHIRootSignature& InRS) override;
-	virtual void SetGraphicsRoot32BitConstants(int32 RootParameterIndex, int32 Num32BitValuesToSet, const void* pSrcData, int32 DestOffsetIn32BitValues) override;
-	virtual void SetGraphicsRootConstantBufferView(int32 RootParameterIndex, int64 BufferLocation) override;
-	virtual void SetGraphicsRootDescriptorTable(int32 RootParameterIndex, int64 VirtualHandleLocation) override;
 
-	virtual void DrawInstanced(bool bStrip, int32 InVertexCount, int32 InInstanceCount, int32 InVertexStart, int32 InInstanceStart) override;
+	virtual void SetSlateShader(const NRHISlateShader& InShader) override;
+	virtual void SetScreenResolutionInfo(const Vector2& InConstant) override;
+	virtual void SetPaintGeometry(int64 VirtualAddress) override;
+	virtual void SetRenderParams(int64 VirtualAddress) override;
+	virtual void SetSlateInputTexture(int64 VirtualHandle) override;
+	virtual void DrawSlateInstance() override;
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return CommandList.Get(); }
 };

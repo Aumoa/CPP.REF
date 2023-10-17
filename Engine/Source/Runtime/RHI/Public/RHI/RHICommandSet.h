@@ -4,11 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "RHI/RHIDeviceChild.h"
+#include "Numerics/VectorInterface/Vector.h"
+#include "ShaderParams/SlateShaderPaintGeometry.h"
+#include "ShaderParams/SlateShaderRenderParams.h"
 
 class NRHIViewport;
 class NRHIRootSignature;
-class NRHIGraphicsPipelineState;
 class NRHIDescriptorHeap;
+class NRHISlateShader;
+struct NSlateShaderPaintGeometry;
 
 class RHI_API NRHICommandSet : public NRHIDeviceChild
 {
@@ -18,17 +22,17 @@ protected:
 public:
 	virtual ~NRHICommandSet() noexcept override = default;
 
-	virtual void BeginFrame(const NRHIGraphicsPipelineState* pInitialPipeline) = 0;
+	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 
 	virtual void BeginRender(const NRHIViewport& InViewport, bool bClear) = 0;
 	virtual void EndRender(const NRHIViewport& InViewport) = 0;
-
 	virtual void SetDescriptorHeaps(std::span<NRHIDescriptorHeap* const> Heaps) = 0;
-	virtual void SetGraphicsRootSignature(NRHIRootSignature& InRS) = 0;
-	virtual void SetGraphicsRoot32BitConstants(int32 RootParameterIndex, int32 Num32BitValuesToSet, const void* pSrcData, int32 DestOffsetIn32BitValues) = 0;
-	virtual void SetGraphicsRootConstantBufferView(int32 RootParameterIndex, int64 BufferLocation) = 0;
-	virtual void SetGraphicsRootDescriptorTable(int32 RootParameterIndex, int64 VirtualHandleLocation) = 0;
 
-	virtual void DrawInstanced(bool bStrip, int32 InVertexCount, int32 InInstanceCount, int32 InVertexStart, int32 InInstanceStart) = 0;
+	virtual void SetSlateShader(const NRHISlateShader& InShader) = 0;
+	virtual void SetScreenResolutionInfo(const Vector2& InConstant) = 0;
+	virtual void SetPaintGeometry(int64 VirtualAddress) = 0;
+	virtual void SetRenderParams(int64 VirtualAddress) = 0;
+	virtual void SetSlateInputTexture(int64 VirtualHandle) = 0;
+	virtual void DrawSlateInstance() = 0;
 };

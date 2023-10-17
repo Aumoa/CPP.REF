@@ -77,12 +77,11 @@ void NSlateRHIRenderer::BeginRender(const NRHIViewport& InViewport)
     }
 
     pVpCommands->Restart();
-    pVpCommands->CommandSet->BeginFrame(&NSlateGlobalShaders::GetSlatePipelineState());
-    pVpCommands->CommandSet->SetGraphicsRootSignature(NSlateGlobalShaders::GetSlateRootSignature());
+    pVpCommands->CommandSet->BeginFrame();
     pVpCommands->CommandSet->BeginRender(InViewport, true);
 
-    Vector2 ScreenResolution = Vector<>::Cast<float>(InViewport.GetViewportSize());
-    pVpCommands->CommandSet->SetGraphicsRoot32BitConstants(0, 2, &ScreenResolution, 0);
+    pVpCommands->CommandSet->SetSlateShader(NSlateGlobalShaders::GetSlateDefaultShader());
+    pVpCommands->CommandSet->SetScreenResolutionInfo(Vector<>::Cast<float>(InViewport.GetViewportSize()));
 }
 
 void NSlateRHIRenderer::EndRender(const NRHIViewport& InViewport)
@@ -91,21 +90,6 @@ void NSlateRHIRenderer::EndRender(const NRHIViewport& InViewport)
     VpCommands.CommandSet->EndRender(InViewport);
     VpCommands.CommandSet->EndFrame();
 }
-
-struct alignas(256) NCV_SlatePaintGeometry
-{
-    Matrix2x2 Transformation;
-    Vector2 Translation;
-    Vector2 LocalSize;
-    Rect TextureCoordinate;
-};
-
-struct alignas(256) NCV_SlateRenderParams
-{
-    Color TintColor;
-    float RenderOpacity;
-    int32 RenderStates;
-};
 
 template<class T>
 inline T* GetConstantBufferPtr(std::shared_ptr<NRHIConstantBuffer>& ConstantBuffer, size_t& Usage, int64& VirtualLocation)
@@ -123,7 +107,7 @@ void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
     NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
 
     int64 VL_PaintGeometry;
-    auto* CB_PaintGeometry = GetConstantBufferPtr<NCV_SlatePaintGeometry>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_PaintGeometry);
+    auto* CB_PaintGeometry = GetConstantBufferPtr<NSlateShaderPaintGeometry>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_PaintGeometry);
     if (InElement.Layout.HasRenderTransform())
     {
         CB_PaintGeometry->Transformation = InElement.Layout.GetAccumulatedRenderTransform().M;
@@ -137,7 +121,7 @@ void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
     CB_PaintGeometry->LocalSize = InElement.Layout.GetLocalSize();
 
     int64 VL_RenderParams;
-    auto* CB_RenderParams = GetConstantBufferPtr<NCV_SlateRenderParams>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_RenderParams);
+    auto* CB_RenderParams = GetConstantBufferPtr<NSlateShaderRenderParams>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_RenderParams);
     CB_RenderParams->TintColor = InElement.TintColor;
     CB_RenderParams->RenderOpacity = InElement.RenderOpacity;
     CB_RenderParams->RenderStates = 0;
@@ -148,12 +132,12 @@ void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
         CB_RenderParams->RenderStates = InElement.Proxy->GetRenderStates();
         VpCommands.DescriptorHeap->ApplyViewSimple(VpCommands.DescriptorUsage, *InElement.Proxy->GetSRV(), 0, 1);
         int64 VirtualHandleLocation = VpCommands.DescriptorHeap->GetVirtualHandleLocation(VpCommands.DescriptorUsage++);
-        VpCommands.CommandSet->SetGraphicsRootDescriptorTable(2, VirtualHandleLocation);
+        VpCommands.CommandSet->SetSlateInputTexture(VirtualHandleLocation);
     }
 
-    VpCommands.CommandSet->SetGraphicsRootConstantBufferView(1, VL_PaintGeometry);
-    VpCommands.CommandSet->SetGraphicsRootConstantBufferView(3, VL_RenderParams);
-    VpCommands.CommandSet->DrawInstanced(true, 4, 1, 0, 0);
+    VpCommands.CommandSet->SetPaintGeometry(VL_PaintGeometry);
+    VpCommands.CommandSet->SetRenderParams(VL_RenderParams);
+    VpCommands.CommandSet->DrawSlateInstance();
 }
 
 void NSlateRHIRenderer::Populate(const NSlateWindowElementList& InElementList)
@@ -161,8 +145,8 @@ void NSlateRHIRenderer::Populate(const NSlateWindowElementList& InElementList)
     NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
     size_t NumElements = InElementList.UnorderedElements.size();
     size_t ConstantBufferSize
-        = sizeof(NCV_SlatePaintGeometry) * NumElements
-        + sizeof(NCV_SlateRenderParams) * NumElements
+        = sizeof(NSlateShaderPaintGeometry) * NumElements
+        + sizeof(NSlateShaderRenderParams) * NumElements
         ;
     VpCommands.ConstantBuffers->Reserve(ConstantBufferSize);
 

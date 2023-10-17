@@ -45,8 +45,7 @@ public:
 	virtual std::shared_ptr<NRHIViewport> CreateViewport() override;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) override;
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() override;
-	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() override;
-	virtual std::shared_ptr<NRHIGraphicsPipelineState> CreateGraphicsPipelineState(NRHIRootSignature& InRS) override;
+	virtual std::shared_ptr<NRHISlateShader> CreateSlateShader() override;
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() override;
 	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() override;
 	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) override;

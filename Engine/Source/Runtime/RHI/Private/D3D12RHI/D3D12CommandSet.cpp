@@ -8,35 +8,27 @@
 #include "D3D12RHI/D3D12Graphics.h"
 #include "D3D12RHI/D3D12SwapChain.h"
 #include "D3D12RHI/D3D12Texture2D.h"
-#include "D3D12RHI/D3D12GraphicsPipelineState.h"
-#include "D3D12RHI/D3D12RootSignature.h"
 #include "D3D12RHI/D3D12DescriptorHeap.h"
 #include "D3D12RHI/D3D12Viewport.h"
+#include "D3D12RHI/D3D12SlateShader.h"
 #include "Numerics/VectorInterface/Color.h"
 
 ND3D12CommandSet::ND3D12CommandSet()
 {
 }
 
-void ND3D12CommandSet::BeginFrame(const NRHIGraphicsPipelineState* pInitialPipeline)
+void ND3D12CommandSet::BeginFrame()
 {
-	auto* pD3DPS = static_cast<const ND3D12GraphicsPipelineState*>(pInitialPipeline);
-	ID3D12PipelineState* pPipelineState = nullptr;
-	if (pD3DPS)
-	{
-		pPipelineState = pD3DPS->Get();
-	}
-
 	if (!Allocator && !CommandList)
 	{
 		ID3D12Device1* pDevice = ND3D12Global::GetDynamicRHI().GetDevice();
 		HR(pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&Allocator)));
-		HR(pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, Allocator.Get(), pPipelineState, IID_PPV_ARGS(&CommandList)));
+		HR(pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, Allocator.Get(), nullptr, IID_PPV_ARGS(&CommandList)));
 	}
 	else
 	{
 		HR(Allocator->Reset());
-		HR(CommandList->Reset(Allocator.Get(), pPipelineState));
+		HR(CommandList->Reset(Allocator.Get(), nullptr));
 	}
 }
 
@@ -159,32 +151,39 @@ void ND3D12CommandSet::SetDescriptorHeaps(std::span<NRHIDescriptorHeap* const> H
 	CommandList->SetDescriptorHeaps((UINT)ppHeaps.size(), ppHeaps.data());
 }
 
-void ND3D12CommandSet::SetGraphicsRootSignature(NRHIRootSignature& InRS)
+void ND3D12CommandSet::SetSlateShader(const NRHISlateShader& InShader)
 {
-	ID3D12RootSignature* pRS = static_cast<ND3D12RootSignature&>(InRS).Get();
-	CommandList->SetGraphicsRootSignature(pRS);
+	auto& dShader = static_cast<const ND3D12SlateShader&>(InShader);
+	CommandList->SetGraphicsRootSignature(dShader.GetRootSignature());
+	CommandList->SetPipelineState(dShader.GetPipelineState());
 }
 
-void ND3D12CommandSet::SetGraphicsRoot32BitConstants(int32 RootParameterIndex, int32 Num32BitValuesToSet, const void* pSrcData, int32 DestOffsetIn32BitValues)
+void ND3D12CommandSet::SetScreenResolutionInfo(const Vector2& InConstant)
 {
-	CommandList->SetGraphicsRoot32BitConstants(RootParameterIndex, Num32BitValuesToSet, pSrcData, DestOffsetIn32BitValues);
+	CommandList->SetGraphicsRoot32BitConstants(ND3D12SlateShader::GetScreenBindingRootIndex(), 2, &InConstant, 0);
 }
 
-void ND3D12CommandSet::SetGraphicsRootConstantBufferView(int32 RootParameterIndex, int64 BufferLocation)
+void ND3D12CommandSet::SetPaintGeometry(int64 VirtualAddress)
 {
-	CommandList->SetGraphicsRootConstantBufferView(RootParameterIndex, BufferLocation);
+	CommandList->SetGraphicsRootConstantBufferView(ND3D12SlateShader::GetPaintGeometryRootIndex(), VirtualAddress);
 }
 
-void ND3D12CommandSet::SetGraphicsRootDescriptorTable(int32 RootParameterIndex, int64 VirtualHandleLocation)
+void ND3D12CommandSet::SetRenderParams(int64 VirtualAddress)
 {
-	D3D12_GPU_DESCRIPTOR_HANDLE hView{ .ptr = (UINT64)VirtualHandleLocation };
-	CommandList->SetGraphicsRootDescriptorTable(RootParameterIndex, hView);
+	CommandList->SetGraphicsRootConstantBufferView(ND3D12SlateShader::GetRenderParametersRootIndex(), VirtualAddress);
 }
 
-void ND3D12CommandSet::DrawInstanced(bool bStrip, int32 InVertexCount, int32 InInstanceCount, int32 InVertexStart, int32 InInstanceStart)
+void ND3D12CommandSet::SetSlateInputTexture(int64 VirtualHandle)
 {
-	CommandList->IASetPrimitiveTopology(bStrip ? D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP : D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	CommandList->DrawInstanced(InVertexCount, InInstanceCount, InVertexStart, InInstanceStart);
+	D3D12_GPU_DESCRIPTOR_HANDLE hSRV;
+	hSRV.ptr = (UINT64)VirtualHandle;
+	CommandList->SetGraphicsRootDescriptorTable(ND3D12SlateShader::GetTextureBindingRootIndex(), hSRV);
+}
+
+void ND3D12CommandSet::DrawSlateInstance()
+{
+	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	CommandList->DrawInstanced(4, 1, 0, 0);
 }
 
 #endif

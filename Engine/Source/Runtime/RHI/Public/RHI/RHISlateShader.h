@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "RHI/RHIDeviceChild.h"
 
-class RHI_API NRHIPipelineState : public NRHIDeviceChild
+class RHI_API NRHISlateShader : public NRHIDeviceChild
 {
 protected:
-	NRHIPipelineState() = default;
+	NRHISlateShader() = default;
 
 public:
-	virtual ~NRHIPipelineState() noexcept override = default;
+	virtual ~NRHISlateShader() noexcept override = default;
 };

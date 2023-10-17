@@ -17,6 +17,8 @@ public class RHI : ModuleRules
             "ApplicationCore"
         });
 
+        PublicDisableWarnings.Add(4324);
+
         if (TargetRule.Platform.Group == PlatformGroup.Windows)
         {
             PrivateAdditionalLibraries.AddRange(new[]

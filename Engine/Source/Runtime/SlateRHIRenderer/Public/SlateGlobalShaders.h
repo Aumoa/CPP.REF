@@ -4,18 +4,15 @@
 
 #include "CoreMinimal.h"
 
-class NRHIRootSignature;
-class NRHIGraphicsPipelineState;
+class NRHISlateShader;
 
 struct SLATERHIRENDERER_API NSlateGlobalShaders : public StaticClass
 {
 	static void Initialize();
 	static void Shutdown();
 
-	static NRHIRootSignature& GetSlateRootSignature() { return *SlateRS; }
-	static NRHIGraphicsPipelineState& GetSlatePipelineState() { return *SlatePS; }
+	static NRHISlateShader& GetSlateDefaultShader() { return *SlateDefaultShader; }
 
 private:
-	static std::shared_ptr<NRHIRootSignature> SlateRS;
-	static std::shared_ptr<NRHIGraphicsPipelineState> SlatePS;
+	static std::shared_ptr<NRHISlateShader> SlateDefaultShader;
 };

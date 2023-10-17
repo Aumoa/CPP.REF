@@ -9,13 +9,12 @@
 #include "D3D12RHI/D3D12Global.h"
 #include "D3D12RHI/D3D12Texture2D.h"
 #include "D3D12RHI/D3D12CommandSet.h"
-#include "D3D12RHI/D3D12RootSignature.h"
-#include "D3D12RHI/D3D12GraphicsPipelineState.h"
 #include "D3D12RHI/D3D12ConstantBuffer.h"
 #include "D3D12RHI/D3D12DescriptorHeap.h"
 #include "D3D12RHI/D3D12ShaderResourceView.h"
 #include "D3D12RHI/D3D12TextFormat.h"
 #include "D3D12RHI/D3D12TextLayout.h"
+#include "D3D12RHI/D3D12SlateShader.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -181,14 +180,9 @@ std::shared_ptr<NRHICommandSet> ND3D12Graphics::CreateCommandSet()
 	return std::make_shared<ND3D12CommandSet>();
 }
 
-std::shared_ptr<NRHIRootSignature> ND3D12Graphics::CreateRootSignature()
+std::shared_ptr<NRHISlateShader> ND3D12Graphics::CreateSlateShader()
 {
-	return std::make_shared<ND3D12RootSignature>(*Device.Get());
-}
-
-std::shared_ptr<NRHIGraphicsPipelineState> ND3D12Graphics::CreateGraphicsPipelineState(NRHIRootSignature& InRS)
-{
-	return std::make_shared<ND3D12GraphicsPipelineState>(*Device.Get(), *static_cast<ND3D12RootSignature&>(InRS).Get());
+	return std::make_shared<ND3D12SlateShader>(*Device.Get());
 }
 
 std::shared_ptr<NRHIConstantBuffer> ND3D12Graphics::CreateConstantBuffer()

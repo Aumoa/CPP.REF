@@ -16,7 +16,5 @@ public class SlateRHIRenderer : ModuleRules
             "Core",
             "SlateCore"
         });
-
-        PrivateDisableWarnings.Add(4324);
     }
 }

@@ -1,13 +1,14 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "D3D12RHI/D3D12RootSignature.h"
+#include "D3D12RHI/D3D12SlateShader.h"
 
 #if PLATFORM_WINDOWS
 
-#include "Numerics/MatrixInterface/Matrix2x2.h"
-#include "Numerics/VectorInterface/Color.h"
+#include "D3D12RHI/D3D12SlateShader.h"
+#include "SlateElementVertexShader.fx.h"
+#include "SlateElementPixelShader.fx.h"
 
-ND3D12RootSignature::ND3D12RootSignature(ID3D12Device& InDevice)
+ND3D12SlateShader::ND3D12SlateShader(ID3D12Device& InDevice)
 {
 	D3D12_DESCRIPTOR_RANGE RS1Ranges[] =
 	{
@@ -92,6 +93,53 @@ ND3D12RootSignature::ND3D12RootSignature(ID3D12Device& InDevice)
 	}
 
 	HR(InDevice.CreateRootSignature(0, pSerializedBlob->GetBufferPointer(), pSerializedBlob->GetBufferSize(), IID_PPV_ARGS(&pRS)));
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc =
+	{
+		.pRootSignature = pRS.Get(),
+		.VS = { SlateElementVertexShader, AE_ARRAYSIZE(SlateElementVertexShader) },
+		.PS = { SlateElementPixelShader, AE_ARRAYSIZE(SlateElementPixelShader) },
+		.BlendState =
+		{
+			.AlphaToCoverageEnable = FALSE,
+			.IndependentBlendEnable = FALSE,
+			.RenderTarget =
+			{
+				{
+					.BlendEnable = TRUE,
+					.SrcBlend = D3D12_BLEND_SRC_ALPHA,
+					.DestBlend = D3D12_BLEND_INV_SRC_ALPHA,
+					.BlendOp = D3D12_BLEND_OP_ADD,
+					.SrcBlendAlpha = D3D12_BLEND_ONE,
+					.DestBlendAlpha = D3D12_BLEND_ZERO,
+					.BlendOpAlpha = D3D12_BLEND_OP_ADD,
+					.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
+				}
+			}
+		},
+		.SampleMask = 0xFFFFFFFF,
+		.RasterizerState =
+		{
+			.FillMode = D3D12_FILL_MODE_SOLID,
+			.CullMode = D3D12_CULL_MODE_BACK,
+		},
+		.DepthStencilState =
+		{
+			.DepthEnable = FALSE,
+			.StencilEnable = FALSE
+		},
+		.InputLayout =
+		{
+			.pInputElementDescs = NULL,
+			.NumElements = 0
+		},
+		.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+		.NumRenderTargets = 1,
+		.RTVFormats = { DXGI_FORMAT_R8G8B8A8_UNORM },
+		.SampleDesc = { 1, 0 }
+	};
+
+	HR(InDevice.CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&pPS)));
 }
 
 #endif

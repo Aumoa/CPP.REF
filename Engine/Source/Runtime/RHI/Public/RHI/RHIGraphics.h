@@ -10,14 +10,13 @@ class NRHICommandQueue;
 class NRHIViewport;
 class NRHITexture2D;
 class NRHICommandSet;
-class NRHIRootSignature;
-class NRHIGraphicsPipelineState;
 class NRHIConstantBuffer;
 class NRHIDescriptorHeap;
 class NRHIShaderResourceView;
 class NRHITextFormat;
 class NRHITextLayout;
 class NRHISwapChain;
+class NRHISlateShader;
 
 class RHI_API NRHIGraphics
 {
@@ -34,8 +33,7 @@ public:
 	virtual std::shared_ptr<NRHIViewport> CreateViewport() = 0;
 	virtual Task<std::shared_ptr<NRHITexture2D>> CreateTexture2DAsync(std::shared_ptr<NGenericImage> ImageSource) = 0;
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() = 0;
-	virtual std::shared_ptr<NRHIRootSignature> CreateRootSignature() = 0;
-	virtual std::shared_ptr<NRHIGraphicsPipelineState> CreateGraphicsPipelineState(NRHIRootSignature& InRS) = 0;
+	virtual std::shared_ptr<NRHISlateShader> CreateSlateShader() = 0;
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() = 0;
 	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() = 0;
 	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) = 0;
