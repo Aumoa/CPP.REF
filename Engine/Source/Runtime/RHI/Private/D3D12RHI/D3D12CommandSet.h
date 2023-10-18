@@ -13,7 +13,7 @@ class ND3D12CommandSet : public NRHICommandSet
 {
 private:
 	ComPtr<ID3D12CommandAllocator> Allocator;
-	ComPtr<ID3D12GraphicsCommandList> CommandList;
+	ComPtr<ID3D12GraphicsCommandList4> CommandList;
 
 public:
 	ND3D12CommandSet();
@@ -31,6 +31,8 @@ public:
 	virtual void SetRenderParams(int64 VirtualAddress) override;
 	virtual void SetSlateInputTexture(int64 VirtualHandle) override;
 	virtual void DrawSlateInstance() override;
+
+	virtual void SetGameShader(const NRHIGameShader& InShader) override;
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return CommandList.Get(); }
 };

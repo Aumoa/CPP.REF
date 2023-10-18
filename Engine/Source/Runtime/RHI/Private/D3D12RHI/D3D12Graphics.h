@@ -12,7 +12,7 @@ class ND3D12Graphics : public NRHIGraphics
 {
 	ComPtr<IDXGIFactory7> DXGIFactory;
 	ComPtr<IDXGIAdapter1> CurrentAdapter;
-	ComPtr<ID3D12Device1> Device;
+	ComPtr<ID3D12Device5> Device;
 	ComPtr<IDWriteFactory> WriteFactory;
 	std::shared_ptr<NRHICommandQueue> PrimaryQueue;
 
@@ -51,6 +51,7 @@ public:
 	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) override;
 	virtual std::shared_ptr<NRHITextFormat> CreateTextFormat(String FontFamilyName, float FontSize, bool bBold, bool bItalic) override;
 	virtual std::shared_ptr<NRHITextLayout> CreateTextLayout(std::shared_ptr<NRHITextFormat> InTextFormat, String InText) override;
+	virtual std::shared_ptr<NRHIGameShader> CreateGameShader() override;
 
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;

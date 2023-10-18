@@ -12,6 +12,7 @@ class NRHIViewport;
 class NRHIRootSignature;
 class NRHIDescriptorHeap;
 class NRHISlateShader;
+class NRHIGameShader;
 struct NSlateShaderPaintGeometry;
 
 class RHI_API NRHICommandSet : public NRHIDeviceChild
@@ -35,4 +36,6 @@ public:
 	virtual void SetRenderParams(int64 VirtualAddress) = 0;
 	virtual void SetSlateInputTexture(int64 VirtualHandle) = 0;
 	virtual void DrawSlateInstance() = 0;
+
+	virtual void SetGameShader(const NRHIGameShader& InShader) = 0;
 };

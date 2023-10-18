@@ -6,6 +6,7 @@
 #include "Rendering/StreamableRenderAssetProxy.h"
 
 class NStreamableRenderAssetProxy;
+class NRHIGameShader;
 
 struct RENDERCORE_API NRenderGlobal : public StaticClass
 {
@@ -13,8 +14,10 @@ struct RENDERCORE_API NRenderGlobal : public StaticClass
 	static void Shutdown();
 
 	static const std::shared_ptr<NStreamableRenderAssetProxy>& GetNullRenderProxy() { return NullRenderProxy; }
+	static const std::shared_ptr<NRHIGameShader>& GetDefaultGameShader() { return DefaultGameShader; }
 	static std::shared_ptr<NStreamableRenderAssetProxy> LoadTexture2DAsync(String InFilename);
 
 private:
 	static std::shared_ptr<NStreamableRenderAssetProxy> NullRenderProxy;
+	static std::shared_ptr<NRHIGameShader> DefaultGameShader;
 };

@@ -15,6 +15,7 @@
 #include "D3D12RHI/D3D12TextFormat.h"
 #include "D3D12RHI/D3D12TextLayout.h"
 #include "D3D12RHI/D3D12SlateShader.h"
+#include "D3D12RHI/D3D12GameShader.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -212,6 +213,11 @@ std::shared_ptr<NRHITextLayout> ND3D12Graphics::CreateTextLayout(std::shared_ptr
 	HR(WriteFactory->CreateTextLayout(InText.c_str(), (UINT32)InText.length(), pTextFormat, D3D12_FLOAT32_MAX, D3D12_FLOAT32_MAX, &pTextLayout));
 	auto Layout = std::make_shared<ND3D12TextLayout>(std::static_pointer_cast<ND3D12TextFormat>(std::move(InTextFormat)), std::move(pTextLayout), InText);
 	return Layout;
+}
+
+std::shared_ptr<NRHIGameShader> ND3D12Graphics::CreateGameShader()
+{
+	return std::make_shared<ND3D12GameShader>(*Device.Get());
 }
 
 Task<> ND3D12Graphics::EnqueueGraphicsCommandAsync(Func<ID3D12GraphicsCommandList*, bool> InAction)

@@ -8,15 +8,18 @@
 #include "RHI/RHIGraphics.h"
 
 std::shared_ptr<NStreamableRenderAssetProxy> NRenderGlobal::NullRenderProxy;
+std::shared_ptr<NRHIGameShader> NRenderGlobal::DefaultGameShader;
 
 void NRenderGlobal::Initialize()
 {
 	NullRenderProxy = std::make_shared<NNullTextureRenderAssetProxy>();
+	DefaultGameShader = NRHIGlobal::GetDynamicRHI().CreateGameShader();
 }
 
 void NRenderGlobal::Shutdown()
 {
 	NullRenderProxy.reset();
+	DefaultGameShader.reset();
 }
 
 std::shared_ptr<NStreamableRenderAssetProxy> NRenderGlobal::LoadTexture2DAsync(String InFilename)

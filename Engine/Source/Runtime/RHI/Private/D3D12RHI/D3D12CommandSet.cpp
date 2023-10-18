@@ -11,6 +11,7 @@
 #include "D3D12RHI/D3D12DescriptorHeap.h"
 #include "D3D12RHI/D3D12Viewport.h"
 #include "D3D12RHI/D3D12SlateShader.h"
+#include "D3D12RHI/D3D12GameShader.h"
 #include "Numerics/VectorInterface/Color.h"
 
 ND3D12CommandSet::ND3D12CommandSet()
@@ -178,6 +179,13 @@ void ND3D12CommandSet::SetSlateInputTexture(int64 VirtualHandle)
 	D3D12_GPU_DESCRIPTOR_HANDLE hSRV;
 	hSRV.ptr = (UINT64)VirtualHandle;
 	CommandList->SetGraphicsRootDescriptorTable(ND3D12SlateShader::GetTextureBindingRootIndex(), hSRV);
+}
+
+void ND3D12CommandSet::SetGameShader(const NRHIGameShader& InShader)
+{
+	auto& dShader = static_cast<const ND3D12GameShader&>(InShader);
+	CommandList->SetComputeRootSignature(dShader.GetRootSignature());
+	CommandList->SetPipelineState1(dShader.GetStateObject());
 }
 
 void ND3D12CommandSet::DrawSlateInstance()
