@@ -100,6 +100,6 @@ void NEngineLoop::PreInitPostStartupScreen()
         .Visibility(ESlateVisibility::Hidden)
     );
 
-    CoreWindow->SetContent(SAssignNew(GameViewport, SViewport));
+    CoreWindow->SetContent(SAssignNew(GameViewport, SViewport).bAllocateViewport(true));
     NSlateApplication::Get().SetupGameViewport(GameViewport);
 }

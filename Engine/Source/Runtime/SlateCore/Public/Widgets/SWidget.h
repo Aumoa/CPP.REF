@@ -79,7 +79,7 @@ public:
 	virtual ~SWidget() noexcept;
 
 	virtual String ToString() const;
-	virtual void Tick(const NGeometry& AllottedGeomtry, const TimeSpan& InDeltaTime);
+	virtual void Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime);
 	virtual bool PrepassLayout();
 
 	int32 Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled);

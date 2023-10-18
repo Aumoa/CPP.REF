@@ -3,6 +3,9 @@
 #include "Widgets/SViewport.h"
 #include "Layout/AlignmentArrangeResult.h"
 #include "RHI/RHIViewport.h"
+#include "RHI/RHIGlobal.h"
+#include "RHI/RHIGraphics.h"
+#include "Rendering/Texture2DTaskRenderAssetProxy.h"
 #include "RenderGlobal.h"
 
 SViewport::SViewport()
@@ -11,6 +14,20 @@ SViewport::SViewport()
 
 SViewport::~SViewport() noexcept
 {
+}
+
+void SViewport::Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime)
+{
+	PLATFORM_UNREFERENCED_PARAMETER(InDeltaTime);
+
+	if (bAllocateViewport)
+	{
+		Vector2N ScreenResolution = Vector<>::Cast<int32>(AllottedGeometry.GetLocalSize());
+		if (Viewport->GetViewportSize() != ScreenResolution)
+		{
+			ResizeViewport(ScreenResolution);
+		}
+	}
 }
 
 auto SViewport::AddSlot() -> NSlot&
@@ -54,7 +71,17 @@ void SViewport::ClearSlots()
 DEFINE_SLATE_CONSTRUCTOR(SViewport, Args)
 {
 	PLATFORM_UNREFERENCED_PARAMETER(Args);
+	bAllocateViewport = Args._bAllocateViewport;
 	Slots = std::move(Args.Slots);
+
+	if (bAllocateViewport)
+	{
+		Viewport = NRHIGlobal::GetDynamicRHI().CreateViewport();
+	}
+	else
+	{
+		RenderProxy = NRenderGlobal::GetNullRenderProxy();
+	}
 }
 
 Vector2 SViewport::ComputeDesiredSize() const
@@ -87,8 +114,8 @@ int32 SViewport::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeomet
 	Element.Layout = AllottedGeometry.ToPaintGeometry();
 	Element.Layer = InLayer;
 	Element.RenderOpacity = Args.RenderOpacity;
-	Element.TintColor = NamedColors::Black;
-	Element.Proxy = NRenderGlobal::GetNullRenderProxy();
+	Element.TintColor = NamedColors::Transparent;
+	Element.Proxy = RenderProxy;
 
 	const std::vector<NArrangedWidget>& ArrangedWidgets = ArrangedChildrens.GetWidgets();
 	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)
@@ -158,4 +185,10 @@ void SViewport::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const N
 			Vector2(XResult.Size, YResult.Size)
 		));
 	}
+}
+
+void SViewport::ResizeViewport(const Vector2N& NewSize)
+{
+	Viewport->Resize(NewSize);
+	RenderProxy = std::make_shared<NTexture2DTaskRenderAssetProxy>(Task<>::FromResult(Viewport->GetTexture()));
 }

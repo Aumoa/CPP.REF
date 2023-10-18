@@ -12,6 +12,13 @@ ND3D12Viewport::ND3D12Viewport(ID3D12Device* pInDevice)
 	: pDevice(pInDevice)
 {
 	SRV = std::make_shared<ND3D12ShaderResourceView>(*pInDevice, 1);
+	D3D12_DESCRIPTOR_HEAP_DESC HeapDesc =
+	{
+		.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+		.NumDescriptors = 1
+	};
+
+	HR(pDevice->CreateDescriptorHeap(&HeapDesc, IID_PPV_ARGS(&pRTVHeap)));
 }
 
 ND3D12Viewport::~ND3D12Viewport() noexcept
@@ -55,6 +62,8 @@ void ND3D12Viewport::Resize(const Vector2N& InSize)
 	// create SRV.
 	Texture = std::make_shared<ND3D12Texture2D>(pResource, Desc);
 	SRV->CreateView(0, Texture.get());
+
+	VpSize = InSize;
 }
 
 #endif

@@ -24,12 +24,17 @@ public:
 	};
 
 private:
+	bool bAllocateViewport = false;
 	std::vector<NSlot> Slots;
+
 	std::shared_ptr<NRHIViewport> Viewport;
+	std::shared_ptr<NStreamableRenderAssetProxy> RenderProxy;
 
 public:
 	SViewport();
 	virtual ~SViewport() noexcept override;
+
+	virtual void Tick(const NGeometry& AllottedGeometry, const TimeSpan& InDeltaTime) override;
 
 	NSlot& AddSlot();
 	bool RemoveSlot(size_t Index);
@@ -62,4 +67,7 @@ protected:
 	virtual Vector2 ComputeDesiredSize() const override;
 	virtual int32 OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled) const override;
 	virtual void OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const NGeometry& AllottedGeometry) const override;
+
+private:
+	void ResizeViewport(const Vector2N& NewSize);
 };
