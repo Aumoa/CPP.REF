@@ -27,8 +27,10 @@ public:
 	virtual ~ND3D12SwapChain() noexcept override;
 
 	virtual void Present() override;
+
 	virtual Vector2N GetViewportSize() const override;
 	virtual void Resize(const Vector2N& InSize) override;
+	virtual std::shared_ptr<NRHITexture2D> GetTexture() const override;
 
 	int32 GetCurrentBackBufferIndex() const { return SwapChain4->GetCurrentBackBufferIndex(); }
 	const ND3D12Texture2D& GetBackBuffer(int32 InIndex) const { return *Buffers[InIndex]; }

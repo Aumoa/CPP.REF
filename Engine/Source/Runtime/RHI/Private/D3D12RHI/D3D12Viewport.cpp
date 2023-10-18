@@ -23,6 +23,11 @@ Vector2N ND3D12Viewport::GetViewportSize() const
 	return VpSize;
 }
 
+std::shared_ptr<NRHITexture2D> ND3D12Viewport::GetTexture() const
+{
+	return Texture;
+}
+
 void ND3D12Viewport::Resize(const Vector2N& InSize)
 {
 	if (pResource)
@@ -48,8 +53,8 @@ void ND3D12Viewport::Resize(const Vector2N& InSize)
 	pDevice->CreateRenderTargetView(pResource.Get(), &RTVDesc, GetRTVHandle());
 
 	// create SRV.
-	ND3D12Texture2D StackView(pResource, Desc);
-	SRV->CreateView(0, &StackView);
+	Texture = std::make_shared<ND3D12Texture2D>(pResource, Desc);
+	SRV->CreateView(0, Texture.get());
 }
 
 #endif

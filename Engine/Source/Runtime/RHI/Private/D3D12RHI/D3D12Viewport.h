@@ -19,6 +19,7 @@ class ND3D12Viewport : public NRHIViewport
 	ComPtr<ID3D12Resource> pResource;
 	ComPtr<ID3D12DescriptorHeap> pRTVHeap;
 	Vector2N VpSize;
+	std::shared_ptr<ND3D12Texture2D> Texture;
 	std::shared_ptr<ND3D12ShaderResourceView> SRV;
 
 public:
@@ -27,6 +28,7 @@ public:
 
 	virtual Vector2N GetViewportSize() const override;
 	virtual void Resize(const Vector2N& InSize) override;
+	virtual std::shared_ptr<NRHITexture2D> GetTexture() const override;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() const { return pRTVHeap->GetCPUDescriptorHandleForHeapStart(); }
 	ComPtr<ID3D12Resource> GetResource() const { return pResource; }

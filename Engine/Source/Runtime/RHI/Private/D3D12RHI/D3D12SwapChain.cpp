@@ -71,6 +71,12 @@ void ND3D12SwapChain::Resize(const Vector2N& InSize)
 	VpSize = InSize;
 }
 
+std::shared_ptr<NRHITexture2D> ND3D12SwapChain::GetTexture() const
+{
+	UINT Index = SwapChain4->GetCurrentBackBufferIndex();
+	return Buffers[Index];
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE ND3D12SwapChain::GetRTVHandle(int32 InIndex) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE hRTV = RTVHeap->GetCPUDescriptorHandleForHeapStart();
