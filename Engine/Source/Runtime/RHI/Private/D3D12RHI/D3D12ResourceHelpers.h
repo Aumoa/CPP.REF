@@ -25,7 +25,7 @@ inline D3D12_RESOURCE_DESC GetTexture2DDesc(const Vector2N& TextureSize, D3D12_R
 	};
 }
 
-inline D3D12_RESOURCE_DESC GetUploadHeapDesc(int64 BufferSize)
+inline D3D12_RESOURCE_DESC GetBufferDesc(int64 BufferSize)
 {
 	return
 	{

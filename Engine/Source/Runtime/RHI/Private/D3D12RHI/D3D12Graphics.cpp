@@ -148,7 +148,7 @@ Task<std::shared_ptr<NRHITexture2D>> ND3D12Graphics::CreateTexture2DAsync(std::s
 	UINT64 TotalBytes;
 	Device->GetCopyableFootprints(&Texture2DDesc, 0, 1, 0, &Layouts, nullptr, &RowSizeInBytes, &TotalBytes);
 
-	D3D12_RESOURCE_DESC UploadDesc = GetUploadHeapDesc(TotalBytes);
+	D3D12_RESOURCE_DESC UploadDesc = GetBufferDesc(TotalBytes);
 	ComPtr<ID3D12Resource> UploadResource;
 	HR(Device->CreateCommittedResource(&UploadHeap, D3D12_HEAP_FLAG_NONE, &UploadDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&UploadResource)));
 
