@@ -6,16 +6,29 @@
 #include "Rendering/SlateRenderer.h"
 
 class NRHICommandSet;
-class NRHIConstantBuffer;
+class NRHIStructuredBuffer;
 class NRHIDescriptorHeap;
+class NRHIShaderResourceView;
 
 class SLATERHIRENDERER_API NSlateRHIRenderer : public NSlateRenderer
 {
 	struct NViewportCommands
 	{
-		std::shared_ptr<NRHICommandSet> CommandSet;
+		struct NLayered
+		{
+			int32 Layer = 0;
+			int32 NumElements = 0;
+			NRHIShaderResourceView* pSRV = nullptr;
 
-		std::shared_ptr<NRHIConstantBuffer> ConstantBuffers;
+			int64 VPaintGeometryStart = 0;
+			int64 VRenderParamsStart = 0;
+			int64 VSRVHandle = 0;
+		};
+
+		std::shared_ptr<NRHICommandSet> CommandSet;
+		std::vector<NLayered> Layers;
+
+		std::shared_ptr<NRHIStructuredBuffer> StructuredBuffers;
 		size_t ConstantBufferUsage = 0;
 
 		std::shared_ptr<NRHIDescriptorHeap> DescriptorHeap;
@@ -43,7 +56,5 @@ public:
 
 	virtual void BeginRender(const NRHIViewport& InViewport) override;
 	virtual void EndRender(const NRHIViewport& InViewport) override;
-	virtual void RenderElement(const NSlateRenderElement& InElement) override;
-
-	virtual void Populate(const NSlateWindowElementList& InElementList) override;
+	virtual void DrawLayered(const NSlateWindowElementList& InElementList) override;
 };

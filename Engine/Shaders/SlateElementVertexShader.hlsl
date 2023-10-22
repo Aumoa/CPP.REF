@@ -19,16 +19,16 @@ static float2 RectTexCoords[] =
 };
 
 ConstantBuffer<NSlateScreenInformation> ScreenInfo : register(b0);
-ConstantBuffer<NSlatePaintGeometry> PaintGeometry : register(b1);
+StructuredBuffer<NSlatePaintGeometry> PaintGeometry : register(t0);
 
-NFragment main(uint InVertexId : SV_VertexID)
+NFragment main(uint InVertexId : SV_VertexID, uint InInstanceId : SV_InstanceID)
 {
     float2 V = RectVertices[InVertexId];
     
     // make element space.
-    V = V * PaintGeometry.LocalSize;
-    V = mul(V, float2x2(PaintGeometry.Transformation));
-    V = V + PaintGeometry.Translation;
+    V = V * PaintGeometry[InInstanceId].LocalSize;
+    V = mul(V, float2x2(PaintGeometry[InInstanceId].Transformation));
+    V = V + PaintGeometry[InInstanceId].Translation;
     
     // make center based space.
     float2 HalfScreen = ScreenInfo.ScreenResolution * 0.5f;
@@ -39,11 +39,13 @@ NFragment main(uint InVertexId : SV_VertexID)
     V = V * float2(+1.0f, -1.0f);
     
     float2 T = RectTexCoords[InVertexId];
-    float2 S = PaintGeometry.TextureCoordinate.zw - PaintGeometry.TextureCoordinate.xy;
-    T = T * S + PaintGeometry.TextureCoordinate.xy;
+    float2 S = PaintGeometry[InInstanceId].TextureCoordinate.zw - PaintGeometry[InInstanceId].TextureCoordinate.xy;
+    T = T * S + PaintGeometry[InInstanceId].TextureCoordinate.xy;
     
     NFragment F;
+    //F.Position = float4(RectVertices[InVertexId], 0, 1.0f);
     F.Position = float4(V, 0, 1.0f);
     F.TexCoord = T;
+    F.InstanceID = InInstanceId;
     return F;
 }

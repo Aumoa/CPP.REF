@@ -30,7 +30,7 @@ public:
 	virtual void SetPaintGeometry(int64 VirtualAddress) override;
 	virtual void SetRenderParams(int64 VirtualAddress) override;
 	virtual void SetSlateInputTexture(int64 VirtualHandle) override;
-	virtual void DrawSlateInstance() override;
+	virtual void DrawSlateInstance(int32 InstanceCount) override;
 
 	virtual void SetGameShader(const NRHIGameShader& InShader) override;
 

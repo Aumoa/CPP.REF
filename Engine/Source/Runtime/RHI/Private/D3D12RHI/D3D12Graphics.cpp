@@ -16,6 +16,7 @@
 #include "D3D12RHI/D3D12TextLayout.h"
 #include "D3D12RHI/D3D12SlateShader.h"
 #include "D3D12RHI/D3D12GameShader.h"
+#include "D3D12RHI/D3D12StructuredBuffer.h"
 #include "GenericPlatform/GenericWindow.h"
 
 ND3D12Graphics::ND3D12Graphics()
@@ -191,6 +192,11 @@ std::shared_ptr<NRHIConstantBuffer> ND3D12Graphics::CreateConstantBuffer()
 	return std::make_shared<ND3D12ConstantBuffer>(*Device.Get());
 }
 
+std::shared_ptr<NRHIStructuredBuffer> ND3D12Graphics::CreateStructuredBuffer(size_t BufferSize)
+{
+	return std::make_shared<ND3D12StructuredBuffer>(*Device.Get(), BufferSize);
+}
+
 std::shared_ptr<NRHIDescriptorHeap> ND3D12Graphics::CreateDescriptorHeap()
 {
 	return std::make_shared<ND3D12DescriptorHeap>(*Device.Get());
@@ -295,7 +301,6 @@ void ND3D12Graphics::PulseAsyncCommands()
 		HR((*pCurrentCmd)->Close());
 		ID3D12CommandList* p = pCurrentCmd->Get();
 		Queue->ExecuteCommandLists(1, &p);
-		pCurrentCmd = nullptr;
 		++CmdIndex;
 	};
 
@@ -325,6 +330,8 @@ void ND3D12Graphics::PulseAsyncCommands()
 	{
 		CloseCommandAndNext();
 	}
+
+	AsyncCommandLists.clear();
 }
 
 #endif

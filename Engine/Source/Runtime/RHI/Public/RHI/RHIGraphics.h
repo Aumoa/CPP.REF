@@ -18,6 +18,7 @@ class NRHITextLayout;
 class NRHISwapChain;
 class NRHISlateShader;
 class NRHIGameShader;
+class NRHIStructuredBuffer;
 
 class RHI_API NRHIGraphics
 {
@@ -36,6 +37,7 @@ public:
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() = 0;
 	virtual std::shared_ptr<NRHISlateShader> CreateSlateShader() = 0;
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() = 0;
+	virtual std::shared_ptr<NRHIStructuredBuffer> CreateStructuredBuffer(size_t BufferSize) = 0;
 	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() = 0;
 	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) = 0;
 	virtual std::shared_ptr<NRHITextFormat> CreateTextFormat(String FontFamilyName, float FontSize, bool bBold, bool bItalic) = 0;

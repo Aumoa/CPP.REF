@@ -59,12 +59,7 @@ void SWindow::Render(const TimeSpan& InDeltaTime, NSlateRenderer& Renderer)
 	if (SwapChain)
 	{
 		Renderer.BeginRender(*SwapChain);
-		Renderer.Populate(DrawElements);
-
-		for (auto& Element : DrawElements.UnorderedElements)
-		{
-			Renderer.RenderElement(Element);
-		}
+		Renderer.DrawLayered(DrawElements);
 		Renderer.EndRender(*SwapChain);
 	}
 }

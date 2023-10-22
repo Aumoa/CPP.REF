@@ -33,10 +33,10 @@ ND3D12SlateShader::ND3D12SlateShader(ID3D12Device& InDevice)
 		},
 		{
 			// PaintGeometry for VS
-			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
+			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
 			.Descriptor =
 			{
-				.ShaderRegister = 1
+				.ShaderRegister = 0
 			},
 			.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
 		},
@@ -52,10 +52,10 @@ ND3D12SlateShader::ND3D12SlateShader(ID3D12Device& InDevice)
 		},
 		{
 			// RenderParams for PS
-			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
+			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
 			.Descriptor =
 			{
-				.ShaderRegister = 0
+				.ShaderRegister = 1
 			},
 			.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL
 		},

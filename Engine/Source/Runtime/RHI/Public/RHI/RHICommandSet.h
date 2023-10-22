@@ -35,7 +35,7 @@ public:
 	virtual void SetPaintGeometry(int64 VirtualAddress) = 0;
 	virtual void SetRenderParams(int64 VirtualAddress) = 0;
 	virtual void SetSlateInputTexture(int64 VirtualHandle) = 0;
-	virtual void DrawSlateInstance() = 0;
+	virtual void DrawSlateInstance(int32 InstanceCount) = 0;
 
 	virtual void SetGameShader(const NRHIGameShader& InShader) = 0;
 };

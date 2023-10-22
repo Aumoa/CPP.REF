@@ -7,6 +7,7 @@ struct NFragment
 {
     float4 Position : SV_Position;
     float2 TexCoord : TEXCOORD;
+    uint InstanceID : SV_InstanceID;
 };
 
 struct NSlatePaintGeometry

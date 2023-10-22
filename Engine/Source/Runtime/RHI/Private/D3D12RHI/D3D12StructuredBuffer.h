@@ -20,7 +20,7 @@ public:
 	ND3D12StructuredBuffer(ID3D12Device& InDevice, size_t BufferSize);
 
 	virtual size_t GetBufferSize() const override { return BufferSize; }
-	virtual void UpdateRange(size_t Offset, std::span<const uint8> Buf) override;
+	virtual void* GetBufferPointer() const override { return pUploadPtr; }
 	virtual Task<> CommitAsync() override;
 	virtual int64 GetGPUVirtualAddress() const override { return (int64)pResource->GetGPUVirtualAddress(); }
 };

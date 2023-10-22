@@ -7,7 +7,7 @@
 #include "RHI/RHIViewport.h"
 #include "RHI/RHICommandSet.h"
 #include "RHI/RHICommandQueue.h"
-#include "RHI/RHIConstantBuffer.h"
+#include "RHI/RHIStructuredBuffer.h"
 #include "RHI/RHIDescriptorHeap.h"
 #include "Application/SlateApplication.h"
 #include "GenericPlatform/GenericWindow.h"
@@ -72,7 +72,6 @@ void NSlateRHIRenderer::BeginRender(const NRHIViewport& InViewport)
 
         pVpCommands = &CachedVpCommands.emplace_back();
         pVpCommands->CommandSet = Graphics.CreateCommandSet();
-        pVpCommands->ConstantBuffers = Graphics.CreateConstantBuffer();
         pVpCommands->DescriptorHeap = Graphics.CreateDescriptorHeap();
     }
 
@@ -91,79 +90,126 @@ void NSlateRHIRenderer::EndRender(const NRHIViewport& InViewport)
     VpCommands.CommandSet->EndFrame();
 }
 
-template<class T>
-inline T* GetConstantBufferPtr(std::shared_ptr<NRHIConstantBuffer>& ConstantBuffer, size_t& Usage, int64& VirtualLocation)
+void NSlateRHIRenderer::DrawLayered(const NSlateWindowElementList& InElementList)
 {
-    auto* Vp = (uint8*)ConstantBuffer->GetBufferPointer();
-    Vp += Usage;
-    VirtualLocation = ConstantBuffer->GetGPUVirtualAddress();
-    VirtualLocation += Usage;
-    Usage += sizeof(T);
-    return (T*)Vp;
-}
+    if (InElementList.UnorderedElements.empty())
+    {
+        return;
+    }
 
-void NSlateRHIRenderer::RenderElement(const NSlateRenderElement& InElement)
-{
     NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
 
-    int64 VL_PaintGeometry;
-    auto* CB_PaintGeometry = GetConstantBufferPtr<NSlateShaderPaintGeometry>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_PaintGeometry);
-    if (InElement.Layout.HasRenderTransform())
-    {
-        CB_PaintGeometry->Transformation = InElement.Layout.GetAccumulatedRenderTransform().M;
-        CB_PaintGeometry->Translation = InElement.Layout.GetAccumulatedRenderTransform().Translation;
-    }
-    else
-    {
-        CB_PaintGeometry->Transformation = Matrix2x2::Identity();
-        CB_PaintGeometry->Translation = InElement.AbsolutePosition;
-    }
-    CB_PaintGeometry->LocalSize = InElement.Layout.GetLocalSize();
+    VpCommands.Layers.clear();
+    const size_t NumElements = InElementList.UnorderedElements.size();
+    const size_t PaintGeometrySize = sizeof(NSlateShaderPaintGeometry) * NumElements;
+    const size_t ShaderRenderParamsSize = sizeof(NSlateShaderRenderParams) * NumElements;
+    const size_t TotalSize = PaintGeometrySize + ShaderRenderParamsSize;
 
-    int64 VL_RenderParams;
-    auto* CB_RenderParams = GetConstantBufferPtr<NSlateShaderRenderParams>(VpCommands.ConstantBuffers, VpCommands.ConstantBufferUsage, VL_RenderParams);
-    CB_RenderParams->TintColor = InElement.TintColor;
-    CB_RenderParams->RenderOpacity = InElement.RenderOpacity;
-    CB_RenderParams->RenderStates = 0;
-
-    if (InElement.Proxy && InElement.Proxy->TryResolve())
+    if (VpCommands.StructuredBuffers == nullptr || VpCommands.StructuredBuffers->GetBufferSize() < TotalSize)
     {
-        CB_PaintGeometry->TextureCoordinate = InElement.Proxy->GetTextureCoordinate();
-        CB_RenderParams->RenderStates = InElement.Proxy->GetRenderStates();
-        VpCommands.DescriptorHeap->ApplyViewSimple(VpCommands.DescriptorUsage, *InElement.Proxy->GetSRV(), 0, 1);
-        int64 VirtualHandleLocation = VpCommands.DescriptorHeap->GetVirtualHandleLocation(VpCommands.DescriptorUsage++);
-        VpCommands.CommandSet->SetSlateInputTexture(VirtualHandleLocation);
+        VpCommands.StructuredBuffers = NRHIGlobal::GetDynamicRHI().CreateStructuredBuffer(TotalSize);
     }
 
-    VpCommands.CommandSet->SetPaintGeometry(VL_PaintGeometry);
-    VpCommands.CommandSet->SetRenderParams(VL_RenderParams);
-    VpCommands.CommandSet->DrawSlateInstance();
-}
+    int8* pHeap = (int8*)VpCommands.StructuredBuffers->GetBufferPointer();
+    auto* pPaintGeometry = (NSlateShaderPaintGeometry*)(pHeap + 0);
+    auto* pRenderParams = (NSlateShaderRenderParams*)(pHeap + PaintGeometrySize);
+    int32 TotalDescriptors = 0;
 
-void NSlateRHIRenderer::Populate(const NSlateWindowElementList& InElementList)
-{
-    NViewportCommands& VpCommands = CachedVpCommands[VpIndex];
-    size_t NumElements = InElementList.UnorderedElements.size();
-    size_t ConstantBufferSize
-        = sizeof(NSlateShaderPaintGeometry) * NumElements
-        + sizeof(NSlateShaderRenderParams) * NumElements
-        ;
-    VpCommands.ConstantBuffers->Reserve(ConstantBufferSize);
+    int64 VirtualAddr = VpCommands.StructuredBuffers->GetGPUVirtualAddress();
+    int64 VPaintGeometry = VirtualAddr + 0;
+    int64 VRenderParams = VirtualAddr + PaintGeometrySize;
 
-    size_t NumDescriptors = 0;
+    bool bNewLayer = false;
+    NViewportCommands::NLayered* pLayered = nullptr;
+
+    int32 CurrentIndex = 0;
+
     for (auto& Element : InElementList.UnorderedElements)
     {
-        if (Element.Proxy)
+        NSlateShaderPaintGeometry* pCurrentPaintGeometry = pPaintGeometry + CurrentIndex;
+        NSlateShaderRenderParams* pCurrentRenderParams = pRenderParams + CurrentIndex;
+
+        if (Element.Layout.HasRenderTransform())
         {
-            ++NumDescriptors;
+            auto& RT = Element.Layout.GetAccumulatedRenderTransform();
+            pCurrentPaintGeometry->Transformation = RT.M;
+            pCurrentPaintGeometry->Translation = RT.Translation;
         }
+        else
+        {
+            pCurrentPaintGeometry->Transformation = Matrix2x2::Identity();
+            pCurrentPaintGeometry->Translation = Element.AbsolutePosition;
+        }
+        pCurrentPaintGeometry->LocalSize = Element.Layout.GetLocalSize();
+
+        pCurrentRenderParams->TintColor = Element.TintColor;
+        pCurrentRenderParams->RenderOpacity = Element.RenderOpacity;
+        pCurrentRenderParams->RenderStates = 0;
+
+        if (VpCommands.Layers.empty() || VpCommands.Layers.back().Layer != Element.Layer)
+        {
+            bNewLayer = true;
+        }
+
+        NRHIShaderResourceView* pSRV = nullptr;
+        if (Element.Proxy && Element.Proxy->TryResolve())
+        {
+            pCurrentPaintGeometry->TextureCoordinate = Element.Proxy->GetTextureCoordinate();
+            pCurrentRenderParams->RenderStates = Element.Proxy->GetRenderStates();
+            pSRV = Element.Proxy->GetSRV().get();
+            if (pSRV)
+            {
+                ++TotalDescriptors;
+            }
+
+            if (VpCommands.Layers.empty() || VpCommands.Layers.back().pSRV != pSRV)
+            {
+                bNewLayer = true;
+            }
+        }
+
+        if (bNewLayer)
+        {
+            pLayered = &VpCommands.Layers.emplace_back();
+            pLayered->Layer = Element.Layer;
+            pLayered->pSRV = pSRV;
+            pLayered->VPaintGeometryStart = VPaintGeometry + sizeof(NSlateShaderPaintGeometry) * CurrentIndex;
+            pLayered->VRenderParamsStart = VRenderParams + sizeof(NSlateShaderRenderParams) * CurrentIndex;
+        }
+
+        ++pLayered->NumElements;
+        ++CurrentIndex;
     }
 
-    if (NumDescriptors)
+    if (TotalDescriptors)
     {
-        VpCommands.DescriptorHeap->Reserve(NumDescriptors);
+        VpCommands.DescriptorHeap->Reserve(TotalDescriptors);
 
         NRHIDescriptorHeap* Heaps[]{ VpCommands.DescriptorHeap.get() };
         VpCommands.CommandSet->SetDescriptorHeaps(Heaps);
+
+        size_t Index = 0;
+        for (auto& Layered : VpCommands.Layers)
+        {
+            if (Layered.pSRV)
+            {
+                Layered.VSRVHandle = VpCommands.DescriptorHeap->GetVirtualHandleLocation(Index);
+                VpCommands.DescriptorHeap->ApplyViewSimple(Index, *Layered.pSRV, 0, 1);
+                ++Index;
+            }
+        }
+    }
+
+    std::ignore = VpCommands.StructuredBuffers->CommitAsync();
+
+    for (auto& Layered : VpCommands.Layers)
+    {
+        VpCommands.CommandSet->SetPaintGeometry(Layered.VPaintGeometryStart);
+        VpCommands.CommandSet->SetRenderParams(Layered.VRenderParamsStart);
+        if (Layered.pSRV)
+        {
+            VpCommands.CommandSet->SetSlateInputTexture(Layered.VSRVHandle);
+        }
+        VpCommands.CommandSet->DrawSlateInstance(Layered.NumElements);
     }
 }

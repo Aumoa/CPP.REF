@@ -17,12 +17,6 @@ ND3D12StructuredBuffer::ND3D12StructuredBuffer(ID3D12Device& InDevice, size_t Bu
 	HR(pUploadHeap->Map(0, nullptr, &pUploadPtr));
 }
 
-void ND3D12StructuredBuffer::UpdateRange(size_t Offset, std::span<const uint8> Buf)
-{
-	int8* p = (int8*)pUploadPtr + Offset;
-	memcpy(p, Buf.data(), Buf.size_bytes());
-}
-
 Task<> ND3D12StructuredBuffer::CommitAsync()
 {
 	return ND3D12Global::GetDynamicRHI().EnqueueGraphicsCommandAsync([pResource = pResource, pUploadHeap = pUploadHeap](ID3D12GraphicsCommandList* pCmd)

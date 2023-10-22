@@ -14,7 +14,7 @@ public:
 	virtual ~NRHIStructuredBuffer() noexcept override = default;
 
 	virtual size_t GetBufferSize() const = 0;
-	virtual void UpdateRange(size_t Offset, std::span<const uint8> Buf) = 0;
+	virtual void* GetBufferPointer() const = 0;
 	virtual Task<> CommitAsync() = 0;
 	virtual int64 GetGPUVirtualAddress() const = 0;
 };

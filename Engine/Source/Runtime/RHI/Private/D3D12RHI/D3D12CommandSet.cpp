@@ -166,12 +166,12 @@ void ND3D12CommandSet::SetScreenResolutionInfo(const Vector2& InConstant)
 
 void ND3D12CommandSet::SetPaintGeometry(int64 VirtualAddress)
 {
-	CommandList->SetGraphicsRootConstantBufferView(ND3D12SlateShader::GetPaintGeometryRootIndex(), VirtualAddress);
+	CommandList->SetGraphicsRootShaderResourceView(ND3D12SlateShader::GetPaintGeometryRootIndex(), VirtualAddress);
 }
 
 void ND3D12CommandSet::SetRenderParams(int64 VirtualAddress)
 {
-	CommandList->SetGraphicsRootConstantBufferView(ND3D12SlateShader::GetRenderParametersRootIndex(), VirtualAddress);
+	CommandList->SetGraphicsRootShaderResourceView(ND3D12SlateShader::GetRenderParametersRootIndex(), VirtualAddress);
 }
 
 void ND3D12CommandSet::SetSlateInputTexture(int64 VirtualHandle)
@@ -188,10 +188,10 @@ void ND3D12CommandSet::SetGameShader(const NRHIGameShader& InShader)
 	CommandList->SetPipelineState1(dShader.GetStateObject());
 }
 
-void ND3D12CommandSet::DrawSlateInstance()
+void ND3D12CommandSet::DrawSlateInstance(int32 InstanceCount)
 {
 	CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	CommandList->DrawInstanced(4, 1, 0, 0);
+	CommandList->DrawInstanced(4, (UINT)InstanceCount, 0, 0);
 }
 
 #endif

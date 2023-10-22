@@ -47,6 +47,7 @@ public:
 	virtual std::shared_ptr<NRHICommandSet> CreateCommandSet() override;
 	virtual std::shared_ptr<NRHISlateShader> CreateSlateShader() override;
 	virtual std::shared_ptr<NRHIConstantBuffer> CreateConstantBuffer() override;
+	virtual std::shared_ptr<NRHIStructuredBuffer> CreateStructuredBuffer(size_t BufferSize) override;
 	virtual std::shared_ptr<NRHIDescriptorHeap> CreateDescriptorHeap() override;
 	virtual std::shared_ptr<NRHIShaderResourceView> CreateShaderResourceView(size_t InNumViews) override;
 	virtual std::shared_ptr<NRHITextFormat> CreateTextFormat(String FontFamilyName, float FontSize, bool bBold, bool bItalic) override;

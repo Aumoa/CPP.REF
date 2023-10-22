@@ -7,7 +7,7 @@
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/VectorInterface/Rect.h"
 
-struct alignas(256) NSlateShaderPaintGeometry
+struct NSlateShaderPaintGeometry
 {
     Matrix2x2 Transformation;
     Vector2 Translation;
