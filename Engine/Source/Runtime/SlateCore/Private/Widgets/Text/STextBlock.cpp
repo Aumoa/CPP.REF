@@ -46,7 +46,7 @@ int32 STextBlock::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeome
 	PLATFORM_UNREFERENCED_PARAMETER(bParentEnabled);
 
 	NSlateRenderElement& Element = OutDrawElements.Add();
-	Element.AbsolutePosition = AllottedGeometry.GetAbsolutePosition();
+	Element.AbsolutePosition = Vector<>::Round(AllottedGeometry.GetAbsolutePosition());
 	Element.Layout = AllottedGeometry.ToPaintGeometry();
 
 	Element.Layer = InLayer;
