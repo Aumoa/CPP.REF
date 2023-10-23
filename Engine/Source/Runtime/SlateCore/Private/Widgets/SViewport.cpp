@@ -7,6 +7,7 @@
 #include "RHI/RHIGraphics.h"
 #include "Rendering/Texture2DTaskRenderAssetProxy.h"
 #include "RenderGlobal.h"
+#include "Renderer/RayTracingSceneRenderer.h"
 
 SViewport::SViewport()
 {
@@ -77,6 +78,7 @@ DEFINE_SLATE_CONSTRUCTOR(SViewport, Args)
 	if (bAllocateViewport)
 	{
 		Viewport = NRHIGlobal::GetDynamicRHI().CreateViewport();
+		SceneRenderer = std::make_shared<NRayTracingSceneRenderer>();
 	}
 	else
 	{
@@ -116,6 +118,12 @@ int32 SViewport::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeomet
 	Element.RenderOpacity = Args.RenderOpacity;
 	Element.TintColor = NamedColors::Transparent;
 	Element.Proxy = RenderProxy;
+
+	if (SceneRenderer)
+	{
+		SceneRenderer->BeginRender();
+		SceneRenderer->EndRender();
+	}
 
 	const std::vector<NArrangedWidget>& ArrangedWidgets = ArrangedChildrens.GetWidgets();
 	for (size_t ChildIndex = 0; ChildIndex < ArrangedWidgets.size(); ++ChildIndex)

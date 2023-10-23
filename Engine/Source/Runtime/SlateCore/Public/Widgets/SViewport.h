@@ -6,6 +6,7 @@
 #include "Widgets/SPanel.h"
 
 class NRHIViewport;
+class NSceneRenderer;
 
 class SLATECORE_API SViewport : public SPanel
 {
@@ -29,6 +30,7 @@ private:
 
 	std::shared_ptr<NRHIViewport> Viewport;
 	std::shared_ptr<NStreamableRenderAssetProxy> RenderProxy;
+	std::shared_ptr<NSceneRenderer> SceneRenderer;
 
 public:
 	SViewport();

@@ -177,6 +177,7 @@ void NSlateRHIRenderer::DrawLayered(const NSlateWindowElementList& InElementList
             pLayered->VRenderParamsStart = VRenderParams + sizeof(NSlateShaderRenderParams) * CurrentIndex;
         }
 
+        check(pLayered);
         ++pLayered->NumElements;
         ++CurrentIndex;
     }
