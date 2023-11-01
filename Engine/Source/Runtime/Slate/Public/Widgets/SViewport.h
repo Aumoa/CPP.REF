@@ -8,12 +8,12 @@
 class NRHIViewport;
 class NSceneRenderer;
 
-class SLATECORE_API SViewport : public SPanel
+class SLATE_API SViewport : public SPanel
 {
 	GENERATED_SLATE_BODY(SViewport)
 
 public:
-	struct SLATECORE_API NSlot : public NSlotBase<NSlot>
+	struct SLATE_API NSlot : public NSlotBase<NSlot>
 	{
 		DECLARE_SLATE_ATTRIBUTE(int32, ZOrder, 0);
 	};

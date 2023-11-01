@@ -7,7 +7,6 @@
 
 class SWindow;
 class NSlateRenderer;
-class SViewport;
 
 class SLATECORE_API NSlateApplication
 {
@@ -19,7 +18,6 @@ private:
     std::shared_ptr<SWindow> CoreWindow;
     std::shared_ptr<NSlateRenderer> Renderer;
     TickTimer Timer;
-    std::shared_ptr<SViewport> GameViewport;
 
 private:
     NSlateApplication();
@@ -27,14 +25,11 @@ private:
 public:
     virtual ~NSlateApplication() noexcept;
 
-    void Tick();
+    void Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents);
     void PresentAllWindows();
 
     void SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow);
     SWindow& GetCoreWindow() { return *CoreWindow; }
-
-    void SetupGameViewport(std::shared_ptr<SViewport> InGameViewport);
-    std::shared_ptr<SViewport> GetGameViewport() const { return GameViewport; }
 
     void SetupSlateRenderer(std::shared_ptr<NSlateRenderer> InRenderer);
 

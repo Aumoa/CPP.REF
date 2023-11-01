@@ -1,8 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #include "EditorSlate/SEditorPlayMenu.h"
-#include "Layout/SSizeBox.h"
-#include "Layout/SHorizontalBoxPanel.h"
+#include "Widgets/Layout/SSizeBox.h"
+#include "Widgets/Layout/SHorizontalBoxPanel.h"
 #include "Widgets/Images/SImage.h"
 #include "Assets/AssetsPath.h"
 #include "RenderGlobal.h"

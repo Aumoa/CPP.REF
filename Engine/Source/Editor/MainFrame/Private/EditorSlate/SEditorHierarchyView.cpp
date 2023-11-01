@@ -1,9 +1,9 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #include "EditorSlate/SEditorHierarchyView.h"
-#include "Layout/SSizeBox.h"
-#include "Layout/SVerticalBoxPanel.h"
-#include "Layout/SOverlay.h"
+#include "Widgets/Layout/SSizeBox.h"
+#include "Widgets/Layout/SVerticalBoxPanel.h"
+#include "Widgets/Layout/SOverlay.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Images/SImage.h"
 

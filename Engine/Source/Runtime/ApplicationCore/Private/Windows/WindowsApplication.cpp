@@ -5,6 +5,8 @@
 #include "Windows/WindowsApplication.h"
 #include "Windows/WindowsWindow.h"
 
+std::vector<NGenericPlatformInputEvent> NWindowsApplication::InputEvents;
+
 NWindowsApplication::NWindowsApplication()
 {
 }
@@ -21,7 +23,7 @@ Vector2N NWindowsApplication::GetScreenResolution()
     return Vector2N(X, Y);
 }
 
-void NWindowsApplication::PumpMessages()
+void NWindowsApplication::PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents)
 {
     static thread_local MSG M;
     while (PeekMessage(&M, NULL, 0, 0, PM_REMOVE))
@@ -37,6 +39,9 @@ void NWindowsApplication::PumpMessages()
             DispatchMessage(&M);
         }
     }
+
+    std::swap(InputEvents, OutInputEvents);
+    InputEvents.clear();
 }
 
 LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -61,6 +66,74 @@ LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wPara
 
     switch (uMsg)
     {
+    case WM_MOUSEMOVE:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseMove;
+            NGenericPlatformInputMouseMoveEvent& MouseMove = Input.MouseMove();
+            MouseMove.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
+    case WM_LBUTTONDOWN:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseButton;
+            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            MouseButton.ButtonType = EGenericPlatformInputMouseButtonType::Left;
+            MouseButton.bUp = false;
+            MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
+    case WM_RBUTTONDOWN:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseButton;
+            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            MouseButton.ButtonType = EGenericPlatformInputMouseButtonType::Right;
+            MouseButton.bUp = false;
+            MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
+    case WM_MBUTTONDOWN:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseButton;
+            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            MouseButton.ButtonType = EGenericPlatformInputMouseButtonType::Middle;
+            MouseButton.bUp = false;
+            MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
+    case WM_LBUTTONUP:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseButton;
+            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            MouseButton.ButtonType = EGenericPlatformInputMouseButtonType::Left;
+            MouseButton.bUp = true;
+            MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
+    case WM_RBUTTONUP:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseButton;
+            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            MouseButton.ButtonType = EGenericPlatformInputMouseButtonType::Right;
+            MouseButton.bUp = true;
+            MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
+    case WM_MBUTTONUP:
+        {
+            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            Input.Idx = Input.IDX_MouseButton;
+            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            MouseButton.ButtonType = EGenericPlatformInputMouseButtonType::Middle;
+            MouseButton.bUp = true;
+            MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
+        }
+        break;
     case WM_DESTROY:
         check(WindowPtr);
         if (WindowPtr->GetDefinition().bPrimaryWindow)

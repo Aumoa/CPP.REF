@@ -50,10 +50,10 @@ void NEngineLoop::Shutdown()
     NRHIGlobal::ShutdownDynamicRHI();
 }
 
-void NEngineLoop::Tick()
+void NEngineLoop::Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents)
 {
     NSlateApplication& SlateApp = NSlateApplication::Get();
-    SlateApp.Tick();
+    SlateApp.Tick(InputEvents);
 }
 
 void NEngineLoop::PreInit(String CmdArgs)
@@ -93,7 +93,6 @@ void NEngineLoop::PreInitPreStartupScreen(String CmdArgs)
 void NEngineLoop::PreInitPostStartupScreen()
 {
     std::shared_ptr<SWindow> CoreWindow;
-    std::shared_ptr<SViewport> GameViewport;
 
     NSlateApplication::Get().SetupCoreWindow(
         SAssignNew(CoreWindow, SWindow)
@@ -101,5 +100,4 @@ void NEngineLoop::PreInitPostStartupScreen()
     );
 
     CoreWindow->SetContent(SAssignNew(GameViewport, SViewport).bAllocateViewport(true));
-    NSlateApplication::Get().SetupGameViewport(GameViewport);
 }

@@ -1,7 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "Widgets/SWindow.h"
-#include "Widgets/SViewport.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
 #include "RHI/RHISwapChain.h"
@@ -28,7 +27,7 @@ void SWindow::AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow)
 	UpdateWindowVisibility();
 }
 
-void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
+void SWindow::ExecuteTick(const TimeSpan& InDeltaTime, NSlateWindowElementList& OutDrawElements, const std::vector<NGenericPlatformInputEvent>& InputEvents)
 {
 	PrepassLayout();
 
@@ -43,19 +42,16 @@ void SWindow::ExecuteTick(const TimeSpan& InDeltaTime)
 		}
 	}
 
+	std::vector<bool> InputEventHandled(InputEvents.size());
+
 	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
-	Tick(AllottedGeometry, InDeltaTime);
+	NPaintArgs Args = NPaintArgs::InitPaintArgs(*this, InDeltaTime, InputEvents, InputEventHandled);
+	Rect CullingRect = { Vector2::Zero(), AllottedSize };
+	Paint(Args, AllottedGeometry, CullingRect, OutDrawElements, 0, IsEnabled());
 }
 
-void SWindow::Render(const TimeSpan& InDeltaTime, NSlateRenderer& Renderer)
+void SWindow::Render(const NSlateWindowElementList& DrawElements, NSlateRenderer& Renderer)
 {
-	Vector2 AllottedSize = ComputeDesiredSize();
-	NPaintArgs Args = NPaintArgs::InitPaintArgs(*this, InDeltaTime);
-	Rect CullingRect = { Vector2::Zero(), AllottedSize };
-	NSlateWindowElementList DrawElements;
-	NGeometry AllottedGeometry = NGeometry::MakeRoot(AllottedSize, NSlateLayoutTransform::Identity());
-	OnPaint(Args, AllottedGeometry, CullingRect, DrawElements, 0, IsEnabled());
-
 	if (SwapChain)
 	{
 		Renderer.BeginRender(*SwapChain);

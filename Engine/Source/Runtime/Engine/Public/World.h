@@ -7,6 +7,7 @@
 #include "World.generated.h"
 
 class AActor;
+class NSceneView;
 
 ACLASS()
 class ENGINE_API AWorld : public AObject
@@ -15,14 +16,15 @@ class ENGINE_API AWorld : public AObject
 
 private:
 	std::vector<RefPtr<AActor>> PersistentActors;
+	std::shared_ptr<NSceneView> SceneView;
 
 public:
 	AWorld();
 	virtual ~AWorld() noexcept override;
 
+	void InitializeScene();
+	void DestroyScene();
+
 	AActor* SpawnPersistentActor(AType* InActorType);
 	AWorld* GetWorld() { return this; }
-
-	void BeginPlay();
-	void EndPlay();
 };

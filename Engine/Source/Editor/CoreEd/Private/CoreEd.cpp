@@ -8,7 +8,7 @@
 
 void NCoreEd::EditorInit(IEngineLoop& Loop)
 {
-	std::shared_ptr<SViewport> GameViewport = NSlateApplication::Get().GetGameViewport();
+	std::shared_ptr<SViewport> GameViewport = std::static_pointer_cast<SViewport>(NSlateApplication::Get().GetCoreWindow().GetContent());
 	NSlateApplication::Get().GetCoreWindow().SetContent(SNew(SEditorViewport)
 		+SEditorViewport::NSlot()
 		.VAlignment(EVerticalAlignment::Fill)

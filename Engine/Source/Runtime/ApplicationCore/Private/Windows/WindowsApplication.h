@@ -17,10 +17,13 @@ public:
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
     virtual Vector2N GetScreenResolution() override;
-    virtual void PumpMessages() override;
+    virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) override;
 
 public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+private:
+    static std::vector<NGenericPlatformInputEvent> InputEvents;
 };
 
 #undef __ALLOW_PLATFORM_COMMON_H__

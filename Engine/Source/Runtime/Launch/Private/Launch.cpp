@@ -42,10 +42,12 @@ int32 NLaunch::GuardedMain()
 #endif
     Loop->PostInit();
 
+    std::vector<NGenericPlatformInputEvent> InputEvents;
+
     while (!GenericApp->IsQuitRequested())
     {
-        GenericApp->PumpMessages();
-        Loop->Tick();
+        GenericApp->PumpMessages(InputEvents);
+        Loop->Tick(InputEvents);
     }
 
     Loop->Shutdown();

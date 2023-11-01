@@ -44,7 +44,7 @@ public:
 	static AType* StaticClass();
 	static RefPtr<AObject> NewObject(AType* InClassType);
 	template<std::derived_from<AObject> UObject>
-	inline RefPtr<UObject> NewObject(AType* InClassType = nullptr);
+	static inline RefPtr<UObject> NewObject(AType* InClassType = nullptr);
 };
 
 
@@ -291,6 +291,15 @@ inline RefPtr<UObject> NewObject(AType* InClassType = nullptr)
 	}
 
 	RefPtr<AObject> Instanced = AObject::NewObject(InClassType);
+	RefPtr<UObject> Casted = Instanced.Cast<UObject>();
+	check(Casted);
+	return Casted;
+}
+
+template<std::derived_from<AObject> UObject, class... TArgs>
+inline RefPtr<UObject> NewObject(TArgs&&... InArgs)
+{
+	RefPtr<AObject> Instanced = UObject::template NewObject<UObject>(std::forward<TArgs>(InArgs)...);
 	RefPtr<UObject> Casted = Instanced.Cast<UObject>();
 	check(Casted);
 	return Casted;

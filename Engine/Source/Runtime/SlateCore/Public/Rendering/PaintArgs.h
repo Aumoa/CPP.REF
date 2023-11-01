@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericPlatform/GenericPlatformInputEvent.h"
 
 class SWidget;
 
@@ -13,6 +14,9 @@ struct SLATECORE_API NPaintArgs
 	const TimeSpan	DeltaTime;
 	const float		RenderOpacity;
 
-	static NPaintArgs InitPaintArgs(const SWidget& InOwningWidget, const TimeSpan& InDeltaTime);
+	const std::vector<NGenericPlatformInputEvent>& InputEvents;
+	std::vector<bool>& InputEventHandled;
+
+	static NPaintArgs InitPaintArgs(const SWidget& InOwningWidget, const TimeSpan& InDeltaTime, const std::vector<NGenericPlatformInputEvent>& InInputEvents, std::vector<bool>& InInputEventHandled);
 	NPaintArgs WithNewParent(const SWidget& InOwningWidget) const;
 };

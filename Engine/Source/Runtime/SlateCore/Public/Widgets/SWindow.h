@@ -8,7 +8,6 @@
 class NGenericWindow;
 class NRHISwapChain;
 class NSlateRenderer;
-class SViewport;
 
 class SLATECORE_API SWindow : public SCompoundWidget
 {
@@ -23,8 +22,8 @@ public:
 	virtual ~SWindow() noexcept override;
 
 	void AttachWindow(std::shared_ptr<NGenericWindow> InNativeWindow);
-	void ExecuteTick(const TimeSpan& InDeltaTime);
-	void Render(const TimeSpan& InDeltaTime, NSlateRenderer& Renderer);
+	void ExecuteTick(const TimeSpan& InDeltaTime, NSlateWindowElementList& OutDrawElements, const std::vector<NGenericPlatformInputEvent>& InputEvents);
+	void Render(const NSlateWindowElementList& DrawElements, NSlateRenderer& Renderer);
 	void Present();
 
 public:

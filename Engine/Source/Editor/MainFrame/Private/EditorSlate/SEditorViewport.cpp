@@ -7,7 +7,7 @@
 #include "EditorSlate/SEditorHierarchyView.h"
 #include "EditorSlate/SEditorPlayMenu.h"
 #include "EditorSlate/SEditorGameViewport.h"
-#include "Layout/SDockPanel.h"
+#include "Widgets/Layout/SDockPanel.h"
 
 SEditorViewport::SEditorViewport()
 {

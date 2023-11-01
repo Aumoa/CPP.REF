@@ -2,6 +2,7 @@
 
 #include "World.h"
 #include "Actors/Actor.h"
+#include "Scene/SceneView.h"
 
 AWorld::AWorld()
 {
@@ -11,16 +12,18 @@ AWorld::~AWorld() noexcept
 {
 }
 
+void AWorld::InitializeScene()
+{
+	SceneView = std::make_shared<NSceneView>();
+}
+
+void AWorld::DestroyScene()
+{
+	SceneView.reset();
+}
+
 AActor* AWorld::SpawnPersistentActor(AType* InActorType)
 {
 	RefPtr<AActor>& Actor = PersistentActors.emplace_back(NewObject<AActor>(InActorType));
 	return Actor.Get();
-}
-
-void AWorld::BeginPlay()
-{
-}
-
-void AWorld::EndPlay()
-{
 }

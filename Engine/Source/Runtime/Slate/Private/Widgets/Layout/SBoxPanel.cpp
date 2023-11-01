@@ -1,6 +1,6 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Layout/SBoxPanel.h"
+#include "Widgets/Layout/SBoxPanel.h"
 #include "Layout/AlignmentArrangeResult.h"
 
 SBoxPanel::SBoxPanel(EOrientation InOrientation)

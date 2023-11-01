@@ -8,6 +8,7 @@
 
 class NGenericApplication;
 class NSlateApplication;
+class SViewport;
 
 class NEngineLoop : public IEngineLoop
 {
@@ -16,6 +17,7 @@ class NEngineLoop : public IEngineLoop
 
 private:
     RefPtr<AGameEngine> EngineInstance;
+    std::shared_ptr<SViewport> GameViewport;
 
 public:
     NEngineLoop();
@@ -23,10 +25,12 @@ public:
 
     virtual void Init(TSubclassOf<AGameEngine> InEngineClass) override;
     virtual void Shutdown() override;
-    virtual void Tick() override;
+    virtual void Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents) override;
 
     void PreInit(String CmdArgs);
     void PostInit();
+
+    inline std::shared_ptr<SViewport> GetGameViewport() const { return GameViewport; }
 
 private:
     void PreInitPreStartupScreen(String CmdArgs);

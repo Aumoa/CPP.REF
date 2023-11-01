@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SubclassOf.h"
+#include "GenericPlatform/GenericPlatformInputEvent.h"
 
 class AGameEngine;
 
@@ -17,5 +18,5 @@ public:
 
     virtual void Init(TSubclassOf<AGameEngine> InEngineClass) = 0;
     virtual void Shutdown() = 0;
-    virtual void Tick() = 0;
+    virtual void Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents) = 0;
 };

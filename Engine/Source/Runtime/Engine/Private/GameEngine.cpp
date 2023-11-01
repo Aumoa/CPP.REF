@@ -22,20 +22,19 @@ void AGameEngine::Initialize()
 {
 	SpawnWorld();
 	InitSubsystems();
-
-	GameWorld->BeginPlay();
 }
 
 void AGameEngine::Deinitialize()
 {
-	GameWorld->EndPlay();
-
+	GameWorld->DestroyScene();
 	Subsystems.Deinitialize();
 }
 
 void AGameEngine::SpawnWorld()
 {
 	GameWorld = NewObject<AWorld>();
+	GameWorld->InitializeScene();
+
 	auto* Instance = static_cast<AGameInstance*>(GameWorld->SpawnPersistentActor(AGameInstance::StaticClass()));
 	Instance->Initialize();
 }

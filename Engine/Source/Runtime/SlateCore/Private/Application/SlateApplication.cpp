@@ -2,7 +2,6 @@
 
 #include "Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
-#include "Widgets/SViewport.h"
 #include "Rendering/SlateRenderer.h"
 #include "RHI/RHIGlobal.h"
 #include "RHI/RHIGraphics.h"
@@ -17,17 +16,18 @@ NSlateApplication::~NSlateApplication() noexcept
 {
 }
 
-void NSlateApplication::Tick()
+void NSlateApplication::Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents)
 {
-    TimeSpan DeltaTime = Timer.Tick();
     NSlateWindowElementList DrawElements;
-    CoreWindow->ExecuteTick(DeltaTime);
 
     NRHIGraphics& Graphics = NRHIGlobal::GetDynamicRHI();
     Graphics.BeginFrame();
 
+    TimeSpan DeltaTime = Timer.Tick();
+    CoreWindow->ExecuteTick(DeltaTime, DrawElements, InputEvents);
+
     Renderer->BeginFrame();
-    CoreWindow->Render(DeltaTime, *Renderer);
+    CoreWindow->Render(DrawElements, *Renderer);
     Renderer->EndFrame();
 
     PresentAllWindows();
@@ -37,11 +37,6 @@ void NSlateApplication::Tick()
 void NSlateApplication::PresentAllWindows()
 {
     CoreWindow->Present();
-}
-
-void NSlateApplication::SetupGameViewport(std::shared_ptr<SViewport> InGameViewport)
-{
-    GameViewport = InGameViewport;
 }
 
 void NSlateApplication::SetupCoreWindow(std::shared_ptr<SWindow> InCoreWindow)

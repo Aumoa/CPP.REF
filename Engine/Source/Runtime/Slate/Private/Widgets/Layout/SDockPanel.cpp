@@ -1,6 +1,6 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Layout/SDockPanel.h"
+#include "Widgets/Layout/SDockPanel.h"
 #include "Layout/AlignmentArrangeResult.h"
 
 SDockPanel::SDockPanel()

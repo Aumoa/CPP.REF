@@ -35,7 +35,34 @@ bool SWidget::PrepassLayout()
 
 int32 SWidget::Paint(const NPaintArgs& Args, const NGeometry& AllottedGeometry, const Rect& CullingRect, NSlateWindowElementList& OutDrawElements, int32 InLayer, bool bParentEnabled)
 {
-	return OnPaint(Args.WithNewParent(*this), AllottedGeometry, CullingRect, OutDrawElements, InLayer, bParentEnabled);
+	if (bCanTick && ShouldBeEnabled(bParentEnabled))
+	{
+		Tick(AllottedGeometry, Args.DeltaTime);
+	}
+
+	int32 ChildLayer = OnPaint(Args.WithNewParent(*this), AllottedGeometry, CullingRect, OutDrawElements, InLayer, bParentEnabled);
+
+	if (ESlateVisibility::IsHitTestVisible(Visibility))
+	{
+		for (size_t i = 0; i < Args.InputEvents.size(); ++i)
+		{
+			if (Args.InputEventHandled[i] == false)
+			{
+				auto& InputEvent = Args.InputEvents[i];
+				switch (InputEvent.Idx)
+				{
+				case InputEvent.IDX_MouseMove:
+					Args.InputEventHandled[i] = OnMouseMove(AllottedGeometry, InputEvent.MouseMove().Location);
+					break;
+				case InputEvent.IDX_MouseButton:
+					Args.InputEventHandled[i] = OnMouseButton(AllottedGeometry, InputEvent.MouseButton().ButtonType, InputEvent.MouseButton().Location, InputEvent.MouseButton().bUp);
+					break;
+				}
+			}
+		}
+	}
+
+	return ChildLayer;
 }
 
 void SWidget::SetVisibility(ESlateVisibility::Enum InVisibility)
@@ -158,4 +185,14 @@ bool SWidget::ShouldBeEnabled(bool bParentEnabled) const
 void SWidget::SetDesiredSize(const Vector2& InDesiredSize)
 {
 	CachedDesiredSize = InDesiredSize;
+}
+
+bool SWidget::OnMouseMove([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] const Vector2N& CursorPosition)
+{
+	return false;
+}
+
+bool SWidget::OnMouseButton([[maybe_unused]] const NGeometry& AllottedGeometry, [[maybe_unused]] EGenericPlatformInputMouseButtonType ButtonType, [[maybe_unused]] const Vector2N& CursorPosition, [[maybe_unused]] bool bUp)
+{
+	return false;
 }

@@ -1,8 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #include "EditorSlate/SEditorMenu.h"
-#include "Layout/SHorizontalBoxPanel.h"
-#include "Layout/SSizeBox.h"
+#include "Widgets/Layout/SHorizontalBoxPanel.h"
+#include "Widgets/Layout/SSizeBox.h"
 #include "Widgets/Text/STextBlock.h"
 
 DEFINE_SLATE_CONSTRUCTOR(SEditorMenu, Args)

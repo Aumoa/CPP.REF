@@ -1,6 +1,6 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Layout/SSizeBox.h"
+#include "Widgets/Layout/SSizeBox.h"
 
 SSizeBox::SSizeBox()
 {

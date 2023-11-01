@@ -73,6 +73,7 @@ private:
 	bool bLayoutInvalidated : 1 = true;
 	bool bVolatilityInvalidated : 1 = true;
 	bool bHasRenderTransform : 1 = false;
+	bool bCanTick : 1 = true;
 
 public:
 	SWidget();
@@ -103,6 +104,8 @@ public:
 
 	void SetRenderOpacity(float InOpacity);
 	float GetRenderOpacity() const { return RenderOpacity; }
+
+	void SetCanTick(bool bInCanTick) { bCanTick = bInCanTick; }
 
 	void SetFlowDirection(EFlowDirection InFlowDirection);
 	EFlowDirection GetFlowDirection() const { return FlowDirection; }
@@ -148,6 +151,10 @@ protected:
 			return Padding;
 		}
 	}
+
+protected:
+	virtual bool OnMouseMove(const NGeometry& AllottedGeometry, const Vector2N& CursorPosition);
+	virtual bool OnMouseButton(const NGeometry& AllottedGeometry, EGenericPlatformInputMouseButtonType ButtonType, const Vector2N& CursorPosition, bool bUp);
 };
 
 namespace DeclarativeSyntaxSupports

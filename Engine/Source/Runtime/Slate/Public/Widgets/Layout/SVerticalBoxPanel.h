@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Layout/SBoxPanel.h"
+#include "Widgets/Layout/SBoxPanel.h"
 
 class SLATE_API SVerticalBoxPanel : public SBoxPanel
 {

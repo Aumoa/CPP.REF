@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericWindowDefinition.h"
+#include "GenericPlatform/GenericPlatformInputEvent.h"
 
 class NGenericWindow;
 
@@ -23,7 +24,7 @@ public:
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) = 0;
     virtual Vector2N GetScreenResolution() = 0;
-    virtual void PumpMessages() = 0;
+    virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) = 0;
 
     virtual String GetApplicationName();
 
