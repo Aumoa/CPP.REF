@@ -34,6 +34,7 @@ public:
 
 	String GetClassName() const noexcept { return ClassName; }
 	APackage* GetPackage() const noexcept { return Package; }
+	AObject* Construct() const noexcept { return Constructor(); }
 
 	bool IsDerivedFrom(AType* InType) const noexcept;
 	template<std::derived_from<AObject> U>
@@ -42,3 +43,8 @@ public:
 public:
 	static AType* StaticClass();
 };
+
+extern "C"
+{
+	COREAOBJECT_API void* NativeCall_CoreAObject_Type_Construct(void*);
+}

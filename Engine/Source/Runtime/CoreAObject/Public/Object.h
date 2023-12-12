@@ -13,12 +13,23 @@ class RefPtr;
 template<class T>
 class WeakPtr;
 
+extern "C"
+{
+	// specialized for AObject
+	COREAOBJECT_API void NativeCall_CoreAObject_Object_AddRef(void*);
+	COREAOBJECT_API void NativeCall_CoreAObject_Object_Release(void*);
+}
+
+
 class COREAOBJECT_API AObject
 {
 	template<class T>
 	friend class RefPtr;
 	template<class T>
 	friend class WeakPtr;
+
+	friend COREAOBJECT_API void NativeCall_CoreAObject_Object_AddRef(void*);
+	friend COREAOBJECT_API void NativeCall_CoreAObject_Object_Release(void*);
 
 	AObject(const AObject&) = delete;
 	AObject(AObject&&) = delete;
@@ -47,6 +58,12 @@ public:
 	static inline RefPtr<UObject> NewObject(AType* InClassType = nullptr);
 };
 
+extern "C"
+{
+	COREAOBJECT_API void* NativeCall_CoreAObject_Object_StaticClass();
+	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetLocks(void*);
+	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetWeaks(void*);
+}
 
 #pragma region RefPtr
 

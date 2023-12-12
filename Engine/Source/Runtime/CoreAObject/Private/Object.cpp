@@ -49,3 +49,34 @@ RefPtr<AObject> AObject::NewObject(AType* InClassType)
 }
 
 REGISTER_INTRINSIC_CLASS(AObject, TEXT("/Script/CoreAObject"), nullptr);
+
+extern "C"
+{
+	COREAOBJECT_API void* NativeCall_CoreAObject_Object_StaticClass()
+	{
+		return AObject::StaticClass();
+	}
+
+	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetLocks(void* self)
+	{
+		return ((AObject*)self)->GetLocks();
+	}
+
+	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetWeaks(void* self)
+	{
+		return ((AObject*)self)->GetWeaks();
+	}
+
+	COREAOBJECT_API void NativeCall_CoreAObject_Object_AddRef(void* self)
+	{
+		((AObject*)self)->Refs->IncrRef();
+	}
+
+	COREAOBJECT_API void NativeCall_CoreAObject_Object_Release(void* self)
+	{
+		if (((AObject*)self)->Refs->DecrRef())
+		{
+			delete (AObject*)self;
+		}
+	}
+}
