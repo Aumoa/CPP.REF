@@ -29,13 +29,11 @@ public:
 	}
 };
 
-INT APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE, LPWSTR lpCmdLine, INT nShow)
+extern "C" INT __declspec(dllexport) WindowsStartup(LPCWSTR lpCmdLine)
 {
-	PLATFORM_UNREFERENCED_PARAMETER(nShow);
-
 	auto Launch = NLaunch::GeneratePlatformLaunch(String::FromLiteral(lpCmdLine));
 	auto* WindowsLaunch = static_cast<NWindowsLaunch*>(Launch.get());
-	WindowsLaunch->ApplicationPointer = hInstance;
+	WindowsLaunch->ApplicationPointer = GetModuleHandleW(nullptr);
 	return Launch->GuardedMain();
 }
 

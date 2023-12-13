@@ -395,6 +395,13 @@ public:
 		return (const char_t*)*this;
 	}
 
+	[[nodiscard]] inline const char_t* lock_thread_local() const
+	{
+		static thread_local std::basic_string<char_t> scoped;
+		scoped = wstring_view();
+		return scoped.c_str();
+	}
+
 	[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& Rhs, EStringComparison Comparison) const noexcept
 	{
 		return this->CompareTo(Rhs.GetRaw(), Rhs.Len, Comparison);

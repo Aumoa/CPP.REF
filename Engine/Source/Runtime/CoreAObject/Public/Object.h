@@ -116,6 +116,13 @@ public:
 		return Ptr;
 	}
 
+	inline T* Drop() noexcept
+	{
+		auto* L = Ptr;
+		Ptr = nullptr;
+		return L;
+	}
+
 	constexpr void Swap(RefPtr<T>& InPtr) noexcept
 	{
 		std::swap(Ptr, InPtr.Ptr);

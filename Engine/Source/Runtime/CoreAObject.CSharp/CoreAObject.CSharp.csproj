@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <RootNamespace>AE.CoreAObject</RootNamespace>
     <BaseOutputPath>$(SolutionDir)Binaries\Interop</BaseOutputPath>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>

@@ -45,8 +45,13 @@ REGISTER_INTRINSIC_CLASS(AType, TEXT("/Script/CoreAObject"), AType::Super::Stati
 
 extern "C"
 {
-	COREAOBJECT_API void* NativeCall_CoreAObject_Type_Construct(void* self)
+	COREAOBJECT_API void* NativeCall_CoreAObject_Type_Construct(void* __this)
 	{
-		return ((AType*)self)->Construct();
+		return ((AType*)__this)->Construct();
+	}
+
+	COREAOBJECT_API void* NativeCall_CoreAObject_Type_StaticClass()
+	{
+		return (AObject*)AType::StaticClass();
 	}
 }

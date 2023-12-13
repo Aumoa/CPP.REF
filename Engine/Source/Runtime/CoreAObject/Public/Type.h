@@ -47,4 +47,5 @@ public:
 extern "C"
 {
 	COREAOBJECT_API void* NativeCall_CoreAObject_Type_Construct(void*);
+	COREAOBJECT_API void* NativeCall_CoreAObject_Type_StaticClass();
 }

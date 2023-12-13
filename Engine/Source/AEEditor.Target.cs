@@ -8,7 +8,7 @@ public class AEEditorTarget : TargetRules
     public AEEditorTarget(TargetInfo Info) : base(Info)
     {
         TargetModuleName = "Launch";
-        Type = TargetType.SlateApplication;
+        Type = TargetType.Module;
         bEditor = true;
     }
 }

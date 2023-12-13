@@ -20,6 +20,4 @@ public:
 
 	bool Rename(Name NewName, AObject* NewOuter);
 	Name GetName() const { return MyName; }
-
-	static void Destroy(AActor* InActor);
 };

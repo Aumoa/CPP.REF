@@ -54,29 +54,29 @@ extern "C"
 {
 	COREAOBJECT_API void* NativeCall_CoreAObject_Object_StaticClass()
 	{
-		return AObject::StaticClass();
+		return (AObject*)AObject::StaticClass();
 	}
 
-	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetLocks(void* self)
+	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetLocks(void* __this)
 	{
-		return ((AObject*)self)->GetLocks();
+		return ((AObject*)__this)->GetLocks();
 	}
 
-	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetWeaks(void* self)
+	COREAOBJECT_API int32 NativeCall_CoreAObject_Object_GetWeaks(void* __this)
 	{
-		return ((AObject*)self)->GetWeaks();
+		return ((AObject*)__this)->GetWeaks();
 	}
 
-	COREAOBJECT_API void NativeCall_CoreAObject_Object_AddRef(void* self)
+	COREAOBJECT_API void NativeCall_CoreAObject_Object_AddRef(void* __this)
 	{
-		((AObject*)self)->Refs->IncrRef();
+		((AObject*)__this)->Refs->IncrRef();
 	}
 
-	COREAOBJECT_API void NativeCall_CoreAObject_Object_Release(void* self)
+	COREAOBJECT_API void NativeCall_CoreAObject_Object_Release(void* __this)
 	{
-		if (((AObject*)self)->Refs->DecrRef())
+		if (((AObject*)__this)->Refs->DecrRef())
 		{
-			delete (AObject*)self;
+			delete (AObject*)__this;
 		}
 	}
 }
