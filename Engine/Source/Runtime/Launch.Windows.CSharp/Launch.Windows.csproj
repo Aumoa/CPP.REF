@@ -9,10 +9,19 @@
     <BaseOutputPath>$(SolutionDir)Binaries\Interop</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <IsPublishable>False</IsPublishable>
+    <AssemblyName>$(MSBuildProjectName).CSharp</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CoreAObject.CSharp\CoreAObject.CSharp.csproj" />
+    <ProjectReference Include="..\CoreAObject.CSharp\CoreAObject.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="AE.CoreAObject.Object">
+      <Alias>Object</Alias>
+    </Using>
   </ItemGroup>
 
 </Project>

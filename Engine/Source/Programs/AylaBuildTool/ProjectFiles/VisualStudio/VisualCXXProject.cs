@@ -144,7 +144,7 @@ public class VisualCXXProject : IVisualStudioProject
                 PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp} -Config {Configuration}";
                 PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp} -Config {Configuration}";
                 PropertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{BuildToolPath} Clean";
-                PropertyGroup.AddElement("NMakeOutput").InnerText = $"{Path.Combine(Global.EngineDirectory.Binaries.Win64, Configuration.ToString(), "Launch.exe")}";
+                PropertyGroup.AddElement("NMakeOutput").InnerText = $"{Path.Combine(Global.EngineDirectory.Binaries.Interop, Configuration.IsDebug() ? "Debug" : "Release", "Launch.Windows.exe")}";
                 PropertyGroup.AddElement("OutDir").InnerText = Path.Combine(ProjectDirectory.Binaries.Win64, Configuration.ToString());
                 PropertyGroup.AddElement("IntDir").InnerText = ProjectDirectory.Intermediate.Unused;
 

@@ -30,27 +30,27 @@ public class Workspace
 
     private async Task CollectModuleInSubdirectoryRecursiveAsync(ProjectDirectory Target, string InSubdirectory, CancellationToken SToken = default)
     {
-        string[] ModulePath = Directory.GetFiles(InSubdirectory, "*.csproj");
-        if (ModulePath.Any())
+        foreach (var ModulePath in Directory.GetFiles(InSubdirectory, "*", SearchOption.TopDirectoryOnly))
         {
-            CSModules.Add(new ACSModule(Target, InSubdirectory));
-            return;
-        }
+            if (ModulePath.EndsWith("csproj", StringComparison.OrdinalIgnoreCase))
+            {
+                CSModules.Add(new ACSModule(Target, InSubdirectory));
+                return;
+            }
 
-        ModulePath = Directory.GetFiles(InSubdirectory, "*.Module.cs");
-        if (ModulePath.Any())
-        {
-            var CXXModule = new ACXXModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
-            await CXXModule.ConfigureAsync(SToken);
-            CXXModules.Add(CXXModule.ModuleName, CXXModule);
-        }
+            if (ModulePath.EndsWith("Module.cs", StringComparison.OrdinalIgnoreCase))
+            {
+                var CXXModule = new ACXXModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
+                await CXXModule.ConfigureAsync(SToken);
+                CXXModules.Add(CXXModule.ModuleName, CXXModule);
+            }
 
-        ModulePath = Directory.GetFiles(InSubdirectory, "*.Target.cs");
-        foreach (var TargetPath in ModulePath)
-        {
-            var RelativePath = Path.GetRelativePath(Target.Source.Root, TargetPath);
-            var Instance = new ATarget(Target, RelativePath);
-            Targets.Add(Instance.TargetName, Instance);
+            if (ModulePath.EndsWith("Target.cs", StringComparison.OrdinalIgnoreCase))
+            {
+                var RelativePath = Path.GetRelativePath(Target.Source.Root, ModulePath);
+                var Instance = new ATarget(Target, RelativePath);
+                Targets.Add(Instance.TargetName, Instance);
+            }
         }
 
         foreach (var Subdirectory in Directory.GetDirectories(InSubdirectory, "*", SearchOption.TopDirectoryOnly))

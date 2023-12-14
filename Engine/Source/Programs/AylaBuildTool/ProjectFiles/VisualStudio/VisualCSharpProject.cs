@@ -25,7 +25,7 @@ public class VisualCSharpProject : IVisualStudioProject
     {
         this.Module = Module;
         ProjectGuid = CRC32.GenerateGuid(Module.SourcePath).ToString().ToUpper();
-        ProjectFile = Path.Combine(Module.SourcePath, Path.ChangeExtension(Module.ModuleName, ".csproj"));
+        ProjectFile = Path.Combine(Module.SourcePath, Module.ModuleName.Replace(".CSharp", string.Empty) + ".csproj");
 
         if (Module.IsInProgramsDirectory())
         {

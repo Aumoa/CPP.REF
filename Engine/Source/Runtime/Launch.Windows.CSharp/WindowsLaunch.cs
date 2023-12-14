@@ -10,15 +10,12 @@ public static class WindowsLaunch
 {
     private static int Main(string[] args)
     {
-        var instance = new MySampleClass();
-        instance.value = 10;
-        var instance2 = new SampleClass();
-        instance2.Assign(instance);
+        var path = Environment.GetEnvironmentVariable("PATH");
         return WindowsStartup(string.Join(' ', args.Select(p => $"\"{p}\"")));
     }
 
     public static int WindowsStartup(string lpCmdLine) => NativeCall_WindowsStartup(lpCmdLine);
 
-    [DllImport("Launch.dll", EntryPoint = "WindowsStartup", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+    [DllImport("Launch", EntryPoint = "WindowsStartup", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
     private static extern int NativeCall_WindowsStartup(string lpCmdLine);
 }

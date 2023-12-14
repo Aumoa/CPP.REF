@@ -8,6 +8,15 @@
     <BaseOutputPath>$(SolutionDir)Binaries\Interop</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <IsPublishable>False</IsPublishable>
+    <AssemblyName>$(MSBuildProjectName).CSharp</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="AE.CoreAObject.Object">
+      <Alias>Object</Alias>
+    </Using>
+  </ItemGroup>
 
 </Project>

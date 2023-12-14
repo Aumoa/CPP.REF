@@ -12,7 +12,7 @@ public class ACSModule : IAModule
     public ACSModule(ProjectDirectory ProjectDirectory, string SourceRelativePath)
     {
         string SourcePath = Path.Combine(ProjectDirectory.Source.Root, SourceRelativePath);
-        this.ModuleName = Path.GetFileNameWithoutExtension(SourcePath);
+        this.ModuleName = Path.GetFileName(SourcePath.Replace(".csproj", string.Empty));
         this.RuleName = this.ModuleName;
         this.SourcePath = SourcePath;
         this.ProjectDirectory = ProjectDirectory;
