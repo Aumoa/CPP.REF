@@ -274,8 +274,20 @@ public:
 		return *this;
 	}
 
+	template<class U> requires std::derived_from<U, T>
+	constexpr operator RefPtr<U>() const noexcept
+	{
+		return Cast<U>();
+	}
+
+	template<class U> requires (!std::derived_from<U, T>)
+	constexpr explicit operator RefPtr<U>() const noexcept
+	{
+		return Cast<U>();
+	}
+
 	template<class U> requires requires { { dynamic_cast<U*>(Ptr) }; }
-	constexpr RefPtr<U> Cast() noexcept
+	constexpr RefPtr<U> Cast() const noexcept
 	{
 		if (auto uPtr = RefPtr<U>(dynamic_cast<U*>(Ptr)))
 		{

@@ -15,6 +15,7 @@ public struct IntermediateDirectory
             Includes = Path.Combine(_Root, "Includes");
             Shaders = Path.Combine(_Root, "Shaders");
             ProjectFiles = Path.Combine(_Root, "ProjectFiles");
+            CSharp = Path.Combine(_Root, "CSharp");
             Build = Path.Combine(_Root, "Build");
             Makefiles = Path.Combine(_Root, "Makefiles");
             Unused = Path.Combine(_Root, "Unused");
@@ -26,6 +27,8 @@ public struct IntermediateDirectory
     public string Shaders { get; private init; }
 
     public string ProjectFiles { get; private init; }
+
+    public string CSharp { get; private init; }
 
     public string Build { get; private init; }
 
@@ -48,6 +51,11 @@ public struct IntermediateDirectory
         if (Directory.Exists(ProjectFiles) == false)
         {
             Directory.CreateDirectory(ProjectFiles);
+        }
+
+        if (Directory.Exists(CSharp) == false)
+        {
+            Directory.CreateDirectory(CSharp);
         }
 
         if (Directory.Exists(Build) == false)

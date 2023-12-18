@@ -49,6 +49,7 @@ Console.CancelKeyPress += (Sender, EventArgs) =>
 
 try
 {
+    Console.WriteLine(string.Join(' ', args));
     var Executor = (IExecutor)Constructor.Invoke(new object[] { CommandLineParser.Parse(args[1..]) });
     return await Executor.RunAsync(CTS.Token);
 }

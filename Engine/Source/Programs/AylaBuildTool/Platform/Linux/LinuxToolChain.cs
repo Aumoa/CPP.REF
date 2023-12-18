@@ -88,4 +88,9 @@ public class LinuxToolChain : ToolChainInstallation
     {
         return ".o";
     }
+
+    public override string GetShaderCompilerDirectory(Architecture TargetArchitecture)
+    {
+        return BaseDirectory;
+    }
 }

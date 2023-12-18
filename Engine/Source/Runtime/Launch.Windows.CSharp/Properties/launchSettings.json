@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Launch.Windows": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "PATH": "%PATH%;..\\Win64\\Debug"
+      },
+      "nativeDebugging": true
+    }
+  }
+}

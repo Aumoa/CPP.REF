@@ -42,7 +42,7 @@ public class AylaProjectCompiler
 
         await GenerateReflectionCodesAsync(Resolver, InCancellationToken);
 
-        int ReturnCode = await CompileShadersAsync(Resolver, InCancellationToken);
+        int ReturnCode = await CompileShadersAsync(ToolChain, Rule.Target.BuildConfiguration.Platform.Architecture, Resolver, InCancellationToken);
         if (ReturnCode != 0)
         {
             return ReturnCode;
@@ -96,8 +96,15 @@ public class AylaProjectCompiler
 
     public static async Task<AylaProjectCompiler> CreateCompilerAsync(Workspace InWorkspace, string InTargetName, TargetInfo InTargetInfo, CancellationToken SToken = default)
     {
-        ATarget Target = InWorkspace.SearchTargetByName(InTargetName)
-            ?? throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.TargetNotFoundException(InTargetName));
+        ATarget? Target = InWorkspace.SearchTargetByName(InTargetName);
+        if (Target == null && InTargetName.EndsWith("Editor"))
+        {
+            Target = InWorkspace.SearchTargetByName(InTargetName.Replace("Editor", string.Empty));
+        }
+        if (Target == null)
+        {
+            throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.TargetNotFoundException(InTargetName));
+        }
         await Target.ConfigureAsync(SToken);
 
         TargetRules Rule = Target.GenerateTargetRule(InTargetInfo);
@@ -276,7 +283,7 @@ public class AylaProjectCompiler
         Console.WriteLine("Reflection code generated in {0} seconds.", ScopedTimer.GetElapsed("Parsing Headers"));
     }
 
-    private async Task<int> CompileShadersAsync(ModuleDependenciesResolver Resolver, CancellationToken InCancellationToken)
+    private async Task<int> CompileShadersAsync(ToolChainInstallation ToolChain, Architecture TargetArchitecture, ModuleDependenciesResolver Resolver, CancellationToken InCancellationToken)
     {
         if (Resolver.HasDependModule("RHI") == false)
         {
@@ -306,7 +313,7 @@ public class AylaProjectCompiler
                 throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform);
             }
 
-            PSI.WorkingDirectory = Path.GetDirectoryName(PSI.FileName);
+            PSI.WorkingDirectory = ToolChain.GetShaderCompilerDirectory(TargetArchitecture);
             PSI.Arguments = $"-Input \"{ShaderSourceDirectory}\" -Output \"{ShaderOutputDirectory}\"";
             Console.WriteLine("Running ShaderCompileWorker \"{0}\"", Workspace.CurrentTarget.Name);
             P = Process.Start(PSI);

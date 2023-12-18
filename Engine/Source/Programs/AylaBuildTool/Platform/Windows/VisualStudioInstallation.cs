@@ -241,6 +241,12 @@ public class VisualStudioInstallation : ToolChainInstallation
         return ".obj";
     }
 
+    public override string GetShaderCompilerDirectory(Architecture TargetArchitecture)
+    {
+        var WindowsSet = CacheWindowsKitVersion(TargetArchitecture);
+        return WindowsSet.CompilerPath;
+    }
+
     private Version SelectVersion(IEnumerable<string> Versions, Func<Version, bool> Predicate)
     {
         return Versions.Select(Version.Parse).Where(Predicate).OrderByDescending(p => p).First();

@@ -26,4 +26,6 @@ public abstract class ToolChainInstallation
     public abstract Linker SpawnLinker();
 
     public abstract string GetOutputExtension();
+
+    public abstract string GetShaderCompilerDirectory(Architecture TargetArchitecture);
 }

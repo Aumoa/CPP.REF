@@ -9,6 +9,7 @@ class AylaHeaderToolApp
 {
 	String SourcePath;
 	String IncludesPath;
+	String CSharpPath;
 	String PackageName;
 
 	std::vector<std::unique_ptr<SourceFile>> Sources;

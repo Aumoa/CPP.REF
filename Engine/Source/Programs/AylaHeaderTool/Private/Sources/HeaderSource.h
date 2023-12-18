@@ -37,7 +37,7 @@ public:
 	virtual Task<bool> TryParseAsync(std::stop_token InCancellationToken) override;
 	virtual std::vector<String> GetErrors() const override;
 	virtual Task<bool> CompileAsync(std::stop_token InCancellationToken) override;
-	virtual Task<> GenerateAsync(String WriteTo, std::stop_token InCancellationToken = {}) override;
+	virtual Task<> GenerateAsync(String IncludePath, String CSharpPath, std::stop_token InCancellationToken = {}) override;
 
 private:
 	bool CompileInACLASS(CompiledACLASS& Body, size_t& Index, std::vector<AylaCxxSyntaxNode*>& Nodes);

@@ -46,6 +46,7 @@ public class ModuleDependenciesResolver
             var ModuleRule = CurrentSearchedModule.Rule;
             var ProjectDir = CurrentSearchedModule.ProjectDir;
             string IncludePath = Path.Combine(ProjectDir.Intermediate.Includes, ModuleRule.Name);
+            string CSharpPath = Path.Combine(ProjectDir.Intermediate.CSharp, ModuleRule.Name);
 
             string AsFullPath(string CurrentPath)
             {
@@ -90,6 +91,7 @@ public class ModuleDependenciesResolver
                 SourceFiles = SourceFiles.ToArray(),
                 SourcePath = SourcePath,
                 GeneratedIncludePath = IncludePath,
+                CSharpPath = CSharpPath,
                 GeneratedShaderPath = ProjectDir.Intermediate.Shaders,
                 DependModules = ApiDescriptions.Distinct().ToArray(),
                 PublicIncludePaths = PublicIncludePaths,
@@ -160,7 +162,7 @@ public class ModuleDependenciesResolver
             foreach (var Cache in HeaderToolPaths)
             {
                 PSI.Arguments = $"""
-                -Source "{Cache.SourcePath}" -Includes "{Cache.GeneratedIncludePath}" -PackageName "{Cache.Name}"
+                -Source "{Cache.SourcePath}" -Includes "{Cache.GeneratedIncludePath}" -PackageName "{Cache.Name}" -CSharp "{Cache.CSharpPath}"
                 """;
 
                 if (Directory.Exists(Cache.GeneratedIncludePath) == false)
