@@ -17,6 +17,8 @@ public record ModuleInformation
 
     public required string SourcePath { get; init; }
 
+    public string ScriptPath => Path.Combine(SourcePath, "Scripts");
+
     public required string GeneratedIncludePath { get; init; }
 
     public required string CSharpPath { get; init; }

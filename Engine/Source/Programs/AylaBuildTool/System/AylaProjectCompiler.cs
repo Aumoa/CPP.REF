@@ -1,7 +1,9 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Data;
 using System.Diagnostics;
 
+using AE.AppHelper;
 using AE.BuildSettings;
 using AE.Diagnostics;
 using AE.Exceptions;
@@ -81,6 +83,28 @@ public class AylaProjectCompiler
             }
 
             ReturnCode = await DispatchCompileWorkers(ToolChain, Context, Rule, InCancellationToken);
+            if (ReturnCode != 0)
+            {
+                return ReturnCode;
+            }
+
+            List<Task<int>> ScriptCompiles = new();
+            string DotNETPath = ToolChain.DotNET;
+            foreach (var (ModuleInfo, _) in Makefiles)
+            {
+                string ScriptPath = Path.Combine(ModuleInfo.ScriptPath, ModuleInfo.Name + ".CSharp.csproj");
+                if (File.Exists(ScriptPath))
+                {
+                    var Config = Rule.Target.BuildConfiguration.Configuration.IsDebug() ? "Debug" : "Release";
+                    var PSI = new ProcessStartInfo();
+                    PSI.FileName = DotNETPath;
+                    PSI.Arguments = $"build -c {Config} -v minimal \"{ScriptPath}\"";
+                    ScriptCompiles.Add(App.Run(PSI, true, InCancellationToken).ContinueWith(p => p.Result.ExitCode));
+                }
+            }
+
+            var ScriptCompileResults = await Task.WhenAll(ScriptCompiles);
+            ReturnCode = ScriptCompileResults.FirstOrDefault(p => p != 0);
             return ReturnCode;
         }
         finally

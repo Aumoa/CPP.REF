@@ -208,8 +208,7 @@ public class VisualStudioInstallation : ToolChainInstallation
     {
         CompilerAndLibraryPath VSSet = CacheVisualStudioPath(TargetArchitecture);
         CompilerAndLibraryPath WindowsSet = CacheWindowsKitVersion(TargetArchitecture);
-
-        return new[] { VSSet.CompilerPath, WindowsSet.CompilerPath };
+        return new[] { VSSet.CompilerPath, WindowsSet.CompilerPath, "C:\\Program Files\\dotnet" };
     }
 
     public override string[] GetRequiredLibraryPaths(Architecture TargetArchitecture)
@@ -246,6 +245,8 @@ public class VisualStudioInstallation : ToolChainInstallation
         var WindowsSet = CacheWindowsKitVersion(TargetArchitecture);
         return WindowsSet.CompilerPath;
     }
+
+    public override string DotNET => $"C:\\Program Files\\dotnet\\dotnet.exe";
 
     private Version SelectVersion(IEnumerable<string> Versions, Func<Version, bool> Predicate)
     {

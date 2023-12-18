@@ -28,4 +28,6 @@ public abstract class ToolChainInstallation
     public abstract string GetOutputExtension();
 
     public abstract string GetShaderCompilerDirectory(Architecture TargetArchitecture);
+
+    public abstract string DotNET { get; }
 }

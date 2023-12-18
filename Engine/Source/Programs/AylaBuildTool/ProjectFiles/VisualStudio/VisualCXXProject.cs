@@ -440,7 +440,7 @@ public class VisualCXXProject : IVisualStudioProject
                         }
                         else
                         {
-                            Executable = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.ToString(), "Launch");
+                            Executable = Path.Combine(Global.EngineDirectory.Binaries.CSharp, "Launch.CSharp");
                             if (ProjectDirectory.Root != Global.EngineDirectory.Root)
                             {
                                 LaunchDLL = Path.ChangeExtension(ProjectDirectory.Name, ".dll");

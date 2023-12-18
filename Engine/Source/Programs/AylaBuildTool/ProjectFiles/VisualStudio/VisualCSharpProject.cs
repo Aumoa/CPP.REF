@@ -101,6 +101,7 @@ public class VisualCSharpProject : IVisualStudioProject
     <PlatformTarget>x64</PlatformTarget>
     <IsPublishable>False</IsPublishable>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <OutputType>{3}</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -135,7 +136,8 @@ public class VisualCSharpProject : IVisualStudioProject
         string InteropOutDir = bInterop ? Module.ProjectDirectory.Binaries.Interop : Module.ProjectDirectory.Binaries.CSharp;
         string ModuleName = Module.ModuleName;
         string ProjectReferencesStr = string.Join(Environment.NewLine, ProjectReferences);
+        string ExecutablePolicy = !bInterop && ModuleName.Contains("Launch") ? "WinExe" : "Library";
 
-        return File.WriteAllTextAsync(ProjectFile, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr), SToken);
+        return File.WriteAllTextAsync(ProjectFile, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr, ExecutablePolicy), SToken);
     }
 }

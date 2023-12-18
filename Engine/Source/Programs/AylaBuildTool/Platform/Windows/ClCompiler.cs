@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
 
+using AE.AppHelper;
 using AE.BuildSettings;
 using AE.Exceptions;
 using AE.Rules;
@@ -188,62 +189,20 @@ public class ClCompiler : Compiler
         PSI.Arguments += $"\"{Item.FilePath}\"";
 
         DateTime StartTime = DateTime.Now;
-        Process? P = Process.Start(PSI);
-        if (P == null)
-        {
-            throw new InvalidOperationException("Internal error.");
-        }
-
-        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.FilePath, P, SToken);
+        var P = await App.Run(PSI, false);
         if (P.ExitCode != 0)
         {
             string Report = string.Empty;
             if (P.ExitCode != 0)
             {
-                Report += Stdout;
+                Report += P.Stdout;
             }
             throw new TerminateException(KnownErrorCode.CompileError, Report);
         }
 
         await GenerateSourceCodeCache(Item, Rule, OutputPath, DependenciesJson);
         var Elapsed = DateTime.Now - StartTime;
-        return $"{Stdout.Trim()} ({Elapsed.TotalSeconds:0.00}s)";
-    }
-
-    private static async Task<(string, string)> GetProcessOutputsAsync(string DebugString, Process P, CancellationToken SToken = default)
-    {
-        _ = DebugString;
-
-        async Task<string> AsyncReader(StreamReader Reader, CancellationToken SToken)
-        {
-            List<string> Lines = new();
-
-            while (SToken.IsCancellationRequested == false)
-            {
-                // Do NOT pass CancellationToken to ReadLineAsync function.
-                string? Line = await Reader.ReadLineAsync();
-                if (Line != null)
-                {
-                    Lines.Add(Line);
-                }
-            }
-            
-            string? Last = await Reader.ReadToEndAsync();
-            if (Last != null)
-            {
-                Lines.Add(Last);
-            }
-            return string.Join('\n', Lines);
-        }
-
-        var CTS = new CancellationTokenSource();
-        Task<string> StdoutReader = AsyncReader(P.StandardOutput, CTS.Token);
-        Task<string> StderrReader = AsyncReader(P.StandardError, CTS.Token);
-
-        await P.WaitForExitAsync(SToken);
-        CTS.Cancel();
-        await Task.WhenAll(StdoutReader, StderrReader);
-        return (StdoutReader.Result, StderrReader.Result);
+        return $"{P.Stdout.Trim()} ({Elapsed.TotalSeconds:0.00}s)";
     }
 
     private async Task GenerateSourceCodeCache(MakefileCompile Item, TargetRules Rule, string ObjectOutput, string Deps)

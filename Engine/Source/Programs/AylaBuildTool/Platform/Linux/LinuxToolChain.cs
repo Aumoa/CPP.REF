@@ -93,4 +93,6 @@ public class LinuxToolChain : ToolChainInstallation
     {
         return BaseDirectory;
     }
+
+    public override string DotNET => $"/usr/bin/dotnet";
 }
