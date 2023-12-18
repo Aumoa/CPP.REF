@@ -1,5 +1,6 @@
 # C# project intermediate file
 **/obj/
+**/Scripts/*.csproj
 
 Intermediate
 Binaries
