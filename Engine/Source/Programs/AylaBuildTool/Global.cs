@@ -80,6 +80,11 @@ public static class Global
             || IsNatvisFile(Name);
     }
 
+    public static bool IsEngineDirectory(this ProjectDirectory ProjectDir)
+    {
+        return ProjectDir.Root == Global.EngineDirectory.Root;
+    }
+
     public static void SearchCXXModulesRecursive(Workspace InWorkspace, TargetRules Rule, Dictionary<string, SearchedModule> SearchedModules, string FromModule, string CurrentModule)
     {
         if (SearchedModules.TryGetValue(CurrentModule, out var ModuleRule) == false)

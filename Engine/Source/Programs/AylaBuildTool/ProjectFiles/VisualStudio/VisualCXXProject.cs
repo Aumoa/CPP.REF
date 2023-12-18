@@ -258,6 +258,14 @@ public class VisualCXXProject : IVisualStudioProject
                     return;
                 }
 
+                foreach (var FileName in Directory.GetFiles(CurrentDirectory, "*.*", SearchOption.TopDirectoryOnly))
+                {
+                    if (FileName.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+                }
+
                 string[] ModuleFile = Directory.GetFiles(CurrentDirectory, "*.Module.cs", SearchOption.TopDirectoryOnly);
                 if (ModuleFile.Any())
                 {

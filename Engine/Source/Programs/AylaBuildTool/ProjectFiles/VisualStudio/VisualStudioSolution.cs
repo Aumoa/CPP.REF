@@ -38,14 +38,20 @@ public class VisualStudioSolution : ISolution
         List<IVisualStudioProject> VSProjects = new();
         foreach (var CSModule in Workspace.GetCSModules())
         {
-            VSProjects.Add(new VisualCSharpProject(CSModule));
+            VSProjects.Add(new VisualCSharpProject(CSModule, false, false));
+        }
+
+        foreach (var CSModule in Workspace.GetScriptModules())
+        {
+            VSProjects.Add(new VisualCSharpProject(CSModule, true, false));
+            VSProjects.Add(new VisualCSharpProject(CSModule, true, true));
         }
 
         VisualCXXProject? EngineCXXProject = null;
         VisualCXXProject? GameCXXProject = null;
         foreach (var CXXModule in Workspace.GetCXXModules())
         {
-            if (CXXModule.IsInProgramsDirectory())
+            if (CXXModule.IsInProgramsDirectory)
             {
                 VSProjects.Add(new VisualCXXProject(Workspace, CXXModule.ProjectDirectory, CXXModule.ModuleName, CXXModule.SourcePath, "Programs"));
             }
@@ -94,12 +100,20 @@ public class VisualStudioSolution : ISolution
         Builder.AppendLine("MinimumVisualStudioVersion = 10.0.40219.1");
 
         Dictionary<string, string> Filters = new();
+        Dictionary<string, string> FilterDepends = new();
         void AddFilter(string FilterPath)
         {
-            string Guid = CRC32.GenerateGuid(FilterPath).ToString().ToUpper();
-            Filters.Add(FilterPath, Guid);
-            Builder.AppendLine($"Project(\"{{{FilterGUID}}}\") = \"{FilterPath}\", \"{FilterPath}\", \"{{{Guid}}}\"");
+            bool bHasParent = VisualStudioProjectExtensions.TryGetFilterPaths(FilterPath, out string Name, out string ParentPath);
+
+            string Guid = CRC32.GenerateGuid(Name).ToString().ToUpper();
+            Filters.Add(Name, Guid);
+            Builder.AppendLine($"Project(\"{{{FilterGUID}}}\") = \"{Name}\", \"{Name}\", \"{{{Guid}}}\"");
             Builder.AppendLine("EndProject");
+
+            if (bHasParent)
+            {
+                FilterDepends.Add(Name, ParentPath);
+            }
         }
 
         foreach (var FilterPath in VSProjects.Select(p => p.FilterPath).Distinct())
@@ -152,10 +166,17 @@ public class VisualStudioSolution : ISolution
             Builder.AppendLine("\tGlobalSection(NestedProjects) = preSolution");
             foreach (var Project in VSProjects)
             {
-                if (Filters.TryGetValue(Project.FilterPath, out string? FilterGuid))
+                Project.TryGetFilterPaths(out string FilterName, out _);
+                if (Filters.TryGetValue(FilterName, out string? FilterGuid))
                 {
                     Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}} = {{{FilterGuid}}}");
                 }
+            }
+            foreach (var (Name, Parent) in FilterDepends)
+            {
+                string MyGuid = Filters[Name];
+                string ParentGuid = Filters[Parent];
+                Builder.AppendLine($"\t\t{{{MyGuid}}} = {{{ParentGuid}}}");
             }
             Builder.AppendLine("\tEndGlobalSection");
 

@@ -162,7 +162,7 @@ public class ModuleDependenciesResolver
             foreach (var Cache in HeaderToolPaths)
             {
                 PSI.Arguments = $"""
-                -Source "{Cache.SourcePath}" -Includes "{Cache.GeneratedIncludePath}" -PackageName "{Cache.Name}" -CSharp "{Cache.CSharpPath}"
+                -Source "{Cache.SourcePath}" -Includes "{Cache.GeneratedIncludePath}" -PackageName "{Cache.Name}" -CSharp "{Cache.CSharpPath}.Interop"
                 """;
 
                 if (Directory.Exists(Cache.GeneratedIncludePath) == false)

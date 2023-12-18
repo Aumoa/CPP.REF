@@ -31,8 +31,5 @@ public class ACSModule : IAModule
         return RuleName;
     }
 
-    public bool IsInProgramsDirectory()
-    {
-        return SourcePath.StartsWith(ProjectDirectory.Source.Programs);
-    }
+    public bool IsInProgramsDirectory => SourcePath.StartsWith(ProjectDirectory.Source.Programs);
 }

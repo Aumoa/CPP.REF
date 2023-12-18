@@ -42,10 +42,7 @@ public class ACXXModule : IAModule
         return RuleName;
     }
 
-    public bool IsInProgramsDirectory()
-    {
-        return SourcePath.StartsWith(ProjectDirectory.Source.Programs);
-    }
+    public bool IsInProgramsDirectory => SourcePath.StartsWith(ProjectDirectory.Source.Programs);
 
     public async Task ConfigureAsync(CancellationToken SToken = default)
     {

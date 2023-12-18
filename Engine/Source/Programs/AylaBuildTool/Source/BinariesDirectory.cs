@@ -16,6 +16,7 @@ public readonly struct BinariesDirectory
             Linux = Path.Combine(_Root, "Linux");
             DotNET = Path.Combine(_Root, "DotNET");
             Interop = Path.Combine(_Root, "Interop");
+            CSharp = Path.Combine(_Root, "CSharp");
         }
     }
 
@@ -26,6 +27,8 @@ public readonly struct BinariesDirectory
     public string DotNET { get; private init; }
 
     public string Interop { get; private init; }
+
+    public string CSharp { get; private init; }
 
     public void GenerateDirectoriesRecursive()
     {

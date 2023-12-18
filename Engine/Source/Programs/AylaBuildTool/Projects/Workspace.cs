@@ -9,6 +9,7 @@ public class Workspace
     private readonly Dictionary<string, ATarget> Targets = new();
     private readonly Dictionary<string, ACXXModule> CXXModules = new();
     private readonly List<ACSModule> CSModules = new();
+    private readonly List<AScriptModule> ScriptModules = new();
 
     public Workspace()
     {
@@ -32,6 +33,12 @@ public class Workspace
     {
         foreach (var ModulePath in Directory.GetFiles(InSubdirectory, "*", SearchOption.TopDirectoryOnly))
         {
+            if (InSubdirectory.EndsWith("Scripts"))
+            {
+                ScriptModules.Add(new AScriptModule(Target, InSubdirectory));
+                return;
+            }
+
             if (ModulePath.EndsWith("csproj", StringComparison.OrdinalIgnoreCase))
             {
                 CSModules.Add(new ACSModule(Target, InSubdirectory));
@@ -60,6 +67,8 @@ public class Workspace
     }
 
     public IEnumerable<ACSModule> GetCSModules() => CSModules;
+
+    public IEnumerable<AScriptModule> GetScriptModules() => ScriptModules;
 
     public IEnumerable<ACXXModule> GetCXXModules() => CXXModules.Values;
 

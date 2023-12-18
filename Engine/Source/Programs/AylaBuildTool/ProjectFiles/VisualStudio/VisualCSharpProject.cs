@@ -5,12 +5,13 @@ using System.Diagnostics.CodeAnalysis;
 using AE.BuildSettings;
 using AE.Misc;
 using AE.Projects;
+using AE.Source;
 
 namespace AE.ProjectFiles.VisualStudio;
 
 public class VisualCSharpProject : IVisualStudioProject
 {
-    public required ACSModule Module { get; init; }
+    public required IAModule Module { get; init; }
 
     public string TargetName => Module.ModuleName;
 
@@ -20,20 +21,25 @@ public class VisualCSharpProject : IVisualStudioProject
 
     public required string FilterPath { get; init; }
 
+    private readonly bool bGenerateProject;
+    private readonly bool bInterop;
+
     [SetsRequiredMembers]
-    public VisualCSharpProject(ACSModule Module)
+    public VisualCSharpProject(IAModule Module, bool bGenerateProject, bool bInterop)
     {
         this.Module = Module;
-        ProjectGuid = CRC32.GenerateGuid(Module.SourcePath).ToString().ToUpper();
-        ProjectFile = Path.Combine(Module.SourcePath, Module.ModuleName.Replace(".CSharp", string.Empty) + ".csproj");
+        this.bGenerateProject = bGenerateProject;
+        this.bInterop = bInterop;
 
-        if (Module.IsInProgramsDirectory())
+        ProjectGuid = CRC32.GenerateGuid(Module.SourcePath + $"_{bGenerateProject}_{bInterop}").ToString().ToUpper();
+
+        if (Module.IsInProgramsDirectory)
         {
             FilterPath = "Programs";
         }
         else
         {
-            if (Module.ProjectDirectory.Root == Global.EngineDirectory.Root)
+            if (Module.ProjectDirectory.IsEngineDirectory())
             {
                 FilterPath = "Engine";
             }
@@ -41,6 +47,24 @@ public class VisualCSharpProject : IVisualStudioProject
             {
                 FilterPath = "Game";
             }
+        }
+
+        if (bGenerateProject)
+        {
+            if (bInterop)
+            {
+                FilterPath += "\\Interop";
+                ProjectFile = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.ModuleName + ".Interop", Module.ModuleName + ".Interop.csproj");
+            }
+            else
+            {
+                FilterPath += "\\Scripts";
+                ProjectFile = Path.Combine(Module.SourcePath, Module.ModuleName + ".CSharp.csproj");
+            }
+        }
+        else
+        {
+            ProjectFile = Path.Combine(Module.SourcePath, Module.ModuleName + ".csproj");
         }
     }
 
@@ -58,6 +82,60 @@ public class VisualCSharpProject : IVisualStudioProject
 
     public Task GenerateProjectFilesAsync(CancellationToken SToken = default)
     {
-        return Task.CompletedTask;
+        if (bGenerateProject == false)
+        {
+            return Task.CompletedTask;
+        }
+
+        const string Template = """
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AE.{1}</RootNamespace>
+    <OutputPath>{0}</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <IsPublishable>False</IsPublishable>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+{2}
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="AE.CoreAObject.Object">
+      <Alias>Object</Alias>
+    </Using>
+  </ItemGroup>
+
+</Project>
+""";
+
+        const string ProjectReference = """
+    <ProjectReference Include="{0}" />
+""";
+
+        List<string> ProjectReferences = new();
+        if (bInterop == false)
+        {
+            string InteropModule = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.ModuleName + ".Interop", Module.ModuleName + ".Interop.csproj");
+            ProjectReferences.Add(string.Format(ProjectReference, InteropModule));
+        }
+        else
+        {
+            string InteropModule = Path.Combine(Global.EngineDirectory.Source.Root, "Runtime", "CoreAObject.CSharp", "CoreAObject.CSharp.csproj");
+            ProjectReferences.Add(string.Format(ProjectReference, InteropModule));
+        }
+
+        string InteropOutDir = bInterop ? Module.ProjectDirectory.Binaries.Interop : Module.ProjectDirectory.Binaries.CSharp;
+        string ModuleName = Module.ModuleName;
+        string ProjectReferencesStr = string.Join(Environment.NewLine, ProjectReferences);
+
+        return File.WriteAllTextAsync(ProjectFile, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr), SToken);
     }
 }
