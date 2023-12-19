@@ -19,6 +19,7 @@ private:
 private:
 	String PackageName;
 	String FileId;
+	String SourceDirectory;
 
 	struct CompiledACLASS
 	{
@@ -31,7 +32,7 @@ private:
 	std::vector<CompiledACLASS> ACLASSes;
 
 public:
-	HeaderSource(String InPackageName, String InPath);
+	HeaderSource(String InPackageName, String InPath, String InSourcePath);
 	virtual ~HeaderSource() noexcept override;
 
 	virtual Task<bool> TryParseAsync(std::stop_token InCancellationToken) override;

@@ -88,7 +88,6 @@ public class AylaProjectCompiler
                 return ReturnCode;
             }
 
-            List<Task<int>> ScriptCompiles = new();
             string DotNETPath = ToolChain.DotNET;
             foreach (var (ModuleInfo, _) in Makefiles)
             {
@@ -99,13 +98,15 @@ public class AylaProjectCompiler
                     var PSI = new ProcessStartInfo();
                     PSI.FileName = DotNETPath;
                     PSI.Arguments = $"build -c {Config} -v minimal \"{ScriptPath}\"";
-                    ScriptCompiles.Add(App.Run(PSI, true, InCancellationToken).ContinueWith(p => p.Result.ExitCode));
+                    var Builder = await App.Run(PSI, true, InCancellationToken);
+                    if (Builder.ExitCode != 0)
+                    {
+                        return Builder.ExitCode;
+                    }
                 }
             }
 
-            var ScriptCompileResults = await Task.WhenAll(ScriptCompiles);
-            ReturnCode = ScriptCompileResults.FirstOrDefault(p => p != 0);
-            return ReturnCode;
+            return 0;
         }
         finally
         {

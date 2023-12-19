@@ -36,7 +36,7 @@ Task<int32> AylaHeaderToolApp::RunConsoleAsync(std::stop_token InCancellationTok
 		{
 			if (Path::GetExtension(Path) == TEXT(".h"))
 			{
-				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<HeaderSource>(PackageName, Path));
+				std::unique_ptr<SourceFile>& Source = Sources.emplace_back(std::make_unique<HeaderSource>(PackageName, Path, SourcePath));
 				Tasks.emplace_back(Source->TryParseAsync(InCancellationToken));
 			}
 		}

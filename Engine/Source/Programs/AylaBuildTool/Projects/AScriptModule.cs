@@ -2,21 +2,38 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+using AE.BuildSettings;
+using AE.ProjectFiles.VisualStudio;
+using AE.Rules;
 using AE.Source;
 
 namespace AE.Projects;
 
 public class AScriptModule : IAModule
 {
-    [SetsRequiredMembers]
-    public AScriptModule(ProjectDirectory ProjectDirectory, string CurrentDirectory)
-    {
-        var Components = CurrentDirectory.Split(Path.DirectorySeparatorChar);
-        var ModuleDirectory = Path.Combine(Components[..^1]);
+    public readonly string[] DependModules;
 
-        this.ModuleName = Path.GetFileNameWithoutExtension(ModuleDirectory);
+    [SetsRequiredMembers]
+    public AScriptModule(ProjectDirectory ProjectDirectory, string CurrentDirectory, ACXXModule NativeModule)
+    {
+        this.ModuleName = Path.GetFileNameWithoutExtension(CurrentDirectory);
         this.SourcePath = CurrentDirectory;
         this.ProjectDirectory = ProjectDirectory;
+
+        var SolutionPreviewTarget = new TargetInfo
+        {
+            BuildConfiguration = new()
+            {
+                Platform = TargetPlatform.Win64,
+                Configuration = Configuration.Development
+            }
+        };
+
+        var SolutionPreviewRule = new TargetRules(SolutionPreviewTarget);
+        SolutionPreviewRule.bEditor = true;
+        var ModuleRule = NativeModule.GenerateModuleRule(SolutionPreviewRule);
+
+        DependModules = ModuleRule.PublicDependencyModuleNames.Concat(ModuleRule.PrivateDependencyModuleNames).ToArray();
     }
 
     public required string ModuleName { get; init; }

@@ -16,5 +16,7 @@ public interface IVisualStudioProject
 
     (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform);
 
+    void ResolveDependencies(IEnumerable<IVisualStudioProject> VSProjects);
+
     Task GenerateProjectFilesAsync(CancellationToken SToken = default);
 }

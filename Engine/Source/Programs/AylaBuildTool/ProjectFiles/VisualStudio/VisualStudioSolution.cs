@@ -80,6 +80,7 @@ public class VisualStudioSolution : ISolution
         List<Task> Tasks = new();
         foreach (var VSProject in VSProjects)
         {
+            VSProject.ResolveDependencies(VSProjects);
             Tasks.Add(VSProject.GenerateProjectFilesAsync(SToken));
         }
 

@@ -6,9 +6,10 @@
 #include "CodeAnalysis/AylaCxx/AylaCxxSyntaxNode.h"
 #include "CodeGen.h"
 
-HeaderSource::HeaderSource(String InPackageName, String InPath)
+HeaderSource::HeaderSource(String InPackageName, String InPath, String InSourceDirectory)
 	: Super(InPath)
 	, PackageName(InPackageName)
+	, SourceDirectory(InSourceDirectory)
 {
 }
 
@@ -168,7 +169,7 @@ using System.Runtime.InteropServices;
 
 namespace AE.{0};
 
-public class {1} : Object
+public class {1} : {2}
 {{
     public {1}() : base(NativeCall_Construct())
     {{
@@ -186,8 +187,17 @@ public class {1} : Object
 }}
 )");
 
-		String CSharpFilename = Path::ChangeExtension(Path::Combine(CSharpPath, Body.ClassName), TEXT(".cs"));
-		Tasks.emplace_back(File::CompareAndWriteAllTextAsync(CSharpFilename, String::Format(CSharpStr, PackageName, ClassNameRemovePrefix), InCancellationToken));
+		String BaseDirectory = Path::GetRelativePath(SourceDirectory, GetSourcePath());
+		BaseDirectory = Path::GetDirectoryName(BaseDirectory);
+		BaseDirectory = Path::Combine(CSharpPath, BaseDirectory);
+
+		if (Directory::Exists(BaseDirectory) == false)
+		{
+			Directory::CreateDirectory(BaseDirectory);
+		}
+
+		String CSharpFilename = Path::ChangeExtension(Path::Combine(BaseDirectory, ClassNameRemovePrefix), TEXT(".cs"));
+		Tasks.emplace_back(File::CompareAndWriteAllTextAsync(CSharpFilename, String::Format(CSharpStr, PackageName, ClassNameRemovePrefix, Body.SuperName.SubstringView(1)), InCancellationToken));
 	}
 
 	String SourceCodePath = GetSourcePath();

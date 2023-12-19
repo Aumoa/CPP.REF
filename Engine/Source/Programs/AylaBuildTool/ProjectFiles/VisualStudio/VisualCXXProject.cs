@@ -144,7 +144,7 @@ public class VisualCXXProject : IVisualStudioProject
                 PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp} -Config {Configuration}";
                 PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp} -Config {Configuration}";
                 PropertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{BuildToolPath} Clean";
-                PropertyGroup.AddElement("NMakeOutput").InnerText = $"{Path.Combine(Global.EngineDirectory.Binaries.Interop, Configuration.IsDebug() ? "Debug" : "Release", "Launch.Windows.CSharp.exe")}";
+                PropertyGroup.AddElement("NMakeOutput").InnerText = $"{Path.Combine(Global.EngineDirectory.Binaries.Interop, Configuration.IsDebug() ? "Debug" : "Release", "Core.dll")}";
                 PropertyGroup.AddElement("OutDir").InnerText = Path.Combine(ProjectDirectory.Binaries.Win64, Configuration.ToString());
                 PropertyGroup.AddElement("IntDir").InnerText = ProjectDirectory.Intermediate.Unused;
 
@@ -447,7 +447,7 @@ public class VisualCXXProject : IVisualStudioProject
                             }
                         }
 
-                        Executable = Path.ChangeExtension(Executable, ".exe");
+                        Executable += ".exe";
                         PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
                         PropertyGroup.AddElement("LocalDebuggerCommandArguments").InnerText = LaunchDLL ?? "";
 
@@ -463,5 +463,9 @@ public class VisualCXXProject : IVisualStudioProject
         var VcxprojUser = Doc;
 
         return (Vcxproj, VcxprojFilters, VcxprojUser);
+    }
+
+    public void ResolveDependencies(IEnumerable<IVisualStudioProject> VSProjects)
+    {
     }
 }

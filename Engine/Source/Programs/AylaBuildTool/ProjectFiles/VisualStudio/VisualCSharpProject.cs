@@ -15,6 +15,8 @@ public class VisualCSharpProject : IVisualStudioProject
 
     public string TargetName => Module.ModuleName;
 
+    public string BaseNamespace => "AE." + Module.ModuleName;
+
     public required string ProjectGuid { get; init; }
 
     public required string ProjectFile { get; init; }
@@ -22,7 +24,10 @@ public class VisualCSharpProject : IVisualStudioProject
     public required string FilterPath { get; init; }
 
     private readonly bool bGenerateProject;
-    private readonly bool bInterop;
+
+    public bool bInterop { get; }
+
+    private readonly List<VisualCSharpProject> ReferencedProjects = new();
 
     [SetsRequiredMembers]
     public VisualCSharpProject(IAModule Module, bool bGenerateProject, bool bInterop)
@@ -59,7 +64,7 @@ public class VisualCSharpProject : IVisualStudioProject
             else
             {
                 FilterPath += "\\Scripts";
-                ProjectFile = Path.Combine(Module.SourcePath, Module.ModuleName + ".CSharp.csproj");
+                ProjectFile = Path.Combine(Module.SourcePath, "Scripts", Module.ModuleName + ".CSharp.csproj");
             }
         }
         else
@@ -77,6 +82,25 @@ public class VisualCSharpProject : IVisualStudioProject
         else
         {
             return ("Release", "Any CPU");
+        }
+    }
+
+    public void ResolveDependencies(IEnumerable<IVisualStudioProject> VSProjects)
+    {
+        if (Module is AScriptModule ScriptModule)
+        {
+            var Sources = VSProjects
+                .OfType<VisualCSharpProject>()
+                .Where(p => p.bInterop)
+                .ToDictionary(p => p.TargetName, p => p);
+
+            foreach (var DependModule in ScriptModule.DependModules)
+            {
+                if (Sources.TryGetValue(DependModule, out var DependProject))
+                {
+                    ReferencedProjects.Add(DependProject);
+                }
+            }
         }
     }
 
@@ -112,6 +136,7 @@ public class VisualCSharpProject : IVisualStudioProject
     <Using Include="AE.CoreAObject.Object">
       <Alias>Object</Alias>
     </Using>
+{4}
   </ItemGroup>
 
 </Project>
@@ -121,7 +146,12 @@ public class VisualCSharpProject : IVisualStudioProject
     <ProjectReference Include="{0}" />
 """;
 
+        const string NamespaceReference = """
+    <Using Include="AE.{0}" />
+""";
+
         List<string> ProjectReferences = new();
+        List<string> NamespaceReferences = new();
         if (bInterop == false)
         {
             string InteropModule = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.ModuleName + ".Interop", Module.ModuleName + ".Interop.csproj");
@@ -131,13 +161,20 @@ public class VisualCSharpProject : IVisualStudioProject
         {
             string InteropModule = Path.Combine(Global.EngineDirectory.Source.Root, "Runtime", "CoreAObject.CSharp", "CoreAObject.CSharp.csproj");
             ProjectReferences.Add(string.Format(ProjectReference, InteropModule));
+
+            foreach (var Referenced in ReferencedProjects)
+            {
+                ProjectReferences.Add(string.Format(ProjectReference, Referenced.ProjectFile));
+                NamespaceReferences.Add(string.Format(NamespaceReference, Referenced.TargetName));
+            }
         }
 
         string InteropOutDir = bInterop ? Module.ProjectDirectory.Binaries.Interop : Module.ProjectDirectory.Binaries.CSharp;
         string ModuleName = Module.ModuleName;
         string ProjectReferencesStr = string.Join(Environment.NewLine, ProjectReferences);
         string ExecutablePolicy = !bInterop && ModuleName.Contains("Launch") ? "WinExe" : "Library";
+        string NamespaceReferencesStr = string.Join(Environment.NewLine, NamespaceReferences);
 
-        return File.WriteAllTextAsync(ProjectFile, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr, ExecutablePolicy), SToken);
+        return File.WriteAllTextAsync(ProjectFile, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr, ExecutablePolicy, NamespaceReferencesStr), SToken);
     }
 }

@@ -35,7 +35,6 @@ public class Workspace
         {
             if (InSubdirectory.EndsWith("Scripts"))
             {
-                ScriptModules.Add(new AScriptModule(Target, InSubdirectory));
                 return;
             }
 
@@ -50,6 +49,12 @@ public class Workspace
                 var CXXModule = new ACXXModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
                 await CXXModule.ConfigureAsync(SToken);
                 CXXModules.Add(CXXModule.ModuleName, CXXModule);
+
+                var ScriptPath = Path.Combine(InSubdirectory, "Scripts");
+                if (Directory.Exists(ScriptPath))
+                {
+                    ScriptModules.Add(new AScriptModule(Target, InSubdirectory, CXXModule));
+                }
             }
 
             if (ModulePath.EndsWith("Target.cs", StringComparison.OrdinalIgnoreCase))
