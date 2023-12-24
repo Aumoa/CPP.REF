@@ -3,6 +3,7 @@
 using System.Text;
 
 using AE.BuildSettings;
+using AE.Extensions;
 using AE.Misc;
 using AE.Projects;
 
@@ -84,7 +85,7 @@ public class VisualStudioSolution : ISolution
             Tasks.Add(VSProject.GenerateProjectFilesAsync(SToken));
         }
 
-        Tasks.Add(Global.CompareAndWriteAsync(SolutionFile, GenerateSolution(VSProjects), SToken));
+        Tasks.Add(IOExtensions.CompareAndWriteAsync(SolutionFile, GenerateSolution(VSProjects), SToken));
         await Task.WhenAll(Tasks);
     }
 

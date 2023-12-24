@@ -3,8 +3,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-using AE.BuildSettings;
 using AE.Exceptions;
+using AE.Extensions;
 using AE.Rules;
 using AE.SourceTree;
 using AE.System;
@@ -81,7 +81,7 @@ public class ModuleDependenciesResolver
             int[] PrivateDisableWarnings = PublicDisableWarnings.Concat(ModuleRule.PrivateDisableWarnings).Distinct().ToArray();
 
             IEnumerable<string> SourceFiles = Directory.GetFiles(SourcePath, "*", SearchOption.AllDirectories);
-            SourceFiles = SourceFiles.Where(Global.IsSourceCode);
+            SourceFiles = SourceFiles.Where(SourceCodeExtensions.IsSourceCode);
 
             DependencyCaches[Current] = new ModuleInformation()
             {
@@ -202,7 +202,7 @@ public class ModuleDependenciesResolver
 
                 foreach (var SourceFile in Cache.SourceFiles)
                 {
-                    if (Global.IsSourceCode(SourceFile) == false)
+                    if (SourceCodeExtensions.IsSourceCode(SourceFile) == false)
                     {
                         continue;
                     }

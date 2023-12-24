@@ -134,7 +134,7 @@ public class AylaProjectCompiler
 
         TargetRules Rule = Target.GenerateTargetRule(InTargetInfo);
         Dictionary<string, SearchedModule> SearchedModules = new();
-        Global.SearchCXXModulesRecursive(InWorkspace, Rule, SearchedModules, Rule.Name, Rule.TargetModuleName);
+        InWorkspace.SearchCXXModulesRecursive(Rule, SearchedModules, Rule.Name, Rule.TargetModuleName);
         return new AylaProjectCompiler(SearchedModules)
         {
             Workspace = InWorkspace,

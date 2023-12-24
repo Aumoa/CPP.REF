@@ -1,10 +1,10 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 using AE.BuildSettings;
+using AE.Extensions;
 using AE.Misc;
 using AE.Platform;
 using AE.Platform.Windows;
@@ -64,7 +64,7 @@ public class VisualCXXProject : IVisualStudioProject
         XmlTextWriter XmlWriter = new(Writer);
         XmlWriter.Formatting = Formatting.Indented;
         Doc.WriteTo(XmlWriter);
-        await Global.CompareAndWriteAsync(Path.ChangeExtension(SaveToBase, SaveToExt), Writer.ToString(), SToken);
+        await IOExtensions.CompareAndWriteAsync(Path.ChangeExtension(SaveToBase, SaveToExt), Writer.ToString(), SToken);
     }
 
     public (XmlDocument, XmlDocument, XmlDocument) GenerateXmlDocument()
@@ -194,7 +194,7 @@ public class VisualCXXProject : IVisualStudioProject
                 }
 
                 string Extension = Path.GetExtension(Filename).ToLower();
-                if (Global.IsSourceCode(Extension))
+                if (SourceCodeExtensions.IsSourceCode(Extension))
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", Filename);
@@ -222,25 +222,25 @@ public class VisualCXXProject : IVisualStudioProject
 
                     return ClCompile;
                 }
-                else if (Global.IsHeaderFile(Extension))
+                else if (SourceCodeExtensions.IsHeaderFile(Extension))
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
                     ClInclude.SetAttribute("Include", Filename);
                     return null;
                 }
-                else if (Global.IsRuleFile(Extension))
+                else if (SourceCodeExtensions.IsRuleFile(Extension))
                 {
                     var None = ItemGroup.AddElement("None");
                     None.SetAttribute("Include", Filename);
                     return null;
                 }
-                else if (Global.IsNatvisFile(Extension))
+                else if (SourceCodeExtensions.IsNatvisFile(Extension))
                 {
                     var None = ItemGroup.AddElement("Natvis");
                     None.SetAttribute("Include", Filename);
                     return null;
                 }
-                else if (Global.IsShaderFile(Extension))
+                else if (SourceCodeExtensions.IsShaderFile(Extension))
                 {
                     var Shader = ItemGroup.AddElement("FxCompile");
                     Shader.SetAttribute("Include", Filename);
@@ -282,7 +282,7 @@ public class VisualCXXProject : IVisualStudioProject
                     {
                         bEditor = true
                     };
-                    Global.SearchCXXModulesRecursive(Workspace, TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
+                    Workspace.SearchCXXModulesRecursive(TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
 
                     var Resolver = new ModuleDependenciesResolver(TargetRule, SearchedModules, ToolChain);
                     Resolver.Resolve();
@@ -358,31 +358,31 @@ public class VisualCXXProject : IVisualStudioProject
 
                 string Extension = Path.GetExtension(Filename);
                 XmlElement? InnerElement = null;
-                if (Global.IsSourceCode(Extension))
+                if (SourceCodeExtensions.IsSourceCode(Extension))
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", Filename);
                     InnerElement = ClCompile;
                 }
-                else if (Global.IsHeaderFile(Extension))
+                else if (SourceCodeExtensions.IsHeaderFile(Extension))
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
                     ClInclude.SetAttribute("Include", Filename);
                     InnerElement = ClInclude;
                 }
-                else if (Global.IsRuleFile(Extension))
+                else if (SourceCodeExtensions.IsRuleFile(Extension))
                 {
                     var None = ItemGroup.AddElement("None");
                     None.SetAttribute("Include", Filename);
                     InnerElement = None;
                 }
-                else if (Global.IsNatvisFile(Extension))
+                else if (SourceCodeExtensions.IsNatvisFile(Extension))
                 {
                     var None = ItemGroup.AddElement("Natvis");
                     None.SetAttribute("Include", Filename);
                     InnerElement = None;
                 }
-                else if (Global.IsShaderFile(Extension))
+                else if (SourceCodeExtensions.IsShaderFile(Extension))
                 {
                     var Shader = ItemGroup.AddElement("FxCompile");
                     Shader.SetAttribute("Include", Filename);

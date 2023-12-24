@@ -3,9 +3,9 @@
 using System.Diagnostics.CodeAnalysis;
 
 using AE.BuildSettings;
+using AE.Extensions;
 using AE.Misc;
 using AE.Projects;
-using AE.Source;
 
 namespace AE.ProjectFiles.VisualStudio;
 

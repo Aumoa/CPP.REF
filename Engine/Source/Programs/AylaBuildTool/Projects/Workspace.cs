@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.Exceptions;
+using AE.Rules;
 using AE.Source;
 
 namespace AE.Projects;
@@ -87,5 +89,30 @@ public class Workspace
     {
         CXXModules.TryGetValue(InModuleName, out ACXXModule? SearchInstance);
         return SearchInstance;
+    }
+
+    public void SearchCXXModulesRecursive(TargetRules Rule, Dictionary<string, SearchedModule> SearchedModules, string FromModule, string CurrentModule)
+    {
+        if (SearchedModules.TryGetValue(CurrentModule, out var ModuleRule) == false)
+        {
+            ACXXModule? Module = SearchCXXModuleByName(CurrentModule);
+            if (Module == null)
+            {
+                throw new TerminateException(KnownErrorCode.ModuleNotFound, CoreStrings.Errors.DependencyModuleNotFound(FromModule, CurrentModule));
+            }
+
+            ModuleRule = new()
+            {
+                Rule = Module.GenerateModuleRule(Rule),
+                ProjectDir = Module.ProjectDirectory,
+                Location = Module.SourcePath
+            };
+            SearchedModules.Add(CurrentModule, ModuleRule);
+
+            foreach (var NextModule in ModuleRule.Rule.PublicDependencyModuleNames.Concat(ModuleRule.Rule.PrivateDependencyModuleNames))
+            {
+                SearchCXXModulesRecursive(Rule, SearchedModules, CurrentModule, NextModule);
+            }
+        }
     }
 }
