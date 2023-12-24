@@ -38,4 +38,43 @@ public class TargetRules
     public string TargetModuleName { get; set; }
 
     public bool bEditor { get; set; } = false;
+
+    public static IEnumerable<TargetRules> GetAllRulesForEditor()
+    {
+        foreach (var rules in GetAllRulesForEditor_Platforms(TargetPlatform.Win64))
+        {
+            yield return rules;
+        }
+
+        foreach (var rules in GetAllRulesForEditor_Platforms(TargetPlatform.Linux))
+        {
+            yield return rules;
+        }
+    }
+
+    public static IEnumerable<TargetRules> GetAllRulesForEditor_Platforms(TargetPlatform platformInfo)
+    {
+        var targetInfo = new TargetInfo()
+        {
+            BuildConfiguration = new()
+            {
+                Configuration = Configuration.Debug,
+                Platform = platformInfo
+            },
+        };
+
+        yield return new TargetRules(targetInfo) { bEditor = false };
+        yield return new TargetRules(targetInfo) { bEditor = true };
+
+        targetInfo.BuildConfiguration.Configuration = Configuration.DebugGame;
+        yield return new TargetRules(targetInfo) { bEditor = false };
+        yield return new TargetRules(targetInfo) { bEditor = true };
+
+        targetInfo.BuildConfiguration.Configuration = Configuration.Development;
+        yield return new TargetRules(targetInfo) { bEditor = false };
+        yield return new TargetRules(targetInfo) { bEditor = true };
+
+        targetInfo.BuildConfiguration.Configuration = Configuration.Shipping;
+        yield return new TargetRules(targetInfo) { bEditor = false };
+    }
 }
