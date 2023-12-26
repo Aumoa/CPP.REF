@@ -3,6 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 
 using AE.Projects;
+using AE.System;
 
 namespace AE.SourceTree;
 
@@ -19,12 +20,12 @@ public sealed class Makefile
 
     public required MakefileSourceCache[] Caches { get; init; }
 
-    public static async Task<Makefile> LoadMakefileCacheAsync(string InPath, CancellationToken SToken = default)
+    public static async Task<Makefile> LoadMakefileCacheAsync(ToolChainInstallation toolChain, string InPath, CancellationToken SToken = default)
     {
         string Filename = Path.Combine(InPath, "Makefile.abin");
         if (File.Exists(Filename) == false)
         {
-            return new(Filename);
+            return Empty(Filename);
         }
 
         using var Stream = new MemoryStream(await File.ReadAllBytesAsync(Filename, SToken));
@@ -34,7 +35,15 @@ public sealed class Makefile
             int MakefileVersion = Reader.ReadInt32();
             if (MakefileVersion != Global.MakefileVersion)
             {
-                return new(Filename);
+                Console.WriteLine("Makefile version is mismatched. {0} -> {1}", MakefileVersion, Global.MakefileVersion);
+                return Empty(Filename);
+            }
+
+            string toolChainSign = Reader.ReadString();
+            if (toolChainSign != toolChain.GetToolChainSignature())
+            {
+                Console.WriteLine("ToolChain signature is mismatched. {0} -> {1}", toolChainSign, toolChain.GetToolChainSignature());
+                return Empty(Filename);
             }
 
             int Count = Reader.ReadInt32();
@@ -52,7 +61,7 @@ public sealed class Makefile
         catch (Exception E)
         {
             Console.WriteLine("Makefile is not compatible with current version: {0}: {1}", E.GetType().Name, E.Message);
-            return new(Filename);
+            return Empty(Filename);
         }
     }
 
@@ -77,6 +86,8 @@ public sealed class Makefile
 
         await File.WriteAllBytesAsync(MakefilePath, Stream.ToArray(), SToken);
     }
+
+    public static Makefile Empty(string filename) => new Makefile(filename);
 
     public ModuleInformation ModuleInfo { get; set; } = null!;
 

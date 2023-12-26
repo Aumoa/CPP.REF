@@ -186,7 +186,7 @@ public class ModuleDependenciesResolver
         return 0;
     }
 
-    public async Task<Dictionary<ModuleInformation, Makefile>> GenerateMakefilesAsync(TargetRules Rule, CancellationToken SToken = default)
+    public async Task<Dictionary<ModuleInformation, Makefile>> GenerateMakefilesAsync(ToolChainInstallation toolChain, TargetRules Rule, CancellationToken SToken = default)
     {
         var Config = Rule.Target.BuildConfiguration;
         List<Task<(ModuleInformation, Makefile)>> Tasks = new();
@@ -194,7 +194,7 @@ public class ModuleDependenciesResolver
         foreach (var (Name, Cache) in DependencyCaches)
         {
             string MakefileDir = Path.Combine(Cache.ProjectDir.Intermediate.Build, Config.Platform.TargetName, Config.Configuration.ToString(), Name);
-            Tasks.Add(Makefile.LoadMakefileCacheAsync(MakefileDir).ContinueWith(p =>
+            Tasks.Add(Makefile.LoadMakefileCacheAsync(toolChain, MakefileDir).ContinueWith(p =>
             {
                 Makefile Makefile = p.Result;
                 var CacheDict = Makefile.Caches.ToDictionary(p => p.SourceCache.Path, p => p);

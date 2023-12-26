@@ -14,7 +14,7 @@ public static class Global
         EngineDirectory = new ProjectDirectory() { Root = Path.GetFullPath(Path.Combine(Location, "..", "..", "..")) };
     }
 
-    public static int MakefileVersion = 7;
+    public static int MakefileVersion = 8;
 
     public static ProjectDirectory EngineDirectory { get; }
 

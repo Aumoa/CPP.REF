@@ -54,7 +54,7 @@ public class AylaProjectCompiler
         Dictionary<ModuleInformation, Makefile> Makefiles;
         using (var Timer = new ScopedTimer("Generate Makefiles"))
         {
-            Makefiles = await Resolver.GenerateMakefilesAsync(Rule, InCancellationToken);
+            Makefiles = await Resolver.GenerateMakefilesAsync(ToolChain, Rule, InCancellationToken);
         }
         Console.WriteLine(" {0} seconds elapsed.", ScopedTimer.GetElapsed("Generate Makefiles"));
 
