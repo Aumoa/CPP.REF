@@ -94,8 +94,11 @@ public class VisualStudioInstallation : ToolChainInstallation
 
     private CompilerAndLibraryPath CacheVisualStudioPath(Architecture TargetArchitecture)
     {
+        Monitor.Enter(CompilerPaths);
         if (CompilerPaths.TryGetValue(TargetArchitecture, out CompilerAndLibraryPath PathSet) == false)
         {
+            Monitor.Exit(CompilerPaths);
+
             string ArchPath = TargetArchitecture switch
             {
                 Architecture.x64 => "x64",
@@ -131,7 +134,15 @@ public class VisualStudioInstallation : ToolChainInstallation
             PathSet.CompilerPath = CompilerPath;
             PathSet.LibraryPath = new[] { Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "lib", ArchPath) };
             PathSet.IncludePath = new[] { Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "include") };
-            CompilerPaths.Add(TargetArchitecture, PathSet);
+
+            lock (CompilerPaths)
+            {
+                CompilerPaths.TryAdd(TargetArchitecture, PathSet);
+            }
+        }
+        else
+        {
+            Monitor.Exit(CompilerPaths);
         }
 
         return PathSet;
@@ -141,8 +152,10 @@ public class VisualStudioInstallation : ToolChainInstallation
 
     private CompilerAndLibraryPath CacheWindowsKitVersion(Architecture InArchitecture)
     {
+        Monitor.Enter(CachedWindowsKitVersion);
         if (CachedWindowsKitVersion.TryGetValue(InArchitecture, out CompilerAndLibraryPath CachedVersion) == false)
         {
+            Monitor.Exit(CachedWindowsKitVersion);
             string ArchPath = InArchitecture switch
             {
                 Architecture.x64 => "x64",
@@ -199,7 +212,14 @@ public class VisualStudioInstallation : ToolChainInstallation
                 Path.Combine(BaseIncludeDirectory, CurrentVersion, "winrt")
             };
 
-            CachedWindowsKitVersion.Add(InArchitecture, CachedVersion);
+            lock (CachedWindowsKitVersion)
+            {
+                CachedWindowsKitVersion.TryAdd(InArchitecture, CachedVersion);
+            }
+        }
+        else
+        {
+            Monitor.Exit(CachedWindowsKitVersion);
         }
 
         return CachedVersion;
