@@ -19,11 +19,12 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
         Args.ApplyTo(GeneratorArgs);
     }
 
-    public async Task<int> RunAsync(CancellationToken SToken = default)
+    public async Task<int> RunAsync(CancellationToken cancellationToken = default)
     {
-        Workspace Workspace = await ConfigureWorkspaceAsync(SToken);
+        Workspace Workspace = await ConfigureWorkspaceAsync(cancellationToken);
         VisualStudioSolution Solution = new(Workspace, ProjectFile);
-        await Solution.GenerateProjectFilesAsync(SToken);
+        await Solution.ConfigureRulesAsync(cancellationToken);
+        await Solution.GenerateProjectFilesAsync(cancellationToken);
         return 0;
     }
 }

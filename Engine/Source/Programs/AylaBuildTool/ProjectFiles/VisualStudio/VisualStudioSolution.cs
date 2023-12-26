@@ -9,16 +9,13 @@ using AE.Projects;
 
 namespace AE.ProjectFiles.VisualStudio;
 
-public class VisualStudioSolution : ISolution
+public class VisualStudioSolution : Solution
 {
-    private readonly Workspace Workspace;
     private readonly string SolutionGuid;
     private readonly string SolutionFile;
 
-    public VisualStudioSolution(Workspace InWorkspace, string? ProjectFile)
+    public VisualStudioSolution(Workspace InWorkspace, string? ProjectFile) : base(InWorkspace)
     {
-        Workspace = InWorkspace;
-
         string SolutionName;
         if (ProjectFile == null)
         {
@@ -34,15 +31,15 @@ public class VisualStudioSolution : ISolution
         SolutionFile = Path.Combine(InWorkspace.CurrentTarget.Root, Path.ChangeExtension(SolutionName, ".sln"));
     }
 
-    public async Task GenerateProjectFilesAsync(CancellationToken SToken = default)
+    public async override Task GenerateProjectFilesAsync(CancellationToken SToken = default)
     {
         List<IVisualStudioProject> VSProjects = new();
-        foreach (var CSModule in Workspace.GetCSModules())
+        foreach (var CSModule in workspace.GetCSModules())
         {
             VSProjects.Add(new VisualCSharpProject(CSModule, false, false));
         }
 
-        foreach (var CSModule in Workspace.GetScriptModules())
+        foreach (var CSModule in workspace.GetScriptModules())
         {
             VSProjects.Add(new VisualCSharpProject(CSModule, true, false));
             VSProjects.Add(new VisualCSharpProject(CSModule, true, true));
@@ -50,11 +47,11 @@ public class VisualStudioSolution : ISolution
 
         VisualCXXProject? EngineCXXProject = null;
         VisualCXXProject? GameCXXProject = null;
-        foreach (var CXXModule in Workspace.GetCXXModules())
+        foreach (var CXXModule in workspace.GetCXXModules())
         {
             if (CXXModule.IsInProgramsDirectory)
             {
-                VSProjects.Add(new VisualCXXProject(Workspace, CXXModule.ProjectDirectory, CXXModule.ModuleName, CXXModule.SourcePath, "Programs"));
+                VSProjects.Add(new VisualCXXProject(workspace, CXXModule.ProjectDirectory, CXXModule.ModuleName, CXXModule.SourcePath, "Programs"));
             }
             else
             {
@@ -63,7 +60,7 @@ public class VisualStudioSolution : ISolution
                 {
                     if (EngineCXXProject == null)
                     {
-                        EngineCXXProject = new VisualCXXProject(Workspace, CXXModule.ProjectDirectory, "AE", SourceDirectory, "Engine");
+                        EngineCXXProject = new VisualCXXProject(workspace, CXXModule.ProjectDirectory, "AE", SourceDirectory, "Engine");
                         VSProjects.Add(EngineCXXProject);
                     }
                 }
@@ -71,7 +68,7 @@ public class VisualStudioSolution : ISolution
                 {
                     if (GameCXXProject == null)
                     {
-                        GameCXXProject = new VisualCXXProject(Workspace, CXXModule.ProjectDirectory, CXXModule.ProjectDirectory.Name, SourceDirectory, "Game");
+                        GameCXXProject = new VisualCXXProject(workspace, CXXModule.ProjectDirectory, CXXModule.ProjectDirectory.Name, SourceDirectory, "Game");
                         VSProjects.Add(GameCXXProject);
                     }
                 }

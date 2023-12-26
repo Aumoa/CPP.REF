@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using System.Diagnostics.Contracts;
+
 using AE.Exceptions;
 using AE.Rules;
 using AE.Source;

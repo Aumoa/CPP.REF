@@ -39,6 +39,19 @@ public class TargetPlatform
         Architecture = Architecture.x64
     };
 
+    public static TargetPlatform Current
+    {
+        get
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                return Win64;
+            }
+
+            throw new NotSupportedException("Not supported platform detected. Please contact to developer.");
+        }
+    }
+
     public static TargetPlatform FromTargetName(string InTargetName)
     {
         return Platforms[InTargetName];
