@@ -5,11 +5,10 @@ using System.Diagnostics;
 
 using AE.AppHelper;
 using AE.BuildSettings;
+using AE.CompilerServices;
 using AE.Diagnostics;
 using AE.Exceptions;
 using AE.Platform;
-using AE.Platform.Linux;
-using AE.Platform.Windows;
 using AE.Projects;
 using AE.Rules;
 using AE.SourceTree;
@@ -26,35 +25,28 @@ public class AylaProjectCompiler
 
     public required TargetRules Rule { get; init; }
 
-    private readonly Dictionary<string, SearchedModule> SearchedModules;
-
-    private AylaProjectCompiler(Dictionary<string, SearchedModule> InSearchedModules)
+    private AylaProjectCompiler()
     {
-        SearchedModules = InSearchedModules;
     }
 
-    public async Task<int> CompileAsync(CancellationToken InCancellationToken = default)
+    public async Task<int> CompileAsync(CancellationToken cancellationToken = default)
     {
-        // Spawn ToolChain.
-        ToolChainInstallation ToolChain = SpawnPlatformToolChain();
-
         // Resolve dependencies.
-        var Resolver = new ModuleDependenciesResolver(Rule, SearchedModules, ToolChain);
-        Resolver.Resolve();
+        ModuleDependencyCache.Clear();
+        ModuleDependencyCache.BuildCache(Rule.TargetModuleName);
 
-        await GenerateReflectionCodesAsync(Resolver, InCancellationToken);
+        await GenerateReflectionCodesAsync(cancellationToken);
 
-        int ReturnCode = await CompileShadersAsync(ToolChain, Rule.Target.BuildConfiguration.Platform.Architecture, Resolver, InCancellationToken);
+        int ReturnCode = await CompileShadersAsync(Rule.Target.BuildConfiguration.Platform.Architecture, cancellationToken);
         if (ReturnCode != 0)
         {
             return ReturnCode;
         }
 
         Console.Write("Generate makefiles for {0}...", Target.TargetName);
-        Dictionary<ModuleInformation, Makefile> Makefiles;
         using (var Timer = new ScopedTimer("Generate Makefiles"))
         {
-            Makefiles = await Resolver.GenerateMakefilesAsync(ToolChain, Rule, InCancellationToken);
+            await MakeFileGen.GenerateMakefilesAsync(cancellationToken);
         }
         Console.WriteLine(" {0} seconds elapsed.", ScopedTimer.GetElapsed("Generate Makefiles"));
 
@@ -65,7 +57,7 @@ public class AylaProjectCompiler
                 CompileNodes = new()
             };
             
-            foreach (var (ModuleInfo, Makefile) in Makefiles)
+            foreach (var Makefile in MakeFileGen.Makefiles)
             {
                 Context.CompileNodes.Add(Makefile, new());
                 foreach (var Item in Makefile.CompileItems)
@@ -82,14 +74,14 @@ public class AylaProjectCompiler
                 }
             }
 
-            ReturnCode = await DispatchCompileWorkers(ToolChain, Context, Rule, InCancellationToken);
+            ReturnCode = await DispatchCompileWorkers(Context, Rule, cancellationToken);
             if (ReturnCode != 0)
             {
                 return ReturnCode;
             }
 
             string DotNETPath = ToolChain.DotNET;
-            foreach (var (ModuleInfo, _) in Makefiles)
+            foreach (var ModuleInfo in MakeFileGen.Modules)
             {
                 string ScriptPath = Path.Combine(ModuleInfo.ScriptPath, ModuleInfo.Name + ".CSharp.csproj");
                 if (File.Exists(ScriptPath))
@@ -98,7 +90,7 @@ public class AylaProjectCompiler
                     var PSI = new ProcessStartInfo();
                     PSI.FileName = DotNETPath;
                     PSI.Arguments = $"build -c {Config} -v minimal \"{ScriptPath}\"";
-                    var Builder = await App.Run(PSI, true, InCancellationToken);
+                    var Builder = await App.Run(PSI, true, cancellationToken);
                     if (Builder.ExitCode != 0)
                     {
                         return Builder.ExitCode;
@@ -111,7 +103,7 @@ public class AylaProjectCompiler
         finally
         {
             List<Task> Tasks = new();
-            foreach (var (_, Makefile) in Makefiles)
+            foreach (var Makefile in MakeFileGen.Makefiles)
             {
                 Tasks.Add(Makefile.SaveMakefileCacheAsync());
             }
@@ -133,9 +125,8 @@ public class AylaProjectCompiler
         await Target.ConfigureAsync(SToken);
 
         TargetRules Rule = Target.GenerateTargetRule(InTargetInfo);
-        Dictionary<string, SearchedModule> SearchedModules = new();
-        InWorkspace.SearchCXXModulesRecursive(Rule, SearchedModules, Rule.Name, Rule.TargetModuleName);
-        return new AylaProjectCompiler(SearchedModules)
+        InWorkspace.SearchCXXModulesRecursive(Rule, Rule.Name, Rule.TargetModuleName);
+        return new AylaProjectCompiler
         {
             Workspace = InWorkspace,
             Target = Target,
@@ -160,10 +151,10 @@ public class AylaProjectCompiler
         public TaskCompletionSource<bool> LinkCompleted { get; } = new();
     }
 
-    private async Task<int> DispatchCompileWorkers(ToolChainInstallation ToolChain, MakefileContext Context, TargetRules Rule, CancellationToken InCancellationToken)
+    private async Task<int> DispatchCompileWorkers(MakefileContext Context, TargetRules Rule, CancellationToken InCancellationToken)
     {
         List<Task> Tasks = new();
-        var CompileTasks = new CompileTasks(ToolChain);
+        var CompileTasks = new CompileTasks();
         int ReturnCode = 0;
 
         string DIAG_TotalString = Context.TotalCount.ToString();
@@ -272,45 +263,21 @@ public class AylaProjectCompiler
         return ReturnCode;
     }
 
-    private ToolChainInstallation SpawnPlatformToolChain()
-    {
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-        {
-            // Host:Windows Target:Windows
-            if (TargetInfo.BuildConfiguration.Platform == TargetPlatform.Win64)
-            {
-                var Installations = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022);
-                if (Installations.Any())
-                {
-                    return Installations[0];
-                }
-            }
-        }
-        else if (Environment.OSVersion.Platform == PlatformID.Unix)
-        {
-            // Host:Linux Target:Linux
-            if (TargetInfo.BuildConfiguration.Platform == TargetPlatform.Linux)
-            {
-                return new LinuxToolChain();
-            }
-        }
-
-        throw new TerminateException(KnownErrorCode.PlatformCompilerNotFound, CoreStrings.Errors.PlatformCompilerNotFound(TargetInfo.BuildConfiguration.Platform.ToString()));
-    }
-
-    private async Task GenerateReflectionCodesAsync(ModuleDependenciesResolver Resolver, CancellationToken InCancellationToken)
+    private async Task GenerateReflectionCodesAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine("Parsing headers for {0}", Target.TargetName);
-        using (var Timer = new ScopedTimer("Parsing Headers"))
+
+        using (var timer = new ScopedTimer("Parsing Headers"))
         {
-            await Resolver.GenerateReflectionCodesAsync(InCancellationToken);
+            await ReflectionCodeGen.GenerateReflectionCodesAsync(ModuleDependencyCache.Modules, cancellationToken);
         }
+
         Console.WriteLine("Reflection code generated in {0} seconds.", ScopedTimer.GetElapsed("Parsing Headers"));
     }
 
-    private async Task<int> CompileShadersAsync(ToolChainInstallation ToolChain, Architecture TargetArchitecture, ModuleDependenciesResolver Resolver, CancellationToken InCancellationToken)
+    private async Task<int> CompileShadersAsync(Architecture TargetArchitecture, CancellationToken InCancellationToken)
     {
-        if (Resolver.HasDependModule("RHI") == false)
+        if (ModuleDependencyCache.Contains("RHI") == false)
         {
             return 0;
         }

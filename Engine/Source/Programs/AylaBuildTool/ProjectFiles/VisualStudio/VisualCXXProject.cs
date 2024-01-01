@@ -14,17 +14,17 @@ using AE.Source;
 
 namespace AE.ProjectFiles.VisualStudio;
 
-public class VisualCXXProject : IVisualStudioProject
+public class VisualCXXProject : VisualStudioProject
 {
     public required Workspace Workspace { get; init; }
 
-    public required string TargetName { get; init; }
+    public override string name { get; }
 
-    public required string ProjectGuid { get; init; }
+    public override string guid { get; }
 
-    public required string FilterPath { get; init; }
+    public override string filter { get; }
 
-    public required string ProjectFile { get; init; }
+    public override string project { get; }
 
     private ProjectDirectory ProjectDirectory { get; init; }
 
@@ -34,27 +34,31 @@ public class VisualCXXProject : IVisualStudioProject
     public VisualCXXProject(Workspace InWorkspace, ProjectDirectory ProjectDirectory, string ProjectName, string SourceDirectory, string FilterPath)
     {
         this.Workspace = InWorkspace;
-        this.TargetName = ProjectName;
-        this.ProjectGuid = CRC32.GenerateGuid(FilterPath + '/' + ProjectName).ToString().ToUpper();
-        this.FilterPath = FilterPath;
-        this.ProjectFile = Path.Combine(InWorkspace.CurrentTarget.Intermediate.ProjectFiles, Path.ChangeExtension(ProjectName, ".vcxproj"));
+        this.name = ProjectName;
+        this.guid = CRC32.GenerateGuid(FilterPath + '/' + ProjectName).ToString().ToUpper();
+        this.filter = FilterPath;
+        this.project = Path.Combine(InWorkspace.CurrentTarget.Intermediate.ProjectFiles, Path.ChangeExtension(ProjectName, ".vcxproj"));
         this.ProjectDirectory = ProjectDirectory;
         this.SourceDirectory = SourceDirectory;
     }
 
-    public (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform)
+    public override void ResolveDependencies(IEnumerable<VisualStudioProject> VSProjects)
+    {
+    }
+
+    public override (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform)
     {
         return (Configuration.ToString() + (bEditor ? "_Editor" : string.Empty), Platform.ToString());
     }
 
-    public async Task GenerateProjectFilesAsync(CancellationToken SToken = default)
+    public override async Task GenerateProjectFilesAsync(CancellationToken SToken = default)
     {
         var (Vcxproj, VcxprojFilter, VcxprojUser) = GenerateXmlDocument();
         await Task.WhenAll(new[]
         {
-            WriteXml(Vcxproj, ProjectFile, ".vcxproj", SToken),
-            WriteXml(VcxprojFilter, ProjectFile, ".vcxproj.filters", SToken),
-            WriteXml(VcxprojUser, ProjectFile, ".vcxproj.user", SToken)
+            WriteXml(Vcxproj, project, ".vcxproj", SToken),
+            WriteXml(VcxprojFilter, project, ".vcxproj.filters", SToken),
+            WriteXml(VcxprojUser, project, ".vcxproj.user", SToken)
         });
     }
 
@@ -64,7 +68,7 @@ public class VisualCXXProject : IVisualStudioProject
         XmlTextWriter XmlWriter = new(Writer);
         XmlWriter.Formatting = Formatting.Indented;
         Doc.WriteTo(XmlWriter);
-        await IOExtensions.CompareAndWriteAsync(Path.ChangeExtension(SaveToBase, SaveToExt), Writer.ToString(), SToken);
+        await IOUtility.CompareAndWriteAsync(Path.ChangeExtension(SaveToBase, SaveToExt), Writer.ToString(), SToken);
     }
 
     public (XmlDocument, XmlDocument, XmlDocument) GenerateXmlDocument()
@@ -98,8 +102,8 @@ public class VisualCXXProject : IVisualStudioProject
                 Globals.SetAttribute("Label", "Globals");
                 Globals.AddElement("VCProjectVersion").InnerText = "16.0";
                 Globals.AddElement("Keyword").InnerText = "Win32Proj";
-                Globals.AddElement("ProjectGuid").InnerText = $"{{{ProjectGuid}}}";
-                Globals.AddElement("RootNamespace").InnerText = FilterPath.Replace(Path.DirectorySeparatorChar, '.');
+                Globals.AddElement("ProjectGuid").InnerText = $"{{{guid}}}";
+                Globals.AddElement("RootNamespace").InnerText = filter.Replace(Path.DirectorySeparatorChar, '.');
                 Globals.AddElement("WindowsTargetPlatformVersion").InnerText = "10.0";
             }
 
@@ -141,8 +145,8 @@ public class VisualCXXProject : IVisualStudioProject
 
                 var IncludePaths = ToolChain.GetRequiredIncludePaths(Platform.Architecture);
 
-                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {TargetName}{TargetApp} -Config {Configuration}";
-                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {TargetName}{TargetApp} -Config {Configuration}";
+                PropertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{BuildToolPath} Build -Target {name}{TargetApp} -Config {Configuration}";
+                PropertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{BuildToolPath} Build -Clean -Target {name}{TargetApp} -Config {Configuration}";
                 PropertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{BuildToolPath} Clean";
                 PropertyGroup.AddElement("NMakeOutput").InnerText = $"{Path.Combine(Global.EngineDirectory.Binaries.Interop, Configuration.IsDebug() ? "Debug" : "Release", "Core.dll")}";
                 PropertyGroup.AddElement("OutDir").InnerText = Path.Combine(ProjectDirectory.Binaries.Win64, Configuration.ToString());
@@ -258,7 +262,7 @@ public class VisualCXXProject : IVisualStudioProject
                     return;
                 }
 
-                foreach (var FileName in Directory.GetFiles(CurrentDirectory, "*.*", SearchOption.TopDirectoryOnly))
+                foreach (var FileName in IOUtility.GetFiles(CurrentDirectory, searchOption: SearchOption.TopDirectoryOnly))
                 {
                     if (FileName.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
                     {
@@ -266,11 +270,10 @@ public class VisualCXXProject : IVisualStudioProject
                     }
                 }
 
-                string[] ModuleFile = Directory.GetFiles(CurrentDirectory, "*.Module.cs", SearchOption.TopDirectoryOnly);
+                string[] ModuleFile = IOUtility.GetFiles(CurrentDirectory, "*.Module.cs", SearchOption.TopDirectoryOnly);
                 if (ModuleFile.Any())
                 {
                     string ModuleName = Path.GetFileName(ModuleFile[0]).Replace(".Module.cs", "");
-                    Dictionary<string, SearchedModule> SearchedModules = new();
                     var TargetRule = new TargetRules(new TargetInfo
                     {
                         BuildConfiguration = new()
@@ -282,19 +285,17 @@ public class VisualCXXProject : IVisualStudioProject
                     {
                         bEditor = true
                     };
-                    Workspace.SearchCXXModulesRecursive(TargetRule, SearchedModules, TargetRule.Name, TargetRule.TargetModuleName);
+                    Workspace.SearchCXXModulesRecursive(TargetRule, TargetRule.Name, TargetRule.TargetModuleName);
 
-                    var Resolver = new ModuleDependenciesResolver(TargetRule, SearchedModules, ToolChain);
-                    Resolver.Resolve();
-                    Module = Resolver.GetDependencyCache(ModuleName);
+                    Module = ModuleDependencyCache.GetCached(TargetRule.TargetModuleName);
                 }
 
-                foreach (var SourceFile in Directory.GetFiles(CurrentDirectory, "*", SearchOption.TopDirectoryOnly))
+                foreach (var SourceFile in IOUtility.GetFiles(CurrentDirectory, "*", SearchOption.TopDirectoryOnly))
                 {
                     AddSourceFile(Module, SourceFile);
                 }
 
-                foreach (var Subdirectory in Directory.GetDirectories(CurrentDirectory, "*", SearchOption.TopDirectoryOnly))
+                foreach (var Subdirectory in IOUtility.GetDirectories(CurrentDirectory, SearchOption.TopDirectoryOnly))
                 {
                     SearchDirectory(Module, Subdirectory);
                 }
@@ -463,9 +464,5 @@ public class VisualCXXProject : IVisualStudioProject
         var VcxprojUser = Doc;
 
         return (Vcxproj, VcxprojFilters, VcxprojUser);
-    }
-
-    public void ResolveDependencies(IEnumerable<IVisualStudioProject> VSProjects)
-    {
     }
 }

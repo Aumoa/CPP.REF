@@ -14,25 +14,25 @@ using AE.System;
 
 namespace AE.Projects;
 
-public class ACXXModule : IAModule
+public class CppModule : Module
 {
     [SetsRequiredMembers]
-    public ACXXModule(ProjectDirectory ProjectDirectory, string SourceRelativePath)
+    public CppModule(ProjectDirectory projectDirectory, string sourceRelativePath)
     {
-        string SourcePath = Path.Combine(ProjectDirectory.Source.Root, SourceRelativePath);
-        this.ModuleName = Path.GetFileNameWithoutExtension(SourcePath);
-        this.RuleName = this.ModuleName;
-        this.ProjectDirectory = ProjectDirectory;
+        string SourcePath = Path.Combine(projectDirectory.Source.Root, sourceRelativePath);
+        this.Name = Path.GetFileNameWithoutExtension(SourcePath);
+        this.RuleName = this.Name;
+        this.ProjectDirectory = projectDirectory;
         this.SourcePath = SourcePath;
     }
 
-    public required string ModuleName { get; init; }
+    public override string Name { get; }
 
     public required string RuleName { get; init; }
     
-    public required ProjectDirectory ProjectDirectory { get; init; }
+    public override ProjectDirectory ProjectDirectory { get; }
 
-    public required string SourcePath { get; init; }
+    public override string SourcePath { get; }
 
     private readonly AsyncLock CachedAssemblyLock = new();
     private Assembly? CachedAssembly;
@@ -70,7 +70,7 @@ public class ACXXModule : IAModule
                     throw new TerminateException(KnownErrorCode.ModuleNotFound, CoreStrings.Errors.ModuleRuleNotFound(SourcePath));
                 }
 
-                string AssemblyCacheDirectory = Path.Combine(ProjectDirectory.Intermediate.Makefiles, ModuleName);
+                string AssemblyCacheDirectory = Path.Combine(ProjectDirectory.Intermediate.Makefiles, Name);
                 string TextCache = Path.Combine(AssemblyCacheDirectory, "Module.cs");
                 string RuleAssemblyCache = Path.Combine(AssemblyCacheDirectory, "Module.dll");
 
@@ -124,7 +124,7 @@ public class ACXXModule : IAModule
                         typeof(ModuleRules).Assembly.Location
                     };
 
-                    await CSCompiler.CompileToAsync(ModuleName, RuleAssemblyCache, new string[] { ModuleCodePath }, ReferencedAssemblies, SToken);
+                    await CSCompiler.CompileToAsync(Name, RuleAssemblyCache, new string[] { ModuleCodePath }, ReferencedAssemblies, SToken);
                     await File.WriteAllTextAsync(TextCache, await File.ReadAllTextAsync(ModuleCodePath), SToken);
 
                     CachedAssembly = Assembly.LoadFile(RuleAssemblyCache);
@@ -143,10 +143,10 @@ public class ACXXModule : IAModule
         {
             if (RulesCache.TryGetValue(Rule, out var ModuleRule) == false)
             {
-                Type? RuleType = CachedAssembly.GetType(ModuleName);
+                Type? RuleType = CachedAssembly.GetType(Name);
                 if (RuleType == null)
                 {
-                    throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.RuleClassDefinitions(ModuleName));
+                    throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.RuleClassDefinitions(Name));
                 }
 
                 ConstructorInfo? Ctor = RuleType.GetConstructor(new[] { typeof(TargetRules) });

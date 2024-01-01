@@ -4,9 +4,9 @@ namespace AE.ProjectFiles.VisualStudio;
 
 public static class VisualStudioProjectExtensions
 {
-    public static bool TryGetFilterPaths(this IVisualStudioProject VSProject, out string OutName, out string OutParentPath)
+    public static bool TryGetFilterPaths(this VisualStudioProject VSProject, out string OutName, out string OutParentPath)
     {
-        return TryGetFilterPaths(VSProject.FilterPath, out OutName, out OutParentPath);
+        return TryGetFilterPaths(VSProject.filter, out OutName, out OutParentPath);
     }
 
     public static bool TryGetFilterPaths(string FilterPath, out string OutName, out string OutParentPath)

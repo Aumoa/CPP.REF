@@ -6,25 +6,25 @@ using AE.Source;
 
 namespace AE.Projects;
 
-public class ACSModule : IAModule
+public class CSharpModule : Module
 {
     [SetsRequiredMembers]
-    public ACSModule(ProjectDirectory ProjectDirectory, string SourceRelativePath)
+    public CSharpModule(ProjectDirectory ProjectDirectory, string SourceRelativePath)
     {
         string SourcePath = Path.Combine(ProjectDirectory.Source.Root, SourceRelativePath);
-        this.ModuleName = Path.GetFileName(SourcePath.Replace(".csproj", string.Empty));
-        this.RuleName = this.ModuleName;
+        this.Name = Path.GetFileName(SourcePath.Replace(".csproj", string.Empty));
+        this.RuleName = this.Name;
         this.SourcePath = SourcePath;
         this.ProjectDirectory = ProjectDirectory;
     }
 
-    public required string ModuleName { get; init; }
+    public override string Name { get; }
 
     public required string RuleName { get; init; }
 
-    public required string SourcePath { get; init; }
+    public override string SourcePath { get; }
 
-    public required ProjectDirectory ProjectDirectory { get; init; }
+    public override ProjectDirectory ProjectDirectory { get; }
 
     public override string ToString()
     {

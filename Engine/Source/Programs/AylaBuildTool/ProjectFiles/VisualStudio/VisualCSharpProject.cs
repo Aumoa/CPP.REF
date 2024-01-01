@@ -9,48 +9,46 @@ using AE.Projects;
 
 namespace AE.ProjectFiles.VisualStudio;
 
-public class VisualCSharpProject : IVisualStudioProject
+public class VisualCSharpProject : VisualStudioProject
 {
-    public required IAModule Module { get; init; }
+    public required Module Module { get; init; }
 
-    public string TargetName => Module.ModuleName;
+    public override string name => Module.Name;
 
-    public string BaseNamespace => "AE." + Module.ModuleName;
+    public string BaseNamespace => "AE." + Module.Name;
 
-    public required string ProjectGuid { get; init; }
+    public override string guid { get; }
 
-    public required string ProjectFile { get; init; }
+    public override string project { get; }
 
-    public required string FilterPath { get; init; }
+    public override string filter { get; }
 
     private readonly bool bGenerateProject;
 
     public bool bInterop { get; }
 
-    private readonly List<VisualCSharpProject> ReferencedProjects = new();
-
     [SetsRequiredMembers]
-    public VisualCSharpProject(IAModule Module, bool bGenerateProject, bool bInterop)
+    public VisualCSharpProject(Module Module, bool bGenerateProject, bool bInterop)
     {
         this.Module = Module;
         this.bGenerateProject = bGenerateProject;
         this.bInterop = bInterop;
 
-        ProjectGuid = CRC32.GenerateGuid(Module.SourcePath + $"_{bGenerateProject}_{bInterop}").ToString().ToUpper();
+        guid = CRC32.GenerateGuid(Module.SourcePath + $"_{bGenerateProject}_{bInterop}").ToString().ToUpper();
 
-        if (Module.IsInProgramsDirectory)
+        if (Module.isProgram)
         {
-            FilterPath = "Programs";
+            filter = "Programs";
         }
         else
         {
             if (Module.ProjectDirectory.IsEngineDirectory())
             {
-                FilterPath = "Engine";
+                filter = "Engine";
             }
             else
             {
-                FilterPath = "Game";
+                filter = "Game";
             }
         }
 
@@ -58,22 +56,22 @@ public class VisualCSharpProject : IVisualStudioProject
         {
             if (bInterop)
             {
-                FilterPath += "\\Interop";
-                ProjectFile = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.ModuleName + ".Interop", Module.ModuleName + ".Interop.csproj");
+                filter += "\\Interop";
+                project = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.Name + ".Interop", Module.Name + ".Interop.csproj");
             }
             else
             {
-                FilterPath += "\\Scripts";
-                ProjectFile = Path.Combine(Module.SourcePath, "Scripts", Module.ModuleName + ".CSharp.csproj");
+                filter += "\\Scripts";
+                project = Path.Combine(Module.SourcePath, "Scripts", Module.Name + ".CSharp.csproj");
             }
         }
         else
         {
-            ProjectFile = Path.Combine(Module.SourcePath, Module.ModuleName + ".csproj");
+            project = Path.Combine(Module.SourcePath, Module.Name + ".csproj");
         }
     }
 
-    public (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform)
+    public override (string, string) MapConfiguration(Configuration Configuration, bool bEditor, TargetPlatform Platform)
     {
         if (Configuration == Configuration.Debug)
         {
@@ -85,26 +83,7 @@ public class VisualCSharpProject : IVisualStudioProject
         }
     }
 
-    public void ResolveDependencies(IEnumerable<IVisualStudioProject> VSProjects)
-    {
-        if (Module is AScriptModule ScriptModule)
-        {
-            var Sources = VSProjects
-                .OfType<VisualCSharpProject>()
-                .Where(p => p.bInterop)
-                .ToDictionary(p => p.TargetName, p => p);
-
-            foreach (var DependModule in ScriptModule.DependModules)
-            {
-                if (Sources.TryGetValue(DependModule, out var DependProject))
-                {
-                    ReferencedProjects.Add(DependProject);
-                }
-            }
-        }
-    }
-
-    public Task GenerateProjectFilesAsync(CancellationToken SToken = default)
+    public override Task GenerateProjectFilesAsync(CancellationToken SToken = default)
     {
         if (bGenerateProject == false)
         {
@@ -146,15 +125,15 @@ public class VisualCSharpProject : IVisualStudioProject
     <ProjectReference Include="{0}" />
 """;
 
-        const string NamespaceReference = """
-    <Using Include="AE.{0}" />
-""";
+//        const string NamespaceReference = """
+//    <Using Include="AE.{0}" />
+//""";
 
         List<string> ProjectReferences = new();
         List<string> NamespaceReferences = new();
         if (bInterop == false)
         {
-            string InteropModule = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.ModuleName + ".Interop", Module.ModuleName + ".Interop.csproj");
+            string InteropModule = Path.Combine(Module.ProjectDirectory.Intermediate.CSharp, Module.Name + ".Interop", Module.Name + ".Interop.csproj");
             ProjectReferences.Add(string.Format(ProjectReference, InteropModule));
         }
         else
@@ -162,19 +141,23 @@ public class VisualCSharpProject : IVisualStudioProject
             string InteropModule = Path.Combine(Global.EngineDirectory.Source.Root, "Runtime", "CoreAObject.CSharp", "CoreAObject.CSharp.csproj");
             ProjectReferences.Add(string.Format(ProjectReference, InteropModule));
 
-            foreach (var Referenced in ReferencedProjects)
-            {
-                ProjectReferences.Add(string.Format(ProjectReference, Referenced.ProjectFile));
-                NamespaceReferences.Add(string.Format(NamespaceReference, Referenced.TargetName));
-            }
+            //foreach (var Referenced in ReferencedProjects)
+            //{
+            //    ProjectReferences.Add(string.Format(ProjectReference, Referenced.project));
+            //    NamespaceReferences.Add(string.Format(NamespaceReference, Referenced.name));
+            //}
         }
 
         string InteropOutDir = bInterop ? Module.ProjectDirectory.Binaries.Interop : Module.ProjectDirectory.Binaries.CSharp;
-        string ModuleName = Module.ModuleName;
+        string ModuleName = Module.Name;
         string ProjectReferencesStr = string.Join(Environment.NewLine, ProjectReferences);
         string ExecutablePolicy = !bInterop && ModuleName.Contains("Launch") ? "WinExe" : "Library";
         string NamespaceReferencesStr = string.Join(Environment.NewLine, NamespaceReferences);
 
-        return File.WriteAllTextAsync(ProjectFile, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr, ExecutablePolicy, NamespaceReferencesStr), SToken);
+        return File.WriteAllTextAsync(project, string.Format(Template, InteropOutDir, ModuleName, ProjectReferencesStr, ExecutablePolicy, NamespaceReferencesStr), SToken);
+    }
+
+    public override void ResolveDependencies(IEnumerable<VisualStudioProject> VSProjects)
+    {
     }
 }

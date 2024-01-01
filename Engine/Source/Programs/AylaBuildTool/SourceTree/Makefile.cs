@@ -2,6 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+using AE.CompilerServices;
 using AE.Projects;
 using AE.System;
 
@@ -20,40 +21,40 @@ public sealed class Makefile
 
     public required MakefileSourceCache[] Caches { get; init; }
 
-    public static async Task<Makefile> LoadMakefileCacheAsync(ToolChainInstallation toolChain, string InPath, CancellationToken SToken = default)
+    public static async Task<Makefile> LoadMakefileCacheAsync(string path, CancellationToken cancellationToken = default)
     {
-        string Filename = Path.Combine(InPath, "Makefile.abin");
-        if (File.Exists(Filename) == false)
+        string filename = Path.Combine(path, "Makefile.abin");
+        if (File.Exists(filename) == false)
         {
-            return Empty(Filename);
+            return Empty(filename);
         }
 
-        using var Stream = new MemoryStream(await File.ReadAllBytesAsync(Filename, SToken));
-        var Reader = new BinaryReader(Stream);
+        using var stream = new MemoryStream(await File.ReadAllBytesAsync(filename, cancellationToken));
+        var reader = new BinaryReader(stream);
         try
         {
-            int MakefileVersion = Reader.ReadInt32();
+            int MakefileVersion = reader.ReadInt32();
             if (MakefileVersion != Global.MakefileVersion)
             {
                 Console.WriteLine("Makefile version is mismatched. {0} -> {1}", MakefileVersion, Global.MakefileVersion);
-                return Empty(Filename);
+                return Empty(filename);
             }
 
-            string toolChainSign = Reader.ReadString();
-            if (toolChainSign != toolChain.GetToolChainSignature())
+            string toolChainSign = reader.ReadString();
+            if (toolChainSign != ToolChain.Current.GetToolChainSignature())
             {
-                Console.WriteLine("ToolChain signature is mismatched. {0} -> {1}", toolChainSign, toolChain.GetToolChainSignature());
-                return Empty(Filename);
+                Console.WriteLine("ToolChain signature is mismatched. {0} -> {1}", toolChainSign, ToolChain.Current.GetToolChainSignature());
+                return Empty(filename);
             }
 
-            int Count = Reader.ReadInt32();
+            int Count = reader.ReadInt32();
             var Caches = new MakefileSourceCache[Count];
             for (int i = 0; i < Count; ++i)
             {
-                Caches[i] = MakefileSourceCache.LoadCacheFromBinary(Reader);
+                Caches[i] = MakefileSourceCache.LoadCacheFromBinary(reader);
             }
 
-            return new(Filename)
+            return new(filename)
             {
                 Caches = Caches
             };
@@ -61,7 +62,10 @@ public sealed class Makefile
         catch (Exception E)
         {
             Console.WriteLine("Makefile is not compatible with current version: {0}: {1}", E.GetType().Name, E.Message);
-            return Empty(Filename);
+#if DEBUG
+            Console.Error.WriteLine(E.StackTrace);
+#endif
+            return Empty(filename);
         }
     }
 
@@ -70,6 +74,8 @@ public sealed class Makefile
         using var Stream = new MemoryStream();
         var Writer = new BinaryWriter(Stream);
         Writer.Write(Global.MakefileVersion);
+
+        Writer.Write(ToolChain.ToolChainSignature);
 
         MakefileSourceCache[] AllCaches = CompileItems.Select(p => p.Cache!).Where(p => p != null).ToArray();
         Writer.Write(AllCaches.Length);

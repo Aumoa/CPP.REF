@@ -4,7 +4,7 @@ using AE.Misc;
 
 namespace AE.Extensions;
 
-public static class IOExtensions
+public static class IOUtility
 {
     private static readonly Dictionary<string, long> s_Hashes = new();
 
@@ -47,5 +47,23 @@ public static class IOExtensions
             }
             return Hash;
         }
+    }
+
+    public static string[] GetFiles(string directory, string searchPattern = "*.*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    {
+        if (Directory.Exists(directory))
+        {
+            return Directory.GetFiles(directory, searchPattern, searchOption);
+        }
+        return Array.Empty<string>();
+    }
+
+    public static string[] GetDirectories(string directory, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    {
+        if (Directory.Exists(directory))
+        {
+            return Directory.GetDirectories(directory, "*.*", searchOption);
+        }
+        return Array.Empty<string>();
     }
 }

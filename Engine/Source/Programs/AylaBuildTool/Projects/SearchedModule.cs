@@ -7,9 +7,9 @@ namespace AE.Projects;
 
 public record SearchedModule
 {
-    public required ModuleRules Rule { get; init; }
+    public required ModuleRules Rules { get; init; }
 
-    public required ProjectDirectory ProjectDir { get; init; }
+    public required ProjectDirectory ProjectDirectory { get; init; }
 
-    public required string Location { get; init; }
+    public required string SourcePath { get; init; }
 }

@@ -4,9 +4,11 @@ using System.Diagnostics;
 
 using AE.BuildSettings;
 using AE.CLI;
+using AE.CompilerServices;
 using AE.Exceptions;
 using AE.Misc;
 using AE.Platform;
+using AE.Platform.Linux;
 using AE.Platform.Windows;
 using AE.Projects;
 using AE.Rules;
@@ -69,6 +71,8 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             }
         };
 
+        ToolChain.Init(SpawnPlatformToolChain(ToolsTargetInfo));
+
         var HeaderToolCompiler = await AylaProjectCompiler.CreateCompilerAsync(Workspace, "AylaHeaderTool", ToolsTargetInfo, SToken);
 
         int ReturnCode = await HeaderToolCompiler.CompileAsync(SToken);
@@ -95,5 +99,31 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         });
 
         return await ProjectCompiler.CompileAsync(SToken);
+    }
+
+    private ToolChainInstallation SpawnPlatformToolChain(TargetInfo targetInfo)
+    {
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            // Host:Windows Target:Windows
+            if (targetInfo.BuildConfiguration.Platform == TargetPlatform.Win64)
+            {
+                var Installations = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022);
+                if (Installations.Any())
+                {
+                    return Installations[0];
+                }
+            }
+        }
+        else if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            // Host:Linux Target:Linux
+            if (targetInfo.BuildConfiguration.Platform == TargetPlatform.Linux)
+            {
+                return new LinuxToolChain();
+            }
+        }
+
+        throw new TerminateException(KnownErrorCode.PlatformCompilerNotFound, CoreStrings.Errors.PlatformCompilerNotFound(targetInfo.BuildConfiguration.Platform.ToString()));
     }
 }

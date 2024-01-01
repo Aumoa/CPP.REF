@@ -6,87 +6,97 @@ using AE.BuildSettings;
 using AE.Extensions;
 using AE.Misc;
 using AE.Projects;
+using AE.System;
 
 namespace AE.ProjectFiles.VisualStudio;
 
 public class VisualStudioSolution : Solution
 {
-    private readonly string SolutionGuid;
-    private readonly string SolutionFile;
+    private readonly string solutionGuid;
+    private readonly string solutionFile;
 
-    public VisualStudioSolution(Workspace InWorkspace, string? ProjectFile) : base(InWorkspace)
+    public VisualStudioSolution(Workspace workspace, string? projectFile) : base(workspace)
     {
         string SolutionName;
-        if (ProjectFile == null)
+        if (projectFile == null)
         {
             SolutionName = "Engine";
         }
         else
         {
-            SolutionName = Path.GetFileNameWithoutExtension(ProjectFile);
+            SolutionName = Path.GetFileNameWithoutExtension(projectFile);
         }
 
-        string SolutionGuidKey = "Solution_" + Path.GetFileNameWithoutExtension(ProjectFile);
-        SolutionGuid = CRC32.GenerateGuid(SolutionGuidKey).ToString().ToUpper();
-        SolutionFile = Path.Combine(InWorkspace.CurrentTarget.Root, Path.ChangeExtension(SolutionName, ".sln"));
+        string SolutionGuidKey = "Solution_" + Path.GetFileNameWithoutExtension(projectFile);
+        solutionGuid = CRC32.GenerateGuid(SolutionGuidKey).ToString().ToUpper();
+        solutionFile = Path.Combine(workspace.CurrentTarget.Root, Path.ChangeExtension(SolutionName, ".sln"));
     }
 
-    public async override Task GenerateProjectFilesAsync(CancellationToken SToken = default)
+    public async override Task GenerateProjectFilesAsync(CancellationToken cancellationToken = default)
     {
-        List<IVisualStudioProject> VSProjects = new();
-        foreach (var CSModule in workspace.GetCSModules())
+        List<VisualStudioProject> vsProjects = new();
+        foreach (var csModule in workspace.GetCSModules())
         {
-            VSProjects.Add(new VisualCSharpProject(CSModule, false, false));
+            vsProjects.Add(new VisualCSharpProject(csModule, false, false));
         }
 
-        foreach (var CSModule in workspace.GetScriptModules())
-        {
-            VSProjects.Add(new VisualCSharpProject(CSModule, true, false));
-            VSProjects.Add(new VisualCSharpProject(CSModule, true, true));
-        }
+        VisualCXXProject? engineCppProject = null;
+        VisualCXXProject? gameCppProject = null;
 
-        VisualCXXProject? EngineCXXProject = null;
-        VisualCXXProject? GameCXXProject = null;
-        foreach (var CXXModule in workspace.GetCXXModules())
+        List<SearchedModule> modules = new();
+        foreach (var cppModule in workspace.GetCXXModules())
         {
-            if (CXXModule.IsInProgramsDirectory)
+            if (cppModule.IsInProgramsDirectory)
             {
-                VSProjects.Add(new VisualCXXProject(workspace, CXXModule.ProjectDirectory, CXXModule.ModuleName, CXXModule.SourcePath, "Programs"));
+                vsProjects.Add(new VisualCXXProject(workspace, cppModule.ProjectDirectory, cppModule.Name, cppModule.SourcePath, "Programs"));
             }
             else
             {
-                string SourceDirectory = CXXModule.ProjectDirectory.Source.Root;
-                if (CXXModule.ProjectDirectory.Root == Global.EngineDirectory.Root)
+                string SourceDirectory = cppModule.ProjectDirectory.Source.Root;
+                if (cppModule.ProjectDirectory.Root == Global.EngineDirectory.Root)
                 {
-                    if (EngineCXXProject == null)
+                    if (engineCppProject == null)
                     {
-                        EngineCXXProject = new VisualCXXProject(workspace, CXXModule.ProjectDirectory, "AE", SourceDirectory, "Engine");
-                        VSProjects.Add(EngineCXXProject);
+                        engineCppProject = new VisualCXXProject(workspace, cppModule.ProjectDirectory, "AE", SourceDirectory, "Engine");
+                        vsProjects.Add(engineCppProject);
                     }
                 }
                 else
                 {
-                    if (GameCXXProject == null)
+                    if (gameCppProject == null)
                     {
-                        GameCXXProject = new VisualCXXProject(workspace, CXXModule.ProjectDirectory, CXXModule.ProjectDirectory.Name, SourceDirectory, "Game");
-                        VSProjects.Add(GameCXXProject);
+                        gameCppProject = new VisualCXXProject(workspace, cppModule.ProjectDirectory, cppModule.ProjectDirectory.Name, SourceDirectory, "Game");
+                        vsProjects.Add(gameCppProject);
                     }
                 }
+
+                modules.Add(new SearchedModule
+                {
+                    Rules = cppModule.GenerateModuleRule(Solution.Rules),
+                    ProjectDirectory = cppModule.ProjectDirectory,
+                    SourcePath = cppModule.SourcePath
+                });
+            }
+
+            var modulesDict = modules.ToDictionary(p => p.Rules.Name, p => p);
+            foreach (var innerCppModule in workspace.GetCXXModules())
+            {
+                ModuleDependencyCache.BuildCache(innerCppModule.Name);
             }
         }
 
-        List<Task> Tasks = new();
-        foreach (var VSProject in VSProjects)
+        List<Task> tasks = new();
+        foreach (var vsProject in vsProjects)
         {
-            VSProject.ResolveDependencies(VSProjects);
-            Tasks.Add(VSProject.GenerateProjectFilesAsync(SToken));
+            vsProject.ResolveDependencies(vsProjects);
+            tasks.Add(vsProject.GenerateProjectFilesAsync(cancellationToken));
         }
 
-        Tasks.Add(IOExtensions.CompareAndWriteAsync(SolutionFile, GenerateSolution(VSProjects), SToken));
-        await Task.WhenAll(Tasks);
+        tasks.Add(IOUtility.CompareAndWriteAsync(solutionFile, GenerateSolution(vsProjects), cancellationToken));
+        await Task.WhenAll(tasks);
     }
 
-    private string GenerateSolution(List<IVisualStudioProject> VSProjects)
+    private string GenerateSolution(List<VisualStudioProject> VSProjects)
     {
         const string FilterGUID = "2150E333-8FDC-42A3-9474-1A3956D46DE8";
         const string VisualCPPGUID = "8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942";
@@ -115,12 +125,12 @@ public class VisualStudioSolution : Solution
             }
         }
 
-        foreach (var FilterPath in VSProjects.Select(p => p.FilterPath).Distinct())
+        foreach (var FilterPath in VSProjects.Select(p => p.filter).Distinct())
         {
             AddFilter(FilterPath);
         }
 
-        void AddVisualStudioProject(IVisualStudioProject VSProject)
+        void AddVisualStudioProject(VisualStudioProject VSProject)
         {
             string TypeGuid = VSProject switch
             {
@@ -129,7 +139,7 @@ public class VisualStudioSolution : Solution
                 _ => throw new InvalidOperationException("Internal error.")
             };
 
-            Builder.AppendLine($"Project(\"{{{TypeGuid}}}\") = \"{VSProject.TargetName}\", \"{VSProject.ProjectFile}\", \"{{{VSProject.ProjectGuid}}}\"");
+            Builder.AppendLine($"Project(\"{{{TypeGuid}}}\") = \"{VSProject.name}\", \"{VSProject.project}\", \"{{{VSProject.guid}}}\"");
             Builder.AppendLine("EndProject");
         }
 
@@ -156,8 +166,8 @@ public class VisualStudioSolution : Solution
                     string App = bEditor ? " Editor" : string.Empty;
                     var Mapped = Project.MapConfiguration(Configuration, bEditor, Platform);
 
-                    Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}{App}|{Platform}.ActiveCfg = {Mapped.Item1}|{Mapped.Item2}");
-                    Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}}.{Configuration}{App}|{Platform}.Build.0 = {Mapped.Item1}|{Mapped.Item2}");
+                    Builder.AppendLine($"\t\t{{{Project.guid}}}.{Configuration}{App}|{Platform}.ActiveCfg = {Mapped.Item1}|{Mapped.Item2}");
+                    Builder.AppendLine($"\t\t{{{Project.guid}}}.{Configuration}{App}|{Platform}.Build.0 = {Mapped.Item1}|{Mapped.Item2}");
                 });
             }
             Builder.AppendLine("\tEndGlobalSection");
@@ -168,7 +178,7 @@ public class VisualStudioSolution : Solution
                 Project.TryGetFilterPaths(out string FilterName, out _);
                 if (Filters.TryGetValue(FilterName, out string? FilterGuid))
                 {
-                    Builder.AppendLine($"\t\t{{{Project.ProjectGuid}}} = {{{FilterGuid}}}");
+                    Builder.AppendLine($"\t\t{{{Project.guid}}} = {{{FilterGuid}}}");
                 }
             }
             foreach (var (Name, Parent) in FilterDepends)
@@ -180,7 +190,7 @@ public class VisualStudioSolution : Solution
             Builder.AppendLine("\tEndGlobalSection");
 
             Builder.AppendLine("\tGlobalSection(ExtensibilityGlobals) = postSolution");
-            Builder.AppendLine($"\t\tSolutionGuid = {{{SolutionGuid.ToString().ToUpper()}}}");
+            Builder.AppendLine($"\t\tSolutionGuid = {{{solutionGuid.ToString().ToUpper()}}}");
             Builder.AppendLine("\tEndGlobalSection");
         }
         Builder.AppendLine("EndGlobal");

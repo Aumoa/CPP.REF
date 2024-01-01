@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.BuildSettings;
+using AE.CompilerServices;
 using AE.Rules;
 using AE.SourceTree;
 using AE.System;
@@ -9,12 +10,10 @@ namespace AE.Platform;
 
 public class CompileTasks : Compiler
 {
-    private readonly ToolChainInstallation ToolChain;
     private readonly SemaphoreSlim Access;
 
-    public CompileTasks(ToolChainInstallation ToolChain, int MaxParallel = 0)
+    public CompileTasks(int MaxParallel = 0)
     {
-        this.ToolChain = ToolChain;
         if (MaxParallel == 0)
         {
             MaxParallel = Environment.ProcessorCount;
