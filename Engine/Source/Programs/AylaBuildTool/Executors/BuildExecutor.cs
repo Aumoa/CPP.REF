@@ -28,6 +28,9 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
 
         [CommandLineApply(CategoryName = "Platform")]
         public string? Platform { get; set; } = null!;
+
+        [CommandLineApply(CategoryName = "Editor")]
+        public bool Editor { get; set; }
     }
 
     private readonly Arguments buildArgs = new();
@@ -66,7 +69,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             }
         };
 
-        Target.Create(targetInfo, true);
+        Target.Create(targetInfo, buildArgs.Editor);
         ModuleDependencyCache.BuildCache(buildArgs.Target, string.Empty);
 
         if (ModuleDependencyCache.GetCached(buildArgs.Target, string.Empty).DependModules.Contains("RHI"))
