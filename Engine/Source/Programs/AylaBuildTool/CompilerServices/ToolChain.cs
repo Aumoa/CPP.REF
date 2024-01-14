@@ -29,6 +29,8 @@ public static class ToolChain
 
     public static Linker SpawnLinker() => Current.SpawnLinker();
 
+    public static string[] GetRequiredIncludePaths(Architecture targetArchitecture) => Current.GetRequiredIncludePaths(targetArchitecture);
+
     public static string DotNET => Current.DotNET;
 
     public static string ToolChainSignature => Current.GetToolChainSignature();

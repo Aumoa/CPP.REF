@@ -5,7 +5,7 @@ using AE.Rules;
 
 public class GameFramework : ModuleRules
 {
-    public GameFramework(TargetRules TargetRule) : base(TargetRule)
+    public GameFramework(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -13,7 +13,6 @@ public class GameFramework : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "CoreAObject",
         });
     }
 }

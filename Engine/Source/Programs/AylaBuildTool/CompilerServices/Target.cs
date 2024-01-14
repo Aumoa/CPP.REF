@@ -2,6 +2,8 @@
 
 using System.Diagnostics;
 
+using AE.BuildSettings;
+using AE.Platform;
 using AE.Rules;
 using AE.Source;
 
@@ -9,23 +11,45 @@ namespace AE.CompilerServices;
 
 public static class Target
 {
-    private static TargetRules? s_Rules;
-    private static ProjectDirectory s_ProjectDirectory;
+    public struct State
+    {
+        public TargetInfo? targetInfo;
+        public bool isEditor;
+    }
+
+    private static readonly Stack<State> s_Stack = new();
+    private static State s_Current;
 
     public static void Clear()
     {
-        s_Rules = null;
-        s_ProjectDirectory = default;
+        s_Current = default;
     }
 
-    public static void Create(TargetRules? rules, ProjectDirectory projectDirectory)
+    public static void Push()
     {
-        Debug.Assert(s_Rules == null);
-        s_Rules = rules;
-        s_ProjectDirectory = projectDirectory;
+        s_Stack.Push(s_Current);
     }
 
-    public static TargetRules Rules => s_Rules ?? throw new InvalidOperationException("Target is not initialized.");
+    public static void Pop()
+    {
+        s_Current = s_Stack.Pop();
+    }
 
-    public static ProjectDirectory ProjectDirectory => s_ProjectDirectory;
+    public static void Create(TargetInfo targetInfo, bool isEditor)
+    {
+        s_Current.targetInfo = targetInfo;
+        s_Current.isEditor = isEditor;
+    }
+
+    public static TargetInfo Info => s_Current.targetInfo ?? throw new InvalidOperationException("Target is not initialized.");
+
+    public static BuildConfiguration Config => Info.BuildConfiguration;
+
+    public static Architecture Architecture => Config.Platform.Architecture;
+
+    public static Configuration Configuration => Config.Configuration;
+
+    public static TargetPlatform Platform => Config.Platform;
+
+    public static bool IsEditor => s_Current.isEditor;
 }

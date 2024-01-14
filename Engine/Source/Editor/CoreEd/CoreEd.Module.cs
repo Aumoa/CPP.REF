@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class CoreEd : ModuleRules
 {
-    public CoreEd(TargetRules TargetRule) : base(TargetRule)
+    public CoreEd(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

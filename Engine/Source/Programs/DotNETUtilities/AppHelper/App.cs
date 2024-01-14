@@ -1,18 +1,19 @@
 ﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
+using System.Text;
 
 namespace AE.AppHelper;
 
 public class App
 {
-    public readonly ProcessStartInfo PSI;
-    private readonly bool bConsoleOut;
+    public readonly ProcessStartInfo psi;
+    private readonly bool writeToConsole;
 
-    public App(ProcessStartInfo PSI, bool bConsoleOut)
+    public App(ProcessStartInfo psi, bool writeToConsole)
     {
-        this.PSI = PSI;
-        this.bConsoleOut = bConsoleOut;
+        this.psi = psi;
+        this.writeToConsole = writeToConsole;
     }
 
     public string Stdout { get; private set; } = string.Empty;
@@ -21,41 +22,54 @@ public class App
 
     public int ExitCode { get; private set; }
 
-    public async Task StartAsync(CancellationToken InCancellationToken = default)
+    public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        Process? P = new Process() { StartInfo = PSI };
-        if (P == null)
+        Process? p = new Process() { StartInfo = psi };
+        if (p == null)
         {
             throw new InvalidOperationException("Internal error.");
         }
 
-        PSI.RedirectStandardOutput = true;
-        PSI.RedirectStandardError = true;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
 
-        TaskCompletionSource TCS = new();
-        P.EnableRaisingEvents = true;
-        P.Exited += (_, _) => TCS.SetResult();
-        if (InCancellationToken != default)
+        TaskCompletionSource tcs = new();
+        p.EnableRaisingEvents = true;
+        p.Exited += (_, _) => tcs.SetResult();
+        if (cancellationToken != default)
         {
-            InCancellationToken.Register(() => TCS.SetCanceled());
+            cancellationToken.Register(() => tcs.SetCanceled());
         }
 
-        P.Start();
-        await (P.HasExited ? Task.CompletedTask : TCS.Task);
+        StringBuilder stdout = new();
+        StringBuilder stderr = new();
+        p.OutputDataReceived += (sender, args) => stdout.AppendLine(args.Data);
+        p.ErrorDataReceived += (sender, args) => stderr.AppendLine(args.Data);
 
-        (Stdout, Stderr) = (P.StandardOutput.ReadToEnd(), P.StandardError.ReadToEnd());
-        if (this.bConsoleOut)
+        p.Start();
+        p.BeginOutputReadLine();
+        p.BeginErrorReadLine();
+
+        while (p.HasExited == false)
+        {
+            await Task.WhenAny(tcs.Task, Task.Delay(1000));
+        }
+
+        Stdout = stdout.ToString();
+        Stderr = stderr.ToString();
+
+        if (writeToConsole)
         {
             Console.Write(Stdout);
             Console.Error.Write(Stderr);
         }
-        ExitCode = P.ExitCode;
+        ExitCode = p.ExitCode;
     }
 
-    public static async Task<App> Run(ProcessStartInfo PSI, bool bConsoleOut = false, CancellationToken InCancellationToken = default)
+    public static async Task<App> Run(ProcessStartInfo psi, bool writeToConsole = false, CancellationToken cancellationToken = default)
     {
-        var A = new App(PSI, bConsoleOut);
-        await A.StartAsync(InCancellationToken);
-        return A;
+        var app = new App(psi, writeToConsole);
+        await app.StartAsync(cancellationToken);
+        return app;
     }
 }

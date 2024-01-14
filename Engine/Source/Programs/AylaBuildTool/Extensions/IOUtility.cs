@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
+using AE.IO;
 using AE.Misc;
 
 namespace AE.Extensions;
@@ -49,21 +51,8 @@ public static class IOUtility
         }
     }
 
-    public static string[] GetFiles(string directory, string searchPattern = "*.*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    public static DirectoryReference GetConfigDirectory(this DirectoryReference directory, BuildConfiguration config)
     {
-        if (Directory.Exists(directory))
-        {
-            return Directory.GetFiles(directory, searchPattern, searchOption);
-        }
-        return Array.Empty<string>();
-    }
-
-    public static string[] GetDirectories(string directory, SearchOption searchOption = SearchOption.TopDirectoryOnly)
-    {
-        if (Directory.Exists(directory))
-        {
-            return Directory.GetDirectories(directory, "*.*", searchOption);
-        }
-        return Array.Empty<string>();
+        return directory.GetHierarchy(config.Platform.TargetName, config.Configuration.ToString());
     }
 }

@@ -5,7 +5,7 @@ using AE.Rules;
 
 public class SlateCore : ModuleRules
 {
-    public SlateCore(TargetRules TargetRule) : base(TargetRule)
+    public SlateCore(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

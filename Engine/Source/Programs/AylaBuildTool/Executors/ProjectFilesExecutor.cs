@@ -6,7 +6,6 @@ using AE.Exceptions;
 using AE.Platform.Windows;
 using AE.ProjectFiles.VisualStudio;
 using AE.Projects;
-using AE.System;
 
 namespace AE.Executors;
 
@@ -25,8 +24,9 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
 
     public async Task<int> RunAsync(CancellationToken cancellationToken = default)
     {
-        Workspace workspace = await ConfigureWorkspaceAsync(cancellationToken);
-        VisualStudioSolution solution = new(workspace, ProjectFile);
+        ConfigureWorkspace();
+        await Workspace.InitAssembliesAsync(cancellationToken);
+
         var toolChain = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022).FirstOrDefault();
         if (toolChain == null)
         {
@@ -34,11 +34,14 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
         }
 
         ToolChain.Init(toolChain);
-        Target.Create(VisualStudioSolution.Rules, workspace.CurrentTarget);
-        workspace.SearchModules();
+        Target.Create(VisualStudioSolution.TargetInfo, true);
 
-        await solution.ConfigureRulesAsync(cancellationToken);
-        await solution.GenerateProjectFilesAsync(cancellationToken);
+        foreach (var innerCppModule in Workspace.CppAssemblies)
+        {
+            ModuleDependencyCache.BuildCache(innerCppModule.Name, string.Empty);
+        }
+
+        await VisualStudioSolution.GenerateProjectFilesAsync(cancellationToken);
         return 0;
     }
 }

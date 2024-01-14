@@ -5,7 +5,7 @@ using AE.Rules;
 
 public class Engine : ModuleRules
 {
-    public Engine(TargetRules TargetRule) : base(TargetRule)
+    public Engine(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -13,7 +13,6 @@ public class Engine : ModuleRules
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
-            "CoreAObject",
             "Numerics",
             "ApplicationCore",
             "RenderCore"

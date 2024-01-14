@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class Core : ModuleRules
 {
-    public Core(TargetRules TargetRule) : base(TargetRule)
+    public Core(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -24,7 +24,7 @@ public class Core : ModuleRules
             5106,
         });
 
-        if (TargetRule.Platform.Group == PlatformGroup.Windows)
+        if (targetInfo.BuildConfiguration.Platform.Group == PlatformGroup.Windows)
         {
             PublicAdditionalMacros.AddRange(new[]
             {

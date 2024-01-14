@@ -2,7 +2,7 @@
 
 namespace AE.Misc;
 
-file class AsyncLockState : IDisposable
+file class AsyncLockState : IDisposable, IAsyncDisposable
 {
     private readonly SemaphoreSlim Semaphore;
 
@@ -15,6 +15,12 @@ file class AsyncLockState : IDisposable
     {
         this.Semaphore.Release();
         GC.SuppressFinalize(this);
+    }
+
+    ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        Dispose();
+        return ValueTask.CompletedTask;
     }
 }
 

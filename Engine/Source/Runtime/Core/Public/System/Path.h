@@ -59,6 +59,11 @@ struct Path : public StaticClass
 		return (false || ... || CompareExtension(InPath, Extensions));
 	}
 
+	static inline bool IsPathFullQualified(String path)
+	{
+		return path.path().is_absolute();
+	}
+
 	template<std::ranges::input_range R> requires std::convertible_to<std::ranges::range_value_t<R>, String>
 	static inline String Combine(const R& InRange)
 	{

@@ -7,4 +7,8 @@ namespace AE.Rules;
 public class TargetInfo
 {
     public required BuildConfiguration BuildConfiguration { get; set; }
+
+    public Configuration Configuration => BuildConfiguration.Configuration;
+
+    public TargetPlatform Platform => BuildConfiguration.Platform;
 }

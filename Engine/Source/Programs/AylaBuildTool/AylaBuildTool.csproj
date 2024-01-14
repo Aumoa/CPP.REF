@@ -24,4 +24,8 @@
     <ProjectReference Include="..\DotNETUtilities\DotNETUtilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SourceTree\" />
+  </ItemGroup>
+
 </Project>

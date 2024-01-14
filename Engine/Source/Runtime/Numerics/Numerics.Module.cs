@@ -5,7 +5,7 @@ using AE.Rules;
 
 public class Numerics : ModuleRules
 {
-    public Numerics(TargetRules TargetRule) : base(TargetRule)
+    public Numerics(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

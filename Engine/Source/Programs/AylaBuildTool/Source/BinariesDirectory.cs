@@ -1,78 +1,55 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
+using AE.IO;
+
 namespace AE.Source;
 
 public readonly struct BinariesDirectory
 {
-    private readonly string _Root;
+    private readonly DirectoryReference _Root;
 
-    public string Root
+    public DirectoryReference Root
     {
         get => _Root;
         init
         {
             _Root = value;
-            Win64 = Path.Combine(_Root, "Win64");
-            Linux = Path.Combine(_Root, "Linux");
-            DotNET = Path.Combine(_Root, "DotNET");
-            Interop = Path.Combine(_Root, "Interop");
-            CSharp = Path.Combine(_Root, "CSharp");
+            DotNET = Root.GetChild("DotNET");
+            Interop = Root.GetChild("Interop");
+            CSharp = Root.GetChild("CSharp");
         }
     }
 
-    public string Win64 { get; private init; }
+    public DirectoryReference DotNET { get; private init; }
 
-    public string Linux { get; private init; }
+    public DirectoryReference Interop { get; private init; }
 
-    public string DotNET { get; private init; }
-
-    public string Interop { get; private init; }
-
-    public string CSharp { get; private init; }
+    public DirectoryReference CSharp { get; private init; }
 
     public void GenerateDirectoriesRecursive()
     {
-        if (Directory.Exists(Root) == false)
-        {
-            Directory.CreateDirectory(Root);
-        }
-
-        if (Directory.Exists(Win64) == false)
-        {
-            Directory.CreateDirectory(Win64);
-        }
-
-        if (Directory.Exists(Linux) == false)
-        {
-            Directory.CreateDirectory(Linux);
-        }
-
-        if (Directory.Exists(DotNET) == false)
-        {
-            Directory.CreateDirectory(DotNET);
-        }
+        Root.Create();
+        DotNET.Create();
+        Interop.Create();
+        CSharp.Create();
     }
 
     public void Cleanup()
     {
-        string[] Targets = new string[]
-        {
-            Win64,
-            Linux,
-        };
-
-        foreach (var Target in Targets)
-        {
-            if (Directory.Exists(Target))
-            {
-                Directory.Delete(Target, true);
-                Directory.CreateDirectory(Target);
-            }
-        }
+        Interop.Clear();
+        CSharp.Clear();
     }
 
     public override string ToString()
     {
         return Root;
     }
+
+    public DirectoryReference BinariesOut(TargetPlatform platform, Configuration configuration)
+    {
+        return _Root.GetHierarchy(platform.ToString(), configuration.ToString());
+    }
+
+    public DirectoryReference BinariesOut(BuildConfiguration buildConfig) => BinariesOut(buildConfig.Platform, buildConfig.Configuration);
 }

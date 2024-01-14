@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class MainFrame : ModuleRules
 {
-    public MainFrame(TargetRules TargetRule) : base(TargetRule)
+    public MainFrame(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

@@ -4,11 +4,18 @@ namespace AE.Rules;
 
 public class ModuleRules
 {
-    public TargetRules TargetRule { get; }
-
-    public ModuleRules(TargetRules TargetRule)
+    public enum ModuleType
     {
-        this.TargetRule = TargetRule;
+        Library,
+        ConsoleApplication,
+        Application
+    }
+
+    public TargetInfo TargetInfo { get; }
+
+    public ModuleRules(TargetInfo TargetInfo)
+    {
+        this.TargetInfo = TargetInfo;
         this.Name = GetType().Name;
     }
 
@@ -18,6 +25,8 @@ public class ModuleRules
     }
 
     public required string Name { get; init; }
+
+    public ModuleType Type { get; protected set; } = ModuleType.Library;
 
     public List<string> PublicDependencyModuleNames { get; protected set; } = new();
 

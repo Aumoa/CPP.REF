@@ -1,123 +1,111 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using System.Diagnostics.Contracts;
+using System.Diagnostics.CodeAnalysis;
 
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.Platform;
-using AE.Rules;
+using AE.Assemblies;
+using AE.IO;
 using AE.Source;
 
 namespace AE.Projects;
 
-public class Workspace
+public static class Workspace
 {
-    private readonly Dictionary<string, ATarget> Targets = new();
-    private readonly Dictionary<string, CppModule> CXXModules = new();
-    private readonly List<CSharpModule> CSModules = new();
+    private static readonly Dictionary<string, ScriptableAssembly> s_Modules = new();
+    private static readonly List<ProjectDirectory> s_ProjectTargets = new();
 
-    public Workspace()
+    public static ProjectDirectory Current { get; private set; }
+
+    public static IEnumerable<ScriptableAssembly> Assemblies => s_Modules.Values;
+
+    public static IEnumerable<CppAssembly> CppAssemblies => Assemblies.OfType<CppAssembly>();
+
+    public static IEnumerable<CSharpAssembly> CSharpAssemblies => Assemblies.OfType<CSharpAssembly>();
+
+    public static ProjectDirectory ProjectTarget => s_ProjectTargets.Last();
+
+    public static FileReference? ProjectFile { get; private set; }
+
+    [MemberNotNullWhen(false, nameof(ProjectFile))]
+    public static bool IsTargetEngine => ProjectTarget == Global.EngineDirectory;
+
+    public static bool TryFindModule(string name, [NotNullWhen(true)] out ScriptableAssembly? assembly)
     {
+        return s_Modules.TryGetValue(name, out assembly);
     }
 
-    public ProjectDirectory CurrentTarget { get; private set; }
-
-    public async Task ConfigureWorkspaceAsync(ProjectDirectory Target, bool bEngineCode, CancellationToken SToken = default)
+    public static void Init(ProjectDirectory target, FileReference? projectFile)
     {
-        await CollectModuleInSubdirectoryRecursiveAsync(Target, Target.Source.Root, SToken);
-        CurrentTarget = Target;
-    }
+        Current = target;
+        ProjectFile = projectFile;
 
-    private async Task CollectModuleInSubdirectoryRecursiveAsync(ProjectDirectory Target, string InSubdirectory, CancellationToken SToken = default)
-    {
-        foreach (var ModulePath in Directory.GetFiles(InSubdirectory, "*", SearchOption.TopDirectoryOnly))
+        s_Modules.Clear();
+        s_ProjectTargets.Clear();
+
+        IEnumerable<ProjectDirectory> targetProjects = target == Global.EngineDirectory ? new[] { Global.EngineDirectory } : new[] { Global.EngineDirectory, target };
+        foreach (var targetProject in targetProjects)
         {
-            if (InSubdirectory.EndsWith("Scripts"))
-            {
-                return;
-            }
-
-            if (ModulePath.EndsWith("csproj", StringComparison.OrdinalIgnoreCase))
-            {
-                CSModules.Add(new CSharpModule(Target, InSubdirectory));
-                return;
-            }
-
-            if (ModulePath.EndsWith("Module.cs", StringComparison.OrdinalIgnoreCase))
-            {
-                var CXXModule = new CppModule(Target, Path.GetRelativePath(Target.Source.Root, InSubdirectory));
-                await CXXModule.ConfigureAsync(SToken);
-                CXXModules.Add(CXXModule.Name, CXXModule);
-            }
-
-            if (ModulePath.EndsWith("Target.cs", StringComparison.OrdinalIgnoreCase))
-            {
-                var RelativePath = Path.GetRelativePath(Target.Source.Root, ModulePath);
-                var Instance = new ATarget(Target, RelativePath);
-                Targets.Add(Instance.TargetName, Instance);
-            }
+            InternalCollect(targetProject, targetProject.Source.Root);
         }
 
-        foreach (var Subdirectory in Directory.GetDirectories(InSubdirectory, "*", SearchOption.TopDirectoryOnly))
+        s_ProjectTargets.AddRange(targetProjects);
+
+        if (Workspace.IsTargetEngine == false)
         {
-            await CollectModuleInSubdirectoryRecursiveAsync(Target, Subdirectory, SToken);
+            if (projectFile == null)
+            {
+                throw new ArgumentNullException(nameof(projectFile));
+            }
         }
     }
 
-    public IEnumerable<CSharpModule> GetCSModules() => CSModules;
-
-    public IEnumerable<CppModule> GetCXXModules() => CXXModules.Values;
-
-    public ATarget? SearchTargetByName(string InTargetName)
+    public static async Task InitAssembliesAsync(CancellationToken cancellationToken = default)
     {
-        Targets.TryGetValue(InTargetName, out ATarget? SearchInstance);
-        return SearchInstance;
-    }
-
-    public CppModule? SearchCXXModuleByName(string InModuleName)
-    {
-        CXXModules.TryGetValue(InModuleName, out CppModule? SearchInstance);
-        return SearchInstance;
-    }
-
-    public void SearchModules()
-    {
-        SearchedModuleCache.Clear();
-
-        foreach (var (name, module) in CXXModules)
+        List<Task> tasks = new();
+        foreach (var module in Assemblies)
         {
-            var searchedModule = new SearchedModule
-            {
-                Rules = module.GenerateModuleRule(Target.Rules),
-                ProjectDirectory = Target.ProjectDirectory,
-                SourcePath = module.SourcePath
-            };
+            tasks.Add(module.CompileScriptableAssemblyAsync(cancellationToken));
+        }
 
-            SearchedModuleCache.TryAdd(name, searchedModule);
+        await Task.WhenAll(tasks);
+    }
+
+    public static void Cleanup()
+    {
+        foreach (var projectTarget in s_ProjectTargets)
+        {
+            projectTarget.Cleanup();
         }
     }
 
-    public void SearchCXXModulesRecursive(TargetRules Rule, string FromModule, string CurrentModule)
+    private static void InternalCollect(ProjectDirectory target, DirectoryReference directory, CancellationToken cancellationToken = default)
     {
-        if (SearchedModuleCache.TryGetModule(CurrentModule, out var ModuleRule) == false)
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var sourceFiles = directory.GetFiles();
+        var csharpModule = sourceFiles.FirstOrDefault(p => p.Extensions.Equals("csproj", StringComparison.OrdinalIgnoreCase));
+        if (csharpModule != null)
         {
-            CppModule? Module = SearchCXXModuleByName(CurrentModule);
-            if (Module == null)
+            var assembly = new CSharpAssembly(target, csharpModule);
+            s_Modules.Add(assembly.Name, assembly);
+            return;
+        }
+
+        bool hasModule = false;
+        foreach (var sourceFile in sourceFiles)
+        {
+            if (sourceFile.FileName.EndsWith(".Module.cs"))
             {
-                throw new TerminateException(KnownErrorCode.ModuleNotFound, CoreStrings.Errors.DependencyModuleNotFound(FromModule, CurrentModule));
+                var assembly = new CppAssembly(target, sourceFile);
+                s_Modules.Add(assembly.Name, assembly);
+                hasModule = true;
             }
+        }
 
-            ModuleRule = new()
+        if (hasModule == false)
+        {
+            foreach (var subdir in directory.GetDirectories())
             {
-                Rules = Module.GenerateModuleRule(Rule),
-                ProjectDirectory = Module.ProjectDirectory,
-                SourcePath = Module.SourcePath
-            };
-            SearchedModuleCache.TryAdd(CurrentModule, ModuleRule);
-
-            foreach (var NextModule in ModuleRule.Rules.PublicDependencyModuleNames.Concat(ModuleRule.Rules.PrivateDependencyModuleNames))
-            {
-                SearchCXXModulesRecursive(Rule, CurrentModule, NextModule);
+                InternalCollect(target, subdir, cancellationToken);
             }
         }
     }

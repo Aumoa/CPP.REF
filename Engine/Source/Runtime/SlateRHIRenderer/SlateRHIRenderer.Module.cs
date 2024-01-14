@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class SlateRHIRenderer : ModuleRules
 {
-    public SlateRHIRenderer(TargetRules TargetRule) : base(TargetRule)
+    public SlateRHIRenderer(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.IO;
 using AE.Rules;
 using AE.Source;
 
@@ -11,9 +12,9 @@ public record ModuleInformation
 
     public required ProjectDirectory ProjectDir { get; init; }
 
-    public required TargetType TargetType { get; init; }
+    public required ModuleRules.ModuleType TargetType { get; init; }
 
-    public required string[] SourceFiles { get; set; }
+    public required FileReference[] SourceFiles { get; set; }
 
     public required string SourcePath { get; init; }
 

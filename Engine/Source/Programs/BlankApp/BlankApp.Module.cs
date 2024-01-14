@@ -5,13 +5,14 @@ using AE.Rules;
 
 public class BlankApp : ModuleRules
 {
-    public BlankApp(TargetRules TargetRule) : base(TargetRule)
+    public BlankApp(TargetInfo targetInfo) : base(targetInfo)
     {
+        Type = ModuleType.ConsoleApplication;
+
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core",
             "Numerics",
-            "CoreAObject",
         });
 
         PrivateIncludePaths.Add("Private");

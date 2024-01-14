@@ -19,6 +19,9 @@ internal class Errors : IErrors
     public string DependencyModuleNotFound(string ModuleName, string RequiredModule)
         => $"`{ModuleName}` 모듈에서 필요한 모듈 `{RequiredModule}`을 찾을 수 없습니다.";
 
+    public string ModuleNotFound(string ModuleName)
+        => $"필요한 모듈 `{ModuleName}`을 찾을 수 없습니다.";
+
     public string DuplicatedModuleDefinitions
         => "두 개 이상의 모듈 정의 파일(`*.Module.cs`)이 검색되었습니다.";
 

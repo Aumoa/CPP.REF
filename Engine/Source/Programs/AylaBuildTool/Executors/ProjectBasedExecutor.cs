@@ -2,6 +2,7 @@
 
 using AE.CLI;
 using AE.Exceptions;
+using AE.IO;
 using AE.Projects;
 using AE.Source;
 
@@ -15,60 +16,36 @@ public abstract class ProjectBasedExecutor
         public string? ProjectFile { get; set; }
     }
 
-    private readonly Arguments ProjectBasedArgs = new();
+    private readonly Arguments projectBasedArgs = new();
 
-    public ProjectBasedExecutor(CommandLineParser Args)
+    public ProjectBasedExecutor(CommandLineParser args)
     {
-        Args.ApplyTo(ProjectBasedArgs);
+        args.ApplyTo(projectBasedArgs);
     }
 
-    protected async Task<Workspace> ConfigureWorkspaceAsync(CancellationToken SToken = default)
+    protected void ConfigureWorkspace()
     {
-        Workspace Workspace = new();
-        await Workspace.ConfigureWorkspaceAsync(Global.EngineDirectory, true, SToken);
-        if (ProjectBasedArgs.ProjectFile != null)
+        if (string.IsNullOrEmpty(projectBasedArgs.ProjectFile))
         {
-            if (Path.IsPathFullyQualified(ProjectBasedArgs.ProjectFile) == false)
-            {
-                ProjectBasedArgs.ProjectFile = Path.Combine(Environment.CurrentDirectory, ProjectBasedArgs.ProjectFile);
-            }
-
-            if (File.Exists(ProjectBasedArgs.ProjectFile) == false)
-            {
-                throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.InvalidProjectFormat);
-            }
-
-            string ProjectFileDir = Path.GetFullPath(Path.GetDirectoryName(ProjectBasedArgs.ProjectFile)!);
-            ProjectDirectory GameProject = new() { Root = ProjectFileDir };
-            await Workspace.ConfigureWorkspaceAsync(GameProject, false, SToken);
-        }
-
-        return Workspace;
-    }
-
-    protected ProjectDirectory[] GetProjectDirectories()
-    {
-        if (ProjectBasedArgs.ProjectFile != null)
-        {
-            if (Path.IsPathFullyQualified(ProjectBasedArgs.ProjectFile) == false)
-            {
-                ProjectBasedArgs.ProjectFile = Path.Combine(Environment.CurrentDirectory, ProjectBasedArgs.ProjectFile);
-            }
-
-            if (File.Exists(ProjectBasedArgs.ProjectFile) == false)
-            {
-                throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.InvalidProjectFormat);
-            }
-
-            string ProjectFileDir = Path.GetFullPath(Path.GetDirectoryName(ProjectBasedArgs.ProjectFile)!);
-            ProjectDirectory GameProject = new() { Root = ProjectFileDir };
-            return new[] { Global.EngineDirectory, GameProject };
+            Workspace.Init(Global.EngineDirectory, null);
         }
         else
         {
-            return new[] { Global.EngineDirectory };
+            var projectFile = new FileReference(projectBasedArgs.ProjectFile);
+
+            if (projectFile.IsPathFullQualified == false)
+            {
+                projectFile = Path.Combine(Environment.CurrentDirectory, projectBasedArgs.ProjectFile);
+            }
+
+            if (File.Exists(projectBasedArgs.ProjectFile) == false)
+            {
+                throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.InvalidProjectFormat);
+            }
+
+            string projectFileDir = Path.GetFullPath(Path.GetDirectoryName(projectBasedArgs.ProjectFile)!);
+            ProjectDirectory gameProject = new() { Root = projectFileDir };
+            Workspace.Init(gameProject, projectBasedArgs.ProjectFile);
         }
     }
-
-    public string? ProjectFile => ProjectBasedArgs.ProjectFile;
 }

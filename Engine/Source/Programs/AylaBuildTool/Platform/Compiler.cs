@@ -1,31 +1,31 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.BuildSettings;
-using AE.Rules;
-using AE.SourceTree;
+using AE.CompilerServices;
+using AE.CompilerServices.Makefiles;
 
 namespace AE.Platform;
 
 public abstract class Compiler
 {
-    public abstract Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default);
+    public abstract Task<string> CompileAsync(MakefileCompile node, CancellationToken cancellationToken = default);
 
-    protected static (string, string)[] GenerateBuildMacros(TargetRules Rule)
+    protected static (string, string)[] GenerateBuildMacros()
     {
-        List<(string, string)> Macros = new();
+        List<(string, string)> macros = new();
 
         PlatformGroup.ForEach(p =>
         {
-            bool bCurrent = p == Rule.Target.BuildConfiguration.Platform.Group;
-            Macros.Add(($"PLATFORM_{p.GroupName.ToUpper()}", bCurrent ? "1" : "0"));
+            bool isCurrent = p == Target.Info.BuildConfiguration.Platform.Group;
+            macros.Add(($"PLATFORM_{p.GroupName.ToUpper()}", isCurrent ? "1" : "0"));
         });
 
-        bool bShipping = Rule.Target.BuildConfiguration.Configuration == Configuration.Shipping;
-        Macros.Add(("SHIPPING", bShipping ? "1" : "0"));
+        bool isShipping = Target.Info.BuildConfiguration.Configuration == Configuration.Shipping;
+        macros.Add(("SHIPPING", isShipping ? "1" : "0"));
 
-        bool bEditor = Rule.bEditor;
-        Macros.Add(("WITH_EDITOR", bEditor ? "1" : "0"));
+        bool isEditor = Target.IsEditor;
+        macros.Add(("WITH_EDITOR", isEditor ? "1" : "0"));
 
-        return Macros.ToArray();
+        return macros.ToArray();
     }
 }

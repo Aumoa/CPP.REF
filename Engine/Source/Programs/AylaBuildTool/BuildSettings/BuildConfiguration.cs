@@ -1,7 +1,5 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using AE.Rules;
-
 namespace AE.BuildSettings;
 
 public class BuildConfiguration

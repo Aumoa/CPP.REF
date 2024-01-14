@@ -11,19 +11,17 @@ public class CleanExecutor : ProjectBasedExecutor, IExecutor
     {
     }
 
-    private readonly Arguments BuildArgs = new();
+    private readonly Arguments buildArgs = new();
 
-    public CleanExecutor(CommandLineParser Args) : base(Args)
+    public CleanExecutor(CommandLineParser args) : base(args)
     {
-        Args.ApplyTo(BuildArgs);
+        args.ApplyTo(buildArgs);
     }
 
-    public Task<int> RunAsync(CancellationToken SToken = default)
+    public Task<int> RunAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var Dir in GetProjectDirectories())
-        {
-            Dir.Cleanup();
-        }
+        ConfigureWorkspace();
+        Workspace.Cleanup();
         return Task.FromResult(0);
     }
 }

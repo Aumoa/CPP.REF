@@ -5,7 +5,7 @@ using AE.Rules;
 
 public class Launch : ModuleRules
 {
-    public Launch(TargetRules TargetRule) : base(TargetRule)
+    public Launch(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -15,19 +15,11 @@ public class Launch : ModuleRules
             "Core",
             "RHI",
             "SlateCore",
-            "CoreAObject",
             "SlateRHIRenderer",
             "Engine",
-            "Slate"
+            "Slate",
+            "CoreEd",
+            "MainFrame"
         });
-
-        if (TargetRule.bEditor)
-        {
-            PublicDependencyModuleNames.AddRange(new[]
-            {
-                "CoreEd",
-                "MainFrame",
-            });
-        }
     }
 }

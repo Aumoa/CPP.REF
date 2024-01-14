@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 
 using AE.BuildSettings;
+using AE.CompilerServices;
 using AE.Exceptions;
 using AE.Projects;
 using AE.Rules;
@@ -21,14 +22,14 @@ public class VSLinker : Linker
         this.ToolChain = ToolChain;
     }
 
-    private void GenerateBuildInformation(TargetRules Rule, ModuleInformation Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem)
+    private void GenerateBuildInformation(ModuleInformation Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem)
     {
-        var Config = Rule.Target.BuildConfiguration;
+        var Config = Target.Config;
         if (Config.Platform == TargetPlatform.Win64)
         {
-            OutputDir = Path.Combine(Module.ProjectDir.Binaries.Win64, Config.Configuration.ToString());
-            BuildDir = Path.Combine(Module.ProjectDir.Intermediate.Build, "Win64");
-            LibraryDir = Path.Combine(Global.EngineDirectory.Binaries.Win64, Config.Configuration.ToString());
+            OutputDir = Module.ProjectDir.Binaries.BinariesOut(Config);
+            BuildDir = Module.ProjectDir.Intermediate.BuildsOut(Config, Module.Name);
+            LibraryDir = Global.EngineDirectory.Binaries.BinariesOut(Config);
 
             if (Directory.Exists(OutputDir) == false)
             {
@@ -42,19 +43,18 @@ public class VSLinker : Linker
 
         BinaryOut = Path.Combine(OutputDir, Module.Name);
         PdbOut = Path.Combine(OutputDir, Module.Name + ".pdb");
-        BuildDir = Path.Combine(BuildDir, Config.Configuration.ToString(), Module.Name);
 
-        if (Module.TargetType == TargetType.Module)
+        if (Module.TargetType == ModuleRules.ModuleType.Library)
         {
             BinaryOut = Path.ChangeExtension(BinaryOut, ".dll");
             Subsystem = "/DLL";
         }
-        else if (Module.TargetType == TargetType.ConsoleApplication)
+        else if (Module.TargetType == ModuleRules.ModuleType.ConsoleApplication)
         {
             BinaryOut = Path.ChangeExtension(BinaryOut, ".exe");
             Subsystem = "/SUBSYSTEM:CONSOLE";
         }
-        else if (Module.TargetType == TargetType.SlateApplication)
+        else if (Module.TargetType == ModuleRules.ModuleType.Application)
         {
             BinaryOut = Path.ChangeExtension(BinaryOut, ".exe");
             Subsystem = "/SUBSYSTEM:WINDOWS";
@@ -65,10 +65,10 @@ public class VSLinker : Linker
         }
     }
 
-    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    public override async Task<string> LinkAsync(ModuleInformation Module, CancellationToken SToken = default)
     {
         string LinkExe = this.LinkExe;
-        var Config = Rule.Target.BuildConfiguration;
+        var Config = Target.Config;
         foreach (var ExecutablePath in ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture))
         {
             string Cur = Path.Combine(ExecutablePath, this.LinkExe);
@@ -79,7 +79,7 @@ public class VSLinker : Linker
             }
         }
 
-        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem);
+        GenerateBuildInformation(Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem);
 
         ProcessStartInfo PSI = new(LinkExe);
         string[] Paths = ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture);
@@ -124,9 +124,9 @@ public class VSLinker : Linker
         return Stdout;
     }
 
-    public override Task<bool> TryCheckOutputsAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken)
+    public override Task<bool> TryCheckOutputsAsync(ModuleInformation Module, CancellationToken SToken)
     {
-        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem);
+        GenerateBuildInformation(Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string PdbOut, out string Subsystem);
         return Task.FromResult(File.Exists(BinaryOut) && File.Exists(PdbOut));
     }
 }

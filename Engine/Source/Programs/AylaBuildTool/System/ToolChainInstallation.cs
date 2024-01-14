@@ -1,8 +1,12 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
+using AE.Exceptions;
 using AE.Misc;
 using AE.Platform;
+using AE.Platform.Linux;
 using AE.Platform.Windows;
+using AE.Rules;
 
 namespace AE.System;
 
@@ -66,4 +70,30 @@ public abstract class ToolChainInstallation
     }
 
     public abstract string DotNET { get; }
+
+    public static ToolChainInstallation Spawn(TargetInfo targetInfo)
+    {
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            // Host:Windows Target:Windows
+            if (targetInfo.BuildConfiguration.Platform == TargetPlatform.Win64)
+            {
+                var installations = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022);
+                if (installations.Any())
+                {
+                    return installations[0];
+                }
+            }
+        }
+        else if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            // Host:Linux Target:Linux
+            if (targetInfo.BuildConfiguration.Platform == TargetPlatform.Linux)
+            {
+                return new LinuxToolChain();
+            }
+        }
+
+        throw new TerminateException(KnownErrorCode.PlatformCompilerNotFound, CoreStrings.Errors.PlatformCompilerNotFound(targetInfo.BuildConfiguration.Platform.ToString()));
+    }
 }

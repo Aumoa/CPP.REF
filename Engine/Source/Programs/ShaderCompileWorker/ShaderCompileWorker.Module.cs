@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class ShaderCompileWorker : ModuleRules
 {
-    public ShaderCompileWorker(TargetRules TargetRule) : base(TargetRule)
+    public ShaderCompileWorker(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicDependencyModuleNames.AddRange(new[]
         {
@@ -15,7 +15,7 @@ public class ShaderCompileWorker : ModuleRules
 
         PrivateIncludePaths.Add("Private");
 
-        if (TargetRule.Platform.Group == PlatformGroup.Windows)
+        if (targetInfo.Platform.Group == PlatformGroup.Windows)
         {
             PrivateAdditionalLibraries.Add("dxcompiler.lib");
         }

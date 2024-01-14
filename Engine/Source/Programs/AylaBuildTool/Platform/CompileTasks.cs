@@ -1,10 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-using AE.BuildSettings;
 using AE.CompilerServices;
-using AE.Rules;
-using AE.SourceTree;
-using AE.System;
+using AE.CompilerServices.Makefiles;
 
 namespace AE.Platform;
 
@@ -24,13 +21,13 @@ public class CompileTasks : Compiler
 
     public int MaxParallel { get; private init; }
 
-    public override async Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default)
+    public override async Task<string> CompileAsync(MakefileCompile Node, CancellationToken SToken = default)
     {
         await Access.WaitAsync();
         try
         {
             var Compiler = ToolChain.SpawnCompiler();
-            return await Compiler.CompileAsync(Node, Rule, SToken);
+            return await Compiler.CompileAsync(Node, SToken);
         }
         finally
         {

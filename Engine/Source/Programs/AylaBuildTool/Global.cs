@@ -2,6 +2,7 @@
 
 using System.Reflection;
 
+using AE.IO;
 using AE.Source;
 
 namespace AE;
@@ -14,7 +15,7 @@ public static class Global
         EngineDirectory = new ProjectDirectory() { Root = Path.GetFullPath(Path.Combine(Location, "..", "..", "..")) };
     }
 
-    public static int MakefileVersion = 8;
+    public static int MakefileVersion = 9;
 
     public static ProjectDirectory EngineDirectory { get; }
 

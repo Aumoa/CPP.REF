@@ -1,98 +1,75 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.BuildSettings;
+using AE.IO;
+
 namespace AE.Source;
 
 public struct IntermediateDirectory
 {
-    private readonly string _Root;
+    private readonly DirectoryReference _Root;
 
-    public string Root
+    public DirectoryReference Root
     {
         get => _Root;
         init
         {
             _Root = value;
-            Includes = Path.Combine(_Root, "Includes");
-            Shaders = Path.Combine(_Root, "Shaders");
-            ProjectFiles = Path.Combine(_Root, "ProjectFiles");
-            CSharp = Path.Combine(_Root, "CSharp");
-            Build = Path.Combine(_Root, "Build");
-            Makefiles = Path.Combine(_Root, "Makefiles");
-            Unused = Path.Combine(_Root, "Unused");
+            Includes = _Root.GetChild("Includes");
+            Shaders = _Root.GetChild("Shaders");
+            ProjectFiles = _Root.GetChild("ProjectFiles");
+            CSharp = _Root.GetChild("CSharp");
+            Build = _Root.GetChild("Build");
+            Makefiles = _Root.GetChild("Makefiles");
+            Assemblies = _Root.GetChild("Assemblies");
+            Unused = _Root.GetChild("Unused");
         }
     }
 
-    public string Includes { get; private init; }
+    public DirectoryReference Includes { get; private init; }
     
-    public string Shaders { get; private init; }
+    public DirectoryReference Shaders { get; private init; }
 
-    public string ProjectFiles { get; private init; }
+    public DirectoryReference ProjectFiles { get; private init; }
 
-    public string CSharp { get; private init; }
+    public DirectoryReference CSharp { get; private init; }
 
-    public string Build { get; private init; }
+    public DirectoryReference Build { get; private init; }
 
-    public string Makefiles { get; private init; }
+    public DirectoryReference Makefiles { get; private init; }
 
-    public string Unused { get; private init; }
+    public DirectoryReference Assemblies { get; private init; }
+
+    public DirectoryReference Unused { get; private init; }
 
     public void GenerateDirectoriesRecursive()
     {
-        if (Directory.Exists(Root) == false)
-        {
-            Directory.CreateDirectory(Root);
-        }
-
-        if (Directory.Exists(Includes) == false)
-        {
-            Directory.CreateDirectory(Includes);
-        }
-
-        if (Directory.Exists(ProjectFiles) == false)
-        {
-            Directory.CreateDirectory(ProjectFiles);
-        }
-
-        if (Directory.Exists(CSharp) == false)
-        {
-            Directory.CreateDirectory(CSharp);
-        }
-
-        if (Directory.Exists(Build) == false)
-        {
-            Directory.CreateDirectory(Build);
-        }
-
-        if (Directory.Exists(Makefiles) == false)
-        {
-            Directory.CreateDirectory(Makefiles);
-        }
-
-        if (Directory.Exists(Unused) == false)
-        {
-            Directory.CreateDirectory(Unused);
-        }
+        Root.Create();
+        Includes.Create();
+        ProjectFiles.Create();
+        CSharp.Create();
+        Build.Create();
+        Makefiles.Create();
+        Assemblies.Create();
+        Unused.Create();
     }
 
     public void Cleanup()
     {
-        string[] Targets = new string[]
-        {
-            Makefiles
-        };
-
-        foreach (var Target in Targets)
-        {
-            if (Directory.Exists(Target))
-            {
-                Directory.Delete(Target, true);
-                Directory.CreateDirectory(Target);
-            }
-        }
+        Includes.Clear();
+        CSharp.Clear();
+        Build.Clear();
+        Makefiles.Clear();
+        Assemblies.Clear();
     }
 
     public override string ToString()
     {
         return Root;
+    }
+
+    public DirectoryReference BuildsOut(BuildConfiguration config, string moduleName)
+    {
+        return Build.GetHierarchy(config.Platform.ToString(), config.Configuration.ToString(), moduleName);
     }
 }

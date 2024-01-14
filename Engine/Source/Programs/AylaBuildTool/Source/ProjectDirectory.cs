@@ -1,27 +1,30 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using AE.BuildSettings;
+using AE.IO;
 using AE.Misc;
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AE.Source;
 
-public readonly struct ProjectDirectory
+public readonly struct ProjectDirectory : IEquatable<ProjectDirectory>
 {
-    private readonly string _Root;
+    private readonly DirectoryReference _Root;
 
-    public string Root
+    public DirectoryReference Root
     {
         get => _Root;
         init
         {
             _Root = value;
-            Name = Path.GetFileNameWithoutExtension(value);
-            Source = new() { Root = Path.Combine(Root, "Source") };
-            Shaders = Path.Combine(_Root, "Shaders");
-            Intermediate = new() { Root = Path.Combine(Root, "Intermediate") };
-            Content = new() { Root = Path.Combine(Root, "Content") };
-            Binaries = new() { Root = Path.Combine(Root, "Binaries") };
-            Build = new() { Root = Path.Combine(Root, "Build") };
+            Name = Root.Name;
+            Source = new() { Root = Root.GetChild("Source") };
+            Shaders = _Root.GetChild("Shaders");
+            Intermediate = new() { Root = Root.GetChild("Intermediate") };
+            Content = new() { Root = Root.GetChild("Content") };
+            Binaries = new() { Root = Root.GetChild("Binaries") };
+            Build = new() { Root = Root.GetChild("Build") };
         }
     }
 
@@ -29,7 +32,7 @@ public readonly struct ProjectDirectory
 
     public SourceDirectory Source { get; private init; }
 
-    public string Shaders { get; private init; }
+    public DirectoryReference Shaders { get; private init; }
 
     public IntermediateDirectory Intermediate { get; private init; }
 
@@ -38,6 +41,23 @@ public readonly struct ProjectDirectory
     public BinariesDirectory Binaries { get; init; }
     
     public BuildDirectory Build { get; private init; }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is ProjectDirectory pd)
+        {
+            return this == pd;
+        }
+
+        return false;
+    }
+
+    public bool Equals(ProjectDirectory rhs)
+    {
+        return this == rhs;
+    }
+
+    public override int GetHashCode() => _Root.GetHashCode();
 
     public void GenerateDirectoriesRecursive()
     {
@@ -55,10 +75,8 @@ public readonly struct ProjectDirectory
 
     public void Cleanup()
     {
-        DirectoryExtensions.Cleanup(Intermediate.Build);
-        DirectoryExtensions.Cleanup(Intermediate.Includes);
-        DirectoryExtensions.Cleanup(Intermediate.Makefiles);
-        DirectoryExtensions.Cleanup(Binaries.Win64);
+        Intermediate.Cleanup();
+        Binaries.Cleanup();
     }
 
     public override string ToString()
@@ -66,8 +84,17 @@ public readonly struct ProjectDirectory
         return Root;
     }
 
-    public string GenerateIntermediateOutput(BuildConfiguration Config, string ModuleName)
+    public static bool operator ==(ProjectDirectory lhs, ProjectDirectory rhs)
     {
-        return Path.Combine(Intermediate.Build, Config.Platform.ToString(), Config.Configuration.ToString(), ModuleName);
+        return lhs._Root == rhs._Root;
     }
+
+    public static bool operator !=(ProjectDirectory lhs, ProjectDirectory rhs)
+    {
+        return lhs._Root != rhs._Root;
+    }
+
+    public static implicit operator DirectoryReference(ProjectDirectory value) => value._Root;
+
+    public static implicit operator ProjectDirectory(DirectoryReference value) => new ProjectDirectory { Root = value };
 }

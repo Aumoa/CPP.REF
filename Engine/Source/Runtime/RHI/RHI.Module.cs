@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class RHI : ModuleRules
 {
-    public RHI(TargetRules TargetRule) : base(TargetRule)
+    public RHI(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -19,7 +19,7 @@ public class RHI : ModuleRules
 
         PublicDisableWarnings.Add(4324);
 
-        if (TargetRule.Platform.Group == PlatformGroup.Windows)
+        if (targetInfo.Platform.Group == PlatformGroup.Windows)
         {
             PrivateAdditionalLibraries.AddRange(new[]
             {

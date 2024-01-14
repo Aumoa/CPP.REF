@@ -3,6 +3,7 @@
 using System.Diagnostics;
 
 using AE.BuildSettings;
+using AE.CompilerServices;
 using AE.Exceptions;
 using AE.Projects;
 using AE.Rules;
@@ -20,14 +21,14 @@ public class GccLinker : Linker
         this.CompilerPath = CompilerPath;
     }
 
-    private void GenerateBuildInformation(TargetRules Rule, ModuleInformation Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem)
+    private void GenerateBuildInformation(ModuleInformation Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem)
     {
-        var Config = Rule.Target.BuildConfiguration;
+        var Config = Target.Config;
         if (Config.Platform == TargetPlatform.Linux)
         {
-            OutputDir = Path.Combine(Module.ProjectDir.Binaries.Linux, Config.Configuration.ToString());
-            BuildDir = Path.Combine(Module.ProjectDir.Intermediate.Build, "Linux");
-            LibraryDir = Path.Combine(Global.EngineDirectory.Binaries.Linux, Config.Configuration.ToString());
+            OutputDir = Module.ProjectDir.Binaries.BinariesOut(Config);
+            BuildDir = Module.ProjectDir.Intermediate.BuildsOut(Config, Module.Name);
+            LibraryDir = Global.EngineDirectory.Binaries.BinariesOut(Config);
 
             if (Directory.Exists(OutputDir) == false)
             {
@@ -43,13 +44,13 @@ public class GccLinker : Linker
         BuildDir = Path.Combine(BuildDir, Config.Configuration.ToString(), Module.Name);
         Subsystem = string.Empty;
 
-        if (Module.TargetType == TargetType.Module)
+        if (Module.TargetType == ModuleRules.ModuleType.Library)
         {
             string Filename = Path.GetFileNameWithoutExtension(BinaryOut);
             BinaryOut = Path.ChangeExtension(Path.Combine(Path.GetDirectoryName(BinaryOut)!, "lib" + Filename), ".so");
             Subsystem = "-shared";
         }
-        else if (Module.TargetType == TargetType.ConsoleApplication)
+        else if (Module.TargetType == ModuleRules.ModuleType.ConsoleApplication)
         {
             BinaryOut = Path.Combine(Path.GetDirectoryName(BinaryOut)!, Path.GetFileNameWithoutExtension(BinaryOut));
             Subsystem = "";
@@ -60,9 +61,9 @@ public class GccLinker : Linker
         }
     }
 
-    public override async Task<string> LinkAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    public override async Task<string> LinkAsync(ModuleInformation Module, CancellationToken SToken = default)
     {
-        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem);
+        GenerateBuildInformation(Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem);
 
         ProcessStartInfo PSI = new(CompilerPath);
         PSI.RedirectStandardOutput = true;
@@ -101,9 +102,9 @@ public class GccLinker : Linker
         return $"Linking: {BinaryOut}";
     }
 
-    public override Task<bool> TryCheckOutputsAsync(TargetRules Rule, ModuleInformation Module, CancellationToken SToken = default)
+    public override Task<bool> TryCheckOutputsAsync(ModuleInformation Module, CancellationToken SToken = default)
     {
-        GenerateBuildInformation(Rule, Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem);
+        GenerateBuildInformation(Module, out string OutputDir, out string BuildDir, out string LibraryDir, out string BinaryOut, out string Subsystem);
         return Task.FromResult(File.Exists(BinaryOut));
     }
 }

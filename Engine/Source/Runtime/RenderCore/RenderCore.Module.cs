@@ -6,7 +6,7 @@ using AE.BuildSettings;
 
 public class RenderCore : ModuleRules
 {
-    public RenderCore(TargetRules TargetRule) : base(TargetRule)
+    public RenderCore(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

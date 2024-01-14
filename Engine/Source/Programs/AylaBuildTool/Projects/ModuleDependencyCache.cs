@@ -2,29 +2,40 @@
 
 using System.Data;
 
+using AE.Assemblies;
+using AE.Exceptions;
 using AE.Extensions;
-using AE.ProjectFiles;
+using AE.IO;
 using AE.Rules;
 
 namespace AE.Projects;
 
 public static class ModuleDependencyCache
 {
-    private static readonly Dictionary<string, ModuleInformation> s_Cached = new();
+    private static readonly Stack<Dictionary<string, ModuleInformation>> s_Stack = new();
+    private static Dictionary<string, ModuleInformation> s_Cached = new();
 
     public static IEnumerable<ModuleInformation> Modules => s_Cached.Values;
 
     public static void Clear()
     {
-        lock (s_Cached)
-        {
-            s_Cached.Clear();
-        }
+        s_Cached = new();
     }
 
-    public static void BuildCache(string name) => GetCached(name);
+    public static void Push()
+    {
+        s_Stack.Push(s_Cached);
+        s_Cached = new();
+    }
 
-    public static ModuleInformation GetCached(string name)
+    public static void Pop()
+    {
+        s_Cached = s_Stack.Pop();
+    }
+
+    public static void BuildCache(string name, string source) => GetCached(name, source);
+
+    public static ModuleInformation GetCached(string name, string source)
     {
         ModuleInformation? dependency = null;
         lock (s_Cached)
@@ -35,14 +46,23 @@ public static class ModuleDependencyCache
             }
         }
 
-        if (SearchedModuleCache.TryGetModule(name, out var searched) == false)
+        if (Workspace.TryFindModule(name, out var assembly) == false || assembly is not CppAssembly cppAssembly)
         {
-            throw new KeyNotFoundException(name);
+            string message;
+            if (string.IsNullOrEmpty(source))
+            {
+                message = CoreStrings.Errors.ModuleNotFound(name);
+            }
+            else
+            {
+                message = CoreStrings.Errors.DependencyModuleNotFound(source, name);
+            }
+            throw new TerminateException(KnownErrorCode.ModuleNotFound, message);
         }
 
-        var sourcePath = searched.SourcePath;
-        var rules = searched.Rules;
-        var projectDir = searched.ProjectDirectory;
+        var sourcePath = cppAssembly.SourceDirectory;
+        var rules = cppAssembly.Rules;
+        var projectDir = cppAssembly.ProjectDirectory;
 
         string AsFullPath(string currentPath)
         {
@@ -60,7 +80,7 @@ public static class ModuleDependencyCache
 
         foreach (var dependName in rules.PublicDependencyModuleNames.Concat(rules.PrivateDependencyModuleNames))
         {
-            var depend = GetCached(dependName);
+            var depend = GetCached(dependName, name);
             includePaths.AddRange(depend.PublicIncludePaths);
             additionalMacros.AddRange(depend.PublicAdditionalMacros);
             apiDescriptions.AddRange(depend.DependModules);
@@ -78,14 +98,14 @@ public static class ModuleDependencyCache
         int[] publicDisableWarnings = disableWarnings.Concat(rules.PublicDisableWarnings).Distinct().ToArray();
         int[] privateDisableWarnings = publicDisableWarnings.Concat(rules.PrivateDisableWarnings).Distinct().ToArray();
 
-        IEnumerable<string> sourceFiles = Directory
-            .GetFiles(sourcePath, "*", SearchOption.AllDirectories)
-            .Where(SourceCodeExtensions.IsSourceCode);
+        IEnumerable<FileReference> sourceFiles = sourcePath
+            .GetFiles(recursive: true)
+            .Where(p => SourceCodeUtility.IsSourceCode(p));
 
         dependency = new ModuleInformation
         {
             Name = name,
-            TargetType = TargetType.Module,
+            TargetType = rules.Type,
             ProjectDir = projectDir,
             SourceFiles = sourceFiles.ToArray(),
             SourcePath = sourcePath,

@@ -7,7 +7,7 @@ using AE.Platform;
 
 public class ApplicationCore : ModuleRules
 {
-    public ApplicationCore(TargetRules TargetRule) : base(TargetRule)
+    public ApplicationCore(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
@@ -18,9 +18,9 @@ public class ApplicationCore : ModuleRules
             "Numerics"
         });
 
-        if (TargetRule.Platform.Group == PlatformGroup.Windows)
+        if (targetInfo.Platform.Group == PlatformGroup.Windows)
         {
-            if (TargetRule.Platform.Architecture == Architecture.x64)
+            if (targetInfo.Platform.Architecture == Architecture.x64)
             {
                 PrivateAdditionalMacros.AddRange(new[]
                 {

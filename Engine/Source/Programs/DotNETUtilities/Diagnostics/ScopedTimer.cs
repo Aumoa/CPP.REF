@@ -4,33 +4,18 @@ using System.Diagnostics;
 
 namespace AE.Diagnostics;
 
-public class ScopedTimer : IDisposable
+public static class ScopedTimer
 {
-    private static readonly ThreadLocal<Dictionary<string, double>> Results = new(() => new());
+    private static readonly Stopwatch s_Stopwatch = new();
 
-    private readonly string Name;
-    private readonly Stopwatch? Timer;
-
-    public ScopedTimer(string InName, bool bStartNew = true)
+    public static void Start()
     {
-        Name = InName;
-        if (bStartNew)
-        {
-            Timer = Stopwatch.StartNew();
-        }
+        s_Stopwatch.Restart();
     }
 
-    public void Dispose()
+    public static TimeSpan Stop()
     {
-        Debug.Assert(Timer != null);
-        Timer.Stop();
-        Results.Value!.TryAdd(Name, Timer.Elapsed.TotalSeconds);
-        GC.SuppressFinalize(this);
-    }
-
-    public static double GetElapsed(string InName)
-    {
-        Results.Value!.TryGetValue(InName, out double Val);
-        return Val;
+        s_Stopwatch.Stop();
+        return s_Stopwatch.Elapsed;
     }
 }

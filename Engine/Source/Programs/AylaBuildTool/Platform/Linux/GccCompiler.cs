@@ -1,12 +1,11 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
-using System.Xml.Linq;
 
 using AE.BuildSettings;
+using AE.CompilerServices;
+using AE.CompilerServices.Makefiles;
 using AE.Exceptions;
-using AE.Rules;
-using AE.SourceTree;
 
 namespace AE.Platform.Linux;
 
@@ -21,7 +20,7 @@ public class GccCompiler : Compiler
         this.CompilerPath = CompilerPath;
     }
 
-    private ProcessStartInfo MakeBaseProcessStartInfo(TargetRules Rule)
+    private ProcessStartInfo MakeBaseProcessStartInfo()
     {
         ProcessStartInfo PSI = new(CompilerPath);
         PSI.RedirectStandardOutput = true;
@@ -45,9 +44,9 @@ public class GccCompiler : Compiler
             ;
     }
 
-    private void SetConfigCompilerParameters(ProcessStartInfo PSI, TargetRules Rule)
+    private void SetConfigCompilerParameters(ProcessStartInfo PSI)
     {
-        switch (Rule.Target.BuildConfiguration.Configuration)
+        switch (Target.Configuration)
         {
             case Configuration.Debug:
             case Configuration.DebugGame:
@@ -79,10 +78,10 @@ public class GccCompiler : Compiler
         }
     }
 
-    private void SetModuleParameters(ProcessStartInfo PSI, MakefileCompile Item, TargetRules Rule)
+    private void SetModuleParameters(ProcessStartInfo PSI, MakefileCompile Item)
     {
         var Includes = Item.CollectCompilerIncludePaths().Select(AsCompilerInclude);
-        var Macros = Item.CollectCompilerMacros(Rule).Select(AsCompilerMacro);
+        var Macros = Item.CollectCompilerMacros().Select(AsCompilerMacro);
 
         string IncludeStr = string.Join(' ', Includes);
         string MacroStr = string.Join(' ', Macros);
@@ -90,38 +89,37 @@ public class GccCompiler : Compiler
         PSI.Arguments += $"{IncludeStr} {MacroStr} ";
     }
 
-    private string SetSourceCodeParameters(ProcessStartInfo PSI, TargetRules Rule, MakefileCompile Item, out string OutputPath)
+    private string SetSourceCodeParameters(ProcessStartInfo PSI, MakefileCompile Item, out string OutputPath)
     {
-        string SourceCodeName = Path.GetFileName(Item.FilePath);
-        string Output = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".o");
+        string SourceCodeName = Path.GetFileName(Item.SourceFile);
+        string Output = Path.Combine(Item.BuildsOut(), SourceCodeName + ".o");
 
         OutputPath = Output;
         return $"-o\"{Output}\" ";
     }
 
-    public override async Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default)
+    public override async Task<string> CompileAsync(MakefileCompile Node, CancellationToken SToken = default)
     {
-        ProcessStartInfo PSI = MakeBaseProcessStartInfo(Rule);
-        MakefileCompile Item = Node.Compile;
+        ProcessStartInfo PSI = MakeBaseProcessStartInfo();
 
-        string Output = Item.GetIntermediateOutputPath(Rule);
+        string Output = Node.BuildsOut();
         if (Directory.Exists(Output) == false)
         {
             Directory.CreateDirectory(Output);
         }
         SetBaseCompilerParameters(PSI);
-        SetConfigCompilerParameters(PSI, Rule);
-        SetModuleParameters(PSI, Item, Rule);
-        string AppendStr = SetSourceCodeParameters(PSI, Rule, Item, out string OutputPath);
+        SetConfigCompilerParameters(PSI);
+        SetModuleParameters(PSI, Node);
+        string AppendStr = SetSourceCodeParameters(PSI, Node, out string OutputPath);
 
-        if (Item.ModuleInfo.DependModules.Contains("Core"))
+        if (Node.ModuleInfo.DependModules.Contains("Core"))
         {
             // Force include CoreMinimal.h
             PSI.Arguments += $"-include CoreMinimal.h ";
         }
 
         // Include source.
-        PSI.Arguments += $"\"{Item.FilePath}\" ";
+        PSI.Arguments += $"\"{Node.SourceFile}\" ";
 
         string BaseArguments = PSI.Arguments;
         PSI.Arguments += AppendStr;
@@ -133,7 +131,7 @@ public class GccCompiler : Compiler
             throw new InvalidOperationException("Internal error.");
         }
 
-        var (Stdout, Stderr) = await GetProcessOutputsAsync(Item.FilePath, P, SToken);
+        var (Stdout, Stderr) = await GetProcessOutputsAsync(Node.SourceFile, P, SToken);
         if (P.ExitCode != 0)
         {
             string Report = string.Empty;
@@ -151,30 +149,30 @@ public class GccCompiler : Compiler
         {
             throw new InvalidOperationException("Internal error.");
         }
-        (Stdout, Stderr) = await GetProcessOutputsAsync(Item.FilePath, P, SToken);
+        (Stdout, Stderr) = await GetProcessOutputsAsync(Node.SourceFile, P, SToken);
 
         if (P.ExitCode == 0)
         {
-            await GenerateSourceCodeCache(Item, Rule, OutputPath, Stdout + Stderr);
+            await GenerateSourceCodeCache(Node, OutputPath, Stdout + Stderr);
         }
 
         var Elapsed = DateTime.Now - StartTime;
-        return $"{Path.GetFileName(Item.FilePath)} ({Elapsed.TotalSeconds:0.00}s)";
+        return $"{Path.GetFileName(Node.SourceFile)} ({Elapsed.TotalSeconds:0.00}s)";
     }
 
-    private async Task GenerateSourceCodeCache(MakefileCompile Item, TargetRules Rule, string ObjectOutput, string Deps)
+    private async Task GenerateSourceCodeCache(MakefileCompile Item, string ObjectOutput, string Deps)
     {
         MakefileSourceCache NewCache = new()
         {
-            SourceCache = SourceCodeCache.Generate(Item.FilePath),
-            Includes = await ReadDependenciesAsync(Item, Rule, Deps),
+            SourceCache = SourceCodeCache.Generate(Item.SourceFile),
+            Dependencies = await ReadDependenciesAsync(Item, Deps),
             ObjectOutputFile = ObjectOutput,
         };
 
         Item.Cache = NewCache;
     }
 
-    private Task<SourceCodeCache[]> ReadDependenciesAsync(MakefileCompile Item, TargetRules Rule, string Deps)
+    private Task<SourceCodeCache[]> ReadDependenciesAsync(MakefileCompile Item, string Deps)
     {
         string[] IncludesArr = Deps.Split('\\', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 

@@ -14,6 +14,8 @@ public interface IErrors
 
     string DependencyModuleNotFound(string ModuleName, string RequiredModule);
 
+    string ModuleNotFound(string ModuleName);
+
     string DuplicatedModuleDefinitions { get; }
 
     string InvalidProjectFormat { get; }

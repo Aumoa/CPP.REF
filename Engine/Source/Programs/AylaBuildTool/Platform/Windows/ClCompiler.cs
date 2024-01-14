@@ -6,9 +6,9 @@ using System.Text.Json.Nodes;
 
 using AE.AppHelper;
 using AE.BuildSettings;
+using AE.CompilerServices;
+using AE.CompilerServices.Makefiles;
 using AE.Exceptions;
-using AE.Rules;
-using AE.SourceTree;
 
 namespace AE.Platform.Windows;
 
@@ -23,10 +23,10 @@ public class ClCompiler : Compiler
         this.ToolChain = Installation;
     }
 
-    private ProcessStartInfo MakeBaseProcessStartInfo(TargetRules Rule)
+    private ProcessStartInfo MakeBaseProcessStartInfo()
     {
         string Cl = this.Cl;
-        var Config = Rule.Target.BuildConfiguration;
+        var Config = Target.Config;
         foreach (var ExecutablePath in ToolChain.GetRequiredExecutablePaths(Config.Platform.Architecture))
         {
             string Cur = Path.Combine(ExecutablePath, this.Cl);
@@ -82,9 +82,9 @@ public class ClCompiler : Compiler
             ;
     }
 
-    private void SetConfigCompilerParameters(ProcessStartInfo PSI, TargetRules Rule)
+    private void SetConfigCompilerParameters(ProcessStartInfo PSI)
     {
-        switch (Rule.Target.BuildConfiguration.Configuration)
+        switch (Target.Configuration)
         {
             case Configuration.Debug:
             case Configuration.DebugGame:
@@ -136,10 +136,10 @@ public class ClCompiler : Compiler
         }
     }
 
-    private void SetModuleParameters(ProcessStartInfo PSI, MakefileCompile Item, TargetRules Rule)
+    private void SetModuleParameters(ProcessStartInfo PSI, MakefileCompile Item)
     {
         var Includes = Item.CollectCompilerIncludePaths().Select(AsCompilerInclude);
-        var Macros = Item.CollectCompilerMacros(Rule).Select(AsCompilerMacro);
+        var Macros = Item.CollectCompilerMacros().Select(AsCompilerMacro);
 
         string IncludeStr = string.Join(' ', Includes);
         string MacroStr = string.Join(' ', Macros);
@@ -150,12 +150,12 @@ public class ClCompiler : Compiler
         PSI.Arguments += $"{DisableWarnings} ";
     }
 
-    private void SetSourceCodeParameters(ProcessStartInfo PSI, TargetRules Rule, MakefileCompile Item, out string OutputPath, out string DependenciesJson)
+    private void SetSourceCodeParameters(ProcessStartInfo PSI, MakefileCompile Item, out string OutputPath, out string DependenciesJson)
     {
-        string SourceCodeName = Path.GetFileName(Item.FilePath);
-        string Output = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".obj");
-        string Deps = Path.Combine(Item.GetIntermediateOutputPath(Rule), SourceCodeName + ".deps.json");
-        string IntermediateOutputPath = Item.GetIntermediateOutputPath(Rule);
+        string SourceCodeName = Path.GetFileName(Item.SourceFile);
+        string Output = Path.Combine(Item.BuildsOut(), SourceCodeName + ".obj");
+        string Deps = Path.Combine(Item.BuildsOut(), SourceCodeName + ".deps.json");
+        string IntermediateOutputPath = Item.BuildsOut();
         string Pdb = Path.Combine(IntermediateOutputPath, SourceCodeName + ".pdb");
 
         PSI.Arguments += $"/Fo\"{Output}\" /Fd\"{Pdb}\" /sourceDependencies \"{Deps}\" ";
@@ -164,29 +164,28 @@ public class ClCompiler : Compiler
         DependenciesJson = Deps;
     }
 
-    public override async Task<string> CompileAsync(CompileNode Node, TargetRules Rule, CancellationToken SToken = default)
+    public override async Task<string> CompileAsync(MakefileCompile Node, CancellationToken SToken = default)
     {
-        ProcessStartInfo PSI = MakeBaseProcessStartInfo(Rule);
-        MakefileCompile Item = Node.Compile;
+        ProcessStartInfo PSI = MakeBaseProcessStartInfo();
 
-        string Output = Item.GetIntermediateOutputPath(Rule);
+        string Output = Node.BuildsOut();
         if (Directory.Exists(Output) == false)
         {
             Directory.CreateDirectory(Output);
         }
         SetBaseCompilerParameters(PSI);
-        SetConfigCompilerParameters(PSI, Rule);
-        SetModuleParameters(PSI, Item, Rule);
-        SetSourceCodeParameters(PSI, Rule, Item, out string OutputPath, out string DependenciesJson);
+        SetConfigCompilerParameters(PSI);
+        SetModuleParameters(PSI, Node);
+        SetSourceCodeParameters(PSI, Node, out string OutputPath, out string DependenciesJson);
 
-        if (Item.ModuleInfo.DependModules.Contains("Core"))
+        if (Node.ModuleInfo.DependModules.Contains("Core"))
         {
             // Force include CoreMinimal.h
             PSI.Arguments += $"/FICoreMinimal.h ";
         }
 
         // Include source.
-        PSI.Arguments += $"\"{Item.FilePath}\"";
+        PSI.Arguments += $"\"{Node.SourceFile}\"";
 
         DateTime StartTime = DateTime.Now;
         var P = await App.Run(PSI, false);
@@ -200,24 +199,24 @@ public class ClCompiler : Compiler
             throw new TerminateException(KnownErrorCode.CompileError, Report);
         }
 
-        await GenerateSourceCodeCache(Item, Rule, OutputPath, DependenciesJson);
+        await GenerateSourceCodeCache(Node, OutputPath, DependenciesJson);
         var Elapsed = DateTime.Now - StartTime;
         return $"{P.Stdout.Trim()} ({Elapsed.TotalSeconds:0.00}s)";
     }
 
-    private async Task GenerateSourceCodeCache(MakefileCompile Item, TargetRules Rule, string ObjectOutput, string Deps)
+    private async Task GenerateSourceCodeCache(MakefileCompile Item, string ObjectOutput, string Deps)
     {
         MakefileSourceCache NewCache = new()
         {
-            SourceCache = SourceCodeCache.Generate(Item.FilePath),
-            Includes = await ReadDependenciesAsync(Item, Rule, Deps),
+            SourceCache = SourceCodeCache.Generate(Item.SourceFile),
+            Dependencies = await ReadDependenciesAsync(Item, Deps),
             ObjectOutputFile = ObjectOutput,
         };
 
         Item.Cache = NewCache;
     }
 
-    private async Task<SourceCodeCache[]> ReadDependenciesAsync(MakefileCompile Item, TargetRules Rule, string Deps)
+    private async Task<SourceCodeCache[]> ReadDependenciesAsync(MakefileCompile Item, string Deps)
     {
         string JsonStr = await File.ReadAllTextAsync(Deps);
         JsonNode? Node = JsonNode.Parse(JsonStr);
@@ -227,7 +226,7 @@ public class ClCompiler : Compiler
             return Array.Empty<SourceCodeCache>();
         }
 
-        string[] BuiltInPaths = ToolChain.GetRequiredIncludePaths(Rule.Target.BuildConfiguration.Platform.Architecture);
+        string[] BuiltInPaths = ToolChain.GetRequiredIncludePaths(Target.Architecture);
         bool IsBuiltIn(string InPath)
         {
             foreach (var BuiltInPath in BuiltInPaths)

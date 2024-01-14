@@ -1,34 +1,29 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+using AE.IO;
+
 namespace AE.Source;
 
 public readonly struct SourceDirectory
 {
-    private readonly string _Root;
+    private readonly DirectoryReference _Root;
 
-    public string Root
+    public DirectoryReference Root
     {
         get => _Root;
         init
         {
             _Root = value;
-            Programs = Path.Combine(_Root, "Programs");
+            Programs = _Root.GetChild("Programs");
         }
     }
 
-    public string Programs { get; private init; }
+    public DirectoryReference Programs { get; private init; }
 
     public void GenerateDirectoriesRecusrive()
     {
-        if (Directory.Exists(Root) == false)
-        {
-            Directory.CreateDirectory(Root);
-        }
-
-        if (Directory.Exists(Programs) == false)
-        {
-            Directory.CreateDirectory(Programs);
-        }
+        Root.Create();
+        Programs.Create();
     }
 
     public override string ToString()

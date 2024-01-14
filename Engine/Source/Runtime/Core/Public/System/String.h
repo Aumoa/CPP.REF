@@ -561,6 +561,55 @@ public:
 			return (size_t)-1;
 		}
 	}
+	[[nodiscard]] inline constexpr size_t LastIndexOf(char_t InChar, EStringComparison Comparison = EStringComparison::CurrentCulture) const noexcept
+	{
+		return LastIndexOf(InChar, 0, (size_t)-1, Comparison);
+	}
+
+	[[nodiscard]] inline constexpr size_t LastIndexOf(char_t InChar, size_t InIndexOf, EStringComparison Comparison = EStringComparison::CurrentCulture) const noexcept
+	{
+		return LastIndexOf(InChar, InIndexOf, (size_t)-1, Comparison);
+	}
+
+	[[nodiscard]] constexpr size_t LastIndexOf(char_t InChar, size_t InIndexOf, size_t InLength, EStringComparison Comparison = EStringComparison::CurrentCulture) const noexcept
+	{
+		if (InLength > Len || InLength == -1)
+		{
+			InLength = Len;
+		}
+
+		if (InLength == 0)
+		{
+			return (size_t)-1;
+		}
+
+		if (Len == 0)
+		{
+			return (size_t)-1;
+		}
+
+		const char_t* const Buf1 = this->GetRaw();
+		const bool bLowerCase = Comparison == EStringComparison::CurrentCultureIgnoreCase;
+
+		if (bLowerCase)
+		{
+			InChar = (char_t)std::tolower(InChar);
+		}
+
+		for (size_t i = InIndexOf; i < InLength; ++i)
+		{
+			size_t Index = InLength - i - 1;
+			char_t Lch = SafeGet(Buf1, InLength, Index, bLowerCase);
+			char_t Rch = InChar;
+
+			if (Lch == Rch)
+			{
+				return Index;
+			}
+		}
+
+		return (size_t)-1;
+	}
 
 	[[nodiscard]] constexpr bool StartsWith(const String& InCompare, EStringComparison Comparison = EStringComparison::CurrentCulture) const noexcept
 	{
@@ -714,6 +763,11 @@ public:
 	[[nodiscard]] inline constexpr bool IsEmpty() const noexcept
 	{
 		return Len == 0;
+	}
+
+	[[nodiscard]] inline constexpr bool IsValidIndex(size_t InIndex) const noexcept
+	{
+		return InIndex < Len;
 	}
 
 	[[nodiscard]] inline String Trim() const
