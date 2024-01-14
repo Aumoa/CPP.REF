@@ -23,6 +23,9 @@ String TerminateException::FormatMessage(EKnownErrorCodes ErrorCode)
 	case EKnownErrorCodes::CompilerError:
 		Message = TEXT("Compile error found.");
 		break;
+	case EKnownErrorCodes::InputFileNotFound:
+		Message = TEXT("The input file is not found.");
+		break;
 	default:
 		Message = TEXT("Internal compiler error.");
 		break;

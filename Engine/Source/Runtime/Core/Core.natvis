@@ -20,6 +20,6 @@
 		<DisplayString Condition="(WindowsToolkitInstallation*)this">WindowsToolkitInstallation {((WindowsToolkitInstallation*)this)->InstallVersion}</DisplayString>
 	</Type>
 	<Type Name="FileSystemReference">
-		<DisplayString>{value}</DisplayString>
+		<DisplayString>{Value}</DisplayString>
 	</Type>
 </AutoVisualizer>

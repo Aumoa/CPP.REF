@@ -2,7 +2,7 @@
   "profiles": {
     "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "Build -ProjectFile \"F:\\SampleGame\\SampleGame.aproject\" -Target Core -Config Debug"
+      "commandLineArgs": "ProjectFiles -ProjectFile \"F:\\SampleGame\\SampleGame.aproject\" -Target Core -Config Debug"
     }
   }
 }

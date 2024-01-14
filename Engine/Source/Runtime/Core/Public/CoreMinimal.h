@@ -75,6 +75,7 @@
 #include "System/Environment.h"
 #include "System/CrcHash.h"
 #include "System/Version.h"
+#include "System/OperationCanceledException.h"
 
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"
@@ -85,12 +86,12 @@
 #include "Threading/Thread.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include "Threading/ThreadPool.h"
+#include "Threading/CancellationToken.h"
 
 #include "Threading/Tasks/TaskStatus.h"
 #include "Threading/Tasks/suspend_and_destroy_if.h"
 #include "Threading/Tasks/AwaiterBase.h"
 #include "Threading/Tasks/co_push.h"
-#include "Threading/Tasks/TaskCanceledException.h"
 #include "Threading/Tasks/co_cancel.h"
 #include "Threading/Tasks/Awaiter.h"
 #include "Threading/Tasks/promise_type.h"
@@ -112,6 +113,9 @@
 #include "IO/IOCompletionOverlapped.h"
 #include "IO/FileStream.h"
 #include "IO/StreamWriter.h"
+#include "IO/FileSystemReference.h"
+#include "IO/DirectoryReference.h"
+#include "IO/FileReference.h"
 
 #include "Localizational/Name.h"
 

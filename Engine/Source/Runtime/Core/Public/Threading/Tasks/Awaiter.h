@@ -3,11 +3,11 @@
 #pragma once
 
 #include "System/VoidableOptional.h"
+#include "System/OperationCanceledException.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include "Threading/Tasks/AwaiterBase.h"
 #include "Threading/Tasks/co_push.h"
-#include "Threading/Tasks/TaskCanceledException.h"
 
 template<class T>
 class Awaiter : public AwaiterBase
@@ -111,7 +111,7 @@ public:
 		auto ScopedLock = std::unique_lock(Lock);
 		if (!IsCompleted())
 		{
-			ExceptionPtr = std::make_exception_ptr(TaskCanceledException());
+			ExceptionPtr = std::make_exception_ptr(OperationCanceledException());
 			Status = ETaskStatus::Canceled;
 
 			auto LocalThens = std::move(Thens);

@@ -30,8 +30,12 @@ public class DirectoryReference : FileSystemReference
 
     public void Clear()
     {
+        bool exists = IsExists;
         Delete(true);
-        Create();
+        if (exists)
+        {
+            Create();
+        }
     }
 
     public DirectoryReference[] GetDirectories(bool recursive = false) => IsExists

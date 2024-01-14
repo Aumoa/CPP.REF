@@ -8,6 +8,8 @@ public class ShaderCompileWorker : ModuleRules
 {
     public ShaderCompileWorker(TargetInfo targetInfo) : base(targetInfo)
     {
+        Type = ModuleType.ConsoleApplication;
+
         PublicDependencyModuleNames.AddRange(new[]
         {
             "Core"

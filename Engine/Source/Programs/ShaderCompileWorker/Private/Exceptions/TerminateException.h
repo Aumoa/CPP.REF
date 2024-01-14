@@ -12,6 +12,7 @@ public:
 		Success = 0,
 		NotSupportedShaderType = 1,
 		CompilerError = 2,
+		InputFileNotFound = 3
 	};
 
 public:

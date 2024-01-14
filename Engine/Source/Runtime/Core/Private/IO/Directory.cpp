@@ -67,3 +67,15 @@ bool Directory::CreateDirectory(String InPath)
 {
 	return std::filesystem::create_directories(InPath.path());
 }
+
+void Directory::Delete(String InPath, bool bRecursive)
+{
+	if (bRecursive)
+	{
+		std::filesystem::remove_all(InPath.path());
+	}
+	else
+	{
+		std::filesystem::remove(InPath.path());
+	}
+}

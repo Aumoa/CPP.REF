@@ -28,6 +28,11 @@ public:
 		return Value;
 	}
 
+	[[nodiscard]] inline String ToString() const noexcept
+	{
+		return Value;
+	}
+
 	[[nodiscard]] inline String GetFileName() const noexcept
 	{
 		return FileName;
@@ -59,10 +64,6 @@ public:
 	{
 		return Path::IsPathFullQualified(Value);
 	}
-
-	[[nodiscard]] virtual std::unique_ptr<FileSystemReference> GetAbsolute() const = 0;
-
-	[[nodiscard]] virtual std::unique_ptr<FileSystemReference> ToCurrentDirectoryBased() const = 0;
 
 	[[nodiscard]] bool Includes(const FileSystemReference& Fr) const
 	{
