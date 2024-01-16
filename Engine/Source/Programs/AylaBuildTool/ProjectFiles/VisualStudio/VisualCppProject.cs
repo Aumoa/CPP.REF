@@ -68,7 +68,7 @@ public class VisualCppProject : VisualStudioProject
 
     private void GenerateXmlDocument(out XmlDocument vcxproj, out XmlDocument vcxprojFilter, out XmlDocument vcxprojUser)
     {
-        HashSet<string> sourceFiles = new();
+        HashSet<FileReference> sourceFiles = new();
 
         XmlDocument doc = new();
         doc.AddXmlDeclaration("1.0", "utf-8");
@@ -178,39 +178,37 @@ public class VisualCppProject : VisualStudioProject
                 {
                     propertyGroup.AddElement("ExecutablePath").InnerText = "$(VC_ExecutablePath_x64);$(CommonExecutablePath)";
                 }
-                
             });
 
             var ItemGroup = project.AddElement("ItemGroup");
 
-            XmlElement? AddSourceFile(ModuleInformation? Module, string Filename)
+            XmlElement? AddSourceFile(ModuleInformation? module, FileReference file)
             {
-                if (sourceFiles.Add(Filename) == false)
+                if (sourceFiles.Add(file) == false)
                 {
                     return null;
                 }
 
-                string Extension = Path.GetExtension(Filename).ToLower();
-                if (SourceCodeUtility.IsSourceCode(Extension))
+                if (file.IsSourceCode())
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
-                    ClCompile.SetAttribute("Include", Filename);
+                    ClCompile.SetAttribute("Include", file);
 
-                    if (Module != null)
+                    if (module != null)
                     {
-                        IEnumerable<string> Macros = Module.PrivateAdditionalMacros;
-                        Macros = Macros.Concat(Module.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"));
-                        Macros = Macros.Append($"{Module.Name.ToUpper()}_API=__declspec(dllexport)");
+                        IEnumerable<string> Macros = module.PrivateAdditionalMacros;
+                        Macros = Macros.Concat(module.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"));
+                        Macros = Macros.Append($"{module.Name.ToUpper()}_API=__declspec(dllexport)");
 
                         var PreprocessorDefinitions = ClCompile.AddElement("PreprocessorDefinitions");
                         PreprocessorDefinitions.InnerText = $"{string.Join(';', Macros)};%(PreprocessorDefinitions)";
 
-                        string GeneratedInclude = Path.Combine(Module.GeneratedIncludePath, Module.Name);
+                        string GeneratedInclude = Path.Combine(module.GeneratedIncludePath, module.Name);
 
                         var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
-                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', Module.PrivateIncludePaths.Concat(new[] { GeneratedInclude, Module.GeneratedShaderPath }))};%(AdditionalIncludeDirectories)";
+                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', module.PrivateIncludePaths.Concat(new[] { GeneratedInclude, module.GeneratedShaderPath }))};%(AdditionalIncludeDirectories)";
 
-                        if (Module.DependModules.Contains("Core"))
+                        if (module.DependModules.Contains("Core"))
                         {
                             var ForcedIncludeFiles = ClCompile.AddElement("ForcedIncludeFiles");
                             ForcedIncludeFiles.InnerText = "CoreMinimal.h";
@@ -219,28 +217,28 @@ public class VisualCppProject : VisualStudioProject
 
                     return ClCompile;
                 }
-                else if (SourceCodeUtility.IsHeaderFile(Extension))
+                else if (file.IsHeaderFile())
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
-                    ClInclude.SetAttribute("Include", Filename);
+                    ClInclude.SetAttribute("Include", file);
                     return null;
                 }
-                else if (SourceCodeUtility.IsRuleFile(Extension))
+                else if (file.IsRuleFile())
                 {
                     var None = ItemGroup.AddElement("None");
-                    None.SetAttribute("Include", Filename);
+                    None.SetAttribute("Include", file);
                     return null;
                 }
-                else if (SourceCodeUtility.IsNatvisFile(Extension))
+                else if (file.IsNatvisFile())
                 {
                     var None = ItemGroup.AddElement("Natvis");
-                    None.SetAttribute("Include", Filename);
+                    None.SetAttribute("Include", file);
                     return null;
                 }
-                else if (SourceCodeUtility.IsShaderCode(Extension))
+                else if (file.IsShaderCode())
                 {
                     var Shader = ItemGroup.AddElement("FxCompile");
-                    Shader.SetAttribute("Include", Filename);
+                    Shader.SetAttribute("Include", file);
                     return null;
                 }
 
@@ -303,28 +301,19 @@ public class VisualCppProject : VisualStudioProject
             var ItemGroup = project.AddElement("ItemGroup");
 
             HashSet<string> Filters = new();
-            foreach (var Filename in sourceFiles)
+            foreach (var file in sourceFiles)
             {
                 string? FilterPath;
 
                 if (SourceDirectory.Includes(TargetDirectory.Source.Programs) == false)
                 {
-                    if (Filename.StartsWith(TargetDirectory.Shaders))
-                    {
-                        FilterPath = Path.GetRelativePath(TargetDirectory.Shaders, Filename);
-                        FilterPath = Path.GetDirectoryName(FilterPath)!;
-                        FilterPath = Path.Combine("Shaders", FilterPath ?? "/");
-                    }
-                    else
-                    {
-                        FilterPath = Path.GetRelativePath(SourceDirectory, Filename);
-                        FilterPath = Path.GetDirectoryName(FilterPath)!;
-                        FilterPath = Path.Combine("Source", FilterPath ?? "/");
-                    }
+                    FilterPath = Path.GetRelativePath(SourceDirectory, file);
+                    FilterPath = Path.GetDirectoryName(FilterPath)!;
+                    FilterPath = Path.Combine("Source", FilterPath ?? "/");
                 }
                 else
                 {
-                    FilterPath = Path.GetRelativePath(SourceDirectory, Filename);
+                    FilterPath = Path.GetRelativePath(SourceDirectory, file);
                     FilterPath = Path.GetDirectoryName(FilterPath)!;
                     FilterPath = Path.Combine("Source", FilterPath ?? "/");
                 }
@@ -337,36 +326,35 @@ public class VisualCppProject : VisualStudioProject
                     Filters.Add(Composed);
                 }
 
-                string Extension = Path.GetExtension(Filename);
                 XmlElement? InnerElement = null;
-                if (SourceCodeUtility.IsSourceCode(Extension))
+                if (file.IsSourceCode())
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
-                    ClCompile.SetAttribute("Include", Filename);
+                    ClCompile.SetAttribute("Include", file);
                     InnerElement = ClCompile;
                 }
-                else if (SourceCodeUtility.IsHeaderFile(Extension))
+                else if (file.IsHeaderFile())
                 {
                     var ClInclude = ItemGroup.AddElement("ClInclude");
-                    ClInclude.SetAttribute("Include", Filename);
+                    ClInclude.SetAttribute("Include", file);
                     InnerElement = ClInclude;
                 }
-                else if (SourceCodeUtility.IsRuleFile(Extension))
+                else if (file.IsRuleFile())
                 {
                     var None = ItemGroup.AddElement("None");
-                    None.SetAttribute("Include", Filename);
+                    None.SetAttribute("Include", file);
                     InnerElement = None;
                 }
-                else if (SourceCodeUtility.IsNatvisFile(Extension))
+                else if (file.IsNatvisFile())
                 {
                     var None = ItemGroup.AddElement("Natvis");
-                    None.SetAttribute("Include", Filename);
+                    None.SetAttribute("Include", file);
                     InnerElement = None;
                 }
-                else if (SourceCodeUtility.IsShaderCode(Extension))
+                else if (file.IsShaderCode())
                 {
                     var Shader = ItemGroup.AddElement("FxCompile");
-                    Shader.SetAttribute("Include", Filename);
+                    Shader.SetAttribute("Include", file);
                     InnerElement = Shader;
                 }
 

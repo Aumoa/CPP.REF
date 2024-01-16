@@ -3,41 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Object.h"
-#include "SubclassOf.h"
-#include "SubsystemCollection.h"
-#include "EngineSubsystem.h"
-#include "GameEngine.generated.h"
+#include "GameObject.h"
 
-class AEngineSubsystem;
-class APackage;
-class AWorld;
-class SViewport;
-
-ACLASS()
-class ENGINE_API AGameEngine : public AObject
+class ENGINE_API GameEngine : public GameObject
 {
-	GENERATED_BODY()
-
-private:
-	NSubsystemCollection Subsystems;
-	RefPtr<AWorld> GameWorld;
-
 public:
-	AGameEngine();
-	virtual ~AGameEngine() noexcept override;
+	GameEngine();
+	virtual ~GameEngine() noexcept;
 
 	virtual void Initialize();
 	virtual void Deinitialize();
-
-	NSubsystemCollection& GetEngineSubsystems() { return Subsystems; }
-
-protected:
-	void SpawnWorld();
-	virtual void InitSubsystems();
-
-private:
-	void AddSubsystemsForPackage(APackage* InPackage);
 };
-
-extern ENGINE_API AGameEngine* GEngine;

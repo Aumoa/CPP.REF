@@ -3,20 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SubclassOf.h"
 #include "GenericPlatform/GenericPlatformInputEvent.h"
 
-class AGameEngine;
+class GameEngine;
 
-class ENGINE_API IEngineLoop
+class IEngineLoop
 {
 protected:
-    IEngineLoop();
+    IEngineLoop()
+    {
+    }
 
 public:
-    virtual ~IEngineLoop() noexcept;
+    virtual ~IEngineLoop() noexcept
+    {
+    }
 
-    virtual void Init(TSubclassOf<AGameEngine> InEngineClass) = 0;
+    virtual void Init(std::shared_ptr<GameEngine> InEngine) = 0;
     virtual void Shutdown() = 0;
     virtual void Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents) = 0;
 };

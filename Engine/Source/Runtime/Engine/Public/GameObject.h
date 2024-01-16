@@ -3,31 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Object.h"
-#include "SubclassOf.h"
-#include "GameObject.generated.h"
 
-ACLASS()
-class ENGINE_API AGameObject : public AObject
+class ENGINE_API GameObject
 {
-	GENERATED_BODY()
-
 private:
-	AObject* Outer = nullptr;
+	std::weak_ptr<GameObject> Outer;
 	Name ObjectName;
 
 public:
-	AGameObject();
+	GameObject();
 	
-	void Rename(AObject* InOuter, Name InName);
-	inline AObject* GetOuter() const { return Outer; }
+	void Rename(std::shared_ptr<GameObject> InOuter, Name InName);
+
+	inline std::shared_ptr<GameObject> GetOuter() const { return Outer.lock(); }
 	inline Name GetName() const { return ObjectName; }
-
-	static RefPtr<AGameObject> NewObject(AObject* InOuter, Name InName, TSubclassOf<AGameObject> InClass);
-
-	template<std::derived_from<AGameObject> T>
-	static RefPtr<T> NewObject(AObject* InOuter, Name InName, TSubclassOf<T> InClass = T::StaticClass())
-	{
-		return NewObject(InOuter, InName, (TSubclassOf<AGameObject>)InClass);
-	}
 };

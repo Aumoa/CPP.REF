@@ -4,14 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameEngine.h"
-#include "EditorEngine.generated.h"
 
-ACLASS()
-class COREED_API AEditorEngine : public AGameEngine
+class COREED_API EditorEngine : public GameEngine
 {
-	GENERATED_BODY()
-
 public:
-	AEditorEngine();
-	virtual ~AEditorEngine() noexcept override;
+	EditorEngine();
+	virtual ~EditorEngine() noexcept override;
 };

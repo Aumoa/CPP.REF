@@ -38,7 +38,7 @@ int32 NLaunch::GuardedMain()
 #if WITH_EDITOR
     NCoreEd::EditorInit(*Loop);
 #else
-    Loop->Init(AGameEngine::StaticClass());
+    Loop->Init(std::make_shared<GameEngine>());
 #endif
     Loop->PostInit();
 

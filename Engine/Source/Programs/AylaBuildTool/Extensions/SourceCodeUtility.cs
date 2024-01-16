@@ -12,22 +12,19 @@ public static class SourceCodeUtility
         return file.Extensions.ToLower() is "cpp";
     }
 
-    public static bool IsHeaderFile(string name)
+    public static bool IsHeaderFile(this FileReference file)
     {
-        string extensions = Path.GetExtension(name).ToLower();
-        return extensions is "h" or "inl";
+        return file.Extensions.ToLower() is "h" or "inl";
     }
 
-    public static bool IsRuleFile(string name)
+    public static bool IsRuleFile(this FileReference file)
     {
-        string extensions = Path.GetExtension(name).ToLower();
-        return extensions is "cs";
+        return file.Extensions.ToLower() is "module.cs";
     }
 
-    public static bool IsNatvisFile(string name)
+    public static bool IsNatvisFile(this FileReference file)
     {
-        string extensions = Path.GetExtension(name).ToLower();
-        return extensions is "natvis";
+        return file.Extensions.ToLower() is "natvis";
     }
 
     public static bool IsShaderCode(this FileReference file)
@@ -40,14 +37,14 @@ public static class SourceCodeUtility
         return file.Extensions.ToLower() is "hlsli";
     }
 
-    public static bool IsSourceFile(FileReference name)
+    public static bool IsSourceFile(FileReference file)
     {
-        return IsSourceCode(name)
-            || IsHeaderFile(name)
-            || IsRuleFile(name)
-            || IsNatvisFile(name)
-            || IsShaderCode(name)
-            || IsShaderHeader(name);
+        return IsSourceCode(file)
+            || IsHeaderFile(file)
+            || IsRuleFile(file)
+            || IsNatvisFile(file)
+            || IsShaderCode(file)
+            || IsShaderHeader(file);
     }
 
     public static bool IsEngineDirectory(this ProjectDirectory projectDir)

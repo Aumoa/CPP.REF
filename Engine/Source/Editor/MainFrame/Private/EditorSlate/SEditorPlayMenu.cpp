@@ -4,12 +4,11 @@
 #include "Widgets/Layout/SSizeBox.h"
 #include "Widgets/Layout/SHorizontalBoxPanel.h"
 #include "Widgets/Images/SImage.h"
-#include "Assets/AssetsPath.h"
 #include "RenderGlobal.h"
 
 DEFINE_SLATE_CONSTRUCTOR(SEditorPlayMenu, Args)
 {
-	auto Image = NRenderGlobal::LoadTexture2DAsync(NAssetsPath::GetFileSystemPath(TEXT("/Engine/Editor/MainFrame/PlayButton.png")));
+	//auto Image = NRenderGlobal::LoadTexture2DAsync(NAssetsPath::GetFileSystemPath(TEXT("/Engine/Editor/MainFrame/PlayButton.png")));
 
 	Args.SingleSlot = SEditorPlayMenu::NSlot()
 	.HAlignment(EHorizontalAlignment::Fill)
@@ -27,7 +26,7 @@ DEFINE_SLATE_CONSTRUCTOR(SEditorPlayMenu, Args)
 			.SlotPadding(5.0f, 5.0f, 5.0f, 0.0f)
 			[
 				SNew(SImage)
-				.Brush(Image, Vector2(70.0f, 70.0f))
+				//.Brush(Image, Vector2(70.0f, 70.0f))
 			]
 		]
 	];

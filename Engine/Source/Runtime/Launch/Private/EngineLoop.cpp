@@ -25,9 +25,9 @@ NEngineLoop::~NEngineLoop() noexcept
 {
 }
 
-void NEngineLoop::Init(TSubclassOf<AGameEngine> InEngineClass)
+void NEngineLoop::Init(std::shared_ptr<GameEngine> InEngine)
 {
-    EngineInstance = NewObject(InEngineClass);
+    EngineInstance = std::move(InEngine);
     EngineInstance->Initialize();
 }
 
@@ -35,7 +35,7 @@ void NEngineLoop::Shutdown()
 {
     // shutdown engine instance.
     EngineInstance->Deinitialize();
-    EngineInstance.Reset();
+    EngineInstance.reset();
 
     // waiting for all graphics commands are completed.
     NRHIGlobal::GetDynamicRHI().SyncFrame();

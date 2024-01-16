@@ -16,14 +16,14 @@ class NEngineLoop : public IEngineLoop
     NEngineLoop(NEngineLoop&&) = delete;
 
 private:
-    RefPtr<AGameEngine> EngineInstance;
+    std::shared_ptr<GameEngine> EngineInstance;
     std::shared_ptr<SViewport> GameViewport;
 
 public:
     NEngineLoop();
     virtual ~NEngineLoop() noexcept override;
 
-    virtual void Init(TSubclassOf<AGameEngine> InEngineClass) override;
+    virtual void Init(std::shared_ptr<GameEngine> InEngine) override;
     virtual void Shutdown() override;
     virtual void Tick(const std::vector<NGenericPlatformInputEvent>& InputEvents) override;
 

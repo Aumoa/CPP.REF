@@ -18,5 +18,5 @@ void NCoreEd::EditorInit(IEngineLoop& Loop)
 		]
 	);
 
-	Loop.Init(AEditorEngine::StaticClass());
+	Loop.Init(std::make_shared<EditorEngine>());
 }

@@ -2,10 +2,10 @@
 
 #include "EditorEngine.h"
 
-AEditorEngine::AEditorEngine()
+EditorEngine::EditorEngine()
 {
 }
 
-AEditorEngine::~AEditorEngine() noexcept
+EditorEngine::~EditorEngine() noexcept
 {
 }
