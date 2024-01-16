@@ -15,7 +15,8 @@ void WindowsStandardStreamTextWriter::Write(String Val)
 	if (hStd)
 	{
 		DWORD Written = 0;
-		WriteConsoleW(hStd, Val.c_str(), (DWORD)Val.length(), &Written, NULL);
+		auto Wide = Val.AsCodepage();
+		WriteFile(hStd, Wide.c_str(), (DWORD)Wide.size(), &Written, NULL);
 	}
 }
 

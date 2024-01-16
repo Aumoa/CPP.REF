@@ -10,7 +10,7 @@ NSCWApp::NSCWApp()
 {
 }
 
-Task<int32> NSCWApp::RunAsync(std::stop_token InCancellationToken)
+Task<> NSCWApp::RunAsync(std::stop_token InCancellationToken)
 {
 	String Input, Output;
 	if (CommandLine::TryGetValue(TEXT("Input"), Input) == false)
@@ -85,8 +85,6 @@ constexpr byte {}[] =
 
 	Timer.Stop();
 	Console::WriteLine(TEXT("{} ({:.2f}s)"), InputFile.GetFileName(), Timer.GetElapsed().GetTotalSeconds<double>());
-
-	co_return 0;
 }
 
 void NSCWApp::PrintUsage(TextWriter& Writer)

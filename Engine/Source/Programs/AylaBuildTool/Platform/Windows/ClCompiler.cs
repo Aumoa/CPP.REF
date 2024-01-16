@@ -9,6 +9,7 @@ using AE.BuildSettings;
 using AE.CompilerServices;
 using AE.CompilerServices.Makefiles;
 using AE.Exceptions;
+using AE.IO;
 
 namespace AE.Platform.Windows;
 
@@ -164,56 +165,56 @@ public class ClCompiler : Compiler
         DependenciesJson = Deps;
     }
 
-    public override async Task<string> CompileAsync(MakefileCompile Node, CancellationToken SToken = default)
+    public override async Task<string> CompileAsync(MakefileCompile node, CancellationToken cancellationToken = default)
     {
-        ProcessStartInfo PSI = MakeBaseProcessStartInfo();
+        ProcessStartInfo psi = MakeBaseProcessStartInfo();
 
-        string Output = Node.BuildsOut();
-        if (Directory.Exists(Output) == false)
+        DirectoryReference output = node.BuildsOut();
+        if (output.IsExists == false)
         {
-            Directory.CreateDirectory(Output);
+            output.Create();
         }
-        SetBaseCompilerParameters(PSI);
-        SetConfigCompilerParameters(PSI);
-        SetModuleParameters(PSI, Node);
-        SetSourceCodeParameters(PSI, Node, out string OutputPath, out string DependenciesJson);
+        SetBaseCompilerParameters(psi);
+        SetConfigCompilerParameters(psi);
+        SetModuleParameters(psi, node);
+        SetSourceCodeParameters(psi, node, out string outputPath, out string dependenciesJson);
 
-        if (Node.ModuleInfo.DependModules.Contains("Core"))
+        if (node.ModuleInfo.DependModules.Contains("Core"))
         {
             // Force include CoreMinimal.h
-            PSI.Arguments += $"/FICoreMinimal.h ";
+            psi.Arguments += $"/FICoreMinimal.h ";
         }
 
         // Include source.
-        PSI.Arguments += $"\"{Node.SourceFile}\"";
+        psi.Arguments += $"\"{node.SourceFile}\"";
 
-        DateTime StartTime = DateTime.Now;
-        var P = await App.Run(PSI, false);
-        if (P.ExitCode != 0)
+        DateTime startTime = DateTime.Now;
+        var app = await App.Run(psi, cancellationToken: cancellationToken);
+        if (app.ExitCode != 0)
         {
-            string Report = string.Empty;
-            if (P.ExitCode != 0)
+            string report = string.Empty;
+            if (app.ExitCode != 0)
             {
-                Report += P.Stdout;
+                report += app.Stdout;
             }
-            throw new TerminateException(KnownErrorCode.CompileError, Report);
+            throw new TerminateException(KnownErrorCode.CompileError, report);
         }
 
-        await GenerateSourceCodeCache(Node, OutputPath, DependenciesJson);
-        var Elapsed = DateTime.Now - StartTime;
-        return $"{P.Stdout.Trim()} ({Elapsed.TotalSeconds:0.00}s)";
+        await GenerateSourceCodeCache(node, outputPath, dependenciesJson);
+        var elapsed = DateTime.Now - startTime;
+        return $"{app.Stdout.Trim()} ({elapsed.TotalSeconds:0.00}s)";
     }
 
-    private async Task GenerateSourceCodeCache(MakefileCompile Item, string ObjectOutput, string Deps)
+    private async Task GenerateSourceCodeCache(MakefileCompile node, string objectOutput, string deps)
     {
         MakefileSourceCache NewCache = new()
         {
-            SourceCache = SourceCodeCache.Generate(Item.SourceFile),
-            Dependencies = await ReadDependenciesAsync(Item, Deps),
-            ObjectOutputFile = ObjectOutput,
+            SourceCache = SourceCodeCache.Generate(node.SourceFile),
+            Dependencies = await ReadDependenciesAsync(node, deps),
+            ObjectOutputFile = objectOutput,
         };
 
-        Item.Cache = NewCache;
+        node.Cache = NewCache;
     }
 
     private async Task<SourceCodeCache[]> ReadDependenciesAsync(MakefileCompile Item, string Deps)

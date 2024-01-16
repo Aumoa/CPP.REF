@@ -9,6 +9,6 @@ class NSCWApp
 public:
 	NSCWApp();
 
-	Task<int32> RunAsync(std::stop_token InCancellationToken);
+	Task<> RunAsync(std::stop_token InCancellationToken);
 	void PrintUsage(TextWriter& Writer);
 };

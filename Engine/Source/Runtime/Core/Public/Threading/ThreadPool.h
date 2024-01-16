@@ -29,6 +29,8 @@ private:
 	static size_t IOCPWorkers;
 
 public:
+	static void Initialize(size_t InNumWorkerThreads, size_t InNumCompletionPortThreads);
+
 	static void BindHandle(void* NativeHandle);
 	static void UnbindHandle(void* NativeHandle);
 
@@ -37,9 +39,6 @@ public:
 
 	static void GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
 	static void GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
-
-private:
-	static void Initialize();
 
 private:
 	static void UpdateWorkers();

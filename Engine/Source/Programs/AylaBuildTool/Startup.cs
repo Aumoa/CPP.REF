@@ -98,3 +98,7 @@ catch (AggregateException AE)
     }
     throw;
 }
+catch (TaskCanceledException)
+{
+    return -1;
+}

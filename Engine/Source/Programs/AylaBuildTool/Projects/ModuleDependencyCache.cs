@@ -69,7 +69,7 @@ public static class ModuleDependencyCache
             return Path.Combine(sourcePath, currentPath);
         }
 
-        var includePath = Path.Combine(projectDir.Intermediate.Includes, rules.Name);
+        var includePath = projectDir.Intermediate.Includes.GetChild(name);
         var csharpPath = Path.Combine(projectDir.Intermediate.CSharp, rules.Name);
 
         var includePaths = new List<string>();
@@ -89,7 +89,7 @@ public static class ModuleDependencyCache
             disableWarnings.AddRange(depend.PublicDisableWarnings);
         }
 
-        string[] publicIncludePaths = includePaths.Concat(rules.PublicIncludePaths.Select(AsFullPath)).Append(includePath).Distinct().ToArray();
+        string[] publicIncludePaths = includePaths.Concat(rules.PublicIncludePaths.Select(AsFullPath)).Append(includePath.Value).Distinct().ToArray();
         string[] privateIncludePaths = publicIncludePaths.Concat(rules.PrivateIncludePaths.Select(AsFullPath)).Distinct().ToArray();
         string[] publicAdditionalMacros = additionalMacros.Concat(rules.PublicAdditionalMacros).Distinct().ToArray();
         string[] privateAdditionalMacros = publicAdditionalMacros.Concat(rules.PrivateAdditionalMacros).Distinct().ToArray();
@@ -100,7 +100,7 @@ public static class ModuleDependencyCache
 
         IEnumerable<FileReference> sourceFiles = sourcePath
             .GetFiles(recursive: true)
-            .Where(p => SourceCodeUtility.IsSourceCode(p));
+            .Where(p => SourceCodeUtility.IsSourceFile(p));
 
         dependency = new ModuleInformation
         {

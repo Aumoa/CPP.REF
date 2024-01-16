@@ -72,7 +72,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         Target.Create(targetInfo, buildArgs.Editor);
         ModuleDependencyCache.BuildCache(buildArgs.Target, string.Empty);
 
-        if (ModuleDependencyCache.GetCached(buildArgs.Target, string.Empty).DependModules.Contains("RHI"))
+        if (buildArgs.Target == "RHI" || ModuleDependencyCache.GetCached(buildArgs.Target, string.Empty).DependModules.Contains("RHI"))
         {
             ModuleDependencyCache.Push();
             Target.Push();

@@ -1,7 +1,7 @@
 ﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
-
+using System.Threading.Channels;
 using AE.CompilerServices.Makefiles;
 using AE.Diagnostics;
 using AE.Exceptions;
@@ -37,13 +37,13 @@ public static class ModuleCompiler
         return await DispatchCompileWorkers(context, cancellationToken);
     }
 
-    private static async Task<bool> DispatchCompileWorker(MakefileContext context, CompileTasks compiler, MakefileCompile makefileNode, CancellationToken cancellationToken)
+    private static async Task<bool> DispatchCompileWorker(MakefileContext context, MakefileCompile makefileNode, CancellationToken cancellationToken)
     {
         try
         {
             await makefileNode.DependsOn.WaitAsync(cancellationToken);
 
-            string stdout = await compiler.CompileAsync(makefileNode, cancellationToken);
+            string stdout = await CompileTasks.CompileAsync(makefileNode, cancellationToken);
             makefileNode.MarkCompleted();
             string count = Interlocked.Increment(ref context.CompiledCount).ToString().PadLeft(context.TotalCountStr.Length);
             Console.WriteLine("[{0}/{1}] {2}", count, context.TotalCountStr, stdout);
@@ -116,20 +116,46 @@ public static class ModuleCompiler
 
     private static async Task<bool> DispatchShaderCompileWorker(MakefileContext context, MakefileCompile node, CancellationToken cancellationToken)
     {
-        node.MarkCompleted();
-        return true;
+        try
+        {
+            await node.DependsOn.WaitAsync(cancellationToken);
+
+            string stdout = await ShaderCompileTasks.CompileAsync(node, cancellationToken);
+            node.MarkCompleted();
+            string count = Interlocked.Increment(ref context.CompiledCount).ToString().PadLeft(context.TotalCountStr.Length);
+            Console.WriteLine("[{0}/{1}] {2}", count, context.TotalCountStr, stdout);
+            return true;
+        }
+        catch (TerminateException terminate)
+        {
+            node.MarkCanceled();
+            Console.Error.WriteLine(terminate.Message);
+            return false;
+        }
+        catch (Exception e)
+        {
+            if (e is OperationCanceledException or TaskCanceledException)
+            {
+                node.MarkCanceled();
+            }
+            else
+            {
+                node.MarkError(e);
+            }
+
+            throw;
+        }
     }
 
     private static async Task<bool> DispatchCompileWorkers(MakefileContext context, CancellationToken cancellationToken)
     {
-        var compiler = new CompileTasks();
         var tasks = new List<Task<bool>>();
 
         foreach (var node in context.CompileNodes)
         {
             if (node.SourceFile.IsSourceCode())
             {
-                tasks.Add(DispatchCompileWorker(context, compiler, node, cancellationToken));
+                tasks.Add(DispatchCompileWorker(context, node, cancellationToken));
             }
             else if (node.SourceFile.IsShaderCode())
             {

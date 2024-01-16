@@ -19,21 +19,45 @@ void* ThreadPool::IO;
 size_t ThreadPool::Workers;
 size_t ThreadPool::IOCPWorkers;
 
+void ThreadPool::Initialize(size_t InNumWorkerThreads, size_t InNumCompletionPortThreads)
+{
+	static int Init = ([&]()
+	{
+		PlatformIO::InitializeIOCPHandle(IO);
+
+		if (InNumWorkerThreads == 0)
+		{
+			InNumWorkerThreads = std::thread::hardware_concurrency();
+		}
+		if (InNumCompletionPortThreads == 0)
+		{
+			InNumCompletionPortThreads = 4;
+		}
+
+		NumWorkerThreads = InNumWorkerThreads;
+		NumCompletionPortThreads = InNumCompletionPortThreads;
+
+		UpdateWorkers();
+		UpdateIOCPWorkers();
+		std::thread(DelayedWorker).detach();
+	}(), 0);
+}
+
 void ThreadPool::BindHandle(void* NativeHandle)
 {
-	Initialize();
+	Initialize(0, 0);
 	PlatformIO::BindIOHandle(IO, NativeHandle);
 }
 
 void ThreadPool::UnbindHandle(void* NativeHandle)
 {
-	Initialize();
+	Initialize(0, 0);
 	PlatformIO::UnbindIOHandle(IO, NativeHandle);
 }
 
 void ThreadPool::QueueUserWorkItem(Action<> InWork)
 {
-	Initialize();
+	Initialize(0, 0);
 	std::unique_lock ScopedLock(Lck);
 	Works.emplace(std::move(InWork));
 	Cv.NotifyOne();
@@ -41,7 +65,7 @@ void ThreadPool::QueueUserWorkItem(Action<> InWork)
 
 void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork)
 {
-	Initialize();
+	Initialize(0, 0);
 	auto Tp = std::chrono::steady_clock::now() + InDur;
 	std::unique_lock ScopedLock(DelayedLck);
 	DelayedWorks.emplace(Tp, std::move(InWork));
@@ -50,31 +74,16 @@ void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action
 
 void ThreadPool::GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 {
-	Initialize();
+	Initialize(0, 0);
 	OutWorkerThreads = NumWorkerThreads;
 	OutCompletionPortThreads = NumCompletionPortThreads;
 }
 
 void ThreadPool::GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 {
-	Initialize();
+	Initialize(0, 0);
 	OutWorkerThreads = NumWorkerThreads;
 	OutCompletionPortThreads = NumCompletionPortThreads;
-}
-
-void ThreadPool::Initialize()
-{
-	static int Init = ([]()
-	{
-		PlatformIO::InitializeIOCPHandle(IO);
-
-		NumWorkerThreads = std::thread::hardware_concurrency();
-		NumCompletionPortThreads = 4;
-
-		UpdateWorkers();
-		UpdateIOCPWorkers();
-		std::thread(DelayedWorker).detach();
-	}(), 0);
 }
 
 void ThreadPool::UpdateWorkers()

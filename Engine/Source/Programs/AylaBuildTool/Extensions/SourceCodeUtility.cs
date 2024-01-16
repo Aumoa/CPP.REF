@@ -15,33 +15,39 @@ public static class SourceCodeUtility
     public static bool IsHeaderFile(string name)
     {
         string extensions = Path.GetExtension(name).ToLower();
-        return extensions is ".h" or ".inl";
+        return extensions is "h" or "inl";
     }
 
     public static bool IsRuleFile(string name)
     {
         string extensions = Path.GetExtension(name).ToLower();
-        return extensions is ".cs";
+        return extensions is "cs";
     }
 
     public static bool IsNatvisFile(string name)
     {
         string extensions = Path.GetExtension(name).ToLower();
-        return extensions is ".natvis";
+        return extensions is "natvis";
     }
 
     public static bool IsShaderCode(this FileReference file)
     {
-        return file.Extensions.ToLower() is "hlsl" or "hlsli";
+        return file.Extensions.ToLower() is "hlsl";
     }
 
-    public static bool IsSourceFile(string name)
+    public static bool IsShaderHeader(this FileReference file)
+    {
+        return file.Extensions.ToLower() is "hlsli";
+    }
+
+    public static bool IsSourceFile(FileReference name)
     {
         return IsSourceCode(name)
             || IsHeaderFile(name)
             || IsRuleFile(name)
             || IsNatvisFile(name)
-            || IsShaderCode(name);
+            || IsShaderCode(name)
+            || IsShaderHeader(name);
     }
 
     public static bool IsEngineDirectory(this ProjectDirectory projectDir)

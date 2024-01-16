@@ -7,6 +7,8 @@
 
 int main(int Argc, char* Argv[])
 {
+	ThreadPool::Initialize(2, 2);
+
 	PlatformProcess::SetupStacktraceSignals();
 	CommandLine::Init(Argc, Argv);
 
@@ -18,9 +20,21 @@ int main(int Argc, char* Argv[])
 
 	NSCWApp App;
 
+	class DisposableFlush
+	{
+	public:
+		~DisposableFlush() noexcept
+		{
+			fflush(stderr);
+		}
+	};
+
+	DisposableFlush V;
+
 	try
 	{
-		return App.RunAsync(CancellationTokenSource.get_token()).GetResult();
+		App.RunAsync(CancellationTokenSource.get_token()).GetResult();
+		return 0;
 	}
 	catch (const UsageException&)
 	{

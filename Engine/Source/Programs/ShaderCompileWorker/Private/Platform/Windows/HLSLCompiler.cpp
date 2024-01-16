@@ -53,8 +53,11 @@ Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InShaderFile, S
 	ComPtr<IDxcBlobEncoding> pErrorBlob;
 	if (SUCCEEDED(pResult->GetErrorBuffer(&pErrorBlob)) && pErrorBlob && pErrorBlob->GetBufferPointer())
 	{
-		std::string_view View = (const char*)pErrorBlob->GetBufferPointer();
-		Console::Error.WriteLine(String(View));
+		ComPtr<IDxcBlobUtf8> pUnicodeBlob;
+		if (SUCCEEDED(pErrorBlob.As(&pUnicodeBlob)))
+		{
+			Console::WriteLine(String::FromLiteral((const wchar_t*)pUnicodeBlob->GetBufferPointer()));
+		}
 	}
 
 	if (FAILED(hCompileResult))
@@ -67,7 +70,7 @@ Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InShaderFile, S
 
 	std::vector<byte> Bytes(pCode->GetBufferSize());
 	memcpy(Bytes.data(), pCode->GetBufferPointer(), pCode->GetBufferSize());
-
+	
 	co_return Bytes;
 }
 
