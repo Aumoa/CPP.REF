@@ -7,6 +7,8 @@ public class Launch : ModuleRules
 {
     public Launch(TargetInfo targetInfo) : base(targetInfo)
     {
+        Type = ModuleType.Application;
+
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");
 

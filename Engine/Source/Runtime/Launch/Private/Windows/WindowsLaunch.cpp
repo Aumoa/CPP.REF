@@ -29,7 +29,7 @@ public:
 	}
 };
 
-extern "C" INT __declspec(dllexport) WindowsStartup(LPCWSTR lpCmdLine)
+extern "C" INT APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, INT)
 {
 	auto Launch = NLaunch::GeneratePlatformLaunch(String::FromLiteral(lpCmdLine));
 	auto* WindowsLaunch = static_cast<NWindowsLaunch*>(Launch.get());
