@@ -9,16 +9,10 @@ using AE.Exceptions;
 
 namespace AE.Platform.Linux;
 
-public class GccCompiler : Compiler
+public class GccCompiler(LinuxToolChain toolChain, string compilerPath) : Compiler
 {
-    private readonly LinuxToolChain ToolChain;
-    private readonly string CompilerPath;
-
-    public GccCompiler(LinuxToolChain ToolChain, string CompilerPath)
-    {
-        this.ToolChain = ToolChain;
-        this.CompilerPath = CompilerPath;
-    }
+    private readonly LinuxToolChain ToolChain = toolChain;
+    private readonly string CompilerPath = compilerPath;
 
     private ProcessStartInfo MakeBaseProcessStartInfo()
     {

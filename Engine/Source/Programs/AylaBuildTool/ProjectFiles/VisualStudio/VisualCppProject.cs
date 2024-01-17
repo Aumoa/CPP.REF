@@ -138,8 +138,14 @@ public class VisualCppProject : VisualStudioProject
                 var includePaths = ToolChain.GetRequiredIncludePaths(platform.Architecture);
                 var extensions = assembly.Rules.Type == Rules.ModuleRules.ModuleType.Library ? ".dll" : ".exe";
 
-                propertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{buildToolPath} Build -Target {this.Name} -Config {configuration} {editorArgs}";
-                propertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{buildToolPath} Build -Clean -Target {this.Name} -Config {configuration} {editorArgs}";
+                var projectFile = string.Empty;
+                if (Workspace.IsTargetEngine == false)
+                {
+                    projectFile = $"-ProjectFile \"{Workspace.ProjectFile}\"";
+                }
+
+                propertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{buildToolPath} Build {projectFile} -Target {this.Name} -Config {configuration} {editorArgs}";
+                propertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{buildToolPath} Build {projectFile} -Clean -Target {this.Name} -Config {configuration} {editorArgs}";
                 propertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{buildToolPath} Clean";
                 propertyGroup.AddElement("NMakeOutput").InnerText = TargetDirectory.Binaries.BinariesOut(platform, configuration).GetFile(assembly.Name + extensions);
                 propertyGroup.AddElement("OutDir").InnerText = TargetDirectory.Binaries.BinariesOut(platform, configuration);
@@ -417,7 +423,7 @@ public class VisualCppProject : VisualStudioProject
                         PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = "$(OutDir)";
 
                         PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
-                        PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "NativeWithManagedCore";
+                        PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
                     }
                 }
             }
