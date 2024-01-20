@@ -103,7 +103,7 @@ MinimumVisualStudioVersion = {MinimumVisualStudioVersion}
         StringBuilder projectConfigurationPlatforms = new();
         Dictionary<string, string> projectGuids = new();
 
-        foreach (var project in projects)
+        foreach (var project in projects.OrderByDescending(p => p.Name == Workspace.Current.Name))
         {
             string typeGuid = project switch
             {

@@ -14,7 +14,7 @@ public static class ConfigurationExtensions
 {
     public static bool IsDebug(this Configuration InConfig)
     {
-        return InConfig == Configuration.Debug;
+        return InConfig is Configuration.Debug or Configuration.DebugGame;
     }
 
     public static bool IsRelease(this Configuration InConfig)
