@@ -49,7 +49,7 @@ public:
 		return Status;
 	}
 
-	virtual void ContinueWith(std::function<void(std::shared_ptr<AwaiterBase>)> ContinuationBody) override
+	virtual void ContinueWith(Action<std::shared_ptr<AwaiterBase>> ContinuationBody) override
 	{
 		auto ScopedLock = std::unique_lock(Lock);
 		if (IsCompleted())

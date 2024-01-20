@@ -47,6 +47,9 @@ public sealed class MakefileCompile : MakefileNode
         bool doCheck = !isShipping;
         macros.Add(("DO_CHECK", doCheck ? "1" : "0"));
 
+        macros.Add(("PLATFORM_STRING", $"TEXT(\"{Target.Platform.ToString()}\")"));
+        macros.Add(("CONFIG_STRING", $"TEXT(\"{Target.Configuration.ToString()}\")"));
+
         // User-defined macros.
         macros.AddRange(ModuleInfo.PrivateAdditionalMacros.Select(p => (p, (string?)null)));
 

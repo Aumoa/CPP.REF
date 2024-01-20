@@ -24,6 +24,7 @@
 #include "Platform/WindowsToolkitInstallation.h"
 #include "Platform/ProcessStartInfo.h"
 #include "Platform/Process.h"
+#include "Platform/DynamicLibrary.h"
 
 #include "System/Action.h"
 #include "System/Func.h"

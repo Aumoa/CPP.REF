@@ -4,7 +4,7 @@
 
 #include "System/Exception.h"
 
-class CORE_API NotImplementedException : public Exception
+class NotImplementedException : public Exception
 {
 public:
 	NotImplementedException()

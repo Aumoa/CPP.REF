@@ -27,6 +27,7 @@ public:
     virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) = 0;
 
     virtual String GetApplicationName();
+    virtual DirectoryReference GetEngineDirectory() const = 0;
 
     virtual void SetApplicationPointer(void* InAppPointer);
     virtual void* GetApplicationPointer();

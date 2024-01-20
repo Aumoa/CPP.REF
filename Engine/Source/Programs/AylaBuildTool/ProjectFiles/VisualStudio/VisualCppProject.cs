@@ -175,6 +175,8 @@ public class VisualCppProject : VisualStudioProject
                     .Concat(new[] { $"WITH_EDITOR={BoolToStr(isEditor)}", $"SHIPPING={BoolToStr(isShipping)}", $"DO_CHECK={BoolToStr(doCheck)}", "UNICODE", "_UNICODE" })
                     .Concat(moduleInfo.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"))
                     .Append($"{moduleInfo.Name.ToUpper()}_API=__declspec(dllexport)")
+                    .Append($"PLATFORM_STRING=TEXT(\"{platform.ToString()}\")")
+                    .Append($"CONFIG_STRING=TEXT(\"{configuration}\")")
                     );
 
                 propertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = string.Join(';', includePaths);

@@ -15,6 +15,10 @@ class FileReference;
 class CORE_API DirectoryReference : public FileSystemReference
 {
 public:
+	DirectoryReference() noexcept
+	{
+	}
+
 	DirectoryReference(String InPath) : FileSystemReference(InPath)
 	{
 	}
@@ -26,14 +30,7 @@ public:
 
 	[[nodiscard]] DirectoryReference GetAbsolute() const
 	{
-		if (IsPathFullQualified())
-		{
-			return DirectoryReference(GetValue());
-		}
-		else
-		{
-			return DirectoryReference(GetAbsolutePath());
-		}
+		return DirectoryReference(GetAbsolutePath());
 	}
 
 	[[nodiscard]] DirectoryReference ToCurrentDirectoryBased() const
@@ -44,6 +41,11 @@ public:
 		}
 
 		return Path::Combine(Environment::GetCurrentDirectory(), GetValue());
+	}
+
+	[[nodiscard]] DirectoryReference GetChild(String InName) const
+	{
+		return Path::Combine(GetValue(), InName);
 	}
 
 	void Create() const
@@ -82,6 +84,16 @@ public:
 			| Linq::ToVector();
 	}
 
+	[[nodiscard]] DirectoryReference GetParent() const
+	{
+		return Path::Combine(GetValue(), TEXT(".."));
+	}
+
 	[[nodiscard]] std::vector<FileReference> GetFiles(bool bRecursive) const;
 	[[nodiscard]] FileReference GetFile(String InName) const;
+
+	DirectoryReference& operator =(const DirectoryReference& Rhs) noexcept
+	{
+		return static_cast<DirectoryReference&>(this->FileSystemReference::operator =(Rhs));
+	}
 };

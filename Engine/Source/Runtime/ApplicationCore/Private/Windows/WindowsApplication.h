@@ -12,12 +12,16 @@
 
 class NWindowsApplication : public NGenericApplication
 {
+private:
+    DirectoryReference EngineDirectory;
+
 public:
     NWindowsApplication();
 
     virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
     virtual Vector2N GetScreenResolution() override;
     virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) override;
+    virtual DirectoryReference GetEngineDirectory() const override;
 
 public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

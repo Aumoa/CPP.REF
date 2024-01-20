@@ -1,7 +1,7 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Actors/GameMode.h"
+#include "World/Actor.h"
 
-AGameMode::AGameMode()
+Actor::Actor()
 {
 }

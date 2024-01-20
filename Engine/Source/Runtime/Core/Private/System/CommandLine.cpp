@@ -81,7 +81,7 @@ bool CommandLine::TryGetValue(String InName, String& OutValue)
 		}
 		else if (bCatchResult)
 		{
-			OutValue = Cur;
+			OutValue = Cur.Trim();
 			break;
 		}
 	}

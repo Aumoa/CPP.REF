@@ -3,14 +3,14 @@
 #include "Launch.h"
 #include "EngineLoop.h"
 #include "GameEngine.h"
+#include "Global.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "Localizational/Name.h"
 
 #if WITH_EDITOR
 #include "CoreEd.h"
 #endif
-
-#include "Localizational/Name.h"
 
 NLaunch* NLaunch::CurrentLaunch;
 
@@ -33,6 +33,8 @@ NLaunch::~NLaunch() noexcept
 int32 NLaunch::GuardedMain()
 {
     GenericApp->SetApplicationPointer(GetApplicationPointer());
+    Global::SetEngineDirectory(GenericApp->GetEngineDirectory());
+    Global::SetGameDirectory(Environment::GetCurrentDirectory());
 
     Loop->PreInit(CmdArgs);
 #if WITH_EDITOR

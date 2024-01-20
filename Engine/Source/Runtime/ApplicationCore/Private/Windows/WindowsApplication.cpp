@@ -44,6 +44,15 @@ void NWindowsApplication::PumpMessages(std::vector<NGenericPlatformInputEvent>& 
     InputEvents.clear();
 }
 
+DirectoryReference NWindowsApplication::GetEngineDirectory() const
+{
+    HMODULE hModule = GetModuleHandleW(L"ApplicationCore.dll");
+    static WCHAR ModuleNameBuf[1024];
+    DWORD Len = GetModuleFileNameW(hModule, ModuleNameBuf, 1024);
+    FileReference ModuleDll = String(ModuleNameBuf, Len);
+    return ModuleDll.GetDirectory().GetParent().GetParent().GetParent().GetAbsolute();
+}
+
 LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_NCCREATE)

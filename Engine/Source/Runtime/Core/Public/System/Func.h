@@ -37,8 +37,48 @@ namespace details
 
 	public:
 		using type = decltype(generate_signature(std::make_index_sequence<sizeof...(TArgs) - 1>{}));
+
+		template<size_t... Index>
+		static auto function_reinterpret_cast(void(*func)(), std::index_sequence<Index...>&&)
+		{
+			using return_t = variant_index_t<sizeof...(TArgs) - 1, TArgs...>;
+			return reinterpret_cast<return_t(*)(variant_index_t<Index, TArgs...>...)>(func);
+		}
 	};
 }
 
 template<class... TArgs>
-using Func = typename details::function_args<TArgs...>::type;
+class Func : private details::function_args<TArgs...>::type
+{
+	using function_t = details::function_args<TArgs...>::type;
+
+public:
+	inline Func()
+	{
+	}
+
+	template<class... UArgs>
+	inline Func(UArgs&&... InArgs) requires std::constructible_from<function_t, UArgs...>
+		: function_t(std::forward<UArgs>(InArgs)...)
+	{
+	}
+
+	[[nodiscard]] bool IsBound() const
+	{
+		return this->operator bool();
+	}
+
+	template<class... UArgs> requires std::invocable<function_t, UArgs...>
+	inline auto Invoke(UArgs&&... InArgs)
+	{
+		return this->operator ()(std::forward<UArgs>(InArgs)...);
+	}
+
+	using function_t::operator bool;
+	using function_t::operator ();
+
+	inline static Func FromAnonymous(void(*AnnPtr)())
+	{
+		return Func(details::function_args<TArgs...>::function_reinterpret_cast(AnnPtr, std::make_index_sequence<sizeof...(TArgs) - 1>{}));
+	}
+};

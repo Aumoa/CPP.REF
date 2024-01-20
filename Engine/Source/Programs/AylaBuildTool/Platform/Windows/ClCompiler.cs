@@ -133,7 +133,7 @@ public class ClCompiler : Compiler
         }
         else
         {
-            return $"/D\"{InPair.Item1}\"=\"{InPair.Item2}\"";
+            return $"/D\"{InPair.Item1}\"=\"{InPair.Item2.Replace("\"", "\\\"")}\"";
         }
     }
 

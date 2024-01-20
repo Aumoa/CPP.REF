@@ -270,7 +270,7 @@ public:
 
 	suspend_and_destroy_if AddConditionVariable(Func<bool> ConditionBody)
 	{
-		if (ConditionBody == nullptr)
+		if (ConditionBody.IsBound() == false)
 		{
 			return IsCancellationRequested();
 		}

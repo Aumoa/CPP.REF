@@ -13,6 +13,10 @@ class DirectoryReference;
 class CORE_API FileReference : public FileSystemReference
 {
 public:
+	FileReference() noexcept
+	{
+	}
+
 	FileReference(String InPath) : FileSystemReference(InPath)
 	{
 	}
@@ -54,4 +58,9 @@ public:
 
 	[[nodiscard]] FileReference WithExtensions(String InExtensions) const;
 	[[nodiscard]] DirectoryReference GetDirectory() const;
+
+	FileReference& operator =(const FileReference& Rhs) noexcept
+	{
+		return static_cast<FileReference&>(this->FileSystemReference::operator =(Rhs));
+	}
 };

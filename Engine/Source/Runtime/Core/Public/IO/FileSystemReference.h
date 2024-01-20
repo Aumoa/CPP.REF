@@ -15,6 +15,10 @@ private:
 	String Extensions;
 
 protected:
+	FileSystemReference() noexcept
+	{
+	}
+
 	FileSystemReference(String InPath)
 	{
 		Value = InPath;
@@ -145,6 +149,16 @@ private:
 public:
 	[[nodiscard]] operator bool() const { return IsExists(); }
 	[[nodiscard]] operator String() const { return Value; }
+
+	FileSystemReference& operator =(const FileSystemReference& Rhs) noexcept
+	{
+		Value = Rhs.Value;
+		FileName = Rhs.FileName;
+		bHasExtensions = Rhs.bHasExtensions;
+		Name = Rhs.Name;
+		Extensions = Rhs.Extensions;
+		return *this;
+	}
 
 	[[nodiscard]] bool operator ==(const FileSystemReference& Rhs) const
 	{
