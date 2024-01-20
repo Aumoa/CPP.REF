@@ -29,6 +29,7 @@ public class VisualCppProject : VisualStudioProject
     public override DirectoryReference SourceDirectory { get; }
 
     private CppAssembly assembly;
+    private ModuleInformation moduleInfo;
 
     public VisualCppProject(CppAssembly assembly)
     {
@@ -39,6 +40,7 @@ public class VisualCppProject : VisualStudioProject
         this.TargetDirectory = assembly.ProjectDirectory;
         this.SourceDirectory = assembly.SourceDirectory;
         this.assembly = assembly;
+        this.moduleInfo = ModuleDependencyCache.GetCached(assembly.Name, string.Empty);
     }
 
     public override (string, string) MapConfiguration(Configuration configuration, bool isEditor, TargetPlatform platform)
@@ -135,7 +137,10 @@ public class VisualCppProject : VisualStudioProject
                 string buildToolPath = Global.BuildToolPath;
                 buildToolPath = Path.ChangeExtension(buildToolPath, ".exe");
 
-                var includePaths = ToolChain.GetRequiredIncludePaths(platform.Architecture);
+                IEnumerable<string> includePaths = ToolChain.GetRequiredIncludePaths(platform.Architecture)
+                    .Concat(moduleInfo.PrivateIncludePaths)
+                    .Append(Path.Combine(moduleInfo.GeneratedIncludePath, moduleInfo.Name))
+                    .Append(moduleInfo.GeneratedShaderPath);
                 var extensions = assembly.Rules.Type == Rules.ModuleRules.ModuleType.Library ? ".dll" : ".exe";
 
                 var projectFile = string.Empty;
@@ -164,17 +169,13 @@ public class VisualCppProject : VisualStudioProject
                     }
                 });
 
-                bool bShipping = configuration == Configuration.Shipping;
-                bool bDoCheck = !bShipping;
-                macros.Add($"WITH_EDITOR={(isEditor ? "1" : "0")}");
-                macros.Add($"SHIPPING={(bShipping ? "1" : "0")}");
-                macros.Add($"DO_CHECK={(bDoCheck ? "1" : "0")}");
-
-                macros.AddRange(new[]
-                {
-                    "UNICODE",
-                    "_UNICODE"
-                });
+                bool isShipping = configuration == Configuration.Shipping;
+                bool doCheck = !isShipping;
+                macros.AddRange(moduleInfo.PrivateAdditionalMacros
+                    .Concat(new[] { $"WITH_EDITOR={BoolToStr(isEditor)}", $"SHIPPING={BoolToStr(isShipping)}", $"DO_CHECK={BoolToStr(doCheck)}", "UNICODE", "_UNICODE" })
+                    .Concat(moduleInfo.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"))
+                    .Append($"{moduleInfo.Name.ToUpper()}_API=__declspec(dllexport)")
+                    );
 
                 propertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = string.Join(';', includePaths);
                 propertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20 /Zc:preprocessor";
@@ -183,6 +184,12 @@ public class VisualCppProject : VisualStudioProject
                 if (platform.Architecture == Architecture.x64)
                 {
                     propertyGroup.AddElement("ExecutablePath").InnerText = "$(VC_ExecutablePath_x64);$(CommonExecutablePath)";
+                }
+
+                if (moduleInfo.DependModules.Contains("Core"))
+                {
+                    var ForcedIncludeFiles = propertyGroup.AddElement("ForcedIncludeFiles");
+                    ForcedIncludeFiles.InnerText = "CoreMinimal.h";
                 }
             });
 
@@ -199,28 +206,6 @@ public class VisualCppProject : VisualStudioProject
                 {
                     var ClCompile = ItemGroup.AddElement("ClCompile");
                     ClCompile.SetAttribute("Include", file);
-
-                    if (module != null)
-                    {
-                        IEnumerable<string> Macros = module.PrivateAdditionalMacros;
-                        Macros = Macros.Concat(module.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"));
-                        Macros = Macros.Append($"{module.Name.ToUpper()}_API=__declspec(dllexport)");
-
-                        var PreprocessorDefinitions = ClCompile.AddElement("PreprocessorDefinitions");
-                        PreprocessorDefinitions.InnerText = $"{string.Join(';', Macros)};%(PreprocessorDefinitions)";
-
-                        string GeneratedInclude = Path.Combine(module.GeneratedIncludePath, module.Name);
-
-                        var AdditionalIncludeDirectories = ClCompile.AddElement("AdditionalIncludeDirectories");
-                        AdditionalIncludeDirectories.InnerText = $"{string.Join(';', module.PrivateIncludePaths.Concat(new[] { GeneratedInclude, module.GeneratedShaderPath }))};%(AdditionalIncludeDirectories)";
-
-                        if (module.DependModules.Contains("Core"))
-                        {
-                            var ForcedIncludeFiles = ClCompile.AddElement("ForcedIncludeFiles");
-                            ForcedIncludeFiles.InnerText = "CoreMinimal.h";
-                        }
-                    }
-
                     return ClCompile;
                 }
                 else if (file.IsHeaderFile())
@@ -431,4 +416,6 @@ public class VisualCppProject : VisualStudioProject
 
         vcxprojUser = doc;
     }
+
+    private static string BoolToStr(bool b) => b ? "1" : "0";
 }
