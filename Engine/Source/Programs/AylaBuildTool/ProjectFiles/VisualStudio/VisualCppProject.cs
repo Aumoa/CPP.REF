@@ -385,29 +385,28 @@ public class VisualCppProject : VisualStudioProject
                         var PropertyGroup = project.AddElement("PropertyGroup");
                         PropertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{ConfigStr}|{PlatformStr}'");
 
-                        bool bIsProgram = SourceDirectory != TargetDirectory.Source.Root;
-                        string Executable;
-                        string? LaunchDLL = null;
-                        if (bIsProgram)
+                        string executable;
+                        string commandArgs;
+
+                        switch (assembly.Rules.Type)
                         {
-                            string ExecutableName = Path.GetFileNameWithoutExtension(SourceDirectory);
-                            Executable =TargetDirectory.Binaries.BinariesOut(TargetPlatform.Win64, Config).GetFile(ExecutableName);
-                        }
-                        else
-                        {
-                            Executable = Path.Combine(Global.EngineDirectory.Binaries.CSharp, "Launch.CSharp");
-                            if (TargetDirectory.Root != Global.EngineDirectory.Root)
-                            {
-                                LaunchDLL = Path.ChangeExtension(TargetDirectory.Name, ".dll");
-                            }
+                            case Rules.ModuleRules.ModuleType.ConsoleApplication:
+                            case Rules.ModuleRules.ModuleType.Application:
+                                string executableName = Path.GetFileNameWithoutExtension(SourceDirectory);
+                                executable = TargetDirectory.Binaries.BinariesOut(TargetPlatform.Win64, Config).GetFile(executableName).WithExtensions("exe");
+                                commandArgs = string.Empty;
+                                break;
+                            case Rules.ModuleRules.ModuleType.Library:
+                                executable = Global.EngineDirectory.Binaries.Root.GetHierarchy("Win64", Config.IsDebug() ? "Debug" : "Development").GetFile("Launch").WithExtensions(".exe");
+                                commandArgs = $"-GameAssembly {assembly.Name}";
+                                break;
+                            default:
+                                continue;
                         }
 
-                        Executable += ".exe";
-                        PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = Executable;
-                        PropertyGroup.AddElement("LocalDebuggerCommandArguments").InnerText = LaunchDLL ?? "";
-
-                        string WorkingDirectory = Path.GetDirectoryName(Executable)!;
-                        PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = "$(OutDir)";
+                        PropertyGroup.AddElement("LocalDebuggerCommand").InnerText = executable;
+                        PropertyGroup.AddElement("LocalDebuggerCommandArguments").InnerText = commandArgs;
+                        PropertyGroup.AddElement("LocalDebuggerWorkingDirectory").InnerText = TargetDirectory.Root;
 
                         PropertyGroup.AddElement("DebuggerFlavor").InnerText = "WindowsLocalDebugger";
                         PropertyGroup.AddElement("LocalDebuggerDebuggerType").InnerText = "Auto";
