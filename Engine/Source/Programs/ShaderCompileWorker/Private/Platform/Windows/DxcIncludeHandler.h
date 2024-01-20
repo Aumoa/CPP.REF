@@ -12,11 +12,11 @@
 class DxcIncludeHandler : public IDxcIncludeHandler
 {
 private:
-	String Root;
+	DirectoryReference Root;
 	size_t Refs;
 
 public:
-	DxcIncludeHandler(String InRoot);
+	DxcIncludeHandler(DirectoryReference InRoot);
 
 	virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
 	virtual ULONG STDMETHODCALLTYPE AddRef() override;

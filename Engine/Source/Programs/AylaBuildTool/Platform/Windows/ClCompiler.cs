@@ -192,17 +192,12 @@ public class ClCompiler : Compiler
         var app = await App.Run(psi, cancellationToken: cancellationToken);
         if (app.ExitCode != 0)
         {
-            string report = string.Empty;
-            if (app.ExitCode != 0)
-            {
-                report += app.Stdout;
-            }
-            throw new TerminateException(KnownErrorCode.CompileError, report);
+            throw new TerminateException(KnownErrorCode.CompileError, app.Outputs.Trim());
         }
 
         await GenerateSourceCodeCache(node, outputPath, dependenciesJson);
         var elapsed = DateTime.Now - startTime;
-        return $"{app.Stdout.Trim()} ({elapsed.TotalSeconds:0.00}s)";
+        return $"{app.Outputs.Trim()} ({elapsed.TotalSeconds:0.00}s)";
     }
 
     private async Task GenerateSourceCodeCache(MakefileCompile node, string objectOutput, string deps)

@@ -18,11 +18,11 @@ class NHLSLCompiler : public NShaderCompiler
 public:
 	NHLSLCompiler();
 
-	virtual Task<std::vector<byte>> CompileVertexShaderAsync(String InShaderFile, std::stop_token InCancellationToken) override;
-	virtual Task<std::vector<byte>> CompilePixelShaderAsync(String InShaderFile, std::stop_token InCancellationToken) override;
+	virtual Task<std::vector<byte>> CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) override;
+	virtual Task<std::vector<byte>> CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) override;
 
 private:
-	Task<std::vector<byte>> CompileShaderAsync(String InShaderFile, String InModelName, std::stop_token InCancellationToken);
+	Task<std::vector<byte>> CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken);
 };
 
 #endif

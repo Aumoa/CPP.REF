@@ -13,37 +13,36 @@ NHLSLCompiler::NHLSLCompiler()
 	HR(DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&pCompiler)));
 }
 
-Task<std::vector<byte>> NHLSLCompiler::CompileVertexShaderAsync(String InShaderFile, std::stop_token InCancellationToken)
+Task<std::vector<byte>> NHLSLCompiler::CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
 {
-	return CompileShaderAsync(InShaderFile, TEXT("vs_6_1"), InCancellationToken);
+	return CompileShaderAsync(InName, ShaderCode, TEXT("vs_6_1"), InCancellationToken);
 }
 
-Task<std::vector<byte>> NHLSLCompiler::CompilePixelShaderAsync(String InShaderFile, std::stop_token InCancellationToken)
+Task<std::vector<byte>> NHLSLCompiler::CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
 {
-	return CompileShaderAsync(InShaderFile, TEXT("ps_6_1"), InCancellationToken);
+	return CompileShaderAsync(InName, ShaderCode, TEXT("ps_6_1"), InCancellationToken);
 }
 
-Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InShaderFile, String InModelName, std::stop_token InCancellationToken)
+Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken)
 {
-	String SrcContent = co_await File::ReadAllTextAsync(InShaderFile, InCancellationToken);
-	std::string SrcContentMultiByte = SrcContent.AsCodepage();
+	std::string SrcContentMultiByte = ShaderCode.AsCodepage();
 
 	ComPtr<IDxcBlobEncoding> pEncoding;
 	HR(pLibrary->CreateBlobWithEncodingFromPinned(SrcContentMultiByte.c_str(), (UINT32)SrcContentMultiByte.length(), 0, &pEncoding));
 
 	ComPtr<IDxcOperationResult> pResult;
 	HRESULT hCompileResult;
-	ComPtr<IDxcIncludeHandler> pIncludeHandler = new DxcIncludeHandler(Path::GetDirectoryName(InShaderFile));
+	ComPtr<IDxcIncludeHandler> pIncludeHandler = new DxcIncludeHandler(GetIncludeDirectory());
 	co_await Task<>::Run([&]()
 	{
 		hCompileResult = pCompiler->Compile(pEncoding.Get(),
-		InShaderFile.c_str(),
-		TEXT("main").c_str(),
-		InModelName.c_str(),
-		NULL, 0,
-		NULL, 0,
-		pIncludeHandler.Get(),
-		&pResult
+			InName.c_str(),
+			TEXT("main").c_str(),
+			InModelName.c_str(),
+			NULL, 0,
+			NULL, 0,
+			pIncludeHandler.Get(),
+			&pResult
 		);
 	});
 
@@ -53,11 +52,8 @@ Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InShaderFile, S
 	ComPtr<IDxcBlobEncoding> pErrorBlob;
 	if (SUCCEEDED(pResult->GetErrorBuffer(&pErrorBlob)) && pErrorBlob && pErrorBlob->GetBufferPointer())
 	{
-		ComPtr<IDxcBlobUtf8> pUnicodeBlob;
-		if (SUCCEEDED(pErrorBlob.As(&pUnicodeBlob)))
-		{
-			Console::WriteLine(String::FromLiteral((const wchar_t*)pUnicodeBlob->GetBufferPointer()));
-		}
+		String Message = String::FromCodepage({ (const char*)pErrorBlob->GetBufferPointer(), (size_t)pErrorBlob->GetBufferSize() });
+		Console::Error.WriteLine(Message);
 	}
 
 	if (FAILED(hCompileResult))

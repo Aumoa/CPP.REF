@@ -20,6 +20,8 @@ public class App
 
     public string Stderr { get; private set; } = string.Empty;
 
+    public string Outputs { get; private set; } = string.Empty;
+
     public int ExitCode { get; private set; }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -43,8 +45,25 @@ public class App
 
         StringBuilder stdout = new();
         StringBuilder stderr = new();
-        p.OutputDataReceived += (sender, args) => stdout.AppendLine(args.Data);
-        p.ErrorDataReceived += (sender, args) => stderr.AppendLine(args.Data);
+        StringBuilder outputs = new();
+        p.OutputDataReceived += (sender, args) =>
+        {
+            stdout.AppendLine(args.Data);
+            outputs.AppendLine(args.Data);
+            if (writeToConsole)
+            {
+                Console.Write(args.Data);
+            }
+        };
+        p.ErrorDataReceived += (sender, args) =>
+        {
+            stderr.AppendLine(args.Data);
+            outputs.AppendLine(args.Data);
+            if (writeToConsole)
+            {
+                Console.Error.Write(args.Data);
+            }
+        };
 
         p.Start();
         p.BeginOutputReadLine();
@@ -57,12 +76,7 @@ public class App
 
         Stdout = stdout.ToString();
         Stderr = stderr.ToString();
-
-        if (writeToConsole)
-        {
-            Console.Write(Stdout);
-            Console.Error.Write(Stderr);
-        }
+        Outputs = outputs.ToString();
         ExitCode = p.ExitCode;
     }
 

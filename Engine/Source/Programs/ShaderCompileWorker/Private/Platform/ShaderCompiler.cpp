@@ -3,6 +3,8 @@
 #include "ShaderCompiler.h"
 #include "Windows/HLSLCompiler.h"
 
+DirectoryReference NShaderCompiler::IncludeDirectory;
+
 std::shared_ptr<NShaderCompiler> NShaderCompiler::GeneratePlatformCompiler()
 {
 #if PLATFORM_WINDOWS
@@ -10,4 +12,9 @@ std::shared_ptr<NShaderCompiler> NShaderCompiler::GeneratePlatformCompiler()
 #else
 	throw NotSupportedException(TEXT("Platform is not supported."));
 #endif
+}
+
+void NShaderCompiler::SetIncludeDirectory(DirectoryReference InIncludeDirectory)
+{
+	IncludeDirectory = InIncludeDirectory;
 }

@@ -23,13 +23,13 @@ public class ShaderCompiler : Compiler
         var app = await App.Run(psi, cancellationToken: cancellationToken);
         if (app.ExitCode != 0)
         {
-            throw new TerminateException(KnownErrorCode.CompileError, app.Stderr);
+            throw new TerminateException(KnownErrorCode.CompileError, app.Outputs);
         }
 
         // shader compiler is not provide cache yet.
         node.Cache = null;
 
-        return $"{app.Stdout.Trim(' ', '\t', '\n', '\r')}";
+        return $"{app.Outputs.Trim(' ', '\t', '\n', '\r')}";
     }
 
     private static ProcessStartInfo GenerateStartInfo(MakefileCompile node)

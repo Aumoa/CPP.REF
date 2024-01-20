@@ -56,6 +56,16 @@ public:
 		}
 	}
 
+	[[nodiscard]] String ReadAllText() const
+	{
+		return File::ReadAllText(GetValue());
+	}
+
+	[[nodiscard]] Task<String> ReadAllTextAsync(std::stop_token InCancellationToken = {}) const
+	{
+		return File::ReadAllTextAsync(GetValue(), InCancellationToken);
+	}
+
 	[[nodiscard]] FileReference WithExtensions(String InExtensions) const;
 	[[nodiscard]] DirectoryReference GetDirectory() const;
 

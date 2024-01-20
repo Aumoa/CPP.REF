@@ -6,7 +6,7 @@
 
 #include "Platform/Windows/DxcBlob.h"
 
-DxcIncludeHandler::DxcIncludeHandler(String InRoot) : Root(InRoot), Refs(1)
+DxcIncludeHandler::DxcIncludeHandler(DirectoryReference InRoot) : Root(InRoot), Refs(1)
 {
 }
 
@@ -44,12 +44,11 @@ ULONG STDMETHODCALLTYPE DxcIncludeHandler::Release()
 
 HRESULT STDMETHODCALLTYPE DxcIncludeHandler::LoadSource(LPCWSTR pFilename, IDxcBlob** ppIncludeSource)
 {
-	auto FileNameStr = String::FromLiteral(pFilename);
-	if (File::Exists(FileNameStr))
+	FileReference File = Root.GetFile(String::FromLiteral(pFilename));
+	if (File.IsExists())
 	{
-		std::string AnsiCode = File::ReadAllText(FileNameStr).AsCodepage();
-		ComPtr<IDxcBlob> pBlob = new DxcBlob(std::move(AnsiCode));
-		*ppIncludeSource = pBlob.Get();
+		std::string AnsiCode = File.ReadAllText().AsCodepage();
+		*ppIncludeSource = new DxcBlob(std::move(AnsiCode));
 		return S_OK;
 	}
 
