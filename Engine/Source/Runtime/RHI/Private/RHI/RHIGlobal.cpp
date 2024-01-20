@@ -25,6 +25,11 @@ void NRHIGlobal::InitDynamicRHI()
 
 void NRHIGlobal::ShutdownDynamicRHI()
 {
+	if (DynamicRHI)
+	{
+		DynamicRHI->SyncFrame();
+	}
+
 	PrimaryCommandQueue.reset();
 	DynamicRHI.reset();
 }

@@ -198,7 +198,7 @@ void SViewport::OnArrangeChildren(NArrangedChildrens& ArrangedChildrens, const N
 
 void SViewport::ResizeViewport(const Vector2N& NewSize)
 {
-	if (NewSize.X < 0 || NewSize.Y < 0)
+	if (NewSize.X <= 0 || NewSize.Y <= 0)
 	{
 		return;
 	}
