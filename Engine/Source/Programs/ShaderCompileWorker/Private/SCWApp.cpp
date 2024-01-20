@@ -87,7 +87,7 @@ constexpr byte {}[] =
 	}
 
 	String Body = String::Join(TEXT(",") + Environment::NewLine + TEXT("\t"), Lines);
-	Body = String::Format(HeaderFormatBase, ShaderCode.Replace(TEXT("\r\n"), TEXT("\n")), Name, Body);
+	Body = String::Format(HeaderFormatBase, ShaderCode, Name, Body).Replace(TEXT("\r\n"), TEXT("\n"));
 	co_await File::CompareAndWriteAllTextAsync(OutputFile, Body, InCancellationToken);
 
 	Timer.Stop();
