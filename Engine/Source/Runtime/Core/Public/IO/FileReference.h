@@ -21,6 +21,9 @@ public:
 	{
 	}
 
+	FileReference(const FileReference&) = default;
+	FileReference(FileReference&&) noexcept = default;
+
 	virtual bool IsExists() const override
 	{
 		return File::Exists(GetValue());
@@ -69,8 +72,6 @@ public:
 	[[nodiscard]] FileReference WithExtensions(String InExtensions) const;
 	[[nodiscard]] DirectoryReference GetDirectory() const;
 
-	FileReference& operator =(const FileReference& Rhs) noexcept
-	{
-		return static_cast<FileReference&>(this->FileSystemReference::operator =(Rhs));
-	}
+	FileReference& operator =(const FileReference& Rhs) noexcept = default;
+	FileReference& operator =(FileReference&& Rhs) noexcept = default;
 };

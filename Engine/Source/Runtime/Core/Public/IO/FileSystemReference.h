@@ -26,6 +26,9 @@ protected:
 		bHasExtensions = ExtractExtensions(FileName, &Name, &Extensions);
 	}
 
+	FileSystemReference(const FileSystemReference& Rhs) noexcept = default;
+	FileSystemReference(FileSystemReference&& Rhs) noexcept = default;
+
 public:
 	[[nodiscard]] inline String GetValue() const noexcept
 	{
@@ -150,15 +153,8 @@ public:
 	[[nodiscard]] operator bool() const { return IsExists(); }
 	[[nodiscard]] operator String() const { return Value; }
 
-	FileSystemReference& operator =(const FileSystemReference& Rhs) noexcept
-	{
-		Value = Rhs.Value;
-		FileName = Rhs.FileName;
-		bHasExtensions = Rhs.bHasExtensions;
-		Name = Rhs.Name;
-		Extensions = Rhs.Extensions;
-		return *this;
-	}
+	FileSystemReference& operator =(const FileSystemReference& Rhs) noexcept = default;
+	FileSystemReference& operator =(FileSystemReference&& Rhs) noexcept = default;
 
 	[[nodiscard]] bool operator ==(const FileSystemReference& Rhs) const
 	{

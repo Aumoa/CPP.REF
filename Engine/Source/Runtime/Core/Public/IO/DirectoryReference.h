@@ -23,6 +23,9 @@ public:
 	{
 	}
 
+	DirectoryReference(const DirectoryReference&) = default;
+	DirectoryReference(DirectoryReference&&) noexcept = default;
+
 	virtual bool IsExists() const override
 	{
 		return Directory::Exists(GetValue());
@@ -92,8 +95,6 @@ public:
 	[[nodiscard]] std::vector<FileReference> GetFiles(bool bRecursive) const;
 	[[nodiscard]] FileReference GetFile(String InName) const;
 
-	DirectoryReference& operator =(const DirectoryReference& Rhs) noexcept
-	{
-		return static_cast<DirectoryReference&>(this->FileSystemReference::operator =(Rhs));
-	}
+	DirectoryReference& operator =(const DirectoryReference& Rhs) noexcept = default;
+	DirectoryReference& operator =(DirectoryReference&& Rhs) noexcept = default;
 };
