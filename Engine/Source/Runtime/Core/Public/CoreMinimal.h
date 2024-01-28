@@ -13,6 +13,8 @@
 #include "Linq/Linq.Values.h"
 #include "Linq/Linq.ToSet.h"
 #include "Linq/Linq.Keys.h"
+#include "Linq/Append.h"
+#include "Linq/Concat.h"
 
 #include "Platform/PlatformMacros.h"
 #include "Platform/PlatformTypes.h"

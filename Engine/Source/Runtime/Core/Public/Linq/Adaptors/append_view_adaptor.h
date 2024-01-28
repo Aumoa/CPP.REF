@@ -3,31 +3,43 @@
 #pragma once
 
 #include <ranges>
-#include "Linq/Ranges/concat_view.h"
+#include "Linq/Ranges/append_view.h"
 
 namespace Linq::adaptors
 {
 	template<class T>
-	struct append_adaptor_closure
+	struct append_view_adaptor_closure
 	{
 		T value;
 
-		constexpr append_adaptor_closure(T&& right_value) noexcept
-			: right_value(std::forward<T>(right_value))
+		template<class U>
+		constexpr append_view_adaptor_closure(U&& v) noexcept
+			: value(std::forward<U>(v))
 		{
 		}
 
-		template<std::ranges::input_range R, class V = std::ranges::single_view<T>> requires
-			requires
-			{
-				typename details::linked_iterator_traits<typename R::iterator, typename V::iterator>::value_type;
-			}
-		constexpr auto operator ()(R&& left_view) const noexcept
+		template<std::ranges::input_range R>
+		constexpr auto operator ()(R&& left_view) noexcept
 		{
-			return concat_view(std::forward<R>(left_view), std::views::single(right_value));
+			return ranges::append_view(std::forward<R>(left_view), std::forward<T>(value));
 		}
 	};
 
 	template<class T>
-	append_adaptor_closure(T&&) -> append_adaptor_closure<T>;
+	append_view_adaptor_closure(T&&) -> append_view_adaptor_closure<T>;
+	
+	struct append_view_adaptor
+	{
+		template<class T>
+		constexpr auto operator ()(T&& value) const noexcept
+		{
+			return append_view_adaptor_closure(std::forward<T>(value));
+		}
+	};
+
+	template<std::ranges::input_range R, class T>
+	constexpr auto operator |(R&& view, append_view_adaptor_closure<T>&& adaptor) noexcept
+	{
+		return adaptor(std::forward<R>(view));
+	}
 }

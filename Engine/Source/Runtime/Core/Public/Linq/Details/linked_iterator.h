@@ -45,7 +45,19 @@ namespace Linq
 			constexpr linked_iterator(const linked_iterator&) noexcept(noexcept(left_cur = left_cur) && noexcept(right_cur = right_cur)) = default;
 			constexpr linked_iterator(linked_iterator&&) noexcept = default;
 
-			constexpr const reference& operator *() const noexcept
+			constexpr const reference operator *() const noexcept requires base::is_same
+			{
+				if (is_left_end())
+				{
+					return *right_cur;
+				}
+				else
+				{
+					return *left_cur;
+				}
+			}
+
+			constexpr value_type operator *() const noexcept requires (!base::is_same)
 			{
 				if (is_left_end())
 				{
@@ -77,12 +89,12 @@ namespace Linq
 			{
 				if (is_left_end())
 				{
-					std::advance(right_cur);
+					std::advance(right_cur, 1);
 					return *this;
 				}
 				else
 				{
-					std::advance(left_cur);
+					std::advance(left_cur, 1);
 					return *this;
 				}
 			}
