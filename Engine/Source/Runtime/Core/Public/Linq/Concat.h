@@ -4,10 +4,7 @@
 
 #include "Linq/Adaptors/concat_view_adaptor.h"
 
-namespace Linq
+namespace Linq::inline views
 {
-	inline namespace views
-	{
-		constexpr adaptors::concat_view_adaptor Concat;
-	}
+	constexpr adaptors::concat_view_adaptor Concat;
 }

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "Linq/Adaptors/append_view_adaptor.h"
+#include "Linq/Adaptors/any_adaptor.h"
 
 namespace Linq::inline views
 {
-	constexpr adaptors::append_view_adaptor Append;
+	constexpr adaptors::any_adaptor Any;
 }
