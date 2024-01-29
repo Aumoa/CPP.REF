@@ -3,7 +3,7 @@
 #include "ShaderCompiler.h"
 #include "Windows/HLSLCompiler.h"
 
-DirectoryReference NShaderCompiler::IncludeDirectory;
+std::vector<DirectoryReference> NShaderCompiler::IncludeDirectories;
 
 std::shared_ptr<NShaderCompiler> NShaderCompiler::GeneratePlatformCompiler()
 {
@@ -14,7 +14,7 @@ std::shared_ptr<NShaderCompiler> NShaderCompiler::GeneratePlatformCompiler()
 #endif
 }
 
-void NShaderCompiler::SetIncludeDirectory(DirectoryReference InIncludeDirectory)
+void NShaderCompiler::SetIncludeDirectory(std::vector<DirectoryReference> InIncludeDirectories)
 {
-	IncludeDirectory = InIncludeDirectory;
+	IncludeDirectories = InIncludeDirectories;
 }

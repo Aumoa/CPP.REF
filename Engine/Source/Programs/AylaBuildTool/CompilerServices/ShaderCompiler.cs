@@ -23,7 +23,7 @@ public class ShaderCompiler : Compiler
         var app = await App.Run(psi, cancellationToken: cancellationToken);
         if (app.ExitCode != 0)
         {
-            throw new TerminateException(KnownErrorCode.CompileError, app.Outputs);
+            throw new TerminateException(KnownErrorCode.CompileError, "\n" + app.Outputs);
         }
 
         // shader compiler is not provide cache yet.

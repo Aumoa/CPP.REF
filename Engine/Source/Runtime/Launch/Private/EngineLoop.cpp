@@ -29,11 +29,13 @@ void NEngineLoop::Init(std::shared_ptr<GameEngine> InEngine)
 {
     EngineInstance = std::move(InEngine);
     EngineInstance->Initialize();
+    EngineInstance->StartGame();
 }
 
 void NEngineLoop::Shutdown()
 {
     // shutdown engine instance.
+    EngineInstance->EndGame();
     EngineInstance->Deinitialize();
     EngineInstance.reset();
 
@@ -70,7 +72,10 @@ void NEngineLoop::PreInit(String CmdArgs)
 
 void NEngineLoop::PostInit()
 {
+#if WITH_EDITOR
     NGenericSplash::Hide();
+#endif
+
     NSlateApplication::Get().GetCoreWindow().SetVisibility(ESlateVisibility::Visible);
 }
 

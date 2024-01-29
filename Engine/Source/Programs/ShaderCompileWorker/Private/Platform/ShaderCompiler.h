@@ -7,15 +7,18 @@
 class NShaderCompiler
 {
 private:
-	static DirectoryReference IncludeDirectory;
+	static std::vector<DirectoryReference> IncludeDirectories;
 
 public:
-	virtual Task<std::vector<byte>> CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) = 0;
-	virtual Task<std::vector<byte>> CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) = 0;
+	virtual Task<> CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) = 0;
+	virtual Task<> CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) = 0;
+
+	virtual std::span<const byte> GetCompileResults() const = 0;
+	virtual std::span<const FileReference> GetCompilerIncludes() const = 0;
 
 public:
 	static std::shared_ptr<NShaderCompiler> GeneratePlatformCompiler();
 
-	static void SetIncludeDirectory(DirectoryReference InIncludeDirectory);
-	inline static DirectoryReference GetIncludeDirectory() { return IncludeDirectory; }
+	static void SetIncludeDirectory(std::vector<DirectoryReference> InIncludeDirectories);
+	inline static std::span<const DirectoryReference> GetIncludeDirectory() { return IncludeDirectories; }
 };

@@ -116,7 +116,7 @@ int32 SViewport::OnPaint(const NPaintArgs& Args, const NGeometry& AllottedGeomet
 	Element.Layout = AllottedGeometry.ToPaintGeometry();
 	Element.Layer = InLayer;
 	Element.RenderOpacity = Args.RenderOpacity;
-	Element.TintColor = NamedColors::White;
+	Element.TintColor = NamedColors::Transparent;
 	Element.Proxy = RenderProxy;
 
 	if (SceneRenderer)

@@ -45,7 +45,6 @@ int32 NLaunch::GuardedMain()
     Loop->PostInit();
 
     std::vector<NGenericPlatformInputEvent> InputEvents;
-
     while (!GenericApp->IsQuitRequested())
     {
         GenericApp->PumpMessages(InputEvents);

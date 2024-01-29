@@ -5,3 +5,7 @@
 GameAssembly::GameAssembly(String InModuleName) : ModuleName(InModuleName)
 {
 }
+
+GameAssembly::~GameAssembly() noexcept
+{
+}

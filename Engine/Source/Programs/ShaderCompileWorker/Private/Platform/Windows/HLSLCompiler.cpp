@@ -11,19 +11,30 @@ NHLSLCompiler::NHLSLCompiler()
 {
 	HR(DxcCreateInstance(CLSID_DxcLibrary, IID_PPV_ARGS(&pLibrary)));
 	HR(DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&pCompiler)));
+	pIncludeHandler = new DxcIncludeHandler(GetIncludeDirectory());
 }
 
-Task<std::vector<byte>> NHLSLCompiler::CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
+Task<> NHLSLCompiler::CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
 {
 	return CompileShaderAsync(InName, ShaderCode, TEXT("vs_6_1"), InCancellationToken);
 }
 
-Task<std::vector<byte>> NHLSLCompiler::CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
+Task<> NHLSLCompiler::CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
 {
 	return CompileShaderAsync(InName, ShaderCode, TEXT("ps_6_1"), InCancellationToken);
 }
 
-Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken)
+std::span<const byte> NHLSLCompiler::GetCompileResults() const
+{
+	return { reinterpret_cast<const byte*>(pCompiledResults->GetBufferPointer()), pCompiledResults->GetBufferSize() };
+}
+
+std::span<const FileReference> NHLSLCompiler::GetCompilerIncludes() const
+{
+	return pIncludeHandler->GetHandledIncludeFiles();
+}
+
+Task<> NHLSLCompiler::CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken)
 {
 	std::string SrcContentMultiByte = ShaderCode.AsCodepage();
 
@@ -32,7 +43,6 @@ Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InName, String 
 
 	ComPtr<IDxcOperationResult> pResult;
 	HRESULT hCompileResult;
-	ComPtr<IDxcIncludeHandler> pIncludeHandler = new DxcIncludeHandler(GetIncludeDirectory());
 	co_await Task<>::Run([&]()
 	{
 		hCompileResult = pCompiler->Compile(pEncoding.Get(),
@@ -61,13 +71,7 @@ Task<std::vector<byte>> NHLSLCompiler::CompileShaderAsync(String InName, String 
 		throw TerminateException(TerminateException::EKnownErrorCodes::CompilerError);
 	}
 
-	ComPtr<IDxcBlob> pCode;
-	HR(pResult->GetResult(&pCode));
-
-	std::vector<byte> Bytes(pCode->GetBufferSize());
-	memcpy(Bytes.data(), pCode->GetBufferPointer(), pCode->GetBufferSize());
-	
-	co_return Bytes;
+	HR(pResult->GetResult(&pCompiledResults));
 }
 
 #endif

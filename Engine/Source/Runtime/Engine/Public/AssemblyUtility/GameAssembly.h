@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameInstance.h"
 
 class ENGINE_API GameAssembly
 {
@@ -13,7 +14,11 @@ protected:
 	GameAssembly(String InModuleName);
 
 public:
+	virtual ~GameAssembly() noexcept;
+
 	[[nodiscard]] String GetModuleName() const { return ModuleName; }
+
+	virtual std::shared_ptr<GameInstance> CreateGameInstance() = 0;
 };
 
 #define DEFINE_GAME_ASSEMBLY_LOADER(AssemblyName) \

@@ -9,20 +9,26 @@
 
 #define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
+#include "Platform/Windows/DxcIncludeHandler.h"
 
 class NHLSLCompiler : public NShaderCompiler
 {
 	ComPtr<IDxcLibrary> pLibrary;
 	ComPtr<IDxcCompiler> pCompiler;
+	ComPtr<DxcIncludeHandler> pIncludeHandler;
+	ComPtr<IDxcBlob> pCompiledResults;
 
 public:
 	NHLSLCompiler();
 
-	virtual Task<std::vector<byte>> CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) override;
-	virtual Task<std::vector<byte>> CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) override;
+	virtual Task<> CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) override;
+	virtual Task<> CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) override;
+
+	virtual std::span<const byte> GetCompileResults() const override;
+	virtual std::span<const FileReference> GetCompilerIncludes() const override;
 
 private:
-	Task<std::vector<byte>> CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken);
+	Task<> CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken);
 };
 
 #endif

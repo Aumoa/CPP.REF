@@ -21,6 +21,20 @@ void GameEngine::Deinitialize()
 {
 }
 
+void GameEngine::StartGame()
+{
+	CurrentGame = Assembly->CreateGameInstance();
+	if (CurrentGame == nullptr)
+	{
+		throw InvalidOperationException(TEXT("CreateGameInstance return nullptr."));
+	}
+}
+
+void GameEngine::EndGame()
+{
+	CurrentGame.reset();
+}
+
 void GameEngine::StartupGameAssembly()
 {
 	String AssemblyName;
