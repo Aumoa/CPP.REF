@@ -2,7 +2,6 @@
 
 #include "System/LanguageSupportMacros.h"
 
-#include "Linq/Linq.Contains.h"
 #include "Linq/Linq.IsValidIndex.h"
 #include "Linq/Linq.ToVector.h"
 #include "Linq/Linq.IndexOf.h"
@@ -15,6 +14,7 @@
 #include "Linq/Append.h"
 #include "Linq/Concat.h"
 #include "Linq/Any.h"
+#include "Linq/Contains.h"
 
 #include "Platform/PlatformMacros.h"
 #include "Platform/PlatformTypes.h"
