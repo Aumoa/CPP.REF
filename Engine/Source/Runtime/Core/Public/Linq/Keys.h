@@ -5,10 +5,7 @@
 #include <concepts>
 #include <ranges>
 
-namespace Linq
+namespace Linq::inline views
 {
-	inline namespace views
-	{
-		constexpr auto Keys = std::views::keys;
-	}
+	constexpr auto Keys = std::views::keys;
 }

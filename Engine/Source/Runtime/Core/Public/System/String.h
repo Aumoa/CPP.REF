@@ -7,7 +7,7 @@
 #include "System/StringComparison.h"
 #include "System/StringSplitOptions.h"
 #include "System/Math.h"
-#include "Linq/Linq.Contains.h"
+#include "Linq/Contains.h"
 #include <variant>
 #include <memory>
 #include <concepts>
