@@ -19,7 +19,7 @@ public class BuildConfiguration
     public static readonly TargetPlatform[] Platforms = new[]
     {
         TargetPlatform.Win64,
-        TargetPlatform.Linux
+        //TargetPlatform.Linux
     };
 
     public static void ForEach(Action<Configuration, bool, TargetPlatform> InAction)

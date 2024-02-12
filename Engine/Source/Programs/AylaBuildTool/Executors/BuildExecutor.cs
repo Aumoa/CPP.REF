@@ -56,7 +56,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         var hostPlatform = Environment.OSVersion.Platform switch
         {
             PlatformID.Win32NT => TargetPlatform.Win64,
-            PlatformID.Unix => TargetPlatform.Linux,
+            //PlatformID.Unix => TargetPlatform.Linux,
             _ => throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform)
         };
 
