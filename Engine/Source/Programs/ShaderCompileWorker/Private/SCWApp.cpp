@@ -10,7 +10,7 @@ NSCWApp::NSCWApp()
 {
 }
 
-Task<> NSCWApp::RunAsync(std::stop_token InCancellationToken)
+Task<> NSCWApp::RunAsync(const CancellationToken& cancellationToken)
 {
 	String Input, Output, Includes;
 	if (CommandLine::TryGetValue(TEXT("Input"), Input) == false)
@@ -45,16 +45,16 @@ Task<> NSCWApp::RunAsync(std::stop_token InCancellationToken)
 	String Name = InputFile.GetName();
 
 	NShaderCompiler::SetIncludeDirectory(IncludesArray);
-	String ShaderCode = co_await InputFile.ReadAllTextAsync(InCancellationToken);
+	String ShaderCode = co_await InputFile.ReadAllTextAsync(cancellationToken);
 
 	auto Timer = PerformanceTimer::StartNew();
 	if (Name.EndsWith(TEXT("VertexShader")))
 	{
-		co_await Compiler->CompileVertexShaderAsync(InputFile.GetAbsolute(), ShaderCode, InCancellationToken);
+		co_await Compiler->CompileVertexShaderAsync(InputFile.GetAbsolute(), ShaderCode, cancellationToken);
 	}
 	else if (Name.EndsWith(TEXT("PixelShader")))
 	{
-		co_await Compiler->CompilePixelShaderAsync(InputFile.GetAbsolute(), ShaderCode, InCancellationToken);
+		co_await Compiler->CompilePixelShaderAsync(InputFile.GetAbsolute(), ShaderCode, cancellationToken);
 	}
 	else
 	{
@@ -65,8 +65,8 @@ Task<> NSCWApp::RunAsync(std::stop_token InCancellationToken)
 	Console::WriteLine(TEXT("{} ({:.2f}s)"), InputFile.GetFileName(), Timer.GetElapsed().GetTotalSeconds<double>());
 
 	co_await Task<>::WhenAll(
-		WriteHeaderOutputAsync(Compiler.get(), OutputDirectory, Name, ShaderCode, InCancellationToken),
-		WriteDependencyCacheAsync(Compiler.get(), OutputDirectory, Name, InCancellationToken)
+		WriteHeaderOutputAsync(Compiler.get(), OutputDirectory, Name, ShaderCode, cancellationToken),
+		WriteDependencyCacheAsync(Compiler.get(), OutputDirectory, Name, cancellationToken)
 	);
 }
 
@@ -79,7 +79,7 @@ void NSCWApp::PrintUsage(TextWriter& Writer)
 	Writer.Write(Usage);
 }
 
-Task<> NSCWApp::WriteHeaderOutputAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, String ShaderCode, std::stop_token InCancellationToken)
+Task<> NSCWApp::WriteHeaderOutputAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, String ShaderCode, const CancellationToken& cancellationToken)
 {
 	static constexpr size_t BinaryEachLine = 16;
 	static constexpr String HeaderFormatBase = TEXT(R"(
@@ -114,7 +114,7 @@ constexpr byte {}[] =
 	Body = String::Format(HeaderFormatBase, ShaderCode, Name, Body).Replace(TEXT("\r\n"), TEXT("\n"));
 
 	FileReference OutputFile = OutputDirectory.GetFile(Name).WithExtensions(TEXT("fx.h"));
-	co_await File::CompareAndWriteAllTextAsync(OutputFile, Body, InCancellationToken);
+	co_await File::CompareAndWriteAllTextAsync(OutputFile, Body, cancellationToken);
 }
 
 template<std::ranges::input_range T>
@@ -122,7 +122,7 @@ void f(T)
 {
 }
 
-Task<> NSCWApp::WriteDependencyCacheAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, std::stop_token InCancellationToken)
+Task<> NSCWApp::WriteDependencyCacheAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, const CancellationToken& cancellationToken)
 {
 	using namespace Linq;
 
@@ -143,5 +143,5 @@ Task<> NSCWApp::WriteDependencyCacheAsync(NShaderCompiler* Compiler, DirectoryRe
 
 	String Body = String::Join(TEXT("\n        "), Compiler->GetCompilerIncludes() | Select(WrapInclude));
 	FileReference OutputFile = OutputDirectory.GetFile(Name).WithExtensions(TEXT("deps.json"));
-	co_await File::CompareAndWriteAllTextAsync(OutputFile, String::Format(DependencyFormatBase, Body), InCancellationToken);
+	co_await File::CompareAndWriteAllTextAsync(OutputFile, String::Format(DependencyFormatBase, Body), cancellationToken);
 }

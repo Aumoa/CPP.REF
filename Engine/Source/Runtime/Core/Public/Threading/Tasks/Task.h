@@ -6,6 +6,7 @@
 #include "Threading/Tasks/promise_type.h"
 #include "Threading/Tasks/Awaiter.h"
 #include "Threading/ThreadPool.h"
+#include "Threading/CancellationToken.h"
 #include "Linq/Linq.ToVector.h"
 #include <memory>
 
@@ -80,13 +81,13 @@ public:
 		return Awaiter->GetException();
 	}
 
-	inline void AddStopCallback(std::stop_token sToken, std::function<void()> CallbackBody)
+	inline void AddStopCallback(CancellationToken sToken, std::function<void()> CallbackBody)
 	{
 		Awaiter->AddStopCallback(std::move(sToken), std::move(CallbackBody));
 	}
 	
 	template<class TBody>
-	auto ContinueWith(TBody&& ContinuationBody, std::stop_token sToken = {}) const -> Task<std::invoke_result_t<TBody, Task>>
+	auto ContinueWith(TBody&& ContinuationBody, CancellationToken sToken = {}) const -> Task<std::invoke_result_t<TBody, Task>>
 	{
 		using U = std::invoke_result_t<TBody, Task>;
 		std::shared_ptr uAwaiter = std::make_shared<::Awaiter<U>>(sToken);
@@ -119,6 +120,14 @@ public:
 		Awaiter->Wait();
 	}
 
+	inline Task<T> WaitAsync(CancellationToken cancellationToken) const noexcept
+	{
+		return ContinueWith([](Task<T> task)
+		{
+			return task.GetResult();
+		}, cancellationToken);
+	}
+
 	inline bool WaitFor(const TimeSpan& Timeout) const noexcept
 	{
 		return Awaiter->WaitFor(Timeout);
@@ -142,22 +151,22 @@ public:
 
 	inline bool IsCompleted() const noexcept
 	{
-		return Awaiter->IsCompleted();
+		return Awaiter && Awaiter->IsCompleted();
 	}
 
 	inline bool IsCompletedSuccessfully() const noexcept
 	{
-		return Awaiter->GetStatus() == ETaskStatus::RanToCompletion;
+		return Awaiter && Awaiter->GetStatus() == ETaskStatus::RanToCompletion;
 	}
 
 	inline bool IsCanceled() const noexcept
 	{
-		return Awaiter->GetStatus() == ETaskStatus::Canceled;
+		return Awaiter && Awaiter->GetStatus() == ETaskStatus::Canceled;
 	}
 
 	inline bool IsFaulted() const noexcept
 	{
-		return Awaiter->GetStatus() == ETaskStatus::Faulted;
+		return Awaiter && Awaiter->GetStatus() == ETaskStatus::Faulted;
 	}
 
 	Task& operator =(const Task&) = default;
@@ -183,7 +192,7 @@ public:
 
 public:
 	template<class TBody>
-	static auto Run(TBody&& Body, std::stop_token sToken = {}) -> Task<std::invoke_result_t<TBody>>
+	static auto Run(TBody&& Body, CancellationToken sToken = {}) -> Task<std::invoke_result_t<TBody>>
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
 
@@ -227,7 +236,7 @@ public:
 		return Task<>(std::move(uAwaiter));
 	}
 
-	static Task<> Delay(std::chrono::milliseconds InDelay, std::stop_token sToken = {})
+	static Task<> Delay(std::chrono::milliseconds InDelay, CancellationToken sToken = {})
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 
@@ -262,16 +271,6 @@ public:
 		auto Ptr = std::make_shared<::Awaiter<U>>();
 		Ptr->SetResult(std::move(InValue));
 		return Task<U>(Ptr);
-	}
-
-	static void CancelAfter(std::stop_source StopSource, std::chrono::milliseconds InDelay)
-	{
-		static_assert(std::same_as<T, void>, "Use Task<>::CancelAfter instead.");
-
-		Delay(InDelay, StopSource.get_token()).ContinueWith([StopSource = std::move(StopSource)](auto) mutable
-		{
-			StopSource.request_stop();
-		});
 	}
 
 	static void ConfigureDefault(bool bContinueOnCapturedContext)

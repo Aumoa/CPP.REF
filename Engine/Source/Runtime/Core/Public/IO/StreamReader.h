@@ -20,11 +20,11 @@ public:
 	StreamReader(Stream* InStreamRaw);
 
 	virtual String ReadLine() override;
-	virtual Task<String> ReadLineAsync(std::stop_token InCancellationToken = {}) override;
-	virtual Task<String> ReadToEndAsync(std::stop_token InCancellationToken = {}) override;
+	virtual Task<String> ReadLineAsync(CancellationToken InCancellationToken = {}) override;
+	virtual Task<String> ReadToEndAsync(CancellationToken InCancellationToken = {}) override;
 	virtual bool IsEOF() const override;
 
 private:
-	Task<> TryShrinkAndFillAsync(std::stop_token InCancellationToken);
-	Task<bool> ExpandBufferAsync(std::stop_token InCancellationToken);
+	Task<> TryShrinkAndFillAsync(CancellationToken InCancellationToken);
+	Task<bool> ExpandBufferAsync(CancellationToken InCancellationToken);
 };

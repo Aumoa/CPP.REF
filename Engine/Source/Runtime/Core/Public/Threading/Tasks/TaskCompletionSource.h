@@ -69,7 +69,7 @@ public:
 	TaskCompletionSource& operator =(TaskCompletionSource&&) = default;
 
 	template<class U = T>
-	static TaskCompletionSource<U> Create(std::stop_token sToken = {})
+	static TaskCompletionSource<U> Create(CancellationToken sToken = {})
 	{
 		return TaskCompletionSource<U>(std::make_shared<Awaiter<U>>(sToken));
 	}

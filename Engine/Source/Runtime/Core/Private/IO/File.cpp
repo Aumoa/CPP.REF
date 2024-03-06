@@ -5,7 +5,7 @@
 #include "IO/StreamReader.h"
 #include "IO/StreamWriter.h"
 
-Task<String> File::ReadAllTextAsync(String InPath, std::stop_token InCancellationToken)
+Task<String> File::ReadAllTextAsync(String InPath, CancellationToken InCancellationToken)
 {
 	FileStream Stream(InPath, EFileMode::Open, EFileAccessMode::Read, EFileSharedMode::Read);
 	StreamReader Reader(&Stream);
@@ -19,7 +19,7 @@ String File::ReadAllText(String InPath)
 	return ReadAllTextAsync(InPath).GetResult();
 }
 
-Task<> File::WriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
+Task<> File::WriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken)
 {
 	FileStream Stream(InPath, EFileMode::Create, EFileAccessMode::Write);
 	StreamWriter Writer(&Stream);
@@ -27,7 +27,7 @@ Task<> File::WriteAllTextAsync(String InPath, String InContent, std::stop_token 
 	Stream.Close();
 }
 
-Task<bool> File::CompareAndWriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
+Task<bool> File::CompareAndWriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken)
 {
 	if (Exists(InPath))
 	{

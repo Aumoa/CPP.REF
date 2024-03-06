@@ -64,9 +64,9 @@ public:
 	virtual void SetResult() { throw InvalidOperationException(TEXT("A typed task cannot setting result without value.")); }
 	virtual bool SetException(std::exception_ptr ExceptionPtr) = 0;
 
-	virtual suspend_and_destroy_if AddCancellationToken(std::stop_token sToken) = 0;
+	virtual suspend_and_destroy_if AddCancellationToken(CancellationToken sToken) = 0;
 	virtual suspend_and_destroy_if AddConditionVariable(std::function<bool()> ConditionBody) = 0;
-	virtual void AddStopCallback(std::stop_token sToken, std::function<void()> CallbackBody) = 0;
+	virtual void AddStopCallback(CancellationToken sToken, std::function<void()> CallbackBody) = 0;
 	virtual bool IsCancellationRequested() const noexcept = 0;
 
 	inline bool IsCompleted() const noexcept

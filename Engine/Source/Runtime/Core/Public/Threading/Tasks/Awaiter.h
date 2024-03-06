@@ -6,6 +6,7 @@
 #include "System/OperationCanceledException.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
+#include "Threading/CancellationToken.h"
 #include "Threading/Tasks/AwaiterBase.h"
 #include "Threading/Tasks/co_push.h"
 
@@ -28,10 +29,10 @@ class Awaiter : public AwaiterBase
 	std::vector<std::function<bool()>> Validators;
 
 public:
-	Awaiter(std::stop_token sToken = {}, ETaskStatus InitialStatus = ETaskStatus::Running)
+	Awaiter(CancellationToken sToken = {}, ETaskStatus InitialStatus = ETaskStatus::Running)
 		: Status(InitialStatus)
 	{
-		if (sToken.stop_possible())
+		if (sToken.CanBeCanceled())
 		{
 			this->Add_cancellation_token(nullptr, sToken);
 		}
@@ -148,14 +149,14 @@ public:
 		}
 	}
 
-	virtual suspend_and_destroy_if AddCancellationToken(std::stop_token sToken) override
+	virtual suspend_and_destroy_if AddCancellationToken(CancellationToken sToken) override
 	{
-		if (!sToken.stop_possible())
+		if (!sToken.CanBeCanceled())
 		{
 			return IsCancellationRequested();
 		}
 
-		if (sToken.stop_requested())
+		if (sToken.IsCancellationRequested())
 		{
 			Cancel();
 			return true;
@@ -204,10 +205,10 @@ public:
 		return IsCancellationRequested();
 	}
 
-	virtual void AddStopCallback(std::stop_token sToken, std::function<void()> CallbackBody) override
+	virtual void AddStopCallback(CancellationToken sToken, std::function<void()> CallbackBody) override
 	{
 		auto ScopedLock = std::unique_lock(Lock);
-		StopCallbacks.emplace_back(std::make_unique<TCallback>(std::move(sToken), std::move(CallbackBody)));
+		StopCallbacks.emplace_back(std::make_unique<TCallback>(std::move((const std::stop_token&)sToken), std::move(CallbackBody)));
 	}
 
 	virtual bool IsCancellationRequested() const noexcept override
@@ -281,7 +282,7 @@ public:
 
 private:
 	template<class ScopedLock_t>
-	inline void Add_cancellation_token(ScopedLock_t&& ScopedLock, std::stop_token sToken)
+	inline void Add_cancellation_token(ScopedLock_t&& ScopedLock, CancellationToken sToken)
 	{
 		auto& StopCallback = StopCallbacks.emplace_back();
 
@@ -291,7 +292,7 @@ private:
 		}
 
 		StopCallback = std::make_unique<TCallback>(
-			sToken,
+			(const std::stop_token&)sToken,
 			[this] { this->Cancel(); }
 		);
 	}

@@ -15,7 +15,7 @@ public:
 	virtual ~TextReader() noexcept = default;
 
 	virtual String ReadLine() = 0;
-	virtual Task<String> ReadLineAsync(std::stop_token InCancellationToken = {}) = 0;
-	virtual Task<String> ReadToEndAsync(std::stop_token InCancellationToken = {}) = 0;
+	virtual Task<String> ReadLineAsync(CancellationToken InCancellationToken = {}) = 0;
+	virtual Task<String> ReadToEndAsync(CancellationToken InCancellationToken = {}) = 0;
 	virtual bool IsEOF() const = 0;
 };

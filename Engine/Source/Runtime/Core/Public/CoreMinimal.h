@@ -62,6 +62,7 @@
 #include "System/MulticastDelegate.h"
 #include "System/MulticastEvent.h"
 #include "System/DelegateHandle.h"
+#include "System/TryFinally.h"
 #include "System/Exception.h"
 #include "System/InvalidOperationException.h"
 #include "System/NotSupportedException.h"
@@ -91,6 +92,7 @@
 #include "Threading/SpinlockConditionVariable.h"
 #include "Threading/ThreadPool.h"
 #include "Threading/CancellationToken.h"
+#include "Threading/CancellationTokenSource.h"
 
 #include "Threading/Tasks/TaskStatus.h"
 #include "Threading/Tasks/suspend_and_destroy_if.h"

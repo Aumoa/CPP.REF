@@ -14,14 +14,14 @@ NHLSLCompiler::NHLSLCompiler()
 	pIncludeHandler = new DxcIncludeHandler(GetIncludeDirectory());
 }
 
-Task<> NHLSLCompiler::CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
+Task<> NHLSLCompiler::CompileVertexShaderAsync(String InName, String ShaderCode, const CancellationToken& cancellationToken)
 {
-	return CompileShaderAsync(InName, ShaderCode, TEXT("vs_6_1"), InCancellationToken);
+	return CompileShaderAsync(InName, ShaderCode, TEXT("vs_6_1"), cancellationToken);
 }
 
-Task<> NHLSLCompiler::CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken)
+Task<> NHLSLCompiler::CompilePixelShaderAsync(String InName, String ShaderCode, const CancellationToken& cancellationToken)
 {
-	return CompileShaderAsync(InName, ShaderCode, TEXT("ps_6_1"), InCancellationToken);
+	return CompileShaderAsync(InName, ShaderCode, TEXT("ps_6_1"), cancellationToken);
 }
 
 std::span<const byte> NHLSLCompiler::GetCompileResults() const
@@ -34,7 +34,7 @@ std::span<const FileReference> NHLSLCompiler::GetCompilerIncludes() const
 	return pIncludeHandler->GetHandledIncludeFiles();
 }
 
-Task<> NHLSLCompiler::CompileShaderAsync(String InName, String ShaderCode, String InModelName, std::stop_token InCancellationToken)
+Task<> NHLSLCompiler::CompileShaderAsync(String InName, String ShaderCode, String InModelName, const CancellationToken& cancellationToken)
 {
 	std::string SrcContentMultiByte = ShaderCode.AsCodepage();
 

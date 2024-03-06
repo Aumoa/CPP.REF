@@ -64,7 +64,7 @@ public:
 		return File::ReadAllText(GetValue());
 	}
 
-	[[nodiscard]] Task<String> ReadAllTextAsync(std::stop_token InCancellationToken = {}) const
+	[[nodiscard]] Task<String> ReadAllTextAsync(CancellationToken InCancellationToken = {}) const
 	{
 		return File::ReadAllTextAsync(GetValue(), InCancellationToken);
 	}

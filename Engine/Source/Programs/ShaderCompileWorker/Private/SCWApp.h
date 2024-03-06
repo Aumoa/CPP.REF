@@ -11,10 +11,10 @@ class NSCWApp
 public:
 	NSCWApp();
 
-	Task<> RunAsync(std::stop_token InCancellationToken);
+	Task<> RunAsync(const CancellationToken& cancellationToken);
 	void PrintUsage(TextWriter& Writer);
 
 private:
-	static Task<> WriteHeaderOutputAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, String ShaderCode, std::stop_token InCancellationToken);
-	static Task<> WriteDependencyCacheAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, std::stop_token InCancellationToken);
+	static Task<> WriteHeaderOutputAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, String ShaderCode, const CancellationToken& cancellationToken);
+	static Task<> WriteDependencyCacheAsync(NShaderCompiler* Compiler, DirectoryReference OutputDirectory, String Name, const CancellationToken& cancellationToken);
 };

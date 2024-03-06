@@ -18,7 +18,7 @@ String StreamReader::ReadLine()
 	return ReadLineAsync().GetResult();
 }
 
-Task<String> StreamReader::ReadLineAsync(std::stop_token InCancellationToken)
+Task<String> StreamReader::ReadLineAsync(CancellationToken InCancellationToken)
 {
 	size_t EndPos = static_cast<size_t>(-1);
 
@@ -69,7 +69,7 @@ Task<String> StreamReader::ReadLineAsync(std::stop_token InCancellationToken)
 	co_return Str;
 }
 
-Task<String> StreamReader::ReadToEndAsync(std::stop_token InCancellationToken)
+Task<String> StreamReader::ReadToEndAsync(CancellationToken InCancellationToken)
 {
 	while (bEOF == false)
 	{
@@ -94,7 +94,7 @@ bool StreamReader::IsEOF() const
 	return bEOF;
 }
 
-Task<> StreamReader::TryShrinkAndFillAsync(std::stop_token InCancellationToken)
+Task<> StreamReader::TryShrinkAndFillAsync(CancellationToken InCancellationToken)
 {
 	if (BufferPos == 0 || BufferPos < InitialBufferSize)
 	{
@@ -119,7 +119,7 @@ Task<> StreamReader::TryShrinkAndFillAsync(std::stop_token InCancellationToken)
 	bEOF = ActualRead == 0;
 }
 
-Task<bool> StreamReader::ExpandBufferAsync(std::stop_token InCancellationToken)
+Task<bool> StreamReader::ExpandBufferAsync(CancellationToken InCancellationToken)
 {
 	size_t SizeToRead;
 	uint8* BufferPtr;

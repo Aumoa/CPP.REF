@@ -17,10 +17,10 @@ public:
 	virtual void Close() = 0;
 
 	virtual void Write(std::span<const uint8> InBytes) = 0;
-	virtual Task<> WriteAsync(std::span<const uint8> InBytes, std::stop_token InCancellationToken = {}) = 0;
+	virtual Task<> WriteAsync(std::span<const uint8> InBytes, CancellationToken InCancellationToken = {}) = 0;
 	virtual void Seek(int64 InSeekpos, ESeekOrigin InOrigin = ESeekOrigin::Begin) = 0;
 
 	virtual size_t Read(std::span<uint8> OutBytes) = 0;
-	virtual Task<size_t> ReadAsync(std::span<uint8> OutBytes, std::stop_token InCancellationToken = {}) = 0;
+	virtual Task<size_t> ReadAsync(std::span<uint8> OutBytes, CancellationToken InCancellationToken = {}) = 0;
 	virtual size_t GetLength() const = 0;
 };

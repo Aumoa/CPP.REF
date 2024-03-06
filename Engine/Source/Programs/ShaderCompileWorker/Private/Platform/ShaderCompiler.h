@@ -10,8 +10,8 @@ private:
 	static std::vector<DirectoryReference> IncludeDirectories;
 
 public:
-	virtual Task<> CompileVertexShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) = 0;
-	virtual Task<> CompilePixelShaderAsync(String InName, String ShaderCode, std::stop_token InCancellationToken) = 0;
+	virtual Task<> CompileVertexShaderAsync(String InName, String ShaderCode, const CancellationToken& cancellationToken) = 0;
+	virtual Task<> CompilePixelShaderAsync(String InName, String ShaderCode, const CancellationToken& cancellationToken) = 0;
 
 	virtual std::span<const byte> GetCompileResults() const = 0;
 	virtual std::span<const FileReference> GetCompilerIncludes() const = 0;

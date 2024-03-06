@@ -49,7 +49,7 @@ void FileStream::Write(std::span<const uint8> InBytes)
 	WriteAsync(InBytes).GetResult();
 }
 
-Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, std::stop_token InCancellationToken)
+Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, CancellationToken InCancellationToken)
 {
 	auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
 	auto Ptr = new IOCompletionOverlapped(PlatformIO::FileIOWrittenAction(TCS, IOCPWriteBuf));
@@ -77,7 +77,7 @@ size_t FileStream::Read(std::span<uint8> OutBytes)
 	return ReadAsync(OutBytes).GetResult();
 }
 
-Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, std::stop_token InCancellationToken)
+Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, CancellationToken InCancellationToken)
 {
 	auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
 	auto Ptr = new IOCompletionOverlapped(PlatformIO::FileIOReadAction(TCS, IOCPReadBuf));
