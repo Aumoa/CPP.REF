@@ -45,7 +45,7 @@ public:
 		}
 	}
 
-	inline CancellationToken GetToken() const noexcept
+	inline CancellationToken GetToken() const
 	{
 		if (hasValue == false)
 		{
@@ -57,7 +57,7 @@ public:
 		return token;
 	}
 
-	inline void Cancel() noexcept
+	inline void Cancel()
 	{
 		if (hasValue == false)
 		{
