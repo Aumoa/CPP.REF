@@ -12,7 +12,7 @@ int main(int Argc, char* Argv[])
 	PlatformProcess::SetupStacktraceSignals();
 	CommandLine::Init(Argc, Argv);
 
-	CancellationTokenSource cancellationTokenSource;
+	CancellationTokenSource cancellationTokenSource = std::in_place;
 	Console::CancelKeyPressed += [&]()
 	{
 		cancellationTokenSource.Cancel();
@@ -20,7 +20,7 @@ int main(int Argc, char* Argv[])
 
 	NSCWApp App;
 
-	TryFinally([&]()
+	return TryFinally([&]()
 	{
 		try
 		{

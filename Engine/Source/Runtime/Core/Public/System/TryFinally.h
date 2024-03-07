@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	inline void Execute()
+	inline std::invoke_result_t<TBody> Execute()
 	{
 		struct FinallyScope
 		{
@@ -36,6 +36,6 @@ public:
 		};
 
 		FinallyScope scope(this);
-		body();
+		return body();
 	}
 };
