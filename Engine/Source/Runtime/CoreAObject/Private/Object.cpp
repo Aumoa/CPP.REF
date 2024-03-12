@@ -2,9 +2,26 @@
 
 #include "Object.h"
 #include "ObjectReference.h"
+#include "Reflection/ObjectMacros.h"
+
+AYLA_DEFINE_CONSTRUCTOR_FUNCTION(Engine, CoreAObject, Object);
+AYLA_DEFINE_DESTROY_FUNCTION(Engine, CoreAObject, Object);
+AYLA_DEFINE_CLASS_INFO(Engine, CoreAObject, Object);
+
+struct AObject::ObjectInitializer
+{
+	AType* classType = nullptr;
+
+	static ObjectInitializer& Get()
+	{
+		static thread_local ObjectInitializer s_Current;
+		return s_Current;
+	}
+};
 
 AObject::AObject()
-	: Referencer(new ObjectReference(this))
+	: classType(ObjectInitializer::Get().classType)
+	, referencer(new ObjectReference(this))
 {
 }
 
@@ -12,20 +29,23 @@ AObject::~AObject() noexcept
 {
 }
 
-extern "C"
+AObject* AObject::NewObject(AType* classType)
 {
-	PLATFORM_SHARED_EXPORT AObject* AObject__Constructor()
+	ObjectInitializer::Get().classType = classType;
+	return new AObject();
+}
+
+void AObject::Destroy(AObject* instance)
+{
+	if (instance == nullptr)
 	{
-		return new AObject();
+		return;
 	}
 
-	PLATFORM_SHARED_EXPORT void AObject__Destroy(ObjectReference* reference)
-	{
-		if (reference == nullptr)
-		{
-			return;
-		}
+	ObjectReference::Destroy(*instance->referencer);
+}
 
-		ObjectReference::Destroy(*reference);
-	}
+AType* AObject::StaticClass()
+{
+	return &__Ayla_RuntimeType_Engine_CoreAObject_Object;
 }

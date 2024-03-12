@@ -8,19 +8,29 @@ class AObject;
 class ObjectReference;
 template<class T>
 class TSharedPtr;
-
-extern "C"
-{
-	PLATFORM_SHARED_EXPORT AObject* AObject__Constructor();
-	PLATFORM_SHARED_EXPORT void AObject__Destroy(ObjectReference* reference);
-}
+class AType;
 
 class COREAOBJECT_API AObject
 {
+	struct ObjectInitializer;
+
 private:
-	ObjectReference* Referencer = nullptr;
+	AType* classType;
+	ObjectReference* referencer = nullptr;
+
+protected:
+	AObject();
 
 public:
-	AObject();
 	virtual ~AObject() noexcept;
+
+	static AObject* NewObject(AType* classType);
+	static void Destroy(AObject* instance);
+	static AType* StaticClass();
+
+	template<class T>
+	static T* NewObject() requires std::derived_from<T, AObject>
+	{
+		return (T*)NewObject(T::StaticClass());
+	}
 };
