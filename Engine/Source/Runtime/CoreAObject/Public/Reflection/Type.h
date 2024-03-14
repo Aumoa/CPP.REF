@@ -9,15 +9,16 @@ class AAssembly;
 
 class COREAOBJECT_API AType : public AObject
 {
+	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, Type);
+	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, Type)
+
 protected:
-	AType()
-	{
-	}
+	AType();
 
 public:
-	virtual ~AType() noexcept
-	{
-	}
+	virtual ~AType() noexcept override;
 
 	virtual AAssembly* GetAssembly() const = 0;
+	virtual String GetName() const = 0;
+	virtual AType* GetBaseType() const = 0;
 };

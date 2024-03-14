@@ -7,6 +7,7 @@
 AYLA_DEFINE_CONSTRUCTOR_FUNCTION(Engine, CoreAObject, Object);
 AYLA_DEFINE_DESTROY_FUNCTION(Engine, CoreAObject, Object);
 AYLA_DEFINE_CLASS_INFO(Engine, CoreAObject, Object);
+AYLA_DEFINE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, Object);
 
 struct AObject::ObjectInitializer
 {
@@ -29,6 +30,11 @@ AObject::~AObject() noexcept
 {
 }
 
+AType* AObject::GetType()
+{
+	return classType;
+}
+
 AObject* AObject::NewObject(AType* classType)
 {
 	ObjectInitializer::Get().classType = classType;
@@ -43,9 +49,4 @@ void AObject::Destroy(AObject* instance)
 	}
 
 	ObjectReference::Destroy(*instance->referencer);
-}
-
-AType* AObject::StaticClass()
-{
-	return &__Ayla_RuntimeType_Engine_CoreAObject_Object;
 }

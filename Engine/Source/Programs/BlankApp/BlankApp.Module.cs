@@ -13,6 +13,7 @@ public class BlankApp : ModuleRules
         {
             "Core",
             "Numerics",
+            "CoreAObject"
         });
 
         PrivateIncludePaths.Add("Private");

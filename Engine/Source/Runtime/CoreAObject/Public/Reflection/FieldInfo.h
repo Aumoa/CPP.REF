@@ -7,15 +7,14 @@
 
 class COREAOBJECT_API AFieldInfo : public AMemberInfo
 {
+	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, FieldInfo);
+	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, FieldInfo);
+
 protected:
-	AFieldInfo()
-	{
-	}
+	AFieldInfo();
 
 public:
-	virtual ~AFieldInfo() noexcept
-	{
-	}
+	virtual ~AFieldInfo() noexcept override;
 
 	virtual AType* GetFieldType() const = 0;
 };

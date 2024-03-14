@@ -20,5 +20,5 @@ extern "C" PLATFORM_SHARED_EXPORT void __Ayla_Destroy_ ## Namespace ## _ ## Asse
 #define AYLA_DEFINE_CONSTRUCTOR_FUNCTION(Namespace, AssemblyName, ClassName) \
 extern "C" PLATFORM_SHARED_EXPORT A ## ClassName* __Ayla_ConstructorInfo_ ## Namespace ## _ ## AssemblyName ## _ ## ClassName() \
 { \
-	return AObject::NewObject(A ## ClassName::StaticClass()); \
+	return (A ## ClassName*)AObject::NewObject(A ## ClassName::StaticClass()); \
 }

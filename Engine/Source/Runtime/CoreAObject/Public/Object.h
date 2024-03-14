@@ -10,8 +10,48 @@ template<class T>
 class TSharedPtr;
 class AType;
 
-class COREAOBJECT_API AObject
+#define AYLA_DECLARE_STATIC_CLASS_FUNCTION(Namespace, AssemblyName, ClassName) \
+public: \
+	static AType* StaticClass();
+
+#define AYLA_DEFINE_STATIC_CLASS_FUNCTION(Namespace, AssemblyName, ClassName) \
+AType* A ## ClassName::StaticClass() \
+{ \
+	return &__Ayla_RuntimeType_ ## Namespace ## _ ## AssemblyName ## _ ## ClassName; \
+}
+
+#define AYLA_DECLARE_CLASS_TYPEDEFS(Namespace, AssemblyName, ClassName) \
+public: \
+	using Super = This; \
+	using This = A ## ClassName;
+
+class COREAOBJECT_API AObjectBase
 {
+protected:
+	using This = AObjectBase;
+
+protected:
+	AObjectBase()
+	{
+	}
+
+public:
+	virtual ~AObjectBase() noexcept
+	{
+	}
+
+	static AType* StaticClass() noexcept
+	{
+		return nullptr;
+	}
+};
+
+class COREAOBJECT_API AObject : public AObjectBase
+{
+	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, Object);
+	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, Object);
+
+private:
 	struct ObjectInitializer;
 
 private:
@@ -22,11 +62,12 @@ protected:
 	AObject();
 
 public:
-	virtual ~AObject() noexcept;
+	virtual ~AObject() noexcept override;
+
+	AType* GetType();
 
 	static AObject* NewObject(AType* classType);
 	static void Destroy(AObject* instance);
-	static AType* StaticClass();
 
 	template<class T>
 	static T* NewObject() requires std::derived_from<T, AObject>

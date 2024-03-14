@@ -9,15 +9,14 @@ class AType;
 
 class COREAOBJECT_API AAssembly : public AObject
 {
+	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, Assembly);
+	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, Assembly);
+
 protected:
-	AAssembly()
-	{
-	}
+	AAssembly();
 
 public:
-	virtual ~AAssembly() noexcept
-	{
-	}
+	virtual ~AAssembly() noexcept override;
 
 	virtual String GetName() const = 0;
 	virtual String GetNamespace() const = 0;

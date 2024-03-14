@@ -9,15 +9,14 @@ class AParameterInfo;
 
 class COREAOBJECT_API AMethodInfo : public AMemberInfo
 {
+	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, MethodInfo);
+	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, MethodInfo);
+
 protected:
-	AMethodInfo()
-	{
-	}
+	AMethodInfo();
 
 public:
-	virtual ~AMethodInfo() noexcept
-	{
-	}
+	virtual ~AMethodInfo() noexcept override;
 
 	virtual AType* GetReturnType() const = 0;
 	virtual std::vector<AParameterInfo*> GetParameters() const = 0;

@@ -5,8 +5,14 @@
 #include "CoreMinimal.h"
 #include "Reflection/Assembly.h"
 
+class ARuntimeType;
+
 class COREAOBJECT_API ARuntimeAssembly : public AAssembly
 {
+	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, RuntimeAssembly);
+	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, RuntimeAssembly);
+
+private:
 	const String namespace_;
 	const String assemblyName;
 	const String fullName;
@@ -19,6 +25,8 @@ public:
 	virtual String GetNamespace() const override;
 	virtual String GetFullName() const override;
 	virtual std::span<AType* const> GetTypes() const override;
+
+	void AddRuntimeType(ARuntimeType* type);
 };
 
 #define AYLA_DEFINE_ASSEMBLY_INFO(Namespace, AssemblyName) \
