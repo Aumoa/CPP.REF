@@ -6,7 +6,7 @@
 AYLA_DEFINE_CLASS_INFO(Engine, CoreAObject, MemberInfo);
 AYLA_DEFINE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, MemberInfo);
 
-AMemberInfo::AMemberInfo()
+AMemberInfo::AMemberInfo() : AObject(std::in_place)
 {
 }
 

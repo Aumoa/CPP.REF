@@ -81,6 +81,7 @@
 #include "System/CrcHash.h"
 #include "System/Version.h"
 #include "System/OperationCanceledException.h"
+#include "System/ConstructorNotFoundException.h"
 
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"

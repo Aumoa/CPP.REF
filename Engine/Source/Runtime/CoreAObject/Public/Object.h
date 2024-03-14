@@ -53,12 +53,14 @@ class COREAOBJECT_API AObject : public AObjectBase
 
 private:
 	struct ObjectInitializer;
+	friend struct ReflectionUtility;
 
 private:
-	AType* classType;
+	AType* classType = nullptr;
 	ObjectReference* referencer = nullptr;
 
 protected:
+	AObject(std::in_place_t builtIn);
 	AObject();
 
 public:
