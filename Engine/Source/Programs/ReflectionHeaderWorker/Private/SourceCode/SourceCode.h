@@ -18,6 +18,7 @@ public:
 	virtual ~SourceCode() noexcept = default;
 
 	virtual Task<> CompileAsync(CancellationToken cancellationToken = {}) = 0;
+	virtual bool TryFormatError(String* outErrorStr) const = 0;
 
 	FileReference GetSourceFile() const;
 	Task<String> ReadContentAsync(CancellationToken cancellationToken = {});

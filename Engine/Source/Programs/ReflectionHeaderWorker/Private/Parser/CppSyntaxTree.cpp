@@ -4,6 +4,8 @@
 #include "Parser/CppNumberExpression.h"
 #include "Parser/CppErrorExpression.h"
 #include "Parser/CppCommentExpression.h"
+#include "Parser/CppPreprocessorExpression.h"
+#include "Parser/CppIdentifierExpression.h"
 
 CppSyntaxTree::CppSyntaxTree(FileReference sourceFile, String sourceCode)
 	: sourceFile(sourceFile)
@@ -23,21 +25,21 @@ void CppSyntaxTree::Parse()
 
 	while (sourceCode.IsValidIndex(index))
 	{
-		if (Char::IsWhiteSpace(sourceCode[index]))
-		{
-			IncrementIndex(false);
-			continue;
-		}
-
-		if (CompareCharsSimple('\r'))
+		if (CompareCharsSimple("\r"))
 		{
 			++index;
 			continue;
 		}
 
-		if (CompareCharsSimple('\n'))
+		if (CompareCharsSimple("\n"))
 		{
 			IncrementIndex(true);
+			continue;
+		}
+
+		if (Char::IsWhiteSpace(sourceCode[index]))
+		{
+			IncrementIndex(false);
 			continue;
 		}
 
@@ -47,9 +49,21 @@ void CppSyntaxTree::Parse()
 			continue;
 		}
 
-		if (CompareCharsSimple('/', '/'))
+		if (Char::IsAlpha(sourceCode[index]))
+		{
+			expressions.emplace_back(ReadIdentifier());
+			continue;
+		}
+
+		if (CompareCharsSimple("//"))
 		{
 			expressions.emplace_back(ReadSingleLineComment());
+			continue;
+		}
+
+		if (CompareCharsSimple("#"))
+		{
+			expressions.emplace_back(ReadPreprocessor());
 			continue;
 		}
 
@@ -58,10 +72,19 @@ void CppSyntaxTree::Parse()
 	}
 }
 
-bool CppSyntaxTree::HasError() const
+bool CppSyntaxTree::TryGetError(const CppExpression** outExpression) const
 {
-	using namespace Linq;
-	return expressions | Any([](const auto& p) { return dynamic_cast<const CppErrorExpression*>(p.get()); });
+	for (auto& expression : expressions)
+	{
+		if (auto* errorExp = dynamic_cast<const CppErrorExpression*>(expression.get()))
+		{
+			*outExpression = errorExp;
+			return true;
+		}
+	}
+
+	outExpression = nullptr;
+	return false;
 }
 
 std::unique_ptr<CppExpression> CppSyntaxTree::MakeErrorExpression()
@@ -144,7 +167,7 @@ std::unique_ptr<CppExpression> CppSyntaxTree::ReadNumberExpression()
 
 		if (isReal)
 		{
-			if (CompareCharsSimple('f'))
+			if (CompareCharsSimple("f"))
 			{
 				IncrementIndex(false);
 				isFloat = true;
@@ -155,12 +178,12 @@ std::unique_ptr<CppExpression> CppSyntaxTree::ReadNumberExpression()
 		}
 		else
 		{
-			if (CompareCharsSimple('u') ||
-				CompareCharsSimple('l') ||
-				CompareCharsSimple('u', 'l') ||
-				CompareCharsSimple('l', 'u') ||
-				CompareCharsSimple('u', 'l', 'l') ||
-				CompareCharsSimple('l', 'l', 'u'))
+			if (CompareCharsSimple("u") ||
+				CompareCharsSimple("l") ||
+				CompareCharsSimple("ul") ||
+				CompareCharsSimple("lu") ||
+				CompareCharsSimple("ull") ||
+				CompareCharsSimple("llu"))
 			{
 				IncrementIndex(false);
 				break;
@@ -189,6 +212,62 @@ std::unique_ptr<CppExpression> CppSyntaxTree::ReadSingleLineComment()
 	}
 
 	return std::make_unique<CppCommentExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+}
+
+std::unique_ptr<CppExpression> CppSyntaxTree::ReadPreprocessor()
+{
+	size_t start = index;
+	IncrementIndex(false);
+	IncrementIndex(false);
+	while (sourceCode.IsValidIndex(index))
+	{
+		if (CompareCharsSimple("\n"))
+		{
+			if (sourceCode[index - 1] == '\\')
+			{
+				IncrementIndex(true);
+			}
+			else
+			{
+				return std::make_unique<CppPreprocessorExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+			}
+		}
+		else if (CompareCharsSimple("\r\n"))
+		{
+			if (sourceCode[index - 1] == '\\')
+			{
+				IncrementIndex(true);
+				IncrementIndex(true);
+			}
+			else
+			{
+				return std::make_unique<CppPreprocessorExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+			}
+		}
+
+		IncrementIndex(false);
+	}
+
+	return std::make_unique<CppPreprocessorExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+}
+
+std::unique_ptr<CppExpression> CppSyntaxTree::ReadIdentifier()
+{
+	size_t start = index;
+	IncrementIndex(false);
+	while (sourceCode.IsValidIndex(index))
+	{
+		auto ch = sourceCode[index];
+		if (Char::IsAlpha(ch) || ch == '_')
+		{
+			IncrementIndex(false);
+			continue;
+		}
+
+		return std::make_unique<CppIdentifierExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+	}
+
+	return std::make_unique<CppIdentifierExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
 }
 
 void CppSyntaxTree::IncrementIndex(bool isNewLine)

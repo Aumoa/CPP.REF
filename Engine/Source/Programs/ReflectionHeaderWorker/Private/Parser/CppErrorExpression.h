@@ -12,4 +12,6 @@ public:
 
 public:
 	CppErrorExpression(String expression, FileReference sourceFile, size_t lineNumber, size_t charNumber);
+
+	virtual String Format() const override;
 };

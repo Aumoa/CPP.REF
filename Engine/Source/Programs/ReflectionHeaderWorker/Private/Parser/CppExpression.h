@@ -18,6 +18,8 @@ protected:
 public:
 	virtual ~CppExpression() noexcept;
 
+	virtual String Format() const;
+
 	String GetExpression() const;
 	FileReference GetSourceFile() const;
 	size_t GetLineNumber() const;

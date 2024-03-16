@@ -32,6 +32,14 @@ App& App::Run(CancellationToken cancellationToken)
 		}
 
 		Task<>::WhenAll(sourceCodes | Select([&](const auto& ptr) { return ptr->CompileAsync(cancellationToken); })).GetResult();
+
+		for (auto& sourceCode : sourceCodes)
+		{
+			if (String errorStr; sourceCode->TryFormatError(&errorStr))
+			{
+				Console::Error.WriteLine(errorStr);
+			}
+		}
 	}
 	catch (const Exception& knownException)
 	{

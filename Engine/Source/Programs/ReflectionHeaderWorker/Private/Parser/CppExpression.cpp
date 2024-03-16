@@ -14,6 +14,11 @@ CppExpression::~CppExpression() noexcept
 {
 }
 
+String CppExpression::Format() const
+{
+	return String::Format(TEXT("{0}({1},{2})"), sourceFile.GetAbsolutePath(), lineNumber, charNumber);
+}
+
 String CppExpression::GetExpression() const
 {
 	return expression;
