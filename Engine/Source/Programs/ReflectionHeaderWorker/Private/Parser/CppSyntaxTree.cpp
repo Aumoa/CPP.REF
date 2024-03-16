@@ -6,6 +6,7 @@
 #include "Parser/CppCommentExpression.h"
 #include "Parser/CppPreprocessorExpression.h"
 #include "Parser/CppIdentifierExpression.h"
+#include "Parser/CppKeywordExpression.h"
 
 CppSyntaxTree::CppSyntaxTree(FileReference sourceFile, String sourceCode)
 	: sourceFile(sourceFile)
@@ -43,18 +44,6 @@ void CppSyntaxTree::Parse()
 			continue;
 		}
 
-		if (Char::IsDigit(sourceCode[index]))
-		{
-			expressions.emplace_back(ReadNumberExpression());
-			continue;
-		}
-
-		if (Char::IsAlpha(sourceCode[index]))
-		{
-			expressions.emplace_back(ReadIdentifier());
-			continue;
-		}
-
 		if (CompareCharsSimple("//"))
 		{
 			expressions.emplace_back(ReadSingleLineComment());
@@ -64,6 +53,35 @@ void CppSyntaxTree::Parse()
 		if (CompareCharsSimple("#"))
 		{
 			expressions.emplace_back(ReadPreprocessor());
+			continue;
+		}
+
+		if (Char::IsDigit(sourceCode[index]))
+		{
+			expressions.emplace_back(ReadNumberExpression());
+			continue;
+		}
+
+		if (CompareCharsMultiple("char", "short", "int", "long", "float", "double", "bool", "void",
+			"class", "struct", "enum",
+			"static", "volatile", "thread_local", "const", "mutable", "constexpr",
+			"typedef", "using",
+			"noexcept", "concept", "requires",
+			"public", "protected", "private",
+			"if", "while", "else", "do", "switch",
+			"try", "catch",
+			"case", "break", "continue",
+			"virtual", "override", "final",
+			"static_cast", "dynamic_cast", "const_cast", "reinterpret_cast",
+			"false", "true", "nullptr"))
+		{
+			expressions.emplace_back(ReadKeyword());
+			continue;
+		}
+
+		if (Char::IsAlpha(sourceCode[index]))
+		{
+			expressions.emplace_back(ReadIdentifier());
 			continue;
 		}
 
@@ -268,6 +286,25 @@ std::unique_ptr<CppExpression> CppSyntaxTree::ReadIdentifier()
 	}
 
 	return std::make_unique<CppIdentifierExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+}
+
+std::unique_ptr<CppExpression> CppSyntaxTree::ReadKeyword()
+{
+	size_t start = index;
+	IncrementIndex(false);
+	while (sourceCode.IsValidIndex(index))
+	{
+		auto ch = sourceCode[index];
+		if (Char::IsAlpha(ch) || ch == '_')
+		{
+			IncrementIndex(false);
+			continue;
+		}
+
+		return std::make_unique<CppKeywordExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
+	}
+
+	return std::make_unique<CppKeywordExpression>(sourceCode.Substring(start, index - start), sourceFile, lineNumber, charNumber);
 }
 
 void CppSyntaxTree::IncrementIndex(bool isNewLine)
