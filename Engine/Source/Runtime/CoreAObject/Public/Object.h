@@ -46,7 +46,7 @@ public:
 	}
 };
 
-class COREAOBJECT_API AObject : public AObjectBase
+class COREAOBJECT_API AObject : virtual public AObjectBase
 {
 	AYLA_DECLARE_STATIC_CLASS_FUNCTION(Engine, CoreAObject, Object);
 	AYLA_DECLARE_CLASS_TYPEDEFS(Engine, CoreAObject, Object);
@@ -60,7 +60,7 @@ private:
 	ObjectReference* referencer = nullptr;
 
 protected:
-	AObject(std::in_place_t builtIn);
+	AObject(std::in_place_t);
 	AObject();
 
 public:
@@ -77,3 +77,5 @@ public:
 		return (T*)NewObject(T::StaticClass());
 	}
 };
+
+#include "Reflection/ObjectMacros.h"

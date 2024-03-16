@@ -135,7 +135,18 @@ public:
 		if (!IsCompleted())
 		{
 			ExceptionPtr = InExceptionPtr;
-			Status = ETaskStatus::Faulted;
+			try
+			{
+				std::rethrow_exception(InExceptionPtr);
+			}
+			catch (const OperationCanceledException&)
+			{
+				Status = ETaskStatus::Canceled;
+			}
+			catch (...)
+			{
+				Status = ETaskStatus::Faulted;
+			}
 
 			auto LocalThens = std::move(Thens);
 			Future.NotifyAll();

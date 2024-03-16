@@ -81,6 +81,11 @@ public:
 		return Awaiter->GetException();
 	}
 
+	inline void RethrowException() const
+	{
+		std::rethrow_exception(Awaiter->GetException());
+	}
+
 	inline void AddStopCallback(CancellationToken sToken, std::function<void()> CallbackBody)
 	{
 		Awaiter->AddStopCallback(std::move(sToken), std::move(CallbackBody));
@@ -114,6 +119,9 @@ public:
 
 		return Task<U>(std::move(uAwaiter));
 	}
+
+	Task<bool> SuppressCancellationThrow() requires std::same_as<T, void>;
+	Task<std::optional<T>> SuppressCancellationThrow() requires (!std::same_as<T, void>);
 
 	inline void Wait() const noexcept
 	{
@@ -482,3 +490,35 @@ public:
 		}
 	}
 };
+
+template<class T>
+Task<bool> Task<T>::SuppressCancellationThrow() requires std::same_as<T, void>
+{
+	return ContinueWith([](Task<void> task)
+	{
+		if (task.GetStatus() == ETaskStatus::Canceled)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	});
+}
+
+template<class T>
+Task<std::optional<T>> Task<T>::SuppressCancellationThrow() requires (!std::same_as<T, void>)
+{
+	return ContinueWith([](Task<T> task) -> std::optional<T>
+	{
+		if (task.GetStatus() == ETaskStatus::Canceled)
+		{
+			return std::nullopt;
+		}
+		else
+		{
+			return task.GetResult();
+		}
+	});
+}

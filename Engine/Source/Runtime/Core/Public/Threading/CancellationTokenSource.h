@@ -101,6 +101,12 @@ public:
 		return get_source() == rhs.get_source();
 	}
 
+public:
+	static inline CancellationTokenSource Create()
+	{
+		return CancellationTokenSource(std::in_place);
+	}
+
 private:
 	inline const std::stop_source& get_source() const noexcept
 	{

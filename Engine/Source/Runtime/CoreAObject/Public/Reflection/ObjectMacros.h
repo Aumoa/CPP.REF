@@ -22,3 +22,6 @@ extern "C" PLATFORM_SHARED_EXPORT A ## ClassName* __Ayla_ConstructorInfo_ ## Nam
 { \
 	return (A ## ClassName*)AObject::NewObject(A ## ClassName::StaticClass()); \
 }
+
+#define GENERATED_BODY(...)
+#define ACLASS(...)
