@@ -1,0 +1,30 @@
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
+
+using System.Diagnostics.CodeAnalysis;
+using AE.IO;
+using AE.Rules;
+using AE.Source;
+
+namespace AE.Assemblies;
+
+public class InteropAssembly : ModuleAssembly
+{
+    public override string Name { get; }
+
+    public override ProjectDirectory ProjectDirectory { get; }
+
+    public override DirectoryReference SourceDirectory { get; }
+
+    public override FileReference ScriptFile { get; }
+
+    protected override string ScriptIdentify => "Interop";
+
+    [SetsRequiredMembers]
+    public InteropAssembly(ProjectDirectory projectDirectory, FileReference scriptFile, string name)
+    {
+        Name = name;
+        ProjectDirectory = projectDirectory;
+        SourceDirectory = scriptFile.GetDirectory();
+        ScriptFile = scriptFile;
+    }
+}

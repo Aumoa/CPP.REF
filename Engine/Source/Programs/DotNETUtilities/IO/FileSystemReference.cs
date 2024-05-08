@@ -133,7 +133,7 @@ public abstract class FileSystemReference : IEquatable<FileSystemReference>
 
     private static bool ExtractExtensions(string fileName, out string namePart, out string extensionsPart)
     {
-        int indexOf = fileName.IndexOf('.');
+        int indexOf = fileName.LastIndexOf('.');
         if (indexOf == -1)
         {
             namePart = fileName;

@@ -44,6 +44,10 @@ public class VisualStudioSolution
         {
             vsProjects.Add(new VisualCppProject(cppModule));
         }
+        foreach (var interopModule in Workspace.InteropAssemblies)
+        {
+            vsProjects.Add(new VisualInteropProject(interopModule));
+        }
 
         List<Task> tasks = new();
         foreach (var vsProject in vsProjects)
@@ -107,7 +111,7 @@ MinimumVisualStudioVersion = {MinimumVisualStudioVersion}
         {
             string typeGuid = project switch
             {
-                VisualCSharpProject => VisualCSharpGuid,
+                VisualCSharpProject or VisualInteropProject => VisualCSharpGuid,
                 VisualCppProject => VisualCppGuid,
                 _ => throw new InvalidOperationException("Internal error.")
             };

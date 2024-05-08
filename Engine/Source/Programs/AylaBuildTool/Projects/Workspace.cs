@@ -11,15 +11,18 @@ namespace AE.Projects;
 public static class Workspace
 {
     private static readonly Dictionary<string, ScriptableAssembly> s_Modules = new();
+    private static readonly Dictionary<string, ScriptableAssembly> s_Interops = new();
     private static readonly List<ProjectDirectory> s_ProjectTargets = new();
 
     public static ProjectDirectory Current { get; private set; }
 
-    public static IEnumerable<ScriptableAssembly> Assemblies => s_Modules.Values;
+    public static IEnumerable<ScriptableAssembly> Assemblies => s_Modules.Values.Concat(s_Interops.Values);
 
-    public static IEnumerable<CppAssembly> CppAssemblies => Assemblies.OfType<CppAssembly>();
+    public static IEnumerable<CppAssembly> CppAssemblies => s_Modules.Values.OfType<CppAssembly>();
 
-    public static IEnumerable<CSharpAssembly> CSharpAssemblies => Assemblies.OfType<CSharpAssembly>();
+    public static IEnumerable<CSharpAssembly> CSharpAssemblies => s_Modules.Values.OfType<CSharpAssembly>();
+
+    public static IEnumerable<InteropAssembly> InteropAssemblies => s_Interops.Values.OfType<InteropAssembly>();
 
     public static ProjectDirectory ProjectTarget => s_ProjectTargets.Last();
 
@@ -82,27 +85,35 @@ public static class Workspace
         cancellationToken.ThrowIfCancellationRequested();
 
         var sourceFiles = directory.GetFiles();
-        var csharpModule = sourceFiles.FirstOrDefault(p => p.Extensions.Equals("csproj", StringComparison.OrdinalIgnoreCase));
-        if (csharpModule != null)
-        {
-            var assembly = new CSharpAssembly(target, csharpModule);
-            s_Modules.Add(assembly.Name, assembly);
-            return;
-        }
 
         bool hasModule = false;
         foreach (var sourceFile in sourceFiles)
         {
             if (sourceFile.FileName.EndsWith(".Module.cs"))
             {
-                var assembly = new CppAssembly(target, sourceFile);
+                var assembly = new CppAssembly(target, sourceFile, sourceFile.FileName[..^".Module.cs".Length]);
                 s_Modules.Add(assembly.Name, assembly);
+                hasModule = true;
+            }
+
+            if (sourceFile.FileName.EndsWith(".Interop.cs"))
+            {
+                var assembly = new InteropAssembly(target, sourceFile, sourceFile.FileName[..^".Interop.cs".Length]);
+                s_Interops.Add(assembly.Name, assembly);
                 hasModule = true;
             }
         }
 
         if (hasModule == false)
         {
+            var csharpModule = sourceFiles.FirstOrDefault(p => p.Extensions.EndsWith("csproj", StringComparison.OrdinalIgnoreCase));
+            if (csharpModule != null)
+            {
+                var assembly = new CSharpAssembly(target, csharpModule);
+                s_Modules.Add(assembly.Name, assembly);
+                return;
+            }
+
             foreach (var subdir in directory.GetDirectories())
             {
                 InternalCollect(target, subdir, cancellationToken);

@@ -38,14 +38,7 @@ public class VisualCSharpProject : VisualStudioProject
         }
         else
         {
-            if (assembly.ProjectDirectory.IsEngineDirectory())
-            {
-                Filter = "Engine";
-            }
-            else
-            {
-                Filter = "Game";
-            }
+            Filter = assembly.RelativeDirectory.Replace(Path.DirectorySeparatorChar, '/');
         }
     }
 

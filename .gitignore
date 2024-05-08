@@ -2,3 +2,6 @@
 .vs/
 *.sln
 Engine/.vs
+
+# Interop Project Files
+*.Interop.csproj

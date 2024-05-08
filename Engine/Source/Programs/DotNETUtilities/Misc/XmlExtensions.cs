@@ -23,6 +23,22 @@ public static class XmlExtensions
         return Elem;
     }
 
+    public static XmlElement AddPropertyGroup(this XmlNode self, string? condition = null)
+    {
+        var element = self.AddElement("PropertyGroup");
+        if (condition != null)
+        {
+            element.SetAttribute("Condition", condition);
+        }
+        return element;
+    }
+
+    public static T Configure<T>(this T self, Action<T> configure) where T : XmlNode
+    {
+        configure(self);
+        return self;
+    }
+
     public static string Serialize(this XmlDocument Self, bool bIndent = false)
     {
         using var Writer = new StringWriter();

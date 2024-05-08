@@ -6,13 +6,13 @@ using AE.Source;
 
 namespace AE.Assemblies;
 
-public class CSharpAssembly : ModuleAssembly
+public class CSharpAssembly : ScriptableAssembly
 {
     [SetsRequiredMembers]
     public CSharpAssembly(ProjectDirectory target, FileReference script)
     {
         var directory = script.GetDirectory();
-        Name = directory.Name;
+        Name = directory.FileName;
         SourceDirectory = directory;
         ProjectDirectory = target;
         ScriptFile = script;
