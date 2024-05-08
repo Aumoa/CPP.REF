@@ -54,7 +54,7 @@ public class VisualCSharpProject : VisualStudioProject
         }
     }
 
-    public override Task GenerateProjectFilesAsync(CancellationToken cancellationToken = default)
+    public override Task GenerateProjectFilesAsync(List<VisualStudioProject> projects, CancellationToken cancellationToken = default)
     {
         return Task.CompletedTask;
     }

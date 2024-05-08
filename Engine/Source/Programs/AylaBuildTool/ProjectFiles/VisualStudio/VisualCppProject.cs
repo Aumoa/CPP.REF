@@ -48,7 +48,7 @@ public class VisualCppProject : VisualStudioProject
         return (configuration.ToString() + (isEditor ? "_Editor" : string.Empty), platform.ToString());
     }
 
-    public override async Task GenerateProjectFilesAsync(CancellationToken cancellationToken = default)
+    public override async Task GenerateProjectFilesAsync(List<VisualStudioProject> projects, CancellationToken cancellationToken = default)
     {
         GenerateXmlDocument(out var vcxproj, out var vcxprojFilter, out var vcxprojUser);
         await Task.WhenAll(new[]

@@ -14,6 +14,8 @@ public abstract class ModuleAssembly : ScriptableAssembly
 
     protected override bool HasAssembly => true;
 
+    protected virtual string ClassName => Name;
+
     public ModuleRules Rules => GenerateModuleRule();
 
     private ModuleRules GenerateModuleRule()
@@ -24,10 +26,10 @@ public abstract class ModuleAssembly : ScriptableAssembly
         {
             if (s_RulesCache.TryGetValue(Target.Info, out var moduleRule) == false)
             {
-                Type? ruleType = CachedAssembly.GetType(Name);
+                Type? ruleType = CachedAssembly.GetType(ClassName);
                 if (ruleType == null)
                 {
-                    throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.RuleClassDefinitions(Name));
+                    throw new TerminateException(KnownErrorCode.ConstructorNotFound, CoreStrings.Errors.RuleClassDefinitions(ClassName));
                 }
 
                 ConstructorInfo? constructor = ruleType.GetConstructor(new[] { typeof(TargetInfo) });

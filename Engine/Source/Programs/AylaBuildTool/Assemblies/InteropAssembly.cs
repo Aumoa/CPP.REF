@@ -19,6 +19,8 @@ public class InteropAssembly : ModuleAssembly
 
     protected override string ScriptIdentify => "Interop";
 
+    protected override string ClassName => base.ClassName.Replace(".Interop", string.Empty);
+
     [SetsRequiredMembers]
     public InteropAssembly(ProjectDirectory projectDirectory, FileReference scriptFile, string name)
     {

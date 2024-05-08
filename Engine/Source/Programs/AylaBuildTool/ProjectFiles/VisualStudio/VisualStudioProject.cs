@@ -26,7 +26,7 @@ public abstract class VisualStudioProject
 
     public abstract DirectoryReference SourceDirectory { get; }
 
-    public abstract Task GenerateProjectFilesAsync(CancellationToken cancellationToken = default);
+    public abstract Task GenerateProjectFilesAsync(List<VisualStudioProject> projects, CancellationToken cancellationToken = default);
 
     public abstract (string, string) MapConfiguration(Configuration configuration, bool isEditor, TargetPlatform platform);
 }

@@ -5,3 +5,4 @@ Engine/.vs
 
 # Interop Project Files
 *.Interop.csproj
+**/*.Interop/Properties/launchSettings.json

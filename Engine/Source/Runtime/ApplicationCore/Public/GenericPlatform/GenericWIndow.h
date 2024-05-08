@@ -22,3 +22,7 @@ public:
     virtual void Hide() = 0;
     virtual Vector2N GetSize() const = 0;
 };
+
+extern "C" APPLICATIONCORE_API void GenericWindow_Interop_Dispose(void* instancePtr);
+extern "C" APPLICATIONCORE_API void GenericWindow_Interop_Show(void* instancePtr);
+extern "C" APPLICATIONCORE_API void GenericWindow_Interop_Hide(void* instancePtr);

@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
 #include "GenericPlatform/GenericApplication.h"
+#include "GenericPlatform/GenericWIndow.h"
 
 NGenericApplication* NGenericApplication::sApp;
 
@@ -57,4 +58,25 @@ int32 NGenericApplication::GetExitCode()
 bool NGenericApplication::IsQuitRequested()
 {
     return (bool)ExitCode;
+}
+
+extern "C" void* GenericApplication_Interop_CreateApplication()
+{
+    return NGenericApplication::CreateApplication().release();
+}
+
+extern "C" void GenericApplication_Interop_Dispose(void* instancePtr)
+{
+    delete (NGenericApplication*)instancePtr;
+}
+
+extern "C" void* GenericApplication_Interop_MakeWindow(void* instancePtr)
+{
+    NGenericWindowDefinition defaultOptions;
+    defaultOptions.bPrimaryWindow = true;
+    defaultOptions.bSystemMenu = true;
+    defaultOptions.bThickframe = true;
+    defaultOptions.bSizebox = true;
+    defaultOptions.bCaption = true;
+    return ((NGenericApplication*)instancePtr)->MakeWindow(defaultOptions).release();
 }

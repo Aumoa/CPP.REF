@@ -1,9 +1,9 @@
 ﻿using System;
 using AE.Rules;
 
-public class Engine : ModuleRules
+public class ApplicationCore : ModuleRules
 {
-    public Engine(TargetInfo targetInfo) : base(targetInfo)
+    public ApplicationCore(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

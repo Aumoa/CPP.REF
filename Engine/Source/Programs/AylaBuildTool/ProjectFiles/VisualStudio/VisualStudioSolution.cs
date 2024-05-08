@@ -52,7 +52,7 @@ public class VisualStudioSolution
         List<Task> tasks = new();
         foreach (var vsProject in vsProjects)
         {
-            tasks.Add(vsProject.GenerateProjectFilesAsync(cancellationToken));
+            tasks.Add(vsProject.GenerateProjectFilesAsync(vsProjects, cancellationToken));
         }
 
         tasks.Add(IOUtility.CompareAndWriteAsync(solutionFile, GenerateSolution(vsProjects, solutionGuid), cancellationToken));

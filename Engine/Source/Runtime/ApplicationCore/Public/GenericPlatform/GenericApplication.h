@@ -43,3 +43,7 @@ public:
     static std::unique_ptr<NGenericApplication> CreateApplication();
     static NGenericApplication& Get() noexcept { return *sApp; }
 };
+
+extern "C" APPLICATIONCORE_API void* GenericApplication_Interop_CreateApplication();
+extern "C" APPLICATIONCORE_API void GenericApplication_Interop_Dispose(void* instancePtr);
+extern "C" APPLICATIONCORE_API void* GenericApplication_Interop_MakeWindow(void* instancePtr);

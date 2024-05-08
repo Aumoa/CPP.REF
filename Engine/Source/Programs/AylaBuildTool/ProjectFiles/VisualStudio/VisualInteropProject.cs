@@ -1,5 +1,8 @@
 ﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Xml;
 using AE.Assemblies;
 using AE.BuildSettings;
@@ -36,7 +39,7 @@ public class VisualInteropProject : VisualStudioProject
         m_Assembly = assembly;
         m_ModuleInfo = ModuleDependencyCache.GetCached(assembly.Name, string.Empty);
 
-        Name = assembly.Name + ".Interop";
+        Name = assembly.Name;
         Filter = assembly.RelativeDirectory.Replace(Path.DirectorySeparatorChar, '/');
         GUID = VSUtility.MakeGUID(ProjectPath);
         SourceDirectory = assembly.SourceDirectory;
@@ -63,24 +66,64 @@ public class VisualInteropProject : VisualStudioProject
         return result;
     }
 
-    public override async Task GenerateProjectFilesAsync(CancellationToken cancellationToken = default)
+    public override async Task GenerateProjectFilesAsync(List<VisualStudioProject> projects, CancellationToken cancellationToken = default)
     {
+        Dictionary<string, VisualInteropProject>? map = null;
+        bool FindReferenceProject(string projectName, [NotNullWhen(true)] out VisualInteropProject? found)
+        {
+            if (map == null)
+            {
+                map = new Dictionary<string, VisualInteropProject>();
+                foreach (var project in projects)
+                {
+                    if (project is VisualInteropProject interopProject)
+                    {
+                        map.Add(interopProject.Name, interopProject);
+                    }
+                }
+            }
+
+            return map.TryGetValue(projectName, out found);
+        }
+
         XmlDocument doc = new();
         var project = doc.AddElement("Project");
         project.SetAttribute("Sdk", "Microsoft.NET.Sdk");
+
+        string outputType = m_ModuleInfo.TargetType switch
+        {
+            Rules.ModuleRules.ModuleType.Library => "Library",
+            Rules.ModuleRules.ModuleType.ConsoleApplication => "Exe",
+            Rules.ModuleRules.ModuleType.Application => "WinExe",
+            _ => string.Empty
+        };
 
         var buildGroup = project.AddPropertyGroup();
         buildGroup.AddElement("TargetFramework").InnerText = DotNETVersion;
         buildGroup.AddElement("ImplicitUsings").InnerText = "enable";
         buildGroup.AddElement("Nullable").InnerText = "enable";
         buildGroup.AddElement("IsPublishable").InnerText = "False";
-        buildGroup.AddElement("OutputType").InnerText = "Library";
+        buildGroup.AddElement("OutputType").InnerText = outputType;
         buildGroup.AddElement("AppendTargetFrameworkToOutputPath").InnerText = "False";
         buildGroup.AddElement("RootNamespace").InnerText = TargetDirectory.IsEngineDirectory() ? "AylaEngine" : m_Assembly.Name;
         buildGroup.AddElement("OutputPath").InnerText = Path.GetRelativePath(SourceDirectory.AbsolutePath, TargetDirectory.Binaries.Interop.GetChild("$(Configuration)").AbsolutePath);
 
         var projectOptions = project.AddElement("ItemGroup");
         projectOptions.AddElement("Compile").Configure(p => p.SetAttribute("Remove", m_Assembly.ScriptFile.FileName));
+        projectOptions.AddElement("None").Configure(p => p.SetAttribute("Include", m_Assembly.ScriptFile.FileName));
+
+        var references = project.AddElement("ItemGroup");
+        foreach (var depend in m_ModuleInfo.DependModules)
+        {
+            if (FindReferenceProject(depend, out var found))
+            {
+                references.AddElement("ProjectReference").Configure(p => p.SetAttribute("Include", found.Project.AbsolutePath));
+            }
+            else
+            {
+                Console.Error.WriteLine("Referenced module {0} is not found in {1} module.", depend, m_ModuleInfo.Name);
+            }
+        }
 
         var compilerOptions = project.AddElement("ItemGroup");
         compilerOptions.AddElement("Using").Configure(p => p.SetAttribute("Include", "AylaEngine"));
@@ -91,7 +134,36 @@ public class VisualInteropProject : VisualStudioProject
         xmlWriter.Formatting = Formatting.Indented;
         doc.WriteTo(xmlWriter);
 
-        var projectFile = SourceDirectory.GetFile(m_Assembly.Name + ".Interop.csproj");
+        var projectFile = SourceDirectory.GetFile(m_Assembly.Name + ".csproj");
         await IOUtility.CompareAndWriteAsync(projectFile.AbsolutePath, writer.ToString(), cancellationToken);
+
+        string includePaths = TargetDirectory.Binaries.BinariesOut(TargetPlatform.Win64, Configuration.Development);
+        if (TargetDirectory.IsEngineDirectory() == false)
+        {
+            includePaths += ";" + Global.EngineDirectory.Binaries.BinariesOut(TargetPlatform.Win64, Configuration.Development);
+        }
+
+        var launchSettingsJson = new JsonObject
+        {
+            ["profiles"] = new JsonObject
+            {
+                [m_Assembly.Name] = new JsonObject
+                {
+                    ["commandName"] = "Project",
+                    ["workingDirectory"] = TargetDirectory.Root.AbsolutePath,
+                    ["environmentVariables"] = new JsonObject
+                    {
+                        ["PATH"] = includePaths + ";%PATH%"
+                    }
+                }
+            }
+        };
+
+        var launchSettings = SourceDirectory.GetChild("Properties").GetFile("launchSettings.json");
+        var serializerOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+        await IOUtility.CompareAndWriteAsync(launchSettings.AbsolutePath, launchSettingsJson.ToJsonString(serializerOptions), cancellationToken);
     }
 }

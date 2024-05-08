@@ -11,18 +11,17 @@ namespace AE.Projects;
 public static class Workspace
 {
     private static readonly Dictionary<string, ScriptableAssembly> s_Modules = new();
-    private static readonly Dictionary<string, ScriptableAssembly> s_Interops = new();
     private static readonly List<ProjectDirectory> s_ProjectTargets = new();
 
     public static ProjectDirectory Current { get; private set; }
 
-    public static IEnumerable<ScriptableAssembly> Assemblies => s_Modules.Values.Concat(s_Interops.Values);
+    public static IEnumerable<ScriptableAssembly> Assemblies => s_Modules.Values;
 
     public static IEnumerable<CppAssembly> CppAssemblies => s_Modules.Values.OfType<CppAssembly>();
 
     public static IEnumerable<CSharpAssembly> CSharpAssemblies => s_Modules.Values.OfType<CSharpAssembly>();
 
-    public static IEnumerable<InteropAssembly> InteropAssemblies => s_Interops.Values.OfType<InteropAssembly>();
+    public static IEnumerable<InteropAssembly> InteropAssemblies => s_Modules.Values.OfType<InteropAssembly>();
 
     public static ProjectDirectory ProjectTarget => s_ProjectTargets.Last();
 
@@ -98,8 +97,8 @@ public static class Workspace
 
             if (sourceFile.FileName.EndsWith(".Interop.cs"))
             {
-                var assembly = new InteropAssembly(target, sourceFile, sourceFile.FileName[..^".Interop.cs".Length]);
-                s_Interops.Add(assembly.Name, assembly);
+                var assembly = new InteropAssembly(target, sourceFile, sourceFile.FileName[..^".cs".Length]);
+                s_Modules.Add(assembly.Name, assembly);
                 hasModule = true;
             }
         }

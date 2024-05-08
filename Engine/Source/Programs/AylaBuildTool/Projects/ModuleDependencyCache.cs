@@ -46,7 +46,7 @@ public static class ModuleDependencyCache
             }
         }
 
-        if (Workspace.TryFindModule(name, out var assembly) == false || assembly is not CppAssembly cppAssembly)
+        if (Workspace.TryFindModule(name, out var assembly) == false || assembly is not ModuleAssembly moduleAssembly)
         {
             string message;
             if (string.IsNullOrEmpty(source))
@@ -60,9 +60,9 @@ public static class ModuleDependencyCache
             throw new TerminateException(KnownErrorCode.ModuleNotFound, message);
         }
 
-        var sourcePath = cppAssembly.SourceDirectory;
-        var rules = cppAssembly.Rules;
-        var projectDir = cppAssembly.ProjectDirectory;
+        var sourcePath = moduleAssembly.SourceDirectory;
+        var rules = moduleAssembly.Rules;
+        var projectDir = moduleAssembly.ProjectDirectory;
 
         string AsFullPath(string currentPath)
         {
