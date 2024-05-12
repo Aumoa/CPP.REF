@@ -1,11 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.System;
 
-namespace AE.Platform.Linux;
+namespace AylaEngine;
 
 public class LinuxToolChain : ToolChainInstallation
 {

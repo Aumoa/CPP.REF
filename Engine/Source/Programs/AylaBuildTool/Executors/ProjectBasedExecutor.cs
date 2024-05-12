@@ -1,12 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.CLI;
-using AE.Exceptions;
-using AE.IO;
-using AE.Projects;
-using AE.Source;
-
-namespace AE.Executors;
+namespace AylaEngine;
 
 public abstract class ProjectBasedExecutor
 {
@@ -40,7 +34,7 @@ public abstract class ProjectBasedExecutor
 
             if (File.Exists(projectBasedArgs.ProjectFile) == false)
             {
-                throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.InvalidProjectFormat);
+                throw new TerminateException(KnownErrorCode.TargetNotFound, Locale.Errors.InvalidProjectFormat);
             }
 
             string projectFileDir = Path.GetFullPath(Path.GetDirectoryName(projectBasedArgs.ProjectFile)!);

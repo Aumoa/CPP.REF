@@ -1,11 +1,9 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
-
-using AE.Misc;
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Reflection;
 using System.Text.Json;
 
-namespace AE.CLI;
+namespace AylaEngine;
 
 public class CommandLineParser
 {
@@ -20,18 +18,18 @@ public class CommandLineParser
         return Options[string.Empty];
     }
 
-    public IReadOnlyList<string>? GetCategoryArguments(string CategoryName)
+    public IReadOnlyList<string>? GetCategoryArguments(string categoryName)
     {
-        Options.TryGetValue(CategoryName.ToLower(), out var OutList);
-        return OutList;
+        Options.TryGetValue(categoryName.ToLower(), out var list);
+        return list;
     }
 
-    public string? GetCategoryFirstArgument(string CategoryName)
+    public string? GetCategoryFirstArgument(string categoryName)
     {
-        var CategoryList = GetCategoryArguments(CategoryName);
-        if (CategoryList != null && CategoryList.Count > 0)
+        var categoryList = GetCategoryArguments(categoryName);
+        if (categoryList != null && categoryList.Count > 0)
         {
-            return CategoryList[0];
+            return categoryList[0];
         }
         return null;
     }
@@ -41,81 +39,81 @@ public class CommandLineParser
         return JsonSerializer.Serialize(Options);
     }
 
-    public void ApplyTo(object ApplyObject)
+    public void ApplyTo(object applyObject)
     {
-        Type ApplyType = ApplyObject.GetType();
-        foreach (var Property in ApplyType.GetProperties())
+        Type applyType = applyObject.GetType();
+        foreach (var property in applyType.GetProperties())
         {
-            var ApplyAtt = Property.GetCustomAttribute<CommandLineApplyAttribute>();
-            if (ApplyAtt == null)
+            var applyAtt = property.GetCustomAttribute<CommandLineApplyAttribute>();
+            if (applyAtt == null)
             {
                 continue;
             }
 
-            string CategoryName = ApplyAtt.CategoryName;
-            IReadOnlyList<string>? CategoryList = GetCategoryArguments(CategoryName);
-            if (CategoryList == null)
+            string categoryName = applyAtt.CategoryName;
+            IReadOnlyList<string>? categoryList = GetCategoryArguments(categoryName);
+            if (categoryList == null)
             {
-                if (ApplyAtt.IsRequired)
+                if (applyAtt.IsRequired)
                 {
-                    throw new KeyNotFoundException($"CategoryName `{CategoryName}` not found in CommandLineParser instance.");
+                    throw new KeyNotFoundException($"CategoryName `{categoryName}` not found in CommandLineParser instance.");
                 }
                 continue;
             }
 
-            Type TargetType = Property.PropertyType;
-            bool bIsList = false;
-            if (IsAllowedApplyType(TargetType) == false)
+            Type targetType = property.PropertyType;
+            bool isList = false;
+            if (IsAllowedApplyType(targetType) == false)
             {
-                bIsList = TargetType.IsGenericList(out TargetType!);
-                if (bIsList == false || IsAllowedApplyType(TargetType) == false)
+                isList = targetType.IsGenericList(out targetType!);
+                if (isList == false || IsAllowedApplyType(targetType) == false)
                 {
                     throw new InvalidOperationException("Not supported member type.");
                 }
             }
 
-            if (bIsList == false && CategoryList.Count > 1)
+            if (isList == false && categoryList.Count > 1)
             {
                 throw new InvalidOperationException("Not enough member to fill arguments.");
             }
 
-            if (bIsList)
+            if (isList)
             {
-                object? List = Property.GetValue(ApplyObject);
-                if (List == null)
+                object? list = property.GetValue(applyObject);
+                if (list == null)
                 {
-                    List = Property.PropertyType.InstantiateList();
-                    Property.SetValue(ApplyObject, List);
+                    list = property.PropertyType.InstantiateList();
+                    property.SetValue(applyObject, list);
                 }
 
-                if (TargetType.IsString())
+                if (targetType.IsString())
                 {
-                    List.GenericAddRange(CategoryList);
+                    GenericList.AddRange(list, categoryList);
                 }
                 else
                 {
-                    List.GenericAddRange(CategoryList.Select(Item => Convert.ChangeType(Item, TargetType)));
+                    GenericList.AddRange(list, categoryList.Select(Item => Convert.ChangeType(Item, targetType)));
                 }
             }
             else
             {
-                string? Value = CategoryList.IsValidIndex(0) ? CategoryList[0] : null;
-                if (Value != null)
+                string? value = categoryList.IsValidIndex(0) ? categoryList[0] : null;
+                if (value != null)
                 {
-                    object? ConvertedValue = Convert.ChangeType(Value, TargetType);
-                    Property.SetValue(ApplyObject, ConvertedValue);
+                    object? convertedValue = Convert.ChangeType(value, targetType);
+                    property.SetValue(applyObject, convertedValue);
                 }
                 else
                 {
-                    Property.SetValue(ApplyObject, true);
+                    property.SetValue(applyObject, true);
                 }
             }
         }
     }
 
-    private static bool IsAllowedApplyType(Type InType)
+    private static bool IsAllowedApplyType(Type type)
     {
-        return Type.GetTypeCode(InType) switch
+        return Type.GetTypeCode(type) switch
         {
             TypeCode.Byte or
             TypeCode.SByte or
@@ -134,40 +132,40 @@ public class CommandLineParser
         };
     }
 
-    public static CommandLineParser Parse(params string[] Args)
+    public static CommandLineParser Parse(params string[] args)
     {
-        var Parser = new CommandLineParser();
+        var parser = new CommandLineParser();
 
-        List<string>? CurrentList = null;
-        List<string> NonCategoryList = new();
-        Parser.Options.Add(string.Empty, NonCategoryList);
+        List<string>? currentList = null;
+        List<string> nonCategoryList = new();
+        parser.Options.Add(string.Empty, nonCategoryList);
 
-        for (int Index = 0; Index < Args.Length; ++Index)
+        for (int index = 0; index < args.Length; ++index)
         {
-            string Current = Args[Index];
-            if (Current.StartsWith("-"))
+            string current = args[index];
+            if (current.StartsWith("-"))
             {
-                string Command = Current[1..];
-                if (string.IsNullOrEmpty(Command) || Command.IsOnlyAlphabet() == false)
+                string command = current[1..];
+                if (string.IsNullOrEmpty(command) || command.IsOnlyAlphabet() == false)
                 {
-                    throw new ArgumentException($"Args[{Index}]({Current}) is not valid parameter value.", nameof(Args));
+                    throw new ArgumentException($"Args[{index}]({current}) is not valid parameter value.", nameof(args));
                 }
 
-                Command = Command.ToLower();
-                if (Parser.Options.TryGetValue(Command, out CurrentList) == false)
+                command = command.ToLower();
+                if (parser.Options.TryGetValue(command, out currentList) == false)
                 {
-                    CurrentList = new();
-                    Parser.Options.Add(Command, CurrentList);
+                    currentList = new();
+                    parser.Options.Add(command, currentList);
                 }
             }
             else
             {
-                CurrentList = CurrentList ?? NonCategoryList;
-                CurrentList.Add(Current);
-                CurrentList = null;
+                currentList = currentList ?? nonCategoryList;
+                currentList.Add(current);
+                currentList = null;
             }
         }
 
-        return Parser;
+        return parser;
     }
 }

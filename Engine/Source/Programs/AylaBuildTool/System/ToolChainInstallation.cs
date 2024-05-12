@@ -1,15 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.Misc;
-using AE.Platform;
-using AE.Platform.Linux;
-using AE.Platform.Windows;
-using AE.Rules;
-
-namespace AE.System;
+namespace AylaEngine;
 
 public abstract class ToolChainInstallation
 {
@@ -95,6 +86,6 @@ public abstract class ToolChainInstallation
             }
         }
 
-        throw new TerminateException(KnownErrorCode.PlatformCompilerNotFound, CoreStrings.Errors.PlatformCompilerNotFound(targetInfo.BuildConfiguration.Platform.ToString()));
+        throw new TerminateException(KnownErrorCode.PlatformCompilerNotFound, Locale.Errors.PlatformCompilerNotFound(targetInfo.BuildConfiguration.Platform.ToString()));
     }
 }

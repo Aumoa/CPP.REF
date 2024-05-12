@@ -1,14 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Text;
 
-using AE.BuildSettings;
-using AE.Extensions;
-using AE.IO;
-using AE.Projects;
-using AE.Rules;
-
-namespace AE.ProjectFiles.VisualStudio;
+namespace AylaEngine;
 
 public class VisualStudioSolution
 {

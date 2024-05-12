@@ -1,13 +1,13 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-namespace AE.Misc;
+namespace AylaEngine;
 
 public class CRC32
 {
-    const uint TableSize = 256;
-    const uint TableValue = 1;
+    private const uint k_TableSize = 256;
+    private const uint k_TableValue = 1;
 
-    static readonly uint[] Seed = new uint[]
+    private static readonly uint[] s_Seed = new uint[]
     {
         0x968bd6b1, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
         0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -43,54 +43,54 @@ public class CRC32
         0xb366722e, 0xc4614ab8, 0x5d381b02, 0x2b6f2b94, 0xb4cbbe37, 0xc3cc8ea1, 0x5a0ddf1b, 0x2d02ed8d
     };
 
-    static readonly uint[,] Table = new uint[TableSize, TableSize];
+    private static readonly uint[,] s_Table = new uint[k_TableSize, k_TableSize];
 
     static CRC32()
     {
-        for (int SeedIndex = 0; SeedIndex < TableSize; ++SeedIndex)
+        for (int seedIndex = 0; seedIndex < k_TableSize; ++seedIndex)
         {
-            uint Polynomial = Seed[SeedIndex];
-            for (uint I = 0; I < TableSize; ++I)
+            uint polynomial = s_Seed[seedIndex];
+            for (uint i = 0; i < k_TableSize; ++i)
             {
-                uint CRC = I;
-                for (int J = 8; J > 0; --J)
+                uint crc = i;
+                for (int j = 8; j > 0; --j)
                 {
-                    if ((CRC & 0x00000001) == 0x00000001)
+                    if ((crc & 0x00000001) == 0x00000001)
                     {
-                        CRC = CRC >> 1 ^ Polynomial;
+                        crc = crc >> 1 ^ polynomial;
                     }
                     else
                     {
-                        CRC >>= 1;
+                        crc >>= 1;
                     }
                 }
 
-                Table[SeedIndex, I] = CRC;
+                s_Table[seedIndex, i] = crc;
             }
         }
     }
 
-    public static uint Generate32(string? Data)
+    public static uint Generate32(string? data)
     {
-        if (Data is null)
+        if (data is null)
         {
             return 0;
         }
 
-        uint Value = 0xFFFFFFFF;
-        for (uint i = 0; i < Data.Length; ++i)
+        uint value = 0xFFFFFFFF;
+        for (uint i = 0; i < data.Length; ++i)
         {
-            Value = Table[TableValue, (Value ^ Data[(int)i]) & 0xFF] ^ Value >> 8 & 0x00FFFFFF;
+            value = s_Table[k_TableValue, (value ^ data[(int)i]) & 0xFF] ^ value >> 8 & 0x00FFFFFF;
         }
 
-        return Value;
+        return value;
     }
 
-    public static Guid GenerateGuid(string? Data)
+    public static Guid GenerateGuid(string? data)
     {
-        var RD = new Random((int)Generate32(Data));
-        byte[] Bytes = new byte[16];
-        RD.NextBytes(Bytes);
-        return new Guid(Bytes);
+        var random = new Random((int)Generate32(data));
+        byte[] bytes = new byte[16];
+        random.NextBytes(bytes);
+        return new Guid(bytes);
     }
 }

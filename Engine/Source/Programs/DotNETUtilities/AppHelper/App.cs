@@ -1,19 +1,19 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
 using System.Text;
 
-namespace AE.AppHelper;
+namespace AylaEngine;
 
 public class App
 {
-    public readonly ProcessStartInfo psi;
-    private readonly bool writeToConsole;
+    public readonly ProcessStartInfo m_PSI;
+    private readonly bool m_WriteToConsole;
 
     public App(ProcessStartInfo psi, bool writeToConsole)
     {
-        this.psi = psi;
-        this.writeToConsole = writeToConsole;
+        m_PSI = psi;
+        m_WriteToConsole = writeToConsole;
     }
 
     public string Stdout { get; private set; } = string.Empty;
@@ -26,14 +26,14 @@ public class App
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        Process? p = new Process() { StartInfo = psi };
+        Process? p = new Process() { StartInfo = m_PSI };
         if (p == null)
         {
             throw new InvalidOperationException("Internal error.");
         }
 
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
+        m_PSI.RedirectStandardOutput = true;
+        m_PSI.RedirectStandardError = true;
 
         TaskCompletionSource tcs = new();
         p.EnableRaisingEvents = true;
@@ -50,7 +50,7 @@ public class App
         {
             stdout.AppendLine(args.Data);
             outputs.AppendLine(args.Data);
-            if (writeToConsole)
+            if (m_WriteToConsole)
             {
                 Console.Write(args.Data);
             }
@@ -59,7 +59,7 @@ public class App
         {
             stderr.AppendLine(args.Data);
             outputs.AppendLine(args.Data);
-            if (writeToConsole)
+            if (m_WriteToConsole)
             {
                 Console.Error.Write(args.Data);
             }

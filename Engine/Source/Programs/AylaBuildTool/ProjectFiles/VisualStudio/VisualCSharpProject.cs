@@ -1,14 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using System.Diagnostics.CodeAnalysis;
-using AE.Assemblies;
-using AE.BuildSettings;
-using AE.Extensions;
-using AE.IO;
-using AE.Misc;
-using AE.Source;
-
-namespace AE.ProjectFiles.VisualStudio;
+namespace AylaEngine;
 
 public class VisualCSharpProject : VisualStudioProject
 {

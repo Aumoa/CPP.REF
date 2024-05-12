@@ -1,11 +1,6 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.Platform;
-using AE.Platform.Linux;
-using AE.Rules;
-using AE.System;
-
-namespace AE.CompilerServices;
+namespace AylaEngine;
 
 public static class ToolChain
 {

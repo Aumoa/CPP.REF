@@ -1,9 +1,6 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.Assemblies;
-using AE.Misc;
-
-namespace AE.ProjectFiles.VisualStudio;
+namespace AylaEngine;
 
 public static class VSUtility
 {

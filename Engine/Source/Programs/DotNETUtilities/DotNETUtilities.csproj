@@ -7,7 +7,7 @@
     <IsPublishable>False</IsPublishable>
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<RootNamespace>AE</RootNamespace>
+	<RootNamespace>AylaEngine</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

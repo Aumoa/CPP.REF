@@ -1,10 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
-
-using AE.BuildSettings;
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Runtime.InteropServices;
 
-namespace AE.System;
+namespace AylaEngine;
 
 public abstract class BuildHostPlatform
 {
@@ -44,21 +42,21 @@ public abstract class BuildHostPlatform
             {
                 return RuntimeInformation.OSArchitecture switch
                 {
-                    Architecture.X64 => WindowsPlatform,
-                    _ => throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
+                    System.Runtime.InteropServices.Architecture.X64 => WindowsPlatform,
+                    _ => throw new InvalidOperationException(Locale.Errors.NotSupportedBuildHostPlatform)
                 };
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return RuntimeInformation.OSArchitecture switch
                 {
-                    Architecture.X64 => LinuxPlatform,
-                    _ => throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
+                    System.Runtime.InteropServices.Architecture.X64 => LinuxPlatform,
+                    _ => throw new InvalidOperationException(Locale.Errors.NotSupportedBuildHostPlatform)
                 };
             }
             else
             {
-                throw new InvalidOperationException(CoreStrings.Errors.NotSupportedBuildHostPlatform);
+                throw new InvalidOperationException(Locale.Errors.NotSupportedBuildHostPlatform);
             }
         }
     }

@@ -1,17 +1,10 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
 
-using AE.AppHelper;
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.CompilerServices.Makefiles;
-using AE.Exceptions;
-using AE.IO;
-
-namespace AE.Platform.Windows;
+namespace AylaEngine;
 
 public class ClCompiler : Compiler
 {

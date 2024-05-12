@@ -1,11 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.IO;
-using AE.Projects;
-
-namespace AE.CompilerServices.Makefiles;
+namespace AylaEngine;
 
 public sealed class MakefileCompile : MakefileNode
 {

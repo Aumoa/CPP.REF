@@ -1,8 +1,7 @@
 ﻿// Copyright 2020-2021 Aumoa.lib. All right reserved.
 
 using System;
-using AE.Rules;
-using AE.BuildSettings;
+using AylaEngine;
 
 public class Core : ModuleRules
 {

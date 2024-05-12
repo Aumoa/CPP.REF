@@ -1,13 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.CLI;
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.Platform.Windows;
-using AE.ProjectFiles.VisualStudio;
-using AE.Projects;
-
-namespace AE.Executors;
+namespace AylaEngine;
 
 public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
 {
@@ -30,7 +23,7 @@ public class ProjectFilesExecutor : ProjectBasedExecutor, IExecutor
         var toolChain = VisualStudioInstallation.FindVisualStudioInstallations(CompilerVersion.VisualStudio2022).FirstOrDefault();
         if (toolChain == null)
         {
-            throw new TerminateException(KnownErrorCode.NotSupportedCompiler, CoreStrings.Errors.CompilerNotSupported);
+            throw new TerminateException(KnownErrorCode.NotSupportedCompiler, Locale.Errors.CompilerNotSupported);
         }
 
         ToolChain.Init(toolChain);

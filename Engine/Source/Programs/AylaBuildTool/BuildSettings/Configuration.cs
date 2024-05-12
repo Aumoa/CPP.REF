@@ -1,6 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-namespace AE.BuildSettings;
+namespace AylaEngine;
 
 public enum Configuration
 {

@@ -1,114 +1,112 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace AE.Misc;
+namespace AylaEngine;
 
 public static class GenericList
 {
-    public static bool IsGenericList(this Type InType, [MaybeNullWhen(false)] out Type OutElementType)
+    private static readonly Dictionary<Type, Type?> s_GenericListCache = new();
+
+    public static bool IsGenericList(this Type type, [MaybeNullWhen(false)] out Type elementType)
     {
-        if (InType.IsGenericType == false)
+        lock (s_GenericListCache)
         {
-            OutElementType = null;
-            return false;
-        }
+            if (s_GenericListCache.TryGetValue(type, out elementType) == false)
+            {
+                if (type.IsGenericType == false)
+                {
+                    elementType = null;
+                    s_GenericListCache.Add(type, elementType);
+                    return false;
+                }
 
-        Type[] Arguments = InType.GetGenericArguments();
-        if (Arguments.Length != 1)
-        {
-            OutElementType = null;
-            return false;
-        }
+                Type[] arguments = type.GetGenericArguments();
+                if (arguments.Length != 1)
+                {
+                    elementType = null;
+                    s_GenericListCache.Add(type, elementType);
+                    return false;
+                }
 
-        Type InterfaceList = typeof(IList<>).MakeGenericType(Arguments);
-        if (InType.IsAssignableTo(InterfaceList) == false)
-        {
-            OutElementType = null;
-            return false;
-        }
+                Type interfaceList = typeof(IList<>).MakeGenericType(arguments);
+                if (type.IsAssignableTo(interfaceList) == false)
+                {
+                    elementType = null;
+                    s_GenericListCache.Add(type, elementType);
+                    return false;
+                }
 
-        OutElementType = Arguments[0];
-        return true;
+                elementType = arguments[0];
+                s_GenericListCache.Add(type, elementType);
+                return true;
+            }
+
+            return elementType != null;
+        }
     }
 
-    public static object InstantiateList(this Type Self)
+    public static object InstantiateList(this Type self)
     {
-        if (Self.IsInterface)
+        if (self.IsInterface)
         {
-            if (Self.GetGenericTypeDefinition() != typeof(IList<>))
+            if (self.GetGenericTypeDefinition() != typeof(IList<>))
             {
                 throw new ArgumentException("Type is interface, but it is not IList<>.");
             }
 
-            Type ListType = typeof(List<>).MakeGenericType(Self.GetGenericArguments());
-            return ListType.GetConstructor(Array.Empty<Type>())!.Invoke(Array.Empty<object>());
+            Type listType = typeof(List<>).MakeGenericType(self.GetGenericArguments());
+            return listType.GetConstructor(Array.Empty<Type>())!.Invoke(Array.Empty<object>());
         }
         else
         {
-            ConstructorInfo? Ctor = Self.GetConstructor(Array.Empty<Type>());
-            if (Ctor == null)
+            ConstructorInfo? constructor = self.GetConstructor(Array.Empty<Type>());
+            if (constructor == null)
             {
                 throw new ArgumentException("List type cannot be create without arguments.");
             }
 
-            return Ctor.Invoke(Array.Empty<object>());
+            return constructor.Invoke(Array.Empty<object>());
         }
     }
 
-    public static bool IsValidIndex<T>(this IReadOnlyList<T> Self, Index Index)
+    private static readonly MethodInfo s_AddMethod = typeof(GenericList).GetMethod(nameof(AddTemplate), BindingFlags.Static | BindingFlags.NonPublic)!;
+
+    public static void Add(object self, object? item)
     {
-        int NumberIndex;
-        if (Index.IsFromEnd)
+        Type listType = self.GetType();
+        MethodInfo instancedMethod = s_AddMethod.MakeGenericMethod(listType.GetGenericArguments());
+        instancedMethod.Invoke(null, new object?[] { self, item });
+    }
+
+    private static void AddTemplate<T>(this IList<T> self, T item)
+    {
+        self.Add(item);
+    }
+
+    private static readonly MethodInfo s_AddRangeMethod = typeof(GenericList).GetMethod(nameof(AddRangeTemplate), BindingFlags.Static | BindingFlags.NonPublic)!;
+
+    public static void AddRange(object self, object collection)
+    {
+        Type listType = self.GetType();
+        MethodInfo instancedMethod = s_AddRangeMethod.MakeGenericMethod(listType.GetGenericArguments());
+        instancedMethod.Invoke(null, new object[] { self, collection });
+    }
+
+    private static void AddRangeTemplate<T>(this IList<T> self, IEnumerable collection)
+    {
+        if (collection is IEnumerable<T> tCollection && self is List<T> list)
         {
-            NumberIndex = Self.Count - Index.Value;
-        }
-        else
-        {
-            NumberIndex = Index.Value;
-        }
-        return Self.Count > NumberIndex;
-    }
-
-#pragma warning disable IDE0051
-    private static readonly MethodInfo GenericAddMethod = typeof(GenericList).GetMethod("GenericAddTemplate", BindingFlags.Static | BindingFlags.NonPublic)!;
-
-    public static void GenericAdd(this object Self, object? Item)
-    {
-        Type ListType = Self.GetType();
-        MethodInfo InstancedMethod = GenericAddMethod.MakeGenericMethod(ListType.GetGenericArguments());
-        InstancedMethod.Invoke(null, new object?[] { Self, Item });
-    }
-
-    private static void GenericAddTemplate<T>(this IList<T> Self, T Item)
-    {
-        Self.Add(Item);
-    }
-
-    private static readonly MethodInfo GenericAddRangeMethod = typeof(GenericList).GetMethod("GenericAddRangeTemplate", BindingFlags.Static | BindingFlags.NonPublic)!;
-
-    public static void GenericAddRange(this object Self, object Collection)
-    {
-        Type ListType = Self.GetType();
-        MethodInfo InstancedMethod = GenericAddRangeMethod.MakeGenericMethod(ListType.GetGenericArguments());
-        InstancedMethod.Invoke(null, new object[] { Self, Collection });
-    }
-
-    private static void GenericAddRangeTemplate<T>(this IList<T> Self, IEnumerable Collection)
-    {
-        if (Collection is IEnumerable<T> TCollection && Self is List<T> List)
-        {
-            List.AddRange(TCollection);
+            list.AddRange(tCollection);
         }
         else
         {
-            foreach (var Elem in Collection)
+            foreach (var element in collection)
             {
-                Self.Add((T)Elem);
+                self.Add((T)element);
             }
         }
     }
-#pragma warning restore IDE0051
 }

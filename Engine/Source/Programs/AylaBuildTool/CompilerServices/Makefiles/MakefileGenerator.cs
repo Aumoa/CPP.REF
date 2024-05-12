@@ -1,13 +1,9 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Data;
-using AE.Extensions;
-using AE.IO;
-using AE.Projects;
-
 using Microsoft.CodeAnalysis;
 
-namespace AE.CompilerServices.Makefiles;
+namespace AylaEngine;
 
 public static class MakefileGenerator
 {

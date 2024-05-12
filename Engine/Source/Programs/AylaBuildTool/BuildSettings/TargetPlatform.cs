@@ -1,8 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.Platform;
-
-namespace AE.BuildSettings;
+namespace AylaEngine;
 
 public class TargetPlatform
 {

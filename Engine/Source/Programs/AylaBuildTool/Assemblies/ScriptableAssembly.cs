@@ -1,14 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Reflection;
 
-using AE.Compilation;
-using AE.Exceptions;
-using AE.IO;
-using AE.Rules;
-using AE.Source;
-
-namespace AE.Assemblies;
+namespace AylaEngine;
 
 public abstract class ScriptableAssembly
 {
@@ -79,7 +73,7 @@ public abstract class ScriptableAssembly
     {
         if (scriptFile.IsExists == false)
         {
-            throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.TargetRuleNotFound(ProjectDirectory.Source.Root, scriptFile.FileName));
+            throw new TerminateException(KnownErrorCode.TargetNotFound, Locale.Errors.TargetRuleNotFound(ProjectDirectory.Source.Root, scriptFile.FileName));
         }
 
         var assemblyCacheDirectory = ProjectDirectory.Intermediate.Assemblies;

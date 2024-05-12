@@ -1,9 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.CompilerServices.Makefiles;
-using AE.Platform;
-
-namespace AE.CompilerServices;
+namespace AylaEngine;
 
 public static class ShaderCompileTasks
 {

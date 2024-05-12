@@ -1,17 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using System.Xml.Linq;
-
-using AE.BuildSettings;
-using AE.CLI;
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.Platform;
-using AE.Projects;
-using AE.Rules;
-using AE.System;
-
-namespace AE.Executors;
+namespace AylaEngine;
 
 public class BuildExecutor : ProjectBasedExecutor, IExecutor
 {
@@ -57,7 +46,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         {
             PlatformID.Win32NT => TargetPlatform.Win64,
             //PlatformID.Unix => TargetPlatform.Linux,
-            _ => throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, CoreStrings.Errors.NotSupportedBuildHostPlatform)
+            _ => throw new TerminateException(KnownErrorCode.NotSupportedBuildHostPlatform, Locale.Errors.NotSupportedBuildHostPlatform)
         };
 
         var targetInfo = new TargetInfo
@@ -89,7 +78,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
             Target.Create(binariesTargetInfo, false);
             ModuleDependencyCache.BuildCache("ShaderCompileWorker", string.Empty);
 
-            if (await ModuleCompiler.CompileAsync("ShaderCompileWorker", Global.EngineDirectory, true, cancellationToken) == false)
+            if (await ModuleCompiler.CompileAsync("ShaderCompileWorker", cancellationToken) == false)
             {
                 return -1;
             }
@@ -99,7 +88,7 @@ public class BuildExecutor : ProjectBasedExecutor, IExecutor
         }
 
 
-        if (await ModuleCompiler.CompileAsync(buildArgs.Target, Workspace.Current, cancellationToken: cancellationToken) == false)
+        if (await ModuleCompiler.CompileAsync(buildArgs.Target, cancellationToken: cancellationToken) == false)
         {
             return -1;
         }

@@ -1,9 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.Projects;
-using AE.Rules;
-
-namespace AE.Platform;
+namespace AylaEngine;
 
 public abstract class Linker
 {

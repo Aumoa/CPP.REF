@@ -1,16 +1,16 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-namespace AE.Compilation;
+namespace AylaEngine;
 
 public class ClassNotFoundException : Exception
 {
-    public ClassNotFoundException(string AssemblyName, Type ClassType)
-        : base(FormatMessage(AssemblyName, ClassType))
+    public ClassNotFoundException(string assemblyName, Type classType)
+        : base(FormatMessage(assemblyName, classType))
     {
     }
 
-    private static string FormatMessage(string AssemblyName, Type ClassType)
+    private static string FormatMessage(string assemblyName, Type classType)
     {
-        return $"Cannot find `{ClassType.Name}` class in `{AssemblyName}` assembly.";
+        return $"Cannot find `{classType.Name}` class in `{assemblyName}` assembly.";
     }
 }

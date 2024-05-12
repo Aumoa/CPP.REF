@@ -1,9 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.BuildSettings;
-using AE.IO;
-
-namespace AE.Source;
+namespace AylaEngine;
 
 public readonly struct BinariesDirectory
 {

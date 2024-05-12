@@ -1,10 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.IO;
-using AE.Rules;
-using AE.Source;
-
-namespace AE.Projects;
+namespace AylaEngine;
 
 public record ModuleInformation
 {

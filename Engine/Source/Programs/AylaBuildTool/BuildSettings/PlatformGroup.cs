@@ -1,6 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-namespace AE.BuildSettings;
+namespace AylaEngine;
 
 public class PlatformGroup
 {
@@ -21,6 +21,6 @@ public class PlatformGroup
     public static void ForEach(Action<PlatformGroup> Body)
     {
         Body(Windows);
-//        Body(Linux);
+        Body(Linux);
     }
 }

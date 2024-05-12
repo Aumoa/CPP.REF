@@ -1,18 +1,7 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Reflection;
-using System.Text;
-
-using AE.BuildSettings;
-using AE.CLI;
-using AE.Diagnostics;
-using AE.Exceptions;
-using AE.Executors;
-using AE.Misc;
-using AE.Platform;
-using AE.Projects;
-using AE.Rules;
-using AE.Source;
+using AylaEngine;
 
 if (args.IsValidIndex(0) == false)
 {
@@ -21,7 +10,7 @@ if (args.IsValidIndex(0) == false)
 }
 
 string ExecutorName = args[0];
-Type? ExecutorType = typeof(IExecutor).Assembly.GetType("AE.Executors." + ExecutorName + "Executor");
+Type? ExecutorType = typeof(IExecutor).Assembly.GetType("AylaEngine." + ExecutorName + "Executor");
 if (ExecutorType == null)
 {
     Console.Error.WriteLine("Executor {0} is not valid. Cannot find class.", ExecutorName);

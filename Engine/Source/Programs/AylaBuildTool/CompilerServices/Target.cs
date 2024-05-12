@@ -1,13 +1,6 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using System.Diagnostics;
-
-using AE.BuildSettings;
-using AE.Platform;
-using AE.Rules;
-using AE.Source;
-
-namespace AE.CompilerServices;
+namespace AylaEngine;
 
 public static class Target
 {

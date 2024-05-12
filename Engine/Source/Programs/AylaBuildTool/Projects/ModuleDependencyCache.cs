@@ -1,14 +1,8 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Data;
 
-using AE.Assemblies;
-using AE.Exceptions;
-using AE.Extensions;
-using AE.IO;
-using AE.Rules;
-
-namespace AE.Projects;
+namespace AylaEngine;
 
 public static class ModuleDependencyCache
 {
@@ -51,11 +45,11 @@ public static class ModuleDependencyCache
             string message;
             if (string.IsNullOrEmpty(source))
             {
-                message = CoreStrings.Errors.ModuleNotFound(name);
+                message = Locale.Errors.ModuleNotFound(name);
             }
             else
             {
-                message = CoreStrings.Errors.DependencyModuleNotFound(source, name);
+                message = Locale.Errors.DependencyModuleNotFound(source, name);
             }
             throw new TerminateException(KnownErrorCode.ModuleNotFound, message);
         }

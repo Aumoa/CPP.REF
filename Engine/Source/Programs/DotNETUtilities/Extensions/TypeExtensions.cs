@@ -1,12 +1,12 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-namespace AE.Misc;
+namespace AylaEngine;
 
 public static class TypeExtensions
 {
-    public static bool IsIntegral(this Type InType)
+    public static bool IsIntegral(this Type type)
     {
-        return Type.GetTypeCode(InType) switch
+        return Type.GetTypeCode(type) switch
         {
             TypeCode.Byte or
             TypeCode.SByte or
@@ -20,9 +20,9 @@ public static class TypeExtensions
         };
     }
 
-    public static bool IsSignedIntegral(this Type InType)
+    public static bool IsSignedIntegral(this Type type)
     {
-        return Type.GetTypeCode(InType) switch
+        return Type.GetTypeCode(type) switch
         {
             TypeCode.SByte or
             TypeCode.Int16 or
@@ -32,9 +32,9 @@ public static class TypeExtensions
         };
     }
 
-    public static bool IsUnsignedIntegral(this Type InType)
+    public static bool IsUnsignedIntegral(this Type type)
     {
-        return Type.GetTypeCode(InType) switch
+        return Type.GetTypeCode(type) switch
         {
             TypeCode.Byte or
             TypeCode.UInt16 or
@@ -44,9 +44,9 @@ public static class TypeExtensions
         };
     }
 
-    public static bool IsFloating(this Type InType)
+    public static bool IsFloating(this Type type)
     {
-        return Type.GetTypeCode(InType) switch
+        return Type.GetTypeCode(type) switch
         {
             TypeCode.Single or
             TypeCode.Double or
@@ -55,13 +55,13 @@ public static class TypeExtensions
         };
     }
 
-    public static bool IsString(this Type InType)
+    public static bool IsString(this Type type)
     {
-        return Type.GetTypeCode(InType) == TypeCode.String;
+        return Type.GetTypeCode(type) == TypeCode.String;
     }
 
-    public static bool IsBoolean(this Type InType)
+    public static bool IsBoolean(this Type type)
     {
-        return Type.GetTypeCode(InType) == TypeCode.Boolean;
+        return Type.GetTypeCode(type) == TypeCode.Boolean;
     }
 }

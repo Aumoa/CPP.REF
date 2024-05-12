@@ -1,10 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics.CodeAnalysis;
-using AE.IO;
-using AE.Source;
 
-namespace AE.Assemblies;
+namespace AylaEngine;
 
 public class CppAssembly : ModuleAssembly
 {

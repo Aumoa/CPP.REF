@@ -1,15 +1,9 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Data;
 using System.Diagnostics;
 
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.Projects;
-using AE.Rules;
-
-namespace AE.Platform.Windows;
+namespace AylaEngine;
 
 public class VSLinker : Linker
 {

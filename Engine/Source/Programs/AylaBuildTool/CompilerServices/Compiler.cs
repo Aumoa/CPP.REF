@@ -1,9 +1,6 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using AE.BuildSettings;
-using AE.CompilerServices.Makefiles;
-
-namespace AE.CompilerServices;
+namespace AylaEngine;
 
 public abstract class Compiler
 {

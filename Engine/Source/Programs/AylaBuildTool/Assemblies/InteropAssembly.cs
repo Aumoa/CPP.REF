@@ -1,11 +1,8 @@
 ﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics.CodeAnalysis;
-using AE.IO;
-using AE.Rules;
-using AE.Source;
 
-namespace AE.Assemblies;
+namespace AylaEngine;
 
 public class InteropAssembly : ModuleAssembly
 {

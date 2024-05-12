@@ -1,14 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
 
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.Exceptions;
-using AE.Projects;
-using AE.Rules;
-
-namespace AE.Platform.Linux;
+namespace AylaEngine;
 
 public class GccLinker : Linker
 {
@@ -57,7 +51,7 @@ public class GccLinker : Linker
         }
         else
         {
-            throw new TerminateException(KnownErrorCode.NotSupportedType, CoreStrings.Errors.NotSupportedType("TargetType", "SlateApplication"));
+            throw new TerminateException(KnownErrorCode.NotSupportedType, Locale.Errors.NotSupportedType("TargetType", "SlateApplication"));
         }
     }
 

@@ -1,26 +1,14 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-using System.Diagnostics;
-using System.Threading.Channels;
-using AE.CompilerServices.Makefiles;
-using AE.Diagnostics;
-using AE.Exceptions;
-using AE.Extensions;
-using AE.Platform;
-using AE.Projects;
-using AE.Rules;
-using AE.Source;
-using AE.System;
-
-namespace AE.CompilerServices;
+namespace AylaEngine;
 
 public static class ModuleCompiler
 {
-    public static async Task<bool> CompileAsync(string targetName, ProjectDirectory projectDirectory, bool suppressShaderCompiler = false, CancellationToken cancellationToken = default)
+    public static async Task<bool> CompileAsync(string targetName, CancellationToken cancellationToken = default)
     {
         if (Workspace.TryFindModule(targetName, out var assembly) == false)
         {
-            throw new TerminateException(KnownErrorCode.TargetNotFound, CoreStrings.Errors.TargetNotFoundException(targetName));
+            throw new TerminateException(KnownErrorCode.TargetNotFound, Locale.Errors.TargetNotFoundException(targetName));
         }
 
         MakefileGenerator.Clear();

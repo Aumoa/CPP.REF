@@ -1,14 +1,8 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
-using System.Text;
 
-using AE.AppHelper;
-using AE.BuildSettings;
-using AE.CompilerServices.Makefiles;
-using AE.Exceptions;
-
-namespace AE.CompilerServices;
+namespace AylaEngine;
 
 public class ShaderCompiler : Compiler
 {

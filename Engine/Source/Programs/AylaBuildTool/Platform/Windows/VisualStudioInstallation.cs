@@ -1,12 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
-
-using AE.CompilerServices;
-using AE.Misc;
-using AE.System;
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using Microsoft.VisualStudio.Setup.Configuration;
 
-namespace AE.Platform.Windows;
+namespace AylaEngine;
 
 public class VisualStudioInstallation : ToolChainInstallation
 {
@@ -54,7 +50,7 @@ public class VisualStudioInstallation : ToolChainInstallation
                     Version CurrentVersion = InCompiler switch
                     {
                         CompilerVersion.VisualStudio2022 => new Version(17, 0),
-                        _ => throw new ArgumentException(CoreStrings.Errors.CompilerNotSupported, nameof(InCompiler))
+                        _ => throw new ArgumentException(Locale.Errors.CompilerNotSupported, nameof(InCompiler))
                     };
 
                     if (InstallVersion < CurrentVersion || InstallVersion > new Version(CurrentVersion.Major, 99))
@@ -103,14 +99,14 @@ public class VisualStudioInstallation : ToolChainInstallation
             string ArchPath = TargetArchitecture switch
             {
                 Architecture.x64 => "x64",
-                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture(TargetArchitecture.ToString())))
+                _ => throw new InvalidOperationException(string.Format(Locale.Errors.NotSupportedArchitecture(TargetArchitecture.ToString())))
             };
 
             string CompilerPath;
             string MSVCToolsetsPath = Path.Combine(BaseDirectory, "VC", "Tools", "MSVC");
             if (Directory.Exists(MSVCToolsetsPath) == false)
             {
-                throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
+                throw new InvalidOperationException(Locale.Errors.InvalidToolChainInstallation);
             }
 
             List<string> CompilerVersions = new();
@@ -122,14 +118,14 @@ public class VisualStudioInstallation : ToolChainInstallation
             string HostArchitecture = BuildHostPlatform.Current.Platform.Architecture switch
             {
                 Architecture.x64 => "Hostx64",
-                _ => throw new NotSupportedException(CoreStrings.Errors.NotSupportedBuildHostPlatform)
+                _ => throw new NotSupportedException(Locale.Errors.NotSupportedBuildHostPlatform)
             };
 
             Version LatestVersion = SelectVersion(CompilerVersions);
             CompilerPath = Path.Combine(MSVCToolsetsPath, LatestVersion.ToString(), "bin", HostArchitecture, ArchPath);
             if (File.Exists(Path.Combine(CompilerPath, "cl.exe")) == false)
             {
-                throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
+                throw new InvalidOperationException(Locale.Errors.InvalidToolChainInstallation);
             }
 
             PathSet.CompilerPath = CompilerPath;
@@ -160,7 +156,7 @@ public class VisualStudioInstallation : ToolChainInstallation
             string ArchPath = InArchitecture switch
             {
                 Architecture.x64 => "x64",
-                _ => throw new InvalidOperationException(string.Format(CoreStrings.Errors.NotSupportedArchitecture(InArchitecture.ToString())))
+                _ => throw new InvalidOperationException(string.Format(Locale.Errors.NotSupportedArchitecture(InArchitecture.ToString())))
             };
 
             List<string> CandidateVersions = new();
@@ -193,7 +189,7 @@ public class VisualStudioInstallation : ToolChainInstallation
 
             if (CandidateVersions.Count == 0)
             {
-                throw new InvalidOperationException(CoreStrings.Errors.InvalidToolChainInstallation);
+                throw new InvalidOperationException(Locale.Errors.InvalidToolChainInstallation);
             }
 
             const string BaseIncludeDirectory = "C:\\Program Files (x86)\\Windows Kits\\10\\Include";

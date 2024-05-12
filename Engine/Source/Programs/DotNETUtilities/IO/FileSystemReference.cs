@@ -1,8 +1,6 @@
 ﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-using AE.Misc;
-
-namespace AE.IO;
+namespace AylaEngine;
 
 public abstract class FileSystemReference : IEquatable<FileSystemReference>
 {

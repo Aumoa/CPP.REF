@@ -8,7 +8,7 @@
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
     <OutputType>Exe</OutputType>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<RootNamespace>AE</RootNamespace>
+	<RootNamespace>AylaEngine</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,8 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AylaLocalization\AylaLocalization.csproj" />
     <ProjectReference Include="..\DotNETUtilities\DotNETUtilities.csproj" />
+    <ProjectReference Include="..\VSCore\VSCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Localizational\" />
   </ItemGroup>
 
 </Project>

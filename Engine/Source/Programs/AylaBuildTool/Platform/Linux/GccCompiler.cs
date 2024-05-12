@@ -1,13 +1,8 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using System.Diagnostics;
 
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.CompilerServices.Makefiles;
-using AE.Exceptions;
-
-namespace AE.Platform.Linux;
+namespace AylaEngine;
 
 public class GccCompiler(LinuxToolChain toolChain, string compilerPath) : Compiler
 {

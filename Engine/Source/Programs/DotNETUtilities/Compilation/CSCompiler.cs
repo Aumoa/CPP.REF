@@ -1,4 +1,4 @@
-﻿// Copyright 2020-2022 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,70 +7,70 @@ using Microsoft.CodeAnalysis.Text;
 
 using System.Reflection;
 
-namespace AE.Compilation;
+namespace AylaEngine;
 
 public static class CSCompiler
 {
-    public static async Task<MemoryStream> InternalCompileAsync(string AssemblyName, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken SToken = default)
+    public static async Task<MemoryStream> InternalCompileAsync(string assemblyName, IEnumerable<string> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
     {
-        CSharpParseOptions ParseOptions = new(LanguageVersion.CSharp11);
-        List<SyntaxTree> SyntaxTrees = new();
-        List<Diagnostic> CompileErrors = new();
+        CSharpParseOptions parseOptions = new(LanguageVersion.CSharp11);
+        List<SyntaxTree> syntaxTrees = new();
+        List<Diagnostic> compileErrors = new();
 
-        foreach (var SourceFile in SourceFiles)
+        foreach (var sourceFile in sourceFiles)
         {
-            var Source = SourceText.From(await File.ReadAllTextAsync(SourceFile, SToken));
-            var Syntax = await Task.Run(() => CSharpSyntaxTree.ParseText(Source, ParseOptions, SourceFile, SToken));
+            var source = SourceText.From(await File.ReadAllTextAsync(sourceFile, cancellationToken));
+            var syntax = await Task.Run(() => CSharpSyntaxTree.ParseText(source, parseOptions, sourceFile, cancellationToken));
 
             // Check syntax error.
-            IEnumerable<Diagnostic> Diagnostics = Syntax.GetDiagnostics(SToken);
-            if (Diagnostics.Any())
+            IEnumerable<Diagnostic> diagnostics = syntax.GetDiagnostics(cancellationToken);
+            if (diagnostics.Any())
             {
-                CompileErrors.AddRange(Diagnostics);
+                compileErrors.AddRange(diagnostics);
             }
             else
             {
-                SyntaxTrees.Add(Syntax);
+                syntaxTrees.Add(syntax);
             }
         }
 
-        if (CompileErrors.Any())
+        if (compileErrors.Any())
         {
-            throw new CSCompilerError(CompileErrors);
+            throw new CSCompilerError(compileErrors);
         }
 
-        var MetadataReferences = ReferencedAssemblies.Select(AssemblyPath => MetadataReference.CreateFromFile(AssemblyPath));
-        var CompilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, true, optimizationLevel: OptimizationLevel.Release);
-        var Compilation = CSharpCompilation.Create(AssemblyName, SyntaxTrees, MetadataReferences, CompilerOptions);
+        var metadataReferences = referencedAssemblies.Select(AssemblyPath => MetadataReference.CreateFromFile(AssemblyPath));
+        var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, true, optimizationLevel: OptimizationLevel.Release);
+        var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilerOptions);
 
-        MemoryStream CompiledBinary = new();
-        var EmitOptions = new EmitOptions(includePrivateMembers: true);
-        var EmitResult = await Task.Run(() => Compilation.Emit(CompiledBinary, options: EmitOptions, cancellationToken: SToken));
-        if (EmitResult.Success == false)
+        MemoryStream compiledBinary = new();
+        var emitOptions = new EmitOptions(includePrivateMembers: true);
+        var emitResult = await Task.Run(() => compilation.Emit(compiledBinary, options: emitOptions, cancellationToken: cancellationToken));
+        if (emitResult.Success == false)
         {
-            throw new CSCompilerError(EmitResult.Diagnostics);
+            throw new CSCompilerError(emitResult.Diagnostics);
         }
 
-        return CompiledBinary;
+        return compiledBinary;
     }
 
-    public static async Task<Assembly> CompileAsync(string AssemblyName, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken SToken = default)
+    public static async Task<Assembly> CompileAsync(string assemblyName, IEnumerable<string> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
     {
-        using MemoryStream CompiledBinary = await InternalCompileAsync(AssemblyName, SourceFiles, ReferencedAssemblies, SToken);
-        return Assembly.Load(CompiledBinary.GetBuffer());
+        using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
+        return Assembly.Load(compiledBinary.GetBuffer());
     }
 
-    public static async Task CompileToAsync(string AssemblyName, string SaveTo, IEnumerable<string> SourceFiles, IEnumerable<string> ReferencedAssemblies, CancellationToken SToken = default)
+    public static async Task CompileToAsync(string assemblyName, string saveTo, IEnumerable<string> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
     {
-        using MemoryStream CompiledBinary = await InternalCompileAsync(AssemblyName, SourceFiles, ReferencedAssemblies, SToken);
-        await File.WriteAllBytesAsync(SaveTo, CompiledBinary.GetBuffer(), SToken);
+        using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
+        await File.WriteAllBytesAsync(saveTo, compiledBinary.GetBuffer(), cancellationToken);
     }
 
-    public static async Task<Assembly> CompileAsync(string AssemblyName, string SourceFile, IEnumerable<string> ReferencedAssemblies, bool bIncludeBaseAssemblies = true, CancellationToken CToken = default)
+    public static async Task<Assembly> CompileAsync(string assemblyName, string sourceFile, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
     {
-        if (bIncludeBaseAssemblies)
+        if (includeBaseAssemblies)
         {
-            ReferencedAssemblies = ReferencedAssemblies.Concat(new string[]
+            referencedAssemblies = referencedAssemblies.Concat(new string[]
             {
                 typeof(object).Assembly.Location,
                 Assembly.Load("System.Runtime").Location,
@@ -78,25 +78,25 @@ public static class CSCompiler
             });
         }
 
-        Assembly CompiledAssembly = await CompileAsync(AssemblyName, new string[] { SourceFile }, ReferencedAssemblies, CToken);
-        return CompiledAssembly;
+        Assembly compiledAssembly = await CompileAsync(assemblyName, new string[] { sourceFile }, referencedAssemblies, cancellationToken);
+        return compiledAssembly;
     }
 
-    public static async Task<Type> LoadClassAsync<TBaseClass>(string SourceFile, CancellationToken CToken = default)
+    public static async Task<Type> LoadClassAsync<TBaseClass>(string sourceFile, CancellationToken cancellationToken = default)
     {
-        Type BasedType = typeof(TBaseClass);
+        Type basedType = typeof(TBaseClass);
 
-        string AssemblyName = Path.GetFileNameWithoutExtension(SourceFile);
-        Assembly CompiledAssembly = await CompileAsync(AssemblyName, SourceFile, new[] { BasedType.Assembly.Location }, CToken: CToken);
+        string assemblyName = Path.GetFileNameWithoutExtension(sourceFile);
+        Assembly compiledAssembly = await CompileAsync(assemblyName, sourceFile, new[] { basedType.Assembly.Location }, cancellationToken: cancellationToken);
 
-        foreach (var Type in CompiledAssembly.GetTypes())
+        foreach (var type in compiledAssembly.GetTypes())
         {
-            if (Type.IsAssignableTo(BasedType))
+            if (type.IsAssignableTo(basedType))
             {
-                return Type;
+                return type;
             }
         }
 
-        throw new ClassNotFoundException(AssemblyName, BasedType);
+        throw new ClassNotFoundException(assemblyName, basedType);
     }
 }

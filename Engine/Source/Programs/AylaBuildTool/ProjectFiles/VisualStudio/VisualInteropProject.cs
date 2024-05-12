@@ -4,16 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml;
-using AE.Assemblies;
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.Extensions;
-using AE.IO;
-using AE.Misc;
-using AE.Projects;
-using AE.Source;
 
-namespace AE.ProjectFiles.VisualStudio;
+namespace AylaEngine;
 
 public class VisualInteropProject : VisualStudioProject
 {
@@ -92,9 +84,9 @@ public class VisualInteropProject : VisualStudioProject
 
         string outputType = m_ModuleInfo.TargetType switch
         {
-            Rules.ModuleRules.ModuleType.Library => "Library",
-            Rules.ModuleRules.ModuleType.ConsoleApplication => "Exe",
-            Rules.ModuleRules.ModuleType.Application => "WinExe",
+            ModuleRules.ModuleType.Library => "Library",
+            ModuleRules.ModuleType.ConsoleApplication => "Exe",
+            ModuleRules.ModuleType.Application => "WinExe",
             _ => string.Empty
         };
 

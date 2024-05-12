@@ -1,6 +1,6 @@
-﻿// Copyright 2020-2023 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-namespace AE.CompilerServices.Makefiles;
+namespace AylaEngine;
 
 public abstract class MakefileNode
 {
