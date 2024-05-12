@@ -14,7 +14,6 @@ namespace Windows
 
             PublicDependencyModuleNames.AddRange(new[]
             {
-                "CoreAObject.Interop",
                 "ApplicationCore.Interop"
             });
         }

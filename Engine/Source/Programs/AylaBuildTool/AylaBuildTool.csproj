@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SourceTree\**" />
+    <EmbeddedResource Remove="SourceTree\**" />
+    <None Remove="SourceTree\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
@@ -22,10 +28,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AylaLocalization\AylaLocalization.csproj" />
     <ProjectReference Include="..\DotNETUtilities\DotNETUtilities.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SourceTree\" />
   </ItemGroup>
 
 </Project>

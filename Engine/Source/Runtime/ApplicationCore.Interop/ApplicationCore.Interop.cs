@@ -10,7 +10,7 @@ public class ApplicationCore : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "CoreAObject.Interop"
+            "Core.Interop"
         });
     }
 }

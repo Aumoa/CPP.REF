@@ -10,7 +10,7 @@ public class Engine : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new[]
         {
-            "CoreAObject.Interop"
+            "Core.Interop"
         });
     }
 }

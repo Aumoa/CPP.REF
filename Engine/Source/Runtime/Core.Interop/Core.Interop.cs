@@ -1,9 +1,9 @@
 ﻿using System;
 using AE.Rules;
 
-public class CoreAObject : ModuleRules
+public class Core : ModuleRules
 {
-    public CoreAObject(TargetInfo targetInfo) : base(targetInfo)
+    public Core(TargetInfo targetInfo) : base(targetInfo)
     {
         PublicIncludePaths.Add("Public");
         PrivateIncludePaths.Add("Private");

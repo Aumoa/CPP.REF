@@ -397,7 +397,7 @@ public class VisualCppProject : VisualStudioProject
                                 commandArgs = string.Empty;
                                 break;
                             case Rules.ModuleRules.ModuleType.Library:
-                                executable = Global.EngineDirectory.Binaries.Root.GetHierarchy("Win64", Config.IsDebug() ? "Debug" : "Development").GetFile("Launch").WithExtensions(".exe");
+                                executable = Global.EngineDirectory.Binaries.Root.GetHierarchy("Interop", Config.IsDebug() ? "Debug" : "Release").GetFile("Windows.Launch.Interop").WithExtensions(".exe");
                                 commandArgs = $"-GameAssembly {assembly.Name}";
                                 break;
                             default:
